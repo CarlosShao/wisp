@@ -1,0 +1,104 @@
+format rulers, 8 combos (gofumpt x gofmt, work tree x out-of-repo blob tree)
+blob tree = tracked .go at HEAD materialized at %LOCALAPPDATA%/Temp/wisp-299r1b-blobs (1003 files, LF)
+
+ruler                         all  cmd/wisp  cmd/wisp offenders
+B1 gofumpt blob-walk           20         1  ['cmd/wisp/panel_transport_35r2_test.go']
+B2 gofumpt work-walk           48         2  ['cmd/wisp/models.go', 'cmd/wisp/panel_transport_35r2_test.go']
+A1 gofumpt work-tracked        33         2  ['cmd/wisp/models.go', 'cmd/wisp/panel_transport_35r2_test.go']
+A2 gofumpt blob-tracked        20         1  ['cmd/wisp/panel_transport_35r2_test.go']
+C1 gofmt blob-walk             15         0  []
+C2 gofmt work-walk             41         1  ['cmd/wisp/models.go']
+C3 gofmt work-tracked          27         1  ['cmd/wisp/models.go']
+C4 gofmt blob-tracked          15         0  []
+
+gofumpt work-only (walk)   : 28
+    .scratch/wisp/probes/161/r1/runs/b8-probe-bands/internal/a/p_b8.go
+    .scratch/wisp/probes/161/r1/runs/unp-bad/internal/a/p_unp.go
+    .scratch/wisp/probes/161/r1/runs/unp-hides-bans/internal/a/p_unp.go
+    .scratch/wisp/probes/161/r3/pre-format/guard.no1.go
+    .scratch/wisp/probes/161/r3/pre-format/guard.no2.go
+    .scratch/wisp/probes/161/r3/pre-format/guard.no3.go
+    .scratch/wisp/probes/161/r5/negative-control/bad-sample.go
+    .scratch/wisp/probes/162/r4/fs_write_m2.go
+    .scratch/wisp/probes/224/v2/posctrl.go
+    .scratch/wisp/probes/226/v1/probe2/main.go
+    .scratch/wisp/probes/226/v1/probe3/main.go
+    .scratch/wisp/probes/226/v1/probe4/main.go
+    .scratch/wisp/probes/226/v1/probe7/main.go
+    .scratch/wisp/probes/257/r2/mut/M1/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M2/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M3/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M4/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M5/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M6/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M7/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M8/firstrun_257_nonpreset_test.go
+    .scratch/wisp/probes/263/v1/src/main.go
+    .scratch/wisp/probes/33/r5/block_ac13_ac14.go
+    .scratch/wisp/probes/33/r5/logs/prev-test-copy.go
+    cmd/wisp/models.go
+    internal/agent/approval/pending_read.go
+    internal/agent/tools.go
+    internal/risk/provenance.go
+gofumpt work-only (tracked): 13
+    .scratch/wisp/probes/257/r2/mut/M1/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M2/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M3/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M4/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M5/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M6/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M7/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M8/firstrun_257_nonpreset_test.go
+    .scratch/wisp/probes/263/v1/src/main.go
+    cmd/wisp/models.go
+    internal/agent/approval/pending_read.go
+    internal/agent/tools.go
+    internal/risk/provenance.go
+gofmt   work-only (walk)   : 26
+    .scratch/wisp/probes/161/r1/runs/b8-probe-bands/internal/a/p_b8.go
+    .scratch/wisp/probes/161/r1/runs/unp-bad/internal/a/p_unp.go
+    .scratch/wisp/probes/161/r1/runs/unp-hides-bans/internal/a/p_unp.go
+    .scratch/wisp/probes/161/r3/pre-format/guard.no1.go
+    .scratch/wisp/probes/161/r3/pre-format/guard.no3.go
+    .scratch/wisp/probes/161/r5/negative-control/bad-sample.go
+    .scratch/wisp/probes/162/r4/fs_write_m2.go
+    .scratch/wisp/probes/224/v2/posctrl.go
+    .scratch/wisp/probes/226/v1/probe2/main.go
+    .scratch/wisp/probes/226/v1/probe3/main.go
+    .scratch/wisp/probes/226/v1/probe4/main.go
+    .scratch/wisp/probes/226/v1/probe7/main.go
+    .scratch/wisp/probes/257/r2/mut/M1/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M2/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M3/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M4/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M5/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M6/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M7/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M8/firstrun_257_nonpreset_test.go
+    .scratch/wisp/probes/33/r5/block_ac13_ac14.go
+    .scratch/wisp/probes/33/r5/logs/prev-test-copy.go
+    cmd/wisp/models.go
+    internal/agent/approval/pending_read.go
+    internal/agent/tools.go
+    internal/risk/provenance.go
+gofmt   work-only (tracked): 12
+    .scratch/wisp/probes/257/r2/mut/M1/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M2/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M3/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M4/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M5/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M6/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M7/firstrun.go
+    .scratch/wisp/probes/257/r2/mut/M8/firstrun_257_nonpreset_test.go
+    cmd/wisp/models.go
+    internal/agent/approval/pending_read.go
+    internal/agent/tools.go
+    internal/risk/provenance.go
+
+MY three edited files in ANY of the 8 offender sets: NONE => net-new offenders from 299-r1b = 0 (both rulers, both trees)
+
+readings for the two cmd/wisp entries that DO appear (neither is mine):
+  cmd/wisp/panel_transport_35r2_test.go: gofumpt-only nit (type grouping), present in BOTH blob and work sets, at HEAD = Q-295-r1-gofumpt-two
+  cmd/wisp/models.go: gofmt+gofumpt flag the WORK bytes only (CR of this machine's checkout); absent from both blob sets, git status clean = Q-295-r1's named CRLF false positive
+  internal/agent/{tools,pending_read}.go + internal/risk/provenance.go: same CRLF shape (work-only, blob-clean)
+  257/r2/mut/M1..M8 + 263/v1/src/main.go: committed by other legs, work bytes carry CR (work-only, blob-clean)

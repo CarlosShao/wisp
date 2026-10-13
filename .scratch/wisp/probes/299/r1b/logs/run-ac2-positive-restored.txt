@@ -1,0 +1,47 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=PATH=... GOFLAGS= go test ./cmd/wisp/ -count=1 -v -run '^TestPanelPageFetchesItsOwnAssets299$'  # positive re-run on the UNTOUCHED tree, after M2
+time=2026-10-13T08:57:14.311+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelPageFetchesItsOwnAssets299
+time=2026-10-13T08:57:14.314+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-13T08:57:14.319+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x289063c"
+time=2026-10-13T08:57:14.319+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x18 known=true"
+time=2026-10-13T08:57:14.319+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x46 known=true"
+time=2026-10-13T08:57:14.321+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x46 known=true"
+time=2026-10-13T08:57:14.322+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x1c known=true"
+time=2026-10-13T08:57:14.323+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x86 known=true"
+time=2026-10-13T08:57:14.325+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x7f known=true"
+time=2026-10-13T08:57:14.325+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x7f known=true"
+time=2026-10-13T08:57:14.325+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x7f known=true"
+time=2026-10-13T08:57:14.325+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x6 known=true"
+time=2026-10-13T08:57:14.335+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x281 known=true"
+time=2026-10-13T08:57:14.339+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x282 known=true"
+time=2026-10-13T08:57:14.340+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x3d known=true"
+time=2026-10-13T08:57:14.340+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x3d known=true"
+time=2026-10-13T08:57:14.340+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x7 known=true"
+time=2026-10-13T08:57:14.340+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x85 known=true"
+time=2026-10-13T08:57:14.340+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x14 known=true"
+time=2026-10-13T08:57:14.341+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x47 known=true"
+time=2026-10-13T08:57:14.341+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x5 known=true"
+time=2026-10-13T08:57:14.341+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x3 known=true"
+time=2026-10-13T08:57:14.341+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-10-13T08:57:14.341+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0xf known=true"
+time=2026-10-13T08:57:14.341+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-10-13T08:57:14.341+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-10-13T08:57:14.341+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-10-13T08:57:14.365+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x210 known=true"
+time=2026-10-13T08:57:14.366+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x7f known=true"
+time=2026-10-13T08:57:14.366+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x31f known=true"
+time=2026-10-13T08:57:14.366+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0xc0f9 known=true"
+time=2026-10-13T08:57:14.373+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x7f known=true"
+time=2026-10-13T08:57:14.373+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x7f known=true"
+time=2026-10-13T08:57:14.780+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-10-13T08:57:14.866+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x14 known=true"
+time=2026-10-13T08:57:14.878+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0xf known=true"
+time=2026-10-13T08:57:14.907+08:00 level=INFO msg="panel host: CreateWebResourceResponse needed attempt 2 of 3 (the stale-GetLastError defect named above)"
+time=2026-10-13T08:57:15.244+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x7f known=true"
+time=2026-10-13T08:57:15.250+08:00 level=INFO msg="MARK299 wndproc hwnd=0x289063c msg=0x7f known=true"
+    panel_assets_299_windows_test.go:217: 299 AC#2 page report (head 91c1d8ab, 1 attempt(s)): "href=https://wisp.panel/index.html;base=https://wisp.panel/index.html;ready=complete;sheets=1;rules=97;root=yes;roottext=100;resjs=1;rescss=1;" | href="https://wisp.panel/index.html" base="https://wisp.panel/index.html" ready="complete" sheets=1 rules=97 root="yes" roottext=100 resjs=1 rescss=1
+--- PASS: TestPanelPageFetchesItsOwnAssets299 (1.11s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.189s
+rc=0

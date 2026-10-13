@@ -1,0 +1,71 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=PATH=... GOFLAGS= go test -overlay '.scratch/wisp/probes/299/r1b/mut/m1-overlay.json' ./cmd/wisp/ -count=1 -v -run '^(TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe|TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe)$'  # M1: probe-last order swap
+time=2026-10-13T08:55:54.870+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe
+    panel_pageover_33r10_windows_test.go:268: AC#13 33-r10 capture: probe document is 136 byte(s), round trip rtMs=0.597
+    panel_pageover_33r10_windows_test.go:270: AC#13 33-r10 world: embed resolves 1044 entry byte(s), 1 element id(s) [root]
+    panel_pageover_33r10_windows_test.go:282: AC#13 33-r10 read: 2 handover act(s), first=nav:"https://wisp.panel/index.html" last=doc:"<!doctype html><html><head><meta charset=\"utf-8\"></head><body><script>if(window.wispProbeRT)window.wispProbeRT();</scrip" rtMs=0.619 entryOK=true
+    panel_pageover_33r10_windows_test.go:287: after a cold start the LAST handover act is doc:"<!doctype html><html><head><meta charset=\"utf-8\"></head><body><script>if(window.wispProbeRT)window.wispProbeRT();</scrip", want a navigation to panelEntryURL "https://wisp.panel/index.html" (ticket 299 AC#1's supply shape: the page's relative ./assets/* references need the synthetic origin, so the entry is navigated to, not SetHtml'd). A last act that is a document is ticket 33 AC#13: the user ends on the probe page instead of the panel.
+    panel_pageover_33r10_windows_test.go:291: the FIRST handover act is no longer the round-trip probe document (nav:"https://wisp.panel/index.html") - the probe stays, it is where cold 'usable' is decided, and AC#13's fix is the ORDER (probe first, entry last), not the probe's removal
+    panel_pageover_33r10_windows_test.go:298: AC#13 33-r10 serving seam: panelAssetLookup("https://wisp.panel/index.html") = status 200 "OK", 1044 byte(s), content-type "text/html; charset=utf-8"
+    panel_pageover_33r10_windows_test.go:320: AC#13 33-r10 read: last act navigates to the entry URL and that URL serves 1 of 1 entry id(s), lookable=true, bytes-equal-to-resolved-entry=true
+--- FAIL: TestAC13ColdStartPageOverEndsOnEntryContentNotTheProbe (0.00s)
+=== RUN   TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+    panel_resident_windows_test.go:394: AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]
+time=2026-10-13T08:55:54.877+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-13T08:55:54.878+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-13T08:55:54.884+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x3b40674"
+time=2026-10-13T08:55:54.884+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x18 known=true"
+time=2026-10-13T08:55:54.884+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x46 known=true"
+time=2026-10-13T08:55:54.887+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x46 known=true"
+time=2026-10-13T08:55:54.888+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x1c known=true"
+time=2026-10-13T08:55:54.889+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x86 known=true"
+time=2026-10-13T08:55:54.890+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:54.890+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:54.890+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:54.891+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x6 known=true"
+time=2026-10-13T08:55:54.900+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x281 known=true"
+time=2026-10-13T08:55:54.904+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x282 known=true"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x3d known=true"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x3d known=true"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7 known=true"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x85 known=true"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x14 known=true"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x47 known=true"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x5 known=true"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x3 known=true"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0xf known=true"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-10-13T08:55:54.906+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-10-13T08:55:54.933+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x210 known=true"
+time=2026-10-13T08:55:54.934+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:54.934+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x31f known=true"
+time=2026-10-13T08:55:54.935+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0xc0f9 known=true"
+time=2026-10-13T08:55:54.941+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:54.941+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:55.233+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:55.234+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:55.378+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-10-13T08:55:55.501+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x14 known=true"
+time=2026-10-13T08:55:55.511+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0xf known=true"
+wisp: panel window is up (test-harness, cold 646.3 ms, hot path 0.0 ms)
+time=2026-10-13T08:55:55.631+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:55.632+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:55.632+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:56.261+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:56.261+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:57.220+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:55:57.221+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x7f known=true"
+time=2026-10-13T08:56:02.953+08:00 level=INFO msg="MARK299 wndproc hwnd=0x3b40674 msg=0x86 known=true"
+    panel_resident_windows_test.go:402: AC#13 no probe attempt over 718 attempt(s) saw a present id; last report: "0"
+    panel_resident_windows_test.go:404: AC#13 page answer (head 91c1d8ab): "0" - 0 of 1 probe id(s) present in the live document
+    panel_resident_windows_test.go:407: after a real cold start the live document contains NONE of the 1 element ids the embedded entry declares (the page itself answered "0"). That is ticket 33 AC#13: the document in the window is not the embedded entry. Since 299-r1 the entry arrives through a navigation plus the resource filter, so this reading is red either when the order is wrong (the round-trip probe page keeping the last word - the defect AC#13 fixed) or when the entry navigation delivers nothing; the fix AC#13 names is the ORDER: bringUp must hand the entry over AFTER the probe - the probe stays, because it is where cold usable is decided
+time=2026-10-13T08:56:10.571+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-13T08:56:10.571+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (15.69s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	15.780s
+FAIL
+rc=1

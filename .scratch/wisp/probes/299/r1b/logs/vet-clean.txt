@@ -1,0 +1,3 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=GOFLAGS= go vet -tags winlive ./cmd/wisp/ ./internal/ball/
+rc=0

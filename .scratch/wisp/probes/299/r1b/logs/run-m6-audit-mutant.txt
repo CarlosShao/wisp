@@ -1,0 +1,14 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=PATH=... GOFLAGS= go test ./cmd/wisp/ -count=1 -v -run '^TestPanelHostOpensNoListeningSocketL1$'  # M6 temp-edit: panel_control_windows.go imports net, restored right after
+time=2026-10-13T08:59:11.227+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelHostOpensNoListeningSocketL1
+    panel_host_gate_test.go:50: panel host source panel_control_windows.go imports "net", which can open a listening socket; D29/AC#3 forbid a localhost server
+--- FAIL: TestPanelHostOpensNoListeningSocketL1 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.070s
+FAIL
+rc=1
+--- restore proof (appended after the run):
+restore source = git show 3b806876:cmd/wisp/panel_control_windows.go
+sha256 after  restore   = 7d257021bdc544a3fccb7971bb60ccacdd419da8f474748e0f844da34d8fdee7 (= leg-start sha256 of this file)
+RESTORE-BYTE-EQUAL yes

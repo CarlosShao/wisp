@@ -1,0 +1,55 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=PATH=... GOFLAGS= go test -overlay '.scratch/wisp/probes/299/r1b/mut/m2-overlay.json' ./cmd/wisp/ -count=1 -v -run '^TestPanelPageFetchesItsOwnAssets299$'  # M2: AddWebResourceRequestedFilter registration hop dropped
+time=2026-10-13T08:56:24.299+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelPageFetchesItsOwnAssets299
+time=2026-10-13T08:56:24.303+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-13T08:56:24.307+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x4ab0bb2"
+time=2026-10-13T08:56:24.307+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x18 known=true"
+time=2026-10-13T08:56:24.307+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x46 known=true"
+time=2026-10-13T08:56:24.310+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x46 known=true"
+time=2026-10-13T08:56:24.311+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x1c known=true"
+time=2026-10-13T08:56:24.312+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x86 known=true"
+time=2026-10-13T08:56:24.314+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:24.315+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:24.315+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:24.316+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x6 known=true"
+time=2026-10-13T08:56:24.327+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x281 known=true"
+time=2026-10-13T08:56:24.331+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x282 known=true"
+time=2026-10-13T08:56:24.333+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x3d known=true"
+time=2026-10-13T08:56:24.333+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x3d known=true"
+time=2026-10-13T08:56:24.333+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7 known=true"
+time=2026-10-13T08:56:24.333+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x85 known=true"
+time=2026-10-13T08:56:24.334+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x14 known=true"
+time=2026-10-13T08:56:24.334+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x47 known=true"
+time=2026-10-13T08:56:24.334+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x5 known=true"
+time=2026-10-13T08:56:24.334+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x3 known=true"
+time=2026-10-13T08:56:24.334+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-10-13T08:56:24.334+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0xf known=true"
+time=2026-10-13T08:56:24.334+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-10-13T08:56:24.334+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-10-13T08:56:24.334+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-10-13T08:56:24.354+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x210 known=true"
+time=2026-10-13T08:56:24.354+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:24.354+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x31f known=true"
+time=2026-10-13T08:56:24.354+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0xc0f9 known=true"
+time=2026-10-13T08:56:24.354+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:24.355+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:24.747+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-10-13T08:56:24.854+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x14 known=true"
+time=2026-10-13T08:56:24.866+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0xf known=true"
+time=2026-10-13T08:56:25.244+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:25.249+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:26.219+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:26.225+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:27.217+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+time=2026-10-13T08:56:27.223+08:00 level=INFO msg="MARK299 wndproc hwnd=0x4ab0bb2 msg=0x7f known=true"
+    panel_assets_299_windows_test.go:217: 299 AC#2 page report (head 91c1d8ab, 10 attempt(s)): "href=chrome-error://chromewebdata/;base=chrome-error://chromewebdata/;ready=complete;sheets=4;rules=264;root=no;roottext=-1;resjs=0;rescss=0;" | href="chrome-error://chromewebdata/" base="chrome-error://chromewebdata/" ready="complete" sheets=4 rules=264 root="no" roottext=-1 resjs=0 rescss=0
+    panel_assets_299_windows_test.go:221: the page is not on the panel's own synthetic origin: it reports href="chrome-error://chromewebdata/", want "https://wisp.panel/index.html" (base="chrome-error://chromewebdata/", ready="complete"). The entry navigation either never committed or was answered by nothing - the page cannot resolve its relative ./assets/* references from anywhere else
+    panel_assets_299_windows_test.go:228: the page reports #root present="no" with -1 character(s) of its own text: the ./assets/*.js bytes either did not arrive or did not run, so the pane shows none of the page's own text nodes - the exact completion criterion ticket 299 AC#1 words (resjs=0 rescss=0)
+--- FAIL: TestPanelPageFetchesItsOwnAssets299 (20.66s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	20.735s
+FAIL
+rc=1
+--- note: this run used -overlay; cmd/wisp/panel_control_windows.go was NEVER written for it.
+the shipped file's sha256 at leg start = 7d257021bdc544a3fccb7971bb60ccacdd419da8f474748e0f844da34d8fdee7 (logs/sha256-before.txt)

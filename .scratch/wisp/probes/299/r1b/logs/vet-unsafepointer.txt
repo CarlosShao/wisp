@@ -1,0 +1,4 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=GOFLAGS= go vet -tags winlive -overlay '.scratch/wisp/probes/299/r1b/mut/m3-overlay.json' ./cmd/wisp/ ./internal/ball/
+.scratch\wisp\probes\299\r1b\mut\m3-panel_control_windows.go.txt:271:22: possible misuse of unsafe.Pointer
+rc=1

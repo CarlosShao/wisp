@@ -1,0 +1,60 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=git ls-files -z '*.go' | git checkout-index --prefix=$LOCALAPPDATA/Temp/wisp-299r1b-blobs/ -z --stdin  (blob tree = tracked .go at HEAD, materialized OUTSIDE the repo)
+--- staged .go diff (must be empty):
+--- dirty .go in worktree:
+ M cmd/wisp/panel_assets_299_windows_test.go
+ M cmd/wisp/panel_control_windows.go
+?? .scratch/.scratch/wisp/probes/222/v1/mutations/asis/bridge.go
+?? .scratch/.scratch/wisp/probes/222/v1/mutations/asis/subagent_197.go
+?? .scratch/probes-242-r1/backup/approval.go
+?? .scratch/probes-242-r1/backup/queue.go
+?? .scratch/probes-242-r1/backup/ui.go
+?? .scratch/probes-255-r1c/schema-pristine.go
+?? .scratch/wisp/probes/161/r2/ctl/neg/n.go
+?? .scratch/wisp/probes/161/r2/ctl/pos/p.go
+?? .scratch/wisp/probes/161/r2/ctl/pos2/r.go
+?? .scratch/wisp/probes/161/r5/negative-control/bad-sample.go
+?? .scratch/wisp/probes/162/r4/fs_edit_m1.go
+?? .scratch/wisp/probes/162/r4/fs_write_m2.go
+?? .scratch/wisp/probes/183/accept-v1/mut-head/provenance.go
+?? .scratch/wisp/probes/183/accept-v1/mut-head/taintmatch.go
+?? .scratch/wisp/probes/183/accept-v1/mut-ma/taintmatch.go
+?? .scratch/wisp/probes/183/accept-v1/mut-mb/provenance.go
+?? .scratch/wisp/probes/183/accept-v1/mut-mc/provenance.go
+?? .scratch/wisp/probes/183/accept-v1/mut-md/provenance.go
+?? .scratch/wisp/probes/183/accept-v1/mut-me/taintmatch.go
+?? .scratch/wisp/probes/183/accept-v1/mut-mf/provenance.go
+?? .scratch/wisp/probes/183/accept-v1/mut/zz183accept_probe_test.go
+?? .scratch/wisp/probes/183/accept-v1/zz183v1_e2e_test.go
+?? .scratch/wisp/probes/197/v1/M4/00_gate.go
+?? .scratch/wisp/probes/197/v1/M4/01_gate.go
+?? .scratch/wisp/probes/198/r1/tmpdump/main.go
+?? .scratch/wisp/probes/224/v2/posctrl.go
+?? .scratch/wisp/probes/226/v1/head-writeguard_226_test.go
+?? .scratch/wisp/probes/226/v1/probe/main.go
+?? .scratch/wisp/probes/226/v1/probe2/main.go
+?? .scratch/wisp/probes/226/v1/probe3/main.go
+?? .scratch/wisp/probes/226/v1/probe4/main.go
+?? .scratch/wisp/probes/226/v1/probe5/main.go
+?? .scratch/wisp/probes/226/v1/probe6/main.go
+?? .scratch/wisp/probes/226/v1/probe7/main.go
+?? .scratch/wisp/probes/239/m1/tokens.go
+?? .scratch/wisp/probes/239/m2/tokens.go
+?? .scratch/wisp/probes/239/m3/renderer_windows.go
+?? .scratch/wisp/probes/242/r1/backup/approval.go
+?? .scratch/wisp/probes/242/r1/backup/queue.go
+?? .scratch/wisp/probes/245/v1/esclistener/main.go
+?? .scratch/wisp/probes/246/r2/mut/base-resident_task_source_windows.go
+?? .scratch/wisp/probes/246/r2/mut/base-run.go
+?? .scratch/wisp/probes/33/r5/block_ac13_ac14.go
+?? .scratch/wisp/probes/33/r5/logs/prev-test-copy.go
+?? .scratch/wisp/probes/62/v1/m1/ball_windows.go
+?? .scratch/wisp/probes/62/v1/m2/liquid.go
+?? .scratch/wisp/probes/62/v1/m3/liquid.go
+?? .scratch/wisp/probes/62/v1/m4/liquid.go
+?? .scratch/wisp/probes/62/v1/m5/dock.go
+?? .scratch/wisp/probes/999/bad-sample.go
+?? .scratch/wisp/probes/signoff-30/ov-head/hit.go
+?? .scratch/wisp/probes/signoff-30/ov-head/renderer_windows.go
+--- tracked .go count:
+1003

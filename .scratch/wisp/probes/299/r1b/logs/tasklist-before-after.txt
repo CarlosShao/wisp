@@ -1,0 +1,13 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=tasklist //FI "IMAGENAME eq wisp.exe" / wisp.test.exe / balldebug.exe  (AFTER the final witness batch; the BEFORE reading was taken 08:47 before any run, same three commands, same result)
+--- before (2026-10-13 08:47 +08):
+wisp.exe:     INFO: No tasks are running which match the specified criteria.
+wisp.test.exe: INFO: No tasks are running which match the specified criteria.
+balldebug.exe: INFO: No tasks are running which match the specified criteria.
+--- after (now):
+wisp.exe:
+INFO: No tasks are running which match the specified criteria.
+wisp.test.exe:
+INFO: No tasks are running which match the specified criteria.
+balldebug.exe:
+INFO: No tasks are running which match the specified criteria.

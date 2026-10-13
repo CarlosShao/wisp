@@ -1,0 +1,3 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
+attrib_rc=2

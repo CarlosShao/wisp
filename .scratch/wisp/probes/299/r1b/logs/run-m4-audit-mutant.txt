@@ -1,0 +1,15 @@
+workdir=D:/work/workspace/projects plans/Wisp
+command_line=PATH=... GOFLAGS= go test ./cmd/wisp/ -count=1 -v -run '^TestTicket255PanelHostBuildsItsWindowOptions$'  # M4 temp-edit: create fed from a local var, restored right after
+time=2026-10-13T08:58:50.008+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255PanelHostBuildsItsWindowOptions
+    panel_geometry_255_test.go:263: the create's first argument is a *ast.Ident, not a call: the geometry is not being resolved at create time
+--- FAIL: TestTicket255PanelHostBuildsItsWindowOptions (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.075s
+FAIL
+rc=1
+--- restore proof (appended after the run):
+restore source = git show 3b806876:cmd/wisp/panel_host_windows.go
+sha256 before mutation  = 45c1059bbda4753827e1bf0f74a8e86bc74fa6fc4804446f612e2b76f21c7016
+sha256 after  restore   = 45c1059bbda4753827e1bf0f74a8e86bc74fa6fc4804446f612e2b76f21c7016
+RESTORE-BYTE-EQUAL yes
