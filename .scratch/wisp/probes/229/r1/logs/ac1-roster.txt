@@ -1,0 +1,65 @@
+== HEAD ==
+f70b540f3466f70074f7685b21299cc194019fa9 Tue Oct 13 20:46:10 2026 +0800 编排者：第二波发送补记＋台账 A879（3 腿在飞；记我=过保守，常态钉为写腿>=2）
+
+== goroutine.go 38-62 (四张表) ==
+       1	// ResidentBaseline is the frozen resident goroutine budget (D38b: ui-sta,
+       2	// audio-capture, hotkey-listener, db-writer, watchdog, log-flusher).
+       3	const ResidentBaseline = 6
+       4	
+       5	// ResidentNames are the 6 resident roster names (D38b), in table order.
+       6	var ResidentNames = []string{
+       7		"ui-sta", "audio-capture", "hotkey-listener", "db-writer", "watchdog", "log-flusher",
+       8	}
+       9	
+      10	// OnDemandNames are state-gated goroutines (D38b).
+      11	var OnDemandNames = []string{"kws-infer"}
+      12	
+      13	// PerTaskPrefixes are the per-task roster entries (D38b): agent-task-<id>
+      14	// holds the task root ctx; tool-exec-<id> and approval-waiter derive from it.
+      15	var PerTaskPrefixes = []string{"agent-task-", "tool-exec-", "approval-waiter"}
+      16	
+      17	// TemporaryNames are DisposalScope-scoped goroutines (D38b). disposal-worker
+      18	// is the C11 per-fn disposal runner (ticket 03); it is bookkeeping, not a
+      19	// product goroutine, and lives inside whichever scope is disposing.
+      20	var TemporaryNames = []string{
+      21		"asr-infer", "tts-infer", "panel-host", "retention-job", "model-downloader",
+      22		"memory-extract", "disposal-worker",
+      23	}
+      24	
+      25	// ClassifyGoroutine maps a goroutine name to its roster category. Unknown
+
+== grep -n 各表声明行 ==
+40:const ResidentBaseline = 6
+43:var ResidentNames = []string{
+48:var OnDemandNames = []string{"kws-infer"}
+52:var PerTaskPrefixes = []string{"agent-task-", "tool-exec-", "approval-waiter"}
+57:var TemporaryNames = []string{
+
+== ClassifyGoroutine 64-84 ==
+func ClassifyGoroutine(name string) GoroutineCategory {
+	if slices.Contains(ResidentNames, name) {
+		return CategoryResident
+	}
+	if slices.Contains(OnDemandNames, name) {
+		return CategoryOnDemand
+	}
+	for _, p := range PerTaskPrefixes {
+		// approval-waiter is the roster name itself (no per-instance id);
+		// agent-task-/tool-exec- carry the task id as suffix.
+		if strings.HasPrefix(name, p) {
+			return CategoryPerTask
+		}
+	}
+	if slices.Contains(TemporaryNames, name) {
+		return CategoryTemporary
+	}
+	return CategoryUnknown
+}
+
+// Root is a task (or process) root: one cancelable context plus a join
+
+== WARN site ==
+271:		slog.Warn("goroutine outside the D38 roster (leak symptom)",
+
+== grep -n subagent internal/observe/goroutine.go ==
+grep-rc=1

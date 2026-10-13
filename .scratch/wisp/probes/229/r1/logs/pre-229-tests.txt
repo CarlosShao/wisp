@@ -1,0 +1,51 @@
+== 改前：go test ./internal/tools/ -run Test229 -count=1 -v ==
+command: GOFLAGS= PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./internal/tools/ -run 'Test229' -count=1 -v
+2026-10-13 20:59:31
+time=2026-10-13T20:59:34.120+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test229FinishWatcherIsRosterNamedWhileChildRuns
+time=2026-10-13T20:59:34.123+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-289d4c66-1bcc-4abd-a683-cf1a9d12ae1a owner=tools
+    spawn_finish_watcher_229_test.go:70: 收尾协程不在册：CountByName("agent-task-289d4c66-1bcc-4abd-a683-cf1a9d12ae1a")=0；此刻 observe.Default：Total=1 PerTask=0 Unknown=[subagent-finish-289d4c66-1bcc-4abd-a683-cf1a9d12ae1a]；旧名 "subagent-finish-289d4c66-1bcc-4abd-a683-cf1a9d12ae1a" 的 CountByName=1（AC#2 没落地，或名册判定被改）
+--- FAIL: Test229FinishWatcherIsRosterNamedWhileChildRuns (5.00s)
+=== RUN   Test229UnknownNameStillRingsLeakAlarm
+--- PASS: Test229UnknownNameStillRingsLeakAlarm (0.00s)
+=== RUN   Test229SpawnNamesAreRosterShaped
+    spawn_roster_census_229_test.go:134: 229 census: cmd/balldebug/main.go:250 NewRoot(goroutineHotkeyBridge) 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:166: 229 census: cmd/balldebug/main.go:251 Spawn(goroutineHotkeyBridge) 非字面量、已复审：balldebug-hotkey-bridge：有意名册外，见 spawn229OffRosterKnown
+    spawn_roster_census_229_test.go:134: 229 census: cmd/balldebug/main.go:431 NewRoot(goroutineLevelFeeder) 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:166: 229 census: cmd/balldebug/main.go:432 Spawn(goroutineLevelFeeder) 非字面量、已复审：balldebug-level-feeder：同上
+    spawn_roster_census_229_test.go:134: 229 census: cmd/wisp/approval_always.go:97 NewRootFrom(s.ctx) 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:149: 229 census: cmd/wisp/approval_always.go:99 Spawn("approval-waiter") -> per_task
+    spawn_roster_census_229_test.go:149: 229 census: cmd/wisp/approval_reply.go:456 Spawn("approval-waiter") -> per_task
+    spawn_roster_census_229_test.go:134: 229 census: cmd/wisp/approval_reply.go:483 NewRoot("approval-reply") 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:134: 229 census: cmd/wisp/config_reload.go:113 NewRoot("config-reload") 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:149: 229 census: cmd/wisp/config_reload.go:123 Spawn("watchdog") -> resident
+    spawn_roster_census_229_test.go:134: 229 census: cmd/wisp/panel_resident_windows.go:153 NewRoot("panel-host") 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:166: 229 census: cmd/wisp/panel_resident_windows.go:154 Spawn(panelSTAName) 非字面量、已复审：panel-sta：有意名册外，见 spawn229OffRosterKnown
+    spawn_roster_census_229_test.go:134: 229 census: cmd/wisp/resident_ball_windows.go:360 NewRoot("ball-hotkey-bridge") 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:149: 229 census: cmd/wisp/resident_ball_windows.go:361 Spawn("hotkey-listener") -> resident
+    spawn_roster_census_229_test.go:134: 229 census: cmd/wisp/resident_task_source_windows.go:311 NewRootFrom(ra.root) 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:166: 229 census: cmd/wisp/resident_task_source_windows.go:347 Spawn(taskSourceConsoleGoroutine) 非字面量、已复审：approval-waiter：per_task
+    spawn_roster_census_229_test.go:134: 229 census: cmd/wisp/resident_task_source_windows.go:451 NewRootFrom(src.root.Ctx) 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:166: 229 census: cmd/wisp/resident_task_source_windows.go:454 Spawn(taskSourceGoroutinePrefix+fmt.Sprint(seq)) 非字面量、已复审：agent-task-resident-<n>：per_task 前缀族
+    spawn_roster_census_229_test.go:134: 229 census: internal/agent/loop.go:330 NewRootFrom(ctx) 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:166: 229 census: internal/agent/loop.go:331 Spawn("agent-task-"+id) 非字面量、已复审：per_task：任务根协程（loop.RunAsync）
+    spawn_roster_census_229_test.go:134: 229 census: internal/agent/loop.go:352 NewRootFrom(ctx) 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:166: 229 census: internal/agent/loop.go:680 Spawn("tool-exec-"+taskID) 非字面量、已复审：per_task：每任务工具执行
+    spawn_roster_census_229_test.go:149: 229 census: internal/audio/audio.go:181 Spawn("audio-capture") -> resident
+    spawn_roster_census_229_test.go:149: 229 census: internal/ball/ball_windows.go:170 Spawn("ui-sta") -> resident
+    spawn_roster_census_229_test.go:134: 229 census: internal/llm/adaptertest/mockllm.go:90 NewRoot("adaptertest:mockllm") 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:154: 229 census: internal/llm/adaptertest/mockllm.go:92 Spawn("mockllm-stdout-reader") 名册外但有登记：internal/llm/adaptertest/mockllm.go:92；cmd/balldebug/main.go:42 登记为票 67 的 loose end
+    spawn_roster_census_229_test.go:149: 229 census: internal/memory/writer.go:79 Spawn("db-writer") -> resident
+    spawn_roster_census_229_test.go:149: 229 census: internal/observe/logging.go:96 Spawn("log-flusher") -> resident
+    spawn_roster_census_229_test.go:134: 229 census: internal/plugin/disposal.go:232 NewRootFrom(s.ctx) 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:166: 229 census: internal/plugin/disposal.go:233 Spawn(name) 非字面量、已复审：参数；生产唯一调用点 internal/memory/retention.go:103 传 retention-job（temporary）
+    spawn_roster_census_229_test.go:149: 229 census: internal/plugin/disposal.go:296 Spawn("disposal-worker") -> temporary
+    spawn_roster_census_229_test.go:134: 229 census: internal/tools/subagent_197.go:383 NewRootFrom(context.WithoutCancel(ctx)) 根标签（不参与名册判定）
+    spawn_roster_census_229_test.go:170: internal/tools/subagent_197.go:384: Spawn 首参不是字符串字面量（"subagent-finish-"+bg.ID）且没有复审记录：把运行期名字与它落的名册类别写进 spawn229ReviewedSites
+    spawn_roster_census_229_test.go:181: 229 census 汇总：生产 .go 289 枚（解析跳过 0 枚）、Spawn 站点 19 个、根标签 14 个；名册外有登记 1 枚、未复审 1 枚
+--- FAIL: Test229SpawnNamesAreRosterShaped (0.14s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	5.172s
+FAIL
+rc=1
+2026-10-13 20:59:39

@@ -1,0 +1,61 @@
+== HEAD ==
+f70b540f3466f70074f7685b21299cc194019fa9 Tue Oct 13 20:46:10 2026 +0800 编排者：第二波发送补记＋台账 A879（3 腿在飞；记我=过保守，常态钉为写腿>=2）
+
+== 尺1：全模块 .Spawn( 站点（含 _test.go）==
+cmd\balldebug\main.go:251:		bridgeHandle := observe.Default.Spawn(goroutineHotkeyBridge, "balldebug", bridgeRoot, func(ctx context.Context) {
+cmd\balldebug\main.go:432:	h := observe.Default.Spawn(goroutineLevelFeeder, "balldebug", root, func(ctx context.Context) {
+cmd\wisp\approval_always.go:99:	observe.Default.Spawn("approval-waiter", "approval", root, func(ctx context.Context) {
+cmd\wisp\approval_reply.go:456:	rt.replyHandle = observe.Default.Spawn("approval-waiter", "approval", rt.replyRoot,
+cmd\wisp\config_reload.go:123:	rt.reloadHandle = observe.Default.Spawn("watchdog", "config", rt.reloadRoot, rt.configReloadTick)
+cmd\wisp\panel_resident_windows.go:154:	rp.thread = reg.Spawn(panelSTAName, panelSTAOwner, root, rp.loop)
+cmd\wisp\resident_ball_windows.go:361:		bridgeHandle := reg.Spawn("hotkey-listener", "ball", bridgeRoot, func(ctx context.Context) {
+cmd\wisp\resident_task_source_windows.go:347:		src.handle = observe.Default.Spawn(taskSourceConsoleGoroutine, "agent", src.root,
+cmd\wisp\resident_task_source_windows.go:454:	observe.Default.Spawn(taskSourceGoroutinePrefix+fmt.Sprint(seq), "agent", root,
+internal\agent\loop.go:331:	t.h = l.reg.Spawn("agent-task-"+id, "agent", t.root, func(c context.Context) {
+internal\agent\loop.go:680:		h := l.reg.Spawn("tool-exec-"+taskID, "agent", root, func(c context.Context) {
+internal\audio\audio.go:181:	return registry.Spawn("audio-capture", "audio", nil, run)
+internal\ball\ball_windows.go:170:	b.sta.handle = opts.Registry.Spawn("ui-sta", "ball", nil, func(_ context.Context) {
+internal\llm\adaptertest\mockllm.go:92:	h := mockllmRegistry.Spawn("mockllm-stdout-reader", "test", spawnRoot,
+internal\memory\writer.go:79:		q.reg.Spawn("db-writer", "memory", nil, func(ctx context.Context) {
+internal\observe\goroutine_test.go:123:	reg.Spawn("tool-exec-sibling", "test", root, func(ctx context.Context) {
+internal\observe\goroutine_test.go:127:	boom := reg.Spawn("tool-exec-boom", "test", root, func(ctx context.Context) {
+internal\observe\goroutine_test.go:190:	mystery := reg.Spawn("mystery-worker", "test", nil, func(ctx context.Context) {
+internal\observe\goroutine_test.go:223:	reg.Spawn("tool-exec-blocked", "test", root, func(ctx context.Context) {
+internal\observe\goroutine_test.go:45:	reg.Spawn("agent-task-noop", "test", root, func(ctx context.Context) {
+internal\observe\goroutine_test.go:51:	reg.Spawn("tool-exec-noop", "test", root, hold("tool-exec-noop"))
+internal\observe\goroutine_test.go:52:	reg.Spawn("approval-waiter", "test", root, hold("approval-waiter"))
+internal\observe\logging.go:96:	h := reg.Spawn("log-flusher", "observe", p.root, w.flushLoop)
+internal\plugin\disposal.go:233:	return s.reg.Spawn(name, "scope:"+s.name, root, func(ctx context.Context) {
+internal\plugin\disposal.go:296:		h := s.reg.Spawn("disposal-worker", "scope:"+s.name, nil, func(context.Context) {
+internal\tools\subagent_197.go:384:	observe.Default.Spawn("subagent-finish-"+bg.ID, "tools", watchRoot, func(c context.Context) {
+internal\tools\task_backfill.go:33:// reg.Spawn("agent-task-"+id, "agent", ...)).
+internal\tools\ticket176r1_start_port_test.go:188:	h := reg.Spawn("agent-task-"+taskID, "test", root, func(c context.Context) {
+tools\d22scan\selftestsamples.go:61:			"func schedule(reg interface{ Spawn(func()) }) {\n\treg.Spawn(work)\n}\n" +
+
+== 尺2：全模块 NewRoot(/NewRootFrom( 站点 ==
+cmd\balldebug\main.go:250:		bridgeRoot := observe.NewRoot(goroutineHotkeyBridge)
+cmd\balldebug\main.go:431:	root := observe.NewRoot(goroutineLevelFeeder)
+cmd\wisp\approval_always.go:97:	root := observe.NewRootFrom(s.ctx, "approval-always")
+cmd\wisp\approval_reply.go:483:		root = observe.NewRoot("approval-reply")
+cmd\wisp\config_reload.go:113:	rt.reloadRoot = observe.NewRoot("config-reload")
+cmd\wisp\panel_resident_windows.go:153:	root := observe.NewRoot("panel-host")
+cmd\wisp\resident_ball_windows.go:360:		bridgeRoot := observe.NewRoot("ball-hotkey-bridge")
+cmd\wisp\resident_task_source_windows.go:311:	src.root = observe.NewRootFrom(ra.root, "resident-task-source")
+cmd\wisp\resident_task_source_windows.go:451:	root := observe.NewRootFrom(src.root.Ctx, fmt.Sprintf("resident-task-%d", seq))
+internal\agent\loop.go:330:	t := &RunningTask{ID: id, root: observe.NewRootFrom(ctx, id), done: make(chan struct{})}
+internal\agent\loop.go:352:	root := observe.NewRootFrom(ctx, taskID)
+internal\llm\adaptertest\mockllm.go:90:	spawnRoot := observe.NewRoot("adaptertest:mockllm")
+internal\observe\goroutine.go:103:func NewRootFrom(parent context.Context, id string) *Root {
+internal\observe\goroutine.go:98:func NewRoot(id string) *Root {
+internal\observe\goroutine.go:99:	return NewRootFrom(context.Background(), id)
+internal\observe\goroutine_test.go:121:	root := NewRoot("task-panic")
+internal\observe\goroutine_test.go:221:	root := NewRoot("task-blocked")
+internal\observe\goroutine_test.go:29:	root := NewRoot("task-noop")
+internal\observe\logging.go:95:	p.root = NewRootFrom(context.Background(), "observe-logs")
+internal\plugin\disposal.go:232:	root := observe.NewRootFrom(s.ctx, s.name+"/go")
+internal\tools\subagent_197.go:383:	watchRoot := observe.NewRootFrom(context.WithoutCancel(ctx), "subagent-finish-"+bg.ID)
+internal\tools\ticket176r1_start_port_test.go:185:	root := observe.NewRoot("176r1-leg")
+internal\tools\ticket176r1_start_port_test.go:250:	root := observe.NewRoot("176r1-terminal")
+
+== 尺3：不在册候选名逐枚 ClassifyGoroutine 判据（改前）==
+subagent 字面量在 goroutine.go 命中数：0  （grep rc=1 即 0 命中）

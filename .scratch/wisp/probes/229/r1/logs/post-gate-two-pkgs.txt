@@ -1,0 +1,6 @@
+== 改后门禁：go test ./internal/tools/... ./internal/observe/... -count=1 ==
+2026-10-13 21:02:45
+ok  	github.com/CarlosShao/wisp/internal/tools	15.953s
+ok  	github.com/CarlosShao/wisp/internal/observe	3.803s
+rc=0
+2026-10-13 21:03:02

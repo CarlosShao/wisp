@@ -1,0 +1,23 @@
+== AC#6 红名归因复量（安静期，逐条现跑）==
+2026-10-13 21:10:44
+
+== (a) cmd/wisp TestTicket255RosterStillMatchesTheActualReadSites 单跑 count=1 ==
+--- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.49s)
+    config_receipt_255_test.go:245: section "voice" (field Voice) is read by [cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] in production, the roster names [cmd/wisp/resident_audio_windows.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.553s
+FAIL
+rc=1
+
+== (b) internal/risk TestResolvePerCallBudget 单跑 count=3 ==
+ok  	github.com/CarlosShao/wisp/internal/risk	3.815s
+rc=0
+
+== (c) internal/session TestSessionListByWorkspace 单跑 count=3 ==
+    manage_test.go:78: workspace filter = [sess_890b032bd4c2c9bd062ffbdcb0b1b200 sess_3aef873c2f3b308eb87202e85c314c8e], want [sess_3aef873c2f3b308eb87202e85c314c8e sess_890b032bd4c2c9bd062ffbdcb0b1b200]
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	0.234s
+FAIL
+rc=1
+
+2026-10-13 21:10:52

@@ -376,12 +376,22 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 	// has really joined, INCLUDING on the path where the parent stopped listening
 	// - otherwise a detached child would sit in the roster reading "Thinking"
 	// forever, which is the lie this layer exists to prevent.
+	//
+	// Ticket 229: its spawn name is the child's per-task roster row,
+	// agent-task-<id> (D38b 每任务 3), not a private "subagent-finish-*" label.
+	// That label matched no table, so every spawn rang the leak alarm ("goroutine
+	// outside the D38 roster") and drowned the one signal that is supposed to
+	// mean "a goroutine ran away". The child's own loop runs on its private
+	// registry (opt.Registry above), so this is the only observe.Default row
+	// carrying task bg.ID, and it lives exactly as long as the child does. The
+	// watch root keeps its descriptive id - root ids are labels, not roster
+	// names (ClassifyGoroutine is never called on them).
 	done := make(chan agent.Result, 1)
 	var releaseOnce sync.Once
 	finish := func() { releaseOnce.Do(release) }
 	var stampWhy string
 	watchRoot := observe.NewRootFrom(context.WithoutCancel(ctx), "subagent-finish-"+bg.ID)
-	observe.Default.Spawn("subagent-finish-"+bg.ID, "tools", watchRoot, func(c context.Context) {
+	observe.Default.Spawn("agent-task-"+bg.ID, "tools", watchRoot, func(c context.Context) {
 		defer finish()
 		res := bg.Wait()
 		// The slot goes back BEFORE the row is finalised, so a reader that sees
