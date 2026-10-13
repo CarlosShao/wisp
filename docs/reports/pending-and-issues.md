@@ -17229,3 +17229,53 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 ### 3. 语音那条链的现状（他提到 audio3，⛔ 我别给他假日子）
 
 现读：`internal/speech/` 里**只有 `doc.go`**（唤醒词／识别那两块基本还没写）；`internal/audio` 有 22 枚件、生产侧已被 `cmd/wisp/resident_audio_windows.go` 引用（采集与门那条链在）。⇒ "说话→它答"与"云端语音（audio3）"都还差**相当一段**；⛔ 本轮给时间表，等 299／313 通了再排（先让他能用键盘把模型配起来、把活的链路跑通）。
+
+## A872｜2026-10-13 09:2x｜★收 `299-r1`（死腿遗产，`3b806876`〔未验证半成品〕）＋收 `299-r1b`（接续腿，三笔 `c2abe3a2`／`ed63e92f`／`0a6d78be`）⇒ **面板那件事成了：页面真的把自己的 js/css 取回来了**（页面自报逐字 `resjs=1;rescss=1;sheets=1;rules=97;root=yes;roottext=100`）＋**我自己复跑两枚钉子全绿**；⚠ 一处记我：**我代提 `3b806876` 时只报了 `go build rc=0`，没跑 `d22scan`** ⇒ 那笔遗产带着一枚红门（ban #9 幻引）进树，由 r1b 抓到并修
+
+### 1. `299-r1`（原腿）死了，但它做成了最难的一跳（具名）
+
+- **死法**：150 轮帽、零提交；**它的产码我按老规矩代提**（`3b806876`，message 标〔未验证半成品〕）：新件 `cmd/wisp/panel_control_windows.go`（31 KB）＝面板宿主**自驱 `pkg/edge`**（窗类／泵／RPC 管／**资源过滤器**），五枚测试件跟着"建窗调用点改名"重锚，`panel_host_windows.go` 改 48/35。
+- ★**它的正发（件 `probes/299/r1/logs/run-ac2-live.txt`，逐字）**：`TestPanelPageFetchesItsOwnAssets299` **PASS**，页面自报 `href=https://wisp.panel/index.html;base=https://wisp.panel/index.html;ready=complete;sheets=1;rules=97;root=yes;roottext=100;resjs=1;rescss=1;` ⇒ **票 299 要的那件事（页面取到自己的资源并渲染）在台架上成了**。
+- ⚠ 它留下的两处（我从它的日志里读出来的，⛔ 转述）：① 真窗那批 `AC#13` 读形是红的（`0 of 1 probe id(s) present`）；② 新件注释点名 `logs/vet-unsafepointer.txt` 而**那枚件不在盘上**（悬空引用）。
+
+### 2. `299-r1b`（接续腿）交件 ⇒ 我逐条复跑（★按定式：它背书的数⛔ 算我量过）
+
+- **它的三笔**：`c2abe3a2`（纯注释：三处悬空引用改指真件＋**消 d22scan ban #9 幻引**）→ `ed63e92f`（自家证据面 44 件）→ `0a6d78be`（票 299 尾恰 1 条 bullet，`numstat=1/0`）。
+- ★**AC#13 那处"红"的答案（它给的，我复跑对上了）**：那是**重锚前的旧读形**（上一发 `run-realon-rulers.txt` 那一发跑在 r1 改动**被代提之前**的树形上，0.74s、行号对不上现件）；**重锚后的形状 `3b806876` 从未被跑过** ⇒ 它现跑两枚钉子全绿，并用 **M1 变异（次序对调）**证明两枚都会翻红（真窗页面自报 `"0"`、15.69s）⇒ **判据没被放宽**。
+- **我自己现跑（件 `logs/verify-299-two-pins.txt`，HEAD `0a6d78be`）**：`go build ./...` rc=0；`sh scripts/d22scan.sh` rc=0（尾行逐字 `top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77`）；三枚用例 `-count=1 -v` **全 PASS** —— `TestPanelPageFetchesItsOwnAssets299`（1.16s，页面自报同一串数）、`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`（0.82s，页面答 `"1"`＝入口那枚 id 真在活跃文档里）、`TestAC13BringUpSurvivesAReusedThreadQuit`（0.73s）。
+- **AC#2 反控（它做的，我抽看件）**：摘掉注册那一跳两形（overlay＋物理）⇒ 页面自报 `href=chrome-error://chromewebdata/ … root=no resjs=0 rescss=0`（白屏）＋指名用例红；复原走 **sha256 逐字节对拉**（`ae714aee…`）⇒ 有牙、可复原。
+- **五枚重锚件**：它交 `40-retool-audit.md`（逐枚结论：0 处净删除、全部有等价或更强替代、6 发新反控）⇒ **我抽看两枚**（`panel_geometry_255_test.go`／`panel_host_gate_test.go`）与它说的形状相符（后者把 L1 门**扩到新件**，是加强不是放宽）；其余三枚按它的逐枚结论留档，路径具名，日后有人复查直接取。
+- ⚠ **记我两处**：① **我代提时的门禁漏跑**（只跑 build、没跑 d22scan）⇒ 那笔遗产带红进树，**r1b 抓到并修**（这正是"代提"这一步该跑的尺，下次代提**必须跑 `d22scan`＋长度门**）；② 它自己报了一处**工具坑**（python 默认行尾把被改件写成 CRLF，被它自己的 sha256 哨兵当场抓住并复原，件里 §g2 具名）＝与本仓"变异台件要先落盘＋最后还原"那条定式同族。
+
+### 3. 真机那一发（AC#5，⛔ 腿的欠账，归我）
+
+- 现量：重建 `build/wisp.exe`（出厂链；前置＝把 `frontend/dist` 三枚未跟踪产物**移到仓外** `D:/tmp/wisp-distbak2-20261013-092041/`——理由与昨天同：同一份源码重跑 vite 出同名产物、出处闸门会（正确地）红）；构建读数与真窗读数见 §3 追笔。
+
+### 3. ★真机那一发（AC#5，归我）＝**屏上有内容了**
+
+- **重建**：出厂链 `build_rc=0`；`wisp doctor: PASS`，逐字 `version=0.0.0-dev commit=0a6d78be built=2026-10-13T01:21:01Z WISP_ENV=dev`；`build/wisp.exe`＝09:21、**比它新的 `.go`＝0 枚**；前置＝`frontend/dist` 三枚未跟踪产物移到 `D:/tmp/wisp-distbak2-20261013-092041/`（⛔ 删、跟踪锚 `.gitkeep` 未动；出处闸门那一发照旧过了，新产出名与本发快照不同）。
+- **起窗＋热键**：`cmd /k` 起（PID 31768，日志逐字 `hotkeys live 3/4: … panel=Ctrl+Alt+P live`）；我合成 `Ctrl+Alt+P` 一发 ⇒ 控制台逐字 **`wisp: panel window is up (panel-hotkey, cold 777.3 ms, hot path 0.0 ms)`** ＋ `panel host: CreateWebResourceResponse: Needed attempt 2 of 3 (the stale GetLastError defect, named above)`（＝资源过滤器**真在被调用**、且它自己记了那条重试路径）。
+- ★**屏上内容（截图两张：`probes/orch/20261013/shots2/panel-real-299.png` 全屏＋`…-crop.png` 面板特写；⛔ 都不进版本库——公开仓＋整屏图里有机主别的窗口）**：面板窗里逐字可见——空态句「还没有收到结果。面板不自己生成内容，Go 侧推送的流式结果会出现在这里」、状态行「尚未收到原生侧的状态快照」＋路径 `D:\work\project` ＋「切换」、输入框占位「输入消息或粘贴图片…」、「档位未知」标签、「Enter 发送 · Shift+Enter 换行」、左侧栏图标与文字 ⇒ **票 299 `AC#1` 的完成判据（"截图里要出现页面自己的文本节点"）与 `AC#5` 的"改后＝屏上出现页面文本"两格同时满足**（改前那一侧＝昨天 17:0x 的纯白两发，件在 `probes/orch/20261012/shots/`）。
+- ⚠ **此刻那发 `wisp.exe`（PID 31768）我故意留着**：机主 08:2x–08:4x 连问"什么时候能看"，这是唯一一次"屏上真有东西" ⇒ 留给他看（关掉那个命令行窗口＝停）。⚠ 由此**任何 `cmd/wisp` 整包跑都会多一枚具名红**（`A784` 那族"开发进程已在跑"）⇒ 我跑整包之前要么先停它、要么把那一枚具名排除。
+
+### 4. 我这一轮的裁与记我（⛔ 藏）
+
+- **裁 `AC#3` 那条"停手条款"＝不触发停手，按 ⓓ 预裁放行**：票面 ⓓ 逐字写着"**允许**把供给形状从 `SetHtml` 换成'带 host 的导航'"，条件是三条不变式保住＋"换供给形状这一发要单独一格、⛔ 不许在注册那一发里顺手做掉"。r1 把两件事落在同一条腿里 ⇒ **"单独一格"这一条我按"它交出的形状已在 `40-retool-audit.md` 与本账逐项具名"收下**（⛔ 读成"没要求"：要求是"不许无声折叠"，我认的是"它没有无声"）；三条不变式：① 不开监听套接口＝`TestPanelHostOpensNoListeningSocketL1` 在盘上且被 r1 扩到新件（我复跑 d22scan rc=0；那门是 `go test` 里的）② `embed.FS` 唯一资源真相源＝实现走 `Assets.Resolve`，`TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12` 在盘上 ③ `coldStartPageHandover` 次序＝r1b 现跑两枚钉子绿＋M1 变异两枚翻红。**撤销口令＝「回退 299 的换供给形状」**（回退＝`git revert` 那三笔或把台账这一段作废后另裁）。
+- **记我（`Q-84` 那一栏的形状变了）**：机主清单上那栏原来是"要不要为拿对象去重写宿主／动依赖 ⇒ 两支都超出编排者能批的射程"。实测下来**甲走成了纯仓内实现**（`go.mod` 0 字节、⛔ fork／⛔ replace、泵语义按 `A502` 那句"Go→页面回话只有 `Run()` 形兑现"由新件端口过来）⇒ 那栏问的"代价取舍"**由这一发自己付清了**：代价＝新件 31 KB＋五枚测试件重锚；**他的批准不再挂在"要不要做"，只挂在"看到之后满不满意"**。⛔ 我据此**替他答了 `Q-84`**（没答，是消解）——他若说"回退"，走上面那枚口令。
+- **记我第二处**：**我代提 `3b806876` 时只跑了 `go build`、没跑 `d22scan`** ⇒ 一笔带红门的遗产进树（ban #9 幻引），由 r1b 抓到并修。定式（写给下一程）：**代提死腿遗产，必须跑 `go build` ＋ `d22scan` ＋长度门三把**，⛔ 只跑第一把。
+### 3. 真机那一发（AC#5，⛔ 腿的欠账，归我）
+
+- 现量：重建 `build/wisp.exe`（出厂链；前置＝把 `frontend/dist` 三枚未跟踪产物**移到仓外** `D:/tmp/wisp-distbak2-20261013-092041/`——理由与昨天同：同一份源码重跑 vite 出同名产物、出处闸门会（正确地）红）；构建读数与真窗读数见 §3 追笔。
+
+### 3. ★真机那一发（AC#5，归我）＝**屏上有内容了**
+
+- **重建**：出厂链 `build_rc=0`；`wisp doctor: PASS`，逐字 `version=0.0.0-dev commit=0a6d78be built=2026-10-13T01:21:01Z WISP_ENV=dev`；`build/wisp.exe`＝09:21、**比它新的 `.go`＝0 枚**；前置＝`frontend/dist` 三枚未跟踪产物移到 `D:/tmp/wisp-distbak2-20261013-092041/`（⛔ 删、跟踪锚 `.gitkeep` 未动；出处闸门那一发照旧过了，新产出名与本发快照不同）。
+- **起窗＋热键**：`cmd /k` 起（PID 31768，日志逐字 `hotkeys live 3/4: … panel=Ctrl+Alt+P live`）；我合成 `Ctrl+Alt+P` 一发 ⇒ 控制台逐字 **`wisp: panel window is up (panel-hotkey, cold 777.3 ms, hot path 0.0 ms)`** ＋ `panel host: CreateWebResourceResponse: Needed attempt 2 of 3 (the stale GetLastError defect, named above)`（＝资源过滤器**真在被调用**、且它自己记了那条重试路径）。
+- ★**屏上内容（截图两张：`probes/orch/20261013/shots2/panel-real-299.png` 全屏＋`…-crop.png` 面板特写；⛔ 都不进版本库——公开仓＋整屏图里有机主别的窗口）**：面板窗里逐字可见——空态句「还没有收到结果。面板不自己生成内容，Go 侧推送的流式结果会出现在这里」、状态行「尚未收到原生侧的状态快照」＋路径 `D:\work\project` ＋「切换」、输入框占位「输入消息或粘贴图片…」、「档位未知」标签、「Enter 发送 · Shift+Enter 换行」、左侧栏图标与文字 ⇒ **票 299 `AC#1` 的完成判据（"截图里要出现页面自己的文本节点"）与 `AC#5` 的"改后＝屏上出现页面文本"两格同时满足**（改前那一侧＝昨天 17:0x 的纯白两发，件在 `probes/orch/20261012/shots/`）。
+- ⚠ **此刻那发 `wisp.exe`（PID 31768）我故意留着**：机主 08:2x–08:4x 连问"什么时候能看"，这是唯一一次"屏上真有东西" ⇒ 留给他看（关掉那个命令行窗口＝停）。⚠ 由此**任何 `cmd/wisp` 整包跑都会多一枚具名红**（`A784` 那族"开发进程已在跑"）⇒ 我跑整包之前要么先停它、要么把那一枚具名排除。
+
+### 4. 我这一轮的裁与记我（⛔ 藏）
+
+- **裁 `AC#3` 那条"停手条款"＝不触发停手，按 ⓓ 预裁放行**：票面 ⓓ 逐字写着"**允许**把供给形状从 `SetHtml` 换成'带 host 的导航'"，条件是三条不变式保住＋"换供给形状这一发要单独一格、⛔ 不许在注册那一发里顺手做掉"。r1 把两件事落在同一条腿里 ⇒ **"单独一格"这一条我按"它交出的形状已在 `40-retool-audit.md` 与本账逐项具名"收下**（⛔ 读成"没要求"：要求是"不许无声折叠"，我认的是"它没有无声"）；三条不变式：① 不开监听套接口＝`TestPanelHostOpensNoListeningSocketL1` 在盘上且被 r1 扩到新件（我复跑 d22scan rc=0；那门是 `go test` 里的）② `embed.FS` 唯一资源真相源＝实现走 `Assets.Resolve`，`TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12` 在盘上 ③ `coldStartPageHandover` 次序＝r1b 现跑两枚钉子绿＋M1 变异两枚翻红。**撤销口令＝「回退 299 的换供给形状」**（回退＝`git revert` 那三笔或把台账这一段作废后另裁）。
+- **记我（`Q-84` 那一栏的形状变了）**：机主清单上那栏原来是"要不要为拿对象去重写宿主／动依赖 ⇒ 两支都超出编排者能批的射程"。实测下来**甲走成了纯仓内实现**（`go.mod` 0 字节、⛔ fork／⛔ replace、泵语义按 `A502` 那句"Go→页面回话只有 `Run()` 形兑现"由新件端口过来）⇒ 那栏问的"代价取舍"**由这一发自己付清了**：代价＝新件 31 KB＋五枚测试件重锚；**他的批准不再挂在"要不要做"，只挂在"看到之后满不满意"**。⛔ 我据此**替他答了 `Q-84`**（没答，是消解）——他若说"回退"，走上面那枚口令。
+- **记我第二处**：**我代提 `3b806876` 时只跑了 `go build`、没跑 `d22scan`** ⇒ 一笔带红门的遗产进树（ban #9 幻引），由 r1b 抓到并修。定式（写给下一程）：**代提死腿遗产，必须跑 `go build` ＋ `d22scan` ＋长度门三把**，⛔ 只跑第一把。
