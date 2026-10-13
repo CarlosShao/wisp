@@ -1,0 +1,37 @@
+# 294-v1 AC#2 读数件 —— 真窗 mute 注册那一跳＋镜像常量同源尺的牙
+
+- 判语一句：**成立且非 skip** —— 真球窗上 mute 那枚 id（镜像 2）现读 live、VK='X'（配置里播的非默认值）；把镜像常量改假（2→3）⇒ **同源尺与真窗用例双红**，红在指名行，且真窗红句把"错槽"的在场表逐枚打出。
+- 真相源现读：internal/ball/hotkey_windows.go 逐字 37:\thkMute   = 2（本腿 grep 现跑，与 r1b 复核同）。
+- 绿读逐字（raw 内日志行，resident_mute_294_windows_test.go:121）：
+  AC#2 reading: id=2 name="mute" binding="Ctrl+Alt+X" status="live" vk=0x58
+- SKIP-LOUD 核：起手/收手两发绿读 --- SKIP 零命中；本机有桌面 ⇒ 交的是读数，⛔ 不是跳（headless 机上 skip 不算读数的口径与票面一致；本机未触发，具名）。
+- 变异（overlay，只作用编译输入）：
+  变体＝仓外 mut-ac2-hkmute-fake.txt，sha256 7cb6fafdcab30433a53339896fa694c92f3611fdb559bf3f64e96412200dcc35；
+  diff 唯一一行 43c43：const hkMute294 uint32 = 2 → const hkMute294 uint32 = 3。
+- 判读：① 同源尺（TestAC294HkMuteMirrorMatchesInternalBallSource）红 ⇒ 镜像不由名字背书，重读 internal/ball 源码比对；② 真窗用例红 ⇒ IsLive(3) 是 cancel 槽（idle 期未绑）——"读错槽"会红，且红句表里 slot2=mute 仍 live，证明红的是槽号而不是环境；③ 该件注释已把 1/3/4 的语义逐枚点名（抄错=假绿/错理由红）。
+- 还原：overlay 全程未落盘；两枚仪器 sha256 收手复核同值；git status --porcelain -- cmd/wisp 零行（见 40 件）。
+- 具名缺口：headless 机上的 SKIP 退路照旧存在（那形不算读数）——本机不是那形。
+
+## 原件逐字（tee）
+
+--- [绿读 AC#2 现读行（自 00-head 起手绿原件）] ---
+12:    resident_mute_294_windows_test.go:121: AC#2 reading: id=2 name="mute" binding="Ctrl+Alt+X" status="live" vk=0x58
+
+--- [镜像改假（2→3）双红原件] ---
+run at 2026-10-13 21:36:00 +0800
+time=2026-10-13T21:36:02.975+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC294HkMuteMirrorMatchesInternalBallSource
+    resident_mute_294_windows_test.go:82: mirror drift: cmd/wisp hkMute294 = 3 but internal/ball hkMute = 2; every IsLive(hkMute294) read in this file would be about the wrong slot
+--- FAIL: TestAC294HkMuteMirrorMatchesInternalBallSource (0.00s)
+=== RUN   TestAC294MuteHotkeyRegistersLiveOnARealBallWindow
+time=2026-10-13T21:36:03.261+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-13T21:36:03.274+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
+wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-13T21:36:03.274+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=3 hotkeys="summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+X live, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P live" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246) and the panel gestures (ticket 33); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+    resident_mute_294_windows_test.go:110: AC#2 RED: the mute hot key is not live on the real window: [{Name:summon ID:1 Binding:Ctrl+Alt+Q Status:live Acc:{Mods:16387 VK:81} Err:<nil> Note:} {Name:mute ID:2 Binding:Ctrl+Alt+X Status:live Acc:{Mods:16387 VK:88} Err:<nil> Note:} {Name:cancel ID:3 Binding:Esc Status:not bound while idle (cancel is borrowed only during Confirming) Acc:{Mods:0 VK:0} Err:<nil> Note:} {Name:panel ID:4 Binding:Ctrl+Alt+P Status:live Acc:{Mods:16387 VK:80} Err:<nil> Note:}]
+time=2026-10-13T21:36:03.279+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- FAIL: TestAC294MuteHotkeyRegistersLiveOnARealBallWindow (0.29s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.402s
+FAIL
+test-rc=1

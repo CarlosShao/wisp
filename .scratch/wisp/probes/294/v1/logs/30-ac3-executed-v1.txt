@@ -1,0 +1,78 @@
+# 294-v1 AC#3 读数件 —— executed==true 的牙（正反两向）＋句子读器对照
+
+- 判语一句：**成立** —— 翻 case gate.Muted(): 支（⛔ 非 r1 的 Open 支）true→false ⇒ 被验用例在第二次按压处红，且红句同报 gate 真翻（muted=true open=false）、句面一字未动；句子读器对照件在同一字节上**被骗绿**、只有在句子被改时才红 ⇒ 判据锚在 gate 自读＋executed 上，⛔ 在句面。
+- 基线：cmd/wisp/resident_audio_windows.go sha256 a841f5220ea68f2158a8ddb34cd378a26b672daf1e20b0f62a9cfed8d2609a84（= r1/r1b 读数；收手复核同值）。
+- 变异体（全部仓外、overlay 作用编译输入；resident_audio_windows.go 磁盘零动）：
+  ⓐ mut-ac3-mutedbranch-false.txt sha256 2d1cac5dbc4899bef56d1319dfe6316c141a9151fc4e92bcaf71d2ac26e15fb2，
+     diff 唯一一行 172c172：:172 的 ", true"→", false"（Muted 支；r1 翻的是 Open 支 :174，两发互不重叠）。
+  ⓑ mut-ac3-sentence-short.txt sha256 26c3a923c2d64eaaa82adb392beecc1869a541e38bfcbe088f832577adb202b2，
+     diff 唯一一行 172c172：句面删去 （再按一次取消静音）、bool 保持 true。
+  ⓒ 句子读器对照件（改**尺**）mut-ac3-sentence-reader.txt sha256 5a2f037f70dd0b35bea1801900e871e6378ee5ee7da6ae85ca8d02894226d90f，
+     diff 151,152c151,152：第二次按压的判据从 if !executed 换成 if outcome != "已静音：采集已关闭，设备未打开（再按一次取消静音）"（正文字面比较）。
+- 四发读数（每发带 -overlay；rc 见原件）：
+  E1  被验尺×ⓐ ⇒ rc=1，红在 :152（answered executed=false while the gate DID turn (muted=true open=false)，句面完整如常）。
+  E2b 句子读器×ⓐ（合并 overlay） ⇒ rc=0 **绿=被骗**（句面照旧就能过）。
+  E3a 被验尺×ⓑ ⇒ rc=0 绿（被验尺**没读句面**：句变而色不变）。
+  E3b 句子读器×ⓑ（合并 overlay） ⇒ rc=1，红在变体 :152（SENTENCE-VARIANT RED）＝对照读器确在读句面 ⇒ E2b 的绿是真被欺骗，不是对照死件。
+- 踩坑具名（记我，防下一位）：go test 的 -overlay **重复给只取最后一枚**——首轮 E2/E3b 用两枚 -overlay 把产码侧变异整枚覆盖掉，两发读数作废（原件保留在下方并标注"作废"）；改用合并 JSON（ⓐ+ⓒ / ⓑ+ⓒ 各一枚）重取。
+- 判读：executed 的断言两压都在（:142/:151），本腿与 r1 各翻一支 ⇒ 正反两向牙齐；第三段（rb.muteGesture）只判"到没到门"（读 gate），⛔ 判句面（件内已自陈）。
+- 还原：全 overlay ⇒ 产码/仪器磁盘字节零动（收手复核见 40 件）。
+
+## 原件逐字（tee）
+### E1 被验尺×ⓐ（bool 翻、句面不动）
+### E2b 句子读器×ⓐ（合并 overlay；绿=被骗）
+### E3a 被验尺×ⓑ（句面变、bool 不动）
+### E3b 句子读器×ⓑ（合并 overlay；红=对照读器活着）
+### 作废读数（重复 -overlay 只取最后一枚；产码侧变异被覆盖）——E2 首轮 / E3b 首轮
+
+--- [E1] ---
+2026-10-13 21:37:07 +0800
+=== RUN   TestAC294ToggleMuteExecutedTrueOnTheHappyPath
+    resident_mute_294_windows_test.go:152: AC#3 RED: the mute-back press answered executed=false while the gate DID turn (muted=true open=false): "已静音：采集已关闭，设备未打开（再按一次取消静音）"
+--- FAIL: TestAC294ToggleMuteExecutedTrueOnTheHappyPath (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.066s
+FAIL
+E1-rc=1
+
+--- [E2b] ---
+2026-10-13 21:38:03 +0800
+=== RUN   TestAC294ToggleMuteExecutedTrueOnTheHappyPath
+--- PASS: TestAC294ToggleMuteExecutedTrueOnTheHappyPath (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.075s
+E2b-rc=0
+
+--- [E3a] ---
+2026-10-13 21:37:31 +0800
+=== RUN   TestAC294ToggleMuteExecutedTrueOnTheHappyPath
+--- PASS: TestAC294ToggleMuteExecutedTrueOnTheHappyPath (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.070s
+E3a-rc=0
+
+--- [E3b] ---
+2026-10-13 21:38:08 +0800
+=== RUN   TestAC294ToggleMuteExecutedTrueOnTheHappyPath
+    resident_mute_294_windows_test.go:152: SENTENCE-VARIANT RED: the mute-back sentence is "已静音：采集已关闭，设备未打开"
+--- FAIL: TestAC294ToggleMuteExecutedTrueOnTheHappyPath (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.078s
+FAIL
+E3b-rc=1
+
+--- [作废·E2 首轮（重复 -overlay 只取最后一枚：产码侧变异被覆盖）] ---
+2026-10-13 21:37:12 +0800
+=== RUN   TestAC294ToggleMuteExecutedTrueOnTheHappyPath
+--- PASS: TestAC294ToggleMuteExecutedTrueOnTheHappyPath (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.070s
+E2-rc=0
+
+--- [作废·E3b 首轮（同因）] ---
+2026-10-13 21:37:36 +0800
+=== RUN   TestAC294ToggleMuteExecutedTrueOnTheHappyPath
+--- PASS: TestAC294ToggleMuteExecutedTrueOnTheHappyPath (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.072s
+E3b-rc=0

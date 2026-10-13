@@ -1,0 +1,152 @@
+# 294-v1 AC#4＋AC#5 读数件 —— 越界逐笔＋名册交集口径核＋门禁抽核
+
+- 判语一句：**AC#4 成立**（全区间逐笔十枚禁列 0 命中；仪器自代提起 blob 不变）；**AC#5 成立**（r1b 交集件本腿逐件复核成立；本腿自抽定向补尺一发与 r1b 稳定名册逐名相同；两处口径欠账具名于末节）。
+- 收手复核（本腿 21:57:44 现跑）：产码 sha256 全同（72fcee7a…/a841f522…）、仓外备份 cmp rc=0、git status --porcelain -- cmd/wisp 零行、仪器 blob e480e15b==HEAD==9704ff08…、仪器 diff 行数 0。
+
+## AC#4 逐笔越界（尺＝git show --name-only 逐笔；⛔ 区间尺）
+- 区间＝e480e15b^..HEAD（扫描时 HEAD=8cfd7b1b，17 笔）；十枚禁列＝frontend/ · design/ · PLAN.md · docs/specs/ · internal/observe/thresholds.go · golden · tools/d22scan/allowlist.txt · internal/panel/tokens_fourway_test.go · internal/panel/l2_grant_boundary_test.go · internal/perm/ticket90_persist_test.go。
+- 结论：**17 笔逐笔 0 命中**；派单点名五笔：e480e15b=44 件／ca777e8f=58 件／ff384b3d=1／b3959665=1／95708485=1，第二把（子串形）复扫同样 0。
+- 旁证：票面 ca777e8f numstat=2/0；后三笔未动票面；仪器件自 e480e15b blob 未变。
+
+## AC#5 名册交集口径核（r1b 方法学 ⇄ 本腿复核）
+- 方法学（ⓐ 同树 overlay-stub 对）：空 stub（package main 两行 .txt）经 overlay 顶掉本腿两枚件 ⇒ 同树"改前"侧。
+  本腿复核（读 r1b 原件，⛔ 抄结论）：stable-pre/stable-post 各 122 行、cmp rc=0、diff 0 行；定向补尺 -run TestAC29 两侧 13⇄17、diff 唯一差＝恰 4 枚 TestAC294*。
+- 死区降格具名：prescribed 5 发全死（4 发 prescribed＋1 发宽跳 companion），go test 报 174.374／161.518／159.877／157.188／158.932s；
+  死点（prescribed）＝TestAC14GoSideEvalPushReachesThePage×1＋TestAC13BringUpSurvivesAReusedThreadQuit×2＋TestPanelThreadIsSTAAndExitsCleanly×1；companion 死点＝TestProvidersProbeRecordsMeasuredThinkingFalse。
+  ⇒ resident_* 区（含 4 枚新名）在死区之后、整包名册零覆盖＝降格用定向补尺（补充⛔ 互替）。
+- 本腿自抽一发（⛔ 未重跑变异、⛔ 未撞整包死区）：-run TestAC29 rc=0、17 PASS、SKIP/FAIL=0；名册与 r1b stable-target-post **diff 空**。
+- 门禁抽核（本腿现跑）：GOFLAGS= go build ./... rc=0；gofumpt -l cmd/wisp 仅两枚既有脏（models.go／panel_transport_35r2_test.go，⛔ 本票账）；sh scripts/d22scan.sh worktree rc=0 clean（扫描射程 frontend/design/internal/cmd，⛔ 含 probes/）。
+- 欠账具名：**prescribed 全包覆盖（resident 区）本腿同样未取得**——死区所致；等票 314 定/修后同形 2+2 重跑＝编排者队列。本腿未跑的其余项：整包套件（⛔ 故意不撞死区）。
+
+## 原件逐字（tee）
+
+--- [AC#5 本腿复核原件] ---
+== AC#5 本腿复核 (read-only re-run 2026-10-13 21:59:44 +0800)
+-- stable rosters wc:
+  122 /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/294/r1b/logs/stable-pre-r1b.txt
+  122 /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/294/r1b/logs/stable-post-r1b.txt
+  244 total
+cmp: rc=0 IDENTICAL
+diff lines: 0
+-- target rosters wc:
+  13 /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/294/r1b/logs/stable-target-pre-r1b.txt
+  17 /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/294/r1b/logs/stable-target-post-r1b.txt
+  30 total
+-- target diff 逐字:
+13a14,17
+> PASS TestAC294AssemblyRootAttachesTheMuteGateByShape
+> PASS TestAC294HkMuteMirrorMatchesInternalBallSource
+> PASS TestAC294MuteHotkeyRegistersLiveOnARealBallWindow
+> PASS TestAC294ToggleMuteExecutedTrueOnTheHappyPath
+-- prescribed 逐发 时长/死点:
+post-1: FAIL	github.com/CarlosShao/wisp/cmd/wisp	174.374s
+   last RUN: === RUN   TestAC14GoSideEvalPushReachesThePage
+post-2: FAIL	github.com/CarlosShao/wisp/cmd/wisp	161.518s
+   last RUN: === RUN   TestAC13BringUpSurvivesAReusedThreadQuit
+pre-1: FAIL	github.com/CarlosShao/wisp/cmd/wisp	159.877s
+   last RUN: === RUN   TestAC13BringUpSurvivesAReusedThreadQuit
+pre-2: FAIL	github.com/CarlosShao/wisp/cmd/wisp	157.188s
+   last RUN: === RUN   TestPanelThreadIsSTAAndExitsCleanly
+post-skip-1: FAIL	github.com/CarlosShao/wisp/cmd/wisp	158.932s
+   last RUN: === RUN   TestProvidersProbeRecordsMeasuredThinkingFalse
+-- 计数两把并排 (含子测试 / 只顶层):
+post-1: 174 / 125 FAIL=1
+post-2: 170 / 121 FAIL=1
+pre-1: 170 / 121 FAIL=1
+pre-2: 174 / 125 FAIL=2
+post-skip-1: 183 / 134 FAIL=1
+-- 本腿自抽一发 -run TestAC29 名册 vs r1b stable-target-post:
+17 /c/Users/swq/AppData/Local/Temp/wisp294v1/roster-target-v1.txt
+roster diff rc=0 (逐名相同)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.484s
+
+--- [AC#4 逐笔越界原件] ---
+== AC#4 sweep; HEAD at sweep = 8cfd7b1be6aa352ccf9ad66a12974f8fd54f6502
+== range: e480e15b^..HEAD (all commits)
+e480e15bb72479a365290ff4f85a69050defc704 files=44 forbidden-hits=0 | e480e15b 294-r1 死腿遗产代提〔未验证半成品〕�
+2a62f96cf7f1e2ccfe806e315459a5a225f35b5e files=1 forbidden-hits=0 | 2a62f96c 编排者：294-r1b 派单存档（先存档后发�
+31cc222b83121986a32504f34f93656b5a6128c9 files=4 forbidden-hits=0 | 31cc222b 编排者：294-r1b 发送补记＋票尾 bullet＋
+084a6656bdf4af6cd271be527d716c6c69617d30 files=1 forbidden-hits=0 | 084a6656 编排者：记我——修正 294 票尾 bullet �
+5f513c612006fdedc8a116781fce3efc8c420bfc files=2 forbidden-hits=0 | 5f513c61 编排者：第二波派单存档（229-r1 甲形�
+f70b540f3466f70074f7685b21299cc194019fa9 files=3 forbidden-hits=0 | f70b540f 编排者：第二波发送补记＋台账 A879（3
+32bba42c0dfc4927ecbb38166e41c0f372ddf467 files=15 forbidden-hits=0 | 32bba42c 229-r1 甲形落地：子代理收尾协程 spawn �
+ca777e8fa7a35cfcdbae7ce40c6cad01b3b51140 files=58 forbidden-hits=0 | ca777e8f 294-r1b（续腿·票 294）：三格复核不回�
+ff384b3dc413a2ad381a0e268926f8ea69a74ddd files=1 forbidden-hits=0 | ff384b3d 294-r1b：50 门禁件补记本笔 AC#4（ca777e8f 
+b3959665625bac045e6c20e32b412f8c0e56c23d files=1 forbidden-hits=0 | b3959665 294-r1b：00-head 补记 HEAD 漂移（229-r1 32bba
+957084859d6194586670b75db52598bb6cefcbea files=1 forbidden-hits=0 | 95708485 294-r1b：50 门禁件补三笔提交的十枚禁�
+3d937469c0c93de781632b2894583224ff9c7245 files=2 forbidden-hits=0 | 3d937469 编排者：294-v1/229-v1 验收派单存档（先�
+4cf3a09ce0a8d1e0d1cd1a4e7d7d66605a187a23 files=4 forbidden-hits=0 | 4cf3a09c 编排者：294-v1/229-v1 发送补记＋台账 A88
+ed45d16ea23b8065abce6d158f259755e077a6cb files=2 forbidden-hits=0 | ed45d16e 编排者：313 收尾链两枚裁定落地（台�
+79a84350af5bb60d8887a0112a9e76bcb811ff2f files=3 forbidden-hits=0 | 79a84350 记我：313 票尾 bullet 误落幽灵文件名（
+3b8df61c8aa8bf69a18d156bac94282dde220fd4 files=33 forbidden-hits=0 | 3b8df61c queue-census-1 交件：只读普查收口——队
+5bbe3205ec8c6e9de5a3ca322d537ca6585150b6 files=1 forbidden-hits=0 | 5bbe3205 编排者：186-r1 发送补记（发放条件已�
+c184075c5444bd0468c2afa3a6881b773127e9fa files=1 forbidden-hits=0 | c184075c 编排者：A883 收队列表普查＋放 186-r1（
+8cfd7b1be6aa352ccf9ad66a12974f8fd54f6502 files=13 forbidden-hits=0 | 8cfd7b1b 229-v1 验收（非实现者，抽核形）：AC#1.
+== named five, full 10-pattern sweep
+--- e480e15b
+  (no HIT line above = 0 hits)
+--- ca777e8f
+  (no HIT line above = 0 hits)
+--- ff384b3d
+  (no HIT line above = 0 hits)
+--- b3959665
+  (no HIT line above = 0 hits)
+--- 95708485
+  (no HIT line above = 0 hits)
+
+--- [本腿自抽 -run TestAC29 名册（17 枚）] ---
+PASS TestAC290BothMuteGesturesTurnTheGateAndBack
+PASS TestAC290GestureBeforeTheAttachSaysSo
+PASS TestAC290MutedDefaultStillDecidesTheBoot
+PASS TestAC290NoGateSaysWhichShapeThisProcessIsIn
+PASS TestAC290OutcomeIsReadOffTheGateNotOffTheRequest
+PASS TestAC290UnhostedGestureWordingStillSaysTrueThing
+PASS TestAC293BootProjectionShowsTheFactoryMutePosture
+PASS TestAC293MuteHotkeyCheckmarkFollowsTheGate
+PASS TestAC293NoGateWritesNoCheckmark
+PASS TestAC293ProjectionIsNilSafeWithoutABallWindow
+PASS TestAC293RefusedDeviceStillProjectsTheGateNotTheHopedOutcome
+PASS TestAC293TrayItemCheckmarkFollowsTheGate
+PASS TestAC293UndrivenTrayFlagIsNotTheSourceOfTruth
+PASS TestAC294AssemblyRootAttachesTheMuteGateByShape
+PASS TestAC294HkMuteMirrorMatchesInternalBallSource
+PASS TestAC294MuteHotkeyRegistersLiveOnARealBallWindow
+PASS TestAC294ToggleMuteExecutedTrueOnTheHappyPath
+
+--- [门禁抽核] ---
+== instrument immutability vs e480e15b
+diff-lines=0
+rev-parse: 9704ff08f32fe360d00f9ac58cb1088b861bd826 (e480e15b) / 9704ff08f32fe360d00f9ac58cb1088b861bd826 (HEAD)
+== ticket numstat in r1b commits
+ca777e8f: 2	0	.scratch/wisp/issues/294-no-production-shape-test-for-the-mute-attach-hop.md
+ff384b3d: b3959665: 95708485: == GOFLAGS= go build ./... 
+
+real	0m5.053s
+user	0m0.015s
+sys	0m0.016s
+build-rc=0
+== gofumpt -l cmd/wisp
+cmd\wisp\models.go
+cmd\wisp\panel_transport_35r2_test.go
+gofumpt-rc=0
+
+--- [d22scan worktree 末行] ---
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=235, bans #1-5 cmd/=40, ban #6 frontend/=107, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=107, ban #8 internal/=543, ban #8 cmd/=123; ban #8 emoji coverage: design/ 39 text files; frontend/ 107 text files; internal/ 543 Go files, comments and _test.go included; cmd/ 123 Go files, comments and _test.go included
+d22scan-rc=0
+
+--- [收手复核（含还原证明）] ---
+== 收手复核（2026-10-13 21:57:44 +0800）
+-- 产码/仪器 sha256（应分别 = 72fcee7a…/a841f522…/7b20b7f8…/ede84f7a…）
+72fcee7ac202b17df2b74b061fa0ffdd3559547d77e765baa1082fe897891509 *cmd/wisp/resident_windows.go
+a841f5220ea68f2158a8ddb34cd378a26b672daf1e20b0f62a9cfed8d2609a84 *cmd/wisp/resident_audio_windows.go
+7b20b7f8d4a8b07b834036e32189a4f01ef055ab2f7daf4792b32efc07cfde49 *cmd/wisp/resident_mute_294_test.go
+ede84f7a80237fba3fb47d3dc9696e20c394c6f18ec91f2864e9fcb924969229 *cmd/wisp/resident_mute_294_windows_test.go
+-- 产码备份件（仓外）cmp：
+resident_windows.go ⇄ 备份 cmp rc=0（逐字节同）
+-- git status --porcelain -- cmd/wisp （空=零改动）
+status-lines=0
+-- blob 锚：e480e15b 与 HEAD 的仪器 blob
+e480e15b:9704ff08f32fe360d00f9ac58cb1088b861bd826
+HEAD    :9704ff08f32fe360d00f9ac58cb1088b861bd826
+-- 仪器 vs 代提笔 diff 行数
+0

@@ -1,0 +1,93 @@
+# 294-v1 AC#1 读数件 —— 装配根形钉的第三类变异（⛔ 不抄 r1 的 D1/D2）
+
+- 锚：起手 HEAD 3d937469（后随别腿漂到 8cfd7b1b，cmd/wisp 零动）；尺件 cmd/wisp/resident_mute_294_test.go sha256 7b20b7f8…cfde49（= 代提 e480e15b blob 9704ff08…，收手复核见 40 件）。
+- 判语一句：**三发独立变异全红在指名子句 ⇒ (a)/(b) 两支都有牙**；缺一枚子句 (c) 的独立红形（具名在末节）。
+- 变异一律：尺侧＝-overlay（只作用编译输入）；产码侧＝仓外备份＋跑后 cp 还原＋sha256 双写证。
+  （overlay 作用不到本用例的测量面：runResidentBody258 在测试运行时从 CWD 的 ./resident_windows.go 现读磁盘，⛔ 编译输入——r1 已把这条具名，本腿复认后走备份+还原形。）
+
+## 1. 尺侧变异 M3-ruler：把走查的 SelectorExpr 层去掉（方向=尺）
+- 变体件＝仓外 mut-ac1-ruler-identlayer.txt，sha256 240cc64f00481a80c945c8785b78f878df3cdef4ce016bdf210c50dd118031a4。
+- overlay 件逐字：{"Replace": {"D:/work/workspace/projects plans/Wisp/cmd/wisp/resident_mute_294_test.go": "C:/Users/swq/AppData/Local/Temp/wisp294v1/mut-ac1-ruler-identlayer.txt"}}
+- diff（base⇄变体）逐字：
+  95,96c95,96
+  < 			sel, ok := d.Fun.(*ast.SelectorExpr)
+  < 			if !ok || sel.Sel.Name != "attachMuteGate" {
+  ---
+  > 			idMatch, ok := d.Fun.(*ast.Ident)
+  > 			if !ok || idMatch.Name != "attachMuteGate" {
+  101,103d100
+  < 			if recv, ok := sel.X.(*ast.Ident); ok {
+  < 				attachRecv = recv.Name
+  < 			}
+- 机制：生产那行是方法调用（call.Fun 是 *ast.SelectorExpr）⇒ 去掉该层后走查对生产读 0。
+- 判读：**变红 ⇒ 该层承重**（⛔ 恒绿假钉）；红落在 (a) 的 ==1 断言上——"空集通过"那一形（对找到的每枚调用检查 X）在本仪器不存在（(b)/(c) 只在 (a) 通过后才跑）。
+- 注意：红句行号 :114 是**变体行号**（变体比原尺短 3 行）；原尺同名断言在 :117。
+
+## 2. 产码侧变异 M3-arg：实参换掉（raudio.toggleMute → nil）
+- 手法：仓外备份 → sed 同行改字（grep -c 现量命中 1 处）→ 跑 → cp 还原。
+- 变形后产码行现读：342:\trb.attachMuteGate(nil)。
+- 判读：红在 (b) 实参子句，红句把生产实参拼写现读为 ""（比较是活的）。
+
+## 3. 产码侧变异 M3-recv：接收者换掉（rb → 别名 rbalias）
+- 手法同上（同行扩两行，编译通过）。
+- 变形后产码两行现读：342:\trbalias := rb ／ 343:\trbalias.attachMuteGate(raudio.toggleMute)。
+- 判读：红在 (b) 接收者子句，红句现读接收者 "rbalias"。
+
+## 4. 还原证明（仓内字节零动）
+- 变异前 S0 = 还原后 S1 = 72fcee7ac202b17df2b74b061fa0ffdd3559547d77e765baa1082fe897891509；
+  git diff --stat -- cmd/wisp/resident_windows.go 空、git status --porcelain -- cmd/wisp 零行（收手复核件在 40 件内）。
+- 两枚仪器件全程只读：sha256 起手⇄收手同值；blob 锚 e480e15b == HEAD == 9704ff08f32fe360d00f9ac58cb1088b861bd826。
+
+## 5. 具名缺口（哪格没牙/没跑）
+- **子句 (c)（挂载晚于 startResidentAudio）本腿未取独立红形**：可编译的"倒序"变异不存在（raudio 必须先绑定才可被引用，Go 作用域使然）⇒ 该子句的牙属结构性；若编排者要逐子句红形须另派（⛔ 本腿不造编译不过的假红充数）。
+- 其余：无。派单点名的"第三种变异＋两个方向"已足额（三发，方向=尺侧一发、产码侧两发）。
+
+## 原件逐字（tee）
+
+--- [M3-ruler 红读原件] ---
+run at 2026-10-13 21:34:20 +0800
+time=2026-10-13T21:34:25.259+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC294AssemblyRootAttachesTheMuteGateByShape
+    resident_mute_294_test.go:114: AC#1(a) RED: runResident (resident_windows.go) contains 0 rb.attachMuteGate call(s), want exactly 1 - the mute hop is not attached (or attached twice)
+--- FAIL: TestAC294AssemblyRootAttachesTheMuteGateByShape (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.064s
+FAIL
+rc=1
+
+--- [M3-arg 红读原件＋还原] ---
+run at 2026-10-13 21:34:49 +0800
+=== RUN   TestAC294AssemblyRootAttachesTheMuteGateByShape
+    resident_mute_294_test.go:133: AC#1(b) RED: the attach argument is "", want raudio.toggleMute (the capture leg's own executor - any other function value is the defect this pin exists to catch)
+--- FAIL: TestAC294AssemblyRootAttachesTheMuteGateByShape (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.066s
+FAIL
+test-rc=1
+
+--- [M3-recv 红读原件＋还原] ---
+run at 2026-10-13 21:35:14 +0800
+=== RUN   TestAC294AssemblyRootAttachesTheMuteGateByShape
+    resident_mute_294_test.go:127: AC#1(b) RED: the attach receiver is "rbalias", want rb (the value startResidentBall returned)
+--- FAIL: TestAC294AssemblyRootAttachesTheMuteGateByShape (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.070s
+FAIL
+test-rc=1
+
+--- [收手复核（含还原证明）] ---
+== 收手复核（2026-10-13 21:57:44 +0800）
+-- 产码/仪器 sha256（应分别 = 72fcee7a…/a841f522…/7b20b7f8…/ede84f7a…）
+72fcee7ac202b17df2b74b061fa0ffdd3559547d77e765baa1082fe897891509 *cmd/wisp/resident_windows.go
+a841f5220ea68f2158a8ddb34cd378a26b672daf1e20b0f62a9cfed8d2609a84 *cmd/wisp/resident_audio_windows.go
+7b20b7f8d4a8b07b834036e32189a4f01ef055ab2f7daf4792b32efc07cfde49 *cmd/wisp/resident_mute_294_test.go
+ede84f7a80237fba3fb47d3dc9696e20c394c6f18ec91f2864e9fcb924969229 *cmd/wisp/resident_mute_294_windows_test.go
+-- 产码备份件（仓外）cmp：
+resident_windows.go ⇄ 备份 cmp rc=0（逐字节同）
+-- git status --porcelain -- cmd/wisp （空=零改动）
+status-lines=0
+-- blob 锚：e480e15b 与 HEAD 的仪器 blob
+e480e15b:9704ff08f32fe360d00f9ac58cb1088b861bd826
+HEAD    :9704ff08f32fe360d00f9ac58cb1088b861bd826
+-- 仪器 vs 代提笔 diff 行数
+0
