@@ -1,0 +1,11 @@
+票 186 落地腿 `186-r1` —— 发送时补记（2026-10-13 21:34:15 +08，编排者现写）
+
+派单正文＝`.scratch/wisp/probes/orch/20261013/txt/186r1-dispatch.txt`（40 行，笔 `b54f1740`，逐字照读）。
+本文件只记"从写派单（10-13 早）到发送（10-13 21:5x）"之间变了的前提；冲突时以本文件为准。
+
+1. **发放条件已满足且现刻复核**：`313-r1` 已交（`89b3b550`，18:20）；`cmd/wisp`＋`internal/panel` 面**现刻无写腿**（你起手仍按派单 §0 三问自证）。
+2. **本波并行腿（写面零交集，但抢 CPU/测试台面）**：`294-v1`（验收，跑 `./cmd/wisp` 定向＋变异；overlay 只落它自己 probes 目录）＋`229-v1`（验收，跑 `internal/tools`）＋你。⇒ `./cmd/wisp` 重包跑前 `tasklist` 自证（含 `.test.exe` 家族），有别的在跑就等 60s×≤12，等待具名落 logs。
+3. **今日 `186-a1` 普查已交**（笔 `2f41a80c`）：git 识别三支读数（`.git/HEAD` 回溯／`.git/worktrees/`＝2＋主＝3／`refs/heads` 递归＝4、无 packed-refs）＋**前端切换器现量：`GitBranchChip` 存在但被 `App.tsx:216-219` 硬编码空视图（return null）** ⇒ AC#9 规格按"页面已就绪待接线"写（⛔ 动 `frontend/**`）。先读它的件再复认读数。
+4. **HEAD 级已知红（⛔ 别算你的账、⛔ 修）**：`cmd/wisp TestTicket255RosterStillMatchesTheActualReadSites`（台账 `A878`＝313-r1 在 `internal/panel/config_handlers.go` 添了 Voice 读面、255 名册未重裁）；`internal/session TestSessionListByWorkspace` 间歇红（`-count=5` 里 2 发，归 166 侧）；`internal/risk TestResolvePerCallBudget` 争用假红（安静 `-count=3` 复量）；`panel` 六枚既有红——`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestC21DesignTokensFourWayAgree`／`TestComposerContractTypesMatchFrontend`／`TestNoGitSwitchCapabilityInThePanelSurface`〔**改写作废权＝你的**，派单 §1 已裁〕／`TestStreamLogDroppedNamingLedgerIsNotBounded35r8`／`TestStreamLogFloodBelowKeyBoundIsNotBounded35r8`。
+5. **票 314 死区续存**：今日 5/5 连发整进程死（157.2–174.4s，机主在场照死）⇒ `./cmd/wisp` 整包撞上按派单 §4 处置（具名死点、不计牙、补一发）。
+6. 发送时刻现场（编排者现跑）：CPU 平均 30%；`wisp.exe`/`balldebug.exe`＝0；HEAD＝`3b8df61c`。
