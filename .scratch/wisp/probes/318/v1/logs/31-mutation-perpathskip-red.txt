@@ -1,0 +1,44 @@
+# 318-v1 自造突变 M2 换判词=逐 path 跳过（我自己的变异，仓外 snap-mut；仓内零突变）
+# 配方: 删 5 行守卫 + 派生循环首行插 if strings.Contains(p, "无法规范化") { continue }（见下 diff）；build rc=0
+# 目的: 独立复核"整卡拒 vs 逐 path 跳过"的登记——跳过语义会让混合卡反向开口（修前拒、修后有）
+
+== mutation diff (snap-post vs snap-mut) ==
+--- /c/tmp/wisp318v1/snap-post/internal/agent/approval/replies.go	2026-10-14 17:05:10.000000000 +0800
++++ replies.go	2026-10-14 18:27:55.064828300 +0800
+@@ -517,13 +517,11 @@
+ // again through C26 like any hand edit of the same section, and which a second,
+ // L2-level confirmation has to approve before anything is written at all.
+ func (c ReplyCard) WideningRule() (dir, rule string, ok bool) {
++	dirs := make([]string, 0, len(c.Paths))
+ 	for _, p := range c.Paths {
+ 		if strings.Contains(p, "无法规范化") {
+-			return "", "", false
++			continue
+ 		}
+-	}
+-	dirs := make([]string, 0, len(c.Paths))
+-	for _, p := range c.Paths {
+ 		d := strings.ReplaceAll(dirOf(p), "\\", "/")
+ 		// A bare drive root ("D:", ".") and an empty segment are refusals, not
+ 		// offers: allowlisting a whole volume is not what one card asked for.
+
+== go build rc ==
+build rc=0
+
+== 指名的钉红（逐字；TestTicket318AMarkedPathRefusesTheWholeCard :84）==
+--- PASS: TestTicket318AMarkerCardOffersNoWideningTarget (0.00s)
+    ticket318_widening_marker_rulers_test.go:84: one marked path must refuse the whole card, got dir="C:/proj/outside" rule="[fs] allowed_dirs += \"C:/proj/outside\""
+--- FAIL: TestTicket318AMarkedPathRefusesTheWholeCard (0.00s)
+--- PASS: TestTicket318TheSamePathWithoutTheMarkerStillDerivesItsParent (0.00s)
+--- PASS: TestTicket318ShortNamesAreNotTheMarker (0.00s)
+--- PASS: TestV318V1JunctionMarkerCardMustNotOfferAWideningTarget (0.00s)
+--- PASS: TestV318V1EmptyPathMarkerMustNotOfferAWideningTarget (0.01s)
+--- PASS: TestV318V1UnmarkedCardsStillDeriveTheirParent (0.03s)
+--- FAIL: TestV318V1MultiPathAndShortNameReadings (0.04s)
+--- PASS: TestZZ201A1JunctionMarkerCardIsRefusedForWidening (0.04s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	1.503s
+
+== 我自己的混合卡尺 D1 同树红（独立复到反向开口）==
+    v318v1_repro_test.go:134: D1 mixed [marked, clean]: ok=true dir="C:/proj/outside" rule="[fs] allowed_dirs += \"C:/proj/outside\"" writeAttempted=true writeErr=<nil>
+    v318v1_repro_test.go:136: mixed card offered a widening target: dir="C:/proj/outside"

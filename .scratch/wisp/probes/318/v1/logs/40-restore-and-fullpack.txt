@@ -1,0 +1,30 @@
+# 318-v1 还原（M1/M2 后把 replies.go 由 pristine 快照拷回，diff -q 逐字节同）＋修后全包门
+# 还原后同射程复跑（态3→还原绿）:
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	1.401s
+
+# M1 还原后的 9 PASS 读数: logs 34 尾部
+--- PASS: TestTicket318AMarkerCardOffersNoWideningTarget (0.00s)
+--- PASS: TestTicket318AMarkedPathRefusesTheWholeCard (0.00s)
+--- PASS: TestTicket318TheSamePathWithoutTheMarkerStillDerivesItsParent (0.00s)
+--- PASS: TestTicket318ShortNamesAreNotTheMarker (0.00s)
+--- PASS: TestV318V1JunctionMarkerCardMustNotOfferAWideningTarget (0.08s)
+--- PASS: TestV318V1EmptyPathMarkerMustNotOfferAWideningTarget (0.04s)
+--- PASS: TestV318V1UnmarkedCardsStillDeriveTheirParent (0.42s)
+--- PASS: TestV318V1MultiPathAndShortNameReadings (0.33s)
+--- PASS: TestZZ201A1JunctionMarkerCardIsRefusedForWidening (0.25s)
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	6.309s
+
+# 修前树全包（skip 我的尺 TestV318V1；既有件一字未动）
+--- SKIP: TestDefaultDeadlineWallClockMeasurement (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	1.953s
+pre PASS count=74
+
+# 修后树全包（同命令）
+--- SKIP: TestDefaultDeadlineWallClockMeasurement (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	2.159s
+post PASS count=78
+
+# SKIP 具名（两树同枚，既有；非新增）:
+=== RUN   TestDefaultDeadlineWallClockMeasurement
+    ticket84_no_owner_test.go:224: 有意慢：300s 墙钟计量，只在 WISP_84_MEASURE=1 时跑（票 84 AC#1；见 docs/evidence/s1/84-ac1-bounded-wait.md）
+--- SKIP: TestDefaultDeadlineWallClockMeasurement (0.00s)

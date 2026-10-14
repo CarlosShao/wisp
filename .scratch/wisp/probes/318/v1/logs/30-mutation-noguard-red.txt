@@ -1,0 +1,51 @@
+# 318-v1 自造突变 M1 摘守卫（我自己的变异，仓外 snap-mut；工作树/仓内零突变）
+# 配方: perl -0pi 删 WideningRule 入口 5 行守卫（见下 diff）；同树 build rc=0 证变异可编译
+# 注意：此突变==把修后树"还原"到修前产码形状（即态3 的读法）
+
+== mutation diff (snap-post vs snap-mut) ==
+--- /c/tmp/wisp318v1/snap-post/internal/agent/approval/replies.go	2026-10-14 17:05:10.000000000 +0800
++++ replies.go	2026-10-14 18:23:03.886740500 +0800
+@@ -517,11 +517,6 @@
+ // again through C26 like any hand edit of the same section, and which a second,
+ // L2-level confirmation has to approve before anything is written at all.
+ func (c ReplyCard) WideningRule() (dir, rule string, ok bool) {
+-	for _, p := range c.Paths {
+-		if strings.Contains(p, "无法规范化") {
+-			return "", "", false
+-		}
+-	}
+ 	dirs := make([]string, 0, len(c.Paths))
+ 	for _, p := range c.Paths {
+ 		d := strings.ReplaceAll(dirOf(p), "\\", "/")
+
+== go build rc ==
+build rc=0
+
+== 指名的钉红（逐字；ticket318_widening_marker_rulers_test.go 四枚之一 :58/:61）==
+=== RUN   TestTicket318AMarkerCardOffersNoWideningTarget
+    ticket318_widening_marker_rulers_test.go:58: junction card as 201-a1 measured it (forward slashes): marked path still offered as a widening base: dir="C:/proj/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction" rule="[fs] allowed_dirs += \"C:/proj/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction\""
+    ticket318_widening_marker_rulers_test.go:61: junction card as 201-a1 measured it (forward slashes): a refusal must clear dir and rule, got ("C:/proj/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction", "[fs] allowed_dirs += \"C:/proj/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction\"")
+    ticket318_widening_marker_rulers_test.go:58: the same chain in backslash spelling: marked path still offered as a widening base: dir="C:/proj/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction" rule="[fs] allowed_dirs += \"C:/proj/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction\""
+    ticket318_widening_marker_rulers_test.go:61: the same chain in backslash spelling: a refusal must clear dir and rule, got ("C:/proj/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction", "[fs] allowed_dirs += \"C:/proj/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction\"")
+    ticket318_widening_marker_rulers_test.go:58: empty-path marker (tools: empty path), no slash in the string: marked path still offered as a widening base: dir=" (无法规范化: tools: empty path)" rule="[fs] allowed_dirs += \" (无法规范化: tools: empty path)\""
+    ticket318_widening_marker_rulers_test.go:61: empty-path marker (tools: empty path), no slash in the string: a refusal must clear dir and rule, got (" (无法规范化: tools: empty path)", "[fs] allowed_dirs += \" (无法规范化: tools: empty path)\"")
+--- FAIL: TestTicket318AMarkerCardOffersNoWideningTarget (0.00s)
+=== RUN   TestTicket318AMarkedPathRefusesTheWholeCard
+--- PASS: TestTicket318AMarkedPathRefusesTheWholeCard (0.00s)
+=== RUN   TestTicket318TheSamePathWithoutTheMarkerStillDerivesItsParent
+--- PASS: TestTicket318TheSamePathWithoutTheMarkerStillDerivesItsParent (0.00s)
+=== RUN   TestTicket318ShortNamesAreNotTheMarker
+--- PASS: TestTicket318ShortNamesAreNotTheMarker (0.00s)
+=== RUN   TestZZ201A1JunctionMarkerCardIsRefusedForWidening
+    zz_201_a1_junction_marker_windows_test.go:163: READING-1 bridge 路由的 Decision: level=L2 rules=[R2 R3] refusal=""
+    zz_201_a1_junction_marker_windows_test.go:168: READING-2 卡面逐字 Paths[0] = "C:/tmp/wisp318v1gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening3955226921/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"
+    zz_201_a1_junction_marker_windows_test.go:189: READING-2b 反斜杠拼法: 卡面=["C:\\tmp\\wisp318v1gotmp\\TestZZ201A1JunctionMarkerCardIsRefusedForWidening3955226921\\001\\allowed\\jn\\victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"] dir="C:/tmp/wisp318v1gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening3955226921/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction" ok=true
+    zz_201_a1_junction_marker_windows_test.go:191: 反斜杠拼法：带标记卡面仍被当作放宽基础（修后两种拼法应同拒）: dir="C:/tmp/wisp318v1gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening3955226921/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction" ok=true
+--- FAIL: TestZZ201A1JunctionMarkerCardIsRefusedForWidening (0.07s)
+
+== 我的复现尺在同树的红（态3）: A1 行 ==
+    v318v1_repro_test.go:82: A1 reading: ok=true dir="C:/proj/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction" rule="[fs] allowed_dirs += \"C:/proj/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction\"" writeAttempted=true writeErr=<nil>
+--- FAIL: TestV318V1JunctionMarkerCardMustNotOfferAWideningTarget (0.12s)
+--- FAIL: TestV318V1EmptyPathMarkerMustNotOfferAWideningTarget (0.07s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	4.158s

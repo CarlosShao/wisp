@@ -1,0 +1,38 @@
+time=2026-10-14T18:19:53.932+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV318V1JunctionMarkerCardMustNotOfferAWideningTarget
+    v318v1_repro_test.go:82: A1 reading: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+    v318v1_repro_test.go:83: A2 config.toml after the 长期-branch write shape (fragmentLanded=false):
+        schema_version = 2
+        
+        [fs]
+        allowed_dirs = []
+--- PASS: TestV318V1JunctionMarkerCardMustNotOfferAWideningTarget (0.01s)
+=== RUN   TestV318V1EmptyPathMarkerMustNotOfferAWideningTarget
+    v318v1_repro_test.go:98: B1 reading: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+    v318v1_repro_test.go:99: B2 config.toml (markerLanded=false):
+        schema_version = 2
+        
+        [fs]
+        allowed_dirs = []
+--- PASS: TestV318V1EmptyPathMarkerMustNotOfferAWideningTarget (0.01s)
+=== RUN   TestV318V1UnmarkedCardsStillDeriveTheirParent
+time=2026-10-14T18:19:53.978+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318v1gotmp\TestV318V1UnmarkedCardsStillDeriveTheirParent1523786459\001\.wisp-config-935320709.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T18:19:53.981+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+    v318v1_repro_test.go:118: C1 the same card as A with the marker removed: ok=true dir="C:/proj/allowed/jn" rule="[fs] allowed_dirs += \"C:/proj/allowed/jn\"" writeAttempted=true writeErr=<nil>
+time=2026-10-14T18:19:53.989+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318v1gotmp\TestV318V1UnmarkedCardsStillDeriveTheirParent1523786459\002\.wisp-config-4107000456.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T18:19:53.992+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+    v318v1_repro_test.go:118: C2 an ordinary out-of-scope read: ok=true dir="C:/proj/outside" rule="[fs] allowed_dirs += \"C:/proj/outside\"" writeAttempted=true writeErr=<nil>
+--- PASS: TestV318V1UnmarkedCardsStillDeriveTheirParent (0.04s)
+=== RUN   TestV318V1MultiPathAndShortNameReadings
+    v318v1_repro_test.go:134: D1 mixed [marked, clean]: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+    v318v1_repro_test.go:139: D2 all paths marked: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+time=2026-10-14T18:19:54.029+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318v1gotmp\TestV318V1MultiPathAndShortNameReadings2401091583\003\.wisp-config-3682645644.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T18:19:54.030+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+    v318v1_repro_test.go:144: D3 two clean paths, one dir: ok=true dir="C:/proj/outside" rule="[fs] allowed_dirs += \"C:/proj/outside\"" writeAttempted=true writeErr=<nil>
+    v318v1_repro_test.go:149: D4 two clean paths, two dirs: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+time=2026-10-14T18:19:54.042+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318v1gotmp\TestV318V1MultiPathAndShortNameReadings2401091583\005\.wisp-config-458840533.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T18:19:54.044+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+    v318v1_repro_test.go:154: D5 8.3 short name (no marker): ok=true dir="C:/PROGRA~1/notes" rule="[fs] allowed_dirs += \"C:/PROGRA~1/notes\"" writeAttempted=true writeErr=<nil>
+--- PASS: TestV318V1MultiPathAndShortNameReadings (0.05s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	2.048s

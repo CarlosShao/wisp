@@ -1,0 +1,41 @@
+# 318-v1 名册双向差集＋AC#2 边界读数＋邻域族
+# (a) 名册: go test ./internal/agent/approval/ -list ".*" 两树；剔除我自己的 TestV318V1*（两树同挂）后 diff
+#     修前 79 枚 / 修后 83 枚；差集=+4 新增(ticket318 四枚)＋1 改名(TestZZ201A1JunctionMarker* )，无其它
+33a34,37
+> TestTicket318AMarkerCardOffersNoWideningTarget
+> TestTicket318AMarkedPathRefusesTheWholeCard
+> TestTicket318TheSamePathWithoutTheMarkerStillDerivesItsParent
+> TestTicket318ShortNamesAreNotTheMarker
+75c79
+< TestZZ201A1JunctionMarkerBecomesAWideningFragment
+---
+> TestZZ201A1JunctionMarkerCardIsRefusedForWidening
+
+# (b) 既有族不回归: 修前/修后全包 rc=0；PASS 74→78（+4 新增）；SKIP 1→1 同枚既有
+#     TestDefaultDeadlineWallClockMeasurement（ticket84 设计内 env 门，非新增）。见 40-restore-and-fullpack.txt
+# (c) AC#2 边界（我的 D 组读数，修前/修后逐字）:
+
+  修前(log 10):
+    v318v1_repro_test.go:134: D1 mixed [marked, clean]: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+    v318v1_repro_test.go:139: D2 all paths marked: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+    v318v1_repro_test.go:144: D3 two clean paths, one dir: ok=true dir="C:/proj/outside" rule="[fs] allowed_dirs += \"C:/proj/outside\"" writeAttempted=true writeErr=<nil>
+    v318v1_repro_test.go:149: D4 two clean paths, two dirs: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+    v318v1_repro_test.go:154: D5 8.3 short name (no marker): ok=true dir="C:/PROGRA~1/notes" rule="[fs] allowed_dirs += \"C:/PROGRA~1/notes\"" writeAttempted=true writeErr=<nil>
+  修后(log 20):
+    v318v1_repro_test.go:134: D1 mixed [marked, clean]: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+    v318v1_repro_test.go:139: D2 all paths marked: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+    v318v1_repro_test.go:144: D3 two clean paths, one dir: ok=true dir="C:/proj/outside" rule="[fs] allowed_dirs += \"C:/proj/outside\"" writeAttempted=true writeErr=<nil>
+    v318v1_repro_test.go:149: D4 two clean paths, two dirs: ok=false dir="" rule="" writeAttempted=false writeErr=<nil>
+    v318v1_repro_test.go:154: D5 8.3 short name (no marker): ok=true dir="C:/PROGRA~1/notes" rule="[fs] allowed_dirs += \"C:/PROGRA~1/notes\"" writeAttempted=true writeErr=<nil>
+
+# (d) 8.3 短名上游无标记面（邻域族，仓外快照跑）: internal/tools Junction/ShortName 11 PASS rc=0
+--- PASS: Test20r2ShortNameOfAPlainFileIsTheOrdinaryOutOfScopeClass (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	3.450s
+
+# (e) Aggregate（另一枚 dirOf 消费方）L1-only 现读（batch.go:35-37）+ WideningRule 生产唯一调用方:
+func Aggregate(d tools.Decision) *BatchView {
+	if d.Level != risk.L1 || len(d.Paths) < BatchMinOps || len(d.Paths) >= R7BatchFloor {
+		return nil
+cmd\wisp\approval_always.go:84:	dir, rule, ok := card.WideningRule()
+internal\agent\approval\replies.go:519:func (c ReplyCard) WideningRule() (dir, rule string, ok bool) {
