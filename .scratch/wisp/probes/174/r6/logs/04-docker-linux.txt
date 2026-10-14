@@ -1,0 +1,41 @@
+== 174-r6 docker-linux captures (concatenation of the two raw captures left on disk:
+   docker-linux-01.txt = clean run; docker-linux-02-mutation.txt = M1 overlay run) ==
+   image: golang:1.27 (linux/amd64); mount: repo read-only at /wisp; go version go1.27.1 linux/amd64
+
+=== capture 1: clean run (criterion 1 + criterion 3-as-seen-from-linux) ===
+Linux
+go version go1.27.1 linux/amd64
+go: downloading modernc.org/sqlite v1.59.0
+go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+go: downloading modernc.org/libc v1.75.7
+go: downloading golang.org/x/sys v0.48.0
+go: downloading modernc.org/mathutil v1.7.1
+go: downloading modernc.org/memory v1.12.1
+go: downloading github.com/dustin/go-humanize v1.0.1
+go: downloading github.com/google/uuid v1.6.0
+go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+time=2026-10-14T05:27:26.220Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+    task_output_pointer_notice_test.go:428: 前置条件缺失：造不出真 NTFS junction（mklink /J /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r32968847835/001/ALLOWLIST-LEAK-PROBE-174r3 /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r32968847835/003/RESOLVED-LEAK-PROBE-174r3: exec: "cmd": executable file not found in $PATH: ）
+--- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.01s)
+=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6
+    task_output_pointer_notice_test.go:599: portable leak-criterion verbatim: IsError=false Truncated=true announce="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在，全文见 \u00a0\u2003\u2009\u205f…]"
+    task_output_pointer_notice_test.go:640: notice region under the leak sweep: "注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在"
+--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6 (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.030s
+
+=== capture 2: M1 overlay (the relay seeded back; criterion 2 on linux itself) ===
+time=2026-10-14T05:28:11.130Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+    task_output_pointer_notice_test.go:428: 前置条件缺失：造不出真 NTFS junction（mklink /J /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r32290287027/001/ALLOWLIST-LEAK-PROBE-174r3 /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r32290287027/003/RESOLVED-LEAK-PROBE-174r3: exec: "cmd": executable file not found in $PATH: ）
+--- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.01s)
+=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6
+    task_output_pointer_notice_test.go:599: portable leak-criterion verbatim: IsError=false Truncated=true announce="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path：\u00a0\u2003\u2009\u205f）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在，全文见 \u00a0\u2003\u2009\u205f…]"
+    task_output_pointer_notice_test.go:625: the filed literal must appear exactly once, in the frozen pointer sentence: found 2 in "abcdefghijklmnopqrstuvwxyzabcdefghijklmn\nopqrstuvwxyzabcdefghijklmnopqrstuvwxyzab\ncdefghijklmnopqrstuvwxyzabcdefghijklmnop\nqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd\nefghijklmnopqrstuvwxyzabcdefghijklmnopqr\nstuvwxyzabcdefghijklmnopqrstuvwxyzabcdef\nghijklmnopqrstuvwxyzabcdefghijklmnopqrst\nuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh\nijklmnopqrstuvwxyzabcdefghijklmnopqrstuv\nwxyzabcdefghijklmnopqrstuvwxyzabcdefghij\nklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx\nyzabcdefghijklmnopqrstuvwxyzabcdefghijkl\nmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\nabcdefghijklmnopqrstuvwxyzabcdefghijklmn\nopqrstuvwxyzabcdefghijklmnopqrstuvwxyzab\ncdefghijklmnopqrstuvwxyzabcdefghijklmnop\nqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd\nefghijklmnopqrstuvwxyzabcdefghijklmnopqr\nstuvwxyzabcdefghijklmnopqrstuvwxyzabcdef\nghijklmnopqrstuvwxyzabcdefghijklmnopqrst\nuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh\nijklmnopqrstuvwxyzabcdefghijklmnopqrstuv\nwxyzabcdefghijklmnopqrstuvwxyzabcdefghij\nklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx\nyzabcdefghijklmnopqrstuvwxyzabcdefghijkl\nmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\nabcdefghijklmnopqrstuvwxyzabcdefghijklmn\nopqrstuvwxyzabcdefghijklmnopqrstuvwxyzab\ncdefghijklmnopqrstuvwxyzabcdefghijklmnop\nqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd\nefghijklmnopqrstuvwxyzabcdefghijklmnopqr\nstuvwxyzabcdefghijklmnopqrstuvwxyzabcdef\nghijklmnopqrstuvwxyzabcdefghijklmnopqrst\nuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh\nijklmnopqrstuvwxyzabcdefghijklmnopqrstuv\nwxyzabcdefghijklmnopqrstuvwxyzabcdefghij\nklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx\nyzabcdefghijklmnopqrstuvwxyzabcdefghijkl\nmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\nabcdefghijklmnopqrstuvwxyzabcdefghijklmn\nopqrstuvwxyzabcdefghijklmnopqrstuvwxyzab\ncdefghijklmnopqrstuvwxyzabcdefghijklmnop\nqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd\nefghijklmnopqrstuvwxyzabcdefghijklmnopqr\nstuvwxyzabcdefghijklmnopqrstuvwxyzabcdef\nghijklmnopqrstuvwxyzabcdefghijklmnopqrst\nuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh\nijklmnopqrstuvwxyzabcdefghijklmnopqrstuv\nwxyzabcdefghijklmnopqrstuvwxyzab\n[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path：\u00a0\u2003\u2009\u205f）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在，全文见 \u00a0\u2003\u2009\u205f…]\nmnopqrstuvwxyzabcdefghijklmn\nopqrstuvwxyzabcdefghijklmnopqrstuvwxyzab\ncdefghijklmnopqrstuvwxyzabcdefghijklmnop\nqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd\nefghijklmnopqrstuvwxyzabcdefghijklmnopqr\nstuvwxyzabcdefghijklmnopqrstuvwxyzabcdef\nghijklmnopqrstuvwxyzabcdefghijklmnopqrst\nuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh\nijklmnopqrstuvwxyzabcdefghijklmnopqrstuv\nwxyzabcdefghijklmnopqrstuvwxyzabcdefghij\nklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx\nyzabcdefghijklmnopqrstuvwxyzabcdefghijkl\nmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\nabcdefghijklmnopqrstuvwxyzabcdefghijklmn\nopqrstuvwxyzabcdefghijklmnopqrstuvwxyzab\ncdefghijklmnopqrstuvwxyzabcdefghijklmnop\nqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd\nefghijklmnopqrstuvwxyzabcdefghijklmnopqr\nstuvwxyzabcdefghijklmnopqrstuvwxyzabcdef\nghijklmnopqrstuvwxyzabcdefghijklm"
+    task_output_pointer_notice_test.go:640: notice region under the leak sweep: "注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path：\u00a0\u2003\u2009\u205f）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在"
+    task_output_pointer_notice_test.go:656: the canonicalize-error notice must not relay "\u00a0\u2003\u2009\u205f": notice "注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path：\u00a0\u2003\u2009\u205f）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在"
+--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6 (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.026s
+FAIL

@@ -1,0 +1,24 @@
+== 174-r6 anchor/gates ==
+2026-10-14 13:24:32 +0800
+6605cb6fb4e2ef4c75bc05b210568b5aff025403 2026-10-14 13:03:39 +0800 编排者：票 252 整票收口（252-v2 判 AC#4/#5 双成立；八框全勾+改名-done+名册键换；门 GREEN）＋A921
+
+== worktree dirty (internal/ cmd/ scripts/ docs/ .github/) AT CAPTURE (after my edit; taskid_source_236r4_teeth_test.go is 236-r6's in-flight file, not mine) ==
+ M internal/tools/task_output_pointer_notice_test.go
+ M internal/tools/taskid_source_236r4_teeth_test.go
+
+== my diff numstat (pure append) ==
+135	0	internal/tools/task_output_pointer_notice_test.go
+
+== ledger greps (scripts/portable-tests.sh) ==
+r3 name (must stay 1): 1
+r6 name (must stay 0 - shape 乙 is not a ledger entry): 0
+
+== gofumpt v0.12.0 -l on the edited file (empty = clean) ==
+v0.12.0 (go1.27.1)
+gofumpt-list-rc=0 (0 = ran; the line above is what it found)
+
+== build ==
+build-rc=0
+
+== host vet ==
+vet-rc=0

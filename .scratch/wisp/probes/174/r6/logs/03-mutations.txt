@@ -1,0 +1,120 @@
+== 174-r6 mutation self-proof (relay seeded back; never edits a tracked file - go -overlay only) ==
+2026-10-14 13:26:28 +0800
+
+== generations (byte-exact; mut/*.go built by this sed, not edited in place) ==
+sed s|（"+err.Error()+"）|（"+err.Error()+"："+raw+"）|   -> mut/task-M1.go
+sed s|（"+err.Error()+"）|（"+err.Error()+"）；授权根 "+strings.Join(d.Paths.Roots(), "、")+"）|   -> mut/task-M2.go
+--- diff task.go vs task-M1.go (one line, 839) ---
+839c839
+< 		notes = append(notes, "注意：这条路径现在读不到，C26 连规范化都没通过（"+err.Error()+"）")
+---
+> 		notes = append(notes, "注意：这条路径现在读不到，C26 连规范化都没通过（"+err.Error()+"："+raw+"）")
+--- diff task.go vs task-M2.go (one line, 839) ---
+839c839
+< 		notes = append(notes, "注意：这条路径现在读不到，C26 连规范化都没通过（"+err.Error()+"）")
+---
+> 		notes = append(notes, "注意：这条路径现在读不到，C26 连规范化都没通过（"+err.Error()+"）；授权根 "+strings.Join(d.Paths.Roots(), "、")+"）")
+
+== M1: the notice relays the filed path (raw). scoped to all 174 tests. ==
+--- PASS: TestCanonicalizeFailureFailsClosedInReply174 (0.00s)
+--- PASS: TestCanonicalizeFailureIsNotTheUnwiredArm174 (0.00s)
+    task_output_pointer_notice_test.go:486: the canonicalize-error notice must not relay "C:\\tmp\\wisp174r6gotmp\\TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r33958608156\\001\\ALLOWLIST-LE …[trimmed]
+    task_output_pointer_notice_test.go:486: the canonicalize-error notice must not relay "ALLOWLIST-LEAK-PROBE-174r3": notice "注意：这条路径现在读不到，C26 连规范化都没通过（risk: path traverses a reparse point (junction/ …[trimmed]
+    task_output_pointer_notice_test.go:486: the canonicalize-error notice must not relay "C:\\tmp\\wisp174r6gotmp\\TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r33958608156\\001": notice "注意： …[trimmed]
+--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.04s)
+--- PASS: TestLeakProbeTokenOnALegalPathStaysSilent174r3 (0.02s)
+    task_output_pointer_notice_test.go:625: the filed literal must appear exactly once, in the frozen pointer sentence: found 2 in "abcdefghijklmnopqrstuvwxyzabcdefghijklmn\nopqrstuvwxyzabcdefghijklmn …[trimmed]
+    task_output_pointer_notice_test.go:656: the canonicalize-error notice must not relay "\u00a0\u2003\u2009\u205f": notice "注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path：\u00a0\u2003\u2009\u205f）；注意：这条 …[trimmed]
+--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6 (0.01s)
+--- PASS: TestPointerAuthorityFollowsC26NotTheSpelling174r4 (0.02s)
+--- PASS: TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4 (0.02s)
+--- PASS: TestPointerCheckWritesNothing174r4 (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	2.967s
+FAIL
+M1-run174-rc=1
+
+== M2: the notice relays the authorized root list. scoped to all 174 tests. ==
+--- PASS: TestCanonicalizeFailureFailsClosedInReply174 (0.00s)
+--- PASS: TestCanonicalizeFailureIsNotTheUnwiredArm174 (0.00s)
+--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.03s)
+--- PASS: TestLeakProbeTokenOnALegalPathStaysSilent174r3 (0.02s)
+    task_output_pointer_notice_test.go:656: the canonicalize-error notice must not relay "c:\\tmp\\wisp174r6gotmp\\testcanonicalizeerrornoticemustnotrelaythefiledpathportable174r63569322689\\001\\root …[trimmed]
+    task_output_pointer_notice_test.go:656: the canonicalize-error notice must not relay "c:\\tmp\\wisp174r6gotmp\\testcanonicalizeerrornoticemustnotrelaythefiledpathportable174r63569322689\\002\\root …[trimmed]
+    task_output_pointer_notice_test.go:656: the canonicalize-error notice must not relay "rootlist-leak-probe-174r6": notice "注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path）；授权根 c:\\tmp\\wisp174r6gotmp\\ …[trimmed]
+--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6 (0.00s)
+--- PASS: TestPointerAuthorityFollowsC26NotTheSpelling174r4 (0.02s)
+--- PASS: TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4 (0.02s)
+--- PASS: TestPointerCheckWritesNothing174r4 (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	2.915s
+FAIL
+M2-run174-rc=1
+
+== after both overlays: the tracked file was never touched ==
+(empty above = clean)
+(empty above = zero bytes diff)
+
+== APPEND (same leg, same overlay files): the WHOLE pointerNotice family, not just the /174/-named subset ==
+   family -run: TestCanonicalizeFailure|TestCanonicalizeErrorNotice|TestLeakProbe|TestPointerOutsideAuthorizedRootSpeaks|TestPointerToMissingCopyFileSpeaks|TestPointerToNonRegularPathSpeaks|TestHealthyPointerStaysSilent|TestUnwiredJudgeFailsClosedInReply|TestBothPointerDefectsAreReportedSeparately|TestPointerNoticeKeepsTheD153StubShape|TestHealthyReplyStillMatchesThePreFixTemplate|TestPointerAuthority
+
+-- clean baseline (no overlay): --
+--- PASS: TestCanonicalizeFailureFailsClosedInReply174 (0.00s)
+--- PASS: TestCanonicalizeFailureIsNotTheUnwiredArm174 (0.00s)
+--- PASS: TestPointerOutsideAuthorizedRootSpeaks (0.01s)
+--- PASS: TestPointerToMissingCopyFileSpeaks (0.01s)
+--- PASS: TestPointerToNonRegularPathSpeaks (0.00s)
+--- PASS: TestHealthyPointerStaysSilent (0.02s)
+--- PASS: TestUnwiredJudgeFailsClosedInReply (0.00s)
+--- PASS: TestBothPointerDefectsAreReportedSeparately (0.00s)
+--- PASS: TestPointerNoticeKeepsTheD153StubShape (0.00s)
+--- PASS: TestHealthyReplyStillMatchesThePreFixTemplate (0.00s)
+--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.04s)
+--- PASS: TestLeakProbeTokenOnALegalPathStaysSilent174r3 (0.02s)
+--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6 (0.01s)
+--- PASS: TestPointerAuthorityFollowsC26NotTheSpelling174r4 (0.02s)
+--- PASS: TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4 (0.02s)
+ok  	github.com/CarlosShao/wisp/internal/tools	2.469s
+clean-family-rc=0
+
+-- M1 overlay (relay raw into the notice): --
+--- PASS: TestCanonicalizeFailureFailsClosedInReply174 (0.00s)
+--- PASS: TestCanonicalizeFailureIsNotTheUnwiredArm174 (0.00s)
+--- PASS: TestPointerOutsideAuthorizedRootSpeaks (0.01s)
+--- PASS: TestPointerToMissingCopyFileSpeaks (0.01s)
+--- PASS: TestPointerToNonRegularPathSpeaks (0.00s)
+--- PASS: TestHealthyPointerStaysSilent (0.02s)
+--- PASS: TestUnwiredJudgeFailsClosedInReply (0.00s)
+--- PASS: TestBothPointerDefectsAreReportedSeparately (0.00s)
+--- PASS: TestPointerNoticeKeepsTheD153StubShape (0.00s)
+--- PASS: TestHealthyReplyStillMatchesThePreFixTemplate (0.01s)
+--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.04s)
+--- PASS: TestLeakProbeTokenOnALegalPathStaysSilent174r3 (0.02s)
+--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6 (0.00s)
+--- PASS: TestPointerAuthorityFollowsC26NotTheSpelling174r4 (0.03s)
+--- PASS: TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4 (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	2.616s
+FAIL
+m1-family-rc=1
+
+-- M2 overlay (relay the root list): --
+--- PASS: TestCanonicalizeFailureFailsClosedInReply174 (0.00s)
+--- PASS: TestCanonicalizeFailureIsNotTheUnwiredArm174 (0.00s)
+--- PASS: TestPointerOutsideAuthorizedRootSpeaks (0.01s)
+--- PASS: TestPointerToMissingCopyFileSpeaks (0.01s)
+--- PASS: TestPointerToNonRegularPathSpeaks (0.00s)
+--- PASS: TestHealthyPointerStaysSilent (0.02s)
+--- PASS: TestUnwiredJudgeFailsClosedInReply (0.00s)
+--- PASS: TestBothPointerDefectsAreReportedSeparately (0.00s)
+--- PASS: TestPointerNoticeKeepsTheD153StubShape (0.00s)
+--- PASS: TestHealthyReplyStillMatchesThePreFixTemplate (0.00s)
+--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.07s)
+--- PASS: TestLeakProbeTokenOnALegalPathStaysSilent174r3 (0.02s)
+--- FAIL: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6 (0.01s)
+--- PASS: TestPointerAuthorityFollowsC26NotTheSpelling174r4 (0.02s)
+--- PASS: TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4 (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	2.962s
+FAIL
+m2-family-rc=1

@@ -1,0 +1,13 @@
+== 174-r6 linux mechanism (host=win32; container=docker golang:1.27 linux/amd64) ==
+2026-10-14 13:25:25 +0800
+
+== GOOS=linux cross-vet ==
+linux-vet-rc=0
+
+== GOOS=linux cross-compiled test binary; the linux binary must CONTAIN the portable name ==
+linux-test-c-rc=0
+-rw-r--r-- 1 swq 197609 27076741 Oct 14 13:25 /c/tmp/wisp174r6gotmp/tools-linux-174r6.test
+portable174r6 name hits in linux binary: 3
+r3 name hits in linux binary (compiled in, skips at runtime): 3
+build-tag lines in the edited test file (0 = compiled on every GOOS): 0
+t.Skip in the new test leg (0 = it cannot skip): 0
