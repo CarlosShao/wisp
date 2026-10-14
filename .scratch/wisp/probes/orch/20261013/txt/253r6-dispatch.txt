@@ -1,0 +1,28 @@
+# 253-r6 派单（票 253 AC#3：静默丢弃那一支要有声；写腿；面＝cmd/wisp）
+
+发送时刻：2026-10-14 14:2x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **253-r6**（`probes/253/` 现 p4/r1/r3/r5/v1，r6 可用；查重已做）。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与目标（AC#3 逐字在票面）
+
+- 票：`.scratch/wisp/issues/253-...md` AC#3：**旧封套被宿主库静默丢弃**（页面按旧形状 `postMessage` ⇒ 宿主库把 Promise 静默 `resolve(null)`、**Go 侧零审计**）。判据：**一发假腿按旧封套发一次** ⇒ ① **Go 侧有可读的现场**（审计行或错误文本）；② **页面拿到的不是无声 `null`**。
+- 约束（票面逐字）：⛔ **不许改上游库**（`webview.go` 那层是第三方）；"本仓射程内能做的是在 Go 侧给'收到但形状不认识'落一条审计/告警（或至少让面板宿主那条腿**具名拒收并回一个错误**）"。
+- 按住理由已消失（当年 `255-r2` 在飞 ⇒ cmd/wisp 按住；现面空）⇒ 开工。
+- ⚠ 相关先例（票内节 8/9/10）：AC#1 已翻（附条件 4 条＋N1）；AC#2 的尺（`internal/panel/inbound_roster_253_test.go`，`253-r5`）已被裁"名字进名册就必须同时进 guard 与 router"；**`Q-76` 若批第五枚入向名，五个分母必须同批动**——与你无直接关系，但别碰那把尺。
+
+## 你要做
+
+1. **先现读机制**：旧封套今天走哪条路被吞（`cmd/wisp/panel_host_windows.go` 的 `w.Bind("wispDispatch")` 一侧／宿主库回调／`panel_inbound.go`）——**哪些点是本仓可达的、哪些在库内不可达**（逐点具名）。⚠ 你判"②页面拿到的不是无声 null"在本仓可达性——**若结构性不可达 ⇒ 具名写清＋给替代闭合（如：Go 侧审计行 ＋ 在可拦截点回显式错误）＋⛔ 别硬造**。
+2. **落修**（形状自裁、最小形）：在可达点给"形状不认识"落审计/告警（或具名拒收＋错误回执）。判据：① 假腿（按旧封套发）⇒ Go 侧现场可读（审计行/错误文本逐字）；② 页面侧读数（可达则给）；③ 既有行为不回归（`-run` 相关族 rc=0）。
+3. **正控/反控**：正常 `wispDispatch` 调用**不许**被新审计误伤（正控）；审计自身要会响（反控：把审计摘掉 ⇒ 假腿读数应确认它没声——或按你门控设计给等价对照）。
+4. **交件**：`probes/253/r6/00-anchor-and-gates.md`＋logs＋票 253 尾**追加 1 条 bullet**（署名 `agent=253-r6`；⛔ 框不翻）。产出 ≤6 枚 ≤200 行。
+
+## 环境与纪律
+
+- 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；别人脏件别动。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（MSYS 形）；`GOTMPDIR` ⛔ 只**反斜杠形** `C:\tmp\wisp253r6gotmp`。
+- 判据 `-run` 小射程；⛔ 整包（314 死区）；窗口逐报（他腿 `317-r1`（scripts）／`236-r7`（internal/tools）／`272-v2`／`253-v2`（internal/panel 读）在飞）。
+- 门禁：build rc=0／gofumpt 动过的件空／相关 `-run` rc=0／d22scan clean／长度门 GREEN。
+- ⛔ 不动三枚冻结件／`thresholds.go`／golden／`allowlist.txt`／`PLAN.md`／`specs/**`／`.github/**`／`scripts/**`；⛔ `frontend/**`／`design/**`（界面侧那半归 owner 的 agent；需要它配合的写进"归口"）。
+- **未定义即停**：可达点找不到／要改上游库／与 AC#1 的器件打架 ⇒ 停手上报。
+- 回执：结论先行＋commit sha（产码/交付分开）＋可达/不可达逐点＋假腿读数①②＋正控＋门禁 rc＋具名没做。
