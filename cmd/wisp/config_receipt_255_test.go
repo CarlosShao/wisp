@@ -10,12 +10,14 @@ package main
 //  2. TestTicket255HotRowRosterCoversTheRegistry /
 //     TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim /
 //     TestTicket255RosterStillMatchesTheActualReadSites - the roster's own honesty:
-//     every hot TierRegistry row carries a verdict, every verdict cites
-//     `file.go:LINE [token]` and that line still contains that token in the real
-//     source, and the set of production files reading each section is exactly the
-//     set the roster names. That is the "会响" half: a new hot section with no
-//     verdict, a drifted evidence line, or a reader appearing where the receipt
-//     said "no reader" each redden here.
+//     every hot TierRegistry row carries a verdict, every verdict cites a
+//     `file.go:LINE [token]` whose token uniquely anchors one line of the real
+//     source (the LINE is a reading, per 票 255 AC#6 - an insertion above it moves
+//     the reading without reddening the ruler), and the set of production files
+//     reading each section is exactly the set the roster names. That is the "会响"
+//     half: a new hot section with no verdict, a changed or non-unique evidence
+//     token, or a reader appearing where the receipt said "no reader" each redden
+//     here.
 //  3. TestTicket255ReceiptOmitsPanelFromTheImmediateSentence /
 //     TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere /
 //     TestTicket255ReceiptStillNamesTheLiveReadSection - the stdout readings the
@@ -172,10 +174,18 @@ func hasRosterEvidence(v string) bool {
 	return len(evidenceCite.FindAllString(v, -1)) > 0 || strings.Contains(v, zeroScanMarker)
 }
 
-// TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim turns every file:line in the
-// roster into a checked reading instead of prose: the file must exist, the line
-// number must be in range, and the line must still carry the quoted token. This is
-// what "逐名给出谁读它的 file:line 证据" has to mean to be auditable.
+// TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim turns every cite in the
+// roster into a checked reading instead of prose: the file must exist, and the
+// quoted token must occur EXACTLY ONCE in it - the token's unique hit is the
+// criterion (票 255 AC#6, 10-10: 「token 唯一命中当判据，行号只当读数」). The
+// recorded :LINE is a reading, so an insertion above it moves the line but never
+// reddens this ruler (before AC#6 it did: 313-r2 inserted two lines, the llm row
+// moved :96 -> :98, and this ruler called that "the evidence drifted" - punishing
+// an edit that never touched the reader). What reddens it is the token: gone ->
+// the evidence changed; not unique -> the anchor cannot pin one line and has to
+// be sharpened ("SizePx" alone hit 13 lines in internal/ball/ball_windows.go).
+// The error names the row, the cite, and what the recorded line says now, so
+// re-adjudicating is a reading, not a guess.
 func TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim(t *testing.T) {
 	root := repoRootForRoster(t)
 	citesChecked := 0
@@ -189,38 +199,54 @@ func TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim(t *testing.T) {
 		}
 		for _, c := range found {
 			rel, lineNo, token := c[1], c[2], c[3]
-			n, err := strconv.Atoi(lineNo)
-			if err != nil {
-				t.Errorf("row %q has an unparseable line number %q", row, lineNo)
-				continue
-			}
 			raw, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(rel)))
 			if err != nil {
 				t.Errorf("row %q cites %s which cannot be read: %v", row, rel, err)
 				continue
 			}
 			lines := strings.Split(string(raw), "\n")
-			if n < 1 || n > len(lines) {
-				t.Errorf("row %q cites %s:%s but the file has %d lines", row, rel, lineNo, len(lines))
-				continue
+			var hits []int
+			for i, line := range lines {
+				if strings.Contains(line, token) {
+					hits = append(hits, i+1)
+				}
 			}
-			got := strings.TrimSpace(lines[n-1])
-			if !strings.Contains(got, token) {
-				t.Errorf("row %q cites %s:%s for %q, that line now reads %q - the evidence drifted, so re-adjudicate this row (and if the reader really moved, the receipt's claim may have moved with it)",
-					row, rel, lineNo, token, got)
+			switch len(hits) {
+			case 1:
+				if n, err := strconv.Atoi(lineNo); err == nil && n != hits[0] {
+					// The reading drifted - allowed, and worth recording so the
+					// next re-adjudication can refresh it (AC#6). The token is
+					// what this ruler asserts; the line number never is.
+					t.Logf("row %q: recorded reading %s:%s drifted, the token %q now uniquely sits at line %d", row, rel, lineNo, token, hits[0])
+				}
+			case 0:
+				t.Errorf("row %q cites %s:%s for %q and the token is now nowhere in that file (the recorded line reads %q) - the evidence changed, so re-adjudicate this row", row, rel, lineNo, token, recordedLineReading(lines, lineNo))
+			default:
+				t.Errorf("row %q cites %s:%s for %q, but that token is not unique in the file (it hits lines %v): a content anchor must pin exactly one line, so sharpen the token and re-adjudicate this row", row, rel, lineNo, token, hits)
 			}
 			citesChecked++
 		}
 	}
-	// Today eight of the seventeen rows back their verdict with a real line (the
-	// consumed [llm] row, the three near-miss readers [agent]/[models]/[hotkey], and
-	// the three "the value is decided elsewhere" rows [ball]/[privacy]/[observe] plus
-	// [panel], whose row cites the hard-coded geometry). The floor keeps a refactor
-	// from quietly turning all the cites into markers.
+	// Today the roster carries cites on 13 of the 17 rows (the three marker-only
+	// rows [session]/[memory]/[cost] and [app.theme] carry none; [panel] carries
+	// two and the four [voice] key rows share the section reader's cite). The
+	// floor keeps a refactor from quietly turning all the cites into markers.
 	const citedRowsFloor = 8
 	if citesChecked < citedRowsFloor {
 		t.Errorf("the roster carries %d checked cites, want at least %d: verdicts are drifting from readings to prose", citesChecked, citedRowsFloor)
 	}
+}
+
+// recordedLineReading returns what the cite's recorded :LINE currently says, for
+// the error message - the reading is quoted so a re-adjudicator can see the
+// change without opening the file. Out-of-range readings are reported as such
+// instead of panicking: the number is a reading, not an invariant (AC#6).
+func recordedLineReading(lines []string, lineNo string) string {
+	n, err := strconv.Atoi(lineNo)
+	if err != nil || n < 1 || n > len(lines) {
+		return "<the recorded reading is out of range>"
+	}
+	return strings.TrimSpace(lines[n-1])
 }
 
 // TestTicket255RosterStillMatchesTheActualReadSites is the scan half: for every
@@ -437,13 +463,16 @@ func TestTicket255ReceiptOmitsPanelFromTheImmediateSentence(t *testing.T) {
 			t.Errorf("the ledger does not name panel's reader as living in another process: %q", line)
 		}
 		// Re-adjudicated in the 票 255 AC#4 batch. This row used to demand
-		// "no-reader" plus panel_host_windows.go:304's hard-coded literal, and AC#4
-		// removed both: the geometry literal is gone from the create block and the
-		// read site moved into the resident assembly root. The cite below is checked
-		// line-by-line by TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim, so
-		// it is a reading and not a memory.
-		if !strings.Contains(line, "panel_resident_windows.go:207") {
-			t.Errorf("the ledger's verdict for panel must cite the per-create read site AC#4 installed: %q", line)
+		// "no-reader" plus a cite to the hard-coded geometry literal
+		// (`Width: 420` / `Height: 260` in panel_host_windows.go's create block,
+		// at HEAD 67ab595d), and AC#4 removed both: the literal is gone from the
+		// create block and the read site moved into the resident assembly root.
+		// The cite below is content-anchored and re-read from the file by
+		// TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim - per 票 255 AC#6
+		// the assertion keys on the file and the token, never on the :LINE reading
+		// (a recorded number here would re-import the rot the roster just shed).
+		if !strings.Contains(line, "panel_resident_windows.go") || !strings.Contains(line, "[cfg.Panel.Width]") {
+			t.Errorf("the ledger's verdict for panel must cite the per-create read site AC#4 installed (file + content anchor): %q", line)
 		}
 		if n := r.rt.windowCount(); n != 0 {
 			t.Errorf("a hot edit with no reader in THIS process displayed %d cards, want 0", n)
