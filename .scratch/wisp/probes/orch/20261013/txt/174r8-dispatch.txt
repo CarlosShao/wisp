@@ -1,0 +1,26 @@
+# 174-r8 派单（票 174 **只切 AC#2b**：把路径判定者接进生产；写腿；面＝`cmd/wisp/run.go` 一枚）
+
+发送时刻：2026-10-14 21:0x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **174-r8**（`probes/174/r8` 未建，查重已做：r1–r7/v1–v3 已用）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与目标（票面逐字为准）
+
+- 票：`.scratch/wisp/issues/174-task-output-points-at-a-file-the-model-cannot-read-by-default-spill-artifacts-are-outside-fs-allowed-dirs.md`（读 AC#2b 全格）
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+- **AC#2b**：把路径判定者**接到生产**——`cmd/wisp/run.go` 组装 `tools.TaskDeps` 那一行（票面现量 `:362`，**行号自己现读复算**）补 `Paths: paths`，使**真机上的回执**给出**精确文案**（"这条路径不在你被授权的目录范围内…要用户先加 `[fs] allowed_dirs`"）而不是一句通用的"授权判定者未接线（fail-closed）"。
+- **判据（票面，两向都要）**：① 接上**之前**那一发端到端只能说"未接线"（先复现今天这个读数）；② 接上之后**必须给出精确文案**、且**安静正例仍然安静**（根内＋真实普通文件 ⇒ 零说明）；③ ⛔ **不许**为了省事让 `task.go` 自己去 `filepath` 拼路径或读配置绕过 C26。
+- **face**：`cmd/wisp/run.go`（＋其测试文件若必须；⛔ 不动 `internal/tools/**`／`internal/risk/**`／`[fs]` 默认值／`docs/PLAN.md`／`docs/specs/**`／`frontend/**`）。
+
+## 与在飞的协调（必读）
+
+- ⚠ **cmd/wisp 面本波另有 `133-v`（验证腿，会跑 cmd/wisp 重包）** ⇒ `go test ./cmd/wisp/` 重包**同一时刻只跑一个**：跑前 `tasklist` 自证并把窗口时刻记下；撞见别人的在飞笔先判归属、必要时错峰重跑。
+- `internal/tools` 侧另有 `174-r7`（spill.go 桩）在飞——**不同文件、不撞**；你的提交 **只带自己的 pathspec**。
+- 314 死区：⛔ 别把整包 `./cmd/wisp/` 全套当主证据；用 `-run` 小射程＋必要单跑并报窗口。
+
+## 交件与纪律
+
+- 交件：`probes/174/r8/00-anchor-and-gates.md` ＋ logs（接前"未接线"逐字／接后精确文案逐字／安静正例零说明；改动 diff）＋ 票 174 尾**追加 1 条 bullet**（`agent=174-r8 did=AC#2b… next=…`）。产出 ≤7 枚 ≤200 行。
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**）；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删、别人脏件别动（工作树里前端 agent 的 `tokens.generated.css` 等一律不碰）。
+- `PATH` MSYS 形；`GOTMPDIR='C:\tmp\wisp174r8gotmp'`（只反斜杠形，先自建）；门禁：`go build ./...` rc=0／`gofumpt`（`D:\work\base\gopath\bin\gofumpt`）动过的件空／相关族 `-run` rc=0／`d22scan` clean／长度门 GREEN。
+- **未定义即停**：接线点对不上现读／须越面（task.go 内置路径判定等）⇒ 停手上报。
+- 回执：结论先行＋commit sha＋接前/接后/正例三态逐字＋门禁 rc＋具名没做。

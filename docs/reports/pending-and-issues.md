@@ -18075,3 +18075,10 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - 恢复选项读数：热键三枚全活 `summon=Ctrl+Alt+Q／mute=Ctrl+Alt+M／panel=Ctrl+Alt+P`（`cancel` 仅 Confirming 期借绑）。
 - 构建过程两账：① 首次 `build.ps1` FATAL 于票 274 的产物名守卫（源码未变⇒npm 产物名不变）；按仓内既定程序绕过＝`mv frontend/dist /c/tmp/wisp-dist-bak-<ts>`（只移不删）＋补 `.gitkeep` 后重编 **rc=0**；② `frontend/src/styles/tokens.generated.css` 工作树脏件 mtime＝**09:01**（前端 agent 自己早期留下的，非本批所动）⇒ **未碰**，登记。
 - 关联：票 228（拓扑）· "ticket 07"（bring-to-front 落它名下的自注，待核）。
+
+## A957｜2026-10-14 20:52 +08｜133-r1 收件（五发归属硬线：门关下逐发红在**自家尺**上；AC#3/#4 各带变异自证；AC#6 CI 落点现读 `run 38554642217/job 115820641622/step#7`）＋**cmd/wisp 面空出**⇒ 派 `133-v`（验）＋`174-r8`（AC#2b 接生产，面空后第一条写腿）⇒ 编队（5）：写×3＝171s/174-r7/174-r8、验×2＝136-v/133-v
+
+- **三把尺**：`da389ca5`（仪器）＋`1740fd48`／`46dee9ef`（交付）真在；`probes/133/r1/`（00＋logs 01–05）在盘；编排者亲跑 `-run 'TestAC1AC2DispatchHopGate133|TestLegDispatchGate133|TestTicket131' ./cmd/wisp/`＝**ok 4.165s**。TaskStop 结算（completed）。
+- **AC#5 三笔新读数**：① 字面 `go test -count=2 -v ./cmd/wisp/` 撞 Go 默认 **10m `-timeout`**（603.1s panic）⇒ 该形要跑必须 `-timeout 40m`（**CI 的 step 另有一套，不受此限**）；② **314 死区复现**：9 趟全包 **2 趟整进程死亡**（317.8s／306.2s）＋1 趟超时——按票 314 如实报；③ 低负载同树单趟 `306/226/7/3`（7 枚全宿主底噪：2 枚 `C:\tmp` 根 ACL 系〔票 311 同形〕＋5 枚热键/真窗）。
+- **AC#6 现读**：仪器随既有 step 跑（`test-windows`→"cmd/wisp CLI tests…"→`portable-tests.sh --scope=cli`），**无需改 `.github/**`**。
+- ⚠ 133-r1 自报"不加尺时那条形状的'全绿'不可满足（红名只有 131 的门）"——归属硬线的三态按其件为准，**待 133-v 独立复核**。

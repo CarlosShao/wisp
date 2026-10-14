@@ -1,0 +1,5 @@
+174-r8 send 记录
+- 发送时刻：2026-10-14 21:0x +08；派单已先存档：txt/174r8-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/174/` = r1..r7/v1..v3/a3/a4/c1/c2（r8 未建，可用）。
+- 收件人：agent_b02e7151-3aef-4ef3-8853-6e29eaeec1a7（general-purpose，后台）。
+- 内容：票 174 AC#2b（run.go 接 Paths: paths；两向判定＋安静正例；禁绕 C26）。面=cmd/wisp/run.go。

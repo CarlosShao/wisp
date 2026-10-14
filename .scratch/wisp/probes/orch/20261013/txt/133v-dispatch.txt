@@ -1,0 +1,28 @@
+# 133-v 派单（票 133 五格复核：分发跳新尺的**非实现者**复核；验证腿；面＝`cmd/wisp` 只读＋仓外快照＋`probes/133/v/`）
+
+发送时刻：2026-10-14 21:0x +08。编排者派发。
+你 = Wisp 流水线的**验证腿 133-v**（`probes/133/v` 未建，查重已做）。身份＝非实现者（实现者是 `133-r1`；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 零产码）。
+
+## 票与背景
+
+- 票：`.scratch/wisp/issues/133-no-instrument-sees-the-dispatch-hop-deleting-one-caller-keeps-76-tests-green.md`（先通读 AC#1–#6）
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+- 落地腿 `133-r1` 交件：仪器 `da389ca5`（新 `cmd/wisp/dispatch_hop_selfproof_133_test.go` ＋增补 `cmd/wisp/leg_dispatch_gate_133_test.go`：下限 11→**12**、nail 两半成对、注册表↔census 双向差、`distinctnessReds133`）＋交付 `1740fd48`／`46dee9ef`（`probes/133/r1/` 6 枚）。编排者亲跑基线 `-run 'TestAC1AC2DispatchHopGate133|TestLegDispatchGate133|TestTicket131' ./cmd/wisp/`＝**ok 4.165s**（仅供参考）。
+- ⚠ **cmd/wisp 面本波另有 `174-r8`**（改 `run.go` 一行）在飞 ⇒ **`go test ./cmd/wisp/` 重包同一时刻只跑一个**：跑前 `tasklist` 自证并把窗口记下；撞见别人的在飞笔先判归属。
+
+## 你要独立回答的（逐条判语＋读数；仓外快照＋**你自己的**变异，⛔ 别只重跑它的日志）
+
+1. **AC#1 归属硬线（核心）**：五发（N-3／X4 早退 if／X8 const 标签／X12 函数值别名／**X14 两拍**——第一拍结构体字段初值、第二拍拆掉它）逐发**你自造**（别抄 `probes/133/r1/logs/*` 的形状），在**门关**（`-run` 只跑本尺、131 的门不注册）下 ⇒ 必须 **rc=1 且红名点到本尺**（`TestAC1AC2DispatchHopGate133`）；再给**门开**两份。⚠ N-3 那发的"全绿不可满足"（不加尺时红名只有 131 的门）逐字复核。
+2. **AC#3**：自证腿不哑——把 `isRunnableCase133` 类判定独立弄坏一发 ⇒ 自证腿必红、门仍 PASS；还原复绿。
+3. **AC#4**：三读数独立重现：① 注册表↔census 双向差；② **Y2 实体**（`-run` 名换靶那 2 行）改前两门全绿、改后 pair 红逐字点名；③ 下限 N=12（`y1drop ⇒ enumerated 11 (12 is the floor)`；`y2blind ⇒ binds no local to os.Args`，不返回空清单）。⚠ 131 门内下限**未动**这一点也核。
+4. **AC#5/314**：它报 9 趟全包 **2 趟整进程死亡**（317.8s/306.2s）＋1 趟 10m 超时——**不必重跑全量**（死区），抽 1 趟复核"默认 10m `-timeout` 撞 panic 原文"这一枚即可（窗口自证＋报时刻）；四数按它留的件抽验（改前/后哪数动）。
+5. **AC#6**：CI 落点现读核（`gh run view 38554642217` 的 job `115820641622` step #7 四数、以及 `scripts/wisp-cli-tests.sh`→`portable-tests.sh --scope=cli` 链、`ci.yml:533/:601` 只读引用）；⛔ 不改 `.github/**`。
+6. **面/不丢牙**：`git show da389ca5 --stat` 面核（只两道 cmd/wisp 测试文件）；`1740fd48`/`46dee9ef` 越面零；`gofumpt`（`D:\work\base\gopath\bin\gofumpt` v0.12.0）只点既有债（`models.go` CRLF 伪影／`panel_transport_35r2_test.go`）复量；`d22scan` 各 scope 核。
+
+## 交件与纪律
+
+- 交件：`docs/evidence/s1/ticket133-133-v-accept-v1.md`（逐格判语＋两门读数）＋`probes/133/v/`（≤7 件 ≤200 行）＋票 133 尾**追加 1 条 bullet**。⛔ 不翻框、⛔ 零产码。
+- 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；⛔ 别碰 `docs/reports/pending-and-issues.md`。
+- `PATH` MSYS 形；`GOTMPDIR='C:\tmp\wisp133vgotmp'`（只反斜杠形，先自建）；快照只落 `$TMPDIR`/`D:/tmp`；跑 cmd/wisp 前 `tasklist` 自证。
+- **未定义即停**：某发做不圆／撞见越面改动 ⇒ 停手上报。
+- 回执：结论先行＋逐格判语＋五发×两门读数＋AC#3/#4 变异＋AC#6 现读＋面核＋具名没做。
