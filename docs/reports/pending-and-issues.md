@@ -17916,3 +17916,6 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **收件（三把尺）**：`64bf9b29` 在／件齐／亲跑 `-run 'TestZZ201A1' ./internal/agent/approval/` rc=0（其全包回归绿在件内）。**判语＝复现**（真 NTFS junction→真 bridge→真 Gate/Queue/Replies→真 WideningRule→真 AddAllowedDir）：卡面标记串进 `ReplyCard.Paths` ⇒ `dirOf`（`batch.go:91` `LastIndexAny`）在标记里的 `/` 切开 ⇒ `dir=…(junction`、`ok=true` ⇒ `AddAllowedDir` 两道闸全过 ⇒ **config.toml 真写成垃圾行**；第二张卡 `Paths[0]`＝同一碎片；对照（无标记）推真父目录。**最坏后果**：`always`＋二卡 allow ⇒ 惰性垃圾行（非直接越权；下游半跳未量、登记）。
 - **立票 318**（两候选：①`WideningRule` 入口拒收含 `无法规范化` 标记〔对齐 `session/grants.go:264`、预期首选〕②让标记不进 `Paths`〔触语义面、须先报〕）＋**派 `318-r1`**（修＋能力形钉＋对照不回归；面 internal/agent/approval）。
 - **结算**：201-a1 本回应 TaskStop。**编队（2）**：`114-r6`（写）＋`318-r1`（写）。⛔ 未推＝**67 笔**（推送邀请在挂、等机主开代理）。
+
+
+- **A938 补**：派 `318-r1`（修碎片进放宽链；候选①入口拒标记、②触语义面须先报）。编队（2）：`114-r6`＋`318-r1`。派单/send 在盘。

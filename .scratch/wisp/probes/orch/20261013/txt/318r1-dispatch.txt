@@ -1,0 +1,23 @@
+# 318-r1 派单（票 318：junction 标记碎片不再进放宽链；写腿；面＝internal/agent/approval）
+
+发送时刻：2026-10-14 17:0x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **318-r1**（`probes/318/` 未建，r1 可用；查重已做）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与目标（AC#1 逐字在票面）
+
+- 票：`.scratch/wisp/issues/318-junction-card-marker-splits-into-a-fragment-that-lands-in-allowed-dirs.md`
+- **已活体复现**（`201-a1`，`64bf9b29`）：junction 拒卡面的标记串进 `ReplyCard.Paths`；`dirOf`（`batch.go:91` `LastIndexAny("/\\")`）在标记里的 `/` 处切开 ⇒ `dir=…(junction`、`ok=true` ⇒ `AddAllowedDir` 两道闸全过 ⇒ **config.toml 真写垃圾行**；第二张卡 `Paths[0]`＝同一碎片。
+- **修**（两候选，你现读后裁并具名理由）：
+  - ① `WideningRule`（`replies.go:503`）入口**拒收含 `无法规范化` 标记的 path**（对齐 `session/grants.go:264` 既有口径）——预期首选；
+  - ② 让标记不进 `Paths`（触 `tools.Decision.Paths` 语义面）⇒ **选它前先停手上报**。
+- **判据（能力形）**：① 复现形（`201-a1` 的链，或你自造等价最小形）**修前红、修后绿**；② **对照不回归**（无标记越界读仍推真父目录）；③ 自造一发突变（摘掉守卫/换判词 ⇒ 指名的钉红且逐字点名）；④ `internal/agent/approval`＋`internal/session`（grants 先例族）＋相关 `bridge` 族 rc=0；⑤ 既有断言**零放宽**。
+- **⛔ 边界**：若修必须动 `cmd/wisp/**` 或 `tools.Decision.Paths` 语义 ⇒ **停手上报**（契约/越面）。AC#2 边界（空路径标记／8.3／多路径 `ok=false`）逐条量或具名"不属本修"。
+
+## 交件与纪律
+
+- 交件：`probes/318/r1/00-anchor-and-gates.md`＋logs（修前红/修后绿/突变/对照逐字）＋票 318 尾**追加 1 条 bullet**。产出 ≤7 枚 ≤200 行。
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**）；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；别人脏件别动。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（MSYS 形）；`GOTMPDIR` ⛔ 只**反斜杠形** `C:\tmp\wisp318r1gotmp`；判据 `-run` 小射程；⛔ 整包 cmd/wisp（314 死区）；窗口逐报（他腿 `114-r6`（internal/panel）在飞）。
+- 门禁：build rc=0／gofumpt 动过的件空／相关族 rc=0／d22scan clean／长度门 GREEN（60=60）。
+- **未定义即停**：两候选都对不上现读／复现形做不圆／须越面 ⇒ 停手上报。
+- 回执：结论先行＋commit sha（产码/交付分开）＋选的候选与理由＋修前红/修后绿/突变/对照逐字＋门禁 rc＋具名没做。
