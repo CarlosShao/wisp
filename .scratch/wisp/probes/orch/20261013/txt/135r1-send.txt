@@ -1,0 +1,5 @@
+135-r1 send 记录
+- 发送时刻：2026-10-14 22:1x +08；派单已先存档：txt/135r1-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/135/` = 未建（r1 可用）。
+- 收件人：agent_e659ab90-6111-42e6-af9c-9c9a848ea7c3（general-purpose，后台）。
+- 内容：票 135 七格（premise 先复核；AC#1-#7；314 死区与 10m timeout 陷阱随单；与 133-v 错峰）。
