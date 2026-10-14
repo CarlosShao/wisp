@@ -1,0 +1,15 @@
+// Ticket 171 r3, sample C (added by 171s, 10-14): a CLOSE-ONLY file - it calls the closing
+// side and never the opening side. Under ticket 178's four-pile caliber this file must land
+// in pile [③ 只关] (it may well be closing what someone else opened, e.g. bridge.mark's lazy
+// open) and must NOT enter the measured column, whose baseline is the [② 只开] file count.
+// r3-sample-deleted.sh's D1c state keeps this file next to d_sample_a so that "one more file,
+// but it is close-only" is a reading instead of a sentence.
+// Not compiled here; copied into a throwaway repository under $TMPDIR.
+
+package fake171
+
+func closeSampleC(rt routerC, id string) error {
+	return rt.CloseTask(id)
+}
+
+type routerC struct{}

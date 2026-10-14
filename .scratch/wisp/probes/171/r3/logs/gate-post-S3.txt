@@ -1,9 +1,9 @@
-# 票 154 AC#1 触发门 —— 锚点 b5ae9efaaf7285b2ef36b93f831500e34b14602e
-# 生成时刻 2026-10-03T10:59:18+08:00
+# 票 154 AC#1 触发门 —— 锚点 4357ca3302ad178d2832d6469e796bd5bab88138
+# 生成时刻 2026-10-14T19:57:28+08:00
 # 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
 
 ## G1 生产码里构造 ToolRequest（排 internal/agent/ 自身）
-$ git grep -nE  'ToolRequest\{' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/*
+$ git grep -nE  'ToolRequest\{' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/*
 # 名册行数＝0 （含注释行，逐行原样＝上面那一份，供下一程 diff；这一格一字未改）
 # 命中行数＝0   （票 171 AC#7 的枚数本体；票 171 AC#1 起分子只吃代码那一半——同一条腿里的第二枚从此躲不进「非空」）
 # 被分子剔掉的行：（空＝今天这一腿没有一枚靠注释进场）
@@ -11,7 +11,7 @@ $ git grep -nE  'ToolRequest\{' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- inte
 # rc=1   （1＝零命中／0＝非空＝该枚子句已响）
 
 ## G1b 生产码里任意 .Execute( 调用点（排 loop.go 与 bridge.go 自身）
-$ git grep -nE  '\.Execute\(' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/loop.go :!internal/tools/bridge.go
+$ git grep -nE  '\.Execute\(' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/loop.go :!internal/tools/bridge.go
 # 名册行数＝0 （含注释行，逐行原样＝上面那一份，供下一程 diff；这一格一字未改）
 # 命中行数＝0   （票 171 AC#7 的枚数本体；票 171 AC#1 起分子只吃代码那一半——同一条腿里的第二枚从此躲不进「非空」）
 # 被分子剔掉的行：（空＝今天这一腿没有一枚靠注释进场）
@@ -19,18 +19,18 @@ $ git grep -nE  '\.Execute\(' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- intern
 # rc=1   （1＝零命中／0＝非空＝该枚子句已响）
 
 ## G2 OpenTask/CloseTask 的生产出现点（排 bridge.go 自身；今日应只剩 cmd/wisp/run.go 那一发＋它上面的注释）
-$ git grep -nE -w 'OpenTask|CloseTask' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
-b5ae9efaaf7285b2ef36b93f831500e34b14602e:internal/fake171/s3_fake_close_comment.go:15:	if err := rt.OpenTask(taskID); err != nil {
-b5ae9efaaf7285b2ef36b93f831500e34b14602e:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
+$ git grep -nE -w 'OpenTask|CloseTask' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+4357ca3302ad178d2832d6469e796bd5bab88138:internal/fake171/s3_fake_close_comment.go:15:	if err := rt.OpenTask(taskID); err != nil {
+4357ca3302ad178d2832d6469e796bd5bab88138:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
 # 名册行数＝2 （含注释行，逐行原样＝上面那一份，供下一程 diff；这一格一字未改）
 # 命中行数＝1   （票 171 AC#7 的枚数本体；票 171 AC#1 起分子只吃代码那一半——同一条腿里的第二枚从此躲不进「非空」）
 # 被分子剔掉的行（注释里提到词表，代码里没有）：
-#   COMMENT-ONLY b5ae9efaaf7285b2ef36b93f831500e34b14602e:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
+#   COMMENT-ONLY 4357ca3302ad178d2832d6469e796bd5bab88138:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
 # 基线枚数＝1   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
 # rc=0   （1＝零命中／0＝非空＝该枚子句已响）
 
 ## G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法
-$ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/agent
+$ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/agent
 # 名册行数＝0 （含注释行，逐行原样＝上面那一份，供下一程 diff；这一格一字未改）
 # 命中行数＝0   （票 171 AC#7 的枚数本体；票 171 AC#1 起分子只吃代码那一半——同一条腿里的第二枚从此躲不进「非空」）
 # 被分子剔掉的行：（空＝今天这一腿没有一枚靠注释进场）
@@ -38,7 +38,7 @@ $ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' b5ae9efaaf7285b
 # rc=1   （1＝零命中／0＝非空＝该枚子句已响）
 
 ## G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面赋值）
-$ git grep -nE  'PassThroughUnclassifiedRisk:' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- *.go :!*_test.go
+$ git grep -nE  'PassThroughUnclassifiedRisk:' 4357ca3302ad178d2832d6469e796bd5bab88138 -- *.go :!*_test.go
 # 名册行数＝0 （含注释行，逐行原样＝上面那一份，供下一程 diff；这一格一字未改）
 # 命中行数＝0   （票 171 AC#7 的枚数本体；票 171 AC#1 起分子只吃代码那一半——同一条腿里的第二枚从此躲不进「非空」）
 # 被分子剔掉的行：（空＝今天这一腿没有一枚靠注释进场）
@@ -46,14 +46,14 @@ $ git grep -nE  'PassThroughUnclassifiedRisk:' b5ae9efaaf7285b2ef36b93f831500e34
 # rc=1   （1＝零命中／0＝非空＝该枚子句已响）
 
 ## G5 OpenScope↔CloseScope 成对普查：生产码里开了 C25 scope 却没在同一文件关过的名册（排 internal/risk 的定义本体、排 *_test.go）
-$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*
+$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenScope|CloseScope|Close\(\)' 的行。
 # 被分子剔掉的行：（空＝今天这一族没有一枚靠注释进场）
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
 #   （空）
-# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
 # 基线枚数＝1   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
 # git grep rc=1（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
 # rc=0   （本枚子句的响＝未成对枚数；0＝不响）
@@ -73,14 +73,14 @@ $ git grep -nEw 'OpenScope|CloseScope|Close\(\)' b5ae9efaaf7285b2ef36b93f831500e
 #       点中——那是假阳性。成对判据从此只吃调用点（见 pair() 里剔注释那一行）。
 
 ## G5-正控 同尺＝主尺射程，只多排掉主尺今天点名的那一枚 panel_assets.go ⇒ 剩下的开方全是 balanced 样本
-$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go
+$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenScope|CloseScope|Close\(\)' 的行。
 # 被分子剔掉的行：（空＝今天这一族没有一枚靠注释进场）
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
 #   （空）
-# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
 # 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
 # git grep rc=1（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
 # rc=0   （本枚子句的响＝未成对枚数；0＝不响）
@@ -88,20 +88,20 @@ $ git grep -nEw 'OpenScope|CloseScope|Close\(\)' b5ae9efaaf7285b2ef36b93f831500e
 ## G5 负一负（同尺摘掉「排测试＋排定义」那两条 ⇒ 今日应非空，证明这把尺吃得住这个形状、不是结构上产不出读数的装饰）
 
 ## G5-负一负 同尺不过滤任何文件
-$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/**/*.go cmd/**/*.go
+$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/**/*.go cmd/**/*.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenScope|CloseScope|Close\(\)' 的行。
 # 被分子剔掉的行：（空＝今天这一族没有一枚靠注释进场）
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
 #   （空）
-# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
 # 基线枚数＝8   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
 # git grep rc=1（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
 # rc=0   （本枚子句的响＝未成对枚数；0＝不响）
 
 ## 附：G1 的负一负（同尺摘掉排测试那一条 ⇒ 今日即非空，证明模式吃得住这个形状，不是结构上产不出读数的装饰）
-$ git grep -cE 'ToolRequest\{' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal cmd 里 *_test.go 的枚数
+$ git grep -cE 'ToolRequest\{' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal cmd 里 *_test.go 的枚数
 0
 
 ## 附：今日 production .Execute( 全名册（不过滤）＝G1b 的排除项本体
@@ -109,37 +109,47 @@ $ git grep -cE 'ToolRequest\{' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- inter
 ## G6 主尺（票 161 AC#6②第一族）OpenTask↔CloseTask：派发了环路却没在同一文件关掉那一枚 id
 # 与 G5 的分工：G5 盘「不过桥、直接对 risk 层开 scope」那一形，G6 盘「过桥的 task 生命周期」那一形。
 # 排 internal/tools/bridge.go 的理由与 G5 排 internal/risk 同一条：OpenTask／CloseTask 的定义本体
-#   在那儿（:633 与 :684），把定义算成调用点＝名册每改一行注释就响一次，那是噪音不是读数。
-# 今日真实枚数（09-27 现量，两向分开登记）：正向 0 枚／反向 1 枚＝cmd/wisp/run.go。
-#   正向那 0 枚**不是**「都关好了」：开方唯一的生产调用点（bridge.go:559 b.OpenTask(dec.TaskID)）
-#   正好落在被排掉的定义本体文件里，这条射程的结构就没有开方可数——所以这一腿的响只由反向撑着，
-#   「新造一发开了却没关的它必须响」那件事交给（甲）合成树那发主证，不靠这条射程的空 0。
+#   在那儿（:855 与 :923；09-27 登记时是 :633／:684），把定义算成调用点＝名册每改一行注释就响一次，那是噪音不是读数。
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/154/gate-clauses.sh: line 587: ring: command not found
+# 票 178 四堆口径（piles 味）：判据只吃【只开】那一堆。09-27 登记的那  是一发【只关】
+#   （run.go 关 bridge.mark／组合根开的那一枚——票 178 判语：关的是别处开的不算缺陷）；票 315
+#   （bfc74ae9）把 admitTask 补成开合成对之后，这条射程两堆都空，诚实登记是 quiet＋0。
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/154/gate-clauses.sh: line 590: 改完之后: command not found
+#   ：在生产码里真造一枚【只开】（合成树 8ca0a52e＝锚树 1675e844
+#   ＋internal/tools/subagent_197.go 的变异 blob f534915a）⇒ ② 堆 1 枚 > 基线 0 ⇒ BAD。
+#   读数＝.scratch/wisp/probes/178/r1/logs/gate-mutation-ac2.txt——同一发在改前尺上实测 1 枚
+#   恰好等于那时登记的基线 1 ⇒ 沉默；改完才点得出来（票 178 AC#2 那句「未修上响不出来」的正文）。
 
-## G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；两向都算）
-$ git grep -nEw 'OpenTask|CloseTask' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+## G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；四堆只吃『只开』）
+$ git grep -nEw 'OpenTask|CloseTask' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
-b5ae9efaaf7285b2ef36b93f831500e34b14602e:internal/fake171/s3_fake_close_comment.go:15:	if err := rt.OpenTask(taskID); err != nil {
-b5ae9efaaf7285b2ef36b93f831500e34b14602e:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
+4357ca3302ad178d2832d6469e796bd5bab88138:internal/fake171/s3_fake_close_comment.go:15:	if err := rt.OpenTask(taskID); err != nil {
+4357ca3302ad178d2832d6469e796bd5bab88138:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
 # 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenTask|CloseTask' 的行。
 # 被分子剔掉的行（注释里提到词表，代码里没有）：
-#   COMMENT-ONLY b5ae9efaaf7285b2ef36b93f831500e34b14602e:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
+#   COMMENT-ONLY 4357ca3302ad178d2832d6469e796bd5bab88138:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
 #   UNPAIRED internal/fake171/s3_fake_close_comment.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
 # 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
 #   （空）
 # 反向未成对枚数＝0   （0＝反向没响）
-# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
-# 基线枚数＝1   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# 四堆（票 178；判据只吃②『只开』那一堆，基线枚数＝它的**文件**枚数）：
+#   ① 开且关＝0 枚文件（同文件两枚都调过；不是缺陷）
+#   ② 只开＝1 枚文件（开了却没在同一文件关过；本腿『未成对枚数』只数这一堆）
+#   ③ 只关＝0 枚文件（合方在场、开方不在＝关的是别处开的；逐枚在『反向名册』格里，不计进退码）
+#   ④ 注释里提到＝1 行（分子已剔；逐行在『COMMENT-ONLY』格里）
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
+# 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
 # git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
 # rc=1   （本枚子句的响＝未成对枚数；0＝不响）
 
 ## G6 正控（同一把尺打在已知「开了又关」的样本上，两向都必须不响）
-# 样本＝internal/tools/bridge.go 自己：:559 的 b.OpenTask 与 :684 的 CloseTask 在同一枚文件里。
+# 样本＝internal/tools/bridge.go 自己：:657 的 b.OpenTask 与 :923 的 CloseTask 在同一枚文件里。
 # 这条射程是真吃得住的（本程现量 git grep rc=0、剔注释后 3 行调用点），不是「射程里根本没这东西」
 #   那种空 0——那种 0 不算正控（票 154 AC#3 就是拿「零区别」否掉装饰腿的，G5 的自纠 (1) 同一条）。
 
 ## G6-正控 同尺只放已知「开又合」的那一枚 internal/tools/bridge.go ⇒ 两向都必须 0 枚
-$ git grep -nEw 'OpenTask|CloseTask' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/tools/bridge.go :!*_test.go
+$ git grep -nEw 'OpenTask|CloseTask' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/tools/bridge.go :!*_test.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenTask|CloseTask' 的行。
@@ -149,31 +159,38 @@ $ git grep -nEw 'OpenTask|CloseTask' b5ae9efaaf7285b2ef36b93f831500e34b14602e --
 # 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
 #   （空）
 # 反向未成对枚数＝0   （0＝反向没响）
-# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
 # 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
 # git grep rc=1（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
 # rc=0   （本枚子句的响＝未成对枚数；0＝不响）
 
-## G6 负一负（同尺摘掉「排测试＋排定义」两条 ⇒ 今日应非空，证明这把尺吃得住这个形状）
-# 今日真实枚数：正向 0 枚／反向 1 枚＝cmd/wisp/run.go。测试文件里 OpenTask 与 CloseTask 同文件成对
-#   （internal/tools/bridge_scope_open_ticket158_test.go），所以摘掉过滤也点不出正向未成对——
-#   本程不把它谎称成点得出；正向那一向的证＝（甲）合成树。
+## G6 负一负（同尺摘掉「排测试＋排定义」两条；票 178 起四堆只吃『只开』）
+# 票 178 立案的形状就住在这条腿里：175-r2 的判据件（internal/tools/ticket175r2_stamp_live_test.go，
+#   5 处 CloseTask）与 pointer_183 的接缝件（2 处）只调合方——它们关的是 bridge.mark／组合根开的
+#   scope，合法。四堆口径下这两枚落【③ 只关】堆、逐枚点名但不顶红（改前它们把基线 1 顶到 2）。
+#   今天【② 只开】全树 0 枚 ⇒ 诚实登记是 quiet＋0；「真造一枚只开仍会红」那一发＝
+#   .scratch/wisp/probes/178/r1/logs/gate-mutation-ac2.txt（合成树 8ca0a52e 上 ② 堆 1 枚 ⇒ BAD）。
 
-## G6-负一负 同尺不过滤任何文件
-$ git grep -nEw 'OpenTask|CloseTask' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/**/*.go cmd/**/*.go
+## G6-负一负 同尺不过滤任何文件（四堆只吃『只开』；『只关』逐枚点名不顶红）
+$ git grep -nEw 'OpenTask|CloseTask' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/**/*.go cmd/**/*.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
-b5ae9efaaf7285b2ef36b93f831500e34b14602e:internal/fake171/s3_fake_close_comment.go:15:	if err := rt.OpenTask(taskID); err != nil {
-b5ae9efaaf7285b2ef36b93f831500e34b14602e:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
+4357ca3302ad178d2832d6469e796bd5bab88138:internal/fake171/s3_fake_close_comment.go:15:	if err := rt.OpenTask(taskID); err != nil {
+4357ca3302ad178d2832d6469e796bd5bab88138:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
 # 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenTask|CloseTask' 的行。
 # 被分子剔掉的行（注释里提到词表，代码里没有）：
-#   COMMENT-ONLY b5ae9efaaf7285b2ef36b93f831500e34b14602e:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
+#   COMMENT-ONLY 4357ca3302ad178d2832d6469e796bd5bab88138:internal/fake171/s3_fake_close_comment.go:18:	return nil // and it is closed later, see CloseTask in the disposal hook
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
 #   UNPAIRED internal/fake171/s3_fake_close_comment.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
 # 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
 #   （空）
 # 反向未成对枚数＝0   （0＝反向没响）
-# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
-# 基线枚数＝1   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# 四堆（票 178；判据只吃②『只开』那一堆，基线枚数＝它的**文件**枚数）：
+#   ① 开且关＝0 枚文件（同文件两枚都调过；不是缺陷）
+#   ② 只开＝1 枚文件（开了却没在同一文件关过；本腿『未成对枚数』只数这一堆）
+#   ③ 只关＝0 枚文件（合方在场、开方不在＝关的是别处开的；逐枚在『反向名册』格里，不计进退码）
+#   ④ 注释里提到＝1 行（分子已剔；逐行在『COMMENT-ONLY』格里）
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
+# 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
 # git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
 # rc=1   （本枚子句的响＝未成对枚数；0＝不响）
 
@@ -192,7 +209,7 @@ b5ae9efaaf7285b2ef36b93f831500e34b14602e:internal/fake171/s3_fake_close_comment.
 #   调用行的已知粗糙处（pair() 只剔以 // 开头的整行）——逐枚人来判真漏／委托，本程不替它判。
 
 ## G7 主尺 Defer↔DisposalScope 成对普查（排 *_test.go、排定义本体 internal/plugin/disposal.go；两向都算）
-$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/plugin/disposal.go
+$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/plugin/disposal.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'Defer(Named)?|(New)?DisposalScope' 的行。
@@ -202,7 +219,7 @@ $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f8315
 # 反向名册（(New)?DisposalScope 出现过、同一文件却没见过 Defer(Named)? 的文件；这一味＝「关过却没开过」）：
 #   （空）
 # 反向未成对枚数＝0   （0＝反向没响）
-# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
 # 基线枚数＝1   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
 # git grep rc=1（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
 # rc=0   （本枚子句的响＝未成对枚数；0＝不响）
@@ -212,7 +229,7 @@ $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f8315
 #   且名册非空（本程现量 git grep rc=0），不是「射程里没这东西」那种空 0。
 
 ## G7-正控 同尺只放定义本体 internal/plugin/disposal.go 这一枚已知「两向都有」的样本
-$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/plugin/disposal.go :!*_test.go
+$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/plugin/disposal.go :!*_test.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'Defer(Named)?|(New)?DisposalScope' 的行。
@@ -222,7 +239,7 @@ $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f8315
 # 反向名册（(New)?DisposalScope 出现过、同一文件却没见过 Defer(Named)? 的文件；这一味＝「关过却没开过」）：
 #   （空）
 # 反向未成对枚数＝0   （0＝反向没响）
-# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
 # 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
 # git grep rc=1（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
 # rc=0   （本枚子句的响＝未成对枚数；0＝不响）
@@ -232,7 +249,7 @@ $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f8315
 #   DisposalScope 这个词）／反向 3 枚＝主尺那三枚 ⇒ 合计 4 枚。
 
 ## G7-负一负 同尺不过滤任何文件
-$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f831500e34b14602e -- internal/**/*.go cmd/**/*.go
+$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 4357ca3302ad178d2832d6469e796bd5bab88138 -- internal/**/*.go cmd/**/*.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'Defer(Named)?|(New)?DisposalScope' 的行。
@@ -242,7 +259,7 @@ $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f8315
 # 反向名册（(New)?DisposalScope 出现过、同一文件却没见过 Defer(Named)? 的文件；这一味＝「关过却没开过」）：
 #   （空）
 # 反向未成对枚数＝0   （0＝反向没响）
-# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
 # 基线枚数＝2   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
 # git grep rc=1（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
 # rc=0   （本枚子句的响＝未成对枚数；0＝不响）
@@ -254,6 +271,7 @@ $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f8315
 # 每腿判定（ok＝说到做到／BAD＝言行不一／SHR＝读数比基线好＝基线过期但不算言行不一；这一份同样逐行可 diff）：
 # 票 171 AC#2／AC#7：pair 腿与 run 腿现在都是同一套两列——基线＝want_n 登记的枚数、
 #   实测＝这一腿自己数出来的枚数（pair 腿＝未成对，run 腿＝命中行数）。
+#   票 178 起：piles 味 pair 腿的『实测』＝【只开】那一堆的文件枚数（『只关』逐枚点名，不进这一列）。
 #   退码累计的是【声明与实测不符】，而「不符」现在有三味：空/非空（票 161 AC#6①）、
 #   实测>基线（票 171 AC#2／AC#7）与【腿不在场】（票 171 AC#8①）。
 # ok   腿=G1 声明=quiet 基线=0枚 实测=0枚
@@ -264,13 +282,13 @@ $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f8315
 # BAD  腿=G5 声明=ring 基线=1枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
 # ok   腿=G5pos 声明=quiet 基线=0枚 实测=0枚
 # BAD  腿=G5neg 声明=ring 基线=8枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
-# ok   腿=G6 声明=ring 基线=1枚 实测=1枚
+# BAD  腿=G6 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
 # ok   腿=G6pos 声明=quiet 基线=0枚 实测=0枚
-# ok   腿=G6neg 声明=ring 基线=1枚 实测=1枚
+# BAD  腿=G6neg 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
 # BAD  腿=G7 声明=ring 基线=1枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
 # ok   腿=G7pos 声明=quiet 基线=0枚 实测=0枚
 # BAD  腿=G7neg 声明=ring 基线=2枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
-# 腿数＝14 声明与实测不符＝4
+# 腿数＝14 声明与实测不符＝6
 # 腿数断言：名册=14 声明=14 记账=14 缺腿=0 空头声明=0
 # 腿数断言＝相符（名册上每一腿都记了账）
 
@@ -280,5 +298,5 @@ $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' b5ae9efaaf7285b2ef36b93f8315
 # 表头：腿 | 声明 | 基线（want_n） | 实测 | 差 | 处置
 #   （空＝今天没有任何一条腿的读数低于基线）
 # 基线过期枚数＝0   （核它的那一把＝.scratch/wisp/probes/161/r6/flip-declaration.sh 新增的那一格）
-# 聚合退码＝4   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）
+# 聚合退码＝6   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）
 # 翻一枚声明让退码跟着变那发证据不在这里，在 .scratch/wisp/probes/161/r6/flip-declaration.sh

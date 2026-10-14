@@ -1,0 +1,44 @@
+# 171s r3-sample-deleted.sh 重钉两态＋变异两态（原文，逐字）
+# 重钉前（178 改形后的旧字节，10-14 现跑）：rc=2
+$ sh .scratch/wisp/probes/171/r3/r3-sample-deleted.sh
+r3-sample-deleted.sh: no 'want G6' declaration - no verdict
+# （178-v1 §7 复现同一发：`r3-sample-deleted.sh: no 'want G6' declaration - no verdict`）
+#
+# 重钉后（就地改：补两行副本登记 want G6 ring piles＋want_n 2；读数写 samples2$tag-*）：
+$ sh .scratch/wisp/probes/171/r3/r3-sample-deleted.sh          # rc=0 GREEN，0 枚 FAIL（194s）
+r3-sample-deleted.sh: ruler with G6 登记 ring＋基线 2（② 堆文件枚数） = /tmp/wisp-171-r3-samples.*/gate-wantn2.sh
+   (two lines changed: want G6 quiet piles -> want G6 ring piles, want_n 0 -> 2)
+===== D2: both registered samples present (the honest state) =====   （② 只开＝2 枚文件／③ 只关＝0 枚文件）
+# ok   腿=G6 声明=ring 基线=2枚 实测=2枚
+  ok    D2: 实测 equals the registered baseline, no table row, no BAD
+  ok    D2: the 基线过期 table is empty
+  ok    D2: G6 is not in the BAD list
+===== D1: ONE sample deleted, the leg and its declaration untouched =====   （② 只开＝1 枚文件）
+# SHR  腿=G6 声明=ring 基线=2枚 实测=1枚 注=读数变好了，基线过期，下一程把 want_n 核下来
+# STALE 腿=G6 声明=ring 基线=2枚 实测=1枚 差=1枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+  ok    D1: the leg is flagged SHR (measured below baseline) - the deletion is readable
+  ok    D1: the standalone 基线过期 table names G6
+===== D1c: one opening sample + one CLOSE-ONLY sample =====   （② 只开＝1 枚／③ 只关＝1 枚）
+# SHR  腿=G6 声明=ring 基线=2枚 实测=1枚 注=读数变好了，基线过期，下一程把 want_n 核下来
+  ok    D1c: the close-only file did not enter the measured column (票 178：③ 只关不计进这一列)
+  ok    D1c: the four-pile printout names ② 只开＝1 枚／③ 只关＝1 枚（实测只吃 ②）
+===== D0: the LAST sample deleted (leg still declared, still run) =====   （② 只开＝0 枚文件）
+# BAD  腿=G6 声明=ring 基线=2枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+  ok    D0: the emptied leg is a BAD on the 空/非空 dimension（它在 BAD 名册里）
+r3-sample-deleted.sh: GREEN.
+#
+# 交叉对照（同一钉、另一把尺＝pre-178 混数口径的 gate-prefix-f78d3cb.sh，同三态）：
+# ok 基线=2枚 实测=2枚  /  SHR 基线=2枚 实测=1枚  /  BAD 基线=2枚 实测=0枚（因=空/非空那一味）
+#
+# 变异两态（自造反向变异：SAMPLE_PIN_MUT=noempty＝把『空/非空』那一味从**副本**里挪走，仓里零字节）：
+$ SAMPLE_PIN_MUT=noempty SAMPLE_PIN_TAG=-mut-noempty sh .scratch/wisp/probes/171/r3/r3-sample-deleted.sh   # rc=1 RED
+r3-sample-deleted.sh: MUTATION noempty active - the 空/非空 verdict moved out of the copy, D0 must go RED
+  FAIL  D2: the table is not empty in the honest state
+  FAIL  D0: expected a BAD row naming 空/非空 for G6, got '# SHR  腿=G6 声明=ring 基线=2枚 实测=0枚 注=读数变好了，基线过期，下一程把 want_n 核下来'
+  FAIL  D0: the emptied leg never reached the BAD list - AC#8-1's other half is hollow
+r3-sample-deleted.sh: RED.
+# （坏处恰恰是这条钉子在防的：样本被删空再也不会把聚合顶红——被测出来的形状，逐字点名 D0。）
+#
+# 还原 ⇒ 绿：变异只落在 $work 的副本，仓里尺零字节；重跑不带变量 ⇒ rc=0 GREEN（194s，同上）。
+# 旧读数 samples-D*.txt 一字节未动；本版读数＝probes/171/r3/logs/samples2-{D2,D1,D1c,D0,X2,X1,X0}.txt
+# ＋ samples2-mut-noempty-{D2,D1,D1c,D0}.txt。

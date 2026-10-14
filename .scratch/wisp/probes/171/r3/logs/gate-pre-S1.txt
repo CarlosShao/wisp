@@ -1,40 +1,40 @@
-# 票 154 AC#1 触发门 —— 锚点 83d3a9b5c9f2999d2422a4ebe181215f4a052d91
-# 生成时刻 2026-10-03T10:58:15+08:00
+# 票 154 AC#1 触发门 —— 锚点 2e5a390e43388b998e0b365ff73ca852f3ac84a6
+# 生成时刻 2026-10-14T19:55:38+08:00
 # 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
 
 ## G1 生产码里构造 ToolRequest（排 internal/agent/ 自身）
-$ git grep -nE  'ToolRequest\{' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/*
+$ git grep -nE  'ToolRequest\{' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/*
 # 命中行数＝0   （票 171 AC#7：run 腿的枚数就是它——同一条腿里的第二枚从此躲不进「非空」）
 # 基线枚数＝0   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
 # rc=1   （1＝零命中／0＝非空＝该枚子句已响）
 
 ## G1b 生产码里任意 .Execute( 调用点（排 loop.go 与 bridge.go 自身）
-$ git grep -nE  '\.Execute\(' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/loop.go :!internal/tools/bridge.go
+$ git grep -nE  '\.Execute\(' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/loop.go :!internal/tools/bridge.go
 # 命中行数＝0   （票 171 AC#7：run 腿的枚数就是它——同一条腿里的第二枚从此躲不进「非空」）
 # 基线枚数＝0   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
 # rc=1   （1＝零命中／0＝非空＝该枚子句已响）
 
 ## G2 OpenTask/CloseTask 的生产出现点（排 bridge.go 自身；今日应只剩 cmd/wisp/run.go 那一发＋它上面的注释）
-$ git grep -nE -w 'OpenTask|CloseTask' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
-83d3a9b5c9f2999d2422a4ebe181215f4a052d91:internal/fake171/s1_only_trailing_comment.go:19:	cfg.Name = "retention-job" // scheduled through OpenTask by the caller, not here
+$ git grep -nE -w 'OpenTask|CloseTask' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+2e5a390e43388b998e0b365ff73ca852f3ac84a6:internal/fake171/s1_only_trailing_comment.go:19:	cfg.Name = "retention-job" // scheduled through OpenTask by the caller, not here
 # 命中行数＝1   （票 171 AC#7：run 腿的枚数就是它——同一条腿里的第二枚从此躲不进「非空」）
 # 基线枚数＝2   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
 # rc=0   （1＝零命中／0＝非空＝该枚子句已响）
 
 ## G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法
-$ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/agent
+$ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/agent
 # 命中行数＝0   （票 171 AC#7：run 腿的枚数就是它——同一条腿里的第二枚从此躲不进「非空」）
 # 基线枚数＝0   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
 # rc=1   （1＝零命中／0＝非空＝该枚子句已响）
 
 ## G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面赋值）
-$ git grep -nE  'PassThroughUnclassifiedRisk:' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- *.go :!*_test.go
+$ git grep -nE  'PassThroughUnclassifiedRisk:' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- *.go :!*_test.go
 # 命中行数＝0   （票 171 AC#7：run 腿的枚数就是它——同一条腿里的第二枚从此躲不进「非空」）
 # 基线枚数＝0   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）
 # rc=1   （1＝零命中／0＝非空＝该枚子句已响）
 
 ## G5 OpenScope↔CloseScope 成对普查：生产码里开了 C25 scope 却没在同一文件关过的名册（排 internal/risk 的定义本体、排 *_test.go）
-$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*
+$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
@@ -59,7 +59,7 @@ $ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 83d3a9b5c9f2999d2422a4ebe181215
 #       点中——那是假阳性。成对判据从此只吃调用点（见 pair() 里剔注释那一行）。
 
 ## G5-正控 同尺＝主尺射程，只多排掉主尺今天点名的那一枚 panel_assets.go ⇒ 剩下的开方全是 balanced 样本
-$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go
+$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
@@ -72,7 +72,7 @@ $ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 83d3a9b5c9f2999d2422a4ebe181215
 ## G5 负一负（同尺摘掉「排测试＋排定义」那两条 ⇒ 今日应非空，证明这把尺吃得住这个形状、不是结构上产不出读数的装饰）
 
 ## G5-负一负 同尺不过滤任何文件
-$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/**/*.go cmd/**/*.go
+$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/**/*.go cmd/**/*.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
@@ -83,7 +83,7 @@ $ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 83d3a9b5c9f2999d2422a4ebe181215
 # rc=0   （本枚子句的响＝未成对枚数；0＝不响）
 
 ## 附：G1 的负一负（同尺摘掉排测试那一条 ⇒ 今日即非空，证明模式吃得住这个形状，不是结构上产不出读数的装饰）
-$ git grep -cE 'ToolRequest\{' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal cmd 里 *_test.go 的枚数
+$ git grep -cE 'ToolRequest\{' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal cmd 里 *_test.go 的枚数
 0
 
 ## 附：今日 production .Execute( 全名册（不过滤）＝G1b 的排除项本体
@@ -98,9 +98,9 @@ $ git grep -cE 'ToolRequest\{' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- inter
 #   「新造一发开了却没关的它必须响」那件事交给（甲）合成树那发主证，不靠这条射程的空 0。
 
 ## G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；两向都算）
-$ git grep -nEw 'OpenTask|CloseTask' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+$ git grep -nEw 'OpenTask|CloseTask' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
-83d3a9b5c9f2999d2422a4ebe181215f4a052d91:internal/fake171/s1_only_trailing_comment.go:19:	cfg.Name = "retention-job" // scheduled through OpenTask by the caller, not here
+2e5a390e43388b998e0b365ff73ca852f3ac84a6:internal/fake171/s1_only_trailing_comment.go:19:	cfg.Name = "retention-job" // scheduled through OpenTask by the caller, not here
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
 #   UNPAIRED internal/fake171/s1_only_trailing_comment.go (开方调用点=1)
 # 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
@@ -117,7 +117,7 @@ $ git grep -nEw 'OpenTask|CloseTask' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 --
 #   那种空 0——那种 0 不算正控（票 154 AC#3 就是拿「零区别」否掉装饰腿的，G5 的自纠 (1) 同一条）。
 
 ## G6-正控 同尺只放已知「开又合」的那一枚 internal/tools/bridge.go ⇒ 两向都必须 0 枚
-$ git grep -nEw 'OpenTask|CloseTask' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/tools/bridge.go :!*_test.go
+$ git grep -nEw 'OpenTask|CloseTask' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/tools/bridge.go :!*_test.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
@@ -136,9 +136,9 @@ $ git grep -nEw 'OpenTask|CloseTask' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 --
 #   本程不把它谎称成点得出；正向那一向的证＝（甲）合成树。
 
 ## G6-负一负 同尺不过滤任何文件
-$ git grep -nEw 'OpenTask|CloseTask' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/**/*.go cmd/**/*.go
+$ git grep -nEw 'OpenTask|CloseTask' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/**/*.go cmd/**/*.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
-83d3a9b5c9f2999d2422a4ebe181215f4a052d91:internal/fake171/s1_only_trailing_comment.go:19:	cfg.Name = "retention-job" // scheduled through OpenTask by the caller, not here
+2e5a390e43388b998e0b365ff73ca852f3ac84a6:internal/fake171/s1_only_trailing_comment.go:19:	cfg.Name = "retention-job" // scheduled through OpenTask by the caller, not here
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
 #   UNPAIRED internal/fake171/s1_only_trailing_comment.go (开方调用点=1)
 # 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
@@ -164,7 +164,7 @@ $ git grep -nEw 'OpenTask|CloseTask' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 --
 #   调用行的已知粗糙处（pair() 只剔以 // 开头的整行）——逐枚人来判真漏／委托，本程不替它判。
 
 ## G7 主尺 Defer↔DisposalScope 成对普查（排 *_test.go、排定义本体 internal/plugin/disposal.go；两向都算）
-$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/plugin/disposal.go
+$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/plugin/disposal.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
@@ -182,7 +182,7 @@ $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 83d3a9b5c9f2999d2422a4ebe181
 #   且名册非空（本程现量 git grep rc=0），不是「射程里没这东西」那种空 0。
 
 ## G7-正控 同尺只放定义本体 internal/plugin/disposal.go 这一枚已知「两向都有」的样本
-$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/plugin/disposal.go :!*_test.go
+$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/plugin/disposal.go :!*_test.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
@@ -200,7 +200,7 @@ $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 83d3a9b5c9f2999d2422a4ebe181
 #   DisposalScope 这个词）／反向 3 枚＝主尺那三枚 ⇒ 合计 4 枚。
 
 ## G7-负一负 同尺不过滤任何文件
-$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 83d3a9b5c9f2999d2422a4ebe181215f4a052d91 -- internal/**/*.go cmd/**/*.go
+$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 2e5a390e43388b998e0b365ff73ca852f3ac84a6 -- internal/**/*.go cmd/**/*.go
 # 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
 #   （空）
 # 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：

@@ -36,6 +36,28 @@
 #     把 want_n 核下来，别留 SHR 当默认"的规矩）；ring/quiet 若因新分子换位，也一并现量重登。
 #     每一腿那一格从此自己说清两个数：# 名册行数＝（含注释，逐行原样，供下一程 diff）与
 #     # 命中行数＝／# 未成对枚数＝（分子），被剔掉的行逐枚打在 #   COMMENT-ONLY 那一格里。
+# 票 178 追加（10-14，**只把 pair 腿的成对判定从「一枚混数」改成四堆可分**；一枚腿没删、
+#   一条 pathspec 射程没减、G5／G7 两族的读数一字未动）：
+#   ① 病：pair 腿的「未成对枚数」本来是「只开（正向）＋只关（反向）」两堆相加。可是【只关】
+#      （同一文件调了合方、没调开方）按票 178 的判语不是缺陷——它关的可以是别处开的那一枚
+#      （bridge.mark 的懒开／组合根 admitTask 的开）：于是任何老实补 CloseTask 的合法文件都会
+#      把 G6neg 从基线顶上去（票 178 立案：175-r2 判据件 5 处 CloseTask 只关不开，1→2 顶红）。
+#   ② 四堆（本程新口径）：① 开且关（两枚都调过）／② 只开（真缺陷）／③ 只关（关的是别处开的）
+#      ／④ 注释里提到（票 171 AC#1 起分子已剔，逐行打在 COMMENT-ONLY 格）。piles 味的腿把四堆
+#      逐堆打出来，判据**只吃 ② 只开那一堆的文件枚数**；③ 逐枚点名但不计进退码。
+#   ③ 新味 piles（want 的第三味，与 rev 互斥）：`want <腿> <ring|quiet> piles`。基线枚数的
+#      语义＝**② 只开堆里的文件枚数**（不是堆数、不是行数）——AC#3 要求把这一句写进仪器头，
+#      此句就是那一句。rev 味那些腿（G5／G7 两族，及 G6-正控）的口径原样：正＋反相加，读数不变。
+#   ④ G6／G6neg 改登 `quiet`＋`want_n 0`（与形状同批，票 178 AC#4 要求同批）：G6 主尺 09-27
+#      登记的 `ring 1` 本来就是一发【只关】（run.go 关 bridge 开的那一枚）；票 315（bfc74ae9）
+#      把 admitTask 补成开合成对之后它连枚数也归 0，四堆口径下它该是 quiet。
+#      `改完之后 AC#2 那一发仍会红`——生产码里真造一枚【只开】⇒ ② 堆 1 枚 > 基线 0 ⇒ BAD。
+#      读数：.scratch/wisp/probes/178/r1/logs/gate-mutation-ac2.txt（合成树 8ca0a52e＝锚树
+#      1675e844＋既有生产件 internal/tools/subagent_197.go 的一枚变异 blob f534915a）。
+#   ⑤ 随单发现（**未修**，归口下一程）：pair()/run() 的 `-- $@` 未加引号，`internal/**/*.go`
+#      先被 bash 在**工作树**上做路径名展开（现量 496 枚路径）再喂 git grep ⇒ 射程的**文件清单**
+#      来自工作树、只有内容来自 $A 那棵树（合成树里「新加一枚文件」因此对这把尺不可见，本程
+#      AC#2 的变异因此改成改既有件的内容）。改它＝改所有腿在所有锚点的射程，须单独立票。
 # 用法：bash .scratch/wisp/probes/154/gate-clauses.sh [锚点]   > 读数文件
 # 规矩：只做 grep／不写仓里任何东西；名册变了即门响。
 #   （G5 的 pair() 为求差集用了一次 bash herestring，临时件走 $TMPDIR、不落仓；
@@ -49,7 +71,8 @@ NT=':_test.go'
 
 # ---- 票 161 AC#6①：每一腿自己声明，聚合只累计【声明与实测不符】的腿 ----------------
 # 形状（判据本体＝票面 AC#6 下面 09-27 09:1x 那个 > 块）：
-#   want <腿号> <ring|quiet> [rev]  —— 开跑前登记这一腿今天该不该响；rev＝成对普查两向都算。
+#   want <腿号> <ring|quiet> [rev|piles] —— 开跑前登记这一腿今天该不该响；rev＝成对普查两向都算；
+#                                     piles＝票 178 的四堆口径（判据只吃【只开】堆，见文件头 178 段）。
 #   ring＝该响（run()：名册非空／pair()：未成对≥1 枚）／quiet＝不该响（零命中／0 枚）。
 # 票 171 AC#2 加味：
 #   want_n <枚数>                   —— 紧跟 want 登记【基线枚数】。票 171 AC#2 时它只管 pair 腿
@@ -59,12 +82,14 @@ NT=':_test.go'
 # 票 171 AC#8① 加味：
 #   LEGS_EXPECT                     —— 腿的名册（唯一一处写这些腿号的地方）；want() 核腿号在不在册，
 #                                     聚合段核名册里每一腿都记过账，缺一枚＝一枚 BAD。
-# ⚠ 这一枚**不是**「任何一腿响⇒脚本非 0」：本文件里 G2、G5-负一负、G6、G6-负一负、G7、G7-负一负
-#   今天按设计就该响（G5 主尺那 1 枚是票 158 登记在册的活形状），把它们计进退码＝把票 161 AC#7
-#   刚收掉的恒红形状从另一扇门放回来（同一枚错，台账 A320／A321）。
+# ⚠ 这一枚**不是**「任何一腿响⇒脚本非 0」：本文件里 G2、G5-负一负、G7、G7-负一负 今天按设计
+#   就该响（G5 主尺那 1 枚是票 158 登记在册的活形状），把它们计进退码＝把票 161 AC#7 刚收掉的
+#   恒红形状从另一扇门放回来（同一枚错，台账 A320／A321）。⚠ 10-14 票 178 之后 G6／G6-负一负
+#   从这张"按设计该响"的名单里退场（改登 quiet＋piles，理由见文件头 178 那一段）。
 LEG='(还没 want)'
 EXPECT='quiet'
 REV=0
+PILES=0
 COUNT=''
 AGG=''
 AGG_BAD=0
@@ -98,10 +123,21 @@ want() { # $1 腿号 $2 ring|quiet [$3 rev]
 	LEG="$1"
 	EXPECT="$2"
 	REV=0
+	PILES=0
 	COUNT=''
 	WANT_COUNT=$((WANT_COUNT + 1))
 	LEG_SEEN="$LEG_SEEN $LEG"
-	if [ "${3:-}" = "rev" ]; then REV=1; fi
+	# 票 178：第三味两形互斥——rev（两向相加，G5／G7 两族的原口径）／piles（四堆可分，判据只吃
+	# 【只开】堆，G6／G6neg）。打错一味不静默：那会让"这条腿按哪把尺跑"没人知道（rc=3）。
+	case "${3:-}" in
+	'') ;;
+	rev) REV=1 ;;
+	piles) PILES=1 ;;
+	*)
+		echo "想死在起跑线上：腿 $LEG 的第三味 '${3:-}' 不是 rev／piles 之一——味打错＝这条腿按哪一把尺跑没人知道（票 178）" >&2
+		exit 3
+		;;
+	esac
 	if [ "$EXPECT" != ring ] && [ "$EXPECT" != quiet ]; then
 		echo "想死在起跑线上：腿 $LEG 的声明 '$EXPECT' 不是 ring／quiet 之一——声明打错＝聚合是枚哑弹" >&2
 		exit 3
@@ -109,6 +145,8 @@ want() { # $1 腿号 $2 ring|quiet [$3 rev]
 }
 
 # want_n（票 171 AC#2，票 171 AC#7 起两族腿都管）：基线枚数。放在 want 之后、腿之前＝「开跑前先登记」这条没破。
+#   票 178 起三族语义各写各的：piles 味 pair 腿＝【只开】那一堆里的**文件**枚数（不是堆数、不是行数）
+#   ／rev 味 pair 腿＝未成对（正＋反）文件枚数／run 腿＝命中行数；腿自己那一格的注释里再各写一遍。
 # 不校「quiet 却登记了 N>0」那种自相矛盾的声明——book_count 里【空/非空】那一味先它一步响，
 # 而且 flip-declaration.sh 正是靠改 want 那一行来验「声明还连着退码」，起跑线上把脚本打死会把
 # 它要证的那件事（聚合累计声明与实测不符）换成另一件事（脚本崩在登记处）。
@@ -128,7 +166,7 @@ want_n() { # $1 基线枚数
 
 # book_count：两族腿共用的记账（票 171 r2 起 run 腿也走这一枚，「只有 0／非 0」那一套从此不存在了；
 # 改前那枚只管 run 腿的 book() 因此整枚删掉——留着它就是同一件事的第二个判法，正是"同源拷贝"的形状）。
-# $1＝实测枚数（pair 腿＝未成对枚数；run 腿＝命中行数） $2＝那一发 git grep 的 rc
+# $1＝实测枚数（pair 腿＝未成对枚数；piles 味的 pair 腿＝【只开】堆文件枚数；run 腿＝命中行数） $2＝那一发 git grep 的 rc
 # $3＝kind：unpaired（默认＝pair 腿）| hits（run 腿，票 171 AC#7）。kind 只决定红句里「新增」后面
 #   那两个词，判据算术一枚不多一枚不少 ⇒ AC#2 结案记录的逐字红句（腿=G5 …因=新增未成对）仍然对得上。
 # 两味**并集**，一枚腿最多计一进退码（不重复计）：
@@ -296,6 +334,7 @@ pair() { # 成对普查：$1 标题 $2 开方 pattern $3 合方 pattern $4 handl
 	# 锚点、pathspec 与逐行可 diff 的名册本体都照 run() 的形状。
 	# $4（票 171 AC#6）＝handle 时开方丢句柄的文件强制点名；'-' ＝不启用（G6/G7 的开方不交句柄）。
 	# 响的粒度（票 171 AC#2）＝want_n 登记的基线枚数，不再是非空——见 book_count()。
+	# 票 178：piles 味的腿把成对名册拆成四堆并只把【只开】堆的枚数交给 book_count（见下面那一段）。
 	local title="$1" open="$2" close="$3" mode="$4"; shift 4
 	echo
 	echo "## $title"
@@ -363,7 +402,8 @@ pair() { # 成对普查：$1 标题 $2 开方 pattern $3 合方 pattern $4 handl
 			printf '%s\n' "$gk" | sed 's|^|#   CLOSE-BY-GENERIC-CLOSE |'
 		fi
 	fi
-	if [ "$REV" = 1 ]; then
+	if [ "$REV" = 1 ] || [ "$PILES" = 1 ]; then
+		# 票 178：piles 味的腿也要算反向那一堆（【只关】），只是它不进判据——分开打着给人判。
 		# 票 161 AC#6②「方向倒过来也算」：合方出现过、同一文件里开方一次都没有，也算一枚未成对。
 		# 这一味不是装饰，G6 主尺今天响的那 1 枚只有反向点得到：
 		#   cmd/wisp/run.go:563 调 rt.bridge.CloseTask(taskID)，而 OpenTask 唯一的生产调用点在
@@ -382,9 +422,29 @@ pair() { # 成对普查：$1 标题 $2 开方 pattern $3 合方 pattern $4 handl
 			echo "#   （空）"
 		fi
 		echo "# 反向未成对枚数＝$rn   （0＝反向没响）"
-		n=$((n + rn))
+		# 票 178：piles 味的腿只吃【只开】堆；反向（只关）逐枚点名但不计进退码。
+		if [ "$REV" = 1 ]; then
+			n=$((n + rn))
+		fi
 	fi
-	echo "# 未成对枚数＝$n   （0＝这把尺没响／>0＝逐枚点名如上）"
+	# ---- 票 178：四堆分明（只加打印、不动任何既有行；判据只吃②『只开』，基线枚数＝它的文件枚数）----
+	if [ "$PILES" = 1 ]; then
+		local bal opened closed
+		opened="$(printf '%s\n' "$calls" | grep -Ew "$open" | cut -d: -f2 | sort -u || true)"
+		closed="$(printf '%s\n' "$calls" | grep -Ew "$close" | cut -d: -f2 | sort -u || true)"
+		bal=''
+		for f in $opened; do
+			printf '%s\n' "$closed" | grep -qxF "$f" && bal="$bal$f
+"
+		done
+		echo "# 四堆（票 178；判据只吃②『只开』那一堆，基线枚数＝它的**文件**枚数）："
+		echo "#   ① 开且关＝$(printf '%s\n' "$bal" | grep -c . || true) 枚文件（同文件两枚都调过；不是缺陷）"
+		printf '%s\n' "$bal" | grep '^.' | sed 's|^|#      BALANCED |' || true
+		echo "#   ② 只开＝$n 枚文件（开了却没在同一文件关过；本腿『未成对枚数』只数这一堆）"
+		echo "#   ③ 只关＝${rn:-0} 枚文件（合方在场、开方不在＝关的是别处开的；逐枚在『反向名册』格里，不计进退码）"
+		echo "#   ④ 注释里提到＝$(printf '%s\n' "$dropped" | grep -c . || true) 行（分子已剔；逐行在『COMMENT-ONLY』格里）"
+	fi
+	echo "# 未成对枚数＝$n   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）"
 	echo "# 基线枚数＝${COUNT:-（没登记）}   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）"
 	echo "# git grep rc=$rrc（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）"
 	echo "# rc=$n   （本枚子句的响＝未成对枚数；0＝不响）"
@@ -523,19 +583,22 @@ echo
 echo "## G6 主尺（票 161 AC#6②第一族）OpenTask↔CloseTask：派发了环路却没在同一文件关掉那一枚 id"
 echo "# 与 G5 的分工：G5 盘「不过桥、直接对 risk 层开 scope」那一形，G6 盘「过桥的 task 生命周期」那一形。"
 echo "# 排 internal/tools/bridge.go 的理由与 G5 排 internal/risk 同一条：OpenTask／CloseTask 的定义本体"
-echo "#   在那儿（:633 与 :684），把定义算成调用点＝名册每改一行注释就响一次，那是噪音不是读数。"
-echo "# 今日真实枚数（09-27 现量，两向分开登记）：正向 0 枚／反向 1 枚＝cmd/wisp/run.go。"
-echo "#   正向那 0 枚**不是**「都关好了」：开方唯一的生产调用点（bridge.go:559 b.OpenTask(dec.TaskID)）"
-echo "#   正好落在被排掉的定义本体文件里，这条射程的结构就没有开方可数——所以这一腿的响只由反向撑着，"
-echo "#   「新造一发开了却没关的它必须响」那件事交给（甲）合成树那发主证，不靠这条射程的空 0。"
-want G6 ring rev
-want_n 1
-pair "G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；两向都算）" \
+echo "#   在那儿（:855 与 :923；09-27 登记时是 :633／:684），把定义算成调用点＝名册每改一行注释就响一次，那是噪音不是读数。"
+echo "# 票 178 四堆口径（piles 味）：判据只吃【只开】那一堆。09-27 登记的那 `ring 1` 是一发【只关】"
+echo "#   （run.go 关 bridge.mark／组合根开的那一枚——票 178 判语：关的是别处开的不算缺陷）；票 315"
+echo "#   （bfc74ae9）把 admitTask 补成开合成对之后，这条射程两堆都空，诚实登记是 quiet＋0。"
+echo "#   `改完之后 AC#2 那一发仍会红`：在生产码里真造一枚【只开】（合成树 8ca0a52e＝锚树 1675e844"
+echo "#   ＋internal/tools/subagent_197.go 的变异 blob f534915a）⇒ ② 堆 1 枚 > 基线 0 ⇒ BAD。"
+echo "#   读数＝.scratch/wisp/probes/178/r1/logs/gate-mutation-ac2.txt——同一发在改前尺上实测 1 枚"
+echo "#   恰好等于那时登记的基线 1 ⇒ 沉默；改完才点得出来（票 178 AC#2 那句「未修上响不出来」的正文）。"
+want G6 quiet piles
+want_n 0
+pair "G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；四堆只吃『只开』）" \
 	'OpenTask' 'CloseTask' - "$GO" "$GO2" ':!*_test.go' ':!internal/tools/bridge.go'
 
 echo
 echo "## G6 正控（同一把尺打在已知「开了又关」的样本上，两向都必须不响）"
-echo "# 样本＝internal/tools/bridge.go 自己：:559 的 b.OpenTask 与 :684 的 CloseTask 在同一枚文件里。"
+echo "# 样本＝internal/tools/bridge.go 自己：:657 的 b.OpenTask 与 :923 的 CloseTask 在同一枚文件里。"
 echo "# 这条射程是真吃得住的（本程现量 git grep rc=0、剔注释后 3 行调用点），不是「射程里根本没这东西」"
 echo "#   那种空 0——那种 0 不算正控（票 154 AC#3 就是拿「零区别」否掉装饰腿的，G5 的自纠 (1) 同一条）。"
 want G6pos quiet rev
@@ -544,13 +607,15 @@ pair "G6-正控 同尺只放已知「开又合」的那一枚 internal/tools/bri
 	'OpenTask' 'CloseTask' - 'internal/tools/bridge.go' ':!*_test.go'
 
 echo
-echo "## G6 负一负（同尺摘掉「排测试＋排定义」两条 ⇒ 今日应非空，证明这把尺吃得住这个形状）"
-echo "# 今日真实枚数：正向 0 枚／反向 1 枚＝cmd/wisp/run.go。测试文件里 OpenTask 与 CloseTask 同文件成对"
-echo "#   （internal/tools/bridge_scope_open_ticket158_test.go），所以摘掉过滤也点不出正向未成对——"
-echo "#   本程不把它谎称成点得出；正向那一向的证＝（甲）合成树。"
-want G6neg ring rev
-want_n 1
-pair "G6-负一负 同尺不过滤任何文件" \
+echo "## G6 负一负（同尺摘掉「排测试＋排定义」两条；票 178 起四堆只吃『只开』）"
+echo "# 票 178 立案的形状就住在这条腿里：175-r2 的判据件（internal/tools/ticket175r2_stamp_live_test.go，"
+echo "#   5 处 CloseTask）与 pointer_183 的接缝件（2 处）只调合方——它们关的是 bridge.mark／组合根开的"
+echo "#   scope，合法。四堆口径下这两枚落【③ 只关】堆、逐枚点名但不顶红（改前它们把基线 1 顶到 2）。"
+echo "#   今天【② 只开】全树 0 枚 ⇒ 诚实登记是 quiet＋0；「真造一枚只开仍会红」那一发＝"
+echo "#   .scratch/wisp/probes/178/r1/logs/gate-mutation-ac2.txt（合成树 8ca0a52e 上 ② 堆 1 枚 ⇒ BAD）。"
+want G6neg quiet piles
+want_n 0
+pair "G6-负一负 同尺不过滤任何文件（四堆只吃『只开』；『只关』逐枚点名不顶红）" \
 	'OpenTask' 'CloseTask' - "$GO" "$GO2"
 
 echo
@@ -614,6 +679,7 @@ echo "#   ＝把票 161 AC#7 刚收掉的恒红形状从另一扇门放回来（
 echo "# 每腿判定（ok＝说到做到／BAD＝言行不一／SHR＝读数比基线好＝基线过期但不算言行不一；这一份同样逐行可 diff）："
 echo "# 票 171 AC#2／AC#7：pair 腿与 run 腿现在都是同一套两列——基线＝want_n 登记的枚数、"
 echo "#   实测＝这一腿自己数出来的枚数（pair 腿＝未成对，run 腿＝命中行数）。"
+echo "#   票 178 起：piles 味 pair 腿的『实测』＝【只开】那一堆的文件枚数（『只关』逐枚点名，不进这一列）。"
 echo "#   退码累计的是【声明与实测不符】，而「不符」现在有三味：空/非空（票 161 AC#6①）、"
 echo "#   实测>基线（票 171 AC#2／AC#7）与【腿不在场】（票 171 AC#8①）。"
 # ---- 票 171 AC#8①：腿数断言。改前这一格只有「腿数＝14」一句打印，摘掉一整条腿它打印 13 然后退 0 ----

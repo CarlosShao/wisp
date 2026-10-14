@@ -1,0 +1,49 @@
+# 171s 全脚本 rc 名册（先量全；2026-10-14 20:0x–21:xx 现跑，逐枚实际执行）
+# 锚：各脚本自带（4f2a777b / f78d3cb / f1b99a70 / 19513cce / 3df74960 / 合成树 / 仓 HEAD）；读尺时仓 HEAD 多次漂移
+#   （1740fd48 -> af983cc4 -> a84fec49 -> eb141e98 -> …，逐报见 00-anchor-and-gates.md §0）。
+# 归因口径：【178】＝被票 178 改形打破；【r3 旧账】＝票 171 自己 AC#1 分子口径改动的既有账；
+#   【漂移】＝今天生产树/他票在飞落地或 HEAD 上既有的红，让静态基线失配；【设计】＝变异/夹具件按设计非 0。
+# script | rc | 判语 | 首条红句/依据
+r1/r1-pair-shapes.sh                        0  GREEN（合成树 9 态两尺全过；329s）
+r1/roster-diff.sh                           0  九腿两向 comm 空（带 09-27 两枚读数作参数；纯报告）
+r2/r2-roster-diff.sh                        1  RED【r3 旧账】G7/G7neg 各退场 2 枚（goroutine.go/shutdown.go，COMMENT-ONLY 已解释）
+   # r2-roster-diff.sh: RED - 有名册位移，按票面那是必须上报的发现，不是可以放宽的旋钮。
+r2/r2-run-legs-and-subtraction.sh           1  RED【r3 旧账＋漂移】3 枚 FAIL（逐字）：
+   # FAIL  FIXED CODE did not react (rc=5 both) - AC#7's 枚数 judgement is decoration (PRE-FIX PASS 除外)
+   #   （因：它假设 G2 基线 2/态1 恰在基线；r3 已把 G2 基线核成 1 ⇒ 两态都在基线上方）
+   # FAIL  UNMODIFIED CODE already rung on a deleted leg (rc=3) - then AC#8-1 is decoration
+   #   （因：pristine 尺跑今天 HEAD ⇒ 吸收 G1b/G2 漂移，rc 不再 0）
+   # FAIL  rc moved on a SHR reading (pristine=4 fixed=2) - 变好被当成言行不一＝新造的恒红
+r3/r3-trailing-comment.sh                   0  GREEN（192s；S1–S4 两族两尺全过）
+r3/r3-roster-diff.sh                        0  GREEN（313s；射程零动、位移逐枚有 COMMENT-ONLY 解释）
+   # 它打印的旁读：4f2a777b 上 改前尺(f78d3cb) 退码=3 / 改后尺(含 178) 退码=1（改后那 1＝G1b 旧账）
+r3/r3-sample-deleted.sh                     2->0  【178 打破的唯一一枚】旧形 rc=2（no 'want G6' declaration - no verdict）；
+   # 171s 按 piles 口径重推后就地改 ⇒ rc=0；变异 SAMPLE_PIN_MUT=noempty ⇒ rc=1 逐字点名 D0（两态原文见 repin-two-states.txt）
+r3/flip-prefix-4f2a777b.sh                  1  RED【漂移】无锚钉＝锚在今天的 HEAD；baseline/restore 两格要 0 而 HEAD 上 rc=2
+   # FAIL  14 legs each say what it does -> rc=2 (want zero)
+   # FAIL  G1 quiet->ring AND G4 quiet->ring together (expect rc to be 2, not 1) -> rc=4 (want 2)
+   # FAIL  G5neg 基线 8->9（实测 8）still exits 0 -> rc=2 (want zero)；FAIL nothing flipped any more -> rc=2
+   # 五个单向 flip 全 ok（rc 都跟着动）；178 不涉（它的 flip 一枚不碰 G6/G6neg）
+r3/gate-prefix-f78d3cb.sh                   5  尺副本（非钉）【设计】HEAD 上 BAD：G1 G1b G2 G6 G6neg（含 pre-178 的 G6 族旧形状）
+r3/fixtures/gate-lie-columns.sh             2  伪造 STALE 行夹具（被 flip-columns 依当前尺重生成）；HEAD 上红＝G1b/G2 漂移
+r3/fixtures/gate-lie-columns-generated-by-unmodified-ruler.sh  5  同一夹具（旧尺生成版）；同 gate-prefix 五 BAD
+r3/doors/door-lie-pre.sh                    <<DOORS>>
+r3/doors/door-lie-post.sh                   <<DOORS>>
+r3/doors/door-honest-post.sh                <<DOORS>>
+v1/v1-run-rulers.sh                         0  两锚各两尺：old rc=1 / new rc=0（复现 AC#6 修好）
+v1/v1-leg-diff.sh                           0  两锚各跑一遍（纯差集报告；逐腿 pathspec 两向 comm 空）
+v1/v1-mutation.sh                           0  三树×两尺；M2 有牙：new extra-leak ⇒ BAD 实测=2枚 基线=1枚
+v1/v1-ruler-mutations.sh                    0  S1 改前静默/改后点名；S2 rc=0；S3 空心 ⇒ rc=4（拒绝出结论）
+v1/v1-declaration-flips.sh                  0  f0=0／f1=1／f2=2／f3=0（还原逐字节同基线）；整腿删 ⇒ 腿数=13、退码=0（旧尺无 AC#8①）
+v1/v1-sample-d.sh                           0  两尺都点名；新尺摊 DISCARD-HANDLE＋CLOSE-BY-GENERIC-CLOSE 批注
+v2/r2-roster-diff-copy.sh                   1  RED【r3 旧账】与 r2/r2-roster-diff.sh 同形同因（名册位移 4 枚）
+v2/gate-290aa63e.sh                         5  尺副本（非钉）【设计】HEAD 上 BAD 五个（r2 那代形状）
+v2/gate-f1b99a70.sh                         4  尺副本（非钉）【设计】HEAD 上 BAD 四个（r2 起点形状）
+v2/mutations/post-noG1-loopsdead.sh         4  变异尺（非钉）；post-stale.sh            5  变异尺（STALE 行诚实体）
+v2/mutations/post-noG1.sh                   5  变异尺；post-stale-lie.sh               5  变异尺（实测=基线、差=0 的假行列）
+v2/mutations/post-stale-count0.sh           5  变异尺（表计数 0）；post-stale-wrongleg.sh  5  变异尺（假腿名 ZZZ）
+v2/mutations/pre-noG1.sh                    3  变异尺（改前代）；pre-stale.sh            4  变异尺（改前代·无 STALE 表）
+a1/commands.sh                              —  非可执行（-rw-r--r--、无 shebang、正文是命令转录）；未跑（具名）
+# —— 汇总：32 枚可执行脚本逐枚现跑。178 打破者＝1 枚（r3-sample-deleted.sh，已重钉）；
+#    绿＝11 枚；红＝5 枚且逐枚有归因（全部【r3 旧账】/【漂移】，无一是 178）；
+#    其余 15 枚＝尺副本/夹具/变异件，rc 是「那版尺打在今天的树上」的读数（非钉，非 0 按设计）。
