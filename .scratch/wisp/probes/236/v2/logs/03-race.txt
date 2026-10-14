@@ -1,0 +1,27 @@
+# -race 一发（票面要求：-run 'Test236' -race）
+# cmd: GOTMPDIR='C:\tmp\wisp236v2gotmp' go test ./internal/tools/ -count=1 -run 'Test236' -race -v
+# rc=0; top-level PASS=9 FAIL=0; 4.114s; raw 全文 raw/race-236.txt 1658 B sha256 9d8ea2f15f10041be4b030334b29d42d861eeca4cd463b84caa7a288c9e964db
+# ---- 原文 ----
+time=2026-10-14T12:36:36.459+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test236R2TaskCancelRefusesWhenHostGaveNoCallerID
+--- PASS: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+=== RUN   Test236R2TaskCancelRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenRosterIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+=== RUN   Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey
+--- PASS: Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey (0.01s)
+=== RUN   Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+    tasklist_deferred_236r3_teeth_test.go:178: 现名册：task.output / task.cancel（DEFERRED 的判据读的是这一行，不是注释里的词面）
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+=== RUN   Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+    tasklist_deferred_236r3_teeth_test.go:222: 成对读数：盘上 2 行 / 编译期 2 行（HEAD 上两数相等＝这把尺没在空转）
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	4.114s

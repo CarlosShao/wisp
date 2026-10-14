@@ -1,0 +1,53 @@
+# 236-v2 AC#4 gh 现读（2026-10-14 12:26→12:40 +08；gh api 只读）
+## run/job 元数据（--jq 逐字）
+# run328meta: 38484004521|2c764c04804f3de09c03c5a6bad0402198d496bf|failure|2026-10-13T23:24:03Z
+# run327meta: 38332849280|2c764c04804f3de09c03c5a6bad0402198d496bf|failure|2026-10-13T01:35:26Z
+# job328meta: 115593146575|38484004521|test-windows|failure|2026-10-13T23:24:06Z|2026-10-13T23:34:11Z
+# job327meta: 115086275360|38332849280|test-windows|failure|2026-10-13T01:35:30Z|2026-10-13T01:46:15Z
+## job steps（run 328 job 115593146575；只抄 7-11）
+# 7|cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)|failure
+# 8|winlive compile gate (go vet -tags winlive, ticket 111 AC#11)|success
+# 9|Package coverage census (ticket 111 AC#1 + GUARD D)|success
+# 10|Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)|failure
+# 11|PathResolver junction placeholder (real cases tickets 18/20)|success
+## job steps（run 327 job 115086275360；只抄 7-11）
+# 7|cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)|failure
+# 8|winlive compile gate (go vet -tags winlive, ticket 111 AC#11)|success
+# 9|Package coverage census (ticket 111 AC#1 + GUARD D)|success
+# 10|Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)|failure
+# 11|PathResolver junction placeholder (real cases tickets 18/20)|success
+## run328 逐字行（带行号；原始 job log 留盘 raw/run328-job.log）
+4412|2026-10-13T23:33:24.7530450Z ##[group]Run bash scripts/portable-tests.sh --scope=windows
+5147|2026-10-13T23:34:04.5856846Z --- PASS: TestPathResolverJunctionWindows (0.08s)
+5148|2026-10-13T23:34:04.5857201Z === RUN   TestPathResolverShortNameAListDenied
+5149|2026-10-13T23:34:04.5858947Z     pathresolver_junction_windows_test.go:135: short name did not expand to long path: got "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestPathResolverShortNameAListDenied859870255\\001\\.git-credentials" want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverShortNameAListDenied859870255\\001\\.git-credentials"
+5150|2026-10-13T23:34:04.5860761Z --- FAIL: TestPathResolverShortNameAListDenied (0.04s)
+5151|2026-10-13T23:34:04.5861123Z === RUN   TestPathResolverUNCAListDenied
+5152|2026-10-13T23:34:04.5863126Z     pathresolver_junction_windows_test.go:164: UNC spelling "\\\\?\\UNC\\localhost\\c$\\Use …[剪]… \.git-credentials", want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverUNCAListDenied3601594269\\001\\.git-credentials"
+5153|2026-10-13T23:34:04.5864775Z --- FAIL: TestPathResolverUNCAListDenied (0.05s)
+5154|2026-10-13T23:34:04.5865160Z === RUN   TestPathResolverExtendedLengthPrefixAListDenied
+5155|2026-10-13T23:34:04.5866864Z     pathresolver_junction_windows_test.go:182: \\?\ spelling normalized to "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestPathResolverExtendedLengthPrefixAListDenied1965593713\\001\\.git-credentials", want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverExtendedLengthPrefixAListDenied1965593713\\001\\.git-credentials"
+5156|2026-10-13T23:34:04.5868364Z --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.02s)
+6162|2026-10-13T23:34:05.7816108Z portable-tests.sh: strict runner exited 1 for scope=[./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/ ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/session/ ./internal/projctx/ ./internal/audio/]
+6172|2026-10-13T23:34:06.7182416Z --- PASS: TestPathResolverJunctionWindows (0.02s)
+6175|2026-10-13T23:34:06.9357967Z runtests.sh: OK - packages=[./internal/risk/ -run TestPathResolverJunctionWindows] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0
+## run327 逐字行（带行号；原始 job log 留盘 raw/run327-job.log）
+4420|2026-10-13T01:45:21.7874783Z ##[group]Run bash scripts/portable-tests.sh --scope=windows
+5155|2026-10-13T01:46:07.2684931Z --- PASS: TestPathResolverJunctionWindows (0.04s)
+5156|2026-10-13T01:46:07.2685264Z === RUN   TestPathResolverShortNameAListDenied
+5157|2026-10-13T01:46:07.2686969Z     pathresolver_junction_windows_test.go:135: short name did not expand to long path: got "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestPathResolverShortNameAListDenied1202975703\\001\\.git-credentials" want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverShortNameAListDenied1202975703\\001\\.git-credentials"
+5158|2026-10-13T01:46:07.2688301Z --- FAIL: TestPathResolverShortNameAListDenied (0.03s)
+5159|2026-10-13T01:46:07.2688638Z === RUN   TestPathResolverUNCAListDenied
+5160|2026-10-13T01:46:07.2690554Z     pathresolver_junction_windows_test.go:164: UNC spelling "\\\\?\\UNC\\localhost\\c$\\Use …[剪]… \.git-credentials", want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverUNCAListDenied2533501355\\001\\.git-credentials"
+5161|2026-10-13T01:46:07.2692168Z --- FAIL: TestPathResolverUNCAListDenied (0.02s)
+5162|2026-10-13T01:46:07.2692731Z === RUN   TestPathResolverExtendedLengthPrefixAListDenied
+5163|2026-10-13T01:46:07.2695610Z     pathresolver_junction_windows_test.go:182: \\?\ spelling normalized to "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestPathResolverExtendedLengthPrefixAListDenied1095253330\\001\\.git-credentials", want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverExtendedLengthPrefixAListDenied1095253330\\001\\.git-credentials"
+5164|2026-10-13T01:46:07.2698009Z --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.03s)
+6169|2026-10-13T01:46:08.6468040Z portable-tests.sh: strict runner exited 1 for scope=[./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/ ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/session/ ./internal/projctx/ ./internal/audio/]
+6179|2026-10-13T01:46:09.7005403Z --- PASS: TestPathResolverJunctionWindows (0.03s)
+6182|2026-10-13T01:46:09.9643605Z runtests.sh: OK - packages=[./internal/risk/ -run TestPathResolverJunctionWindows] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0
+## 零行为核（本腿自跑）
+# git diff 0c7f3c5d^ 0c7f3c5d -- .github/workflows/ci.yml | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' | grep -vE '^[+-][[:space:]]*#' | wc -l  ⇒ 0
+# python: yaml.safe_load 两版 rc=0；structures equal: True；steps old/new: 52 52；jobs identical；non-comment bytes identical: True
+# grep -n 'today\|FAILS' <new comment block> ⇒ rc=1（零残留）
+# tools/d22scan/runtests.sh 尾：if [ "$rc" -ne 0 ]; then … exit "$rc"（非零传播声明核）

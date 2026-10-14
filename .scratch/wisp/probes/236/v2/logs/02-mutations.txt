@@ -1,0 +1,48 @@
+# 236-v2 自种 3 发突变（全 overlay；红句逐字；还原后绿）
+# anchor: internal/agent/loop.go sha256 cb7f9da7a6d277f341d3b40caee59eecec3bea4e4faee31777b1ad47c3763189 == HEAD blob（git hash-object 0d53277d…）== 仓外 backup loop.orig.go；overlay 结构性不写盘
+
+## m1 = loop.go:330 填点换 uuid 形常量（模型可给的值）—— 形 r4 没种过
+```diff
+@@ -327,7 +327,7 @@
+-	t := &RunningTask{ID: id, root: observe.NewRootFrom(ctx, id), done: make(chan struct{})}
++	t := &RunningTask{ID: "00000000-0000-4000-8000-000000000000", root: observe.NewRootFrom(ctx, id), done: make(chan struct{})}
+```
+cmd: GOTMPDIR='C:\tmp\wisp236v2gotmp' go test ./internal/tools/ -count=1 -run 'Test236R4' -v -overlay=C:/tmp/wisp236v2/mut/m1.json  ⇒ rc=1
+红句逐字（4 枚）：
+    taskid_source_236r4_teeth_test.go:203: Result.TaskID = "43043c2c-ace0-4dfe-a90e-32365f379f44" 而 RunningTask.ID = "00000000-0000-4000-8000-000000000000"：这两处必须是同一枚宿主铸的键。铸造与传递在 internal/agent/loop.go:329（id := newTaskID()）与 :333（同一个 id 交给 run），结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1105（MarkRoot(bg.ID)）与 :1110/:1124/:1135/:1145（回填、task_log、状态行全部用 res.TaskID）。两处分叉即「名册登记的键」和「输出写进的键」不是同一枚
+    taskid_source_236r4_teeth_test.go:223: 工具接缝上 TaskID = "43043c2c-ace0-4dfe-a90e-32365f379f44"，不是环路铸的那枚 RunningTask.ID = "00000000-0000-4000-8000-000000000000"：internal/agent/loop.go:676 把 run 收到的 taskID 填进 ToolRequest.TaskID，它与 cmd/wisp/run.go:1105/:1110 后来当名册键、回填键用的是同一个值
+    taskid_source_236r4_teeth_test.go:247: 以铸来的键读回的正文 = "现在是 22 摄氏度，晴。" / ""，不是 Result 的 "现在是 22 摄氏度，晴。"：输出写的键与名册登的键分叉了（res.TaskID "43043c2c-ace0-4dfe-a90e-32365f379f44" vs RunningTask.ID "00000000-0000-4000-8000-000000000000"）
+    taskid_source_236r4_teeth_test.go:255: 名册有 2 行, want 1：MarkRoot(bg.ID) 与 Backfill(res.TaskID) 一旦分叉就会多出一行，这正是「两处相等」的可观察后果
+
+## m2 = loop.go:1165 newTaskID 铸形排版换位（36 字符・4 连字符，第 1 个在 4 位）—— 形 r4 没种过
+```diff
+@@ -1162,5 +1162,5 @@
+-	return h[0:8] + "-" + h[8:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:]
++	return h[0:4] + "-" + h[4:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:]
+```
+cmd: GOTMPDIR='C:\tmp\wisp236v2gotmp' go test ./internal/tools/ -count=1 -run 'Test236R4' -v -overlay=C:/tmp/wisp236v2/mut/m2.json  ⇒ rc=1
+红句逐字（1 枚）：
+    taskid_source_236r4_teeth_test.go:189: RunningTask.ID = "b6d4-85234aef-44f3-b167-72b255c42485" 不是宿主铸的形状（36 字符、8/13/18/23 位是连字符、其余小写 hex）：internal/agent/loop.go:329 的 id := newTaskID() 填的就是这一格，形状由 :1153 决定。把来源换成模型可给的值时这一句必须红
+
+## m3 = loop.go:382 Result.TaskID 换模型字面量 —— 形 r4 没种过
+```diff
+@@ -379,7 +379,7 @@
+-	res := Result{TaskID: taskID, Status: StatusCompleted}
++	res := Result{TaskID: "call_e1", Status: StatusCompleted}
+```
+cmd: GOTMPDIR='C:\tmp\wisp236v2gotmp' go test ./internal/tools/ -count=1 -run 'Test236R4' -v -overlay=C:/tmp/wisp236v2/mut/m3.json  ⇒ rc=1
+红句逐字（4 枚）：
+    taskid_source_236r4_teeth_test.go:203: Result.TaskID = "call_e1" 而 RunningTask.ID = "7b66e1a3-5603-448b-ab81-b0a27697bc8a"：这两处必须是同一枚宿主铸的键。铸造与传递在 internal/agent/loop.go:329（id := newTaskID()）与 :333（同一个 id 交给 run），结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1105（MarkRoot(bg.ID)）与 :1110/:1124/:1135/:1145（回填、task_log、状态行全部用 res.TaskID）。两处分叉即「名册登记的键」和「输出写进的键」不是同一枚
+    taskid_source_236r4_teeth_test.go:247: 以铸来的键读回的正文 = "现在是 22 摄氏度，晴。" / ""，不是 Result 的 "现在是 22 摄氏度，晴。"：输出写的键与名册登的键分叉了（res.TaskID "call_e1" vs RunningTask.ID "7b66e1a3-5603-448b-ab81-b0a27697bc8a"）
+    taskid_source_236r4_teeth_test.go:255: 名册有 2 行, want 1：MarkRoot(bg.ID) 与 Backfill(res.TaskID) 一旦分叉就会多出一行，这正是「两处相等」的可观察后果
+    taskid_source_236r4_teeth_test.go:267: 铸出来的 id 等于模型侧字面量 "call_e1"：模型给的值冒充了宿主铸的键
+
+## 交叉读数（牙是新增的）
+# old ruler internal/agent/compress_trace_test.go:526 (36 chars/4 dashes) under overlay m1: rc=0 --- PASS: TestCompressionTraceCarriesTheOwningTaskID (0.01s) ⇒ 旧尺 PASS、本钉红
+# old ruler internal/agent/compress_trace_test.go:526 (36 chars/4 dashes) under overlay m2: rc=0 --- PASS: TestCompressionTraceCarriesTheOwningTaskID (0.01s) ⇒ 旧尺 PASS、本钉红
+## 还原证
+sha256 internal/agent/loop.go = cb7f9da7a6d277f341d3b40caee59eecec3bea4e4faee31777b1ad47c3763189
+sha256 raw backup loop.go.orig.go = cb7f9da7a6d277f341d3b40caee59eecec3bea4e4faee31777b1ad47c3763189
+sha256(git show HEAD:internal/agent/loop.go) = cb7f9da7a6d277f341d3b40caee59eecec3bea4e4faee31777b1ad47c3763189
+git hash-object worktree loop.go = 0d53277d9610f07855eb5e5fe4bdf4c5ed6d35e3 = git rev-parse HEAD:internal/agent/loop.go
+# 三发后重跑未突变 Test236 整族 rc=0（9 枚顶层 PASS：R2×6 + R4 + R3×2，2.256s）

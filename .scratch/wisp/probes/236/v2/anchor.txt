@@ -1,0 +1,25 @@
+# 236-v2 anchor（票 236 AC#3＋AC#4 非实现者验收腿）
+派单发送: 2026-10-14 12:2x +08；本腿窗口: 12:24 → 12:5x；起手 HEAD: ade60808（近 2a814389 的现量）
+被裁两笔: AC#3=f88d98ae（新钉/evidence/票尾1条）；AC#4=0c7f3c5d（ci.yml 注释）+faa8950d（票尾1条）
+被裁件哈希（本腿现跑）:
+  internal/tools/taskid_source_236r4_teeth_test.go  sha256 47fb441dc1597524db490007c859307a58c691aa04346998b6482194af2ae2f9  (275 行; == r4 声明)
+  internal/agent/loop.go  blob 0d53277d9610f07855eb5e5fe4bdf4c5ed6d35e3 (f88d98ae == HEAD == worktree)；sha256 cb7f9da7a6d277f341d3b40caee59eecec3bea4e4faee31777b1ad47c3763189
+  cmd/wisp/run.go  blob f88d98ae:f62cd65a -> HEAD:f101efa0（315-r1 bfc74ae9 +29 行；钉内 run.go 行号在 HEAD 上须重跑）
+  .github/workflows/ci.yml  blob a5075a3e -> 80b7a393（0c7f3c5d）
+命令窗口（+08，逐事）:
+  12:24 起手盘查；12:26→12:40 gh 现读（run 328/327 元数据+job steps+两发全文日志）
+  12:32:58→12:33:17 baseline v2 rc=0（top-level 220/0/0, 16.768s）
+  12:33:46→12:34:34 m1/m2/m3 三发突变各 rc=1
+  ~12:35:10 xread m1/m2 rc=0（仓里唯一旧形状尺）
+  12:35:40→12:35:50 race rc=0（9 枚）
+  12:36→12:40 交叉/账目复算；12:4x→12:5x 落件
+仪器环境形一记（非钉缺陷）: GOTMPDIR 用 posix 形 'C:/tmp/wisp236v2gotmp' ⇒ 5 枚 junction 用例红（rc=1, 215/5/0）；改反斜杠形后同批全绿、整包 220/0/0。见 logs/01-baseline.txt 尾。
+CPU: CI run 38508311376 自跑期间采样（受扰已记），未见测试超时/时序红。
+raw（留盘未提交，本目录 raw/）:
+  baseline-tools-v2.txt 154056 B sha256 31826a2d9c026d1c338a411756bddb491eac96aeaffd7975ccd3f4ba1bfa7482
+  baseline-tools-v1-forward-slash-gotmpdir.txt（第一遍 rc=1 原样）
+  run328-job.log 920292 B sha256 5d68cb65ff3567e193ba73e6d6e411a2eb435de5030794fb98242c3a50558a43
+  run327-job.log 920412 B sha256 c85e37f23f09f803970ba982bc0b65711229a0dbed83b2397260e487126d7794
+  race-236.txt 1658 B sha256 9d8ea2f15f10041be4b030334b29d42d861eeca4cd463b84caa7a288c9e964db
+  mut-m1.txt / mut-m2.txt / mut-m3.txt / xread-m1.txt / xread-m2.txt
+交件: docs/evidence/s1/ticket236-236-v2-accept-v1.md + logs/01..04（逐件 ≤200 行）+ 票尾 1 bullet；⛔ 零翻框、零 push。
