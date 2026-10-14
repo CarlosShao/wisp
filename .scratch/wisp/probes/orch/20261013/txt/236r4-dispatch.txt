@@ -1,0 +1,46 @@
+# 236-r4 派单（票 236 AC#3 落地：钉"键的来源"这一维；写腿；面＝internal/tools／internal/agent／internal/session 测试面）
+
+发送时刻：2026-10-14 10:3x +08。编排者派发（裁定＝账 `A898`）。
+你 = Wisp 流水线的落地腿 **236-r4**。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 裁定（A898 逐字精神，按此落）
+
+- **只钉"键的来源（宿主铸 vs 模型给）"这一维**：`cmd/wisp/run.go:892 res.TaskID` ⇄ `internal/agent/loop.go:323 newTaskID()` 填 `RunningTask.ID`——"**两者相等**"这件事今天没有尺（`236-a4` 现量：两目录口径内 0 枚；跨包那 1 枚形状尺买不到这一维）。
+- **形状抄 `internal/session` 的 minted-shape 锁三段双向先例**（`grants_test.go:152`＋`session.go:67`/`:94`＋`cmd/wisp/ticket224_assembly_test.go:433`）：不靠新工具面、不触票面禁区。
+- **射程必须含 `internal/agent`**（`236-a4` 具名的漏因：按包开尺看不见跨包那一枚）。
+- 载具形状抄 `internal/tools/pointer_183_cli_seam_test.go`（`:162 TestPointer183BackfilledArtifactRereadStaysClean`／`:227 TestPointer183SiblingArtifactInTheSameDirectoryStillHits` 两枚真跑组合根的 CLI 接缝形）。
+- ⚠ 行号全部现读重跑（a4 的读数是 10-06 的；`loop.go` 的铸点行号以你现量为准——票面写 `:329`/`:340` 是 a4 那次）。
+
+## 材料
+
+- 票：`.scratch/wisp/issues/236-six-cells-that-only-surface-at-the-reading-layer.md`（AC#3 判据＋"不做什么"三条＋§二 收窄注）
+- 普查：`.scratch/wisp/probes/236/a4/census.md`（385 行；★四条读数：0 枚→真值 1 枚和它的漏因／铸造点只有两枚没有第三枚／D34 无工具面／落点四理由＋可抄先例）
+- `docs/evidence/s1/ticket236-236-r2-acceptance…`（若有）与 `236-v1` 骨架（`probes/236/v1/verdict.md`）作上下文。
+
+## 硬约束（票面逐字）
+
+- ⛔ 不许新造工具面（D34 无对应行）；⛔ 不许顺手把 `allowed_dirs` 之类做成硬边界。
+- ⛔ 熵源退化支（`loop.go` 直引 `crypto/rand`、无注入缝）**不许为测试开后门**（AGENTS §1.3 只在既有接缝注入）；性质钉若采用，**交回时必须写明"覆盖不到熵失败"**，否则是拿假绿换一条勾。
+- ⛔ 不放宽/删除任何既有断言；⛔ 不动三枚冻结件／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`；⛔ `frontend/**`／`design/**` 零读零写。
+- ⚠ 写面在 `internal/tools`（**315 票的写腿未派**，本刻你独占 tools 写面）；`237-r1/v1` 最近动过 `subagent_197_test.go`／`subagent_222_test.go`——你若碰这两枚先现读。
+
+## 判据（能力形，⛔ 词表形）
+
+- 钉必须**会响**：自造 ≥2 发突变（例：把某处填 id 的来源换成模型可给的值／把铸点与用点的关联拆开 ⇒ 指名的钉必须红、红句点名这两处）。每发**仓外备份＋sha256 还原证**＋窗口起止时刻逐报。
+- 正控：不突变 ⇒ 绿（且**基线名册**具名——`internal/tools` 当前 0 红、`internal/agent` 以你现跑为准）。
+- 若你判"钉该带跨包射程"，写明它怎么防"按包开尺看不见"那一漏。
+
+## 纪律（十条）
+
+1. 只 commit、⛔ 不 push；`git add`/`commit` 显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内不建 worktree；临时件只建不删；别人脏件别动。
+2. `GOTMPDIR` ⛔ 只 C:（你的例 `C:\tmp\wisp236r4gotmp`）；`-race` 重跑前 `tasklist` 看台面。
+3. 判据用 `-run` 小射程；⛔ 别跑 `./cmd/wisp/` 整包（314 死区）；若必须跑一发整包当环境读数 ⇒ 先报备。
+4. 突变窗口逐报时刻（他腿 `315-a1`（只读复量，cmd/wisp）在飞，与你零文件重叠）。
+5. 门禁：build rc=0／gofumpt 动过的件空／本票新用例 rc=0／`sh scripts/d22scan.sh` clean／长度门 GREEN（现 59=59）。
+6. 票面：票 236 尾**追加 1 条 bullet**；⛔ 框不翻。
+7. 产出预算 ≤7 枚 ≤200 行（`probes/236/r4/`：锚＋门禁＋突变读数；大日志留盘不入库，点名＋字节数）。
+8. **未定义即停**：落点抄形抄不上、铸点/用点现读与 a4 对不上、要动产码语义 ⇒ 停手上报。
+9. 交件判语里写清：你选的落点（文件/函数）＋为什么它满足"射程含 agent"＋两发突变的红句逐字。
+10. 回执：结论先行＋commit sha＋件路径＋门禁 rc＋突变读数＋具名没做。
+
+发送时刻现量：HEAD `a5b2938c`；`315-a1` 只读复量在飞；CPU ~33%。

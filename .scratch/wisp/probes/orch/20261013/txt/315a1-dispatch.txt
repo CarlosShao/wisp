@@ -1,0 +1,39 @@
+# 315-a1 派单（票 315 AC#0：生产面 task-scope 形状的**活体复量**；探针腿；面＝cmd/wisp 只读＋一枚 zz 探针测试件）
+
+发送时刻：2026-10-14 10:3x +08。编排者派发。
+你 = Wisp 流水线的**探针腿 `315-a1`**。身份＝只读复量＋（如需要）**一枚 zz 前缀的探针测试件**作为载具。⛔ 不翻框、⛔ 不动票面/`Status:`。
+
+## 要量的（票 315 AC#0 逐字）
+
+一发**真跑**（组合根/CLI 接缝；⛔ 不许用 mock 冒充真桥），触发"**子代理的兄弟孩子工具调用**"形；读数＝`unbound-scope` R4/L2／审批卡／拒绝句**是否出现**（命令＋时刻＋rc＋红句逐字）。
+
+## 静态链（237-v1 核过；你从这五条出发，⛔ 行号先现读）
+
+1. 非测试 `OpenTask(` 全树仅 `internal/tools/bridge.go:649`（`b.mark` 懒开，仅敏感源结果收口时）；定义 `:847`。
+2. `cmd/wisp/run.go:953-962` admitTask 只 `CloseTask(:960)`；`internal/agent/loop.go:373-379`、`subagent_197.go:311-320` 均不开。
+3. 触发条件（`internal/risk/provenance.go:694-711` ＋ Detector `:858-869`）：**调用方 scope 未注册＋别的 scope 有 mark ⇒ 每次走桥判 unbound-scope R4/L2**。
+4. 首发诱因：首枚子代理结论 mark 落父名（`subagent_197.go:487`）后，兄弟孩子（工具面＝父桥 `:296`，dispatch 带自己 task id `loop.go:675-676`）即中。
+5. 生产 L2 = 真审批门（`run.go:612`）＝假卡/超时拒；`run.go:1052` 项目说明 scope 默认 true 构成"别处有 mark"。
+
+## 载具候选（现读点名再选）
+
+- `cmd/wisp/subagent_carrier_197_test.go`／`subagent_blocked_197_test.go`／`subagent_selfapproval_197_test.go`／`subagent_stream_key_197_test.go`（子代理族，自带 harness 与假 provider 接缝）。
+- `cmd/wisp/run_test.go:245 TestHostDispatchThroughTheAssembledBridge`（宿主自带 id 那一形，票 154 的来路）。
+- 若现成用例触发不了"兄弟孩子"，**你可新建一枚 `cmd/wisp/zz315a1probe_test.go`**（zz 前缀、只加不改；探针件随证据入库，⛔ 不许删——临时件只建不删）。
+
+## 读数怎么落（判据）
+
+- 每个场景：命令（含 `-run` 与 `-count`）＋起止时刻＋rc＋**红句/审批句逐字**；贴 `-v` 里那个任务的流（`VERDICT237`/`BEXIT237` 同族行就是 237-v1 用过的观察点——现读他们件 `docs/evidence/s1/ticket237-237-v1-accept-v1.md` 与 `probes/237/r1/logs/dump5-leg2.txt` 的观察法，⛔ 别照抄结论）。
+- **三种结局都算成品**：① 复现（给最小形＋红句）② 量不到（逐条写明试过哪些形、为什么那些形不触发——**这直接喂票 315 的"撤票判语"**）③ 半复现（哪个条件缺了就哑，逐条具名）。
+- ⚠ 若你手感"要触发它得先注册 scope 才不炸"之类的措辞，⛔ 别写判语（那是裁），只写读数。
+
+## 环境与纪律
+
+1. 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内不建 worktree；别人脏件别动。
+2. `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（**MSYS 形**）；`GOTMPDIR` ⛔ 只 C:（`C:\tmp\wisp315a1gotmp`）。
+3. 判据用 `-run` 小射程；⛔ 整包（314 死区）；你的每发起止时刻逐报（他腿 `236-r4`（internal/tools 写）在飞，与你零文件重叠）。
+4. 交件：`.scratch/wisp/probes/315/a1/`（锚＋读数 logs）＋票 315 尾**追加 1 条 bullet**；产出 ≤7 枚 ≤200 行（大日志留盘，点名＋字节数）。
+5. **未定义即停**：测不动的形（例：假 provider 接缝过不了桥、需要真 API）⇒ 停手上报，⛔ 别硬造假绿。
+6. 回执：结论先行（复现/量不到/半复现）＋命令与红句逐字＋你没试的形＋下一位要点。
+
+发送时刻现量：HEAD `a5b2938c`；`236-r4` 在飞；CPU ~33%。

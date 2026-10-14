@@ -17615,3 +17615,10 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **★立票 315**（`.scratch/wisp/issues/315-production-task-scope-never-opens-…-l2.md`）：生产面"任务开始不开 scope"静态链五条（237-v1 逐行核）；**AC#0＝活体复量**（量不到就地撤，口令「315 撤」）；写面≈cmd/wisp／internal/tools／internal/agent（与 236 AC#3 串行）。
 - **★记我**：给名册插 237-done 条目时锚点选错（少了行尾），把 186 行切成"裸键＋双赋值"⇒ awk syntax error；就地修复两行、复跑门 **GREEN 59=59**。教训＝字符串锚点必须含整行尾部。
 - **在飞（0）**；下一手顺位：① 236 AC#3 落地腿（tools 面空出）② 252（cmd/wisp 面）③ push 决策（推前跑 314 形状取样；两验收已收、腿静）。⛔ 未 push（未推约 326）。
+
+
+## A906｜2026-10-14 10:22:43 +08｜派 `236-r4`（AC#3"键的来源"钉；写腿 tools）＋`315-a1`（生产面 task-scope 活体复量；探针腿 cmd/wisp）——本波在飞 2、零文件重叠
+
+- **236-r4**：按 `A898` 裁定落钉（宿主铸 vs 模型给；形状抄 `internal/session` minted-shape 锁三段双向；射程含 `internal/agent`；载具抄 `pointer_183_cli_seam` 两形）；票面硬约束转述（⛔ 新工具面／⛔ 熵源后门／⛔ 放宽）；判据＝能力形 ≥2 发突变＋sha256 还原证。写面 tools（315 写腿未派 ⇒ 独占）。
+- **315-a1**：票 315 AC#0——真跑触发"兄弟孩子工具调用"形，读数三选一（复现/量不到/半复现）皆成品；允许自建 `cmd/wisp/zz315a1probe_test.go` 探针件（只加不改）；观察法引 237-v1 的 `VERDICT237`/`BEXIT237` 同族行（⛔ 不照抄结论）。
+- 派单/send 存档在盘。**在飞（2）**＝`236-r4`（tools）＋`315-a1`（cmd/wisp 只读）。⛔ 未 push（未推约 327；**推送决策＝挂在等待**：会自启本机 ~1.5h CI（含真机进程），先问机主"现在推不推"免得与他试界面打架——见汇报）。
