@@ -1,0 +1,12 @@
+$ mkdir -p LOCALAPPDATA/wisp-test-gotmp/174-r5-probe && GOTMPDIR=... go test -list '^TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3$' ./internal/tools/
+(this is the script's staleness-check instrument, run on the windows test binary; the linux binary cannot be exec'd on win32)
+time=2026-10-14T11:00:57.777+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+ok  	github.com/CarlosShao/wisp/internal/tools	0.035s
+go test -list rc=0
+
+$ grep -c '^//go:build' internal/tools/task_output_pointer_notice_test.go (0 = compiles into EVERY platform's test binary)
+0
+
+$ grep -n 'func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3' internal/tools/task_output_pointer_notice_test.go
+420:func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3(t *testing.T) {

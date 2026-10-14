@@ -1,0 +1,23 @@
+$ bash -n scripts/portable-tests.sh (POST-EDIT)
+bash -n rc=0
+
+$ grep -c 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3' scripts/portable-tests.sh
+1
+
+$ grep -n 'ledger=(' scripts/portable-tests.sh
+659:ledger=(
+
+$ git diff --numstat -- scripts/portable-tests.sh
+1	0	scripts/portable-tests.sh
+
+$ git diff -- scripts/portable-tests.sh | grep -c '^+[^+]'
+1
+$ git diff -- scripts/portable-tests.sh | grep -c '^-[^-]'
+0
+
+$ bonus: d22scan emoji-band self-check on the new ledger line (bands 1F000-1FAFF / 2200-22FF / 2600-27BF / 2B00-2BFF / FE0F / 1F1E6-1F1FF; expect 0 hits)
+0 hits; grep rc=1
+
+$ no ASCII pipe inside the new row beyond the 4 field separators:
+4
+(that count is the whole file: 4 separators on the ledger row = 4; grep found 1 line)

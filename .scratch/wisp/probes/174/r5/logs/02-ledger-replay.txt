@@ -1,0 +1,18 @@
+$ sed -n '/^ledger=(/,/^)/p' -> eval, then the script's OWN malformed-entry + name-regex checks (copied verbatim), for both GOOS values
+
+entries=12
+new-row field count on | = 5
+goos=linux malformed=0 active=9
+^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop|TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3)$
+goos=windows malformed=0 active=7
+^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$
+replay rc=0
+
+===== appended: HEAD vs worktree, names active per platform (old-vs-new) =====
+== goos=windows ==
+   HEAD set == worktree set : YES (pattern unchanged)
+== goos=linux ==
+   diff (< = HEAD, > = worktree):
+   8a9
+   > TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+name-in-pattern counts: HEAD linux=8 windows=7; worktree linux=9 windows=7

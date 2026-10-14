@@ -1,0 +1,18 @@
+leg: 174-r5  date: 2026-10-14 10:57:55 +0800
+HEAD: 351214de9df264e28048c69543d62abe1dab66c9
+
+$ git status --porcelain -- scripts/ .github/
+(nothing above = both clean)
+
+$ grep -c 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3' scripts/portable-tests.sh
+0
+grep rc=1
+
+$ awk ledger entry count (rows starting with 4 spaces + double quote between ledger=( and ))
+11
+
+$ grep -n 'ledger=(' scripts/portable-tests.sh
+659:ledger=(
+
+$ bash -n scripts/portable-tests.sh (PRE-EDIT)
+rc=0

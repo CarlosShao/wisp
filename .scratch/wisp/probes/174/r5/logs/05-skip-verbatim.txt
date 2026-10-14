@@ -1,0 +1,17 @@
+$ skip text verbatim, current HEAD line 408 (source)
+func mkJunctionForLeakProbe174r3(t *testing.T, link, target string) {
+	t.Helper()
+	out, err := exec.Command("cmd", "/c", "mklink", "/J", link, target).CombinedOutput()
+	if err != nil {
+		t.Skipf("前置条件缺失：造不出真 NTFS junction（mklink /J %s %s: %v: %s）", link, target, err, out)
+	}
+
+$ rendered skip on the ubuntu leg, archived log run-37166458550-failed.log (file then at :428)
+7162:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.6585474Z --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.00s)
+8689:test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7329513Z --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.00s)
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.6585203Z     task_output_pointer_notice_test.go:428: 前置条件缺失：造不出真 NTFS junction（mklink /J /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r32408037487/001/ALLOWLIST-LEAK-PROBE-174r3 /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r32408037487/003/RESOLVED-LEAK-PROBE-174r3: exec: "cmd": executable file not found in $PATH: ）
+
+$ the three step lines the ticket quotes
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7327350Z portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it print
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7329513Z --- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.00s)
+test-core	Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)	2026-10-04T00:57:50.7331068Z portable-tests.sh: strict runner exited 1 for scope=[./internal/agent/ ./internal/agen
