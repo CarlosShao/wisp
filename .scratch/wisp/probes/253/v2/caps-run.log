@@ -1,0 +1,35 @@
+########## M1 CAPABILITY: plant InboundPeek253v2 = "settings.read253v2" in bridge.go (physical), shipped family ##########
+    inbound_roster_253_test.go:437: ticket 253 AC#2: bridge.go declares the inbound method name settings.read253v2 at bridge.go:68 const InboundPeek253v2 and the closed roster does not carry it - a new inbound route entered the tree without being registered anywhere. The two prefix rulers cannot see a name that carries no "panel." prefix (panelMethodRe at git_test.go:394, routeLiteralRe at composer_test.go:394), which is the hole this roster exists to close. If the name is meant to stay, register it in wantFullInboundRoster253 and move the count constants beside it
+--- FAIL: TestFullInboundMethodRosterIsClosed (0.02s)
+    inbound_roster_253_test.go:642: planted an unregistered inbound name (plain-identifier-const) and the roster ruler reported extra="config.peek253", "settings.read253v2", want exactly ["config.peek253"] - this ruler has no teeth for the shape AC#2 was filed over
+    inbound_roster_253_test.go:642: planted an unregistered inbound name (Method-named-const) and the roster ruler reported extra="config.foo253", "settings.read253v2", want exactly ["config.foo253"] - this ruler has no teeth for the shape AC#2 was filed over
+    inbound_roster_253_test.go:683: the plants only mean something if the real tree reads quiet under the same helper; got missing=(none) extra="settings.read253v2"
+--- FAIL: TestPlantedUnregisteredInboundMethodNameGoesRed (0.01s)
+    inbound_roster_253_test.go:723: a fully registered inbound name still reads missing=(none) extra="settings.read253v2" - the roster ruler would then be shouting at a change that did go through every surface, and shouting at honest work is how a ruler gets muted
+--- FAIL: TestRegistrationSilencesTheRosterRuler (0.01s)
+--- PASS: TestFullInboundRosterRefusesAnEmptyDeclarationFile (0.00s)
+    inbound_roster_253_test.go:830: the strict form did not name the planted name: extra="config.blind253", "settings.read253v2", want ["config.blind253"] - the form being measured as blind only matters while the shipped form has teeth
+--- FAIL: TestSubsetOnlyRosterDirectionIsBlindToAPlantedName (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.093s
+FAIL
+caps-family rc=1
+
+########## M1: shipped main test alone (the named step) ##########
+=== RUN   TestFullInboundMethodRosterIsClosed
+    inbound_roster_253_test.go:437: ticket 253 AC#2: bridge.go declares the inbound method name settings.read253v2 at bridge.go:68 const InboundPeek253v2 and the closed roster does not carry it - a new inbound route entered the tree without being registered anywhere. The two prefix rulers cannot see a name that carries no "panel." prefix (panelMethodRe at git_test.go:394, routeLiteralRe at composer_test.go:394), which is the hole this roster exists to close. If the name is meant to stay, register it in wantFullInboundRoster253 and move the count constants beside it
+    inbound_roster_253_test.go:519: full inbound roster held: 7 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- FAIL: TestFullInboundMethodRosterIsClosed (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.074s
+FAIL
+caps-main rc=1
+
+########## M1 + REVERSED denominator 1 (overlay test copy): expect GREEN ##########
+=== RUN   TestFullInboundMethodRosterIsClosed
+    inbound_roster_253_test.go:516: full inbound roster held: 7 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- PASS: TestFullInboundMethodRosterIsClosed (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.058s
+reverse rc=0
+(restore) sha_before=fc23919c034d2f0814a36cc0b4bc810eabb9085b94bdccde1aa27efefe736c37 sha_after=fc23919c034d2f0814a36cc0b4bc810eabb9085b94bdccde1aa27efefe736c37 blob_check=bebe8e702a85c640641551e93dd09936530950f4 head_blob=bebe8e702a85c640641551e93dd09936530950f4 porcelain=0

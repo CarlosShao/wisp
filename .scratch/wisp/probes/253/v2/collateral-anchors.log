@@ -1,0 +1,10 @@
+########## M1 plant in place: the anchors that must stay GREEN (want-4 + frozen l2 family) ##########
+--- PASS: TestTheRendererHoldsExactlyOneDoorToTheHost (0.03s)
+--- PASS: TestGitDimensionHasNoModelCallableTool (0.01s)
+--- PASS: TestPlantedGitToolShapesGoRed (0.01s)
+--- PASS: TestAnsweredPanelRoutesCarryNoApprovalDecision (0.01s)
+--- PASS: TestRealGuardRefusesEveryAssemblableApprovalRouteName (0.00s)
+--- PASS: TestNoInboundEnvelopeCanBindAnApprovalVerdict (0.01s)
+--- PASS: TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/panel	0.126s
+anchors rc=0

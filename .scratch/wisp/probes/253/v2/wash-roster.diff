@@ -1,0 +1,25 @@
+--- internal/panel/inbound_roster_253_test.go	2026-10-03 09:49:33.201929300 +0800
++++ /tmp/tmp.11i6yGYyua/roster.washed_test.go	2026-10-14 14:13:30.095684300 +0800
+@@ -56,12 +56,12 @@
+ 	// numbers a diff has to move on purpose. Pinning them is what stops this file
+ 	// from being satisfied by a silently narrowed roster - and, together with the
+ 	// empty-source case below, by an extractor that found nothing.
+-	wantFullInboundRosterSize253 = 6
++	wantFullInboundRosterSize253 = 7
+ 	// wantNonPanelPrefixedInbound253 is AC#2's target count: the names carrying no
+ 	// "panel." prefix, invisible to both old rulers. It is 2 today ("config.get",
+ 	// "config.set"); a third settings-shaped route has to move this number, which
+ 	// is the friction the ticket asked for.
+-	wantNonPanelPrefixedInbound253 = 2
++	wantNonPanelPrefixedInbound253 = 3
+ )
+ 
+ // wantFullInboundRoster253 is the closed roster: every name a page can put in the
+@@ -69,6 +69,7 @@
+ var wantFullInboundRoster253 = []string{
+ 	"config.get",
+ 	"config.set",
++	"config.wash253",
+ 	"panel.attachment.add",
+ 	"panel.message.send",
+ 	"panel.mode.request",

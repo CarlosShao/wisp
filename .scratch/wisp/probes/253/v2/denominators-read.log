@@ -1,0 +1,29 @@
+== denominator 1 (my read): bridge.go package-level string consts ==
+  ComposerRequestSource    = "panel-composer"         MethodPrefix=false dotShaped=false inbound=false (line 30)
+  MethodAttachmentAdd      = "panel.attachment.add"   MethodPrefix=true  dotShaped=true  inbound=true (line 44)
+  MethodConfigGet          = "config.get"             MethodPrefix=true  dotShaped=true  inbound=true (line 66)
+  MethodConfigSet          = "config.set"             MethodPrefix=true  dotShaped=true  inbound=true (line 67)
+  MethodMessageSend        = "panel.message.send"     MethodPrefix=true  dotShaped=true  inbound=true (line 45)
+  MethodModeRequest        = "panel.mode.request"     MethodPrefix=true  dotShaped=true  inbound=true (line 42)
+  MethodWorkspaceRequest   = "panel.workspace.request" MethodPrefix=true  dotShaped=true  inbound=true (line 43)
+  DECLARED set = ["config.get" "config.set" "panel.attachment.add" "panel.message.send" "panel.mode.request" "panel.workspace.request"]
+
+== package-level string consts merged from 16 production files: 43 names ==
+
+== denominator 3 (my read): knownComposerMethod case labels (bridge.go) ==
+  labels resolved via bridge.go consts = ["config.get" "config.set" "panel.attachment.add" "panel.message.send" "panel.mode.request" "panel.workspace.request"]
+  unresolvable labels = [] ; default present = false ; default calls = []
+
+== denominator 4 (my read): composer_dispatch.go dispatch case labels ==
+  labels resolved via bridge.go+pkg consts = ["config.get" "config.set" "panel.attachment.add" "panel.message.send" "panel.mode.request" "panel.workspace.request"]
+  unresolvable labels = [] ; default present = true ; default calls = ["rosterMismatch"]
+
+== denominator 5 (my read): dot-shaped literals in production files, and whether the DECLARED six answer them ==
+  "config.get"             answeredByTheSix=true  sites=[bridge.go:66]
+  "config.set"             answeredByTheSix=true  sites=[bridge.go:67]
+  "index.html"             answeredByTheSix=false sites=[assets.go:29]
+  "panel.attachment.add"   answeredByTheSix=true  sites=[bridge.go:44]
+  "panel.message.send"     answeredByTheSix=true  sites=[bridge.go:45]
+  "panel.mode.request"     answeredByTheSix=true  sites=[bridge.go:42]
+  "panel.workspace.request" answeredByTheSix=true  sites=[bridge.go:43]
+probe rc=1

@@ -1,0 +1,21 @@
+########## SCOPE (a): a declared-but-UNANSWERED inbound-shaped const in a NEW package file (overlay) ##########
+    inbound_roster_253_test.go:519: full inbound roster held: 6 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- PASS: TestFullInboundMethodRosterIsClosed (0.02s)
+scope-a rc=0
+
+########## SCOPE (b): the same name declared in composer_dispatch.go and WIRED into the guard as an ident ##########
+scope-b rc=1
+
+########## SCOPE (b) retry: name declared in composer_dispatch.go, wired into the guard as an ident ##########
+    inbound_roster_253_test.go:472: ticket 253 AC#2: bridge.go:148 case label CrossPeek253v2 names no package-level string constant of internal/panel: a route spelled out only here
+    inbound_roster_253_test.go:515: ticket 253 AC#2: the running guard answers the dotted literal "settings.cross253v2" found at composer_dispatch.go:67, and it is on no roster - a route that exists only inside an expression has no registerable spelling, which is how an inbound door gets shipped unnumbered
+    inbound_roster_253_test.go:519: full inbound roster held: 6 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- FAIL: TestFullInboundMethodRosterIsClosed (0.01s)
+scope-b rc=1
+
+# NOTE (253-v2): the FIRST "scope-b rc=1" block above is a botched PLANT, not a
+# reading: the const was inserted before composer_dispatch.go's import block,
+# which does not compile (imports must precede other declarations). Nothing
+# matched in that run. The retry below (const after the imports) is the reading
+# of record: ③ :472 "names no package-level string constant ... a route spelled
+# out only here" + ⑤ :515.

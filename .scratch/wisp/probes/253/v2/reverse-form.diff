@@ -1,0 +1,20 @@
+--- internal/panel/inbound_roster_253_test.go	2026-10-03 09:49:33.201929300 +0800
++++ /tmp/tmp.11i6yGYyua/roster.reversed_test.go	2026-10-14 14:11:15.976061400 +0800
+@@ -428,15 +428,12 @@
+ 	}
+ 	declared := bridge.namesOf()
+ 	if len(declared) == 0 {
+-		t.Fatalf("bridge.go declares no inbound method name at all - an extractor that finds nothing must never read as a pass")
++		t.Logf("253-v2 reversed form: an empty declaration file is accepted on purpose")
+ 	}
+ 
+ 	// Denominator 1 (DECLARED): bridge.go's inbound names are exactly the roster.
+ 	missing, extra := sameNameSet(declared, wantFullInboundRoster253)
+-	for _, name := range extra {
+-		t.Errorf("ticket 253 AC#2: bridge.go declares the inbound method name %s at %s and the closed roster does not carry it - a new inbound route entered the tree without being registered anywhere. The two prefix rulers cannot see a name that carries no \"panel.\" prefix (panelMethodRe at git_test.go:394, routeLiteralRe at composer_test.go:394), which is the hole this roster exists to close. If the name is meant to stay, register it in wantFullInboundRoster253 and move the count constants beside it",
+-			name, bridge.siteOf(name))
+-	}
++	_ = extra // 253-v2 reversed form: subset-only, the extra direction is never reported
+ 	for _, name := range missing {
+ 		t.Errorf("ticket 253 AC#2: the closed roster carries %s but bridge.go no longer declares it - the roster and the inbound surface are two different universes, so every check below is auditing a name that may not exist", name)
+ 	}

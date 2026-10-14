@@ -1,0 +1,24 @@
+########## CONTROL A: overlay guard returns false (② has teeth / real Q&A) ##########
+=== RUN   TestFullInboundMethodRosterIsClosed
+    inbound_roster_253_test.go:465: ticket 253 AC#2: the roster carries config.get but the running guard knownComposerMethod refuses it - a rostered inbound name Go does not answer is a page-visible dead door
+    inbound_roster_253_test.go:465: ticket 253 AC#2: the roster carries config.set but the running guard knownComposerMethod refuses it - a rostered inbound name Go does not answer is a page-visible dead door
+    inbound_roster_253_test.go:465: ticket 253 AC#2: the roster carries panel.attachment.add but the running guard knownComposerMethod refuses it - a rostered inbound name Go does not answer is a page-visible dead door
+    inbound_roster_253_test.go:465: ticket 253 AC#2: the roster carries panel.message.send but the running guard knownComposerMethod refuses it - a rostered inbound name Go does not answer is a page-visible dead door
+    inbound_roster_253_test.go:465: ticket 253 AC#2: the roster carries panel.mode.request but the running guard knownComposerMethod refuses it - a rostered inbound name Go does not answer is a page-visible dead door
+    inbound_roster_253_test.go:465: ticket 253 AC#2: the roster carries panel.workspace.request but the running guard knownComposerMethod refuses it - a rostered inbound name Go does not answer is a page-visible dead door
+    inbound_roster_253_test.go:519: full inbound roster held: 6 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- FAIL: TestFullInboundMethodRosterIsClosed (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.049s
+FAIL
+A rc=1
+
+########## CONTROL B: overlay guard also answers "index.html" (⑤ has teeth) ##########
+=== RUN   TestFullInboundMethodRosterIsClosed
+    inbound_roster_253_test.go:515: ticket 253 AC#2: the running guard answers the dotted literal "index.html" found at assets.go:29, and it is on no roster - a route that exists only inside an expression has no registerable spelling, which is how an inbound door gets shipped unnumbered
+    inbound_roster_253_test.go:519: full inbound roster held: 6 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- FAIL: TestFullInboundMethodRosterIsClosed (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.051s
+FAIL
+B rc=1

@@ -1,0 +1,22 @@
+########## W2 (N2): full registration = roster+counts (overlay) AND const+guard+router (physical) ##########
+--- single: -run TestFullInboundMethodRosterIsClosed (expect washed GREEN) ---
+    inbound_roster_253_test.go:520: full inbound roster held: 7 names declared in bridge.go, 7 guard case labels, 7 router case labels, 3 of them carrying no "panel." prefix ("config.get", "config.set", "config.wash253")
+--- PASS: TestFullInboundMethodRosterIsClosed (0.02s)
+ok  	github.com/CarlosShao/wisp/internal/panel	0.055s
+W2-single rc=0
+--- whole leg: ./internal/panel/ -count=1 -v (expect 整腿 rc=1) ---
+W2-whole rc=1
+139
+7
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.06s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.57s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestPlantedUnregisteredInboundMethodNameGoesRed (0.01s)
+--- FAIL: TestRegistrationSilencesTheRosterRuler (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+--- the two fixture fatals (verbatim) ---
+325:    inbound_roster_253_test.go:662: bridge.go's guard case list is no longer written as one comma-separated clause - re-read knownComposerMethod and rebuild this plant from what is on disk rather than replacing nothing
+328:    inbound_roster_253_test.go:706: bridge.go's guard case list is not the one comma-separated clause this plant was written against - re-read knownComposerMethod rather than trusting this line
+--- was the main test green in the whole leg? ---
+--- PASS: TestFullInboundMethodRosterIsClosed (0.01s)

@@ -1,0 +1,18 @@
+time=2026-10-14T14:15:28.454+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFullInboundMethodRosterIsClosed
+    inbound_roster_253_test.go:519: full inbound roster held: 6 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- PASS: TestFullInboundMethodRosterIsClosed (0.02s)
+=== RUN   TestPlantedUnregisteredInboundMethodNameGoesRed
+    inbound_roster_253_test.go:686: AC#2's judgement shape holds under this ruler: an unregistered inbound name is named in all three planted shapes (plain const, Method-named const, guard case literal) while the unplanted tree reads quiet
+--- PASS: TestPlantedUnregisteredInboundMethodNameGoesRed (0.01s)
+=== RUN   TestRegistrationSilencesTheRosterRuler
+    inbound_roster_253_test.go:761: registration read both ways: declared AND answered reads quiet (7 names, no diff); roster-only reads red on the answered side ("config.registered253"), so adding a name to the list is not how this ruler gets satisfied
+--- PASS: TestRegistrationSilencesTheRosterRuler (0.01s)
+=== RUN   TestFullInboundRosterRefusesAnEmptyDeclarationFile
+    inbound_roster_253_test.go:800: empty-source refusal held: 6 roster names reported missing against a file that declares none
+--- PASS: TestFullInboundRosterRefusesAnEmptyDeclarationFile (0.00s)
+=== RUN   TestSubsetOnlyRosterDirectionIsBlindToAPlantedName
+    inbound_roster_253_test.go:832: relaxed form measured blind on purpose: with the plant in the source the subset-only reading finds no problem (missing=(none)) while the shipped equality names "config.blind253". Subset-only is not admissible as AC#2's credential
+--- PASS: TestSubsetOnlyRosterDirectionIsBlindToAPlantedName (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.091s
