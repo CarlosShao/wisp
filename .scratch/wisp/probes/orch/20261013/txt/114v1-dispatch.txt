@@ -1,0 +1,26 @@
+# 114-v1 派单（票 114 四格落地＋拆分表的非实现者判语；验收腿；面＝internal/panel 读）
+
+发送时刻：2026-10-14 16:2x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `114-v1`**（`probes/114/` 现仅 a2（腿自核：台账只出现过 `114-a2`）⇒ v1 可用）。⛔ 不翻框、⛔ 不动 `Status:`/票名——判语交回。
+
+## 被裁对象
+
+- 落地腿 `114-a5`：产码 `d8dd4b38`（`internal/panel/composer_test.go` +146/−22、`internal/panel/bridge_test.go` +73，两枚新钉 `TestDoorTwoReadsEveryTextTypeTheScannerWalks`／`TestEveryWhitelistedInboundNameIsAlsoSentByThePage`）＋交付 `37eb6992`（`probes/114/a5/00-split-and-landing.md` 78 行＋logs 6＋票尾 bullet）。编排者抽核＝两枚新钉亲跑 ok 1.965s。
+- 拆分表主张（要你独立核）：**落地 4 格**＝AC#4（门二 15 文本类全读；改前 `.json` 同时逃过两枚仪器）／AC#7（门禁读数）／AC#8（**253-r5 未覆盖"两边同改"这方向**——其尺只读 `internal/panel` 生产源；新门在仓外模块拷贝种形：旧套件盲 PASS vs 新门 FAIL 逐字点名；真树 `page mirrors all 6`）／AC#9（扫描根：改前"绿与事实无关"复现；改后 `109 files scanned, 2 host call sites`＋种形被点名）。**停手上报 2 格**＝AC#3（J1 未定案：`Confirm: nil` 两枚未接、`rt.modeWrites` 死码、变宽被 `composer_handlers.go:133-138` 的 `ErrNoL2Confirm` 拒）/AC#11（`.github` 邻接）。**skipped=frontend**＝AC#6/#10。
+
+## 你要独立做的（⛔ 不许只引）
+
+1. **AC#4 牙**：自造一发（删一个文本类或摘 `.json` 对齐 ⇒ 新钉必须红且点名）；把"改前 `.json` 逃过两枚仪器"的 old-state 复读（overlay/仓外拷贝）。
+2. **AC#8 牙**：自己种一发"页面少发一枚白名单名"的形（⛔ A713 纪律：不许拿 overlay 绿抵账——真种盘或仓外模块拷贝）⇒ 新门必须红点名；并核 253-r5 的尺为何不覆盖（现读其源码引一句）。
+3. **AC#9 牙**：改前态（"真树绿与事实无关"）与改后态（扫描计数＋种形点名）各一发；核它读语两种平台（windows 词法/junction 侧只登记不假跑）。
+4. **AC#7 抽核**：panel 整包红集与该 HEAD 对照**同集**（抽 1-2 名核并给三数）。
+5. **两停手格复核**：AC#3 的"生产不可达"三件（`ErrNoL2Confirm`／`rt.modeWrites` 死码／`Confirm: nil` ×2）现读各引一行；AC#11 的 `.github` 邻接判对否。
+6. **拆分表抽核**：随机抽 2 格，核其"面/三态"判对。
+7. **判语**：AC#4／#7／#8／#9 各自"成立/附条件/不成立"＋翻框建议（含留档句）；对两停手格给"停得对否"。
+
+## 交付与纪律
+
+- 交件：`docs/evidence/s1/ticket114-114-v1-accept-v1.md`＋`.scratch/wisp/probes/114/v1/`（锚＋logs）＋票 114 尾 **1 条 bullet**；产出 ≤7 枚 ≤200 行。⛔ 框不翻。
+- 只 commit、⛔ 不 push；显式 pathspec（⚠ 前一条腿因未带 pathspec 出过暂存泄漏，⛔ 别再犯）；`GOTMPDIR` ⛔ 只**反斜杠形** `C:\tmp\wisp114v1gotmp`；突变优先 overlay/仓外备份＋sha256；窗口逐报（他腿 `20-r2`（internal/tools+config）在飞）。
+- **未定义即停**：新钉打不红／拆分表某格判错／停手格证据对不上 ⇒ 停手上报。
+- 回执：结论先行（四格判语＋停手格复核）＋各发红/绿句逐字＋门禁 rc＋具名没做。
