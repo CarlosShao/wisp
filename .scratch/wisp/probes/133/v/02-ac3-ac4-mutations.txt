@@ -1,0 +1,64 @@
+# 133-v AC#3 自证腿 ＋ AC#4 静默缩短：本腿自造变异的读数
+# 全日志：D:/tmp/wisp133v/logs/06..13（快照 base）
+
+==== AC#3：独立弄坏 isRunnableCase133（本腿形状：只去掉 fd.Recv != nil 半边） ====
+变异（leg_dispatch_gate_133_test.go，1 行）：
+  - if fd.Recv != nil || !strings.HasPrefix(fd.Name.Name, "Test") {
+  + if !strings.HasPrefix(fd.Name.Name, "Test") {
+真目录预检：`grep "func ([^)]*) Test" cmd/wisp/*_test.go` 只命中自证文件里夹具字符串内的方法
+（fixtureTest133 常量，不是真声明）⇒ 真目录不受本变异影响。
+(a) 自证腿单跑 rc=1  --- FAIL: TestAC3SelfProof133TheDispatchReadersCanAnswerNo (0.06s)
+    失败断言逐字（dispatch_hop_selfproof_133_test.go:315）：
+      the coverage reader did not report gamma's only would-be driver is a method, which is not a case:
+      the leg must stay uncovered (looked for "leg \"gamma\""); it reported:
+      [夹具红名单里 gamma 已被 `covered=test TestPhantomMethod133` 洗成"有覆盖"，而 delta 仍 `covered by nothing`]
+    ⇒ 方法被洗成覆盖的那一形，自证腿当场点破（R-121-2 同族的"sanify 腿不哑"）。
+(b) 同一棵树上门单跑 rc=0  --- PASS: TestAC1AC2DispatchHopGate133 (0.20s)   ← 门仍 PASS
+(c) 还原（sha256 1273fdcc...）后两枚同跑 rc=0 双双 PASS。
+⇒ AC#3 该格：**会响、门不连坐**（没有这枚自证腿，本变异在这一棵树上就是哑的）。
+（06-ac3-selfproof-red.log / 06-ac3-gate-still-green.log / 06-ac3-restored-green.log）
+
+==== AC#4 读数① 注册表↔census 双向差 ====
+预读（零变异，两门）rc=0 双双 PASS；账本 12 legs / 4 claims。
+(a) 注册表指向一枚没人分发的腿（改 legCovers133 一行：leg:"models"→"modelsv"）
+    rc=1  AC#1 RED: this gate's registry claims leg "modelsv" is nailed by "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk",
+          and func main dispatches no such leg: ... A rename would otherwise leave its nail behind in silence -
+          the Y1 shape ticket 129's readings were filed for.
+(b) 另一方向（本尺既有的 census↔usage 双向差，逐向各造一发）：
+    b1 y1drop（删 case "doctor" 整枚子句）：census 11 腿 ⇒ 见读数③
+    b2 usage 加一行 `wisp phantomcmd`（没人分发）：rc=1
+       AC#1/#2 RED: the usage block documents command "phantomcmd", which func main does not dispatch ...
+⇒ 两个集合对差任一方向非空即红，逐字点名的是被种的那枚事实。
+（08-ac4-registry-vs-census.log / 09-ac4-usage-vs-census.log）
+
+==== AC#4 读数② Y2 实体（-run 名换靶那 2 行） ====
+改前（纯净树，两门）rc=0 双 PASS（07-ac4-pre-bothgreen.log）。
+变异＝`run`↔`models` 两枚 claim 的 test 名对调（2 行，腿名/entry/count 全保留）：
+  {leg: "run",    test: "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk", entry: "runTextTask"},
+  {leg: "models", test: "TestAC2SealNoticeLandsInTheRunLegLogFile",    entry: "cmdModels"},
+改后本尺单跑 rc=1，pair 红恰 2 枚、逐字点名（赋两半的判定，不只是"名单短了"）：
+  AC#1 RED: leg "models"'s nail pairs the case "TestAC2SealNoticeLandsInTheRunLegLogFile" with the entry "cmdModels",
+            and that case never calls "cmdModels": a nail whose two halves point at different legs is a claim about neither.
+  AC#1 RED: leg "run"'s nail pairs the case "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk" with the entry "runTextTask",
+            and that case never calls "runTextTask": ...
+同树 131 门单跑 rc=0 PASS ⇒ pair 红是本尺自己的牙（不蹭 131）。
+（10-ac4-y2-pair.log / 10b-ac4-y2-131alone.log）
+
+==== AC#4 读数③ 下限 N=12 ＋ 全瞎必须红着说看不见 ====
+写死值：`minLegs133 = 12`（文件内文自带实测口径：10 枚字面标签＋no-args＋default；谓词 floorReds133 门与自证腿同一份）。
+(a) y1drop（删 case "doctor" 整枚）rc=1：
+    AC#1/#2 RED: the leg census enumerated 11 legs (12 is the floor written down next to minLegs133), so a dispatch
+      rewrite is being read as "no legs" rather than reported. Census: default, help, models, no-args, panel-assets,
+      panel-inbound, providers, run, secret, slo, version
+    AC#1/#2 RED: the usage block documents command "doctor", which func main does not dispatch ...
+(b) y2blind（args := os.Args[1:] → args := os.Args）rc=1：
+    AC#1/#2 RED: func main binds no local to os.Args, so this gate cannot tell a dispatch from a call
+    AC#1/#2 RED: the leg census enumerated 0 legs (12 is the floor ...) ...
+    ⇒ **不返回空清单当"没有腿要测"**：0 腿同时撞下限与"看不见"两条红。
+(c) 131 门内下限未动：leg_sink_gate_131_test.go 只有 `len(legs) == 0 { t.Fatal }`（:258-259），无 `>=N` 数值下限；
+    该文件不在 da389ca5 变更表里（最后一次动它的是 6f702aeb），本票三枚提交对它零触碰。
+（11-ac4-y1drop.log / 12-ac4-y2blind.log）
+
+==== 还原终态 ====
+13-final-green.log：门/自证腿/逐枚可区分/131 门 四用例同跑 rc=0 全 PASS；
+main.go=24efbffb...、leg_dispatch_gate_133_test.go=1273fdcc...、dispatch_hop_selfproof_133_test.go=cc19ac94... 逐字节还原。

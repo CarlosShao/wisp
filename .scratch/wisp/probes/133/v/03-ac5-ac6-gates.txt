@@ -1,0 +1,59 @@
+# 133-v AC#5/AC#6：字面 10m -timeout 撞 panic 复核、四数抽验、CI 链、门禁
+# 全日志：D:/tmp/wisp133v/logs/（14/14b 字面两趟、15/16 d22scan、ci-job115820641622.log）
+
+==== 字面命令 go test -count=2 -v ./cmd/wisp/（默认 -timeout，仓外快照 base） ====
+第 1 趟（21:11:06 → 21:21:19，wall 613s；无 third_party 的快照姿态）：
+  panic: test timed out after 10m0s（605.700s，rc=1）；partial RUN=403 PASS=272 FAIL=21 SKIP=5
+  21 枚红里：7 枚＝r1 登记的宿主底噪；1 枚＝快照无 .git（TestCleanCheckoutBuilds_AC11，
+  `git rev-parse --show-toplevel: exit status 128`）；其余 13 枚＝快照无 third_party 一族
+  （逐字 `no native DLLs in ..\..\third_party\sherpa-onnx` ⇒ 8-9s 后失败）＋负载族。
+  ⇒ 该趟数作废，不是判语；修正姿态后重跑。
+第 2 趟（21:33:20 → 21:43:33，wall 613s；拷入三枚 DLL、PATH=快照内绝对 MSYS 形）：
+  **panic: test timed out after 10m0s（603.103s，rc=1）**  ← 票面那一枚读数逐字复现（本机第二趟独立复现）
+  partial RUN=311 PASS=228 FAIL=8 SKIP=5
+  FAIL 逐名（8 枚）＝r1 那 7 枚宿主底噪
+  （TestAC2SealNoticeLandsInTheRunLegLogFile、TestAC4FocusReturnToPriorWindowGap33r5、
+   TestAC14GoSideEvalPushReachesThePage、Test258BridgeMutationNoSrcKeepsOldBinding、
+   Test258OccupiedCombinationNamesTheNewValue、Test258V1ProbeSummonEditRebindsLiveBall、
+   TestAC246DevLegIgnoresTheTestTaskInjection）
+   ＋1 枚快照姿态（TestCleanCheckoutBuilds_AC11，无 .git；`no native DLLs` 命中 0 ⇒ DLL 姿态已清）
+  panic 时刻在飞：TestTicket101ModeSwitchUsesTheRealL2Gate；两趟窗口内 tasklist 无别的 go/test 进程
+  （W1/W3 自证：2 枚 cargo.exe 是子串误配，`wisp.exe`＝机主常驻球）。
+  对照 r1 同形读数（11-ac5 原档）：603.108s / partial 318/235/7/3、在飞 TestHostDispatchThroughTheAssembledBridge
+  ⇒ **同一形：本机单趟 5-10 分钟，字面命令跑不完、撞 Go 默认 10m 即 panic**；partial 数随负载浮动，
+  不作判语（票 314 登记成立，本腿两趟各为窗口一次，无整进程死亡）。
+
+==== 四数抽验（按 r1 留的件，D:/tmp/wisp133r1/logs/） ====
+- 11-ac5（同第 1 趟）：partial 318/235/7/3；窗 19:24:37-19:34:48
+- 15-ac5（-timeout 40m 跑完）：**824/575/23/6**，窗 19:45:19-20:14:51（29.4min，负载诱发面板/STA 红 9 枚）
+- 14-ac5（CI 形 step 第 1 次）：**177/126/1/0**，306.2s **整进程死亡**（本仓 314 形，无判决）
+- 18-ac5（CI 形 step 第 2 次）：**282/217/4/1**，683s 跑完；四枚本票用例逐枚 `--- PASS`
+  （TestAC1AC2DispatchHopGate133 / TestAC4EveryLegIsNailedOrRuled / TestAC3SelfProof133… / TestAC4Distinctness133…）
+  红 4 枚＝宿主 3 ＋ TestAC1ResidentLegInstallsItsLogListenerOnDisk(19.64s，负载族)
+- 低负载同树整趟（02/03 原档）：**306/226/7/3**（7 枚全是 r1 登记的宿主底噪）
+**改前/后哪数动（本腿独立量）**：`go test -list '.*' ./cmd/wisp/` 的 startable 分母
+  da389ca5^ = **300** → da389ca5 = **302**（+2 恰为自证腿文件的 TestAC3SelfProof133… 与 TestAC4Distinctness133…；
+  TestAC1AC2DispatchHopGate133 与 131 门都在改前就存在）⇒ 同环境整趟四数的预期移动＝RUN/PASS 各 +2、
+  FAIL/SKIP 零（本票对 123 批审批用例零触碰：da389ca5 的 -12 行全是该尺自己的旧文案/常量）。
+  票面 121 那枚九月账 `202/108/0/0`（per-count 101/54/0/0）与今日数不可比（数月新票与宿主底噪），只作史料登记。
+
+==== AC#6：CI 落点（只读，未改 .github/**） ====
+- run **38554642217**（sha `72db0f396c7a60cf123c2e3b3a86139628bd91f8`，branch dev，conclusion failure）
+  / job `test-windows` databaseId **115820641622** / step #7 **"cmd/wisp CLI tests (needs the sherpa DLLs
+  staged above, ticket 111 AC#4)"**（`gh run view --log` 现读；ci.yml:533＝test-windows、ci.yml:601＝该 step 名）。
+- step 自己的行逐字：`runtests.sh: go test exited 1 - packages=[./cmd/wisp/ -count=1 -skip ^(...)$]
+  top-level: PASS=297 FAIL=2 SKIP=1, === RUN=410` ＋ `portable-tests.sh: four numbers (all from -v output):
+  === RUN=410  --- PASS=297  --- FAIL=2  --- SKIP=1`（2026-10-14T11:19:28Z）。
+- 该 step 的 2 枚红逐名：TestTicket223PermissionDeniedSitsInItsOwnSentence(1.00s)、
+  TestAC14GoSideEvalPushReachesThePage(0.51s)（都不是本票用例）；该 run 里本票用例 PASS 的只有
+  TestAC1AC2DispatchHopGate133(0.15s) 与 TestAC4EveryLegIsNailedOrRuled(0.08s)。
+- **口径收窄（如实登记）**：该 run 的 sha 早于仪器 commit `da389ca5` ⇒ 自证腿/逐枚可区分两枚
+  **没有任何远程 run 跑过**；结构上它们已进 CI（`_test.go` 在 cmd/wisp，step 跑整包）。
+- 链：step → `bash scripts/wisp-cli-tests.sh` → `portable-tests.sh --scope=cli`（:223-224）→
+  `scope=(./cmd/wisp/)`（portable-tests.sh:341）。无 `.github/**` 改动（见 04 面核）。
+
+==== 门禁复量（本腿） ====
+- `gofmt -l cmd/wisp/` = models.go（CRLF 伪影）；`gofumpt -l cmd/wisp/` = models.go + panel_transport_35r2_test.go
+  （既有债，`18d43f8e`）；仪器两枚文件 gofmt/gofumpt 皆 clean；CI 形原命令非空（见 04 分歧 2）。
+- `sh scripts/d22scan.sh` rc=0 纯净；活树各 scope 与 base 快照同日控制逐数（设计差见 04），不降。
+- `go vet ./cmd/wisp/`（快照 base、修正 DLL 姿态后）：**rc=0**、零诊断（21:46:08-21:46:10；与 r1 同读数）。

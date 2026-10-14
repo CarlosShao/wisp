@@ -1,0 +1,74 @@
+# 133-v AC#1：五发（自造）× 门关/门开 ＋ N-3 "不加尺"字面复核
+# 门关＝go test -count=1 -v -run '^TestAC1AC2DispatchHopGate133$' ./cmd/wisp/（在快照 base 内）
+# 门开＝-run '^(TestAC1AC2DispatchHopGate133|TestAC4EveryLegIsNailedOrRuled)$'
+# 全日志：D:/tmp/wisp133v/logs/ 编号见各行末
+
+==== 基线（零变异） ====
+rc=0  --- PASS: TestAC1AC2DispatchHopGate133 (0.28s)  ok 4.038s
+账本：12 legs / 4 claims；roster 披露 "302 startable cases ... this round was narrowed by -test.run=^TestAC1AC2DispatchHopGate133$"
+（00-baseline-gateclosed.log）
+
+==== 发 1 N-3：main.go 摘掉 cmdModels 调用者（换 os.Exit(2)，落地行 main.go:109→单行替换） ====
+门关 rc=1  --- FAIL: TestAC1AC2DispatchHopGate133 (0.18s)
+  AC#1 RED: cmdModels (models.go:104) reaches installLogSink (or is a production entry ...), and no chain from func main reaches it any more.
+  AC#1 RED: modelStore.handOffModel (models.go:302) ... no chain from func main reaches it any more.
+  AC#1 RED: modelsEnsure (models.go:262) ... no chain from func main reaches it any more.
+  AC#1 RED: leg "models" (main.go:102) is claimed by nail "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk" on entry "cmdModels",
+           and the dispatch no longer reaches that symbol. This is the dispatch hop itself: ...
+门开 rc=1  --- FAIL: TestAC1AC2DispatchHopGate133 (0.18s)  --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.13s)
+131 单跑（本尺被 -run 排除＝"不加尺"字面形）rc=1  --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.10s)
+  leg_sink_gate_131_test.go:318: AC#4 RED: nail "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk" claims leg "models",
+     which no longer installs the persistent sink (main.go:102): the nail is now proving something else, or nothing
+  leg_sink_gate_131_test.go:324: ... the dispatch main.go makes for "models" never reaches "cmdModels" ...
+⇒ "全绿不可满足"逐字成立：不加本尺时红名**只有** 131 的门（131 单跑即红）；本尺装上后同一发也红且红名本尺。
+还原：main.go sha256 → 24efbffb...  identical=True
+（01-n3-closed.log / 01-n3-open.log / 01b-n3-131alone.log）
+
+==== 发 2 X4：早退 if 腿 --hopv133（main.go:69 三条新行 ＋ 新件 hopv133v.go） ====
+门关 rc=1  --- FAIL: TestAC1AC2DispatchHopGate133 (0.24s)
+  AC#1 RED: leg "--hopv133" (main.go:69) reaches installLogSink on this path: dispatch -> installLogSink
+  AC#1/#2 RED: leg "--hopv133" is dispatched by func main and documented in no line of the usage block ...
+  账本行：leg --hopv133  main.go:69  installs=true handoff=false covered=RED sink with no nail  entries=cmdHopV133
+门开 rc=1  两门并红（TestAC1AC2DispatchHopGate133 FAIL ＋ TestAC4EveryLegIsNailedOrRuled FAIL）
+还原：identical=True（02-x4-closed.log / 02-x4-open.log）
+
+==== 发 3 X8：case 标签写成 const（main.go:95 `case doctorCmdV133:`；新件 cmdlabels133v.go） ====
+门关 rc=1  --- FAIL: TestAC1AC2DispatchHopGate133 (0.29s)
+  AC#1/#2 RED: main.go:95: the case label doctorCmdV133 is not a string literal, which resolves to the literal "doctor".
+    ... This row carries it as "unparsed-label@main.go:95:doctorCmdV133" instead of folding it into default.
+  AC#1/#2 RED: the usage block documents command "doctor", which func main does not dispatch ...
+  账本仍出全 12 行，只有 doctor 行变合成腿（不是"整包坏掉才响"）：
+    leg unparsed-label@main.go:95:doctorCmdV133  main.go:95  installs=false ... covered=test TestAC2EveryLegRefuses... drives cmdDoctor
+门开 rc=1  两门并红
+还原：identical=True（03-x8-closed.log / 03-x8-open.log）
+
+==== 发 4 X12：函数值别名（新件 hopalias133v.go `var hopAliasV133 = installLogSink`；case "hopalias133" main.go:110） ====
+门关 rc=1  --- FAIL: TestAC1AC2DispatchHopGate133 (0.18s)
+  AC#1 RED: leg "hopalias133" (main.go:110) reaches installLogSink on this path: dispatch -> hopAliasV133 -> installLogSink
+  AC#1/#2 RED: leg "hopalias133" is dispatched by func main and documented in no line of the usage block ...
+  账本行：leg hopalias133  main.go:110  installs=true ... covered=RED sink with no nail  entries=cmdHopAliasV133
+  ⇒ 别名边被本尺走图接住（红名里有 `dispatch -> hopAliasV133 -> installLogSink` 这条 via 路径）。
+门开 rc=1  两门并红
+还原：identical=True（04-x12-closed.log / 04-x12-open.log）
+
+==== 发 5 X14 第一拍：install 藏在结构体字段初值（新件 vhold133v.go；case "vhold133" main.go:121） ====
+门关 rc=1  --- FAIL: TestAC1AC2DispatchHopGate133 (0.23s)
+  AC#1 RED: leg "vhold133" (main.go:121) reaches installLogSink on this path: dispatch -> vHolder133.openFn -> installLogSink
+  AC#1/#2 RED: leg "vhold133" ... documented in no line of the usage block ...
+门开 rc=1  --- FAIL: TestAC1AC2DispatchHopGate133 (0.19s)  --- PASS: TestAC4EveryLegIsNailedOrRuled (0.11s)
+  ⇒ 本发种子里**没有 slog**（＝票面原形）⇒ 131 的门看不见、本尺独占目击（当日复核成立）。
+
+==== 发 5 X14 第二拍：字段初值与那次调用删掉，腿仍在（cmdHoldV133 空身 ＋ case 保留） ====
+门关 rc=1  --- FAIL: TestAC1AC2DispatchHopGate133 (0.24s)
+  AC#1 RED: leg "vhold133" (main.go:121) is dispatched by func main and covered by nothing: no nail in this gate's registry,
+    no test case in this directory that drives a symbol belonging to this leg alone, and no WISP-LEG-COVERAGE-RULING: sentence naming it.
+  AC#1/#2 RED: leg "vhold133" ... documented in no line of the usage block ...
+  账本行：leg vhold133  main.go:121  installs=false handoff=false covered=RED nothing
+门开 rc=1  本尺红、131 门 PASS（同第一拍）⇒ "拆掉 install 后仍零红"这一形被真正接住。
+还原：identical=True（05-x14b1-closed/open.log、05-x14b2-closed/open.log）
+
+==== 五发机检（逐发两份读数） ====
+门关：每发 rc=1、`--- FAIL: TestAC1AC2DispatchHopGate133` 逐发 1 次、131 门提及 0、panic 0。
+门开：每发 rc=1；N-3/X4/X8/X12 两门并红；X14 两拍本尺红＋131 门 PASS（独占目击）。
+还原：五发＋两拍逐发 main.go sha256 回 24efbffb...；腿文件（hopv133v.go 等）逐发删净、快照回到 base 逐字节态
+（`find` 无 *133v* 残留；13-final-green.log：四用例 rc=0 全 PASS）。
