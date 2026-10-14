@@ -1,0 +1,21 @@
+# 114-r6 log 01 — 三向之一：基线绿（live 树，HEAD 3b6f170f，2026-10-14 16:5x +08）
+# 命令：GOTMPDIR='C:\tmp\wisp114r6gotmp' go test -count=1 -run 'TestTheBoundDispatchDoorIsReachableFromThePage|TestTheRendererHoldsExactlyOneDoorToTheHost|TestPlantedRendererDoorShapesGoRed|TestDoorTwoReadsEveryTextTypeTheScannerWalks' -v ./internal/panel/
+# 读法：新钉绿＋既有 .postMessage( 牙不动（'red as required' 行逐字）
+=== RUN   TestTheBoundDispatchDoorIsReachableFromThePage
+    bound_dispatch_door_114_test.go:454: bound door held: 36 cmd/wisp production file(s), 2 w.Bind door site(s) [cmd/wisp/panel_host_windows.go:842 binds "wispDispatch" via panelDispatchBinding; cmd/wisp/panel_host_windows.go:892 binds "wispProbeRT" via "wispProbeRT"], 1 skipped non-door .Bind call(s); 27 window.* read site(s) under frontend/, door-relevant: [frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch]
+=== RUN   TestTheBoundDispatchDoorIsReachableFromThePage/a_dead_or_renamed_door_reddens_the_same_scan
+--- PASS: TestTheBoundDispatchDoorIsReachableFromThePage (0.21s)
+    --- PASS: TestTheBoundDispatchDoorIsReachableFromThePage/a_dead_or_renamed_door_reddens_the_same_scan (0.14s)
+=== RUN   TestTheRendererHoldsExactlyOneDoorToTheHost
+    composer_test.go:594: renderer door held: 113 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+--- PASS: TestTheRendererHoldsExactlyOneDoorToTheHost (0.03s)
+=== RUN   TestPlantedRendererDoorShapesGoRed
+    composer_test.go:678: red as required: 3 outside call sites, 1 assembled routes, 3 unknown literals, door 2 named 3 line(s)
+--- PASS: TestPlantedRendererDoorShapesGoRed (0.03s)
+=== RUN   TestDoorTwoReadsEveryTextTypeTheScannerWalks
+    composer_test.go:709: door 2 reads all 15 text types the scanner walks: .css .go .html .js .json .jsx .md .svg .toml .ts .tsx .txt .vue .yaml .yml
+=== RUN   TestDoorTwoReadsEveryTextTypeTheScannerWalks/the_containment_names_a_type_that_is_genuinely_not_read
+--- PASS: TestDoorTwoReadsEveryTextTypeTheScannerWalks (0.00s)
+    --- PASS: TestDoorTwoReadsEveryTextTypeTheScannerWalks/the_containment_names_a_type_that_is_genuinely_not_read (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	1.775s

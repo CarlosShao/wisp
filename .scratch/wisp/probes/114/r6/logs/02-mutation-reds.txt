@@ -1,0 +1,92 @@
+# 114-r6 log 02 — 三向之二：突变必须红且点名（仓外真种盘，非 overlay）
+# 仓外树：D:\tmp\wisp114r6\tree（git archive HEAD=3b6f170f 真盘；A713：overlay 换不到 os.ReadFile，故用真树）
+# 变异驱动：D:\tmp\wisp114r6\mut.py；每次突变前用 git archive HEAD <两产码件> 还原（host/page sha256 与 live 逐字同值）
+# 每个突变三跑：①新钉（必须 FAIL 且逐字点名）②旧 .postMessage( 尺（对照：同树上仍绿=旧射程盲区现场）
+
+# ---- 树基线（未突变；只跑新钉） ----
+=== RUN   TestTheBoundDispatchDoorIsReachableFromThePage
+    bound_dispatch_door_114_test.go:454: bound door held: 36 cmd/wisp production file(s), 2 w.Bind door site(s) [cmd/wisp/panel_host_windows.go:842 binds "wispDispatch" via panelDispatchBinding; cmd/wisp/panel_host_windows.go:892 binds "wispProbeRT" via "wispProbeRT"], 1 skipped non-door .Bind call(s); 27 window.* read site(s) under frontend/, door-relevant: [frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch]
+=== RUN   TestTheBoundDispatchDoorIsReachableFromThePage/a_dead_or_renamed_door_reddens_the_same_scan
+--- PASS: TestTheBoundDispatchDoorIsReachableFromThePage (0.16s)
+    --- PASS: TestTheBoundDispatchDoorIsReachableFromThePage/a_dead_or_renamed_door_reddens_the_same_scan (0.11s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	1.418s
+
+# ================= m1 =================
+# m1 = the w.Bind call is gone (span spliced to error(nil)) on the real file in the out-of-repo tree (HEAD 3b6f170f copy)
+$ python D:\tmp\wisp114r6\mut.py m1-bind-gone
+m1 span offsets [42508,42619) = 'w.Bind(panelDispatchBinding, func(raw string) string {\n\t\treply, _ := m.dispatchRaw(ctx, raw)\n\t\treturn reply\n\t})'
+
+$ GOTMPDIR='C:\tmp\wisp114r6gotmp' go test -count=1 -run 'TestTheBoundDispatchDoorIsReachableFromThePage' -v ./internal/panel/
+=== RUN   TestTheBoundDispatchDoorIsReachableFromThePage
+    bound_dispatch_door_114_test.go:448: cmd/wisp's production sources bind no door through a w.Bind(<package-level string constant>, callback) call, so the page's door has no host-side receiver: the third mounting method is what makes window.<door> exist, AddHostObjectToScript has zero call sites in this repository, and the .postMessage( reachability scan cannot see a bound door at all (ticket 114 AC#10). w.Bind sites read: cmd/wisp/panel_host_windows.go:889 binds "wispProbeRT" via "wispProbeRT"; page window.* reads: frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch
+--- FAIL: TestTheBoundDispatchDoorIsReachableFromThePage (0.07s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.442s
+FAIL
+new-pin rc=1
+
+$ older .postMessage( reachability instrument on the SAME mutated tree
+$ go test -count=1 -run 'TestTheRendererHoldsExactlyOneDoorToTheHost|TestPlantedRendererDoorShapesGoRed' -v ./internal/panel/
+=== RUN   TestTheRendererHoldsExactlyOneDoorToTheHost
+    composer_test.go:594: renderer door held: 113 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+--- PASS: TestTheRendererHoldsExactlyOneDoorToTheHost (0.03s)
+=== RUN   TestPlantedRendererDoorShapesGoRed
+    composer_test.go:678: red as required: 3 outside call sites, 1 assembled routes, 3 unknown literals, door 2 named 3 line(s)
+--- PASS: TestPlantedRendererDoorShapesGoRed (0.03s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	1.588s
+old-instrument rc=0
+
+# ================= m2 =================
+# m2 = the binding name is renamed at the one reviewed constant (:80), Bind call and page untouched, on the real file in the out-of-repo tree
+$ python D:\tmp\wisp114r6\mut.py m2-const-renamed
+m2 replaced 1 anchor: 'panelDispatchBinding = "wispDispatch"' -> 'panelDispatchBinding = "wispDispatchX"'
+
+$ GOTMPDIR='C:\tmp\wisp114r6gotmp' go test -count=1 -run 'TestTheBoundDispatchDoorIsReachableFromThePage' -v ./internal/panel/
+=== RUN   TestTheBoundDispatchDoorIsReachableFromThePage
+    bound_dispatch_door_114_test.go:448: cmd/wisp/panel_host_windows.go:842 binds "wispDispatchX" through w.Bind, and frontend/src/lib/panel.ts never reads window.wispDispatchX - a bound door no page line reaches for is dead weight, and the two-sided name tie is the whole capability (ticket 114 AC#10). The page's window.* reads: frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch
+--- FAIL: TestTheBoundDispatchDoorIsReachableFromThePage (0.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.453s
+FAIL
+new-pin rc=1
+
+$ older .postMessage( reachability instrument on the SAME mutated tree
+=== RUN   TestTheRendererHoldsExactlyOneDoorToTheHost
+    composer_test.go:594: renderer door held: 113 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+--- PASS: TestTheRendererHoldsExactlyOneDoorToTheHost (0.05s)
+=== RUN   TestPlantedRendererDoorShapesGoRed
+    composer_test.go:678: red as required: 3 outside call sites, 1 assembled routes, 3 unknown literals, door 2 named 3 line(s)
+--- PASS: TestPlantedRendererDoorShapesGoRed (0.05s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	1.537s
+old-instrument rc=0
+
+# ================= m3 =================
+# m3 = the page's read is renamed instead (window.wispDispatch -> window.wispDispatchX in panel.ts, comment + code), host untouched
+$ python D:\tmp\wisp114r6\mut.py m3-page-read-renamed
+m3 replaced 2 window.wispDispatch occurrence(s) -> window.wispDispatchX
+
+$ GOTMPDIR='C:\tmp\wisp114r6gotmp' go test -count=1 -run 'TestTheBoundDispatchDoorIsReachableFromThePage' -v ./internal/panel/
+=== RUN   TestTheBoundDispatchDoorIsReachableFromThePage
+    bound_dispatch_door_114_test.go:448: cmd/wisp/panel_host_windows.go:842 binds "wispDispatch" through w.Bind, and frontend/src/lib/panel.ts never reads window.wispDispatch - a bound door no page line reaches for is dead weight, and the two-sided name tie is the whole capability (ticket 114 AC#10). The page's window.* reads: frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatchX
+--- FAIL: TestTheBoundDispatchDoorIsReachableFromThePage (0.07s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.750s
+FAIL
+new-pin rc=1
+
+$ older .postMessage( reachability instrument on the SAME mutated tree
+=== RUN   TestTheRendererHoldsExactlyOneDoorToTheHost
+    composer_test.go:594: renderer door held: 113 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+--- PASS: TestTheRendererHoldsExactlyOneDoorToTheHost (0.03s)
+=== RUN   TestPlantedRendererDoorShapesGoRed
+    composer_test.go:678: red as required: 3 outside call sites, 1 assembled routes, 3 unknown literals, door 2 named 3 line(s)
+--- PASS: TestPlantedRendererDoorShapesGoRed (0.03s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	1.418s
+old-instrument rc=0
+
+# 判读：三突变各自红且逐字点名（m1 缺 Bind＋剩余站点清单；m2 绑的是 "wispDispatchX" 而页读 window.wispDispatch；m3 绑 "wispDispatch" 而页读只剩 window.wispDispatchX）；
+# 同一棵突变树上旧 .postMessage( 尺全部 PASS（m3 更是页面侧改动、仍在其射程外）＝第三装法在旧尺射程外的事实现场。

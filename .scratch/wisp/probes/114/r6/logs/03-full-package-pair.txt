@@ -1,0 +1,19 @@
+# 114-r6 log 03 — 抽核：internal/panel 整包 A/B（同一棵仓外树，有无新钉各一跑）＋ live 窗口读
+# A/B 同树（D:\tmp\wisp114r6\tree，HEAD 3b6f170f 导出）：A=有新钉（packA.txt）／B=移走新钉（packB.txt），-count=1 -v ./internal/panel/
+# A: RUN=225 PASS=142 FAIL=7 rc=1
+# B: RUN=223 PASS=141 FAIL=7 rc=1
+# RUN 差 +2＝新钉顶层＋其子控；PASS 差 +1＝新钉顶层；红集 diff（逐名）：
+$ diff <(grep '^--- FAIL' packA.txt | sed 's/ ([0-9.]*s)//') <(grep '^--- FAIL' packB.txt | sed 's/ ([0-9.]*s)//')
+SAME SET
+# 树的 7 红＝2 枚树工件＋5 枚 live 既有：TestReadGitOnThisRepositoryIsSelfConsistent（git archive 树无 .git）＋TestComposerRenderFixtureTellsTheTruth（导出件为 CRLF，该尺块分隔符写字面 ' -->\n'，live 工作副本为 LF 故过）——两枚均与本次改动无关（A/B 同集即证）。
+
+# live 树整包（同窗口，含 frontend/design 未提交脏面）：
+$ GOTMPDIR='C:\tmp\wisp114r6gotmp' go test -count=1 -v ./internal/panel/   → RUN=225 PASS=144 FAIL=5 rc=1
+# 5 红逐名（与 v1/a5 记录同集）：
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.33s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.60s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+# 新钉绿句（逐字）：
+    bound_dispatch_door_114_test.go:454: bound door held: 36 cmd/wisp production file(s), 2 w.Bind door site(s) [cmd/wisp/panel_host_windows.go:842 binds "wispDispatch" via panelDispatchBinding; cmd/wisp/panel_host_windows.go:892 binds "wispProbeRT" via "wispProbeRT"], 1 skipped non-door .Bind call(s); 27 window.* read site(s) under frontend/, door-relevant: [frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch]
