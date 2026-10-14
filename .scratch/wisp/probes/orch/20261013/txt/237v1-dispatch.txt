@@ -1,0 +1,43 @@
+# 237-v1 派单（票 237 三格的**非实现者**判语；验收腿；面＝internal/tools）
+
+发送时刻：2026-10-14 09:5x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `237-v1`**（非实现者；实现者＝`237-r1`）。⛔ 不翻框、⛔ 不动 `Status:`/票名——判语交回，框由编排者凭你的表翻。
+
+## 被裁对象
+
+- `d8a4d913`（产码/测试面：`internal/tools/subagent_197_test.go` +1、`subagent_222_test.go` +135/−47；**零产码**）／`f3dc1389`（交付件：`probes/237/r1/evidence.md` 84 行＋锚/现量/变异/门禁读数＋票尾 1 bullet）。
+- 票：`.scratch/wisp/issues/237-race-run-exposes-a-parentheft-inference-that-never-held-plus-two-things-only-a-human-reads.md`（三格 AC＋禁区＋"跑突变/-race 的腿绝不并发"）。
+- 来路：非实现者裁决腿 `235-v1`（`docs/evidence/s1/235-pool-nail-and-bridge-preread-v1.md`）。
+
+## 实现者自报（要你独立核，⛔ 不许只引）
+
+1. **AC#1 选甲**：`parkParents` 从"收满 n 枚 started 后拿 `len(h.parked)` 当快照"改成"**每枚父任务各收一枚 parked 签**"（说清：真没在等的那枚以自己的结果现身，不再甩给护栏）。改前红两发（`-race -count=60 -run Test222 ./internal/tools/`：shot1 3 枚 FAIL／shot2 1 枚，全为"只有 3/4 枚父任务到达等待点"句、DATA RACE 0）；改后同命令 ×2 零红＋提交后 `-count=20` 零红。
+2. **AC#3 选甲**：`awaitChildOnBridge222(t,n)` 收紧成逐枚＋到达托底计数＋父结果退出时一次性交回（**未走 strict**，理由：慢而诚实的孩子可合法晚于别的父任务返回到达）；四形读数＝①一枚绕过（after）三腿全红 ②同形收紧前 leg2/leg3 全绿（235-v1 点名失明形）③全量绕过（M3）三红 ④`x-noopadmit-after`（harness 修复回退成 no-op）三红。
+3. **收紧期间撞出独立真形（已修，在测试面）**：孩子 C25 scope 从未开 ⇒ `subagent_197.go:487` 首枚 mark 落父名后、未注册 task id 走桥被判 `unbound-scope` L2 ⇒ `NoGate` 打回（`gate.go:144`）⇒ 孩子根本没上桥。修法＝harness `AdmitTask` 每任务边界补 `OpenTask`/`CloseTask`（照 `pointer_185_cli_seam_test.go:346` 先例）。
+4. **AC#2**：`subagent_197_test.go` 守池注释段尾 +1 行（`1 0` 净；⛔ 未新写"断言注释文字"的测试）。
+5. 门禁：build 0／vet 0／gofumpt 0／d22scan clean／长度门 GREEN（58=58）／全包 `-race` ok 24.773s；`git status --porcelain -- internal cmd` 空。
+
+## 你要独立做的（每格判"成立/附条件/不成立"＋逐条凭据）
+
+1. **AC#1**：① 自己造一发**回退形**（`-overlay` 把 `parkParents` 的等待逻辑退回快照形）⇒ `-race -count=60`（或至少 count≥20）必须**红**且红句是"父任务没到达等待点"那族；② 交付态自己跑 **`-race -count=60`（或 N≥20）** 零红；③ 读 `d8a4d913` 的 `parkParents` diff——判"等的确实是它依赖的那件事"（⛔ 不许是"多等一会儿"/降 count 换绿）。
+2. **AC#3**：用实现者留的 `mut/x-partial-after|before`、`x-full-after`、`x-noopadmit-after` ＋同名 `overlay-*.json`（在 `probes/237/r1/`，现读点名），**自己复跑 ≥2 形**（建议 ① 一枚绕过 ② noopadmit 控制），核四形读数；★**最关键判语＝harness 的 C25 scope 补丁不是放宽**（noopadmit 控制 + 一枚绕过形仍红 双向坐实）。
+3. **unbound-scope L2 归因链**：按 `dump5-leg2.txt`（68,968 B，留盘）＋现读源码，核链条 `subagent_197.go:487 → 未注册 task id → bridge unbound-scope L2 → gate.go:144 NoGate 打回`；给"归因成立/否"。
+4. **AC#2**：`git show d8a4d913 -- internal/tools/subagent_197_test.go` 现读＝**纯注释、+1/−0**；⛔ 无断言变动。
+5. **零产码**：`git diff d8a4d913~1..f3dc1389 -- internal/tools/subagent_197.go internal/tools/bridge.go` 现读＝空（编排者已核=0，你复核）；另扫两笔 commit 的完整名册确认没碰第三枚文件。
+6. **门禁抽核**：`sh scripts/d22scan.sh` clean／`GOFLAGS= go build ./...` rc=0／长度门 GREEN——各现跑一发。
+7. **★实现者留给编排者的具名项（你给它一个"生产面读数"）**：实现者说"composition root 从不开 task scope ⇒ 子代理/第二个任务首次工具调用可能被判 unbound-scope L2＝可复量形状，建议编排者落账"。你要给**生产面的现读**：`cmd/wisp` 装配根/`bridge.OpenTask` 的生产调用链（票 151 曾记"OpenTask 在 dispatch 热路径"）——**生产里每个任务的 scope 到底谁开、什么时候开**；判它"只在 harness 缺、生产无恙"还是"生产同样有真形"（含证据行号）。这决定编排者立不立票。
+
+## 环境与纪律（十条）
+
+1. 只 commit、⛔ 不 push；`git add`/`commit` 显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内不建 worktree；临时件只建不删；别人脏件别动。
+2. `GOTMPDIR` ⛔ 只 C:（你的例 `C:\tmp\wisp237v1gotmp`）；`-race` 重跑前 `tasklist` 看台面。
+3. 他腿 `313-v1`（panel/config/cmdwisp 面）在飞——与你**零文件重叠**；你的 `-race`/突变**窗口起止时刻逐报**（纪律）。
+4. 突变方法论：`-overlay` 优先；真改文件形＝仓外备份＋sha256 逐字节还原证；⛔ 不看还原证不算凭据。
+5. 门禁表见上第 6 条；大日志留盘不入库（件里点名＋字节数）。
+6. 票面：票 237 尾**追加 1 条 bullet**；⛔ 框不翻、`Status:` 不动。
+7. 产出预算：交件 ≤7 枚 ≤200 行——`docs/evidence/s1/ticket237-237-v1-accept-v1.md`＋`probes/237/v1/`（锚＋logs）＋票尾 bullet。
+8. **未定义即停**：回退形做不圆、某形读数与实现者对不上、生产面判不了 ⇒ 停手上报。
+9. ⛔ 不许为了"复核好看"改实现者的件；你的读数全部现跑、带命令＋时刻＋rc。
+10. 回执：结论先行（三格判语＋生产面读数）＋自造/复跑逐发红绿句＋门禁 rc＋具名没做。
+
+发送时刻现量：HEAD `f3dc1389` 之后（编排者三把尺已过：两笔 commit 在／件齐／亲跑 `-race -count=20 -run Test222` ok 4.305s／产码零动核=0）；`313-v1` 在飞；CPU ~44%。

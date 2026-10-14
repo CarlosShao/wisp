@@ -17596,3 +17596,11 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 
 - 派单/send 存档在盘。要点：★页面侧已落地（机主前端会话 `9e9964f8`）⇒ 本腿最值钱的一格＝**契约双向对拉**（Go 载荷 ↔ `313-panel-ask.md` ↔ `frontend/src/lib/config-view.ts`/`model-settings.tsx` 读键，`frontend/**` 只读）；失败集归因必须把他们的提交算进去。
 - 面图：`313-v1`＝panel/config/cmdwisp 三包（255-v3 已收、名册面已静 ⇒ 写面独享）；`237-r1`＝tools -race（零重叠，窗口报时刻）。⛔ 未 push（未推约 319）。
+
+
+## A904｜2026-10-14 09:50:04 +08｜237-r1 收件（三把尺过：产码零动核=0；亲跑 `-race -count=20 -run Test222` ok 4.305s）＋派 `237-v1`（三格判语＋★"生产面 task-scope"读数一项）＋在飞（2）
+
+- **237-r1 交件**：`d8a4d913`（仅两枚 `_test.go`，+136/−47；**零产码**）＋`f3dc1389`（交付：`evidence.md` 84 行＋4 枚读数＋票尾 bullet）。三格自报：AC#1 甲（`parkParents` 逐枚 parked 签名因果等待；改前红两发 `-race -count=60`、改后零红×2＋提交后 count=20）／AC#3 甲（`awaitChildOnBridge222` 逐枚＋到达托底＋退出时一次性交回；四形读数）／AC#2（注释 +1/−0）。★收紧期间撞出**独立真形**并修好（在测试面）：孩子 C25 scope 从未开 ⇒ 首枚 mark 落父名 ⇒ 未注册 task id 走桥被判 `unbound-scope` L2 ⇒ `NoGate` 打回（`gate.go:144`）⇒ 孩子没上桥；修法＝harness `AdmitTask` 每任务边界补 `OpenTask/CloseTask`（`pointer_185_cli_seam_test.go:346` 先例）。门禁：build/vet/gofumpt/d22scan/长度门/全包 -race 全 0。
+- **编排者三把尺**：两笔 commit 在／件齐（evidence 84 行）/亲跑 `-race -count=20`＝ok 4.305s／**产码零动核 `git diff -- subagent_197.go bridge.go`＝0 行**。
+- **派 `237-v1`**（非实现者）：三格判语＋回退形自造＋四形复跑（≥2）＋归因链核＋门禁抽核＋**★实现者留给编排者的具名项＝"生产面 task-scope"读数**（生产里每个任务的 C25 scope 谁开、何时开；判"只在 harness 缺"还是"生产同样有真形"——这决定立不立票）。派单/send 存档在盘。
+- **在飞（2）**：`313-v1`（panel/config/cmdwisp）／`237-v1`（tools）——零文件重叠、窗口双报。⛔ 未 push（未推约 320）。
