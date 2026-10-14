@@ -1,0 +1,51 @@
+== git diff --stat -- .github/workflows/ci.yml ==
+warning: in the working copy of '.github/workflows/ci.yml', LF will be replaced by CRLF the next time Git touches it
+ .github/workflows/ci.yml | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
+
+== git diff -- .github/workflows/ci.yml ==
+warning: in the working copy of '.github/workflows/ci.yml', LF will be replaced by CRLF the next time Git touches it
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index a5075a3e..80b7a393 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -802,12 +802,21 @@ jobs:
+         # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
+         # reports `ok` and matches nothing. Verified locally on Windows: PASS=1,
+         # SKIP=0, === RUN=1 through the script; the drifted pattern exits 1.
+-        # DO NOT READ THIS WIRING AS A FIX OR A MASK: the step FAILS on
+-        # windows-latest today for its own real reason (run 35551819606 job
+-        # 106188167785: USERPROFILE's 8.3 form RUNNER~1 makes the A-tier anchor
+-        # classify B, want ClassA), and runtests.sh propagates a non-zero `go
+-        # test` exit code unchanged (registry A43② documents the same discipline
+-        # for the vet failure that hid this gate).
++        # DO NOT READ THIS WIRING AS A FIX OR A MASK: the junction case really
++        # passes on windows-latest - read off dev @ 2c764c04, run 328 job
++        # 115593146575 (2026-10-13 23:34Z) and run 327 job 115086275360
++        # (2026-10-13 01:46Z): both carry step conclusion=success, `--- PASS:
++        # TestPathResolverJunctionWindows` and `runtests.sh: OK -
++        # packages=[./internal/risk/ -run TestPathResolverJunctionWindows]
++        # top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1`. The 8.3 short-name cause
++        # (USERPROFILE's RUNNER~1 form) did not go away - in those two runs it
++        # lands on the sibling `--scope=windows` step, not here: same package,
++        # TestPathResolverShortNameAListDenied, TestPathResolverUNCAListDenied
++        # and TestPathResolverExtendedLengthPrefixAListDenied all FAIL with
++        # `want "C:\\Users\\RUNNER~1\\..."`. runtests.sh propagates a non-zero
++        # `go test` exit code unchanged (registry A43② documents the same
++        # discipline for the vet failure that hid this gate), so a red here
++        # would still be real.
+         shell: bash
+         if: ${{ !cancelled() }}
+         run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows
+
+== line-ending check ==
+HEAD    CRLF count: 0 | bare LF: 1032
+worktree CRLF count: 0 | bare LF: 1041
+
+== comment-only proof: strip every comment line from both revisions, compare ==
+HEAD non-comment lines: 304 | worktree non-comment lines: 304
+non-comment content identical: True
+
+== per-diff-line proof: every added/removed diff line must be a comment ==
+non-comment changed lines: 0 (want 0)
+rc=0

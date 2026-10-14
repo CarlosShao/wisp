@@ -1,0 +1,38 @@
+== run 327 metadata (gh api) ==
+workflow=ci run_number=327 id=38332849280 head_branch=dev head_sha=2c764c04804f3de09c03c5a6bad0402198d496bf created=2026-10-13T01:35:26Z conclusion=failure
+
+== job 115086275360 step conclusions (gh api, steps 10-11) ==
+job id=115086275360 name=test-windows conclusion=failure
+step 10 | Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord) | conclusion=failure | started=2026-10-13T01:45:21Z | completed=2026-10-13T01:46:08Z
+step 11 | PathResolver junction placeholder (real cases tickets 18/20) | conclusion=success | started=2026-10-13T01:46:08Z | completed=2026-10-13T01:46:09Z
+
+== junction step (step 11) log, raw log lines 6171-6182 ==
+test-windows	UNKNOWN STEP	2026-10-13T01:46:08.6707188Z ##[group]Run bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows
+test-windows	UNKNOWN STEP	2026-10-13T01:46:08.6707984Z ^[[36;1mbash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows^[[0m
+test-windows	UNKNOWN STEP	2026-10-13T01:46:08.6724991Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+test-windows	UNKNOWN STEP	2026-10-13T01:46:08.6725376Z env:
+test-windows	UNKNOWN STEP	2026-10-13T01:46:08.6725554Z   WISP_ENV: test
+test-windows	UNKNOWN STEP	2026-10-13T01:46:08.6725736Z ##[endgroup]
+test-windows	UNKNOWN STEP	2026-10-13T01:46:09.7003772Z time=2026-10-13T01:46:09.536Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+test-windows	UNKNOWN STEP	2026-10-13T01:46:09.7004875Z === RUN   TestPathResolverJunctionWindows
+test-windows	UNKNOWN STEP	2026-10-13T01:46:09.7005403Z --- PASS: TestPathResolverJunctionWindows (0.03s)
+test-windows	UNKNOWN STEP	2026-10-13T01:46:09.7005899Z PASS
+test-windows	UNKNOWN STEP	2026-10-13T01:46:09.7006271Z ok  	github.com/CarlosShao/wisp/internal/risk	0.082s
+test-windows	UNKNOWN STEP	2026-10-13T01:46:09.9643605Z runtests.sh: OK - packages=[./internal/risk/ -run TestPathResolverJunctionWindows] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0
+
+== step 10 (Portable windows tests) excerpt, raw log lines 5154-5164 ==
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2684602Z === RUN   TestPathResolverJunctionWindows
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2684931Z --- PASS: TestPathResolverJunctionWindows (0.04s)
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2685264Z === RUN   TestPathResolverShortNameAListDenied
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2686969Z     pathresolver_junction_windows_test.go:135: short name did not expand to long path: got "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestPathResolverShortNameAListDenied1202975703\\001\\.git-credentials" want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverShortNameAListDenied1202975703\\001\\.git-credentials"
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2688301Z --- FAIL: TestPathResolverShortNameAListDenied (0.03s)
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2688638Z === RUN   TestPathResolverUNCAListDenied
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2690554Z     pathresolver_junction_windows_test.go:164: UNC spelling "\\\\?\\UNC\\localhost\\c$\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverUNCAListDenied2533501355\\001\\.git-credentials" normalized to "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestPathResolverUNCAListDenied2533501355\\001\\.git-credentials", want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverUNCAListDenied2533501355\\001\\.git-credentials"
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2692168Z --- FAIL: TestPathResolverUNCAListDenied (0.02s)
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2692731Z === RUN   TestPathResolverExtendedLengthPrefixAListDenied
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2695610Z     pathresolver_junction_windows_test.go:182: \\?\ spelling normalized to "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\TestPathResolverExtendedLengthPrefixAListDenied1095253330\\001\\.git-credentials", want "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverExtendedLengthPrefixAListDenied1095253330\\001\\.git-credentials"
+test-windows	UNKNOWN STEP	2026-10-13T01:46:07.2698009Z --- FAIL: TestPathResolverExtendedLengthPrefixAListDenied (0.03s)
+
+== raw full log ==
+1075384 bytes  .scratch/wisp/probes/236/r5/logs/run327-test-windows.log
+6198 .scratch/wisp/probes/236/r5/logs/run327-test-windows.log

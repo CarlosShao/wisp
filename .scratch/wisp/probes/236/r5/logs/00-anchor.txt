@@ -1,0 +1,23 @@
+anchor-time: 2026-10-14 10:38:59 +0800
+HEAD: b8f883a37cfbb3389014ffb6bba9f8ca55f67a76
+HEAD short: b8f883a3
+ci.yml blob: a5075a3ea219e1c59100d5c962f0db14de376a5a
+ci.yml worktree blob: a5075a3ea219e1c59100d5c962f0db14de376a5a
+ticket blob: 3786a6ad6ebce43f321dd125f4b2e1f514cd49d9
+--- git status (target files) ---
+--- ci.yml target lines 799-813 ---
+      - name: "PathResolver junction placeholder (real cases tickets 18/20)"
+        # bash + runtests.sh (ticket 71 AC#3): the file that declares this test is
+        # pathresolver_junction_windows_test.go, so on any runner where the name or
+        # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
+        # reports `ok` and matches nothing. Verified locally on Windows: PASS=1,
+        # SKIP=0, === RUN=1 through the script; the drifted pattern exits 1.
+        # DO NOT READ THIS WIRING AS A FIX OR A MASK: the step FAILS on
+        # windows-latest today for its own real reason (run 35551819606 job
+        # 106188167785: USERPROFILE's 8.3 form RUNNER~1 makes the A-tier anchor
+        # classify B, want ClassA), and runtests.sh propagates a non-zero `go
+        # test` exit code unchanged (registry A43② documents the same discipline
+        # for the vet failure that hid this gate).
+        shell: bash
+        if: ${{ !cancelled() }}
+        run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows

@@ -1,0 +1,9 @@
+== yaml check: safe_load both revisions + structural equality ==
+yaml ok (both revisions parse under yaml.safe_load)
+parsed structures equal: True
+python rc=0
+
+== literal dispatch command ==
+$ python -c "import yaml,sys; yaml.safe_load(open('.github/workflows/ci.yml',encoding='utf-8')); print('yaml ok')"
+yaml ok
+literal command rc=0
