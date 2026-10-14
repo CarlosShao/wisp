@@ -38,3 +38,7 @@
   6. AC#3：`isRunnableCase133` 去掉 `fd.Recv != nil` 半边（≠r1 的 `return true` 顶置）。
   7. AC#4：注册表腿名换靶 1 行；usage 加一枚 `phantomcmd` 行；`run`↔`models` 两枚 claim 的 test 名对调 2 行；
      删整枚 `case "doctor"` 子句（y1drop）；`args := os.Args[1:]` → `args := os.Args`（y2blind）。
+- **收笔后漂移补记**：本腿提交 `c1975a7c` 的父＝`8616d71a`（b75089cc 之后再前进一步）；
+  该步在 `cmd/wisp/` 只新增别的腿的 `task_output_pointer_notice_174r8_test.go`。
+  在 `8616d71a` 快照上复跑本票四用例 rc=0 全 PASS、账本 12 legs/4 claims（17-head2-green.log）
+  ⇒ 本文件全部读数对 `8616d71a` 依旧成立。

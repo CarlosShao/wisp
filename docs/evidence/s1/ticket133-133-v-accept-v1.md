@@ -124,3 +124,12 @@ step 自己的四数逐字 **RUN=410 PASS=297 FAIL=2 SKIP=1**；该 step 2 枚�
 - 本表；`probes/133/v/`：`00-anchor-env-windows.md`、`01-ac1-five-shots.txt`、
   `02-ac3-ac4-mutations.txt`、`03-ac5-ac6-gates.txt`、`04-face-and-undone.md`（5 枚，皆 ≤200 行）；
   票面 1 条 bullet（append-only）；仓外原档 `D:/tmp/wisp133v/logs/`（只建不删）。⛔ 未 push。
+
+## §10 收笔后漂移补记（append-only，2026-10-14 21:5x）
+
+- 本腿提交 `c1975a7c` 的父提交是 **`8616d71a`**（"编排者：171s 遗产代提＋174-r9 半程"），而非快照锚 `b75089cc`：
+  `b75089cc → 8616d71a` 之间 `cmd/wisp/` 唯一变化＝新落件 `cmd/wisp/task_output_pointer_notice_174r8_test.go`
+  （本波另一条腿，已提交；本腿零触碰）。
+- 因此在新父上重跑了本票四枚用例（快照 `D:/tmp/wisp133v/head2`＝`git archive 8616d71a`）：
+  `rc=0` 四枚全 PASS、账本仍 `12 legs, 4 claims` ⇒ **新落件未扰动本尺；本表全部读数对 `8616d71a` 依旧成立**
+  （原档 `D:/tmp/wisp133v/logs/17-head2-green.log`）。
