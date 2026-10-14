@@ -139,13 +139,20 @@ const (
 	// noArgsLeg133 names func main's `if len(args) == 0` branch, the one leg with
 	// no case label to read.
 	noArgsLeg133 = "no-args"
-	// minLegs133 is the lower bound on the enumerated census. Measured at the
-	// commit this file landed: nine literal case labels (run, providers, doctor,
-	// secret, models, slo, panel-assets, version, help), the no-args branch, and
-	// the switch's default. A dispatch rewrite that parses to nothing has to trip
-	// this, not pass quietly - ticket 131's AC#4 names the same hole in its own
-	// census, which is computed from main.go's shape rather than from a floor.
-	minLegs133 = 11
+	// minLegs133 is the lower bound on the enumerated census, and the number is
+	// the measurement rather than a guess: 12 legs were enumerated on this
+	// directory in the run this floor was raised in (2026-10-14, ticket 133 leg
+	// r1): ten literal case labels (run, providers, doctor, secret, models, slo,
+	// panel-assets, panel-inbound, version, help), the no-args branch, and the
+	// switch's default. It was 11 when this file landed; panel-inbound is newer,
+	// and a floor left at the old measurement lets one leg leave the census in
+	// silence, which is exactly the audible-shortening reading AC#4 asks for. A
+	// dispatch rewrite that parses to nothing has to trip this, not pass quietly
+	// - ticket 131's AC#4 names the same hole in its own census, which is
+	// computed from main.go's shape rather than from a floor. The predicate is
+	// floorReds133 (dispatch_hop_selfproof_133_test.go), so the gate and the
+	// self-proof leg exercise the same number.
+	minLegs133 = 12
 )
 
 // usageCommand133 reads one documented command line out of the usage block.
@@ -164,13 +171,20 @@ type legCover133 struct {
 	leg   string
 	test  string
 	entry string
+	// process marks a claim whose only driver is a real process: the case boots
+	// the binary instead of calling the entry, so the pair half of the claim
+	// (does this case drive this entry) cannot be checked in-process and is
+	// disclosed in the ledger instead of being waved green. Ticket 131's own
+	// ledger records the same limit for the same nail in its `subprocess:`
+	// wording.
+	process bool
 }
 
 var legCovers133 = []legCover133{
 	{leg: "run", test: "TestAC2SealNoticeLandsInTheRunLegLogFile", entry: "runTextTask"},
 	{leg: "models", test: "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk", entry: "cmdModels"},
 	{leg: "secret", test: "TestAC3SecretLegBooksItsAuditRecordsOnDisk", entry: "cmdSecret"},
-	{leg: "no-args", test: "TestAC1ResidentLegInstallsItsLogListenerOnDisk", entry: "runResident"},
+	{leg: "no-args", test: "TestAC1ResidentLegInstallsItsLogListenerOnDisk", entry: "runResident", process: true},
 }
 
 // TestAC1AC2DispatchHopGate133 is the gate. Every red below names a leg, a symbol
@@ -184,9 +198,8 @@ func TestAC1AC2DispatchHopGate133(t *testing.T) {
 	for _, r := range reds {
 		t.Errorf("AC#1/#2 RED: %s", r)
 	}
-	if len(legs) < minLegs133 {
-		t.Errorf("AC#1/#2 RED: the leg census enumerated %d legs (%d is the floor, measured when this gate landed), so a dispatch rewrite is being read as \"no legs\" rather than reported. Census: %s",
-			len(legs), minLegs133, strings.Join(legKeys133(legs), ", "))
+	for _, r := range floorReds133(legs) {
+		t.Errorf("AC#1/#2 RED: %s", r)
 	}
 
 	sinks := pkg.sinkCallers133()
@@ -207,6 +220,15 @@ func TestAC1AC2DispatchHopGate133(t *testing.T) {
 
 	for _, r := range pkg.coverageReds133(legs) {
 		t.Errorf("AC#1 RED: %s", r)
+	}
+
+	// AC#4: no two legs may wear the same ledger row, and the coverage column may
+	// not say one thing for every leg at once (a table that is true for every row
+	// is the Y3 shape: the judgement replaced by its expectation). The predicate
+	// is exercised on planted twins by TestAC3SelfProof133... in
+	// dispatch_hop_selfproof_133_test.go.
+	for _, r := range distinctnessReds133(legs) {
+		t.Errorf("AC#4 RED: %s", r)
 	}
 
 	// The instrument's own blindness, reported instead of leafed past.
@@ -1405,6 +1427,17 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 		}
 		claimedBy[c.leg] = append(claimedBy[c.leg], c)
 	}
+	// AC#4, the roster half read as a two-way set difference: the registry is a
+	// list of legs, the census is the other list, and a claim for a leg func main
+	// does not dispatch is a coverage claim about nothing. Shortening the registry
+	// is caught by the leg losing its nail; a claim left pointing at a renamed leg
+	// is caught here.
+	for _, c := range legCovers133 {
+		if _, ok := byLeg[c.leg]; !ok {
+			reds = append(reds, fmt.Sprintf("this gate's registry claims leg %q is nailed by %q, and func main dispatches no such leg: the registry and the census are the two lists this gate reconciles, and a claim for a command nobody dispatches is a coverage claim about nothing. A rename would otherwise leave its nail behind in silence - the Y1 shape ticket 129's readings were filed for.",
+				c.leg, c.test))
+		}
+	}
 
 	for _, leg := range legs {
 		nails := claimedBy[leg.key]
@@ -1422,7 +1455,7 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 		case len(nails) > 0:
 			var ns []string
 			for _, n := range nails {
-				ns = append(ns, n.test+" -> "+n.entry)
+				ns = append(ns, n.test+" -> "+n.entry+processNote133(n))
 				if !p.hasDecl133(n.entry) {
 					reds = append(reds, fmt.Sprintf("leg %q's nail %q claims it drives %q, which this directory does not declare.", leg.key, n.test, n.entry))
 					continue
@@ -1430,6 +1463,15 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 				if !leg.reached[n.entry] {
 					reds = append(reds, fmt.Sprintf("leg %q (%s) is claimed by nail %q on entry %q, and the dispatch no longer reaches that symbol. This is the dispatch hop itself: the case still compiles and still reads a disk, but the command it names is not wired to the code it claims to cover.",
 						leg.key, leg.site, n.test, n.entry))
+				}
+				// AC#4, the per-claim half: the pair IS the claim. Ticket 131
+				// measured this hole over there as R-131-2 (two nails whose legs
+				// were swapped, the package green), and this registry has the
+				// same two halves - swapping the case names between two claims
+				// here used to leave every row reading `nail ... -> ...` while
+				// neither case drove what it was booked against.
+				if !n.process && !p.testDrivesEntry133(n.test, n.entry) {
+					reds = append(reds, fmt.Sprintf("leg %q's nail pairs the case %q with the entry %q, and that case never calls %q: a nail whose two halves point at different legs is a claim about neither. Fix: name the case that drives this leg's entry, or mark the claim process-shaped if a real process is the only driver.", leg.key, n.test, n.entry, n.entry))
 				}
 			}
 			leg.covered = "nail " + strings.Join(ns, ", ")
