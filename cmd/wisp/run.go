@@ -936,8 +936,10 @@ func (rt *agentRuntime) auditf(format string, args ...any) {
 
 // admitTask is this composition root's per-task boundary: it registers the
 // TEXT-loop task with the D47 gate and hands back the revocation the loop
-// defers (internal/agent/loop.go:366). The revocation now also closes the
-// task's C25 taint scope on the bridge (ticket 151).
+// defers (internal/agent/loop.go:374). The same boundary owns the task's C25
+// taint scope end to end: it OPENS that scope at the task's start (ticket 315)
+// and the revocation CLOSES it (ticket 151). Same id, same owner both times -
+// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
 //
 // WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
 // root defers it "on the task's ..." boundary, and this is the only boundary
@@ -947,11 +949,38 @@ func (rt *agentRuntime) auditf(format string, args ...any) {
 // readings were rejected: closing after loop.Run returns would skip every
 // panic exit, and a task-lifecycle event does not exist in this tree yet.
 //
-// What this does NOT close: a task id a host-internal caller invents when it
-// dispatches on the bridge directly (no admission, no boundary). That shape is
-// recorded as an open end, not silently folded into this line.
+// WHY THIS HOOK OWNS THE OPEN TOO (ticket 315). C25's own design text puts it
+// here: Provenance.OpenScope's doc says "composition root calls this at task
+// start" and scopeMarks' fail-closed log asks the wiring to "ensure OpenScope
+// at task start". Until ticket 315 the only production open was the bridge's
+// lazy one inside mark() - i.e. only AFTER a call already produced a
+// sensitive-source result - so a task that had read nothing yet sat
+// unregistered, and the moment ANY other scope held a taint it was judged
+// L2/R4 "unbound-scope": the first child's conclusion is stamped into the
+// PARENT's scope (internal/tools/subagent_197.go stampConclusion), which made
+// the sibling child's own first allowlisted fs.read land on a real card and
+// auto-reject on the production default 31s timeout (reproduced live, red:
+// .scratch/wisp/probes/315/a1/evidence.md; green nail:
+// cmd/wisp/zz315a1probe_test.go). The two rejected alternatives: opening from
+// inside the child loop would need a new route from internal/agent to the C25
+// engine and would still leave the ROOT loop task unregistered; opening on
+// every bridge dispatch would run ahead of the assessor and make the unbound
+// fail-closed branch unreachable for bridge calls (a C19/C25 verdict change),
+// while also growing a scope per host-invented id that no owner would close.
+// None of C19/C25's verdict logic moves here - only the wiring the contract
+// already prescribed. The lazy open in bridge.mark stays as the backstop for
+// callers that dispatch without crossing this boundary.
+//
+// What this does NOT open/close: a task id a host-internal caller invents when
+// it dispatches on the bridge directly (no admission, no boundary). That shape
+// is recorded as an open end, not silently folded into this line.
 func (rt *agentRuntime) admitTask(taskID string) func() {
 	rt.noteTask(taskID)
+	// The open side of the pair, at the task's own start: from here until the
+	// revocation below this task's scope is registered, so its own first bridge
+	// call is inspected against its own (still untainted) scope instead of
+	// failing closed as an unbound one (ticket 315).
+	rt.bridge.OpenTask(taskID)
 	revoke := rt.gate.AdmitTextTask(taskID)
 	return func() {
 		if revoke != nil {

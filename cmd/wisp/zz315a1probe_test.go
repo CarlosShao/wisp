@@ -1,6 +1,8 @@
 package main
 
-// zz315a1probe_test.go — ticket 315 AC#0's LIVE re-measurement (probe leg 315-a1).
+// zz315a1probe_test.go — ticket 315's live re-measurement (AC#0, probe leg
+// 315-a1) and, since leg 315-r1 landed the fix, the STANDING REGRESSION NAIL for
+// the production shape it reproduced.
 //
 // WHAT IS MEASURED. A REAL `wisp run` composition root — real config.toml ->
 // real secret.Store -> real approval.Gate (run.go's approval.New) -> real
@@ -28,20 +30,34 @@ package main
 //	child 乙  ends, root turn 3 -> run closes
 //
 // The assertions are the EXPECTED-CORRECT readings (an allowlisted read inside
-// the allowlist is L0; no confirmation card is owed). While ticket 315's bug is
-// live this case is RED by construction, which is why it is env-gated: without
-// WISP_315A1=1 it is skipped BY NAME, so the package's own runs are not broken
-// by a probe that exists to ring.
+// the allowlist is L0; no confirmation card is owed).
 //
-//	WISP_315A1=1 go test ./cmd/wisp/ -run 'TestZZ315A1' -count=1 -v
+// RED BEFORE, GREEN AFTER, AND WHY IT IS NO LONGER ENV-GATED. While ticket 315's
+// bug was live, case B was RED by construction (乙's first bridge call judged
+// L2/R4 "unbound-scope", a real card, auto-reject after the 31s production
+// default), so 315-a1 landed it behind WISP_315A1=1. Two things ended that:
+//   1. leg 315-r1 fixed the root cause (cmd/wisp/run.go admitTask now OPENS the
+//      task's own C25 scope at its start, pairing the CloseTask ticket 151 put
+//      in the same hook), and the same run is green and fast — 0.21s, no card,
+//      no 31s wait (pre-fix: rc=1, 31.22s; readings in
+//      .scratch/wisp/probes/315/{a1,r1}/).
+//   2. An env-gated t.Skip is NOT neutral in this repo: the cli scope
+//      (scripts/wisp-cli-tests.sh -> portable-tests.sh --scope=cli) runs every
+//      cmd/wisp test through tools/d22scan/runtests.sh, where ANY top-level
+//      `--- SKIP` is fatal (ticket 71 AC#3), and no ledger row accounts for this
+//      name. Measured at HEAD 5ed56c2f: the strict runner exits 1 with SKIP=1 on
+//      this very test (probes/315/r1/logs/12-prefix-gated-skip-under-strict-runner.txt).
+//      De-gating removes the skip, registers nothing in scripts/portable-tests.sh
+//      (another leg's face) and gives the fix a permanent witness in the default
+//      package run, which is this package's own tradition for composition-root
+//      tests (run_test.go, task_scope_close_151_test.go).
 //
-// Case A (TestZZ315A1RootLoopFirstBridgeCall) is the no-other-marks control and
-// runs ungated: no seed scope holds a mark, so the root's own first bridge call
-// must execute as L0 — that is the baseline which makes case B's reading mean
-// something.
+// Case A (TestZZ315A1RootLoopFirstBridgeCall) is the no-other-marks control: no
+// seed scope holds a mark, so the root's own first bridge call must execute as
+// L0 — that is the baseline which makes case B's reading mean something.
 //
-// 只读复量：this file adds one zz-prefixed probe carrier and changes no
-// production file. It is evidence, kept (临时件只建不删).
+// 只读复量：this file is a zz-prefixed carrier; the only production byte ticket
+// 315 changed is cmd/wisp/run.go's admitTask. Kept (临时件只建不删).
 
 import (
 	"context"
@@ -504,7 +520,9 @@ func TestZZ315A1RootLoopFirstBridgeCall(t *testing.T) {
 
 // ---------------------------------------------------------------------------
 // Case B: the ticket's shape — a sibling child's first bridge call after the
-// first child's conclusion has stamped the PARENT's C25 scope.
+// first child's conclusion has stamped the PARENT's C25 scope. This is the
+// STANDING NAIL for ticket 315: it is red on the pre-fix tree (probes/315/a1)
+// and green on the fix (admitTask opens the task's own scope at its start).
 // ---------------------------------------------------------------------------
 
 const (
@@ -513,9 +531,6 @@ const (
 )
 
 func TestZZ315A1SiblingChildFirstBridgeCall(t *testing.T) {
-	if os.Getenv("WISP_315A1") != "1" {
-		t.Skip("ticket 315 AC#0 repro probe: RED while the bug is live; set WISP_315A1=1 to run it")
-	}
 	note := ""
 	f := zz315Setup(t, func(dir string) string {
 		note = filepath.Join(dir, "zz315a1-note.txt")
@@ -617,6 +632,72 @@ func TestZZ315A1SiblingChildFirstBridgeCall(t *testing.T) {
 			yiRead.RiskLevel, yiRead.Decision, yiRead.ErrorClass,
 			snap.line, zz315CardLines(f.out.String()),
 			zz315AuditLine(f.errb.String(), "ANSWER-EXPIRED"), *yiRead, snap.scopes)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Case C: the OTHER shape ticket 315 named as unmeasured — a seed mark that
+// exists in a scope that is NOT the task's own, BEFORE that task's first bridge
+// call. The run's data dir carries AGENTS.md, so the projctx loader stamps
+// run:project-instructions (risk.SrcFSRead) while building the first request.
+// On the pre-fix tree even the FIRST task's own allowlisted fs.read then fails
+// closed (its own scope unregistered + a seeded mark elsewhere => L2/R4); the
+// admitTask open covers this for the same reason it covers case B: the task's
+// own scope is registered before its first bridge call. Not a new fix - a
+// reading of what the one line already covers (dispatch 315-r1 item 4).
+//
+// The precondition is ASSERTED, not assumed: the load-manifest line naming the
+// global-tier file must be on stderr, so "the seed never landed" cannot read as
+// a green.
+// ---------------------------------------------------------------------------
+
+func TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask(t *testing.T) {
+	note := ""
+	f := zz315Setup(t, func(dir string) string {
+		note = filepath.Join(dir, "zz315a1-note.txt")
+		return zz315Script(t, []zz315Turn{
+			{tool: "fs.read", args: map[string]string{"path": filepath.ToSlash(note)}, id: "call_zz315_a1c_root_read"},
+			{text: "根任务读过笔记，收口。"},
+		})
+	})
+	if err := os.WriteFile(note, []byte("zz315a1 note body：窗口编号例如 315-A1。"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	// The global tier is the run's data dir (run.go hands it to the loader as
+	// GlobalDir), and AGENTS.md is first in projctx's FileNamePriority.
+	instr := filepath.Join(f.dir, "AGENTS.md")
+	if err := os.WriteFile(instr, []byte("项目说明种子正文：这条说明必须在任何工具调用之前被 C25 盖戳。"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	start := time.Now()
+	code := f.run("315a1 探针：数据目录带项目说明时，根任务的第一发走桥调用")
+	took := time.Since(start)
+	t.Logf("case C: rc=%d in %s; golden requests=%v", code, took, f.rep.Requests)
+	t.Logf("case C raw stdout:\n%s", f.out.String())
+	t.Logf("case C raw stderr:\n%s", f.errb.String())
+	if code != 0 {
+		t.Fatalf("exit %d — the scripted run did not complete; the reading below would be misaligned.\nstdout:\n%s\nstderr:\n%s",
+			code, f.out.String(), f.errb.String())
+	}
+	// Precondition first: the seed mark really landed. The manifest line the
+	// loader logs names the file, its tier and its fate.
+	if !strings.Contains(f.errb.String(), instr) || !strings.Contains(f.errb.String(), "tier=global") {
+		t.Fatalf("前置条件缺失：数据目录里那枚 AGENTS.md 没有被装载（stderr 里找不到 tier=global 那一行），本形量不到，不算绿\nstderr:\n%s",
+			f.errb.String())
+	}
+	if strings.Contains(f.out.String(), "[确认") {
+		t.Errorf("有种子 mark（run:project-instructions）时，根任务的第一发走桥调用出了确认卡：stdout:\n%s", f.out.String())
+	}
+	read := zz315FindRow(t, f.rows(t, f.rootTaskID(t)), "fs.read")
+	t.Logf("case C root read row: %+v", *read)
+	if read.RiskLevel != memory.RiskL0 || read.Decision != agent.DecisionAllow || read.Outcome != agent.OutcomeSuccess {
+		t.Errorf("TICKET 315 REPRODUCED (project-instructions seed shape): the root's own first bridge call (allowlisted fs.read) was judged %s/%s/%s class=%q while a seed mark sits only in run:project-instructions.\n"+
+			"  stderr audit (verbatim): %s\n"+
+			"  stdout card segment:\n%s\n"+
+			"  row: %+v",
+			read.RiskLevel, read.Decision, read.Outcome, read.ErrorClass,
+			zz315AuditLine(f.errb.String(), "R4"), zz315CardLines(f.out.String()), *read)
 	}
 }
 
