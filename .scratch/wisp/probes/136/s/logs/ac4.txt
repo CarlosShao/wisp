@@ -1,0 +1,64 @@
+# ticket 136s / AC#4 (R-134-8) - a future timestamp must not be clamped to
+# "0 days old". Same seams/stub/clock as logs/ac2.txt; the named mutation原文 is
+# future-sample (SLO_FULL_LAST_SAMPLE="2027-01-01T00:00:00Z<TAB>..." with
+# SLO_FRESH_NOW=2026-09-23T09:00:00Z).
+#
+# world            what it forges                                     rc old -> new
+# control          normal fresh seam record (must stay 0)               0 -> 0
+# future-sample    P3 seam record stamped 2027-01-01                   0 -> 2
+# future-job       P2 seam record stamped 2027-01-01                   0 -> 2
+# stale-sample     10-day-old seam record (must stay red, not clamp)    1 -> 1
+
+################ tree-old (today, unfixed) ################
+
+== control rc=0
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=80 run=700
+   | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 2 valid-sample record(s) considered
+   | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+== future-sample rc=0
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2027-01-01T00:00:00Z artifact_id=10736979707 run=35831084009
+   | slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 valid-sample record(s) considered
+   | slo-freshness:   age: 0 day(s) (0 s); threshold: 3 day(s)
+   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+== future-job rc=0
+   | slo-freshness: P2 newest slo-full job record: created_at=2027-01-01T00:00:00Z status=completed conclusion=success
+   | slo-freshness:   job url: https://example.invalid/run/2
+   | slo-freshness:   age: 0 day(s) (0 s); threshold: 3 day(s)
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=10736979707 run=35831084009
+   | slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 valid-sample record(s) considered
+   | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+== stale-sample rc=1
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-13T08:45:00Z artifact_id=10736979707 run=35831084009
+   | slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 valid-sample record(s) considered
+   | slo-freshness:   age: 10 day(s) (864900 s); threshold: 3 day(s)
+   | slo-freshness: FAIL slo-full-sample-stale: the last VALID SLO SAMPLE is 10 day(s) old (> 3). Jobs may well be green - since ticket 134 AC#6 a machine-contended run exits 0 without a report - so a green job is not the question. The question is when numbers last existed, and that was 2026-09-13T08:45:00Z (run 35831084009). D32 has been unverified since then.
+   | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
+
+
+################ tree-new (AC#4 fixed, f706dedd) ################
+
+== control rc=0
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=80 run=700
+   | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 0 rejected by the source predicate
+   | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+== future-sample rc=2
+   | slo-freshness: FAIL slo-full-timestamp-in-future: an injected slo-full-report record claims created_at=2027-01-01T00:00:00Z, which is later than 'now' (1790154000 s); a future sample cannot be aged (ticket 136 AC#4).
+
+== future-job rc=2
+   | slo-freshness: FAIL slo-full-timestamp-in-future: the newest slo-full job record claims created_at=2027-01-01T00:00:00Z, which is later than 'now' (1790154000 s); a future record cannot be aged (ticket 136 AC#4). Check the clock of whatever produced it.
+
+== stale-sample rc=1
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-13T08:45:00Z artifact_id=10736979707 run=35831084009
+   | slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 record(s) considered, 0 rejected by the source predicate
+   | slo-freshness:   age: 10 day(s) (864900 s); threshold: 3 day(s)
+   | slo-freshness: FAIL slo-full-sample-stale: the last VALID SLO SAMPLE is 10 day(s) old (> 3). Jobs may well be green - since ticket 134 AC#6 a machine-contended run exits 0 without a report - so a green job is not the question. The question is when numbers last existed, and that was 2026-09-13T08:45:00Z (run 35831084009). D32 has been unverified since then.
+   | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
+
+

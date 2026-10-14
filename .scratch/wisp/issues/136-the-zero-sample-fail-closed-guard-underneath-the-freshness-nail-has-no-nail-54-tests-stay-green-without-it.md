@@ -644,3 +644,33 @@
   ⚠ 一处口径：`SLO_FULL_LAST_SAMPLE` 注入的记录按文档仍是"declared valid-sample fixture"（3 列），**不再过来源谓词**——谓词守的是 API 扫描
   （生产输入），已写进脚本头注释；本格未碰 `slo-check.ps1`、`.github/**`、`internal/**`、阈值/golden。
   next=AC#3（分页上限）与 AC#4（未来时间戳）同腿继续；两格交回后请非实现者按 `logs/ac2.txt` 复算三态并裁 AC#2。
+
+- [2026-10-14 19:2x +08] agent=136s did=**AC#3（`R-134-7`）落地**。**产码 commit `966c2aa9`**：P3 扫描前先只读计数
+  （`actions/artifacts?per_page=1&page=1` 的 `total_count`）；非数字/查询失败 ⇒ exit 2；`total > SLO_FULL_ARTIFACT_PAGES*100`
+  ⇒ 红句 token **`slo-full-scan-incomplete`**（印 total、cap 与"子集会给什么错结论"）＋ exit 2；scan note 记上 listing size。
+  **三态（`logs/ac3.txt`）**：① 今天不红（tree-old）——`partial-green`（total=350 > cap=300、页 1 有新鲜真样）`rc=0`：
+  `P3 newest VALID SAMPLE: ... artifact_id=95 run=706`＋`scanned 3 page(s) x 100 ...`＋`OK`（部分扫描被当整读）；
+  `partial-notfound`（total=350、3 页无样）`rc=1`，红句逐字 `slo-full-sample-never: no uploaded slo-full-report artifact at
+  all (scanned 3 page(s) x 100 ...)` ⇒ 把"没扫到"读成"没找到"；`cap-zero`（PAGES=0）同形 `rc=1`。② 修后同发：
+  `partial-green`/`partial-notfound` 双双 exit 2，红句 `P3 slo-full-scan-incomplete: the artifact listing holds 350 entries
+  but this pin reads only 3 page(s) x 100 = 300. ... Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES ...`；
+  `k4b-total-fail`（计数查询本身失败）`0→2`。③ 对照：`control`（188≤300）旧新 `rc=0`；`spread`（total=188、最新真样在
+  **第 2 页**）旧新 `rc=0` 且修后取到 `artifact_id=83 run=801` ⇒ 跨页 max 与新谓词兼容；`stale-sample` 仍 `rc=1`。
+  ⚠ **上线口径（要编排者收口）**：listing 只增不减（09-23 全库 188 枚）⇒ 修后**只要 total 超 cap，这条钉每次都 exit 2
+  （job 红）**，直到把 `SLO_FULL_ARTIFACT_PAGES`（默认 3）抬到覆盖 total_count；本腿**不猜新默认值**（live total 须带
+  token 现量）、不动 `.github/**`。另记一枚方向收紧的口径变化：`SLO_FULL_ARTIFACT_PAGES=0` 从旧 `rc=1` 变 exit 2（`cap-zero` 发）。
+  next=AC#4 同腿继续；AC#3 终裁请按 `logs/ac3.txt` 复算（含 cap-zero 与 spread 两对照）。
+
+- [2026-10-14 19:3x +08] agent=136s did=**AC#4（`R-134-8`）落地 ⇒ 三格齐**。**产码 commit `f706dedd`**：P2 与 P3（扫描路＋seam 路）
+  三处 `ts > now` ⇒ token **`slo-full-timestamp-in-future`** 报错 exit 2；最终计龄处不可达的负值夹取删除；头注释/token 名册/exit codes 同步。
+  **三态（`logs/ac4.txt`）**：① 今天不红（tree-old，票面那发原文）：`future-sample`（`SLO_FULL_LAST_SAMPLE="2027-01-01T00:00:00Z<TAB>…"`、
+  `SLO_FRESH_NOW=2026-09-23T09:00:00Z`）`rc=0`，逐字 `P3 newest VALID SAMPLE: artifact slo-full-report
+  created_at=2027-01-01T00:00:00Z ...`＋`age: 0 day(s) (0 s)`＋`OK`；`future-job`（P2 seam 未来戳）同形 `rc=0`＋`age: 0 day(s) (0 s)`。
+  ② 修后两发均 exit 2：`FAIL slo-full-timestamp-in-future: ... created_at=2027-01-01T00:00:00Z, which is later than 'now'
+  (1790154000 s); a future sample cannot be aged (ticket 136 AC#4).`（P2 侧同 token）。③ 对照：`stale-sample`（10 天）旧新都 `rc=1`、
+  `control` 旧新都 `rc=0`。**门禁**：`sh -n` rc=0；shellcheck **0.11.0**（docker，`-s sh`，CI lint 步同形）rc=0；
+  `sh scripts/d22scan.sh` rc=0 `clean`；长度门 `--with-self-test` rc=0 `VERDICT GREEN`（over-budget=60／roster=60＝60=60）；
+  `gofmt`/`go vet` N/A（零 Go 改动）；探针全量 22 world × 2 树 rc 表见 `logs/gates.txt`（`scripts/slo-check.ps1` 一字未动）。
+  **改动的三处面**：`scripts/slo-freshness.sh`（三笔产码 commit）＋`probes/136/s/**`（交付）＋票尾 bullets；证伪面（`docs/PLAN.md`、
+  `docs/specs/**`、`internal/**`、`tools/d22scan/**`、`allowlist.txt`、阈值/golden、`.github/**`、`frontend/**`）零改动、未 push。
+  next=请非实现者按 `logs/*.txt` 复算三格三态并裁 AC#2/#3/#4；AC#3 的"抬上限"与 AC#2 的"live total 现量"是编排者侧的收口动作。

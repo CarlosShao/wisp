@@ -27,10 +27,9 @@ trig_future='2027-01-01T00:00:00Z|completed|success|https://example.invalid/run/
 samp_fresh="2026-09-23T08:45:00Z${tab}35831084009${tab}10736979707"
 samp_stale="2026-09-13T08:45:00Z${tab}35831084009${tab}10736979707"
 samp_future="2027-01-01T00:00:00Z${tab}35831084009${tab}10736979707"
-all_worlds='control forge-branch forge-workflow forge-event missing-ts missing-source partial-green partial-notfound future-sample future-job stale-sample k1-no-token k2-no-repo k3-runs-fail k4-artifacts-fail k4b-total-fail k5-empty k6-empty-stale k7-run-fail'
+all_worlds='control spread cap-zero forge-branch forge-workflow forge-event missing-ts missing-source partial-green partial-notfound future-sample future-job stale-sample k1-no-token k2-no-repo k3-runs-fail k4-artifacts-fail k4b-total-fail k5-empty k6-empty-stale k7-run-fail'
 
-stubdir=$ws/bin
-mkdir -p "$stubdir"
+stubdir=$ws/bin; mkdir -p "$stubdir"
 cat > "$stubdir/gh" <<'STUB'
 #!/bin/sh
 # gh stub for the ticket-136s probes: serves only the endpoints
@@ -119,6 +118,11 @@ setup_world() { # sets W_* and builds $wdir fixtures
     case $w in
     control) W_ART1="80,2026-09-23T08:45:00Z,700,dev;81,2026-09-23T04:00:00Z,701,main"
              W_RUNS="700,.github/workflows/ci.yml,push,dev;701,.github/workflows/ci.yml,schedule,main" ;;
+    spread) W_ART1="82,2026-09-01T04:00:00Z,800,dev"
+             W_ART2="83,2026-09-23T08:45:00Z,801,main"
+             W_RUNS="800,.github/workflows/ci.yml,push,dev;801,.github/workflows/ci.yml,schedule,main" ;;
+    cap-zero) W_PAGES=0; W_ART1="84,2026-09-23T08:45:00Z,802,dev"
+             W_RUNS="802,.github/workflows/ci.yml,push,dev" ;;
     forge-branch) W_ART1="90,2026-09-23T08:45:00Z,701,feature/evil"
              W_RUNS="701,.github/workflows/ci.yml,push,dev" ;;
     forge-workflow) W_ART1="91,2026-09-23T08:45:00Z,702,dev"

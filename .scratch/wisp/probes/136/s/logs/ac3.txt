@@ -1,0 +1,65 @@
+# ticket 136s / AC#3 (R-134-7) - a page cap smaller than the listing must
+# be reported, not absorbed. Same seams/stub/clock as logs/ac2.txt.
+#
+# world            what it forges                                     rc old -> new
+# control          total 188 <= 300, genuine sample (must stay 0)       0 -> 0
+# partial-green    total 350 > cap 300, a fresh genuine sample sits on   0 -> 2
+#                  page 1 -> the pin used to judge a partial listing green
+# partial-notfound total 350 > cap 300, no sample on the pages read      1 -> 2
+#                  (old reading, verbatim: "no slo-full-report artifact found")
+# cap-zero         SLO_FULL_ARTIFACT_PAGES=0, total 188 (degenerate cap) 1 -> 2
+# k4b-total-fail   the listing-size query itself fails (new seam)        0 -> 2
+
+################ tree-old (today, unfixed) ################
+
+== control rc=0
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=80 run=700
+   | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 2 valid-sample record(s) considered
+   | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+== cap-zero rc=1
+   | slo-freshness: P3 scanned 0 page(s) x 100 of the artifact listing - no slo-full-report artifact found
+   | slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 0 page(s) x 100 of the artifact listing). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+   | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
+
+== partial-green rc=0
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=95 run=706
+   | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+   | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+== partial-notfound rc=1
+   | slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing - no slo-full-report artifact found
+   | slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+   | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
+
+== k4b-total-fail rc=0
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=97 run=708
+   | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+   | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+
+################ tree-new (AC#3 fixed, f706dedd) ################
+
+== control rc=0
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=80 run=700
+   | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 0 rejected by the source predicate
+   | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+== cap-zero rc=2
+   | slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 188 entries but this pin reads only 0 page(s) x 100 = 0. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+== partial-green rc=2
+   | slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 350 entries but this pin reads only 3 page(s) x 100 = 300. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+== partial-notfound rc=2
+   | slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 350 entries but this pin reads only 3 page(s) x 100 = 300. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+== k4b-total-fail rc=2
+   | slo-freshness: P3 the listing-size query failed, GitHub said:
+   | stub gh: injected failure 'total' for repos/stub/repo/actions/artifacts?per_page=1&page=1
+
+

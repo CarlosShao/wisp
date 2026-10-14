@@ -1,162 +1,183 @@
-# ticket 136s / AC#2 (R-134-5) - the freshness pin only looked at "name + not
-# expired"; a name-right, date-right artifact the slo-full job never produced
-# could vouch for it (134 acceptance H7). This log is the three-state reading.
+# ticket 136s / AC#2 (R-134-5) - source predicate on the freshness pin.
 #
-# generated 2026-10-14 +08; raw matrices kept at
-#   /d/tmp/wisp136s/matrix-pristine.txt (tree-old = git show HEAD:scripts/slo-freshness.sh @ b38567a9)
-#   /d/tmp/wisp136s/matrix-ac2.txt      (tree-new = scripts/slo-freshness.sh after commit bb47e9e7)
+# three states: (1) tree-old = git show HEAD:scripts/slo-freshness.sh @ b38567a9
+# (today, unfixed); (2) tree-new = the fixed script (AC#2 commit bb47e9e7, final
+# tree f706dedd); (3) the controls in the same transcripts. Raw matrices kept,
+# never deleted: /d/tmp/wisp136s/matrix-pristine.txt, matrix-final.txt.
 # driver: sh .scratch/wisp/probes/136/s/drive.sh <script> <out> [world ...]
-# every world below injects a fresh P2 record via SLO_FULL_LAST_TRIGGER, so a red
-# can only come from P3; SLO_FRESH_NOW=2026-09-23T09:00:00Z; gh = probe stub (no
-# network, no token, no wisp slo, no slo-check.ps1).
 #
-# world            what it forges                                    rc old -> new
-# control          newest artifact dev + ci.yml + push (must stay green)  0 -> 0
-# forge-branch     newest slo-full-report artifact on branch feature/evil 0 -> 1
-# forge-workflow   branch dev, uploading run of chore.yml                 0 -> 1
-# forge-event      branch dev, ci.yml run, but event pull_request         0 -> 1
-# missing-ts       real-shaped record with no created_at                  0 -> 2
-# missing-source   real-shaped record with no workflow_run fields         0 -> 2
-# k7-run-fail      actions/runs/{id} look-up fails (new check must fail closed) 0 -> 2
-# stale-sample     10-day-old seam record (regression control)            1 -> 1
+# every world injects a fresh P2 record via SLO_FULL_LAST_TRIGGER so a red can
+# only come from P3; SLO_FRESH_NOW=2026-09-23T09:00:00Z; gh = probe stub (no
+# network, no token, no `wisp slo`, no slo-check.ps1). The P2 preamble every
+# body would repeat - "P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z
+# status=completed conclusion=success" + job url + "age: 0 day(s) (1800 s)" - is
+# elided to stay inside the 200-line budget (raw files kept).
+#
+# world            what it forges                                     rc old -> new
+# control          genuine: branch dev + ci.yml + push (must stay 0)   0 -> 0
+# spread           188 total, newest genuine sits on page 2            0 -> 0
+# forge-branch     newest slo-full-report artifact on feature/evil      0 -> 1
+# forge-workflow   branch dev, uploading run of chore.yml               0 -> 1
+# forge-event      branch dev, ci.yml run, but event pull_request       0 -> 1
+# missing-ts       real-shaped record with no created_at                0 -> 2
+# missing-source   real-shaped record with no workflow_run fields       0 -> 2
+# k1 no token 2/2  k2 no repo 2/2  k3 runs query fails 2/2  k4 artifacts
+#   query fails 2/2  k5 empty listing 1/1  k6 empty runs list 1/1
+# k7 run look-up fails (new check, must fail closed)                    0 -> 2
+# stale-sample     10-day-old seam record (regression control)          1 -> 1
 
 ################ tree-old (today, unfixed) ################
 
 == control rc=0
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=80 run=700
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 2 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
    | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
+== spread rc=0
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=83 run=801
+   | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 2 valid-sample record(s) considered
+   | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
 == forge-branch rc=0
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=90 run=701
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
    | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == forge-workflow rc=0
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=91 run=702
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
    | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == forge-event rc=0
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=92 run=703
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
    | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == missing-ts rc=0
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=704 artifact_id= run=93
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (0 s); threshold: 3 day(s)
    | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == missing-source rc=0
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=94 run=0
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
    | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == stale-sample rc=1
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-13T08:45:00Z artifact_id=10736979707 run=35831084009
    | slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 valid-sample record(s) considered
    | slo-freshness:   age: 10 day(s) (864900 s); threshold: 3 day(s)
    | slo-freshness: FAIL slo-full-sample-stale: the last VALID SLO SAMPLE is 10 day(s) old (> 3). Jobs may well be green - since ticket 134 AC#6 a machine-contended run exits 0 without a report - so a green job is not the question. The question is when numbers last existed, and that was 2026-09-13T08:45:00Z (run 35831084009). D32 has been unverified since then.
    | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
 
+== k1-no-token rc=2
+   | slo-freshness: no GH_TOKEN/GITHUB_TOKEN - the freshness probes cannot look (this is not a pass)
+
+== k2-no-repo rc=2
+   | slo-freshness: no injection seam and no GITHUB_REPOSITORY - cannot ask GitHub anything
+
+== k3-runs-fail rc=2
+   | slo-freshness: the runs query failed, GitHub said:
+   | stub gh: injected failure 'runs-list' for repos/stub/repo/actions/workflows/ci.yml/runs?per_page=25
+
+== k4-artifacts-fail rc=2
+   | slo-freshness: P3 the artifacts query (page 1) failed, GitHub said:
+   | stub gh: injected failure 'artifacts' for repos/stub/repo/actions/artifacts?per_page=100&page=1
+
+== k5-empty rc=1
+   | slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing - no slo-full-report artifact found
+   | slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+   | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
+
+== k6-empty-stale rc=1
+   | slo-freshness: FAIL slo-full-never-triggered: no slo-full job found in the 25 newest ci runs on main/dev
+   | slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing - no slo-full-report artifact found
+   | slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+   | slo-freshness: 2 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
+
 == k7-run-fail rc=0
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=96 run=707
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
    | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 
-################ tree-new (AC#2 fixed) ################
+################ tree-new (AC#2 fixed, f706dedd) ################
 
 == control rc=0
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=80 run=700
-   | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 2 record(s) considered, 0 rejected by the source predicate
+   | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 0 rejected by the source predicate
+   | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+== spread rc=0
+   | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=83 run=801
+   | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 0 rejected by the source predicate
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
    | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == forge-branch rc=1
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 source predicate: artifact 90 on branch 'feature/evil' rejected (branch must be main or dev; ticket 136 AC#2)
-   | slo-freshness: FAIL slo-full-sample-never: 1 slo-full-report artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); 1 rejected. Refusing to age on a lookalike (scanned 3 page(s) x 100 of the artifact listing). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+   | slo-freshness: FAIL slo-full-sample-never: 1 slo-full-report artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); 1 rejected. Refusing to age on a lookalike (scanned 3 page(s) x 100 of the artifact listing (listing size 188)). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
    | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
 
 == forge-workflow rc=1
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 source predicate: artifact 91 (branch 'dev') comes from run 702 of workflow '.github/workflows/chore.yml' event 'push' on 'dev' - rejected (the uploading run must be .github/workflows/ci.yml with event push|schedule|workflow_dispatch; ticket 136 AC#2)
-   | slo-freshness: FAIL slo-full-sample-never: 1 slo-full-report artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); 1 rejected. Refusing to age on a lookalike (scanned 3 page(s) x 100 of the artifact listing). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+   | slo-freshness: FAIL slo-full-sample-never: 1 slo-full-report artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); 1 rejected. Refusing to age on a lookalike (scanned 3 page(s) x 100 of the artifact listing (listing size 188)). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
    | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
 
 == forge-event rc=1
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 source predicate: artifact 92 (branch 'dev') comes from run 703 of workflow '.github/workflows/ci.yml' event 'pull_request' on 'dev' - rejected (the uploading run must be .github/workflows/ci.yml with event push|schedule|workflow_dispatch; ticket 136 AC#2)
-   | slo-freshness: FAIL slo-full-sample-never: 1 slo-full-report artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); 1 rejected. Refusing to age on a lookalike (scanned 3 page(s) x 100 of the artifact listing). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+   | slo-freshness: FAIL slo-full-sample-never: 1 slo-full-report artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); 1 rejected. Refusing to age on a lookalike (scanned 3 page(s) x 100 of the artifact listing (listing size 188)). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
    | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
 
 == missing-ts rc=2
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 a slo-full-report record from the scan carries no created_at (run=704 artifact=93) - 'no timestamp' is not 'endlessly fresh', refusing (ticket 136 AC#2)
 
 == missing-source rc=2
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 a slo-full-report record from the scan carries no workflow_run fields (run='0' branch='' artifact=94) - its provenance cannot be checked, so it cannot be aged (ticket 136 AC#2)
 
 == stale-sample rc=1
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-13T08:45:00Z artifact_id=10736979707 run=35831084009
    | slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 record(s) considered, 0 rejected by the source predicate
    | slo-freshness:   age: 10 day(s) (864900 s); threshold: 3 day(s)
    | slo-freshness: FAIL slo-full-sample-stale: the last VALID SLO SAMPLE is 10 day(s) old (> 3). Jobs may well be green - since ticket 134 AC#6 a machine-contended run exits 0 without a report - so a green job is not the question. The question is when numbers last existed, and that was 2026-09-13T08:45:00Z (run 35831084009). D32 has been unverified since then.
    | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
 
+== k1-no-token rc=2
+   | slo-freshness: no GH_TOKEN/GITHUB_TOKEN - the freshness probes cannot look (this is not a pass)
+
+== k2-no-repo rc=2
+   | slo-freshness: no injection seam and no GITHUB_REPOSITORY - cannot ask GitHub anything
+
+== k3-runs-fail rc=2
+   | slo-freshness: the runs query failed, GitHub said:
+   | stub gh: injected failure 'runs-list' for repos/stub/repo/actions/workflows/ci.yml/runs?per_page=25
+
+== k4-artifacts-fail rc=2
+   | slo-freshness: P3 the listing-size query failed, GitHub said:
+   | stub gh: injected failure 'artifacts' for repos/stub/repo/actions/artifacts?per_page=1&page=1
+
+== k5-empty rc=1
+   | slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing (listing size 0) - no slo-full-report artifact found
+   | slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing (listing size 0)). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+   | slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
+
+== k6-empty-stale rc=1
+   | slo-freshness: FAIL slo-full-never-triggered: no slo-full job found in the 25 newest ci runs on main/dev
+   | slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing (listing size 0) - no slo-full-report artifact found
+   | slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing (listing size 0)). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+   | slo-freshness: 2 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
+
 == k7-run-fail rc=2
-   | slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z status=completed conclusion=success
-   | slo-freshness:   job url: https://example.invalid/run/1
-   | slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
    | slo-freshness: P3 the run look-up for 707 failed, GitHub said:
    | stub gh: injected failure 'run' for repos/stub/repo/actions/runs/707
+
 

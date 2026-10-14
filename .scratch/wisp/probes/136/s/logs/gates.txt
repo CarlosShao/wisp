@@ -1,0 +1,73 @@
+# ticket 136s gate readings (2026-10-14 ~19:4x +08, tree f706dedd)
+# commands and verbatim readings; big logs kept under /d/tmp/wisp136s (never deleted)
+
+## 1. sh -n scripts/slo-freshness.sh
+rc=0
+
+## 2. shellcheck -s sh scripts/slo-freshness.sh (CI slo-fresh.yml lint step, same command)
+##    run in docker koalaman/shellcheck:v0.11.0 (host has no shellcheck; CI image measured 0.11.0 by ticket 134 AC#5)
+rc=0 (no output above = clean)
+
+## 3. the pin's own self-check mode really run: the seam/stub probe matrix
+##    sh .scratch/wisp/probes/136/s/drive.sh <script> <out>   [22 worlds x 2 trees]
+##    tree-old = git show HEAD:scripts/slo-freshness.sh @ b38567a9; tree-new = f706dedd
+   old control rc=0
+   old spread rc=0
+   old cap-zero rc=1
+   old forge-branch rc=0
+   old forge-workflow rc=0
+   old forge-event rc=0
+   old missing-ts rc=0
+   old missing-source rc=0
+   old partial-green rc=0
+   old partial-notfound rc=1
+   old future-sample rc=0
+   old future-job rc=0
+   old stale-sample rc=1
+   old k1-no-token rc=2
+   old k2-no-repo rc=2
+   old k3-runs-fail rc=2
+   old k4-artifacts-fail rc=2
+   old k4b-total-fail rc=0
+   old k5-empty rc=1
+   old k6-empty-stale rc=1
+   old k7-run-fail rc=0
+   ---
+   new control rc=0
+   new spread rc=0
+   new cap-zero rc=2
+   new forge-branch rc=1
+   new forge-workflow rc=1
+   new forge-event rc=1
+   new missing-ts rc=2
+   new missing-source rc=2
+   new partial-green rc=2
+   new partial-notfound rc=2
+   new future-sample rc=2
+   new future-job rc=2
+   new stale-sample rc=1
+   new k1-no-token rc=2
+   new k2-no-repo rc=2
+   new k3-runs-fail rc=2
+   new k4-artifacts-fail rc=2
+   new k4b-total-fail rc=2
+   new k5-empty rc=1
+   new k6-empty-stale rc=1
+   new k7-run-fail rc=2
+##    per-AC three-state transcripts: logs/ac2.txt / ac3.txt / ac4.txt
+
+## 4. sh scripts/d22scan.sh (positive control + real scan; scripts/ is outside its scopes)
+d22scan: scope ban #8 cmd/              examined 128 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=237, bans #1-5 cmd/=41, ban #6 frontend/=115, ban #7 internal/tools/=24, ban #8 design/=39, ban #8 frontend/=115, ban #8 internal/=556, ban #8 cmd/=128; ban #8 emoji coverage: design/ 39 text files; frontend/ 115 text files; internal/ 556 Go files, comments and _test.go included; cmd/ 128 Go files, comments and _test.go included
+rc=0 (whole log /d/tmp/wisp136s/gates-d22scan.txt)
+
+## 5. sh scripts/check-path-length-budget.sh --with-self-test (the length gate)
+   positive control bench=/tmp/tmp.TrX6IQiTp9 (kept on disk; this project never deletes temp artifacts)
+   positive control PASSED
+   denominator: tracked paths=12934  over-budget=60  covered by roster=60  not in roster=0
+   VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+   unit cross-check: the byte view and the character view select the SAME 60 paths on this tree, recomputed just now in both units
+rc=0 (whole log /d/tmp/wisp136s/gates-pathlen.txt)
+
+## 6. gofmt -l / go vet: not applicable - this leg changed no Go file
+   git diff --name-only bb47e9e7~1 f706dedd -- '*.go' => (empty)
