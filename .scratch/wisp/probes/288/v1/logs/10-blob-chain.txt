@@ -1,0 +1,7 @@
+== wisp 288-v1 blob chain ==
+date=2026-10-14 11:54:19 +0800
+HEAD=1f1226cbec1bbf09deb44cd34534824b2ee3f96c
+-- 18d43f8e^:path  => a917e0dc1e2ef0801c189da66a6b726de3c45301
+-- 18d43f8e:path   => 9713dc37a072b9580f4e1c83e61e5bd1bc30a884
+-- HEAD:path       => 9713dc37a072b9580f4e1c83e61e5bd1bc30a884
+-- 18d43f8e^      => 48e7b0a46ba9c2fa31de11fdc92a8ded6bf9ae9f
