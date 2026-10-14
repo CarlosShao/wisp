@@ -1,0 +1,38 @@
+=== RUN   TestSessionListByWorkspace
+time=2026-10-14T16:53:17.903+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace3838203273\001\data kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:53:17.923+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace3838203273\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:53:17.931+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:53:17Z duration_ms=7
+time=2026-10-14T16:53:17.938+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace3838203273\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:53:17.945+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:53:17Z duration_ms=7
+time=2026-10-14T16:53:17.953+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace3838203273\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:53:17.959+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:53:17Z duration_ms=5
+time=2026-10-14T16:53:17.964+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:53:17.969+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    manage_test.go:78: workspace filter = [sess_a3d3cf0810cd1836be634cbb29b53245 sess_92055c489316f0913317177e54c9f6f2], want [sess_92055c489316f0913317177e54c9f6f2 sess_a3d3cf0810cd1836be634cbb29b53245]
+--- FAIL: TestSessionListByWorkspace (0.11s)
+=== RUN   TestSessionListByWorkspace
+time=2026-10-14T16:53:18.004+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace2865490132\001\data kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:53:18.021+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace2865490132\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:53:18.029+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:53:18Z duration_ms=6
+time=2026-10-14T16:53:18.036+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace2865490132\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:53:18.042+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:53:18Z duration_ms=6
+time=2026-10-14T16:53:18.051+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace2865490132\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:53:18.057+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:53:18Z duration_ms=5
+time=2026-10-14T16:53:18.061+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:53:18.064+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    manage_test.go:78: workspace filter = [sess_fb1374edce4431af03bbaecea435d19f sess_b7afd9972d7cd42c4b1be44f745a0f0d], want [sess_b7afd9972d7cd42c4b1be44f745a0f0d sess_fb1374edce4431af03bbaecea435d19f]
+--- FAIL: TestSessionListByWorkspace (0.09s)
+=== RUN   TestSessionListByWorkspace
+time=2026-10-14T16:53:18.096+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace1774939185\001\data kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:53:18.112+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace1774939185\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:53:18.117+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:53:18Z duration_ms=5
+time=2026-10-14T16:53:18.125+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace1774939185\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:53:18.131+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:53:18Z duration_ms=5
+time=2026-10-14T16:53:18.138+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestSessionListByWorkspace1774939185\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:53:18.144+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:53:18Z duration_ms=6
+time=2026-10-14T16:53:18.149+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:53:18.152+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestSessionListByWorkspace (0.09s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	1.452s
+FAIL

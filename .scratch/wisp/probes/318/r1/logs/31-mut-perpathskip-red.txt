@@ -1,0 +1,25 @@
+time=2026-10-14T16:52:18.775+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket318AMarkerCardOffersNoWideningTarget
+--- PASS: TestTicket318AMarkerCardOffersNoWideningTarget (0.00s)
+=== RUN   TestTicket318AMarkedPathRefusesTheWholeCard
+    ticket318_widening_marker_rulers_test.go:84: one marked path must refuse the whole card, got dir="C:/proj/outside" rule="[fs] allowed_dirs += \"C:/proj/outside\""
+--- FAIL: TestTicket318AMarkedPathRefusesTheWholeCard (0.00s)
+=== RUN   TestTicket318TheSamePathWithoutTheMarkerStillDerivesItsParent
+--- PASS: TestTicket318TheSamePathWithoutTheMarkerStillDerivesItsParent (0.00s)
+=== RUN   TestTicket318ShortNamesAreNotTheMarker
+--- PASS: TestTicket318ShortNamesAreNotTheMarker (0.00s)
+=== RUN   TestZZ201A1JunctionMarkerCardIsRefusedForWidening
+    zz_201_a1_junction_marker_windows_test.go:163: READING-1 bridge 路由的 Decision: level=L2 rules=[R2 R3] refusal=""
+    zz_201_a1_junction_marker_windows_test.go:168: READING-2 卡面逐字 Paths[0] = "C:/tmp/wisp318r1gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening1679792039/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"
+    zz_201_a1_junction_marker_windows_test.go:189: READING-2b 反斜杠拼法: 卡面=["C:\\tmp\\wisp318r1gotmp\\TestZZ201A1JunctionMarkerCardIsRefusedForWidening1679792039\\001\\allowed\\jn\\victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"] dir="" ok=false
+    zz_201_a1_junction_marker_windows_test.go:219: READING-3 ledger 卡: level=L2 tool=fs.read paths=["C:/tmp/wisp318r1gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening1679792039/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"]
+    zz_201_a1_junction_marker_windows_test.go:232: READING-4 WideningRule: ok=false
+    zz_201_a1_junction_marker_windows_test.go:233: READING-5 dir  = ""
+    zz_201_a1_junction_marker_windows_test.go:234: READING-6 rule = ""
+    zz_201_a1_junction_marker_windows_test.go:242: READING-7 真父目录 = "C:/tmp/wisp318r1gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening1679792039/001/allowed/jn"（修后不再被产出到任何卡/规则文本）
+    zz_201_a1_junction_marker_windows_test.go:265: READING-11 对照（无标记的越界读）: paths=["C:\\tmp\\wisp318r1gotmp\\TestZZ201A1JunctionMarkerCardIsRefusedForWidening1679792039\\001\\outside\\victim.txt"] dir="C:/tmp/wisp318r1gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening1679792039/001/outside" rule="[fs] allowed_dirs += \"C:/tmp/wisp318r1gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening1679792039/001/outside\"" ok=true
+    zz_201_a1_junction_marker_windows_test.go:275: READING-12 结论：带标记卡面在入口整卡拒（两种拼法 + 空路径标记同拒），干净卡面仍推真父目录 "C:/tmp/wisp318r1gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening1679792039/001/outside"
+--- PASS: TestZZ201A1JunctionMarkerCardIsRefusedForWidening (0.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent/approval	2.969s
+FAIL

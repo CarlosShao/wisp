@@ -1,0 +1,107 @@
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+time=2026-10-14T16:53:38.791+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestTicket224RecordWritesOneRowPerAnswer433589845\001\data kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:53:38.817+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224RecordWritesOneRowPerAnswer433589845\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:53:38.825+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:53:38Z duration_ms=7
+time=2026-10-14T16:53:38.832+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224RecordWritesOneRowPerAnswer433589845\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:53:38.836+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:53:38Z duration_ms=4
+time=2026-10-14T16:53:38.844+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224RecordWritesOneRowPerAnswer433589845\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:53:38.850+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:53:38Z duration_ms=5
+time=2026-10-14T16:53:38.854+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:53:38.858+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.11s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+time=2026-10-14T16:53:38.897+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestTicket224RecordRefusesUnusableSubjects1726299522\001\data kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:53:38.913+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224RecordRefusesUnusableSubjects1726299522\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:53:38.919+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:53:38Z duration_ms=5
+time=2026-10-14T16:53:38.925+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224RecordRefusesUnusableSubjects1726299522\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:53:38.931+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:53:38Z duration_ms=5
+time=2026-10-14T16:53:38.938+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224RecordRefusesUnusableSubjects1726299522\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:53:38.943+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:53:38Z duration_ms=5
+time=2026-10-14T16:53:38.947+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:53:38.951+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.08s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+time=2026-10-14T16:53:38.972+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestTicket224CoveringMatchesItsOwnSession405017752\001\data kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:53:38.988+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224CoveringMatchesItsOwnSession405017752\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:53:38.994+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:53:38Z duration_ms=5
+time=2026-10-14T16:53:39.005+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224CoveringMatchesItsOwnSession405017752\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:53:39.012+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:53:39Z duration_ms=6
+time=2026-10-14T16:53:39.020+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224CoveringMatchesItsOwnSession405017752\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:53:39.024+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:53:39Z duration_ms=4
+time=2026-10-14T16:53:39.029+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:53:39.032+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.09s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+time=2026-10-14T16:53:39.061+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestTicket224CoveringDoesNotCrossToANewSession3885962410\001\data kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:53:39.075+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224CoveringDoesNotCrossToANewSession3885962410\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:53:39.081+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:53:39Z duration_ms=6
+time=2026-10-14T16:53:39.088+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224CoveringDoesNotCrossToANewSession3885962410\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:53:39.093+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:53:39Z duration_ms=4
+time=2026-10-14T16:53:39.099+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224CoveringDoesNotCrossToANewSession3885962410\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:53:39.104+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:53:39Z duration_ms=5
+time=2026-10-14T16:53:39.109+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:53:39.112+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.08s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+time=2026-10-14T16:53:39.142+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestTicket224ExpiredOrRevokedRowIsNotLive2521357956\001\data kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:53:39.162+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224ExpiredOrRevokedRowIsNotLive2521357956\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:53:39.172+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:53:39Z duration_ms=9
+time=2026-10-14T16:53:39.178+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224ExpiredOrRevokedRowIsNotLive2521357956\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:53:39.184+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:53:39Z duration_ms=5
+time=2026-10-14T16:53:39.190+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224ExpiredOrRevokedRowIsNotLive2521357956\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:53:39.196+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:53:39Z duration_ms=5
+time=2026-10-14T16:53:39.201+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:53:39.203+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.09s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+time=2026-10-14T16:53:39.236+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestTicket224NewLedgerRefusesHandWrittenIDs491412572\001\data kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:53:39.251+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224NewLedgerRefusesHandWrittenIDs491412572\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:53:39.257+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:53:39Z duration_ms=6
+time=2026-10-14T16:53:39.264+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224NewLedgerRefusesHandWrittenIDs491412572\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:53:39.269+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:53:39Z duration_ms=5
+time=2026-10-14T16:53:39.275+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224NewLedgerRefusesHandWrittenIDs491412572\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:53:39.281+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:53:39Z duration_ms=5
+time=2026-10-14T16:53:39.284+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:53:39.288+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.06s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+time=2026-10-14T16:53:39.293+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestTicket224WildcardRowCoversAConcretePath3880208581\002\data kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:53:39.310+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224WildcardRowCoversAConcretePath3880208581\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:53:39.316+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:53:39Z duration_ms=6
+time=2026-10-14T16:53:39.323+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224WildcardRowCoversAConcretePath3880208581\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:53:39.328+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:53:39Z duration_ms=4
+time=2026-10-14T16:53:39.335+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestTicket224WildcardRowCoversAConcretePath3880208581\002\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:53:39.341+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:53:39Z duration_ms=5
+time=2026-10-14T16:53:39.345+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:53:39.347+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.08s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	1.542s

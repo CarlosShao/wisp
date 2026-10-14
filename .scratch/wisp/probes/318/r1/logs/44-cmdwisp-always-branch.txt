@@ -1,0 +1,34 @@
+time=2026-10-14T16:56:17.717+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card
+time=2026-10-14T16:56:21.278+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 16:56:21 mockllm: serving on http://127.0.0.1:51186 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T16:56:21.299+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card2427202591\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:56:21.305+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card2427202591\002\logs min_level=info early_records=3 early_dropped=0
+time=2026-10-14T16:56:21.315+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card2427202591\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:56:21.336+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card2427202591\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:56:21.343+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:56:21Z duration_ms=6
+time=2026-10-14T16:56:21.353+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card2427202591\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:56:21.358+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:56:21Z duration_ms=4
+time=2026-10-14T16:56:21.366+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card2427202591\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:56:21.372+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:56:21Z duration_ms=6
+time=2026-10-14T16:56:21.377+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:56:21.379+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-14T16:56:21.391+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+--- PASS: TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card (3.70s)
+=== RUN   TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused
+time=2026-10-14T16:56:24.652+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 16:56:24 mockllm: serving on http://127.0.0.1:64610 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T16:56:24.669+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused2008886256\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:56:24.674+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused2008886256\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T16:56:24.681+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused2008886256\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:56:24.705+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused2008886256\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T16:56:24.715+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T08:56:24Z duration_ms=9
+time=2026-10-14T16:56:24.730+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused2008886256\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T16:56:24.738+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T08:56:24Z duration_ms=7
+time=2026-10-14T16:56:24.747+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp318r1gotmp\TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused2008886256\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T16:56:24.753+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T08:56:24Z duration_ms=5
+time=2026-10-14T16:56:24.757+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T16:56:24.761+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused (3.42s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	9.336s
