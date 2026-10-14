@@ -17822,3 +17822,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 
 
 - **A928 补**：派 `174-v2`（形乙非实现者收口＋整票框态建议＋Docker 复核）。编队（2）：写 `253-r6`＋验 `174-v2`。派单/send 存档在盘。
+
+
+## A929｜2026-10-14 14:49:31 +08｜253-r6 收件（AC#3 落地：静默丢弃→具名拒收＋Go 侧留痕；机制更正＝299-r1 已把 RPC 管道搬进本仓）＋★编排者自伤修复（`${X:-"..."}` 反斜杠吃一层 ⇒ 我写的单反斜杠炸、253-r6 在非它地界的 d22scan 正控里撞出）
+
+- **253-r6 交付**：产码 `2298f7d2`（`cmd/wisp/panel_control_windows.go` +54/−1＋新测试件 270 行）＋交付 `89d29fce`（证据 70 行＋logs＋票尾 bullet）。编排者三把尺：两笔 commit 在／件齐／亲跑 `-run 'Test253r6' ./cmd/wisp/` rc=0。
+- **机制更正（归本腿）**：票 299-r1 把库的 RPC 管道搬进本仓后，"静默面属第三方、本仓不修上游"**在生产路径上已过期**：`msgcb`（`panel_control_windows.go:711`）／`callbinding`（`:757`）是本仓代码。落点＝旧门 `window.external.invoke(旧封套)` 那一支：**改前 `resolve(null)`＋Go 零记录 ⇒ 改后 Go 侧 slog 留痕（resident JSONL）＋页面拿具名 `REJECTED('…宿主已记录本次丢弃…')`**；正控（同装配走 `chrome.webview.postMessage`）＝`RESOLVED('')`＋handler 恰 1＋零新告警；反控（`git show HEAD:` 还原）＝`RESOLVED(null)`、rc=1、逐字节还原。门禁：build/vet/gofumpt/族（headless 15 PASS＋RealWindowHop/AC13/AC14 各自单跑 rc=0）/d22scan clean/长度门 GREEN 60=60。
+- **★自伤与修复（记我）**：`253-r6` 在**它写面外**的 d22scan 正控里撞出 `tools/d22scan/runtests.sh:92` 报 `LOCALAPPDATAwisp: unbound variable` rc=1——**那是我下午微修时写的单反斜杠**。**规则现读定案（字节级＋文件级复现）**：在 `${X:-"…"}` 的默认词里，反斜杠**会被吃一层** ⇒ 那里必须写**双反斜杠**（`"$LOCALAPPDATA\wisp-test-gotmp"`，317-r1 写的正是双、正确；我写了单 ⇒ 变量名被并成 `LOCALAPPDATAwisp`）。修复＝单→双（od 复核 `\ \ w`）＋`bash -n` rc=0＋**把真文件那一行原样嵌进 `set -u` 脚本实测** `eval-ok: C:\Users\x\wisp-test-gotmp/d22scan-…` rc=0。**教训并入铁律**（GOTMPDIR 条＋派单/微修纪律：凡在 `${…:-"…"}` 里写 Windows 路径一律双反斜杠＋字节级验证）。
+- **253-r6 其余具名**：P3/P4 未真窗单发；`-tags winlive`/整包未跑；**本机 pre-existing 间歇**：同一 test 二进制连开第二枚真窗偶发建窗猝死（既有 AC13→AC14 同发可复现、`AC14 -count=2` 又全绿 ⇒ 共享机争用，非回归）。
+- **编队**：`253-r6` 收；**在飞仅 1＝`174-v2`**（机主令：其收尾前不派新腿，待他重启 ZCode 并给指令后再开工）。⛔ 未推＝`e3788f08` 后多笔（含本批）。

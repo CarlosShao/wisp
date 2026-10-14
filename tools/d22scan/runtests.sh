@@ -89,7 +89,7 @@ fi
 # keep the loud-degradation shape; revocation phrase "310 改 fail-closed").
 if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ]; then
     if [ -n "${LOCALAPPDATA:-}" ]; then
-        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\wisp-test-gotmp"}/d22scan-$(date +%Y%m%d-%H%M%S)-$$"
+        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}/d22scan-$(date +%Y%m%d-%H%M%S)-$$"
         if mkdir -p "$gotmp_run" 2>/dev/null; then
             export GOTMPDIR="$gotmp_run"
             echo "runtests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
