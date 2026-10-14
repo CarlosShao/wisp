@@ -1,0 +1,9 @@
+time=2026-10-14T11:12:14.985+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestZZ315A1SiblingChildFirstBridgeCall
+    zz315a1probe_test.go:517: ticket 315 AC#0 repro probe: RED while the bug is live; set WISP_315A1=1 to run it
+--- SKIP: TestZZ315A1SiblingChildFirstBridgeCall (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.997s
+runtests.sh: 1 test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3) - packages=[./cmd/wisp/ -run ^TestZZ315A1SiblingChildFirstBridgeCall$] top-level: PASS=0 FAIL=0 SKIP=1, === RUN=1, '[no tests to run]'=0
+runtests.sh: either make the step's scope exclude it or run it where it can execute;
+             do not relax this script.

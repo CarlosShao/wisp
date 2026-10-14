@@ -1,0 +1,96 @@
+time=2026-10-14T11:22:44.850+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask
+time=2026-10-14T11:22:44.864+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T11:22:44.872+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-14T11:22:44.881+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T11:22:44.902+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T11:22:44.908+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T03:22:44Z duration_ms=6
+time=2026-10-14T11:22:44.915+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T11:22:44.921+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T03:22:44Z duration_ms=5
+time=2026-10-14T11:22:44.928+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T11:22:44.935+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T03:22:44Z duration_ms=6
+time=2026-10-14T11:22:44.940+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T11:22:44.944+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    zz315a1probe_test.go:676: case C: rc=0 in 31.1039587s; golden requests=[POST /v1/chat/completions POST /v1/chat/completions]
+    zz315a1probe_test.go:677: case C raw stdout:
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        
+        [确认 L2 fs.read] R4: 包含来自 unbound-scope scope is not open (no OpenScope for this id, or its own handle closed it) 的内容
+          规则 R4
+          取消方式：单击悬浮球：悬浮球取消不可用（未加载）
+          取消方式：取消键通道：快捷键取消不可用（未加载）
+          取消方式：面板拒绝：面板取消不可用（票 37 未接入）（未加载）
+          取消方式：说取消词：语音取消不可用（未加载）
+          影响路径：C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001\zz315a1-note.txt
+          窗口 0.0s
+          卡片编号：fd5ed2dc-aae3-45de-8d51-2e84a81617c3#call_zz315_a1c_root_read
+        [warning] 审批将在 30 秒后自动拒绝，请尽快确认
+        [dismissed] 审批超时（31 秒未确认），C18 一律判拒绝，已自动拒绝
+        [工具 fs.read -> error]
+        根任务读过笔记，收口。
+        wisp run: 任务 fd5ed2dc-aae3-45de-8d51-2e84a81617c3 结束（completed，2 轮，1 次工具调用，成本 0 CNY（未计价））
+        wisp run: 回复已完成
+    zz315a1probe_test.go:678: case C raw stderr:
+        [audit] wisp run: SESSION-MINT id=sess_5d3ec6953a0248891dd5a23575deb5ec (结束点＝本进程退出，A435 第 2 条)
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\tmp\\wisp315r1gotmp\\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\\001\\config.toml"
+        [audit] config: HOT-RELOAD state=armed tick=1s path="C:\\tmp\\wisp315r1gotmp\\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\\001\\config.toml" goroutine=watchdog owner=config d36_confirm=on restart_notice=on detail="本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效"
+        [audit] wisp run: 项目说明加载器 workspace="" globalDir="C:\\tmp\\wisp315r1gotmp\\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\\001" enabled=true budget=2300
+        [audit] projctx: projctx: 本轮项目说明预算 2300 tokens，已用 53 tokens
+        [audit] projctx: projctx:   C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001\AGENTS.md tier=global bytes=89 状态=完整注入
+        [audit] wisp run: 风险判定 tool=fs.read level=L2 rules=[R4] reason="R4: 包含来自 unbound-scope scope is not open (no OpenScope for this id, or its own handle closed it) 的内容"
+        [audit] approval: queued corr=fd5ed2dc-aae3-45de-8d51-2e84a81617c3#call_zz315_a1c_root_read task=fd5ed2dc-aae3-45de-8d51-2e84a81617c3 tool=fs.read depth=1
+        [audit] approval: WAITING-STATE state="AwaitingApproval" awaiting=true corr="fd5ed2dc-aae3-45de-8d51-2e84a81617c3#call_zz315_a1c_root_read" tool=fs.read level=L2 paths=1 producer="ui-prompt"
+        [audit] approval: ANSWER-EXPIRED corr=fd5ed2dc-aae3-45de-8d51-2e84a81617c3#call_zz315_a1c_root_read tool=fs.read decision=timeout->reject after=31s
+        [audit] approval: WAITING-STATE state=none awaiting=false tracked=0 producer="ui-dismissed"
+        [audit] tools: call kind=approval-timeout task=fd5ed2dc-aae3-45de-8d51-2e84a81617c3 corr=fd5ed2dc-aae3-45de-8d51-2e84a81617c3#call_zz315_a1c_root_read tool=fs.read risk=L2 decision=timeout outcome=error rules_hit=[R4] in_allowlist_scope=true grant_id=0 reason="R4: 包含来自 unbound-scope scope is not open (no OpenScope for this id, or its own handle closed it) 的内容"
+        [audit] tools: PATH-ACCOUNT task=fd5ed2dc-aae3-45de-8d51-2e84a81617c3 tool=fs.read roots=1 rewritten=[] unusable=[]
+        [audit] wisp run: 风险判定 tool=fs.read level=L2 rules=[R4] reason="R4: 包含来自 unbound-scope scope is not open (no OpenScope for this id, or its own handle closed it) 的内容"
+        [audit] projctx: projctx: 本轮项目说明预算 2300 tokens，已用 53 tokens
+        [audit] projctx: projctx:   C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001\AGENTS.md tier=global bytes=89 状态=完整注入
+        [audit] tools: C25 scope closed task=fd5ed2dc-aae3-45de-8d51-2e84a81617c3 was_open=false dropped=0 open_scopes=0 close_err=<nil>
+        [audit] config: HOT-RELOAD state=stopped reason=run-root-cancelled detail="轮询协程已退出（本次进程正在收口）；此后对 config.toml 的改动要下一次启动才会被读到"
+    zz315a1probe_test.go:690: 有种子 mark（run:project-instructions）时，根任务的第一发走桥调用出了确认卡：stdout:
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        
+        [确认 L2 fs.read] R4: 包含来自 unbound-scope scope is not open (no OpenScope for this id, or its own handle closed it) 的内容
+          规则 R4
+          取消方式：单击悬浮球：悬浮球取消不可用（未加载）
+          取消方式：取消键通道：快捷键取消不可用（未加载）
+          取消方式：面板拒绝：面板取消不可用（票 37 未接入）（未加载）
+          取消方式：说取消词：语音取消不可用（未加载）
+          影响路径：C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001\zz315a1-note.txt
+          窗口 0.0s
+          卡片编号：fd5ed2dc-aae3-45de-8d51-2e84a81617c3#call_zz315_a1c_root_read
+        [warning] 审批将在 30 秒后自动拒绝，请尽快确认
+        [dismissed] 审批超时（31 秒未确认），C18 一律判拒绝，已自动拒绝
+        [工具 fs.read -> error]
+        根任务读过笔记，收口。
+        wisp run: 任务 fd5ed2dc-aae3-45de-8d51-2e84a81617c3 结束（completed，2 轮，1 次工具调用，成本 0 CNY（未计价））
+        wisp run: 回复已完成
+time=2026-10-14T11:23:15.988+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    zz315a1probe_test.go:693: case C root read row: {ID:1 TaskID:fd5ed2dc-aae3-45de-8d51-2e84a81617c3 Seq:1 Tool:fs.read ArgsJSON:{"path":"C:/tmp/wisp315r1gotmp/TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608/001/zz315a1-note.txt"} RiskLevel:L2 Decision:timeout DecidedAt:<nil> StartedAt:<nil> EndedAt:<nil> Outcome:error ErrorClass:user_rejected CorrelationID:fd5ed2dc-aae3-45de-8d51-2e84a81617c3#call_zz315_a1c_root_read GrantID:<nil>}
+    zz315a1probe_test.go:695: TICKET 315 REPRODUCED (project-instructions seed shape): the root's own first bridge call (allowlisted fs.read) was judged L2/timeout/error class="user_rejected" while a seed mark sits only in run:project-instructions.
+          stderr audit (verbatim): [audit] wisp run: 风险判定 tool=fs.read level=L2 rules=[R4] reason="R4: 包含来自 unbound-scope scope is not open (no OpenScope for this id, or its own handle closed it) 的内容"
+          stdout card segment:
+        [确认 L2 fs.read] R4: 包含来自 unbound-scope scope is not open (no OpenScope for this id, or its own handle closed it) 的内容
+          规则 R4
+          取消方式：单击悬浮球：悬浮球取消不可用（未加载）
+          取消方式：取消键通道：快捷键取消不可用（未加载）
+          取消方式：面板拒绝：面板取消不可用（票 37 未接入）（未加载）
+          取消方式：说取消词：语音取消不可用（未加载）
+          影响路径：C:\tmp\wisp315r1gotmp\TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608\001\zz315a1-note.txt
+          窗口 0.0s
+          卡片编号：fd5ed2dc-aae3-45de-8d51-2e84a81617c3#call_zz315_a1c_root_read
+        [warning] 审批将在 30 秒后自动拒绝，请尽快确认
+        [dismissed] 审批超时（31 秒未确认），C18 一律判拒绝，已自动拒绝
+        [工具 fs.read -> error]
+        根任务读过笔记，收口。
+        wisp run: 任务 fd5ed2dc-aae3-45de-8d51-2e84a81617c3 结束（completed，2 轮，1 次工具调用，成本 0 CNY（未计价））
+        wisp run: 回复已完成
+        
+        [dismissed] 审批超时（31 秒未确认），C18 一律判拒绝，已自动拒绝
+          row: {ID:1 TaskID:fd5ed2dc-aae3-45de-8d51-2e84a81617c3 Seq:1 Tool:fs.read ArgsJSON:{"path":"C:/tmp/wisp315r1gotmp/TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3116666608/001/zz315a1-note.txt"} RiskLevel:L2 Decision:timeout DecidedAt:<nil> StartedAt:<nil> EndedAt:<nil> Outcome:error ErrorClass:user_rejected CorrelationID:fd5ed2dc-aae3-45de-8d51-2e84a81617c3#call_zz315_a1c_root_read GrantID:<nil>}
+--- FAIL: TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask (31.15s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	33.424s
+FAIL
