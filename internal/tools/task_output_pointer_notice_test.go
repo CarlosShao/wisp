@@ -523,6 +523,141 @@ func TestLeakProbeTokenOnALegalPathStaysSilent174r3(t *testing.T) {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// Ticket 174 AC#6, shape 乙 (174-r6): the leak criterion above in its
+// POSIX-runnable form. The ledger row 174-r5 added to scripts/portable-tests.sh
+// names this exact debt ("OWNER of the POSIX half: whoever lands AC#6 shape 乙
+// on ticket 174, a POSIX-runnable equivalent of the same criterion (the notice
+// may not relay the filed path, no junction needed)"), and this leg lands that
+// half. The junction case keeps its ledger row and its Windows legs untouched:
+// this is an addition, not a replacement - on linux this leg runs and the
+// junction leg is still skipped under its accounted ledger row; on windows
+// both run.
+//
+// The wall the row names is real: on POSIX risk.pathresolver_other.go returns
+// no reparse components, so C26 refuses no traversal and a junction arm has no
+// subject there (risk/pathresolver_other.go:12). The criterion is not "a
+// junction is refused" though - it is "the canonicalize-error notice must not
+// relay what the host filed" - and the ONE non-empty literal Canonicalize
+// refuses on EVERY platform is the whitespace shape (paths.go's TrimSpace
+// guard, ahead of risk.Resolve; 174-r2 built its criterion on the same shape),
+// so the criterion is reachable here on the SAME branch of pointerNotice,
+// judged through the same plumbing as r3's arm: real bridge, real C26, real
+// roster, real configured roots on disk.
+//
+// What does NOT port, registered rather than faked: r3's filed path is a
+// token-bearing path literal, and no non-whitespace literal reaches this
+// branch on POSIX. The sweep's path half therefore runs on the filed literal
+// itself - a rune sequence no notice can spell by accident, plus its %q
+// spelling (r3's "detectable in any spelling", in the strongest form this
+// platform supplies) - while its root-list half runs on poison-token roots,
+// which are ordinary POSIX objects, so that half loses nothing. r3 pairs its
+// arm with a token-on-a-legal-path control; that control needs no junction and
+// already runs here (TestLeakProbeTokenOnALegalPathStaysSilent174r3), so the
+// pair is whole again on this platform with this arm.
+// ---------------------------------------------------------------------------
+
+// filed174r6 is this leg's filed path literal: whitespace-only, so
+// PathCanonicalizer.Canonicalize refuses it before risk.Resolve is ever
+// called, on every platform; non-empty, so the tool's pointer branch takes it
+// at all (task.go: rec.ArtifactPath != ""). The runes are Unicode spaces
+// (U+00A0, U+2003, U+2009, U+205F) - the class strings.TrimSpace folds -
+// chosen so that a notice carrying them is a relay, not a coincidence.
+const filed174r6 = "\u00a0\u2003\u2009\u205f"
+
+// rootToken174r6 stamps both configured roots, so the root-list bans below
+// name strings that cannot occur in the notice by accident. Both spellings are
+// banned: as NewPathCanonicalizer raises them, the roots arrive
+// comparison-folded (paths.go foldPath lowercases; Roots() hands out the
+// folded form).
+const rootToken174r6 = "ROOTLIST-LEAK-PROBE-174R6"
+
+// tokenRoot174r6 creates one real root directory whose name carries the poison
+// token and returns its C26 spelling.
+func tokenRoot174r6(t *testing.T, name string) string {
+	t.Helper()
+	root := filepath.Join(t.TempDir(), name)
+	if err := os.MkdirAll(root, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	return mustCanonical(t, root)
+}
+
+// TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6 is the leak
+// criterion of TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 in the
+// form a POSIX machine can actually evaluate.
+func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6(t *testing.T) {
+	rootA, rootB := tokenRoot174r6(t, rootToken174r6+"-A"), tokenRoot174r6(t, rootToken174r6+"-B")
+
+	body := asciiRun(20000)
+	roster := NewTaskRoster()
+	roster.Record("bg-portable-174r6", TaskOutput{Text: body, ArtifactPath: filed174r6})
+	// Two configured roots, so the root-list ban is a list, not one dir.
+	b := judgedTaskBridge(t, roster, NewPathCanonicalizer([]string{rootA, rootB}, nil))
+
+	out := callTaskOutput(t, b, "bg-portable-174r6")
+	t.Logf("portable leak-criterion verbatim: IsError=%v Truncated=%v announce=%q",
+		out.IsError, out.Truncated, announceOf(out.Text))
+
+	// Forward half, re-pinned so this criterion stands alone: the branch must
+	// speak before the question "what does it relay" can be asked of it.
+	if out.IsError || !out.Truncated {
+		t.Fatalf("a recorded long output must still be answered as a truncation: %+v", out)
+	}
+	if !strings.Contains(out.Text, noticeLead) || !strings.Contains(out.Text, "读不到") {
+		t.Fatalf("a path C26 refuses must be handled as unreadable, got %q", announceOf(out.Text))
+	}
+	// This branch specifically, by its own claim: the sweep below must judge
+	// the canonicalize-error notice, not a neighbor's sentence.
+	if !strings.Contains(out.Text, "连规范化都没通过") {
+		t.Fatalf("the reply must name normalization as the step that failed, got %q", announceOf(out.Text))
+	}
+	// The pointer itself is still owed (PLAN.md:2564). On this fixture the
+	// filed string IS whitespace, so pointerRe (which needs \S) cannot match
+	// it; the literal is pinned against the roster's own string instead.
+	if !strings.Contains(out.Text, "全文见 "+filed174r6) {
+		t.Fatalf("failing closed is not withholding the pointer, got %q", out.Text)
+	}
+	// The carve below is only meaningful because the banned literal IS in the
+	// reply: exactly once, where the frozen pointer sentence puts it. A relay
+	// that leaks it anywhere else changes this number.
+	if n := strings.Count(out.Text, filed174r6); n != 1 {
+		t.Errorf("the filed literal must appear exactly once, in the frozen pointer sentence: found %d in %q",
+			n, out.Text)
+	}
+
+	// The notice region: from the first 注意： up to the frozen pointer
+	// sentence - the same carve r3's arm uses, for the same reason (the
+	// pointer sentence legitimately carries the literal).
+	i := strings.Index(out.Text, noticeLead)
+	if i < 0 {
+		t.Fatalf("the branch speaks above, so a notice region must exist: %q", out.Text)
+	}
+	notice := out.Text[i:]
+	if j := strings.Index(out.Text[i:], "，全文见 "); j >= 0 {
+		notice = out.Text[i : i+j]
+	}
+	t.Logf("notice region under the leak sweep: %q", notice)
+
+	// Leak sweep. The notice is the tool's own sentence about the failure;
+	// none of these may pass through it.
+	for _, banned := range []string{
+		filed174r6,                    // the filed path literal, host spelling
+		fmt.Sprintf("%q", filed174r6), // ...or its quoted spelling
+		rootA, rootB,                  // the authorized root list, entry by entry
+		strings.ToLower(rootA), strings.ToLower(rootB), // ...as the fold spells it
+		rootToken174r6, strings.ToLower(rootToken174r6), // the poison tokens, any case
+		"读得回来", "随时可读", "可以读回", // no road-back promise
+		"不在你被授权的目录范围内", // not the allowlist verdict - that is the OTHER branch
+		"未接线",          // the judge IS wired here
+		"不可找回",         // a pointer is given; that announcement is the no-pointer arm
+	} {
+		if strings.Contains(notice, banned) {
+			t.Errorf("the canonicalize-error notice must not relay %q: notice %q", banned, notice)
+		}
+	}
+}
+
 // announceOf carves the bracketed announcement sentence out of a stub, i.e. the
 // part of the reply that is about the pointer.
 func announceOf(stub string) string {
