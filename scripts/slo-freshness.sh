@@ -503,8 +503,21 @@ EOF5
     else
         # Test-seam records (SLO_FULL_LAST_SAMPLE) are declared valid-sample
         # fixtures; the source predicate guards the API scan, not the fixture.
-        while IFS=$tab read -r ts art_run art_id; do
-            [ -n "$ts" ] || continue
+        # A fixture whose first field is empty is still refused (exit 2): an
+        # empty field would shift the columns apart and let a malformed record
+        # be aged as if it were whole, and "missing field" must never silently
+        # become "aged fine" on either path (ticket 136 AC#2).
+        while IFS= read -r row; do
+            [ -n "$row" ] || continue
+            case $row in
+            "$tab"*)
+                echo "slo-freshness: P3 an injected $sample_artifact record starts with an empty field (row: '$row') - a record this pin cannot read must not be aged" >&2
+                exit 2
+                ;;
+            esac
+            IFS=$tab read -r ts art_run art_id <<EOF4
+$row
+EOF4
             sample_count=$((sample_count + 1))
             e=$(to_epoch "$ts")
             if [ "$e" -gt "$now" ]; then
