@@ -1,0 +1,26 @@
+# 20-r2 派单（票 20 第 7 框：`[fs] allowed_dirs` 首次使用询问流的最小闭子集；写腿；面＝internal/tools＋internal/config（触 cmd/wisp/panel 先报））
+
+发送时刻：2026-10-14 15:2x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **20-r2**（台账已用 20-a2/20-r1/20-v1；r2 可用；查重已做）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与目标
+
+- 票：`.scratch/wisp/issues/20-*.md`（`ls .scratch/wisp/issues/20-*.md` 现定位）——**第 7 框**（约 `:120` 起）逐字读全文；范围**只有三条，多一条就算越界**；GUI 完整版归票 39；⚠ **SPEC-12 §5 没有这一行 ⇒ 代码里不许标 `DEFERRED`**。
+- (a) **拒绝原因可区分**：因"路径不在任何 allowed 根下"被拒时，桥必须返回**机器可辨**的原因值，**与 PathResolver 的红队拒绝（junction/8.3/UNC/`\?\`）不共用同一字符串**（理由：后者绝不能变成询问——注入文档可拿它驱动社工卡）。
+- (b) **同意只走已有 🔒 通道**：批准后追加只许经 `internal/config` 的 `fs.allowed_dirs` 方向引擎 confirm hook（先例已测：`manager.go:362`＋`manager_test.go:162-225`——拒绝后仍为空、批准后才生效）。**禁止**：新增第二条授权路径／直接改 PathCanonicalizer 根集合／"这次先放行下次再说"。
+- (c) 三条断言（票面逐字；第三条在你起手现读补齐）：①(a) 两类拒绝原因可区分；②批准 → 同路径下一次成功、拒绝 → 仍被拒；③…现读。
+
+## 你的活
+
+1. **先现读**：票面第 7 框全文＋§头部 ④ 来路；`internal/tools` 里那条拒绝路径（`InAllowlist` 相关今日刚被 `252-r4` 摸过——**它的写面是测试件、你是产码侧，⛔ 不许动它的新件**）；`manager.go:362` 的 hook 现读。
+2. **落最小形**：只按 (a)/(b)/(c) 三条做；每格配**改前红/改后绿**读数；突变证明（把可辨原因值并回红队字符串 ⇒ 哪枚钉红，逐字）。
+3. **⛔ 边界**：不动三枚冻结件／`thresholds.go`／golden／`allowlist.txt`／`PLAN.md`／`specs/**`／`.github/**`／`scripts/**`；⛔ `frontend/**`／`design/**`；**若落地必须动 `cmd/wisp/**` 或 `internal/panel/**` ⇒ 停手上报**（那边有 `114-a5`/`253-v3` 在飞）。
+4. **交件**：`probes/20/r2/00-anchor-and-gates.md`＋logs＋票 20 尾**追加 1 条 bullet**（署名 `agent=20-r2`；⛔ 框不翻）。产出 ≤7 枚 ≤200 行。
+
+## 环境与纪律
+
+- 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；别人脏件别动。
+- `GOTMPDIR` ⛔ 只**反斜杠形** `C:\tmp\wisp20r2gotmp`；判据 `-run` 小射程；⛔ 整包 cmd/wisp（314 死区）；窗口逐报（他腿 `252-r4`（同包 internal/tools 测试面）／`114-a5`（cmd/wisp/panel）／`253-v3`、`174-v3`（只读）在飞）。
+- 门禁：build rc=0／gofumpt 动过的件空／相关 `-run` rc=0／d22scan clean／长度门 GREEN（现 60=60）。
+- **未定义即停**：三条之外的邻接设计（GUI/卡片文案/新方法名）冒出来 ⇒ 停手上报（那就是越界）。
+- 回执：结论先行＋commit sha（产码/交付分开）＋逐格 (a)/(b)/(c) 读数＋突变红句逐字＋门禁 rc＋具名没做。

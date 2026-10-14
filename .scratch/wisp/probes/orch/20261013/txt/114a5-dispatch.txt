@@ -1,0 +1,24 @@
+# 114-a5 派单（票 114：九格拆分＋落地"干净子集"；写腿；面＝先只读拆分、落地限非前端非契约格）
+
+发送时刻：2026-10-14 15:1x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **114-a5**（`probes/114/` 现仅 a2；**腿号查重**：先 `grep -c "114-r\|114-v" 台账`，若 r1–r4 已用则取首个未用号，并在票尾 bullet 署名你的实际号）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 背景
+
+- 票：`.scratch/wisp/issues/114-composer-request-has-no-production-caller-and-the-real-gate-must-be-native.md`——**九格未勾**（AC#3/4/5/6/7/8/9/10/11），且票头有 2026-09-23 加注：**AC#6 与任何 `frontend/src/` 改动＝owner-delegated（skip、不勾、不写）**；"先把要写的文件列出来，有一枚在 `frontend/` 下就整段停手上报"。
+- 今日新事实：`253-r5` 的五分母名册尺已落地（"名字进名册就必须同时进 guard 与 router"）；`253-r6` 刚把旧封套静默丢弃改成有声；`253-v2` 定的 `config.reload` 不算入向名——**这些可能已覆盖 114 AC#8 的意图**，先现读再判。
+
+## 你的活（第一步＝拆分表，第二步＝只落干净子集）
+
+1. **拆分表（只读先行）**：把九格逐格给出三件——① 它要写哪些 `file:line`（列名单）；② 归哪个面（frontend／`.github`／契约／真机／本队可写）；③ 现读下"是否已被别的票满足"（例：AC#8 vs 253-r5 的五分母；AC#6/AC#10＝frontend ⇒ 直接标 `skipped=frontend(owner-delegated)`，⛔ 不写不勾）。**任一枚要写的文件落 `frontend/` ⇒ 该格整段停手、具名**。
+2. **只落"干净子集"**：从拆分表里挑**本队可写且不触契约**的仪器格（候选：AC#4"门二扩展名集与 d22scan 文本类一致"、AC#9"结构钉扫描根太窄"、AC#7"门禁读数"里缺的那一发），**逐格小落地**＋每格自配"改前红/改后绿"读数。⚠ `AC#11`（把 `npm run render:composer && git diff` 做成 CI 一步）＝动 `.github/**` ⇒ **停手上报**（契约邻接）；`AC#3` 真机格·`AC#5` 审计格按拆分表判可否随行（真机格若需真窗 ⇒ 具名留档）。
+3. **交件**：`probes/114/a5/00-split-and-landing.md`（拆分表全文＋落地格的逐格读数）＋logs＋票 114 尾**追加 1 条 bullet**（含 `skipped=frontend(owner-delegated)` 对 AC#6/AC#10）产出 ≤7 枚 ≤200 行。
+
+## 环境与纪律
+
+- 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；别人脏件别动。
+- ⛔ 不动三枚冻结件／`thresholds.go`／golden／`allowlist.txt`／`PLAN.md`／`specs/**`／`.github/**`／`scripts/**`；⛔ `frontend/**`／`design/**`。
+- `GOTMPDIR` ⛔ 只**反斜杠形**；判据 `-run` 小射程；⛔ 整包 cmd/wisp（314 死区）；窗口逐报（他腿 `252-r4`（internal/tools）、`253-v3`／`174-v3`（只读）在飞）。
+- 门禁：build rc=0／gofumpt 动过的件空／各落地格读数绿／d22scan clean／长度门 GREEN（60=60）。
+- **未定义即停**：某格"是否已被满足"判不了／落地格越面 ⇒ 停手上报（拆分表仍是成品）。
+- 回执：结论先行（拆分表九行＋落了哪几格）＋commit sha（产码/交付分开）＋逐格读数＋`skipped` 具名＋具名没做。

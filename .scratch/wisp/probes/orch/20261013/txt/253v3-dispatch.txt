@@ -1,0 +1,25 @@
+# 253-v3 派单（票 253 AC#3 的非实现者判语＋AC#4 结线建议；验收腿；面＝cmd/wisp 读）
+
+发送时刻：2026-10-14 15:1x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `253-v3`**（`probes/253/` 现 p4/r1/r3/r5/r6/v1/v2，v3 可用；查重已做）。⛔ 不翻框、⛔ 不动 `Status:`/票名——判语交回。
+
+## 被裁对象
+
+- 落地腿 `253-r6`：产码 `2298f7d2`（`cmd/wisp/panel_control_windows.go` +54/−1；新测试件 `panel_unbound_253r6_windows_test.go` 270 行）＋交付 `89d29fce`（证据 70 行＋logs＋票尾 bullet）。
+- 主张（要你独立核）：票 299-r1 把库 RPC 管道搬进本仓后，"静默面属第三方"在生产路径上已过期；落点＝旧门 `window.external.invoke(旧封套)` 支——改前 `resolve(null)`＋Go 零记录 ⇒ 改后 **Go 侧 slog 留痕（resident JSONL）＋页面拿具名 `REJECTED('…宿主已记录本次丢弃…')`**；正控＝同装配走 `chrome.webview.postMessage` ⇒ `RESOLVED('')`＋handler 恰 1＋零新告警；反控＝`git show HEAD:` 还原 ⇒ `RESOLVED(null)`、rc=1、逐字节还原。
+- 已知背景：`253-v2` 已判 AC#2 成立（附条件 1）；`253-r6` 自报 P3/P4 未真窗单发、`-tags winlive`/整包未跑、本机 pre-existing 间歇（同一 test 二进制连开第二枚真窗偶发猝死）。
+
+## 你要独立做的
+
+1. **机制链条自核**：`panel_control_windows.go` 的 `msgcb`/`callbinding` 现读；"旧门那一支"与"35/303 钩子已覆盖的那一支"分界逐点；判"改前静默 null"的必要条件（⛔ 不许只引它的件）。
+2. **真窗自跑 ≥2 发**（可复用其测试件但**读数自己取**）：改前形（用其留档或 overlay 还原）⇒ `RESOLVED(null)`＋零日志；改后 ⇒ `REJECTED(...)`＋slog 行逐字；**你自己再种一发**它没种过的形（例：旧封套带 `_rpc` 槽/不带槽两形，或换 method 名）⇒ 判"裸发无槽"那形是否如它所述结构不可达（页面侧拿不到东西、闭合只在 Go 记录）。
+3. **正控不误伤**：正常 `wispDispatch` 调用 rc=0＋零新告警（自跑）。
+4. **AC#3 判语**：成立/附条件/不成立＋逐条凭据；**并给 AC#4（三枚各自结线，不许合并成"入向修好了"）的结线建议**（AC#1 成立附条件＋AC#2 成立附条件＋AC#3 判语 ⇒ 能否按"三格各自结线"收口、留档句怎么措辞）。
+5. **门禁抽核**：build／族（`-run 'Test253r6'`＋headless 15 枚）／d22scan clean／长度门 GREEN（60=60）。
+
+## 交付与纪律
+
+- 交件：`docs/evidence/s1/ticket253-253-v3-accept-v1.md`＋`.scratch/wisp/probes/253/v3/`（锚＋logs）＋票 253 尾 **1 条 bullet**；产出 ≤7 枚 ≤200 行。⛔ 框不翻。
+- 只 commit、⛔ 不 push；显式 pathspec；`PATH` 带 sherpa（MSYS 形）；`GOTMPDIR` ⛔ 只**反斜杠形**；突变优先 overlay/仓外备份；**真窗族单枚独立跑**（已知间歇：别把两枚真窗连在一发里）；窗口逐报（他腿 `252-r4`／`114-a5`／`174-v3` 在飞）。
+- **未定义即停**：机制链对不上／你的种树打不响／裸发无槽形与它读法冲突 ⇒ 停手上报。
+- 回执：结论先行（AC#3 判语＋AC#4 结线建议）＋各发读数逐字＋门禁 rc＋具名没做。
