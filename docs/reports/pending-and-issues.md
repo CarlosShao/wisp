@@ -18069,3 +18069,9 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **判语要点**：① 两件**不互斥**（桥级两枚原位腿今天绿＝`TestLongOutputPointerRecoversEveryByte`／`TestPointerPast256KiBIsNotFullyReadable`；反向面仍在＝外来内容携同路径仍命中 R4，非放宽换的）；② **175 已落**（175-r2 的 `ticket175r2_stamp_live_test.go` 五枚＋名册 `+SrcTaskOutput`），唯一未勾＝AC#5 分账＝结题动作；③ **纠正我的假设**：化解者不是 315/179（那是同管更后面的两扇门）；④ 下一条可派腿＝**179 AC#8 CLI e2e**（零产码；硬前置＝`cmd/wisp` 空出＋台件对现树编译复验），一发喂 177 AC#3／175 AC#5／176 AC#3-4。**今天不可达**：179 AC#8 全家、177 AC#0（丙形零读数不许冒充）、185 证据表 §②–⑪ 待填。
 - **解锁与派单**：174 AC#2c 票面"等 177 裁完再动"⇒ 现已裁 ⇒ 派 `174-r7`（AC#2c spill.go 桩如实说明＋AC#2d 第五支零覆盖牙）——**它一落地即补进"可收"队列**，其面（internal/tools＋internal/agent/spill.go）与在飞全不撞。
 - **175 的收口**：只余 AC#5（与 Q-59 分账的结题说明）＝编排者桌面（随其族收口时做）。
+
+## A956｜2026-10-14 20:37 +08｜★机主实报"界面打不开"：根因＝**旧实例的面板线程 15:41 死了（终态）＋二次启动无唤窗路径**（日志逐字）；编排者**临时恢复**（掐僵尸 29284 → 重编含 v2 设置页的 exe〔20:34，doctor rc=0，`index-CQdw3HH0.js`＋`index-MtwQJ5iZ.css` 嵌实〕→ 拉起 PID 40296）；**立票 319**（AC#0–#4）
+
+- 恢复选项读数：热键三枚全活 `summon=Ctrl+Alt+Q／mute=Ctrl+Alt+M／panel=Ctrl+Alt+P`（`cancel` 仅 Confirming 期借绑）。
+- 构建过程两账：① 首次 `build.ps1` FATAL 于票 274 的产物名守卫（源码未变⇒npm 产物名不变）；按仓内既定程序绕过＝`mv frontend/dist /c/tmp/wisp-dist-bak-<ts>`（只移不删）＋补 `.gitkeep` 后重编 **rc=0**；② `frontend/src/styles/tokens.generated.css` 工作树脏件 mtime＝**09:01**（前端 agent 自己早期留下的，非本批所动）⇒ **未碰**，登记。
+- 关联：票 228（拓扑）· "ticket 07"（bring-to-front 落它名下的自注，待核）。
