@@ -130,8 +130,12 @@ func Test313EmptyConfigToStepfunRowChainAndPair(t *testing.T) {
 	if want := config.PresetNames(); !reflect.DeepEqual(gotPresets, want) {
 		t.Errorf("presets = %v, want the built-in list %v", gotPresets, want)
 	}
-	if payload["providers"] != nil {
-		t.Errorf("zero provider rows rendered as %v", payload["providers"])
+	// Zero rows travel as an empty array, not null and not absent: the settings
+	// page reads providers with unguarded find/some at render (ticket 313's
+	// acceptance leg 313-v1 measured the old null shape against the live page;
+	// it throws exactly on the fresh-config state AC#1 targets).
+	if rows, ok := payload["providers"].([]any); !ok || len(rows) != 0 {
+		t.Errorf("zero provider rows must render as the empty array [], got %v", payload["providers"])
 	}
 
 	// The six writes in dependency order (the row comes first: both the chains and
