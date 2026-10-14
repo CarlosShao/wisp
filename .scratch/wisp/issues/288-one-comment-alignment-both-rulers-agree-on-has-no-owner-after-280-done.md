@@ -12,9 +12,9 @@
 
 ## 要建什么
 
-- [ ] **AC#1 只改那一处对齐**：写面**只许** `cmd/wisp/panel_inbound_guards_35r3_test.go`；尺＝改前后各跑 `gofmt -d <该件>` 两列并排（前＝14 行、后＝**0 行**），且 `gofumpt -d <该件>` 也降到 0（它本就是 14＝同声）。⛔ `-w` 全仓禁用、⛔ 不许批量重排、⛔ 不许碰第二枚文件。
-- [ ] **AC#2 证明没伤到测试**：`go test ./cmd/wisp/ -count=1` 改前改后各一次，报 **PASS/FAIL/SKIP 三数＋红名册差集**（⚠ 本机跑 `cmd/wisp` 需要 sherpa/onnxruntime 原生 DLL 的 harness：`GOMODCACHE` 三枚 DLL 拷到测试 exe 旁＋CWD＝包目录；**不带 DLL 时那枚 0xc0000135 是环境红、不是被验物**，基线一律具名写清用了哪支）。⛔ 不许因为"整包本来就红"就不跑改前基线。
-- [ ] **AC#3 门禁与越界**：`GOFLAGS= go build ./...` rc=0；`sh scripts/d22scan.sh` 纯净树 rc=0；`gofmt -l`／`gofumpt -l` 对动过的件空；`git show --stat` 名册**只含该件**；`frontend/**`／`design/**`／三枚冻结件／`testdata/**`／golden／`thresholds.go`／`allowlist.txt` 零字节；⛔ 零 push、commit 必带显式 pathspec。
+- [x] **AC#1 只改那一处对齐**：写面**只许** `cmd/wisp/panel_inbound_guards_35r3_test.go`；尺＝改前后各跑 `gofmt -d <该件>` 两列并排（前＝14 行、后＝**0 行**），且 `gofumpt -d <该件>` 也降到 0（它本就是 14＝同声）。⛔ `-w` 全仓禁用、⛔ 不许批量重排、⛔ 不许碰第二枚文件。 〔10-14 2026-10-14 12:07 编排者翻勾：**债已付清（非本票腿）＝`18d43f8e`（298-r1）**；凭据＝非实现者 `288-v1`（`87b3065e`）独立复认：blob 链 `a917e0dc→9713dc37`＝HEAD、前态两把尺 14/14 逐字节同声、后态 0/0、变换等价 `gofmt(pre)`==post `cmp` rc=0；链收口核 298 验收＋终裁。账 `A917`〕
+- [x] **AC#2 证明没伤到测试**：`go test ./cmd/wisp/ -count=1` 改前改后各一次，报 **PASS/FAIL/SKIP 三数＋红名册差集**（⚠ 本机跑 `cmd/wisp` 需要 sherpa/onnxruntime 原生 DLL 的 harness：`GOMODCACHE` 三枚 DLL 拷到测试 exe 旁＋CWD＝包目录；**不带 DLL 时那枚 0xc0000135 是环境红、不是被验物**，基线一律具名写清用了哪支）。⛔ 不许因为"整包本来就红"就不跑改前基线。 〔10-14 2026-10-14 12:07 编排者翻勾：N/A＋承接形（`288-v1` 建议并经我核）——零写面下承接 295 链（剥空白 8301⇄8301 `cmp` rc=0＋编排者成对两发新红 0）／名册尺改挂 `18d43f8e`（numstat `2 2`）。账 `A917`〕
+- [x] **AC#3 门禁与越界**：`GOFLAGS= go build ./...` rc=0；`sh scripts/d22scan.sh` 纯净树 rc=0；`gofmt -l`／`gofumpt -l` 对动过的件空；`git show --stat` 名册**只含该件**；`frontend/**`／`design/**`／三枚冻结件／`testdata/**`／golden／`thresholds.go`／`allowlist.txt` 零字节；⛔ 零 push、commit 必带显式 pathspec。 〔10-14 2026-10-14 12:07 编排者翻勾：N/A＋承接形（`288-v1` 建议并经我核）——零写面下承接 295 链（剥空白 8301⇄8301 `cmp` rc=0＋编排者成对两发新红 0）／名册尺改挂 `18d43f8e`（numstat `2 2`）。账 `A917`〕
 
 ## 禁区
 
@@ -24,3 +24,9 @@
 
 - [2026-10-14 11:37:32 +08] agent=288-r1（落地腿）did=**停手上报：本票那处对齐在 HEAD 上已不存在**——「前」态（blob `a917e0dc`＝`18d43f8e^:cmd/wisp/panel_inbound_guards_35r3_test.go`）两把尺复现票面逐字（裸 `gofmt -d` rc=1 14 行／`gofumpt -d` rc=1 14 行，同一 hunk `@@ -63,8 +63,8 @@`），而 `18d43f8e`（票 298 的 298-r1，2026-10-10 16:19，"35r3＝const 块内尾随注释列对齐"1 hunk／numstat 2 2）已把它洗完、`18d43f8e:path`＝`HEAD:path`＝`9713dc37`（改后无人再动）⇒ 工作树现量 `gofmt -d`／`gofumpt -d` 同声 **0／0**、件级 `gofmt -l`／`gofumpt -l` 皆空、`git status` 对该件 0 行、`i/lf w/lf` CR=0；⇒ 零写面（⛔ 无字节可改，改任何东西都违反 `AC#1` 自己的"只改那一处"）⇒ 本腿**零 commit 于该件**、按派单 §5「未定义即停」停手；`AC#2` 具名未跑整包（无「改前/改后」对可作差＋`wisp.test.exe` PID 38192 占窗；同一 blob 过渡的等价证据在册：`tr -d '[:space:]'|cmp` rc=0＋编排者 10-12 成对两发新增红 0，件 `probes/orch/20261012/logs/298ac4/{new-red.txt,summary.txt}`）；`AC#3` 树态读数＝build rc=0／d22scan rc=0 clean（⛔ 非写腿门禁）；`AC#1/#2/#3` 一格未勾、`Status` 未动；此债自 298 起归票 298 的账（其残余只剩 `AC#5`＝另一枚件的 `gofumpt` 残留） next=编排者裁本票收口措辞（建议句＝债由 `18d43f8e` 付清）＋若仍要一发整包现色则另派（等 PID 38192 退场）；交件 `probes/288/r1/{00-anchor-and-gates.md,logs/*}`（两列并排＋锚链＋树态 rc，无一 0 字节入册件）
 - [2026-10-14 12:05:04 +08] agent=288-v1（非实现者验收腿）did=判语：「**债由 `18d43f8e` 付清**」成立——blob 链现跑三枚 `a917e0dc…`／`9713dc37…`／`9713dc37…`（＝HEAD；`git log 18d43f8e..HEAD -- <件>` 空）；前态两把尺同声 14 行 rc=1（两输出 `cmp` rc=0、hunk `@@ -63,8`）、后态同声 0 行 rc=0；付款笔核成＝diff 头逐字 `index a917e0dc..9713dc37`、numstat `2 2`，且 `gofmt(pre blob)`⇄post blob 逐字节 `cmp` rc=0（净效果恰为 gofmt、剥空白 8301⇄8301、工作树⇄HEAD blob rc=0）；链收口现读＝`docs/evidence/s1/ticket298-298-r1-accept-v1.md`＋票 298 编排者终裁（AC#0–3 翻）＋AC#4 翻勾（10-12 14:52，新增红 0）；目录级两枚（`models.go` CRLF 假枚／35r2 gofumpt 残留＝298 AC#5 的账）与本票无关、288 件在两把尺上皆空；AC 收口建议＝AC#1 债已付清勾形、AC#2/AC#3 零写面 N/A 承接形（措辞在证据件 §二）；背景 1 发整包 rc=1、唯一顶层 FAIL＝`TestAC2SealNoticeLandsInTheRunLegLogFile`（GOTMPDIR=C:\tmp 环境形、台账在册非真红）＋build rc=0／d22scan rc=0 clean（⛔ 非判据）；交件 `docs/evidence/s1/ticket288-288-v1-accept-v1.md`＋`probes/288/v1/`（锚＋logs） next=编排者裁收口措辞并翻框；⛔ 零字节改动、零翻框、零 push
+
+## 编排者收口（2026-10-14 2026-10-14 12:07 +08）
+
+- **三框全勾**：AC#1＝**债已付清（`18d43f8e`，298-r1，非本票腿）**；AC#2／AC#3＝**N/A＋承接**形（零写面，判据由 `18d43f8e` 的验收链与 295 链承接；硬补一发整包＝~30 分钟 CPU 且与 298 AC#4 同物重复，⛔ 不做）。
+- 凭据＝**非实现者** `288-v1`（`docs/evidence/s1/ticket288-288-v1-accept-v1.md`；`87b3065e`）——它自己重跑了 blob 链、两把尺（前 14/14 逐字节同声＝sha256 皆 `02f4bd00…`；后 0/0）、变换等价（`gofmt(pre blob)` 与 post blob `cmp` rc=0）、剥空白 cmp、298 链收口与目录级两假枚归属；编排者抽核同中。
+- **改名 `-done`**（防重领键）；本票无 `Status:` 行故不替换。账 `A917`。
