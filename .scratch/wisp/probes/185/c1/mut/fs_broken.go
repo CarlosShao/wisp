@@ -1,5 +1,4 @@
 package tools
-var probe185c1BrokenMarker = undefinedSymbol185c1
 
 import (
 	"context"
@@ -14,6 +13,8 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/risk"
 )
+
+var probe185c1BrokenMarker = undefinedSymbol185c1
 
 // The D34 fs family lands slice by slice. This file holds the L0 pair:
 //
