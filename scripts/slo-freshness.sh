@@ -135,7 +135,7 @@ root=$(CDPATH='' cd -- "$here/.." && pwd)
 
 max_age_days=${SLO_FULL_MAX_AGE_DAYS:-3}
 sample_max_age_days=${SLO_FULL_SAMPLE_MAX_AGE_DAYS:-3}
-sample_pages=${SLO_FULL_ARTIFACT_PAGES:-3}
+sample_pages=${SLO_FULL_ARTIFACT_PAGES:-20}  # 2026-10-14: listing held 348 entries (measured via gh, roster A953); 20 pages = 2000 gives ~7 months of headroom at the observed ~8/day. The pin still rings whenever the listing exceeds this cap (ticket 136 AC#3).
 ci_file=${SLO_FRESH_CI:-$root/.github/workflows/ci.yml}
 record=${SLO_FULL_LAST_TRIGGER:-}
 sample_record=${SLO_FULL_LAST_SAMPLE:-}
