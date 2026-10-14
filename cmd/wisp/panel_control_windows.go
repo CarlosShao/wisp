@@ -45,6 +45,11 @@ package main
 // webview2.HintNone. SetSize still records the pair (its body is the library's),
 // but nothing reads the two fields now.
 //
+// There is a SECOND NAMED DEVIATION, and it is a product behaviour rather than a
+// gate's demand: ticket 253 AC#3 required the pipe's silent drops to speak, and the
+// one place that can speak for them is msgcb below. Its exact shape is stated in the
+// RPC-pipe section's own note; nothing else in the pipe differs from the library.
+//
 // WHY A SYNTHETIC ORIGIN. The page's entry references its bundle relatively
 // (frontend/vite.config.ts:23 `base: "./"`, so `./assets/index-*.js` and
 // `./assets/*.css`), and a document's relative URLs resolve against its BASE
@@ -62,6 +67,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 	"reflect"
 	"strconv"
 	"strings"
@@ -669,6 +675,20 @@ func (c *panelControl) Eval(js string)      { c.browser.Eval(js) }
 // window._rpc[<id>].resolve(...) posted through Dispatch. panel_transport_35r2
 // models this pipe call for call, so the two descriptions can be read against
 // each other.
+//
+// THE SECOND NAMED DEVIATION (ticket 253 AC#3, this file's header). The two
+// branches where a message is RECEIVED and answers no door were silent in the
+// library: a non-JSON message left one stderr line and no reply, and a frame whose
+// method no Bind registered answered (nil, nil), which the reply script turned into
+// window._rpc[id].resolve(null) - the page's promise settled with null and the Go
+// side recorded nothing at all (webview.go:162-168; the census reading is ticket
+// 114-a2 R10). Since ticket 299-r1 this pipe is this package's code, so both
+// branches now say what happened: one slog record naming the drop (slog is the
+// channel the resident process keeps - logsink.go installs the JSONL sink over it),
+// and, where a slot exists to receive it, a reject carrying the sentence instead of
+// a null. A frame whose method IS bound takes the library's path unchanged, byte for
+// byte; callbinding keeps its faithful (nil, nil) branch for the same reason, it is
+// simply preceded by the named refusal here.
 
 type ctlRpcMessage struct {
 	ID     int               `json:"id"`
@@ -678,14 +698,47 @@ type ctlRpcMessage struct {
 
 func ctlJsString(v interface{}) string { b, _ := json.Marshal(v); return string(b) }
 
+// boundDoor reports whether any Bind registered this door name. It exists so msgcb
+// can tell "no door answers this method" (ticket 253 AC#3's refusal) apart from "the
+// door answered" before callbinding is reached.
+func (c *panelControl) boundDoor(name string) bool {
+	c.m.Lock()
+	_, ok := c.bindings[name]
+	c.m.Unlock()
+	return ok
+}
+
 func (c *panelControl) msgcb(msg string) {
 	d := ctlRpcMessage{}
 	if err := json.Unmarshal([]byte(msg), &d); err != nil {
-		log.Printf("invalid RPC message: %v", err)
+		// Ticket 253 AC#3, first of the pipe's two silent deaths: a message that is
+		// not an RPC frame at all. It has no id to address a reply to, so the record
+		// is the whole answer - and it rides slog, not a bare log line.
+		slog.Warn("panel host: inbound message is not an RPC frame - received and dropped, no door and no reply (ticket 253 AC#3)",
+			"err", err, "bytes", len(msg))
 		return
 	}
 
 	id := strconv.Itoa(d.ID)
+	// Ticket 253 AC#3, the second and worse death: a well-formed frame naming no
+	// bound door - the shape an old page's envelope takes when it arrives at this
+	// callback instead of through the wispDispatch binding (the census's "old
+	// envelope": id derived from a missing field, method read as the envelope's own
+	// method, nothing bound under it).
+	if !c.boundDoor(d.Method) {
+		named := d.Method
+		if named == "" {
+			named = "(无 method)"
+		}
+		refusal := "面板请求被拒绝 [" + named + "]：这枚 RPC 帧的方法名没有已绑定的门（door），没有任何处理器接手；宿主已记录本次丢弃"
+		slog.Warn("panel host: inbound RPC frame names no bound door - received and refused instead of resolved null (ticket 253 AC#3)",
+			"method", d.Method, "id", d.ID, "params", len(d.Params), "reply", refusal)
+		c.Dispatch(func() {
+			c.Eval("window._rpc[" + id + "].reject(" + ctlJsString(refusal) + "); window._rpc[" + id + "] = undefined")
+		})
+		return
+	}
+
 	if res, err := c.callbinding(d); err != nil {
 		c.Dispatch(func() {
 			c.Eval("window._rpc[" + id + "].reject(" + ctlJsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
