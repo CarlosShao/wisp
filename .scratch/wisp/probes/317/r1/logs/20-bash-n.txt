@@ -1,0 +1,3 @@
+scripts/portable-tests.sh bash-n rc=0
+scripts/winsec-tests.sh bash-n rc=0
+scripts/wisp-cli-tests.sh bash-n rc=0

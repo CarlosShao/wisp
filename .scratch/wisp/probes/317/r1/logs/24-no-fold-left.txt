@@ -1,0 +1,13 @@
+== grep: any LOCALAPPDATA fold left in scripts/
+scripts/portable-tests.sh:818:    wisp_311_ref_path=${LOCALAPPDATA//\\//}
+scripts/wisp-cli-tests.sh:186:    wisp_311_ref_path=${LOCALAPPDATA//\\//}
+scripts/winsec-tests.sh:174:    wisp_311_ref_path=${LOCALAPPDATA//\\//}
+
+== which of those feed a GOTMPDIR value (expect none)
+none
+
+== diff stat
+ scripts/portable-tests.sh | 15 +++++++++++++--
+ scripts/winsec-tests.sh   |  8 +++++++-
+ scripts/wisp-cli-tests.sh |  8 +++++++-
+ 3 files changed, 27 insertions(+), 4 deletions(-)
