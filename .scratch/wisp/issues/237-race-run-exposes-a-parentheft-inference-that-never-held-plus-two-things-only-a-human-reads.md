@@ -37,3 +37,16 @@
   门禁：build/vet/gofumpt/`d22scan` clean/长度门 GREEN(58) 全 rc=0。读数、逐发时刻、变异四形、盘上日志字节数
   ＝`.scratch/wisp/probes/237/r1/evidence.md`。⛔ 未 push；⚠ 产码侧"composition root 从不开 task scope"的
   具名发现（建议落 `A##`/`Q##`，台账不在本腿写面）见台件 §2。
+- 2026-10-14 10:0x **237-v1（验收腿，非实现者；只读只测、零改实现件）**：三格判语 **AC#1 成立／AC#3 成立／AC#2 成立**；
+  零产码与 unbound-scope 归因链＝成立；**★生产面＝不是"只在 harness 缺、生产无恙"——同一机制在生产链路静态可达**
+  （生产无任何任务 scope 开点：`OpenTask` 非测试调用点全树仅 `bridge.go:649` mark 懒开；`run.go:953-962` admitTask 只
+  `CloseTask`；`loop.go:373-379`；子环路 `subagent_197.go:311-320`；触发＝首枚子代理结论把 mark 落父名 `:487` 后，任何
+  自己 scope 尚未注册的任务每次走桥都判 unbound-scope R4/L2，落真审批门 `run.go:612`）——建议编排者据此落 `A##`/`Q##`。
+  AC#1：自造回退形（现件只把 `parkParents` 退回快照体，`-overlay`，工作树零突变字节）`-race -count=60 -run Test222`
+  09:54:03→09:54:16 **rc=1** 一发红、红句＝"只有 3/4 枚父任务到达等待点（父任务没派生成功…）"、DATA RACE 0；交付态同命令
+  ×2（09:54:35→09:54:45／09:55:05→09:55:16）**零红**。AC#3：四形逐枚复跑——partial-after 三红(3.00/0.00/0.00s)、
+  partial-before leg1 30s 护栏红＋leg2/leg3 绿（失明形复现）、full-after 三红 0.00s、noopadmit 三红（同族红句；leg1
+  时长 0.01s 与 r1 表 3.00s 有差、判据落）⇒ **C25 scope 补丁不是放宽（双向坐实）**。AC#2＝纯注释 +1/-0；产码 diff 空；
+  门禁 build/vet/`d22scan` clean/长度门 GREEN(58) 全 rc=0；全包 `-race` rc=0 `ok 21.798s`（另有一发误用正斜杠 GOTMPDIR
+  的环境前置红，已具名改正，与 237 断言无关）。交件＝`docs/evidence/s1/ticket237-237-v1-accept-v1.md`＋
+  `probes/237/v1/`（锚＋3 枚合订 raw log＋回退形变异件＋overlay）。⛔ 未翻框、⛔ 未 push。

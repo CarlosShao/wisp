@@ -1,0 +1,14 @@
+# 237-v1 AC#1 原文（raw，逐发；GOTMPDIR='C:/tmp/wisp237v1gotmp'，GOFLAGS=）
+# [1] fallback-shot1.txt (400 B): -overlay ../overlay-parkparents-snapshot.json -race -count=60 -run Test222 ./internal/tools/  09:54:03→09:54:16 rc=1
+time=2026-10-14T09:54:15.371+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: Test222SpawnConclusionArrivesThroughRealBridgeChildren (0.00s)
+    subagent_222_test.go:516: 只有 3/4 枚父任务到达等待点（父任务没派生成功，等待读数就无从谈起）
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	3.004s
+FAIL
+
+# [2] delivery-race60-shot1.txt (54 B): 交付态同命令  09:54:35→09:54:45 rc=0
+ok  	github.com/CarlosShao/wisp/internal/tools	3.900s
+
+# [3] delivery-race60-shot2.txt (54 B): 09:55:05→09:55:16 rc=0
+ok  	github.com/CarlosShao/wisp/internal/tools	4.285s

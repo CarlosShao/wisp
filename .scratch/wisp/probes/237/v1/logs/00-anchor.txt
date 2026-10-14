@@ -1,0 +1,27 @@
+# 237-v1 起手锚点与窗口（验收腿；非实现者）
+date: 2026-10-14 09:51:56 / 10:06 (+08)
+git rev-parse HEAD: bfb62488eb66cc29cc17cdbce9cdfa9c150c68a9
+  （送发时现量为 f3dc1389；bfb62488＝编排者文档提交：只动 .scratch/wisp/probes/orch/**、docs/reports/HANDOVER.md、
+    docs/reports/pending-and-issues.md；代码面 blobs 仍＝d8a4d913 态）
+被裁两笔（名册现读）:
+  d8a4d913: internal/tools/subagent_197_test.go (M) + internal/tools/subagent_222_test.go (M)
+  f3dc1389: 票 237 + probes/237/r1/evidence.md + logs/00-anchor|10-pre-fix-red|20-post-fix|30-mutations.txt (A)
+worktree 哈希（git hash-object）:
+  internal/tools/subagent_197_test.go  d2d52bff972309aca5a7019ce01b633805a61fb5（＝d8a4d913 后 blob）
+  internal/tools/subagent_222_test.go  ba852ebf3e4267e7b84bde69bbe11ee3fae9391d（＝d8a4d913 后 blob）
+  internal/tools/subagent_197.go       b72f67407962bd10768f6f5866c0c461fecb97ff（＝r1 锚点同一枚，本腿零改）
+  internal/tools/bridge.go             4f8f6e9048d00c2b5387dfabdc6a7da6fdb09279
+  git diff d8a4d913~1..f3dc1389 -- internal/tools/subagent_197.go internal/tools/bridge.go  -> 空（复跑）
+tasklist: 09:51／09:53／10:03 三次现看，无 go/compile/link 进程（仅 cargo/node；313-v1 未在跑 -race）
+GOTMPDIR: C:\tmp\wisp237v1gotmp（只 C:；10:03 全包一发误用正斜杠拼法致环境前置红，10:04 改正）
+窗口（本腿全部 -race/突变，串行；无并发腿）:
+  AC#1 回退形 shot1        09:54:03→09:54:16  rc=1
+  AC#1 交付态 shot1        09:54:35→09:54:45  rc=0
+  AC#1 交付态 shot2        09:55:05→09:55:16  rc=0
+  AC#3 partial-after       09:55:17→09:55:29  rc=1
+  AC#3 noopadmit-after     09:55:39→09:55:48  rc=1
+  AC#3 partial-before      09:55:48→09:56:27  rc=1
+  AC#3 full-after          09:56:53→09:57:04  rc=1
+  门禁四发                10:01:42→10:02:17  全 rc=0
+  全包 -race 发1(环境)     10:03:12→10:03:38  rc=1（7 FAIL 全环境前置，DATA RACE 0）
+  全包 -race 发2(改正)     10:04:58→10:05:25  rc=0
