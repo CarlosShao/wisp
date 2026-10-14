@@ -205,11 +205,20 @@ func TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun(t *testing.T) {
 
 // grantLinesOf pulls just the grant-shaped audit lines out of the run's stderr, so
 // a failure prints the sentences that matter instead of a 400-line dump.
+//
+// Ticket 252 AC#5: the filter also keeps the bridge's per-call line
+// ("tools: call ... risk=... in_allowlist_scope=..."). 224-c2 found the
+// decision this file's cases keep colliding with - a call judged R2/L2
+// because its 8.3 spelling did not match the allowed root - carried no
+// needle the old filter knew, so every failure dump printed here was blind
+// to the level dimension exactly when it mattered. The needle is the audit
+// line's own literal prefix (the call site in internal/tools/bridge.go), not
+// a column name, so a reordering of the format cannot silently drop it again.
 func grantLinesOf(h *replyHost) string {
 	var kept []string
 	for _, l := range strings.Split(h.err.String(), "\n") {
 		if strings.Contains(l, "GRANT") || strings.Contains(l, "SESSION-MINT") ||
-			strings.Contains(l, "REPLY ") {
+			strings.Contains(l, "REPLY ") || strings.Contains(l, "tools: call ") {
 			kept = append(kept, l)
 		}
 	}
