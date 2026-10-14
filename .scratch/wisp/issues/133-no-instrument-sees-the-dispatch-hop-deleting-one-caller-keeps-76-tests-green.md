@@ -28,7 +28,7 @@
 
 ## AC（1:1，裁决表 `docs/evidence/s1/133-*.md` 由**非实现者**出）
 
-- [ ] **AC#1** 判据先立住：本仪器的**唯一硬标准是"能把 N-3 那一形做成红"**。
+- [x] **AC#1** 判据先立住：本仪器的**唯一硬标准是"能把 N-3 那一形做成红"**。
       做法固定为三步：①先**不加仪器**、只把那 1 行调用者摘掉 ⇒ 记录"全绿"这个事实（红之前必须先证明现在不红）；
       ②装上仪器、**同一发变异** ⇒ 必须红、红名点到本仪器；③还原 ⇒ 复绿。三态读数都要贴原文。
       - **⚠ 2026-09-23 12:4x 编排者扩判据（来源：票 131 验收方 `R-131-1`，`docs/evidence/s1/131-adversarial-acceptance.md` §4/§8）**：
@@ -65,7 +65,7 @@
 - [x] **AC#2** 覆盖面要说得出**删掉它哪条用例会红**：清单式（每条生产入口 → 它的分发调用者存在）还是图式（从 `main` 出发的可达性）？
       两种的失效面不同——清单会漏"新加的入口没人登记"，图会被 `//go:embed`/反射/`goja` 注册这类**静态看不见**的边骗过。
       ⚠ 选了哪一种，就要在票面写明**另一种能看见而它看不见的例子**，不许写"顺带全覆盖"。
-- [ ] **AC#3** 自证腿**不许是哑的**：`R-121-2` 实测到"成员判定退化成子串 ⇒ 整枚用例 PASS、它自己的 `notARealPackage` sanity 腿不响"。
+- [x] **AC#3** 自证腿**不许是哑的**：`R-121-2` 实测到"成员判定退化成子串 ⇒ 整枚用例 PASS、它自己的 `notARealPackage` sanity 腿不响"。
       ⇒ 本仪器的 sanity 腿必须**被独立破坏一次并证明它会响**（变异自证，不是注释声明）。
       - **⚠ 09-23 17:3x 编排者裁定同族洞的归属（不是本票的活，写在这里只为防"两票都不接"）**：
         票 131 第三任复验方测出 `R-131r3-1`——第二把尺 `rulingCrossChecks131` **只到文件粒度**，一枚不绑任何 func 的裸标记句落在
@@ -73,7 +73,7 @@
         `slo_other.go` 末尾 ⇒ 命中 **0**，红被洗掉）。**归票 135**（它的 AC#1/AC#2 恰是"两枚变异叠起来全绿"与"自证腿不许是哑的"，同一根），
         修法采其倾向的 ②（给这把尺装一枚**主动弄哑自己**的自证腿 ⇒ 现在就红），细节见票 135 面上 `R-131r3-1` 那一格。
         本票 **不重复实现**，也**不许**因为"135 会修"而把 AC#3 的 sanity 腿做成哑的。
-- [ ] **AC#4** 静默缩短要能响：两枚策略清单（本票自己的入口清单 + 票 121 的 `capabilityPackages`/`graphGOOS`）
+- [x] **AC#4** 静默缩短要能响：两枚策略清单（本票自己的入口清单 + 票 121 的 `capabilityPackages`/`graphGOOS`）
       **加长被查、缩短静默**是同一枚病 ⇒ 补严格前缀负断言 + `len(...) >= N` 下限断言（同 `R-121-2`，那三行顺手一起做）。
       - **⚠ 09-23 12:4x 编排者并入第三枚清单（来源：票 130 接续代理交回的 `next=` N1）**：
         **票 131 那扇枚举门的"腿清单"自身没有下限断言**——它今天从 `main.go` 现算，算出几条算几条；
@@ -92,7 +92,7 @@
           （造法固定：把判定改成直接取期望值那一发，Y3 就是靶子）。
         ⚠ 并把我先前那句"下限断言（同 `R-121-2`，那三行顺手一起做）"**降为必要不充分**——
         它的效果实测只有：删腿会红；换靶与恒真**都不会**。
-- [ ] **AC#5** 门禁：`go test -count=2 -v ./cmd/wisp/` 四数（只能从 `-v` 量）；`gofmt`/`gofumpt` 真跑；`go vet`；
+- [x] **AC#5** 门禁：`go test -count=2 -v ./cmd/wisp/` 四数（只能从 `-v` 量）；`gofmt`/`gofumpt` 真跑；`go vet`；
       `sh scripts/d22scan.sh` 纯净快照 rc=0 + 台账各 scope 不降。
       ⚠ 票 123 那批 CLI 用例（"审批超时 1/300 秒未确认 ⇒ C18 一律判拒绝"）**不许被放宽换绿**。
       ⚠ 若取任何时序/RSS 读数：先做 `A103④` 的三连检查（在飞的 run / runner `_diag` mtime / `actions-runner\_work\` 下的进程），本机 CI 会抢 CPU。
@@ -306,3 +306,5 @@ commit 列表（本程，锚 `54123e0`；只 commit 未 push）：
 
 - [2026-10-14 21:5x +08] agent=worker-133-v（**非实现者复核**，实现者＝133-r1；判语与读数全文＝`docs/evidence/s1/ticket133-133-v-accept-v1.md`＋`probes/133/v/` 5 枚）did=**五格复核：AC#1 五发本腿自造（新命令名/新件：N-3／X4 `--hopv133`／X8 `case doctorCmdV133: const`／X12 `var hopAliasV133=installLogSink`／X14 字段初值 `vHolder133.openFn` 两拍）门关逐发 rc=1 红名逐字 `TestAC1AC2DispatchHopGate133`，门开逐发两门并红（X14 两拍例外：**131 门 PASS**＝"独占目击"第一手复核），N-3"不加尺"字面复核＝本尺被 `-run` 排除后 131 门单跑 rc=1、红名只有 `TestAC4EveryLegIsNailedOrRuled`（"全绿不可满足"逐字成立）；AC#3 去掉 `isRunnableCase133` 的 Recv 半边（≠r1 的 `return true`）⇒自证腿 rc=1（`:315` gamma 断言）、门 rc=0 PASS；AC#4 注册表改名⇒`dispatches no such leg`、usage 加 `phantomcmd`⇒`does not dispatch`、`run`↔`models` 换靶 2 行⇒改前两门绿/改后 pair 红 2 枚逐字点名＋同树 131 门 PASS、y1drop⇒`enumerated 11 legs (12 is the floor…)`、y2blind⇒`binds no local to os.Args`＋0 腿；**131 门内下限未动**（只有 `len(legs)==0` Fatal；该文件最后动于 `6f702aeb`）；AC#5/314 字面 `-count=2 -v ./cmd/wisp/` 两趟均撞 **`panic: test timed out after 10m0s`**（姿态修正后 603.103s；首趟快照无 `third_party`/无 `.git` 的两族姿态债已逐枚归因后重跑），四数按其留件抽验（CI 形 `282/217/4/1` 四枚本票用例全 PASS、40m 趟 `824/575/23/6`、step 第 1 跑 306.2s 整进程死亡），**改前/后移动＝startable 300→302（+2 恰为自证两枚）⇒ RUN/PASS 各 +2、FAIL/SKIP 零**；AC#6 现读 `38554642217`/`115820641622`/step #7 四数逐字 `410/297/2/1`（2 枚红非本票用例）＋链 `wisp-cli-tests.sh:223-224`→`portable-tests.sh --scope=cli`→`./cmd/wisp/`，⚠ **该 run sha `72db0f39` 早于仪器 `da389ca5` ⇒ 自证腿/逐枚可区分无远程 run 跑过**（结构覆盖成立、跑读给不出，如实登记）；面核：`da389ca5` 只两枚 cmd/wisp 测试件、-12 行全是自尺旧文案（无断言放宽）、交付两枚越面零、gofumpt 只点既有债（`models.go` CRLF＋`panel_transport_35r2_test.go`）、`go vet ./cmd/wisp/` rc=0、`d22scan` rc=0 相对同日控制不降；**分歧/偏差三处登记**：①r1 探针行号取自未提交版本（红名文本逐字同）②票面"CI 形 gofumpt … 空"缺原档且本腿复量非空（仓已定 161 AC#7 口径：raw walk 结构性不可满足）③AC#6 收窄（见上）；锚 `51e2f5ea`→现读 `b75089cc` 漂移逐报，五发＋AC#3/#4 全落仓外快照（⛔ 仓内 `cmd/wisp/**` 零写、⛔ 未翻框、⛔ 未动 Status/台账/HANDOVER、⛔ 未 push） next=编排者按本表裁五格；具名没做＝方法值 `v.M()` 支/跨包支/linux 分母/"两门都摘"全包读数/远程新用例跑读（逐条在证据 §8）；⛔ 只 commit 不 push。
 
+
+- [2026-10-14 22:2x +08] **编排者：AC#1/#3/#4/#5 收件＋翻勾**（依据＝非实现者 `133-v` 判语：表 `docs/evidence/s1/ticket133-133-v-accept-v1.md`；**五格全 PASS**；本腿自造五发×两门逐发 rc=1 红名逐字 `TestAC1AC2DispatchHopGate133`；X14 两拍"独占目击"（本尺红而 131 门 PASS）；AC#3 去掉 `isRunnableCase133` 半边 ⇒ 自证腿红门仍绿；AC#4 三读数含 Y2 换靶"改前两门绿/改后 pair 红恰 2 枚"；131 门内下限未动）。编排者三把尺：`c1975a7c`／`6a819cc6` 真在；`probes/133/v/` 5 枚在盘；亲跑 `-run 'TestAC1AC2DispatchHopGate133|TestLegDispatchGate133' ./cmd/wisp/`＝**ok 2.462s**。**AC#6 暂不翻**：判语口径收窄＝`38554642217` 的 sha 早于仪器 ⇒ 仪器**首届真跑**正在排队（push run `38575155791` 起，四数落盘后即翻）。三处登记照收：① r1 探针行号取未提交版本（红名文本逐字同）；② "CI 形 gofumpt 空"缺原档、复量非空（161 AC#7 口径）；③ AC#6 收窄。
