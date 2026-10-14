@@ -17936,3 +17936,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **派单存档**：`txt/255r8-dispatch.txt`／`255r8-send.txt`／`179r2-dispatch.txt`／`179r2-send.txt`＋`179r2-correction.txt`（同刻）。⚠ 去重核翻车自报：179 的 r2 槽位早被 09-28 旧台件腿占用（`probes/179/r2/` 已有 zz179r2_e2e_test.go＋overlay-e2e.json）；在飞腿已 SendMessage 更名 **179-r3**、交件落 `probes/179/r3/`，派单正文其余一字不变。
 - **波间守恒**：写≤4 ✓（3）、总≤7 ✓（4）；面互斥：cmd/wisp＋panel 本波写腿只 255-r8 一枚（114-v2 只读验）；cmd/wisp 重包同一时刻只跑一个 ⇒ 179 的 AC#8 overlay e2e 具名延后。
 - **下波候选**（腿落即补）：179 AC#8 e2e（cmd/wisp 空出后）／114-v2 判后翻 AC#10 并收 114 剩余格／318 验证腿／201 五格（cmd/wisp＋approval 面，待让位）／236 AC#5/#6（cmd/wisp 测试面）。
+
+## A941｜2026-10-14 17:20:11 +08｜★第二发 CI 全色对账（run 38539150385，树锚 7e8ac3fa）：**317 的账清了**（windows 便携范围 FAIL=5→1：4 枚 junction/sync 假红全消，剩 1＝已登记负载敏感老红 `TestResolvePerCallBudget`）＋core 6 红→5 红（`TestSessionListByWorkspace` 消）；**余红逐枚皆已登记旧账**；前端 v2（`c4319a87`）不是任何红的成因
+
+- 对账尺（可重跑）：`gh run view 38539150385 --json jobs`；与首发 38508311376 同 job 色逐发对比；`gh run view --job <id> --log` 后 `grep 'four numbers'/'--- FAIL'`。
+- **windows 四数两发**：cmd/wisp CLI 409→410 RUN／FAIL=2／SKIP=1——同两枚（`TestTicket223PermissionDeniedSitsInItsOwnSentence`＋`TestAC14GoSideEvalPushReachesThePage`＝真窗族随会话漂，A875/314 族在册）；便携 648 RUN／**FAIL=5→1**／SKIP=1——清掉的四枚＝`TestSyncAncestorActableLegFailsClosedOnMovedAncestor116`、`TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116`、`TestSyncAncestorLegReResolvesThroughJunctionToRealTree`、`TestSyncAncestorLegNotExemptedStaysFailClosed` ⇒ **317 修复的 CI 实证（4→0）**；剩 1＝`TestResolvePerCallBudget`（`:15224/:15263` 已登记·负载敏感计时判据·待归因）。
+- **core 两发**：RUN=1672→1687／PASS=1140→1150／FAIL=6→5／SKIP=0→0。余五红＝35 有意两红（`…35r8` 两枚）＋页面契约三红（`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestC21DesignTokensFourWayAgree`，A922/13952/14065/14769 族登记）。
+- **lint 两发逐字同**：gofumpt（A-ROSTER 同名单 14+ 枚探针夹具，含票 236 AC#6 点名的 `fs_broken.go`）＋staticcheck export data v5 工具链崩（16/15 行）⇒ **零新增**。
+- **前端 v2 排除**：`c4319a87` `is-ancestor e3788f08`＝**否**（首发不含它）⇒ 首发 core 已红同名五枚＋本发只减不增；`lint-frontend` 两发皆绿、d22scan ban#6（frontend/=107）绿。
+- 第二发 docs 批 `8811cd0a` 已推（CI 38540981602 在跑；预计同色——纯文档笔）。171 行 fixture 账与其余旧红照旧在册，本轮不新开票、不改写任何旧句（只登记本发读数）。
