@@ -1,0 +1,33 @@
+# 04 reverse control (pre-fix blob overlaid; raw 09-reverse-control-run-E.txt + 07-reverse-control-run.txt)
+# pre-fix overlay sha256 (== 253-r6's claimed ae714aee…):
+ae714aeeafe2f24c584f2cb4eb14a36c3a75f252fc3340cbc969d88087de1e46 *-
+# shot5 (my five shapes, pre-fix) rc=1:
+    panel_unbound_253v3_windows_test.go:143: 253v3 (A) id=977 legacy.echo, the page's own words: "RESOLVED(null)"
+    panel_unbound_253v3_windows_test.go:145: 253v3 RED (A): the page settled with "RESOLVED(null)", want REJECTED(<sentence>)
+    panel_unbound_253v3_windows_test.go:148: 253v3 RED (A): the refusal does not name the method the frame carried: "RESOLVED(null)"
+    panel_unbound_253v3_windows_test.go:160: 253v3 RED (A): no slog record names legacy.echo; records: [...raw...]
+    panel_unbound_253v3_windows_test.go:171: 253v3 (B) slotless, the page's own words: "getterHit=true"
+    panel_unbound_253v3_windows_test.go:185: 253v3 RED (B): no slog record for the slotless old envelope; records: [...raw...]
+    panel_unbound_253v3_windows_test.go:193: 253v3 (C) non-JSON, the page's own words: "sent-non-json"
+    panel_unbound_253v3_windows_test.go:215: 253v3 (D) positive control (direct window.wispDispatch): "RESOLVED('')"
+    panel_unbound_253v3_windows_test.go:236: 253v3 (E) door absent, the page's own words: "RESOLVED(null)"
+    panel_unbound_253v3_windows_test.go:238: 253v3 RED (E): the page settled with "RESOLVED(null)", want REJECTED(<sentence>)
+    panel_unbound_253v3_windows_test.go:241: 253v3 RED (E): the refusal does not name the method the envelope carried: "RESOLVED(null)"
+    panel_unbound_253v3_windows_test.go:253: 253v3 RED (E): want exactly one new unbound-door record for the door-absent shape (0 -> 0)
+--- FAIL: Test253v3NewShapesOnTheRealHost (1.88s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.187s
+FAIL
+# the pre-fix non-JSON line IS in the captured denominator (stdlib log->slog bridge):
+invalid RPC message: invalid character 'v' after top-level value
+
+# shot3 (four-shape version) rc=1 raw=07-reverse-control-run.txt; its (C) RED also shows the same bridged line.
+# tree restore proof (now):
+2fe49342912fa4ab054880f2cf914ad9ed2b0e9dacaacef8f8ccd6a650469ede *cmd/wisp/panel_control_windows.go
+# git hash-object == HEAD blob:
+84ff38c9207c9beac2cd149dcb59ffd10bd7ca69
+84ff38c9207c9beac2cd149dcb59ffd10bd7ca69
+# git status --porcelain cmd/wisp internal/panel:
+ M internal/panel/bridge_test.go
+ M internal/panel/composer_test.go
+# (empty above = clean)

@@ -1,0 +1,15 @@
+# 01 gates (merge of raw 01-gates-build-vet.txt + 03-d22scan.txt + 04-length-gate.txt)
+# HEAD=125e2255e581e9d6dd7533de0910468408df522f at 2026-10-14T15:39:02+08:00
+# -- go build ./cmd/wisp/ -- rc=0 ; go vet ./cmd/wisp/ rc=0 ; gofumpt -l (GOPATH/bin) empty rc=0 ; gofmt -l empty rc=0 --
+# sha256 (match 253-r6's claims 2fe49342…/53ed0947…):
+2fe49342912fa4ab054880f2cf914ad9ed2b0e9dacaacef8f8ccd6a650469ede *cmd/wisp/panel_control_windows.go
+53ed0947406dd5a80285f2570fdeb95a6be7c22a296bfc1dcc3af46a10e87e26 *cmd/wisp/panel_unbound_253r6_windows_test.go
+# -- d22scan tail --
+d22scan: scope ban #8 internal/         examined 550 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 126 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=236, bans #1-5 cmd/=40, ban #6 frontend/=111, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=111, ban #8 internal/=550, ban #8 cmd/=126; ban #8 emoji coverage: design/ 39 text files; frontend/ 111 text files; internal/ 550 Go files, comments and _test.go included; cmd/ 126 Go files, comments and _test.go included
+# -- path-length gate tail --
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=58  past the old debt line(180)=2  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 60 paths on this tree, recomputed just now in both units

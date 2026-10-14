@@ -1,0 +1,23 @@
+# 03 real-window post-fix readings (excerpts; raw files kept on disk, uncommitted)
+# shot1 (r6's own case, my invocation) rc=0   raw=05-realwindow-r6-postfix.txt
+    panel_unbound_253r6_windows_test.go:211: AC#3 fake leg (old envelope into the RPC callback), the page's own words: "REJECTED('面板请求被拒绝 [panel.mode.request]：这枚 RPC 帧的方法名没有已绑定的门（door），没有任何处理器接手；宿主已记录本次丢弃')"
+    panel_unbound_253r6_windows_test.go:226: AC#3 criterion ①, the host's own record: panel host: inbound RPC frame names no bound door - received and refused instead of resolved null (ticket 253 AC#3) method=panel.mode.request id=0 params=0 reply=面板请求被拒绝 [panel.mode.request]：这枚 RPC 帧的方法名没有已绑定的门（door），没有任何处理器接手；宿主已记录本次丢弃
+    panel_unbound_253r6_windows_test.go:240: AC#3 positive control (the same envelope through window.chrome.webview.postMessage): "RESOLVED('')"
+    panel_unbound_253r6_windows_test.go:256: AC#3 folded postMessage path (unregistered name), the page's own words: "RESOLVED('面板请求被拒绝 [panel.approval.request (无 requestId)]：panel: composer request refused: 方法 ''panel.approval.request'' 不是面板 composer 通路的能力入口')"
+    panel_unbound_253r6_windows_test.go:264: AC#3 criterion ① on the folded path, the dispatch chain's audit line: panel: INBOUND-DISPATCH request="" method="panel.approval.request" source="" origin="panel" err=panel: composer request refused: 方法 "panel.approval.request" 不是面板 composer 通路的能力入口 detail="处理器未被调用：该请求没有任何一侧发生变化"
+--- PASS: Test253r6TheSilentDropBranchIsLoud (0.83s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.910s
+
+# shot4 (my five shapes, post-fix) rc=0   raw=08-realwindow-v3shapes-postfix-E.txt
+    panel_unbound_253v3_windows_test.go:143: 253v3 (A) id=977 legacy.echo, the page's own words: "REJECTED('面板请求被拒绝 [legacy.echo]：这枚 RPC 帧的方法名没有已绑定的门（door），没有任何处理器接手；宿主已记录本次丢弃')"
+    panel_unbound_253v3_windows_test.go:162: 253v3 (A) Go-side record: panel host: inbound RPC frame names no bound door - received and refused instead of resolved null (ticket 253 AC#3) method=legacy.echo id=977 params=1 reply=面板请求被拒绝 [legacy.echo]：这枚 RPC 帧的方法名没有已绑定的门（door），没有任何处理器接手；宿主已记录本次丢弃
+    panel_unbound_253v3_windows_test.go:171: 253v3 (B) slotless, the page's own words: "getterHit=true"
+    panel_unbound_253v3_windows_test.go:187: 253v3 (B) Go-side record: panel host: inbound RPC frame names no bound door - received and refused instead of resolved null (ticket 253 AC#3) method=panel.mode.request id=0 params=0 reply=面板请求被拒绝 [panel.mode.request]：这枚 RPC 帧的方法名没有已绑定的门（door），没有任何处理器接手；宿主已记录本次丢弃
+    panel_unbound_253v3_windows_test.go:193: 253v3 (C) non-JSON, the page's own words: "sent-non-json"
+    panel_unbound_253v3_windows_test.go:203: 253v3 (C) Go-side record: panel host: inbound message is not an RPC frame - received and dropped, no door and no reply (ticket 253 AC#3) err=invalid character 'v' after top-level value bytes=34
+    panel_unbound_253v3_windows_test.go:215: 253v3 (D) positive control (direct window.wispDispatch): "RESOLVED('')"
+    panel_unbound_253v3_windows_test.go:236: 253v3 (E) door absent, the page's own words: "REJECTED('面板请求被拒绝 [panel.mode.request]：这枚 RPC 帧的方法名没有已绑定的门（door），没有任何处理器接手；宿主已记录本次丢弃')"
+--- PASS: Test253v3NewShapesOnTheRealHost (1.24s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.354s
+
+# (shot2, the four-shape version, rc=0, readings identical to shot4) raw=06-realwindow-v3shapes-postfix.txt

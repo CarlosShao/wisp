@@ -1,0 +1,5 @@
+# 02 headless 15 (one invocation, -count=1 -v; raw 02-headless-family15.txt)
+--- PASS lines: 15
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.187s
+# raw file kept on disk (uncommitted): 02-headless-family15.txt
