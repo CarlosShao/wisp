@@ -1,0 +1,47 @@
+# 票 154 AC#1 触发门 —— 锚点 6d272fbe6db4ccd37c8baf4a123c26b7d5c83ee3
+# 生成时刻 2026-10-14T19:04:06+08:00
+# 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
+
+===== 控制发：仅把 want G6 quiet piles 一行改成 want G6 ring piles（ 副本，仓内仪器零改）=====
+594:want G6 ring piles
+
+===== G6 主尺 section =====
+## G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；四堆只吃『只开』）
+$ git grep -nEw 'OpenTask|CloseTask' 6d272fbe6db4ccd37c8baf4a123c26b7d5c83ee3 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+6d272fbe6db4ccd37c8baf4a123c26b7d5c83ee3:cmd/wisp/resident_task_source_windows.go:481:	src.run.bridge.OpenTask(taskID)
+6d272fbe6db4ccd37c8baf4a123c26b7d5c83ee3:cmd/wisp/run.go:945:// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
+6d272fbe6db4ccd37c8baf4a123c26b7d5c83ee3:cmd/wisp/run.go:947:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+6d272fbe6db4ccd37c8baf4a123c26b7d5c83ee3:cmd/wisp/run.go:986:	rt.bridge.OpenTask(taskID)
+6d272fbe6db4ccd37c8baf4a123c26b7d5c83ee3:cmd/wisp/run.go:992:		rt.bridge.CloseTask(taskID)
+6d272fbe6db4ccd37c8baf4a123c26b7d5c83ee3:internal/tools/subagent_197.go:335:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+# 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenTask|CloseTask' 的行。
+# 被分子剔掉的行（注释里提到词表，代码里没有）：
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED cmd/wisp/resident_task_source_windows.go (开方调用点=1)
+# 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
+#   （空）
+# 反向未成对枚数＝0   （0＝反向没响）
+# 四堆（票 178；判据只吃②『只开』那一堆，基线枚数＝它的**文件**枚数）：
+#   ① 开且关＝1 枚文件（同文件两枚都调过；不是缺陷）
+#      BALANCED cmd/wisp/run.go
+#   ② 只开＝1 枚文件（开了却没在同一文件关过；本腿『未成对枚数』只数这一堆）
+#   ③ 只关＝0 枚文件（合方在场、开方不在＝关的是别处开的；逐枚在『反向名册』格里，不计进退码）
+#   ④ 注释里提到＝3 行（分子已剔；逐行在『COMMENT-ONLY』格里）
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
+# 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=1   （本枚子句的响＝未成对枚数；0＝不响）
+
+
+===== 我的变异件被逐名点名（G6 主尺/G6neg）=====
+#   UNPAIRED cmd/wisp/resident_task_source_windows.go (开方调用点=1)
+#   ② 只开＝1 枚文件（开了却没在同一文件关过；本腿『未成对枚数』只数这一堆）
+#   今天【② 只开】全树 0 枚 ⇒ 诚实登记是 quiet＋0；「真造一枚只开仍会红」那一发＝
+#   UNPAIRED cmd/wisp/resident_task_source_windows.go (开方调用点=1)
+#   ② 只开＝1 枚文件（开了却没在同一文件关过；本腿『未成对枚数』只数这一堆）
+
+===== G6/G6neg 判定行 =====
+# BAD  腿=G6 声明=ring 基线=0枚 实测=1枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+# BAD  腿=G6neg 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+# 聚合退码＝4   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）

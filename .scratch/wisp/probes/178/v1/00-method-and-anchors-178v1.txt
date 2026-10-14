@@ -1,0 +1,68 @@
+# 178-v1 件 1 —— 方法、锚与命令（可复算）
+
+- 身份：验证腿 178-v1（非实现者；实现者＝178-r1）。派单存档
+  `.scratch/wisp/probes/orch/20261013/txt/178v1-dispatch.txt`。跑于 2026-10-14 18:5x–19:2x +08。
+- 机器：工作目录＝`D:\work\workspace\projects plans\Wisp`；`GOTMPDIR='C:\tmp\wisp178v1gotmp'`（已建）。
+  本票不跑 go（仪器是纯 grep），未碰 `cmd/wisp` 测试包（本波归 133-r1）。
+
+## 锚与漂移（逐报）
+
+- 派发锚 `401191b7`；**本腿起手现读＝`a26cb9ab`**（中间已落 `31b5cd36`／`25d34231`＝178-r1 两笔＋`c7900257`）。
+- **全部读数显式钉 `a26cb9ab`**（两把尺 × 净树／自造变异树＝四态，逐态都传 `$A=a26cb9ab` 或其 `^{tree}`）。
+- **终手现读＝`81730cea`**（验期中另有 10 笔落地：`6c958adc`/`d34b23c7`/`41e13372`/`59e2b3ed`/`8f637271`/
+  `df120e50`/`bb47e9e7`/`ea32f239`/`966c2aa9`/`f706dedd`/`81730cea`）。其中只有 `59e2b3ed`（票 318-r1 续单，
+  只改 `internal/agent/approval/zz_201_a1_junction_marker_windows_test.go` 两处头注）动了 `internal/`，
+  ⇒ 派单那条 `git diff ..25d34231 -- internal cmd` 起手为空、终手**不空**（成因＝这枚他票提交，非 178-r1 交件；
+  交件本地形 `git diff 25d34231^..25d34231 -- internal cmd` 起终皆为空）。
+
+## 被验仪器
+
+- `.scratch/wisp/probes/154/gate-clauses.sh`
+  - 改前快照（`git show 31b5cd36^:…` ⇒ `/c/tmp/wisp178v1/gate-pre-178v1.sh`）：
+    sha256 `cda7c3f655697a8d384eafe13338047990fbad4aa59117ef8234c157f1bf70d3`，669 行。
+  - 改后（工作树＝`31b5cd36` 提交 blob，逐字节同）：
+    sha256 `20e45dc88bc008d90e055c5fcb2652c51f0375d70b99845e2b452d446c8b918f`，735 行；终手复量仍同值。
+  - `git show --numstat 31b5cd36` ⇒ `91 25 .scratch/wisp/probes/154/gate-clauses.sh`（与腿报一致）。
+- `git diff 31b5cd36^..31b5cd36 --name-only` 逐字只一行：`.scratch/wisp/probes/154/gate-clauses.sh`。
+
+## 我自造的 AC#2 变异（不复用腿的 mut-*.go）
+
+- 目标＝**生产件** `cmd/wisp/resident_task_source_windows.go`（HEAD 版；在本案四堆名册里 ①/②/③/④ 全无，
+  且它在 `cmd/**/*.go` 工作树路径展开清单里 ⇒ 合成树里改它内容＝这把尺看得见）。
+- 变异＝在 `submitTask` 的 `root := observe.NewRootFrom(…)` 前插 9 行（注释 6 行＋真调用 2 行＋空行 1 行）：
+  `taskID := fmt.Sprintf("resident-task-%d", seq)` ＋ `src.run.bridge.OpenTask(taskID)`——**同一文件无收尾调用**
+  （`grep -cw OpenTask`＝1／`grep -cw CloseTask`＝0；样本 sha256 `f593fd6e332ded33b6a81cd0c7757421df083ce8c29dac13a8e17a2147ca84e0`）。
+  形状＝把票 315 在组合根 `admitTask` 的"任务起点开 scope"搬到常驻任务入口、忘了配对收尾——现实偏差，不是测试面。
+- 合成树（对象只落 `C:/tmp/wisp178v1-obj`，工作树/索引/ref 零写）：
+  ```
+  export GIT_OBJECT_DIRECTORY="C:/tmp/wisp178v1-obj"
+  export GIT_ALTERNATE_OBJECT_DIRECTORIES="D:/work/workspace/projects plans/Wisp/.git/objects"
+  blob=$(git hash-object -w /c/tmp/wisp178v1/mut-178v1-resident-based-open.go)   # 359cc0430ca3fdfc4dc8145ec64418e0125f875b
+  export GIT_INDEX_FILE="C:/tmp/wisp178v1-idx"
+  git read-tree a26cb9ab^{tree}
+  git update-index --add --cacheinfo 100644,$blob,cmd/wisp/resident_task_source_windows.go
+  git write-tree                                                                # 6d272fbe6db4ccd37c8baf4a123c26b7d5c83ee3
+  ```
+  - 隔离证：`git cat-file -e 359cc043…`／`6d272fbe…` **在仓对象库里 rc=1（不存在）**（不带 GIT_OBJECT_DIRECTORY 复核）。
+  - 变异始终只是 `$TMPDIR` 的不达对象；工作树里那一枚生产件**没改**（`git status -- internal cmd` 里没有它）。
+
+## 四态命令（逐态落 /c/tmp/wisp178v1/*.txt，摘要在本目录 logs/）
+
+```
+sh .scratch/wisp/probes/154/gate-clauses.sh a26cb9ab                     > post-net-a26cb9ab.txt    # rc=2
+sh /c/tmp/wisp178v1/gate-pre-178v1.sh     a26cb9ab                       > pre-net-a26cb9ab.txt     # rc=4
+GIT_OBJECT_DIRECTORY=… GIT_ALTERNATE_OBJECT_DIRECTORIES=… \
+  sh .scratch/wisp/probes/154/gate-clauses.sh 6d272fbe…                  > post-mut-178v1.txt       # rc=4
+  sh /c/tmp/wisp178v1/gate-pre-178v1.sh        6d272fbe…                 > pre-mut-178v1.txt        # rc=3
+  sh /c/tmp/wisp178v1/gate-post-g6ring-178v1.sh 6d272fbe…                > post-mut-g6ring-178v1.txt # rc=4（控制：仅 G6 那一行改声明）
+```
+控制发的唯一差异（diff 恰 2 行，`sed` 单行替换）：`want G6 quiet piles` → `want G6 ring piles`。
+
+## 面与纪律（自证）
+
+- 起手 `git status --porcelain -- internal cmd` ＝ ` M cmd/wisp/main.go`（**别的腿的**在飞脏件，本腿未动）；
+  终手 ＝ 同上 ＋ `?? cmd/wisp/sfx131x.go`（18:48 出现的他腿新文件，本腿未动；它把"工作树路径清单"多喂一枚路径，
+  但 `git grep <tree> -- <不存在于该树的字面路径>` 实测被容忍：T1 混合 rc=0／T2 单枚 rc=1 且无报错 ⇒ 读数不受影响）。
+- 本腿全部写入面＝`docs/evidence/s1/178-four-pile-ruler-178-v1-accept-v1.md`＋本目录＋票 178 尾 1 bullet；
+  ⛔ 未 push、⛔ 未动票面 Status／AC 框、⛔ 未碰 `docs/reports/pending-and-issues.md`、⛔ 未动 `thresholds.go`／SLO／golden。
+- 临时件只建不删（`/c/tmp/wisp178v1*`、`/c/tmp/wisp178v1gotmp`）。
