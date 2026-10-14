@@ -11,12 +11,24 @@ package approval_test
 // the LAST '/' or '\'. Is there a '/' inside the marker that the split mistakes
 // for a path separator, so a "directory" with half the marker in it comes out?
 //
+// ANSWER, and what changed on 2026-10-14: YES, that is exactly what the probe
+// measured (ok=true, "…(junction" as the "dir", the fragment passing both
+// AddAllowedDir gates and landing in config.toml — readings, verbatim, in
+// .scratch/wisp/probes/201/a1/logs/run3-full.txt). Ticket 318 then fixed it:
+// WideningRule now REFUSES the whole card at its entry when any path carries
+// the marker (replies.go:503), so legs 3–5 below flipped their assertions from
+// "the fragment comes out" to "the refusal comes out, and the fragment cannot".
+// Leg 315-r1 set the precedent for this flip (a zz probe becoming the standing
+// regression nail for the production shape it reproduced); the pre-fix reading
+// is preserved where it was measured, not rewritten here.
+//
 // THIS FILE IS A PROBE, NOT AN ACCEPTANCE. It fails LOUDLY (never skips) when a
-// prerequisite is missing, and it pins today's reading for the orchestrator; the
-// fix and the ruling are not this file's business. Every artifact used is real:
-// a real NTFS junction (mklink /J, no admin needed), the real C26 canonicalizer,
-// the real tools.Bridge, the real approval Gate/Queue/Replies, the real
-// WideningRule, and the real internal/config write gate.
+// prerequisite is missing. Every artifact used is real: a real NTFS junction
+// (mklink /J, no admin needed), the real C26 canonicalizer, the real
+// tools.Bridge, the real approval Gate/Queue/Replies, the real WideningRule.
+// On the pre-fix tree legs 3+ are RED by construction; on the fixed tree they
+// are GREEN, which is why they run in the package's default run (no env gate —
+// an env-gated t.Skip is fatal under tools/d22scan/runtests.sh, ticket 71 AC#3).
 
 import (
 	"context"
@@ -31,7 +43,6 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/agent"
 	"github.com/CarlosShao/wisp/internal/agent/approval"
-	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/tools"
 )
@@ -98,10 +109,12 @@ func probeBridge(t *testing.T, allowed string, g *probeToolsGate) *tools.Bridge 
 	})
 }
 
-// TestZZ201A1JunctionMarkerBecomesAWideningFragment is the live reproduction of
-// the dispatch's chain: junction refused → card face carries the marker → the
-// 长期 branch's own derivation turns it into a widening target.
-func TestZZ201A1JunctionMarkerBecomesAWideningFragment(t *testing.T) {
+// TestZZ201A1JunctionMarkerCardIsRefusedForWidening is the live reproduction of
+// the dispatch's chain — junction refused → card face carries the marker → the
+// 长期 branch's own derivation reads that card — plus, since ticket 318's fix,
+// the negative reading on the same chain: WideningRule must return a refusal,
+// not a fragment.
+func TestZZ201A1JunctionMarkerCardIsRefusedForWidening(t *testing.T) {
 	root := t.TempDir()
 	allowed := filepath.Join(root, "allowed")
 	outside := filepath.Join(root, "outside")
@@ -158,7 +171,9 @@ func TestZZ201A1JunctionMarkerBecomesAWideningFragment(t *testing.T) {
 	}
 
 	// Same call in the OTHER separator spelling (backslashes, no fold needed).
-	// If the fragment only appeared for one spelling, this is where it would show.
+	// The pre-fix reading showed the same fragment for this spelling too
+	// (READING-2b in probes/201/a1/logs/run3-full.txt, ok=true); the fix must
+	// refuse it for the same reason, from the same guard.
 	bargs, err := json.Marshal(map[string]any{"path": filepath.Join(link, "victim.txt")})
 	if err != nil {
 		t.Fatal(err)
@@ -172,8 +187,8 @@ func TestZZ201A1JunctionMarkerBecomesAWideningFragment(t *testing.T) {
 	bsCard := approval.ReplyCard{CorrelationID: "bs", Level: "L2", Tool: "fs.read", Paths: pg.decision().Paths}
 	bsDir, _, bsOK := bsCard.WideningRule()
 	t.Logf("READING-2b 反斜杠拼法: 卡面=%q dir=%q ok=%v", bsCard.Paths, bsDir, bsOK)
-	if !bsOK || !strings.HasSuffix(bsDir, "(junction") {
-		t.Fatalf("第二种拼法没有复现同一碎片（=半复现，需另找条件）: dir=%q ok=%v", bsDir, bsOK)
+	if bsOK || bsDir != "" {
+		t.Fatalf("反斜杠拼法：带标记卡面仍被当作放宽基础（修后两种拼法应同拒）: dir=%q ok=%v", bsDir, bsOK)
 	}
 
 	// ---- leg 2: the real gate raises the card, the ledger books it ---------
@@ -204,70 +219,33 @@ func TestZZ201A1JunctionMarkerBecomesAWideningFragment(t *testing.T) {
 	t.Logf("READING-3 ledger 卡: level=%s tool=%s paths=%q", card.Level, card.Tool, card.Paths)
 
 	// ---- leg 3: THE MEASUREMENT — the 长期 branch's own derivation ---------
+	// Ticket 318 flipped this leg on 2026-10-14. The pre-fix reading (verbatim:
+	// probes/201/a1/logs/run3-full.txt READING-4/5/6) was ok=true with dir =
+	// "…victim.txt (无法规范化: …(junction", the half-marker fragment. Post-fix
+	// WideningRule refuses the whole card at its entry, so the chain stops here:
+	// cmd/wisp's 长期 branch takes its ok=false branch (approval_always.go:85-91),
+	// raises no second card and never calls AddAllowedDir — which is why the
+	// pre-fix legs 4-5 (fragment reaching config.toml, second card carrying the
+	// same fragment) have no post-fix counterpart left to run: their subject
+	// cannot exist. Those readings stay where they were measured, not rewritten.
 	dir, rule, ok := card.WideningRule()
 	t.Logf("READING-4 WideningRule: ok=%v", ok)
 	t.Logf("READING-5 dir  = %q", dir)
 	t.Logf("READING-6 rule = %q", rule)
-	if !ok {
-		t.Fatalf("这条链今天没有产出放宽目标（=量不到），需另找条件")
+	if ok {
+		t.Fatalf("修后带标记卡面仍产出放宽目标（碎片没有死在入口）: dir=%q rule=%q", dir, rule)
+	}
+	if dir != "" || rule != "" {
+		t.Fatalf("拒绝必须同时清空 dir/rule，got (%q,%q)", dir, rule)
 	}
 	trueParent := strings.ReplaceAll(link, `\`, "/")
-	t.Logf("READING-7 真父目录（对照）= %q", trueParent)
-	if dir == trueParent {
-		t.Fatalf("dir 竟是真父目录 %q，碎片复现不成立", dir)
-	}
-	if !strings.Contains(dir, "无法规范化") {
-		t.Fatalf("dir 不含标记串，复现不成立: %q", dir)
-	}
-	if !strings.HasSuffix(dir, "(junction") {
-		t.Fatalf("dir 尾部不是被切半的标记碎片: %q", dir)
-	}
-	if rule != `[fs] allowed_dirs += "`+dir+`"` {
-		t.Fatalf("rule 文本不是由 dir 逐字拼成: %q", rule)
-	}
-
-	// ---- leg 4: would the 放宽口 accept it? (internal/config, for real) ----
-	t.Logf("READING-8 allowdirs 两道闸预探: trimspace非空=%v 含\"..\"=%v",
-		strings.TrimSpace(dir) != "", strings.Contains(dir, ".."))
-	cfgPath := filepath.Join(root, "config.toml")
-	if err := os.WriteFile(cfgPath, []byte("schema_version = 2\n\n[fs]\nallowed_dirs = []\n"), 0o600); err != nil {
-		t.Fatal(err)
-	}
-	m, err := config.NewManager(cfgPath, nil)
-	if err != nil {
-		t.Fatalf("NewManager: %v", err)
-	}
-	if err := m.AddAllowedDir(dir); err != nil {
-		t.Logf("READING-9 AddAllowedDir 拒收: %v", err)
-	} else {
-		raw, _ := os.ReadFile(cfgPath)
-		t.Logf("READING-9 AddAllowedDir 接受了碎片，config.toml 现为:\n%s", raw)
-		if !strings.Contains(string(raw), "(junction") {
-			t.Fatalf("AddAllowedDir 说成功，但文件里没有碎片: %s", raw)
-		}
-	}
-
-	// ---- leg 5: the second card, raised exactly as approval_always.go:115-123
-	revokeW := g.AdmitTextTask("host:fs-allow-widen")
-	defer revokeW()
-	ch2 := runApproval(t, g, ctx, tools.Decision{
-		TaskID: "host:fs-allow-widen", Tool: "config.allow_dir", Level: risk.L2,
-		Reason: rule + "（这是「一直」要求的 L2 级重新确认）",
-		Paths:  []string{dir},
-	})
-	p2 := ui.wait(t)
-	t.Logf("READING-10 第二张卡逐字 Paths[0] = %q", p2.Paths[0])
-	if len(p2.Paths) != 1 || p2.Paths[0] != dir {
-		t.Fatalf("第二张卡的 Paths 与 dir 不一致: %q", p2.Paths)
-	}
-	if err := g.Native().Allow(ctx, p2.CorrelationID, p2.Grant); err != nil {
-		t.Fatalf("第二张卡 Allow: %v", err)
-	}
-	if a := mustAnswer(t, ch2); a.a != tools.AnswerAllow {
-		t.Fatalf("第二张卡的答复 = %v", a)
-	}
+	t.Logf("READING-7 真父目录 = %q（修后不再被产出到任何卡/规则文本）", trueParent)
 
 	// ---- negative control: the same derivation on a clean card -------------
+	// Ticket 318 kept this control and sharpened it: a real out-of-scope read
+	// whose path CAN be canonicalized carries no marker, so it must still derive
+	// its true parent - if the new guard ever fired here it would be refusing
+	// clean cards, which is the regression direction the fix must not have.
 	clean := filepath.Join(outside, "victim.txt")
 	pg2 := &probeToolsGate{}
 	b2 := probeBridge(t, allowed, pg2)
@@ -283,10 +261,16 @@ func TestZZ201A1JunctionMarkerBecomesAWideningFragment(t *testing.T) {
 	}
 	cd := pg2.decision()
 	ctrlCard := approval.ReplyCard{CorrelationID: "ctrl", Level: "L2", Tool: cd.Tool, Paths: cd.Paths}
-	cdir, _, cok := ctrlCard.WideningRule()
-	t.Logf("READING-11 对照（无标记的越界读）: paths=%q dir=%q ok=%v", cd.Paths, cdir, cok)
+	cdir, crule, cok := ctrlCard.WideningRule()
+	t.Logf("READING-11 对照（无标记的越界读）: paths=%q dir=%q rule=%q ok=%v", cd.Paths, cdir, crule, cok)
+	if !cok {
+		t.Fatalf("对照（无标记）不再推出放宽目标，说明守卫误伤干净卡面: dir=%q ok=%v", cdir, cok)
+	}
+	if !strings.EqualFold(cdir, filepath.ToSlash(outside)) {
+		t.Fatalf("对照推出的不是真父目录: dir=%q want %q", cdir, filepath.ToSlash(outside))
+	}
 	if strings.Contains(cdir, "无法规范化") {
 		t.Fatalf("对照项也带标记串，说明夹具被污染: %q", cdir)
 	}
-	t.Logf("READING-12 结论：碎片只在带标记串的卡面上出现，干净卡面推出真父目录 %q", cdir)
+	t.Logf("READING-12 结论：带标记卡面在入口整卡拒（两种拼法 + 空路径标记同拒），干净卡面仍推真父目录 %q", cdir)
 }

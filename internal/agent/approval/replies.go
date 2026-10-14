@@ -493,6 +493,22 @@ func (r *Replies) View(corr string) (PanelItem, bool) {
 // refused rather than guessed at, because a stored rule the operator did not read
 // is the failure this ticket was filed for.
 //
+// A card whose paths carry the C26 "无法规范化" marker is refused WHOLE, before
+// dirOf sees anything (ticket 318). The marker is how a raw path C26 could not
+// canonicalize renders — "<raw path> (无法规范化: <err>)" (internal/tools/
+// bridge.go:1028) — and its own text carries a slash ("…(junction/symlink)…",
+// internal/risk/pathresolver.go:36), so dirOf's LastIndexAny would split inside
+// the marker and hand back half a sentence as a "directory" (measured live:
+// .scratch/wisp/probes/201/a1, where the fragment passed both AddAllowedDir
+// gates into config.toml). Refusing the whole card, not merely the one path, is
+// the same 口径 the two existing marker consumers already keep: session refuses
+// a row, and answers the whole coverage question false, on any marked path
+// (internal/session/grants.go:260-268 and 193-197), and bridge.scopeVerdictOf
+// judges the whole call out of scope on any marked one (internal/tools/
+// bridge.go:1273). Skipping the marked path and deriving from the remainder
+// would offer a rule exactly where the pre-fix code refused one — wider, in the
+// one gate whose job is narrowing.
+//
 // The parent segment comes from this package's existing dirOf (batch.go:91),
 // which splits an already-canonical path by pure string work and deliberately
 // calls no filepath.* — AGENTS.md §1.2 ban #2 is on making path DECISIONS outside
@@ -501,6 +517,11 @@ func (r *Replies) View(corr string) (PanelItem, bool) {
 // again through C26 like any hand edit of the same section, and which a second,
 // L2-level confirmation has to approve before anything is written at all.
 func (c ReplyCard) WideningRule() (dir, rule string, ok bool) {
+	for _, p := range c.Paths {
+		if strings.Contains(p, "无法规范化") {
+			return "", "", false
+		}
+	}
 	dirs := make([]string, 0, len(c.Paths))
 	for _, p := range c.Paths {
 		d := strings.ReplaceAll(dirOf(p), "\\", "/")
