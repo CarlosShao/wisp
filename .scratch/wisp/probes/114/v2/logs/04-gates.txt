@@ -1,0 +1,17 @@
+# 114-v2 log 04 - gates (live, 2026-10-14 17:04 +08)
+$ go build ./internal/panel/ ./cmd/wisp/ ; rc=0
+$ go test -count=1 -run 'TestTheBoundDispatchDoorIsReachableFromThePage|TestTheRendererHoldsExactlyOneDoorToTheHost|TestPlantedRendererDoorShapesGoRed' -v ./internal/panel/ ; rc=0
+    bound_dispatch_door_114_test.go:454: bound door held: 36 cmd/wisp production file(s), 2 w.Bind door site(s) [cmd/wisp/panel_host_windows.go:842 binds "wispDispatch" via panelDispatchBinding; cmd/wisp/panel_host_windows.go:892 binds "wispProbeRT" via "wispProbeRT"], 1 skipped non-door .Bind call(s); 27 window.* read site(s) under frontend/, door-relevant: [frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch]
+    composer_test.go:594: renderer door held: 113 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+    composer_test.go:678: red as required: 3 outside call sites, 1 assembled routes, 3 unknown literals, door 2 named 3 line(s)
+$ sh scripts/d22scan.sh ; rc=0
+    d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14
+$ sh scripts/check-path-length-budget.sh ; rc=0
+    denominator: tracked paths=12876  over-budget=60  covered by roster=60  not in roster=0
+    VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+# repo zero-mutation (start = end): cmd/wisp/panel_host_windows.go 45c1059bbda4753827e1bf0f74a8e86bc74fa6fc4804446f612e2b76f21c7016
+#   frontend/src/lib/panel.ts 2b7a9fd00be45d906af06d1e6af638b80d2ba66ad13b66dfd901dea42476d29b
+#   internal/panel/composer_test.go d2b2e848ab12e4b29b31ee6a62964507404252c670fa6048e1ff0c89ea67edcf
+#   internal/panel/bound_dispatch_door_114_test.go 6924b8e1daee9dba730671e066df4f0f0693b5b17d38b6f8815b781673814a39
+#   cmd/wisp/resident_task_source_windows.go 016b69438cd702a6536db16dd7c98e1629b19bdbf8e3d1131c035987ca987909
+# out-of-repo artifacts (created, never deleted): D:\tmp\wisp114v2\{tree,park,pristine,logs,mut.py,mklogs.sh} ; GOTMPDIR=C:\tmp\wisp114v2gotmp (backslash form)

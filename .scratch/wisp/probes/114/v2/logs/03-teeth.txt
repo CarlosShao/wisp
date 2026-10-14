@@ -1,0 +1,37 @@
+# 114-v2 log 03 - my own teeth (every shot planted on the real out-of-repo tree; sha256 from mut.py output)
+# command per shot: GOTMPDIR='C:\tmp\wisp114v2gotmp' PATH="...sherpa..." go test -count=1 -run 'TestTheBoundDispatchDoorIsReachableFromThePage' -v ./internal/panel/
+
+===== t1-bind-gone (host): the const-bound w.Bind statement deleted; host sha256=9ada941da80f9353 -> rc=1
+    bound_dispatch_door_114_test.go:448: cmd/wisp's production sources bind no door through a w.Bind(<package-level string constant>, callback) call, so the page's door has no host-side receiver: the third mounting method is what makes window.<door> exist, AddHostObjectToScript has zero call sites in this repository, and the .postMessage( reachability scan cannot see a bound door at all (ticket 114 AC#10). w.Bind sites read: cmd/wisp/panel_host_windows.go:886 binds "wispProbeRT" via "wispProbeRT"; page window.* reads: frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch
+    old .postMessage( instrument on the SAME tree: PASS rc=0
+      composer_test.go:594: renderer door held: 113 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+      composer_test.go:678: red as required: 3 outside call sites, 1 assembled routes, 3 unknown literals, door 2 named 3 line(s)
+
+===== t2-decl-moved (host): const declaration moved to cmd/wisp/run.go; host sha256=5ba4e237c947f7f9, run.go=7117244eef05aee4 -> rc=0 GREEN (cross-file package const resolves; bind site now :841)
+bound_dispatch_door_114_test.go:454: bound door held: 36 cmd/wisp production file(s), 2 w.Bind door site(s) [cmd/wisp/panel_host_windows.go:841 binds "wispDispatch" via panelDispatchBinding; cmd/wisp/panel_host_windows.go:891 binds "wispProbeRT" via "wispProbeRT"], 1 skipped non-door .Bind call(s); 27 window.* read site(s) under frontend/, door-relevant: [frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch]
+
+===== t2b-spelling-mismatch (host): declaration renamed panelDispatchBindingV2, call still panelDispatchBinding; sha256=eb2ec072499f2572 -> rc=1
+    bound_dispatch_door_114_test.go:448: cmd/wisp/panel_host_windows.go:842: the w.Bind argument panelDispatchBinding names panelDispatchBinding, which no package-level string constant in cmd/wisp declares - the door name is not stated anywhere this scan can read (ticket 114 AC#10)
+    bound_dispatch_door_114_test.go:448: cmd/wisp's production sources bind no door through a w.Bind(<package-level string constant>, callback) call, so the page's door has no host-side receiver: the third mounting method is what makes window.<door> exist, AddHostObjectToScript has zero call sites in this repository, and the .postMessage( reachability scan cannot see a bound door at all (ticket 114 AC#10). w.Bind sites read: cmd/wisp/panel_host_windows.go:842 binds "<unreadable>" via panelDispatchBinding; cmd/wisp/panel_host_windows.go:892 binds "wispProbeRT" via "wispProbeRT"; page window.* reads: frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch
+
+===== t3-page-comment (page): real read at panel.ts:350 commented out, prose at :329 untouched; sha256=a08e260095412b52 -> rc=1
+    bound_dispatch_door_114_test.go:448: cmd/wisp/panel_host_windows.go:842 binds "wispDispatch" through w.Bind, and frontend/src/lib/panel.ts never reads window.wispDispatch - a bound door no page line reaches for is dead weight, and the two-sided name tie is the whole capability (ticket 114 AC#10). The page's window.* reads: frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome
+    old .postMessage( instrument on the SAME tree: PASS rc=0
+      composer_test.go:594: renderer door held: 113 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+
+===== t4-outside-read (page): window.wispDispatch read appended in config-view.ts; sha256=e0f16d258529091e -> rc=1
+    bound_dispatch_door_114_test.go:448: frontend/src/lib/config-view.ts:168 reads window.wispDispatch, and every read of a door cmd/wisp binds must live in frontend/src/lib/panel.ts (the one door file, ticket 92 AC#1): a page-side reach of the third mounting method outside that file is a second door
+
+===== t5-vacuity-literal (host): Bind argument became string literal -> reviewed empty, both binds stay; sha256=2b60d11463d8210c -> rc=1
+    bound_dispatch_door_114_test.go:448: cmd/wisp's production sources bind no door through a w.Bind(<package-level string constant>, callback) call, so the page's door has no host-side receiver: the third mounting method is what makes window.<door> exist, AddHostObjectToScript has zero call sites in this repository, and the .postMessage( reachability scan cannot see a bound door at all (ticket 114 AC#10). w.Bind sites read: cmd/wisp/panel_host_windows.go:842 binds "wispDispatch" via "wispDispatch"; cmd/wisp/panel_host_windows.go:892 binds "wispProbeRT" via "wispProbeRT"; page window.* reads: frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch
+
+===== t6-vacuity-nobind (host): every .Bind selector renamed -> binds empty, reviewed empty; sha256=2f89f0471433790e -> rc=1
+    bound_dispatch_door_114_test.go:448: cmd/wisp's production sources bind no door through a w.Bind(<package-level string constant>, callback) call, so the page's door has no host-side receiver: the third mounting method is what makes window.<door> exist, AddHostObjectToScript has zero call sites in this repository, and the .postMessage( reachability scan cannot see a bound door at all (ticket 114 AC#10). w.Bind sites read: (none); page window.* reads: frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch
+
+===== t7-skip-flip (host): ws.Bind(run.paths) -> ws.Bind(run.paths, nil) (two args, non-door shape); sha256=1a52005f0d68e835 -> rc=1
+    bound_dispatch_door_114_test.go:448: cmd/wisp/resident_task_source_windows.go:311: the w.Bind argument run.paths is not a plain name (a string literal or a package-level constant), so the door it binds is not stated anywhere a page-side pin can judge (ticket 114 AC#10)
+
+===== t8-root-gone (vacuity): tree/cmd/wisp renamed away; scan sees no producer files at all -> rc=1
+    bound_dispatch_door_114_test.go:448: cmd/wisp is not walkable: GetFileAttributesEx D:\tmp\wisp114v2\tree\cmd\wisp: The system cannot find the file specified.
+    bound_dispatch_door_114_test.go:448: cmd/wisp's production sources bind no door through a w.Bind(<package-level string constant>, callback) call, so the page's door has no host-side receiver: the third mounting method is what makes window.<door> exist, AddHostObjectToScript has zero call sites in this repository, and the .postMessage( reachability scan cannot see a bound door at all (ticket 114 AC#10). w.Bind sites read: (none); page window.* reads: frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch
+# restored after every shot: mutate driver re-copies pristine bytes; final host sha256=45c1059bbda47538 = live 45c1059bbda4753827e1bf0f74a8e86bc74fa6fc4804446f612e2b76f21c7016

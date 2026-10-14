@@ -1,0 +1,16 @@
+# 114-v2 log 01 - baseline: live tree pin green + full-package reading
+# live HEAD 7e8ac3fa, window 2026-10-14 16:56 +08; other leg 318-r1 (internal/agent/approval) in flight
+# $ GOTMPDIR='C:\tmp\wisp114v2gotmp' PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 -run 'TestTheBoundDispatchDoorIsReachableFromThePage' -v ./internal/panel/
+bound_dispatch_door_114_test.go:454: bound door held: 36 cmd/wisp production file(s), 2 w.Bind door site(s) [cmd/wisp/panel_host_windows.go:842 binds "wispDispatch" via panelDispatchBinding; cmd/wisp/panel_host_windows.go:892 binds "wispProbeRT" via "wispProbeRT"], 1 skipped non-door .Bind call(s); 27 window.* read site(s) under frontend/, door-relevant: [frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch]
+pin rc=0
+
+# $ ... go test -count=1 -v ./internal/panel/   (live full package)
+# RUN=225 PASS=144 FAIL=5 SKIP=0 rc=1  (same 5-red set as 114-r6/114-v1/a5 records)
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestC21DesignTokensFourWayAgree
+# sampled verbatim (2 of 5):
+composer_test.go:78: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified.

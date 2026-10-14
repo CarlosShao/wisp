@@ -1,0 +1,23 @@
+# 114-v2 log 02 - tree A/B control (out-of-repo tree D:\tmp\wisp114v2\tree = git archive HEAD real disk)
+# A713: the pin reads the disk (os.ReadFile), so red/green is claimed on a real tree, never via -overlay
+# A = extracted tree (pin present); B = same tree with internal/panel/bound_dispatch_door_114_test.go parked outside
+# A: RUN=225 PASS=142 FAIL=7 rc=1
+# B: RUN=223 PASS=141 FAIL=7 rc=1
+# FAIL name set diff (A vs B):
+SAME SET
+# A's 7 reds = live 5 + 2 tree artifacts (both also in B):
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestComposerRenderFixtureTellsTheTruth
+--- FAIL: TestReadGitOnThisRepositoryIsSelfConsistent
+--- FAIL: TestC21DesignTokensFourWayAgree
+# tree artifact verbatim:
+composer_test.go:902: render fixture verified across 0 painted states
+git_test.go:600: kind = "not_a_repo" reason = "这棵工作区目录及其以上都没有 .git，所以没有分支可显示": this repository has a .git directory
+# why the fixture red is a tree artifact: the archive export carries CRLF while the ruler's block separator is the literal ' -->\n'
+$ file tree/frontend/fixtures/composer-states.html
+/d/tmp/wisp114v2/tree/frontend/fixtures/composer-states.html: exported SGML document, Unicode text, UTF-8 text, with very long lines (1974), with CRLF line terminators
+# the pin itself is green in both A and B-adjacent runs (B was the control without it):
+bound_dispatch_door_114_test.go:454: bound door held: 36 cmd/wisp production file(s), 2 w.Bind door site(s) [cmd/wisp/panel_host_windows.go:842 binds "wispDispatch" via panelDispatchBinding; cmd/wisp/panel_host_windows.go:892 binds "wispProbeRT" via "wispProbeRT"], 1 skipped non-door .Bind call(s); 27 window.* read site(s) under frontend/, door-relevant: [frontend/src/lib/panel.ts:161 window.wispBridge; frontend/src/lib/panel.ts:161 window.chrome; frontend/src/lib/panel.ts:350 window.wispDispatch]
