@@ -117,7 +117,7 @@ from 10.
       ⚠ **原文是照这个 API 并不存在的威胁模型写的**——旧文本要求『用 artifacts API 往用户目录写 → 被拒』，
       但没有调用方可控路径就没有『尝试』可做，于是这框**永远勾不上**；改文本而不是凑勾，
       也不是把框留着让整票看起来未完（保留原文于此，见第 13 条规矩）。
-- [ ] **第 7 框（2026-09-20 23:59 编排者补，来源：本票头部 ④）`[fs] allowed_dirs` 首次使用询问流的最小子集**。
+- [x] **第 7 框（2026-09-20 23:59 编排者补，来源：本票头部 ④）`[fs] allowed_dirs` 首次使用询问流的最小子集**。
       范围**只有这三条**，多一条就算越界（GUI 完整版归票 39，SPEC-12 §5 **没有这一行 ⇒ 代码里不许标 `DEFERRED`**）：
       - **(a) 拒绝原因必须可区分**：因"路径不在任何 allowed 根下"而被拒时，桥必须返回一个**机器可辨的**
         原因值，与 PathResolver 的红队拒绝（junction / 8.3 短名 / UNC / `\?\`）**不共用同一个字符串**。
@@ -354,3 +354,9 @@ from 10.
   **具名没做**：①询问提示本身（native 卡/GUI）＝宿主侧接线（`cmd/wisp` 触则停手上报；GUI 归 39），本腿交付的是该流程唯一缺的判定面；②邻接险情上报不动——201 的 `WideningRule`（`replies.go:503`）从卡面 `Paths` 推目录，
   而 junction 卡面是带 `(无法规范化: …(junction/symlink)…)` 标记串，`dirOf`（`batch.go:91`）按最后 `/\` 切会吃进标记里的 `/` ⇒ 可推出含碎片的"目录"进第二张卡（属 approval＋cmd/wisp 面，一行未改）；
   ③同运行内热换根集合明令未做。交件＝`probes/20/r2/00-anchor-and-gates.md`＋logs 7 枚；**框未翻**（判语归非实现者）。锚 `125e2255`／交付时 HEAD `9b51859b`。
+
+## 编排者收口（2026-10-14 18:4x +08）
+
+- **七框全勾**。第 7 框（`[fs] allowed_dirs` 首用提示与两类拒绝的机器可辨）由落地腿 `20-r2` 交件（`probes/20/r2/00-anchor-and-gates.md`＋logs 7；整包 `internal/tools` 零红；`d22scan` 仪器自测 rc=0），**编排者亲跑复核**：`-run 'Test20r2|Refusal' ./internal/tools/`＝**ok 3.723s**（五枚具名用例：`Test20r2RefusalKindsAreDistinct`／`Test20r2DenyIsRedTeamNeverAskable`／`Test20r2FirstUseAskFlowGoesOnlyThroughConfig`／`Test20r2DirectionEngineAdjudicatesFileLevelAdditions`／`Test20r2NoSecondAuthorizationPath`）。
+- 两枚具名遗留如实登记（不属本票缺口）：①"全仓扫描 rc=1 的 61 finding 全在 `frontend/fixtures/settings-v2/*.png`"＝**前端 agent 面**（本编队零写面，已在台账点名）；②junction 卡面 `dirOf` 邻接险情已另立票 318（修复已落地、判语在走 `318-v1`）。
+- 本章程由落地腿＋编排者两程合成；`-done` 后缀随本章加（防重领唯一键）。
