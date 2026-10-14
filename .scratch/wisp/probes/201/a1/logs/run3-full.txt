@@ -1,0 +1,198 @@
+time=2026-10-14T16:34:35.680+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestZZ201A1JunctionMarkerBecomesAWideningFragment
+    zz_201_a1_junction_marker_windows_test.go:150: READING-1 bridge 路由的 Decision: level=L2 rules=[R2 R3] refusal=""
+    zz_201_a1_junction_marker_windows_test.go:155: READING-2 卡面逐字 Paths[0] = "C:/tmp/wisp201a1gotmp/TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"
+    zz_201_a1_junction_marker_windows_test.go:174: READING-2b 反斜杠拼法: 卡面=["C:\\tmp\\wisp201a1gotmp\\TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446\\001\\allowed\\jn\\victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"] dir="C:/tmp/wisp201a1gotmp/TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction" ok=true
+    zz_201_a1_junction_marker_windows_test.go:204: READING-3 ledger 卡: level=L2 tool=fs.read paths=["C:/tmp/wisp201a1gotmp/TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"]
+    zz_201_a1_junction_marker_windows_test.go:208: READING-4 WideningRule: ok=true
+    zz_201_a1_junction_marker_windows_test.go:209: READING-5 dir  = "C:/tmp/wisp201a1gotmp/TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction"
+    zz_201_a1_junction_marker_windows_test.go:210: READING-6 rule = "[fs] allowed_dirs += \"C:/tmp/wisp201a1gotmp/TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction\""
+    zz_201_a1_junction_marker_windows_test.go:215: READING-7 真父目录（对照）= "C:/tmp/wisp201a1gotmp/TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446/001/allowed/jn"
+    zz_201_a1_junction_marker_windows_test.go:230: READING-8 allowdirs 两道闸预探: trimspace非空=true 含".."=false
+time=2026-10-14T16:34:35.721+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp201a1gotmp\TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446\001\.wisp-config-3823791170.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:34:35.723+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+    zz_201_a1_junction_marker_windows_test.go:244: READING-9 AddAllowedDir 接受了碎片，config.toml 现为:
+        schema_version = 2
+        
+        [app]
+        language = 'zh-CN'
+        theme = 'dark'
+        autostart = false
+        single_instance = true
+        
+        [ball]
+        size = 56
+        opacity_idle = 0.35
+        click_through = true
+        hide_on_fullscreen = true
+        
+        [ball.position]
+        x = 0
+        y = 0
+        monitor = ''
+        
+        [hotkey]
+        summon = ''
+        mute = ''
+        cancel = 'Esc'
+        panel = ''
+        
+        [session]
+        warm_timeout_sec = 90
+        settling_sec = 3
+        conversation_idle_sec = 30
+        
+        [voice]
+        enabled = true
+        punctuation = true
+        conversation_mode = false
+        cloud_asr_chain = []
+        cloud_tts_chain = []
+        
+        [voice.wake_word]
+        enabled = false
+        keywords = []
+        thresholds = []
+        veto_words = ['取消', '停下', '别']
+        
+        [voice.asr]
+        provider = 'local-sherpa'
+        model = ''
+        
+        [voice.tts]
+        provider = 'local-sherpa'
+        voice = ''
+        speed = 1.0
+        
+        [voice.aec]
+        enabled = true
+        echo_ref = 'self-render'
+        
+        [voice.realtime]
+        enabled = false
+        provider = ''
+        model = ''
+        api_key_ref = ''
+        base_url = ''
+        
+        [audio]
+        input_device = 'default'
+        sample_rate = 16000
+        half_duplex = true
+        mic_muted_default = true
+        
+        [llm]
+        text_chain = []
+        timeout_ms = 60000
+        
+        [llm.roles]
+        [llm.roles.chat]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.memory_extract]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.handoff]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.summarize]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.retry]
+        max = 3
+        backoff_ms = 1000
+        
+        [agent]
+        max_rounds = 50
+        token_budget = 200000
+        per_tool_timeout_ms = 0
+        steering_enabled = true
+        project_instructions_enabled = true
+        
+        [agent.loop_guard]
+        repeat_thresholds = [3, 5, 8]
+        
+        [risk]
+        confirm_timeout_sec = 300
+        l1_window_sec = 2
+        shell_enabled = false
+        allow_shell_string = false
+        shell_allowlist = []
+        blacklist_overrides = []
+        permission_mode = 'ask_every_step'
+        
+        [fs]
+        allowed_dirs = ['C:/tmp/wisp201a1gotmp/TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction']
+        reparse_point_exceptions = []
+        delete_enabled = false
+        
+        [net]
+        allowlist = []
+        block_private_ranges = true
+        
+        [net.proxy]
+        mode = 'system'
+        url = ''
+        
+        [privacy]
+        redact_paths = false
+        diagnostics_opt_in = false
+        retention_days = 30
+        keep_transcript = false
+        keep_audio = false
+        
+        [memory]
+        l1_enabled = true
+        l1_max = 20
+        l3_retention_days = 30
+        extract_model = ''
+        
+        [panel]
+        enabled = true
+        width = 640
+        height = 0
+        keep_alive_in_session = true
+        scale = 0.0
+        
+        [cost]
+        daily_budget = 0
+        monthly_budget = 0
+        alert_threshold = 0.8
+        over_budget = 'pause'
+        
+        [models]
+        dir = ''
+        mirror = []
+        verify_signature = true
+        
+        [observe]
+        level = 'info'
+        slo_sample_interval_sec = 5
+        
+        [observe.roll]
+        size_mb = 10
+        days = 7
+        [plugins]
+        tier2_enabled = false
+    zz_201_a1_junction_marker_windows_test.go:259: READING-10 第二张卡逐字 Paths[0] = "C:/tmp/wisp201a1gotmp/TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction"
+    zz_201_a1_junction_marker_windows_test.go:287: READING-11 对照（无标记的越界读）: paths=["C:\\tmp\\wisp201a1gotmp\\TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446\\001\\outside\\victim.txt"] dir="C:/tmp/wisp201a1gotmp/TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446/001/outside" ok=true
+    zz_201_a1_junction_marker_windows_test.go:291: READING-12 结论：碎片只在带标记串的卡面上出现，干净卡面推出真父目录 "C:/tmp/wisp201a1gotmp/TestZZ201A1JunctionMarkerBecomesAWideningFragment2892618446/001/outside"
+--- PASS: TestZZ201A1JunctionMarkerBecomesAWideningFragment (0.06s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	1.219s
