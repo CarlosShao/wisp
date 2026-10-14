@@ -91,16 +91,6 @@ export type ConfigReply =
   | { kind: "payload-error"; message: string; raw: string }
   | { kind: "no-payload"; raw: string };
 
-/** The credential aggregate states, spelled as the Go side spells them. Named
-    so a renderer does not spell "partly_missing" in three places. */
-export const CREDENTIAL_LABELS: Record<string, string> = {
-  unknown: "凭据状态未知（没人答过）",
-  config_unreadable: "配置读不出来，凭据状态无从谈起",
-  no_ref_declared: "还没有任何服务商声明密钥引用",
-  all_recorded: "所有声明的引用都已录入",
-  partly_missing: "至少一条声明的引用缺失或还没核对",
-};
-
 /** Parse one config.get reply. The prose half is returned as-is (display
     only); the structured half is the line that starts with the marker. */
 export function parseConfigReply(reply: string): ConfigReply {

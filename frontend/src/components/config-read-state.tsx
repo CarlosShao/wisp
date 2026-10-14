@@ -36,36 +36,19 @@ export function ConfigReadGate({
   if (state.phase === "no-host") {
     return (
       <div className="mt-2 rounded-card border border-line bg-surface px-3.5 py-3">
-        <p className="text-[12px] leading-[1.7] text-ink-3">
-          没接到宿主：这一页的配置读口在原生侧（C17），浏览器里点不出来。面板不画假的选择器。
+        <p className="text-[12px] leading-[1.7] text-ink-2">
+          暂未连接到本机服务，读不到配置。
         </p>
       </div>
     );
   }
-  if (state.phase === "unreadable") {
+  if (state.phase === "unreadable" || state.phase === "payload-error") {
     return (
-      <div className="mt-2 flex flex-col gap-1.5 rounded-card border border-line bg-surface px-3.5 py-3">
-        <p className="text-[12px] leading-[1.7] text-ink-2">
-          宿主回的话里没有配置读据。原文如下，不替它解释：
-        </p>
-        <pre className="whitespace-pre-wrap font-mono text-[11px] leading-[1.7] text-ink-3">
-          {state.raw}
-        </pre>
+      <div className="mt-2 flex flex-col gap-2 rounded-card border border-line bg-surface px-3.5 py-3">
+        <p className="text-[12px] leading-[1.7] text-ink-2">暂时读不到配置，请稍后重试。</p>
         <Button className="self-start" onClick={reload} size="xs" variant="secondary">
           重试
         </Button>
-      </div>
-    );
-  }
-  if (state.phase === "payload-error") {
-    return (
-      <div className="mt-2 flex flex-col gap-1.5 rounded-card border border-line bg-surface px-3.5 py-3">
-        <p className="text-[12px] leading-[1.7] text-ink-2">
-          宿主说读据没构出来（payloadError），这不是「没有配置」：
-        </p>
-        <pre className="whitespace-pre-wrap font-mono text-[11px] leading-[1.7] text-ink-3">
-          {state.message}
-        </pre>
       </div>
     );
   }

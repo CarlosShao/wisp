@@ -51,18 +51,18 @@ const CATEGORIES: readonly Category[] = [
     control: "config",
   },
   {
-    // Ticket 313's page half landed 2026-10-13: the read (config.get's
-    // structured line) and the writes (row / credential / chat pair) are
-    // live, so this category is no longer a waiting note.
+    // Ticket 313's page half landed 2026-10-13, v2 cut 2026-10-14: the read
+    // (config.get's structured line) and the writes (provider row / credential
+    // / chat pair) are live, so this category is no longer a waiting note.
     name: "模型",
-    purpose: "默认模型、每家的密钥、聊天角色指向哪两半。",
+    purpose: "添加供应商、保存密钥，并选择默认聊天模型。",
     waiting: "",
     control: "model",
   },
   {
     // Ticket 313's voice half: the two cloud chains and the realtime head.
     name: "语音",
-    purpose: "听写与朗读的云回退链、实时头（陪聊路径）。",
+    purpose: "配置听写、朗读与实时语音使用的供应商和模型。",
     waiting: "",
     control: "voice",
   },

@@ -1,44 +1,46 @@
 /* ============================================================================
-   语音 settings page - ticket 313's page half for the voice category.
+   语音 settings page - v2 (owner review 2026-10-14; see model-settings.tsx's
+   header for what changed and why).
    ----------------------------------------------------------------------------
-   WHAT THIS IS. The 语音 category wired to the same settings door as the 模型
-   page: one config.get read (shared gate in components/config-read-state.tsx)
-   and config.set writes against the two cloud chains and the realtime head
-   (313-panel-ask §3):
+   Same interface as v1 (313-panel-ask.md §3): two cloud fallback chains and the
+   realtime head. v2 makes it a product surface:
 
-     voice_cloud_asr_chain / voice_cloud_tts_chain  value = the chain, elements
-       "provider/model", comma-separated. Each element is checked on the Go
-       side: the provider must be in the registry, the model must be in that
-       provider's catalog, and local-sherpa is refused outright (it is the
-       local fallback and never enters a cloud chain).
-     voice_realtime_provider / voice_realtime_model  the realtime head as two
-       single-key writes (A877 ruling 1's beta shape - one key per call).
+     - 听写 / 朗读 are CHAIN EDITORS (rows of provider+model, add/remove), which
+       is what the field actually is - a comma-separated fallback list. v1 wrote
+       a whole chain from one typed string, which silently overwrote a multi-hop
+       chain the operator may have written by hand.
+     - everything reads in plain language; the enabled-switch gap is stated as a
+       scope line, not as internal jargon.
+     - the pair rule is checked at SAVE time, per segment.
 
-   THE TWO NAMED GAPS, printed on the page instead of papered over (§5):
-     1. An EMPTY chain value is refused by the gate ("空值不写成默认", no clear
-        sentinel exists yet) - so this page does not offer a clear button that
-        could only ever fail, and says why next to the inputs.
-     2. voice.realtime.enabled is NOT writable (the ruled roster has
-        provider/model only) - the page can point the head but cannot switch
-        it on, and says so where the realtime rows are.
+   A chain element must name a provider AND a model the config already lists
+   (checkChainElement at load and on write), so the model control lists the
+   provider's catalog - there is no typed-id path here, and a provider with no
+   models says so instead of offering a doomed save.
 
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
-import { useRef, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { useState } from "react";
+import { Plus, RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ai-native/button";
 import { ConfigReadGate } from "@/components/config-read-state";
-import { cn } from "@/lib/cn";
-import type { ConfigView } from "@/lib/config-view";
+import { COPY, configStatus, translateWriteReply, type Feedback } from "@/lib/config-feedback";
+import type { ConfigView, ConfigViewProvider } from "@/lib/config-view";
 import { requestConfigWrite } from "@/lib/panel";
+import {
+  EmptyState,
+  FeedbackLine,
+  PairFields,
+  SettingsCard,
+  StateTag,
+} from "@/components/settings-controls";
+import type { ConfigWireWrite } from "@/components/model-settings";
 
 export function VoiceSettings({
   heading = "语音",
-  lede = "云回退链与实时头。链的每个元素写成「服务商/模型」，多个用逗号隔开；写入要重启进程才用得上，回执里会说。",
+  lede = "配置听写、朗读与实时语音使用的供应商和模型。",
 }: {
-  /** The settings page passes its own words here - same convention as
-      config-screen.tsx (see the note there). */
   heading?: string;
   lede?: string;
 }) {
@@ -47,253 +49,275 @@ export function VoiceSettings({
       <h2 className="text-[15px] font-semibold text-ink">{heading}</h2>
       <p className="text-[12.5px] text-ink-2">{lede}</p>
       <ConfigReadGate>
-        {(view, prose, reload) => <VoiceBody onChanged={reload} prose={prose} view={view} />}
+        {(view, _prose, reload) => (
+          <VoiceSettingsView
+            onReload={reload}
+            performWrite={async (write) => translateWriteReply(await requestConfigWrite(write))}
+            view={view}
+          />
+        )}
       </ConfigReadGate>
     </section>
   );
 }
 
-interface Receipt {
-  step: string;
-  text: string;
-  refused: boolean;
-}
-
-function chainText(chain: string[] | null): string {
-  if (chain === null) return "";
-  return chain.join(", ");
-}
-
-function VoiceBody({
-  view,
-  prose,
-  onChanged,
-}: {
+export interface VoiceSettingsViewProps {
   view: ConfigView;
-  prose: string;
-  onChanged: () => void;
-}) {
-  const [asr, setAsr] = useState(() => chainText(view.voice.cloudASRChain));
-  const [tts, setTts] = useState(() => chainText(view.voice.cloudTTSChain));
-  // The realtime inputs are seeded from the read once; they are field VALUES
-  // from the config, not credentials, so keeping them in state is the same
-  // thing the model page does with the provider name.
-  const [rtProvider, setRtProvider] = useState(view.voice.realtimeProvider);
-  const [rtModel, setRtModel] = useState(view.voice.realtimeModel);
-  const [receipts, setReceipts] = useState<Receipt[]>([]);
-  const [busy, setBusy] = useState<string | null>(null);
-  const seq = useRef(0);
+  performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
+  onReload: () => void;
+}
 
-  async function run(step: string, send: () => Promise<string | null>) {
-    const mine = ++seq.current;
-    setBusy(step);
-    const reply = await send();
-    if (mine !== seq.current) return;
+export function VoiceSettingsView({ view, performWrite, onReload }: VoiceSettingsViewProps) {
+  const status = configStatus(view);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  async function run(key: string, fn: () => Promise<Feedback>): Promise<Feedback> {
+    setBusy(key);
+    const feedback = await fn();
     setBusy(null);
-    if (reply === null) {
-      setReceipts((all) => [{ step, text: "没接到宿主，请求没有发出去。", refused: true }, ...all].slice(0, 6));
-      return;
-    }
-    setReceipts((all) => [{ step, text: reply, refused: reply.includes("被拒绝") }, ...all].slice(0, 6));
-    onChanged();
+    onReload();
+    return feedback;
   }
 
   return (
     <div className="mt-2 flex min-w-0 flex-col gap-3">
-      {/* 读到的现状。 */}
-      <div className="flex flex-col gap-1.5 rounded-card border border-line bg-surface px-3.5 py-3">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">配置读回</p>
-          <Button aria-label="重读配置" onClick={onChanged} size="xs" variant="quiet">
-            <RefreshCw aria-hidden="true" size={11} strokeWidth={2} />
-            重读
-          </Button>
-        </div>
-        <pre className="whitespace-pre-wrap text-[12px] leading-[1.7] text-ink-2">{prose}</pre>
-        <div className="flex flex-col gap-1 pt-1">
-          <ReadLine label="云 ASR 链" value={view.voice.cloudASRChain} />
-          <ReadLine label="云 TTS 链" value={view.voice.cloudTTSChain} />
-          <p className="text-[11.5px] text-ink-3">
-            实时头：
-            {view.voice.realtimeEnabled ? "已开" : "未开（enabled 不可写，见下）"}
-            {view.voice.realtimeProvider !== "" ? ` · ${view.voice.realtimeProvider}` : " · provider 未设"}
-            {view.voice.realtimeModel !== "" ? ` / ${view.voice.realtimeModel}` : " / model 未设"}
-          </p>
-        </div>
+      <div className="flex items-center gap-2">
+        <StateTag text={status.label} tone={status.tone} />
+        <span className="min-w-0 flex-1" />
+        <Button aria-label="刷新" onClick={onReload} size="xs" variant="quiet">
+          <RefreshCw aria-hidden="true" size={11} strokeWidth={2} />
+          刷新
+        </Button>
       </div>
 
       {!view.readable ? (
-        <div className="rounded-card border border-line bg-surface px-3.5 py-3">
-          <p className="text-[12px] leading-[1.7] text-ink-2">
-            配置当前不可读（这不是未配置）：先把它修好，下面的输入框才谈得上有意义。
-          </p>
-        </div>
+        <SettingsCard title="配置">
+          <p className="text-[12px] leading-[1.7] text-ink-2">暂时读不到配置，请稍后刷新。</p>
+        </SettingsCard>
+      ) : view.providers.length === 0 ? (
+        <SettingsCard title="语音">
+          <EmptyState text="先在「模型」页添加一个供应商，再回来配置语音。" />
+        </SettingsCard>
       ) : (
         <>
-          {/* 两条云链。 */}
-          <ChainRow
-            busy={busy !== null}
-            caption="ASR（听写）回退链"
+          <ChainEditor
+            busy={busy}
+            description="听写优先走这里列出的顺序，都不可用时回退到本地引擎。"
             field="voice_cloud_asr_chain"
-            onChange={setAsr}
-            onWrite={() =>
-              run("写 ASR 链", () =>
-                requestConfigWrite({ field: "voice_cloud_asr_chain", value: asr.trim() }),
-              )
-            }
-            placeholder="stepfun/模型id, 另一家/模型id"
-            value={asr}
+            initial={view.voice.cloudASRChain}
+            performWrite={performWrite}
+            providers={view.providers}
+            run={run}
+            title="听写（ASR）"
           />
-          <ChainRow
-            busy={busy !== null}
-            caption="TTS（朗读）回退链"
+          <ChainEditor
+            busy={busy}
+            description="朗读优先走这里列出的顺序，都不可用时回退到本地引擎。"
             field="voice_cloud_tts_chain"
-            onChange={setTts}
-            onWrite={() =>
-              run("写 TTS 链", () =>
-                requestConfigWrite({ field: "voice_cloud_tts_chain", value: tts.trim() }),
-              )
-            }
-            placeholder="stepfun/模型id"
-            value={tts}
+            initial={view.voice.cloudTTSChain}
+            performWrite={performWrite}
+            providers={view.providers}
+            run={run}
+            title="朗读（TTS）"
           />
-          <p className="text-[11px] leading-[1.6] text-ink-3">
-            元素规则：provider 必须在注册表里、model 必须在该服务商的目录里；local-sherpa 是本地兜底，永远不会进云链。
-            空值不写成默认，所以这里没有「清空」按钮：清空链暂时没有界面口。
-          </p>
-
-          {/* 实时头：两个单键写入（β 形）。 */}
-          <div className="flex flex-col gap-2 rounded-card border border-line bg-surface px-3.5 py-3">
-            <p className="text-[12.5px] font-medium text-ink">实时头（陪聊路径）</p>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11.5px] text-ink-3">服务商</span>
-              <input
-                aria-label="实时头服务商"
-                className="h-[27px] w-44 rounded-control bg-inset px-2 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
-                onChange={(e) => setRtProvider(e.currentTarget.value)}
-                placeholder="服务商名"
-                value={rtProvider}
-              />
-              <Button
-                disabled={busy !== null || rtProvider.trim() === ""}
-                onClick={() =>
-                  run("写实时服务商", () =>
-                    requestConfigWrite({ field: "voice_realtime_provider", value: rtProvider.trim() }),
-                  )
-                }
-                size="sm"
-                variant="secondary"
-              >
-                写入 provider
-              </Button>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11.5px] text-ink-3">模型</span>
-              <input
-                aria-label="实时头模型"
-                className="h-[27px] w-44 rounded-control bg-inset px-2 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
-                onChange={(e) => setRtModel(e.currentTarget.value)}
-                placeholder="模型 id"
-                value={rtModel}
-              />
-              <Button
-                disabled={busy !== null || rtModel.trim() === ""}
-                onClick={() =>
-                  run("写实时模型", () =>
-                    requestConfigWrite({ field: "voice_realtime_model", value: rtModel.trim() }),
-                  )
-                }
-                size="sm"
-                variant="secondary"
-              >
-                写入 model
-              </Button>
-            </div>
-            <p className="text-[11px] leading-[1.6] text-ink-3">
-              两枚是两次单键写入（一字段一写入，β 形）。enabled 不可写：这里配得成对，但今天点不亮实时头。
-            </p>
-          </div>
-
-          {/* 回执：每一句都是宿主发的原文。 */}
-          {receipts.length > 0 ? (
-            <div className="flex flex-col gap-2">
-              {receipts.map((r, i) => (
-                <div
-                  className={cn(
-                    "rounded-card border px-3.5 py-2.5",
-                    r.refused ? "border-red/40 bg-red-tint" : "border-line bg-surface",
-                  )}
-                  key={`${r.step}-${i}`}
-                >
-                  <p className="text-[11px] font-medium text-ink-3">{r.step}</p>
-                  <pre className="whitespace-pre-wrap text-[11.5px] leading-[1.7] text-ink-2">{r.text}</pre>
-                </div>
-              ))}
-            </div>
-          ) : null}
-
-          <p className="text-[11px] leading-[1.6] text-ink-3">
-            写入的生效级别由回执里那句话说，页面不另说。
-          </p>
+          <RealtimeCard
+            busy={busy}
+            performWrite={performWrite}
+            providers={view.providers}
+            run={run}
+            view={view}
+          />
         </>
       )}
     </div>
   );
 }
 
-/** One line of the read-back: the chain as the config carries it, or the
-    honest "not answered" when the array is null (which is a different fact
-    from an empty chain). */
-function ReadLine({ label, value }: { label: string; value: string[] | null }) {
+/* ---------------------------------------------------------------------------
+   One chain.
+   --------------------------------------------------------------------------- */
+
+interface ChainSegment {
+  provider: string;
+  model: string;
+}
+
+/** "provider/model" as the config spells a chain element; a hand-written
+    element without a slash keeps its whole text in the provider half so the
+    editor never silently drops it. */
+function parseChain(chain: string[] | null): ChainSegment[] {
+  if (chain === null) return [];
+  return chain.map((el) => {
+    const cut = el.indexOf("/");
+    return cut < 0 ? { provider: el, model: "" } : { provider: el.slice(0, cut), model: el.slice(cut + 1) };
+  });
+}
+
+function chainText(chain: string[] | null): string {
+  if (chain === null || chain.length === 0) return "未设置";
+  return chain.join(", ");
+}
+
+function ChainEditor({
+  title,
+  description,
+  field,
+  initial,
+  providers,
+  busy,
+  run,
+  performWrite,
+}: {
+  title: string;
+  description: string;
+  field: string;
+  initial: string[] | null;
+  providers: readonly ConfigViewProvider[];
+  busy: string | null;
+  run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
+  performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
+}) {
+  const [segments, setSegments] = useState<ChainSegment[]>(() => {
+    const parsed = parseChain(initial);
+    return parsed.length > 0 ? parsed : [{ provider: "", model: "" }];
+  });
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+
+  function update(index: number, next: Partial<ChainSegment>) {
+    setSegments((all) => all.map((seg, i) => (i === index ? { ...seg, ...next } : seg)));
+  }
+
+  function save() {
+    if (segments.length === 0) {
+      setFeedback({ tone: "error", text: COPY.chainEmpty });
+      return;
+    }
+    for (const seg of segments) {
+      if (seg.provider === "" || seg.model === "") {
+        const row = providers.find((p) => p.name === seg.provider);
+        const noModels = seg.provider !== "" && row !== undefined && (row.models === null || row.models.length === 0);
+        setFeedback({
+          tone: "error",
+          text: noModels ? "这家供应商还没有模型" : COPY.chainSegmentMissing,
+        });
+        return;
+      }
+    }
+    void run(`${field}`, () =>
+      performWrite({
+        field,
+        value: segments.map((seg) => `${seg.provider}/${seg.model}`).join(","),
+      }),
+    ).then(setFeedback);
+  }
+
   return (
-    <p className="text-[11.5px] leading-[1.6] text-ink-2">
-      {label}：
-      {value === null ? (
-        <span className="text-ink-3">没读到（腿还没答）</span>
-      ) : value.length === 0 ? (
-        <span className="text-ink-3">空（未配置）</span>
-      ) : (
-        <span className="font-mono">{value.join(", ")}</span>
-      )}
-    </p>
+    <SettingsCard title={title} description={description}>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
+          {segments.map((seg, index) => (
+            <div className="flex flex-wrap items-center gap-2" key={`${index}-${seg.provider}`}>
+              <span className="w-8 shrink-0 font-mono text-[11px] text-ink-3">{index + 1}</span>
+              <PairFields
+                manualFallback={false}
+                model={seg.model}
+                onModel={(next) => update(index, { model: next })}
+                onProvider={(next) => update(index, { provider: next, model: "" })}
+                provider={seg.provider}
+                providers={providers}
+              />
+              <Button
+                aria-label={`移除第 ${index + 1} 段`}
+                onClick={() => setSegments((all) => all.filter((_, i) => i !== index))}
+                size="xs"
+                variant="quiet"
+              >
+                <X aria-hidden="true" size={12} strokeWidth={2} />
+              </Button>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            onClick={() => setSegments((all) => [...all, { provider: "", model: "" }])}
+            size="xs"
+            variant="secondary"
+          >
+            <Plus aria-hidden="true" size={12} strokeWidth={2} />
+            添加一段
+          </Button>
+          <Button disabled={busy !== null} onClick={save} size="sm" variant="primary">
+            {busy === field ? COPY.saving : COPY.save}
+          </Button>
+        </div>
+        <p className="text-[11.5px] text-ink-3">当前：{chainText(initial)}</p>
+        <FeedbackLine feedback={feedback} />
+      </div>
+    </SettingsCard>
   );
 }
 
-function ChainRow({
-  caption,
-  field,
-  value,
-  placeholder,
+/* ---------------------------------------------------------------------------
+   实时语音.
+   --------------------------------------------------------------------------- */
+
+function RealtimeCard({
+  view,
+  providers,
   busy,
-  onChange,
-  onWrite,
+  run,
+  performWrite,
 }: {
-  caption: string;
-  field: string;
-  value: string;
-  placeholder: string;
-  busy: boolean;
-  onChange: (next: string) => void;
-  onWrite: () => void;
+  view: ConfigView;
+  providers: readonly ConfigViewProvider[];
+  busy: string | null;
+  run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
+  performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
 }) {
+  const [provider, setProvider] = useState(view.voice.realtimeProvider);
+  const [model, setModel] = useState(view.voice.realtimeModel);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+
+  const current =
+    view.voice.realtimeProvider !== "" || view.voice.realtimeModel !== ""
+      ? `${view.voice.realtimeProvider} / ${view.voice.realtimeModel}`
+      : "未设置";
+
+  function save() {
+    if (provider === "" || model === "") {
+      setFeedback({ tone: "error", text: COPY.pairMissing });
+      return;
+    }
+    void run("realtime", async () => {
+      const head = await performWrite({ field: "voice_realtime_provider", value: provider });
+      if (head.tone !== "ok") return head;
+      const tail = await performWrite({ field: "voice_realtime_model", value: model });
+      return tail.tone === "ok" ? { tone: "ok" as const, text: "已保存，重启后生效" } : tail;
+    }).then(setFeedback);
+  }
+
   return (
-    <div className="flex flex-col gap-2 rounded-card border border-line bg-surface px-3.5 py-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[12.5px] font-medium text-ink">{caption}</span>
-        <span className="font-mono text-[10.5px] text-ink-3">{field}</span>
+    <SettingsCard title="实时语音" description="陪聊模式的实时通话；通话开关由应用控制，这里配置供应商与模型。">
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <PairFields
+            manualFallback
+            model={model}
+            onModel={setModel}
+            onProvider={(next) => {
+              setProvider(next);
+              setModel("");
+            }}
+            provider={provider}
+            providers={providers}
+          />
+          <Button disabled={busy !== null} onClick={save} size="sm" variant="primary">
+            {busy === "realtime" ? COPY.saving : COPY.save}
+          </Button>
+        </div>
+        <p className="text-[11.5px] text-ink-3">当前：{current}</p>
+        <FeedbackLine feedback={feedback} />
       </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <input
-          aria-label={caption}
-          className="h-[27px] min-w-[280px] flex-1 rounded-control bg-inset px-2 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
-          onChange={(e) => onChange(e.currentTarget.value)}
-          placeholder={placeholder}
-          value={value}
-        />
-        <Button disabled={busy || value.trim() === ""} onClick={onWrite} size="sm" variant="primary">
-          写入链
-        </Button>
-      </div>
-    </div>
+    </SettingsCard>
   );
 }
