@@ -1,0 +1,13 @@
+## my re-created gate (t.Skip via overlay) under strict runner
+## start 2026-10-14 11:40:02 +0800
+time=2026-10-14T11:40:12.973+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestZZ315A1SiblingChildFirstBridgeCall
+    zz315a1probe_test.go:535: v1 re-created gate: strict runner must treat this as fatal (ticket 71 AC#3)
+--- SKIP: TestZZ315A1SiblingChildFirstBridgeCall (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.474s
+runtests.sh: 1 test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3) - packages=[./cmd/wisp/ -overlay=C:/tmp/wisp315v1overlay/v1-overlay-gated.json -run ^TestZZ315A1SiblingChildFirstBridgeCall$] top-level: PASS=0 FAIL=0 SKIP=1, === RUN=1, '[no tests to run]'=0
+runtests.sh: either make the step's scope exclude it or run it where it can execute;
+             do not relax this script.
+## end 2026-10-14 11:40:13 +0800
+## rc=1

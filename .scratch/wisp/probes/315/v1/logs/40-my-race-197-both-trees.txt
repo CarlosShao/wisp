@@ -1,0 +1,1143 @@
+## MERGED committed copy of two raw v1 logs (originals left on disk in this dir):
+##   A) 40-my-race-197-current-tree.txt     (sha256 adee6bd7… prefix, 37732 B)
+##   B) 41-my-race-197-overlay-noopen.txt   (sha256 6d3be686… prefix, 38020 B)
+
+==================================================================
+## current tree (with the fix): go test ./cmd/wisp/ -race -count=1 -run '^Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands$' -v
+## start 2026-10-14 11:40:43 +0800
+time=2026-10-14T11:40:52.778+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands
+time=2026-10-14T11:40:56.499+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 11:40:56 mockllm: serving on http://127.0.0.1:58382 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T11:40:56.524+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands580011945\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T11:40:56.540+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands580011945\002\logs min_level=info early_records=3 early_dropped=0
+time=2026-10-14T11:40:56.549+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands580011945\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T11:40:56.587+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands580011945\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T11:40:56.628+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T03:40:56Z duration_ms=40
+time=2026-10-14T11:40:56.637+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands580011945\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T11:40:56.654+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T03:40:56Z duration_ms=15
+time=2026-10-14T11:40:56.668+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands580011945\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T11:40:56.693+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T03:40:56Z duration_ms=25
+time=2026-10-14T11:40:56.699+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T11:40:56.712+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+==================
+WARNING: DATA RACE
+Write at 0x00c000034bf0 by goroutine 54:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).bookWaitingState()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/approval_always.go:177 +0x1cc
+  github.com/CarlosShao/wisp/cmd/wisp.(*consoleApprovalUI).Update()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:1436 +0x29a
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).PendingApproval()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:554 +0x11bd
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).route()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:458 +0x719
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:352 +0x15bc
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:115 +0x324
+
+Previous write at 0x00c000034bf0 by goroutine 41:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).allowScoped()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:442 +0x968
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).allow()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:366 +0x1e4
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).DecideFromNative()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:729 +0x19c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).Allow()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:328 +0x23e
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:445 +0x103d
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 54 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:112 +0x579
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:396 +0x169
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 41 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:217 +0x244
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:260 +0x538
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c000034bd0 by goroutine 54:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:134 +0x48
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).bookWaitingState()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/approval_always.go:177 +0x1cc
+  github.com/CarlosShao/wisp/cmd/wisp.(*consoleApprovalUI).Update()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:1436 +0x29a
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).PendingApproval()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:554 +0x11bd
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).route()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:458 +0x719
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:352 +0x15bc
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:115 +0x324
+
+Previous write at 0x00c000034bd0 by goroutine 41:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:135 +0xa5
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).allowScoped()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:442 +0x968
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).allow()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:366 +0x1e4
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).DecideFromNative()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:729 +0x19c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).Allow()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:328 +0x23e
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:445 +0x103d
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 54 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:112 +0x579
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:396 +0x169
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 41 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:217 +0x244
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:260 +0x538
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00c000034bf0 by goroutine 62:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).bookWaitingState()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/approval_always.go:177 +0x1cc
+  github.com/CarlosShao/wisp/cmd/wisp.(*consoleApprovalUI).Update()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:1436 +0x29a
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).PendingApproval()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:554 +0x11bd
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).route()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:458 +0x719
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:352 +0x15bc
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:115 +0x324
+
+Previous write at 0x00c000034bf0 by goroutine 41:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).reject()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:517 +0x468
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).DecideFromNative()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:727 +0x245
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).decide()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:413 +0x1d2
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).Reject()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:373 +0x1994
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:480 +0x192c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 62 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:112 +0x579
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:463 +0x141a
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 41 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:217 +0x244
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:260 +0x538
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c000034bd0 by goroutine 62:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:134 +0x48
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).bookWaitingState()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/approval_always.go:177 +0x1cc
+  github.com/CarlosShao/wisp/cmd/wisp.(*consoleApprovalUI).Update()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:1436 +0x29a
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).PendingApproval()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:554 +0x11bd
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).route()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:458 +0x719
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:352 +0x15bc
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:115 +0x324
+
+Previous write at 0x00c000034bd0 by goroutine 41:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:135 +0xa5
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).reject()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:517 +0x468
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).DecideFromNative()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:727 +0x245
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).decide()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:413 +0x1d2
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).Reject()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:373 +0x1994
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:480 +0x192c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 62 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:112 +0x579
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:463 +0x141a
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 41 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:217 +0x244
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:260 +0x538
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00c000034bf0 by goroutine 40:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:144 +0x1d4
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick-fm()
+      <autogenerated>:1 +0x3e
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x98
+
+Previous write at 0x00c000034bf0 by goroutine 49:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).log()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1305 +0x419
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).CloseTask()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:934 +0x1d6
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).admitTask.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:989 +0x77
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute.func1.1()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:317 +0x33
+  runtime.deferreturn()
+      D:/work/base/go/src/runtime/panic.go:668 +0x53
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).RunAsync.func1()
+      D:/work/workspace/projects plans/Wisp/internal/agent/loop.go:333 +0x14e
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x98
+
+Goroutine 40 (running) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).startConfigReload()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:123 +0x3a6
+  github.com/CarlosShao/wisp/cmd/wisp.assembleRuntime()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:813 +0x4a47
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:249 +0x494
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+
+Goroutine 49 (finished) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/internal/agent.(*Loop).RunAsync()
+      D:/work/workspace/projects plans/Wisp/internal/agent/loop.go:331 +0x4bb
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:347 +0xe56
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.(*subagentSpawn).Execute()
+      <autogenerated>:1 +0x108
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:545 +0x7d9
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:362 +0x1b51
+  github.com/CarlosShao/wisp/cmd/wisp.(*spawn197).launch()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_carrier_197_test.go:172 +0x5e6
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1.gowrap2()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x59
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c000034bd0 by goroutine 40:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:134 +0x48
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:144 +0x1d4
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick-fm()
+      <autogenerated>:1 +0x3e
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x98
+
+Previous write at 0x00c000034bd0 by goroutine 42:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:135 +0xa5
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).log()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1305 +0x7fa
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).book()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1153 +0x254
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).close()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1109 +0x211
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:612 +0x1752
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:405 +0x17e9
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.(*subagentSpawn).Execute()
+      <autogenerated>:1 +0x108
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:545 +0x7d9
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:362 +0x1b51
+  github.com/CarlosShao/wisp/cmd/wisp.(*spawn197).launch()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_carrier_197_test.go:172 +0x5e6
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1.gowrap2()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x59
+
+Goroutine 40 (running) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).startConfigReload()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:123 +0x3a6
+  github.com/CarlosShao/wisp/cmd/wisp.assembleRuntime()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:813 +0x4a47
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:249 +0x494
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+
+Goroutine 42 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x21c
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c000034bd0 by goroutine 42:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:134 +0x48
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).log()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1305 +0x1397
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).book()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1205 +0x11b9
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).close()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1109 +0x211
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:612 +0x1752
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:405 +0x17e9
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.(*subagentSpawn).Execute()
+      <autogenerated>:1 +0x108
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:545 +0x7d9
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:362 +0x1b51
+  github.com/CarlosShao/wisp/cmd/wisp.(*spawn197).launch()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_carrier_197_test.go:172 +0x5e6
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1.gowrap2()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x59
+
+Previous write at 0x00c000034bd0 by goroutine 40:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:135 +0xa5
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:144 +0x1d4
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick-fm()
+      <autogenerated>:1 +0x3e
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x98
+
+Goroutine 42 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x21c
+
+Goroutine 40 (running) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).startConfigReload()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:123 +0x3a6
+  github.com/CarlosShao/wisp/cmd/wisp.assembleRuntime()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:813 +0x4a47
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:249 +0x494
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+    subagent_selfapproval_197_test.go:366: child=6b477222-484a-4abe-95f8-50d604e604e5 corr1=6b477222-484a-4abe-95f8-50d604e604e5-corr-1 corr2=6b477222-484a-4abe-95f8-50d604e604e5-corr-2 | 空令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 假令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 自称来源=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 借证=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 重放=approval: correlation_id 无对应待审批项 | 面板递证=面板来源的「允许」被服务端 API 直接拒绝（F2 第三层），可改为拒绝或查看完整参数 | 烧后再试=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 宿主允许=<nil> | 落盘=true/false
+    testing.go:1865: race detected during execution of test
+--- FAIL: Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands (13.99s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	16.875s
+FAIL
+## end 2026-10-14 11:41:06 +0800
+## rc=1
+
+==================================================================
+## pre-fix production semantics (overlay removes the one OpenTask line): go test ./cmd/wisp/ -race -count=1 -run '^Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands$' -v -overlay=C:/tmp/wisp315v1overlay/v1-overlay.json
+## start 2026-10-14 11:41:18 +0800
+time=2026-10-14T11:41:36.182+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands
+time=2026-10-14T11:41:39.821+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 11:41:39 mockllm: serving on http://127.0.0.1:54466 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T11:41:39.847+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands764549182\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T11:41:39.863+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands764549182\002\logs min_level=info early_records=3 early_dropped=0
+time=2026-10-14T11:41:39.870+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands764549182\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T11:41:39.902+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands764549182\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T11:41:39.958+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T03:41:39Z duration_ms=54
+time=2026-10-14T11:41:39.972+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands764549182\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T11:41:39.992+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T03:41:39Z duration_ms=19
+time=2026-10-14T11:41:40.005+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315v1gotmp\Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands764549182\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T11:41:40.046+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T03:41:40Z duration_ms=39
+time=2026-10-14T11:41:40.053+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T11:41:40.065+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+==================
+WARNING: DATA RACE
+Write at 0x00c0001c0170 by goroutine 53:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).bookWaitingState()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/approval_always.go:177 +0x1cc
+  github.com/CarlosShao/wisp/cmd/wisp.(*consoleApprovalUI).Update()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:1436 +0x29a
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).PendingApproval()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:554 +0x11bd
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).route()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:458 +0x719
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:352 +0x15bc
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:115 +0x324
+
+Previous write at 0x00c0001c0170 by goroutine 41:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).allowScoped()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:442 +0x968
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).allow()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:366 +0x1e4
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).DecideFromNative()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:729 +0x19c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).Allow()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:328 +0x23e
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:445 +0x103d
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 53 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:112 +0x579
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:396 +0x169
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 41 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:217 +0x244
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:260 +0x538
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c0001c0150 by goroutine 53:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:134 +0x48
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).bookWaitingState()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/approval_always.go:177 +0x1cc
+  github.com/CarlosShao/wisp/cmd/wisp.(*consoleApprovalUI).Update()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:1436 +0x29a
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).PendingApproval()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:554 +0x11bd
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).route()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:458 +0x719
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:352 +0x15bc
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:115 +0x324
+
+Previous write at 0x00c0001c0150 by goroutine 41:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:135 +0xa5
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).allowScoped()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:442 +0x968
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).allow()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:366 +0x1e4
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).DecideFromNative()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:729 +0x19c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).Allow()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:328 +0x23e
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:445 +0x103d
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 53 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:112 +0x579
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:396 +0x169
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 41 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:217 +0x244
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:260 +0x538
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00c0001c0170 by goroutine 61:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).bookWaitingState()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/approval_always.go:177 +0x1cc
+  github.com/CarlosShao/wisp/cmd/wisp.(*consoleApprovalUI).Update()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:1436 +0x29a
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).PendingApproval()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:554 +0x11bd
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).route()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:458 +0x719
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:352 +0x15bc
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:115 +0x324
+
+Previous write at 0x00c0001c0170 by goroutine 41:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).reject()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:517 +0x468
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).DecideFromNative()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:727 +0x245
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).decide()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:413 +0x1d2
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).Reject()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:373 +0x1994
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:480 +0x192c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 61 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:112 +0x579
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:463 +0x141a
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 41 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:217 +0x244
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:260 +0x538
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c0001c0150 by goroutine 61:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:134 +0x48
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).bookWaitingState()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/approval_always.go:177 +0x1cc
+  github.com/CarlosShao/wisp/cmd/wisp.(*consoleApprovalUI).Update()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:1436 +0x29a
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).PendingApproval()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:554 +0x11bd
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).route()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:458 +0x719
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:352 +0x15bc
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:115 +0x324
+
+Previous write at 0x00c0001c0150 by goroutine 41:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:135 +0xa5
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Queue).reject()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/queue.go:517 +0x468
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Gate).DecideFromNative()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/gate.go:727 +0x245
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).decide()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:413 +0x1d2
+  github.com/CarlosShao/wisp/internal/agent/approval.(*Replies).Reject()
+      D:/work/workspace/projects plans/Wisp/internal/agent/approval/replies.go:373 +0x1994
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:480 +0x192c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 61 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.startChildWrite197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:112 +0x579
+  github.com/CarlosShao/wisp/cmd/wisp.probeSelfApproval197()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:463 +0x141a
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:220 +0x253
+
+Goroutine 41 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:217 +0x244
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:260 +0x538
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00c0001c0170 by goroutine 40:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:144 +0x1d4
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick-fm()
+      <autogenerated>:1 +0x3e
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x98
+
+Previous write at 0x00c0001c0170 by goroutine 42:
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:194 +0x3a
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).log()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1305 +0x7fa
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).book()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1153 +0x254
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).close()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1109 +0x211
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:612 +0x1752
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:405 +0x17e9
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.(*subagentSpawn).Execute()
+      <autogenerated>:1 +0x108
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:545 +0x7d9
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:362 +0x1b51
+  github.com/CarlosShao/wisp/cmd/wisp.(*spawn197).launch()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_carrier_197_test.go:172 +0x5e6
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1.gowrap2()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x59
+
+Goroutine 40 (running) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).startConfigReload()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:123 +0x3a6
+  github.com/CarlosShao/wisp/cmd/wisp.assembleRuntime()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:813 +0x4a47
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:249 +0x494
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+
+Goroutine 42 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x21c
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c0001c0150 by goroutine 40:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:134 +0x48
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:144 +0x1d4
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick-fm()
+      <autogenerated>:1 +0x3e
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x98
+
+Previous write at 0x00c0001c0150 by goroutine 42:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:135 +0xa5
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).log()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1305 +0x7fa
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).book()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1153 +0x254
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).close()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1109 +0x211
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:612 +0x1752
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:405 +0x17e9
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.(*subagentSpawn).Execute()
+      <autogenerated>:1 +0x108
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:545 +0x7d9
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:362 +0x1b51
+  github.com/CarlosShao/wisp/cmd/wisp.(*spawn197).launch()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_carrier_197_test.go:172 +0x5e6
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1.gowrap2()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x59
+
+Goroutine 40 (running) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).startConfigReload()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:123 +0x3a6
+  github.com/CarlosShao/wisp/cmd/wisp.assembleRuntime()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:813 +0x4a47
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:249 +0x494
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+
+Goroutine 42 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x21c
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c0001c0150 by goroutine 42:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:134 +0x48
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf-fm()
+      <autogenerated>:1 +0x5c
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).log()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1305 +0x1397
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).book()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1205 +0x11b9
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).close()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:1109 +0x211
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:612 +0x1752
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:570 +0xe3b
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:550 +0x885
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:405 +0x17e9
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.subagentSpawn.Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/subagent_197.go:239 +0xa2
+  github.com/CarlosShao/wisp/internal/tools.(*subagentSpawn).Execute()
+      <autogenerated>:1 +0x108
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).run()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:545 +0x7d9
+  github.com/CarlosShao/wisp/internal/tools.(*Bridge).Execute()
+      D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go:362 +0x1b51
+  github.com/CarlosShao/wisp/cmd/wisp.(*spawn197).launch()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_carrier_197_test.go:172 +0x5e6
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1.gowrap2()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x59
+
+Previous write at 0x00c0001c0150 by goroutine 40:
+  bytes.(*Buffer).tryGrowByReslice()
+      D:/work/base/go/src/bytes/buffer.go:135 +0xa5
+  bytes.(*Buffer).Write()
+      D:/work/base/go/src/bytes/buffer.go:195 +0xb9
+  fmt.Fprint()
+      D:/work/base/go/src/fmt/print.go:255 +0x84
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).auditf()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:933 +0x117
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:144 +0x1d4
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).configReloadTick-fm()
+      <autogenerated>:1 +0x3e
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).run()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:340 +0x1a1
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn.gowrap1()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x98
+
+Goroutine 42 (running) created at:
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands.func1.1()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:219 +0x21c
+
+Goroutine 40 (running) created at:
+  github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn()
+      D:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x57c
+  github.com/CarlosShao/wisp/cmd/wisp.(*agentRuntime).startConfigReload()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/config_reload.go:123 +0x3a6
+  github.com/CarlosShao/wisp/cmd/wisp.assembleRuntime()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:813 +0x4a47
+  github.com/CarlosShao/wisp/cmd/wisp.runTextTask()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run.go:249 +0x494
+  github.com/CarlosShao/wisp/cmd/wisp.(*runFixture).run()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/run_test.go:122 +0x27c
+  github.com/CarlosShao/wisp/cmd/wisp.Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands()
+      D:/work/workspace/projects plans/Wisp/cmd/wisp/subagent_selfapproval_197_test.go:224 +0x56e
+  testing.tRunner()
+      D:/work/base/go/src/testing/testing.go:2193 +0x1ca
+  testing.(*T).Run.gowrap1()
+      D:/work/base/go/src/testing/testing.go:2258 +0x38
+==================
+    subagent_selfapproval_197_test.go:366: child=971464ec-65bc-41a5-9029-3cb0d4638b8b corr1=971464ec-65bc-41a5-9029-3cb0d4638b8b-corr-1 corr2=971464ec-65bc-41a5-9029-3cb0d4638b8b-corr-2 | 空令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 假令牌=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 自称来源=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 借证=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 重放=approval: correlation_id 无对应待审批项 | 面板递证=面板来源的「允许」被服务端 API 直接拒绝（F2 第三层），可改为拒绝或查看完整参数 | 烧后再试=approval: 原生令牌无效（缺失/已用/与本次请求不绑定） | 宿主允许=<nil> | 落盘=true/false
+    testing.go:1865: race detected during execution of test
+--- FAIL: Test197SubagentSelfApprovalIsRefusedAndTheHostAnswerLands (13.95s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	17.099s
+FAIL
+## end 2026-10-14 11:41:50 +0800
+## rc=1
