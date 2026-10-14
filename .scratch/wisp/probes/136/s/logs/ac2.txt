@@ -1,9 +1,10 @@
 # ticket 136s / AC#2 (R-134-5) - source predicate on the freshness pin.
 #
 # three states: (1) tree-old = git show HEAD:scripts/slo-freshness.sh @ b38567a9
-# (today, unfixed); (2) tree-new = the fixed script (AC#2 commit bb47e9e7, final
-# tree f706dedd); (3) the controls in the same transcripts. Raw matrices kept,
-# never deleted: /d/tmp/wisp136s/matrix-pristine.txt, matrix-final.txt.
+# (today, unfixed); (2) tree-new = the fixed script (AC#2 code bb47e9e7, seam
+# addendum b6fc818d; final tree b6fc818d); (3) the controls in the same
+# transcripts. Raw matrices kept, never deleted: /d/tmp/wisp136s/matrix-pristine.txt,
+# matrix-final.txt; the appendix at the end comes from /d/tmp/wisp136s/extra.txt.
 # driver: sh .scratch/wisp/probes/136/s/drive.sh <script> <out> [world ...]
 #
 # every world injects a fresh P2 record via SLO_FULL_LAST_TRIGGER so a red can
@@ -11,7 +12,9 @@
 # network, no token, no `wisp slo`, no slo-check.ps1). The P2 preamble every
 # body would repeat - "P2 newest slo-full job record: created_at=2026-09-23T08:30:00Z
 # status=completed conclusion=success" + job url + "age: 0 day(s) (1800 s)" - is
-# elided to stay inside the 200-line budget (raw files kept).
+# elided to stay inside the 200-line budget, together with the closing
+# "OK - slo-full still has automatic triggers ..." line (every green world rc is
+# 0 in its own "== world rc=" line; raw files kept).
 #
 # world            what it forges                                     rc old -> new
 # control          genuine: branch dev + ci.yml + push (must stay 0)   0 -> 0
@@ -32,43 +35,36 @@
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=80 run=700
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 2 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == spread rc=0
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=83 run=801
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 2 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == forge-branch rc=0
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=90 run=701
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == forge-workflow rc=0
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=91 run=702
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == forge-event rc=0
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=92 run=703
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == missing-ts rc=0
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=704 artifact_id= run=93
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (0 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == missing-source rc=0
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=94 run=0
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == stale-sample rc=1
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-13T08:45:00Z artifact_id=10736979707 run=35831084009
@@ -106,22 +102,19 @@
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=96 run=707
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 
-################ tree-new (AC#2 fixed, f706dedd) ################
+################ tree-new (AC#2 fixed, b6fc818d) ################
 
 == control rc=0
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=80 run=700
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 0 rejected by the source predicate
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == spread rc=0
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=83 run=801
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 0 rejected by the source predicate
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == forge-branch rc=1
    | slo-freshness: P3 source predicate: artifact 90 on branch 'feature/evil' rejected (branch must be main or dev; ticket 136 AC#2)
@@ -181,3 +174,25 @@
    | stub gh: injected failure 'run' for repos/stub/repo/actions/runs/707
 
 
+   ################ appendix: two one-off probes (not world-table rows) ################
+   
+   == mixed: forged newer lookalike (branch dev, event pull_request) + genuine older sample
+      expectation: lookalike rejected AND named, genuine sample aged on; rc=0 (tree-new)
+      | slo-freshness: P3 source predicate: artifact 99 (branch 'dev') comes from run 910 of workflow '.github/workflows/ci.yml' event 'pull_request' on 'dev' - rejected (the uploading run must be .github/workflows/ci.yml with event push|schedule|workflow_dispatch; ticket 136 AC#2)
+      | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=98 run=911
+      | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 1 rejected by the source predicate
+      | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+      | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+      | rc=0
+   
+   == seam-empty-ts: SLO_FULL_LAST_SAMPLE starts with an empty first field (leading TAB)
+      old tree: read shifts the columns and ages the misread record as fresh; new: exit 2
+      --- tree-old:
+      | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id= run=35831084009
+      | slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 valid-sample record(s) considered
+      | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+      | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+      | rc=0
+      --- tree-new:
+      | slo-freshness: P3 an injected slo-full-report record starts with an empty field (row: '	2026-09-23T08:45:00Z	35831084009') - a record this pin cannot read must not be aged
+      | rc=2

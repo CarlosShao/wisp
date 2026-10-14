@@ -16,7 +16,6 @@
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=80 run=700
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 2 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == cap-zero rc=1
    | slo-freshness: P3 scanned 0 page(s) x 100 of the artifact listing - no slo-full-report artifact found
@@ -27,7 +26,6 @@
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=95 run=706
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == partial-notfound rc=1
    | slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing - no slo-full-report artifact found
@@ -38,16 +36,14 @@
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=97 run=708
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 
-################ tree-new (AC#3 fixed, f706dedd) ################
+################ tree-new (AC#3 fixed, b6fc818d) ################
 
 == control rc=0
    | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=80 run=700
    | slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 0 rejected by the source predicate
    | slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
-   | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
 
 == cap-zero rc=2
    | slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 188 entries but this pin reads only 0 page(s) x 100 = 0. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.

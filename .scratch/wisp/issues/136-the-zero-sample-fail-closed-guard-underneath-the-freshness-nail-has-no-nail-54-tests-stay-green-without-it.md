@@ -674,3 +674,13 @@
   **改动的三处面**：`scripts/slo-freshness.sh`（三笔产码 commit）＋`probes/136/s/**`（交付）＋票尾 bullets；证伪面（`docs/PLAN.md`、
   `docs/specs/**`、`internal/**`、`tools/d22scan/**`、`allowlist.txt`、阈值/golden、`.github/**`、`frontend/**`）零改动、未 push。
   next=请非实现者按 `logs/*.txt` 复算三格三态并裁 AC#2/#3/#4；AC#3 的"抬上限"与 AC#2 的"live total 现量"是编排者侧的收口动作。
+
+- [2026-10-14 20:0x +08] agent=136s did=**AC#2 追加（append-only，不改写前笔 `bb47e9e7`）：seam 注入路的"缺字段静默跳过"也封掉**。
+  **产码 commit `b6fc818d`**：前笔只把**扫描路**的字段完整性做成 exit 2，而 **seam 路**（`SLO_FULL_LAST_SAMPLE`）仍是
+  `[ -n "$ts" ] || continue`；更坏的是列首为空的行会被 `read` 把列位**错开**——同一发
+  `SLO_FULL_LAST_SAMPLE="<TAB>2026-09-23T08:45:00Z<TAB>35831084009"` 在旧树逐字读成
+  `created_at=2026-09-23T08:45:00Z artifact_id= run=35831084009`（id 落到空位）并判 `age: 0 day(s) (900 s)` ⇒ **rc=0**；
+  修后同一发 exit 2：`P3 an injected slo-full-report record starts with an empty field (row: '<TAB>…') - a record this pin cannot
+  read must not be aged`。22 world × 2 树全量重跑与上一笔**逐发同值**；shellcheck 0.11.0 rc=0；`logs/ac2.txt` 末节＋
+  `mixed` 一发（伪造更新样＋真样并存 ⇒ lookalike 被点名拒绝、真样照常背书、rc=0）都留在证据里。
+  next=同上（三格终裁）；本追加不扩面（仍只 `scripts/slo-freshness.sh`＋`probes/136/s/**`）。

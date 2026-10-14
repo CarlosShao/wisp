@@ -13,14 +13,15 @@
 
 ## 0. 结论先行
 
-| 格 | 判据物 | 产码 commit | 今天（旧树 `b38567a9`） | 修后（tree-new＝`f706dedd`） | 三态出处 |
+| 格 | 判据物 | 产码 commit | 今天（旧树 `b38567a9`） | 修后（tree-new＝`b6fc818d`） | 三态出处 |
 |---|---|---|---|---|---|
-| AC#2 | 来源谓词 workflow/branch/event | `bb47e9e7` | 伪造 artifact 三形全 rc=0 背书；缺字段二形 rc=0 | 三形 rc=1；缺字段二形 0→2；run 查询失败 0→2 | `logs/ac2.txt` |
-| AC#3 | 分页上限 < 总数 ⇒ 报"扫描不完整" | `966c2aa9` | 部分扫描静默判绿（0）/判"没找到"（1） | 两形 + cap-zero 均 exit 2 + `slo-full-scan-incomplete` | `logs/ac3.txt` |
+| AC#2 | 来源谓词 workflow/branch/event | `bb47e9e7`＋seam 追加 `b6fc818d` | 伪造 artifact 三形全 rc=0 背书；缺字段三形 rc=0 | 三形 rc=1；缺字段三形 0→2；run 查询失败 0→2 | `logs/ac2.txt` |
+| AC#3 | 分页上限 < 总数 ⇒ 报"扫描不完整" | `966c2aa9` | 部分扫描静默判绿（0）/判"没找到"（1） | 三形均 exit 2 + `slo-full-scan-incomplete` | `logs/ac3.txt` |
 | AC#4 | 未来时间戳不许夹成 0 天 | `f706dedd` | 2027 时间戳 rc=0、`age: 0 day(s)` 判新鲜 | P3 seam 与 P2 双双 exit 2 + `slo-full-timestamp-in-future` | `logs/ac4.txt` |
 
-证据/交付 commit：`ea32f239`（探针台 + AC#2 读数 + 票尾 bullet）、本发（三份 logs + 本表 + AC#3/#4 bullet）。
-探针复跑：`sh .scratch/wisp/probes/136/s/drive.sh <slo-freshness.sh 路径> <out 文件> [world …]`。
+证据/交付 commit：`ea32f239`（探针台 + AC#2 读数）、`b6e959b1`（三份 logs + 门禁 + 本表）、本发（seam 追加读数）。
+探针复跑：`sh .scratch/wisp/probes/136/s/drive.sh <slo-freshness.sh 路径> <out 文件> [world …]`；
+末笔产码后全量 22 world × 2 树重跑与上一笔逐发同值（`/d/tmp/wisp136s/matrix-final.txt`）。
 
 ## 1. AC#2（R-134-5）：来源谓词
 
@@ -52,6 +53,11 @@
   `event=pull_request` 被拒、run 911 push 被取，`2 record(s) considered, 1 rejected by the source predicate`、
   `rc=0`；这与 P2 的"筛事件/分支后取最新"同形。AC#2① 的"必须红"发生在"那枚 lookalike 是唯一/最新
   可背书者"的世界上（`forge-*` 三形即此）。
+- seam 追加（产码 `b6fc818d`，`logs/ac2.txt` 末节）：扫描路的字段守卫之外，把 **seam 注入路**的
+  `[ -n "$ts" ] || continue` 静默跳过也换成"列首为空即 exit 2"——同一发
+  `SLO_FULL_LAST_SAMPLE="<TAB>2026-09-23T08:45:00Z<TAB>35831084009"` 在旧树被 read 错列、
+  读成 `created_at=2026-09-23T08:45:00Z run=35831084009 artifact_id=`（id 空位）仍判 `age: 0 day(s)` ⇒ rc=0；
+  修后 exit 2（`an injected ... record starts with an empty field ... must not be aged`）。
 
 ## 2. AC#3（R-134-7）：分页上限 < 总数 ⇒ 报"扫描不完整"
 
@@ -122,7 +128,7 @@
 | `00-anchor-and-gates.md` ★ | 本表 |
 | `drive.sh` ★ | 探针驱动器（world 矩阵 + gh 桩，复跑：`sh drive.sh <script> <out> [world…]`） |
 | `ghjq.py` ★ | gh 桩的 `--jq` 替身（仓内无 jq 时用；只认脚本实际传的 filter） |
-| `logs/ac2.txt` ★ | AC#2 两树逐字（三态） |
+| `logs/ac2.txt` ★ | AC#2 两树逐字（三态）＋末节两条一次性探针（`mixed`／seam-empty-ts） |
 | `logs/ac3.txt` ★ | AC#3 两树逐字 |
 | `logs/ac4.txt` ★ | AC#4 两树逐字 |
 | `logs/gates.txt` ★ | 门禁原文（`sh -n`／shellcheck／d22scan／长度门／22 world rc 表） |
