@@ -1,0 +1,91 @@
+# 236-r6 gates (pre/post), merged (2026-10-14 13:28:23 +0800)
+# sources: logs/02-pre-Test236.txt + logs/03-pre-gofumpt-build.txt + logs/05-post-Test236-race.txt + logs/06-post-gofumpt-build-length.txt + logs/07-d22scan.txt (raw kept on disk)
+
+===== PRE (before edit) =====
+== 2026-10-14 13:22:10 pre-edit Test236 ==
+dirty(pkg input):  M internal/tools/task_output_pointer_notice_test.go;
+time=2026-10-14T13:22:15.135+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test236R2TaskCancelRefusesWhenHostGaveNoCallerID
+--- PASS: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+=== RUN   Test236R2TaskCancelRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenRosterIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+=== RUN   Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey
+--- PASS: Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey (0.01s)
+=== RUN   Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+    tasklist_deferred_236r3_teeth_test.go:178: 现名册：task.output / task.cancel（DEFERRED 的判据读的是这一行，不是注释里的词面）
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+=== RUN   Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+    tasklist_deferred_236r3_teeth_test.go:222: 成对读数：盘上 2 行 / 编译期 2 行（HEAD 上两数相等＝这把尺没在空转）
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	1.989s
+rc=0
+
+== 2026-10-14 13:22:27 pre-edit gofumpt ==
+gofumpt-l rc=0 (empty above = clean)
+== build ==
+build rc=0
+
+===== POST (after edit) =====
+== 2026-10-14 13:23:30 post-edit Test236 ==
+dirty(pkg input):  M internal/tools/task_output_pointer_notice_test.go; M internal/tools/taskid_source_236r4_teeth_test.go;
+=== RUN   Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+=== RUN   Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey
+--- PASS: Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey (0.02s)
+=== RUN   Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+    tasklist_deferred_236r3_teeth_test.go:178: 现名册：task.output / task.cancel（DEFERRED 的判据读的是这一行，不是注释里的词面）
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+=== RUN   Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+    tasklist_deferred_236r3_teeth_test.go:222: 成对读数：盘上 2 行 / 编译期 2 行（HEAD 上两数相等＝这把尺没在空转）
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	3.361s
+rc=0
+
+== 2026-10-14 13:23:38 race ==
+ok  	github.com/CarlosShao/wisp/internal/tools	4.650s
+rc=0
+
+== 2026-10-14 13:24:07 post-edit gofumpt ==
+gofumpt-l rc=0 (empty above = clean)
+== build ==
+build rc=0
+== length gate ==
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 12672 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=12672  over-budget=59  covered by roster=59  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=59  of which in the 122..180 middle=57  past the old debt line(180)=2  in the wall interval=0  roster entries=59
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 59 paths on this tree, recomputed just now in both units
+length-gate rc=0
+
+===== d22scan =====
+== 2026-10-14 13:24:25 d22scan ==
+PASS
+ok  	github.com/CarlosShao/wisp/tools/d22scan	32.644s
+runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 276 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 236 production Go files
+d22scan: scope bans #1-5 cmd/           examined  40 production Go files
+d22scan: scope ban #6 frontend/         examined 111 text files
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 111 text files
+d22scan: scope ban #8 internal/         examined 550 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 125 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=236, bans #1-5 cmd/=40, ban #6 frontend/=111, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=111, ban #8 internal/=550, ban #8 cmd/=125; ban #8 emoji coverage: design/ 39 text files; frontend/ 111 text files; internal/ 550 Go files, comments and _test.go included; cmd/ 125 Go files, comments and _test.go included
+d22scan rc=0
+== 2026-10-14 13:25:04 done ==

@@ -50,7 +50,7 @@ package tools
 //	loop.go:329 id := <a model-suppliable literal>  -> shape + literal + seam red
 //	loop.go:333 run(c, newTaskID(), ...)            -> equality + roster-chain red
 //
-// The entropy-failure degenerate branch (loop.go:1132-1137) is NOT covered by
+// The entropy-failure degenerate branch (loop.go:1155-1161) is NOT covered by
 // this file and cannot be: rand.Read is a package-level call with no injection
 // seam, and the fallback keeps the exact same 36-char shape (the formatting sits
 // outside the if), so neither the lock nor the equality asserts can tell whether
@@ -76,10 +76,13 @@ import (
 // a string the MODEL gives, off the same wire production reads.
 const r236r4ModelCallID = "call_e1"
 
-// r236r4ModelWireIDs names id values the frozen C5 seam really carries, re-read
-// from internal/agent/testdata/golden and internal/llm/testdata/golden on
-// 2026-10-14 (grep -rhoE '"id":"[^"]+"' over both directories). None of them may
-// validate as a host-minted task id: every one is a value the model supplies.
+// r236r4ModelWireIDs names id values the frozen C5 seam really carries. Ten of
+// the twelve were re-read on 2026-10-14 from internal/agent/testdata/golden and
+// internal/llm/testdata/golden (grep -rhoE '"id":"[^"]+"' over both directories,
+// 33 unique ids). The other two sit in inline wire payloads elsewhere in this
+// repo, not in those directories: "call_w1" (internal/tools/loop_approval_test.go:288)
+// and "chatcmpl-fake" (cmd/wisp/secret_test.go:1133). None of them may validate
+// as a host-minted task id: every one is a value the model supplies.
 var r236r4ModelWireIDs = []string{
 	"call_e1", "call_w1", "call_b2", "call_a1", "call_x1",
 	"fc_1", "fc_2", "rs_1",
@@ -105,7 +108,7 @@ var r236r4FixtureTaskIDs = []string{
 // tightened only to the fixed dash positions.
 //
 // Not checked on purpose: the v4 version/variant nibbles newTaskID sets at
-// loop.go:1139-1140. Pinning implementation detail adds nothing here because
+// loop.go:1162-1163. Pinning implementation detail adds nothing here because
 // the entropy-failure fallback sets the same bits (the formatting sits outside
 // the if), so the nibbles can never tell the branches apart.
 func r236r4MintedShape(s string) bool {

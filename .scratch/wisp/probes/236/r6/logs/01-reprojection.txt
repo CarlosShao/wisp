@@ -1,0 +1,54 @@
+# 236-r6 reprojection (2026-10-14 13:27:27 +0800)
+
+## window: HEAD + blobs
+HEAD=a4590ac2e3a35cb56457b8b73ffef5a43012c046
+dirty(relevant)=  M internal/tools/task_output_pointer_notice_test.go; M internal/tools/taskid_source_236r4_teeth_test.go;
+loop.go blob(HEAD)=0d53277d9610f07855eb5e5fe4bdf4c5ed6d35e3  worktree=0d53277d9610f07855eb5e5fe4bdf4c5ed6d35e3
+run.go  blob(HEAD)=154279f70752162f8a74f0f30debafc1669de3cd  worktree=154279f70752162f8a74f0f30debafc1669de3cd
+
+## flaw-1 truth: loop.go entropy branch + nibbles (blob 0d53277d)
+1153	func newTaskID() string {
+1154		var b [16]byte
+1155		if _, err := rand.Read(b[:]); err != nil {
+1156			// Entropy source unavailable: fall back to a clock-derived unique id.
+1157			n := time.Now().UnixNano()
+1158			for i := range b {
+1159				b[i] = byte(n >> (8 * uint(i%8)))
+1160			}
+1161		}
+1162		b[6] = (b[6] & 0x0f) | 0x40
+1163		b[8] = (b[8] & 0x3f) | 0x80
+1164		h := hex.EncodeToString(b[:])
+1165		return h[0:8] + "-" + h[8:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:]
+-> entropy if-block = 1155-1161 ; v4 nibbles = 1162-1163 ; new comment refs = these
+
+## run.go consumption (CURRENT blob 154279f7; pin comments/strings still say 1105/1110/1124/1135/1145 = r4-era; NOT touched by r6)
+1137:	rt.tasks.MarkRoot(bg.ID, task)
+1142:	}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+1156:			ID: res.TaskID, State: state, QueryText: task,
+1160:		if err := rt.store.StartTaskLog(c, tl); err != nil {
+1167:		if err := rt.store.FinishTaskLog(c, res.TaskID, state, summary,
+1177:		res.TaskID, res.Status, res.Rounds, res.ToolCalls, costLine(res))
+
+## ticket224 assembly Valid() assertion (pin:28 says :433 = r4-era; now:)
+442:			t.Fatalf("boot 1 minted %q, which the shape lock rejects: the minting point and the "+
+
+## flaw-2: exact cited grep over the two golden dirs
+unique ids=33
+-- per-id hits under THAT pattern (golden dirs) / elsewhere:
+  call_e1        golden=1 first-elsewhere=internal/\agent\loop_golden_test.go:66:	if call.Req.Name != "echo" || call.Req.CallID != "call_e1" {
+  call_w1        golden=0 first-elsewhere=internal/\tools\loop_approval_test.go:288:
+  call_b2        golden=3 first-elsewhere=internal/\llm\adaptertest\harness.go:171:			ID: "call_b2", Name: "get_time",
+  call_a1        golden=2 first-elsewhere=internal/\llm\adaptertest\harness.go:167:			ID: "call_a1", Name: "get_weather",
+  call_x1        golden=2 first-elsewhere=none
+  fc_1           golden=3 first-elsewhere=none
+  fc_2           golden=2 first-elsewhere=none
+  rs_1           golden=2 first-elsewhere=none
+  msg_mock1      golden=11 first-elsewhere=none
+  msg_out1       golden=12 first-elsewhere=none
+  resp_mock1     golden=20 first-elsewhere=none
+  chatcmpl-fake  golden=0 first-elsewhere=cmd/\wisp\secret_test.go:1133:		_, _ = w.Write([]byte(`{"id":"chatcmpl-fake","object":"chat.completion","model":"m1","choices":[{"index":0,"message":{"role":"assistant","content":"pong"},"finish_reason":"stop"}]}`))
+
+## the two exceptions, exact homes
+loop_approval_test.go:288	data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_w1","type":"func
+secret_test.go:1133			_, _ = w.Write([]byte(`{"id":"chatcmpl-fake","object":"chat.completion","model":"m1","ch
