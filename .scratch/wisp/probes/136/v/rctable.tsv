@@ -1,0 +1,40 @@
+# 136-v own matrix: 33 worlds x 4 trees (rc per run).
+# old  = git show b38567a9:scripts/slo-freshness.sh (pre-AC#2/#3/#4)
+# pre  = git show f706dedd:... (AC#2+#3+#4 in, before b6fc818d seam fix)
+# head = HEAD committed version (== b6fc818d, cmp verified)
+# wt   = working-tree version (head + orchestrator's :-20 收口, line 138 only)
+# cross-shell: same matrix re-run with dash => 132/132 rc identical (see live-readings.txt tail)
+world	old	pre	head	wt
+bnd-at	0	0	0	0
+bnd-over	0	2	2	2
+cap-zero	1	2	2	2
+ctrl188	0	0	0	0
+d-cap2000	0	2	2	0
+d-cap2001	1	2	2	2
+forge-branch	0	1	1	1
+forge-event	0	1	1	1
+forge-workflow	0	1	1	1
+future-job	0	2	2	2
+future-sample	0	2	2	2
+future-scan	0	2	2	2
+k1-no-token	2	2	2	2
+k2-no-repo	2	2	2	2
+k3-runs-fail	2	2	2	2
+k4-pages-fail	2	2	2	2
+k4b-total-fail	0	2	2	2
+k5-empty	1	1	1	1
+k6-runs-empty	1	1	1	1
+k7-run-fail	0	2	2	2
+live349	0	2	2	0
+missing-source	0	2	2	2
+missing-ts	0	2	2	2
+mixed	0	0	0	0
+p-green	0	2	2	0
+p-notfound	1	2	2	1
+p2-live-path	0	0	0	0
+real	0	0	0	0
+seam-empty-first	0	0	2	2
+seam-forged-aged	0	0	0	0
+spread2	0	0	0	0
+stale-job	1	1	1	1
+stale-sample	1	1	1	1

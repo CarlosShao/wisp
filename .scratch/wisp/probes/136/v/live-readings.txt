@@ -1,0 +1,62 @@
+# 136-v live readings: both trees run against the REAL GitHub API (no stub), 2026-10-14 ~20:0x..20:2x +08
+# GH_TOKEN from `gh auth token` (never written to disk); GITHUB_REPOSITORY=CarlosShao/wisp
+
+## live head tree (default cap 3)  rc=2
+slo-freshness: P2 newest slo-full job record: created_at=2026-10-14T12:14:04Z status=in_progress conclusion=none
+slo-freshness:   job url: https://github.com/CarlosShao/wisp/actions/runs/38562279573/job/115846062335
+slo-freshness:   age: 0 day(s) (249 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 351 entries but this pin reads only 3 page(s) x 100 = 300. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+live-head rc=2
+
+## live wt tree (default cap 20) attempt 1  rc=0 (full output)
+slo-freshness: P2 newest slo-full job record: created_at=2026-10-14T11:46:55Z status=in_progress conclusion=none
+slo-freshness:   job url: https://github.com/CarlosShao/wisp/actions/runs/38558994919/job/115835100358
+slo-freshness:   age: 0 day(s) (1249 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-10-14T00:57:21Z artifact_id=11862826438 run=38484004521
+slo-freshness:   scanned 20 page(s) x 100 of the artifact listing (listing size 350); 123 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (40223 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+## live wt attempts 2..5 (linux-style loop above; each rc in the file list)
+attempt 2: rc=0; key lines: slo-freshness:   age: 0 day(s) (1335 s); threshold: 3 day(s) | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-10-14T00:57:21Z artifact_id=11862826438 run=38484004521 | slo-freshness:   age: 0 day(s) (40309 s); threshold: 3 day(s) | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+attempt 3: rc=0; key lines: slo-freshness:   age: 0 day(s) (1413 s); threshold: 3 day(s) | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-10-14T00:57:21Z artifact_id=11862826438 run=38484004521 | slo-freshness:   age: 0 day(s) (40387 s); threshold: 3 day(s) | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+attempt 4: rc=0; key lines: slo-freshness:   age: 0 day(s) (1493 s); threshold: 3 day(s) | slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-10-14T00:57:21Z artifact_id=11862826438 run=38484004521 | slo-freshness:   age: 0 day(s) (40467 s); threshold: 3 day(s) | slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+# attempt 1 of the FIRST live-wt sweep (before file logging) died fail-closed:
+#   slo-freshness: P3 the artifacts query (page 7) failed, GitHub said:
+#   Get "https://api.github.com/repos/CarlosShao/wisp/actions/artifacts?per_page=100&page=7": EOF
+#   rc=2. Observed in-session verbatim; not saved at the time (no file for that attempt).
+#   A second raw EOF hit my own rate query at 12:18:15Z -> transient network/API, not a stub artifact.
+
+## rate.txt (raw)
+# 136-v live rate data (2026-10-14T12:18:15Z)
+Get "https://api.github.com/repos/CarlosShao/wisp/actions/artifacts?per_page=1&page=1": EOF
+total_count now = 
+page 1 rows=100 min_created=2026-09-25T10:28:58Z
+page 2 rows=100 min_created=2026-09-23T02:13:51Z
+page 3 rows=100 min_created=2026-09-21T04:42:07Z
+page 4 rows=51 min_created=2026-09-20T15:34:28Z
+retry@12:19:40Z attempt 1 total_count=351 (clean; the 12:18Z call itself EOF'd once)
+--- EOF events observed live this session ---
+1) first live-wt attempt: 'Get "...artifacts?per_page=100&page=7": EOF' -> pin exit 2 (fail-closed). TEXT OBSERVED IN SESSION, NOT SAVED TO FILE (fetched before logging was added).
+2) rate.txt total_count call @12:18:15Z: same EOF, empty value; retry 3 min later clean.
+3) live-wt attempts 2..5: 4/4 rc=0, 0 EOF.
+--- arithmetic (136-v recompute) ---
+cap 20 pages = 20*100 = 2000
+8/day at 348: (2000-348)/8 = 206.5 d = 6.8 mo -> '~7 months' holds
+observed avg since 09-23 (188 measured 09-23): (351-188)/21.1 d = 7.73/d -> (2000-351)/7.73 = 213 d = 7.0 mo
+alt windows: newest-100 span 09-25T10:28Z..now = 5.24/d -> 314 d = 10.3 mo | whole listing 09-20T15:34Z..now = 14.7/d -> 112 d = 3.7 mo
+burst: 348(A953 11:38Z) -> 351(12:20Z) = +3 in 42 min (~103/d) -> (2000-351)/103 = 16 d
+
+## PRODUCTION RED, already happened (read-only `gh run view 38561478699 --log-failed`, saved raw in out/prod-run-38561478699.log)
+run 38561478699  event=schedule  branch=dev  headSha=a84fec49  createdAt=2026-10-14T12:07:32Z  conclusion=FAILURE
+(previous run 38514656982 @05:04:04Z success on old sha e3788f08; origin/dev carries all five 136s commits since ~11:46Z;
+ origin/dev:scripts/slo-freshness.sh line 138 is still `:-3` -- the `:-20` 收口 is NOT committed anywhere)
+verbatim, from the failed step ('slo-full freshness pin (ticket 134 AC#3)'):
+  slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 350 entries but this pin reads only 3 page(s) x 100 = 300. ... Refusing to conclude (exit 2);
+  ##[error]Process completed with exit code 2.
+=> the pin reds on the default branch right now, exactly as the 收口 rationale predicted; the fix exists only as an uncommitted worktree edit.
+
+## cross-shell parity: MSYS bash-as-sh vs dash (CI ubuntu /bin/sh)
+same 33 worlds x 4 trees re-run with /usr/bin/dash (driver-dash.sh; raw rctable-dash.<tree>.txt under out/):
+132/132 rc identical to the bash tables; `dash -n` rc=0 on both head and wt versions.

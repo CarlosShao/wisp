@@ -684,3 +684,21 @@
   read must not be aged`。22 world × 2 树全量重跑与上一笔**逐发同值**；shellcheck 0.11.0 rc=0；`logs/ac2.txt` 末节＋
   `mixed` 一发（伪造更新样＋真样并存 ⇒ lookalike 被点名拒绝、真样照常背书、rc=0）都留在证据里。
   next=同上（三格终裁）；本追加不扩面（仍只 `scripts/slo-freshness.sh`＋`probes/136/s/**`）。
+
+- [2026-10-14 21:0x +08] agent=136-v did=**票 136 AC#2/#3/#4 非实现者复核交件 ⇒ 三格判 PASS（无附条件）；⛔ 未翻框、未 push、对 `scripts/**` 与 `probes/136/s/**` 零写**。
+  起手锚现读 `1740fd48`（派发链顶 `f8b92e7e` 之后的邻居提交；`f8b92e7e..HEAD -- scripts/` 空）；**方法＝仓外四树**
+  （old=`b38567a9`／pre=`f706dedd`／head=提交版、`cmp` 与 `b6fc818d` 逐字同／wt=工作树含 `:-20`）＋**自建 33-world 夹具＋自写 `gh` 桩**
+  （33×4＝132 发 rc 表 `probes/136/v/rctable.tsv`；⛔ 未拿重跑其 drive.sh 冒充交付，对跑仅作对照＝其 22 世界表 1:1 复现；bash 与 dash 两壳 132/132 同）。
+  **AC#2 成立**：旧树 forge-* 三形与 missing-* 两形 `rc=0` 逐发复现（旧 missing-ts 把列读串位成 `created_at=920 artifact_id= run=520` 还判 0 天）；
+  新树三形 `rc=1` 且红句逐字点名 branch/workflow/event 与拒枚数；missing-* 两形 `exit 2`；六形 k1–k6＝`2/2/2/2/1/1`（无一 pass）；k4b／k7 新缝 `0→2`；
+  `mixed`（伪造更新样＋真样并存）旧树给伪造件背书、新树点名拒绝并背书真样（`2 considered, 1 rejected`）；seam 豁免零生产入口（全仓无一处设 `SLO_FULL_LAST_*`）。
+  **AC#3 成立**：旧 partial-green `rc=0` 把部分扫描当整读／partial-notfound `rc=1` 把"没扫到"读成"没找到"／cap-zero `rc=1` ⇒ 新树各 `exit 2` 红句 `slo-full-scan-incomplete`；
+  control／spread（真样第 2 页）不受累；触发条件＝严格 `total>cap`（cap=1：100 过／101 响）；收口 cap=20 下 349/350 过、2000 过、**2001 首响**。
+  **AC#4 成立**：future-sample／future-job＋我自加的 future-scan（扫描路）旧 `rc=0` 且 `age 0 day(s) (0 s)`（夹取）⇒ 新 `exit 2` 逐 token；stale-* 仍 rc=1、control 不受累。
+  **零放宽**：132 发无一条由非绿变绿、旧红全仍红；`sh -n`／`dash -n`／shellcheck **0.11.0**（docker）／`d22scan clean`／长度门 `GREEN` 全 rc=0；
+  b6fc818d 旁证＝pre↔head 唯一差＝seam 空首字段 `0→2`（收紧）；`%SystemDrive%` 杂目录仓内零、移出件在 `/d/tmp/wisp136s/stray/`。
+  **收口复核＋一枚生产现场（最要紧）**：算术复算成立（2000＝20×100；(2000−348)/8≈206 d≈6.8 mo≈"~7 months"；我同会话现量 listing 349→350→**351**、~7.7/d 均值、burst 42 min +3）；
+  ⚠ **该行至今只在工作树、未入库**（`origin/dev:138` 仍 `:-3`，而五个 136s 提交已在 `origin/dev`）⇒ **12:07:32Z 的 schedule run `38561478699` 已红**（exit 2，逐字 `holds 350 entries but this pin reads only 3 page(s) x 100 = 300`；上一发 05:04Z 绿）；
+  wt 版真 API 5 发＝**4 发 rc=0**＋1 发空尾页 `page=7: EOF` 瞬断（fail-closed）⇒ 具名建议：**尽快提交并推 `:-20`**（否则逐 6h 连红），可选两条（扫描上界 `min(cap,ceil(total/100))` 消空尾页调用；注释给速率标窗口）见证据 §5。
+  证据 `docs/evidence/s1/ticket136-136s-accept-v1.md`＋`probes/136/v/`（7 件）；自两处错位目录按只建不删留证（`D:\d\tmp\wisp136v`、`...\projects plans Wisp\.scratch\...`，后者无 .git 且早存他腿同病内容）。
+  next=编排者据本表滚勾三格＋把收口一行入库（红线即刻可解）；AC#5/#6/#7/#10 不属本格。

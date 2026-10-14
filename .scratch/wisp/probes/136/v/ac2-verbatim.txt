@@ -1,0 +1,195 @@
+# 136-v verbatim extraction; full logs under /d/tmp/wisp136v/out/<tree>--<world>.log
+
+===== old / real  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=500 run=900
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / real  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=500 run=900
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== old / forge-branch  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=501 run=901
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / forge-branch  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 source predicate: artifact 501 on branch 'feature/evil' rejected (branch must be main or dev; ticket 136 AC#2)
+slo-freshness: FAIL slo-full-sample-never: 1 slo-full-report artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); 1 rejected. Refusing to age on a lookalike (scanned 3 page(s) x 100 of the artifact listing (listing size 188)). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== old / forge-workflow  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=502 run=902
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / forge-workflow  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 source predicate: artifact 502 (branch 'dev') comes from run 902 of workflow '.github/workflows/chore.yml' event 'push' on 'dev' - rejected (the uploading run must be .github/workflows/ci.yml with event push|schedule|workflow_dispatch; ticket 136 AC#2)
+slo-freshness: FAIL slo-full-sample-never: 1 slo-full-report artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); 1 rejected. Refusing to age on a lookalike (scanned 3 page(s) x 100 of the artifact listing (listing size 188)). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== old / forge-event  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=503 run=903
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / forge-event  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 source predicate: artifact 503 (branch 'dev') comes from run 903 of workflow '.github/workflows/ci.yml' event 'pull_request' on 'dev' - rejected (the uploading run must be .github/workflows/ci.yml with event push|schedule|workflow_dispatch; ticket 136 AC#2)
+slo-freshness: FAIL slo-full-sample-never: 1 slo-full-report artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); 1 rejected. Refusing to age on a lookalike (scanned 3 page(s) x 100 of the artifact listing (listing size 188)). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== old / missing-ts  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=920 artifact_id= run=520
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (0 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / missing-ts  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 a slo-full-report record from the scan carries no created_at (run=920 artifact=520) - 'no timestamp' is not 'endlessly fresh', refusing (ticket 136 AC#2)
+
+===== old / missing-source  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=530 run=0
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / missing-source  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 a slo-full-report record from the scan carries no workflow_run fields (run='0' branch='' artifact=530) - its provenance cannot be checked, so it cannot be aged (ticket 136 AC#2)
+
+===== old / mixed  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:55:00Z artifact_id=510 run=910
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 2 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (300 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / mixed  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 source predicate: artifact 510 on branch 'release/forge' rejected (branch must be main or dev; ticket 136 AC#2)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=511 run=911
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 1 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== old / seam-forged-aged  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=777 run=999
+slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / seam-forged-aged  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=777 run=999
+slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== old / seam-empty-first  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id= run=35831084009
+slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / seam-empty-first  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 an injected slo-full-report record starts with an empty field (row: '	2026-09-23T08:45:00Z	35831084009') - a record this pin cannot read must not be aged
+
+===== old / k1-no-token  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+
+===== head / k1-no-token  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+
+===== old / k2-no-repo  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+
+===== head / k2-no-repo  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+
+===== old / k3-runs-fail  rc=2 =====
+slo-freshness: the runs query failed, GitHub said:
+
+===== head / k3-runs-fail  rc=2 =====
+slo-freshness: the runs query failed, GitHub said:
+
+===== old / k4-pages-fail  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 the artifacts query (page 1) failed, GitHub said:
+
+===== head / k4-pages-fail  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 the artifacts query (page 1) failed, GitHub said:
+
+===== old / k4b-total-fail  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=540 run=940
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / k4b-total-fail  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 the listing-size query failed, GitHub said:
+
+===== old / k5-empty  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing - no slo-full-report artifact found
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== head / k5-empty  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing (listing size 0) - no slo-full-report artifact found
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing (listing size 0)). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== old / k6-runs-empty  rc=1 =====
+slo-freshness: FAIL slo-full-never-triggered: no slo-full job found in the 25 newest ci runs on main/dev
+slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing - no slo-full-report artifact found
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== head / k6-runs-empty  rc=1 =====
+slo-freshness: FAIL slo-full-never-triggered: no slo-full job found in the 25 newest ci runs on main/dev
+slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing (listing size 0) - no slo-full-report artifact found
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing (listing size 0)). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== old / k7-run-fail  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=550 run=950
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / k7-run-fail  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 the run look-up for 950 failed, GitHub said:
+
+===== old / p2-live-path  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=560 run=961
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / p2-live-path  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=560 run=961
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window

@@ -1,0 +1,73 @@
+# 136-v verbatim extraction; full logs under /d/tmp/wisp136v/out/<tree>--<world>.log
+
+===== old / future-sample  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2027-01-01T00:00:00Z artifact_id=500 run=900
+slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (0 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / future-sample  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: FAIL slo-full-timestamp-in-future: an injected slo-full-report record claims created_at=2027-01-01T00:00:00Z, which is later than 'now' (1790154000 s); a future sample cannot be aged (ticket 136 AC#4).
+
+===== old / future-job  rc=0 =====
+slo-freshness:   age: 0 day(s) (0 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=500 run=900
+slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / future-job  rc=2 =====
+slo-freshness: FAIL slo-full-timestamp-in-future: the newest slo-full job record claims created_at=2027-01-01T00:00:00Z, which is later than 'now' (1790154000 s); a future record cannot be aged (ticket 136 AC#4). Check the clock of whatever produced it.
+
+===== old / future-scan  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2027-01-01T00:00:00Z artifact_id=630 run=1030
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (0 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / future-scan  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: FAIL slo-full-timestamp-in-future: a slo-full-report record claims created_at=2027-01-01T00:00:00Z, which is later than 'now' (1790154000 s); a future sample cannot be aged (ticket 136 AC#4).
+
+===== old / stale-sample  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-13T08:45:00Z artifact_id=500 run=900
+slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 valid-sample record(s) considered
+slo-freshness:   age: 10 day(s) (864900 s); threshold: 3 day(s)
+slo-freshness: FAIL slo-full-sample-stale: the last VALID SLO SAMPLE is 10 day(s) old (> 3). Jobs may well be green - since ticket 134 AC#6 a machine-contended run exits 0 without a report - so a green job is not the question. The question is when numbers last existed, and that was 2026-09-13T08:45:00Z (run 900). D32 has been unverified since then.
+
+===== head / stale-sample  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-13T08:45:00Z artifact_id=500 run=900
+slo-freshness:   SLO_FULL_LAST_SAMPLE injected (test seam, 1 record); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 10 day(s) (864900 s); threshold: 3 day(s)
+slo-freshness: FAIL slo-full-sample-stale: the last VALID SLO SAMPLE is 10 day(s) old (> 3). Jobs may well be green - since ticket 134 AC#6 a machine-contended run exits 0 without a report - so a green job is not the question. The question is when numbers last existed, and that was 2026-09-13T08:45:00Z (run 900). D32 has been unverified since then.
+
+===== old / stale-job  rc=1 =====
+slo-freshness:   age: 10 day(s) (865800 s); threshold: 3 day(s)
+slo-freshness: FAIL slo-full-stale: no slo-full trigger record for 10 day(s) (> 3). Either nobody pushed and the schedule stopped firing, or the self-hosted runner has been deaf. D32 has had no automatic verdict since 2026-09-13T08:30:00Z.
+slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing - no slo-full-report artifact found
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== head / stale-job  rc=1 =====
+slo-freshness:   age: 10 day(s) (865800 s); threshold: 3 day(s)
+slo-freshness: FAIL slo-full-stale: no slo-full trigger record for 10 day(s) (> 3). Either nobody pushed and the schedule stopped firing, or the self-hosted runner has been deaf. D32 has had no automatic verdict since 2026-09-13T08:30:00Z.
+slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing (listing size 188) - no slo-full-report artifact found
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing (listing size 188)). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== old / real  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=500 run=900
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / real  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=500 run=900
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window

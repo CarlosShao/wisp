@@ -1,0 +1,173 @@
+# 136-v verbatim extraction; full logs under /d/tmp/wisp136v/out/<tree>--<world>.log
+
+===== old / p-green  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=570 run=970
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / p-green  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 350 entries but this pin reads only 3 page(s) x 100 = 300. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+===== wt / p-green  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=570 run=970
+slo-freshness:   scanned 20 page(s) x 100 of the artifact listing (listing size 350); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== old / p-notfound  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing - no slo-full-report artifact found
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== head / p-notfound  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 350 entries but this pin reads only 3 page(s) x 100 = 300. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+===== wt / p-notfound  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 scanned 20 page(s) x 100 of the artifact listing (listing size 350) - no slo-full-report artifact found
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 20 page(s) x 100 of the artifact listing (listing size 350)). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== old / cap-zero  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 scanned 0 page(s) x 100 of the artifact listing - no slo-full-report artifact found
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 0 page(s) x 100 of the artifact listing). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== head / cap-zero  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 188 entries but this pin reads only 0 page(s) x 100 = 0. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+===== wt / cap-zero  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 188 entries but this pin reads only 0 page(s) x 100 = 0. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+===== old / ctrl188  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=590 run=990
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / ctrl188  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=590 run=990
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== wt / ctrl188  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=590 run=990
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== old / spread2  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=601 run=1001
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 2 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / spread2  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=601 run=1001
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== wt / spread2  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=601 run=1001
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing (listing size 188); 2 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== old / bnd-at  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=610 run=1010
+slo-freshness:   scanned 1 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / bnd-at  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=610 run=1010
+slo-freshness:   scanned 1 page(s) x 100 of the artifact listing (listing size 100); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== wt / bnd-at  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=610 run=1010
+slo-freshness:   scanned 1 page(s) x 100 of the artifact listing (listing size 100); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== old / bnd-over  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=611 run=1011
+slo-freshness:   scanned 1 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / bnd-over  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 101 entries but this pin reads only 1 page(s) x 100 = 100. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+===== wt / bnd-over  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 101 entries but this pin reads only 1 page(s) x 100 = 100. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+===== old / live349  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=620 run=1020
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / live349  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 349 entries but this pin reads only 3 page(s) x 100 = 300. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+===== wt / live349  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=620 run=1020
+slo-freshness:   scanned 20 page(s) x 100 of the artifact listing (listing size 349); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== old / d-cap2000  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=621 run=1021
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 1 valid-sample record(s) considered
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== head / d-cap2000  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 2000 entries but this pin reads only 3 page(s) x 100 = 300. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+===== wt / d-cap2000  rc=0 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T08:45:00Z artifact_id=621 run=1021
+slo-freshness:   scanned 20 page(s) x 100 of the artifact listing (listing size 2000); 1 record(s) considered, 0 rejected by the source predicate
+slo-freshness:   age: 0 day(s) (900 s); threshold: 3 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+
+===== old / d-cap2001  rc=1 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 scanned 3 page(s) x 100 of the artifact listing - no slo-full-report artifact found
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (scanned 3 page(s) x 100 of the artifact listing). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+
+===== head / d-cap2001  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 2001 entries but this pin reads only 3 page(s) x 100 = 300. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
+
+===== wt / d-cap2001  rc=2 =====
+slo-freshness:   age: 0 day(s) (1800 s); threshold: 3 day(s)
+slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds 2001 entries but this pin reads only 20 page(s) x 100 = 2000. The newest slo-full-report may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind.
