@@ -18040,3 +18040,11 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
   `exec.Command` 邻域 2 枚皆文件名/测试名。真调用方＝`scripts/slo-check.ps1`（`wisp slo -state`）＋`.github/workflows/slo-fresh.yml`。
 - **结论并排**：**前端 `dist` 字节变化**与 **`wisp slo` 端到端行为**，今天都不在任何 `go test` 门禁射程里——两条同因（「门禁看不见的那半」）。
   正确尺＝上面 (a)(b)；不是「两包内搜 `frontend` 字样」（已证伪；159-r1 今日现量 `cmd/wisp/` 11 枚文件含该串，票 159 当时为 2 枚）。
+
+## A952｜2026-10-14 19:21 +08｜178-v1 判语收件（AC#2/#3/#4/#5 格成立；G5/G7 附条件"措辞收窄"已就地追加）＋**178 收口**（五格翻勾；`-done`＋名册同步；门 GREEN）＋171 钉旁效登记 ⇒ 编队（3）：写×3＝133-r1/136s/236s；完成度 **130/305 ≈ 42.6%**
+
+- 三把尺：`898ce5f3`（表+件 +855 行）真在；`docs/evidence/s1/178-four-pile-ruler-178-v1-accept-v1.md`（21,700 B）＋`probes/178/v1/` 在盘；亲跑净树尺 **rc=2**（`G6/G6pos/G6neg` 三行 ok）。TaskStop 结算（completed）。
+- 判语要点：AC#2 自造生产件样本（`resident_task_source_windows.go` 插 `OpenTask`）——改后红且逐名 `UNPAIRED`、**改前沉默**（复现旧盲区，且另加控制证②枚数维独立有牙）；AC#3 175-r2 落③只关堆；AC#4 `want_n` 只 4 行且为**降**；AC#5 与 171 零并格；面核对只 `gate-clauses.sh` 一枚；G1b/G2 两枚旁账归因复核成立（197/315 别账）。
+- **G5/G7 收窄**：腿件"逐字节不变"→"口径/数值/判语/名册逐字节不变（共享尾注行加新注）"——就地追加于 `probes/178/r1/00-anchor-and-gates.md`（原句不抹）。
+- **171 登记**：`probes/171/r3/r3-sample-deleted.sh` 钉 rc=2 ⇒ 归 171 自己（含 `want_n` 值与 D2/D1/D0 口径重推）；已 append 到票 171 面。
+- 观察留存（不属任何账）：`178-v1` 报工作树有 133-r1 的在飞变异件（`M main.go`、`?? sfx131x.go`、`?? dispatch_hop_selfproof_133_test.go`）——在飞腿的临时变异，非交件，本批未动。
