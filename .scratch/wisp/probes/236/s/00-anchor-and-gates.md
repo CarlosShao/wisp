@@ -86,3 +86,5 @@ AC#6 **甲案已落地**：`fs_broken.go` 的 import 块挪到其它声明之前
 | `logs/05-gates.txt`（39 行） | 窗口与漂移 8 笔＋d22scan 尾段 rc=0 |
 | `logs/06-gates.txt`（81 行） | 长度门 GREEN 60=60＋scoped porcelain＋tracked 尺里 `fs_broken`＝0 |
 | 仓外临时件 | `C:\tmp\wisp236sgotmp\work\cand{1,2,3,4}.go`（只建不删） |
+
+**提交**（只 commit、⛔ 零 push；显式 pathspec，逐笔 `git show --stat` 已在手）：夹具 `4961c3b5`（1 枚、+2/−1）／交付 `e915413a`（7 枚、340 行）／票 236 bullet `4abdbf7d`（1 行）／本行补记（第 4 笔）。三笔皆落在编辑窗 `da389ca5` 之上（起手锚 `81730cea` → 收件前 HEAD 逐笔现读为准）。
