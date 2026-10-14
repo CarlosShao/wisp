@@ -1,0 +1,34 @@
+== 票 288 AC#1 那把尺，两列并排（288-r1 现跑，2026-10-14 11:35:57 +0800）==
+件 = cmd/wisp/panel_inbound_guards_35r3_test.go
+
+锚链（三条 rev-parse 逐字）：
+  18d43f8e^:path = a917e0dc1e2ef0801c189da66a6b726de3c45301   # 票面「前」态
+  18d43f8e:path  = 9713dc37a072b9580f4e1c83e61e5bd1bc30a884   # 298-r1 修后
+  HEAD:path      = 9713dc37a072b9580f4e1c83e61e5bd1bc30a884   # 现 HEAD
+
+---- 前 | blob a917e0dc | 尺 = git cat-file -p a917e0dc > /c/tmp/wisp288r1gotmp/pre-35r3.go; gofmt -d <- (裸) ----
+diff C:/tmp/wisp288r1gotmp/pre-35r3.go.orig C:/tmp/wisp288r1gotmp/pre-35r3.go
+--- C:/tmp/wisp288r1gotmp/pre-35r3.go.orig
++++ C:/tmp/wisp288r1gotmp/pre-35r3.go
+@@ -63,8 +63,8 @@
+ // cases may assert the same sentence (:63's "三支不许共用一句文案").
+ const (
+ 	guard35r3Roster    = `不是面板 composer 通路的能力入口` // bridge.go:133 (name %q ... 不是面板 composer 通路的能力入口)
+-	guard35r3Source    = `按伪造/串台拒绝`               // bridge.go:136-137 (来源 %q 不是 %q，按伪造/串台拒绝...)
+-	guard35r3RequestID = `缺少 requestId`                // bridge.go:140-141 (缺少 requestId，无法与审计/卡片对齐...)
++	guard35r3Source    = `按伪造/串台拒绝`              // bridge.go:136-137 (来源 %q 不是 %q，按伪造/串台拒绝...)
++	guard35r3RequestID = `缺少 requestId`          // bridge.go:140-141 (缺少 requestId，无法与审计/卡片对齐...)
+ )
+ 
+ // The three envelopes, all in the page's own posting shape.
+gofmt -d preblob rc=1 lines=14
+
+---- 后 | 工作树=HEAD blob 9713dc37 | 尺 = gofmt -d cmd/wisp/panel_inbound_guards_35r3_test.go ----
+gofmt -d HEAD rc=0 lines=0
+
+---- 同两列，第二把尺 gofumpt（/d/work/base/gopath/bin/gofumpt.exe v0.12.0 go1.27.1）----
+前 | gofumpt -d pre-35r3.go : rc=1 lines=14 （原文 logs/gofumpt-d-preblob-a917e0dc.txt，逐行与 gofmt 那 14 行同声）
+后 | gofumpt -d 工作树件    : rc=0 lines=0
+
+拆解（尺带逐字命令）：wc -l=14 ; grep -c '^[+-][^+-]' = 4（2 删 2 加 正文）; 14 = 3 路径头 + 1 hunk 头 + 10 正文
+hunk 头 = @@ -63,8 +63,8 @@（与票面「同一个 hunk @@ -63,8」逐字同）
