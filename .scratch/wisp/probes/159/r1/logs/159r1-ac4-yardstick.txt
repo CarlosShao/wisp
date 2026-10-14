@@ -1,0 +1,73 @@
+# 159-r1 AC#4 判据（票 159 C4）: (a) go list -deps 承载 //go:embed 的包; (b) 提交有没有动嵌入源目录
+## 环境
+go version go1.27.1 windows/amd64
+HEAD=966c2aa9
+
+## (a) 现量
+$ go list -deps ./cmd/wisp/ | grep -c "CarlosShao/wisp/frontend"
+1
+$ go list -deps -f "{{if .EmbedPatterns}}{{.ImportPath}} {{.EmbedPatterns}}{{end}}" ./cmd/wisp/   (非测试面)
+github.com/CarlosShao/wisp/frontend [all:dist]
+github.com/jchv/go-webview2/webviewloader [sdk/x64/WebView2Loader.dll]
+$ go list -deps -test -f "…同上…" ./cmd/wisp/   (含测试依赖面)
+github.com/CarlosShao/wisp/frontend [all:dist]
+github.com/jchv/go-webview2/webviewloader [sdk/x64/WebView2Loader.dll]
+$ grep -rn "^[\/][\/]go:embed" --include="*.go" .   (本机 grep=ugrep; 字面 // 形图案会被吃, 用方括号形)
+frontend\embed.go:19://go:embed all:dist
+internal\tools\tasklist_deferred_236r3_teeth_test.go:109://go:embed task.go
+$ sed -n "19p" frontend/embed.go
+//go:embed all:dist
+⇒ (a): 承载面板字节 embed(all:dist) 的包=github.com/CarlosShao/wisp/frontend, 在 cmd/wisp 依赖图上(计 1)。
+   另: webviewloader 是第三方模块的 embed(自带 dll), 不受 frontend/** 提交影响; internal/tools 那枚 directive 在 _test.go 里(测试夹具, 不在这条依赖面的 embed 集)。
+
+## (b) 现量: 嵌入源目录 = frontend/dist (模式 all:dist 相对 frontend/embed.go)
+$ git log --oneline -- frontend/dist
+9318bb81 feat(77,AC#1): frontend scaffold + go:embed panel bundle + node-free proof surface
+$ git diff-tree --no-commit-id --name-only -r 9318bb81 -- frontend/dist   # 正控: 必须响
+frontend/dist/.gitkeep
+$ git diff-tree --no-commit-id --name-only -r a2a3b3c -- frontend/dist   # 负控(只动 src): 应为空
+⇒ 判据=输出非空; git diff-tree 空结果 rc 仍 0, ⛔ 别拿 rc 当尺。
+
+## dist↔src 产物关系 (如实)
+8:    "build": "tsc -b && vite build",
+// vite empties outDir before writing, which would delete the tracked anchor that
+// keeps the go:embed pattern in frontend/embed.go valid in an unbuilt checkout.
+function keepDistAnchor() {
+  return {
+    name: "wisp-keep-dist-anchor",
+    closeBundle() {
+      writeFileSync(new URL("./dist/.gitkeep", import.meta.url), "");
+    },
+22:frontend/dist/*
+23:!frontend/dist/.gitkeep
+9:# Build output: dist/ is a product, but go:embed needs the directory to exist
+12:dist/*
+13:!dist/.gitkeep
+$ git ls-files frontend/dist
+frontend/dist/.gitkeep
+$ git check-ignore -v frontend/dist/index.html   (工作树今天另有未入库 build 产物)
+frontend/.gitignore:12:dist/*	frontend/dist/index.html
+assets
+index.html
+
+## wisp slo 老账 (同一条记录并排)
+$ grep -rn "\"slo\"" --include="*_test.go" .   → 2 命中, 皆注释引文
+cmd\wisp\leg_dispatch_gate_133_test.go:49://	X8    `case "slo":` rewritten as `case sloCmdName131:` => red: a leg is
+cmd\wisp\leg_sink_gate_131_test.go:41://	形 b  X8, `case sloCmdName131:` instead of `case "slo":`:
+$ grep -rn "cmdSLO" --include="*_test.go" .   → 2 命中, 皆注释
+cmd\wisp\leg_sink_gate_131_test.go:485:			// declared in per-platform files (cmdSLO lives in slo_windows.go and
+cmd\wisp\leg_sink_gate_131_test.go:805:		// Both platform halves of a leg may carry prose (cmdSLO does), and a
+$ grep -rn "exec.Command" --include="*_test.go" cmd/wisp/ | grep -i slo   → 2 枚=文件名/测试名, 非执行 wisp slo
+cmd/wisp/\slo_exit_os_156_windows_test.go:322:	cmd := exec.Command(os.Args[0], "-test.run=^TestSLO156FixtureChildrenDoWhatTheirNamesSay$",
+cmd/wisp/\slo_report_144_windows_test.go:881:	dead := exec.Command("cmd.exe", "/c", "exit", "7")
+$ grep -n "wisp slo" scripts/slo-check.ps1 | head -3   → 真调用方=脚本/CI 面
+9:    Per state: builds/uses build\wisp.exe, runs `wisp slo -state <X>` which
+29:    protects (Sleeping CPU <=0.5%, RSS <=25MB) live in `wisp slo` and are not
+40:                     "report": <wisp slo StateReport JSON> } ],
+
+## 坏尺复核（票 159 点名的已证伪尺；159-r1 现量）
+$ grep -rln "frontend" cmd/wisp/ | wc -l
+11
+$ grep -rln "frontend" internal/tools/ | wc -l
+2
+⇒ '两包内搜 frontend 字样'这把尺今天更坏（票 159 当时量 cmd/wisp 2 枚；现量 11 枚）——正确尺＝上面 (a)(b)。

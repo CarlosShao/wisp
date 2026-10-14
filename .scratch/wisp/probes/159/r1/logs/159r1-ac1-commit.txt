@@ -1,0 +1,116 @@
+=== AC#1: git show -s --format=%H%n%an%n%ad%n%B 0e95353 ===
+0e953533ed8c29184aaf2f27de851239e3b32788
+CarlosShao
+Sat Sep 26 13:21:26 2026 +0800
+wip(156 checkpoint·编排者代提停在轮次上限的程): 它只提交了第 0+1 格（cc58445），第 2/3 格的码与表全躺在工作树里——go build rc=0 我现量、代提只为止污（gofumpt 与兄弟程的目录级 pathspec 会扫到它），不代表任何一格已被验收：AC#2/AC#3 未复判、AC#4..AC#7 未交
+
+=== --name-only ===
+.scratch/wisp/probes/156/anchor/constraints.txt
+.scratch/wisp/probes/156/gate-post/cmdwisp.log
+.scratch/wisp/probes/156/gate-post/internaltools.log
+.scratch/wisp/probes/156/mut-156-first-run-summaries.txt
+.scratch/wisp/probes/156/mut-156/asis.log
+.scratch/wisp/probes/156/mut-156/case15-off.log
+.scratch/wisp/probes/156/mut-156/case16-off.log
+.scratch/wisp/probes/156/mut-156/case17-off.log
+.scratch/wisp/probes/156/mut-156/case18-off.log
+.scratch/wisp/probes/156/mut-156/m1-os-arm-removed.log
+.scratch/wisp/probes/156/mut-156/m1-plus-all-new-cases-off.log
+.scratch/wisp/probes/156/mut-156/m2-os-arm-never-dead.log
+.scratch/wisp/probes/156/mut-156/m3-os-arm-always-dead.log
+.scratch/wisp/probes/156/mut-156/m4-plus-case13-off.log
+.scratch/wisp/probes/156/mut-156/m4-shortcircuit-deleted.log
+.scratch/wisp/probes/156/mut-156/m5-code-read-dropped.log
+.scratch/wisp/probes/156/my156.py
+.scratch/wisp/probes/156/probe-post/probe-156.log
+.scratch/wisp/probes/156/roster-post-cmdwisp.txt
+.scratch/wisp/probes/156/roster-post-internaltools.txt
+.scratch/wisp/probes/156/zero156.sh
+cmd/wisp/slo_exit_os_156_windows_test.go
+cmd/wisp/slo_report_144_windows_test.go
+cmd/wisp/slo_windows.go
+docs/evidence/s1/156-exited-asks-os-r1.md
+=== --stat numbers ===
+ cmd/wisp/slo_windows.go                            |  89 ++-
+ docs/evidence/s1/156-exited-asks-os-r1.md          | 122 +++++
+ 25 files changed, 2071 insertions(+), 4 deletions(-)
+
+################ (append) 159-r1 锚点与漂移 ################
+=== 159-r1 anchor: 59e2b3ed09864a6728ec7e2cd6e39874b5269fe8 (59e2b3ed) ===
+--- git log --oneline -8 ---
+59e2b3ed 318-r1 续单：按 318-v1 附条件做最小修复（仅 zz_201_a1 头注两处；零行为改动）
+8f637271 编排者：A947（318-v1 判语收件；附条件最小修复集已回 318-r1；翻框待修复）
+df120e50 编排者：A946（178-r1 收件＋20 收口记录＋派 178-v1/159-r1）
+a26cb9ab 318-v1 验证腿（非实现者）：AC#1 判据①/②/③ 全成立＋被改 201-a1 件判语=诚实翻面＋AC#2 三条全核到＋名册零放宽
+c7900257 编排者：20 收口（七框全勾；第 7 框亲跑 ok 3.723s；-done）
+25d34231 票 178 r1 交件：probes/178/r1/（证据件＋四态 logs＋AC#1 四堆名册/脚本＋AC#2 变异样本两枚）＋票 178 尾 1 bullet
+31b5cd36 票 178 r1（写腿·仪器程）：成对普查尺 G6 家族判定从「一枚混数」改成四堆可分
+401191b7 编排者：136s send 档勘误（去重核实为空目录）
+--- dispatch anchor 401191b7 exists? ---
+commit
+--- distance 401191b7..HEAD ---
+7
+--- commits 401191b7..HEAD ---
+59e2b3ed 318-r1 续单：按 318-v1 附条件做最小修复（仅 zz_201_a1 头注两处；零行为改动）
+8f637271 编排者：A947（318-v1 判语收件；附条件最小修复集已回 318-r1；翻框待修复）
+df120e50 编排者：A946（178-r1 收件＋20 收口记录＋派 178-v1/159-r1）
+a26cb9ab 318-v1 验证腿（非实现者）：AC#1 判据①/②/③ 全成立＋被改 201-a1 件判语=诚实翻面＋AC#2 三条全核到＋名册零放宽
+c7900257 编排者：20 收口（七框全勾；第 7 框亲跑 ok 3.723s；-done）
+25d34231 票 178 r1 交件：probes/178/r1/（证据件＋四态 logs＋AC#1 四堆名册/脚本＋AC#2 变异样本两枚）＋票 178 尾 1 bullet
+31b5cd36 票 178 r1（写腿·仪器程）：成对普查尺 G6 家族判定从「一枚混数」改成四堆可分
+
+################ (append) 0e95353 的 case-13 裁定头归属 ################
+=== 0e95353 ancestor of HEAD? ===
+rc=0 YES ancestor
+=== 10e3585: what is it ===
+10e3585c Sat Sep 26 09:50:23 2026 +0800 fix(152 AC#3): contradictionOffset 那条退路不再借位置——它明说自己没有位置可报
+=== 10e3585 diff on the test file (deletion col) ===
+2
+--- a/cmd/wisp/slo_report_144_windows_test.go
+-// Case 13 - AC#3's ruling is ⓐ: the s.exited() branch SHOULD name where the last
+=== 0e95353 additions to slo_report_144_windows_test.go : Case 13 mentions ===
+15:+// Case 13 - AC#3's ruling is ⓐ: the s.exited() branch SHOULD name where the last
+12
+1
+
+################ (append) 0e95353 对 slo_report_144_windows_test.go 的完整 diff ＋ A/M 状态 ################
+=== 0e95353 diff of slo_report_144_windows_test.go (full) ===
+commit 0e953533ed8c29184aaf2f27de851239e3b32788
+Author: CarlosShao <1933942520@qq.com>
+Date:   Sat Sep 26 13:21:26 2026 +0800
+
+    wip(156 checkpoint·编排者代提停在轮次上限的程): 它只提交了第 0+1 格（cc58445），第 2/3 格的码与表全躺在工作树里——go build rc=0 我现量、代提只为止污（gofumpt 与兄弟程的目录级 pathspec 会扫到它），不代表任何一格已被验收：AC#2/AC#3 未复判、AC#4..AC#7 未交
+
+diff --git a/cmd/wisp/slo_report_144_windows_test.go b/cmd/wisp/slo_report_144_windows_test.go
+index e38eda21..d804ca30 100644
+--- a/cmd/wisp/slo_report_144_windows_test.go
++++ b/cmd/wisp/slo_report_144_windows_test.go
+@@ -799,6 +799,7 @@ func TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne(t *testing.T) {
+ 	}
+ }
+ 
++// Case 13 - AC#3's ruling is ⓐ: the s.exited() branch SHOULD name where the last
+ // reading stopped, for the reason readSubjectReport's own doc comment gives - a
+ // subject that died part-way through its write is exactly the shape that looks
+ // like a prefix, and "exited (code 7) without writing its report" with no reading
+@@ -811,6 +812,16 @@ func TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne(t *testing.T) {
+ // reading rather than a hand-made ProcessState; the report file is still scripted,
+ // because counting the reads is how "on the spot" is shown without a wall-clock
+ // claim (same reason as case 5).
++//
++// Which ⓐ this is, and which one it is not (ticket 156 AC#4(i), restoring the
++// header ticket 152 deleted - 152's own acceptance run recorded the deletion at
++// docs/evidence/s1/152-...-accept-r1.md §2.2; the line is verbatim from
++// `git show 10e3585 -- cmd/wisp/slo_report_144_windows_test.go`, the one `^-//`
++// hit in that commit). The letter belongs to TICKET 149's AC#3, whose three options
++// were ⓐ name it / ⓑ by design never reached / ⓒ say so and stop. It is NOT the
++// letter ticket 152's AC#2 drew: 152 took ⓒ and sent "who reaps a subject, and
++// where" upstairs as Q-57, which owner ruled on 2026-09-26 as ticket 156's option
++// 乙 (exited() asks the OS). Neither ruling moved one assertion in this case.
+ func TestSLO149ExitedGiveUpSentenceCarriesTheLastReading(t *testing.T) {
+ 	dead := exec.Command("cmd.exe", "/c", "exit", "7")
+ 	_ = dead.Run() // a non-zero exit is the fixture, not a failure of this test
+=== 0e95353: slo_exit_os added? ===
+A	cmd/wisp/slo_exit_os_156_windows_test.go
+=== 0e95353: slo_windows.go status ===
+M	cmd/wisp/slo_windows.go

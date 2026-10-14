@@ -66,3 +66,11 @@
 - [2026-09-26 17:5x] 编排者开票。来路＝票 156 非实现者验收程 §8.2 的 C1–C5 五笔条件（七格零退回）。
   ⚠ 两条我在开票时自己复算过的：C3 的 `143/83`（我重数 r1 那发日志）、C4 的 `go list -deps` 命中两枚包（我现跑）。
   ⇒ **本票两枚数字若与你现量不符，以你为准并报回**——本仓今天已因"派单写死号／写死数"错过三次。
+
+- [2026-10-14 19:0x +08] **159-r1 交件（四格：AC#1／AC#3／AC#4／AC#5）；AC#2 具名押后**——`cmd/wisp/slo_report_144_windows_test.go` 属 `cmd/wisp` 面，本波被 133-r1 占。
+  锚：起手首读 `a26cb9ab` → 写作期现读 `f706dedd`（`401191b7` 后 14 笔，兄弟腿并发；逐笔见 `probes/159/r1/logs/159r1-ac1-commit.txt`）。
+  ①AC#1＝`0e95353` 一枚里同含动作①裁定头（`slo_report_144_windows_test.go` diff `+// Case 13 …`，与现 `:835` 逐字节同）与 AC#2 的码（`slo_windows.go` M＋`slo_exit_os_156_windows_test.go` A）⇒"分开 commit"未兑现；账＋判据草案＝`probes/159/r1/ledger-entry.txt`①（⛔ 台账本腿零触碰，编排者代贴）。
+  ②AC#3＝复算 r1 那发＝**143/83＋4 枚**、`144/84＋5` 属 `gate-r3-pre`（与票面数吻合、无分歧）；更正节已追加到 `docs/evidence/s1/156-exited-asks-os-r1.md` 末尾（"见第 7 格"＝"该指针在 r1 写作时不存在"＋真实落点；另登记同形前向引用"第 4 格"×8／"§9"×6，未动正文）。
+  ③AC#4＝判据两条（(a) `go list -deps` 含承载 `all:dist` 的 `wisp/frontend`；(b) `git diff-tree … -- frontend/dist` 输出非空）＋正控 `9318bb81`（响）／负控 `a2a3b3c`（空）＋`wisp slo` 老账并排＝`ledger-entry.txt`②。
+  ④AC#5＝r1 文件末尾已加一句"case 19＝夹具守卫"；同类扫描命中 2 枚（1 被点名＋1 计数面候选 `:579`"8 枚"vs 枚举 9 项），第 2 枚只列不改、报回。
+  交件 6 枚（每件 ≤200 行）在 `probes/159/r1/`；只 commit 不 push。

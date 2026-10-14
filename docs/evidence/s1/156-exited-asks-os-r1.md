@@ -672,3 +672,41 @@ $ grep -nE '156.{0,40}(AC#4|AC#5).{0,40}(成立|不成立)' docs/reports/pending
 - **本格不判任何一框**：票面 7 框由编排者按非实现者验收表定（`SPEC-12 §4.3` #1/#3）。
 
 ---
+
+## 收口追加（编排者／收口程追加，非 r1 原文）　C3：数字归属与悬空指针 · C5：case 19 归类
+
+> 本节由票 159 落地腿 **159-r1** 于 2026-10-14 现量后追加（锚 `f706dedd` 一轮现读；原文＝`.scratch/wisp/probes/159/r1/logs/159r1-ac3-recount.txt`、`.../159r1-ac5-scan.txt`）。
+> 上文各格（r1 与 r2）正文一字未改——本节是唯一新增；两句被纠正的原文仍在上文原位（`:283`／`:285`）。
+
+### C3-①　"144/84 与 5 枚"是谁的读数
+
+- 上文 `:283` 写"改后 cmd/wisp　RUN=144　PASS=84…（见第 7 格现量）"、`:285` 写"only-in-post: 5 枚"——**这两对读数不是 r1 自己那发 `gate-post` 的**。
+- 现量复算（命令可逐字重跑）：
+  - r1 那发＝`.scratch/wisp/probes/156/gate-post/cmdwisp.log`：`grep -c '^=== RUN'`＝**143**、`grep -c '^---'`＝**83** ⇒ **143/83**、FAIL=0；
+    名册两向 comm（`roster-pre-cmdwisp.txt` vs `roster-post-cmdwisp.txt`）only-in-post＝**4 枚**（15/16/17/18）、only-in-pre＝0。
+    （case 19 当时还没落：该日志 0 命中 `FixtureChildren`；case 19 由 `0e95353` 才引入。）
+  - **144/84＋5 枚那一对＝`gate-r3-pre` 那发**：`.scratch/wisp/probes/156/gate-r3-pre/cmdwisp.log` 现数 RUN=144、`^---`=84；
+    `cmdwisp-verdicts.txt` 里 `TestSLO156*`＝5 枚。（r4 的 `gate-r4-post` 现读同形 144/84。）
+- 复算命令块：
+  ```
+  grep -c '^=== RUN' .scratch/wisp/probes/156/gate-post/cmdwisp.log     # 143
+  grep -c '^---'     .scratch/wisp/probes/156/gate-post/cmdwisp.log     # 83
+  comm -13 <(sort -u .scratch/wisp/probes/156/roster-pre-cmdwisp.txt) \
+           <(sort -u .scratch/wisp/probes/156/roster-post-cmdwisp.txt)  # 4 行
+  grep -c '^=== RUN' .scratch/wisp/probes/156/gate-r3-pre/cmdwisp.log   # 144
+  grep -c '^---'     .scratch/wisp/probes/156/gate-r3-pre/cmdwisp.log   # 84
+  grep -c TestSLO156 .scratch/wisp/probes/156/gate-r3-pre/cmdwisp-verdicts.txt   # 5
+  ```
+
+### C3-②　"见第 7 格"指针
+
+- 该指针**在 r1 写作时不存在**：r1 停在轮次上限，计划中的"第 7 格"从未落笔；本文件今天那个"第 7 格"是续程 r2 的伪授权两栏（`:627` 起），**不含**它承诺的两组读数。上文两句（`:283`／`:285`）一字未删。
+- 它要指的两组读数的真实落点（现量存在）：
+  - 门禁四数 ⇒ `.scratch/wisp/probes/156/gate-post/cmdwisp.log`（重数见 C3-①）；
+  - 新增用例逐枚 ⇒ `cmd/wisp/slo_exit_os_156_windows_test.go:100/:141/:183/:232/:270`（五枚，行号现读）＋ `.scratch/wisp/probes/156/roster-post-cmdwisp.txt:57-60`（当时 4 枚）。
+- 同形登记（只登记、不改正文）：r1 正文另有同类前向引用——"第 4 格"×8（`:159`／`:166`／`:236`／`:247`／`:268`／`:273`／`:290`／`:298`）、"§9／第 9 格"×6（`:107`／`:177`／`:212`／`:234`／`:259`／`:303`）——
+  都指 r1 从未落笔的计划节；今日相关内容在 r2 的第 5 格（`:468` 起）与各日志里。是否归口由编排者定，159-r1 未动。
+
+### C5（票 159 只追加一句）
+
+case 19 归类＝**夹具守卫**，不是"会响的检"。

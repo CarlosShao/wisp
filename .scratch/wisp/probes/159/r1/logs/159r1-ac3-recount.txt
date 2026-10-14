@@ -1,0 +1,50 @@
+=== case 19 in gate-post log? ===
+0
+=== case 19 in gate-r3-pre log? ===
+2
+=== which commit added case 19 ===
+0e953533 wip(156 checkpoint·编排者代提停在轮次上限的程): 它只提交了第 0+1 格（cc58445），第 2/3 格的码与表全躺在工作树里——go build rc=0 我现量、代提只为止污（gofumpt 与兄弟程的目录级 pathspec 会扫到它），不代表任何一格已被验收：AC#2/AC#3 未复判、AC#4..AC#7 未交
+=== line numbers of the 5 test funcs (current) ===
+100:func TestSLO156FixtureChildrenDoWhatTheirNamesSay(t *testing.T) {
+141:func TestSLO156ExitedAsksTheOSForAChildNobodyReaped(t *testing.T) {
+183:func TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees(t *testing.T) {
+232:func TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn(t *testing.T) {
+270:func TestSLO156WaitReadyNamesTheDeadSubjectToo(t *testing.T) {
+=== roster-post: PASS count; roster-pre: PASS count ===
+83
+79
+=== gate-post anchored ^--- = ? and === RUN = ? ===
+83
+143
+=== gate-r3-pre anchored ^--- = ? and === RUN = ? ===
+84
+144
+
+################ (append) gate-pre / gate-r4-post 计数 ＋ 本机 grep(ugrep) 仪器桩 ################
+=== gate-pre: RUN / ^--- ===
+139
+79
+=== gate-r4-post: RUN / ^--- / SLO156 verdicts ===
+144
+84
+5
+=== grep anomaly tests ===
+0
+rc1=1
+0
+rc2=1
+1
+rc3=0
+ugrep: no search PATTERN specified
+
+Examples:
+  ugrep "PATTERN"       # match PATTERN
+  ugrep -e "-PATTERN"   # match -PATTERN (including the leading dash)
+  ugrep -e "/PATTERN"   # match /PATTERN (including the leading slash)
+  ugrep ""              # match all lines
+  ugrep --match         # match all lines
+
+For more help, run `ugrep --help' or `ugrep --help -e'
+rc4=2
+1
+rc5=0

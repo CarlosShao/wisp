@@ -1,0 +1,37 @@
+# 票 159 r1 — 台账条目原文草案（两笔；A 号由编排者代贴时现定）
+# 来源＝派单 159r1（AC#1② 与 AC#4「写在同一条台账记录里」两处要求）。
+# ⚠ 本腿对 docs/reports/pending-and-issues.md 零触碰（编排者面、共享文件防撞）；原文在此，代贴归编排者。
+
+## A###｜2026-10-14 +08｜159-r1 记账①（票 159 C1）：票 156「分开 commit」在 AC#4① 上未兑现——账＋判据，不动码
+
+- **笔形**：票 156 `:46` 明写那三枚注释级动作「不影响 AC#2 的成立与否，**分开 commit**、分开报数」；
+  而动作①（补回 case 13 裁定头）与 AC#2 的码**同枚落地**＝`0e95353`。
+- **159-r1 按自己锚点现量**（命令原文：`.scratch/wisp/probes/159/r1/logs/159r1-ac1-commit.txt`）：
+  - `git show --name-only 0e95353` 一枚 25 文件里同时含：`cmd/wisp/slo_windows.go`（M；diff 有 `+ return s.queryProcess()` 与 `queryProcess()`）、
+    `cmd/wisp/slo_exit_os_156_windows_test.go`（A）、`cmd/wisp/slo_report_144_windows_test.go`（`+// Case 13 - AC#3's ruling is ⓐ: …`＝动作①；与现 `:835` 逐字节同）。
+  - `-S "Case 13 - AC#3's ruling"` 三步：`b417d310` 加 → `10e3585` 删 → `0e95353` 补。
+  - 标题＝「wip(156 checkpoint·编排者代提停在轮次上限的程): …」（**编排者代提**，非 r1 自提；责属见 `156-close-and-load-bearing-r1-accept-r1.md` §4.4）。
+- **判据（下一个人可重跑）**：凡票面写「分开 commit」的格，验收时要能用 `git show --name-only <该动作所在 commit>`
+  指出**该动作所在的那一枚 commit 里不含其它格的码改**。反例＝`0e95353`（① 的注释面与 AC#2 的码同枚）。
+- ⚠ 不许拆已落地的码（改写历史）——本笔只入账＋立判据，不产生新 diff。
+
+## A###｜2026-10-14 +08｜159-r1 记账②（票 159 C4）：「frontend 提交会不会改 cmd/wisp 读数」的可执行判据 ＋ `wisp slo` 老账（同一条记录）
+
+- **判据只两条**（159-r1 现量、逐字可跑；原文 `logs/159r1-ac4-yardstick.txt`）：
+  - (a) `go list -deps ./cmd/wisp/ | grep -c 'CarlosShao/wisp/frontend'` ⇒ **1**：承载 `//go:embed all:dist`
+    （`frontend/embed.go:19`）的那枚包在 `cmd/wisp` 依赖图上 ⇒ 面板字节**可以**进 `cmd/wisp` 读数。
+  - (b) `git diff-tree --no-commit-id --name-only -r <commit> -- frontend/dist` ⇒ **输出非空**＝该提交动了嵌入源目录。
+    判据是输出非空（空结果 rc 仍 0，⛔ 别拿 rc 当尺）；源目录＝`frontend/dist`（由图案 `all:dist` 导出）。
+- **正控（没有正控的判据＝恒真判据）**：`9318bb81`（全仓唯一动过 `frontend/dist` 的提交，落 `.gitkeep` 锚）⇒ 命中 `frontend/dist/.gitkeep`。
+  **负控**：`a2a3b3c`（只动 `frontend/src/**` 3 枚）⇒ 空。
+- **精度备注**：依赖图上另有一枚第三方 embed（`github.com/jchv/go-webview2/webviewloader [sdk/x64/WebView2Loader.dll]`），不受 `frontend/**` 影响；
+  仓内第二处 directive 在 `internal/tools/tasklist_deferred_236r3_teeth_test.go:109`（测试夹具级，不在这条依赖面的 embed 集里）。
+- **dist↔src 产物关系（如实）**：`npm run build`（`tsc -b && vite build`，`frontend/package.json:8`）产 `dist/`；
+  `dist/*` 被 `.gitignore:22-23` 与 `frontend/.gitignore:12-13` 忽略、只留 `.gitkeep` 锚（`vite.config.ts` 的 `keepDistAnchor` 在 build 后回写它）；
+  `git ls-files frontend/dist` ⇒ 只 1 枚锚。**今天的工作树**另有未入库 build 产物（`frontend/dist/index.html`＋`assets/`，`git check-ignore` 命中）——
+  提交级判据看不见它们，而工作树级 `go build` 会把它们吃进二进制。
+- **老账（并排，同一条记录）**：`wisp slo` 这条命令**今天不被任何 `go test` 执行**（票 156 `:67` 登记；验收程确认未闭）。
+  159-r1 复验：`grep -rn '"slo"' --include='*_test.go' .`＝2 命中皆注释；`grep -rn 'cmdSLO' --include='*_test.go' .`＝2 命中皆注释；
+  `exec.Command` 邻域 2 枚皆文件名/测试名。真调用方＝`scripts/slo-check.ps1`（`wisp slo -state`）＋`.github/workflows/slo-fresh.yml`。
+- **结论并排**：**前端 `dist` 字节变化**与 **`wisp slo` 端到端行为**，今天都不在任何 `go test` 门禁射程里——两条同因（「门禁看不见的那半」）。
+  正确尺＝上面 (a)(b)；不是「两包内搜 `frontend` 字样」（已证伪；159-r1 今日现量 `cmd/wisp/` 11 枚文件含该串，票 159 当时为 2 枚）。

@@ -1,0 +1,96 @@
+=== HEAD version line numbers of the 5 test funcs ===
+100:func TestSLO156FixtureChildrenDoWhatTheirNamesSay(t *testing.T) {
+141:func TestSLO156ExitedAsksTheOSForAChildNobodyReaped(t *testing.T) {
+183:func TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees(t *testing.T) {
+232:func TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn(t *testing.T) {
+270:func TestSLO156WaitReadyNamesTheDeadSubjectToo(t *testing.T) {
+=== worktree clean for these files? ===
+rc=0
+=== roster-post line numbers of SLO156 entries ===
+57:--- PASS TestSLO156ExitedAsksTheOSForAChildNobodyReaped
+58:--- PASS TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees
+59:--- PASS TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn
+60:--- PASS TestSLO156WaitReadyNamesTheDeadSubjectToo
+=== grep --version ===
+ugrep 7.8.4 WIN64 +sse2; -P:pcre2jit; -z:zlib,bzip2,zstd,brotli,7z,tar/pax/cpio/zip
+License: BSD-3-Clause; ugrep user manual: <https://ugrep.com>
+=== ugrep quirk demo ===
+0
+literal-// rc=1
+1
+bracket rc=0
+
+=== AC#5 扫描（票 159）：尺＋逐枚输出 ===
+尺（159-r1 写死，可重跑）：
+  T（表行面）＝本文件所有以 '|' 开头、带 case 编号 13..19 的行：grep -n '^| 1[3-9]' <file>
+  V（判定句面）＝(a) '**第 N 格判定**' 行＋(b) 含'会响'的句＋(c) 含计数'四枚\|五枚\|8 枚\|9 枚'的汇总句
+  互斥判据＝同一 case（或同一批枚举项）在 T 与 V 里的归类/计数不一致 ⇒ 命中
+
+--- T: grep -n '^| 1[3-9]' docs/evidence/s1/156-exited-asks-os-r1.md ---
+272:| 15 `ExitedAsksTheOSForAChildNobodyReaped` | **机制**：等态门一亮，`exited()` 第一次问就 true、`exitCode()` 就是 7；且**同一刻 `ProcessState == nil`**，问完再问一次还是 nil | "OS 说死⇒我们算死"这一形若被"顺手在 `exited()` 里 `Wait()` 一下"实现，前两条断言照样满足——是 `ProcessState==nil` 那一枚把它挡在门外（AC#3 要的正是钉这一形，不是钉这个答案） |
+273:| 16 `LiveSubjectStaysAliveUntilTheOSDisagrees` | **反方向**与两支的分界：16a 活着 ⇒ false／`exitCodeUnknown`；16b 我们亲手 `Kill` 且未收尸 ⇒ true（走 (b)）；16c `Wait()` 之后 ⇒ true 走 (a) | 只往"死"的方向加用例，`exited() := true` 就能满足全部（第 4 格 `m3` 量到只有 16 一枚红 ⇒ 这一枚是唯一的持有者） |
+274:| 17 `ReportLoopNamesTheDeadSubjectItWasWaitingOn` | **那一发本身**在生产接缝的闭环：`:822`（派单记作 `:820`，本票前提③那枚）那枚调用者对**已死未收尸**的孩子印 `exited (code 7) without writing its report`，且**读 1 次**、不许出现 BUDGET 句 | 票 149 的 case 13 已经钉过同一句的**文案**，但它靠 `dead.Run()` 先把尸收了——生产里不存在那一手（152 验收件第 1、2 格）。17 是唯一一枚"真 corpse ＋真循环"的接线 |
+275:| 18 `WaitReadyNamesTheDeadSubjectToo` | 第二枚出口 `:522`：subject 死在 ready 标记之前 ⇒ `exited early (code 7) before reporting ready`，不许印 `never reported ready within 1m0s` | 票 152 第 2 格量过这句"今天根本产不出"，此前全仓零枚持有者；这一枚是它的第一枚 |
+276:| 19 `FixtureChildrenDoWhatTheirNamesSay` | **夹具自己**：`exit` 角色真的以 7 死、死时 `ProcessState` 为 nil；`sleep` 角色真的活着且杀得掉 | 本程先踩后钉：第一版把角色分发塞在 case 15 里，于是"摘掉 case 15"这发变异把别的 cell 的**子进程**一起摘坏了，`case15-off` 在未改的码上报出 17/18 两枚假红（`mut-156-first-run-summaries.txt`） |
+--- V(a): grep -n '第 .*格判定' ---
+117:**第 0 格判定**：**成立**（锚点三版逐字节全等、四条前提逐条现量并点名哪一条不成立、互斥按文件级成立、四枚坑各有"绕成／没绕成"判据）。
+172:**第 1 格判定**：**成立**——AC#1 那一发被本程自己复现成两条独立读数（`prefix`／`nofile`），窗口有 ms 与具名次数，
+255:**第 2 格判定**：**成立**——乙落地，机制为本程所选并给出 §2.1 三条现量理由；三件硬约束各有零命中读数；
+298:**第 3 格判定**：**成立**——四枚会响的检（15/17/18/19）加一枚双向界（16），每枚在第 4 格都有它**唯一持有**的那一发；
+438:**第 4 格判定**：**① 成立（r1 交付＋本程字节核）／② 读数成立、修法只到"纯追加纠正"那一半，残留一行过期数字未闭／
+592:**第 5 格判定**：**①〔成立·带条件，且条件是本程量的〕**（单摘一味＝四枚红；打不红的两发分别是"同时摘四枚持有者"与"只问改前旧名册"）；
+--- V(b): grep -n '会响' ---
+158:4. **阴性对照没坏**：`live-child` 那一发仍旧烧预算、仍旧印预算句。这条是本格给"改后会响"设的下界——
+236:### 2.3 举证"这一发在改前不响、改后会响"（承重按操作定义答在第 4 格）
+256:"改前不响／改后会响"两向都有本程自己的读数（§2.3 两枚来源：探针对照 ＋ `m1` 变异）。
+266:## 第 3 格　AC#3：会响的检——四枚新用例钉"OS 说死 ⇒ 我们立刻算死"，既有断言一枚没弄松
+298:**第 3 格判定**：**成立**——四枚会响的检（15/17/18/19）加一枚双向界（16），每枚在第 4 格都有它**唯一持有**的那一发；
+342:   会把 149 的 ⓐ 读成 156 的 AC#3 也 draw 了一枚字母（156 的 AC#3 要的是"会响的检"，今天一枚字母都没 draw）。
+--- V(c): grep -n '四枚\|五枚\|8 枚\|9 枚\|5 枚' ---
+67:| ③ `exited()` 调用者**只有三枚**：`:520`／`:837`／`:851` | 调用者是**四枚**：`:520`（`waitReady`）、**`:820`（`collectReportWithin`）**、`:837`（`exitCode` 守卫）、`:851`（`stop` 守卫）——派单列的三枚行号都对，**漏的正是 `:820` 这一枚** | **不成立**（少记一枚，且少的恰是本票主靶） |
+78:  两处同错；本件把四枚名册钉在 §0.2，下一程别再用三枚那版。
+86:?? .scratch/wisp/probes/152/mut-shipped/                 <- 本票 AC#4(iii) 点名要入库的那 9 枚
+96:### 0.4 工具版本与四枚仪器坑（含本程新增一条）
+114:（limited 权限的句柄不带 `SYNCHRONIZE`），四枚用例各撞 20s 假红；现版 witness 换 `SYNCHRONIZE\|PROCESS_QUERY_LIMITED_INFORMATION`
+117:**第 0 格判定**：**成立**（锚点三版逐字节全等、四条前提逐条现量并点名哪一条不成立、互斥按文件级成立、四枚坑各有"绕成／没绕成"判据）。
+132:**仓里没落一字**（§0.1 末段）。四枚 cell 全是真子进程（`exec.Command(os.Args[0], "-test.run=…")` 重入本测试二进制，真 pid、真退出码 7）。
+215:   `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` 的句柄做 `WaitForSingleObject`，四枚用例各撞
+248:四枚新用例全红、case 17 量到 **1469 次真读／30.07s**（同 cell 前一发 1468 次）并印回 BUDGET 句——
+251:**放水两问自答**：① 断言方向：本程没有为了让任何一格通过而放宽任何断言；第 3 格四枚用例是**新增**的、只往严加；
+266:## 第 3 格　AC#3：会响的检——四枚新用例钉"OS 说死 ⇒ 我们立刻算死"，既有断言一枚没弄松
+268:新建 `cmd/wisp/slo_exit_os_156_windows_test.go`（cases 15-19，5 枚）。每枚各自钉一件，**互不替代**（替代关系是量出来的，见第 4 格的单枚摘掉表）：
+285:only-in-post: 5 枚，全部 TestSLO156*（本票新增，逐枚点名见第 7 格）
+295:**放水两问自答**：① 断言方向动没动——没动，五枚全是新增，两向 `comm` 的 only-in-pre 为空集就是这一句的读数；
+296:② helper 是不是原有的那枚——判定用的 helper 全是原有那三枚；新增四枚是**取版器**，它们唯一的 `t.Fatalf` 出现在"夹具没照名字死／活"上（守卫，不评产品）。
+298:**第 3 格判定**：**成立**——四枚会响的检（15/17/18/19）加一枚双向界（16），每枚在第 4 格都有它**唯一持有**的那一发；
+301:**本程没测什么（本格）**：19 枚 code-path 之外的 `stop()`（§2.2 末段）；
+350:`-run 'TestSLO144|TestSLO147|TestSLO149|TestSLO152'`（票 152 那一族的原选择器，**不含**本票新增的 5 枚）。
+394:- 票面 ③ 的两支：**(甲)** 把 `mut-shipped/` 那 9 枚**入库**——纯新增（0 删），但目标路径是 `.scratch/wisp/probes/152/**`，
+398:  把 9 枚日志**复制**进 `probes/156/` 再 commit 是**假交件**——被点名的那条路径依旧 0 枚 tracked，
+401:  这一半不缺；缺的是 `§4.2` 点名的 `mut-shipped/` 那一族（9 枚、0 tracked、0 commit）。
+443:2. **没跑 `mut-shipped/` 那 9 枚日志里除 g1 之外的任何一发**（h1/h2/i1/g2/g3/g4 全是 r1 或票 152 的凭据，本程一枚未复算）；
+470:| 甲：**单摘这一味** | `r2-m1-same-shape-after-ac4` | `TestSLO149Exited\|TestSLO156` | RUN=6 PASS=**2** **FAIL=4** SKIP=0 | **有牙**：四枚红（名与句见 §5.3）。仍绿的两枚＝`TestSLO156FixtureChildrenDoWhatTheirNamesSay`（夹具自检）＋`TestSLO149ExitedGiveUpSentenceCarriesTheLastReading`（**票 149 的 case 13**）⇒ case 13 **不是**这味的主人，它走 (a) 那条支，所以 m1 拿它无可奈何——这正是 m1"只摘 (b)"的证据 |
+471:| 乙：**同一味摘掉＋本票新增四枚持有者逐枚改名** | `r2-m1-plus-all-new-cases-off-after-ac4` | 全 SLO 五族 | RUN=22 PASS=15 **FAIL=0** SKIP=0 | **存在打不红的那一发**——形状＝"摘一味 **并且** 同时摘掉四枚新用例"。这与票 152 那枚"条件式"（`h1` 红／`h2` 逃逸）同形，本程把它从**断言**降级成了**读数** |
+475:单摘一味（甲）红四枚，而打不红的两发**都要靠摘掉用例本身**才成立。本程**没有**把乙/丙读成"这一味没牙"，
+495:   而树字节全是 `d2bc41ecfef06bd4` ⇒ 五发说的是**同一 edits、同一底版**，不是五枚各自漂出来的东西。
+528:| `r2-m1-slo-all-after-ac4`（变异） | 2ce77e1 | RUN=26 PASS=15 **FAIL=4** | 红名＝四枚新用例 |
+530:| `r2-asis-slo-all-after-ac4`（AC#4 落库后，同一形状） | 2ce77e1 | RUN=26 PASS=19 **FAIL=0** | 19 枚名字与前两发逐字相同 |
+570:| `mut-156/m1-os-arm-removed.log`（6/2/4，四枚红名） | `r2-m1-same-shape-after-ac4` | **对上**：6/2/4/0、四枚红名逐字相同；reads 1467 对 1469＝本机差 |
+579:⇒ 这 8 枚的档位一律**停在〔r1 日志＋本程只数了四数〕**：本程只**现数了这四数的字面**（`grep -c`），**没有**重跑任何一发 m2-m5／caseNN-off。
+592:**第 5 格判定**：**①〔成立·带条件，且条件是本程量的〕**（单摘一味＝四枚红；打不红的两发分别是"同时摘四枚持有者"与"只问改前旧名册"）；
+597:1. **没跑 m2/m3/m4/m5 与四枚 caseNN-off**（§5.6 点名，全是引用），因此**没有独立复核**"这一味内部每一枚 syscall 是否都有主人"
+625:5. **本程没判 `mut-shipped/` 那 9 枚该入库还是该降级**（§4.3），也没复跑它里面除 g1 之外的任何一发。
+636:$ for s in '实现方（若被叫回）只剩这三枚注释级动作' 'RUN=21, PASS=14, FAIL=0` 改成' '那 9 枚日志（h1/h2/i1' ; do
+--- 逐枚对（结论）---
+命中 1（票面点名的那枚）：V :298 '四枚会响的检（15/17/18/19）' vs T :276 行 19 '**夹具自己**…' ⇒ 互斥（19 一边入'会响'名单、一边归'夹具自己'）。
+命中 2（同类·计数面候选）：V :579 '⇒ 这 8 枚的档位一律停在…' vs :577-578 枚举 9 项
+   （m2-os-arm-never-dead／m3-os-arm-always-dead／m4-shortcircuit-deleted／m5-code-read-dropped／
+     case15-off／case16-off／case17-off／case18-off／m4-plus-case13-off）⇒ 计数 9≠8；
+   若作者本意排除 m4-plus-case13-off，同句'没有重跑任何一发 m2-m5／caseNN-off'仍把它包进来。只列不改、报回。
+扫过、按尺不判命中：
+ - :266 标题'四枚新用例'＝无点名名单，不可逐枚比（尺边界）。
+ - :268 '（cases 15-19，5 枚）'＝文件枚数事实，与 §3 表 5 行一致。
+ - :285 'only-in-post: 5 枚'＝数字归属面（已由 C3 单独更正），非'表 vs 判定句'。
+ - :470 '四枚红'／:471 '四枚持有者'／:528 '红名＝四枚新用例'／:541-545 PASS 差集 4 名：与 §5.3 红名、§5.5 名册逐枚一致（全为 15/16/17/18）。
+ - 第 4／5 格（r2）判定句与各自表逐枚对：读数一致，未命中。
+⇒ 结论：命中 2 枚（1 枚＝票面点名，1 枚＝同类计数面候选，只报不改）。本腿对第 1 枚按票面只追加一句（已写入本文件末节 C5）。
