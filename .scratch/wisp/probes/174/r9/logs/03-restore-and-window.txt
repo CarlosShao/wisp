@@ -1,0 +1,20 @@
+# 174-r9 log 03 -- 还原绿 ＋ overlay 未留痕 ＋ 窗口自证。原始＝raw/03-restore-green.txt、raw/04-gates-a.txt
+
+## R1 撤 overlay 复跑（同一 -run）：窗口 21:28:07-21:28:28
+ok  	github.com/CarlosShao/wisp/cmd/wisp	12.305s
+    rc=0
+
+## R2 overlay 没碰树（原件一字节未改）
+    $ md5sum cmd/wisp/run.go                       -> 07541a1f80d5fcd55590041de0320280
+    $ git show HEAD:cmd/wisp/run.go | md5sum       -> 07541a1f80d5fcd55590041de0320280
+    $ git status --porcelain -- cmd/wisp/          -> 只有 r8 那枚未跟踪件：
+        ?? cmd/wisp/task_output_pointer_notice_174r8_test.go
+    $ git status --porcelain -- internal/ cmd/     -> 同上（整个共享编译面零脏件，除那枚未跟踪件）
+
+## R3 窗口自证（跑 cmd/wisp 重包前现读 tasklist）
+  21:29:18 精确形 grep -E '(^|[[:space:]])go\.exe|wisp\.test\.exe|compile\.exe|link\.exe'
+     -> QUIET: no go.exe / wisp.test.exe / compile.exe / link.exe
+  ⚠ 自报一处仪器缺陷（本腿中途发现并更正）：早先那条窗口尺写成 grep -cE 'go\.exe|wisp\.test\.exe'，
+     而 cargo.exe 含子串 go.exe -> 假报 '2 枚在飞'。改用行首/空白锚定后归零；上面 R1-R3 各跑的
+     窗口读数不受影响（cargo.exe 与本面无关，且 cmd/wisp 重包窗口内无第二个真 go.exe）。
+  ⚠ 另记现场事实：21:28:58 见到 wisp.exe pid 40296 在跑（非本腿所起；本腿只跑 go test）。

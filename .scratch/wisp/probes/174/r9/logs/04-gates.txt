@@ -1,0 +1,23 @@
+# 174-r9 log 04 -- 门禁现量（逐条 rc）。原始全量＝raw/04-gates-a.txt、raw/05-gates-b.txt、raw/07-adopt-gates.txt、raw/08-post-adopt-gates.txt
+
+## A. 代提四门（对 r8 那枚件；co-ordinator 裁定要求）
+  gofumpt -l cmd/wisp/task_output_pointer_notice_174r8_test.go  -> 空 rc=0
+  go build ./...                                                -> rc=0
+  sh scripts/d22scan.sh                                         -> clean rc=0（cmd/=129）
+  sh scripts/check-path-length-budget.sh                        -> VERDICT GREEN rc=0（tracked=12999）
+
+## B. 本腿面门禁（21:29:18 安静窗）
+QUIET: no go.exe / wisp.test.exe / compile.exe / link.exe (cargo.exe does NOT count - substring false positive)
+=== G1 go build ./... ===
+G1 rc=0
+=== G2 gofumpt -l ===
+G2 rc=0
+  go test ./internal/tools/ -run '174|PointerNotice|Pointer' -count=1 -> ok 3.276s rc=0（21:29:57）
+  d22scan -> clean rc=0（internal/=557 cmd/=129）
+  check-path-length-budget.sh -> VERDICT GREEN rc=0
+
+## C. 代提后复跑（已提交树）
+  21:38:23 窗口现读撞见别人的在飞笔（go.exe 36364 + wisp.test.exe 38860）=> 这一发不作主证，已错峰重跑（见 log 05）
+  go test ./cmd/wisp/ -run 'TestTaskOutputPointerNotice174r8' -count=1 -> ok 16.760s rc=0
+  长度门 -> VERDICT GREEN rc=0，denominator: tracked paths=13000 over-budget=60 covered by roster=60 not in roster=0
+  git status --porcelain -- cmd/ internal/ -> 空（共享编译面零脏件）

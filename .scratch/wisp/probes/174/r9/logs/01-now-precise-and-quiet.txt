@@ -1,0 +1,15 @@
+# 174-r9 log 01 -- 现树（已接线）：精确文案 ＋ 安静正例。
+# 命令：export PATH=<root>/third_party/sherpa-onnx:$PATH; GOTMPDIR='C:\tmp\wisp174r9gotmp' go test ./cmd/wisp/ -run 'TestTaskOutputPointerNotice174r8' -count=1 -v
+# 窗口 21:24:13-21:24:34，rc=0；原始全量＝raw/01-now-r8harness-wired.txt
+
+## T1 授权根外那枚真副本（出厂 allowed_dirs=[]）—— 模型可见的那一段，逐字：
+    […输出已落文件：省略 45204 字符，总长 48000 字节 / 约 12000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\tmp\wisp174r9gotmp\TestTaskOutputPointerNotice174r8SpeaksTheRealReason4284726055\002\artifacts\tool-output-call-174r8.txt…]
+
+## T2 安静正例（根内＋真实普通文件）—— 同一段，逐字：
+    […输出已落文件：省略 45204 字符，总长 48000 字节 / 约 12000 token，全文见 C:\tmp\wisp174r9gotmp\TestTaskOutputPointerNotice174r8StaysQuiet681179210\002\artifacts\tool-output-call-174r8.txt…]
+
+## 判决行
+--- PASS: TestTaskOutputPointerNotice174r8SpeaksTheRealReason (5.09s)
+--- PASS: TestTaskOutputPointerNotice174r8StaysQuiet (5.46s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	13.883s

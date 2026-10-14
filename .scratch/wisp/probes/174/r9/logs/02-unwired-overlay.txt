@@ -1,0 +1,28 @@
+# 174-r9 log 02 -- 未接线形（overlay 把 run.go:547 那行字节级种回接线前形态）：回执只能说「未接线」。
+# overlay＝mut/overlay-unwired.json -> mut/run-unwired.go（与 cmd/wisp/run.go 只差 1 行，diff＝raw/06-mutant-diff.txt）
+# 命令：go test -overlay <...>/mut/overlay-unwired.json ./cmd/wisp/ -run 'TestTaskOutputPointerNotice174r8' -count=1 -v
+# 窗口 21:26:25-21:26:49，rc=1（两枚都红）；原始全量＝raw/02-unwired-overlay.txt
+
+## 模型可见的那一段，逐字（两枚用例拿去断言的都是这一段）：
+    […输出已落文件：省略 45204 字符，总长 48000 字节 / 约 12000 token；注意：路径授权判定者未接线（fail-closed：C26 没接进来，这条路径是否还读得回来无法核实，按读不到处理），全文见 C:\tmp\wisp174r9gotmp\TestTaskOutputPointerNotice174r8SpeaksTheRealReason4088209371\002\artifacts\tool-output-call-174r8.txt…]
+
+## T1 三条红句（题头逐字）
+        task_output_pointer_notice_174r8_test.go:150: 授权根外的副本路径必须给出精确文案（不在授权范围内＋加进 [fs] allowed_dirs 两条都在），实际回执：
+        task_output_pointer_notice_174r8_test.go:154: 判定者已经接进生产（run.go 的 TaskDeps.Paths），回执里不许再出现「未接线」：
+## T2 两条红句（安静正例在未接线形下也被污染）
+        task_output_pointer_notice_174r8_test.go:179: 健康的指针必须安静：注意：应出现 0 次，实际 1 次：
+        task_output_pointer_notice_174r8_test.go:182: 根内真文件不该触发任何一条「读不到」的说明：
+
+## 判决行
+--- FAIL: TestTaskOutputPointerNotice174r8SpeaksTheRealReason (4.74s)
+--- FAIL: TestTaskOutputPointerNotice174r8StaysQuiet (4.71s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	12.931s
+FAIL
+
+## 字节同一性证明（那行 unwired 形 = 4db5f3f6 接线前父提交的那一行）
+    $ git show 4db5f3f6^:cmd/wisp/run.go | grep 'BuiltinTaskEntries(tools.TaskDeps' | sha256sum
+      e3b19cba121f41de8a029ec974201cfeba2d32bd5a91837fadecb52e13e2fcbf *-
+    $ grep 'BuiltinTaskEntries(tools.TaskDeps' mut/run-unwired.go | sha256sum
+      e3b19cba121f41de8a029ec974201cfeba2d32bd5a91837fadecb52e13e2fcbf *-
+    $ diff cmd/wisp/run.go mut/run-unwired.go   # 恰 1 行，547c547

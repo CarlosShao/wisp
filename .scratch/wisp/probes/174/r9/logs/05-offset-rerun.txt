@@ -1,0 +1,18 @@
+# 174-r9 log 05 -- 撞见别人在飞笔后的错峰重跑（已提交树）。原始＝raw/09-window-and-rerun.txt、raw/09-offset-rerun.txt
+
+## W1 撞窗自报（派单：重包同一时刻只跑一个）
+  21:38:23 跑前现读 -> 在飞：go.exe 36364 ＋ wisp.test.exe 38860（非本腿所起；疑 133-v 重包）
+  21:39:32 / 21:41:16 / 21:43:29 复查 -> 仍在（约 7 分钟，符合 314 死区那种整趟长跑的形状）
+  21:45:30 复查 -> WINDOW QUIET
+  => 21:38:23-21:38:51 那一发（rc=0 ok 16.760s）与别人重叠，按派单**不作主证**，只作旁证；
+     主证仍是 21:24:13 / 21:26:25 / 21:28:07 三个安静窗的读数（logs/01-03）。
+
+## W2 错峰重跑（安静窗 21:45:45-21:46:03；命令同 logs/01，-count=1 -v）
+  --- PASS: TestTaskOutputPointerNotice174r8SpeaksTheRealReason (4.40s)
+  --- PASS: TestTaskOutputPointerNotice174r8StaysQuiet (4.16s)
+  PASS
+  ok  	github.com/CarlosShao/wisp/cmd/wisp	11.434s
+  rc=0
+
+## W3 归属声明
+  本腿未读、未跑、未归因别人的那一趟；上面两枚进程号只是 tasklist 现场事实，不指认到腿。
