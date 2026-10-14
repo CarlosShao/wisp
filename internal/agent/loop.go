@@ -807,8 +807,12 @@ func (l *Loop) dispatch(ctx context.Context, j *taskJournal, rowID int64,
 //     not L2", and anything else the directory declares no tier for fails
 //     closed here too.
 //
-// The second result reports "booked nothing" (gate-owned routing) so the caller
-// can drop its own pending row instead of leaving one open forever.
+// The second result reports "booked nothing" (gate-owned routing): the row is
+// left pending and the gate writes the decision column (ruling A13). The only
+// caller (executeCalls) currently DISCARDS that value - it drops no row, and
+// this comment must not promise that it does; who settles a gate-owned pending
+// row after the gate hop is deferred (tickets 21/162). Ticket 179 AC#10
+// corrected this text, which used to promise a consumer that never existed.
 
 func (l *Loop) decideRisk(ctx context.Context, j *taskJournal, rowID int64, info ToolInfo) (ok, unbooked bool, why string) {
 	risk := info.RiskLevel

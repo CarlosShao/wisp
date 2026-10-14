@@ -252,4 +252,13 @@ func TestDeclaredL1L2RoutingUnchanged179(t *testing.T) {
 		t.Errorf("declared L0 with a gate wired: ok/unbooked/why = %v/%v/%q, want true/false/empty",
 			ok, unbooked, why)
 	}
+	// AC#9: the return values above are only half the promise - the direct L0
+	// arm must also book its allow into the decision column.
+	rows, err := store.ListToolCallsByTask(ctx, j.taskID)
+	if err != nil {
+		t.Fatalf("tool_call lookup: %v", err)
+	}
+	if len(rows) != 1 || rows[0].Decision != DecisionAllow {
+		t.Errorf("decision = %+v, want one row with %q booked by the direct L0 arm", rows, DecisionAllow)
+	}
 }
