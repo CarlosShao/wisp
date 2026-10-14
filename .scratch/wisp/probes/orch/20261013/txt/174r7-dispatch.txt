@@ -1,0 +1,26 @@
+# 174-r7 派单（票 174 **切两格**：AC#2c＝`spill.go` 桩如实说明 ＋ AC#2d＝第五支指针文案的零覆盖牙；写腿；面＝`internal/tools/**`＋`internal/agent/spill.go`）
+
+发送时刻：2026-10-14 20:2x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **174-r7**（`probes/174/r7` 未建，查重已做：r1–r6/v1–v3 已用）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与范围（**本腿只做两格**；票面逐字为准）
+
+- 票：`.scratch/wisp/issues/174-task-output-points-at-a-file-the-model-cannot-read-by-default-spill-artifacts-are-outside-fs-allowed-dirs.md`（先通读 AC#2/AC#2c/AC#2d 与其上的追加块）
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+- **解锁依据（必读）**：AC#2c 票面写着"排程：等票 177 裁完再动"，理由是"那枚桩里嵌的路径正是票 177 争论的当事文本"。**177 已裁**：只读设计腿 `177-a1` 判**"盖章 vs 续读"今天不互斥**（化解链＝`177-r1`→`175-r2`→`183`→`185`；175-r1 §7.1 当初撞红的两枚今天在真桥具上逐枚绿；出处＝`.scratch/wisp/probes/177/a1/census.md`＋票 177 尾 bullet）。⇒ **解锁成立**；你现读复核该 census 的结论后按 AC#2c 开工。
+- **AC#2c**：`internal/agent/spill.go` 的 D15(3) 桩**今天仍然静默**（同一句"全文见"两条腿、只有 `task.output` 一侧说了实话）。要求：**那枚桩也走同一判据**——**首选"同样如实说明"**（与 `task.go` 已落的文案口径一致：路径不在授权根内/不存在/非普通文件时外部可见地说清）；若你现读发现 177 的裁定让"显式裁掉这一支"更正确 ⇒ **停手上报**并写明为什么（⛔ 不许自己替两票选路）。
+  - 判据：**两向**（未修码那一发＝静默"不响"）＋**安静正例仍安静**（根内＋真实普通文件 ⇒ 零说明）；措辞归你但**模型看得见的那一段才算数**（⛔ 不许只在日志/Go error）。
+- **AC#2d**：`pointerNotice` 会说五种话、八枚判据只钉住四种；`internal/tools/task.go`（现量约 `:313-314`，自己复算）那一支＝**C26 连规范化都没通过**、且它是**唯一把 `err.Error()` 原文拼进模型可见文本**的一支，**全仓零覆盖**（`174-v1` 的正控：`MUT-V5` 摘掉整支 ⇒ `rc=0`、顶层 PASS 124 全绿）。
+  - 要做的：**补一枚判据**钉住它，且必须**同时问两半**：①说了没有（`注意：`那一支确实出话）；②**拼进去的那段 `err.Error()` 里不许带**：路径原文／根目录列表／C26 内部状态（只断言"有注意二字"＝恒真尺，⛔ 不通过）。
+  - ⚠ 先证"今天不响"（未修码上该断言不红或零覆盖的形状逐字）再装钉；三态齐（未修/已修/还原）。
+- **⛔ 本腿不做**：AC#2b（`cmd/wisp/run.go` 接线——**该面本波被 133-r1 占**）、AC#4（契约轴＝owner 批准面）、AC#5（结题说明＝编排者）。票尾 bullet 逐条具名。
+- **禁改**：`[fs] allowed_dirs` 默认值、C26 判定语义、`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`internal/panel/**`、`thresholds.go`、golden、`allowlist.txt`、`frontend/**`、`design/**`、`cmd/**`（除只读）。判"在不在根里"**必须走 C26/`risk.PathCanonicalizer`**，⛔ 不许在它之外用 `filepath.Clean|Abs` 做文件系统决策。
+
+## 交件与纪律
+
+- 交件：`probes/174/r7/00-anchor-and-gates.md` ＋ logs（两格各自：未修不响/修后响/还原绿；AC#2d 的 err.Error 泄漏两半）+ 票 174 尾**追加 bullet**（逐格一笔）。产出 ≤7 枚 ≤200 行。
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**）；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；仓内遗留（如 `probes/174/c1/wisp-probe.exe`）别动。
+- `PATH` MSYS 形；`GOTMPDIR='C:\tmp\wisp174r7gotmp'`（只反斜杠形，先自建）；判据 `-run` 小射程；门禁：`go test -count=1 ./internal/tools/`、`sh scripts/d22scan.sh` clean、长度门 GREEN；⛔ 别跑 `cmd/wisp` 整包（133-r1 在跑 `-count=2 -v -timeout 40m` 全套，窗口自证）。
+- 面互斥：本波 `cmd/wisp` 归 133-r1、`probes/171` 归 171s、`scripts/slo-*` 归 136-v（只读）——你只写 `internal/tools/**`＋`internal/agent/spill.go`＋`probes/174/r7/`。
+- **未定义即停**：AC#2c 两支取舍判不了／须动禁改面／两向打不圆 ⇒ 停手上报。
+- 回执：结论先行＋commit sha（产码/交付分开）＋两格两向三态逐字＋AC#2d 的泄漏两半证据＋门禁 rc＋具名没做。

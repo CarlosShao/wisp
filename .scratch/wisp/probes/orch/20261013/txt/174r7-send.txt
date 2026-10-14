@@ -1,0 +1,5 @@
+174-r7 send 记录
+- 发送时刻：2026-10-14 20:2x +08；派单已先存档：txt/174r7-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/174/` = a3 a4 c1 c2 r1 r2 r3 r4 r5 r6 v1 v2 v3（r7 未建，可用）。
+- 收件人：agent_e56e1dca-aee6-4514-9cff-9cf1e8ea9391（general-purpose，后台）。
+- 内容：票 174 两格——AC#2c（spill.go 桩如实说明；解锁依据＝177-a1 已裁不互斥）＋AC#2d（第五支零覆盖牙＋err.Error 泄漏两半）。面=internal/tools+internal/agent/spill.go。
