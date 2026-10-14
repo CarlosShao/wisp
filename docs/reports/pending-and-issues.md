@@ -17564,3 +17564,11 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **★唯一自裁点（未停手，按"重演＋可退回点"办）＝六枚 token 削尖**：我的派单把"token 在文件里不唯一"列为停手形；实现者选了"削尖至唯一＋留退回点（锚 §5.3）＋起手读数留档"⇒ **正当性交 `255-v3` 逐枚裁**（判语要求：削尖后 token 必须是**被引行真实子串**、不得改判据方向/放宽）。
 - **派 `255-v3`**（非实现者验收；面＝cmd/wisp 名册/收据两件）：裁四件＝① 两形复跑/自造 ≥3 发（含第三形）② 六枚削尖正当性 ③ A878 两处独立复量 ④ 零放宽＋行号保留边界的逐块读。派单/send 存档在盘；⛔ 不翻框（框由我凭判语翻）。
 - **面图**：`cmd/wisp` 面＝255-v3（验收；其突变窗口与 237-r1 零文件重叠、逐枚报时刻）；`237-r1`（tools -race）在飞；**`313-v` 顺延到 255-v3 之后**（313 面突变要读 `panel_config_store.go`，与名册 llm 证据行同文件——硬串行）。⛔ 未 push（未推约 313）。
+
+
+## A900｜2026-10-14 09:25:37 +08｜★前端 agent（机主会话）在 dev 落地 313 页面侧（`9e9964f8`，6 件 frontend/src +1196/−5，自带门禁）＋重编 exe 已开机（后台 `scripts/build.ps1 -Env dev`）——"配模型"离您上手只差一次双击
+
+- **事件**：机主的 frontend 会话直接照 `docs/evidence/s1/313-panel-ask.md` 实现并提交（commit 信息自述：settings 门不新增方法名/CSP 未碰/凭据只上 `credentialValue`；解析 `wisp-config-view:` 标记；stepfun 默认高亮不落盘；三步写＋成对拦；语音两云链＋realtime 双字段；§5 具名缺口如实上屏）。其门禁：typecheck rc=0／lint 0 新增／tokens:check rc=0／build rc=0／render 四门 OK／d22scan rc=0＋自检绿／internal/panel 里盯 frontend 的尺全绿；浏览器 harness 实检四态诚实渲染。⛔ 其 `frontend/src/styles/tokens.generated.css` 工作树脏件＝CRLF 幻影，**不归我们**。
+- **对我们的影响（面图更新）**：① `frontend/**` 仍是本队零写、他们在 dev 与并发提交 ⇒ git 锁重试照旧，我 A899 的提交与他们的 09:22 提交无缝同树（`edf643c9`→`9e9964f8`）；② 我们读 `frontend/**` 的测试颜色会见他们落笔而变 ⇒ **313-v 的失败集归因必须现跑 `git log -- frontend/` 并把他们的提交算进去**（三个已知红：两枚 contract 尺漂移＝197 族／C21 tokens＝`design/assets/tokens.css` 被机主移走／35r8 两枚故意红——与他们的自述一致）；③ "313-panel-ask 转交"动作**事实上已由他们自己完成**（条目从待人清单移除，改成"已在用"）。
+- **端到端**：`frontend/dist`（未跟踪）已由他们 09:13 本地构建出新页面；`go:embed all:dist`（frontend/embed.go）在重编 exe 时嵌入 ⇒ **我已在后台跑 `scripts/build.ps1 -Env dev`**（旧 `build/wisp.exe`＝10-13 09:43，不含新界面；构建含 npm 重建＋staleness 守卫＋CGO 链接＋`wisp.exe doctor` 冒烟）。建成后**机主可双击 `build/wisp.exe` 直接在界面里配 stepfun＋语音链＋录密钥**（这正是早前停车点里"下一次打扰您就是界面做出来之后"那一刻）。⚠ 构建期间 CPU 会抬（起手 46%）；255-v3/237-r1 的突变窗口照报时刻。
+- 在飞（2）：`255-v3`（名册验；面＝cmd/wisp）／`237-r1`（tools -race）＋后台构建 1。⛔ 未 push。
