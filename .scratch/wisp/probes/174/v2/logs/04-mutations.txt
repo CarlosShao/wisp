@@ -1,0 +1,46 @@
+== 174-v2 mutation leg: r6's M1/M2 rerun + my own M3/M4 (both new forms) ==
+anchor HEAD 4c7f0726; task.go sha256 e74197192745af05b3677e8ed38315a68a74c10621dbd46d0795f6f7e59d7bf0 (before AND after)
+all mutations are -overlay only (tracked task.go never touched); family = the 16 pointerNotice names (r1 8 + r2 2 + r3 2 + r4 3 + r6 1)
+
+== how each mutant was made (HEAD blob -> probes, one line each at :839) ==
+M1 (r6's file)  .scratch/wisp/probes/174/r6/mut/task-M1.go  sha256 6c1160020e28f6644febcbf89a1fa1769d5c25bc9a6283bb632d7c0baec06207
+  （"+err.Error()+"）  ->  （"+err.Error()+"："+raw+"）
+M2 (r6's file)  .scratch/wisp/probes/174/r6/mut/task-M2.go  sha256 14629468d129de6f4c70351fd81e66c98470a10daa9ba37e4fd959ab719197ac
+  （"+err.Error()+"）  ->  （"+err.Error()+"）；授权根 "+strings.Join(d.Paths.Roots(), "、")+"）
+M3 (mine, NEW form, %q spelling of the filed literal)
+  cmd: git show HEAD:internal/tools/task.go | sed '839s/（"+err.Error()+"）/（"+err.Error()+"，"+fmt.Sprintf("%q", raw)+"）/' > .../v2/mut/task-M3.go
+  diff vs HEAD = exactly `839c839`; sha256 be7ebd2bb28a23a6cdd4d5eed111123af03849a07cfeb571dfe2fb7992060c2d
+M4 (mine, NEW form, case-folded raw via strings.ToLower)
+  cmd: git show HEAD:internal/tools/task.go | sed '839s/（"+err.Error()+"）/（"+err.Error()+"，"+strings.ToLower(raw)+"）/' > .../v2/mut/task-M4.go
+  diff vs HEAD = exactly `839c839`; sha256 488a6e1aa6628bfdb8fd346290b9cb3e85c8c9f3acfc1756e290979ff87ea168
+
+== windows family runs (host, GOTMPDIR=C:\tmp\wisp174v2gotmp) ==
+base (no overlay): rc=0, --- PASS=16 --- FAIL=0 --- SKIP=0
+M1: rc=1 PASS=14 FAIL=2 -> FAIL names: ...174r3, ...Portable174r6 (r6's read reproduced: exactly 2)
+M2: rc=1 PASS=15 FAIL=1 -> FAIL name: ...Portable174r6 only; r3 green (r6's fold read reproduced)
+M3: rc=1 PASS=14 FAIL=2 -> FAIL names: ...174r3, ...Portable174r6
+M4: rc=1 PASS=15 FAIL=1 -> FAIL name: ...Portable174r6 only; r3 green
+
+== verbatim failure lines (windows) ==
+M1 r3  : :486: must not relay "C:\\tmp\\wisp174v2gotmp\\TestCanonicalize...\\001\\ALLOWLIST-LEAK-PROBE-174r3" (+ the bare token, + the 001-prefix) - three ban hits, one notice
+M1 new : :625: the filed literal must appear exactly once ... found 2 in "<20000-byte body><…body truncated here…>（tools: empty path：\u00a0\u2003\u2009\u205f）；…全文见 \u00a0\u2003\u2009\u205f…]"
+         :656: must not relay "\u00a0\u2003\u2009\u205f"
+M2 new : :656: must not relay "c:\\tmp\\wisp174v2gotmp\\testcanonicalize...\\001\\rootlist-leak-probe-174r6-a" (same for -b, same for the lowercased token)
+M3 r3  : :486: must not relay "ALLOWLIST-LEAK-PROBE-174r3"  [caught via the token INSIDE the %q spelling]
+M3 new : :656: must not relay "\"\\u00a0\\u2003\\u2009\\u205f\""  [the dedicated %q ban, exactly]
+M4 new : :625 found 2 + :656 must not relay "\u00a0\u2003\u2009\u205f"
+M4 r3  : NO FAIL - and its logged notice region PROVES the leak went through its sweep unnoticed:
+  :470 notice region under the leak sweep: "…C26 连规范化都没通过（risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions，c:\\tmp\\wisp174v2gotmp\\testcanonicalizeerrornoticemustnotrelaythefiledpath174r33629130756\\001\\allowlist-leak-probe-174r3）；…"
+  (r3's ban list is case-sensitive: filed/token/roots are banned as-spelled; strings.ToLower(raw) evades all three. The new test catches it because its filed literal is case-invariant whitespace.)
+
+== linux docker runs (Docker Desktop 29.6.2, image golang:1.27 linux/amd64, repo ro at /wisp) ==
+clean (no overlay): rc=0; r3 SKIP (t.Skipf), new PASS (portable leak-criterion verbatim identical to windows)
+M1: rc=1, FAIL = new (r3 SKIP) - r6's linux read reproduced
+M4: rc=1, FAIL = new: :656 must not relay "\u00a0\u2003\u2009\u205f"
+M3 first try: rc=0 PASS - I had passed the HOST-keyed overlay-m3.json into the container: a no-op overlay (notice showed the unmutated （tools: empty path）). Caught because the mutation "passed"; not reported as a read.
+M3 rerun with overlay-m3-linux.json (/wisp-keyed): rc=1, FAIL = new: :656 must not relay "\"\\u00a0\\u2003\\u2009\\u205f\"" - matches windows.
+
+== restore proof (after every run above) ==
+sha256sum internal/tools/task.go -> e74197192745af05b3677e8ed38315a68a74c10621dbd46d0795f6f7e59d7bf0 (same as before)
+git status --porcelain -- internal/tools/task.go internal/tools/task_output_pointer_notice_test.go -> empty
+git diff --numstat -- internal/tools/ -> empty

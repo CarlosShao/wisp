@@ -1,0 +1,38 @@
+== 174-v2 docker linux clean run; anchor HEAD 4c7f0726; test file sha 15e0ef42… (== a65bb386 blob) ==
+== cmd: docker run --rm -v "<repo>:/wisp:ro" -v wisp174r6-gomod:/go/pkg/mod -v wisp174r6-gocache:/root/.cache/go-build -w /wisp golang:1.27 go test -count=1 -v -run 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath' ./internal/tools/ ==
+2026-10-14 14:32:10 +0800
+time=2026-10-14T06:32:18.937Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+    task_output_pointer_notice_test.go:428: 前置条件缺失：造不出真 NTFS junction（mklink /J /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r31999872691/001/ALLOWLIST-LEAK-PROBE-174r3 /tmp/TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r31999872691/003/RESOLVED-LEAK-PROBE-174r3: exec: "cmd": executable file not found in $PATH: ）
+--- SKIP: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.00s)
+=== RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6
+    task_output_pointer_notice_test.go:599: portable leak-criterion verbatim: IsError=false Truncated=true announce="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在，全文见 \u00a0\u2003\u2009\u205f…]"
+    task_output_pointer_notice_test.go:640: notice region under the leak sweep: "注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在"
+--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6 (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.022s
+docker-clean-rc=0
+2026-10-14 14:32:19 +0800
+
+== environment, said plainly (NOT CI ubuntu) ==
+host = Windows Git Bash; Docker Desktop server 29.6.2; image = golang:1.27 (linux/amd64, ID 3680233e3204);
+repo mounted read-only at /wisp; module/build caches = the r6 volumes wisp174r6-gomod / wisp174r6-gocache.
+This reproduces the two readings mechanically, but the CI linux leg runs on an ubuntu host - only the next
+pushed CI run is the strongest evidence; everything here is a local linux/amd64 container.
+
+== mutation reruns in the same container ==
+M1 (r6's raw relay, r6's overlay-m1-linux.json): rc=1, --- SKIP r3, --- FAIL new only   [r6's read reproduced]
+M4 (mine, ToLower relay, overlay-m4-linux.json):  rc=1, --- SKIP r3, --- FAIL new only
+     :656 must not relay "\u00a0\u2003\u2009\u205f"
+M3 (mine, %q relay): FIRST run rc=0 PASS - I had passed the HOST-keyed overlay-m3.json into the container,
+     which is a silent no-op there (notice still showed the unmutated （tools: empty path）). Recorded as a
+     harness false-negative, caught because the mutation "passed"; NOT counted as a read.
+M3 rerun with /wisp-keyed overlay-m3-linux.json: rc=1, --- SKIP r3, --- FAIL new only
+     :656 must not relay "\"\\u00a0\\u2003\\u2009\\u205f\""   [same ban as the windows read]
+
+== ledger -skip proxy (what the next CI linux leg does with these two names) ==
+cmd: docker ... go test -count=1 -v -skip '^(TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3)$' \
+     -run 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath' ./internal/tools/
+output: === RUN new / --- PASS new / ok ... 0.014s / rc=0
+        the r3 name produces NO output at all (filtered by -skip before it runs, so no --- SKIP line) =>
+        on the linux leg this pair contributes SKIP=0 and the new name lands on the PASS side.

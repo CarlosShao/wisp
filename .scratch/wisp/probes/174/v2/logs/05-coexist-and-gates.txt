@@ -1,0 +1,69 @@
+== 174-v2 coexistence + gates + one windfall (all readings taken 2026-10-14 14:30-14:45 +0800) ==
+
+== the two names in scripts/portable-tests.sh, quoted ==
+grep -c 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3'      -> 1  (the ledger row, :682)
+grep -c 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6' -> 0  (not in the ledger)
+r3 row fields (5): name=TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 | pkg=./internal/tools/ |
+  platform=linux | class=fixture | reason starts: "ticket174 AC#6 shape 甲 (the ledger row, not the
+  POSIX-equivalent shape 乙)…" and ends: "OWNER of the POSIX half: whoever lands AC#6 shape 乙 on ticket 174,
+  a POSIX-runnable equivalent of the same criterion (the notice may not relay the filed path, no junction
+  needed); this row does not fake that half. … next= on ticket 174"
+ledger row sha256 at r5-landing (32f9823f) vs now: b1ffdb59171cf81eae28b9b65db6acc2678ceeb3e5e6036a8892b882d750fd7a == same
+ledger mechanism read (scripts/portable-tests.sh): 12 entries; platform filter keeps `any`+linux => linux-active
+  = 9 (4 any + 5 linux, r3's row the newest of the 5); each active name must still be listed by `go test -list
+  "^name$"` (stale => red); skip_pattern = '^(name1|name2|…)$' => r3's name is filtered BEFORE it can run, so it
+  prints no `--- SKIP`; the strict runner counts '^--- SKIP' and fails on any unaccounted one.
+next-CI judgment (linux leg), written out: r3 name = silently accounted (no SKIP line); r6 name = not in the
+  ledger and cannot skip (0 build tags, 0 t.Skip) => it RUNS and must PASS => this pair contributes SKIP=0 and
+  the new name sits on the PASS side. Docker proxy of exactly that: see logs/03 (skip-proxy run rc=0).
+
+== r3 side pristine (zero-regression, byte-level where it counts) ==
+git show --numstat a65bb386 -> `135 0 internal/tools/task_output_pointer_notice_test.go` (pure addition)
+diff of the file's old lines 1-522 vs HEAD lines 1-522 -> empty (PRE-523 IDENTICAL)
+anchors :376 :408 :420 :428 :439 :486 (r3 fixture comments, t.Skipf, func, call, logs, Errorf) -> SAME content, same line numbers
+git diff 2b31d728..HEAD --stat -- .scratch/wisp/probes/174/ -> only r6's own six files (+302); r1/r2/r3/r5 probes untouched
+git status --porcelain -- probes/174/{r1,r2,r3,r5} -> clean (r5's logs/03,logs/06 were untracked when r5 landed and still are)
+scripts/portable-tests.sh was NOT touched by r6: its current diff vs r6's parent is 317-r1's GOTMPDIR block only;
+  the ledger line is byte-identical to r5's commit (sha above).
+
+== gates (each run now) ==
+go build ./internal/tools/ -> rc=0 ; go build ./... -> rc=0 (tree also carries 253-r6's in-flight cmd/wisp edit + go.mod)
+GOOS=linux go vet ./internal/tools/ -> rc=0 (logs/02)
+gofumpt v0.12.0 (go1.27.1) -l internal/tools/task_output_pointer_notice_test.go internal/tools/task.go -> empty, rc=0
+bash scripts/d22scan.sh  (GOTMPDIR='C:\tmp\wisp174v2gotmp') -> "d22scan: clean - no D22 ban violations",
+  ban #8 internal/=550, cmd/=126, rc=0
+bash scripts/check-path-length-budget.sh -> tracked=12755 over-budget=60 roster=60 not-in-roster=0,
+  VERDICT GREEN, rc=0  (the dispatcher's "现 60=60" reproduced)
+
+== windfall (not r6's; found because my first d22scan ran with GOTMPDIR unset) ==
+bash scripts/d22scan.sh with GOTMPDIR unset -> rc=1, verbatim:
+  d22scan.sh: positive control - runtests.sh -C tools/d22scan ./...
+  /d/work/.../tools/d22scan/runtests.sh: line 92: LOCALAPPDATAwisp: unbound variable
+line 92 (tools/d22scan/runtests.sh): gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\wisp-test-gotmp"}/d22scan-…"
+  — single backslash inside ${…:-…}: under `set -eu` (line 39) the backslash escapes into the name and the
+  variable LOCALAPPDATAwisp does not exist. Introduced by commit 581dd252 ("微修 runtests.sh 第四处折法
+  （镜像317-r1形）"), whose diff shows the previous form ${LOCALAPPDATA//\\//}/wisp-test-gotmp replaced by the
+  single-backslash form. The three sibling scripts kept the doubled backslash that works:
+    scripts/portable-tests.sh:155  ${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}
+    scripts/winsec-tests.sh:69    same \w double form
+    scripts/wisp-cli-tests.sh:82  same double form
+  => the fourth mirror dropped one backslash.
+repro table (sh and bash, LOCALAPPDATA set, X unset): single \ => "LOCALAPPDATAwisp: unbound variable";
+  \\ => [C:\Users\swq\AppData\Local\wisp-test-gotmp]; braced-single is silently wrong (no separator);
+  portable-tests.sh's exact shape evaluates correctly. Script: outside the repo at C:\tmp\wisp174v2gotmp\parse-test.sh
+not registered anywhere yet at 14:38 (grep 'LOCALAPPDATAwisp|unbound variable' pending-and-issues.md HANDOVER.md -> 0);
+  in the SAME window 253-r6 hit the identical line in its own d22scan control; the orchestrator fixed it in
+  76b9e214 (2026-10-14 14:49:32, single -> double backslash, "字节级验证") and registered it as A929. The six-
+  spelling repro above was taken BEFORE the fix (state 4c7f0726) and matches 76b9e214's diff byte for byte.
+post-fix verification (mine): bash scripts/d22scan.sh with GOTMPDIR UNSET -> "d22scan: clean - no D22 ban
+  violations", rc=0 (was rc=1 before the fix).
+blast radius: WINDOWS-LOCAL only (the block runs when $GOTMPDIR empties on a windows GOOS); ubuntu CI never takes it.
+
+== window (not touched) ==
+in-flight while I ran: cmd/wisp/panel_control_windows.go (+55) and go.mod (go-webview2 direct) = leg 253-r6's edit;
+  unrelated to internal/tools; left alone. Zero writes outside my two deliverable paths + ticket bullet.
+late commits during my leg: 4de57a83, 2298f7d2+89d29fce (253-r6), 76b9e214 (orchestrator: 253-r6 receipt +
+  runtests.sh fix + A929) -> terminal HEAD 76b9e214. All main readings were taken at 4c7f0726; the post-fix
+  d22scan rerun and the final sha checks at 76b9e214. internal/tools/ and portable-tests.sh: zero overlap
+  (git diff --stat 4c7f0726..HEAD -- internal/tools/ scripts/portable-tests.sh = empty); test blob 15e0ef42…
+  and task.go e7419719… unchanged across both points.

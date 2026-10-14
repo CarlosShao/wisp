@@ -1,0 +1,17 @@
+== 174-v2 windows leg: the dispatch-required run ==
+cmd: go test -count=1 -v -run 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath' ./internal/tools/
+     (GOTMPDIR='C:\tmp\wisp174v2gotmp', go1.27.1 windows/amd64, HEAD 4c7f0726, test-file sha 15e0ef42…)
+--- RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3
+    :439: announce="[…省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，C26 连规范化都没通过（risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions）；注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状），全文见 C:\\tmp\\wisp174v2gotmp\\TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r34063395985\\001\\ALLOWLIST-LEAK-PROBE-174r3…]"
+    :470: notice region under the leak sweep: "注意：这条路径现在读不到，C26 连规范化都没通过（risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions）；注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状）"
+--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3 (0.04s)         <- real mklink /J ran; NOT a skip
+--- RUN   TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6
+    :599: portable leak-criterion verbatim: IsError=false Truncated=true announce="[…省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在，全文见 \u00a0\u2003\u2009\u205f…]"
+    :640: notice region under the leak sweep: "注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在"
+--- PASS: TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6 (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	1.959s
+rc=0
+== r3 zero-regression read ==
+same two tests green with no overlay; family baseline (16 pointerNotice names, raw/base-family.txt): rc=0 PASS=16 FAIL=0 SKIP=0
+r3's notice sentence on this host is byte-for-byte the one r6 recorded (C26 reparse text; pointer sentence unchanged)
