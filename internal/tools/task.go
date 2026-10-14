@@ -836,7 +836,14 @@ func (d TaskDeps) pointerNotice(raw string) string {
 	canon, err := d.Paths.Canonicalize(raw)
 	switch {
 	case err != nil:
-		notes = append(notes, "注意：这条路径现在读不到，C26 连规范化都没通过（"+err.Error()+"）")
+		// The step is named and the sentence stops. The upstream text is NOT
+		// spliced in: this arm was the one place err.Error() reached the
+		// model-visible reply, and the relay is unbounded - any future C26
+		// error text would ride it into the context (174-v1/A375; 174-a3
+		// form 乙, struck by A587 as one line with zero criteria moved). The
+		// sentence below is the one internal/agent/spill.go already speaks for
+		// this same failure, so both legs now say the same thing.
+		notes = append(notes, "注意：这条路径现在读不到，C26 连规范化都没通过")
 	case !d.Paths.InAllowlist(canon):
 		notes = append(notes, "注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；"+
 			"要用户先把所属目录加进 [fs] allowed_dirs 才读得回来")
