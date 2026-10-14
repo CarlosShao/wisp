@@ -18090,3 +18090,15 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **红复盘（记账）**：`origin/dev` 上 `:-3`＋AC#3 钉子（已推）⇒ listing 350>300 ⇒ `38561478699` exit 2。**修复提交随本账**（`scripts/slo-freshness.sh` 一枚）；下一发定时 18:23Z 验绿。⚠ 教训：**收口编辑落工作树后必须立刻入库**（我把它夹在收件与派单之间忘了 pathspec——136-v 这次是"替我发现"而非我自查，登记）。
 - **口径漂移已报**（不驳）：`b38567a9..HEAD -- scripts/` 实为两枚（`slo-freshness.sh`＋我 178 收口的 `check-path-length-budget.sh`）；派单里"只许一枚/133+/22−"只对单提交成立。
 - **136-v 自报的错位目录**：`D:\d\tmp\wisp136v` 与仓旁 `projects plans Wisp\.scratch\...` 副本（后者无 .git、且早存他腿同病内容）——"空格代斜杠/路径折叠"陷阱第 N 次，全线警惕。
+
+## A959｜2026-10-14 21:21 +08｜174-r7 收件（AC#2c＝**早已落地**（`5b14afe5`，A575 在案）本腿交现读复核＋两向三态；AC#2d＝C26 文本泄漏那半**已落齐**〔新判据＋1 行修〕）＋翻 AC#2c/#2d；**AC#2b 疑早已接线**（`run.go:547` 现读带 `Paths`）⇒ 已预警在飞 `174-r9` 转"复核＋三态"；`r8` 空回执＝死腿（只留空目录，零提交）⇒ 无遗产改名重派 `174-r9`
+
+- 三把尺：`67a7ab41`／`dd2e4fe3` 真在；`probes/174/r7/`（00＋logs 01–05＋mut 留盘）在盘；亲跑 `-run 174 ./internal/agent/` **ok 2.754s**、`./internal/tools/` **ok 3.695s**。TaskStop 结算（completed）。
+- 编队（4）：写×2＝171s/174-r9、验×1＝133-v（+读者面 174-r9 自核）⇒ 写<3 的具名原因：其余写票动作面仍排 `cmd/wisp`（本波写腿只 174-r9 一枚）＋`probes/171`（171s）。
+
+## A960｜2026-10-14 21:21 +08｜★机主模型页 v3 反馈（StepFun **plan/api 双模式**＋**模型目录空**＝"暂无模型"卡死默认模型选择）＋编排者 Go 侧普查＋`docs/evidence/s1/model-page-v3-brief.md` 已成文（给前端 agent 转交件）＋**三件待机主点头**（接口面变更）
+
+- 机主原话要点：audio3 只在 **api 计费**下免费；界面只能给 stepfun 一行一个基底 ⇒ 二选一；"根本不符合主流 harness"。
+- Go 侧现读（21:2x）：行结构含 **`billing(plan|pay-per-token)` 枚举**（字段已存在）；预设 stepfun 默认基底**就是** `https://api.stepfun.com/v1`（API 口）；**非预设名合法**（`validate.go:209-212` 逐字"非预设 provider 必须显式写 protocol"）⇒ **数据层允许 `stepfun-plan`/`stepfun-api` 两行**。缺口：① 无 `billing` 写入字段；② `provider_row_create` 选择器只吃预设名（建不出自定义名第二行）；③ 已存在行无"添加模型条目"写入路径。
+- **待机主点头（点头即由编排者落地；不点头则前端只做只读展示与骨架）**：① `provider_billing` 写入字段；② 建行支持自定义名（或"复制 stepfun 为 stepfun-api"）；③ 模型条目写入 **或** "从 `/v1/models` 拉取列表"端口（后者一并解"模型真名单"老账）。
+- 另：机主若直接给**模型 id 名单**（stepfun 文本模型＋audio3），可先落"预设默认模型目录"，无需等端口。
