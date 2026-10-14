@@ -17810,3 +17810,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **裁决（履行"归编排者裁"）**：`config.reload` **不算入向名、不进名册**——依据＝`config_reload.go:90`（派单 :86 是注释块）唯一消费点 `:285` 为出向 L2 身份；入向链 `bridge.go:126→:146→composer_dispatch.go:181` 两宿主同走此名册、页面无处发；文件自述 `:82-87` 非 C4/C17；**将来若开"面板触发热加载"须走 C17 面且五分母同批**（写进票尾即本条）。
 - **门禁抽读**：整腿 `internal/panel` **141 PASS/5 FAIL/0 SKIP**（5 红＝在册族：ApprovalCardView／35r8×2／ComposerContract／C21；⚠ `PanelColourLiterals` 已转绿——红名册随树动，引用带时刻）／d22scan clean／长度门 GREEN。
 - **253 现态**：AC#1/#2 已勾；AC#3（`253-r6` 在飞）／AC#4（结线）待。⛔ 未推＝`e3788f08` 后多笔。
+
+
+## A928｜2026-10-14 14:26:33 +08｜★票 272 整票收口（七框全勾＋改名 -done＋名册 60=60 GREEN；AC#5/AC#7 凭 272-v2 双成立）＋两枚"族在册名未入册"新名登记＋272-v2 自曝仓外残件登记
+
+- **272-v2 收件（三把尺）**：`7a42e168`（锚）＋`db5ec603`（交付）在／裁决件 98 行＋probes/272/v2（锚＋logs 12）在／编排者亲跑家族 `-run 'TestTicket223' ./cmd/wisp/` 读数在案。判语：**AC#5＝成立**（四数全现跑：d22scan 正控先绿＋clean／gofmt+gofumpt 限 .go 空／`go vet ./cmd/wisp/` rc=0／多包红名册逐名归因，**314 死区两发未复现**（330.4s/286.1s 跑完）——唯一红 `TestAC2SealNotice…` 与 12:0x 基线逐名同集）；**AC#7＝成立**（自建 overlay 双色：welcome `PASS 4.22s`／零份对照 `FAIL 44.97s @:623` await ⇒ 非空转）。
+- **272 收口**：七框全勾＋Status 留档＋`git mv -done`＋名册补条目 ⇒ 门 **GREEN 60=60**。附记：票 316（重复票）已撤、其现读并入本票。AC#7 留档句含**前向残留**：单份 post-mark 欢迎语仍假绿（arm1 只堵种前份、arm2 只堵 ≥2 份；钉死需产码侧因果锚点＝人工批准面），**本票不选形不修、据实留档**。
+- **★两枚"族在册、名未入册"新名（272-v2 上报，本笔登记）**：`TestAC4InstallDirWidthIsDeliberateAndHasABreakLine`（**环境形**：mandated `GOTMPDIR=C:\tmp` 红／默认 `%TEMP%` 绿）／`TestBallPanelGesturesReachThePanelThread`（**真窗族漂色**：整包红 19.55s「failed measurement」、单跑 0.81/0.69s 绿、CI run327/328 绿）。后程红名册对账引用这两名时按其族读。
+- **272-v2 自曝**：两笔 cwd 笔误把空目录/两枚小件写进**仓外同名邻近目录** `D:\work\workspace\projects plans Wisp`（该目录生于 12:20:08＝我先前同类笔误；按"只建不删"保留、登记在此）。
+- **编队**：`253-r6`（在飞、已进验证段）；本刻其余全收。写位待补（见 `A925` 补的机制：剩余写活＝114 纠缠九格等；下一手从 253-r6 交件与 114 预读里出）。⛔ 未推＝`e3788f08` 后多笔。
