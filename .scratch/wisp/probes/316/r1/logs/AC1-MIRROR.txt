@@ -1,0 +1,18 @@
+time=2026-10-14T13:21:29.069+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+time=2026-10-14T13:21:32.728+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:21:32 mockllm: serving on http://127.0.0.1:50069 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:21:32.748+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply2737319337\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:21:32.753+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply2737319337\002\logs min_level=info early_records=3 early_dropped=0
+time=2026-10-14T13:21:32.765+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply2737319337\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:21:32.786+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply2737319337\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:21:32.794+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:21:32Z duration_ms=8
+time=2026-10-14T13:21:32.804+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply2737319337\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:21:32.813+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:21:32Z duration_ms=9
+time=2026-10-14T13:21:32.825+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply2737319337\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:21:32.831+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:21:32Z duration_ms=5
+time=2026-10-14T13:21:32.835+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:21:32.838+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket223RestartTierSaysItWillNotApply (4.81s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	7.078s

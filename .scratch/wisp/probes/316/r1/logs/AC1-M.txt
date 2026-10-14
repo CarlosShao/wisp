@@ -1,0 +1,23 @@
+time=2026-10-14T13:21:44.494+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+time=2026-10-14T13:21:47.743+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:21:47 mockllm: serving on http://127.0.0.1:59942 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:21:47.765+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply540664878\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:21:47.771+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply540664878\002\logs min_level=info early_records=3 early_dropped=0
+time=2026-10-14T13:21:47.782+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply540664878\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:21:47.801+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply540664878\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:21:47.807+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:21:47Z duration_ms=6
+time=2026-10-14T13:21:47.815+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply540664878\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:21:47.822+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:21:47Z duration_ms=6
+time=2026-10-14T13:21:47.830+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply540664878\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:21:47.835+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:21:47Z duration_ms=4
+time=2026-10-14T13:21:47.839+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:21:47.843+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    config_reload_223_test.go:596: the operator stream carried "本次运行不会生效" 1 time(s) BEFORE this run planted the edit; a copy nobody planted cannot be evidence that this run will not use the new values. stdout before the plant:
+        wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、head / view <编号> 看卡片；quit 退出监听。
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        wisp run: 这些段的改动本次运行不会生效（D36 重启档，需要重启进程）。原因：上一版横幅。涉及：app.autostart / app.language / app.single_instance。注意两件事都没发生：文件里的新值没有被丢掉。
+--- FAIL: TestTicket223RestartTierSaysItWillNotApply (4.38s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	6.811s
+FAIL

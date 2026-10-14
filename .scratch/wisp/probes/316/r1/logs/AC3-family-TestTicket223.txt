@@ -1,0 +1,235 @@
+time=2026-10-14T13:28:15.267+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223RunArmsTheReloadTick
+time=2026-10-14T13:28:18.659+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:28:18 mockllm: serving on http://127.0.0.1:62456 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:28:18.682+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223RunArmsTheReloadTick3617643346\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:18.688+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223RunArmsTheReloadTick3617643346\002\logs min_level=info early_records=3 early_dropped=0
+time=2026-10-14T13:28:18.699+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223RunArmsTheReloadTick3617643346\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:18.722+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RunArmsTheReloadTick3617643346\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:28:18.729+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:28:18Z duration_ms=7
+time=2026-10-14T13:28:18.737+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RunArmsTheReloadTick3617643346\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:28:18.743+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:28:18Z duration_ms=6
+time=2026-10-14T13:28:18.751+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RunArmsTheReloadTick3617643346\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:28:18.758+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:28:18Z duration_ms=7
+time=2026-10-14T13:28:18.763+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:28:18.767+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket223RunArmsTheReloadTick (4.57s)
+=== RUN   TestTicket223HandEditedFsLooseningCostsAnL2Card
+time=2026-10-14T13:28:23.311+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:28:23 mockllm: serving on http://127.0.0.1:56363 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:28:23.328+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223HandEditedFsLooseningCostsAnL2Card732369938\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:23.331+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223HandEditedFsLooseningCostsAnL2Card732369938\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T13:28:23.343+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223HandEditedFsLooseningCostsAnL2Card732369938\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:23.363+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223HandEditedFsLooseningCostsAnL2Card732369938\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:28:23.373+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:28:23Z duration_ms=9
+time=2026-10-14T13:28:23.383+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223HandEditedFsLooseningCostsAnL2Card732369938\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:28:23.388+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:28:23Z duration_ms=5
+time=2026-10-14T13:28:23.398+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223HandEditedFsLooseningCostsAnL2Card732369938\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:28:23.405+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:28:23Z duration_ms=7
+time=2026-10-14T13:28:23.411+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:28:23.415+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-14T13:28:24.438+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestTicket223HandEditedFsLooseningCostsAnL2Card (4.65s)
+=== RUN   TestTicket223RefusedLooseningKeepsOldValues
+time=2026-10-14T13:28:27.818+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:28:27 mockllm: serving on http://127.0.0.1:65388 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:28:27.835+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223RefusedLooseningKeepsOldValues4252856744\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:27.838+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223RefusedLooseningKeepsOldValues4252856744\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T13:28:27.848+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223RefusedLooseningKeepsOldValues4252856744\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:27.867+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RefusedLooseningKeepsOldValues4252856744\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:28:27.874+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:28:27Z duration_ms=5
+time=2026-10-14T13:28:27.882+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RefusedLooseningKeepsOldValues4252856744\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:28:27.888+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:28:27Z duration_ms=5
+time=2026-10-14T13:28:27.896+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RefusedLooseningKeepsOldValues4252856744\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:28:27.903+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:28:27Z duration_ms=7
+time=2026-10-14T13:28:27.909+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:28:27.911+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-14T13:28:28.933+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestTicket223RefusedLooseningKeepsOldValues (7.50s)
+=== RUN   TestTicket223TighteningRaisesNoCard
+time=2026-10-14T13:28:35.243+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:28:35 mockllm: serving on http://127.0.0.1:63749 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:28:35.259+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223TighteningRaisesNoCard110376867\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:35.262+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223TighteningRaisesNoCard110376867\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T13:28:35.272+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223TighteningRaisesNoCard110376867\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:35.293+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223TighteningRaisesNoCard110376867\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:28:35.301+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:28:35Z duration_ms=7
+time=2026-10-14T13:28:35.308+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223TighteningRaisesNoCard110376867\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:28:35.313+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:28:35Z duration_ms=5
+time=2026-10-14T13:28:35.322+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223TighteningRaisesNoCard110376867\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:28:35.327+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:28:35Z duration_ms=5
+time=2026-10-14T13:28:35.332+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:28:35.334+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-14T13:28:36.336+08:00 level=INFO msg="config: locked section tightened, hot-applied" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestTicket223TighteningRaisesNoCard (4.37s)
+=== RUN   TestTicket223ModeLooseningChangesTheRunningModeAfterAllow
+time=2026-10-14T13:28:39.540+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:28:39 mockllm: serving on http://127.0.0.1:60218 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:28:39.560+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1478859666\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:39.565+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1478859666\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T13:28:39.576+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1478859666\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:39.595+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1478859666\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:28:39.606+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:28:39Z duration_ms=11
+time=2026-10-14T13:28:39.614+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1478859666\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:28:39.622+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:28:39Z duration_ms=7
+time=2026-10-14T13:28:39.630+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow1478859666\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:28:39.636+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:28:39Z duration_ms=5
+time=2026-10-14T13:28:39.642+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:28:39.644+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-14T13:28:40.666+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+--- PASS: TestTicket223ModeLooseningChangesTheRunningModeAfterAllow (4.35s)
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+time=2026-10-14T13:28:43.933+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:28:43 mockllm: serving on http://127.0.0.1:59529 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:28:43.951+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply402572393\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:43.954+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply402572393\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T13:28:43.965+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply402572393\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:43.983+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply402572393\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:28:43.991+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:28:43Z duration_ms=7
+time=2026-10-14T13:28:44.002+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply402572393\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:28:44.012+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:28:44Z duration_ms=9
+time=2026-10-14T13:28:44.020+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223RestartTierSaysItWillNotApply402572393\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:28:44.069+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:28:44Z duration_ms=49
+time=2026-10-14T13:28:44.075+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:28:44.081+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket223RestartTierSaysItWillNotApply (4.40s)
+=== RUN   TestTicket223FailureSentencesAreDistinct
+=== RUN   TestTicket223FailureSentencesAreDistinct/缺失
+time=2026-10-14T13:28:48.575+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:28:48 mockllm: serving on http://127.0.0.1:49952 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:28:48.590+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct缺失3396501338\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:48.594+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct缺失3396501338\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T13:28:48.602+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct缺失3396501338\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:48.620+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct缺失3396501338\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:28:48.627+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:28:48Z duration_ms=7
+time=2026-10-14T13:28:48.635+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct缺失3396501338\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:28:48.640+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:28:48Z duration_ms=4
+time=2026-10-14T13:28:48.647+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct缺失3396501338\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:28:48.652+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:28:48Z duration_ms=5
+time=2026-10-14T13:28:48.656+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:28:48.660+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket223FailureSentencesAreDistinct/语法错
+time=2026-10-14T13:28:52.859+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:28:52 mockllm: serving on http://127.0.0.1:52025 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:28:52.877+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct语法错2560179575\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:52.880+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct语法错2560179575\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T13:28:52.892+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct语法错2560179575\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:52.914+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct语法错2560179575\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:28:52.919+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:28:52Z duration_ms=4
+time=2026-10-14T13:28:52.927+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct语法错2560179575\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:28:52.933+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:28:52Z duration_ms=5
+time=2026-10-14T13:28:52.940+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct语法错2560179575\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:28:52.949+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:28:52Z duration_ms=9
+time=2026-10-14T13:28:52.955+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:28:52.959+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket223FailureSentencesAreDistinct/声明了版本但坏在后面
+time=2026-10-14T13:28:57.285+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:28:57 mockllm: serving on http://127.0.0.1:65088 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:28:57.303+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct声明了版本但坏930189812\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:57.307+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct声明了版本但坏930189812\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T13:28:57.317+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct声明了版本但坏930189812\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:28:57.335+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct声明了版本但坏930189812\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:28:57.343+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:28:57Z duration_ms=7
+time=2026-10-14T13:28:57.350+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct声明了版本但坏930189812\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:28:57.356+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:28:57Z duration_ms=5
+time=2026-10-14T13:28:57.365+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinct声明了版本但坏930189812\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:28:57.372+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:28:57Z duration_ms=6
+time=2026-10-14T13:28:57.376+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:28:57.380+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket223FailureSentencesAreDistinct/schema未知键
+time=2026-10-14T13:29:01.629+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:29:01 mockllm: serving on http://127.0.0.1:61110 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:29:01.645+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinctschema未知键4070150919\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:29:01.649+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinctschema未知键4070150919\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T13:29:01.660+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinctschema未知键4070150919\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:29:01.685+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinctschema未知键4070150919\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:29:01.694+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:29:01Z duration_ms=9
+time=2026-10-14T13:29:01.702+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinctschema未知键4070150919\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:29:01.707+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:29:01Z duration_ms=4
+time=2026-10-14T13:29:01.716+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223FailureSentencesAreDistinctschema未知键4070150919\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:29:01.721+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:29:01Z duration_ms=5
+time=2026-10-14T13:29:01.727+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:29:01.729+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket223FailureSentencesAreDistinct (17.64s)
+    --- PASS: TestTicket223FailureSentencesAreDistinct/缺失 (4.59s)
+    --- PASS: TestTicket223FailureSentencesAreDistinct/语法错 (4.28s)
+    --- PASS: TestTicket223FailureSentencesAreDistinct/声明了版本但坏在后面 (4.43s)
+    --- PASS: TestTicket223FailureSentencesAreDistinct/schema未知键 (4.35s)
+=== RUN   TestTicket223PanelInboundSaysHotReloadIsDisabled
+time=2026-10-14T13:29:02.776+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223PanelInboundSaysHotReloadIsDisabled8343665\001\config.toml.bak-1 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:29:02.777+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223PanelInboundSaysHotReloadIsDisabled8343665\001\.wisp-config-3601422441.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:29:02.781+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223PanelInboundSaysHotReloadIsDisabled8343665\001\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestTicket223PanelInboundSaysHotReloadIsDisabled (0.02s)
+=== RUN   TestTicket223PermissionDeniedSitsInItsOwnSentence
+time=2026-10-14T13:29:06.160+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/14 13:29:06 mockllm: serving on http://127.0.0.1:64327 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-14T13:29:06.176+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223PermissionDeniedSitsInItsOwnSentence603147205\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:29:06.180+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp316r1gotmp\TestTicket223PermissionDeniedSitsInItsOwnSentence603147205\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-14T13:29:06.189+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223PermissionDeniedSitsInItsOwnSentence603147205\002 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T13:29:06.211+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223PermissionDeniedSitsInItsOwnSentence603147205\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T13:29:06.217+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T05:29:06Z duration_ms=5
+time=2026-10-14T13:29:06.225+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223PermissionDeniedSitsInItsOwnSentence603147205\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T13:29:06.230+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T05:29:06Z duration_ms=5
+time=2026-10-14T13:29:06.237+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp316r1gotmp\TestTicket223PermissionDeniedSitsInItsOwnSentence603147205\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T13:29:06.244+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T05:29:06Z duration_ms=6
+time=2026-10-14T13:29:06.249+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T13:29:06.254+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket223PermissionDeniedSitsInItsOwnSentence (4.56s)
+=== RUN   TestTicket223R2FailureSentenceRouting
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_注释以方括号开头_C1
+time=2026-10-14T13:29:07.346+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223R2FailureSentenceRouting声明当前版_注释以350152153\001\.wisp-config-1064692468.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_注释以方括号开头_C1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_CRLF_E1
+time=2026-10-14T13:29:07.424+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223R2FailureSentenceRouting声明当前版_CRLF_E12867217912\001\.wisp-config-2642881237.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_CRLF_E1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_无空格_G1
+time=2026-10-14T13:29:07.491+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223R2FailureSentenceRouting声明当前版_无空格_3620524725\001\.wisp-config-2870310680.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_无空格_G1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明当前版_缩进版本行_L1
+time=2026-10-14T13:29:07.558+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223R2FailureSentenceRouting声明当前版_缩进版3693520583\001\.wisp-config-764391110.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    config_sentences_223r2_test.go:123: ROUTING "声明当前版_缩进版本行_L1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明未来版_正文语法坏_J1
+time=2026-10-14T13:29:07.624+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223R2FailureSentenceRouting声明未来版_正文语983300818\001\.wisp-config-2838951267.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    config_sentences_223r2_test.go:123: ROUTING "声明未来版_正文语法坏_J1"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/读不出版本_A1_基线不动
+time=2026-10-14T13:29:07.692+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223R2FailureSentenceRouting读不出版本_A1_基线1289500501\001\.wisp-config-163371160.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    config_sentences_223r2_test.go:123: ROUTING "读不出版本_A1_基线不动"
+          raw err = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明旧版_坏表头_A2_仍归迁移
+time=2026-10-14T13:29:07.758+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223R2FailureSentenceRouting声明旧版_坏表头_A2_3559994352\001\.wisp-config-1997105049.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    config_sentences_223r2_test.go:123: ROUTING "声明旧版_坏表头_A2_仍归迁移"
+          raw err = config: config.toml: cannot migrate from schema version 1: not valid TOML: toml: expected character ]; the file was left untouched - fix or restore it manually, it will never be silently reset
+          PRODUCTION LINE = cause=migration detail="config.toml 声明了一个这份 Wisp 不会迁移的 schema_version（文件被原样留着，不会被重置）。本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它"
+=== RUN   TestTicket223R2FailureSentenceRouting/解析得开_未知键_不抢语法错
+time=2026-10-14T13:29:07.825+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223R2FailureSentenceRouting解析得开_未知键_不2104894250\001\.wisp-config-2669631294.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    config_sentences_223r2_test.go:123: ROUTING "解析得开_未知键_不抢语法错"
+          raw err = config: config.toml: unknown key "this_key_does_not_exist" at line 3
+          PRODUCTION LINE = cause=unknown-key detail="config.toml 语法没问题，但里面有这份 schema 不认的键（拼错的键会被这样拒绝，而不是被忽略）。本次运行继续用内存里的旧配置"
+=== RUN   TestTicket223R2FailureSentenceRouting/声明未来版_正文解析得开_归更高版本自己那句
+time=2026-10-14T13:29:07.892+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp316r1gotmp\TestTicket223R2FailureSentenceRouting声明未来版_正文解3774907544\001\.wisp-config-314573607.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    config_sentences_223r2_test.go:123: ROUTING "声明未来版_正文解析得开_归更高版本自己那句"
+          raw err = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+          PRODUCTION LINE = cause=newer-build detail="config.toml 是由一个更新的 Wisp 写出来的（它声明的 schema_version 比这份程序懂得的高；这一条不说语法错，也不说值不合法，因为它还没走到校验）。本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它"
+--- PASS: TestTicket223R2FailureSentenceRouting (0.61s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_注释以方括号开头_C1 (0.08s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_CRLF_E1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_无空格_G1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明当前版_缩进版本行_L1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明未来版_正文语法坏_J1 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/读不出版本_A1_基线不动 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明旧版_坏表头_A2_仍归迁移 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/解析得开_未知键_不抢语法错 (0.07s)
+    --- PASS: TestTicket223R2FailureSentenceRouting/声明未来版_正文解析得开_归更高版本自己那句 (0.07s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	54.971s
