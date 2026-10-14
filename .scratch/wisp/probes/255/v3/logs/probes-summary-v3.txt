@@ -1,0 +1,143 @@
+== 255-v3 自造反证与门禁 汇总（交付态 sha 上跑；逐发窗口见各 probe 原文，留盘不入库） ==
+gate: go test -count=1 -v -run 'TestTicket255' ./cmd/wisp/  rc=0  20 PASS / 0 FAIL  23.186s  窗口 09:27:09-09:27:39 +08
+delivered shas: roster 6b840071c183b3ed6470935508247037c416ed3787b22c1b50f839a56f2b55f2 / test 2195e669aab19be80643d0040be67c3fdbd716d082b4e04de25d60caf68dfa4e
+
+== independent static re-measure (verify-roster-255v3.py) ==
+ruler1(path:LINE) total=27 unique=20   ruler2(:LINE [) items=23 rows=22   test-side .go:NN lines=2   (parent state: 27/20, 23/22 identical -- see anchor)
+roster verdict cites checked=14 all token-unique+on-recorded-line=True
+  llm                          cmd/wisp/panel_config_store.go:98          hits=[98] recorded==hit=True
+  agent                        cmd/wisp/run.go:991                        hits=[991] recorded==hit=True
+  models                       cmd/wisp/models.go:163                     hits=[163] recorded==hit=True
+  hotkey                       cmd/wisp/resident_ball_windows.go:322      hits=[322] recorded==hit=True
+  ball                         internal/ball/ball_windows.go:64           hits=[64] recorded==hit=True
+  audio                        cmd/wisp/resident_audio_windows.go:256     hits=[256] recorded==hit=True
+  privacy                      internal/observe/logging.go:51             hits=[51] recorded==hit=True
+  observe                      cmd/wisp/logsink.go:149                    hits=[149] recorded==hit=True
+  panel                        cmd/wisp/panel_resident_windows.go:207     hits=[207] recorded==hit=True
+  panel                        cmd/wisp/panel_host_windows.go:262         hits=[262] recorded==hit=True
+  voice.tts.speed              cmd/wisp/resident_audio_windows.go:257     hits=[257] recorded==hit=True
+  voice.punctuation            cmd/wisp/resident_audio_windows.go:257     hits=[257] recorded==hit=True
+  voice.wake_word.thresholds   cmd/wisp/resident_audio_windows.go:257     hits=[257] recorded==hit=True
+  voice.wake_word.veto_words   cmd/wisp/resident_audio_windows.go:257     hits=[257] recorded==hit=True
+all-14-section scan vs sectionReadSites: match=True  Voice=['cmd/wisp/panel_config_store.go', 'cmd/wisp/resident_audio_windows.go', 'internal/panel/config_handlers.go']
+bare (pre-sharpening) tokens still non-unique now:
+  llm            cmd/wisp/panel_config_store.go         hits=[98, 99]
+  ball           internal/ball/ball_windows.go          hits=[64, 144, 145, 147, 148, 150, 151, 229, 233, 346, 377, 560, 698]
+  audio          cmd/wisp/resident_audio_windows.go     hits=[32, 145, 253, 256, 273]
+  privacy        internal/observe/logging.go            hits=[50, 51, 88]
+  voice          cmd/wisp/resident_audio_windows.go     hits=[253, 257, 262]
+  agent_comment  cmd/wisp/run.go                        hits=[763, 1014]
+
+== P1 insert above internal/observe/logging.go:51 (log probe-P1-insert-logging.txt, 837B) ==
+  start 09:29:14 +08
+  -- sha before --
+  ae6ddfe2ee9187914d64eea86ff383067e1c7494b8532e872c7a8d7e8f0a189e *internal/observe/logging.go
+  -- sha after mutation --
+  a5740d48056e9e28c07615ca2b7dcfd03829b43b4934d115ee24736bc9bb6603 *internal/observe/logging.go
+  -- run new ruler --
+  rc=0
+  config_receipt_255_test.go:220: row "privacy": recorded reading internal/observe/logging.go:51 drifted, the token "RedactPaths bool" now uniquely sits at line 52
+  --- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+  ok  	github.com/CarlosShao/wisp/cmd/wisp	2.646s
+  -- restore --
+  -- sha after restore (must equal before) --
+  ae6ddfe2ee9187914d64eea86ff383067e1c7494b8532e872c7a8d7e8f0a189e *internal/observe/logging.go
+  end 09:29:30 +08
+
+== P2 change token cmd/wisp/logsink.go:149 (log probe-P2-token-change-logsink.txt, 1013B) ==
+  start 09:29:41 +08
+  -- sha before --
+  f06e2a5b249230456818a82bf274b57f0c8df12096af160ab6c04a2a1ae62c11 *cmd/wisp/logsink.go
+  -- sha after mutation --
+  d3d339b7254ab4bf2261fc38db917304eb8b6ca08b7fa79b77623383cfd92260 *cmd/wisp/logsink.go
+  -- token hits after mutation (expect 0) --
+  -- run new ruler --
+  rc=1
+  config_receipt_255_test.go:223: row "observe" cites cmd/wisp/logsink.go:149 for "Level: logSinkLevel" and the token is now nowhere in that file (the recorded line reads "p, err := observe.InitLog(observe.LogConfig{Dir: dir, Level:  logSinkLevel})") - the evidence changed, so re-adjudicate this row
+  --- FAIL: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+  FAIL
+  FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.004s
+  FAIL
+  -- restore --
+  -- sha after restore (must equal before) --
+  f06e2a5b249230456818a82bf274b57f0c8df12096af160ab6c04a2a1ae62c11 *cmd/wisp/logsink.go
+  end 09:29:54 +08
+
+== P3 duplicate token internal/observe/logging.go:51 (log probe-P3-nonunique-logging.txt, 994B) ==
+  start 09:30:04 +08
+  -- sha before --
+  ae6ddfe2ee9187914d64eea86ff383067e1c7494b8532e872c7a8d7e8f0a189e *internal/observe/logging.go
+  -- sha after mutation --
+  8f6b1b1b04b95cc464a4c44cc2841ac56506967e6a636020230ab1f4836a484d *internal/observe/logging.go
+  -- token hits after mutation (expect 2) --
+  -- run new ruler --
+  rc=1
+  config_receipt_255_test.go:225: row "privacy" cites internal/observe/logging.go:51 for "RedactPaths bool", but that token is not unique in the file (it hits lines [51 52]): a content anchor must pin exactly one line, so sharpen the token and re-adjudicate this row
+  --- FAIL: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+  FAIL
+  FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.749s
+  FAIL
+  -- restore --
+  -- sha after restore (must equal before) --
+  ae6ddfe2ee9187914d64eea86ff383067e1c7494b8532e872c7a8d7e8f0a189e *internal/observe/logging.go
+  end 09:30:14 +08
+
+== P4 wrong recorded :LINE in roster (log probe-P4-wrong-reading-roster.txt, 849B) ==
+  start 09:30:30 +08
+  -- sha before --
+  6b840071c183b3ed6470935508247037c416ed3787b22c1b50f839a56f2b55f2 *cmd/wisp/config_readers_255.go
+  -- sha after mutation --
+  4ebe74a16784e59c1587e4c563955f1bed6f11a6c9ada17b0a80ac517ef36acb *cmd/wisp/config_readers_255.go
+  -- run new ruler --
+  rc=0
+  config_receipt_255_test.go:220: row "llm": recorded reading cmd/wisp/panel_config_store.go:96 drifted, the token "ChatModel:      cfg.LLM.Roles.Chat.Model" now uniquely sits at line 98
+  --- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+  ok  	github.com/CarlosShao/wisp/cmd/wisp	3.595s
+  -- restore --
+  -- sha after restore (must equal before) --
+  6b840071c183b3ed6470935508247037c416ed3787b22c1b50f839a56f2b55f2 *cmd/wisp/config_readers_255.go
+  end 09:30:44 +08
+
+== P5 old-ruler red / new-ruler green A-B (log probe-P5-old-ruler-red.txt, 1741B) ==
+  == P5: same mutation window as new-ruler form, but with the OLD ruler (test file at dcaff922^) ==
+  start 09:30:55 +08
+  -- sha before (ball + test) --
+  89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 *internal/ball/ball_windows.go
+  2195e669aab19be80643d0040be67c3fdbd716d082b4e04de25d60caf68dfa4e *cmd/wisp/config_receipt_255_test.go
+  -- sha of extracted old ruler --
+  5701ce4c22988022ea906a8d9736f9d4c3140724415e662fca4ffb87b67fd275 */c/tmp/wisp255v3backup/old-ruler-test.go
+  -- sha after mutation --
+  44a6b84ee4a4d91bfb3659c385ab564576b886be2f790de823109faf1ee94ae4 *internal/ball/ball_windows.go
+  -- (a) NEW ruler on this state --
+  rc=0
+  config_receipt_255_test.go:220: row "ball": recorded reading internal/ball/ball_windows.go:64 drifted, the token "SizePx   int // configured orb size 44..72" now uniquely sits at line 65
+  --- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+  -- (b) swap in OLD ruler --
+  5701ce4c22988022ea906a8d9736f9d4c3140724415e662fca4ffb87b67fd275 *cmd/wisp/config_receipt_255_test.go
+  rc=1
+  config_receipt_255_test.go:209: row "ball" cites internal/ball/ball_windows.go:64 for "SizePx   int // configured orb size 44..72", that line now reads "// probe 255-v3 P5: inserted line above the cited ball option" - the evidence drifted, so re-adjudicate this row (and if the reader really moved, the receipt's claim may have moved with it)
+  --- FAIL: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+  -- restore both --
+  -- sha after restore (must equal before) --
+  89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 *internal/ball/ball_windows.go
+  2195e669aab19be80643d0040be67c3fdbd716d082b4e04de25d60caf68dfa4e *cmd/wisp/config_receipt_255_test.go
+  end 09:31:19 +08
+
+== P6 parent-state old ruler red (log probe-P6-parent-state-red.txt, 1274B) ==
+  start 09:33:43 +08
+  -- delivered shas (will restore to these) --
+  6b840071c183b3ed6470935508247037c416ed3787b22c1b50f839a56f2b55f2 *cmd/wisp/config_readers_255.go
+  2195e669aab19be80643d0040be67c3fdbd716d082b4e04de25d60caf68dfa4e *cmd/wisp/config_receipt_255_test.go
+  -- sha of swapped-in parent pair --
+  367d4a432b873cb6a1c8a4bf04f9f67291ccf3f516766e0e5e191c9a278cb884 *cmd/wisp/config_readers_255.go
+  5701ce4c22988022ea906a8d9736f9d4c3140724415e662fca4ffb87b67fd275 *cmd/wisp/config_receipt_255_test.go
+  -- run OLD ruler on OLD state --
+  rc=1
+  config_receipt_255_test.go:209: row "llm" cites cmd/wisp/panel_config_store.go:96 for "cfg.LLM.Roles.Chat.Model", that line now reads "view := panel.SettingsView{" - the evidence drifted, so re-adjudicate this row (and if the reader really moved, the receipt's claim may have moved with it)
+  --- FAIL: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+  -- restore delivered pair --
+  -- sha after restore (must equal delivered) --
+  6b840071c183b3ed6470935508247037c416ed3787b22c1b50f839a56f2b55f2 *cmd/wisp/config_readers_255.go
+  2195e669aab19be80643d0040be67c3fdbd716d082b4e04de25d60caf68dfa4e *cmd/wisp/config_receipt_255_test.go
+  end 09:33:52 +08
+
