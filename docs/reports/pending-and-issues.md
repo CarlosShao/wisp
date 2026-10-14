@@ -17572,3 +17572,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **对我们的影响（面图更新）**：① `frontend/**` 仍是本队零写、他们在 dev 与并发提交 ⇒ git 锁重试照旧，我 A899 的提交与他们的 09:22 提交无缝同树（`edf643c9`→`9e9964f8`）；② 我们读 `frontend/**` 的测试颜色会见他们落笔而变 ⇒ **313-v 的失败集归因必须现跑 `git log -- frontend/` 并把他们的提交算进去**（三个已知红：两枚 contract 尺漂移＝197 族／C21 tokens＝`design/assets/tokens.css` 被机主移走／35r8 两枚故意红——与他们的自述一致）；③ "313-panel-ask 转交"动作**事实上已由他们自己完成**（条目从待人清单移除，改成"已在用"）。
 - **端到端**：`frontend/dist`（未跟踪）已由他们 09:13 本地构建出新页面；`go:embed all:dist`（frontend/embed.go）在重编 exe 时嵌入 ⇒ **我已在后台跑 `scripts/build.ps1 -Env dev`**（旧 `build/wisp.exe`＝10-13 09:43，不含新界面；构建含 npm 重建＋staleness 守卫＋CGO 链接＋`wisp.exe doctor` 冒烟）。建成后**机主可双击 `build/wisp.exe` 直接在界面里配 stepfun＋语音链＋录密钥**（这正是早前停车点里"下一次打扰您就是界面做出来之后"那一刻）。⚠ 构建期间 CPU 会抬（起手 46%）；255-v3/237-r1 的突变窗口照报时刻。
 - 在飞（2）：`255-v3`（名册验；面＝cmd/wisp）／`237-r1`（tools -race）＋后台构建 1。⛔ 未 push。
+
+
+## A901｜2026-10-14 09:30:26 +08｜★重编 exe 成功（第一发被陈旧守卫拦下→按指名处置重跑过）：`build/wisp.exe` 已是含新界面＋配模型 Go 侧的新件；冒烟 `wisp doctor: PASS` 全绿——机主可双击试配模型
+
+- **第一发**（09:2x）：`build.ps1` 到前端步被 **staleness 守卫**拦下（FATAL 具名）：npm 重建产物名与旧快照逐字相同（`index-Co9nihKl.js`/`index-DJh_bGz4.css`），守卫无法区分"真重建"与"空跑 npm" ⇒ 按它指名的处置：**旧 `frontend/dist` 整体移至 `C:/tmp/wisp-dist-bak-20261014`（只移不删）＋重建 `dist/.gitkeep` 锚** ⇒ 重跑。
+- **第二发（成功）**：npm 重建（新产物名过守卫）→ `go build ok (cgo linked against sherpa-onnx C API)` → DLL 就位（onnxruntime 1.28.2／sherpa-onnx-c-api/cxx-api）→ `SHA256SUMS` 写出 → **冒烟 `wisp doctor: PASS`**（gcc 16.2.0／sherpa C API 1.13.8＝构建钉／onnxruntime 逐版／deps.toml 三钉／data dir 可写）；exe 版本戳 `version=0.0.0-dev commit=2bb6394a built=2026-10-14T01:26:32Z`。产物：`build/wisp.exe` 31,456,004 字节（10-14 09:26；旧件＝10-13 09:43 31,379,386）。
+- **含义**：exe 里嵌的是当前 dev 树（未推送）的页面（前端 agent `9e9964f8` 的 6 件 src 产物）＋Go 侧（313-r1/r2 的设置读写面）⇒ **"在界面上配模型"的端到端链路已就绪**：机主双击 `build/wisp.exe` → 打开面板 → 模型/语音两分类里配 stepfun＋云链＋录密钥（凭据只显示"已配置/未配置"，值不回显）。⛔ 未 push（本地 dev 构建，常态）。
+- **附注**：`frontend/src/styles/tokens.generated.css` 工作树脏件＝前端 agent 的 CRLF 幻影，不归我们；`frontend/dist` 重建后为本次产物（未跟踪）。**构建期间 CPU 抬过（起手 46%）**；255-v3/237-r1 照报突变窗口。
+- 在飞（2）：`255-v3`（已自写独立校验器 `verify-roster-255v3.py` 在验）／`237-r1`（count=20 复现读数在落）。⛔ 未 push。
