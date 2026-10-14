@@ -1,0 +1,170 @@
+# 票 154 AC#1 触发门 —— 锚点 605838b07388cb64997fa1022bb1ea8e4394402f
+# 生成时刻 2026-10-14T18:11:13+08:00
+# 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
+# [截取说明] 本件＝改后尺 × 净树（锚 605838b0）读数的按腿边界摘录：表头3行＋G6 主尺/正控/负一负 三段＋聚合退码段至文末。
+#   G1b／G2 两段（其读数与改前相同、两枚 BAD 的逐字行在下面聚合表里）与其余腿段此处不重录；全文复算＝
+#   sh .scratch/wisp/probes/154/gate-clauses.sh 605838b07388cb64997fa1022bb1ea8e4394402f
+#   改后尺 sha256＝20e45dc88bc008d90e055c5fcb2652c51f0375d70b99845e2b452d446c8b918f
+## G6 主尺（票 161 AC#6②第一族）OpenTask↔CloseTask：派发了环路却没在同一文件关掉那一枚 id
+# 与 G5 的分工：G5 盘「不过桥、直接对 risk 层开 scope」那一形，G6 盘「过桥的 task 生命周期」那一形。
+# 排 internal/tools/bridge.go 的理由与 G5 排 internal/risk 同一条：OpenTask／CloseTask 的定义本体
+#   在那儿（:855 与 :923；09-27 登记时是 :633／:684），把定义算成调用点＝名册每改一行注释就响一次，那是噪音不是读数。
+.scratch/wisp/probes/154/gate-clauses.sh: line 587: ring: command not found
+# 票 178 四堆口径（piles 味）：判据只吃【只开】那一堆。09-27 登记的那  是一发【只关】
+#   （run.go 关 bridge.mark／组合根开的那一枚——票 178 判语：关的是别处开的不算缺陷）；票 315
+#   （bfc74ae9）把 admitTask 补成开合成对之后，这条射程两堆都空，诚实登记是 quiet＋0。
+.scratch/wisp/probes/154/gate-clauses.sh: line 590: 改完之后: command not found
+#   ：在生产码里真造一枚【只开】（合成树 8ca0a52e＝锚树 1675e844
+#   ＋internal/tools/subagent_197.go 的变异 blob f534915a）⇒ ② 堆 1 枚 > 基线 0 ⇒ BAD。
+#   读数＝.scratch/wisp/probes/178/r1/logs/gate-mutation-ac2.txt——同一发在改前尺上实测 1 枚
+#   恰好等于那时登记的基线 1 ⇒ 沉默；改完才点得出来（票 178 AC#2 那句「未修上响不出来」的正文）。
+
+## G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；四堆只吃『只开』）
+$ git grep -nEw 'OpenTask|CloseTask' 605838b07388cb64997fa1022bb1ea8e4394402f -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:945:// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:947:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:986:	rt.bridge.OpenTask(taskID)
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:992:		rt.bridge.CloseTask(taskID)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/subagent_197.go:335:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+# 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenTask|CloseTask' 的行。
+# 被分子剔掉的行（注释里提到词表，代码里没有）：
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:945:// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:947:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/subagent_197.go:335:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
+#   （空）
+# 反向未成对枚数＝0   （0＝反向没响）
+# 四堆（票 178；判据只吃②『只开』那一堆，基线枚数＝它的**文件**枚数）：
+#   ① 开且关＝1 枚文件（同文件两枚都调过；不是缺陷）
+#      BALANCED cmd/wisp/run.go
+#   ② 只开＝0 枚文件（开了却没在同一文件关过；本腿『未成对枚数』只数这一堆）
+#   ③ 只关＝0 枚文件（合方在场、开方不在＝关的是别处开的；逐枚在『反向名册』格里，不计进退码）
+#   ④ 注释里提到＝3 行（分子已剔；逐行在『COMMENT-ONLY』格里）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
+# 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=0   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G6 正控（同一把尺打在已知「开了又关」的样本上，两向都必须不响）
+# 样本＝internal/tools/bridge.go 自己：:657 的 b.OpenTask 与 :923 的 CloseTask 在同一枚文件里。
+# 这条射程是真吃得住的（本程现量 git grep rc=0、剔注释后 3 行调用点），不是「射程里根本没这东西」
+#   那种空 0——那种 0 不算正控（票 154 AC#3 就是拿「零区别」否掉装饰腿的，G5 的自纠 (1) 同一条）。
+
+## G6-负一负 同尺不过滤任何文件（四堆只吃『只开』；『只关』逐枚点名不顶红）
+$ git grep -nEw 'OpenTask|CloseTask' 605838b07388cb64997fa1022bb1ea8e4394402f -- internal/**/*.go cmd/**/*.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:945:// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:947:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:986:	rt.bridge.OpenTask(taskID)
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:992:		rt.bridge.CloseTask(taskID)
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/task_scope_close_151_test.go:7://	   一整轮真 `wisp run`，要求任务结束时那发 CloseTask 的审计行带着**本轮
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/task_scope_close_151_test.go:16:// 承重读数（变异＝只把 admitTask 里那一发 CloseTask 摘掉，其余一字不动）：
+605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/zz315a1probe_test.go:40://      task's own C25 scope at its start, pairing the CloseTask ticket 151 put
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge.go:657:	b.OpenTask(dec.TaskID)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge.go:842:// OpenTask opens the C25 taint scope for one task - ticket 19's
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge.go:852:// calls, and a caller that opens a scope and never reaches CloseTask still
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge.go:855:func (b *Bridge) OpenTask(taskID string) {
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge.go:867:// CloseTask closes one task's taint scope. The composition root defers this on
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge.go:923:func (b *Bridge) CloseTask(taskID string) {
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:6:// b.OpenTask(dec.TaskID)，本包 115/79/0/0 零枚红；同一发变异换到 cmd/wisp 才红
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:12://     读数的那枚变异（摘掉 OpenTask）唯一直接改变的包内状态。
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:13://  2. 收尾那一条 CloseTask 审计行必须报 was_open=true / dropped=1 —— 判据 1 的**后果**，
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:22:// "Mark 之后 ScopeTaints 非空"这把尺**量不出 OpenTask 在不在**——本包 fs_test.go:35 正是
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:116:			"bridge.scopes 里没有 %q。这一味（mark 里的 b.OpenTask）是本包对 C25 开侧唯一的"+
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:121:	b.CloseTask(taintedTask)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:133:			"（was_open=false 就是开侧那一味丢了的形状：CloseTask 会照常打点、"+
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_183_cli_seam_test.go:218:	b.CloseTask(task)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_183_cli_seam_test.go:285:	b.CloseTask(task)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_185_cli_seam_test.go:42://     b.OpenTask the composition root would have done at task start.
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_185_cli_seam_test.go:217:	b.CloseTask(task)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_185_cli_seam_test.go:243:	b.CloseTask(task)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_185_cli_seam_test.go:282:	b.CloseTask(task)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_185_cli_seam_test.go:323:	b.CloseTask(task)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_185_cli_seam_test.go:346:	b.OpenTask(borrowerTask)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_185_cli_seam_test.go:364:	b.CloseTask(ownerTask)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_185_cli_seam_test.go:365:	b.CloseTask(borrowerTask)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_185_cli_seam_test.go:404:	b.CloseTask(task)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/subagent_197.go:335:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/subagent_222_test.go:332:					h.bridge.OpenTask(taskID)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/subagent_222_test.go:333:					return func() { h.bridge.CloseTask(taskID) }
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/ticket175r2_stamp_live_test.go:176:	b.CloseTask(task)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/ticket175r2_stamp_live_test.go:199:	b.CloseTask(task)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/ticket175r2_stamp_live_test.go:271:	clean.CloseTask(aloneTask)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/ticket175r2_stamp_live_test.go:272:	b.CloseTask(task)
+605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/ticket175r2_stamp_live_test.go:324:	b.CloseTask(task)
+# 分子口径（票 171 AC#1）＝剔整行注释＋剔行尾注释之后仍然匹配词表 'OpenTask|CloseTask' 的行。
+# 被分子剔掉的行（注释里提到词表，代码里没有）：
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:945:// the handle OpenTask stored on the bridge is the only thing CloseTask can use.
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/run.go:947:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/task_scope_close_151_test.go:7://	   一整轮真 `wisp run`，要求任务结束时那发 CloseTask 的审计行带着**本轮
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/task_scope_close_151_test.go:16:// 承重读数（变异＝只把 admitTask 里那一发 CloseTask 摘掉，其余一字不动）：
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:cmd/wisp/zz315a1probe_test.go:40://      task's own C25 scope at its start, pairing the CloseTask ticket 151 put
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge.go:842:// OpenTask opens the C25 taint scope for one task - ticket 19's
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge.go:852:// calls, and a caller that opens a scope and never reaches CloseTask still
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge.go:867:// CloseTask closes one task's taint scope. The composition root defers this on
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:6:// b.OpenTask(dec.TaskID)，本包 115/79/0/0 零枚红；同一发变异换到 cmd/wisp 才红
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:12://     读数的那枚变异（摘掉 OpenTask）唯一直接改变的包内状态。
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:13://  2. 收尾那一条 CloseTask 审计行必须报 was_open=true / dropped=1 —— 判据 1 的**后果**，
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/bridge_scope_open_ticket158_test.go:22:// "Mark 之后 ScopeTaints 非空"这把尺**量不出 OpenTask 在不在**——本包 fs_test.go:35 正是
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/pointer_185_cli_seam_test.go:42://     b.OpenTask the composition root would have done at task start.
+#   COMMENT-ONLY 605838b07388cb64997fa1022bb1ea8e4394402f:internal/tools/subagent_197.go:335:	// gap is the open question Q-56 recorded in bridge.go's CloseTask comment,
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
+#   UNPAIRED-REV internal/tools/pointer_183_cli_seam_test.go (合方调用点=2)  # 同文件没见过开方：人来判「真漏／委托」
+#   UNPAIRED-REV internal/tools/ticket175r2_stamp_live_test.go (合方调用点=5)  # 同文件没见过开方：人来判「真漏／委托」
+# 反向未成对枚数＝2   （0＝反向没响）
+# 四堆（票 178；判据只吃②『只开』那一堆，基线枚数＝它的**文件**枚数）：
+#   ① 开且关＝5 枚文件（同文件两枚都调过；不是缺陷）
+#      BALANCED cmd/wisp/run.go
+#      BALANCED internal/tools/bridge.go
+#      BALANCED internal/tools/bridge_scope_open_ticket158_test.go
+#      BALANCED internal/tools/pointer_185_cli_seam_test.go
+#      BALANCED internal/tools/subagent_222_test.go
+#   ② 只开＝0 枚文件（开了却没在同一文件关过；本腿『未成对枚数』只数这一堆）
+#   ③ 只关＝2 枚文件（合方在场、开方不在＝关的是别处开的；逐枚在『反向名册』格里，不计进退码）
+#   ④ 注释里提到＝14 行（分子已剔；逐行在『COMMENT-ONLY』格里）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上；piles 味下这一枚＝②只开堆的文件枚数）
+# 基线枚数＝0   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=0   （本枚子句的响＝未成对枚数；0＝不响）
+
+## 聚合退码（票 161 AC#6①）：只累计【声明与实测不符】的腿
+# 判据**不是**「任何一腿响⇒脚本非 0」——见文件头 want 那一段与本票票面 09-27 09:1x 的 > 块：
+#   G2／G5-负一负／G6／G6-负一负／G7／G7-负一负 今天按设计就该响，把它们计进退码
+#   ＝把票 161 AC#7 刚收掉的恒红形状从另一扇门放回来（同一枚错，台账 A320／A321）。
+# 每腿判定（ok＝说到做到／BAD＝言行不一／SHR＝读数比基线好＝基线过期但不算言行不一；这一份同样逐行可 diff）：
+# 票 171 AC#2／AC#7：pair 腿与 run 腿现在都是同一套两列——基线＝want_n 登记的枚数、
+#   实测＝这一腿自己数出来的枚数（pair 腿＝未成对，run 腿＝命中行数）。
+#   票 178 起：piles 味 pair 腿的『实测』＝【只开】那一堆的文件枚数（『只关』逐枚点名，不进这一列）。
+#   退码累计的是【声明与实测不符】，而「不符」现在有三味：空/非空（票 161 AC#6①）、
+#   实测>基线（票 171 AC#2／AC#7）与【腿不在场】（票 171 AC#8①）。
+# ok   腿=G1 声明=quiet 基线=0枚 实测=0枚
+# BAD  腿=G1b 声明=quiet 基线=0枚 实测=1枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+# BAD  腿=G2 声明=ring 基线=1枚 实测=2枚 因=新增命中（票 171 AC#7：实测 > 基线）
+# ok   腿=G3 声明=quiet 基线=0枚 实测=0枚
+# ok   腿=G4 声明=quiet 基线=0枚 实测=0枚
+# ok   腿=G5 声明=ring 基线=1枚 实测=1枚
+# ok   腿=G5pos 声明=quiet 基线=0枚 实测=0枚
+# ok   腿=G5neg 声明=ring 基线=8枚 实测=8枚
+# ok   腿=G6 声明=quiet 基线=0枚 实测=0枚
+# ok   腿=G6pos 声明=quiet 基线=0枚 实测=0枚
+# ok   腿=G6neg 声明=quiet 基线=0枚 实测=0枚
+# ok   腿=G7 声明=ring 基线=1枚 实测=1枚
+# ok   腿=G7pos 声明=quiet 基线=0枚 实测=0枚
+# ok   腿=G7neg 声明=ring 基线=2枚 实测=2枚
+# 腿数＝14 声明与实测不符＝2
+# 腿数断言：名册=14 声明=14 记账=14 缺腿=0 空头声明=0
+# 腿数断言＝相符（名册上每一腿都记了账）
+
+## 基线过期（票 171 AC#8②）：实测低于基线的腿，逐枚列成一张表
+# 这一味**不**计进退码：变好了不算言行不一（算了就是把门换成「为好消息响」的恒红形状，台账 A320／A321）。
+# 改前它只是聚合行里那句「注=读数变好了」，现量＝退码 0、单列表 0 枚（只有人眼看得见）。
+# 表头：腿 | 声明 | 基线（want_n） | 实测 | 差 | 处置
+#   （空＝今天没有任何一条腿的读数低于基线）
+# 基线过期枚数＝0   （核它的那一把＝.scratch/wisp/probes/161/r6/flip-declaration.sh 新增的那一格）
+# 聚合退码＝2   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）
+# 翻一枚声明让退码跟着变那发证据不在这里，在 .scratch/wisp/probes/161/r6/flip-declaration.sh
