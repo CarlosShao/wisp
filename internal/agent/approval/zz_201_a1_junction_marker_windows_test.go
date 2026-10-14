@@ -6,7 +6,7 @@ package approval_test
 // measured live. QUESTION: a junction-refused fs call raises an L2 card whose
 // Prompt.Paths carry the marker "<raw path> (无法规范化: …(junction/symlink)…)";
 // cmd/wisp's 长期 branch reads that same card and asks it for the widening rule
-// (cmd/wisp/approval_always.go:84 → ReplyCard.WideningRule, replies.go:503),
+// (cmd/wisp/approval_always.go:84 → ReplyCard.WideningRule, replies.go:519),
 // which derives the directory through dirOf (batch.go:91) — a string split at
 // the LAST '/' or '\'. Is there a '/' inside the marker that the split mistakes
 // for a path separator, so a "directory" with half the marker in it comes out?
@@ -16,8 +16,8 @@ package approval_test
 // AddAllowedDir gates and landing in config.toml — readings, verbatim, in
 // .scratch/wisp/probes/201/a1/logs/run3-full.txt). Ticket 318 then fixed it:
 // WideningRule now REFUSES the whole card at its entry when any path carries
-// the marker (replies.go:503), so legs 3–5 below flipped their assertions from
-// "the fragment comes out" to "the refusal comes out, and the fragment cannot".
+// the marker (replies.go:521), so leg 3 below flipped its assertions while
+// legs 4–5 were removed (their subject cannot exist after the guard).
 // Leg 315-r1 set the precedent for this flip (a zz probe becoming the standing
 // regression nail for the production shape it reproduced); the pre-fix reading
 // is preserved where it was measured, not rewritten here.
