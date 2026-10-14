@@ -1,0 +1,9 @@
+# 237-r1 起手锚点（逐条现跑）
+date:            2026-10-14 09:08 / 09:40 (+08)
+git rev-parse HEAD:  ab6da884（派单写 58366328；其间仅编排者文档提交；internal/tools 最后被 8509e52e 碰过）
+改前 git hash-object:
+  internal/tools/subagent_197_test.go  b4336141935a20c9cd296f1f53be250a1bf8f111
+  internal/tools/subagent_222_test.go  7c64505ec3bb7242725ff8240bfd293ce9d73843
+  internal/tools/subagent_197.go       b72f67407962bd10768f6f5866c0c461fecb97ff（本腿零改）
+tasklist（09:08 起手）：台面正常（另腿 255 在飞）；09:40 复看：30 行 go/wisp/node 名册行
+GOTMPDIR: C:\tmp\wisp237gotmp

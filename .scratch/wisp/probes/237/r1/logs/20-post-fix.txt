@@ -1,0 +1,10 @@
+# 改后读数（逐发时刻现跑）
+shot1: GOFLAGS= go test -race -count=60 -run Test222 ./internal/tools/  09:34:11->09:34:27 rc=0  FAIL=0  DATA RACE=0
+shot2: 同命令 09:38:13->09:38:25 rc=0  FAIL=0  DATA RACE=0
+fullpkg: GOFLAGS= go test -count=1 -race ./internal/tools/  09:37:31->09:38:02 rc=0  ok 24.773s  FAIL=0
+vet:  GOFLAGS= go vet ./internal/tools/  rc=0
+gofumpt: "$(go env GOPATH)/bin/gofumpt.exe" -l <两枚>  rc=0 零输出
+d22scan: sh scripts/d22scan.sh  rc=0  -> d22scan: clean
+pathlen: sh scripts/check-path-length-budget.sh  rc=0  -> VERDICT GREEN; over-budget=58; 单位互核同 58 枚
+diff 形: git diff --stat -- internal/tools  ->  197: +1 -0 / 222: +136 -47
+终态: git status --porcelain -- internal cmd  ->  仅两枚 _test.go 的 " M"（提交后应空）

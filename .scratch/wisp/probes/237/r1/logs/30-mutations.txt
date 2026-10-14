@@ -1,0 +1,12 @@
+# AC#3 判据读数（变异只经 -overlay，工作树零突变字节；每发 -race -count=1 -run Test222 -v）
+x-partial-after（当前件 + 恰好一枚孩子绕开真桥）rc=1
+  leg1 红 3.00s  "桥上的到达信号只有 3 枚，而已经有 4 枚父任务拿到了结论（真桥上累计执行 3 次）"
+  leg2 红 0.00s  同句（3/4）
+  leg3 红 0.00s  同句（3/4；真桥上累计执行 9 次＝6 宿主＋3 孩子）
+x-partial-before（git HEAD 件 + 同一枚绕过）rc=1
+  leg1 红 30.00s "孩子在桥上跑工具调用：只等到 2/4 枚，护栏到点"（旧侧唯一防线＝30s 护栏）
+  leg2 绿 0.00s / leg3 绿 0.00s  <= 235-v1 §6.5 点名的失明形，收紧后由 0.00s 红取代
+x-full-after（当前件 + 全部孩子绕开真桥=M3 回归）rc=1
+  leg1/leg2/leg3 全红 0.00s  "只有 0 枚到达，而已经有 1 枚父任务拿到了结论"
+x-noopadmit-after（当前件 + 把 harness 的 OpenTask/CloseTask 布线摘回 no-op）rc=1
+  leg1 红 3.00s / leg2 红 0.00s / leg3 红 0.00s  <= 布线是承重的（尺子依旧见红，零放宽）

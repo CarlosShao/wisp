@@ -23,3 +23,17 @@
 零产码（`internal/tools/**` 的判定分支、`bridge.go` 一条都不许动，只动 `_test.go`）；不动 `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`；不动三枚冻结件（`internal/panel/tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）；⛔ 不许为了变绿放宽任何断言或减少 `-race` 的次数口径；`frontend/**`／`design/**` 零读零写零转述；⚠ **与票 224／213／214／220／236 同撞 `internal/tools`／`cmd/wisp` ⇒ 一律串行**（写面同时最多两枚，且**跑突变／`-race` 的腿绝不并发**）。
 
 ## Progress log (append-only, newest last)
+
+- 2026-10-14 09:4x **237-r1（实现者，起手锚 `ab6da884`；只动两枚 `_test.go`，零产码）**：
+  **AC#1 走甲**——`parkParents` 的快照 `len(h.parked)` 改成**逐枚 parked 因果等待**；改前同锚点具名命令
+  `go test -race -count=60 -run Test222 ./internal/tools/` 复现红两发（3 枚／1 枚，全为 "只有 3/4 枚父任务到达等待点"，
+  DATA RACE 0），改后同命令 ×2 零红、全包 `-race` rc=0。**AC#3 走甲**——`awaitChildOnBridge222(t,n)` 收紧成逐枚
+  （全 n 枚到达才返回；返回须由到达托底，先排空缓冲；收到的父结果退出时一次性交回，r1 自捉过"二次收取"错计并具名）；
+  判据：一枚孩子绕开真桥 ⇒ leg1 3.00s／leg2 0.00s／leg3 0.00s 全红，收紧前同形 leg2／leg3 全绿（缚 30s 护栏只 leg1 红）。
+  收紧期间撞出**独立真形**：孩子 C25 scope 从未开 ⇒ `subagent_197.go:487` 首枚 mark 落父名后，未注册 task id 走桥
+  被判 unbound-scope L2 ⇒ `NoGate` 打回、孩子根本没上桥；落点=测试面，在 `AdmitTask` 每任务边界补
+  `OpenTask`/`CloseTask`（照 `pointer_185_cli_seam_test.go:346` 先例），`x-noopadmit-after` 变异三枚仍全红。
+  **AC#2**——守池注释段尾 +1 行"这枚散文没有仪器盯着、只有人读"，`git diff` = +1/-0 纯注释。
+  门禁：build/vet/gofumpt/`d22scan` clean/长度门 GREEN(58) 全 rc=0。读数、逐发时刻、变异四形、盘上日志字节数
+  ＝`.scratch/wisp/probes/237/r1/evidence.md`。⛔ 未 push；⚠ 产码侧"composition root 从不开 task scope"的
+  具名发现（建议落 `A##`/`Q##`，台账不在本腿写面）见台件 §2。

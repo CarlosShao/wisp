@@ -1,0 +1,16 @@
+# AC#1 改前红形状（同一锚点，具名命令；rc 逐发现跑）
+cmd: GOFLAGS= go test -race -count=60 -run Test222 ./internal/tools/
+shot1 09:08:45 -> 09:09:11  rc=1
+shot2 09:09:20 -> 09:09:30  rc=1
+--- shot1 FAIL 行（原样）---
+--- FAIL: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+    subagent_222_test.go:514: 只有 3/4 枚父任务到达等待点（父任务没派生成功，等待读数就无从谈起）
+--- FAIL: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+    subagent_222_test.go:514: 只有 3/4 枚父任务到达等待点（父任务没派生成功，等待读数就无从谈起）
+--- FAIL: Test222SpawnConclusionArrivesThroughRealBridgeChildren (0.00s)
+    subagent_222_test.go:437: 只有 3/4 枚父任务到达等待点（父任务没派生成功，等待读数就无从谈起）
+DATA RACE 计数: 0    FAIL 枚数: 3
+--- shot2 FAIL 行（原样）---
+--- FAIL: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+    subagent_222_test.go:514: 只有 3/4 枚父任务到达等待点（父任务没派生成功，等待读数就无从谈起）
+DATA RACE 计数: 0    FAIL 枚数: 1
