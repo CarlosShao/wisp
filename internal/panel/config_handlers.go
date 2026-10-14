@@ -602,6 +602,12 @@ func renderSettingsPayload(v SettingsView) string {
 			CredentialError: p.CredentialError,
 		})
 	}
+	if payload.Providers == nil {
+		// The settings page reads providers as an array and has no null guard;
+		// a fresh config with zero rows must still put [] on the wire (ticket
+		// 313 acceptance 313-v1 measured the null shape against the live page).
+		payload.Providers = []providerPayload{}
+	}
 	data, err := json.Marshal(payload)
 	if err != nil {
 		// A struct of strings and slices cannot fail to marshal; if a later

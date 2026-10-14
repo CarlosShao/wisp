@@ -322,3 +322,23 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 		}
 	}
 }
+
+// Test313ZeroRowPayloadKeepsProvidersAnArray is the pin for the one shape the
+// acceptance leg 313-v1 measured against the live page: the settings page reads
+// `providers` as an array with no null guard (find/some at render), so a fresh
+// config with zero provider rows must still put [] on the wire. This is the
+// AC#1 target state - the owner's very first open of the model category.
+func Test313ZeroRowPayloadKeepsProvidersAnArray(t *testing.T) {
+	line := renderSettingsPayload(SettingsView{Readable: true})
+	if !strings.Contains(line, `"providers":[]`) {
+		t.Fatalf("a zero-row SettingsView puts providers on the wire as something other than []: %s", line)
+	}
+	// Control: one row still travels as an array of objects, not a bare [].
+	one := renderSettingsPayload(SettingsView{
+		Readable:  true,
+		Providers: []ProviderSettings{{Name: "stepfun", APIKeyRef: "dpapi:x", ModelCount: 1, Models: []string{"m"}}},
+	})
+	if !strings.Contains(one, `"providers":[{"name":"stepfun"`) {
+		t.Fatalf("a one-row SettingsView no longer marshals the row as the page expects: %s", one)
+	}
+}
