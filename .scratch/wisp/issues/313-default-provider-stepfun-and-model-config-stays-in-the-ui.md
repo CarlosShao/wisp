@@ -35,3 +35,11 @@
 
 - [2026-10-13 23:44 +08] agent=313-r2 did=`cmd/wisp` 精确落点包落地（`panel_config_store.go`：`ReadSettings` 六味＋`modelNames` 排序切片；`ApplySetting` 六 case＋`splitChainValue`；三禁区一字未动）＋新增 `cmd/wisp/panel_config_313_test.go`（空配置→建 stepfun 行→两云链→realtime 两枚→chat pair 端到端，六枚 case 各报自身键路径；A881 ⓒ 并集等值钉——r1 未放本腿补，现读 PASS）。A881 三条件现读齐：ⓐ 第一张表块 `0d87a681`↔HEAD 字节相同＋248 钉未动（本腿 diff 0）；ⓑ 并集单一 accessor；ⓒ 钉在。门禁：build rc=0／gofumpt 空／panel+config 改前=改后失败集（既有 5 红）／cmd/wisp rc=1 具名 255 两枚——本腿落地使 voice 读者行需补 `cmd/wisp/panel_config_store.go`、`config_readers_255.go:103` 的 llm 证据行需从 `:96` 重裁到 `:98`（修面越界，转 313 收尾链/255-r2，push 前必须清）／d22scan clean／长度门 RED=`.scratch/wisp/issues/173-…-done.md` 超长路径（2a8ab9c4 引入，非本腿）。⛔ 未 push。next=编排者收件；255 名册重裁后清账再推。
 - [2026-10-14 10:12 +08] agent=313-v1 did=Go 侧整包验收（非实现者；HEAD bfb62488 终跑）：逐格判语＝AC#1/#2/#3 的 Go 半**成立**；A881 ⓐ/ⓑ/ⓒ 全成立（248 表块 50 行逐字节证＋248 钉零动／并集单 accessor 无第三名册／两发突变证牙：B1 截并集红句逐字、B2 删表员红在 roster 用例＋端到端）；读面载荷 11/7/5 三方键集全等，**具名形状分歧**＝零行 `providers:null` vs 页面 `ConfigViewProvider[]` 无守卫（fresh 配置渲染 TypeError 风险）；**具名覆盖缺口**＝多元素逗号链三包零钉（突变乙证，本腿探针先红）；六枚 setter 十发拒绝文件 sha256 不变＋控制移动 hash；密钥面 canary 四表面零命中＋248 哨兵钉亲跑 PASS；失败集 0 新红（5 旧红全在已知三族）；⛔ 未翻框、⛔ 未动 Status/票名/AC 框、⛔ 未 push。件＝`docs/evidence/s1/ticket313-313-v1-accept-v1.md`＋`.scratch/wisp/probes/313/v1/`（锚＋logs 两枚＋探针载具）。next=编排者裁两枚挂账（providers 形状／多元素链补钉）
+
+
+## 编排者判语落地（2026-10-14 2026-10-14 10:18 +08，凭据＝非实现者验收腿 `313-v1`）
+
+- **Go 侧三格判语＝成立**（AC#1/#2/#3 的 Go 半）：三方差集**全空**（Go 现跑载荷 ↔ `313-panel-ask.md` ↔ 页面读键；顶层 11／行 7／voice 5 三方向差集 go-only=spec-only=page-only=[]）＋`A881` ⓐ/ⓑ/ⓒ 成立（两发突变证牙、红句逐字）＋六枚 setter 十发拒绝 **`config.toml` sha256 前后不变**＋端到端行为突变（换脚⇒红点名）＋密钥面 canary 四表面零命中＋失败集 **0 新红**（旧 5 红全在已知三族、与四笔无因果）。凭据＝`docs/evidence/s1/ticket313-313-v1-accept-v1.md`（`a5198871`）。
+- **挂账①（`"providers":null`）＝已由编排者热修**：零行配置时载荷发 `null` 而页面 `find/some` 无守卫（全新配置首开即炸、正是 AC#1 目标态）⇒ `a5dabe38`（载荷发 `[]`＋同包钉）＋`7a6f493d`（订正 313-r2 把 null 钉住的旧断言——**订正非放宽**）；三包 `-run Test313` 全绿；**修正版 exe 已重编**（10:16，`wisp doctor` PASS）。页面侧 null 守卫不强制（Go 已保证 array）；如需加固归前端会话。
+- **挂账②（多元素逗号链三包零钉）＝候选补钉**（未派；见 `A905`）。
+- **页面侧半格不判**：归机主前端会话与真机端到端（双击 exe 试配模型）。本票**不 `-done`**。

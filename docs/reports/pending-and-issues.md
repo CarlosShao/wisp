@@ -17604,3 +17604,14 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **编排者三把尺**：两笔 commit 在／件齐（evidence 84 行）/亲跑 `-race -count=20`＝ok 4.305s／**产码零动核 `git diff -- subagent_197.go bridge.go`＝0 行**。
 - **派 `237-v1`**（非实现者）：三格判语＋回退形自造＋四形复跑（≥2）＋归因链核＋门禁抽核＋**★实现者留给编排者的具名项＝"生产面 task-scope"读数**（生产里每个任务的 C25 scope 谁开、何时开；判"只在 harness 缺"还是"生产同样有真形"——这决定立不立票）。派单/send 存档在盘。
 - **在飞（2）**：`313-v1`（panel/config/cmdwisp）／`237-v1`（tools）——零文件重叠、窗口双报。⛔ 未 push（未推约 320）。
+
+
+## A905｜2026-10-14 10:19:13 +08｜★313-v1 收件（Go 半全成立＋两挂账）＋编排者热修两笔（`providers:null`⇒`[]`，修正版 exe 10:16 重编）＋237-v1 收件＋票 237 收口（改名 -done）＋★立票 315（生产面 task-scope 真形，先活体复量）＋★记我：名册插入切坏一行已修
+
+- **313-v1 收件（三把尺过）**：`a5198871` 在／裁决表 9,447 字节＋probes/313/v1（含独立 `compare-keys-313v1.py`）／亲跑三包 `-run 'Test313'` ok。判语：Go 三格**全成立**（三方差集全空 11/7/5；A881 ⓐⓑⓒ 两发突变证牙；六 setter 十拒 sha256 不变；密钥面 canary 零命中；0 新红）。
+- **热修（挂账①）**：`a5dabe38` 载荷 `providers` 零行发 `[]`＋`internal/panel` 同包钉；`7a6f493d` 订正 `cmd/wisp` 旧钉（313-r2 当年把 `null` 钉住、与规格/页面矛盾——**订正非放宽**）。三包 Test313 全绿；d22scan clean；**`build/wisp.exe` 10:16 重编**（doctor PASS；dist 二次外移 `C:/tmp/wisp-dist-bak2-20261014`）。
+- **237-v1 收件（三把尺过）**：`be0934b7`＋`54750186` 在／裁决表 109 行＋probes/237/v1（含回退形 overlay）／亲跑 `-race -count=5` ok 3.804s。判语：**AC#1/#2/#3 全成立＋零产码成立＋unbound-scope L2 归因链成立**；并复现"一枚绕过 leg2/leg3 全绿"失明形（坐实 harness 补丁非放宽）。
+- **票 237 收口**：三框翻＋Status 留档＋`git mv -done`＋长度门名册补条目（59=59 GREEN）。
+- **★立票 315**（`.scratch/wisp/issues/315-production-task-scope-never-opens-…-l2.md`）：生产面"任务开始不开 scope"静态链五条（237-v1 逐行核）；**AC#0＝活体复量**（量不到就地撤，口令「315 撤」）；写面≈cmd/wisp／internal/tools／internal/agent（与 236 AC#3 串行）。
+- **★记我**：给名册插 237-done 条目时锚点选错（少了行尾），把 186 行切成"裸键＋双赋值"⇒ awk syntax error；就地修复两行、复跑门 **GREEN 59=59**。教训＝字符串锚点必须含整行尾部。
+- **在飞（0）**；下一手顺位：① 236 AC#3 落地腿（tools 面空出）② 252（cmd/wisp 面）③ push 决策（推前跑 314 形状取样；两验收已收、腿静）。⛔ 未 push（未推约 326）。

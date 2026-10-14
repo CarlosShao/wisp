@@ -1,0 +1,31 @@
+# 315 — 生产里"任务开始"不开 C25 作用域：子代理／兄弟任务的首批走桥调用会被判 unbound-scope L2，落成假审批卡或超时硬拒（来路＝票 237 的独立真形；**先活体复量再定真伪**）
+
+- **Status**：**ready-for-agent（第一格＝活体复量；⛔ 不许先修）**（编排者 2026-10-14 2026-10-14 10:18 立；起手锚点＝本票现读 `git rev-parse --short HEAD`）。
+- 来源＝非实现者验收腿 `237-v1`（件 `docs/evidence/s1/ticket237-237-v1-accept-v1.md`，`be0934b7`）：它在裁票 237 AC#3 时撞出并修好 **harness 侧**同形（harness `AdmitTask` 补 `OpenTask/CloseTask` 孩子才上桥），随后按令核了生产面静态链。
+- 关联：票 151（-done，"关"那半——`admitTask` revoke 挂 `CloseTask`）· 票 154（-done，RESERVED：宿主自带 id 那一形没人关）· 票 237（-done，测试面）。⚠ 本票**只裁"开"这一侧的生产形状**，⛔ 不重开 151/154。
+
+## 现量（`237-v1` 逐行核过；引用前先现读——树会漂）
+
+1. 非测试 `OpenTask(` 全树仅 `internal/tools/bridge.go:649`（`b.mark` 里懒开，**仅敏感源结果收口时**）；定义 `:847`。
+2. `cmd/wisp/run.go:953-962` 的 admitTask 只 `CloseTask(:960)`；`internal/agent/loop.go:373-379`、子环路 `internal/tools/subagent_197.go:311-320` 均**不开**。
+3. 触发条件（`internal/risk/provenance.go:694-711` ＋ Detector `:858-869`）：**调用方 scope 未注册＋别的 scope 有 mark ⇒ 每次走桥判 unbound-scope R4/L2**。
+4. 首发诱因：首枚子代理结论把 mark 落父名（`subagent_197.go:487`）后，兄弟孩子（工具面＝父桥 `:296`，dispatch 带自己 task id `loop.go:675-676`）即中。
+5. 生产 L2 落真审批门（`run.go:612` approval.New）＝假审批卡／超时拒；`run.go:1052` 项目说明 scope（`ProjectInstructionsEnabled` 默认 true）整跑期间构成"别处有 mark"。
+⚠ 交叉读数（151/154 时代）：154 记"唯一非测试 `OpenTask` 调用者＝`bridge.go:559`（mark 里）"——同一处、行号漂了；"懒开**仅敏感源收口**"这一窄化是 237-v1 的新读数，**以现读为准**。
+
+## 要建什么
+
+- [ ] **AC#0 活体复量（先跑这格；量不到就地撤本票）**：一发真跑组合根／CLI 接缝的用例或最小驾驶脚本，触发"子代理的兄弟孩子工具调用"形；读数＝`unbound-scope` R4/L2／审批卡／拒绝句是否出现（命令＋时刻＋rc＋红句逐字；⛔ 不许用 mock 冒充）。若**量不到** ⇒ 撤票（口令「**315 撤**」）＋台账写明量法。
+- [ ] **AC#1（按 AC#0 的读数裁）**：或**修**（三案各自代价表：ⓐ`admitTask` 补 OpenTask／ⓑ子环路自开／ⓒ桥懒开扩到每次 dispatch）或**登记**（判"有意为之"须给理由链）。⛔ 改判据方向／放宽断言一律禁。
+
+## 禁区
+
+⛔ 不动 C19/C25 语义本身；⛔ 三枚冻结件／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`docs/PLAN.md`／`docs/specs/**` 一字不动；⛔ `frontend/**`／`design/**` 零读零写零转述；⛔ 零 push；⛔ 不许重开 151/154 的框。
+
+## 排程
+
+写面≈`cmd/wisp`／`internal/tools`／`internal/agent`；⚠ 与票 236 AC#3 腿撞 `internal/tools` ⇒ **串行**；本票腿起手先跑包级互斥尺。
+
+## Progress log (append-only, newest last)
+
+- [2026-10-14 10:18 +08] 编排者立票（来路＝`237-v1` 生产面读数；静态链五条已核；AC#0 活体复量为门；撤票口令「315 撤」）。账 `A905`。
