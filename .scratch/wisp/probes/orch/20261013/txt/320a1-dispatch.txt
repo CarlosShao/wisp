@@ -1,0 +1,27 @@
+# 320-a1 派单（票 320 **只读设计核查**：模型页 v3 Go 侧的字段集/新方法名/契约同批计划；零产码）
+
+发送时刻：2026-10-14 23:0x +08。编排者派发。
+你 = Wisp 流水线的**只读设计核查腿 320-a1**。身份＝只读（**零产码**；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 不碰台账）。
+
+## 票与依据
+
+- 票：`.scratch/wisp/issues/320-model-page-v3-go-side-three-writes-and-a-fetch-port.md`（先通读）
+- 依据件：`docs/evidence/s1/model-page-v3-brief.md`（§2 普查＋§6 机主批准）＋台账 `A968`
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+
+## 你要交的形状（逐条；全部现读复算，行号会烂）
+
+1. **字段集定稿**（AC#1/#2/#3）：新写入字段的**字段名/值格式/选择列**（provider？model？），与既有两表机制对齐——逐处读 `internal/panel/config_handlers.go`（248 表＋`fieldNeedsProvider/NeedsModel/TakesValue`）与 `internal/panel/config_write_313.go`（313 表＋其 twin 三 map），给"新字段落在哪张表/哪个 map/哪枚 ApplySetting case"的**逐枚清单**；并列出**同批必须一起改的测试**（`config_313_test.go` 的"名册从哪读"机制、248 侧对应件）——逐文件点名。
+2. **新方法名**（AC#4）：读 `internal/panel/bridge.go` 的 Bind 方法注册表与 `internal/panel/config_handlers.go` 的读取面，给"拉取模型列表"端口的**方法名候选**＋载荷/回执形状；逐字核 **冻结件 `internal/panel/l2_grant_boundary_test.go`** 的扫描口径（新名/新字段名**不许带审批词汇**）；并核 `config_313_test.go` 对"字段名不许进 locked 家族"的断言是否会被新名字触发。
+3. **拉取的执行面**：密钥如何取（读 `api_key_ref` 解析链：dpapi/env → 谁在运行时把它解成明文）、HTTP 调用落在哪一层（面板 handler 直发？还是经 `internal/llm/*` 的适配器？）——给"最小且不泄密"的形状（超时/错误分类/**不回显密钥/不落盘明文**逐条）；⛔ 与 C26/文件系统无涉。
+4. **AC#3 与 AC#5 的取舍**：模型条目写入＝复用既有 `model_context_window/price_in/price_out`＋新"建条目"字段，还是并入一枚新字段；预设默认目录**落 or 不落**——给推荐与理由（读 `internal/config/defaults.go` 的 preset 机制）。
+5. **面序与冲突**：逐枚点名改动落在 `internal/config` / `internal/panel` / `cmd/wisp` 的哪些文件；与在飞 `319-r1`（`cmd/wisp`＋`internal/proc`）的**串行序**；给"先落哪半、后落哪半"的建议。
+6. **风险清单**：冻结件、审批词汇扫描、313 名册测试的读法、d22scan 禁令（ban#6/#7/#8 射程）、长度门——逐条给"会不会被本票触发"的现读判断。
+
+## 纪律
+
+- **零产码**：只读＋`git grep`/`git show`/读文件；⛔ 不改任何仓内文件（除 `probes/320/a1/` 新建）。
+- 交件：`probes/320/a1/census.md`（≤200 行，结论先行＋逐条）＋票 320 尾**追加 1 条 bullet**（`agent=320-a1 did=… next=…`）；只 commit、⛔ 不 push；显式 pathspec。
+- `GOTMPDIR`／`PATH` 若用到 go 命令按既有形（MSYS PATH＋反斜杠 GOTMPDIR）。
+- **未定义即停**：某处读不出定论 ⇒ 明写"未定 + 两条候选 + 判据缺口"，⛔ 不猜。
+- 回执：结论先行＋逐条形状＋逐文件清单＋风险表＋具名没做。
