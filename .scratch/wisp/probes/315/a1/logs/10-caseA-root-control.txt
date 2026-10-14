@@ -1,0 +1,38 @@
+time=2026-10-14T10:46:58.399+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestZZ315A1RootLoopFirstBridgeCall
+time=2026-10-14T10:46:58.421+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp315a1gotmp\TestZZ315A1RootLoopFirstBridgeCall185115925\001\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T10:46:58.432+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\tmp\wisp315a1gotmp\TestZZ315A1RootLoopFirstBridgeCall185115925\001\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-14T10:46:58.449+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp315a1gotmp\TestZZ315A1RootLoopFirstBridgeCall185115925\001 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T10:46:58.494+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315a1gotmp\TestZZ315A1RootLoopFirstBridgeCall185115925\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-14T10:46:58.506+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-14T02:46:58Z duration_ms=11
+time=2026-10-14T10:46:58.522+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315a1gotmp\TestZZ315A1RootLoopFirstBridgeCall185115925\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-14T10:46:58.531+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-14T02:46:58Z duration_ms=8
+time=2026-10-14T10:46:58.545+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\tmp\wisp315a1gotmp\TestZZ315A1RootLoopFirstBridgeCall185115925\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-14T10:46:58.558+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-14T02:46:58Z duration_ms=13
+time=2026-10-14T10:46:58.574+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-14T10:46:58.578+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    zz315a1probe_test.go:473: case A: rc=0 in 214.1329ms; golden requests=[POST /v1/chat/completions POST /v1/chat/completions]
+    zz315a1probe_test.go:474: case A raw stdout:
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        [工具 fs.read -> success]
+        根任务读完了，收口。
+        wisp run: 任务 028305c3-7459-4b8a-a2fa-edc1d984d50f 结束（completed，2 轮，1 次工具调用，成本 0 CNY（未计价））
+        wisp run: 回复已完成
+    zz315a1probe_test.go:475: case A raw stderr:
+        [audit] wisp run: SESSION-MINT id=sess_94a596300c6a4a3284eb8f6489ef815d (结束点＝本进程退出，A435 第 2 条)
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\tmp\\wisp315a1gotmp\\TestZZ315A1RootLoopFirstBridgeCall185115925\\001\\config.toml"
+        [audit] config: HOT-RELOAD state=armed tick=1s path="C:\\tmp\\wisp315a1gotmp\\TestZZ315A1RootLoopFirstBridgeCall185115925\\001\\config.toml" goroutine=watchdog owner=config d36_confirm=on restart_notice=on detail="本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效"
+        [audit] wisp run: 项目说明加载器 workspace="" globalDir="C:\\tmp\\wisp315a1gotmp\\TestZZ315A1RootLoopFirstBridgeCall185115925\\001" enabled=true budget=2300
+        [audit] projctx: projctx: 没有找到任何项目说明文件（工作区逐级向上与数据目录都查过）
+        [audit] tools: MODE-REDLINE mode=ask_every_step still asks tool=fs.read rules=[] because=无法识别的风险级，fail-closed 保留询问
+        [audit] wisp run: 风险判定 tool=fs.read level=L0 rules=[] reason="无规则命中（L0 直接执行）"
+        [audit] tools: call kind=success task=028305c3-7459-4b8a-a2fa-edc1d984d50f corr=028305c3-7459-4b8a-a2fa-edc1d984d50f#call_zz315_a1_root_read tool=fs.read risk=L0 decision=allow outcome=success rules_hit=[] in_allowlist_scope=true grant_id=0 reason="无规则命中（L0 直接执行）"
+        [audit] tools: PATH-ACCOUNT task=028305c3-7459-4b8a-a2fa-edc1d984d50f tool=fs.read roots=1 rewritten=[] unusable=[]
+        [audit] projctx: projctx: 没有找到任何项目说明文件（工作区逐级向上与数据目录都查过）
+        [audit] tools: C25 scope closed task=028305c3-7459-4b8a-a2fa-edc1d984d50f was_open=true dropped=1 open_scopes=0 close_err=<nil>
+        [audit] config: HOT-RELOAD state=stopped reason=run-root-cancelled detail="轮询协程已退出（本次进程正在收口）；此后对 config.toml 的改动要下一次启动才会被读到"
+time=2026-10-14T10:46:58.697+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    zz315a1probe_test.go:482: case A row: tool=fs.read level=L0 decision=allow outcome=success class="" corr="028305c3-7459-4b8a-a2fa-edc1d984d50f#call_zz315_a1_root_read"
+--- PASS: TestZZ315A1RootLoopFirstBridgeCall (0.31s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.076s
