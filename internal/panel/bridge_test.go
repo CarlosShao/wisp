@@ -164,4 +164,77 @@ func TestFrontendComposerRequestsMatchTheEnvelope(t *testing.T) {
 	}
 }
 
+// TestEveryWhitelistedInboundNameIsAlsoSentByThePage is ticket 114 AC#8's
+// forward direction as a gate: adding a name to the Go-side whitelist must make
+// the page carry the matching literal, or this test goes red. Its subject is
+// measured, not guessed: the cousin above checks four names written out by hand,
+// so when ticket 248 added MethodConfigGet/MethodConfigSet ("config.get",
+// "config.set") the whitelist grew and no instrument tied either name to the page
+// (a2 census section 2, AC#8). Ticket 253's closed-roster ruler gates the Go-side
+// registration spine - declared, guard, router - and reads nothing about the
+// page, so it does not close this direction.
+//
+// The name list is read off bridge.go through the same prefix-agnostic extractor
+// the closed-roster test uses, so a new constant cannot slip past by not being
+// copied into a list here; the page is frontend/src/lib/panel.ts, the one door
+// file the structural nails pin as the only place a host call may live
+// (composer_test.go, TestTheRendererHoldsExactlyOneDoorToTheHost). The planted
+// half runs the SAME check against a bridge.go copy carrying an unmirrored name,
+// so a green above cannot come from a check that looks at nothing.
+func TestEveryWhitelistedInboundNameIsAlsoSentByThePage(t *testing.T) {
+	root := panelRepoRoot(t)
+	bridgePath := filepath.Join(root, "internal", "panel", "bridge.go")
+	pageData, err := os.ReadFile(filepath.Join(root, "frontend", "src", "lib", "panel.ts"))
+	if err != nil {
+		t.Fatalf("read frontend/src/lib/panel.ts: %v", err)
+	}
+	page := string(pageData)
+
+	declared := parseFileInbound(t, bridgePath)
+	if declared.parseError != "" {
+		t.Fatalf("bridge.go: %s", declared.parseError)
+	}
+	names := declared.namesOf()
+	if len(names) < 6 {
+		t.Fatalf("bridge.go declares %d inbound names (%v) - an extractor reading almost nothing must not read as a pass", len(names), names)
+	}
+	if missing := namesAbsentFromPage(page, names); len(missing) > 0 {
+		t.Errorf("the Go side answers %s and frontend/src/lib/panel.ts never spells %s as a literal: adding a route on one side only is the drift ticket 114 AC#8 turns into a gate - land the page literal in the same change or take the Go name out",
+			strings.Join(names, ", "), strings.Join(missing, ", "))
+	}
+
+	src, err := os.ReadFile(bridgePath)
+	if err != nil {
+		t.Fatalf("read bridge.go: %v", err)
+	}
+	dir := t.TempDir()
+	plantedPath := filepath.Join(dir, "bridge.go")
+	plant := "\nconst ConfigUnmirrored114Test = \"config.unmirrored114\"\n"
+	if err := os.WriteFile(plantedPath, append(append([]byte{}, src...), []byte(plant)...), 0o644); err != nil {
+		t.Fatalf("plant bridge.go: %v", err)
+	}
+	planted := parseFileInbound(t, plantedPath)
+	if planted.parseError != "" {
+		t.Fatalf("planted bridge.go: %s", planted.parseError)
+	}
+	missing := namesAbsentFromPage(page, planted.namesOf())
+	if len(missing) != 1 || missing[0] != "config.unmirrored114" {
+		t.Errorf("a whitelist name the page never sends read as missing=%v, want exactly [\"config.unmirrored114\"] - this gate has no teeth for the shape ticket 114 AC#8 was filed over", missing)
+	}
+	t.Logf("page mirrors all %d whitelisted inbound names; the planted unmirrored name was reported (%v), so this check reads bridge.go rather than a list in this file",
+		len(names), missing)
+}
+
+// namesAbsentFromPage reports which names never appear as a double-quoted string
+// literal in the page source, keeping the input order (namesOf returns sorted).
+func namesAbsentFromPage(page string, names []string) []string {
+	var out []string
+	for _, name := range names {
+		if !strings.Contains(page, `"`+name+`"`) {
+			out = append(out, name)
+		}
+	}
+	return out
+}
+
 func jsonString(s string) string { b, _ := json.Marshal(s); return string(b) }

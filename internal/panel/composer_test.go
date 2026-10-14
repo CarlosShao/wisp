@@ -405,10 +405,19 @@ func reMatchesInFile(re *regexp.Regexp, path string) []string {
 	return out
 }
 
-// rendererSourceFile is the file set the renderer can actually load: the text
-// types tools/d22scan walks under frontend/, which is wider than the trio
-// (.ts/.tsx/.css) door 2 used to open. R-92-1's first shape is a route spelled in
-// a plain .js file, a file the old filter never read at all.
+// rendererSourceFile is the file set the renderer can actually load and, at the
+// same time, a SUPERSET of every text type tools/d22scan walks under frontend/ -
+// the wider of the two on purpose, never the narrower. R-92-1's first shape is a
+// route spelled in a plain .js file, a file the old trio filter never read; the
+// residue ticket 114 AC#4 measured is the other direction, .json, which the
+// scanner's whitelist already carried and this filter did not, so a route spelled
+// there walked past both doors.
+//
+// The containment direction is pinned by TestDoorTwoReadsEveryTextTypeTheScannerWalks:
+// everything the scanner treats as text, this filter must read too. The .mjs
+// entries above that list are the deliberate asymmetry (R18's vendoring tooling is
+// .mjs, the scanner's whitelist drops it, and dropping it here to force equality
+// would re-narrow a gate, which R16#4 forbids).
 //
 // frontend/dist is excluded on purpose, not by omission: it is generated output,
 // so a gate over it would flip red and green with whether somebody re-ran
@@ -419,7 +428,8 @@ func reMatchesInFile(re *regexp.Regexp, path string) []string {
 // generated text.
 func rendererSourceFile(p string) bool {
 	switch filepath.Ext(p) {
-	case ".ts", ".tsx", ".js", ".mjs", ".jsx", ".css", ".html":
+	case ".ts", ".tsx", ".js", ".mjs", ".jsx", ".css", ".html", ".json",
+		".md", ".txt", ".yaml", ".yml", ".toml", ".go", ".svg", ".vue":
 		return true
 	}
 	return false
@@ -544,14 +554,24 @@ func scanRendererHostDoors(t *testing.T, srcDir string) rendererDoorReport {
 // set - which file may talk to the host at all, and which words it may say - so
 // neither shape survives regardless of how the method name is spelled.
 //
-//	(i)   every .postMessage( call site under frontend/src lives in lib/panel.ts,
+//	(i)   every .postMessage( call site under frontend/ lives in lib/panel.ts,
 //	      and there are exactly two of them;
 //	(ii)  no dotted name is assembled at runtime anywhere in the renderer;
 //	(iii) sendRequest is never called with a computed route;
 //	(iv)  every "panel.*" literal is one the Go side answers.
+//
+// The root is the whole frontend/ tree, not frontend/src, and that is ticket 114
+// AC#9 landed rather than a preference: R-92b-2's second shape put a channel in
+// frontend/public/*.js referenced from index.html and the src-only root never saw
+// it, because vite serves public/ verbatim and any file under the tree can reach
+// the shipped bundle. The whole tree is a superset of whatever the renderer loads,
+// so the pin cannot miss a loadable file; answering "exactly which files load"
+// would need the import closure plus the entry HTML and is left to the interface
+// agent (a2 census J3). It is also the same root door 2 walks above, so the two
+// instruments can no longer judge two different trees.
 func TestTheRendererHoldsExactlyOneDoorToTheHost(t *testing.T) {
 	root := panelRepoRoot(t)
-	rep := scanRendererHostDoors(t, filepath.Join(root, "frontend", "src"))
+	rep := scanRendererHostDoors(t, filepath.Join(root, "frontend"))
 	if len(rep.outside) != 0 {
 		t.Errorf("the renderer reaches the host from outside src/lib/panel.ts; there is no second channel in this design"+
 			" (ticket 92 AC#1, R-92-1):%s", "\n  "+strings.Join(rep.outside, "\n  "))
@@ -575,11 +595,14 @@ func TestTheRendererHoldsExactlyOneDoorToTheHost(t *testing.T) {
 		rep.files, len(rep.callSites), len(composerRouteLiterals()))
 }
 
-// TestPlantedRendererDoorShapesGoRed is AC#1's positive nail for the two shapes
-// the acceptance round measured as GREEN under the old instruments: a
-// panel.mode.set sent from a plain .js file, and the same route assembled at
-// runtime from an array. Both are planted into a copy of the real tree, so the
-// run also shows the clean half still passes.
+// TestPlantedRendererDoorShapesGoRed is AC#1's positive nail for the shapes
+// the acceptance rounds measured as GREEN under the old instruments: a
+// panel.mode.set sent from a plain .js file, the same route assembled at
+// runtime from an array, a door planted OUTSIDE frontend/src (ticket 114 AC#9:
+// R-92b-2's frontend/public shape, which the src-only root could not see), and a
+// route spelled in a .json file (ticket 114 AC#4: a scanner text type door 2 did
+// not read). All are planted into one copy of the real tree, so the run also
+// shows the clean half still passes.
 func TestPlantedRendererDoorShapesGoRed(t *testing.T) {
 	root := panelRepoRoot(t)
 	real := filepath.Join(root, "frontend", "src")
@@ -608,29 +631,130 @@ func TestPlantedRendererDoorShapesGoRed(t *testing.T) {
 	}
 	write("ac92-plant-a.js", plantA)
 	write("ac92-plant-c.ts", plantB)
+	// Shape C: the same door, in the directory vite serves verbatim instead of
+	// building - outside frontend/src, which is where AC#9's second shape lived
+	// while the structural pin reported "2 host call sites, one number unmoved".
+	plantC := `window.chrome.webview.postMessage(JSON.stringify({ method: "panel.mode.set", to: "auto_approve" }));`
+	if err := os.MkdirAll(filepath.Join(dir, "frontend", "public"), 0o755); err != nil {
+		t.Fatalf("plant dir frontend/public: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "frontend", "public", "ac92-public-door.js"), []byte(plantC+"\n"), 0o644); err != nil {
+		t.Fatalf("plant frontend/public/ac92-public-door.js: %v", err)
+	}
+	// Shape D: a route in a .json file, a text type the scanner already walked and
+	// door 2's extension set did not (ticket 114 AC#4's residual). It stays inside
+	// src so the extension variable is the only one this shape moves.
+	write("ac92-plant-d.json", `{"method": "panel.mode.set"}`)
 
-	rep := scanRendererHostDoors(t, filepath.Join(dir, "frontend", "src"))
-	if len(rep.outside) < 2 {
-		t.Errorf("shape A and shape B each add a host call site outside src/lib/panel.ts; the scan found %d:%s",
+	rep := scanRendererHostDoors(t, filepath.Join(dir, "frontend"))
+	if len(rep.outside) < 3 {
+		t.Errorf("shapes A, B and C each add a host call site outside src/lib/panel.ts; the scan found %d:%s",
 			len(rep.outside), "\n  "+strings.Join(rep.outside, "\n  "))
+	}
+	if joined := strings.Join(rep.outside, "\n"); !strings.Contains(joined, "public/ac92-public-door.js") {
+		t.Errorf("the host-call-site scan does not reach frontend/public - a door planted there is exactly ticket 114 AC#9's shape and the scan root still stops short of the tree it must judge")
 	}
 	if len(rep.assembly) != 1 {
 		t.Errorf("shape B's runtime-assembled route = %d hits, want 1:%s",
 			len(rep.assembly), "\n  "+strings.Join(rep.assembly, "\n  "))
 	}
-	if len(rep.unknown) != 1 || !strings.Contains(rep.unknown[0], "panel.mode.set") {
-		t.Errorf("shape A's route literal should be named once, got %v", rep.unknown)
+	if len(rep.unknown) != 3 || !strings.Contains(strings.Join(rep.unknown, "\n"), "panel.mode.set") {
+		t.Errorf("shapes A, C and D each name a route the Go side does not answer, so 3 unknown literals were expected; got %v", rep.unknown)
 	}
-	// The widened door 2 must also reach a .js file now: this is the half R-92-1
-	// measured as invisible, and it is fixed by extension, not by loosening.
+	// The widened door 2 must also reach a .js file and the .json file now: those
+	// are the halves R-92-1 measured as invisible, fixed by extension, not by
+	// loosening.
 	hits := scanComposerPermissionWrites(t, filepath.Join(dir, "frontend"))
 	if len(hits) == 0 {
 		t.Error("door 2 read neither plant: its extension set is still narrower than what the renderer loads")
-	} else if !strings.Contains(strings.Join(hits, "\n"), "ac92-plant-a.js") {
-		t.Errorf("door 2 must name the planted .js file, got %v", hits)
+	} else {
+		joined := strings.Join(hits, "\n")
+		for _, want := range []string{"ac92-plant-a.js", "ac92-public-door.js", "ac92-plant-d.json"} {
+			if !strings.Contains(joined, want) {
+				t.Errorf("door 2 must name %s, got %v", want, hits)
+			}
+		}
 	}
 	t.Logf("red as required: %d outside call sites, %d assembled routes, %d unknown literals, door 2 named %d line(s)",
 		len(rep.outside), len(rep.assembly), len(rep.unknown), len(hits))
+}
+
+// TestDoorTwoReadsEveryTextTypeTheScannerWalks pins ticket 114 AC#4's "aligned"
+// half so it cannot rot back into a one-off edit: the text-type whitelist of
+// tools/d22scan's isTextFile is parsed out of that source and every type in it
+// must also be read by rendererSourceFile, the filter both doors above share. The
+// direction is containment, never equality, on purpose: this gate is allowed to be
+// WIDER than the scanner's list (.mjs is - R18's vendoring scripts - and narrowing
+// this filter to force a symmetric comparison would shrink a ban, R16#4). That is
+// also why this file reads the scanner's source text instead of importing it: a
+// hand-copied extension list is the shape whose drift ticket 114 was filed over.
+//
+// The floor below refuses a set that does not carry the members isTextFile has
+// always had (a moved or renamed switch must fail loudly, not read as "aligned"),
+// and the planted sub-case drives the same extractor and the same containment
+// predicate over a synthetic switch, so a green cannot come from machinery that
+// never looks at anything.
+func TestDoorTwoReadsEveryTextTypeTheScannerWalks(t *testing.T) {
+	root := panelRepoRoot(t)
+	data, err := os.ReadFile(filepath.Join(root, "tools", "d22scan", "main.go"))
+	if err != nil {
+		t.Fatalf("read tools/d22scan/main.go: %v", err)
+	}
+	exts := textTypesOfScannerWhitelist(t, string(data))
+	for _, ext := range exts {
+		if !rendererSourceFile("probe" + ext) {
+			t.Errorf("tools/d22scan's text whitelist admits %q and this package's door-2 filter does not read it: a route spelled in that type walks past every composer gate (ticket 114 AC#4, R-92-1), and the fix is to widen this filter, never to narrow the scanner", ext)
+		}
+	}
+	t.Logf("door 2 reads all %d text types the scanner walks: %s", len(exts), strings.Join(exts, " "))
+
+	t.Run("the containment names a type that is genuinely not read", func(t *testing.T) {
+		fake := "package main\n\nfunc isTextFile(path string) bool {\n" +
+			"\tswitch path {\n\tcase \".go\", \".json\", \".html\", \".zzz114\":\n\t\treturn true\n\t}\n\treturn false\n}\n"
+		got := textTypesOfScannerWhitelist(t, fake)
+		if !containsString(got, ".zzz114") {
+			t.Fatalf("the extractor lost the planted .zzz114 type: got %v", got)
+		}
+		if rendererSourceFile("probe.zzz114") {
+			t.Fatal("rendererSourceFile admits .zzz114, so the containment assertion above would pass on a type nobody intended to read")
+		}
+	})
+}
+
+// textTypesOfScannerWhitelist extracts the extension list from isTextFile's switch
+// and refuses to return a set that is missing members every revision of that
+// switch has carried.
+func textTypesOfScannerWhitelist(t *testing.T, src string) []string {
+	t.Helper()
+	body := funcBody(src, "func isTextFile")
+	if strings.Contains(body, "function not found") {
+		t.Fatalf("tools/d22scan/main.go no longer declares func isTextFile: this gate's one source of truth moved, re-point it rather than deleting the containment (ticket 114 AC#4)")
+	}
+	var exts []string
+	seen := map[string]bool{}
+	for _, m := range regexp.MustCompile(`"(\.[A-Za-z0-9]+)"`).FindAllStringSubmatch(body, -1) {
+		if !seen[m[1]] {
+			seen[m[1]] = true
+			exts = append(exts, m[1])
+		}
+	}
+	for _, must := range []string{".go", ".json", ".html"} {
+		if !seen[must] {
+			t.Fatalf("the text-type extraction found %v and is missing %q, which isTextFile has always carried: the switch moved and a green here would mean nothing", exts, must)
+		}
+	}
+	sort.Strings(exts)
+	return exts
+}
+
+// containsString reports whether one string slice carries a value.
+func containsString(list []string, want string) bool {
+	for _, s := range list {
+		if s == want {
+			return true
+		}
+	}
+	return false
 }
 
 // scanComposerPermissionWrites applies BOTH doors to one tree and returns the
