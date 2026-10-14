@@ -1,0 +1,46 @@
+=== (1) go test ./internal/tools/ -count=1 (full package, window 16:07:53-16:09:08) ===
+ok  	github.com/CarlosShao/wisp/internal/tools	33.514s
+
+=== (2) go vet ./internal/tools/ ===
+vet rc=0 (clean)
+
+=== (3) go build ./... ===
+rc=0
+
+=== (4) scripts/d22scan.sh -> rc=1, attributed: the only finding caused by this leg was refusal_20r2_test.go:224 (lock glyph in a STRING); fixed. Remaining finding-site FAIL names + direct-run summary follow. ===
+--- FAIL: TestScannerSelfScanOfRealRepoIsGreen (2.22s)
+--- FAIL: TestRealRepoLedgerIsHonest (3.54s)
+
+--- direct run: go run . -root ../.. (from tools/d22scan) ---
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 277 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 237 production Go files
+[61 finding lines elided here; counts: internal/=0 cmd/=0, findings by directory:]
+     61 frontend/fixtures
+[tail]
+d22scan: 61 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+exit status 1
+
+=== (5) d22scan -self-test (instrument health) ===
+clean - all 40 direction checks passed (20 expect-ring, 20 expect-silent), rc=0
+
+=== (6) go test -run TestManagerLocked ./internal/config/ -count=1 ===
+ok  	github.com/CarlosShao/wisp/internal/config	1.913s
+
+=== (7) scripts/check-path-length-budget.sh ===
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=unset)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 12808 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=12808  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=58  past the old debt line(180)=2  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 60 paths on this tree, recomputed just now in both units
+
+=== (8) go test -race -run Test20r2 ./internal/tools/ -count=1 ===
+ok  	github.com/CarlosShao/wisp/internal/tools	21.921s
+
+=== (9) go test -run Test20r2 ./internal/tools/ -count=1 -v -> see 10-baseline-green.txt (8 PASS / 0 FAIL / 0 SKIP) ===

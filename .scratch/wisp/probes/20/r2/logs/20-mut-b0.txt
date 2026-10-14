@@ -1,0 +1,41 @@
+=== run: go test -run Test20r2 ./internal/tools/ -count=1 (MUT-B0: dec.Refusal not set = pre-change behavior) ===
+time=2026-10-14T15:57:42.682+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: Test20r2RefusalKindsAreDistinct (0.01s)
+    refusal_20r2_test.go:120: 越界拒绝的机器可辨值 = "", want "out-of-allowlist"（措辞不参与判定）
+--- FAIL: Test20r2DenyIsRedTeamNeverAskable (0.01s)
+    refusal_20r2_test.go:169: A 档拒绝的机器可辨值 = "", want "redteam-denied"（Deny 永远不可问）
+time=2026-10-14T15:57:42.713+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp20r2gotmp\Test20r2FirstUseAskFlowGoesOnlyThroughConfig523907422\001\.wisp-config-539302264.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T15:57:42.714+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+--- FAIL: Test20r2FirstUseAskFlowGoesOnlyThroughConfig (0.03s)
+    --- FAIL: Test20r2FirstUseAskFlowGoesOnlyThroughConfig/refused:_the_refusal_is_the_askable_class (0.00s)
+        refusal_20r2_test.go:208: allowed=false refusal=""：空名单下这一发必须是可问类拒绝
+    --- FAIL: Test20r2FirstUseAskFlowGoesOnlyThroughConfig/denied:_nothing_is_appended_and_the_next_call_is_still_refused (0.00s)
+        refusal_20r2_test.go:218: 拒绝后必须仍被拒且仍是可问类: allowed=false refusal=""
+    --- FAIL: Test20r2FirstUseAskFlowGoesOnlyThroughConfig/approved:_the_append_lands_via_Manager.AddAllowedDir_and_the_next_assembly_passes (0.02s)
+        refusal_20r2_test.go:246: 同一枚桥的复核必须仍是被拒且可问（allowed=false refusal=""）——名单一写盘就跑通，那是「这次先放行下次再说」，被 (b) 明令禁止
+    --- FAIL: Test20r2FirstUseAskFlowGoesOnlyThroughConfig/scoped:_the_widening_authorized_one_directory,_not_the_machine (0.01s)
+        refusal_20r2_test.go:265: 被授权的是 C:\tmp\wisp20r2gotmp\Test20r2FirstUseAskFlowGoesOnlyThroughConfig523907422\002，兄弟目录不该跟着放行: allowed=false refusal=""
+time=2026-10-14T15:57:42.745+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- FAIL: Test20r2DirectionEngineAdjudicatesFileLevelAdditions (0.02s)
+    refusal_20r2_test.go:314: 拒绝后同路径必须仍被拒: allowed=false refusal=""
+--- FAIL: Test20r2JunctionRefusalIsNeverAskable (0.03s)
+    refusal_20r2_windows_test.go:50: junction 拒绝的机器可辨值 = "", want "redteam-denied"
+--- FAIL: Test20r2ShortNameOfAnAListFileIsNeverAskable (0.01s)
+    refusal_20r2_windows_test.go:100: 8.3 拒绝的机器可辨值 = "", want "redteam-denied"
+--- FAIL: Test20r2ShortNameOfAPlainFileIsTheOrdinaryOutOfScopeClass (0.01s)
+    refusal_20r2_windows_test.go:148: 非黑名单越界文件的 8.3 拼法类 = "", want "out-of-allowlist"（8.3 是拼法不是拒绝类，见 TestShortNameSpellingGetsTheSameVerdictAsTheLongOne 的已裁定注释）
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	3.632s
+FAIL
+
+=== red sentences (verbatim) ===
+refusal_20r2_test.go:120: 越界拒绝的机器可辨值 = "", want "out-of-allowlist"（措辞不参与判定）
+refusal_20r2_test.go:169: A 档拒绝的机器可辨值 = "", want "redteam-denied"（Deny 永远不可问）
+refusal_20r2_test.go:208: allowed=false refusal=""：空名单下这一发必须是可问类拒绝
+refusal_20r2_test.go:218: 拒绝后必须仍被拒且仍是可问类: allowed=false refusal=""
+refusal_20r2_test.go:246: 同一枚桥的复核必须仍是被拒且可问（allowed=false refusal=""）——名单一写盘就跑通，那是「这次先放行下次再说」，被 (b) 明令禁止
+refusal_20r2_test.go:265: 被授权的是 C:\tmp\wisp20r2gotmp\Test20r2FirstUseAskFlowGoesOnlyThroughConfig2493183929\002，兄弟目录不该跟着放行: allowed=false refusal=""
+refusal_20r2_test.go:314: 拒绝后同路径必须仍被拒: allowed=false refusal=""
+refusal_20r2_windows_test.go:50: junction 拒绝的机器可辨值 = "", want "redteam-denied"
+refusal_20r2_windows_test.go:100: 8.3 拒绝的机器可辨值 = "", want "redteam-denied"
+refusal_20r2_windows_test.go:148: 非黑名单越界文件的 8.3 拼法类 = "", want "out-of-allowlist"（8.3 是拼法不是拒绝类，见 TestShortNameSpellingGetsTheSameVerdictAsTheLongOne 的已裁定注释）

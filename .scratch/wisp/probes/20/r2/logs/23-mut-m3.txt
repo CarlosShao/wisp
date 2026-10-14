@@ -1,0 +1,15 @@
+=== run: -count=1 (MUT-M3: PathCanonicalizer.AddRoot added) ===
+time=2026-10-14T16:00:15.031+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-14T16:00:15.067+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp20r2gotmp\Test20r2FirstUseAskFlowGoesOnlyThroughConfig3860141188\001\.wisp-config-4157156386.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T16:00:15.068+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-10-14T16:00:15.114+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+time=2026-10-14T16:00:15.129+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- FAIL: Test20r2NoSecondAuthorizationPath (0.01s)
+    refusal_20r2_test.go:363: PathCanonicalizer grew AddRoot. If it WIDENS what InAllowlist authorizes outside NewPathCanonicalizer, that is the second authorization path ticket 20 frame 7 (b) forbids.
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	5.449s
+FAIL
+
+=== red sentences (verbatim) ===
+refusal_20r2_test.go:363: PathCanonicalizer grew AddRoot. If it WIDENS what InAllowlist authorizes outside NewPathCanonicalizer, that is the second authorization path ticket 20 frame 7 (b) forbids.
+--- FAIL: Test20r2NoSecondAuthorizationPath (0.00s)

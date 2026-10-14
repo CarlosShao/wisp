@@ -1,0 +1,15 @@
+=== run: -count=1 (MUT-M2: resolver-error branch returns the askable class) ===
+time=2026-10-14T15:59:25.487+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-14T15:59:25.544+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp20r2gotmp\Test20r2FirstUseAskFlowGoesOnlyThroughConfig2773207303\001\.wisp-config-2057847156.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T15:59:25.548+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-10-14T15:59:25.596+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+time=2026-10-14T15:59:25.610+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- FAIL: Test20r2JunctionRefusalIsNeverAskable (0.03s)
+    refusal_20r2_windows_test.go:50: junction 拒绝的机器可辨值 = "out-of-allowlist", want "redteam-denied"
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	3.340s
+FAIL
+
+=== red sentences (verbatim) ===
+refusal_20r2_windows_test.go:50: junction 拒绝的机器可辨值 = "out-of-allowlist", want "redteam-denied"
+--- FAIL: Test20r2JunctionRefusalIsNeverAskable (0.03s)

@@ -1,0 +1,31 @@
+time=2026-10-14T15:56:45.664+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test20r2RefusalKindsAreDistinct
+--- PASS: Test20r2RefusalKindsAreDistinct (0.01s)
+=== RUN   Test20r2DenyIsRedTeamNeverAskable
+--- PASS: Test20r2DenyIsRedTeamNeverAskable (0.01s)
+=== RUN   Test20r2FirstUseAskFlowGoesOnlyThroughConfig
+=== RUN   Test20r2FirstUseAskFlowGoesOnlyThroughConfig/refused:_the_refusal_is_the_askable_class
+=== RUN   Test20r2FirstUseAskFlowGoesOnlyThroughConfig/denied:_nothing_is_appended_and_the_next_call_is_still_refused
+=== RUN   Test20r2FirstUseAskFlowGoesOnlyThroughConfig/approved:_the_append_lands_via_Manager.AddAllowedDir_and_the_next_assembly_passes
+time=2026-10-14T15:56:45.694+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp20r2gotmp\Test20r2FirstUseAskFlowGoesOnlyThroughConfig485002444\001\.wisp-config-1003652924.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T15:56:45.695+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+=== RUN   Test20r2FirstUseAskFlowGoesOnlyThroughConfig/scoped:_the_widening_authorized_one_directory,_not_the_machine
+--- PASS: Test20r2FirstUseAskFlowGoesOnlyThroughConfig (0.04s)
+    --- PASS: Test20r2FirstUseAskFlowGoesOnlyThroughConfig/refused:_the_refusal_is_the_askable_class (0.00s)
+    --- PASS: Test20r2FirstUseAskFlowGoesOnlyThroughConfig/denied:_nothing_is_appended_and_the_next_call_is_still_refused (0.00s)
+    --- PASS: Test20r2FirstUseAskFlowGoesOnlyThroughConfig/approved:_the_append_lands_via_Manager.AddAllowedDir_and_the_next_assembly_passes (0.02s)
+    --- PASS: Test20r2FirstUseAskFlowGoesOnlyThroughConfig/scoped:_the_widening_authorized_one_directory,_not_the_machine (0.00s)
+=== RUN   Test20r2DirectionEngineAdjudicatesFileLevelAdditions
+time=2026-10-14T15:56:45.727+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+time=2026-10-14T15:56:45.741+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- PASS: Test20r2DirectionEngineAdjudicatesFileLevelAdditions (0.03s)
+=== RUN   Test20r2NoSecondAuthorizationPath
+--- PASS: Test20r2NoSecondAuthorizationPath (0.00s)
+=== RUN   Test20r2JunctionRefusalIsNeverAskable
+--- PASS: Test20r2JunctionRefusalIsNeverAskable (0.04s)
+=== RUN   Test20r2ShortNameOfAnAListFileIsNeverAskable
+--- PASS: Test20r2ShortNameOfAnAListFileIsNeverAskable (0.01s)
+=== RUN   Test20r2ShortNameOfAPlainFileIsTheOrdinaryOutOfScopeClass
+--- PASS: Test20r2ShortNameOfAPlainFileIsTheOrdinaryOutOfScopeClass (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	2.196s

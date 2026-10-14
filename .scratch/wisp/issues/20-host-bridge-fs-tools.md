@@ -332,3 +332,25 @@ from 10.
   承认残留可接受）；证据 `docs/evidence/s1/20-a18-taskkill-residue-characterization.md` §2/§3/§5。
   反空跑：绕过阻塞点的子进程自己 `os.Exit(5)` 打印 "wrote without blocking" 并被父进程判失败；
   未测的分支（暂存文件**内容**是否等于已 Write 量、rename 之后那一段的真 kill 时机）写在证据 §5。
+- [2026-10-14T08:14Z] agent=20-r2 did=**第 7 框（`[fs] allowed_dirs` 首次使用询问流）的最小闭子集落码**。**先现读**：框面三条＋头部 ④；
+  （a）要的"机器可辨原因值"此前**不存在**（两类拒绝只靠措辞分岔，`risk.ErrReparseDenied` 折成字符串——第 5 框 §4③ 原文）；
+  `manager.go:362` 指的是 `fsDirection` 的 `fs.allowed_dirs` 行（现读 `manager.go:468`）＋`planLocked` 的 🔒 确认路径，
+  先例读数＝`manager_test.go:162-225`（答否保持旧值／答可才生效），生产侧同意落点＝`AddAllowedDir`（201 建，`cmd/wisp/approval_always.go:134` 已驱动）。
+  **做了什么（只三条，未多一格）**：
+  **(a) 机器可辨值**＝新产码 `internal/tools/refusal.go`：`RefusalKind` 两值 `out-of-allowlist`（refusal.go:53，**唯一**允许被首次使用询问取用的类）
+  ／`redteam-denied`（:58＝解析器拒绝∪Deny）；`refusalKindOf`（:72）跑在 C19 判过的同一批 raw paths 上，只在 routing 拒绝分支取（`bridge.go:361`），
+  经 `Decision.Refusal`（`gate.go:37`→OnDecision）＋审计行 `refusal=%s`（`bridge.go:1162`）两个宿主面离开桥；人话 `Reason` 一字未动，`Decision` 字段扫描禁字（allow/approve/grant）不受影响。
+  **(b) 同意只走既有 🔒 通道**＝**零新授权产码**：只走 `AddAllowedDir`／方向引擎＋`ConfirmLocked`；钉住禁形的三条＝`PathCanonicalizer` 方法名册（无加根口，仅收窄 workspace 面）
+  ＋"`internal/tools` 产码不 import `internal/config`"＋流程格断言"同一枚旧桥复检仍拒、下一枚装配才放行"（禁「这次先放行下次再说」）。
+  ⚠「下一次」＝下一次装配（重启形状），依据是仓里已落裁定：`config_reload.go` 头部"Why mid-run re-feed 未做/不许 mint 新导出名"＋201 卡面「下一次启动生效」。
+  **(c) 三断言用例**（`refusal_20r2_test.go`＋`refusal_20r2_windows_test.go`，零 `t.Skip`）：①两类可辨＋越界＝可问/Deny＝不可问；②批准→盘上落地→新装配 L0 直读，拒绝→仍拒（含方向引擎答否仍空、答可才生效，先例形状复跑）；③真 `mklink /J`＋真 `GetShortPathNameW` 打 A 档：
+  一律 `redteam-denied` 且可问谓词假。**边界如实登记**：非黑名单越界文件的 8.3 拼法＝与长名**同一类**（可问），依同包已提交 `TestShortNameSpellingGetsTheSameVerdictAsTheLongOne` 逐字"8.3 is deliberately NOT a resolver-refused class"；
+  要更严读法是 refusal.go 一行的事，边界格会红（注释已写明）。
+  **读数**：基线 8 顶层全绿；MUT-B0（值不设＝改前）10 句红（`越界拒绝的机器可辨值 = "", want "out-of-allowlist"` …）；**MUT-M1（并回红队字符串）＝题面要的那发**，
+  4 枚钉红逐字含 `两类拒绝共用同一个字符串 "redteam-denied" —— 被拒原因不再可机器区分（票 20 第 7 框 (a)）`；MUT-M2（junction 变可问）唯一红＝`junction 拒绝的机器可辨值 = "out-of-allowlist", want "redteam-denied"`；
+  MUT-M3（加 `AddRoot`）钉红＝`PathCanonicalizer grew AddRoot. …second authorization path ticket 20 frame 7 (b) forbids.`；三处已还原（`grep MUTATION` 零、paths.go 零 diff、复跑绿）。
+  **门禁**：`go build ./...` rc=0；gofumpt/gofmt 空；`go test ./internal/tools/ -count=1` rc=0（整包 ok 33.5s，既有用例零红）；`-race -run Test20r2` rc=0；`-run TestManagerLocked ./internal/config/` rc=0；长度门 rc=0（60=60）；
+  `d22scan` 仪器自测 rc=0，**全仓扫描 rc=1＝61 finding 逐条全在 `frontend/fixtures/settings-v2/*.png`（16:01 未跟踪件＝机主外部前端 agent 在飞产物，本编队零写面）**，`internal/`/`cmd/` 0 命中；本腿撞出的唯一一条（测试件字符串里的 🔒）已改并复跑 0 命中。
+  **具名没做**：①询问提示本身（native 卡/GUI）＝宿主侧接线（`cmd/wisp` 触则停手上报；GUI 归 39），本腿交付的是该流程唯一缺的判定面；②邻接险情上报不动——201 的 `WideningRule`（`replies.go:503`）从卡面 `Paths` 推目录，
+  而 junction 卡面是带 `(无法规范化: …(junction/symlink)…)` 标记串，`dirOf`（`batch.go:91`）按最后 `/\` 切会吃进标记里的 `/` ⇒ 可推出含碎片的"目录"进第二张卡（属 approval＋cmd/wisp 面，一行未改）；
+  ③同运行内热换根集合明令未做。交件＝`probes/20/r2/00-anchor-and-gates.md`＋logs 7 枚；**框未翻**（判语归非实现者）。锚 `125e2255`／交付时 HEAD `9b51859b`。
