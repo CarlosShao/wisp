@@ -625,3 +625,22 @@
   注入两栏：真回显 1（自家 `cat >>` 后 Edit 报"file changed"，与授权无关）／判为注入 0。
   next=①编排者据 §4（新 exe、`verdicts[sampling gate=true]`、sample_errors/exit 逐发 0）翻 `AC#14` 的勾 ＋ 顺带收口 `:546-555` 注释；
   ②`AC#15` 排后、靶形现量重划（本程 2 枚改写腿仍用同一前提腿，§6.2 那 7 枚站点一起数）；③`AC#10` 等编队安静窗口。
+
+- [2026-10-14 19:0x +08] agent=136s did=**AC#2（`R-134-5`）落地**（只做 AC#2/AC#3/AC#4 三格的写腿；`Status`/票名/框未动，未 push）。
+  锚起手现读 `b38567a9`（＝派发锚，零漂移）。**产码 commit `bb47e9e7`**：`scripts/slo-freshness.sh` 的 P3 扫描行加第 4 列
+  `head_branch`；扫描记录先过字段完整性（`created_at` 用 `-` 哨兵带出、`workflow_run.id`、`head_branch` 缺一即 exit 2）；
+  来源谓词＝branch `main|dev`（列表现成）＋ workflow `.github/workflows/ci.yml` ＋ event `push|schedule|workflow_dispatch`
+  （与 P2 同套；对 branch 合格候选按时间倒序核 `actions/runs/{id}`，首个通过即停，常态只多一次查询）；被拒 lookalike 逐枚打印＋计数，
+  零合格样本时用既有 token `slo-full-sample-never` 点名三档谓词与拒枚数。
+  **三态（探针 `probes/136/s`，stub gh＋`SLO_*` 缝，未真跑采集；读出 `logs/ac2.txt`）**：① 今天不红（tree-old＝`git show b38567a9:` 的脚本副本）：
+  `forge-branch`/`forge-workflow`/`forge-event` 三形逐发 `rc=0` 且日志里 `P3 newest VALID SAMPLE: ... artifact_id=90/91/92 ...`＋`OK`；
+  `missing-source` 今天 `rc=0`（`run=0` 静默当新鲜）；`missing-ts` 今天把记录读串位成 `created_at=704 artifact_id= run=93` 仍判 `0 day(s)` ⇒ `rc=0`。
+  ② 修后同八发：三形 `rc=1`，红句点名（`artifact 90 on branch 'feature/evil' rejected (branch must be main or dev…)`／
+  `workflow '.github/workflows/chore.yml' event 'push'… rejected`／`event 'pull_request'… rejected`）＋
+  `FAIL slo-full-sample-never: 1 slo-full-report artifact(s) were found but none carries the source predicate …`；
+  `missing-ts`/`missing-source` 各 `rc=2` 并逐字印缺的字段名。③ 取不到数据六形修后逐形 rc＝2/2/2/2/1/1（无一 pass），
+  另加 k4b（总数查询失败）`0→2`、k7（run 查询失败）`0→2`；**对照**：`control`（真 dev+ci.yml+push）旧新均 `rc=0` 且印 `0 rejected`，
+  `stale-sample`（10 天）旧新均 `rc=1`。`sh -n` rc=0、shellcheck **0.11.0**（docker `koalaman/shellcheck:v0.11.0`，CI 同形命令 `-s sh`）rc=0。
+  ⚠ 一处口径：`SLO_FULL_LAST_SAMPLE` 注入的记录按文档仍是"declared valid-sample fixture"（3 列），**不再过来源谓词**——谓词守的是 API 扫描
+  （生产输入），已写进脚本头注释；本格未碰 `slo-check.ps1`、`.github/**`、`internal/**`、阈值/golden。
+  next=AC#3（分页上限）与 AC#4（未来时间戳）同腿继续；两格交回后请非实现者按 `logs/ac2.txt` 复算三态并裁 AC#2。
