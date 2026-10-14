@@ -24,6 +24,17 @@ type Decision struct {
 	Capabilities []Capability
 	// SessionOverrideBlocked is R4's "no D45 grant covers this" flag.
 	SessionOverrideBlocked bool
+	// Refusal is the MACHINE-READABLE class of a refusal (ticket 20 frame 7
+	// (a), see refusal.go). Empty means the call was not refused, or was
+	// refused for a reason with no askable counterpart. It is set by the
+	// bridge when routing refuses the call, travels to the host on this same
+	// Decision (OnDecision) and onto the audit line, and it is the ONLY field
+	// a [fs] allowed_dirs first-use ask may be derived from: only
+	// RefusalOutOfAllowlist is askable, and RefusalRedTeamDenied (a resolver
+	// refusal - junction/symlink traversal - or an absolute Deny) must never
+	// become a question. The human Reason text is deliberately NOT the
+	// contract here; it is wording, and wording drifts.
+	Refusal RefusalKind
 	// Mode is the user-facing permission mode this call was screened under
 	// (ticket 90, R20). It travels with the verdict because "why was I not
 	// asked?" is a question the audit trail has to answer from the record, not

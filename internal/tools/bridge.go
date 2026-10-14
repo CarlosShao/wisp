@@ -351,6 +351,14 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 	// --- routing: L0 pass, L1 window, L2 approval, Deny never reaches a gate -
 	ok2, why := b.route(ctx, &dec, sil, grantID)
 	if !ok2 {
+		// Ticket 20 frame 7 (a): name WHICH refusal this was, in a
+		// machine-readable value, before the verdict leaves the bridge. It is
+		// computed over the same raw paths C19 judged and only for refusals
+		// (a call that ran carries no refusal class), and the human Reason
+		// stays untouched: the class exists precisely so no host has to match
+		// on wording to tell an out-of-allowlist refusal (the one class a
+		// first-use ask may offer a fix for) from a red-team one.
+		dec.Refusal = b.refusalKindOf(rawPaths, sil.Level)
 		class := string(observe.ClassUserRejected)
 		if dec.Level == risk.Deny {
 			class = string(observe.ClassPermissionDenied)
@@ -1151,10 +1159,10 @@ func (b *Bridge) book(ctx context.Context, req agent.ToolRequest, dec Decision,
 	grantID int64, kind OutcomeKind,
 ) {
 	b.log("tools: call kind=%s task=%s corr=%s tool=%s risk=%s decision=%s "+
-		"outcome=%s rules_hit=%v in_allowlist_scope=%s grant_id=%d reason=%q",
+		"outcome=%s rules_hit=%v in_allowlist_scope=%s grant_id=%d refusal=%s reason=%q",
 		kind, req.TaskID, orDefault(req.CorrelationID, req.TaskID), req.Name,
 		dec.LevelString(), dec.DecisionColumn, kind.outcomeColumn(),
-		dec.RulesHit, b.scopeVerdictOf(dec).token(), grantID, dec.Reason)
+		dec.RulesHit, b.scopeVerdictOf(dec).token(), grantID, dec.Refusal.refusalToken(), dec.Reason)
 
 	// Ticket 105 AC#2: this is the production reader of ticket 102's rewrite
 	// account. Until here the only consumers of Roots()/RewrittenRoots()/
