@@ -17819,3 +17819,6 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **★两枚"族在册、名未入册"新名（272-v2 上报，本笔登记）**：`TestAC4InstallDirWidthIsDeliberateAndHasABreakLine`（**环境形**：mandated `GOTMPDIR=C:\tmp` 红／默认 `%TEMP%` 绿）／`TestBallPanelGesturesReachThePanelThread`（**真窗族漂色**：整包红 19.55s「failed measurement」、单跑 0.81/0.69s 绿、CI run327/328 绿）。后程红名册对账引用这两名时按其族读。
 - **272-v2 自曝**：两笔 cwd 笔误把空目录/两枚小件写进**仓外同名邻近目录** `D:\work\workspace\projects plans Wisp`（该目录生于 12:20:08＝我先前同类笔误；按"只建不删"保留、登记在此）。
 - **编队**：`253-r6`（在飞、已进验证段）；本刻其余全收。写位待补（见 `A925` 补的机制：剩余写活＝114 纠缠九格等；下一手从 253-r6 交件与 114 预读里出）。⛔ 未推＝`e3788f08` 后多笔。
+
+
+- **A928 补**：派 `174-v2`（形乙非实现者收口＋整票框态建议＋Docker 复核）。编队（2）：写 `253-r6`＋验 `174-v2`。派单/send 存档在盘。

@@ -1,0 +1,25 @@
+# 174-v2 派单（票 174 AC#6 形 乙 的非实现者判语＋整票框态建议；验收腿；面＝internal/tools 读＋Docker 复核）
+
+发送时刻：2026-10-14 14:4x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `174-v2`**（`probes/174/` 现 a3/a4/c1/c2/r1–r6/v1，v2 可用；查重已做）。⛔ 不翻框、⛔ 不动 `Status:`/票名——判语交回。
+
+## 被裁对象
+
+- 落地腿 `174-r6`：`a65bb386`（`internal/tools/task_output_pointer_notice_test.go` +135/−0；新用例 `TestCanonicalizeErrorNoticeMustNotRelayTheFiledPathPortable174r6`，`:589`）＋`11cfbc93`（证据件八节＋logs 五＋票尾 bullet）。主张＝**形 乙**：同一判据/分支/承重，把 r3 的 junction 夹具换成 **POSIX 唯一可达的非空被拒形＝空白字面量**（`paths.go:131-134` 的 `TrimSpace` 闸在 `risk.Resolve` 之前，平台无关）；**Docker linux/amd64 实跑绿**＋`GOOS=linux vet` rc=0；r3 原名在 linux 仍照旧 SKIP（ledger 行未动、共存）。
+- 已知先例：`174-r5` 的 ledger 行（甲形）已被 CI run `38508311376` 实证（SKIP=0、名在 -skip）；`236-a4` 曾把"进 ledger 还是改平台 tag"标为 111 AC#10 地界；编排者三把尺＝两笔 commit 在／件齐／亲跑 `-run 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath' ./internal/tools/` **ok 2.068s**。
+
+## 你要独立做的（⛔ 不许只引）
+
+1. **windows 半边**：自跑 `-run 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath' ./internal/tools/ -count=1`（r3＋新枚）⇒ rc 与逐字；核"r3 行为零回归"。
+2. **linux 半边**：复核"新枚在 linux 真跑"——至少复跑 `GOOS=linux go vet ./internal/tools/`＋linux 测试二进制含新名（`go test -c` 或 `go tool nm`／`grep -a` 现读）；**若本机 Docker 可用且时间允可 ⇒ 复跑其 docker 命令**（件里有原始捕获；⚠ docker 与 CI ubuntu 宿主非同一环境——照实写你用了哪支）。⛔ 不许假称跑过。
+3. **牙（自造反证 ≥2 发，≥1 发是 r6 没种过的形）**：把"转发行为"种回（自选形）⇒ windows 红（点名哪几枚）＋linux 红（若你跑 docker）；还原 sha256 证。核 r6 的 M1/M2 读数（含"M2 抓到 fold 小写形而 r3 漏"那条）。
+4. **共存在位**：r3 用例/`scripts/portable-tests.sh` ledger 行/`probes/**` 一字节未动（现读 diff/porcelain）；`portable-tests.sh` 里那两个名字的现状全引一遍（r3=skip 入账、新枚=linux 应真跑——**下一发 CI 的判法**写清：linux 腿四数应 `SKIP=0` 且新名出现在 PASS 侧）。
+5. **判语**：形 乙"成立/附条件/不成立"＋对"POSIX 上'路径半边'弱一档（空白字面量＋4×Unicode 空格锐序列补强）"这条**如实强度差**的接受/保留；**并核票 174 整票框态**（其余 AC 是否都已勾、可否收口）——给收口建议（我落）。
+6. 门禁抽核：build/`GOOS=linux` vet/gofumpt/d22scan clean/长度门 GREEN（现 60=60）——各现跑。
+
+## 交付与纪律
+
+- 交件：`docs/evidence/s1/ticket174-174-v2-accept-v1.md`＋`.scratch/wisp/probes/174/v2/`（锚＋logs）＋票 174 尾 **1 条 bullet**；产出 ≤7 枚 ≤200 行。⛔ 框不翻。
+- 只 commit、⛔ 不 push；显式 pathspec；`GOTMPDIR` ⛔ 只**反斜杠形**；突变优先 `-overlay`/仓外备份；窗口逐报（他腿 `253-r6`（cmd/wisp）在飞）。
+- **未定义即停**：docker 不可用且其余半边做不圆／你的反证打不红／整票框态有意外 ⇒ 停手上报。
+- 回执：结论先行（形乙判语＋收口建议）＋各发红/绿句逐字＋门禁 rc＋具名没做。
