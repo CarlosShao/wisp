@@ -1,0 +1,15 @@
+# 114-v1 log 05 — 两停手格复核＋拆分表抽核（全部现读）
+# AC#3（停得对）三件现读：
+  internal/panel/composer_handlers.go:133: if modeIsWidening(from, to) && h.Confirm == nil {
+  cmd/wisp/panel_inbound.go:254 / :264: Confirm: nil, ×2（同一个 newComposerDispatchChain 函数体；CLI seam 与常驻腿 newResidentComposerDispatch→（panel_resident_windows.go:222/244）共用）
+  cmd/wisp/run.go:340 modeWrites *panel.ModeWriteHandler；:677 rt.modeWrites = &panel.ModeWriteHandler{（带真 confirm 转发）——全仓零读者（git grep 仅 注释/声明/赋值 3 处；余命中在 probes 非编译件）
+  cmd/wisp/panel_resident_windows.go:238: // nil on purpose: this leg has no card of its own, so a widening request is
+  ⇒ 两条产码腿都 Confirm:nil ⇒ 变宽在 :133 被 ErrNoL2Confirm 拒、走不到 Set 的卡；"常驻腿拿什么举 C18 卡"（普查 J1）无一处具名 ⇒ 停手正确。
+# AC#11（停得对；措辞更正一处）：
+  .github/workflows/ci.yml:1026: run: npm run render:composer（其后无 git diff 步骤）；grep -c "exit-code" ci.yml = 0（防腐坏半支确缺）
+  票 111 Status open、Packages 含 `.github/workflows/ci.yml`（末条 log"本票另有 AC#11 等未勾格…"）；票 85 Status open（排队："本票要改 ci.yml 与全仓多个包"）；两票零处"让渡/已让出"
+  ⚠ 措辞：`.github` 不在 AGENTS.md §1.1 与本票禁改清单的明列冻结内；准确根因＝他票占用未让渡＋CI 属治理面（"契约邻接"宜改写）。
+# 抽取表抽核（shuf -e "AC#5" "AC#6" "AC#10" -n 2 ⇒ AC#10, AC#5）：
+  AC#5 判对：internal/agent/approval/ui.go:167-171 PanelAPI={Reject,Head,View} 无 Allow（:164-166 逐字 "It has no Allow method"）；internal/panel/config_handlers.go:108 lockedFieldFamilies 拒 7 族＋2 叶名（a5 写"拒 risk./fs."＝低报，方向对）
+  AC#10 ②面判不成立 ⇒ 停手上报：a2 普查 :198 逐字"5 枚是仪器格（AC#4/AC#8/AC#9/AC#10/AC#11）…另有 1 枚（AC#6）永不归本编队"；a5 本行① 列的两枚落点全在 Go（cmd/wisp／internal/panel）；现读真门＝panel_host_windows.go:80 const panelDispatchBinding="wispDispatch" ＋ :842 w.Bind(panelDispatchBinding,…)（a5 引的 :82/:319 系普查旧锚、已腐烂；:892 另有 wispProbeRT 测试门）；钉正则 composer_test.go:441 hostBridgeCallRe＝\.\s*postMessage\s*\(（页面真调用＝panel.ts:350 window.wispDispatch）⇒ 该格含本队写面（仪器），"面=frontend(owner-delegated)"名不副实。③不落站得住：普查 §5-丙自陈"两条都超出补 114 差集的范围，按 AGENTS.md §2 该上报而不是自选"＋J3 精确加载集归界面侧。
+# 纪律：仓内两测试件 sha256 前后同值（composer_test.go d2b2e848…／bridge_test.go 6ed0d1a4…）；突变全在仓外 D:\tmp\wisp114v1\（overlay）与 ac8tree/ac9tree。

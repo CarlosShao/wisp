@@ -1,0 +1,20 @@
+# 114-v1 log 01 — AC#4 牙（overlay 变异；仓内零突变）
+# 基线 window 16:05 +08，HEAD 9b51859b，live tree
+$ GOTMPDIR='C:\tmp\wisp114v1gotmp' go test -count=1 -run 'TestDoorTwoReadsEveryTextTypeTheScannerWalks|TestEveryWhitelistedInboundNameIsAlsoSentByThePage' -v ./internal/panel/
+    composer_test.go:709: door 2 reads all 15 text types the scanner walks: .css .go .html .js .json .jsx .md .svg .toml .ts .tsx .txt .vue .yaml .yml
+--- PASS: TestDoorTwoReadsEveryTextTypeTheScannerWalks (0.00s)
+
+# m1 = rendererSourceFile 单删 ".json"（overlay ovl-ac4-m1.json → mut\composer_test.ac4-m1.go）
+$ go test -overlay='D:\tmp\wisp114v1\mut\ovl-ac4-m1.json' -count=1 -run 'TestDoorTwoReadsEveryTextTypeTheScannerWalks|TestPlantedRendererDoorShapesGoRed' -v ./internal/panel/
+    composer_test.go:706: tools/d22scan's text whitelist admits ".json" and this package's door-2 filter does not read it: a route spelled in that type walks past every composer gate (ticket 114 AC#4, R-92-1), and the fix is to widen this filter, never to narrow the scanner
+    composer_test.go:662: shapes A, C and D each name a route the Go side does not answer, so 3 unknown literals were expected; got [2: public/ac92-public-door.js... src/ac92-plant-a.js...]
+    composer_test.go:674: door 2 must name ac92-plant-d.json, got [ac92-plant-a.js... ac92-public-door.js...]
+--- FAIL: TestPlantedRendererDoorShapesGoRed (0.07s)
+--- FAIL: TestDoorTwoReadsEveryTextTypeTheScannerWalks (0.00s)
+
+# m2 = 全量回退旧 7 类集（overlay ovl-ac4-m2.json）
+$ go test -overlay='D:\tmp\wisp114v1\mut\ovl-ac4-m2.json' -count=1 -run 'TestDoorTwoReadsEveryTextTypeTheScannerWalks' -v ./internal/panel/
+    composer_test.go:705 ×9 逐字：admits ".go" / ".json" / ".md" / ".svg" / ".toml" / ".txt" / ".vue" / ".yaml" / ".yml" and this package's door-2 filter does not read it
+--- FAIL: TestDoorTwoReadsEveryTextTypeTheScannerWalks (0.00s)
+
+# 判读：新对齐尺有牙且逐字点名；旧集下 .json 种形同时逃过结构钉（unknown 2≠3）与门二（少点名）＝"改前逃过两枚仪器"的 old-state 复读成立。

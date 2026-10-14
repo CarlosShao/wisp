@@ -1,0 +1,12 @@
+# 114-v1 log 04 — AC#7 抽核（windows 整包；live 与 88c7e752 对照件背靠背同窗口）
+$ GOTMPDIR='C:\tmp\wisp114v1gotmp' go test -count=1 -v ./internal/panel/                                   → RUN=223 PASS=143 FAIL=5 SKIP=0 rc=1
+$ GOTMPDIR='C:\tmp\wisp114v1gotmp' go test -overlay='D:\tmp\wisp114v1\mut\ovl-ac7-control.json' -count=1 -v ./internal/panel/ → RUN=220 PASS=141 FAIL=5 SKIP=0 rc=1
+# 红集 diff = 空（SAME SET，两跑逐名同）：
+  TestApprovalCardViewJSONKeysMatchFrontendTypes / TestComposerContractTypesMatchFrontend / TestC21DesignTokensFourWayAgree
+  / TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 / TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+# 抽两枚逐字对照（两跑同句）：
+  composer_test.go:78: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+  backpressure_bound_35r8_test.go:309: flood under a blocked consumer with no fan-out ... pinned text 4800000 runes > the cap 36864
+# RUN 差 3、PASS 差 2 = 本波新增（两顶层钉＋一枚子测试）——与 a5 读数 223/143/5/0 逐数同。
+# 门禁亲跑：go vet ./internal/panel/ rc=0；"$(go env GOPATH)\bin\gofumpt.exe" -l 两文件零行 rc=0；bash -n scripts/d22scan.sh rc=0；bash -n scripts/check-path-length-budget.sh rc=0
+# 未复跑（具名）：sh scripts/d22scan.sh 全跑、长度门、POSIX 三合包——凭 a5 logs/05、06c；本窗口非纯净（frontend 在写、20-r2 在飞）。

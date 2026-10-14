@@ -1,0 +1,13 @@
+# 114-v1 log 02 — AC#8 牙（仓外模块拷贝 ac8tree = git archive HEAD；真种盘＝panel.ts 的 "config.set"×2 改 "config.sets"）
+$ cd /d/tmp/wisp114v1/ac8tree && GOTMPDIR='C:\tmp\wisp114v1gotmp' go test -count=1 -run 'TestEveryWhitelistedInboundNameIsAlsoSentByThePage|TestFullInboundMethodRosterIsClosed|TestFrontendComposerRequestsMatchTheEnvelope' -v ./internal/panel/
+    bridge_test.go:202: the Go side answers config.get, config.set, panel.attachment.add, panel.message.send, panel.mode.request, panel.workspace.request and frontend/src/lib/panel.ts never spells config.set as a literal: adding a route on one side only is the drift ticket 114 AC#8 turns into a gate - land the page literal in the same change or take the Go name out
+--- FAIL: TestEveryWhitelistedInboundNameIsAlsoSentByThePage (0.04s)
+    inbound_roster_253_test.go:519: full inbound roster held: 6 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- PASS: TestFullInboundMethodRosterIsClosed (0.13s)
+--- PASS: TestFrontendComposerRequestsMatchTheEnvelope (0.00s)
+
+# 253 为何不覆盖此方向（现读其源码，引 19-20 行）：
+#   and this leg leaves both alone), and it reads nothing outside internal/panel's
+#   production sources - cmd/wisp's inbound surface belongs to that package's legs.
+# 真树绿（window 16:05）：page mirrors all 6 whitelisted inbound names; the planted unmirrored name was reported ([config.unmirrored114])
+# 判读：同一棵种了页侧漂移的树上——旧套件（253 尺＋N7 手抄四枚）全绿、新门 FAIL 逐字点名 ＝ "旧盲新有牙"同台对照成立。

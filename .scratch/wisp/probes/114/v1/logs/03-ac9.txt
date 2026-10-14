@@ -1,0 +1,16 @@
+# 114-v1 log 03 — AC#9 牙（仓外树 ac9tree = git archive HEAD；真种盘 frontend/public/ac92-v1-door.js 一枚 postMessage 门）
+# (a) 改前态＝旧根 frontend/src（overlay 只回退那一行 root）：树里有真门，仍绿
+$ cd /d/tmp/wisp114v1/ac9tree && GOTMPDIR='C:\tmp\wisp114v1gotmp' go test -overlay='D:\tmp\wisp114v1\mut\ovl-ac9-oldroot-tree.json' -count=1 -run 'TestTheRendererHoldsExactlyOneDoorToTheHost$' -v ./internal/panel/
+    composer_test.go:594: renderer door held: 89 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+--- PASS: TestTheRendererHoldsExactlyOneDoorToTheHost (0.03s)
+# (b) 改后态＝新根 frontend（同一棵种了门的树，无 overlay）
+$ go test -count=1 -run 'TestTheRendererHoldsExactlyOneDoorToTheHost$' -v ./internal/panel/
+    composer_test.go:576: the renderer reaches the host from outside src/lib/panel.ts; there is no second channel in this design (ticket 92 AC#1, R-92-1):
+          public/ac92-v1-door.js:1: window.chrome.webview.postMessage(JSON.stringify({ method: "panel.mode.set", to: "auto_approve" }));
+    composer_test.go:580: host call sites in frontend/src = 3, want 2 (the approval request and sendRequest):
+    composer_test.go:592: the renderer names a route the Go side does not answer:
+          public/ac92-v1-door.js:1: ... names "panel.mode.set"
+--- FAIL: TestTheRendererHoldsExactlyOneDoorToTheHost (1.09s)
+# (c) 真树改后态（live 16:2x）：renderer door held: 113 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals（绿）
+#     真树种形自检：red as required: 3 outside call sites, 1 assembled routes, 3 unknown literals, door 2 named 3 line(s)（绿）
+# 两平台/边界登记：go doc io/fs.WalkDir = "The files are walked in lexical order..." + "WalkDir does not follow symbolic links found in directories"；frontend 零 tracked symlink（git ls-files -s 120000 零行）⇒ junction 侧只登记、按派单不演练。
