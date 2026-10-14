@@ -1,0 +1,27 @@
+# 252-v2 AC#5 dump 等级行留档（本腿自造同形红；overlay 优先；时刻 +08）
+# 发（在 tree-before 上，短名 TMP、GOTMPDIR unset）：
+#   go test -count=1 -v -overlay='C:\tmp\wisp252v2\overlay-ac5-v2.json' -run '^TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking$' ./cmd/wisp/
+# overlay JSON 逐字：{"Replace":{"C:/tmp/wisp252v2/tree-before/cmd/wisp/ticket224_assembly_test.go":"D:/work/workspace/projects plans/Wisp/cmd/wisp/ticket224_assembly_test.go"}}
+# 交付件现读 sha256（工作树）=366da8f5f64488be4975a2b67f7a7e2f2e40bcbb86166c8859958936487180ff
+# 改前树该件 sha256（tree-before）=8ac227a80c03ab479a2910a74720f541e278eff7c14d529c2e217cf485f7df6f
+== 改前（旧滤网；W1 改前红 12:26:29->12:27:29 rc=1）==
+全日志 grep -c 'tools: call' = 0 ；grep -c in_allowlist_scope = 0
+dump 段逐字（只有两行）：
+    ticket224_assembly_test.go:324: audit is missing the GRANT-USE line naming row 1; got:
+        [audit] wisp run: SESSION-MINT id=sess_3f3c6666ad7d3158dcc000154a3d9b43 (结束点＝本进程退出，A435 第 2 条)
+        [audit] session: GRANT-RECORD id=1 tool=fs.write pattern="C:\\tmp\\wisp252v2\\SHORT-~1\\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking1611525002\\002\\granted-in-this-session.txt" session=sess_3f3c6666ad7d3158dcc000154a3d9b43 expires_at=1794544028
+
+== 改后（交付滤网叠加到 tree-before；12:37:04->12:38:36 rc=1）==
+--- FAIL: TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking (83.11s)
+全日志 grep -c 'tools: call' = 2 ；grep -c in_allowlist_scope = 2
+dump 段逐字（交付行号 :333，两枚 tools: call）：
+    ticket224_assembly_test.go:333: audit is missing the GRANT-USE line naming row 1; got:
+        [audit] wisp run: SESSION-MINT id=sess_e3aa3cf40eb94c3d6ec30d8ac97f16c8 (结束点＝本进程退出，A435 第 2 条)
+        [audit] tools: call kind=approval-timeout task=t224r2-read corr=t224r2-ask tool=fs.write risk=L2 decision=timeout outcome=error rules_hit=[R1 R2] in_allowlist_scope=false grant_id=0 reason="R1: 工具声明为下界（L1）; R2: 目标路径在授权目录之外: C:\\tmp\\wisp252v2\\SHORT-~1\\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking2041497340\\002\\never-granted.txt"
+        [audit] session: GRANT-RECORD id=1 tool=fs.write pattern="C:\\tmp\\wisp252v2\\SHORT-~1\\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking2041497340\\002\\granted-in-this-session.txt" session=sess_e3aa3cf40eb94c3d6ec30d8ac97f16c8 expires_at=1794544676
+        [audit] tools: call kind=approval-timeout task=t224r2-read corr=t224r2-hit tool=fs.write risk=L2 decision=timeout outcome=error rules_hit=[R1 R2] in_allowlist_scope=false grant_id=0 reason="R1: 工具声明为下界（L1）; R2: 目标路径在授权目录之外: C:\\tmp\\wisp252v2\\SHORT-~1\\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking2041497340\\002\\granted-in-this-session.txt"
+
+== 还原证（overlay 零写盘）==
+工作树 cmd/wisp/ticket224_assembly_test.go：发前=366da8f5… 发后=366da8f5…（同）
+tree-before 同件：发前=8ac227a8… 发后=8ac227a8…（同）
+原始日志：C:\tmp\wisp252v2\logs\ac5-overlay-red-v2.log 5411B（只建不删）

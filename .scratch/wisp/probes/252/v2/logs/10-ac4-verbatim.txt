@@ -1,0 +1,36 @@
+# 252-v2 AC#4 键句留档（本腿自跑；时刻 +08；原始日志在 C:\tmp\wisp252v2\logs\，只建不删）
+# 跑法：cd <树>; unset GOTMPDIR; PATH 前置 third_party/sherpa-onnx（MSYS 形）;
+#   TMP="C:\tmp\wisp252v2\SHORT-~1" TEMP="C:\tmp\wisp252v2\SHORT-~1" go test -count=1 -v -run '^NAME$' ./cmd/wisp/
+# 树：tree-before=git archive 2b1a3071^（62ca6c34）；tree-delivery=git archive d3cccfda
+== W1 TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking ==
+before tree-before    12:26:29 -> 12:27:29  rc=1  log=4615B
+--- FAIL: TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking (43.48s)
+    ticket224_assembly_test.go:269: the control call errored: the L1 window running out means execute
+    ticket224_assembly_test.go:293: the granted call errored: true
+    ticket224_assembly_test.go:311: a live session grant left 1 cards on screen for the covered call: 「命中授权就不再弹卡」 is not happening in the assembled run (ledger id=sess_3f3c6666ad7d3158dcc000154a3d9b43, pattern="C:\\tmp\\wisp252v2\\SHORT-~1\\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking1611525002\\002\\granted-in-this-session.txt", row=1)
+    ticket224_assembly_test.go:316: covered call booked decision="timeout", want "allow_session_grant"
+    ticket224_assembly_test.go:319: covered call booked grant_id=<nil>, want the covering row 1: tool_call.grant_id is the column D45-2 promised for forensics
+    ticket224_assembly_test.go:324: audit is missing the GRANT-USE line naming row 1; got:
+        [audit] wisp run: SESSION-MINT id=sess_3f3c6666ad7d3158dcc000154a3d9b43 (结束点＝本进程退出，A435 第 2 条)
+        [audit] session: GRANT-RECORD id=1 tool=fs.write pattern="C:\\tmp\\wisp252v2\\SHORT-~1\\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking1611525002\\002\\granted-in-this-session.txt" session=sess_3f3c6666ad7d3158dcc000154a3d9b43 expires_at=1794544028
+    ticket224_assembly_test.go:327: the covered call should have written C:\tmp\wisp252v2\SHORT-~1\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking1611525002\002\granted-in-this-session.txt: GetFileAttributesEx C:\tmp\wisp252v2\SHORT-~1\TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking1611525002\002\granted-in-this-session.txt: The system cannot find the file specified.
+after  tree-delivery  12:46:05 -> 12:46:19  rc=0  log=3331B
+--- PASS: TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking (5.76s)
+
+== W2 TestComposedGateBlocksAWriteForTwoSeconds ==
+before tree-before    12:28:34 -> 12:33:44  rc=1  log=2844B
+--- FAIL: TestComposedGateBlocksAWriteForTwoSeconds (303.07s)
+    run_test.go:378: an unvetoed L1 window means EXECUTE, got: 审批超时（300 秒未确认），C18 一律判拒绝，已自动拒绝
+after  tree-delivery  12:40:11 -> 12:40:23  rc=0  log=3219B
+--- PASS: TestComposedGateBlocksAWriteForTwoSeconds (5.15s)
+
+== W3 TestTicket101SessionGrantDoesNotCrossRestart ==
+before tree-before    12:36:00 -> 12:36:14  rc=1  log=3448B
+--- FAIL: TestTicket101SessionGrantDoesNotCrossRestart (6.55s)
+    run_mode101_test.go:506: control write should NOT error under auto_approve (审批超时（1 秒未确认），C18 一律判拒绝，已自动拒绝); the control half is broken, so the refusal above proves nothing
+after  tree-delivery  12:40:37 -> 12:42:07  rc=0  log=3615B
+--- PASS: TestTicket101SessionGrantDoesNotCrossRestart (83.11s)
+
+辅助（弃用/不入判语）：W1 工作树绿 12:27:57->12:28:09 rc=0 PASS (6.01s)（受扰前）；
+W2 工作树绿 12:35:34->12:35:48 rc=0 PASS (5.70s)（279-r1 笔墨在场，弃用）。
+短名形状现证 grep -c 'SHORT-~1'：w1-before=7 w2-before=4 w3-before=5 w1-after=5 w2-after=5 w3-after=6 ac5-overlay=9
