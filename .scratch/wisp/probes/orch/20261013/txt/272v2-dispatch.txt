@@ -1,0 +1,26 @@
+# 272-v2 派单（票 272 剩余两格 AC#5／AC#7 的收尾判语；验收腿；面＝只读＋重跑）
+
+发送时刻：2026-10-14 14:1x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `272-v2`**（`probes/272/` 查重后 r1 可用号规避；v2 可用）。⛔ 不翻框、⛔ 不动 `Status:`/票名——判语交回。
+
+## 背景
+
+- 票：`.scratch/wisp/issues/272-restart-tier-test-window-starts-before-the-plant-so-a-banner-carrying-the-same-words-passes.md`——AC#1–#4／#6 已勾；**只剩 AC#5（门禁四数）与 AC#7（单份 post-mark 欢迎语形判语）**。
+- ★**新鲜读数可直接用**（非实现者 `316-r1` 今天在现行 HEAD 上重跑，件 `probes/316/r1/verdict.md`＋`logs/`，交件 `8cc028f8`，零写面）：M FAIL 4.38s（arm1 红句逐字）／MK FAIL 44.94s（不回归）／SA FAIL 44.24s（不回归）／cur PASS 5.64s／MIRROR PASS 4.81s；`-run 'TestTicket223'` rc=0 PASS=10；**编排者抽核** arm1 在盘（`config_reload_223_test.go:595-596` 的 `Count(prePlant, restartSentence272)!=0 ⇒ t.Errorf`，`grep -c restartSentence272`＝6）。
+- ⚠ 撤票记录在票 316（口令「316 撤」）：其 M/G 冲突裁定＝**arm1 保留、正控由 cur/MIRROR 承担**（M/G 同形是 232 两腿的形定义撞车，非本票缺陷）——你复核该裁定的现读依据即可（⛔ 不重开）。
+
+## 你要做（⛔ 不许只引）
+
+1. **AC#5 门禁四数**（逐条现跑、rc 逐字）：
+   - `PATH="$PWD/third_party/sherpa-onnx:$PATH" sh scripts/d22scan.sh`（正控先绿）；
+   - `gofmt -l`／`gofumpt v0.12.0 -l` **只喂 `.go`**（⛔ 别喂 .md——票面点名那坑）；
+   - `go vet ./cmd/wisp/` rc=0；
+   - **终态多包逐名红名册 vs 起手作差**：⚠ `cmd/wisp` 整包撞 314 死区（157–215s 死形状——如实记：时长＋无红句＋〔台面故障〕口径；本机 10-14 12:0x 两发实测**未死** 296.8s/333.9s、唯一红 `TestAC2SealNotice…`＝`GOTMPDIR=C:\tmp` 环境形），`internal/...` 逐包或选最小可信集；红名册与**在册族**（panel 契约漂移/C21/35r8×2/session 间歇/环境形）逐名归类——**作差≠0 的每一枚都要归因**（在册 or 新；新⇒停手上报）。
+2. **AC#7 判语**：单份 post-mark 欢迎语形（272-v1 件在 `probes/272/`）——你自跑或复用 316-r1 的 overlay 件核"落地尺上 PASS 且非空转（零份对照在 `:623` await 红 42.10s）"两条；判"成立/附条件/不成立"＋给编排者的**翻框建议与留档句**。
+3. **交件**：`docs/evidence/s1/ticket272-272-v2-accept-v1.md`＋`.scratch/wisp/probes/272/v2/`（锚＋logs）＋票 272 尾 **1 条 bullet**；产出 ≤7 枚 ≤200 行。⛔ 框不翻。
+
+## 环境与纪律
+
+- 只 commit、⛔ 不 push；显式 pathspec；`GOTMPDIR` ⛔ 只**反斜杠形** `C:\tmp\wisp272v2gotmp`；**突变优先 `-overlay`/仓外备份**（零工作树足迹）；窗口起止时刻逐报（他腿 `174-r6`／`236-r7`（internal/tools）、`317-r1`（scripts）在飞）。
+- **未定义即停**：AC#7 复跑与在案读数对不上／整包红名册出现无法归因的新名 ⇒ 停手上报。
+- 回执：结论先行（两格判语＋翻框建议）＋四数各 rc 与红名归因表＋AC#7 两条读数逐字＋具名没做。
