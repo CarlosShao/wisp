@@ -20,12 +20,6 @@
    185:# below would be vacuous. -count=1 is forced for the same reason a cached result
    188:go test -v -count=1 "$@" >"$out" 2>&1
 
-==== run id / job id: none quoted ====
-   gh was not used in this leg; per this repo's rule, a step that cannot name its last real run is
-   evidenced by the tracked chain above instead. scripts/wisp-cli-tests.sh is the step's own entry
-   (its header records the four measured readings of ticket 111 AC#4) and was re-run by this leg;
-   the reading is in logs/04-ac5-gates.txt.
-
 ==== a real run of the step (gh run view, this leg, 2026-10-14 19:3x +08) ====
 run 38554642217 sha 72db0f396c7a60cf123c2e3b3a86139628bd91f8:
    job test-windows databaseId=115820641622, step #7 "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)" conclusion=failure

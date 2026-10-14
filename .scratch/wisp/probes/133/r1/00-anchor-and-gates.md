@@ -11,7 +11,7 @@
 - **宿主底噪 7 枚**（pristine 树、零变异、`-count=1 -v` 全包，原档 `01-pristine-7reds-rerun.log`）：`TestAC2SealNoticeLandsInTheRunLegLogFile`、`TestAC4FocusReturnToPriorWindowGap33r5`、`TestAC14GoSideEvalPushReachesThePage`、`Test258BridgeMutationNoSrcKeepsOldBinding`、`Test258OccupiedCombinationNamesTheNewValue`、`Test258V1ProbeSummonEditRebindsLiveBall`、`TestAC246DevLegIgnoresTheTestTaskInjection`。
   - **归因①（根/ACL 系 2 枚）**：把 `GOTMPDIR` 换成 `%LOCALAPPDATA%\wisp-test-gotmp\cli-133r1-attr` 后这两枚转绿（原档 `02-localappdata-root-7reds.log`；`TestAC2SealNotice...` 的红是 `records naming "seal cleared principals..." = 2, want 1`，temp 根继承 ACE 不同 ⇒ 多一条 seal 记录）⇒ **票 311 同形**（"gate 的颜色是根的函数"），与派单指定根绑定，**不是本腿引入**。
   - **归因②（热键/真窗系 5 枚）**：日志行 `hotkey ... err="Hot key is already registered."`（本机 `wisp.exe`＋微信等占着 `Ctrl+Alt+M/P`）＋ WebView2 真窗 ⇒ 宿主环境分母；CI runner 无这些占位者。
-- **314 死区**：全包单趟在 **317.8s** 处**整进程死亡一次**（原档 `n3-10-no133instr.log`：`start 18:31:10 end 18:36:35`，RUN=186，日志停在 `=== RUN TestShapeA3SecondPagePostStillDelivers` 无判决 ⇒ 该趟不得当完整分母用）；其余 5 趟全包（含 `-count=2` 的 AC#5 趟）走完，窗口逐条见 `logs/04-ac5-gates.txt`。tasklist 自证见同文件头部。
+- **314 死区**：本腿起过的 **9 趟全包进程里 2 趟整进程死亡**（无判决断在面板/WebView2 段：`n3-10` 18:31:10→18:36:35 = 317.8s、RUN=186 停在 `TestShapeA3SecondPagePostStillDelivers`；CI 形 step 第 1 次 19:35:23→19:41:12 = 306.2s 停在 `TestAC13BringUpSurvivesAReusedThreadQuit`），另 1 趟撞 Go 默认 10m `-timeout`（`panic: test timed out after 10m0s`，603.1s）；其余 6 趟走完（3 趟 306/226/7/3＋2 趟 AC#5＋1 趟 CI 形）。逐趟窗口表在 `logs/04-ac5-gates.txt` 末节；tasklist 自证见同文件头部。⇒ 本腿不把任何单趟四数当判语，主证是红名集合。
 
 ## 1. AC#1 五发×两份读数（门开＝131 的门在跑；门关＝`-run` 只跑本尺，不动 131 的文件）
 
@@ -54,15 +54,17 @@
   - **y2blind**（`args := os.Args[1:]` ⇒ `args := os.Args`，解析器整个瞎）：门 rc=1，**红着说** `func main binds no local to os.Args, so this gate cannot tell a dispatch from a call` ＋ 0 legs 撞下限 ⇒ **不许返回空清单当"没有腿要测"**。
   - ⚠ **票面 AC#4 第三枚清单（"131 那扇枚举门的腿清单"）的落点说明**：131 的门（`cmd/wisp/leg_sink_gate_131_test.go`）本腿**一字未改**——派单明写"修复须动 131 的门 ⇒ 停手上报"，且本腿的地界是新文件。对"同一枚 census 无下限"这一要求，本尺以**自己的** `floorReds133`（同一个 `main.go` 现算的 12 条腿）＋全瞎红覆盖（③上面两条读数），**不借 131 的门**。131 自家门内那三行（`len(legs)==0` 的 Fatal 有、`>=N` 下限无）留给它的 owner，本腿只登记事实。
 
-## 4. AC#5 门禁：`logs/04-ac5-gates.txt`
+## 4. AC#5 门禁：`logs/04-ac5-gates.txt`（四数只从 `-v` 量；计数口径＝仓内 `tools/d22scan/runtests.sh` 那四把 grep）
 
-- tasklist 先行自证无争用（文件头部）；`go test -count=2 -v ./cmd/wisp/` 四数只从 `-v` 量、给窗口起止；
-- `gofmt -l cmd/wisp/`、`gofumpt -l cmd/wisp/`（版本写明）、`go vet ./cmd/wisp/`、`sh scripts/d22scan.sh` rc＋各 scope；
-- **票 123 那批 CLI 用例（"审批超时 1/300 秒未确认 ⇒ 一律判拒绝"）本腿零触碰、零放宽**（逐字见于 04 的逐名字段）。
+- **字面命令 `go test -count=2 -v ./cmd/wisp/`**：603.108s 处 `panic: test timed out after 10m0s`（Go 默认 `-timeout`；本机单趟就要 5–10 分钟）⇒ 字面跑不完，按 314 如实报；同一断言集换 `-timeout 40m` 跑完（1765.788s）：**RUN=824 PASS=575 FAIL=23 SKIP=6**（两趟），红名＝7 枚宿主底噪 ×2 ＋ 9 枚负载诱发面板/STA 超时（15s/17.95s 那种，R-133-12 同族）——本机四数不是稳定量，主证是红名集合，低负载同树单趟仍 **306/226/7/3**（7 枚全是宿主底噪）。
+- **CI 形 step `bash scripts/wisp-cli-tests.sh`**（run Id 链见 §5）：第 2 次跑完读 **RUN=282 PASS=217 FAIL=4 SKIP=1**；4 枚红＝宿主底噪 3（Seal notice/Focus return/GoSideEval）＋ `TestAC1ResidentLegInstallsItsLogListenerOnDisk`（19.64s，R-133-12 负载族——低负载同树它是绿的）。**本腿四枚用例在该 step 的分母里全 PASS**（`TestAC1AC2DispatchHopGate133`、`TestAC4EveryLegIsNailedOrRuled`、`TestAC3SelfProof133...`、`TestAC4Distinctness133...`）。
+- **`gofmt -l cmd/wisp/`**：只剩 `cmd/wisp/models.go`（gofmt 与 gofumpt 都点它）；**归因**：该文件与 HEAD blob 只差行尾（盘上 CRLF、blob LF，`cmp` 第 13 字节即差）⇒ 工作树 CRLF 伪影、`git status` 看不见；同日前一版快照（`git archive da389ca5^`）gofmt 干净、gofumpt 只点 `panel_transport_35r2_test.go`（commit `18d43f8e` 自述的 "HEAD 真格式债"）。**两枚都不在本腿 pathspec 里**；本腿两枚文件逐枚干净。`gofumpt` 版本 `v0.12.0 (go1.27.1)`（CI 装的是 `@latest`，跨版本可比性仅此一注）；`go vet ./cmd/wisp/` **rc=0**。
+- **`sh scripts/d22scan.sh` rc=0 纯净**；各 scope（含本腿两枚文件）：`bans#1-5 internal/=237 cmd/=40 · #6 frontend/=115 · #7 internal/tools/=24 · #8 design/=39 frontend/=115 internal/=556 cmd/=128`。**同日控制组**（`da389ca5^` 的 `git archive` 快照）：除 `#8 cmd/` 127→128（恰为本腿新增的 1 枚 `_test.go`）外逐数相同 ⇒ **不降**有同日基线（控制组非 git 仓、gitignore 不生效，`#8 design/` 30 vs 39 是姿态差，已登记）。
+- **票 123 那批 CLI 用例（"审批超时 1/300 秒未确认 ⇒ 一律判拒绝"）本腿零触碰、零放宽**（04 的逐名字段里它既没被 -skip、也没被改阈值）。
 
 ## 5. AC#6 仪器自己进 CI：`logs/05-ac6-ci.txt`
 
-新文件是 `cmd/wisp` 的 `_test.go` ⇒ 随既有 step 跑：job **`test-windows`**（`.github/workflows/ci.yml:533`）里的 step **"cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"**（ci.yml:601）→ `bash scripts/wisp-cli-tests.sh`（ci.yml:621）→ `portable-tests.sh --scope=cli` → `scope=(./cmd/wisp/)`＋`cli_pin=github.com/CarlosShao/wisp/cmd/wisp`。**无需改 `.github/**`**（若需改则按派单停手上报）。本腿另跑了一次该脚本作旁证（04/05 里给 rc 与窗口）。
+新文件是 `cmd/wisp` 的 `_test.go` ⇒ 随既有 step 跑：job **`test-windows`**（`.github/workflows/ci.yml:533`）里的 step **"cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"**（ci.yml:601）→ `bash scripts/wisp-cli-tests.sh`（ci.yml:621）→ `portable-tests.sh --scope=cli` → `scope=(./cmd/wisp/)`＋`cli_pin=github.com/CarlosShao/wisp/cmd/wisp`。**无需改 `.github/**`**（若需改则按派单停手上报）。真 run 读数（`gh`，本腿 2026-10-14）：**run `38554642217` / sha `72db0f39`，job `test-windows` databaseId `115820641622`，step #7 同名**，该 step 自己的行 `four numbers: === RUN=410 --- PASS=297 --- FAIL=2 --- SKIP=1`（红是那棵树的状态，非本腿）；另一条 `38551683523` 同 step 亦跑过。本腿自跑该脚本两次：一次 314 死（306.2s）、一次跑完（282/217/4/1）——**本腿四枚用例两次都在分母里、跑完那次全 PASS**（§4）。
 
 ## 6. 没做的、偏离与停手上报项（逐条具名）
 
@@ -70,4 +72,4 @@
 2. **AC#4 第三枚清单的"131 门内下限"未在 131 的文件里加**（停手上报规则的直接后果，§3③ 已写清本尺自己的替代覆盖）。
 3. **AC#1 三态里"不加尺全绿"字面不可满足**：与 09-23 §2.0.1 同结论（131 已接住 N-3/X4/X8/X12），本腿以 no-doors 读数（§1）给出"两门都摘仍零门提及"的第一手复核，X14 两拍由 x14c/x14b2c 承担独占目击。**读数与票面 09-23 记录不同的一处**：那一次 X14 种子账本读 `install=false records=false`（无 slog），与本腿 x14c/x14b2c 逐字同；本腿主发 x14/x14b2 的种子里带 slog ⇒ 131 也红（不同种子，已并列登记，不算分歧）。
 4. **AC#2 本腿未动**（已由编排者翻勾）；**票面框一枚未翻**。
-5. 全包在 `C:\tmp` 根下带 7 枚宿主底噪（§0），AC#5 四数**不是 0/0**，逐枚归因已给；"不降"缺进仓基线一处按 `R-133-7` 口径仍只写"无缩小"。
+5. 全包在 `C:\tmp` 根下带 7 枚宿主底噪（§0），AC#5 四数**不是 0/0**，逐枚归因已给；"不降"本腿另取**同日控制组**（`da389ca5^` 的 `git archive` 快照，除 `#8 cmd/` +1〔本腿新文件〕外逐数相同），但仍比不出"进仓历史基线"（`R-133-7` 口径照旧）。
