@@ -1,0 +1,73 @@
+== HEAD 605838b0 at 2026-10-14T17:39:01+08:00 — all line numbers re-read now ==
+
+## hop 0: the config key (internal/config)
+$ grep -n "width\" default" internal/config/schema.go
+542:	Width int `toml:"width" default:"640"`
+$ sed -n "539,549p" internal/config/schema.go
+type PanelSection struct {
+	Enabled bool `toml:"enabled" default:"true"`
+	// Width is the panel width in px.
+	Width int `toml:"width" default:"640"`
+	// Height in px; 0 = auto from content.
+	Height int `toml:"height"`
+	// KeepAliveInSession keeps the WebView2 warm during a session.
+	KeepAliveInSession bool `toml:"keep_alive_in_session" default:"true"`
+	// Scale is the UI zoom factor; 0 = follow system DPI.
+	Scale float64 `toml:"scale"`
+}
+
+## hop 1: assembly root reads [panel] per creation via config.LoadFile (cmd/wisp/panel_resident_windows.go:198-209)
+$ sed -n "198,209p" cmd/wisp/panel_resident_windows.go
+func panelGeometrySource(dataDir string) func() (width, height int) {
+	cfgPath := filepath.Join(dataDir, configFileName)
+	return func() (width, height int) {
+		cfg, _, err := config.LoadFile(cfgPath, nil)
+		if err != nil {
+			slog.Warn("panel host: [panel] geometry source unreadable, sizing at the host's own default",
+				"path", cfgPath, "err", err, "default", fmt.Sprintf("%dx%d", panelWidthPx, panelHeightPx))
+			return 0, 0
+		}
+		return cfg.Panel.Width, cfg.Panel.Height
+	}
+}
+$ grep -n "withGeometrySource(panelGeometrySource" cmd/wisp/panel_resident_windows.go
+273:	return NewPanelManager(disp, assets, dataPath, withGeometrySource(panelGeometrySource(dataDir))), workspaceScope, nil
+
+## hop 2: host stores a closure, never the package (no panel->config edge)
+184:	geometry func() (width, height int)
+199:func withGeometrySource(src func() (width, height int)) panelHostOption {
+$ import block of panel_host_windows.go (no internal/config):
+import (
+	"context"
+	"errors"
+	"fmt"
+	"log/slog"
+	"sync"
+	"time"
+	"unsafe"
+
+	"github.com/CarlosShao/wisp/internal/panel"
+	webview2 "github.com/jchv/go-webview2"
+	"golang.org/x/sys/windows"
+)
+$ mentions of internal/config or config.toml OUTSIDE comments ->
+0
+  (all 5 textual hits are comments at :181/:248/:595/:596/:597 - the ruler TestTicket255HostStillDoesNotParseConfigItself is the one that decides; it skips comment lines)
+
+## hop 3a (create): ONE windowOptions per create -> WindowOptions.Width -> newPanelControl
+236:func (m *PanelManager) windowOptions() webview2.WindowOptions {
+391:	c, cerr := newPanelControl(m.windowOptions(), m.dataPath)
+262:		Width:  uint(width),
+
+## hop 3b (re-show): Show's else branch -> requestGeometryOnReshow -> Dispatch(SetSize)
+532:		m.requestGeometryOnReshow()
+610:func (m *PanelManager) requestGeometryOnReshow() {
+627:		w.SetSize(width, height, webview2.HintNone)
+
+## hop 4: panelControl.SetSize is CLIENT-area semantics (AdjustWindowRect + SetWindowPos)
+637:func (c *panelControl) SetSize(width int, height int, hints webview2.Hint) {
+654:		_, _, _ = ctlAdjustWindowRect.Call(uintptr(unsafe.Pointer(&r)), ctlWsOverlappedWindow, 0)
+655:		_, _, _ = ctlSetWindowPos.Call(
+
+## hop 5: the ONLY drainer of the Dispatch queue = the library pump Run() on the panel thread
+319:	w.Run()

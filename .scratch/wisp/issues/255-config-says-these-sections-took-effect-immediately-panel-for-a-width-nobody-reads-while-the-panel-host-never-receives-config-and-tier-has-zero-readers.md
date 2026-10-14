@@ -180,6 +180,8 @@ DPI 逻辑→物理那层（今天**既没实现也没仪器**，`A700` §2 已�
 
 - [2026-10-14 09:4x +08] agent=255-v3 did=AC#6＋A878 两处重裁的**非实现者判语**（件 `docs/evidence/s1/ticket255-255-v3-accept-v1.md`＋`probes/255/v3/{00-anchor-and-gates.md,verify-roster-255v3.py,logs/}`）：AC#6 两形＝**成立**（自造 5 发：插行绿＋Logf／改 token 红逐名／二义红／错读数仍绿；旧尺父态 P6 实红 `llm :96→view := panel.SettingsView{`；逐发仓外备份＋sha256 前后同值）；六枚 token 削尖＝**可以接受**（逐枚是被引行真实子串且含原 token、同指一行；裸形今仍不唯一 2/13/5/3/3/2）；A878-①＝**成立**（自写扫描复刻，14 段生产读者集==名册集合，Voice 三枚齐）／②＝**成立**（`:98` 现读即 token 真身且 unique）；零放宽＝**成立、一处具名降级**（断言点 57→56 全是行号判据族换 token 判据；floor=8 未动；无 Skip；尺①/②改前=改后 27/20、23/22；测试侧 4→2 两枚留下的是活的 `panel_config_store.go:92` 读数）。门禁 `-run 'TestTicket255' ./cmd/wisp/` rc=0（20 PASS/0 FAIL，23.186s）＋gofmt 空。⛔ 未翻框、⛔ 未动 `Status:`、⛔ 未 push。next=编排者凭本判语翻 AC#6 框并将 A878 两处收口
 
+- [2026-10-14 17:4x +08] agent=255-r8 did=AC#1 现跑复认（零产码：255-r2 落地在盘；正控 `[panel] width=641` 不进「已立即生效」句而落诚实句逐字点名，反控 `[llm]` 仍在、活腿 `ReadSettings` 当场读到新 ref；`-run TestTicket255 ./cmd/wisp/` 两发 rc=0／20 顶层 PASS 0 FAIL）＋AC#4 **甲形真窗那一发已补**：新立 winlive 尺（产码 `c88356c1`）走生产全链（真 config.toml→`panelGeometrySource`→`startResidentPanel`/`Run()` 泵→`RequestToggle`+`RequestShow`），hide+show 不销毁 ⇒ 同 HWND、client 624→900、outer 640→916、帧差 16px 恒等（PASS；r3 重建尺现跑复核 640→900 PASS）＋装配链五跳现读＋门禁 rc 全 0（build／`vet -tags winlive`／gofumpt 空／TestTicket255／internal/config／d22scan clean／长度门 60=60）；具名没做：整包 `cmd/wisp` 禁跑（314 死区）、DPI 逻辑→物理层无仪器（读数在 implied scale 1.0000 上）、「保存那一刻自动变」不在本票裁定射程；两格一致性＝按「加载面 ≠ 保存那刻」未翻转支（见件 §3 末）；⛔ 未翻框、⛔ 未动 `Status:`、⛔ 未 push。next=非实现者裁 AC#1＋AC#4（件 `probes/255/r8/00-anchor-and-gates.md`）
+
 
 ## 编排者判语落地（2026-10-14 2026-10-14 09:41 +08，凭据＝非实现者验收腿 `255-v3`）
 
