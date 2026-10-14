@@ -1,0 +1,24 @@
+### 174-r7 AC#2d 已修态 —— 形乙：task.go 的 case err != nil 支剥掉 （"+err.Error()+"）
+date=2026-10-14T20:43+08  HEAD 现读=ccab14fb（修码此刻在树、未提交）
+$ git diff --stat -- internal/tools/task.go
+ internal/tools/task.go | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+改后句（与 internal/agent/spill.go:229 同形，非新造措辞）：
+  注意：这条路径现在读不到，C26 连规范化都没通过
+完整原始读数＝logs/raw/02-ac2d-after.txt
+
+[读数3·新判据 → 绿]
+$ go test -count=1 -v -run TestCanonicalizeErrorNoticeRelaysNoUpstreamErrorText174r7 ./internal/tools/ → rc=0
+  --- PASS: TestCanonicalizeErrorNoticeRelaysNoUpstreamErrorText174r7 (0.01s)
+  notice region under the err-text ban: "注意：这条路径现在读不到，C26 连规范化都没通过；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在"
+
+[读数4·同一发跑既有两条泄漏扫（r3 junction + r6 便携）→ 各自 PASS，notice 区变干净]
+$ go test -count=1 -v -run TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath ./internal/tools/ → rc=0
+  r3: "注意：这条路径现在读不到，C26 连规范化都没通过；注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状）"
+  r6: "注意：这条路径现在读不到，C26 连规范化都没通过；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在"
+
+[读数5·修后整族 174 判据（tools 包）]
+$ go test -count=1 -v -run 174 ./internal/tools/ → ok 3.048s（9 枚 PASS／0 FAIL：
+  r2 两枚＋r7 新枚＋r3 两枚＋r6 一枚＋r4 三枚，逐枚名见 raw）
+$ 另跑 r1 那八枚（测试名里不带 174 的那族）→ 8 枚全 PASS，ok 2.715s
+（全包门禁 G1 见 00-anchor-and-gates.md §4）

@@ -1,0 +1,22 @@
+### 174-r7 AC#2c 未修态（overlay 种回静默形：pointerNotice 恒返 "" ＝ 5b14afe5 之前那一发的行为）+ 还原
+date=2026-10-14T20:52+08  HEAD=51e2f5ea
+md5 现量：mut/spill-silent.go=a0fc92bc4032e26110d9545de6e9ee14
+          internal/agent/spill.go（终树）＝f31147b4264a9c7111479d5b85e30f65
+完整原始读数＝logs/raw/05-ac2c-silent-and-restore.txt
+
+[读数10·静默形上跑 agent 包 174 族 → 7 枚红（桩只剩"全文见 <路径>"、零说明）]
+$ go test -count=1 -v -overlay=…/mut/overlay-spill-silent.json -run 174 ./internal/agent/ → rc=1
+  --- FAIL ×7：TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r4／
+  TestSpillPointerUnwiredJudgeFailsClosed174／TestSpillPointerOutsideAllowlistNamesBothRoadsBack174／
+  TestSpillPointerCanonicalizeFailureQuotesNoUpstreamText174／TestSpillPointerNoticeKeepsHeadTailAndBudget174／
+  TestLoopSpillNoticeReachesHistoryUnwired174／TestLoopHonorsConfigPointerJudgeQuietly174
+  逐字样例（红句里就是静默形的桩文本；我以 … 标了截断）：
+    Unwired 枚：unwired judge must say so in the reply, got "HEADSTART-…\n[…输出已落文件：省略 65221 字符，总长 68021 字节 / 约 17005 token，全文见 C:\tmp\…\tool-output-call_honesty.txt…]\n…-TAILFINISH"
+    r4 枚：C26 answered OUT for the string it returned, so the pointer must say so; got "[…输出已落文件：…，全文见 C:\tmp\…\tool-output-call_honesty.txt…]"
+  --- PASS ×2（静默形下本就该绿的两枚＝"安静正例"与"指针唯一"）：
+  TestSpillHealthyPointerStillMatchesThePreFixSentence174／TestSpillPointerNoticeAddsNoSecondPath174（三子臂）
+
+[读数11·撤 overlay 回 HEAD —— 绿 + porcelain（agent 面零改动）]
+$ go test -count=1 -run 174 ./internal/agent/ → ok 2.537s
+porcelain(internal/ cmd/) = [ M internal/tools/task.go; ?? internal/tools/task_output_pointer_notice_errtext_174r7_test.go;]
+⇒ "未修不响／修后响／还原绿" 三态齐；spill.go 本腿一字节未动（md5 同 HEAD blob）。

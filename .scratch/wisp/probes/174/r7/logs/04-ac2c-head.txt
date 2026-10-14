@@ -1,0 +1,22 @@
+### 174-r7 AC#2c 已修态＝HEAD —— spill.go 的 D15(3) 桩按同一判据说实话（落点＝5b14afe5，10-03 14:51）
+date=2026-10-14T20:51+08  HEAD=51e2f5ea
+`git merge-base --is-ancestor 5b14afe5 HEAD` ＝ 真（本程现跑）；该 commit 动 internal/agent/spill.go(+97/-5)＋loop.go(+9)
+起手锚链（漂移逐报）：e9810346(20:28 首读)→eb141e98→ccab14fb→46dee9ef→51e2f5ea→b75089cc。
+逐枚 `git show --stat` ＝ 编排者/133-r1 的 bookkeeping（probes/**＋issues/**＋台账/证据表），internal/＋cmd/ 零命中。
+完整原始读数＝logs/raw/04-ac2c-head.txt
+
+[读数9·HEAD 上跑 agent 包 174 族 → 9 枚逐枚 PASS（桩说话），ok 2.915s]
+$ go test -count=1 -v -run 174 ./internal/agent/ → 全绿：
+  TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r4
+  TestSpillPointerUnwiredJudgeFailsClosed174        （未接线＝fail-closed 明说）
+  TestSpillPointerOutsideAllowlistNamesBothRoadsBack174（根外＝两条回来的路）
+  TestSpillPointerCanonicalizeFailureQuotesNoUpstreamText174（规范化失败＝只报事实、不拼上游文本）
+  TestSpillPointerNoticeKeepsHeadTailAndBudget174
+  TestLoopSpillNoticeReachesHistoryUnwired174      （真环路：话进 history，不是只进结构体）
+  TestLoopHonorsConfigPointerJudgeQuietly174
+  TestSpillPointerNoticeAddsNoSecondPath174（三子臂；"全文见"恰一次＝票 177 豁免窗口纹丝不动）
+  TestSpillHealthyPointerStillMatchesThePreFixSentence174
+
+[读数9b·安静正例仍安静（根内判定＋真落盘文件 ⇒ 零说明）单跑]
+$ go test -count=1 -v -run TestSpillHealthyPointerStillMatchesThePreFixSentence174 ./internal/agent/ → PASS
+  该判据自带断言：整段回执零「注意：」＋逐字节等于修前模板（期望串在测试里独立重算，非自回声）。

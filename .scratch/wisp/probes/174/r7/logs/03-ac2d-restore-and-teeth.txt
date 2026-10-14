@@ -1,0 +1,22 @@
+### 174-r7 AC#2d 牙 + 还原 —— overlay 突变（只改运行包；跟踪件零字节）
+date=2026-10-14T20:49+08  HEAD=46dee9ef（133-r1 交件commit；internal/cmd 零命中）
+md5 现量：mut/task-splice.go=ded82068ffd67bb28c638663e4d6c243（修前整枚 task.go）
+          mut/task-roots.go=eb44b292d9fac7788488e2fedb2b8a2a（已修版＋把根列表拼回句里）
+          internal/tools/task.go（终树,已修）=5638a29b6460ceb8f67f738f3a353002
+完整原始读数＝logs/raw/03-ac2d-restore-and-teeth.txt
+
+[读数6·牙之一：把「根目录列表」拼回句里（overlay-task-roots.json）——恰两枚根禁词红]
+$ go test -count=1 -v -overlay=…/mut/overlay-task-roots.json -run …174r7 ./internal/tools/ → rc=1
+  --- FAIL: TestCanonicalizeErrorNoticeRelaysNoUpstreamErrorText174r7
+  must not relay "c:\tmp\wisp174r7gotmp\…174r7…\001": notice "…（c:\tmp\…\001|c:\tmp\…\002）…"
+  must not relay "c:\tmp\wisp174r7gotmp\…174r7…\002": （同上 notice）
+  ⇒ ②的「根目录列表」半边不是恒真尺：谁把它拼回去，谁红。
+
+[读数7·还原：overlay 种回修前整枚 task.go（overlay-task-splice.json）——新判据重新红]
+$ go test -count=1 -v -overlay=…/mut/overlay-task-splice.json -run …174r7 ./internal/tools/ → rc=1
+  must not relay "tools: empty path" / must not relay "tools:"（notice 逐字同 01 的读数2）
+  ⇒ 绿是修码挣来的，不是夹具运气。
+
+[读数8·撤 overlay 回终树 —— 绿 + porcelain]
+$ go test -count=1 -run TestCanonicalizeErrorNoticeRelaysNoUpstreamErrorText174r7 ./internal/tools/ → ok 3.099s
+porcelain(internal/ cmd/) = [ M internal/tools/task.go; ?? internal/tools/task_output_pointer_notice_errtext_174r7_test.go;]

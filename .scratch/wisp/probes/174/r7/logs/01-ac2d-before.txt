@@ -1,0 +1,31 @@
+### 174-r7 AC#2d 未修态 —— 泄漏两半（串上真在漏，而全绿＝今天不响）+ 新判据装钉即红
+date=2026-10-14T20:35..20:41+08  HEAD=eb141e98（起手链见 00-anchor-and-gates.md §0）
+porcelain(internal/ cmd/) 起手＝空
+完整原始读数＝logs/raw/01-ac2d-before.txt（含两发自造缺陷的留档，见 §尾）
+
+[零覆盖尺·逐字]
+- grep -rn "连规范化都没通过" --include='*_test.go' internal/ → 8 行＝6 枚断言＋2 行注释，
+  断言点：tools/task_output_canonicalize_fail_174_test.go:85,:130,:148（r2）／
+  tools/task_output_pointer_notice_test.go:450（r3）,:612（r6）／agent/spill_pointer_honesty_174_test.go:172（另一条腿）。
+  ⇒ 全部只问「说了没有」；无一枚问「拼进去的那段 err.Error() 带了什么」。
+- grep -rn "err.Error()" --include='*_test.go' internal/tools/ → 命中全与本支无关（bridge/短名探针/subagent/task_cancel）；
+  沾本支的只有 task_output_pointer_notice_test.go:373/:386 两行注释。
+- grep -rn "tools: empty path｜risk: path traverses" --include='*_test.go' internal/ → 3 处旁引
+  （fs_edit 注释、r2 注释、agent/approval 票 318 侧标记），本分支零钉。
+
+[读数1·泄漏两半：未修码上既有两条泄漏扫【双双 PASS】＝今天不响，而 notice 区逐字含上游文本]
+$ go test -count=1 -v -run TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath ./internal/tools/  → rc=0
+  r3（真 junction 臂）PASS，notice 区逐字：
+    "注意：这条路径现在读不到，C26 连规范化都没通过（risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions）；注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状）"
+  r6（便携臂）PASS，notice 区逐字：
+    "注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在"
+
+[读数2·装钉后在未修码上跑新判据 → 红（钉有牙）]
+$ go test -count=1 -v -run TestCanonicalizeErrorNoticeRelaysNoUpstreamErrorText174r7 ./internal/tools/ → rc=1
+  --- FAIL: TestCanonicalizeErrorNoticeRelaysNoUpstreamErrorText174r7
+  errtext_174r7_test.go:111: the canonicalize-error notice must not relay "tools: empty path": notice "注意：这条路径现在读不到，C26 连规范化都没通过（tools: empty path）；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在"
+  errtext_174r7_test.go:111: the canonicalize-error notice must not relay "tools:": （同上 notice）
+
+[§尾·两枚我自造的缺陷，照实留档]
+- 首发漏 import（build failed 一发）——不是判据读数；
+- 我一度自造过一枚过严断言「恰一条注意」，本夹具本就出两条（C26 失败＋副本不存在；r3 的 junction 臂同形），与泄漏无关 ⇒ 已摘，非产码缺陷。
