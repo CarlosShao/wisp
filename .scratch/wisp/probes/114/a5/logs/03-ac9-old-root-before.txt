@@ -1,0 +1,36 @@
+# 114-a5 logs/03 — AC#9 BEFORE: overlay reverts ONLY the two structural scan roots to frontend/src
+# overlay: D:/tmp/wisp114a5/overlay-old-root.json -> /d/tmp/wisp114a5/composer-old-root.go
+# overlay diff vs landed file:
+574c574
+< 	rep := scanRendererHostDoors(t, filepath.Join(root, "frontend"))
+---
+> 	rep := scanRendererHostDoors(t, filepath.Join(root, "frontend", "src"))
+649c649
+< 	rep := scanRendererHostDoors(t, filepath.Join(dir, "frontend"))
+---
+> 	rep := scanRendererHostDoors(t, filepath.Join(dir, "frontend", "src"))
+
+# 114-a5 log 04 — BEFORE (AC#9): overlay reverts ONLY the two structural scan roots to frontend/src
+# overlay: D:/tmp/wisp114a5/overlay-old-root.json -> /d/tmp/wisp114a5/composer-old-root.go
+
+## 04a planted shapes under the old root (expect FAIL)
+time=2026-10-14T15:43:47.256+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPlantedRendererDoorShapesGoRed
+    composer_test.go:651: shapes A, B and C each add a host call site outside src/lib/panel.ts; the scan found 2:
+          src/ac92-plant-a.js:1: window.chrome.webview.postMessage(JSON.stringify({ method: "panel.mode.set", to: "auto_approve" }));
+          src/ac92-plant-c.ts:3: window.chrome?.webview.postMessage(JSON.stringify({ method: route }));
+    composer_test.go:655: the host-call-site scan does not reach frontend/public - a door planted there is exactly ticket 114 AC#9's shape and the scan root still stops short of the tree it must judge
+    composer_test.go:662: shapes A, C and D each name a route the Go side does not answer, so 3 unknown literals were expected; got [src/ac92-plant-a.js:1: window.chrome.webview.postMessage(JSON.stringify({ method: "panel.mode.set", to: "auto_approve" })); names "panel.mode.set" src/ac92-plant-d.json:1: {"method": "panel.mode.set"} names "panel.mode.set"]
+    composer_test.go:678: red as required: 2 outside call sites, 1 assembled routes, 2 unknown literals, door 2 named 3 line(s)
+--- FAIL: TestPlantedRendererDoorShapesGoRed (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.083s
+FAIL
+
+## 04b real-tree pin under the old root (stays green: without a plant the hole is invisible, which is why this cell needed one)
+time=2026-10-14T15:43:49.087+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTheRendererHoldsExactlyOneDoorToTheHost
+    composer_test.go:594: renderer door held: 89 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+--- PASS: TestTheRendererHoldsExactlyOneDoorToTheHost (0.03s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.076s

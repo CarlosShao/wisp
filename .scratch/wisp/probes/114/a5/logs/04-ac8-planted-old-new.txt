@@ -1,0 +1,24 @@
+# 114-a5 logs/04 — AC#8: same on-disk planted drift (config.unmirrored114 in bridge.go) in a repo-external module copy (D:/tmp/wisp114a5/repo8), old suite vs new gate
+=================================================================
+# 114-a5 log 05 — BEFORE (AC#8): temp module copy (D:/tmp/wisp114a5/repo8), bridge.go planted with
+#   const ConfigUnmirrored114Test = "config.unmirrored114"  (a whitelisted name the page never sends),
+#   HEAD bridge_test.go in place, real frontend/src/lib/panel.ts in place.
+# cmd: go test -count=1 -v -run 'TestFrontendComposerRequestsMatchTheEnvelope' ./internal/panel/
+
+time=2026-10-14T15:43:59.624+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFrontendComposerRequestsMatchTheEnvelope
+--- PASS: TestFrontendComposerRequestsMatchTheEnvelope (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.069s
+=================================================================
+# 114-a5 log 06 — AFTER (AC#8): same planted copy, this leg's new gate in place
+# cmd: go test -count=1 -v -run 'TestEveryWhitelistedInboundNameIsAlsoSentByThePage' ./internal/panel/
+
+time=2026-10-14T15:44:13.294+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestEveryWhitelistedInboundNameIsAlsoSentByThePage
+    bridge_test.go:202: the Go side answers config.get, config.set, config.unmirrored114, panel.attachment.add, panel.message.send, panel.mode.request, panel.workspace.request and frontend/src/lib/panel.ts never spells config.unmirrored114 as a literal: adding a route on one side only is the drift ticket 114 AC#8 turns into a gate - land the page literal in the same change or take the Go name out
+    bridge_test.go:224: page mirrors all 7 whitelisted inbound names; the planted unmirrored name was reported ([config.unmirrored114]), so this check reads bridge.go rather than a list in this file
+--- FAIL: TestEveryWhitelistedInboundNameIsAlsoSentByThePage (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.045s
+FAIL

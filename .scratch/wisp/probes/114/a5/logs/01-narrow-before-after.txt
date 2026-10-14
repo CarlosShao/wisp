@@ -1,0 +1,55 @@
+=================================================================
+# 114-a5 logs/01 — narrow set: BEFORE (HEAD test files, overlay) then AFTER (landed files), real tree
+# (01a) BEFORE cmd: go test -count=1 -v -overlay 'D:/tmp/wisp114a5/overlay-head-both.json' -run '<5 names>' ./internal/panel/
+# (01b) AFTER  cmd: go test -count=1 -v -run '<7 names>' ./internal/panel/
+=================================================================
+
+########## 01a BEFORE (HEAD bridge_test.go + composer_test.go overlaid) ##########
+# 114-a5 log 01 — BEFORE baseline: HEAD versions of both test files (overlay), narrow set, current tree
+# cmd: go test -count=1 -v -overlay 'D:/tmp/wisp114a5/overlay-head-both.json' -run 'TestTheRendererHoldsExactlyOneDoorToTheHost|TestPlantedRendererDoorShapesGoRed|TestFrontendComposerRequestsMatchTheEnvelope|TestThePanelSwitchCapabilityRidesOneWhitelistedRoute|TestFullInboundMethodRosterIsClosed' ./internal/panel/
+
+time=2026-10-14T15:43:10.708+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFrontendComposerRequestsMatchTheEnvelope
+--- PASS: TestFrontendComposerRequestsMatchTheEnvelope (0.00s)
+=== RUN   TestThePanelSwitchCapabilityRidesOneWhitelistedRoute
+--- PASS: TestThePanelSwitchCapabilityRidesOneWhitelistedRoute (0.01s)
+=== RUN   TestTheRendererHoldsExactlyOneDoorToTheHost
+    composer_test.go:574: renderer door held: 89 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+--- PASS: TestTheRendererHoldsExactlyOneDoorToTheHost (0.04s)
+=== RUN   TestPlantedRendererDoorShapesGoRed
+    composer_test.go:632: red as required: 2 outside call sites, 1 assembled routes, 1 unknown literals, door 2 named 1 line(s)
+--- PASS: TestPlantedRendererDoorShapesGoRed (0.01s)
+=== RUN   TestFullInboundMethodRosterIsClosed
+    inbound_roster_253_test.go:519: full inbound roster held: 6 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- PASS: TestFullInboundMethodRosterIsClosed (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.126s
+
+########## 01b AFTER (landed files on disk) ##########
+# 114-a5 log 02 — AFTER green: landed files, narrow set, real tree
+# cmd: go test -count=1 -v -run '...' ./internal/panel/
+
+time=2026-10-14T15:43:29.338+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFrontendComposerRequestsMatchTheEnvelope
+--- PASS: TestFrontendComposerRequestsMatchTheEnvelope (0.00s)
+=== RUN   TestEveryWhitelistedInboundNameIsAlsoSentByThePage
+    bridge_test.go:224: page mirrors all 6 whitelisted inbound names; the planted unmirrored name was reported ([config.unmirrored114]), so this check reads bridge.go rather than a list in this file
+--- PASS: TestEveryWhitelistedInboundNameIsAlsoSentByThePage (0.01s)
+=== RUN   TestThePanelSwitchCapabilityRidesOneWhitelistedRoute
+--- PASS: TestThePanelSwitchCapabilityRidesOneWhitelistedRoute (0.01s)
+=== RUN   TestTheRendererHoldsExactlyOneDoorToTheHost
+    composer_test.go:594: renderer door held: 109 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+--- PASS: TestTheRendererHoldsExactlyOneDoorToTheHost (0.05s)
+=== RUN   TestPlantedRendererDoorShapesGoRed
+    composer_test.go:678: red as required: 3 outside call sites, 1 assembled routes, 3 unknown literals, door 2 named 3 line(s)
+--- PASS: TestPlantedRendererDoorShapesGoRed (0.03s)
+=== RUN   TestDoorTwoReadsEveryTextTypeTheScannerWalks
+    composer_test.go:709: door 2 reads all 15 text types the scanner walks: .css .go .html .js .json .jsx .md .svg .toml .ts .tsx .txt .vue .yaml .yml
+=== RUN   TestDoorTwoReadsEveryTextTypeTheScannerWalks/the_containment_names_a_type_that_is_genuinely_not_read
+--- PASS: TestDoorTwoReadsEveryTextTypeTheScannerWalks (0.00s)
+    --- PASS: TestDoorTwoReadsEveryTextTypeTheScannerWalks/the_containment_names_a_type_that_is_genuinely_not_read (0.00s)
+=== RUN   TestFullInboundMethodRosterIsClosed
+    inbound_roster_253_test.go:519: full inbound roster held: 6 names declared in bridge.go, 6 guard case labels, 6 router case labels, 2 of them carrying no "panel." prefix ("config.get", "config.set")
+--- PASS: TestFullInboundMethodRosterIsClosed (0.03s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.220s
