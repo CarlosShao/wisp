@@ -1,0 +1,22 @@
+# 288-r1 派单（票 288：一处 gofmt 对齐；写腿；面＝cmd/wisp 单件）
+
+发送时刻：2026-10-14 11:4x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **288-r1**。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票（逐字在票面）
+
+- 票：`.scratch/wisp/issues/288-one-comment-alignment-both-rulers-agree-on-has-no-owner-after-280.md`
+- **AC#1 只改那一处对齐**：写面**只许** `cmd/wisp/panel_inbound_guards_35r3_test.go`；尺＝改前后各跑 `gofmt -d <该件>` 两列并排（前＝14 行、后＝**0 行**），且 `gofumpt -d <该件>` 也降到 0。⛔ `-w` 全仓禁用、⛔ 不许批量重排、⛔ 不许碰第二枚文件。
+- **AC#2 证明没伤到测试**：`go test ./cmd/wisp/ -count=1` 改前改后各一次，报 **PASS/FAIL/SKIP 三数＋红名册差集**（⚠ 本机跑 `cmd/wisp` 需要 sherpa 原生 DLL：`PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（**MSYS 形**，盘符形撞 `0xc0000135`）；基线一律具名写清用了哪支）。⛔ 不许因为"整包本来就红"就不跑改前基线。⚠ **另加"314 死区"口径**：整包若在 **157–215s** 窗口整进程死（无红句）＝已知形状（票 314），**照实记**（时长＋无红句＋它与改动的无关性）；死区不是放弃 AC#2 的理由——先跑、再记。
+- **AC#3 门禁与越界**：`GOFLAGS= go build ./...` rc=0；`sh scripts/d22scan.sh` clean；`gofmt -l`／`gofumpt -l` 对动过的件空；`git show --stat` 名册**只含该件**；`frontend/**`／`design/**`／三枚冻结件／`testdata/**`／golden／`internal/observe/thresholds.go`／`tools/d22scan/allowlist.txt` 零字节；⛔ 零 push、commit 必带显式 pathspec。
+
+## 环境与纪律
+
+1. `GOTMPDIR` ⛔ 只 C:（`C:\tmp\wisp288r1gotmp`）。
+2. **整包窗口纪律**：`go test ./cmd/wisp/` 重包**同一时刻只跑一个**——跑前 `tasklist` 看有没有别人的测试二进制在跑（他腿：`315-v1` 验收（优先 overlay、零工作树足迹）／`236-r4` tools／`236-r5` .github）；你的两发整包**起止时刻逐报**（纪律）。
+3. 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内不建 worktree；临时件只建不删；别人脏件别动。
+4. 交件：`.scratch/wisp/probes/288/r1/00-anchor-and-gates.md`＋logs（两列并排的 diff 输出＋整包三数＋红名册差集）＋票 288 尾**追加 1 条 bullet**。产出 ≤6 枚 ≤200 行（大日志留盘，点名＋字节数）。
+5. **未定义即停**：那处对齐改动会带出第二处／`gofmt -l` 余量非零／整包在改前就死得不留三数 ⇒ 停手上报。
+6. 回执：结论先行＋commit sha＋两列并排读数＋整包三数与红差集（含 314 死区口径）＋具名没做。
+
+发送时刻现量：HEAD 近 `2d1d4e27`；CPU ~36%。

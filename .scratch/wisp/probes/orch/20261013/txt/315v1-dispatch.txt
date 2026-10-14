@@ -1,0 +1,31 @@
+# 315-v1 派单（票 315 AC#1 修复的**非实现者**判语；验收腿；面＝cmd/wisp）
+
+发送时刻：2026-10-14 11:4x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `315-v1`**（非实现者；实现者＝`315-r1`）。⛔ 不翻框、⛔ 不动 `Status:`/票名——判语交回。
+
+## 被裁对象
+
+- 产码 `bfc74ae9`：`cmd/wisp/run.go`（+34/−5，其中产码 1 行＋注释：`admitTask` 任务开始补 `rt.bridge.OpenTask(taskID)`，与同钩子 revoke 里既有 `CloseTask` 同 id/同所有者成对）＋`cmd/wisp/zz315a1probe_test.go`（+97/−16，去 `WISP_315A1` 门控＋Case C）。
+- 交付 `b7a15297`：`probes/315/r1/` 七件（锚 §1–§8＋mutation/overlay）。
+- 上游：AC#0＝复现（`315-a1`，`e0d6d383`＋`810deeb4`；件 `probes/315/a1/evidence.md`）；编排者亲跑三把尺已过（修后默认全绿 `ok 2.877s`）。
+
+## 要判的（每格"成立/附条件/不成立"＋逐条凭据；⛔ 不许只引实现者的件）
+
+1. **选案正当性**：实现者选 **ⓐ**（admitTask 补开），排除 ⓑ（子环路自开——盖不住根任务＋新路由）与 ⓒ（桥懒开——会在评估器前登记、使 fail-closed 不可达＝动 C19/C25 语义）。**你现读四处引证**核其逐字：`internal/risk/provenance.go:453` "composition root calls this at task start"／`:706` "ensure OpenScope at task start"／票 151 的"AdmitTask 是唯一 per-task 边界"／票 237 的 harness 同形（`internal/tools/subagent_222_test.go:331-333`）。判"ⓐ 是否**用**既有机制而非**改** C25 语义"（`git show bfc74ae9 -- cmd/wisp/run.go` 逐行读）。
+2. **读数你独立复现**：① 修后默认三枚（无门控）自己跑 ⇒ A/B/C 绿、stdout 无 `[确认 L2`；② **自造反证**：你自己的 `-overlay` 摘掉新开的那行 ⇒ B（与 C）必须红且红句含 `unbound-scope`／31s 超时族（或复跑他们的 `probes/315/r1/mutation/overlay-mut-noopen.json` 并对 sha256；**至少一发是你自己的形**）；③ **修前红**用他们的留档核（未修树那一发）＋你自造反证的红双向坐实。
+3. **Case C（项目说明种子）正当性**：数据目录 `AGENTS.md` 盖戳 `run:project-instructions` 的前置断言＋修前 31.15s 红/修后 0.16s 绿——核其读数与断言写法（⛔ 不许"为绿而绿"）。
+4. **去门控决定**：核实现者理由（旧门控在 strict runner 下实测 `SKIP=1` 致命 rc=1；ledger 无此名而 ledger 属 `scripts/**` 别的面）＋现跑 `sh tools/d22scan/runtests.sh ./cmd/wisp/ -run '^TestZZ315A1'` 或等价 strict 形 ⇒ **无 SKIP、rc=0**；判"去门控 vs 入 ledger vs 保持门控"三选的落法。
+5. **既有 `-race` 夹具红归因**：`Test197SubagentSelfApproval…`（`run.go:933` 一带）——实现者称"同 overlay 无本修的树上同红 ⇒ 非本修引入"。你独立抽核（现读台账该族条目／或用父 commit 跑一发同形），判"归因为既有"成立/否。
+6. **门禁抽核**：build／d22scan clean／长度门 GREEN（59=59）／`Test222 -race` 一发——各现跑。
+
+## 环境与纪律
+
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（MSYS 形）；`GOTMPDIR` ⛔ 只 C:（`C:\tmp\wisp315v1gotmp`）。
+- ⛔ 整包 `./cmd/wisp/`（314 死区）；判据 `-run` 小射程；**突变优先 `-overlay`/仓外备份（零工作树足迹）**；真改文件形必 sha256 还原证；窗口起止时刻逐报。
+- 他腿在飞：`236-r4`（tools）／`236-r5`（.github）／`288-r1`（cmd/wisp 写腿，只碰一枚对齐注释件 `panel_inbound_guards_35r3_test.go`）——与你零文件重叠；编译窗相撞时重试并报时刻。
+- 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- 交件：`docs/evidence/s1/ticket315-315-v1-accept-v1.md`（判语表）＋`.scratch/wisp/probes/315/v1/`（锚＋logs）＋票 315 尾 **1 条 bullet**；产出 ≤7 枚 ≤200 行。⛔ 框不翻。
+- **未定义即停**：引证逐字对不上／你的反证打不红（钉子无牙）／去门控有 SKIP ⇒ 停手上报。
+- 回执：结论先行＋每发红/绿句逐字＋门禁 rc＋**给编排者的收口建议**（AC#0/AC#1 双成立时票 315 可否收）＋具名没做。
+
+发送时刻现量：HEAD 近 `2d1d4e27`；在飞 3 写＋你 1 验；CPU ~36%。

@@ -17668,3 +17668,14 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 
 
 - **A911 补正（记我）**：A911 写"翻 AC#2、Status→done"——实际首笔（`1e9f20af`）只落了**改名＋账**（python 对 `Status:` 行的 assert 拦下写盘；本票**本就没有** `Status:` 行）；**翻框与收口注**落在此补笔 commit。教训＝先 `grep` 确认目标行格式再写替换脚本。
+
+
+## A912｜2026-10-14 11:30:48 +08｜★315-r1 交件（真缺陷修复：admitTask 补 OpenTask 对称成对；修前 31s 红↔修后 0.18s 绿）＋编排者三把尺过（亲跑默认全绿 ok 2.877s）＋派 `315-v1`（修复验收）与 `288-r1`（对齐写腿，编队回到写 3）
+
+- **`315-r1` 交付**：产码 `bfc74ae9`（`run.go` +34/−5＝产码 1 行＋注释：`admitTask` 任务开始补 `rt.bridge.OpenTask(taskID)`，与同钩子 revoke 的 `CloseTask` 同 id/同所有者成对；`zz315a1probe_test.go` +97/−16＝**去 `WISP_315A1` 门控**＋Case C）＋交付 `b7a15297`（probes/315/r1 七件＋票尾 bullet）。
+- **选案ⓐ 带四处逐字引证**：`provenance.go:453` "composition root calls this at task start"／`:706` "ensure OpenScope at task start"／151 的 per-task 边界／237 harness 同形（`subagent_222_test.go:331-333`）；ⓑ（盖不住根任务）与 ⓒ（会在评估器前登记、改判定语义）均排除；⛔ 未动 C25 语义。
+- **读数**：修前红（11:07 未修树 B rc=1 31.22s＋`was_open=false`）→ 修后绿（A 0.15s／B 0.18s／C 0.12s；乙行 `L0/allow`、三条 close 全 `was_open=true`）→ 突变（overlay 只摘那一行）B/C 红 31.2s。★**编排者三把尺**：两笔 commit 在／件齐（锚 167 行＋mutation/）／**亲跑默认全绿 `ok 2.877s`**（无门控无 SKIP）。
+- **去门控理由（实现者具名）**：旧门控在 strict runner 下 `SKIP=1` 致命 rc=1，且 ledger 属 `scripts/**` 别的面 ⇒ 直接把钉子做成常驻（⛔ 不碰别人面）。
+- **Case C**：a1 未试的"项目说明种子"形**活体复到并同修**（修前 31.15s 红→修后 0.16s 绿）。
+- **派**：`315-v1`（非实现者：选案引证逐字核／自造反证／去门控 strict 核／既有 `-race` 红归因／门禁抽核；**含收口建议**）；`288-r1`（票 288 单件对齐＋整包前/后三数；314 死区口径转述；窗口纪律）。
+- **编队（4）**：写 3＝`236-r4`／`236-r5`／`288-r1`；验 1＝`315-v1`。⛔ 未 push（未推约 337）。
