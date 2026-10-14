@@ -1,0 +1,36 @@
+# 174-r5 派单（票 174 AC#6：把 ubuntu 腿那枚未记账 SKIP 登记进 portable-tests.sh 名册；写腿；面＝scripts/portable-tests.sh）
+
+发送时刻：2026-10-14 11:1x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **174-r5**。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与目标（AC#6 逐字在票面第 90 行）
+
+- 票：`.scratch/wisp/issues/174-task-output-points-at-a-file-the-model-cannot-read-by-default-spill-artifacts-are-outside-fs-allowed-dirs.md`（AC#6；⚠ 它原写 AC#4、10-06 改号为 AC#6——**⛔ 别碰本票已有的 AC#4 框**）
+- 现量（编排者 11:0x 现跑）：`grep -c 'TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3' scripts/portable-tests.sh` ＝ **0 枚**；名册 `ledger=(` 共 **11 行**（`scripts/portable-tests.sh:659` 起）。
+- 后果（票面逐字）：ubuntu 腿 step7 打 `portable-tests.sh: unaccounted SKIP lines…` → `strict runner exited 1` ⇒ **下次推送后 test-core 常红**、且会被后续程误读成"又是 panel 那四枚"。
+
+## 要做的
+
+1. **现读**：① `internal/tools/task_output_pointer_notice_test.go:420` 一带那枚用例的**跳过条件与它打印的跳过原文**（行号现量）；② `scripts/portable-tests.sh` 的 `ledger=(` 11 行的**字段格式**（`"TestName|./package/|platform|kind|reason（含 file:line 与理由）"`）与它上方注释里 GUARD/staleness 的再核机制。
+2. **登记一行**：按既有格式加 `TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3|./internal/tools/|linux|kind|reason…`——`platform`＝它跳的平台（ubuntu/linux）；`kind` 从既有取值里选最贴的（`fixture`/`opt-in`/`reexec`…）；`reason` 必须含**现量 file:line＋跳过原文摘句＋为什么这台机器没有可测对象＋next= 归口**（照 11 行的文风，一句到底）。
+3. **路由先例核**（⚠ 必做）：`236-a4` 曾把"进 ledger 还是改平台 tag"标为**票 111 AC#10／票 236 AC#4 地界**——你读一遍 `scripts/portable-tests.sh` 自己的 GUARD 段落与 111 AC#10 的现文；**若仓内现行裁法就是 ledger 登记**（AC#6 字面如此）⇒ 照做；**若两处口径真矛盾** ⇒ **停手上报**（⛔ 别自裁）。
+4. **局部可验的都验**：`bash -n scripts/portable-tests.sh` rc=0；该名册行的**字段数/引号格式**与 11 行逐字对（写一行小尺 better：`grep -c 'TestCanonicalize…' ＝ 1`）；脚本若带本地自检/干跑开关（读它的 usage）能跑就跑，跑不了**具名"为什么只能等下一发 CI"**。
+5. 交件：`.scratch/wisp/probes/174/r5/00-anchor-and-gates.md`＋logs（含两把 grep 尺、`bash -n` rc、跳过原文逐字）＋票 174 尾**追加 1 条 bullet**。产出 ≤6 枚 ≤200 行。
+
+## 硬约束
+
+- 写面**只许** `scripts/portable-tests.sh`（＋你的证据件目录）。⛔ **不碰 `.github/**`**（那是我另一条腿 `236-r5` 的写面）；⛔ 不动任何测试文件/产码；⛔ 不许顺手把别枚 skip 也"顺手登记"（别的行各自有主）。
+- ⛔ 不动三枚冻结件／`thresholds.go`／golden／`allowlist.txt`／`PLAN.md`／`specs/**`；⛔ `frontend/**`／`design/**` 零读零写。
+
+## 纪律（十条）
+
+1. 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内不建 worktree；临时件只建不删；别人脏件别动。
+2. `GOTMPDIR` ⛔ 只 C:（若你跑任何 go 仪器；本腿预计不需要）。
+3. 他腿在飞（`236-r4` tools／`236-r5` .github／`313-r3` config+cmdwisp／`315-a1` cmd/wisp 只读／`260-v2` ball）——与你**零文件重叠**。
+4. 门禁：`bash -n` rc=0＋两把 grep 尺＋（若脚本带）自检；d22scan/长度门与 shell 名册无关，⛔ 不必跑（若你跑了逐字报）。
+5. 票面：票 174 尾**追加 1 条 bullet**；⛔ 框不翻。
+6. 只在"路由矛盾/跳过原文与你找不到的对象对不上"时停手上报。
+7. 交件写明：加的行逐字＋它对应哪一条跳过原文＋为什么 platform/kind 这么填。
+8. 回执：结论先行＋commit sha（产码/交付分开）＋件路径＋尺读数与 rc＋具名没做。
+
+发送时刻现量：HEAD `b8cb0b8f`；在飞 5；CPU ~35%。
