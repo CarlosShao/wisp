@@ -1,0 +1,58 @@
+WINDOW-START 2026-10-14 14:16:40 +0800 HEAD=c2b00de4
+wrote D:/tmp/wisp272v2\mut-welcome/cmd/wisp/config_reload.go 21858
+wrote D:/tmp/wisp272v2\mut-zero/cmd/wisp/config_reload.go 21496
+wrote D:/tmp/wisp272v2\overlay-welcome.json
+wrote D:/tmp/wisp272v2\overlay-zero.json
+deleted-block bytes: 248
+leftovers of real sentence in welcome file: 0
+leftovers of real sentence in zero file: 0
+needles in welcome print: True
+gen-rc=0
+=== diff welcome vs HEAD (unified, first 80) ===
+--- cmd/wisp/config_reload.go	2026-10-08 19:17:21.803547700 +0800
++++ /d/tmp/wisp272v2/mut-welcome/cmd/wisp/config_reload.go	2026-10-14 14:16:40.443816600 +0800
+@@ -182,6 +182,10 @@
+ func (rt *agentRuntime) reportReload(rep *config.Report) {
+ 	rt.auditf("config: HOT-RELOAD state=applied hot=%v reload=%v restart=%v locked=%d",
+ 		rep.Hot, rep.Reload, rep.Restart, len(rep.Locked))
++	// MUTATION 272-v2 welcome shape part b: a post-mark print that has nothing to
++	// do with this plant. Carries the sentence and every needle the case reads.
++	fmt.Fprintf(rt.stdout,
++		"wisp run: 欢迎语（与本次改动无关的一条 post-mark 打印）：app.autostart / 开机自启 / app.language / app.single_instance 这些键只在启动时被读一次，交给平台层；原因：启动时读一次。关于本次改动：本次运行不会生效，需要重启进程；内存里的旧值没有换掉，文件里的新值没有被丢掉。\n")
+ 	if len(rep.Hot) > 0 {
+ 		split := splitHotTier(rep.Hot)
+ 		for _, name := range rep.Hot {
+@@ -322,12 +326,7 @@
+ 		"这些键只在进程启动时被读一次并交给平台层（开机自启注册、单实例锁、界面语言），本次运行没有重新加载它们的路径；"+
+ 			"内存里继续用旧值，文件里的新值没有被丢掉，重启进程后生效",
+ 		restartTierKeys)
+-	fmt.Fprintf(rt.stdout,
+-		"wisp run: 这些段的改动本次运行不会生效（D36 重启档，需要重启进程）：%v。"+
+-			"原因：这几枚键在进程启动时被读一次就交给平台层（开机自启注册、单实例锁、界面语言），"+
+-			"本次运行没有重新注册它们的路径。涉及：%s。"+
+-			"注意两件事都没发生：文件里的新值没有被丢掉，内存里的旧值也没有被偷偷替换。\n",
+-		sections, strings.Join(restartTierKeys, " / "))
++	// MUTATION 272-v2: the real operator sentence was deleted (welcome-shape part a).
+ }
+ 
+ // restartTierKeys names the keys planApp books as restart-tier (D36, PLAN.md
+=== diff zero vs HEAD ===
+--- cmd/wisp/config_reload.go	2026-10-08 19:17:21.803547700 +0800
++++ /d/tmp/wisp272v2/mut-zero/cmd/wisp/config_reload.go	2026-10-14 14:16:40.443816600 +0800
+@@ -322,12 +322,7 @@
+ 		"这些键只在进程启动时被读一次并交给平台层（开机自启注册、单实例锁、界面语言），本次运行没有重新加载它们的路径；"+
+ 			"内存里继续用旧值，文件里的新值没有被丢掉，重启进程后生效",
+ 		restartTierKeys)
+-	fmt.Fprintf(rt.stdout,
+-		"wisp run: 这些段的改动本次运行不会生效（D36 重启档，需要重启进程）：%v。"+
+-			"原因：这几枚键在进程启动时被读一次就交给平台层（开机自启注册、单实例锁、界面语言），"+
+-			"本次运行没有重新注册它们的路径。涉及：%s。"+
+-			"注意两件事都没发生：文件里的新值没有被丢掉，内存里的旧值也没有被偷偷替换。\n",
+-		sections, strings.Join(restartTierKeys, " / "))
++	// MUTATION 272-v2: the real operator sentence was deleted (welcome-shape part a).
+ }
+ 
+ // restartTierKeys names the keys planApp books as restart-tier (D36, PLAN.md
+=== worktree md5 (must be unchanged) ===
+348f5a67a73442d45f751079e3b80a6c *cmd/wisp/config_reload.go
+WINDOW-END 2026-10-14 14:16:40 +0800

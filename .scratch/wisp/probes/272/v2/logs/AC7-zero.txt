@@ -1,0 +1,10 @@
+WINDOW-START 2026-10-14 14:17:52 +0800 HEAD=c2b00de4
+== AC7-zero: overlay-zero.json (expect FAIL at :623 await) ==
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+    config_reload_223_test.go:623: stdout never carried "本次运行不会生效" AFTER the plant within 40s; window since the mark:
+--- FAIL: TestTicket223RestartTierSaysItWillNotApply (44.97s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	47.260s
+FAIL
+rc=1
+WINDOW-END 2026-10-14 14:18:47 +0800

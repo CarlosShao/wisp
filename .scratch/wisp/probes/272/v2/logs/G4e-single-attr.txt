@@ -1,0 +1,39 @@
+== RETRY (cygpath form) 2026-10-14 14:06:08 +0800 HEAD=c2b00de4 ==
+== A: SealNotice, mandated GOTMPDIR ==
+    logsink_windows_test.go:175: records naming "winsec: seal cleared principals that stood on this object" = 2, want 1; all records: [{Time:2026-10-14T14:06:15.3825804+08:00 Level:INFO Msg:winsec: sealing path resolver installed Path: Kind: Cleared: ClearedInherited: Policy:} {Time:2026-10-14T14:06:15.4368985+08:00 Level:INFO Msg:wisp: persistent log sink installed Path: Kind: Cleared: ClearedInherited: Policy:} {Time:2026-10-14T14:06:15.441611+08:00 Level:WARN Msg:winsec: seal cleared principals that stood on this object Path:C:\tmp\wisp272v2gotmp\TestAC2SealNoticeLandsInTheRunLegLogFile870929462\001\secrets Kind:explicit+inherited Cleared:S-1-1-0(A;OICI;0x1200a9;;;WD) ClearedInherited:S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) Policy:winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal} {Time:2026-10-14T14:06:15.4433592+08:00 Level:WARN Msg:winsec: seal cleared principals that stood on this object Path:C:\tmp\wisp272v2gotmp\TestAC2SealNoticeLandsInTheRunLegLogFile870929462\001\.wisp-config-1883660226.tmp Kind:inherited Cleared: ClearedInherited:S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) Policy:winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal}]
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.09s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.307s
+FAIL
+rc=1
+== B: BallPanelGestures, mandated GOTMPDIR ==
+--- PASS: TestBallPanelGesturesReachThePanelThread (0.81s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.470s
+rc=0
+== C: AC14GoSideEval, mandated GOTMPDIR ==
+    panel_resident_windows_test.go:944: AC#14 nail 2 (Eval push hop), page's own words: title=""
+    panel_resident_windows_test.go:946: Go's Eval push did not reach the document: the page reports its title as "", want "PUSHED-33R5-OK". This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (0.88s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.708s
+FAIL
+rc=1
+== D: SealNotice, default GOTMPDIR ==
+--- PASS: TestAC2SealNoticeLandsInTheRunLegLogFile (0.08s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.164s
+rc=0
+== E: BallPanelGestures, default GOTMPDIR ==
+--- PASS: TestBallPanelGesturesReachThePanelThread (0.69s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.813s
+rc=0
+== F: AC14GoSideEval, default GOTMPDIR ==
+    panel_resident_windows_test.go:946: Go's Eval push did not reach the document: the page reports its title as "", want "PUSHED-33R5-OK". This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (0.79s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.919s
+FAIL
+rc=1
+WINDOW-END 2026-10-14 14:06:45 +0800

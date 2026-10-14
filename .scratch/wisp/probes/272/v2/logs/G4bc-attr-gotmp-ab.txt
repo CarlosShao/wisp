@@ -1,0 +1,60 @@
+WINDOW-START 2026-10-14 13:55:50 +0800
+== A: mandated GOTMPDIR=C:\tmp\wisp272v2gotmp ==
+-- winsec pair --
+time=2026-10-14T13:55:53.645+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/runner_descriptor_is_judged_by_what_it_resolves_to
+    testing.go:1617: TempDir RemoveAll cleanup: openfdat C:\tmp\wisp272v2gotmp\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju3298442346\001\runner: Access is denied.
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/the_set_holds_no_name_in_the_form_it_is_compared_with
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/a_name_spelling_cannot_change_the_verdict
+    testing.go:1617: TempDir RemoveAll cleanup: openfdat C:\tmp\wisp272v2gotmp\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_576215293\001\named: Access is denied.
+=== NAME  TestGateJudgesThePrivateSetByResolvedSID
+    testing.go:1617: TempDir RemoveAll cleanup: openfdat C:\tmp\wisp272v2gotmp\TestGateJudgesThePrivateSetByResolvedSID535756359\001\la: Access is denied.
+--- FAIL: TestGateJudgesThePrivateSetByResolvedSID (5.70s)
+    --- FAIL: TestGateJudgesThePrivateSetByResolvedSID/runner_descriptor_is_judged_by_what_it_resolves_to (2.00s)
+    --- PASS: TestGateJudgesThePrivateSetByResolvedSID/the_set_holds_no_name_in_the_form_it_is_compared_with (0.00s)
+    --- FAIL: TestGateJudgesThePrivateSetByResolvedSID/a_name_spelling_cannot_change_the_verdict (1.76s)
+=== RUN   TestSealNarrowsAndNamesThePrincipalItRemovedBySID
+    private_set_sid_windows_test.go:314: planted as strangers: [S-1-1-0 S-1-5-32-546 S-1-5-21-1228170099-895614386-1166154857-500]; planted as a private-set member: S-1-5-32-544 (LA=S-1-5-21-1228170099-895614386-1166154857-500, in set: false, set=[S-1-5-18 S-1-5-32-544 S-1-5-21-1228170099-895614386-1166154857-1001])
+    testing.go:1617: TempDir RemoveAll cleanup: openfdat C:\tmp\wisp272v2gotmp\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2111731315\002\la: Access is denied.
+--- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (1.85s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	8.841s
+FAIL
+rc=1
+-- models single --
+=== RUN   TestAC4InstallDirWidthIsDeliberateAndHasABreakLine
+    handoff_window_109_windows_test.go:159: store root seeded with: [BUILTIN\Users (OI)(CI)(M) BUILTIN\Users (I)(OI)(CI)(RX)]
+    handoff_window_109_windows_test.go:172: removing the parent's grant left an explicit foreign ACE on the install dir - out-of-band by ticket 89's definition: [BUILTIN\Users (I)(OI)(CI)(RX)]
+--- FAIL: TestAC4InstallDirWidthIsDeliberateAndHasABreakLine (1.54s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/models	2.928s
+FAIL
+rc=1
+== B: GOTMPDIR unset (default %TEMP%) ==
+-- winsec pair --
+time=2026-10-14T13:56:07.589+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/runner_descriptor_is_judged_by_what_it_resolves_to
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/the_set_holds_no_name_in_the_form_it_is_compared_with
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/a_name_spelling_cannot_change_the_verdict
+--- PASS: TestGateJudgesThePrivateSetByResolvedSID (0.02s)
+    --- PASS: TestGateJudgesThePrivateSetByResolvedSID/runner_descriptor_is_judged_by_what_it_resolves_to (0.00s)
+    --- PASS: TestGateJudgesThePrivateSetByResolvedSID/the_set_holds_no_name_in_the_form_it_is_compared_with (0.00s)
+    --- PASS: TestGateJudgesThePrivateSetByResolvedSID/a_name_spelling_cannot_change_the_verdict (0.00s)
+=== RUN   TestSealNarrowsAndNamesThePrincipalItRemovedBySID
+    private_set_sid_windows_test.go:314: planted as strangers: [S-1-1-0 S-1-5-32-546 S-1-5-21-1228170099-895614386-1166154857-500]; planted as a private-set member: S-1-5-32-544 (LA=S-1-5-21-1228170099-895614386-1166154857-500, in set: false, set=[S-1-5-18 S-1-5-32-544 S-1-5-21-1228170099-895614386-1166154857-1001])
+--- PASS: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (0.11s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.167s
+rc=0
+-- models single --
+=== RUN   TestAC4InstallDirWidthIsDeliberateAndHasABreakLine
+    handoff_window_109_windows_test.go:159: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:176: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:200: AC#4 nail: install dir kws-fixture inherits [BUILTIN\Users (I)(OI)(CI)(M)] (parent policy, guard is the re-verify)
+--- PASS: TestAC4InstallDirWidthIsDeliberateAndHasABreakLine (1.52s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/models	1.551s
+rc=0
+WINDOW-END 2026-10-14 13:56:10 +0800

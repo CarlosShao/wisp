@@ -1,0 +1,13 @@
+WINDOW-START 2026-10-14 13:50:23 +0800
+== [1] gofmt -l (audited two .go) ==
+rc=0
+== [2] gofumpt v0.12.0 -l (audited two .go) ==
+rc=0
+== [3] gofmt -l cmd/wisp (package scope; gofmt reads only .go by design) ==
+cmd\wisp\models.go
+rc=0
+== [4] gofumpt v0.12.0 -l cmd/wisp ==
+cmd\wisp\models.go
+cmd\wisp\panel_transport_35r2_test.go
+rc=0
+WINDOW-END 2026-10-14 13:50:24 +0800

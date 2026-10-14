@@ -1,0 +1,8 @@
+WINDOW-START 2026-10-14 14:17:39 +0800 HEAD=c2b00de4
+== AC7-welcome: overlay-welcome.json (expect PASS) ==
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+--- PASS: TestTicket223RestartTierSaysItWillNotApply (4.22s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	6.247s
+rc=0
+WINDOW-END 2026-10-14 14:17:52 +0800
