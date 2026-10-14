@@ -71,6 +71,14 @@
 # never a pass, never an age read off a subset, and never "no artifact found"
 # pretending to be a statement about the whole listing.
 #
+# Ticket 136 AC#4 closed the last clamp. A timestamp in the future - a stamp
+# written by a clock ahead of this runner's, or a forged record - used to read
+# as "0 day(s) old" in BOTH dynamic probes, because a negative age was clamped
+# to 0 and 0 days is inside any threshold (R-134-8, H12). Both probes now
+# refuse a future stamp: exit 2 with the token `slo-full-timestamp-in-future`,
+# because a clock that has not reached the stamp cannot age it, and "cannot
+# age" is not "fresh".
+#
 # Three probes, all required:
 #   P1 static   - .github/workflows/ci.yml still carries the triggers that make
 #                 slo-full auto-run (push on main/dev + a schedule), and the
@@ -111,7 +119,7 @@
 # Exit codes: 0 = all three probes agree slo-full is alive and sampling,
 # 1 = at least one failed, 2 = the pin could not look (no gh, no token, no
 # ci.yml, unparseable date, a partial artifact scan, a scanned record missing
-# the fields the source predicate reads).
+# the fields the source predicate reads, a timestamp in the future).
 set -eu
 
 # Spell the empty prefix assignment as `CDPATH=''` rather than `CDPATH=`.
@@ -283,8 +291,15 @@ EOF2
         fail "slo-full-never-triggered: the record has no created_at: $record"
     else
         then=$(to_epoch "$created")
+        # Ticket 136 AC#4: a timestamp in the future used to be clamped to a
+        # 0-day age, i.e. read as "very fresh" (R-134-8, H12). A clock that has
+        # not reached the stamp cannot age it, so this is a refusal (exit 2),
+        # not a pass and not a red made up from a number nobody can compute.
+        if [ "$then" -gt "$now" ]; then
+            echo "slo-freshness: FAIL slo-full-timestamp-in-future: the newest slo-full job record claims created_at=$created, which is later than 'now' ($now s); a future record cannot be aged (ticket 136 AC#4). Check the clock of whatever produced it." >&2
+            exit 2
+        fi
         age=$((now - then))
-        if [ "$age" -lt 0 ]; then age=0; fi
         age_days=$((age / 86400))
         echo "slo-freshness: P2 newest slo-full job record: created_at=$created status=$status conclusion=$conclusion"
         echo "slo-freshness:   job url: $url"
@@ -433,6 +448,10 @@ EOF4
                 exit 2
             fi
             e=$(to_epoch "$ts")
+            if [ "$e" -gt "$now" ]; then
+                echo "slo-freshness: FAIL slo-full-timestamp-in-future: a $sample_artifact record claims created_at=$ts, which is later than 'now' ($now s); a future sample cannot be aged (ticket 136 AC#4)." >&2
+                exit 2
+            fi
             case $art_branch in
             main | dev) ;;
             *)
@@ -488,6 +507,10 @@ EOF5
             [ -n "$ts" ] || continue
             sample_count=$((sample_count + 1))
             e=$(to_epoch "$ts")
+            if [ "$e" -gt "$now" ]; then
+                echo "slo-freshness: FAIL slo-full-timestamp-in-future: an injected $sample_artifact record claims created_at=$ts, which is later than 'now' ($now s); a future sample cannot be aged (ticket 136 AC#4)." >&2
+                exit 2
+            fi
             if [ "$e" -gt "$best_epoch" ]; then
                 best_epoch=$e
                 best_ts=$ts
@@ -506,7 +529,6 @@ elif [ "$best_epoch" -lt 0 ]; then
     fail "slo-full-sample-never: $sample_count $sample_artifact artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); $rejected rejected. Refusing to age on a lookalike ($sample_scan_note). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified."
 else
     sample_age=$((now - best_epoch))
-    if [ "$sample_age" -lt 0 ]; then sample_age=0; fi
     sample_age_days=$((sample_age / 86400))
     echo "slo-freshness: P3 newest VALID SAMPLE: artifact $sample_artifact created_at=$best_ts artifact_id=$best_art run=$best_run"
     echo "slo-freshness:   $sample_scan_note; $sample_count record(s) considered, $rejected rejected by the source predicate"
