@@ -138,11 +138,22 @@ fi
 # are about this host's %TEMP%. The ubuntu leg is left exactly as it is because
 # this leg cannot run CI to measure what a redirected temp root does to those
 # steps (registered as a debt on ticket 310, not silently assumed safe).
+#
+# WHY THE ROOT KEEPS THE NATIVE SPELLING (ticket 317). The first cut of this step
+# folded `\` to `/` while composing the default root; the folded `C:/...` value
+# then reached internal/risk's literal-spelling preconditions and two real
+# `mklink /J` targets on the windows leg of run 38508311376, reading as four false
+# reds (`precondition: deepestExistingAncestor(...) ... want
+# "C:/Users/runneradmin/..."`, `mklink ... Invalid switch - "Users"`). Measured
+# both ways on a dev host: those four cases are red under a `C:/...` root and
+# green under a `C:\...` root with everything else unchanged. So the default below
+# is composed with the native separator, and an explicit WISP_TEST_GOTMP_ROOT is
+# still taken verbatim - this step does not rewrite the operator's spelling.
 if [ -z "${GOTMPDIR:-}" ]; then
     if [ "$(go env GOOS)" = windows ]; then
         if [ -n "${LOCALAPPDATA:-}" ]; then
-            gotmp_base=${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}
-            gotmp_run="$gotmp_base/portable-$(date +%Y%m%d-%H%M%S)-$$"
+            gotmp_base=${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}
+            gotmp_run="$gotmp_base\\portable-$(date +%Y%m%d-%H%M%S)-$$"
             if mkdir -p "$gotmp_run" 2>/dev/null; then
                 export GOTMPDIR="$gotmp_run"
                 echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \

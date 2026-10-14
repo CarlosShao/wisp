@@ -58,9 +58,15 @@ fi
 # GOTMPDIR line, no DEGRADED line, nothing said that the redirection did not
 # happen. It is now a finding on stderr, still NOT a fail-closed exit and NOT a
 # refusal to run (orchestrator ruling; revocation phrase "310 改 fail-closed").
+#
+# TICKET 317: the default root is composed with the NATIVE separator. A folded
+# `C:/...` root makes internal/risk's literal-spelling preconditions and real
+# `mklink /J` targets falsely red on the windows leg; both readings and the dev-host
+# reproduction are in the ticket 317 note of scripts/portable-tests.sh. An explicit
+# WISP_TEST_GOTMP_ROOT is still taken verbatim.
 if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ]; then
     if [ -n "${LOCALAPPDATA:-}" ]; then
-        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"${LOCALAPPDATA//\\//}/wisp-test-gotmp"}/winsec-$(date +%Y%m%d-%H%M%S)-$$"
+        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}\\winsec-$(date +%Y%m%d-%H%M%S)-$$"
         if mkdir -p "$gotmp_run" 2>/dev/null; then
             export GOTMPDIR="$gotmp_run"
             echo "winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
