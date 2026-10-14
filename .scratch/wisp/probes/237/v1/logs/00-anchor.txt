@@ -12,7 +12,8 @@ worktree 哈希（git hash-object）:
   internal/tools/subagent_197.go       b72f67407962bd10768f6f5866c0c461fecb97ff（＝r1 锚点同一枚，本腿零改）
   internal/tools/bridge.go             4f8f6e9048d00c2b5387dfabdc6a7da6fdb09279
   git diff d8a4d913~1..f3dc1389 -- internal/tools/subagent_197.go internal/tools/bridge.go  -> 空（复跑）
-tasklist: 09:51／09:53／10:03 三次现看，无 go/compile/link 进程（仅 cargo/node；313-v1 未在跑 -race）
+tasklist: 09:51／10:03 两次现看，无 go/compile/link 进程（仅 cargo/node）；09:54-09:57 突变/-race 连发期间本腿自持串行。
+  他腿 313-v1 在本腿窗口内提交 a5198871（零文件重叠、未并发跑测试；本腿两笔与其无交集）
 GOTMPDIR: C:\tmp\wisp237v1gotmp（只 C:；10:03 全包一发误用正斜杠拼法致环境前置红，10:04 改正）
 窗口（本腿全部 -race/突变，串行；无并发腿）:
   AC#1 回退形 shot1        09:54:03→09:54:16  rc=1
