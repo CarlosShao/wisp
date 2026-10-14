@@ -17752,3 +17752,13 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **252 收口**：AC#4/#5 双翻（留档句在框内）＋收口节＋`git mv -done`＋**名册键换**（旧键→`-done` 键＋理由改实况）⇒ 门 **GREEN 59=59**。**301 秒账自今日 12:19 起改归本票**（票尾＋01 件逐字）。
 - **具名残余（不阻塞、登记）**：`"绝不许把两段并成一段"` 硬禁**今天零仪器**（M-merge 实测 257 PASS/0 FAIL）——补尺候选（按调用图造"拆任一段必红"的尺）留作后续，账内点名。
 - 编队：写 3＝`316-r1`／`174-r6`／`236-r6`；验 1＝`252-v2`（收）。CI `38508311376` 仍跑。⛔ 未推＝`e3788f08` 后多笔。
+
+
+## A922｜2026-10-14 13:24:44 +08｜★推送后 CI 全色对账完成（run `38508311376`）＋**立案 317（存量真回归：GOTMPDIR 折法把 windows 腿打假红）**＋派 `317-r1`＋翻 174 AC#6（甲形实证）
+
+- **run 全色**：`slo-full` ✓（4m54s）／`slo-smoke` ✓／`lint-frontend` ✓；`test-core` ✗／`lint` ✗／`test-windows` ✗——三红逐枚归账如下。
+- **`test-core` ✗＝6 FAIL 全在册**（panel 三契约漂移／35r8×2／`TestSessionListByWorkspace` 间歇）**＋`SKIP=0`**（那枚 174 跳过名已进 `-skip` 名册、名册打印含逐字行）⇒ **"未记账 SKIP 致红"成因消除** ⇒ **翻 174 AC#6**（留档句在框内）。step 仍红＝6 枚在册 FAIL 的账，⛔ 非本格。
+- **`lint` ✗＝三红全在册**（gofmt 夹具 `fs_broken.go`＝Q-66 域／tracked 名册（fixtures＋`panel_transport_35r2_test.go` 债）／staticcheck）＋**★两道 `go vet` 现已真跑且绿**（守卫生效——"被吃掉"已成历史；Q-66 的剩值＝gofmt 红本身）。
+- **`test-windows` ✗＝两发差集：19 消（真窗/短名族漂色）／5 增**：① `TestSessionListByWorkspace`＝已知间歇（**本机 ×3 亦红**，归 166 侧）；② **4 枚 `internal/risk` Sync/116 族**＝**本机同树全绿**＋CI 红句＝`want "C:/…"` 混合分隔符 ＋ `mklink … Invalid switch - "Users"` ⇒ **环境形真回归**：元凶＝`scripts/portable-tests.sh:144` 等的 `${LOCALAPPDATA//\//}`（折成 `C:/…` 当 GOTMPDIR 根；三处同形）；出身笔 `6a8f537a`（票 310）＋`f8b1f446`（票 311）**在未推存量里、本发首次暴露**；旧 tip 无此转换。★交叉先例＝`236-v2` 本机实测同效应。
+- **立案 317＋派 `317-r1`**（scripts 面；先读 310/311 原意→两形本机复现→修；⛔ 若须动 `.github/**` 停手上报）。派单/send 存档在盘。
+- **编队（4 写＝cap）**：`316-r1`／`174-r6`／`236-r6`／`317-r1`。⛔ 未推＝`e3788f08` 后多笔（含本批；下波随推）。

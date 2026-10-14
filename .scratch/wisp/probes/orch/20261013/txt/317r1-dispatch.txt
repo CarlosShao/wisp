@@ -1,0 +1,27 @@
+# 317-r1 派单（票 317：`GOTMPDIR` 根的分隔符折法致 windows 腿假红；写腿；面＝scripts/**）
+
+发送时刻：2026-10-14 13:4x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **317-r1**（`probes/317/` 未建，r1 可用；查重已做）。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与来路
+
+- 票：`.scratch/wisp/issues/317-localslash-fold-in-gotmpdir-root-makes-windows-junction-tests-falsely-red.md`（元凶行、CI 逐字证据、出身笔、交叉先例全在）。
+- 摘要：`scripts/portable-tests.sh:144` 等三处的 `${LOCALAPPDATA//\\//}` 把 GOTMPDIR 根折成 `C:/…` 正斜杠形 ⇒ windows 腿 4 枚 junction/路径字面量族用例假红（`mklink … Invalid switch - "Users"`／want 混合分隔符）；本机同树全绿、旧 tip 无此转换、引入笔＝`6a8f537a`（票 310）＋`f8b1f446`（票 311）。
+
+## 你的活（按票内 AC#1/AC#2 逐字）
+
+1. **先读原意**：票 310／311 ＋ `git show 6a8f537a`／`f8b1f446`——**为什么当时折成正斜杠**（linux 腿形状？"只许 C: 卷"？某测试依赖？）；逐条具名。⛔ 未读懂原意前不许动手。
+2. **本机复现**（236-v2 形状）：`GOTMPDIR='C:/tmp/…'`（posix 形）⇒ 4 枚红；`'C:\tmp\…'`（反斜杠形）⇒ 绿；failing/passing 红句逐字进件。
+3. **修**（形状自裁、须保住 310／311 原意）：候选 ⓐ仅 windows 腿用反斜杠；ⓑ全腿不折；ⓒ逐处判（`wisp_311_ref_path` 那三处是 311 的对照位，未必同病）。**判据**：harness 自产的 GOTMPDIR 在 windows 腿为反斜杠形；若本机可跑 harness 的 windows 腿（读其 usage/scope 开关）就跑一发实读；不可跑则给"下一发 CI 的预期读数与判法"逐条。⛔ 不许为绿放开任何测试/删 skip。
+4. **交件**：`probes/317/r1/00-anchor-and-gates.md`＋logs（两形复现＋修后读数＋`bash -n` rc）＋票 317 尾**追加 1 条 bullet**。产出 ≤6 枚 ≤200 行。
+
+## 环境与纪律
+
+1. 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；别人脏件别动。
+2. `GOTMPDIR` ⛔ 只**反斜杠形**（你的例 `C:\tmp\wisp317r1gotmp`）——本票就是在修这个坑，别自己踩。
+3. 写面＝`scripts/**`（三处同形逐处判）＋`probes/317/r1/`；⚠ **若修必须动 `.github/**` 或触发表 ⇒ 停手上报**（契约邻接）。
+4. ⛔ 不动 `scripts/portable-tests.sh` 里 174-r5 已入册的 ledger 行（它刚被本发 CI 实证有效）；若你判那行表述须改 ⇒ 停手上报。
+5. 他腿在飞：`316-r1`（cmd/wisp）／`174-r6`／`236-r6`（internal/tools）——与你零文件重叠；CI `38508311376` 已跑完（本票的来路）。
+6. 门禁：`bash -n` rc=0／（可跑的）相关读数绿／d22scan 与长度门若适用各现跑。
+7. **未定义即停**：310/311 原意与"改回反斜杠"冲突／本机复现不出／修面越过 scripts ⇒ 停手上报。
+8. 回执：结论先行＋commit sha（产码/交付分开）＋原意三条具名＋两形复现红/绿逐字＋修后读数（或 CI 预期）＋门禁 rc＋具名没做。
