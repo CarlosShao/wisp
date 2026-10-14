@@ -1,0 +1,11 @@
+=== ruler: diff body lines over the two write-face files ===
+body lines total: 23
+R1 comment hits (^[+-][[:space:]]*//): 21
+R2 hits (/*|*/|*): 0
+R3 hits (code line with //): 0
+non-comment lines:
+-	"agent": hotClaimSnapshotOnly + "cmd/wisp/run.go:991 [cfg := rt.cfg] - every cfg.Agent read is the boot copy, so this run keeps acting on the old value",
++	"agent": hotClaimSnapshotOnly + "cmd/wisp/run.go:1023 [cfg := rt.cfg] - every cfg.Agent read is the boot copy, so this run keeps acting on the old value",
+
+=== run.go only ===
+0

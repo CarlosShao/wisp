@@ -1,0 +1,10 @@
+HEAD=1d19b60b 2026-10-14 12:24:10 +0800
+=== numstat (worktree vs HEAD) ===
+7	7	cmd/wisp/config_readers_255.go
+6	3	cmd/wisp/run.go
+=== body lines / R1 / R2 / R3 ===
+body=23 R1=21 R2=0 R3=0
+non-comment:
+-	"agent": hotClaimSnapshotOnly + "cmd/wisp/run.go:991 [cfg := rt.cfg] - every cfg.Agent read is the boot copy, so this run keeps acting on the old value",
++	"agent": hotClaimSnapshotOnly + "cmd/wisp/run.go:1023 [cfg := rt.cfg] - every cfg.Agent read is the boot copy, so this run keeps acting on the old value",
+run.go-only non-comment=0

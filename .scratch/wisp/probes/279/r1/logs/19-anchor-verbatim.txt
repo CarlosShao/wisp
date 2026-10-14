@@ -1,0 +1,3 @@
+A) anchor before paste: material original (332-337) == HEAD run.go (331-336): True
+B) paste verbatim:      material replacement (341-349) == working run.go (331-339): True
+C) block line counts:   original=6 replacement=9

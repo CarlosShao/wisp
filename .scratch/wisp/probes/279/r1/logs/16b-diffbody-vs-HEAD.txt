@@ -1,0 +1,23 @@
+-// the sentence is about THIS run: cmd/wisp/run.go:423-424 takes `cfg := mgr.Config()`
++// the sentence is about THIS run: cmd/wisp/run.go:426-427 takes `cfg := mgr.Config()`
+-// what this boot read", and execute() reads that copy (cmd/wisp/run.go:991
++// what this boot read", and execute() reads that copy (cmd/wisp/run.go:1023
+-	// (cmd/wisp/run.go:435 [res := llm.NewResolver(cfg, st)]), so "已立即生效"
++	// (cmd/wisp/run.go:438 [res := llm.NewResolver(cfg, st)]), so "已立即生效"
+-	// at assembly (cmd/wisp/run.go:424 [rt.cfg = cfg]) and every use reads that
+-	// copy (cmd/wisp/run.go:991 [cfg := rt.cfg]; the field is consumed at
+-	// cmd/wisp/run.go:1014 [PerToolTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS)]). plan() did overwrite
++	// at assembly (cmd/wisp/run.go:427 [rt.cfg = cfg]) and every use reads that
++	// copy (cmd/wisp/run.go:1023 [cfg := rt.cfg]; the field is consumed at
++	// cmd/wisp/run.go:1046 [PerToolTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS)]). plan() did overwrite
+-	"agent": hotClaimSnapshotOnly + "cmd/wisp/run.go:991 [cfg := rt.cfg] - every cfg.Agent read is the boot copy, so this run keeps acting on the old value",
++	"agent": hotClaimSnapshotOnly + "cmd/wisp/run.go:1023 [cfg := rt.cfg] - every cfg.Agent read is the boot copy, so this run keeps acting on the old value",
+-	// Nothing calls it yet - the WebView2 "event -> ParseComposerRequest" hop does
+-	// not exist in this tree (tickets 33/35) - so this is the gate's other half,
+-	// not a path: the host that gets wired later cannot assemble a wider档 without
++	// Nothing reads this field yet: the "event -> ParseComposerRequest" hop now
++	// exists (composer_dispatch.go:155, reached from `wisp panel-inbound` and the
++	// panel host), but every leg that reaches it assembles its own handler chain
++	// (cmd/wisp/panel_inbound.go, the resident leg's newResidentComposerDispatch)
++	// and nothing attaches this one - so this is the gate's other half, not a
++	// path: the leg that gets wired to it later cannot assemble a wider档 without

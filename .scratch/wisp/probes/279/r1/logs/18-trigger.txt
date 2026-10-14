@@ -1,0 +1,10 @@
+=== trigger: last real run.go change ===
+bfc74ae9d84d988331740ce285427b634e7aeb5d 2026-10-14 11:27:28 +0800 315-r1 写腿（票 315 AC#1，实现者）：admitTask 任务开始补 OpenTask，与同钩子 revoke 里那枚 CloseTask 同 id/同所有者成对（C25 生产 scope 此前只在 mark 后懒开 ⇒ 未登记任务的首次走桥调用在别处有 mark 时被判 L2/R4 unbound-scope）
+=== that commit's run.go numstat ===
+34	5	cmd/wisp/run.go
+=== run.go changed between bfc74ae9 and HEAD? ===
+(empty above = no)
+=== modeWrites occurrences after paste (read side) ===
+331:	// modeWrites is ticket 114 AC#2's gate: the one handler a panel mode request
+340:	modeWrites *panel.ModeWriteHandler
+677:	rt.modeWrites = &panel.ModeWriteHandler{
