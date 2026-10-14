@@ -86,7 +86,7 @@
 
 **入库（本 commit）**：`00-anchor-and-gates.md`／`inventory-cites.py`（r7 副本，已清一行死赋值；原始件在 `../r2/`）／`logs/{inventory.txt(起手,4333B), inventory-after-all-roster.txt(终态,4095B), final-measurements.txt(343B), sha-before-probes.txt(382B), probe-a1-old-ruler-green.txt(48B), probe-a2-old-ruler-insert-red.txt(572B), probe-v2-a1-insert-run-green.txt(474B), probe-v2-b1-token-change-run-red.txt(493B), probe-v2-a2-insert-voice-green.txt(1147B), probe-v2-b2-token-change-voice-red.txt(1480B), probe-v2-c1-ambiguous-token-red.txt(567B)}`。
 
-**留盘不入库**：`logs/pre-run.txt`(14673B，改前两枚红原始日志)／`gate-d22scan.txt`(23734B)／`gate-test255.txt`(49B)／`gate-build.txt`(0B)／`gate-pathlength.txt`(1457B)／`inventory-after-roster.txt`(4319B)／`roster-tests-after.txt`(565B)／v1 四枚 probe 日志 `probe-b1-…`(474B)／`probe-b2-…`(1147B)／`probe-c1-…`(493B)／`probe-c2-…`(1480B)／`probe-d1-…`(567B)（与 v2 同形，roster gofmt 洗格式前取；v2 为交付态正本）。
+**留盘不入库**：`logs/pre-run.txt`(14673B，改前两枚红原始日志)／`gate-d22scan.txt`(23734B)／`gate-test255.txt`(49B)／`gate-build.txt`(0B)／`gate-pathlength.txt`(1457B)／`inventory-after-roster.txt`(4319B)／`roster-tests-after.txt`(565B)／v1 五枚 probe 日志 `probe-b1-…`(474B)／`probe-b2-…`(1147B)／`probe-c1-…`(493B)／`probe-c2-…`(1480B)／`probe-d1-…`(567B)（与 v2 同形，roster gofmt 洗格式前取；v2 为交付态正本）。
 
 ## 8. 下一位要点
 
