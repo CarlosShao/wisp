@@ -117,3 +117,6 @@ git write-tree                                                                  
 - G1b／G2 未修、未重登（不在本票判据；归口见 §2）。
 - 未改 `r3-sample-deleted.sh`／`flip-declaration.sh`／任何别的探针或门（非本腿面）。
 - 未 push；未 amend/reset/rebase/stash/checkout/clean；未用 `git add -A`。
+
+---
+[编排者追加 2026-10-14 19:2x，append-only] 按非实现者 `178-v1` §3 的裁定，本件 §4 里「G5/G7 读数逐字节不变」一句**收窄**为：「两族**口径、数值、判语、名册**逐字节不变；共享的 `# 未成对枚数＝` 行加了新尾注（G5 3 处＋G7 3 处）」。原句不抹。
