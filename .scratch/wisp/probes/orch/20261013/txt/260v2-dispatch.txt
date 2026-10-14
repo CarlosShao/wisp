@@ -1,0 +1,28 @@
+# 260-v2 派单（票 260 AC#2 的**非实现者**判语；验收腿；面＝internal/ball（＋winlive 谨慎））
+
+发送时刻：2026-10-14 10:4x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `260-v2`**（非实现者；实现者＝`260-r5`）。⛔ 不翻框、⛔ 不动 `Status:`/票名——判语交回，框由编排者凭你的表翻。
+
+## 被裁对象与判据
+
+- 票：`.scratch/wisp/issues/260-configured-cancel-hotkey-never-registers.md`——**AC#2 逐字**：装一发**会响**的尺（种"借用请求发出但 Win32 没成键"⇒ **指名那一步必须红**，⛔ 不许 `t.Skip`、不许把 SKIP 读成通过）；⚠ 要与票 258 落地腿的 rebind×借还自钉**分开**（那是"改热键时正有借用在飞"，本格是"借的那把键根本没成"）。
+- 实现者 `260-r5`：尺＝`internal/ball/hotkey_borrow_refused_260r5_test.go`（非 winlive 真调用点 `:202`；winlive 里 5 枚真调用）；证据＝`.scratch/wisp/probes/260/r5/evidence.md`（九节，含 `mutate260r5*.py`、md5 还原链 `2488b2ac692c99ae4e3b4831526637d7`）＋复跑笔 `b617084e`／`8a463bc6`；自报的四发突变＝**M1 摘 `ball_windows.go:895` 失败回执 ⇒ 两枚为接线而红**／M1b 摘块内两枚写入（红仍全来自 `:895`）／M3 摘 `return` ⇒ 两枚红／**M4 只摘 `:896` 登记集镜像 ⇒ rc 0 本尺不敏感**（r5 自报"属另一格"）；另有具名上报：**`cmd/wisp` 侧非 winlive 真调用 0 枚**（按票面第 33 行"要动 cmd/wisp 先停手上报"未跨包）。
+- 上下文：票 260 撞钉预检节（10-03）与两格裁死节；台账 `A603`（r5 真注册过一次全局热键的具名上报）。
+
+## 你要独立做的（每格判"成立/附条件/不成立"＋逐条凭据；⛔ 不许只引 r5 的件）
+
+1. **复跑绿**：非突变态 `go test -count=1 -run '260r5|BorrowRefused' ./internal/ball/`（全名册口径现读）⇒ PASS/FAIL/SKIP 三数逐字；**SKIP 出现即不算读数**（判语里具名）。
+2. **自造反证 ≥2 发**（⛔ 别只重跑 r5 的脚本，至少一发是 r5 没种过的形）：建议甲＝重演"摘 `:895` 失败回执写入"⇒ **红句必须点名那一步**（记红句逐字）；乙＝自选（例：把 `:896` 登记集镜像那格做更强读法／或自造"借用请求发出但 `TakeEscForCancel` 返回失败"的更直接形——现读源码后选）；每发**仓外备份＋sha256（不是 md5）改前==改后逐字节证**＋窗口起止时刻逐报。
+3. **判语**（三选一）：AC#2 成立／附条件（条件逐条：如"M4 `:896` 不敏感"算不算残差、"cmd/wisp 侧 0 枚"算不算欠账）／不成立。⚠ 你判的是**这把尺是否达到 AC#2 的判据**，⛔ 不是"产品以后该怎么改"。
+4. **越界核**：`git show --stat` r5 两笔——名册只在 `probes/260/r5/**`＋`internal/ball/**` 测试/尺件？`internal/ball` 产码（`ball_windows.go`）自 r5 之后零字节改动？（`git log -1 --format=%H -- internal/ball/ball_windows.go` 现读＋`git diff <r5 起手锚>..HEAD -- internal/ball/ball_windows.go`）＋与 258 的 rebind×借还自钉**分开**这条核一遍（两把尺的射程文本各引一句）。
+5. **winlive 谨慎**：机主可能正在用这台机器（试界面）——真注册热键的用例（Esc 借用族）跑前 `tasklist` 看台面、跑完确认不留进程；**若热键被占/冲突，具名如实报**（⛔ 别掩盖、⛔ 别把环境红当产品红）。非 winlive 那把尺是主判据，winlive 那半按"能跑则跑、跑不了具名"办。
+
+## 交付与纪律
+
+- 交件：`docs/evidence/s1/ticket260-260-v2-accept-v1.md`（判语表）＋`.scratch/wisp/probes/260/v2/`（锚＋logs）＋票 260 尾**追加 1 条 bullet**；产出 ≤7 枚 ≤200 行（大日志留盘，点名＋字节数）。
+- 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；`GOTMPDIR` ⛔ 只 C:（`C:\tmp\wisp260v2gotmp`）；别人脏件别动。
+- 他腿（`236-r4` tools 写／`315-a1` cmd/wisp 只读／`236-r5` `.github` 注释）在飞——与你**零文件重叠**；你的突变窗口逐报时刻。
+- **未定义即停**：红句与判据对不上、winlive 环境不可控、自造反证做不圆 ⇒ 停手上报。
+- 回执：结论先行（AC#2 判语）＋每发红/绿句逐字＋门禁 rc（d22scan／`go test` 全名册／`-count`）＋**"与 258 自钉分开"那句的现读证据**＋具名没做的格。
+
+发送时刻现量：HEAD `1179e232`；CPU ~35%。

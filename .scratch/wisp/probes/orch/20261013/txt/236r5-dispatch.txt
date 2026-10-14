@@ -1,0 +1,28 @@
+# 236-r5 派单（票 236 AC#4：`ci.yml` 那句"指错对象"的注释改对；写腿；面＝`.github/` 注释面＋CI 日志只读）
+
+发送时刻：2026-10-14 10:4x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **236-r5**（本格按裁定必须由**非实现者**写腿做）。⛔ 不翻框、⛔ 不动 `Status:`/票名。
+
+## 票与裁定
+
+- 票：`.scratch/wisp/issues/236-six-cells-that-only-surface-at-the-reading-layer.md` AC#4 逐字＋票尾 10-06 §七 的**改判**：
+  - AC#4 原文要求：只改注释、零行为改动；**改前先现读两发**确认 junction 那步真的 PASS；低利害、可逆、**不该拿去问 owner**。
+  - §七 改判逐字精神：那句 "the step **FAILS** on windows-latest today" **不是"过期"，是"指错对象"**——junction 那步今晚两发 `--- PASS: TestPathResolverJunctionWindows (0.03s)`＋`runtests.sh: OK … PASS=1 FAIL=0`；**8.3 短名那一因没消失，只是不砸在这一步上**：同包里 `TestPathResolverShortNameAListDenied`／`…UNCAListDenied`／`…ExtendedLengthPrefixAListDenied` 三枚 FAIL，失败正文正是 `want "C:\\Users\\RUNNER~1\\…"`。
+  - **判据补一句**：改后的注释要写"**读数＋日期＋run 号**"，⛔ 不写"今天为真"。
+- ⛔ 禁区：零行为改动（只许注释行）；⛔ 不动其它步骤/触发条件/并发组；⛔ 不新增步骤；⛔ 不许 `continue-on-error`/`if:` 舞步；⛔ 零 push。
+
+## 你要做的
+
+1. **现读两发**（⛔ 别拿旧读数当长期事实）：`gh api repos/CarlosShao/wisp/actions/runs?branch=dev&per_page=10` 找最近两发 run；逐发取 job steps（`gh api repos/CarlosShao/wisp/actions/jobs/<id>`）＋日志（`gh run view --log`／`gh api …/logs`，⚠ `--log-failed` 会漏计且步名可能是 `UNKNOWN STEP`——以正文自报行为准）：记 **junction 那步**（名含 `TestPathResolverJunctionWindows` 或它的宿主步骤）的 conclusion＋那三枚短名用例的 FAIL 正文；读数带 **run 号＋日期＋step 名＋rc**。
+2. **改注释**：`grep -n "FAILS on windows-latest\|RUNNER~1\|8\.3" .github/workflows/ci.yml` 定位那句（旧引用 `:519-524` 已漂）；改成"**实测读数＋日期＋run 号＋指对对象**"（junction 步 PASS；8.3 短名之因今天落在 <三枚用例名> 上）。文风照该文件既有注释（先说 why）。
+3. **证明零行为**：`git diff` 对该件**只有注释行**（非注释行＝0，删除列只落注释）；`python -c "import yaml,sys; yaml.safe_load(open('.github/workflows/ci.yml',encoding='utf-8')); print('yaml ok')"` 现跑（或仓里现成的 workflow 校验）rc=0。
+4. 交件：`.scratch/wisp/probes/236/r5/`（锚＋两发读数＋diff 证＋yaml 校验）＋票 236 尾**追加 1 条 bullet**。产出 ≤6 枚 ≤200 行。
+
+## 纪律
+
+1. 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；临时件只建不删；别人脏件别动。
+2. 他腿（`236-r4` tools／`315-a1` cmd/wisp 只读／`260-v2` ball）在飞——与你**零文件重叠**。
+3. **未定义即停**：找不到那句话／两发读数里 junction 步不 PASS（⇒ 停手上报，别照旧文本意改）／步骤名给不出 ⇒ 停手上报。
+4. 回执：结论先行＋commit sha＋两发读数（run 号/日期/step/rc）＋diff 证明＋yaml 校验 rc＋具名没做。
+
+发送时刻现量：HEAD `1179e232`；CPU ~35%；`gh` 2.96.0 可用。
