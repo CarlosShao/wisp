@@ -17945,3 +17945,11 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **lint 两发逐字同**：gofumpt（A-ROSTER 同名单 14+ 枚探针夹具，含票 236 AC#6 点名的 `fs_broken.go`）＋staticcheck export data v5 工具链崩（16/15 行）⇒ **零新增**。
 - **前端 v2 排除**：`c4319a87` `is-ancestor e3788f08`＝**否**（首发不含它）⇒ 首发 core 已红同名五枚＋本发只减不增；`lint-frontend` 两发皆绿、d22scan ban#6（frontend/=107）绿。
 - 第二发 docs 批 `8811cd0a` 已推（CI 38540981602 在跑；预计同色——纯文档笔）。171 行 fixture 账与其余旧红照旧在册，本轮不新开票、不改写任何旧句（只登记本发读数）。
+
+## A942｜2026-10-14 17:30 +08｜179-r3 收件＋编排者亲验（M2 重做：新牙真咬＋还原绿）＋**翻 AC#9／AC#10**；AC#10 选②＝**「注释与产码不一致已归口」登记**（原格要求）；票 179 余 AC#1／AC#8
+
+- **收件三把尺**：① `0d45d6f4`（产码：尾测＋9 行断言／`loop.go` 注释 −2/+6，**零行为改动**）＋`72b77434`（交付 7 枚）真在；② `probes/179/r3/` 件在盘（00 主件 9,957 B＋logs 6）；③ 我复跑 `-run TestDeclared` ok 1.984s、全包 ok 4.004s。
+- **★M2 亲跑（我，非照抄腿读数）**：备份+sed 摘 `loop.go:828`（L0 直臂 decide）⇒ grep 计数 2→1、`go build ./...` rc=0；C1 红 `:104`＋尾测 `TestDeclaredL1L2RoutingUnchanged179` 红 `:262`（逐字）；还原 sha256 `57b734eb…` 相等 ⇒ `-run TestDeclared` 绿、`git status -- internal/agent` 空。
+- **AC#10 选②登记**（该格要求原文）：注释与产码不一致**已归口**——唯一调用方 executeCalls 丢弃该值、不 drop 任何行；gate-owned pending 行归宿推迟票 21/162（A13 分工不动）。
+- **两枚候补未开票**（腿报）：`riskColumn` 压平、decision 词汇缺口——留编排者裁（登记为候补，不新开）。
+- **下波**：AC#8 e2e（176-r1 探针族 overlay，命令与基线在 `probes/179/r3/00-anchor-and-gates.md` §4＋`probes/179/r2/logs/e2e-readings.txt`）——等 `cmd/wisp` 面空出（255-r8 尚在）。
