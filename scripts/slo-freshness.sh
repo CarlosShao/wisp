@@ -62,6 +62,15 @@
 # declared valid-sample fixtures and are not re-checked: the predicates exist to
 # guard the API scan, which is the production input.
 #
+# Ticket 136 AC#3 closed the other half of "the scan is the evidence": the page
+# cap (SLO_FULL_ARTIFACT_PAGES) could shrink the scan surface silently, so a
+# listing larger than the cap was still judged as if it had been read whole
+# (R-134-7: 188 artifacts vs 3 x 100 on 2026-09-23, and the listing only grows).
+# The endpoint reports the size of the whole collection in `total_count`, and a
+# cap smaller than that now exits 2 with the token `slo-full-scan-incomplete` -
+# never a pass, never an age read off a subset, and never "no artifact found"
+# pretending to be a statement about the whole listing.
+#
 # Three probes, all required:
 #   P1 static   - .github/workflows/ci.yml still carries the triggers that make
 #                 slo-full auto-run (push on main/dev + a schedule), and the
@@ -83,7 +92,7 @@
 #
 # Failure tokens are stable strings so a log grep can name the cause:
 #   slo-full-trigger-missing   /  slo-full-never-triggered  /  slo-full-stale
-#   slo-full-sample-never      /  slo-full-sample-stale
+#   slo-full-sample-never      /  slo-full-sample-stale  /  slo-full-scan-incomplete
 #
 # Test seams (documented, and NOT set by the workflow below): SLO_FRESH_NOW
 # overrides "now", SLO_FULL_LAST_TRIGGER injects a job record instead of
@@ -101,7 +110,8 @@
 #
 # Exit codes: 0 = all three probes agree slo-full is alive and sampling,
 # 1 = at least one failed, 2 = the pin could not look (no gh, no token, no
-# ci.yml, unparseable date).
+# ci.yml, unparseable date, a partial artifact scan, a scanned record missing
+# the fields the source predicate reads).
 set -eu
 
 # Spell the empty prefix assignment as `CDPATH=''` rather than `CDPATH=`.
@@ -320,6 +330,30 @@ elif [ -n "$sample_record" ]; then
 else
     can_look
     sample_scanned=1
+    # Ticket 136 AC#3: how big is the collection this scan is a window into?
+    # The listing endpoint reports total_count, and a cap smaller than that is a
+    # PARTIAL scan. R-134-7: a partial scan must say so out loud instead of
+    # being read as a statement about slo-full - "no artifact found" from a
+    # partial listing is not about slo-full at all, and an age computed from a
+    # subset is not either (the subset-max direction being "older" does not help
+    # when the question is whether the TRUE newest sample is inside the window).
+    if ! sample_total=$(gh api \
+        "repos/$repo/actions/artifacts?per_page=1&page=1" \
+        --jq '.total_count' 2>&1 </dev/null); then
+        echo 'slo-freshness: P3 the listing-size query failed, GitHub said:' >&2
+        printf '%s\n' "$sample_total" >&2
+        exit 2
+    fi
+    case $sample_total in
+    '' | *[!0-9]*)
+        echo "slo-freshness: P3 the listing-size query returned '$sample_total', which is not a count - cannot tell whether the pages below would be the whole listing" >&2
+        exit 2
+        ;;
+    esac
+    if [ "$sample_total" -gt $((sample_pages * 100)) ]; then
+        echo "slo-freshness: P3 slo-full-scan-incomplete: the artifact listing holds $sample_total entries but this pin reads only $sample_pages page(s) x 100 = $((sample_pages * 100)). The newest $sample_artifact may sit on a page this pin never reads, so an age computed from the pages it did read - or 'no artifact found' - would describe a partial listing, not slo-full. Refusing to conclude (exit 2); raise SLO_FULL_ARTIFACT_PAGES to cover the listing or the pin is blind." >&2
+        exit 2
+    fi
     # Measured 2026-09-23 on this repo, two facts that both bite:
     #   * the listing is ordered by ARTIFACT ID descending, not by created_at:
     #     page 1 started 05:39:19 / 05:25:01 / 04:53:50 / 05:39:05 / 04:44:08,
@@ -329,9 +363,10 @@ else
     #   * pages past the end answer with an empty artifacts array, not an
     #     error (per_page=100 -> page 1 = 100 rows, page 2 = 70, pages 3-5 = 0),
     #     so the loop below is bounded and cheap even when the cap overshoots.
-    # Cap: SLO_FULL_ARTIFACT_PAGES * 100. If a future repo ever holds more
-    # artifacts than that the scan is PARTIAL - and a partial max can only be
-    # older than the true newest, so the error direction is RED, never green.
+    # Cap: SLO_FULL_ARTIFACT_PAGES * 100. Since ticket 136 AC#3 a cap smaller
+    # than the listing's total_count is refused above (exit 2) instead of being
+    # scanned anyway; a partial max could only be older than the true newest,
+    # which is the wrong thing to answer "when was the newest sample" with.
     sample_page=1
     while [ "$sample_page" -le "$sample_pages" ]; do
         if ! page_records=$(gh api \
@@ -355,7 +390,7 @@ $page_records"
         fi
         sample_page=$((sample_page + 1))
     done
-    sample_scan_note="scanned $sample_pages page(s) x 100 of the artifact listing"
+    sample_scan_note="scanned $sample_pages page(s) x 100 of the artifact listing (listing size $sample_total)"
     if [ -z "$sample_records" ]; then
         echo "slo-freshness: P3 $sample_scan_note - no $sample_artifact artifact found"
     fi
