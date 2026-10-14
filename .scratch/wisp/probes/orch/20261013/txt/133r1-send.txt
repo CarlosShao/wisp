@@ -1,0 +1,5 @@
+133-r1 send 记录
+- 发送时刻：2026-10-14 18:2x +08；派单已先存档：txt/133r1-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/133/` = 空（r1 可用）。
+- 收件人：agent_ed641d8b-a1f7-4ba8-b82e-355f51c1d2a5（general-purpose，后台）。
+- 内容：票 133 五发变异（N-3/X4/X8/X12/X14）＋门开/门关两份＋AC#3 sanity 自证＋AC#4 静默缩短（双向差集/逐枚可区分/Y2Y3）＋AC#5 门禁（314 死区纪律）＋AC#6 进 CI。面＝cmd/wisp 新文件（本波该面唯一写腿）。

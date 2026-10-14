@@ -17960,3 +17960,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - 派单/去重/存档：`txt/178r1-dispatch.txt`＋`178r1-send.txt`；起手锚 `93452d45`；读数落 `probes/178/r1/`。
 - 编排者现量留档：`/c/tmp/wisp-orch-178/run-now.txt`（rc=4 全表）。
 - 编队守恒：写 ≤4 ✓（3）、总 ≤7 ✓（4）；面互斥：178 零 Go 包、不撞任何在飞面。
+
+## A944｜2026-10-14 17:57 +08｜255-r8 收件＋**255 整票收口**（AC#1/#4 亲跑翻勾；`-done`＋长度名册 GREEN 60=60）＋补第三写腿 **133-r1**（分发跳新尺；cmd/wisp 面）⇒ 编队（4）：写×3＝318-r1/133-r1/178-r1、验×1＝114-v2
+
+- **收件三把尺**：`c88356c1`（新尺 `cmd/wisp/panel_reshow_255r8_winlive_test.go` 236 行）／`19fb3670`（交付 6 件）／`aa539691`（复跑）真在；`probes/255/r8/` 件在盘；**编排者亲跑**：`-run TestTicket255 ./cmd/wisp/` **ok 21.252s**、winlive 单跑 `TestTicket255r8RealWindowFollowsTheConfigAcrossAReshow` **PASS 0.72s**（读数逐字与腿同形：client 624→900／outer 640→916／帧差 16px 恒等／`same hwnd: true`）。本机当刻有**用户自己的 wisp.exe 在跑**，未干扰（如实登记）。
+- **AC#1 性质**：零产码（诚实句/读者名册是 255-r2 落的）——本腿交正控/反控双绿＋复认；AC#4 真窗读数首落。
+- **255 收口**：`-done` 改名＋票尾「编排者收口」章（）；长度门 **GREEN 60=60**（守卫 A/B 双向核过）。⚠ 教训：名册「hist:」理由句是 **29 条共用模板**——改单票只能动它那一行，⛔ 全局替换（我第一发就撞上，assert 拦下未写盘）。
+- **133-r1 随单**：票 133＝"摘掉 `cmd/wisp/models.go:303` 调用者、两包 76 条一条不红"⇒ 补新尺；五发变异（N-3/X4/X8/X12/X14）＋**门开/门关两份**＋AC#3 sanity 自证＋AC#4（双向差集/逐枚可区分/Y2Y3）＋AC#5（**314 死区纪律**）＋AC#6 进 CI（若须动 `.github` ⇒ 停手报）。
+- 存档：`txt/133r1-dispatch.txt`＋`133r1-send.txt`（去重核：`probes/133/` 空）。
+- 波间守恒：写 ≤4 ✓（3）、总 ≤7 ✓（4）；面互斥：cmd/wisp 本波写腿只 133-r1 一枚。
