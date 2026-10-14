@@ -43,7 +43,7 @@
 - **字节同一性证明**（"字节级种回"不是形容词）：
   - `git show 4db5f3f6^:cmd/wisp/run.go | grep 'BuiltinTaskEntries(tools.TaskDeps' | sha256sum` → `e3b19cba121f41de8a029ec974201cfeba2d32bd5a91837fadecb52e13e2fcbf`
   - `grep 'BuiltinTaskEntries(tools.TaskDeps' mut/run-unwired.go | sha256sum` → **同值**。
-- overlay 生效是**行为级**证明的：若不生效，回执里不可能出现"未接线"那句（`d.Paths == nil` 才走那支，`internal/tools/task.go:833`）。
+- overlay 生效是**行为级**证明的：若不生效，回执里不可能出现"未接线"那句（`d.Paths == nil` 才走那支，`internal/tools/task.go:832`）。
 
 ## 4. 代提（与 §2/§3 的读数**分开**记：谁跑的门、跑了哪几门）
 
@@ -77,7 +77,7 @@
 
 ## 8. 复现原料（留盘未提交，规则 8 只建不删）
 
-- `logs/raw/` 9 枚：`01-now-r8harness`（首跑＝缺 DLL 的 `0xc0000135` 复现，见 174-c1 旧账）／`01-now-r8harness-wired`／`02-unwired-overlay`／`03-restore-green`／`04-gates-a`／`05-gates-b`／`06-mutant-diff`／`07-adopt-gates`／`08-post-adopt-gates`／`09-offset-rerun`（＋`09-window-and-rerun`）。
+- `logs/raw/` 11 枚：`01-now-r8harness`（首跑＝缺 DLL 的 `0xc0000135` 复现，见 174-c1 旧账）／`01-now-r8harness-wired`／`02-unwired-overlay`／`03-restore-green`／`04-gates-a`／`05-gates-b`／`06-mutant-diff`／`07-adopt-gates`／`08-post-adopt-gates`／`09-offset-rerun`／`09-window-and-rerun`。
 - `mut/` 4 枚：`run-unwired.go`＋`overlay-unwired.json`＋`harness-174r8-frozen-copy.go.txt`＋`commit-msg-adopt.txt`。
 - 提交面的 `logs/01..05` 为上述 raw 的紧凑摘录（决定性逐字＋rc）。
 - 复跑一条命令（安静窗内）：`export PATH=<root>/third_party/sherpa-onnx:$PATH; GOTMPDIR='C:\tmp\wisp174r9gotmp' go test ./cmd/wisp/ -run 'TestTaskOutputPointerNotice174r8' -count=1 -v`；反形加 `-overlay .scratch/wisp/probes/174/r9/mut/overlay-unwired.json`。
