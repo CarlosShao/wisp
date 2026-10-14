@@ -1,0 +1,36 @@
+# 252-r2 派单（票 252 剩余两格 AC#4／AC#5；写腿；面＝cmd/wisp）
+
+发送时刻：2026-10-14 12:0x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **252-r2**。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与剩余格（逐字在票面）
+
+- 票：`.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2.md`
+- 已勾：AC#1／AC#2／AC#3（凭 `252-v1`）／AC#6。**你的两格＝AC#4／AC#5**（此前按住理由"`cmd/wisp` 被 `255-r3` 写着"早已消失——现无写腿占面，开工）。
+- **AC#4 三枚 witness 逐枚结线**：`TestTicket224…`／`cmd/wisp/run_test.go:378`／`cmd/wisp/run_mode101_test.go:506` 各配"**改前必红、改后必绿**"的**同机对照读数**。⚠ 结案时**必须明说** `TestComposedGateBlocksAWriteForTwoSeconds` 那 **301 秒的账从"C18 超时既有一笔"改归本票**（⛔ 别留两笔——在票尾 bullet 或证据件里写明这句）。
+- **AC#5 审计现场那一行别再被自己滤掉**（仪器的牙）：`224-c2` 报 `grantLinesOf`（`cmd/wisp/ticket224_assembly_test.go:206-217`，**行号待验**）把自己的 `tools: call … risk=… in_allowlist_scope=…` 审计行**过滤掉**了 ⇒ CI 红名册天生看不见"等级"维。判据＝**载具必须 dump 那行等级**（逐字 dump 到 stdout/log 供红名册读）。
+- ⚠ 票尾"编队追加"节里那两笔推翻（形改"对授权根取用的包含调用枚数"；正则 187 漏计别用）——**引用前先读**。
+
+## 方法要求
+
+- "改前红"：优先 `git archive <改前锚> 到仓外树` 或 `-overlay` 复刻（⛔ 现读工作树当锚；树会呼吸）；"改后绿"＝交付态现跑。每发带命令＋时刻＋rc＋红/绿句。
+- 若某枚 witness 的"改前红"结构上做不到（例：需要旧码）⇒ 具名写明得法与为何，⛔ 别造假绿、⛔ 别用"看起来"代替读数。
+- AC#5 的改动面＝载具/测试侧（`cmd/wisp/ticket224_assembly_test.go` 及其调用面）；⛔ 不许放宽任何既有断言、⛔ 不许碰产码语义。
+
+## 硬约束
+
+- ⛔ 不动三枚冻结件／`thresholds.go`／golden／`allowlist.txt`／`PLAN.md`／`specs/**`／`.github/**`；⛔ `frontend/**`／`design/**`；⛔ 不碰 `scripts/**`（174-r5 的名册行已入库，别动它）。
+- 写面＝`cmd/wisp` 测试/载具面（逐枚点名在你交件里）＋`probes/252/r2/`。
+
+## 环境与纪律（十条）
+
+1. 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内不建 worktree；临时件只建不删；别人脏件别动。
+2. `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（MSYS 形）；`GOTMPDIR` ⛔ 只 C:（`C:\tmp\wisp252r2gotmp`）。
+3. 判据用 `-run` 小射程；⛔ 整包 `./cmd/wisp/`（314 死区，且别人可能在跑整包——跑前 `tasklist` 看）；**你的每发起止时刻逐报**（纪律：他腿 `315-v1` 验收在飞（优先 overlay）、`236-r4` tools、`236-r5` .github）。
+4. 门禁：build rc=0／gofumpt 动过的件空／你的新读数全绿／d22scan clean／长度门 GREEN（现 59=59）。
+5. 票面：票 252 尾**追加 1 条 bullet**（含"301 秒账归本票"那句）；⛔ 框不翻。
+6. 产出预算 ≤7 枚 ≤200 行：`probes/252/r2/`（锚＋witness 对照读数＋AC#5 dump 证据）；大日志留盘（点名＋字节数）。
+7. **未定义即停**：某格结构上做不到／行号对不上（先现读）／要动产码 ⇒ 停手上报。
+8. 回执：结论先行＋commit sha（产码/交付分开）＋每 witness 改前红/改后绿逐字＋AC#5 的 dump 样行＋301 秒归账句＋具名没做。
+
+发送时刻现量：HEAD 近 `e3788f08`；CPU ~36%；**推送刚发（CI 可能开始占 CPU）**——读数受扰就报时刻。
