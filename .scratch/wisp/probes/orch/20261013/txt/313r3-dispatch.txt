@@ -1,0 +1,36 @@
+# 313-r3 派单（票 313 挂账②：多元素逗号链"三包零钉"补钉；写腿；面＝internal/config＋cmd/wisp 测试面）
+
+发送时刻：2026-10-14 11:0x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **313-r3**。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 来路（验收腿 `313-v1` 的具名挂账②，`docs/evidence/s1/ticket313-313-v1-accept-v1.md`）
+
+- 现有钉子对 `splitChainValue`（`cmd/wisp/panel_config_store.go`，票 313-r2 落点）的**逗号语义零覆盖**：它的行为突变 **B＝把 `splitChainValue` 改成按 `;` 切 ⇒ 三包 `-run Test313` 全绿**（无钉）；只有它自己的 overlay 探针先红（`element "stepfun/step-2,stepfun/step-2-mini" references unknown model`）。
+- 该挂账判语＝"**候选补钉（未派）**"、**非 AC 不成立**。本腿就是去补这一枚。
+
+## 要建的（能力形钉子，最小形）
+
+1. **正钉（多元素链合法路径走通）**：至少一发用例——`voice.cloud_asr_chain`（或 tts）写**两元素**逗号链（如 `stepfun/m1,stepfun/m2`，模型名用你现读存在的；⛔ 不编名）⇒ 应被接受；判据＝**落盘 `config.toml`/回执/读面载荷**三处至少两处逐字对（按既有 313 用例的观察法抄，⛔ 不发明新观察面）。
+2. **牙证（突变红）**：把 `splitChainValue` 的逗号语义弄坏（例：只切第一枚／按 `;` 切——照 313-v1 的 B 形）⇒ **你的新钉必须红且红句点名**；还原 ⇒ 绿（仓外备份＋**sha256** 逐字节证＋窗口起止时刻）。
+3. **落点自裁（现读后选最小形）**：候选＝`internal/config/settings_313_test.go`（元素级/链级）与/或 `cmd/wisp/panel_config_313_test.go`（端到端）。⚠ 若行为层今天**本就工作**（预期如此），钉是覆盖补强；若你发现**行为层真坏**（多元素链被拒/只落一半）⇒ **停手上报**（那升级为缺陷，另裁）。
+
+## 硬约束
+
+- ⛔ 只加不改：不许动/删任何既有断言（`config_313_test.go`、`settings_313_test.go`、`panel_config_313_test.go` 的存量用例一字不动）；⛔ 不改产码语义——**若你认为必须改产码才能过，停手上报**。
+- ⛔ 不动三枚冻结件／`thresholds.go`／golden／`allowlist.txt`／`PLAN.md`／`specs/**`／`.github/**`；⛔ `frontend/**`／`design/**` 零读零写。
+- ⛔ 不碰 `313-v1` 与 `255-r7/r5` 近期的在飞件命名的文件之外的东西；共享树里别人脏件别动。
+
+## 环境与纪律（十条）
+
+1. 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内不建 worktree；临时件只建不删。
+2. `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（**MSYS 形**）；`GOTMPDIR` ⛔ 只 C:（`C:\tmp\wisp313r3gotmp`）。
+3. 判据用 `-run` 小射程（`-run 'Test313'` 三包＋你的新用例具名 `-run`）；⛔ 整包 `./cmd/wisp/`（314 死区）。
+4. 他腿在飞（`236-r4` tools／`236-r5` .github／`315-a1` cmd/wisp 只读复量／`260-v2` ball）——与你零**文件**重叠；你的突变**窗口起止时刻逐报**（纪律）。
+5. 门禁：`GOFLAGS= go build ./...` rc=0；gofumpt 动过的件空；`-run 'Test313'` 三包 rc=0；`sh scripts/d22scan.sh` clean；长度门（现 GREEN 59=59）。
+6. 票面：票 313 尾**追加 1 条 bullet**；⛔ 框不翻。
+7. 产出预算 ≤6 枚 ≤200 行：`probes/313/r3/00-anchor-and-gates.md`＋logs。
+8. **未定义即停**：多元素链今天行为真坏／钉无处落／要改产码 ⇒ 停手上报。
+9. 交件写明：你选的落点＋新用例名＋突变红句逐字＋为什么"只加不改"成立（存量 diff 佐证）。
+10. 回执：结论先行＋commit sha（产码/交付分开）＋件路径＋门禁 rc＋突变读数＋具名没做。
+
+发送时刻现量：HEAD `b8f883a3`；在飞 4；CPU ~35%。
