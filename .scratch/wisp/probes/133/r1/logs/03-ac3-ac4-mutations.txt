@@ -1,0 +1,96 @@
+# 133-r1 deliverable log 03: AC#3 self-proof legs and AC#4 audible-shortening mutations.
+# All mutations are out-of-repo backed up (D:/tmp/wisp133r1/backup/) and reverted; every revert prints
+# the sha256 identity and the shot rig prints git status --porcelain cmd/wisp/ afterwards.
+# full originals: D:/tmp/wisp133r1/logs/{m3,m3b,m1,m2,y1drop,y2blind}-*.{log,txt}
+
+==== m3 (Y2 shape, BEFORE the pair fix): swap the two claims' test names in the registry ====
+APPLIED m3 to leg_dispatch_gate_133_test.go
+  sha256 9baa6a0e937ceb71d1ba5df6a882a6eaa558e0a6bd5b1d293b3c7ef7385044c5 -> 21f903690f856f98e6d9deaf45bb29ef173c11880dfefbe6acbb0a5eac7e40a9
+-- door closed (my gate alone, un-fixed registry):
+   rc=0
+   --- PASS: TestAC1AC2DispatchHopGate133 (0.21s)
+-- door open (both gates, un-fixed registry):
+   rc=0
+   --- PASS: TestAC1AC2DispatchHopGate133 (0.17s)
+   --- PASS: TestAC4EveryLegIsNailedOrRuled (0.10s)
+   REVERTED m3: leg_dispatch_gate_133_test.go sha256=9baa6a0e937ceb71d1ba5df6a882a6eaa558e0a6bd5b1d293b3c7ef7385044c5 identical-to-backup=True
+
+==== m3b (the SAME swap AFTER the pair fix landed) ====
+APPLIED m3b to leg_dispatch_gate_133_test.go
+  sha256 1273fdcc53098f78fcd62c397ad2830163692b2562fbbe29d4a65d9f18dbf1c5 -> cee5825617385eed8c61ecfda5eed2eabcc3842b8b92b63e5ca840e24c718ed9
+-- door closed:
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.17s)
+   leg_dispatch_gate_133_test.go:222: AC#1 RED: leg "models"'s nail pairs the case "TestAC3SecretLegBooksItsAuditRecordsOnDisk" with the entry "cmdModels", and that case never calls "cmdModels": a nail whose two halves point at different legs is a claim about 
+   leg_dispatch_gate_133_test.go:222: AC#1 RED: leg "secret"'s nail pairs the case "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk" with the entry "cmdSecret", and that case never calls "cmdSecret": a nail whose two halves point at different legs is a claim abou
+-- door open:
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.17s)
+   --- PASS: TestAC4EveryLegIsNailedOrRuled (0.09s)
+   REVERTED m3b: leg_dispatch_gate_133_test.go sha256=1273fdcc53098f78fcd62c397ad2830163692b2562fbbe29d4a65d9f18dbf1c5 identical-to-backup=True
+
+==== m1 (AC#3: isRunnableCase133 degraded to always-yes, the R-121-2 shape) ====
+APPLIED m1 to leg_dispatch_gate_133_test.go
+  sha256 1273fdcc53098f78fcd62c397ad2830163692b2562fbbe29d4a65d9f18dbf1c5 -> 2139dfa38b24ebd4b23f6bdd8ebaab9950a647c4edd920d25187d7bcdd223f23
+   rc=1
+   --- FAIL: TestAC3SelfProof133TheDispatchReadersCanAnswerNo (0.02s)
+   --- PASS: TestAC4Distinctness133NoTwoLegsWearTheSameRow (0.13s)
+   --- PASS: TestAC1AC2DispatchHopGate133 (0.21s)
+   dispatch_hop_selfproof_133_test.go:315: the coverage reader did not report gamma's only would-be driver is a method, which is not a case: the leg must stay uncovered (looked for "leg \"gamma\""); it reported:
+   dispatch_hop_selfproof_133_test.go:333: a roster that names the credited case and this case reconciled dirty: [leg "gamma" (main.go:18) is booked in the ledger below as covered by the case "TestPhantomMethod133", and this round's test binary has no such cas
+   REVERTED m1: leg_dispatch_gate_133_test.go sha256=1273fdcc53098f78fcd62c397ad2830163692b2562fbbe29d4a65d9f18dbf1c5 identical-to-backup=True
+
+==== m2 (AC#3/Y3: the run-roster reconciliation made vacuous: 'if roster[name]' -> 'if true') ====
+APPLIED m2 to leg_dispatch_gate_133_test.go
+  sha256 1273fdcc53098f78fcd62c397ad2830163692b2562fbbe29d4a65d9f18dbf1c5 -> e5b1bfe1b708aedbd94541b1cfbbd182fe84c284d69679e73dca602b6ebbce00
+   rc=1
+   --- FAIL: TestAC3SelfProof133TheDispatchReadersCanAnswerNo (0.02s)
+   --- PASS: TestAC4Distinctness133NoTwoLegsWearTheSameRow (0.13s)
+   --- PASS: TestAC1AC2DispatchHopGate133 (0.16s)
+   dispatch_hop_selfproof_133_test.go:337: a roster WITHOUT the credited case has to red the row that credits it (this is the ticket 133 R-133-9 / family shot M-G reading for the `covered=test` bucket); the reader said: []
+   dispatch_hop_selfproof_133_test.go:398: distinctness ledger: 12 legs, 12 distinct rows, coverage kinds present: [nail ruling test]
+   REVERTED m2: leg_dispatch_gate_133_test.go sha256=1273fdcc53098f78fcd62c397ad2830163692b2562fbbe29d4a65d9f18dbf1c5 identical-to-backup=True
+
+==== y1drop (AC#4 floor: one whole leg deleted from the dispatch) ====
+APPLIED y1drop to main.go
+  sha256 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 -> a18b3fbbcba73db9774aff35de8ba01e283eb867f82a1c1a14469d48820429de
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.20s)
+   leg_dispatch_gate_133_test.go:202: AC#1/#2 RED: the leg census enumerated 11 legs (12 is the floor written down next to minLegs133), so a dispatch rewrite is being read as "no legs" rather than reported. Census: default, doctor, help, models, no-args, panel
+   leg_dispatch_gate_133_test.go:241: AC#1/#2 RED: the usage block documents command "panel-inbound", which func main does not dispatch: the promise and the dispatch disagree, which is how a leg goes missing from this census without anything noticing.
+
+==== y2blind (AC#4: parser all-blind - bind nothing to os.Args) ====
+APPLIED y2blind to main.go
+  sha256 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 -> 1b04ed5db79a0f0f9ccb1b59972af1482718a8ef20d75bc74be592d9aa6a0c8b
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.15s)
+   leg_dispatch_gate_133_test.go:199: AC#1/#2 RED: func main binds no local to os.Args, so this gate cannot tell a dispatch from a call
+   leg_dispatch_gate_133_test.go:202: AC#1/#2 RED: the leg census enumerated 0 legs (12 is the floor written down next to minLegs133), so a dispatch rewrite is being read as "no legs" rather than reported. Census: 
+
+==== the fixed instrument on the healthy tree (door closed and open), and the restore-green run ====
+   03-postfix: --- PASS: TestAC3SelfProof133TheDispatchReadersCanAnswerNo (0.06s)
+   03-postfix: --- PASS: TestAC4Distinctness133NoTwoLegsWearTheSameRow (0.18s)
+   03-postfix: --- PASS: TestAC1AC2DispatchHopGate133 (0.21s)
+   03-postfix: ok  	github.com/CarlosShao/wisp/cmd/wisp	4.032s
+   03-postfix: dispatch_hop_selfproof_133_test.go:398: distinctness ledger: 12 legs, 12 distinct rows, coverage kinds present: [nail ruling test]
+   04-restore: --- PASS: TestAC3SelfProof133TheDispatchReadersCanAnswerNo (0.02s)
+   04-restore: --- PASS: TestAC4Distinctness133NoTwoLegsWearTheSameRow (0.13s)
+   04-restore: --- PASS: TestAC1AC2DispatchHopGate133 (0.25s)
+   04-restore: --- PASS: TestAC4EveryLegIsNailedOrRuled (0.21s)
+   04-restore: ok  	github.com/CarlosShao/wisp/cmd/wisp	2.990s
+   04-restore: rc=0
+
+==== y1drop / y2blind revert proofs (main.go back to the pristine sha; post-status shows only
+     this leg's own two instrument files, the mutation leftovers are gone) ====
+   y1drop: REVERTED y1drop: main.go sha256=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 identical-to-backup=True
+   y1drop: revert rc=0
+   y1drop: --- post: git status --porcelain cmd/wisp/ ---
+   y1drop:  M cmd/wisp/leg_dispatch_gate_133_test.go
+   y1drop: ?? cmd/wisp/dispatch_hop_selfproof_133_test.go
+   y2blind: REVERTED y2blind: main.go sha256=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 identical-to-backup=True
+   y2blind: revert rc=0
+   y2blind: --- post: git status --porcelain cmd/wisp/ ---
+   y2blind:  M cmd/wisp/leg_dispatch_gate_133_test.go
+   y2blind: ?? cmd/wisp/dispatch_hop_selfproof_133_test.go
+
+==== main.go pristine sha256 = 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 (backup: D:/tmp/wisp133r1/backup/main.go.pristine) ====

@@ -1,0 +1,139 @@
+# 133-r1 deliverable log 01: AC#1 five shots, per shot: landed mutation -> door-closed (131 door out) -> door-open -> 131 alone -> revert proof
+# full originals: D:/tmp/wisp133r1/logs/<shot>-*.{log,txt} (outside the repo)
+
+==== shot n3 ====
+-- landed mutation (sha256 of main.go before -> after; planted lines):
+APPLIED n3: main.go sha256 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 -> 9e6d011facce167e42681438bb38086cb91cc166ca11e0c5094a14eba5ee28f0
+LANDED n3: the os.Exit(cmdModels(...)) call is gone from main.go
+  main.go:102: 	case "models":
+  main.go:103: 		// Ticket 121 AC#2: the model hand-off chain (models.Manager ->
+  main.go:104: 		// DownloadingBridge.Run -> VerifyInstalled) reaches the product through
+-- door closed: -run '^TestAC1AC2DispatchHopGate133$' -count=1 -v
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.26s)
+   leg_dispatch_gate_133_test.go:203: AC#1 RED: cmdModels (models.go:104) reaches installLogSink (or is a production entry of this package's dispatch), and no chain from func main reaches it any more.
+   leg_dispatch_gate_133_test.go:203: AC#1 RED: modelStore.handOffModel (models.go:302) reaches installLogSink (or is a production entry of this package's dispatch), and no chain from func main reaches it any more.
+   leg_dispatch_gate_133_test.go:203: AC#1 RED: modelsEnsure (models.go:262) reaches installLogSink (or is a production entry of this package's dispatch), and no chain from func main reaches it any more.
+-- door open: both gates
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.28s)
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.15s)
+-- 131's gate alone
+   rc=1
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.11s)
+-- revert proof:
+   RESTORED (explicit): main.go sha256=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 pristine=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 identical=True
+   --- post: git status --porcelain cmd/wisp/ ---
+
+==== shot x4 ====
+-- landed mutation (sha256 of main.go before -> after; planted lines):
+APPLIED x4: main.go sha256 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 -> c8eea7907910bb7e28af7a7ebd8bbcbbcd36acf50d5ebcfe852bb9063f2d7282
+LANDED x4:
+  main.go:88: 	if len(args) > 0 && args[0] == "--diag" {
+  diag131x.go:17: 	if _, err := installLogSink(args[0]); err != nil {
+-- door closed: -run '^TestAC1AC2DispatchHopGate133$' -count=1 -v
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.30s)
+   leg_dispatch_gate_133_test.go:209: AC#1 RED: leg "--diag" (main.go:88) reaches installLogSink on this path: dispatch -> installLogSink
+   leg_dispatch_gate_133_test.go:219: AC#1/#2 RED: leg "--diag" is dispatched by func main and documented in no line of the usage block: an operator cannot find it, and this gate has no second reading of the census to check it against.
+-- door open: both gates
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.22s)
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.12s)
+-- 131's gate alone
+   rc=1
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.12s)
+-- revert proof:
+   RESTORED (explicit): main.go sha256=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 pristine=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 identical=True
+   --- post: git status --porcelain cmd/wisp/ ---
+
+==== shot x8 ====
+-- landed mutation (sha256 of main.go before -> after; planted lines):
+APPLIED x8: main.go sha256 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 -> aeb1a90eff3020f20449958f9fd67f431b71056afc9a96142cdc88b00cbc7556
+LANDED x8:
+  main.go:58: const sloCmdName131 = "slo"
+  main.go:112: 	case sloCmdName131:
+-- door closed: -run '^TestAC1AC2DispatchHopGate133$' -count=1 -v
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.23s)
+   leg_dispatch_gate_133_test.go:185: AC#1/#2 RED: main.go:112: the case label sloCmdName131 is not a string literal, which resolves to the literal "slo". A leg is identified by a literal command name; a label that has to be resolved throug
+   leg_dispatch_gate_133_test.go:209: AC#1 RED: slo_windows.go:199 carries a coverage ruling for leg "slo", which is not in the dispatch census: a ruling about a command nobody dispatches is prose, not a decision.
+   leg_dispatch_gate_133_test.go:219: AC#1/#2 RED: the usage block documents command "slo", which func main does not dispatch: the promise and the dispatch disagree, which is how a leg goes missing from this census without anything noticing
+-- door open: both gates
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.21s)
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.12s)
+-- 131's gate alone
+   rc=1
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.13s)
+-- revert proof:
+   RESTORED (explicit): main.go sha256=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 pristine=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 identical=True
+   --- post: git status --porcelain cmd/wisp/ ---
+
+==== shot x12 ====
+-- landed mutation (sha256 of main.go before -> after; planted lines):
+APPLIED x12: main.go sha256 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 -> 6ce804aa370f279b3acae27e3328a0cc2ee88b9ef2342ff43e7f975c4c70e3ab
+LANDED x12:
+  main.go:89: 	case "fake131":
+  fake131x.go:11: var sinkAlias131 = installLogSink
+  fake131x.go:18: 	if _, err := sinkAlias131(args[0]); err != nil {
+-- door closed: -run '^TestAC1AC2DispatchHopGate133$' -count=1 -v
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.20s)
+   leg_dispatch_gate_133_test.go:209: AC#1 RED: leg "fake131" (main.go:89) reaches installLogSink on this path: dispatch -> sinkAlias131 -> installLogSink
+   leg_dispatch_gate_133_test.go:219: AC#1/#2 RED: leg "fake131" is dispatched by func main and documented in no line of the usage block: an operator cannot find it, and this gate has no second reading of the census to check it against.
+-- door open: both gates
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.19s)
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.12s)
+-- 131's gate alone
+   rc=1
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.12s)
+-- revert proof:
+   RESTORED (explicit): main.go sha256=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 pristine=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 identical=True
+   --- post: git status --porcelain cmd/wisp/ ---
+
+==== shot x14 ====
+-- landed mutation (sha256 of main.go before -> after; planted lines):
+APPLIED x14: main.go sha256 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 -> 1ccdbe840f256b3313533d1402582031a5073c8d1e6e6717cd08bc08958a37a9
+LANDED x14:
+  main.go:89: 	case "sfx131":
+  sfx131x.go:15: var holder131 = sinkHolder131{open: installLogSink}
+  sfx131x.go:22: 	if _, err := holder131.open(args[0]); err != nil {
+-- door closed: -run '^TestAC1AC2DispatchHopGate133$' -count=1 -v
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.18s)
+   leg_dispatch_gate_133_test.go:209: AC#1 RED: leg "sfx131" (main.go:89) reaches installLogSink on this path: dispatch -> holder131.open -> installLogSink
+   leg_dispatch_gate_133_test.go:219: AC#1/#2 RED: leg "sfx131" is dispatched by func main and documented in no line of the usage block: an operator cannot find it, and this gate has no second reading of the census to check it against.
+-- door open: both gates
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.19s)
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.11s)
+-- 131's gate alone
+   rc=1
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.16s)
+-- revert proof:
+   RESTORED (explicit): main.go sha256=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 pristine=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 identical=True
+   --- post: git status --porcelain cmd/wisp/ ---
+
+==== shot x14b2 ====
+-- landed mutation (sha256 of main.go before -> after; planted lines):
+APPLIED x14b2: main.go sha256 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 -> 1ccdbe840f256b3313533d1402582031a5073c8d1e6e6717cd08bc08958a37a9
+LANDED x14b2:
+  main.go:89: 	case "sfx131":
+  sfx131x.go:13: var holder131 = sinkHolder131{}
+-- door closed: -run '^TestAC1AC2DispatchHopGate133$' -count=1 -v
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.23s)
+   leg_dispatch_gate_133_test.go:209: AC#1 RED: leg "sfx131" (main.go:89) is dispatched by func main and covered by nothing: no nail in this gate's registry, no test case in this directory that drives a symbol belonging to this leg alone, a
+   leg_dispatch_gate_133_test.go:219: AC#1/#2 RED: leg "sfx131" is dispatched by func main and documented in no line of the usage block: an operator cannot find it, and this gate has no second reading of the census to check it against.
+-- door open: both gates
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.22s)
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.14s)
+-- 131's gate alone
+   rc=1
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.14s)
+-- revert proof:
+   RESTORED (explicit): main.go sha256=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 pristine=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 identical=True
+   --- post: git status --porcelain cmd/wisp/ ---

@@ -1,0 +1,39 @@
+# 133-r1 deliverable log 05 (AC#6): how the new test file reaches CI, read out of the tracked files.
+# new file: cmd/wisp/dispatch_hop_selfproof_133_test.go (package main, _test.go => the cmd/wisp scope)
+
+==== .github/workflows/ci.yml: the job that owns the windows leg ====
+   533:  test-windows:
+==== the step (name and its run line, verbatim) ====
+        1	      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+        2	        # AC#4 asked whether this package can be tested on CI at all, and forbade
+        3	        run: bash scripts/wisp-cli-tests.sh
+==== scripts/wisp-cli-tests.sh -> portable-tests.sh ====
+   223:echo "wisp-cli-tests.sh: handing the verdict to portable-tests.sh --scope=cli"
+==== scripts/portable-tests.sh: the cli scope and its pin ====
+   286:cli_pin='
+   337:cli)
+   338:    # cmd/wisp's own tests. Only scripts/wisp-cli-tests.sh may call this, because
+   341:    scope=(./cmd/wisp/)
+==== the runner forces -v -count=<n> (tools/d22scan/runtests.sh) ====
+   7:#	$ go test ./internal/proc/ -run TestNoSuchThingExists -count=1 -v
+   184:# -v is forced: without it Go prints no per-test lines at all and the counts
+   185:# below would be vacuous. -count=1 is forced for the same reason a cached result
+   188:go test -v -count=1 "$@" >"$out" 2>&1
+
+==== run id / job id: none quoted ====
+   gh was not used in this leg; per this repo's rule, a step that cannot name its last real run is
+   evidenced by the tracked chain above instead. scripts/wisp-cli-tests.sh is the step's own entry
+   (its header records the four measured readings of ticket 111 AC#4) and was re-run by this leg;
+   the reading is in logs/04-ac5-gates.txt.
+
+==== a real run of the step (gh run view, this leg, 2026-10-14 19:3x +08) ====
+run 38554642217 sha 72db0f396c7a60cf123c2e3b3a86139628bd91f8:
+   job test-windows databaseId=115820641622, step #7 "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)" conclusion=failure
+   step log tail (verbatim):
+     portable-tests.sh: four numbers (all from -v output): === RUN=410  --- PASS=297  --- FAIL=2  --- SKIP=1
+     runtests.sh: go test exited 1 - packages=[./cmd/wisp/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasur...
+   => the step executes the whole cmd/wisp package, so a new _test.go in this directory is inside its denominator by construction.
+run 38551683523 sha 6c958adc1f78a945f19c4e7579a4eb8c08253a2b: same step #7 conclusion=failure (dev tree state;
+   neither this leg's file nor its commit is in that sha - the failure predates this work).
+   ⚠ one gh call mid-way died with 'dial tcp 198.18.0.87:443: ... failed to respond' (API flake), registered as such;
+   the two readings above were taken before/after it and are quoted verbatim from the successful calls.

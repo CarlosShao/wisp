@@ -1,0 +1,85 @@
+# 133-r1 deliverable log 02: X14's two beats in the ticket face's own shape (install in a struct-field initializer,
+# no slog record) - the variant 131's enumeration door reads as 'no records' and leaves PASS, so this instrument
+# is the only witness. x14c = first beat, x14b2c = second beat (initializer + the call through it deleted).
+# full originals: D:/tmp/wisp133r1/logs/x14c-*.{log,txt}, x14b2c-*.{log,txt}
+
+==== shot x14c ====
+APPLIED x14c: main.go sha256 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 -> 1ccdbe840f256b3313533d1402582031a5073c8d1e6e6717cd08bc08958a37a9
+LANDED x14c:
+  main.go:89: 	case "sfx131":
+  sfx131x.go:16: var holder131 = sinkHolder131{open: installLogSink}
+-- door closed (my gate alone):
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.25s)
+   leg_dispatch_gate_133_test.go:209: AC#1 RED: leg "sfx131" (main.go:89) reaches installLogSink on this path: dispatch -> holder131.open -> installLogSink
+   leg_dispatch_gate_133_test.go:219: AC#1/#2 RED: leg "sfx131" is dispatched by func main and documented in no line of the usage block: an operator cannot find it, and this gate has no second reading of the census to check it against.
+-- door open (both gates):
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.20s)
+   --- PASS: TestAC4EveryLegIsNailedOrRuled (0.10s)
+-- 131's gate ALONE: the row and the verdict
+             leg sfx131       main.go:89                 install=false records=false ruled=false nails=-                                                          -> no records
+   --- PASS: TestAC4EveryLegIsNailedOrRuled (0.10s)
+   ok  	github.com/CarlosShao/wisp/cmd/wisp	3.001s
+   rc=0
+   RESTORED (explicit): main.go sha256=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 pristine=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 identical=True
+
+==== shot x14b2c ====
+APPLIED x14b2c: main.go sha256 24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 -> 1ccdbe840f256b3313533d1402582031a5073c8d1e6e6717cd08bc08958a37a9
+LANDED x14b2c:
+  main.go:89: 	case "sfx131":
+  sfx131x.go:12: var holder131 = sinkHolder131{}
+-- door closed (my gate alone):
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.18s)
+   leg_dispatch_gate_133_test.go:209: AC#1 RED: leg "sfx131" (main.go:89) is dispatched by func main and covered by nothing: no nail in this gate's registry, no test case in this directory that drives a symbol belonging to this leg alone, and no WISP
+   leg_dispatch_gate_133_test.go:219: AC#1/#2 RED: leg "sfx131" is dispatched by func main and documented in no line of the usage block: an operator cannot find it, and this gate has no second reading of the census to check it against.
+-- door open (both gates):
+   rc=1
+   --- FAIL: TestAC1AC2DispatchHopGate133 (0.17s)
+   --- PASS: TestAC4EveryLegIsNailedOrRuled (0.09s)
+-- 131's gate ALONE: the row and the verdict
+             leg sfx131       main.go:89                 install=false records=false ruled=false nails=-                                                          -> no records
+   --- PASS: TestAC4EveryLegIsNailedOrRuled (0.10s)
+   ok  	github.com/CarlosShao/wisp/cmd/wisp	2.337s
+   rc=0
+   RESTORED (explicit): main.go sha256=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 pristine=24efbffbee6eeb2719b114dbb9241da1c738b4e32544480760f2069b5076e0a3 identical=True
+
+==== x14/x14b2 (the same two beats WITH a slog call in the planted body: 131 also reds there; kept for contrast) ====
+-- x14: 131 alone verdict + row:
+             leg sfx131       main.go:89                 install=false records=true  ruled=false nails=-                                                          -> RED records with no liste
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.16s)
+   rc=1
+-- x14b2: 131 alone verdict + row:
+             leg sfx131       main.go:89                 install=false records=true  ruled=false nails=-                                                          -> RED records with no liste
+   --- FAIL: TestAC4EveryLegIsNailedOrRuled (0.14s)
+   rc=1
+
+==== no-doors readings (both gates skipped), the founding 'nobody sees it' shape ====
+-- n3 -skip both doors:
+   start 2026-10-14 18:36:35 +0800 rc=1 end 2026-10-14 18:46:45 +0800 
+     red: --- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.06s)
+     red: --- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (0.43s)
+     red: --- FAIL: TestAC14GoSideEvalPushReachesThePage (0.44s)
+     red: --- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding (0.47s)
+     red: --- FAIL: Test258OccupiedCombinationNamesTheNewValue (0.06s)
+     red: --- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (0.06s)
+     red: --- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection (43.02s)
+-- x14 -skip both doors:
+   start 2026-10-14 18:49:37 +0800 rc=1 end 2026-10-14 18:59:46 +0800 
+     red: --- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.06s)
+     red: --- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (2.67s)
+     red: --- FAIL: TestAC14GoSideEvalPushReachesThePage (0.40s)
+     red: --- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding (0.47s)
+     red: --- FAIL: Test258OccupiedCombinationNamesTheNewValue (0.06s)
+     red: --- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (0.06s)
+     red: --- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection (41.31s)
+-- x14b2 -skip both doors:
+   start 2026-10-14 19:00:29 +0800 rc=1 end 2026-10-14 19:10:39 +0800 
+     red: --- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.07s)
+     red: --- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (0.47s)
+     red: --- FAIL: TestAC14GoSideEvalPushReachesThePage (0.51s)
+     red: --- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding (0.44s)
+     red: --- FAIL: Test258OccupiedCombinationNamesTheNewValue (0.05s)
+     red: --- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (0.05s)
+     red: --- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection (38.62s)
