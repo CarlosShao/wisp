@@ -17889,3 +17889,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 
 
 - **A935 补**：派 `114-v1`（四格落地＋拆分表验收；面 internal/panel）。编队（2）：写 `20-r2`＋验 `114-v1`。派单/send 存档在盘。
+
+
+## A936｜2026-10-14 16:17:26 +08｜20-r2 收件（第 7 框三格全落；整包 internal/tools 零红；两枚具名＝前端夹具 PNG 触 d22scan 61 条＋201 junction 卡面 dirOf 邻接险情）＋★本波写腿全落地（只余 114-v1 验证）
+
+- **20-r2 收件（三把尺）**：`2008e4b4`（产码 5 件 +679/−2：`refusal.go` 新 117／`bridge.go` +12／`gate.go` +11／两测试件）＋`81ebecbc`（交付）在／件齐／亲跑 `-run 'Test20r2' ./internal/tools/` ok 2.886s＋`-run 'TestManagerLocked' ./internal/config/` ok 1.649s。
+- **三格落地**：(a) `RefusalKind` 两值（`out-of-allowlist`／`redteam-denied`）＋`refusal=%s` 审计行；题面突变（并回）⇒ **4 钉红逐字**。(b) **零新授权产码**——同意只走既有锁定通道＋结构钉（`PathCanonicalizer` 方法名册[加 `AddRoot` ⇒ 点名红]／`internal/tools` 不 import `internal/config`／同一旧桥复检仍拒）。(c) 七枚用例全绿（真 junction/8.3、零 skip）；M2（junction 变可问）单红。边界如实登记：非黑名单越界的 8.3 拼法与长名同类（可问），依据同包已提交注释。
+- **具名①（前端面、⛔ 不归我们动）**：`d22scan.sh` 全仓 rc=1＝61 findings 全在 `frontend/fixtures/settings-v2/*.png`（机主前端 agent 在飞产物；`internal/`/`cmd/` 0 命中）⇒ ⚠ **若该目录被入库，CI 的 lint 可能红**——已观察 `settings-v2-preview.html` 未跟踪在位（前端 v2 已开工）。我们这发推送**不含未跟踪件、安全**；此条建议带给前端 agent（加 .gitignore 或挪件）。**本腿自撞自修一条**（测试字符串 🔒 ⇒ 已改复跑 0 命中）。
+- **具名②（邻接险情、建议立票）**：201 的 `WideningRule`（`internal/agent/approval/replies.go:503`）从卡面 `Paths` 推目录；junction 卡面带 `(无法规范化: …(junction/symlink)…)` 标记串，`dirOf`（`batch.go:91`）按最后 `/\` 切会吃进标记里的 `/` ⇒ 可推出含碎片的"目录"进第二张卡（approval＋cmd/wisp 面，一行未动）⇒ **候选票：先活体复量再定**（同 315 先例）。登记在案。
+- **本波结算**：写腿全落地（`252-r4`／`114-a5`／`20-r2` 三收）；只余 `114-v1`（验证）在飞。**⛔ 未推＝约 65 笔** ⇒ 本回应向机主发出**推送邀请**（开代理）。
