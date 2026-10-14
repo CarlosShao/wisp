@@ -1,0 +1,44 @@
+# 179-r2 派单（票 179：AC#9 尾测补 `decision` 列钉 ＋ AC#10 注释与产码不一致归口；写腿；面＝internal/agent（loop.go＋declared_l0_risk_179_test.go））
+
+发送时刻：2026-10-14 17:4x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **179-r2**（先查重：`ls .scratch/wisp/probes/179/`，r2 可用）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与背景（票面逐字为准）
+
+- 票：`.scratch/wisp/issues/179-loop-deciderisk-treats-a-declared-l0-as-unclassified-so-every-readonly-builtin-is-refused-on-the-real-cli-and-no-criterion-holds-that-sentence.md`
+- 起手先 `git rev-parse --short HEAD` 现读锚（派发锚 7e8ac3fa 已推 origin/dev）；漂移逐报。
+- 本票主修（"声明 L0 不再被当未分类"）**已落地**并经非实现者 `179-v1` 变异审计（它实测出 AC#9 的少牙形）；AC#2/#3/#4/#5/#6/#7 已闭。
+- ⛔ 保住两枚守卫（AC#3 未分级仍拒、AC#4 L1/L2 路由一字不变）——你的任何改动不许让它们变安静。
+
+## 本腿做两格
+
+### AC#9 —— 尾测补一句读 `decision` 列的断言
+
+- 现量（`179-v1` 变异 M2 实证，你现读复认）：`internal/agent/declared_l0_risk_179_test.go` 尾测（票面现量 `:246-255`）只断 `ok/unbooked/why` 三值，**不读 journal 那行的 `decision` 列**；"decision 列"断言只长在 `:104`（正向 C1）与 `:220`/`:239`（L1/L2 守卫）三处。
+- M2 形状：把 `loop.go`（票面现量 `:794`）那句 `j.decide(ctx, rowID, DecisionAllow)` **单独摘掉** ⇒ C1 红于 `:104 decision = ""`，**而尾测照绿**——"档位即放行时那行必须记账"在尾测那条接缝上没人钉。
+- 修法：**只**在尾测里补一句读 `decision` 列的断言。**⛔ 不许改产码**（这一格）；⛔ 不许动 `thresholds.go`；⛔ 不许 `t.Skip`、不许放宽任何断言。
+- 判据：先证变异落地（`grep -n` 原文 ＋ `go build` rc=0）再读数，贴：**M2 ⇒ 尾测必红且逐字点名红行；还原 ⇒ 绿**。
+
+### AC#10 —— `decideRisk` 第二返回值：注释与产码不一致，二选一归口
+
+- 现量：`loop.go`（票面现量 `:622`）逐字 `ok, _, why := l.decideRisk(ctx, j, p.rowID, info)`——产码**只有这一处**调用；而 `:780-782` 注释逐字写 "The second result reports \"booked nothing\" (gate-owned routing) so **the caller can drop its own pending row** instead of leaving one open forever." ⇒ 注释承诺的调用方行为在产码里没有对应物。
+- 你现读后**裁一支并具名理由**：
+  - **①** 调用方真去消费 `unbooked`（要新判据；**不许**因此让 AC#3/AC#4 两枚守卫变安静）；
+  - **②** 把注释改成实话（如"当前调用方丢弃该值；pending 行的归宿另议"）＋票尾 bullet 写明归口（台账由编排者登记）。
+- ⛔ 不许第三种处置（留着不一致没人说）。边界：pending 行归宿本身属票 21/162 地界，本格只做①或②。
+
+## ⛔ AC#8 本波不跑（具名延后）
+
+AC#8 的 overlay e2e 属 `cmd/wisp` 重包（`probes/176/r1` 探针族），本波 `cmd/wisp` 已被 255-r8 独占 ⇒ **AC#8 归下一波**。可以顺手把它的前置备好（用哪条命令、哪个 overlay 件、预期读法）写进交件日志让下一波直接跑；⛔ 别现在跑。
+
+## 交件与纪律（十条款照旧）
+
+- 交件：`probes/179/r2/00-anchor-and-gates.md` ＋ logs（M2 红/还原绿逐字；AC#10 选型理由）＋ 票 179 尾**追加 1 条 bullet**。产出 ≤7 枚 ≤200 行。
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**）；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（MSYS 形）；`GOTMPDIR='C:\tmp\wisp179r2gotmp'`（**只反斜杠形**）；判据 `-run` 小射程（例：`GOFLAGS= go test -count=1 -run 'TestDeclaredL0' ./internal/agent/`）。
+- ⚠ `./internal/risk/` 要单包跑（票 179 AC#7 的教训：并发时 `TestResolvePerCallBudget` 假红）；本腿不碰 risk，若顺手跑了只当旁证。
+- 门禁：`GOFLAGS= go test -count=1 ./internal/agent/`（**禁 `./...`**）／`go build ./...` rc=0／gofumpt 动过的件空／`sh scripts/d22scan.sh` clean／长度门 GREEN（60=60）。
+- ⚠ G3 陷阱（票面）：不许给 `(*Loop)` 加收带 `taskID` 的**导出**方法（普查尺会把安静腿打红）。
+- 树会呼吸：318-r1（`internal/agent/approval`）、255-r8（`internal/config`＋`cmd/wisp`）在飞；`./internal/agent/` 编译树含 approval 子包，撞见编译红先判归属（`git status`/diff），必要时等 60 秒重跑——别把别人的在飞笔算你的账。
+- **未定义即停**：AC#10 两处置都对不上现读／须动别处 ⇒ **停手上报**。
+- 回执：结论先行＋commit sha（产码/交付分开）＋M2 红/还原绿逐字＋AC#10 选了哪支及理由＋门禁 rc＋具名没做。

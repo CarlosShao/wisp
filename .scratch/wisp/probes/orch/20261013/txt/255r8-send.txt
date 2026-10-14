@@ -1,0 +1,5 @@
+255-r8 send 记录
+- 发送时刻：2026-10-14 17:4x +08；派单已先存档：txt/255r8-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/255/` = r1 r2 r7 v1 v3（r8 未建，可用）。
+- 收件人：agent_5fad9875-86cc-44d5-913e-548a9ef92bbf（general-purpose，后台）。
+- 内容：票 255 AC#1（热加载报告只列真有读者的段；正控=改 [panel] width 不许出现 [panel]）＋ AC#4（装配根把配置递给面板宿主；420×260 变成缺省值）。面=internal/config＋cmd/wisp（本波唯一共享面写腿）。

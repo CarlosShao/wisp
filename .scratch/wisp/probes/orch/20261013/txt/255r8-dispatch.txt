@@ -1,0 +1,36 @@
+# 255-r8 派单（票 255：热加载报告说实话 ＋ [panel] width 真生效；写腿；面＝internal/config ＋ cmd/wisp）
+
+发送时刻：2026-10-14 17:4x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **255-r8**（`probes/255/r8` 未建，先用查重：`ls .scratch/wisp/probes/255/`）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与目标（票面逐字为准）
+
+- 票：`.scratch/wisp/issues/255-config-says-these-sections-took-effect-immediately-panel-for-a-width-nobody-reads-while-the-panel-host-never-receives-config-and-tier-has-zero-readers.md`
+- 起手先 `git rev-parse --short HEAD` 现读锚（派发锚 7e8ac3fa 已推 origin/dev）；漂移逐报。
+- 已闭格（⛔ 不许再动）：AC#2（TierRegistry，`dd92bb92`，255-v1 三步实证）、AC#3（255-r7/v3 两向读数）、AC#6（255-r7/v3）。**本腿只做 AC#1 ＋ AC#4 两格。**
+
+### AC#1 —— 那句"这些都立即生效"只许说真话
+
+- 现量出处：`internal/config/manager.go` 热应用段表（票面现量 `:280-288`，`{"panel", &cur.Panel, &fresh.Panel, …}` 在其列）⇒ 其后 `for _, s := range rest {` 逐段应用并打印"这些段已立即生效：…[panel]…"。**它报的是"内存里的值换掉了"，不是"有人按新值做了事"。**
+- 判据（票面）：**正控**＝手改 `[panel] width` ⇒ 那句里**不许出现 `[panel]`**（要么不出现、要么换成诚实形状，如"值已换、但当前无组件应用它 / 下次启动生效"——形状你现读后选，具名理由）；**反控**＝真有生产读者的段（逐名给出证据）**仍要出现**。
+- ⛔ 不许把整句删掉（摘尺不许当修法）；⛔ 不许动 `docs/PLAN.md`／`docs/specs/**` 一字（契约＝人工批准）。行号会烂，一律现读。
+
+### AC#4 —— 让 `[panel] width` 真生效
+
+- 落点（票面）：**装配根把配置递给面板宿主**（既有约定：装配根是唯一接缝）；⛔ 不新开 `panel→config` 依赖边；⛔ 不在 `PanelManager` 里自己读盘。
+- 现量：`NewPanelManager(disp *panel.ComposerDispatch, assets *panel.Assets, dataPath string)`（全仓唯一定义，**无配置参数**）；窗口尺寸写死在 `cmd/wisp/panel_host_windows.go`（票面现量 `:304-306`，逐字 `Width: 420,` / `Height: 260,`）。⇒ 写死的值改成"配置缺省时的值"，不是唯一来源。
+- 判据（票面）：改 width ⇒ 真窗口宽度随之变。⚠ 这一格属**只有本机可量**那一族：若能安全拉起真窗口量一发实宽（样板：`.scratch/wisp/probes/orch/2026-10-09-live-window-runsheet.md`）就量并贴读数；拉不起/不安全就交**装配链逐跳读数**（config → 装配根 → 窗口创建实参）并**具名**"真窗口实测未做，留编排者/机主"——⛔ 别伪装成 CI 测过。
+
+### 两格的一致性（别互相打架）
+
+`[panel]` 的生效时刻在窗口创建（启动面）⇒ 它不属于"已立即生效"（热加载）那句，AC#1 正控自然成立。**若你现读发现 `[panel]` 其实做得到真热生效（live resize）**，就把 AC#1 的正控按"确实生效了"重写为诚实形状并逐字报——两格都要真。
+
+## 交件与纪律（十条款照旧）
+
+- 交件：`probes/255/r8/00-anchor-and-gates.md` ＋ logs（正控/反控逐字、装配链逐跳读数）＋ 票 255 尾**追加 1 条 bullet**。产出 ≤7 枚 ≤200 行。
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**）；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；别人脏件别动。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（MSYS 形）；`GOTMPDIR='C:\tmp\wisp255r8gotmp'`（**只反斜杠形**）；判据 `-run` 小射程；⛔ **整包 `cmd/wisp` 全套当主证据**（314 死区）——需要跑单跑并报窗口时刻。
+- 门禁：`go build ./...` rc=0／gofumpt 动过的件空／相关族 `go test` rc=0／`sh scripts/d22scan.sh` clean／长度门 GREEN（60=60）。
+- 树会呼吸：318-r1（`internal/agent/approval`）、179-r2（`internal/agent`）在飞；撞见编译红先判归属（`git status`/diff），别把别人的在飞笔算你的账；你的 commit **只带自己 pathspec**。
+- **未定义即停**：AC#1/AC#4 形状对不上现读／须越面（panel 出向契约、C17 方法名、新配置键）⇒ **停手上报**。
+- 回执：结论先行＋commit sha（产码/交付分开）＋正控/反控逐字＋装配链读数＋门禁 rc＋具名没做（含"真窗口实测做没做"）。

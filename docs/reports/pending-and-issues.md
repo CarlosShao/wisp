@@ -17928,3 +17928,11 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 
 
 - **A939 补**：派 `114-v2`（AC#10 判语）。编队（2）：写 `318-r1`＋验 `114-v2`。派单/send 在盘。
+
+## A940｜2026-10-14 17:14:48 +08｜★第二发推送成功（`e3788f08..7e8ac3fa`；CI run 38539150385 在跑＝将验 317 windows FAIL=4→0 与 174 形乙 linux SKIP=0）＋★前端 agent 的 v2 重做已随推进入树（`c4319a87`）＋按铁律补写腿：派 `255-r8` 与 `179-r3` ⇒ 编队（4）：写×3＝318-r1/255-r8/179-r3、验×1＝114-v2
+
+- **推送核**：`git push origin dev` rc=0；`git rev-list --count HEAD..origin/dev`＝**0**；`origin/dev` 现停 `7e8ac3fa`（前发 `e3788f08`）。CI `38539150385`（ci／dev／push）已起。
+- **前端件**：`c4319a87`（v2 模型/语音设置页产品化重做：全站人话＋供应商列表/链编辑器＋保存成对校验）＋`9e9964f8`（313 页面侧）在 `frontend/`；本编队零写面，仅随推。
+- **派单存档**：`txt/255r8-dispatch.txt`／`255r8-send.txt`／`179r2-dispatch.txt`／`179r2-send.txt`＋`179r2-correction.txt`（同刻）。⚠ 去重核翻车自报：179 的 r2 槽位早被 09-28 旧台件腿占用（`probes/179/r2/` 已有 zz179r2_e2e_test.go＋overlay-e2e.json）；在飞腿已 SendMessage 更名 **179-r3**、交件落 `probes/179/r3/`，派单正文其余一字不变。
+- **波间守恒**：写≤4 ✓（3）、总≤7 ✓（4）；面互斥：cmd/wisp＋panel 本波写腿只 255-r8 一枚（114-v2 只读验）；cmd/wisp 重包同一时刻只跑一个 ⇒ 179 的 AC#8 overlay e2e 具名延后。
+- **下波候选**（腿落即补）：179 AC#8 e2e（cmd/wisp 空出后）／114-v2 判后翻 AC#10 并收 114 剩余格／318 验证腿／201 五格（cmd/wisp＋approval 面，待让位）／236 AC#5/#6（cmd/wisp 测试面）。
