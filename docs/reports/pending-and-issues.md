@@ -17909,3 +17909,10 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 
 
 - **A937 补**：派 `114-r6`（AC#10 补第三装法钉）／`201-a1`（junction dirOf 险情活体复量）。编队（2）。派单/send 存档在盘。
+
+
+## A938｜2026-10-14 16:38 +08｜201-a1 收件（**复现成立**：junction 标记串被 `dirOf` 切出半截 `(junction` 真写进 `allowed_dirs`）＋立票 318＋派 `318-r1`（修）＋结算 201-a1
+
+- **收件（三把尺）**：`64bf9b29` 在／件齐／亲跑 `-run 'TestZZ201A1' ./internal/agent/approval/` rc=0（其全包回归绿在件内）。**判语＝复现**（真 NTFS junction→真 bridge→真 Gate/Queue/Replies→真 WideningRule→真 AddAllowedDir）：卡面标记串进 `ReplyCard.Paths` ⇒ `dirOf`（`batch.go:91` `LastIndexAny`）在标记里的 `/` 切开 ⇒ `dir=…(junction`、`ok=true` ⇒ `AddAllowedDir` 两道闸全过 ⇒ **config.toml 真写成垃圾行**；第二张卡 `Paths[0]`＝同一碎片；对照（无标记）推真父目录。**最坏后果**：`always`＋二卡 allow ⇒ 惰性垃圾行（非直接越权；下游半跳未量、登记）。
+- **立票 318**（两候选：①`WideningRule` 入口拒收含 `无法规范化` 标记〔对齐 `session/grants.go:264`、预期首选〕②让标记不进 `Paths`〔触语义面、须先报〕）＋**派 `318-r1`**（修＋能力形钉＋对照不回归；面 internal/agent/approval）。
+- **结算**：201-a1 本回应 TaskStop。**编队（2）**：`114-r6`（写）＋`318-r1`（写）。⛔ 未推＝**67 笔**（推送邀请在挂、等机主开代理）。
