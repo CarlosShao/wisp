@@ -1,0 +1,41 @@
+== 179-r3 / 票 179 AC#10：`decideRisk` 第二返回值（unbooked）注释与产码不一致，二选一归口 ==
+锚：起手 `f6fda72d`（派发锚 7e8ac3fa 之后 318-r1 两枚 commit＝漂移，已记）；产码 commit `0d45d6f4`
+现读时刻：2026-10-14 17:1x +08
+
+--- 现量（本程现读，锚 0d45d6f4） ---
+① 唯一调用点（尺：`grep -n "l.decideRisk(ctx" internal/agent/loop.go`）⇒ 产码 1 行：
+   `internal/agent/loop.go:651:			ok, _, why := l.decideRisk(ctx, j, p.rowID, info)`
+   ⇒ 第二返回值被 `_` 丢弃。
+② 旧注释逐字（改前，`decideRisk` 上方文档段末两行）：
+   // The second result reports "booked nothing" (gate-owned routing) so the caller
+   // can drop its own pending row instead of leaving one open forever.
+   ⇒ 承诺的调用方动作（drop its own pending row）在产码里没有对应物。
+
+--- 两处置的现读证据 ---
+①（调用方真去消费 unbooked）——否决：
+   a. `unbooked=true` 只在"声明 L1/L2 且 AdmitTask 已接"那一支产生（loop.go `case RiskL1, RiskL2:`＝:820，
+      该支第二返回 `return true, true, ""`＝:825）。而真组合根（`cmd/wisp/run.go:1027-1040`）正是
+      `Journal: nil` + `AdmitTask: rt.admitTask`：loop 的 taskJournal 落在 `newTaskJournal(nil, …)` 的
+      no-op 形（`journal.go:59-64`；`startCall` 的 `if t.j == nil { return 0 }`＝:71、`decide` 直接 return）——
+      **调用方手里根本没有"自己的 pending 行"可 drop**（行归桥写；同一形状另在
+      `internal/tools/loop_approval_test.go:117-119` 逐字自述 "The bridge owns the tool_call rows in this
+      composition (the loop's Journal is nil)"）。承诺的动作在真组合里**没有对象**。
+   b. 剩下的"调用方该做什么"＝"门那一跳之后 pending 行归谁收"，票面明示属票 21/162 地界；仓里没有定案
+      文本可依（D43 转移表把 decision 列判给门）。真去实现＝自造新判据＋挑一个未定案的归宿（drop/close），
+      且拦不拦截由门与 loop 两处 writer 的既有分工（A13：行留 pending、列归门）会被改掉——有让
+      AC#3/AC#4 两枚守卫变安静的实险，还撞"未定义即停"。
+②（注释改成实话）——采用：零产码行为改动，恰是格面二选一之一，把注释与产码的对齐关系如实登记；
+   归宿问题点名推迟票 21/162（台账由编排者登记）。
+
+--- 落地：新注释逐字（commit 0d45d6f4，loop.go decideRisk 文档段末） ---
+   // The second result reports "booked nothing" (gate-owned routing): the row is
+   // left pending and the gate writes the decision column (ruling A13). The only
+   // caller (executeCalls) currently DISCARDS that value - it drops no row, and
+   // this comment must not promise that it does; who settles a gate-owned pending
+   // row after the gate hop is deferred (tickets 21/162). Ticket 179 AC#10
+   // corrected this text, which used to promise a consumer that never existed.
+
+--- 未触面自证（⛔ 边界） ---
+- 未触 thresholds.go / golden / internal/risk/** / PassThroughUnclassifiedRisk 语义；
+- AC#3（未分级仍拒）／AC#4（L1/L2 路由一字不变）两枚守卫零改动：本程只改注释（零行为）＋尾测加断言
+  （只加牙），`go test -run 'TestDeclared'` 两枚守卫腿在改后/还原后均照绿（logs/10、logs/40）。

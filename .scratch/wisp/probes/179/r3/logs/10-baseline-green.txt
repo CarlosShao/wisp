@@ -1,0 +1,17 @@
+time=2026-10-14T17:16:15.682+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestDeclaredL0RunsWhenPassThroughIsOff179
+time=2026-10-14T17:16:15.692+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp179r3gotmp\TestDeclaredL0RunsWhenPassThroughIsOff1792364084789\001 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestDeclaredL0RunsWhenPassThroughIsOff179 (0.11s)
+=== RUN   TestDeclaredL1L2RoutingUnchanged179
+time=2026-10-14T17:16:15.793+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp179r3gotmp\TestDeclaredL1L2RoutingUnchanged1791532968230\001 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L1/no-approval-layer
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L1/with-approval-layer
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L2/no-approval-layer
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L2/with-approval-layer
+--- PASS: TestDeclaredL1L2RoutingUnchanged179 (0.09s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L1/no-approval-layer (0.02s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L1/with-approval-layer (0.00s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L2/no-approval-layer (0.00s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L2/with-approval-layer (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	2.731s

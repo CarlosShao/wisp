@@ -1,0 +1,21 @@
+time=2026-10-14T17:17:21.258+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestDeclaredL0RunsWhenPassThroughIsOff179
+time=2026-10-14T17:17:21.270+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp179r3gotmp\TestDeclaredL0RunsWhenPassThroughIsOff1791255120728\001 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    declared_l0_risk_179_test.go:104: decision = "", want "allow"
+--- FAIL: TestDeclaredL0RunsWhenPassThroughIsOff179 (0.12s)
+=== RUN   TestDeclaredL1L2RoutingUnchanged179
+time=2026-10-14T17:17:21.382+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp179r3gotmp\TestDeclaredL1L2RoutingUnchanged1791347969362\001 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L1/no-approval-layer
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L1/with-approval-layer
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L2/no-approval-layer
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L2/with-approval-layer
+=== NAME  TestDeclaredL1L2RoutingUnchanged179
+    declared_l0_risk_179_test.go:262: decision = [{ID:5 TaskID:task-179-l0-direct Seq:1 Tool:fs.read ArgsJSON:{} RiskLevel:L0 Decision: DecidedAt:<nil> StartedAt:<nil> EndedAt:<nil> Outcome: ErrorClass: CorrelationID:task-179-l0-direct GrantID:<nil>}], want one row with "allow" booked by the direct L0 arm
+--- FAIL: TestDeclaredL1L2RoutingUnchanged179 (0.09s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L1/no-approval-layer (0.02s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L1/with-approval-layer (0.00s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L2/no-approval-layer (0.00s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L2/with-approval-layer (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	2.804s
+FAIL

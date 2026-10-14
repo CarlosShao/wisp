@@ -1,0 +1,30 @@
+== HEAD at mutation: 0d45d6f4
+== before: grep -n 'j.decide(ctx, rowID, DecisionAllow)' internal/agent/loop.go
+828:		j.decide(ctx, rowID, DecisionAllow)
+837:		j.decide(ctx, rowID, DecisionAllow)
+== before: sed -n '822,826p' internal/agent/loop.go
+			j.decide(ctx, rowID, DecisionReject)
+			return false, false, "该操作属于 " + risk + " 级，审批通道尚未接入（ticket 21），已拒绝执行"
+		}
+		return true, true, ""
+	case RiskL0:
+
+== MUTATION: sed -i '828d' internal/agent/loop.go  (the RiskL0 arm's decide; :837 arm untouched by construction)
+== after: sed -n '824,836p' internal/agent/loop.go
+		}
+		return true, true, ""
+	case RiskL0:
+		// A declared tier, the lowest one: run it, interrupt nobody (D4).
+		return true, false, ""
+	default:
+		// Reached only by RiskUnclassified ("") and by anything the directory
+		// declares no tier for; both fail closed while the switch is off.
+		if !l.opt.Config.PassThroughUnclassifiedRisk {
+			j.decide(ctx, rowID, DecisionReject)
+			return false, false, "风险未分级且直通开关关闭，已拒绝执行"
+		}
+		j.decide(ctx, rowID, DecisionAllow)
+== after: grep -n 'j.decide(ctx, rowID, DecisionAllow)' internal/agent/loop.go (expect only the :837 arm left)
+836:		j.decide(ctx, rowID, DecisionAllow)
+
+== go build ./... rc=0, output bytes: 0
