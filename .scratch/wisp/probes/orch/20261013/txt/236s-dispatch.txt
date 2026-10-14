@@ -1,0 +1,30 @@
+# 236s 派单（票 236 **只切 AC#6**：`fs_broken.go` 的 gofmt 红——**甲案**；写腿；面＝`.scratch/wisp/probes/185/c1/mut/fs_broken.go` 一枚 ＋ `probes/236/s/`）
+
+发送时刻：2026-10-14 19:1x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **236s**（腿名固定 `236s`；`probes/236/s` 未建，查重已做）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与范围（**只做 AC#6**）
+
+- 票：`.scratch/wisp/issues/236-six-cells-that-only-surface-at-the-reading-layer.md`（读 AC#6 全文＋其下的三案，其余 AC 一律不碰）
+- 起手 `git rev-parse --short HEAD` 现读锚（派发锚 `6c958adc` 后若干笔，现读为准）；漂移逐报。
+- **病**：`.scratch/wisp/probes/185/c1/mut/fs_broken.go` 是**故意编译不过**的控制夹具（`undefinedSymbol185c1`）；它入库后合法进了格式门 tracked 分母 ⇒ CI `lint` 的 `gofmt (gofumpt)` 步**常红**（逐字 `##[error].scratch/wisp/probes/185/c1/mut/fs_broken.go:4:1: imports must appear before other declarations`），并吃掉后面两道 `go vet`。
+- **编排者裁定＝甲案**（票面三案里的"最小、零门改动"）：**只把该文件的 import 顺序排好**，**保留"未定义符号"那一枚坏点**——它的用途是**符号坏、不是格式坏**。⛔ 不改门的分母（乙案＝批准面）、⛔ 不做"什么都不动只写文档"（丙案）。
+  - ⚠ 甲案的代价（票面逐字）：它是票 185 已归归档数的对象，**动之前要先核 185 名下有无 md5／字节数引用它**。
+
+## 步骤与判据（逐条）
+
+1. **引用普查（先做，硬闸）**：全仓搜 `fs_broken.go`／`undefinedSymbol185c1`／该文件的 md5／字节数／行数引用（票文件、`docs/evidence/**`、`probes/**`、`scripts/**`、`.github/**` 只读搜）——**若存在任何硬引用（md5／字节数／行数级钉）⇒ 停手上报**（我把裁定改到乙/丙）。
+2. 改：只动该文件的 **import 顺序**（把 import 块挪到其它声明之前），**符号仍未定义**、注释仍说清它是"符号坏"的夹具。`git diff` 只许这一枚文件、hunk 只在 import 区。
+3. 判据（逐发贴原文）：
+   - `gofumpt -l .scratch/wisp/probes/185/c1/mut/fs_broken.go` ⇒ **改前非空、改后空**（本机 v0.12.0）；
+   - **"符号坏"仍成立**：给出你的证法（例：把该文件以临时包名拷进仓外树 `go build` ⇒ 仍报 `undefined: undefinedSymbol185c1`；或按票 185 原有用法重放一发）——**证法的选择与结果具名**；
+   - `sh scripts/d22scan.sh` 纯净快照 rc=0（各 scope 不降）；长度门 GREEN（60=60）。
+4. 具名不做：其余 14+ 枚 A-ROSTER 夹具（163/a1／174/c2／183/r2／185/r1／197/r1c／212/v1／220/r1／222/v1／224/v2／231/v1／235/v1／241/v1…）**一律不动**（那是乙案/别的账）；`.github/**`、`tools/d22scan/**`、`scripts/attrib.sh` 零触碰。
+
+## 交件与纪律
+
+- 交件：`probes/236/s/00-anchor-and-gates.md` ＋ logs（引用普查原文、改前/改后 `gofumpt -l`、符号坏证法逐字）＋票 236 尾**追加 1 条 bullet**（`agent=236s did=AC#6 甲案… next=…`）。产出 ≤7 枚 ≤200 行。
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**）；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删。
+- `GOTMPDIR='C:\tmp\wisp236sgotmp'`（只反斜杠形，先自建）；面：本波 `cmd/wisp` 归 133-r1、`scripts/slo-*` 归 136s、`probes/154` 系归 178 族——你只写该夹具一枚＋`probes/236/s/`。
+- **未定义即停**：步骤 1 见硬引用／改法做不到"只动 import"／符号坏保不住 ⇒ 停手上报。
+- 回执：结论先行＋commit sha（夹具/交付分开或说明）＋引用普查结果＋改前改后 `gofumpt -l`＋符号坏证法逐字＋门禁 rc＋具名没做。

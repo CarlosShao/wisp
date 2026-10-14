@@ -1,0 +1,5 @@
+236s send 记录
+- 发送时刻：2026-10-14 19:1x +08；派单已先存档：txt/236s-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/236/` = 见本档首行（旧 rN 腿目录，无 s）；腿名固定 236s。
+- 收件人：agent_947515c3-45a2-45a0-934c-28243cadfb12（general-purpose，后台）。
+- 内容：票 236 AC#6 **甲案**（fs_broken.go 只排 import 顺序、保未定义符号坏点；先做引用硬闸；其余 14+ 夹具零触碰）。面＝该夹具一枚＋probes/236/s。
