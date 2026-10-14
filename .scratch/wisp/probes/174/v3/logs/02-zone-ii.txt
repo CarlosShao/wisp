@@ -1,0 +1,111 @@
+=== zone (ii) C26-sole-decider evidence, 174-v3 ===
+date: 2026-10-14 15:32:03+0800
+HEAD: 037bfb7fba96890c75c7d3fab47f1f22562887c0
+task.go md5: ded82068ffd67bb28c638663e4d6c243
+
+--- static: decision legs ask C26 (Canonicalize then InAllowlist) ---
+49:	Paths *PathCanonicalizer
+820://	authorization  C26 decides it, through the same *PathCanonicalizer fs.read
+821://	               is judged by: Canonicalize, then InAllowlist. Nothing here
+823://	existence      os.Stat on the exact string being printed. Read-only: this
+836:	canon, err := d.Paths.Canonicalize(raw)
+840:	case !d.Paths.InAllowlist(canon):
+844:	if st, statErr := os.Stat(raw); statErr != nil {
+
+60://   - the concrete *tools.PathCanonicalizer the composition root already builds
+69:	Canonicalize(raw string) (string, error)
+70:	InAllowlist(canonical string) bool
+227:	canon, err := s.judge.Canonicalize(path)
+231:	if !s.judge.InAllowlist(canon) {
+
+--- static: no filepath.Clean|Abs CODE token in the two legs (paren form; comments excluded) ---
+rc=1 (1 = zero hits)
+
+--- static: the one sanctioned implementation lives in internal/risk ---
+206:func lexCanonical(p string) string {
+207-	if p == "" {
+208-		return p
+209-	}
+210-	if a, err := filepath.Abs(p); err == nil {
+211-		p = a
+212-	}
+213-	return filepath.Clean(p)
+214-}
+215-
+216-// sepStr is the platform's path separator as a string. C26's canonical form is
+
+--- baseline arm run (pristine tree + my case arm via overlay) ---
+rc=0
+=== RUN   TestV3PointerFollowsC26OnCaseFlippedSpelling174
+    zz174v3_pointer_case_arm_windows_test.go:28: case-flip fixture: dir="C:\\Users\\swq\\AppData\\Local\\Temp\\TestV3PointerFollowsC26OnCaseFlippedSpelling1744245449926\\001" real="C:\\Users\\swq\\AppData\\Local\\Temp\\TestV3PointerFollowsC26OnCaseFlippedSpelling1744245449926\\001\\tool-output-174v3-case.txt" filed="C:\\USERS\\SWQ\\APPDATA\\LOCAL\\TEMP\\TESTV3POINTERFOLLOWSC26ONCASEFLIPPEDSPELLING1744245449926\\001\\TOOL-OUTPUT-174V3-CASE.TXT"
+    zz174v3_pointer_case_arm_windows_test.go:41: case arm verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token，全文见 C:\\USERS\\SWQ\\APPDATA\\LOCAL\\TEMP\\TESTV3POINTERFOLLOWSC26ONCASEFLIPPEDSPELLING1744245449926\\001\\TOOL-OUTPUT-174V3-CASE.TXT…]"
+    zz174v3_pointer_case_arm_windows_test.go:68: case arm, no root verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\USERS\\SWQ\\APPDATA\\LOCAL\\TEMP\\TESTV3POINTERFOLLOWSC26ONCASEFLIPPEDSPELLING1744245449926\\001\\TOOL-OUTPUT-174V3-CASE.TXT…]"
+--- PASS: TestV3PointerFollowsC26OnCaseFlippedSpelling174 (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.052s
+
+--- MUT-V3-A on the tree (overlay; tracked bytes untouched): hand-rolled case-sensitive HasPrefix over the FILED string ---
+date: 2026-10-14 15:32:14+0800
+MUT-V3-A rc=1
+=== RUN   TestPointerAuthorityFollowsC26NotTheSpelling174r4
+--- FAIL: TestPointerAuthorityFollowsC26NotTheSpelling174r4 (0.02s)
+=== RUN   TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4
+--- FAIL: TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4 (0.02s)
+=== RUN   TestV3PointerFollowsC26OnCaseFlippedSpelling174
+--- FAIL: TestV3PointerFollowsC26OnCaseFlippedSpelling174 (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.087s
+FAIL
+--- verbatim red lines ---
+    task_pointer_authority_ac3_174r4_windows_test.go:121: two spellings of one file: long="C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerAuthorityFollowsC26NotTheSpelling174r44083709869\\001\\tool-output-174r4-alias.txt" short="C:\\Users\\swq\\AppData\\Local\\Temp\\TESTPO~1\\001\\TOOL-O~1.TXT"
+    task_pointer_authority_ac3_174r4_windows_test.go:128: alias arm verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TESTPO~1\\001\\TOOL-O~1.TXT…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:135: a pointer C26 authorizes must stay silent whatever spelling the host filed; found "注意：" in "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TESTPO~1\\001\\TOOL-O~1.TXT…]" - that is a decision made on the string, not on C26's answer
+    task_pointer_authority_ac3_174r4_windows_test.go:135: a pointer C26 authorizes must stay silent whatever spelling the host filed; found "读不到" in "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TESTPO~1\\001\\TOOL-O~1.TXT…]" - that is a decision made on the string, not on C26's answer
+    task_pointer_authority_ac3_174r4_windows_test.go:135: a pointer C26 authorizes must stay silent whatever spelling the host filed; found "不在你被授权的目录范围内" in "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TESTPO~1\\001\\TOOL-O~1.TXT…]" - that is a decision made on the string, not on C26's answer
+    task_pointer_authority_ac3_174r4_windows_test.go:157: alias arm, no root verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TESTPO~1\\001\\TOOL-O~1.TXT…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:205: workspace-narrowed arm verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r41928672425\\001\\artifacts174r4\\tool-output-174r4-narrowed.txt…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:224: workspace cleared verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r41928672425\\001\\artifacts174r4\\tool-output-174r4-narrowed.txt…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:228: clearing the narrowing must silence the notice; found "注意：" in "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r41928672425\\001\\artifacts174r4\\tool-output-174r4-narrowed.txt…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:228: clearing the narrowing must silence the notice; found "读不到" in "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r41928672425\\001\\artifacts174r4\\tool-output-174r4-narrowed.txt…]"
+    zz174v3_pointer_case_arm_windows_test.go:28: case-flip fixture: dir="C:\\Users\\swq\\AppData\\Local\\Temp\\TestV3PointerFollowsC26OnCaseFlippedSpelling174690834834\\001" real="C:\\Users\\swq\\AppData\\Local\\Temp\\TestV3PointerFollowsC26OnCaseFlippedSpelling174690834834\\001\\tool-output-174v3-case.txt" filed="C:\\USERS\\SWQ\\APPDATA\\LOCAL\\TEMP\\TESTV3POINTERFOLLOWSC26ONCASEFLIPPEDSPELLING174690834834\\001\\TOOL-OUTPUT-174V3-CASE.TXT"
+    zz174v3_pointer_case_arm_windows_test.go:41: case arm verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\USERS\\SWQ\\APPDATA\\LOCAL\\TEMP\\TESTV3POINTERFOLLOWSC26ONCASEFLIPPEDSPELLING174690834834\\001\\TOOL-OUTPUT-174V3-CASE.TXT…]"
+    zz174v3_pointer_case_arm_windows_test.go:47: C26 authorizes the real file whatever the case of the filed string; found "注意：" in "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\USERS\\SWQ\\APPDATA\\LOCAL\\TEMP\\TESTV3POINTERFOLLOWSC26ONCASEFLIPPEDSPELLING174690834834\\001\\TOOL-OUTPUT-174V3-CASE.TXT…]" - that is a decision made on the string, not on C26's answer
+    zz174v3_pointer_case_arm_windows_test.go:47: C26 authorizes the real file whatever the case of the filed string; found "读不到" in "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\USERS\\SWQ\\APPDATA\\LOCAL\\TEMP\\TESTV3POINTERFOLLOWSC26ONCASEFLIPPEDSPELLING174690834834\\001\\TOOL-OUTPUT-174V3-CASE.TXT…]" - that is a decision made on the string, not on C26's answer
+    zz174v3_pointer_case_arm_windows_test.go:47: C26 authorizes the real file whatever the case of the filed string; found "不在你被授权的目录范围内" in "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\USERS\\SWQ\\APPDATA\\LOCAL\\TEMP\\TESTV3POINTERFOLLOWSC26ONCASEFLIPPEDSPELLING174690834834\\001\\TOOL-OUTPUT-174V3-CASE.TXT…]" - that is a decision made on the string, not on C26's answer
+    zz174v3_pointer_case_arm_windows_test.go:68: case arm, no root verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\USERS\\SWQ\\APPDATA\\LOCAL\\TEMP\\TESTV3POINTERFOLLOWSC26ONCASEFLIPPEDSPELLING174690834834\\001\\TOOL-OUTPUT-174V3-CASE.TXT…]"
+
+--- banned-token code check on the mutations (paren form) ---
+.scratch/wisp/probes/174/v3/mut/task-MUT-V3A.go:0
+.scratch/wisp/probes/174/v3/mut/spill-MUT-V3C.go:0
+.scratch/wisp/probes/174/v3/mut/task-MUT-V3B.go:0
+(0 = no call token; the file's pre-existing comments still mention the phrase in prose)
+
+--- MUT-V3-C (spill leg): ask InAllowlist with a folded FILED string, not C26's answer ---
+date: 2026-10-14 15:32:41+0800
+MUT-V3-C rc=1
+PASS count: 0
+--- verbatim red lines (first 4) ---
+(first MUT-V3-C attempt failed to BUILD: canon declared and not used; fixed by a _ = canon marker, rerun below)
+date: 2026-10-14 15:33:01+0800 (rerun)
+MUT-V3-C rerun rc=1
+PASS count: 21  FAIL count: 1  SKIP count: 0
+--- FAIL: TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r4 (0.01s)
+--- verbatim red lines ---
+    spill_acl_windows_test.go:29: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:30: icacls artifacts -> [NT AUTHORITY\SYSTEM NT AUTHORITY\SYSTEM BUILTIN\Administrators BUILTIN\Administrators DESKTOP-LVS7839\swq DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:37: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+    spill_path_invariant_test.go:284: control: escape id "..\\..\\..\\..\\CONTROL-escape" resolves to "C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillContainmentByDirectoryListing3881080011\\001\\CONTROL-escape.txt" (root is "C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillContainmentByDirectoryListing3881080011\\001")
+    spill_path_invariant_test.go:307: literal-backslash control: id "..\\..\\..\\..\\CONTROL-literal" resolves to "C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillContainmentByDirectoryListing3881080011\\001\\CONTROL-literal.txt"
+RED:     spill_pointer_authority_ac3_174r4_test.go:87: arm 1 verbatim: Text="[…输出已落文件：省略 65221 字符，总长 68021 字节 / 约 17005 token；注意：这条路径现在读不到，它不在你被授权的目录范围内：fs.read 会要一张 L2 卡，没人批就是直接拒；回来的路有两条——要么用户把所属目录加进 [fs] allowed_dirs，要么批下那一张卡，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r43360942160\\001\\tool-output-call_honesty.txt…]"
+RED:     spill_pointer_authority_ac3_174r4_test.go:89: C26 answers INSIDE for the string it returned, so a pointer to it must stay quiet; got a notice in "[…输出已落文件：省略 65221 字符，总长 68021 字节 / 约 17005 token；注意：这条路径现在读不到，它不在你被授权的目录范围内：fs.read 会要一张 L2 卡，没人批就是直接拒；回来的路有两条——要么用户把所属目录加进 [fs] allowed_dirs，要么批下那一张卡，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r43360942160\\001\\tool-output-call_honesty.txt…]" - the authorization question was not asked with C26's answer (asked with: [c:\users\swq\appdata\local\temp\testspillpointerauthorityaskswiththecanonicalanswer174r43360942160\001\tool-output-call_honesty.txt], canonical: "C:\\mock\\filed\\tool-output-174-r4.txt")
+RED:     spill_pointer_authority_ac3_174r4_test.go:98: InAllowlist must be asked with Canonicalize's answer, not with the filed string: got [c:\users\swq\appdata\local\temp\testspillpointerauthorityaskswiththecanonicalanswer174r43360942160\001\tool-output-call_honesty.txt], want ["C:\\mock\\filed\\tool-output-174-r4.txt"]
+RED:     spill_pointer_authority_ac3_174r4_test.go:110: arm 2 verbatim: Text="[…输出已落文件：省略 65221 字符，总长 68021 字节 / 约 17005 token；注意：这条路径现在读不到，它不在你被授权的目录范围内：fs.read 会要一张 L2 卡，没人批就是直接拒；回来的路有两条——要么用户把所属目录加进 [fs] allowed_dirs，要么批下那一张卡，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r43360942160\\002\\tool-output-call_honesty.txt…]"
+RED:     spill_pointer_authority_ac3_174r4_test.go:122: the reverse arm must ask with the same string the forward arm did: got [c:\users\swq\appdata\local\temp\testspillpointerauthorityaskswiththecanonicalanswer174r43360942160\002\tool-output-call_honesty.txt]
+
+--- broader token check: filepath.Clean(|Abs( as CALL tokens, non-test, whole internal/ cmd/ ---
+internal/\memory\open.go:169:	abs, err := filepath.Abs(dir)
+internal/\models\manifest.go:293:	clean := filepath.ToSlash(filepath.Clean(p))
+internal/\risk\pathresolver.go:210:	if a, err := filepath.Abs(p); err == nil {
+internal/\risk\pathresolver.go:213:	return filepath.Clean(p)
+(only the sanctioned lexCanonical in internal/risk + none in the two legs)
+[... 1 logf/INFO lines elided by 174-v3 when compacting; raw dumps reproducible from the commands quoted above ...]

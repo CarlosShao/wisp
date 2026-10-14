@@ -1,0 +1,153 @@
+=== zone (iii) [fs] default + SPEC-03:35 one-byte-unchanged, 174-v3 ===
+date: 2026-10-14 15:33:50+0800
+HEAD: 037bfb7fba96890c75c7d3fab47f1f22562887c0
+
+--- SPEC-03 line 35 verbatim ---
+| 🔒 `[fs]` | `allowed_dirs[]=[]` `reparse_point_exceptions[]=[]`（按具体路径）`delete_enabled(bool)=false` | 🔒 同上 |
+
+--- its blob id at three anchors of this ticket (r1 b5a07961 / r4 2549a18a / HEAD) ---
+b5a07961: 8975f6ba8da4ac21ae500c61db8b80a208970125
+2549a18a: 8975f6ba8da4ac21ae500c61db8b80a208970125
+HEAD: 8975f6ba8da4ac21ae500c61db8b80a208970125
+
+--- commits touching that file since 2026-09-20: ---
+(empty = none)
+
+--- last change of that very line ---
+5d777f78 2026-09-19 09:11:42 +0800 chore: initial import - PLAN (D1-D46/C1-C31), 13 implementation specs, design prototypes
+
+
+--- the code-side default: schema.go:485-487 (no default: tag => zero value) ---
+	// AllowedDirs are the readable/writable roots. Additions are loosening.
+	AllowedDirs []string `toml:"allowed_dirs"`
+	// ReparsePointExceptions whitelists specific symlink/junction paths
+
+--- history of those three lines ---
+fe126e27 2026-09-19 18:53:27 +0800 feat(config): schema tree, tag defaults, strict parse with line numbers (WIP reconcile vs SPEC-03 sec 3/3.1)
+
+
+--- who builds the allowlist for the runtime (no second source) ---
+500:	allowed := make([]string, 0, len(cfg.FS.AllowedDirs))
+501:	for _, d := range cfg.FS.AllowedDirs {
+504:	rt.paths = tools.NewPathCanonicalizer(allowed, cfg.FS.ReparsePointExceptions)
+
+--- artifacts dir wiring in run.go (same dataDir, never added to roots) ---
+1045:			ArtifactsDir:  filepath.Join(rt.spec.dataDir, "artifacts"),
+1129:	// artifacts 目录、同一份缩放后的预算），产物 key 带 agent-task- 前缀，
+1141:		Spills: agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets()),
+
+--- HEAD moved during the leg; window check ---
+037bfb7f 2026-10-14 15:29:00 +0800 编排者：A931 更正（重写版；记我 heredoc 引号；推送失败按令攒量；5 腿在飞）
+f260b8a6 2026-10-14 15:26:59 +0800 编排者：A931（重启后第一波 5 腿=写3+验2；推送试发失败=代理关按令攒量）＋五份派单/send 存档（含防残影 TaskStop 常态）
+9065c659 2026-10-14 15:01:45 +0800 编排者：4.0dk 校正笔（反引号吃字补回 174-v2；照规矩追加不 amend）
+porcelain internal/ cmd/: [ M cmd/wisp/panel_control_windows.go; M internal/tools/paths.go;?? cmd/wisp/panel_unbound_253v3_windows_test.go;]
+task.go md5 now: ded82068ffd67bb28c638663e4d6c243  spill.go md5 now: f31147b4264a9c7111479d5b85e30f65
+
+--- in-process probe of the factory default (overlay-add, internal/config byte-clean) ---
+date: 2026-10-14 15:34:00+0800
+rc=0
+    zz174v3_defaults_probe_test.go:14: NewDefaults: FS.AllowedDirs=[] (len=0) ReparsePointExceptions=[] DeleteEnabled=false
+--- PASS: TestV3FSDefaultsStillEmpty174 (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/config	0.045s
+
+################ merged: former logs/04-gates.txt (same content, kept on disk uncommitted) ################
+
+--- pristine baseline of r4's four pins (no overlay): gate ---
+go test -count=1 -run '174r4' ./internal/tools/ ./internal/agent/ rc=0
+ok  	github.com/CarlosShao/wisp/internal/tools	0.083s
+ok  	github.com/CarlosShao/wisp/internal/agent	0.052s
+
+=== 174-v3 gate readings ===
+date: 2026-10-14 15:34:12+0800
+HEAD: 037bfb7fba96890c75c7d3fab47f1f22562887c0
+
+--- full-package runs (pristine tree) ---
+go test -count=1 ./internal/tools/ ./internal/agent/ ./internal/config/ rc=1
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.01s)
+    paths_shortname_252_r1_test.go:163: cwd="D:\\work\\workspace\\projects plans\\Wisp\\internal\\tools" derived repo root="D:\\work\\workspace\\projects plans\\Wisp"
+    --- FAIL: TestTicket252R1AlignmentAddsNoAuthorization/N7_inside_the_root_but_unresolvable (0.00s)
+        paths_shortname_252_r1_test.go:226:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+        paths_shortname_252_r1_test.go:226:   foldPath(canonical)           : "d:\\work\\workspace\\projects plans\\wisp\\q252r1<invalid>:*?.md"
+        paths_shortname_252_r1_test.go:226:   LEG1 rootsContain(roots,folded): true
+        paths_shortname_252_r1_test.go:226:   resolvedForm(canonical)        : "" ok=false
+        paths_shortname_252_r1_test.go:226:   foldPath(resolvedForm)         : ""
+        paths_shortname_252_r1_test.go:226:   LEG2 rootsContain(roots,foldRF): false
+        paths_shortname_252_r1_test.go:226:   InAllowlist(canonical)         : true
+        paths_shortname_252_r1_test.go:226:   FIRST FAILING LEG              : LEG 2 resolvedForm (paths.go:152-153)
+        paths_shortname_252_r1_test.go:234: AC#2 RED (widening): an unresolvable path inside the root was authorized (leg1=true leg2=false ok=false rf=""): "cannot be resolved means not authorized" must stay
+    paths_shortname_252_r1_test.go:244: short ask roots check
+--- FAIL: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.03s)
+    paths_ticket107b_probes_test.go:158: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\001\proj\esc -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\001\proj\esc <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\001\outside
+    paths_ticket107b_probes_test.go:159: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\\001\\proj\\esc" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\\001\\proj\\esc",<nil> eval(through)="",The system cannot find the path specified.
+    paths_ticket107b_probes_test.go:165: roots=[c:\users\swq\appdata\local\temp\testticket107bprobeclinkinsideallowedrootstaysoutside3789689866\001\proj] rewritten=["%WISP107B_C_ROOT%\\proj" -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\001\proj (env)] unusable=[]
+    paths_ticket107b_probes_test.go:178: Canonicalize("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\\001\\proj\\esc\\marker.txt") refused: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions (judging the lexical spelling instead)
+    paths_ticket107b_probes_test.go:180: AC#3 RED: InAllowlist("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\\001\\proj\\esc\\marker.txt") = true: it leaves the allowed root "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\\001\\proj" through the link "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\\001\\proj\\esc" and lands on "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside3789689866\\001\\proj\\esc\\marker.txt"
+--- FAIL: TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses (0.03s)
+    paths_twocontainments_252_r2_test.go:105: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\001\proj\esc -> C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\001\proj\esc <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\001\outside
+    paths_twocontainments_252_r2_test.go:106: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\proj\\esc" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\proj\\esc",<nil> eval(through)="",The system cannot find the path specified.
+    paths_twocontainments_252_r2_test.go:139: allowed root        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\proj" -> roots=["c:\\users\\swq\\appdata\\local\\temp\\testticket252r2resolvedlegrefuseswhatonlyitrefuses3742717050\\001\\proj"]
+    paths_twocontainments_252_r2_test.go:140: escaping ask        : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\proj\\esc\\marker.txt"
+    paths_twocontainments_252_r2_test.go:141: LEG1 lexical        : true
+    paths_twocontainments_252_r2_test.go:142: resolvedForm        : "" ok=false
+    paths_twocontainments_252_r2_test.go:143: LEG2 resolved       : false (refused because ok=false, or because the answer is outside the root)
+    paths_twocontainments_252_r2_test.go:144: InAllowlist         : true
+    paths_twocontainments_252_r2_test.go:145: link target written : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\outside"
+    paths_twocontainments_252_r2_test.go:146: what the link gives : "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\proj\\esc\\marker.txt"
+    paths_twocontainments_252_r2_test.go:158: TICKET 252 BAN RED (resolvedForm leg missing / two containments merged into one): InAllowlist("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\proj\\esc\\marker.txt") = true while the lexical leg is the only one that vouched for it (leg1=true leg2=false, resolvedForm="" ok=false, roots=["c:\\users\\swq\\appdata\\local\\temp\\testticket252r2resolvedlegrefuseswhatonlyitrefuses3742717050\\001\\proj"]): that path leaves the allowed root "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\proj" through the link "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\proj\\esc", which the OS reports as "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses3742717050\\001\\outside". Either half of the second leg - "it will not answer" or "its answer is elsewhere" - is the refusal, and both are the same containment in paths.go. Ticket 107's hole re-opened: the pair looks redundant on aligned input by design, and AC#2's "绝不许把两次包含改成一次" is what keeps it that way.
+--- FAIL: TestTicket252R2BothContainmentsReachable (0.01s)
+    paths_twocontainments_252_r2_test.go:283: S1 scanned 23 non-test .go files of this package; InAllowlist is declared at paths.go:201
+    paths_twocontainments_252_r2_test.go:301: TICKET 252 BAN RED (assertion a: two containments, not one): InAllowlist's body asks the authorization book 1 times, want 2 (found: [paths.go:208 key=f]). AC#2's "绝不许把两次包含改成一次" is a hard ban, and the shape this fires on is exactly the one no value test can see: after 2b1a3071 every string production hands this function is already one form, so the two legs agree on all of them and a missing leg is invisible from outside. If this deletion was NOT intended, restore both legs at paths.go:196 and paths.go:209. If the code is right and the ruler is stale, the ruler is the thing that needs a human approval, not a green test run.
+    paths_twocontainments_252_r2_test.go:344: S1 carrier: receiver="p" parameter="canonical" decl=paths.go:201
+    paths_twocontainments_252_r2_test.go:347: containment paths.go:208 key=f calls=[foldPath] tainted=false refuses=true
+    paths_twocontainments_252_r2_test.go:350: S1 re-resolution names: []
+    paths_twocontainments_252_r2_test.go:351: S1 names an if-with-return-false consults: [f p roots rootsContain string workspace]
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	14.283s
+ok  	github.com/CarlosShao/wisp/internal/agent	2.426s
+ok  	github.com/CarlosShao/wisp/internal/config	1.327s
+FAIL
+
+=== 174-v3 quiet-window re-run (the 15:33-15:34 window had another leg's in-tree paths.go mutation: porcelain showed ' M internal/tools/paths.go'; the four FAILs below were theirs, re-run here) ===
+date-in: 2026-10-14 15:35:38+0800
+porcelain in : [ M cmd/wisp/panel_control_windows.go;?? cmd/wisp/panel_unbound_253v3_windows_test.go;]
+md5 task.go=ded82068ffd67bb28c638663e4d6c243 spill.go=f31147b4264a9c7111479d5b85e30f65 paths.go=adeb51d9f817a4905a39370994eeec18
+HEAD: 037bfb7fba96890c75c7d3fab47f1f22562887c0
+--- arm baseline (-overlay=overlay-arm.json -run V3PointerFollowsC26) rc=0
+--- MUT-V3-A (-run my arm + r4 two arms) rc=1
+    --- FAIL: TestPointerAuthorityFollowsC26NotTheSpelling174r4 (0.01s)
+    --- FAIL: TestPointerAuthorityNarrowsWithWorkspaceNotLexicalRoot174r4 (0.02s)
+    --- FAIL: TestV3PointerFollowsC26OnCaseFlippedSpelling174 (0.01s)
+--- MUT-V3-B (-run read-only pin + r1 pin) rc=1
+    --- FAIL: TestPointerToMissingCopyFileSpeaks (0.01s)
+    --- FAIL: TestPointerCheckWritesNothing174r4 (0.01s)
+--- MUT-V3-C (-run Spill, agent pkg) rc=1
+    --- FAIL: TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r4 (0.01s)
+--- pristine gate r4 pins (-run 174r4) rc=0
+--- pristine defaults probe (-overlay=overlay-defaults.json -run V3FSDefaultsStillEmpty) rc=0
+porcelain out: [ M cmd/wisp/panel_control_windows.go;?? cmd/wisp/panel_unbound_253v3_windows_test.go;]
+date-out: 2026-10-14 15:35:51+0800
+
+--- full-package re-run in the same quiet window ---
+date: 2026-10-14 15:36:02+0800  porcelain: []
+go test -count=1 ./internal/tools/ ./internal/agent/ ./internal/config/ rc=0
+ok  	github.com/CarlosShao/wisp/internal/tools	14.325s
+ok  	github.com/CarlosShao/wisp/internal/agent	2.304s
+ok  	github.com/CarlosShao/wisp/internal/config	1.115s
+porcelain after: []
+
+--- d22scan (GOTMPDIR unset; the 76b9e214 fix re-verified) ---
+date: 2026-10-14 15:36:55+0800
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 111 text files
+d22scan: scope ban #8 internal/         examined 550 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 127 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=236, bans #1-5 cmd/=40, ban #6 frontend/=111, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=111, ban #8 internal/=550, ban #8 cmd/=127; ban #8 emoji coverage: design/ 39 text files; frontend/ 111 text files; internal/ 550 Go files, comments and _test.go included; cmd/ 127 Go files, comments and _test.go included
+--- path-length budget gate ---
+check-path-length-budget.sh: denominator: tracked paths=12778  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=58  past the old debt line(180)=2  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 60 paths on this tree, recomputed just now in both units
+[... 73 logf/INFO lines elided by 174-v3 when compacting; raw dumps reproducible from the commands quoted above ...]

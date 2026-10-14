@@ -1,0 +1,76 @@
+=== zone (i) read-only / no-gated-artifacts-Tool evidence, 174-v3 ===
+date: 2026-10-14 15:33:22+0800
+HEAD: 037bfb7fba96890c75c7d3fab47f1f22562887c0
+
+--- the ban verbatim (AGENTS.md:51, quoting issues/README Hard global constraints) ---
+- 把宿主内部 artifacts 写入实现成受门控的 Tool；
+211-  （冻结面，**我没有改，等 owner 定**）。按范围收紧比放宽安全：漏计会让人以为"D47 不存在、可以随便动"。
+212-- Forbidden patterns (auto-checked in CI): bare `go func(` without owner/recover; `filepath.Clean|Abs`
+213-  for fs decisions outside `risk.PathResolver`; plaintext API keys; wall-clock-difference timeouts;
+214:  hashes fetched from mirrors; panel-sourced L2 "allow"; host-internal artifact writes implemented
+
+--- model-facing surface: task family schema exposes only a roster id, never a path/write ---
+476:// taskOutputSchema is the C1 Parameters document. There is deliberately NO
+477-// offset / cursor / page token in it: PLAN.md:431 already froze the re-read
+478-// mechanism ("模型可用 fs.read 按需再读"), and ticket 164's ruling 1 forbids
+479-// inventing a second pagination scheme in this ticket.
+480:var taskOutputSchema = JSONSchema(`{"type":"object","properties":{` +
+481-	`"task_id":{"type":"string","description":"后台任务的 id（由宿主记录，不是路径）"}` +
+482-	`},"required":["task_id"],"additionalProperties":false}`)
+483-
+484-func (taskOutput) Name() string { return "task.output" }
+--
+490:func (taskOutput) Parameters() JSONSchema { return taskOutputSchema }
+491-
+
+--- artifacts appear in internal/tools only as host-filled pointer fields (no artifacts-serving Tool) ---
+internal/tools/\task_backfill.go:30:// taskArtifactPrefix is the logical prefix a background task's artifact key
+internal/tools/\task_backfill.go:46:const taskArtifactPrefix = "agent-task-"
+internal/tools/\task_backfill.go:100:// ArtifactPath follows ticket 174's rule of telling the truth: it is only ever
+internal/tools/\task_backfill.go:130:		sp, err := b.Spills.Prepare(taskArtifactPrefix+taskID, text)
+internal/tools/\task_backfill.go:138:			rec.ArtifactPath = sp.Path
+internal/tools/\task.go:105:	// ArtifactPath is where the host landed those exact bytes (the
+internal/tools/\task.go:108:	ArtifactPath string
+internal/tools/\task.go:213:// Text, ArtifactPath and State are NOT preserved - an empty State is a real
+internal/tools/\task.go:547:	if rec.ArtifactPath != "" {
+internal/tools/\task.go:548:		notice := t.d.pointerNotice(rec.ArtifactPath)
+internal/tools/\task.go:559:			box.set(rec.ArtifactPath)
+internal/tools/\task.go:563:			head, totalBytes-len(head)-len(tail), totalBytes, totalTokens, notice, rec.ArtifactPath, tail)
+
+--- the four entry families; none serves artifacts ---
+internal/\tools\fs.go:325:func BuiltinFSEntries(d FSDeps) []Entry {
+internal/\tools\fs_write.go:772:func BuiltinFSWriteEntries(d FSDeps) []Entry {
+internal/\tools\task.go:600:func BuiltinTaskEntries(d TaskDeps) []Entry {
+internal/\tools\subagent_197.go:233:func BuiltinSubagentEntries(d SubagentDeps) []Entry {
+
+--- baseline: the read-only pin, pristine tree ---
+rc=0
+    task_pointer_authority_ac3_174r4_windows_test.go:265: ghost arm verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerCheckWritesNothing174r41633884459\\001\\tool-output-174r4-ghost.txt…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:278: intact arm verbatim: IsError=false Truncated=true Text="[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerCheckWritesNothing174r41633884459\\001\\tool-output-174r4-intact.txt…]"
+--- PASS: TestPointerCheckWritesNothing174r4 (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/tools	0.043s
+
+--- MUT-V3-B (overlay): os.WriteFile(raw, nil, 0600) inserted before the existence probe ---
+date: 2026-10-14 15:33:32+0800
+MUT-V3-B rc=1
+--- FAIL: TestPointerToMissingCopyFileSpeaks (0.04s)
+--- FAIL: TestPointerCheckWritesNothing174r4 (0.05s)
+--- verbatim red lines (FS facts) ---
+    task_output_pointer_notice_test.go:165: a pointer at a missing copy file must say so, got "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerToMissingCopyFileSpeaks2941964888\\001\\tool-output-does-not-exist.txt…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:271: a pointer at a missing copy file must say so, got "[…输出已落文件：省略 17200 字符，总长 20000 字节 / 约 5000 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestPointerCheckWritesNothing174r42219083143\\001\\tool-output-174r4-ghost.txt…]"
+    task_pointer_authority_ac3_174r4_windows_test.go:274: answering a pointer at an absent copy file must NOT create it: Lstat=<nil>
+    task_pointer_authority_ac3_174r4_windows_test.go:288: the pointer check wrote into the artifacts tree: before=[tool-output-174r4-intact.txt] after=[tool-output-174r4-ghost.txt tool-output-174r4-intact.txt]
+
+--- the D34 roster face: which existing criteria reference it ---
+internal/tools/bridge_junction_windows_test.go
+internal/tools/failclosed_236_teeth_test.go
+internal/tools/fs_test.go
+internal/tools/fs_edit_test.go
+internal/tools/fs_edit_ac5_gate_r4_test.go
+internal/tools/fs_write_test.go
+internal/tools/task_cancel_221_legs_test.go
+internal/tools/tasklist_deferred_236r3_teeth_test.go
+internal/tools/tier_consistency_172_ruler_test.go
+internal/tools/tier_consistency_172_machine_test.go
+internal/tools/tier_consistency_172_cases_test.go
+--- and the whole tools+agent+config packages ran green (see 04-gates.txt, rc=0 15:35:5x) ---
