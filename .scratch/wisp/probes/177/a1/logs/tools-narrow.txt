@@ -1,0 +1,19 @@
+time=2026-10-14T19:57:52.369+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPointer183BackfilledArtifactRereadStaysClean
+time=2026-10-14T19:57:52.424+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp177a1gotmp\TestPointer183BackfilledArtifactRereadStaysClean14825335\001\artifacts kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestPointer183BackfilledArtifactRereadStaysClean (0.12s)
+=== RUN   TestPointer183SiblingArtifactInTheSameDirectoryStillHits
+time=2026-10-14T19:57:52.527+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp177a1gotmp\TestPointer183SiblingArtifactInTheSameDirectoryStillHits104158797\001\artifacts kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestPointer183SiblingArtifactInTheSameDirectoryStillHits (0.05s)
+=== RUN   TestLongOutputPointerRecoversEveryByte
+--- PASS: TestLongOutputPointerRecoversEveryByte (0.03s)
+=== RUN   TestPointerPast256KiBIsNotFullyReadable
+--- PASS: TestPointerPast256KiBIsNotFullyReadable (0.30s)
+=== RUN   TestTaskOutputStampedOnRealBridge175r2
+--- PASS: TestTaskOutputStampedOnRealBridge175r2 (0.01s)
+=== RUN   TestForeignMentionOfHostPathStillHitsR4OnRealBridge175r2
+--- PASS: TestForeignMentionOfHostPathStillHitsR4OnRealBridge175r2 (0.04s)
+=== RUN   TestHostMintedPointerRereadStaysCleanOnRealBridge175r2
+--- PASS: TestHostMintedPointerRereadStaysCleanOnRealBridge175r2 (0.03s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	6.206s

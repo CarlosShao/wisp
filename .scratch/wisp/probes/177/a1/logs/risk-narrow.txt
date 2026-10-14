@@ -1,0 +1,55 @@
+time=2026-10-14T19:56:21.082+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted
+--- PASS: TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted (0.01s)
+=== RUN   TestPointer183RefereeControlBodyWithoutTwinIsClean
+--- PASS: TestPointer183RefereeControlBodyWithoutTwinIsClean (0.02s)
+=== RUN   TestPointer183PathAppearingTwiceInBodyStaysExempted
+--- PASS: TestPointer183PathAppearingTwiceInBodyStaysExempted (0.02s)
+=== RUN   TestPointer183BodySecretOutsideSpanStillHits
+--- PASS: TestPointer183BodySecretOutsideSpanStillHits (0.01s)
+=== RUN   TestPointer183ForeignMarkCarryingSamePathStillHits
+--- PASS: TestPointer183ForeignMarkCarryingSamePathStillHits (0.01s)
+=== RUN   TestPointer183AlmostPathInSameHostMarkStillHits
+--- PASS: TestPointer183AlmostPathInSameHostMarkStillHits (0.01s)
+=== RUN   TestPointer183WorstCaseOfTheLandedExemptionIsPinned
+--- PASS: TestPointer183WorstCaseOfTheLandedExemptionIsPinned (0.01s)
+=== RUN   TestPointer183DeclaredPathAbsentFromBodyStillHits
+--- PASS: TestPointer183DeclaredPathAbsentFromBodyStillHits (0.02s)
+=== RUN   TestPointer185SecondRereadOfAHostArtifactIsClean
+--- PASS: TestPointer185SecondRereadOfAHostArtifactIsClean (0.01s)
+=== RUN   TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt
+--- PASS: TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt (0.01s)
+=== RUN   TestPointer185AModelNominatedFileIsNotOnTheRoster
+--- PASS: TestPointer185AModelNominatedFileIsNotOnTheRoster (0.01s)
+=== RUN   TestPointer185ForeignContentCarryingTheHostPathStillHits
+--- PASS: TestPointer185ForeignContentCarryingTheHostPathStillHits (0.01s)
+=== RUN   TestPointer185RosterDoesNotCrossScopeIDs
+--- PASS: TestPointer185RosterDoesNotCrossScopeIDs (0.01s)
+=== RUN   TestPointer185RosterDiesWithTheMarksItWasDerivedFrom
+--- PASS: TestPointer185RosterDiesWithTheMarksItWasDerivedFrom (0.01s)
+=== RUN   TestPointer185SiblingArtifactInSameDirectoryStillHits
+--- PASS: TestPointer185SiblingArtifactInSameDirectoryStillHits (0.01s)
+=== RUN   TestPointer185OneRuneDifferentPathStillHits
+--- PASS: TestPointer185OneRuneDifferentPathStillHits (0.01s)
+=== RUN   TestPointer185SameBasenameOtherDirectoryStillHits
+--- PASS: TestPointer185SameBasenameOtherDirectoryStillHits (0.01s)
+=== RUN   TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan
+--- PASS: TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan (0.04s)
+=== RUN   TestShapeAHostReReadOfDeclaredPathIsClean
+--- PASS: TestShapeAHostReReadOfDeclaredPathIsClean (0.01s)
+=== RUN   TestShapeAW1RestOfHostMarkStillIndexed
+--- PASS: TestShapeAW1RestOfHostMarkStillIndexed (0.01s)
+=== RUN   TestShapeAW2ForeignMarkCarryingSamePathStillHits
+--- PASS: TestShapeAW2ForeignMarkCarryingSamePathStillHits (0.04s)
+=== RUN   TestShapeAW3NeverMintedSiblingUnderSameDirStillHits
+--- PASS: TestShapeAW3NeverMintedSiblingUnderSameDirStillHits (0.01s)
+=== RUN   TestShapeAW4PositionalExclusionNeverLeavesHostMark
+--- PASS: TestShapeAW4PositionalExclusionNeverLeavesHostMark (0.05s)
+=== RUN   TestShapeAFExclusionDiesWithScopeClose
+--- PASS: TestShapeAFExclusionDiesWithScopeClose (0.01s)
+=== RUN   TestShapeAW5EmptyCheckPrecedesExclusion
+--- PASS: TestShapeAW5EmptyCheckPrecedesExclusion (0.02s)
+=== RUN   TestShapeAOrderOneSpanLocatedAfterNormalization
+--- PASS: TestShapeAOrderOneSpanLocatedAfterNormalization (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	1.792s
