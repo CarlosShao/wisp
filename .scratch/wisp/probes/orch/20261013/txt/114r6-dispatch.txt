@@ -1,0 +1,19 @@
+# 114-r6 派单（票 114 AC#10：可达性钉认"第三装法"；写腿；面＝internal/panel 测试面）
+
+发送时刻：2026-10-14 16:4x +08。编排者派发（依据＝`114-v1` 顶回＋编排者重裁，见票面 AC#10 框内注）。
+你 = Wisp 流水线的落地腿 **114-r6**（`probes/114/` 现 a2/a5/v1，r6 可用；查重已做）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 目标（AC#10，重裁后口径）
+
+- **面＝本队可写仪器格**（⛔ 非 frontend）。事实链（`114-v1` 现读）：真门＝`cmd/wisp/panel_host_windows.go:80` 的 const ＋ **`:842` 的 `w.Bind("wispDispatch")`**（第三装法）；现有可达性钉 `internal/panel/composer_test.go:441` **只认 `.postMessage(`** ⇒ 第三装法在尺的射程外。
+- **补钉方向**：让可达性裁决**认第三装法**（能力形）：至少 ① 产码里 `w.Bind("wispDispatch")` 存在性被某尺断言；② 造"把 `w.Bind` 摘掉/把绑定名换掉"的突变 ⇒ 指名的钉**必须红**且点名；③ `.postMessage(`-only 假腿仍红（既有牙不回退）。⚠ `panel.ts 注释自陈两种装法`那半归前端（本腿不碰）。
+- ⛔ 若落地必须动 `cmd/wisp/**` 产码（不止测试）⇒ **停手上报**（本腿是仪器面；产码那一行 `w.Bind` 是既有的，别动）。
+- 交件：`probes/114/r6/00-anchor-and-gates.md`＋logs（三向读数逐字）＋票 114 尾**追加 1 条 bullet**。产出 ≤6 枚 ≤200 行。
+
+## 环境与纪律
+
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**，两次暂存泄漏先例在前）；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（MSYS 形）；`GOTMPDIR` ⛔ 只**反斜杠形** `C:\tmp\wisp114r6gotmp`；判据 `-run` 小射程；⛔ 整包 cmd/wisp（314 死区）；窗口逐报（他腿 `201-a1`（approval 面）在飞）。
+- 门禁：build rc=0／gofumpt 动过的件空／`-run` rc=0／d22scan clean／长度门 GREEN（60=60）。
+- **未定义即停**：`w.Bind` 的行号/常量现读与 `114-v1` 报的对不上／换名突变做不圆 ⇒ 停手上报。
+- 回执：结论先行＋commit sha（产码/交付分开）＋三向红/绿句逐字＋门禁 rc＋具名没做。

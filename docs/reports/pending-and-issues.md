@@ -17906,3 +17906,6 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **重裁 AC#10（v1 顶回、我落）**：面＝**本队可写仪器格**——真门 `panel_host_windows.go:80` const＋`:842 w.Bind`，现钉只认 `.postMessage(` ⇒ 补钉方向＝认第三装法；panel.ts 注释半归前端。
 - **派**：`114-r6`（AC#10 补钉）／`201-a1`（junction 卡面 `dirOf` 险情活体复量；先量不修）。派单/send 在盘。
 - **结算**：`114-v1` 本回应 TaskStop；编队（2）＝`114-r6`＋`201-a1`。⛔ 未推＝**67 笔**（**推送邀请已发出、等机主开代理**）。
+
+
+- **A937 补**：派 `114-r6`（AC#10 补第三装法钉）／`201-a1`（junction dirOf 险情活体复量）。编队（2）。派单/send 存档在盘。
