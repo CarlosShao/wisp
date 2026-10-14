@@ -1,0 +1,34 @@
+# 正控（pristine 树，两次：突变前 00 发／全部还原后终态发）——逐字摘自原始日志
+# cmd: GOTMPDIR=C:\tmp\wisp252r4gotmp go test -count=1 -v -run 'TestTicket252|TestTicket107b' ./internal/tools/
+
+== 起手发 00-pristine-252verbatim.log（范围只含 TestTicket252*）
+rc=0；topPASS=10 subPASS=22 topFAIL=0 subFAIL=0 skip=0
+--- PASS: TestTicket252P1AllowlistLegs (0.01s)
+--- PASS: TestTicket252P1OwnerMachineReachability (0.01s)
+--- PASS: TestTicket252P1EnvSpellingCensus (0.00s)
+--- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.01s)
+--- PASS: TestTicket252R1BothSpellingsAnswerTheSame (0.04s)
+--- PASS: TestTicket252R1AlignmentAddsNoAuthorization (0.01s)
+--- PASS: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+--- PASS: TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses (0.15s)
+--- PASS: TestTicket252R2BothContainmentsReachable (0.06s)
+--- PASS: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/tools	2.480s
+
+== 终态发 50-pristine-after-restore-all.log（范围含 TestTicket107b*；paths.go sha256=28890e63… 与备份逐字节同）
+rc=0；topPASS=13 subPASS=22 topFAIL=0 subFAIL=0 skip=0
+--- PASS: TestTicket252P1AllowlistLegs (0.01s)
+--- PASS: TestTicket252P1OwnerMachineReachability (0.01s)
+--- PASS: TestTicket252P1EnvSpellingCensus (0.00s)
+--- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.01s)
+--- PASS: TestTicket252R1BothSpellingsAnswerTheSame (0.04s)
+--- PASS: TestTicket252R1AlignmentAddsNoAuthorization (0.01s)
+--- PASS: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+--- PASS: TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing (0.04s)
+--- PASS: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.05s)
+--- PASS: TestTicket107bProbeBJudgedTreeIsTheOpenedTree (0.04s)
+--- PASS: TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses (0.04s)
+--- PASS: TestTicket252R2BothContainmentsReachable (0.01s)
+--- PASS: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses (0.01s)
+
+（子测试 22 枚全 PASS、零 SKIP；原始件在盘 C:\tmp\wisp252r4\logs\00-*.log/50-*.log）

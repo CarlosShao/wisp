@@ -1,0 +1,29 @@
+# 反形对照：按返回值恒等式的旧形，在 M-lex 与 M-fold 两棵同一突变树上仍绿（逐字 PASS 行）
+# 旧形所在：run252 内 final == (leg1 && leg2)（paths_shortname_252_probe_test.go:192）与
+# R1BothSpellings 的 :143/:147 恒等式；它们只喂 Canonicalize 之后的同形串 ⇒ 对删段无鉴别力。
+
+== M-lex 树（同 10-mlex-all.log）
+--- PASS: TestTicket252P1AllowlistLegs (0.02s)
+--- PASS: TestTicket252P1OwnerMachineReachability (0.02s)
+--- PASS: TestTicket252P1EnvSpellingCensus (0.00s)
+--- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.01s)
+--- PASS: TestTicket252R1BothSpellingsAnswerTheSame (0.06s)
+--- PASS: TestTicket252R1AlignmentAddsNoAuthorization (0.02s)
+--- PASS: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+--- PASS: TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing (0.06s)
+--- PASS: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.05s)
+--- PASS: TestTicket107bProbeBJudgedTreeIsTheOpenedTree (0.09s)
+--- PASS: TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses (0.05s)
+
+== M-fold 树（同 20-mfold-all.log）
+--- PASS: TestTicket252P1AllowlistLegs (0.01s)
+--- PASS: TestTicket252P1OwnerMachineReachability (0.01s)
+--- PASS: TestTicket252P1EnvSpellingCensus (0.00s)
+--- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.01s)
+--- PASS: TestTicket252R1BothSpellingsAnswerTheSame (0.02s)
+--- PASS: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+--- PASS: TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing (0.03s)
+--- PASS: TestTicket107bProbeBJudgedTreeIsTheOpenedTree (0.03s)
+--- PASS: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses (0.00s)
+
+（对照：同一两棵树上判据尺 S1/W1/W2 各红——见 20/30 两件；reds 与 greens 出自同一发日志）

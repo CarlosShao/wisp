@@ -1,0 +1,35 @@
+# 发 M-lex：删词法腿（paths.go:208-210 三行整摘）——rc=1；判据尺红句逐字
+# 红句 1（S1 调用图尺，可携）——
+    paths_twocontainments_252_r2_test.go:301: TICKET 252 BAN RED (assertion a: two containments, not one): InAllowlist's body asks the authorization book 1 times, want 2 (found: [paths.go:218 key=foldPath(rf)]). AC#2's "绝不许把两次包含改成一次" is a hard ban, and the shape this fires on is exactly the one no value test can see: after 2b1a3071 every string production hands this function is already one form, so the two legs agree on all of them and a missing leg is invisible from outside. If this deletion was NOT intended, restore both legs at paths.go:196 and paths.go:209. If the code is right and the ruler is stale, the ruler is the thing that needs a human approval, not a green test run.
+
+# 红句 2（W1 词法腿值证，Windows）——B1 格
+    paths_twocontainments_252_r2_windows_test.go:89: TICKET 252 BAN RED (lexical containment missing / two containments merged into one): InAllowlist("D:\\work\\WORKSP~1\\PROJEC~1\\Wisp\\q252r2-lexical-leg-only.md") = true (the 8.3 spelling of the allowed root, new file under it) although the lexical leg refuses it: foldPath(canonical)="d:\\work\\worksp~1\\projec~1\\wisp\\q252r2-lexical-leg-only.md" sits under no root in ["d:\\work\\workspace\\projects plans\\wisp"], and only resolvedForm="D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" (ok=true) would. AC#2's "绝不许把两次包含改成一次" is what keeps that leg in the code; ticket 107 round 2's own note (paths.go:199-207, "Requiring both is strictly narrower") is the reason it may not be called redundant and removed.
+
+# W1 B1 格同格值读数（t.Logf 逐字，节选自 10-mlex-all.log:407-415）
+=== RUN   TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B1_short-of-existing-tree_+_missing-leaf
+    paths_twocontainments_252_r2_windows_test.go:76:   Roots()                       : ["d:\\work\\workspace\\projects plans\\wisp"]
+    paths_twocontainments_252_r2_windows_test.go:76:   foldPath(canonical)           : "d:\\work\\worksp~1\\projec~1\\wisp\\q252r2-lexical-leg-only.md"
+    paths_twocontainments_252_r2_windows_test.go:76:   LEG1 rootsContain(roots,folded): false
+    paths_twocontainments_252_r2_windows_test.go:76:   resolvedForm(canonical)        : "D:\\work\\workspace\\projects plans\\Wisp\\q252r2-lexical-leg-only.md" ok=true
+    paths_twocontainments_252_r2_windows_test.go:76:   foldPath(resolvedForm)         : "d:\\work\\workspace\\projects plans\\wisp\\q252r2-lexical-leg-only.md"
+    paths_twocontainments_252_r2_windows_test.go:76:   LEG2 rootsContain(roots,foldRF): true
+    paths_twocontainments_252_r2_windows_test.go:76:   InAllowlist(canonical)         : true
+    paths_twocontainments_252_r2_windows_test.go:76:   FIRST FAILING LEG              : LEG 1 lexical (paths.go:140 rootsContain(p.roots, foldPath(canonical)))
+
+# FAIL 名册（逐字）
+--- FAIL: TestTicket252R2BothContainmentsReachable (0.02s)
+--- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses (0.01s)
+    --- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B1_short-of-existing-tree_+_missing-leaf (0.00s)
+    --- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses/B2_short-of-existing-tree_itself (0.00s)
+# PASS 名册（同发同树；旧恒等式形全绿见 50-antiform-green.txt）
+--- PASS: TestTicket252P1AllowlistLegs (0.02s)
+--- PASS: TestTicket252P1OwnerMachineReachability (0.02s)
+--- PASS: TestTicket252P1EnvSpellingCensus (0.00s)
+--- PASS: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.01s)
+--- PASS: TestTicket252R1BothSpellingsAnswerTheSame (0.06s)
+--- PASS: TestTicket252R1AlignmentAddsNoAuthorization (0.02s)
+--- PASS: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+--- PASS: TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing (0.06s)
+--- PASS: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.05s)
+--- PASS: TestTicket107bProbeBJudgedTreeIsTheOpenedTree (0.09s)
+--- PASS: TestTicket252R2ResolvedLegRefusesWhatOnlyItRefuses (0.05s)
