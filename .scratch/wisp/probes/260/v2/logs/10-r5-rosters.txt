@@ -1,0 +1,50 @@
+=== r5 commit rosters 2026-10-14 10:43:32 ===
+## 8174c325 2026-10-04 14:09:43 +0800 260-r5 骨架：证据件九节先立＋★可达性�
+.scratch/wisp/probes/260/r5/instrument.md
+.scratch/wisp/probes/260/r5/logs/baseline-gotest-names.txt
+.scratch/wisp/probes/260/r5/logs/probe-registerhotkey-handle-refusal.txt
+.scratch/wisp/probes/260/r5/logs/ruler-build-tags.txt
+.scratch/wisp/probes/260/r5/logs/ruler-receipt-writesite.txt
+.scratch/wisp/probes/260/r5/logs/ruler-takeesc-testcallers.txt
+## 629f146b 2026-10-04 14:29:13 +0800 260-r5 交件（码）：票 260 AC#2 那枚会响的�
+internal/ball/hotkey_borrow_refused_260r5_test.go
+## ed892e6e 2026-10-04 14:50:09 +0800 260-r5 校尺（码）：把 AC#2 那句症状本身�
+internal/ball/hotkey_borrow_refused_260r5_test.go
+## 6ab2efdd 2026-10-04 15:00:04 +0800 260-r5 交件（证据）：instrument.md 九节写满
+.scratch/wisp/probes/260/r5/instrument.md
+.scratch/wisp/probes/260/r5/logs/ball_windows.go.head-blob
+.scratch/wisp/probes/260/r5/logs/gate-final-block.txt
+.scratch/wisp/probes/260/r5/logs/gate-gofumpt.txt
+.scratch/wisp/probes/260/r5/logs/gate-path-length-budget.txt
+.scratch/wisp/probes/260/r5/logs/gate-test-260r5-verbose.txt
+.scratch/wisp/probes/260/r5/logs/gate-vet-ball-winelive-tag.txt
+.scratch/wisp/probes/260/r5/logs/gate-vet-ball.txt
+.scratch/wisp/probes/260/r5/logs/mutation-M1-drop-receipt-write-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs/mutation-M2-canned-error-receipt-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs/mutation-M2b-canned-default-key-line-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs/mutation-M3-no-return-after-refusal-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs/mutation-md5-ledger.txt
+.scratch/wisp/probes/260/r5/logs/mutation-restored-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs/mutation-summary.txt
+.scratch/wisp/probes/260/r5/mutate260r5.py
+## 5ad1a7b8 2026-10-04 15:14:54 +0800 260-r5 收尾：名册与还原证明落档（rosters-
+.scratch/wisp/probes/260/r5/instrument.md
+.scratch/wisp/probes/260/r5/logs/rosters-260r5.txt
+## 5d680d78 2026-10-04 15:29:49 +0800 260-r5 交底（证据）：仓库外那枚探针确�
+.scratch/wisp/probes/260/r5/instrument.md
+## b617084e 2026-10-05 11:26:31 +0800 260-r5 复跑笔（票 260 AC#2 判据在今天锚点�
+.scratch/wisp/probes/260/r5/evidence.md
+.scratch/wisp/probes/260/r5/logs-recheck/ball_windows.go.head-blob
+.scratch/wisp/probes/260/r5/logs-recheck/baseline-gotest-plain.txt
+.scratch/wisp/probes/260/r5/logs-recheck/gate-readings.txt
+.scratch/wisp/probes/260/r5/logs-recheck/mutation-M1-drop-receipt-write-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs-recheck/mutation-M1b-drop-both-writes-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs-recheck/mutation-M3-no-return-after-refusal-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs-recheck/mutation-M4-drop-mirror-only-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs-recheck/mutation-md5-ledger.txt
+.scratch/wisp/probes/260/r5/logs-recheck/mutation-restored-go-test-v.txt
+.scratch/wisp/probes/260/r5/logs-recheck/ruler-takeesc-callers-20261005.txt
+.scratch/wisp/probes/260/r5/mutate260r5-m4.py
+.scratch/wisp/probes/260/r5/mutate260r5-recheck.py
+## 8a463bc6 2026-10-05 11:27:33 +0800 260-r5 兑现笔（名册只有 evidence.md 一枚）�
+.scratch/wisp/probes/260/r5/evidence.md

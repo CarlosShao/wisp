@@ -1,0 +1,76 @@
+=== scope & separation 2026-10-14 10:47:33 ===
+-- TakeEscForCancel test callers (all):
+internal\ball\hotkey_cancel_borrow_live_260_test.go:37:	b.TakeEscForCancel()
+internal\ball\hotkey_cancel_borrow_live_260_test.go:70:	b.TakeEscForCancel()
+internal\ball\hotkey_live_test.go:373:	b.TakeEscForCancel()
+internal\ball\hotkey_cancel_borrow_260_test.go:48:// is the shape TakeEscForCancel leaves behind on the real ball.
+internal\ball\interaction_live_test.go:141:			b.TakeEscForCancel() // B1: Esc is the cancel key while Confirming
+internal\ball\live_windows_test.go:126:	b.TakeEscForCancel()
+internal\ball\hotkey_borrow_refused_260r5_test.go:14:// every case that calls Ball.TakeEscForCancel sits behind //go:build windows &&
+internal\ball\hotkey_borrow_refused_260r5_test.go:44:// names a handle this process does not own. Then the shipped TakeEscForCancel runs
+internal\ball\hotkey_borrow_refused_260r5_test.go:145:// shipped Ball.TakeEscForCancel on it. cfg.Cancel is the planted binding.
+internal\ball\hotkey_borrow_refused_260r5_test.go:202:		b.TakeEscForCancel()
+internal\ball\hotkey_borrow_refused_260r5_test.go:233:// ball_windows.go:892-899 through the shipped TakeEscForCancel, with no window, no
+internal\ball\hotkey_borrow_refused_260r5_test.go:391:// TakeEscForCancel's idempotency branch (ball_windows.go:883-885) returns before any
+internal\ball\hotkey_status_test.go:257:	// holds it, and the caller must be told (TakeEscForCancel is idempotent on
+cmd\wisp\resident_cancel_key_wording_260r3_windows_test.go:21:// line TakeEscForCancel fills from the SAME cancelBorrow it hands to
+-- per-file build tag:
+head: cannot open 'internal\ball\hotkey_borrow_refused_260r5_test.go'$'\r' for reading: No such file or directory
+internal\ball\hotkey_borrow_refused_260r5_test.go : 
+head: cannot open 'internal\ball\hotkey_cancel_borrow_live_260_test.go'$'\r' for reading: No such file or directory
+internal\ball\hotkey_cancel_borrow_live_260_test.go : 
+head: cannot open 'internal\ball\hotkey_live_test.go'$'\r' for reading: No such file or directory
+internal\ball\hotkey_live_test.go : 
+head: cannot open 'internal\ball\hotkey_status_test.go'$'\r' for reading: No such file or directory
+internal\ball\hotkey_status_test.go : 
+head: cannot open 'internal\ball\hotkey_cancel_borrow_260_test.go'$'\r' for reading: No such file or directory
+internal\ball\hotkey_cancel_borrow_260_test.go : 
+head: cannot open 'internal\ball\interaction_live_test.go'$'\r' for reading: No such file or directory
+internal\ball\interaction_live_test.go : 
+head: cannot open 'internal\ball\live_windows_test.go'$'\r' for reading: No such file or directory
+internal\ball\live_windows_test.go : 
+cmd\wisp\resident_cancel_key_wording_260r3_windows_test.go : //go:build windows
+-- 260-r5 ruler scope quote (lines 5-18):
+// Ticket 260 AC#2, leg 260-r5: a ruler that can HEAR the borrow being refused.
+//
+// What the cell asks for, from the ticket: plant "the borrow request went out but
+// Win32 never lent the key" and make the step that says so go red - in a
+// non-winelive case, with no t.Skip, and NOT in the shape the two existing rulers
+// use, where the test itself pastes the failure line back into the report with
+// withCancel(cancelFailedLine(...)) and the wiring is never walked.
+//
+// Why nobody had one (260-v1's measurement, re-run by this leg before writing):
+// every case that calls Ball.TakeEscForCancel sits behind //go:build windows &&
+// winlive (logs/ruler-takeesc-testcallers.txt and logs/ruler-build-tags.txt under
+// .scratch/wisp/probes/260/r5/), so deleting the failure-receipt write at
+// ball_windows.go:892-899 out of production leaves this whole package green.
+// That silence is AC#2's defect.
+-- 258 rebind ruler scope quote:
+// TestLive258ResidentRebindsWithoutRestart is AC#2's live form: the process is
+// UP on a planted non-default summon, then config.toml is edited underneath
+// it; the poll (1s) must rebind the live keys inside the same process.
+//
+// THE RULER WAS FIXED IN 258-R2 (258-v1 §5 condition (i)): the judge used to
+// grep the console equals shape (summon=VALUE) off the sink, but the sink is a
+// slog JSON file and the rebind record spells it "summon":"VALUE" - so the
+// read could never hit and the case failed on a working line. The reading now
+// goes through sinkRebindLineHas258 (cmd/wisp/resident_hotkey_258_test.go,
+// pinned in CI by Test258SinkRebindRulerReadsBothSpellings), which judges the
+// record in either spelling and reads "absent" as absent. What cannot be read
+// at all - a sink that never opened - fails named, with the tail attached, not
+// silently.
+func TestLive258ResidentRebindsWithoutRestart(t *testing.T) {
+	exe := buildWispForTest(t)
+	dataDir := t.TempDir()
+-- 258/r5 ruler intersection greps:
+r5 file Rebind count: 0
+258 winlive file TakeEscForCancel|Borrow count: 0
+-- RebindHotkeys doc quote (ball_windows.go:805-812):
+// poll; HotkeyReloader still diffs so the Win32 churn happens once per change.
+//
+// A rebind drops an in-flight Esc borrow (escTakenOver below): the new binding
+// set is the idle set, and the idle set does not include cancel (ticket 245).
+// A host that rebinds while a card is waiting therefore has to call
+// TakeEscForCancel again on the next state sync - no caller does that today
+// because the config poll and the card live on different legs, and the residual
+// is named in ticket 245 rather than papered over.

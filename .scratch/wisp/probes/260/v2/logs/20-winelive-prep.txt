@@ -1,0 +1,9 @@
+### winlive prep 2026-10-14 10:45:53
+-- pre-run tasklist wisp/go:
+(none)
+-- internal/ball clean check:
+(empty=clean)
+-- ball_windows.go sha256 pre-run:
+89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 *internal/ball/ball_windows.go
+-- go list deps winlive grep sherpa:
+(no sherpa dep)

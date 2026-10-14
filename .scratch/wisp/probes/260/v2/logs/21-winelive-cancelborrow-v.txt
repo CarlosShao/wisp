@@ -1,0 +1,16 @@
+### winlive run start 2026-10-14 10:46:03
+time=2026-10-14T10:46:07.106+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLiveCancelBorrowDefaultUnchanged260
+time=2026-10-14T10:46:07.439+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-14T10:46:07.457+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+--- PASS: TestLiveCancelBorrowDefaultUnchanged260 (0.35s)
+=== RUN   TestLiveCancelBorrowFollowsConfig260
+time=2026-10-14T10:46:07.485+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+Y
+time=2026-10-14T10:46:07.489+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Ctrl+Alt+Y
+--- PASS: TestLiveCancelBorrowFollowsConfig260 (0.04s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/ball	1.272s
+rc=0
+### winlive run end 2026-10-14 10:46:07
+-- post-run tasklist wisp:
+(none - no leftover process)

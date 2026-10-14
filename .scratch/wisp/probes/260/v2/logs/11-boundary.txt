@@ -1,0 +1,19 @@
+=== boundary checks 2026-10-14 10:43:51 ===
+-- git log -1 -- internal/ball/ball_windows.go:
+b1e59d63900dd6ba1906d494f27949afbe31807e 2026-10-04 10:01:15 +0800 260-r1 补一句实话：借用吃配置之后，idle 那行日志不许再说 "Esc is borrowed"
+-- git diff c6cf66e6..HEAD -- internal/ball/ball_windows.go (r5 recheck start anchor):
+(end diff1)
+-- git diff c43a791a..HEAD -- internal/ball/ (r5 Oct4 start anchor, whole package):
+ internal/ball/hotkey_borrow_refused_260r5_test.go | 448 ++++++++++++++++++++++
+ 1 file changed, 448 insertions(+)
+(end diff2)
+-- git log --oneline c6cf66e6..HEAD -- internal/ball/ :
+(end log)
+-- working tree vs HEAD:
+(end status)
+-- roster of the two named commits outside probes:
+(end non-probes lines; empty = all inside)
+-- 260-r5 ruler mentions Rebind:
+0
+-- 258 rebind ruler mentions TakeEscForCancel/Borrow:
+0

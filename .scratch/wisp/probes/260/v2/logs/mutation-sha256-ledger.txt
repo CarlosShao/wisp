@@ -1,0 +1,17 @@
+### 260-v2 mutation ledger (sha256; md5 only as r5 cross-check)
+script started 2026-10-14 10:49:23
+start ball_windows.go: working=89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 blob=89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 backup=89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 identical=True
+start hotkey_windows.go: working=13b15011c73544d16930f9a8902fea0dbeb35dd2b7e460aeea57f84c50850cdc blob=13b15011c73544d16930f9a8902fea0dbeb35dd2b7e460aeea57f84c50850cdc backup=13b15011c73544d16930f9a8902fea0dbeb35dd2b7e460aeea57f84c50850cdc identical=True
+M-A-drop-receipt-write: window 2026-10-14 10:49:23 -> 2026-10-14 10:49:25 rc=1 mutated-sha256=b76d9cf7e1250af86776ef309a33297ee462b4b65c84fb9b62768a67fe443e93 mutated-md5=51d4024f927c55a84565dee91039cac1 restored-sha256=89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 restored-ok=True
+    verdicts PASS=66 FAIL=3 SKIP=0 reds=['TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)', 'TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)', 'TestC21TableColourRowsMatchTokensCSS (0.00s)']
+M-B-silent-receipt: window 2026-10-14 10:49:25 -> 2026-10-14 10:49:27 rc=1 mutated-sha256=fa34a743d8755d3316549fa20f1f927e4e4e29c9176e5f2b9141bd374b6e7c0f mutated-md5=fe2c129e7a1f0337bdcedaa8b52d6062 restored-sha256=89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 restored-ok=True
+    verdicts PASS=1 FAIL=2 SKIP=0 reds=['TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)', 'TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)']
+M-C-drop-refusal-log: window 2026-10-14 10:49:27 -> 2026-10-14 10:49:29 rc=1 mutated-sha256=d679c997025438e1ee7c8229825f2c35ba0af7ed319282312d782575f8b181f8 mutated-md5=8829b2c9dfef93eb26347ba6bac424c2 restored-sha256=13b15011c73544d16930f9a8902fea0dbeb35dd2b7e460aeea57f84c50850cdc restored-ok=True
+    verdicts PASS=2 FAIL=1 SKIP=0 reds=['TestRefusedBorrowIsNamedOnTheReport260r5 (0.00s)']
+M-D-receipt-failed-set-claims-live: window 2026-10-14 10:49:29 -> 2026-10-14 10:49:31 rc=1 mutated-sha256=d6d1b43153d87ce614a7f13523716d4b8b5d80da505c7a94cfd858eb61dab9ca mutated-md5=562144a34fa258caf6667e18986baee5 restored-sha256=89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 restored-ok=True
+    verdicts PASS=2 FAIL=1 SKIP=0 reds=['TestWindowlessSTAReachesTheBorrowWiring260r5 (0.01s)']
+M-E-drop-mirror-only: window 2026-10-14 10:49:31 -> 2026-10-14 10:49:34 rc=0 mutated-sha256=34ea6ad27e1de1bea7fc342d73b763837dece866eddae48e7a63829f8130892d mutated-md5=3cfc5ee9d780e796aa20abae9f4b2791 restored-sha256=89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 restored-ok=True
+    verdicts PASS=3 FAIL=0 SKIP=0 reds=[]
+FINAL ball_windows.go: sha256=89c543601be926a1df26b6b0166f7c03952f62ebeca955c7c889099c975984d1 matches_start=True
+FINAL hotkey_windows.go: sha256=13b15011c73544d16930f9a8902fea0dbeb35dd2b7e460aeea57f84c50850cdc matches_start=True
+script ended 2026-10-14 10:49:34

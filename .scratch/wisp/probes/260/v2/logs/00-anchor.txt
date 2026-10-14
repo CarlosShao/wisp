@@ -1,0 +1,11 @@
+=== v2 anchor 2026-10-14 10:39:02 +0800 ===
+HEAD: b8f883a37cfbb3389014ffb6bba9f8ca55f67a76 2026-10-14 10:33:18 +0800 编排者：A907（机主令火力全开——补派 236-r5 CI 注释＋260-v2 验收；在飞 4=2写+2验；cmd/wisp 面读窗解释）
+--- git status --porcelain -- internal cmd tools .github ---
+?? internal/tools/taskid_source_236r4_teeth_test.go
+--- ball_windows.go hash vs HEAD ---
+af9ff08a57cdf7f8535fda790f725cd15f21fc1d
+af9ff08a57cdf7f8535fda790f725cd15f21fc1d
+--- go version ---
+go version go1.27.1 windows/amd64
+--- go env GOPATH ---
+D:\work\base\gopath

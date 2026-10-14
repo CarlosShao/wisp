@@ -1,0 +1,17 @@
+=== tags + doc quote 2026-10-14 10:47:49 ===
+internal/ball/hotkey_borrow_refused_260r5_test.go : //go:build windows
+internal/ball/hotkey_cancel_borrow_live_260_test.go : //go:build windows && winlive
+internal/ball/hotkey_live_test.go : //go:build windows && winlive
+internal/ball/hotkey_cancel_borrow_260_test.go : //go:build windows
+internal/ball/interaction_live_test.go : //go:build windows && winlive
+internal/ball/live_windows_test.go : //go:build windows && winlive
+internal/ball/hotkey_status_test.go : //go:build windows
+cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go : //go:build windows
+-- RebindHotkeys doc (grep -n +/-):
+805-// poll; HotkeyReloader still diffs so the Win32 churn happens once per change.
+806-//
+807:// A rebind drops an in-flight Esc borrow (escTakenOver below): the new binding
+808-// set is the idle set, and the idle set does not include cancel (ticket 245).
+809-// A host that rebinds while a card is waiting therefore has to call
+810-// TakeEscForCancel again on the next state sync - no caller does that today
+811-// because the config poll and the card live on different legs, and the residual
