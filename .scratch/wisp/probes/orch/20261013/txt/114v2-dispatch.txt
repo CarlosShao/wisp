@@ -1,0 +1,26 @@
+# 114-v2 派单（票 114 AC#10 第三装法钉的非实现者判语；验收腿；面＝internal/panel＋cmd/wisp 只读）
+
+发送时刻：2026-10-14 17:2x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `114-v2`**（`probes/114/` 现 a2/a5/v1/r6，v2 可用；查重已做）。⛔ 不翻框、⛔ 不动 `Status:`/票名——判语交回。
+
+## 被裁对象
+
+- 落地腿 `114-r6`：产码 `3b6f170f`（唯一新件 `internal/panel/bound_dispatch_door_114_test.go` 530 行）＋交付 `c499adac`（件＋logs＋票尾）。
+- 钉主张：host 侧 AST 走 `cmd/wisp` 产码取 `w.Bind(<包级字符串常量>,回调)`（`:80` const → `:842 w.Bind`；单参 `ws.Bind(run.paths)` 与 literal（如 `wispProbeRT`）不入 reviewed）；page 侧要求常量值在 `panel.ts:350` 被 `window.<名>` 读到，且**整棵 `frontend/` 该门读只许在 panel.ts**（注释剥掉）；**reviewed 空即红**（空读≠绿）。三突变（m1 摘 Bind／m2 常量换名／m3 页读换名）各自红逐字；**旧 `.postMessage(` 尺同三树全 PASS**。
+- 背景：`114-v1` 顶回"AC#10 面误标 frontend"并给出现读链；编排者已重裁＝本队仪器格（本钉即其落地）。
+
+## 你要独立做的（⛔ 不许只引）
+
+1. **牙（≥2 发你自己的形，仓外树真种盘、⛔ A713 纪律）**：建议 ① 摘 `w.Bind` 两处之一；② 自选一发（常量**声明搬家**到别的文件、或把页读改成注释里提到、或造"两边都在但拼写不一致"）——每发 rc=1＋红句逐字点名。
+2. **钉的射程边界核**：`skipped` 单参调用、literal 不入 reviewed、注释剥离、only-panel.ts 四条各抽核一行（现读代码）。
+3. **空读≠绿**：造"reviewed 集合为空"的形（如仓外树把 Bind 全摘）⇒ 必须红（这条是最容易恒真的一条，重点攻）。
+4. **基线**：真树 rc=0＋整包红集与对照**同集**（抽 1-2 名）。
+5. **判语**：AC#10"成立/附条件/不成立"＋翻框建议（留档句）＋对本钉与 `114-v1` 链的相容性一句。
+6. 门禁抽核：build／两枚相关 `-run`／d22scan clean／长度门 GREEN（60=60）。
+
+## 交付与纪律
+
+- 交件：`docs/evidence/s1/ticket114-114-v2-accept-v1.md`＋`.scratch/wisp/probes/114/v2/`（锚＋logs）＋票 114 尾 **1 条 bullet**；产出 ≤7 枚 ≤200 行。⛔ 框不翻。
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**）；`PATH` 带 sherpa（MSYS 形）；`GOTMPDIR` ⛔ 只**反斜杠形** `C:\tmp\wisp114v2gotmp`；突变优先仓外树/overlay＋sha256；窗口逐报（他腿 `318-r1`（internal/agent/approval）在飞）。
+- **未定义即停**：钉打不红／射程某条与主张对不上／相容性冲突 ⇒ 停手上报。
+- 回执：结论先行（AC#10 判语＋翻框建议）＋各发红/绿句逐字＋门禁 rc＋具名没做。

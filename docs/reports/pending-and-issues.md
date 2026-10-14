@@ -17925,3 +17925,6 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 
 - **收件（三把尺）**：`3b6f170f`（新件 `internal/panel/bound_dispatch_door_114_test.go` 530 行，唯一写腿）＋`c499adac`（交付 6 件）在／件齐／亲跑 `-run 'TestTheBoundDispatchDoorIsReachableFromThePage' ./internal/panel/` rc=0。钉形：host 侧 AST 走 `cmd/wisp` 产码取 `w.Bind(<包级字符串常量>,回调)`（`:80 const`→`:842 w.Bind`；单参/literal 记 reviewed 外）；page 侧要求常量值在 `panel.ts:350` 读到且全 `frontend/` 该门读只在 panel.ts；**reviewed 空即红**。三向红逐字（m1 摘 Bind／m2 常量换名／m3 页读换名）；★**旧 `.postMessage(` 尺在同样三棵突变树上全 PASS**＝"只认 postMessage"的盲区被当场坐实、由新钉补上。门禁 build/vet/gofumpt/d22scan clean/长度门 GREEN（60=60）/整包红集 A/B **SAME SET**。
 - **结算**：114-r6 本回应 TaskStop。**编队**：`318-r1`（写）＋本笔派 `114-v2`（AC#10 判语＋本钉复核）。⛔ 未推＝67 笔（邀请在挂）。
+
+
+- **A939 补**：派 `114-v2`（AC#10 判语）。编队（2）：写 `318-r1`＋验 `114-v2`。派单/send 在盘。
