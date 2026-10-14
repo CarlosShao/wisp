@@ -1,0 +1,31 @@
+# 136s 派单（票 136 **切三格**：AC#2／AC#3／AC#4＝新鲜度钉三缺口；写腿；面＝`scripts/slo-freshness.sh`＋`scripts/slo-check.ps1`＋`probes/136/s/`）
+
+发送时刻：2026-10-14 18:1x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **136s**（腿名固定为 `136s`，别用 rN；`probes/136/s` 未建，查重已做）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与范围（**只做三格**，票面逐字为准）
+
+- 票：`.scratch/wisp/issues/136-the-zero-sample-fail-closed-guard-underneath-the-freshness-nail-has-no-nail-54-tests-stay-green-without-it.md`（先通读 §AC#2/#3/#4 与 134 系"新鲜度钉"来路；票里另有一半已结的 `internal/observe` 旧账，⛔ 与你无关）
+- 起手 `git rev-parse --short HEAD` 现读锚（派发锚 `b38567a9`）；漂移逐报。
+- **本腿三格**（`R-134-5/7/8`）：
+  - **AC#2**：新鲜度钉的判据物**只看"名字＋未过期"**，不看内容、不看来源 ⇒ 加**来源谓词**（workflow／分支／事件类型**至少各一**），并造两档探针：① 伪造一枚"名字对、来源错"的 ⇒ **必须红**；② 真 artifact 缺字段 ⇒ "取不到数据那六形全 `rc=2`/`rc=1`、无一 pass"（**不许静默当新鲜**）。
+  - **AC#3**：分页上限会**静默缩小扫描面**（`SLO_FULL_ARTIFACT_PAGES=3 ×100`）⇒ 把上限压到小于总数时**必须报"扫描不完整"**，不许读成"没找到"以外的任何结论。判据：上限 < 总数 ⇒ 必须报"扫描不完整"。
+  - **AC#4**：**未来时间戳被夹成 0 天 ⇒ 判新鲜**（`ts > now` 那一支现在算"很新"）⇒ 必须**判不新鲜或直接报错**；给一发变异原文：`SLO_FULL_LAST_SAMPLE="2027-01-01T…" SLO_FRESH_NOW=<某个 now>` ⇒ **今天 rc=0**（先复现这个"今天不红"），修后必须不 pass。
+- **⛔ 明确不做（具名留给后续）**：AC#5（`tools/d22scan/**` 需具名解冻）／AC#6（CI schedule 与本仓 `.github`——**批准面**）／AC#7 里属 `internal/observe` 的部分（那半已结）／AC#10（真跑 CLI＋机时）。你在票尾 bullet 里**逐条具名**这些不做。
+- **禁改**：`docs/PLAN.md`、`docs/specs/**`、`internal/**`（含 `internal/observe/**` 生产码）、`tools/d22scan/**`、`allowlist.txt`、任何阈值/golden、`.github/**`、`frontend/**`。
+
+## 做法与判据（每格逐条）
+
+- 三格都必须**先证明"今天不红"**（在未修脚本/快照上跑出今天的读数），再装判据，再复现同一发 ⇒ 红；还原 ⇒ 复绿。三态原文齐。
+- 探针用**脚本自己的 env 缝**驱动（`SLO_*` 家族；`SLO_FRESH_NOW` 等已在票面/上游用过）——**别真跑采集**（⛔ 不跑 `wisp slo` 真采样、⛔ 不跑 `slo-check.ps1` 的重活），本波 `cmd/wisp` 重包归 133-r1，别撞。
+- 每格红句必须**指名**（哪一枚探针、哪一档谓词）；⛔ 不许放宽任何既有断言换绿、⛔ 不许 `t.Skip`/`skip` 式静默。
+- 逐格一笔 commit；票尾每格 append 一条 bullet（`agent=136s did=… next=…`）。
+
+## 交件与纪律
+
+- 交件：`probes/136/s/00-anchor-and-gates.md` ＋ logs（三格 × 三态逐字＋红句）＋票 136 尾 bullets。产出 ≤7 枚 ≤200 行。
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**）；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；别人脏件别动。
+- 门禁：改动的三个文件所在处 `gofmt -l`（如适用）／你所动脚本的**自检模式真跑**／`sh scripts/d22scan.sh` clean／长度门 GREEN（60=60）；各件自落 `rc=`。
+- 树会呼吸：133-r1（cmd/wisp）／178-r1（probes/154 脚本）／318-v1（approval 只读）在飞——撞见无关红先判归属。
+- **未定义即停**：三格的"今天不红"复现不出／须动禁改面／env 缝不够用 ⇒ **停手上报**。
+- 回执：结论先行＋commit sha（产码/交付分开）＋三格三态逐字＋红句点名＋门禁 rc＋具名没做（含上面四条不做）。

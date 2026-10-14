@@ -1,0 +1,5 @@
+136s send 记录
+- 发送时刻：2026-10-14 18:1x +08；派单已先存档：txt/136s-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/136/` = 见本档首行（旧腿目录，无 s）；腿名固定 136s。
+- 收件人：agent_e7ff8923-b728-458b-913a-7fdb4d0b3c30（general-purpose，后台）。
+- 内容：票 136 切三格（AC#2 来源谓词两档探针／AC#3 分页上限静默缩面／AC#4 未来时间戳）；⛔ AC#5/#6/#7observe/#10 具名不做；面=scripts/slo-freshness.sh＋slo-check.ps1＋probes/136/s。

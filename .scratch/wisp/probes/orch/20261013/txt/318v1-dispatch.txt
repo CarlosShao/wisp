@@ -1,0 +1,28 @@
+# 318-v1 派单（票 318：junction 标记碎片修复的**非实现者复核**；验证腿；面＝`internal/agent/approval` 只读＋仓外快照变异）
+
+发送时刻：2026-10-14 18:1x +08。编排者派发。
+你 = Wisp 流水线的**验证腿 318-v1**（`probes/318/v1` 未建，查重已做）。身份＝非实现者（实现者是 `318-r1`；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 零产码）。
+
+## 票与背景
+
+- 票：`.scratch/wisp/issues/318-junction-card-marker-splits-into-a-fragment-that-lands-in-allowed-dirs.md`（先通读；AC#1/AC#2 未勾）
+- 起手 `git rev-parse --short HEAD` 现读锚（派发锚 `b38567a9`）；漂移逐报。
+- 落地腿 `318-r1` 交件：`8707a7ed`（`internal/agent/approval/replies.go` **+21 行**；新尺 `ticket318_widening_marker_rulers_test.go` 129 行四枚用例；**并改 `zz_201_a1_junction_marker_windows_test.go` 128 行**）＋`f6fda72d`（交付 14 件，含 3 枚 overlay 变异 JSON）。编排者亲跑 `-run 'Ticket318|Widening|318' ./internal/agent/approval/`＝**ok 2.496s**（仅供参考，不当你的读数）。
+
+## 你要独立回答的（逐条给判语与读数；方法＝仓外 `git archive` 快照＋你自己的变异，⛔ 不用 overlay 抵账）
+
+1. **复现形修前红/修后绿**（AC#1 判据①）：自造等价最小形或复用 `201-a1` 链——在**修前快照**（`8707a7ed^`）上让 `WideningRule` 吃到含 `无法规范化` 标记的 path ⇒ `dirOf` 在标记内 `/` 处切出 `…(junction` 片段进 `AddAllowedDir`（真写 `allowed_dirs` 垃圾行）；**修后**同一形不再发生。三态原文（修前红/修后绿/还原）。
+2. **对照不回归**（AC#1 判据②）：**无标记**的越界读仍推真父目录（不许把宽卡一并拒了）。
+3. **自造一发突变**（AC#1 判据③）：摘掉守卫或换判词 ⇒ 指名的钉（`ticket318_widening_marker_rulers_test.go` 四枚之一）**红且逐字点名**；先证变异落地（`diff -u` / `grep` 原文＋`go build` rc=0）。
+4. **★重点：被改的 201-a1 复现件（128 行）有没有被削牙**——它是 `201-a1` 证缺陷的原始链；修后它必须"翻面"（原本断言缺陷在＝红，修后应改断言为"拒收"），但**同一条链、同样的可达步骤**要还在：逐条 diff 判它是"诚实翻面"还是"删/弱化/跳过"。此项单独一节给具名判语。
+5. **AC#2 边界登记**：票面 AC#2（空路径标记／8.3 短名／多路径 `ok=false` 分支）——逐条现量或具名"不属本修"，看落地者的登记是否成立。
+6. **既有断言零放宽**：修前修后两棵树同命令跑 `./internal/agent/approval/`（与你相关的用例族），名册双向差集；`SKIP` 不许新增。
+
+## 交件与纪律
+
+- 交件：`docs/evidence/s1/ticket318-318-v1-accept-v1.md`（逐格判语＋读数）＋`probes/318/v1/`（logs，≤7 件 ≤200 行）＋票 318 尾**追加 1 条 bullet**（`agent=318-v1 did=… next=…`）。⛔ 不翻框、⛔ 不动 `Status:`、⛔ 零产码（判断只许落在证据件与票尾 bullet）。
+- 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删。
+- `PATH="…/third_party/sherpa-onnx:$PATH"`（MSYS 形）；`GOTMPDIR='C:\tmp\wisp318v1gotmp'`（只反斜杠形，先自建）；**仓外快照**（`git archive` + `tar -x`）；判据 `-run` 小射程。
+- 面：`internal/agent/approval` 本刻**无在飞写腿**（318-r1 已结）；你只读＋仓外变异；`cmd/wisp` 重包本波归 133-r1（⛔ 别跑整包 cmd/wisp）。
+- **未定义即停**：复现形做不圆／201-a1 件判不出诚实翻面 ⇒ 停手上报。
+- 回执：结论先行＋逐格判语（成立/不成立/附条件）＋三态逐字＋翻面判语＋名册差集＋具名没做。

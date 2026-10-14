@@ -17971,3 +17971,13 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - 波间守恒：写 ≤4 ✓（3）、总 ≤7 ✓（4）；面互斥：cmd/wisp 本波写腿只 133-r1 一枚。
 
 - **A944 补（同刻，append-only；修复一处 heredoc 自伤）**：上面「255 收口」那条里「票尾『编排者收口』章」后的 sha 应为 `a7b88997`（被 shell 吃掉，现呈空括号）——票 255 收口提交＝`a7b88997`「编排者：255 收口（AC#1/#4 亲跑翻勾：winlive 真窗 PASS＋判据组 ok；-done 改名；长度名册同步 GREEN 60=60）」。**教训重申**：含反引号的文本进台账一律用**带引号 heredoc**；需展开时间就「占位符＋sed」，⛔ 别用未引号 heredoc 图省事。
+
+## A945｜2026-10-14 18:12 +08｜收 318-r1（junction 碎片修复；三把尺＋我复跑 §green）＋收 114-v2（**AC#10 判成立**，翻勾）＋结算两条幽灵（318-r1/114-v2 TaskStop→completed）＋补位写腿 `136s`（AC#2/#3/#4 脚本半）与验证腿 `318-v1`
+
+- **幽灵结算**：机主点名的两条"已完成仍显示执行中"＝`318-r1`（agent_0f1676e7）＋`114-v2`（agent_f9eaee88）——**TaskStop 双查均返回 completed**（显示滞后是宿主面，我侧已逐条结算；此前 179-r3/255-r8 同形）。
+- **318-r1 收件（三把尺）**：① `8707a7ed`（产码：`internal/agent/approval/replies.go` +21；新尺 `ticket318_widening_marker_rulers_test.go` 129 行；**并改 `zz_201_a1_junction_marker_windows_test.go` 128 行**）＋`f6fda72d`（交付 14 件，含 3 枚 overlay 变异 JSON）真在；② `probes/318/r1/`（00 主件＋logs 9＋mutation/3）在盘；③ 编排者亲跑 `-run 'Ticket318|Widening|318' ./internal/agent/approval/` **ok 2.496s**。⚠ 交接面：AC#1/AC#2 两格**未翻**——新尺四枚＋被改的 201-a1 复现件要**非实现者**独立复核（含"复现件没被削牙"这一向）⇒ 派 `318-v1`。
+- **114-v2 收件**：判语件 `docs/evidence/s1/ticket114-114-v2-accept-v1.md`＋`probes/114/v2/{00-anchor.md,logs}` 在盘；**判=AC#10 成立**（重裁口径＝"让可达性钉认第三方装法"）；编排者采信＋**翻 AC#10**。票 114 余：AC#3／AC#5／AC#6（真机面）＋AC#11（CI 一步，属 `.github` 批准面）。
+- **补位**：写腿 `136s`（票 136 的 AC#2/#3/#4＝新鲜度钉三缺口；面＝`scripts/slo-freshness.sh`＋`slo-check.ps1`＋probes，**脚本面净**；AC#5/#6/#7/#10 具名留给后续/待批准面）＋验证腿 `318-v1`（internal/agent/approval，只读＋独立变异，面净）。
+- 编队（4）：写×3＝178-r1/133-r1/136s、验×1＝318-v1。
+- **票完成度（机主令现算）**：总票 **306**、已关（`-done`）**127**、未关 179 ⇒ **41.5%**（尺：`ls .scratch/wisp/issues/*.md | wc -l` 与 `...*-done.md | wc -l`）。
+- **A945 勘误（同刻，append-only）**：上面标题栏里的「三把尺＋我复跑 §green」是笔误——应为「三把尺＋我复跑 **ok 2.496s**（`-run 'Ticket318|Widening|318' ./internal/agent/approval/`）」。原文不抹。
