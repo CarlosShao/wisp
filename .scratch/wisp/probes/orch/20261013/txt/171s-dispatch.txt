@@ -1,0 +1,27 @@
+# 171s 派单（票 171 切片：把 r3 的"删样本不删腿"钉重推到 178 后的新语义；写腿；面＝`probes/171/**`）
+
+发送时刻：2026-10-14 19:4x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **171s**（腿名固定 `171s`；`probes/171/s` 未建，查重已做）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与背景
+
+- 票：`.scratch/wisp/issues/171-three-ruler-holes-ticket-161-cannot-carry-aggregate-rs-selftest-not-in-ci-trailing-comments-counted-as-calls-and-count-blind-pair-legs.md`（读票尾 2026-10-14 19:2x 那条**编排者登记**）
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+- **来路**：票 178（普查尺"四堆不分"修复，`31b5cd36`，已 `-done`）把 G6/G6neg 改形成 `quiet piles` 语义（判据只吃"②只开堆里的文件枚数"、基线 0；"只关（关的是别处开的）"不再顶红）。⇒ 本票的 `probes/171/r3/r3-sample-deleted.sh` 钉形失效：`sh` 它 ⇒ **rc=2**，逐字 `no 'want G6' declaration - no verdict`（`178-v1` §7 复现；我 19:2x 复核一致）。且不止声明形——`want_n` 值与 D2/D1/D0 三个形状是"混数"口径推出来的，**要按新口径重推**。
+
+## 你要做的
+
+1. **先量全**：把 `probes/171/**` 下所有可执行脚本逐枚跑一遍（`r3/` 里至少：`r3-sample-deleted.sh`／`r3-trailing-comment.sh`／`r3-flip-columns.sh`／`r3-roster-diff.sh`／`flip-prefix-*.sh`／`gate-prefix-*.sh`；`r1/`、`r2/` 里若也有钉 G6 族的同样跑），**逐枚报 rc 与红句**，具名"哪些是 178 改形打破的、哪些本来就红/本来就绿"。
+2. **重钉**（只钉 178 打破的那些；在本面内不设上限，但逐枚给两态）：
+   - 读 `probes/154/gate-clauses.sh` 现在的 G6/G6neg 声明与四堆计数（**只读**），把每个形状的期望值**重推**（D2/D1/D0 在新口径下各应是什么 rc/哪行）；`want_n` 类补丁照新声明改。
+   - 判据（每枚）：**旧钉 rc 读数 ⇒ 新钉 rc=0** 两态原文；且**新钉自己要有牙**：自造一发反向变异（把被钉的行为挪走）⇒ 新钉转红并逐字点名；还原 ⇒ 绿。
+   - 修改落点：pin 脚本可**就地改**（`r3-sample-deleted.sh` 等）或**加后继脚本**（`probes/171/s/` 下），你选并具名理由；⛔ 旧读数原样保留（只追加/只建不删）。
+3. **⛔ 本腿不做**：票 171 的 AC#1（尺洞③ 两发对照台件）／AC#3（CI 新步＝`.github/**` 批准面）／AC#5（契约转＝含 `ci.yml`）／AC#9——票尾 bullet 里逐条具名"押后"。⛔ 不动 `probes/154/gate-clauses.sh`（178 的仪器，刚落地）／`.github/**`／`scripts/**`／`internal/**`／`cmd/**`／台账。
+
+## 交件与纪律
+
+- 交件：`probes/171/s/00-anchor-and-gates.md` ＋ logs（全脚本名册 rc 表；每枚重钉的两态＋变异两态）＋ 票 171 尾**追加 1 条 bullet**（`agent=171s did=… next=…`）。产出 ≤7 枚 ≤200 行。
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**）；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；合成树只落 `$TMPDIR`。
+- `GOTMPDIR='C:\tmp\wisp171sgotmp'`（只反斜杠形，先自建）；面：本波 `cmd/wisp` 归 133-r1、`scripts/slo-*` 归 136-v（只读）、`probes/185` 归 236s（已结）——你只写 `probes/171/**`。
+- **未定义即停**：某形状按新语义推不出唯一期望／须动 `probes/154` 或别的面 ⇒ 停手上报。
+- 回执：结论先行＋commit sha＋全脚本 rc 名册＋每枚重钉两态逐字＋变异两态＋门禁（改动面核）＋具名没做。

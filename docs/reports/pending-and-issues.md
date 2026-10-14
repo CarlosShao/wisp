@@ -18048,3 +18048,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **G5/G7 收窄**：腿件"逐字节不变"→"口径/数值/判语/名册逐字节不变（共享尾注行加新注）"——就地追加于 `probes/178/r1/00-anchor-and-gates.md`（原句不抹）。
 - **171 登记**：`probes/171/r3/r3-sample-deleted.sh` 钉 rc=2 ⇒ 归 171 自己（含 `want_n` 值与 D2/D1/D0 口径重推）；已 append 到票 171 面。
 - 观察留存（不属任何账）：`178-v1` 报工作树有 133-r1 的在飞变异件（`M main.go`、`?? sfx131x.go`、`?? dispatch_hop_selfproof_133_test.go`）——在飞腿的临时变异，非交件，本批未动。
+
+## A953｜2026-10-14 19:38 +08｜136s 收件（三格全交；★收口①＝默认上限 `:-3`→`:-20`，依据 gh 现量 listing=**348** ⇒ 不抬下一发定时必红；我亲跑 21-world 矩阵逐发同色含 `future-sample rc=2`）＋236s 收件（AC#6 甲案：import 重排；亲跑 gofumpt 空＋overlay `undefined` rc=1）＋翻 236 AC#6＋派 `136-v`（验三格＋收口项）与 `171s`（r3 重钉）⇒ 编队（3）：写×2＝133-r1/171s、验×1＝136-v
+
+- **136s 三把尺**：七笔（`bb47e9e7`/`966c2aa9`/`f706dedd`/`b6fc818d`＋`ea32f239`/`b6e959b1`/`f8b92e7e`）真在；面核只 `scripts/slo-freshness.sh`（+133/−22）；我亲跑其 harness `drive.sh` ⇒ 21 world rc 逐发与腿记录同（`control 0／spread 0／cap-zero 2／forge-* 1／missing-* 2／partial-* 2／future-sample 2／future-job 2／stale 1／k1-k4b 2／k5-k6 1／k7 2`）。
+- **收口①裁定**：`sample_pages=${SLO_FULL_ARTIFACT_PAGES:-3}` → **`:-20`**（注释写明：2026-10-14 现量 348；~8 枚/日 ⇒ 2000 约 7 个月余量；>2000 时钉照响）。live 相容性由 `136-v` 复核。
+- **收口②待观**：AC#2 来源谓词的 live 终验（artifact 皆带 `workflow_run.head_branch`）＝等 `slo-fresh` 下一发定时 run 实读（CI 面）。
+- **236s 三把尺**：四笔真在；diff 只 import 重排（+2/−1，符号行未动）；我亲跑 gofumpt（`D:\work\base\gopath\bin\gofumpt` v0.12.0）＝空 rc=0、overlay＝rc=1 `undefined: undefinedSymbol185c1`。引用普查判"不咬"（机械钉 0；两处 digest 历史读数＝H 档）⇒ 甲案落定、**翻 AC#6**（票余 AC#5）。
+- **两枚顶正登记**（236s 报，我采信）：字节 `11,041→11,042`／行 `338→339`；md5 `f5c325e0…→c43e4b1e…`；blob `ee583853…→20f5ae54…`。⚠ `probes/232/v1/verdict.md:152` 与 `probes/269/a1/census.md:101/:159` 的旧 digest 若需同步＝另案（H 档历史读数，不属本改的义务）。
+- **杂目录**：136s 报的 `%SystemDrive%` 缓存副本已移出仓面（`/d/tmp/wisp136s/stray/`，未删）——已核仓内无它。

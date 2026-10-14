@@ -1,0 +1,29 @@
+# 136-v 派单（票 136 三格：AC#2/#3/#4 的**非实现者复核**；验证腿；面＝`scripts/slo-freshness.sh` 只读＋`probes/136/v/`）
+
+发送时刻：2026-10-14 19:3x +08。编排者派发。
+你 = Wisp 流水线的**验证腿 136-v**（`probes/136/v` 未建，查重已做）。身份＝非实现者（实现者是 `136s`；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 对 `scripts/**` 零写）。
+
+## 票与背景
+
+- 票：`.scratch/wisp/issues/136-the-zero-sample-fail-closed-guard-underneath-the-freshness-nail-has-no-nail-54-tests-stay-green-without-it.md`（读 AC#2/#3/#4 与其下判据）
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+- 落地腿 `136s` 交件：产码 `bb47e9e7`（AC#2 来源谓词）／`966c2aa9`（AC#3 扫描不完整 exit 2）／`f706dedd`（AC#4 未来时间戳）／`b6fc818d`（seam 空首字段追加）；交付 `ea32f239`／`b6e959b1`／`f8b92e7e`（`probes/136/s/**`＋票尾 4 bullets）。它的 harness＝`probes/136/s/drive.sh`（22 world × 2 树）＋`gh` 桩（PATH 首位，无网络）。
+- **编排者已做的一处收口（你要一并验）**：`scripts/slo-freshness.sh:138` 的默认上限 `SLO_FULL_ARTIFACT_PAGES` 从 `:-3` 抬到 `:-20`（我 gh 现量 listing=**348**；AC#3 落地后 cap<total 会 exit 2 ⇒ 不抬则下一发定时必红；注释里写了 348／~8 枚/日／7 个月余量——**注释数字与算术语你要独立核**）。
+
+## 你要独立回答的（逐条判语＋读数；方法＝仓外两树副本＋你自己的打法，⛔ 别只重跑它的 drive.sh 交差）
+
+1. **AC#2**：旧树（`git show b38567a9:scripts/slo-freshness.sh`）三形 forge-* 与 missing-* "今天不红"逐发复现；新树红句逐字点名；**"取不到数据六形"**（k1–k6）逐形 rc 表 ＋ k4b/k7 新缝；`mixed` 控制形（伪造样＋真样并存）行为。
+2. **AC#3**：`partial-green`／`partial-notfound`／`cap-zero` 旧"不红或误读"⇒ 新 exit 2 且红句点名"扫描不完整"；`control`／`spread`（真样在第 2 页）不受累；**pin 的触发条件＝listing_size > cap** 现量坐实；cap 抬到 20 后与 listing=348 的相容性（live 不红），及"listing 再涨到 >2000 时会响"这一句的证据（用 cap-zero/partial 世界代证亦可，说明清楚）。
+3. **AC#4**：`future-sample`／`future-job` 旧 `rc=0`（`age: 0 day(s)`）⇒ 新 exit 2 且红句逐字；`stale-sample`／`control` 不受累。
+4. **不丢牙/零放宽**：`git diff b38567a9..HEAD -- scripts/` 只许 `slo-freshness.sh` 一枚＋逐 hunk 归因（133+/22−）；旧树本来就红的（stale-sample rc=1 等）在新树仍红；`sh -n` rc=0；shellcheck（v0.11.0，`-s sh`）rc=0；`sh scripts/d22scan.sh` clean；长度门 GREEN。
+5. **编排者收口项的复核**：`:-20` 与注释（348／速率／余量）——算术独立复算，若你判"应更高/更低或注释措辞该改"⇒ 具名给建议（裁定归编排者，你不改文件）。
+6. **旁证**：`b6fc818d`（seam 空首字段追加）有没有弱化任何既有世界；本腿报过的那枚 `%SystemDrive%` 缓存杂目录已移出仓面（`/d/tmp/wisp136s/stray/`）——现量核仓内无它。
+
+## 交件与纪律
+
+- 交件：`docs/evidence/s1/ticket136-136s-accept-v1.md`（逐格判语＋两树读数）＋`probes/136/v/`（≤7 件 ≤200 行）＋票 136 尾**追加 1 条 bullet**。⛔ 不翻框、⛔ 对 `scripts/**`·`probes/136/s/**` 零写。
+- 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；⛔ 别碰 `docs/reports/pending-and-issues.md`。
+- 快照/副本只落 `$TMPDIR` 或 `/d/tmp`；`GOTMPDIR='C:\tmp\wisp136vgotmp'`（只反斜杠形，先自建）；判定格：`git status -- scripts` 起终同。
+- 面：本波 `cmd/wisp` 归 133-r1、`probes/171` 归 171s、`probes/185` 夹具归 236s——你只读。
+- **未定义即停**：某世界与 136s 报的读数不符／须动 `scripts/**` ⇒ 停手上报。
+- 回执：结论先行＋逐格判语＋两树逐发 rc 表＋diff 归因＋门禁 rc＋对编排者收口项的复核＋具名没做。

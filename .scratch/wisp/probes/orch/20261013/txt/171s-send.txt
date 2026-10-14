@@ -1,0 +1,5 @@
+171s send 记录
+- 发送时刻：2026-10-14 19:4x +08；派单已先存档：txt/171s-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/171/` = a1 r1 r2 r3 v1 v2（s 未建，可用）。
+- 收件人：agent_7bf7cf5e-f20b-4a63-bbed-c1bf5bbc7f83（general-purpose，后台）。
+- 内容：178 改形后 r3 钉重推（D2/D1/D0 新口径；want_n 补丁；每枚两态＋自造反向变异）；面=probes/171/**。
