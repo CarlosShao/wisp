@@ -1,0 +1,26 @@
+# 159-r1 派单（票 159 **切片**：AC#1／AC#3／AC#4／AC#5＝记录级收口四格；写腿；面＝`docs/evidence/s1/156-*` 追加＋`probes/159/r1/`；AC#2 具名押后）
+
+发送时刻：2026-10-14 18:5x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **159-r1**（`probes/159` 未建，查重已做）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与范围（**本腿只做四格**；票面逐字为准，先通读）
+
+- 票：`.scratch/wisp/issues/159-record-level-cleanup-c1-c5-left-by-ticket-156-acceptance.md`
+- 起手 `git rev-parse --short HEAD` 现读锚（派发锚 `401191b7` 后若干笔，现读为准）；漂移逐报。
+- **总规矩（票面立的）**：五笔全部走"**只追加更正**"——⛔ 不许改写实现程/验收程已入库的正文、⛔ 不许为"看起来一致"删段；某一笔按字面做不了 ⇒ **停手上报**。
+- **本腿四格**：
+  - **AC#1（C1）**：①按**你自己的锚点**贴出那枚 commit（验收程点的名是 `0e95353`，先现量复核是不是它）的 `--name-only` 与标题，证明"case 13 裁定头"与 AC#2 的码**同枚落地**；②把这一笔形写成**台账条目原文**（草案）落进你的证据件——⚠ **⛔ 不许动 `docs/reports/pending-and-issues.md`**（编排者面、共享文件防撞），把原文放 `probes/159/r1/ledger-entry.txt`，由编排者代贴；③给出**下一个人能重跑的判据**："凡票面写'分开 commit'的格，验收时要能用 `git show --name-only` 指出该动作所在的那一枚 commit 里不含其它格的码改"。⚠ ⛔ 不许拆已落地的码（改写历史）。
+  - **AC#3（C3）**：在 `docs/evidence/s1/156-exited-asks-os-r1.md` **末尾追加**一节（标题带"编排者／收口程追加，非 r1 原文"字样）：① "144/84 与'5 枚'"归属错——真值 r1 那发＝**143/83＋4 枚**、那对 +5 属 `gate-r3-pre` 那发（**先自己复算**：`probes/156/gate-post/cmdwisp.log` 按 `^---` 锚定重数；与票面数字不符⇒以你为准并报回）；② 悬空指针（"见第 7 格"）要么补真实落点（`<文件>:<行>` 现量存在），要么明写"该指针在 r1 写作时不存在"——⛔ 不许悄悄删。
+  - **AC#4（C4）**：把"某个 `frontend/**` 提交会不会改变 `cmd/wisp` 读数"的**可执行判据**立起来：只许两条——(a) `go list -deps ./cmd/wisp/` 里有没有承载 `//go:embed` 的包；(b) 该提交有没有动**嵌入源目录**（现量：模式 `all:dist`，目录归 `frontend/`）。⚠ 禁拿"两包内搜 `frontend` 字样 0 命中"当理由（已证伪）。交付＝命令逐字贴＋**正控**（故意拿一枚动过 `frontend/dist` 的历史提交打一发 ⇒ 必须响）＋`wisp slo` 老账（"这条命令今天不被任何 `go test` 执行"）**并排写在同一条记录里**（这条记录草案同样落 `probes/159/r1/`，编排者代贴）。⚠ `frontend/dist` 与 `src` 的产物关系若量得出**如实写**，不确定就报回，⛔ 别按猜测写判据。
+  - **AC#5（C5）**：在 r1 那枚文件里**只追加一句**："case 19 归类＝**夹具守卫**，不是'会响的检'"；并逐枚现量扫同类"表与判定句互斥"的形状，**列出命中或明写"命中 0 枚、用的尺是……"**——⛔ 不许默默只补被点名的那一枚。
+- **⛔ AC#2 本腿不做**（`cmd/wisp/slo_report_144_windows_test.go` 属 `cmd/wisp` 面，本波被 133-r1 占）——票尾 bullet 里具名"AC#2 押后"。
+- **禁改**（票面）：`tools/d22scan/**`、`scripts/slo-check.ps1`、任何 golden／阈值、`frontend/**`、`design/**`、`internal/panel/**`；⚠ 另加：`docs/reports/pending-and-issues.md` 本腿零触碰（见 AC#1②）。
+
+## 交件与纪律
+
+- 交件：`probes/159/r1/00-anchor-and-gates.md` ＋ `ledger-entry.txt`（AC#1②与 AC#4 的记账原文）＋ logs（AC#3 复算原文、AC#4 正控读数、AC#5 扫描尺与输出）＋ 票 159 尾**追加 1 条 bullet**（写明 AC#2 押后）。产出 ≤7 枚 ≤200 行。
+- 只 commit、⛔ 不 push；显式 pathspec（**必带**）；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删。
+- `GOTMPDIR='C:\tmp\wisp159r1gotmp'`（只反斜杠形，先自建）；AC#4 若需 go 命令按轻活跑（`go list` 很轻）。
+- 面：本波 `cmd/wisp` 归 133-r1、`scripts/**` 归 136s、`probes/154` 归 178 族——你只写 `docs/evidence/s1/156-*`（追加）＋`probes/159/r1/`。
+- **未定义即停**：某笔按字面做不了（要改的那句在冻结面里等）⇒ 停手上报，⛔ 不自创第二种修法。
+- 回执：结论先行＋commit sha（逐格一笔或分开说明）＋四格逐字读数＋AC#2 押后具名＋门禁（`git diff` 面核）＋具名没做。

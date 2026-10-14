@@ -1,0 +1,5 @@
+178-v1 send 记录
+- 发送时刻：2026-10-14 18:5x +08；派单已先存档：txt/178v1-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/178/` = r1（v1 未建，可用）。
+- 收件人：agent_97e6bc18-c694-4a85-9ff1-43fedf34ff96（general-purpose，后台）。
+- 内容：票 178 非实现者复核（AC#2 真只开独立重做；AC#3 175-r2 落堆＋基线语义；diff 丢牙归因；AC#4 无抬基线；AC#5 分工；面核对；171 钉旁效）。

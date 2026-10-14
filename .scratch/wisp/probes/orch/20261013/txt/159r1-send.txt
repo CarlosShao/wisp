@@ -1,0 +1,5 @@
+159-r1 send 记录
+- 发送时刻：2026-10-14 18:5x +08；派单已先存档：txt/159r1-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/159/` = 未建（r1 可用）。
+- 收件人：agent_19063659-8e34-47e1-84b3-91cbcc907b75（general-purpose，后台）。
+- 内容：票 159 四格（AC#1 分开commit 入账+判据；AC#3 156 证据件追加更正；AC#4 前端进 Go 读数判据+正控；AC#5 case19 归类更正+扫描）；AC#2 押后（cmd/wisp 面）；⛔ 台账零触碰（原文交编排者代贴）。

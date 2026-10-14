@@ -1,0 +1,29 @@
+# 178-v1 派单（票 178：普查尺四堆修复的**非实现者复核**；验证腿；面＝`probes/154/gate-clauses.sh` 只读＋仓外变异）
+
+发送时刻：2026-10-14 18:5x +08。编排者派发。
+你 = Wisp 流水线的**验证腿 178-v1**（`probes/178/v1` 未建，查重已做）。身份＝非实现者（实现者是 `178-r1`；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 零产码）。
+
+## 票与背景
+
+- 票：`.scratch/wisp/issues/178-pair-census-ruler-g6-negative-leg-cannot-express-closing-a-scope-opened-elsewhere-and-rings-every-honest-test.md`（先通读；AC#1–#5 全未勾）
+- 起手 `git rev-parse --short HEAD` 现读锚（派发锚 `401191b7` 后若干笔，现读为准）；漂移逐报。
+- 落地腿 `178-r1` 交件：仪器＝`31b5cd36`（`gate-clauses.sh` +91/−25）＋交付＝`25d34231`（`probes/178/r1/` 8 枚＋票尾 bullet）。它的四态表自报：改前净树 rc=4／改后净树 rc=2、G6/G6neg 改形为 `quiet 基线=0`＋四堆只吃②只开。**编排者亲跑**（仅供参考）：改后净树 `sh .scratch/wisp/probes/154/gate-clauses.sh` ⇒ **rc=2**（G6/G6neg ok；余 G1b/G2 两枚 BAD＝腿报"别的账"）。
+
+## 你要独立回答的（逐条判语＋读数；方法＝仓外快照＋你自己的变异，⛔ 不照抄腿的合成树）
+
+1. **AC#2 这一向（最值钱）**：真造一枚【只开】（真实生产形状的偏差，不是测试面）——**你自己造**，不许复用腿的 `mut-*.go`；打改后尺 ⇒ **必须红**且红句点名；再证明改前尺对同一形**沉默**（若改前尺对该形本来就红，说明该形不可分辨，换一形并说明）。
+2. **AC#3 这一向**：`175-r2` 那枚只写 `CloseTask` 的合法文件（`internal/tools/ticket175r2_stamp_live_test.go`）在改后尺上**不再顶红**且**逐名落到③只关堆**；仪器头里**基线枚数语义**（数"堆"还是"枚文件"）是否写清——逐字引。
+3. **换形有没有丢牙**：逐条读 `31b5cd36` 的 diff（+91/−25 每一行归因），回答二问：① 四堆计数里"②只开"这一维是否与旧判据**同强或更强**（给对照）；② `G5/G7` 两族口径与读数是否**逐字节未变**（引 diff 与两态读数）。
+4. **AC#4**：基线有没有从 1 悄悄抬到 2——引仪器现在的 `want_n`／声明栏逐字；"改完之后 AC#2 那一发仍会红"这句是否写进仪器表。
+5. **AC#5**：与票 171 的分工句是否成立（不许并格/充数）。
+6. **面核对**：`git diff 31b5cd36^..31b5cd36 --name-only` 只许 `gate-clauses.sh`（逐字贴）；`git diff ..25d34231 -- internal cmd` 起终为空。腿自报的两枚旁账不要动它——只需**具名复核**它俩确实是别的账（G1b＝票 197 的 `subagent_197.go:591` 转发；G2＝票 315 `run.go:986` 的 `OpenTask`；给归口建议）。
+7. **旁效**：腿报 `probes/171/r3/r3-sample-deleted.sh` 的钉 `^want G6 ring` 因本次改形而 rc=2——现量复核这一点，并具名"该钉的主人是谁、该由哪张票换钉"。
+
+## 交件与纪律
+
+- 交件：`docs/evidence/s1/178-four-pile-ruler-178-v1-accept-v1.md`（逐格判语＋读数）＋`probes/178/v1/`（logs，≤7 件 ≤200 行）＋票 178 尾**追加 1 条 bullet**。⛔ 不翻框、⛔ 零产码（判断只落证据件与票尾 bullet）。
+- 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；⛔ 别碰 `docs/reports/pending-and-issues.md`（编排者面）。
+- 变异按仓规：对象只落 `$TMPDIR`／仓外快照；`git status -- internal cmd` 起终皆空自证；`GOTMPDIR='C:\tmp\wisp178v1gotmp'`（只反斜杠形，先自建）。
+- 面：本波 `cmd/wisp` 归 133-r1（⛔ 不跑整包 cmd/wisp）；`scripts/**` 归 136s；你只读 `probes/**`＋仓外快照。
+- **未定义即停**：改前尺对该形本来就红／diff 里出现越面行 ⇒ 停手上报。
+- 回执：结论先行＋逐格判语（成立/不成立/附条件）＋两向读数逐字＋diff 归因＋面核对＋具名没做。
