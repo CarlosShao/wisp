@@ -2,7 +2,7 @@
 
 - 腿身份＝探针（只读复量＋一枚 zz 探针载具）；⛔ 不翻框、⛔ 不动票面 Status。
 - 锚（现读 `git rev-parse --short HEAD`）＝`a5b2938c`（派单同锚）。载具＝新建 `cmd/wisp/zz315a1probe_test.go`（只加不改）；
-  读数日志＝`logs/10-caseA-root-control.txt`（3,134 B）＋`logs/20-caseB-sibling-child.txt`（17,039 B，留盘）。
+  读数日志＝`logs/10-caseA-root-control.txt`（5,925 B）＋`logs/20-caseB-sibling-child.txt`（17,615 B，留盘）。
 - 环境：`PATH=…/third_party/sherpa-onnx:$PATH`（MSYS 形）；`GOTMPDIR=C:\tmp\wisp315a1gotmp`；`GOFLAGS=`；
   判据用 `-run` 小射程 `-count=1`；零 push、零 `add -A`。
 - **结论先行：① 复现**。子代理的兄弟孩子（同一父任务的第二枚子代理）**自己**的首次走桥调用
