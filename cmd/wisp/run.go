@@ -330,9 +330,12 @@ type agentRuntime struct {
 	modes *perm.Store
 	// modeWrites is ticket 114 AC#2's gate: the one handler a panel mode request
 	// is answered by, assembled with the SAME L2 leg the Store above was handed.
-	// Nothing calls it yet - the WebView2 "event -> ParseComposerRequest" hop does
-	// not exist in this tree (tickets 33/35) - so this is the gate's other half,
-	// not a path: the host that gets wired later cannot assemble a wider档 without
+	// Nothing reads this field yet: the "event -> ParseComposerRequest" hop now
+	// exists (composer_dispatch.go:155, reached from `wisp panel-inbound` and the
+	// panel host), but every leg that reaches it assembles its own handler chain
+	// (cmd/wisp/panel_inbound.go, the resident leg's newResidentComposerDispatch)
+	// and nothing attaches this one - so this is the gate's other half, not a
+	// path: the leg that gets wired to it later cannot assemble a wider档 without
 	// a confirmation leg.
 	modeWrites *panel.ModeWriteHandler
 	// pump assembles the packet the panel is rendered from, out of the live

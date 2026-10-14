@@ -53,9 +53,9 @@ package main
 // 票 180's census classes a key "R" when production code reads its value at all.
 // By that ruler [agent] and [models] have readers. This file claims "已立即生效"
 // only for the narrower class - a reader that re-reads the live Manager - because
-// the sentence is about THIS run: cmd/wisp/run.go:423-424 takes `cfg := mgr.Config()`
+// the sentence is about THIS run: cmd/wisp/run.go:426-427 takes `cfg := mgr.Config()`
 // once and its own comment says "the runtime's non-mode settings stay frozen at
-// what this boot read", and execute() reads that copy (cmd/wisp/run.go:991
+// what this boot read", and execute() reads that copy (cmd/wisp/run.go:1023
 // `cfg := rt.cfg`). Calling [agent] 立即生效 on that shape is the same lie as
 // [panel], one layer deeper. Both files' evidence is in the roster strings below and
 // is pinned by config_receipt_255_test.go, so the disagreement is checkable rather
@@ -104,17 +104,17 @@ var hotRowClaims = map[string]string{
 	// :98 [ChatModel:      cfg.LLM.Roles.Chat.Model]), so a hand-edited [llm] role/provider
 	// changes what the next settings read says without a restart. Caveat this
 	// file owns: the boot snapshot still drives the running provider chain
-	// (cmd/wisp/run.go:435 [res := llm.NewResolver(cfg, st)]), so "已立即生效"
+	// (cmd/wisp/run.go:438 [res := llm.NewResolver(cfg, st)]), so "已立即生效"
 	// here means "the live reader answers differently", not "the in-flight
 	// model swapped".
 	"llm": hotClaimConsumed + "cmd/wisp/panel_config_store.go:98 [ChatModel:      cfg.LLM.Roles.Chat.Model] - configStore.ReadSettings calls s.mgr.Config() per call",
 
 	// Read in production, but only from the boot snapshot: rt.cfg is taken once
-	// at assembly (cmd/wisp/run.go:424 [rt.cfg = cfg]) and every use reads that
-	// copy (cmd/wisp/run.go:991 [cfg := rt.cfg]; the field is consumed at
-	// cmd/wisp/run.go:1014 [PerToolTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS)]). plan() did overwrite
+	// at assembly (cmd/wisp/run.go:427 [rt.cfg = cfg]) and every use reads that
+	// copy (cmd/wisp/run.go:1023 [cfg := rt.cfg]; the field is consumed at
+	// cmd/wisp/run.go:1046 [PerToolTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS)]). plan() did overwrite
 	// the memory, so the honest sentence is "值已换进内存", not "已立即生效".
-	"agent": hotClaimSnapshotOnly + "cmd/wisp/run.go:991 [cfg := rt.cfg] - every cfg.Agent read is the boot copy, so this run keeps acting on the old value",
+	"agent": hotClaimSnapshotOnly + "cmd/wisp/run.go:1023 [cfg := rt.cfg] - every cfg.Agent read is the boot copy, so this run keeps acting on the old value",
 
 	// Read by a DIFFERENT command's process: openModelStore takes the config
 	// (cmd/wisp/models.go:163 [cfg.Models.Mirror]) but its callers are the
