@@ -45,16 +45,18 @@ import (
 //     nothing can run until a parent's budget freed its slot, so the number it
 //     writes down is nonzero.
 //
-// Ticket 235 AC#2 added one more ruler to all three legs, and it is the one that
-// reads which side moved first: a child's arrival on the bridge must precede any
-// parent's return (h.awaitChildOnBridge222). Causally it always does - a parent's
-// conclusion comes from its child, and the child only reaches its conclusion
-// after its tool call has come back through the bridge - so the reading costs
-// microseconds on the fixed shape. Hand the child a tool surface that bypasses
-// the bridge (the M3 shape, the child back on a fake197Dir) and nothing ever
-// arrives while the parents still collect their conclusions one by one, which is
-// exactly what that leg now reads red at 0.00s instead of leaning on the 30s
-// guard rail below it.
+// Ticket 235 AC#2 added one more ruler to all three legs - the one that reads
+// which side moved first - and ticket 237 AC#3 tightened it from "one child
+// arrived" to every child: no leg goes on until all n of ITS children have
+// arrived on the real bridge, and a parent return is only accepted while
+// arrivals cover it (h.awaitChildOnBridge222). Causally a return cannot outrun
+// its own child's arrival - a parent's conclusion comes from its child, and the
+// child only reaches its conclusion after its tool call has come back through
+// the bridge - so the reading costs microseconds on the fixed shape. Hand one
+// child a tool surface that bypasses the bridge (the M3 shape, the child back on
+// a fake197Dir) and the arrivals stop covering the returns, which is what every
+// leg reads red at 0.00s now; before 237 the one-child shape stayed green in two
+// of the three legs and leaned on the 30s guard rail in the third.
 //
 // The per-tool budget these legs build the bridge with is a test-local knob
 // (Options.DefaultTimeout; production reads cfg.Agent.PerToolTimeoutMS at
@@ -309,8 +311,27 @@ func (h *h222) wireSpawn(t *testing.T) {
 					started: h.started,
 					release: h.release,
 				},
-				Tools:     h.bridge,
-				AdmitTask: func(string) func() { return func() {} },
+				Tools: h.bridge,
+				// This hook is the per-task boundary the composition root owns
+				// (internal/agent/loop.go:372 hands it the loop's own task id
+				// before any tool call, and defers the revocation at the end).
+				// The child's C25 scope must be OPEN before its first bridge
+				// call, or that call is assessed against an unregistered scope
+				// and fails closed: as soon as ANY scope holds a taint mark,
+				// risk's scopeMarks reports "unbound-scope" and R4 upgrades the
+				// call to L2 (internal/risk/provenance.go:705), which NoGate
+				// then refuses outright - the child's tool call never reaches
+				// the bridge and its arrival never comes. Ticket 237 AC#3's
+				// per-child pre-read is the first ruler to see this: the
+				// children that lost the race against the first child's
+				// finalize mark (subagent_197.go:487 marks the conclusion as
+				// task.output under the PARENT's id) were refused right there.
+				// pointer_185_cli_seam_test.go:346 opens a scope the same way
+				// ("the composition root would have done at task start").
+				AdmitTask: func(taskID string) func() {
+					h.bridge.OpenTask(taskID)
+					return func() { h.bridge.CloseTask(taskID) }
+				},
 			}, true
 		},
 	}
@@ -363,46 +384,111 @@ func await222Tokens[T any](t *testing.T, name string, ch <-chan T, n int) []T {
 // parkParents puts n parents at the wait and proves the children are alive but
 // held: every child is inside its first model call and every parent has emitted
 // its spawn delta, which the tool emits AFTER it gave the bridge slot back.
+//
+// The two facts are awaited as two separate happenings, because neither implies
+// the other: in subagent_197.go the child's goroutine is started (RunAsync)
+// BEFORE the spawn path reaches giveBackWhileWaiting and the "已派生" delta, so
+// under -race a child can already be inside its first model call while its
+// parent has not written its delta down yet. Reading len(h.parked) as a snapshot
+// the moment n "started" tokens arrived assumed that implication - it is ticket
+// 237's red (`-race -count=60 -run Test222`, "父任务没派生成功" over and over
+// while nothing had failed). A parked token per parent is the causality this leg
+// actually stands on: one channel receive per parent, no deadline, no extra
+// waiting. A parent that really gave up shows up as its own result instead.
 func (h *h222) parkParents(t *testing.T, n int) {
 	t.Helper()
 	h.launchParents(t, n)
 	await222Tokens(t, "孩子进入第一枚模型调用", h.started, n)
-	if got := len(h.parked); got != n {
-		t.Fatalf("只有 %d/%d 枚父任务到达等待点（父任务没派生成功，等待读数就无从谈起）", got, n)
+	timer := time.NewTimer(h222SafetyBound)
+	defer timer.Stop()
+	atWait := 0
+	for atWait < n {
+		select {
+		case <-h.parked:
+			atWait++
+		case res := <-h.parents:
+			h.parents <- res
+			t.Fatalf("只有 %d/%d 枚父任务到达等待点，却已经有父任务带着结果返回了：%q（这一枚真的没在等，不是派生回执还没写完）", atWait, n, res.Text)
+		case <-timer.C:
+			t.Fatalf("父任务到达等待点：只等到 %d/%d 枚，护栏到点（这一发真挂住了，不是读数不同）", atWait, n)
+		}
 	}
 	if got := len(h.parents); got != 0 {
 		t.Fatalf("已经有 %d 枚父任务返回了，这一发的等待读数就是假的", got)
 	}
 }
 
-// awaitChildOnBridge222 is ticket 235 AC#2's pre-read: it reads WHICH side moved
-// first before the leg goes on to collect n records. On the fixed shape a child's
-// arrival on the bridge always precedes any parent's return - the parent's
-// conclusion comes from its child, and the child only reaches that conclusion
-// after its tool call has come back through the bridge - so this returns in
-// microseconds and asserts nothing but the ordering. Hand the child a tool
-// surface that bypasses the bridge (the M3 shape) and nothing arrives while the
-// parents keep collecting conclusions, which is the reading this now fails on
-// instead of the 30s guard rail of the await behind it.
+// awaitChildOnBridge222 is ticket 235 AC#2's pre-read, tightened by ticket 237
+// AC#3 from "one child arrived" to EVERY child: it keeps reading until all n of
+// this leg's children have arrived on the real bridge, and a parent's return is
+// only accepted while arrivals cover it - the k-th returned child must have
+// reached the bridge before its own return, so with fewer than k arrivals
+// counted, k returns prove that some child's tool call never came through the
+// bridge at all (a bypassing child hands its parent a conclusion all the same).
+// Before 237 one arrival excused all of it, and the one-child-back-on-a-
+// fake197Dir shape stayed green in two of the three legs.
 //
-// The parent result it may pick up is handed straight back, so the leg's own
-// await over h.parents still sees all n of them. h.parents is buffered at
+// Counting rather than "any return before the n-th arrival kills it", on
+// purpose: children are independent goroutines, so a slow but honest child may
+// legitimately arrive after another child's parent has returned - only a
+// never-arriving child is a violation, and only a shortfall can prove one, while
+// a strict first-return rule would red on scheduling noise.
+//
+// A return is judged only after draining every arrival already buffered, because
+// a token is written before the child that sent it can complete: with the buffer
+// empty the count is exact rather than sampled. The parent results picked up are
+// all handed back on the way out, so the leg's own await over h.parents still
+// sees n of them - and handed back at the END, not one by one, because a result
+// put back mid-loop can be received a second time and counted twice (the same
+// shape as the snapshot bug AC#1 fixes: a reading picking up something that is
+// not the event it claims to read). h.parents is buffered at
 // 2*MaxConcurrentSubagents and never holds more than n at once.
-func (h *h222) awaitChildOnBridge222(t *testing.T) {
+func (h *h222) awaitChildOnBridge222(t *testing.T, n int) {
 	t.Helper()
 	timer := time.NewTimer(h222SafetyBound)
 	defer timer.Stop()
-	select {
-	case <-h.probe.arrived:
-	case res := <-h.parents:
-		h.parents <- res
-		t.Fatalf("桥上的到达信号一枚都没有，而第一枚父任务已经拿到了结论（真桥上累计执行 %d 次，"+
-			"反控那一发里这些全是宿主调用，孩子一次都没上桥）：%q ——"+
-			"孩子的工具面绕开了真桥＝A420 的第 7 环，票 235 AC#2 这一发就是为它加的",
-			h.probe.runs.Load(), res.Text)
-	case <-timer.C:
-		t.Fatalf("前置读数两头都没到（桥上到达 0 枚，父任务已返回 %d/%d 枚），护栏到点："+
-			"这一发真挂住了，不是读数不同", len(h.parents), MaxConcurrentSubagents)
+	// Every result taken off h.parents is held here and handed back on the way
+	// out - hand it back mid-loop and the next select can pick the SAME result
+	// up again, which would count one child's return twice (ticket 237 r1's
+	// first cut did exactly that and reddened on the fixed shape). At most n
+	// results exist and h.parents is buffered at 2*MaxConcurrentSubagents, so
+	// holding them cannot block the spawns that are still returning.
+	var picked []Result
+	defer func() {
+		for _, r := range picked {
+			h.parents <- r
+		}
+	}()
+	seen := 0
+	for seen < n {
+		select {
+		case <-h.probe.arrived:
+			seen++
+		case res := <-h.parents:
+			picked = append(picked, res)
+			// Drain every arrival already buffered before judging this return:
+			// a token is written before the child that sent it can complete, so
+			// with the buffer empty this count is exact rather than sampled.
+			for {
+				select {
+				case <-h.probe.arrived:
+					seen++
+					continue
+				default:
+				}
+				break
+			}
+			if seen < len(picked) {
+				t.Fatalf("桥上的到达信号只有 %d 枚，而已经有 %d 枚父任务拿到了结论（真桥上累计执行 %d 次）：%q ——"+
+					"父任务的结论来自它自己的子代理，子代理要到自己的工具调用从真桥回来之后才拿得到结论；"+
+					"到达数少于返回数＝有孩子的工具面绕开了真桥＝A420 的第 7 环"+
+					"（票 235 AC#2 加的这枚读数，票 237 AC#3 收紧成逐枚）",
+					seen, len(picked), h.probe.runs.Load(), res.Text)
+			}
+		case <-timer.C:
+			t.Fatalf("前置读数没读齐（桥上到达 %d/%d 枚，父任务已返回 %d 枚），护栏到点："+
+				"这一发真挂住了，不是读数不同", seen, n, len(picked))
+		}
 	}
 }
 
@@ -436,12 +522,13 @@ func Test222SpawnConclusionArrivesThroughRealBridgeChildren(t *testing.T) {
 	n := MaxConcurrentSubagents
 	h.parkParents(t, n)
 	close(h.release)
-	// Ticket 235 AC#2: the pre-read in front of the await below. This leg was the
-	// only one of the three that ever noticed a child whose tool surface bypasses
-	// the bridge, and it noticed only after the 30s guard rail fired; the arrival
-	// ordering decides that in microseconds, so the rail is a rail again and not
-	// the assertion.
-	h.awaitChildOnBridge222(t)
+	// Ticket 235 AC#2: the pre-read in front of the await below, tightened by
+	// ticket 237 AC#3 to every child (all n arrivals must come, and no parent
+	// return may outrun them). This leg was the only one of the three that ever
+	// noticed a child whose tool surface bypasses the bridge, and it noticed only
+	// after the 30s guard rail fired; the arrival ordering decides that in
+	// microseconds, so the rail is a rail again and not the assertion.
+	h.awaitChildOnBridge222(t, n)
 
 	// The gate keeps every child inside its bridge call until all n arrived, so
 	// "the child ran while its parent was still waiting" is a fact this leg
@@ -532,8 +619,9 @@ func Test222WaitingParentHoldsNoBridgeSlot(t *testing.T) {
 	// Ticket 235 AC#2: this leg used to be blind to a child whose tool surface
 	// bypasses the bridge - the bypassing child still hands its parent a
 	// conclusion, so every assertion above reads the same either way. The arrival
-	// ordering is what tells the two shapes apart, and it reads in microseconds.
-	h.awaitChildOnBridge222(t)
+	// ordering is what tells the two shapes apart, and it reads in microseconds;
+	// ticket 237 AC#3 made it read every child, so ONE such child is enough.
+	h.awaitChildOnBridge222(t, n)
 	results := await222Tokens(t, "父任务拿到结论", h.parents, n)
 	for i, res := range results {
 		if res.IsError {
@@ -598,10 +686,10 @@ func Test222CeilingStillCapsExecutedCallsWhileParentsWait(t *testing.T) {
 	// is about the children only. wg.Wait() has returned, so every host send is
 	// already buffered here and no child has been released yet: emptying the
 	// channel now means whatever awaitChildOnBridge222 reads next came from a
-	// child.
+	// child (ticket 237 AC#3 reads n of them, not one).
 	h.drainBridgeArrivals()
 	close(h.release)
-	h.awaitChildOnBridge222(t)
+	h.awaitChildOnBridge222(t, n)
 	results := await222Tokens(t, "父任务拿到结论", h.parents, n)
 	for i, res := range results {
 		if res.IsError {

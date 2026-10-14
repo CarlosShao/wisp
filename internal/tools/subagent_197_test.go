@@ -408,6 +408,7 @@ func Test197RowExistsBeforeFirstChildModelCall(t *testing.T) {
 // MaxConcurrentSubagents and this leg still goes red; ticket 222's M6 reading
 // (pool 8 against a bridge of 4, four legs red) is recorded in
 // docs/evidence/s1/222-spawn-holds-bridge-permit-v1.md.
+// No instrument watches this prose - only a human reads it (ticket 237 AC#2): deleting or rewording this paragraph turns nothing red, and the tie from it to the rulers it describes (Test222WaitingParentHoldsNoBridgeSlot reads len(bridge.sem), this nail reads the two constants) exists only in a reader's head.
 func Test197SubagentPoolNeverExceedsBridgeCeiling(t *testing.T) {
 	if MaxConcurrentSubagents > MaxToolConcurrency {
 		t.Errorf("池 %d 大于桥的 D38d 天花板 %d：多出来的 %d 枚会被桥排成队，名册却说它们在跑；"+
