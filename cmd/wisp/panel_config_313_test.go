@@ -265,3 +265,72 @@ func Test313WritableUnionEqualsTheTwoRosters(t *testing.T) {
 		}
 	}
 }
+
+// 313-r3: the comma split of a chain value, pinned at the seam that performs it.
+//
+// WHAT WAS MISSING. The panel sends a whole chain as ONE string (configValue), and
+// panel_config_store.go's splitChainValue is the only place in the repository that
+// turns it into the element slice the config setter takes. Until this pin, every
+// door-level chain write in the tests carried a single element, so 313-v1's
+// mutation - splitting on ";" instead of "," - left all three Test313 packages
+// green: a two-element chain would have been refused (the whole comma string read
+// as one model id) with nothing in the repository to say so. This is that reader.
+//
+// THE NAMES. The two model ids below are the ones the repository's own fixtures
+// already spell (settingsSeed's "deepseek-chat"; "deepseek-reasoner" is the second
+// model the 313/257 seeds carry, e.g. internal/config's enabled-head variant). No
+// name is invented here.
+//
+// THE VALUE carries the space a user types after the comma on purpose:
+// splitChainValue trims each element (its own contract), and the anchored line
+// below is what keeps that trimming from being dropped silently along with the
+// split.
+func Test313MultiElementCommaChainKeepsEveryElement(t *testing.T) {
+	// settingsSeed declares deepseek/deepseek-chat; the appended entry gives the
+	// chain a second legal fallback head.
+	const seed = settingsSeed + `
+[llm.providers.deepseek.models.deepseek-reasoner]
+enabled = true
+context_window = 32000
+`
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, configFileName), []byte(seed), 0o600); err != nil {
+		t.Fatalf("seed config.toml: %v", err)
+	}
+	var audit []string
+	disp, _ := newRealSettingsLeg(t, dir, &audit, nil)
+
+	// One config.set for the whole chain; apply313 carries the receipt-side
+	// requirement (names voice.cloud_asr_chain, keeps the restart wording).
+	const chainValue = "deepseek/deepseek-chat, deepseek/deepseek-reasoner"
+	apply313(t, disp, set313Env("r-313-2elt-asr", panel.FieldVoiceCloudASRChain, "", "", chainValue), "voice.cloud_asr_chain")
+
+	// Surface 1 - the file: both elements, in order, trimmed. Anchored to the array
+	// line itself because the seed's own model section also spells
+	// "deepseek-reasoner": a fragment search over the whole body would pass even if
+	// the chain landed half of itself.
+	body, err := os.ReadFile(filepath.Join(dir, configFileName))
+	if err != nil {
+		t.Fatalf("read config: %v", err)
+	}
+	const wantLine = "cloud_asr_chain = ['deepseek/deepseek-chat', 'deepseek/deepseek-reasoner']"
+	if !strings.Contains(string(body), wantLine) {
+		t.Errorf("config.toml does not carry the two comma-separated elements of %q as %q:\n%s", chainValue, wantLine, body)
+	}
+
+	// Surface 2 - the read side the picker calls: the same two elements, in order.
+	reply, err := disp.Handle(context.Background(), `{"method":"config.get","requestId":"r-313-2elt-get","source":"panel-composer"}`)
+	if err != nil {
+		t.Fatalf("config.get after the chain write: %v", err)
+	}
+	payload := settingsPayload313(t, reply)
+	voice, _ := payload["voice"].(map[string]any)
+	asr, _ := voice["cloudASRChain"].([]any)
+	if len(asr) != 2 || asr[0] != "deepseek/deepseek-chat" || asr[1] != "deepseek/deepseek-reasoner" {
+		t.Errorf("voice.cloudASRChain read back as %v, want both elements of %q in order", voice["cloudASRChain"], chainValue)
+	}
+	// The write owns the ASR chain alone.
+	if tts, _ := voice["cloudTTSChain"].([]any); len(tts) != 0 {
+		t.Errorf("the ASR-only write moved the TTS chain: %v", voice["cloudTTSChain"])
+	}
+}
