@@ -1,0 +1,30 @@
+# 319-r1 派单（票 319 落地：面板线程"死而能复活"＋二次启动唤窗＋三枚钉子；写腿；面＝`cmd/wisp`＋`internal/proc`）
+
+发送时刻：2026-10-14 22:4x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **319-r1**（`probes/319/r1` 未建，查重已做）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与依据（**先通读两件**）
+
+- 票：`.scratch/wisp/issues/319-panel-thread-death-is-terminal-and-a-second-launch-cannot-bring-any-window-to-front.md`
+- **只读普查件（本轮落地的最小形全在里面，逐枚）**：`.scratch/wisp/probes/319/a1/census.md`（162 行；根因已定案：15:41:45 用户/系统关窗 ⇒ `WM_CLOSE→WM_DESTROY→PostQuitMessage(0)→Run() return→teardown→finished(closed)`，此后每个手势 `post()` 返 false；假说乙 WebView2 崩、丙 会话事件均被反证）。
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。**行号一律现读复算**（census 的行号只作指路）。
+
+## 三格
+
+- **AC#1（甲形：手势处惰性重建）**：按 census §AC#1 的形状——`cmd/wisp/resident_windows.go` 把 `*residentPanel` 换成**持有者**（`mu/reg/mgr/rp` ＋ `toggle`/`statusLine`/`stop`）；`toggle` 里 `rp == nil || rp.isFinished()` ⇒ `rp = startResidentPanel(reg, mgr)`；`defer` 从停那枚改成停持有者；闭包改 `holder.toggle`／状态行改 `holder.statusLine()`；`panel_resident_windows.go` **只加读级谓词**（`isFinished()` 已存在）。
+  - **不变量（census 逐字，不许破）**：同一 `panel-sta` 名/同一 owner 走 `Registry.Spawn`（D38b 名册不动）、**不新增依赖边**、**不改 D38(e) 十步**；新 goroutine 的 `LockOSThread` 拿全新 OS 线程（Go 对 lock 后 return 的线程是销毁）⇒ `bringUp` 的前置成立。
+  - **判据（两向三态）**：未修形（现树）＝真窗 `PostMessageW(WM_SYSCOMMAND, SC_CLOSE)` ⇒ `finished` 关 ⇒ 下一次手势 `toggle` 返 false、不出窗（逐字）；修后同一发 ⇒ 下一次手势**重建出窗**（新 hwnd、逐字）；还原 ⇒ 复现未修形。⚠ 顺带把 census 曝的同族缺陷处置：`RequestDispose` 注释自称 "It keeps the pump running, so a later RequestShow builds a fresh window" **不成立**（它走 `WM_CLOSE` 同一条死路）——**只改注释与事实对齐**（逐字写清），⛔ 不许改既有行为行；本格随 AC#1 一起交。
+- **AC#2（二次启动唤窗）**：`internal/proc/boot_windows.go` 加 `SetActivationHook(func() string)`（同 `RegisterShutdownHook` 形状、func 值、**零依赖边**）；把其现量 `:133-142` 抽成可测 `handleActivation()`；`resident_windows.go` 把 hook 接到**球/托盘同一执行器**（census 指 `:257` 的 `panel.RequestToggle`）；第二实例在 `SetEvent` 前补 `AllowSetForegroundWindow(ASFW_ANY)`；回退提示用既有 `internal/ball` `SetTrayTip`（`ball_windows.go:961`）。
+  - ⛔ 托盘气泡（NIF_INFO）**另立腿**；页面内闪烁落 `frontend/**` ⇒ 面归外部 agent，**本腿不碰**。
+  - **判据**：headless＝`SignalExistingInstance` → 一轮 ⇒ hook **恰 1 次**、Reset 生效；活体＝census 记 21:40:38 那发"activation while alive"同形——修后必须真的把面板唤出（或至少托盘提示写字），逐字。
+- **AC#3 三枚钉子**：**N1** headless（spawn 可注入；塞一枚 `finished` 已关的假 rp ⇒ `toggle` 返 true 且 spawn 第 2 次；**变异＝删 `isFinished()` 那半 ⇒ 必红**）；**N2** headless（hook 恰 1 次；**变异＝去掉 hook 调用 ⇒ 必红**）；**N3** winlive（真窗 `SC_CLOSE` ⇒ finished ⇒ 下一次手势重建出窗）。⛔ 不许 `t.Skip`/恒真；先证"今天不响"再装钉。
+
+## 纪律
+
+- ⛔ **别扰动正在跑的 wisp 实例**：winlive 单跑前 `tasklist` 自证并报窗口；撞见在飞笔（如 `wisp.exe` 或别人的 `go.exe` 重包）**错峰重跑**、别把撞窗读数当主证。
+- ⚠ 314 死区：⛔ 整包 `./cmd/wisp/` 全套当主证；`-run` 小射程＋winlive 单跑。
+- 门禁：`go build ./...` rc=0／`go vet -tags winlive ./cmd/wisp/` rc=0／gofumpt 动过的件空／`sh scripts/d22scan.sh` clean／长度门 GREEN。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（MSYS 形；⛔ 缺它 0xc0000135）；`GOTMPDIR='C:\tmp\wisp319r1gotmp'`（只反斜杠形，先自建）；变异按仓规（仓外备份＋sha256＋还原证；不许进 commit）。
+- 交件：`probes/319/r1/00-anchor-and-gates.md`＋logs（两格各自"未修/修后/还原"＋变异两态）＋票 319 尾**逐格 append bullet**。产出 ≤7 枚 ≤200 行；只 commit、⛔ 不 push；显式 pathspec。
+- **未定义即停**：形状对不上现读／须碰禁区面（`frontend/**` 等）⇒ 停手上报。
+- 回执：结论先行＋commit sha（逐格）＋AC#1 三态逐字＋AC#2 两态逐字＋三钉变异两态＋门禁 rc＋具名没做。

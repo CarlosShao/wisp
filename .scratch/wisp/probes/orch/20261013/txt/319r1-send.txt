@@ -1,0 +1,5 @@
+319-r1 send 记录
+- 发送时刻：2026-10-14 22:4x +08；派单已先存档：txt/319r1-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/319/` = a1（r1 未建，可用）。
+- 收件人：agent_42b9050f-e91c-4172-89f5-3e51ecabfa8b（general-purpose，后台）。
+- 内容：票 319 落地（AC#1 甲形手势处惰性重建＋RequestDispose 注释对齐；AC#2 SetActivationHook＋AllowSetForegroundWindow＋SetTrayTip；AC#3 三钉 N1/N2/N3）。面=cmd/wisp+internal/proc。
