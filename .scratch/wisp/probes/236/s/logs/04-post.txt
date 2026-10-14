@@ -1,0 +1,20 @@
+=== gofumpt -l AFTER (expect empty, rc=0) ===
+
+rc=0
+
+=== gofumpt -d AFTER (expect empty) ===
+
+rc=0
+
+=== SYMBOL-BROKEN PROOF: replay ticket 185's own instrument (overlay build) AFTER ===
+# github.com/CarlosShao/wisp/internal/tools
+.\.scratch\wisp\probes\185\c1\mut\fs_broken.go:17:30: undefined: undefinedSymbol185c1
+rc=1
+--- position ---
+var probe185c1BrokenMarker = undefinedSymbol185c1
+
+=== overlay-muta control AFTER (clean mutant copy, expect rc=0) ===
+rc=0
+
+=== secondary ruler: only the marker line names an undefined symbol ===
+17:var probe185c1BrokenMarker = undefinedSymbol185c1

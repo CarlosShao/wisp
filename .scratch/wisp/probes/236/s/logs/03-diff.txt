@@ -1,0 +1,33 @@
+=== git diff (this file only) ===
+diff --git a/.scratch/wisp/probes/185/c1/mut/fs_broken.go b/.scratch/wisp/probes/185/c1/mut/fs_broken.go
+index ee583853..20f5ae54 100644
+--- a/.scratch/wisp/probes/185/c1/mut/fs_broken.go
++++ b/.scratch/wisp/probes/185/c1/mut/fs_broken.go
+@@ -1,5 +1,4 @@
+ package tools
+-var probe185c1BrokenMarker = undefinedSymbol185c1
+ 
+ import (
+ 	"context"
+@@ -15,6 +14,8 @@ import (
+ 	"github.com/CarlosShao/wisp/internal/risk"
+ )
+ 
++var probe185c1BrokenMarker = undefinedSymbol185c1
++
+ // The D34 fs family lands slice by slice. This file holds the L0 pair:
+ //
+ //	fs.read  L0 inside [fs] allowed_dirs, L2 out of scope via R2
+
+=== numstat ===
+2	1	.scratch/wisp/probes/185/c1/mut/fs_broken.go
+
+=== diff cand2 (intended target, byte-exact) ===
+IDENTICAL to cand2
+
+=== fingerprint AFTER ===
+  339 11042 .scratch/wisp/probes/185/c1/mut/fs_broken.go
+c43e4b1e1acc88b7832b85d2eaa611ec *.scratch/wisp/probes/185/c1/mut/fs_broken.go
+f4fd2d4714b2e44d3bcf56e5ead85df3efa303db *.scratch/wisp/probes/185/c1/mut/fs_broken.go
+a14dbcc91b518473db2862897095f0dba6b02768ff93e1e45c6f8ec68b68c5b9 *.scratch/wisp/probes/185/c1/mut/fs_broken.go
+20f5ae5407fdb29c464ea1268aed3a9301d75269

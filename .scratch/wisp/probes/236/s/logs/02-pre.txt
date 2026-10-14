@@ -1,0 +1,31 @@
+=== window ===
+da389ca5
+2026-10-14 19:25:13 +0800
+
+=== fingerprint BEFORE ===
+  338 11041 .scratch/wisp/probes/185/c1/mut/fs_broken.go
+f5c325e04a9a0d94421a665d9479e7b5 *.scratch/wisp/probes/185/c1/mut/fs_broken.go
+f9bc1dbd863667eda987f0e898b3663178e76786 *.scratch/wisp/probes/185/c1/mut/fs_broken.go
+6db34456c1e097fad745348b29071e77e8a1ee547b9611a4ba42e2b590300e90 *.scratch/wisp/probes/185/c1/mut/fs_broken.go
+ee58385366d8fb6693c12fe0a4367225538f9dd4
+100644 ee58385366d8fb6693c12fe0a4367225538f9dd4 0	.scratch/wisp/probes/185/c1/mut/fs_broken.go
+--- git diff vs HEAD (expect empty) ---
+--- fs.go diff (expect only added marker line) ---
+1a2
+> var probe185c1BrokenMarker = undefinedSymbol185c1
+
+=== gofumpt -l BEFORE (stdout+stderr, rc) ===
+.scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: imports must appear before other declarations
+rc=2
+
+=== gofumpt -d BEFORE ===
+.scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: imports must appear before other declarations
+rc=2
+
+=== overlay build BEFORE (ticket 185 original instrument) ===
+# github.com/CarlosShao/wisp/internal/tools
+.\.scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: syntax error: imports must appear before other declarations
+rc=1
+
+=== overlay-muta control (clean mutant copy, expect rc=0) ===
+rc=0

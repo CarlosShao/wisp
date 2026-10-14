@@ -1,0 +1,81 @@
+=== length gate: scripts/check-path-length-budget.sh ===
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=unset)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 12954 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=12954  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 60 paths on this tree, recomputed just now in both units
+length rc=0
+
+=== scoped status: my face (185 + 236) ===
+ M .scratch/wisp/probes/185/c1/mut/fs_broken.go
+?? .scratch/wisp/probes/185/c1/logs/d22scan-post-final.txt
+?? .scratch/wisp/probes/236/r5/logs/run327-test-windows.err
+?? .scratch/wisp/probes/236/r5/logs/run327-test-windows.log
+?? .scratch/wisp/probes/236/r5/logs/run328-test-windows.err
+?? .scratch/wisp/probes/236/r5/logs/run328-test-windows.log
+?? .scratch/wisp/probes/236/r6/logs/01-anchor.txt
+?? .scratch/wisp/probes/236/r6/logs/02-pre-Test236.txt
+?? .scratch/wisp/probes/236/r6/logs/03-pre-gofumpt-build.txt
+?? .scratch/wisp/probes/236/r6/logs/04-diff-comment-only.txt
+?? .scratch/wisp/probes/236/r6/logs/05-post-Test236-race.txt
+?? .scratch/wisp/probes/236/r6/logs/06-post-gofumpt-build-length.txt
+?? .scratch/wisp/probes/236/r6/logs/07-d22scan.txt
+?? .scratch/wisp/probes/236/r7/logs/00-time.txt
+?? .scratch/wisp/probes/236/r7/logs/01-anchor.txt
+?? .scratch/wisp/probes/236/r7/logs/01-reprojection-raw.txt
+?? .scratch/wisp/probes/236/r7/logs/02-same-text-check.txt
+?? .scratch/wisp/probes/236/r7/logs/03-pre-Test236.txt
+?? .scratch/wisp/probes/236/r7/logs/04-pre-gofumpt-build.txt
+?? .scratch/wisp/probes/236/r7/logs/05-ruler.txt
+?? .scratch/wisp/probes/236/r7/logs/06-post-Test236-race.txt
+?? .scratch/wisp/probes/236/r7/logs/07-post-gofumpt-build.txt
+?? .scratch/wisp/probes/236/r7/logs/08-post-truth-projection.txt
+?? .scratch/wisp/probes/236/r7/logs/09-post-commit-recheck.txt
+?? .scratch/wisp/probes/236/s/
+?? .scratch/wisp/probes/236/v2/raw/
+
+=== scoped status: internal cmd (not mine; expect other legs only) ===
+
+=== scoped status: scripts .github (not mine) ===
+
+=== tracked-set gofumpt ruler (worktree): is fs_broken gone from the dirty list? ===
+.scratch\wisp\probes\163\a1\main.go
+.scratch\wisp\probes\174\c2\zz174c2_wiring_pair_windows_test.go
+.scratch\wisp\probes\183\r2\mut\task-boxset-off.go
+.scratch\wisp\probes\185\r1\mut-m1\hostpath_185.go
+.scratch\wisp\probes\197\r1c\pre\subagent_197.go
+.scratch\wisp\probes\197\r1c\pre\subagent_197_test.go
+.scratch\wisp\probes\212\v1\mut\main-noq9.go
+.scratch\wisp\probes\220\r1\prechange\prechange220_probe_test.go
+.scratch\wisp\probes\222\v1\mutations\m11-budget-50ms-gated\subagent_222_test.go
+.scratch\wisp\probes\224\v2\dialect_probe_test.go
+.scratch\wisp\probes\231\v1\mutation\config_reload_branch_after_prefix.go
+.scratch\wisp\probes\235\v1\mut\prereadoff-m3_222_test.go
+.scratch\wisp\probes\241\v1\posctl\badly_formatted.go
+.scratch\wisp\probes\241\v1\probe_v1_readings_test.go
+.scratch\wisp\probes\253\v2\denoms253v2.go
+.scratch\wisp\probes\257\r2\mut\M1\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M2\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M3\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M4\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M5\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M6\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M7\firstrun.go
+.scratch\wisp\probes\257\r2\mut\M8\firstrun_257_nonpreset_test.go
+.scratch\wisp\probes\259\r1\gofumpt-negctl\probe.go
+.scratch\wisp\probes\263\v1\src\main.go
+.scratch\wisp\probes\33\p1\q1\main.go
+.scratch\wisp\probes\33\p1\q2\main.go
+.scratch\wisp\probes\33\p1\q3\main.go
+cmd\wisp\models.go
+cmd\wisp\panel_transport_35r2_test.go
+--- stderr (parse errors if any) ---
+--- does fs_broken appear anywhere? ---
+0
+(0 = gone)

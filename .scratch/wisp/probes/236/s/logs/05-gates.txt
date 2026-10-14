@@ -1,0 +1,39 @@
+=== window (now) ===
+da389ca5
+2026-10-14 19:26:50 +0800
+--- drift since my start anchor 81730cea ---
+da389ca5 test(133 AC#3/AC#4): 自证腿（弄哑即响）＋注册表两半成对＋下限抬到实测 12＋逐枚可区分
+d01f4b71 编排者：A952（178 收口：判语收件＋五格翻＋-done＋171 登记；完成度 130/305）
+41071cdc 编排者：178 收口（五格亲验后翻；G5/G7 措辞收窄；-done＋名册同步；171 钉旁效登记）
+b6fc818d fix(136 AC#2 追加): seam 注入路的空首字段也拒绝——补上"缺字段不许静默当新鲜"的另一半
+b6e959b1 evidence(136 AC#3,AC#4): 三格三态全量与门禁读数（22 world x 2 树）
+898ce5f3 178-v1 验证腿（非实现者）：AC#2 成立（自造生产件只开两向＋②计数控制）＋AC#3/AC#4/AC#5 成立＋G5/G7 数值逐字节同（共享行尾注 6 处=措辞收窄、附条件）＋面核对与 r3 钉 rc=2 归 171
+72db0f39 编排者：159 翻四格（AC#2 押后）＋A949/A950/A951（记账两笔代贴）＋派 236s（AC#6 甲案）
+
+=== d22scan.sh (expect rc=0, control first green) ===
+=== RUN   TestSelfTestRosterAuditRejectsAHollowTable
+--- PASS: TestSelfTestRosterAuditRejectsAHollowTable (0.00s)
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers
+--- PASS: TestSelfTestRefusesToAuditAnEmptyRoster (0.01s)
+    --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster (0.00s)
+    --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers (0.00s)
+=== RUN   TestSelfTestFlagIsWiredInTheBuiltBinary
+--- PASS: TestSelfTestFlagIsWiredInTheBuiltBinary (4.50s)
+PASS
+ok  	github.com/CarlosShao/wisp/tools/d22scan	27.081s
+runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 277 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 237 production Go files
+d22scan: scope bans #1-5 cmd/           examined  40 production Go files
+d22scan: scope ban #6 frontend/         examined 115 text files
+d22scan: scope ban #7 internal/tools/   examined  24 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 115 text files
+d22scan: scope ban #8 internal/         examined 556 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 128 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=237, bans #1-5 cmd/=40, ban #6 frontend/=115, ban #7 internal/tools/=24, ban #8 design/=39, ban #8 frontend/=115, ban #8 internal/=556, ban #8 cmd/=128; ban #8 emoji coverage: design/ 39 text files; frontend/ 115 text files; internal/ 556 Go files, comments and _test.go included; cmd/ 128 Go files, comments and _test.go included
+d22scan rc=0
