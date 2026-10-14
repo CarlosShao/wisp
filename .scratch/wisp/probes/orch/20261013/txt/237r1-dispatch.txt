@@ -1,0 +1,37 @@
+# 237 派单（-race 偶发红修/登记＋注释旁零提示＋前置读数射程；写腿；面＝internal/tools 测试面）
+
+发送时刻：2026-10-14 09:1x +08。编排者派发。HEAD 现量 `58366328`。
+你 = Wisp 流水线的落地腿 **237-r1**。身份＝实现者（判语归后续非实现者腿）。票面自述：**三格全是"测试面／注释面"，零行为变更**。
+
+## 票与目标
+
+- 票：`.scratch/wisp/issues/237-race-run-exposes-a-parentheft-inference-that-never-held-plus-two-things-only-a-human-reads.md`（通读全文；判据三格＋禁区＋现量表＋来路）
+- 来路：非实现者裁决腿 `235-v1`（`docs/evidence/s1/235-pool-nail-and-bridge-preread-v1.md`，27,557 字节）给了决定性对照——隔离 20/100 发绿、12 枚 CPU 压载 150 发绿、**把 235 之前的代码换回来同一枚命令照样红一枚**、两发 `DATA RACE` 都是 0 ⇒ 那枚红**不是票 235 造的**，是"测试等的不是它真正依赖的那件事"。
+
+### 三格（判据逐字在票面）
+
+- **AC#1**：那枚 `-race` 红**修推断（甲）或登记（乙）**，二选一并写清。甲＝把测试的等待条件改成它真正依赖的那件事（⛔ 不许"多等一会儿"糊）；乙＝承认推断不成立、用例改成不依赖回执数已满＋在台件与 CI 归因文案写明"CI 偶发在这句上时别归因成父任务没派生成功"。**完成判据＝改前红形状复现（具名命令＋`-race -count=N` 读数）＋改后同命令 N≥20 发零红＋`git status --porcelain -- internal cmd` 为空。**
+- **AC#2**：在 `subagent_197_test.go` 那段守池注释（"今天没有任何仪器盯着、只能靠人读"）的**代码旁边**加一行同义提示。⛔ 禁法＝**不许新写"断言注释文字"的测试**。判据＝`git diff` 只有注释行、删除列为零或只落在注释行。
+- **AC#3**：前置读数射程收紧（甲：从"至少一枚到达早于第一枚返回"改成**逐枚**）**或**具名作废（乙：常驻注释＋台账登记已知盲区，⛔ 不许只留"以后加固"）。判据＝形状 (i) 摘掉逐枚要求必红、(ii) "只有一枚孩子绕开真桥"那形必红（或按乙具名写明今天必不红＋原因）。
+- ⚠ **行号全漂了**（例：`subagent_197.go` 被 229-r1 在 `:394` 改过名字、`subagent_197_test.go:398` 的"398"只是票面写时的读数）⇒ **行号你自己现量重跑**（`grep -n`），⛔ 别照抄票面/派单里的号。
+
+## 写面与禁区
+
+- 写面＝`internal/tools/**` 的 **_test.go** 文件（＋你的证据件目录 `.scratch/wisp/probes/237/r1/`）。
+- ⛔ **零产码语义变更**：`internal/tools/subagent_197.go`／`bridge.go` 的判定分支一条都不许动。⚠ 票面说"只动 `_test.go`"；AC#2 的"代码旁边"若你判必须动产码文件的**注释行** ⇒ **停手上报**（⛔ 别自行跨线）。
+- ⛔ 不动 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`tools/d22scan/**`／三枚冻结件（`internal/panel/tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）；⛔ 不为变绿放宽任何断言或减少 `-race` 次数口径；`frontend/**`／`design/**` 零读零写零转述。
+
+## 环境与纪律（十条）
+
+1. **只 commit、⛔ 不 push**。`git add`／`git commit` **都带显式 pathspec**；⛔ `add -A`／目录／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内不建 worktree；临时件只建不删；共享树里别人脏件别动（`design/**` 删除态、`go.mod`、`.gitignore`、`?? -` 等既有脏件全不归你）。
+2. `GOTMPDIR` ⛔ 只 C: 卷（你自己的例 `C:\tmp\wisp237gotmp`）。
+3. **-race 跑法与窗口**：跑重发前 `tasklist` 看台面；你的每发 `-race -count=N` **起止时刻逐枚报**（纪律；先例 `probes/260/r5/evidence.md` §3.3）——现在有他腿（255-r7，cmd/wisp 面）在飞，窗口报时刻是纪律。⚠ 本机夜里挂起过（23:58→08:53），若读数期间机器又睡，具名重跑。
+4. 314 死区只影响 `cmd/wisp` 整包，与你无关；但也 ⛔ 别顺手跑 `./cmd/wisp/`（本票零需要）。
+5. 门禁（每件自落 rc）：`GOFLAGS= go build ./...` rc=0；`gofumpt -l` 动过的件＝空；`go test -count=1 -race -run '<该用例>' ./internal/tools/`（AC#1 的 N≥20 口径，逐发报）；`sh scripts/d22scan.sh` clean；长度门 `sh scripts/check-path-length-budget.sh`（今晨 09:0x 现跑＝**GREEN**，58=58；若你见到 RED 逐字报）。
+6. 红形状复现要在**同一锚点**上先发（**改前**），读数逐字落 logs；改后同命令 N≥20 发。
+7. 票面：票尾 Progress-log **追加 1 条 bullet**；⛔ `- [ ]` 框不翻（判语归非实现者）；⛔ `Status:`／票名一字不动。
+8. 产出预算：交件 ≤7 枚 ≤200 行（大日志留盘不入库，件里点名路径＋字节数）。
+9. **未定义即停**：票面没覆盖的形（AC#2 落点只能进产码文件／AC#1 两案都做不圆／-race 复现不了／红形状与你锚点对不上）⇒ **停手上报**，⛔ 别自己裁一个形硬干。
+10. 回执：结论先行（干没干成／红绿）＋两笔 commit 短 sha（产码＋交付件分开）＋每件路径＋门禁 rc＋**AC#1/AC#3 你选的案（甲/乙）与理由**＋具名没做的格＋下一位要点。
+
+发送时刻现量：HEAD `58366328`；在飞他腿＝`255-r7`（cmd/wisp 名册面，与你的面零重叠）；CPU 以你起手现读为准（09:1x 编排者读数为 ~30%）。
