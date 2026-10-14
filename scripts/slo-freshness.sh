@@ -44,6 +44,24 @@
 #                                gate look healthy - the same silent death this
 #                                nail exists to catch.
 #
+# Ticket 136 AC#2 changed what "a valid sample" is. R-134-5 measured a world in
+# which a name-right, date-right artifact that the slo-full job never produced
+# kept P3 green (H7 in docs/evidence/s1/134-adversarial-acceptance.md section
+# 6.2), so an artifact now has to carry its PROVENANCE before P3 will age on it:
+#   workflow  the run that uploaded it is a run of .github/workflows/ci.yml
+#   branch    that run is on main or dev (the branches P2 accepts)
+#   event     that run is a push, a schedule or a workflow_dispatch
+# The branch comes from the artifact listing itself (workflow_run.head_branch is
+# part of the response); workflow and event need one `actions/runs/{id}`
+# look-up, made only for branch-valid candidates and stopping at the first that
+# passes (the normal case costs exactly one look-up). A lookalike that fails the
+# predicates is named and counted (red token slo-full-sample-never), never
+# silently dropped; a scanned record missing any field these checks read exits 2
+# instead of being aged, because a missing field is the one shape that could
+# hide the real sample. Records injected through SLO_FULL_LAST_SAMPLE are
+# declared valid-sample fixtures and are not re-checked: the predicates exist to
+# guard the API scan, which is the production input.
+#
 # Three probes, all required:
 #   P1 static   - .github/workflows/ci.yml still carries the triggers that make
 #                 slo-full auto-run (push on main/dev + a schedule), and the
@@ -57,9 +75,10 @@
 #                 only, or the whole workflow stops being referenced. Since
 #                 AC#6 this probe alone is NOT enough (see above) - it is kept
 #                 because it is still the only one that sees a queued job.
-#   P3 sampling - the newest `slo-full-report` ARTIFACT is younger than
-#                 SLO_FULL_SAMPLE_MAX_AGE_DAYS, and at least one exists. This
-#                 is the probe that stays sharp when every run is a
+#   P3 sampling - the newest `slo-full-report` ARTIFACT that carries the source
+#                 predicate (ticket 136 AC#2, see below) is younger than
+#                 SLO_FULL_SAMPLE_MAX_AGE_DAYS, and at least one such artifact
+#                 exists. This is the probe that stays sharp when every run is a
 #                 machine-contended no-conclusion run.
 #
 # Failure tokens are stable strings so a log grep can name the cause:
@@ -70,12 +89,15 @@
 # overrides "now", SLO_FULL_LAST_TRIGGER injects a job record instead of
 # querying GitHub, SLO_FULL_LAST_SAMPLE injects (or, as the literal `none`,
 # fixtures away) a valid-sample record, SLO_FRESH_CI points at a different copy
-# of ci.yml. They exist so this pin can be mutation-tested without touching a
-# shared file or the API; every one of them shapes the INPUT of a check, none
-# of them turns a check off. There is no seam that makes a probe pass: an empty
-# SLO_FULL_LAST_TRIGGER still queries the API, `none` for SLO_FULL_LAST_SAMPLE
-# forces the reddest branch there is, and a missing token exits 2 rather than
-# exiting 0 (D22 mode-6: no skip switch).
+# of ci.yml. A record injected through SLO_FULL_LAST_SAMPLE is a declared
+# valid-sample fixture with the documented shape created_at <TAB> run <TAB>
+# artifact-id; a record the API scan returns carries a 4th column (head_branch)
+# and is the one that goes through the source predicate. They exist so this pin
+# can be mutation-tested without touching a shared file or the API; every one of
+# them shapes the INPUT of a check, none of them turns a check off. There is no
+# seam that makes a probe pass: an empty SLO_FULL_LAST_TRIGGER still queries the
+# API, `none` for SLO_FULL_LAST_SAMPLE forces the reddest branch there is, and a
+# missing token exits 2 rather than exiting 0 (D22 mode-6: no skip switch).
 #
 # Exit codes: 0 = all three probes agree slo-full is alive and sampling,
 # 1 = at least one failed, 2 = the pin could not look (no gh, no token, no
@@ -270,7 +292,10 @@ fi
 # header of this file for why P2 alone stopped being enough the moment a
 # machine-contended run learned to exit 0.
 #
-# Records are TSV: created_at <TAB> workflow-run-id <TAB> artifact-id.
+# Records are TSV: created_at <TAB> workflow-run-id <TAB> artifact-id, and the
+# API scan appends a 4th field, head_branch. A scanned record with no created_at
+# arrives with the sentinel `-` in that first field, so the field count never
+# shifts and the missing value stays visible to the checks below.
 #
 # ONE source of truth for the name. It is a plain assignment, not a knob: an
 # env-overridable name would let whoever sets it to `slo-smoke-report` blind
@@ -282,6 +307,7 @@ fi
 sample_artifact=slo-full-report
 sample_records=''
 sample_scan_note=''
+sample_scanned=0
 if [ "$sample_record" = none ]; then
     # Fixture branch: the world in which the artifact scan came back empty,
     # i.e. runs keep happening but not one of them produced a report. Only a
@@ -293,6 +319,7 @@ elif [ -n "$sample_record" ]; then
     sample_scan_note='SLO_FULL_LAST_SAMPLE injected (test seam, 1 record)'
 else
     can_look
+    sample_scanned=1
     # Measured 2026-09-23 on this repo, two facts that both bite:
     #   * the listing is ordered by ARTIFACT ID descending, not by created_at:
     #     page 1 started 05:39:19 / 05:25:01 / 04:53:50 / 05:39:05 / 04:44:08,
@@ -312,7 +339,7 @@ else
             --jq '.artifacts[]
                   | select(.name=="'"$sample_artifact"'")
                   | select(.expired==false)
-                  | [(.created_at // ""), ((.workflow_run.id // 0)|tostring), ((.id // 0)|tostring)]
+                  | [(.created_at // "-"), ((.workflow_run.id // 0)|tostring), ((.id // 0)|tostring), (.workflow_run.head_branch // "")]
                   | join("\t")' 2>&1 </dev/null); then
             echo "slo-freshness: P3 the artifacts query (page $sample_page) failed, GitHub said:" >&2
             printf '%s\n' "$page_records" >&2
@@ -335,35 +362,119 @@ $page_records"
 fi
 
 sample_count=0
+rejected=0
 best_ts=''
 best_run=''
 best_art=''
 best_epoch=-1
 if [ -n "$sample_records" ]; then
     tab=$(printf '\t')
-    while IFS=$tab read -r ts art_run art_id; do
-        [ -n "$ts" ] || continue
-        sample_count=$((sample_count + 1))
-        e=$(to_epoch "$ts")
-        if [ "$e" -gt "$best_epoch" ]; then
-            best_epoch=$e
-            best_ts=$ts
-            best_run=$art_run
-            best_art=$art_id
-        fi
-    done <<EOF3
+    if [ "$sample_scanned" -eq 1 ]; then
+        # Ticket 136 AC#2: a scanned record is only a CANDIDATE until it has
+        # carried its provenance. The fields are checked one by one before
+        # anything is aged - created_at to age it, workflow_run.id to look the
+        # run up, head_branch for the one source predicate the listing itself
+        # carries. A record missing any of them is a refusal (exit 2), never a
+        # sample: a missing field is the one shape that could hide the real one.
+        survivors=''
+        while IFS= read -r row; do
+            [ -n "$row" ] || continue
+            case $row in
+            "$tab"*)
+                echo "slo-freshness: P3 a $sample_artifact record from the scan starts with an empty field (row: '$row') - a record this pin cannot read must not be aged" >&2
+                exit 2
+                ;;
+            esac
+            IFS=$tab read -r ts art_run art_id art_branch <<EOF4
+$row
+EOF4
+            sample_count=$((sample_count + 1))
+            if [ "$ts" = '-' ]; then
+                echo "slo-freshness: P3 a $sample_artifact record from the scan carries no created_at (run=$art_run artifact=$art_id) - 'no timestamp' is not 'endlessly fresh', refusing (ticket 136 AC#2)" >&2
+                exit 2
+            fi
+            if [ "$art_run" = 0 ] || [ -z "$art_branch" ]; then
+                echo "slo-freshness: P3 a $sample_artifact record from the scan carries no workflow_run fields (run='$art_run' branch='$art_branch' artifact=$art_id) - its provenance cannot be checked, so it cannot be aged (ticket 136 AC#2)" >&2
+                exit 2
+            fi
+            e=$(to_epoch "$ts")
+            case $art_branch in
+            main | dev) ;;
+            *)
+                rejected=$((rejected + 1))
+                echo "slo-freshness: P3 source predicate: artifact $art_id on branch '$art_branch' rejected (branch must be main or dev; ticket 136 AC#2)"
+                continue
+                ;;
+            esac
+            survivors="$survivors$e$tab$ts$tab$art_run$tab$art_id$tab$art_branch
+"
+        done <<EOF3
 $sample_records
 EOF3
+        if [ -n "$survivors" ]; then
+            # Newest branch-valid candidate first. Workflow and event live on
+            # the run, not on the artifact, so each candidate costs one look-up
+            # and the first that passes it is the newest valid sample.
+            while IFS=$tab read -r e ts art_run art_id art_branch; do
+                [ -n "$e" ] || continue
+                if ! run_line=$(gh api "repos/$repo/actions/runs/$art_run" \
+                    --jq '[(.path // ""), (.event // ""), (.head_branch // "")] | join("\t")' 2>&1 </dev/null); then
+                    echo "slo-freshness: P3 the run look-up for $art_run failed, GitHub said:" >&2
+                    printf '%s\n' "$run_line" >&2
+                    exit 2
+                fi
+                IFS=$tab read -r run_path run_event run_branch <<EOF4
+$run_line
+EOF4
+                ok=1
+                [ "$run_path" = '.github/workflows/ci.yml' ] || ok=0
+                case $run_event in
+                push | schedule | workflow_dispatch) ;;
+                *) ok=0 ;;
+                esac
+                if [ "$ok" -eq 0 ]; then
+                    rejected=$((rejected + 1))
+                    echo "slo-freshness: P3 source predicate: artifact $art_id (branch '$art_branch') comes from run $art_run of workflow '$run_path' event '$run_event' on '$run_branch' - rejected (the uploading run must be .github/workflows/ci.yml with event push|schedule|workflow_dispatch; ticket 136 AC#2)"
+                    continue
+                fi
+                best_epoch=$e
+                best_ts=$ts
+                best_run=$art_run
+                best_art=$art_id
+                break
+            done <<EOF5
+$(printf '%s' "$survivors" | sort -t "$tab" -k1,1nr)
+EOF5
+        fi
+    else
+        # Test-seam records (SLO_FULL_LAST_SAMPLE) are declared valid-sample
+        # fixtures; the source predicate guards the API scan, not the fixture.
+        while IFS=$tab read -r ts art_run art_id; do
+            [ -n "$ts" ] || continue
+            sample_count=$((sample_count + 1))
+            e=$(to_epoch "$ts")
+            if [ "$e" -gt "$best_epoch" ]; then
+                best_epoch=$e
+                best_ts=$ts
+                best_run=$art_run
+                best_art=$art_id
+            fi
+        done <<EOF3
+$sample_records
+EOF3
+    fi
 fi
 
 if [ "$sample_count" -eq 0 ]; then
     fail "slo-full-sample-never: no uploaded $sample_artifact artifact at all ($sample_scan_note). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified."
+elif [ "$best_epoch" -lt 0 ]; then
+    fail "slo-full-sample-never: $sample_count $sample_artifact artifact(s) were found but none carries the source predicate of a valid sample (ticket 136 AC#2: workflow .github/workflows/ci.yml, branch main|dev, event push|schedule|workflow_dispatch); $rejected rejected. Refusing to age on a lookalike ($sample_scan_note). D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified."
 else
     sample_age=$((now - best_epoch))
     if [ "$sample_age" -lt 0 ]; then sample_age=0; fi
     sample_age_days=$((sample_age / 86400))
     echo "slo-freshness: P3 newest VALID SAMPLE: artifact $sample_artifact created_at=$best_ts artifact_id=$best_art run=$best_run"
-    echo "slo-freshness:   $sample_scan_note; $sample_count valid-sample record(s) considered"
+    echo "slo-freshness:   $sample_scan_note; $sample_count record(s) considered, $rejected rejected by the source predicate"
     echo "slo-freshness:   age: $sample_age_days day(s) ($sample_age s); threshold: $sample_max_age_days day(s)"
     if [ "$sample_age_days" -gt "$sample_max_age_days" ]; then
         fail "slo-full-sample-stale: the last VALID SLO SAMPLE is $sample_age_days day(s) old (> $sample_max_age_days). Jobs may well be green - since ticket 134 AC#6 a machine-contended run exits 0 without a report - so a green job is not the question. The question is when numbers last existed, and that was $best_ts (run $best_run). D32 has been unverified since then."
