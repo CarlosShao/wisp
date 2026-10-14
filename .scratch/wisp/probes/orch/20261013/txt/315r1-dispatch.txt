@@ -1,0 +1,34 @@
+# 315-r1 派单（票 315 AC#1：修"任务开始不开 C25 作用域"根因；写腿；面＝cmd/wisp（＋必要时 internal/agent））
+
+发送时刻：2026-10-14 11:2x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **315-r1**。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 来路（AC#0＝**复现**，已完成；你从读数出发）
+
+- 探针腿 `315-a1` 活体复现（件 `.scratch/wisp/probes/315/a1/evidence.md`；提交 `e0d6d383`＋`810deeb4`）：**子代理的兄弟孩子**（同一父任务的第二枚子代理）**自己**的首批走桥调用（白名单内 `fs.read`、与兄弟同路径）被真桥判 **L2/R4 unbound-scope** → 落真审批门 → 生产默认 **31s 超时自动拒**；对照腿（同子代理的首调用、无别处 mark）＝L0/allow。编排者亲跑复核（11:2x）：逐字红句＋`in_allowlist_scope=true`＋`decision=timeout->reject after=31s`。
+- 因果链（a1 快照＋静态现读）：甲结论 mark 落**父名**（`internal/tools/subagent_197.go:487`）→ 乙 scope **从未开**（audit `was_open=false`）→ `internal/risk/provenance.go:694` 的 `scopeMarks` fail-closed 开火（"别的 scope 有 mark"条件满足）→ R4。
+- 复跑命令（门控）：`WISP_315A1=1 GOFLAGS= go test ./cmd/wisp/ -run 'TestZZ315A1' -count=1 -v`（A 当发 ~0.3s；B 当发 ≈31s＋编译）。
+
+## 你要做的（按序）
+
+0. **先现读＋复现**：读 a1 的 `evidence.md` 全文；自己跑上面那条命令看**修前红**（B＝rc 1、红句逐字；A＝绿）。
+1. **设计读出（先读再动）**：C25 scope 生命周期的**所有权原文**（`internal/tools/bridge.go` 的 `OpenTask`/`CloseTask` 注释与 `:847` 定义、`internal/risk/provenance.go` 的 scope 语义、SPEC-06 相关节）＋票 151 的裁决（"组合根 defer 关"）＋票 154 的残余（"宿主自带 id"形）＋★**票 237 的 harness 侧同形修法**（`237-r1` 在 `internal/tools/subagent_222_test.go` 的 `AdmitTask` 每任务边界补 `OpenTask/CloseTask` 才让孩子上桥——**生产侧的对称形**）。⇒ 选案并**具名理由**；三案＝ⓐ`admitTask` 补开（对称于既有 `CloseTask`）／ⓑ子环路自开／ⓒ桥懒开扩到每次 dispatch。**若设计原文指向另一层 ⇒ 以原文为准**；若必须改 C25 语义 ⇒ **停手上报**（契约邻接）。
+2. **落修**：预期 ⓐ——在任务开始处为**该任务自己的 id** 开 scope，与 `cmd/wisp/run.go:960` 那枚 `CloseTask` **成对**（同一 id、同一所有者）。⚠ 全程 ⛔ 不动 C19/C25 判定语义、⛔ 不改阈值/规则集、⛔ 不开第二套 scope 机制。
+3. **钉子（能力形）**：把复现形**钉子化**——判据＝修前红（你已跑）→ 修后绿；且**场景 A 对照仍绿**。钉子落法由你裁但具名理由（a1 的 `cmd/wisp/zz315a1probe_test.go` 以 `WISP_315A1=1` 门控、默认按名 skip：修好后 B 形"绿时快"（无卡即无 31s），可评估去门控为常驻回归钉——⚠ 若去门控，先读 `scripts/portable-tests.sh` 的 skip/ledger 规矩与包内默认跑的传统，选哪条都写清；⛔ 不许把"会红的测试"默认跑进包）。
+4. **射程**：只修"任务开始未开 scope"这一根因。a1 未试形（并发兄弟／project-instructions 作种子 mark）**不扩修**——若你的修法**自然涵盖**它们，报读数（同命令或最小形），不涵盖就登记为候选。
+5. **回归**：`-run 'TestZZ315A1'`（新钉子+对照）＋`-run 'Test222' ./internal/tools/ -race`（票 237 家族一发）＋与 task/审批相关的既有名册（现读选最小集）＋`GOFLAGS= go build ./...`／gofumpt／d22scan／长度门（现 GREEN 59=59）。
+6. **交件**：`.scratch/wisp/probes/315/r1/00-anchor-and-gates.md`（锚＋设计读出结论与理由＋修前后读数＋门禁 rc 表）＋logs＋**票 315 尾追加 1 条 bullet**（AC#0 复现归 a1、本腿＝AC#1 的修；⛔ 框不翻）。产出 ≤7 枚 ≤200 行（大日志留盘，点名＋字节数）。
+
+## 纪律（十条）
+
+1. 只 commit、⛔ 不 push；`git add`/`commit` 显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内不建 worktree；临时件只建不删；别人脏件别动。
+2. `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（**MSYS 形**）；`GOTMPDIR` ⛔ 只 C:（`C:\tmp\wisp315r1gotmp`）。
+3. 判据用 `-run` 小射程；⛔ 整包 `./cmd/wisp/`（314 死区）；突变/计时钟读数窗口逐报时刻。
+4. 他腿在飞（`236-r4` tools -race／`236-r5` .github／`174-r5` scripts；`315-a1` 已交）——与你 cmd/wisp 面零**文件**冲突；但你的读数窗口逐报。
+5. ⛔ 不动三枚冻结件／`thresholds.go`／golden／`allowlist.txt`／`PLAN.md`／`specs/**`；⛔ `frontend/**`／`design/**`。
+6. 票面：票 315 尾 1 bullet；⛔ `Status:`／框不动。
+7. **未定义即停**：设计原文与三案都对不上／修法要动 C25 语义／钉子化与包默认跑传统冲突 ⇒ 停手上报。
+8. 交件写明：选案（ⓐ/ⓑ/ⓒ）与原文依据（引文）＋修前红/修后绿逐字＋新钉子名与门控状态＋"自然涵盖"读数（若适用）。
+9. 回执：结论先行＋commit sha（产码/交付分开）＋件路径＋门禁 rc＋具名没做。
+
+发送时刻现量：HEAD 近 `0137ec08`（a1/r3 等笔均已入树）；CPU ~35%。
