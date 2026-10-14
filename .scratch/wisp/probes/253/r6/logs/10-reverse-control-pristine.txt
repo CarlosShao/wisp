@@ -1,0 +1,9 @@
+=== RUN   Test253r6TheSilentDropBranchIsLoud
+    panel_unbound_253r6_windows_test.go:211: AC#3 fake leg (old envelope into the RPC callback), the page's own words: "RESOLVED(null)"
+    panel_unbound_253r6_windows_test.go:213: AC#3 RED (criterion ②): the page's promise settled with "RESOLVED(null)", want a REJECTED(<sentence>) - a silent resolve(null) is the ticket's own symptom (253:12), and it is what this rig reads with the audit branch absent
+    panel_unbound_253r6_windows_test.go:233: AC#3 RED (criterion ①): nothing in the host's slog records says an inbound RPC frame named no bound door. Records seen: [goroutine outside the D38 roster (leak symptom) goroutine=panel-sta owner=panel host (ticket 33) MARK299 before CreateWindowExW MARK299 after CreateWind
+    panel_unbound_253r6_windows_test.go:256: AC#3 folded postMessage path (unregistered name), the page's own words: "RESOLVED('面板请求被拒绝 [panel.approval.request (无 requestId)]：panel: composer request refused: 方法 ''panel.approval.request'' 不是面板 composer 通路的能力入口')"
+--- FAIL: Test253r6TheSilentDropBranchIsLoud (1.22s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.793s
+FAIL

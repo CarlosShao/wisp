@@ -1,0 +1,9 @@
+=== RUN   Test253r6TheSilentDropBranchIsLoud
+    panel_unbound_253r6_windows_test.go:211: AC#3 fake leg (old envelope into the RPC callback), the page's own words: "REJECTED('面板请求被拒绝 [panel.mode.request]：这枚 RPC 帧的方法名没有已绑定的门（door），没有任何处理器接手；宿主已记录本次丢弃')"
+    panel_unbound_253r6_windows_test.go:226: AC#3 criterion ①, the host's own record: panel host: inbound RPC frame names no bound door - received and refused instead of resolved null (ticket 253 AC#3) method=panel.mode.request id=0 params=0 reply=面板请求被拒绝 [panel.mode.request]：这枚 RPC 帧的方法名没有已绑定的门（door），没有任何处理器接手；宿主已记录
+    panel_unbound_253r6_windows_test.go:240: AC#3 positive control (the same envelope through window.chrome.webview.postMessage): "RESOLVED('')"
+    panel_unbound_253r6_windows_test.go:256: AC#3 folded postMessage path (unregistered name), the page's own words: "RESOLVED('面板请求被拒绝 [panel.approval.request (无 requestId)]：panel: composer request refused: 方法 ''panel.approval.request'' 不是面板 composer 通路的能力入口')"
+    panel_unbound_253r6_windows_test.go:264: AC#3 criterion ① on the folded path, the dispatch chain's audit line: panel: INBOUND-DISPATCH request="" method="panel.approval.request" source="" origin="panel" err=panel: composer request refused: 方法 "panel.approval.request" 不是面板 composer 通路的能力入口 detail="处理器未被调用：该请求没有任何一侧发生变化"
+--- PASS: Test253r6TheSilentDropBranchIsLoud (1.13s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.483s

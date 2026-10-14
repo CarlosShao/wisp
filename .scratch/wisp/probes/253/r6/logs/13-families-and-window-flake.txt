@@ -1,0 +1,44 @@
+# 13: related families + the pre-existing two-window flake (each截取 from the named raw file in this dir)
+# -- POST-FIX headless transport family (one invocation, rc=0) --
+--- PASS: TestTransportDoorBindingMatchesRoster253r1 (0.02s)
+--- PASS: TestBindingRosterBitesItsOwnFixtures253r1 (0.00s)
+--- PASS: TestAC9ComposerDispatchHasAProductionCaller (0.02s)
+--- PASS: TestInboundRosterGuardRefusesUnregisteredNameOnPageEdge (0.00s)
+--- PASS: TestInboundSourceGuardRefusesForeignSourceOnPageEdge (0.00s)
+--- PASS: TestInboundRequestIDGuardRefusesMissingIDOnPageEdge (0.00s)
+--- PASS: TestPagePostMessageEnvelopeReachesDispatchRawViaTransport (0.00s)
+--- PASS: TestShapeA3SecondPagePostStillDelivers (0.00s)
+--- PASS: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+--- PASS: TestLegacySubShapeOneHookDiesInAReentryLoop (0.00s)
+--- PASS: TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot (0.00s)
+--- PASS: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+--- PASS: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.177s
+# -- POST-FIX TestPanelHostRealWindowHopAndLifecycle (own invocation) --
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.353s
+# -- POST-FIX TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (own invocation) --
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.047s
+# -- POST-FIX TestAC14AwaitedBindingReplyReachesThePage (own invocation) --
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.880s
+# -- PRE-EXISTING, PRISTINE tree: AC13 then AC14 in ONE binary (2nd window dies; reproduced without this leg's change) --
+=== RUN   TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.91s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.949s
+FAIL
+# -- SAME SHAPE, this leg's change in tree: AC13 then AC14 in ONE binary --
+=== RUN   TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.92s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.527s
+FAIL
+# -- SAME SHAPE, late reading: AC14 alone -count=2 passed once (the flake is intermittent on this shared box) --
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (1.02s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (0.64s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	4.335s
