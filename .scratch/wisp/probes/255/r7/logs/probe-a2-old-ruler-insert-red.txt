@@ -1,0 +1,6 @@
+time=2026-10-14T08:59:55.363+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+    config_receipt_255_test.go:209: row "agent" cites cmd/wisp/run.go:991 for "cfg := rt.cfg", that line now reads "// 255-r7 probe: one inserted line, token below preserved as-is" - the evidence drifted, so re-adjudicate this row (and if the reader really moved, the receipt's claim may have moved with it)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.970s
+FAIL

@@ -1,0 +1,6 @@
+time=2026-10-14T09:14:09.003+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim
+    config_receipt_255_test.go:220: row "agent": recorded reading cmd/wisp/run.go:991 drifted, the token "cfg := rt.cfg" now uniquely sits at line 992
+--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.004s

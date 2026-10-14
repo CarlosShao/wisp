@@ -1,0 +1,13 @@
+== delivered sha ==
+6b840071c183b3ed6470935508247037c416ed3787b22c1b50f839a56f2b55f2 *cmd/wisp/config_readers_255.go
+2195e669aab19be80643d0040be67c3fdbd716d082b4e04de25d60caf68dfa4e *cmd/wisp/config_receipt_255_test.go
+== 尺① path:LINE total ==
+27
+== 尺① unique ==
+20
+== 尺② items ==
+23
+== 尺② rows ==
+22
+== test-side lines ==
+2

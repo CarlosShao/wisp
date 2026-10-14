@@ -1,0 +1,39 @@
+==============================================================================
+FILE cmd/wisp/config_readers_255.go lines= 381
+------------------------------------------------------------------------------
+L96: CITE cmd/wisp/panel_config_store.go:92 [cfg := s.mgr.Config()] -> hits=[92] recorded_has_token=True UNIQUE
+L100: CITE cmd/wisp/run.go:435 [res := llm.NewResolver(cfg, st)] -> hits=[435] recorded_has_token=True UNIQUE
+L103: CITE cmd/wisp/panel_config_store.go:96 [cfg.LLM.Roles.Chat.Model] -> hits=[98, 99] recorded_has_token=False NONUNIQ(2)
+L106: CITE cmd/wisp/run.go:424 [rt.cfg = cfg] -> hits=[424] recorded_has_token=True UNIQUE
+L107: CITE cmd/wisp/run.go:991 [cfg := rt.cfg] -> hits=[991] recorded_has_token=True UNIQUE
+L108: CITE cmd/wisp/run.go:1014 [cfg.Agent.PerToolTimeoutMS] -> hits=[763, 1014] recorded_has_token=True NONUNIQ(2)
+L110: CITE cmd/wisp/run.go:991 [cfg := rt.cfg] -> hits=[991] recorded_has_token=True UNIQUE
+L113: CITE cmd/wisp/models.go:163 [cfg.Models.Mirror] -> hits=[163] recorded_has_token=True UNIQUE
+L115: CITE cmd/wisp/models.go:183 [func loadModelConfig] -> hits=[183] recorded_has_token=True UNIQUE
+L118: CITE cmd/wisp/models.go:163 [cfg.Models.Mirror] -> hits=[163] recorded_has_token=True UNIQUE
+L121: CITE cmd/wisp/resident_ball_windows.go:322 [Hotkeys:  cfg,] -> hits=[322] recorded_has_token=True UNIQUE
+L129: CITE cmd/wisp/resident_ball_windows.go:322 [Hotkeys:  cfg,] -> hits=[322] recorded_has_token=True UNIQUE
+L137: CITE internal/ball/ball_windows.go:64 [SizePx] -> hits=[64, 144, 145, 147, 148, 150, 151, 229, 233, 346, 377, 560, 698] recorded_has_token=True NONUNIQ(13)
+L150: CITE cmd/wisp/resident_audio_windows.go:256 [c.Audio.MicMutedDefault] -> hits=[32, 145, 253, 256, 273] recorded_has_token=True NONUNIQ(5)
+L151: CITE internal/observe/logging.go:50 [RedactPaths] -> hits=[50, 51, 88] recorded_has_token=True NONUNIQ(3)
+L154: CITE cmd/wisp/logsink.go:149 [Level: logSinkLevel] -> hits=[149] recorded_has_token=True UNIQUE
+L193: CITE cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] -> hits=[207] recorded_has_token=True UNIQUE
+L193: CITE cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)] -> hits=[262] recorded_has_token=True UNIQUE
+L199: CITE cmd/wisp/resident_audio_windows.go:257 [c.Voice.Enabled] -> hits=[253, 257, 262] recorded_has_token=True NONUNIQ(3)
+L200: CITE cmd/wisp/resident_audio_windows.go:257 [c.Voice.Enabled] -> hits=[253, 257, 262] recorded_has_token=True NONUNIQ(3)
+L201: CITE cmd/wisp/resident_audio_windows.go:257 [c.Voice.Enabled] -> hits=[253, 257, 262] recorded_has_token=True NONUNIQ(3)
+L202: CITE cmd/wisp/resident_audio_windows.go:257 [c.Voice.Enabled] -> hits=[253, 257, 262] recorded_has_token=True NONUNIQ(3)
+------------------------------------------------------------------------------
+L56: BARE cmd/wisp/run.go:423 ... context: // the sentence is about THIS run: cmd/wisp/run.go:423-424 takes `cfg := mgr.Config()`
+L58: BARE cmd/wisp/run.go:991 ... context: // what this boot read", and execute() reads that copy (cmd/wisp/run.go:991
+L127: BARE internal/ball/ball_windows.go:807 ... context: // rebind drops an in-flight Esc borrow (internal/ball/ball_windows.go:807-812);
+L141: BARE internal/audio/gate.go:57 ... context: // audio.WithStartMuted, which is the sentence internal/audio/gate.go:57 wrote
+L172: BARE cmd/wisp/panel_resident_windows.go:253 ... context: //     call site, cmd/wisp/panel_resident_windows.go:253). `wisp run` never
+==============================================================================
+FILE cmd/wisp/config_receipt_255_test.go lines= 624
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+L79: BARE cmd/wisp/panel_config_store.go:92 ... context: t.Errorf("claimable = %v, want exactly [llm]: it is the only hot section this host reads live (cmd/wisp/panel_
+L440: BARE panel_host_windows.go:304 ... context: // "no-reader" plus panel_host_windows.go:304's hard-coded literal, and AC#4
+L445: BARE panel_resident_windows.go:207 ... context: if !strings.Contains(line, "panel_resident_windows.go:207") {
+L500: BARE cmd/wisp/panel_config_store.go:92 ... context: // out of the live Manager (cmd/wisp/panel_config_store.go:92), so the case reads

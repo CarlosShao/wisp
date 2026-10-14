@@ -1,0 +1,6 @@
+time=2026-10-14T09:15:19.522+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+    config_receipt_255_test.go:225: row "ball" cites internal/ball/ball_windows.go:64 for "SizePx", but that token is not unique in the file (it hits lines [64 144 145 147 148 150 151 229 233 346 377 560 698]): a content anchor must pin exactly one line, so sharpen the token and re-adjudicate this row
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.425s
+FAIL

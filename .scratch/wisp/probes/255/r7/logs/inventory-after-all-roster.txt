@@ -1,0 +1,37 @@
+==============================================================================
+FILE cmd/wisp/config_readers_255.go lines= 395
+------------------------------------------------------------------------------
+L103: CITE cmd/wisp/panel_config_store.go:92 [cfg := s.mgr.Config()] -> hits=[92] recorded_has_token=True UNIQUE
+L107: CITE cmd/wisp/run.go:435 [res := llm.NewResolver(cfg, st)] -> hits=[435] recorded_has_token=True UNIQUE
+L110: CITE cmd/wisp/panel_config_store.go:98 [ChatModel:      cfg.LLM.Roles.Chat.Model] -> hits=[98] recorded_has_token=True UNIQUE
+L113: CITE cmd/wisp/run.go:424 [rt.cfg = cfg] -> hits=[424] recorded_has_token=True UNIQUE
+L114: CITE cmd/wisp/run.go:991 [cfg := rt.cfg] -> hits=[991] recorded_has_token=True UNIQUE
+L115: CITE cmd/wisp/run.go:1014 [PerToolTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS)] -> hits=[1014] recorded_has_token=True UNIQUE
+L117: CITE cmd/wisp/run.go:991 [cfg := rt.cfg] -> hits=[991] recorded_has_token=True UNIQUE
+L120: CITE cmd/wisp/models.go:163 [cfg.Models.Mirror] -> hits=[163] recorded_has_token=True UNIQUE
+L122: CITE cmd/wisp/models.go:183 [func loadModelConfig] -> hits=[183] recorded_has_token=True UNIQUE
+L125: CITE cmd/wisp/models.go:163 [cfg.Models.Mirror] -> hits=[163] recorded_has_token=True UNIQUE
+L128: CITE cmd/wisp/resident_ball_windows.go:322 [Hotkeys:  cfg,] -> hits=[322] recorded_has_token=True UNIQUE
+L136: CITE cmd/wisp/resident_ball_windows.go:322 [Hotkeys:  cfg,] -> hits=[322] recorded_has_token=True UNIQUE
+L144: CITE internal/ball/ball_windows.go:64 [SizePx   int // configured orb size 44..72] -> hits=[64] recorded_has_token=True UNIQUE
+L157: CITE cmd/wisp/resident_audio_windows.go:256 [ra.mutedAtBoot = c.Audio.MicMutedDefault] -> hits=[256] recorded_has_token=True UNIQUE
+L158: CITE internal/observe/logging.go:51 [RedactPaths bool] -> hits=[51] recorded_has_token=True UNIQUE
+L161: CITE cmd/wisp/logsink.go:149 [Level: logSinkLevel] -> hits=[149] recorded_has_token=True UNIQUE
+L200: CITE cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] -> hits=[207] recorded_has_token=True UNIQUE
+L200: CITE cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)] -> hits=[262] recorded_has_token=True UNIQUE
+L206: CITE cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] -> hits=[257] recorded_has_token=True UNIQUE
+L207: CITE cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] -> hits=[257] recorded_has_token=True UNIQUE
+L208: CITE cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] -> hits=[257] recorded_has_token=True UNIQUE
+L209: CITE cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] -> hits=[257] recorded_has_token=True UNIQUE
+------------------------------------------------------------------------------
+L56: BARE cmd/wisp/run.go:423 ... context: // the sentence is about THIS run: cmd/wisp/run.go:423-424 takes `cfg := mgr.Config()`
+L58: BARE cmd/wisp/run.go:991 ... context: // what this boot read", and execute() reads that copy (cmd/wisp/run.go:991
+L134: BARE internal/ball/ball_windows.go:807 ... context: // rebind drops an in-flight Esc borrow (internal/ball/ball_windows.go:807-812);
+L148: BARE internal/audio/gate.go:55 ... context: // audio.WithStartMuted, which is the sentence internal/audio/gate.go:55-56 wrote
+L179: BARE cmd/wisp/panel_resident_windows.go:273 ... context: //     call site, cmd/wisp/panel_resident_windows.go:273). `wisp run` never
+==============================================================================
+FILE cmd/wisp/config_receipt_255_test.go lines= 653
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+L81: BARE cmd/wisp/panel_config_store.go:92 ... context: t.Errorf("claimable = %v, want exactly [llm]: it is the only hot section this host reads live (cmd/wisp/panel_
+L529: BARE cmd/wisp/panel_config_store.go:92 ... context: // out of the live Manager (cmd/wisp/panel_config_store.go:92), so the case reads

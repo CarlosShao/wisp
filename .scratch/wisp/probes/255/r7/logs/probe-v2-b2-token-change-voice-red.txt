@@ -1,0 +1,9 @@
+time=2026-10-14T09:15:05.741+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+    config_receipt_255_test.go:223: row "voice.wake_word.thresholds" cites cmd/wisp/resident_audio_windows.go:257 for "ra.voiceEnabled = c.Voice.Enabled" and the token is now nowhere in that file (the recorded line reads "ra.voiceEnabled =  c.Voice.Enabled") - the evidence changed, so re-adjudicate this row
+    config_receipt_255_test.go:223: row "voice.tts.speed" cites cmd/wisp/resident_audio_windows.go:257 for "ra.voiceEnabled = c.Voice.Enabled" and the token is now nowhere in that file (the recorded line reads "ra.voiceEnabled =  c.Voice.Enabled") - the evidence changed, so re-adjudicate this row
+    config_receipt_255_test.go:223: row "voice.wake_word.veto_words" cites cmd/wisp/resident_audio_windows.go:257 for "ra.voiceEnabled = c.Voice.Enabled" and the token is now nowhere in that file (the recorded line reads "ra.voiceEnabled =  c.Voice.Enabled") - the evidence changed, so re-adjudicate this row
+    config_receipt_255_test.go:223: row "voice.punctuation" cites cmd/wisp/resident_audio_windows.go:257 for "ra.voiceEnabled = c.Voice.Enabled" and the token is now nowhere in that file (the recorded line reads "ra.voiceEnabled =  c.Voice.Enabled") - the evidence changed, so re-adjudicate this row
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.633s
+FAIL

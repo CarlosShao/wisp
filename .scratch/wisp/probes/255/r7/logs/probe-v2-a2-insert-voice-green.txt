@@ -1,0 +1,9 @@
+time=2026-10-14T09:14:44.529+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim
+    config_receipt_255_test.go:220: row "voice.punctuation": recorded reading cmd/wisp/resident_audio_windows.go:257 drifted, the token "ra.voiceEnabled = c.Voice.Enabled" now uniquely sits at line 258
+    config_receipt_255_test.go:220: row "voice.wake_word.veto_words": recorded reading cmd/wisp/resident_audio_windows.go:257 drifted, the token "ra.voiceEnabled = c.Voice.Enabled" now uniquely sits at line 258
+    config_receipt_255_test.go:220: row "voice.tts.speed": recorded reading cmd/wisp/resident_audio_windows.go:257 drifted, the token "ra.voiceEnabled = c.Voice.Enabled" now uniquely sits at line 258
+    config_receipt_255_test.go:220: row "voice.wake_word.thresholds": recorded reading cmd/wisp/resident_audio_windows.go:257 drifted, the token "ra.voiceEnabled = c.Voice.Enabled" now uniquely sits at line 258
+--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.468s
