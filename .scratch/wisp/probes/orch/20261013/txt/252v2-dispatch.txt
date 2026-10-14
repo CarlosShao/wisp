@@ -1,0 +1,29 @@
+# 252-v2 派单（票 252 AC#4／AC#5 的**非实现者**判语；验收腿；面＝cmd/wisp 读＋重跑）
+
+发送时刻：2026-10-14 12:3x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `252-v2`**（非实现者；实现者＝`252-r3`，原派单名叫 252-r2、因撞 10-03 旧腿已更正）。⛔ 不翻框、⛔ 不动 `Status:`/票名——判语交回。
+
+## 被裁对象（三笔）
+
+- 产码 `d3cccfda`：`cmd/wisp/ticket224_assembly_test.go`（+10/−1，只加 dump 滤针——让 `grantLinesOf` 不再滤掉 `tools: call … risk=… in_allowlist_scope=…` 那行）。
+- 交付 `c8a360e8`：`probes/252/r3/{00-anchor-and-method,01-ac4-witness-readings,02-ac5-level-dump}.md`（3 件 118 行）；`ade60808`：票尾 bullet（含"301 秒账归本票"句）。
+- **AC#4 判据**：三枚 witness（`TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking`／`run_test.go:378 TestComposedGateBlocksAWriteForTwoSeconds`／`run_mode101_test.go:506 TestTicket101SessionGrantDoesNotCrossRestart`）各配"**改前必红、改后必绿**"的同机对照；并**明说 301 秒的账从"C18 超时既有一笔"改归本票**。
+- 实现者的读数（要你独立核，⛔ 不许只引）：改前树＝`git archive 2b1a3071^`（`62ca6c34`）＋**真短名临时根** `C:\tmp\wisp252r2\SHORT-~1`（`dir /x` 现读）；W1 43.52s→PASS 5.55s／W2 303.23s（`审批超时（300 秒未确认）`逐字）→PASS 5.78s／W3 6.20s→PASS 83.47s；⚠ 实测坑：`GOTMPDIR` 会被透传给 test 二进制 ⇒ 短名发必须 unset（它已具名）。
+
+## 你要独立做的
+
+1. **短名皮肤自己复刻**：`dir /x` 确得短名根（拿不到就照仓规"必须红、不许 skip"办并具名）；`GOTMPDIR` unset 后跑 **≥1 枚 witness 的改前红**（建议 W1，43s 级；W2 303s 级如时间允可加跑）＋该 witness 的**交付态绿**；每发带命令＋起止时刻＋rc＋红/绿句逐字。
+2. **301 秒归账句**：核票尾 bullet 与 01 件里那句逐字在（引它原文）；判"归账成立"（它等的是被 R2 判 L2 后无人应答的卡，不是 C18 本身——核这个因果）。
+3. **AC#5 的针**：读 `d3cccfda` 的 +10/−1——确认**只加 dump 滤针、产码语义零动、无既有断言被放宽**；自己造一发**同形红**（叠加到 pre-fix 树或长名根都行）核 dump 里**出现** `tools: call … risk=L2 in_allowlist_scope=false` 那行（改前 grep 计数 0）；还原证（sha256；overlay 优先）。
+4. **门禁抽核**：build／d22scan clean／长度门 GREEN（59=59）——各现跑。
+5. **判语**：AC#4／AC#5 各自"成立/附条件/不成立"＋翻框建议（含留档句）。
+
+## 交付与纪律
+
+- 交件：`docs/evidence/s1/ticket252-252-v2-accept-v1.md`＋`.scratch/wisp/probes/252/v2/`（锚＋logs）＋票 252 尾 **1 条 bullet**；产出 ≤7 枚 ≤200 行。⛔ 框不翻。
+- 只 commit、⛔ 不 push；显式 pathspec；`PATH` 带 sherpa（MSYS 形）；`GOTMPDIR` ⛔ 只 C:；**整包 ⛔**（314 死区）。
+- 他腿在飞：`279-r1`（cmd/wisp 写）／`236-v2`（只读）——窗口逐报；**CI run 38508311376 在自跑**——重跑受扰报时刻。
+- **未定义即停**：短名根拿不到／改前红复不出／针的 diff 与"只加滤针"不符 ⇒ 停手上报。
+- 回执：结论先行＋每发红/绿句逐字＋301 句原文＋门禁 rc＋具名没做。
+
+发送时刻现量：HEAD 近 `ade60808`；CPU ~30%。
