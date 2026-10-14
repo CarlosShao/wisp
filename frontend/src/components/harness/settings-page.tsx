@@ -21,6 +21,8 @@
 
 import { ArrowLeft } from "lucide-react";
 import { ConfigScreen } from "@/components/config-screen";
+import { ModelSettings } from "@/components/model-settings";
+import { VoiceSettings } from "@/components/voice-settings";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 
@@ -32,6 +34,8 @@ interface Category {
   purpose: string;
   /** What the panel is waiting on. "" means the category has real controls. */
   waiting: string;
+  /** Which real component draws this category when `waiting` is empty. */
+  control?: "config" | "model" | "voice";
 }
 
 const CATEGORIES: readonly Category[] = [
@@ -44,16 +48,23 @@ const CATEGORIES: readonly Category[] = [
     name: "外观",
     purpose: "主题、面板底色深浅、动画档位、字号。",
     waiting: "", // ConfigScreen renders here; two of its rows are live today.
+    control: "config",
   },
   {
+    // Ticket 313's page half landed 2026-10-13: the read (config.get's
+    // structured line) and the writes (row / credential / chat pair) are
+    // live, so this category is no longer a waiting note.
     name: "模型",
-    purpose: "默认模型、温度、上下文长度、每家的密钥。",
-    waiting: "还没收到模型清单。C5 抽象了 provider，但面板没有一个字段能列出「有哪些模型可选」。",
+    purpose: "默认模型、每家的密钥、聊天角色指向哪两半。",
+    waiting: "",
+    control: "model",
   },
   {
+    // Ticket 313's voice half: the two cloud chains and the realtime head.
     name: "语音",
-    purpose: "听写与朗读、唤醒词、打断策略。",
-    waiting: "还没收到语音链路的状态。D47 定了半双工干活 / 全双工陪聊两条路，面板看不到它们走到哪一步。",
+    purpose: "听写与朗读的云回退链、实时头（陪聊路径）。",
+    waiting: "",
+    control: "voice",
   },
   {
     name: "记忆",
@@ -186,11 +197,15 @@ export function SettingsPage({
         </nav>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
-          {cat.waiting === "" ? (
+          {cat.control === "config" ? (
             <ConfigScreen
               heading={cat.name}
               lede={cat.purpose}
             />
+          ) : cat.control === "model" ? (
+            <ModelSettings heading={cat.name} lede={cat.purpose} />
+          ) : cat.control === "voice" ? (
+            <VoiceSettings heading={cat.name} lede={cat.purpose} />
           ) : (
             <section aria-label={cat.name} className="flex min-w-0 flex-col gap-1">
               <h2 className="text-[15px] font-semibold text-ink">{cat.name}</h2>

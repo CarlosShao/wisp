@@ -1,0 +1,176 @@
+/* ============================================================================
+   Config view - ticket 313's settings read payload, its parser, and the hook
+   the settings page reads it through.
+   ----------------------------------------------------------------------------
+   WHAT ARRIVES. config.get answers a multi-line string: ticket 248's two
+   frozen sentences (plus one line per declared provider), and AFTER them one
+   line beginning with panel.SettingsPayloadMarker ("wisp-config-view:"). What
+   follows that marker on the same line is the JSON this file parses. The
+   prose is for humans and is NEVER parsed - a page that read the sentences
+   would break the day their wording changes, and their wording is frozen on
+   the other side.
+
+   The keys are frozen too (config_313_test.go pins them one by one):
+     readable          the config was read. false = unreadable, a state of its
+                       own - never rendered as "nothing configured".
+     credential        one of the five aggregate states, or "unknown".
+     presetsKnown      the LEG ANSWERED the preset list. When false, presets
+                       being null means "nobody asked", NOT "there are none".
+     presets           built-in provider preset names (includes stepfun).
+     configuredKnown   the leg answered the "has the user configured
+     configured        anything yet" question, and its answer. While
+                       configuredKnown && !configured, the model page
+                       default-highlights stepfun (A877 ruling 3) - and that
+                       highlight writes nothing until the user acts.
+     chatProvider / chatModel / chatModelKnown
+                       llm.roles.chat's two halves as the leg read them.
+     providers[]       one row per DECLARED provider: name, apiKeyRef (a
+                       reference name, never a value), hasBaseURL, modelCount,
+                       models (the model-name list, the model picker's data
+                       source, null = not answered), credentialSet,
+                       credentialError.
+     voice             cloudASRChain / cloudTTSChain (null = not answered),
+                       realtimeEnabled / realtimeProvider / realtimeModel.
+
+   WHAT NEVER ARRIVES: no credential value and no redacted tail of one - the
+   reference name is the whole of what a page may see.
+
+   THE HOOK. useConfigView() sends one config.get on mount and exposes reload()
+   for after a write: every accepted write re-reads rather than patching a
+   local picture, because the receipt is the fact and this page keeps no
+   second copy of it (PLAN.md:1044). "no-host" and "unreadable" are separate
+   states because a plain browser and an unreadable config are different
+   facts, and rendering them the same way would be the lie the whole file
+   exists to avoid.
+   ============================================================================ */
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { requestConfigView } from "@/lib/panel";
+
+/** One declared provider row, as the wire carries it. */
+export interface ConfigViewProvider {
+  name: string;
+  apiKeyRef: string;
+  hasBaseURL: boolean;
+  modelCount: number;
+  models: string[] | null;
+  credentialSet: boolean;
+  credentialError: string;
+}
+
+/** The voice half: chains and the realtime head. Names and ids only. */
+export interface ConfigViewVoice {
+  cloudASRChain: string[] | null;
+  cloudTTSChain: string[] | null;
+  realtimeEnabled: boolean;
+  realtimeProvider: string;
+  realtimeModel: string;
+}
+
+export interface ConfigView {
+  readable: boolean;
+  credential: string;
+  presetsKnown: boolean;
+  presets: string[] | null;
+  configuredKnown: boolean;
+  configured: boolean;
+  chatProvider: string;
+  chatModel: string;
+  chatModelKnown: boolean;
+  providers: ConfigViewProvider[];
+  voice: ConfigViewVoice;
+}
+
+/** The wire marker. Spelled once here; panel.SettingsPayloadMarker is the
+    other side of the same string. */
+export const CONFIG_VIEW_MARKER = "wisp-config-view:";
+
+/** What one reply turned out to be. */
+export type ConfigReply =
+  | { kind: "parsed"; view: ConfigView; prose: string }
+  | { kind: "payload-error"; message: string; raw: string }
+  | { kind: "no-payload"; raw: string };
+
+/** The credential aggregate states, spelled as the Go side spells them. Named
+    so a renderer does not spell "partly_missing" in three places. */
+export const CREDENTIAL_LABELS: Record<string, string> = {
+  unknown: "凭据状态未知（没人答过）",
+  config_unreadable: "配置读不出来，凭据状态无从谈起",
+  no_ref_declared: "还没有任何服务商声明密钥引用",
+  all_recorded: "所有声明的引用都已录入",
+  partly_missing: "至少一条声明的引用缺失或还没核对",
+};
+
+/** Parse one config.get reply. The prose half is returned as-is (display
+    only); the structured half is the line that starts with the marker. */
+export function parseConfigReply(reply: string): ConfigReply {
+  const at = reply.indexOf(CONFIG_VIEW_MARKER);
+  if (at < 0) return { kind: "no-payload", raw: reply };
+  const afterMarker = reply.slice(at + CONFIG_VIEW_MARKER.length);
+  const line = afterMarker.split("\n", 1)[0] ?? "";
+  let data: unknown;
+  try {
+    data = JSON.parse(line);
+  } catch {
+    return { kind: "no-payload", raw: reply };
+  }
+  if (typeof data !== "object" || data === null) return { kind: "no-payload", raw: reply };
+  // The Go side's own marshalling failure arrives as {"payloadError": "..."}.
+  // It is a named state rather than an empty view, because "the payload could
+  // not be built" and "nothing is configured" must not look the same.
+  const err = (data as { payloadError?: unknown }).payloadError;
+  if (typeof err === "string" && err !== "") {
+    return { kind: "payload-error", message: err, raw: reply };
+  }
+  return { kind: "parsed", view: data as ConfigView, prose: reply.slice(0, at).trimEnd() };
+}
+
+/** What the settings page renders from. */
+export type ConfigReadState =
+  | { phase: "loading" }
+  | { phase: "no-host" }
+  | { phase: "ready"; view: ConfigView; prose: string; raw: string }
+  | { phase: "unreadable"; raw: string }
+  | { phase: "payload-error"; message: string; raw: string };
+
+/** Read the settings view once, and expose reload() for after a write. */
+export function useConfigView(): {
+  state: ConfigReadState;
+  reload: () => void;
+} {
+  const [state, setState] = useState<ConfigReadState>({ phase: "loading" });
+  // A per-call token: a reload that lands after a newer one must not overwrite
+  // the newer read (a slow first read resolving late would otherwise show an
+  // older config than the receipt the user just got).
+  const seq = useRef(0);
+
+  const reload = useCallback(() => {
+    const mine = ++seq.current;
+    // No synchronous setState here on purpose: a re-read keeps whatever the
+    // current phase shows until the new reply lands (the alternative is a
+    // loading flash on every write), and the mount call below starts from the
+    // "loading" the initialiser already set. It also keeps this callable from
+    // an effect without tripping react(set-state-in-effect).
+    void requestConfigView().then((reply) => {
+      if (mine !== seq.current) return;
+      if (reply === null) {
+        setState({ phase: "no-host" });
+        return;
+      }
+      const parsed = parseConfigReply(reply);
+      if (parsed.kind === "parsed") {
+        setState({ phase: "ready", view: parsed.view, prose: parsed.prose, raw: reply });
+      } else if (parsed.kind === "payload-error") {
+        setState({ phase: "payload-error", message: parsed.message, raw: reply });
+      } else {
+        setState({ phase: "unreadable", raw: reply });
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  return { state, reload };
+}

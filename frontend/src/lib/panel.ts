@@ -146,6 +146,13 @@ declare global {
     /** Installed by WebView2's AddHostObjectToScript / postMessage pipe. */
     wispBridge?: WispHostBridge;
     chrome?: { webview?: WispHostBridge };
+    /** The bound door cmd/wisp's installPanelTransport installs (ticket 35):
+        the page hands it one raw envelope and gets the reply back. Today's
+        host returns it synchronously; Promise.resolve below makes the call
+        work whichever way it is handed back. Ticket 313's settings page is
+        the only caller that NEEDS the answer - everything else on this page
+        is fire-and-forget onto the composer envelope above. */
+    wispDispatch?: (raw: string) => string | Promise<string>;
   }
 }
 
@@ -308,4 +315,85 @@ function toBase64(buf: ArrayBuffer): string {
     chunk += String.fromCharCode(...bytes.subarray(i, i + step));
   }
   return btoa(chunk);
+}
+
+/* --------------------------------------------------------------------------
+   Settings door (ticket 313)
+   --------------------------------------------------------------------------
+   The read/write half of the settings page, and the ONE half of this file
+   that needs an ANSWER back. The composer envelope above is fire-and-forget
+   (responses arrive as snapshot pushes); settings cannot work that way:
+   config.get replies with ticket 248's two frozen sentences plus ticket 313's
+   structured line, and config.set replies with the receipt that names what
+   actually landed. The host exposes that answer through its bound door
+   (window.wispDispatch, installed by cmd/wisp's installPanelTransport): the
+   call returns the reply, and Promise.resolve here settles it whichever way
+   the host hands it back.
+
+   Still no local copy of the answer: a settings page that cached a reply
+   would be a second state holder (PLAN.md:1044). Every render comes from a
+   reply to a request this page just sent, and lib/config-view.ts re-reads
+   after every accepted write instead of patching its own picture.
+
+   The credential WRITE is the one request whose value does not ride
+   configValue: it goes on the envelope's own credentialValue key, because
+   the shared envelope is decoded by every answered method, so a value placed
+   there would be readable from the message route too (ticket 248 ruling J4).
+
+   No host attached (a plain browser, the render harnesses): every function
+   resolves to null, and the caller says "没接到宿主" rather than drawing an
+   empty picker that looks like an empty config.
+   -------------------------------------------------------------------------- */
+
+async function requestHostAnswer(envelope: Record<string, unknown>): Promise<string | null> {
+  if (typeof window === "undefined") return null;
+  const door = window.wispDispatch;
+  if (typeof door !== "function") return null;
+  const answer = await Promise.resolve(door(JSON.stringify(envelope)));
+  return typeof answer === "string" ? answer : null;
+}
+
+/** Ask the host for the settings view (config.get). The reply is ticket 248's
+    prose plus one line starting with the wisp-config-view marker; parse it
+    with parseConfigReply (lib/config-view.ts) and never by reading the prose. */
+export function requestConfigView(): Promise<string | null> {
+  return requestHostAnswer({
+    method: "config.get",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+  });
+}
+
+/** One whitelisted settings write (config.set), value in configValue. The
+    credential field must NOT come through here - it has its own function so
+    a value can never be placed on the shared envelope's value key. */
+export function requestConfigWrite(write: {
+  field: string;
+  provider?: string;
+  model?: string;
+  value?: string;
+}): Promise<string | null> {
+  const envelope: Record<string, unknown> = {
+    method: "config.set",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    configField: write.field,
+  };
+  if (write.provider !== undefined) envelope.configProvider = write.provider;
+  if (write.model !== undefined) envelope.configModel = write.model;
+  if (write.value !== undefined) envelope.configValue = write.value;
+  return requestHostAnswer(envelope);
+}
+
+/** The credential write: the value rides credentialValue and only that key.
+    The reply is a status sentence and never echoes the value. */
+export function requestCredentialWrite(provider: string, value: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "config.set",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    configField: "provider_credential",
+    configProvider: provider,
+    credentialValue: value,
+  });
 }
