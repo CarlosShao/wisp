@@ -17877,3 +17877,12 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **判语**：`A921` 记的「"绝不许把两段并成一段"今天零仪器」＝**过期句**（尺 `70a935ce` 于 10-03 10:59 进树；今日 M-lex 删词法腿 ⇒ S1/W1 红句逐字点名 `词法腿`；M-fold 删 fold 腿 ⇒ 红句点名 `fold 腿`＋既有 N7/probe C）。**反形对照**：旧形（返回值恒等式）在同一两棵突变树上**全绿** ⇒ 不可作凭据（与先例一致）。**候选撤销**：结算补尺不再立（已在树）。
 - **两枚残差（登记）**：① POSIX 侧"腿在位但 dead"无值证（S1 抓不到、W1 是 windows 件；镜像链接形本机不可造）⇒ 后续；② dead 形（`false &&`）下 S1 静默 ⇒ 如实登记。
 - **结算**：252-r4 本回应已 TaskStop（防残影常态）。**编队**：写 2＝`114-a5`／`20-r2` 在飞。
+
+
+## A935｜2026-10-14 16:00:59 +08｜114-a5 收件（九格拆分＋**落地 4 格仪器**＋2 格按规停手；两新钉亲跑 ok 1.965s）＋裁两格（AC#11→Q 候选；AC#3→J1 未定案登记）＋★暂存泄漏记我（我 253 收口笔漏了旧名半边）
+
+- **收件（三把尺）**：`d8dd4b38`（产码：`composer_test.go` +146/−22、`bridge_test.go` +73）＋`37eb6992`（交付 8 件）在／件齐／**亲跑 `-run 'TestEveryWhitelistedInboundNameIsAlsoSentByThePage|TestDoorTwoReadsEveryTextTypeTheScannerWalks' ./internal/panel/` ok 1.965s**（⚠ 首抽错靶＝我抽了两个在册常红名，已改抽其新钉名）。
+- **拆分明细**：**落地 4 格**＝AC#4（门二 15 文本类全读；改前 `.json` 同时逃过两枚仪器）／AC#7（补记门禁读数：panel 223/143/5/0 红同集＋POSIX 三合包 621/441/5/5 红同集）／AC#8（**253-r5 未覆盖此方向**〔其尺只读 panel 生产源〕——仓外模块拷贝种形：旧套件盲 PASS vs 新门 FAIL 逐字点名；真树 `page mirrors all 6`）／AC#9（扫描根：改前"绿与事实无关"复现；改后真树 `109 files scanned, 2 host call sites`＋种形被点名）。**停手上报 2 格**＝AC#3（J1 未定案：`Confirm: nil` 两枚未接、`rt.modeWrites` 死码、变宽在 `composer_handlers.go:133-138` 被 `ErrNoL2Confirm` 拒）/AC#11（`.github` 邻接）。**skipped=frontend(owner-delegated)**＝AC#6/AC#10（补量：`AddHostObjectToScript` 仓内零调用点；真门＝第三装法 `w.Bind("wispDispatch")`）。
+- **本笔裁定**：**AC#11 → Q 候选**（动 `.github/**`＝冻结/契约邻接 ⇒ 进待人批："把界面产物校验做成 CI 一步"）；**AC#3 → J1 未定案登记**（未定义即停，⛔ 不替它猜）。114 余量＝AC#3/J1、AC#5（Go 半成立＋仪器读数随行）、AC#6/#10（frontend）、AC#11（Q）。
+- **★暂存泄漏（记我＋腿自报）**：`d8dd4b38` 意外带走了**我 253 收口时已暂存未提交的旧名删除半边**（`253-panel-inbound-three-ruler-holes.md` 的删除；我的 `ab3e0636` pathspec 只传了新名——"old+new 都要传"的教训我又踩）。现态：`git ls-files` 只见 `…-holes-done.md`、索引干净、内容无损 ⇒ **253 改名现已完整**。⚠ 另更正：253 的真实文件名是**短名** `253-panel-inbound-three-ruler-holes.md`（我在部分派单文本里写过我编的长 slug，实际文件/glob 操作全按短名，无实际影响）。腿自报其产码提交未带显式 pathspec（派单明令仍漏，已在票尾 bullet 具名）。
+- **编队**：写 1＝`20-r2`；验＝本笔派 `114-v1`。
