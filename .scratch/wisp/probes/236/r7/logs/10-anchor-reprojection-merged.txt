@@ -1,0 +1,106 @@
+# 236-r7 anchors + re-projection + same-text check (merged from raw 00/01/02, 2026-10-14 13:56:31 +0800)
+
+===== 01-anchor.txt =====
+# 236-r7 anchor (2026-10-14 13:48:00 +0800)
+HEAD=11cfbc93fd490bbbddc0a79f8f244dddfb132882
+pin blob(HEAD)=30e5fab0e08b27e3bce8c4291ffa81583431c7a0
+pin worktree sha256=7e23ec320f6aadac100857c8b40f3515d6f2f4be2cc16dae00cf4d94c0193808
+run.go blob(HEAD)=154279f70752162f8a74f0f30debafc1669de3cd worktree=154279f70752162f8a74f0f30debafc1669de3cd
+ticket224 blob(HEAD)=ebe020dd60b73fee5d877afdbc2b1ecd4de80a8b worktree=ebe020dd60b73fee5d877afdbc2b1ecd4de80a8b
+loop.go blob(HEAD)=0d53277d9610f07855eb5e5fe4bdf4c5ed6d35e3 worktree=0d53277d9610f07855eb5e5fe4bdf4c5ed6d35e3
+--- dirty (cmd internal scripts), others' legs ---
+ M scripts/portable-tests.sh
+ M scripts/winsec-tests.sh
+ M scripts/wisp-cli-tests.sh
+
+===== 01-reprojection-raw.txt =====
+# 236-r7 re-projection (2026-10-14 13:49:20 +0800), HEAD=7a42e168a0f5a96596fe135efe8d4d764e6b2d35
+
+## run.go cited lines, CURRENT (blob 154279f7)
+1105		// The task's own deadline rides on the parent named above (ticket 246 AC#7's
+1107		// line always produced. For the resident leg it is a root under the ctx that
+1108		// D38(e) step 3 cancels, so "leaving cancels the running task" is a mechanism
+1109		// and not a sentence.
+1110		baseCtx := parent
+1124		//   ② 名册回填只在 Wait() 之后：那枚 Wait 同时 join 结果信号与登记册句柄，
+1135		// ticket 196's per ruling A394, so StateAnswer keeps saying 「宿主没有登记这一维」
+1145		}
+1137		rt.tasks.MarkRoot(bg.ID, task)
+1139		_, why := (tools.TaskBackfill{
+1140			Roster: rt.tasks,
+1141			Spills: agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets()),
+1142		}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+1155			tl := memory.TaskLog{
+1156				ID: res.TaskID, State: state, QueryText: task,
+1157				CostTokensIn: int64(res.Usage.InputTokens), CostTokensOut: int64(res.Usage.OutputTokens),
+1158				CostAmountMicro: res.CostMicros, Currency: res.Currency, ErrorClass: class,
+1159			}
+1160			if err := rt.store.StartTaskLog(c, tl); err != nil {
+1167			if err := rt.store.FinishTaskLog(c, res.TaskID, state, summary,
+1177			res.TaskID, res.Status, res.Rounds, res.ToolCalls, costLine(res))
+
+## ticket224 cited assertion, CURRENT (blob ebe020dd)
+432			decision  string
+433			grant     *int64
+440			id1 = rt.session.SessionID().String()
+441			if !rt.session.SessionID().Valid() {
+442				t.Fatalf("boot 1 minted %q, which the shape lock rejects: the minting point and the "+
+443					"lock disagree, so no literal can be excluded from either", id1)
+
+===== 02-same-text-check.txt =====
+## same-text cross-check (r4 blob f88d98ae vs HEAD worktree)
+
+run.go 1105 -> 1137 : IDENTICAL
+  old: 	rt.tasks.MarkRoot(bg.ID, task)
+  new: 	rt.tasks.MarkRoot(bg.ID, task)
+run.go 1124 -> 1156 : IDENTICAL
+  old: 			ID: res.TaskID, State: state, QueryText: task,
+  new: 			ID: res.TaskID, State: state, QueryText: task,
+run.go 1135 -> 1167 : IDENTICAL
+  old: 		if err := rt.store.FinishTaskLog(c, res.TaskID, state, summary,
+  new: 		if err := rt.store.FinishTaskLog(c, res.TaskID, state, summary,
+run.go 1145 -> 1177 : IDENTICAL
+  old: 		res.TaskID, res.Status, res.Rounds, res.ToolCalls, costLine(res))
+  new: 		res.TaskID, res.Status, res.Rounds, res.ToolCalls, costLine(res))
+
+run.go 1107-1110 -> 1139-1142 (block): IDENTICAL
+  old: 	_, why := (tools.TaskBackfill{
+  old: 		Roster: rt.tasks,
+  old: 		Spills: agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets()),
+  old: 	}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+  new: 	_, why := (tools.TaskBackfill{
+  new: 		Roster: rt.tasks,
+  new: 		Spills: agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets()),
+  new: 	}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+
+ticket224_test.go 433 -> 442 : IDENTICAL
+  old: 			t.Fatalf("boot 1 minted %q, which the shape lock rejects: the minting point and the "+
+  new: 			t.Fatalf("boot 1 minted %q, which the shape lock rejects: the minting point and the "+
+
+===== 08-post-truth-projection.txt =====
+# 236-r7 post-edit truth projection (2026-10-14 13:55:14 +0800)
+run.go blob now: 154279f70752162f8a74f0f30debafc1669de3cd (anchor: 154279f7)
+ticket224 blob now: ebe020dd60b73fee5d877afdbc2b1ecd4de80a8b (anchor: ebe020dd)
+
+## every NEW number in the pin, and what it points at
+run.go:1137 -> 	rt.tasks.MarkRoot(bg.ID, task)
+run.go:1142 -> 	}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+run.go:1156 -> 			ID: res.TaskID, State: state, QueryText: task,
+run.go:1167 -> 		if err := rt.store.FinishTaskLog(c, res.TaskID, state, summary,
+run.go:1177 -> 		res.TaskID, res.Status, res.Rounds, res.ToolCalls, costLine(res))
+run.go:1139 -> 	_, why := (tools.TaskBackfill{
+run.go:1139-1142 -> [	_, why := (tools.TaskBackfill{ ... 	}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)]
+ticket224:442 -> 			t.Fatalf("boot 1 minted %q, which the shape lock rejects: the minting point and the "+
+
+## new pin lines (the 11 changed sites)
+//	cmd/wisp/run.go:1137         rt.tasks.MarkRoot(bg.ID, task)
+//	cmd/wisp/run.go:1142         Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+//	cmd/wisp/run.go:1156/1167/1177   task_log 与状态行，全部用 res.TaskID
+// (grants_test.go:152 + session.go:67/:94 + cmd/wisp/ticket224_assembly_test.go:442):
+// dispatches. The roster + spill pair is wired the way cmd/wisp/run.go:1139-1142
+			"结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1137（MarkRoot(bg.ID)）与 "+
+			":1142/:1156/:1167/:1177（回填、task_log、状态行全部用 res.TaskID）。"+
+			"它与 cmd/wisp/run.go:1137/:1142 后来当名册键、回填键用的是同一个值", req.TaskID, bg.ID)
+	// The consumption the composition root really performs (run.go:1137 then
+	// :1142): if the two ids ever diverge, the roster gains a second row under
+		t.Fatalf("名册里没有以 RunningTask.ID（%q）为键的行：cmd/wisp/run.go:1137 用 bg.ID 登的行不见了", bg.ID)

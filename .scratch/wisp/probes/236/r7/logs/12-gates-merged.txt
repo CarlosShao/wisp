@@ -1,0 +1,101 @@
+# 236-r7 gates pre/post (merged from raw 03/04/06/07, 2026-10-14 13:56:31 +0800)
+
+===== 03-pre-Test236.txt =====
+== 2026-10-14 13:50:28 +0800 pre-edit Test236 ==
+cmd: GOTMPDIR='C:\tmp\wisp236r7gotmp' go test ./internal/tools/ -count=1 -run 'Test236' -v
+time=2026-10-14T13:50:32.410+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test236R2TaskCancelRefusesWhenHostGaveNoCallerID
+--- PASS: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+=== RUN   Test236R2TaskCancelRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenRosterIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+=== RUN   Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey
+--- PASS: Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey (0.01s)
+=== RUN   Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+    tasklist_deferred_236r3_teeth_test.go:178: 现名册：task.output / task.cancel（DEFERRED 的判据读的是这一行，不是注释里的词面）
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+=== RUN   Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+    tasklist_deferred_236r3_teeth_test.go:222: 成对读数：盘上 2 行 / 编译期 2 行（HEAD 上两数相等＝这把尺没在空转）
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	2.042s
+rc=0
+
+===== 04-pre-gofumpt-build.txt =====
+== 2026-10-14 13:51:23 +0800 pre-edit gofumpt ==
+cmd: D:\work\base\gopath/bin/gofumpt.exe -l internal/tools/taskid_source_236r4_teeth_test.go
+gofumpt-l rc=0 (empty above = clean)
+== build ==
+build rc=0
+
+===== 06-post-Test236-race.txt =====
+== 2026-10-14 13:54:20 +0800 post-edit Test236 ==
+cmd: GOTMPDIR='C:\tmp\wisp236r7gotmp' go test ./internal/tools/ -count=1 -run 'Test236' -v
+time=2026-10-14T13:54:28.826+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test236R2TaskCancelRefusesWhenHostGaveNoCallerID
+--- PASS: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+=== RUN   Test236R2TaskCancelRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskCancelRefusesWhenRosterIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenRosterIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenRosterIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired
+--- PASS: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)
+=== RUN   Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID
+--- PASS: Test236R2TaskSpawnRefusesWhenHostGaveNoTaskID (0.00s)
+=== RUN   Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey
+--- PASS: Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey (0.01s)
+=== RUN   Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment
+    tasklist_deferred_236r3_teeth_test.go:178: 现名册：task.output / task.cancel（DEFERRED 的判据读的是这一行，不是注释里的词面）
+--- PASS: Test236R3TaskListDeferralIsPinnedByTheRosterNotByAComment (0.00s)
+=== RUN   Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt
+    tasklist_deferred_236r3_teeth_test.go:222: 成对读数：盘上 2 行 / 编译期 2 行（HEAD 上两数相等＝这把尺没在空转）
+--- PASS: Test236R3InstrumentFactReadDiskIsBlindToOverlayCarriesIt (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	3.134s
+rc=0
+
+== 2026-10-14 13:54:28 +0800 race ==
+cmd: GOTMPDIR='C:\tmp\wisp236r7gotmp' go test ./internal/tools/ -count=1 -run 'Test236' -race
+ok  	github.com/CarlosShao/wisp/internal/tools	4.193s
+rc=0
+
+===== 07-post-gofumpt-build.txt =====
+== 2026-10-14 13:54:54 +0800 post-edit gofumpt ==
+gofumpt-l rc=0 (empty above = clean)
+== build ==
+build rc=0
+
+== dirty window at close ==
+ M internal/tools/taskid_source_236r4_teeth_test.go
+
+===== supplementary =====
+== 2026-10-14 13:55:25 +0800 d22scan ==
+d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 276 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 236 production Go files
+d22scan: scope bans #1-5 cmd/           examined  40 production Go files
+d22scan: scope ban #6 frontend/         examined 111 text files
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 111 text files
+d22scan: scope ban #8 internal/         examined 550 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 125 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=236, bans #1-5 cmd/=40, ban #6 frontend/=111, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=111, ban #8 internal/=550, ban #8 cmd/=125; ban #8 emoji coverage: design/ 39 text files; frontend/ 111 text files; internal/ 550 Go files, comments and _test.go included; cmd/ 125 Go files, comments and _test.go included
+d22scan rc=0
+== length gate ==
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=59  of which in the 122..180 middle=57  past the old debt line(180)=2  in the wall interval=0  roster entries=59
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 59 paths on this tree, recomputed just now in both units
+length-gate rc=0
+

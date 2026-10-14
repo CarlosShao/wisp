@@ -14,9 +14,9 @@ package tools
 //	internal/agent/loop.go:330   t := &RunningTask{ID: id, ...}   <- RunningTask.ID
 //	internal/agent/loop.go:333   t.result = l.run(c, id, input)   <- the same id
 //	internal/agent/loop.go:382   res := Result{TaskID: taskID, ...}
-//	cmd/wisp/run.go:1105         rt.tasks.MarkRoot(bg.ID, task)
-//	cmd/wisp/run.go:1110         Backfill(bg.Root().Ctx, res.TaskID, res.Text)
-//	cmd/wisp/run.go:1124/1135/1145   task_log 与状态行，全部用 res.TaskID
+//	cmd/wisp/run.go:1137         rt.tasks.MarkRoot(bg.ID, task)
+//	cmd/wisp/run.go:1142         Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+//	cmd/wisp/run.go:1156/1167/1177   task_log 与状态行，全部用 res.TaskID
 //
 // THIS pin is written in internal/tools but its射程 includes internal/agent on
 // purpose: it drives the REAL loop (agent.New + RunAsync) over the frozen C5
@@ -25,7 +25,7 @@ package tools
 // stays inside one package.
 //
 // The three segments are copied from internal/session's minted-shape lock
-// (grants_test.go:152 + session.go:67/:94 + cmd/wisp/ticket224_assembly_test.go:433):
+// (grants_test.go:152 + session.go:67/:94 + cmd/wisp/ticket224_assembly_test.go:442):
 //
 //	1. the lock       r236r4MintedShape below: the shape newTaskID mints
 //	                  (loop.go:1153). The session lock's Valid() is exported
@@ -136,7 +136,7 @@ func r236r4MintedShape(s string) bool {
 // an httptest server (loop_approval_test.go:60-85's wiring, SPEC-05 §9: no
 // function mocks at the C5 seam). The tool surface is the loop's own default
 // (agent.NewEchoProvider), declared L0 so the fixture's one echo call really
-// dispatches. The roster + spill pair is wired the way cmd/wisp/run.go:1107-1110
+// dispatches. The roster + spill pair is wired the way cmd/wisp/run.go:1139-1142
 // wires it, because the consumption half of this pin IS that wiring.
 func r236r4Carrier(t *testing.T) (*agent.Loop, *agent.EchoProvider, *TaskRoster, *agent.Spiller) {
 	t.Helper()
@@ -205,8 +205,8 @@ func Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey(t *testing.T) {
 	if res.TaskID != bg.ID {
 		t.Errorf("Result.TaskID = %q 而 RunningTask.ID = %q：这两处必须是同一枚宿主铸的键。"+
 			"铸造与传递在 internal/agent/loop.go:329（id := newTaskID()）与 :333（同一个 id 交给 run），"+
-			"结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1105（MarkRoot(bg.ID)）与 "+
-			":1110/:1124/:1135/:1145（回填、task_log、状态行全部用 res.TaskID）。"+
+			"结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1137（MarkRoot(bg.ID)）与 "+
+			":1142/:1156/:1167/:1177（回填、task_log、状态行全部用 res.TaskID）。"+
 			"两处分叉即「名册登记的键」和「输出写进的键」不是同一枚", res.TaskID, bg.ID)
 	}
 
@@ -225,15 +225,15 @@ func Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey(t *testing.T) {
 	if req.TaskID != bg.ID {
 		t.Errorf("工具接缝上 TaskID = %q，不是环路铸的那枚 RunningTask.ID = %q："+
 			"internal/agent/loop.go:676 把 run 收到的 taskID 填进 ToolRequest.TaskID，"+
-			"它与 cmd/wisp/run.go:1105/:1110 后来当名册键、回填键用的是同一个值", req.TaskID, bg.ID)
+			"它与 cmd/wisp/run.go:1137/:1142 后来当名册键、回填键用的是同一个值", req.TaskID, bg.ID)
 	}
 	if req.TaskID == req.CallID {
 		t.Errorf("接缝上 TaskID 与 CallID 同值（%q）：宿主铸的键与模型给的键合流了，"+
 			"「键的来源」这一维当场失效（loop.go:676 的两格必须各是各的）", req.TaskID)
 	}
 
-	// The consumption the composition root really performs (run.go:1105 then
-	// :1110): if the two ids ever diverge, the roster gains a second row under
+	// The consumption the composition root really performs (run.go:1137 then
+	// :1142): if the two ids ever diverge, the roster gains a second row under
 	// the result's key and the root row stops carrying the text — so "两者相等"
 	// has an observable consequence, not just a string comparison.
 	roster.MarkRoot(bg.ID, "236r4 根任务")
@@ -244,7 +244,7 @@ func Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey(t *testing.T) {
 	}
 	row, ok := roster.Look(bg.ID)
 	if !ok {
-		t.Fatalf("名册里没有以 RunningTask.ID（%q）为键的行：cmd/wisp/run.go:1105 用 bg.ID 登的行不见了", bg.ID)
+		t.Fatalf("名册里没有以 RunningTask.ID（%q）为键的行：cmd/wisp/run.go:1137 用 bg.ID 登的行不见了", bg.ID)
 	}
 	if rec.Text != res.Text || row.Text != res.Text {
 		t.Errorf("以铸来的键读回的正文 = %q / %q，不是 Result 的 %q：输出写的键与名册登的键分叉了（res.TaskID %q vs RunningTask.ID %q）",

@@ -1,0 +1,111 @@
+# 236-r7 digit-only ruler (2026-10-14 13:53:27 +0800)
+HEAD=c92f4dd507959ad91f212fbb3a1ce1c2baa53b35  pin blob(HEAD)=30e5fab0e08b27e3bce8c4291ffa81583431c7a0
+
+== RULER: strip every [0-9]+ run from BOTH versions, then diff (expect: empty) ==
+cmd: diff <(git show HEAD:internal/tools/taskid_source_236r4_teeth_test.go | sed -E 's/[0-9]+/#/g') <(sed -E 's/[0-9]+/#/g' internal/tools/taskid_source_236r4_teeth_test.go)
+ruler rc=0 (0 = 剥掉数字后两版逐字同)
+
+== per-line (git diff -U0, only number-token lines) ==
+cmd: git diff -U0 -- internal/tools/taskid_source_236r4_teeth_test.go
+diff --git a/internal/tools/taskid_source_236r4_teeth_test.go b/internal/tools/taskid_source_236r4_teeth_test.go
+index 30e5fab0..cdaed84e 100644
+--- a/internal/tools/taskid_source_236r4_teeth_test.go
++++ b/internal/tools/taskid_source_236r4_teeth_test.go
+@@ -17,3 +17,3 @@ package tools
+-//	cmd/wisp/run.go:1105         rt.tasks.MarkRoot(bg.ID, task)
+-//	cmd/wisp/run.go:1110         Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+-//	cmd/wisp/run.go:1124/1135/1145   task_log 与状态行，全部用 res.TaskID
++//	cmd/wisp/run.go:1137         rt.tasks.MarkRoot(bg.ID, task)
++//	cmd/wisp/run.go:1142         Backfill(bg.Root().Ctx, res.TaskID, res.Text)
++//	cmd/wisp/run.go:1156/1167/1177   task_log 与状态行，全部用 res.TaskID
+@@ -28 +28 @@ package tools
+-// (grants_test.go:152 + session.go:67/:94 + cmd/wisp/ticket224_assembly_test.go:433):
++// (grants_test.go:152 + session.go:67/:94 + cmd/wisp/ticket224_assembly_test.go:442):
+@@ -139 +139 @@ func r236r4MintedShape(s string) bool {
+-// dispatches. The roster + spill pair is wired the way cmd/wisp/run.go:1107-1110
++// dispatches. The roster + spill pair is wired the way cmd/wisp/run.go:1139-1142
+@@ -208,2 +208,2 @@ func Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey(t *testing.T) {
+-			"结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1105（MarkRoot(bg.ID)）与 "+
+-			":1110/:1124/:1135/:1145（回填、task_log、状态行全部用 res.TaskID）。"+
++			"结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1137（MarkRoot(bg.ID)）与 "+
++			":1142/:1156/:1167/:1177（回填、task_log、状态行全部用 res.TaskID）。"+
+@@ -228 +228 @@ func Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey(t *testing.T) {
+-			"它与 cmd/wisp/run.go:1105/:1110 后来当名册键、回填键用的是同一个值", req.TaskID, bg.ID)
++			"它与 cmd/wisp/run.go:1137/:1142 后来当名册键、回填键用的是同一个值", req.TaskID, bg.ID)
+@@ -235,2 +235,2 @@ func Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey(t *testing.T) {
+-	// The consumption the composition root really performs (run.go:1105 then
+-	// :1110): if the two ids ever diverge, the roster gains a second row under
++	// The consumption the composition root really performs (run.go:1137 then
++	// :1142): if the two ids ever diverge, the roster gains a second row under
+@@ -247 +247 @@ func Test236R4RunningTaskIDAndResultTaskIDAreOneHostMintedKey(t *testing.T) {
+-		t.Fatalf("名册里没有以 RunningTask.ID（%q）为键的行：cmd/wisp/run.go:1105 用 bg.ID 登的行不见了", bg.ID)
++		t.Fatalf("名册里没有以 RunningTask.ID（%q）为键的行：cmd/wisp/run.go:1137 用 bg.ID 登的行不见了", bg.ID)
+
+== numstat ==
+11	11	internal/tools/taskid_source_236r4_teeth_test.go
+
+== per-pair verdict (k-th '-' vs k-th '+', strip [0-9]+ on each, expect equal) ==
+PAIR 01  STRIP-EQUAL
+  -: //	cmd/wisp/run.go:1105         rt.tasks.MarkRoot(bg.ID, task)
+  +: //	cmd/wisp/run.go:1137         rt.tasks.MarkRoot(bg.ID, task)
+PAIR 02  STRIP-EQUAL
+  -: //	cmd/wisp/run.go:1110         Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+  +: //	cmd/wisp/run.go:1142         Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+PAIR 03  STRIP-EQUAL
+  -: //	cmd/wisp/run.go:1124/1135/1145   task_log 与状态行，全部用 res.TaskID
+  +: //	cmd/wisp/run.go:1156/1167/1177   task_log 与状态行，全部用 res.TaskID
+PAIR 04  STRIP-EQUAL
+  -: // (grants_test.go:152 + session.go:67/:94 + cmd/wisp/ticket224_assembly_test.go:433):
+  +: // (grants_test.go:152 + session.go:67/:94 + cmd/wisp/ticket224_assembly_test.go:442):
+PAIR 05  STRIP-EQUAL
+  -: // dispatches. The roster + spill pair is wired the way cmd/wisp/run.go:1107-1110
+  +: // dispatches. The roster + spill pair is wired the way cmd/wisp/run.go:1139-1142
+PAIR 06  STRIP-EQUAL
+  -: 			"结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1105（MarkRoot(bg.ID)）与 "+
+  +: 			"结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1137（MarkRoot(bg.ID)）与 "+
+PAIR 07  STRIP-EQUAL
+  -: 			":1110/:1124/:1135/:1145（回填、task_log、状态行全部用 res.TaskID）。"+
+  +: 			":1142/:1156/:1167/:1177（回填、task_log、状态行全部用 res.TaskID）。"+
+PAIR 08  STRIP-EQUAL
+  -: 			"它与 cmd/wisp/run.go:1105/:1110 后来当名册键、回填键用的是同一个值", req.TaskID, bg.ID)
+  +: 			"它与 cmd/wisp/run.go:1137/:1142 后来当名册键、回填键用的是同一个值", req.TaskID, bg.ID)
+PAIR 09  STRIP-EQUAL
+  -: 	// The consumption the composition root really performs (run.go:1105 then
+  +: 	// The consumption the composition root really performs (run.go:1137 then
+PAIR 10  STRIP-EQUAL
+  -: 	// :1110): if the two ids ever diverge, the roster gains a second row under
+  +: 	// :1142): if the two ids ever diverge, the roster gains a second row under
+PAIR 11  STRIP-EQUAL
+  -: 		t.Fatalf("名册里没有以 RunningTask.ID（%q）为键的行：cmd/wisp/run.go:1105 用 bg.ID 登的行不见了", bg.ID)
+  +: 		t.Fatalf("名册里没有以 RunningTask.ID（%q）为键的行：cmd/wisp/run.go:1137 用 bg.ID 登的行不见了", bg.ID)
+
+== gate (6): non-comment changed lines, named (expect only string-literal lines, digits-only) ==
+cmd: git diff -U0 | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)'  # then classify first non-space char
+comment     -//	cmd/wisp/run.go:1105         rt.tasks.MarkRoot(bg.ID, task)
+comment     -//	cmd/wisp/run.go:1110         Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+comment     -//	cmd/wisp/run.go:1124/1135/1145   task_log 与状态行，全部用 res.TaskID
+comment     +//	cmd/wisp/run.go:1137         rt.tasks.MarkRoot(bg.ID, task)
+comment     +//	cmd/wisp/run.go:1142         Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+comment     +//	cmd/wisp/run.go:1156/1167/1177   task_log 与状态行，全部用 res.TaskID
+comment     -// (grants_test.go:152 + session.go:67/:94 + cmd/wisp/ticket224_assembly_test.go:433):
+comment     +// (grants_test.go:152 + session.go:67/:94 + cmd/wisp/ticket224_assembly_test.go:442):
+comment     -// dispatches. The roster + spill pair is wired the way cmd/wisp/run.go:1107-1110
+comment     +// dispatches. The roster + spill pair is wired the way cmd/wisp/run.go:1139-1142
+CODE-STRING -			"结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1105（MarkRoot(bg.ID)）与 "+
+CODE-STRING -			":1110/:1124/:1135/:1145（回填、task_log、状态行全部用 res.TaskID）。"+
+CODE-STRING +			"结果在 :382 落进 Result.TaskID；消费在 cmd/wisp/run.go:1137（MarkRoot(bg.ID)）与 "+
+CODE-STRING +			":1142/:1156/:1167/:1177（回填、task_log、状态行全部用 res.TaskID）。"+
+CODE-STRING -			"它与 cmd/wisp/run.go:1105/:1110 后来当名册键、回填键用的是同一个值", req.TaskID, bg.ID)
+CODE-STRING +			"它与 cmd/wisp/run.go:1137/:1142 后来当名册键、回填键用的是同一个值", req.TaskID, bg.ID)
+comment     -	// The consumption the composition root really performs (run.go:1105 then
+comment     -	// :1110): if the two ids ever diverge, the roster gains a second row under
+comment     +	// The consumption the composition root really performs (run.go:1137 then
+comment     +	// :1142): if the two ids ever diverge, the roster gains a second row under
+CODE-STRING -		t.Fatalf("名册里没有以 RunningTask.ID（%q）为键的行：cmd/wisp/run.go:1105 用 bg.ID 登的行不见了", bg.ID)
+CODE-STRING +		t.Fatalf("名册里没有以 RunningTask.ID（%q）为键的行：cmd/wisp/run.go:1137 用 bg.ID 登的行不见了", bg.ID)
+
+== counts ==
+changed lines: -11 +11
+non-comment changed lines: 8
+file lines: 278 (pre: 278)
+sha256: 00fd832e21711ff23736a46c41396378f20a0a53e8aebfb3a0ef240a62b70262 (pre: 7e23ec320f6aadac100857c8b40f3515d6f2f4be2cc16dae00cf4d94c0193808)
