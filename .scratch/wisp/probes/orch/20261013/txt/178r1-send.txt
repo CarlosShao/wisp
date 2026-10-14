@@ -1,0 +1,6 @@
+178-r1 send 记录
+- 发送时刻：2026-10-14 18:4x +08；派单已先存档：txt/178r1-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/178/` = 未建（r1 可用）；`probes/154/gate-clauses.sh` 在盘（48,783 B，最后改动 `2a5489d3` 2026-10-03）。
+- 收件人：agent_ad3d3a9d-0261-4526-b437-79559c8204aa（general-purpose，后台）。
+- 内容：票 178 AC#1–#5（四堆可分；AC#2 真只开不关仍红；AC#3 合法 CloseTask-only 不再顶红；AC#4 禁抬基线；AC#5 vs 171 分工）。面＝gate-clauses.sh 一枚。
+- ★编排者现量随单附上：现跑 rc=4、四条 BAD（G1b/G2/G6/G6neg）——票面立票时只 1 枚；腿第 0 步归因，G1b/G2 不属本票判据。

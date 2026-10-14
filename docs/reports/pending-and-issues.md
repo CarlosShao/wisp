@@ -17953,3 +17953,10 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **AC#10 选②登记**（该格要求原文）：注释与产码不一致**已归口**——唯一调用方 executeCalls 丢弃该值、不 drop 任何行；gate-owned pending 行归宿推迟票 21/162（A13 分工不动）。
 - **两枚候补未开票**（腿报）：`riskColumn` 压平、decision 词汇缺口——留编排者裁（登记为候补，不新开）。
 - **下波**：AC#8 e2e（176-r1 探针族 overlay，命令与基线在 `probes/179/r3/00-anchor-and-gates.md` §4＋`probes/179/r2/logs/e2e-readings.txt`）——等 `cmd/wisp` 面空出（255-r8 尚在）。
+
+## A943｜2026-10-14 17:39 +08｜收 179-r3 后补写腿：派 **178-r1**（成对普查尺 G6neg 四堆不分；面＝`probes/154/gate-clauses.sh` 一枚）⇒ 编队（4）：写×3＝318-r1/255-r8/178-r1、验×1＝114-v2。★随单发现：该尺现跑 **rc=4、四条 BAD**（G1b/G2/G6/G6neg），票面立票时只 1 枚（G6neg）——G1b/G2 明标"不在本票判据里"，腿第 0 步逐枚归因（161 AC#6① 空非空／171 AC#7 口径／树演化〔315 的 admitTask OpenTask〕）
+
+- 选腿依据：136/133/139 的面都撞 `cmd/wisp`（255-r8 占）或 `.github`（需批准）；178 是 ready 池里唯一净面写腿。
+- 派单/去重/存档：`txt/178r1-dispatch.txt`＋`178r1-send.txt`；起手锚 `93452d45`；读数落 `probes/178/r1/`。
+- 编排者现量留档：`/c/tmp/wisp-orch-178/run-now.txt`（rc=4 全表）。
+- 编队守恒：写 ≤4 ✓（3）、总 ≤7 ✓（4）；面互斥：178 零 Go 包、不撞任何在飞面。
