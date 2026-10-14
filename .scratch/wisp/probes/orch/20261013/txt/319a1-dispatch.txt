@@ -1,0 +1,26 @@
+# 319-a1 派单（票 319：面板线程一死不可复活＋二次启动不能唤窗——**根因调查与最小形建议**；只读腿；面＝`cmd/wisp` 只读＋`probes/319/a1/`）
+
+发送时刻：2026-10-14 21:5x +08。编排者派发。
+你 = Wisp 流水线的**只读根因调查腿 319-a1**。身份＝只读（**零产码、零写生产面**；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 不碰台账）。
+
+## 票与背景
+
+- 票：`.scratch/wisp/issues/319-panel-thread-death-is-terminal-and-a-second-launch-cannot-bring-any-window-to-front.md`（先通读；面＝`cmd/wisp` 面板宿主）
+- 起手 `git rev-parse --short HEAD` 现读锚；证据主源＝`%APPDATA%\wisp-dev\logs\wisp-20261014-001.jsonl`（机主实报现场）。
+
+## 三问（逐条给读数与判断）
+
+1. **AC#0 根因（首要）**：`15:41:45` 那条 `panel thread ending / why: the library pump returned / window_opened: true` 为什么返回？调查方向（逐条核，给逐字证据）：
+   - **假说甲（最可能）：面板窗被关掉 ⇒ 消息泵返回 ⇒ 线程退出**。核 `cmd/wisp/panel_host_windows.go`（＋`panel_resident_windows.go` 等）里那条线程的生命周期：什么消息/事件会让 `Run()`/泵返回（WM_QUIT？`PostQuitMessage`？窗口销毁后的循环条件？）。再看 15:41 前的日志上下文（15:33 机主保存配置、15:41 前后有无关窗相关行）、以及**之后每一次手势都被"线程已退出"拒**这一事实是否与该假说自洽。
+   - 乙：WebView2 崩溃/进程退出导致泵返回——查 Windows 事件日志（`wevtutil qe Application /f:text /q:"*[System[TimeCreated[@SystemTime>='2026-10-14T07:35:00' and @SystemTime<='2026-10-14T07:50:00']]]"`，筛 wisp/WebView2/Application Error）与 crashpad/用户数据目录残留。
+   - 丙：其它（电源/会话事件、我们自己的代码路径）。
+   - **判据**：无论哪种，给"哪一行代码 + 哪一条日志/事件"的双向锚；答不出就明写"根因未定、三假说各自的支持/反证读数"。
+2. **AC#1 复活路径**：面板线程退出后，代码里**有没有**任何重新创建它的路径？（现读证据）最小可行形状是什么（例：手势处检测线程已死 ⇒ 重建；或泵返回不退出线程而重建窗口）？face 与要碰的文件逐枚点名；⛔ 本次**不改码**，只给形状。
+3. **AC#2 二次启动唤窗**：现读"第二次启动"那条路径（`activation requested by second launch / bring_to_front: no path from this loop to a window…`）——它今天为什么没有唤窗路径？最小形是什么（球闪烁/托盘提示/真实 bring-to-front）？要点名代码位置与 face；若涉及 `frontend/**` ⇒ 标注"面归外部 agent"。
+
+## 纪律
+
+- ⛔ **不得扰动机主正在跑的实例**（`wisp.exe` PID 40296 可能仍在）：⛔ 不 kill、⛔ 不重启、⛔ 不跑第二个实例；需要活体复现的设想**只写进建议**，别执行。
+- 只读命令为主（`git log -S`/`git blame`/读码/`wevtutil`/读日志）。⛔ 不改任何仓内文件（除你新建的 `probes/319/a1/`）。
+- 交件：`probes/319/a1/census.md`（≤200 行，结论先行）＋ 票 319 尾**追加 1 条 bullet**（`agent=319-a1 did=… next=…`）；只 commit 不 push，显式 pathspec。
+- 回执：结论先行（根因判/未定）＋三问逐条＋逐字证据＋最小形建议＋具名没做。
