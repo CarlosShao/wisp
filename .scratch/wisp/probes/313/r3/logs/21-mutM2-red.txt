@@ -1,0 +1,9 @@
+# mutation M2 (only the first element kept: strings.SplitN(v, ",", 2)[:1]), window 2026-10-14 10:53:05..10:53:47 +0800
+# (the error's full config.toml body dump is kept raw at logs/22-mutM2-red.raw.txt, not committed)
+--- FAIL: Test313MultiElementCommaChainKeepsEveryElement (0.02s)
+    panel_config_313_test.go:318: config.toml does not carry the two comma-separated elements of "deepseek/deepseek-chat, deepseek/deepseek-reasoner" as "cloud_asr_chain = ['deepseek/deepseek-chat', 'deepseek/deepseek-reasoner']":
+    panel_config_313_test.go:330: voice.cloudASRChain read back as [deepseek/deepseek-chat], want both elements of "deepseek/deepseek-chat, deepseek/deepseek-reasoner" in order
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.009s
+FAIL
+rc=1

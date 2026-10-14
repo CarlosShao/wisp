@@ -1,0 +1,5 @@
+2026-10-14 10:50:30 +0800
+ok  	github.com/CarlosShao/wisp/internal/config	1.972s
+ok  	github.com/CarlosShao/wisp/internal/panel	2.150s
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.414s
+test313-pre rc=0

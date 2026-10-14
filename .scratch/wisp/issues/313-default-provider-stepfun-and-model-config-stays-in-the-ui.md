@@ -43,3 +43,5 @@
 - **挂账①（`"providers":null`）＝已由编排者热修**：零行配置时载荷发 `null` 而页面 `find/some` 无守卫（全新配置首开即炸、正是 AC#1 目标态）⇒ `a5dabe38`（载荷发 `[]`＋同包钉）＋`7a6f493d`（订正 313-r2 把 null 钉住的旧断言——**订正非放宽**）；三包 `-run Test313` 全绿；**修正版 exe 已重编**（10:16，`wisp doctor` PASS）。页面侧 null 守卫不强制（Go 已保证 array）；如需加固归前端会话。
 - **挂账②（多元素逗号链三包零钉）＝候选补钉**（未派；见 `A905`）。
 - **页面侧半格不判**：归机主前端会话与真机端到端（双击 exe 试配模型）。本票**不 `-done`**。
+
+- [2026-10-14 10:58 +08] agent=313-r3 did=挂账②补钉（写腿）：`cmd/wisp/panel_config_313_test.go` 追加 `Test313MultiElementCommaChainKeepsEveryElement`（**+69/-0**，存量用例一字未动）——两元素逗号链端到端三面钉（回执键路径／落盘 config.toml 数组行逐字／`config.get` 载荷按序；两枚模型名现读自既有 fixture：`deepseek-chat`＋`deepseek-reasoner`，⛔ 未编名）；两发突变证牙（`splitChainValue` 按 `;` 切 ⇒ 拒写红句点名整串元素；只切第一枚 ⇒ 落盘＋载荷两发红），仓外备份＋sha256 逐字节证（原/还原 `43acff43…`；窗口 M1 10:52:14→10:52:44／M1R 10:55:47→10:55:56／M2 10:53:05→10:53:47）；门禁 rc 全 0（build／gofumpt 空／`-run Test313` 三包／新钉具名／d22scan clean／长度门 GREEN 59=59）；落点自裁＝只取 cmd/wisp 端到端（逗号语义只在 door 侧，config 层加钉对突变无牙）。件＝`.scratch/wisp/probes/313/r3/`。next=编排者复核后随收尾链推；本票不 `-done`，⛔ 未 push。

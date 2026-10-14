@@ -1,0 +1,8 @@
+# mutation M1 (split on ';' instead of ','), window 2026-10-14 10:55:48 +0800
+--- FAIL: Test313MultiElementCommaChainKeepsEveryElement (0.02s)
+    panel_config_313_test.go:306: config.set was refused: config: config: refused to write voice.cloud_asr_chain。 第 2 种拒因：行不存在：链元素点名的 provider/model 必须已经在目录里（先用建行那一步，或手改文件）。: config: config.toml: voice.cloud_asr_chain element "deepseek/deepseek-chat, deepseek/deepseek-reasoner" references unknown model "deepseek-chat, deepseek/deepseek-reasoner" of provider "deepseek"
+        {"configField":"voice_cloud_asr_chain","configModel":"","configProvider":"","configValue":"deepseek/deepseek-chat, deepseek/deepseek-reasoner","method":"config.set","requestId":"r-313-2elt-asr","source":"panel-composer"}
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.478s
+FAIL
+rc=1

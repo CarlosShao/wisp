@@ -1,0 +1,13 @@
+HEAD==351214de9df264e28048c69543d62abe1dab66c9
+351214de 2026-10-14 10:55:01 +0800 260-v2 勘误（非 amend）：判语表 §9 交件名册的 logs 枚数 22→21（首笔当时 20，补笔 +31-post-commit.txt；逐枚名册与字节数首笔一直正确，只有那个合计数字错），首笔 commit 消息里同名数字按本笔读
+branch=dev
+date=2026-10-14 10:57:07 +0800
+--- file sha256 (mine) ---
+43acff433ae72f2677b4efb6e3fdab9a35a6a393a89ed84107eaa647a9119a9d *cmd/wisp/panel_config_store.go
+db7d40500508da6f40199c499e907f90a72204dbd1665845b6027f6acfc3b200 *cmd/wisp/panel_config_313_test.go
+--- diff stat (my leg) ---
+ cmd/wisp/panel_config_313_test.go | 69 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
+deleted-lines=0
+--- other 313 test files untouched ---
+(empty above = untouched)

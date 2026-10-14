@@ -1,0 +1,17 @@
+# 313-r3 post gates 2026-10-14 10:54:12 +0800
+## build
+build-post rc=0
+## gofumpt (touched files)
+gofumpt rc=0
+## go test -count=1 -run Test313 three packages
+ok  	github.com/CarlosShao/wisp/internal/config	1.650s
+ok  	github.com/CarlosShao/wisp/internal/panel	1.801s
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.835s
+test313-post rc=0
+## d22scan
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=236, bans #1-5 cmd/=40, ban #6 frontend/=111, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=111, ban #8 internal/=550, ban #8 cmd/=125; ban #8 emoji coverage: design/ 39 text files; frontend/ 111 text files; internal/ 550 Go files, comments and _test.go included; cmd/ 125 Go files, comments and _test.go included
+d22scan rc=0
+## length gate
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 59 paths on this tree, recomputed just now in both units
+length rc=0
