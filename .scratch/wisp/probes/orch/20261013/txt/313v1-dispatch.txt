@@ -1,0 +1,37 @@
+# 313-v1 派单（票 313「配模型」Go 侧整包验收；非实现者；面＝internal/panel＋internal/config＋cmd/wisp）
+
+发送时刻：2026-10-14 09:5x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `313-v1`**（非实现者；实现者＝`313-r1`＋`313-r2`）。⛔ 不翻框、⛔ 不动 `Status:`/票名——判语交回，框由编排者凭你的表翻。
+
+## 被裁对象
+
+- `89b3b550`（`313-r1`，5 枚产码件）：`internal/panel/config_handlers.go`（+159/−7 读面：`SettingsView` 追加字段／`VoiceSettingsView`／`ProviderSettings.Models`／`renderSettingsPayload`＋标记）／`internal/panel/config_write_313.go`（新 123 行，第二张可写表六枚＋并集/选择器助手）／`internal/panel/config_313_test.go`（新 324 行，6 用例）／`internal/config/settings_313.go`（新 222 行，六枚 setter）／`internal/config/settings_313_test.go`（新 273 行，5 用例）；交付件含 `docs/evidence/s1/313-panel-ask.md`（页面接口规格）与 `probes/313/r1/10-cmdwisp-landing-package.md`。
+- `2f8964b9`＋`9e3013e4`（`313-r2`，cmd/wisp 落点）：`cmd/wisp/panel_config_store.go`（+47/−3：`ReadSettings` 六味字面量＋`modelNames` 排序切片；`ApplySetting` 六 case＋`splitChainValue`）＋`cmd/wisp/panel_config_313_test.go`（新 263 行，端到端）＋交付件（锚/门禁/A881 现读）。
+- 票：`.scratch/wisp/issues/313-default-provider-stepfun-and-model-config-stays-in-the-ui.md`（三格 AC#1 默认选中／AC#2 界面配两模型／AC#3 界面录 key——**页面侧半归机主的前端会话**，本腿只判 Go 侧承载物）。
+- 裁定：`A881`（① `role_chat_pair` 三条件：两键枚举/原子/回执双报；② 第二张可写表＋两表并查三条件：ⓐ248 钉零动／ⓑ单一 accessor／ⓒ并集等值钉）；`A896`（r2 收件）。
+- ★**页面侧已落地**（机主前端会话 `9e9964f8`，只许**只读**）：`frontend/src/lib/config-view.ts` 解析 `wisp-config-view:` 标记后 JSON、`components/model-settings.tsx` 消费 `presets/providers/models`、三步写 `provider_row_create/provider_credential/role_chat_pair`——**契约双向对拉**是本腿最值钱的一格。
+
+## 要判的（每格"成立/附条件/不成立"＋逐条凭据；⛔ 不许只引实现者的件）
+
+1. **读面载荷 vs 规格 vs 页面**：① 现跑一发 `config.get` 路径拿 `renderSettingsPayload` 的 JSON 载荷（现成载具或自造小 harness——走真 Manager/ComposerDispatch，⛔ 不许 mock 冒充）；② 与 `313-panel-ask.md` 的键表**逐键**对拉；③ 与页面读键（`config-view.ts`/`model-settings.tsx` 现读，只读）**逐键对拉**——三方差集逐枚具名（含"页面读了 Go 不发的键"这种方向）。
+2. **A881 ⓐ/ⓑ/ⓒ 独立现读**：ⓐ 第一张表（`allWritableFields` 块）与 248 冻结钉（`internal/panel/config_route_248_test.go:271-277` 七枚）零动——`git log -1` 两文件＋`git diff` 抽核；ⓑ 并集唯一 accessor（现读源码，⛔ 无第三处列名册）；ⓒ **并集等值钉有牙**——自造 ≥1 发（从并集/两表之一删或加一枚 ⇒ 何钉红、红句逐字；放回 ⇒ 绿）。
+3. **六枚 setter 原子性/拒绝面**（`internal/config/settings_313.go`）：自造 ≥2 发（例：`role_chat_pair` 只给一半 ⇒ 拒且**文件逐字节不变**；云链含非法元素 ⇒ 拒）。仓外备份＋sha256 还原证。
+4. **cmd/wisp 端到端**：复跑 `-run 'Test313' ./cmd/wisp/ ./internal/panel/ ./internal/config/`（三包）＋自造 ≥1 发**行为突变**（例：把 `splitChainValue` 的解析改坏、或把某 case 的 Set 目标换错 ⇒ 指名的钉必须红）。⚠ 别只做 overlay 型——这些用例是真写盘的行为尺。
+5. **密钥面**：拒绝文案现读（列举两表并集）；`credential` 只回 `dpapi:`/状态、**值不回显**、不进载荷/日志（现读核）。
+6. **失败集归因**：三包现跑失败名单（改前/改后交集法）；⚠ **`frontend/**` 见到机主前端会话 `9e9964f8` 的落笔 ⇒ 必须先 `git log -- frontend/` 现读**，把他们的提交算进归因（已知三族红：两枚 contract 尺＝197 族漂移／`TestC21DesignTokensFourWayAgree`＝`design/assets/tokens.css` 被机主移走／35r8 两枚故意红）。新红逐枚具名、旧红引用名册。
+7. **翻框建议**（不翻，只写表）：Go 侧三格各自判语＋明说哪些半格属页面侧（不判）；`AC#3`（界面录 key）的 Go 机制部分（`api_key_ref` DPAPI 路）判"既有且未被动"还是"需要补"。
+
+## 环境与纪律（十条）
+
+1. 只 commit、⛔ 不 push；`git add`/`commit` 显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；⛔ 仓内不建 worktree；临时件只建不删；共享树里别人脏件别动（`design/**` 删除态／`frontend/dist`／`tokens.generated.css` 等全不归你）。
+2. `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（**MSYS 形**；盘符形撞 `0xc0000135`）；`GOTMPDIR` ⛔ 只 C:（你的例 `C:\tmp\wisp313v1gotmp`）。
+3. **整包 `./cmd/wisp/` 有 314 死区**（157–215s 进程死）⇒ 判据一律 `-run` 小射程；⛔ 别跑整包。
+4. 他腿 `237-r1`（`internal/tools` -race/突变）在飞——与你**零文件重叠**；你的每发突变**窗口起止时刻逐报**（纪律）。⚠ 共享树会呼吸（机主前端会话可能随时再提交）——读数带锚点时刻。
+5. 门禁：`GOFLAGS= go build ./...` rc=0；gofumpt 动过的件空；三包 `-run 'Test313'` rc=0；`sh scripts/d22scan.sh` clean；长度门（现 GREEN，58=58）。
+6. 突变方法论：真实写盘尺＝仓外备份＋**sha256 改前=改后逐字节证**；编译级尺可用 `-overlay`；⛔ 不看还原证不算凭据。
+7. 票面：票 313 尾**追加 1 条 bullet**；⛔ `- [ ]` 不翻、⛔ `Status:`/票名不动。
+8. 产出预算：交件 ≤7 枚 ≤200 行——`docs/evidence/s1/ticket313-313-v1-accept-v1.md`（判语表）＋`probes/313/v1/`（锚＋logs）＋票尾 bullet。
+9. **未定义即停**：票面/派单没覆盖的形（页面读键与规格矛盾、某载荷键无处对契、突变做不圆）⇒ 停手上报。
+10. 回执：结论先行（逐格判语）＋每笔 commit sha＋件路径＋门禁 rc＋自造突变逐发红/绿句＋**三方差集表**（Go 载荷↔规格↔页面）＋具名没做的格。
+
+发送时刻现量：HEAD `159a416e`；`255-v3` 刚收（名册面已静）；`237-r1` 在飞；今日 exe 已重编（与本腿无关）。
