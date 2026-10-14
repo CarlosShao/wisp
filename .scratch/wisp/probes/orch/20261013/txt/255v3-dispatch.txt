@@ -1,0 +1,48 @@
+# 255-v3 派单（票 255 AC#6＋A878 两处重裁的**非实现者**判语；验收腿；面＝cmd/wisp 名册/收据两件）
+
+发送时刻：2026-10-14 09:2x +08。编排者派发。
+你 = Wisp 流水线的**验收腿 `255-v3`**（非实现者；实现者是 `255-r7`）。⛔ 你不翻框、⛔ 不动 `Status:`/票名——判语交回，框由编排者凭你的表翻。
+
+## 被裁对象（实现者 `255-r7` 的三笔）
+
+- 产码 `dcaff922`：`cmd/wisp/config_readers_255.go`（+52/−?）＋ `cmd/wisp/config_receipt_255_test.go`（+97/−?）。
+- 交付 `9bd5ff21`：`.scratch/wisp/probes/255/r7/{00-anchor-and-gates.md, inventory-cites.py, logs/×11}`＋票 255 尾 1 bullet（署名 `agent=255-r7`）。
+- 更正 `94398165`（追加不 amend）：锚 §7 清单计数笔误四枚→五枚。
+- 票面：`.scratch/wisp/issues/255-config-says-these-sections-took-effect-immediately-panel-for-a-width-nobody-reads-while-the-panel-host-never-receives-config-and-tier-has-zero-readers.md`（AC#6 在看 10-10 节；A878 的来路看 09-2x 点名与账 `A878`／`A896`）。
+
+## 要判的四件（每件给"成立／附条件／不成立"＋逐条凭据；⛔ 不许只引实现者的件）
+
+### 1. AC#6 两形判据（票面逐字：**token 唯一命中当判据，行号只当读数**）
+
+- ⓐ 在**同一枚被引文件**里插一行、token 原样保住 ⇒ 尺⛔ 不许变红（改前会红＝缺陷面）。
+- ⓑ 把被引那一行的 token 改掉 ⇒ 必须红且逐名点到那一行。
+- 实现者报了：ⓐ×2（`run.go` 09:13:56–09:14:09 rc=0＋漂读 Logf；`resident_audio_windows.go` 09:14:32–09:14:44 rc=0）／ⓑ×2（`run.go:991` 09:14:19 rc=1 点名 row "agent"+行现读；`resident_audio_windows.go:257` 09:14:54 rc=1 逐名四条 voice 行）／ⓒ 支撑一发（token 回 `SizePx`＝13 命中 ⇒ rc=1 "not unique"）／旧尺缺陷面重演（08:59 插行 ⇒ 旧形 rc=1）。
+- **你自己复跑或自造反证**（至少三发，⛔ 不照抄上述组合）：建议 ① 另选一枚**被引**文件独立做插行⇒绿；② 独立改一枚 token⇒红且点名；③ 自造一发第三形（例：把 token 改成在文件里出现两次 ⇒ 必红"not unique"；或"行号读数漂了但不该红"⇒ 绿＝验证":LINE 只当读数"）。每发**仓外备份＋sha256 改前=改后逐字节证**＋突变窗口起止时刻。
+
+### 2. 实现者唯一自裁点：**六枚不唯一 token 削尖**的正当性
+
+- 起手实测六枚 token 不唯一（`cfg.LLM.Roles.Chat.Model`＝2／`SizePx`＝13／`c.Audio.MicMutedDefault`＝5／`RedactPaths`＝3／`c.Voice.Enabled`＝3 …；读数在锚件与 `logs/inventory*.txt`）⇒ 实现者**未停手**、把它们**削尖至唯一**并留了可退回点（锚 §5.3）。
+- **你逐枚核**：削尖后的 token 是否仍是**被引行的真实子串**（⛔ 不许改写成"意思是那行"的近似）；是否改判据方向；是否趁机放宽。⇒ 给出"可以接受／退回"的判语与理由。这是本票唯一"实现者自裁"的位置，判语要最硬。
+
+### 3. A878 两处重裁
+
+- ① `sectionReadSites["Voice"]` 补两枚读者（`cmd/wisp/panel_config_store.go`＋`internal/panel/config_handlers.go`）＋四枚 voice 键行去"唯一读者"表述 ⇒ 你**独立**按名册自己的扫描逻辑（`config_receipt_255_test.go` 的 `scanReadFiles` 一族）现跑，核"生产读者集 == 名册集合"。
+- ② llm 证据行 `:96→:98` 并削尖 ⇒ 核真实（token 是被引行真实子串、行号读数与现读一致）。
+
+### 4. 零放宽＋行号读数保留（"摘尺不许当修尺"的边界）
+
+- 逐块读 `config_receipt_255_test.go` 的 diff：有没有任何断言被放宽/删除换绿（`citedRowsFloor=8`、count guard、"0 命中 vs >1 命中"两档行为…）。
+- 行号读数：尺① 27/27、尺② 23 枚/22 行（改前=改后）＋测试侧 4 行→2 行（哪两行、为何留 2 枚活读数）⇒ 核"行号读数一枚未删"。
+- 旧尺红形要**独立**来一发（或写明为何不必）。
+
+## 环境与纪律
+
+- 环境：`PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（**MSYS 形**；盘符形撞 `0xc0000135`）；`GOTMPDIR` ⛔ 只 C: 卷（你的例 `C:\tmp\wisp255v3gotmp`）。
+- 判据用 `-run 'TestTicket255'`（整包撞 314 死区，⛔ 别跑整包）。
+- 他腿在飞：`237-r1` 在 `internal/tools` 面跑 -race/突变（与你**零文件重叠**）⇒ 你的突变窗口逐枚报起止时刻（纪律）。
+- 只 commit、⛔ 不 push；`git add`/`commit` 显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`／`--no-verify`；临时件只建不删；别人脏件别动。
+- 交件：`docs/evidence/s1/ticket255-255-v3-accept-v1.md`（判语表）＋`.scratch/wisp/probes/255/v3/`（锚＋logs）＋票 255 尾 **1 条 bullet**（追加；⛔ 框不翻、`Status:` 不动）。产出预算 ≤7 件 ≤200 行（大日志留盘不入库，点名路径＋字节数）。
+- **未定义即停**：票面没覆盖的形（削尖正当性判不了、某枚 token 无真实子串可用…）⇒ 停手上报。
+- 回执：结论先行（AC#6 成立/附条件/不成立＋A878 两处各自判语）＋三笔 commit sha ＋每件路径＋门禁 rc＋自造反证逐发红/绿句＋**你判"削尖"可否接受**＋具名没做的格。
+
+发送时刻现量：HEAD 附近＝`dcaff922`/`9bd5ff21`/`94398165` 已在树（编排者三把尺：两笔 commit 在、锚件 10,808 字节＋logs 23 枚、**编排者亲跑 `-run 'TestTicket255' ./cmd/wisp/` rc=0（23.648s）**）；`237-r1` 在飞。
