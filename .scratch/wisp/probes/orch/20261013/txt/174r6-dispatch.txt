@@ -1,0 +1,27 @@
+# 174-r6 派单（票 174 AC#6 **形 乙**：让同一判据在 POSIX 上可跑；写腿；面＝internal/tools 测试面）
+
+发送时刻：2026-10-14 13:0x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **174-r6**。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 背景与目标
+
+- 甲形已由 `174-r5` 落地（`32f9823f`：`scripts/portable-tests.sh` 名册补一行，把 ubuntu 腿那枚 SKIP 入账）。名册行里具名："**OWNER of the POSIX half: whoever lands AC#6 shape 乙 on ticket 174, a POSIX-runnable equivalent of the same criterion (the notice may not relay the filed path, no junction needed)**"——**你就是那个 owner**。
+- 现用例 `TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3`（`internal/tools/task_output_pointer_notice_test.go`）在 ubuntu 跳过：它要**真 NTFS junction**（`cmd /c mklink /J`）才产生"被 C26 拒的 reparse 路径字面量"；POSIX 上 `risk/pathresolver_other.go` 的 `reparseComponents` 返 nil ⇒ 没有可被拒的对象。
+- **你的活＝设计并落"形 乙"**：把**同一判据**（notice 不许转发 filed path）变成 POSIX 上可跑的形。设计权在你，但先读三条候选方向的代价（不预设答案）：
+  - ⓐ **层内直接喂**：从"端到端经真 junction"降到"把被拒形态的路径字面量**直接**喂给 canonicalize／notice 那一层，断言 notice 不转发它"——不伪造，只是换承重层；
+  - ⓑ **可移植的拒形**：若 C26 的"拒"只在 Windows 分支存在 ⇒ 在 POSIX 构造等价输入（例如显式构造"被判超界/被判 reparse"的那一输入形）——⚠ 若这需要伪造检测结果 ⇒ 停手（那就是造假绿）；
+  - ⓒ **判不了**：若你读完后判"不伪造前提就做不到" ⇒ **停手上报＋给出三案各自代价表**（那也算成品，喂台账/撤格）。
+- ⚠ 先读路由史：`236-a4` 曾把"该进 ledger 还是改平台 tag"标为票 111 AC#10 地界；`174-r5` 已核过 111 先例＝**ledger 登记**。你**不撤甲形**（旧 skip 已入账），**只加**形 乙；新形与旧形共存时把"linux 上跑哪一枚、windows 上跑哪一枚"写清（若新形使旧 skip 失去意义 ⇒ **停手上报**，⛔ 别删旧件/别动 ledger 行——那是 174-r5 的写面遗产）。
+
+## 判据
+
+1. linux 语义下新形**真跑**（本机=Windows，你可用 `GOOS=linux go vet`／交叉编译检查＋把"linux 分支会跑"的机制写清；⚠ win32 上无法 exec linux 二进制，这点如实具名，别假称跑过）；2. 正控/反控：把"转发行为"种回来 ⇒ 新形**红**；3. Windows 腿行为不回归（现用例照跑 rc=0）；4. `go test -run '...174' ./internal/tools/` rc=0。
+
+## 环境与纪律
+
+1. 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删。
+2. `GOTMPDIR` ⛔ 只**反斜杠形** `C:\tmp\wisp174r6gotmp`；判据 `-run` 小射程；⛔ 整包 cmd/wisp（314 死区）；窗口逐报（他腿 `316-r1`（cmd/wisp）、`236-r6`（同包 internal/tools，不同文件）、`252-v2` 在飞；CI 在跑）。
+3. 门禁：build rc=0／gofumpt 动过的件空／相关 `-run` rc=0／d22scan clean／长度门 GREEN。
+4. 票面：票 174 尾**追加 1 条 bullet**（署名 `agent=174-r6`；⛔ 框不翻）。产出 ≤6 枚 ≤200 行。
+5. **未定义即停**是**主选项之一**——ⓒ 不许硬凑。
+6. 回执：结论先行（落了哪案/停手上报）＋commit sha＋判据逐条读数＋你没做的格。

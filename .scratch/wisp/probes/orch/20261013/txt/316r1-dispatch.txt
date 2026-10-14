@@ -1,0 +1,26 @@
+# 316-r1 派单（票 316 AC#1：M 形假绿收口；写腿；面＝cmd/wisp 单件）
+
+发送时刻：2026-10-14 13:0x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **316-r1**。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 票与目标
+
+- 票：`.scratch/wisp/issues/316-m-form-false-green-window-lower-bound-before-plant-lets-banner-wording-pass.md`（现量四条＋收口三选一逐字）。
+- 核心：M 形（启动横幅先含同样字样、之后种改动、重启句照打）**终态仍假绿 PASS 2.62s**——窗口下界取在 plant 之前、且无"恰一次/晚于 applied"要求。你的活＝按 (a)「窗口内恰一次」／(b)「标记取在 `state=armed` 之后」／(c)「该句偏移晚于 `HOT-RELOAD state=applied`」**三选一**收口（现读后裁并具名理由）。
+- 判据：① 复造 M 形 ⇒ **必须红**（红句体现"横幅同名句被逮住"）；② MK/SA/正例 G **不回归**（MK/SA 仍红、G 仍绿）；③ 232 家族最小集 rc=0（现读选名）；④ ⛔ 只许加严/换形、不许放宽。
+- 写面＝`cmd/wisp/config_reload_223_test.go`（232-r2 载体）＋`probes/316/r1/`。
+
+## 方法
+
+- 先读 `probes/232/v1/verdict.md` 的 §5②/③ 与 M/MK/SA/G 四形描述（`232-v1` 的 mutation 手法照抄其门控/窗口机制，⛔ 别另造第二套 harness）。
+- 每发突变窗口起止时刻逐报；⛔ 不许把"0ms"那句当判据读（那格归你裁但要说清读法）。
+
+## 环境与纪律
+
+1. 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；别人脏件别动。
+2. `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（MSYS 形）；`GOTMPDIR` ⛔ 只 **反斜杠形** `C:\tmp\wisp316r1gotmp`（posix 形会让 junction 用例假红，`236-v2` 实测）。
+3. 判据 `-run` 小射程；⛔ 整包（314 死区）；窗口逐报（他腿 `174-r6`/`236-r6`（internal/tools）与 `252-v2`（cmd/wisp 读）在飞；CI `38508311376` 在跑）。
+4. 门禁：build rc=0／gofumpt 动过的件空／你的新读数全绿／d22scan clean／长度门 GREEN。
+5. 票面：票 316 尾**追加 1 条 bullet**；⛔ 框不翻。产出 ≤6 枚 ≤200 行。
+6. **未定义即停**：四形复不出来／收口三选一哪个都过不了 G 正例 ⇒ 停手上报。
+7. 回执：结论先行＋commit sha（产码/交付分开）＋你选的收口与理由＋M 红句逐字＋MK/SA/G 对照读数＋门禁 rc＋具名没做。

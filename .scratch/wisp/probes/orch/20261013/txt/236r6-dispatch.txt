@@ -1,0 +1,24 @@
+# 236-r6 派单（票 236：r4 钉内两条**注释级**小瑕疵的清扫；写腿；面＝internal/tools 单件）
+
+发送时刻：2026-10-14 13:0x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **236-r6**。身份＝实现者（判语归后续非实现者腿；⛔ 不翻框、⛔ 不动 `Status:`/票名）。
+
+## 背景（来路＝非实现者 `236-v2` 判语里登记的两条"注释级小缺陷"，不阻塞、非读数被推翻）
+
+- 目标文件：`internal/tools/taskid_source_236r4_teeth_test.go`（`236-r4` 的钉）。
+- 瑕疵①：钉内注释引的熵支行号 **过期**——注释写 `loop.go:1132-1137`/`:1139-1140`，被裁 blob 上现读为 **`:1155-1161`/`:1162-1163`**（`236-v2` 现读；⚠ 你再现读一次确认、看会不会又漂）。
+- 瑕疵②：`r236r4ModelWireIDs` 的注释称"两 golden 目录现读"，但 12 枚里有 2 枚（`call_w1`／`chatcmpl-fake`）**不在那两个目录**（分别在 `internal/tools/loop_approval_test.go:288`、`cmd/wisp/secret_test.go:1133`；`236-v2` 的 grep 现读得 33 枚唯一 id）——**断言本体仍成立**（两枚都是模型侧值、过不了锁）；要改的是**注释的实话**（⛔ 别动断言、⛔ 别动 id 列表）。
+
+## 你的活
+
+1. 现读两处注释与对应真身，按实测把**注释文字**改准（行号改现值；"两 golden 目录"的句子改成真实的来源描述）。
+2. 判据：① `git diff` 只动**注释行**（非注释行＝0）；② `-run 'Test236' ./internal/tools/ -count=1` rc=0；③ `-race` 一发 rc=0；④ gofumpt 该件空；⑤ ⛔ 断言/锁逻辑/id 集合一字不动。
+3. 交件：`probes/236/r6/00-anchor-and-gates.md`＋logs＋票 236 尾**追加 1 条 bullet**（署名 `agent=236-r6`；⛔ 框不翻）。产出 ≤5 枚 ≤150 行。
+
+## 环境与纪律
+
+- 只 commit、⛔ 不 push；显式 pathspec；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删。
+- `GOTMPDIR` ⛔ 只**反斜杠形** `C:\tmp\wisp236r6gotmp`；窗口逐报（他腿 `174-r6`（同包 internal/tools、不同文件）、`316-r1`（cmd/wisp）、`252-v2` 在飞；CI `38508311376` 在跑）。
+- 门禁：build rc=0／gofumpt 空／d22scan clean／长度门 GREEN。
+- **未定义即停**：你现读的行号与 `236-v2` 报的对不上／改动波及断言 ⇒ 停手上报。
+- 回执：结论先行＋commit sha＋"非注释行 0"读数＋`-run`/`-race` rc＋具名没做。

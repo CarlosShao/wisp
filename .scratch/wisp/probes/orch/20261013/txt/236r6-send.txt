@@ -1,0 +1,5 @@
+236r6 发送记录
+发送时刻：2026-10-14 13:00:25 +08
+HEAD：35da8bc9
+查重 ls：a1 a2 a4 msg-a641-fix.txt msg-a641.txt r1 r2 r3 r4 r5 v1 v2 
+与派单存档（236r6-dispatch.txt）差异：无（逐字发送）
