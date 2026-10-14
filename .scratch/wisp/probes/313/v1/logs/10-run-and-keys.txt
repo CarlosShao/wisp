@@ -1,0 +1,619 @@
+######## 313-v1 probe run log 1/2: anchor, baselines, payload, three-way keys, key surface ########
+
+######## FILE 10-baseline-config.txt ########
+2026-10-14 09:45:43 +0800
+f3dc1389ff361c977e6d4d81e84011bb2e996baa 票 237 落地腿 237-r1 交付件：锚＋现量（AC#1 改前红两发：-race -count=60 复现 3 红/1 红；改后同命令 ×2 零红＋全包 -race rc=0）＋AC#3 判据四形读数（一枚绕过：leg1 3.00s/leg2、leg3 0.00s 全红；收紧前 leg2/leg3 全绿）＋unbound-scope L2 归因链＋门禁 rc 表＋票尾 1 条 bullet；⛔ 未翻框、⛔ 未 push
+=== internal/config Test313 ===
+=== RUN   Test313CreateProviderRowRefusesNonPresetAndExistingRow
+=== RUN   Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_non-preset_provider_name
+=== RUN   Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_row_the_config_already_declares
+time=2026-10-14T09:45:46.575+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\Test313CreateProviderRowRefusesNonPresetAndExistingRow4099872479\001\.wisp-config-178903951.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:45:46.576+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.stepfun wrote=[llm.providers.stepfun]
+--- PASS: Test313CreateProviderRowRefusesNonPresetAndExistingRow (0.03s)
+    --- PASS: Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_non-preset_provider_name (0.00s)
+    --- PASS: Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_row_the_config_already_declares (0.00s)
+=== RUN   Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa
+time=2026-10-14T09:45:46.598+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa3320154237\001\.wisp-config-3363392020.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:45:46.599+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.stepfun wrote=[llm.providers.stepfun]
+time=2026-10-14T09:45:46.605+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa3320154237\001\.wisp-config-1822943356.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:45:46.606+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=voice.cloud_asr_chain wrote=[voice.cloud_asr_chain] kept_in_file_not_in_memory="[llm.providers.stepfun.base_url llm.providers.stepfun.protocol]"
+time=2026-10-14T09:45:46.629+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa3320154237\001\.wisp-config-680690376.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:45:46.631+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=voice.cloud_tts_chain wrote=[voice.cloud_tts_chain] kept_in_file_not_in_memory="[llm.providers.stepfun.base_url llm.providers.stepfun.protocol]"
+--- PASS: Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa (0.04s)
+=== RUN   Test313RoleChatPairWritesBothKeysOrNeither
+time=2026-10-14T09:45:46.651+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\Test313RoleChatPairWritesBothKeysOrNeither2291141103\001\.wisp-config-1023697286.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:45:46.652+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.roles.chat wrote="[llm.roles.chat.model llm.roles.chat.provider]"
+--- PASS: Test313RoleChatPairWritesBothKeysOrNeither (0.04s)
+=== RUN   Test313RealtimeHalfPairFollowsTheEnabledRule
+time=2026-10-14T09:45:46.677+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\Test313RealtimeHalfPairFollowsTheEnabledRule2866138709\001\.wisp-config-3655352329.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:45:46.677+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=voice.realtime.provider wrote=[voice.realtime.provider]
+time=2026-10-14T09:45:46.696+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\Test313RealtimeHalfPairFollowsTheEnabledRule2866138709\001\.wisp-config-1617503302.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:45:46.698+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=voice.realtime.model wrote=[voice.realtime.model]
+time=2026-10-14T09:45:46.732+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\Test313RealtimeHalfPairFollowsTheEnabledRule2866138709\002\.wisp-config-1130469516.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:45:46.734+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=voice.realtime.model wrote=[voice.realtime.model]
+--- PASS: Test313RealtimeHalfPairFollowsTheEnabledRule (0.08s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/config	1.732s
+
+######## FILE 10-baseline-cmdwisp.txt ########
+2026-10-14 09:45:56 +0800
+f3dc1389ff361c977e6d4d81e84011bb2e996baa 票 237 落地腿 237-r1 交付件：锚＋现量（AC#1 改前红两发：-race -count=60 复现 3 红/1 红；改后同命令 ×2 零红＋全包 -race rc=0）＋AC#3 判据四形读数（一枚绕过：leg1 3.00s/leg2、leg3 0.00s 全红；收紧前 leg2/leg3 全绿）＋unbound-scope L2 归因链＋门禁 rc 表＋票尾 1 条 bullet；⛔ 未翻框、⛔ 未 push
+=== cmd/wisp Test313 ===
+=== RUN   Test313EmptyConfigToStepfunRowChainAndPair
+--- PASS: Test313EmptyConfigToStepfunRowChainAndPair (0.13s)
+=== RUN   Test313WritableUnionEqualsTheTwoRosters
+--- PASS: Test313WritableUnionEqualsTheTwoRosters (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.035s
+rc=0
+
+######## FILE 70-final-green.txt ########
+2026-10-14 10:07:35 +0800
+bfb62488eb66cc29cc17cdbce9cdfa9c150c68a9 编排者：A904（237-r1 收件三把尺过＋派 237-v1）＋停车点 4.0dh（界面可试；237/255 欠账清）
+== three packages -run Test313 (final) ==
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.258s
+ok  	github.com/CarlosShao/wisp/internal/panel	0.765s
+ok  	github.com/CarlosShao/wisp/internal/config	0.719s
+== overlay probe all (final) ==
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.160s
+== worktree: judged paths clean? ==
+(empty above = the judged Go files are back to HEAD)
+
+######## FILE 20-probe-v1-raw.txt ########
+time=2026-10-14T09:50:21.711+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV1ProbeReadPayloadAndPageFlow
+time=2026-10-14T09:50:21.733+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\TestV1ProbeReadPayloadAndPageFlow3695706775\001\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+V1-EMPTY-REPLY-BEGIN
+配置可读。服务商 0 家；凭据状态 no_ref_declared。 当前聊天模型未读到。
+wisp-config-view:{"readable":true,"credential":"no_ref_declared","presetsKnown":true,"presets":["anthropic","deepseek","mimo","minimax","moonshot","ollama","openai","openrouter","qwen","siliconflow","stepfun","zhipu"],"configuredKnown":true,"configured":false,"chatProvider":"","chatModel":"","chatModelKnown":false,"providers":null,"voice":{"cloudASRChain":null,"cloudTTSChain":null,"realtimeEnabled":false,"realtimeProvider":"","realtimeModel":""}}
+V1-EMPTY-REPLY-END
+V1-EMPTY-PAYLOAD {"readable":true,"credential":"no_ref_declared","presetsKnown":true,"presets":["anthropic","deepseek","mimo","minimax","moonshot","ollama","openai","openrouter","qwen","siliconflow","stepfun","zhipu"],"configuredKnown":true,"configured":false,"chatProvider":"","chatModel":"","chatModelKnown":false,"providers":null,"voice":{"cloudASRChain":null,"cloudTTSChain":null,"realtimeEnabled":false,"realtimeProvider":"","realtimeModel":""}}
+time=2026-10-14T09:50:21.738+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\TestV1ProbeReadPayloadAndPageFlow3695706775\001\.wisp-config-316802540.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:50:21.739+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=llm.providers.stepfun wrote=[llm.providers.stepfun]
+V1-RECEIPT-ROW 设置已写入。 实际落盘的键路径：llm.providers.stepfun。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。
+time=2026-10-14T09:50:21.747+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\TestV1ProbeReadPayloadAndPageFlow3695706775\001\.wisp-config-3130772511.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:50:21.747+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=llm.providers.stepfun.api_key_ref wrote=[llm.providers.stepfun.api_key_ref] kept_in_file_not_in_memory="[llm.providers.stepfun.base_url llm.providers.stepfun.protocol]"
+V1-RECEIPT-CRED 密钥已录入（只写不回显：这一页任何时候都不会再显示它的值，只会显示已录入/未录入）。 服务商 stepfun。 记录的是引用 dpapi:974b628a2c49feeb74184d424e094580。 实际落盘的键路径：llm.providers.stepfun.api_key_ref。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。 值本身不在配置里，也不在任何回话里。
+time=2026-10-14T09:50:21.763+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\TestV1ProbeReadPayloadAndPageFlow3695706775\001\.wisp-config-1585118941.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:50:21.764+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=llm.roles.chat wrote="[llm.roles.chat.model llm.roles.chat.provider]" kept_in_file_not_in_memory="[llm.providers.stepfun.base_url llm.providers.stepfun.protocol]"
+V1-RECEIPT-PAIR 设置已写入。 实际落盘的键路径：llm.roles.chat.model, llm.roles.chat.provider。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。
+V1-DISK-AFTER-THREE-STEPS-BEGIN
+schema_version = 2
+
+[app]
+language = 'zh-CN'
+theme = 'dark'
+autostart = false
+single_instance = true
+
+[ball]
+size = 56
+opacity_idle = 0.35
+click_through = true
+hide_on_fullscreen = true
+
+[ball.position]
+x = 0
+y = 0
+monitor = ''
+
+[hotkey]
+summon = ''
+mute = ''
+cancel = 'Esc'
+panel = ''
+
+[session]
+warm_timeout_sec = 90
+settling_sec = 3
+conversation_idle_sec = 30
+
+[voice]
+enabled = true
+punctuation = true
+conversation_mode = false
+cloud_asr_chain = []
+cloud_tts_chain = []
+
+[voice.wake_word]
+enabled = false
+keywords = []
+thresholds = []
+veto_words = ['取消', '停下', '别']
+
+[voice.asr]
+provider = 'local-sherpa'
+model = ''
+
+[voice.tts]
+provider = 'local-sherpa'
+voice = ''
+speed = 1.0
+
+[voice.aec]
+enabled = true
+echo_ref = 'self-render'
+
+[voice.realtime]
+enabled = false
+provider = ''
+model = ''
+api_key_ref = ''
+base_url = ''
+
+[audio]
+input_device = 'default'
+sample_rate = 16000
+half_duplex = true
+mic_muted_default = true
+
+[llm]
+text_chain = []
+timeout_ms = 60000
+
+[llm.roles]
+[llm.roles.chat]
+provider = 'stepfun'
+model = 'model-under-test-313'
+temperature = 0.7
+thinking_intensity = 'off'
+max_output_tokens = 0
+
+[llm.roles.memory_extract]
+provider = ''
+model = ''
+temperature = 0.7
+thinking_intensity = 'off'
+max_output_tokens = 0
+
+[llm.roles.handoff]
+provider = ''
+model = ''
+temperature = 0.7
+thinking_intensity = 'off'
+max_output_tokens = 0
+
+[llm.roles.summarize]
+provider = ''
+model = ''
+temperature = 0.7
+thinking_intensity = 'off'
+max_output_tokens = 0
+
+[llm.retry]
+max = 3
+backoff_ms = 1000
+
+[llm.providers]
+[llm.providers.stepfun]
+protocol = 'openai-chat'
+base_url = 'https://api.stepfun.com/v1'
+api_key_ref = 'dpapi:974b628a2c49feeb74184d424e094580'
+billing = 'pay-per-token'
+plan_credit_total_micro = 0
+rpm = 0
+tpm = 0
+
+[llm.providers.stepfun.compat]
+loose = false
+allow_missing_usage = false
+
+[llm.providers.stepfun.models]
+[llm.providers.stepfun.models.model-under-test-313]
+display = ''
+context_window = 0
+max_output_tokens = 0
+thinking_levels = []
+billing = 'pay-per-token'
+quota_daily_micro = 0
+quota_monthly_micro = 0
+enabled = true
+
+[llm.providers.stepfun.models.model-under-test-313.capabilities]
+text = false
+vision = false
+audio_in = false
+audio_out = false
+realtime = false
+thinking = false
+fc = false
+stream = false
+
+[llm.providers.stepfun.models.model-under-test-313.price]
+in = 0.0
+out = 0.0
+cached = 0.0
+audio_in = 0.0
+audio_out = 0.0
+
+[agent]
+max_rounds = 50
+token_budget = 200000
+per_tool_timeout_ms = 0
+steering_enabled = true
+project_instructions_enabled = true
+
+[agent.loop_guard]
+repeat_thresholds = [3, 5, 8]
+
+[risk]
+confirm_timeout_sec = 300
+l1_window_sec = 2
+shell_enabled = false
+allow_shell_string = false
+shell_allowlist = []
+blacklist_overrides = []
+permission_mode = 'ask_every_step'
+
+[fs]
+allowed_dirs = []
+reparse_point_exceptions = []
+delete_enabled = false
+
+[net]
+allowlist = []
+block_private_ranges = true
+
+[net.proxy]
+mode = 'system'
+url = ''
+
+[privacy]
+redact_paths = false
+diagnostics_opt_in = false
+retention_days = 30
+keep_transcript = false
+keep_audio = false
+
+[memory]
+l1_enabled = true
+l1_max = 20
+l3_retention_days = 30
+extract_model = ''
+
+[panel]
+enabled = true
+width = 640
+height = 0
+keep_alive_in_session = true
+scale = 0.0
+
+[cost]
+daily_budget = 0
+monthly_budget = 0
+alert_threshold = 0.8
+over_budget = 'pause'
+
+[models]
+dir = ''
+mirror = []
+verify_signature = true
+
+[observe]
+level = 'info'
+slo_sample_interval_sec = 5
+
+[observe.roll]
+size_mb = 10
+days = 7
+[plugins]
+tier2_enabled = false
+
+V1-DISK-AFTER-THREE-STEPS-END
+V1-FULL-PAYLOAD {"readable":true,"credential":"all_recorded","presetsKnown":true,"presets":["anthropic","deepseek","mimo","minimax","moonshot","ollama","openai","openrouter","qwen","siliconflow","stepfun","zhipu"],"configuredKnown":true,"configured":true,"chatProvider":"stepfun","chatModel":"model-under-test-313","chatModelKnown":true,"providers":[{"name":"stepfun","apiKeyRef":"dpapi:974b628a2c49feeb74184d424e094580","hasBaseURL":false,"modelCount":1,"models":["model-under-test-313"],"credentialSet":true,"credentialError":""}],"voice":{"cloudASRChain":null,"cloudTTSChain":null,"realtimeEnabled":false,"realtimeProvider":"","realtimeModel":""}}
+--- PASS: TestV1ProbeReadPayloadAndPageFlow (0.06s)
+=== RUN   TestV1ProbeMultiElementChainAndSeedPayload
+time=2026-10-14T09:50:21.794+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\TestV1ProbeMultiElementChainAndSeedPayload1612145435\001\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:50:21.797+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\TestV1ProbeMultiElementChainAndSeedPayload1612145435\001\.wisp-config-205462040.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:50:21.798+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=voice.cloud_asr_chain wrote=[voice.cloud_asr_chain]
+V1-RECEIPT-2ELT 设置已写入。 实际落盘的键路径：voice.cloud_asr_chain。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。
+time=2026-10-14T09:50:21.812+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\TestV1ProbeMultiElementChainAndSeedPayload1612145435\001\.wisp-config-204045792.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:50:21.813+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=voice.cloud_tts_chain wrote=[voice.cloud_tts_chain]
+V1-RECEIPT-TTS 设置已写入。 实际落盘的键路径：voice.cloud_tts_chain。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。
+V1-DISK-2ELT-BEGIN
+schema_version = 2
+
+[app]
+language = 'zh-CN'
+theme = 'dark'
+autostart = false
+single_instance = true
+
+[ball]
+size = 56
+opacity_idle = 0.35
+click_through = true
+hide_on_fullscreen = true
+
+[ball.position]
+x = 0
+y = 0
+monitor = ''
+
+[hotkey]
+summon = ''
+mute = ''
+cancel = 'Esc'
+panel = ''
+
+[session]
+warm_timeout_sec = 90
+settling_sec = 3
+conversation_idle_sec = 30
+
+[voice]
+enabled = true
+punctuation = true
+conversation_mode = false
+cloud_asr_chain = ['stepfun/step-2', 'stepfun/step-2-mini']
+cloud_tts_chain = ['stepfun/step-2']
+
+[voice.wake_word]
+enabled = false
+keywords = []
+thresholds = []
+veto_words = ['取消', '停下', '别']
+
+[voice.asr]
+provider = 'local-sherpa'
+model = ''
+
+[voice.tts]
+provider = 'local-sherpa'
+voice = ''
+speed = 1.0
+
+[voice.aec]
+enabled = true
+echo_ref = 'self-render'
+
+[voice.realtime]
+enabled = false
+provider = ''
+model = ''
+api_key_ref = ''
+base_url = ''
+
+[audio]
+input_device = 'default'
+sample_rate = 16000
+half_duplex = true
+mic_muted_default = true
+
+[llm]
+text_chain = []
+timeout_ms = 60000
+
+[llm.roles]
+[llm.roles.chat]
+provider = ''
+model = ''
+temperature = 0.7
+thinking_intensity = 'off'
+max_output_tokens = 0
+
+[llm.roles.memory_extract]
+provider = ''
+model = ''
+temperature = 0.7
+thinking_intensity = 'off'
+max_output_tokens = 0
+
+[llm.roles.handoff]
+provider = ''
+model = ''
+temperature = 0.7
+thinking_intensity = 'off'
+max_output_tokens = 0
+
+[llm.roles.summarize]
+provider = ''
+model = ''
+temperature = 0.7
+thinking_intensity = 'off'
+max_output_tokens = 0
+
+[llm.retry]
+max = 3
+backoff_ms = 1000
+
+[llm.providers]
+[llm.providers.stepfun]
+protocol = 'openai-chat'
+base_url = 'https://api.stepfun.com/v1'
+api_key_ref = 'env:STEPFUN_KEY'
+billing = ''
+plan_credit_total_micro = 0
+rpm = 0
+tpm = 0
+
+[llm.providers.stepfun.compat]
+loose = false
+allow_missing_usage = false
+
+[llm.providers.stepfun.models]
+[llm.providers.stepfun.models.step-2]
+display = ''
+context_window = 32000
+max_output_tokens = 0
+thinking_levels = []
+billing = ''
+quota_daily_micro = 0
+quota_monthly_micro = 0
+enabled = false
+
+[llm.providers.stepfun.models.step-2.capabilities]
+text = false
+vision = false
+audio_in = false
+audio_out = false
+realtime = false
+thinking = false
+fc = false
+stream = false
+
+[llm.providers.stepfun.models.step-2.price]
+in = 0.0
+out = 0.0
+cached = 0.0
+audio_in = 0.0
+audio_out = 0.0
+
+[llm.providers.stepfun.models.step-2-mini]
+display = ''
+context_window = 16000
+max_output_tokens = 0
+thinking_levels = []
+billing = ''
+quota_daily_micro = 0
+quota_monthly_micro = 0
+enabled = false
+
+[llm.providers.stepfun.models.step-2-mini.capabilities]
+text = false
+vision = false
+audio_in = false
+audio_out = false
+realtime = false
+thinking = false
+fc = false
+stream = false
+
+[llm.providers.stepfun.models.step-2-mini.price]
+in = 0.0
+out = 0.0
+cached = 0.0
+audio_in = 0.0
+audio_out = 0.0
+
+[agent]
+max_rounds = 50
+token_budget = 200000
+per_tool_timeout_ms = 0
+steering_enabled = true
+project_instructions_enabled = true
+
+[agent.loop_guard]
+repeat_thresholds = [3, 5, 8]
+
+[risk]
+confirm_timeout_sec = 300
+l1_window_sec = 2
+shell_enabled = false
+allow_shell_string = false
+shell_allowlist = []
+blacklist_overrides = []
+permission_mode = 'ask_every_step'
+
+[fs]
+allowed_dirs = []
+reparse_point_exceptions = []
+delete_enabled = false
+
+[net]
+allowlist = []
+block_private_ranges = true
+
+[net.proxy]
+mode = 'system'
+url = ''
+
+[privacy]
+redact_paths = false
+diagnostics_opt_in = false
+retention_days = 30
+keep_transcript = false
+keep_audio = false
+
+[memory]
+l1_enabled = true
+l1_max = 20
+l3_retention_days = 30
+extract_model = ''
+
+[panel]
+enabled = true
+width = 640
+height = 0
+keep_alive_in_session = true
+scale = 0.0
+
+[cost]
+daily_budget = 0
+monthly_budget = 0
+alert_threshold = 0.8
+over_budget = 'pause'
+
+[models]
+dir = ''
+mirror = []
+verify_signature = true
+
+[observe]
+level = 'info'
+slo_sample_interval_sec = 5
+
+[observe.roll]
+size_mb = 10
+days = 7
+[plugins]
+tier2_enabled = false
+
+V1-DISK-2ELT-END
+V1-SEED-PAYLOAD {"readable":true,"credential":"partly_missing","presetsKnown":true,"presets":["anthropic","deepseek","mimo","minimax","moonshot","ollama","openai","openrouter","qwen","siliconflow","stepfun","zhipu"],"configuredKnown":true,"configured":true,"chatProvider":"","chatModel":"","chatModelKnown":false,"providers":[{"name":"stepfun","apiKeyRef":"env:STEPFUN_KEY","hasBaseURL":true,"modelCount":2,"models":["step-2","step-2-mini"],"credentialSet":false,"credentialError":""}],"voice":{"cloudASRChain":["stepfun/step-2","stepfun/step-2-mini"],"cloudTTSChain":["stepfun/step-2"],"realtimeEnabled":false,"realtimeProvider":"","realtimeModel":""}}
+--- PASS: TestV1ProbeMultiElementChainAndSeedPayload (0.05s)
+=== RUN   TestV1ProbeRefusalsLeaveTheFileByteIdentical
+time=2026-10-14T09:50:21.840+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\TestV1ProbeRefusalsLeaveTheFileByteIdentical3347646802\001\secrets kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;OICIID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+V1-HASH-BEFORE e8436df18bf6e3e52bad10a2c0ff9f0b505ad6ae86305fc21572835419a3bfc9
+V1-REFUSAL door: role_chat_pair without model | refused=true hash-unchanged=true | err=panel: 配置字段不在可写名册内: 字段 "role_chat_pair" 必须指名目录里的模型（requestId="v1-r1"）
+V1-REFUSAL door: role_chat_pair without provider | refused=true hash-unchanged=true | err=panel: 配置字段不在可写名册内: 字段 "role_chat_pair" 必须指名服务商（requestId="v1-r2"）
+V1-REFUSAL leg: SetRoleChatPair half | refused=true hash-unchanged=true | err=config: config: llm.roles.chat 的 provider 与 model 必须一起点名（set both or neither）；半对不会写进文件
+V1-REFUSAL leg: SetVoiceCloudASRChain ghost model | refused=true hash-unchanged=true | err=config: config: refused to write voice.cloud_asr_chain。 第 2 种拒因：行不存在：链元素点名的 provider/model 必须已经在目录里（先用建行那一步，或手改文件）。: config: config.toml: voice.cloud_asr_chain element "stepfun/ghost" references unknown model "ghost" of provider "stepfun"
+V1-REFUSAL door: voice_cloud_asr_chain ghost element | refused=true hash-unchanged=true | err=config: config: refused to write voice.cloud_asr_chain。 第 2 种拒因：行不存在：链元素点名的 provider/model 必须已经在目录里（先用建行那一步，或手改文件）。: config: config.toml: voice.cloud_asr_chain element "stepfun/ghost" references unknown model "ghost" of provider "stepfun"
+V1-REFUSAL door: voice_cloud_asr_chain local-sherpa | refused=true hash-unchanged=true | err=config: config: refused to write voice.cloud_asr_chain。 第 2 种拒因：行不存在：链元素点名的 provider/model 必须已经在目录里（先用建行那一步，或手改文件）。: config: config.toml: voice.cloud_asr_chain element "local-sherpa/anything": the local sherpa cascade is the terminal voice fallback and must not appear in a cloud chain
+V1-REFUSAL door: provider_row_create non-preset | refused=true hash-unchanged=true | err=config: config: "inventco" 不是内置预设名，这一步不能替它建行：非预设的 [llm.providers.inventco] 必须自己写 protocol，而这一步没有 protocol 字段，写出来的节下一次加载会不过。 第 2 种拒因：行不存在：请在配置文件里添加一节 [llm.providers.<名>]（对上内置预设名的，protocol 与 base_url 可以留空；非预设名必须自己写 protocol，否则这份文件加载不过）。
+V1-REFUSAL door: provider_row_create existing row | refused=true hash-unchanged=true | err=config: config: llm.providers.stepfun already exists; 这一步是「建行」，不是改写已有行——已有行请用逐字段写口（base_url / api_key_ref / 目录模型那几枚）
+V1-REFUSAL leg: CreateProviderRow non-preset | refused=true hash-unchanged=true | err=config: config: "inventco" 不是内置预设名，这一步不能替它建行：非预设的 [llm.providers.inventco] 必须自己写 protocol，而这一步没有 protocol 字段，写出来的节下一次加载会不过。 第 2 种拒因：行不存在：请在配置文件里添加一节 [llm.providers.<名>]（对上内置预设名的，protocol 与 base_url 可以留空；非预设名必须自己写 protocol，否则这份文件加载不过）。
+V1-REFUSAL leg: SetVoiceCloudTTSChain empty element | refused=true hash-unchanged=true | err=config: config: cloud chain 里有一枚空元素；空元素不会被跳过（跳过＝替你猜），要清空就传空链
+time=2026-10-14T09:50:21.848+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\tmp\wisp313v1gotmp\TestV1ProbeRefusalsLeaveTheFileByteIdentical3347646802\001\.wisp-config-2523623180.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-14T09:50:21.849+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=voice.cloud_asr_chain wrote=[voice.cloud_asr_chain]
+V1-HASH-AFTER-CONTROL 1b8cb8bdaa3d8df225e0af81b160c16ecce3479c014a70d95bc2fcdd0f69b873 moved=true
+--- PASS: TestV1ProbeRefusalsLeaveTheFileByteIdentical (0.04s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.676s
+
+######## FILE 22-threeway-keys.txt ########
+== top-level ==
+  go  (11): ['chatModel', 'chatModelKnown', 'chatProvider', 'configured', 'configuredKnown', 'credential', 'presets', 'presetsKnown', 'providers', 'readable', 'voice']
+  spec(11): ['chatModel', 'chatModelKnown', 'chatProvider', 'configured', 'configuredKnown', 'credential', 'presets', 'presetsKnown', 'providers', 'readable', 'voice']
+  page(11): ['chatModel', 'chatModelKnown', 'chatProvider', 'configured', 'configuredKnown', 'credential', 'presets', 'presetsKnown', 'providers', 'readable', 'voice']
+  go-vs-spec : go-only [] | spec-only []
+  go-vs-page : go-only [] | page-only []
+  spec-vs-page: spec-only [] | page-only []
+== provider row ==
+  go  (7): ['apiKeyRef', 'credentialError', 'credentialSet', 'hasBaseURL', 'modelCount', 'models', 'name']
+  spec(7): ['apiKeyRef', 'credentialError', 'credentialSet', 'hasBaseURL', 'modelCount', 'models', 'name']
+  page(7): ['apiKeyRef', 'credentialError', 'credentialSet', 'hasBaseURL', 'modelCount', 'models', 'name']
+  go-vs-spec : go-only [] | spec-only []
+  go-vs-page : go-only [] | page-only []
+  spec-vs-page: spec-only [] | page-only []
+== voice ==
+  go  (5): ['cloudASRChain', 'cloudTTSChain', 'realtimeEnabled', 'realtimeModel', 'realtimeProvider']
+  spec(5): ['cloudASRChain', 'cloudTTSChain', 'realtimeEnabled', 'realtimeModel', 'realtimeProvider']
+  page(5): ['cloudASRChain', 'cloudTTSChain', 'realtimeEnabled', 'realtimeModel', 'realtimeProvider']
+  go-vs-spec : go-only [] | spec-only []
+  go-vs-page : go-only [] | page-only []
+  spec-vs-page: spec-only [] | page-only []
+empty payload providers value: None
+
+######## FILE 40-key-surface.txt ########
+2026-10-14 10:00:27 +0800
+bfb62488eb66cc29cc17cdbce9cdfa9c150c68a9
+== union refusal text + credential sentinel nail ==
+V1-UNION-REFUSAL panel: 配置字段不在可写名册内: "v1_no_such_field" 不在可写名册内；可写的只有 model_context_window/model_price_in/model_price_out/provider_api_key_ref/provider_base_url/provider_credential/provider_row_create/role_chat_model/role_chat_pair/voice_cloud_asr_chain/voice_cloud_tts_chain/voice_realtime_model/voice_realtime_provider（requestId="v1-u"）
+--- PASS: TestV1ProbeUnionRefusalText (0.02s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.197s
+== 248 sentinel nail rerun (existing pin, my own run) ==
+=== RUN   TestAC2CredentialSentinelAppearsInNoArtifact
+--- PASS: TestAC2CredentialSentinelAppearsInNoArtifact (0.04s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.052s

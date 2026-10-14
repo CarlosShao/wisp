@@ -1,0 +1,219 @@
+######## 313-v1 probe run log 2/2: mutations (with restores), failure ledger, gates ########
+
+######## FILE 30-mutB1-union-truncated.txt ########
+== MUT-B1: acceptedWritableFields drops last member ==
+== cmd/wisp Test313WritableUnionEqualsTheTwoRosters ==
+=== RUN   Test313WritableUnionEqualsTheTwoRosters
+    panel_config_313_test.go:248: the door reports the union [model_context_window model_price_in model_price_out provider_api_key_ref provider_base_url provider_credential provider_row_create role_chat_model role_chat_pair voice_cloud_asr_chain voice_cloud_tts_chain voice_realtime_model]; the two rosters say [model_context_window model_price_in model_price_out provider_api_key_ref provider_base_url provider_credential provider_row_create role_chat_model role_chat_pair voice_cloud_asr_chain voice_cloud_tts_chain voice_realtime_model voice_realtime_provider] (A881: union == table1 + table2)
+--- FAIL: Test313WritableUnionEqualsTheTwoRosters (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.329s
+FAIL
+== cmd/wisp whole Test313 ==
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.188s
+FAIL
+== internal/panel Test313 ==
+--- PASS: Test313AdditionalFieldsReachTheLegAndThe248PinIsUntouched (0.00s)
+--- PASS: Test313SelectorRefusalsOnTheAdditionalRoster (0.00s)
+--- PASS: Test313AdditionalFieldNamesCarryNoApprovalWordAndNoLockedFamily (0.00s)
+--- PASS: Test313ConfigGetCarriesThePickerPayloadAfterTheFrozenProse (0.00s)
+--- PASS: Test313SilentAndUnreadableLegsRenderAsStatesNotAsFacts (0.00s)
+--- PASS: Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	1.392s
+
+######## FILE 30-mutB1-restored.txt ########
+== RESTORED: sha256 above must equal 932bd7a9e42e05af25422593ba475fe46cf5d90e1cd780acb2d1d17ed587d8e4
+== green re-run after restore 2026-10-14 09:55:39 +0800 ==
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.738s
+ok  	github.com/CarlosShao/wisp/internal/panel	0.817s
+
+######## FILE 31-mutB2-roster-dropped.txt ########
+== MUT-B2: FieldVoiceRealtimeModel dropped from fields313 ==
+== internal/panel whole Test313 ==
+    config_313_test.go:71: field "voice_realtime_model" was refused by the door: panel: 配置字段不在可写名册内: "voice_realtime_model" 不在可写名册内；可写的只有 model_context_window/model_price_in/model_price_out/provider_api_key_ref/provider_base_url/provider_credential/provider_row_create/role_chat_model/role_chat_pair/voice_cloud_asr_chain/voice_cloud_tts_chain/voice_realtime_provider（requestId="r-313-voice_realtime_model"）
+    config_313_test.go:74: field "voice_realtime_model" reached the leg 0 time(s), want 1
+    config_313_test.go:77: the leg received field "", want "voice_realtime_model"
+--- FAIL: Test313AdditionalFieldsReachTheLegAndThe248PinIsUntouched (0.00s)
+--- PASS: Test313SelectorRefusalsOnTheAdditionalRoster (0.00s)
+--- PASS: Test313AdditionalFieldNamesCarryNoApprovalWordAndNoLockedFamily (0.00s)
+--- PASS: Test313ConfigGetCarriesThePickerPayloadAfterTheFrozenProse (0.00s)
+--- PASS: Test313SilentAndUnreadableLegsRenderAsStatesNotAsFacts (0.00s)
+--- PASS: Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.357s
+FAIL
+== cmd/wisp union pin and end-to-end ==
+    panel_config_313_test.go:143: config.set was refused: panel: 配置字段不在可写名册内: "voice_realtime_model" 不在可写名册内；可写的只有 model_context_window/model_price_in/model_price_out/provider_api_key_ref/provider_base_url/provider_credential/provider_row_create/role_chat_model/role_chat_pair/voice_cloud_asr_chain/voice_cloud_tts_chain/voice_realtime_provider（requestId="r-313-set-5"）
+        {"configField":"voice_realtime_model","configModel":"model-under-test-313","configProvider":"stepfun","configValue":"model-under-test-313","method":"config.set","requestId":"r-313-set-5","source":"panel-composer"}
+--- FAIL: Test313EmptyConfigToStepfunRowChainAndPair (0.03s)
+--- PASS: Test313WritableUnionEqualsTheTwoRosters (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.115s
+FAIL
+
+######## FILE 31-mutB2-restored.txt ########
+== RESTORED B2: sha256 must equal 932bd7a9...d8e4
+== green re-run after restore 2026-10-14 09:56:40 +0800 ==
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.521s
+ok  	github.com/CarlosShao/wisp/internal/panel	0.853s
+
+######## FILE 32-mutA-case-swapped.txt ########
+== MUT-A: FieldVoiceCloudASRChain case wired to SetVoiceCloudTTSChain ==
+=== RUN   Test313EmptyConfigToStepfunRowChainAndPair
+    panel_config_313_test.go:140: receipt does not name "voice.cloud_asr_chain": "设置已写入。 实际落盘的键路径：voice.cloud_tts_chain。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。"
+    panel_config_313_test.go:141: receipt does not name "voice.cloud_tts_chain": "设置已写入。 本次没有任何键路径发生变化（文件里已经是这个值）。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。"
+    panel_config_313_test.go:187: voice chains read back as <nil> / [stepfun/model-under-test-313]
+--- FAIL: Test313EmptyConfigToStepfunRowChainAndPair (0.09s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.843s
+FAIL
+
+######## FILE 32-mutA-restored.txt ########
+== RESTORED A: sha256 must equal 43acff43...9a9d
+== green re-run 2026-10-14 09:58:23 +0800 ==
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.384s
+
+######## FILE 33-mutB-splitchain.txt ########
+== MUT-B: splitChainValue splits on ';' instead of ',' ==
+== repo pins, three packages ==
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.832s
+ok  	github.com/CarlosShao/wisp/internal/panel	1.065s
+ok  	github.com/CarlosShao/wisp/internal/config	0.975s
+== overlay probe (multi-element chain) ==
+--- FAIL: TestV1ProbeMultiElementChainAndSeedPayload (0.01s)
+    zz313v1probe_test.go:156: config.set v1-s-asr (voice_cloud_asr_chain): config: config: refused to write voice.cloud_asr_chain。 第 2 种拒因：行不存在：链元素点名的 provider/model 必须已经在目录里（先用建行那一步，或手改文件）。: config: config.toml: voice.cloud_asr_chain element "stepfun/step-2,stepfun/step-2-mini" references unknown model "step-2,stepfun/step-2-mini" of provider "stepfun"
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.079s
+FAIL
+
+######## FILE 33-mutB-restored.txt ########
+== RESTORED B: sha256 must equal 43acff43...9a9d
+== green re-run 2026-10-14 09:59:37 +0800 ==
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.281s
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.194s
+
+######## FILE 50-panel-full.txt ########
+2026-10-14 10:00:52 +0800
+bfb62488eb66cc29cc17cdbce9cdfa9c150c68a9
+=== internal/panel FULL ===
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.13s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.58s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	8.538s
+FAIL
+rc-loop=0
+
+######## FILE 51-known-red-detail.txt ########
+time=2026-10-14T10:01:17.530+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+    approval_test.go:134: ApprovalCardView <-> ApprovalCardView: 10 JSON keys reconciled
+    approval_test.go:134: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    approval_test.go:134: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+    composer_test.go:78: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    composer_test.go:83: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+    composer_test.go:78: Go ComposerState emits [git currentModel modelKnown credentialState credentialKnown] that interface ComposerState does not declare
+    composer_test.go:83: ComposerState <-> ComposerState: 11 JSON keys reconciled
+    composer_test.go:83: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:83: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:83: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:83: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+    tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified.
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.405s
+FAIL
+
+######## FILE 52-config-full.txt ########
+2026-10-14 10:02:03 +0800
+=== internal/config FULL ===
+ok  	github.com/CarlosShao/wisp/internal/config	3.081s
+=== git status frontend/ ===
+ M frontend/src/styles/tokens.generated.css
+=== git log -- frontend/ latest ===
+9e9964f81a39f7c901192caa62bcae7bdd66ba5b 2026-10-14 09:22:36 +0800 feat(frontend 313 页面侧): 「在界面上配模型」落地——config.get 读 + config.set 三笔写 + 语音链/实时头
+
+######## FILE 53-cmdwisp-255-roster.txt ########
+2026-10-14 10:02:35 +0800
+=== cmd/wisp TestTicket255 scope ===
+=== RUN   TestTicket255SplitOnlyClaimsSectionsWithALiveReader
+--- PASS: TestTicket255SplitOnlyClaimsSectionsWithALiveReader (0.00s)
+=== RUN   TestTicket255HotRowRosterCoversTheRegistry
+--- PASS: TestTicket255HotRowRosterCoversTheRegistry (0.00s)
+=== RUN   TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim
+--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+--- PASS: TestTicket255RosterStillMatchesTheActualReadSites (0.55s)
+=== RUN   TestTicket255ReceiptOmitsPanelFromTheImmediateSentence
+--- PASS: TestTicket255ReceiptOmitsPanelFromTheImmediateSentence (4.39s)
+=== RUN   TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere
+--- PASS: TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere (4.33s)
+=== RUN   TestTicket255ReceiptStillNamesTheLiveReadSection
+--- PASS: TestTicket255ReceiptStillNamesTheLiveReadSection (4.14s)
+=== RUN   TestTicket255ReceiptSentenceAssemblyIsFiltered
+    config_receipt_255_test.go:626: SENTENCES
+          IMMEDIATE "wisp run: 配置热加载：这些段已立即生效（D36 立即档）：[llm]"
+          HONEST    "wisp run: 配置热加载：这些段的值已换进本进程内存，但本宿主没有会按新值做事的读者，本次运行不会因此改变行为（票 255 AC#1：这一半不许说成「已立即生效」；逐段的读者判定见 HOT-RELOAD-READER 行）：[ball] [session] [audio] [agent] [privacy] [memory] [panel] [cost] [models] [observe] [hotkey] [app] [voice]"
+    config_receipt_255_test.go:635: LEDGER [audit] config: HOT-RELOAD-READER section=panel tier_row=[panel] claims=["panel":other-process: cmd/wisp/panel_resident_windows.go:207 [cfg.Panel.Width] - the resident panel host's assembly root re-reads [panel] at every window creation and the window is built from that number (cmd/wisp/panel_host_windows.go:262 [Width:  uint(width)], reached from the create at :392); 面板关窗再开即跟上新值, and since 票 255-r1 a re-show of an already-created window posts this host's currently resolved pair through the library's SetSize on Dispatch - a CLIENT-area request, not the OUTER-FRAME one the create makes, so the same width is not the same on-screen pixels; nothing presses it when config.toml is saved, so the size arrives on the next show request, and this `wisp run` process builds no panel host at all]
+    config_receipt_255_test.go:635: LEDGER [audit] config: HOT-RELOAD-READER section=llm tier_row=[llm] claims=["llm":consumed: cmd/wisp/panel_config_store.go:98 [ChatModel:      cfg.LLM.Roles.Chat.Model] - configStore.ReadSettings calls s.mgr.Config() per call]
+    config_receipt_255_test.go:635: LEDGER [audit] config: HOT-RELOAD-READER section=app tier_row=[app.theme] claims=["app.theme":no-reader: 扫描零命中：nothing outside internal/config reads cfg.App - manager.go's planApp compares and copies it, and no component re-skins from it]
+    config_receipt_255_test.go:635: LEDGER [audit] config: HOT-RELOAD-READER section=voice tier_row=[voice.punctuation voice.tts.speed voice.wake_word.thresholds voice.wake_word.veto_words] claims=["voice.punctuation":no-reader: 扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the punctuation switch has no consumer yet | "voice.tts.speed":no-reader: 扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the TTS knobs are not threaded to the voice path yet | "voice.wake_word.thresholds":no-reader: 扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet | "voice.wake_word.veto_words":no-reader: 扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the veto list is not consumed by the KWS path yet]
+--- PASS: TestTicket255ReceiptSentenceAssemblyIsFiltered (3.26s)
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource/no_source_at_all_keeps_the_host's_own_constants
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource/a_config_width_and_height_both_arrive
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource/height_0_is_NOT_auto-height:_the_ruling_is_260,_and_schema.go's_PanelSection.Height_carries_no_default_tag_so_0_is_what_a_config_saying_nothing_answers
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource/width_0_falls_back_to_the_host_constant,_not_to_a_guess
+=== RUN   TestTicket255WindowOptionsFollowTheConfigSource/a_negative_answer_is_garbage,_and_garbage_is_not_a_second_spelling_of_auto
+--- PASS: TestTicket255WindowOptionsFollowTheConfigSource (0.00s)
+    --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/no_source_at_all_keeps_the_host's_own_constants (0.00s)
+    --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/a_config_width_and_height_both_arrive (0.00s)
+    --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/height_0_is_NOT_auto-height:_the_ruling_is_260,_and_schema.go's_PanelSection.Height_carries_no_default_tag_so_0_is_what_a_config_saying_nothing_answers (0.00s)
+    --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/width_0_falls_back_to_the_host_constant,_not_to_a_guess (0.00s)
+    --- PASS: TestTicket255WindowOptionsFollowTheConfigSource/a_negative_answer_is_garbage,_and_garbage_is_not_a_second_spelling_of_auto (0.00s)
+=== RUN   TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions
+--- PASS: TestTicket255AssemblyRootGeometrySourceReachesTheWindowOptions (0.01s)
+=== RUN   TestTicket255PanelHostBuildsItsWindowOptions
+    panel_geometry_255_test.go:267: 255 ruler 3: the one create site is newPanelControl at 391, fed by m.windowOptions()
+--- PASS: TestTicket255PanelHostBuildsItsWindowOptions (0.02s)
+
+######## FILE 60-gates-1.txt ########
+2026-10-14 10:04:36 +0800
+bfb62488eb66cc29cc17cdbce9cdfa9c150c68a9
+== build ==
+build rc=0
+== gofumpt on judged files (empty = clean) ==
+/usr/bin/bash: line 3: gofumpt: command not found
+gofumpt rc=127
+gofumpt rc=0 (empty list above = clean)
+
+######## FILE 61-gates-2.txt ########
+== d22scan ==
+d22scan: scope bans #1-5 cmd/           examined  40 production Go files
+d22scan: scope ban #6 frontend/         examined 111 text files
+d22scan: scope ban #7 internal/tools/   examined  23 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 111 text files
+d22scan: scope ban #8 internal/         examined 549 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 124 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=236, bans #1-5 cmd/=40, ban #6 frontend/=111, ban #7 internal/tools/=23, ban #8 design/=39, ban #8 frontend/=111, ban #8 internal/=549, ban #8 cmd/=124; ban #8 emoji coverage: design/ 39 text files; frontend/ 111 text files; internal/ 549 Go files, comments and _test.go included; cmd/ 124 Go files, comments and _test.go included
+d22scan rc=0
+== length gate ==
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=unset)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 12523 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=12523  over-budget=58  covered by roster=58  not in roster=0
+check-path-length-budget.sh: longest=184 chars relative (.scratch/wisp/issues/261-the-model-enabled-key-promises-removal-from-discovery-and-selection-but-no-production-code-reads-it-while-the-default-true-tag-is-inert-for-map-entries-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=228 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=58  of which in the 122..180 middle=57  past the old debt line(180)=1  in the wall interval=0  roster entries=58
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 58 paths on this tree, recomputed just now in both units
+length rc=0
