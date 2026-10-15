@@ -46,3 +46,11 @@
 - [2026-10-13 17:22:56 +08] agent=编排者 did=立票即连发 5 枚（q1–q5）**全部整进程死亡**（174.0–211.6s；死点仅 2 枚测试：3×`TestAC13BringUpSurvivesAReusedThreadQuit`＋2×`TestAC14GoSideEvalPushReachesThePage`）；排除面＝wrapper（q3 直发照死）／单包与 `-skip`（q4 两包无 skip 照死）／共享 user-data 夹（q5 挪夹重生成照死）；对照＝16:22–16:50 同形 4/4 全活 ⇒ 边界＝机主 16:50 最后交互前后（候选 (a) 桌面会话状态，现最强、未验）next=机主在场时复跑同形一发（便宜实验）；`AC#0`（直跑测试二进制取退出码）随下一枚能占 `cmd/wisp` 色的腿走；原始日志 `orch311-q-20261013/logs/{qshot-default,qshot-default-2,qshot-direct,q4-two-package,qshot-shape2}.txt`（⛔ 入仓，同根另存）
 
 - [2026-10-13 21:23 +08] agent=编排者 did=★"机主在场"对照数据入档：`294-r1b` 的 prescribed-form 整包 **5/5 全死**（157.2–174.4s；死点 4 枚具名＝`TestAC14GoSideEvalPushReachesThePage`／`TestAC13BringUpSurvivesAReusedThreadQuit`×2／`TestPanelThreadIsSTAAndExitsCleanly`；覆盖边界＝`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`；r1b 件 `probes/294/r1b/**`），且机主 20:4x–21:1x **全程在机器旁** ⇒ "桌面会话状态"候选不因在场消解 next=等 314 定/修后按 AC#5 重跑同形 2+2
+
+- [2026-10-15 16:2x +08] agent=编排者 did=**★本票的"CI 暴露"来了（AC#3 预告的那一发）**：主 CI 的 `test-windows/cmd/wisp` 步**连续两发跑到窗口区整进程死亡**，与旧台账同签名——`MARK299 before/after CreateWindowExW`＋`MARK299 wndproc …` 后直接 `FAIL … <秒>s`、**该枚用例无 verdict**。逐发读数：
+  - run **`38690995413`**（sha `0d1a0d3e`）：四数 `RUN=182 PASS=130 FAIL=2 SKIP=0`；**死在 `TestAC13BringUpSurvivesAReusedThreadQuit`**（起跑后仅 7 行 MARK299，然后 `228.091s`＋`FAIL`）——与旧账"3× AC13BringUp"同枚。
+  - run **`38687919508`**（sha `1de62995`）：四数 `RUN=193 PASS=142 FAIL=2 SKIP=0`；死在 `TestLegacySubShapeOneHookDiesInAReentryLoop`（`panel_transport_35r2` 族）之后、下一枚无 verdict。
+  - **对照三发（同一步、同 skip 名单、同 runner 标签 `windows-latest`，sha 早于两枚死发的树）全部跑完**：`38582016056`＝`414/301/2/1`、`38673468762`＝`415/302/2/1`、`38676514264`＝`415/301/3/1`（收尾到 `TestZZ315A1*`）。
+  - **本机对照**（编排者现跑，`1de62995` 仓外快照、同 skip 名单）＝**`RUN=413`、跑到 `TestZZ315A1*`、`FAIL … 338.989s`**（19 枚红全属本机已知噪声族）⇒ **树面在本机能跑完整套**；⇒ 判**仍是本票那枚未定性的整进程死亡在 CI 上的实例**（不是"少跑/分母缩小"）。
+- ⚠ **给本票 AC#3 的两条现读**：① `ci.yml:601-621` 那一跳今天确实"会看见生死"（连续两发死在窗口区）；② 因此**该步的四数不是覆盖面分母**——编排者已立新口径（`A976`）：读 `cmd/wisp` 四数前**先证该趟跑到终点锚 `TestZZ315A1*`**，没跑到就只记"该趟早停、四数不作分母"。⚠ 两枚死发的树都含 `319-r2` 新加的两枚 319 测试，但**本机同树 413 枚跑完**＋死点两发各不相同（AC13BringUp ／ panel_transport 族）⇒ 编排者**暂无证据**把这两发归给 319 新用例；待下一批推送后再取 1–2 发读色（若连发都在窗口区死，再考虑"窗口区用例枚数增长"这条候选）。
+- ⛔ 本笔未跑任何本票 AC 的"整包重跑"（`cmd/wisp` 色本刻被 `319-r3/r4` 的腿占；且本票 AC#1/#2 要求不在编队跑动时采读数）；⛔ 未动 `.github/**`；⛔ 未碰任何测试件。

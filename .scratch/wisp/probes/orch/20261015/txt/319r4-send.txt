@@ -1,0 +1,8 @@
+319-r4 send 记录
+- 发送时刻：2026-10-15 15:4x +08；派单已先存档：txt/319r4-dispatch.txt（同刻写入）。
+- 去重核：`.scratch/wisp/probes/319/`＝a1／r1／r2／r3／v（r4 未用，可用）。
+- 收件人：agent_14e69392-f0cc-4b23-9050-9aa21c84abe2（general-purpose，后台）。
+- 内容：补 AC#2 的"抬前台"半格——给 `PanelManager` 加具名 `Raise()`（SetForegroundWindow、记录不重试）＋`residentPanel.RequestRaise`＋`panelHolder.show` 里 show→raise；N4 第三条断言（winlive：可见非前台 ⇒ 生产二次启动后 `GetForegroundWindow()==面板 HWND`）＋变异自证＋**D29 焦点族回归逐名读数**。
+- 派发依据：`319-r3`（`60f3b1ec`）按"未定义即停"报回"该断言在其冻结面内不可达"（`mgr.Show` 尾 `if !shown` 守卫）＋机主验收场景＝窗口活着但被压住时双击要唤到前台 ⇒ 裁定补（落 `A978`）。
+- 面序：`319-r3` 已交件、`cmd/wisp` 面空 ⇒ 即发；后随 `320-v`／`135-r1`（同面串行）。
+- 事前盘面：HEAD=`0d1a0d3e`（origin/dev 同步；本批已在远端）；机主实例 wisp.exe PID 40296（⛔ 别扰动）。

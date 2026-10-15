@@ -1,0 +1,40 @@
+# 319-r4 派单（票 319 AC#2 的**"抬前台"半格**：二次启动对**已可见（可能被压在别的窗口后面）**的面板，必须把前台夺过来；写面＝`cmd/wisp` 319 宿主面；配 N4 第三条断言＋变异自证）
+
+发送时刻：2026-10-15 15:4x +08。编排者派发（`319-r3` 已交件 `60f3b1ec`、面已空）。
+你 = Wisp 流水线的落地腿 **319-r4**（`probes/319/` 现有 `a1 r1 r2 r3 v`，`r4` 未建）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 不碰台账/HANDOVER）。
+
+## 为什么有这一单（`319-r3` 按"未定义即停"报回的洞；编排者已裁"补这半格"）
+
+- 票：`.scratch/wisp/issues/319-...md`（AC#2 逐字："二次启动必须把已有实例的 UI **唤到前台**"）。
+- `319-r3` 已修"藏窗"半格（`panelHolder.show` 走 `RequestShow`；可见态不再被藏），并**具名**：第三条断言（可见态要 `GetForegroundWindow()==面板 HWND`）在它被冻结的面内**不可达**——`cmd/wisp/panel_host_windows.go` 的 `mgr.Show` 尾：
+  `pnlShowWindow.Call(hwnd, SW_SHOW); pnlUpdateWindow.Call(hwnd); if !shown { pnlSetForeground.Call(hwnd) }`
+  ⇒ **只有"此前未显示"才夺前台**；`ShowWindow(SW_SHOW)` 对已可见窗不激活，而 `m.SetForegroundWindow` 单发能夺（它自己的仓外探针读数：A `fg-after-Show=… panel-was-fg=false`；C 单独 SW_SHOW 不夺；B 单独 SetForegroundWindow 夺）。
+- 机主验收场景＝**面板开着但被别的窗口压住**时双击 exe ⇒ 必须到前台（21:40:38 那发现场就是"窗口活着、双击没反应"）⇒ 这半格就是 AC#2 的承重那半。
+
+## 裁定的形状（编排者 15:4x）
+
+- **首选（加性命名跳，⛔ 不动任何既有语义）**：
+  1. `cmd/wisp/panel_host_windows.go`：给 `PanelManager` 加一枚**具名夺前台**方法（建议 `Raise()`——形状照 `Hide`/`Show` 尾的 `pnlSetForeground.Call(hwnd)`；⚠ **记录返回、从不重试**＝本仓已定的姿态（前景锁被拒时不许 sleep-retry 把它做绿）；`hwnd==0` 时静默返回）。
+  2. `cmd/wisp/panel_resident_windows.go`：给 `residentPanel` 加 `RequestRaise(via string) bool`（照 `RequestShow` 的 post 形状，落 `raiseOnThread`）＋自己的计数（便于钉子读数：建议 `raises`）。
+  3. `cmd/wisp/resident_windows.go`：`panelHolder.show(via)` 在 `RequestShow` 之后**再** `RequestRaise`（同一把锁内、顺序 show→raise；`toggle`/`RequestToggle` 一字不动）。
+  4. ⛔ **不许**用"拆 `mgr.Show` 的 `if !shown` 守卫"当默认做法——除非你能给出**逐条读数**证明既有断言谁都不变（那样也要写在回执里，由编排者复核）。
+- **N4 第三条断言（钉子）**：
+  - **winlive**：造"面板可见但**不是**前台"的姿态（自己再造一枚测试进程内的窗口并先让它当前台——`319-r3` 的仓外探针 B/C 已证同进程内 `SetForegroundWindow` 可夺），跑**生产**二次启动那条路 ⇒ 断言 **`GetForegroundWindow()==面板 HWND`**（⛔ 不是"没报错"、⛔ 不靠等待超时当红）。
+  - **headless**（能做就做）：holder 层断言"show 之后 raise 被请求过、且 toggle 计数零增"。
+  - **变异自证**：把 raise 那一跳摘掉（`-overlay` 仓外）⇒ winlive 那枚**必红且红名点到"没到前台"**；还原 ⇒ 绿＋`git diff` 0 字节。
+- **回归（这一单最要紧的一栏）**：`mgr.Show`/`Hide` 的**D29 焦点语义**不许被碰坏 ⇒ 逐项跑并报读数（分段 `-run`）：
+  `-run '319' ./cmd/wisp/ ./internal/proc/` 两包；`cmd/wisp` 的焦点/显示族（自点名单：`panel_resident_windows_test.go`、`panel_locked_naming_33r11_windows_test.go` 及任何 `Focus|PriorFocus|Hide|Show` 相关用例——**逐名报**，撞 314 死区就分段）；既有 winlive 按名单发（⚠ 一次一枚、会抢前台）。
+- **门禁**：`go build ./...`／gofumpt（只点你的件）／`go vet -tags winlive ./cmd/wisp/ ./internal/proc/`／`sh scripts/d22scan.sh`／长度门。
+- **面核**：`git diff --name-only` 逐枚——只许 `cmd/wisp` 319 面（`panel_host_windows.go`／`panel_resident_windows.go`／`resident_windows.go`＋319 测试件）＋`probes/319/r4/`＋票尾 1 bullet。
+- **票尾 append 1 条 bullet**（`agent=319-r4 did=… next=…`；⛔ 不翻 AC 框）。
+
+## 纪律
+
+- ⚠ `go test ./cmd/wisp` 重包同一时刻只跑一个；跑前 `tasklist` 自证；314 死区（整包可能整进程死亡＋默认 10m `-timeout` panic）⇒ 分段 `-run` 为主。
+- ⛔ 不扰动机主实例（`wisp.exe` PID 40296：别 kill、别关窗）；⛔ 不拉第二个 `--env dev`；活体一次一枚、会抢前台（跑之前看一眼别家腿是否在跑窗用例）。
+- ⚠ `GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\wisp319r4gotmp'`（C: 卷＋只反斜杠形；**别用 `C:\tmp\`**）。
+- ⛔ 不碰：`docs/PLAN.md`／`docs/specs/**`／`internal/risk|winsec`／阈值/golden／`.github/**`／`frontend/**`／`design/**`；⛔ 别家腿半成品（`probes/152/my152.py`、`probes/268/v1/evidence.md`）。
+- 只 commit ⛔ 不 push；`add`／`commit` 两处**显式 pathspec**；⛔ `add -A`／目录／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；变异用 `-overlay`／仓外备份＋sha256 还原证；注释与测试零 emoji（含 `≤`/`✓`）。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`。
+- **未定义即停**：D29 焦点语义被证明会变／须动冻结面 ⇒ 停手上报（写进回执）。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋改了什么（逐枚）＋两拍三态读数逐字＋变异红名＋**焦点族回归逐名读数**＋门禁 rc＋面核＋**具名没做**。
