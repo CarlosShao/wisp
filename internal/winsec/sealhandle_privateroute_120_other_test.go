@@ -1,21 +1,19 @@
 //go:build !windows
 
-// Ticket 120 residual gap 1, the same two sealHandle faces reached through the entry
+// Ticket 120 residual gap 1: the same two sealHandle faces reached through the entry
 // point that actually has callers - privateFile -> sealHandle (winsec.go:117) - plus
 // the reading that says the window is not a fixture invention.
 //
-// Why the route belongs beside the direct cases in sealhandle_identity_120_other_test.go:
-// sealHandle exists for one caller shape, a process that already holds a descriptor
-// and is about to write through it. A hand-made descriptor proves the leg's
-// arithmetic; this file proves that a production call refuses, that the bytes do not
-// land, and that the unlink-on-refusal removes the planted name and not what it
-// points at. The world and the honesty of the seam-windowed plant are stated once in
+// A hand-made descriptor (sealhandle_identity_120_other_test.go) proves the leg's
+// arithmetic; this file proves that a production call refuses, that its bytes do not
+// land, and that the unlink-on-refusal removes the planted name and not what that link
+// points at. The world, and the honesty of the seam-windowed plant, are stated once in
 // sealhandle_window_120_other_test.go.
 //
-// The third case here is the blind racer: same fixture, no seam help, the flip driven
-// by its own goroutine. Its classification rows are READINGS, because 120-v1 section
-// 2's third ruling holds that a landing count nobody can promise must not become a
-// gate; the hard assertions are the two that must hold whatever the distribution is.
+// The third case is the blind racer: same fixture, no seam help, the flip driven by its
+// own goroutine. Its classification rows are READINGS, because 120-v1 section 2's third
+// ruling holds that a landing count nobody can promise must not become a gate; what is
+// judged is the racer's own health and the invariants these legs do own.
 package winsec
 
 import (
