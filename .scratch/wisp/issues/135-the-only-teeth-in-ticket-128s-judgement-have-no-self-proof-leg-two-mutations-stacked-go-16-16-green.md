@@ -190,3 +190,12 @@
   ② 新增 `TestAC2ARefusalWithATreeInTheStartUpDirectoryIsRed128`：把 M-F 那一形**植在 CWD 里**（不植生产），五腿逐腿跑真腿＋真拒绝句＋要求那枚检查点名 `wisp-dev`/`wisp-20260923-001.jsonl`。
   读数：本轮 23/23/0/0 rc=0；**变异下**＝**M-C 单发 `23/16/7/0` rc=1**、**M-F+M-C 叠发 `23/16/7/0` rc=1**（红的正是新两枚），且**摘掉 AC#1 那枚用例**（`-run` 只选 AC#2A＋既有腿表）**仍 `12/6/6/0` rc=1** ⇒ 牙有两名看守，不是单点。
   存证 `.scratch/wisp/probes/135/01-premise-and-ac1-ac2.txt`。next=AC#3（doctor 腿独立 CWD-empty 断言）
+
+- [2026-10-15 15:4x +08] agent=135-r1 did=**AC#3（`R-128-6`）落地：给 `doctor` 腿一枚自己的 CWD 牙**。做法＝把**生产自己那枚探针路径**
+  （`doctor-write-probe.tmp`，`probeWritable` 写的那个名字）先**植在启动目录里**，再跑 `cmdDoctor()`，然后查它是否被动过——因为探针写完自删，
+  旧的"目录空"断言对这一腿**结构上无牙**。新增 `TestAC3TheDoctorLegLeavesTheStartUpDirectoryUntouched128`（哨兵还在／字节没变／目录只多出我植的两件），
+  并自证耦合：`doctor.go` 里不再出现这个名字 ⇒ 该用例自己红（"植的文件是惰性的、它看不见回落"），用 `runtime.Caller` 取路径、不依赖 CWD。
+  读数（仓外快照）：不修树 `16/16/0/0` rc=0；**M-A**（`dir = "."` 吞掉拒绝，票 128 原形）⇒ `14/9/5/0` rc=1（marker＋新牙都响）；
+  **M-A2**（**拒绝句一字不动**＋仍 `probeWritable(".")`）⇒ 不修树 **`16/16/0/0` rc=0（今天这一形是静默的！）**、修后 **`9/8/1/0` rc=1 且唯一红的正是新用例**。
+  ⇒ 如实更正票面 `R-128-6` 的口径：旧描述"只被 marker 逮"是**较弱**的那一半——**把 marker 留着、照样探启动目录**这一形，票 128 全部用例今天一声不响；
+  新牙与 marker 无关（M-A2 下只有它响）。存证 `.scratch/wisp/probes/135/02-ac3-doctor-tooth.txt`。next=AC#4（自证用例真读生产文案、成句断言）

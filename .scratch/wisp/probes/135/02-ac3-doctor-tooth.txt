@@ -1,0 +1,30 @@
+# 135-r1 reading 02: AC#3 the doctor leg's own CWD-empty tooth (agent=135-r1, R-128-6)
+
+Trees (out of repo, D:/work/build-tmp/wisp135r1/): base = git archive HEAD (8f41a4df) + DLLs;
+"fix" = cmd/wisp/dataroot_128_test.go copied from the working tree at the AC#3 commit.
+Slice -run as in reading 01; four numbers from -v; PATH/GOTMPDIR as in reading 01.
+
+| tree | mutation | slice | RUN | PASS | FAIL | SKIP | rc | red names |
+|---|---|---|---|---|---|---|---|---|
+| base    | none | none | 16 | 16 | 0 | 0 | 0 | - |
+| mut-ma  | M-A  | fix + AC#3 | 14 | 9 | 5 | 0 | 1 | EveryLeg/cmdDoctor (markers), AC#3 (sentinel gone), AC#2A/cmdDoctor (markers) |
+| base-ma2 | M-A2 | no fix | 16 | 16 | 0 | 0 | 0 | none |
+| mut-ma2 | M-A2 | fix + AC#3 | 9 | 8 | 1 | 0 | 1 | AC#3 only |
+
+M-A  = doctor.go:105 `dir, dirErr := resolveDataDir(env)` / `if dirErr != nil { dir, dirErr = ".", nil }` (ticket 128's own shape: the refusal is swallowed).
+M-A2 = doctor.go, inside the refusal branch: `fail("data dir resolvable ("+env+")", dirErr.Error())` stays
+       AND `_ = probeWritable(".")` is added: the readable line is intact, the leg still probes the
+       start-up directory. (grep -n "MUTATION" base-ma2/cmd/wisp/doctor.go => :108; go build rc=0.)
+
+The two readings that matter:
+- M-A2 on the UNFIXED tree reads 16 RUN / 16 PASS / 0 FAIL / 0 SKIP, rc=0. R-128-6 as the ticket wrote it
+  ("the doctor leg is caught by the markers only") is therefore the weaker half of the fact: a doctor leg
+  that keeps the markers and probes the start-up directory anyway was silent in every case of ticket 128.
+- M-A2 on the fixed tree reddens exactly one case, TestAC3TheDoctorLegLeavesTheStartUpDirectoryUntouched128,
+  whose line reads: "the doctor leg resolved the start-up directory as its data root and its writability
+  probe removed the sentinel (...doctor-write-probe.tmp), so the leg fell back to \".\" instead of refusing.
+  This is the shape the emptiness check cannot see - the probe deletes its own file."
+  Nothing else fires, so the new tooth is independent of the markers by measurement, not by argument.
+- The case also refuses to lose its tooth in silence: it fails if doctor.go no longer mentions
+  "doctor-write-probe.tmp" (the name it plants), checked through runtime.Caller so it does not depend on
+  the test's working directory.

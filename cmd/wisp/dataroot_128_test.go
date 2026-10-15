@@ -47,6 +47,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"testing"
@@ -485,6 +486,63 @@ func TestAC1TheStartUpDirectoryCheckHasItsOwnTeeth128(t *testing.T) {
 	assertDirEmpty128(absent, filepath.Join(t.TempDir(), "absent-dir"), "missing dir")
 	if len(absent.reds)+len(absent.fatals) == 0 {
 		t.Errorf("AC#1 RED (the instrument): walking a directory that does not exist produced no report at all, so a leg can be called clean by a start-up directory nobody could read")
+	}
+}
+
+// TestAC3TheDoctorLegLeavesTheStartUpDirectoryUntouched128 is AC#3 (R-128-6).
+// The doctor leg was the one leg whose emptiness check had no tooth at all: on
+// the fallback shape it resolves the start-up directory as its data root, probes
+// it for writability and removes its own probe file again, so the directory is
+// empty again by the time the check looks and only the refusal markers catch it.
+// This case gives the leg an fs-level tooth of its own: production's own probe
+// path is planted in the start-up directory first, and a leg that resolves "."
+// overwrites and then deletes that file, which no marker can hide and no probe
+// cleanup can undo.
+func TestAC3TheDoctorLegLeavesTheStartUpDirectoryUntouched128(t *testing.T) {
+	assertNoPortableOverride128(t)
+	const probeName = "doctor-write-probe.tmp"
+	const bystander = "ticket-135-bystander.txt"
+	// The sentinel is only a sentinel while it is the file production probes
+	// with. If that name ever moves, this has to be said out loud instead of the
+	// case quietly losing its tooth.
+	if _, src, _, ok := runtime.Caller(0); !ok {
+		t.Fatalf("AC#3 RED (the instrument): runtime.Caller cannot name this file, so the sentinel cannot be checked against doctor.go's probe path")
+	} else if body, err := os.ReadFile(filepath.Join(filepath.Dir(src), "doctor.go")); err != nil {
+		t.Fatalf("AC#3 RED (the instrument): reading doctor.go next to %s: %v", src, err)
+	} else if !strings.Contains(string(body), probeName) {
+		t.Fatalf("AC#3 RED (the instrument): doctor.go no longer mentions %q, so the file this case plants is inert and the case would pass a fallback it cannot see", probeName)
+	}
+
+	pinEnvThatAsksTheOS128(t)
+	cwd := t.TempDir()
+	t.Chdir(cwd)
+	sentinel := filepath.Join(cwd, probeName)
+	const sentinelBody = "ticket 135 sentinel: untouched\n"
+	if err := os.WriteFile(sentinel, []byte(sentinelBody), 0o644); err != nil {
+		t.Fatalf("planting the sentinel: %v", err)
+	}
+	plantTree128(t, cwd, bystander)
+
+	var ok bool
+	out := captureStdout128(t, func() { ok = cmdDoctor() })
+	if ok {
+		t.Fatalf("AC#3 RED: the doctor leg reported success with no data root: %s", out)
+	}
+	got, err := os.ReadFile(sentinel)
+	if err != nil {
+		t.Fatalf("AC#3 RED: the doctor leg resolved the start-up directory as its data root and its writability probe removed the sentinel (%s), so the leg fell back to \".\" instead of refusing. This is the shape the emptiness check cannot see - the probe deletes its own file. Reader: %v", sentinel, err)
+	}
+	if string(got) != sentinelBody {
+		t.Errorf("AC#3 RED: the doctor leg overwrote %s (now %q), so its writability probe ran in the start-up directory", sentinel, got)
+	}
+	entries, err := os.ReadDir(cwd)
+	if err != nil {
+		t.Fatalf("reading %s after the doctor leg: %v", cwd, err)
+	}
+	for _, e := range entries {
+		if e.Name() != probeName && e.Name() != bystander {
+			t.Errorf("AC#3 RED: the doctor leg left %q in the start-up directory", e.Name())
+		}
 	}
 }
 
