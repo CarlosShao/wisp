@@ -26,6 +26,9 @@
 - [ ] **AC#3 迁移那一格**：加列的迁移要交**崩溃原子性**证据（中途被杀之后重开必须是"要么全成要么全不成"，不许出现"表里有半列"）；⚠ 数字前缀当幂等键那一形要**分别推演新库/老库各缺哪列**。
 - [ ] **AC#4 分叉不许吞原件**：分叉后原会话历史必须逐字仍在（拿一发"分叉时顺手清理"的变异证）。
 - [ ] **AC#5 契约轴**：`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`internal/panel/**`、`internal/agent/approval/**`、`thresholds.go`、golden、`allowlist.txt`、`frontend/**`、`design/**` 零字节；名册按 commit 号集合算（`--no-walk`）。
+- [ ] **AC#6 同秒并列那一支的次序（2026-10-15 编排者现量加格）**：`TestSessionListByWorkspace` 是台账里挂了很久的"间歇红、归 166 侧"，成因这次已读码具名——`internal/session/manage.go:93` 写的是 `m.now().Unix()`（**秒级**），`internal/memory/dao_session.go:125` 排的是 `ORDER BY updated_at DESC, id DESC`，而 id 由 `internal/session/session.go:96` 的 `rand.Read` 铸 ⇒ 同一秒内建的两条会话 `updated_at` 相等，次序落到**随机 hex 的倒序**＝一枚硬币。命中率现量（同一台面、两棵仓外导出树、`-count=20`）：HEAD＝**PASS 10／FAIL 10**，推前基线 `0ab64fe9`＝**PASS 7／FAIL 13**。本格要做两件事：
+  - ⓐ 把仪器改成**确定性**：`newTestManager` 已经收一枚 `*time.Time` 并每次调用前进一分钟（`manage_test.go:15-22`，那枚用固定时钟的用例 20/20 全绿就是证据），把 `:69` 与 `:84` 两处传 `nil` 的改成用那枚步进时钟；⛔ 放宽任何断言、⛔ 把 `want` 改成"两种次序都算对"、⛔ 删用例。交回要带**改前命中率的复现读数**（同台面，`-count=20` 里 FAIL>0）与**改后 20/20 绿**，两发⛔ 缺一。
+  - ⓑ **只答不改**：生产上同一秒内动过的两条会话，在"按时间列"里次序随机——这一形机主看不看得见（谁调 `List`/`Search`、面板上排的是不是它），带 `file:line`。改排序 tie-break 是行为变更，**由编排者读完这格再裁**，⛔ 本腿自己动 `dao_session.go`。
 
 ## 本票**不**解决
 

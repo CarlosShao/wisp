@@ -1,0 +1,47 @@
+腿名：166-r2（落地腿·写）｜票：.scratch/wisp/issues/166-no-session-layer-list-search-rename-archive-fork-on-the-go-side.md（AC#6 ⓐ 那半格＋ⓑ 那半格只答不改）
+开工锚：HEAD 17ca21ee（2026-10-15 22:58 +0800）
+存档时刻：2026-10-15 23:0x +08（⛔ 尚未放出，释放条件＝CPU 回落 70% 以下＋本腿那块面空）｜编排者放腿前自跑的三把尺：① git log -1 17ca21ee 真在 ② internal/session 那枚测试件真在盘 ③ 命中率我自己现量（HEAD＝ByWorkspace PASS 10／FAIL 10，推前 0ab64fe9＝PASS 7／FAIL 13，同一台面两棵仓外导出树）
+
+★这一格要修的到底是什么（先读这段再动手）
+`TestSessionListByWorkspace` 是台账里挂了很久的"间歇红、归 166 侧"（`pending-and-issues.md` 里 `TestSessionListByWorkspace` 命中 8 处，A998 第四节是这次的成对读数）。
+成因已读码具名，三行：
+  - `internal/session/manage.go:93` 内容锚＝`now := m.now().Unix()` ⇒ 时间戳只到**秒**；
+  - `internal/memory/dao_session.go:125` 内容锚＝`q += ` 后接 ` ORDER BY updated_at DESC, id DESC`；
+  - `internal/session/session.go:96` 内容锚＝`rand.Read(buf)` ⇒ id 是随机 hex。
+⇒ 同一秒建的两条会话 `updated_at` 相等，次序由"随机 id 的倒序"决定＝一枚硬币（所以命中率约五成，⛔ 恒定）。
+接缝已经在这个测试文件里：`internal/session/manage_test.go:15-22` 的 `newTestManager(t, store, clock *time.Time)`，非 nil 时每次调用前进一分钟；
+用它的 `:48` 那一发 20/20 全绿，传 `nil` 的 `:69`（本用例）与 `:84`（`TestSessionSearchTitleAndBody`）＝硬币。
+
+你要交付两格，⛔ 合并成一句"顺手都改了"：
+ⓐ **仪器改成确定性**（只动 `internal/session/manage_test.go`，⛔ 动产码）：把传 `nil` 的两处改用一枚会前进的时钟（沿 `:48` 已有的形状，⛔ 新造第二种时钟助手，除非那枚助手的签名要扩——要扩就具名写在你交回的"没做完"一节里）。
+  ★硬判据（缺一＝本格没做完，⛔ 用"应该不会再红了"交回）：
+   - **改前复现读数**：同一台面上 `go test ./internal/session/ -count=20 -run 'TestSessionList' -v`，名册里 `TestSessionListByWorkspace` 必须 **FAIL>0**（这是"那个坏世界真在盘上"的证据；⛔ 拿到"改前 0 红"还往下修——那说明你那一发正好是硬币的另一面，重跑到复现为止，并把每一发的 rc／四数逐发落盘）。
+   - **改后读数**：同一台面、同一把尺、`-count=20` ⇒ **FAIL=0 且 PASS 那一枚＝20**，并且 `TestSessionSearchTitleAndBody` 同形复跑一发。
+   - 两发**⛔ 不同台面**（同卷、同 GOTMPDIR 写法、同一棵导出树或同一份工作树）＝读数不可比；把台面名写在每一发旁边。
+   - ⛔ 放宽任何断言：⛔ 把 `want` 改成"两种次序都算对"、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 改成只比集合不比次序。这格买的是"次序真被测到了"，不是"门变绿"。
+  ★牙的自证（正控，物理改、⛔ `-overlay` 冒充）：把改后的时钟换成"每次返回同一个时刻"（即人为把 `updated_at` 再做平），点名那枚用例**必须红**；还原后**必须绿**。红句原文连文案落盘。这一发是回答"你这把尺到底在量次序还是在量运气"。
+ⓑ **只答不改**：生产上同一秒内动过的两条会话，在"按时间列"里次序随机——**这一形机主看不看得见**。要的是带 `file:line` 的调用链（谁调 `Manager.List`／`Search`、面板或 CLI 有没有把这份清单排到屏幕上、排的时候有没有再排一次）。⛔ 动 `internal/memory/dao_session.go`（tie-break 是行为变更，读完这格由编排者裁，⛔ 你替他裁）。
+
+写面（只许这三处，逐字）：
+  1) `internal/session/manage_test.go`（⛔ 本票其余产码件、⛔ `internal/memory/**`、⛔ `internal/session/session.go`）
+  2) `.scratch/wisp/probes/166/r2/`（你自己的读数目录，⛔ 写进别家的 probes）
+  3) `docs/evidence/s1/` 里本票那一份裁决/读数件（件名短、⛔ 长名⛔ 带 `§`，长度门会为别家腿的拷贝件红）
+  ＋ 票 166 末尾**一条** bullet（只追加，⛔ 勾任何 AC 框——勾框归非实现者）
+禁区（具名，⛔ 你替我判断"应该没关系"）：
+  `docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`internal/panel/**`、`internal/agent/approval/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、三枚冻结件（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）＝**零字节**；
+  D1–D47／C1–C32／R1–R9／D43 转移表⛔ 动；SLO 阈值⛔ 动；⛔ 为变绿放宽断言。
+在飞邻居（⛔ 碰它们的件，零字）：`322-r1`＝`internal/winsec`（它中途 `winsec.go` 会引用尚未写出的符号 ⇒ 全仓 `go build`／`go vet` 在这一分钟可能红，那是别腿的在飞态、⛔ 记成你的红、⛔ 去修它）；`324-v1`＝`cmd/wisp` 定向跑。
+★台面（照做，否则你的"红"是台面故障）：
+  - `internal/session` 整包可以跑（⛔ `cmd/wisp` 整包＝票 314 死亡区，本票也用不到）。
+  - `GOTMPDIR` 预先 `mkdir -p` 再指过去（没建＝`creating work dir` 红＝长得像判据响了的台面故障）。
+  - 要"改前基线"就用 `git archive <rev> | tar -x -C <仓外临时目录>`（⛔ 在共享工作树里跑"改前那发"，那是别人的在飞态；⛔ 在仓内建 worktree/checkout）。取出来先 `find <dir> -name '*.go' | wc -l` 证非空，再信它的 0。
+  - ⛔ 仓内临时件删不掉就别删（临时件只建不删）。
+Git 纪律：只 commit、⛔ push（推送归编排者，且只推 `origin/dev`）；`git add`／`git commit` 两处都带**显式 pathspec**（逐枚列文件，⛔ `-A`／`.`／目录形）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+输出预算（四条硬款，逐条自证）：
+  1) 每件读数件**自带 `rc=`**；`gofmt -l`／`gofumpt -l` 退码恒 0＝空尺，必须写"列出几枚＋逐枚件名"。
+  2) 正控两发（红＋绿）＋还原，**自己算一枚凭据**；⛔ `-overlay` 冒充物理突变。
+  3) 红句里出现 `walk`／`build failed`／`no tests to run`／`connection refused`／`0xc0000135`／`RUN=0` ⇒ 归类面故障、另节具名，⛔ 计入判据（`RUN=0` 的四个 0 ⛔ 是读数，那＝根本没跑）。
+  4) 报数必带**尺名＋射程＋单位名**：几枚**文件**／几枚**顶层用例**（`^--- PASS`）／几枚**子测试**（含子测试那把）；两把尺并列时具名差在哪。
+门禁（自己跑、自己落 `rc=`，⛔ 交回"应该都绿"）：`go build ./...`、`go vet ./internal/session/`、`gofumpt -l`（本机 gofumpt 现在⛔ 装，那就写"gofumpt 本机不可用＝台面"＋跑 `gofmt -l` 并具名这把更窄、⛔ 拿 gofmt 的 0 冒充 gofumpt 的 0）、`sh scripts/d22scan.sh`、`sh scripts/check-path-length-budget.sh --with-self-test`（必须在仓根跑，否则 rc=2 那句 `not inside a git work tree` 是射程拒绝⛔ 是红）。
+预算：≤5 件、每件 ≤260 行；没做完的格**具名写"没做完"**＋缺哪一发读数。
+交回格式：`.scratch/wisp/probes/166/r2/` 里逐节落盘＋票尾一条 bullet；⛔ 勾 AC 框。凡引用一个数，写全"哪把尺／射程／量的还是算的"。
