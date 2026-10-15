@@ -1,0 +1,194 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+	"github.com/CarlosShao/wisp/internal/winsec"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strconv"
+	"sync/atomic"
+	"time"
+)
+
+const payload = "WITNESS-PAYLOAD-DO-NOT-TOUCH-0123456789"
+
+var stop = make(chan struct{})
+
+func main() {
+	attempts := 2000
+	if v := os.Getenv("P2_ATTEMPTS"); v != "" {
+		attempts, _ = strconv.Atoi(v)
+	}
+	base, err := os.MkdirTemp("", "probe322-p2-")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("P2 BASE=%s attempts=%d shape=%s\n", base, attempts, os.Getenv("P2_SHAPE"))
+	if os.Getenv("P3_DOUBLEWRITE") == "1" {
+		doubleWrite(base)
+		return
+	}
+	tree, foreign := filepath.Join(base, "tree"), filepath.Join(base, "foreign")
+	must(os.MkdirAll(tree, 0o700), os.MkdirAll(foreign, 0o700))
+	witness := filepath.Join(foreign, "keep-me.bin")
+	leaf := filepath.Join(tree, "artifact.bin")
+	var flips, flipErrs int64
+	go func() {
+		var n int
+		swap := func(st string) {
+			if err := os.Rename(st, leaf); err != nil {
+				atomic.AddInt64(&flipErrs, 1)
+				_ = os.Remove(st)
+				return
+			}
+			atomic.AddInt64(&flips, 1)
+		}
+		for i := 0; ; i++ {
+			select {
+			case <-stop:
+				return
+			default:
+			}
+			n++
+			if i%2 == 0 {
+				st := filepath.Join(tree, "stage-link-"+strconv.Itoa(n))
+				if err := os.Symlink(witness, st); err != nil {
+					atomic.AddInt64(&flipErrs, 1)
+					continue
+				}
+				swap(st)
+			} else {
+				st := filepath.Join(tree, "stage-real-"+strconv.Itoa(n))
+				if err := os.WriteFile(st, []byte("OURS-OWN-OBJECT"), 0o600); err != nil {
+					atomic.AddInt64(&flipErrs, 1)
+					continue
+				}
+				swap(st)
+			}
+		}
+	}()
+	must(os.WriteFile(leaf, []byte("OURS-OWN-OBJECT"), 0o600))
+	var damaged, linkRefused, otherRefused, okWrites, existRefused int
+	samples := map[string]int{}
+	for i := 0; i < attempts; i++ {
+		must(os.WriteFile(witness, []byte(payload), 0o666))
+		err := winsec.PrivateFile(leaf, []byte("PRIVATE-SECRET-BYTES"), 0o600)
+		got, rerr := os.ReadFile(witness)
+		if rerr != nil {
+			panic(rerr)
+		}
+		dmg := "no"
+		if string(got) != payload {
+			damaged++
+			dmg = "YES"
+		}
+		samples[dmg+" | leaf="+modeOf(leaf)+" | err="+short(err)]++
+		switch {
+		case err == nil:
+			okWrites++
+		case errors.Is(err, fs.ErrExist):
+			existRefused++
+			if linkCredit(err) {
+				linkRefused++
+			}
+		default:
+			otherRefused++
+			if linkCredit(err) {
+				linkRefused++
+			}
+		}
+	}
+	close(stop)
+	time.Sleep(50 * time.Millisecond)
+	fmt.Printf("P2 READOUT shape=%s attempts=%d damaged=%d ok=%d refused-exist=%d refused-other=%d link-credited=%d flips=%d flip-errs=%d\n",
+		os.Getenv("P2_SHAPE"), attempts, damaged, okWrites, existRefused, otherRefused, linkRefused,
+		atomic.LoadInt64(&flips), atomic.LoadInt64(&flipErrs))
+	keys := make([]string, 0, len(samples))
+	for k := range samples {
+		keys = append(keys, k)
+	}
+	for n := 0; n < len(keys) && n < 8; n++ {
+		for m := n + 1; m < len(keys); m++ {
+			if samples[keys[m]] > samples[keys[n]] {
+				keys[n], keys[m] = keys[m], keys[n]
+			}
+		}
+	}
+	for _, k := range keys[:min(len(keys), 8)] {
+		fmt.Printf("P2 SAMPLE n=%-6d %s\n", samples[k], k)
+	}
+}
+func doubleWrite(base string) {
+	dir := filepath.Join(base, "dw")
+	must(os.MkdirAll(dir, 0o700))
+	p := filepath.Join(dir, "blob.bin")
+	e1 := winsec.PrivateFile(p, []byte("FIRST"), 0o600)
+	e2 := winsec.PrivateFile(p, []byte("SECOND"), 0o600)
+	got, rerr := os.ReadFile(p)
+	fmt.Printf("P3 DOUBLEWRITE PrivateFile x2 -> err1=%s err2=%s content=%q readerr=%v\n", short(e1), short(e2), string(got), rerr)
+	q := filepath.Join(dir, "excl.bin")
+	x1 := winsec.PrivateFileExclusive(q, []byte("A"))
+	x2 := winsec.PrivateFileExclusive(q, []byte("B"))
+	got2, _ := os.ReadFile(q)
+	fmt.Printf("P3 EXCLUSIVE x2 -> err1=%s err2=%s content=%q\n", short(x1), short(x2), string(got2))
+	r := filepath.Join(dir, "pre.bin")
+	must(os.WriteFile(r, []byte("PRE-EXISTING-LONGER-THAN-NEW"), 0o644))
+	e3 := winsec.PrivateFile(r, []byte("OVER"), 0o600)
+	got3, _ := os.ReadFile(r)
+	mode := "<nil>"
+	if st3, serr := os.Stat(r); serr == nil {
+		mode = st3.Mode().String()
+	}
+	fmt.Printf("P3 PRIVATEFILE over a pre-existing file -> err=%s content=%q mode=%s\n", short(e3), string(got3), mode)
+}
+func linkCredit(err error) bool {
+	if err == nil {
+		return false
+	}
+	if errors.Is(err, winsec.ErrUnresolvedPath) || errors.Is(err, winsec.ErrNotSealable) {
+		return true
+	}
+	msg := err.Error()
+	for _, k := range []string{"symbolic link", "symlink", "link", "ELOOP", "too many levels"} {
+		if len(k) <= len(msg) {
+			for i := 0; i+len(k) <= len(msg); i++ {
+				if msg[i:i+len(k)] == k {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+func short(err error) string {
+	if err == nil {
+		return "nil"
+	}
+	s := err.Error()
+	if len(s) > 120 {
+		s = s[:120] + "..."
+	}
+	return s
+}
+func modeOf(p string) string {
+	info, err := os.Lstat(p)
+	if err != nil {
+		return "gone"
+	}
+	return info.Mode().String()
+}
+func must(errs ...error) {
+	for _, e := range errs {
+		if e != nil {
+			panic(e)
+		}
+	}
+}
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}

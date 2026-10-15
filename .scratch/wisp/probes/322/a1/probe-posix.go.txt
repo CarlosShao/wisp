@@ -1,0 +1,173 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"syscall"
+)
+
+const payload = "WITNESS-PAYLOAD-DO-NOT-TOUCH-01234567890123456789012345678901234567890"
+
+func snap(p string) string {
+	st, err := os.Stat(p)
+	if err != nil {
+		return "STAT_ERR(" + err.Error()[:min(30, len(err.Error()))] + ")"
+	}
+	sys, ok := st.Sys().(*syscall.Stat_t)
+	if !ok {
+		return fmt.Sprintf("size=%d", st.Size())
+	}
+	return fmt.Sprintf("size=%d mtime=%d.%09d", st.Size(), sys.Mtim.Sec, sys.Mtim.Nsec)
+}
+func main() {
+	base, err := os.MkdirTemp("", "probe322-p1-")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("BASE=%s uid=%d O_NOFOLLOW=%d ELOOP=%d EEXIST=%d\n", base, os.Getuid(), syscall.O_NOFOLLOW, syscall.ELOOP, syscall.EEXIST)
+	shapes := []struct {
+		name  string
+		flags int
+	}{
+		{"trunc(:87 today)", os.O_WRONLY | os.O_CREATE | os.O_TRUNC},
+		{"excl(:97 today)", os.O_WRONLY | os.O_CREATE | os.O_EXCL},
+		{"trunc|NOFOLLOW(jia)", os.O_WRONLY | os.O_CREATE | os.O_TRUNC | syscall.O_NOFOLLOW},
+		{"excl|NOFOLLOW", os.O_WRONLY | os.O_CREATE | os.O_EXCL | syscall.O_NOFOLLOW},
+		{"WRONLY|NOFOLLOW(yi hop2)", os.O_WRONLY | syscall.O_NOFOLLOW},
+		{"WRONLY|TRUNC|NOFOLLOW(yi hop2+T)", os.O_WRONLY | os.O_TRUNC | syscall.O_NOFOLLOW},
+		{"create-only", os.O_WRONLY | os.O_CREATE},
+	}
+	kinds := []string{"rel", "abs", "up", "absout", "dangling", "anc-sib", "anc-out", "real"}
+	for _, s := range shapes {
+		fmt.Printf("\n### shape=%s flags=0x%x\n", s.name, s.flags)
+		for _, kind := range kinds {
+			dir := filepath.Join(base, s.name, kind) // one tree per case: nothing carries over
+			tree, foreign := filepath.Join(dir, "tree"), filepath.Join(dir, "foreign")
+			must(os.MkdirAll(tree, 0o700), os.MkdirAll(foreign, 0o700))
+			victim := filepath.Join(foreign, "keep-me.bin")
+			own := filepath.Join(tree, "own.bin")
+			sub := filepath.Join(tree, "sub")
+			writeAt(victim, payload)
+			writeAt(own, payload)
+			must(os.MkdirAll(sub, 0o700))
+			insideVictim := filepath.Join(sub, "keep-me.bin")
+			writeAt(insideVictim, payload)
+			name := filepath.Join(tree, "artifact.bin")
+			witness := victim
+			switch kind {
+			case "rel":
+				must(os.Symlink("own.bin", name))
+				witness = own
+			case "abs":
+				must(os.Symlink(own, name))
+				witness = own
+			case "up":
+				must(os.Symlink(filepath.Join("..", "foreign", "keep-me.bin"), name))
+			case "absout":
+				must(os.Symlink(victim, name))
+			case "dangling":
+				must(os.Symlink(filepath.Join(foreign, "nope.bin"), name))
+				witness = filepath.Join(foreign, "nope.bin")
+			case "real":
+				name = own
+			case "anc-sib", "anc-out":
+				if kind == "anc-sib" {
+					must(os.Symlink("sub", filepath.Join(tree, "ldir")))
+					witness = insideVictim
+				} else {
+					must(os.Symlink(".."+string(filepath.Separator)+"foreign", filepath.Join(tree, "ldir")))
+				}
+				name = filepath.Join(tree, "ldir", "keep-me.bin")
+				if kind == "anc-out" {
+					witness = victim
+				}
+			}
+			before := snap(witness)
+			f, oerr := os.OpenFile(name, s.flags, 0o600)
+			res, cls := "ERR("+fmt.Sprint(oerr)+")", ""
+			if oerr == nil {
+				res = "OPENED"
+				if pinned, e1 := f.Stat(); e1 == nil {
+					if now, e2 := os.Lstat(name); e2 == nil {
+						cls = fmt.Sprintf("SameFile=%v linkNow=%v", os.SameFile(pinned, now), now.Mode()&os.ModeSymlink != 0)
+					}
+				}
+				_ = f.Close()
+			} else {
+				cls = fmt.Sprintf("is(ErrExist)=%v is(ELOOP)=%v", errors.Is(oerr, fs.ErrExist), errors.Is(oerr, syscall.ELOOP))
+			}
+			after := snap(witness)
+			fmt.Printf("  %-9s | byname %-10s | %-9s %-30s | %s | leaf=%s\n", kind, res, verdict(before, after), after, cls, modeOf(name))
+			root, rerr := os.OpenRoot(tree)
+			if rerr != nil {
+				fmt.Printf("  %-9s | OpenRoot ERR %v\n", kind, rerr)
+				continue
+			}
+			rel, rerr := filepath.Rel(tree, name)
+			if rerr != nil {
+				fmt.Printf("  %-9s | Rel ERR %v\n", kind, rerr)
+				root.Close()
+				continue
+			}
+			beforeR := snap(witness)
+			fr, errR := root.OpenFile(rel, s.flags, 0o600)
+			resR := "ERR(" + fmt.Sprint(errR) + ")"
+			if errR == nil {
+				resR = "OPENED"
+				_ = fr.Close()
+			}
+			afterR := snap(witness)
+			fmt.Printf("  %-9s | ROOT   %-10s | %-9s %-30s | root.Lstat=%v\n", kind, resR, verdict(beforeR, afterR), afterR, rootMode(root, rel))
+			if s.name == "excl(:97 today)" {
+				fc, ec := root.Create(rel)
+				rc := "ERR(" + fmt.Sprint(ec) + ")"
+				if ec == nil {
+					rc = "OPENED"
+					_ = fc.Close()
+				}
+				fmt.Printf("  %-9s | ROOT.Create %-7s | witness %s\n", kind, rc, snap(witness))
+			}
+			root.Close()
+		}
+	}
+}
+func verdict(before, after string) string {
+	if before == after {
+		return "UNCHANGED"
+	}
+	return "DAMAGED"
+}
+func rootMode(root *os.Root, rel string) string {
+	info, err := root.Lstat(rel)
+	if err != nil {
+		return "gone/err"
+	}
+	return info.Mode().String()
+}
+func modeOf(p string) string {
+	info, err := os.Lstat(p)
+	if err != nil {
+		return "gone"
+	}
+	return info.Mode().String()
+}
+func writeAt(p, s string) {
+	must(os.WriteFile(p, []byte(s), 0o666))
+	must(os.Chmod(p, 0o666))
+}
+func must(errs ...error) {
+	for _, e := range errs {
+		if e != nil {
+			panic(e)
+		}
+	}
+}
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}

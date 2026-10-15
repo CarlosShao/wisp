@@ -1,0 +1,204 @@
+//go:build windows
+
+// Probe 322-a1 PW (Windows host = shipped target D7): W1 capability, W2 :87 over a reparse
+// leaf, W3 :97, W3b O_CREATE, W4 ancestor junction, W5 os.Root, W6 same-object, W7
+// FILE_FLAG_OPEN_REPARSE_POINT (+CREATE_ALWAYS), W8 attrs-only detect.  go run .
+package main
+
+import (
+	"errors"
+	"fmt"
+	"golang.org/x/sys/windows"
+	"io/fs"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"syscall"
+)
+
+const payload = "WITNESS-PAYLOAD-DO-NOT-TOUCH-01234567890123456789012345678901234567890"
+
+func main() {
+	base, err := os.MkdirTemp("", "probe322-pw-")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("PW BASE=%s\n", base)
+	tree, victim := freshCase(base, "w1")
+	fmt.Printf("W1 os.Symlink(file)=%v os.Symlink(dir)=%v mklink /J=%v\n", os.Symlink(victim, filepath.Join(tree, "probe-file-link.bin")), os.Symlink(filepath.Dir(victim), filepath.Join(tree, "probe-dir-link")), mkJOK(exec.Command("cmd", "/c", "mklink", "/J", filepath.Join(tree, "probe-junc"), filepath.Dir(victim)).Run()))
+	tree, victim = freshCase(base, "w23")
+	link := filepath.Join(tree, "link.bin")
+	must(os.Symlink(victim, link))
+	openCase("W2 :87 O_WRONLY|O_CREATE|O_TRUNC over link", link, victim, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	openCase("W3 :97 O_WRONLY|O_CREATE|O_EXCL  over link", link, victim, os.O_WRONLY|os.O_CREATE|os.O_EXCL)
+	openCase("W3b O_WRONLY|O_CREATE (no TRUNC) over link", link, victim, os.O_WRONLY|os.O_CREATE)
+	tree, victim = freshCase(base, "w4")
+	jdir := filepath.Dir(victim)
+	must(exec.Command("cmd", "/c", "mklink", "/J", filepath.Join(tree, "junc"), jdir).Run())
+	spelled := filepath.Join(tree, "junc", "keep-me.bin")
+	openCase("W4a :87 over junction ANCESTOR", spelled, victim, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	openCase("W4b :97 over junction ANCESTOR", spelled, victim, os.O_WRONLY|os.O_CREATE|os.O_EXCL)
+	tree, _ = freshCase(base, "w5")
+	own := filepath.Join(tree, "own.bin")
+	writeAt(own, payload)
+	must(os.Symlink("own.bin", filepath.Join(tree, "rel.bin")))
+	must(os.Symlink(own, filepath.Join(tree, "abs.bin")))
+	root, rerr := os.OpenRoot(tree)
+	must(rerr)
+	rootCase(root, "W5a root.OpenFile(rel link, O_TRUNC)", "rel.bin", own, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	rootCase(root, "W5b root.OpenFile(rel link, O_EXCL)", "rel.bin", own, os.O_WRONLY|os.O_CREATE|os.O_EXCL)
+	rootCase(root, "W5c root.Create(rel link) [O_TRUNC, not excl]", "rel.bin", own, 0)
+	rootCase(root, "W5d root.OpenFile(ABS-target link)", "abs.bin", own, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	root.Close()
+	tree, victim = freshCase(base, "w78")
+	link = filepath.Join(tree, "link.bin")
+	must(os.Symlink(victim, link))
+	fmt.Printf("W7 witness before: %s\n", sizeOf(victim))
+	h, herr := windows.CreateFile(windows.StringToUTF16Ptr(link), windows.GENERIC_WRITE, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE|windows.FILE_SHARE_DELETE, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_OPEN_REPARSE_POINT, 0)
+	if herr != nil {
+		fmt.Printf("W7a CreateFile(REPARSE_POINT, GENERIC_WRITE, OPEN_EXISTING) -> ERR(%v)\n", herr)
+	} else {
+		fh := os.NewFile(uintptr(h), link)
+		var bi syscall.ByHandleFileInformation
+		_ = syscall.GetFileInformationByHandle(syscall.Handle(h), &bi)
+		fmt.Printf("W7b handle names the LINK: attrs=0x%x reparse=%v size=%d\n", bi.FileAttributes, bi.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0, bi.FileSizeLow)
+		n, werr := fh.Write([]byte("PRIVATE-SECRET-BYTES"))
+		fmt.Printf("W7c Write via reparse handle -> n=%d err=%v ; witness now %s\n", n, werr, sizeOf(victim))
+		terr := fh.Truncate(0)
+		fmt.Printf("W7d Truncate(0) via reparse handle -> err=%v ; witness now %s\n", terr, sizeOf(victim))
+		_ = fh.Close()
+		rl, rlerr := os.Readlink(link)
+		fmt.Printf("W7e link survives: readlink=%q err=%v %s\n", rl, rlerr, reparseTag(link))
+	}
+	tree2, victim2 := freshCase(base, "w7f")
+	link2 := filepath.Join(tree2, "link.bin")
+	must(os.Symlink(victim2, link2))
+	h2, e2 := windows.CreateFile(windows.StringToUTF16Ptr(link2), windows.GENERIC_WRITE, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE|windows.FILE_SHARE_DELETE, nil, windows.CREATE_ALWAYS, windows.FILE_FLAG_OPEN_REPARSE_POINT, 0)
+	if e2 != nil {
+		fmt.Printf("W7f CreateFile(REPARSE_POINT, CREATE_ALWAYS) -> ERR(%v)\n", e2)
+	} else {
+		var bi2 syscall.ByHandleFileInformation
+		_ = syscall.GetFileInformationByHandle(syscall.Handle(h2), &bi2)
+		fmt.Printf("W7f CREATE_ALWAYS -> OK attrs=0x%x reparse=%v size=%d ; witness %s ; leaf %s\n", bi2.FileAttributes, bi2.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0, bi2.FileSizeLow, sizeOf(victim2), reparseTag(link2))
+		_ = windows.CloseHandle(h2)
+	}
+	tree3, victim3 := freshCase(base, "w8")
+	link3 := filepath.Join(tree3, "link.bin")
+	must(os.Symlink(victim3, link3))
+	detect("W8a reparse-flag open (link) ", link3, true)
+	detect("W8b plain open, NO flag (link)", link3, false)
+	detect("W8c plain open, NO flag (real)", victim3, false)
+	fmt.Println("PW DONE")
+}
+func openCase(label, name, witness string, flags int) {
+	before := sizeOf(witness)
+	f, err := os.OpenFile(name, flags, 0o600)
+	res, sig := "ERR("+fmt.Sprint(err)+")", ""
+	if err == nil {
+		res = "OPENED"
+		if pinned, perr := f.Stat(); perr == nil {
+			if now, nerr := os.Lstat(name); nerr == nil {
+				sig = fmt.Sprintf("W6 SameFile(pin,lstat)=%v linkNow=%v", os.SameFile(pinned, now), now.Mode()&os.ModeSymlink != 0)
+			}
+		}
+		_ = f.Close()
+	} else {
+		sig = fmt.Sprintf("is(ErrExist)=%v", errors.Is(err, fs.ErrExist))
+	}
+	after := sizeOf(witness)
+	verdict := "UNCHANGED"
+	if before != after {
+		verdict = "DAMAGED"
+	}
+	fmt.Printf("%-46s | %-8s | %-9s %-12s | %s | leaf=%s\n", label, res, verdict, after, sig, reparseTag(name))
+	writeAt(witness, payload) // restore so the next case is attributable on its own
+}
+func rootCase(root *os.Root, label, rel, witness string, flags int) {
+	before := sizeOf(witness)
+	var f *os.File
+	var err error
+	if flags == 0 {
+		f, err = root.Create(rel)
+	} else {
+		f, err = root.OpenFile(rel, flags, 0o600)
+	}
+	res := "ERR(" + fmt.Sprint(err) + ")"
+	if err == nil {
+		res = "OPENED"
+		_ = f.Close()
+	}
+	after := sizeOf(witness)
+	verdict := "UNCHANGED"
+	if before != after {
+		verdict = "DAMAGED"
+	}
+	fmt.Printf("%-46s | %-8s | %-9s %-12s | is(ErrExist)=%v\n", label, res, verdict, after, errors.Is(err, fs.ErrExist))
+	writeAt(witness, payload)
+}
+func detect(label, path string, withReparse bool) {
+	attrs := uint32(0)
+	if withReparse {
+		attrs = windows.FILE_FLAG_OPEN_REPARSE_POINT
+	}
+	h, err := windows.CreateFile(windows.StringToUTF16Ptr(path), windows.FILE_READ_ATTRIBUTES, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE|windows.FILE_SHARE_DELETE, nil, windows.OPEN_EXISTING, attrs, 0)
+	if err != nil {
+		fmt.Printf("%s CreateFile -> ERR(%v)\n", label, err)
+		return
+	}
+	var bi syscall.ByHandleFileInformation
+	gerr := syscall.GetFileInformationByHandle(syscall.Handle(h), &bi)
+	fmt.Printf("%s attrs=0x%x reparse=%v index=%d:%d size=%d getinfo=%v\n", label, bi.FileAttributes, bi.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0, bi.FileIndexHigh, bi.FileIndexLow, bi.FileSizeLow, gerr)
+	_ = windows.CloseHandle(h)
+}
+func verdictOf(a, b string) string {
+	if a == b {
+		return "UNCHANGED"
+	}
+	return "DAMAGED"
+}
+func writeAt(p, s string) { must(os.WriteFile(p, []byte(s), 0o666)) }
+func mkJOK(err error) string {
+	if err == nil {
+		return "nil"
+	}
+	return err.Error()
+}
+
+func must(errs ...error) {
+	for _, e := range errs {
+		if e != nil {
+			panic(e)
+		}
+	}
+}
+func sizeOf(p string) string {
+	st, err := os.Stat(p)
+	if err != nil {
+		e := err.Error()
+		if len(e) > 30 {
+			e = e[:30]
+		}
+		return "STAT_ERR(" + e + ")"
+	}
+	return fmt.Sprintf("size=%d", st.Size())
+}
+func reparseTag(p string) string {
+	info, err := os.Lstat(p)
+	if err != nil {
+		return "lstat_err"
+	}
+	attr, ok := info.Sys().(*syscall.Win32FileAttributeData)
+	if !ok {
+		return "no-attr"
+	}
+	return fmt.Sprintf("attrs=0x%x reparse=%v", attr.FileAttributes, attr.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0)
+}
+func freshCase(base, name string) (tree, victim string) {
+	dir := filepath.Join(base, name)
+	tree = filepath.Join(dir, "tree")
+	foreign := filepath.Join(dir, "foreign")
+	must(os.MkdirAll(tree, 0o700), os.MkdirAll(foreign, 0o700))
+	victim = filepath.Join(foreign, "keep-me.bin")
+	writeAt(victim, payload)
+	return
+}
