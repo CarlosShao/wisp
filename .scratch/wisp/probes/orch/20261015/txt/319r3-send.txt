@@ -1,0 +1,8 @@
+319-r3 send 记录
+- 发送时刻：2026-10-15 15:0x +08；定稿派单已先存档：txt/319r3-dispatch.txt（发送时回填了发送行）。
+- 去重核：`.scratch/wisp/probes/319/`＝a1／r1／r2／v（r3 未用，可用）。
+- 收件人：agent_16e1b047-e0ae-4b71-8269-6c5f3be0f5e5（general-purpose，后台）。
+- 内容：修 D1（`secondLaunchActivation319` 从 `panelHolder.toggle` 换成"确保线程活着＋`RequestShow`"的展示形；⛔ 不改 toggle/RequestToggle 语义）＋新钉 N4（已可见态不得藏窗；headless＋winlive 两向三态＋变异自证）＋回归/门禁/面核。
+- 派发依据：`319-v` 非实现者对抗验收判 AC#2＝**附条件成立**（D1＝已可见态被藏窗），编排者代码级坐实 `panel_resident_windows.go:447-455`；裁定落 `A976`。
+- 面序：`320-r1` 已交件（`9413aed3`）⇒ `cmd/wisp` 面空，故即发；后随 `320-v`／`135-r1`（同面串行）。
+- 事前盘面：HEAD=`9413aed3`；机主实例 wisp.exe PID 40296（⛔ 别扰动）；GOTMPDIR 用约定根（别用 `C:\tmp\`）。
