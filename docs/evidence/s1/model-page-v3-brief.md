@@ -44,3 +44,32 @@
 
 ⇒ **§4 待批三件全部获批**：① `provider_billing` 写入；② 建自定义名供应商行（`stepfun-plan`/`stepfun-api` 两行并存）；③ 模型条目写入 **＋** "从 `/v1/models` 拉取列表"端口。Go 侧落地票＝`.scratch/wisp/issues/320-model-page-v3-go-side-*.md`（设计腿先出形状）。
 ⇒ **给前端 agent 的口径（机主方向）**：页面按"主流 harness 的完整形态"做——供应商列表（多行/计费模式/模型清单/拉取）＋模型目录＋角色映射；**不做**"为了能录 key 就应付"的简版。Go 侧新字段/新方法落地后再接写入（本简报 §3 的只读展示可先行）。
+
+---
+
+## 7. ★接口面定稿（编排者 2026-10-15 12:0x 裁定，落账 A972；依据＝设计腿 `320-a1` 交件 `.scratch/wisp/probes/320/a1/census.md`，编排者已逐条复跑核过）
+
+- **三个写入字段**（都骑**既有** `config.set` 方法，⛔ 不新增方法名）：`provider_billing`（值 `plan` / `pay-per-token`）· `provider_row_create_custom`（值 `<protocol>,<base_url>`，可带首枚模型 id）· `model_row_create`（provider+model，无值）。⇒ 落地后页面的"计费切换 / 再加一行 / 添加模型"三个动作就能接真写入，**前端不必为它们改方法名**（写入仍走既有 `requestConfigWrite` 形状，只是 `field` 取三个新名）。
+- **"拉取模型列表"端口＝新方法名 `config.models.list`**（⛔ 不叫 `models.list`：那个名字在 `SPEC-08 §5.2` 已属本地签署模型仓 C29/D26，语义相撞；⛔ 不带 `panel.` 前缀：`panel.*` 四枚白名单钉死）。请求载荷复用既有键 `configProvider`（⛔ 不发明新信封键）；回执＝散文＋**一枚标记行** `wisp-models-list:` 后跟 JSON（照 `wisp-config-view:` 的先例，`config_handlers.go:546-555`）；失败只给 D37 分类文案，**不回显上游原文/密钥**。
+
+### 7.1 给前端 agent 的**一行活**（请机主转交；这是 Go 半落地的前置）
+
+`frontend/src/lib/panel.ts` 加**一枚**导出发送函数（形状照该文件既有 `requestConfigView`／`requestConfigWrite` 那几处，用现成 `requestHostAnswer`）：
+
+```ts
+/** Ask the host to fetch one provider's model catalog (config.models.list). */
+export function requestProviderModels(provider: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "config.models.list",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    configProvider: provider,
+  });
+}
+```
+
+三条硬约束（仓里既有测试钉死的，不是我加的口径）：① 方法名**必须写成字面量**（`sendRequest`/`requestHostAnswer` 的第一参数不许算出来）；② **不许**新开 `postMessage` 调用点（恰 2 处）／不许 `fetch(`／不许 `new WebSocket`；③ 用 `config.` 前缀，⛔ 别写成 `panel.`（四枚白名单钉死）。
+
+页面侧（模型页 v3 顺手做）：行内模型区加**"拉取模型列表"**按钮；Go 侧是**同步**调用（预算 ≤10s）⇒ 按钮要有**加载态**；拉到后列 id 供勾选，逐枚走 `model_row_create` 写入（§7 第一行）。
+
+**时序**：前端这一行**先落**即可（按现读，`config.*` 字面量不进 `panel.*` 两道扫描面，落它不会让任何测试变红；此时点按钮会收到"未知方法"的分类拒绝，属预期）→ Go 半（`320-r2`：方法名注册四点＋拉取实现）随其后，两侧合起来 `TestEveryWhitelistedInboundNameIsAlsoSentByThePage` 才绿。

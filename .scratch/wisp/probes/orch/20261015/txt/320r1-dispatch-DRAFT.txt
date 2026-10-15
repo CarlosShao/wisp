@@ -1,0 +1,43 @@
+# 320-r1 派单（票 320 **AC#1/#2/#3 三个写入**：计费模式／自定义供应商行／模型条目；写面＝`internal/config`＋`internal/panel`＋`cmd/wisp` 三半；⛔ 不含 AC#4 拉取端口）
+
+⏳ **预备稿**：2026-10-15 12:0x 编排者写好候场（面被 `319-r2` 占，等它让面后发送；**发送时回填时刻并写 `-send.txt`**）。去重核：`.scratch/wisp/probes/320/` 现只有 `a1`（`320-r1` 未建，可用）。
+
+你 = Wisp 流水线的落地腿 **320-r1**。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 不碰台账）。
+
+## 票、依据与已定稿的形状（**别重新设计**）
+
+- 票：`.scratch/wisp/issues/320-model-page-v3-go-side-three-writes-and-a-fetch-port.md`（通读；**AC#4 不在本腿**）
+- 设计定稿（编排者已复跑核过）：`.scratch/wisp/probes/320/a1/census.md`（**逐节按它做**；行号会烂，action 语义不变）
+- 编排者五裁落账 `A972`＋票尾 bullet（**AC#2 採乙形／方法名 `config.models.list`（本轮不用）／同步 ≤10s（本轮不用）／上游错误体不回显（本轮不用）／AC#5 不落**）。
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+
+## 本轮三格（逐格一笔 commit）
+
+1. **AC#1 `provider_billing` 写入**：字段名定稿；值＝`plan` / `pay-per-token`（字面量读 `internal/config/schema.go` 的 `BillingPlan`/`BillingPayPerToken`，**别抄字符串**）；落 `llm.providers.<name>.billing`；**写前枚举校验**；落 313 名册（`internal/panel/config_write_313.go` 的 `fields313`＋`fields313NeedsProvider`＋`fields313TakesValue` 三 map）＋`internal/config/settings_320.go` 的 `SetProviderBilling`（骑 `settings.go` 的 `writeOneKey`，one-key-per-call）。
+2. **AC#2 自定义供应商行**（乙形，编排者已裁）：字段名 `provider_row_create_custom`；值＝`<protocol>,<base_url>`（逗号连接，链值先例）；可选首枚模型照走 `SettingWrite.Model`（`config_handlers.go:386-411` 现读形状）；`CreateCustomProviderRow` 四条拒：拒预设名（指回 `provider_row_create`）、拒空 base_url、拒枚举外 protocol、拒已存在行；**一次 guarded 写**（行＋可选模型）。
+3. **AC#3 模型条目写入**：字段名 `model_row_create`（无值）；键 `llm.providers.<p>.models.<id>`；ModelSpec 由既有 `applyDefaults` 播种（读现文，别自造默认）；拒未知 provider／已存在条目；复用既有 `model_context_window/price_in/price_out` 三枚（⛔ 别并成一枚新字段——one-key-per-call）。
+
+**同批必改测试**（照 census §1 逐文件）：`internal/panel/config_313_test.go`（`fields313Cases()` **追加**三 case；命名禁令测试读 live 自动覆盖）· `cmd/wisp/panel_config_313_test.go`（并集钉读 live accessor，自动）· `internal/config/settings_313_test.go` 或新 `settings_320_test.go`（三 setter 落地/拒因）· `cmd/wisp/panel_config_store.go` 三枚新 `ApplySetting` case ＋ 其用例（新件 `cmd/wisp/panel_config_320_test.go` 或 313 测试尾追加）。
+
+## 硬钉（碰了＝红，别动）
+
+- `config_route_248_test.go:271-277` 的七枚 `want` **一枚不许动**；`internal/panel/config_route_248_test.go` **整件零改动**（前提＝**不往 `ConfigStore` 加方法**；新字段是字符串常量＋`ApplySetting` case，不加接口方法）。
+- `config.get` 载荷键集冻结（`config_313_test.go:262-324`）——拉取/新字段**不进** config.get 载荷。
+- 新字段名**不带点**（`models.x` 会撞 locked 家族）、**不带审批词**（approve/allow/decide/verdict/outcome/override/bypass…）。
+- ⛔ 不加任何新方法名（那要动 `frontend/**`＝机主外部 agent 面）；⛔ 不碰 `panel.*` 四枚白名单（`git_test.go:383-391`）。
+- ⛔ 不碰：`docs/PLAN.md`／`docs/specs/**`／`internal/risk/**`／`internal/winsec/**`／阈值/golden/`tools/d22scan/allowlist.txt`／`.github/**`／`frontend/**`／`design/**`；冻结三件（`l2_grant_boundary_test.go`／`tokens_fourway_test.go`／`internal/perm/ticket90_persist_test.go`）零改动——**若它们因你的改动变红 ⇒ 停手上报**。
+
+## 门禁与协调
+
+- 门禁：`go build ./...`；gofumpt（`D:\work\base\gopath\bin\gofumpt` v0.12.0）只点你的件；`go vet`；`sh scripts/d22scan.sh` clean；长度门；`go test ./internal/panel/ ./internal/config/` ＋ 相关 `./cmd/wisp/` 用例（`-run` 分段为主）。
+- ⚠ **314 死区**：`./cmd/wisp/` 整包会整进程死亡（已知 2/9 趟）＋默认 10m `-timeout` 会 panic ⇒ 用 `-timeout 40m`、分段 `-run` 为主，**跑前 `tasklist` 自证**。
+- ⚠ 开工前 `git status --porcelain -- cmd/wisp internal/panel internal/config internal/proc`：有**不是你的**未提交改动 ⇒ **停手上报**。
+- 变异/两向三态：AC#7 要求"每格两向三态＋变异自证"——用 `-overlay` 或仓外备份＋sha256＋还原证；**变异不许进 commit**；还原后必须回绿。
+
+## 交件与纪律
+
+- 交件：`docs/evidence/s1/320-go-side-writes-r1.md`（逐格：改了什么/落点/两向三态读数/变异红名逐字/门禁 rc）＋`.scratch/wisp/probes/320/r1/`（读数件 ≤7 枚 ≤200 行）＋票 320 尾**追加 1 条 bullet**（逐格 sha＋具名没做）。
+- 只 commit ⛔ 不 push；`git add`／`commit` 两处**显式 pathspec**；⛔ `add -A`／目录／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删；注释与测试**零 emoji**（含 `≤`/`✓`）。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`；`GOTMPDIR='C:\tmp\wisp320r1gotmp'`（**只反斜杠形**，先自建）。
+- **未定义即停**：census 某处与现读不符／须动硬钉面／须新增方法名 ⇒ 停手上报（写进回执）。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋逐格 sha＋三格读数＋变异逐发红名＋门禁 rc＋面核（`git diff --name-only` 逐枚）＋**具名没做**。
