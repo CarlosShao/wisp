@@ -1,0 +1,27 @@
+# 接手引导（一页纸）— 2026-10-15
+
+> **给新会话**：读这一页 ＋ `docs/reports/HANDOVER.md` §4 **最新那节（4.0dm）** ＋ `docs/reports/pending-and-issues.md` **尾 6 条（A968 起）** ＋ `AGENTS.md` §0/§1/§2/§3。**不需要旧会话的任何历史。**
+> 我是机主；原会话因"上下文太重"卡死（见文末"为什么会卡"）。
+
+## 盘面（2026-10-15 10:5x 现跑）
+- `HEAD=a06c03f3`；`origin/dev` 同步；**未推 0**；**在飞 0 腿**。
+- 桌面：`wisp.exe` PID 40296（机主自用实例，**别 kill**）。
+- 权威状态源：HANDOVER **4.0dm** · 台账 **A969** · `AGENTS.md`。
+
+## 下一步（按序）
+1. **`319-v`**＝验 319-r1 的代提（`e6d1373e`：面板死而能复活＋二次启动唤窗＋三钉 N1/N2/N3）。**代提只跑了**：build／gofumpt（空）／`go vet -tags winlive`／d22scan／长度门／headless 两包。**未跑**：AC#1 三态、AC#2 活体唤窗、N3 真窗、变异两态。⚠ 跑 winlive 前 `tasklist` 自证、勿扰动 `wisp.exe`。
+2. **`320-r1`**＝模型页 v3 Go 侧（**票 320 已获批**：`provider_billing`／自定义供应商行／模型条目写入／`/v1/models` 拉取端口）。设计形状待 `320-a1`（其腿被掐死、零遗产，需**重派**）。⚠ 与 319 同 `cmd/wisp` 面 ⇒ **串行**。
+3. **`135-r1`**＝票 135（128 判据的自证腿；被 319 挤掉的）。
+4. **133 收口**：**AC#6 已可翻**（CI run `38582016056`／job `115914074257`：`TestAC1AC2DispatchHopGate133` **PASS**、四数 `414/301/2/1`）⇒ 翻格＋`-done`＋长度名册同步。
+
+## 铁律速记（全文见 `AGENTS.md`）
+- 派发规格：**写腿 ≥3／总 ≤7／写 ≤4**；CPU ≤70% 就补位。
+- **只推 `origin/dev`**，由编排者做（`A813`）；腿**只 commit 不 push**；`add`/`commit` **两处显式 pathspec**；⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`。
+- 派单**先存档再发**（`.scratch/wisp/probes/orch/20261013/txt/<腿名>-dispatch.txt`＋`-send.txt`）；**派前查重** `ls .scratch/wisp/probes/<票>/`。
+- 收件**三把尺**（提交真在／件真在／自己复跑）；**完成通知一律当未验证**；每收一条腿**立即 `TaskStop`** 结算（防面板残影）。
+- `GOTMPDIR` **只反斜杠形** `C:\tmp\...`；`PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（缺它 `0xc0000135`）。
+- **报告结尾必带「你需要做什么」栏**（没有就写"没有"）。
+- 陷阱：**314 死区**（`cmd/wisp` 整包会整进程死亡，别当主证；`-count=2 -v` 撞 10m timeout ⇒ 用 `-timeout 40m`）；**别关面板窗口**（关了＝界面打不开，需杀进程重拉）；`frontend/**`＋`design/**` 归机主外部 agent（零写面）；⛔ 别碰别家腿的半成品（现盘：`.scratch/wisp/probes/152/my152.py`、`268/v1/evidence.md`）。
+
+## 为什么会卡（给新会话的背景，免得重蹈）
+本会话跑了 20+ 小时、上百次工具调用、数轮压缩，**每次发言都要把全部历史重新发给模型**，而"压缩上下文"这一步本身也要把全部历史再送一遍 ⇒ 请求体极大 ⇒ 表现为"发消息不回、不报错、压缩半天没反应"。**新会话历史为空 ⇒ 秒回。** ⇒ 处理方式：**换新会话接手**，本会话别再尝试压缩。
