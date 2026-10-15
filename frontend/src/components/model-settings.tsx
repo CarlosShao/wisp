@@ -719,6 +719,26 @@ function AddProviderForm({
   };
   const vendorKey = customName.trim().split("-")[0]?.toLowerCase() ?? "";
   const altEndpoint = KNOWN_ALT_ENDPOINTS[vendorKey];
+  // "COMMON SECOND ROWS": the vendors that are already configured AND have a
+  // known second endpoint. The preset picker above is filtered to vendors the
+  // operator has NOT added yet (a preset row cannot be added twice), which reads
+  // as "stepfun is missing" to anyone who already has a stepfun row - so the
+  // second-billing-entry case is offered here by name instead of hiding behind a
+  // picker entry that is deliberately absent.
+  const takenAll = (presets ?? []).filter((name) => !(available ?? []).includes(name));
+  const takenVendors = takenAll.filter((name) => KNOWN_ALT_ENDPOINTS[name.toLowerCase()]);
+  const secondRows = takenVendors.map((name) => {
+    const alt = KNOWN_ALT_ENDPOINTS[name.toLowerCase()];
+    return { name: `${name}-api`, label: alt.label, base: alt.base, vendor: name };
+  });
+
+  function prefillSecondRow(row: { name: string; base: string }) {
+    setSelectedMode("自定义接入");
+    setCustomName(row.name);
+    setProtocol("openai-chat");
+    setCustomBase(row.base);
+    setBilling(BILLING[1]);
+  }
 
   function submit() {
     const keyValue = keyInputRef.current?.value ?? "";
@@ -814,7 +834,28 @@ function AddProviderForm({
                 value={provider}
               />
             )}
+            <span className="text-[11px] text-ink-3">
+              这里只列还没添加过的内置供应商；同一家要第二行请用下面那条
+            </span>
           </div>
+          {takenAll.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] text-ink-3">已添加：{takenAll.join("、")}</span>
+            </div>
+          ) : null}
+          {secondRows.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2 rounded-control bg-surface/60 px-2 py-1.5">
+              <span className={rowLabel}>常用第二行</span>
+              {secondRows.map((row) => (
+                <Button key={row.name} onClick={() => prefillSecondRow(row)} size="xs" variant="quiet">
+                  加一行 {row.name}（{row.label}）
+                </Button>
+              ))}
+              <span className="text-[11px] text-ink-3">
+                同一厂商两行并存：各用各的基址、各拉各的模型清单
+              </span>
+            </div>
+          ) : null}
           {provider !== "" && KNOWN_ALT_ENDPOINTS[provider.toLowerCase()] ? (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] text-ink-3">
@@ -822,13 +863,12 @@ function AddProviderForm({
                 ——同一厂商两行并存时，两行各有各的基址与模型目录：
               </span>
               <Button
-                onClick={() => {
-                  setSelectedMode("自定义接入");
-                  setCustomName(`${provider}-api`);
-                  setProtocol("openai-chat");
-                  setCustomBase(KNOWN_ALT_ENDPOINTS[provider.toLowerCase()].base);
-                  setBilling(BILLING[1]);
-                }}
+                onClick={() =>
+                  prefillSecondRow({
+                    name: `${provider}-api`,
+                    base: KNOWN_ALT_ENDPOINTS[provider.toLowerCase()].base,
+                  })
+                }
                 size="xs"
                 variant="quiet"
               >
