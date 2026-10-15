@@ -1,0 +1,30 @@
+## AC#3 model_row_create: seeded entry, two refusals, the leaf fields it unblocks
+cmd: go test ./internal/config/ -run Test320CreateModelRow -v
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_undeclared_provider
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_entry_that_already_exists
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/no_model_id_at_all
+--- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice (0.03s)
+    --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_undeclared_provider (0.00s)
+    --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_entry_that_already_exists (0.00s)
+    --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/no_model_id_at_all (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/config	0.059s
+
+cmd (attempt 1): go test ./cmd/wisp/ -run Test320ModelRowCreateThroughTheRealLeg -v
+=== RUN   Test320ModelRowCreateThroughTheRealLeg
+--- PASS: Test320ModelRowCreateThroughTheRealLeg (0.02s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.103s
+note: the FIRST capture of this command (13:59) answered rc=1 with NO --- FAIL line (the process died before naming one; the ./cmd/wisp flake the dispatch already names). Both captures below are rc=0 with the PASS line verbatim:
+cmd (retry, same args): 
+=== RUN   Test320ModelRowCreateThroughTheRealLeg
+--- PASS: Test320ModelRowCreateThroughTheRealLeg (0.02s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.103s
+
+states asserted:
+  S1 accept  deepseek + new id -> section on disk, enabled=true / billing=pay-per-token from the default tags (not zero values)
+  S2 accept  the entry then takes context_window=128000 and price.in=1500000 through the existing three fields
+  S3 refuse  ghostco -> reason 2 (行不存在), file byte-identical
+  S4 refuse  existing deepseek-chat -> sentence says already exists
+  S5 refuse  empty model id -> reason 2 (行不存在)
+  S6 control second entry -> lands, first entry's leaves untouched
+  S7 read side -> config.get lists both entries in order (deepseek-chat then the new one)

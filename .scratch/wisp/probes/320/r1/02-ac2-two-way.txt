@@ -1,0 +1,32 @@
+## AC#2 provider_row_create_custom: one guarded write, five refusals, real leg
+cmd: go test ./internal/config/ -run Test320CreateCustomProviderRow -v
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/a_preset_name_belongs_to_provider_row_create
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/an_empty_base_url
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/a_protocol_outside_the_enum
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/a_row_the_config_already_declares
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/no_name_at_all
+--- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName (0.02s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/a_preset_name_belongs_to_provider_row_create (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/an_empty_base_url (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/a_protocol_outside_the_enum (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/a_row_the_config_already_declares (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/no_name_at_all (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/config	0.055s
+
+cmd: go test ./cmd/wisp/ -run Test320CustomProviderRowThroughTheRealLeg -v
+=== RUN   Test320CustomProviderRowThroughTheRealLeg
+--- PASS: Test320CustomProviderRowThroughTheRealLeg (0.04s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.132s
+
+states asserted:
+  S1 accept  local-gw + first model -> section + protocol + base_url + model entry on disk, one receipt key (llm.providers.local-gw)
+  S2 accept  provider-only (no model) -> row landed, catalog empty (control)
+  S3 refuse  preset name stepfun -> sentence names provider_row_create, file byte-identical
+  S4 refuse  empty base_url -> sentence names base_url
+  S5 refuse  protocol grpc -> sentence names protocol
+  S6 refuse  existing non-preset row -> sentence says already exists
+  S7 refuse  empty name -> reason 2 (行不存在)
+  S8 real leg value 'openai-chat, http://127.0.0.1:8080/v1' -> comma split + both halves trimmed
+  S9 read side -> config.get payload carries the row with modelCount=1 and hasBaseURL=true
+  S10 control local-gw-four (openai-responses) -> lands after the two real-leg refusals

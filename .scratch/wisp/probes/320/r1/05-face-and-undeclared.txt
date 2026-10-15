@@ -1,0 +1,76 @@
+# 320-r1 face sweep + baseline comparison + named-not-done
+date=2026-10-15 14:00:50 +0800
+
+## face: every path each commit touched (git diff --name-only per sha)
+--- a2d29798 ---
+cmd/wisp/panel_config_320_test.go
+cmd/wisp/panel_config_store.go
+internal/config/settings_320.go
+internal/config/settings_320_test.go
+internal/panel/config_313_test.go
+internal/panel/config_write_313.go
+--- a920c4d4 ---
+cmd/wisp/panel_config_320_test.go
+cmd/wisp/panel_config_store.go
+internal/config/settings_320.go
+internal/config/settings_320_test.go
+internal/panel/config_313_test.go
+internal/panel/config_write_313.go
+--- 84fc3f20 ---
+cmd/wisp/panel_config_320_test.go
+cmd/wisp/panel_config_store.go
+internal/config/settings_320.go
+internal/config/settings_320_test.go
+internal/panel/config_313_test.go
+internal/panel/config_write_313.go
+--- 527d483f ---
+cmd/wisp/panel_config_320_test.go
+internal/config/settings_320_test.go
+
+## frozen / hard-pinned files: zero change across 33e429c1..HEAD
+git diff --name-only 33e429c1..HEAD -- internal/panel/l2_grant_boundary_test.go
+  internal/panel/tokens_fourway_test.go internal/perm/ticket90_persist_test.go
+  internal/panel/config_route_248_test.go cmd/wisp/panel_config_313_test.go
+  internal/panel/config_handlers.go internal/panel/bridge.go
+  internal/panel/composer_dispatch.go internal/panel/inbound_roster_253_test.go
+  frontend design docs/PLAN.md docs/specs tools/d22scan/allowlist.txt .github
+output: (empty - zero paths)
+note: the same range also carries .github/workflows/ci.yml, but NOT from this leg -
+      757f08fc (orchestrator's ticket-111 close-out, comment-only) is the commit that
+      touched it; this leg's four commits touch no path outside the six below.
+## my three packages across the whole range: only this leg's six files
+git diff --name-only 33e429c1..HEAD -- cmd/wisp internal/panel internal/config
+cmd/wisp/panel_config_320_test.go
+cmd/wisp/panel_config_store.go
+internal/config/settings_320.go
+internal/config/settings_320_test.go
+internal/panel/config_313_test.go
+internal/panel/config_write_313.go
+
+## internal/panel full package: leg tree vs 33e429c1 overlay, same run args
+with leg (HEAD 527d483f):
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.25s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.59s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+FAIL	github.com/CarlosShao/wisp/internal/panel	6.633s
+with overlay (leg files -> 33e429c1):
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.26s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.58s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+FAIL	github.com/CarlosShao/wisp/internal/panel	9.832s
+
+## cmd/wisp: the window-bearing 255 receipt segment dies whole-process BOTH ways (known flake)
+with leg:      rc=1, no --- FAIL line, last log MARK299 wndproc (dead at ~21s)
+overlay HEAD:  rc=1, no --- FAIL line, same place (dead at ~23s)
+window-free segment with the leg (313/320 + 255 roster scan + 248 credential): rc=0
+
+## named-not-done (this leg)
+  AC#4 fetch port: NOT built (320-r2 owns it; frontend literal must land first).
+  AC#5 preset model catalog: NOT landed (ruler A972 #5: do not land).
+  config.models.list / any new socket name: NOT added (no new method by design).
+  Inbound roster 253 counters: NOT touched (no new method).
+  docs/PLAN.md, docs/specs, thresholds, golden, allowlist, .github, frontend, design: NOT touched.

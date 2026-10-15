@@ -1,0 +1,17 @@
+## AC#1 provider_billing: two directions, three states (config setter = the write; real leg = the door)
+cmd: go test ./internal/config/ -run Test320SetProviderBilling -v
+=== RUN   Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers
+--- PASS: Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers (0.02s)
+ok  	github.com/CarlosShao/wisp/internal/config	0.051s
+
+cmd: go test ./cmd/wisp/ -run Test320ProviderBillingThroughTheRealLeg -v
+=== RUN   Test320ProviderBillingThroughTheRealLeg
+--- PASS: Test320ProviderBillingThroughTheRealLeg (0.03s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.118s
+
+states asserted (all in the two tests above):
+  S1 accept  plan          -> llm.providers.deepseek.billing on disk, read back the way LoadFile reads
+  S2 accept  pay-per-token -> second enum word, then a REAL change (file carried plan)
+  S3 refuse  flat-rate     -> sentence names billing, file byte-identical, NOT the whole-file gate (no refusalInvalid tag)
+  S4 refuse  ghostco       -> reason 2 (行不存在), file byte-identical
+  S5 control deepseek+plan -> still writes after both refusals

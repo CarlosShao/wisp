@@ -1,0 +1,74 @@
+# 320-r1 mutation self-proof: five overlays, red names verbatim, tree untouched
+# tooling: go test -overlay=<mutant overlay>  (mutant bodies live outside the repo,
+# under D:\work\tmp\wisp320r1\mutants\; the working tree was never written to)
+date=2026-10-15 14:0x +08
+
+## M1  AC#1: the billing assignment becomes a no-op (p.Billing = p.Billing)
+file=internal/config/settings_320.go
+cmd= go test -overlay=.../m1_settings_320.overlay.json ./internal/config/ -run Test320SetProviderBilling
+--- FAIL: Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers (0.01s)
+    settings_320_test.go:29: written key paths = [], want [llm.providers.deepseek.billing]
+    settings_320_test.go:32: the billing mode never reached the file: ""
+    settings_320_test.go:40: billing = "", want "pay-per-token"
+cmd= go test -overlay=.../m1_settings_320.overlay.json ./cmd/wisp/ -run Test320ProviderBillingThroughTheRealLeg
+--- FAIL: Test320ProviderBillingThroughTheRealLeg (0.02s)
+    panel_config_320_test.go:45: receipt does not name "llm.providers.deepseek.billing":
+      "设置已写入。 本次没有任何键路径发生变化（文件里已经是这个值）。 这一项要重启进程并重新运行才算用上（同一次运行里模型通路不会重建）。"
+    panel_config_320_test.go:48: config.toml does not carry the billing mode:
+    panel_config_320_test.go:72: receipt does not name "llm.providers.deepseek.billing": (same sentence)
+    panel_config_320_test.go:75: the control write did not land:
+
+## M1b AC#1: the field's own enum pre-check is neutered (isBillingMode returns "non-empty")
+file=internal/config/settings_320.go
+cmd= go test -overlay=.../m1b_settings_320.overlay.json ./internal/config/ -run Test320SetProviderBilling
+FIRST READING (before this leg's strengthening commit 527d483f): ok - the value was
+still refused by validate(), the second gate, and its sentence also contains "billing".
+That is why 527d483f added the layer assertion. AFTER it:
+--- FAIL: Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers (0.03s)
+    settings_320_test.go:60: the out-of-enum value reached the whole-file gate instead of the
+      field's own pre-check: config: config: refused to write llm.providers.deepseek.billing;
+      the value would not survive validation, so config.toml is unchanged。第 3 种拒因：校验不过：
+      值本身过不了这份 schema 的校验，这一行要改的是值；文件一个字节都没动。:
+      config: config.toml: llm.providers.deepseek.billing "flat-rate" must be one of pay-per-token|plan
+
+## M2  AC#2: the preset-name refusal is deleted from CreateCustomProviderRow
+file=internal/config/settings_320.go
+cmd= go test -overlay=.../m2_settings_320.overlay.json ./internal/config/ -run Test320CreateCustomProviderRow
+--- FAIL: Test320CreateCustomProviderRowLandsAndRefusesByName (0.03s)
+    --- FAIL: .../a_preset_name_belongs_to_provider_row_create (0.00s)
+        settings_320_test.go:152: the create was accepted (reported [llm.providers.stepfun])
+    --- FAIL: .../an_empty_base_url ... "config.toml changed under a refused create"
+    --- FAIL: .../a_protocol_outside_the_enum ... same
+    --- FAIL: .../a_row_the_config_already_declares ... same
+    --- FAIL: .../no_name_at_all ... same
+    (the four later subtests cascade: the mutant let the preset row land first, so the
+     shared file the subtests compare against had already moved - the first red is the
+     one that names the missing refusal)
+
+## M2b AC#2: the leg splits the row value on ';' instead of ',' (strings.Cut)
+file=cmd/wisp/panel_config_store.go
+cmd= go test -overlay=.../m2b_panel_config_store.overlay.json ./cmd/wisp/ -run Test320CustomProviderRowThroughTheRealLeg
+--- FAIL: Test320CustomProviderRowThroughTheRealLeg (0.02s)
+    panel_config_320_test.go:109: config.set was refused: config: config: 建 [llm.providers.local-gw]
+      的值必须是「协议,base_url」两半，base_url 空着不会被写成默认：第 2 种拒因：行不存在
+
+## M3  AC#3: the entry is seeded from zero values instead of the default tags
+file=internal/config/settings_320.go
+cmd= go test -overlay=.../m3_settings_320.overlay.json ./internal/config/ -run Test320CreateModelRow
+--- FAIL: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice (0.04s)
+    settings_320_test.go:197: the created entry is not enabled: an entry without enabled=true
+      is treated as off and is refused at start-up
+    settings_320_test.go:200: the entry's billing = "", want the schema's own default
+
+## restore proof (mutants never entered the tree; no amend/reset was used)
+git status --porcelain -- <the six leg files>            -> empty
+sha256 (final tree, after commit 527d483f):
+  13747b5df05c898e16eae6f492ec884d16a7af8830f4880fc5337489e8173d6e  internal/config/settings_320.go
+  895cbfaed7ae5c5530488b786347f84951d4511705b86f2c19230e2267aa26ca  internal/config/settings_320_test.go
+  66fdda0e869feca5d5f4afc5350240c4acec05d2cdde828b3cc1eeb5663f4490  internal/panel/config_write_313.go
+  20a7636e3682592f71a3ed8d963d8546e1c9c38eb63a96d83c90b6a1025f8320  internal/panel/config_313_test.go
+  172fad3b1d9b3f60fee1cf812c754582432c1b1913c7f796b56bf5ca85c48110  cmd/wisp/panel_config_store.go
+  8c7ce9b3865abed5e1415432474d36be2835d633091cdfe5631f5cc0492016de  cmd/wisp/panel_config_320_test.go
+green re-runs without any overlay (restored state):
+  go test ./internal/config/ -run 'Test320SetProviderBilling|Test320CreateCustomProviderRow|Test320CreateModelRow'  -> ok
+  go test ./cmd/wisp/ -run 'Test320'                                                                                 -> ok
