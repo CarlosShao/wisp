@@ -1,0 +1,17 @@
+### bash -n every scripts/*.sh + tools/d22scan/runtests.sh (HEAD 2ad0aa86)
+bash -n scripts/check-path-length-budget.sh rc=0
+bash -n scripts/d22scan.sh rc=0
+bash -n scripts/portable-tests-selftest.sh rc=0
+bash -n scripts/portable-tests.sh rc=0
+bash -n scripts/slo-freshness.sh rc=0
+bash -n scripts/winsec-tests.sh rc=0
+bash -n scripts/wisp-cli-tests.sh rc=0
+bash -n tools/d22scan/runtests.sh rc=0
+
+### python yaml.safe_load .github/workflows/ci.yml - declared steps per job
+lint 13 steps
+test-core 7 steps
+test-windows 10 steps
+slo-smoke 6 steps
+slo-full 5 steps
+lint-frontend 11 steps

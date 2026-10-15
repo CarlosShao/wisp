@@ -1,0 +1,63 @@
+### ci.yml new-step pins (name/if/run) at HEAD 2ad0aa86
+### ci.yml new-step triple (name/if/run), HEAD 2ad0aa86
+342:      - name: "Portable tests carrier self-test (ticket 111 AC#3 - GUARD D's positive control)"
+395:        run: bash scripts/portable-tests-selftest.sh
+487:        run: bash scripts/portable-tests.sh --scope=core
+623:      - name: "winlive compile gate (go vet -tags winlive, ticket 111 AC#11)"
+672:        run: go vet -tags winlive ./cmd/wisp/ ./internal/ball/
+674:      - name: "Package coverage census (ticket 111 AC#1 + GUARD D)"
+761:        run: bash scripts/portable-tests.sh --scope=census
+797:        run: bash scripts/portable-tests.sh --scope=windows
+### all step-level if: lines (any leading whitespace)
+81:        if: ${{ !cancelled() }}
+106:        if: ${{ !cancelled() }}
+136:        if: ${{ !cancelled() }}
+169:        if: ${{ !cancelled() }}
+173:        if: ${{ !cancelled() }}
+239:        if: ${{ !cancelled() }}
+243:        if: ${{ !cancelled() }}
+247:        if: ${{ !cancelled() }}
+301:        if: ${{ !cancelled() }}
+338:        if: ${{ !cancelled() }}
+394:        if: ${{ !cancelled() }}
+431:        if: ${{ !cancelled() }}
+435:        if: ${{ !cancelled() }}
+461:        if: ${{ !cancelled() }}
+486:        if: ${{ !cancelled() }}
+490:        if: always()
+550:        if: ${{ !cancelled() }}
+588:        if: ${{ !cancelled() }}
+598:        if: ${{ !cancelled() }}
+620:        if: ${{ !cancelled() }}
+671:        if: ${{ !cancelled() }}
+760:        if: ${{ !cancelled() }}
+796:        if: ${{ !cancelled() }}
+821:        if: ${{ !cancelled() }}
+839:        if: ${{ !cancelled() }}
+846:        if: ${{ !cancelled() }}
+850:        if: ${{ !cancelled() }}
+979:        if: ${{ !cancelled() }}
+983:        if: ${{ !cancelled() }}
+987:        if: ${{ !cancelled() }}
+994:        if: ${{ !cancelled() }}
+998:        if: ${{ !cancelled() }}
+1012:        if: ${{ !cancelled() }}
+1025:        if: ${{ !cancelled() }}
+1031:        if: ${{ !cancelled() }}
+1039:        if: ${{ !cancelled() }}
+
+### run 38676514264 conclusion proof: lint job 116231259522 steps 8-14 (8/9 failure, 12 failure) and test-windows job 116231259514 steps 7-11 (7 failure)
+7	failure	cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)
+8	success	winlive compile gate (go vet -tags winlive, ticket 111 AC#11)
+9	success	Package coverage census (ticket 111 AC#1 + GUARD D)
+10	failure	Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
+11	success	PathResolver junction placeholder (real cases tickets 18/20)
+--- lint:
+8	failure	gofmt (gofumpt)
+9	failure	gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)
+12	failure	staticcheck
+13	success	mockllm module vet
+14	success	Portable tests carrier self-test (ticket 111 AC#3 - GUARD D's positive control)
+
+### pre-fix shape (ticket record, run 35600043583): step4 failure -> step5..8 skipped; and 111-c1 census: go vet (module)/gofmt-denominator 12/12 skipped before the guard sweep
+recorded on ticket 111 Progress log 2026-09-21 21:4x / 10-08 11:0x (111-c1 ci-colours.md Q5/N5/N6)
