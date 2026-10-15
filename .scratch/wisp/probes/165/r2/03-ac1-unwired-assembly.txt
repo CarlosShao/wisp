@@ -1,0 +1,22 @@
+165-r2 AC#1 未修码读数·尺 b 与 c（装配可达／批准只批这一批），量于接线之前
+ruler: go test ./cmd/wisp/ -run 'Test165r2' -v -count=1
+射程: 真装配（newReplyHost -> runTextTask -> assembleRuntime）里的 bridge.Registry()/bridge.Tools()/真确认卡/真 tool_call 行/真会话授权表
+env: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\165r2gotmp ＋ PATH 前置母仓 third_party/sherpa-onnx 与 build（票 98 那枚 0xc0000135 黑洞的解法）
+HEAD: 29be2b67  date: 2026-10-15 22:22:16 +0800
+--- 逐字输出（只留判定行与颜色行，日志全文同批留 /d/tmp/165r2-ac1-unwired.log）---
+=== RUN   Test165r2AssembledBridgeReachesPlanPresent
+    plan_assembled_165r2_test.go:151: 接线 RED：生产装配的 registry 里没有 plan.present；名册 9 枚：[fs.edit fs.list fs.move fs.read fs.trash fs.write task.cancel task.output task.spawn]（这正是开工前 AC#1 的未修码形状：这份清单在 wisp run 里够不到）
+--- FAIL: Test165r2AssembledBridgeReachesPlanPresent (11.60s)
+=== RUN   Test165r2UnlistedWriteRingsItsOwnCardAfterAnApprovedPlan
+    plan_assembled_165r2_test.go:226: 接线 RED：批方案那一发没升起卡（回文="未知工具 plan.present，可用工具见 list_tools"）⇒ 装配里没有这一发，c) 的后续读不到
+--- FAIL: Test165r2UnlistedWriteRingsItsOwnCardAfterAnApprovedPlan (12.24s)
+=== RUN   Test165r2PlanWiringCallSiteCensus
+--- FAIL: Test165r2PlanWiringCallSiteCensus (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	23.921s
+FAIL
+rc=1
+--- 判读 ---
+registry 名册 9 枚＝[fs.edit fs.list fs.move fs.read fs.trash fs.write task.cancel task.output task.spawn]，零枚 plan 形；
+把这一发真打一遍的回文＝「未知工具 plan.present，可用工具见 list_tools」，且没升起任何卡 ⇒ 未修码「只读地出一份方案」这一发到不了，本票成立（不是推断，是量来的）。
+write rc=0

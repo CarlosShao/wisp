@@ -1,0 +1,43 @@
+165-r2 AC#4（面板不许代答／只加发起请求的出口）读数
+date: 2026-10-15 22:36:05 +0800
+== 尺 1：现跑两包边界钉（射程＝按名点定向 -run，⛔ 整包）==
+cmd: go test ./internal/tools/ -run 'Test165...(五枚)' -count=1 -v
+rc=0
+--- PASS: Test165UnmodifiedRosterHasNoPlanTool (0.00s)
+--- PASS: Test165PlanPresentAsksThroughTheExistingL2Card (0.00s)
+--- PASS: Test165PlanApprovalRingsAgainForAnUnlistedWrite (0.03s)
+--- PASS: Test165ScopeClauseNamesTheBatch (0.00s)
+--- PASS: Test165PlanPresentAddsNoAllowExit (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/tools	0.102s
+--- PASS: TestAnsweredPanelRoutesCarryNoApprovalDecision (0.01s)
+--- PASS: TestRealGuardRefusesEveryAssemblableApprovalRouteName (0.00s)
+cmd: go test ./internal/panel/ -run 'TestAnsweredPanelRoutesCarryNoApprovalDecision|TestNoInboundEnvelopeCanBindAnApprovalVerdict|TestRealGuardRefusesEveryAssemblableApprovalRouteName|TestGrantWireShapesAreRefusedAtTheDoor' -count=1 -v
+rc=0
+--- PASS: TestAnsweredPanelRoutesCarryNoApprovalDecision (0.01s)
+--- PASS: TestRealGuardRefusesEveryAssemblableApprovalRouteName (0.00s)
+--- PASS: TestNoInboundEnvelopeCanBindAnApprovalVerdict (0.01s)
+--- PASS: TestGrantWireShapesAreRefusedAtTheDoor (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/panel	0.093s
+
+== 尺 2：本腿新增行里有没有「给出允许」的出口（射程＝git diff -- cmd/wisp/run.go 的 + 行）==
+含 allow/approve/grant 字面的新增行枚数：2
+19:+	// kind, no new answer channel, no allow exit. The entry declares L2, so the
+22:+	// Nothing here mints a grant: ticket 224's grantRead stays the one place a
+其中作为*调用*（不是注释散文）的枚数：0
+本腿新增行里出现的非注释代码行（射程＝+ 行去掉注释）：
+++ b/cmd/wisp/run.go
+	for _, e := range tools.BuiltinPlanEntries() {
+		if err := reg.Register(e); err != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
+			return rt, 2
+		}
+	}
+
+rc=0
+
+== 判读 ==
+① 三枚产码行就是那一块 for-range＋reg.Register＋错误回口，与先例 subagent 块同形：注册的入口是「发起请求」那一条（L2 声明走现成 C18 卡），零枚答复出口；
+② allow/approve/grant 那 2 行全在注释散文里（写的是「no allow exit」「grantRead stays the one place」），非注释代码行里 0 枚；
+   （上面「非注释代码行」那一档里第一行 `++ b/cmd/wisp/run.go` 是 diff 抬头，不是产码行，尺没剥它，读数按后五行看。）
+③ internal/panel 四枚冻结边界钉（ban #6 家族）同发 rc=0＝面板路线仍不许代答，本腿没往里加任何答复通道（internal/panel 零字节，见 08 件）；
+④ 装配级正面读数在 04 件与 c) 用例里：清单那一发升的是卡、答的是原生侧 yes，面板侧本腿零出口。

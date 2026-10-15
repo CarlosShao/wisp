@@ -1,0 +1,25 @@
+165-r2 门禁基线（改码之前，本腿现跑）
+date: 2026-10-15 22:11:36 +0800  HEAD: e64294a0
+env: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\165r2gotmp（先 mkdir -p 已做）
+env: PATH 前置母仓绝对路径 $PWD/third_party/sherpa-onnx 与 $PWD/build（票 98 那枚 0xc0000135 黑洞的解法，HANDOVER:708）
+sherpa dll 枚数: 3
+build dll 枚数: 3
+== go build ./... ==
+rc=0
+== gofmt -l cmd internal ==
+cmd\wisp\models.go
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+internal\tools\task_output_pointer_notice_errtext_174r7_test.go
+rc=0
+== gofumpt -l cmd internal ==
+cmd\wisp\models.go
+cmd\wisp\panel_transport_35r2_test.go
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+internal\tools\task_output_pointer_notice_errtext_174r7_test.go
+rc=0
+== go vet -tags winlive ./cmd/wisp/ ==
+rc=0

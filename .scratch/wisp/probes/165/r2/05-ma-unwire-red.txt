@@ -1,0 +1,22 @@
+165-r2 正控 M-A·第一发＝明知该红的定向突变红（物理摘掉 run.go 那一整块 range，⛔ -overlay）
+date: 2026-10-15 22:30:39 +0800
+ruler: go test ./cmd/wisp/ -run 'Test165r2' -v -count=1
+射程: cmd/wisp 三枚 165r2 用例；突变面＝cmd/wisp/run.go 我写的那 29 行（本腿写面内）
+突变落法: 先落仓外快照 /d/tmp/165r2-snap-a/run.go.wired（sha256 7f28db4f...），再用编辑工具把那 29 行整块摘掉；
+        下面这枚 sha 是【摘除之后又已还原】的当前文件（还原证明见 06 件），摘除态那发的文件已不在盘上，
+        它的证据是本件这三行红句与 --- FAIL 名册，⛔ 拿 sha 冒充摘除态。
+7f28db4fa8c47147d1a2a2110c1387db1ba7d898376d941ac61f579126ee6eb9 *cmd/wisp/run.go
+--- 三枚红句首行逐字 ---
+    plan_assembled_165r2_test.go:159: 接线 RED：生产装配的 registry 里没有 plan.present；名册 9 枚：[fs.edit fs.list fs.move fs.read fs.trash fs.write task.cancel task.output task.spawn]（这正是开工前 AC#1 的未修码形状：这份清单在 wisp run 里够不到）
+    plan_assembled_165r2_test.go:234: 接线 RED：批方案那一发没升起卡（回文="未知工具 plan.present，可用工具见 list_tools"）⇒ 装配里没有这一发，c) 的后续读不到
+    plan_wiring_165r2_test.go:187: 阳性对照成立：cmd/wisp/run.go:783 range=true register=true 是已接形状（range＋Register）⇒ 尺读得出「接上了」这一形
+    plan_wiring_165r2_test.go:191: 接线 RED：tools.BuiltinPlanEntries 在 internal/ 与 cmd/ 的产码里调用点 0 枚，要 1 枚（cmd/wisp/run.go 的装配那一处）；命中清单＝[]（0 枚＝写了没接线那一族，plan.present 在生产装配里根本够不到）
+--- 颜色与 rc ---
+--- FAIL: Test165r2AssembledBridgeReachesPlanPresent (11.62s)
+--- FAIL: Test165r2UnlistedWriteRingsItsOwnCardAfterAnApprovedPlan (11.24s)
+--- FAIL: Test165r2PlanWiringCallSiteCensus (0.42s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	23.368s
+FAIL
+rc=1
+判读: 三把尺同发全红＝接线由这三把尺担着，摘掉就响；阳性对照（先例 subagent 1 枚）仍绿＝红不是尺坏了。

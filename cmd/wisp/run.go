@@ -797,6 +797,35 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		}
 	}
 
+	// plan.present (ticket 165, 甲路; this is the assembly half 165-r1's ticket
+	// tail named as owed) is registered from tools.BuiltinPlanEntries in exactly
+	// the loop shape above it, and for the same reason the subagent family is a
+	// separate builder: the plan family needs no host dependency - no roster, no
+	// canonicalizer, no file handle - so this root owes it nothing but the call.
+	//
+	// WHAT THIS HOP IS THE ONLY WAY TO GET: internal/tools holds the tool and its
+	// five cases, and those cases build their own roster (plan_present_165_test.go
+	// appends the family by hand). A tool nobody registers here is compiled,
+	// vetted and green while the model cannot knock on the door - the "written but
+	// never wired" family this repository names, and the reason the register call,
+	// not the builder, is the thing under test (cmd/wisp/plan_wiring_165r2_test.go
+	// counts call sites, cmd/wisp/plan_assembled_165r2_test.go drives the call
+	// through THIS assembly).
+	//
+	// WHAT IT DOES NOT ADD, and that is the security half of the frozen row
+	// (PLAN.md:2567 / SPEC-07 §3:73, L2 + resident): no new state, no new card
+	// kind, no new answer channel, no allow exit. The entry declares L2, so the
+	// EXISTING C18 route - D43 #17/#23/#24/#25 over the gate assembled above - is
+	// what answers this call, and the click covers only the batch on the card.
+	// Nothing here mints a grant: ticket 224's grantRead stays the one place a
+	// session authorization enters the decision chain.
+	for _, e := range tools.BuiltinPlanEntries() {
+		if err := reg.Register(e); err != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
+			return rt, 2
+		}
+	}
+
 	// The answer side, last - so a reply can never arrive at a half-built
 	// runtime (ticket 201). With no reply source this is a no-op and the run
 	// keeps the posture it had before the field existed: cards get shown, nobody

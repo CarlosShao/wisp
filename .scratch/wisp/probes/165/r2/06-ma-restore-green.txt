@@ -1,0 +1,11 @@
+165-r2 正控 M-A·第二发＝还原后绿＋还原证明（本腿自己算的，⛔ 抄别人的 hash 串）
+date: 2026-10-15 22:30:59 +0800
+ruler-1: sha256sum 当前 cmd/wisp/run.go vs 仓外快照 run.go.wired
+7f28db4fa8c47147d1a2a2110c1387db1ba7d898376d941ac61f579126ee6eb9 *cmd/wisp/run.go
+7f28db4fa8c47147d1a2a2110c1387db1ba7d898376d941ac61f579126ee6eb9 */d/tmp/165r2-snap-a/run.go.wired
+ruler-2: git diff --numstat -- cmd/wisp/run.go（删除列必须 0，新增列＝我那 29 行）
+29	0	cmd/wisp/run.go
+ruler-3: go test ./cmd/wisp/ -run 'Test165r2' -count=1（还原后重跑）
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.874s
+rc=0（上一行是那发的终态行；本腿记的 rc 见 04/06 两件同形）
+判读: 三把尺同发回绿＝M-A 的红是那一块造成的，不是环境；还原＝逐字节回到摘除前那一发（sha 前 64 位逐位相等）。

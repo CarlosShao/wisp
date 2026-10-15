@@ -1,0 +1,20 @@
+165-r2 AC#1 未修码读数·尺 a（调用点枚数尺）
+date: (见 00 件起手时刻) 量于接线之前，HEAD 见下
+ruler: go test ./cmd/wisp/ -run 'Test165r2PlanWiringCallSiteCensus' -v -count=1
+射程: internal/ 与 cmd/ 的全部 .go，剥 _test.go 与 /testdata/（go/ast 逐文件解析）
+env: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\165r2gotmp ＋ PATH 前置母仓 third_party/sherpa-onnx 与 build
+HEAD: 29be2b67
+--- 逐字输出 ---
+time=2026-10-15T22:21:51.446+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test165r2PlanWiringCallSiteCensus
+    plan_wiring_165r2_test.go:187: 阳性对照成立：cmd/wisp/run.go:783 range=true register=true 是已接形状（range＋Register）⇒ 尺读得出「接上了」这一形
+    plan_wiring_165r2_test.go:191: 接线 RED：tools.BuiltinPlanEntries 在 internal/ 与 cmd/ 的产码里调用点 0 枚，要 1 枚（cmd/wisp/run.go 的装配那一处）；命中清单＝[]（0 枚＝写了没接线那一族，plan.present 在生产装配里根本够不到）
+--- FAIL: Test165r2PlanWiringCallSiteCensus (0.34s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.422s
+FAIL
+test rc=1
+--- 判读 ---
+阳性对照（先例 BuiltinSubagentEntries）＝1 枚，cmd/wisp/run.go:783，range=true register=true ⇒ 尺不瞎；
+tools.BuiltinPlanEntries 产码调用点＝0 枚 ⇒ 未接线成立：这份清单在生产装配里够不到（本票 AC#1 的那一发＝做不到）。
+write rc=0

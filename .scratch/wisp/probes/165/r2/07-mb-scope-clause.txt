@@ -1,0 +1,49 @@
+165-r2 AC#3② 两发变异（台件＝仓外快照树 /d/tmp/165r2-snap-b/repo，⛔ 母仓 internal/tools 零字，287-r1 在那棵面写）
+date: 2026-10-15 22:34:14 +0800
+建树尺: git archive HEAD | tar -x（导出树 .go 枚数＝705，third_party sherpa dll 先数得 0 枚再 cp＝3 枚，build dll cp＝3 枚；A802 那条坑照做）
+母仓 internal/tools/plan_present.go 与本腿无关的写面：sha256 见下（与导出树基线逐位相等＝台件没歪）
+3fc878959be94f4c41bd724cf3433ddc0b90c039d00781cc58be27b93f9a37e1 *D:/work/workspace/projects plans/Wisp/internal/tools/plan_present.go
+ruler: go test ./internal/tools/ -run 'Test165' -v -count=1 ＋ go test ./cmd/wisp/ -run 'Test165r2' -v -count=1（同一台件、同一次突变，两包成对跑）
+
+== 基线（导出树、未突变）==
+internal/tools rc=0：5 枚全 PASS（Test165UnmodifiedRosterHasNoPlanTool／PlanPresentAsksThroughTheExistingL2Card／PlanApprovalRingsAgainForAnUnlistedWrite／ScopeClauseNamesTheBatch／PlanPresentAddsNoAllowExit）
+cmd/wisp rc=0：3 枚全 PASS
+
+== M-B1＝摘掉整句范围句（planPresentText 里那一行 b.WriteString 删掉）==
+--- PASS: Test165UnmodifiedRosterHasNoPlanTool (0.00s)
+--- PASS: Test165PlanPresentAsksThroughTheExistingL2Card (0.00s)
+--- PASS: Test165PlanApprovalRingsAgainForAnUnlistedWrite (0.03s)
+--- FAIL: Test165ScopeClauseNamesTheBatch (0.00s)
+--- PASS: Test165PlanPresentAddsNoAllowExit (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.082s
+FAIL
+internal rc=1／cmd rc=1
+红句首行逐字（internal）:
+    plan_present_165_test.go:263: 方案文本里读不到批准范围的边界（缺 "只限上面这 3 步"）：人类点头时看不到「批到哪儿为止」："这批改动要达成：165 探针\n我要做的事（共 3 步）：\n1. 甲\n2. 乙\n3. 丙\n"
+    plan_present_165_test.go:263: 方案文本里读不到批准范围的边界（缺 "清单之外"）：人类点头时看不到「批到哪儿为止」："这批改动要达成：165 探针\n我要做的事（共 3 步）：\n1. 甲\n2. 乙\n3. 丙\n"
+红句首行逐字（cmd/wisp）:
+    plan_assembled_165r2_test.go:182: 清单文本读不到 "只限上面这 2 步"："这批改动要达成：165-r2 装配探针\n我要做的事（共 2 步）：\n1. 改 A 文件\n2. 改 B 文件\n"
+
+== M-B2＝换成不提条数的通用句（保留「只限这一批」与「清单之外」，摘掉「上面这 N 步」）==
+--- PASS: Test165UnmodifiedRosterHasNoPlanTool (0.00s)
+--- PASS: Test165PlanPresentAsksThroughTheExistingL2Card (0.00s)
+--- PASS: Test165PlanApprovalRingsAgainForAnUnlistedWrite (0.02s)
+--- FAIL: Test165ScopeClauseNamesTheBatch (0.00s)
+--- PASS: Test165PlanPresentAddsNoAllowExit (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.074s
+FAIL
+internal rc=1／cmd rc=1
+红句首行逐字（internal，注意只缺一味）:
+    plan_present_165_test.go:263: 方案文本里读不到批准范围的边界（缺 "只限上面这 3 步"）：人类点头时看不到「批到哪儿为止」："这批改动要达成：165 探针\n我要做的事（共 3 步）：\n1. 甲\n2. 乙\n3. 丙\n批准范围只限这一批：清单之外的任何写（包括随后想到的新步骤、以及之后的每一条命令）都仍会各自弹卡，不会因为这份清单被点头而顺带放行。"
+红句首行逐字（cmd/wisp）:
+    plan_assembled_165r2_test.go:182: 清单文本读不到 "只限上面这 2 步"："这批改动要达成：165-r2 装配探针\n我要做的事（共 2 步）：\n1. 改 A 文件\n2. 改 B 文件\n批准范围只限这一批：清单之外的任何写（包括随后想到的新步骤、以及之后的每一条命令）都仍会各自弹卡，不会因为这份清单被点头而顺带放行。"
+
+== 判读（本腿具名报，⛔ 顺手补）==
+① 摘掉「批过的范围」这一味，两包各红一枚文字尺（internal 的 ScopeClauseNamesTheBatch、本腿的 AssembledBridge 清单文本 needles）；
+② 两发之下，行为尺都还绿：Test165PlanApprovalRingsAgainForAnUnlistedWrite 与本腿 c) 依旧 PASS＝「清单外的写仍各自弹卡、授权表零行」不由这段文字裁决；
+③ 所以「是否存在一发越界从此打不红」＝不存在（在这枚尺的射程内）：越界那一维的判定在「L2 永不进持久授权」那条结构上，两形尺各自量得到；文字句只决定人读卡上看没看到边界；
+④ M-B2 另外钉住一条：只摘「条数」不摘「清单之外」时，两味 needles 缺一味、另一味不红＝那把尺的两味是真分开的，不是同义反复；
+⑤ 本腿没动 internal/tools 一字（母仓那枚文件 sha 与导出树基线同值＝未改）。
+rc=0（本件是判读汇总；两发的包级 rc 已在各行写明）

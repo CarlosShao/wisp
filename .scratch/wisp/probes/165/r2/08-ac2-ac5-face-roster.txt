@@ -1,0 +1,53 @@
+165-r2 AC#2／AC#4／AC#5 写面名册（尺＝git status --porcelain 逐路径分档＋git ls-files --others；全是量来的，⛔ 算来的）
+date: 2026-10-15 22:35:28 +0800  HEAD: 6f53583d
+契约轴 docs/PLAN.md : 0 行
+契约轴 docs/specs : 0 行
+契约轴 internal/risk : 0 行
+契约轴 internal/statemachine : 0 行
+契约轴 internal/panel : 0 行
+契约轴 internal/agent/approval : 0 行
+契约轴 internal/agent/statemachine : 0 行
+契约轴 frontend : 0 行
+契约轴 ci.yml : 0 行
+契约轴 .github : 0 行
+契约轴 tools/d22scan/allowlist.txt : 0 行
+契约轴 internal/llm/testdata : 0 行
+另味（golden 家族按名数）: 0 行；thresholds.go: 0 行
+
+== design/** 与 go.mod/.gitignore：别人的在飞（具名归属，⛔ 计入本票、⛔ 顺手修）==
+ M .gitignore
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+design 行数合计：31（AGENTS §1.3：design/**、frontend/** 归机主外部 agent＝本编队零写面，本腿在其中零字节）
+
+== 本腿自己的写面（tracked 修改，射程＝全仓 git diff --name-only 里属于本腿的枚数）==
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/152/my152.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261015/txt/319r3-dispatch.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design/doubao/demo/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next time Git touches it
+cmd/wisp/run.go
+本腿 tracked 修改枚数＝1（cmd/wisp/run.go）；上面那行是尺打出来的，⛔ 手数
+
+== 本腿新增（untracked，射程＝cmd internal docs .scratch/wisp/probes/165 .scratch/wisp/issues）==
+.scratch/wisp/probes/165/r2/00-start-anchor.txt
+.scratch/wisp/probes/165/r2/01-gates-baseline.txt
+.scratch/wisp/probes/165/r2/01b-gates-baseline-static.txt
+.scratch/wisp/probes/165/r2/02-ac1-unwired-census.txt
+.scratch/wisp/probes/165/r2/03-ac1-unwired-assembly.txt
+.scratch/wisp/probes/165/r2/04-nail-wired-green.txt
+.scratch/wisp/probes/165/r2/05-ma-unwire-red.txt
+.scratch/wisp/probes/165/r2/06-ma-restore-green.txt
+.scratch/wisp/probes/165/r2/07-mb-scope-clause.txt
+.scratch/wisp/probes/165/r2/08-ac2-ac5-face-roster.txt
+cmd/wisp/plan_assembled_165r2_test.go
+cmd/wisp/plan_wiring_165r2_test.go
+
+== D43 状态枚数（AC#2 的分母，射程＝internal/statemachine/states.go 的 const 段）==
+状态常量枚数：20
+AwaitingApproval 那一行：22:	StateAwaitingApproval State = "AwaitingApproval" // L2 queue
+本腿 diff 里 statemachine 命中：0 枚；新增 State 常量：0 枚
+rc=0（本件每一档都是现跑；上面各档的行数＝量来的）

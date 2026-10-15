@@ -1,0 +1,33 @@
+165-r2 起手锚点与台面初判（本腿现跑，不是抄编排者的数）
+date: 2026-10-15 22:10:47 +0800
+HEAD: e1973191b839c49473543fca2ce304898a408434
+branch: dev
+ruler: tasklist //FI "IMAGENAME eq wisp*" / *.test.exe / go.exe -- 射程＝全机进程名册
+-- wisp* --
+
+Image Name                     PID Session Name        Session#    Mem Usage
+========================= ======== ================ =========== ============
+wisp.exe                     21892 Console                    1     63,568 K
+-- *.test.exe --
+-- go.exe --
+
+Image Name                     PID Session Name        Session#    Mem Usage
+========================= ======== ================ =========== ============
+go.exe                       44432 Console                    1     38,644 K
+reading: wisp.exe PID 21892（机主常驻应用，非测试进程）；*.test.exe 0 枚；go.exe 2 枚 PID 26452/39668（别枚腿的编译/计算，不占 go test ./cmd/wisp 那面）
+ruler: git status --porcelain -- internal cmd -- 射程＝共享面
+reading: internal/tools/subagent_depth_fixture_287_test.go 处于 STAGED(A)＝287-r1 的活在我的索引里；因此本腿 add/commit 两处逐文件显式 pathspec，⛔ 裸 commit（会把那枚 staged 文件吞进我的提交）
+ruler: grep -rn BuiltinPlanEntries --include=*.go internal cmd（原单 §0 那把尺的复跑，射程＝internal+cmd 的 *.go 含 _test）
+internal/tools/plan_present.go:134:// BuiltinPlanEntries returns the plan family (today exactly one tool). It is a
+internal/tools/plan_present.go:138:func BuiltinPlanEntries() []Entry {
+internal/tools/plan_present_165_test.go:76:	roster = append(roster, BuiltinPlanEntries()...)
+internal/tools/plan_present_165_test.go:286:	entry := BuiltinPlanEntries()[0]
+rc=0
+reading: 产码侧 0 处调用者（internal/tools/plan_present.go:134 注释＋:138 定义自己）；测试侧 2 处（plan_present_165_test.go:76 测试自己 append、:286 取 [0]）⇒ 与编排者 21:2x 的量一致，今天没有生产调用者
+rc=0
+-- 原单 §0 那把尺逐字复跑（带 grep -v _test）--
+cmd: grep -rn "BuiltinPlanEntries" --include=*.go internal cmd | grep -v _test
+rc=0（0=有命中行；下面的行只含定义面）
+internal/tools/plan_present.go:134:// BuiltinPlanEntries returns the plan family (today exactly one tool). It is a
+internal/tools/plan_present.go:138:func BuiltinPlanEntries() []Entry {
+调用者计数（剥掉 plan_present.go 自身两行）＝0 处

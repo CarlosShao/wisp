@@ -1,0 +1,19 @@
+165-r2 接线钉·还原前基线＝接线后绿（本腿现跑）
+date: 2026-10-15 22:29:15 +0800  HEAD: 29be2b67
+ruler: go test ./cmd/wisp/ -run 'Test165r2' -v -count=1
+射程: cmd/wisp 包内三枚 165r2 用例（定向 -run，⛔ 整包＝票 314 的死亡区）
+env: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\165r2gotmp ＋ PATH 前置母仓 third_party/sherpa-onnx 与 build
+--- 颜色与判定行 ---
+=== RUN   Test165r2AssembledBridgeReachesPlanPresent
+    plan_assembled_165r2_test.go:194: 装配可达读数：registry 10 枚含 plan.present；卡=plan.present；行 risk=L2 decision=allow；授权行 0 枚
+--- PASS: Test165r2AssembledBridgeReachesPlanPresent (1.26s)
+=== RUN   Test165r2UnlistedWriteRingsItsOwnCardAfterAnApprovedPlan
+    plan_assembled_165r2_test.go:278: AC#3① 装配读数：方案卡=plan.present（yes）→ 清单外卡=fs.write（no，IsError=true）→ 授权行 0 枚 → 目标文件未落盘
+--- PASS: Test165r2UnlistedWriteRingsItsOwnCardAfterAnApprovedPlan (1.22s)
+=== RUN   Test165r2PlanWiringCallSiteCensus
+    plan_wiring_165r2_test.go:187: 阳性对照成立：cmd/wisp/run.go:783 range=true register=true 是已接形状（range＋Register）⇒ 尺读得出「接上了」这一形
+    plan_wiring_165r2_test.go:205: 接线读数：cmd/wisp/run.go:822 range=true register=true ⇒ 产码调用点 1 枚，形状与先例同形
+--- PASS: Test165r2PlanWiringCallSiteCensus (0.22s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.772s
+rc=0
