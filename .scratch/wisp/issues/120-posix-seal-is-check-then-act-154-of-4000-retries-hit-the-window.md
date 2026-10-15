@@ -87,3 +87,23 @@
   ③ 票面那句 `154/4000` 仍是**改前**口径，措写要人批⇒ 本格只追加此 1 条 bullet、⛔ 翻 AC 框、⛔ 改名、⛔ 改已有正文；
   ④ 射程外读数：`internal/risk`、`cmd/wisp` 等消费者在 Linux CI 上会不会因 r 位收紧变色，本腿写面之外、未量。
   **next=** 上述①②③④逐枚 + `privateFile` 开 leg 归票 322。**⛔ push。**
+- 2026-10-15 21:1x（agent=120-v1，验收腿＝非实现者，零产码）：did=对 `120-r2` 自报三枚具名缺口给三态 + 独立复跑成对读数。
+  件＝`docs/evidence/s1/120-v1.md`。起手锚 `400927c4`、`git status --porcelain -- internal/winsec` 空、docker 29.6.2。
+  **成对读数独立复跑**（`/d/tmp/probe120v1/{fixed,prebase}`，先数 `.go`=1073/1072 证非空）：改前 `WISP_120_BASELINE=1`
+  三形 hit-foreign **9/12/22 合 43/6000 > 0**（旁站分母 2000 与活性 refused/sealed-own 非零＝坏世界真被造），改后默认严格档
+  三形 **0/2000**；与腿 26/6000、编排者缩小档**不可相减**，只作方向独立复认。**三枚缺口三态**：① `sealHandle` inline
+  `SameFile`（`winsec_other.go:269-274`）＝**缺世界**——本腿物理去这一支的牙（clean `137442cd…`→变异 `57e29c0b…`→还原
+  `137442cd…` `RESTORE MATCHES`、`.bak-120v1-sealhandle-control` 留底、仓内工作树全程未碰）跑整包 ⇒ **RUN=55 PASS=55 FAIL=0
+  SKIP=0 rc=0**，零枚变色 ⇒ 无任何用例走这一支；须落地腿补具名台件 + 单独去牙，本腿⛔ 代补。② 形 1/2 去牙后仍 0＝**成立**
+  （射程限制、非藏）——Root 对绝对目标链接 `openat …: path escapes from parent` 在 open 处即拒，判据**只买到形 3**
+  （兄弟相对链接才逼 `sameObjectPinned` 开火）。③ `refused-at-act>0` 只 `t.Logf`＝**成立**（建议⛔ 整体升硬：本腿一发
+  shape2 逐样本 `refused-at-act=1,1,0,0` 已证升硬会 flaky/形 1、2 恒红；闸门有牙已由去牙反控钉住）。
+  **注释说实话两处**：`winsec_other.go:52-74` r 位收紧写成现状 + `A990` 裁②具名、无新造承诺＝成立；`:82` 票 322 "unfixed"
+  现核 `322-…md` 存在、Status "已立，未派落地腿"⇒ 仍属实＝成立。**名册口径**：`-run 'TestAC[1-4]POSIX'` 现数**顶层 20 枚**（票里 16 已过期）、
+  容器 RUN=31/PASS=31/0 FAIL/0 SKIP rc=0，腿报名册数与逐枚点名一致。**门禁 rc**：容器 fixed 0、prebase 0、整包去牙 0、名册 0、
+  `gofmt -l` 0、`gofumpt -l` 0、`go vet ./internal/winsec/` 0、`GOOS=darwin GOARCH=arm64 go vet ./internal/winsec/` 0、
+  `sh scripts/d22scan.sh` 0（首跑 rc=2 系 GOTMPDIR 落 D 卷触 ticket-311 体积守卫，改指 C 卷后 0；分母 internal/=564 ≥ r2 的 563，各 scope **未降**）。
+  **存量债具名记色**（⛔ 算进本票）：`cmd/wisp` 的 255 名册尺起手即红（归票 324，本腿**面限制⛔ 未跑** `go test ./cmd/wisp`，〔待面空补验〕）、
+  `internal/panel` 5 枚既有红（未跑、非本票）。**没裁完**：`sealHandle` 补集台件（本腿⛔ 产码）、`internal/risk`/`cmd/wisp` 在 Linux CI 上因
+  r 位收紧的射程外变色（面外，〔待面空补验〕）、票面 154/4000 与"16→20"措写（属改票面须人工批准）、`privateFile` 开 leg 归票 322。
+  ⛔ 翻 AC 框、⛔ 改票名/Status/已有正文。**next=** 落地腿补 `sealHandle` 具名单元台件 + 单独去牙反控（缺口 1 去处）。**⛔ push。**
