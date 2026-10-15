@@ -1,0 +1,13 @@
+=== host rulers, anchor HEAD 58de465a, working tree with 120-r2 fix ===
+--- go version
+go version go1.27.1 windows/amd64
+--- gofmt -l (two files)
+gofmt rc=0
+--- gofumpt -l
+gofumpt rc=0
+--- go vet ./internal/winsec/
+vet-linuxhost-tag rc=0
+--- GOOS=darwin go vet ./internal/winsec/ (cross-check of the !windows build file)
+darwin-vet rc=0
+container-gate rc=0
+counts: RUN=110 PASS=110 FAIL=0 SKIP=0

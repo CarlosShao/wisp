@@ -1,0 +1,12 @@
+P1 plain O_RDONLY open of a FIFO BLOCKS (waited 1.500815045s) - O_NONBLOCK is required
+P1 O_NONBLOCK open fifo: ok mode=prw-------(stat-err=<nil>) fchmod=<nil> after 114.608µs
+P2 pinned dir fd: statdot=drwxr-xr-x(<nil>) lstat=drwxr-xr-x(<nil>) fdstat=drwxr-xr-x(<nil>) same=true
+P2 fchmod(dir) ok, read back -rwx------
+P3 OpenFile(dir child) direct: ok
+P4 rename "real" over leaf ok: leaf=-rw-r--r--(err=<nil>) staged-gone=true
+P4 rename "link" over leaf ok: leaf=Lrwxrwxrwx(err=<nil>) staged-gone=true
+P5 "abs.bin" -> "/tmp/r2probe2936402316/witness.bin": OpenFile ERR openat abs.bin: path escapes from parent
+P5 "up.bin" -> "../witness.bin": OpenFile ERR openat up.bin: path escapes from parent
+P5 "sib.bin" -> "target.bin": OpenFile OPENED lstatIsLink=true sameAgainstName=false(stat-err=<nil>)
+P5 OpenRoot through a sibling dir link: FOLLOWED self=drwx------(<nil>) lstat=Lrwxrwxrwx(<nil>) same=false isLink=true
+P5 witness mode after all of the above: -rw-r--r--

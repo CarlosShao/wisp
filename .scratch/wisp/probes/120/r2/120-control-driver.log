@@ -1,0 +1,23 @@
+== state at entry ==
+sha256 current =137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313
+sha256 bak     =137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313
+sha256 restored=137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313
+== re-mutate: sameObjectPinned neutered on disk ==
+neutered
+sha256 mutated =f7327671ab9784fea6f7b597b0d5964c86ded64f2a986139b7d9d559db7d4741
+== control run against those bytes (strict default, no env) ==
+control rc=1
+failing names:
+--- FAIL: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed (0.29s)
+red rows quoted with the文案:
+    posix_seal_window_120_other_test.go:419: AC#1 RED sample 1/4 shape=ancestor-swap-relative-sibling-link: the seal landed on the foreign tree 8 time(s), 8 of them while returning nil (window open on THIS sample; every sample is judgement, no averaging)
+    posix_seal_window_120_other_test.go:419: AC#1 RED sample 2/4 shape=ancestor-swap-relative-sibling-link: the seal landed on the foreign tree 4 time(s), 4 of them while returning nil (window open on THIS sample; every sample is judgement, no averaging)
+    posix_seal_window_120_other_test.go:419: AC#1 RED sample 3/4 shape=ancestor-swap-relative-sibling-link: the seal landed on the foreign tree 9 time(s), 9 of them while returning nil (window open on THIS sample; every sample is judgement, no averaging)
+    posix_seal_window_120_other_test.go:419: AC#1 RED sample 4/4 shape=ancestor-swap-relative-sibling-link: the seal landed on the foreign tree 4 time(s), 4 of them while returning nil (window open on THIS sample; every sample is judgement, no averaging)
+== restore and prove ==
+sha256 after restore=137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313
+RESTORE MATCHES
+== the repository's own file: never part of this control ==
+repo sha256=137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313
+snapshot-clean sha256=137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313
+ M internal/winsec/winsec_other.go

@@ -1,0 +1,28 @@
+base=/tmp/r2probe1846265967
+Q1 pin "tmp": statdot-err=<nil> lstat-err=<nil> same=true mode=dtrwxrwxrwx
+Q1 pin "r2probe1846265967": statdot-err=<nil> lstat-err=<nil> same=true mode=drwx------
+Q1 pin "root": statdot-err=<nil> lstat-err=<nil> same=true mode=drwx------
+Q1 pin "data": statdot-err=<nil> lstat-err=<nil> same=true mode=drwx------
+Q1 pin "sub": statdot-err=<nil> lstat-err=<nil> same=true mode=drwx------
+Q1 chain ok to /tmp/r2probe1846265967/root/data/sub
+Q2 leaf pinned: lstat=-rw-r--r-- fstat=-rw-r--r-- same=true
+Q2 after fchmod read-back=-rw-------, witness still=-rw-r--r--
+Q3 OpenFile(.) on directory ok: mode=drwx------ isdir=true
+Q3 f.Chmod(dir) ok mode=-rwx------
+Q4 link "../../../foreign/sub/blob.bin": Lstat isLink=true err=<nil> / OpenFile ERR openat blob.bin: path escapes from parent
+Q4 link "../../../foreign/sub/blob.bin": Lstat isLink=true err=<nil> / OpenFile ERR openat blob.bin: path escapes from parent
+Q5 pinned open ok: lstatIsLink=false(lerr=<nil>) same=true
+Q5 after fchmod: original(moved) blob=-rw------- witness2=-rw-r--r--
+Q5 by-name ancestor now: mode=Lrwxrwxrwx isLink=true
+Q6 name "..": Lstat=statat ..: path escapes from parent OpenFile=openat ..: path escapes from parent
+Q6 name "": Lstat=statat : empty path OpenFile=openat : empty path
+Q6 name "/abs": Lstat=statat /abs: path escapes from parent OpenFile=openat /abs: path escapes from parent
+Q6 name "a\\b": Lstat=statat a\b: no such file or directory OpenFile=openat a\b: no such file or directory
+Q6 name ".": Lstat=<nil> OpenFile=<nil>
+Q7 mkfifo: no such file or directory
+Q8 staged: open /tmp/r2probe1846265967/root/data/sub/staged.bin: no such file or directory
+Q8 relink staged: symlink /tmp/r2probe1846265967/foreign/sub/blob.bin /tmp/r2probe1846265967/root/data/sub/staged.bin: no such file or directory
+Q8 rename link over leaf: ERR rename /tmp/r2probe1846265967/root/data/sub/staged.bin /tmp/r2probe1846265967/root/data/sub/blob.bin: no such file or directory
+Q8 restage: open /tmp/r2probe1846265967/root/data/sub/staged.bin: no such file or directory
+Q8 rename real over link: ERR rename /tmp/r2probe1846265967/root/data/sub/staged.bin /tmp/r2probe1846265967/root/data/sub/blob.bin: no such file or directory
+Q9 done witness=-rw-r--r--

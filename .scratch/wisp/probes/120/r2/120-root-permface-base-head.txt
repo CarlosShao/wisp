@@ -1,0 +1,11 @@
+0
+uid=0 euid=0 gid=0
+shape=file-0400  before=400 want=600 after=600 outcome=SEALED verdict=nil
+shape=file-0600  before=600 want=600 after=600 outcome=SEALED verdict=nil
+shape=file-0200  before=200 want=600 after=600 outcome=SEALED verdict=nil
+shape=file-0000  before=0 want=600 after=600 outcome=SEALED verdict=nil
+shape=dir-0700   before=700 want=700 after=700 outcome=SEALED verdict=nil
+shape=dir-0300   before=300 want=700 after=700 outcome=SEALED verdict=nil
+shape=dir-0500   before=500 want=700 after=700 outcome=SEALED verdict=nil
+shape=handle-0200 PrivateFile outcome=SEALED after=600 size=13 err=<nil>
+shape=dir-0300-parent PrivateDirAll err=<nil> exists=true

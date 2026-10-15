@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"syscall"
 )
 
@@ -21,15 +22,210 @@ import (
 // code: the non-Windows leg measures something, it does not skip.
 var applyDescriptor = applyDescriptorPOSIX
 
+// applyDescriptorPOSIX narrows the mode of the object a spelling names, checked
+// and applied on ONE pinned descriptor.
+//
+// This function used to be os.Chmod(path) followed by os.Stat(path): one check
+// and one act on a *name*, which is two resolutions of the same spelling with a
+// window in the middle, and os.Chmod follows any link planted in that window.
+// Ticket 113's acceptance round measured 154 of 4000 retries landing the seal on
+// somebody else's file through it (R-113-D), and ticket 120's r1 round re-measured
+// the same window on the committed code with the instrument in
+// posix_seal_window_120_other_test.go. The act below is fchmod on the descriptor
+// the walk pinned, so the object that passed the identity check is the object that
+// is narrowed - check and act are the same object by construction, not by luck
+// about how fast the racer is.
+//
+// The walk is portable stdlib only, and it is NOT the form ticket 120's AC#2 named
+// first. The fully openat-based form is unreachable from this file: syscall.Openat
+// exists only on linux (r1's probe: undefined on darwin, freebsd, openbsd, netbsd,
+// dragonfly and solaris), and os.Root does not enforce this package's floor rule -
+// it follows a symbolic link whose target stays inside the root, which for a root
+// of "/" means every relative link with no ".." element is followed (measured this
+// round: OpenFile on "sib.bin -> target.bin" returned a descriptor of the TARGET).
+// So O_NOFOLLOW through Root is not a defence here and must never be written as
+// one (r1 measured it defeated by Root.OpenFile), and "Root refuses it" only covers
+// absolute targets and ".."-climbing targets, which is not the interesting shape.
+// What closes the window is sameObjectPinned: the pinned descriptor's identity
+// (fstat) compared against what the name carries right now (lstat at the parent).
+//
+// Three costs, stated here rather than discovered later.
+//
+//   - an open is now a permission question. Pinning takes O_RDONLY on the leaf and
+//     read plus search on every ancestor, where os.Chmod needed only search. So a
+//     file at 0w0 or 000, or a directory without r, goes from "the owner can still
+//     repair its mode" to "refused". This is a tightening, and it was accepted by
+//     the ledger as A990 ruling 2: the direction is refusal, never relaxation (this
+//     repository's iron rule is that nothing is loosened to make a reading green),
+//     the leg is !windows-only so the shipped platform is untouched, and the cost
+//     was measured at uid 1000 in a container (0200/0000 files and a 0300 directory
+//     answer EACCES; under the container's uid 0 all of them answer ok, which is
+//     ticket 113's standing note about root distorting permission faces - so the
+//     permission faces of this leg are read at uid 1000, not at uid 0).
+//   - the open also has to be non-blocking. A FIFO standing where an artifact was
+//     named would hang an O_RDONLY open forever (measured: blocked past 1.5s, while
+//     the same open with O_NONBLOCK returned in 115 microseconds and fchmod on it
+//     worked), so the leaf open carries O_NONBLOCK. os.Chmod never opened anything,
+//     so this is a new failure mode the old shape could not have; hanging a seal is
+//     worse than refusing one.
+//   - one seal is now roughly two syscalls per path component plus the fchmod and
+//     its read-back, instead of chmod plus stat. Sealing is not a hot path in this
+//     repository (data roots at startup, artifacts per spill), and the alternative
+//     is the window above.
+//
+// And one thing this does NOT fix, named so nobody reads the paragraph above as the
+// end of the family: the OPEN inside privateFile (winsec.go, outside this ticket's
+// write surface) still resolves a leaf link before this walk runs, so a link planted
+// in that gap truncates somebody else's file on the way in. What the leg here stops
+// is the private BYTES reaching that object - sealHandle refuses, privateFile writes
+// nothing and unlinks the name - the O_TRUNC damage of that open is not undone. That
+// shape is booked separately as ticket 322 and is unfixed at this anchor.
 func applyDescriptorPOSIX(path string, dir bool) error {
 	mode := fs.FileMode(0o600)
 	if dir {
 		mode = 0o700
 	}
-	if err := os.Chmod(path, mode); err != nil {
+	target, err := pinPlacement(path)
+	if err != nil {
+		return err
+	}
+	defer target.Close()
+	return chmodPinned(target, path, mode)
+}
+
+// pinPlacement walks path from the root of its own volume, pinning every component
+// as a descriptor and re-verifying each one against the name it was reached through,
+// and hands back the pinned descriptor of the object path names. Closing every
+// parent on the way down is safe and deliberate: a child descriptor is independent
+// of the directory it was opened from, so the chain that the act stands on is the
+// sequence of objects, not the spelling.
+//
+// Order at each level is pin, then verify - never verify, then pin. Lstat before the
+// open is the check-then-act shape this function exists to delete: the racer plants
+// a link after the Lstat and the open follows it. Pin-then-verify closes both
+// directions of that interleaving. Either way the object that comes back is refused
+// unless (a) the name still carries a non-link and (b) the name's object is the
+// pinned object, by dev and inode (os.SameFile). A link planted and then swapped back
+// for a *different* real object still fails (b); a link still standing fails (a).
+//
+// Nothing after the last check re-resolves this spelling by name. That is the whole
+// claim of the function: the act is fchmod on what is returned here, so a swap that
+// happens after the walk cannot move it (measured: with the ancestor renamed away and
+// replaced by a link, the seal still landed on the original object and the foreign
+// witness kept its mode). The only by-name read left below is fstypeOf, which runs on
+// an already-refused path to name a filesystem type in an error message; it cannot
+// select an object because nothing is acted on after it.
+func pinPlacement(path string) (*os.File, error) {
+	if !filepath.IsAbs(path) {
+		// Not a new refusal in practice: every caller reaches this through
+		// builtinVerifier.Resolve, which refuses a relative spelling before any
+		// seal runs. It is here because pinning has to name the root it starts
+		// from, and a relative spelling has no such root - it has wherever the
+		// process happens to be standing, which is a tree this call did not name.
+		return nil, placementRefusal(path, path, "the spelling is not absolute, so no root pins it")
+	}
+	comps := pathComponents(path)
+	leaf := "."
+	ancestors := comps
+	if n := len(comps); n > 0 {
+		leaf = comps[n-1]
+		ancestors = comps[:n-1]
+	}
+	cur, err := os.OpenRoot(pinBase(path))
+	if err != nil {
+		return nil, wrapPath(path, err)
+	}
+	for _, comp := range ancestors {
+		next, err := cur.OpenRoot(comp)
+		if err != nil {
+			_ = cur.Close()
+			return nil, wrapPath(path, err)
+		}
+		pinned, err := next.Stat(".")
+		if err != nil {
+			_ = next.Close()
+			_ = cur.Close()
+			return nil, wrapPath(path, err)
+		}
+		if err := sameObjectPinned(path, comp, cur, pinned); err != nil {
+			_ = next.Close()
+			_ = cur.Close()
+			return nil, err
+		}
+		_ = cur.Close()
+		cur = next
+	}
+	f, err := cur.OpenFile(leaf, os.O_RDONLY|syscall.O_NONBLOCK, 0)
+	if err != nil {
+		_ = cur.Close()
+		return nil, wrapPath(path, err)
+	}
+	info, err := f.Stat()
+	if err != nil {
+		_ = f.Close()
+		_ = cur.Close()
+		return nil, wrapPath(path, err)
+	}
+	if err := sameObjectPinned(path, leaf, cur, info); err != nil {
+		_ = f.Close()
+		_ = cur.Close()
+		return nil, err
+	}
+	_ = cur.Close()
+	return f, nil
+}
+
+// sameObjectPinned is the identity gate: the name inside parent has to carry a
+// non-link right now, and it has to carry the object that was just pinned. Both
+// halves are needed and neither is decoration - the first refuses the link that
+// Root follows happily, the second refuses the swap-back that leaves no link
+// standing by the time anyone looks.
+func sameObjectPinned(path, name string, parent *os.Root, pinned fs.FileInfo) error {
+	now, err := parent.Lstat(name)
+	if err != nil {
 		return wrapPath(path, err)
 	}
-	info, err := os.Stat(path)
+	if now.Mode()&os.ModeSymlink != 0 {
+		return placementRefusal(path, name, "the name carries a link, so the pinned object is not what the spelling reaches")
+	}
+	if !os.SameFile(pinned, now) {
+		return placementRefusal(path, name, "the name carries a different object than the one that was pinned")
+	}
+	return nil
+}
+
+// pinBase is the root the pinning walk starts from. On this platform
+// filepath.VolumeName is the empty string for every spelling, so this is "/", and
+// the statement is spelled out rather than assumed because the walk's whole meaning
+// is "every component below this root is checked as an object".
+func pinBase(path string) string {
+	if v := filepath.VolumeName(path); v != "" {
+		return v
+	}
+	return string(os.PathSeparator)
+}
+
+// placementRefusal is the act-time face of the rule platformVerifyPlacement states
+// before the act, and it carries both sentinels on purpose: ErrUnresolvedPath keeps
+// a refusal attributable to "this spelling does not name the tree it claims" - which
+// is what the ticket 120 instrument counts as refused-at-check - and ErrNotSealable
+// keeps this package's contract ("a refused seal is not a completed write", AC#5)
+// independent of whether sealError remembered to relabel it.
+func placementRefusal(path, at, why string) error {
+	return fmt.Errorf("%w: %s: pinned object at %s is not what the name carries: %s (%w)",
+		ErrUnresolvedPath, path, at, why, ErrNotSealable)
+}
+
+// chmodPinned narrows the mode through an already pinned descriptor and reads it back
+// from that SAME descriptor. The read-back is still AC#6's requirement, not a
+// formality: a filesystem that stores no usable mode bits answers fchmod with success
+// and reports something else, and that has to become ErrNotSealable rather than a
+// promise.
+func chmodPinned(f *os.File, path string, mode fs.FileMode) error {
+	if err := f.Chmod(mode); err != nil {
+		return wrapPath(path, err)
+	}
+	info, err := f.Stat()
 	if err != nil {
 		return wrapPath(path, err)
 	}
@@ -41,8 +237,43 @@ func applyDescriptorPOSIX(path string, dir bool) error {
 }
 
 // sealHandle is the pre-content seal used by PrivateFile and
-// PrivateFileExclusive: same mechanism as SealFile, by name.
-func sealHandle(f *os.File) error { return applyDescriptor(f.Name(), false) }
+// PrivateFileExclusive. It consults applyDescriptor first, so the seam AC#5's
+// injection replaces is on this route on both platforms (private_fail_test.go is
+// untagged and asserts that a refused handle seal stops the bytes), and then adds
+// the question a seal by name cannot ask: is the descriptor the caller is about to
+// write through the object that was just narrowed?
+//
+// The identity check is os.SameFile(f.Stat(), os.Lstat(f.Name())) - the caller's
+// open and the name, not two opens of the name. Lstat does not follow the leaf, so
+// this leg needs no walk, and it refuses both shapes a by-name seal cannot see: the
+// name carrying a link, and the name having been moved to a different real object
+// since the caller opened it. In the second case the pinned walk seals the object
+// the name denotes now, which is NOT the object the pending write goes to, so
+// without this leg private bytes would land in a file that was never narrowed.
+//
+// What it cannot do is undo the damage of the open that came before it; see the
+// ticket 322 sentence in applyDescriptorPOSIX's costs.
+func sealHandle(f *os.File) error {
+	if err := applyDescriptor(f.Name(), false); err != nil {
+		return err
+	}
+	name := f.Name()
+	pinned, err := f.Stat()
+	if err != nil {
+		return wrapPath(name, err)
+	}
+	now, err := os.Lstat(name)
+	if err != nil {
+		return wrapPath(name, err)
+	}
+	if now.Mode()&os.ModeSymlink != 0 {
+		return placementRefusal(name, name, "the name carries a link, so this descriptor is not the object the caller named")
+	}
+	if !os.SameFile(pinned, now) {
+		return placementRefusal(name, name, "this descriptor is not the object the name carries now, so the bytes would not land in what was just sealed")
+	}
+	return chmodPinned(f, name, 0o600)
+}
 
 func fstypeOf(path string) string {
 	var st syscall.Statfs_t
