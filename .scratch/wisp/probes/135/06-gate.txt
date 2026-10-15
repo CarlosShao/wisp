@@ -1,0 +1,50 @@
+# 135-r1 reading 06: AC#6 the gate (agent=135-r1)
+
+Anchor: this leg started at HEAD 8f41a4df (working tree clean on cmd/wisp + internal/proc); the
+orchestrator's send record 5e25303a is the only drift seen, and it carries no code.
+
+## static gate, run on the working tree / on the snapshots as noted
+
+gofmt        my three files clean (gofmt -l lists nothing); whole-dir run also lists nothing new.
+gofumpt      host binary v0.12.0 (D:\work\base\gopath\bin\gofumpt.exe, never `go install @latest`):
+             my three files clean. Whole-dir comparison, LF archives on both sides so the comparison
+             is apples to apples: base3 (pre-135) and fix7 list exactly one offender,
+             cmd/wisp/panel_transport_35r2_test.go - pre-existing on the anchor tree, not this leg's,
+             and not touched here (out of face).
+go vet       native: `go vet ./cmd/wisp/ ./internal/proc/` rc=0.
+             GOOS=linux GOARCH=amd64 go vet ./internal/proc/ rc=0 (cross-GOOS clean).
+             GOOS=linux GOARCH=amd64 go vet ./cmd/wisp/ rc=1 with the sherpa-linux build-constraint
+             chain only (no diagnostic line points at a cmd/wisp source file) - the shape already
+             registered on ticket 131 (R-131r3-5); cmd/wisp is not cross-vettable from this host.
+d22scan      `sh scripts/d22scan.sh` rc=0 on fix7 (positive control PASS=35 FAIL=0 SKIP=0, === RUN=77,
+             28.002s; scan: "d22scan: clean - no D22 ban violations"). Scope ledger, base3 vs fix7,
+             byte-identical: bans #1-5 internal/=238, #1-5 cmd/=40, #6 frontend/=116,
+             #7 internal/tools/=24, #8 design/=30, #8 frontend/=116, #8 internal/=560, #8 cmd/=132.
+             Both snapshots carry no .git, so the scanner says out loud that it applied no gitignore
+             rules and that the denominator is machine-dependent (A207) - both sides, same shape.
+             No scope decreased, none moved.
+
+## four numbers, -count=2 -v -timeout 40m (the 40m is ticket 314's dead zone: the 10m default panics)
+
+cmd/wisp, ticket 135's own slice (the five ticket-128 cases + AC#1/AC#3/AC#7 cases + the 131 gate):
+  52 RUN / 52 PASS / 0 FAIL / 0 SKIP, rc=0   (26 case entries x 2 counts)
+internal/proc, whole package:
+  98 RUN / 96 PASS / 0 FAIL / 2 SKIP, rc=0   (49 x 2; the 2 SKIP are TestHelperProcess, the
+             helper-process pattern, one per count - not one of this leg's cases)
+
+## the whole-package cmd/wisp run: NOT a denominator (deadline-pause)
+
+`go test -count=2 -v -timeout 40m ./cmd/wisp/` was launched at 16:12 and stopped on the
+orchestrator's deadline-pause order while still in flight, so its numbers are not used as a
+denominator. What it had read when it was stopped: === RUN 432, four FAIL cases, and the run had
+already passed all three TestZZ315A1* end anchors (the check ticket 314 asks for), with no
+MARK299/wndproc death signature. The four reds are all in the windowed/live-hotkey family, none of
+them in this leg's face and none of them an assertion this leg touched:
+  TestAC14GoSideEvalPushReachesThePage, Test258BridgeMutationNoSrcKeepsOldBinding,
+  Test258OccupiedCombinationNamesTheNewValue, Test258V1ProbeSummonEditRebindsLiveBall,
+  TestAC246DevLegIgnoresTheTestTaskInjection
+their log lines read "hotkey ... is occupied by another program and was NOT registered" - the host
+has other processes holding Ctrl+Alt+M/P/V, which is the load-window shape the orchestrator flagged
+for this window (Docker legs in the same wave). This is reported as a shape, not as an attribution
+this leg proved: the pre-existing/not-mine reading for these cases was NOT taken (that would have
+been another full-package run, which the deadline order forbids).

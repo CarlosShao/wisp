@@ -234,3 +234,15 @@
   诚实树：`slo` 行仍 `ruled`、门＋新用例 `2/2` rc=0。存证 `.scratch/wisp/probes/135/05-ac7-granularity.txt`。
   ⚠ 派单面清单里写的是 `cmd/wisp/leg_dispatch_gate_133_test.go` 的"句段粒度尺"，但**票面 AC#7 逐字指的是 `rulingCrossChecks131`（票 131 的第二把尺，文件在 `leg_sink_gate_131_test.go`）**，故本程按票面做在 131 那把尺上；
   133 那把尺的"裁决句绑到腿自己的代码"（`rulingAdjacentTo133`）属票 133 面、本程未动（漂移已报编排者）。next=AC#6 门禁
+
+- [2026-10-15 16:2x +08] agent=135-r1 did=**AC#6 门禁（静态面全绿＋分段四数）＋deadline-pause 收尾**。静态：`gofmt`／宿主 `gofumpt v0.12.0`（`D:\work\base\gopath\bin`，未装任何新东西）对**本腿三件零命中**；
+  整目录对照（两侧都用 LF 快照、可比）base3 与 fix7 **各只列一枚既存 offender** `cmd/wisp/panel_transport_35r2_test.go`（非本腿、未碰）；`go vet` 原生两包 rc=0、`GOOS=linux go vet ./internal/proc/` rc=0、
+  `GOOS=linux go vet ./cmd/wisp/` rc=1 但唯一诊断链落在 sherpa-onnx-go-linux 第三方模块（`R-131r3-5` 已登记形状）；`sh scripts/d22scan.sh` 在 fix7 **rc=0 clean**（正控 `PASS=35 FAIL=0 SKIP=0`、`=== RUN=77`），
+  **scope 台账 base3 与 fix7 逐 scope 完全一致**（238/40/116/24/30/116/560/132，无一枚下降）。
+  四数（`-count=2 -v -timeout 40m`，40m 是票 314 死区要求的）：本票切片 `./cmd/wisp/` **52/52/0/0 rc=0**；`./internal/proc/` 整包 **98/96/0/2 rc=0**（2 枚 SKIP＝`TestHelperProcess` 帮助进程形，非本腿用例）。
+  ⚠ **整包 `./cmd/wisp/ -count=2 -v` 因编排者 deadline-pause 口令停在途中**（16:12 起跑、读到 `=== RUN 432`、3 枚 `TestZZ315A1*` 终点锚**均已跑到**、无 `MARK299`/`wndproc` 整进程死亡签名）⇒ **四数不作分母**；途中 4-5 枚红全属窗口/热键族
+  （`TestAC14GoSideEvalPushReachesThePage`、`Test258BridgeMutationNoSrcKeepsOldBinding`、`Test258OccupiedCombinationNamesTheNewValue`、`Test258V1ProbeSummonEditRebindsLiveBall`、`TestAC246DevLegIgnoresTheTestTaskInjection`，日志逐字 `hotkey ... occupied by another program and was NOT registered`），
+  **零枚落在本腿面**；其"是否既存"的对照读数**未取**（需再跑整包，deadline 口令禁止）。
+  ⚠ 票 123 那批（`run_mode101_test.go` 三枚 `TestTicket101*`＋`run_test.go` 的 `TestComposedGateBlocksAWriteForTwoSeconds`，逐名现核在案）：**本腿一字未碰、未放宽**（本腿五枚 commit 只带三件 Go：`dataroot_128_test.go`／`leg_sink_gate_131_test.go`／`internal/proc/envfork_test.go`）。
+  存证 `.scratch/wisp/probes/135/06-gate.txt`。next=**剩 AC#6 的整包 cmd/wisp 四数**（需一次完整 `-count=2 -v` 跑到终点锚；本轮被 deadline-pause 停）、**以及非实现者的终裁**（本腿七格自评不翻框）；
+  `did=deadline-pause`：⛔ 未翻 AC 框／未动 `Status:`／票名／台账／HANDOVER／`frontend/**`／`design/**`；只 commit 不 push。
