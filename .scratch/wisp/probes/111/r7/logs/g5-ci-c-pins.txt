@@ -1,0 +1,55 @@
+### ci.yml winlive step pins (HEAD 2ad0aa86): :623 name, :624 claim, :637, :668, :671 if, :672 run
+      - name: "winlive compile gate (go vet -tags winlive, ticket 111 AC#11)"
+        # WHY THIS STEP EXISTS (compile coverage, not execution): the 12 files
+        # (ticket 111 AC#11 c): it reddens the job when any of those 12 files is
+        # weakened, none of the 12 files is edited, and nothing here is tuned to
+        if: ${{ !cancelled() }}
+        run: go vet -tags winlive ./cmd/wisp/ ./internal/ball/
+
+### c-block verbatim (ci.yml:636-645)
+        # WHAT THIS BUYS, STATED AS COMPILE-ONLY SO IT IS NOT READ AS A SLIDE
+        # (ticket 111 AC#11 c): it reddens the job when any of those 12 files is
+        # broken at the compile / vet level and nothing else. `go vet` type-checks
+        # and runs analyzers, it does NOT build a test binary and executes ZERO
+        # cases, so this opens no ball window and needs no native DLL on PATH.
+        # It is explicitly NOT a CI carrier for ticket 35's real-window readings
+        # (:52 / :75(c)) - those take the "host-measurable only" route per A690
+        # and are NOT wired here; do not read this step as "the winlive cases now
+        # run on CI".
+        #
+
+### CI colour of the step: run 38676514264 / job 116231259514 (steps 7-9)
+7	failure	cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)
+8	success	winlive compile gate (go vet -tags winlive, ticket 111 AC#11)
+9	success	Package coverage census (ticket 111 AC#1 + GUARD D)
+
+### roster drift: r6 (2026-10-08) roster vs today (normalized, same ruler)
+1,12c1,14
+< cmd/wisp/panel_geometry_255_winlive_test.go
+< cmd/wisp/panel_host_windows_live_test.go
+< cmd/wisp/panel_transport_live_35v2_windows_test.go
+< cmd/wisp/resident_approval_live_246_windows_test.go
+< cmd/wisp/resident_ball_live_228_windows_test.go
+< cmd/wisp/resident_hotkey_live_258_windows_test.go
+< cmd/wisp/resident_task_source_live_246_windows_test.go
+< internal/ball/hotkey_cancel_borrow_live_260_test.go
+< internal/ball/hotkey_live_test.go
+< internal/ball/interaction_live_test.go
+< internal/ball/live_guard_windows_test.go
+< internal/ball/live_windows_test.go
+---
+> cmd/wisp/panel_death_replay_319_winlive_test.go
+> cmd/wisp/panel_geometry_255_winlive_test.go
+> cmd/wisp/panel_host_windows_live_test.go
+> cmd/wisp/panel_reshow_255r8_winlive_test.go
+> cmd/wisp/panel_transport_live_35v2_windows_test.go
+> cmd/wisp/resident_approval_live_246_windows_test.go
+> cmd/wisp/resident_ball_live_228_windows_test.go
+> cmd/wisp/resident_hotkey_live_258_windows_test.go
+> cmd/wisp/resident_task_source_live_246_windows_test.go
+> internal/ball/hotkey_cancel_borrow_live_260_test.go
+> internal/ball/hotkey_live_test.go
+> internal/ball/interaction_live_test.go
+> internal/ball/live_guard_windows_test.go
+> internal/ball/live_windows_test.go
+(only the '>' lines are new; diff rc=1)
