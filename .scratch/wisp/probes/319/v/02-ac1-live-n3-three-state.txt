@@ -1,0 +1,56 @@
+319-v · AC#1 live (winlive, N3 both halves) three states, run by THIS leg, one case at a
+time. Verbatim excerpts; "[... elided ...]" marks removed log noise.
+
+(a) BEFORE shape / pre-existing case (current tree, no overlay). Every live capture in
+this file begins with the tasklist self-proof; here it was:
+RUN at 2026-10-15 13:34:21 +0800  anchor=33e429c1
+wisp.exe                     40296 Console                    1     56,120 K     <- owner's instance, untouched
+$ go test -tags winlive -run 'TestPanelDeathReplay319UnfixedReading$' ./cmd/wisp/ -count=1 -v
+=== RUN   TestPanelDeathReplay319UnfixedReading
+    panel_death_replay_319_winlive_test.go:109: 319 unfixed live reading: hwnd=0x18300D02 closed via WM_SYSCOMMAND/SC_CLOSE; thread finished=true; next gesture RequestToggle=false; mgr.IsCreated=false; mgr hwnd=0x0
+--- PASS: TestPanelDeathReplay319UnfixedReading (1.08s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.207s
+=> the dead thread's refusal and "no window came back" are still true after the fix.
+
+(b) AFTER shape / rebuild (current tree, no overlay).
+RUN at 2026-10-15 13:34:36 +0800  wisp.exe 40296 present
+$ go test -tags winlive -run 'TestPanelDeathThenHolderGestureRebuilds319$' ./cmd/wisp/ -count=1 -v
+time=2026-10-15T13:34:41.302+08:00 level=INFO msg="panel host: starting a fresh panel thread for this gesture" via=319-live-rebuild why="the previous panel thread had exited"
+    panel_death_replay_319_winlive_test.go:184: 319 live rebuild reading: old hwnd=0x20C0228 closed via WM_SYSCOMMAND/SC_CLOSE (alive after the close=false); after the close: mgr.IsCreated=false mgr hwnd=0x0 dead-thread RequestToggle=false; after the holder's rebuild: holder toggle=true new hwnd=0x18330D02 mgr.IsCreated=true mgr.IsShown=true old window alive=false
+--- PASS: TestPanelDeathThenHolderGestureRebuilds319 (3.14s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.261s
+=> old HWND 0x20C0228 != new HWND 0x18330D02; mgr.IsCreated=true; gesture returned true.
+
+(c) MUTANT (state 1/3, same overlay mutation as the headless file:
+resident_windows.go:535 'if h.rp == nil {').
+RUN at 2026-10-15 13:34:51 +0800  wisp.exe 40296 present
+$ go test -overlay .../mut-antifinished.json -tags winlive -run 'TestPanelDeathThenHolderGestureRebuilds319$' ./cmd/wisp/ -count=1 -v
+=== RUN   TestPanelDeathThenHolderGestureRebuilds319
+    panel_death_replay_319_winlive_test.go:162: panelHolder.toggle refused the gesture after the panel thread had died; AC#1 says this gesture must make the holder start a fresh thread and the window must come back
+    panel_death_replay_319_winlive_test.go:167: 319 live rebuild reading (the holder refused, so no window was asked for): old hwnd=0x21A125E closed via WM_SYSCOMMAND/SC_CLOSE (alive after the close=false); after the close: mgr.IsCreated=false mgr hwnd=0x0 dead-thread RequestToggle=false
+--- FAIL: TestPanelDeathThenHolderGestureRebuilds319 (0.85s)
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.959s
+=> red BY NAME on the refusal; it returns on the named red in 0.85s instead of waiting
+out a 15s timeout (no "failed measurement" shape added).
+
+(d) RESTORED (state 3/3, no overlay).
+RUN at 2026-10-15 13:35:05 +0800  wisp.exe 40296 present
+integrity before this run: sha256(resident_windows.go)=06eacd97... (== HEAD); git diff bytes: 0
+    panel_death_replay_319_winlive_test.go:184: 319 live rebuild reading: old hwnd=0xD007E closed via WM_SYSCOMMAND/SC_CLOSE (alive after the close=false); after the close: mgr.IsCreated=false mgr hwnd=0x0 dead-thread RequestToggle=false; after the holder's rebuild: holder toggle=true new hwnd=0x2C370B42 mgr.IsCreated=true mgr.IsShown=true old window alive=false
+--- PASS: TestPanelDeathThenHolderGestureRebuilds319 (7.70s)
+=> a second independent run: old 0xD007E -> new 0x2C370B42 (new handle again).
+
+(d2) BEFORE shape's own teeth (N1/N3 raw refusal), mutant M-A:
+panel_resident_windows.go:373 `if rp.startUpErr() != nil || rp.isFinished() {` -> `if rp.startUpErr() != nil {`
+RUN at 2026-10-15 13:39:09 +0800
+    panel_death_replay_319_winlive_test.go:104: a gesture was accepted by a panel thread whose pump had returned - the refusal is the honest half of the defect, and this case pins it
+    panel_death_replay_319_winlive_test.go:109: 319 unfixed live reading: hwnd=0xE490EF2 closed via WM_SYSCOMMAND/SC_CLOSE; thread finished=true; next gesture RequestToggle=true; mgr.IsCreated=false; mgr hwnd=0x0
+--- FAIL: TestPanelDeathReplay319UnfixedReading (0.89s)
+and after lifting it (RUN at 2026-10-15 13:39:38 +0800 RESTORED: no overlay):
+    panel_death_replay_319_winlive_test.go:109: 319 unfixed live reading: hwnd=0x16007E closed via WM_SYSCOMMAND/SC_CLOSE; thread finished=true; next gesture RequestToggle=false; mgr.IsCreated=false; mgr hwnd=0x0
+--- PASS: TestPanelDeathReplay319UnfixedReading (0.90s)
+
+VERDICT (this leg): AC#1 live CONFIRMED on both halves: the close chain really ends the
+thread and the next gesture through the holder really brings a NEW window up; the same
+mutation that kills the holder half in the headless tier kills it live by the same named
+red. Integrity: both production files' sha256 equal to HEAD after all runs; git diff 0.

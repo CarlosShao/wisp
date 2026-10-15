@@ -1,0 +1,58 @@
+319-v · AC#3 one mutant per nail, all run by THIS leg (all injected with -overlay; the
+landed files were never touched - sha256 + `git diff | wc -c` = 0 after each). Nails:
+N1 = dead thread refuses + holder rebuilds (spawn asked a 2nd time); N2 = hook exactly
+once + Reset, no-hook still consumes and clears; N3 = live close chain + live rebuild.
+
+N1 · holder rebuild, headless (full text in 01-ac1-headless-three-state.txt)
+  MUTATION  cmd/wisp/resident_windows.go:535  `if h.rp == nil || h.rp.isFinished() {` -> `if h.rp == nil {`
+  RED       FAIL: TestPanelHolderRebuildsADeadThread319
+              panel_holder_319_windows_test.go:146: ... a dead thread must make the holder start a fresh one for this gesture
+              panel_holder_319_windows_test.go:149: the spawn was asked 1 time(s) for one gesture after a dead thread, want exactly 2 (the eager first thread plus one rebuild)
+              reading: holder toggle=false; spawns=1; rebuilt thread queued requests=-1; same manager=false
+  GREEN     restore -> both headless cases pass; reading toggle=true spawns=2 queued=1 same manager=true
+
+N1 · raw refusal (the "must stay refused" half), headless
+  MUTATION  cmd/wisp/panel_resident_windows.go:373 `if rp.startUpErr() != nil || rp.isFinished() {` -> `if rp.startUpErr() != nil {`
+  RED       FAIL: TestDeadPanelThreadRefusesEveryGesture319
+              panel_holder_319_windows_test.go:84: a gesture handed to a dead panel thread was accepted (toggle=true show=true) - post() must refuse a thread whose goroutine has returned ...
+              reading: RequestToggle=true RequestShow=true isFinished=true
+            also FAIL: TestPanelHolderRebuildsADeadThread319
+              panel_holder_319_windows_test.go:142: a gesture was accepted by the dead thread itself - the refusal is the honest half of the defect and must stay
+  GREEN     restore -> `-run '319' ./cmd/wisp/ ./internal/proc/` all pass (see 05-gates-face.txt)
+
+N1/N3 · raw refusal, LIVE (same M-A mutation as above)
+  RED       FAIL: TestPanelDeathReplay319UnfixedReading (0.89s)
+              panel_death_replay_319_winlive_test.go:104: a gesture was accepted by a panel thread whose pump had returned - the refusal is the honest half of the defect, and this case pins it
+              reading: hwnd=0xE490EF2 closed via WM_SYSCOMMAND/SC_CLOSE; thread finished=true; next gesture RequestToggle=true; mgr.IsCreated=false; mgr hwnd=0x0
+  GREEN     restore -> PASS (0.90s), reading RequestToggle=false (full text in 02-...)
+
+N2 · hook exactly once + Reset, internal/proc
+  MUTATION  internal/proc/boot_windows.go:205-212 - the whole `if hook := rt.activationHookRead(); hook != nil { ... }` block deleted (the no-hook branch stays)
+  RED       FAIL: TestActivationHook319RunsExactlyOnceAndResets (0.06s)
+              activation_hook_319_windows_test.go:79: the registered activation hook ran 0 time(s) for ONE second launch, want exactly 1
+            PASS: TestActivationWithoutHook319StillConsumesAndClears (the positive control for the no-hook branch)
+  GREEN     restore -> both pass; `-run '319' ./internal/proc/` ok 0.248s
+
+N2 · Reset half, internal/proc
+  MUTATION  internal/proc/boot_windows.go:210 `_ = rt.Instance.ResetActivation()` (hook branch only) deleted
+  RED       FAIL: TestActivationHook319RunsExactlyOnceAndResets (0.07s)
+              activation_hook_319_windows_test.go:85: a second round consumed a signal: ResetActivation did not clear the manual-reset event
+              activation_hook_319_windows_test.go:88: the activation hook ran 2 time(s) across two rounds, want 1 - one launch's signal leaked into two handoffs
+  GREEN     restore -> `-run '319' ./internal/proc/` ok 0.212s (capture 16)
+
+N3 · live rebuild (full text in 02-ac1-live-n3-three-state.txt)
+  MUTATION  same N1 mutation (resident_windows.go:535)
+  RED       FAIL: TestPanelDeathThenHolderGestureRebuilds319 (0.85s)
+              panel_death_replay_319_winlive_test.go:162: panelHolder.toggle refused the gesture after the panel thread had died; AC#1 says this gesture must make the holder start a fresh thread and the window must come back
+              and it returns ON the named red (no 15s timeout shape added)
+  GREEN     restore -> PASS (7.70s), old hwnd=0xD007E -> new hwnd=0x2C370B42
+
+INTEGRITY (after ALL of the above):
+  sha256 cmd/wisp/resident_windows.go             06eacd97... (== HEAD)
+  sha256 cmd/wisp/panel_resident_windows.go       fb2cbec2... (== HEAD)
+  sha256 internal/proc/boot_windows.go            c98119ca... (== HEAD)
+  sha256 internal/proc/singleinstance_windows.go  2dbb0502... (== HEAD)
+  git diff -- <those 4 files> | wc -c = 0 ; git status --porcelain -- cmd/wisp/ internal/proc/ = 0 lines
+
+VERDICT (this leg): all three nails have teeth ("弄坏⇒红 by name, 还原⇒绿") and the
+before-shape nails (refusal) have their own teeth demonstrated twice (headless + live).

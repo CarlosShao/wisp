@@ -1,0 +1,73 @@
+319-v · AC#2 live: the committed case, three out-of-repo probes, one negative control,
+and this leg's adjudication of whether the shape is enough. Verbatim excerpts; probes were
+injected with -overlay and never written into the tree (sources in the report appendix).
+
+(1) THE COMMITTED CASE, re-run by this leg (not its log).
+RUN at 2026-10-15 13:36:03 +0800  anchor=33e429c1  wisp.exe 40296 present
+$ go test -tags winlive -run 'TestSecondLaunchActivationRaisesThePanel319$' ./cmd/wisp/ -count=1 -v
+    panel_death_replay_319_winlive_test.go:288: 319 second-launch live reading: signal=SignalExistingInstance("Local\\wisp-test-319-activation-10040-1792042569647668300.activate") from this process; hook receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; panel hwnd=0x18370D02 mgr.IsCreated=true mgr.IsShown=true window alive=true; foreground window=0x18370D02; prior window=0x144307AC; event loop still running=true
+--- PASS: TestSecondLaunchActivationRaisesThePanel319 (0.87s)
+`grep -c "AllowSetForegroundWindow(ASFW_ANY) was refused"` over the whole capture = 0.
+=> the production hop runs end to end IN THIS PROCESS: signal -> hook -> toggle -> real
+window up -> GetForegroundWindow == the panel's HWND. Cold shape (no window before).
+
+(2) PROBE shape B (window EXISTS but hidden - the field shape behind 21:40:38).
+RUN at 2026-10-15 13:38:02 +0800 anchor=592a69cd
+    probe_319v_hotpath_winlive_test.go:146: 319v shape B READING (panel exists but hidden): same hwnd 0x64D0C12 shown again=true alive=true; foreground after=0x64D0C12 (panel=0x64D0C12, prior=0xD780E56); receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+--- PASS: TestProbe319vSecondLaunchWhilePanelHidden (0.90s)
+=> the re-show branch of Show is reached and the hidden window comes back AND takes the
+foreground. (The committed case only covers created=false; this covers created=true.)
+
+(3) PROBE shape A (window already VISIBLE when the second launch arrives).
+RUN at 2026-10-15 13:38:16 +0800 anchor=592a69cd
+    probe_319v_hotpath_winlive_test.go:118: 319v shape A READING (panel already visible): shown before=true after=false; window 0x99507AA alive=true; foreground after=0xA07E8 (panel=0x99507AA, prior=0x126C0E26); receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines" -- THE SECOND LAUNCH HID THE PANEL (toggle semantics), which is not the ticket's letter for this shape
+--- PASS: TestProbe319vSecondLaunchWhilePanelVisible (0.80s)
+=> DIVERGENCE FINDING (this leg): RequestToggle hides a shown panel
+(panel_resident_windows.go:447-457 -> mgr.Hide()); so a double click while the panel is
+already visible makes it disappear instead of raising it. Register, do not silently fix.
+
+(4) PROBE two-process (the layer 319-r2 named as not built): the parent holds the
+foreground with an editor window, spawns a SECOND process (same test binary,
+-test.run=^TestProbe319vTwoProcessChild$), the child creates its own window, takes the
+foreground, then calls SignalExistingInstance on the parent's per-run event name and
+stays alive; the parent's panel window exists and is hidden.
+RUN at 2026-10-15 13:43:36 +0800 anchor=90a68597
+    probe_319v_twoprocess_winlive_test.go:139: 319v two-process READING: parent pid=44140 child pid=26676; child window=0x2AB11E4; child took the foreground before signalling=true (checked while waiting); ASFW refusal warning in the child=false; parent's panel: hwnd=0x144907AC shown-after=true alive=true; foreground after=0x144907AC (panel=0x144907AC, child=0x2AB11E4, parent prior=0x9B20F74); parent held the foreground at signal time=false; receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; RAISED-BY-THE-SECOND-PROCESS=true
+--- PASS: TestProbe319vSecondLaunchFromRealChildProcess (1.50s)
+=> a REAL second process's signal raises the panel and the panel takes the foreground
+while a DIFFERENT process held it; the parent was not foreground at signal time.
+
+(4b) NEGATIVE CONTROL for (4): the same run with the AllowSetForegroundWindow call
+deleted from SignalExistingInstance (singleinstance_windows.go:170-173 -> no-op).
+RUN at 2026-10-15 13:44:17 +0800
+    probe_319v_twoprocess_winlive_test.go:139: 319v two-process READING: parent pid=39512 child pid=43876; child window=0xA040602; child took the foreground before signalling=true (checked while waiting); ASFW refusal warning in the child=false; parent's panel: hwnd=0x67A0FC8 shown-after=true alive=true; foreground after=0x67A0FC8 (panel=0x67A0FC8, child=0xA040602, parent prior=0x8200D38); parent held the foreground at signal time=false; receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; RAISED-BY-THE-SECOND-PROCESS=true
+--- PASS (1.63s)
+=> the outcome is the SAME without ASFW: this instrument does NOT show the ASFW call to
+be load-bearing. Likely because the foreground holder (the child) is a process the
+resident itself spawned, which Windows' foreground rules do not treat as the field's
+"unrelated foreground app (Explorer/browser) + shell-launched second instance" case.
+Stated as a failed isolation of that one variable, not as a product verdict.
+
+(5) THIS LEG'S ADJUDICATION of "is the in-process shape enough as AC#2's evidence?"
+- WHAT IS PROVEN: the production wire exists end to end (named event -> RunEventLoop
+  handleActivation -> SetActivationHook -> secondLaunchActivation319 -> holder.toggle ->
+  real window shown + foreground), on three shapes (cold / hidden / cross-process), and
+  the receipt sentence does not over-claim ("the window verdict lands on the panel
+  thread's own log lines").
+- WHAT IS NOT PROVEN by the repo's own case: (i) the cross-process ASFW layer - it is
+  now measured by this leg's out-of-repo probe (4) and PASSES, but that probe is not a
+  permanent nail and its ASFW-specific isolation control (4b) came out NEGATIVE, so
+  "ASFW is what makes the steal work in the field" remains unestablished; (ii) the
+  already-visible shape raises a divergence (3).
+- RESIDUAL LOOP: TestSecondLaunchActivationRaisesThePanel319 leaves RunEventLoop
+  running (its own comment names it; no exported stop). This leg's reading is that it
+  cannot pollute later cases in the same binary: handleActivation reads
+  Instance.ActivateEvent() every 50ms; after the case's cleanup runs rt.Shutdown(true)
+  -> Instance.Release() sets the event handle to 0, so the loop's
+  WaitForSingleObject(0) returns an error and the round consumes nothing
+  (singleinstance_windows.go:92-96 + boot_windows.go:198-204); it never registers in
+  the D38 roster, so no roster report can flag it; winlive runs one case per process.
+- VERDICT: AC#2 = 附条件成立. The field defect (a double click is silence) is answered;
+  the committed evidence covers the in-process cold shape, this leg adds hot-path and
+  cross-process readings, and two named residuals (visible-shape hides; ASFW necessity
+  unmeasured) are registered for the orchestrator.

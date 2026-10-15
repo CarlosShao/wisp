@@ -1,0 +1,49 @@
+319-v (verification leg, non-implementer) evidence index — ticket 319 "panel thread
+death is terminal and a second launch cannot bring any window to front".
+
+Anchor at start: HEAD 33e429c1 (2026-10-15 13:2x +08). HEAD moved WHILE this leg ran
+(320-r1's commits + the orchestrator's HANDOVER commit landed: 33e429c1 -> 592a69cd ->
+90a68597 -> a920c4d4); the 319 face is byte-identical across all of them -
+`git diff --stat 33e429c1 a920c4d4 -- <the 4 production files + the 3 319 test files>`
+is 0 lines, and the four production sha256 below equal both anchors - so every reading
+below is a reading of the landed 319 code. Readings taken at 13:33-13:37 carry
+anchor=33e429c1, at 13:38-13:44 anchor=592a69cd/90a68597; the face is the same.
+Every reading in 01..05 was taken by THIS leg on this box; no 319-r1/319-r2 log line is
+re-quoted as a reading.
+
+Method: read-only repo + out-of-repo instruments. NO tracked file was modified:
+every mutation was injected with `go test -overlay <json>` whose Replace map points at
+mutant copies under C:\Users\swq\AppData\Local\Temp\wisp319v-mut\ (outside the repo),
+and every mutant run was followed by an integrity check of the landed file:
+  cmd/wisp/resident_windows.go             06eacd979a46bf802efd6d5774b0e0546fe17f419d9d9264f0f85773d1ef07e0
+  cmd/wisp/panel_resident_windows.go       fb2cbec2d6be279087c592e0cda08706ee7ac763755159ced6d3851adbf711bd
+  internal/proc/boot_windows.go            c98119cac2a8998f64dc57897331ce063ca1e492903c19a93b0cc6962eb84868
+  internal/proc/singleinstance_windows.go  2dbb050274f28bc807c8a4bbaa384b25c44448c2299bc7df8599a7d486cad905
+After every mutant: `git diff -- <the file> | wc -c` = 0 and
+`git status --porcelain -- cmd/wisp/ internal/proc/` = 0 lines. The hashes above equal
+`git show HEAD:<file> | sha256sum`, so the working tree == HEAD for the 319 face.
+
+Env for every run: PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH";
+GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\wisp319vgotmp'.
+Owner instance: wisp.exe PID 40296 present and untouched in every live run (the
+tasklist line is captured in each reading file). winlive cases ran ONE AT A TIME, one
+process per case. Two probe instruments were injected but never written into the tree
+(their sources are in the acceptance report's appendix):
+  probe_319v_hotpath_winlive_test.go     shapes A/B of AC#2 on the hot path
+  probe_319v_twoprocess_winlive_test.go  the cross-process ASFW-sensitive shape
+
+01-ac1-headless-three-state.txt  AC#1 (N1 holder half) three states: mutant red (named),
+                                 current-tree green, post-restore green + integrity.
+02-ac1-live-n3-three-state.txt   AC#1 live (N3 both halves): before-shape green, rebuild
+                                 green (new HWND != old), live mutant red, restored green.
+03-ac2-live-adjudication.txt     AC#2: the committed live case re-run by this leg, then
+                                 three out-of-repo probes (visible / hidden / real
+                                 second process) and the no-ASFW control, then this
+                                 leg's adjudication of whether the shape is enough.
+04-ac3-mutants.txt               AC#3 one mutant per nail, own runs: N1 rebuild, N1 raw
+                                 refusal, N2 exactly-once, N2 Reset (plus restore greens).
+05-gates-face.txt                AC#4 gates (build / gofumpt / vet / d22scan / length)
+                                 and the face check (both landed commits, frozen paths,
+                                 what is dirty in the tree and whose it is).
+
+Verdicts live in docs/evidence/s1/ticket319-319-v-accept-v1.md ("逐格判语").

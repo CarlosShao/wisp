@@ -1,0 +1,63 @@
+319-v · AC#4 gates and face check, all run by THIS leg. Verbatim key lines.
+
+GATE A: go build ./...            rc=0 (live tree, 13:39 +08; and again in the pristine
+                                  HEAD snapshot at /tmp/wisp319v-main, rc=0)
+GATE B: gofumpt -l                no names for the 7 landed 319 Go files (rc=0), both in
+                                  the live tree and in the pristine snapshot. THIS leg
+                                  writes no Go file; the probe instruments were
+                                  gofmt-checked out of tree before use.
+GATE C: go vet -tags winlive ./cmd/wisp/ ./internal/proc/
+  - live tree at 13:40 +08: rc=1, but NOT from the 319 face:
+      # github.com/CarlosShao/wisp/internal/config
+      internal\config\settings_320.go:26:2: "reflect" imported and not used
+    That file is leg 320-r1's UNCOMMITTED, mid-write change at that minute
+    (`git status --porcelain -- internal/config/` = " M internal/config/settings_320.go";
+    mtime 13:40). Foreign, not touched by this leg.
+  - pristine HEAD snapshot (`git archive 33e429c1` -> /tmp/wisp319v-main): rc=0.
+  - live tree again AFTER 320-r1 committed (HEAD a920c4d4, 13:4x +08): rc=0.
+  => the 319 face passes the vet gate; the one rc=1 reading is attributable to another
+  leg's in-flight file and resolved by that leg's own commit.
+GATE D: sh scripts/d22scan.sh         rc=0, verbatim:
+      d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=238,
+      bans #1-5 cmd/=40, ban #6 frontend/=115, ban #7 internal/tools/=24, ban #8
+      design/=39, ban #8 frontend/=115, ban #8 internal/=560, ban #8 cmd/=132; ban #8
+      emoji coverage: design/ 39 text files; frontend/ 115 text files; internal/ 560 Go
+      files, comments and _test.go included; cmd/ 132 Go files, comments and _test.go
+      included
+GATE E: sh scripts/check-path-length-budget.sh --with-self-test   rc=0, verbatim:
+      check-path-length-budget.sh: denominator: tracked paths=13116  over-budget=60
+      covered by roster=60  not in roster=0
+      check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is
+      rostered by name with a reason, and the roster equals the tree
+
+FACE: the two landed 319 commits, per-file (git show --stat --name-only):
+  e6d1373e (319-r1's estate, 11 files): 4 production files
+    (cmd/wisp/resident_windows.go +217, cmd/wisp/panel_resident_windows.go +31,
+    internal/proc/boot_windows.go +92, internal/proc/singleinstance_windows.go +43),
+    3 test files (cmd/wisp/panel_holder_319_windows_test.go, cmd/wisp/
+    panel_death_replay_319_winlive_test.go, internal/proc/
+    activation_hook_319_windows_test.go), the ticket, probes/319/r1/logs/ 3 files.
+  2ad0aa86 (319-r2, 13 files): the two cmd/wisp 319 test files
+    (+113 / +216), the ticket, probes/319/r2/ 10 reading files. Nothing else.
+  Frozen check over BOTH commits (`git show --name-only <c> | grep -E
+  "^docs/PLAN\.md|^docs/specs/|thresholds\.go|golden|^frontend/|^design/"`):
+    e6d1373e: no frozen hit   2ad0aa86: no frozen hit
+  Production files net diff: at this leg's anchor (33e429c1),
+  `git diff --stat 2ad0aa86..HEAD -- cmd/wisp/ internal/proc/` was EMPTY: no 319 file
+  moved between 319-r2's delivery and this leg's anchor. (Afterwards 320-r1 landed its
+  own files in the same dirs; those are not 319 files and are named below.)
+
+WORKING TREE (what is dirty and whose it is; this leg touched no tracked file yet):
+  - 319 face: CLEAN (`git status --porcelain -- cmd/wisp/ internal/proc/` = 0 lines).
+  - Foreign changes present while this leg ran (for the record, not this leg's doing):
+    .gitignore, go.mod (jchv/go-webview2 indirect->direct), design/** + frontend/** (owner's
+    external agent), docs/reports/HANDOVER.md + pending-and-issues.md (orchestrator),
+    internal/config/settings_320*.go + internal/panel/config_*_313*.go + cmd/wisp/
+    panel_config_*.go (leg 320-r1, now committed at a920c4d4), probes/152 + probes/268
+    (other legs' half-done files, untouched per dispatch).
+  - HEAD moved mid-leg 33e429c1 -> 592a69cd -> 90a68597 -> a920c4d4; the 319 face is
+    byte-identical across all four (see 00-index.txt for the exact command).
+
+VERDICT (this leg): the four gates pass on the 319 face (live tree after the sibling
+commit landed, and in the pristine snapshot); both landed commits lie entirely inside the
+319 face + ticket + probes; the frozen paths are untouched by them.

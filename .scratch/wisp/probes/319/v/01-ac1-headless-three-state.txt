@@ -1,0 +1,49 @@
+319-v · AC#1 headless three-state (N1 holder half), run by THIS leg. Verbatim excerpts;
+"[... elided ...]" marks lines removed (log noise/shutdown steps), nothing reworded.
+
+MUTANT (state 1/3). Mutation, applied OUTSIDE the repo and injected with -overlay:
+cmd/wisp/resident_windows.go:535 changed from
+  if h.rp == nil || h.rp.isFinished() {
+to
+  if h.rp == nil {
+Mutant copy: C:\Users\swq\AppData\Local\Temp\wisp319v-mut\resident_windows.mut.go
+sha256 f326fce685fa991d1359bd452612286ec7f2da23d081c9d5025957c007e77b5e
+Landed file sha256 during the run and after: 06eacd979a46bf802efd6d5774b0e0546fe17f419d9d9264f0f85773d1ef07e0
+`grep -c "h.rp.isFinished()" <mutant>` = 0 (the term is really gone);
+`go build -overlay mut-antifinished.json ./cmd/wisp/` rc=0 (overlay compiles).
+
+$ go test -overlay .../mut-antifinished.json -run 'TestPanelHolderRebuildsADeadThread319' ./cmd/wisp/ -count=1 -v
+=== RUN   TestPanelHolderRebuildsADeadThread319
+    panel_holder_319_windows_test.go:146: panelHolder.toggle returned false for a gesture after the panel thread had died - the dead thread's refusal reached the caller again, which is the 2026-10-14 field defect (every tray/ball gesture refused after 15:41:45); a dead thread must make the holder start a fresh one for this gesture
+    panel_holder_319_windows_test.go:149: the spawn was asked 1 time(s) for one gesture after a dead thread, want exactly 2 (the eager first thread plus one rebuild)
+    panel_holder_319_windows_test.go:152: the holder hands out the dead thread again - the rebuild replaced nothing, so the next gesture walks the same road
+    panel_holder_319_windows_test.go:175: 319 holder rebuild reading: dead thread refused its own gesture; holder toggle=false; spawns=1; rebuilt thread queued requests=-1; same manager=false
+--- FAIL: TestPanelHolderRebuildsADeadThread319 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.064s
+
+=> red names point at the rebuild itself (toggle false + "spawn asked 1 time, want exactly 2").
+
+CURRENT TREE (state 2/3; no overlay).
+$ go test -run '319' ./cmd/wisp/ ./internal/proc/ -count=1 -v   (same command as the
+combined regression; full file is 10-regression-319-both.txt, not archived here)
+=== RUN   TestDeadPanelThreadRefusesEveryGesture319
+    panel_holder_319_windows_test.go:89: 319 dead-thread raw reading: RequestToggle=false RequestShow=false isFinished=true
+--- PASS: TestDeadPanelThreadRefusesEveryGesture319 (0.00s)
+=== RUN   TestPanelHolderRebuildsADeadThread319
+    panel_holder_319_windows_test.go:175: 319 holder rebuild reading: dead thread refused its own gesture; holder toggle=true; spawns=2; rebuilt thread queued requests=1; same manager=true
+--- PASS: TestPanelHolderRebuildsADeadThread319 (0.00s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.132s
+
+RESTORED (state 3/3; mutant lifted, same two cases again).
+$ go test -run 'TestDeadPanelThreadRefusesEveryGesture319|TestPanelHolderRebuildsADeadThread319' ./cmd/wisp/ -count=1 -v
+--- PASS: TestDeadPanelThreadRefusesEveryGesture319 (0.00s)
+--- PASS: TestPanelHolderRebuildsADeadThread319 (0.00s)
+    panel_holder_319_windows_test.go:175: 319 holder rebuild reading: dead thread refused its own gesture; holder toggle=true; spawns=2; rebuilt thread queued requests=1; same manager=true
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.076s
+Integrity after the mutant run: sha256(resident_windows.go)=
+06eacd979a46bf802efd6d5774b0e0546fe17f419d9d9264f0f85773d1ef07e0 (== HEAD);
+`git diff -- cmd/wisp/resident_windows.go | wc -c` = 0; `git status --porcelain -- cmd/wisp/ internal/proc/` = 0 lines.
+
+VERDICT (this leg): AC#1 headless teeth CONFIRMED — the holder half goes red by name on
+the exact mutation, and both states around it are green.
