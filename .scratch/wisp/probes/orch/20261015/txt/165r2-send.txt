@@ -1,0 +1,29 @@
+# 165-r2 放腿记录（本文件＝存档 `165r2-dispatch.txt` 的释放条件核对＋两条更正＋输出预算）
+
+编排者放腿时刻 `2026-10-15 22:0x +08`，HEAD `6eb3d2e8`。原存档写于 21:2x（提交 `41673704`），本文件是**发腿那一刻**的对账，⛔ 取代原单正文。
+
+## 一、释放条件已核（三把尺都是我自己现跑的）
+- 原单写"⛔ 与 `324-r1` 撞 `cmd/wisp` 面"⇒ **`324-r1` 已交并已收件**（`9c5916e8`／`e038304b`／`60481441`），我定向复跑 `rc=0`、三枚点名全 PASS。
+- 该面此刻没人占：进程名册 `wisp*`/`*test*` 只剩机主自己的常驻 `wisp` PID **21892**（那是应用，不是测试进程），`*.test.exe` **0 枚**。
+- 本机负载两发采样 **44.5% → 55.5%**（阈 70%）⇒ 允许补位。
+
+## 二、发腿时对原单的两处更正（照这两条做，⛔ 抄原单的旧数）
+1. 原单 §2 那句"已知存量红一枚＝`TestTicket255RosterStillMatchesTheActualReadSites`（归口票 324、`324-r1` 正在修）"**今天已不成立**：我在 `6eb3d2e8` 之前的 `8beaed39` 面上复跑，该枚 **PASS (1.75s)**，⛔ 再把它当存量红登记；你若在它上面看到红，那是**你造成的**，具名报回，⛔ 顺手改尺。
+2. 那把 255 名册尺的**定型已由编排者裁为"乙′"**（文本匹配＋那一跳必须是段结构体自己声明的导出字段、成员名册用反射现读 `config.Config`；台账本轮记 `A996`——它可能比你起手晚一步落盘，那就以本文件这一段为准，⛔ 因为找不到 A996 而自己重裁⇒ 你**不许**为了让尺安静而改它判定形状；接线若真动了"谁读配置字段"，正确做法是**往名册里加一行**（`cmd/wisp/config_readers_255.go`），⛔ 动尺。
+
+## 三、在飞邻居与禁区（此刻另有两枚腿活着）
+- `287-r1` 写面＝`internal/tools/**`（深度判定夹具）；`120-r3` 写面＝`internal/winsec/**` 测试件。
+- ⇒ 你**零字**不碰这两枚目录；原单 §1 已写"⛔ 不改 `internal/tools/**` 一字"，此处扩到整棵 `internal/winsec/**`。
+- 共享编译面规矩不变：`cmd/wisp/**` 与 `internal/panel/**` 每波只许一枚写腿——**这一波那一枚就是你**。
+
+## 四、输出预算（交件体例，缺一条当我没派）
+- **证据件**：`docs/evidence/s1/165-wiring.md`（短名，⛔ `§`、⛔ 长名），逐格写"判据／我跑了什么／读数（连 `rc=`）／成立·不成立·缺世界"。
+- **读数件**：`.scratch/wisp/probes/165/r2/`，每把尺一枚 `.txt`，**件里必须有 `rc=` 那一行**；⛔ 交 0 字节的 `.out`（若某件空，先找同格带 `rc=` 的同伴件并具名说明）。
+- **票尾**：`.scratch/wisp/issues/165-*.md` 末尾 **1** 条 bullet（⛔ 翻 AC 框、⛔ 改 Status/票名、⛔ 动台账）。
+- **门禁逐条带 `rc=`**：`go build ./...`／`gofumpt -l`（绝对路径 `/d/work/base/gopath/bin/gofumpt.exe`，PATH 里没有它）／`go vet -tags winlive ./cmd/wisp/`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh --with-self-test`。
+- **正控必须自带**：接线钉那枚"摘掉那一行必须红"要落**两发**——① 明知该红的定向突变红（连红句首行逐字），② 还原后绿；还原证明＝你自己算的 `git diff` 0 字节＋`git status --porcelain -- cmd/wisp internal` 回空，⛔ 抄别人的 hash 串。
+- **⛔ `-overlay`** 当物理突变的替身（它只换编译期输入，对运行时读盘的尺失明）。
+- **台面故障与读数分开写**：`walk …: The system cannot find the file specified.`／`build failed`／`no test files`／`connection refused` 这类红句**不算**判据，要另起一节具名写"是哪一行红的"。
+- **未做的格**：写"没做完"＋缺哪件料，⛔ 空着或写成"应该没问题"。
+- 件数 ≤5、每件 ≤260 行；**只 commit、⛔ push**；`add`/`commit` 两处**逐文件显式 pathspec**（⛔ 目录形、⛔ `add -A`/`--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`）。
+- ⛔ 双引号串里出现反引号或 `$`；正文一律单引号或加引号 heredoc，或先 Write 成文件再 `git commit -F`。临时件只建不删。
