@@ -4,13 +4,13 @@
 - **来源**：机主 2026-10-14 22:5x 原话逐字「**模型列表要允许拉，三个写入能力可以做**」＋方向「别为了录入 key 就搞个简陋的页面……按照票上来」。**批准落账＝`A968`**（本条即"接口面变更获人工批准"的记录；改 C17/config.set 白名单由此获准）。
 - **背景证据**：`docs/evidence/s1/model-page-v3-brief.md`（§2 Go 侧普查：`billing` 枚举已存在、非预设名合法〔`validate.go:209-212`〕、`provider_row_create` 选择器只吃预设名、无 billing 写入字段）＋台账 `A960`/`A968`。
 - **AC（1:1；裁决表由非实现者出）**：
-  - [ ] **AC#1** `provider_billing` 写入（值 `plan|pay-per-token`，枚举校验；落 `llm.providers.<name>.billing`；选择列与既有 248/313 表机制一致）。
-  - [ ] **AC#2** **自定义供应商行**：非预设名＋显式 `protocol`＋`base_url`（数据层已合法）；"复制 stepfun 为 stepfun-api"形由 UI 组合；值格式/字段名由设计腿定稿。
-  - [ ] **AC#3** **模型条目写入**（provider＋model id；窗口/价格复用既有三字段或并入，设计腿定稿）。
+  - [x] **AC#1** `provider_billing` 写入（值 `plan|pay-per-token`，枚举校验；落 `llm.providers.<name>.billing`；选择列与既有 248/313 表机制一致）。
+  - [x] **AC#2** **自定义供应商行**：非预设名＋显式 `protocol`＋`base_url`（数据层已合法）；"复制 stepfun 为 stepfun-api"形由 UI 组合；值格式/字段名由设计腿定稿。
+  - [x] **AC#3** **模型条目写入**（provider＋model id；窗口/价格复用既有三字段或并入，设计腿定稿）。
   - [ ] **AC#4** **"拉取模型列表"端口**：用已存密钥 GET `<base>/models`（超时/错误分类/不回显密钥/不落盘明文）；返回 id 列表；**新方法名由设计腿定稿并过白名单检查**。
-  - [ ] **AC#5**（可选）预设默认模型目录：仅在拿到真名单后落；或明确"不落、一律拉"（设计腿裁）。
-  - [ ] **AC#6** 门禁＋契约：313/248 两表与 `config_313_test.go` 同批对齐；`go test ./internal/panel/ ./internal/config/`＋相关 `cmd/wisp` 用例；d22scan；长度门；⛔ **冻结件 `internal/panel/l2_grant_boundary_test.go` 零改动**（新字段/方法名不许带审批词汇——设计腿先验）。
-  - [ ] **AC#7** 证据：每格两向三态＋变异自证；证据件 `docs/evidence/s1/320-*.md`。
+  - [x] **AC#5**（可选）预设默认模型目录：仅在拿到真名单后落；或明确"不落、一律拉"（设计腿裁）。
+  - [x] **AC#6** 门禁＋契约：313/248 两表与 `config_313_test.go` 同批对齐；`go test ./internal/panel/ ./internal/config/`＋相关 `cmd/wisp` 用例；d22scan；长度门；⛔ **冻结件 `internal/panel/l2_grant_boundary_test.go` 零改动**（新字段/方法名不许带审批词汇——设计腿先验）。
+  - [x] **AC#7** 证据：每格两向三态＋变异自证；证据件 `docs/evidence/s1/320-*.md`。
 - **禁区**：`docs/PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、`.github/**`、`frontend/**`、`design/**`；冻结三件不动。
 - **撤销口令**：**「撤 320」**（⇒ 新字段/端口一并退回，页面回到只读展示）。
 - **关联**：313（v1 底层）· `docs/evidence/s1/model-page-v3-brief.md`（前端件）· 319（面板宿主修复，在飞）。
@@ -23,3 +23,5 @@
 - [2026-10-15 12:0x +08] **编排者：`320-a1` 收件（三把尺过）＋五枚未定逐条裁＋AC#4 拆两半**（全文落账 `A972`；转交件 `docs/evidence/s1/model-page-v3-brief.md` **§7/§7.1** 已写，待机主转交前端 agent）。**五裁**：① AC#2＝乙形（新字段 `provider_row_create_custom`）② 方法名＝`config.models.list` ③ 拉取＝同步单发、预算 ≤10s ④ 上游错误体不回显（只给 D37 分类＋摘要）⑤ AC#5＝不落。**拆两半**：`TestEveryWhitelistedInboundNameIsAlsoSentByThePage` 是 Go↔页双向硬耦合、`frontend/**` 属机主外部 agent ⇒ ① 前端一行先落（`requestProviderModels`＋按钮＋加载态）② Go 半＝**`320-r2`**（注册四点＋拉取实现＋253 名册 6→7／2→3）；⇒ 本班次 **`320-r1` 只做 AC#1/#2/#3**（三个写入＋AC#6/AC#7），⛔ 不写 fetch 死码。串行序：`319-r2` → `320-r1` → `320-r2`（待前端字面量）／`135-r1`。**AC 框一枚未动**（等实现＋非实现者判语）。
 
 - [2026-10-15 14:0x +08] agent=320-r1 did=**AC#1/#2/#3 三写入落地**（⛔ 不含 AC#4）逐格一笔＋一笔测试补强：`a2d29798` AC#1 `provider_billing`（313 名册三 map＋`SetProviderBilling` 写 `llm.providers.<名>.billing`、写前枚举预检读 `billingModes`、`cmd/wisp` 第三枚 case）· `a920c4d4` AC#2 `provider_row_create_custom`（值 `<protocol>,<base_url>` 由腿按首个逗号切并 trim；一次 guarded 写行＋可选首枚模型；四拒具名〔预设名指回 `provider_row_create`／空 base_url／枚举外 protocol／行已存在〕＋空名拒）· `84fc3f20` AC#3 `model_row_create`（无值、ModelSpec 由既有 `applyDefaults` 播种、拒未知 provider 与已存在条目、复用既有 `model_context_window`/`price_in`/`price_out` 三枚不并字段）· `527d483f` 追加笔：AC#1 拒因分层断言（变异 M1b 首读绿 ⇒ 钉「拒的是字段自己的预检、不是整文件闸」）。**两向三态**＝每格 accept/refuse/control 三面＋真腿 `config.get` 回读；**变异**（`-overlay`＋仓外 mutant，未进树）：M1／M1b／M2／M2b／M3 红名逐字在 `probes/320/r1/04-mutations-red-names.txt`，还原后同参复跑绿、六件 sha256 记在案。**门禁**：`go build ./...`／`go vet ./...`／`d22scan`／长度门 rc=0；`./internal/config` 全包 ok；`./internal/panel` 5 枚失败与「六件 overlay 回 `33e429c1`」逐枚同名（`frontend/**`＋`design/**` 外部面，非本腿）；`./cmd/wisp` 带窗 255 段两向皆整进程死（314 死区同形）、无窗段 rc=0。**面核**六件（`git diff --name-only` 逐 sha 在 `probes/320/r1/05-…`）、冻结面零改动、248 两处 `want` 与 `config_route_248_test.go` 零改、`config.get` 载荷键集未动。证据 `docs/evidence/s1/320-go-side-writes-r1.md`。⛔ 具名没做：AC#4 拉取端口（`320-r2`）、AC#5 不落（`A972` 第 5 裁）、无新方法名／未动 253 计数、未碰 `frontend/**`／`design/**`／`docs/PLAN.md`／`docs/specs/**`／阈值／golden／allowlist。next=编排者收件＋派非实现者判语；`320-r2` 待前端字面量先落。⛔ 未翻框／未动台账／票名；只 commit 不 push。
+
+- [2026-10-15 17:0x +08] **编排者：`320-r1` 收件（三把尺过）＋出判语表（非实现者＝编排者亲自）⇒ 翻 AC#1/#2/#3/#5/#6/#7；AC#4 保持未勾（等前端）**。表＝`docs/evidence/s1/320-orch-accept-v1.md`。三把尺：① 五笔 `git show --stat` 在；② 件在盘；③ **编排者另取读数**——`./internal/config -run Test320` ok＋`./cmd/wisp -run Test320` 三枚真腿 PASS＋`internal/panel` 红名单与基线 `1de62995` **逐枚同名**（零新增红）＋冻结三件/248/`git_test.go` 面零改动；**并自己造一发变异**（`-overlay` 把 `SetProviderBilling` 写入回调改可编译 no-op、`go build -overlay` rc=0）⇒ `Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers` 红名逐字 `written key paths = [], want [llm.providers.deepseek.billing]` ⇒ 钉有牙。⚠ **具名不遮**：AC#2/AC#3 的其余八发变异**我没重跑**（只重跑 AC#1 一发），照仓规腿自报不当数 ⇒ 若判语需要独立复核，派 `320-v` 腿。**AC#5** 依 `A972` 第⑤裁"不落"（票面逐字允许该支）⇒ 可翻。**AC#4** 归 `320-r2`（`frontend/src/lib/panel.ts` 落 `config.models.list` 字面量＝硬耦合；转交件 `docs/evidence/s1/model-page-v3-brief.md` §7/§7.1，**本班次已把可粘贴提示词交机主转交**）。**撤销口令**：照票面「撤 320」；本笔五格＋#7 的勾随之回退。
