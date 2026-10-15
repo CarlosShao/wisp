@@ -18268,3 +18268,13 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
   2. 本笔：**「常用第二行」一键入口**（＝已配置**且**在 `KNOWN_ALT_ENDPOINTS` 里有第二计费口的厂商，逐个给按钮：`加一行 stepfun-api（按量口）`）——**不依赖任何下拉选择**，进表单即见；并把选择器旁注明"这里只列还没添加过的内置供应商"＋列出"已添加：stepfun"。
 - **并行的一条真账（不遮）**：行上的"计费模式/基址**当前值**"仍显示"暂未读取"——宿主回读载荷（`providerPayload`）只带 `name/apiKeyRef/hasBaseURL/modelCount/models/credentialSet/credentialError`，而该键集被 `config_313_test.go:315` 的 `wantRow` **逐键钉死**；要把"这一行是哪个计费口、基址是什么"读回页面，须**有意识地移动那道键钉**（加 `baseURL/protocol/billing` 三个键）＋前端显示 ⇒ 排下一轮（当前额度窗不做）。
 - **面边界（照实说）**：`frontend/**` 原归机主外部 agent（零写面）；本轮两笔是**机主明确要求我重新设计**（原话"不要看那个b表单，你自己重新设计补充…现在让你重新设计最完善，最方便，最符合主流harness的模型配置"）⇒ 我按此就地改前端；若前端 agent 后续动这两处，以"常用第二行入口必须不依赖下拉选择""布尔值在派发期间取"两条为准。
+
+## A987｜2026-10-15 17:3x +08（`date` 现读）｜机主第 3/4 轮实报驱动三批（**行身份读回**＋**加完就拉**＋**★删除能力**）：删模型条目／删整行＝**宿主侧新增两枚写入能力**（此前根本不存在），照"被引用则按名拒删"的姿势落地
+
+- **机主第 3 轮实报**（截图）："添加过的模型竟然不能自由删除，一点逻辑都没有"。**核因属实**：248/313/320 三张字段表**从没有删除档**（`grep "func (m \*Manager) Remove|Delete" internal/config` 空），页面那句"暂不支持删除供应商"就是我方能力的真实状态。⇒ 本批补上。
+- **删除能力（Go 侧，逐枚）**：`internal/config/settings_320.go` 新增 `RemoveModelRow(provider, model)`（删 `llm.providers.<p>.models.<id>`）与 `RemoveProviderRow(provider)`（删整行）；两者都骑 `writeOneKey`（先 `validate()` 后落字节、拒则文件字节不变）；整行删除带**引用护栏** `providerReference320`：仍被 `llm.roles.chat.provider`／`Voice.Realtime.Provider`／`CloudASRChain`／`CloudTTSChain`（链元素 `provider/model`）引用时**按名拒**（"先把那处改指别的行"）。面板侧＋两枚字段 `model_row_delete`／`provider_row_delete`（313 名册＋选择列 map＋派发 case）；`cmd/wisp` 两 case；**两枚真腿测试**（`panel_delete_320_test.go`：建了再删＝文件里名字消失、重复删＝按名拒"不在这个目录里"、删被 chat 角色引用的行＝按名拒"默认聊天模型"且文件字节不变、无引用行删得掉）。
+- **行身份读回（本批另一半）**：`providerPayload` 加 `baseURL/protocol/billing` 三键（非密钥；**有意移动 `config_313_test.go:315` 的 `wantRow` 键钉**——那道钉就是为"加键必须有意识"而立）＋ `ProviderSettings` 三字段 ＋ `panel_config_store.go` 填值 ⇒ 行上现在直接显示"**真实基址 + 计费标签 + 协议**"（两行同厂商一眼可辨），计费按钮**高亮当前值**、文案从"当前值暂未读取"改成"当前：按量（点击「套餐」即改）"。
+- **加完就拉**：新增行成功后**自动对该行发起 `config.models.list`**并把结果落在它的面板里（"添加供应商"＝建行+计费+密钥+拉清单一步走完）；顺带修掉"自定义接入不给拉、要自己填"的观感（"模型 id"框改写"选填；添加后会自动拉一次"）。
+- **前端接线（删除）**：模型目录每条 chip 加 `×` 单删（`model_row_delete`）；行级 `删除` 改成**两步确认**（点一次变"确认删除"）；`COPY.deleteUnavailable` 不再被用。
+- **读数**：`Test320*` **八枚全 PASS**（含两枚新删除腿）；`internal/panel -run Test313` ok；`internal/panel` 全包仍**5 枚既有红**（外部面族）＝**零新增红**；gofumpt 空／vet rc=0／d22scan clean／长度门 GREEN；前端 `npm run build`（tsc+vite）过；每批重编 exe＋重启实例（`doctor` 全 PASS）。
+- **推送**：本窗口网络断续；其中一试 git 回 **`Everything up-to-date`**（通常意味远端其实已收到、本地跟踪 ref 未刷新）⇒ **待网络确认，未确认前不宣称已推**。
