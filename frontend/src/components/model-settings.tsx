@@ -690,7 +690,7 @@ function AddProviderForm({
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
 }) {
   const MODES = ["内置供应商", "自定义接入"] as const;
-  const [mode, setMode] = useState<(typeof MODES)[number]>("内置供应商");
+  const [selectedMode, setSelectedMode] = useState<(typeof MODES)[number]>("内置供应商");
   const [provider, setProvider] = useState("");
   const [customName, setCustomName] = useState("");
   const [protocol, setProtocol] = useState("");
@@ -700,7 +700,7 @@ function AddProviderForm({
 
   function submit() {
     const keyValue = keyInputRef.current?.value ?? "";
-    if (mode === "内置供应商") {
+    if (selectedMode === "内置供应商") {
       if (provider === "") {
         onFeedback({ tone: "error", text: "请先选择供应商" });
         return;
@@ -724,10 +724,10 @@ function AddProviderForm({
       }
     }
     if (keyInputRef.current) keyInputRef.current.value = "";
-    const name = mode === "内置供应商" ? provider : customName.trim();
+    const name = selectedMode === "内置供应商" ? provider : customName.trim();
     void run("add-provider", async () => {
       const created = await performWrite(
-        mode === "内置供应商"
+        selectedMode === "内置供应商"
           ? {
               field: "provider_row_create",
               provider: name,
@@ -762,10 +762,10 @@ function AddProviderForm({
       style={{ animation: "fade-up 200ms var(--ease-out-strong) both" }}
     >
       <div className="flex items-center gap-2">
-        <SegmentedControl onChange={setMode} options={MODES} value={mode} />
+        <SegmentedControl onChange={setSelectedMode} options={MODES} value={selectedMode} />
       </div>
 
-      {mode === "内置供应商" ? (
+      {selectedMode === "内置供应商" ? (
         <div className="flex flex-wrap items-center gap-2">
           <span className={rowLabel}>供应商</span>
           {available === null ? (
