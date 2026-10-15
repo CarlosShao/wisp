@@ -1,0 +1,37 @@
+腿名：317-v1（验收腿·非实现者·只读产码，写面只有 probes／证据件／票尾一条）｜票：.scratch/wisp/issues/317-localslash-fold-in-gotmpdir-root-makes-windows-junction-tests-falsely-red.md（AC#1／AC#2 两格）
+裁决锚：实现笔＝`78805129`（317-r1，10-14 落，`git log --oneline --all --since='2026-10-14 00:00' -- scripts` 现量命中；⛔ 别的 136/174 那几枚不是本票的）；当前 HEAD＝`8235e683`（2026-10-15 23:4x）
+存档时刻：2026-10-15 23:4x +08｜编排者放腿前三把尺现跑：① `git log -1 78805129` 真在 ② `git status --porcelain -- scripts tools` ＝ **0 行**（写面空、实现者的改动早已入库）③ CPU 48%＜70%。
+★为什么现在放：这一格从 10-14 13:48 起就挂着等非实现者（实现腿自己在 `next＝` 里写明"判 AC#1/AC#2 归非实现者腿"），我把它漏了一整天（记在我身上，A999 已具名）。**这一修是测量完整性类的**：`GOTMPDIR` 折成正斜杠会让 windows 腿的 junction/路径字面量族用例**假红**（`mklink … Invalid switch - "Users".`），而本编队每天在跑那族——判错了不止欠一格账，会让后续所有腿在坏尺上读数。
+
+★身份钉死（AGENTS.md §0 第 3 条／§1：裁决者≠实现者）
+非实现者。⛔ 改任何产码／脚本／测试件（一处都不许）；⛔ 勾票上 AC 框（翻框由编排者按你的判语做）；⛔ 动 `Status:`／票名／`-done` 后缀。判语只许三种：成立／不成立（带被造出来的坏世界）／证据不足（具名缺哪一发读数）。**⛔ "附条件成立"**。
+
+要裁的两格（票面 14–15 行，逐格引原文，⛔ 概括成"修好了"）
+- **AC#1 复现**：判据要点＝"先读 310／311 的原意，再动手"＋两形对照（posix 形 ⇒ 指名用例必须红；原生形 ⇒ 必须绿）。实现腿交回的是**四枚 `-run` 名＋rc＋PASS/FAIL**＋harness 前后各一发（`portable-tests.sh ./internal/risk/`，`GOTMPDIR`/`WISP_TEST_GOTMP_ROOT` 抽干）。你要做的⛔ 重跑它的脚本，而是**判那些读数算不算凭据**：① 红的这一发红在**哪一行**（要能指出是 `mklink` 目标那行、⛔ 是别的建目录失败）；② 成对两发是不是**同一台面上只差分隔符**（⛔ 拿"改前跑共享工作树、改后跑导出树"这种混台面当对照）；③ 那四枚用例名今天**真存在吗**（自己 `go test -run <名> -list .` 验名，先例＝我本会话用不存在的用例名数出过 0）。
+- **AC#2 修（形状由落地腿现读后裁，须同时保住 310／311 的原意）**：实现腿选了"三处 GOTMPDIR 赋值改原生分隔符合成、`WISP_TEST_GOTMP_ROOT` 仍原样采用、三处 `wisp_311_ref_path` 判不修"。你要逐枚独立复核这三条判断：① 现读 `scripts/portable-tests.sh` 那三处（⛔ 抄它的行号，自己 `grep -n GOTMPDIR` 取现量）；② "**override 仍原样采用**"那一支到底防的是什么（它的证据＝logs/17 那发 posix override 仍 4 红）——如果这一支今天已经不成立（例如 override 被别腿改了写法），要具名说"哪一行"；③ **不修的那三处判对没有**（它给的理由＝折法不流向 GOTMPDIR、读取器第一行再折一次）；④ ★**恒真检查**：把修法退回原状必须红（它给了改前那发＝红 4 枚），还要问**"换成反形会不会也红"**——例：如果谁把 `\\<entry>-` 那段也写成 `/`，这把尺会不会照绿？绿了就说明它对"分隔符"这件事其实不敏感＝写"证据不足"并说缺哪一发。
+- ★**第四处同形（射程外、它自己上报的）**＝`tools/d22scan/runtests.sh:92`。⚠ 编排者 23:5x 现量给你两行，⛔ 拿实现腿的措辞当现量：那一行今天写的是 `gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}/d22scan-…"`＝**基座用反斜杠、尾接用正斜杠的混形**（而 `scripts/portable-tests.sh` 被 317-r1 改成 `:155` 基座 `"$LOCALAPPDATA\\wisp-test-gotmp"`＋`:156` 尾接 `"$gotmp_base\\portable-…"`＝两处都原生）。⇒ 它报的"仍折形"这句按现量要重述成"混形"，你要判的是：**混形今天会不会爆**（会不会有用例拿这个根去拼 `mklink` 目标），以及"不修"要不要转成一张新票。⛔ 你去改（写面不含 `tools/**`），只报判语＋建议。
+- ⚠ 另两处过期/不完整的锚点具名（读码时按现量走，⛔ 抄报告里的号）：票面"元凶行＝`scripts/portable-tests.sh:144`"已被这枚修改动过行位（现量在 `:154`–`:156`）；实现腿说"三处 `wisp_311_ref_path` 判不修"，**编排者 23:5x 现量是 4 处赋值**＝`scripts/portable-tests.sh:818`／`scripts/winsec-tests.sh:174`／`scripts/wisp-cli-tests.sh:186`／`tools/d22scan/runtests.sh:155`（全部同形 `${LOCALAPPDATA//\\//}`）。⇒ 你要判的是"差的那一处是不是它写面外（`tools/**`）所以没算"，还是**真的漏了一处没复核**——这一条只有你能裁，我⛔ 替你盖章。
+
+★读数与用词纪律（我自己踩出来的，⛔ 再踩）
+- 凡引一个数：写全**哪把尺＋射程（哪些目录、工作树还是 HEAD blob、仓内还是仓外导出树）＋量的还是算的**；凡"几枚"带单位名（**文件**／**顶层用例** `^--- PASS`／**子测试**／**调用点**）——两把 PASS 尺同日志可差十枚、两把都对。
+- `gofmt -l`／`gofumpt -l` 退码恒 0＝空尺 ⇒ 必须写"列出几枚＋逐枚件名"。⚠ 本机现在 `gofumpt` ⛔ 装（我 22:4x 量到 `command not found`＝rc 127 台面故障）：跑 `gofmt -l` 并具名这把比门禁那把窄，⛔ 冒充。脚本自己另有 `bash -n` 一把。
+- 一把尺报"0 命中"前先看它的 stderr，并先拿"已知存在的那一枚"当正控——**"0" 是量到的还是正则造的**。
+- 红句里出现 `walk`／`build failed`／`no tests to run`／`connection refused`／`0xc0000135`／`RUN=0` ⇒ 归类面故障、另节具名，⛔ 计入判据（`RUN=0` 的四个 0 ⛔ 是读数＝根本没跑）。
+
+★台面（这一单专属）
+- **⛔ 共享工作树现在有三个别人的在飞面**：`322-r1`＝`internal/winsec`（6 行未提交，它中途会让全仓 `go build`／`go vet ./...` 红在**未定义符号** `preOpenLeafGuard`／`oNoFollowPlatform` 之类）、`166-r2`＝`internal/session`（1 行）、`287-v1`/`324-v1b`＝只读验收腿（`internal/tools`、`cmd/wisp` 定向跑）。⇒ 你要跑的 `./internal/risk/` 若因 winsec 中间态编译不过，那是**别腿的在飞态**，另节具名、⛔ 算本票的红、⛔ 去修；改判＝用 `git archive 8235e683 | tar -x -C <仓外目录>` 取干净树再跑。
+- 导出树必带六件套 `go.mod go.sum internal cmd tools scripts`（少一枚仪器自己声明的 root 就会造**假红**，形如 `walk …: The system cannot find the file specified.`）；取出后先 `find <dir> -name '*.go' | wc -l` 证非空，再信它的 0。
+- ⚠ 仓外导出树里 `cmd/wisp` 的 test 二进制会因未跟踪的 `third_party/sherpa-onnx/*.dll` 缺如而回 `exit status 0xc0000135`（本票大概率用不到 `cmd/wisp`，但如果你要跑，定式＝三枚 DLL 与 test exe 同目录、cwd 设 `cmd/wisp`）。
+- `GOTMPDIR` 先 `mkdir -p` 再指；⚠ **这一票本身就是讲分隔符的**，所以你两次对照跑要**显式打印**你传进去的那一行的逐字形状（`C:\…` ⇄ `C:/…`），⛔ 让"我传的是哪一种"留在猜测里。
+- ⛔ `go test ./cmd/wisp` 整包＝票 314 死亡区（174–212 s 会整进程死）；本票⛔ 需要它，别扩射程。
+- ⛔ 在共享工作树跑 `go mod tidy`／`go get`（会动一枚已挂了五天的 `go.mod`，账归不清）。
+- 长度门必须仓根跑（仓根以外那句 `not inside a git work tree` 是射程拒绝、rc=2，⛔ 当红）。
+- 门禁五件自己跑、自己落 `rc=`：`go build ./...`（红在 winsec ⇒ 上面那节具名）／格式化尺／`go vet ./internal/risk/`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh --with-self-test`。⚠ `internal/` 分母会随别腿新测试件上涨（22:3x 我量到 568），⛔ 当红、⛔ 归给你。
+
+写面（只许这三处，逐字）：1) `.scratch/wisp/probes/317/v1/`；2) `docs/evidence/s1/` 里**你这一份**验收表（件名要短、⛔ 长名、⛔ 带 `§`——长度门会为别家腿的拷贝件红，处置是 `git mv` 短名，⛔ 加名册豁免）；3) 票 317 末尾**一条** bullet（只追加，⛔ 翻框）。⛔ 改产码／脚本／测试件。
+Git 纪律：只 commit、⛔ push；`git add`／`git commit` 两处都带**显式 pathspec**（逐枚列文件，⛔ `-A`／`.`／目录形）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree／checkout；临时件只建不删。
+禁区（零字节）：`docs/PLAN.md`、`docs/specs/**`、`scripts/**`（你只读它判 AC#2）、`tools/**`、`internal/**` 的产码与测试件、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、三枚冻结件（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、`go.mod`／`go.sum`／`.gitignore`（这三枚挂着别会话的改动，⛔ 动）；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动。
+预算：≤4 件、每件 ≤260 行；没裁完的格具名写"没裁完"＋缺哪一发读数。⚠ 输出预算：读数落盘、正文只引关键行（红句逐字＋行号），⛔ 把整份日志贴进交件正文。
+shell 规矩：进 shell 的正文一律单引号或**加引号的 heredoc**；⛔ 双引号串里出现反引号或 `$`（这族在本仓造过两次真事故：拉起孤儿 `build\wisp.exe`、把台账正文当脚本执行⇒暂存区被灌 2113 条）。中文 commit 正文先 Write 成文件再 `git commit -F`。
+轮次：约 150 轮上限，用尽会强杀且零提交（本会话已有三枚腿这样死）。每落一枚文件就 commit（commit-first）。
+交件自证三把尺：① 提交号＋`git show --stat HEAD` 路径清单；② 你的证据件与读数件**绝对路径＋字节数**；③ 两格判语各一句话＋第四处同形的建议。⛔ 只说"已完成"。

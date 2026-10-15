@@ -1,0 +1,10 @@
+317-v1 释放记录（编排者·2026-10-15 23:5x +08）
+
+- 派单正文＝同目录 `317v1-dispatch.txt`（本条与之同批提交，冲突以本条为准）。
+- 票＝`.scratch/wisp/issues/317-localslash-fold-in-gotmpdir-root-makes-windows-junction-tests-falsely-red.md`（AC#1／AC#2 两格，现量在票面 14／15 行）。
+- ★这单为什么在我手里挂了一整天（记我）：实现腿 `317-r1` 10-14 13:48 就交件并**已入库**（`78805129 ticket 317 (317-r1): compose the test temp root with the native separator…`，现跑尺＝`git log --oneline --all --since='2026-10-14 00:00' -- scripts` 命中），它自己那句 `next＝非实现者腿判 AC#1/AC#2` 我没接住 ⇒ 票面两格今天仍 `- [ ]`。定式：**交件里带 `next＝` 的，收件当场转成排程**，⛔ 让"腿等我"变成"我忘了"。
+- 放腿前三把尺现跑：① `git log -1 78805129` 真在；② `git status --porcelain -- scripts tools` ＝ **0 行**（这块面今天没人写）；③ CPU 48%＜70%。
+- 我派单时按现量写进派单的三条更正（⛔ 让腿抄旧号）：a) 票面"元凶行 `scripts/portable-tests.sh:144`"已被这枚修改动过行位 ⇒ 现量 `:154`–`:156`；b) 实现腿说"三处 `wisp_311_ref_path` 判不修"，现量是 **4 处赋值**＝`scripts/portable-tests.sh:818`／`scripts/winsec-tests.sh:174`／`scripts/wisp-cli-tests.sh:186`／`tools/d22scan/runtests.sh:155` ⇒ 差的那一处是"写面外所以没算"还是"真漏了一处"，交腿裁、⛔ 我盖章；c) `tools/d22scan/runtests.sh:92` 今天现量是**混形**（基座 `\\`＋尾接 `/`）而⛔ 纯 posix 形 ⇒ 判"会不会爆"要按混形重述。
+- 编队现状（枚数＋写面类型）：在飞 5 枚＝写码 2（`322-r1`/`internal/winsec` 6 行、`166-r2`/`internal/session` 1 行）＋只读验收 3（`287-v1`/`internal/tools`、`324-v1b`/`cmd/wisp` 定向、本腿/`scripts`＋`internal/risk` 读数）。
+- 台面风险已在派单具名：`internal/risk` 若因 winsec 中间态编译不过 ⇒ 走 `git archive` 仓外树，⛔ 算别腿的红。
+- ⛔ push（推送只在编排者手里，A813；本枚留本地队列，等两条写腿交完一次推）。
