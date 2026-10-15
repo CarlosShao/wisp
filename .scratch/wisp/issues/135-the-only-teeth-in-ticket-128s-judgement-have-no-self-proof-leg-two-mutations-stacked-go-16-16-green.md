@@ -219,3 +219,18 @@
   **修后**：windows 整包 `49/48/0/1` rc=0、linux 单发 `PASS`；**M-D′ 下**：windows 整包 `49/47/1/1` rc=1、**linux 单发 `FAIL`（红名逐字 `DataDir:wisp-dev`）** ⇒ POSIX 这一形今天有分母了，
   且那枚 windows-only 真进程用例**不再是唯一证人**。⚠ 口径按 AC 原文收紧：本程任何结论**不写"两腿一致"**，只写"windows 腿一致、POSIX 另有自己的分母（`internal/proc` 本包用例）"。
   存证 `.scratch/wisp/probes/135/04-ac5-posix-denominator.txt`。next=AC#7（131 第二把尺收到句段粒度）
+
+- [2026-10-15 16:2x +08] agent=135-r1 did=**AC#7（`R-131r3-1`）落地：131 第二把尺从"文件粒度"收到"句段粒度"＋装上自证腿**（按编排者裁定采②）。
+  改法（`cmd/wisp/leg_sink_gate_131_test.go`）：`mainPackage131.rulingFiles map[string]bool` ⇒ `rulingAnchors131 map[string][]int`——
+  新函数 `rulingAnchorLines131` 在**纯文本**上算"每枚标记词的注释块接到哪一行"（块后第一行；文件末尾的裸句接到 `末行+1`），
+  `rulingCrossChecks131` 的正向要求**站点行恰等于某枚标记的锚行**（否则若该文件里确有标记 ⇒ 红名点到**粒度** `not at sentence-segment granularity`；
+  文件里根本没有标记 ⇒ 保留原"`in none of those files`"），反向也从"每文件"收到"每枚标记的锚行都要有裁决行点名"。
+  ⚠ 没折回"只信 AST"：尺仍是**原始文本扫描**，与 AST doc 走读零共享代码（这正是 ① 被否的理由，故未动）。
+  新增常备用例 `TestAC7ARulingParkedInAFileBacksNothing131`：**把那枚裸标记做成 fixture**（`legSinkRulingMarker + " a sentence parked in this file by the probe, attached to no function."`）
+  与"诚实的锚"（标记在该行点名的那个函数的 doc 注释里）两形**喂真扫描**，前者必须让尺红、后者必须静。
+  **两拍读数（票面判据，可重算）**：(a) 只放宽 `ruled` 谓词（`|| fi.name == "cmdSLO"`）＋真裁决句改名 ⇒ 不修树 **红（1 命中 `in none of those files`）**、修后 **仍红（同句 1 命中）**；
+  (b) 放宽＋把裸标记追加到 `slo_other.go` 末尾 ⇒ **不修树绿（今天这一拍逐字复现）**、**修后红 & 红名点到粒度**（`... in one of those files but not at sentence-segment granularity: slo_other.go carries the marker at line(s) [43], none of them a site this row names`）
+  ＋反向那枚 `anchoring to line 43 ... is prose, not a decision`（`in none of those files` 命中 0 ⇒ 不是"缺标记"那条）。**自证腿的哑法读数**：把新正向谓词悄悄退回文件粒度 ⇒ 该用例**自己红**且红名点到粒度（`Anchors computed for this fixture: [6]`）。
+  诚实树：`slo` 行仍 `ruled`、门＋新用例 `2/2` rc=0。存证 `.scratch/wisp/probes/135/05-ac7-granularity.txt`。
+  ⚠ 派单面清单里写的是 `cmd/wisp/leg_dispatch_gate_133_test.go` 的"句段粒度尺"，但**票面 AC#7 逐字指的是 `rulingCrossChecks131`（票 131 的第二把尺，文件在 `leg_sink_gate_131_test.go`）**，故本程按票面做在 131 那把尺上；
+  133 那把尺的"裁决句绑到腿自己的代码"（`rulingAdjacentTo133`）属票 133 面、本程未动（漂移已报编排者）。next=AC#6 门禁

@@ -1,0 +1,54 @@
+# 135-r1 reading 05: AC#7 the second ruler at sentence-segment granularity (agent=135-r1, R-131r3-1)
+
+Trees (out of repo): base3 = git archive 8f41a4df (pre-135); fix7 = base3 + this leg's
+cmd/wisp/dataroot_128_test.go, cmd/wisp/leg_sink_gate_131_test.go, internal/proc/envfork_test.go.
+Command per tree (see below): go test -count=1 -v -timeout 40m -run 'TestAC4EveryLegIsNailedOrRuled|TestAC7ARulingParkedInAFileBacksNothing131' ./cmd/wisp/
+
+Mutations, all applied with grep proof + go build rc=0:
+  GRAN-loosen  leg_sink_gate_131_test.go: `if strings.Contains(fi.doc, legSinkRulingMarker) {` ->
+               `... || fi.name == "cmdSLO" {` (the 131 acceptor's one-clause loosening of `ruled`)
+  GRAN-rename  slo_windows.go: the marker sentence renamed to LEG-SINK-DECISION-REMOVED (the ruling is gone)
+  GRAN-park    slo_other.go: the bare marker appended at the end of the file, attached to no function
+  SELFMUTE     the new forward check quietly back at file granularity:
+               `if anchor == line {` -> `if len(pkg.rulingAnchors131[file]) > 0 {`
+
+| tree | mutation | RUN | PASS | FAIL | rc | "in none of those files" | "sentence-segment granularity" | "anchoring to line" | AC#7 RED |
+|---|---|---|---|---|---|---|---|---|---|
+| fix7            | none            | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| base3-gran-a    | loosen          | 1 | 0 | 1 | 1 | 1 | 0 | 0 | - |
+| base3-gran-b    | loosen + park   | 1 | 1 | 0 | 0 | 0 | 0 | 0 | - |
+| fix7-gran-a     | loosen          | 2 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |
+| fix7-gran-b     | loosen + park   | 2 | 1 | 1 | 1 | 0 | 1 | 1 | 0 |
+| fix7-selfmute   | SELFMUTE        | 2 | 1 | 1 | 1 | 0 | 1 | 0 | 1 |
+
+The two readings AC#7 is closed on:
+(a) loosen only, pre-fix  = red (1 hit), post-fix = red (1 hit, the same wording as before):
+    leg_sink_gate_131_test.go:379: AC#4 RED: leg "slo" is booked as ruled at [slo_other.go:34 |
+    slo_windows.go:204], but the marker sentence "WISP-LEG-SINK-RULING:" is in none of those files ...
+(b) loosen + park, pre-fix = GREEN (today's reading, measured), post-fix = RED, and the red is a
+    granularity finding, not a missing-marker one:
+    AC#4 RED: leg "slo" is booked as ruled at [slo_other.go:34 | slo_windows.go:204], and the marker
+    sentence "WISP-LEG-SINK-RULING:" is in one of those files but not at sentence-segment granularity:
+    slo_other.go carries the marker at line(s) [43], none of them a site this row names. Backing a
+    decision by a sentence parked in a file is R-131r3-1's shape ...
+    AC#4 RED: slo_other.go carries a "WISP-LEG-SINK-RULING:" sentence anchoring to line 43, and no ruled
+    ledger row's site names that line: a ruling nobody's dispatch reaches is prose, not a decision.
+
+The self-proof leg and its own mute (the reading that says the leg has a tooth - "one line inside the
+instrument makes the column read its own expectation" is ticket 129's Y3 shape, and this is the case
+that catches it):
+    AC#7 RED (the instrument, not the code): a sentence parked at the end of the file, attached to no
+    function, with the ledger booking a ruled row at fixture.go:3, produced []. The second reading is
+    only worth its line if it answers at sentence-segment granularity: file granularity lets one parked
+    sentence back a ruling nobody wrote next to that row, which is R-131r3-1. Anchors computed for this
+    fixture: [6]
+The leg drives the real scan (rulingAnchorLines131) on two raw-text fixtures: a marker parked at the
+end of a file (must back nothing) and a marker inside the doc comment of the function the row names
+(must stay silent). Where the rule lives, for the record: the second reading is still a plain line scan
+and shares no code with the AST doc walk - the tightening is "which line does the marker's own comment
+block attach to", not "ask the AST which func this comment belongs to" (that would have cost the
+instrument its independence, which is why the orchestrator ruled out the other repair).
+
+Honest tree check: on fix7 the ledger row for `slo` still reads `ruled` (main.go:110 ... -> ruled) and
+the gate + the new case are 2/2 PASS; the marker in slo_windows.go anchors to line 204 = the cmdSLO
+declaration the row names, both platform halves being merged into one site string.

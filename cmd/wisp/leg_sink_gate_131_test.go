@@ -451,23 +451,73 @@ type mainPackage131 struct {
 
 	unparsedLabels []unparsedLabel131
 	strayArgvReads []argvRead131
-	// rulingFiles names the files on disk whose own text carries the ruling
-	// marker, collected by a plain line scan that shares no code with the AST doc
-	// walk. It exists so `ruled=true` can be cross-checked against the source
+	// rulingAnchors131 maps each file on disk to the lines its ruling markers
+	// attach to, collected by a plain line scan that shares no code with the AST
+	// doc walk. It exists so `ruled=true` can be cross-checked against the source
 	// rather than only against the reader's own predicate; see 第五形 in the
-	// header and rulingCrossChecks131.
-	rulingFiles map[string]bool
+	// header and rulingCrossChecks131. Ticket 135 AC#7 (R-131r3-1) moved it from a
+	// per-file bool to anchor lines: at file granularity a marker sentence parked
+	// anywhere in the file backed a row whose own ruling sentence was gone.
+	rulingAnchors131 map[string][]int
+}
+
+// rulingAnchorLines131 is the granularity rule of the second reading, kept in raw
+// text on purpose (ticket 135 AC#7 chose this over asking the AST, which would
+// have cost the instrument its independence). A marker's anchor is the first line
+// after the maximal run of consecutive comment lines that contains it: the line
+// of the declaration the marker sits on. A sentence parked in a file by itself
+// anchors to whatever follows it, or past the end of the file, and so backs
+// nothing; a sentence inside a doc comment anchors to its own function's line,
+// which is exactly what leg.rulingSites records.
+func rulingAnchorLines131(src []byte) []int {
+	var out []int
+	seen := map[int]bool{}
+	lines := strings.Split(string(src), "\n")
+	for i, line := range lines {
+		if !strings.Contains(line, legSinkRulingMarker) {
+			continue
+		}
+		j := i
+		for j+1 < len(lines) && isCommentLine131(lines[j+1]) {
+			j++
+		}
+		anchor := j + 2 // 1-based: the first line after the comment block
+		if !seen[anchor] {
+			seen[anchor] = true
+			out = append(out, anchor)
+		}
+	}
+	sort.Ints(out)
+	return out
+}
+
+// isCommentLine131 says whether a line continues a comment block. Only the line
+// forms this repository writes are recognised, and a form that is not recognised
+// makes an anchor land somewhere honest instead of nowhere.
+func isCommentLine131(line string) bool {
+	t := strings.TrimSpace(line)
+	if t == "" {
+		return false
+	}
+	if strings.HasPrefix(t, "//") {
+		return true
+	}
+	if i := strings.Index(t, "//"); i >= 0 && !strings.Contains(t[:i], `"`) {
+		return true // a trailing comment does not end the block above it
+	}
+	return strings.HasPrefix(t, "/*") || strings.HasSuffix(t, "*/")
 }
 
 // rulingCrossChecks131 is the second reading over the same fact, which is what
 // makes a one-line loosening of the first reading loud instead of silent
 // (ticket 129's Y3 shape, aimed at this door: a single swapped predicate made a
 // whole table read its own expectation). For every leg the ledger books as ruled,
-// the file behind one of its ruling sites has to carry the marker sentence in its
-// text, and every file that carries the marker has to be claimed by some ruled
-// row. Either direction failing is red: the first is "the ledger says ruled
-// because its own predicate says so, not because anybody wrote the ruling down",
-// the second is "a ruling was written where no dispatch reaches it".
+// one of its ruling sites has to be anchored by a marker sentence in that file -
+// the marker's own comment block has to be the one the site's declaration sits
+// under - and every marker has to be claimed by some ruled row. Either direction
+// failing is red: the first is "the ledger says ruled because its own predicate
+// says so, not because anybody wrote the ruling down", the second is "a ruling
+// was written where no dispatch reaches it".
 func rulingCrossChecks131(pkg *mainPackage131, legs []leg131) []string {
 	var reds []string
 	claimed := map[string]bool{}
@@ -479,36 +529,93 @@ func rulingCrossChecks131(pkg *mainPackage131, legs []leg131) []string {
 			reds = append(reds, fmt.Sprintf("leg %q is booked as ruled and names no ruling site at all: nothing on disk says anybody chose this.", leg.key))
 			continue
 		}
-		hit := ""
+		hit, unanchored := "", ""
 		for _, site := range leg.rulingSites {
 			// A site is one file:line, or several joined when the same function is
 			// declared in per-platform files (cmdSLO lives in slo_windows.go and
-			// slo_other.go, so its site is "slo_other.go:34 | slo_windows.go:185").
+			// slo_other.go, so its site is "slo_other.go:34 | slo_windows.go:204").
 			// Each half gets checked; reading only the first one called an honest
-			// ruling a false one, which this run measured on the unmutated tree.
+			// ruling a false one, which a previous run measured on the unmutated tree.
 			for _, one := range strings.Split(site, " | ") {
-				file := one
-				if i := strings.Index(file, ":"); i >= 0 {
-					file = file[:i]
+				file, line := one, 0
+				if i := strings.Index(one, ":"); i >= 0 {
+					file = one[:i]
+					if n, cerr := strconv.Atoi(one[i+1:]); cerr == nil {
+						line = n
+					}
 				}
-				if pkg.rulingFiles[file] {
-					hit = file
-					claimed[file] = true
+				for _, anchor := range pkg.rulingAnchors131[file] {
+					if anchor == line {
+						hit = one
+						claimed[fmt.Sprintf("%s:%d", file, anchor)] = true
+					}
+				}
+				if unanchored == "" && len(pkg.rulingAnchors131[file]) > 0 {
+					unanchored = fmt.Sprintf("%s carries the marker at line(s) %v, none of them a site this row names",
+						file, pkg.rulingAnchors131[file])
 				}
 			}
 		}
 		if hit == "" {
-			reds = append(reds, fmt.Sprintf("leg %q is booked as ruled at %v, but the marker sentence %q is in none of those files: the reading came from the instrument's own predicate, not from a ruling anybody wrote down.",
-				leg.key, leg.rulingSites, legSinkRulingMarker))
+			if unanchored != "" {
+				reds = append(reds, fmt.Sprintf("leg %q is booked as ruled at %v, and the marker sentence %q is in one of those files but not at sentence-segment granularity: %s. Backing a decision by a sentence parked in a file is R-131r3-1's shape - the ruling this row claims was deleted, and the marker left behind belonged to something else.",
+					leg.key, leg.rulingSites, legSinkRulingMarker, unanchored))
+			} else {
+				reds = append(reds, fmt.Sprintf("leg %q is booked as ruled at %v, but the marker sentence %q is in none of those files: the reading came from the instrument's own predicate, not from a ruling anybody wrote down.",
+					leg.key, leg.rulingSites, legSinkRulingMarker))
+			}
 		}
 	}
-	for file := range pkg.rulingFiles {
-		if !claimed[file] {
-			reds = append(reds, fmt.Sprintf("%s carries a %q sentence that no ruled ledger row claims: a ruling nobody's dispatch reaches is prose, not a decision.", file, legSinkRulingMarker))
+	for file, anchors := range pkg.rulingAnchors131 {
+		for _, anchor := range anchors {
+			if !claimed[fmt.Sprintf("%s:%d", file, anchor)] {
+				reds = append(reds, fmt.Sprintf("%s carries a %q sentence anchoring to line %d, and no ruled ledger row's site names that line: a ruling nobody's dispatch reaches is prose, not a decision.", file, legSinkRulingMarker, anchor))
+			}
 		}
 	}
 	sort.Strings(reds)
 	return reds
+}
+
+// TestAC7ARulingParkedInAFileBacksNothing131 is ticket 135 AC#7 (R-131r3-1), the
+// self-proof leg the second reading was missing, and the reason it is driven by
+// raw text fixtures rather than by a hand-built map: the reading under test is
+// the scan's own granularity rule. Ticket 131's acceptor measured what the
+// absence costs - with the `ruled` predicate loosened by one clause, deleting the
+// real slo ruling sentence and parking a marker sentence at the end of
+// slo_other.go washed the red away, because "this file contains the marker word"
+// was the whole question. The parked sentence is a standing case here: it must
+// back nothing. The honest shape - the marker inside the doc comment of the very
+// function the row names - must still be silent, or the reading is just red.
+func TestAC7ARulingParkedInAFileBacksNothing131(t *testing.T) {
+	parked := "package p\n\nfunc elsewhere() {}\n\n// " + legSinkRulingMarker + " a sentence parked in this file by the probe, attached to no function.\n"
+	honest := "package p\n\n// f is the leg this ruling is about.\n// " + legSinkRulingMarker + " this leg resolves the pipeline itself\nfunc f() {}\n"
+	for _, tc := range []struct {
+		what     string
+		src      string
+		siteLine int
+		wantRed  bool
+	}{
+		{"a sentence parked at the end of the file, attached to no function", parked, 3, true},
+		{"the marker inside the doc comment of the function the row names", honest, 5, false},
+	} {
+		pkg := &mainPackage131{
+			fset:             token.NewFileSet(),
+			funcs:            map[string]*funcInfo131{},
+			tests:            map[string]*funcInfo131{},
+			rulingAnchors131: map[string][]int{},
+		}
+		pkg.rulingAnchors131["fixture.go"] = rulingAnchorLines131([]byte(tc.src))
+		legs := []leg131{{key: "slo", ruled: true, rulingSites: []string{fmt.Sprintf("fixture.go:%d", tc.siteLine)}}}
+		reds := rulingCrossChecks131(pkg, legs)
+		if gotRed := len(reds) > 0; gotRed != tc.wantRed {
+			t.Fatalf("AC#7 RED (the instrument, not the code): %s, with the ledger booking a ruled row at fixture.go:%d, produced %v. The second reading is only worth its line if it answers at sentence-segment granularity: file granularity lets one parked sentence back a ruling nobody wrote next to that row, which is R-131r3-1. Anchors computed for this fixture: %v",
+				tc.what, tc.siteLine, reds, pkg.rulingAnchors131["fixture.go"])
+		}
+		if tc.wantRed && !strings.Contains(strings.Join(reds, "\n"), "granularity") {
+			t.Errorf("AC#7 RED: %s was reported, but not as a granularity finding - the red has to say what the reading was too coarse about: %v", tc.what, reds)
+		}
+	}
 }
 
 // aliasTarget131 is the right-hand side of a package-level `var x = <name>`.
@@ -563,14 +670,14 @@ func loadMainPackage131(dir string) (*mainPackage131, error) {
 		return nil, fmt.Errorf("reading %s: %w", dir, err)
 	}
 	pkg := &mainPackage131{
-		fset:        token.NewFileSet(),
-		funcs:       map[string]*funcInfo131{},
-		tests:       map[string]*funcInfo131{},
-		aliases:     map[string]aliasTarget131{},
-		aliasEdges:  map[string]bool{},
-		declared:    map[string]bool{},
-		stringConst: map[string]string{},
-		rulingFiles: map[string]bool{},
+		fset:             token.NewFileSet(),
+		funcs:            map[string]*funcInfo131{},
+		tests:            map[string]*funcInfo131{},
+		aliases:          map[string]aliasTarget131{},
+		aliasEdges:       map[string]bool{},
+		declared:         map[string]bool{},
+		stringConst:      map[string]string{},
+		rulingAnchors131: map[string][]int{},
 	}
 	var parsed int
 	for _, e := range entries {
@@ -584,14 +691,16 @@ func loadMainPackage131(dir string) (*mainPackage131, error) {
 		}
 		parsed++
 		isTest := strings.HasSuffix(name, "_test.go")
-		// 第五形's second instrument: does this file's own text carry the ruling
-		// marker? Read off the bytes, not off the AST doc the ledger's ruled column
-		// is built from, so the two readings can disagree and say so. Test files are
-		// out of the scan: this very file states the marker in a const, which is an
+		// 第五形's second instrument: which lines does this file's own text anchor a
+		// ruling marker to? Read off the bytes, not off the AST doc the ledger's ruled
+		// column is built from, so the two readings can disagree and say so. Test files
+		// are out of the scan: this very file states the marker in a const, which is an
 		// instrument's string, not a leg's ruling.
 		if !isTest {
 			if src, srcErr := os.ReadFile(filepath.Join(dir, name)); srcErr == nil && bytes.Contains(src, []byte(legSinkRulingMarker)) {
-				pkg.rulingFiles[name] = true
+				if anchors := rulingAnchorLines131(src); len(anchors) > 0 {
+					pkg.rulingAnchors131[name] = anchors
+				}
 			}
 		}
 		for _, d := range f.Decls {
