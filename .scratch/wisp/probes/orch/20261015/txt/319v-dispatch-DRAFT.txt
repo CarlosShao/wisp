@@ -1,0 +1,32 @@
+# 319-v 派单（票 319 **非实现者验收**：面板死而能复活＋二次启动唤窗——AC#1 三态/活体、AC#2 活体唤窗、AC#3 三钉与变异、AC#4 门禁与面核；验证腿；面＝`cmd/wisp`／`internal/proc` **只读**＋仓外快照＋`probes/319/v/`）
+
+⏳ **预备稿**：2026-10-15 12:3x 编排者写好候场（等 `319-r2` 落地后回填其 commit/读数并发送；**发送时写 `-send.txt`**）。去重核：`.scratch/wisp/probes/319/` 现只有 `a1`／`r1`／`r2`（`v` 未建，可用）。
+
+你 = Wisp 流水线的**验证腿 319-v**。身份＝**非实现者**（实现者＝死腿 `319-r1`（其产码由编排者代提 `e6d1373e`）＋续腿 `319-r2`；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 零产码）。
+
+## 票与既证
+
+- 票：`.scratch/wisp/issues/319-panel-thread-death-is-terminal-and-a-second-launch-cannot-bring-any-window-to-front.md`（通读 AC#0–#4）。
+- 根因定案（AC#0）＝`probes/319/a1/census.md`（关窗致死链：`WM_SYSCOMMAND/SC_CLOSE`→`WM_CLOSE`→`DestroyWindow`→`WM_DESTROY`→`PostQuitMessage`⇒泵返回⇒线程终态；乙/丙两假说反证）。
+- 落地两程：`e6d1373e`（代提：4 枚生产件＋3 枚测试件）＋`319-r2`（续腿：**待回填 commit**；补 N1 持有者半＋N3 活体后半＋三态/变异/活体）。
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+
+## 你要独立回答的（逐格判语＋**你自己的**读数；⛔ 别只重跑它留的日志）
+
+1. **AC#1 三态（headless）**：自己造未修形（摘掉 `panelHolder.toggle` 里的 `isFinished()` 支；先 `grep -n` 证落地＋`go build ./cmd/wisp/` rc=0）⇒ 新用例必红且**红名点到"重建"**；现树 ⇒ 绿；还原 ⇒ 绿＋`git diff` 0 字节。
+2. **AC#1 活体（winlive）**：真窗重放关窗链（`PostMessageW(WM_SYSCOMMAND, SC_CLOSE)`）⇒ ① **原始半**仍须真（死线拒手势、无窗回来）② **后半**经 holder ⇒ 真出**新窗**（新 HWND≠旧；⛔ 复用旧句柄算失败）。逐字给：旧 HWND／新 HWND／`mgr.IsCreated()`／手势回值。
+3. **AC#2 活体唤窗**：判 `319-r2` 的活体形状**够不够**——它若用"同进程 `SignalExistingInstance`＋`RunEventLoop`＋读前台 HWND"这一类（**待回填**）：你要独立复现该读数，**并具名说清它没覆盖什么**（例：真第二进程的进程边界、`AllowSetForegroundWindow` 由"前台进程"发出的那一层、冷启动 vs 热路径）；若你另能造更强且**不扰动机主实例**的形状（⛔ 别真拉第二个 `--env dev` 实例：mutex/event 名 `Local\wisp-dev-single-instance` 与机主在跑实例**同名**），就做，并按"旧窗在后/新窗在前"给逐字读数。
+4. **AC#3 三钉与变异**（逐钉给"弄坏⇒红→还原⇒绿"）：N1（死线拒单＋holder 重建，含 `spawn` 第二次被问）／N2（`SetActivationHook` 恰一次＋Reset；无 hook 仍消费并清）／N3（活体两半）。⚠ 每钉给**变异前/后/还原**三份读数；⛔ 别用它的变异发、自己造。
+5. **回归**：改前既有的 4 枚用例（N1 原始半／N2 两枚／N3 原始半）照旧全绿；`-run '319' ./cmd/wisp/ ./internal/proc/ -count=1`。
+6. **AC#4 门禁＋面核**：`go build ./...`／gofumpt（只点你的件）／`go vet -tags winlive ./cmd/wisp/ ./internal/proc/`／`d22scan`／长度门；`git show --stat <两程 commit>` 面核＋`git diff --name-only` 逐枚——**只许落在 319 面**（`cmd/wisp/**319**`／`internal/proc/**319**`＋票面/probes）；冻结点名：`docs/PLAN.md`／`docs/specs/**`／阈值/golden／`frontend/**` 零字节。
+
+## 纪律
+
+- **只读＋仓外快照**（`git archive <sha> | tar -x -C /tmp/<带会话后缀>`；⛔ 不在仓库内建 worktree/checkout）：⛔ 不改任何跟踪文件（变异只用 `-overlay`／仓外拷贝＋sha256 还原证）。
+- ⛔ **不扰动机主实例**：跑 winlive 前 `tasklist` 自证（`wisp.exe` PID 40296 在也**别 kill、别关窗**）；一次只跑一枚 winlive。
+- ⚠ **`go test ./cmd/wisp` 重包同一时刻只跑一个**；默认 10m `-timeout` 会 panic ⇒ 分段 `-run` 为主。
+- 交件：`docs/evidence/s1/ticket319-319-v-accept-v1.md`（**逐格判语**＋三态/活体/变异读数＋分歧逐处登记）＋`.scratch/wisp/probes/319/v/`（≤7 件 ≤200 行）＋票 319 尾**追加 1 条 bullet**；只 commit ⛔ 不 push；显式 pathspec。
+- ⛔ 不碰台账/HANDOVER；⛔ 不碰别家腿半成品（`probes/152/my152.py`、`probes/268/v1/evidence.md`、`design/**`）。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`；`GOTMPDIR='C:\tmp\wisp319vgotmp'`（只反斜杠形，先自建）。
+- **未定义即停**：某格做不圆／撞见越面改动 ⇒ 写成"做不到＋缺什么"，别硬来。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋逐格判语（成立/附条件/不成立）＋三态与活体读数逐字＋变异逐发红名＋面核＋**具名没做**。
