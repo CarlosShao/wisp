@@ -18278,3 +18278,10 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **前端接线（删除）**：模型目录每条 chip 加 `×` 单删（`model_row_delete`）；行级 `删除` 改成**两步确认**（点一次变"确认删除"）；`COPY.deleteUnavailable` 不再被用。
 - **读数**：`Test320*` **八枚全 PASS**（含两枚新删除腿）；`internal/panel -run Test313` ok；`internal/panel` 全包仍**5 枚既有红**（外部面族）＝**零新增红**；gofumpt 空／vet rc=0／d22scan clean／长度门 GREEN；前端 `npm run build`（tsc+vite）过；每批重编 exe＋重启实例（`doctor` 全 PASS）。
 - **推送**：本窗口网络断续；其中一试 git 回 **`Everything up-to-date`**（通常意味远端其实已收到、本地跟踪 ref 未刷新）⇒ **待网络确认，未确认前不宣称已推**。
+
+## A988｜2026-10-15 19:0x +08（`date` 现读；⚠ `A986`/`A987` 的时刻是我手打的、偏早约 1.5h，原文不抹、以本行为准）｜★机主"配置搞完了"＋**其 StepFun 计费口径定案**＋已按"重启后生效"重启实例（PID 21892）
+
+- **机主原话逐字**：「好了，我已经搞完了，现在该加的模型也都加了，stepfun计费就只能用 realtime 免费，剩下都用套餐选择的模型就行」。⇒ **口径落账（这一条是域名决定，后续任何默认链/文档要对齐它）**：**StepFun 的按量（API）行只承担 realtime**（`stepaudio-3-realtime-preview`，只有它在 API 计费侧免费）；**其余（ASR/TTS/对话）一律走套餐行的模型**。
+- **实况**（机主自报＋我现读截图确认）：`stepfun`（plan 行，基址 `https://api.stepfun.com/step_plan/v1`）目录＝`step-3.7-flash`／`step-5-preview`／`stepaudio-2.5-asr`／`stepaudio-2.5-realtime`／`stepaudio-2.5-tts`；`stepfun-api`（按量行，`https://api.stepfun.com/v1`）＝`stepaudio-3-realtime-preview`（＋其早前写过的 `stepaudio-3-tts`，按新口径应已删——**删除能力正是本轮补的**，他确实删掉了一个模型条目）。两行经我新加的读回字段显示，**基址/计费/协议一眼可辨**。
+- **生效动作**：这类改动是**重启档**（宿主常驻腿不 tick config.toml）⇒ 编排者已**掐旧实例（34324）＋拉起新实例（PID 21892）**，`%APPDATA%\wisp-dev\logs\` 19:03:15 起新行、boot 正常（唯二 WARN＝无交互控制台／采集腿静音，属常态）。
+- **本班次与机主的协作口径（值得记住）**：机主要的是"**页面告诉他能干什么、一眼看懂哪行是什么、加了能删**"；票面只写到"能写进去"的层级。⇒ 三处由我按实报当场改并重编（读回行身份／加完就拉／删除能力），**全部已推远端**（`origin/dev=57b8eb4f`，未推 0）。
