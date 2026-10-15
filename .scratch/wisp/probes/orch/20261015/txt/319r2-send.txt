@@ -1,0 +1,6 @@
+319-r2 send 记录
+- 发送时刻：2026-10-15 11:5x +08；派单已先存档：txt/319r2-dispatch.txt（同刻写入）。
+- 去重核：`ls .scratch/wisp/probes/319/` = a1、r1（r2 未建，可用；函数名册现读只有 4 枚用例，N1 持有者半与 N3 活体后半**树里没有**⇒ 续腿补）。
+- 收件人：agent_01e96a09-d0a1-4aaf-9d27-e7b27f6e70e6（general-purpose，后台）。
+- 内容：票 319 续落地（N1 持有者半 headless 用例＋N3 活体后半 winlive 用例＋三态/变异自证＋AC#2 活体唤窗判）。面＝cmd/wisp＋internal/proc 的 319 面。
+- 事前盘面：HEAD=36cf5d06（未推 1 笔＝36cf5d06）；在飞 0；机主实例 wisp.exe PID 40296（⛔ 别扰动）。

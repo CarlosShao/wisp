@@ -1,0 +1,46 @@
+# 319-r2 派单（票 319 **续落地腿**：把死腿 319-r1 留下的"牙"补完并采三态/活体读数；写面＝`cmd/wisp/` 两枚 319 测试件，必要时 `cmd/wisp/`＋`internal/proc/` 的 319 生产件最小修）
+
+发送时刻：2026-10-15 11:5x +08。编排者派发。
+你 = Wisp 流水线的**落地腿 319-r2**（续腿）。前一腿 `319-r1` 被平台掐死（吊约 11.2h、零回执），其**生产码已在盘上并已由编排者代提**（`e6d1373e`）。身份＝实现者（判语归后续 `319-v` 的非实现者；⛔ 不翻票面框、⛔ 不动 `Status:`/票名、⛔ 不碰台账）。
+
+## 先说清盘面（行号会烂 ⇒ 每处自己现读）
+
+- 票：`.scratch/wisp/issues/319-panel-thread-death-is-terminal-and-a-second-launch-cannot-bring-any-window-to-front.md`（先通读 AC#0–AC#4）。
+- 根因定案（AC#0 已闭）＝`.scratch/wisp/probes/319/a1/census.md`；前一腿三枚 pre 读数＝`.scratch/wisp/probes/319/r1/logs/`（n1 raw／n2 编译红／n3 winlive 未修形）。
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+
+**已在盘上（别重做）**：`e6d1373e` 的 4 枚生产件——
+`cmd/wisp/resident_windows.go`（`panelHolder`＋`toggle` 的惰性重建＋`spawn` 缝＋`secondLaunchActivation319`／`secondLaunchTrayTip319`）·
+`cmd/wisp/panel_resident_windows.go` ·
+`internal/proc/boot_windows.go`（`SetActivationHook`＋`handleActivation`）·
+`internal/proc/singleinstance_windows.go`（`SignalExistingInstance`＋`AllowSetForegroundWindow`＋`ResetActivation`）。
+＋3 枚测试件里**已有的 4 枚用例**：
+- N1 原始半 `TestDeadPanelThreadRefusesEveryGesture319`（headless，`cmd/wisp/panel_holder_319_windows_test.go`）：死线程拒一切手势——**这一半是对的、修后也照旧**；
+- N2 两枚（`internal/proc/activation_hook_319_windows_test.go`）：hook 恰一次＋Reset；无 hook 仍消费并清；
+- N3 原始半 `TestPanelDeathReplay319UnfixedReading`（winlive，`cmd/wisp/panel_death_replay_319_winlive_test.go`）：真窗重放关窗链（`WM_SYSCOMMAND/SC_CLOSE`）后死线拒单、无窗回来。
+
+**缺的东西**（编排者现读函数名册＝只有上列 4 枚；**你要独立复核后再补**）——这两枚都是**文件自己的注释写着、树里没有**：
+1. **N1 持有者半（headless）**：同一手势走装配根的 `panelHolder.toggle`（线程已死）⇒ 必须**重建**：新线程、同一 manager、这次手势被接住。文件注释逐字给的判据＝"toggle returned true"＋"the spawn was asked a second time"（`panelHolder.spawn` 这道缝就是为它留的观察面）。
+2. **N3 活体后半（winlive）**：关窗链之后，同一手势走 holder ⇒ **真出一扇新窗**（新 HWND；⛔ 复用旧句柄算失败，那句话照抄在注释里）；文件注释称它为 "the AC#1 judgement read live"。
+
+## 你要交的（逐条；每条给两拍/三态读数）
+
+1. **AC#1 三态（headless）**：① 未修形——摘掉/中和 `panelHolder.toggle` 里的 `isFinished()` 支（先 `grep -n` 证落地＋`go build ./cmd/wisp/` rc=0），跑新用例 ⇒ **必红且红名点到"重建"**；② 现树 ⇒ 绿；③ 还原 ⇒ 绿＋`git diff` 0 字节。
+2. **AC#1 活体三态（winlive）**：同形用第 2 枚新用例在真窗上重放；必须给逐字读数（旧 HWND／新 HWND／`mgr.IsCreated()`／`RequestToggle` 回值）。跑前 `tasklist` 自证、**一次只跑一枚**、⛔ 不扰动机主在跑的 `wisp.exe`（PID 40296，别 kill、别关窗）。
+3. **AC#2 活体唤窗**：生产码齐（`secondLaunchActivation319`＋`SetActivationHook`＋`SignalExistingInstance` 里的 `AllowSetForegroundWindow`），N2 只证了管路。**取最强且安全的活体读数**——形状建议（自己裁，做不出就明写缺什么）：
+   用 `internal/proc/boot_windows_test.go` 的 `uniqueLayout(t)`（每跑唯一 mutex/event 名）boot 一枚 Runtime（`WithLayout`），`rt.SetActivationHook(secondLaunchActivation319(h, rb))`，`go rt.RunEventLoop()`，再 `proc.SignalExistingInstance(rt.Layout.ActivateEventName)`（＝第二次启动那一枚调用），读真窗是否被抬起（`GetForegroundWindow`／HWND 变化）＋hook 文案。
+   ⚠ **不许**真拉第二个 `--env dev` 实例：mutex/event 名由 env 定（`internal/proc/envfork.go`），dev 形与机主在跑实例**同名**（`Local\wisp-dev-single-instance`）⇒ 会去戳机主的窗。端到端两进程做不到就**明写"做不到＋缺什么形状"**，别硬来。
+4. **钉子与变异自证**：两枚新用例各自"弄坏⇒红"：第 1 条那发（toggle 的 isFinished 支）＋第 2 条的 winlive 复刻。逐发给：变异前绿／变异后红名逐字／还原绿。
+5. **回归**：已有 4 枚用例照旧全绿；`-run '319' ./cmd/wisp/ ./internal/proc/ -count=1` 两包；winlive 单枚按名跑。
+6. **门禁**：`go build ./...`；`gofumpt -l`（用宿主现成 `D:\work\base\gopath\bin\gofumpt` v0.12.0，只点你自己的件）；`go vet -tags winlive ./cmd/wisp/ ./internal/proc/`；`sh scripts/d22scan.sh`；长度门（按既有脚本口径）。
+7. **面核**：`git diff --name-only` 逐枚点名你的改动，确认只落在 319 面。
+
+## 畛域与纪律
+
+- 写面＝`cmd/wisp/`＋`internal/proc/` 的 319 面。**优先只加/改测试件**；若某读数**证伪**了修复（新用例红在真洞上）⇒ 允许最小改（限这 4 枚 319 生产件），但必须：红名逐字入证据＋票面 log 写明"改了什么/为什么"＋逐枚 pathspec。⛔ 不许顺手重构、⛔ 不扩写行为。
+- ⛔ 不碰：`docs/PLAN.md`／`docs/specs/**`／阈值/golden/`tools/d22scan/allowlist.txt`／`.github/**`／`frontend/**`／`design/**`；⛔ 不碰别家腿半成品（`.scratch/wisp/probes/152/my152.py`、`.scratch/wisp/probes/268/v1/evidence.md`、`design/**` 的删除态）。
+- 只 commit 不 push；`git add` 只用显式 pathspec；commit 前 `git diff --cached --name-only`；共树禁 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；临时件只建不删；注释与测试**零 emoji**（仪器口径：`U+1F000–1FAFF`／`U+2200–22FF`／`U+2600–27BF`／`U+2B00–2BFF`／`U+FE0F`）。
+- 交件：`.scratch/wisp/probes/319/r2/`（读数＋变异日志，≤10 件）＋票 319 尾**追加 1 条 bullet**（`agent=319-r2 did=… next=…`）；⛔ 不翻票面框。
+- 环境：`PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（缺它 `0xc0000135`）；`GOTMPDIR='C:\tmp\wisp319r2gotmp'`（**只反斜杠形**，先自建）；快照/临时件只落 `$TMPDIR`／`D:/tmp`。
+- **未定义即停**：做不圆／撞见越面改动／需要动冻结契约 ⇒ 停手上报（写进回执），⛔ 别自己填。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋两枚新用例＋四发读数（未修/修后/还原＋活体）＋AC#2 形状判＋门禁逐项＋面核＋**具名没做**。
