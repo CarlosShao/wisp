@@ -1,0 +1,7 @@
+320-r1 send 记录
+- 发送时刻：2026-10-15 13:0x +08；定稿派单已先存档：txt/320r1-dispatch.txt（预备稿 12:0x＝320r1-dispatch-DRAFT.txt，两份都在）。
+- 去重核：`.scratch/wisp/probes/320/`＝a1（r1 未建，可用）。
+- 收件人：agent_c4d134e1-3230-466c-8822-bbb82402acc4（general-purpose，后台）。
+- 内容：票 320 AC#1/#2/#3 三枚写入（provider_billing／provider_row_create_custom／model_row_create），面＝internal/config＋internal/panel＋cmd/wisp；⛔ 不含 AC#4（等前端面板加 `requestProviderModels` 一行，转交件＝`docs/evidence/s1/model-page-v3-brief.md` §7）。
+- 依据：设计腿 `320-a1` census（编排者已复跑核 8 项）；五裁见台账 `A972`。
+- 事前盘面：同波在飞 `319-v`（验证腿，会跑活体窗用例）⇒ 两边派单都写了"重包错峰＋tasklist 自证"；GOTMPDIR 改约定根（别用 `C:\tmp\`，那是 319-r2 实测的假红源）。

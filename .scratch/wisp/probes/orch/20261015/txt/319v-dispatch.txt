@@ -1,0 +1,33 @@
+# 319-v 派单（票 319 **非实现者验收**：面板死而能复活＋二次启动唤窗——AC#1 三态/活体、AC#2 活体唤窗、AC#3 三钉与变异、AC#4 门禁与面核；验证腿；面＝`cmd/wisp`／`internal/proc` **只读**＋仓外快照＋`probes/319/v/`）
+
+发送时刻：2026-10-15 13:0x +08（定稿；预备稿 12:3x 已存档为 `319v-dispatch-DRAFT.txt`）。编排者派发。
+你 = Wisp 流水线的**验证腿 319-v**。身份＝**非实现者**（实现者＝死腿 `319-r1`（其产码由编排者代提 `e6d1373e`）＋续腿 `319-r2`（`2ad0aa86`）；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 零产码）。
+
+## 票与既证（回填）
+
+- 票：`.scratch/wisp/issues/319-panel-thread-death-is-terminal-and-a-second-launch-cannot-bring-any-window-to-front.md`（通读 AC#0–#4）。
+- 根因定案（AC#0）＝`probes/319/a1/census.md`（关窗致死链：`WM_SYSCOMMAND/SC_CLOSE`→`WM_CLOSE`→`DestroyWindow`→`WM_DESTROY`→`PostQuitMessage`⇒泵返回⇒线程终态；乙/丙两假说反证）。
+- 落地两程：① 代提 `e6d1373e`（4 枚生产件＋3 枚测试件；**只跑四门＋headless 两包**）② 续腿 `2ad0aa86`（只动两枚 319 测试件：`panel_holder_319_windows_test.go` +113／`panel_death_replay_319_winlive_test.go` +216；读数件 `probes/319/r2/` 10 枚＋`00-index.txt`）。**它自报的四发**：headless 变异红→还原绿、活体变异红→还原绿（旧 `0xAD20544`→新 `0x7E90E60`）、AC#2 活体（`SignalExistingInstance`→hook→`panel hwnd=0x49212CC == GetForegroundWindow`）＋回归/门禁全绿。
+- **编排者已亲跑的三把尺**（供你定位，⛔ 不当你的读数）：`git show --stat 2ad0aa86` 只 13 枚（两测试件＋票面＋10 读数件）；`probes/319/r2/` 在盘；我复跑 headless **绿**（`toggle=true spawns=2 queued=1 same manager=true`）＋**我自己的变异**（`resident_windows.go:535` 摘 `|| h.rp.isFinished()` ⇒ 红名逐字点到"dead thread must make the holder start a fresh one"＋"spawn asked 1 time want exactly 2"；`go build ./cmd/wisp/` rc=0；还原后 `git diff` 0 字节＋复绿）。
+- **它具名没做的两条（你要裁"要不要补腿"）**：① AC#2 **真两进程**那层（独立第二进程的 ASFW 授权）未建，现形是同进程内最强安全形（真 `SignalExistingInstance`＋真 `RunEventLoop`＋生产 hook＋真窗＋前台读数）；② 该活体用例会留下 `RunEventLoop` 的 goroutine 与 signal 注册（只在进程退出信号时返回、无导出停止口），已在用例注释点名。
+
+## 你要独立回答的（逐格判语＋**你自己的**读数；⛔ 别只重跑它留的日志）
+
+1. **AC#1 三态（headless）**：自己造未修形（摘 `panelHolder.toggle` 的 `isFinished()` 支；先 `grep -n` 证落地＋`go build ./cmd/wisp/` rc=0）⇒ 新用例必红且**红名点到"重建"**；现树 ⇒ 绿；还原 ⇒ 绿＋`git diff` 0 字节。
+2. **AC#1 活体（winlive）**：真窗重放关窗链（`PostMessageW(WM_SYSCOMMAND, SC_CLOSE)`）⇒ ① **原始半**仍须真（死线拒手势、无窗回来）② **后半**经 holder ⇒ 真出**新窗**（新 HWND≠旧；⛔ 复用旧句柄算失败）。逐字给：旧 HWND／新 HWND／`mgr.IsCreated()`／手势回值。
+3. **AC#2 活体唤窗**：独立复现它的同进程形，**并具名裁**：这一形够不够当 AC#2 的证据？（要点：进程边界、`AllowSetForegroundWindow` 由"前台进程"发出的那一层、冷启动 vs 热路径、`RunEventLoop` 残留 goroutine 会不会污染后续用例／要不要补 helper 子进程那一层）。若你另能造更强且**不扰动机主实例**的形状就做；⛔ 别真拉第二个 `--env dev`（mutex/event 名与机主实例同名）。
+4. **AC#3 三钉与变异**（逐钉给"弄坏⇒红→还原⇒绿"三份读数，**自己造**）：N1（死线拒单＋holder 重建，含 `spawn` 第二次被问）／N2（`SetActivationHook` 恰一次＋Reset；无 hook 仍消费并清）／N3（活体两半）。
+5. **回归**：改前既有的 4 枚用例（N1 原始半／N2 两枚／N3 原始半）照旧全绿；`-run '319' ./cmd/wisp/ ./internal/proc/ -count=1`。
+6. **AC#4 门禁＋面核**：`go build ./...`／gofumpt（只点你的件）／`go vet -tags winlive ./cmd/wisp/ ./internal/proc/`／`d22scan`／长度门；`git show --stat e6d1373e 2ad0aa86`＋`git diff --name-only` 逐枚——**只许落在 319 面**（`cmd/wisp/**319**`／`internal/proc/**319**`＋票面/probes）；冻结点名：`docs/PLAN.md`／`docs/specs/**`／阈值/golden／`frontend/**`／`design/**` 零字节。
+
+## 纪律
+
+- **只读＋仓外快照**（`git archive <sha> | tar -x -C /tmp/<带会话后缀>`；⛔ 不在仓库内建 worktree/checkout）：⛔ 不改任何跟踪文件（变异只用 `-overlay`／仓外拷贝＋sha256 还原证）。
+- ⛔ **不扰动机主实例**：跑 winlive 前 `tasklist` 自证（`wisp.exe` PID 40296 在也**别 kill、别关窗**）；一次只跑一枚 winlive；活体会抢前台，跑之前看有没有别的腿在跑窗用例。
+- ⚠ **`go test ./cmd/wisp` 重包同一时刻只跑一个**（本刻同波另有 `320-r1` 写 `internal/config`＋`internal/panel`＋`cmd/wisp`）⇒ 重包前 `tasklist` 自证＋与它错峰；默认 10m `-timeout` 会 panic ⇒ 分段 `-run` 为主。
+- ⚠ **`GOTMPDIR` 用 `C:\Users\swq\AppData\Local\wisp-test-gotmp\wisp319vgotmp`**（C: 卷＋只反斜杠形；**别用 `C:\tmp\`**——`C:\tmp` 根会让 `TestAC2SealNoticeLandsInTheRunLegLogFile` 假红，`2ad0aa86` 的 `07-…txt` 尾有矩阵）。
+- 交件：`docs/evidence/s1/ticket319-319-v-accept-v1.md`（**逐格判语**＋三态/活体/变异读数＋分歧逐处登记）＋`.scratch/wisp/probes/319/v/`（≤7 件 ≤200 行）＋票 319 尾**追加 1 条 bullet**；只 commit ⛔ 不 push；显式 pathspec。
+- ⛔ 不碰台账/HANDOVER；⛔ 不碰别家腿半成品（`probes/152/my152.py`、`probes/268/v1/evidence.md`、`design/**`）。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`。
+- **未定义即停**：某格做不圆／撞见越面改动 ⇒ 写成"做不到＋缺什么"，别硬来。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋逐格判语（成立/附条件/不成立）＋三态与活体读数逐字＋变异逐发红名＋面核＋**具名没做**。

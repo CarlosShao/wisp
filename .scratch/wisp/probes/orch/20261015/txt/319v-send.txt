@@ -1,0 +1,8 @@
+319-v send 记录
+- 发送时刻：2026-10-15 13:0x +08；定稿派单已先存档：txt/319v-dispatch.txt（预备稿 12:3x＝319v-dispatch-DRAFT.txt，两份都在）。
+- 去重核：`.scratch/wisp/probes/319/`＝a1／r1／r2（v 未建，可用）。
+- 收件人：agent_8f576da6-70cc-4113-bc85-494accd9ff6d（general-purpose，后台）。
+- 内容：票 319 非实现者验收（AC#1 三态/活体、AC#2 唤窗形状判＋真两进程要不要补、AC#3 三钉自己变异、AC#4 门禁面核）。
+- 实现侧现状：代提 `e6d1373e`＋续腿 `2ad0aa86`（只动两枚 319 测试件）；编排者亲跑三把尺过（headless 绿＋我自己的变异红名逐字＋还原 diff 0）。
+- 事前盘面：HEAD=`2ad0aa86`＋(111-r7 五笔＋编排者两笔)；在飞同波另有 `320-r1`（写 internal/config＋internal/panel＋cmd/wisp）⇒ 已写进两边派单：重包错峰＋GOTMPDIR 用 `%LOCALAPPDATA%\wisp-test-gotmp\` 根（别用 `C:\tmp\`）。
+- 机主实例 wisp.exe PID 40296 仍在（⛔ 别扰动）。

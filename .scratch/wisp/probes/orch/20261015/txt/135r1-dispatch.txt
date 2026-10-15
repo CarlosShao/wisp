@@ -1,0 +1,25 @@
+# 135-r1 派单（票 135：票 128 判据的双叠假绿与四处同源小账；写腿；面＝`cmd/wisp/dataroot_128_test.go`＋`cmd/wisp/doctor.go`（只读判定）＋`internal/proc/**`＋`cmd/wisp/leg_dispatch_gate_133_test.go` 的句段粒度尺）
+
+发送时刻：**（待填——面空后即发：本单与 `320-r1` 同压 `cmd/wisp`（共享编译面每波一枚写腿），按序排在 `320-r1` 收件之后）**。编排者派发。
+你 = Wisp 流水线的落地腿 **135-r1**。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 不碰台账）。**本发是重发**：首法（2026-10-14 22:1x）被平台 **ECONNRESET 掐死（579s，零回执、零遗产：`probes/135/` 未建、无提交）**；派单存档＝`probes/orch/20261013/txt/135r1-dispatch.txt`（前一发）＋本单。
+
+## 票与目标（票面逐字为准）
+
+- 票：`.scratch/wisp/issues/135-the-only-teeth-in-ticket-128s-judgement-have-no-self-proof-leg-two-mutations-stacked-go-16-16-green.md`（先通读 AC#1–#7 与其来路；**AC#8 已于 09-24 由非实现者终裁翻勾**，别重做）
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+- **第 0 步＝先复核 premise**（本票自 09-23 立，树已动过多轮）：在**仓外快照**上复现"M-F（拒绝路径上先长一棵 CWD 树）+ M-C（把 `assertDirEmpty` 弄哑）两发叠起来 ⇒ **16/16 全绿**"这一形——现树还成不成立，逐字读数；**不成立就如实转成"今天的形状是什么"并据此调整各格**（⛔ 不许硬套旧判据）。
+- **七格**：AC#1 给后果断言装自证腿（主动弄哑 `assertDirEmpty` ⇒ 必须响）／AC#2 M-F 形做成常备用例（红名点到"目录非空"）／AC#3 `doctor` 腿补独立 CWD-empty 断言（`R-128-6`）／AC#4 自证用例真读生产文案（**成句断言**，非六段子串）／AC#5 常驻腿 POSIX 零分母：**补上或降级主张**（二选一，不许沉默）／AC#6 门禁（⚠ 票 123 那批 CLI 用例"审批超时 1/300 秒未确认 ⇒ C18 一律判拒绝"**不许放宽换绿**）／AC#7 第二把尺从文件粒度收到句段粒度（**编排者已裁②**：给 `rulingCrossChecks131` 装一枚**主动弄哑自己**的自证腿 ⇒ 现在就红、红名点到"粒度"；两拍读数 (a) 只放宽谓词不带裸标记 ⇒ 红；(b) 放宽＋裸标记 ⇒ **仍红**）。
+- **禁区**（票面）：`docs/PLAN.md`、`docs/specs/*.md`、`internal/risk/**`、`internal/winsec/**`、`rules_gateway.go`、`tools/d22scan/**`、`allowlist.txt`、任何阈值/golden；⛔ 不碰 `frontend/**`、`design/**`。
+
+## 协调与纪律（必读）
+
+- ⚠ **面互斥**：本刻同波 `320-r1` 应已收件（`internal/config`＋`internal/panel`＋`cmd/wisp`）；若没收件就发本单 ⇒ 先与编排者核（⛔ 两腿不同时在 `cmd/wisp` 写）。
+- ⚠ **cmd/wisp 重包同一时刻只跑一个**：跑前 `tasklist` 自证并报窗口；撞见别人的在飞笔**错峰重跑**，别把撞窗读数当主证。
+- ⚠ **314 死区**：`-count=2 -v ./cmd/wisp/` 会撞 Go 默认 **10m `-timeout`**（实测 603.1s panic）⇒ 必须 `-timeout 40m`，且**别把整包全套当主证据**（9 趟里 2 趟整进程死亡＝票 314 已知）；分段 `-run` 为主、全套为辅并报窗口。
+- ⚠ **`GOTMPDIR` 用 `C:\Users\swq\AppData\Local\wisp-test-gotmp\wisp135r1gotmp`**（C: 卷＋只反斜杠形；**别用 `C:\tmp\`**——它会 `TestAC2SealNoticeLandsInTheRunLegLogFile` 假红，矩阵见 `probes/319/r2/07-…txt` 尾）。
+- ⚠ 开工前 `git status --porcelain -- cmd/wisp internal/proc`：有**不是你的**未提交改动 ⇒ **停手上报，别替别人提交**。
+- 变异按仓规：仓外备份/`-overlay`＋sha256＋还原证＋`git diff` 空；**变异不许进 commit**。
+- 每格一笔 commit＋票尾 append 一条 bullet（`agent=135-r1 did=… next=…`）；产出 ≤7 枚 ≤200 行；只 commit、⛔ 不 push；显式 pathspec。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`（MSYS 形；⛔ 缺它会 0xc0000135）。
+- **未定义即停**：premise 复核不出／某格须动禁区面 ⇒ 停手上报（写进回执）。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋commit sha（逐格）＋premise 复核读数＋七格逐格读数＋门禁 rc＋**具名没做**。
