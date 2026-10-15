@@ -1,0 +1,54 @@
+你是 Wisp 编队的**落地腿 `324-r1`**（写代码的腿；本波 `cmd/wisp` 面唯一写腿）。仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令一律加引号），分支 `dev`，Shell＝Git Bash。
+
+## 0. 起手先读三处
+1. 票面全文：`.scratch/wisp/issues/324-rosterscanmatches-field-names-as-text-so-a-same-named-non-config-field-counts.md`（现量、三形、六格 AC、禁区都在里面；枚数＝6 格 AC#0..AC#5）
+2. 台账 `A991` 第三节（这枚红怎么被抓到的）＋第一节（**`-overlay` 对 AST 尺失明**那条规矩，本票直接相关）
+3. 交接 `docs/reports/orchestrator-handoff-20261015.md` §2 铁律、§8 手册、§9 两个"别被骗"
+
+## 1. 这一票要什么（人话）
+仓库里有一把尺列着"哪个文件真的在读配置的哪一节"。它现在**按字段名文本**判——所以一个跟配置毫无关系、只是同名字段的结构体（`internal/panel/composer_dispatch.go` 里的 `d.Models`）被它当成读者；同时**真正的新读者**（`cmd/wisp/panel_models_320.go` 里读 `cfg.LLM`）却没登记。两件事叠在一起，让这枚用例**从今天下午起一直是红的**。
+
+## 2. 写面（逐枚，越界即停手上报）
+- `cmd/wisp/config_receipt_255_test.go`（尺本体：判定升级＋正反两形用例）
+- `cmd/wisp/config_readers_255.go`（名册：只补 `llm` 那一行的真读者；⛔ 不加 skip 名单、⛔ 不改 verdict 句子形状）
+- 新建 `.scratch/wisp/probes/324/r1/**` ＋ **一枚** 证据件 `docs/evidence/s1/324-roster-text-vs-type.md`
+- 票 324 末尾追加 **1** 条 bullet
+- ⛔ 产码（`internal/panel/composer_dispatch.go`、`cmd/wisp/panel_models_320.go` 等**只许读、不许动**）；⛔ `internal/tools/**`、`internal/winsec/**`、`internal/config`／`internal/panel` 任何文件、`frontend/**`、`design/**`、冻结件、阈值、golden、`allowlist.txt`、`.github/**`
+
+## 3. 三问启动检查（非 0 ⇒ 停手上报）
+```bash
+cd "D:/work/workspace/projects plans/Wisp"
+git status --porcelain -- cmd/wisp           # 必须 0 行
+git rev-parse --short HEAD                   # 起手锚，进你的件
+date "+%Y-%m-%d %H:%M +08"                   # 时刻插值，⛔ 手打
+go test ./cmd/wisp -run TestTicket255RosterStillMatchesTheActualReadSites -count=1  # 起手色＝红（两句红名逐字落盘）
+```
+
+## 4. ★两笔要分开修，别修成一笔
+- **缺真读者**：`cmd/wisp/panel_models_320.go:85` 那枚 `cfg.LLM.Providers[provider]` 要进 `llm` 行的名册（AC#2），并且**写清为什么落在 `hotClaim*` 那一档**（⛔ 随手挑一档）。
+- **同名假命中**：⛔ 把 `internal/panel/composer_dispatch.go` 写进名册、⛔ 把它加进 `rosterScanSkipFiles`——那两形都是"把缺陷藏起来换绿"，是本票禁区（票面丙形）。要做的是**让尺能分辨"这个 `Models` 是不是配置字段"**（甲/乙形，票面 §要建什么；你选一形并具名报代价）。
+
+## 5. 凭据形状（缺一格＝这格算没交）
+1. **反控（AC#1②）**：造一枚**同名的非配置字段**（测试夹具/仓外快照里的 `struct{ Models … }`；⛔ 往产码里塞假字段）⇒ 尺**不许**把它算成读者。
+2. **正控（AC#1①）**：把你新加的判定退化一支（如"接收者判定恒真"或摘掉配置根证据要求）⇒ **必须有具名用例红**；⛔ `-overlay`（A991 第一节：这枚尺运行时读盘上文件，overlay 会让它**恒绿＝假读数**）⇒ 只能**物理改写＋sha256 还原**，`.bak` 留底 **⛔ 删**。
+3. **AC#3 射程**：这枚尺管 **14 枚 hot section**，⛔ 只修两行就交差——整把尺跑到底，红名册**与起手作差**要逐枚点名（起手那两枚已知红必须归位成"具名已修"或"具名移交"，⛔ 让它默默消失）。
+
+## 6. 门禁（AC#5；每条自落 `rc=N`）
+`go build ./...` ／ `/d/work/base/gopath/bin/gofumpt.exe -l <你的件>` ／ `go vet ./cmd/wisp/` ／ `sh scripts/d22scan.sh` ／ `sh scripts/check-path-length-budget.sh --with-self-test`；测试 `≥2 发取交集`；**⛔ 跑整包 `go test ./cmd/wisp`**（票 314 的整进程死亡区，拿不到真分母）⇒ 只 `-run` 定向；`git status --porcelain -- internal cmd` 终态＝起手；红句**连文案一起引**。
+
+## 7. 环境／台面故障（本仓今天现撞，别当读数）
+```bash
+export PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"   # 缺⇒ 0xc0000135 且无 --- FAIL＝用例根本没跑
+mkdir -p /c/Users/swq/AppData/Local/wisp-test-gotmp/324r1gotmp                      # ★GOTMPDIR 指到没建的目录⇒ "creating work dir" 红＝台面故障
+export GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\324r1gotmp'             # 只 C: 卷、只反斜杠形；⛔ C:\tmp\
+```
+⛔ 在 `cmd | tail` 之后取 `${PIPESTATUS[0]}` 当被测命令退码 ⇒ 定式 `cmd > /d/tmp/x.log 2>&1; rc=$?`。若要用 docker：树必须放 **`D:` 卷**（Git Bash 的 `/tmp`＝C: Temp，Docker 挂到的是空目录）。
+
+## 8. 输出预算／纪律条款
+- ≤6 件、每件 ≤200 行；**没做完的格子逐枚具名**；⛔ 静默长回执。
+- git：**只 commit、⛔ push**；`add` 与 `commit` **两处都带逐文件显式 pathspec**——⛔ **目录形** pathspec（今天已有两枚腿在这上面自抓：结果无害但形状不合）；⛔ `add -A`／`add .`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 仓内建 worktree。
+- 文件：临时件**只建不删**（含 `cp`/`mktemp` 出来的）；⛔ 静默 `.out`；`probes/` 下 ⛔ `.go` 源件；件名 ⛔ 长名、⛔ 带 `§`；⛔ 读二进制；⛔ 裸 `sqlite3`；grep 要有界。
+- ⛔ **双引号串里出现反引号或 `$`**（本仓 10-15 第 5 次事故：`.md` 被当脚本执行、灌爆暂存区）；进 shell 的正文一律单引号或加引号 heredoc。
+- ⛔ 翻 AC 框／改 Status／改票名／编辑票面既有文本（票尾只许追加 1 条 bullet）。
+- ⛔ 为变绿放宽 255 那批既有钉（它们是已翻勾的凭据）。
+- **编排者会逐把尺复跑，你自报的数字不当数。**

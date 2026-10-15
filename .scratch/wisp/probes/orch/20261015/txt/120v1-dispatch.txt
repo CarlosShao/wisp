@@ -1,0 +1,54 @@
+你是 Wisp 编队的**验收腿 `120-v1`**＝**非实现者**（本票产码由落地腿 `120-r2` 完成、上一手仪器由 `120-r1` 完成；⛔ 实现者自判）。仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令加引号），分支 `dev`，Shell＝Git Bash。
+
+## 0. 起手先读四处
+1. 票面：`.scratch/wisp/issues/120-posix-seal-is-check-then-act-154-of-4000-retries-hit-the-window.md`
+2. 落地腿的证据件：`docs/evidence/s1/120-fd-anchor.md`（176 行）＋它的读数目录 `.scratch/wisp/probes/120/r2/`（29 件）
+3. 上一手的件：`.scratch/wisp/probes/120/r1/index.md`（§2 替代形态判据、§4 两条已裁、§5 `next=1..5`）
+4. 台账 `A990` 裁①②（`privateFile` 归票 322、r 权限类收紧**已接受**）＋`A991` 第二节（编排者自己的容器复跑与它**不可相减**的口径）
+
+## 1. 你要裁的（逐格给三态：成立／不成立／缺世界）
+1. **★三枚具名缺口**（`120-r2` 自己报回来的，⛔ 由它或我追认）：
+   - `sealHandle` 那半的 `SameFile` **零具名单元台件**（反控只去了 `sameObjectPinned` 的牙）⇒ 这一支今天**没人守**，判"缺世界"还是"不成立"，你裁。
+   - **形 1/2 去牙后仍 0 命中**（`os.Root` 本身拒绝对目标链接）⇒ 那两形的红**只来自 stdlib**，不是来自新装的闸门 ⇒ 判据到底买到了什么，要具名。
+   - `refused-at-act > 0` 那一形今天只 `t.Logf` 不 `t.Errorf` ⇒ 要不要升成硬判据（升了会不会恒红），你给判语。
+2. **成对读数的独立性**：⛔ 抄腿的数。自己进容器跑一遍（**缩小档也算，但要标你的尺**），并核"修前那一发的坏世界是不是真被造出来"（`hit-foreign>0` 旁边必须有分母与活性）。
+3. **注释说实话**：`internal/winsec/winsec_other.go` 里两处——① r 权限类收紧（`0w0`/`000` 文件、缺 `r` 目录由可修变拒）写得是否只是现状、有没有新造承诺；② `:82` 那句"ticket 322 … unfixed"是否仍然属实（票 322 已立、未修 ⇒ 属实）。
+4. **仪器转严有没有把活性那一半摘掉**（本仓定式：`0 命中`＋死仪器＝假绿；`120-r1` §1 缺陷 2 的原读数就是这一形）。
+5. **名册口径**：那条 `-run` 口径今天匹配**顶层 20 枚**（不是票里写的 16）——腿报的名册数是否与它逐枚点名一致。
+
+## 2. 写面（极窄）
+- **只新建** `docs/evidence/s1/120-v1.md`（短名、⛔ `§`）＋票 120 末尾 **1** 条 bullet
+- ⛔ 任何产码/测试码；⛔ 翻 AC 框（框只有编排者能翻）；⛔ 改票名/Status/台账；⛔ `internal/tools/**`、`cmd/wisp/**`、`internal/panel`、`frontend/**`、`design/**`
+
+## 3. 面限制（今天有别的腿在飞）
+```bash
+# 可跑：容器（golang:1.27、CGO_ENABLED=0、可特意降权 uid 1000）／go vet ./internal/winsec/／GOOS=darwin go vet ./internal/winsec/／gofmt -l／gofumpt -l
+# ⛔ 禁跑：go test ./cmd/wisp（324-r1 是该面唯一写腿）／go test ./internal/tools（同理）
+```
+⇒ 需要那两个面才能证的格，具名写〔待面空补验〕，⛔ 用读码推断冒充"已验"。
+
+## 4. 台面故障（本仓今天现撞四次，⛔ 当读数）
+1. `GOTMPDIR` 指到没建的目录 ⇒ `go: creating work dir: … cannot find the file specified` ＋ `rc=0` ⇒ 先 `mkdir -p`。
+2. `git archive` 的导出树放 Git Bash `/tmp`（＝C: Temp）⇒ Docker 挂到**空目录**、容器里报 `go.mod file not found` ⇒ **树放 `/d/tmp/…`**，`-v` 配 `MSYS_NO_PATHCONV=1`，量之前先数 `.go` 证非空（"0"⛔ 是读数，"分母 N 且 0"才是）。
+3. ⛔ 在 `cmd | tail` 之后取 `${PIPESTATUS[0]}` 当被测命令退码 ⇒ 定式 `cmd > /d/tmp/x.log 2>&1; rc=$?`。
+4. ★`-overlay` 只换编译期输入；对"运行时读盘上文件"的尺**失明** ⇒ 你要去牙就用**物理改写＋sha256 还原**，`.bak` **⛔ 删**。
+
+## 5. 判据纪律
+- ⛔ 恒真检测器（判据换成反形也全绿＝它对这事不敏感）；⛔ "降级是对的"与"降级是允许的"混成一格；⛔ "附条件通过"——AC 声称要防的结局被造出来了就判**退回**。
+- 既有红不算新债：本机跑 `internal/winsec` 在容器/Windows 两侧的名册差异、`internal/panel` 那 5 枚既有红、`cmd/wisp` 的 `TestTicket255RosterStillMatchesTheActualReadSites` **今天起手即红**（存量债，归口票 324）⇒ ⛔ 算进本票、⛔ 去修，但要在件里具名记色。
+- 变异台件：输出先落文件、`finally` 还原（⚠ 中途炸会把突变留在跟踪文件里）。
+
+## 6. 三问启动检查
+```bash
+cd "D:/work/workspace/projects plans/Wisp"
+git status --porcelain -- internal/winsec     # 非 0 ⇒ 具名写下是谁的面，⛔ 动它
+docker info --format '{{.ServerVersion}}'      # 应回 29.6.2；起不来就停手上报
+git rev-parse --short HEAD; date "+%Y-%m-%d %H:%M +08"   # 起手锚＋时刻插值
+```
+
+## 7. 输出预算／纪律
+- ≤4 件、每件 ≤200 行；判语表逐格三态＋每格带**读数行**（引红句要连文案）；没裁完的具名自报。
+- git：**只 commit、⛔ push**；`add`／`commit` 两处**逐文件显式 pathspec**（⛔ 目录形，今天已有两枚腿在此自抓）；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ⛔ 双引号串里出现反引号或 `$`（本仓第 5 次事故）；进 shell 的正文一律单引号或加引号 heredoc。
+- 文件：临时件只建不删；⛔ 静默 `.out`；⛔ 读二进制；⛔ 裸 `sqlite3`；grep 要有界；件名 ⛔ 长名、⛔ `§`。
+- **编排者会逐把尺复跑，你自报的数字不当数。**
