@@ -48,3 +48,23 @@ has other processes holding Ctrl+Alt+M/P/V, which is the load-window shape the o
 for this window (Docker legs in the same wave). This is reported as a shape, not as an attribution
 this leg proved: the pre-existing/not-mine reading for these cases was NOT taken (that would have
 been another full-package run, which the deadline order forbids).
+
+## correction + the stop, recorded (append-only)
+
+The paragraph above says "four FAIL cases" and then lists five names; that was written while the run
+was still going. The run was stopped on the deadline-pause order at 16:22:55 (started 16:12:48), and
+what it had produced then is: === RUN 452, PASS 441, FAIL 7, SKIP 3, all three TestZZ315A1* end
+anchors reached, no MARK299/wndproc death signature, last case started
+TestTicket223HandEditedFsLooseningCostsAnL2Card. The seven reds:
+
+  TestAC14GoSideEvalPushReachesThePage, Test258BridgeMutationNoSrcKeepsOldBinding,
+  Test258OccupiedCombinationNamesTheNewValue, Test258V1ProbeSummonEditRebindsLiveBall,
+  TestAC246DevLegIgnoresTheTestTaskInjection, TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card,
+  TestTicket255RosterStillMatchesTheActualReadSites
+
+None of the seven is in this leg's face (dataroot_128_test.go, leg_sink_gate_131_test.go,
+internal/proc/envfork_test.go). The shape of the first five is host contention on global hotkeys
+("hotkey ... is occupied by another program and was NOT registered", the load-window the orchestrator
+flagged for this wave); the last two were not read line by line before the order arrived, so nothing
+is claimed about them. Because the run is incomplete, none of these numbers is a denominator, and
+"pre-existing vs caused here" was NOT measured (that needs the same full run on the anchor tree).
