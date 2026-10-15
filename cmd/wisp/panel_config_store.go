@@ -254,6 +254,10 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		// leg's (the panel's own gate only knows the field takes a value).
 		protocol, baseURL := splitCustomRowValue(w.Value)
 		written, err = s.mgr.CreateCustomProviderRow(w.Provider, protocol, baseURL, w.Model)
+	case panel.FieldModelRowCreate:
+		// 票 320 AC#3: provider and model are the two selectors, no value - the
+		// entry's window and price leaves keep their own fields.
+		written, err = s.mgr.CreateModelRow(w.Provider, w.Model)
 	case panel.FieldRoleChatPair:
 		written, err = s.mgr.SetRoleChatPair(w.Provider, w.Model)
 	case panel.FieldProviderCredential:

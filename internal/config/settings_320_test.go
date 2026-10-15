@@ -172,3 +172,92 @@ func Test320CreateCustomProviderRowLandsAndRefusesByName(t *testing.T) {
 		t.Errorf("the control row landed as %+v", p)
 	}
 }
+
+// AC#3: the catalog entry. One guarded write adds the entry seeded from the
+// schema's own default tags, the two refusals (an undeclared provider, an entry
+// that already exists) leave the file byte-identical, and the leaves the page
+// writes afterwards - context_window and the two price halves - address the entry
+// this step created.
+func Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice(t *testing.T) {
+	m, path, _ := newTestManager(t, settingsBase)
+
+	written, err := m.CreateModelRow("deepseek", "deepseek-new-under-test-320")
+	if err != nil {
+		t.Fatalf("CreateModelRow: %v", err)
+	}
+	if want := []string{"llm.providers.deepseek.models.deepseek-new-under-test-320"}; !reflect.DeepEqual(written, want) {
+		t.Errorf("written key paths = %v, want %v", written, want)
+	}
+	got := readLoaded(t, path)
+	spec, ok := got.LLM.Providers["deepseek"].Models["deepseek-new-under-test-320"]
+	if !ok {
+		t.Fatalf("the catalog entry never landed: %+v", got.LLM.Providers["deepseek"].Models)
+	}
+	if !spec.Enabled {
+		t.Error("the created entry is not enabled: an entry without enabled=true is treated as off and is refused at start-up")
+	}
+	if spec.Billing != BillingPayPerToken {
+		t.Errorf("the entry's billing = %q, want the schema's own default", spec.Billing)
+	}
+	if body := readSettingsFile(t, path); !strings.Contains(body, "[llm.providers.deepseek.models.deepseek-new-under-test-320]") {
+		t.Errorf("the entry's section is not in the file:\n%s", body)
+	}
+	if got.Ball.Size != 56 {
+		t.Errorf("an unrelated key moved: ball.size = %d", got.Ball.Size)
+	}
+
+	// The step exists so the three leaf fields have something to address: the
+	// control proves the entry the create made is the one they then write.
+	if _, err := m.SetModelContextWindow("deepseek", "deepseek-new-under-test-320", 128000); err != nil {
+		t.Fatalf("the leaf write against the created entry: %v", err)
+	}
+	if _, err := m.SetModelPriceIn("deepseek", "deepseek-new-under-test-320", 1500000); err != nil {
+		t.Fatalf("the price write against the created entry: %v", err)
+	}
+	if after := readLoaded(t, path).LLM.Providers["deepseek"].Models["deepseek-new-under-test-320"]; after.ContextWindow != 128000 || after.Price.In != 1500000 {
+		t.Errorf("the leaves did not land on the created entry: %+v", after)
+	}
+
+	// Two refusals, the file byte-identical under each.
+	before := readSettingsFile(t, path)
+	cases := []struct {
+		name     string
+		provider string
+		model    string
+		mustSay  string
+	}{
+		{"an undeclared provider", "ghostco", "m-320", "行不存在"},
+		{"an entry that already exists", "deepseek", "deepseek-chat", "already exists"},
+		{"no model id at all", "deepseek", "   ", "行不存在"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			written, err := m.CreateModelRow(tc.provider, tc.model)
+			if err == nil {
+				t.Fatalf("the create was accepted (reported %v)", written)
+			}
+			if written != nil {
+				t.Errorf("a refused create reported %v, want none", written)
+			}
+			if !strings.Contains(err.Error(), tc.mustSay) {
+				t.Errorf("the refusal does not say why (%q missing): %v", tc.mustSay, err)
+			}
+			if after := readSettingsFile(t, path); after != before {
+				t.Errorf("config.toml changed under a refused create:\n%s", after)
+			}
+		})
+	}
+
+	// Control: after the refusals a second entry still lands, and the first one
+	// (with its leaves) is untouched by that write.
+	if _, err := m.CreateModelRow("deepseek", "deepseek-second-under-test-320"); err != nil {
+		t.Fatalf("the control create after three refusals: %v", err)
+	}
+	after := readLoaded(t, path).LLM.Providers["deepseek"].Models
+	if _, ok := after["deepseek-second-under-test-320"]; !ok {
+		t.Fatalf("the control entry never landed: %+v", after)
+	}
+	if after["deepseek-new-under-test-320"].ContextWindow != 128000 {
+		t.Errorf("the control write disturbed the first entry: %+v", after["deepseek-new-under-test-320"])
+	}
+}

@@ -36,6 +36,7 @@ func fields313Cases() []fields313Case {
 		{field: FieldProviderRowCreateCustom, extra: map[string]any{
 			"configProvider": "local-gw", "configValue": "openai-chat,http://127.0.0.1:8080/v1",
 		}},
+		{field: FieldModelRowCreate, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313"}},
 		{field: FieldRoleChatPair, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313"}},
 	}
 }
@@ -118,6 +119,12 @@ func Test313SelectorRefusalsOnTheAdditionalRoster(t *testing.T) {
 		}},
 		{"provider_row_create_custom with an empty value", map[string]any{
 			"configField": FieldProviderRowCreateCustom, "configProvider": "local-gw", "configValue": "   ",
+		}},
+		{"model_row_create without a provider", map[string]any{
+			"configField": FieldModelRowCreate, "configModel": "m-320",
+		}},
+		{"model_row_create without a model", map[string]any{
+			"configField": FieldModelRowCreate, "configProvider": "stepfun",
 		}},
 	}
 	for _, tc := range cases {

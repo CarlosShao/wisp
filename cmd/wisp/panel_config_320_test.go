@@ -160,3 +160,53 @@ func Test320CustomProviderRowThroughTheRealLeg(t *testing.T) {
 		t.Errorf("the control custom row did not land:\n%s", body)
 	}
 }
+
+// AC#3 through the real leg: a catalog entry lands on an existing provider by
+// name alone (no value), the read side lists it next to the seeded entry, and
+// both refusal directions - an undeclared provider, an entry that already exists
+// - leave the file byte-identical.
+func Test320ModelRowCreateThroughTheRealLeg(t *testing.T) {
+	dir := settingsDir248(t)
+	var audit []string
+	disp, _ := newRealSettingsLeg(t, dir, &audit, nil)
+	ctx := context.Background()
+
+	const newModel320 = "deepseek-new-under-test-320"
+	apply313(t, disp, set313Env("r-320-model-row", panel.FieldModelRowCreate, "deepseek", newModel320, ""),
+		"llm.providers.deepseek.models."+newModel320)
+	if body := readConfigBody320(t, dir); !strings.Contains(body, "[llm.providers.deepseek.models."+newModel320+"]") {
+		t.Errorf("config.toml does not carry the new entry's section:\n%s", body)
+	}
+
+	// Read back: the page's own data source now lists both entries.
+	reply, err := disp.Handle(ctx, `{"method":"config.get","requestId":"r-320-model-get","source":"panel-composer"}`)
+	if err != nil {
+		t.Fatalf("config.get after the entry write: %v", err)
+	}
+	row := providerRow320(t, settingsPayload313(t, reply), "deepseek")
+	models, _ := row["models"].([]any)
+	if row["modelCount"] != float64(2) || len(models) != 2 || models[0] != "deepseek-chat" || models[1] != newModel320 {
+		t.Errorf("the read side lists %v (count %v), want the seeded entry plus the new one in order",
+			row["models"], row["modelCount"])
+	}
+
+	// Refusal directions, each leaving the file byte-identical.
+	before := readConfigBody320(t, dir)
+	if _, err := disp.Handle(ctx, set313Env("r-320-model-ghost", panel.FieldModelRowCreate, "ghostco", "m-320", "")); err == nil {
+		t.Fatal("an entry under an undeclared provider cleared the step")
+	} else if !strings.Contains(err.Error(), "行不存在") {
+		t.Errorf("the undeclared-provider refusal is not reason 2 (行不存在): %v", err)
+	}
+	if _, err := disp.Handle(ctx, set313Env("r-320-model-dup", panel.FieldModelRowCreate, "deepseek", "deepseek-chat", "")); err == nil {
+		t.Fatal("an entry that already exists cleared the create step")
+	} else if !strings.Contains(err.Error(), "already exists") {
+		t.Errorf("the existing-entry refusal does not say so: %v", err)
+	}
+	if after := readConfigBody320(t, dir); after != before {
+		t.Errorf("config.toml changed under the two refused entry writes:\n%s", after)
+	}
+
+	// Control: after both refusals a second entry still lands.
+	apply313(t, disp, set313Env("r-320-model-ctl", panel.FieldModelRowCreate, "deepseek", "deepseek-ctl-under-test-320", ""),
+		"llm.providers.deepseek.models.deepseek-ctl-under-test-320")
+}

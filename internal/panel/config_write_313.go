@@ -47,6 +47,11 @@ package panel
 //	  because a non-preset name has no preset to inherit protocol from and
 //	  validateAPIKeyRefs refuses a section without one, so the explicit row
 //	  step has to carry the protocol in the same call.
+//	model_row_create  one catalog entry under an EXISTING provider, seeded
+//	  from the schema's own default tags. Deliberately no value: the leaves
+//	  it seeds (context_window, price) already have their own single-key
+//	  fields, and one key per guarded write is the discipline this roster
+//	  keeps.
 
 import "sort"
 
@@ -69,6 +74,10 @@ const (
 	// 320 AC#2). Value = "<protocol>,<base_url>"; provider = the row's name;
 	// model optional, exactly like provider_row_create's optional model half.
 	FieldProviderRowCreateCustom = "provider_row_create_custom"
+	// FieldModelRowCreate is the catalog-entry step (ticket 320 AC#3): provider
+	// and model in the two selectors, no value - the entry is seeded from the
+	// schema's default tags and its leaves have their own fields.
+	FieldModelRowCreate = "model_row_create"
 	// FieldRoleChatPair is llm.roles.chat's provider+model, written together.
 	FieldRoleChatPair = "role_chat_pair"
 )
@@ -76,6 +85,7 @@ const (
 // fields313 is the roster this file owns, sorted at the accessor. It is kept
 // apart from config_handlers.go's allWritableFields on purpose (see the header).
 var fields313 = []string{
+	FieldModelRowCreate,
 	FieldProviderBilling,
 	FieldProviderRowCreate,
 	FieldProviderRowCreateCustom,
@@ -90,11 +100,12 @@ var fields313 = []string{
 // maps so the gate can ask one question per column across both tables.
 var (
 	fields313NeedsProvider = map[string]bool{
-		FieldProviderBilling: true, FieldProviderRowCreate: true,
-		FieldProviderRowCreateCustom: true, FieldRoleChatPair: true,
+		FieldModelRowCreate: true, FieldProviderBilling: true,
+		FieldProviderRowCreate: true, FieldProviderRowCreateCustom: true,
+		FieldRoleChatPair: true,
 	}
 	fields313NeedsModel = map[string]bool{
-		FieldRoleChatPair: true,
+		FieldModelRowCreate: true, FieldRoleChatPair: true,
 	}
 	fields313TakesValue = map[string]bool{
 		FieldProviderBilling: true, FieldProviderRowCreateCustom: true,

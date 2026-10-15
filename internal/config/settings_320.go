@@ -147,3 +147,54 @@ func isProtocol(v string) bool {
 	}
 	return false
 }
+
+// CreateModelRow is ticket 320 AC#3: one catalog entry under a provider this
+// config ALREADY declares. It is the step ticket 313's catalog fields
+// (context_window, price.in, price.out) could not do without - those setters
+// address an entry that exists, and a page that has just discovered a model id
+// from a provider has nothing to address until the entry is there.
+//
+// The entry is seeded from the schema's own `default:"..."` tags, exactly the way
+// CreateProviderRow seeds a row: enabled=true and billing=pay-per-token come from
+// ModelSpec's tags, not from zero values - a section emitted with an explicit
+// false enabled would be treated as off and refused at start-up, which is the
+// opposite of what "create the entry" means.
+//
+// TWO REFUSALS, both reason 2 with the guidance a catalog write already carries:
+// a provider the config does not declare (unknownProviderErr), and an entry that
+// already exists (this step creates; context_window and the two price leaves are
+// the fields that rewrite an existing entry). Nothing here overwrites a row the
+// operator wrote.
+func (m *Manager) CreateModelRow(provider, model string) ([]string, error) {
+	id := strings.TrimSpace(model)
+	if id == "" {
+		return nil, observe.New(observe.ClassConfig,
+			"config: "+refusalRowMissing+"：建目录条目必须点名模型 id")
+	}
+	ownedKey := "llm.providers." + provider + ".models." + id
+	return m.writeOneKey(ownedKey, func(base *Config) bool {
+		p, ok := base.LLM.Providers[provider]
+		if !ok {
+			return false
+		}
+		if p.Models == nil {
+			p.Models = map[string]ModelSpec{}
+		}
+		spec := ModelSpec{}
+		applyDefaults(reflect.ValueOf(&spec).Elem())
+		p.Models[id] = spec
+		base.LLM.Providers[provider] = p
+		return true
+	}, func(base *Config) error {
+		p, ok := base.LLM.Providers[provider]
+		if !ok {
+			return unknownProviderErr(provider)
+		}
+		if _, exists := p.Models[id]; exists {
+			return observe.New(observe.ClassConfig, fmt.Sprintf(
+				"config: llm.providers.%s.models.%s already exists；这一步是「建条目」，不是改写已有条目——"+
+					"已有条目请用 context_window 与 price.in / price.out 那几枚写口", provider, id))
+		}
+		return nil
+	})
+}
