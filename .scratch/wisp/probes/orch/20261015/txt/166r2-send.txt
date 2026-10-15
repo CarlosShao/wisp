@@ -1,0 +1,3 @@
+释放记录 166-r2｜2026-10-15 23:0x +08
+三把尺现跑：① HEAD=e10d6a43（A998）且票 166 的 AC#6 真在盘上（git log -1 -- 该件 命中）② internal/session 面空：git status 对 internal/session 与 cmd/wisp 零输出 ③ CPU 三发 79→70→62（阈 70，取末发）；go build ./internal/winsec/ rc=0（在飞腿 322-r1 此刻面上不留未定义符号）
+禁区邻居具名：322-r1=internal/winsec、324-v1=cmd/wisp 定向（同一批放出，面不相交）

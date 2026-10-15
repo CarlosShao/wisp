@@ -1,0 +1,3 @@
+释放记录 324-v1｜2026-10-15 23:0x +08
+三把尺现跑：① 实现三笔 9c5916e8/e038304b/60481441 真在（git log -1 逐枚）＋证据件 docs/evidence/s1/324-roster-text-vs-type.md 130 行真在盘 ② cmd/wisp 写面空（165-r2 遗产已代提 17ca21ee，git status 对 cmd/wisp 零输出）＋同包定向 -run 无他人（166-r2 的面是 internal/session）③ CPU 末发 62%＜70
+禁区邻居具名：322-r1=internal/winsec（它中途 winsec.go 会引用尚未写出的符号⇒全仓 go build/go vet 的红⛔ 记成本腿的）、166-r2=internal/session
