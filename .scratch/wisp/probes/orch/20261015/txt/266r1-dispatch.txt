@@ -1,0 +1,31 @@
+# 266-r1 派单（票 266：`scripts/*.ps1` 的门自锁钉**零外牙**——删掉它不影响检查；写面＝`scripts/**`＋CI **只许新增**步骤）
+
+发送时刻：见 `-send.txt`（编排者按 `date` 现读插值）。编排者派发。
+你 = Wisp 流水线的落地腿 **266-r1**（`probes/266/` 未建，查重已做）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 不碰台账/HANDOVER）。
+
+## 票与目标（逐字为准）
+
+- 票：`.scratch/wisp/issues/266-no-external-tooth-over-the-slo-check-self-locking-nails.md`（**通读**；含"现量 1/2/3/4"四锚——**引用前自己重跑**，别把它们当常量）
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+- **五格**（票面 AC 1:1；摘要供定位，逐字读票）：
+  1. **AC#0** 落地腿自己现跑复认票面"现量 1/2/3"（那把 scope 尺、P3 的射程那句）＋现读两枚钉今天的真身行号。
+  2. **AC#1** 外牙的**形状**要**落在被检文件之外**，具名 `file:line`；并答"它凭什么发现不了『删检查也删声明』"这一问。
+  3. **AC#2** 正控两发读数齐（删钉必响**逐字**／还原绿）＋**还原证明**（`git status --porcelain -- scripts tools .github` 空）。
+  4. **AC#3** 四条偷懒形状逐条自查并在交件里点名"我没做哪一种"（动阈值／放宽严格模式／把某步改成跳过／…）。
+  5. **AC#4** 卫生门读数不扩大（`tools/d22scan`／`check-path-length-budget.sh --with-self-test`／票 212 那本账）。
+- **候选落点**（票面给了几条，编排者裁）：**采 ①/②**（复用 `slo-freshness.sh`／新尺＋CI 新步／`slo-check.ps1` 外层断行）。**③（动 `tools/d22scan` 的 scope）须具名解冻、本单未给** ⇒ 若你判定非 ③ 不可 ⇒ **停手上报**。
+
+## 畛域与硬钉
+
+- 写面＝`scripts/**`＋`.github/workflows/ci.yml`（**只许新增步骤**；⛔ **不动触发面** `on:`／`paths:`／并发块）。⛔ 不碰 `cmd/wisp`／`internal/**`／`frontend/**`／`design/**`／`tools/d22scan/**`（未解冻）／阈值/golden/`allowlist.txt`。
+- ⚠ 与票 262／302／301／136 同区族（`scripts`／`ci.yml`）⇒ **一次一枚**：本刻该面只有你；⛔ 别顺手改别人的文件。
+- ⚠ 新步排序：若排在"会失败的步骤"之后 ⇒ 必须放前面或带 `if: !cancelled()`（本仓实测过"门因此从未执行"）。
+
+## 纪律
+
+- 每格一笔 commit＋票尾 append 一条 bullet（`agent=266-r1 did=… next=…`）；只 commit ⛔ 不 push；`add`／`commit` 显式 pathspec；⛔ `add -A`／目录／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；变异用仓外拷贝＋sha256 还原证（⛔ 别裸改跟踪文件不还）；零 emoji。
+- 门禁：`bash -n` 改动脚本／`python -c yaml.safe_load`（ci.yml）／`sh scripts/d22scan.sh`／长度门。
+- 环境：`GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\wisp266r1gotmp'`（若用到 go；C: 卷＋只反斜杠形）。
+- 本刻同波在飞：`135-r1`（cmd/wisp）／`120-r1`（winsec，容器）／`165-r1`（internal/tools）⇒ 你的面（scripts／ci.yml）独占、与三者零重叠。
+- **未定义即停**：非 ③ 不可／须动触发面／须动未解冻面 ⇒ 停手上报。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋逐格 sha＋五格读数（含正控两发红名逐字＋还原证明）＋门禁 rc＋面核＋**具名没做**。

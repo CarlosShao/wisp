@@ -1,0 +1,29 @@
+# 165-r1 派单（票 165：**`plan.present`**——"先出方案、你点头再动手"那一档按已批甲路实现；写面＝`internal/tools/**`）
+
+发送时刻：见 `-send.txt`（编排者按 `date` 现读插值）。编排者派发。
+你 = Wisp 流水线的落地腿 **165-r1**（`probes/165/` 未建，查重已做）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 不碰台账/HANDOVER）。
+
+## 票与授权（逐字为准）
+
+- 票：`.scratch/wisp/issues/165-plan-first-then-act-a-brake-the-voice-entry-needs.md`（**通读**：机主 09-27 批准经 `A322/A323` 落进冻结文本＝`PLAN.md:2567` 的 `plan.present`（L2）＋`SPEC-07:73` 镜像；票 161 已 `-done`；**票面零字节名单**＝`internal/risk/**`、`internal/agent/approval/**`、`internal/panel/**`、`docs/PLAN.md`、`docs/specs/**`）。
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+- **五格**（按票面 AC 1:1；摘要供定位，逐字读票）：
+  1. **AC#1** 未修码读数：今天"只读地出一份方案"这一发能不能做到（做不到＝本票成立；做得到 ⇒ 直接报回）。
+  2. **AC#2** 复用形状：方案这一档**不新增审批状态**（拿 `--name-only` 名册自证没动 `internal/risk/**` 与状态机文件）；若必须新增 ⇒ **停手上报**。
+  3. **AC#3** 批准的**范围**只批这一批：两发变异（批完方案后再来一发不在方案里的写 ⇒ 必须响；摘掉"批过的范围"这一句 ⇒ 越界那发必须响）。
+  4. **AC#4** 只加"**发起请求**"的出口，**⛔ 不许**加"给出允许"的出口（面板侧来源的 L2"允许"不算允许）。
+  5. **AC#5** 契约轴：只动已批准面；`D43`/`C12` 状态机**照旧冻结**（⛔ 别顺手扩档）。
+
+## 畛域与硬钉
+
+- 写面＝`internal/tools/**`（新工具＋用例；注册表在 `internal/tools` 内）。⛔ 不碰 `cmd/wisp`（在飞 `135-r1` 的面）／`internal/winsec`（在飞 `120-r1`）／`scripts`＋`.github`（在飞 `266-r1`）／`internal/panel`／`frontend/**`／`design/**`／阈值/golden/`tools/d22scan/**`/`allowlist.txt`。
+- ⚠ **落点须先现读**：若实现非动 `internal/risk/mode.go`／`internal/agent/approval/batch.go`（都在你自家零字节名单内）不可 ⇒ **停手上报**（那是票面明写的停手线）。
+- 与同族票（163/164/270/287/176 抢 `internal/tools`）**一次一枚**：本刻该面只有你。
+
+## 纪律
+
+- 每格一笔 commit＋票尾 append 一条 bullet（`agent=165-r1 did=… next=…`）；只 commit ⛔ 不 push；`add`／`commit` 显式 pathspec；⛔ `add -A`／目录／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；变异用 `-overlay`／仓外备份＋sha256 还原证；注释与测试零 emoji（含 `≤`/`✓`）。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`；`GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\wisp165r1gotmp'`（C: 卷＋只反斜杠形；**别用 `C:\tmp\`**）。
+- 环境提示：本刻同波另有 `135-r1`（cmd/wisp）／`120-r1`（winsec，容器跑抬 CPU）／`266-r1`（scripts）⇒ 你的面独占；重包只跑你自己的包（`go test ./internal/tools/ -run ...` 分段）。
+- **未定义即停**：AC#2 要新增状态／AC#4 要加"允许"出口／须动零字节名单 ⇒ 停手上报。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋逐格 sha＋五格读数（含两发变异红名逐字）＋门禁 rc＋面核（`git diff --name-only` 逐枚）＋**具名没做**。

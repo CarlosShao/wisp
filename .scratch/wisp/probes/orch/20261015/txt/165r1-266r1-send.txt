@@ -1,0 +1,16 @@
+165-r1 send 记录
+- 发送时刻：2026-10-15 16:2x +08（`date` 现读插值见本行；⛔ 不再手打）。
+- 去重核：`.scratch/wisp/probes/165/` 未建（可用）。
+- 收件人：agent_ec0e1e0a-d86f-418a-8c65-30642cdf1c0c（general-purpose，后台）。
+- 内容：票 165 五格（`plan.present` 按已批甲路实现：未修码读数／复用形状不新增状态／批准范围只批这一批两发变异／只加发起出口不强加允许出口／契约轴）。
+- 面：`internal/tools/**`（注册表也在包内）⇒ 与在飞 `135-r1`（cmd/wisp＋internal/proc）／`120-r1`（internal/winsec）／`266-r1`（scripts＋ci.yml）**零重叠**。
+- 派发依据：`pool-r2`（16:1x 普查）四尺全过（授权＝`A322/A323`＋`PLAN.md:2567`＋`SPEC-07:73`；161 已 done）；同族票 163/164/270/287/176 抢同一文件族 ⇒ 本刻只此一枚。
+- 停手线（写进派单）：若非动 `internal/risk/mode.go`／`internal/agent/approval/batch.go` 不可 ⇒ 停手上报。
+
+266-r1 send 记录
+- 发送时刻：2026-10-15 16:2x +08（同上，`date` 插值）。
+- 去重核：`.scratch/wisp/probes/266/` 未建（可用）。
+- 收件人：agent_d72dfef2-d383-4ef5-af02-780af3eff49a（general-purpose，后台）。
+- 内容：票 266 五格（外牙落在被检文件之外＋具名 file:line／正控两发＋还原证明／四条偷懒形状自查／卫生门不扩大）。
+- 面：`scripts/**`＋`ci.yml`（**只许新增步骤、⛔ 不动触发面**）⇒ 与在飞三腿零重叠；同区族票 262/302/301/136 一次一枚。
+- 裁决：采候选 ①/②；**③（动 `tools/d22scan` scope）未解冻** ⇒ 非 ③ 不可即停手上报。
