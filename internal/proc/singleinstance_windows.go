@@ -5,6 +5,7 @@ package proc
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"sync"
 
 	"golang.org/x/sys/windows"
@@ -13,8 +14,13 @@ import (
 // Per-session single instance (D42#7, D38): the mutex lives in the `Local\`
 // namespace, so it is scoped to the login session - a second user (or RDP
 // session) can run their own Wisp, but within one session only one instance
-// runs. A second launch signals the first instance's activation event
-// (bringing the ball to the front is the ball's job, ticket 07) and exits.
+// runs. A second launch signals the first instance's activation event and exits.
+// (The old parenthetical here said bringing the ball to the front is "the ball's
+// job, ticket 07"; 319-a1's census checked and ticket 07 is static states plus
+// basic animations - no bring-to-front in it. What actually answers the signal
+// now is the owner runtime's registered activation hook: Runtime
+// .SetActivationHook, ticket 319, whose resident leg drives the ball's own panel
+// executor.)
 
 // ErrAlreadyRunning is returned by AcquireSingleInstance when another Wisp
 // process of this session owns the mutex.
@@ -81,7 +87,8 @@ func AcquireSingleInstance(mutexName, eventName string) (*SingleInstance, error)
 }
 
 // ActivateEvent returns the activation event handle for the owner's wait
-// loop (ball, ticket 07). Handle with care: do not close it.
+// loop - the resident runtime's event loop, which runs the registered
+// activation hook (ticket 319). Handle with care: do not close it.
 func (s *SingleInstance) ActivateEvent() windows.Handle {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -122,8 +129,34 @@ func (s *SingleInstance) Release() error {
 	return nil
 }
 
+// asfwAny is ASFW_ANY: "any process may be allowed to set the foreground".
+const asfwAny = 0xFFFFFFFF
+
+// user32 procs this package needs that golang.org/x/sys/windows does not export.
+var (
+	procUser32                   = windows.NewLazySystemDLL("user32.dll")
+	procAllowSetForegroundWindow = procUser32.NewProc("AllowSetForegroundWindow")
+)
+
 // SignalExistingInstance signals the activation event of the running
 // instance. Used by the second launch right before exiting.
+//
+// Ticket 319 AC#2 added one statement to this function, and why it belongs here
+// rather than in the resident's panel host: a background process's
+// SetForegroundWindow is refused by Windows' foreground lock, and the ONE moment
+// in a session when somebody who may hand that permission over is running is
+// this one - the second launch is the process the user just double-clicked, i.e.
+// the foreground-eligible one, and it is about to exit. So the permission is
+// handed to whoever will answer the signal (ASFW_ANY, the only target this
+// process can name: it knows an event name, not the owner's PID) BEFORE the
+// signal, so the resident's answer is allowed to raise a window on receipt.
+// Without it the resident's Show still runs but its SetForegroundWindow comes
+// back 0 and the panel may open behind - the "double click did nothing" the
+// owner reported, one layer down.
+//
+// The return value is recorded and never retried: a refusal (the caller did not
+// hold the foreground at this instant) must not turn a wake-up into a loop, the
+// same posture panel_host_windows.go's Hide takes toward its own SetForegroundWindow.
 func SignalExistingInstance(eventName string) error {
 	ename, err := windows.UTF16PtrFromString(eventName)
 	if err != nil {
@@ -134,6 +167,10 @@ func SignalExistingInstance(eventName string) error {
 		return fmt.Errorf("proc: open activation event %q: %w", eventName, err)
 	}
 	defer windows.CloseHandle(h)
+	if r, _, callErr := procAllowSetForegroundWindow.Call(asfwAny); r == 0 {
+		slog.Warn("proc: AllowSetForegroundWindow(ASFW_ANY) was refused; the resident's SetForegroundWindow may be denied by the foreground lock",
+			"err", callErr)
+	}
 	if err := windows.SetEvent(h); err != nil {
 		return fmt.Errorf("proc: signal activation event %q: %w", eventName, err)
 	}

@@ -10,11 +10,13 @@ import (
 	"os/signal"
 	"path/filepath"
 	"strings"
+	"sync"
 	"syscall"
 
 	"github.com/CarlosShao/wisp/internal/ball"
 	"github.com/CarlosShao/wisp/internal/buildinfo"
 	"github.com/CarlosShao/wisp/internal/config"
+	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/proc"
 )
 
@@ -190,14 +192,24 @@ func runResident() {
 	// source then binds nothing (its switches are refused by name rather than
 	// narrowing a scope no panel can reach).
 	rp, panelScope, rpErr := newResidentPanelManager(rt.Layout.DataDir)
-	var panel *residentPanel
+	// Ticket 319 AC#1: the assembly root's handle on the panel thread is a HOLDER
+	// now, not the thread itself. The one thing that changes in a visible way:
+	// after the thread has ended (any way at all - the owner's X, a system
+	// SC_CLOSE, a named refusal), the next gesture starts a fresh thread on the
+	// same manager instead of being refused forever. See panelHolder above for
+	// the defect, the field, and the three frozen things it leaves alone.
+	holder := newPanelHolder(rt.Registry, rp)
 	if rpErr != nil {
 		slog.Error("panel host: this process has no panel", "err", rpErr)
 		fmt.Printf("wisp: panel host unavailable (%v): the panel hot key and the tray item will be recorded, not executed\n", rpErr)
 	} else {
-		panel = startResidentPanel(rt.Registry, rp)
-		defer panel.stop()
+		// The eager first thread, the same step the boot has always taken (the
+		// thread exists from boot; the window still appears only when asked).
+		// What moved is who holds the name: the holder, which is also what
+		// re-starts a thread later.
+		holder.start()
 	}
+	defer holder.stop()
 
 	// Ticket 228 AC#1: this leg is the process the ball belongs in (D2,
 	// PLAN.md:74 and :83-88 - layered window, tray, hot keys and the Job Object
@@ -254,7 +266,7 @@ func runResident() {
 	// of the closure inside a test reads green no matter what production does.
 	hotReload258 := func() ball.HotkeyConfig { return hotkeyReloadSource296(rt.Layout.DataDir) }
 	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withPanelHost(func(via string) bool {
-		return panel.RequestToggle(via)
+		return holder.toggle(via)
 	}))
 	defer rb.stop()
 
@@ -265,6 +277,26 @@ func runResident() {
 	// registered after rb.stop() above, so LIFO runs it first.
 	defer ra.detachBall()
 	ra.bindBallHost(rb)
+
+	// Ticket 319 AC#2: the hop every earlier leg left open, and the ONE line that
+	// turns a second launch into something the operator can see. Before this,
+	// RunEventLoop's activation branch booked and cleared the signal and said out
+	// loud why it could do nothing else ("no path from this loop to a window") -
+	// true as a fact about internal/proc, false as a fact about this process,
+	// which has held a window-raising executor since ticket 33 (the ball's panel
+	// gestures; :257 above drives the same one). The owner's 2026-10-14 log has 12
+	// "activation requested by second launch" entries, one of them (21:40:38)
+	// while the panel thread and its window were both alive: the double click was
+	// silence because nobody had connected these two ends, not because the panel
+	// was dead.
+	//
+	// The value handed over is closed over the holder and the ball host and does
+	// the work itself - SetActivationHook only stores it, so internal/proc gains
+	// no dependency edge (Runtime.SetActivationHook takes a func() string, the
+	// same shape RegisterShutdownHook set). It is registered here, after the ball
+	// exists (the fallback tip needs it) and before the event loop below (the only
+	// consumer).
+	rt.SetActivationHook(secondLaunchActivation319(holder, rb))
 
 	// Ticket 246 AC#4: D38(e) step 3 ("all task root ctxs cancelled -> wait
 	// <= 3s") gets the one thing it never had - a producer. Before this,
@@ -385,7 +417,7 @@ func runResident() {
 		names = append(names, fmt.Sprintf("%d:%s", int(s), s.Name()))
 	}
 	fmt.Printf("wisp: %s; 任务来源：%s; 面板：%s; D38(e) steps with an owner in this process: %s\n",
-		ra.residentStatusLine(), src.taskPosture(), panel.statusLine(), strings.Join(names, ", "))
+		ra.residentStatusLine(), src.taskPosture(), holder.statusLine(), strings.Join(names, ", "))
 	// Ticket 247 AC#6/AC#10: the capture posture gets its own line, taken off
 	// the state the assembly recorded. It says which of the three shapes this
 	// process is in (no collector / armed and muted / running) and it does NOT
@@ -410,4 +442,179 @@ func runResident() {
 		reason = rt.RunEventLoop()
 	}
 	fmt.Printf("wisp: event loop ending (%s); running the D38(e) shutdown order\n", reason)
+}
+
+// panelHolder is the assembly root's handle on the panel thread, and it exists
+// because a dead panel thread must not be the end of this process's panel
+// (ticket 319 AC#1).
+//
+// THE DEFECT IT KILLS, verbatim from the field: the owner closed the panel
+// window at 15:41:45 on 2026-10-14; the system's close chain
+// (WM_SYSCOMMAND/SC_CLOSE -> WM_CLOSE -> DestroyWindow -> WM_DESTROY ->
+// PostQuitMessage(0)) made the library pump return, the panel thread's loop()
+// returned, rp.finished closed - and from then on every tray/ball gesture was
+// refused by post() ("panel gesture could not be handed over", 9 entries that
+// afternoon) with no path anywhere that could start a thread again:
+// startResidentPanel had exactly one production caller, the boot line below.
+// Root cause fixed by 319-a1's census (.scratch/wisp/probes/319/a1/census.md).
+//
+// WHAT THIS HOLDER IS. One field of state (the current thread) behind one lock,
+// and three answers the assembly root needs: the gesture executor (toggle), the
+// boot-report line (statusLine) and the shutdown stop (stop). toggle notices a
+// thread whose goroutine has returned and starts a fresh one on the SAME
+// manager, which is what makes the window really come back.
+//
+// WHAT IT DOES NOT CHANGE, each named because this is the kind of edit that can
+// quietly move a frozen contract:
+//   - the fresh thread goes through Registry.Spawn with the same panel-sta
+//     name and the same owner (startResidentPanel, untouched), so the D38b
+//     resident roster - six frozen names, the panel thread deliberately not
+//     among them - is not touched, and no new name appears;
+//   - the D38(e) ten-step order is not touched (the holder's stop is still a
+//     plain defer in runResident, in the same position as before);
+//   - no new dependency edge: this file already imports internal/observe (the
+//     registry it hands every leg) and internal/panel types stay out of it;
+//   - the fresh goroutine's runtime.LockOSThread gets a BRAND-NEW OS thread
+//     (Go destroys a locked thread when its goroutine returns), which is what
+//     keeps bringUp's precondition honest: the thread about to create a window
+//     has no used message queue behind it. A fresh thread on a REUSED OS thread
+//     is exactly the shape 33-r7 / 33-r9 measured panicking.
+type panelHolder struct {
+	mu  sync.Mutex
+	reg *observe.Registry
+	mgr *PanelManager
+	// spawn is startResidentPanel in production, and a seam in the headless nail
+	// (panel_holder_319_windows_test.go) so "a second thread was really asked
+	// for" is an observable fact instead of an inference from behaviour.
+	spawn func(*observe.Registry, *PanelManager) *residentPanel
+	rp    *residentPanel
+}
+
+// newPanelHolder builds the holder around the manager the boot assembled. A nil
+// mgr is legal and means "the panel host could not be assembled at all": the
+// holder then refuses by name (toggle false, statusLine says so out loud), which
+// is the pre-319 behaviour for that boot shape, kept.
+func newPanelHolder(reg *observe.Registry, mgr *PanelManager) *panelHolder {
+	return &panelHolder{reg: reg, mgr: mgr, spawn: startResidentPanel}
+}
+
+// start brings up the FIRST thread - the eager step the resident boot has always
+// taken, so the boot report's statusLine still describes a thread that exists.
+// The window is still created only when someone asks; nothing here changes the
+// "no gesture, no window" posture.
+func (h *panelHolder) start() {
+	if h == nil {
+		return
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.mgr == nil || h.rp != nil {
+		return
+	}
+	h.rp = h.spawn(h.reg, h.mgr)
+}
+
+// toggle is the one executor the ball's two panel gestures, the panel hot key,
+// the tray item and the second-launch activation drive. It answers exactly what
+// residentPanel.RequestToggle answers, and it adds the one thing that answer
+// never had: when the thread behind it is gone, a fresh thread is started for
+// this request instead of refusing forever.
+//
+// The lock is held across the whole call on purpose: two gestures racing here
+// must not start two threads, and RequestToggle never calls back into the
+// holder, so the lock is a serialization point and not a deadlock.
+func (h *panelHolder) toggle(via string) bool {
+	if h == nil {
+		return false
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.mgr == nil {
+		return false
+	}
+	if h.rp == nil || h.rp.isFinished() {
+		why := "the previous panel thread had exited"
+		if h.rp == nil {
+			why = "no panel thread had been started"
+		}
+		h.rp = h.spawn(h.reg, h.mgr)
+		slog.Info("panel host: starting a fresh panel thread for this gesture",
+			"via", via, "why", why)
+	}
+	return h.rp.RequestToggle(via)
+}
+
+// statusLine is the boot report's "does this process have a panel" answer. The
+// no-manager branch returns the same sentence residentPanel's nil receiver
+// returns (panelNoThreadLine, panel_resident_windows.go): the boot shape where
+// the panel host never assembled must not read as though a thread were there.
+func (h *panelHolder) statusLine() string {
+	if h == nil {
+		return panelNoThreadLine
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.mgr == nil || h.rp == nil {
+		return panelNoThreadLine
+	}
+	return h.rp.statusLine()
+}
+
+// stop ends whichever thread is current. It is the assembly root's defer, in the
+// same position the single panel.stop() defer had before ticket 319: a thread
+// that was rebuilt during this process's life is the one that must be stopped
+// (the earlier ones ended by themselves - that is why a rebuild happened).
+func (h *panelHolder) stop() {
+	if h == nil {
+		return
+	}
+	h.mu.Lock()
+	rp := h.rp
+	h.mu.Unlock()
+	if rp != nil {
+		rp.stop()
+	}
+}
+
+// secondLaunchTrayTip319 is the fallback the operator can SEE when the panel
+// cannot be raised (ticket 319 AC#2's "或给机主可见的提示"). It goes through
+// internal/ball's existing SetTrayTip (ball_windows.go), which posts to the ui-sta
+// thread: zero new API, zero new dependency edge. The stronger shape - a real
+// tray balloon (Shell_NotifyIcon + NIF_INFO) or a flashing orb - needs a new
+// internal/ball method and is another ticket; what this constant buys is that a
+// second launch is never silence again.
+const secondLaunchTrayTip319 = "Wisp: another launch asked for the window, but this process found no panel to raise (see the wisp-dev log)"
+
+// secondLaunchActivation319 is the function value the resident runtime runs when
+// the second-instance activation event fires (ticket 319 AC#2). The runtime's
+// event loop hands it over through Runtime.SetActivationHook - the same
+// injection shape RegisterShutdownHook uses, so internal/proc stays a leaf and
+// knows nothing about panels, balls or windows.
+//
+// WHY THE TOGGLE EXECUTOR AND NOT A NEW "RAISE" CALL: bringing the window
+// forward is not a capability this process lacks - Show already runs
+// ShowWindow(SW_SHOW) + SetForegroundWindow (panel_host_windows.go) - it was a
+// hop nobody had connected. The day's reading shows the two defects are
+// separable: the 21:40:38 second launch arrived while the panel thread AND its
+// window were alive and still did nothing. So the hook drives the same executor
+// the tray item drives (panelHolder.toggle), and what the operator gets is
+// exactly what pressing that tray item gets.
+//
+// WHAT THE RECEIPT CAN AND CANNOT SAY. The toggle is asynchronous by contract
+// (post() returns once the request is queued; the window verdict lands on the
+// panel thread), so this sentence reports the hand-off, never the window's fate.
+// When the hand-off itself was refused - no panel host, or a thread that will
+// not take requests - the tray tip above is written instead, because that is the
+// one shape where the double click would otherwise be silence again.
+func secondLaunchActivation319(h *panelHolder, rb *residentBall) func() string {
+	return func() string {
+		if h.toggle("second-launch") {
+			return "the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+		}
+		if rb != nil && rb.b != nil {
+			rb.b.SetTrayTip(secondLaunchTrayTip319)
+			return "no panel host would take the request; the tray was told to say so: " + secondLaunchTrayTip319
+		}
+		return "no panel host and no tray in this process; the activation was booked and cleared only"
+	}
 }

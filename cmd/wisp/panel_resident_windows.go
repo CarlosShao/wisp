@@ -456,9 +456,24 @@ func (rp *residentPanel) RequestToggle(via string) bool {
 	return rp.RequestShow(via)
 }
 
-// RequestDispose tears the window down for good on the thread that owns it (the
-// recreate path). It keeps the pump running, so a later RequestShow builds a
-// fresh window; stop() is what ends the thread.
+// RequestDispose tears the window down for good on the thread that owns it.
+//
+// THE COMMENT THAT STOOD HERE WAS WRONG, and ticket 319 corrected the sentence
+// without touching a line of behaviour (319-a1's census, section 2, found the
+// same family defect the ticket was filed about). It claimed this "keeps the
+// pump running, so a later RequestShow builds a fresh window". It does not:
+// Destroy() only POSTS WM_CLOSE (panel_control_windows.go's panelControl.Destroy
+// -> the same message the user's X sends), the owning thread dispatches it into
+// ctlWndProc, and WM_CLOSE -> DestroyWindow -> WM_DESTROY -> PostQuitMessage(0)
+// is the library's own chain (the 2026-10-14 15:41:45 log in the owner's
+// wisp-20261014-001.jsonl carries exactly that sequence, and
+// panel_death_replay_319_winlive_test.go replays it on a real window). The pump
+// then returns, loop() returns, finished closes, and post() refuses every later
+// request on this thread. So dispose does NOT keep a rebuild possible on the same
+// thread: the "dispose + show" recreate path is dead on arrival in this
+// port - which never showed because it has zero production callers. What a later
+// gesture needs is a fresh thread, and that is resident_windows.go's panelHolder
+// (isFinished() => spawn). No behaviour changed here, only the sentence.
 func (rp *residentPanel) RequestDispose() bool {
 	if rp == nil {
 		return false
@@ -556,13 +571,21 @@ func (rp *residentPanel) isFinished() bool {
 	}
 }
 
+// panelNoThreadLine is the honest sentence for "this process has no panel host
+// at all". It is a named constant because two places now answer it - the nil
+// receiver below (the shape the pre-319 boot used when the panel host never
+// assembled) and panelHolder.statusLine (resident_windows.go) when the assembly
+// failed - and the boot report's wording must not be able to drift between what
+// asked and what answered.
+const panelNoThreadLine = "this process has NO panel thread (the panel host never started)"
+
 // statusLine is the honest one-line answer to "does this process have a panel".
 // It reports the thread, not a window: the window is created on first use, so a
 // booted process with no gesture yet has a thread and no HWND, and that is the
 // truth the boot line has to carry.
 func (rp *residentPanel) statusLine() string {
 	if rp == nil {
-		return "this process has NO panel thread (the panel host never started)"
+		return panelNoThreadLine
 	}
 	if err := rp.startUpErr(); err != nil {
 		return "panel thread could not start: " + err.Error()

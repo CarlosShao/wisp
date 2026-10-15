@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -38,6 +39,20 @@ type Runtime struct {
 	// step to the module that owns it instead of leaving seven steps with no
 	// producer. It carries no order: RunShutdownSequence still walks 1..10.
 	shutdownHooks *ShutdownHookSet
+
+	// activationHook is what one round of the activation pump runs when the
+	// second-instance event fires (ticket 319 AC#2). Nil is the honest pre-319
+	// shape - the signal is booked and cleared only - and that branch is kept
+	// verbatim below, because a runtime nobody injected into must keep behaving
+	// exactly as it did. See SetActivationHook.
+	//
+	// The mutex is not decoration: RunEventLoop reads the field on its own
+	// goroutine while an assembly root (today: cmd/wisp's resident boot, before
+	// the loop starts) writes it, and a later ticket that reads a second-launch
+	// condition may write it from anywhere. The field is one function value;
+	// the lock makes the handoff as race-free as the shape allows.
+	activationMu   sync.Mutex
+	activationHook func() string
 }
 
 // BootOption adjusts Boot (tests, embedders).
@@ -124,24 +139,15 @@ func Boot(env buildinfo.Env, opts ...BootOption) (*Runtime, error) {
 // pumps the activation event without a dedicated goroutine (a short
 // WaitForSingleObject per iteration keeps the loop responsive while the D38b
 // resident roster stays at its frozen baseline). Returns the shutdown reason.
+//
+// Since ticket 319 the activation round is handleActivation - still in this
+// loop, still no goroutine, still one 50 ms wait per tick.
 func (rt *Runtime) RunEventLoop() string {
 	sigCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
 	for {
-		if rt.Instance != nil {
-			if code, err := windows.WaitForSingleObject(rt.Instance.ActivateEvent(), 50); err == nil && code == windows.WAIT_OBJECT_0 {
-				// What this loop does with an activation is all it does: book it
-				// and clear it. It has no window to bring forward - the floating
-				// ball belongs to whichever leg hosts it (cmd/wisp's resident
-				// path does, through internal/ball), and no path connects this
-				// event to that window in either direction today.
-				slog.Info("activation requested by second launch",
-					"handled_here", "booked and cleared only",
-					"bring_to_front", "no path from this loop to a window; the ball, when a process has one, is its host's")
-				_ = rt.Instance.ResetActivation()
-			}
-		}
+		rt.handleActivation()
 		select {
 		case <-sigCtx.Done():
 			return "signal"
@@ -149,6 +155,66 @@ func (rt *Runtime) RunEventLoop() string {
 			// loop tick: activation pump + signal check
 		}
 	}
+}
+
+// SetActivationHook attaches this runtime's second-launch executor. It is the
+// same injection shape RegisterShutdownHook set for the D38(e) sequence: the
+// module that owns the capability hands the process a FUNCTION VALUE at assembly
+// time, so internal/proc stays a leaf - it learns nothing about balls, panels,
+// WebView2 or internal/ball, and no package-level dependency edge appears
+// (`GOOS=windows go list -deps ./cmd/wisp` is unchanged by this field).
+//
+// What the hook must do, and what it may not: it runs inline on the event-loop
+// goroutine for one round of the pump, so it has to return - a hook that blocks
+// stalls the exit-signal check with it. It answers a receipt string, which
+// handleActivation logs verbatim; it must not claim work it did not do, because
+// that receipt is the only sentence the field has for "who was asked to raise
+// what". A nil hook restores the honest pre-319 behaviour (book and clear only).
+func (rt *Runtime) SetActivationHook(f func() string) {
+	rt.activationMu.Lock()
+	defer rt.activationMu.Unlock()
+	rt.activationHook = f
+}
+
+// activationHookRead returns the registered hook, or nil.
+func (rt *Runtime) activationHookRead() func() string {
+	rt.activationMu.Lock()
+	defer rt.activationMu.Unlock()
+	return rt.activationHook
+}
+
+// handleActivation runs ONE round of the activation pump: wait a bounded 50 ms
+// for the second-instance event, and when it fired, hand it to whatever this
+// runtime was given and clear the event so the next launch can signal again. It
+// is the testable half of what used to be an inline branch of RunEventLoop
+// (ticket 319 AC#2's harness drives one round at a time), and it reports whether
+// this round consumed a signal: false means the event was quiet.
+//
+// The pre-319 sentence is the no-hook branch below, and it is kept word for word
+// except for the part that was describing a lack ("no path from this loop to a
+// window"). That was true of this package and false of the process that hosts
+// it, which had the path all along (the ball's own panel executor). What is
+// still true is stated instead: this runtime was handed no hook.
+func (rt *Runtime) handleActivation() bool {
+	if rt.Instance == nil {
+		return false
+	}
+	if code, err := windows.WaitForSingleObject(rt.Instance.ActivateEvent(), 50); err != nil || code != windows.WAIT_OBJECT_0 {
+		return false
+	}
+	if hook := rt.activationHookRead(); hook != nil {
+		receipt := hook()
+		slog.Info("activation requested by second launch",
+			"handled_here", "the registered activation hook ran",
+			"receipt", receipt)
+		_ = rt.Instance.ResetActivation()
+		return true
+	}
+	slog.Info("activation requested by second launch",
+		"handled_here", "booked and cleared only",
+		"bring_to_front", "no activation hook is registered with this runtime (Runtime.SetActivationHook); the signal was booked and cleared only")
+	_ = rt.Instance.ResetActivation()
+	return true
 }
 
 // Shutdown runs the D38(e) sequence with the hooks this runtime owns today

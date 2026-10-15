@@ -1,0 +1,9 @@
+== tasklist self-proof (before) ==
+cargo.exe                    25488 Console                    1      9,856 K
+cargo.exe                    28568 Console                    1     16,948 K
+wisp.exe                     40296 Console                    1     63,832 K
+== run ==
+=== RUN   TestPanelDeathReplay319UnfixedReading
+    panel_death_replay_319_winlive_test.go:72: 319 unfixed live reading: hwnd=0xC520AC2 closed via WM_SYSCOMMAND/SC_CLOSE; thread finished=true; next gesture RequestToggle=false; mgr.IsCreated=false; mgr hwnd=0x0
+--- PASS: TestPanelDeathReplay319UnfixedReading (1.14s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	6.095s

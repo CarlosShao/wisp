@@ -1,0 +1,10 @@
+# github.com/CarlosShao/wisp/internal/proc [github.com/CarlosShao/wisp/internal/proc.test]
+internal\proc\activation_hook_319_windows_test.go:55:5: rt.SetActivationHook undefined (type *Runtime has no field or method SetActivationHook)
+internal\proc\activation_hook_319_windows_test.go:63:8: rt.handleActivation undefined (type *Runtime has no field or method handleActivation)
+internal\proc\activation_hook_319_windows_test.go:75:9: rt.handleActivation undefined (type *Runtime has no field or method handleActivation)
+internal\proc\activation_hook_319_windows_test.go:84:8: rt.handleActivation undefined (type *Runtime has no field or method handleActivation)
+internal\proc\activation_hook_319_windows_test.go:96:9: rt.handleActivation undefined (type *Runtime has no field or method handleActivation)
+internal\proc\activation_hook_319_windows_test.go:113:9: rt.handleActivation undefined (type *Runtime has no field or method handleActivation)
+internal\proc\activation_hook_319_windows_test.go:116:8: rt.handleActivation undefined (type *Runtime has no field or method handleActivation)
+FAIL	github.com/CarlosShao/wisp/internal/proc [build failed]
+FAIL
