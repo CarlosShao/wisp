@@ -621,9 +621,12 @@ jobs:
         run: bash scripts/wisp-cli-tests.sh
 
       - name: "winlive compile gate (go vet -tags winlive, ticket 111 AC#11)"
-        # WHY THIS STEP EXISTS (compile coverage, not execution): the 12 files
-        # carrying `//go:build windows && winlive` (7 under cmd/wisp, 5 under
-        # internal/ball; ruler `grep -rlE '//go:build.*winlive' --include=*.go`)
+        # WHY THIS STEP EXISTS (compile coverage, not execution): the files
+        # carrying `//go:build windows && winlive` (9 under cmd/wisp, 5 under
+        # internal/ball at 2026-10-15 - 14 in total, up from 12 when this step
+        # landed; the count is a READING, not a pin, which is why the roster was
+        # last re-measured by ticket 111-r7; ruler
+        # `grep -rlE '//go:build.*winlive' --include=*.go`)
         # were never even COMPILED anywhere in this workflow. PAST TENSE ON
         # PURPOSE (an earlier draft of this comment wrote "hits 0 times in this
         # file", which became false the moment this step landed): at HEAD
@@ -634,7 +637,7 @@ jobs:
         # compile check - break one and nothing reddened.
         #
         # WHAT THIS BUYS, STATED AS COMPILE-ONLY SO IT IS NOT READ AS A SLIDE
-        # (ticket 111 AC#11 c): it reddens the job when any of those 12 files is
+        # (ticket 111 AC#11 c): it reddens the job when any of those files is
         # broken at the compile / vet level and nothing else. `go vet` type-checks
         # and runs analyzers, it does NOT build a test binary and executes ZERO
         # cases, so this opens no ball window and needs no native DLL on PATH.
@@ -663,10 +666,16 @@ jobs:
         # orchestrator in probes/111/r6/logs/orch-vet-winline.txt). The hosted
         # windows-runner colour is NOT yet observed - no push had happened when
         # this landed, so "this step has teeth in CI" stays an open reading until
-        # a real run shows success or failure. If the runner ever does say
+        # a real run shows success or failure. CLOSED 2026-10-15 (ticket 111-r7):
+        # run 38676514264 / job 116231259514 step 8 reads success on the hosted
+        # runner - and it answers while step 7 above it is red - so the open
+        # reading is now a green one; the reverse shape was re-proved the same
+        # day (a syntax error planted by overlay in one winlive file turns the
+        # same command red, and the file is invisible without the tag). If the
+        # runner ever does say
         # otherwise, that is the hole this step exists to name: no assertion is
-        # weakened, none of the 12 files is edited, and nothing here is tuned to
-        # make it green.
+        # weakened, none of the winlive-tagged files is edited, and nothing here
+        # is tuned to make it green.
         shell: bash
         if: ${{ !cancelled() }}
         run: go vet -tags winlive ./cmd/wisp/ ./internal/ball/
