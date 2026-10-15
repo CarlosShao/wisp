@@ -1,0 +1,7 @@
+fe-x1 send 记录
+- 发送时刻：2026-10-15 18:2x +08；派单已先存档：txt/fex1-dispatch.txt。
+- 去重核：`.scratch/wisp/probes/fe-x1/` 未建。
+- 收件人：agent_ae644de0-163f-4d3e-9e06-c3346ec8f300（general-purpose，后台）。
+- 内容：只读交叉核对——前端 agent 刚落地的 `requestProviderModels`／`config.models.list`／`wisp-models-list` 解析 vs 我方 §7/§7.1 口径 vs Go 侧硬耦合（`bridge_test.go` 逐枚要求），判 `320-r2` 能否安全起跑；附带：三个写入接线逐字核＋零 emoji 扫描（frontend/ 在 ban#8 射程内）。
+- 派发依据：机主报"前端会话已完成"；编排者现读已见 `panel.ts:401-410`。
+- 边界：⛔ 零写（frontend/** 属机主外部 agent 面，只读）；件落 `probes/fe-x1/`。

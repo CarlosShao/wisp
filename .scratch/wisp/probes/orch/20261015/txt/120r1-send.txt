@@ -1,0 +1,7 @@
+120-r1 send 记录
+- 发送时刻：2026-10-15 18:2x +08；派单已先存档：txt/120r1-dispatch.txt。
+- 去重核：`.scratch/wisp/probes/120/` 未建（r1 可用）。
+- 收件人：agent_58498a6c-2dc4-4507-b9a3-55f5f7492e27（general-purpose，后台）。
+- 内容：票 120 五格（可重跑竞态用例＋openat/O_NOFOLLOW 可行性判据／降级／113 的 16 枚不许红／边界话先报／容器四数）。
+- 面：`internal/winsec/winsec_other.go`（`!windows`，Windows 宿主不编译）⇒ 与在飞 `135-r1`（cmd/wisp）零编译面冲突；容器跑抬 CPU。
+- 派发依据：池子普查一轮（12:1x）把它列为"写面与在飞 cmd/wisp 不相交"的第二候选；其票面排程前置（113/118/119 让出 internal/winsec）已满足。

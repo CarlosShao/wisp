@@ -1,0 +1,26 @@
+# fe-x1 派单（**只读交叉核对**：前端 agent 刚落地的模型页 v3 接线 vs 编排者 §7/§7.1 口径 vs Go 侧硬耦合——判 `320-r2` 能不能安全起跑）
+
+发送时刻：2026-10-15 18:2x +08。编排者派发。
+你 = Wisp 流水线的**只读核对腿 `fe-x1`**（`probes/fe-x1/` 未建）。身份＝只读（⛔ 零写：⛔ 不改任何文件、⛔ 不 commit、⛔ 不跑 go/npm 构建；只读文件＋`grep`＋可选 `node` 纯解析不算构建也要先问自己是否必要）。
+
+## 背景
+
+- 机主报告：**前端会话已完成**"模型页 v3"那边我们交给它的任务。
+- 我们先看了一眼前端文件，已见：`frontend/src/lib/panel.ts:401-410` 有 `requestProviderModels`＋`method: "config.models.list"`＋注释提到 `wisp-models-list` 标记与 `parseModelsListReply`。
+- Go 侧硬耦合（我现读）：`internal/panel/bridge_test.go` 的 `TestEveryWhitelistedInboundNameIsAlsoSentByThePage` **逐枚**要求"Go 声明的每个入向名，页面上必须有字面量"；`routeLiteralRe` 只扫 `panel.*`；`postMessage` 调用点恰 2 处；`frontend/**` 属机主外部 agent 面。
+
+## 你要核的（逐条给读数与判断；⛔ 别改任何东西）
+
+1. **方法名逐字**：`panel.ts`（及其引用的解析件，如 `frontend/src/lib/config-view.ts` 或新的 `*-models*`）里 `config.models.list` 的字面量**拼写逐字正确**（大小写、点号）？用 `grep -n` 给行号。
+2. **信封形状**：`requestProviderModels` 用的是既有 `requestHostAnswer`（不是新开 `postMessage`／`fetch`／`WebSocket`）？provider 走的是哪个键（我方口径＝`configProvider`）？逐字给代码。
+3. **回执解析**：`parseModelsListReply`（或同职责函数）的**标记行**拼写与我方口径 `wisp-models-list:` 是否逐字一致？它期望的 JSON 形状（`provider`／`models[].id`／`ownedBy`）与 §7 是否一致？若它**自带默认容忍**（如去空格/小写化），逐条点名。
+4. **三个写入接线**（若已接）：`provider_billing`（值 `plan`／`pay-per-token`）／`provider_row_create_custom`（值 `<protocol>,<base_url>`；协议词表仅 `openai-chat`／`openai-responses`／`anthropic`）／`model_row_create`（provider+model、无 value）——字段名/值拼法逐字核；**并核它是否误用了 `panel.*` 前缀或发明了新信封键**。
+5. **零 emoji**（仓级门禁 ban#8 覆盖 `frontend/` 文本）：对**本次前端改动涉及的文件**扫一遍禁带区（`U+1F000–1FAFF`／`U+2200–22FF`／`U+2600–27BF`／`U+2B00–2BFF`／`U+FE0F`／`U+1F1E6–1F1FF`），逐文件给命中/零命中（⚠ 注释也在射程内；`→` 是刻意留的缝隙）。
+6. **会给 `320-r2` 造成的风险**：把上面任何**不一致**写成"`320-r2` 落地时会红在哪一枚测试"（点名测试＋文件:行若可判）；若全部一致 ⇒ 明写"`320-r2` 可安全起跑"。
+
+## 纪律
+
+- ⛔ 只读：不改任何文件（含 `frontend/**`、`design/**`）、不建仓内文件（你的件写 `.scratch/wisp/probes/fe-x1/`，≤4 件）。
+- ⛔ 不做评价性建议（"建议改成…"）；只给**事实读数＋不一致清单**，改法归机主的前端 agent。
+- 交件：`.scratch/wisp/probes/fe-x1/report.md`（≤120 行，结论先行）＋（⛔ 不动票面——本腿不是任何票的实现/验收腿）；只 commit ⛔ 不 push；显式 pathspec。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋六条逐条读数＋不一致清单（若有）＋**具名没做**。
