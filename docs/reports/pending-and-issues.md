@@ -18223,3 +18223,10 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **附条件那半 ⇒ 另立票 321**（`321-tray-hotkey-gesture-wiring-to-holder-toggle-has-no-case-that-reds-if-rewired.md`）：`resident_windows.go:268-270` 的托盘/热键装配仍走 `holder.toggle`，**没有用例区分执行器语义**（把 `toggle` 换成 `show` 今天不红）⇒ 立小票要一枚常驻判据＋变异；⛔ 不因此把 319 重开（AC#3 原文只裁 AC#1/AC#2 的判据，二者各有钉）。
 - **D2 补读数（319-v2 交回，维持 `A976` 裁定）**：15:05–15:08 无关进程（Tabbit Browser）持前台 ⇒ 固定树上 ASFW 自身被拒（`Access is denied`）、`set_foreground_ret=0`、重建窗 shown/alive 但抢不回前台 ⇒ **固定树与变异树同红、两发不具判别力**；"第二实例由前台 shell 拉起"链仍不可进程内复现 ⇒ **保留＋具名未证**，⛔ 不据此改码。
 - **在飞 0**：下一波＝`135-r1`（写；面空）＋`120-r1`（第三写腿候选）＋`320-r2`（待前端字面量）；`320-v` 视需要再派。**本地未推 8 笔**（含 r3/r4 与两票收口；网络窗口全断，重试中）。
+
+## A981｜2026-10-15 18:3x +08｜★机主纠偏"派得太少"⇒**铺开编队**（在飞 4：写×2＋读×2）＋**前端会话已交**（`panel.ts` 落地 `requestProviderModels`/`config.models.list`/`wisp-models-list`）⇒ `320-r2` 解锁、排共享面之后
+
+- **机主原话（逐字）**：「你每次多派发点子代理不会吗？看看规则和铁律，记忆里面没写吗？？？」⇒ 认错并当场铺开：**在飞 4 条**＝`135-r1`（写；`cmd/wisp` 测试件＋`internal/proc`；已交 5 格：premise／AC#1+AC#2／AC#3／AC#4／AC#5——**本批推送已含其前五笔**）＋**`120-r1`**（写；票 120 POSIX 密封竞态；面＝`internal/winsec/winsec_other.go`（`!windows` ⇒ 与在飞 `cmd/wisp` 写腿**零编译面**）＋其用例；容器腿）＋**`fe-x1`**（只读；前端落地件 vs §7/§7.1 vs Go 硬耦合交叉核对）＋**`pool-r2`**（只读；池子普查二轮——133/111/319 收口后重出候选表）。
+- **`320-r2`（票 320 AC#4 的 Go 半）＝已解锁、排共享面之后**：机主报"前端会话已完成"⇒ 编排者现读确认 `frontend/src/lib/panel.ts:401-410` 有 `requestProviderModels`＋`method: "config.models.list"`＋`wisp-models-list` 标记与 `parseModelsListReply`。**它要写 `internal/panel`＋`cmd/wisp`＝与在飞 `135-r1` 同压共享编译面 ⇒ 按铁律每波一枚写腿、排在 `135-r1` 之后**（具名理由；`135-r1` 已到 AC#5/7，落完即发）。`321-r1` 排 `320-r2` 之后（同面）。
+- **推送**：本批 **`0d1a0d3e..bf25809a` 一发成功**（含 319 三笔修复＋两票收口＋`135-r1` 前五笔）⇒ `origin/dev=bf25809a`、未推 0（另：`1806fdc5` 三单存档紧随其后）。
+- **给 `135-r1` 的编队变更通知**（SendMessage）：新写腿 `120-r1` 的容器跑会抬 CPU ⇒ 若出现时序/`-count=2` 红，按"负载窗口"归因别当主证；其 `cmd/wisp` 面仍独占。
