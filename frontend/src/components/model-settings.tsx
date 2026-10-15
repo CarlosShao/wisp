@@ -698,16 +698,31 @@ function AddProviderForm({
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
 }) {
   const MODES = ["内置供应商", "自定义接入"] as const;
+  const BILLING = ["套餐（plan）", "按量（pay-per-token）"] as const;
   const [selectedMode, setSelectedMode] = useState<(typeof MODES)[number]>("内置供应商");
   const [provider, setProvider] = useState("");
   const [customName, setCustomName] = useState("");
   const [protocol, setProtocol] = useState("");
   const [customBase, setCustomBase] = useState("");
+  const [billing, setBilling] = useState("");
   const [model, setModel] = useState("");
   const keyInputRef = useRef<HTMLInputElement>(null);
 
+  // KNOWN ALTERNATE ENDPOINTS. A vendor's plan 口 and its API 口 are different
+  // base URLs, and the operator's StepFun case (audio models are only free on the
+  // API-billing side) is the reason this list exists: the same key answers a
+  // different catalog per endpoint. One entry today, spelled out rather than
+  // guessed; the plan-side address is the operator's own and is never invented
+  // here.
+  const KNOWN_ALT_ENDPOINTS: Record<string, { label: string; base: string }> = {
+    stepfun: { label: "按量（API）口", base: "https://api.stepfun.com/v1" },
+  };
+  const vendorKey = customName.trim().split("-")[0]?.toLowerCase() ?? "";
+  const altEndpoint = KNOWN_ALT_ENDPOINTS[vendorKey];
+
   function submit() {
     const keyValue = keyInputRef.current?.value ?? "";
+    const billingValue = billing === "" ? "" : billing === BILLING[0] ? "plan" : "pay-per-token";
     if (selectedMode === "内置供应商") {
       if (provider === "") {
         onFeedback({ tone: "error", text: "请先选择供应商" });
@@ -749,6 +764,15 @@ function AddProviderForm({
             },
       );
       if (created.tone !== "ok") return created;
+      // Billing is its own one-key write (one key per call, settings.go), so a row
+      // born as 按量 is two writes: the row, then the leaf that names how it is
+      // billed. Failure here still reports the row that did land.
+      if (billingValue !== "") {
+        const billed = await performWrite({ field: "provider_billing", provider: name, value: billingValue });
+        if (billed.tone !== "ok") {
+          return { tone: "error" as const, text: `供应商已添加，但计费模式没有写入：${billed.text}` };
+        }
+      }
       if (keyValue === "") return created;
       const keyed = await performCredential(name, keyValue);
       return keyed.tone === "ok"
@@ -774,21 +798,44 @@ function AddProviderForm({
       </div>
 
       {selectedMode === "内置供应商" ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className={rowLabel}>供应商</span>
-          {available === null ? (
-            <span className="text-[11.5px] text-ink-3">暂未读取到供应商列表，请稍后刷新</span>
-          ) : (
-            <Picker
-              ariaLabel="供应商"
-              className="w-[220px]"
-              emptyText="内置供应商都已添加"
-              onSelect={setProvider}
-              options={available.map((name) => ({ value: name, note: name === "stepfun" ? "推荐" : "" }))}
-              placeholder="选择供应商"
-              value={provider}
-            />
-          )}
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={rowLabel}>供应商</span>
+            {available === null ? (
+              <span className="text-[11.5px] text-ink-3">暂未读取到供应商列表，请稍后刷新</span>
+            ) : (
+              <Picker
+                ariaLabel="供应商"
+                className="w-[220px]"
+                emptyText="内置供应商都已添加"
+                onSelect={setProvider}
+                options={available.map((name) => ({ value: name, note: name === "stepfun" ? "推荐" : "" }))}
+                placeholder="选择供应商"
+                value={provider}
+              />
+            )}
+          </div>
+          {provider !== "" && KNOWN_ALT_ENDPOINTS[provider.toLowerCase()] ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] text-ink-3">
+                {provider} 还有另一个计费口（{KNOWN_ALT_ENDPOINTS[provider.toLowerCase()].label}）
+                ——同一厂商两行并存时，两行各有各的基址与模型目录：
+              </span>
+              <Button
+                onClick={() => {
+                  setSelectedMode("自定义接入");
+                  setCustomName(`${provider}-api`);
+                  setProtocol("openai-chat");
+                  setCustomBase(KNOWN_ALT_ENDPOINTS[provider.toLowerCase()].base);
+                  setBilling(BILLING[1]);
+                }}
+                size="xs"
+                variant="quiet"
+              >
+                切到自定义并预填这一行
+              </Button>
+            </div>
+          ) : null}
         </div>
       ) : (
         <>
@@ -827,6 +874,34 @@ function AddProviderForm({
               placeholder="https://…"
               value={customBase}
             />
+          </div>
+          {altEndpoint ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] text-ink-3">
+                {vendorKey} 的{altEndpoint.label}已知基址：{altEndpoint.base}
+              </span>
+              <Button
+                onClick={() => {
+                  setCustomBase(altEndpoint.base);
+                  if (billing === "") setBilling(BILLING[1]);
+                }}
+                size="xs"
+                variant="quiet"
+              >
+                填入
+              </Button>
+            </div>
+          ) : null}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={rowLabel}>计费模式</span>
+            <SegmentedControl
+              onChange={(next) =>
+                setBilling(next === BILLING[0] ? BILLING[0] : next === BILLING[1] ? BILLING[1] : "")
+              }
+              options={BILLING}
+              value={billing === BILLING[0] ? BILLING[0] : billing === BILLING[1] ? BILLING[1] : ""}
+            />
+            <span className="text-[11px] text-ink-3">选填；同一厂商两个计费口各记各的</span>
           </div>
         </>
       )}
