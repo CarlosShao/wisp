@@ -1,0 +1,91 @@
+319-v2 · AC#2-a/b/c/d readings. Every line below is THIS leg's own run output, verbatim
+(owner instance tasklist self-proof and face sha256 were captured at the head/tail of
+each run; the raws are under /tmp/wisp319v2-raw/ and summarized here).
+
+================================================================================
+A. AC#2-a (an already-visible panel must not be hidden) + AC#2-b (it must become
+   the foreground window) — one instrument, two assertion groups.
+================================================================================
+
+RUN 1, green, anchor 259cce15, 14:57:57, overlay: probe only.
+$ go test -tags winlive -overlay overlay-probe-visible.json -run '^TestProbe319v2VisibleStaysShownAndRaised$' ./cmd/wisp/ -count=1 -v
+    probe_319v2_visible_winlive_test.go:92: BEFORE: panel hwnd=0x7551138 mgr.IsShown=true alive=true; prior=0xACA10AE foreground=0xACA10AE; resident raises=0
+    probe_319v2_visible_winlive_test.go:125: AFTER: receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; mgr.IsShown=true hwnd=0x7551138 (same=true) alive=true; foreground=0x7551138 (panel=true, prior=0xACA10AE); resident raises 0->1; SetForegroundWindow answered 1
+time=... msg="panel host: raise request landed on the panel thread" via=second-launch set_foreground_ret=1
+--- PASS: TestProbe319v2VisibleStaysShownAndRaised (0.69s)
+=> AC#2-a facts: IsShown stays true, HWND unchanged (same=true), window alive.
+=> AC#2-b facts: prior=0xACA10AE, foreground after=0x7551138 == the panel's HWND,
+   SetForegroundWindow answered 1 (the raise hop's own Win32 answer).
+
+RUN 2, mutant A (D1 regression, h.show -> h.toggle), 14:58:24.
+    ...:92: BEFORE: panel hwnd=0xA7208A0 mgr.IsShown=true alive=true; prior=0x28D11D6 foreground=0x28D11D6; resident raises=0
+    ...:125: AFTER: mgr.IsShown=false hwnd=0xA7208A0 (same=true) alive=true; foreground=0xA07E8 (panel=false, prior=0x28D11D6); resident raises 0->0; SetForegroundWindow answered 0
+    ...:130: AC#2-a RED (the visible panel was HIDDEN by the second launch): the window 0xA7208A0 was shown before the activation and mgr.IsShown() is false after it; AC#2 says a second launch brings the running instance's UI to the front, and hiding it is the D1 defect
+    ...:140: AC#2-b RED (the second launch left the panel in the background): ... foreground window is 0xA07E8, not the panel ...
+--- FAIL (0.74s)
+=> the red name points at "HIDDEN". (0xA07E8 is a desktop-level window, not the prior:
+   the hidden panel's Hide handed focus elsewhere - both groups red here.)
+
+RUN 3, mutant B (raise hop dropped, tookRaise := true), 14:58:50.
+    ...:92: BEFORE: panel hwnd=0x578046E mgr.IsShown=true alive=true; prior=0x31712A0 foreground=0x31712A0; resident raises=0
+    ...:125: AFTER: mgr.IsShown=true hwnd=0x578046E (same=true) alive=true; foreground=0x31712A0 (panel=false, prior=0x31712A0); resident raises 0->0; SetForegroundWindow answered 0
+    ...:140: AC#2-b RED (the second launch left the panel in the background): the panel window 0x578046E is shown=true (alive=true) but the foreground window is 0x31712A0, not the panel (the prior window was 0x31712A0, SetForegroundWindow answered 0); ...
+--- FAIL (0.69s)
+=> ONLY the foreground group reddens: the three AC#2-a assertions pass in the same run.
+   The two halves are separable and AC#2-b's assertion is the load-bearing one for the
+   raise hop. "SetForegroundWindow answered 0" here is mgr.LastRaiseSetForeground()'s
+   zero value (the raise never ran), NOT a recorded Win32 refusal.
+
+RUN 4, restored (no mutant overlay; tree never changed), 14:59:10.
+    ...:92: BEFORE: panel hwnd=0xAA5112E ... prior=0x16F0CBA foreground=0x16F0CBA; resident raises=0
+    ...:125: AFTER: mgr.IsShown=true hwnd=0xAA5112E (same=true) alive=true; foreground=0xAA5112E (panel=true, prior=0x16F0CBA); resident raises 0->1; SetForegroundWindow answered 1
+--- PASS (0.69s); `git diff -- <3 production files> | wc -c` = 0; `git status --porcelain -- cmd/wisp/ internal/proc/` = 0 lines.
+
+================================================================================
+B. AC#2-c (hidden panel comes forward) and AC#2-d (dead thread -> NEW window, in
+   front) — the same production hop; both facts asserted, both readings below.
+================================================================================
+
+RUN 5, AC#2-c green, 14:59:23.
+    probe_319v2_shapes_winlive_test.go:100: BEFORE: hwnd=0x42505B0 mgr.IsShown=false alive-while-hidden=true; prior=0x3EC1292 foreground=0x3EC1292
+    probe_319v2_shapes_winlive_test.go:124: AFTER: mgr.IsShown=true hwnd=0x42505B0 (same=true) alive=true; foreground=0x42505B0 (panel=true, prior=0x3EC1292); SetForegroundWindow answered 1
+time=... msg="panel host: raise request landed on the panel thread" via=second-launch set_foreground_ret=1
+--- PASS (0.80s)
+=> fact 1: shown again = true, same HWND (hide-not-destroy, C27); fact 2: foreground
+   == panel. Hidden shape does not depend on the raise hop alone: mgr.Show's `!shown`
+   branch ran (the raise hop also answered 1).
+
+RUN 6, AC#2-d green, 14:59:35.
+    probe_319v2_shapes_winlive_test.go:177: BEFORE: old hwnd=0xA7708A0 closed via WM_SYSCOMMAND/SC_CLOSE (alive after close=false); mgr.IsCreated=false mgr hwnd=0x0; prior=0xA590FB2 foreground-before-signal=0xA590FB2 (prior-in-front=true)
+time=... msg="panel host: starting a fresh panel thread for this request" via=second-launch why="the previous panel thread had exited"
+time=... msg="panel host: raise request landed on the panel thread" via=second-launch set_foreground_ret=1
+    probe_319v2_shapes_winlive_test.go:195: AFTER: rebuilt hwnd=0xA210958 (new=true) mgr.IsCreated=true mgr.IsShown=true alive=true; old window alive=false; foreground=0xA210958 (rebuilt-in-front=true); SetForegroundWindow answered 1
+--- PASS (7.57s)
+=> fact 1: the rebuild produced a NEW handle (0xA7708A0 -> 0xA210958) that is alive
+   while the old one is not; fact 2: the rebuilt window is the foreground window.
+
+================================================================================
+C. FALL-OUT READING (not an AC assertion): an UNRELATED process held the
+   foreground (Tabbit Browser PID 28348, hwnd 0x191204B8) from ~15:05 to >=15:08.
+   In that window our process could not install its prior, so c/d re-runs are not
+   usable as raise-hop sensitivity readings; both states red the same way, which is
+   recorded instead:
+================================================================================
+- 15:05:43 c under B: FAILED as a FAILED MEASUREMENT (t.Fatalf, probe line 98):
+  "the prior window 0x9060DD8 did not take the foreground (the foreground is 0x191204B8)".
+- 15:05:43 d under B: BEFORE ... foreground-before-signal=0x191204B8 (prior-in-front=false);
+  AFTER rebuilt hwnd=0x35C12F6 (new=true) ... foreground=0x191204B8 (rebuilt-in-front=false)
+  --- FAIL. The fixed tree reds IDENTICALLY in the same environment:
+- 15:08:50 d on the FIXED tree:
+  time=... level=WARN msg="proc: AllowSetForegroundWindow(ASFW_ANY) was refused; the resident's SetForegroundWindow may be denied by the foreground lock" err="Access is denied."
+  time=... msg="panel host: raise request landed on the panel thread" via=second-launch set_foreground_ret=0
+  AFTER: rebuilt hwnd=0x6160BE2 (new=true) mgr.IsCreated=true mgr.IsShown=true alive=true; old window alive=false; foreground=0x191204B8 (rebuilt-in-front=false); SetForegroundWindow answered 0 --- FAIL
+=> READ AS: Windows' foreground lock (an unrelated app held the foreground; our own
+   AllowSetForegroundWindow was REFUSED with "Access is denied.") is what reds both
+   states. It is NOT evidence about mutant B. It also gives the one reading 319-v's
+   D2 (ASFW necessity) lacked: a shape where the ASFW call's own answer is a refusal
+   and the raise's SFW is denied after it (set_foreground_ret=0), i.e. the mechanism
+   the production code names as load-bearing. The field chain (a second instance
+   STARTED BY the foreground shell) cannot be reproduced in-process; that residual
+   stands. The rebuild itself stayed green in this environment (new window shown and
+   alive; old one dead) - only "in front" could not be granted by Windows.

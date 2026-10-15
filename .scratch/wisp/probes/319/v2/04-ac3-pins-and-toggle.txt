@@ -1,0 +1,83 @@
+319-v2 · AC#3: the three new pins + r4's third assertion, each "break -> red (named) ->
+restore -> green" with mutants THIS leg built; plus the toggle-semantics nail census.
+
+================================================================================
+Pin N4-1 (headless) TestSecondLaunchActivationDoesNotTakeTheHideRoad319
+Pin N4-2 (headless) TestPanelHolderShowRebuildsADeadThread319
+================================================================================
+Green baseline, 14:59:58, no overlay:
+$ go test -run '^(TestSecondLaunchActivationDoesNotTakeTheHideRoad319|TestPanelHolderShowRebuildsADeadThread319)$' ./cmd/wisp/ -count=1 -v
+  N4-1 reading: control toggle hides=1 shows=0; activation receipt="...took the request (second-launch)..."; after activation: shows=1 toggles=1 hides=1 raises=1; queued requests=3; spawns=1 --- PASS (0.00s)
+  N4-2 reading: dead thread finished=true; spawns=2; rebuilt thread shows=1 toggles=0 hides=0 raises=1 queued=2 same manager=true --- PASS (0.00s)
+
+Mutant A (h.show -> h.toggle), 15:00:10:
+  N4-1 red names: :289 did not take the show road (shows went 0 -> 0) | :292 took the
+       toggle road (toggles went 1 -> 2): with a visible panel that road HIDES it |
+       :295 asked the panel thread to HIDE (hides went 1 -> 2) | :298 never asked for
+       the raise hop (raises 0 -> 0) | :301 queue holds 2, want 3. --- FAIL
+  N4-2 red names: :370 the rebuilt thread got a toggle request (toggles=1, want 0) |
+       :376 did not get the raise request (raises=0, want 1) | :379 queue holds 1,
+       want the show and the raise. --- FAIL
+
+Mutant B (RequestRaise dropped), 15:00:30:
+  N4-1 red names: :298 never asked for the raise hop (raises went 0 -> 0) | :301 queue
+       holds 2, want 3. Everything else (show road, no toggle, no hide) stayed green
+       in the same run: shows=1 toggles=1 hides=1 raises=0. --- FAIL
+  N4-2 red names: :376 did not get the raise request (raises=0, want 1) | :379 queue
+       holds 1. shows=1 toggles=0 hides=0 stayed green. --- FAIL
+
+Mutant C (show's rebuild condition loses isFinished()), 15:00:44:
+  N4-1: PASS (unaffected: its manager state has a live thread).
+  N4-2 red names: :355 the spawn was asked 1 time(s) for one activation after a dead
+       thread, want exactly 2 | :358 the holder hands out the dead thread again |
+       :361 the rebuild's spawn returned no thread at all. --- FAIL
+
+Restore green (no overlay), aggregate run 15:04:02:
+$ go test -run '319' ./cmd/wisp/ ./internal/proc/ -count=1
+  cmd/wisp: TestDeadPanelThreadRefusesEveryGesture319, TestPanelHolderRebuildsADeadThread319,
+  TestSecondLaunchActivationDoesNotTakeTheHideRoad319, TestPanelHolderShowRebuildsADeadThread319
+  all PASS; ok 0.059s. internal/proc: TestActivationHook319RunsExactlyOnceAndResets,
+  TestActivationWithoutHook319StillConsumesAndClears PASS; ok 0.206s. rc=0.
+
+================================================================================
+Pin N4-3 (winlive) TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319
+================================================================================
+Green baseline 15:01:03; restored 15:01:52 (both PASS, identical shape):
+  live reading: hwnd before=0x1E2309C2 shown before=true; ... after: mgr.IsShown=true
+  hwnd=0x1E2309C2 (same=true) window alive=true; foreground=0x1E2309C2 (panel=true,
+  prior=0x3EE1292); SetForegroundWindow answered 1 --- PASS (0.69s)
+  restored: hwnd=0x8B10328 ... foreground=0x8B10328 (panel=true, prior=0x67611BE);
+  SetForegroundWindow answered 1 --- PASS (0.66s)
+Mutant A, 15:01:17:
+  :433 the second launch HID the panel: the window 0x78C05B2 was shown before the
+  activation (true) and mgr.IsShown() is false after it; ... (also :442 background). --- FAIL
+Mutant B, 15:01:31:
+  :442 the second launch left the panel in the background: the panel window 0xA240958
+  is shown (alive=true) but the foreground window is 0x2CB117C, not the panel (the
+  prior window was 0x2CB117C, SetForegroundWindow answered 0); ... --- FAIL
+  => exactly the r4 third assertion, and it reddens while mgr.IsShown stays true:
+     the visibility assertions above it passed in the same run.
+
+================================================================================
+"toggle semantics untouched" (a visible panel is still hidden by the tray/hotkey):
+which case guards it?
+================================================================================
+The SEMANTICS have two named teeth, both proven with mutant D
+(RequestToggle's `if rp.mgr.IsShown() {` -> `if false {`):
+  (a) headless: the control half of TestSecondLaunchActivationDoesNotTakeTheHideRoad319.
+      Mutant D red names, 15:02:10: :277 the toggle control did not take the hide road
+      (hides=0, want 1) | :280 the toggle control took the show road (shows=1) while the
+      manager reported the panel visible. --- FAIL
+  (b) live: TestTicket255r8RealWindowFollowsTheConfigAcrossAReshow (panel_reshow_255r8_
+      winlive_test.go). Green 15:02:24: "config 640x400 -> create hop ... hwnd=0x13DE0FAC;
+      config rewritten to 900x400, hide+show with no destroy -> ... hwnd=0x13DE0FAC
+      (same hwnd: true)" --- PASS (0.74s). Mutant D 15:02:35: :156 timed out after 15s
+      waiting for the panel to hide - this is a failed measurement, not a pass. --- FAIL
+      (a timeout red, not a named product red - recorded as such.)
+NOT PINNED: the ROUTING line that still sends the tray/hotkey/ball gestures to
+panelHolder.toggle (resident_windows.go:268-270, `withPanelHost(func(via string) bool
+{ return holder.toggle(via) })`). I found no case that would go red if that one line
+drove holder.show instead; the headless gesture tests build their hooks by hand
+(panel_resident_windows_test.go's TestBallPanelGesturesReachThePanelThread uses
+rp.RequestToggle directly). So: please read the dispatch's generic reading as
+"toggle's decision teeth = (a)+(b); the wiring's 'still toggle' half = NO PIN".

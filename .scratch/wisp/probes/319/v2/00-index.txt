@@ -1,0 +1,56 @@
+319-v2 (verification leg, non-implementer) evidence index — ticket 319 "panel thread
+death is terminal and a second launch cannot bring any window to front".
+
+Role: THIS leg is the non-implementer. It wrote ZERO production code and ZERO tracked
+Go files: every instrument and every mutant was injected with `go test -overlay`
+(probe sources shipped here under 01/02; mutant copies under
+C:\Users\swq\AppData\Local\Temp\wisp319v2-mut\, outside the repo). The two measured
+commits are 60f3b1ec (319-r3, the "do not hide" half) and 259cce15 (319-r4, the raise
+hop); the anchor of every run below is HEAD 259cce15, and the 319 face on disk is
+byte-identical to `git show 259cce15:<file>` (sha256 checked after every mutant run):
+
+  cmd/wisp/resident_windows.go                816017b68c495b6ca3770b08e01b0cf502d91822cb31dec0305eedafb5f9d90d
+  cmd/wisp/panel_host_windows.go              9bb2be453edd96bf2aa1b5d0e6090dded6f002afab4e17088fce1978ede415a3
+  cmd/wisp/panel_resident_windows.go          4154d1d0664874b84c88240ff1ee2c6c6a6e2a2592857f017ac24fe28432fe9e
+
+The four mutants (all out of repo, one line changed each, `git diff` on the tree stayed
+0 bytes the whole leg):
+  A  resident_windows.go:690   `if h.show("second-launch") {` -> `if h.toggle("second-launch") {`
+     sha256 2c95c84a4c26565beff5db8286ce19c66069958e4347a47210c9692b694bb4ae  (D1 regression)
+  B  resident_windows.go:614   `tookRaise := h.rp.RequestRaise(via)` -> `tookRaise := true`
+     sha256 f844993881b23c7df276dd39dedac83a7d60cf15a3b8932b396666904fbd7b68  (raise-hop regression)
+  C  resident_windows.go:604   `if h.rp == nil || h.rp.isFinished() {` -> `if h.rp == nil {`
+     sha256 11bfd56b8f84a48884aba79b9b5e57559de371550b3b7df303b822927af5d969  (show's rebuild tooth)
+  D  panel_resident_windows.go:488 `if rp.mgr.IsShown() {` -> `if false {`
+     sha256 ef08d3bfa11615b8453e8137cd064ba3ccae06e5ecea70a11c3f0eb36462adca  (toggle visible->hide broken)
+
+Env for every run: PATH prepended with third_party/sherpa-onnx;
+GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\wisp319v2gotmp'. The owner's
+instance wisp.exe PID 40296 was present and untouched in every live run (tasklist
+self-proof at the head of each run log); winlive ran one case per process, one at a
+time; no second `wisp --env dev` was ever started. Out-of-repo snapshot:
+`git archive 259cce15 | tar -x -C /tmp/wisp319v2snap` — all eight 319-face files are
+sha256-equal between the working tree and that snapshot.
+
+NOTE ON PROBE 02's REVISION. The two probe sources shipped here (01, 02) are the
+instruments. Probe 01 is byte-identical to the file used in every run. Probe 02 was
+RUN in a revision whose only difference from the shipped copy is comment text (shortened
+after the runs) and four t.Logf calls whose continuation lines were folded onto their
+first line (no statement, assertion, format string or reading changed). The line
+numbers cited in the run logs (c BEFORE :100 / AFTER :124; d BEFORE :177 / AFTER :195 /
+RED :208) refer to that run-time revision; the shipped file's logic is identical.
+
+Files:
+00-index.txt            this index (method, mutants, env, revision note)
+01-probe-visible_...go  AC#2-a/b instrument: visible panel + prior window in front,
+                        production second-launch hop; asserts shown/same-HWND/alive and
+                        foreground==panel, with prior/foreground handles + SFW answer.
+02-probe-shapes_...go   AC#2-c/d instrument: hidden panel comes forward; dead thread
+                        rebuilds a NEW window and it is in front.
+03-ac2-runs.txt         AC#2-a/b/c/d readings: green, mutant A, mutant B, restored, plus
+                        the foreign-foreground-holder readings (Tabbit) that fell out.
+04-ac3-pins-and-toggle.txt  the three new pins + r4's third assertion, one mutant each
+                        (red -> restore green), and the toggle-semantics nail census.
+05-gates-focus-face.txt gates (build/gofumpt/vet/d22scan/length), the D29 focus family
+                        rc by name, the aggregate -run 319, and the face check.
+Verdicts live in docs/evidence/s1/ticket319-319-v2-accept-v1.md ("逐格判语").

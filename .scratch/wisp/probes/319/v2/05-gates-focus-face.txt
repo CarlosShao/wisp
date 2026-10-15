@@ -1,0 +1,70 @@
+319-v2 · gates, D29 focus family (rc by name), aggregate 319, face check.
+All at anchor 259cce15, 15:03-15:10 +0800, this leg (no 319-file was modified).
+
+================================================================================
+GATES (all rc=0)
+================================================================================
+$ go build ./...                                  -> rc=0
+$ "$(go env GOPATH)/bin/gofumpt.exe" -l <the 8 319-face files>  -> empty list, rc=0
+    files: cmd/wisp/{resident_windows.go,panel_host_windows.go,panel_resident_windows.go,
+    panel_holder_319_windows_test.go,panel_death_replay_319_winlive_test.go},
+    internal/proc/{boot_windows.go,singleinstance_windows.go,activation_hook_319_windows_test.go};
+    version v0.12.0 (go1.27.1)
+$ go vet -tags winlive ./cmd/wisp/ ./internal/proc/   -> rc=0
+$ sh scripts/d22scan.sh                           -> "d22scan: clean - no D22 ban violations", rc=0
+$ sh scripts/check-path-length-budget.sh --with-self-test -> "VERDICT GREEN", rc=0
+    (tracked paths=13187 over-budget=60 covered by roster=60 not in roster=0)
+Also: my two probe sources (shipped under 01/02 here) are gofumpt-clean (empty list, rc=0).
+
+================================================================================
+D29 FOCUS FAMILY — segmented by name, one go test per group, rc per group
+================================================================================
+group -run '33r11'                                              rc=0 (all 5 PASS)
+  TestLockedSuffixNeverTakesTheLockItself33r11 | TestRosteredLockedMethodReturns-
+  WhileCallerHoldsTheLock33r11 | TestLockedNamingCensusBitesItsOwnFixture33r11 |
+  TestLockedNamingCensusRejectsTheOldName33r11 | TestCompletedWithinReportsAParkedCall33r11
+group -run 'TestTicket255r1'                                    rc=0 (all 6 PASS)
+group -run 'TestTicket255[A-Z]' (the 255 parse/roster/receipts sweep) rc=0 (all PASS;
+  incl. TestTicket255HostStillDoesNotParseConfigItself, TestTicket255WindowOptions-
+  FollowTheConfigSource, TestTicket255RosterStillMatchesTheActualReadSites, and the
+  receipt/restart cases the same pattern sweeps)
+group -run 'TestAC4PriorFocusSurvivesARefusedPanelSample'       rc=0 (PASS)
+group -run 'TestAC4FocusReturnToPriorWindowGap33r5'             rc=0 (PASS 0.89s)
+group -run 'TestBallPanelGesturesReachThePanelThread|TestBallGestureWithoutPanelHost-
+      StillRecords|TestPanelThreadNameIsNotInResidentRoster'    rc=0 (all 3 PASS;
+      TestBallPanelGesturesReachThePanelThread opens a real window: PASS 0.64s)
+group -run 'TestPanelThreadIsSTAAndExitsCleanly'                rc=0 (PASS 0.63s)
+group -run 'TestPanelHostRealWindowHopAndLifecycle'             rc=0 (PASS 0.83s)
+No 314 death zone hit in any of the eight groups (each was its own process; none died).
+Aggregate committed 319 pins: `go test -run '319' ./cmd/wisp/ ./internal/proc/` rc=0
+  (cmd/wisp ok 0.059s, internal/proc ok 0.206s; 6 PASS).
+NOT RUN, named: the bare full-package `go test ./cmd/wisp/` (314's known death zone; the
+dispatch asked for the family by name instead) and the winlive cold-shape case
+TestSecondLaunchActivationRaisesThePanel319 (not in this dispatch's list; its r4 reading
+stands as the orchestrator's, and this leg did not re-take it).
+
+================================================================================
+FACE CHECK
+================================================================================
+$ git show --name-only 60f3b1ec / 259cce15  (each commit, verbatim file list):
+  60f3b1ec: .scratch/wisp/issues/319-...md | .scratch/wisp/probes/319/r3/** (15) |
+            cmd/wisp/{panel_death_replay_319_winlive_test.go, panel_holder_319_windows_test.go,
+            resident_windows.go}
+  259cce15: .scratch/wisp/issues/319-...md | .scratch/wisp/probes/319/r4/** (30) |
+            cmd/wisp/{panel_death_replay_319_winlive_test.go, panel_holder_319_windows_test.go,
+            panel_host_windows.go, panel_resident_windows.go, resident_windows.go}
+frozen-path scan over the union of both commits (docs/PLAN.md | docs/specs/ | thresholds |
+golden | frontend/ | design/): ZERO hits.
+working tree vs out-of-repo snapshot `git archive 259cce15` (sha256, 8 files):
+  same cmd/wisp/resident_windows.go, panel_host_windows.go, panel_resident_windows.go,
+  panel_holder_319_windows_test.go, panel_death_replay_319_winlive_test.go,
+  internal/proc/activation_hook_319_windows_test.go, boot_windows.go, singleinstance_windows.go
+  -> the 319 face measured here IS the landed face; every mutant run kept
+     `git diff -- <319 files> | wc -c` = 0 and the three production sha256 at
+     816017b6... / 9bb2be45... / 4154d1d0...
+`git status --porcelain` of this leg's working tree: the 319 face (cmd/wisp/, internal/proc/)
+is CLEAN (0 lines). The dirty entries present belong to other legs/the owner and were not
+touched: design/** (deleted/edited by the owner-side design work), frontend/src/styles/
+tokens.generated.css, go.mod (go-webview2 direct), .gitignore, .scratch/wisp/probes/152,
+268, orch txt files, ticket 320 file. This leg added only .scratch/wisp/probes/319/v2/**
+(and, in the commit: the evidence table + one ticket bullet).
