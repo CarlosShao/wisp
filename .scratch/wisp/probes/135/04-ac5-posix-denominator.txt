@@ -1,0 +1,34 @@
+# 135-r1 reading 04: AC#5 the resident leg's layout now has a POSIX denominator (agent=135-r1, R-128-5)
+
+R-128-5 said the M-D' shape (DefaultLayout falling back to the start-up directory) had exactly one
+witness - a //go:build windows case in cmd/wisp driven through a compiled exe - and zero cases in
+internal/proc itself, so on POSIX the shape had no denominator. This leg took option A (add it), in
+internal/proc/envfork_test.go: TestDefaultLayoutRefusesWithNoUserConfigDir clears %AppData% / $HOME /
+$XDG_CONFIG_HOME, asserts the premise (os.UserConfigDir must fail), then requires DefaultLayout to
+refuse and to name the OS read.
+
+M-D' = internal/proc/envfork.go DefaultLayout: `dir, err = ".", nil // MUTATION M-D'` (+ `_ = err` to keep
+the read) in place of `return Layout{}, fmt.Errorf("proc: user config dir: %w", err)`
+(grep -n "MUTATION M-D" => envfork.go:238; go build ./internal/proc/ rc=0).
+
+| tree | GOOS | command | RUN | PASS | FAIL | SKIP | rc | verdict |
+|---|---|---|---|---|---|---|---|---|
+| base3-mdp-nocase (pristine + M-D') | windows | go test ./internal/proc/ | - | - | 0 | - | 0 | ok 2.989s |
+| base3-mdp-nocase (pristine + M-D') | linux   | (golang:1.27 container) | - | - | 0 | - | 0 | ok 2.354s |
+| ac5tree (new case only)            | linux   | -run TestDefaultLayoutRefusesWithNoUserConfigDir | 1 | 1 | 0 | 0 | 0 | PASS |
+| mut-mdp (new case + M-D')          | linux   | same | 1 | 0 | 1 | 0 | 1 | FAIL, red = DataDir:wisp-dev |
+| ac5tree (new case only)            | windows | go test ./internal/proc/ | 49 | 48 | 0 | 1 | 0 | ok |
+| mut-mdp (new case + M-D')          | windows | go test ./internal/proc/ | 49 | 47 | 1 | 1 | 1 | the one red is the new case |
+
+Reading 1 and 2 are what R-128-5 claimed, measured rather than taken on trust: on the pre-135 tree the
+whole internal/proc package says `ok` under M-D' on both platforms. Reading 3 vs 4 is the POSIX
+denominator: the same mutation is now red on linux, where before there was no case to be red.
+The red line on both platforms reads:
+  "AC#5 RED: DefaultLayout(dev) answered {Env:dev DataDir:wisp-dev ...} with no error on a machine whose
+   OS cannot say where the user config dir is ..."
+(The container runs are golang:1.27, linux/amd64, tree mounted at /src with MSYS_NO_PATHCONV=1; no
+network was needed - internal/proc has no module outside this repo.)
+
+Claim bookkeeping, since AC#5 forbids leaving this silent: nothing in this leg's output says "the two
+legs agree". What is true now is "the windows real-process leg agrees, and POSIX has its own denominator
+in internal/proc" - and the windows-only real-process case is no longer the only witness.

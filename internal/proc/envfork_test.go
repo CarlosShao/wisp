@@ -328,3 +328,32 @@ func TestDefaultLayoutUnknownEnvFails(t *testing.T) {
 		t.Fatalf("DefaultLayout(test): %v", err)
 	}
 }
+
+// TestDefaultLayoutRefusesWithNoUserConfigDir is ticket 135 AC#5 (R-128-5).
+// The resident leg's refusal on a machine whose OS has no user config dir had
+// exactly one witness, and it is a //go:build windows case in another package
+// driven through a compiled exe, so on POSIX that shape had no denominator at
+// all. DefaultLayout is where the resident leg asks the OS, and it is reachable
+// from here on every GOOS, so the shape is pinned where it is produced: unset
+// both answers os.UserConfigDir reads and require a refusal instead of a data
+// root. That is the shape R-128-5 measured as `dir = "."` in DefaultLayout.
+func TestDefaultLayoutRefusesWithNoUserConfigDir(t *testing.T) {
+	// os.UserConfigDir reads %AppData% on Windows and $XDG_CONFIG_HOME then $HOME
+	// elsewhere; clearing all three leaves the OS without an answer on either.
+	for _, name := range []string{"AppData", "APPDATA", "XDG_CONFIG_HOME", "HOME"} {
+		t.Setenv(name, "")
+	}
+	if dir, err := os.UserConfigDir(); err == nil {
+		t.Fatalf("premise broke: the OS still answers the config dir question (%q), so nothing below is the shape this case is about", dir)
+	}
+	l, err := DefaultLayout(buildinfo.EnvDev)
+	if err == nil {
+		t.Fatalf("AC#5 RED: DefaultLayout(dev) answered %+v with no error on a machine whose OS cannot say where the user config dir is - every DefaultLayout caller, the resident leg included, then reads and writes its data root in whatever directory the process started in", l)
+	}
+	if l.DataDir != "" {
+		t.Errorf("AC#5 RED: a refusing DefaultLayout still handed back the data dir %q", l.DataDir)
+	}
+	if !strings.Contains(err.Error(), "user config dir") {
+		t.Errorf("AC#5 RED: the refusal does not say which OS read failed, so the resident leg's line cannot be acted on: %v", err)
+	}
+}

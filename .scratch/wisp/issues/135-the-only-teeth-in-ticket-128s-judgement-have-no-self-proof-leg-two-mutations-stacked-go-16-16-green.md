@@ -210,3 +210,12 @@
   **修后 `19/18/1/0` rc=1——唯一红名就是这枚用例、且恰好 3 条 AC#4 断言**（六子串／路径／OS 原话三条检查在 M-E 文本上仍全过 ⇒ 新牙与旧清单**独立**）。
   存证 `.scratch/wisp/probes/135/03-ac4-sentence.txt`；`02` 文件追加一段更正（首版"No fix"行取自一棵曾被硬链写穿的快照，已在 `base3` 上全部重测，数不变）。
   next=AC#5（常驻腿 POSIX 零分母：补 `internal/proc` 单元的 M-D′ 牙）
+
+- [2026-10-15 16:1x +08] agent=135-r1 did=**AC#5（`R-128-5`）落地：选"补上"，给常驻腿的布局在 `internal/proc` 自己包里装一枚 POSIX 有分母的用例**。
+  新增 `TestDefaultLayoutRefusesWithNoUserConfigDir`（`internal/proc/envfork_test.go`）：清掉 `%AppData%`／`$HOME`／`$XDG_CONFIG_HOME` 三处 OS 答案、
+  **先证前提**（`os.UserConfigDir()` 必须失败——跨平台自证，不是假设平台）、再要求 `DefaultLayout(dev)` **拒绝**且拒绝句点到 `user config dir`，并要求回执里没有数据根。
+  读数：**先量"零分母"本身**——pre-135 树 ＋ M-D′（`envfork.go:238` 的 `return Layout{}, fmt.Errorf(...)` ⇒ `dir, err = ".", nil`，`_ = err` 保活，`go build` rc=0）：
+  `./internal/proc/` 在 **windows `ok 2.989s` / linux(golang:1.27 容器) `ok 2.354s` 两处 rc=0**（⇒ R-128-5 那句"它自己包里零用例"逐字复现）；
+  **修后**：windows 整包 `49/48/0/1` rc=0、linux 单发 `PASS`；**M-D′ 下**：windows 整包 `49/47/1/1` rc=1、**linux 单发 `FAIL`（红名逐字 `DataDir:wisp-dev`）** ⇒ POSIX 这一形今天有分母了，
+  且那枚 windows-only 真进程用例**不再是唯一证人**。⚠ 口径按 AC 原文收紧：本程任何结论**不写"两腿一致"**，只写"windows 腿一致、POSIX 另有自己的分母（`internal/proc` 本包用例）"。
+  存证 `.scratch/wisp/probes/135/04-ac5-posix-denominator.txt`。next=AC#7（131 第二把尺收到句段粒度）
