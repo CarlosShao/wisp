@@ -208,6 +208,7 @@ func TestAC2TestDataDirBranchStillResolves128(t *testing.T) {
 // have, and the negative leg proves the check is a prefix-sensitive one rather
 // than "is any of these present".
 func TestAC2RefusalMarkersAreNotAShortenableList128(t *testing.T) {
+	assertNoPortableOverride128(t)
 	if len(rescueMarkers128) < 6 {
 		t.Fatalf("AC#2 RED (the instrument, not the code): rescueMarkers128 holds %d entries; AC#2's booked cost requires at least 6 (verdict, no-fallback statement, both variable spellings, the writable-directory rule, the tree the root belongs in). Shortening this list is how a refusal stops being actionable and the gate keeps reading green", len(rescueMarkers128))
 	}
@@ -223,6 +224,40 @@ func TestAC2RefusalMarkersAreNotAShortenableList128(t *testing.T) {
 	}
 	if !allMarkersPresent128(full, rescueMarkers128) {
 		t.Fatal("AC#2 RED (the instrument): the complete marker text failed its own matcher, so nothing below can be believed")
+	}
+
+	// Ticket 135 AC#4, R-128-2: everything above joined a fixture this case owns,
+	// so nothing here had read the line a human actually sees. M-E measured what
+	// that leaves open - all six markers present in one scrambled, sentenceless
+	// string, every case of ticket 128 green. The production line is read here
+	// instead, and AC#2's three demands are pinned as clauses with their
+	// connectives and their sentence-final punctuation. Pinning the wording on
+	// purpose: reword the line and this fails until somebody re-reads the ruling.
+	failConfigDir128(t)
+	dir, err := resolveDataDir("dev")
+	if err == nil {
+		t.Fatalf("AC#4 RED: resolveDataDir(dev) answered %q with no error, so there is no production sentence to read", dir)
+	}
+	sentence := err.Error()
+	clauses := []struct{ what, text string }{
+		{"which OS read failed, in the OS's own words", "数据根无法解析：用户配置目录不可得（OS 原话：" + planted128Cause.Error() + "）："},
+		{"where the data root belongs, on the no-fallback statement it hangs off", "数据根本应是 " + filepath.Join("<用户配置目录>", "wisp-dev") + "，而 Wisp 拒绝把它回落到当前工作目录"},
+		{"what to set to get the data root back", "修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。"},
+	}
+	at := -1
+	for _, c := range clauses {
+		i := strings.Index(sentence, c.text)
+		if i < 0 {
+			t.Errorf("AC#4 RED: the refusal does not read as a sentence that says %s - the clause %q is not in it:\n%s", c.what, c.text, sentence)
+			continue
+		}
+		if i < at {
+			t.Errorf("AC#4 RED: the clause that says %s reads before the one before it, so the three demands are a bag of tokens rather than a sentence:\n%s", c.what, sentence)
+		}
+		at = i
+	}
+	if !strings.HasSuffix(sentence, "然后重试。") {
+		t.Errorf("AC#4 RED: the refusal does not end with the fix and its full stop, so the last thing a human reads is not the way out:\n%s", sentence)
 	}
 }
 

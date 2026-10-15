@@ -28,3 +28,21 @@ The two readings that matter:
 - The case also refuses to lose its tooth in silence: it fails if doctor.go no longer mentions
   "doctor-write-probe.tmp" (the name it plants), checked through runtime.Caller so it does not depend on
   the test's working directory.
+
+## correction (2026-10-15 15:5x, append-only): where the "no fix" row was measured
+
+The first run of the "base-ma2" row used a snapshot whose cmd/wisp/dataroot_128_test.go had been
+written through a hardlink shared with the snapshot it was derived from (a cp -al copy plus a Python
+in-place write, caught before anything was committed). Every number reported above was re-measured on a
+rebuilt pristine snapshot, `base3` = `git archive 8f41a4df` (the anchor this leg started from) + DLLs,
+md5(cmd/wisp/dataroot_128_test.go) = 7c0255a41afec1a905b9a8a813ab0193 = the blob of 8f41a4df:
+
+| tree | RUN | PASS | FAIL | SKIP | rc |
+|---|---|---|---|---|---|
+| base3 (pristine)        | 16 | 16 | 0 | 0 | 0 |
+| base3-ma2 (M-A2, no fix)| 16 | 16 | 0 | 0 | 0 |
+| base3-me (M-E, no fix)  | 16 | 16 | 0 | 0 | 0 |
+| base3-mfmc (M-F+M-C)    | 16 | 16 | 0 | 0 | 0 |
+
+The mutation-side rows of this file are unchanged: they were taken on trees whose edited files were
+private copies, and they are re-checked in readings 05/06 on the final file.

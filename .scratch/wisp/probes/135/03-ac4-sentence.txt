@@ -1,0 +1,28 @@
+# 135-r1 reading 03: AC#4 the self-proof case reads the production sentence (agent=135-r1, R-128-2)
+
+Trees: base3 = `git archive 8f41a4df` (the anchor this leg started from, i.e. BEFORE ticket 135) + DLLs;
+mut-me2 = base3 + the AC#4 test file from the working tree + M-E. Slice and env as in reading 01.
+
+M-E = doctor.go's dataDirUnresolved128 return rewritten so that all six markers are still present,
+      the OS's own words are still present and the tree path is still present, but the connectives,
+      the order and the full stop are gone: "…：启动失败 数据根本应是 <用户配置目录>\wisp-dev 当前工作目录
+      APPDATA XDG_CONFIG_HOME 可写目录 不对话不成句" (grep -n "MUTATION M-E" => doctor.go:294; go build rc=0).
+      This is ticket 128's M-E, the one that read 16/16 green.
+
+| tree | RUN | PASS | FAIL | SKIP | rc | red names |
+|---|---|---|---|---|---|---|
+| base3 (pristine, no mutation) | 16 | 16 | 0 | 0 | 0 | - |
+| base3-me (M-E, no fix)        | 16 | 16 | 0 | 0 | 0 | none - M-E reproduced on today's tree |
+| mut-me2 (M-E + AC#4)          | 19 | 18 | 1 | 0 | 1 | TestAC2RefusalMarkersAreNotAShortenableList128 only, 3 AC#4 reds |
+
+The three reds under M-E are the three clause assertions, and nothing else in the slice fires:
+the six-marker conjunctive check, the "<用户配置目录>\wisp-dev" path check and the OS-words check
+all still pass on this text (that is exactly what M-E was built to satisfy). So the new reading is
+independent of the marker list by measurement.
+
+The clauses pinned against the production line (env "dev", cause planted as "%AppData% is not defined"):
+  1. "数据根无法解析：用户配置目录不可得（OS 原话：%AppData% is not defined）："
+  2. "数据根本应是 <用户配置目录>\wisp-dev，而 Wisp 拒绝把它回落到当前工作目录"
+  3. "修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。"
+plus an order check (each clause may not read before the previous one) and HasSuffix("然后重试。").
+The wording is pinned on purpose: reword the line and the case reddens until somebody re-reads the ruling.
