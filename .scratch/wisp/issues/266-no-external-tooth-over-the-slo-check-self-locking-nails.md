@@ -52,3 +52,7 @@
 - ⛔ 不动 `docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／任何 golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**`／三枚冻结件（`internal/panel/tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）。
 - ⛔ 本票**不碰** `internal/agent/**`、`cmd/wisp/**`、`internal/ball/**`（票 260 那批在飞/待验收，包级互斥）。
 - ⛔ 不在本票里"顺手"给 `scripts/**` 加别的规矩——一枚外牙就是一枚外牙。
+
+## 腿尾 bullet
+
+- [2026-10-15T16:19+08] agent=266-r1 did=deadline-pause（编排者额度警戒，干净边界停车）：**AC#0 完成**——§现量 1 复认（`grep -c '"scripts' tools/d22scan/main.go`＝0/rc=1，补尺 `.scratch|.github` 同为 0）、§现量 3 复认（P3 常量 `scripts/slo-freshness.sh:137`、判定 `:549-550`、入口 `slo-fresh.yml:46-52` dev 上 inert）、两枚钉今天真身现读（能力钉 `:214`/探测 `:223`/ok `:230`；词面钉 `:233`/`:247-249`/`:251-252`/`:255-256`/ok `:258`；调用 `:291`/`:292`；"测量之前"注释 `:286-290`；`eol attr=crlf` 而工作树 LF）。§现量 2（删钉 rc=0）**未现跑**（归 AC#2）。**AC#1–AC#4 未做**；写面零改动（`git status --porcelain -- scripts tools .github` 空两次现跑）。已取卫生门基线：路径门 `--with-self-test` rc=0、13212 tracked／over-budget 60＝roster 60／GREEN（起止 16:18:20/16:18:26；票面 5594/57 为 10-04 旧读数）。读数全文落 `.scratch/wisp/probes/266/r1/evidence.md`（含选形 ①-A、② 的现读障碍、正控变异册、AC#4 前后尺）。next=AC#1 落地 ①-A（新尺 `scripts/slo-nail-census.sh` ＋ lint 作业新增一步、`if: !cancelled()`）→ AC#2 仓外拷贝变异正控两发＋sha256 还原证 → AC#3 四条偷懒自查 → AC#4 `sh scripts/d22scan.sh`＋ban #9 前后读数。
