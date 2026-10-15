@@ -554,6 +554,18 @@ func recordedWord(p ProviderSettings) string {
 // method name nor a route.
 const SettingsPayloadMarker = "wisp-config-view:"
 
+// ModelsListPayloadMarker is ticket 320 AC#4's machine half: the fetch route's
+// receipt is one sentence plus ONE line beginning with this token, and the page
+// parses what follows it as JSON ({"provider": ..., "models": [{"id", "ownedBy"}]}).
+// The frontend carries the same spelling (frontend/src/lib/config-view.ts's
+// MODELS_LIST_MARKER, checked by bridge_test.go's page-side ruler), so the two
+// sides cannot drift without one of them going red.
+//
+// Same two properties as the settings marker, for the same two reasons: no
+// `panel.` prefix and no dot (it is neither a method name nor a route). It lives
+// here, not in cmd/wisp, so both producers and the spelling test read one symbol.
+const ModelsListPayloadMarker = "wisp-models-list:"
+
 // renderSettingsPayload is the read side's machine half. It carries the same
 // facts the prose carries plus ticket 313's additions (preset list, model names,
 // the chat provider half, the configured flag, the voice chain) and NOTHING else:

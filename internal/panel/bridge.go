@@ -65,6 +65,14 @@ const (
 	//     (AGENTS.md §1.2 keeps panel-side L2 "allow" off the table entirely).
 	MethodConfigGet = "config.get"
 	MethodConfigSet = "config.set"
+	// MethodModelsList is ticket 320 AC#4's read-only route: "ask the host what
+	// the provider's own model endpoint reports". Like the two above it carries
+	// no `panel.` prefix (ticket 181's extractor counts those literals) and no
+	// approval vocabulary (the grant-boundary instrument's grid), and it is
+	// deliberately NOT spelled `models.list`: that name already belongs to the
+	// local signed model repository (SPEC-08 sec 5.2, ticket 29/D26), so the
+	// settings namespace is where this route belongs.
+	MethodModelsList = "config.models.list"
 )
 
 // ErrComposerRequest is every way a composer request can fail to be usable.
@@ -145,7 +153,7 @@ func ParseComposerRequest(raw string) (ComposerRequest, error) {
 
 func knownComposerMethod(m string) bool {
 	switch m {
-	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet:
+	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend, MethodConfigGet, MethodConfigSet, MethodModelsList:
 		return true
 	}
 	return false

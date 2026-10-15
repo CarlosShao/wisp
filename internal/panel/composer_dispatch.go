@@ -116,6 +116,20 @@ type ConfigRequestHandler interface {
 	HandleConfigRequest(ctx context.Context, req ComposerRequest, raw string) (string, error)
 }
 
+// ModelsListRequestHandler answers ticket 320 AC#4's read-only route: it asks the
+// provider's own model endpoint and returns the receipt the page renders (a
+// sentence plus one marker line, ModelsListPayloadMarker's shape).
+//
+// It is a SEPARATE optional field and not a third method on ConfigRequestHandler
+// on purpose: the settings legs' implementations are exercised by closed-roster
+// tests whose spies implement the interface they were built against, so adding a
+// method there would break those tests for a reason that has nothing to do with
+// this route. nil means the same refusal the other unattached doors give (the
+// name is on the whitelist, so an assembly with no fetch leg must say so by name).
+type ModelsListRequestHandler interface {
+	HandleModelsListRequest(ctx context.Context, req ComposerRequest) (string, error)
+}
+
 // ComposerDispatch is the inbound entry for one postMessage string: the host's
 // receive callback hands it the text it was given and reads back the one
 // sentence the user should see.
@@ -138,6 +152,9 @@ type ComposerDispatch struct {
 	// refusal as the three above, not a silent drop: the two names are on the
 	// whitelist, so a machine with no settings leg attached must say so by name.
 	Config ConfigRequestHandler
+	// Models answers ticket 320 AC#4's fetch route. Optional in the same way:
+	// nil is a refusal that names the door, not a silence.
+	Models ModelsListRequestHandler
 	// Audit is the project's existing "[audit]" sink (workspace.go's AuditFunc).
 	// A refusal is returned whether or not it is attached; a nil sink silences
 	// the line, never the refusal.
@@ -210,6 +227,11 @@ func (d *ComposerDispatch) dispatch(ctx context.Context, req ComposerRequest, ra
 			return "", d.unattached(req)
 		}
 		return d.Config.HandleConfigRequest(ctx, req, raw)
+	case MethodModelsList:
+		if d == nil || d.Models == nil {
+			return "", d.unattached(req)
+		}
+		return d.Models.HandleModelsListRequest(ctx, req)
 	default:
 		return "", d.rosterMismatch(req)
 	}

@@ -280,6 +280,10 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		Audit: auditf,
 		Actor: actor,
 	}
+	// Ticket 320 AC#4: the fetch leg. It reads through the same Manager and the
+	// same secret store as the settings leg above, so "拉取模型列表" and the
+	// writes it feeds cannot disagree about which row or which key they mean.
+	modelsList := &modelsListHandler320{mgr: mgr, secrets: secrets}
 	// Ticket 186's leg, attached only where a runtime scope was handed over (see
 	// the signature note). The interface is left nil rather than holding a typed
 	// nil pointer, because the router's refusal is decided by a nil interface
@@ -298,6 +302,8 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		Message:    nil,
 		// Ticket 248's two settings doors are answered by the leg above.
 		Config: configWrites,
+		// Ticket 320 AC#4's read-only door is answered by the fetch leg above.
+		Models: modelsList,
 		Audit:  auditf,
 	}, nil
 }
