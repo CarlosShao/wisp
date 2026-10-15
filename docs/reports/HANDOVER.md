@@ -3338,3 +3338,5 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 - **推送（未做，具名）**：`git push origin dev` 与 `git ls-remote origin` 均 `Failed to connect to github.com port 443`（21s 超时）；**`api.github.com` 通**（`gh run view` 正常）⇒ 判断＝机主代理未开/未覆盖 git ⇒ **等代理开后只推 `origin/dev`**（推前跑 `sh scripts/check-path-length-budget.sh --with-self-test`，已 GREEN）。
 - **下一步（按序）**：① `319-r2` 落地 → `319-v`（验整票含活体）② `320-a1` 交件 → `320-r1`（面空后）③ `135-r1`（`cmd/wisp`＋`internal/proc`）④ 推 4 笔（等代理）⑤ 池子普查若给出干净面写票 ⇒ 补第三写腿。
 - **你需要做什么**：① **代理开好后说一声**（或直接说"推吧"）——本编队只推 `origin/dev`；② 修好前**别关面板窗口**（关了＝界面打不开，喊我重拉）；③ 其余没有。
+
+**追记（2026-10-15 12:1x，编排者）**：上面"推送（未做）"已过期——**推送成功**：`git push origin dev` 通（21:0x 那次还 443 不通，12:1x 重试成功）⇒ `origin/dev = 39b0a246`（＝HEAD，**未推 0**；6 笔一起上：`36cf5d06`→`f3ac21be`→`6dbe29c7`→`443aaaf2`→`541db6f6`→`39b0a246`）。CI run **`38676514264`** 在跑（sha `39b0a246`）。另：`320-a1` 已收件（commit `7b55646a`，三把尺过）⇒ 五裁＋AC#4 拆两半落账 `A972`；转交件 `docs/evidence/s1/model-page-v3-brief.md` **§7/§7.1** 已写好（**待机主转交前端 agent**：`panel.ts` 加 `requestProviderModels` 一行）。在飞：`319-r2`（写）＋池子普查（只读）。
