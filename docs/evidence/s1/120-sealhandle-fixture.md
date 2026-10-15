@@ -69,7 +69,7 @@ clean `137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313`
 **tooth-269（`:269` 链接那一支摘掉）＝ `rc=1 / RUN=62 / PASS=60 / FAIL=2 / SKIP=0`，两枚红都是本腿的链接形：**
 ```
 --- FAIL: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
-    sealhandle_identity_120_other_test.go:86: AC#1 RED name-becomes-a-sibling-link-after-the-pinned-seal: refusal came from sealHandle inline SameFile face (winsec_other.go:272), want the leg carrying "the name carries a link, so this descriptor is not the object the caller named"; verbatim: winsec: path is not provably resolved, refusing to seal: /tmp/TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3392843619/001/caller-object-120r3.bin: pinned object at /tmp/…/caller-object-120r3.bin is not what the name carries: this descriptor is not the object the name carries now, so the bytes would not land in what was just sealed (winsec: cannot apply a private security descriptor)
+    sealhandle_identity_120_other_test.go:86: AC#1 RED name-becomes-a-sibling-link-after-the-pinned-seal: refusal came from sealHandle inline SameFile face (winsec_other.go:272), want the leg carrying "the name carries a link, so this descriptor is not the object the caller named"; verbatim: winsec: path is not provably resolved, refusing to seal: /tmp/TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3162948924/001/caller-object-120r3.bin: pinned object at /tmp/…/caller-object-120r3.bin is not what the name carries: this descriptor is not the object the name carries now, so the bytes would not land in what was just sealed (winsec: cannot apply a private security descriptor)
 --- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
     sealhandle_privateroute_120_other_test.go:110: AC#1 RED private-file-route-name-becomes-a-sibling-link: refusal came from sealHandle inline SameFile face (winsec_other.go:272), want the leg carrying "the name carries a link, so this descriptor is not the object the caller named"; verbatim: winsec: path is not provably resolved, refusing to seal: /tmp/TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal…/001/caller-object-120r3.bin: …（同一形状，路由那份）
 ```
@@ -110,9 +110,10 @@ stat，与 fd 上对象必不同 ⇒ SameFile 假）。⇒ 判据必须问"**是
 ### 3.2 未去牙那发（全绿）
 
 `120r3-run1-teeth-on.log`（**交付字节锚 `29be2b67`**）：`go-test rc=0`／`RUN=62`／顶层 `PASS=40 FAIL=0 SKIP=0`／
-全行 `PASS=62 FAIL=0 SKIP=0`。另三发同件复跑确认（Go 字节未变、只差注释或只差 `.scratch/**`）：
-`120r3-run4-confirm-at-final-anchor.log`（`e1973191`）、`120r3-run5-confirm-at-delivery-commit.log`（`adec1db1`）、
-`120r3-run6-confirm-comment-only-trim.log`（`29be2b67` 之前的注释修复面）＝**同数 rc=0／62／62／0／0**。
+全行 `PASS=62 FAIL=0 SKIP=0`。另三发确认（`winsec_other.go` 与三枚测试件的 Go 字节全程相同，只差别腿落的 `.scratch/**` 存档件）：
+`120r3-run4-confirm-at-final-anchor.log`（锚 `e1973191`，stdout 件＝`go-test rc=0`）、
+`120r3-run5-confirm-at-delivery-commit.log`（锚 `adec1db1`，整件体 **RUN=62／PASS=62／FAIL=0／SKIP=0**）、
+`120r3-run6-confirm-comment-only-trim.log`（与 run5 同一棵树的第二次读数，stdout 件 `rc=0`）。
 参照 120-v1 §2 的那发：同一支牙**去两支**跑整包是 `55/55/0/0 rc=0`（零枚变色＝今天没这世界）；
 补之后同一牙形必须出现红——本件两发分别出 **2 枚与 3 枚**红，全部是本腿用例（枚数差异的成因见 §3.1★与 §5①）。
 
