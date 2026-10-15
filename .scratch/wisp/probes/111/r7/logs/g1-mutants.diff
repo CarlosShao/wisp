@@ -1,0 +1,13 @@
+### M1 mutant diff (core scope entry ./internal/plugin/ pulled, pin untouched)
+324c324
+<         ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
+---
+>         ./cmd/llmrecord/ "$winsec_scope"
+
+### M2 mutant diff (core scope+pin gain ./internal/watchdog/)
+270a271
+> github.com/CarlosShao/wisp/internal/watchdog
+325c326
+<         ./internal/session/ ./internal/projctx/
+---
+>         ./internal/session/ ./internal/projctx/ ./internal/watchdog/

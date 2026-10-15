@@ -1,0 +1,39 @@
+### M1 run: bash scripts/portable-tests.sh --scope=core (rc=1)
+portable-tests.sh: GUARD C - scope mode=core resolved to a DIFFERENT package
+portable-tests.sh:   set than the one pinned next to it. Pinned: 27, resolved: 26.
+portable-tests.sh:   19d18
+portable-tests.sh:   < github.com/CarlosShao/wisp/internal/plugin
+portable-tests.sh: a deleted or newly-uncovered package must fail the step, not
+portable-tests.sh: shorten it. Either restore the scope entry or update the pin
+portable-tests.sh: in the SAME commit and say why in the CI log.
+
+### M2 run: bash scripts/portable-tests.sh --scope=core (rc=1)
+portable-tests.sh: GUARD A - these packages are declared in scope mode=core but
+portable-tests.sh:   compile NO test file at all for GOOS=windows:
+portable-tests.sh:   EMPTY github.com/CarlosShao/wisp/internal/watchdog
+portable-tests.sh: a scope entry with no denominator cannot fail, so keeping it there
+portable-tests.sh: is a false claim of coverage (ticket 111 AC#3). Give the package a
+portable-tests.sh: test, or take the entry out and say where its coverage lives.
+
+### M2 take-1 collateral (sed also caught the windows scope line; restored + re-cut, kept for honesty)
+portable-tests.sh: GUARD A - these packages are declared in scope mode=core but
+portable-tests.sh:   compile NO test file at all for GOOS=windows:
+portable-tests.sh:   EMPTY github.com/CarlosShao/wisp/internal/watchdog
+portable-tests.sh: a scope entry with no denominator cannot fail, so keeping it there
+portable-tests.sh: is a false claim of coverage (ticket 111 AC#3). Give the package a
+portable-tests.sh: test, or take the entry out and say where its coverage lives.
+
+### empty-denominator rows (baseline census)
+portable-tests.sh: github.com/CarlosShao/wisp/internal/session    3/0         corewindows
+portable-tests.sh: github.com/CarlosShao/wisp/internal/watchdog   0/0          NO-SCOPE <-NO-TESTS
+
+### guard line anchors
+629:if [ -n "$pinned" ]; then
+634:            echo "portable-tests.sh: GUARD C - scope mode=$mode resolved to a DIFFERENT package"
+651:denom=$(go list -f '{{if or .TestGoFiles .XTestGoFiles}}{{else}}EMPTY {{.ImportPath}}
+655:        echo "portable-tests.sh: GUARD A - these packages are declared in scope mode=$mode but"
+476:                unclaimed="$unclaimed$p  tests-compiled-for-$goos=${counts:-UNKNOWN}"$'\n'
+474:            0/0) ;;
+490:            echo "portable-tests.sh: GUARD D - $guardd package(s) compile a test file for GOOS=$goos and"
+244:core_pin='
+301:tiers='core windows cli winsec census'

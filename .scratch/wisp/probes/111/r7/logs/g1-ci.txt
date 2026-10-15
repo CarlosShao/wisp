@@ -1,0 +1,54 @@
+### run 38676514264 (head 39b0a246) test-windows/lint step lists + carrier summary + census totals
+== run 38676514264 (head 39b0a246) ==
+{"conclusion":"failure","created_at":"2026-10-15T03:29:17Z","event":"push","head_sha":"39b0a246f39b3858912825a660af2d830fa7a98b"}
+
+== test-windows job 116231259514 steps ==
+1	success	Set up job
+2	success	Run actions/checkout@v4
+3	success	Run actions/setup-go@v5
+4	success	Windows ACL sealing gate (internal/winsec's own tests, ticket 110)
+5	success	Cache third_party (deps.toml key)
+6	success	cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)
+7	failure	cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)
+8	success	winlive compile gate (go vet -tags winlive, ticket 111 AC#11)
+9	success	Package coverage census (ticket 111 AC#1 + GUARD D)
+10	failure	Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
+11	success	PathResolver junction placeholder (real cases tickets 18/20)
+20	skipped	Post Cache third_party (deps.toml key)
+21	skipped	Post Run actions/setup-go@v5
+22	success	Post Run actions/checkout@v4
+23	success	Complete job
+== lint job 116231259522 steps ==
+1	success	Set up job
+2	success	Run actions/checkout@v4
+3	success	Run actions/setup-go@v5
+4	success	D22 scanner positive control (tools/d22scan tests, seeded red)
+5	success	D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)
+6	success	D22 seven-ban + emoji scan (tools/d22scan)
+7	success	Tracked path-length budget (ticket 262)
+8	failure	gofmt (gofumpt)
+9	failure	gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)
+10	success	go vet (module)
+11	success	go vet (tools/d22scan module)
+12	failure	staticcheck
+13	success	mockllm module vet
+14	success	Portable tests carrier self-test (ticket 111 AC#3 - GUARD D's positive control)
+27	skipped	Post Run actions/setup-go@v5
+28	success	Post Run actions/checkout@v4
+29	success	Complete job
+== selftest step (lint) carrier summary ==
+== case guard-a-empty-test-package: rc=1 log=/tmp/tmp.eRgxAl9qAJ/guard-a-empty-test-package.log
+== case census-unclaimed-package-goes-red: rc=1 log=/tmp/tmp.eRgxAl9qAJ/census-unclaimed-package-goes-red.log
+== case guard-d-slice-is-what-bites: mutant replaced 1 line (GUARD D's 0/0 arm at
+        scripts/portable-tests.sh:393; 0 = nothing to mutate, and a seed that cannot take is
+        not evidence)
+   mutant (the 0/0 arm swallows every count): same seed, GUARD D neutered.
+   (log: /tmp/tmp.eRgxAl9qAJ/guard-d-slice-is-what-bites-mutant.log)
+== case guard-d-slice-is-what-bites-real: rc=1 log=/tmp/tmp.eRgxAl9qAJ/guard-d-slice-is-what-bites-real.log
+   (logs: /tmp/tmp.eRgxAl9qAJ/guard-d-slice-is-what-bites-mutant.log / /tmp/tmp.eRgxAl9qAJ/guard-d-slice-is-what-bites-real.log)
+
+portable-tests-selftest.sh: 32 case(s) ran, 0 assertion(s) failed
+portable-tests-selftest.sh: carrier scratch kept at /tmp/tmp.eRgxAl9qAJ (rules: temp files are created, not deleted)
+portable-tests-selftest.sh: GREEN - every seeded anomaly was refused, and the clean scope passed.
+== census step (test-windows) totals ==
+portable-tests.sh: census totals: packages=35 with-zero-compiled-tests=7 claimed-by-no-scope=7 unclaimed-with-tests=0
