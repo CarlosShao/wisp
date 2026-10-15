@@ -1,0 +1,8 @@
+time=2026-10-15T19:56:10.217+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC321PanelHopDrivesTheHolderToggle
+--- PASS: TestAC321PanelHopDrivesTheHolderToggle (0.00s)
+=== RUN   TestAC321NamedExecutorIsTheToggleRoad
+--- PASS: TestAC321NamedExecutorIsTheToggleRoad (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.097s
+rc=0

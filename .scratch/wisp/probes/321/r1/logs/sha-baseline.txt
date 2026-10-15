@@ -1,0 +1,2 @@
+816017b68c495b6ca3770b08e01b0cf502d91822cb31dec0305eedafb5f9d90d *cmd/wisp/resident_windows.go
+816017b68c495b6ca3770b08e01b0cf502d91822cb31dec0305eedafb5f9d90d *.scratch/wisp/probes/321/r1/resident_windows.go.bak

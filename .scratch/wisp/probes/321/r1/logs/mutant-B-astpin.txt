@@ -1,0 +1,11 @@
+time=2026-10-15T19:52:48.277+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC321PanelHopDrivesTheHolderToggle
+    exec_holder_toggle_321_test.go:154: AC#1 RED: the panel hop in runResident (resident_windows.go) is a function literal that drives NO executor on newPanelHolder (receiver "") - the tray item, the ball and the panel hot key now execute nothing, whatever this file is named
+--- FAIL: TestAC321PanelHopDrivesTheHolderToggle (0.00s)
+=== RUN   TestAC321NamedExecutorIsTheToggleRoad
+    exec_holder_toggle_321_test.go:173: AC#1 RED: the panel hop (resident_windows.go) drives [] executor(s), want exactly one toggle - no single method here has a capability that could be checked
+--- FAIL: TestAC321NamedExecutorIsTheToggleRoad (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.105s
+FAIL
+rc=1
