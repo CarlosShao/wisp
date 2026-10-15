@@ -1,0 +1,10 @@
+{
+  "Replace": {
+    "D:/work/workspace/projects plans/Wisp/cmd/wisp/probe_319r4_visible_foreground_winlive_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/319/r4/probe_319r4_visible_foreground_winlive_test.go",
+    "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_host_windows.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/319/r4/prechange-panel_host_windows.go",
+    "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_resident_windows.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/319/r4/prechange-panel_resident_windows.go",
+    "D:/work/workspace/projects plans/Wisp/cmd/wisp/resident_windows.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/319/r4/prechange-resident_windows.go",
+    "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_holder_319_windows_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/319/r4/prechange-panel_holder_319_windows_test.go",
+    "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_death_replay_319_winlive_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/319/r4/prechange-panel_death_replay_319_winlive_test.go"
+  }
+}

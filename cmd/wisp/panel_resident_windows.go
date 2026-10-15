@@ -126,6 +126,7 @@ type residentPanel struct {
 	toggles    atomic.Int64
 	shows      atomic.Int64
 	hides      atomic.Int64
+	raises     atomic.Int64
 	disposals  atomic.Int64
 	failedPost atomic.Int64
 
@@ -440,6 +441,41 @@ func (rp *residentPanel) showOnThread(via string) {
 			"via", via, "err", err, "shows", rp.shows.Load())
 		fmt.Printf("wisp: panel thread will take no further requests: %v\n", err)
 	}
+}
+
+// RequestRaise asks for the panel window to be brought to the foreground WITHOUT
+// touching its visibility (ticket 319 AC#2's raise half, leg 319-r4). It follows
+// RequestShow's shape exactly: a nil receiver is legal and answers "no", one
+// counter of its own (raises), and the request lands on the panel thread through
+// post() instead of running on the caller's thread.
+//
+// WHY A SEPARATE REQUEST AND NOT PART OF showOnThread. RequestShow's meaning is
+// "this window should be on screen" (mgr.Show creates on a cold call and
+// re-asserts visibility on a hot one, and its own SetForegroundWindow runs only
+// when the window was NOT already shown); RequestRaise's meaning is "foreground".
+// The one caller that asks for both is the second-launch activation, in that
+// order (panelHolder.show, resident_windows.go) - Windows makes them two Win32
+// calls with two separate answers, and the raise's answer is recorded on the
+// manager (PanelManager.lastRaiseSetForeground), never retried.
+func (rp *residentPanel) RequestRaise(via string) bool {
+	if rp == nil {
+		return false
+	}
+	rp.raises.Add(1)
+	return rp.post(func() { rp.raiseOnThread(via) })
+}
+
+// raiseOnThread runs one raise request ON the panel thread. It is the thin
+// counterpart of showOnThread and deliberately has no failure branch: Raise has
+// no error to become this thread's state (a refused SetForegroundWindow is a
+// recorded reading, not a reason to retire the thread, and a missing window is a
+// silent no-op - panel_host_windows.go's Raise). The log line is written on the
+// panel thread so the field record carries the Win32 answer next to the request
+// that asked for it.
+func (rp *residentPanel) raiseOnThread(via string) {
+	rp.mgr.Raise()
+	slog.Info("panel host: raise request landed on the panel thread",
+		"via", via, "set_foreground_ret", rp.mgr.LastRaiseSetForeground())
 }
 
 // RequestToggle is what the panel hot key and the tray item drive: an open panel

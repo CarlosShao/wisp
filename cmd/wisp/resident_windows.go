@@ -555,10 +555,27 @@ func (h *panelHolder) toggle(via string) bool {
 }
 
 // show is the executor the second-launch activation drives (ticket 319 AC#2,
-// leg 319-r3). It answers exactly what residentPanel.RequestShow answers - ask
-// for the window to appear, never for a state flip - and it carries the same
-// dead-thread rebuild toggle has, for the same reason (AC#1: a thread that
-// ended must not make the request impossible).
+// leg 319-r3; extended with the raise hop by leg 319-r4). It answers exactly
+// what residentPanel.RequestShow answers - ask for the window to appear, never
+// for a state flip - and it carries the same dead-thread rebuild toggle has, for
+// the same reason (AC#1: a thread that ended must not make the request
+// impossible). Since 319-r4 it asks for TWO requests, in this order and under
+// this one lock: RequestShow (the window on screen) and then RequestRaise (the
+// window in front, panel_resident_windows.go). The order is by construction -
+// both posts are FIFO behind each other on the panel thread's queue - and it is
+// the order AC#2's field shape needs (a window cannot be brought to the front
+// before it is shown). The method answers the conjunction: if either half was
+// refused by the thread, the caller sees false and the activation takes its
+// tray-tip branch instead of reporting a window move that never happened.
+//
+// WHY THE RAISE IS ITS OWN REQUEST. RequestShow's meaning is "this window should
+// be on screen"; for an ALREADY-VISIBLE panel mgr.Show re-asserts visibility
+// without touching the foreground (its SetForegroundWindow runs only when the
+// window was not already shown), and 319-r3 measured that this leaves the prior
+// window in front - the "panel open but pushed behind, double click does
+// nothing" shape of 2026-10-14 21:40:38. RequestRaise is the named second hop
+// that covers exactly that shape; it does not edit mgr.Show's guard and does not
+// touch any focus bookkeeping.
 //
 // WHY THIS IS A SIBLING COPY OF toggle AND NOT A MODE OF IT. The two route to
 // two different requests on purpose: toggle's contract is a toggle, so a panel
@@ -566,20 +583,15 @@ func (h *panelHolder) toggle(via string) bool {
 // that is correct for the ball's gestures, the hot key and the tray item. The
 // second launch is not a toggle: AC#2's letter is "bring the existing instance's
 // UI to the front", and the live reading behind D1 (319-v's shape A) is that
-// the toggle road made the window DISAPPEAR on a double click. RequestShow is
-// the request whose meaning is "this window should be on screen", and it is the
-// only show road this leg may route to. What it delivers per shape, measured:
-// the cold and hidden shapes really come forward (mgr.Show runs
-// ShowWindow(SW_SHOW) + SetForegroundWindow when the window was not already
-// shown), while for an ALREADY-VISIBLE panel the same call re-asserts
-// visibility without raising it - 319-r3 measured that in isolation
-// (probes/319/r3/02-probe-foreground-fixed.txt: ShowWindow(SW_SHOW) does not
-// activate a visible window; SetForegroundWindow alone does, and mgr.Show skips
-// it when already shown). That raise hop is an open decision on mgr.Show, named
-// in the leg's receipt, outside this leg's surface. The rebuild block is a
-// second copy rather than a shared helper because the AC#1 mutation teeth sit
-// on toggle's own isFinished() term: sharing would move an existing pin's
-// subject without changing anything it asserts.
+// the toggle road made the window DISAPPEAR on a double click. What the show
+// road delivers per shape, measured: the cold and hidden shapes really come
+// forward (mgr.Show runs ShowWindow(SW_SHOW) + SetForegroundWindow when the
+// window was not already shown), the already-visible shape is raised by the
+// RequestRaise hop added in 319-r4 (before it, 319-r3 measured the foreground
+// staying on the prior window: probes/319/r3/02-probe-foreground-fixed.txt). The
+// rebuild block is a second copy rather than a shared helper because the AC#1
+// mutation teeth sit on toggle's own isFinished() term: sharing would move an
+// existing pin's subject without changing anything it asserts.
 func (h *panelHolder) show(via string) bool {
 	if h == nil {
 		return false
@@ -598,7 +610,9 @@ func (h *panelHolder) show(via string) bool {
 		slog.Info("panel host: starting a fresh panel thread for this request",
 			"via", via, "why", why)
 	}
-	return h.rp.RequestShow(via)
+	tookShow := h.rp.RequestShow(via)
+	tookRaise := h.rp.RequestRaise(via)
+	return tookShow && tookRaise
 }
 
 // statusLine is the boot report's "does this process have a panel" answer. The
@@ -660,8 +674,10 @@ const secondLaunchTrayTip319 = "Wisp: another launch asked for the window, but t
 // ensures a live thread and asks RequestShow, the request whose meaning is
 // "this window should be on screen". The tray item, the hot key and the ball's
 // gestures keep driving toggle, unchanged. The in-front half for an
-// already-visible panel is NOT delivered by this routing (measured; see show's
-// comment and probes/319/r3/) and stays an open decision on mgr.Show.
+// already-visible panel - the one hop 319-r3 measured missing and stopped on -
+// is delivered since 319-r4 by panelHolder.show's own second request,
+// RequestRaise (see show's comment; mgr.Show's `if !shown` guard was left
+// untouched).
 //
 // WHAT THE RECEIPT CAN AND CANNOT SAY. The request is asynchronous by contract
 // (post() returns once the request is queued; the window verdict lands on the

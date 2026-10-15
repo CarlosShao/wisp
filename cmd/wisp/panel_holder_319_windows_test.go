@@ -26,7 +26,11 @@ package main
 // Ticket 319-r3 adds the D1 half (N4, AC#2/AC#3): with the manager believing its
 // window is on screen, the production second-launch hook must take the SHOW road
 // and never the toggle/hide road, and panelHolder.show must rebuild a dead
-// thread exactly the way toggle does. Both are below.
+// thread exactly the way toggle does. Ticket 319-r4 adds the raise half to the
+// same pins: the activation must also ask for the named RequestRaise hop behind
+// the show (and the rebuilt thread must get both), because a visible panel that
+// is pushed behind another window only comes forward through that request. All
+// of it is below.
 
 import (
 	"os"
@@ -209,18 +213,23 @@ func inertPanelThread319(reg *observe.Registry, mgr *PanelManager) *residentPane
 }
 
 // TestSecondLaunchActivationDoesNotTakeTheHideRoad319 is N4's headless half
-// (ticket 319-r3, the D1 fix): the production second-launch hook, driven against
-// a holder whose manager believes its window is on screen, must take the SHOW
-// road. The defect it pins is the one 319-v measured live on 2026-10-15 (shape A
-// in .scratch/wisp/probes/319/v/03-ac2-live-adjudication.txt): the hook used to
-// drive panelHolder.toggle, and toggle's contract on a visible panel is to HIDE
-// it - a double click made the window disappear.
+// (ticket 319-r3, the D1 fix; extended with the raise half by 319-r4): the
+// production second-launch hook, driven against a holder whose manager believes
+// its window is on screen, must take the SHOW road - and, since 319-r4, also the
+// RAISE road behind it. The defect the first half pins is the one 319-v measured
+// live on 2026-10-15 (shape A in .scratch/wisp/probes/319/v/03-ac2-live-adjudication.txt):
+// the hook used to drive panelHolder.toggle, and toggle's contract on a visible
+// panel is to HIDE it - a double click made the window disappear. The defect the
+// second half covers is 319-r3's own stopped item: the show road alone re-asserts
+// visibility of a visible panel without moving the foreground, so a second
+// launch on an already-visible panel that is pushed behind another window did
+// nothing (the 21:40:38 field shape).
 //
 // How a headless tier can hold a "visible" state at all: the state the executor
 // branches on is the manager's own (IsShown() = created && shown). No window
 // exists here - the fixture's thread is inertPanelThread319, which runs nothing -
 // so the two booleans are set directly under the manager's lock, and what is
-// judged is the executor's DECISION: which request the activation hands to the
+// judged is the executor's DECISION: which requests the activation hands to the
 // thread.
 //
 // The control is what makes the hides assertion non-vacuous: the toggle road is
@@ -230,6 +239,8 @@ func inertPanelThread319(reg *observe.Registry, mgr *PanelManager) *residentPane
 // Mutation control: make secondLaunchActivation319 drive h.toggle again (the D1
 // regression) and this case goes red on three named judgements - "did not take
 // the show road", "took the toggle road" and "asked the panel thread to HIDE".
+// Drop panelHolder.show's RequestRaise call (the 319-r4 raise-hop regression) and
+// it goes red on "never asked for the raise hop" and on the queue count.
 func TestSecondLaunchActivationDoesNotTakeTheHideRoad319(t *testing.T) {
 	reg := observe.NewRegistry()
 	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: &recordingModeHandler{}}, nil, panel319DataPath(t))
@@ -270,9 +281,9 @@ func TestSecondLaunchActivationDoesNotTakeTheHideRoad319(t *testing.T) {
 	}
 
 	// The fix under the same state: the production hook.
-	before := [3]int64{live.shows.Load(), live.toggles.Load(), live.hides.Load()}
+	before := [4]int64{live.shows.Load(), live.toggles.Load(), live.hides.Load(), live.raises.Load()}
 	receipt := secondLaunchActivation319(h, nil)()
-	after := [3]int64{live.shows.Load(), live.toggles.Load(), live.hides.Load()}
+	after := [4]int64{live.shows.Load(), live.toggles.Load(), live.hides.Load(), live.raises.Load()}
 
 	if after[0]-before[0] != 1 {
 		t.Errorf("the second-launch activation did not take the show road (shows went %d -> %d, want exactly one more): D1's fix is that the activation requests a SHOW, the one request whose meaning is 'this window should be on screen and in front'", before[0], after[0])
@@ -283,27 +294,33 @@ func TestSecondLaunchActivationDoesNotTakeTheHideRoad319(t *testing.T) {
 	if after[2] != before[2] {
 		t.Errorf("the second-launch activation asked the panel thread to HIDE (hides went %d -> %d): a second launch on an already-visible panel must never hide it (ticket 319 AC#2)", before[2], after[2])
 	}
-	if n := len(live.tasks); n != 2 {
-		t.Errorf("the requests did not land in the thread's own queue (it holds %d, want the control's hide plus the activation's show): the executor answered with a request the thread never received", n)
+	if after[3]-before[3] != 1 {
+		t.Errorf("the second-launch activation never asked for the raise hop (raises went %d -> %d, want exactly one more): a visible panel that is pushed behind another window only comes forward through RequestRaise (ticket 319 AC#2's field shape, leg 319-r4)", before[3], after[3])
+	}
+	if n := len(live.tasks); n != 3 {
+		t.Errorf("the requests did not land in the thread's own queue (it holds %d, want 3: the control's hide plus the activation's show and raise): the executor answered with a request the thread never received", n)
 	}
 	if !strings.Contains(receipt, "second-launch") {
 		t.Errorf("the activation hook answered %q, which is not the hand-off branch sentence; the counters above say the request was taken, so the receipt and the request disagree", receipt)
 	}
-	t.Logf("319-r3 headless visible-panel reading: control toggle hides=%d shows=%d; activation receipt=%q; after activation: shows=%d toggles=%d hides=%d; queued requests=%d; spawns=%d",
-		before[2], before[0], receipt, after[0], after[1], after[2], len(live.tasks), spawns)
+	t.Logf("319-r3/r4 headless visible-panel reading: control toggle hides=%d shows=%d; activation receipt=%q; after activation: shows=%d toggles=%d hides=%d raises=%d; queued requests=%d; spawns=%d",
+		before[2], before[0], receipt, after[0], after[1], after[2], after[3], len(live.tasks), spawns)
 }
 
 // TestPanelHolderShowRebuildsADeadThread319 is N4's second headless half: the
 // show executor carries the same dead-thread rebuild toggle has. A panel thread
 // that ended (AC#1's field shape) must not make the second launch impossible -
-// the activation must start a fresh thread and hand IT the show request.
+// the activation must start a fresh thread and hand IT the show request, and
+// (since 319-r4) the raise request behind it.
 //
 // Mutation control: drop the isFinished() term from panelHolder.show's rebuild
 // condition (cmd/wisp/resident_windows.go) and this case goes red on "the spawn
 // was asked 1 time(s)" and on the dead thread's own refusal reaching the caller.
 // The copy of that term in toggle is NOT exercised here: delete it instead and
 // TestPanelHolderRebuildsADeadThread319 above goes red, which is why the two
-// executors keep two separate copies with two separate teeth.
+// executors keep two separate copies with two separate teeth. The raise-hop
+// mutation (RequestRaise dropped from show, tested by -overlay in the 319-r4
+// evidence) reddens the raises and queue assertions below.
 func TestPanelHolderShowRebuildsADeadThread319(t *testing.T) {
 	reg := observe.NewRegistry()
 	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: &recordingModeHandler{}}, nil, panel319DataPath(t))
@@ -355,12 +372,15 @@ func TestPanelHolderShowRebuildsADeadThread319(t *testing.T) {
 	if got := fresh.hides.Load(); got != 0 {
 		t.Errorf("the rebuilt thread was asked to HIDE (hides=%d, want 0): a second launch never hides", got)
 	}
-	if n := len(fresh.tasks); n != 1 {
-		t.Errorf("this activation did not land in the rebuilt thread's own queue (it holds %d request(s), want the one show just taken)", n)
+	if got := fresh.raises.Load(); got != 1 {
+		t.Errorf("the rebuilt thread did not get the raise request (raises=%d, want 1): without it the rebuilt window comes back without the in-front hop the second launch is for (ticket 319 AC#2)", got)
+	}
+	if n := len(fresh.tasks); n != 2 {
+		t.Errorf("this activation did not land in the rebuilt thread's own queue (it holds %d request(s), want the show and the raise just taken)", n)
 	}
 	if !strings.Contains(receipt, "second-launch") {
 		t.Errorf("the activation hook answered %q, which is not the hand-off branch sentence; the counters above say the request was taken, so the receipt and the request disagree", receipt)
 	}
-	t.Logf("319-r3 headless dead-thread show reading: dead thread finished=true; spawns=%d; rebuilt thread shows=%d toggles=%d hides=%d queued=%d same manager=%v; receipt=%q",
-		spawns, fresh.shows.Load(), fresh.toggles.Load(), fresh.hides.Load(), len(fresh.tasks), sameMgr, receipt)
+	t.Logf("319-r3/r4 headless dead-thread show reading: dead thread finished=true; spawns=%d; rebuilt thread shows=%d toggles=%d hides=%d raises=%d queued=%d same manager=%v; receipt=%q",
+		spawns, fresh.shows.Load(), fresh.toggles.Load(), fresh.hides.Load(), fresh.raises.Load(), len(fresh.tasks), sameMgr, receipt)
 }

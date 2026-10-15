@@ -1,0 +1,3 @@
+82896e211df8a828b1f826c5598ac48d557bd1b65ae56fcf8e6e4e96369793e6 *cmd/wisp/panel_host_windows.go
+4154d1d0664874b84c88240ff1ee2c6c6a6e2a2592857f017ac24fe28432fe9e *cmd/wisp/panel_resident_windows.go
+816017b68c495b6ca3770b08e01b0cf502d91822cb31dec0305eedafb5f9d90d *cmd/wisp/resident_windows.go

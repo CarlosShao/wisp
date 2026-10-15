@@ -1,0 +1,86 @@
+== git diff --name-only (whole tree) ==
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/152/my152.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.scratch/wisp/probes/orch/20261015/txt/319r3-dispatch.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design/doubao/demo/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/styles/tokens.generated.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next time Git touches it
+.gitignore
+.scratch/wisp/probes/152/my152.py
+.scratch/wisp/probes/268/v1/evidence.md
+.scratch/wisp/probes/orch/20261015/txt/319r3-dispatch.txt
+cmd/wisp/panel_death_replay_319_winlive_test.go
+cmd/wisp/panel_holder_319_windows_test.go
+cmd/wisp/panel_host_windows.go
+cmd/wisp/panel_resident_windows.go
+cmd/wisp/resident_windows.go
+design/assets/base.css
+design/assets/icons.js
+design/assets/theme.js
+design/assets/tokens.css
+design/doubao/README.md
+design/doubao/demo/app.js
+design/doubao/demo/index.html
+design/doubao/demo/styles.css
+design/index.html
+design/screens/approval.html
+design/screens/ball.html
+design/screens/chat.html
+design/screens/config.html
+design/screens/cost.html
+design/screens/firstrun.html
+design/screens/palette.html
+design/screens/privacy.html
+design/screens/security.html
+design/screens/states.html
+design/screens/tasks.html
+go.mod
+
+== git status --porcelain (untracked + modified) ==
+ M .gitignore
+ M .scratch/wisp/probes/152/my152.py
+ M .scratch/wisp/probes/268/v1/evidence.md
+ M .scratch/wisp/probes/orch/20261015/txt/319r3-dispatch.txt
+ M cmd/wisp/panel_death_replay_319_winlive_test.go
+ M cmd/wisp/panel_holder_319_windows_test.go
+ M cmd/wisp/panel_host_windows.go
+ M cmd/wisp/panel_resident_windows.go
+ M cmd/wisp/resident_windows.go
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+ M frontend/src/styles/tokens.generated.css
+ M go.mod
+?? -
+?? .scratch/.scratch/
+?? .scratch/ci-logs/run-37158259050.err
+?? .scratch/ci-logs/run-37158259050.log
+?? .scratch/ci-logs/run-37166458550-failed.err
+?? .scratch/commit-msg-136s-ac2-ev.txt
+?? .scratch/commit-msg-136s-ac2.txt
+?? .scratch/commit-msg-136s-ac2b.txt
+?? .scratch/commit-msg-136s-ac3.txt
+
+== one-line mutant diff re-proof on the final tree ==
+614c614
+< 	tookRaise := h.rp.RequestRaise(via)
+---
+> 	tookRaise := true // MUTANT (319-r4): the RequestRaise hop removed; the tree is never edited for this run
+diff rc=1 (1 = exactly the two lines shown above)

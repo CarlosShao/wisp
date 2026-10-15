@@ -1,0 +1,67 @@
+== PROBE on PRE-CHANGE tree (all 5 files overlaid from HEAD), -overlay ==
+time=2026-10-15T14:41:52.932+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe319r4VisibleForeground
+time=2026-10-15T14:41:52.935+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T14:41:52.935+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-15T14:41:52.949+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x2d060ad6"
+time=2026-10-15T14:41:52.949+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x18 known=true"
+time=2026-10-15T14:41:52.950+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x46 known=true"
+time=2026-10-15T14:41:52.955+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x46 known=true"
+time=2026-10-15T14:41:52.956+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x1c known=true"
+time=2026-10-15T14:41:52.957+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x86 known=true"
+time=2026-10-15T14:41:52.960+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x7f known=true"
+time=2026-10-15T14:41:52.960+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x7f known=true"
+time=2026-10-15T14:41:52.961+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x7f known=true"
+time=2026-10-15T14:41:52.962+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x6 known=true"
+time=2026-10-15T14:41:53.032+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x281 known=true"
+time=2026-10-15T14:41:53.042+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x282 known=true"
+time=2026-10-15T14:41:53.044+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x3d known=true"
+time=2026-10-15T14:41:53.044+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x3d known=true"
+time=2026-10-15T14:41:53.044+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x7 known=true"
+time=2026-10-15T14:41:53.044+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x85 known=true"
+time=2026-10-15T14:41:53.045+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x14 known=true"
+time=2026-10-15T14:41:53.045+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x47 known=true"
+time=2026-10-15T14:41:53.046+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x5 known=true"
+time=2026-10-15T14:41:53.046+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x3 known=true"
+time=2026-10-15T14:41:53.046+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-10-15T14:41:53.046+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0xf known=true"
+time=2026-10-15T14:41:53.046+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-10-15T14:41:53.046+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-10-15T14:41:53.046+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-10-15T14:41:53.059+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x210 known=true"
+time=2026-10-15T14:41:53.059+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x7f known=true"
+time=2026-10-15T14:41:53.059+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x88 known=true"
+time=2026-10-15T14:41:53.060+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x31f known=true"
+time=2026-10-15T14:41:53.060+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0xc0f9 known=true"
+time=2026-10-15T14:41:53.060+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x282 known=true"
+time=2026-10-15T14:41:53.060+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x7f known=true"
+time=2026-10-15T14:41:53.062+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x7f known=true"
+time=2026-10-15T14:41:53.063+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0xc053 known=true"
+time=2026-10-15T14:41:53.063+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x288 known=true"
+time=2026-10-15T14:41:53.487+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-10-15T14:41:53.574+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x14 known=true"
+time=2026-10-15T14:41:53.590+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0xf known=true"
+wisp: panel window is up (319r4-probe-setup, cold 660.0 ms, hot path 0.0 ms)
+time=2026-10-15T14:41:53.622+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x86 known=true"
+time=2026-10-15T14:41:53.623+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x6 known=true"
+time=2026-10-15T14:41:53.629+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x8 known=true"
+time=2026-10-15T14:41:53.629+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x281 known=true"
+time=2026-10-15T14:41:53.630+08:00 level=INFO msg="MARK299 wndproc hwnd=0x2d060ad6 msg=0x282 known=true"
+time=2026-10-15T14:41:53.637+08:00 level=INFO msg="activation requested by second launch" handled_here="the registered activation hook ran" receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+time=2026-10-15T14:41:53.643+08:00 level=INFO msg="panel host: CreateWebResourceResponse needed attempt 2 of 3 (the stale-GetLastError defect named above)"
+wisp: panel window is up (second-launch, cold 660.0 ms, hot path 0.0 ms)
+    probe_319r4_visible_foreground_winlive_test.go:106: PROBE 319-r4 (visible panel, production second-launch hop): hwnd=0x2D060AD6 shown=true alive=true; foreground=0x6E11208 panel-was-fg=false prior=0x6E11208
+    probe_319r4_visible_foreground_winlive_test.go:109: the panel was left in the background: the panel window 0x2D060AD6 is shown (alive=true) but the foreground window is 0x6E11208, not the panel (prior window 0x6E11208) - the committed pin's assertion `GetForegroundWindow() == the panel's HWND` is RED on this tree
+time=2026-10-15T14:41:53.644+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-15T14:41:53.644+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-15T14:41:53.644+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-15T14:41:53.644+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-15T14:41:53.644+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-15T14:41:53.644+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-15T14:41:53.644+08:00 level=WARN msg="fast shutdown: skipping non-critical log/db flushes (D38e fast path)"
+time=2026-10-15T14:41:53.651+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-15T14:41:53.651+08:00 level=INFO msg="panel thread exited cleanly" shows=2 toggles=1 disposals=0
+--- FAIL: TestProbe319r4VisibleForeground (0.72s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.824s
+FAIL

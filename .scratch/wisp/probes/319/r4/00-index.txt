@@ -1,0 +1,158 @@
+319-r4 evidence index. Leg 319-r4: the "raise half" of ticket 319 AC#2 - a second
+launch on an ALREADY-VISIBLE panel must bring it to the front. The leg landed the
+orchestrator's named-hop shape (additive only, no existing semantics moved):
+PanelManager.Raise + its recorded SetForegroundWindow answer
+(cmd/wisp/panel_host_windows.go), residentPanel.RequestRaise + raiseOnThread + the
+raises counter (cmd/wisp/panel_resident_windows.go), and panelHolder.show calling
+RequestShow then RequestRaise under the same lock (cmd/wisp/resident_windows.go).
+RequestToggle/toggle, mgr.Show, mgr.Hide and internal/proc are byte-untouched.
+Anchor at start: a75ebfcc. All files below are captured `go test` output, verbatim
+except that ticket 299's MARK299 window-procedure trace lines are left in (another
+leg's tracing, harmless here).
+
+Production shas on the final tree (after the last comment-only edit; the only
+change between the mutant/probe runs and the final tree was one comment line in
+panel_host_windows.go - resident_windows.go, the mutated file, is bit-identical
+across all runs, so every red/green reading below reproduces on the final tree):
+  9bb2be453edd96bf2aa1b5d0e6090dded6f002afab4e17088fce1978ede415a3  cmd/wisp/panel_host_windows.go
+  4154d1d0664874b84c88240ff1ee2c6c6a6e2a2592857f017ac24fe28432fe9e  cmd/wisp/panel_resident_windows.go
+  816017b68c495b6ca3770b08e01b0cf502d91822cb31dec0305eedafb5f9d90d  cmd/wisp/resident_windows.go
+
+00-production-shas.txt            The three production files' shas BEFORE the
+                                  mutant/probe runs; 05-shas-after-mutant-runs.txt
+                                  is identical (diff clean), so the -overlay
+                                  mutants/probes left zero tree residue.
+01-unfixed-red.txt                THE "UNFIXED TREE" READING. Out-of-repo probe
+                                  (probe_319r4_visible_foreground_winlive_test.go,
+                                  injected with overlay-prechange.json, which also
+                                  replaces all five touched files with their
+                                  `git show HEAD:` copies) on the PRE-CHANGE tree:
+                                  panel already visible, prior window in front,
+                                  production second-launch hop. RED, verbatim:
+                                  "PROBE 319-r4 ... hwnd=0x2D060AD6 shown=true
+                                  alive=true; foreground=0x6E11208
+                                  panel-was-fg=false prior=0x6E11208" and
+                                  ":109 the panel was left in the background: the
+                                  panel window 0x2D060AD6 is shown (alive=true) but
+                                  the foreground window is 0x6E11208, not the panel
+                                  ... the committed pin's assertion
+                                  `GetForegroundWindow() == the panel's HWND` is
+                                  RED on this tree". This is the answer to "does
+                                  the pin ring on the tree before this leg": yes.
+02-fixed-headless-both-packages.txt
+                                  `go test -run 319 ./cmd/wisp/ ./internal/proc/
+                                  -count=1 -v` on the fixed tree: green. New
+                                  readings verbatim: "after activation: shows=1
+                                  toggles=1 hides=1 raises=1; queued requests=3;
+                                  spawns=1" and "rebuilt thread shows=1 toggles=0
+                                  hides=0 raises=1 queued=2 same manager=true".
+03-fixed-winlive-visible-green.txt
+                                  The committed pin on the fixed tree, GREEN:
+                                  TestSecondLaunchActivationOnAVisiblePanelDoesNot
+                                  HideIt319. Reading verbatim: "after:
+                                  mgr.IsShown=true hwnd=0x565046E (same=true)
+                                  window alive=true; foreground=0x565046E
+                                  (panel=true, prior=0x89B0F5A); SetForegroundWindow
+                                  answered 1", with the production log line
+                                  "panel host: raise request landed on the panel
+                                  thread via=second-launch set_foreground_ret=1".
+04a-mutant-red-headless.txt       Mutation self-proof, headless. Mutant =
+                                  mutant-resident_windows.go (the final tree with
+                                  exactly one line changed: `tookRaise :=
+                                  h.rp.RequestRaise(via)` -> `tookRaise := true`,
+                                  diff re-proven in 09), injected with
+                                  overlay-mutant.json. Reds verbatim:
+                                  ":298 the second-launch activation never asked
+                                  for the raise hop (raises went 0 -> 0, want
+                                  exactly one more)"; ":301 the requests did not
+                                  land in the thread's own queue (it holds 2, want
+                                  3 ...)"; ":376 the rebuilt thread did not get
+                                  the raise request (raises=0, want 1)"; ":379 this
+                                  activation did not land in the rebuilt thread's
+                                  own queue (it holds 1 request(s), want the show
+                                  and the raise just taken)". rc=1.
+04b-mutant-red-winlive.txt        Same mutant, winlive pin, RED, verbatim:
+                                  ":442 the second launch left the panel in the
+                                  background: ... foreground=0xA5808A0, not the
+                                  panel (the prior window was 0xA5808A0,
+                                  SetForegroundWindow answered 0) ... a red here
+                                  says the raise hop did not run". rc=1.
+05a-probe-fixed-green.txt         The same probe on the FIXED tree (probe injected
+                                  only): GREEN, "foreground=0x30F12A0
+                                  panel-was-fg=true prior=0x77A0D46" + the
+                                  set_foreground_ret=1 log line. Two-way reading
+                                  with 01: red before, green after.
+05b-restored-headless-green.txt   Restored (no -overlay) headless 319 both
+                                  packages: green.
+06a-focus-family-headless.txt     33r11 census (5 cases, incl. the Locked-suffix
+                                  roster over ALL production sources - the new
+                                  names Raise/RequestRaise/raiseOnThread are not
+                                  Locked-suffixed and take the lock themselves,
+                                  which the roster's rule expects), 255r1 reshow
+                                  family (6), 255 parse family that re-reads the
+                                  edited files (7): all PASS.
+06b-AC4PriorFocus.txt             TestAC4PriorFocusSurvivesARefusedPanelSample
+                                  (real window, prevFocus/Hide bookkeeping):
+                                  PASS.
+06c-AC4FocusGap33r5.txt           TestAC4FocusReturnToPriorWindowGap33r5 (real
+                                  window; 319-r2 recorded this RED on its tree as
+                                  an environment-gated case): PASS here, reading
+                                  "foreground while hidden (prior) 0x7010d5e |
+                                  after Show 0x7171138 | panel hwnd 0x7171138 |
+                                  prevFocus recorded at Show 0x7010d5e | after
+                                  Hide 0x7010d5e". D29's focus semantics intact.
+06d-resident-family.txt           panel_resident family headless group (3 PASS) +
+                                  TestPanelThreadIsSTAAndExitsCleanly (window)
+                                  PASS.
+06e-PanelHostRealWindowHop.txt    TestPanelHostRealWindowHopAndLifecycle (real
+                                  window Show/Hide lifecycle): PASS, cold 775.061
+                                  ms / hot 45.479 ms.
+06f-winlive-319-named.txt         Existing winlive 319 cases by name, one per
+                                  invocation: TestSecondLaunchActivationRaisesThe
+                                  Panel319 PASS (cold raise, foreground=panel),
+                                  TestPanelDeathReplay319UnfixedReading PASS.
+06g-winlive-319-rebuild.txt       TestPanelDeathThenHolderGestureRebuilds319 PASS:
+                                  "old hwnd=0x8980328 ... after the holder's
+                                  rebuild: holder toggle=true new hwnd=0x1DFD09C2
+                                  mgr.IsCreated=true mgr.IsShown=true old window
+                                  alive=false".
+06h-winlive-restored-and-255.txt  The raise pin re-run after the mutant (green)
+                                  + the two 255 winlive cases by name
+                                  (TestTicket255r8RealWindowFollowsTheConfig
+                                  AcrossAReshow, TestTicket255RealWindowWidth
+                                  FollowsTheConfig): both PASS.
+07-gates.txt                      go build ./... rc=0; gofumpt -l (this leg's five
+                                  files) empty rc=0 (v0.12.0); go vet -tags
+                                  winlive ./cmd/wisp/ ./internal/proc/ rc=0; sh
+                                  scripts/d22scan.sh rc=0 clean; length gate
+                                  (check-path-length-budget.sh --with-self-test)
+                                  VERDICT GREEN rc=0.
+08-final-tree-recheck.txt         After the last comment-only edit to
+                                  panel_host_windows.go: build rc=0, gofumpt
+                                  empty rc=0, vet rc=0, `-run 319` both packages
+                                  ok, the winlive pin PASS, and the final shas
+                                  above.
+09-surface-check.txt              git diff --name-only: this leg's five files are
+                                  the only cmd/wisp entries (other modified paths
+                                  - design/, frontend/, go.mod, .gitignore,
+                                  probes/152, probes/268, the orch dispatch file -
+                                  belong to other legs/the owner and were not
+                                  touched); the one-line mutant diff re-proof.
+
+mutant-resident_windows.go        The mutant source (final tree, one line
+overlay-mutant.json               changed), the -overlay mapping that injects it.
+prechange-<five files>            The pre-change copies (`git show HEAD:` for the
+overlay-prechange.json            three production files and both 319 test files)
+                                  and the mapping that combines them with the
+                                  probe: the composed "pre-change tree" run.
+probe_319r4_visible_foreground_winlive_test.go
+overlay-probe-fixed.json          The out-of-repo probe source and the mapping
+                                  that injects it alone against the fixed tree.
+
+WHAT THIS LEG DID NOT DO (named, not implied): the raise pin is one live case on
+this desktop session; the two-process layer (a genuinely separate second process
+whose AllowSetForegroundWindow grant the raise consumes) is still not a committed
+pin - 319-v measured it out-of-repo and the orchestrator left it optional; the
+frontend/tray visible-notice surface was not touched; the full bare
+`go test ./cmd/wisp/` was not run (314's known death zone; the focus family was
+run in named segments instead).

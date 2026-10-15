@@ -167,6 +167,13 @@ type PanelManager struct {
 	lastRestoreSetForeground uintptr
 	lastRestoreSetFocus      uintptr
 
+	// lastRaiseSetForeground is what the most recent Raise was answered by
+	// SetForegroundWindow (0 = nothing was raised: no window, or a refusal both
+	// read 0). Like the three fields above it is a per-run reading, never a
+	// verdict, and it is recorded so a refused raise can be reported instead of
+	// retried; see Raise.
+	lastRaiseSetForeground uintptr
+
 	// lastColdMs / lastHotMs are the most recent measured bring-up latencies on
 	// THIS host instance (D32 panel rows: cold <=1500ms, hot <=200ms). They are
 	// measurements, never thresholds - the SLO thresholds live in
@@ -548,6 +555,62 @@ func (m *PanelManager) Show(ctx context.Context) error {
 	m.shown = true
 	m.mu.Unlock()
 	return nil
+}
+
+// Raise brings the window to the foreground WITHOUT touching anything else - not
+// its visibility, not prevFocus, not shown, no geometry read. It exists because
+// Show's own raise is conditional, and the field shape ticket 319 AC#2 is about
+// (the panel is open but pushed behind another window) sits exactly outside that
+// condition (leg 319-r4, the "raise half" 319-r3 stopped at).
+//
+// WHY SHOW ALONE CANNOT DO THIS. Show's tail calls SetForegroundWindow only when
+// the window was NOT already shown (`if !shown` there), which is the shape the
+// cold and hidden cases need. An already-visible panel therefore never gets its
+// foreground re-asserted: the owner's 2026-10-14 21:40:38 shape was "panel open,
+// pushed behind another window, double click does nothing". 319-r3 measured each
+// candidate in isolation on this box
+// (.scratch/wisp/probes/319/r3/02-probe-foreground-fixed.txt): ShowWindow(SW_SHOW)
+// leaves the foreground on the prior window (probe C), SetForegroundWindow alone
+// takes it (probe B), and the routed mgr.Show left the foreground where it was
+// (probes A/A2). So this hop is a named method and not a second spelling of Show,
+// and it deliberately does NOT edit Show's `if !shown` guard - the existing D29
+// focus bookkeeping (prevFocus sampling, Hide's restore) is untouched by a Raise.
+//
+// THE RETURN IS RECORDED, NEVER RETRIED. Windows' foreground lock can refuse
+// SetForegroundWindow (a process that does not own the foreground cannot move it;
+// the second-launch road carries AllowSetForegroundWindow for exactly that
+// reason), and this host takes the repository's settled posture on such a refusal:
+// store the Win32 answer in lastRaiseSetForeground for the reading and never
+// sleep-and-retry it green (the same rule Hide's tail states, 10-01 12:12 ruling
+// item 2). hwnd == 0 - no window yet, or one already destroyed - is a silent
+// return: there is nothing to raise and no error to invent.
+//
+// The resident path reaches this on the window's own thread through the library's
+// Dispatch queue (panel_resident_windows.go's RequestRaise -> raiseOnThread), the
+// same route every other host call takes; unlike SetFocus, SetForegroundWindow
+// has no window-owner-thread requirement, and nothing here asserts one.
+func (m *PanelManager) Raise() {
+	m.mu.Lock()
+	hwnd := m.hwnd
+	m.lastRaiseSetForeground = 0
+	m.mu.Unlock()
+	if hwnd == 0 {
+		return
+	}
+	r, _, _ := pnlSetForeground.Call(uintptr(hwnd))
+	m.mu.Lock()
+	m.lastRaiseSetForeground = r
+	m.mu.Unlock()
+}
+
+// LastRaiseSetForeground exposes the last Raise's Win32 answer so a caller (the
+// panel thread's own log line, a test) can print it as a reading instead of
+// inferring it. 0 means "nothing raised": either no window was there or Win32
+// refused - which of the two is answered by IsCreated/window state, not here.
+func (m *PanelManager) LastRaiseSetForeground() uintptr {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.lastRaiseSetForeground
 }
 
 // requestGeometryOnReshow is 票 255 AC#4's 甲形 on the live window (orchestrator

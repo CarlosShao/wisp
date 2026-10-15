@@ -1,0 +1,51 @@
+== 2026-10-15T14:36:47+0800 go test -run 319 ./cmd/wisp/ ./internal/proc/ -count=1 -v ==
+time=2026-10-15T14:36:50.075+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestDeadPanelThreadRefusesEveryGesture319
+time=2026-10-15T14:36:50.078+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T14:36:50.078+08:00 level=INFO msg="panel thread ending" why="stop requested before the panel window existed" window_opened=false
+time=2026-10-15T14:36:50.078+08:00 level=INFO msg="panel thread exited cleanly" shows=0 toggles=0 disposals=0
+    panel_holder_319_windows_test.go:99: 319 dead-thread raw reading: RequestToggle=false RequestShow=false isFinished=true
+time=2026-10-15T14:36:50.078+08:00 level=INFO msg="panel thread exited cleanly" shows=2 toggles=1 disposals=0
+--- PASS: TestDeadPanelThreadRefusesEveryGesture319 (0.00s)
+=== RUN   TestPanelHolderRebuildsADeadThread319
+time=2026-10-15T14:36:50.079+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T14:36:50.079+08:00 level=INFO msg="panel thread ending" why="stop requested before the panel window existed" window_opened=false
+time=2026-10-15T14:36:50.079+08:00 level=INFO msg="panel thread exited cleanly" shows=0 toggles=0 disposals=0
+time=2026-10-15T14:36:50.079+08:00 level=INFO msg="panel host: starting a fresh panel thread for this gesture" via=319-holder-rebuild why="the previous panel thread had exited"
+    panel_holder_319_windows_test.go:185: 319 holder rebuild reading: dead thread refused its own gesture; holder toggle=true; spawns=2; rebuilt thread queued requests=1; same manager=true
+--- PASS: TestPanelHolderRebuildsADeadThread319 (0.00s)
+=== RUN   TestSecondLaunchActivationDoesNotTakeTheHideRoad319
+    panel_holder_319_windows_test.go:306: 319-r3/r4 headless visible-panel reading: control toggle hides=1 shows=0; activation receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; after activation: shows=1 toggles=1 hides=1 raises=1; queued requests=3; spawns=1
+--- PASS: TestSecondLaunchActivationDoesNotTakeTheHideRoad319 (0.00s)
+=== RUN   TestPanelHolderShowRebuildsADeadThread319
+time=2026-10-15T14:36:50.079+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T14:36:50.079+08:00 level=INFO msg="panel thread ending" why="stop requested before the panel window existed" window_opened=false
+time=2026-10-15T14:36:50.079+08:00 level=INFO msg="panel thread exited cleanly" shows=0 toggles=0 disposals=0
+time=2026-10-15T14:36:50.079+08:00 level=INFO msg="panel host: starting a fresh panel thread for this request" via=second-launch why="the previous panel thread had exited"
+    panel_holder_319_windows_test.go:384: 319-r3/r4 headless dead-thread show reading: dead thread finished=true; spawns=2; rebuilt thread shows=1 toggles=0 hides=0 raises=1 queued=2 same manager=true; receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+--- PASS: TestPanelHolderShowRebuildsADeadThread319 (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.073s
+=== RUN   TestActivationHook319RunsExactlyOnceAndResets
+time=2026-10-15T14:36:50.104+08:00 level=INFO msg="activation requested by second launch" handled_here="the registered activation hook ran" receipt="panel toggle accepted (second-launch)"
+time=2026-10-15T14:36:50.162+08:00 level=INFO msg="activation requested by second launch" handled_here="the registered activation hook ran" receipt="panel toggle accepted (second-launch)"
+time=2026-10-15T14:36:50.162+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-15T14:36:50.162+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-15T14:36:50.162+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-15T14:36:50.162+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-15T14:36:50.162+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-15T14:36:50.162+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-15T14:36:50.162+08:00 level=WARN msg="fast shutdown: skipping non-critical log/db flushes (D38e fast path)"
+--- PASS: TestActivationHook319RunsExactlyOnceAndResets (0.13s)
+=== RUN   TestActivationWithoutHook319StillConsumesAndClears
+time=2026-10-15T14:36:50.165+08:00 level=INFO msg="activation requested by second launch" handled_here="booked and cleared only" bring_to_front="no activation hook is registered with this runtime (Runtime.SetActivationHook); the signal was booked and cleared only"
+time=2026-10-15T14:36:50.225+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-15T14:36:50.225+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-15T14:36:50.225+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-15T14:36:50.225+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-15T14:36:50.225+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-15T14:36:50.225+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-15T14:36:50.225+08:00 level=WARN msg="fast shutdown: skipping non-critical log/db flushes (D38e fast path)"
+--- PASS: TestActivationWithoutHook319StillConsumesAndClears (0.06s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/proc	0.217s

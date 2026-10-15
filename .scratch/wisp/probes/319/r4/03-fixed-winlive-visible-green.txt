@@ -1,0 +1,75 @@
+== 14:38:50 tasklist before: wisp.exe 40296 in place; one live case at a time ==
+time=2026-10-15T14:38:53.365+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319
+time=2026-10-15T14:38:53.368+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T14:38:53.369+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-15T14:38:53.382+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x565046e"
+time=2026-10-15T14:38:53.382+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x18 known=true"
+time=2026-10-15T14:38:53.383+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x46 known=true"
+time=2026-10-15T14:38:53.388+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x46 known=true"
+time=2026-10-15T14:38:53.389+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x1c known=true"
+time=2026-10-15T14:38:53.390+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x86 known=true"
+time=2026-10-15T14:38:53.392+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x7f known=true"
+time=2026-10-15T14:38:53.393+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x7f known=true"
+time=2026-10-15T14:38:53.393+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x7f known=true"
+time=2026-10-15T14:38:53.394+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x6 known=true"
+time=2026-10-15T14:38:53.464+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x281 known=true"
+time=2026-10-15T14:38:53.475+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x282 known=true"
+time=2026-10-15T14:38:53.476+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x3d known=true"
+time=2026-10-15T14:38:53.476+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x3d known=true"
+time=2026-10-15T14:38:53.477+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x7 known=true"
+time=2026-10-15T14:38:53.477+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x85 known=true"
+time=2026-10-15T14:38:53.477+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x14 known=true"
+time=2026-10-15T14:38:53.477+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x47 known=true"
+time=2026-10-15T14:38:53.478+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x5 known=true"
+time=2026-10-15T14:38:53.478+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x3 known=true"
+time=2026-10-15T14:38:53.478+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-10-15T14:38:53.478+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0xf known=true"
+time=2026-10-15T14:38:53.478+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-10-15T14:38:53.478+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-10-15T14:38:53.478+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-10-15T14:38:53.490+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x210 known=true"
+time=2026-10-15T14:38:53.490+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x7f known=true"
+time=2026-10-15T14:38:53.490+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x88 known=true"
+time=2026-10-15T14:38:53.491+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x31f known=true"
+time=2026-10-15T14:38:53.491+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0xc0f9 known=true"
+time=2026-10-15T14:38:53.491+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x7f known=true"
+time=2026-10-15T14:38:53.491+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x282 known=true"
+time=2026-10-15T14:38:53.491+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x7f known=true"
+time=2026-10-15T14:38:53.495+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0xc053 known=true"
+time=2026-10-15T14:38:53.495+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x288 known=true"
+time=2026-10-15T14:38:54.053+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-10-15T14:38:54.181+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x14 known=true"
+time=2026-10-15T14:38:54.195+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0xf known=true"
+wisp: panel window is up (319-visible-setup, cold 831.7 ms, hot path 0.0 ms)
+time=2026-10-15T14:38:54.219+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x86 known=true"
+time=2026-10-15T14:38:54.222+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x6 known=true"
+time=2026-10-15T14:38:54.228+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x8 known=true"
+time=2026-10-15T14:38:54.228+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x281 known=true"
+time=2026-10-15T14:38:54.229+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x282 known=true"
+wisp: panel window is up (second-launch, cold 831.7 ms, hot path 0.0 ms)
+time=2026-10-15T14:38:54.242+08:00 level=INFO msg="activation requested by second launch" handled_here="the registered activation hook ran" receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+time=2026-10-15T14:38:54.243+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x46 known=true"
+time=2026-10-15T14:38:54.246+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x47 known=true"
+time=2026-10-15T14:38:54.248+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x86 known=true"
+time=2026-10-15T14:38:54.249+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x6 known=true"
+time=2026-10-15T14:38:54.252+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x281 known=true"
+time=2026-10-15T14:38:54.252+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x282 known=true"
+time=2026-10-15T14:38:54.253+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x3d known=true"
+time=2026-10-15T14:38:54.253+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x3d known=true"
+time=2026-10-15T14:38:54.253+08:00 level=INFO msg="MARK299 wndproc hwnd=0x565046e msg=0x7 known=true"
+time=2026-10-15T14:38:54.255+08:00 level=INFO msg="panel host: raise request landed on the panel thread" via=second-launch set_foreground_ret=1
+    panel_death_replay_319_winlive_test.go:444: 319-r3/r4 visible-panel live reading: hwnd before=0x565046E shown before=true; signal=SignalExistingInstance("Local\\wisp-test-319-visible-20064-1792046334203947100.activate"); hook receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; after: mgr.IsShown=true hwnd=0x565046E (same=true) window alive=true; foreground=0x565046E (panel=true, prior=0x89B0F5A); SetForegroundWindow answered 1; event loop still running=true
+time=2026-10-15T14:38:54.257+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-15T14:38:54.257+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-15T14:38:54.257+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-15T14:38:54.257+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-15T14:38:54.257+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-15T14:38:54.257+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-15T14:38:54.257+08:00 level=WARN msg="fast shutdown: skipping non-critical log/db flushes (D38e fast path)"
+time=2026-10-15T14:38:54.266+08:00 level=INFO msg="panel host: CreateWebResourceResponse needed attempt 2 of 3 (the stale-GetLastError defect named above)"
+time=2026-10-15T14:38:54.277+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-15T14:38:54.279+08:00 level=INFO msg="panel thread exited cleanly" shows=2 toggles=1 disposals=0
+--- PASS: TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319 (0.91s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.067s
