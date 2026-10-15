@@ -1,0 +1,116 @@
+BASELINE-SHA 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3  (.scratch/wisp/probes/287/r1/subagent_197.go.pre-mutation.bak)
+WROTE M1-disable-branch anchor_hits=1 lands=b'false && ok && rec.Kind == TaskKindSubagent'
+WROTE M2-identity-to-corr anchor_hits=1 lands=b'parentID := CorrelationID(ctx)'
+WROTE M3-overbroad-any-row anchor_hits=1 lands=b'Look(parentID); ok {'
+
+############ M1-disable-branch ############
+-- 落地尺寸（vs 基线）：hunks=1 改行数=1 --
+-- 种后 sha256 --
+69087120ea40590e545449688abf038049d4ec01deab02eb59e113e6bfe71e56 *internal/tools/subagent_197.go
+-- 种后现量（271 / 276）--
+	parentID := TaskID(ctx)
+	if rec, ok := t.d.Roster.Look(parentID); false && ok && rec.Kind == TaskKindSubagent {
+-- 内容锚命中（LANDS）--
+1
+-- go test ./internal/tools/ -count=1 -run Test287 -v  rc=1
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.15s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.10s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.09s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.406s
+FAIL
+-- 红句逐字（文件:行 + 文案）--
+    subagent_depth_fixture_287_test.go:169: subagent_197.go:278 那句「拒绝派生：深度上限是 1」没有出现在 task.spawn 的回执里＝深度判定那一支没跑到（种坏 M1/M2 就是这个读数形）：text="子代理 df68984f-542b-46f4-85ea-e3f0537adb3b（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:173: subagent_197.go:279 那句 "子代理不许再派子代理。"（AC#1 尺①数出来全部 *_test.go 零命中）没被说出口：text="子代理 df68984f-542b-46f4-85ea-e3f0537adb3b（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:179: :278 那句里的「派生者 <task id>」抽不出来＝身份这一维没有读数：text="子代理 df68984f-542b-46f4-85ea-e3f0537adb3b（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:185: 父 kind 那一枚 = [], want "subagent"（判定读的不是调用者自己的子代理行）：text="子代理 df68984f-542b-46f4-85ea-e3f0537adb3b（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:189: 名册里出现第二代（1 枚 [df68984f-542b-46f4-85ea-e3f0537adb3b]）＝深度上限 1 被走到并破掉；调用者=5fdfb5db-4e91-40b7-bc75-f94a6bdcfdaa
+    subagent_depth_fixture_287_test.go:192: parent197 的孩子行 = 2 枚 [5fdfb5db-4e91-40b7-bc75-f94a6bdcfdaa df68984f-542b-46f4-85ea-e3f0537adb3b], want 1（夹具只登记调用者自己那一枚）
+    subagent_depth_fixture_287_test.go:195: task.spawn 的 outcome = "success", want "error"：被判定拒掉的那一发必须是错误回执，模型才改得动
+    subagent_depth_fixture_287_test.go:255: 深度判定没有在池位判定之前拦住（池已满，回执是另一句）：text="拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：37c75927-9ea3-4ea0-905c-76c74644b441）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+    subagent_depth_fixture_287_test.go:258: 调用者自己是子代理，却先读到池满那句＝:276 那一支没跑："拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：37c75927-9ea3-4ea0-905c-76c74644b441）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+-- 还原 sha256 --  86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+RESTORED-EQUAL-OK
+-- 还原现量（271 / 276）--
+	parentID := TaskID(ctx)
+	if rec, ok := t.d.Roster.Look(parentID); ok && rec.Kind == TaskKindSubagent {
+-- git status --porcelain -- internal --
+ M internal/winsec/sealhandle_privateroute_120_other_test.go
+?? internal/tools/subagent_depth_fixture_287_test.go
+
+############ M2-identity-to-corr ############
+-- 落地尺寸（vs 基线）：hunks=1 改行数=1 --
+-- 种后 sha256 --
+7c7185cc95d9b098662aad4830243e77f22f822fcd3f085701b297ff54cbf25c *internal/tools/subagent_197.go
+-- 种后现量（271 / 276）--
+	parentID := CorrelationID(ctx)
+	if rec, ok := t.d.Roster.Look(parentID); ok && rec.Kind == TaskKindSubagent {
+-- 内容锚命中（LANDS）--
+1
+-- go test ./internal/tools/ -count=1 -run Test287 -v  rc=1
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.17s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.12s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.13s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.503s
+FAIL
+-- 红句逐字（文件:行 + 文案）--
+    subagent_depth_fixture_287_test.go:169: subagent_197.go:278 那句「拒绝派生：深度上限是 1」没有出现在 task.spawn 的回执里＝深度判定那一支没跑到（种坏 M1/M2 就是这个读数形）：text="子代理 670fce8a-b321-45f4-a75a-27c287b477c3（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:173: subagent_197.go:279 那句 "子代理不许再派子代理。"（AC#1 尺①数出来全部 *_test.go 零命中）没被说出口：text="子代理 670fce8a-b321-45f4-a75a-27c287b477c3（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:179: :278 那句里的「派生者 <task id>」抽不出来＝身份这一维没有读数：text="子代理 670fce8a-b321-45f4-a75a-27c287b477c3（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:185: 父 kind 那一枚 = [], want "subagent"（判定读的不是调用者自己的子代理行）：text="子代理 670fce8a-b321-45f4-a75a-27c287b477c3（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:195: task.spawn 的 outcome = "success", want "error"：被判定拒掉的那一发必须是错误回执，模型才改得动
+    subagent_depth_fixture_287_test.go:221: 孩子行 = 0 枚 [], want 1：{CallID:call-197-spawn Name:task.spawn Outcome:success ErrorClass: Text:子代理 a49d0da5-8556-42c4-a5ff-9a65b73538f5（孙代理）已结束，状态 Settling。
+    subagent_depth_fixture_287_test.go:255: 深度判定没有在池位判定之前拦住（池已满，回执是另一句）：text="拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：51c37702-5def-49af-8a60-1323d40157c5）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+    subagent_depth_fixture_287_test.go:258: 调用者自己是子代理，却先读到池满那句＝:276 那一支没跑："拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：51c37702-5def-49af-8a60-1323d40157c5）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+-- 还原 sha256 --  86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+RESTORED-EQUAL-OK
+-- 还原现量（271 / 276）--
+	parentID := TaskID(ctx)
+	if rec, ok := t.d.Roster.Look(parentID); ok && rec.Kind == TaskKindSubagent {
+-- git status --porcelain -- internal --
+ M internal/winsec/sealhandle_privateroute_120_other_test.go
+?? internal/tools/subagent_depth_fixture_287_test.go
+
+############ M3-overbroad-any-row ############
+-- 落地尺寸（vs 基线）：hunks=1 改行数=1 --
+-- 种后 sha256 --
+5aaba840f472d410c1b30cec88019b8900343025ff3afae81d0cf3ec5dd7d24e *internal/tools/subagent_197.go
+-- 种后现量（271 / 276）--
+	parentID := TaskID(ctx)
+	if rec, ok := t.d.Roster.Look(parentID); ok {
+-- 内容锚命中（LANDS）--
+1
+-- go test ./internal/tools/ -count=1 -run Test287 -v  rc=1
+--- PASS: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.13s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.13s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.11s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.433s
+FAIL
+-- 红句逐字（文件:行 + 文案）--
+    subagent_depth_fixture_287_test.go:213: 父 kind=root 的调用者被深度判定拒了（那一支已经宽到认不出 kind）：refusal="拒绝派生：深度上限是 " 出现在 text="拒绝派生：深度上限是 1，而派生者 cd17a648-8d56-4323-a8c5-e7389c9fbf5c 自己就是一枚子代理（父 kind=root）。子代理不许再派子代理。"
+    subagent_depth_fixture_287_test.go:213: 父 kind=root 的调用者被深度判定拒了（那一支已经宽到认不出 kind）：refusal="子代理不许再派子代理。" 出现在 text="拒绝派生：深度上限是 1，而派生者 cd17a648-8d56-4323-a8c5-e7389c9fbf5c 自己就是一枚子代理（父 kind=root）。子代理不许再派子代理。"
+    subagent_depth_fixture_287_test.go:217: task.spawn 的 outcome = "error", want "success"：正控必须真的派出来一枚
+    subagent_depth_fixture_287_test.go:221: 孩子行 = 0 枚 [], want 1：{CallID:call-197-spawn Name:task.spawn Outcome:error ErrorClass:tool Text:拒绝派生：深度上限是 1，而派生者 cd17a648-8d56-4323-a8c5-e7389c9fbf5c 自己就是一枚子代理（父 kind=root）。子代理不许再派子代理。 Spilled:false Artifact: Truncated:false Rejected:false}
+-- 还原 sha256 --  86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+RESTORED-EQUAL-OK
+-- 还原现量（271 / 276）--
+	parentID := TaskID(ctx)
+	if rec, ok := t.d.Roster.Look(parentID); ok && rec.Kind == TaskKindSubagent {
+-- git status --porcelain -- internal --
+ M internal/winsec/sealhandle_privateroute_120_other_test.go
+?? internal/tools/subagent_depth_fixture_287_test.go
+
+############ 台面读数（三枚用例，还原后）############
+targeted-green rc=0
+--- PASS: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.15s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.12s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.11s)
+ok  	github.com/CarlosShao/wisp/internal/tools	0.453s
+-- 终盘 sha256 --
+86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3 *internal/tools/subagent_197.go
+-- 终盘 git status --porcelain -- internal cmd --
+ M internal/winsec/sealhandle_privateroute_120_other_test.go
+?? internal/tools/subagent_depth_fixture_287_test.go
+DONE

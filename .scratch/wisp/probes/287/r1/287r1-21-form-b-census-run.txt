@@ -1,0 +1,46 @@
+BASELINE-SHA 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+WROTE B1-name-gate-off line_changes=1
+WROTE B2-name-gate-and-listing-off line_changes=2
+
+############ B1-name-gate-off（整包普查）############
+-- 种后 sha256 --
+ca32f92450615f6eb02b54ca0b779f9f57933563317259a9550295f1963344a6 *internal/tools/subagent_197.go
+-- 内容锚逐枚现量 --
+604:	if false && req.Name == subagentHiddenTool {
+-- go test ./internal/tools/ -count=1 -timeout 180s -v  rc=1
+-- PASS=241 FAIL=1 SKIP=0
+-- 红名册逐枚 --
+--- FAIL: Test197ChildCannotDeriveSubagent (0.00s)
+-- 287 本票三枚的颜色 --
+--- PASS: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.13s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.15s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.13s)
+-- 挂死证据（有则具名）--
+FAIL
+FAIL
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+
+############ B2-name-gate-and-listing-off（整包普查）############
+-- 种后 sha256 --
+8a3bcbc76bbbc6dac2a23781091a11d84dbdc804d7e0874a7cf316eec0ccbe81 *internal/tools/subagent_197.go
+-- 内容锚逐枚现量 --
+595:		if false && info.Name == subagentHiddenTool {
+604:	if false && req.Name == subagentHiddenTool {
+-- go test ./internal/tools/ -count=1 -timeout 180s -v  rc=1
+-- PASS=241 FAIL=1 SKIP=0
+-- 红名册逐枚 --
+--- FAIL: Test197ChildCannotDeriveSubagent (0.00s)
+-- 287 本票三枚的颜色 --
+--- PASS: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.08s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.08s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.08s)
+-- 挂死证据（有则具名）--
+FAIL
+FAIL
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+
+-- 终盘 sha256 --
+86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3 *internal/tools/subagent_197.go
+-- 终盘 git status --porcelain -- internal cmd tools --
+?? internal/tools/subagent_depth_fixture_287_test.go
+DONE
