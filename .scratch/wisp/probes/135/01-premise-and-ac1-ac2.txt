@@ -1,0 +1,44 @@
+# 135-r1 reading 01: premise re-check + AC#1/AC#2 (agent=135-r1)
+
+Anchor at start: HEAD 8f41a4df (working tree clean on cmd/wisp + internal/proc).
+Snapshots are OUTSIDE the repo: D:/work/build-tmp/wisp135r1/<tree> = `git archive HEAD` + DLLs
+copied into third_party/sherpa-onnx (not tracked in git). Env for every run:
+PATH="$REPO/third_party/sherpa-onnx" (MSYS form), GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\wisp135r1gotmp.
+
+Slice = ticket 128's own five top-level cases + their 11 subtests, -count=1 -timeout 40m:
+  -run 'TestAC2(ResolveDataDirRefusesInsteadOfFallingBackToCWD128|TestDataDirBranchStillResolves128|
+        RefusalMarkersAreNotAShortenableList128|EveryLegRefusesTheSameShapeAndWritesNothing128|
+        RealProcessRefusesOnEveryLegWithoutAppData128)'
+Four numbers = RUN / PASS / FAIL / SKIP counted from -v.
+
+## premise: does "M-F + M-C stacked => 16/16 green" still hold today? YES, verbatim
+
+| tree | RUN | PASS | FAIL | SKIP | rc | red names |
+|---|---|---|---|---|---|---|
+| base (HEAD, untouched) | 16 | 16 | 0 | 0 | 0 | none |
+| mut-mf   (M-F only)    | 16 | 12 | 4 | 0 | 1 | runTextTask + real leg run, both "wrote into the start-up directory ... wisp-dev (true), wisp-dev\logs (true)" |
+| mut-mc   (M-C only)    | 16 | 16 | 0 | 0 | 0 | none (the mute alone is invisible) |
+| mut-mfmc (M-F + M-C)   | 16 | 16 | 0 | 0 | 0 | none  <- the premise, reproduced on today's tree |
+
+M-F  = cmd/wisp/run.go, in the `if dirErr != nil` branch of runTextTask: `_ = os.MkdirAll(filepath.Join("wisp-dev","logs"), 0o755)` before `return 2`
+       (grep -n "MUTATION M-F" mut-mf/cmd/wisp/run.go => run.go:210; go build ./cmd/wisp/ rc=0).
+M-C  = cmd/wisp/dataroot_128_test.go: the start-up-directory check's one report downgraded to a no-op
+       (grep -n "AC#2 RED: %s wrote into the start-up directory" => the single line; go build rc=0).
+
+## with the fix (AC#1 + AC#2 landed in the repo tree)
+
+Slice above + the two new cases (TestAC1TheStartUpDirectoryCheckHasItsOwnTeeth128,
+TestAC2ARefusalWithATreeInTheStartUpDirectoryIsRed128): 23 RUN / 23 PASS / 0 FAIL / 0 SKIP, rc=0.
+
+| tree | RUN | PASS | FAIL | SKIP | rc | red names |
+|---|---|---|---|---|---|---|
+| repo tree (fix, no mutation) | 16 | 16 | 0 | 0 | 0 | none |
+| repo tree, -run Ac1+Ac2+slice | 23 | 23 | 0 | 0 | 0 | none |
+| mut-mc + fix   | 23 | 16 | 7 | 0 | 1 | TestAC1TheStartUpDirectoryCheckHasItsOwnTeeth128 + all 5 subtests of TestAC2ARefusalWithATreeInTheStartUpDirectoryIsRed128 |
+| mut-mfmc + fix | 23 | 16 | 7 | 0 | 1 | same 7; AC#1 line 467 ("the check said nothing about a tree that is provably there"), AC#2 line 519 ("refused correctly with a wisp-dev tree sitting in the start-up directory and the emptiness check said nothing") |
+| mut-mfmc + fix, AC#1 case NOT selected (-run AC#2A|EveryLeg only) | 12 | 6 | 6 | 0 | 1 | the emptiness red is still raised: 5 of the 6 are AC#2A subtests |
+
+Readings 3 and 4 are the pair AC#1 asks for: with the check muted the new cases go red, so the
+one tooth of "the start-up directory gains not one byte" now has two witnesses (AC#1's three-shape
+drive of the check, AC#2's planted M-F shape on the real legs), and reading 5 shows the AC#1 case is
+not the only one of the two: remove it and the ticket's remaining cases are still not all green.

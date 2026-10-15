@@ -179,3 +179,14 @@
   next＝**票 133 AC#2 就此翻勾**（C1 的字面形状我量出它**结构上产不出它自己要的读数**，处置写在票 133 面）；
   队列按 HANDOVER 走：**137 AC#3（三枚钉已备、不碰 `cmd/wisp`，可与下一枚并行）→ 137 AC#4 → 136 AC#10／AC#14 → 136 AC#11 → `#40` 全树终判据复算**。
   ⚠ 本票 AC#1…AC#7 七格**一枚未核**（终裁表 §13"没核"清单第 1 条明写），AC#7 那格它只做了存在性检查、**未**复算两拍 ⇒ 别把"AC#8 绿"读成"这张票快了"。
+
+- [2026-10-15 15:3x +08] agent=135-r1 did=**第 0 步 premise 复核（本票重发的第一件事）**：起手锚 `8f41a4df`（现 HEAD `5e25303a`＝编排者本单 send 记录，无码漂移），
+  在**仓外快照**（`D:/work/build-tmp/wisp135r1/<树>`＝`git archive HEAD`＋把未跟踪的 `third_party/sherpa-onnx` DLL 拷进去）上逐发复现，四数逐枚从 `-v` 称。
+  **premise 成立、逐字仍成立**：base（未变异）`16/16/0/0` rc=0；M-F 单发（`run.go` 拒绝分支里 `os.MkdirAll("wisp-dev/logs")`）`16/12/4/0` rc=1（红名逐字＝`wrote into the start-up directory ... wisp-dev (true), wisp-dev\logs (true)`，两叶＝进程内 runTextTask＋真进程 run）；
+  M-C 单发（把 `assertDirEmpty128` 那唯一一句 `t.Errorf` 降成哑）`16/16/0/0` rc=0（对照：它平时不是恒红）；
+  **M-F ＋ M-C 叠发 `16/16/0/0` rc=0** ⇒ 票面那句"16/16 全绿"今天仍是真读数，判据不用改形。
+  ⇒ 同时把 AC#1/AC#2 落地（同一枚牙的正反面）：① `assertDirEmpty128` 的报文口改成 `redSink128` 接口（`*testing.T` 天然满足），
+  新增 `TestAC1TheStartUpDirectoryCheckHasItsOwnTeeth128` 用 `recorder128` 三形问它——种一棵树必须响（且点名树）、空目录必须静、**喂它不存在的目录必须响**（walk 错不得被读成"空"）；
+  ② 新增 `TestAC2ARefusalWithATreeInTheStartUpDirectoryIsRed128`：把 M-F 那一形**植在 CWD 里**（不植生产），五腿逐腿跑真腿＋真拒绝句＋要求那枚检查点名 `wisp-dev`/`wisp-20260923-001.jsonl`。
+  读数：本轮 23/23/0/0 rc=0；**变异下**＝**M-C 单发 `23/16/7/0` rc=1**、**M-F+M-C 叠发 `23/16/7/0` rc=1**（红的正是新两枚），且**摘掉 AC#1 那枚用例**（`-run` 只选 AC#2A＋既有腿表）**仍 `12/6/6/0` rc=1** ⇒ 牙有两名看守，不是单点。
+  存证 `.scratch/wisp/probes/135/01-premise-and-ac1-ac2.txt`。next=AC#3（doctor 腿独立 CWD-empty 断言）

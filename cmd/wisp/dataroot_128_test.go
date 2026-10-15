@@ -378,9 +378,55 @@ func resolveDataDirConsumers128(t *testing.T) []string {
 	return out
 }
 
-// assertDirEmpty128 fails when dir holds anything at all, named or nested.
-func assertDirEmpty128(t *testing.T, dir, who string) {
+// redSink128 is the only thing the start-up-directory check may do when it finds
+// the tree non-empty: report. It is an interface instead of *testing.T because a
+// case cannot ask a *testing.T "did you fail?" without failing itself, and the
+// question ticket 135 AC#1 has to ask is exactly whether this check still fires.
+type redSink128 interface {
+	Errorf(format string, args ...any)
+	Fatalf(format string, args ...any)
+}
+
+// recorder128 is redSink128 for a case that wants to read the reds rather than
+// end on them. Fatalf stops the check that called it (each one returns right
+// after reporting), which is what testing.T's does via runtime.Goexit.
+type recorder128 struct {
+	reds   []string
+	fatals []string
+}
+
+func (r *recorder128) Errorf(format string, args ...any) {
+	r.reds = append(r.reds, fmt.Sprintf(format, args...))
+}
+
+func (r *recorder128) Fatalf(format string, args ...any) {
+	r.fatals = append(r.fatals, fmt.Sprintf(format, args...))
+}
+
+func (r *recorder128) text() string {
+	return strings.Join(append(append([]string{}, r.fatals...), r.reds...), "\n")
+}
+
+// plantTree128 creates the tree ticket 128 AC#1 measured a fallback leaving in
+// the start-up directory (relative to dir), so the shape can be planted in a
+// case instead of mutated into production.
+func plantTree128(t *testing.T, dir string, entries ...string) {
 	t.Helper()
+	for _, rel := range entries {
+		p := filepath.Join(dir, filepath.FromSlash(rel))
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatalf("planting %s: %v", p, err)
+		}
+		if err := os.WriteFile(p, []byte("planted by ticket 135\n"), 0o644); err != nil {
+			t.Fatalf("planting %s: %v", p, err)
+		}
+	}
+}
+
+// assertDirEmpty128 reports through sink when dir holds anything at all, named or
+// nested, and when the walk itself fails (a directory nobody could read is not
+// an empty one).
+func assertDirEmpty128(sink redSink128, dir, who string) {
 	var found []string
 	err := filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -396,11 +442,86 @@ func assertDirEmpty128(t *testing.T, dir, who string) {
 		return nil
 	})
 	if err != nil {
-		t.Fatalf("AC#2: walking %s after %s: %v", dir, who, err)
+		sink.Fatalf("AC#2: walking %s after %s: %v", dir, who, err)
+		return
 	}
 	if len(found) > 0 {
-		t.Errorf("AC#2 RED: %s wrote into the start-up directory instead of refusing - AC#1's搬家 result in one line: %s",
+		sink.Errorf("AC#2 RED: %s wrote into the start-up directory instead of refusing - AC#1's搬家 result in one line: %s",
 			who, strings.Join(found, ", "))
+	}
+}
+
+// TestAC1TheStartUpDirectoryCheckHasItsOwnTeeth128 is AC#1 of ticket 135
+// (R-128-4). "Not one byte in the start-up directory" was carried by this one
+// check and nothing else, and the check had no witness of its own: ticket 128's
+// acceptor muted its only line (M-C) on top of a refusal that plants a wisp-dev
+// tree (M-F) and read every case green. This case is that witness, driven
+// through a recorder so the check is asked instead of obeyed; muting the report
+// inside assertDirEmpty128 makes this the case that goes red.
+func TestAC1TheStartUpDirectoryCheckHasItsOwnTeeth128(t *testing.T) {
+	planted := t.TempDir()
+	plantTree128(t, planted, "wisp-dev/logs/wisp-20260923-001.jsonl", "wisp-dev/config.toml")
+	got := &recorder128{}
+	assertDirEmpty128(got, planted, "planted tree")
+	if len(got.reds)+len(got.fatals) == 0 {
+		t.Fatalf("AC#1 RED (the instrument, not the code): the start-up-directory check said nothing about a tree that is provably there (%s). Every \"the directory stayed empty\" reading in this file is that check's word, and this is the case that asks whether the word still means anything.", planted)
+	}
+	for _, want := range []string{"wisp-dev", "config.toml"} {
+		if !strings.Contains(got.text(), want) {
+			t.Errorf("AC#1 RED: the check reported the planted tree but never named %q, so a reader cannot tell which tree moved: %s", want, got.text())
+		}
+	}
+	// The other direction, without which "it fired here" proves nothing: a check
+	// that always fires is not a check.
+	quiet := &recorder128{}
+	assertDirEmpty128(quiet, t.TempDir(), "empty dir")
+	if len(quiet.reds)+len(quiet.fatals) > 0 {
+		t.Errorf("AC#1 RED (the instrument): an empty directory was reported as non-empty, so the check is constant-red and its agreement above proves nothing: %s", quiet.text())
+	}
+	// AC#1's own wording allows feeding it a directory that is not there. A walk
+	// error has to be reported: read as "nothing found", an unreadable start-up
+	// directory would declare every leg clean.
+	absent := &recorder128{}
+	assertDirEmpty128(absent, filepath.Join(t.TempDir(), "absent-dir"), "missing dir")
+	if len(absent.reds)+len(absent.fatals) == 0 {
+		t.Errorf("AC#1 RED (the instrument): walking a directory that does not exist produced no report at all, so a leg can be called clean by a start-up directory nobody could read")
+	}
+}
+
+// TestAC2ARefusalWithATreeInTheStartUpDirectoryIsRed128 is AC#2: ticket 128's
+// M-F shape kept as a standing case rather than as a one-off mutation. M-F left
+// the refusal sentence and the exit code intact and only grew a wisp-dev tree in
+// the start-up directory before returning; measured on this tree, M-F alone
+// reddens the run leg (16 RUN / 12 PASS / 4 FAIL) and M-F stacked with M-C reads
+// 16 RUN / 16 PASS / 0 FAIL / 0 SKIP. Planted here on every leg, the same shape
+// must be red, and red for the tree by name - an exit code alone is not it.
+func TestAC2ARefusalWithATreeInTheStartUpDirectoryIsRed128(t *testing.T) {
+	assertNoPortableOverride128(t)
+	pinEnvThatAsksTheOS128(t)
+	for _, leg := range refusalLegs128() {
+		t.Run(leg.entry, func(t *testing.T) {
+			cwd := t.TempDir()
+			t.Chdir(cwd)
+			plantTree128(t, cwd,
+				"wisp-dev/logs/wisp-20260923-001.jsonl",
+				"wisp-dev/config.toml",
+				"wisp-dev/secrets/key.dpapi")
+			rc, out := leg.drive(t)
+			if rc == 0 {
+				t.Fatalf("AC#2 RED: leg %q exited 0 with a data root sitting in the start-up directory: %s", leg.entry, out)
+			}
+			if !allMarkersPresent128(out, rescueMarkers128) {
+				t.Fatalf("AC#2 RED: leg %q no longer refuses with the readable line, so this case is measuring a shape other than M-F's:\n%s", leg.entry, out)
+			}
+			got := &recorder128{}
+			assertDirEmpty128(got, cwd, "leg "+leg.entry)
+			if len(got.reds)+len(got.fatals) == 0 {
+				t.Fatalf("AC#2 RED: leg %q refused correctly with a wisp-dev tree sitting in the start-up directory and the emptiness check said nothing. That is M-F exactly, and it is the shape that read green once this check was muted.", leg.entry)
+			}
+			if !strings.Contains(got.text(), "wisp-dev") || !strings.Contains(got.text(), "wisp-20260923-001.jsonl") {
+				t.Errorf("AC#2 RED: the check fired, but its line does not name the tree that moved, so the red reads \"something changed\" instead of \"the directory is not empty\": %s", got.text())
+			}
+		})
 	}
 }
 
