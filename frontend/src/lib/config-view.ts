@@ -52,6 +52,13 @@ export interface ConfigViewProvider {
   name: string;
   apiKeyRef: string;
   hasBaseURL: boolean;
+  /** The row's own base URL (never a secret), so two rows of one vendor can be
+      told apart on screen. "" when the row inherits the preset default. */
+  baseURL: string;
+  /** "openai-chat" | "openai-responses" | "anthropic" (the schema's three). */
+  protocol: string;
+  /** "plan" | "pay-per-token" | "" (not chosen yet). */
+  billing: string;
   modelCount: number;
   models: string[] | null;
   credentialSet: boolean;

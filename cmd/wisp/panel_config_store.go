@@ -124,6 +124,12 @@ func (s *configStore) ReadSettings(_ context.Context) (panel.SettingsView, error
 			Name:       name,
 			APIKeyRef:  p.APIKeyRef,
 			HasBaseURL: strings.TrimSpace(p.BaseURL) != "",
+			// The row's identity, read back for the page (see the field notes in
+			// panel.ProviderSettings): with two rows of one vendor on screen, the
+			// base URL and the billing word are what tell them apart.
+			BaseURL:  p.BaseURL,
+			Protocol: p.Protocol,
+			Billing:  p.Billing,
 		}
 		modelNames := make([]string, 0, len(p.Models))
 		for id := range p.Models {

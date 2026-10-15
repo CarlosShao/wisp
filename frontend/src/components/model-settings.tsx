@@ -345,8 +345,16 @@ function ProviderRow({
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 py-2.5">
         <StateDot tone={key.tone} />
         <span className="shrink-0 text-[12.5px] font-medium text-ink">{row.name}</span>
-        <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-3">
-          {row.hasBaseURL ? "已设置基址" : "默认基址"}
+        {row.billing === "plan" || row.billing === "pay-per-token" ? (
+          <span className="shrink-0 rounded-chip bg-inset px-1.5 py-0.5 text-[10.5px] text-ink-2">
+            {row.billing === "plan" ? "套餐" : "按量"}
+          </span>
+        ) : null}
+        {row.protocol !== "" ? (
+          <span className="shrink-0 font-mono text-[10.5px] text-ink-3">{row.protocol}</span>
+        ) : null}
+        <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-3" title={row.baseURL}>
+          {row.baseURL !== "" ? row.baseURL : "默认基址（预设）"}
         </span>
         <span className="shrink-0 text-[11px] text-ink-3">{key.label}</span>
         <span className="shrink-0 text-[11px] text-ink-3">
@@ -573,13 +581,29 @@ function ProviderEdit({
 
       <div className="flex flex-wrap items-center gap-2">
         <span className="w-16 shrink-0 text-[11.5px] text-ink-3">计费模式</span>
-        <Button disabled={busy !== null} onClick={() => setBilling("plan")} size="xs" variant="secondary">
+        <Button
+          disabled={busy !== null}
+          onClick={() => setBilling("plan")}
+          size="xs"
+          variant={row.billing === "plan" ? "primary" : "secondary"}
+        >
           套餐
         </Button>
-        <Button disabled={busy !== null} onClick={() => setBilling("pay-per-token")} size="xs" variant="secondary">
+        <Button
+          disabled={busy !== null}
+          onClick={() => setBilling("pay-per-token")}
+          size="xs"
+          variant={row.billing === "pay-per-token" ? "primary" : "secondary"}
+        >
           按量
         </Button>
-        <span className="text-[11px] text-ink-3">点击即保存；当前值暂未读取</span>
+        <span className="text-[11px] text-ink-3">
+          {row.billing === "plan"
+            ? "当前：套餐（点击「按量」即改）"
+            : row.billing === "pay-per-token"
+              ? "当前：按量（点击「套餐」即改）"
+              : "未设置；点击即保存（同一厂商两个计费口各记各的）"}
+        </span>
       </div>
 
       <div className="flex flex-col gap-2">

@@ -312,7 +312,7 @@ func Test313PayloadKeySetIsFrozenAndCarriesNoValueBearingKey(t *testing.T) {
 		rowKeys = append(rowKeys, k)
 	}
 	sort.Strings(rowKeys)
-	wantRow := `["apiKeyRef","credentialError","credentialSet","hasBaseURL","modelCount","models","name"]`
+	wantRow := `["apiKeyRef","baseURL","billing","credentialError","credentialSet","hasBaseURL","modelCount","models","name","protocol"]`
 	if got := `["` + strings.Join(rowKeys, `","`) + `"]`; got != wantRow {
 		t.Errorf("provider row keys = %s, want %s", got, wantRow)
 	}

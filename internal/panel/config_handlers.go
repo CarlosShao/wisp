@@ -217,6 +217,16 @@ type ProviderSettings struct {
 	// page's model picker needs the names, 248's ModelCount could only say how
 	// many there were). nil = the leg did not answer this half.
 	Models []string
+	// BaseURL / Protocol / Billing are the row's own identity, read back so the
+	// page can SHOW what a row is instead of only that it exists. They came in
+	// with the operator's second-billing-entry work: with two rows of one vendor
+	// on screen (stepfun and stepfun-api), "which one is the plan side and which
+	// base does it point at" has to be legible from the row itself, and
+	// HasBaseURL alone cannot answer it. None of the three is a secret: the URL
+	// and the protocol are config.toml text and billing is one of two words.
+	BaseURL  string
+	Protocol string
+	Billing  string
 }
 
 // CredentialState is the read side's whole vocabulary about credentials.
@@ -608,6 +618,9 @@ func renderSettingsPayload(v SettingsView) string {
 			Name:            p.Name,
 			APIKeyRef:       p.APIKeyRef,
 			HasBaseURL:      p.HasBaseURL,
+			BaseURL:         p.BaseURL,
+			Protocol:        p.Protocol,
+			Billing:         p.Billing,
 			ModelCount:      p.ModelCount,
 			Models:          p.Models,
 			CredentialSet:   p.CredentialSet,
@@ -637,6 +650,9 @@ type providerPayload struct {
 	Name            string   `json:"name"`
 	APIKeyRef       string   `json:"apiKeyRef"`
 	HasBaseURL      bool     `json:"hasBaseURL"`
+	BaseURL         string   `json:"baseURL"`
+	Protocol        string   `json:"protocol"`
+	Billing         string   `json:"billing"`
 	ModelCount      int      `json:"modelCount"`
 	Models          []string `json:"models"`
 	CredentialSet   bool     `json:"credentialSet"`
