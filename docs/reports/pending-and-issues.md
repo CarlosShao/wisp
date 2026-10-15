@@ -18198,3 +18198,4 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **派 `319-r3`**（修 D1；先存档再发）：`probes/orch/20261015/txt/319r3-dispatch.txt`＋`319r3-send.txt`（收件 `agent_16e1b047`）。修法＝给 `panelHolder` 加展示形（锁＋死线程重建＋`RequestShow`）并把 `secondLaunchActivation319` 的执行器从 `toggle` 换过去；⛔ 不改 `toggle`/`RequestToggle`；新钉 N4＝已可见态不得藏窗（headless＋winlive 两向三态＋变异自证）；面＝`cmd/wisp` 319 面（`320-r1` 已让面）。
 - **推送（未成，具名）**：本批 10 笔未推；`git push origin dev` 两试皆败（`Recv failure: Connection was reset` ／ `Failed to connect … 443`）⇒ **网络时通时断**（上一批 12:1x 与 14:0x 两发都成）⇒ 下轮再试，推前照跑长度门（本刻 `--with-self-test` **GREEN**）。
 - **编队（1）**：`319-r3`（写）。**写腿仅 1 的具名原因**：`135-r1`／`320-v` 与它同压 `cmd/wisp`（每波一枚）⇒ 排其后；`120-r1` 仍等机器安静。
+  - **推送补记（15:2x）**：重试环第 **6** 试成功——`1de62995..0d1a0d3e dev -> dev`（**11 笔**上远端）⇒ `origin/dev = 0d1a0d3e`、**未推 0**；新 CI run **`38690995413`**（sha `0d1a0d3e`）在跑。⚠ 网络判据更新：`github.com:443` **时通时断**（本批 5 试连败、第 6 试成；上两批也各需 1–2 试）⇒ **推送一律用重试环**（90s 超时×≤6、间隔 20s），⛔ 一次失败不算"不能推"。
