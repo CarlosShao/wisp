@@ -1,0 +1,4 @@
+-				if readsFieldAccess(trimmed, field) {
+-func readsFieldAccess(line, field string) bool {
+-		if next := line[i+len(dotted)]; next >= 'A' && next <= 'Z' {
+-			return true

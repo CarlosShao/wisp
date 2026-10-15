@@ -1,0 +1,10 @@
+time=2026-10-15T23:24:54.713+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255SplitOnlyClaimsSectionsWithALiveReader
+--- PASS: TestTicket255SplitOnlyClaimsSectionsWithALiveReader (0.00s)
+=== RUN   TestTicket255HotRowRosterCoversTheRegistry
+--- PASS: TestTicket255HotRowRosterCoversTheRegistry (0.00s)
+=== RUN   TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim
+    config_receipt_255_test.go:220: row "panel": recorded reading cmd/wisp/panel_resident_windows.go:207 drifted, the token "cfg.Panel.Width" now uniquely sits at line 208
+    config_receipt_255_test.go:220: row "panel": recorded reading cmd/wisp/panel_host_windows.go:262 drifted, the token "Width:  uint(width)" now uniquely sits at line 269
+--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+PASS

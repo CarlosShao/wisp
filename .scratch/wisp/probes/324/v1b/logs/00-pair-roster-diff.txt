@@ -1,0 +1,140 @@
+票 324 验收腿 324-v1b — 读数件 00：改前/改后成对树＋红名册作差（A996 欠的必答）
+腿＝324-v1b（非实现者·只读产码）｜时刻＝2026-10-15 23:2x +08（`date` 现读）
+起手锚（本腿第一条命令现读）＝HEAD `136606724efc4178ad9b8ac5470589c7a27c038f`，分支 `dev`
+（⚠ 派单写的「当前 HEAD＝988ce413」在放腿后已被我自己的编排者推进两笔：`136606724`＝台账 A999，
+ 2 枚文件＝`.scratch/wisp/probes/orch/20261015/txt/A999-entry.md`＋`docs/reports/pending-and-issues.md`，
+ ⛔ 碰任何被扫描目录 ⇒ 本腿的成对读数⛔ 受它影响；`dce9eb90`＝存档并放腿。）
+裁决锚三枚实现笔逐枚 `git log -1` 现跑命中：`9c5916e8b`／`e038304b3`／`604814414`；
+`git rev-parse 9c5916e8^`＝`aa1427f6368458ca6d278b547701066da17220c4`＝改前那发。
+
+────────────────────────────────────────────────────────────────
+0. 台面（三把尺的口径，先写死再引数）
+- 三棵**仓外**导出树＝`git archive <rev> | tar -x -C <仓外目录>`（⛔ 共享工作树当改前那发）：
+  pre＝`aa1427f63` → `/d/tmp/324v1b/pre`（1073 枚 `.go`，`find … | wc -l` 先证非空）
+  post＝`9c5916e8b` → `/d/tmp/324v1b/post`（1073 枚 `.go`）
+  head＝`136606724` → `/d/tmp/324v1b/head`（1087 枚 `.go`）
+  pre↔post 的差集尺＝`git diff --name-only aa1427f63 9c5916e8b -- cmd internal tools scripts`
+  ＝**只有 2 枚**：`cmd/wisp/config_receipt_255_test.go`（尺）＋`cmd/wisp/config_readers_255.go`（名册）
+  ⇒ 两棵树里**被扫描的产码语料逐字节相同**（名册件被 `rosterScanSkipFiles` 跳过、`_test.go` 被跳过），
+    所以红名册的差**只能**来自这两枚，这是作差成立的前提。
+- 台件＝`go test -c`（cwd＝各树的 `cmd/wisp`，`GOTMPDIR=D:/tmp/324v1b/gotmp` 先 `mkdir -p`）
+  编出 `bin/pre.test.exe`／`bin/post.test.exe`／`bin/head.test.exe`，
+  三枚 `third_party/sherpa-onnx/*.dll`（onnxruntime／sherpa-onnx-c-api／sherpa-onnx-cxx-api）
+  `cp` 到 exe 同目录、运行 cwd＝`<tree>/cmd/wisp` ⇒ 零枚 `0xc0000135`、`RUN`⛔ 为 0。
+- 跑法＝**定向 `-test.run`**（⛔ 整包＝票 314 死亡区）；尺的射程＝那枚用例自己走的
+  `scanReadFiles`（`cmd internal tools scripts` 四目录、排 `_test.go`／`internal/config/`／名册件／`testdata`／`//`、`*` 开头行）。
+- 两把 PASS 尺并列时都带尺名：`^--- PASS`（只数顶层）与含子测试那把（本票这枚用例**无子测试**，两把同数＝3，仍具名尺名）。
+
+────────────────────────────────────────────────────────────────
+1. AC#0 现量复跑（四枚⛔ 抄票面号，本腿自己在 HEAD 工作树量的）
+
+尺＝`grep -n`（锚行首、工作树＝HEAD，`cmd/wisp` 写面现量 0 行改动）
+A. 判定入口与射程：`config_receipt_255_test.go:333 func scanReadFiles`／`:337` 四目录那行／
+   `:421 func readsFieldAccess(line, field string, sectionMembers map[string]bool) bool`／
+   `:452 func identName`／`:465 func configSectionMembers`／`:267` 那道 `len(fields) < 14` 门／
+   `:67 var rosterScanSkipFiles`；`config_readers_255.go:218 var sectionReadSites`／`:374 func configSectionsForScan`。
+   ⇒ 票面 §现量 1（文本级判定、走四目录）在改前那发同样成立（改前号＝票面 `:306`／`:366`）。
+B. ★同名假命中那枚站点：`internal/panel/composer_dispatch.go:140 type ComposerDispatch struct`、
+   `:157 Models ModelsListRequestHandler`、`:231 if d == nil || d.Models == nil {`、
+   `:234 return d.Models.HandleModelsListRequest(ctx, req)`。
+   ⇒ **票面写的 `:231` 不命中这把尺**（`.Models` 后面是空格，`dotted = ".Models."` 要有点）；
+     命中的是 `:234`。文件／字段名／定性（非配置类型 `*ComposerDispatch` 的派发字段）三样都对，
+     只有行号差 3 ⇒ 本腿**复认实现者的具名更正成立**（票面自己声明"行号会腐烂"，AC#0 要求现跑）；
+     ⛔ 改票面文本（改契约须人工批准，本腿没改一字）。
+C. ★真读者缺一行：`cmd/wisp/panel_models_320.go:73 func (h *modelsListHandler320) HandleModelsListRequest(...)`、
+   `:81 cfg := h.mgr.Config()`、`:85 p, ok := cfg.LLM.Providers[provider]` ⇒ 与票面 `:85` 逐字一致。
+D. 名册两行＋射程实证：`config_readers_255.go:248 "Models": {"cmd/wisp/models.go"}`、
+   `:259 "LLM": {… panel_models_320.go …}`（5 枚，含本次补的那枚）；
+   下面第 3 节 post 树读数打印出 **14 行 `SECTION i/14`**＝射程 14 枚的仪器自陈。
+E. schema 成员名册（本腿自己读 `internal/config/schema.go`，⛔ 抄实现者的计数）：
+   `:589 type ModelsSection struct` 导出字段＝`Dir`／`Mirror`／`VerifySignature`／`LocalOverride`（**4 枚**）
+   ⇒ `HandleModelsListRequest` ⛔ 在里面；
+   `:406 type LLMSection struct` 导出字段＝`TextChain`／`Roles`／`TimeoutMS`／`Retry`／`Providers`（**5 枚**）。
+
+────────────────────────────────────────────────────────────────
+2. 改前那发的红名册（pre 树，逐字；原始打印＝本目录 `pre-255-ruler.log`）
+
+命令＝`/d/tmp/324v1b/bin/pre.test.exe -test.run 'TestTicket255RosterStillMatchesTheActualReadSites' -test.v`
+（cwd＝`/d/tmp/324v1b/pre/cmd/wisp`）⇒ **rc=1**、`--- FAIL`（顶层用例 1 枚）、`t.Errorf` 2 行、
+`SECTION` 行数＝**0**（改前那发没有逐枚日志⇒这本身就是"日志是新增"的读数）
+
+    config_receipt_255_test.go:271: section "llm" (field LLM) is read by [cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] in production, the roster names [cmd/wisp/panel_config_store.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    config_receipt_255_test.go:271: section "models" (field Models) is read by [cmd/wisp/models.go internal/panel/composer_dispatch.go] in production, the roster names [cmd/wisp/models.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    --- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.64s)
+
+⇒ 票面「现象」那两句与红句**逐字同形**（只差报错行号 `:271`，改前那发的行位），
+   两笔性质各自独立：**llm＝名册缺真读者（scan 有 5 枚、roster 只 4 枚）**／
+   **models＝尺多算同名非配置字段（scan 多 `internal/panel/composer_dispatch.go`）**。
+   ⛔ 没被合成一笔：补的那行只动 roster、挡那枚只动尺。
+
+3 枚邻居用例（同一次定向跑，⛔ 窗口／stdout 族）pre 与 post **逐枚同色**
+（原始打印＝`pre-other255.log`／`post-other255.log`）：
+`TestTicket255SplitOnlyClaimsSectionsWithALiveReader` PASS／`TestTicket255HotRowRosterCoversTheRegistry` PASS／
+`TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim` PASS（pre 0.00s／post 0.00s、0.01s；两把尺都 rc=0、`^--- PASS`＝3）。
+⇒ 读码复认：那 3 枚⛔ 经过 `scanReadFiles`／`readsFieldAccess`（只查 `hotRowClaims` 的句首、cite token 唯一命中与
+   `citedRowsFloor`），所以改尺⛔ 可能改它们的色——实测同色＝第二重保险。
+
+────────────────────────────────────────────────────────────────
+3. 改后那发／HEAD 那发的绿名册（post 与 head 树；原始打印＝`post-ruler.log`／`head-ruler.log`）
+
+命令同上、`-test.run 'TestTicket255RosterStillMatchesTheActualReadSites|TestTicket324'`
+post＝**rc=0**，`^--- PASS`（只数顶层）＝**3 枚**（255 名册尺＋324 两枚控制件），`^--- FAIL`＝0，
+`SECTION` 行数＝**14**、逐枚 `match=true`；head＝同色同数（14/14、顶层 3 枚 PASS、rc=0）。
+逐枚（roster／scan 现量，两棵树逐枚同名）：
+  1 agent [run.go]＝[run.go]｜2 app []＝[]｜3 audio [resident_audio_windows.go]＝同｜4 ball []｜5 cost []｜
+  6 hotkey [resident_windows.go, cmd/balldebug/main.go]＝同（打印序差＝`sort.Strings` 对 scan 生效、roster 是声明序，⛔ 判据，`slicesEqualSorted` 两边都排）｜
+  7 llm 5 枚含 `cmd/wisp/panel_models_320.go`＝同｜8 memory []｜9 models [cmd/wisp/models.go]＝同｜10 observe []｜
+  11 panel [panel_resident_windows.go]＝同｜12 privacy []｜13 session []｜
+  14 voice [panel_config_store.go, resident_audio_windows.go, internal/panel/config_handlers.go]＝同
+
+────────────────────────────────────────────────────────────────
+4. ★红名册作差（含文案；尺＝上面 pre/post/head 三发打印；集合差，⛔ 剥耗时后作差）
+
+- 红**用例**名册（顶层）：pre＝{`TestTicket255RosterStillMatchesTheActualReadSites`} ⇒ post／head＝{}。
+  差＝**减 1 枚**，那 1 枚＝票面点名的存量红，归位见下。**新增红用例＝0 枚。**
+- 红**段**名册（`t.Errorf` 逐枚）：pre＝{`llm`（roster-vs-scan 差 1 枚文件）, `models`（scan-vs-roster 差 1 枚文件）}
+  ⇒ post／head＝{}。**新增红段＝0 枚**；两枚已知红的去处＝**具名已修**：
+  `llm`→名册 `:259` 补 `cmd/wisp/panel_models_320.go`（第 2 节 pre 红句里 scan 那一侧本来就点名它）；
+  `models`→判定升乙′把 `internal/panel/composer_dispatch.go` 挡在 `[models]` 之外（⛔ 写进名册、⛔ 加 `rosterScanSkipFiles`＝丙形禁区，第 5 节读数证明一枚没加）。
+- scan 结果（`got`）逐段差＝**只 1 枚文件退出**（`internal/panel/composer_dispatch.go` 退出 `[models]`）；
+  roster 结果（`want`）逐段差＝**只 1 枚文件进入**（`cmd/wisp/panel_models_320.go` 进入 `[llm]`）。
+  ⚠ 这一行是**从红句作差**得来的（pre 只打印 2 枚红段的 got，12 枚绿段 got≡want）；
+    逐段 got 全名册的直接读数＝读数件 01 的**去判定突变**那一发（旧形判定在 HEAD 语料上把 14 段 got 全打出来）。
+- 文案差（pre→post 同一枚用例的红句结构）：post 的 `t.Errorf` 文本⛔ 改一字（`:295` 那句与 pre `:271` 那句逐字相同，
+  只是行位下移＝票 255 AC#6"行号只当读数"）；新增的两类文案＝地板句
+  `section field %q resolves to %d schema member names, want at least 2 …`（`:277`，本腿⛔ 触发＝0 行）与
+  `TestTicket324SectionMembersAreReadOffTheSchema`／`TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite` 的红句
+  （绿态不打印）。**⛔ 没有任何一枚 pre 存在的判据文案在 post 消失**——逐枚对拉尺＝
+  `git diff aa1427f63 9c5916e8b -- cmd/wisp/config_receipt_255_test.go` 里 `^-` 行**只有 4 枚**（原始打印已落
+  `/d/tmp/324v1b/ruler-diff.txt`，本腿另存 `ruler-diff-minus-lines.txt`）：
+    -`				if readsFieldAccess(trimmed, field) {`（→换成三参调用，同位置）
+    -`func readsFieldAccess(line, field string) bool {`（→签名加 `sectionMembers`）
+    -`		if next := line[i+len(dotted)]; next >= 'A' && next <= 'Z' {`（→同一支改成"首字母大写 **且** 是段成员"两道门）
+    -`			return true`（→挪到两道门之后）
+  ⇒ 被删的 4 行**全部**属于同一支（`.`Field`.` 那一支），且新形在那一支上是**严格子集**
+    （旧形真⇒新形未必真；新形真⇒旧形必真——首字母大写仍是前置门，多一道成员名册门）；
+    `Config().Field`／`Config.Field` 那一支在 diff 里**零字节改动**（我数过：`^-` 行⛔ 含 `Config().`）。
+
+────────────────────────────────────────────────────────────────
+5. ★必答（A996）：324-r1 在 255 尺里加严的两处是不是「只加不减」
+
+**成员数地板**＝`config_receipt_255_test.go:275-279`（在 `if len(fields) < 14 { t.Fatalf }` 之后、逐段循环之前）：
+`for _, field := range fields { if n := len(configSectionMembers(t, field)); n < 2 { t.Errorf(…) } }`
+- 判据形状：一枚**新的** `t.Errorf`，条件是"段成员数 < 2"。它⛔ 与任何既有判定共享变量、⛔ 不改 `got`／`want`、
+  ⛔ 早退（用的是 `t.Errorf` 不是 `t.Fatalf`）⇒ 只会**多**红，结构上不可能把一枚红改成不红。
+- 反证它"不是装饰"＝读数件 01 的**突变乙**（把 `configSectionMembers` 摘成恒空）⇒ 地板 14 枚逐枚点名红。
+  ⚠ 本腿在 HEAD 树量到地板触发次数＝**0**（post／head 两发都 rc=0）＝今天的 schema 满足它，⛔ 等于它没牙。
+- 豁免面：地板对 14 枚段**一视同仁**（射程＝`configSectionsForScan()` 的全部），⛔ 按段名点名放行；
+  ⛔ 扩大豁免＝`rosterScanSkipFiles` 在 diff 里零改动（读数件 02 的 AC#4 面核）。
+
+**逐枚日志**＝`:283` `sectionLogged := 0`／`:286` `sectionLogged++`／`:293` `t.Logf("SECTION %d/%d …")`：
+- 判据形状：`t.Logf` ⛔ 计入 `testing` 的失败判定（Go 仪器事实：只有 `Error*/Fatal*` 会置失败位）；
+  `match=%v` 那格调的是与 `:294` 判据**同一个** `slicesEqualSorted(got, want)`＝同形复算，⛔ 新口径。
+- 唯一的副作用是**顺序**：`sectionLogged++` 在 `want, ok := sectionReadSites[field]` 之前，
+  于是"某段无 site 条目"那一支（`:289` 的 `t.Errorf`＋`continue`）会让计数**比总段数少 1 枚**的假象？
+  ⛔ 不会：`continue` 之前已经 `++`，所以打印出的 `i/14` 与真实索引一致（本腿实测两发都是 1/14…14/14 满 14 行）。
+- 结论：两处都**只加不减**（本腿的凭据＝§4 的 4 行 `^-` 全名册＋两棵树 14 段逐枚对拉＋3 枚邻居用例同色＋
+  地板／日志的形状读码）。**它没有把任何一枚判据从"会红"改成"不红"、⛔ 放宽断言、⛔ 扩大豁免。**
+  唯一的**语义变更**是 `readsFieldAccess` 那一支收紧＝一次**有意的、被编排者裁过的**（A996 裁乙′）
+  判定收窄，效果＝`got` 少 1 枚文件；它会把"该被算成读者的同名镜像段字段"也算漏（残余，见读数件 02 的探针实测），
+  ⇒ 那一维⛔ 属"顺手加严的两处"，本腿单列。
