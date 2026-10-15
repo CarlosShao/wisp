@@ -26,7 +26,7 @@
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LoaderCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ai-native/button";
 import { ConfigReadGate } from "@/components/config-read-state";
@@ -210,6 +210,7 @@ function ProvidersCard({
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
 }) {
   const rows = view.providers;
+  const [autoFetch, setAutoFetch] = useState<string | null>(null);
   const availablePresets =
     view.presetsKnown && view.presets !== null
       ? view.presets.filter((name) => !rows.some((p) => p.name === name))
@@ -223,9 +224,11 @@ function ProvidersCard({
         <div className="flex flex-col">
           {rows.map((row) => (
             <ProviderRow
+              autoFetch={autoFetch === row.name}
               busy={busy}
               editing={editing === row.name}
               key={row.name}
+              onAutoFetchHandled={() => setAutoFetch(null)}
               onEditing={() => onEditing(editing === row.name ? null : row.name)}
               onFeedback={onFeedback}
               performCredential={performCredential}
@@ -246,7 +249,16 @@ function ProvidersCard({
               performWrite={performWrite}
               presets={view.presets}
               run={run}
-              onDone={() => setAddOpen(false)}
+              onDone={(name) => {
+                // ADD, THEN FETCH. A brand-new row has nothing to pick from, and
+                // making the operator open the row and press 拉取 themselves is
+                // the two-step shape this form exists to remove: the fetch runs
+                // for the row that was just created and its result lands in that
+                // row's panel.
+                setAddOpen(false);
+                onEditing(name);
+                setAutoFetch(name);
+              }}
             />
           ) : (
             <div className="pt-3">
@@ -277,6 +289,8 @@ function ProviderRow({
   row,
   busy,
   editing,
+  autoFetch,
+  onAutoFetchHandled,
   onEditing,
   onFeedback,
   performWrite,
@@ -287,6 +301,8 @@ function ProviderRow({
   row: ConfigViewProvider;
   busy: string | null;
   editing: boolean;
+  autoFetch: boolean;
+  onAutoFetchHandled: () => void;
   onEditing: () => void;
   onFeedback: (next: Feedback | null) => void;
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
@@ -308,6 +324,21 @@ function ProviderRow({
       setFetch(result.ok ? { phase: "ready", models: result.models } : { phase: "error", feedback: result.feedback });
     });
   }
+
+  // AUTO-FETCH AFTER ADD: the form hands a freshly created row's name up, and
+  // this row is the one that then asks the host for its catalog - so "add a
+  // provider, then fetch its models" is one flow, not two. The ref keeps the
+  // effect to a single firing per handed-over name (the row re-renders as the
+  // fetch progresses).
+  const startFetchRef = useRef(startFetch);
+  startFetchRef.current = startFetch;
+  const autoFired = useRef(false);
+  useEffect(() => {
+    if (!autoFetch || autoFired.current) return;
+    autoFired.current = true;
+    onAutoFetchHandled();
+    startFetchRef.current();
+  }, [autoFetch, onAutoFetchHandled]);
 
   return (
     <div className="border-b border-line last:border-b-0">
@@ -691,7 +722,7 @@ function AddProviderForm({
   presets: string[] | null;
   busy: string | null;
   onCancel: () => void;
-  onDone: () => void;
+  onDone: (name: string) => void;
   onFeedback: (next: Feedback | null) => void;
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
   performCredential: (provider: string, value: string) => Promise<Feedback>;
@@ -800,7 +831,7 @@ function AddProviderForm({
         : { tone: "error" as const, text: `供应商已添加，但密钥没有保存：${keyed.text}` };
     }).then((fb) => {
       onFeedback(fb);
-      if (fb.tone === "ok") onDone();
+      if (fb.tone === "ok") onDone(name);
     });
   }
 
@@ -955,7 +986,7 @@ function AddProviderForm({
           placeholder="选填"
           value={model}
         />
-        <span className="text-[11px] text-ink-3">现在填上，之后就能直接选</span>
+        <span className="text-[11px] text-ink-3">选填；添加后会自动拉一次这行的模型清单</span>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <span className={rowLabel}>密钥</span>
