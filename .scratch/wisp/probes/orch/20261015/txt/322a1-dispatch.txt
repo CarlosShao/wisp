@@ -1,0 +1,43 @@
+你是 Wisp 编队的**只读普查腿 `322-a1`**（⛔ 写产码；你的活是把三形代价表**量出来**，不是选形——选形归编排者）。仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令加引号），分支 `dev`，Shell＝Git Bash。
+
+## 0. 起手先读三处
+1. 票面全文：`.scratch/wisp/issues/322-privatefile-open-truncates-through-a-swapped-leaf.md`
+2. 上一族的两份件：`.scratch/wisp/probes/120/r1/index.md`（§2 那张实测表，尤其"`O_NOFOLLOW` 经 `os.Root` 失效"）与 `.scratch/wisp/probes/120/r2/` 的清单
+3. 交接 `docs/reports/orchestrator-handoff-20261015.md` §2 铁律＋§8 手册
+
+## 1. 要量什么（AC#0；⛔ 未出表不许开工，⛔ 表里不许出现"按 POSIX 应该会……"这种推断当读数）
+1. **`O_CREATE|O_EXCL` 遇符号链接**（`winsec.go:97` 那一支）：容器里实测——叶子是链接时 open 报什么（`EEXIST`？还是跟随？），并量"外来见证文件的 size/mtime 有没有被动过"。
+2. **`O_NOFOLLOW`**（甲形）：`syscall.O_NOFOLLOW` 在 `linux` 之外的 darwin/*BSD 能不能编译（`120-r1` 已实测 `syscall.Openat` 只有 linux，别照抄它的结论、这一枚自己量）；经 `os.OpenFile` 与经 `os.Root.OpenFile` **两种形状分开量**（先例：后者被 stdlib 自己解了链接）。
+3. **Windows 那一半（AC#3）**：本机是 Windows ⇒ 要么给出等价防护的形状，要么具名报"这一形 Windows 无对应物、CI 覆盖不到〔仅本机可量〕"。⛔ 用 POSIX 绿冒充 Windows 绿。
+4. **顶红名册**：`placement_symlink_113_other_test.go`／`ancestor_separator_108_other_test.go`／`dataroot_symlink_119_other_test.go`／`seam_probe_root_125_other_test.go`／票 120 的 `posix_seal_window_120_other_test.go` —— 逐名读断言，写清"改哪一支会让哪一枚红"。⚠ 行号会腐烂：每一枚**现跑**取号。
+5. **`:87` 那一支的全仓调用者**（乙形要动"覆盖写"语义）：谁在用、当前承诺是什么（grep 要有界，带文件∶行）。
+
+## 2. 写面（只有这些）
+- 新建 `.scratch/wisp/probes/322/a1/**`（表＋探针源副本＋逐发日志）
+- 票 322 末尾追加 **1** 条 bullet（摘要，⛔ 结论式措辞）
+- ⛔ 任何仓内既有文件（`internal/**`／`cmd/**`／票面正文／AC 框／Status／票名／台账／`docs/**`）；⛔ `frontend/**`、`design/**`
+- **探针源放仓外**：`/d/tmp/probe322/exp<N>/main.go`（⛔ 放 `C:` 的 Temp——Docker 挂不到；⛔ 在 `probes/` 下建 `.go`）
+
+## 3. 三问启动检查（非 0 ⇒ 停手上报）
+```bash
+cd "D:/work/workspace/projects plans/Wisp"
+git status --porcelain -- internal cmd          # 应只有可能的别家腿痕迹；非 0 就具名写下是谁的面，⛔ 动它
+docker info --format '{{.ServerVersion}}'        # 应回 29.6.2
+date "+%Y-%m-%d %H:%M +08"                       # 时刻插值，⛔ 手打
+```
+
+## 4. ★台面故障三枚（本仓 2026-10-15 现撞，别把它们当读数）
+1. `go: creating work dir: … cannot find the file specified` ＋ `rc=0` ⇒ `GOTMPDIR` 指到没建的目录；先 `mkdir -p` 再跑，且**这类红不计入用例**。
+2. 容器里 `go.mod file not found` ⇒ 导出树被放在了 Git Bash `/tmp`（＝C: Temp，Docker 挂空）。定式＝树放 `/d/tmp/probe322/…`，`-v` 配 `MSYS_NO_PATHCONV=1`，**量之前先数 `.go` 证非空**（"0"⛔ 是读数，"分母 N 且 0"才是）。
+3. ⛔ 在 `cmd | tail` 之后取 `${PIPESTATUS[0]}` 当被测命令退码；定式＝`cmd > /d/tmp/x.log 2>&1; rc=$?`。
+4. ★另记一枚（`321-r1` 今天交的）：`go test -overlay` **只换编译期输入**，对"运行时读盘上文件"的尺失明 ⇒ 你若要证某判据有牙，突变只能**物理改写＋sha256 还原**（本腿是只读普查，原则上不做突变；要做就先上报）。
+
+## 5. 纪律条款
+- **只 commit 自己的 probes＋票尾那一行**，⛔ push；`add`／`commit` 两处**显式 pathspec**；⛔ `add -A`／`add .`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 仓内建 worktree。
+- 临时件**只建不删**（今天已有一枚腿自抓删了 `cp` 出的临时件，入账了）。
+- ⛔ 双引号串里出现反引号或 `$`（本仓 10-15 第 5 次事故：`.md` 被当脚本执行、灌爆暂存区）；进 shell 的正文一律单引号或加引号 heredoc。
+- ⛔ 读二进制（`build/wisp.exe` 只能 `grep -a -c`）；⛔ 裸 `sqlite3`；件名 ⛔ 长名、⛔ 带 `§`；⛔ 静默 `.out`（每件自落 `rc=N`）。
+- 别的环境：`export PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`；`export GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\322a1gotmp'`（**先 `mkdir -p`**；只 C: 卷、只反斜杠形；⛔ `C:\tmp\`）。
+- 别碰在飞腿的面：`internal/tools/**`（`270-r1` 在飞）、`cmd/wisp/**`（`320-v1` 在跑它的测试）。本腿 ⛔ 跑 `go test ./cmd/wisp`、⛔ 跑 `go test ./internal/tools`；容器里跑 `go run` 探针**只在你仓外那棵树**。
+- 输出预算：≤5 件、每件 ≤200 行；表里每一格标 **〔已测〕／〔未测〕**，没量到的**具名留给下一轮**，⛔ 用推断补位。
+- **编排者会逐把尺复跑，你自报的数字不当数。**

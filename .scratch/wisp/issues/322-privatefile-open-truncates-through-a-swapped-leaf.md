@@ -1,0 +1,44 @@
+# 322 — `privateFile` 的 **open 本身**在窗口里跟随被换成的叶子链接 ⇒ 外来文件被 `O_TRUNC` 截断（票 120 交回来的那一支，`A990` 裁①独立立票）
+
+- **Status**：已立，**未派落地腿**（先派只读普查 `322-a1` 出三形代价表；`120-r2` 的 fd 闸门已落，本票只管"字节写出之前那次 open"）
+- **Type**：安全必修邻接（`D33` 那一族的"路径/链接竞态"）；⛔ 不改契约（`C26` 的入口语义不动）
+- **来源**：`120-r1` 的 §4 第二条（交回编排者裁）＋`120-r2` 落地的产码注释 `internal/winsec/winsec_other.go:82` 逐字写着 "That shape is booked separately as ticket 322 and is unfixed at this anchor."；编排者裁定＝`A990` 裁①。
+
+## 为什么立案（读数不是感觉）
+
+- 票 120 关掉的是"**私密字节落到外来对象**"那一跳（`sealHandle`/`applyDescriptorPOSIX` 改到钉住的 fd＋同一对象复验）。
+- 但 `privateFile` 的 `os.OpenFile(..., os.O_WRONLY|os.O_CREATE|**os.O_TRUNC**, ...)` 发生在**底线检查之后**：叶子在窗口里被换成链接时，**open 自己就跟随它并把那个对象截断**。fd 闸门此时拦得住字节、拦不住已经发生的截断。`120-r1` 的 §2 与 `120-r2` 的反控读数都点到这一支未覆盖。
+
+## 现量（⚠ 引用前先重跑；下列为编排者 2026-10-15 20:5x 自己跑）
+
+1. `internal/winsec/winsec.go:108` = `func privateFile(path string, data []byte, flags int, perm fs.FileMode) error`；`:113` = `f, err := os.OpenFile(resolved, flags, perm)`。
+2. 两枚调用者（同文件）：`:87` = `os.O_WRONLY|os.O_CREATE|os.O_TRUNC`（**这一支是敞着的**）；`:97` = `os.O_WRONLY|os.O_CREATE|os.O_EXCL`。
+3. ★`O_EXCL` 那一支今天到底关没关，**本票不假设**——POSIX 对 `O_CREAT|O_EXCL` 遇符号链接的规定（EEXIST、不跟随）要用台件实测，不靠常识（先例：`120-r1` §2 实测 `O_NOFOLLOW` 经 `os.Root` **失效**，与直觉相反）。
+4. 平台射程：`syscall.O_NOFOLLOW` 是否可在本仓 portable 地取到、Windows 侧 Go 对 reparse point 的 open 行为如何 —— 全部待量。
+
+## 要建什么（⛔ 形不在票面写死，落地前先普查；三形都要量）
+
+- **甲**：POSIX 侧给那次 open 加 `O_NOFOLLOW`（按平台拆常量：`winsec_other.go` 里定义、`winsec.go` 用平台名），Windows 侧该 flag 为 0 ⇒ **必须具名回答"Windows 这形等于没修还是另有等价物"**。
+- **乙**：把 `:87` 那一支的形状改成"不与链接竞争"（例：`O_CREATE|O_EXCL`＋失败后走"已存在则按 fd 复核再截断"的第二跳）；代价＝既有"覆盖写"语义要不要变，逐个调用者点名。
+- **丙**：不动 open，只在**截断已发生后**检测并报错（`f.Stat()` vs `os.Lstat(name)` 同一对象复验）。⇒ 这是**诚实报告**形，不是**防住**形；若选它，票面与注释一律不许写成"窗口已关"。
+
+判据要覆盖的形状：**叶子在检查与 open 之间被换成链接时，树外那个真文件的内容不许被清空**（读数＝外来见证文件在调用前后 size/mtime 逐字节不变）。
+
+## 判据（AC 框由编排者翻，产码腿一枚都不许碰）
+
+- [ ] **AC#0 三形代价表**：甲／乙／丙各自的改动面（文件∶行）、POSIX 实测读数（`O_EXCL` 遇链接是否 EEXIST、`O_NOFOLLOW` 经不经 `os.Root` 生效、Windows 上这两个 flag 的实际行为）、会顶红谁现有的钉（逐名读断言：`placement_symlink_113_other_test.go`／`ancestor_separator_108_other_test.go`／`dataroot_symlink_119_other_test.go`／`seam_probe_root_125_other_test.go`／票 120 的 `posix_seal_window_120_other_test.go`）。⛔ 未出表之前任何一形都不许开工。
+- [ ] **AC#1 截断窗口关死**：容器台件里成对读数——修前"外来见证文件被截断"分子 > 0，修后 **0 且 liveness 非零**（⛔ 拿"0 命中"当凭据，除非同一发证明窗口真到达过链接态）。
+- [ ] **AC#2 覆盖写语义不破**：`:87` 那一支的既有承诺（"写私密内容并允许覆盖"）在选形下仍然成立或被**具名改成拒绝**；两种都要点名现有调用者（全仓 grep 谁在用它）。
+- [ ] **AC#3 Windows 那一半单独答**：本仓目标平台＝Windows（`D7`）。要么给出 Windows 侧等价防护并量到，要么把这一格降成〔**仅本机可量**〕并登记"CI/容器读数覆盖不到它"——⛔ 用 POSIX 绿冒充 Windows 绿。
+- [ ] **AC#4 门禁＋消费者不推红**：容器 `-count=2 -v` 四数、`-run` 名册逐枚点名、gofmt/gofumpt/go vet（含 `GOOS=darwin go vet`）、`sh scripts/d22scan.sh`、长度门；**并**量 `internal/risk`／`cmd/wisp` 这些消费者在 Linux 档会不会因本票再收紧变色（`120-r2` 已把这一维具名留给本票）。
+- [ ] **AC#5 注释说实话**：`winsec_other.go:82` 那句"booked separately as ticket 322 and is unfixed"要随本票终态更新；⛔ 许诺未实现的能力。
+
+## 禁区
+
+`docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`.github/**`／`frontend/**`／`design/**`；冻结三件不动；⛔ 为变绿放宽票 113/120 的既有钉；⛔ 顺手把票 120 的"r 权限类"口径再改（那是 `A990` 裁②，已定）。
+
+**撤销口令**：「撤 322」（⇒ `privateFile` 那一支退回 `120-r2` 终态，本票整张退回未派）。
+
+## Progress log (append-only, newest last)
+
+- [2026-10-15 20:5x +08] 编排者立票：来源＝`120-r1` §4 第二条＋`A990` 裁①（"并进 120 但不塞进 `120-r2`，另立一票"，理由＝跨平台面不同、一枚腿不许同时改两枚平台面）。现量四项已跑（见上，行号为真）；⛔ 未派落地腿，先要 AC#0 三形代价表。

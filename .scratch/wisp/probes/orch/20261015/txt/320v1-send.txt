@@ -1,0 +1,2 @@
+[2026-10-15 20:2x +08] 320-v1 发送补记（后台）：★与 dispatch §3 的偏离——发送时 321-r1 已交件并 commit ⇒ cmd/wisp 面空，故解除"⛔ go test ./cmd/wisp"，改为**允许且必须**定向跑 -run Test320（⛔ 整包，314 死区）。
+同批发出的一枚已知存量红：TestTicket255RosterStillMatchesTheActualReadSites 今天红（320 取件端口引入，归票 255），已命它具名记色、⛔ 算进本票判语、⛔ 去修。
