@@ -1,0 +1,123 @@
+319-r3 evidence index. Leg 319-r3 (D1 fix: a second launch must not hide an
+already-visible panel; it must keep it shown - and the raise half, see "STOPPED
+ITEM" below). Anchor at start: 9413aed3. All files below are captured `go test`
+output, verbatim except that ticket 299's MARK299 window-procedure trace lines
+are left in (they are another leg's tracing, harmless here). The tree files this
+leg touched: cmd/wisp/resident_windows.go (the fix + its comments),
+cmd/wisp/panel_holder_319_windows_test.go (two headless pins),
+cmd/wisp/panel_death_replay_319_winlive_test.go (one winlive pin + one stale
+comment corrected). Production file sha256 on the final tree:
+a205fbe928f9cba1743034730df122d6ada9ba4381b272815afc98991fd97431 (it was the same
+before and after every mutant run: the mutant is injected with -overlay, the tree
+is never edited for a mutation).
+
+01-winlive-visible-green.txt     N4 winlive pin on the fixed tree, GREEN. Setup:
+                                 panel already visible (ordinary gesture road),
+                                 prior window in front. Production hop:
+                                 proc.SignalExistingInstance -> RunEventLoop ->
+                                 secondLaunchActivation319 -> panelHolder.show ->
+                                 RequestShow -> mgr.Show. Deterministic wait: a
+                                 sentinel posted after the activation's own
+                                 request through the same route. Reading: after:
+                                 mgr.IsShown=true hwnd=0x48B1206 (same=true)
+                                 window alive=true; foreground=0x2F0A6A
+                                 (panel=false, prior=0x2F0A6A). The raise half is
+                                 READ AND REPORTED (the "RAISE HALF OF AC#2, READ
+                                 NOT ASSERTED" log line), not asserted - see the
+                                 STOPPED ITEM below.
+02-probe-foreground-fixed.txt    Out-of-repo probe (injected -overlay; source and
+                                 overlay JSON in this directory), fixed tree:
+                                 where the foreground lands after the activation
+                                 on a visible panel, and each candidate raise
+                                 call in isolation. Readings:
+                                 A  shown=true hwnd=0x283117C same-hwnd=true
+                                    alive=true fg-after-Show=0x3C405B0
+                                    panel-was-fg=false prior=0x3C405B0
+                                 A2 one second later, nothing else called:
+                                    fg=0x3C405B0 panel-was-fg=false
+                                 C  ShowWindow(SW_SHOW) alone, clean
+                                    prior-in-front state: fg stays 0x3C405B0,
+                                    panel-was-fg=false
+                                 B  SetForegroundWindow alone, clean state:
+                                    fg=0x283117C panel-was-fg=true
+03-mutant-red.txt                Mutation self-proof, injected with -overlay
+                                 (mutant copy = the final tree with exactly one
+                                 line changed: secondLaunchActivation319 drives
+                                 h.toggle again; the one-line proof is appended at
+                                 the foot of 08). Headless red names verbatim:
+                                 ":278 the second-launch activation did not take
+                                 the show road (shows went 0 -> 0, want exactly
+                                 one more)", ":281 ... took the toggle road
+                                 (toggles went 1 -> 2): with a visible panel that
+                                 road HIDES it", ":284 ... asked the panel thread
+                                 to HIDE (hides went 1 -> 2)", ":353 the rebuilt
+                                 thread got a toggle request (toggles=1, want
+                                 0)". Winlive red name verbatim: ":425 the second
+                                 launch HID the panel: the window 0x8E30DD8 was
+                                 shown before the activation (true) and
+                                 mgr.IsShown() is false after it". Both rc=1.
+04-restored-green.txt            Same two headless pins + the winlive pin, run
+                                 again without -overlay after the mutant: all
+                                 three PASS; production file sha256 before and
+                                 after the runs identical (a205fbe9...), so the
+                                 mutation left zero tree residue.
+05-regression-319-both-packages.txt
+                                 `go test -run '319' ./cmd/wisp/ ./internal/proc/
+                                 -count=1 -v`: green, with the four AC#1 cases
+                                 named PASS (TestDeadPanelThreadRefusesEveryGesture319,
+                                 TestPanelHolderRebuildsADeadThread319, and the
+                                 319 headless holder pair), the two internal/proc
+                                 N2 cases PASS, and the two new N4 headless pins
+                                 PASS.
+06-winlive-existing-named.txt    The existing winlive cases, one per invocation by
+                                 name: TestPanelDeathReplay319UnfixedReading PASS,
+                                 TestPanelDeathThenHolderGestureRebuilds319 PASS,
+                                 TestSecondLaunchActivationRaisesThePanel319 PASS,
+                                 TestTicket255RealWindowWidthFollowsTheConfig
+                                 (1 flake in 5 runs; 0 in 7 pre-change runs - the
+                                 failure is `t.TempDir()` RemoveAll racing
+                                 WebView2's file release, "EBWebView\Default: The
+                                 directory is not empty", after every product
+                                 assertion of that case passed; the same flake and
+                                 its known fix are on record for leg 255-r8,
+                                 probes/255/r8/00-anchor-and-gates.md section 72,
+                                 and this hunk is not reachable from that case),
+                                 TestTicket255r8RealWindowFollowsTheConfigAcrossAReshow
+                                 PASS.
+07-gates.txt                     go build ./... rc=0; gofumpt -l on this leg's
+                                 three files empty rc=0 (v0.12.0); go vet -tags
+                                 winlive ./cmd/wisp/ ./internal/proc/ rc=0;
+                                 sh scripts/d22scan.sh rc=0 clean; length gate
+                                 (check-path-length-budget.sh --with-self-test)
+                                 VERDICT GREEN rc=0.
+08-final-tree-recheck.txt        After the last comment-only edit to the
+                                 production file: build rc=0, gofumpt empty rc=0,
+                                 vet rc=0, `-run '319'` both packages ok, the
+                                 winlive pin PASS. Also carries the sha256 pair
+                                 and the one-line diff proving the mutant copy
+                                 differs from the final tree by exactly the
+                                 executor line.
+mutant-resident_windows.go       The mutant source (final tree, one line changed),
+overlay-mutant.json              the -overlay mapping that injects it, and the
+prechange-resident_windows.go    pre-change copy of the production file
+overlay-prechange.json           (`git show HEAD:...`) + its mapping, used to show
+                                 the 255 flake is not caused by this hunk.
+probe_319r3_visible_foreground_winlive_test.go
+overlay-fixed.json               The out-of-repo probe source and the mapping that
+                                 injects it as cmd/wisp/probe_319r3_..._test.go.
+
+STOPPED ITEM (reported, not silently fixed). The dispatch's N4 winlive assertion
+`GetForegroundWindow() == hwnd` is NOT satisfiable on today's tree by the routed
+executor, and closing it would mean touching mgr.Show - explicitly frozen for
+this leg ("不改 RequestShow/mgr.Show"), so this leg stopped there per 未定义即停
+and left the reasons where a reader cannot miss them: the pin's doc comment and
+its "RAISE HALF OF AC#2, READ NOT ASSERTED" log line, this index, and the leg's
+receipt. What the probes isolate, each from a clean state: the activation's own
+mgr.Show leaves the foreground on the prior window (A, and A2 one second later);
+ShowWindow(SW_SHOW) alone does not activate an already-visible window (C), while
+SetForegroundWindow alone does (B). Reading of mgr.Show: it calls
+SetForegroundWindow only when the window was NOT already shown
+(panel_host_windows.go, Show's tail), which is exactly the shape the cold and
+hidden cases need and the visible case lacks. Candidate fix, for the
+orchestrator: drop that guard for the re-show branch (one line), or add a named
+raise hop - either is a contract-shaped decision this leg may not take.

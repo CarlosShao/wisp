@@ -1,0 +1,83 @@
+== final-tree recheck after the last comment-only edit ==
+-- build/fumpt/vet --
+build_rc=0
+fumpt_rc=0
+vet_rc=0
+-- sha256 of tree production file and mutant copy --
+62641b488657918dd0eaebd88c5b44d90d399205e58a9d62fb8f913bd5859c59 *cmd/wisp/resident_windows.go
+fc411c18b156ca5dc8d996820d06855cc72c36bebb75bf375804a044e195f6b9 *.scratch/wisp/probes/319/r3/mutant-resident_windows.go
+-- one-line mutant proof: diff above must be exactly one line pair --
+674c674
+< 		if h.show("second-launch") {
+---
+> 		if h.toggle("second-launch") {
+-- -run 319 both packages --
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.061s
+ok  	github.com/CarlosShao/wisp/internal/proc	0.214s
+reg_rc=0
+-- winlive N4 pin on the final tree --
+time=2026-10-15T14:24:04.961+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319
+time=2026-10-15T14:24:04.964+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T14:24:04.964+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-15T14:24:04.976+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x62b114c"
+time=2026-10-15T14:24:04.976+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x18 known=true"
+time=2026-10-15T14:24:04.977+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x46 known=true"
+time=2026-10-15T14:24:04.981+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x46 known=true"
+time=2026-10-15T14:24:04.982+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x1c known=true"
+time=2026-10-15T14:24:04.983+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x86 known=true"
+time=2026-10-15T14:24:04.985+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x7f known=true"
+time=2026-10-15T14:24:04.986+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x7f known=true"
+time=2026-10-15T14:24:04.987+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x7f known=true"
+time=2026-10-15T14:24:04.988+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x6 known=true"
+time=2026-10-15T14:24:05.069+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x281 known=true"
+time=2026-10-15T14:24:05.079+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x282 known=true"
+time=2026-10-15T14:24:05.081+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x3d known=true"
+time=2026-10-15T14:24:05.081+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x3d known=true"
+time=2026-10-15T14:24:05.081+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x7 known=true"
+time=2026-10-15T14:24:05.081+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x85 known=true"
+time=2026-10-15T14:24:05.082+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x14 known=true"
+time=2026-10-15T14:24:05.082+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x47 known=true"
+time=2026-10-15T14:24:05.083+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x5 known=true"
+time=2026-10-15T14:24:05.083+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x3 known=true"
+time=2026-10-15T14:24:05.083+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-10-15T14:24:05.083+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0xf known=true"
+time=2026-10-15T14:24:05.083+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-10-15T14:24:05.083+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-10-15T14:24:05.083+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-10-15T14:24:05.097+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x210 known=true"
+time=2026-10-15T14:24:05.097+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x7f known=true"
+time=2026-10-15T14:24:05.097+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x31f known=true"
+time=2026-10-15T14:24:05.097+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0xc0f9 known=true"
+time=2026-10-15T14:24:05.097+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x7f known=true"
+time=2026-10-15T14:24:05.098+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x282 known=true"
+time=2026-10-15T14:24:05.098+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x7f known=true"
+time=2026-10-15T14:24:05.101+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0xc053 known=true"
+time=2026-10-15T14:24:05.101+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x288 known=true"
+time=2026-10-15T14:24:05.509+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-10-15T14:24:05.594+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x14 known=true"
+time=2026-10-15T14:24:05.606+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0xf known=true"
+wisp: panel window is up (319-visible-setup, cold 645.4 ms, hot path 0.0 ms)
+time=2026-10-15T14:24:05.627+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x86 known=true"
+time=2026-10-15T14:24:05.629+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x6 known=true"
+time=2026-10-15T14:24:05.633+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x8 known=true"
+time=2026-10-15T14:24:05.633+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x281 known=true"
+time=2026-10-15T14:24:05.634+08:00 level=INFO msg="MARK299 wndproc hwnd=0x62b114c msg=0x282 known=true"
+time=2026-10-15T14:24:05.643+08:00 level=INFO msg="activation requested by second launch" handled_here="the registered activation hook ran" receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+time=2026-10-15T14:24:05.649+08:00 level=INFO msg="panel host: CreateWebResourceResponse needed attempt 2 of 3 (the stale-GetLastError defect named above)"
+wisp: panel window is up (second-launch, cold 645.4 ms, hot path 0.0 ms)
+    panel_death_replay_319_winlive_test.go:434: RAISE HALF OF AC#2, READ NOT ASSERTED: the panel 0x62B114C is shown (alive=true) but the foreground window is 0xA8A112E (the prior window), not the panel. This is the measured state of the routed executor on today's tree, not a flake: mgr.Show skips SetForegroundWindow when the window was already shown, and ShowWindow(SW_SHOW) does not activate a visible window - probes/319/r3/02-probe-foreground-fixed.txt (A/A2/C/B) isolates all three facts. Closing this hop means a decision on mgr.Show (frozen for 319-r3); see the leg's receipt
+    panel_death_replay_319_winlive_test.go:436: 319-r3 visible-panel live reading: hwnd before=0x62B114C shown before=true; signal=SignalExistingInstance("Local\\wisp-test-319-visible-42156-1792045445615568100.activate"); hook receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; after: mgr.IsShown=true hwnd=0x62B114C (same=true) window alive=true; foreground=0xA8A112E (panel=false, prior=0xA8A112E); event loop still running=true
+time=2026-10-15T14:24:05.651+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-15T14:24:05.651+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-15T14:24:05.651+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-15T14:24:05.651+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-15T14:24:05.651+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-15T14:24:05.651+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-15T14:24:05.651+08:00 level=WARN msg="fast shutdown: skipping non-critical log/db flushes (D38e fast path)"
+time=2026-10-15T14:24:05.661+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-15T14:24:05.661+08:00 level=INFO msg="panel thread exited cleanly" shows=2 toggles=1 disposals=0
+--- PASS: TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319 (0.70s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.814s
+winlive_rc=0

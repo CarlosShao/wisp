@@ -196,7 +196,9 @@ func TestPanelDeathThenHolderGestureRebuilds319(t *testing.T) {
 // and the answer is the resident runtime's own path: RunEventLoop's activation
 // round (Runtime.handleActivation) runs the hook registered with
 // Runtime.SetActivationHook, which is cmd/wisp's secondLaunchActivation319, which
-// drives the same panelHolder.toggle the tray item drives. Only two things are
+// drives panelHolder.show - the 319-r3 D1 correction; before it, this hook drove
+// panelHolder.toggle, and a toggle on an already-visible panel HIDES it, which the
+// visible-panel case below pins. Only two things are
 // this case's own: the layout (unique mutex/event names for this run) and the
 // timer window that tells the foreground reading where the operator came from.
 //
@@ -287,4 +289,150 @@ func TestSecondLaunchActivationRaisesThePanel319(t *testing.T) {
 	}
 	t.Logf("319 second-launch live reading: signal=SignalExistingInstance(%q) from this process; hook receipt=%q; panel hwnd=0x%X mgr.IsCreated=%v mgr.IsShown=%v window alive=%v; foreground window=0x%X; prior window=0x%X; event loop still running=%v",
 		rt.Layout.ActivateEventName, receipt, hwnd, mgr.IsCreated(), mgr.IsShown(), isLiveWindow(hwnd), fg, uintptr(prior), len(loop) == 0)
+}
+
+// TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319 is N4's live reading
+// (ticket 319-r3, the D1 fix): the panel is ALREADY on screen when the second
+// launch arrives - the 21:40:38 field shape, and the exact shape 319-v's
+// out-of-repo probe A measured the defect on.
+//
+// What the defect was: the hook drove panelHolder.toggle, RequestToggle hides a
+// shown panel, and the double click made the window DISAPPEAR (probes/319/v/
+// 03-ac2-live-adjudication.txt, shape A: "THE SECOND LAUNCH HID THE PANEL"). What
+// this case requires as visible facts, not as "no error was reported":
+// mgr.IsShown() stays true, the HWND is the same window, and that window is
+// still alive.
+//
+// WHAT THIS CASE DOES NOT ASSERT, AND WHY (the raise half, measured by leg
+// 319-r3). The dispatch for this leg also asked for `GetForegroundWindow() ==
+// hwnd` here. That assertion is NOT satisfiable on today's tree by the routed
+// executor: mgr.Show calls SetForegroundWindow only when the window was NOT
+// already shown (`if !shown`, panel_host_windows.go's Show tail), and
+// ShowWindow(SW_SHOW) alone does not activate an already-visible window. The
+// out-of-repo probe behind this file's legs measured all three facts in
+// isolation (probes/319/r3/02-probe-foreground-fixed.txt): after the activation
+// on a visible panel the foreground is still the prior window (A and A2, one
+// second later unchanged); ShowWindow(SW_SHOW) alone on the visible HWND does
+// not raise it (C); SetForegroundWindow alone does (B). So the foreground is
+// READ AND REPORTED below, never asserted green here, and the raise half is an
+// open decision on mgr.Show (a frozen surface for this leg) named in the leg's
+// receipt - asserting it today would mean shipping either a red pin or a green
+// lie, and "not reported" is exactly what this ticket refuses.
+//
+// The layout is per-run for the same reason the case above states: a second
+// `wisp --env dev` would signal the OWNER's instance, so the second launch is
+// this process signalling a name it just created.
+//
+// Mutation control: make secondLaunchActivation319 drive h.toggle again (the D1
+// regression) and this case goes red by name on "the second launch HID the
+// panel". The wait below is deterministic for both states: a sentinel posted
+// through the same route after the activation's own request is FIFO behind it,
+// so its closure running proves the activation's request was served (Show on the
+// fixed road, Hide on the mutant's) - the read is never a race with the panel
+// thread.
+func TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319(t *testing.T) {
+	h, mgr := startPanelHolder319(t)
+
+	// The operator's panel is already on screen, opened through the ordinary
+	// gesture road (toggle's show half) - how an operator gets there before a
+	// later double click.
+	if !h.toggle("319-visible-setup") {
+		t.Fatalf("the holder refused the setup gesture whose whole job is to put the panel on screen")
+	}
+	waitPanelTrue(t, "the setup panel window to be shown", func() bool { return mgr.IsShown() })
+	hwnd := mgr.windowHandle()
+	if hwnd == 0 {
+		t.Fatalf("the setup show reported a shown window with HWND 0")
+	}
+
+	// The runtime + event loop + production hook, the same in-process shape the
+	// case above builds (and for the same reason: no second dev process, so the
+	// owner's instance is never touched).
+	reg := observe.NewRegistry()
+	layout := proc.Layout{
+		Env:               buildinfo.EnvProd,
+		DataDir:           t.TempDir(),
+		MutexName:         fmt.Sprintf(`Local\wisp-test-319-visible-%d-%d`, os.Getpid(), time.Now().UnixNano()),
+		ActivateEventName: fmt.Sprintf(`Local\wisp-test-319-visible-%d-%d.activate`, os.Getpid(), time.Now().UnixNano()),
+		MutexEnabled:      true,
+	}
+	rt, err := proc.Boot(buildinfo.EnvProd, proc.WithLayout(layout), proc.WithRegistry(reg))
+	if err != nil {
+		t.Fatalf("proc.Boot with this run's own layout: %v", err)
+	}
+	t.Cleanup(func() { rt.Shutdown(true) })
+	if rt.Instance == nil {
+		t.Fatalf("this layout owns a mutex, so rt.Instance must be non-nil before the second-launch hop can mean anything")
+	}
+
+	hook := secondLaunchActivation319(h, nil)
+	receipts := make(chan string, 4)
+	rt.SetActivationHook(func() string {
+		s := hook()
+		select {
+		case receipts <- s:
+		default:
+		}
+		return s
+	})
+
+	// The same residual the case above names: RunEventLoop returns only on a
+	// process exit signal, so its goroutine outlives this case; winlive runs one
+	// case per process by name.
+	loop := make(chan string, 1)
+	go func() { loop <- rt.RunEventLoop() }()
+
+	// Where the operator's foreground is when the second launch arrives: a window
+	// of this process in front of the visible panel, so the foreground reading
+	// below says where the operator came from. Same prior-window ruler as the case
+	// above.
+	prior := editorOnPanelThread(t, h.rp)
+	if fg := uintptr(windows.GetForegroundWindow()); fg != uintptr(prior) {
+		t.Fatalf("the prior window 0x%X did not take the foreground (the foreground is 0x%X), so the foreground reading below would be about an unknown desktop; this is a failed measurement, not a product verdict", uintptr(prior), fg)
+	}
+	shownBefore := mgr.IsShown()
+	hwndBefore := mgr.windowHandle()
+
+	// The second launch: the identical call the ErrAlreadyRunning branch makes.
+	if err := proc.SignalExistingInstance(rt.Layout.ActivateEventName); err != nil {
+		t.Fatalf("SignalExistingInstance(%q): %v", rt.Layout.ActivateEventName, err)
+	}
+	var receipt string
+	select {
+	case receipt = <-receipts:
+	case <-time.After(panelThreadWait):
+		t.Fatalf("the activation hook never answered within %v: the signal reached nothing (the readings below would be about a desktop nothing moved on)", panelThreadWait)
+	}
+
+	// The activation's request was handed to the panel thread when the receipt was
+	// written; this sentinel is posted through the SAME route afterwards, so its
+	// closure runs after the activation's one. Waiting on it makes the state read
+	// below deterministic for the fixed road and for the mutant alike.
+	served := make(chan struct{})
+	if !h.rp.post(func() { close(served) }) {
+		t.Fatalf("the sentinel post was refused by the panel thread, so the activation's own request cannot be assumed served either")
+	}
+	select {
+	case <-served:
+	case <-time.After(panelThreadWait):
+		t.Fatalf("the sentinel was not served within %v - a failed measurement of the panel thread's own queue", panelThreadWait)
+	}
+
+	shownAfter := mgr.IsShown()
+	afterHwnd := mgr.windowHandle()
+	fg := uintptr(windows.GetForegroundWindow())
+	if !shownAfter {
+		t.Errorf("the second launch HID the panel: the window 0x%X was shown before the activation (%v) and mgr.IsShown() is false after it; AC#2 says a second launch brings the running instance's UI to the front, and hiding it is the D1 defect 319-v measured live", hwnd, shownBefore)
+	}
+	if afterHwnd != hwnd {
+		t.Errorf("the second launch changed the window handle (0x%X -> 0x%X): an already-visible panel must stay the window the operator was looking at, and a different handle means it was destroyed and rebuilt", hwnd, afterHwnd)
+	}
+	if !isLiveWindow(hwnd) {
+		t.Errorf("the panel's window 0x%X is no longer a live window after the activation", hwnd)
+	}
+	if fg != hwnd {
+		t.Logf("RAISE HALF OF AC#2, READ NOT ASSERTED: the panel 0x%X is shown (alive=%v) but the foreground window is 0x%X (the prior window), not the panel. This is the measured state of the routed executor on today's tree, not a flake: mgr.Show skips SetForegroundWindow when the window was already shown, and ShowWindow(SW_SHOW) does not activate a visible window - probes/319/r3/02-probe-foreground-fixed.txt (A/A2/C/B) isolates all three facts. Closing this hop means a decision on mgr.Show (frozen for 319-r3); see the leg's receipt", hwnd, isLiveWindow(hwnd), fg)
+	}
+	t.Logf("319-r3 visible-panel live reading: hwnd before=0x%X shown before=%v; signal=SignalExistingInstance(%q); hook receipt=%q; after: mgr.IsShown=%v hwnd=0x%X (same=%v) window alive=%v; foreground=0x%X (panel=%v, prior=0x%X); event loop still running=%v",
+		hwndBefore, shownBefore, rt.Layout.ActivateEventName, receipt, shownAfter, afterHwnd, afterHwnd == hwnd, isLiveWindow(afterHwnd), fg, fg == hwnd, uintptr(prior), len(loop) == 0)
 }

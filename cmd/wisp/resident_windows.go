@@ -295,7 +295,9 @@ func runResident() {
 	// no dependency edge (Runtime.SetActivationHook takes a func() string, the
 	// same shape RegisterShutdownHook set). It is registered here, after the ball
 	// exists (the fallback tip needs it) and before the event loop below (the only
-	// consumer).
+	// consumer). Ticket 319-r3 corrected which holder executor it drives: show,
+	// not toggle - a toggle hides a panel that is already on screen, and AC#2 is
+	// about bringing it to the front (see secondLaunchActivation319's comment).
 	rt.SetActivationHook(secondLaunchActivation319(holder, rb))
 
 	// Ticket 246 AC#4: D38(e) step 3 ("all task root ctxs cancelled -> wait
@@ -459,9 +461,11 @@ func runResident() {
 // Root cause fixed by 319-a1's census (.scratch/wisp/probes/319/a1/census.md).
 //
 // WHAT THIS HOLDER IS. One field of state (the current thread) behind one lock,
-// and three answers the assembly root needs: the gesture executor (toggle), the
-// boot-report line (statusLine) and the shutdown stop (stop). toggle notices a
-// thread whose goroutine has returned and starts a fresh one on the SAME
+// and four answers the assembly root needs: the gesture executors - toggle for
+// the ball's panel gestures, the panel hot key and the tray item, show for the
+// second-launch activation (ticket 319 AC#2's D1 correction, leg 319-r3) - plus
+// the boot-report line (statusLine) and the shutdown stop (stop). Both executors
+// notice a thread whose goroutine has returned and start a fresh one on the SAME
 // manager, which is what makes the window really come back.
 //
 // WHAT IT DOES NOT CHANGE, each named because this is the kind of edit that can
@@ -492,8 +496,8 @@ type panelHolder struct {
 
 // newPanelHolder builds the holder around the manager the boot assembled. A nil
 // mgr is legal and means "the panel host could not be assembled at all": the
-// holder then refuses by name (toggle false, statusLine says so out loud), which
-// is the pre-319 behaviour for that boot shape, kept.
+// holder then refuses by name (toggle and show false, statusLine says so out
+// loud), which is the pre-319 behaviour for that boot shape, kept.
 func newPanelHolder(reg *observe.Registry, mgr *PanelManager) *panelHolder {
 	return &panelHolder{reg: reg, mgr: mgr, spawn: startResidentPanel}
 }
@@ -514,11 +518,17 @@ func (h *panelHolder) start() {
 	h.rp = h.spawn(h.reg, h.mgr)
 }
 
-// toggle is the one executor the ball's two panel gestures, the panel hot key,
-// the tray item and the second-launch activation drive. It answers exactly what
-// residentPanel.RequestToggle answers, and it adds the one thing that answer
-// never had: when the thread behind it is gone, a fresh thread is started for
-// this request instead of refusing forever.
+// toggle is the one executor the ball's two panel gestures, the panel hot key
+// and the tray item drive. It answers exactly what residentPanel.RequestToggle
+// answers, and it adds the one thing that answer never had: when the thread
+// behind it is gone, a fresh thread is started for this request instead of
+// refusing forever.
+//
+// It is deliberately NOT the executor the second-launch activation drives: a
+// toggle HIDES a panel that is already on screen, and AC#2 asks for the window
+// to be brought to the front. That trigger drives show below instead (ticket
+// 319-r3; the reading that split the two is probes/319/v/03-ac2-live-adjudication.txt,
+// shape A: "THE SECOND LAUNCH HID THE PANEL").
 //
 // The lock is held across the whole call on purpose: two gestures racing here
 // must not start two threads, and RequestToggle never calls back into the
@@ -542,6 +552,53 @@ func (h *panelHolder) toggle(via string) bool {
 			"via", via, "why", why)
 	}
 	return h.rp.RequestToggle(via)
+}
+
+// show is the executor the second-launch activation drives (ticket 319 AC#2,
+// leg 319-r3). It answers exactly what residentPanel.RequestShow answers - ask
+// for the window to appear, never for a state flip - and it carries the same
+// dead-thread rebuild toggle has, for the same reason (AC#1: a thread that
+// ended must not make the request impossible).
+//
+// WHY THIS IS A SIBLING COPY OF toggle AND NOT A MODE OF IT. The two route to
+// two different requests on purpose: toggle's contract is a toggle, so a panel
+// already on screen gets hidden (RequestToggle, panel_resident_windows.go), and
+// that is correct for the ball's gestures, the hot key and the tray item. The
+// second launch is not a toggle: AC#2's letter is "bring the existing instance's
+// UI to the front", and the live reading behind D1 (319-v's shape A) is that
+// the toggle road made the window DISAPPEAR on a double click. RequestShow is
+// the request whose meaning is "this window should be on screen", and it is the
+// only show road this leg may route to. What it delivers per shape, measured:
+// the cold and hidden shapes really come forward (mgr.Show runs
+// ShowWindow(SW_SHOW) + SetForegroundWindow when the window was not already
+// shown), while for an ALREADY-VISIBLE panel the same call re-asserts
+// visibility without raising it - 319-r3 measured that in isolation
+// (probes/319/r3/02-probe-foreground-fixed.txt: ShowWindow(SW_SHOW) does not
+// activate a visible window; SetForegroundWindow alone does, and mgr.Show skips
+// it when already shown). That raise hop is an open decision on mgr.Show, named
+// in the leg's receipt, outside this leg's surface. The rebuild block is a
+// second copy rather than a shared helper because the AC#1 mutation teeth sit
+// on toggle's own isFinished() term: sharing would move an existing pin's
+// subject without changing anything it asserts.
+func (h *panelHolder) show(via string) bool {
+	if h == nil {
+		return false
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.mgr == nil {
+		return false
+	}
+	if h.rp == nil || h.rp.isFinished() {
+		why := "the previous panel thread had exited"
+		if h.rp == nil {
+			why = "no panel thread had been started"
+		}
+		h.rp = h.spawn(h.reg, h.mgr)
+		slog.Info("panel host: starting a fresh panel thread for this request",
+			"via", via, "why", why)
+	}
+	return h.rp.RequestShow(via)
 }
 
 // statusLine is the boot report's "does this process have a panel" answer. The
@@ -591,16 +648,22 @@ const secondLaunchTrayTip319 = "Wisp: another launch asked for the window, but t
 // injection shape RegisterShutdownHook uses, so internal/proc stays a leaf and
 // knows nothing about panels, balls or windows.
 //
-// WHY THE TOGGLE EXECUTOR AND NOT A NEW "RAISE" CALL: bringing the window
-// forward is not a capability this process lacks - Show already runs
-// ShowWindow(SW_SHOW) + SetForegroundWindow (panel_host_windows.go) - it was a
-// hop nobody had connected. The day's reading shows the two defects are
-// separable: the 21:40:38 second launch arrived while the panel thread AND its
-// window were alive and still did nothing. So the hook drives the same executor
-// the tray item drives (panelHolder.toggle), and what the operator gets is
-// exactly what pressing that tray item gets.
+// WHY THE SHOW EXECUTOR AND NOT A TOGGLE. Bringing the window forward is not a
+// capability this process lacks - Show already runs ShowWindow(SW_SHOW) +
+// SetForegroundWindow (panel_host_windows.go) - it was a hop nobody had
+// connected. The day's reading shows the two defects are separable: the
+// 21:40:38 second launch arrived while the panel thread AND its window were
+// alive and still did nothing. What the same day did NOT settle, and 319-v's
+// live probes did (2026-10-15): a toggle on an already-visible panel HIDES it
+// (shape A in .scratch/wisp/probes/319/v/03-ac2-live-adjudication.txt), which is
+// the opposite of AC#2's letter. So the executor here is panelHolder.show: it
+// ensures a live thread and asks RequestShow, the request whose meaning is
+// "this window should be on screen". The tray item, the hot key and the ball's
+// gestures keep driving toggle, unchanged. The in-front half for an
+// already-visible panel is NOT delivered by this routing (measured; see show's
+// comment and probes/319/r3/) and stays an open decision on mgr.Show.
 //
-// WHAT THE RECEIPT CAN AND CANNOT SAY. The toggle is asynchronous by contract
+// WHAT THE RECEIPT CAN AND CANNOT SAY. The request is asynchronous by contract
 // (post() returns once the request is queued; the window verdict lands on the
 // panel thread), so this sentence reports the hand-off, never the window's fate.
 // When the hand-off itself was refused - no panel host, or a thread that will
@@ -608,7 +671,7 @@ const secondLaunchTrayTip319 = "Wisp: another launch asked for the window, but t
 // one shape where the double click would otherwise be silence again.
 func secondLaunchActivation319(h *panelHolder, rb *residentBall) func() string {
 	return func() string {
-		if h.toggle("second-launch") {
+		if h.show("second-launch") {
 			return "the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
 		}
 		if rb != nil && rb.b != nil {

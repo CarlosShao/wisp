@@ -1,0 +1,189 @@
+== tasklist self-proof (before) ==
+
+Image Name                     PID Session Name        Session#    Mem Usage
+========================= ======== ================ =========== ============
+wisp.exe                     40296 Console                    1     56,164 K
+== mutant = secondLaunchActivation319 drives h.toggle again (one line, h.show -> h.toggle); injected with -overlay, tree untouched ==
+== run 1 (headless two N4 cases): go test -overlay=overlay-mutant.json -run '319' ./cmd/wisp/ ==
+time=2026-10-15T14:18:17.483+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSecondLaunchActivationDoesNotTakeTheHideRoad319
+    panel_holder_319_windows_test.go:278: the second-launch activation did not take the show road (shows went 0 -> 0, want exactly one more): D1's fix is that the activation requests a SHOW, the one request whose meaning is 'this window should be on screen and in front'
+    panel_holder_319_windows_test.go:281: the second-launch activation took the toggle road (toggles went 1 -> 2): with a visible panel that road HIDES it, which is the D1 defect 319-v measured live
+    panel_holder_319_windows_test.go:284: the second-launch activation asked the panel thread to HIDE (hides went 1 -> 2): a second launch on an already-visible panel must never hide it (ticket 319 AC#2)
+    panel_holder_319_windows_test.go:292: 319-r3 headless visible-panel reading: control toggle hides=1 shows=0; activation receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; after activation: shows=0 toggles=2 hides=2; queued requests=2; spawns=1
+--- FAIL: TestSecondLaunchActivationDoesNotTakeTheHideRoad319 (0.00s)
+=== RUN   TestPanelHolderShowRebuildsADeadThread319
+time=2026-10-15T14:18:17.488+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T14:18:17.488+08:00 level=INFO msg="panel thread ending" why="stop requested before the panel window existed" window_opened=false
+time=2026-10-15T14:18:17.488+08:00 level=INFO msg="panel thread exited cleanly" shows=0 toggles=0 disposals=0
+time=2026-10-15T14:18:17.488+08:00 level=INFO msg="panel host: starting a fresh panel thread for this gesture" via=second-launch why="the previous panel thread had exited"
+    panel_holder_319_windows_test.go:353: the rebuilt thread got a toggle request (toggles=1, want 0): the activation must not take the hide-capable road
+    panel_holder_319_windows_test.go:364: 319-r3 headless dead-thread show reading: dead thread finished=true; spawns=2; rebuilt thread shows=1 toggles=1 hides=0 queued=1 same manager=true; receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+--- FAIL: TestPanelHolderShowRebuildsADeadThread319 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.071s
+FAIL
+
+== run 2 (winlive N4 pin): go test -overlay=overlay-mutant.json -tags winlive -run TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319 ./cmd/wisp/ -count=1 -v ==
+time=2026-10-15T14:18:22.279+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319
+time=2026-10-15T14:18:22.282+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T14:18:22.283+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-15T14:18:22.293+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x15c08e0"
+time=2026-10-15T14:18:22.293+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x18 known=true"
+time=2026-10-15T14:18:22.294+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x46 known=true"
+time=2026-10-15T14:18:22.298+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x46 known=true"
+time=2026-10-15T14:18:22.300+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x1c known=true"
+time=2026-10-15T14:18:22.301+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x86 known=true"
+time=2026-10-15T14:18:22.303+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x7f known=true"
+time=2026-10-15T14:18:22.304+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x7f known=true"
+time=2026-10-15T14:18:22.305+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x7f known=true"
+time=2026-10-15T14:18:22.306+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x6 known=true"
+time=2026-10-15T14:18:22.386+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x281 known=true"
+time=2026-10-15T14:18:22.395+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x282 known=true"
+time=2026-10-15T14:18:22.398+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x3d known=true"
+time=2026-10-15T14:18:22.398+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x3d known=true"
+time=2026-10-15T14:18:22.398+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x7 known=true"
+time=2026-10-15T14:18:22.398+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x85 known=true"
+time=2026-10-15T14:18:22.399+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x14 known=true"
+time=2026-10-15T14:18:22.399+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x47 known=true"
+time=2026-10-15T14:18:22.400+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x5 known=true"
+time=2026-10-15T14:18:22.400+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x3 known=true"
+time=2026-10-15T14:18:22.400+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-10-15T14:18:22.400+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0xf known=true"
+time=2026-10-15T14:18:22.400+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-10-15T14:18:22.400+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-10-15T14:18:22.400+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-10-15T14:18:22.415+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x210 known=true"
+time=2026-10-15T14:18:22.415+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x7f known=true"
+time=2026-10-15T14:18:22.416+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x31f known=true"
+time=2026-10-15T14:18:22.416+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0xc0f9 known=true"
+time=2026-10-15T14:18:22.416+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x7f known=true"
+time=2026-10-15T14:18:22.416+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x282 known=true"
+time=2026-10-15T14:18:22.417+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x7f known=true"
+time=2026-10-15T14:18:22.421+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0xc053 known=true"
+time=2026-10-15T14:18:22.421+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x288 known=true"
+time=2026-10-15T14:18:22.803+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-10-15T14:18:22.888+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x14 known=true"
+time=2026-10-15T14:18:22.900+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0xf known=true"
+wisp: panel window is up (319-visible-setup, cold 619.7 ms, hot path 0.0 ms)
+time=2026-10-15T14:18:22.917+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x86 known=true"
+time=2026-10-15T14:18:22.918+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x6 known=true"
+time=2026-10-15T14:18:22.923+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x8 known=true"
+time=2026-10-15T14:18:22.924+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x281 known=true"
+time=2026-10-15T14:18:22.925+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x282 known=true"
+time=2026-10-15T14:18:22.932+08:00 level=INFO msg="activation requested by second launch" handled_here="the registered activation hook ran" receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+time=2026-10-15T14:18:22.932+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x18 known=true"
+time=2026-10-15T14:18:22.932+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x46 known=true"
+time=2026-10-15T14:18:22.933+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x47 known=true"
+time=2026-10-15T14:18:22.940+08:00 level=INFO msg="MARK299 wndproc hwnd=0x15c08e0 msg=0x1c known=true"
+    panel_death_replay_319_winlive_test.go:425: the second launch HID the panel: the window 0x15C08E0 was shown before the activation (true) and mgr.IsShown() is false after it; AC#2 says a second launch brings the running instance's UI to the front, and hiding it is the D1 defect 319-v measured live
+    panel_death_replay_319_winlive_test.go:434: RAISE HALF OF AC#2, READ NOT ASSERTED: the panel 0x15C08E0 is shown (alive=true) but the foreground window is 0xA07E8 (the prior window), not the panel. This is the measured state of the routed executor on today's tree, not a flake: mgr.Show skips SetForegroundWindow when the window was already shown, and ShowWindow(SW_SHOW) does not activate a visible window - probes/319/r3/02-probe-foreground-fixed.txt (A/A2/C/B) isolates all three facts. Closing this hop means a decision on mgr.Show (frozen for 319-r3); see the leg's receipt
+    panel_death_replay_319_winlive_test.go:436: 319-r3 visible-panel live reading: hwnd before=0x15C08E0 shown before=true; signal=SignalExistingInstance("Local\\wisp-test-319-visible-30688-1792045102906516600.activate"); hook receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; after: mgr.IsShown=false hwnd=0x15C08E0 (same=true) window alive=true; foreground=0xA07E8 (panel=false, prior=0xA7F112E); event loop still running=true
+time=2026-10-15T14:18:22.943+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-15T14:18:22.943+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-15T14:18:22.943+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-15T14:18:22.943+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-15T14:18:22.943+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-15T14:18:22.943+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-15T14:18:22.943+08:00 level=WARN msg="fast shutdown: skipping non-critical log/db flushes (D38e fast path)"
+time=2026-10-15T14:18:22.951+08:00 level=INFO msg="panel host: CreateWebResourceResponse needed attempt 2 of 3 (the stale-GetLastError defect named above)"
+time=2026-10-15T14:18:22.951+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-15T14:18:22.952+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=2 disposals=0
+--- FAIL: TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319 (0.67s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.773s
+FAIL
+
+== final-tree mutant re-run (mutant regenerated from the final tree; the only difference is the one executor line, proof above) ==
+== go test -overlay=overlay-mutant.json -run 'N4 two headless cases' ./cmd/wisp/ ==
+time=2026-10-15T14:24:21.403+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSecondLaunchActivationDoesNotTakeTheHideRoad319
+    panel_holder_319_windows_test.go:278: the second-launch activation did not take the show road (shows went 0 -> 0, want exactly one more): D1's fix is that the activation requests a SHOW, the one request whose meaning is 'this window should be on screen and in front'
+    panel_holder_319_windows_test.go:281: the second-launch activation took the toggle road (toggles went 1 -> 2): with a visible panel that road HIDES it, which is the D1 defect 319-v measured live
+    panel_holder_319_windows_test.go:284: the second-launch activation asked the panel thread to HIDE (hides went 1 -> 2): a second launch on an already-visible panel must never hide it (ticket 319 AC#2)
+    panel_holder_319_windows_test.go:292: 319-r3 headless visible-panel reading: control toggle hides=1 shows=0; activation receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; after activation: shows=0 toggles=2 hides=2; queued requests=2; spawns=1
+--- FAIL: TestSecondLaunchActivationDoesNotTakeTheHideRoad319 (0.00s)
+=== RUN   TestPanelHolderShowRebuildsADeadThread319
+time=2026-10-15T14:24:21.408+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T14:24:21.408+08:00 level=INFO msg="panel thread ending" why="stop requested before the panel window existed" window_opened=false
+time=2026-10-15T14:24:21.408+08:00 level=INFO msg="panel thread exited cleanly" shows=0 toggles=0 disposals=0
+time=2026-10-15T14:24:21.408+08:00 level=INFO msg="panel host: starting a fresh panel thread for this gesture" via=second-launch why="the previous panel thread had exited"
+    panel_holder_319_windows_test.go:353: the rebuilt thread got a toggle request (toggles=1, want 0): the activation must not take the hide-capable road
+    panel_holder_319_windows_test.go:364: 319-r3 headless dead-thread show reading: dead thread finished=true; spawns=2; rebuilt thread shows=1 toggles=1 hides=0 queued=1 same manager=true; receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+--- FAIL: TestPanelHolderShowRebuildsADeadThread319 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.126s
+FAIL
+
+== go test -overlay=overlay-mutant.json -tags winlive -run TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319 ./cmd/wisp/ ==
+time=2026-10-15T14:24:26.124+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319
+time=2026-10-15T14:24:26.126+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T14:24:26.127+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-15T14:24:26.138+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x8e30dd8"
+time=2026-10-15T14:24:26.138+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x18 known=true"
+time=2026-10-15T14:24:26.139+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x46 known=true"
+time=2026-10-15T14:24:26.143+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x46 known=true"
+time=2026-10-15T14:24:26.145+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x1c known=true"
+time=2026-10-15T14:24:26.146+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x86 known=true"
+time=2026-10-15T14:24:26.149+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x7f known=true"
+time=2026-10-15T14:24:26.150+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x7f known=true"
+time=2026-10-15T14:24:26.150+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x7f known=true"
+time=2026-10-15T14:24:26.152+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x6 known=true"
+time=2026-10-15T14:24:26.234+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x281 known=true"
+time=2026-10-15T14:24:26.246+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x282 known=true"
+time=2026-10-15T14:24:26.247+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x3d known=true"
+time=2026-10-15T14:24:26.247+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x3d known=true"
+time=2026-10-15T14:24:26.247+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x7 known=true"
+time=2026-10-15T14:24:26.247+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x85 known=true"
+time=2026-10-15T14:24:26.248+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x14 known=true"
+time=2026-10-15T14:24:26.249+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x47 known=true"
+time=2026-10-15T14:24:26.249+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x5 known=true"
+time=2026-10-15T14:24:26.250+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x3 known=true"
+time=2026-10-15T14:24:26.250+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-10-15T14:24:26.250+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0xf known=true"
+time=2026-10-15T14:24:26.250+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-10-15T14:24:26.250+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-10-15T14:24:26.250+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-10-15T14:24:26.262+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x210 known=true"
+time=2026-10-15T14:24:26.262+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x7f known=true"
+time=2026-10-15T14:24:26.262+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x31f known=true"
+time=2026-10-15T14:24:26.262+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0xc0f9 known=true"
+time=2026-10-15T14:24:26.263+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x282 known=true"
+time=2026-10-15T14:24:26.263+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x7f known=true"
+time=2026-10-15T14:24:26.264+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x7f known=true"
+time=2026-10-15T14:24:26.268+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0xc053 known=true"
+time=2026-10-15T14:24:26.268+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x288 known=true"
+time=2026-10-15T14:24:26.638+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-10-15T14:24:26.721+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x14 known=true"
+time=2026-10-15T14:24:26.736+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0xf known=true"
+wisp: panel window is up (319-visible-setup, cold 613.2 ms, hot path 0.0 ms)
+time=2026-10-15T14:24:26.761+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x86 known=true"
+time=2026-10-15T14:24:26.762+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x6 known=true"
+time=2026-10-15T14:24:26.766+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x8 known=true"
+time=2026-10-15T14:24:26.767+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x281 known=true"
+time=2026-10-15T14:24:26.767+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x282 known=true"
+time=2026-10-15T14:24:26.775+08:00 level=INFO msg="activation requested by second launch" handled_here="the registered activation hook ran" receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+time=2026-10-15T14:24:26.780+08:00 level=INFO msg="panel host: CreateWebResourceResponse needed attempt 2 of 3 (the stale-GetLastError defect named above)"
+time=2026-10-15T14:24:26.781+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x18 known=true"
+time=2026-10-15T14:24:26.781+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x46 known=true"
+time=2026-10-15T14:24:26.783+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x47 known=true"
+time=2026-10-15T14:24:26.795+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8e30dd8 msg=0x1c known=true"
+    panel_death_replay_319_winlive_test.go:425: the second launch HID the panel: the window 0x8E30DD8 was shown before the activation (true) and mgr.IsShown() is false after it; AC#2 says a second launch brings the running instance's UI to the front, and hiding it is the D1 defect 319-v measured live
+    panel_death_replay_319_winlive_test.go:434: RAISE HALF OF AC#2, READ NOT ASSERTED: the panel 0x8E30DD8 is shown (alive=true) but the foreground window is 0xA07E8 (the prior window), not the panel. This is the measured state of the routed executor on today's tree, not a flake: mgr.Show skips SetForegroundWindow when the window was already shown, and ShowWindow(SW_SHOW) does not activate a visible window - probes/319/r3/02-probe-foreground-fixed.txt (A/A2/C/B) isolates all three facts. Closing this hop means a decision on mgr.Show (frozen for 319-r3); see the leg's receipt
+    panel_death_replay_319_winlive_test.go:436: 319-r3 visible-panel live reading: hwnd before=0x8E30DD8 shown before=true; signal=SignalExistingInstance("Local\\wisp-test-319-visible-32296-1792045466747485400.activate"); hook receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; after: mgr.IsShown=false hwnd=0x8E30DD8 (same=true) window alive=true; foreground=0xA07E8 (panel=false, prior=0x62C114C); event loop still running=true
+time=2026-10-15T14:24:26.799+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-15T14:24:26.799+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-15T14:24:26.799+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-15T14:24:26.799+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-15T14:24:26.799+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-15T14:24:26.799+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-15T14:24:26.799+08:00 level=WARN msg="fast shutdown: skipping non-critical log/db flushes (D38e fast path)"
+time=2026-10-15T14:24:26.806+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-15T14:24:26.807+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=2 disposals=0
+--- FAIL: TestSecondLaunchActivationOnAVisiblePanelDoesNotHideIt319 (0.68s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.855s
+FAIL
+62641b488657918dd0eaebd88c5b44d90d399205e58a9d62fb8f913bd5859c59 *cmd/wisp/resident_windows.go
