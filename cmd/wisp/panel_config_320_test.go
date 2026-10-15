@@ -51,8 +51,15 @@ func Test320ProviderBillingThroughTheRealLeg(t *testing.T) {
 	before := readConfigBody320(t, dir)
 	if _, err := disp.Handle(ctx, set313Env("r-320-billing-bad", panel.FieldProviderBilling, "deepseek", "", "flat-rate")); err == nil {
 		t.Fatal("a billing word outside the enum cleared the leg")
-	} else if !strings.Contains(err.Error(), "billing") {
-		t.Errorf("the refusal does not name the field: %v", err)
+	} else {
+		if !strings.Contains(err.Error(), "billing") {
+			t.Errorf("the refusal does not name the field: %v", err)
+		}
+		// The field's own pre-check answers, not the whole-file gate: the sentence
+		// the page gets must point at the field.
+		if strings.Contains(err.Error(), "第 3 种拒因") {
+			t.Errorf("the value was refused by the whole-file gate instead of the field's own pre-check: %v", err)
+		}
 	}
 	if after := readConfigBody320(t, dir); after != before {
 		t.Errorf("config.toml changed under a refused billing value:\n%s", after)

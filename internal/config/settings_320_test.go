@@ -53,6 +53,12 @@ func Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers(t *testing.T) {
 	if !strings.Contains(err.Error(), "billing") {
 		t.Errorf("the refusal does not name the field: %v", err)
 	}
+	// And the layer that refuses is the field's own pre-check, not the whole-file
+	// gate: both leave the file alone, but only one of them tells the operator
+	// which field is wrong, and that is the reason this check exists at all.
+	if strings.Contains(err.Error(), refusalInvalid) {
+		t.Errorf("the out-of-enum value reached the whole-file gate instead of the field's own pre-check: %v", err)
+	}
 	if after := readSettingsFile(t, path); after != before {
 		t.Errorf("config.toml changed under a refused billing write:\n%s", after)
 	}
