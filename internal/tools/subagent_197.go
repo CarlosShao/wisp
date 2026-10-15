@@ -253,6 +253,15 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 	if t.d.Roster == nil {
 		return Result{Text: "任务名册未接线（fail-closed：拒绝派生子代理，派生了也没有地方登记它）", IsError: true}, nil
 	}
+	// ONE branch, TWO duties (ticket 270): it refuses an assembly the host never
+	// wired, and it is also the only site that keeps the t.d.BaseOptions() call
+	// below from being reached with an empty func value - calling that is not an
+	// error but a panic that ends the whole internal/tools run, which is the
+	// reading internal/tools/failclosed_236_teeth_test.go records as its own red.
+	// Form 甲 (ledger A990, decision 3) put a nil check of its own at that call,
+	// so deleting this branch now lands on the same named refusal instead of on
+	// that panic; the sentence below stays the one this branch of the || speaks
+	// for both of its fields.
 	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
 		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
 	}
@@ -278,6 +287,17 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 			MaxConcurrentSubagents, strings.Join(t.d.Roster.RunningSubagentIDs(), ", ")), IsError: true}, nil
 	}
 
+	// Form 甲: the call protects itself. BaseOptions is a func value, so the next
+	// line is a nil call, not a nil read, and a nil call panics instead of
+	// refusing. The guard above fires first in every wiring this package builds
+	// today, which is why this check has no ordinary caller - it is here because
+	// that guard is one branch of an ||, and if it is ever split or loosened this
+	// line is the only thing left that cannot be called empty. The Text is the
+	// same sentence as that guard's, so one missing assembly gets one reason.
+	if t.d.BaseOptions == nil {
+		release()
+		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
+	}
 	base, wired := t.d.BaseOptions()
 	if !wired {
 		release()
