@@ -1,0 +1,34 @@
+腿名：287-v1（验收腿·非实现者·只读产码）｜票：.scratch/wisp/issues/287-depth-guard-has-no-fixture-so-the-subagent-spawn-hop-is-unreachable-and-untested.md（AC#2／AC#3／AC#4 三格；AC#1 已勾、归实现前普查，⛔ 你重开）
+裁决锚：实现笔＝`e1973191`（287-r1 落地腿，票 287 AC#2∥AC#3∥AC#4；另 `e64294a0`＝它按⛔ amend 规矩另发的台面登记）；当前 HEAD＝`988ce413`（2026-10-15 23:12）
+存档时刻：2026-10-15 23:1x +08（与 `-send.txt` 同批发出）｜编排者放腿前三把尺现跑：① `git log -1 e1973191`＋`e64294a0` 逐枚命中 ② `git status --porcelain -- internal/tools` ＝ 0 行（写面空、287-r1 已收） ③ CPU 23:10＝57%／23:13＝46%，两发都＜70%（⚠ 这一行先前写的是 52%，那是更早一发的采样，按这两发改正）
+
+★身份钉死（AGENTS.md §0 第 3 条）
+非实现者。⛔ 改任何产码／测试件，⛔ 勾 AC 框（翻框归编排者）。判语只许三种：成立／不成立（带被造出来的坏世界）／证据不足（具名缺哪一发读数）。⛔ "附条件成立"。
+
+要裁的三格（票面 17–19 行，逐格引原文，⛔ 概括成"夹具造好了"）
+- **AC#2 造那枚夹具**：判据要点＝让**调用者那一行**的 `Kind == TaskKindSubagent`、派发经**真 loop**（因而 `corr != taskID`）、请求 `task.spawn`。⇒ 你必查三件事：① 夹具真的走到"深度判定那一支"（⛔ 恒真：判据换成反形必须红）；② `corr != taskID` 这一维是**量出来**的还是**注释里写的**；③ 那枚 `Kind` 是夹具自己造的字段还是真装配给的（自己塞字段＝测了个假对象）。
+- **AC#3 "要不要让它走到"（⛔ 不改产码）**：编排者已裁＝**维持甲**（孩子的 `task.spawn` 被 `subagentToolProvider` 硬拒＝设计如此，深度 1；口令「287 改裁乙」在案）。你的任务⛔ 重裁这一格，而是**查甲形的代价句说实话没有**：票面/证据件里凡是"硬拒所以够不到"的句子，有没有具名"最坏后果是什么形状"（孩子能不能间接拿到 spawn、拒句可不可见）。你认为那句写得虚，就**造一发证明它虚**，落到读数件里。
+- **AC#4 边界与门禁**：写面只许 `internal/tools/**`。⇒ 你独立复跑"越界扫"：`git show --stat e1973191` 逐枚路径对照票面允许面；⛔ 拿腿的自述当你的尺。并核它⛔ 碰 `internal/agent/loop.go` 的 `callCorr`、⛔ 碰 `approval/gate` 那一族。
+
+★必查的第二件（编排者在 A996 里欠着的）
+腿自报 `d22scan` 一度 `rc=1`，它当时点是 `internal/tools/subagent_depth_fixture_287_test.go:249` 一枚 emoji，而编排者 21:5x 自己跑＝0 clean ⇒ 判语＝**它中途自己改了**（不是我修的、也不是存量债）。你要**现在复跑那一把**并具名：`sh scripts/d22scan.sh` 的 rc ＋ `internal/` 分母枚数（22:3x 编排者量到 568，会随别腿上涨，⛔ 当红、⛔ 归给你）。⚠ 具名射程：bans #1-5 **不含** `_test.go`，ban #8 **才含**——所以那枚 emoji 属 #8 那一支，别把两条禁当同一条。
+
+★这台仪器有没有牙（首要攻击点＝判据仪器自己）
+`e1973191` 交回里带了 5 枚突变台件（`.scratch/wisp/probes/287/r1/mutants/`：`B1-name-gate-off.go`／`B2-name-gate-and-listing-off.go`／`M1-disable-branch.go`／`M2-identity-to-corr.go`／`M3-overbroad-any-row.go`）。⚠ 编排者 23:1x 现量该目录＝**5 枚 `.go` ＋ 一枚子目录 `stale-crlf/`**（里面是 M1／M2／M3 三枚同名的 CRLF 变体，腿的自报里没提它）；`probes/287/r1/` 顶层另有 **6 枚 `stale-pre-trim-*.log` ＋ 1 枚 `subagent_197.go.pre-mutation.bak`**。这些是不是台面残留、该不该算它的突变凭据，**由你判并具名**（判据落点＝`e1973191` 交回里那句"5 枚"有没有把 CRLF 那一套另算一次）。证据件真名＝`docs/evidence/s1/287-depth-fixture.md`。你要做的⛔ 重跑它们的脚本，而是**判它们算不算凭据**：① 每枚突变锚是不是落在**函数体内**（行号锚会腐烂，认内容短语）；② 有没有"改前必红"⓪ 就够——还要问"换成反形会不会也红"（恒真三形之一：一把尺两种形状都放行）；③ `M2-identity-to-corr`（把 corr 换成 taskID）必须让点名用例红，否则 `corr != taskID` 那一维**没人钉**＝写"没测到"，⛔ 追认。
+★**缺世界**那一形要专门查：如果夹具里根本没有"孩子的 `Kind` 为 subagent 且经真 loop"那一行世界，退化判据后仍全绿＝它对这件事不敏感（先例＝`sealHandle` 那半格，编排者与验收腿各跑整包皆 55/0/rc=0、sha 同串）。要的是**同文件里两对同形判据⛔ 互冒充**那种坑（`winsec_other.go` 里 `sameObjectPinned` 与 inline 各一对）——若 287 的夹具也落在两处，逐枚点名。
+
+★读数与用词纪律（我自己踩出来的，⛔ 再踩）
+凡引一个数：写全**哪把尺＋射程（哪些目录、工作树还是 HEAD blob）＋量的还是算的**；凡"几枚"带单位名（**文件**／**顶层用例** `^--- PASS`／**子测试**，两把 PASS 尺同日志可差十枚、两把都对）；`gofmt -l`／`gofumpt -l` 退码恒 0＝空尺，必写"列出几枚＋逐枚件名"；⚠ 本机现在**没装 gofumpt**（22:4x 我量到 `command not found`＝rc 127 台面故障）⇒ 跑 `gofmt -l` 并具名这把更窄，⛔ 冒充，或自己在仓外临时目录 `go install`（⛔ 动机主 git 配置、⛔ 动 `.gitattributes`）。一把尺报"0 命中"前先看 stderr，并先拿"已知存在的那一枚"当正控——**"0" 是量到的还是正则造的**。红句里出现 `walk`／`build failed`／`no tests to run`／`connection refused`／`0xc0000135`／`RUN=0` ⇒ 归类面故障另节具名，⛔ 计入判据。
+
+★台面
+- `internal/tools` 整包可以跑（⛔ `cmd/wisp` 整包＝票 314 死亡区；定向 `-run` 也别扩到那包）。要"改前基线"用 `git archive <rev> | tar -x -C <仓外目录>`（⛔ 共享工作树跑改前那发＝那是别人的在飞态；⛔ 仓内 worktree），取出后先数 `.go` 证非空再信它的 0。
+- `GOTMPDIR` 先 `mkdir -p` 再指；导出树要带六件套 `go.mod go.sum internal cmd tools scripts`。
+- 长度门必须仓根跑（否则 rc=2 那句 `not inside a git work tree` 是射程拒绝⛔ 是红）。
+门禁五件自己跑、自己落 `rc=`：`go build ./...`／格式化尺（见上）／`go vet ./internal/tools/`／`sh scripts/d22scan.sh`／长度门 `--with-self-test`。⚠ `go build ./...` 的红若指向 `internal/winsec` 的未定义符号＝在飞腿 `322-r1` 的中间态，另节具名，⛔ 算本腿的账。
+
+写面（只许三处，逐字）：1) `.scratch/wisp/probes/287/v1/`；2) `docs/evidence/s1/` 里**你这一份**验收表（件名短、⛔ 长名⛔ 带 `§`——长度门会为别家腿的拷贝件红，处置是 `git mv` 短名⛔ 加名册豁免）；3) 票 287 末尾**一条** bullet（只追加）。⛔ 改产码／测试件，⛔ 勾 AC 框。
+在飞邻居（⛔ 碰、⛔ 记成自己的红）：`322-r1`＝`internal/winsec`（写腿，现量 6 行）；`166-r2`＝`internal/session` 一枚测试件（写腿，现量 1 行）；`324-v1b`＝`cmd/wisp` 定向跑（只读验收腿，同批另一条腿；它与我都在盯 `docs/evidence/s1/`，各写各的件）。⚠ 具名一条账：先前的 `324-v1` 是**假交件**（49 秒交回、盘上三把尺全空），它没读过任何东西 ⇒ ⛔ 在任何地方把"324-v1 的判语"当已存在的凭据。
+Git 纪律：只 commit、⛔ push；`git add`／`git commit` 两处逐枚显式 pathspec（⛔ `-A`／`.`／目录形）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删；⛔ 仓内建 worktree／checkout。
+禁区（零字节）：`docs/PLAN.md`、`docs/specs/**`、`internal/agent/loop.go` 的 `callCorr`、`internal/approval/**` 与 `approval/gate` 那一族、`internal/risk/**`、`internal/panel/**`、`internal/agent/approval/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、三枚冻结件（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）；D1–D47／C1–C32／R1–R9／D43 转移表⛔ 动。
+预算：≤5 件、每件 ≤260 行；没裁完的格具名写"没裁完"＋缺哪一发读数。
+shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（本仓这族造过两次事故：拉起孤儿 `build\wisp.exe`、把台账正文当脚本执行⇒暂存区被灌 2113 条）。中文 commit 正文先 Write 成文件再 `git commit -F`。

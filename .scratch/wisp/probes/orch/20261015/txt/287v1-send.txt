@@ -1,0 +1,12 @@
+287-v1 释放记录（编排者·2026-10-15 23:1x +08）
+
+- 派单正文＝同目录 `287v1-dispatch.txt`（本条与之同批提交，冲突以本条为准）
+- 票＝`.scratch/wisp/issues/287-depth-guard-has-no-fixture-so-the-subagent-spawn-hop-is-unreachable-and-untested.md`（AC#2／AC#3／AC#4 三格）
+- 放腿前三把尺现跑（⛔ 拿旧数当现量）：
+  ① 提交真在＝`git log -1 e1973191`（10-15 22:09「287-r1 落地腿交件」）＋`e64294a0`（22:11 台面登记）逐枚命中
+  ② 面空＝`git status --porcelain -- internal/tools` → **0 行**
+  ③ 负载＝CPU 57%（23:10）→ 46%（23:13），两发都＜70%（我自己那条补位线）
+- 同批另一条腿＝`324-v1b`（面＝`cmd/wisp` 定向跑，⛔ 整包＝票 314 死亡区）；两枚面不相交。
+- 编队现状（枚数＋写面类型一起报）：在飞 4 枚＝写码 2（`322-r1`/`internal/winsec` 6 行、`166-r2`/`internal/session` 1 行）＋只读验收 2（本腿/`internal/tools`、`324-v1b`/`cmd/wisp`）。
+- 我随本批发出的更正：① 派单里 CPU 那格原写 52%，按上面两发改正；② 突变名册现量＝5 枚 `.go`＋子目录 `stale-crlf/`（内含 M1／M2／M3 的 CRLF 变体）＋顶层 6 枚 `stale-pre-trim-*.log`＋1 枚 `.pre-mutation.bak`，判归属交腿（先前派单只写"5 枚"＝不完整）；③ 证据件真名 `docs/evidence/s1/287-depth-fixture.md` 补进派单。
+- ⛔ push（推送只由编排者按 A813 做）。
