@@ -1,0 +1,7 @@
+135-r1 send 记录（重发）
+- 发送时刻：2026-10-15 18:0x +08；定稿派单已先存档：txt/135r1-dispatch.txt（发送时回填发送行；预备稿＝txt/135r1-dispatch-DRAFT.txt，12:0x 那版）。
+- 去重核：`.scratch/wisp/probes/135/` 未建（首法 2026-10-14 22:1x 被平台 ECONNRESET 掐死、零遗产）⇒ 重发可用。
+- 收件人：agent_4c67b9e7-ea54-4872-bb50-327ebed3f26f（general-purpose，后台）。
+- 内容：票 135 七格（AC#1 后果断言自证腿／AC#2 M-F 常备用例／AC#3 doctor 腿 CWD-empty／AC#4 成句断言／AC#5 POSIX 零分母二选一／AC#6 门禁／AC#7 句段粒度自证腿两拍）；面＝`cmd/wisp`（dataroot_128_test.go／doctor.go 只读／leg_dispatch_gate_133_test.go 尺）＋`internal/proc/**`。
+- 面序：票 319 全链收口（`-done`）＋`320-r1` 收件 ⇒ `cmd/wisp` 面空，故即发；后随 `120-r1`（第三写腿候选，等本腿让机器安静）。
+- 事前盘面：HEAD=`8f41a4df`（未推 10，含 319 r3/r4 与两票收口）；机主实例 wisp.exe PID 40296（⛔ 别扰动）；GOTMPDIR 约定根（别用 `C:\tmp\`）。
