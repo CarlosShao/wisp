@@ -1,0 +1,16 @@
+### ticket 93 face, next= item 4 (the promise's source)
+4. 谁碰 `test-windows`：把 `-run TestSyncRegistryProbeLive` 接进 windows job（用 `runtests.sh`），
+   那才是"这条只在 Windows 上参评"的真结论；今天它在 windows job 里没有任何步骤跑它。
+
+### ticket 110 face :15 (R-110-4 转票) / :96 (AC#4 answer, was :90 when done-check wrote it) / :119 (R-110-4)
+`R-110-3` 匹配式缺、`R-110-4` 票面承诺的 step7 读数至今 0 次 ⇒ 一并转票 111。）
+- （agent-ticket110）**AC#4 `R-93-4` 的答复 = 它不该进 RUN 分母，但它该拿的步级证据我给了**。本机（windows 主机）`go test ./internal/risk/ -run 'TestSyncRegistryProbeLive$' -count=1 -v` = **`--- SKIP`，syncdirs_windows_test.go:133 `no registry-grade sync record on this machine`** ⇒ 纳入 run 分母只有两种读数：`runtests.sh` 下 SKIP=1 的常红，或裸 `go test` 下的假 `ok`（正是票 93 要消灭的字节形状），所以维持 ledger 的 fixture 记账。**做了的加严**：windows 腿的 portable 步现在把 `./internal/risk/` 纳入 scope（步名同步改成 `Portable windows tests (proc/secret/config/risk)`），于是那行 ledger 第一次**在 windows 腿**被 `go test -list` 对着 windows 编出的 test binary 复验、并在该步日志里带 class+reason 打印；改名/删测试/埋进 build tag 都会让这一步红。顺带把 windows 腿的 risk 分母从"一条 `-run`"扩到整包：本机 **rc=0，PASS=201 / FAIL=0 / SKIP=0 / === RUN=325**。
+- **R-110-4** AC#4 许诺的"windows 腿第一次复验 ledger"至今**无一次步级读数**（step7 两枚样本都 skipped）⇒ 与 R-110-2 同根，修完步序/红名后读 step7 的 class+reason 行回填。
+
+### ticket 111 face :75-76 (AC#7 verbatim)
+- [ ] **AC#7** `R-110-4`：票 110 承诺过"`-run TestSyncRegistryProbeLive` 经 `runtests.sh` 接进 windows 腿（step7）"，
+      验收复算发现**至今 0 次** ⇒ 要么落地并给 step7 读数，要么在票 110/111 面把它**当众改口径**（不许留在原地当已做）。
+
+### acceptance table docs/evidence/s1/110-adversarial-acceptance.md:17 and :33
+| AC#4 | `R-93-4` 一并收：windows 腿把 `TestSyncRegistryProbeLive` 纳入分母的步级证据，或论证不该纳入 | **通过（附条件：步级证据至今不存在）** | 〔日志＋归档，我抽验〕＋论证＝〔独立复现（读码）〕 | 我读了 `scripts/portable-tests.sh`：ledger 行仍在（`:93`），reason 自陈"as of ticket 110 AC#4 the windows leg carries `./internal/risk/` in its scope, so this row is re-verified against the compiled WINDOWS test binary (`go test -list`) and printed with its reason in that step's log"，且 `ci.yml` 的 windows portable 步实跑 `bash scripts/portable-tests.sh ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/`（我读 `.github/workflows/ci.yml` 原文核到）。**"不该进 RUN 分母"的论证我认可**：`runtests.sh` 把任何顶层 SKIP 判死（M1/旧红读数里可见 `-skip ^...TestSyncRegistryProbeLive$` 已把它排除在跑之外），纳入只有两种读数——常红或裸 `go test` 的假 `ok`（票 93 要消灭的字节形状）。⚠ **但它许诺的步级证据至今 0 次**：run `35595651898` 的 step 7 `Portable windows tests (proc/secret/config/risk)` = **con=skipped**（被新步的红挡住），`test-windows` 目录下我只解出 step1-4 的日志文件 ⇒ 该 reason 行**从未在 CI 上打印过一次**。补救动作：见 `R-110-2`/`R-110-4`（修 winsec 红或调整步序，之后回填 step 7 的 class+reason 行）。票自述的本机读数（`--- SKIP` at `syncdirs_windows_test.go:133`；risk 整包 PASS=201）我**未复跑**，记第三档。 |
+**通过（附条件）**：AC#1/AC#2/AC#3/AC#5 成立（前两格数字全部我复算过、第三格三发变异全部我独立复现），AC#4 成立但**附条件**（其步级证据至今不存在，条件 = R-110-2/R-110-4 的补救）。
