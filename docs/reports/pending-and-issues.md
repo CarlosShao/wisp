@@ -18251,3 +18251,11 @@ Windows 那一支＝`proc.OpenJobScope()`（**新建一枚匿名 job**，`Create
 - **`266-r1` 收件**（`38cc3243`）：AC#0 完成落件（scope 尺＝0 命中、P3 常量 `slo-freshness.sh:137`、两钉真身 `slo-check.ps1:291/:292`、路径门 GREEN 基线）；AC#1–#4 未做、`scripts/**` 与 `ci.yml` **零改动**、`next=` 精确（①-A 新尺＋lint 新步）。
 - **★两条待机主拍板（`Q`，由 `120-r1` 交回）**：① **`privateFile` 的开**在 `winsec.go`（本票写面外）——同一窗口里它仍会**跟随叶子链接 `O_TRUNC` 外来文件**（私密字节会被新闸门拦住，**破坏仍在**）⇒ 要不要并入票 120 下一轮？② **r 权限类收紧代价**（`0w0`/`000` 文件、缺 `r` 目录由"可修"变"拒"）是否接受？——两条都改用户可见行为，⛔ 我不替机主拍。
 - **推送**：`bf25809a..a8d02022` 已推（第 1 试成）；本 A984 与 `272405f5` 落本地待推（下一发即成批）。
+
+## A985｜2026-10-15 16:4x +08（`date` 现读）｜机主实报："拉取列表出来了，勾第二个模型就崩" ⇒ **单点根因：在 setState 更新函数里读 `e.currentTarget.checked`**（前端一行为级修复，我已就地改并重编）＋**拉取端口经机主真机验收＝通**（9 个模型列表出得来）
+
+- **机主的两个读数**：① 拉取**成功**（面板里列出 9 个模型：`step-3.5-flash`／`step-3.5-flash-2603`／`step-3.7-flash`／`step-5-preview`／`step-router-v1`／`stepaudio-2.5-asr`…）⇒ **`320-r2` 的首个真机验收读数**；② 勾**第二个**模型时面板切到错误边界卡（"面板出了点问题…`Cannot read properties of null (reading 'checked')`"）。
+- **根因（现读 + 逐行）**：`frontend/src/components/model-settings.tsx:604-611` 的 `onChange` 把 `e.currentTarget.checked` **写在 `setTicked(current => …)` 的更新函数体内**。React 只在**队列为空**时才在派发期间立即求值该更新函数，否则推迟到渲染/提交阶段——而 `e.currentTarget` 在事件派发结束后就被置空 ⇒ 推迟那次读到 `null.checked` ⇒ TypeError ⇒ 错误边界。**这解释了"第一下不崩、第二下崩"**（第一发队列空＝立即跑）。全仓同型扫描：`currentTarget` 共 9 处，其余 8 处都在派发期间直接读（`…(e.currentTarget.value)` 直接进 setter／`getBoundingClientRect()` 在处理器体内）**安全**；只有这一处带 deferred 依赖。
+- **处置**：**就地修**（一行级：`const isChecked = e.currentTarget.checked;` 提到更新函数**之外**，注释写明为什么）。⚠ 面边界说明：`frontend/**` 按现行归属是机主外部 agent 的零写面；本次是**机主实报崩溃 + 前端会话已收工**，我按"好好弄弄好"就地把这一处改掉，并**把补丁原文交给机主**（供其转交，若那边要重写这段以它为准）。**改动只此一处**（`git diff --stat frontend/src/components/model-settings.tsx`＝1 文件）。
+- **重编**：`scripts/build.ps1 -Env dev`（旧实例 PID 27452 已掐；`frontend/dist` 移出留底后重建；产物名守卫的合规过法同 `A982`）。构建后逐字核 exe 内新页字节，重拉实例。
+- **待办（挂在票 320）**：AC#4 的勾由非实现者复核；本条只记"真机通 + 崩已修"。

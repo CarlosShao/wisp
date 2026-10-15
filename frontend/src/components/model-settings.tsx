@@ -602,9 +602,17 @@ function ProviderEdit({
                         checked={ticked.has(id)}
                         className="size-3.5 accent-primary"
                         onChange={(e) => {
+                          // Read the DOM flag DURING dispatch. The updater below
+                          // is not promised to run here: React only computes it
+                          // eagerly when the queue is empty, and by the time a
+                          // deferred updater runs, React has already nulled
+                          // e.currentTarget - which is exactly the
+                          // "Cannot read properties of null (reading 'checked')"
+                          // crash the operator hit on the SECOND tick.
+                          const isChecked = e.currentTarget.checked;
                           setTicked((current) => {
                             const next = new Set(current);
-                            if (e.currentTarget.checked) next.add(id);
+                            if (isChecked) next.add(id);
                             else next.delete(id);
                             return next;
                           });
