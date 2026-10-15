@@ -26,6 +26,14 @@ package main
 //     built, so the sentence measured is the production one and not a re-typed
 //     copy). The middle one is [panel]'s control re-pointed at [session] once
 //     票 255 AC#4 gave [panel] a reader in another process.
+//  4. TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite /
+//     TestTicket324SectionMembersAreReadOffTheSchema - 票 324's controls for the
+//     judgement upgrade in readsFieldAccess. The refusal half is the AC#1反控: a
+//     fixture struct that merely OWNS a field named like a section (built under a
+//     temp dir, so no production file has to carry a fake field) must not be counted
+//     as a reader. The second half is what keeps that refusal from being blindness:
+//     a real schema member still counts, and the member set must be a non-empty
+//     reading of internal/config's schema.
 //
 // The positive control is 票 255's own words: 手改 `[panel] width` ⇒ the sentence
 // "这些段已立即生效" must not contain `[panel]`. The negative control is a section
@@ -259,14 +267,30 @@ func TestTicket255RosterStillMatchesTheActualReadSites(t *testing.T) {
 	if len(fields) < 14 {
 		t.Fatalf("the roster adjudicates %d Config sections, want the 14 hot ones: the walk itself narrowed", len(fields))
 	}
+	// 票 324's teeth-check for the upgraded judgement, kept next to the scan it gates:
+	// every scanned section must resolve to a non-trivial member set off the schema.
+	// Without this floor, a scanReadFiles that reads NO member names would refuse every
+	// line and this ruler would report "no readers anywhere" as a clean reading - the
+	// same 摘尺-as-fix shape AC#1 of 票 255 forbids.
+	for _, field := range fields {
+		if n := len(configSectionMembers(t, field)); n < 2 {
+			t.Errorf("section field %q resolves to %d schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)", field, n)
+		}
+	}
+	// 票 324 AC#3 wants the sections named one by one, so the loop counts its own rows
+	// and logs each one's reading under -v. Reporting only: the judgement below is
+	// 票 255's, unchanged.
+	sectionLogged := 0
 	for _, field := range fields {
 		section := sectionNameForField(t, field)
+		sectionLogged++
 		want, ok := sectionReadSites[field]
 		if !ok {
 			t.Errorf("section %q (field %s) has roster claims but no sectionReadSites entry - the scan cannot tell a reader-less section from an unmapped one", section, field)
 			continue
 		}
 		got := scanReadFiles(t, root, field)
+		t.Logf("SECTION %d/%d section=%q field=%s roster=%v scan=%v match=%v", sectionLogged, len(fields), section, field, want, got, slicesEqualSorted(got, want))
 		if !slicesEqualSorted(got, want) {
 			t.Errorf("section %q (field %s) is read by %v in production, the roster names %v: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated",
 				section, field, got, want)
@@ -303,8 +327,12 @@ func sectionNameForField(t *testing.T, field string) string {
 // compare and copy what it declares - that is not a consumer), this ticket's roster
 // file (its verdict strings quote code), testdata trees, and comment lines (票 180's
 // census refuses to count a doc comment that names a field).
+//
+// The section's member names are read off the schema ONCE per field, outside the walk,
+// so every line of every file is judged against the same reading (票 324).
 func scanReadFiles(t *testing.T, root, field string) []string {
 	t.Helper()
+	sectionMembers := configSectionMembers(t, field)
 	hits := map[string]bool{}
 	for _, dir := range []string{"cmd", "internal", "tools", "scripts"} {
 		base := filepath.Join(root, dir)
@@ -338,7 +366,7 @@ func scanReadFiles(t *testing.T, root, field string) []string {
 				if strings.HasPrefix(trimmed, "//") || strings.HasPrefix(trimmed, "*") {
 					continue
 				}
-				if readsFieldAccess(trimmed, field) {
+				if readsFieldAccess(trimmed, field, sectionMembers) {
 					hits[rel] = true
 					break
 				}
@@ -363,15 +391,47 @@ func scanReadFiles(t *testing.T, root, field string) []string {
 // anything (and internal/ball's HotkeyConfig has its own Panel field, which is not
 // this section), and 票 180's census draws the line the same way. These are exactly
 // the three patterns whose readings produced the file lists in sectionReadSites.
-func readsFieldAccess(line, field string) bool {
+//
+// 票 324 UPGRADED THE DOTTED PATTERN, AND THE COST IS STATED HERE BECAUSE THE TICKET
+// MAKES THE SHIPPED SHAPE BE CHOSEN AND NAMED. It used to stop at "the component
+// after `.Field.` starts with a capital", so any struct that happened to own a
+// same-named field counted as a reader of that section: internal/panel/composer_dispatch.go's
+// `d.Models.HandleModelsListRequest(ctx, req)` reads a dispatch HANDLER hanging off
+// *ComposerDispatch (ticket 320 AC#4's optional route), and was counted as a reader of
+// [models]. The judgement now requires that component to be a name the schema declares
+// INSIDE the section (configSectionMembers): reaching for a member the section does not
+// have cannot be a read of that section.
+//
+// What that buys, and what it does not:
+//   - it is a word-level ruler, so it stays fooled at the edges in both directions. A
+//     config read spelled through something the schema does not declare (a method on the
+//     section, a hop the schema walk does not take) is MISSED; a non-config struct that
+//     MIRRORS the schema's member names is COUNTED. The second case is live on purpose:
+//     internal/panel/config_handlers.go's `v.Voice.*` lines read panel.SettingsView, a
+//     mirror of [voice], and 票 313 adjudicated that render leg into
+//     sectionReadSites["Voice"] - this ticket's write face does not include
+//     re-adjudicating another section's rows, so the field-name shape is still what the
+//     ruler measures there. The receiver-typed alternative (票 324's 甲) would drop that
+//     row and owe a roster edit outside this ticket: named as the residual, not quietly
+//     paid for with a green.
+//   - it is not a name whitelist and not a skip list. Nothing here names a file, so
+//     there is nothing for a later wave to add to "make the red go away": the only way
+//     to let a new follow-name count is to give internal/config's section struct that
+//     field, which is a schema change another ticket owns.
+func readsFieldAccess(line, field string, sectionMembers map[string]bool) bool {
 	dotted := "." + field + "."
 	for i := 0; i+len(dotted) < len(line); i++ {
 		if line[i:i+len(dotted)] != dotted {
 			continue
 		}
-		if next := line[i+len(dotted)]; next >= 'A' && next <= 'Z' {
-			return true
+		rest := line[i+len(dotted):]
+		if rest[0] < 'A' || rest[0] > 'Z' {
+			continue
 		}
+		if sectionMembers[identName(rest)] == false {
+			continue
+		}
+		return true
 	}
 	for _, prefix := range []string{"Config()." + field, "Config." + field} {
 		idx := strings.Index(line, prefix)
@@ -384,6 +444,47 @@ func readsFieldAccess(line, field string) bool {
 		}
 	}
 	return false
+}
+
+// identName returns the identifier at the head of s (empty when s does not start with
+// one), so readsFieldAccess can ask the schema about the component that follows
+// `.Field.` instead of asking it about the first letter.
+func identName(s string) string {
+	end := 0
+	for end < len(s) && isIdentByte(s[end]) {
+		end++
+	}
+	return s[:end]
+}
+
+// configSectionMembers reads the section's own member names off internal/config's
+// schema instead of typing them here: the exported fields of the struct Config
+// declares for this field. It is a READING, so the roster cannot drift from the schema
+// without reddening (TestTicket324SectionMembersAreReadOffTheSchema), and a struct of
+// some other package that owns a same-named field cannot widen it.
+func configSectionMembers(t *testing.T, field string) map[string]bool {
+	t.Helper()
+	out := map[string]bool{}
+	ft := reflect.TypeOf(config.Config{})
+	for i := 0; i < ft.NumField(); i++ {
+		sf := ft.Field(i)
+		if sf.Name != field {
+			continue
+		}
+		st := sf.Type
+		for st.Kind() == reflect.Ptr {
+			st = st.Elem()
+		}
+		if st.Kind() != reflect.Struct {
+			return out
+		}
+		for j := 0; j < st.NumField(); j++ {
+			if mf := st.Field(j); mf.IsExported() {
+				out[mf.Name] = true
+			}
+		}
+	}
+	return out
 }
 
 func isIdentByte(b byte) bool {
@@ -404,6 +505,100 @@ func slicesEqualSorted(a, b []string) bool {
 		}
 	}
 	return true
+}
+
+// --- 票 324: the two controls for the upgraded reader judgement ------------------
+
+// The fake site is the shape 票 324 measured in production: a struct that OWNS a
+// field named like a config section, and reaches a member that section's schema does
+// not declare (a handler, not a value). It lives in a fixture the scan reads, not in a
+// production file - the ticket forbids planting a fake field in the shipped tree.
+const rosterScanFakeSite324 = `package panel
+
+type samenameHandler interface{ HandleModelsListRequest() error }
+
+type samenameDispatch struct{ Models samenameHandler }
+
+func (d *samenameDispatch) list() error { return d.Models.HandleModelsListRequest() }
+`
+
+// The schema site is the counterpart: the member the [models] section really declares.
+// Both fixtures are needed - a ruler that refused EVERYTHING would pass a refusal-only
+// control, so the counted half is what makes the refusal half a reading.
+const rosterScanSchemaSite324 = `package main
+
+func readMirror(cfg struct{ Models struct{ Mirror []string } }) []string {
+	return cfg.Models.Mirror
+}
+`
+
+// TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite is 票 324 AC#1's 反控,
+// taken through the real scan (not through a re-typed predicate): over a fixture tree,
+// the handler-shaped same-named field must not be named as a reader of [models] while
+// the schema member must be.
+func TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite(t *testing.T) {
+	root := t.TempDir()
+	// The scan walks cmd/internal/tools/scripts and fails the test on a missing tree,
+	// so the fixture root carries all four.
+	for _, dir := range []string{"cmd/wisp", "internal/panel", "tools", "scripts"} {
+		if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(dir)), 0o755); err != nil {
+			t.Fatalf("fixture dir %s: %v", dir, err)
+		}
+	}
+	fixtures := map[string]string{
+		"internal/panel/samename_fixture.go": rosterScanFakeSite324,
+		"cmd/wisp/schembsite_fixture.go":     rosterScanSchemaSite324,
+	}
+	for rel, src := range fixtures {
+		if err := os.WriteFile(filepath.Join(root, filepath.FromSlash(rel)), []byte(src), 0o644); err != nil {
+			t.Fatalf("write fixture %s: %v", rel, err)
+		}
+	}
+	got := scanReadFiles(t, root, "Models")
+	want := []string{"cmd/wisp/schembsite_fixture.go"}
+	// The reading itself, logged so the 反控 is quotable as a measurement and not just
+	// as a PASS line (go test -v). fakeSiteRefused is true exactly when the scan named
+	// the schema-member fixture and nothing else.
+	t.Logf("FIXTURE root=%s scan=%v want=%v fakeSiteRefused=%v", root, got, want, slicesEqualSorted(got, want))
+	if !slicesEqualSorted(got, want) {
+		t.Errorf("the scan read %v for section field Models over the two fixtures, want %v: d.Models.HandleModelsListRequest in internal/panel/samename_fixture.go is 票 324's same-named NON-config field shape (a dispatch handler, not a value the [models] section declares) and must not be counted as a config reader, while cfg.Models.Mirror must be - a scan that named both has no judgement, and a scan that named neither is 摘尺", got, want)
+	}
+}
+
+// TestTicket324SectionMembersAreReadOffTheSchema pins the judgement on the two
+// production lines 票 324 read, as data rather than as a walk: the [models] schema
+// member keeps counting, the handler-shaped same name stops counting, and the
+// section-level `Config().Hotkey` shape (no member after it) still counts. It is the
+// named case that reddens when the schema-member requirement is degraded to "any
+// capitalised component" (AC#1's 正控), and the one that reddens if the member reading
+// is broken so hard the ruler refuses everything.
+func TestTicket324SectionMembersAreReadOffTheSchema(t *testing.T) {
+	models := configSectionMembers(t, "Models")
+	if !models["Mirror"] {
+		t.Errorf("the [models] schema reading lost its Mirror member (got %v): the real reader line would stop counting, which is 摘尺当修尺", models)
+	}
+	if models["HandleModelsListRequest"] {
+		t.Errorf("the [models] schema reading carries HandleModelsListRequest, which is panel.ModelsListRequestHandler's method and not a config member: the ruler can no longer tell the two apart (got %v)", models)
+	}
+	schemaSite := "mirrors = cfg.Models.Mirror"
+	if !readsFieldAccess(schemaSite, "Models", models) {
+		t.Errorf("cmd/wisp/models.go's real read line %q is no longer judged a read of [models]: the ruler went blind instead of going strict", schemaSite)
+	}
+	fakeSite := "return d.Models.HandleModelsListRequest(ctx, req)"
+	if readsFieldAccess(fakeSite, "Models", models) {
+		t.Errorf("internal/panel/composer_dispatch.go's handler line %q is judged a read of [models] again: the schema-member evidence was dropped, so a same-named field of any other struct counts as a config reader", fakeSite)
+	}
+	hotkey := configSectionMembers(t, "Hotkey")
+	if !readsFieldAccess("h := mgr.Config().Hotkey", "Hotkey", hotkey) {
+		t.Errorf("the Config()-rooted section-level line stopped counting: a whole section taken off the live Manager is a read of it")
+	}
+	// The upgrade must be a judgement about names the schema declares, not a general
+	// refusal: [llm] carries Providers, and the reader 票 324 added to the roster keys
+	// on exactly that member.
+	llm := configSectionMembers(t, "LLM")
+	if !llm["Providers"] || !readsFieldAccess("p, ok := cfg.LLM.Providers[provider]", "LLM", llm) {
+		t.Errorf("cmd/wisp/panel_models_320.go's cfg.LLM.Providers line must count as a read of [llm]; schema members = %v", llm)
+	}
 }
 
 // --- the two stdout readings, through the `wisp run` seam ----------------------

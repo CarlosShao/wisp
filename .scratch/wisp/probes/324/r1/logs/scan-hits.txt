@@ -1,0 +1,44 @@
+=== Ball (0 files) ===
+=== Session (0 files) ===
+=== Audio (1 files) ===
+  cmd/wisp/resident_audio_windows.go
+    253: "mic_muted_default", c.Audio.MicMutedDefault, "voice_enabled", c.Voice.Enabled)
+=== Privacy (0 files) ===
+=== Memory (0 files) ===
+=== Cost (0 files) ===
+=== Observe (0 files) ===
+=== Panel (1 files) ===
+  cmd/wisp/panel_resident_windows.go
+    208: return cfg.Panel.Width, cfg.Panel.Height
+=== App (0 files) ===
+=== Voice (3 files) ===
+  cmd/wisp/panel_config_store.go
+    106: CloudASRChain:    cfg.Voice.CloudASRChain,
+  cmd/wisp/resident_audio_windows.go
+    253: "mic_muted_default", c.Audio.MicMutedDefault, "voice_enabled", c.Voice.Enabled)
+  internal/panel/config_handlers.go
+    609: CloudASRChain:    v.Voice.CloudASRChain,
+=== Agent (1 files) ===
+  cmd/wisp/run.go
+    766: DefaultTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS) * time.Millisecond,
+=== Models (2 files) ===
+  cmd/wisp/models.go
+    163: mirrors = cfg.Models.Mirror
+  internal/panel/composer_dispatch.go
+    234: return d.Models.HandleModelsListRequest(ctx, req)
+=== LLM (5 files) ===
+  cmd/wisp/panel_config_store.go
+    98: ChatModel:      cfg.LLM.Roles.Chat.Model,
+  cmd/wisp/panel_models_320.go
+    85: p, ok := cfg.LLM.Providers[provider]
+  cmd/wisp/providers.go
+    118: p, ok := cfg.LLM.Providers[name]
+  cmd/wisp/run.go
+    1118: time.Duration(cfg.LLM.TimeoutMS)*time.Millisecond)
+  internal/llm/resolver.go
+    95: Providers: cfg.LLM.Providers,
+=== Hotkey (2 files) ===
+  cmd/balldebug/main.go
+    238: h := mgr.Config().Hotkey
+  cmd/wisp/resident_windows.go
+    55: return ball.ApplyHotkeyDefaults(ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel})

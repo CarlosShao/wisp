@@ -1,0 +1,28 @@
+=== Ball sec=BallSection files=0 members=[ClickThrough HideOnFullscreen OpacityIdle Position Size] ===
+=== Session sec=SessionSection files=0 members=[ConversationIdleSec SettlingSec WarmTimeoutSec] ===
+=== Audio sec=AudioSection files=1 members=[HalfDuplex InputDevice MicMutedDefault SampleRate] ===
+  cmd/wisp/resident_audio_windows.go | 253: "mic_muted_default", c.Audio.MicMutedDefault, "voice_enabled", c.Voice.Enabled)
+=== Privacy sec=PrivacySection files=0 members=[DiagnosticsOptIn KeepAudio KeepTranscript RedactPaths RetentionDays] ===
+=== Memory sec=MemorySection files=0 members=[ExtractModel L1Enabled L1Max L3RetentionDays] ===
+=== Cost sec=CostSection files=0 members=[AlertThreshold DailyBudget MonthlyBudget OverBudget] ===
+=== Observe sec=ObserveSection files=0 members=[Level Roll SLOSampleIntervalSec] ===
+=== Panel sec=PanelSection files=1 members=[Enabled Height KeepAliveInSession Scale Width] ===
+  cmd/wisp/panel_resident_windows.go | 208: return cfg.Panel.Width, cfg.Panel.Height
+=== App sec=AppSection files=0 members=[Autostart Language Portable SingleInstance Theme] ===
+=== Voice sec=VoiceSection files=3 members=[AEC ASR CloudASRChain CloudTTSChain ConversationMode Enabled Punctuation Realtime TTS WakeWord] ===
+  cmd/wisp/panel_config_store.go | 106: CloudASRChain:    cfg.Voice.CloudASRChain,
+  cmd/wisp/resident_audio_windows.go | 253: "mic_muted_default", c.Audio.MicMutedDefault, "voice_enabled", c.Voice.Enabled)
+  internal/panel/config_handlers.go | 609: CloudASRChain:    v.Voice.CloudASRChain,
+=== Agent sec=AgentSection files=1 members=[LoopGuard MaxRounds PerToolTimeoutMS ProjectInstructionsEnabled SteeringEnabled TokenBudget] ===
+  cmd/wisp/run.go | 766: DefaultTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS) * time.Millisecond,
+=== Models sec=ModelsSection files=1 members=[Dir LocalOverride Mirror VerifySignature] ===
+  cmd/wisp/models.go | 163: mirrors = cfg.Models.Mirror
+=== LLM sec=LLMSection files=5 members=[Providers Retry Roles TextChain TimeoutMS] ===
+  cmd/wisp/panel_config_store.go | 98: ChatModel:      cfg.LLM.Roles.Chat.Model,
+  cmd/wisp/panel_models_320.go | 85: p, ok := cfg.LLM.Providers[provider]
+  cmd/wisp/providers.go | 118: p, ok := cfg.LLM.Providers[name]
+  cmd/wisp/run.go | 1118: time.Duration(cfg.LLM.TimeoutMS)*time.Millisecond)
+  internal/llm/resolver.go | 95: Providers: cfg.LLM.Providers,
+=== Hotkey sec=HotkeySection files=2 members=[Cancel Mute Panel Summon] ===
+  cmd/balldebug/main.go | 238: h := mgr.Config().Hotkey
+  cmd/wisp/resident_windows.go | 55: return ball.ApplyHotkeyDefaults(ball.HotkeyConfig{Summon: c.Hotkey.Summon, Mute: c.Hotkey.Mute, Cancel: c.Hotkey.Cancel, Panel: c.Hotkey.Panel})

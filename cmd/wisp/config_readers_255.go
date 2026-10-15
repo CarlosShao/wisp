@@ -246,7 +246,17 @@ var sectionReadSites = map[string][]string{
 	"Voice":  {"cmd/wisp/panel_config_store.go", "cmd/wisp/resident_audio_windows.go", "internal/panel/config_handlers.go"},
 	"Agent":  {"cmd/wisp/run.go"},
 	"Models": {"cmd/wisp/models.go"},
-	"LLM":    {"cmd/wisp/panel_config_store.go", "cmd/wisp/providers.go", "cmd/wisp/run.go", "internal/llm/resolver.go"},
+	// 票 320's fetch port added a fifth live reader of [llm], and 票 324 AC#2 books it
+	// here: cmd/wisp/panel_models_320.go's HandleModelsListRequest takes `cfg :=
+	// h.mgr.Config()` on the request hop and reads `cfg.LLM.Providers[provider]` off
+	// that answer, so it reads the LIVE Manager at use time - the same class as
+	// panel_config_store.go, which is why the row above stays in the hotClaimConsumed
+	// tier instead of moving to snapshot-only or other-process. The tier was not picked
+	// for this edit: it was adjudicated by 票 255 AC#1 and this reader agrees with it
+	// (a hand-edited provider row changes what the NEXT models.list hop asks for, with
+	// no restart). Its caveat is the row's existing caveat, unchanged - the boot
+	// snapshot still drives the in-flight chain.
+	"LLM": {"cmd/wisp/panel_config_store.go", "cmd/wisp/panel_models_320.go", "cmd/wisp/providers.go", "cmd/wisp/run.go", "internal/llm/resolver.go"},
 	// Ticket 258 moved the shipped reader into the resident leg: the
 	// construction chain lives in resident_windows.go (it maps [hotkey] into
 	// ball.HotkeyConfig), while resident_ball_windows.go only receives the

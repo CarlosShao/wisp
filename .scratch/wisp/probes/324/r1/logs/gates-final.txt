@@ -1,0 +1,77 @@
+2026-10-15 21:35 +08
+HEAD=aa1427f6
+sha(cmd/wisp/config_receipt_255_test.go)=bf02e902354914850bd643270310e6370d848b03dadd42a0fd7a0e9d2b70e106
+=== go build ./... ===
+rc=0
+=== gofumpt -l (my two files) ===
+rc=0 (empty list above = clean)
+=== go vet ./cmd/wisp/ ===
+rc=0
+=== test pass1 (-run targeted, never whole package) ===
+time=2026-10-15T21:36:12.345+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255SplitOnlyClaimsSectionsWithALiveReader
+--- PASS: TestTicket255SplitOnlyClaimsSectionsWithALiveReader (0.00s)
+=== RUN   TestTicket255HotRowRosterCoversTheRegistry
+--- PASS: TestTicket255HotRowRosterCoversTheRegistry (0.00s)
+=== RUN   TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim
+    config_receipt_255_test.go:228: row "panel": recorded reading cmd/wisp/panel_resident_windows.go:207 drifted, the token "cfg.Panel.Width" now uniquely sits at line 208
+    config_receipt_255_test.go:228: row "panel": recorded reading cmd/wisp/panel_host_windows.go:262 drifted, the token "Width:  uint(width)" now uniquely sits at line 269
+--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.01s)
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+    config_receipt_255_test.go:293: SECTION 1/14 section="agent" field=Agent roster=[cmd/wisp/run.go] scan=[cmd/wisp/run.go] match=true
+    config_receipt_255_test.go:293: SECTION 2/14 section="app" field=App roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 3/14 section="audio" field=Audio roster=[cmd/wisp/resident_audio_windows.go] scan=[cmd/wisp/resident_audio_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 4/14 section="ball" field=Ball roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 5/14 section="cost" field=Cost roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 6/14 section="hotkey" field=Hotkey roster=[cmd/wisp/resident_windows.go cmd/balldebug/main.go] scan=[cmd/balldebug/main.go cmd/wisp/resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 7/14 section="llm" field=LLM roster=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] match=true
+    config_receipt_255_test.go:293: SECTION 8/14 section="memory" field=Memory roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 9/14 section="models" field=Models roster=[cmd/wisp/models.go] scan=[cmd/wisp/models.go] match=true
+    config_receipt_255_test.go:293: SECTION 10/14 section="observe" field=Observe roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 11/14 section="panel" field=Panel roster=[cmd/wisp/panel_resident_windows.go] scan=[cmd/wisp/panel_resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 12/14 section="privacy" field=Privacy roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 13/14 section="session" field=Session roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 14/14 section="voice" field=Voice roster=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] match=true
+--- PASS: TestTicket255RosterStillMatchesTheActualReadSites (1.29s)
+=== RUN   TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite
+    config_receipt_255_test.go:562: FIXTURE root=C:\Users\swq\AppData\Local\wisp-test-gotmp\324r1gotmp\TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite3905284283\001 scan=[cmd/wisp/schembsite_fixture.go] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=true
+--- PASS: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+=== RUN   TestTicket324SectionMembersAreReadOffTheSchema
+--- PASS: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.575s
+pass1 rc=0
+=== test pass2 ===
+time=2026-10-15T21:36:19.317+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255SplitOnlyClaimsSectionsWithALiveReader
+--- PASS: TestTicket255SplitOnlyClaimsSectionsWithALiveReader (0.00s)
+=== RUN   TestTicket255HotRowRosterCoversTheRegistry
+--- PASS: TestTicket255HotRowRosterCoversTheRegistry (0.00s)
+=== RUN   TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim
+    config_receipt_255_test.go:228: row "panel": recorded reading cmd/wisp/panel_resident_windows.go:207 drifted, the token "cfg.Panel.Width" now uniquely sits at line 208
+    config_receipt_255_test.go:228: row "panel": recorded reading cmd/wisp/panel_host_windows.go:262 drifted, the token "Width:  uint(width)" now uniquely sits at line 269
+--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+    config_receipt_255_test.go:293: SECTION 1/14 section="agent" field=Agent roster=[cmd/wisp/run.go] scan=[cmd/wisp/run.go] match=true
+    config_receipt_255_test.go:293: SECTION 2/14 section="app" field=App roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 3/14 section="audio" field=Audio roster=[cmd/wisp/resident_audio_windows.go] scan=[cmd/wisp/resident_audio_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 4/14 section="ball" field=Ball roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 5/14 section="cost" field=Cost roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 6/14 section="hotkey" field=Hotkey roster=[cmd/wisp/resident_windows.go cmd/balldebug/main.go] scan=[cmd/balldebug/main.go cmd/wisp/resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 7/14 section="llm" field=LLM roster=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] match=true
+    config_receipt_255_test.go:293: SECTION 8/14 section="memory" field=Memory roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 9/14 section="models" field=Models roster=[cmd/wisp/models.go] scan=[cmd/wisp/models.go] match=true
+    config_receipt_255_test.go:293: SECTION 10/14 section="observe" field=Observe roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 11/14 section="panel" field=Panel roster=[cmd/wisp/panel_resident_windows.go] scan=[cmd/wisp/panel_resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 12/14 section="privacy" field=Privacy roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 13/14 section="session" field=Session roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 14/14 section="voice" field=Voice roster=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] match=true
+--- PASS: TestTicket255RosterStillMatchesTheActualReadSites (1.19s)
+=== RUN   TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite
+    config_receipt_255_test.go:562: FIXTURE root=C:\Users\swq\AppData\Local\wisp-test-gotmp\324r1gotmp\TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite1454756805\001 scan=[cmd/wisp/schembsite_fixture.go] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=true
+--- PASS: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+=== RUN   TestTicket324SectionMembersAreReadOffTheSchema
+--- PASS: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.358s
+pass2 rc=0
