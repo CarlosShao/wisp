@@ -32,6 +32,7 @@ func fields313Cases() []fields313Case {
 		{field: FieldVoiceRealtimeProvider, extra: map[string]any{"configValue": "stepfun"}},
 		{field: FieldVoiceRealtimeModel, extra: map[string]any{"configValue": "model-under-test-313"}},
 		{field: FieldProviderRowCreate, extra: map[string]any{"configProvider": "stepfun"}},
+		{field: FieldProviderBilling, extra: map[string]any{"configProvider": "stepfun", "configValue": "plan"}},
 		{field: FieldRoleChatPair, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313"}},
 	}
 }
@@ -107,6 +108,8 @@ func Test313SelectorRefusalsOnTheAdditionalRoster(t *testing.T) {
 		{"role_chat_pair without a provider", map[string]any{"configField": FieldRoleChatPair, "configModel": "m"}},
 		{"role_chat_pair without a model", map[string]any{"configField": FieldRoleChatPair, "configProvider": "stepfun"}},
 		{"voice_cloud_asr_chain with an empty value", map[string]any{"configField": FieldVoiceCloudASRChain, "configValue": "   "}},
+		{"provider_billing without a provider", map[string]any{"configField": FieldProviderBilling, "configValue": "plan"}},
+		{"provider_billing with an empty value", map[string]any{"configField": FieldProviderBilling, "configProvider": "stepfun", "configValue": "   "}},
 	}
 	for _, tc := range cases {
 		leg := &cfg248Leg{}

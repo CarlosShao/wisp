@@ -245,6 +245,10 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		written, err = s.mgr.SetVoiceRealtimeModel(w.Value)
 	case panel.FieldProviderRowCreate:
 		written, err = s.mgr.CreateProviderRow(w.Provider, w.Model)
+	case panel.FieldProviderBilling:
+		// 票 320 AC#1: the value is the enum word itself; the config setter owns
+		// the vocabulary check so the page is told which field it got wrong.
+		written, err = s.mgr.SetProviderBilling(w.Provider, w.Value)
 	case panel.FieldRoleChatPair:
 		written, err = s.mgr.SetRoleChatPair(w.Provider, w.Model)
 	case panel.FieldProviderCredential:

@@ -34,6 +34,14 @@ package panel
 // privacy. / models. / audio.), and none carries a word of the approval
 // vocabulary the frozen grant-boundary instrument keys on - both are asserted in
 // config_313_test.go rather than promised in a comment.
+//
+// TICKET 320's FIRST ADDITION lives in the same roster and follows the same two
+// rules the 313 names follow. It is a FIELD, not a method: no new socket name, no
+// ConfigStore method, so the 248 pin and its legs stay untouched.
+//
+//	provider_billing  llm.providers.<name>.billing, the pay-per-token|plan
+//	  switch. The enum is enforced in internal/config before the write, the
+//	  same way the three older leaf setters refuse their out-of-band values.
 
 import "sort"
 
@@ -49,6 +57,9 @@ const (
 	// FieldProviderRowCreate is the explicit provider-row (and optional one-model)
 	// creation step (A877 ruling 2). Provider in the selector; model optional.
 	FieldProviderRowCreate = "provider_row_create"
+	// FieldProviderBilling is llm.providers.<name>.billing (ticket 320 AC#1).
+	// Value = plan or pay-per-token, checked against the schema's own enum.
+	FieldProviderBilling = "provider_billing"
 	// FieldRoleChatPair is llm.roles.chat's provider+model, written together.
 	FieldRoleChatPair = "role_chat_pair"
 )
@@ -56,6 +67,7 @@ const (
 // fields313 is the roster this file owns, sorted at the accessor. It is kept
 // apart from config_handlers.go's allWritableFields on purpose (see the header).
 var fields313 = []string{
+	FieldProviderBilling,
 	FieldProviderRowCreate,
 	FieldRoleChatPair,
 	FieldVoiceCloudASRChain,
@@ -68,12 +80,13 @@ var fields313 = []string{
 // maps so the gate can ask one question per column across both tables.
 var (
 	fields313NeedsProvider = map[string]bool{
-		FieldProviderRowCreate: true, FieldRoleChatPair: true,
+		FieldProviderBilling: true, FieldProviderRowCreate: true, FieldRoleChatPair: true,
 	}
 	fields313NeedsModel = map[string]bool{
 		FieldRoleChatPair: true,
 	}
 	fields313TakesValue = map[string]bool{
+		FieldProviderBilling:    true,
 		FieldVoiceCloudASRChain: true, FieldVoiceCloudTTSChain: true,
 		FieldVoiceRealtimeProvider: true, FieldVoiceRealtimeModel: true,
 	}
