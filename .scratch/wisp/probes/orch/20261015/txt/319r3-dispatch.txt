@@ -1,0 +1,40 @@
+# 319-r3 派单（票 319 **AC#2 的 D1 修复**：二次启动对"已可见"面板**不得藏窗**，必须"确保线程活着＋展示/抬前台"；写面＝`cmd/wisp` 319 面；配新钉＋变异自证）
+
+发送时刻：**（待填——本单排 `320-r1` 收件之后：与它同压 `cmd/wisp`，共享编译面每波一枚写腿；面空即发）**。编排者派发。
+你 = Wisp 流水线的落地腿 **319-r3**（`probes/319/` 现有 `a1 r1 r2 v`，`r3` 未建）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 不碰台账/HANDOVER）。
+
+## 为什么有这一单（D1，由非实现者 `319-v` 抓出、编排者代码级坐实）
+
+- 票：`.scratch/wisp/issues/319-panel-thread-death-is-terminal-and-a-second-launch-cannot-bring-any-window-to-front.md`（**AC#2 是唯一未勾的实现格**）。
+- 缺陷（D1）逐字锚：`cmd/wisp/panel_resident_windows.go:447-455` 的 `RequestToggle`——`if rp.mgr.IsShown() { rp.hides.Add(1); return rp.post(func() { rp.mgr.Hide() }) }`；而 `secondLaunchActivation319`（`resident_windows.go`）今天驱动的是 **`panelHolder.toggle`** ⇒ **面板已经在屏幕上时，第二次双击 exe 会把它藏掉**（AC#2 要的是"唤到前台"）。
+- 正解语义的锚：`RequestShow`（`:398`）→ `showOnThread` → `mgr.Show`（`panel_host_windows.go:518`，`ShowWindow(SW_SHOW)`＋`SetForegroundWindow`）。
+- 非实现者读数（件 `docs/evidence/s1/ticket319-319-v-accept-v1.md`＋`probes/319/v/03-ac2-live-adjudication.txt`）：隐藏态二次启动 ⇒ 同柄再显＋夺前台（绿）；**已可见态 ⇒ `THE SECOND LAUNCH HID THE PANEL`**；真两进程 ⇒ `RAISED-BY-THE-SECOND-PROCESS=true`。
+
+## 你要交的（逐条；每条两拍/三态）
+
+1. **修 D1（最小形）**：给 `panelHolder` 加一枚**展示形**（建议名 `show(via string) bool`）——与 `toggle` 同一条"锁＋螺纹程已死则 `h.spawn` 重建"的形状，但末尾调 **`h.rp.RequestShow(via)`**；把 `secondLaunchActivation319` 的执行器从 `toggle` 换成它。
+   ⛔ **不许改 `RequestToggle`／`toggle` 的语义**（托盘/热键/球的手势仍是 toggle；票面 AC#1 的既有四枚用例必须照旧全绿）；⛔ 不改 `RequestShow`/`mgr.Show`；⛔ 不动 `internal/proc` 的 hook 形状（`SetActivationHook` 那条管道是 319-r1/r2 已验的）。
+   ⚠ 回执文案可保留现形（"the panel executor took the request…"）；若你要改字，必须给两向三态读数说明旧文案为何会假（⛔ 别顺手改）。
+2. **新钉（N4）：已可见态不得藏窗**——两条一起：
+   - **headless**：能证"执行器走的是展示路"（例：holder 层的 `show` 对活线程只发 show、不触 hide；`hide` 计数为 0）；读数落 `probes/319/r3/`。
+   - **winlive**：真窗先显示（隐藏态 tick 一次 ⇒ 出窗）⇒ 跑二次启动那条路（生产 hook，形状照 `319-r2` 的 `TestSecondLaunchActivationRaisesThePanel319`）⇒ **断言 `mgr.IsShown()==true`、HWND 不变、`GetForegroundWindow()==该 HWND`**（⛔ 不是"没报错"）。
+   - **变异自证**：把执行器换回 `toggle`（或把 `show` 里那句改成 toggle 路）⇒ winlive 那枚**必红且红名点到"被藏了"**；还原 ⇒ 绿＋`git diff` 0 字节。
+3. **回归**：`-run '319' ./cmd/wisp/ ./internal/proc/ -count=1` 两包全绿（尤其 AC#1 的四枚既有用例）；winlive 既有四枚按名单发各绿一次。
+4. **门禁**：`go build ./...`／gofumpt（只点你的件）／`go vet -tags winlive ./cmd/wisp/ ./internal/proc/`／`sh scripts/d22scan.sh`／长度门。
+5. **面核**：`git diff --name-only` 逐枚点名——只许 `cmd/wisp` 的 319 面（`resident_windows.go`＋319 测试件）＋`probes/319/r3/`＋票尾 1 bullet。
+6. **票尾 append 1 条 bullet**（`agent=319-r3 did=… next=…`；⛔ 不翻 AC 框——AC#2/#3 的勾归非实现者复核后由编排者做）。
+
+## 可选（顺手做，不做不算欠）
+
+- 把 `319-v` 仓外探针里的**真两进程**形升格成仓内 winlive 钉子（helper 子进程＋stdout 回读）；若做，照它证据附录的源码形状，并把"两个进程各自的 layout 名唯一"写进用例注释（⛔ 别碰机主实例）。
+
+## 纪律
+
+- ⚠ **面互斥**：本刻 `320-r1` 应已收件；若未收件 ⇒ 先与编排者核（⛔ 两腿不同时在 `cmd/wisp` 写）。`go test ./cmd/wisp` 重包同一时刻只跑一个；跑前 `tasklist` 自证；314 死区＝整包可能整进程死亡＋默认 10m `-timeout` panic ⇒ 分段 `-run` 为主。
+- ⛔ 不扰动机主实例（`wisp.exe` PID 40296：别 kill、别关窗）；⛔ 不拉第二个 `--env dev`；活体一次一枚、会抢前台。
+- ⚠ `GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\wisp319r3gotmp'`（C: 卷＋只反斜杠形；**别用 `C:\tmp\`**）。
+- ⛔ 不碰：`docs/PLAN.md`／`docs/specs/**`／`internal/risk/**`／`internal/winsec/**`／阈值/golden／`.github/**`／`frontend/**`／`design/**`；⛔ 别家腿半成品（`probes/152/my152.py`、`probes/268/v1/evidence.md`）。
+- 只 commit ⛔ 不 push；`add`／`commit` 两处**显式 pathspec**；⛔ `add -A`／目录／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；变异用 `-overlay`／仓外备份＋sha256 还原证；注释与测试零 emoji（含 `≤`/`✓`）。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`。
+- **未定义即停**：要动 toggle/RequestShow 语义、或发现 D1 的修法会碰冻结面 ⇒ 停手上报。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋改了什么（逐枚）＋两拍三态读数逐字＋变异红名＋回归/门禁 rc＋面核＋**具名没做**。
