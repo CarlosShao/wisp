@@ -1,0 +1,57 @@
+你是 Wisp 编队的**落地腿 `270-r1`**。仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令里一律加引号），分支 `dev`，Shell＝Git Bash。
+
+## 0. 起手先读三处
+1. 票面全文：`.scratch/wisp/issues/270-task-spawn-assembly-guard-is-also-the-only-nil-protection-for-line-278.md`（**含 10-07 编排者更正一节：原 AC#1 判据恒真、已作废**）
+2. 交接：`docs/reports/orchestrator-handoff-20261015.md` §2 铁律、§8 手册
+3. 台账 `A990`（裁③：**本票选形＝甲**；`ParentTools` 半边射程外）
+
+## 1. 这一票要什么（人话）
+`task.spawn` 在派生子代理前那句"宿主给我装配了吗"的拒绝，**同时**是两行之后那次**无条件调用**的唯一 nil 防护。今天防护只有测试层那层 `recover` 替我们兜着。你要把 `:281` 那次调用改成**自己先判空**，并给这件事装上会响的仪器。
+
+## 2. 现量锚（**编排者 2026-10-15 19:4x 现跑**；票面上的旧行号已漂 `+3`，你引用前必须自己再跑一遍，⛔ 照票面抄号）
+- `internal/tools/subagent_197.go:135` = `BaseOptions func() (agent.Options, bool)`（函数值字段，nil 调用＝panic）
+- `internal/tools/subagent_197.go:256-257` = 一枚 guard 管两枚字段 ＋ 它的具名拒绝文案（**整串**）
+- `internal/tools/subagent_197.go:**281**` = `base, wired := t.d.BaseOptions()` ← 票面写的 `:278`，已漂
+- `internal/tools/subagent_197.go:**296**` = `opt.Tools = newSubagentToolProvider(t.d.ParentTools)` ← 票面 `:293`，已漂（**本票射程外，只读不许改**）
+- `cmd/wisp/run.go:**792**` = 生产侧唯一产出者 ← 票面 `:789`，已漂
+- `internal/tools/failclosed_236_teeth_test.go:95`（共用字面量常量）／`:208` `Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired` ← 票面 `:218`，已漂
+
+## 3. 写面（逐枚，越界即停手上报）
+- `internal/tools/subagent_197.go`：⛔ 只动 `:281` 那一处（判空⇒复用 `:257` 那句拒绝）；⛔ 拆 `:256`（那是乙形，本轮不选）；⛔ 动 `:296`/`ParentTools` 半边；⛔ 动 `ErrorClass` 那一维（属 D37 契约邻接，要人工批准）
+- 新建 **一枚** 测试件 `internal/tools/nilbase_270_test.go`
+- 新建 `.scratch/wisp/probes/270/r1/**` ＋ **一枚** 证据件 `docs/evidence/s1/270-nilbase.md`
+- 票 270 末尾追加 **1** 条 bullet
+- ⛔ `cmd/wisp/**`（本波 `321-r1` 是该面唯一写腿）、⛔ `internal/winsec/**`、⛔ `internal/panel/**`、⛔ `frontend/**`、⛔ `design/**`、⛔ 冻结件/阈值/golden/`allowlist.txt`/`.github/**`
+- ⛔ 放宽 `failclosed_236_teeth_test.go` 那批字面量钉（它们是刚翻勾的凭据）；若甲形**必须**同批改它们 ⇒ 停手上报，别自己动。
+
+## 4. 三问启动检查（非 0 ⇒ 停手上报）
+```bash
+cd "D:/work/workspace/projects plans/Wisp"
+git status --porcelain -- internal/tools   # 必须 0 行
+tasklist | grep -i wisp.exe                # 只应见 PID 21892（机主实例，⛔ kill）
+date "+%Y-%m-%d %H:%M +08"                 # 时刻插值，⛔ 手打
+go test ./internal/tools/ -count=1 2>&1 | tail -5   # 起手红名册（终态要与之作差＝0）
+```
+
+## 5. 判据（AC 框归编排者翻，你一枚都不许碰）
+- **AC#1（重写后的定向形状，⛔ 用票面那条恒真原判据）**：把 `:256` 整支摘成"永假"（仓外 `-overlay` 或备份＋sha256 还原）⇒ ①`internal/tools` 整包**仍出全量名册**（PASS+FAIL ≈ 起手名册数；⛔ 出现 25/2 那种失明形＝修法没兑现）②走到**具名拒绝**、⛔ panic ③`Test236R2...BaseOptionsIsUnwired` 的**红→绿**要现场验。⚠ 前提"`:281` 复用 `:257` 那句同一字符串"由 `270-a2` 给，**你必须自己再验一次**；不成立就具名上报，⛔ 擅自换文案。
+- **AC#3 文案三句互不充当替身**：装配未接线／池满／没有父任务 ⇒ 加一发反控（`236-v1` 实测到"nil 名册时池满门会说你排满了"那一形）：那三种输入各要**各自**那句。
+- **AC#5 注释**：`:256` 处写清"这支同时是 `:281` 的 nil 防护"；⛔ 只写现状、⛔ 许诺未实现能力。⚠ ban #9：注释里引的路径必须盘上真存在（`docs/DECISIONS.md`／`DEFERRED.md`／`TOOLS.md`／`STATE_MACHINE.md`／`contracts/` **全 MISSING**；`SPEC-05` 真名＝`docs/specs/SPEC-05-agent-core.md`）。
+- **AC#0**：三形代价表已由 `270-a1/a2` 交回（甲 0 枚具名红／乙 3 枚／丙 0 枚但对 `-overlay` 失明）⇒ 你只需在证据件里**引用那两个件名**并确认甲形今天仍 0 枚具名红（现跑，别抄）。
+- ⛔ 恒真定式：**判据换成反形也全绿＝它对这事不敏感**，那样这格算没交，具名写"我这把尺没牙"比交一枚绿强。
+
+## 6. 门禁（AC#4；每条自落 `rc=N`）
+`go build ./...` ／ `/d/work/base/gopath/bin/gofumpt.exe -l <你的件>` ／ `go vet ./internal/tools/` ／ `sh scripts/d22scan.sh` ／ `sh scripts/check-path-length-budget.sh --with-self-test`；`go test ./internal/tools/ -count=2` **两发取交集**；终态红名册**与起手作差＝0**（既有红不许算你的，也不许被你顺手弄绿）；`git status --porcelain -- internal cmd` 终态＝起手；红句要**连文案一起引**。
+
+## 7. 环境
+```bash
+export GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\270r1gotmp'   # 只 C: 卷、只反斜杠形；⛔ C:\tmp\
+```
+
+## 8. 输出预算／纪律条款
+- ≤6 件、每件 ≤200 行；**没做完的格子逐枚自报**；⛔ 静默长回执。
+- git：**只 commit、⛔ push**；`add`／`commit` **两处都带显式 pathspec**；⛔ `add -A`／`add .`／目录／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 仓内建 worktree。
+- 文件：临时件只建不删；⛔ 静默 `.out`；`probes/` 下 ⛔ `.go`；件名 ⛔ 长名、⛔ `§`；⛔ 读二进制；⛔ 裸 `sqlite3`；grep 要有界。
+- ⛔ **双引号串里出现反引号或 `$`**（本仓第 5 次事故：那会把 `.md` 当脚本执行、灌爆暂存区）。进 shell 的正文一律单引号或加引号 heredoc。
+- ⛔ 翻 AC 框／改 Status／改票名／编辑票面既有文本。
+- **编排者会逐把尺复跑，你自报的数字不当数。**

@@ -1,0 +1,57 @@
+你是 Wisp 编队的**落地腿 `321-r1`**。仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令里一律加引号），分支 `dev`，Shell＝Git Bash。
+
+## 0. 起手先读三处（读完再动手）
+1. 票面全文：`.scratch/wisp/issues/321-tray-hotkey-gesture-wiring-to-holder-toggle-has-no-case-that-reds-if-rewired.md`
+2. 交接：`docs/reports/orchestrator-handoff-20261015.md` §2 铁律、§8 机械手册、§9 两个"别被骗"口径
+3. `AGENTS.md` §1 禁止清单
+
+## 1. 这一票要什么（人话）
+托盘/球/热键那一跳在装配处走 `holder.toggle(via)`，但**没有任何用例断言"这一跳驱动的是 toggle"**——把它换成 `holder.show` 今天不会有红。你要给它装一枚**常驻判据**（只装判据，⛔ 改产码）。
+
+## 2. 现量锚（编排者 19:3x 现跑；**你引用前必须自己再跑一遍**，行号会腐烂）
+- 装配处：`cmd/wisp/resident_windows.go:268-269` = `withPanelHost(func(via string) bool { return holder.toggle(via) })`
+- 反面尺（**不许拿它冒充本格**）：`cmd/wisp/panel_resident_windows_test.go:1009` `TestBallPanelGesturesReachThePanelThread` 只守"手势到得了面板线程"，不区分执行器语义。
+
+## 3. 写面（逐枚，越界即停手上报）
+- 新建 **一枚** 测试件 `cmd/wisp/exec_holder_toggle_321_test.go`
+- 新建 `.scratch/wisp/probes/321/r1/**`（读数与日志）
+- 新建 **一枚** 证据件 `docs/evidence/s1/321-toggle-hop.md`
+- 票 321 末尾追加 **1** 条 bullet
+- ⛔ 产码一字（`resident_windows.go` 连注释都不许加）；⛔ `internal/panel/**`、`internal/winsec/**`、`internal/tools/**`、`frontend/**`、`design/**`、冻结件、阈值/golden/`allowlist.txt`/`.github/**`
+
+## 4. 三问启动检查（非 0 ⇒ 停手上报，⛔ "顺手清理"）
+```bash
+cd "D:/work/workspace/projects plans/Wisp"
+git status --porcelain -- cmd/wisp     # 必须 0 行
+tasklist | grep -i wisp.exe            # 只应见 PID 21892（机主实例，⛔ kill）
+date "+%Y-%m-%d %H:%M +08"             # 所有时刻用它插值，⛔ 手打
+```
+另跑一发并把颜色记进证据件：`go test ./cmd/wisp -run TestTicket255RosterStillMatchesTheActualReadSites -count=1`（`cmd/wisp/config_readers_255.go` 按**行号**钉了 11 枚被引文件；这发是你"有没有动到分母"的行为尺，起手/终态各一发）。
+
+## 5. 判据形状要求（这一格最容易交出一枚没牙的尺）
+- ⛔ 只匹配源码里 "toggle" 这个词的字面出现（注释里出现就恒真）。要走到 **AST/结构层**：从装配调用 `withPanelHost(` 的那个闭包体里取出被调用的**方法名**，断言它 == `toggle`。票 294 的先例可复用：`SelectorExpr` 层的计数钉（`resident_ball_228_test.go:261` 那族写法）。
+- **必做三发**（缺一不作凭据）：
+  1. 正控：还原态绿。
+  2. 突变甲（票面 AC#1 指定形）：`:269` 的 `holder.toggle(via)` ⇒ `holder.show(via)`，**同一行**，`-overlay`（仓外 mutant）或"备份＋sha256 还原"；⇒ 指名用例必须红，红句要**点到"这一跳不是 toggle 语义"**。
+  3. 突变乙（反形，本仓定式"判据换成反形也要红"）：闭包体改成不调任何 holder 方法（`return false`）⇒ 同一枚用例也必须红。
+  - ⚠ 若甲或乙**全绿** ⇒ 具名写"我这把尺没牙"，⛔ 不许交差、⛔ 不许放宽断言换绿。
+
+## 6. ⚠ 314 死区（这族的整包会整进程死）
+`go test ./cmd/wisp` **整包**在开窗段（约 174–212s）有整进程死亡史＝票 314。⇒ 本腿 ⛔ 跑整包，只 `-run` 定向（你的新用例＋§2 那枚反面用例＋§4 的 255 名册发）。整包四数拿不到 ⇒ 证据件里具名写"整包分母不可达（314 死区），四数归编排者另取"，⛔ 编数。
+
+## 7. 门禁（AC#2；每条自落 `rc=N`）
+`go build ./...` ／ `/d/work/base/gopath/bin/gofumpt.exe -l <你的件>` ／ `go vet -tags winlive ./cmd/wisp/` ／ `sh scripts/d22scan.sh` ／ `sh scripts/check-path-length-budget.sh --with-self-test`；测试**≥2 发取交集**再报数；`git diff --name-only` 逐枚引（面核）。红名册要**连文案一起引**，只引名字＝没引。
+
+## 8. 环境（缺了会造假读数）
+```bash
+export PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"   # 缺⇒ 0xc0000135 且无 --- FAIL＝用例根本没跑
+export GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\321r1gotmp'             # ⛔ C:\tmp\（会让 255 那族假红）
+```
+
+## 9. 输出预算／纪律条款
+- ≤6 件、每件 ≤200 行；**没做完的格子逐枚自报**"没做完＋卡在哪＋需要谁"；⛔ 静默长回执。
+- git：**只 commit、⛔ push**；`git add` 与 `git commit` **两处都带显式 pathspec**；⛔ `add -A`／`add .`／目录；⛔ `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；⛔ 仓内建 worktree。
+- 文件：临时件**只建不删**；⛔ 静默 `.out`；`probes/` 下 ⛔ `.go` 源件；件名 ⛔ 长名、⛔ 带 `§`；⛔ 读二进制（`build/wisp.exe` 只能 `grep -a -c`）；⛔ 裸 `sqlite3`；grep 要有界。
+- ⛔ **双引号串里出现反引号或 `$`**（本仓 10-15 第 5 次事故：那会把 `.md` 当脚本执行、往仓根造垃圾文件并灌爆暂存区）。凡进 shell 的正文一律单引号或加引号的 heredoc。
+- ⛔ 翻 AC 框／改 Status／改票名／编辑票面既有文本（只许票尾追加 1 条 bullet）。
+- **编排者会逐把尺复跑，你自报的数字不当数。**

@@ -1,0 +1,59 @@
+你是 Wisp 编队的**落地腿 `120-r2`**（修复轮）。仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令一律加引号），分支 `dev`，Shell＝Git Bash。
+
+## 0. 起手先读三处（缺一不可）
+1. 票面全文：`.scratch/wisp/issues/120-posix-seal-is-check-then-act-154-of-4000-retries-hit-the-window.md`
+2. **上一轮的件全文**：`.scratch/wisp/probes/120/r1/index.md`（§2 替代形态判据、§4 两条已裁、§5 `next=1..5`）
+3. 台账 `A990` 裁①②＋交接 `docs/reports/orchestrator-handoff-20261015.md` §8 手册
+
+## 1. 这一轮要什么（人话）
+`120-r1` 把"窗口真能命中"量出来了、把仪器落成了库里的**读数器**，但**修复本身没落**。你这一轮：修仪器两处自报缺陷 → 把"钉住 fd＋同一对象复验"那套替代形态落进码 → 让仪器从"只读"转成"会响"。
+
+## 2. 现量锚（编排者 19:4x 现跑；**你引用前自己再跑**，⛔ 抄过期行号）
+- `internal/winsec/winsec_other.go:24` = `func applyDescriptorPOSIX(path string, dir bool) error`
+- `internal/winsec/winsec_other.go:45` = `func sealHandle(f *os.File) error { return applyDescriptor(f.Name(), false) }`
+- `internal/winsec/winsec.go:108` = `func privateFile(...)` ← **本腿写面外**（A990 裁①：归未来票 322）
+- 仪器三枚环境变量名（`posix_seal_window_120_other_test.go`）：`WISP_120_BASELINE=1`／`WISP_120_ASSERT_CLOSED=1`／`WISP_120_ATTEMPTS=<n>`
+- ★名册过期警告：`-run 'TestAC1POSIX|TestAC2POSIX|TestAC3POSIX|TestAC4POSIX'` 那条口径，票里写的"16 枚"**已过期**。我这把尺（`grep -c '^func TestAC[0-9]POSIX'`，射程＝`internal/winsec/*_test.go`，**量**不是算）现跑＝**顶层 20 枚**，跨 4 件：`ancestor_separator_108`=4／`dataroot_symlink_119`=5／`placement_symlink_113`=8／`seam_probe_root_125`=3（子用例另计）。⇒ 你逐枚点名，⛔ 报"N 枚全绿"这种抄来的数。
+
+## 3. 写面（逐枚，越界即停手上报）
+- `internal/winsec/winsec_other.go`（产码：next=2 的替代形态）
+- `internal/winsec/posix_seal_window_120_other_test.go`（next=1 修两处缺陷＋next=4 转严格）
+- 新建 `.scratch/wisp/probes/120/r2/**` ＋ **一枚** 证据件 `docs/evidence/s1/120-fd-anchor.md`
+- 票 120 末尾追加 **1** 条 bullet
+- ⛔ `winsec.go`／`winsec_windows.go`／`internal/risk/**`／⛔ `cmd/wisp/**`（本波 `321-r1` 独占）／⛔ `internal/tools/**`（`270-r1` 独占）／⛔ `internal/panel`／`frontend/**`／`design/**`／冻结件／阈值／golden／`allowlist.txt`／`.github/**`
+
+## 4. 三问启动检查（非 0 ⇒ 停手上报）
+```bash
+cd "D:/work/workspace/projects plans/Wisp"
+git status --porcelain -- internal/winsec   # 必须 0 行
+docker info --format '{{.ServerVersion}}'   # 应回 29.6.2；⛔ 起不来就停手上报，别改判据硬跑
+date "+%Y-%m-%d %H:%M +08"                  # 时刻插值
+```
+
+## 5. 必做四件（照 r1 的 `next=`，逐件落）
+- **next=1(a)** 叶子 racer 换 `rename(2)` **原子**换手（两枚 staged 名字交替，叶子四步里永不缺席）——r1 首跑 `other=89/100` 就是被"空档"吞掉分子。
+- **next=1(b)** 祖先 racer 翻转步改幂等（先 `Remove(blob)` 再 `Remove(dir)` 再 `Symlink`），去掉那次 `recorded flip errors: 1`。
+- **next=2** 替代形态：`sealHandle`＝`os.SameFile(f.Stat(), os.Lstat(f.Name()))` 同一对象闸门＋`f.Chmod`＋`f.Stat` 回读；`applyDescriptorPOSIX`＝逐级 `Root.OpenRoot(comp)` 钉＋`Root.Lstat(comp)` 复验、叶子同法、`fchmod` **钉住的那枚 fd**；末次复验之后 ⛔ 再按名复解析。⚠ r1 §2 已实测 `O_NOFOLLOW` 经 `os.Root` **失效**、且 Root 跟随"根内相对链接" ⇒ ⛔ 把这两样当防线写进注释。
+- **next=4** 仪器转严格：`WISP_120_ASSERT_CLOSED=1` 的断言（每样本 `hits==0` **＋** liveness）**提升为默认**。⛔ 摘掉 liveness 那一半——r1 §1 缺陷 2 的原话读数就是"死仪器长得像干净"（`refused=0、sealed-own=100`×4）。
+- **next=2(c)** 注释按本仓"两条成本"体例写清两件事：① **r 权限类收紧**（`0w0`/`000` 文件、缺 `r` 目录由可修变拒）＝**A990 裁②已接受**，照此写、别再当未决；② `privateFile` 那一支 ⛔ **不许写成"本票已修"**，要写"另立票 322、未修"。
+
+## 6. ★凭据形状：成对读数，缺一不作凭据
+同一台件、同一容器镜像，两发都要落盘（读数行自带"坏世界真被造出来"的证据）：
+1. **修前**：`git archive <起手 HEAD>` 导出到仓外快照＋把**这份**测试件复制进去 ⇒ reader 形态命中 **> 0**（证明台件仍会响）。
+2. **修后**：严格形态（默认）⇒ 每样本 `hit-foreign == 0` **且** `refused-at-check`/`sealed-own` 一类 liveness 计数**非零**。
+⚠ 只有第 2 发＝"0"不是读数；"分母 N 且 0"才是。第 1 发拿不到（造不出坏世界）⇒ 具名写**缺世界**，⛔ 用"码面看过了"顶替。
+再加一发**反控**：把同一对象闸门那一支单独摘成恒真（`-overlay`／备份＋sha256 还原）⇒ 指名用例必须红；全绿＝你新装的闸门没人守着。
+
+## 7. 门禁（AC#5；容器一轮，每条自落 `rc=N`）
+`go test -count=2 -v ./internal/winsec/` 四数逐条点名／§2 那条 `-run` 口径**逐枚点名**（0 红 0 Skip）／`gofmt -l`＋`gofumpt -l`（宿主 `/d/work/base/gopath/bin/gofumpt.exe`）／`go vet ./internal/winsec/`／**`GOOS=darwin go vet ./internal/winsec/`**／按 113 验收方口径跑**等价 uid-1000**读数（uid 0 下 mode 全 ok＝失真，必须特意降权）／`sh scripts/d22scan.sh` 快照 rc=0 且台账各 scope 分母不降。
+台件卫生：一树一 `mktemp -d`；量之前先数 `.go` 证非空；⛔ 静默 `.out`。
+
+## 8. 环境／纪律条款
+- `export GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\120r2gotmp'`（只 C: 卷、只反斜杠形；⛔ `C:\tmp\`）
+- git：**只 commit、⛔ push**；`add`／`commit` 两处**显式 pathspec**；⛔ `add -A`／`add .`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 仓内建 worktree。
+- ⛔ 翻 AC 框／改 Status／改票名／编辑票面既有文本（票尾只许追加 1 条 bullet）。
+- ⛔ 为变绿放宽任何断言（本仓铁律）；红句要**连文案一起引**。
+- 文件：临时件只建不删；`probes/` 下 ⛔ `.go`；件名 ⛔ 长名、⛔ `§`；⛔ 读二进制；⛔ 裸 `sqlite3`；grep 要有界。
+- ⛔ **双引号串里出现反引号或 `$`**（本仓 10-15 第 5 次事故：`.md` 被当脚本执行、灌爆暂存区）——docker/sh -c 那类命令尤其注意；进 shell 的正文一律单引号或加引号 heredoc。
+- 输出预算：≤6 件、每件 ≤200 行；**没做完的 next 项逐枚自报**"没做完＋卡在哪"。
+- **编排者会逐把尺复跑，你自报的数字不当数。**

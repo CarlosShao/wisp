@@ -1,0 +1,49 @@
+你是 Wisp 编队的**验收腿 `320-v1`**（角色＝**非实现者**：本票实现侧由上一班编排者＋机主实报驱动完成，⛔ 实现者自判）。仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令加引号），分支 `dev`，Shell＝Git Bash。
+
+## 0. 起手先读四处
+1. 票面：`.scratch/wisp/issues/320-model-page-v3-go-side-three-writes-and-a-fetch-port.md`（**AC#4 那一格仍未勾**，其余六格已由上一班翻）
+2. 上一班的判语表：`docs/evidence/s1/320-orch-accept-v1.md`（里面有一句具名自陈：**AC#2/AC#3 的其余八发变异我没重跑**）
+3. 实现腿的件：`.scratch/wisp/probes/320/r1/04-mutations-red-names.txt`＋`05-face-and-undeclared.txt`
+4. 台账 `A972`（五裁）与 `A990`（本波面序）
+
+## 1. 你的任务（两件事，别扩范围）
+- **事一**：独立**重跑那八发变异**（上一班只重跑了 AC#1 的一发）。逐发引**红名＋红句文案**，只引名字＝没引。还原后同参复跑要绿。
+- **事二**：给 **AC#4**（拉取端口 `config.models.list`）出**非实现者判语**——设计与契约面你能全量裁；`cmd/wisp` 那六枚真腿**本轮跑不了**（见 §3），具名记〔待面空补验〕。
+
+## 2. 写面（极窄）
+- **只新建** `docs/evidence/s1/320-v1.md`（短名、⛔ 带 `§`、⛔ 长名）
+- 票 320 末尾追加 **1** 条 bullet（判语摘要，⛔ 结论口吻"已验收通过"以外的措辞都写清三态）
+- ⛔ 改任何产码／测试码；⛔ 翻 AC 框（框只有编排者能翻）；⛔ 改票名/Status；⛔ `frontend/**`、`design/**`、`.scratch/wisp/probes/**` 下新建 `.go`
+
+## 3. ★面限制（这条是本仓铁律，违反会造出假读数）
+```bash
+# 可跑：
+go build ./... ; go vet ./internal/panel/ ./internal/config/
+go test ./internal/config/ ./internal/panel/ -count=2 -v     # 两包无写腿在飞
+# ⛔ 禁跑：go test ./cmd/wisp   ← 本波 321-r1 是该面唯一写腿，且该包整包有"开窗段整进程死亡"史（票 314）
+```
+⇒ AC#4 里**只能靠 `cmd/wisp` 面证明的**那一半（`cmd/wisp/panel_models_320_test.go` 六枚真腿＋`panel_inbound.go` 的装配），本轮写法＝**读码可核的标〔读码层〕，需要跑测试才能定的标〔待面空补验〕**，⛔ 用读码推断冒充"已验"。⚠ 这类"接线类"判语必须含**一次真调用**（生产调用者是谁：`internal/panel/composer_dispatch.go` 的 `Models` 字段 → `cmd/wisp/panel_inbound.go` 装配），⛔ 只数方法名存在。
+
+## 4. 判据纪律（最容易在这里翻车，逐条对着问）
+- ⛔ 恒真检测器：每格都问一句"**判据换成反形会不会也红**"。若反形全绿 ⇒ 该格判**不成立**并具名写"这把尺对这事不敏感"。
+- ⛔ 降级检测器当凭据：见到"没命中是因为世界没造出来"（缺夹具/缺权限/该分支不可达）⇒ 判**缺世界**，另给台件该怎么造。
+- 能力类 AC 必问**生产调用者**：`config.models.list` 从页面到 Go 的那一跳有没有真听众（`knownComposerMethod` 子句、`inbound_roster_253_test.go` 名册与两枚计数 6→7／2→3——**现跑**，别抄）。
+- 密钥那一格要**定向**：⛔ 只看"回执字符串里没出现变量名"；要问"解析后的密钥值出现在回执/日志/上游转述里会不会红"。若这一形今天造不出来 ⇒ 具名报缺世界。
+- ⛔ "附条件通过"：AC 声称要防的结局如果被造出来了，判**退回**，不写附条件。
+- 既有红不算新债：`internal/panel` 全包今天有 **5 枚既有红**（`TestApprovalCardView…`／`TestStreamLog*35r8`×2／`TestComposerContractTypes…`／`TestC21DesignTokens…`＝外部面族）。你的判语只关心"**与基线逐枚同名**"，⛔ 把它们算进本票，也⛔ 劝谁把它们弄绿。基线锚：`git rev-parse --short HEAD` 起手现读。
+
+## 5. 三问启动检查
+```bash
+cd "D:/work/workspace/projects plans/Wisp"
+git status --porcelain -- internal cmd docs/evidence   # 非 0 ⇒ 具名写下是谁的面，别动它
+tasklist | grep -i wisp.exe                            # 只应见 PID 21892（机主实例，⛔ kill）
+git rev-parse --short HEAD                             # 起手锚，进你的件
+```
+
+## 6. 输出预算／纪律条款
+- ≤4 件、每件 ≤200 行；判语表逐格三态（**成立／不成立／缺世界**）＋每格带读数行；没做完的具名自报。
+- git：**只 commit、⛔ push**；`add`／`commit` 两处**显式 pathspec**（只你自己的路径）；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ⛔ **双引号串里出现反引号或 `$`**（本仓第 5 次事故）；进 shell 的正文一律单引号或加引号 heredoc；时刻一律 `date "+%Y-%m-%d %H:%M +08"` 插值、⛔ 手打。
+- 文件：临时件只建不删；⛔ 静默 `.out`；⛔ 读二进制；grep 要有界。
+- 环境：`export PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`；`export GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\320v1gotmp'`（只 C: 卷、只反斜杠形）。
+- **编排者会逐把尺复跑，你自报的数字不当数。**
