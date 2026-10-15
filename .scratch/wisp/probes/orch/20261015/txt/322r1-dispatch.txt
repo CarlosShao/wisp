@@ -1,0 +1,41 @@
+# 322-r1 派单（票 322 落地腿：`privateFile` 那次 open 自己跟随被换的叶子链接 ⇒ 外来文件被 `O_TRUNC`；形已由编排者裁，见 §2）
+
+★**本单=待派，不是在飞**（`A993` 定式：存档≠放腿）。**释放条件**＝`120-r3` 交件并收件、`internal/winsec/**` 写面空出来（它与 `120-r2`/`120-r3` 撞同一面）。
+编排者写单时刻 `2026-10-15 22:0x +08`，锚 `afcec913`。
+
+你 = Wisp 流水线落地腿 **322-r1**（实现者；判语归非实现者，⛔ 自己翻 AC 框）。仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令加引号），分支 `dev`，Shell＝Git Bash。
+
+## 1. 起手先读三处（⛔ 只读本单就开工）
+1. 票面：`.scratch/wisp/issues/322-privatefile-open-truncates-through-a-swapped-leaf.md`（含 `322-a1` 的代价表读数摘要）
+2. 普查件（AC#0 的原始读数）：`.scratch/wisp/probes/322/a1/index.md` ＋ `logs.md`
+3. 你要动的那几行（**编排者 22:0x 现量**，仍要你自己复跑确认，行号会腐烂）：
+   - `internal/winsec/winsec.go:87` = `return privateFile(path, data, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)`
+   - `internal/winsec/winsec.go:97` = `return privateFile(path, data, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)`
+   - `internal/winsec/winsec.go:108` = `func privateFile(...)`，`:113` = `f, err := os.OpenFile(resolved, flags, perm)`，失败路径 `:119`/`:124` = `_ = os.Remove(resolved)`
+   - `internal/winsec/winsec_other.go:82` 那句逐字 `booked separately as ticket 322 and is unfixed at this anchor`（AC#5 要改的就是它）
+
+## 2. ★形已裁死（台账 `A996`，⛔ 你重裁；不认同就停下来具名报回，不许自行改形）
+**分平台两半，⛔ 单一形。⛔ 乙（两跳）⛔ 丙（只报告）。**
+- **POSIX＝甲**：给 `:113` 那次 open 加 `O_NOFOLLOW`，按平台拆常量（`!windows` 文件里定义、`windows` 文件里定义为 0；`322-a1` 实测 `syscall.O_NOFOLLOW` 在 unix 全家族可编译、`windows/js/plan9` undefined ⇒ 只需两文件，⛔ 照抄 `120-r1` 的"只 linux"写法）。
+  ★**硬约束**：票面/注释/证据件**只许写"叶子那一支关着"**，**必须具名写"祖先那一支今天仍开着"**。凭据＝编排者自己那一发探针：叶子链接 ⇒ `too many levels of symbolic links`＋被指真文件 size 不动；**祖先是链接 ⇒ `OPENED`、目标 size 24→7（被截断）**。⛔ 任何形式的"窗口已关"。
+- **Windows＝重解析点判据形**：以 `FILE_FLAG_OPEN_REPARSE_POINT` 打开**只为判"这个名字是不是链接"**，是 ⇒ **具名拒绝**（走现有拒绝路径）。⛔ 把它当"不跟随的覆盖开"——`322-a1` 实测 `CREATE_ALWAYS` 变体会把链接条目换成空普通文件＝另一种破坏。⛔ 用 POSIX 绿冒充 Windows 绿（AC#3 的〔仅本机可量〕口径保留，本机可造 symlink/junction，必须真量）。
+  这一半**必做**：本机洞是量出来的（`damaged=571/759/780`、`ok=868/1252/1216` 里含 `err=<nil>`＝截断了外来文件还报成功）。
+
+## 3. 两格不许事后补（写进你的交件，缺一格＝退回）
+- **AC#2 覆盖写新钉**：`322-a1` 量到"覆盖写"承诺今天**零枚钉**，而四处生产调用者依赖它——`internal/secret/store.go:79`（同 id 覆盖）、`internal/config/migrate.go:93`（注释逐字是 wide-backup 修复路径）、`internal/secret/migrate.go:189`、`internal/agent/spill.go:166`。⇒ 你选形之下这些调用者的行为要各有一枚钉，且给"摘掉钉必须红"的正控。
+- **AC#1 成对读数**：容器台件里同发两数——修前分子 > 0、修后 **0 且 liveness 非零**，两个数**同一屏**（⛔ 单写"0 命中"；⛔ 用"没造出坏世界"的那发当"防住了"）。
+
+## 4. 面与台面（今天现撞的，⛔ 当读数）
+- 写面＝`internal/winsec/**`（产码＋测试件）；⛔ 此刻 `120-r3` 若仍在飞，本单**不许发**。
+- **winsec 的容器颜色随 `GOTMPDIR` 所在卷变**（票 311 现量：`D:` 卷 `56/2`、`C:` 卷 `58/0`）⇒ 成对读数必须**同一台面**，且起手先跑 `-- internal cmd` 那把全量尺并留档，⛔ 拿别卷的数当基线。
+- 22:0x 现量：`internal/winsec/` 容器整包在 `8beaed39` 上＝`RUN=62 / PASS_TOP=40 / FAIL=0 / SKIP=0`（含 `120-r3` 那三枚件）；`120-r3` 后续笔只动注释（我逐字看过 `8beaed39..6eb3d2e8` 的 diff，改动行全在 `//` 头注释里）。⛔ 把这些枚数当存量债、⛔ 为了让它们安静去改别人的件。
+- 容器规矩：树导到 **D 卷**（Git Bash 的 `/tmp` 在 C: Temp，挂进容器是空的）；量之前先数 `.go` 证非空；`GOTMPDIR` 先 `mkdir -p`；⛔ `cmd | tail` 之后取 `${PIPESTATUS[0]}`，定式 `cmd > 日志 2>&1; rc=$?`；无外网 ⇒ 只读挂宿主模块缓存 `GOPROXY=off` ＋ `GOMODCACHE=/gomod`（否则 `connection refused`／`[setup failed]` 会冒充测试红）。
+- 突变⛔ `-overlay`（它只换编译期输入，对运行时读盘的尺失明）⇒ 物理改写＋`sha256` 还原，`.bak` 只建不删；⚠ 同一枚文件里**同一对判据可能不止一处**（`internal/winsec/winsec_other.go`：`sealHandle` 体内一对、`sameObjectPinned`（约 `:184-193`）另有一对，我 21:4x 第一发就是因为假定"全文件唯一"被自己的 assert 挡下、那发作废），锚位要收到函数体内并先数命中枚数。
+
+## 5. 纪律
+- 写面**只许**：`internal/winsec/**`、`docs/evidence/s1/322-open-nofollow.md`、`.scratch/wisp/probes/322/r1/`、票 322 末尾 **1** 条 bullet。⛔ 翻 AC 框／改 Status／动台账；⛔ `frontend/**`／`design/**`／契约轴那批（票面「禁区」一节逐字生效）。
+- **只 commit、⛔ push**；`add`/`commit` 两处逐文件显式 pathspec；⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 仓内建 worktree。
+- ⛔ 双引号串里出现反引号或 `$`；正文一律单引号／加引号 heredoc／先 Write 成文件再 `git commit -F`。
+- 门禁逐条带 `rc=`：`go build ./...`／`gofumpt -l`（绝对路径 `/d/work/base/gopath/bin/gofumpt.exe`）／`go vet ./internal/winsec/` ＋ `GOOS=darwin` 与 `GOOS=windows` 两档 vet／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh --with-self-test`。
+- AC#4 那一格要**消费者色**：`internal/risk`／`cmd/wisp` 在 Linux 档会不会因本票再收紧变色——`cmd/wisp` 有整进程死亡区（票 314）⇒ **只用定向 `-run`**，且同一次只许一枚腿在那面上跑。
+- 件数 ≤5、每件 ≤260 行；没做完的格具名写"没做完"＋缺哪件料；**编排者会逐把尺复跑，你自报的数字不当数**。
