@@ -88,3 +88,116 @@ func TestDeadPanelThreadRefusesEveryGesture319(t *testing.T) {
 	}
 	t.Logf("319 dead-thread raw reading: RequestToggle=%v RequestShow=%v isFinished=%v", toggle, show, rp.isFinished())
 }
+
+// TestPanelHolderRebuildsADeadThread319 is the holder half this file's header
+// names: the same gesture the case above hands to the dead thread, handed
+// instead to the assembly root's panelHolder, must come back taken, with a
+// fresh thread on the same manager behind it.
+//
+// Mutation control (the teeth): drop the isFinished() term from
+// panelHolder.toggle's rebuild condition (cmd/wisp/resident_windows.go) and this
+// case goes red on both judgements the header lists - "toggle returned true" and
+// "the spawn was asked a second time" - because the dead thread behind the
+// holder keeps refusing every request.
+//
+// The spawn seam is the observation point. Call 1 goes through the production
+// startResidentPanel (the eager first thread every resident boot starts) and is
+// stopped into the dead state the field leaves behind; only the REBUILD's thread
+// is a double (inertPanelThread319 below), so this tier still creates no window.
+// What the double cannot prove - that a rebuilt thread really brings a window up
+// - is panel_death_replay_319_winlive_test.go's second case, on a real desktop.
+func TestPanelHolderRebuildsADeadThread319(t *testing.T) {
+	reg := observe.NewRegistry()
+	mgr := NewPanelManager(&panel.ComposerDispatch{Mode: &recordingModeHandler{}}, nil, panel319DataPath(t))
+	h := newPanelHolder(reg, mgr)
+
+	productionSpawn := h.spawn
+	var (
+		spawns  int
+		sameMgr bool
+		fresh   *residentPanel
+	)
+	h.spawn = func(r *observe.Registry, m *PanelManager) *residentPanel {
+		spawns++
+		if spawns == 1 {
+			return productionSpawn(r, m)
+		}
+		sameMgr = m == mgr
+		fresh = inertPanelThread319(r, m)
+		return fresh
+	}
+	h.start()
+	if spawns != 1 || h.rp == nil {
+		t.Fatalf("the holder did not start its eager first thread through the seam (spawns=%d, holder thread started=%v)", spawns, h.rp != nil)
+	}
+	dead := h.rp
+	dead.stop()
+	if !dead.isFinished() {
+		t.Fatalf("the first thread did not finish after stop(); every assertion below would be about a live thread")
+	}
+
+	// Both roads, side by side: the dead thread itself still refuses this gesture
+	// (the case above), the holder takes it (the fix).
+	if dead.RequestToggle("319-holder-dead-thread") {
+		t.Errorf("a gesture was accepted by the dead thread itself - the refusal is the honest half of the defect and must stay")
+	}
+	toggle := h.toggle("319-holder-rebuild")
+	if !toggle {
+		t.Errorf("panelHolder.toggle returned false for a gesture after the panel thread had died - the dead thread's refusal reached the caller again, which is the 2026-10-14 field defect (every tray/ball gesture refused after 15:41:45); a dead thread must make the holder start a fresh one for this gesture")
+	}
+	if spawns != 2 {
+		t.Errorf("the spawn was asked %d time(s) for one gesture after a dead thread, want exactly 2 (the eager first thread plus one rebuild)", spawns)
+	}
+	if h.rp == dead {
+		t.Errorf("the holder hands out the dead thread again - the rebuild replaced nothing, so the next gesture walks the same road")
+	}
+	if spawns == 2 {
+		// Everything below is about the rebuilt thread, so it is judged only once
+		// the case above has established that there is one: without that gate a
+		// missing rebuild would report six reds for one defect.
+		if !sameMgr {
+			t.Errorf("the rebuilt thread was asked for on a manager other than the one the boot assembled; the window an operator sees comes from the manager's state, so a second manager would be a second panel")
+		}
+		if fresh == nil {
+			t.Fatalf("the rebuild's spawn returned no thread at all")
+		}
+		if fresh.isFinished() {
+			t.Errorf("the rebuilt thread is already finished when the gesture is handed to it")
+		}
+		if n := len(fresh.tasks); n != 1 {
+			t.Errorf("this gesture did not land in the rebuilt thread's own queue (it holds %d request(s), want the one toggle just took) - the holder answered yes with nowhere for the request to be", n)
+		}
+	}
+	queued := -1
+	if fresh != nil {
+		queued = len(fresh.tasks)
+	}
+	t.Logf("319 holder rebuild reading: dead thread refused its own gesture; holder toggle=%v; spawns=%d; rebuilt thread queued requests=%d; same manager=%v",
+		toggle, spawns, queued, sameMgr)
+}
+
+// inertPanelThread319 is what this headless tier lets the holder rebuild into:
+// the production residentPanel type wired to the production manager, with its
+// request queue open and no goroutine behind it. A gesture taken by it lands in
+// that queue exactly the way a rebuilt thread's first gesture does - post()
+// answers true and the closure can be seen waiting - and nothing runs it, so
+// this file judges the holder's decision without ever asking bringUp for a
+// window, which is this tier's contract (panel319DataPath above).
+//
+// isFinished() is false on it for the same reason it is false on a thread that
+// just started: it reads the registry handle, and this double holds none.
+// finished is closed up front instead, so a later edit that wires holder.stop()
+// into this case reads "already gone" rather than waiting out
+// panelThreadExitBudget.
+func inertPanelThread319(reg *observe.Registry, mgr *PanelManager) *residentPanel {
+	rp := &residentPanel{
+		mgr:     mgr,
+		reg:     reg,
+		tasks:   make(chan func(), 16),
+		entered: make(chan struct{}),
+		stopNow: make(chan struct{}),
+	}
+	rp.finished = make(chan struct{})
+	close(rp.finished)
+	return rp
+}

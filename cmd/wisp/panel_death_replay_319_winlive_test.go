@@ -29,9 +29,30 @@ package main
 // /tmp), and every event name any case in this tree opens is unique per run -
 // the owner's running wisp.exe is never touched. winlive has no CI job: this
 // runs on the desktop box only, one case at a time, by name.
+//
+// Three cases live here, all three of them live readings of the same ticket:
+//  1. TestPanelDeathReplay319UnfixedReading - the close chain replayed, the dead
+//     thread's refusal kept (the BEFORE shape of the fix);
+//  2. TestPanelDeathThenHolderGestureRebuilds319 - the AFTER shape of AC#1: the
+//     same gesture through the assembly root's panelHolder really brings a NEW
+//     window up, and reusing the old handle reads as a failure;
+//  3. TestSecondLaunchActivationRaisesThePanel319 - AC#2 read live: one round of
+//     the production second-launch call (SignalExistingInstance, its
+//     AllowSetForegroundWindow included) against a runtime this run owns raises
+//     the panel window, and the window takes the foreground.
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
+	"time"
+
+	"github.com/CarlosShao/wisp/internal/buildinfo"
+	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/panel"
+	"github.com/CarlosShao/wisp/internal/proc"
+	"golang.org/x/sys/windows"
 )
 
 // The two message numbers the close chain starts with (winuser.h), named so the
@@ -40,6 +61,22 @@ const (
 	pan319WmSysCommand = 0x112
 	pan319ScClose      = 0xF060
 )
+
+// startPanelHolder319 is the live fixture for this file's second and third
+// cases: the production manager (real embedded assets, its own WebView2 profile
+// under the system temp dir) behind the production panelHolder, with the eager
+// first thread already started - the assembly cmd/wisp/resident_windows.go
+// builds at boot, with the holder as the one name the gestures go through.
+func startPanelHolder319(t *testing.T) (*panelHolder, *PanelManager) {
+	t.Helper()
+	dataPath := filepath.Join(os.TempDir(), "wisp-319r2-live-profile")
+	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
+	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
+	h := newPanelHolder(observe.NewRegistry(), mgr)
+	h.start()
+	t.Cleanup(h.stop)
+	return h, mgr
+}
 
 // TestPanelDeathReplay319UnfixedReading replays the 15:41:45 chain on a real
 // window and records the shape the ticket was filed about: dead thread, refused
@@ -71,4 +108,183 @@ func TestPanelDeathReplay319UnfixedReading(t *testing.T) {
 	}
 	t.Logf("319 unfixed live reading: hwnd=0x%X closed via WM_SYSCOMMAND/SC_CLOSE; thread finished=%v; next gesture RequestToggle=%v; mgr.IsCreated=%v; mgr hwnd=0x%X",
 		old, rp.isFinished(), toggle, mgr.IsCreated(), mgr.windowHandle())
+}
+
+// TestPanelDeathThenHolderGestureRebuilds319 is N3's second half: the AFTER shape
+// of AC#1, read live. The first case above stops at "the dead thread refuses and
+// no window comes back"; this one continues with the same gesture through the
+// assembly root's panelHolder and requires that a REAL window comes up, on the
+// same manager, with a NEW handle - a rebuild that reused the old handle is a
+// failure here, not a pass.
+//
+// Mutation control: drop the isFinished() term from panelHolder.toggle
+// (cmd/wisp/resident_windows.go) and this case goes red on "the holder took the
+// gesture", the same red the headless holder case turns in
+// panel_holder_319_windows_test.go.
+func TestPanelDeathThenHolderGestureRebuilds319(t *testing.T) {
+	h, mgr := startPanelHolder319(t)
+
+	// The first window through the production gesture path - the one executor the
+	// ball's panel gestures, the hot key, the tray item and the second-launch
+	// activation all drive.
+	if !h.toggle("319-live-first-open") {
+		t.Fatalf("the holder refused the very first gesture, before any thread had died")
+	}
+	waitPanelTrue(t, "the first panel window to be shown", func() bool { return mgr.IsShown() })
+	old := mgr.windowHandle()
+	if old == 0 {
+		t.Fatalf("the first show reported a shown window with HWND 0")
+	}
+	dead := h.rp
+
+	// The 15:41:45 chain, planted: WM_SYSCOMMAND(0x112) + SC_CLOSE on the real
+	// window, the same pair the system sends for the owner's X.
+	r, _, callErr := t33r9NailPostMessage.Call(old, pan319WmSysCommand, pan319ScClose, 0)
+	if r == 0 {
+		t.Fatalf("PostMessageW(hwnd 0x%X, WM_SYSCOMMAND, SC_CLOSE) was refused: %v", old, callErr)
+	}
+	waitPanelTrue(t, "the panel thread to end after its window was closed", dead.isFinished)
+
+	// Both readings before the rebuild: the dead thread still refuses, and the
+	// manager has no window recorded.
+	refused := dead.RequestToggle("319-live-dead-refusal")
+	createdAfterDeath := mgr.IsCreated()
+	hwndAfterDeath := mgr.windowHandle()
+	oldAliveAfterDeath := isLiveWindow(old)
+
+	// The fix, live: the same gesture through the holder must rebuild, and the
+	// rebuilt thread must bring a real window up.
+	toggle := h.toggle("319-live-rebuild")
+	if refused {
+		t.Errorf("the dead thread accepted a gesture (RequestToggle=%v) - the refusal is the honest half of the defect and must stay", refused)
+	}
+	if !toggle {
+		t.Errorf("panelHolder.toggle refused the gesture after the panel thread had died; AC#1 says this gesture must make the holder start a fresh thread and the window must come back")
+		// No rebuild was asked for, so no window can come: waiting out
+		// panelThreadWait would turn this one named defect into a timeout as well,
+		// which is the second red shape 33-r9's refusal case refuses to add. The
+		// readings taken before the rebuild are reported instead.
+		t.Logf("319 live rebuild reading (the holder refused, so no window was asked for): old hwnd=0x%X closed via WM_SYSCOMMAND/SC_CLOSE (alive after the close=%v); after the close: mgr.IsCreated=%v mgr hwnd=0x%X dead-thread RequestToggle=%v",
+			old, oldAliveAfterDeath, createdAfterDeath, hwndAfterDeath, refused)
+		return
+	}
+	waitPanelTrue(t, "the rebuilt panel thread to show a fresh window", func() bool {
+		return mgr.IsCreated() && mgr.IsShown() && mgr.windowHandle() != 0
+	})
+	neu := mgr.windowHandle()
+	if neu == old {
+		t.Errorf("the rebuilt thread reports the OLD window handle 0x%X as current; the window that handle belongs to is the one the close chain destroyed, so a rebuild that reuses the dead handle reads as a failure, not as a pass", old)
+	}
+	if h.rp == dead || h.rp.isFinished() {
+		t.Errorf("the holder still answers with the dead thread (same thread=%v finished=%v) - the next gesture would be refused again", h.rp == dead, h.rp != nil && h.rp.isFinished())
+	}
+	if isLiveWindow(old) {
+		t.Errorf("the closed window 0x%X is alive again after the rebuild; the close chain is supposed to have destroyed it, and a live old handle would make the new-window reading meaningless", old)
+	}
+	t.Logf("319 live rebuild reading: old hwnd=0x%X closed via WM_SYSCOMMAND/SC_CLOSE (alive after the close=%v); after the close: mgr.IsCreated=%v mgr hwnd=0x%X dead-thread RequestToggle=%v; after the holder's rebuild: holder toggle=%v new hwnd=0x%X mgr.IsCreated=%v mgr.IsShown=%v old window alive=%v",
+		old, oldAliveAfterDeath, createdAfterDeath, hwndAfterDeath, refused, toggle, neu, mgr.IsCreated(), mgr.IsShown(), isLiveWindow(old))
+}
+
+// TestSecondLaunchActivationRaisesThePanel319 is AC#2's live reading: the hop
+// from "a second launch signals the instance's activation event" to "the
+// running instance's panel is in front of the operator", driven end to end
+// through production code.
+//
+// What is production here, piece by piece: the signal is
+// internal/proc.SignalExistingInstance - the identical call cmd/wisp's
+// ErrAlreadyRunning branch makes, AllowSetForegroundWindow(ASFW_ANY) included -
+// and the answer is the resident runtime's own path: RunEventLoop's activation
+// round (Runtime.handleActivation) runs the hook registered with
+// Runtime.SetActivationHook, which is cmd/wisp's secondLaunchActivation319, which
+// drives the same panelHolder.toggle the tray item drives. Only two things are
+// this case's own: the layout (unique mutex/event names for this run) and the
+// timer window that tells the foreground reading where the operator came from.
+//
+// WHY THE LAYOUT IS PER-RUN, AND WHY NO SECOND PROCESS IS STARTED. The dev and
+// prod mutex/event names derive from the environment (internal/proc/envfork.go),
+// so a second `wisp --env dev` would signal the OWNER's running instance and
+// raise the owner's window instead of this test's - it would disturb a live
+// process to measure a rule that the in-process call already carries. So the
+// second launch is this process calling SignalExistingInstance on a name it
+// just created. Not covered by that shape, named here instead of implied: the
+// caller being a genuinely separate process, whose AllowSetForegroundWindow
+// grant is what the resident's SetForegroundWindow consumes in the field (the
+// call itself runs, in production code, and its refusal is logged by
+// SignalExistingInstance). The hook is wrapped only to copy its receipt out (a
+// func() string has no reader otherwise): the wrap calls the production hook and
+// returns its answer unchanged.
+func TestSecondLaunchActivationRaisesThePanel319(t *testing.T) {
+	h, mgr := startPanelHolder319(t)
+
+	reg := observe.NewRegistry()
+	layout := proc.Layout{
+		Env:               buildinfo.EnvProd,
+		DataDir:           t.TempDir(),
+		MutexName:         fmt.Sprintf(`Local\wisp-test-319-activation-%d-%d`, os.Getpid(), time.Now().UnixNano()),
+		ActivateEventName: fmt.Sprintf(`Local\wisp-test-319-activation-%d-%d.activate`, os.Getpid(), time.Now().UnixNano()),
+		MutexEnabled:      true,
+	}
+	rt, err := proc.Boot(buildinfo.EnvProd, proc.WithLayout(layout), proc.WithRegistry(reg))
+	if err != nil {
+		t.Fatalf("proc.Boot with this run's own layout: %v", err)
+	}
+	t.Cleanup(func() { rt.Shutdown(true) })
+	if rt.Instance == nil {
+		t.Fatalf("this layout owns a mutex, so rt.Instance must be non-nil before the second-launch hop can mean anything")
+	}
+
+	hook := secondLaunchActivation319(h, nil)
+	receipts := make(chan string, 4)
+	rt.SetActivationHook(func() string {
+		s := hook()
+		select {
+		case receipts <- s:
+		default:
+		}
+		return s
+	})
+
+	// The loop the resident process runs. One thing this case leaves behind and
+	// names instead of hiding: RunEventLoop returns only on a process exit signal,
+	// so its goroutine and its signal registration outlive this case for the rest
+	// of the run. winlive has no CI job and is run one case at a time by name, and
+	// no signal is raised here to end it - the alternative was an exported stop()
+	// on Runtime that production does not have.
+	loop := make(chan string, 1)
+	go func() { loop <- rt.RunEventLoop() }()
+
+	// Where the operator came from. The foreground reading below is decidable only
+	// when this process holds the foreground when the panel is raised (Windows
+	// refuses SetForegroundWindow to a process that does not), which is the same
+	// reason 33-r5's AC#4 ruler builds its own prior window. It is built on the
+	// panel thread - the thread that pumps the panel window.
+	prior := editorOnPanelThread(t, h.rp)
+	if fg := uintptr(windows.GetForegroundWindow()); fg != uintptr(prior) {
+		t.Fatalf("the prior window 0x%X did not take the foreground (the foreground is 0x%X), so 'was the panel raised' cannot be decided on this desktop; this is a failed measurement, not a product verdict", uintptr(prior), fg)
+	}
+
+	// The second launch: the identical call the ErrAlreadyRunning branch makes.
+	if err := proc.SignalExistingInstance(rt.Layout.ActivateEventName); err != nil {
+		t.Fatalf("SignalExistingInstance(%q): %v", rt.Layout.ActivateEventName, err)
+	}
+
+	waitPanelTrue(t, "the second-launch activation to raise the panel window", func() bool {
+		return mgr.IsCreated() && mgr.IsShown() && mgr.windowHandle() != 0
+	})
+	hwnd := mgr.windowHandle()
+	fg := uintptr(windows.GetForegroundWindow())
+
+	var receipt string
+	select {
+	case receipt = <-receipts:
+	case <-time.After(panelThreadWait):
+		t.Fatalf("the activation hook never answered within %v: the signal reached nothing (the window above came from somewhere else)", panelThreadWait)
+	}
+
+	if fg != hwnd {
+		t.Errorf("the panel window 0x%X came up (created=%v shown=%v visible=%v) but the foreground window is 0x%X, not the panel - AC#2 says a second launch must bring the running instance's UI to the front, and the tray tip is only the fallback for a panel that cannot be raised; the prior window was 0x%X",
+			hwnd, mgr.IsCreated(), mgr.IsShown(), isLiveWindow(hwnd), fg, uintptr(prior))
+	}
+	t.Logf("319 second-launch live reading: signal=SignalExistingInstance(%q) from this process; hook receipt=%q; panel hwnd=0x%X mgr.IsCreated=%v mgr.IsShown=%v window alive=%v; foreground window=0x%X; prior window=0x%X; event loop still running=%v",
+		rt.Layout.ActivateEventName, receipt, hwnd, mgr.IsCreated(), mgr.IsShown(), isLiveWindow(hwnd), fg, uintptr(prior), len(loop) == 0)
 }

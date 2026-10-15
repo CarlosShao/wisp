@@ -1,0 +1,62 @@
+319-r2 evidence index. Leg 319-r2 (continuation of the platform-killed 319-r1),
+anchor at start: 36cf5d06. All files below are captured `go test` output, verbatim
+except that ticket 299's MARK299 window-procedure trace lines are filtered out of
+the live runs (they are another leg's tracing, not a reading of this ticket), and
+the live files carry the tasklist self-proof line the leg was told to take before
+each run (the owner's wisp.exe, PID 40296, is present and untouched in every one).
+
+01-headless-mutant-red.txt       AC#1 three-state, state 1/3 (mutant): the isFinished()
+                                 term deleted from panelHolder.toggle
+                                 (cmd/wisp/resident_windows.go:535 became
+                                 "if h.rp == nil {"), grep + `go build ./cmd/wisp/`
+                                 rc=0 shown, TestPanelHolderRebuildsADeadThread319
+                                 RED by name (toggle=false, spawns=1).
+02-winlive-mutant-red.txt        AC#1 live three-state, state 1/3 (same mutant):
+                                 TestPanelDeathThenHolderGestureRebuilds319 RED by
+                                 name, no window asked for (returns on the named red
+                                 instead of waiting out a timeout).
+03-restored-headless-green.txt   AC#1 three-state, state 3/3 (restored): both headless
+                                 cases green, holder reading toggle=true spawns=2
+                                 queued=1 same manager=true.
+04-restored-winlive-green.txt    AC#1 live three-state, state 3/3 (restored): green,
+                                 old hwnd 0xAD20544 -> new hwnd 0x7E90E60,
+                                 mgr.IsCreated/IsShown true, old window dead.
+05-activation-live-green.txt     AC#2 live: SignalExistingInstance (production call,
+                                 AllowSetForegroundWindow included, no refusal
+                                 warning) -> hook receipt -> panel hwnd 0x49212CC
+                                 comes up and GetForegroundWindow == that hwnd.
+06-regression-existing-winlive.txt  the pre-existing winlive 319 case
+                                 (TestPanelDeathReplay319UnfixedReading) by name.
+07-regression-319-both-packages.txt `-run '319' ./cmd/wisp/ ./internal/proc/` green,
+                                 plus the appended full default-tier run of both
+                                 packages (the shape CI's cmd/wisp step runs), the
+                                 per-name verdicts for its 7 reds run ALONE (my new
+                                 case is not in that -run set at all), and the
+                                 GOTMPDIR matrix that separates one of them from this
+                                 leg's own temp-root choice. One red of the seven
+                                 (TestAC2SealNoticeLandsInTheRunLegLogFile) is a
+                                 function of GOTMPDIR: FAIL with this leg's prescribed
+                                 C:\tmp\wisp319r2gotmp, PASS with GOTMPDIR unset and
+                                 PASS with the repo's own root convention
+                                 (%LOCALAPPDATA%\wisp-test-gotmp\cli-<ts>-<pid>,
+                                 scripts/wisp-cli-tests.sh ticket 310 AC#1). The other
+                                 six fail under all three settings: TestAC4...33r5
+                                 (panel did not take the foreground), TestAC14...
+                                 (Eval push did not reach the page), the three
+                                 Test258* (Ctrl+Alt+M/Q occupied by other apps on this
+                                 host), TestAC246... (its own message: "a dev Wisp is
+                                 already running in this session"). None of the seven
+                                 is in ticket 319's face; my new case was absent from
+                                 the -run set of every isolation run.
+08-gates-a-build-fumpt-vet.txt   go build ./... rc=0; gofumpt -l (the leg's own
+                                 files) empty rc=0 (v0.12.0); go vet -tags winlive
+                                 ./cmd/wisp/ ./internal/proc/ rc=0.
+09-gates-b-d22scan-length.txt    sh scripts/d22scan.sh rc=0, clean (ban #1-5, #8);
+                                 sh scripts/check-path-length-budget.sh
+                                 --with-self-test VERDICT GREEN.
+
+Working-tree face at the end of the leg (git diff --numstat, the leg's own two files
+only): cmd/wisp/panel_holder_319_windows_test.go +113/-0,
+cmd/wisp/panel_death_replay_319_winlive_test.go +216/-0. No production file was left
+changed: the mutant was reverted with an exact reverse edit and
+`git diff -- cmd/wisp/resident_windows.go | wc -c` is 0.

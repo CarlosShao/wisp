@@ -1,0 +1,17 @@
+== tasklist self-proof (before) ==
+wisp.exe                     40296 Console                    1     55,828 K
+== production file restored; run: go test -tags winlive -run TestPanelDeathThenHolderGestureRebuilds319 ./cmd/wisp/ -count=1 -v ==
+time=2026-10-15T11:22:47.447+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelDeathThenHolderGestureRebuilds319
+time=2026-10-15T11:22:47.449+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (319-live-first-open, cold 648.3 ms, hot path 0.0 ms)
+time=2026-10-15T11:22:48.192+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-15T11:22:48.198+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T11:22:48.198+08:00 level=INFO msg="panel host: starting a fresh panel thread for this gesture" via=319-live-rebuild why="the previous panel thread had exited"
+wisp: panel window is up (319-live-rebuild, cold -1.0 ms, hot path 0.0 ms)
+    panel_death_replay_319_winlive_test.go:184: 319 live rebuild reading: old hwnd=0xAD20544 closed via WM_SYSCOMMAND/SC_CLOSE (alive after the close=false); after the close: mgr.IsCreated=false mgr hwnd=0x0 dead-thread RequestToggle=false; after the holder's rebuild: holder toggle=true new hwnd=0x7E90E60 mgr.IsCreated=true mgr.IsShown=true old window alive=false
+time=2026-10-15T11:22:54.980+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-15T11:22:54.981+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=1 disposals=0
+--- PASS: TestPanelDeathThenHolderGestureRebuilds319 (7.53s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	10.033s

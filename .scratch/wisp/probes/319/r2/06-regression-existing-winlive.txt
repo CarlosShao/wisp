@@ -1,0 +1,13 @@
+== tasklist self-proof (before) ==
+wisp.exe                     40296 Console                    1     55,904 K
+== run (by name, the pre-existing winlive case): go test -tags winlive -run TestPanelDeathReplay319UnfixedReading ./cmd/wisp/ -count=1 -v ==
+time=2026-10-15T11:23:43.795+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelDeathReplay319UnfixedReading
+time=2026-10-15T11:23:43.798+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 736.1 ms, hot path 0.0 ms)
+time=2026-10-15T11:23:44.704+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+    panel_death_replay_319_winlive_test.go:109: 319 unfixed live reading: hwnd=0x5BF0534 closed via WM_SYSCOMMAND/SC_CLOSE; thread finished=true; next gesture RequestToggle=false; mgr.IsCreated=false; mgr hwnd=0x0
+time=2026-10-15T11:23:44.706+08:00 level=INFO msg="panel thread exited cleanly" shows=2 toggles=1 disposals=0
+--- PASS: TestPanelDeathReplay319UnfixedReading (0.91s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.372s

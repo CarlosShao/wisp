@@ -1,0 +1,21 @@
+== tasklist self-proof (before) ==
+wisp.exe                     40296 Console                    1     55,900 K
+== run: go test -tags winlive -run TestSecondLaunchActivationRaisesThePanel319 ./cmd/wisp/ -count=1 -v ==
+time=2026-10-15T11:23:13.658+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSecondLaunchActivationRaisesThePanel319
+time=2026-10-15T11:23:13.661+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-15T11:23:13.776+08:00 level=INFO msg="activation requested by second launch" handled_here="the registered activation hook ran" receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"
+wisp: panel window is up (second-launch, cold 710.7 ms, hot path 0.0 ms)
+    panel_death_replay_319_winlive_test.go:288: 319 second-launch live reading: signal=SignalExistingInstance("Local\\wisp-test-319-activation-3648-1792034593662955700.activate") from this process; hook receipt="the panel executor took the request (second-launch); the window verdict lands on the panel thread's own log lines"; panel hwnd=0x49212CC mgr.IsCreated=true mgr.IsShown=true window alive=true; foreground window=0x49212CC; prior window=0x415111A; event loop still running=true
+time=2026-10-15T11:23:14.497+08:00 level=INFO msg="shutdown step skipped (module not present)" step=1 name=scheduler-close
+time=2026-10-15T11:23:14.497+08:00 level=INFO msg="shutdown step skipped (module not present)" step=2 name=stop-hotkey-kws
+time=2026-10-15T11:23:14.497+08:00 level=INFO msg="shutdown step skipped (module not present)" step=3 name=cancel-task-roots
+time=2026-10-15T11:23:14.497+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-15T11:23:14.497+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-15T11:23:14.498+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-15T11:23:14.498+08:00 level=WARN msg="fast shutdown: skipping non-critical log/db flushes (D38e fast path)"
+time=2026-10-15T11:23:14.507+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-15T11:23:14.507+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=1 disposals=0
+--- PASS: TestSecondLaunchActivationRaisesThePanel319 (0.85s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.448s

@@ -1,0 +1,8 @@
+== 1. go build ./... ==
+rc=0
+== 2. gofumpt -l (my files) ==
+gofumpt rc=0
+== 2b. gofumpt version ==
+v0.12.0 (go1.27.1)
+== 3. go vet -tags winlive ./cmd/wisp/ ./internal/proc/ ==
+rc=0

@@ -1,0 +1,92 @@
+== run: go test -run '319' ./cmd/wisp/ ./internal/proc/ -count=1 ==
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.525s
+ok  	github.com/CarlosShao/wisp/internal/proc	0.555s
+
+== appended: full default-tier packages (what CI's cmd/wisp step runs) ==
+== go test ./cmd/wisp/ ./internal/proc/ -count=1 ==
+time=2026-10-15T11:31:52.028+08:00 level=INFO msg="MARK299 wndproc hwnd=0x7110c msg=0x7f known=true"
+time=2026-10-15T11:31:52.029+08:00 level=INFO msg="MARK299 wndproc hwnd=0x7110c msg=0x7f known=true"
+time=2026-10-15T11:31:52.030+08:00 level=INFO msg="MARK299 wndproc hwnd=0x7110c msg=0x6 known=true"
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	354.980s
+ok  	github.com/CarlosShao/wisp/internal/proc	3.753s
+FAIL
+
+== appended: the 7 full-package reds, run ALONE (my new case not in the -run set at all) ==
+== go test -run '^(TestAC2SealNoticeLandsInTheRunLegLogFile|TestAC4FocusReturnToPriorWindowGap33r5|TestAC14GoSideEvalPushReachesThePage|Test258BridgeMutationNoSrcKeepsOldBinding|Test258OccupiedCombinationNamesTheNewValue|Test258V1ProbeSummonEditRebindsLiveBall|TestAC246DevLegIgnoresTheTestTaskInjection)$' ./cmd/wisp/ -count=1 ==
+        stdout:
+        wisp 0.0.0-dev (unknown, built unknown)
+        WISP_ENV=dev (data dir rules: SPEC-03 §5)
+        sherpa-onnx runtime version: 1.13.8
+        wisp: another instance is running in this session; activated it; exiting
+        
+        stderr:
+        time=2026-10-15T11:42:54.668+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+        time=2026-10-15T11:42:54.672+08:00 level=WARN msg="proc: AllowSetForegroundWindow(ASFW_ANY) was refused; the resident's SetForegroundWindow may be denied by the foreground lock" err="Access is denied."
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	42.575s
+FAIL
+
+== appended: the 7 full-package reds alone, per-name verdicts (my new case is NOT in this -run set) ==
+=== RUN   TestAC2SealNoticeLandsInTheRunLegLogFile
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.07s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (0.82s)
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (0.83s)
+=== RUN   Test258BridgeMutationNoSrcKeepsOldBinding
+--- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding (0.80s)
+=== RUN   Test258OccupiedCombinationNamesTheNewValue
+--- FAIL: Test258OccupiedCombinationNamesTheNewValue (0.06s)
+=== RUN   Test258V1ProbeSummonEditRebindsLiveBall
+--- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (0.05s)
+=== RUN   TestAC246DevLegIgnoresTheTestTaskInjection
+--- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection (38.21s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	43.155s
+FAIL
+
+== appended: the same 7 reds with GOTMPDIR UNSET (the leg was told to set GOTMPDIR=C:\tmp\wisp319r2gotmp) ==
+=== RUN   TestAC2SealNoticeLandsInTheRunLegLogFile
+--- PASS: TestAC2SealNoticeLandsInTheRunLegLogFile (0.07s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+--- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (0.99s)
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (0.97s)
+=== RUN   Test258BridgeMutationNoSrcKeepsOldBinding
+--- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding (0.84s)
+=== RUN   Test258OccupiedCombinationNamesTheNewValue
+--- FAIL: Test258OccupiedCombinationNamesTheNewValue (0.06s)
+=== RUN   Test258V1ProbeSummonEditRebindsLiveBall
+--- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (0.06s)
+=== RUN   TestAC246DevLegIgnoresTheTestTaskInjection
+--- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection (33.76s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	36.861s
+FAIL
+
+== appended: one more row - the repo's OWN root convention (scripts/wisp-cli-tests.sh ticket 310 AC#1: %LOCALAPPDATA%\wisp-test-gotmp\cli-<ts>-<pid>) ==
+GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\cli-20261015-114643-522824
+=== RUN   TestAC2SealNoticeLandsInTheRunLegLogFile
+--- PASS: TestAC2SealNoticeLandsInTheRunLegLogFile (0.08s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.148s
+
+== appended: why the ONE red that turned out to be this leg's own env choice differs ==
+== icacls C:\tmp (read-only, raw) ==
+C:\tmp BUILTIN\Administrators:(I)(OI)(CI)(F)
+       NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+       BUILTIN\Users:(I)(OI)(CI)(RX)
+       NT AUTHORITY\Authenticated Users:(I)(M)
+       NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+
+== icacls C:\tmp\wisp319r2gotmp (read-only, raw) ==
+C:\tmp\wisp319r2gotmp BUILTIN\Administrators:(I)(OI)(CI)(F)
+                      NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                      BUILTIN\Users:(I)(OI)(CI)(RX)
+                      NT AUTHORITY\Authenticated Users:(I)(M)
+                      NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+
+== matrix ==
+GOTMPDIR=C:\tmp\wisp319r2gotmp  -> TestAC2SealNoticeLandsInTheRunLegLogFile FAIL
+GOTMPDIR unset                    -> TestAC2SealNoticeLandsInTheRunLegLogFile PASS
+GOTMPDIR=%LOCALAPPDATA%\wisp-test-gotmp\cli-<ts>-<pid> (repo convention, scripts/wisp-cli-tests.sh ticket 310 AC#1) -> PASS
+the other 6 reds FAIL under every one of the three settings (no GOTMPDIR dependence measured)
