@@ -89,11 +89,21 @@ export function keyLabel(row: { credentialSet: boolean; credentialError: string 
    --------------------------------------------------------------------------- */
 
 /** The refusal matcher: sealed sentences, most specific first. Each maps to
-    the one line a person can act on. */
+    the one line a person can act on. Order matters where two sentences share
+    a word (a model row's "already exists" must not be read as a provider's). */
 const REFUSALS: readonly { match: string; text: string }[] = [
   { match: "没有对应的写入腿", text: "这项暂不支持在界面上保存" },
-  { match: "already exists", text: "这家供应商已经存在（不会覆盖）" },
+  { match: "不是面板 composer 通路的能力入口", text: "暂不支持拉取模型列表" },
+  { match: "建目录条目必须点名模型 id", text: "请先填入模型 id" },
+  { match: "这一步是「建条目」", text: "这个模型已经在目录里了" },
+  // The two provider-name refusals both quote the word `protocol` further
+  // along, so they are matched before the protocol line itself.
+  { match: "预设行请走", text: "这是内置供应商名，请用「内置供应商」入口添加" },
   { match: "不是内置预设名", text: "只能添加内置供应商" },
+  { match: "billing", text: "计费模式只支持「套餐」或「按量」" },
+  { match: "protocol", text: "协议只支持 openai-chat / openai-responses / anthropic" },
+  { match: "两半", text: "自定义接入需要协议和基址两项" },
+  { match: "already exists", text: "这家供应商已经存在（不会覆盖）" },
   { match: "必须一起点名", text: "供应商与模型要一起选好再保存" },
   { match: "空值不会被写成默认", text: "这项不能留空" },
   { match: "has no model", text: "这家供应商名下没有这个模型" },
@@ -130,6 +140,21 @@ export function translateWriteReply(reply: string | null): Feedback {
     sentence and this reads it rather than assuming. */
 function restartTier(reply: string): boolean {
   return reply.includes("重启");
+}
+
+/** The model-list fetch's answer when it did not carry a payload: a refusal
+    gets its matched human line; anything else (the host's D37 prose) is shown
+    verbatim - the fetch has no receipt to translate, and inventing a summary
+    for prose this page never parsed would be a guess. */
+export function translateFetchReply(reply: string | null): Feedback {
+  if (reply === null) return { tone: "error", text: "未连接到本机服务，未拉取" };
+  if (reply.includes("被拒绝")) {
+    for (const rule of REFUSALS) {
+      if (reply.includes(rule.match)) return { tone: "error", text: rule.text };
+    }
+  }
+  const text = reply.trim();
+  return { tone: "error", text: text === "" ? "拉取失败" : text };
 }
 
 /** Local validation lines (checked before anything is sent - the pair rule is

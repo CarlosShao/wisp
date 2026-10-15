@@ -24,18 +24,24 @@ import { createRoot } from "react-dom/client";
 import type { ReactNode } from "react";
 import { ModelSettingsView } from "@/components/model-settings";
 import { VoiceSettingsView } from "@/components/voice-settings";
-import { translateWriteReply } from "@/lib/config-feedback";
 import type { ConfigView } from "@/lib/config-view";
-import { requestConfigWrite, requestCredentialWrite } from "@/lib/panel";
+import { performConfigWrite, performCredentialWrite } from "@/lib/config-actions";
 import "../styles/theme.css";
 
-/* The real write path, bound the way the containers bind it. A browser has no
-   host, so every save reports 未连接到本机服务 - which is the truth here. */
-const performWrite = async (write: { field: string; provider?: string; model?: string; value?: string }) =>
-  translateWriteReply(await requestConfigWrite(write));
-const performCredential = async (provider: string, value: string) =>
-  translateWriteReply(await requestCredentialWrite(provider, value));
+/* The real path, bound the way the containers bind it (lib/config-actions.ts).
+   A browser has no host, so every save and the fetch report 未连接到本机服务 -
+   which is the truth here. */
+const performWrite = performConfigWrite;
+const performCredential = performCredentialWrite;
 const noReload = () => undefined;
+/* The fetch is the one call the preview replaces with fixture data: without a
+   host the real one can only answer 未连接到本机服务, and the fetched-list UI
+   (tick, write selected) is exactly what needs eyes on it. The ids are
+   placeholders, said so in the page header. */
+const performFetchModels = async () => ({
+  ok: true as const,
+  models: ["示例模型-1", "示例模型-2", "示例模型-3"],
+});
 
 /* ---------------------------------------------------------------------------
    Fixture reads. Key sets and value shapes follow config_313_test.go's envelope.
@@ -135,7 +141,8 @@ export function Preview() {
         <h1 className="text-[17px] font-semibold text-ink">模型 / 语音设置页 · v2 夹具预览</h1>
         <p className="mt-1 text-[12px] leading-[1.7] text-ink-2">
           这一页用夹具数据挂真组件；写入走真路径，浏览器里没有本机服务，所以点「保存」会得到真实的
-          「未连接到本机服务」。模型名是占位示例（仓里没有真实清单，由配置读取后显示真名单）。
+          「未连接到本机服务」；「拉取模型列表」是本页唯一替换成夹具的调用（否则看不到勾选写入那一块）。
+          模型名是占位示例（仓里没有真实清单，由配置读取后显示真名单）。
         </p>
       </header>
 
@@ -144,6 +151,7 @@ export function Preview() {
           <ModelSettingsView
             onReload={noReload}
             performCredential={performCredential}
+            performFetchModels={performFetchModels}
             performWrite={performWrite}
             view={UNCONFIGURED}
           />
@@ -153,6 +161,7 @@ export function Preview() {
           <ModelSettingsView
             onReload={noReload}
             performCredential={performCredential}
+            performFetchModels={performFetchModels}
             performWrite={performWrite}
             view={CONFIGURED}
           />
@@ -163,6 +172,7 @@ export function Preview() {
             <ModelSettingsView
               onReload={noReload}
               performCredential={performCredential}
+              performFetchModels={performFetchModels}
               performWrite={performWrite}
               view={CONFIGURED}
             />
@@ -173,6 +183,7 @@ export function Preview() {
           <ModelSettingsView
             onReload={noReload}
             performCredential={performCredential}
+            performFetchModels={performFetchModels}
             performWrite={performWrite}
             view={UNREADABLE}
           />

@@ -397,3 +397,18 @@ export function requestCredentialWrite(provider: string, value: string): Promise
     credentialValue: value,
   });
 }
+
+/** Ask the host to fetch one provider's model catalog (config.models.list,
+    ticket 320's read port; the method name is registered on the Go side by
+    320-r2). The reply is prose plus one line starting with the
+    wisp-models-list marker; parse it with parseModelsListReply
+    (lib/config-view.ts). Until the Go half lands the door refuses the name
+    with its own sentence, which the page shows in place. */
+export function requestProviderModels(provider: string): Promise<string | null> {
+  return requestHostAnswer({
+    method: "config.models.list",
+    requestId: nextRequestId(),
+    source: "panel-composer",
+    configProvider: provider,
+  });
+}

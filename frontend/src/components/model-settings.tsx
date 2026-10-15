@@ -1,45 +1,45 @@
 /* ============================================================================
-   模型 settings page - v2 (owner review 2026-10-14: the v1 page was the
-   shortest path that made the wiring work, not a product surface).
+   模型 settings page - v3 (2026-10-15: ticket 320's write capabilities landed
+   on the Go side; see docs/evidence/s1/model-page-v3-brief.md §6/§7).
    ----------------------------------------------------------------------------
-   WHAT CHANGED FROM v1. The interface is untouched (313-panel-ask.md); this is
-   the product cut of the page:
+   WHAT v3 ADDS, on top of v2's product cut (see the v2 notes in git history):
 
-     - copy: every visible word is plain language. The spec's internal
-       vocabulary is gone from the screen, statuses read 未读取 / 未配置 /
-       已配置, and a write's answer is one translated sentence instead of a
-       receipt with key paths (lib/config-feedback.ts owns all of it).
-     - structure: 供应商 is a LIST (name, base URL, key state, actions) with
-       「添加供应商」, not a three-step form; the chat role is one provider +
-       model pair with 「保存」.
-     - validation: the pair rule is stated at SAVE time (a pre-disabled button
-       is a black box to the person looking at it).
-     - the add form carries an optional model id because a model can only be
-       created together with a provider row (config.go's CreateProviderRow is
-       the only creator, and an existing row is refused) - a provider added
-       without one cannot have a model added later through the panel.
+     - 拉取模型列表: reads one provider's catalog through config.models.list
+       (panel.ts's requestProviderModels; the Go half is 320-r2, so until it
+       lands the door refuses the name and the page shows that sentence in
+       place). The fetched ids are listed for ticking and written ONE PER CALL
+       through model_row_create - one key per guarded write.
+     - 计费模式: plan / pay-per-token, written through provider_billing. The
+       read payload carries no billing field, so the page says 暂未读取 for the
+       current value instead of guessing one.
+     - 模型目录: the row's models plus a manual "add one id" box
+       (model_row_create).
+     - 同一厂商两行: the add form has a 自定义接入 mode
+       (provider_row_create_custom, value "<protocol>,<base_url>") so
+       stepfun-plan and stepfun-api can coexist - the preset path stays for
+       built-in names.
 
-   THE VIEW IS PURE (ModelSettingsView takes the view plus two write callbacks)
-   so scripts/render-settings.tsx can paint every state from a fixture and the
-   owner can review the design without a backend. The container below binds it
-   to the read gate and the settings door.
+   THE VIEW IS PURE (ModelSettingsView takes the view plus three callbacks), so
+   the fixture preview (src/fixtures/settings-v2-preview.tsx) can paint every
+   state without a backend.
 
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
 import { useRef, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { LoaderCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ai-native/button";
 import { ConfigReadGate } from "@/components/config-read-state";
-import {
-  COPY,
-  configStatus,
-  keyLabel,
-  translateWriteReply,
-  type Feedback,
-} from "@/lib/config-feedback";
+import { SegmentedControl } from "@/components/ai-native/segmented-control";
+import { COPY, configStatus, keyLabel, type Feedback } from "@/lib/config-feedback";
 import type { ConfigView, ConfigViewProvider } from "@/lib/config-view";
-import { requestConfigWrite, requestCredentialWrite } from "@/lib/panel";
+import {
+  performConfigWrite,
+  performCredentialWrite,
+  performModelsFetch,
+  type ConfigWireWrite,
+  type ModelsFetchResult,
+} from "@/lib/config-actions";
 import {
   EmptyState,
   FeedbackLine,
@@ -50,13 +50,9 @@ import {
   StateTag,
 } from "@/components/settings-controls";
 
-/** One settings write, in the shape the door takes. */
-export interface ConfigWireWrite {
-  field: string;
-  provider?: string;
-  model?: string;
-  value?: string;
-}
+/* voice-settings.tsx still imports ConfigWireWrite from here; the definition
+   itself lives in lib/config-actions.ts with the performers that take it. */
+export type { ConfigWireWrite, ModelsFetchResult } from "@/lib/config-actions";
 
 export interface ModelSettingsViewProps {
   view: ConfigView;
@@ -64,6 +60,8 @@ export interface ModelSettingsViewProps {
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
   /** The credential write: value rides its own key, never state. */
   performCredential: (provider: string, value: string) => Promise<Feedback>;
+  /** Fetch one provider's model catalog (config.models.list). */
+  performFetchModels: (provider: string) => Promise<ModelsFetchResult>;
   /** Re-read the config (after every accepted write). */
   onReload: () => void;
 }
@@ -83,10 +81,9 @@ export function ModelSettings({
         {(view, _prose, reload) => (
           <ModelSettingsView
             onReload={reload}
-            performCredential={async (provider, value) =>
-              translateWriteReply(await requestCredentialWrite(provider, value))
-            }
-            performWrite={async (write) => translateWriteReply(await requestConfigWrite(write))}
+            performCredential={performCredentialWrite}
+            performFetchModels={performModelsFetch}
+            performWrite={performConfigWrite}
             view={view}
           />
         )}
@@ -103,6 +100,7 @@ export function ModelSettingsView({
   view,
   performWrite,
   performCredential,
+  performFetchModels,
   onReload,
 }: ModelSettingsViewProps) {
   const status = configStatus(view);
@@ -151,6 +149,7 @@ export function ModelSettingsView({
             onEditing={setEditing}
             onFeedback={setProvidersFeedback}
             performCredential={performCredential}
+            performFetchModels={performFetchModels}
             performWrite={performWrite}
             run={run}
             setAddOpen={setAddOpen}
@@ -194,6 +193,7 @@ function ProvidersCard({
   onFeedback,
   performWrite,
   performCredential,
+  performFetchModels,
   run,
 }: {
   view: ConfigView;
@@ -206,6 +206,7 @@ function ProvidersCard({
   onFeedback: (next: Feedback | null) => void;
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
   performCredential: (provider: string, value: string) => Promise<Feedback>;
+  performFetchModels: (provider: string) => Promise<ModelsFetchResult>;
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
 }) {
   const rows = view.providers;
@@ -228,6 +229,7 @@ function ProvidersCard({
               onEditing={() => onEditing(editing === row.name ? null : row.name)}
               onFeedback={onFeedback}
               performCredential={performCredential}
+              performFetchModels={performFetchModels}
               performWrite={performWrite}
               row={row}
               run={run}
@@ -242,6 +244,7 @@ function ProvidersCard({
               onFeedback={onFeedback}
               performCredential={performCredential}
               performWrite={performWrite}
+              presets={view.presets}
               run={run}
               onDone={() => setAddOpen(false)}
             />
@@ -263,6 +266,13 @@ function ProvidersCard({
   );
 }
 
+/** The fetch's four states; `ready` holds the ids the host listed. */
+type FetchState =
+  | { phase: "idle" }
+  | { phase: "loading" }
+  | { phase: "error"; feedback: Feedback }
+  | { phase: "ready"; models: string[] };
+
 function ProviderRow({
   row,
   busy,
@@ -271,6 +281,7 @@ function ProviderRow({
   onFeedback,
   performWrite,
   performCredential,
+  performFetchModels,
   run,
 }: {
   row: ConfigViewProvider;
@@ -280,13 +291,27 @@ function ProviderRow({
   onFeedback: (next: Feedback | null) => void;
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
   performCredential: (provider: string, value: string) => Promise<Feedback>;
+  performFetchModels: (provider: string) => Promise<ModelsFetchResult>;
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
 }) {
   const key = keyLabel(row);
+  const [fetch, setFetch] = useState<FetchState>({ phase: "idle" });
+
+  // The row's own 拉取模型列表 button: opens the detail panel so the result is
+  // visible where it will be written from, then runs the fetch. The loading
+  // state is the button's (Go answers synchronously, budget <= 10s).
+  function startFetch() {
+    if (fetch.phase === "loading" || busy !== null) return;
+    if (!editing) onEditing();
+    setFetch({ phase: "loading" });
+    void performFetchModels(row.name).then((result) => {
+      setFetch(result.ok ? { phase: "ready", models: result.models } : { phase: "error", feedback: result.feedback });
+    });
+  }
 
   return (
     <div className="border-b border-line last:border-b-0">
-      <div className="flex items-center gap-3 py-2.5">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 py-2.5">
         <StateDot tone={key.tone} />
         <span className="shrink-0 text-[12.5px] font-medium text-ink">{row.name}</span>
         <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-3">
@@ -304,6 +329,22 @@ function ProviderRow({
           >
             测试连接
           </Button>
+          <Button
+            aria-busy={fetch.phase === "loading"}
+            disabled={fetch.phase === "loading" || busy !== null}
+            onClick={startFetch}
+            size="xs"
+            variant="quiet"
+          >
+            {fetch.phase === "loading" ? (
+              <span className="flex items-center gap-1">
+                <LoaderCircle aria-hidden="true" className="animate-spin" size={11} strokeWidth={2} />
+                拉取中…
+              </span>
+            ) : (
+              "拉取模型列表"
+            )}
+          </Button>
           <Button onClick={onEditing} size="xs" variant="quiet">
             {editing ? "收起" : "编辑"}
           </Button>
@@ -320,6 +361,8 @@ function ProviderRow({
       {editing ? (
         <ProviderEdit
           busy={busy}
+          fetch={fetch}
+          onDismissFetch={() => setFetch({ phase: "idle" })}
           onFeedback={onFeedback}
           performCredential={performCredential}
           performWrite={performWrite}
@@ -333,14 +376,18 @@ function ProviderRow({
 
 function ProviderEdit({
   row,
+  fetch,
   busy,
+  onDismissFetch,
   onFeedback,
   performWrite,
   performCredential,
   run,
 }: {
   row: ConfigViewProvider;
+  fetch: FetchState;
   busy: string | null;
+  onDismissFetch: () => void;
   onFeedback: (next: Feedback | null) => void;
   performWrite: (write: ConfigWireWrite) => Promise<Feedback>;
   performCredential: (provider: string, value: string) => Promise<Feedback>;
@@ -348,7 +395,14 @@ function ProviderEdit({
 }) {
   const [baseURL, setBaseURL] = useState("");
   const [replacingKey, setReplacingKey] = useState(false);
+  const [manualModel, setManualModel] = useState("");
+  // Ticked ids from the last fetch. New ids start ticked; ids the row already
+  // lists are shown as 已有 and cannot be ticked again.
+  const [ticked, setTicked] = useState<ReadonlySet<string>>(new Set());
   const keyInputRef = useRef<HTMLInputElement>(null);
+
+  const existing = new Set(row.models ?? []);
+  const fetchedNew = fetch.phase === "ready" ? fetch.models.filter((id) => !existing.has(id)) : [];
 
   function saveKey() {
     const input = keyInputRef.current;
@@ -365,6 +419,54 @@ function ProviderEdit({
       onFeedback(fb);
       if (fb.tone === "ok") setReplacingKey(false);
     });
+  }
+
+  function setBilling(value: "plan" | "pay-per-token") {
+    void run(`billing:${row.name}`, () =>
+      performWrite({ field: "provider_billing", provider: row.name, value }),
+    ).then(onFeedback);
+  }
+
+  function addOneModel(id: string) {
+    const model = id.trim();
+    if (model === "") {
+      onFeedback({ tone: "error", text: "请先填入模型 id" });
+      return;
+    }
+    void run(`models:${row.name}`, () =>
+      performWrite({ field: "model_row_create", provider: row.name, model }),
+    ).then((fb) => {
+      onFeedback(fb);
+      if (fb.tone === "ok") setManualModel("");
+    });
+  }
+
+  /** One write per selected id - model_row_create is a single-entry step, and
+      the answered receipt is per call. The summary line keeps the receipt's
+      own meaning (saved + restart tier). */
+  function addFetchedModels() {
+    const ids = fetchedNew.filter((id) => ticked.has(id));
+    if (ids.length === 0) {
+      onFeedback({ tone: "error", text: "先勾选要添加的模型" });
+      return;
+    }
+    void run(`models:${row.name}`, async () => {
+      let saved = 0;
+      let firstError: Feedback | null = null;
+      for (const id of ids) {
+        const fb = await performWrite({ field: "model_row_create", provider: row.name, model: id });
+        if (fb.tone === "ok") saved += 1;
+        else if (firstError === null) firstError = fb;
+      }
+      if (firstError === null) {
+        onDismissFetch();
+        return { tone: "ok" as const, text: `已保存 ${saved} 个模型，重启后生效` };
+      }
+      return {
+        tone: "error" as const,
+        text: saved > 0 ? `${saved} 个已保存；其余没有写成：${firstError.text}` : firstError.text,
+      };
+    }).then(onFeedback);
   }
 
   return (
@@ -437,12 +539,138 @@ function ProviderEdit({
           测试密钥
         </Button>
       </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="w-16 shrink-0 text-[11.5px] text-ink-3">计费模式</span>
+        <Button disabled={busy !== null} onClick={() => setBilling("plan")} size="xs" variant="secondary">
+          套餐
+        </Button>
+        <Button disabled={busy !== null} onClick={() => setBilling("pay-per-token")} size="xs" variant="secondary">
+          按量
+        </Button>
+        <span className="text-[11px] text-ink-3">点击即保存；当前值暂未读取</span>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className="text-[11.5px] text-ink-3">模型目录</span>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {row.models !== null && row.models.length > 0 ? (
+            row.models.map((id) => (
+              <span
+                className="inline-flex h-5 items-center rounded-chip bg-inset px-2 font-mono text-[11px] text-ink-2"
+                key={id}
+              >
+                {id}
+              </span>
+            ))
+          ) : (
+            <span className="text-[11.5px] text-ink-3">
+              {row.models === null ? "暂时读不到模型清单" : "暂无模型"}
+            </span>
+          )}
+        </div>
+
+        {fetch.phase === "loading" ? (
+          <p className="flex items-center gap-1.5 text-[11.5px] text-ink-3">
+            <LoaderCircle aria-hidden="true" className="animate-spin" size={11} strokeWidth={2} />
+            正在向上游拉取模型列表…
+          </p>
+        ) : fetch.phase === "error" ? (
+          <div className="flex flex-col gap-1">
+            <FeedbackLine feedback={fetch.feedback} />
+            <div>
+              <Button onClick={onDismissFetch} size="xs" variant="quiet">
+                知道了
+              </Button>
+            </div>
+          </div>
+        ) : fetch.phase === "ready" ? (
+          <div className="flex flex-col gap-2 rounded-control bg-inset p-2.5">
+            {fetch.models.length === 0 ? (
+              <p className="text-[11.5px] text-ink-3">上游返回的清单是空的。</p>
+            ) : fetchedNew.length === 0 ? (
+              <p className="text-[11.5px] text-ink-3">上游清单里的模型都已经在目录里了。</p>
+            ) : (
+              <>
+                <p className="text-[11.5px] text-ink-3">
+                  拉到 {fetchedNew.length} 个新模型，勾选后写入：
+                </p>
+                <div className="flex max-h-44 flex-col gap-0.5 overflow-y-auto">
+                  {fetchedNew.map((id) => (
+                    <label className="flex items-center gap-2 rounded-chip px-1.5 py-1 hover:bg-hover" key={id}>
+                      <input
+                        checked={ticked.has(id)}
+                        className="size-3.5 accent-primary"
+                        onChange={(e) => {
+                          setTicked((current) => {
+                            const next = new Set(current);
+                            if (e.currentTarget.checked) next.add(id);
+                            else next.delete(id);
+                            return next;
+                          });
+                        }}
+                        type="checkbox"
+                      />
+                      <span className="font-mono text-[11.5px] text-ink">{id}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button disabled={busy !== null} onClick={addFetchedModels} size="xs" variant="primary">
+                    写入所选
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      setTicked((current) => {
+                        const next = new Set(current);
+                        for (const id of fetchedNew) next.add(id);
+                        return next;
+                      })
+                    }
+                    size="xs"
+                    variant="quiet"
+                  >
+                    全选
+                  </Button>
+                  <Button onClick={onDismissFetch} size="xs" variant="quiet">
+                    取消
+                  </Button>
+                </div>
+              </>
+            )}
+            {fetch.models.length > 0 && fetchedNew.length === 0 ? (
+              <div>
+                <Button onClick={onDismissFetch} size="xs" variant="quiet">
+                  取消
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            aria-label="模型 id"
+            className="h-[30px] w-[220px] rounded-control bg-inset px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
+            onChange={(e) => setManualModel(e.currentTarget.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") addOneModel(manualModel);
+            }}
+            placeholder="模型 id"
+            value={manualModel}
+          />
+          <Button disabled={busy !== null} onClick={() => addOneModel(manualModel)} size="xs" variant="secondary">
+            添加
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
 
 function AddProviderForm({
   available,
+  presets,
   busy,
   onCancel,
   onDone,
@@ -452,6 +680,7 @@ function AddProviderForm({
   run,
 }: {
   available: string[] | null;
+  presets: string[] | null;
   busy: string | null;
   onCancel: () => void;
   onDone: () => void;
@@ -460,26 +689,60 @@ function AddProviderForm({
   performCredential: (provider: string, value: string) => Promise<Feedback>;
   run: (key: string, fn: () => Promise<Feedback>) => Promise<Feedback>;
 }) {
+  const MODES = ["内置供应商", "自定义接入"] as const;
+  const [mode, setMode] = useState<(typeof MODES)[number]>("内置供应商");
   const [provider, setProvider] = useState("");
+  const [customName, setCustomName] = useState("");
+  const [protocol, setProtocol] = useState("");
+  const [customBase, setCustomBase] = useState("");
   const [model, setModel] = useState("");
   const keyInputRef = useRef<HTMLInputElement>(null);
 
   function submit() {
-    if (provider === "") {
-      onFeedback({ tone: "error", text: "请先选择供应商" });
-      return;
-    }
     const keyValue = keyInputRef.current?.value ?? "";
+    if (mode === "内置供应商") {
+      if (provider === "") {
+        onFeedback({ tone: "error", text: "请先选择供应商" });
+        return;
+      }
+    } else {
+      if (customName.trim() === "") {
+        onFeedback({ tone: "error", text: "请先填行名" });
+        return;
+      }
+      if (presets !== null && presets.includes(customName.trim())) {
+        onFeedback({ tone: "error", text: "这是内置供应商名，请用「内置供应商」添加" });
+        return;
+      }
+      if (protocol === "") {
+        onFeedback({ tone: "error", text: "请先选择协议" });
+        return;
+      }
+      if (customBase.trim() === "") {
+        onFeedback({ tone: "error", text: "请先填基址" });
+        return;
+      }
+    }
     if (keyInputRef.current) keyInputRef.current.value = "";
+    const name = mode === "内置供应商" ? provider : customName.trim();
     void run("add-provider", async () => {
-      const created = await performWrite({
-        field: "provider_row_create",
-        provider,
-        ...(model.trim() !== "" ? { model: model.trim() } : {}),
-      });
+      const created = await performWrite(
+        mode === "内置供应商"
+          ? {
+              field: "provider_row_create",
+              provider: name,
+              ...(model.trim() !== "" ? { model: model.trim() } : {}),
+            }
+          : {
+              field: "provider_row_create_custom",
+              provider: name,
+              value: `${protocol},${customBase.trim()}`,
+              ...(model.trim() !== "" ? { model: model.trim() } : {}),
+            },
+      );
       if (created.tone !== "ok") return created;
       if (keyValue === "") return created;
-      const keyed = await performCredential(provider, keyValue);
+      const keyed = await performCredential(name, keyValue);
       return keyed.tone === "ok"
         ? created
         : { tone: "error" as const, text: `供应商已添加，但密钥没有保存：${keyed.text}` };
@@ -489,32 +752,82 @@ function AddProviderForm({
     });
   }
 
+  const rowLabel = "w-16 shrink-0 text-[11.5px] text-ink-3";
+  const inputCls =
+    "h-[30px] rounded-control bg-surface px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3";
+
   return (
     <div
       className="mt-1 flex flex-col gap-2.5 rounded-control bg-inset p-3"
       style={{ animation: "fade-up 200ms var(--ease-out-strong) both" }}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="w-16 shrink-0 text-[11.5px] text-ink-3">供应商</span>
-        {available === null ? (
-          <span className="text-[11.5px] text-ink-3">暂未读取到供应商列表，请稍后刷新</span>
-        ) : (
-          <Picker
-            ariaLabel="供应商"
-            className="w-[220px]"
-            emptyText="内置供应商都已添加"
-            onSelect={setProvider}
-            options={available.map((name) => ({ value: name, note: name === "stepfun" ? "推荐" : "" }))}
-            placeholder="选择供应商"
-            value={provider}
-          />
-        )}
+      <div className="flex items-center gap-2">
+        <SegmentedControl onChange={setMode} options={MODES} value={mode} />
       </div>
+
+      {mode === "内置供应商" ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={rowLabel}>供应商</span>
+          {available === null ? (
+            <span className="text-[11.5px] text-ink-3">暂未读取到供应商列表，请稍后刷新</span>
+          ) : (
+            <Picker
+              ariaLabel="供应商"
+              className="w-[220px]"
+              emptyText="内置供应商都已添加"
+              onSelect={setProvider}
+              options={available.map((name) => ({ value: name, note: name === "stepfun" ? "推荐" : "" }))}
+              placeholder="选择供应商"
+              value={provider}
+            />
+          )}
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={rowLabel}>行名</span>
+            <input
+              aria-label="行名"
+              className={`${inputCls} w-[220px]`}
+              onChange={(e) => setCustomName(e.currentTarget.value)}
+              placeholder="例如 stepfun-api"
+              value={customName}
+            />
+            <span className="text-[11px] text-ink-3">同一厂商可以两行并存，各用各的基址与密钥</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={rowLabel}>协议</span>
+            <Picker
+              ariaLabel="协议"
+              className="w-[220px]"
+              onSelect={setProtocol}
+              options={[
+                { value: "openai-chat", note: "OpenAI 兼容" },
+                { value: "openai-responses", note: "OpenAI 响应式" },
+                { value: "anthropic", note: "Anthropic" },
+              ]}
+              placeholder="选择协议"
+              value={protocol}
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={rowLabel}>基址</span>
+            <input
+              aria-label="基址"
+              className={`${inputCls} w-[320px]`}
+              onChange={(e) => setCustomBase(e.currentTarget.value)}
+              placeholder="https://…"
+              value={customBase}
+            />
+          </div>
+        </>
+      )}
+
       <div className="flex flex-wrap items-center gap-2">
-        <span className="w-16 shrink-0 text-[11.5px] text-ink-3">模型 id</span>
+        <span className={rowLabel}>模型 id</span>
         <input
           aria-label="模型 id（选填）"
-          className="h-[30px] w-[220px] rounded-control bg-surface px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
+          className={`${inputCls} w-[220px]`}
           onChange={(e) => setModel(e.currentTarget.value)}
           placeholder="选填"
           value={model}
@@ -522,10 +835,10 @@ function AddProviderForm({
         <span className="text-[11px] text-ink-3">现在填上，之后就能直接选</span>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="w-16 shrink-0 text-[11.5px] text-ink-3">密钥</span>
+        <span className={rowLabel}>密钥</span>
         <input
           aria-label="密钥（选填）"
-          className="h-[30px] w-[260px] rounded-control bg-surface px-2.5 font-mono text-[12px] text-ink shadow-hairline outline-none placeholder:font-sans placeholder:text-ink-3"
+          className={`${inputCls} w-[260px]`}
           placeholder="粘贴密钥（保存后不再显示）"
           ref={keyInputRef}
           type="password"
@@ -582,7 +895,11 @@ function ChatModelCard({
       const noModels = row != null && (row.models === null || row.models.length === 0);
       onFeedback({
         tone: "error",
-        text: chatProvider === "" ? COPY.chatPairMissing : noModels ? "这家供应商还没有模型" : COPY.pairMissing,
+        text: chatProvider === ""
+          ? COPY.chatPairMissing
+          : noModels
+            ? "这家供应商还没有模型；在供应商行的「编辑」里用「拉取模型列表」或手动添加"
+            : COPY.pairMissing,
       });
       return;
     }
@@ -617,4 +934,3 @@ function ChatModelCard({
     </SettingsCard>
   );
 }
-

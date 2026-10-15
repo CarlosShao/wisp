@@ -85,6 +85,45 @@ export interface ConfigView {
     other side of the same string. */
 export const CONFIG_VIEW_MARKER = "wisp-config-view:";
 
+/** The model-catalog marker (ticket 320's config.models.list; the Go half is
+    320-r2). Same shape as the view marker: prose, then exactly one line. */
+export const MODELS_LIST_MARKER = "wisp-models-list:";
+
+/** What one config.models.list reply turned out to be. A failure carries only
+    prose (D37 class copy, no marker line), which the page shows in place. */
+export type ModelsListReply =
+  | { kind: "parsed"; provider: string; models: string[] }
+  | { kind: "no-payload"; raw: string };
+
+/** Parse one config.models.list reply. Only models[].id is read; unknown
+    fields are ignored on purpose (the wire shape is the Go side's to grow).
+    The prose half is never parsed - on failure it is returned verbatim for
+    display. */
+export function parseModelsListReply(reply: string): ModelsListReply {
+  const at = reply.indexOf(MODELS_LIST_MARKER);
+  if (at < 0) return { kind: "no-payload", raw: reply };
+  const afterMarker = reply.slice(at + MODELS_LIST_MARKER.length);
+  const line = afterMarker.split("\n", 1)[0] ?? "";
+  let data: unknown;
+  try {
+    data = JSON.parse(line);
+  } catch {
+    return { kind: "no-payload", raw: reply };
+  }
+  if (typeof data !== "object" || data === null) return { kind: "no-payload", raw: reply };
+  const payload = data as { provider?: unknown; models?: unknown };
+  const provider = typeof payload.provider === "string" ? payload.provider : "";
+  const models: string[] = [];
+  if (Array.isArray(payload.models)) {
+    for (const entry of payload.models) {
+      if (typeof entry !== "object" || entry === null) continue;
+      const id = (entry as { id?: unknown }).id;
+      if (typeof id === "string" && id.trim() !== "") models.push(id.trim());
+    }
+  }
+  return { kind: "parsed", provider, models };
+}
+
 /** What one reply turned out to be. */
 export type ConfigReply =
   | { kind: "parsed"; view: ConfigView; prose: string }

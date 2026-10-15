@@ -25,9 +25,9 @@ import { useState } from "react";
 import { Plus, RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ai-native/button";
 import { ConfigReadGate } from "@/components/config-read-state";
-import { COPY, configStatus, translateWriteReply, type Feedback } from "@/lib/config-feedback";
+import { COPY, configStatus, type Feedback } from "@/lib/config-feedback";
 import type { ConfigView, ConfigViewProvider } from "@/lib/config-view";
-import { requestConfigWrite } from "@/lib/panel";
+import { performConfigWrite, type ConfigWireWrite } from "@/lib/config-actions";
 import {
   EmptyState,
   FeedbackLine,
@@ -35,7 +35,7 @@ import {
   SettingsCard,
   StateTag,
 } from "@/components/settings-controls";
-import type { ConfigWireWrite } from "@/components/model-settings";
+
 
 export function VoiceSettings({
   heading = "语音",
@@ -52,7 +52,7 @@ export function VoiceSettings({
         {(view, _prose, reload) => (
           <VoiceSettingsView
             onReload={reload}
-            performWrite={async (write) => translateWriteReply(await requestConfigWrite(write))}
+            performWrite={performConfigWrite}
             view={view}
           />
         )}
