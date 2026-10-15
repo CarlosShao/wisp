@@ -1,0 +1,48 @@
+== snapshot: rebuilt from HEAD 627998fc, .go counted before any measurement ==
+go-files=1076 winsec-go=36
+
+== container roster 1: the ticket's own AC#1-4 POSIX filter, counted as it stands today ==
+=== roster-ac1234: run-filter='TestAC[1-4]POSIX' docker-and-test rc=0
+RUN=38 (=== RUN rows, t.Run subtests included)
+top-level result rows (anchored ^---): PASS=27 FAIL=0 SKIP=0
+all result rows (unanchored): PASS=38 FAIL=0 SKIP=0
+top-level names in the filter, from the source not the log: 27
+names this leg added: 7
+
+== container roster 2: this leg's seven cases alone (names ending in 120r3) ==
+=== roster-120r3: run-filter='120r3$' docker-and-test rc=0
+RUN=7 (=== RUN rows, t.Run subtests included)
+top-level result rows (anchored ^---): PASS=7 FAIL=0 SKIP=0
+all result rows (unanchored): PASS=7 FAIL=0 SKIP=0
+
+== host rulers ==
+gofmt -l rc=0 body=0 bytes
+gofumpt -l (absolute path) rc=0 body=0 bytes
+-- build
+go build ./... rc=0
+-- vet-linux
+GOOS=linux go vet rc=0
+-- vet-darwin
+GOOS=darwin GOARCH=arm64 go vet rc=0
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 280 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 239 production Go files
+d22scan: scope bans #1-5 cmd/           examined  41 production Go files
+d22scan: scope ban #6 frontend/         examined 116 text files
+d22scan: scope ban #7 internal/tools/   examined  25 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 116 text files
+d22scan: scope ban #8 internal/         examined 568 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 136 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=239, bans #1-5 cmd/=41, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=568, ban #8 cmd/=136; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 568 Go files, comments and _test.go included; cmd/ 136 Go files, comments and _test.go included
+sh scripts/d22scan.sh rc=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 60 paths on this tree, recomputed just now in both units
+sh scripts/check-path-length-budget.sh rc=0
+
+== the product file this leg must NOT have touched ==
+repo winsec_other.go sha256 = 137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313
+expect 137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313

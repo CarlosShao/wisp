@@ -1,0 +1,1 @@
+gofumpt -l (absolute path) rc=0 body=0 bytes

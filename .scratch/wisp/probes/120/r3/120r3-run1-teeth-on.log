@@ -1,0 +1,6 @@
+go-test rc=0
+=== teeth-on: docker-and-test rc=0 (go-test rc line inside /d/tmp/probe120r3/logs/teeth-on.log)
+RUN=62 (=== RUN rows, t.Run subtests included)
+top-level result rows (anchored ^---): PASS=40 FAIL=0 SKIP=0
+all result rows (unanchored, the 120-v1 口径: PASS=RUN when nothing fails): PASS=62 FAIL=0 SKIP=0 counted from /d/tmp/probe120r3/logs/teeth-on-body.log
+--- failing names:

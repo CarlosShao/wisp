@@ -1,0 +1,8 @@
+go-test rc=1
+=== tooth-272: docker-and-test rc=1 (go-test rc line inside /d/tmp/probe120r3/logs/tooth-272.log)
+RUN=62 (=== RUN rows, t.Run subtests included)
+top-level result rows (anchored ^---): PASS=38 FAIL=2 SKIP=0
+all result rows (unanchored, the 120-v1 口径: PASS=RUN when nothing fails): PASS=60 FAIL=2 SKIP=0 counted from /d/tmp/probe120r3/logs/tooth-272-body.log
+--- failing names:
+--- FAIL: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.00s)
+--- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)

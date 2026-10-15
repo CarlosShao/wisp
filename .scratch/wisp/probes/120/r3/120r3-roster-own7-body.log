@@ -1,0 +1,37 @@
+=== RUN   TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3
+    sealhandle_identity_120_other_test.go:44: AC#1' world: fd and name = two different objects; name kind=file mode=-rw-rw-rw-
+    sealhandle_identity_120_other_test.go:48: AC#1' name-carries-another-real-object: leg that spoke = sealHandle inline SameFile face (winsec_other.go:272)
+    sealhandle_identity_120_other_test.go:53: AC#1' read-back: name's object=-rw-------, caller's object=-rw-rw-rw-
+--- PASS: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.00s)
+=== RUN   TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3
+    sealhandle_identity_120_other_test.go:86: AC#1' name-becomes-a-sibling-link-after-the-pinned-seal: leg that spoke = sealHandle inline link face (winsec_other.go:269)
+    sealhandle_identity_120_other_test.go:91: AC#1' read-back: name kind=link, caller's object=-rw-------, witness=-rw-rw-rw-
+--- PASS: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+=== RUN   TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3
+    sealhandle_identity_120_other_test.go:120: AC#1' world: the name carries a link at a relative sibling; the fd and the name hold the same object
+    sealhandle_identity_120_other_test.go:124: AC#1' pre-planted-link-is-answered-by-the-walk: leg that spoke = pinPlacement sameObjectPinned link face (winsec_other.go:188)
+--- PASS: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+=== RUN   TestAC1POSIXSealHandlePlainObjectStillSeals120r3
+--- PASS: TestAC1POSIXSealHandlePlainObjectStillSeals120r3 (0.00s)
+=== RUN   TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3
+    sealhandle_privateroute_120_other_test.go:85: AC#1' private-file-route-name-carries-another-real-object: leg that spoke = sealHandle inline SameFile face (winsec_other.go:272)
+    sealhandle_privateroute_120_other_test.go:89: AC#1' tree after the refusal: 1 readable entries, none carrying the payload
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)
+=== RUN   TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3
+    sealhandle_privateroute_120_other_test.go:112: AC#1' private-file-route-name-becomes-a-sibling-link: leg that spoke = sealHandle inline link face (winsec_other.go:269)
+    sealhandle_privateroute_120_other_test.go:124: AC#1' tree after the refusal: 1 readable entries, none carrying the payload
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+=== RUN   TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3
+    sealhandle_privateroute_120_other_test.go:206: AC#1' natural-window reading, denominator=2000, attempts classified by the leg that answered:
+    sealhandle_privateroute_120_other_test.go:209: AC#1'   floor before the act (winsec_other.go platformVerifyPlacement) = 1772
+    sealhandle_privateroute_120_other_test.go:209: AC#1'   other failure = 2
+    sealhandle_privateroute_120_other_test.go:209: AC#1'   pinPlacement sameObjectPinned SameFile face (winsec_other.go:191) = 12
+    sealhandle_privateroute_120_other_test.go:209: AC#1'   pinPlacement sameObjectPinned link face (winsec_other.go:188) = 188
+    sealhandle_privateroute_120_other_test.go:209: AC#1'   returned nil: the flip missed every check = 6
+    sealhandle_privateroute_120_other_test.go:209: AC#1'   sealHandle inline SameFile face (winsec_other.go:272) = 16
+    sealhandle_privateroute_120_other_test.go:209: AC#1'   sealHandle inline link face (winsec_other.go:269) = 4
+    sealhandle_privateroute_120_other_test.go:212: AC#1' natural-window reading, first other-failure verbatim: winsec: cannot apply a private security descriptor: /tmp/TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r33349745681/001/caller-object-120r3.bin: openat caller-object-120r3.bin: too many levels of symbolic links
+    sealhandle_privateroute_120_other_test.go:239: AC#1' R-322 SHAPE OBSERVED, counted and not judged: the witness now holds "", so at least one open truncated it through a flipped leaf link (ticket 322, unfixed at this anchor; winsec_other.go:78-82). The sealHandle legs answered the write: see the rows above.
+--- PASS: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.21s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.238s

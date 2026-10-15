@@ -1,0 +1,5 @@
+go-test rc=0
+=== roster-ac1234: run-filter='TestAC[1-4]POSIX' docker-and-test rc=0
+RUN=38 (=== RUN rows, t.Run subtests included)
+top-level result rows (anchored ^---): PASS=27 FAIL=0 SKIP=0
+all result rows (unanchored): PASS=38 FAIL=0 SKIP=0
