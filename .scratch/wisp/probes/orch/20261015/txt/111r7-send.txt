@@ -1,0 +1,7 @@
+111-r7 send 记录
+- 发送时刻：2026-10-15 12:2x +08；派单已先存档：txt/111r7-dispatch.txt（同刻写入）。
+- 去重核：`.scratch/wisp/probes/111/` 现占用＝a5 a6 a6b c1 c2 ci-read-1 ci1 ciif1 r1 r1b r2 r3 r4 r5 r6 v1（r7 未用，可用）。
+- 收件人：agent_9c147772-8b1d-4482-8f33-974320d599ed（general-purpose，后台）。
+- 内容：票 111 五格（AC#3 空分母守卫／AC#5 门禁／AC#7 TestSyncRegistryProbeLive 步级读数或改口径／AC#8 包匹配前缀锚定／AC#11 winlive 编译门反形自证）。面＝`scripts/`＋`ci.yml`（**零 Go 源码**）⇒ 与在飞 `319-r2`（cmd/wisp＋internal/proc）零编译面冲突。
+- 派发依据（池子普查腿 `agent_4bad5fc8`，2026-10-15 12:1x 交回）：111＝"零 Go 源码、与在飞面零冲突"里排第一；前置（Blocked by 票 110）已 `-done` 满足；`ci.yml` 归本票（110 已交件）。
+- 事前盘面：HEAD=457e7513；origin/dev=39b0a246（未推 1）；在飞＝319-r2＋本腿；机主实例 wisp.exe PID 40296（⛔ 别扰动）。

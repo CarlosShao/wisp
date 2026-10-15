@@ -1,0 +1,35 @@
+# 111-r7 派单（票 111：CI 覆盖缺口收尾——AC#3 空分母守卫／AC#5 门禁／AC#7 `TestSyncRegistryProbeLive` 步级读数或改口径／AC#8 包匹配前缀锚定／AC#11 winlive 编译门反形自证；写面＝`scripts/`＋`.github/workflows/ci.yml`，零 Go 源码）
+
+发送时刻：2026-10-15 12:2x +08。编排者派发。
+你 = Wisp 流水线的落地腿 **111-r7**（`probes/111/` 现无 `r7`，查重已做：占用＝`a5 a6 a6b c1 c2 ci-read-1 ci1 ciif1 r1 r1b r2 r3 r4 r5 r6 v1`）。身份＝实现者（判语归非实现者；⛔ 不翻框、⛔ 不动 `Status:`/票名、⛔ 不碰台账/HANDOVER）。
+
+## 票与背景
+
+- 票：`.scratch/wisp/issues/111-ci-tests-20-of-33-packages.md`（**通读**：AC 1–12、Rules 一节的五条取数纪律、"追加判据"一节）。
+- 起手 `git rev-parse --short HEAD` 现读锚；漂移逐报。
+- **第 0 步＝逐格现读核对**（本票自 09-21 立，CI 已动过多轮；**AC 框可能落后于树**）：把 `[ ]` 的五格（AC#3／#5／#7／#8／#11）逐格现读，判"没做／半做／已做但框没翻"；**已做的那半用逐字读数钉住，只做没落的**（⛔ 不许重做已落的、⛔ 不许替它翻框）。
+- ⚠ 事实提示（编排者 12:1x 现读，可复核）：CI run **`38676514264`**（sha `39b0a246`）的 `test-windows` job 里**已有一枚** step "winlive compile gate (go vet -tags winlive, ticket 111 AC#11)"＝**success** ⇒ AC#11 的 ⓐ 那半**已落地**；本腿要补的是它的 **ⓑ反形自证**＋ⓒ口径具名。逐字复核：`gh api repos/CarlosShao/wisp/actions/jobs/<jobid> --jq '.steps[]'`。
+
+## 五格（逐格一笔 commit；每格读数落 `probes/111/r7/`）
+
+1. **AC#3**：`session`/`watchdog` 这类"**空分母**"要响亮——**scope 校验**加守卫"声明在范围内但该平台**没有任何测试文件** ⇒ 直接失败"；并**人为抽掉一个包**证明它会红（抽掉动作只在仓外快照做）。
+2. **AC#5**：门禁——`bash -n` 改动脚本 rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 各 scope 不降；**新步排序**：若新步排在"会失败的步骤"之后 ⇒ 必须放前面或 `if: always()`（本仓实测过这道门因此**从未执行**）。
+3. **AC#7**：二选一并在票面写死：① 落地 `-run TestSyncRegistryProbeLive` 经 `runtests.sh` 接进 windows 腿（step7）——⚠ 读步级结论要**编排者 push 后**，交件时写明"欠编排者 push 后读 step7"；② 在票 110/111 面**当众改口径**（不许留在原地当已做）。
+4. **AC#8**：包匹配式补**前缀锚定**（`"winsec"` 宽松串曾把 0 命中说成 18 次）⇒ 匹配式要能区分"**被测包**"与"日志里出现过这个词"，并用**阳性自证**（种一个只在字符串里出现的包名 ⇒ 不许计入分母）。
+5. **AC#11**：补 ⓑ**反形自证**——把那 12 枚 `winlive` 文件之一里塞一行语法错（**overlay／仓外拷贝，⛔ 不动跟踪文件**），那一步必须红；还原后证名册逐枚同＋rc=0。＋ⓒ口径具名：**只主张"编译覆盖"**，⛔ 不许被任何件读成真窗读数。
+
+## 畛域与硬钉
+
+- 写面＝`scripts/portable-tests.sh`／`scripts/winsec-tests.sh`（scope 表与校验）＋`.github/workflows/ci.yml`（**只许按票面 AC 加/挪步**）。⛔ **不动触发面**（`on:`／`paths:`／并发块）——那是票 134 的触发表；需动 ⇒ **停手上报**。
+- ⛔ 不许为了让门绿去改被测包的任何测试文案/阈值/`//go:build`；⛔ 不碰 `docs/PLAN.md`／`docs/specs/**`／`internal/risk/**`／`internal/proc/**`／`internal/winsec/**` 源码／`tools/d22scan/**`／`allowlist.txt`／`frontend/**`／`design/**`。
+- ⚠ **本刻在飞**：`319-r2`（`cmd/wisp`＋`internal/proc` 的 319 测试件）⇒ 你的五格**零 `go` 面**、与它零文件重叠（唯二例外：AC#11 的 overlay 自证只读 `cmd/wisp` 的 winlive 文件；⛔ 别改它们）。若某格真要动 Go 源码 ⇒ **停手上报**。
+- ⛔ 别碰别家腿半成品：`probes/152/my152.py`、`probes/268/v1/evidence.md`、`design/**` 的删除态。
+
+## 纪律
+
+- 只 commit ⛔ 不 push（本票判据要看 CI：**欠编排者 push 后读步级结论**，票面 Rules 逐字如此）；`git add`／`commit` 两处**显式 pathspec**；⛔ `add -A`／目录／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删；变更先 `bash -n` 与 d22scan 自证。
+- 变异/快照只在 `/tmp` 或 `D:/tmp` 的 `git archive <sha>` 快照做（⛔ 不在仓库内建 worktree/checkout）。
+- 交件：`.scratch/wisp/probes/111/r7/`（逐格读数，≤8 件 ≤200 行）＋票 111 尾**追加 1 条 bullet**（`agent=111-r7 did=… next=…`，逐格 sha）。
+- `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`；`GOTMPDIR='C:\tmp\wisp111r7gotmp'`（只反斜杠形，先自建）。
+- **未定义即停**：某格须动触发面／被测包／Go 源码 ⇒ 停手上报（写进回执）。
+- 回执（结尾必带「你需要做什么」栏）：结论先行＋五格逐格判（已做/没做/半做）＋逐格 sha＋门禁 rc＋**具名没做**＋"欠 push 后读"的 run/step 位清单。
