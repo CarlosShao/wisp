@@ -1,0 +1,37 @@
+== committed matcher lines (verbatim, with line numbers) ==
+874:escape_re() { printf '%s' "$1" | sed 's/[][\\^$.*+?(){}|]/\\&/g'; }
+884:result_tail='[[:space:]]+([0-9]+\.[0-9]+s|\[build failed\])$'
+890:    line=$(grep -E "^(ok|FAIL)[[:space:]]+$(escape_re "$pkg")${result_tail}" "$capture" | tail -1 || true)
+234:esc_pkgpath=$(printf '%s' "$pkgpath" | sed 's/[][\\^$.*+?(){}|]/\\&/g')
+235:result_line=$(grep -E "^(ok|FAIL)[[:space:]]+${esc_pkgpath}[[:space:]]+([0-9]+\.[0-9]+s|\[build failed\])$" "$capture" | tail -1 || true)
+
+== Part B: capture-b.txt ==
+=== RUN   TestRealThing
+--- PASS: TestRealThing (0.01s)
+    fixture_test.go:1: golden fixture recorded under github.com/CarlosShao/wisp/internal/perm (string-only mention)
+    fixture_test.go:2: a typo in a doc string spells githubXcom/CarlosShao/wisp/internal/perm
+ok  	github.com/CarlosShao/wisp/internal/plugin	0.012s
+loose grep -c '<PKG>'                          = 2   (the word is in the log)
+loose grep -c 'github.com/...' (dots are wild) = 2
+committed matcher, tests PKG                   = 0   (string-only mention grants nothing)
+committed matcher, tests OTHER (control)       = [ok  	github.com/CarlosShao/wisp/internal/plugin	0.012s]
+winsec guard-2 matcher, tests PKG             = []
+
+== Part A control: no seeds (PKG must get its own line, rc=0) ==
+rc=0
+1:portable-tests.sh: platform=linux scope=[./internal/agent/ ./internal/agent/approval/ ./internal/llm/... ./internal/config/... ./internal/memory/... ./internal/observe/... ./internal/secret/... ./internal/risk/... ./internal/statemachine/... ./internal/tools/... ./internal/models/... ./internal/buildinfo/... ./internal/audio/... ./internal/proc/... ./internal/panel/... ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/winsec/... ./internal/session/ ./internal/projctx/]
+66:ok  	github.com/CarlosShao/wisp/internal/perm	0.01s
+95:runtests.sh: OK - packages=[./internal/agent/ ./internal/agent/approval/ ./internal/llm/... ./internal/config/... ./internal/memory/... ./internal/observe/... ./internal/secret/... ./internal/risk/... ./internal/statemachine/... ./internal/tools/... ./internal/models/... ./internal/buildinfo/... ./internal/audio/... ./internal/proc/... ./internal/panel/... ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ./internal/winsec/... ./internal/session/ ./internal/projctx/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop|TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3)$] top-level: PASS=27 FAIL=0 SKIP=0, === RUN=27, '[no tests to run]'=0
+114:portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/internal/perm
+
+== Part A: PKG's result line withheld + its name planted in a string (rc=1, GUARD B names it) ==
+rc=1
+loose grep -c '<PKG> over the whole log' = 3
+lines naming PKG:
+  2:portable-tests.sh:   err| go: downloading github.com/CarlosShao/wisp/internal/perm v0.0.1 (string-only mention, not a result line)
+  113:portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing github.com/CarlosShao/wisp/internal/perm
+  125:portable-tests.sh:   github.com/CarlosShao/wisp/internal/perm
+execution-shaped lines naming PKG (=== RUN/--- PASS/FAIL/SKIP) = 0
+GUARD B verdict row for PKG:
+  113:portable-tests.sh:   <NO TOP-LEVEL RESULT LINE> missing github.com/CarlosShao/wisp/internal/perm
+  123:portable-tests.sh: GUARD B - 1 of 27 packages in scope mode=core printed
