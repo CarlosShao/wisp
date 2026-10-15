@@ -1,0 +1,58 @@
+# 120-r3 派单（票 120 残余：**给 `sealHandle` 那半的 inline 复验补一枚"能红"的具名台件**；写面＝`internal/winsec/**` 的测试件）
+
+编排者写单/发送时刻 2026-10-15 21:3x +08（`date` 现读）。锚 `HEAD=e57dca98`（未推 11）。
+你 = Wisp 流水线落地腿 **120-r3**（实现者；判语归**非实现者**，⛔ 你自判、⛔ 翻 AC 框）。
+仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令加引号），分支 `dev`，Shell＝Git Bash。
+
+## 0. 为什么有这一单（读数，不是感觉）
+- 非实现者验收腿 `120-v1`（`docs/evidence/s1/120-v1.md`，提交 `e57dca98`）裁 `120-r2` 自报的三枚缺口：**①＝缺世界、②③＝成立（限制）**。
+- ★**本单只做缺口 1**：产码 `internal/winsec/winsec_other.go:269-274`（`sealHandle` 自带的两枚 inline 复验：名字带链接 ⇒ 拒；`os.SameFile(pinned, now)` 不等 ⇒ 拒）
+  **今天没有任何用例走得到**。验收腿的实测逐字：把这两枚判据各改成 `false && …`（物理改写、sha 还原）跑**整包**
+  ⇒ `RUN=55 PASS=55 FAIL=0 SKIP=0 rc=0`，**零枚变色** ⇒ 这半闸门**有形状、无证据**。
+- 成因（验收腿读码，你要复量）：既有 `PrivateFile` 用例（票 113/118/119 那一族）都在 **open 之前**就把链接种在名字上，
+  于是 `sealHandle` 在 `:257 applyDescriptor` 处已拒，**走不到** `:269`。
+
+## 1. 你要做的（一格，⛔ 扩大射程）
+- **AC#1′（承接票 120 AC#1 的那半）**：造出**唯一能让这一支说话的世界**＝
+  ① 调用方 fd 已开在真对象 A 上（名字此刻还是普通文件）⇒ ② **open 之后、seal 之前**把名字换成**另一枚真对象 B**
+  （⚠ 必须 Root 会跟的形：**相对兄弟链接**，绝对目标链接会在 open 处就被 `os.Root` 拒＝`path escapes from parent`，那是形 1/2 的地界、⛔ 到不了这里）
+  ⇒ ③ `sealHandle` 必须**具名拒**（红句/拒因要点明"descriptor 不是名字现在携带的对象"）。
+- 两形都要：**链接指向另一枚真文件**（SameFile 不等）＋**名字本身变成链接**（Mode 检查那一支）；
+  ⚠ 只造出一形＝另一形仍缺世界，必须具名写"没造出来"。
+- ★**反控（本票最要紧，缺一不作凭据）**：**单独**摘掉 `sealHandle` 这一支的牙（物理改写＋sha256 还原，⛔ `-overlay`——
+  它只换编译期输入、对运行时读盘的尺失明）⇒ **你新增的那枚用例必须红**，且**其余用例零变色**
+  （这条正是 `120-v1` 的读数形状：去牙后整包 55/55 全绿＝没牙；你补完之后同一发必须出现"1 枚红"）。
+  ⛔ 不许拿 `sameObjectPinned`（`pinPlacement` 那条腿）的去牙冒充——`120-v1` 已判二者是**两条不同腿**。
+- ⛔ **不许为了让世界到位而改产码**：`winsec_other.go` 一字不动。若你的夹具做完仍走不到 `:269`，或发现这半闸门**真的错**，
+  具名报回（那是**退回**形状，不是"顺手修一下"）；⛔ 放宽任何既有断言。
+
+## 2. 名册口径（票面那句"16"已过期）
+`-run 'TestAC[1-4]POSIX'` 现数**顶层 20 枚**（编排者 21:3x 自己 `grep -h "^func TestAC[1-4]POSIX" internal/winsec/*_test.go | wc -l` = **20**；
+容器实跑 `RUN=31/PASS=31/0/0`＝20 顶层＋11 枚 `t.Run` 子测，这一发是 `120-v1` 报的、编排者未复跑）。
+⇒ 你交件时按**现量**报名册数与四数，⛔ 抄票面的 16；票面措写不归你（⛔ 改票名/Status/正文）。
+
+## 3. 台面故障（今天现撞五次，⛔ 当读数）
+1. ★**容器树必须放 `D:` 卷**：Git Bash 的 `/tmp`＝C: Temp，Docker 挂进去是**空目录** ⇒ `go.mod file not found`。
+   定式：`git archive HEAD | tar -x -C /d/tmp/<你的目录>/fixed`，**量之前先数 `.go` 证非空**（"0"⛔ 是读数，"分母 N 且 0"才是）。
+2. `go test ./internal/winsec/` 的**颜色随 GOTMPDIR 所在卷变**（票 311 的 AC#1 shape B 体积守卫）：
+   `D:/tmp` 根 ⇒ 56 PASS/2 FAIL；**C: 卷** ⇒ 58 PASS/0 FAIL。⇒ 改前改后**必须同一台面**，且把卷名具名写进件里。
+3. `GOTMPDIR` 先 `mkdir -p`（指到没建的目录 ⇒ `creating work dir … cannot find the file specified` **且 rc=0**）。
+4. ⛔ `cmd | tail` 之后取 `${PIPESTATUS[0]}`；定式 `cmd > /d/tmp/120r3.log 2>&1; rc=$?`。
+5. Windows 侧**不编** `winsec_other.go`（`!windows` 构建标签）⇒ 这一族的判据只能在容器里出颜色；`go build ./...`／`go vet ./internal/winsec/` 在宿主上 rc=0 **证不了这一族任何东西**（Go 不为未走的分支报错）。
+   ⛔ 拿宿主的 rc=0 当"已验"。
+
+## 4. 门禁（逐把带 `rc=` 落盘）
+`go build ./...`／`GOOS=darwin GOARCH=arm64 go vet ./internal/winsec/`（真读那一半）／`gofmt -l`／
+`gofumpt -l`（**绝对路径** `/d/work/base/gopath/bin/gofumpt`——PATH 里没这命令，`320-v1` 因此欠过一发）／
+`sh scripts/d22scan.sh`（注释豁免、字符串不豁免、零 emoji）／`sh scripts/check-path-length-budget.sh`；
+容器：整包**成对两发**（未去牙 ⇒ 全绿；去牙 ⇒ 你那枚新用例红＋其余零变色）。
+
+## 5. 面与纪律
+- 写面**只许**：`internal/winsec/**` 的**测试件**（新文件名带 `_120`）、`docs/evidence/s1/120-sealhandle-fixture.md`（短名、⛔ `§`）、
+  `.scratch/wisp/probes/120/r3/`、票 120 末尾 **1** 条 bullet。
+- ⛔ 禁跑 `go test ./cmd/wisp`（`324-r1` 是该面唯一写腿）；⛔ 禁写 `cmd/wisp/**`、`internal/tools/**`（`287-r1` 在飞）、`internal/panel/**`、`frontend/**`、`design/**`。
+- ⛔ 三枚冻结件一字不动；⛔ 阈值/golden/`allowlist.txt`/`.github/**`。
+- **只 commit、⛔ push**；`add`／`commit` 两处**逐文件显式 pathspec**（⛔ 目录形）。⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ⛔ 双引号串里出现反引号或 `$`（本仓第 5 次事故）；进 shell 的正文一律单引号或加引号 heredoc。临时件只建不删（`.bak` 留底、⛔ 删）。
+- ≤4 件、每件 ≤260 行；每格带读数行（引红句连文案）；没做完的具名写"没做完"。
+- **编排者会逐把尺复跑，你自报的数字不当数。**

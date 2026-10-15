@@ -1,0 +1,11 @@
+发送记录：`120-r3`（落地腿／写手，面＝`internal/winsec/**` 测试件）
+发送时刻 2026-10-15 21:3x +08（`date` 现读；派单存档 `120r3-dispatch.txt` 同分钟写、含两处当场改正）
+锚 `HEAD=e57dca98`（`120-v1` 交件笔）；未推 11；CPU 39%；机主实例 PID 21892 未动。
+面来源：`120-v1`（验收腿）交完 ⇒ `internal/winsec` 写面空出，本腿是该面唯一写腿。
+
+任务＝只做 `120-v1` 判**缺世界**的那一枚缺口（`sealHandle` 的 inline 复验今天零用例可达）。
+禁令转达：⛔ 产码一字不动、⛔ 放宽既有断言、⛔ 拿 `sameObjectPinned` 那条腿的去牙冒充、⛔ `-overlay` 做突变、
+⛔ 禁跑 `go test ./cmd/wisp`、⛔ 翻 AC 框、⛔ 双引号串里反引号/`$`、commit 逐文件 pathspec、只 commit 不 push。
+台面写进派单五条：容器树放 `D:` 卷＋先数 `.go` 证非空／winsec 颜色随 GOTMPDIR 所在卷变⇒改前改后同台面／`GOTMPDIR` 先 `mkdir -p`／
+⛔ `PIPESTATUS` 取 tail 的退码／Windows 侧不编 `winsec_other.go` ⇒ 宿主 rc=0 证不了这一族。
+名册口径按现量（顶层 20 枚＝我自己 grep 复量；容器 31/31＝腿报、我未复跑，派单里已把这两层分开写）。
