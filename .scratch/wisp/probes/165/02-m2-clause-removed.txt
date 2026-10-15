@@ -1,0 +1,7 @@
+time=2026-10-15T16:26:02.673+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: Test165ScopeClauseNamesTheBatch (0.00s)
+    plan_present_165_test.go:263: 方案文本里读不到批准范围的边界（缺 "只限上面这 3 步"）：人类点头时看不到「批到哪儿为止」："这批改动要达成：165 探针\n我要做的事（共 3 步）：\n1. 甲\n2. 乙\n3. 丙\n"
+    plan_present_165_test.go:263: 方案文本里读不到批准范围的边界（缺 "清单之外"）：人类点头时看不到「批到哪儿为止」："这批改动要达成：165 探针\n我要做的事（共 3 步）：\n1. 甲\n2. 乙\n3. 丙\n"
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.062s
+FAIL

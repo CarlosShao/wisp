@@ -1,0 +1,14 @@
+time=2026-10-15T16:26:27.443+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test165UnmodifiedRosterHasNoPlanTool
+    plan_present_165_test.go:138: 未修码名册 10 枚、零枚 plan/propose 形：[fs.read fs.list fs.write fs.edit fs.trash fs.move fs.delete task.output task.cancel task.spawn]
+--- PASS: Test165UnmodifiedRosterHasNoPlanTool (0.00s)
+=== RUN   Test165PlanPresentAsksThroughTheExistingL2Card
+--- PASS: Test165PlanPresentAsksThroughTheExistingL2Card (0.00s)
+=== RUN   Test165PlanApprovalRingsAgainForAnUnlistedWrite
+--- PASS: Test165PlanApprovalRingsAgainForAnUnlistedWrite (0.03s)
+=== RUN   Test165ScopeClauseNamesTheBatch
+--- PASS: Test165ScopeClauseNamesTheBatch (0.00s)
+=== RUN   Test165PlanPresentAddsNoAllowExit
+--- PASS: Test165PlanPresentAddsNoAllowExit (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.084s

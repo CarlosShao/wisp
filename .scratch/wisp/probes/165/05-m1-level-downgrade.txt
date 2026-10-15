@@ -1,0 +1,10 @@
+time=2026-10-15T16:26:32.804+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: Test165PlanPresentAsksThroughTheExistingL2Card (0.00s)
+    plan_present_165_test.go:161: Declared=L1，冻结文本（PLAN.md:2567 / SPEC-07 §3:73）写的是 L2
+    plan_present_165_test.go:179: 清单走了 L1 静默窗口 1 次：这一档要的是卡（3 秒无人应答不是点头）
+    plan_present_165_test.go:182: L2 卡被问了 0 次，要 1 次
+--- FAIL: Test165PlanApprovalRingsAgainForAnUnlistedWrite (0.03s)
+    plan_present_165_test.go:233: L2 卡被问了 0 次，要 1 次（只有清单那一发）
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.077s
+FAIL

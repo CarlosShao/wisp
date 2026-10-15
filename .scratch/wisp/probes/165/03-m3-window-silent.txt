@@ -1,0 +1,6 @@
+time=2026-10-15T16:26:15.203+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: Test165PlanApprovalRingsAgainForAnUnlistedWrite (0.02s)
+    plan_present_165_test.go:236: 方案批过之后，清单外的写没有响（L1 窗口被问 0 次，要 1 次）——批准变成了对后续写的放行
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.124s
+FAIL
