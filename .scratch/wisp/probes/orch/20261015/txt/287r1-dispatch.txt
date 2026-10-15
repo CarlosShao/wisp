@@ -1,0 +1,62 @@
+你是 Wisp 编队的**落地腿 `287-r1`**（写腿）。仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令一律加引号），分支 `dev`，Shell＝Git Bash。
+本票做**夹具**，不是修缺陷：票面明写"这一支不是缺陷"（深度 1 是设计），缺的是**能让它走到的仪器**。
+
+## 0. 起手先读两处
+1. 票面：`.scratch/wisp/issues/287-depth-guard-has-no-fixture-so-the-subagent-spawn-hop-is-unreachable-and-untested.md`
+   —— **AC#1 已闭合**（只读腿 `287-a1` 的三把尺复现，件 `.scratch/wisp/probes/287/a1/00-three-rulers-re-run.md` 340 行）；你只做 **AC#2 ∥ AC#3 ∥ AC#4**。
+2. 契约出处：台账 `A399`／`A401`（09-28 定"深度 1／子级永不自批"）。⛔ 不许改这一维的任何数值。
+
+## 1. ★锚已腐烂（票面写的是 10-09 的号；`270-r1` 刚给同一枚文件加了 20 行）
+编排者 2026-10-15 21:1x 现量（`grep -n` 于 `internal/tools/subagent_197.go`，你**起手必须再重跑一遍**，别抄这里的号）：
+- 票面 `:262` ⇒ 现 **271** 逐字 `parentID := TaskID(ctx)`
+- 票面 `:267` ⇒ 现 **276** 逐字 `if rec, ok := t.d.Roster.Look(parentID); ok && rec.Kind == TaskKindSubagent {`
+- 票面 `:270` 那句拒语 ⇒ 现 **278–279**
+- 票面 `:296`（孩子的 `opt.Tools` 被换）⇒ 现 **316** 逐字 `opt.Tools = newSubagentToolProvider(t.d.ParentTools)`
+- 票面 `:573-580`（名字闸）⇒ 现 **606** 一带（`拒绝执行：子代理不能再派生子代理`）
+⇒ **判据只用内容锚＋`sed -n '<现号>p'` 复量**；引用的每一枚号都要在你的证据件里标"我现量到的号"。
+
+## 2. 你要交的三格
+- **AC#2 造夹具**：三件缺一都作不出读数——① **调用者那一行**的 `Kind == TaskKindSubagent`（⚠ `287-a1` 已量出现有 6 枚断言位点**全部**断言孩子那行，这就是本票的存在理由）；② 派发经**真 loop**，因而 `corr != taskID` 必须**同屏出现在红句里**（方法学前置＝票 282 那条）；③ 请求 `task.spawn`。
+  判据＝新增用例**今天能红**：种坏（把深度判定那一支摘掉／改成恒通过）⇒ **指名用例必须红**，四件套齐（种前 hash／`sed -n` 复量／红句 `文件:行` 逐字连文案／还原 hash 等值＋`git status --porcelain -- internal cmd` 空）。
+  ⛔ 不许用"字段非空"充当判据；⛔ `t.Skip`；⛔ `-overlay` 做这一格的突变——★本仓今天新定式：`-overlay` **只换编译期输入**，对"运行时读盘上文件"的尺**失明**；要动就**物理改写＋sha256 还原**，`.bak` **⛔ 删**（临时件只建不删）。
+- **AC#3 代价表**（⛔ 不改产码、⛔ 不许当成已裁）：孩子的 `task.spawn` 被 `subagentToolProvider` 硬拒＝设计如此，还是挡住了一枚本该走到的检查？两形各写"要动哪几枚文件＋会不会把深度上限放开"，交编排者裁。
+- **AC#4 门禁**：见第 4 节。
+
+## 3. 面限制（今天有别的腿在飞，务必遵守）
+```bash
+# 你独占：internal/tools/**（写面只有这里）
+# 可跑：go build ./... ／ go test ./internal/tools/ -count=1（改前改后各一次）／ go vet ./internal/tools/ ／ gofmt -l ／ gofumpt -l
+# ⛔ 禁跑：go test ./cmd/wisp（324-r1 是该面唯一写腿；且该包有整进程死亡区＝票 314）
+# ⛔ 禁写：cmd/wisp/**、internal/panel/**、internal/winsec/**（120-v1 在裁）、frontend/**、design/**
+# ⛔ 三枚冻结件一字不动：internal/panel/tokens_fourway_test.go／internal/panel/l2_grant_boundary_test.go／internal/perm/ticket90_persist_test.go
+```
+需要 `cmd/wisp` 面才能证的格，具名写〔待面空补验〕，⛔ 用读码推断冒充"已验"。
+
+## 4. 台面故障（本仓今天现撞四次，⛔ 当读数）
+1. `PATH` 缺 `third_party/sherpa-onnx` ⇒ `exit status 0xc0000135` **且没有 `--- FAIL`＝用例根本没跑**：
+   `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH"`
+2. `GOTMPDIR` 指到没建的目录 ⇒ `go: creating work dir: … cannot find the file specified` ＋ `rc=0` ⇒ 先 `mkdir -p`；且必须 **C: 卷＋只反斜杠形**：`C:\Users\swq\AppData\Local\wisp-test-gotmp\287r1gotmp`（⛔ `C:\tmp\`）。
+3. ⛔ 在 `cmd | tail` 之后取 `${PIPESTATUS[0]}` 当被测命令退码 ⇒ 定式 `cmd > /d/tmp/287r1.log 2>&1; rc=$?`。
+4. ★`-overlay` 对运行时读盘的尺失明（见第 2 节）。
+
+## 5. 判据纪律
+- ⛔ **恒真检测器**：判据换成反形也全绿＝它对这事不敏感；你每枚新用例都要**自己证它能红**（种坏读数与还原读数成对，且**分母与活性同屏**：`0 命中`＋死仪器＝假绿）。
+- ⛔ 为变绿放宽任何既有断言；⛔ 顺手把深度上限改成 2 或放开子级 `task.spawn`。
+- 既有红不算新债：`cmd/wisp` 的 `TestTicket255RosterStillMatchesTheActualReadSites` **今天起手即红**（存量债，归口票 324，⛔ 算进本票、⛔ 去修）；`internal/panel` 5 枚既有红；本机 `internal/tools` 现量应 **239 PASS／0 FAIL**（`4d90dfcd` 那发）⇒ 你的改动只许"不增加红"，并给**红名册差集**。
+
+## 6. 三问启动检查
+```bash
+cd "D:/work/workspace/projects plans/Wisp"
+git status --porcelain -- internal cmd tools scripts   # 非 0 ⇒ 具名写下是谁的面，⛔ 动它
+git rev-parse --short HEAD; date "+%Y-%m-%d %H:%M +08" # 起手锚＋时刻一律插值
+# 第 1 节那五枚锚重跑一遍（grep -n），号不同就以你的现量为准并在件里具名说明
+```
+
+## 7. 输出预算／纪律
+- 写面**只新建**：夹具＋用例放 `internal/tools/**`（新文件名带 `_287`），证据 `docs/evidence/s1/287-depth-fixture.md`（短名、⛔ `§`）＋读数目录 `.scratch/wisp/probes/287/r1/`＋票 287 末尾 **1** 条 bullet。⛔ 翻 AC 框（框只有编排者能翻）、⛔ 改票名/Status/台账。
+- ≤5 件、每件 ≤260 行；自报没做完的格具名写"没裁完/没造出来"，⛔  blanks。
+- git：**只 commit、⛔ push**；`add`／`commit` 两处**逐文件显式 pathspec**（⛔ 目录形——今天已有两枚腿在此自抓）。⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ⛔ 双引号串里出现反引号或 `$`（本仓第 5 次事故）；进 shell 的正文一律单引号或加引号 heredoc。
+- 门禁逐条落盘带 `rc=`：`go build ./...`／`gofmt -l`／`gofumpt -l`（宿主 `/d/work/base/gopath/bin/gofumpt`）／`sh scripts/d22scan.sh`（注释豁免、字符串不豁免、零 emoji）／`sh scripts/check-path-length-budget.sh --with-self-test`。
+- ⛔ 静默 `.out`；⛔ 读二进制；grep 要有界；临时件只建不删。
+- **编排者会逐把尺复跑，你自报的数字不当数。**
