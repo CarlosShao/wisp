@@ -1,19 +1,17 @@
 //go:build !windows
 
 // Ticket 120 residual gap 1: the same two sealHandle faces reached through the entry
-// point that actually has callers - privateFile -> sealHandle (winsec.go:117) - plus
-// the reading that says the window is not a fixture invention.
-//
+// point that actually has callers - privateFile -> sealHandle (winsec.go:117) - plus the
+// reading that says the window is not a fixture invention.
 // A hand-made descriptor (sealhandle_identity_120_other_test.go) proves the leg's
 // arithmetic; this file proves that a production call refuses, that its bytes do not
 // land, and that the unlink-on-refusal removes the planted name and not what that link
 // points at. The world, and the honesty of the seam-windowed plant, are stated once in
-// sealhandle_window_120_other_test.go.
-//
-// The third case is the blind racer: same fixture, no seam help, the flip driven by its
-// own goroutine. Its classification rows are READINGS, because 120-v1 section 2's third
-// ruling holds that a landing count nobody can promise must not become a gate; what is
-// judged is the racer's own health and the invariants these legs do own.
+// sealhandle_window_120_other_test.go. The third case is the blind racer: same fixture,
+// no seam help, the flip driven by its own goroutine. Its classification rows are
+// READINGS, because 120-v1 section 2's third ruling holds that a landing count nobody
+// can promise must not become a gate; what is judged is the racer's own health and the
+// invariants these legs do own.
 package winsec
 
 import (
@@ -31,10 +29,10 @@ import (
 // windowProbeAttempts120r3 is the blind racer's denominator, printed with every row.
 const windowProbeAttempts120r3 = 2000
 
-// assertRefusedWriteLeavesNothing120r3 is AC#5's promise measured on THIS world: after
-// a refused seal the payload must not be readable under any name in the tree - and
-// reading the spelling the caller asked for follows whatever the name carries now,
-// which is the whole subject of the leg.
+// assertRefusedWriteLeavesNothing120r3 is AC#5's promise measured on THIS world: after a
+// refused seal the payload must not be readable under any name in the tree - and reading
+// the spelling the caller asked for follows whatever the name carries now, which is the
+// whole subject of the leg.
 func assertRefusedWriteLeavesNothing120r3(t *testing.T, dir, name, payload string) {
 	t.Helper()
 	entries, err := os.ReadDir(dir)
@@ -130,8 +128,7 @@ func TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3(t *te
 // every state (120-r2's fix for its own dead instrument, reused in shape here), and
 // PrivateFile runs over that spelling windowProbeAttempts120r3 times. Every attempt is
 // classified by the leg that answered it and printed. The distribution is a READING;
-// what is judged is the racer's own health and the two invariants that have to hold
-// whatever it says.
+// what is judged is the racer's health and the two invariants that hold whatever it says.
 func TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3(t *testing.T) {
 	dir, name, witness := sealHandleFixture120r3(t)
 	stageReal := filepath.Join(dir, "stage-real-120r3.bin")
