@@ -78,6 +78,13 @@ const (
 	// and model in the two selectors, no value - the entry is seeded from the
 	// schema's default tags and its leaves have their own fields.
 	FieldModelRowCreate = "model_row_create"
+	// FieldModelRowDelete / FieldProviderRowDelete are the taking-back steps the
+	// owner asked for right after the three writes landed ("added models cannot
+	// be deleted at all"): provider+model deletes one catalog entry, provider
+	// alone deletes the whole row. No value, same selectors as their create
+	// twins, and the setters refuse by name when a row is still referenced.
+	FieldModelRowDelete    = "model_row_delete"
+	FieldProviderRowDelete = "provider_row_delete"
 	// FieldRoleChatPair is llm.roles.chat's provider+model, written together.
 	FieldRoleChatPair = "role_chat_pair"
 )
@@ -86,9 +93,11 @@ const (
 // apart from config_handlers.go's allWritableFields on purpose (see the header).
 var fields313 = []string{
 	FieldModelRowCreate,
+	FieldModelRowDelete,
 	FieldProviderBilling,
 	FieldProviderRowCreate,
 	FieldProviderRowCreateCustom,
+	FieldProviderRowDelete,
 	FieldRoleChatPair,
 	FieldVoiceCloudASRChain,
 	FieldVoiceCloudTTSChain,
@@ -100,12 +109,13 @@ var fields313 = []string{
 // maps so the gate can ask one question per column across both tables.
 var (
 	fields313NeedsProvider = map[string]bool{
-		FieldModelRowCreate: true, FieldProviderBilling: true,
+		FieldModelRowCreate: true, FieldModelRowDelete: true, FieldProviderBilling: true,
 		FieldProviderRowCreate: true, FieldProviderRowCreateCustom: true,
-		FieldRoleChatPair: true,
+		FieldProviderRowDelete: true,
+		FieldRoleChatPair:      true,
 	}
 	fields313NeedsModel = map[string]bool{
-		FieldModelRowCreate: true, FieldRoleChatPair: true,
+		FieldModelRowCreate: true, FieldModelRowDelete: true, FieldRoleChatPair: true,
 	}
 	fields313TakesValue = map[string]bool{
 		FieldProviderBilling: true, FieldProviderRowCreateCustom: true,

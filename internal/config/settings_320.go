@@ -198,3 +198,90 @@ func (m *Manager) CreateModelRow(provider, model string) ([]string, error) {
 		return nil
 	})
 }
+
+// RemoveModelRow deletes one catalog entry. The owner asked for it in the same
+// breath as the three writes above ("added models cannot be deleted at all"):
+// until this setter existed the page could ADD entries and had no way to take
+// one back, so a mistyped id or a tried-and-rejected model stayed in the catalog
+// forever.
+func (m *Manager) RemoveModelRow(provider, model string) ([]string, error) {
+	id := strings.TrimSpace(model)
+	if id == "" {
+		return nil, observe.New(observe.ClassConfig,
+			"config: "+refusalRowMissing+"：删目录条目必须点名模型 id")
+	}
+	ownedKey := "llm.providers." + provider + ".models." + id
+	return m.writeOneKey(ownedKey, func(base *Config) bool {
+		p, ok := base.LLM.Providers[provider]
+		if !ok {
+			return false
+		}
+		if _, ok := p.Models[id]; !ok {
+			return false
+		}
+		delete(p.Models, id)
+		base.LLM.Providers[provider] = p
+		return true
+	}, func(base *Config) error {
+		p, ok := base.LLM.Providers[provider]
+		if !ok {
+			return unknownProviderErr(provider)
+		}
+		if _, ok := p.Models[id]; !ok {
+			return observe.New(observe.ClassConfig, fmt.Sprintf(
+				"config: llm.providers.%s.models.%s 不在这个目录里；这一步只删已存在的条目", provider, id))
+		}
+		return nil
+	})
+}
+
+// RemoveProviderRow deletes a whole provider row. A row that is still referenced
+// by the chat role or by one of the voice chains is refused BY NAME rather than
+// removed and then caught by validate(): the operator needs to know which
+// sentence points at the row, not that "the value would not survive validation".
+func (m *Manager) RemoveProviderRow(provider string) ([]string, error) {
+	ownedKey := "llm.providers." + provider
+	return m.writeOneKey(ownedKey, func(base *Config) bool {
+		if _, ok := base.LLM.Providers[provider]; !ok {
+			return false
+		}
+		delete(base.LLM.Providers, provider)
+		return true
+	}, func(base *Config) error {
+		if _, ok := base.LLM.Providers[provider]; !ok {
+			return unknownProviderErr(provider)
+		}
+		if ref := providerReference320(provider, base); ref != "" {
+			return observe.New(observe.ClassConfig, fmt.Sprintf(
+				"config: 供应商 %q 还在被「%s」引用；先把那处改指别的行，再删这一行", provider, ref))
+		}
+		return nil
+	})
+}
+
+// providerReference320 names the first place that still points at this row, or
+// "" when nothing does. Chain elements are spelled "provider/model".
+func providerReference320(provider string, cfg *Config) string {
+	if cfg.LLM.Roles.Chat.Provider == provider {
+		return "默认聊天模型"
+	}
+	if cfg.Voice.Realtime.Provider == provider {
+		return "实时语音"
+	}
+	for _, el := range cfg.Voice.CloudASRChain {
+		if chainProvider320(el) == provider {
+			return "语音识别链"
+		}
+	}
+	for _, el := range cfg.Voice.CloudTTSChain {
+		if chainProvider320(el) == provider {
+			return "语音合成链"
+		}
+	}
+	return ""
+}
+
+func chainProvider320(element string) string {
+	head, _, _ := strings.Cut(element, "/")
+	return strings.TrimSpace(head)
+}

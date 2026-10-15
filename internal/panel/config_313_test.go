@@ -37,6 +37,8 @@ func fields313Cases() []fields313Case {
 			"configProvider": "local-gw", "configValue": "openai-chat,http://127.0.0.1:8080/v1",
 		}},
 		{field: FieldModelRowCreate, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313"}},
+		{field: FieldModelRowDelete, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313"}},
+		{field: FieldProviderRowDelete, extra: map[string]any{"configProvider": "stepfun"}},
 		{field: FieldRoleChatPair, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313"}},
 	}
 }

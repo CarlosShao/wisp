@@ -264,6 +264,15 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		// 票 320 AC#3: provider and model are the two selectors, no value - the
 		// entry's window and price leaves keep their own fields.
 		written, err = s.mgr.CreateModelRow(w.Provider, w.Model)
+	case panel.FieldModelRowDelete:
+		// The taking-back twin of the line above (owner follow-up): provider+model
+		// deletes one catalog entry. The setter refuses by name when the entry is
+		// not there, so a double click cannot pretend it removed something.
+		written, err = s.mgr.RemoveModelRow(w.Provider, w.Model)
+	case panel.FieldProviderRowDelete:
+		// Deletes a whole row; the setter refuses by name while the chat role or a
+		// voice chain still points at it.
+		written, err = s.mgr.RemoveProviderRow(w.Provider)
 	case panel.FieldRoleChatPair:
 		written, err = s.mgr.SetRoleChatPair(w.Provider, w.Model)
 	case panel.FieldProviderCredential:

@@ -325,6 +325,21 @@ function ProviderRow({
     });
   }
 
+  // REMOVING A ROW is a destructive step, so it is two clicks (the first turns
+  // the button into a confirmation) rather than a dialog the WebView would have
+  // to own. The host refuses by name while the chat role or a voice chain still
+  // points at the row, and that refusal lands in the same feedback line.
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  function removeRow() {
+    void run(`row:${row.name}`, () => performWrite({ field: "provider_row_delete", provider: row.name })).then(
+      (fb) => {
+        setConfirmRemove(false);
+        onFeedback(fb);
+        if (fb.tone === "ok" && editing) onEditing();
+      },
+    );
+  }
+
   // AUTO-FETCH AFTER ADD: the form hands a freshly created row's name up, and
   // this row is the one that then asks the host for its catalog - so "add a
   // provider, then fetch its models" is one flow, not two. The ref keeps the
@@ -387,13 +402,20 @@ function ProviderRow({
           <Button onClick={onEditing} size="xs" variant="quiet">
             {editing ? "收起" : "编辑"}
           </Button>
-          <Button
-            onClick={() => onFeedback({ tone: "neutral", text: COPY.deleteUnavailable })}
-            size="xs"
-            variant="quiet"
-          >
-            删除
-          </Button>
+          {confirmRemove ? (
+            <>
+              <Button disabled={busy !== null} onClick={removeRow} size="xs" variant="primary">
+                确认删除
+              </Button>
+              <Button onClick={() => setConfirmRemove(false)} size="xs" variant="quiet">
+                取消
+              </Button>
+            </>
+          ) : (
+            <Button onClick={() => setConfirmRemove(true)} size="xs" variant="quiet">
+              删除
+            </Button>
+          )}
         </div>
       </div>
 
@@ -478,6 +500,14 @@ function ProviderEdit({
       onFeedback(fb);
       if (fb.tone === "ok") setManualModel("");
     });
+  }
+
+  /** The taking-back half the operator asked for: one catalog entry, removed by
+      name, with the setter's own refusal when it is already gone. */
+  function removeOneModel(id: string) {
+    void run(`models:${row.name}`, () =>
+      performWrite({ field: "model_row_delete", provider: row.name, model: id }),
+    ).then(onFeedback);
   }
 
   /** One write per selected id - model_row_create is a single-entry step, and
@@ -612,10 +642,19 @@ function ProviderEdit({
           {row.models !== null && row.models.length > 0 ? (
             row.models.map((id) => (
               <span
-                className="inline-flex h-5 items-center rounded-chip bg-inset px-2 font-mono text-[11px] text-ink-2"
+                className="inline-flex h-5 items-center gap-1 rounded-chip bg-inset pl-2 pr-1 font-mono text-[11px] text-ink-2"
                 key={id}
               >
                 {id}
+                <button
+                  aria-label={`删除模型 ${id}`}
+                  className="rounded-full px-1 text-[13px] leading-none text-ink-3 hover:text-ink disabled:opacity-40"
+                  disabled={busy !== null}
+                  onClick={() => removeOneModel(id)}
+                  type="button"
+                >
+                  ×
+                </button>
               </span>
             ))
           ) : (
