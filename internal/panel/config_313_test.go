@@ -33,6 +33,9 @@ func fields313Cases() []fields313Case {
 		{field: FieldVoiceRealtimeModel, extra: map[string]any{"configValue": "model-under-test-313"}},
 		{field: FieldProviderRowCreate, extra: map[string]any{"configProvider": "stepfun"}},
 		{field: FieldProviderBilling, extra: map[string]any{"configProvider": "stepfun", "configValue": "plan"}},
+		{field: FieldProviderRowCreateCustom, extra: map[string]any{
+			"configProvider": "local-gw", "configValue": "openai-chat,http://127.0.0.1:8080/v1",
+		}},
 		{field: FieldRoleChatPair, extra: map[string]any{"configProvider": "stepfun", "configModel": "model-under-test-313"}},
 	}
 }
@@ -110,6 +113,12 @@ func Test313SelectorRefusalsOnTheAdditionalRoster(t *testing.T) {
 		{"voice_cloud_asr_chain with an empty value", map[string]any{"configField": FieldVoiceCloudASRChain, "configValue": "   "}},
 		{"provider_billing without a provider", map[string]any{"configField": FieldProviderBilling, "configValue": "plan"}},
 		{"provider_billing with an empty value", map[string]any{"configField": FieldProviderBilling, "configProvider": "stepfun", "configValue": "   "}},
+		{"provider_row_create_custom without a provider", map[string]any{
+			"configField": FieldProviderRowCreateCustom, "configValue": "openai-chat,http://127.0.0.1:8080/v1",
+		}},
+		{"provider_row_create_custom with an empty value", map[string]any{
+			"configField": FieldProviderRowCreateCustom, "configProvider": "local-gw", "configValue": "   ",
+		}},
 	}
 	for _, tc := range cases {
 		leg := &cfg248Leg{}

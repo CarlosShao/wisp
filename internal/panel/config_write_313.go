@@ -35,13 +35,18 @@ package panel
 // vocabulary the frozen grant-boundary instrument keys on - both are asserted in
 // config_313_test.go rather than promised in a comment.
 //
-// TICKET 320's FIRST ADDITION lives in the same roster and follows the same two
-// rules the 313 names follow. It is a FIELD, not a method: no new socket name, no
+// TICKET 320's ADDITIONS live in the same roster and follow the same two rules
+// the 313 names follow. They are FIELDS, not methods: no new socket name, no
 // ConfigStore method, so the 248 pin and its legs stay untouched.
 //
 //	provider_billing  llm.providers.<name>.billing, the pay-per-token|plan
 //	  switch. The enum is enforced in internal/config before the write, the
 //	  same way the three older leaf setters refuse their out-of-band values.
+//	provider_row_create_custom  the non-preset twin of provider_row_create:
+//	  value = "<protocol>,<base_url>", provider = the row's name. It exists
+//	  because a non-preset name has no preset to inherit protocol from and
+//	  validateAPIKeyRefs refuses a section without one, so the explicit row
+//	  step has to carry the protocol in the same call.
 
 import "sort"
 
@@ -60,6 +65,10 @@ const (
 	// FieldProviderBilling is llm.providers.<name>.billing (ticket 320 AC#1).
 	// Value = plan or pay-per-token, checked against the schema's own enum.
 	FieldProviderBilling = "provider_billing"
+	// FieldProviderRowCreateCustom is the non-preset row-creation step (ticket
+	// 320 AC#2). Value = "<protocol>,<base_url>"; provider = the row's name;
+	// model optional, exactly like provider_row_create's optional model half.
+	FieldProviderRowCreateCustom = "provider_row_create_custom"
 	// FieldRoleChatPair is llm.roles.chat's provider+model, written together.
 	FieldRoleChatPair = "role_chat_pair"
 )
@@ -69,6 +78,7 @@ const (
 var fields313 = []string{
 	FieldProviderBilling,
 	FieldProviderRowCreate,
+	FieldProviderRowCreateCustom,
 	FieldRoleChatPair,
 	FieldVoiceCloudASRChain,
 	FieldVoiceCloudTTSChain,
@@ -80,13 +90,14 @@ var fields313 = []string{
 // maps so the gate can ask one question per column across both tables.
 var (
 	fields313NeedsProvider = map[string]bool{
-		FieldProviderBilling: true, FieldProviderRowCreate: true, FieldRoleChatPair: true,
+		FieldProviderBilling: true, FieldProviderRowCreate: true,
+		FieldProviderRowCreateCustom: true, FieldRoleChatPair: true,
 	}
 	fields313NeedsModel = map[string]bool{
 		FieldRoleChatPair: true,
 	}
 	fields313TakesValue = map[string]bool{
-		FieldProviderBilling:    true,
+		FieldProviderBilling: true, FieldProviderRowCreateCustom: true,
 		FieldVoiceCloudASRChain: true, FieldVoiceCloudTTSChain: true,
 		FieldVoiceRealtimeProvider: true, FieldVoiceRealtimeModel: true,
 	}

@@ -249,6 +249,11 @@ func (s *configStore) ApplySetting(_ context.Context, w panel.SettingWrite) (pan
 		// 票 320 AC#1: the value is the enum word itself; the config setter owns
 		// the vocabulary check so the page is told which field it got wrong.
 		written, err = s.mgr.SetProviderBilling(w.Provider, w.Value)
+	case panel.FieldProviderRowCreateCustom:
+		// 票 320 AC#2: the wire value is one "协议,base_url" pair; the split is this
+		// leg's (the panel's own gate only knows the field takes a value).
+		protocol, baseURL := splitCustomRowValue(w.Value)
+		written, err = s.mgr.CreateCustomProviderRow(w.Provider, protocol, baseURL, w.Model)
 	case panel.FieldRoleChatPair:
 		written, err = s.mgr.SetRoleChatPair(w.Provider, w.Model)
 	case panel.FieldProviderCredential:
@@ -336,4 +341,15 @@ func splitChainValue(v string) []string {
 		out = append(out, strings.TrimSpace(p))
 	}
 	return out
+}
+
+// splitCustomRowValue splits ticket 320 AC#2's row value ("<protocol>,<base_url>")
+// at the FIRST comma, and trims both halves - the same courtesy splitChainValue
+// shows an operator who types a space after the comma. A value with no comma
+// yields an empty second half, which the config setter refuses by name; this
+// helper never guesses that a missing half means "take the preset default",
+// because a non-preset row has no preset to fall back to.
+func splitCustomRowValue(v string) (protocol, baseURL string) {
+	proto, url, _ := strings.Cut(v, ",")
+	return strings.TrimSpace(proto), strings.TrimSpace(url)
 }

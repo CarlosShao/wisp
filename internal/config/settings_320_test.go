@@ -75,3 +75,100 @@ func Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers(t *testing.T) {
 		t.Fatalf("the control write after two refusals: %v", err)
 	}
 }
+
+// AC#2: the non-preset row. One guarded write lands the section with the protocol
+// and base_url it was given plus the optional first model; five refusals - the
+// four the design named and the empty name - each say why and leave the file
+// byte-identical. The preset-name refusal names the step that DOES own preset
+// rows, so the page is sent to the right field instead of to the file.
+func Test320CreateCustomProviderRowLandsAndRefusesByName(t *testing.T) {
+	m, path, _ := newTestManager(t, settingsBase)
+
+	written, err := m.CreateCustomProviderRow("local-gw", ProtocolOpenAIChat, "http://127.0.0.1:8080/v1", "local-model-x")
+	if err != nil {
+		t.Fatalf("CreateCustomProviderRow: %v", err)
+	}
+	if want := []string{"llm.providers.local-gw"}; !reflect.DeepEqual(written, want) {
+		t.Errorf("written key paths = %v, want %v", written, want)
+	}
+	got := readLoaded(t, path)
+	row, ok := got.LLM.Providers["local-gw"]
+	if !ok {
+		t.Fatalf("the custom row never landed: %+v", got.LLM.Providers)
+	}
+	if row.Protocol != ProtocolOpenAIChat || row.BaseURL != "http://127.0.0.1:8080/v1" {
+		t.Errorf("the row landed with protocol %q / base_url %q", row.Protocol, row.BaseURL)
+	}
+	if row.Billing != BillingPayPerToken {
+		t.Errorf("the row's billing = %q, want the schema's own default: a zero value here would override the default on the next load", row.Billing)
+	}
+	spec, ok := row.Models["local-model-x"]
+	if !ok {
+		t.Fatalf("the first model never landed: %+v", row.Models)
+	}
+	if !spec.Enabled {
+		t.Error("the created model entry is not enabled: an entry without enabled=true is treated as off and is refused at start-up")
+	}
+	if body := readSettingsFile(t, path); !strings.Contains(body, "[llm.providers.local-gw]") {
+		t.Errorf("the section is not in the file:\n%s", body)
+	}
+	if got.Ball.Size != 56 {
+		t.Errorf("an unrelated key moved: ball.size = %d", got.Ball.Size)
+	}
+	if _, ok := got.LLM.Providers["deepseek"]; !ok {
+		t.Error("the pre-existing provider row disappeared")
+	}
+
+	// The model half is optional (the control): a provider with no catalog entry
+	// yet is a legitimate state.
+	if _, err := m.CreateCustomProviderRow("local-gw-bare", ProtocolAnthropic, "http://127.0.0.1:9090", ""); err != nil {
+		t.Fatalf("the provider-only control was refused: %v", err)
+	}
+	if bare, ok := readLoaded(t, path).LLM.Providers["local-gw-bare"]; !ok || len(bare.Models) != 0 {
+		t.Errorf("the provider-only control landed as %+v", bare)
+	}
+
+	// The refusals, each naming its reason, each leaving the file byte-identical.
+	before := readSettingsFile(t, path)
+	cases := []struct {
+		name     string
+		provider string
+		protocol string
+		baseURL  string
+		mustSay  string
+	}{
+		{"a preset name belongs to provider_row_create", "stepfun", ProtocolOpenAIChat, "https://api.stepfun.com/v1", "provider_row_create"},
+		{"an empty base_url", "local-gw-two", ProtocolOpenAIChat, "   ", "base_url"},
+		{"a protocol outside the enum", "local-gw-three", "grpc", "http://127.0.0.1:1", "protocol"},
+		// The row this test created above: a non-preset name that already exists,
+		// so this is refusal 4 and not the preset-name refusal one row up.
+		{"a row the config already declares", "local-gw", ProtocolOpenAIChat, "http://127.0.0.1:8080/v1", "already exists"},
+		{"no name at all", "   ", ProtocolOpenAIChat, "http://127.0.0.1:1", "行不存在"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			written, err := m.CreateCustomProviderRow(tc.provider, tc.protocol, tc.baseURL, "")
+			if err == nil {
+				t.Fatalf("the create was accepted (reported %v)", written)
+			}
+			if written != nil {
+				t.Errorf("a refused create reported %v, want none", written)
+			}
+			if !strings.Contains(err.Error(), tc.mustSay) {
+				t.Errorf("the refusal does not say why (%q missing): %v", tc.mustSay, err)
+			}
+			if after := readSettingsFile(t, path); after != before {
+				t.Errorf("config.toml changed under a refused create:\n%s", after)
+			}
+		})
+	}
+
+	// Control: after five refusals the same call on a fresh name still lands, and
+	// the third protocol word is a legal row too.
+	if _, err := m.CreateCustomProviderRow("local-gw-four", ProtocolOpenAIResponses, "http://127.0.0.1:4/v1", ""); err != nil {
+		t.Fatalf("the control write after five refusals: %v", err)
+	}
+	if p, ok := readLoaded(t, path).LLM.Providers["local-gw-four"]; !ok || p.Protocol != ProtocolOpenAIResponses {
+		t.Errorf("the control row landed as %+v", p)
+	}
+}

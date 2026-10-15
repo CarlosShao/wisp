@@ -75,3 +75,88 @@ func Test320ProviderBillingThroughTheRealLeg(t *testing.T) {
 		t.Errorf("the control write did not land:\n%s", body)
 	}
 }
+
+// customModel320 is the made-up catalog id AC#2's row carries as its optional
+// first model. The name is this test's own; no real model is invented (A877
+// ruling 4's rule, inherited).
+const customModel320 = "custom-model-under-test-320"
+
+// providerRow320 finds one provider row in the config.get payload.
+func providerRow320(t *testing.T, payload map[string]any, name string) map[string]any {
+	t.Helper()
+	rows, _ := payload["providers"].([]any)
+	for _, r := range rows {
+		row, _ := r.(map[string]any)
+		if row["name"] == name {
+			return row
+		}
+	}
+	t.Fatalf("the payload carries no provider row %q: %v", name, payload["providers"])
+	return nil
+}
+
+// AC#2 through the real leg: a non-preset row appears with the protocol and
+// base_url the value carried (the space after the comma is trimmed by the leg's
+// split, the wire format's own courtesy), the first model lands with it, the read
+// side the page already calls sees both, and a preset name is refused with the
+// file untouched.
+func Test320CustomProviderRowThroughTheRealLeg(t *testing.T) {
+	dir := settingsDir248(t)
+	var audit []string
+	disp, _ := newRealSettingsLeg(t, dir, &audit, nil)
+	ctx := context.Background()
+
+	apply313(t, disp, set313Env("r-320-custom-row", panel.FieldProviderRowCreateCustom, "local-gw", customModel320,
+		"openai-chat, http://127.0.0.1:8080/v1"), "llm.providers.local-gw")
+	body := readConfigBody320(t, dir)
+	for _, frag := range []string{
+		"[llm.providers.local-gw]",
+		"protocol = 'openai-chat'",
+		"base_url = 'http://127.0.0.1:8080/v1'",
+		"[llm.providers.local-gw.models." + customModel320 + "]",
+	} {
+		if !strings.Contains(body, frag) {
+			t.Errorf("config.toml does not carry %q:\n%s", frag, body)
+		}
+	}
+
+	// Read back: the row and its catalog entry reach the page's own data source.
+	reply, err := disp.Handle(ctx, `{"method":"config.get","requestId":"r-320-custom-get","source":"panel-composer"}`)
+	if err != nil {
+		t.Fatalf("config.get after the custom row: %v", err)
+	}
+	row := providerRow320(t, settingsPayload313(t, reply), "local-gw")
+	models, _ := row["models"].([]any)
+	if row["modelCount"] != float64(1) || len(models) != 1 || models[0] != customModel320 {
+		t.Errorf("the custom row read back as %v", row)
+	}
+	if row["hasBaseURL"] != true {
+		t.Errorf("the read side does not see the base_url: %v", row)
+	}
+
+	// Refusal direction: a built-in preset name belongs to provider_row_create,
+	// and the whole value must be present - both leave the file byte-identical.
+	before := readConfigBody320(t, dir)
+	if _, err := disp.Handle(ctx, set313Env("r-320-custom-preset", panel.FieldProviderRowCreateCustom, "stepfun", "",
+		"openai-chat,https://api.stepfun.com/v1")); err == nil {
+		t.Fatal("a preset name cleared the custom-row step")
+	} else if !strings.Contains(err.Error(), "provider_row_create") {
+		t.Errorf("the preset-name refusal does not name the step that owns preset rows: %v", err)
+	}
+	if _, err := disp.Handle(ctx, set313Env("r-320-custom-novalue", panel.FieldProviderRowCreateCustom, "local-gw-two", "",
+		"openai-chat")); err == nil {
+		t.Fatal("a value with no second half cleared the custom-row step")
+	} else if !strings.Contains(err.Error(), "base_url") {
+		t.Errorf("the half-value refusal does not name the missing half: %v", err)
+	}
+	if after := readConfigBody320(t, dir); after != before {
+		t.Errorf("config.toml changed under the two refused custom-row writes:\n%s", after)
+	}
+
+	// Control: a second custom row still lands after both refusals.
+	apply313(t, disp, set313Env("r-320-custom-ctl", panel.FieldProviderRowCreateCustom, "local-gw-four", "",
+		"openai-responses,http://127.0.0.1:4/v1"), "llm.providers.local-gw-four")
+	if body := readConfigBody320(t, dir); !strings.Contains(body, "[llm.providers.local-gw-four]") {
+		t.Errorf("the control custom row did not land:\n%s", body)
+	}
+}
