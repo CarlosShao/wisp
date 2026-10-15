@@ -99,7 +99,9 @@ stat，与 fd 上对象必不同 ⇒ SameFile 假）。⇒ 判据必须问"**是
 
 `120r3-run1-teeth-on.log`：`go-test rc=0`／`RUN=62`／顶层 `PASS=40 FAIL=0 SKIP=0`／全行 `PASS=62 FAIL=0 SKIP=0`。
 交件锚再确认一发（`e1973191`，编排者的 4 枚 `.scratch/**` 存档件之后，Go 字节未变）：
-`120r3-run4-confirm-at-final-anchor.log` 同数 **rc=0 / RUN=62 / PASS=62 / FAIL=0 / SKIP=0**。
+`120r3-run4-confirm-at-final-anchor.log` 同数 **rc=0 / RUN=62 / PASS=62 / FAIL=0 / SKIP=0**；
+交件件落盘后再确认一发（`120r3-run5-confirm-at-delivery-commit.log`，锚 `adec1db1`＝本腿 2232f206 之后编排者
+又落了 `.scratch/**` 存档件，Go 字节未变）＝**rc=0 / RUN=62 / PASS=62 / FAIL=0 / SKIP=0**（顶层尺 40）。
 参照 120-v1 §2 的那发：同一支牙**去两支**跑整包是 `55/55/0/0 rc=0`（零枚变色＝今天没这世界）；
 补完之后同一牙形必须出现红——本件两发各出 2 枚红，都是本腿用例。
 
@@ -112,8 +114,8 @@ stat，与 fd 上对象必不同 ⇒ SameFile 假）。⇒ 判据必须问"**是
 | `GOOS=darwin GOARCH=arm64 go vet ./internal/winsec/` | 派单点名的交叉尺 | **0** | `120r3-vet-darwin.log` |
 | `gofmt -l`（三枚） | 空输出＝0 字节 | **0** | `120r3-gofmt.log`（`body=0 bytes`） |
 | `/d/work/base/gopath/bin/gofumpt -l`（绝对路径） | 空输出＝0 字节 | **0** | `120r3-gofumpt.log`（`body=0 bytes`） |
-| `sh scripts/d22scan.sh` | 注释豁免、字符串不豁免、零 emoji | **0** | `clean - no D22 ban violations`；分母 **无一下降**：`internal/=568`（120-v1 报 564，+4 含本腿 3 枚）、`cmd/=136`、`ban#7 internal/tools/=25`、`ban#6/#8 frontend/=116`、`ban#8 design/=39`、`examined 280` |
-| `sh scripts/check-path-length-budget.sh` | VERDICT GREEN | **0** | `longest=185 chars relative`（仍是别腿那枚 252 的旧件）、`worst full path=229`；本腿最长新件 62 字符（`.scratch/wisp/probes/120/r3/120r3-teeth-on-verdict-by-name.txt`），⛔ 动名册 |
+| `sh scripts/d22scan.sh` | 注释豁免、字符串不豁免、零 emoji | **0** | `clean - no D22 ban violations`；分母 **无一下降**：`internal/=568`（120-v1 报 564，+4 含本腿 3 枚）、`cmd/=136`、`ban#7 internal/tools/=25`、`ban#6/#8 frontend/=116`、`ban#8 design/=39`、`examined 280`。★交件后又跑一发（`2232f206` 之后）仍 **0**，`cmd/=137`＝别腿 287-r1 落了 `cmd/wisp` 测试件，与本腿无关，⛔ 动分母 |
+| `sh scripts/check-path-length-budget.sh` | VERDICT GREEN | **0** | `longest=185 chars relative`（仍是别腿那枚 252 的旧件）、`worst full path=229`；本腿最长新件 62 字符（`.scratch/wisp/probes/120/r3/120r3-teeth-on-verdict-by-name.txt`），⛔ 动名册；交件后复跑仍 **0**（`roster entries=60`＝名册与树相等，本腿没加过预算件） |
 | 容器整包（成对三发） | teeth-on／tooth-269／tooth-272 | **0／1／1** | §3 逐字 |
 | 容器名册（两发） | `TestAC[1-4]POSIX`／`120r3$` | **0／0** | 38/38/0/0 与 7/7/0/0 |
 
