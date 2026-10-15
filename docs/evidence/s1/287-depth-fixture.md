@@ -119,7 +119,11 @@ Execute**, because "reachable but refused" is a weaker guarantee than "not offer
 台面自抓（细节在 probes 件 §5）：① 首版把 `⊂`（U+2282，字符串不豁免）写进 `t.Errorf` 文案 ⇒ d22scan 真红过一次，
 改文案后 rc=0；② M3 的整包档跑到 `Test197RowExistsBeforeFirstChildModelCall` 时挂住（M3 把派生一律拒了），
 本腿掐掉该趟并具名登记先红的 5 枚 ⇒ ⛔ 当本票读数；③ 突变体第一趟被 Python 文本模式写成 CRLF，
-"落地尺寸"账本失真 ⇒ 改逐字节替换后第二趟重跑，hunks=1／改行数=1 逐发对上。
+"落地尺寸"账本失真 ⇒ 改逐字节替换后第二趟重跑，hunks=1／改行数=1 逐发对上；④ ⚠ 复跑台件的人先看：本机
+`git config core.autocrlf = true`（现量）、`git add` 已对本目录 `.log`/`.bak`/`mutants/*.go` 打过
+"LF will be replaced by CRLF" 的警告 ⇒ 用 `subagent_197.go.pre-mutation.bak` 当字节基线之前先跑
+`grep -c $'\r'` 证它＝0（本腿交件时现量 0，新用例文件 disk sha＝blob sha `02cbaf10da0cedd4…`），
+不是 0 就改用 `git show HEAD:internal/tools/subagent_197.go` 重落一份（probes 件 §5.7）。
 
 ## 6. 没做完／待人拍板（具名，⛔ blanks）
 

@@ -169,6 +169,15 @@ subagent_depth_fixture_287_test.go:221: 孩子行 = 0 枚 [], want 1：{CallID:c
    处置＝台件改成 `read_bytes`/`write_bytes` 逐字节替换（`run-mutations.sh` 现形），三枚 CRLF 拷贝改名留档在
    `mutants/stale-crlf/`，第二趟重跑：三发各自 **hunks=1／改行数=1**、种后 sha 与第一趟逐字节一致
    （`69087120…`／`7c7185cc…`／`5aaba840…`），红句点位不变。
+7. ⚠ **下一位跑这台件的人先看这条**：本机 `git config core.autocrlf = true`（现量），`git add` 时 git 已经对
+   本目录的 `.log`／`.bak`／`mutants/*.go` 打过 "LF will be replaced by CRLF the next time Git touches it"
+   的警告。⇒ 盘上那份 `subagent_197.go.pre-mutation.bak` 在**任何 checkout/reset 之后**可能是 CRLF，
+   拿它 `cp` 回产码会让整枚文件在 `git diff HEAD` 里看起来全红（并且会把 CRLF 带进 gofmt/d22scan 的射程）。
+   用之前先跑一把 `grep -c $'\r' .scratch/wisp/probes/287/r1/subagent_197.go.pre-mutation.bak`，**必须是 0**
+   （本腿交件时现量＝0，且新用例文件的 disk sha 与 blob sha 同串 `02cbaf10da0cedd4…`）；
+   不是 0 就⛔ 用这枚 `.bak` 当字节基线，改用 `git show HEAD:internal/tools/subagent_197.go` 重新落一份。
+   本腿的三发还原判定用的是**同一枚 `.bak` 回灌＋sha 等值**（`RESTORED-EQUAL-OK` ×3，且每发之后都跑了
+   `git status --porcelain -- internal` 打印），所以那三趟没有踩到这个坑；这条只是防下一趟。
 
 ## 6. 本腿没做／待人拍板
 
