@@ -1,5 +1,5 @@
-== rebuild the snapshot from HEAD (6eb3d2e8) ==
-go-files-in-snapshot=1076 winsec-go=36
+== rebuild the snapshot from HEAD (29be2b67) ==
+go-files-in-snapshot=1085 winsec-go=36
 clean sha256 of internal/winsec/winsec_other.go = 137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313
 183:func sameObjectPinned(path, name string, parent *os.Root, pinned fs.FileInfo) error {
 256:func sealHandle(f *os.File) error {
@@ -14,8 +14,8 @@ LANDS: tooth 269 targets line 269 of internal/winsec/winsec_other.go, inside fun
 LANDS: after: 	if false && now.Mode()&os.ModeSymlink != 0 {
 LANDS: isolated - exactly 1 line in the file carries false && (grep -n: 269)
 changed-lines=2
---- /d/tmp/probe120r3/fixed/internal/winsec/winsec_other.go.120r3.bak	2026-10-15 22:00:28.254567300 +0800
-+++ /d/tmp/probe120r3/fixed/internal/winsec/winsec_other.go	2026-10-15 22:00:28.614194400 +0800
+--- /d/tmp/probe120r3/fixed/internal/winsec/winsec_other.go.120r3.bak	2026-10-15 22:22:08.506999900 +0800
++++ /d/tmp/probe120r3/fixed/internal/winsec/winsec_other.go	2026-10-15 22:22:08.722872200 +0800
 +	if false && now.Mode()&os.ModeSymlink != 0 {
 mutated sha256 = e81a8bf7a4478490c464fd9142c4c0455ab4a921230df8fed74647b5814739c5
 === tooth-269: docker-and-test rc=1 (go-test rc line inside /d/tmp/probe120r3/logs/tooth-269.log)
@@ -31,17 +31,18 @@ LANDS: tooth 272 targets line 272 of internal/winsec/winsec_other.go, inside fun
 LANDS: after: 	if false && !os.SameFile(pinned, now) {
 LANDS: isolated - exactly 1 line in the file carries false && (grep -n: 272)
 changed-lines=2
---- /d/tmp/probe120r3/fixed/internal/winsec/winsec_other.go.120r3.bak	2026-10-15 22:00:34.084859600 +0800
-+++ /d/tmp/probe120r3/fixed/internal/winsec/winsec_other.go	2026-10-15 22:00:34.340891200 +0800
+--- /d/tmp/probe120r3/fixed/internal/winsec/winsec_other.go.120r3.bak	2026-10-15 22:22:13.033520900 +0800
++++ /d/tmp/probe120r3/fixed/internal/winsec/winsec_other.go	2026-10-15 22:22:13.621428600 +0800
 +	if false && !os.SameFile(pinned, now) {
 mutated sha256 = d859e67263508ca702127ca9d62df5b2af81f9fd50f848a848f96cd3d246faa5
 === tooth-272: docker-and-test rc=1 (go-test rc line inside /d/tmp/probe120r3/logs/tooth-272.log)
 RUN=62 (=== RUN rows, t.Run subtests included)
-top-level result rows (anchored ^---): PASS=38 FAIL=2 SKIP=0
-all result rows (unanchored, the 120-v1 口径: PASS=RUN when nothing fails): PASS=60 FAIL=2 SKIP=0 counted from /d/tmp/probe120r3/logs/tooth-272-body.log
+top-level result rows (anchored ^---): PASS=37 FAIL=3 SKIP=0
+all result rows (unanchored, the 120-v1 口径: PASS=RUN when nothing fails): PASS=59 FAIL=3 SKIP=0 counted from /d/tmp/probe120r3/logs/tooth-272-body.log
 --- failing names:
 --- FAIL: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.00s)
 --- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)
+--- FAIL: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.14s)
 RESTORE MATCHES: 137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313
 == repo working tree must be untouched by the whole control ==
 repo sha256 of internal/winsec/winsec_other.go = 137442cdecbb77701c7029c42960593016a152fc965679613314b764c13e2313 (compare with the clean sha above)

@@ -1,5 +1,5 @@
-== snapshot: rebuilt from HEAD 627998fc, .go counted before any measurement ==
-go-files=1076 winsec-go=36
+== snapshot: rebuilt from HEAD 29be2b67, .go counted before any measurement ==
+go-files=1085 winsec-go=36
 
 == container roster 1: the ticket's own AC#1-4 POSIX filter, counted as it stands today ==
 === roster-ac1234: run-filter='TestAC[1-4]POSIX' docker-and-test rc=0
@@ -33,8 +33,8 @@ d22scan: scope ban #7 internal/tools/   examined  25 production Go files
 d22scan: scope ban #8 design/           examined  39 text files
 d22scan: scope ban #8 frontend/         examined 116 text files
 d22scan: scope ban #8 internal/         examined 568 Go files, comments and _test.go included
-d22scan: scope ban #8 cmd/              examined 136 Go files, comments and _test.go included
-d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=239, bans #1-5 cmd/=41, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=568, ban #8 cmd/=136; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 568 Go files, comments and _test.go included; cmd/ 136 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 138 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=239, bans #1-5 cmd/=41, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=568, ban #8 cmd/=138; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 568 Go files, comments and _test.go included; cmd/ 138 Go files, comments and _test.go included
 sh scripts/d22scan.sh rc=0
 check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
 check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
