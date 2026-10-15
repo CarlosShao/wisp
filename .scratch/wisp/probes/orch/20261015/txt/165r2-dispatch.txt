@@ -1,0 +1,37 @@
+# 165-r2 派单（票 165 **装配半格**：把已实现有测试的 plan 家族接进生产装配；写面＝`cmd/wisp` 装配一处＋名册钉）
+
+★**本单=待派，不是在飞**（`A993` 定式：存档≠放腿）。释放条件＝`324-r1` 交完收件、`cmd/wisp` 写面空、且 `go test ./cmd/wisp` 没人占。
+编排者写单时刻 2026-10-15 21:2x +08。
+
+你 = Wisp 流水线落地腿 **165-r2**（实现者；判语归非实现者）。仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令加引号），分支 `dev`，Shell＝Git Bash。
+
+## 0. 这一单为什么存在（★"写了没接线"那一族，本仓定式：⛔ 用 `go build`/`vet` 的 rc=0 冒充接线）
+- `165-r1` 已把实现落在 `internal/tools/plan_present.go`，并有测试件 `internal/tools/plan_present_165_test.go`。
+- **编排者 21:2x 现量**（`grep -rn "BuiltinPlanEntries" --include=*.go internal cmd | grep -v _test`）⇒ 产码侧命中 **0 处**，只有 `internal/tools/plan_present.go:138` 那枚定义自己；
+  测试侧两枚命中（`:76` 名册 append、`:286` 取 `[0]`）⇒ **今天没有生产调用者**。这把尺可重跑，你起手先复跑一遍并把结果写进件里。
+- 先例形状＝子代理家族**已接**：`cmd/wisp/run.go:783`（现量号）`for _, e := range tools.BuiltinSubagentEntries(tools.SubagentDeps{`——plan 家族**照这一形的样子**接，⛔ 另造一套装配。
+
+## 1. 你要做的（一格：把那一行接上；⛔ 扩大射程）
+- **AC#1 未修码读数**：先在**未接线**的当前树上量"只读地出一份方案"这一发到不到得了（装配名册里没有它＝到不了），读数落盘；⛔ 不许把"应该做不到"写成交件。
+- **接线**：在 `cmd/wisp` 的装配处把 `tools.BuiltinPlanEntries()` 并进那批 builtin entries（与 subagent 那枚同一循环形状）。⛔ 不改 `internal/tools/**` 一字（那是 `287-r1` 的面，且本票已完成）。
+- **接线钉（★本票最要紧，否则又是"rc=0 证明不了接线"）**：加/用**调用点枚数尺**或整包颜色两形之一，且给**摘掉那一行必须红**的正控（物理改写＋sha 还原，⛔ `-overlay`——它只换编译期输入、对运行时读盘的尺失明）。
+  ⚠ 名册若已有"该工具在名单里"那把尺，要问清它读的是**产码装配**还是**测试自己 append 的那份**（`plan_present_165_test.go:76` 就是测试自己拼的 ⇒ ⛔ 拿它当"已接"的凭据）。
+- **AC#2 复用形状**：`--name-only` 名册自证没动 `internal/risk/**` 与状态机文件；⛔ 新增状态（新增了本票退回、转 `Q##`）。
+- **AC#3 两发变异**：①批完方案后来一发**没在方案里**的写 ⇒ 必须响；②摘掉"批过的范围"这一味 ⇒ 是否存在一发越界从此打不红（有就具名报，⛔ 自己顺手补）。
+- **AC#4 面板不许代答**：只加"发起请求"的出口，⛔ 加"给出允许"的出口（绝对禁令在案）。
+- **AC#5 契约轴零字节**：`docs/PLAN.md`／`docs/specs/**`／`internal/risk/**`／`internal/panel/**`／`internal/agent/approval/**`／`thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**`。
+
+## 2. 面与台面（今天现撞，⛔ 当读数）
+- `go test ./cmd/wisp` 有**整进程死亡区**（票 314，开窗段 ~174–212 s）⇒ **只用定向 `-run`**；开工前 `tasklist` 初判该面没人占并具名写下。
+- `PATH` 缺 `third_party/sherpa-onnx` ⇒ `0xc0000135` **且无 `--- FAIL`＝根本没跑**。
+- `GOTMPDIR` 先 `mkdir -p`，C: 卷＋只反斜杠：`C:\Users\swq\AppData\Local\wisp-test-gotmp\165r2gotmp`。
+- ⛔ `cmd | tail` 之后取 `${PIPESTATUS[0]}`；定式 `cmd > /d/tmp/165r2.log 2>&1; rc=$?`。
+- **已知存量红一枚**＝`TestTicket255RosterStillMatchesTheActualReadSites`（归口票 324、`324-r1` 正在修）⇒ 具名记色、⛔ 计入本票、⛔ 去修；若你的接线**动了名册枚数**，具名写"这一枚名册会因我而变"，⛔ 为了让它安静去改尺。
+
+## 3. 纪律（git／shell／写面）
+- 写面**只许**：`cmd/wisp/**`（装配那一处＋钉）、`docs/evidence/s1/165-wiring.md`、`.scratch/wisp/probes/165/r2/`、票 165 末尾 **1** 条 bullet。⛔ 翻 AC 框、⛔ 改票名/Status/台账。
+- **只 commit、⛔ push**；`add`／`commit` 两处**逐文件显式 pathspec**（⛔ 目录形）。⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ⛔ 双引号串里出现反引号或 `$`；进 shell 的正文一律单引号或加引号 heredoc。临时件只建不删；⛔ 读二进制；件名 ⛔ 长名、⛔ `§`。
+- 门禁逐条带 `rc=`：`go build ./...`／`gofmt -l`／`gofumpt -l`（绝对路径 `/d/work/base/gopath/bin/gofumpt`）／`go vet -tags winlive ./cmd/wisp/`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`。
+- ≤5 件、每件 ≤260 行；没做完的格具名写"没做完"。
+- **编排者会逐把尺复跑，你自报的数字不当数。**

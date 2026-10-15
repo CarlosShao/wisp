@@ -1,0 +1,41 @@
+# 321-v1 派单（票 321 **非实现者终裁**：托盘/热键那一跳的执行器接线钉到底有没有牙；面＝`cmd/wisp`＋其测试件；⛔ 实现者自判）
+
+★**本单=待派，不是在飞**（`A993` 的教训：存档≠放腿）。释放条件＝`324-r1` 交完并收件、`cmd/wisp` 写面与 `go test ./cmd/wisp` 都空出来。
+编排者写单时刻 2026-10-15 21:2x +08。
+
+你 = Wisp 流水线的验收腿 **321-v1**。身份＝**非实现者**（产码与钉由落地腿 `321-r1` 完成、提交 `58de465a`；⛔ 由它或编排者追认你裁的每一格）。
+仓库 `D:\work\workspace\projects plans\Wisp`（路径带空格⇒命令加引号），分支 `dev`，Shell＝Git Bash。
+
+## 0. 起手先读三处
+1. 票面：`.scratch/wisp/issues/321-tray-hotkey-gesture-wiring-to-holder-toggle-has-no-case-that-reds-if-rewired.md`（AC#1 接线钉＋AC#2 门禁）
+2. 实现者的件：`docs/evidence/s1/321-toggle-hop.md` ＋ 读数目录 `.scratch/wisp/probes/321/r1/`
+3. 它守的那一行（**现量**，别抄号）：`cmd/wisp/resident_windows.go` 的 `withPanelHost(func(via string) bool { return holder.toggle(via) })`
+
+## 1. 你要裁的（逐格三态：成立／不成立／缺世界；⛔ "附条件通过"）
+1. **AC#1 的牙**：`321-r1` 交了两把尺（`cmd/wisp/exec_holder_toggle_321_test.go`）——
+   - 形 A：**AST 尺**，读 `withPanelHost` 那个闭包里绑的执行器名字必须逐字等于 `toggle`；
+   - 形 B：**能力尺**，被点名的那个方法真的投递 `RequestToggle`。
+   ⇒ 你各攻一发：**形 A** 把闭包里换成 `holder.show`（**物理改写＋sha256 还原**，⛔ `-overlay`——★本仓定式：overlay 只换编译期输入，对"运行时读盘的尺"失明）⇒ **指名用例必须红**，红句要能点出"这一跳不是 toggle 语义"（⛔ 只要"编译不过/别处红"就算过）。
+   ⇒ **再攻它的反向**：把闭包体改成 `return holder.toggle(via) || false` 之类的**等价改写**，形 A 该**仍绿**（若它也红＝尺在认字面而非认绑定，判"射程过宽"具名报回）。
+2. **★它有没有拿"手势到得了线程"冒充本格**（票面"反面"那一格明令不许）：核 `TestBallPanelGesturesReachThePanelThread` **没有**被当成 AC#1 的凭据；若实现件里引了它，判**不成立**。
+3. **形 B 是不是恒真**：什么取值能让形 B 红？自己造一发（把被点名方法体里的 `RequestToggle` 投递换成 `RequestShow`，物理改写＋还原）⇒ 必须红。若两形都绿 ⇒ 具名判"这把尺零敏感"。
+4. **还原证明**：`git status --porcelain -- cmd/wisp internal` 必须回到空，且你**自己**跑一遍 `git diff` 0 字节（⛔ 抄腿的 hash 串，要自己算起讫两值）。
+5. **AC#2 门禁独立性**：⛔ 抄腿的 rc。自己跑 `go build ./...`／`gofumpt -l`（绝对路径 `/d/work/base/gopath/bin/gofumpt`，腿 `320-v1` 因 PATH 缺这命令欠过一发）／`go vet -tags winlive ./cmd/wisp/`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`，每把尺带 `rc=` 落盘。
+
+## 2. 写面（极窄）
+- **只新建** `docs/evidence/s1/321-wiring-accept.md`（短名、⛔ `§`）＋票 321 末尾 **1** 条 bullet
+- ⛔ 任何产码/测试码改动（突变台件只进 `.scratch/wisp/probes/321/v1/`）；⛔ 翻 AC 框；⛔ 改票名/Status/台账；⛔ `frontend/**`／`design/**`
+
+## 3. 面与台面（今天现撞的四次，⛔ 当读数）
+- `go test ./cmd/wisp` 有**整进程死亡区**（票 314，开窗段 ~174–212 s）⇒ **只用定向 `-run`**，⛔ 整包；同一次只许一枚腿在这面上跑（你开工前 `tasklist | grep -i "wisp.*test\|cmd_wisp"` 初判并具名写下）。
+- `PATH` 缺 `third_party/sherpa-onnx` ⇒ `0xc0000135` **且无 `--- FAIL`＝根本没跑**。
+- `GOTMPDIR` 先 `mkdir -p`，C: 卷＋只反斜杠形：`C:\Users\swq\AppData\Local\wisp-test-gotmp\321v1gotmp`。
+- ⛔ `cmd | tail` 之后取 `${PIPESTATUS[0]}`；定式 `cmd > /d/tmp/321v1.log 2>&1; rc=$?`。
+- ⛔ 把别家腿的在飞态当"存量红"：**已知存量红一枚**＝`TestTicket255RosterStillMatchesTheActualReadSites`（归口票 324、`324-r1` 正在修）⇒ 你只许具名记色、⛔ 计入本票、⛔ 去修。
+
+## 4. 纪律（git／shell）
+- **只 commit、⛔ push**；`add`／`commit` 两处**逐文件显式 pathspec**（⛔ 目录形）。⛔ `add -A`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ⛔ 双引号串里出现反引号或 `$`（本仓第 5 次事故）；进 shell 的正文一律单引号或加引号 heredoc。
+- 突变台件：输出先落文件、`finally` 还原（中途炸会把突变留在跟踪文件里）；`.bak` **⛔ 删**（临时件只建不删）。
+- 输出预算：≤3 件、每件 ≤200 行；每格判语必须带**读数行**（引红句连文案）；没裁完的格具名自报"没裁完"。
+- **编排者会逐把尺复跑，你自报的数字不当数。**
