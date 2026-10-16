@@ -1,0 +1,48 @@
+clean sha256 = 19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2
+backup kept (never deleted) = /d/tmp/probe120v2/head/internal/winsec/winsec_other.go.bak-120v2-teeth-on
+sealHandle body range = 287 307   sameObjectPinned body range = 214 226
+whole-file occurrences of the link predicate: 219:	if now.Mode()&os.ModeSymlink != 0 { 300:	if now.Mode()&os.ModeSymlink != 0 { 455:	return info.Mode()&os.ModeSymlink != 0 
+whole-file occurrences of the identity predicate: 222:	if !os.SameFile(pinned, now) { 303:	if !os.SameFile(pinned, now) { 
+v2-teeth-on go-test rc=0
+v2-teeth-on RUN=71 TOPPASS=43 TOPFAIL=0 TOPSKIP=0
+--- control 1: neuter the link face INSIDE sealHandle ---
+sealHandle link-face line(s) in range: [300]  (count=1)
+before: 	if now.Mode()&os.ModeSymlink != 0 {
+after : 	if false && now.Mode()&os.ModeSymlink != 0 {
+LANDS: false && in file at lines: 300:	if false && now.Mode()&os.ModeSymlink != 0 {   count=1
+mutated sha256 = 989af68717ee5b05296c8fc094be253dd2e0588712afdb00fef4a08ab1d3f88a
+v2-tooth-handle-link go-test rc=1
+v2-tooth-handle-link RUN=71 TOPPASS=41 TOPFAIL=2 TOPSKIP=0
+v2-tooth-handle-link FAILED --- FAIL: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+v2-tooth-handle-link FAILED --- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+RESTORE MATCHES (19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2)
+--- control 2: neuter the SameFile face INSIDE sealHandle ---
+sealHandle SameFile-face line(s) in range: [303]  (count=1)
+before: 	if !os.SameFile(pinned, now) {
+after : 	if false && !os.SameFile(pinned, now) {
+LANDS: false && in file at lines: 303:	if false && !os.SameFile(pinned, now) {   count=1
+mutated sha256 = 76e49806edae651d03f2fcaf3f58ef009f780e820309031494bfecb56124dd54
+v2-tooth-handle-samefile go-test rc=1
+v2-tooth-handle-samefile RUN=71 TOPPASS=41 TOPFAIL=2 TOPSKIP=0
+v2-tooth-handle-samefile FAILED --- FAIL: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.00s)
+v2-tooth-handle-samefile FAILED --- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)
+RESTORE MATCHES (19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2)
+--- control 3: neuter BOTH faces INSIDE sameObjectPinned (the other pair) ---
+sameObjectPinned faces in range: [219 222]  (count=2)
+before line 219: 	if now.Mode()&os.ModeSymlink != 0 {
+after  line 219: 	if false && now.Mode()&os.ModeSymlink != 0 {
+before line 222: 	if !os.SameFile(pinned, now) {
+after  line 222: 	if false && !os.SameFile(pinned, now) {
+LANDS: false && in file at lines: 219:	if false && now.Mode()&os.ModeSymlink != 0 { 222:	if false && !os.SameFile(pinned, now) {   count=2
+mutated sha256 = 3dc077484d9b4fd1e6e6cd87f73e49d7b9282958c0caa647cf6a5e095e9dddbf
+v2-tooth-walk-pair go-test rc=1
+v2-tooth-walk-pair RUN=71 TOPPASS=39 TOPFAIL=4 TOPSKIP=0
+v2-tooth-walk-pair FAILED --- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.78s)
+v2-tooth-walk-pair FAILED --- FAIL: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+v2-tooth-walk-pair FAILED --- FAIL: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.15s)
+v2-tooth-walk-pair FAILED --- FAIL: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed (0.39s)
+RESTORE MATCHES (19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2)
+v2-restored-reconfirm go-test rc=0
+v2-restored-reconfirm RUN=71 TOPPASS=43 TOPFAIL=0 TOPSKIP=0
+final file sha256 = 19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2   clean = 19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2
+driver done

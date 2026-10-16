@@ -1,0 +1,20 @@
+--- control: neuter sameObjectPinned walk-link-face at line 219 ---
+before: 	if now.Mode()&os.ModeSymlink != 0 {
+after : 	if false && now.Mode()&os.ModeSymlink != 0 {
+LANDS: false && lines: 219:	if false && now.Mode()&os.ModeSymlink != 0 {  count=1
+mutated sha256 = 2b99434cfdfb1e29a6b8e7c3fabb558958456e0e63546c8a2dab4cddcf1382e5
+v2-tooth-walk-link-face go-test rc=1
+v2-tooth-walk-link-face RUN=71 TOPPASS=42 TOPFAIL=1 TOPSKIP=0
+v2-tooth-walk-link-face FAILED --- FAIL: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+RESTORE MATCHES (19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2)
+--- control: neuter sameObjectPinned walk-samefile-face at line 222 ---
+before: 	if !os.SameFile(pinned, now) {
+after : 	if false && !os.SameFile(pinned, now) {
+LANDS: false && lines: 222:	if false && !os.SameFile(pinned, now) {  count=1
+mutated sha256 = 375962438ef1c8475dfe55b053003092d9c13d05b29112c598ac5d22904acf93
+v2-tooth-walk-samefile-face go-test rc=1
+v2-tooth-walk-samefile-face RUN=71 TOPPASS=41 TOPFAIL=2 TOPSKIP=0
+v2-tooth-walk-samefile-face FAILED --- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.89s)
+v2-tooth-walk-samefile-face FAILED --- FAIL: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed (0.68s)
+RESTORE MATCHES (19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2)
+final sha256 = 19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2 clean = 19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2

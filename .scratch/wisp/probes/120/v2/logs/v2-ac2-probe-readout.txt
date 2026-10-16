@@ -1,0 +1,5 @@
+AC#2 P1 syscall.O_NOFOLLOW = 0x20000 (131072)
+AC#2 P2 Root.OpenFile(O_RDONLY|O_NOFOLLOW) on a relative sibling link: OPENED, and the descriptor stands on the TARGET object=true
+AC#2 P3 Root.Create on an absent name: OPENED (no exclusivity claimed)
+AC#2 P3b Root.Create over the leaf link: OPENED
+AC#2 P4 getuid=0
