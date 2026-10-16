@@ -1,0 +1,73 @@
+time=2026-10-16T12:17:58.336+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/empty
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/plain_ascii
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/windows_path_untouched
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/chinese_untouched
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/esc
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/nul
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/crlf
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/tab
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/del
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_next_line
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_device_control
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_highest
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/invalid_utf8_byte
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/two_escs_keep_both
+--- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/empty (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/plain_ascii (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/windows_path_untouched (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/chinese_untouched (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/esc (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/nul (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/crlf (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/tab (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/del (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_next_line (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_device_control (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_highest (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/invalid_utf8_byte (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/two_escs_keep_both (0.00s)
+=== RUN   TestTheWashReturnsTheSameStringWhenThereIsNothingToWash
+--- PASS: TestTheWashReturnsTheSameStringWhenThereIsNothingToWash (0.00s)
+=== RUN   TestTheSnapshotBoundaryWashesBothRosterFieldsAndCopiesTheRows
+--- PASS: TestTheSnapshotBoundaryWashesBothRosterFieldsAndCopiesTheRows (0.00s)
+=== RUN   TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow
+time=2026-10-16T12:17:58.401+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow432824689\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:17:58.411+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:17:58Z duration_ms=10
+time=2026-10-16T12:17:58.422+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow432824689\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:17:58.430+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:17:58Z duration_ms=8
+time=2026-10-16T12:17:58.443+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow432824689\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:17:58.450+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:17:58Z duration_ms=7
+time=2026-10-16T12:17:58.458+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:17:58.462+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    display_scrub_216_test.go:166: AC#3 menu row as the page receives it: "photo\\x1b已允许.png"
+--- PASS: TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow (0.11s)
+=== RUN   TestTheClaimInANameChangesNoVerdict
+time=2026-10-16T12:17:58.494+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict1191704857\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:17:58.502+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:17:58Z duration_ms=7
+time=2026-10-16T12:17:58.511+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict1191704857\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:17:58.521+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:17:58Z duration_ms=10
+time=2026-10-16T12:17:58.532+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict1191704857\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:17:58.538+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:17:58Z duration_ms=6
+time=2026-10-16T12:17:58.543+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:17:58.545+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:17:58.564+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict1191704857\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:17:58.573+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:17:58Z duration_ms=8
+time=2026-10-16T12:17:58.580+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict1191704857\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:17:58.585+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:17:58Z duration_ms=5
+time=2026-10-16T12:17:58.593+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict1191704857\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:17:58.599+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:17:58Z duration_ms=6
+time=2026-10-16T12:17:58.604+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:17:58.606+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    display_scrub_216_test.go:248: real assessor verdicts: plain=L2/[R1 R8] hostile=L2/[R1 R8] washed=L2/[R1 R8]
+--- PASS: TestTheClaimInANameChangesNoVerdict (0.15s)
+=== RUN   TestWorkspaceAbsentAndWorkspaceUnreadAreTwoSentences
+    display_scrub_216_test.go:299: AC#4 pair: 没有="未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定" / 读不到="工作区这一维没有读数：本机的快照泵没有被接入工作区读数腿（PumpSources.Workspace=nil），所以「未选择工作区」这句话我没有资格说——这里是没有读数，不是没有工作区（票 216 AC#4；票 200 的 not_run 是同一纪律）"
+--- PASS: TestWorkspaceAbsentAndWorkspaceUnreadAreTwoSentences (0.00s)
+=== RUN   TestTheFiveInstructionStatesAreStillTheDiskSpelling
+--- PASS: TestTheFiveInstructionStatesAreStillTheDiskSpelling (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.365s
+rc=0

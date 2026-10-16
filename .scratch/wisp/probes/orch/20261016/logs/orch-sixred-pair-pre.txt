@@ -1,163 +1,181 @@
 === PRE-WIRING (fd01e7962) ===
-2026-10-16 11:39:32 +0800
+2026-10-16 11:49:02 +0800
 anchor=fd01e7962
-time=2026-10-16T11:39:50.450+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
-time=2026-10-16T11:39:50.508+08:00 level=INFO msg="MARK299 before CreateWindowExW"
-time=2026-10-16T11:39:50.515+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0xd9106a0"
-time=2026-10-16T11:39:50.515+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x18 known=true"
-time=2026-10-16T11:39:50.515+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x46 known=true"
-time=2026-10-16T11:39:50.521+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x46 known=true"
-time=2026-10-16T11:39:50.522+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x86 known=true"
-time=2026-10-16T11:39:50.523+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x7f known=true"
-time=2026-10-16T11:39:50.523+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x7f known=true"
-time=2026-10-16T11:39:50.523+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x7f known=true"
-time=2026-10-16T11:39:50.523+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x6 known=true"
-time=2026-10-16T11:39:50.524+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x281 known=true"
-time=2026-10-16T11:39:50.524+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x282 known=true"
-time=2026-10-16T11:39:50.524+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x3d known=true"
-time=2026-10-16T11:39:50.524+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x3d known=true"
-time=2026-10-16T11:39:50.524+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x7 known=true"
-time=2026-10-16T11:39:50.524+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x85 known=true"
-time=2026-10-16T11:39:50.525+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x14 known=true"
-time=2026-10-16T11:39:50.525+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x47 known=true"
-time=2026-10-16T11:39:50.527+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x5 known=true"
-time=2026-10-16T11:39:50.527+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x3 known=true"
-time=2026-10-16T11:39:50.527+08:00 level=INFO msg="MARK299 after ShowWindow"
-time=2026-10-16T11:39:50.527+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0xf known=true"
-time=2026-10-16T11:39:50.527+08:00 level=INFO msg="MARK299 after UpdateWindow"
-time=2026-10-16T11:39:50.528+08:00 level=INFO msg="MARK299 after SetFocus"
-time=2026-10-16T11:39:50.528+08:00 level=INFO msg="MARK299 before Embed"
-time=2026-10-16T11:39:50.559+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x210 known=true"
-time=2026-10-16T11:39:50.562+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x31f known=true"
-time=2026-10-16T11:39:50.564+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x7f known=true"
-time=2026-10-16T11:39:50.569+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0xc0f9 known=true"
-time=2026-10-16T11:39:50.570+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x7f known=true"
-time=2026-10-16T11:39:50.570+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x7f known=true"
-time=2026-10-16T11:39:51.243+08:00 level=INFO msg="MARK299 after Embed"
-time=2026-10-16T11:39:51.481+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x14 known=true"
-time=2026-10-16T11:39:51.505+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0xf known=true"
-time=2026-10-16T11:39:51.521+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x18 known=true"
-time=2026-10-16T11:39:51.521+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x46 known=true"
-time=2026-10-16T11:39:51.524+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x47 known=true"
-time=2026-10-16T11:39:51.526+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x8 known=true"
-time=2026-10-16T11:39:51.527+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x281 known=true"
-time=2026-10-16T11:39:51.527+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x282 known=true"
-time=2026-10-16T11:39:51.542+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x18 known=true"
-time=2026-10-16T11:39:51.542+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x46 known=true"
-time=2026-10-16T11:39:51.550+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x85 known=true"
-time=2026-10-16T11:39:51.552+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x14 known=true"
-time=2026-10-16T11:39:51.553+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x47 known=true"
-time=2026-10-16T11:39:51.555+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0xf known=true"
-time=2026-10-16T11:39:51.582+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x18 known=true"
-time=2026-10-16T11:39:51.584+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x46 known=true"
-time=2026-10-16T11:39:51.587+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x47 known=true"
-time=2026-10-16T11:39:51.610+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x7f known=true"
-time=2026-10-16T11:39:51.625+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x7f known=true"
-time=2026-10-16T11:39:51.626+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0xc0f9 known=true"
-time=2026-10-16T11:39:51.636+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd9106a0 msg=0x7f known=true"
---- FAIL: TestAC4FocusReturnToPriorWindowGap33r5 (1.37s)
-    panel_host_windows_test.go:944: AC#4 focus hop (head HEAD-unknown): foreground before any panel 0x50102 | the ruler's own editor window 0x68010da | foreground while hidden (prior) 0x50102 | after Show 0x50102 | panel hwnd 0xd9106a0 | prevFocus recorded at Show 0x50102 | after Hide 0x50102 | Hide attempted restore to 0x50102 (SetForegroundWindow 1, SetFocus 0)
-    panel_host_windows_test.go:948: the panel did not take the foreground on Show: foreground 0x50102, panel hwnd 0xd9106a0 (AC#4 says only the panel takes focus when shown)
-time=2026-10-16T11:39:51.837+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
-time=2026-10-16T11:39:51.839+08:00 level=INFO msg="MARK299 before CreateWindowExW"
-time=2026-10-16T11:39:51.865+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0xae310c4"
-time=2026-10-16T11:39:51.865+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x18 known=true"
-time=2026-10-16T11:39:51.866+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x46 known=true"
-time=2026-10-16T11:39:51.873+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x46 known=true"
-time=2026-10-16T11:39:51.874+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x1c known=true"
-time=2026-10-16T11:39:51.874+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x86 known=true"
-time=2026-10-16T11:39:51.875+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x7f known=true"
-time=2026-10-16T11:39:51.876+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x7f known=true"
-time=2026-10-16T11:39:51.877+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x7f known=true"
-time=2026-10-16T11:39:51.878+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x6 known=true"
-time=2026-10-16T11:39:51.895+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x281 known=true"
-time=2026-10-16T11:39:51.905+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x282 known=true"
-time=2026-10-16T11:39:51.906+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x3d known=true"
-time=2026-10-16T11:39:51.907+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x3d known=true"
-time=2026-10-16T11:39:51.907+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x7 known=true"
-time=2026-10-16T11:39:51.909+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x85 known=true"
-time=2026-10-16T11:39:51.910+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x14 known=true"
-time=2026-10-16T11:39:51.910+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x47 known=true"
-time=2026-10-16T11:39:51.911+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x5 known=true"
-time=2026-10-16T11:39:51.912+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x3 known=true"
-time=2026-10-16T11:39:51.912+08:00 level=INFO msg="MARK299 after ShowWindow"
-time=2026-10-16T11:39:51.912+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0xf known=true"
-time=2026-10-16T11:39:51.912+08:00 level=INFO msg="MARK299 after UpdateWindow"
-time=2026-10-16T11:39:51.912+08:00 level=INFO msg="MARK299 after SetFocus"
-time=2026-10-16T11:39:51.912+08:00 level=INFO msg="MARK299 before Embed"
-time=2026-10-16T11:39:51.923+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x210 known=true"
-time=2026-10-16T11:39:51.924+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x31f known=true"
-time=2026-10-16T11:39:51.969+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x7f known=true"
-time=2026-10-16T11:39:51.970+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0xc0f9 known=true"
-time=2026-10-16T11:39:51.972+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x7f known=true"
-time=2026-10-16T11:39:51.975+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x7f known=true"
-time=2026-10-16T11:39:52.713+08:00 level=INFO msg="MARK299 after Embed"
-time=2026-10-16T11:39:52.999+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x14 known=true"
-time=2026-10-16T11:39:53.013+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0xf known=true"
-wisp: panel window is up (test-harness, cold 1194.7 ms, hot path 0.0 ms)
-time=2026-10-16T11:39:53.068+08:00 level=INFO msg="panel host: CreateWebResourceResponse needed attempt 2 of 3 (the stale-GetLastError defect named above)"
-time=2026-10-16T11:39:53.148+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x7f known=true"
-time=2026-10-16T11:39:53.148+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x7f known=true"
-time=2026-10-16T11:39:53.149+08:00 level=INFO msg="MARK299 wndproc hwnd=0xae310c4 msg=0x7f known=true"
-time=2026-10-16T11:39:53.233+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
-time=2026-10-16T11:39:53.234+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
---- FAIL: TestAC14GoSideEvalPushReachesThePage (1.40s)
+time=2026-10-16T11:49:10.015+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-10-16T11:49:10.180+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-16T11:49:10.187+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0xd180cb2"
+time=2026-10-16T11:49:10.187+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x18 known=true"
+time=2026-10-16T11:49:10.187+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x46 known=true"
+time=2026-10-16T11:49:10.196+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x46 known=true"
+time=2026-10-16T11:49:10.197+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x86 known=true"
+time=2026-10-16T11:49:10.199+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7f known=true"
+time=2026-10-16T11:49:10.201+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7f known=true"
+time=2026-10-16T11:49:10.201+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7f known=true"
+time=2026-10-16T11:49:10.202+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x6 known=true"
+time=2026-10-16T11:49:10.205+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x281 known=true"
+time=2026-10-16T11:49:10.205+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x282 known=true"
+time=2026-10-16T11:49:10.205+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x3d known=true"
+time=2026-10-16T11:49:10.206+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x3d known=true"
+time=2026-10-16T11:49:10.206+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7 known=true"
+time=2026-10-16T11:49:10.208+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x85 known=true"
+time=2026-10-16T11:49:10.209+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x14 known=true"
+time=2026-10-16T11:49:10.209+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x47 known=true"
+time=2026-10-16T11:49:10.210+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x5 known=true"
+time=2026-10-16T11:49:10.210+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x3 known=true"
+time=2026-10-16T11:49:10.210+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-10-16T11:49:10.210+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0xf known=true"
+time=2026-10-16T11:49:10.210+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-10-16T11:49:10.210+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-10-16T11:49:10.210+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-10-16T11:49:10.233+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x210 known=true"
+time=2026-10-16T11:49:10.234+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7f known=true"
+time=2026-10-16T11:49:10.234+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x282 known=true"
+time=2026-10-16T11:49:10.235+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x31f known=true"
+time=2026-10-16T11:49:10.236+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0xc0f9 known=true"
+time=2026-10-16T11:49:10.240+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0xc053 known=true"
+time=2026-10-16T11:49:10.240+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x288 known=true"
+time=2026-10-16T11:49:10.250+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7f known=true"
+time=2026-10-16T11:49:10.250+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7f known=true"
+time=2026-10-16T11:49:10.976+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-10-16T11:49:11.190+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x14 known=true"
+time=2026-10-16T11:49:11.241+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0xf known=true"
+time=2026-10-16T11:49:11.271+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x18 known=true"
+time=2026-10-16T11:49:11.271+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x46 known=true"
+time=2026-10-16T11:49:11.273+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x47 known=true"
+time=2026-10-16T11:49:11.275+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x86 known=true"
+time=2026-10-16T11:49:11.276+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x6 known=true"
+time=2026-10-16T11:49:11.282+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x8 known=true"
+time=2026-10-16T11:49:11.282+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x281 known=true"
+time=2026-10-16T11:49:11.283+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x282 known=true"
+time=2026-10-16T11:49:11.306+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x18 known=true"
+time=2026-10-16T11:49:11.306+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x46 known=true"
+time=2026-10-16T11:49:11.316+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x46 known=true"
+time=2026-10-16T11:49:11.316+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x86 known=true"
+time=2026-10-16T11:49:11.319+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x6 known=true"
+time=2026-10-16T11:49:11.331+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x281 known=true"
+time=2026-10-16T11:49:11.332+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x282 known=true"
+time=2026-10-16T11:49:11.332+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x3d known=true"
+time=2026-10-16T11:49:11.332+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x3d known=true"
+time=2026-10-16T11:49:11.332+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7 known=true"
+time=2026-10-16T11:49:11.335+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x85 known=true"
+time=2026-10-16T11:49:11.337+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x14 known=true"
+time=2026-10-16T11:49:11.337+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x47 known=true"
+time=2026-10-16T11:49:11.338+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0xf known=true"
+time=2026-10-16T11:49:11.389+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x18 known=true"
+time=2026-10-16T11:49:11.389+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x46 known=true"
+time=2026-10-16T11:49:11.391+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x47 known=true"
+time=2026-10-16T11:49:11.392+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x86 known=true"
+time=2026-10-16T11:49:11.392+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x6 known=true"
+time=2026-10-16T11:49:11.399+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x8 known=true"
+time=2026-10-16T11:49:11.400+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x281 known=true"
+time=2026-10-16T11:49:11.401+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x282 known=true"
+time=2026-10-16T11:49:11.404+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7f known=true"
+time=2026-10-16T11:49:11.404+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0xc0f9 known=true"
+time=2026-10-16T11:49:11.449+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7f known=true"
+time=2026-10-16T11:49:11.451+08:00 level=INFO msg="MARK299 wndproc hwnd=0xd180cb2 msg=0x7f known=true"
+time=2026-10-16T11:49:11.940+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+time=2026-10-16T11:49:11.941+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-16T11:49:11.983+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x35a1356"
+time=2026-10-16T11:49:11.983+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x18 known=true"
+time=2026-10-16T11:49:11.983+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x46 known=true"
+time=2026-10-16T11:49:11.992+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x46 known=true"
+time=2026-10-16T11:49:11.994+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x1c known=true"
+time=2026-10-16T11:49:11.995+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x86 known=true"
+time=2026-10-16T11:49:11.996+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x7f known=true"
+time=2026-10-16T11:49:11.997+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x7f known=true"
+time=2026-10-16T11:49:11.998+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x7f known=true"
+time=2026-10-16T11:49:11.999+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x6 known=true"
+time=2026-10-16T11:49:12.106+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x281 known=true"
+time=2026-10-16T11:49:12.111+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x282 known=true"
+time=2026-10-16T11:49:12.112+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x3d known=true"
+time=2026-10-16T11:49:12.113+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x3d known=true"
+time=2026-10-16T11:49:12.113+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x7 known=true"
+time=2026-10-16T11:49:12.113+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x85 known=true"
+time=2026-10-16T11:49:12.114+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x14 known=true"
+time=2026-10-16T11:49:12.114+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x47 known=true"
+time=2026-10-16T11:49:12.115+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x5 known=true"
+time=2026-10-16T11:49:12.115+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x3 known=true"
+time=2026-10-16T11:49:12.115+08:00 level=INFO msg="MARK299 after ShowWindow"
+time=2026-10-16T11:49:12.115+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0xf known=true"
+time=2026-10-16T11:49:12.115+08:00 level=INFO msg="MARK299 after UpdateWindow"
+time=2026-10-16T11:49:12.115+08:00 level=INFO msg="MARK299 after SetFocus"
+time=2026-10-16T11:49:12.115+08:00 level=INFO msg="MARK299 before Embed"
+time=2026-10-16T11:49:12.153+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x210 known=true"
+time=2026-10-16T11:49:12.154+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x88 known=true"
+time=2026-10-16T11:49:12.154+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x7f known=true"
+time=2026-10-16T11:49:12.154+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x31f known=true"
+time=2026-10-16T11:49:12.154+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0xc0f9 known=true"
+time=2026-10-16T11:49:12.154+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x86 known=true"
+time=2026-10-16T11:49:12.155+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x46 known=true"
+time=2026-10-16T11:49:12.157+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x7f known=true"
+time=2026-10-16T11:49:12.158+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x282 known=true"
+time=2026-10-16T11:49:12.161+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0xc053 known=true"
+time=2026-10-16T11:49:12.161+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x288 known=true"
+time=2026-10-16T11:49:12.165+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x7f known=true"
+time=2026-10-16T11:49:13.218+08:00 level=INFO msg="MARK299 after Embed"
+time=2026-10-16T11:49:13.413+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0x14 known=true"
+time=2026-10-16T11:49:13.427+08:00 level=INFO msg="MARK299 wndproc hwnd=0x35a1356 msg=0xf known=true"
+wisp: panel window is up (test-harness, cold 1503.2 ms, hot path 0.0 ms)
+time=2026-10-16T11:49:13.485+08:00 level=INFO msg="panel host: CreateWebResourceResponse needed attempt 2 of 3 (the stale-GetLastError defect named above)"
+time=2026-10-16T11:49:13.811+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-16T11:49:13.811+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (1.87s)
     panel_resident_windows_test.go:944: AC#14 nail 2 (Eval push hop), page's own words: title=""
     panel_resident_windows_test.go:946: Go's Eval push did not reach the document: the page reports its title as "", want "PUSHED-33R5-OK". This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other
-time=2026-10-16T11:39:54.271+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=summon binding=Ctrl+Alt+Q err="Hot key is already registered."
-time=2026-10-16T11:39:54.272+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
-time=2026-10-16T11:39:54.272+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
-time=2026-10-16T11:39:54.272+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
-time=2026-10-16T11:39:54.308+08:00 level=ERROR msg="ball: hotkey summon = \"Ctrl+Alt+Q\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:14.974+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=summon binding=Ctrl+Alt+Q err="Hot key is already registered."
+time=2026-10-16T11:49:14.974+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-16T11:49:14.974+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-16T11:49:14.974+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-16T11:49:14.999+08:00 level=ERROR msg="ball: hotkey summon = \"Ctrl+Alt+Q\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
 wisp: hotkey summon = "Ctrl+Alt+Q" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
-time=2026-10-16T11:39:54.308+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:14.999+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
 wisp: hotkey mute = "Ctrl+Alt+M" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
-time=2026-10-16T11:39:54.308+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:14.999+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
 wisp: hotkey panel = "Ctrl+Alt+P" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
-time=2026-10-16T11:39:54.310+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=defaults hotkeys_live=0 hotkeys="summon=Ctrl+Alt+Q occupied by another app, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246) and the panel gestures (ticket 33); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
-time=2026-10-16T11:39:54.735+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
---- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding (1.39s)
+time=2026-10-16T11:49:14.999+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=defaults hotkeys_live=0 hotkeys="summon=Ctrl+Alt+Q occupied by another app, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246) and the panel gestures (ticket 33); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+time=2026-10-16T11:49:15.417+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding (1.33s)
     resident_hotkey_258_windows_test.go:361: the old binding did not survive a no-rebind host (VK=0x0): the premise moved
-time=2026-10-16T11:39:54.804+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
-time=2026-10-16T11:39:54.804+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
-time=2026-10-16T11:39:54.804+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
-time=2026-10-16T11:39:54.813+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
+time=2026-10-16T11:49:15.486+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-16T11:49:15.486+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-16T11:49:15.486+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-16T11:49:15.497+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
 wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
-time=2026-10-16T11:39:54.813+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:15.497+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
 wisp: hotkey mute = "Ctrl+Alt+M" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
-time=2026-10-16T11:39:54.813+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:15.497+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
 wisp: hotkey panel = "Ctrl+Alt+P" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
-time=2026-10-16T11:39:54.813+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=1 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246) and the panel gestures (ticket 33); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
-time=2026-10-16T11:39:54.826+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
-time=2026-10-16T11:39:54.826+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
-time=2026-10-16T11:39:54.826+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+V err="Hot key is already registered."
-time=2026-10-16T11:39:54.826+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
-time=2026-10-16T11:39:54.826+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey panel = \"Ctrl+Alt+V\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
-time=2026-10-16T11:39:54.826+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Z mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+V live=1
-time=2026-10-16T11:39:54.836+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
---- FAIL: Test258OccupiedCombinationNamesTheNewValue (0.10s)
+time=2026-10-16T11:49:15.498+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=1 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246) and the panel gestures (ticket 33); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+time=2026-10-16T11:49:15.518+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-16T11:49:15.518+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-16T11:49:15.518+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+V err="Hot key is already registered."
+time=2026-10-16T11:49:15.518+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:15.518+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey panel = \"Ctrl+Alt+V\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:15.518+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Z mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+V live=1
+time=2026-10-16T11:49:15.527+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- FAIL: Test258OccupiedCombinationNamesTheNewValue (0.11s)
     resident_hotkey_258_windows_test.go:448: the boot verdict lost the live-count shape: "the floating ball window is up in this process (tray icon added, hotkeys from config, hotkeys live 1/4: summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app)"
     resident_hotkey_258_windows_test.go:453: live slots after the rebind = 1, want 2 (summon+mute; cancel is standby, panel is taken)
-time=2026-10-16T11:39:54.897+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
-time=2026-10-16T11:39:54.897+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
-time=2026-10-16T11:39:54.897+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
-time=2026-10-16T11:39:54.901+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
+time=2026-10-16T11:49:15.592+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-16T11:49:15.592+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-16T11:49:15.592+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-16T11:49:15.598+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
 wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
-time=2026-10-16T11:39:54.901+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:15.598+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
 wisp: hotkey mute = "Ctrl+Alt+M" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
-time=2026-10-16T11:39:54.901+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:15.598+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
 wisp: hotkey panel = "Ctrl+Alt+P" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
-time=2026-10-16T11:39:54.902+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=1 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246) and the panel gestures (ticket 33); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
-time=2026-10-16T11:39:54.909+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
-time=2026-10-16T11:39:54.909+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
-time=2026-10-16T11:39:54.909+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
-time=2026-10-16T11:39:54.909+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
-time=2026-10-16T11:39:54.909+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
-time=2026-10-16T11:39:54.909+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+7 mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=1
-time=2026-10-16T11:39:54.915+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
---- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (0.08s)
+time=2026-10-16T11:49:15.598+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=1 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246) and the panel gestures (ticket 33); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+time=2026-10-16T11:49:15.607+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-16T11:49:15.608+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-16T11:49:15.608+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-16T11:49:15.608+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:15.608+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-16T11:49:15.608+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+7 mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=1
+time=2026-10-16T11:49:15.617+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (0.09s)
     resident_hotkey_v1probe_test.go:108: 258-v1 PROBE: boot verdict lost the live-count shape: "the floating ball window is up in this process (tray icon added, hotkeys from config, hotkeys live 1/4: summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app)"
---- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection (36.14s)
+--- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection (37.68s)
     resident_task_source_246_windows_test.go:434: AC#7 RED (desktop state, not our code): a dev Wisp is already running in this session, so this leg handed its activation over and exited. Stop it and re-run.
         stdout:
         wisp 0.0.0-dev (unknown, built unknown)
@@ -166,19 +184,18 @@ time=2026-10-16T11:39:54.915+08:00 level=INFO msg="ball: resident leg destroyed 
         wisp: another instance is running in this session; activated it; exiting
         
         stderr:
-        time=2026-10-16T11:40:00.705+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
-        time=2026-10-16T11:40:00.712+08:00 level=WARN msg="proc: AllowSetForegroundWindow(ASFW_ANY) was refused; the resident's SetForegroundWindow may be denied by the foreground lock" err="Access is denied."
+        time=2026-10-16T11:49:23.077+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
 FAIL
-FAIL	github.com/CarlosShao/wisp/cmd/wisp	40.770s
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	43.435s
 FAIL
 rc=1
 --- names ---
 grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/orch/20261016/logs/orch-sixred-pair-pre.txt’ is also the output
 (no FAIL lines)
-FAIL_COUNT=6
+FAIL_COUNT=5
 PASS_COUNT=0
 FAIL
-FAIL	github.com/CarlosShao/wisp/cmd/wisp	40.770s
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	43.435s
 FAIL
-FAIL_COUNT=6
-2026-10-16 11:40:31 +0800
+FAIL_COUNT=5
+2026-10-16 11:49:53 +0800

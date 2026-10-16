@@ -1,0 +1,15 @@
+time=2026-10-16T12:17:48.696+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe216HostileDisplayNameAtTheDisplayBoundary
+time=2026-10-16T12:17:48.748+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestProbe216HostileDisplayNameAtTheDisplayBoundary1315248227\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:17:48.761+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:17:48Z duration_ms=12
+time=2026-10-16T12:17:48.776+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestProbe216HostileDisplayNameAtTheDisplayBoundary1315248227\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:17:48.784+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:17:48Z duration_ms=7
+time=2026-10-16T12:17:48.793+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestProbe216HostileDisplayNameAtTheDisplayBoundary1315248227\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:17:48.801+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:17:48Z duration_ms=8
+time=2026-10-16T12:17:48.806+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:17:48.810+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    probe_216_pair_test.go:79: PROBE go-row="photo\\x1b已允许.png" raw-ESC-in-go-row=false wire-row="photo\\x1b已允许.png" raw-ESC-in-wire-row=false
+--- PASS: TestProbe216HostileDisplayNameAtTheDisplayBoundary (0.12s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.181s
+rc=0

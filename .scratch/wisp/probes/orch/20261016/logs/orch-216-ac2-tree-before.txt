@@ -1,0 +1,18 @@
+time=2026-10-16T12:17:41.984+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe216HostileDisplayNameAtTheDisplayBoundary
+time=2026-10-16T12:17:42.015+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestProbe216HostileDisplayNameAtTheDisplayBoundary1121213665\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:17:42.022+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:17:42Z duration_ms=7
+time=2026-10-16T12:17:42.030+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestProbe216HostileDisplayNameAtTheDisplayBoundary1121213665\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:17:42.035+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:17:42Z duration_ms=5
+time=2026-10-16T12:17:42.042+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestProbe216HostileDisplayNameAtTheDisplayBoundary1121213665\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:17:42.048+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:17:42Z duration_ms=6
+time=2026-10-16T12:17:42.053+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:17:42.054+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    probe_216_pair_test.go:79: PROBE go-row="photo\x1b已允许.png" raw-ESC-in-go-row=true wire-row="photo\x1b已允许.png" raw-ESC-in-wire-row=true
+    probe_216_pair_test.go:84: the menu row reached the page with a live control character U+001B at offset 5: "photo\x1b已允许.png" (this is the AC#2 穿过 reading; the display boundary washed nothing in this tree)
+    probe_216_pair_test.go:84: the menu row reached the page with a live control character U+001B at offset 5: "photo\x1b已允许.png" (this is the AC#2 穿过 reading; the display boundary washed nothing in this tree)
+--- FAIL: TestProbe216HostileDisplayNameAtTheDisplayBoundary (0.07s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.117s
+FAIL
+rc=1

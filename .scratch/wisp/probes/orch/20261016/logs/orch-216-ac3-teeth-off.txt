@@ -1,0 +1,97 @@
+time=2026-10-16T12:17:54.718+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/empty
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/plain_ascii
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/windows_path_untouched
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/chinese_untouched
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/esc
+    display_scrub_216_test.go:72: scrubForDisplay("photo\x1b已允许.png") = "photo\x1b已允许.png", want "photo\\x1b已允许.png"
+    display_scrub_216_test.go:75: output "photo\x1b已允许.png" still carries a control byte (0x1b) at offset 5
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/nul
+    display_scrub_216_test.go:72: scrubForDisplay("a\x00b") = "a\x00b", want "a\\0b"
+    display_scrub_216_test.go:75: output "a\x00b" still carries a control byte (0x0) at offset 1
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/crlf
+    display_scrub_216_test.go:72: scrubForDisplay("a\r\nb") = "a\r\nb", want "a\\r\\nb"
+    display_scrub_216_test.go:75: output "a\r\nb" still carries a control byte (0xd) at offset 1
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/tab
+    display_scrub_216_test.go:72: scrubForDisplay("a\tb") = "a\tb", want "a\\tb"
+    display_scrub_216_test.go:75: output "a\tb" still carries a control byte (0x9) at offset 1
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/del
+    display_scrub_216_test.go:72: scrubForDisplay("a\x7fb") = "a\x7fb", want "a\\x7fb"
+    display_scrub_216_test.go:75: output "a\x7fb" still carries a control byte (0x7f) at offset 1
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_next_line
+    display_scrub_216_test.go:72: scrubForDisplay("a\u0085b") = "a\u0085b", want "a\\x85b"
+    display_scrub_216_test.go:75: output "a\u0085b" still carries a control byte (0xc2) at offset 1
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_device_control
+    display_scrub_216_test.go:72: scrubForDisplay("a\u0090b") = "a\u0090b", want "a\\x90b"
+    display_scrub_216_test.go:75: output "a\u0090b" still carries a control byte (0xc2) at offset 1
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_highest
+    display_scrub_216_test.go:72: scrubForDisplay("a\u009fb") = "a\u009fb", want "a\\x9fb"
+    display_scrub_216_test.go:75: output "a\u009fb" still carries a control byte (0xc2) at offset 1
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/invalid_utf8_byte
+=== RUN   TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/two_escs_keep_both
+    display_scrub_216_test.go:72: scrubForDisplay("\x1b\x1b") = "\x1b\x1b", want "\\x1b\\x1b"
+    display_scrub_216_test.go:75: output "\x1b\x1b" still carries a control byte (0x1b) at offset 0
+--- FAIL: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/empty (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/plain_ascii (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/windows_path_untouched (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/chinese_untouched (0.00s)
+    --- FAIL: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/esc (0.00s)
+    --- FAIL: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/nul (0.00s)
+    --- FAIL: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/crlf (0.00s)
+    --- FAIL: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/tab (0.00s)
+    --- FAIL: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/del (0.00s)
+    --- FAIL: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_next_line (0.00s)
+    --- FAIL: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_device_control (0.00s)
+    --- FAIL: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/c1_highest (0.00s)
+    --- PASS: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/invalid_utf8_byte (0.00s)
+    --- FAIL: TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse/two_escs_keep_both (0.00s)
+=== RUN   TestTheWashReturnsTheSameStringWhenThereIsNothingToWash
+--- PASS: TestTheWashReturnsTheSameStringWhenThereIsNothingToWash (0.00s)
+=== RUN   TestTheSnapshotBoundaryWashesBothRosterFieldsAndCopiesTheRows
+    display_scrub_216_test.go:107: the attachment row reached the menu as "photo\x1b已允许.png", want the ESC shown as a visible escape
+    display_scrub_216_test.go:110: the canonical path reached the menu as "C:\\data\\\u0085reports", want the C1 shown as a visible escape
+    display_scrub_216_test.go:134: the packet the page renders still carries a control character: "photo\x1b已允许.png"
+    display_scrub_216_test.go:134: the packet the page renders still carries a control character: "C:\\data\\\u0085reports"
+--- FAIL: TestTheSnapshotBoundaryWashesBothRosterFieldsAndCopiesTheRows (0.00s)
+=== RUN   TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow
+time=2026-10-16T12:17:54.784+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow1207504903\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:17:54.809+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:17:54Z duration_ms=24
+time=2026-10-16T12:17:54.820+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow1207504903\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:17:54.827+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:17:54Z duration_ms=7
+time=2026-10-16T12:17:54.837+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow1207504903\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:17:54.846+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:17:54Z duration_ms=8
+time=2026-10-16T12:17:54.853+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:17:54.858+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    display_scrub_216_test.go:157: menu row = "photo\x1b已允许.png", want the ESC shown as backslash-x-1-b and every other byte kept
+    display_scrub_216_test.go:166: AC#3 menu row as the page receives it: "photo\x1b已允许.png"
+--- FAIL: TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow (0.12s)
+=== RUN   TestTheClaimInANameChangesNoVerdict
+time=2026-10-16T12:17:54.888+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict479338681\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:17:54.900+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:17:54Z duration_ms=12
+time=2026-10-16T12:17:54.909+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict479338681\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:17:54.916+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:17:54Z duration_ms=7
+time=2026-10-16T12:17:54.926+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict479338681\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:17:54.933+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:17:54Z duration_ms=6
+time=2026-10-16T12:17:54.941+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:17:54.947+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:17:54.969+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict479338681\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:17:54.977+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:17:54Z duration_ms=8
+time=2026-10-16T12:17:54.988+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict479338681\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:17:54.994+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:17:54Z duration_ms=5
+time=2026-10-16T12:17:55.004+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\orch216replay\TestTheClaimInANameChangesNoVerdict479338681\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:17:55.010+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:17:55Z duration_ms=6
+time=2026-10-16T12:17:55.016+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:17:55.018+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    display_scrub_216_test.go:248: real assessor verdicts: plain=L2/[R1 R8] hostile=L2/[R1 R8] washed=L2/[R1 R8]
+--- PASS: TestTheClaimInANameChangesNoVerdict (0.16s)
+=== RUN   TestWorkspaceAbsentAndWorkspaceUnreadAreTwoSentences
+    display_scrub_216_test.go:299: AC#4 pair: 没有="未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定" / 读不到="工作区这一维没有读数：本机的快照泵没有被接入工作区读数腿（PumpSources.Workspace=nil），所以「未选择工作区」这句话我没有资格说——这里是没有读数，不是没有工作区（票 216 AC#4；票 200 的 not_run 是同一纪律）"
+--- PASS: TestWorkspaceAbsentAndWorkspaceUnreadAreTwoSentences (0.00s)
+=== RUN   TestTheFiveInstructionStatesAreStillTheDiskSpelling
+--- PASS: TestTheFiveInstructionStatesAreStillTheDiskSpelling (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.472s
+FAIL
+rc=1
