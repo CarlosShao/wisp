@@ -1,0 +1,6 @@
+--- FAIL: TestCleanCheckoutBuilds_AC11 (0.08s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+time=2026-10-16T12:11:23.421+08:00 level=INFO msg="MARK299 before CreateWindowExW"
+time=2026-10-16T12:11:23.434+08:00 level=INFO msg="MARK299 after CreateWindowExW hwnd=0x8d911d2"
+time=2026-10-16T12:11:23.434+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8d911d2 msg=0x18 known=true"
+time=2026-10-16T12:11:23.434+08:00 level=INFO msg="MARK299 wndproc hwnd=0x8d911d2 msg=0x46 known=true"

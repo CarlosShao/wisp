@@ -1,0 +1,11 @@
+=== 两枚新红的归因确认发（低负载·同树·逐名 -run）2026-10-16 12:14:52 +0800
+--- PASS: TestTenOpsInOneToolCallGetOneConfirm (0.33s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	0.479s
+    composer_dispatch_test.go:438: native-host capability hits in C:\Users\swq\AppData\Local\Temp\wisp220v1\full: 15 -> [cmd/wisp/panel_control_windows.go:342:identifier CoreWebView2 cmd/wisp/panel_control_windows.go:342:identifier CoreWebView2 cmd/wisp/panel_control_windows.go:450:identifier CoreWebView2 cmd/wisp/panel_control_windows.go:450:identifier CoreWebView2 cmd/wisp/panel_control_windows.go:460:identifier CoreWebView2 cmd/wisp/panel_control_windows.go:460:identifier CoreWebView2 cmd/wisp/panel_control_windows.go:512:identifier CoreWebView2 cmd/wisp/panel_control_windows.go:512:identifier CoreWebView2 cmd/wisp/panel_control_windows.go:78:imports github.com/jchv/go-webview2 cmd/wisp/panel_control_windows.go:79:imports github.com/jchv/go-webview2/pkg/edge cmd/wisp/panel_host_windows.go:64:imports github.com/jchv/go-webview2 cmd/wisp/panel_resident_windows.go:73:imports github.com/jchv/go-webview2 go.mod:19:dependency "webview" go.sum:10:dependency "webview" go.sum:9:dependency "webview"] (production=true dependency=true)
+    composer_dispatch_test.go:468: carrier A (fake host source) -> 5 hit(s) [internal/panel/host_windows.go:3:identifier CoreWebView2 internal/panel/host_windows.go:5:identifier CoreWebView2 internal/panel/host_windows.go:5:identifier WebMessage internal/panel/host_windows.go:7:identifier CoreWebView2 internal/panel/host_windows.go:7:identifier WebMessage]
+    composer_dispatch_test.go:480: carrier B (webview dependency) -> 2 hit(s) [go.mod:3:dependency "webview" go.sum:1:dependency "webview"]
+    composer_dispatch_test.go:504: carrier C (CLI seam, no host) -> 0 hits, as required
+    composer_dispatch_test.go:533: carrier D (host identifiers neutralised) -> 0 hit(s) [] (production=false dependency=false)
+--- PASS: TestPanelHostIsAttachedAndNamesTheWindowHops (0.36s)
+=== end 2026-10-16 12:14:58 +0800

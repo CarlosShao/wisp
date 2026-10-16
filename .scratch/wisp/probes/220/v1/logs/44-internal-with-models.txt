@@ -1,0 +1,18 @@
+=== internal2 2026-10-16 12:12:20 +0800 tree=/tmp/wisp220v1/full（已补 models/）
+cmd=go test ./internal/... -count=1 -timeout 30m
+rc=1
+RUN=0 PASS_TOP=0 FAIL=10 SKIP=0
+包级 FAIL=3 包级 ok=23 无测试文件=4
+--- 红名名册 ---
+--- FAIL: TestTenOpsInOneToolCallGetOneConfirm
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+--- FAIL: TestPanelHostIsAttachedAndNamesTheWindowHops
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestComposerRenderFixtureTellsTheTruth
+--- FAIL: TestReadGitOnThisRepositoryIsSelfConsistent
+--- FAIL: TestC21DesignTokensFourWayAgree
+--- FAIL: TestResolvePerCallBudget
+--- 哨兵 ---
+=== end 2026-10-16 12:13:41 +0800 ===

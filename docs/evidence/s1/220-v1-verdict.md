@@ -102,7 +102,35 @@
   白名单载体件（`internal/panel/bridge.go`、`composer_dispatch.go`、`cmd/wisp/panel_inbound.go`）**不在本票四笔的写面文件名册里**（逐枚 `git show --name-only` 见抬头）；
   逐笔新增 `"panel.*.*"` 字面量＝**0 枚**（四笔全 0）；`internal/panel/**`＋`cmd/wisp/**` 内新增 `State*` 常量＝**0 枚**
 
-## AC#5 整包终态读数＝**（待本腿那两发落定，数字见 `## AC#5` 追加节）**
+## AC#5 整包终态读数＝**不可判**〔缺那一发"整包跑到终态"的 ./cmd/wisp 名册〕
+
+- 我带的超时＝**显式 `-timeout 30m`**（./cmd/wisp 三发与 ./internal/... 两发全带上）。三发都没到超时——**没跑到终态的原因是测试进程被拦腰打断，⛔ 是 `panic: test timed out`**
+- `./cmd/wisp -count=1 -v` 三发四数（同一枚仓外 `full` 树＝`ca0e30fce` 导出树，⛔ 共享工作树；分母取自该导出树）：
+  发1（`logs/40-full-cmdwisp.txt`）＝`RUN=203 PASS_TOP=145 FAIL=3 SKIP=0 rc=1`（包级 161.777s）
+  发2 同台面复跑（`logs/42-rerun-cmdwisp2.txt`）＝`RUN=203 PASS_TOP=145 FAIL=3 SKIP=0 rc=1`（168.634s，逐数同发1）
+  发3 排除发1/2 拦腰那枚后（`logs/43-cmdwisp-skipAC13.txt`，`-skip '^TestAC13BringUpSurvivesAReusedThreadQuit$'`）＝`RUN=206 PASS_TOP=150 FAIL=1 SKIP=0 rc=1`（165.630s）
+- 三发**全部未达终态**，断点逐名（原始 `-v` 日志末行都是 `=== RUN <名>` 紧跟 `FAIL github.com/CarlosShao/wisp/cmd/wisp …s`，零 `panic:` 句、零该用例自己的 `--- FAIL`＝进程硬终止）：
+  发1／发2 断在 `TestAC13BringUpSurvivesAReusedThreadQuit`（`cmd/wisp/panel_resident_windows_test.go:523`，票 33 的 poisoned-thread 形）
+  发3 断在 `TestAC14GoSideEvalPushReachesThePage`
+  ⇒ 归因⛔ 本腿下（派单第二节那六枚的归因已由编排者成对台件闭掉；我这三发**到不了**那六枚里的五枚，具名在下面）
+- 断点之前跑到的红名逐名归因（**全⛔ 本票射程、全⛔ 代码红**）：
+  `TestAC2AC3DegradedLegsStillDeliverTheirVerdict/models` 与 `TestAC2ModelsLegBooksItsHandOffVerdictOnDisk`＝**台面缺件**，红句逐字 `leg_sink_nail_131_windows_test.go:494/349: committed models/manifest.json not found from the test working directory`
+  ⇒ 这把尺自证：我在发3 前把 `models/`（HEAD 跟踪件，`git ls-files models`＝2）补进树，那两枚转绿，发3 的 `FAIL` 只剩 1 枚
+  `TestCleanCheckoutBuilds_AC11`＝**导出树没有 `.git`**，红句逐字 `panel_host_gate_test.go:404: git rev-parse --show-toplevel: exit status 128`
+- 那六枚已知红在我自己三发里的颜色（`logs/41-cmdwisp-sixred-verbatim.txt`）：
+  `TestAC4FocusReturnToPriorWindowGap33r5` **三发全 PASS**（0.67s／1.48s／1.68s）⇒ 它不是恒定红，本机前台状态随时序变；
+  其余五枚（`TestAC14GoSideEvalPushReachesThePage`／三枚 `Test258*`／`TestAC246DevLegIgnoresTheTestTaskInjection`）**未跑到**
+  ⇒ 所以本腿⛔ 报"整包含 6 枚红"、⛔ 报"本波新增红"，只能报"三发未达终态＋到达过的全绿/台面红"
+- 本票那枚真腿用例在**整包里**（⛔ `-run` 单跑）也绿：发3 名册逐字 `--- PASS: TestRunPacketLightsTheRosterRowOfItsLiveL1Window (12.16s)`
+- `./internal/... -count=1 -timeout 30m` **达终态**，两发四数（分母取自 HEAD 导出树）：
+  发1（`logs/40-full-internal.txt`）＝`RUN=0 PASS_TOP=0 FAIL=11 SKIP=0 rc=1`（非 `-v` ⇒ 那两枚恒 0，名册以 `^--- FAIL` 计；包级 `ok`／`FAIL` 逐行在件内）
+  发2（`logs/44-internal-with-models.txt`，补 `models/` 后）＝`FAIL=10 rc=1`，包级 `ok=23／no test files=4／FAIL=3`（`internal/agent/approval`、`internal/panel`、`internal/risk`）
+  逐名归因（发2 那 10 枚）：`internal/panel` 8 枚＝其中 7 枚同发1 的台面／他票／前端地界（两枚跨语对照键差 `Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare`＝HEAD 跟踪的前端件落后于机主未提交件，本腿⛔ 按其调色、⛔ 读 `frontend/**`；`TestC21DesignTokensFourWayAgree`＝四处令牌不一致；`TestComposerRenderFixtureTellsTheTruth`；`TestReadGitOnThisRepositoryIsSelfConsistent`＝无 `.git`；两枚 `TestStreamLog*35r8`＝票 35 堆上限）＋第 8 枚 `TestPanelHostIsAttachedAndNamesTheWindowHops`＝**负载／临时目录形**，红句逐字 `composer_dispatch_test.go:436: scan … for host capability: open ….gotmp\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2895323098\002\la: Access is denied.`，低负载单发复跑＝**绿**（`logs/45-flake-confirm.txt`）；
+  `internal/agent/approval` 1 枚 `TestTenOpsInOneToolCallGetOneConfirm`＝**墙钟计时形**，红句逐字 `batch_test.go:164: 确认界面从未收到提示（等待 2s 后放弃）`＋`fakes_test.go:193: 派生的测试协程未在 3s 内退出（闸门存在无限等待）`，同尺发1 该包为 `ok 3.456s`，低负载单发复跑＝**绿**（同件）；
+  `internal/risk` 1 枚 `TestResolvePerCallBudget`＝本机 C26 每调用预算读数（红句自述 `1758386 ns/op = 1.758 ms/op (budget 1.000 ms, 1196 samples)`），⛔ 动 `internal/observe/thresholds.go` 一字、⛔ 本票射程
+  ⇒ 票 220 自己的判据面在两发里都不是红名；panel 那四枚 220 用例我另发逐名复跑全绿（`logs/22-panel-postrestore-green.txt`：`--- PASS` ×4，`ok … 0.133s`，且还原后整包红名回到基线 8 枚）
+- 缺的那一发读数（具名）＝〔**无活实例／前台可控世界**下的 `./cmd/wisp -v -count=1 -timeout 30m` 整包终态名册〕。
+  本腿⛔ 停 PID 21892（机主 2026-10-15 19:03 按台账 `A988` 自起的 `build\wisp.exe`），⛔ 为让整包跑完而排除任何别的用例；〔缺世界〕交编排者裁。
 
 ## 能力类必答：这一格在产品界面上今天看得见的有几维
 
@@ -125,8 +153,10 @@
    队列改写那形（`queue.go:163-168`）要求两枚**同 corr** 的卡才发生，按上面那形今天的循环造不出碰撞
    ⇒ **净效果**：`blockedOnApproval` 今天靠 L1 窗口那一半点亮（本票 AC#2 那一跳，真 run 已证），
    L2 卡片那一半只在"provider 给纯数字 callID"那一形才亮＝**票 220 射程外的既有缺口**，与编排者 10-15 那条读数同族（`docs/reports/pending-and-issues.md:14937`：真 provider 若给纯数字 `callID` 卡片那一半才点亮、"树内不可复现"），归口＝编排者裁（建议另立一枚：真 run 上种两枚 L2 卡的正控）
-2. 本腿没裁完的格：**无**（AC#1/AC#2/AC#3/AC#4 各格读数齐；AC#5 只等我自己那两发整包落盘）
-3. 台面/他票噪声（HEAD 导出树 `./internal/panel/ -count=1` 基线 8 枚红，逐名归因）：
+2. **没裁完的格＝AC#5 一格**，缺的那一发读数具名＝〔无活实例／前台可控世界下的 `./cmd/wisp -v -count=1 -timeout 30m` 整包终态名册〕（三发全部未达终态：两枚拦腰用例逐名＝`TestAC13BringUpSurvivesAReusedThreadQuit`、`TestAC14GoSideEvalPushReachesThePage`）。
+   AC#1／AC#2／AC#3／AC#4 四格读数齐、已裁死；`./internal/...` 那发**达终态**、已并入 AC#5 的读数面
+3. **台面定式再加一枚（写给编排者的七件套清单）**：`models/`（HEAD 跟踪 2 枚）不在清单里 ⇒ 未补时 `internal/models` 三枚红＋`cmd/wisp` 两枚红全是"committed models/manifest.json not found"那一形（本腿两棵台面各自实测：补进树后逐枚转绿）
+4. 台面/他票噪声（HEAD 导出树 `./internal/panel/ -count=1` 基线 8 枚红，逐名归因）：
    `TestGitDimensionHasNoModelCallableTool`／`TestC21DesignTokensFourWayAgree`＝台面缺件形（红句自述 `read docs/PLAN.md … cannot find the path`／`read design/assets/tokens.css …`，`bench` 树没这两枚目录；`full` 树补齐后应消，见 AC#5 节）；
    `TestReadGitOnThisRepositoryIsSelfConsistent`＝导出树没有 `.git`（红句自述"这棵工作区目录及其以上都没有 .git"）；
    `TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`＝跨语对照在 **HEAD 跟踪件**上为红（红句自述 `Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare`），前端未提交件归机主外部 agent，本腿⛔ 按其调色、⛔ 动其字节；
