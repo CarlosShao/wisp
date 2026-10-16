@@ -22,7 +22,9 @@
 - 三枚树 `go build ./cmd/wisp/` 退码**全 0** 后才开始量（`logs/00-tree.txt`）
 - `GOTMPDIR`＝`cygpath -w` 出来的**原生反斜杠形**且先 `mkdir -p`；跑 go 前置 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`
 - ⛔ `-overlay`：五发突变全部打在导出树的物理字节上，每发先备份⇒跑⇒还原⇒`sha256` 对回（`logs/10-mut-check.txt`），
-  还原后台面自证＝三枚文件树内 sha ⇄ `git cat-file HEAD:<f>` sha **逐枚 match=YES**（`logs/30-restore-verify.txt`）
+  还原后台面自证＝三枚文件树内 sha ⇄ `git cat-file HEAD:<f>` sha **逐枚 match=YES**（`logs/30-restore-verify.txt`；`run.go`＝`4f6510cd…`、`panel_pump.go`＝`30502ec7…`、`subagent_roster_197.go`＝`bb47ef90…`），
+  还原后真腿用例再跑一发＝**绿**（`logs/23-cmdwisp-postrestore-green.txt`：`--- PASS … (11.19s)`、`ok … 11.286s`、`rc=0`，同发行内仍带 `pre blocked=false | … | post blocked=false`），
+  四枚 220 用例同批发复跑也全绿（`logs/22-panel-postrestore-green.txt`：`--- PASS` ×4、`ok … 0.133s`、整包红名回到基线 8 枚）
 
 ## AC#1 join 读对（corr 与 taskID 双查⛔ 新增导出方法）＝**成立**
 

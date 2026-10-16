@@ -1,0 +1,11 @@
+=== AC#2 还原后绿（bench 树·MU-D／MU-E 都还原之后·真腿用例整包外单发）2026-10-16 12:24:07 +0800
+还原哈希（⇄ git cat-file HEAD:<f> 的 sha256，逐枚 match=YES，见 30-restore-verify.txt）：
+4f6510cda5a46f90f4e572785a832abfcb2f5f409d8d666d2377e42c9d1d050c *cmd/wisp/run.go
+30502ec79543a1309817a264988226f479b068179a50e4964953e0f03ed1ed5c *cmd/wisp/panel_pump.go
+bb47ef90c58fd12eca22102dd9d9386e487d13c4bdde4649c86468e23d305feb *internal/panel/subagent_roster_197.go
+=== RUN   TestRunPacketLightsTheRosterRowOfItsLiveL1Window
+    panel_l1_blocked_220_test.go:249: L1 window task=8783bf8b-1fb6-4169-b01a-95a2eb708572 corr=l1-220-corr-1792124654435180000 | pre blocked=false | lit at publ
+--- PASS: TestRunPacketLightsTheRosterRowOfItsLiveL1Window (11.19s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	11.286s
+rc=0
+=== end 2026-10-16 12:24:24 +0800
