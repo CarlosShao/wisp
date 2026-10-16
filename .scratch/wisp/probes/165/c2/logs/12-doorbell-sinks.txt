@@ -1,0 +1,41 @@
+=== production audit lines naming a tool call (doorbell-capable sinks) ===
+cmd/wisp/approval_always.go:182:	rt.auditf("approval: WAITING-STATE state=%q awaiting=true corr=%q tool=%s level=%s paths=%d producer=%q",
+cmd/wisp/approval_reply.go:420:	s.audit("approval: REPLY %s corr=%q tool=%s route=%q detail=%q", kind, corr, tool, route, detail)
+cmd/wisp/resident_approval_windows.go:741:			ra.residentAuditf("approval: RESIDENT-WINDOW-ABANDONED corr=%s tool=%s decision=reject "+
+cmd/wisp/run.go:22://	                -> streamed text + notify + task_log/tool_call rows
+cmd/wisp/run.go:772:			rt.auditf("wisp run: 风险判定 tool=%s level=%s rules=%v reason=%q",
+cmd/wisp/run.go:1064:		// The loop's own tool_call rows are deliberately NOT booked: the
+cmd/wisp/run.go:1067:		// tool_call a guess instead of a record.
+cmd/wisp/run.go:1210:		res.TaskID, res.Status, res.Rounds, res.ToolCalls, costLine(res))
+internal/memory/dao_tasklog.go:128:// tool_call rows are governed by their own domain and retention window.
+internal/memory/dao_toolcall.go:12:// tool_call DAO (D35): forensics for "what did it actually do to my machine".
+internal/memory/dao_toolcall.go:16:// InsertToolCall records a tool invocation (pending decision/outcome).
+internal/memory/dao_toolcall.go:17:func (s *Store) InsertToolCall(ctx context.Context, tc ToolCall) (int64, error) {
+internal/memory/dao_toolcall.go:18:	if err := validateToolCall(tc); err != nil {
+internal/memory/dao_toolcall.go:24:			`INSERT INTO tool_call(task_id, seq, tool, args_json, risk_level, decision, decided_at,
+internal/memory/dao_toolcall.go:39:		return 0, fmt.Errorf("memory: insert tool_call: %w", err)
+internal/memory/dao_toolcall.go:44:// DecideToolCall records the approval decision (and optional grant linkage).
+internal/memory/dao_toolcall.go:45:func (s *Store) DecideToolCall(ctx context.Context, id int64, decision string, grantID *int64) error {
+internal/memory/dao_toolcall.go:47:		return fmt.Errorf("memory: invalid tool_call.decision %q", decision)
+internal/memory/dao_toolcall.go:52:			`UPDATE tool_call SET decision=?, decided_at=?, grant_id=COALESCE(?, grant_id) WHERE id=?`,
+internal/memory/dao_toolcall.go:58:			return fmt.Errorf("tool_call %d: %w", id, ErrNotFound)
+
+=== 161 AC#3 census artifact ===
+.scratch/wisp/probes/161/r2/fix/neg_comment_and_string.gofix
+.scratch/wisp/probes/161/r4/logs/runtests-mirror-ring-removed.log
+.scratch/wisp/probes/161/r4/logs/runtests-mirror-ring-removed.log.roster.txt
+.scratch/wisp/probes/161/r4/logs/selftest-baregoroutine-ring1-removed.txt
+.scratch/wisp/probes/161/r4/logs/selftest-mirror-ring-removed.txt
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-baregoroutine-ring1.go
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-mirror-ring.go
+.scratch/wisp/probes/161/v1/logs/ac3-rulers.txt
+.scratch/wisp/probes/161/v1/logs/ac3-rulers.txt.controls.tmp
+.scratch/wisp/probes/161/v1/logs/mut2-mirror-ring-gone.txt
+docs/evidence/s1/161-attrib-selftest-r5.md
+docs/evidence/s1/161-doorbell-census-r1.md
+docs/evidence/s1/161-gate-aggregate-r6.md
+docs/evidence/s1/161-gate-blindspot-r1.md
+docs/evidence/s1/161-gate-order-r4.md
+docs/evidence/s1/161-gates-accept-r2.md
+docs/evidence/s1/161-gates-selftest-accept-r1.md
+docs/evidence/s1/161-selftests-r3.md

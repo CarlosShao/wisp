@@ -1,0 +1,37 @@
+=== harness.bodies accessors + who asserts on request body ===
+internal/agent/harness_test.go:105:		h.bodies = append(h.bodies, body)
+internal/agent/harness_test.go:162:func (h *harness) requests() int {
+internal/agent/harness_test.go:165:	return len(h.bodies)
+internal/agent/harness_test.go:169:func (h *harness) requestBodies() [][]byte {
+internal/agent/harness_test.go:172:	out := make([][]byte, len(h.bodies))
+internal/agent/harness_test.go:173:	copy(out, h.bodies)
+internal/agent/harness_test.go:178:func (h *harness) echo() *EchoProvider {
+internal/agent/harness_test.go:187:func (h *harness) run(text string) Result {
+internal/agent/harness_test.go:193:func (h *harness) waitForFirstRequest(within time.Duration) bool {
+
+=== existing request-body assertions across repo (tools array) ===
+cmd/wisp/config_receipt_255_test.go:337:	for _, dir := range []string{"cmd", "internal", "tools", "scripts"} {
+cmd/wisp/config_receipt_255_test.go:543:	for _, dir := range []string{"cmd/wisp", "internal/panel", "tools", "scripts"} {
+cmd/wisp/plan_wiring_165r2_test.go:144:		if pkg, ok := sel.X.(*ast.Ident); !ok || pkg.Name != "tools" {
+internal/agent/control_test.go:147:	if len(bodies) != 2 || !strings.Contains(string(bodies[1]), "顺便说下湿度") {
+internal/agent/declared_l0_risk_179_test.go:130:	if !strings.Contains(string(bodies[1]), produced) {
+internal/agent/declared_l0_risk_179_test.go:133:	if strings.Contains(string(bodies[1]), unclassifiedRefusal) {
+internal/agent/declared_l0_risk_179_test.go:187:	if !strings.Contains(string(bodies[1]), unclassifiedRefusal) {
+internal/agent/loop_golden_test.go:138:	second := string(bodies[1])
+internal/agent/loop_golden_test.go:143:	if strings.Contains(string(bodies[0]), "tool_call_id") {
+internal/agent/loop_golden_test.go:144:		t.Errorf("round 1 body already carries a tool result:\n%s", trunc(string(bodies[0]), 600))
+internal/llm/anthropic/cache_test.go:86:	if bytes.Contains([]byte(string(sent["tools"])), []byte("cache_control")) {
+internal/llm/anthropic/cache_test.go:87:		t.Errorf("cache_control leaked into the tool definitions:\n%s", sent["tools"])
+internal/llm/openaichat/mockllm_integ_test.go:63:	toolDir := filepath.Join(repoRoot, "tools", "mockllm")
+internal/llm/openairesponses/protocol_test.go:66:	if err := json.Unmarshal(sent["tools"], &tools); err != nil || len(tools) != 1 {
+internal/llm/openairesponses/protocol_test.go:67:		t.Fatalf("tools field: %v %s", err, sent["tools"])
+internal/models/downloader_test.go:195:	body, ok := cs.bodies[r.URL.Path]
+internal/panel/composer_test.go:699:	data, err := os.ReadFile(filepath.Join(root, "tools", "d22scan", "main.go"))
+internal/panel/git_test.go:376:	offenders := gitToolNamesUnder(filepath.Join(root, "internal", "tools"))
+internal/panel/git_test.go:501:	if clean := gitToolNamesUnder(filepath.Join(panelRepoRoot(t), "internal", "tools")); len(clean) != 0 {
+internal/risk/pathresolver_rewrite_account_test.go:176:		{filepath.Join("..", "tools", "paths.go"), []string{"res.Rewritten"}, "allowlist roots authorize a tree"},
+internal/risk/pathresolver_rewrite_account_test.go:232:		if strings.HasPrefix(filepath.ToSlash(path), filepath.ToSlash(filepath.Join(repo, "tools"))) {
+internal/tools/paths_shortname_252_probe_test.go:264:	for _, sub := range []string{"docs", filepath.Join("internal", "tools")} {
+internal/tools/paths_shortname_252_r1_test.go:62:	dirs := []string{long, filepath.Join(long, "docs"), filepath.Join(long, "internal", "tools")}
+internal/tools/spawn_roster_census_229_test.go:88:	for _, root := range []string{"cmd", "internal", "tools", "frontend"} {
+internal/tools/toolrequest_nail_309_test.go:365:		filepath.Join("..", "..", "tools"),

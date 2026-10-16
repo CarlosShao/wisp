@@ -1,0 +1,88 @@
+=== probes/161 attrib.sh exists? ===
+.scratch/wisp/probes/161/r1/.gitignore
+.scratch/wisp/probes/161/r1/README.md
+.scratch/wisp/probes/161/r1/bench.sh
+.scratch/wisp/probes/161/r1/logs/al-overbroad.scan.log
+.scratch/wisp/probes/161/r1/logs/b1-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b1-closure-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b1-named-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b1-probe-testfile.scan.log
+.scratch/wisp/probes/161/r1/logs/b2-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b2-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b2-probe-alias.scan.log
+.scratch/wisp/probes/161/r1/logs/b3-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b3-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b3-probe-structlit.scan.log
+.scratch/wisp/probes/161/r1/logs/b4-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b4-sub-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b4-unix-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b5-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b5-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b6-bad.scan.log
+
+=== attrib.sh header ===
+#!/bin/sh
+# attrib.sh - ticket 161 AC#7 step 2, the attribution instrument, r5 copy.
+# Written by 161-r5 as a COPY of .scratch/wisp/probes/161/r4/attrib.sh (that file
+# is another program's committed artifact: read-only here). Nothing in r4 was
+# edited; every rule below that r4 already had is the same rule, same text.
+#
+# WHAT r5 ADDED ON TOP OF r4, AND WHY EACH ADDITION IS NOT A WEAKENING
+# ---------------------------------------------------------------------------
+#   --classify-line <text>  the classifier, drivable from TEXT instead of disk.
+#   --self-test             feeds the classifier known lines and requires BOTH
+#                           directions: lines that must ring and lines that must
+#                           stay silent. This is what lets the physical negative
+#                           control stop being load-bearing (see r5/README.md).
+#   --tracked-only          runs ruler (A) alone, with the same hollow guard.
+#                           This is the shape CI executes.
+#   negative-control sample copied to probes/161/r5/negative-control/, so a
+#   deliberately-unattributable .go file now sits under a path that IS attributable
+#   to a real ticket, and the on-disk injury the r4 program left at
+#   probes/999/bad-sample.go is no longer the only proof that (B) can ring.
+#
+# WHY THIS EXISTS AT ALL (the sentence AC#7 was really asking for)
+# ---------------------------------------------------------------------------
+# The criterion this instrument replaces read: "gofumpt -l . tools/d22scan
+# tools/mockllm must be EMPTY". That reading is STRUCTURALLY unsatisfiable on a
+# working tree of this repo, and no amount of formatting fixes it, because
+# gofumpt walks .scratch/** (measured: `git ls-files '.scratch/**/*.go'` = 40
+# files) and a forensic bench is BY DEFINITION a directory you fill with
+# deliberately-broken samples. So the criterion could produce exactly two kinds of
+# answer, neither of them the thing it wanted to measure: "empty", which on this
+# tree is only reachable by deleting or formatting somebody else's bad sample
+# (both forbidden), and "non-empty", which reads identical to a real regression.
+#
+# The fix is not an exemption for .scratch, not a gofumpt flag, not a wider
+# allowlist, and not "the working-tree reading does not count". It is TWO RULERS,
+# each of which can actually produce the reading it names:
+#
+#   (A) TRACKED TREE   git ls-files '*.go' | xargs gofumpt -l
+#       MUST BE EMPTY. This is the form CI executes, because a CI checkout
+#       contains tracked bytes and nothing else.
+#   (B) WORKING TREE   gofumpt -l . tools/d22scan tools/mockllm
+
+=== ci.yml context around line 235-245 ===
+        # WHY THIS STEP AND NOT THE GATES ABOVE IT (the two categories stay apart):
+        # this step is a CENSUS - it measures and prints a denominator, so skipping
+        # it destroys a reading while adding a guard weakens nothing (a red here
+        # still reddens the job). gofmt / go vet / staticcheck are production gates
+        # whose ORDER is itself a claim this file makes twice (see the two ordering
+        # notes on the D22 steps above), so they keep failing fast. And the two
+        # `Upload SLO report` steps are deliberately NOT given a guard even though
+        # they carry readings: scripts/slo-freshness.sh P1 (:160-170) fails the nail
+        # if the slo-full job body carries `if:` at all, and :38-45 of that script
+        # states that a FAILED sample must not produce an artifact, because P3 ages
+        # on "a valid sample happened". Registered in the ticket instead.
+        if: ${{ !cancelled() }}
+        run: sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
+
+      - name: go vet (module)
+        if: ${{ !cancelled() }}
+        run: go vet ./...
+
+      - name: go vet (tools/d22scan module)
+        if: ${{ !cancelled() }}
+        run: go vet ./...
+        working-directory: tools/d22scan
+

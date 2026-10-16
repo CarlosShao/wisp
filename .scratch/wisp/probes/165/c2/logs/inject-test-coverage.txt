@@ -1,0 +1,24 @@
+=== tests that call Inject / assert ToolDefs / req.Tools ===
+internal/agent/inject.go
+internal/agent/loop.go
+---
+
+=== openaichat harness_golden_test tools assertions ===
+internal/llm/openaichat/harness_golden_test.go:45:	case adaptertest.ScDisconnectTools:
+
+=== CI scope script: which packages are tested ===
+scripts/portable-tests-selftest.sh
+scripts/portable-tests.sh
+scripts/testdata/portable-tests/go
+scripts/winsec-tests.sh
+scripts/wisp-cli-tests.sh
+tools/d22scan/runtests.sh
+tools/d22scan/scan_test.go
+tools/d22scan/selftest.go
+tools/d22scan/selftest_test.go
+tools/d22scan/selftestsamples.go
+tools/mockllm/capability_test.go
+tools/mockllm/mockllm_test.go
+tools/mockllm/testdata/golden/backoff-429.sse
+tools/mockllm/testdata/golden/tool-call.sse
+tools/mockllm/thinking_capability_test.go

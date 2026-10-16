@@ -1,0 +1,15 @@
+=== plan_assembled_165r2_test.go: Tools()/roster assertions ===
+cmd/wisp/plan_assembled_165r2_test.go:9://	b) AssembledBridgeReachesPlanPresent：registry 有没有 plan.present、声明面是不是
+cmd/wisp/plan_assembled_165r2_test.go:10://	   冻结行那一枚（L2＋常驻）、模型面 Tools() 有没有报它，再把这一发真打一遍：升卡、
+cmd/wisp/plan_assembled_165r2_test.go:122:		registered, declared, resident = ok, entry.Decl.Declared, entry.Decl.Resident
+cmd/wisp/plan_assembled_165r2_test.go:123:		list, err := rt.bridge.Tools(context.Background())
+cmd/wisp/plan_assembled_165r2_test.go:130:				advertised = i.Resident && i.RiskLevel == memory.RiskL2
+cmd/wisp/plan_assembled_165r2_test.go:153:		t.Errorf("装配读到的声明面变了：Declared=%v Resident=%v，冻结行（PLAN.md 的 D34 那一行／SPEC-07 §3）写的是 L2 且常驻",
+cmd/wisp/plan_assembled_165r2_test.go:157:		t.Errorf("模型面读不到它：bridge.Tools() 里没有 %s，或它不是 L2/常驻那一项", planToolName165r2)
+cmd/wisp/plan_assembled_165r2_test.go:241:		"approval: ANSWER-ALLOW corr=" + pCorr + " tool=plan.present route=native decision=allow",
+
+=== does ANY test reach llm.Request.Tools with plan.present? (Inject+plan co-occurrence) ===
+cmd/wisp/plan_assembled_165r2_test.go:9://	b) AssembledBridgeReachesPlanPresent：registry 有没有 plan.present、声明面是不是
+cmd/wisp/plan_assembled_165r2_test.go:241:		"approval: ANSWER-ALLOW corr=" + pCorr + " tool=plan.present route=native decision=allow",
+cmd/wisp/plan_wiring_165r2_test.go:37:	planToolName165r2     = "plan.present"
+cmd/wisp/plan_wiring_165r2_test.go:193:			"plan.present 在生产装配里根本够不到）",

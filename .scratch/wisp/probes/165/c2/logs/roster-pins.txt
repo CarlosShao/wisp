@@ -1,0 +1,53 @@
+=== tests asserting a tool-roster COUNT ===
+cmd/wisp/config_receipt_255_test.go:12://     TestTicket255RosterStillMatchesTheActualReadSites - the roster's own honesty:
+cmd/wisp/config_receipt_255_test.go:17://     reading each section is exactly the set the roster names. That is the "会响"
+cmd/wisp/config_receipt_255_test.go:63:// rosterScanSkipFiles names the one production file excluded from the reader scan:
+cmd/wisp/config_receipt_255_test.go:64:// this ticket's own roster, whose verdict strings QUOTE code (the evidence tokens)
+cmd/wisp/config_receipt_255_test.go:67:var rosterScanSkipFiles = map[string]bool{
+cmd/wisp/config_receipt_255_test.go:125:// TestTicket255HotRowRosterCoversTheRegistry is the roster's completeness ruler, in
+cmd/wisp/config_receipt_255_test.go:127:// hot row -> the roster owes a verdict; the roster keeps a row the registry no
+cmd/wisp/config_receipt_255_test.go:157:			t.Errorf("hotRowClaims carries %q but TierRegistry says tier=%q ok=%v: the roster drifted from the tier table", row, tier, ok)
+cmd/wisp/config_receipt_255_test.go:186:// roster into a checked reading instead of prose: the file must exist, and the
+cmd/wisp/config_receipt_255_test.go:238:	// Today the roster carries cites on 13 of the 17 rows (the three marker-only
+cmd/wisp/config_receipt_255_test.go:244:		t.Errorf("the roster carries %d checked cites, want at least %d: verdicts are drifting from readings to prose", citesChecked, citedRowsFloor)
+cmd/wisp/config_receipt_255_test.go:261:// Config section the roster adjudicates, the production files that read it must be
+cmd/wisp/config_receipt_255_test.go:268:		t.Fatalf("the roster adjudicates %d Config sections, want the 14 hot ones: the walk itself narrowed", len(fields))
+cmd/wisp/config_receipt_255_test.go:289:			t.Errorf("section %q (field %s) has roster claims but no sectionReadSites entry - the scan cannot tell a reader-less section from an unmapped one", section, field)
+cmd/wisp/config_receipt_255_test.go:293:		t.Logf("SECTION %d/%d section=%q field=%s roster=%v scan=%v match=%v", sectionLogged, len(fields), section, field, want, got, slicesEqualSorted(got, want))
+cmd/wisp/config_receipt_255_test.go:295:			t.Errorf("section %q (field %s) is read by %v in production, the roster names %v: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated",
+cmd/wisp/config_receipt_255_test.go:307:			t.Errorf("sectionReadSites names field %q which the roster no longer adjudicates (a hot row left hotRowClaims but its site list stayed)", field)
+cmd/wisp/config_receipt_255_test.go:327:// compare and copy what it declares - that is not a consumer), this ticket's roster
+cmd/wisp/config_receipt_255_test.go:357:			if strings.HasPrefix(rel, "internal/config/") || rosterScanSkipFiles[filepath.Base(path)] {
+cmd/wisp/config_receipt_255_test.go:415://     row and owe a roster edit outside this ticket: named as the residual, not quietly
+cmd/wisp/config_receipt_255_test.go:462:// declares for this field. It is a READING, so the roster cannot drift from the schema
+cmd/wisp/config_receipt_255_test.go:516:const rosterScanFakeSite324 = `package panel
+cmd/wisp/config_receipt_255_test.go:528:const rosterScanSchemaSite324 = `package main
+cmd/wisp/config_receipt_255_test.go:549:		"internal/panel/samename_fixture.go": rosterScanFakeSite324,
+cmd/wisp/config_receipt_255_test.go:550:		"cmd/wisp/schembsite_fixture.go":     rosterScanSchemaSite324,
+cmd/wisp/config_receipt_255_test.go:596:	// refusal: [llm] carries Providers, and the reader 票 324 added to the roster keys
+cmd/wisp/config_receipt_255_test.go:668:		// (a recorded number here would re-import the rot the roster just shed).
+cmd/wisp/config_receipt_255_test.go:688:// zero production readers in every process of this repository (the roster row and
+cmd/wisp/config_reload_223_test.go:742:	// 票 231 AC#2's cause joins the roster: a fifth "read refused" shape that is
+cmd/wisp/config_reload_perm_223_windows_test.go:115:			// 票 231 AC#2's sentence joins the roster so the permission reading
+
+=== D34 authority-table-vs-code pins ===
+cmd/wisp/notify_windows.go
+cmd/wisp/plan_assembled_165r2_test.go
+cmd/wisp/run.go
+internal/agent/inject.go
+internal/agent/loop.go
+internal/agent/spill.go
+internal/agent/tools.go
+internal/panel/git.go
+internal/panel/git_test.go
+internal/risk/pathresolver_junction_windows_test.go
+internal/risk/provenance.go
+internal/risk/provenance_test.go
+internal/tools/bridge_junction_windows_test.go
+internal/tools/doc.go
+internal/tools/failclosed_236_teeth_test.go
+internal/tools/fs.go
+internal/tools/fs_edit.go
+internal/tools/fs_edit_ac5_gate_r4_test.go
+internal/tools/fs_edit_test.go
+internal/tools/fs_test.go

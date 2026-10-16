@@ -1,0 +1,43 @@
+=== agent testdata ReadDir scopes ===
+		t.Errorf("retry of the same id changed the name: %q then %q", a.Name, b.Name)
+	}
+	body, err := os.ReadFile(a.Path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.HasPrefix(string(body), "BBBB") {
+		t.Errorf("same-id retry left %q in the artifact, want the newer payload (last-writer-wins)",
+			body[:min(24, len(body))])
+	}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 1 {
+		names := make([]string, 0, len(entries))
+---- spill_path_invariant 135,150
+			}
+			body, err := os.ReadFile(sp.Path)
+			if err != nil {
+				t.Fatalf("the artifact did not appear at the asserted path: %v", err)
+			}
+			if len(body) == 0 {
+				t.Fatal("empty artifact")
+			}
+			// Real listing, not a string comparison: the dir holds exactly one
+			// file and it is the asserted name.
+			entries, err := os.ReadDir(dir)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(entries) != 1 || entries[0].Name() != sh.wantName {
+				t.Errorf("artifacts dir listing = %v, want exactly [%s]", inv76aNames(entries), sh.wantName)
+			}
+		})
+	}
+
+=== fixture prefix census internal/llm/testdata/golden ===
+chat- -> 3
+anthropic- -> 13
+responses- -> 13
+bare/unprefixed -> 26

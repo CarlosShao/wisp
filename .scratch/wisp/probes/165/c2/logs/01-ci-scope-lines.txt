@@ -1,0 +1,43 @@
+=== ci.yml go test lines ===
+56:  # ban #8 zero-emoji scan. The scope names come from the tool, never from this
+76:        # top-level PASS/FAIL lines > 0 and zero SKIP, so "go test ./..." can
+82:        run: bash tools/d22scan/runtests.sh -C tools/d22scan ./...
+107:        run: go run . -self-test
+137:        run: sh scripts/d22scan.sh
+170:        run: sh scripts/check-path-length-budget.sh --with-self-test
+174:        run: |
+240:        run: sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
+244:        run: go vet ./...
+248:        run: go vet ./...
+273:        #    files (root `go list ./...` returns zero packages for both) - so
+277:        #    prints modules / packages / findings / toolchain-crash-lines: a
+302:        run: |
+318:            echo "--- module $mod: exit=$step_rc packages=$m_pkgs findings=$m_find toolchain-crash-lines=$m_crash"
+324:          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount packages=$pkgs findings=$findings toolchain-crash-lines=$crashes (step exit is $rc)"
+339:        run: go vet ./...
+351:        # file while no named scope claims it, and asserts the step prints
+375:        # exec'd, no test binary is built, and the milliseconds-sensitive packages
+395:        run: bash scripts/portable-tests-selftest.sh
+398:  # Pure-Go logic tests on ubuntu (SPEC-11 §6 scope) + golden replay +
+400:  # Windows-only packages (ball GUI, cgo speech) are out of this job's scope by
+410:  # landed (2026-10-10; the `windows)` scope array and win_pin in
+418:  # `grep -nE 'portable-tests|go test|internal/audio' scripts/slo-check.ps1`.
+432:        run: docker compose -f docker/compose.test.yml --profile test up -d --build mock-llm
+436:        run: |
+448:        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+455:        # and no threshold changed): it sat below a step that bare `go test` lets
+462:        run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+464:      - name: Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)
+465:        # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
+472:        # re-verified ledger for the cases that are declared out of scope. The
+475:        # TICKET 111 moved the list behind a NAME (`--scope=core`) and added three
+476:        # guards to it, because "the scope has a row for X" was never the same
+481:        # scope now pins its own resolved package set, rejects any declared package
+483:        # them to print its own anchored top-level result line. Four packages with
+487:        run: bash scripts/portable-tests.sh --scope=core
+491:        run: docker compose -f docker/compose.test.yml --profile test down
+585:        run: bash scripts/winsec-tests.sh
+599:        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+621:        run: bash scripts/wisp-cli-tests.sh
+
+=== tools/ci scope scripts ===

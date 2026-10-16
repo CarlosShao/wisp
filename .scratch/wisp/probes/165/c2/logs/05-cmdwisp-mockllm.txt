@@ -1,0 +1,43 @@
+=== cmd/wisp tests that run the agent Loop against mockllm ===
+cmd/wisp/providers_test.go
+cmd/wisp/run_mode101_test.go
+cmd/wisp/run_test.go
+cmd/wisp/secret_test.go
+cmd/wisp/subagent_carrier_197_test.go
+cmd/wisp/subagent_selfapproval_197_test.go
+cmd/wisp/task_scope_close_151_test.go
+cmd/wisp/zz315a1probe_test.go
+
+=== run_test.go: how it drives a task ===
+122:	return runTextTask(runSpec{
+158:func TestRunTextTaskTextPathEndToEnd(t *testing.T) {
+166:	replyAt := strings.Index(out, "echo:")
+187:		if strings.Contains(n, "echo:") {
+208:func TestRunTextTaskFailNextIsClassified(t *testing.T) {
+249:func TestHostDispatchThroughTheAssembledBridge(t *testing.T) {
+334:func TestComposedGateBlocksAWriteForTwoSeconds(t *testing.T) {
+424:func TestRunTextTaskKeyResolvesInTheStore(t *testing.T) {
+450:func TestMissingBlobFailsUnconfiguredNeverSilently(t *testing.T) {
+
+=== subagent_carrier_197_test.go shape (loop+mockllm precedent) ===
+50:	"github.com/CarlosShao/wisp/internal/tools"
+203:			if row.Kind == tools.TaskKindRoot && row.TaskID != "" {
+218:		if row.Kind == tools.TaskKindSubagent && row.ParentTaskID == rootID {
+231:func TestRunPacketCarriesTheSubagentItsRosterRowFed(t *testing.T) {
+291:	if child.Kind != tools.TaskKindSubagent {
+292:		t.Errorf("kind = %q, want %q as the spawner filed it", child.Kind, tools.TaskKindSubagent)
+320:	if root.Kind != tools.TaskKindRoot {
+321:		t.Errorf("root row kind = %q, want %q", root.Kind, tools.TaskKindRoot)
+330:	if sect.PoolCap != tools.MaxConcurrentSubagents {
+331:		t.Errorf("poolCap = %d, want tools.MaxConcurrentSubagents (%d)", sect.PoolCap, tools.MaxConcurrentSubagents)
+418:// the duplicated key spelling. internal/tools and internal/panel each used to write
+427:// expected spelling is how the shape stays pinned at its source (internal/tools'
+430:func TestSubagentStreamKeyHasOneMintSite(t *testing.T) {
+444:	if tools.SubagentStreamKeyPrefix != panel.SubagentStreamKeyPrefix {
+445:		t.Errorf("tools = %q, panel = %q: the aliases drifted", tools.SubagentStreamKeyPrefix,
+449:		if got, wantKey := tools.SubagentStreamKey(id), panel.SubagentStreamKey(id); got != wantKey {
+450:			t.Errorf("id %q: tools minted %q, panel reads %q", id, got, wantKey)
+524:func TestRunPacketReportsTheStreamLogPastItsBound(t *testing.T) {
+570:		if row.Kind != tools.TaskKindSubagent {
+619://     stays internal/tools' Test197RowExistsBeforeFirstChildModelCall.
+620://  5. Cancellation is not re-measured here. 取消不级联 is internal/tools'

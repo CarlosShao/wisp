@@ -1,0 +1,44 @@
+=== winlive tag users ===
+.scratch/wisp/probes/228/a2/census.md:629:  ⇒ 首发把 `//go:build winlive` 也写错了，真词面是 `//go:build windows && winlive`（R12）。
+.scratch/wisp/probes/260/r2/sync.md:338:1. **真窗／winlive 全档今天一次没跑**（`//go:build winlive` 会在机主桌面真注册全局热键、真开球窗；
+.scratch/wisp/probes/298/orch/logs/README-failed-ruler.md:6:- ★**尺形也写错过一次**（就地具名）：我第一版把尺写成 `grep -rln '^//go:build winlive' cmd/wisp/*.go` ⇒ 命中 **0**，因为盘上的标签行是**合取形**。真尺＝
+.scratch/wisp/probes/300/a2/snap/ledger.md:10398:- **纪律自记（记在我头上）**：我写进派单的参考尺 `grep -rl "//go:build winlive" --include=*.go .` **本机实测 0 命中**——真实拼写带 `windows &&`（我 18:3x 重跑：松散模式 `grep -rl winlive` 得 **8 枚文件**、其中 `^func` 行 **64 枚**，前一枚腿报的"22 函数"应是只数 `Test*`）。⇒ 派单里我当场写了"⛔ 别照抄这两个数、自己重跑，量到不同报你的实测值"，但**"凡写进派单的尺先在本机跑一遍"这条我又破了一次**（第 70 条）。这一格若让腿白烧轮次，损失记在我身上，不改它的交件判语。
+.scratch/wisp/probes/300/a2/snap/ledger.md:10406:  - ① 我写的 `scripts/runtests.sh:98` **不存在**——`ls scripts/runtests.sh` 报 No such file；真身 **`tools/d22scan/runtests.sh:98`**（逐字 `runtests.sh: $skipped test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3)`），且 `ci.yml` 全部四处调用都指这枚真身（`:81`／`:317`／`:527` 等）。⇒ ⛔ 以后任何腿再写 `scripts/runtests.sh` 一律按幻影引用处理。**这是我今天第二次破"凡写进派单的尺／事实先在本机跑一遍"（第 70 条）**，第一次是同一天那把 `grep '//go:build winlive'`（0 命中，真形带 `windows &&`）。
+.scratch/wisp/probes/300/a2/snap/ledger.md:10455:  ⇒ **已当场改**：每晚 23:30 那台自动统计（id `2136ae8e…`）升到 **revision 3**，第 4 步两把尺改成允许行首空白、第 7 步同步，并在 prompt 里写死"10-02 之前是旧尺、跨这一点不可相减"＋"0–99 段 10-02 已派桶、回来前不许算进主链"。**这是我今天第四把写进派单／台账的坏尺**（前三把：`//go:build winlive` 词面、`scripts/runtests.sh` 幻影路径、`tasklist|grep go.exe` 子串）——**定式再收紧一层：凡"数枚数"的尺，入账前必须在**一枚已知有缩进项的文件**上跑两把尺并排比一次，只看一把尺的对不上不算发现。
+.scratch/wisp/probes/300/a2/snap/ledger.md:15024:- **连带处置：那四条"新知"一并作废为我的未证猜测**（⛔ 不据此改票 299 一字）：① "甲形不自足——过滤器需要一枚能匹配上的文档 URL，故要自定义 scheme 或虚拟主机映射"；② "入口那枚 CSP `<meta>` 今天根本不生效"；③ "那 6 枚红是 `//go:build winlive`、从不进 CI"；④ "我 `AC#1` 的措辞得改"。⇒ 票面现量六条**不受影响**（那六条是我 09:0x 自己 `git grep -in 'WebResourceRequested' HEAD`／`git show HEAD:…` 现跑的，与本次无关，`28b484ec` 已入库）。这四枚一律**降级成问题**写进真腿派单，其中 ①③ 落在票面 `AC#0` ②③ 已有框内（"注册需要哪一枚控制器对象、本仓宿主现在手里有没有那枚对象"＋"两形代价表"）⇒ ⛔ 不为本票加格。④ 在真读数交回前⛔ 不动票面。
+.scratch/wisp/probes/302/a1/40-census.md:76:### (b) tag 尺（`//go:build winlive`）
+.scratch/wisp/probes/33/winc1/families.md:17:| 尺的字面串 | `grep -rl '//go:build winlive' --include=*.go .` | **原样跑＝0 命中** | 仓里**没有**任何文件写 `//go:build winlive`；真形是 `//go:build windows && winlive`（全仓 tag 清单现量：`windows`=130、`!windows`=28、`windows && winlive`=8、`windows && wisp174r1after`=1、`cgo_sherpa`=1、`!race`=1、`!cgo_sherpa`=1）⇒ 用派单那串尺会得到"零枚"，与本族存在的 Fact 相反 |
+.scratch/wisp/probes/orch/a796-append.md:9:- **连带处置：那四条"新知"一并作废为我的未证猜测**（⛔ 不据此改票 299 一字）：① "甲形不自足——过滤器需要一枚能匹配上的文档 URL，故要自定义 scheme 或虚拟主机映射"；② "入口那枚 CSP `<meta>` 今天根本不生效"；③ "那 6 枚红是 `//go:build winlive`、从不进 CI"；④ "我 `AC#1` 的措辞得改"。⇒ 票面现量六条**不受影响**（那六条是我 09:0x 自己 `git grep -in 'WebResourceRequested' HEAD`／`git show HEAD:…` 现跑的，与本次无关，`28b484ec` 已入库）。这四枚一律**降级成问题**写进真腿派单，其中 ①③ 落在票面 `AC#0` ②③ 已有框内（"注册需要哪一枚控制器对象、本仓宿主现在手里有没有那枚对象"＋"两形代价表"）⇒ ⛔ 不为本票加格。④ 在真读数交回前⛔ 不动票面。
+.scratch/wisp/probes/orchestrator/ci223-1/raw_range_roster.txt:6:b3eed120 ledger(A508)：33-n1 结掉"CI 那台 Windows 机器有没有 WebView2"这一格——甲＝装了但只到【旁证级】（出处是 runner-images issue 报障人自述，未独立复核；我裁定不单开验证，第一次真推送的那发日志就是独立复核，之前任何腿不许据此实现"CI 自动装库/自动恢复"），乙＝未定（无人值守能不能真建可见窗/像素/毫秒时序，官方零句话）⇒ winlive 里"要人眼"那几枚继续按【仅本机可量】写死，不许伪装成 CI 测过；选档"有条件能"带两条前置（先解 frontend/dist 只有 .gitkeep 撞 runtests.sh:98 的 SKIP 判红＝无关红；只用 Evergreen 不用 Fixed Version），整族不许进 CI ⇒ 另派 winlive-census-1 按六族拆；另记我自己一把坏尺（派单里那行 grep '//go:build winlive' 本机 0 命中，真实拼写带 windows &&）
+docs/reports/pending-and-issues.md:10398:- **纪律自记（记在我头上）**：我写进派单的参考尺 `grep -rl "//go:build winlive" --include=*.go .` **本机实测 0 命中**——真实拼写带 `windows &&`（我 18:3x 重跑：松散模式 `grep -rl winlive` 得 **8 枚文件**、其中 `^func` 行 **64 枚**，前一枚腿报的"22 函数"应是只数 `Test*`）。⇒ 派单里我当场写了"⛔ 别照抄这两个数、自己重跑，量到不同报你的实测值"，但**"凡写进派单的尺先在本机跑一遍"这条我又破了一次**（第 70 条）。这一格若让腿白烧轮次，损失记在我身上，不改它的交件判语。
+docs/reports/pending-and-issues.md:10406:  - ① 我写的 `scripts/runtests.sh:98` **不存在**——`ls scripts/runtests.sh` 报 No such file；真身 **`tools/d22scan/runtests.sh:98`**（逐字 `runtests.sh: $skipped test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3)`），且 `ci.yml` 全部四处调用都指这枚真身（`:81`／`:317`／`:527` 等）。⇒ ⛔ 以后任何腿再写 `scripts/runtests.sh` 一律按幻影引用处理。**这是我今天第二次破"凡写进派单的尺／事实先在本机跑一遍"（第 70 条）**，第一次是同一天那把 `grep '//go:build winlive'`（0 命中，真形带 `windows &&`）。
+docs/reports/pending-and-issues.md:10455:  ⇒ **已当场改**：每晚 23:30 那台自动统计（id `2136ae8e…`）升到 **revision 3**，第 4 步两把尺改成允许行首空白、第 7 步同步，并在 prompt 里写死"10-02 之前是旧尺、跨这一点不可相减"＋"0–99 段 10-02 已派桶、回来前不许算进主链"。**这是我今天第四把写进派单／台账的坏尺**（前三把：`//go:build winlive` 词面、`scripts/runtests.sh` 幻影路径、`tasklist|grep go.exe` 子串）——**定式再收紧一层：凡"数枚数"的尺，入账前必须在**一枚已知有缩进项的文件**上跑两把尺并排比一次，只看一把尺的对不上不算发现。
+docs/reports/pending-and-issues.md:15024:- **连带处置：那四条"新知"一并作废为我的未证猜测**（⛔ 不据此改票 299 一字）：① "甲形不自足——过滤器需要一枚能匹配上的文档 URL，故要自定义 scheme 或虚拟主机映射"；② "入口那枚 CSP `<meta>` 今天根本不生效"；③ "那 6 枚红是 `//go:build winlive`、从不进 CI"；④ "我 `AC#1` 的措辞得改"。⇒ 票面现量六条**不受影响**（那六条是我 09:0x 自己 `git grep -in 'WebResourceRequested' HEAD`／`git show HEAD:…` 现跑的，与本次无关，`28b484ec` 已入库）。这四枚一律**降级成问题**写进真腿派单，其中 ①③ 落在票面 `AC#0` ②③ 已有框内（"注册需要哪一枚控制器对象、本仓宿主现在手里有没有那枚对象"＋"两形代价表"）⇒ ⛔ 不为本票加格。④ 在真读数交回前⛔ 不动票面。
+
+=== ci.yml winlive line ===
+623:      - name: "winlive compile gate (go vet -tags winlive, ticket 111 AC#11)"
+625:        # carrying `//go:build windows && winlive` (9 under cmd/wisp, 5 under
+629:        # `grep -rlE '//go:build.*winlive' --include=*.go`)
+633:        # 8e98b8f0, before this step, `-tags` and `winlive` each hit 0 times here,
+636:        # leg ever passed the `winlive` half. So all twelve sat outside every CI
+646:        # and are NOT wired here; do not read this step as "the winlive cases now
+673:        # day (a syntax error planted by overlay in one winlive file turns the
+677:        # weakened, none of the winlive-tagged files is edited, and nothing here
+681:        run: go vet -tags winlive ./cmd/wisp/ ./internal/ball/
+
+=== go env (self-reported, read-only) ===
+
+auto
+D:\work\base\gopath\pkg\mod
+rc=0
+
+=== go list of the two candidate homes ===
+github.com/CarlosShao/wisp/internal/agent
+github.com/CarlosShao/wisp/internal/tools
+github.com/CarlosShao/wisp/internal/llm
+github.com/CarlosShao/wisp/internal/llm/adaptertest
+github.com/CarlosShao/wisp/internal/llm/anthropic
+github.com/CarlosShao/wisp/internal/llm/golden
+github.com/CarlosShao/wisp/internal/llm/openaichat
+github.com/CarlosShao/wisp/internal/llm/openairesponses
+rc=0

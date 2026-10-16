@@ -1,0 +1,49 @@
+=== inject tests present? ===
+internal/agent/inject.go
+internal/agent/spill_name_injectivity_test.go
+(none above = no inject_test)
+
+=== internal/agent test file count ===
+43
+
+=== CI scope scripts ===
+scripts/build.ps1
+scripts/check-path-length-budget.sh
+scripts/d22scan.sh
+scripts/dev/ball-cycle.ps1
+scripts/dev/gen_fixtures11.py
+scripts/fetch-deps.ps1
+scripts/portable-tests-selftest.sh
+scripts/portable-tests.sh
+scripts/sign-models.ps1
+scripts/slo-check.ps1
+scripts/slo-freshness.sh
+scripts/spike/common/machine.go
+scripts/spike/common/mem.go
+scripts/spike/common/winshell.go
+scripts/spike/go.mod
+scripts/spike/go.sum
+scripts/spike/goja-caps/main.go
+scripts/spike/model-residency/main.go
+scripts/spike/run.ps1
+scripts/spike/shell-baseline/main.go
+scripts/spike/speech-baseline/main.go
+scripts/spike/webview2-latency/main.go
+scripts/spike/xy-verdict/main.go
+scripts/spike/xy-verdict/session_cgo.go
+scripts/spike/xy-verdict/session_nocgo.go
+scripts/testdata/portable-tests/go
+scripts/winsec-tests.sh
+scripts/wisp-cli-tests.sh
+
+=== go-test-scope-ish scripts ===
+.github/workflows/ci.yml
+scripts/d22scan.sh
+scripts/portable-tests-selftest.sh
+scripts/portable-tests.sh
+scripts/slo-check.ps1
+scripts/testdata/portable-tests/go
+scripts/winsec-tests.sh
+scripts/wisp-cli-tests.sh
+tools/d22scan/runtests.sh
+tools/d22scan/selftest.go

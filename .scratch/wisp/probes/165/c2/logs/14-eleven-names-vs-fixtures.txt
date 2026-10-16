@@ -1,0 +1,45 @@
+ruler: git grep -F -l "<name>" 232f309e8092b15ede2d6f0455d71775e5a5de96 -- '*.sse' '*/testdata/*' 'tools/mockllm/**'
+meaning: literal-string (-F) file-presence count over the FIXTURE SURFACE only, read from the
+         commit blob (never the shared working tree). Unit = 枚 tracked files.
+
+denominators of the fixture surface at this anchor (ruler = git ls-tree -r --name-only $A):
+  *.sse files ................................ 52
+  files under any */testdata/* ................ 56
+  files under tools/mockllm/ .................. 14
+  files under internal/llm/ ................... 90
+  ("*/testdata/*" and "*.sse" overlap: the 52 sse files ARE 52 of the 56 testdata files.)
+
+=== every REGISTERED builtin tool Name() (11 names, minted at internal/tools/*.go Name() sites) ===
+fs.read -> fixture files 0
+fs.list -> fixture files 0
+fs.edit -> fixture files 0
+fs.write -> fixture files 0
+fs.trash -> fixture files 0
+fs.move -> fixture files 0
+fs.delete -> fixture files 0
+plan.present -> fixture files 0
+task.spawn -> fixture files 0
+task.output -> fixture files 0
+task.cancel -> fixture files 0
+
+Name() mint sites (尺 = git grep -n 'func (.*) Name() string' $A -- internal/tools, prod only, 11 lines):
+  internal/tools/fs.go:124 fs.read | fs.go:190 fs.list | fs_edit.go:70 fs.edit
+  fs_write.go:234 fs.write | :369 fs.trash | :440 fs.move | :583 fs.delete
+  plan_present.go:72 plan.present | subagent_197.go:187 task.spawn
+  task.go:484 task.output | task.go:625 task.cancel
+(fs.delete is config-gated: `DeleteEnabled: cfg.FS.DeleteEnabled` at cmd/wisp/run.go:520, register loop
+ at run.go:522 — see 15-sleep-gettime-and-deletegate.txt. sleep=3, get_time=4 on the same -F ruler.)
+
+=== POSITIVE CONTROLS, the very same -F ruler, the very same pathspecs ===
+echo -> fixture files 17
+get_weather -> fixture files 8
+tool_calls -> fixture files 15
+=> the ruler reads on this surface; the eleven zeros above are measurements, not a blind ruler.
+
+=== WHAT THIS SAYS ===
+The doorbell hole is NOT plan.present-specific. Not one of the 11 names this repository actually
+registers appears anywhere in the fixture surface. The 4 names that do appear (echo 17 / get_weather 8 /
+sleep / get_time) are all fake tools invented by the adapter/loop harnesses
+(internal/agent/tools.go:142 EchoProvider, internal/llm/adaptertest/harness.go:154 BaseRequest).
+So "a golden SSE can express 'the model asked for tool X this round'" is PROVEN by the surface itself,
+and "no real tool has ever been given that expression" is the general state of the shelf.

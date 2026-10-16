@@ -1,0 +1,10 @@
+sleep=232f309e8092b15ede2d6f0455d71775e5a5de96
+3
+get_time=4
+
+=== fs.delete registration gate in run.go ===
+511|	// (`Registry.Register` refuses "notify": "name must be 'namespace.action'").
+516|	// and list_tools keeps its D15(2) in-loop answer. Registering notify as a
+520|		DeleteEnabled: cfg.FS.DeleteEnabled,
+522|		if err := reg.Register(e); err != nil {
+548|		if err := reg.Register(e); err != nil {

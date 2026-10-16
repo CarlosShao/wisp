@@ -1,0 +1,88 @@
+=== internal/llm/golden/golden.go: API surface ===
+9:// Grammar (wisp golden sse v1):
+13://   - Header zone: every line BEFORE the first "# @" directive is a comment
+14://     and ignored. Convention: first line "# wisp golden sse v1".
+16://   - Directive lines begin exactly with "# @":
+18://     # @scenario <free text>                (documentation, ignored)
+19://     # @response <status> [retry-after:<n>] [content-type:<mime>]
+20://     # @latency <ms>                        (per-chunk pacing hint)
+22://   - The body of a response is every line after its "# @response" until the
+23://     next "# @" directive, verbatim, joined with "\n" and terminated by one
+29://   - A body line that must start with "# @" is escaped as "# @@".
+32:// multiple "# @response" sections: each successive request consumes the next
+44:const FormatHeader = "# wisp golden sse v1"
+47:type Response struct {
+55:func Parse(src []byte) ([]Response, error) {
+62:	defaultLatency := 0 // a @latency seen before the first @response
+105:					return nil, fmt.Errorf("golden: line %d: bad @latency %q", i+1, args)
+115:				return nil, fmt.Errorf("golden: line %d: unknown directive @%s", i+1, verb)
+129:		// Unescape body lines that legitimately start with "# @".
+130:		if strings.HasPrefix(line, "# @@") {
+131:			line = "# @" + strings.TrimPrefix(line, "# @@") // unescape: "# @@x" -> "# @x"
+140:func LoadFile(path string) ([]Response, error) {
+150:func Write(sb *strings.Builder, scenario string, rs []Response) {
+153:		sb.WriteString("# @scenario " + scenario + "\n")
+157:		d.WriteString("# @response " + strconv.Itoa(r.Status))
+166:			sb.WriteString("# @latency " + strconv.Itoa(r.LatencyMS) + "\n")
+171:				if strings.HasPrefix(line, "# @") {
+172:					line = "# @" + line
+181:func isDirective(line string) bool {
+182:	return strings.HasPrefix(line, "# @") && !strings.HasPrefix(line, "# @@")
+185:// parseDirective splits "# @verb args..." (args may be empty).
+186:func parseDirective(line string) (verb, args string) {
+187:	rest := strings.TrimPrefix(line, "# @")
+196:func parseResponseArgs(args string) (int, http.Header, error) {
+200:		return 0, nil, fmt.Errorf("@response needs a status")
+204:		return 0, nil, fmt.Errorf("@response status %q out of range", fields[0])
+213:			return 0, nil, fmt.Errorf("@response: unknown option %q", f)
+
+=== cmd/llmrecord files ===
+cmd/llmrecord/main.go
+cmd/llmrecord/main_test.go
+
+=== llmrecord header ===
+// Command llmrecord records golden SSE fixtures from a REAL provider
+// (ticket 09 recorder CLI). It POSTs one streaming chat completion and
+// writes the raw response bytes as testdata/golden/<name>.sse in the
+// "wisp golden sse v1" format (internal/llm/golden), so the unit-test
+// replayer and tools/mockllm can replay it verbatim.
+//
+// STATUS: STUB - live recording is DEFERRED until an LLM API key is
+// available (docs/reports/pending-and-issues.md item H2; see also ticket 09
+// progress log). The full record path (request -> capture -> format write)
+// is implemented and exercised against mockllm today; only the real
+// provider endpoint is pending. Without a key the command fails with an
+// explicit error and never writes a file.
+//
+// Usage:
+//
+//	llmrecord -base-url https://api.openai.com/v1 -model gpt-4o \
+//	          -name tool-call -prompt "call the echo tool" \
+//	          -out testdata/golden [-key-env WISP_LLM_KEY]
+package main
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"flag"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"github.com/CarlosShao/wisp/internal/llm"
+	"github.com/CarlosShao/wisp/internal/observe"
+)
+
+func main() {
+	baseURL := flag.String("base-url", "https://api.openai.com/v1", "provider base URL (OpenAI-compatible)")
+	model := flag.String("model", "", "model id to record")
+	prompt := flag.String("prompt", "", "user prompt for the recorded turn")
+	name := flag.String("name", "", "golden name (file becomes <out>/<name>.sse)")
+	out := flag.String("out", "testdata/golden", "output directory")
+	keyEnv := flag.String("key-env", "WISP_LLM_KEY", "environment variable holding the API key")
+	scenario := flag.String("scenario", "", "free-text scenario note written into the file")

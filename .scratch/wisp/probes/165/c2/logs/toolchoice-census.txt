@@ -1,0 +1,15 @@
+=== ToolChoice set in production (agent side) ===
+
+=== Request.ToolChoice field def ===
+internal/llm/content.go:86:// ToolChoiceMode selects how the model may use the declared tools.
+internal/llm/content.go:87:type ToolChoiceMode string
+internal/llm/content.go:90:	ToolChoiceAuto     ToolChoiceMode = "auto"
+internal/llm/content.go:91:	ToolChoiceNone     ToolChoiceMode = "none"
+internal/llm/content.go:92:	ToolChoiceRequired ToolChoiceMode = "required"
+internal/llm/content.go:93:	ToolChoiceTool     ToolChoiceMode = "tool" // force ToolName
+internal/llm/content.go:96:// ToolChoice is the normalized tool-selection directive.
+internal/llm/content.go:97:type ToolChoice struct {
+internal/llm/content.go:98:	Mode     ToolChoiceMode
+internal/llm/content.go:99:	ToolName string // used when Mode == ToolChoiceTool
+internal/llm/provider.go:70:	// ToolChoice is nil for the provider default (auto).
+internal/llm/provider.go:71:	ToolChoice *ToolChoice

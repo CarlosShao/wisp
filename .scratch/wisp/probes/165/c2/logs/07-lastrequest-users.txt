@@ -1,0 +1,51 @@
+=== LastRequest users (existing wire-body assertions) ===
+.scratch/wisp/probes/154-accept/ac3-ast-roster-5766be9.txt:168:C Add                        on=hdr                      in=LastRequest                    PROD internal\llm\adaptertest\mockllm.go:396
+.scratch/wisp/probes/154-accept/ac3-ast-roster-5766be9.txt:309:C Close                      on=resp.Body                in=LastRequest                    PROD internal\llm\adaptertest\mockllm.go:383
+.scratch/wisp/probes/304/r1/logs/landed/mockllm.go:380:// LastRequest returns the captured request body (raw bytes) mockllm received
+.scratch/wisp/probes/304/r1/logs/landed/mockllm.go:383:func (m *Mockllm) LastRequest(t *testing.T, route string) (string, http.Header) {
+cmd/wisp/run_test.go:432:	_, hdr := f.srv.LastRequest(t, "responses")
+internal/llm/adaptertest/mockllm.go:380:// LastRequest returns the captured request body (raw bytes) mockllm received
+internal/llm/adaptertest/mockllm.go:383:func (m *Mockllm) LastRequest(t *testing.T, route string) (string, http.Header) {
+internal/llm/anthropic/cache_test.go:51:	body, hdr := proc.LastRequest(t, "messages")
+internal/llm/anthropic/cache_test.go:116:	first, _ := proc.LastRequest(t, "messages")
+internal/llm/anthropic/cache_test.go:138:	second, _ := proc.LastRequest(t, "messages")
+internal/llm/anthropic/cache_test.go:212:	body, _ := proc.LastRequest(t, "messages")
+internal/llm/openairesponses/protocol_test.go:38:	body, hdr := proc.LastRequest(t, "responses")
+internal/llm/openairesponses/protocol_test.go:99:	body, _ := proc.LastRequest(t, "responses")
+internal/llm/openairesponses/protocol_test.go:151:		body, _ := proc.LastRequest(t, "responses")
+tools/mockllm/control.go:145:func (s *Server) handleLastRequest(w http.ResponseWriter, r *http.Request) {
+tools/mockllm/server.go:112:	mux.HandleFunc("GET /__control/last_request", s.handleLastRequest)
+
+=== control.go last_request endpoint ===
+tools/mockllm/control.go:141:// GET /__control/last_request?route=messages|responses|chat
+tools/mockllm/control.go:148:		writeJSONError(w, http.StatusBadRequest, "last_request needs a ?route= parameter")
+tools/mockllm/messages.go:164:	// previous /__control/last_request capture in place.
+tools/mockllm/server.go:112:	mux.HandleFunc("GET /__control/last_request", s.handleLastRequest)
+tools/mockllm/server.go:156:// recordRequest captures the body of one request for /__control/last_request.
+
+=== a real LastRequest assertion example ===
+--
+internal/llm/anthropic/cache_test.go:51:	body, hdr := proc.LastRequest(t, "messages")
+internal/llm/anthropic/cache_test.go-52-	var sent map[string]json.RawMessage
+internal/llm/anthropic/cache_test.go-53-	if err := json.Unmarshal([]byte(body), &sent); err != nil {
+internal/llm/anthropic/cache_test.go-54-		t.Fatalf("captured body is not JSON: %v\n%s", err, body)
+internal/llm/anthropic/cache_test.go-55-	}
+internal/llm/anthropic/cache_test.go-56-
+internal/llm/anthropic/cache_test.go-57-	// 1. The system block array carries exactly one cache_control, on its
+--
+internal/llm/anthropic/cache_test.go:116:	first, _ := proc.LastRequest(t, "messages")
+internal/llm/anthropic/cache_test.go-117-
+internal/llm/anthropic/cache_test.go-118-	// Turn 2: the same prefix, a longer conversation and a volatile suffix
+internal/llm/anthropic/cache_test.go-119-	// message (time/focus section) appended AFTER the breakpoint.
+internal/llm/anthropic/cache_test.go-120-	r2 := turn(userMsg("今天天气怎么样"),
+internal/llm/anthropic/cache_test.go-121-		llm.Message{Role: llm.RoleAssistant, Content: []llm.Content{
+internal/llm/anthropic/cache_test.go-122-			llm.ToolUsePart{
+--
+internal/llm/anthropic/cache_test.go:138:	second, _ := proc.LastRequest(t, "messages")
+internal/llm/anthropic/cache_test.go-139-
+internal/llm/anthropic/cache_test.go-140-	fieldOf := func(body, key string) string {
+internal/llm/anthropic/cache_test.go-141-		var m map[string]json.RawMessage
+internal/llm/anthropic/cache_test.go-142-		if err := json.Unmarshal([]byte(body), &m); err != nil {
+internal/llm/anthropic/cache_test.go-143-			t.Fatalf("captured body: %v", err)
+internal/llm/anthropic/cache_test.go-144-		}
+--

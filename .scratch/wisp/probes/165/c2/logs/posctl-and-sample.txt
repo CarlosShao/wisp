@@ -1,0 +1,35 @@
+=== POSCTL-B: same ruler widened to whole repo (proves names greppable) ===
+fs\.write whole-repo files=805 | fixture files=0
+task\.spawn whole-repo files=335 | fixture files=0
+list_tools whole-repo files=274 | fixture files=0
+plan\.present whole-repo files=63 | fixture files=0
+
+=== six-tools.sse first lines ===
+# wisp golden sse v1
+# @scenario agent loop: six tool calls in one message - the D38d concurrency
+# @scenario ceiling (4) must serialize the excess. Second response answers with text.
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+
+=== tool-call.sse (llm) full ===
+# wisp golden sse v1
+# @scenario tool call assembly: two calls, fragmented args, finish tool_calls, usage with cached
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"Let me check."},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_a1","type":"function","function":{"name":"get_weather","arguments":""}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"{\"city\":\"Zh"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"uhai\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":1,"id":"call_b2","type":"function","function":{"name":"get_time","arguments":"{}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":21,"completion_tokens":9,"total_tokens":30,"prompt_tokens_details":{"cached_tokens":8}}}
+
+data: [DONE]

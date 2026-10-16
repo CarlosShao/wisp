@@ -1,0 +1,54 @@
+=== openaichat/harness_golden_test.go 95-130 ===
+	for _, sc := range all {
+		if !seen[sc] {
+			t.Errorf("scenario %s is not in the executed table", sc)
+		}
+	}
+	assertNoOrphans(t, claimed, "chat-")
+}
+
+// assertNoOrphans fails on a prefixed fixture no scenario claims (an orphan
+// fixture is fake coverage).
+func assertNoOrphans(t *testing.T, claimed map[string]bool, prefix string) {
+	t.Helper()
+	entries, err := os.ReadDir(adaptertest.GoldenDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range entries {
+		n := e.Name()
+		if !strings.HasSuffix(n, ".sse") {
+			continue
+		}
+		base := strings.TrimSuffix(n, ".sse")
+		if !strings.HasPrefix(base, prefix) {
+			continue
+		}
+		if !claimed[base] {
+			t.Errorf("orphan fixture %s: no scenario maps to it", base)
+		}
+	}
+}
+
+// TestMockllmSharedFaultSuite runs the live-server fault suite (mockllm
+// subprocess + /__control injections) for this adapter.
+func TestMockllmSharedFaultSuite(t *testing.T) {
+	adaptertest.RunFaultSuite(t, unit(), adaptertest.FaultSuite{
+		Path: "/chat/completions", Route: "chat",
+
+=== Unit.Prefix values ===
+internal/llm/adaptertest/harness.go:59:	// Prefix is the golden-file prefix this unit's scenarios carry (fixture
+internal/llm/adaptertest/harness.go:60:	// names are Prefix+scenario, except where Fixture overrides).
+internal/llm/adaptertest/harness.go:61:	Prefix string
+internal/llm/adaptertest/harness.go:304:	prefix := u.Prefix
+internal/llm/adaptertest/harness.go:314:		if !strings.HasPrefix(base, prefix) {
+internal/llm/adaptertest/mockllm.go:96:				if v, ok := strings.CutPrefix(sc.Text(), "MOCKLLM_ADDR="); ok {
+internal/llm/adaptertest/mockllm.go:226:	// GoldenPrefix is the fixture-name prefix of this unit's golden files, so
+internal/llm/adaptertest/mockllm.go:228:	GoldenPrefix string
+internal/llm/adaptertest/registry_test.go:23:			Name: "openai-chat", Prefix: "chat-", EndpointPath: "/chat/completions",
+internal/llm/adaptertest/registry_test.go:42:			Name: "anthropic", Prefix: "anthropic-", EndpointPath: "/messages",
+internal/llm/adaptertest/registry_test.go:49:			Name: "openai-responses", Prefix: "responses-", EndpointPath: "/responses",
+internal/llm/anthropic/adapter.go:219:		case strings.HasPrefix(line, ":"):
+internal/llm/anthropic/adapter.go:221:		case strings.HasPrefix(line, "event:"):
+internal/llm/anthropic/adapter.go:222:			eventName = strings.TrimSpace(strings.TrimPrefix(line, "event:"))
+internal/llm/anthropic/adapter.go:223:		case strings.HasPrefix(line, "data:"):

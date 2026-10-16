@@ -1,0 +1,9 @@
+PINNED ANCHOR=232f309e8092b15ede2d6f0455d71775e5a5de96  (export tree built from this commit; date of extract 2026-10-16 11:14 +08)
+HEAD at 11:18 drifted to bdb69e16 -> ALL rulers below use git grep <pat> 232f309e8092b15ede2d6f0455d71775e5a5de96, never bare HEAD
+
+### 56/0 ruler re-run at anchor
+files_anywhere=63
+lines_anywhere=133
+fixture_files=0
+fixture_lines=0
+POSCTL tool_calls_fixture_files=20

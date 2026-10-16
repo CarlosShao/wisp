@@ -1,0 +1,31 @@
+== Injection field set/read ==
+internal/agent/inject.go:27:// Injection is one turn's tool-injection decision.
+internal/agent/inject.go:28:type Injection struct {
+internal/agent/inject.go:44:func Inject(query string, dir []ToolInfo, b Budgets) Injection {
+internal/agent/inject.go:54:	inj := Injection{Resident: resident}
+internal/agent/loop.go:577:		Injection: inj,
+internal/agent/prompt.go:93:	// Injection is this turn's tool-injection decision (D15(1)/(2)).
+internal/agent/prompt.go:94:	Injection Injection
+internal/agent/prompt.go:152:		residentIdx = indexText(in.Injection.Resident, a.budgets.SectionResidentTools)
+internal/agent/prompt.go:168:			Text: in.Injection.IndexText,
+internal/agent/prompt.go:251:		Tools:             in.Injection.ToolDefs,
+
+== Assembler.Build callers ==
+internal/agent/loop.go:187:	asm      *Assembler
+internal/agent/loop.go:244:		asm:      NewAssembler(model, b, info.Cache),
+internal/agent/loop.go:579:	return l.asm.Build(in, l.History()), nil
+internal/agent/prompt.go:107:// means nothing was injected: the assembler then renders exactly the D39
+internal/agent/prompt.go:114:// Assembler renders D39 sections and turns them into a C5 request.
+internal/agent/prompt.go:115:type Assembler struct {
+internal/agent/prompt.go:139:// NewAssembler builds an assembler for a scaled budget set.
+internal/agent/prompt.go:140:func NewAssembler(model string, b Budgets, cache llm.CacheSupport) *Assembler {
+internal/agent/prompt.go:141:	return &Assembler{
+internal/agent/prompt.go:149:func (a *Assembler) Sections(in PromptInput) []Section {
+internal/agent/prompt.go:181:func (a *Assembler) TotalTokens() int {
+internal/agent/prompt.go:188:func (a *Assembler) SystemPrefix(in PromptInput) []llm.Content {
+internal/agent/prompt.go:199:func (a *Assembler) prefixSections(in PromptInput) []Section {
+internal/agent/prompt.go:212:func (a *Assembler) ContextMessage(in PromptInput) (llm.Message, bool) {
+internal/agent/prompt.go:226:func (a *Assembler) suffixSections(in PromptInput) []Section {
+internal/agent/prompt.go:239:func (a *Assembler) Build(in PromptInput, history []llm.Message) *llm.Request {
+internal/agent/prompt.go:269:func (a *Assembler) projectInstructionBlock() string {
+internal/agent/prompt.go:277:// assembler. This is the whole agent-side surface: the loader can only ever

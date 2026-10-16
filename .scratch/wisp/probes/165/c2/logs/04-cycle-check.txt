@@ -1,0 +1,25 @@
+=== package clause census internal/agent test files ===
+     34 package agent
+     20 package approval
+     12 package approval_test
+      1 package scheduler
+
+=== does internal/agent (any file) import internal/tools? ===
+internal/agent/approval/batch.go:8:	"github.com/CarlosShao/wisp/internal/tools"
+internal/agent/approval/batch_test.go:14:	"github.com/CarlosShao/wisp/internal/tools"
+internal/agent/approval/cancel_key_label_260r4_test.go:43:	"github.com/CarlosShao/wisp/internal/tools"
+internal/agent/approval/fakes_test.go:14:	"github.com/CarlosShao/wisp/internal/tools"
+internal/agent/approval/gate.go:12:	"github.com/CarlosShao/wisp/internal/tools"
+internal/agent/approval/pending_read.go:3:import "github.com/CarlosShao/wisp/internal/tools"
+internal/agent/approval/pending_read_test.go:23:	"github.com/CarlosShao/wisp/internal/tools"
+internal/agent/approval/queue.go:10:	"github.com/CarlosShao/wisp/internal/tools"
+internal/agent/approval/queue_test.go:15:	"github.com/CarlosShao/wisp/internal/tools"
+internal/agent/approval/report.go:7:	"github.com/CarlosShao/wisp/internal/tools"
+
+=== does internal/tools import internal/agent? ===
+internal/tools/bridge.go:13:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/subagent_197.go:11:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/task.go:13:	"github.com/CarlosShao/wisp/internal/agent"
+internal/tools/task_backfill.go:6:	"github.com/CarlosShao/wisp/internal/agent"
+
+=== any external test pkg in internal/agent ===

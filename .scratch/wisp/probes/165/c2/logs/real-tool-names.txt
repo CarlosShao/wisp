@@ -1,0 +1,28 @@
+=== registered builtin tool Name() strings in production ===
+internal/tools/fs.go:124:func (fsRead) Name() string { return "fs.read" }
+internal/tools/fs.go:190:func (fsList) Name() string           { return "fs.list" }
+internal/tools/fs_edit.go:70:func (fsEdit) Name() string { return "fs.edit" }
+internal/tools/fs_write.go:234:func (fsWrite) Name() string { return "fs.write" }
+internal/tools/fs_write.go:369:func (fsTrash) Name() string { return "fs.trash" }
+internal/tools/fs_write.go:440:func (fsMove) Name() string { return "fs.move" }
+internal/tools/fs_write.go:583:func (fsDelete) Name() string { return "fs.delete" }
+internal/tools/plan_present.go:72:func (planPresent) Name() string { return "plan.present" }
+internal/tools/subagent_197.go:187:func (subagentSpawn) Name() string { return "task.spawn" }
+internal/tools/task.go:484:func (taskOutput) Name() string { return "task.output" }
+internal/tools/task.go:625:func (taskCancel) Name() string { return "task.cancel" }
+
+=== return statements near Name ===
+internal/tools/fs.go:124:func (fsRead) Name() string { return "fs.read" }
+internal/tools/fs.go-126-	return "读取一个 UTF-8 文本文件的内容（越界路径会被升为 L2 审批）"
+internal/tools/fs_edit.go:70:func (fsEdit) Name() string { return "fs.edit" }
+internal/tools/fs_edit.go-72-	return "在已存在的文件里按字面子串定位并替换一小段（票 162）。old 必须逐字一致且唯一命中；" +
+internal/tools/fs_write.go:234:func (fsWrite) Name() string { return "fs.write" }
+internal/tools/fs_write.go-236-	return "写入一个文本文件：先写临时文件再原子重命名（D31）。新建文件为 L1，覆盖已有文件为 L2"
+internal/tools/fs_write.go:369:func (fsTrash) Name() string { return "fs.trash" }
+internal/tools/fs_write.go-371-	return "把文件/目录放入系统回收站（Shell API，可从回收站还原，因此是 L1 而非 L2）"
+internal/tools/fs_write.go:440:func (fsMove) Name() string { return "fs.move" }
+internal/tools/fs_write.go-442-	return "移动/重命名文件：同卷是一次可逆重命名（L1），跨卷是复制+永久删除源（L2）"
+internal/tools/fs_write.go:583:func (fsDelete) Name() string { return "fs.delete" }
+internal/tools/fs_write.go-585-	return "永久删除一个文件（不进回收站）。仅当配置 [fs] delete_enabled=true 时才会注册"
+internal/tools/plan_present.go:72:func (planPresent) Name() string { return "plan.present" }
+internal/tools/subagent_197.go:187:func (subagentSpawn) Name() string { return "task.spawn" }

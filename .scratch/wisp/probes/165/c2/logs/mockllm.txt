@@ -1,0 +1,69 @@
+=== tools/mockllm files ===
+tools/mockllm/capability_test.go
+tools/mockllm/chat.go
+tools/mockllm/control.go
+tools/mockllm/go.mod
+tools/mockllm/goldenfmt.go
+tools/mockllm/main.go
+tools/mockllm/messages.go
+tools/mockllm/mockllm_test.go
+tools/mockllm/responses.go
+tools/mockllm/server.go
+tools/mockllm/sse.go
+tools/mockllm/testdata/golden/backoff-429.sse
+tools/mockllm/testdata/golden/tool-call.sse
+tools/mockllm/thinking_capability_test.go
+
+=== mockllm main.go header ===
+// Command mockllm is the Wisp mock LLM server (ticket 09): an
+// OpenAI/Anthropic-compatible mock with golden replay and fault injection.
+// It is a separate Go module (stdlib only) so it can be built and run
+// without the sherpa/sqlite cgo budget: `go run .` from this directory, or
+// via compose (port 18080).
+//
+// Endpoints:
+//
+//	POST /v1/chat/completions   OpenAI chat, stream SSE or JSON
+//	POST /v1/responses          OpenAI Responses (framework level)
+//	POST /v1/messages           Anthropic Messages (framework level)
+//	GET  /v1/models             model list (discovery target)
+//	POST /__control/fail_next   inject N failing responses {status,times,retry_after,body}
+//	POST /__control/latency     per-chunk delay ms {ms}
+//	POST /__control/truncate    cut the stream after N chunks {chunks}
+//	POST /__control/reset       clear all injections and counters
+//	GET  /__control/state       dump state + request counters
+//
+// Golden mode: a request whose model is "golden/<name>" (or that carries the
+// X-Wisp-Golden header <name>) replays testdata/golden/<name>.sse through
+// the SAME format grammar as internal/llm/golden (one format, two runners;
+// the parser here mirrors that package and the equivalence is pinned by the
+// integration test).
+//
+// Deterministic synthesis (no golden): the mock echoes the last user text
+// ("echo: ..."), replies "vision-ok" when an image_url part is present,
+// "audio-ok" for an input_audio part, emits a tool call when tools are
+// declared with tool_choice required/forced, truncates with
+// finish_reason=length when max_tokens is smaller than the answer, and
+// reports chunked usage. Anything else is stable by construction, which is
+
+=== chat.go: how it picks a golden / handles tools ===
+tools/mockllm/chat.go:33:	if name := goldenName(req.Model, r.Header.Get("X-Wisp-Golden")); name != "" {
+tools/mockllm/chat.go:63:	Tools       []chatTool      `json:"tools"`
+tools/mockllm/chat.go:74:	// assistant tool_calls
+tools/mockllm/chat.go:75:	ToolCalls []chatToolCall `json:"tool_calls,omitempty"`
+tools/mockllm/chat.go:172:	if len(req.Tools) > 0 && req.ToolChoice != nil {
+tools/mockllm/chat.go:177:				toolName = req.Tools[0].Function.Name
+tools/mockllm/chat.go:180:					toolName = req.Tools[0].Function.Name
+tools/mockllm/chat.go:185:			// with no arguments and no tool_calls finish reason.
+tools/mockllm/chat.go:211:			finish = "tool_calls"
+tools/mockllm/chat.go:230:		// tool_choice: same text answer, no tool_calls block.
+tools/mockllm/chat.go:232:		if finish == "tool_calls" {
+tools/mockllm/chat.go:243:			msg["tool_calls"] = []map[string]any{{
+tools/mockllm/chat.go:280:		if !sse.chunk(chunkBase(reqID, created, req.Model, map[string]any{"tool_calls": []any{tc}})) {
+tools/mockllm/chat.go:368:// serveGoldenChat replays testdata/golden/<name>.sse section-by-section.
+tools/mockllm/chat.go:371:		writeJSONError(w, http.StatusBadRequest, "invalid golden name")
+tools/mockllm/chat.go:374:	path := filepath.Join(s.goldenDir, name+".sse")
+tools/mockllm/chat.go:377:		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("golden %q not found in %s", name, s.goldenDir))
+tools/mockllm/chat.go:382:		writeJSONError(w, http.StatusInternalServerError, "golden parse: "+err.Error())
+tools/mockllm/chat.go:388:			fmt.Sprintf("golden %q exhausted (%d responses served; use /__control/reset)", name, len(sections)))
+tools/mockllm/chat.go:411:// validGoldenName rejects path traversal in golden names.

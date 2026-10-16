@@ -1,0 +1,70 @@
+=== prompt_test.go resident/byte-stable assertions ===
+internal/agent/prompt_test.go:13:// the CACHE-STABLE prefix (identity, safety, style, resident tools) is byte-
+internal/agent/prompt_test.go:16:// the scene LAST. A moving byte anywhere in the prefix is a per-turn cache
+internal/agent/prompt_test.go:19:// sysBytes renders the request's cache-prefix content to a single byte string:
+internal/agent/prompt_test.go:20:// the exact stable prefix the provider would cache.
+internal/agent/prompt_test.go:32:func prefixOnlyTools() []ToolInfo {
+internal/agent/prompt_test.go:35:			Name: "echo", Description: "Echo back the given text.", Resident: true,
+internal/agent/prompt_test.go:39:			Name: "sleep", Description: "Sleep for milliseconds.", Resident: true,
+internal/agent/prompt_test.go:45:// TestCachePrefixIsByteStableAcrossTurns drives two different turns (different
+internal/agent/prompt_test.go:47:// the cache-prefix bytes to be IDENTICAL, while the volatile bytes differ and
+internal/agent/prompt_test.go:49:func TestCachePrefixIsByteStableAcrossTurns(t *testing.T) {
+internal/agent/prompt_test.go:51:	resident := prefixOnlyTools()
+internal/agent/prompt_test.go:63:			Injection: Injection{Resident: resident, IndexText: bm25},
+internal/agent/prompt_test.go:78:	// The cache-prefix bytes must match exactly across two turns whose volatile
+internal/agent/prompt_test.go:81:		t.Fatalf("cache prefix is not byte-stable across turns\n--turn1--\n%s\n--turn2--\n%s",
+internal/agent/prompt_test.go:84:	prefix := sysBytes(req1)
+internal/agent/prompt_test.go:87:	// require the stable identity block to be present in the cached prefix.
+internal/agent/prompt_test.go:88:	if !strings.Contains(prefix, "你是 Wisp") || len(prefix) < 200 {
+internal/agent/prompt_test.go:89:		t.Fatalf("cache prefix is empty/trivial (len=%d), byte-stability unproven", len(prefix))
+internal/agent/prompt_test.go:93:	// the cached prefix.
+internal/agent/prompt_test.go:95:		if strings.Contains(prefix, leak) {
+
+=== any prompt golden text fixtures ===
+internal/agent/approval/approval.go
+internal/agent/approval/batch.go
+internal/agent/approval/doc.go
+internal/agent/approval/gate.go
+internal/agent/approval/pending_read.go
+internal/agent/approval/queue.go
+internal/agent/approval/replies.go
+internal/agent/approval/report.go
+internal/agent/approval/ui.go
+internal/agent/approval/window_read.go
+internal/agent/budgets.go
+internal/agent/compress.go
+internal/agent/control.go
+internal/agent/cost.go
+internal/agent/doc.go
+internal/agent/guard.go
+internal/agent/inject.go
+internal/agent/journal.go
+internal/agent/loop.go
+internal/agent/prompt.go
+internal/agent/scheduler/doc.go
+internal/agent/sink.go
+internal/agent/spill.go
+internal/agent/testdata/golden/budget-loop.sse
+internal/agent/testdata/golden/disconnect-mid-toolcall.sse
+internal/agent/testdata/golden/max-tokens-toolcall.sse
+internal/agent/testdata/golden/parallel-tools.sse
+internal/agent/testdata/golden/provider-500.sse
+internal/agent/testdata/golden/repeat-echo.sse
+internal/agent/testdata/golden/six-tools.sse
+internal/agent/testdata/golden/slow-tool.sse
+internal/agent/testdata/golden/spill-tool.sse
+internal/agent/testdata/golden/text-reply.sse
+internal/agent/testdata/golden/tool-then-text.sse
+internal/agent/tools.go
+
+=== cacheStable/D39 pins over cmd/wisp ===
+internal/agent/budgets.go:26:	refSectionResidentTools = 1200 // (2) resident tool index (builtin full set)
+internal/agent/budgets.go:61:	SectionResidentTools int
+internal/agent/budgets.go:98:	b.SectionResidentTools = s(refSectionResidentTools)
+internal/agent/prompt.go:150:	residentIdx := in.ResidentIndex
+internal/agent/prompt.go:151:	if residentIdx == "" {
+internal/agent/prompt.go:152:		residentIdx = indexText(in.Injection.Resident, a.budgets.SectionResidentTools)
+internal/agent/prompt.go:159:			Kind: SecResidentTools, Budget: a.budgets.SectionResidentTools,
+internal/agent/prompt.go:160:			Text: residentIdx, CachePrefix: true,
+internal/agent/prompt_test.go:210:		b.SectionResidentTools != 1200 || b.SectionProfile != 400 ||
+internal/agent/prompt_test.go:344:			SecResidentTools: b.SectionResidentTools, SecProfile: b.SectionProfile,

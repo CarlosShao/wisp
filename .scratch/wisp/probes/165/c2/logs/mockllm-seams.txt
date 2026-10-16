@@ -1,0 +1,62 @@
+=== who spawns mockllm in tests/scripts ===
+cmd/balldebug/main.go
+cmd/llmrecord/main.go
+cmd/wisp/providers_test.go
+cmd/wisp/run_mode101_test.go
+cmd/wisp/run_test.go
+cmd/wisp/secret_test.go
+cmd/wisp/subagent_carrier_197_test.go
+cmd/wisp/subagent_selfapproval_197_test.go
+cmd/wisp/task_scope_close_151_test.go
+cmd/wisp/zz315a1probe_test.go
+docs/evidence/s1/09-adversarial-acceptance.md
+docs/evidence/s1/10-adversarial-acceptance.md
+docs/evidence/s1/101-adversarial-acceptance.md
+docs/evidence/s1/11-adversarial-acceptance.md
+docs/evidence/s1/110-adversarial-acceptance.md
+docs/evidence/s1/111-ci-step-readings-attempt2.md
+docs/evidence/s1/111-ci-step-readings.md
+docs/evidence/s1/111-orch-accept-v1.md
+docs/evidence/s1/117-adversarial-acceptance.md
+docs/evidence/s1/121-adversarial-acceptance.md
+docs/evidence/s1/121-preflight-deps-reachability.md
+docs/evidence/s1/124-ac2b-3a-conversion.md
+docs/evidence/s1/124-ac2b-4-conversion.md
+docs/evidence/s1/129-ac4-ac5-mutation-and-gates.md
+docs/evidence/s1/129-adversarial-acceptance.md
+docs/evidence/s1/130-ac3-a-with-mirror-implementation.md
+docs/evidence/s1/133-ac2-fix.md
+docs/evidence/s1/136-ac11-second-witness-readings.md
+docs/evidence/s1/136-slo-output-contract-census-r1.md
+docs/evidence/s1/137-ac2-ac5-r1-acceptance.md
+
+=== X-Wisp-Golden users ===
+.scratch/wisp/issues/09-llm-provider-openai-mockllm-done.md:64:- [2026-09-19T15:00:00Z] agent=T09-impl did=mockllm-module: tools/mockllm as SEPARATE stdlib-only go module (go build+vet+test green; nested module excluded from parent ./...): POST /v1/chat/completions (stream SSE chunked role/reasoning/text/tool_calls/finish/usage/[DONE] + non-stream; deterministic synthesis: echo last user text, vision-ok on image_url, audio-ok on input_audio, [think] marker -> reasoning_content, forced|required|auto+[tool] tool call, max_tokens*4char heuristic -> finish_reason=length), POST /v1/responses + POST /v1/messages framework-level SSE dialects (message_start/content_block_delta/message_delta cumulative usage; response.created/output_text.delta/completed), GET /v1/models (discovery target, from -models flag), control endpoints /__control/fail_next{status,times,retry_after,body} latency{ms} truncate{chunks} reset state; golden mode via model="golden/<name>" or X-Wisp-Golden header replaying testdata/golden/<name>.sse section-cursor per name, byte-faithful body serving, parseGolden mirrors internal/llm/golden grammar (documented mirror contract); 8 module tests green (echo assembly, tool/vision/audio/max_tokens/think synthesis, fault queue + retry-after header, truncate cuts before [DONE], golden byte-identity vs fixture + ladder + exhaustion + reset, /v1/models shape, messages+responses smoke); counters mutex-based resettable next=main-module golden unit tests
+.scratch/wisp/probes/292/v1/10-ac1-four-questions.md:76:⚠ **但我必须记一条射程例外**：mockllm 有**第二条与 tool_choice 无关**的出话路径＝golden 回放（`tools/mockllm/chat.go:33 if name := goldenName(req.Model, r.Header.Get("X-Wisp-Golden")); name != "" {`），而仓里带 tool_call 的 golden **成族存在**（尺＝`grep -ln "tool_call" internal/agent/testdata/golden/*` ⇒ `budget-loop / disconnect-mid-toolcall / max-tokens-toolcall / parallel-tools / repeat-echo / six-tools / slow-tool / spill-tool / tool-then-text`＝**11 枚里 9 枚命中**）。
+tools/mockllm/chat.go:33:	if name := goldenName(req.Model, r.Header.Get("X-Wisp-Golden")); name != "" {
+tools/mockllm/main.go:20:// X-Wisp-Golden header <name>) replays testdata/golden/<name>.sse through
+tools/mockllm/messages.go:188:	if name := goldenName(req.Model, r.Header.Get("X-Wisp-Golden")); name != "" {
+tools/mockllm/responses.go:73:	if name := goldenName(req.Model, r.Header.Get("X-Wisp-Golden")); name != "" {
+tools/mockllm/server.go:215:// X-Wisp-Golden header.
+
+=== tool_choice forced/required producers ===
+internal/llm/anthropic/request.go:62:type wireToolChoice struct {
+internal/llm/anthropic/request.go:81:	ToolChoice json.RawMessage `json:"tool_choice,omitempty"`
+internal/llm/anthropic/request.go:161:	if req.ToolChoice != nil {
+internal/llm/anthropic/request.go:162:		tc, err := encodeToolChoice(req.ToolChoice)
+internal/llm/anthropic/request.go:166:		w.ToolChoice = tc
+internal/llm/anthropic/request.go:437:// encodeToolChoice maps the normalized choice onto the Anthropic vocabulary
+internal/llm/anthropic/request.go:439:func encodeToolChoice(tc *llm.ToolChoice) (json.RawMessage, error) {
+internal/llm/anthropic/request.go:441:	case llm.ToolChoiceAuto:
+internal/llm/anthropic/request.go:442:		return mustJSON(wireToolChoice{Type: "auto"}), nil
+internal/llm/anthropic/request.go:443:	case llm.ToolChoiceNone:
+internal/llm/anthropic/request.go:447:	case llm.ToolChoiceRequired:
+internal/llm/anthropic/request.go:448:		return mustJSON(wireToolChoice{Type: "any"}), nil
+internal/llm/anthropic/request.go:449:	case llm.ToolChoiceTool:
+internal/llm/anthropic/request.go:454:		return mustJSON(wireToolChoice{Type: "tool", Name: tc.ToolName}), nil
+internal/llm/content.go:86:// ToolChoiceMode selects how the model may use the declared tools.
+internal/llm/content.go:87:type ToolChoiceMode string
+internal/llm/content.go:90:	ToolChoiceAuto     ToolChoiceMode = "auto"
+internal/llm/content.go:91:	ToolChoiceNone     ToolChoiceMode = "none"
+internal/llm/content.go:92:	ToolChoiceRequired ToolChoiceMode = "required"
+internal/llm/content.go:93:	ToolChoiceTool     ToolChoiceMode = "tool" // force ToolName

@@ -1,0 +1,55 @@
+=== loop_golden_test.go: structure ===
+20:func TestGoldenTextReply(t *testing.T) {
+55:func TestGoldenSingleToolCall(t *testing.T) {
+93:func TestGoldenParallelToolCalls(t *testing.T) {
+128:func TestGoldenToolResultFeedsNextTurn(t *testing.T) {
+148:func TestGoldenConcurrencyCeiling(t *testing.T) {
+176:func TestToolExecutionRunsFourAcross(t *testing.T) {
+179:	h := newHarness(t, "six-tools", withTools(tools), withConfig(func(c *Config) {
+221:func TestGoldenBudgetExhaustionStuck(t *testing.T) {
+258:func TestGoldenCancellationEndToEnd(t *testing.T) {
+282:func TestGoroutineBudgetDrains(t *testing.T) {
+310:func TestTaskLogAndToolCallRows(t *testing.T) {
+371:func TestGoldenProviderFailureIsVisible(t *testing.T) {
+
+=== adaptertest/harness.go: request capture surface ===
+89:	ScDisconnectTools ScenarioID = "disconnect-tools"
+102:func AllScenarios() []ScenarioID {
+104:		ScToolCall, ScMaxTokens, ScDisconnect, ScDisconnectTools,
+132:	// Request builds the normalized request (nil = BaseRequest()).
+133:	Request func() *llm.Request
+153:// BaseRequest is the protocol-agnostic request the golden fixtures answer.
+154:func BaseRequest() *llm.Request {
+155:	return &llm.Request{Model: "mock-small", Messages: []llm.Message{{
+164:func weatherAndTimeCalls() []llm.ToolCall {
+178:func CaseTable() []Case {
+205:			ID: ScDisconnectTools, Mode: ModeStream,
+279:func AssertCoverage(t *testing.T, u Unit) {
+329:func GoldenDir() string {
+339:func RepoRoot() string {
+344:func Serve(t *testing.T, u Unit, sc ScenarioID, pace bool) (base string, rep *golden.Replayer) {
+363:func ServeFixtureByName(t *testing.T, name string) (string, *golden.Replayer) {
+376:func ObserveErr(err error) *observe.Error {
+385:func ServeBody(t *testing.T, src string) (base string, rep *golden.Replayer) {
+403:func Drain(t *testing.T, p llm.LlmProvider, req *llm.Request) ([]llm.StreamEvent, llm.TurnResult, error) {
+416:func ClassOf(err error) observe.ErrorClass {
+423:func CodeOf(err error) string {
+431:func as(err error, target **observe.Error) bool {
+446:func eqToolCalls(got, want []llm.ToolCall) string {
+464:func Run(t *testing.T, u Unit, c Case) {
+481:func RunAll(t *testing.T, u Unit) {
+491:func requestFor(c Case) *llm.Request {
+492:	if c.Request != nil {
+493:		return c.Request()
+495:	return BaseRequest()
+498:func runStream(t *testing.T, u Unit, c Case) {
+507:func runRetry(t *testing.T, u Unit, c Case) {
+524:	// Request counts prove the ladder actually ran (and that 401 never did).
+527:		if n := len(rep.Requests); n != 3 {
+537:		if n := len(rep.Requests); n != 4 {
+541:		if n := len(rep.Requests); n != 1 {
+547:func runCompat(t *testing.T, u Unit, c Case) {
+579:func runCancel(t *testing.T, u Unit, c Case) {
+630:func checkTurn(t *testing.T, c Case, turn llm.TurnResult) {
+675:func checkTerminalContract(t *testing.T, c Case, events []llm.StreamEvent, turn llm.TurnResult, err error) {
+773:func RetryOptionsOf() llm.RetryOptions {

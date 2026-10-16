@@ -1,0 +1,59 @@
+anchor=232f309e8092b15ede2d6f0455d71775e5a5de96
+== BuiltinPlanEntries ==
+lines=9 prod=4 test=5
+cmd/wisp/run.go:805:	// tail named as owed) is registered from tools.BuiltinPlanEntries in exactly
+cmd/wisp/run.go:826:	for _, e := range tools.BuiltinPlanEntries() {
+internal/tools/plan_present.go:134:// BuiltinPlanEntries returns the plan family (today exactly one tool). It is a
+internal/tools/plan_present.go:138:func BuiltinPlanEntries() []Entry {
+
+== \.Register( ==
+lines=64 prod=6 test=58
+cmd/wisp/run.go:522:		if err := reg.Register(e); err != nil {
+cmd/wisp/run.go:548:		if err := reg.Register(e); err != nil {
+cmd/wisp/run.go:798:		if err := reg.Register(e); err != nil {
+cmd/wisp/run.go:827:		if err := reg.Register(e); err != nil {
+internal/proc/boot_windows.go:258:	return rt.shutdownHooks.Register(step, hook)
+tools/mockllm/main.go:51:	srv.Register(mux)
+
+== reg\.List()\|b\.reg\.List() ==
+lines=2 prod=1 test=1
+internal/tools/bridge.go:235:	entries := b.reg.List()
+
+== func (b \*Bridge) Tools ==
+lines=1 prod=1 test=0
+internal/tools/bridge.go:234:func (b *Bridge) Tools(_ context.Context) ([]agent.ToolInfo, error) {
+
+== opt\.Tools\.Tools( ==
+lines=3 prod=3 test=0
+internal/agent/loop.go:569:	dir, err := l.opt.Tools.Tools(ctx)
+internal/agent/loop.go:618:	dir, err := l.opt.Tools.Tools(ctx)
+internal/agent/loop.go:845:	dir, err := l.opt.Tools.Tools(ctx)
+
+== agent\.ToolInfo{ ==
+lines=3 prod=1 test=2
+internal/tools/bridge.go:238:		out = append(out, agent.ToolInfo{
+
+== Inject( ==
+lines=2 prod=2 test=0
+internal/agent/inject.go:44:func Inject(query string, dir []ToolInfo, b Budgets) Injection {
+internal/agent/loop.go:573:	inj := Inject(latestUserText(l.History()), dir, l.b)
+
+== Injection\.ToolDefs\|in\.Injection\.ToolDefs ==
+lines=1 prod=1 test=0
+internal/agent/prompt.go:251:		Tools:             in.Injection.ToolDefs,
+
+== req\.Tools\|\.Tools\b ==
+lines=37 prod=22 test=15
+internal/agent/loop.go:205:	if opt.Tools == nil {
+internal/agent/loop.go:206:		opt.Tools = NewEchoProvider()
+internal/agent/loop.go:569:	dir, err := l.opt.Tools.Tools(ctx)
+internal/agent/loop.go:618:	dir, err := l.opt.Tools.Tools(ctx)
+internal/agent/loop.go:760:		return l.opt.Tools.Execute(ctx, req)
+internal/agent/loop.go:764:	out, err := l.opt.Tools.Execute(tctx, req)
+internal/agent/loop.go:845:	dir, err := l.opt.Tools.Tools(ctx)
+internal/llm/anthropic/request.go:149:	for _, t := range req.Tools {
+internal/llm/anthropic/request.go:158:		w.Tools = append(w.Tools, wireToolDef{Name: t.Name, Description: t.Description, InputSchema: params})
+internal/llm/openaichat/request.go:109:	for _, t := range req.Tools {
+internal/llm/openaichat/request.go:114:		w.Tools = append(w.Tools, wireToolDef{
+internal/llm/openairesponses/request.go:104:	for _, t := range req.Tools {
+

@@ -1,0 +1,16 @@
+=== real builtin names inside fixture surface (sse/testdata/mockllm/llm) ===
+fs\.read -> 0 命中
+fs\.write -> 0 命中
+fs\.edit -> 0 命中
+fs\.trash -> 0 命中
+fs\.move -> 0 命中
+fs\.delete -> 0 命中
+task\.spawn -> 0 命中
+task\.output -> 0 命中
+task\.cancel -> 0 命中
+plan\.present -> 0 命中
+web\.search -> 0 命中
+list_tools -> 0 命中
+
+=== positive control: same ruler, name=echo ===
+18

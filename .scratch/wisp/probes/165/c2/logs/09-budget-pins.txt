@@ -1,0 +1,27 @@
+=== pins on resident tool count / SectionResidentTools / byte-stable prefix ===
+cmd/wisp/dispatch_hop_selfproof_133_test.go:168:		runResident()
+cmd/wisp/dispatch_hop_selfproof_133_test.go:204:func runResident() {}
+cmd/wisp/dispatch_hop_selfproof_133_test.go:253:		runResident()
+cmd/wisp/dispatch_hop_selfproof_133_test.go:274:func runResident() {}
+cmd/wisp/exec_holder_toggle_321_test.go:15:// .scratch/wisp/probes/321/r1/). Why a source walk: runResident never returns
+cmd/wisp/exec_holder_toggle_321_test.go:45:	installs int      // startResidentBall calls in runResident
+cmd/wisp/exec_holder_toggle_321_test.go:52:// readPanelHop321 walks runResident's AST. No line numbers anywhere: every clause reads
+cmd/wisp/exec_holder_toggle_321_test.go:74:		t.Fatalf("AC#1 RED: runResident binds no variable from %s(...), so this boot has no panel holder the ball's gestures could drive - the hop is gone, not merely rewired", panelHolderCtor321)
+cmd/wisp/exec_holder_toggle_321_test.go:143:		t.Fatalf("no runResident found in resident_windows.go (the instrument, not the code)")
+cmd/wisp/exec_holder_toggle_321_test.go:149:		t.Fatalf("AC#1 RED: runResident (%s) has %d %s call(s) reaching %d %s call(s), want 1 and 1 - the panel hop either hands the ball host no executor or hands it two, and this pin cannot say which the gestures drive", file, hop.installs, ballHostInstaller321, hop.hops, panelHostHook321)
+cmd/wisp/exec_holder_toggle_321_test.go:154:		t.Fatalf("AC#1 RED: the panel hop in runResident (%s) is %s that drives NO executor on %s (receiver %q) - the tray item, the ball and the panel hot key now execute nothing, whatever this file is named", file, hop.argShape, panelHolderCtor321, hop.receiver)
+cmd/wisp/exec_holder_toggle_321_test.go:158:		t.Fatalf("AC#1 RED: this hop is NOT toggle semantics - runResident (%s) hands the ball host the executor set %v on %s (receiver %q, argument %s), want exactly [%s]. A panel hop that shows instead of flipping is the rewiring ticket 319-r3 split the two executors to forbid: it hid the operator's window on a double click (probes/319/v/03-ac2-live-adjudication.txt shape A).", file, hop.driven, panelHolderCtor321, hop.receiver, hop.argShape, toggleExecutor321)
+cmd/wisp/exec_holder_toggle_321_test.go:169:		t.Fatalf("no runResident found in resident_windows.go (the instrument, not the code)")
+cmd/wisp/leg_dispatch_gate_133_test.go:187:	{leg: "no-args", test: "TestAC1ResidentLegInstallsItsLogListenerOnDisk", entry: "runResident", process: true},
+cmd/wisp/leg_sink_gate_131_test.go:900:// has runResident in resident_windows.go and a fail-closed counterpart in
+cmd/wisp/leg_sink_nail_131_windows_test.go:631:	nailResident131 = registerLegNail131("no-args", TestAC1ResidentLegInstallsItsLogListenerOnDisk, "subprocess:runResident")
+cmd/wisp/plan_assembled_165r2_test.go:122:		registered, declared, resident = ok, entry.Decl.Declared, entry.Decl.Resident
+cmd/wisp/plan_assembled_165r2_test.go:130:				advertised = i.Resident && i.RiskLevel == memory.RiskL2
+cmd/wisp/plan_assembled_165r2_test.go:153:		t.Errorf("装配读到的声明面变了：Declared=%v Resident=%v，冻结行（PLAN.md 的 D34 那一行／SPEC-07 §3）写的是 L2 且常驻",
+cmd/wisp/resident_approval_risk_256_windows_test.go:12:// runResident with rt.Layout.DataDir).
+
+=== thresholds.go resident/tool entries ===
+internal/observe/thresholds.go:168:			v.Note = "D38b resident baseline; goroutines are only readable in-process, so an out-of-tree row reports the measuring skeleton's own roster (same boot path, upper bound for the subject)"
+internal/observe/thresholds.go:182:			Note: "per-task counts vary; D38b roster report governs",
+
+=== d22scan allowlist mentions of plan ===

@@ -1,0 +1,23 @@
+=== who provides f.srv (mockllm fixture) in cmd/wisp ===
+cmd/wisp/approval_reply_201_test.go:86:	srv     *adaptertest.Mockllm
+cmd/wisp/providers_test.go:27:	srv   *adaptertest.Mockllm
+cmd/wisp/run_test.go:58:type runFixture struct {
+cmd/wisp/run_test.go:60:	srv *adaptertest.Mockllm
+cmd/wisp/zz315a1probe_test.go:190:	srv  *httptest.Server
+
+=== golden selection in cmd/wisp tests ===
+cmd/wisp/zz315a1probe_test.go:131:// mirrors internal/llm/testdata/golden/tool-call.sse (fragmented args are not
+
+=== adaptertest.RunFaultSuite / mockllm.go start ===
+internal/llm/adaptertest/mockllm.go:51:func StartMockllm(t *testing.T) *Mockllm {
+internal/llm/adaptertest/mockllm.go:138:func exeSuffix() string {
+internal/llm/adaptertest/mockllm.go:146:func (m *Mockllm) Control(t *testing.T, route, body string) map[string]any {
+internal/llm/adaptertest/mockllm.go:158:func (m *Mockllm) RouteCount(t *testing.T, route string) int {
+internal/llm/adaptertest/mockllm.go:171:func (m *Mockllm) decode(route string, resp *http.Response) map[string]any {
+internal/llm/adaptertest/mockllm.go:193:func (m *Mockllm) QueueFault(t *testing.T, f Fault) {
+internal/llm/adaptertest/mockllm.go:206:func GoldenRequestModel(name string) *llm.Request {
+internal/llm/adaptertest/mockllm.go:234:func RunFaultSuite(t *testing.T, u Unit, fs FaultSuite) {
+internal/llm/adaptertest/mockllm.go:355:func (m *Mockllm) StreamGolden(t *testing.T, u Unit, fixture string, req *llm.Request) []llm.StreamEvent {
+internal/llm/adaptertest/mockllm.go:373:func ContextOf(t *testing.T) context.Context {
+internal/llm/adaptertest/mockllm.go:383:func (m *Mockllm) LastRequest(t *testing.T, route string) (string, http.Header) {
+internal/llm/adaptertest/mockllm.go:412:func (m *Mockllm) Reset(t *testing.T) {

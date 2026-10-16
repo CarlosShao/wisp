@@ -1,0 +1,61 @@
+=== portable-tests.sh scope definitions ===
+2:# scripts/portable-tests.sh - the runner behind CI's "Portable package tests"
+5:#	go test <16 packages> -count=1
+7:# and Go books a SKIP as `ok`: internal/risk's TestSyncRegistryProbeLive skipped
+8:# on Windows AND on ubuntu, printed `ok  github.com/CarlosShao/wisp/internal/risk`,
+28:# + the package that declares it + a platform + a class + a reason, and on every
+40:# pattern internal/risk/pathresolver*.go; the other needs a second volume that no
+45:# "A package name in a list" and "that package was tested" were never connected
+46:# here. AC#1's census over CI history found 20 tested packages out of `go list
+48:# with NOTHING behind it cannot fail. internal/session and internal/watchdog are
+50:# "DEFERRED: implemented by ticket 28 / 42, this ticket only freezes the package
+51:# boundary" - and a third case (internal/agent/scheduler) was reachable only
+52:# because the list said ./internal/agent/... . Measured, not argued:
+53:# `runtests.sh ./internal/session/` alone exits 1 (no top-level result at all),
+54:# but INSIDE a 23-package invocation the strict runner's "PASS>0" test is
+55:# satisfied by the other packages, so the empty one contributes nothing and stays
+56:# invisible forever. That is why the scope is now resolved to import paths and
+57:# audited per package by three guards, none of which can be talked around:
+58:#   GUARD A (AC#3)  a declared package that compiles ZERO test files on this
+61:#   GUARD B (AC#2)  every declared package must print its OWN top-level result
+63:#                   appeared in the log" can never count as "the package ran";
+64:#   GUARD C (AC#3)  the named scopes pin their resolved import paths, so
+68:#                   while a package compiles a test file for this GOOS and no tier
+69:#                   claims it. A/B/C audit the packages a scope NAMES; nothing
+70:#                   audited the packages a scope FORGETS, which is why "20 of 33"
+74:#                   package arrives with tests and no entry at all (internal/projctx,
+78:#   bash scripts/portable-tests.sh                    # the core (ubuntu) CI scope
+79:#   bash scripts/portable-tests.sh --scope=windows    # the test-windows scope
+80:#   bash scripts/portable-tests.sh --scope=cli        # cmd/wisp, after third_party
+81:#   bash scripts/portable-tests.sh --scope=winsec     # the internal/winsec tier (ticket 251)
+82:#   bash scripts/portable-tests.sh ./internal/proc/   # explicit scope (A and B still
+85:#                                                     # scope, see the ticket 251 AC#1 block)
+132:# and an inherited set from another volume is not the same set. The same scope run
+144:# then reached internal/risk's literal-spelling preconditions and two real
+179:# The scopes CI runs, stated once, here - ci.yml names a scope, it does not carry
+180:# a package list. That move is ticket 111 AC#2's: a workflow line naming a package
+181:# is not evidence the package was tested, and the guard that makes deleting one
+184:#   core    test-core (ubuntu). Every portable package with a test denominator on
+185:#           both platforms. ./internal/watchdog/ is NOT here and cannot be: it is a
+187:#           and never proved anything; ./internal/agent/... is spelled out as agent +
+189:#           agent/scheduler, a second doc.go-only stub. When those packages get code,
+192:#           ./internal/session/ RE-ENTERED on 2026-10-05 (ticket 111 r1 leg): ticket
+195:#           nothing noticed - the package sat at zero CI coverage for four days while
+196:#           the census that could see it was a command nobody ran. ./internal/projctx/
+198:#           any scope in any commit). Both compile tests on BOTH platforms, both carry
+201:#           package they import is already in this scope (memory / panel / risk / perm
+209:#   cli     cmd/wisp, whose test binary needs the sherpa DLLs (ticket 98's load
+211:#   winsec  the internal/winsec tier (ticket 251 AC#1). This tier is NEW: the pin
+215:#           package paths) arrived in GUARD C's "nothing to pin" branch. So a split
+216:#           of or a rename inside internal/winsec was, until ticket 251, a step that
+217:#           kept passing while testing one package less. The tier's scope is written
+218:#           as the GLOB ./internal/winsec/... on purpose: unlike the bare directory,
+219:#           the glob puts a newly created subpackage INTO the resolved set, where
+221:#           census is not a scope - it is the audit of the four above, and it is in
+223:#           census reads and the branches that give a tier its scope to be ONE list.
+225:# ./internal/winsec/ joined the core list for ticket 111 AC#9: the ubuntu leg ran
+226:# 16 globs that never named it, so the whole `!windows` half of the package that
+234:# two legs now cover different files of the same package, which is the point.
+237:    --scope=*) mode=${1#--scope=}; shift ;;
+240:# Each named scope carries the set its globs resolve to, on one line per import
+241:# path. GUARD C compares against this, and --scope=census reads it, so the list a

@@ -1,0 +1,90 @@
+=== newHarness defs ===
+internal/agent/harness_test.go:92:func newHarness(t *testing.T, fixture string, opts ...harnessOpt) *harness {
+=== withTools def ===
+internal/agent/corr_percall_242_test.go:84:	h := newHarness(t, "parallel-tools", withTools(p),
+internal/agent/declared_l0_risk_179_test.go:84:	h := newHarness(t, "tool-then-text", withJournal(store), withTools(ep),
+internal/agent/declared_l0_risk_179_test.go:154:	h := newHarness(t, "tool-then-text", withJournal(store), withTools(ep),
+internal/agent/forensics_test.go:92:	h := newHarness(t, "six-tools", withJournal(store), withTools(tools),
+internal/agent/guard_test.go:221:	h := newHarness(t, "slow-tool", withJournal(store), withTools(tools),
+internal/agent/harness_test.go:58:// withTools replaces the ToolProvider.
+internal/agent/harness_test.go:59:func withTools(tp ToolProvider) harnessOpt {
+internal/agent/loop_golden_test.go:179:	h := newHarness(t, "six-tools", withTools(tools), withConfig(func(c *Config) {
+internal/agent/ticket285_corr_distinct_rulers_test.go:103:	h := newHarness(t, "parallel-tools", withTools(p))
+
+=== TestGoldenSingleToolCall body ===
+func TestGoldenTextReply(t *testing.T) {
+	h := newHarness(t, "text-reply")
+	res := h.run("提醒我五分钟后关火")
+
+	if res.Status != StatusCompleted {
+		t.Fatalf("status = %s (%s), want completed", res.Status, res.Message)
+	}
+	if res.Text != "好的，已经把提醒设好了。" {
+		t.Errorf("text = %q", res.Text)
+	}
+	if res.Rounds != 1 {
+		t.Errorf("rounds = %d, want 1", res.Rounds)
+	}
+	if h.requests() != 1 {
+		t.Errorf("provider requests = %d, want 1", h.requests())
+	}
+	if res.ToolCalls != 0 {
+		t.Errorf("tool calls = %d, want 0", res.ToolCalls)
+	}
+	// C23 data: usage lands on the result from the Usage event.
+	if res.Usage.InputTokens != 140 || res.Usage.OutputTokens != 9 {
+		t.Errorf("usage = %+v", res.Usage)
+	}
+	if res.Usage.CachedTokens != 96 {
+		t.Errorf("cached = %d, want 96 (prompt cache hit is visible)", res.Usage.CachedTokens)
+	}
+	// The streamed text reached the sink as deltas.
+	if h.sink.Of(EvTextDelta) == 0 {
+		t.Error("no text deltas published")
+	}
+	if got := h.sink.LastOf(EvDone); got == nil {
+		t.Error("no done event published")
+	}
+}
+
+func TestGoldenSingleToolCall(t *testing.T) {
+	h := newHarness(t, "tool-then-text")
+	res := h.run("现在天气怎么样")
+
+	if res.Status != StatusCompleted {
+		t.Fatalf("status = %s (%s), want completed", res.Status, res.Message)
+	}
+	if n := h.echo().CallCount(); n != 1 {
+		t.Fatalf("tool executions = %d, want 1", n)
+	}
+	call := h.echo().Calls()[0]
+	if call.Req.Name != "echo" || call.Req.CallID != "call_e1" {
+		t.Errorf("call = %+v", call.Req)
+	}
+	// Ticket 242 mints one correlation id per tool call (loop.go:603 callCorr,
+	// sole call site loop.go:676). C18 seats correlationId BESIDE the task id and
+	// never requires equality (docs/PLAN.md:1368), so this request's corr is the
+	// task id prefixed onto the call's own wire id - call_e1 in this replay, the
+	// same id pinned two lines above. All three halves are pinned: the task id
+	// prefix, the exact call-id suffix and inequality with the bare task id.
+	// "corr is non-empty" would not do - the pre-242 value passed that too.
+	wantCorr := res.TaskID + "#call_e1"
+	if call.Req.TaskID != res.TaskID ||
+		!strings.HasPrefix(call.Req.CorrelationID, res.TaskID) ||
+		strings.TrimPrefix(call.Req.CorrelationID, res.TaskID+"#") != "call_e1" ||
+		call.Req.CorrelationID == res.TaskID {
+		t.Errorf("call identity = %+v, want task %s and correlation id %s (task id prefix + this call's own id, never the bare task id)", call.Req, res.TaskID, wantCorr)
+	}
+	if res.Text != "现在是 22 摄氏度，晴。" {
+		t.Errorf("final text = %q", res.Text)
+	}
+	// The assistant turn and its tool result both stay in the history, keyed by
+	// the same call id (C25/D21 depend on the chain being intact).
+	if !historyHasCallID(h.loop.History(), "call_e1") {
+		t.Errorf("history lost call id: %s", dumpHistory(h.loop.History()))
+	}
+}
+
+func TestGoldenParallelToolCalls(t *testing.T) {
+	h := newHarness(t, "parallel-tools")
+	res := h.run("两件事一起办")

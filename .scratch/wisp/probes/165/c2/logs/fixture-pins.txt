@@ -1,0 +1,87 @@
+=== pins counting golden fixtures ===
+cmd/wisp/dataroot_128_test.go:573:	entries, err := os.ReadDir(cwd)
+cmd/wisp/early_log_nail_130_windows_test.go:150:	for _, name := range mustGlob117(t, filepath.Join(dir, "wisp-*.jsonl")) {
+cmd/wisp/firstrun_198_test.go:132:	if strays, _ := filepath.Glob(filepath.Join(dir, ".wisp-config-*.tmp")); len(strays) > 0 {
+cmd/wisp/firstrun_198_test.go:180:	if entries, _ := os.ReadDir(cfgPath); len(entries) != 0 {
+cmd/wisp/firstrun_198r2_test.go:331:	if strays, _ := filepath.Glob(filepath.Join(dir, ".wisp-config-*.tmp")); len(strays) > 0 {
+cmd/wisp/firstrun_198r2_test.go:455:	if strays, _ := filepath.Glob(filepath.Join(rootDir, ".wisp-config-*.tmp")); len(strays) > 0 {
+cmd/wisp/instructions_200r2_test.go:235:	var sawGlobal bool
+cmd/wisp/instructions_200r2_test.go:238:			sawGlobal = true
+cmd/wisp/instructions_200r2_test.go:245:	if !sawGlobal {
+cmd/wisp/leg_dispatch_gate_133_test.go:387:	entries, err := os.ReadDir(dir)
+cmd/wisp/leg_sink_gate_131_test.go:668:	entries, err := os.ReadDir(dir)
+cmd/wisp/leg_sink_nail_131_windows_test.go:243:	names, err := filepath.Glob(filepath.Join(s.dir, "wisp-*.jsonl"))
+cmd/wisp/logsink_test.go:81:	before, err := os.ReadDir(cwd)
+cmd/wisp/logsink_test.go:96:	after, err := os.ReadDir(cwd)
+cmd/wisp/logsink_test.go:184:	names, err := filepath.Glob(filepath.Join(dir, "*.jsonl"))
+cmd/wisp/logsink_windows_test.go:73:	for _, name := range mustGlob117(t, filepath.Join(dir, "wisp-*.jsonl")) {
+cmd/wisp/logsink_windows_test.go:97:func mustGlob117(t *testing.T, pattern string) []string {
+cmd/wisp/logsink_windows_test.go:99:	matches, err := filepath.Glob(pattern)
+cmd/wisp/panel_config_248_test.go:289:	blobs, err := filepath.Glob(filepath.Join(dir, "secrets", "*"))
+cmd/wisp/panel_config_248_test.go:297:	extra, err := filepath.Glob(filepath.Join(dir, "*.key"))
+
+=== AssertCoverage body ===
+func AssertCoverage(t *testing.T, u Unit) {
+	t.Helper()
+	table := CaseTable()
+	if len(table) != len(AllScenarios()) {
+		t.Fatalf("CaseTable has %d rows but AllScenarios lists %d", len(table), len(AllScenarios()))
+	}
+	claimed := map[string]bool{}
+	for _, c := range table {
+		name := u.Fixture(c.ID)
+		if name == "" {
+			t.Fatalf("scenario %s has no fixture for unit %s", c.ID, u.Name)
+		}
+		claimed[name] = true
+		rs, err := golden.LoadFile(filepath.Join(GoldenDir(), name+".sse"))
+		if err != nil {
+			t.Fatalf("scenario %s: fixture %s: %v", c.ID, name, err)
+		}
+		if len(rs) == 0 {
+			t.Fatalf("scenario %s: fixture %s parses to zero responses", c.ID, name)
+		}
+	}
+	entries, err := os.ReadDir(GoldenDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	prefix := u.Prefix
+	if prefix == "" {
+		prefix = u.Name
+	}
+	for _, e := range entries {
+		n := e.Name()
+		if !strings.HasSuffix(n, ".sse") {
+			continue
+		}
+		base := strings.TrimSuffix(n, ".sse")
+		if !strings.HasPrefix(base, prefix) {
+			continue
+		}
+		if !claimed[base] {
+			t.Errorf("orphan fixture %s: no scenario of the shared table maps to it", base)
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Fixture plumbing
+// ---------------------------------------------------------------------------
+
+// GoldenDir is the shared fixture directory: the SAME files tools/mockllm
+// replays over HTTP (one format, two runners).
+func GoldenDir() string {
+	_, thisFile, _, ok := runtime.Caller(0)
+
+=== winlive tag ===
+.github/workflows/ci.yml
+.scratch/wisp/issues/07-ball-state-machine-core-done.md
+.scratch/wisp/issues/111-ci-tests-20-of-33-packages-done.md
+.scratch/wisp/issues/12-cli-text-path-s1-gate.md
+.scratch/wisp/issues/165-plan-first-then-act-a-brake-the-voice-entry-needs.md
+.scratch/wisp/issues/20-host-bridge-fs-tools-done.md
+.scratch/wisp/issues/239-the-ball-was-cut-into-a-square-by-its-own-window-three-numbers-changed-at-the-09-30-sign-off.md
+.scratch/wisp/issues/245-the-bare-esc-cancel-default-is-a-global-hotkey-so-the-resident-process-steals-esc-from-every-other-app.md
+.scratch/wisp/issues/246-the-process-that-runs-tasks-is-not-the-process-holding-the-ball-so-no-veto-channel-has-an-executor.md
+.scratch/wisp/issues/253-panel-inbound-three-ruler-holes-done.md

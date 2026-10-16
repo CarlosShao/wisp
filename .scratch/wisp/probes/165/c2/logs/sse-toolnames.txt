@@ -1,0 +1,11 @@
+=== tool names appearing inside SSE fixtures ===
+     18 "name":"echo"
+      8 "name":"get_weather"
+      7 "name":"sleep"
+      5 "name":"get_time"
+
+=== also with no space ===
+     18 "name":"echo"
+      8 "name":"get_weather"
+      7 "name":"sleep"
+      5 "name":"get_time"

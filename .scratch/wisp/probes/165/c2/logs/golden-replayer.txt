@@ -1,0 +1,18 @@
+=== golden pkg: Replayer + Requests ===
+internal/llm/golden/golden.go
+internal/llm/golden/golden_test.go
+internal/llm/golden/replay.go
+internal/llm/golden/replay.go:32:	// Requests records every request line seen (for attempt-count asserts).
+internal/llm/golden/replay.go:33:	Requests []string
+internal/llm/golden/replay.go:37:func NewReplayer(rs []Response) *Replayer { return &Replayer{rs: rs} }
+internal/llm/golden/replay.go:40:func (r *Replayer) Remaining() int { return len(r.rs) - r.cursor }
+internal/llm/golden/replay.go:43:func (r *Replayer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+internal/llm/golden/replay.go:44:	r.Requests = append(r.Requests, req.Method+" "+req.URL.Path)
+internal/llm/golden/replay.go:71:func (r *Replayer) paceDelay(res Response) time.Duration {
+internal/llm/golden/replay.go:123:func (r *Replayer) Server() *httptest.Server {
+internal/llm/golden/replay.go:129:func ServerFromBytes(src []byte) (*httptest.Server, *Replayer, error) {
+internal/llm/golden/replay.go:139:func ServerFromFile(path string) (*httptest.Server, *Replayer, error) {
+
+=== newHarness / withTools in internal/agent ===
+internal/agent/harness_test.go:59:func withTools(tp ToolProvider) harnessOpt {
+internal/agent/harness_test.go:92:func newHarness(t *testing.T, fixture string, opts ...harnessOpt) *harness {

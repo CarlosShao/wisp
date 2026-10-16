@@ -1,0 +1,7 @@
+anchor=232f309e8092b15ede2d6f0455d71775e5a5de96
+ruler=git show $A:internal/tools/plan_present_165_test.go | awk 'NR>=13 && NR<=16'
+[L13]//
+[L14]// 两发变异（-overlay 注入、树零改）见 probes/165：把 Declared 从 L2 降成 L1
+[L15]// 必须叫 AC#2 那条红；摘掉 planPresentScopeClause 必须叫 AC#3 的条款那条红。
+[L16]
+file total lines=327
