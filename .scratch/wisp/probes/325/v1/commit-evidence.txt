@@ -1,0 +1,18 @@
+325-v1 验收表落盘：五格逐格判语（AC#1 成立／AC#2 成立·含我自己作废的那一发／AC#3 成立·11 包逐包四数／AC#4 成立·含 gofumpt 真身更正／AC#5 验毕·不立"第五处"的票）
+
+件＝docs/evidence/s1/325-v1-acceptance.md（165 行）。要点：
+- 台面：两枚导出缺件的红（缺 frontend／缺 design）具名不作判据；runtests.sh 五处 sha 同值 ad6f6a8d…4bf6。
+- AC#1：固定串形状尺四处同形＋正则假 0 示范；改前（混形）与改后（正形）各一发 sh scripts/d22scan.sh 都 rc=0 clean、
+  正控制四数逐字同形 PASS=35 RUN=77，只差发射根那个分隔符。
+- AC#2：我的第一发 sed 静默 no-op ⇒ 整栏作废并保留；第二发加硬门后四形同屏＝正形绿／混形 rc=1 四红
+  （Parameter format not correct）／纯正斜杠根 rc=1 四红（Invalid switch - "tmp".）／还原绿；
+  判语＝仪器自红（:182/:286 两枚红的字面开头就是 precondition:）；射程＝缺世界，独立现跑到（d22scan.sh:51 只交
+  -C tools/d22scan、tools/ 里可执行 mklink 0 枚、ci.yml:831 那发在混形码上仍 rc=0 PASS=1）。
+- AC#3：整档 --scope=windows rc=0，发射行原生形，11 包逐包四数（切块之和＝脚本总计 662/462/0/0，另以三枚小包独立复跑验尺），
+  红名册空（正控 462），与 A922 那两张名册作差＝新增 0 ⇒ 票 317 的 AC#3 那一发齐了。
+- AC#4：四枚门全 rc=0；票 311 rc=2 零命中；gofumpt 真身定位在 /d/work/base/gopath/bin/gofumpt.exe（更正 r1 的"找不到真身"），
+  按绝对路径跑 gofumpt -l tools scripts＝0，⛔ 拿 gofmt 顶。
+- AC#5：当值用 4 枚 export GOTMPDIR（尾接全反斜杠）／只当展示用 4 枚 wisp_311_ref_path（:818/:174/:186/runtests.sh:178）／
+  混形尾接 hunt 全 0（正控＝那 4 枚对照串现量 4）⇒ 没有第五处；两枚要编排者拍板的缺口具名上报（改射程＝改门、CI 名册＝禁区）。
+
+只 commit，⛔ push；⛔ 翻框；⛔ 动票 317 一字；产码一字未动。
