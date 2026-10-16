@@ -1,0 +1,49 @@
+2026-10-16 11:56:18 +0800
+cmd=go test ./internal/panel/ -count=1 (tree=bench)
+time=2026-10-16T11:56:21.442+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+    approval_test.go:134: ApprovalCardView <-> ApprovalCardView: 10 JSON keys reconciled
+    approval_test.go:134: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    approval_test.go:134: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.25s)
+    backpressure_bound_35r8_test.go:309: flood under a blocked consumer with no fan-out (3 streams, so the key bound never engages): 1x pinned 1200000 text runes over 3 rows (live heap +1203416 bytes), 4x pinned 4800000 runes over 3 rows (live heap +4824840 bytes), against the cap this package can state (36864 runes over 64 rows). Retention grew 4.0x for a 4x flood and equals the flood exactly, so ticket 35 :49's "no unbounded memory (heap cap asserted)" has no counterpart in internal/panel below the key bound. pinned text 4800000 runes > the cap 36864; live heap + 4824840 bytes > the cap 1196032
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.63s)
+    backpressure_bound_35r8_test.go:336: blocked consumer, fan-out past the ceiling: 1x opened 4000 streams and pins 3936 names (50058 runes, live heap +153744 bytes), 4x opened 16000 and pins 15936 names (211994 runes, live heap +563744 bytes) - rows stayed at the ceiling 64 in both, so the memory the flood bought is the naming ledger itself. Its cap is the event count, not the bound. pinned dropped-name runes 211994 > the cap 36864
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+    composer_test.go:78: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    composer_test.go:83: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+    composer_test.go:78: Go ComposerState emits [git currentModel modelKnown credentialState credentialKnown] that interface ComposerState does not declare
+    composer_test.go:83: ComposerState <-> ComposerState: 11 JSON keys reconciled
+    composer_test.go:83: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:83: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:83: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:83: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+--- FAIL: TestComposerRenderFixtureTellsTheTruth (0.00s)
+    composer_test.go:873: the render fixture has no block for "no host attached" - the harness and this test disagree about which states are evidenced
+    composer_test.go:873: the render fixture has no block for "workspace chosen, video stored" - the harness and this test disagree about which states are evidenced
+    composer_test.go:873: the render fixture has no block for "unsupported attachment told to the user" - the harness and this test disagree about which states are evidenced
+    composer_test.go:902: render fixture verified across 0 painted states
+--- FAIL: TestGitDimensionHasNoModelCallableTool (0.00s)
+    git_test.go:369: read docs/PLAN.md: open C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\docs\PLAN.md: The system cannot find the path specified.
+--- FAIL: TestReadGitOnThisRepositoryIsSelfConsistent (0.00s)
+    git_test.go:600: kind = "not_a_repo" reason = "这棵工作区目录及其以上都没有 .git，所以没有分支可显示": this repository has a .git directory
+--- FAIL: TestASecondCardForTheSameTaskStillLightsItsRow (0.00s)
+    subagent_blocked_220_test.go:109: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[{"correlationId":"child-1#9","tool":"fs.write","args":[],"level":"L2","rulesHit":["R2"],"reason":"写在工作区之外","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"native"}],"results":[],"composer":{"mode":{"current":"ask_high_risk","names":["ask_every_step","ask_high_risk","auto_approve"],"l2ConfirmNames":["auto_approve"]},"workspace":{"set":false,"spelling":"","canonical":"","reparse":false,"rewritten":false,"reason":"未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定"},"attachments":[],"acceptedAttachmentMimes":["image/png","image/jpeg","image/gif","image/webp","video/mp4","video/quicktime"],"maxAttachmentBytes":67108864,"attachmentError":"","git":{"kind":"unreadable","reason":"本轮未选择工作区，git 这一维没有可探测的目录","branch":"","detachedSha":"","isDetached":false,"repoRoot":"","currentWorktree":"","worktrees":[],"branches":[],"switchBlocked":"本进程不持有面板宿主，无法执行工作区切换：切换由持有面板的常驻腿按其 panel.workspace.request 收窄它自己的范围；本快照的 git 这一维在本进程里只读"},"currentModel":"","modelKnown":false,"credentialState":"unknown","credentialKnown":false},"generatedAt":"2026-10-03T09:00:00Z","tasks":{"rows":[{"taskId":"child-1","label":"读三份文件","kind":"subagent","parentTaskId":"root-1","status":"Thinking","statusKnown":true,"streamKey":"subagent:child-1","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"root-1","label":"总结这份笔记","kind":"root","parentTaskId":"","status":"Thinking","statusKnown":true,"streamKey":"root-1","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":1,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}}
+--- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt (0.00s)
+    --- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights (0.00s)
+        subagent_blocked_220_test.go:139: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[{"correlationId":"child-1#9","tool":"fs.write","args":[],"level":"L2","rulesHit":["R2"],"reason":"写在工作区之外","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"native"}],"results":[],"composer":{"mode":{"current":"ask_high_risk","names":["ask_every_step","ask_high_risk","auto_approve"],"l2ConfirmNames":["auto_approve"]},"workspace":{"set":false,"spelling":"","canonical":"","reparse":false,"rewritten":false,"reason":"未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定"},"attachments":[],"acceptedAttachmentMimes":["image/png","image/jpeg","image/gif","image/webp","video/mp4","video/quicktime"],"maxAttachmentBytes":67108864,"attachmentError":"","git":{"kind":"unreadable","reason":"本轮未选择工作区，git 这一维没有可探测的目录","branch":"","detachedSha":"","isDetached":false,"repoRoot":"","currentWorktree":"","worktrees":[],"branches":[],"switchBlocked":"本进程不持有面板宿主，无法执行工作区切换：切换由持有面板的常驻腿按其 panel.workspace.request 收窄它自己的范围；本快照的 git 这一维在本进程里只读"},"currentModel":"","modelKnown":false,"credentialState":"unknown","credentialKnown":false},"generatedAt":"2026-10-03T09:00:00Z","tasks":{"rows":[{"taskId":"child-1","label":"读三份文件","kind":"subagent","parentTaskId":"root-1","status":"Thinking","statusKnown":true,"streamKey":"subagent:child-1","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"root-1","label":"总结这份笔记","kind":"root","parentTaskId":"","status":"Thinking","statusKnown":true,"streamKey":"root-1","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":1,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}}
+    --- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights (0.00s)
+        subagent_blocked_220_test.go:139: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[{"correlationId":"child-1#147","tool":"fs.write","args":[],"level":"L2","rulesHit":["R2"],"reason":"写在工作区之外","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"native"}],"results":[],"composer":{"mode":{"current":"ask_high_risk","names":["ask_every_step","ask_high_risk","auto_approve"],"l2ConfirmNames":["auto_approve"]},"workspace":{"set":false,"spelling":"","canonical":"","reparse":false,"rewritten":false,"reason":"未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定"},"attachments":[],"acceptedAttachmentMimes":["image/png","image/jpeg","image/gif","image/webp","video/mp4","video/quicktime"],"maxAttachmentBytes":67108864,"attachmentError":"","git":{"kind":"unreadable","reason":"本轮未选择工作区，git 这一维没有可探测的目录","branch":"","detachedSha":"","isDetached":false,"repoRoot":"","currentWorktree":"","worktrees":[],"branches":[],"switchBlocked":"本进程不持有面板宿主，无法执行工作区切换：切换由持有面板的常驻腿按其 panel.workspace.request 收窄它自己的范围；本快照的 git 这一维在本进程里只读"},"currentModel":"","modelKnown":false,"credentialState":"unknown","credentialKnown":false},"generatedAt":"2026-10-03T09:00:00Z","tasks":{"rows":[{"taskId":"child-1","label":"读三份文件","kind":"subagent","parentTaskId":"root-1","status":"Thinking","statusKnown":true,"streamKey":"subagent:child-1","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"root-1","label":"总结这份笔记","kind":"root","parentTaskId":"","status":"Thinking","statusKnown":true,"streamKey":"root-1","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":1,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}}
+--- FAIL: TestABlockedRowKeepsItsRunningDimension (0.00s)
+    subagent_blocked_220_test.go:191: the second card is pending and the row does not say so
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+    tokens_fourway_test.go:441: read design/assets/tokens.css: open C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\design\assets\tokens.css: The system cannot find the path specified.
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	7.750s
+FAIL
+rc=1
+--- counts: RUN=0 TOPPASS=0 FAIL=11 SKIP=0
+--- fail names ---
+(no FAIL lines)
+2026-10-16 11:56:29 +0800

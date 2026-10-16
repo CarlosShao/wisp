@@ -1,0 +1,8 @@
+# 六枚已知名在 220-v1 自己那一发（40-full-cmdwisp.txt，run#1）里的颜色（尺＝grep -E '^--- (PASS|FAIL): <名> ' raw，现跑）
+raw=仓外 /tmp/wisp220v1/raw/cmdwisp.log（194267 字节／1301 行，未达终态：断在 TestAC13BringUpSurvivesAReusedThreadQuit）
+TestAC4FocusReturnToPriorWindowGap33r5 : --- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.67s)
+TestAC14GoSideEvalPushReachesThePage : 未跑到（那一发在到达它之前就断了）
+Test258BridgeMutationNoSrcKeepsOldBinding : 未跑到（那一发在到达它之前就断了）
+Test258OccupiedCombinationNamesTheNewValue : 未跑到（那一发在到达它之前就断了）
+Test258V1ProbeSummonEditRebindsLiveBall : 未跑到（那一发在到达它之前就断了）
+TestAC246DevLegIgnoresTheTestTaskInjection : 未跑到（那一发在到达它之前就断了）

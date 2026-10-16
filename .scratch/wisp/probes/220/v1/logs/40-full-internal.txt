@@ -1,0 +1,22 @@
+=== internal 2026-10-16 12:01:25 +0800 anchor=92e8cc575efe29387e5b277af4859a9701ad1e25 tree=/tmp/wisp220v1/full
+cmd=go test ./internal/... -count=1 -timeout 30m
+rc=1
+--- four ---
+RUN=0 PASS_TOP=0 FAIL=11 SKIP=0
+--- 台面故障哨兵（任一命中⇒那一发不算终态）---
+--- fail names ---
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestC21DesignTokensFourWayAgree
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestComposerRenderFixtureTellsTheTruth
+--- FAIL: TestP3BlockedModelRefused
+--- FAIL: TestReadGitOnThisRepositoryIsSelfConsistent
+--- FAIL: TestRealManifestAuthoringConsistency
+--- FAIL: TestRealManifestInRepoVerifies
+--- FAIL: TestResolvePerCallBudget
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+FAIL_TOTAL=11  SUBFAIL=0
+raw_bytes=69303 raw_lines=400
+=== end 2026-10-16 12:02:48 +0800 ===
+sixred_extract_bytes=0

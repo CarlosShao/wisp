@@ -1,0 +1,26 @@
+2026-10-16 11:56:55 +0800
+cmd=go test ./cmd/wisp/ -count=1 -timeout 30m -v -run ^TestRunPacketLightsTheRosterRowOfItsLiveL1Window$ (tree=bench)
+time=2026-10-16T11:57:05.735+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestRunPacketLightsTheRosterRowOfItsLiveL1Window
+time=2026-10-16T11:57:07.081+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/16 11:57:07 mockllm: serving on http://127.0.0.1:63291 (golden dir C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\internal\llm\testdata\golden)
+time=2026-10-16T11:57:07.140+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\.gotmp\TestRunPacketLightsTheRosterRowOfItsLiveL1Window1504022238\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-16T11:57:07.174+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\.gotmp\TestRunPacketLightsTheRosterRowOfItsLiveL1Window1504022238\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T11:57:07.182+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T03:57:07Z duration_ms=8
+time=2026-10-16T11:57:07.194+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\.gotmp\TestRunPacketLightsTheRosterRowOfItsLiveL1Window1504022238\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T11:57:07.201+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T03:57:07Z duration_ms=5
+time=2026-10-16T11:57:07.210+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\.gotmp\TestRunPacketLightsTheRosterRowOfItsLiveL1Window1504022238\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T11:57:07.217+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T03:57:07Z duration_ms=6
+time=2026-10-16T11:57:07.222+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T11:57:07.225+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    panel_l1_blocked_220_test.go:216: PRE-CHANGE / WIRING READING: an L1 window was live on task "ad5ba047-e1ec-4f8c-b944-403396ad94ae" (corr "l1-220-corr-1792123027139025600") and its roster row still read blockedOnApproval=false - the pump's reader is only as good as the producer the composition root points at it (cmd/wisp/run.go's PumpSources literal)
+    panel_l1_blocked_220_test.go:249: L1 window task=ad5ba047-e1ec-4f8c-b944-403396ad94ae corr=l1-220-corr-1792123027139025600 | pre blocked=false | lit at publish #2 (was #1; pending 0, queue 0) | post blocked=false | lit bytes: 
+--- FAIL: TestRunPacketLightsTheRosterRowOfItsLiveL1Window (11.60s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	11.699s
+FAIL
+rc=1
+--- counts: RUN=1 TOPPASS=0 FAIL=1 SKIP=0
+--- fail names ---
+(no FAIL lines)
+2026-10-16 11:57:17 +0800

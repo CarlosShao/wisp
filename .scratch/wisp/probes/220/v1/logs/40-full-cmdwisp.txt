@@ -1,0 +1,15 @@
+=== cmdwisp 2026-10-16 11:58:32 +0800 anchor=5326f65e3819fd0165e51ba45ab8c172d029ecb2 tree=/tmp/wisp220v1/full
+cmd=go test ./cmd/wisp/ -v -count=1 -timeout 30m
+rc=1
+--- four ---
+RUN=203 PASS_TOP=145 FAIL=3 SKIP=0
+--- 台面故障哨兵（任一命中⇒那一发不算终态）---
+586:time=2026-10-16T12:00:24.360+08:00 level=INFO msg="audit: perm: MODE-READ-FAILED path=\"C:\\\\Users\\\\swq\\\\AppData\\\\Local\\\\Temp\\\\wisp220v1\\\\full\\\\.gotmp\\\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing81204503\\\\001\\\\config.toml\" err=config: config.toml read: no file at this path yet。第 1 种拒因：文件没建：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置（它不替你选任何模型，也不替你建任何服务商行）: open C:\\Users\\swq\\AppData\\Local\\Temp\\wisp220v1\\full\\.gotmp\\TestTicket198R2J1TheAssemblyRootStillCreatesNothing81204503\\001\\config.toml: The system cannot find the file specified. mode=ask_every_step origin=startup result=fail-closed detail=\"档位读不到：本进程不缓存任何上一次的宽松值，决策链不会被装配（退出码 2）\""
+--- fail names ---
+--- FAIL: TestAC2AC3DegradedLegsStillDeliverTheirVerdict
+--- FAIL: TestAC2ModelsLegBooksItsHandOffVerdictOnDisk
+--- FAIL: TestCleanCheckoutBuilds_AC11
+FAIL_TOTAL=3  SUBFAIL=1
+raw_bytes=194267 raw_lines=1301
+=== end 2026-10-16 12:01:24 +0800 ===
+sixred_extract_bytes=0

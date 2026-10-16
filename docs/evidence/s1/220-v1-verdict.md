@@ -1,0 +1,135 @@
+# 220-v1 判语表（非实现者终裁·票 220 五格）
+
+- 腿名 `220-v1`｜角色＝裁决者（可写测试件⛔ 动产码；本波依派单更正 (1)⛔ 新建 `cmd/wisp/**`、`internal/panel/**` 任何件）
+- 起手 `git rev-parse HEAD`＝`ca0e30fce32425e31b9882c5d947e56a3b17d851`｜`date '+%F %T %z'`＝`2026-10-16 11:44:33 +0800`（起手现跑）
+- 票框尺（现跑）＝`grep -c '^- \[ \]' <票面>`＝**5**，`grep -c '^- \[x\]'`＝**0**（rc=1）⇒ 本腿一枚框没翻
+- 被裁实现方＝`220-r1`（`ce693ce4`＋`480b970d2`）＋`220-r2`（`2d10bd0f`＋`fc4f704b`，撞 150 轮帽死在最后一步）
+- 逐枚 `git show --name-only` 写面核证（⛔ 区间尺）：
+  `ce693ce4`＝`internal/agent/approval/{gate.go,ticket220_l1_window_read_test.go,window_read.go}`
+  `480b970d2`＝`internal/panel/{pump.go,subagent_blocked_220_test.go,subagent_roster_197.go}`＋probes 14 枚
+  `2d10bd0f`＝`cmd/wisp/{panel_pump.go,run.go}`
+  `fc4f704b`＝`cmd/wisp/panel_l1_blocked_220_test.go`＋probes 3 枚
+  ⇒ 四笔写面全在票 220 声明的射程内（`internal/agent/approval`＋`internal/panel`＋`cmd/wisp`＋probes），**零越界**
+
+## 台面（本腿自己的，⛔ 引他人读数）
+
+- 三枚仓外 `git archive` 导出树（七件套 `go.mod go.sum internal cmd tools scripts frontend`）：
+  `bench`（HEAD，突变台）／`full`（HEAD，整包台）／`pre`（`fd01e7962`＝接线那笔的父）
+  件数尺＝`find <tree> -name '*.go' | wc -l`＝**743**（HEAD 两枚）／**741**（pre）⇒ 非空
+- 手工补的台面缺件（派单更正 (2)(3)＋放腿时刻那节）：`frontend/dist` 整目录（**4 枚文件**）、
+  `build/*.dll`（3）、`third_party/sherpa-onnx/*.dll`（3）、另拷 3 枚 `.dll` 进 `cmd/wisp/` 旁；
+  `full` 树再加 `docs`＋`design`（从 HEAD `git archive` 取，⛔ 动仓内）＝消掉两枚"读 docs/PLAN.md／design/assets/tokens.css 的台面缺件假红"
+- 三枚树 `go build ./cmd/wisp/` 退码**全 0** 后才开始量（`logs/00-tree.txt`）
+- `GOTMPDIR`＝`cygpath -w` 出来的**原生反斜杠形**且先 `mkdir -p`；跑 go 前置 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`
+- ⛔ `-overlay`：五发突变全部打在导出树的物理字节上，每发先备份⇒跑⇒还原⇒`sha256` 对回（`logs/10-mut-check.txt`），
+  还原后台面自证＝三枚文件树内 sha ⇄ `git cat-file HEAD:<f>` sha **逐枚 match=YES**（`logs/30-restore-verify.txt`）
+
+## AC#1 join 读对（corr 与 taskID 双查⛔ 新增导出方法）＝**成立**
+
+① 双查那两行的当前行号（内容锚，现跑 `git show HEAD:… | grep -n`）：
+- `internal/panel/subagent_roster_197.go:214`＝`indexWaitingKey(waiting, card.CorrelationID)`（索引侧＝卡片的 corr，含去 `#十进制序号`）
+- `internal/panel/subagent_roster_197.go:236`＝`BlockedOnApproval: row.TaskID != "" && waiting[row.TaskID],`（查询侧＝行的 taskID）
+- L1 那一半的两枚索引＝`:219`（`w.CorrelationID`）／`:220`（`w.TaskID`）；去 `#序号` 的识别器＝`:262-270 indexWaitingKey`＋`:277-288 splitClashSuffix`
+
+② 去牙反控（MU-A：把 `:214` 退成 220 之前的单键形 `waiting[card.CorrelationID] = true`，即不再认队列改写）⇒
+`./internal/panel/ -count=1` 红名集合从基线 **8 枚**变 **11 枚**，新增三枚**必须红**＝
+`TestASecondCardForTheSameTaskStillLightsItsRow`／`TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt`（红掉的子测试逐字＝`the queue's own rewrite lights` 与 `a multi-digit seq lights`）／`TestABlockedRowKeepsItsRunningDimension`。
+逐字红句（`logs/20-panel-MU-A.txt`，⛔ 转述）：
+`subagent_blocked_220_test.go:109: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[{"correlationId":"child-1#9",…`
+`subagent_blocked_220_test.go:139: row "child-1" blockedOnApproval=false，期望 true； …`（同发两枚子测试：`child-1#9` 与 `child-1#147`）
+`subagent_blocked_220_test.go:191: the second card is pending and the row does not say so`
+
+③ 反形两发都跑了（**不是只跑一形**）：
+- MU-B（L1 那一半只按 corr 索引，丢 `w.TaskID`）⇒ 红名 8→**10**，新增 `TestAL1WindowInWaitingLightsItsRow`（`:152` 逐字：`row "child-1" blockedOnApproval=false，期望 true`）＋`TestABlockedRowKeepsItsRunningDimension`（`:200` 逐字：`root row = {…BlockedOnApproval:false…}, want blocked AND still carrying its filed state`）
+- MU-C（查询侧改成只按 corr 维＝`row.StreamKey`）⇒ 红名 8→**13**，除上面两族外另红 `TestTheRosterReaderPutsSubagentsOnTheWire`（`subagent_roster_197_test.go:165` 逐字：`the child has an L2 card on the queue and the packet does not say so: …`）
+⇒ **两形都拦得住＝这把尺对这一格敏感**（⛔"两形都放行"那一判不成立）。基线 8 枚红的具名归因见文末〔台面/他票噪声〕。
+
+④ 导出方法新增枚数尺（带分母，现跑）：
+- 尺＝`git grep -h '^func (g \*Gate)' <ref> -- internal/agent/approval/{gate,report,window_read}.go | wc -l`（⛔ 测试件）：
+  `ce693ce4^`＝**23** 枚 ⇄ `ce693ce4`＝**24** ⇄ `HEAD`＝**24** ⇒ 本票射程净增**1 枚**＝`Gate.LiveL1Windows()`（`window_read.go:63`）＝**AC#2 甲形那枚只读枚举口**，具名批准＝台账 `A562` §1（`pending-and-issues.md:11111` 起，本腿现读到）＋`A1002`（`:18680`）沿用
+- 尺＝逐笔导出名差集（`git show <c>:<f>` 名册 diff）：`480b970d2` 在 `internal/panel/pump.go` 净增**1 枚导出类型**`L1WindowWait`、在 `subagent_roster_197.go` **0 枚**；`2d10bd0f` 两文件**0 枚**；`ce693ce4` 净增 `type L1Window`＋`Gate.LiveL1Windows`
+⇒ **AC#1 那一格自身＝新增导出方法 0 枚**（`TaskRosterSectionFrom` 的对外签名逐字未动＝`:187-189` 仍转调内部 `taskRosterSectionFrom`）；本票全射程新增的导出面＝1 枚方法＋2 枚类型，全部归 AC#2 甲形与其数据形状，⛔ 记在 AC#1 名下。
+
+## AC#2 让 L1 可见（落点已裁＝甲）＝**成立**
+
+① "改前 0 枚生产者 ⇄ 改后 2 枚"＝**本腿自己现跑**，两发同一把尺、两个台面：
+尺＝`grep -rn 'L1Windows' --include='*.go' <tree>/cmd | grep -v '_test.go' | grep -vE ':[0-9]+:\s*//' | wc -l`（射程＝该导出树 `cmd/`；**量的**）
+- 改前锚树（`fd01e7962`）＝**0 枚**（同尺全部命中＝0，含测试与注释）
+- HEAD 树（`ca0e30fce`）＝**2 枚**＝`cmd/wisp/panel_pump.go:108`（reader 本体 `wins := rt.gate.LiveL1Windows()`）＋`cmd/wisp/run.go:731`（装配处 `L1Windows: rt.liveL1WindowWaits,`）
+⇒ 我自己数的计数＝**0 ⇄ 2**（与实现件那枚数偶然同值，但尺、树、时刻都是本腿现跑的；`logs/01-count.txt`＋`01b-count.txt`）
+
+② 真腿用例确实**经真 run**（⛔ fixture 直喂）——`cmd/wisp/panel_l1_blocked_220_test.go` 现读＋我自己那一发：
+开窗走 `rt.bridge.Execute(ctx, agent.ToolRequest{TaskID: rootID, CorrelationID: corr, Name: "fs.write", …})`（`:130-133`），
+窗口活着与否是 `rt.gate.LiveL1Windows()` 现读（`:142` 轮询、`:174` 轮询到关），
+根行 id 由 `waitRootRow197(rt)` 从这枚 run 的名册取（`:98`），点亮那一包字节只认 `rt.lastPanelSnapshot()`（`:159-163`）且带 `snapshotCount` 钉（`:220-223`）
+我自己那一发＝**绿**：`--- PASS: TestRunPacketLightsTheRosterRowOfItsLiveL1Window (20.39s)`，`logs/04-cmdwisp-base.txt` 里那一行同屏读数＝
+`L1 window task=06e1ed6f-… corr=l1-220-corr-1792122967550428000 | pre blocked=false | lit at publish #2 (was #1; pending 0, queue 0) | post blocked=false | lit bytes: {"pending":[],…"blockedOnApproval":true,…}`
+
+③ 去牙＝摘掉 `run.go` 那一行供数（MU-D）⇒ 该用例**必须红且红在装配那一格**，实测红句逐字（`logs/21-cmdwisp-MU-D.txt`）：
+`panel_l1_blocked_220_test.go:216: PRE-CHANGE / WIRING READING: an L1 window was live on task "ad5ba047-e1ec-4f8c-b944-403396ad94ae" (corr "l1-220-corr-1792123027139025600") and its roster row still read blockedOnApproval=false - the pump's reader is only as good as the producer the composition root points at it (cmd/wisp/run.go's PumpSources literal)`
+⇒ 同一发里 `--- FAIL` 只有 1 枚、`setupErr` 为空（窗口真开出来）、`:249` 那行照打 `pre blocked=false | … | pending 0, queue 0 | post blocked=false`
+⇒ **红在装配那一格，⛔ 红在建窗失败／台面故障**（`RUN=1 TOPPASS=0 FAIL=1 SKIP=0`，rc=1）
+
+④ 反形＝供一枚常量非空列表（MU-E：`liveL1WindowWaits` 不看窗口、按名册行恒供 `[]L1WindowWait{{CorrelationID:"const-220v1", TaskID: 行 id}}`）⇒ **被抓住**，实测红句逐字（`logs/21-cmdwisp-MU-E.txt`）：
+`panel_l1_blocked_220_test.go:212: the pre-window packet carried no row for "84a3350b-f974-4754-8e24-f0543fa7177c", or already lit it: the readings below would describe a constant, not a state`
+⇒ 抓住它的判据字节＝**窗口还没开那一包**名册行的 `blockedOnApproval`（用例在 `:211-214` 就把这一发当"常量"拦下，`t.Fatalf`）
+④′ "名册那行随窗口结束回到 `false`"这一发**本腿自己复跑过**＝② 那一发绿里的 `post blocked=false` ＋ 断言面 `:229-232`；
+    且 `:211` 的 `pre found && !blocked` 与 `:215` 的 lit 双向都响 ⇒ 这一维随状态动，不是常量、也不是建包时的固定字面
+
+## AC#3 两形各有正控＝**成立**（附一枚具名射程缺口，见"残余"）
+
+- 形一〔L1 等待中〕：正控两枚——渲染级 `TestAL1WindowInWaitingLightsItsRow`（MU-B 掏掉 taskID 那一半即红）＋
+  生产级 `TestRunPacketLightsTheRosterRowOfItsLiveL1Window`（MU-D 摘供数即红）。
+  **坏世界真被造出来的同屏证据**在我自己那一发的行内：`pending 0, queue 0`＋`"pending":[]`＋`"blockedOnApproval":true`
+  ＋同一发还带 `[确认 L1 fs.write]`／`ANSWER-EXPIRED` 两句界面自述（用例 `:240-245` 断的就是这两句），⛔ 把"没复现"读成"修法成立"那一支在此不成立
+- 形二〔同任务第二张卡〕：正控＝`TestASecondCardForTheSameTaskStillLightsItsRow`＋`TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt`
+  （六枚子测试含"非队列形不点亮"那一支：`a non-numeric suffix is not the queue's form`／`a task id that merely prefixes does not light`）；
+  MU-A 一掏改写识别即三枚红⇒**种 X 必响**成立
+- 缺口具名（⛔ 翻框、⛔ 我补）：形二的"坏世界"今天只在 fixture 层被造出来（手写串 `child-1#9`），
+  全仓零枚用例经真队列把改写形跑出来（尺＝`grep -rn 'clash' internal/agent/approval/*_test.go`＝**0 命中**＋
+  `grep -rnE '"[^"]*#[0-9]+"' --include='*_test.go' internal cmd` 只命中 `internal/panel/subagent_blocked_220_test.go` 那六枚手写样本）
+
+## AC#4 ⛔ 把布尔改成态／⛔ 新造 D43 名＝**成立**
+
+- `blockedOnApproval` 今天仍是布尔＝`internal/panel/subagent_roster_197.go:132`（`BlockedOnApproval bool` json 键 `blockedOnApproval`），
+  且名册那一行未被替换：我自己那一发的字节里同一行同时带 `"status":""`/`"statusKnown":false`/`"statusReason":"宿主没有登记这一维…"` 与 `"blockedOnApproval":true`⇒附加的一维，不是替换（票面"外部对照"那条约束）
+- 越界尺（现量）：本票射程（`ce693ce4^..HEAD`）内 `internal/statemachine/` 的 `git diff` **0 行**⇒状态名册与转移表零改动；
+  名册里 `StateConfirming`/`StateAwaitingApproval` 的当前行号＝`internal/statemachine/states.go:21`/`:22`（现跑，与票面 `:16` 写的一致）
+- 引 D43 那几枚编号的当前行号自证没动转移表（`internal/statemachine/table.go`，现跑 `grep -n 'D43: 17, …'`）：
+  **#17**＝`:118`（→Confirming）与 `:123`（→AwaitingApproval）｜**#21**＝`:150`｜**#22**＝`:154`｜**#23**＝`:158`/`:163`｜**#24**＝`:168`/`:172`｜**#25**＝`:176`/`:180`
+  （派单"四枚编号"若指回复那两枚 D43 名所出入的四条边，则＝`#17/#21/#22/#23`；本表把六行都给出来，判语不依赖是哪四枚）
+- C17 白名单／三枚冻结件命中数：`git diff ce693ce4^..HEAD -- internal/panel/tokens_fourway_test.go internal/panel/l2_grant_boundary_test.go internal/perm/ticket90_persist_test.go`＝**0 行**；
+  白名单载体件（`internal/panel/bridge.go`、`composer_dispatch.go`、`cmd/wisp/panel_inbound.go`）**不在本票四笔的写面文件名册里**（逐枚 `git show --name-only` 见抬头）；
+  逐笔新增 `"panel.*.*"` 字面量＝**0 枚**（四笔全 0）；`internal/panel/**`＋`cmd/wisp/**` 内新增 `State*` 常量＝**0 枚**
+
+## AC#5 整包终态读数＝**（待本腿那两发落定，数字见 `## AC#5` 追加节）**
+
+## 能力类必答：这一格在产品界面上今天看得见的有几维
+
+- **0 维**看得见。尺（现跑，射程＝HEAD 树全部非测试 `.go`）：`grep -rn 'BlockedOnApproval|blockedOnApproval' --include='*.go' internal cmd | grep -v _test.go`
+  ＝**8 行**，全部是**生产者与注释**（`subagent_roster_197.go:127/132/236`、`pump.go:199/327`、`panel_pump.go:78`、`run.go:728`），
+  **零枚 Go 侧读者把这一维交给页面**
+- 出口的实读：产码里 `Publish()` 只有 `cmd/wisp/panel_pump.go:446` 一处，其 `Out`＝`run.go:732 rt.bookPanelSnapshot`（`panel_pump.go:360` 定义＝写这枚 run 的台账），
+  加上 `run.go:742 rt.ui.publish`（控制台面）。`internal/panel/pump.go:15-20` 逐字自述"WHAT THIS FILE IS NOT: the transport…no Go -> page channel in this tree today"，
+  `pump.go:366` 的错误文案自述最后一公里在票 33/35 名下⇒ **实现件 §3 那句"传输那一跳仍属票 33／35"＝本腿复认（带上面这两把尺）**
+- 包上（页面若接得到）此刻并存的是**两维**：`blockedOnApproval`（本票那一格）＋`status/statusKnown/statusReason`（宿主登记的运行态那一维），二者互不替换；
+  名册渲染那枚函数＝`internal/panel/subagent_roster_197.go:198 taskRosterSectionFrom`（行装配 `:226-252`，排序 `:253`），
+  沿路：`internal/panel/pump.go:323-327`（读 `L1Windows`⇒`taskRosterSectionFrom(p.src.Tasks(), cards, waits)`）⇒`:327`⇒上面那枚 `:198`
+
+## 残余（具名，⛔ 记进任何一格 AC）
+
+1. **卡片那一半在生产里今天点不亮行**（本腿现量，⛔ 本票判据、属能力缺口）：`internal/agent/loop.go:603-608 callCorr` 逐字
+   `if callID == "" { return fmt.Sprintf("%s#call-%d", taskID, index) }`／`return taskID + "#" + callID`，并在 `:676` 作为 `CorrelationID` 交给桥；
+   ⇒ 生产侧卡的 corr 恒为 `<taskID>#<callID>` 形，`#` 后那一段是 `call-<i>`（含字母）或 provider 的 call id，
+   而名册去牙识别器 `splitClashSuffix`（`subagent_roster_197.go:277-288`）只认**末 `#` 后全 ASCII 数字**；
+   队列改写那形（`queue.go:163-168`）要求两枚**同 corr** 的卡才发生，按上面那形今天的循环造不出碰撞
+   ⇒ **净效果**：`blockedOnApproval` 今天靠 L1 窗口那一半点亮（本票 AC#2 那一跳，真 run 已证），
+   L2 卡片那一半只在"provider 给纯数字 callID"那一形才亮＝**票 220 射程外的既有缺口**，与编排者 10-15 那条读数同族（`docs/reports/pending-and-issues.md:14937`：真 provider 若给纯数字 `callID` 卡片那一半才点亮、"树内不可复现"），归口＝编排者裁（建议另立一枚：真 run 上种两枚 L2 卡的正控）
+2. 本腿没裁完的格：**无**（AC#1/AC#2/AC#3/AC#4 各格读数齐；AC#5 只等我自己那两发整包落盘）
+3. 台面/他票噪声（HEAD 导出树 `./internal/panel/ -count=1` 基线 8 枚红，逐名归因）：
+   `TestGitDimensionHasNoModelCallableTool`／`TestC21DesignTokensFourWayAgree`＝台面缺件形（红句自述 `read docs/PLAN.md … cannot find the path`／`read design/assets/tokens.css …`，`bench` 树没这两枚目录；`full` 树补齐后应消，见 AC#5 节）；
+   `TestReadGitOnThisRepositoryIsSelfConsistent`＝导出树没有 `.git`（红句自述"这棵工作区目录及其以上都没有 .git"）；
+   `TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`＝跨语对照在 **HEAD 跟踪件**上为红（红句自述 `Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare`），前端未提交件归机主外部 agent，本腿⛔ 按其调色、⛔ 动其字节；
+   `TestComposerRenderFixtureTellsTheTruth`＝渲染夹具自述 `render fixture verified across 0 painted states`；
+   `TestStreamLogFloodBelowKeyBoundIsNotBounded35r8`／`TestStreamLogDroppedNamingLedgerIsNotBounded35r8`＝票 35 的堆上限用例，非本票射程
+4. 工作树 `go.mod` 那枚未提交改动（mtime `2026-10-10 22:28`）＝**还脏**，本腿⛔ 碰／⛔ 提交／⛔ revert，归编排者处置

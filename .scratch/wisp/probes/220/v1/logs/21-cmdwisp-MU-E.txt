@@ -1,0 +1,25 @@
+2026-10-16 11:57:18 +0800
+cmd=go test ./cmd/wisp/ -count=1 -timeout 30m -v -run ^TestRunPacketLightsTheRosterRowOfItsLiveL1Window$ (tree=bench)
+time=2026-10-16T11:57:27.031+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestRunPacketLightsTheRosterRowOfItsLiveL1Window
+time=2026-10-16T11:57:28.280+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/16 11:57:28 mockllm: serving on http://127.0.0.1:57329 (golden dir C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\internal\llm\testdata\golden)
+time=2026-10-16T11:57:28.326+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\.gotmp\TestRunPacketLightsTheRosterRowOfItsLiveL1Window487032204\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-16T11:57:28.359+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\.gotmp\TestRunPacketLightsTheRosterRowOfItsLiveL1Window487032204\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T11:57:28.369+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T03:57:28Z duration_ms=9
+time=2026-10-16T11:57:28.383+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\.gotmp\TestRunPacketLightsTheRosterRowOfItsLiveL1Window487032204\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T11:57:28.393+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T03:57:28Z duration_ms=9
+time=2026-10-16T11:57:28.402+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp220v1\bench\.gotmp\TestRunPacketLightsTheRosterRowOfItsLiveL1Window487032204\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T11:57:28.409+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T03:57:28Z duration_ms=6
+time=2026-10-16T11:57:28.417+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T11:57:28.420+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    panel_l1_blocked_220_test.go:212: the pre-window packet carried no row for "84a3350b-f974-4754-8e24-f0543fa7177c", or already lit it: the readings below would describe a constant, not a state
+--- FAIL: TestRunPacketLightsTheRosterRowOfItsLiveL1Window (11.48s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	11.613s
+FAIL
+rc=1
+--- counts: RUN=1 TOPPASS=0 FAIL=1 SKIP=0
+--- fail names ---
+(no FAIL lines)
+2026-10-16 11:57:38 +0800
