@@ -1,0 +1,16 @@
+票 327 落地（1/4）：显示边界的洗集从 Cc 扩到裁好的那 15 枚 Cf，转义不删
+
+`internal/panel/display_scrub_216.go`：新增 `isDisplayWashCf` 一枚名单（九枚方向控制
+U+202A–U+202E／U+2066–U+2069 ＋ 六枚隐形排版 U+00AD／U+200B／U+200C／U+200D／U+2060／U+FEFF），
+写入侧 `scrubForDisplay` 与判据侧 `needsDisplayWash` 各调**同一枚函数**，两把尺不许分家＝AC#2。
+洗出来的形沿用 `writeControlEscape` 既有词汇（U+00AD 落 `\xad`，其余 `\uXXXX` 小写），
+⛔ 新造第二套转义格式；⛔ 删字符——删会把 `abc`＋U+202E＋`def` 拼成 `abcdef` 那枚没人起过的名字。
+
+AC#1 那批里 census 量到可达、裁定**没点名**的 7 枚（U+2061–U+2064 数学作用符、U+061C、
+U+180E、U+206A）照旧原样穿过，已写进件头"故意不洗"那一节；⛔ 动 `unicode.Mn`、
+⛔ 动 `internal/risk/taintmatch.go` 的判级输入表（两轴取向相反，件内注释具名）。
+
+本票写面仅此一枚；门禁四数在工作树上跑：gofumpt rc=0／d22scan rc=0／长度门 rc=0／
+`go vet ./internal/panel/` rc=0。颜色成对＝仓外导出树（锚 `c315980b`），红名册作差 0。
+派单头写的"共 22 枚"与它逐枚列出的名册不符（枚举＝15 枚，与票 AC#1 建议起点 9＋6 一致），
+按枚举实现并把差值具名交回编排者，⛔ 自扩。

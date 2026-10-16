@@ -49,13 +49,11 @@ package panel
 //     contract-face change (AGENTS.md 1.1 / this leg's write face is internal/panel
 //     only), and the two sides disagree on the OUTPUT SHAPE (space vs escape), so
 //     the merge is a ruling, not an edit;
-//   - it does not wash Cf (format) characters such as U+202E RTL OVERRIDE or
-//     U+200B ZERO WIDTH SPACE. unicode.IsControl is category Cc only, and "控制字符"
-//     is what AC#2 says. Widening to Cf is a real question - U+202E is exactly the
-//     "盖掉后半段名字" attack the ticket's rationale names - and the honest answer
-//     for this leg is to record it as residual for the verifying leg to rule on,
-//     not to silently widen a security-relevant character set in the same commit
-//     that claims to implement the narrower one;
+//   - it does not wash the Cf characters that the display ruling did not name. See
+//     isDisplayWashCf below for the fifteen it DOES wash; the seven the census
+//     measured as reachable but AC#1's ruling leaves out (U+2061-U+2064 the
+//     mathematical operators, U+061C, U+180E, U+206A) stay raw on purpose until a
+//     ruling names them;
 //   - it does not touch ApprovalCardView.Tool/Args[]/Reason. Those also go out
 //     verbatim today (census 问 2's 相邻面 note) but sit outside this ticket's
 //     composer roster, so naming them here is all this leg does;
@@ -88,11 +86,19 @@ import (
 //	\n \r \t          -> the two-character mnemonic Go itself prints
 //	other C0 and C1    -> \xNN, lowercase hex, the same spelling Go uses
 //	invalid UTF-8 byte -> \xNN of the raw byte, never U+FFFD
+//	format rune above U+00FF (the ticket 327 Cf roster) -> \uXXXX, lowercase hex
 //
-// The last one matters for this input class: a picker that returns truncated or
-// non-UTF-8 bytes would otherwise be rendered as the replacement character, which
-// the user reads as "a name with a strange glyph in it" rather than "these bytes
-// are not a string at all". Showing the byte is the honest version.
+// The last shape is the one the invisible roster lands in: U+202E prints as
+// `\u202e`, U+00AD soft hyphen - which is below U+00FF - prints as `\xad`. Both
+// spellings are the vocabulary writeControlEscape already had; ticket 327 widened
+// WHICH runes enter that vocabulary, not how the vocabulary spells them, so the
+// menu has still exactly one escape format.
+//
+// The invalid-UTF-8 shape matters for this input class: a picker that returns
+// truncated or non-UTF-8 bytes would otherwise be rendered as the replacement
+// character, which the user reads as "a name with a strange glyph in it" rather
+// than "these bytes are not a string at all". Showing the byte is the honest
+// version.
 //
 // Idempotence holds because every escape this function emits is printable ASCII:
 // washing an already-washed string returns it unchanged, which is what lets the
@@ -114,12 +120,58 @@ func scrubForDisplay(s string) string {
 		case unicode.IsControl(r):
 			writeControlEscape(&b, r)
 			i += size
+		case isDisplayWashCf(r):
+			// Ticket 327: the invisible formatting runes take the SAME visible
+			// escape shape as the control runes, because the alternative - deleting
+			// them - is the attack this ticket is about. "abc" + U+202E + "def"
+			// deleted reads "abcdef", a name no file ever had.
+			writeControlEscape(&b, r)
+			i += size
 		default:
 			b.WriteRune(r)
 			i += size
 		}
 	}
 	return b.String()
+}
+
+// isDisplayWashCf is the display boundary's invisible-rune roster, written out
+// rune by rune and NOT derived from a Unicode category: unicode.Is(unicode.Cf, r)
+// would sweep in the mathematical operators (U+2061-U+2064), U+061C, U+180E and
+// the deprecated U+206A-U+206B, and AC#1's ruling is that only the named runes
+// below get washed. It is equally NOT internal/risk's isIgnorableTaintRune: that
+// table serves the judgement axis (make an invisible character stop changing the
+// word shape a rule looks at), this one serves the display axis (make an invisible
+// character stop changing what a human reads). The two lists overlap on six runes
+// and disagree on the bidi family, which is exactly why they stay in separate
+// files - see ticket 327's boundary section and AGENTS.md 1.2.
+//
+// Fifteen runes, each with the name it is audited under:
+//
+//	U+00AD  soft hyphen          U+202A  left-to-right embedding
+//	U+200B  zero width space     U+202B  right-to-left embedding
+//	U+200C  zero width non-joiner        U+202C  pop directional formatting
+//	U+200D  zero width joiner    U+202D  left-to-right override
+//	U+2060  word joiner          U+202E  right-to-left override
+//	U+2066  left-to-right isolate        U+FEFF  byte order mark / ZWNBSP
+//	U+2067  right-to-left isolate        U+2068  first strong isolate
+//	U+2069  pop directional isolate
+//
+// The nine directional ones (U+202A-U+202E, U+2066-U+2069) are the "cover up the
+// back half of the name" family; the six spacing ones (U+200B, U+200C, U+200D,
+// U+2060, U+FEFF, U+00AD) are the "two names that look identical but are not"
+// family. Nine plus six is the whole list.
+func isDisplayWashCf(r rune) bool {
+	switch r {
+	case 0x00AD,
+		0x200B, 0x200C, 0x200D,
+		0x2060, 0xFEFF,
+		0x202A, 0x202B, 0x202C, 0x202D, 0x202E,
+		0x2066, 0x2067, 0x2068, 0x2069:
+		return true
+	default:
+		return false
+	}
 }
 
 // writeControlEscape is the vocabulary above, kept apart from the scan so the
@@ -148,11 +200,18 @@ func writeControlEscape(b *strings.Builder, r rune) {
 
 // needsDisplayWash reports whether scrubForDisplay would change s. It is the same
 // character set as the writer, read once: unicode.IsControl (C0 U+0000-U+001F and
-// C1 U+007F-U+009F) plus any byte that is not a valid UTF-8 sequence.
+// C1 U+007F-U+009F), the invisible formatting roster in isDisplayWashCf, plus any
+// byte that is not a valid UTF-8 sequence.
+//
+// AC#2 of ticket 327 is the reason the roster lives in ONE function that both
+// sides call: this fast path decides whether the writer runs at all, so a rune
+// listed here but not handled there is a rune that gets promised a wash and never
+// gets one, and a rune handled there but not listed here is a rune that reaches
+// the menu raw whenever the rest of the string happens to be clean.
 func needsDisplayWash(s string) bool {
 	for i := 0; i < len(s); {
 		r, size := utf8.DecodeRuneInString(s[i:])
-		if (r == utf8.RuneError && size == 1) || unicode.IsControl(r) {
+		if (r == utf8.RuneError && size == 1) || unicode.IsControl(r) || isDisplayWashCf(r) {
 			return true
 		}
 		i += size
