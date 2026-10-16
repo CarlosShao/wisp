@@ -1,0 +1,38 @@
+ruler: git grep -l 'plan\.present' <commit> | wc -l   (files, whole tracked tree, at each commit)
+range 71002d0..232f309e = 32 commits; all 22 listed below with the FIXTURE-surface twin
+
+48f53c21 10:18  all=45  fixture=0
+e396301d 10:23  all=45  fixture=0
+755fb974 10:26  all=45  fixture=0
+0683074e 10:27  all=45  fixture=0
+8b8fa0be 10:30  all=45  fixture=0
+63fff90b 10:33  all=45  fixture=0
+f918d81e 10:33  all=45  fixture=0
+a9886142 10:34  all=45  fixture=0
+fb157e95 10:34  all=45  fixture=0
+35cfbad9 10:34  all=45  fixture=0
+7dec3a6c 10:35  all=54  fixture=0
+6eeb71ea 10:36  all=54  fixture=0
+da6fda0d 10:36  all=54  fixture=0
+cd4f6d7d 10:38  all=54  fixture=0
+2c679634 10:39  all=54  fixture=0
+4a18e275 10:41  all=55  fixture=0
+d378635d 10:44  all=55  fixture=0
+c4ecb2c8 10:47  all=55  fixture=0
+d646625e 10:49  all=56  fixture=0
+d4e93cb8 10:49  all=56  fixture=0
+26e1f03b 10:50  all=56  fixture=0
+f146781c 10:53  all=58  fixture=0
+f912a5af 10:53  all=58  fixture=0
+c8a09847 10:54  all=58  fixture=0
+1e5dfda6 10:54  all=58  fixture=0
+70776c1a 10:54  all=59  fixture=0
+fd01e796 10:56  all=59  fixture=0
+2d10bd0f 11:03  all=59  fixture=0
+fc4f704b 11:07  all=59  fixture=0
+ce8df8b6 11:07  all=62  fixture=0
+86298e24 11:09  all=62  fixture=0
+232f309e 11:11  all=63  fixture=0
+
+READ: the orchestrator's 56 reproduces, at 10:49-10:50 (d646625e / d4e93cb8 / 26e1f03b).
+fixture=0 on EVERY one of the 22 commits => the zero is not a timestamp artifact.

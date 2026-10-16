@@ -1,0 +1,18 @@
+anchor=232f309e8092b15ede2d6f0455d71775e5a5de96
+
+### internal/llm/golden file count
+internal/llm/golden/golden.go
+internal/llm/golden/golden_test.go
+internal/llm/golden/replay.go
+count=3
+
+### winlive, my own rulers (two, side by side)
+strict: git grep -lE '//go:build.*winlive' $A -- cmd internal tools => 14 枚 (cmd/wisp 9 + internal/ball 5 + elsewhere 0)
+loose : git grep -l 'winlive' $A -- '*.go' => 54 枚 (其中 .scratch/wisp/probes/** 下的取证台件也命中；枚数未单独点，两把尺并列只为说明"松散尺会连带读台件")
+=> the ledger's '8 枚' (A508-era) is NOT reproducible on either of these rulers at this anchor; the CI comment ci.yml:625 '9 under cmd/wisp, 5 under' matches my strict ruler exactly.
+CI only vets them: ci.yml:681 = go vet -tags winlive ./cmd/wisp/ ./internal/ball/  (compile gate, never runs them)
+
+### Registry.List() callers, broad ruler git grep -n '\.List()' prod
+internal/tools/bridge.go:235:	entries := b.reg.List()
+internal/tools/registry.go:178:	for _, e := range p.List() {
+=> registry.go:178 is Provider.List() (a different interface); Registry.List()'s sole prod caller stays bridge.go:235.

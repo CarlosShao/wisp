@@ -1,0 +1,13 @@
+ruler: git grep -l 'tool_call' $A -- internal/agent/testdata/golden
+internal/agent/testdata/golden/budget-loop.sse
+internal/agent/testdata/golden/disconnect-mid-toolcall.sse
+internal/agent/testdata/golden/max-tokens-toolcall.sse
+internal/agent/testdata/golden/parallel-tools.sse
+internal/agent/testdata/golden/repeat-echo.sse
+internal/agent/testdata/golden/six-tools.sse
+internal/agent/testdata/golden/slow-tool.sse
+internal/agent/testdata/golden/spill-tool.sse
+internal/agent/testdata/golden/tool-then-text.sse
+hits=9 / total=11
+
+POSCTL: file NOT in the list must be absent -> provider-500.sse present? 0
