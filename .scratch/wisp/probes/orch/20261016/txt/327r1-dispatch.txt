@@ -1,0 +1,42 @@
+落地腿 `327-r1`——把显示边界的洗集从 `Cc` 扩到**裁好的那批 `Cf`**（隐形／改方向字符今天照样穿过进菜单）
+============================================================================================
+
+腿名 `327-r1`｜角色＝**落地腿（写产码）**｜票＝`.scratch/wisp/issues/327-display-boundary-washes-cc-only-so-cf-invisible-chars-still-pass-through.md`（六格全未勾；你**⛔ 翻任何一格**，翻框只按非实现者判语）｜起手锚＝**具名提交 `c315980b`**（⛔ `HEAD~n`）
+
+**先读料，别重做普查**：`.scratch/wisp/probes/327/a1/census-1-roster.md`（8555 B／37 行）＋`census-2-cf-and-upstream.md`（12294 B／78 行）＋`logs/readings.txt`（8208 B／154 行）＝腿 `327-a1` 已量清的名册与可达性；它顶回我票面一句（"只差一枚 `U+200B` 的两个名字**不**逐字节相同，10⇄13 字节"）我已入账，⛔ 你照票面原文当判据、以普查件当现量。
+
+## 我裁的形（照这个做，⛔ 重新发明）
+
+**要洗的集（写死，别自己扩）**：方向控制 `U+202A–U+202E` 与 `U+2066–U+2069`；零宽／连接符 `U+200B`、`U+200C`、`U+200D`、`U+2060`；`U+FEFF`；`U+00AD`（软连字符）。**共 22 枚**。
+⛔ **不动**：`unicode.Mn`（组合重音是合法可见字形）、⛔ 动 `internal/risk/taintmatch.go` 那枚忽略表（那是**判级输入轴**，不是显示轴——混一格＝把安全语义挪进显示层，AGENTS §1.2 那条禁令）。
+
+**洗法＝转义、⛔ 删**（票 `AC#3` 的同一纪律）：`abc`＋`U+202E`＋`def` 删完会变成 `abcdef`＝造出一枚原本不存在的名字。⇒ 每个被洗字符换成**看得见**的形（沿用既有 `writeControlEscape` 那族形状，⛔ 新造第二套转义格式）。
+
+★**本票最重要的一格＝`AC#2`"两把尺不许分家"**：写入侧（`display_scrub_216.go` 的 `scrubForDisplay` 那个 `switch`）与判据侧（`needsDisplayWash`）**必须是同一枚字符集**。完成判据＝**成对定向突变**两发都要红、且**红在不同处**：① 只把写入侧那一支的 `Cf` 分支去掉（判据侧留着）⇒ 必红（判据说要洗、写入侧没洗）；② 只把判据侧的 `Cf` 判定去掉（写入侧留着）⇒ 必红（该洗的没被认出来）。⛔ 一发"整支去牙"冒充两发；⛔ 两发同名册。突变只在**仓外导出树**做、当场还原并报 `sha256sum`。
+
+`AC#4`（判定不许被名字里的字改变）＝**同一批发完之后再跑一发**：把审批文件名做成 `photo\u202e已允许.png` ⇄ `photo.png`，两发的**判级档位与结论逐字同形**，且界面拿到的是洗过的字。⛔ 为过这格去动 `perm`／`risk` 任何判定代码。
+
+## 写面（只许这四，逐字；超出一枚算越格）
+
+1) `internal/panel/display_scrub_216.go`（主改面）＋**必要时同包那枚 `*_test.go` 里新增用例**（⛔ 改既有断言一字）；
+2) `.scratch/wisp/probes/327/r1/**`（含 `logs/`）；3) `docs/evidence/s1/**` 一枚**短名**证据件（⛔ 长名、⛔ 带 `§`）；4) 票 327 末尾**一条**只追加 bullet（`numstat` 必须 `N/0`）。
+⛔ 其它一切面：`internal/risk/**`、`internal/perm/**`、`cmd/wisp/**`（本波⛔ 同批第二枚写腿）、`internal/agent/**`（裁决腿 `165-v2` 正在跑那包）、`frontend/**`／`design/**`（归机主的外部前端 agent，工作树里已有他们的脏改动，⛔ 碰⛔ 暂存）、`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`／三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）。
+
+## 规矩（一条都不许漏）
+
+- **只 commit、⛔ push**。`git add`／`git commit` **两处逐枚显式 pathspec**；⛔ `-A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`、⛔ 动判据文字。
+- **⛔ 跑整包 `./cmd/wisp`；⛔ 跑全树 `go test ./...`**；所有 `go test` 带 `-count=1 -timeout 30m`。颜色尺＝`./internal/panel` 整包**改前⇄改后同一台面**成对（分母现跑：`internal/panel` 顶层 156／`RUN` 246 是 10-16 12:5x 的读数，⛔ 抄，自己数），终态红名册与起手名册**作差＝0**。
+- 台面＝仓外导出树**八件套** `git archive <具名 sha> go.mod go.sum internal cmd tools scripts frontend models` ＋手工拷 `build/*.dll`／`third_party/sherpa-onnx/*.dll`／`frontend/dist`；取出后先 `find … -name '*.go' | wc -l` 证非空。★**门禁四数（`gofumpt`／`d22scan`／长度门／`go vet ./internal/panel/`）只在工作树上跑**——`d22scan` 自己声明了 `design/`＋`frontend/` 射程（`tools/d22scan/main.go:581-582`），部分树上跑＝`rc=2` GUARD 拒绝、⛔ 读成红；逐枚落 `rc=`。红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写哪一行，⛔ 计入判据。
+- ⛔ 为了变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 在注释里指名一枚不存在的测试当凭据（本仓入账五次）。
+- ⛔ 杀 `wisp.exe` **PID 21892**（机主 10-15 19:03 自起，台账 `A988`；握全局热键与单实例锁）。
+- 读数纪律：尺口径写清 `^=== RUN`（含子测试）⇄ `^--- PASS`（只数顶层），⛔ 混用；引任何数带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先看 stderr＋跑正控。
+- **UI 件里⛔ 任何 emoji**（`d22scan` ban #8 扫字符串不扫注释；`→` 抓不到，`✓`/`≤` 抓得到）。
+- **输出预算**：≤4 枚件、每件 ≤160 行；⛔ 0 字节（逐枚 `wc -c`）；轮次帽约 150 ⇒ **每落一枚就 commit**。
+- shell：正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（本仓 10-15 出过事故：那段会被当脚本真跑）；中文 commit 先 Write 成文件再 `git commit -F`。
+- 并发在飞：`270-r2`（写 `internal/tools` 注释）∥ `165-v2`（裁 `internal/agent`，独占那包 `go test`）∥ `216-a2`／`33-a3`（只读，⛔ 跑 Go）⇒ ⛔ 把别腿的在飞字节当"改前基线"。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+
+① 逐枚提交号＋逐枚 `git show --name-only`（只含上面四处）＋`git diff --numstat` 逐枚；② 证据件绝对路径＋`wc -c`＋行数；③ 改前⇄改后两发 `./internal/panel` 四数与红名册作差＝0，**★两分成对突变各红在哪一行**（含还原 `sha256sum` 两串）＋门禁四数逐枚 `rc=`。
+另加我的必答题（⛔ 你盖章不算）：把 `needsDisplayWash` 与 `scrubForDisplay` 的字符集**逐枚列出来对给我看**（22 枚一一对齐，⛔ 只说"一致"）；并答"新加的那批里哪几枚如果只删不转义，会把两个名字拼成第三个名字"——各举一枚实例。

@@ -1,0 +1,37 @@
+只读普查腿 `33-a3`——"最后一公里"到底缺哪一跳：快照字节今天怎么（不）到页面，页面那边等着什么（⛔ 产码、⛔ 判语、⛔ 跑 Go）
+==========================================================================================================
+
+腿名 `33-a3`｜角色＝**只读普查**｜票＝`.scratch/wisp/issues/33-panel-host-c27.md`（未勾格多枚，本腿只补"快照出向那一跳"的料）｜起手锚＝**具名提交 `c315980b`**（⛔ `HEAD~n`）
+
+## 为什么先量这个（我 14:0x 自己复认的两条）
+
+`internal/panel/pump.go:359` 往上那枚 `Publish()` 在 `p.src.Out == nil` 时**自己报错**"快照已构造但没有出口（最后一公里在票 33/35 名下），本次未送达"；生产侧 `cmd/wisp/run.go:732` 把 `Out` 装成 `rt.bookPanelSnapshot`（只存字段＋一条日志），而唯一的读者 `cmd/wisp/panel_pump.go:424 lastPanelSnapshot` **生产调用者 0 枚**（我现跑 `grep -n 'lastPanelSnapshot'`＝只剩定义那一行）。⇒ 今天**界面里的活状态可能压根没在更新**。这条如果成立，它排在所有"显示层装牙"的票前面——⚠ 但也可能页面是**拉**的（`window._rpc` 那条 resolve 路，见 `cmd/wisp/panel_control_windows.go:752`），⛔ 我还没量，这就是本腿的活。
+
+## 你要交的三节（每条旁站着尺）
+
+**① 出向到底有没有**：把"Go 把字节送进 WebView"的每一形列出来——`Eval`／`NavigateToString`／`PostWebMessage*`／宿主对象（`AddHostObjectToScript`）——逐枚答：这枚调用点在哪个文件、**生产里谁调它**（调用者枚数）、送的是**快照**还是**RPC 回执**。⛔ 把测试/夹具里的调用算进生产。判据尺＝`grep -rn` 的命中行逐条＋每条的调用点计数。
+**② 页面那边等着什么**：只读 `frontend/**`（⛔ 零写），列出页面**声明会读**的入口名（`frontend/src/lib/panel.ts` 那族方法名、`App.tsx` 的 `snapshot` prop 从哪来、有没有订阅/轮询）。⇒ 回答："页面是在**等推**、在**拉**、还是**只用 props 初始值**"。这一节决定修法形状，⛔ 你选。
+**③ 桥里缺哪一枚名**：`internal/panel/bridge.go:42-75` 那 7 枚入向方法常量逐枚点名，回答"有没有 `panel.snapshot.*` 这一族"（正控＝同尺能数出 7 枚）。若缺，列出**要新增一枚方法名**会撞的既有钉（`cmd/wisp/git_test.go` 的 `whitelistMethodsFromSource`、C17 名册、`docs/specs/SPEC-08` 那两处），逐枚 `file:line`。⛔ 你替我排程、⛔ 你写判据。
+
+**上交给你答不了的一件**：`33-panel-host-c27.md` 里 `AC#14` 那句"最后一公里"的原文（`sed -n '42p'`）与票 35/145 的关系——请**逐字读回这三处原文**并在件里并排放，⛔ 概括；这三句谁覆盖了谁，决定我下一步是翻 33 的格、还是另立一枚接线票。
+
+## 写面（只许两处，逐字）
+
+1) `.scratch/wisp/probes/33/a3/**`（含 `logs/`；短名、⛔ 带 `§`）；2) 票 33 末尾**一条**只追加 bullet（`numstat` 必须 `N/0`）。
+⛔ 其它一切面：产码／测试件／`docs/evidence/s1/**`／`frontend/**`（**只读**）／`design/**`／`.gitignore`／`go.mod`／`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／`ci.yml`／`.github/**`／三枚冻结件。
+
+## 规矩（一条都不许漏）
+
+- **只 commit、⛔ push**；`add`／`commit` 两处**逐枚显式 pathspec**；⛔ `-A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`、⛔ 动判据文字、⛔ 选修法形状（全归编排者裁）。
+- **⛔ 跑 `go test`／`go build`／`go vet`／门禁**（编译面这波归在飞的裁决腿）；`go env` 可，具名自报。⛔ 真开窗、⛔ 起任何 exe。
+- ⛔ 把注释里的测试名当凭据（`grep -rn` 证存在）；行号只当读数；报"0 命中"前先看 stderr＋跑一枚已知存在的正控。
+- ⛔ 杀 `wisp.exe` **PID 21892**（机主自起的常驻实例）。**⛔ 为量"页面上有没有东西"去点鼠键或开新窗**——桌面归机主。
+- **输出预算**：≤3 枚件、每件 ≤160 行；⛔ 0 字节（逐枚 `wc -c`）；轮次帽约 150 ⇒ **每落一枚就 commit**。
+- shell：正文一律单引号或加引号 heredoc；⛔ 双引号串里反引号或 `$`；中文 commit 先 Write 成文件再 `-F`。
+- 并发在飞：`270-r2`（写 `internal/tools` 注释）∥ `165-v2`（裁 `internal/agent`，跑 Go）∥ `216-a2`（只读）∥ `327-r1`（若已放＝写 `internal/panel`）⇒ ⛔ 读别人的在飞字节当凭据；`frontend/**` 有另一家在飞的脏改动（机主的外部前端 agent），⛔ `git add` 它。
+
+## 交件自证（三把尺）
+
+① 逐枚提交号＋逐枚 `git show --name-only`（只含两处）；② 件绝对路径＋`wc -c`＋行数＋占位符计数 0；③ 三节每条结论旁站尺的逐字输出。
+必答题：**"今天从 `Publish()` 出来的那串字节，到用户屏幕上，缺的具体是哪一跳？"** 用 `file:line` 把断点说成一枚，⛔ 说成"整条都没接"（那是一枚射程更大的断言，要另外的尺）。
