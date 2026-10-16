@@ -108,3 +108,47 @@
   r 位收紧的射程外变色（面外，〔待面空补验〕）、票面 154/4000 与"16→20"措写（属改票面须人工批准）、`privateFile` 开 leg 归票 322。
   ⛔ 翻 AC 框、⛔ 改票名/Status/已有正文。**next=** 落地腿补 `sealHandle` 具名单元台件 + 单独去牙反控（缺口 1 去处）。**⛔ push。**
 - 2026-10-15 22:1x（agent=120-r3，落地腿＝实现者，零产码：`winsec_other.go` 全程 `sha256=137442cd…` 未变）：did=补掉 `120-v1` 判"缺世界"的那枚缺口 1——给 `sealHandle` 自带的两枚 inline 复验（`:269` 链接那一支、`:272` 真对象那一支）**各**造出能走到的世界，并对每一支**单独**去牙做反控。件＝`docs/evidence/s1/120-sealhandle-fixture.md`＋测试三枚 `internal/winsec/sealhandle_window_120_other_test.go`（夹具与判据）／`sealhandle_identity_120_other_test.go`（直接调 `sealHandle` 四枚）／`sealhandle_privateroute_120_other_test.go`（走 `PrivateFile` 产码路由两枚＋一枚盲跑读数），读数与脚本在 `.scratch/wisp/probes/120/r3/`（23 枚＋`tooth.sh`／`gates.sh`）。**新用例 7 枚**（顶层，全 `TestAC1POSIX…120r3`）。**两形都造出来了**：① `:272`＝fd 开在真对象 A、`rename(2)` 把第二枚真对象换到名字上，全程零链接 ⇒ `pinPlacement` 按名钉到的就是它、`sameObjectPinned` 满足，只有 `sealHandle` 自己的 `os.SameFile` 能拒（确定性、⛔ 接缝）；② `:269`＝名字必须在 **pinned seal 判语出来之后**才变成相对兄弟链接 ⇒ 经包自己声明的接缝变量 `applyDescriptor` 先调**真的** `applyDescriptorPOSIX`、保留判语，之后才动手（⛔ 替换；`private_fail_test.go` 为 AC#5 早换过同一枚 var）。★**对派单 §1 那句"⚠ 必须 Root 会跟的形"要更正为读数**：相对兄弟链接若种在调用**之前**，`Root` 会跟它、`pinPlacement` 在 `:188` 当场拒，`sealHandle` 在 `:257` 就返回——**这正是 120-v1 写的成因**，本腿把它具名成一枚用例（`TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3`，逐字 `leg that spoke = pinPlacement sameObjectPinned link face (winsec_other.go:188)`）而不是照字面当前提。**反控成对三发**（同一快照 `git archive HEAD=6eb3d2e8`、同镜像 `golang:1.27`、同 temp；物理改写＋sha256 还原、`.bak` 两支留底未删；锚⛔ 用行号——同文件 `sameObjectPinned` 在 `:188`/`:191` 有一对同形判据，改法是先由 `func sealHandle` 体范围现找行＋硬校 `false &&` 全文件恰好 1 处＋`LANDS` 自证）：未去牙 **rc=0／RUN=62／PASS=62／FAIL=0／SKIP=0**（顶层尺 40/40/0/0；交件锚 `e1973191` 再确认一发同数）；去 `:269` 一支 **rc=1／FAIL=2**＝只有本腿两枚链接形红，红句逐字 `sealhandle_identity_120_other_test.go:86: AC#1 RED name-becomes-a-sibling-link-after-the-pinned-seal: refusal came from sealHandle inline SameFile face (winsec_other.go:272), want the leg carrying "the name carries a link, so this descriptor is not the object the caller named"`（★**这一支摘掉后仍被拒、但拒因换腿** ⇒ 判据必须问"哪一腿说的"、⛔ 只问"有没有拒"）；去 `:272` 一支 **rc=1／FAIL=2**＝只有本腿两枚真对象形红，红句逐字 `…:48: AC#1 RED name-carries-another-real-object: the call returned nil, so the leg carrying "this descriptor is not the object the name carries now, so the bytes would not land in what was just sealed" never spoke`＋盘上事实那一行 `…:60: AC#1 RED: the caller's own object was narrowed to -rw------- …`（没牙时 `chmodPinned` 真落在 fd 的对象上）与路由那发 `…:87: … the refused write left the name carrying a file, want it unlinked; err=<nil>`（产码 `PrivateFile` 会**报成功**）。**零变色的尺**⛔ 看四数：`--- FAIL` 连名逐枚比对，三发名册 `diff` 全等、变色只发生在本腿用例（其余 60 枚含 113/118/119/125 那族与我的成因枚、反方向枚、盲跑枚全绿）。**盲跑读数**（⛔ 接缝帮忙、`PrivateFile`×2000 由赛跑者翻名字）同发指纹＝未去牙 `inline SameFile=25 / inline link=11`，去 `:269` 那发 link 行整行消失、去 `:272` 那发 SameFile 行整行消失；命中数按 120-v1 §2 裁③**只上报⛔ 升硬**。**门禁 rc**：`go build ./...` 0（宿主不编 `winsec_other.go`，⛔ 当已验）、`GOOS=linux go vet` 0、`GOOS=darwin GOARCH=arm64 go vet` 0（真读那一半）、`gofmt -l` 0（0 字节）、`/d/work/base/gopath/bin/gofumpt -l` 0（绝对路径）、`sh scripts/d22scan.sh` 0 且分母无一下降（`internal/=568`≥120-v1 的 564、`cmd/=136`、`tools/=25`、`design/=39`、`frontend/=116`、`examined 280`）、`sh scripts/check-path-length-budget.sh` 0 GREEN、容器名册 `-run 'TestAC[1-4]POSIX'` 0（现量**顶层 27 枚**＝旧 20＋本腿 7，RUN=38/PASS=38/0/0；只跑本腿 7 枚 `-run '120r3$'` 0＝7/7/0/0）。**没做完／没证的（逐枚具名）**：① 自然 landing 的分布只有**一发**、⛔ 多次读数与阈值（判者可攻）；② 盲跑里 `other failure=1` 逐字 `openat caller-object-120r3.bin: too many levels of symbolic links`——只上报、⛔ 归因（本腿没查清那一发的交错顺序）；③ **R-322 那一形在这条路由上是活的**：名字带链接时 `privateFile` 的 `O_TRUNC` 在 walk 之前把外站对象截空（读数 `the witness now holds ""`），产码 `:78-82` 自己写着这一句不做、票 322 已立未派 ⇒ 本腿**只计数上报⛔ 判⛔ 顺手修**，因此枚 7 的内容判据是三态（模式硬判／raced 载荷落进外站对象硬判／只被截空＝计数）——⚠ 那条"内容不许变"的硬断言是本腿自己首发起的、首发即红，改的是**本腿用例的射程**，根据＝产码注释＋322 已立事实，判者要攻这一点请攻这里；④ Windows 半格（`winsec_windows.go:328` 缺同一对象闸门）非本单射程；⑤ 台面故障三形已具名实录（`awk` 替换串里 `&`＝匹配文本 ⇒ 造出 `build failed` 且四数全 0、`MSYS_NO_PATHCONV` 泄漏给宿主尺令 d22scan 拿到 `D:\d\work\…missing go.mod` rc=2、`tail -1` 多文件＋`set -e` 令驱动中途死）——前两发的作废读数件**随 `rm -rf` 重建快照一起消失**（只建不删⛔ 删，这一笔是我自己的重建步骤带走的，具名认错）。**⛔ 翻 AC 框、⛔ 改票名/Status/已有正文、⛔ push。**
+- 2026-10-16 11:2x（agent=120-v2，终裁腿＝非实现者·只读，零产码、零字节触碰工作树）：did=五格逐格判语＋★`sealHandle` 那半**裁活**。
+  件＝`docs/evidence/s1/120-v2-verdict.md`（244 行／27735 字节，现量）＋读数 23 枚与两枚去牙脚本 `.scratch/wisp/probes/120/v2/`（含 `logs/`）。
+  起手锚 `232f309e`、时刻 11:14 +08、票框现量 **5 未勾／0 已勾**、`git status --porcelain -- internal/winsec` 全程空。
+  台面＝`git archive` 的**仓外导出树**（`head` 742 枚 `.go`／`prebase` 729 枚，先数后跑）；HEAD 那枚 `winsec_other.go` 现量
+  `sha256=19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2`（456 行）＝**与 120-r3 全件引用的 `137442cd…` 不同**
+  （票 322 两枚写腿 `8baec646`/`1fbc9067` 在 120-r3 交件之后改过它）⇒ 本腿所有读数落在**今天交付的字节**上，比腿报那一版更强。
+  **★`sealHandle` 判「成立」＝120-v1 的"缺世界"对今天这枚面不再成立**：7 枚台件复跑 `RUN=7 TOPPASS=7 TOPFAIL=0 SKIP=0 rc=0` 且世界行与读数同发
+  （`identity:44 AC#1' world: fd and name = two different objects`；夹具 `:41-43` 的 `t.Fatalf` 让"没造出世界"自己叫红）；
+  逐支**单独**去牙（物理改写仓外树＋sha256 还原、⛔ `-overlay`）＝摘 `:300`（链接那一支）恰红 **2 枚**（突变 `989af687…`，红句＝仍被拒**但拒因换腿**），
+  摘 `:303`（真对象那一支）恰红 **2 枚**（突变 `76e49806…`，含盘上事实那一行 `caller's own object was narrowed to -rw-------`）；
+  ★同形两对之问用一发正面区分＝把**另一对** `sameObjectPinned`（`:219`/`:222`）两支一起摘 ⇒ 红的是**完全不同的 4 枚**（票 322 一枚、成因枚 3、盲跑枚 7、仪器形 3），
+  而我那 4 枚链接/真对象形全绿；再拆开单摘：只摘 `:219` 只红成因枚、只摘 `:222` 红 322 枚＋形 3 ⇒ 牙下在对的那对上
+  （尺＝整文件 `ModeSymlink != 0` 命中 **3 行**＝219/300/455、`!os.SameFile(pinned, now)` 命中 **2 行**＝222/303，现量；改法＝由 `func sealHandle` 体范围 287..307 现找行＋硬校 `false &&` 全文件恰好 1 处）。
+  三发全部 `RESTORE MATCHES`（还原＝`19f3c211…`），还原后整包复跑回基线色 `RUN=71 TOPPASS=43 TOPFAIL=0 SKIP=0 rc=0`。
+  **五格**：AC#1 **成立**（多样本＝`sealWindowSamples120=4`×`sealWindowAttempts120=500`；成对读数本腿现跑＝改前 `9/8/17` 合 **34/6000>0** 且 `refused-at-act=0/0/0`，
+  HEAD **0/6000** 且活性非零 `check=942/82/133 act=19/9/20 sealed-own=943/121/137`；"抓到窗口的次数"是**量的**＝`posix_seal_window_120_other_test.go:171-172`
+  每次 attempt 读回外站证人的盘上 mode，单位＝次数；反形三发都会红＝未修码面走默认严格档 `3/3 全红 rc=1`（样本里只命中 1 次也叫红）＋只摘 `:222` 红形 3＋确定性台件红；
+  判据在样本循环内、total 行只额外打印 ⇒ 无平均、无"只报最好那次"）；AC#2 **成立**（可执行答复＝"按已验证 fd 密封"做得到且已是今天落地的形状，"逐级 `openat`+`O_NOFOLLOW` 完全体"做不到 ⇒ 只关到密封那一跳，⛔ 读成"从根上关"）：
+  `syscall.O_NOFOLLOW` 容器实测 **`0x20000`(131072)**；11 平台×2 枚交叉编译矩阵自跑（`O_NOFOLLOW` 于 windows/js/plan9 取不到；★`syscall.Openat` 除 linux 外 **aix/ppc64 也 COMPILES**＝更正前任"只有 linux"的口径，⛔ 改文字、只具名记现量）；
+  `Root.OpenFile(leaf, O_RDONLY|O_NOFOLLOW)` 对相对兄弟链接读数 `OPENED, and the descriptor stands on the TARGET object=true`（＝经 `os.Root` 失效，我量的）；
+  `winsec_windows.go:335` 那枚常量今天值＝**0**，OS 手段 `:374 preOpenLeafGuard`（`:379 FILE_FLAG_OPEN_REPARSE_POINT`）只给判据不给不跟随的覆盖开；
+  AC#3 **成立**（名册现量＝`-run 'TestAC[1-4]POSIX'` **顶层 28 枚**、四数 `39/28/0/0 rc=0`＝0 红 0 Skip；票面"16"过期、120-v1 20、120-r3 27、第 28 枚＝票 322 落的 leaf-open 枚；⛔ 改票面只具名；
+  逐枚点名两栏见件 §5；★一枚具名口径落差：**"同一个对象被换掉"这一形，113 那批是失明的**（只摘 `:222` 时红的正是 120 自己的形 3 与 322 枚，28 枚名册一枚不红）⇒ 该形今天的凭据只在 120 的仪器与 `120-r3` 的台件上）；
+  AC#4 **成立**（尺＝`git diff 58de465a..232f309e -- internal/winsec/winsec.go` 现量 **2 个 hunk／+42−1**，被删那一行逐字 `f, err := os.OpenFile(resolved, flags, perm)`；
+  `git log` 该枚件在此窗口**只有 1 枚 commit**＝`8baec646`（票 322 遗产、编排者代提）⇒ 票 120 三枚腿一枚没碰那段话，唯一改动者**已登记**＝台账 **A1001** 第 7 条接线尺，
+  其四枚落点本腿逐枚 `grep -n` 复认存在：`winsec.go:146`/`:149`、`winsec_other.go:29`、`winsec_windows.go:335`/`:374`）；
+  AC#5 **成立**（容器 `-count=2 -v` 整包四数逐条＝`RUN=142 / TOPPASS=86 / TOPFAIL=0 / TOPSKIP=0 rc=0`，口径写清＝不同顶层名 43 枚 ×2＝86 条 `--- PASS`、`=== RUN` 含 28 枚子测；
+  `gofmt -l` 列 **0 枚**、`gofumpt -l` 列 **0 字节**（`/d/work/base/gopath/bin/gofumpt.exe` 真跑 rc=0）、`go vet` host/linux/darwin-arm64 三把 rc=0、
+  `sh scripts/d22scan.sh` 纯净全仓导出树 rc=0 `clean - no D22 ban violations`，分母**成对同尺**（58de465a ⇄ HEAD）＝`ban#8 internal/=563→573`、`cmd/=136→139`，其余 239/41/116/25/examined 280 持平 ⇒ 无一 scope 下降；
+  ⚠ `design/` 我读 **30**、前任报 39＝尺的射程差（他们跑在带未跟踪件的工作树、我跑在 `git archive` 树；`git ls-tree -r design/` 两枚锚都 30 枚），⛔ 当成 scope 掉了；
+  容器实测 `getuid=0` ⇒ 权限类断言在本台面失真＝票 113 常注，这一族夹具头自己写明不碰权限面）。
+  **能力类必答**：`sealHandle` 产码调用点**只有 1 枚**＝`winsec.go:158`（在 `privateFile` 体内），`PrivateFile`(`:95`) 与 `PrivateFileExclusive`(`:105`) 两条公开入口都经它 ⇒ 生产调用者上**通**；
+  测试侧 5 枚件 29 处命中；定义两枚（POSIX `winsec_other.go:287`／Windows `winsec_windows.go:413`）。⛔ 拿 `go build` 的 rc=0 当"接上了"。
+  **交付缺陷三枚具名（⛔ 本腿动一字）**：① `spokeLeg120r3` 名册印的行号过期（印 `188/191/269/272`，今天 **219/222/300/303**；判据按文案子串匹配、四串在产码逐字仍在 ⇒ 红绿与归属不受影响，但会误导下一枚腿）；
+  ② `sealhandle_privateroute_120_other_test.go:233-238` 与 `sealhandle_window_120_other_test.go:7/:21-23` 仍写"票 322 unfixed at this anchor"，而 322 的**叶子腿今天已落地**
+  （本腿两发盲跑那一形都没出现＝`witness holds its own bytes after 2000 raced attempts`），仍开的只有**祖先腿**（`winsec_other.go:103-113` 逐字）；
+  ③ 票 120 的 **Windows 半格仍空**＝`winsec_windows.go:413` 缺同一对象闸门（`120-r3` §5④ 指的 `:328` 今天落在 322 的注释段里＝①同一族）。
+  **没裁完的格（具名＋缺哪一发读数）**：Windows 侧＝**不可判**〔缺 windows/amd64 上"名字被换成另一枚真对象"这一形的台件与去牙反控；仓里没有这一枚，且票面逐字禁改那枚件〕；
+  射程外消费者（`internal/risk`/`cmd/wisp`/`internal/secret` 因 r 位收紧在 Linux CI 的变色）＝**不可判**〔缺 `go test ./cmd/wisp` 整包（票面 314 死亡区、本腿⛔ 跑）与 `internal/tools` 整包（同批只读腿 `270-v1` 在用、本腿⛔ 跑）〕；
+  自然 landing 分布只两发（`:272/:269`＝10/9 与 9/1，另 `returned nil=26/50`、`other=41/21`）＝按 120-v1 §2 裁③只上报⛔ 升硬⛔ 给阈值。
+  **本腿自抓两把坏尺具名（⛔ 计入判据）**：把读者档与严格档塞进同一枚 `docker run -e WISP_120_BASELINE=1` ⇒ 那发"严格档 rc=0"是假读数（作废件留底
+  `logs/v2-prebase-strict-DUPLICATE-of-reader.log`，只建不删）；`grep 'live scope work' | head -1` 抓到 d22scan 仪器自测那枚临时小树的摘要（`internal/=14`）＝坏尺，改 `tail -1` 才是最终行。
+  **⛔ 翻任何 AC 框、⛔ 动 `Status:`/票名/`-done`、⛔ push；本腿只 commit。**
+
