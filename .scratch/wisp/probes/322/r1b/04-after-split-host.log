@@ -1,0 +1,7 @@
+# 322-r1b 拆分后本机五尺＋整包 -v（2026-10-16 09:45:03 +0800）
+files lines:  214 internal/winsec/openleaf_322_other_test.go 78 internal/winsec/openleaf_flag_322_other_test.go 254 internal/winsec/openleaf_guard_322_windows_test.go 131 internal/winsec/openleaf_overwrite_322_test.go 677 total 
+rc_build=0
+rc_vet=0
+rc_gofmt=0 listed_files=0
+rc_test=0
+RUN=110 PASS_TOP=61 FAIL_TOP=0 SKIP_TOP=0

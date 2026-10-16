@@ -6,23 +6,24 @@
 // POSIX and the ANCESTOR leg stays open and stays named - it speaks about the last component
 // only, so an ancestor swapped for a link after resolveString answered is still followed and
 // its O_TRUNC still lands in somebody else's tree. Nothing here claims the window is closed;
-// reasoning, top-red roster and paired readings: docs/evidence/s1/322-open-nofollow.md. Why a
+// reasoning, top-red roster and paired readings: docs/evidence/s1/322-openleaf.md. Why a
 // racer: a leaf link planted before the call is refused by the placement floor before the open
 // runs, so planting cannot reach this leg (120-r3's reason for winsec_other.go:269). Judged: no
 // fresh foreign witness loses its own bytes or mtime, AND the new leg spoke at least once, so a
 // 0 numerator is never read as "nothing was raced". Both numbers print on one screen.
+//
+// SPLIT NOTE (leg 322-r1b): this file came in at 262 lines, two over the 260-line budget, and
+// the by-name deterministic case that sat under it is now openleaf_flag_322_other_test.go. The
+// split moved bytes only - every assertion, message and threshold here is the one 322-r1 wrote.
 package winsec
 
 import (
-	"errors"
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"testing"
 	"time"
 )
@@ -209,54 +210,5 @@ func TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1(t *t
 	if landed > 0 || narrowed > 0 {
 		t.Errorf("AC#1 RED: %d foreign witnesses hold a raced private payload and %d were narrowed off 0666, so a "+
 			"write or a seal followed a flipped leaf link into a foreign object (ticket 120's surface re-opened)", landed, narrowed)
-	}
-}
-
-// TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 pins the constant's kernel
-// effect deterministically, including two shapes only this can show: a refusal must not
-// delete the link it was told about (322-a1's nearest miss, the unlink on privateFile's
-// seal-failure path), and a DANGLING leaf must stop creating an object outside the tree.
-func TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1(t *testing.T) {
-	dir, outside := SealableTempDirForTest124(t), SealableTempDirForTest124(t)
-	witness := filepath.Join(outside, "someone-elses-file-322r1.bin")
-	const body = "the bytes a truncating open would have taken away"
-	if err := os.WriteFile(witness, []byte(body), 0o666); err != nil {
-		t.Fatal(err)
-	}
-	before, err := os.Lstat(witness)
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, tc := range []struct{ label, link, target string }{
-		{"relative sibling", filepath.Join(dir, "sib-322r1.lnk"), filepath.Base(witness)},
-		{"dangling, target never created", filepath.Join(dir, "dangling-322r1.lnk"), "never-created-322r1.bin"},
-	} {
-		if err := os.Symlink(tc.target, tc.link); err != nil {
-			t.Fatalf("%s: stage the leaf: %v", tc.label, err)
-		}
-		f, err := os.OpenFile(tc.link, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
-		if err == nil {
-			_ = f.Close()
-			t.Errorf("AC#1 RED %s: the open carrying oNoFollowPlatform took a leaf link, want ELOOP", tc.label)
-		} else if !errors.Is(err, syscall.ELOOP) || !strings.Contains(err.Error(), whyOpenELOOP322r1) {
-			t.Errorf("AC#1 RED %s: the open answered %v, want the leaf leg carrying %q", tc.label, err, whyOpenELOOP322r1)
-		}
-		if _, sErr := os.Lstat(tc.link); sErr != nil {
-			t.Errorf("AC#1 RED %s: the refusal removed the link itself (%v), so a refusal deleted the entry it was told about", tc.label, sErr)
-		}
-	}
-	if _, err := os.Lstat(filepath.Join(dir, "never-created-322r1.bin")); !errors.Is(err, fs.ErrNotExist) {
-		t.Errorf("AC#1 RED: the dangling-leaf spelling created an object outside the tree")
-	}
-	after, err := os.Lstat(witness)
-	if err != nil {
-		t.Fatalf("the witness became unreadable: %v", err)
-	}
-	if got, rErr := os.ReadFile(witness); rErr != nil || string(got) != body {
-		t.Errorf("AC#1 RED: the witness holds %q, want its own bytes untouched", got)
-	}
-	if after.Size() != before.Size() || !after.ModTime().Equal(before.ModTime()) {
-		t.Errorf("AC#1 RED: the witness moved from size %d mtime %s to size %d mtime %s", before.Size(),
-			before.ModTime().Format(time.RFC3339Nano), after.Size(), after.ModTime().Format(time.RFC3339Nano))
 	}
 }

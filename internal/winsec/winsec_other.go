@@ -103,7 +103,7 @@ var applyDescriptor = applyDescriptorPOSIX
 // And one thing this does NOT fix, named so nobody reads the paragraph above as the
 // end of the family: the OPEN inside privateFile (winsec.go) resolves a leaf link
 // before this walk runs. Ticket 322 closed the LEAF leg of that open on this
-// platform by carrying O_NOFOLLOW on it (oNoFollowPlatform below), so a leaf link
+// platform by carrying O_NOFOLLOW on it (oNoFollowPlatform above), so a leaf link
 // planted in the gap now makes the open itself answer ELOOP instead of truncating
 // the object behind the link. What is still open, and stays open at this anchor,
 // is the ANCESTOR leg: O_NOFOLLOW speaks about the last component only, so an
