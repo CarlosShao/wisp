@@ -1,0 +1,36 @@
+=== RUN   TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1
+    openleaf_322_other_test.go:191: AC#1 paired reading on one screen: attempts=3000 flips=350 flipErrs=0 damagedWitnesses=0 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+    openleaf_322_other_test.go:195: AC#1' leg that answered = placement floor before the act (platformVerifyPlacement) : 2573 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = some other failure : 427 attempts
+    openleaf_322_other_test.go:205: AC#1 RED instrument: across 3000 raced attempts the leaf leg ("too many levels of symbolic links") answered 0 and the racer landed 350 flips (0 errors, first ""), so the damaged count above is not evidence about a window that was never reached
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.77s)
+=== RUN   TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322r1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern108100380/001/blob-322r1.bin), which breaks storing the same id twice replaces the blob in place
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "secret-value-one, longer than the replacement" (err <nil>), want "secret-value-two" - storing the same id twice replaces the blob in place
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322r1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern4031650513/001/config-backup-322r1.toml), which breaks this call is the repair path for a wide backup left by an older build
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "a wide backup left by an older build, longer than the replacement" (err <nil>), want "narrow" - this call is the repair path for a wide backup left by an older build
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322r1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern104926709/001/wisp-secrets-322r1.toml.tmp), which breaks a pre-rename temp left by a crash is overwritten, not refused
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "tmp body from the run that crashed" (err <nil>), want "tmp body from this run" - a pre-rename temp left by a crash is overwritten, not refused
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322r1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern845006512/001/artifact-322r1.bin.retry), which breaks a leftover .retry temp is overwritten (D31 last-writer-wins)
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "first spill that needed a retry" (err <nil>), want "retry spill bytes" - a leftover .retry temp is overwritten (D31 last-writer-wins)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+    openleaf_overwrite_322_test.go:95: first write: winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322r1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1the_en1904755644/001/private-after-rewrite-322r1.bin
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+    openleaf_overwrite_322_test.go:122: first exclusive create: winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322r1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1the_ex1297221111/001/artifact-322r1.bin
+--- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.01s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.797s
+FAIL
+go-test rc=1

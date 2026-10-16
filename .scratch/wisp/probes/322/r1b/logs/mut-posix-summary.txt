@@ -1,0 +1,76 @@
+### 322-r1b POSIX teeth run, started 2026-10-16 09:39:35 +0800 HEAD=d9e1498bc9da52a5d577d1ab70555049789376e5
+TREE /d/tmp/probe322r1b/base.5ElZmH (rev=8baec646^): .go=1090 winsec/*.go=39
+TREE /d/tmp/probe322r1b/fixed.SHic9u (rev=HEAD): .go=1090 winsec/*.go=39
+FIXED-BYTES 41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d */d/tmp/probe322r1b/fixed.SHic9u/internal/winsec/winsec.go
+FIXED-BYTES 21139cdd9dc9f570fd9690f5634f3484da2dc2fcf2d2e233dc99275fdab7bcf1 */d/tmp/probe322r1b/fixed.SHic9u/internal/winsec/winsec_other.go
+=== base-322 rc=1 filter='TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1|TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1|TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1'
+RUN=9 topPASS=1 topFAIL=2 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=0 buildfailed=0 noteststorun=0 setupfailed=0
+    openleaf_322_other_test.go:191: AC#1 paired reading on one screen: attempts=3000 flips=2164 flipErrs=0 damagedWitnesses=63 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (1.81s)
+--- FAIL: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.02s)
+--- red lines verbatim:
+    openleaf_322_other_test.go:199: AC#1 RED: 63 of 3000 foreign witnesses lost their own bytes or mtime, so the open in privateFile followed a leaf link swapped into the caller's name and truncated a file no caller named (first: foreign-witness-0048-322r1.bin: content is "", want its own bytes). This is ticket 322's shape and the outcome the leaf leg exists to prevent.
+    openleaf_322_other_test.go:205: AC#1 RED instrument: across 3000 raced attempts the leaf leg ("too many levels of symbolic links") answered 0 and the racer landed 2164 flips (0 errors, first ""), so the damaged count above is not evidence about a window that was never reached
+    openleaf_322_other_test.go:240: AC#1 RED relative sibling: the open carrying oNoFollowPlatform took a leaf link, want ELOOP
+    openleaf_322_other_test.go:240: AC#1 RED dangling, target never created: the open carrying oNoFollowPlatform took a leaf link, want ELOOP
+    openleaf_322_other_test.go:249: AC#1 RED: the dangling-leaf spelling created an object outside the tree
+=== fixed-322 rc=0 filter='TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1|TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1|TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1'
+RUN=9 topPASS=3 topFAIL=0 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=0 buildfailed=0 noteststorun=0 setupfailed=0
+    openleaf_322_other_test.go:191: AC#1 paired reading on one screen: attempts=3000 flips=1772 flipErrs=0 damagedWitnesses=0 leafLegRefusals=48 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (1.18s)
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.02s)
+--- red lines verbatim:
+(no RED line)
+TREE /d/tmp/probe322r1b/m1-teethout.OwXUlw (rev=HEAD): .go=1090 winsec/*.go=39
+ANCHOR M1 open line: internal/winsec/winsec.go:149 before: 	f, err := os.OpenFile(resolved, flags|oNoFollowPlatform, perm)
+M1-BEFORE sha=41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d
+M1-AFTER  line: 	f, err := os.OpenFile(resolved, flags, perm)
+M1-AFTER  sha=97b3f277593dd8a9b7129524e9b84ab9344857a9c4bdd4555088ab886e5ef3c3  hits-of-const-in-open=0
+=== m1-322 rc=1 filter='TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1|TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1|TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1'
+RUN=9 topPASS=2 topFAIL=1 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=0 buildfailed=0 noteststorun=0 setupfailed=0
+    openleaf_322_other_test.go:191: AC#1 paired reading on one screen: attempts=3000 flips=2402 flipErrs=0 damagedWitnesses=70 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (2.07s)
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.01s)
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.03s)
+--- red lines verbatim:
+    openleaf_322_other_test.go:199: AC#1 RED: 70 of 3000 foreign witnesses lost their own bytes or mtime, so the open in privateFile followed a leaf link swapped into the caller's name and truncated a file no caller named (first: foreign-witness-0005-322r1.bin: content is "", want its own bytes). This is ticket 322's shape and the outcome the leaf leg exists to prevent.
+    openleaf_322_other_test.go:205: AC#1 RED instrument: across 3000 raced attempts the leaf leg ("too many levels of symbolic links") answered 0 and the racer landed 2402 flips (0 errors, first ""), so the damaged count above is not evidence about a window that was never reached
+M1-RESTORE sha=41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d (must equal M1-BEFORE)
+=== m1-restore-322 rc=0 filter='TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1|TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1|TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1'
+RUN=9 topPASS=3 topFAIL=0 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=0 buildfailed=0 noteststorun=0 setupfailed=0
+    openleaf_322_other_test.go:191: AC#1 paired reading on one screen: attempts=3000 flips=1856 flipErrs=0 damagedWitnesses=0 leafLegRefusals=52 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (1.84s)
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.01s)
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.03s)
+--- red lines verbatim:
+(no RED line)
+TREE /d/tmp/probe322r1b/m2-blanket.MUfbjX (rev=HEAD): .go=1090 winsec/*.go=39
+ANCHOR M2 posix probe body: internal/winsec/winsec_other.go:39 before: func preOpenLeafGuard(string) error { return nil }
+M2-BEFORE sha=21139cdd9dc9f570fd9690f5634f3484da2dc2fcf2d2e233dc99275fdab7bcf1
+M2-AFTER  body: 39:func preOpenLeafGuard(path string) error { return fmt.Errorf("%w: MUTANT blanket refusal on every name, fixed or not: %s", ErrUnresolvedPath, path) }
+M2-AFTER  sha=3f77600ddb0e793324431473d4903fbeb14c853dbc39ed8492bf1a9bdcdcd2f0
+=== m2-322 rc=1 filter='TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1|TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1|TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1'
+RUN=9 topPASS=1 topFAIL=2 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=0 buildfailed=0 noteststorun=0 setupfailed=0
+    openleaf_322_other_test.go:191: AC#1 paired reading on one screen: attempts=3000 flips=350 flipErrs=0 damagedWitnesses=0 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.77s)
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+--- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.01s)
+--- red lines verbatim:
+    openleaf_322_other_test.go:205: AC#1 RED instrument: across 3000 raced attempts the leaf leg ("too many levels of symbolic links") answered 0 and the racer landed 350 flips (0 errors, first ""), so the damaged count above is not evidence about a window that was never reached
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322r1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern108100380/001/blob-322r1.bin), which breaks storing the same id twice replaces the blob in place
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "secret-value-one, longer than the replacement" (err <nil>), want "secret-value-two" - storing the same id twice replaces the blob in place
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322r1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern4031650513/001/config-backup-322r1.toml), which breaks this call is the repair path for a wide backup left by an older build
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "a wide backup left by an older build, longer than the replacement" (err <nil>), want "narrow" - this call is the repair path for a wide backup left by an older build
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322r1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern104926709/001/wisp-secrets-322r1.toml.tmp), which breaks a pre-rename temp left by a crash is overwritten, not refused
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "tmp body from the run that crashed" (err <nil>), want "tmp body from this run" - a pre-rename temp left by a crash is overwritten, not refused
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322r1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern845006512/001/artifact-322r1.bin.retry), which breaks a leftover .retry temp is overwritten (D31 last-writer-wins)
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "first spill that needed a retry" (err <nil>), want "retry spill bytes" - a leftover .retry temp is overwritten (D31 last-writer-wins)
+### done 2026-10-16 09:41:37 +0800
+TREES kept (never removed): base=/d/tmp/probe322r1b/base.5ElZmH fixed=/d/tmp/probe322r1b/fixed.SHic9u m1=/d/tmp/probe322r1b/m1-teethout.OwXUlw m2=/d/tmp/probe322r1b/m2-blanket.MUfbjX

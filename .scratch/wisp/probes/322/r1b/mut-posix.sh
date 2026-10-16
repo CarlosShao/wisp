@@ -34,11 +34,11 @@ PAT322='TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1|T
 say() { echo "$@" | tee -a "$LOGS/mut-posix-summary.txt"; }
 say "### 322-r1b POSIX teeth run, started $(date '+%F %T %z') HEAD=$HEAD"
 
-newtree() {
+newtree() { # <label> <rev> : HEAD by default; pass 8baec646^ for the pre-ticket tree
 	tree=$(mktemp -d "$S/$1.XXXXXX")
-	( cd "$REPO" && git archive HEAD | tar -x -C "$tree" )
+	( cd "$REPO" && git archive "${2:-HEAD}" | tar -x -C "$tree" )
 	for f in $NEWFILES; do cp "$REPO/$f" "$tree/$f"; done
-	printf 'TREE %s: .go=%s winsec/*.go=%s\n' "$tree" \
+	printf 'TREE %s (rev=%s): .go=%s winsec/*.go=%s\n' "$tree" "${2:-HEAD}" \
 		"$(find "$tree" -name '*.go' | wc -l | tr -d ' ')" \
 		"$(find "$tree/internal/winsec" -name '*.go' | wc -l | tr -d ' ')" | tee -a "$LOGS/mut-posix-summary.txt"
 	return 0
@@ -75,8 +75,10 @@ container() { # <label> <tree> <runfilter>
 	} | tee -a "$LOGS/mut-posix-summary.txt"
 }
 
-# ---------- tree 1: base = pre-ticket values of both symbols (teeth out by construction) ----------
-BASE=$(newtree base | awk '{print $2; exit}')
+# ---------- tree 1: base = the commit BEFORE 322-r1's product bytes + pre-ticket symbols ----------
+# ⚠ 8baec646^ and NOT HEAD: HEAD already carries the leg's product files, so exporting HEAD and
+# adding a stub would be a duplicate declaration, and exporting HEAD alone would be "fixed".
+BASE=$(newtree base '8baec646^' | awk '{print $2; exit}')
 mkdir -p "$BASE/internal/winsec"
 cat >"$BASE/internal/winsec/zz322r1b_stub_pre_ticket_other.go" <<'STUB'
 //go:build !windows

@@ -1,0 +1,59 @@
+### 322-r1b Windows teeth run, started 2026-10-16 09:39:30 +0800 HEAD=d9e1498bc9da52a5d577d1ab70555049789376e5
+host go: go version go1.27.1 windows/amd64 / GOTMPDIR=<unset> / tmp volume=C:\Users\swq\AppData\Local\Temp
+TREE /d/tmp/probe322r1b/wfixed.oO5YLw: .go=1090 winsec/*.go=39
+FIXED-BYTES 5cdef88183deb576e742da8bf42349063d6ed199b7279232222d5ee4e7740afa
+=== w-fixed rc=0 filter='TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1|TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1'
+RUN=2 topPASS=2 topFAIL=0 topSKIP=0
+--- PASS: TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1 (0.40s)
+--- PASS: TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1 (1.61s)
+    openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=278 guardRefusals=13 otherRefusals=261 returnedNil=126 witnessTruncated=true witnessSize=0 witnessMode=-rw-rw-rw- firstGuardVerbatim="winsec: path is not provably resolved, refusing to seal: C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r13425813952\\001\\caller-name-322r1.bin: refusing to open for a private write: the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets (winsec: cannot apply a private security descriptor)"
+--- RED lines verbatim:
+(no RED line)
+TREE /d/tmp/probe322r1b/w1-teethout.oW9M6k: .go=1090 winsec/*.go=39
+w1 ANCHOR internal/winsec/winsec_windows.go:374; BEFORE sha=5cdef88183deb576e742da8bf42349063d6ed199b7279232222d5ee4e7740afa
+w1 AFTER line 375: 	return nil // MUTANT w1: guard removed
+w1 AFTER sha=e1d6df805c3be1eb7c39e6ef4f106352cd705b9856bc2f559a21172d116bd031  hits-of-injected=1
+=== w1 rc=1 filter='TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1|TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1'
+RUN=2 topPASS=0 topFAIL=2 topSKIP=0
+--- FAIL: TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1 (0.26s)
+--- FAIL: TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1 (1.49s)
+    openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=268 guardRefusals=0 otherRefusals=247 returnedNil=153 witnessTruncated=true witnessSize=35 witnessMode=-rw-rw-rw- firstGuardVerbatim=""
+--- RED lines verbatim:
+    openleaf_guard_322_windows_test.go:127: AC#3 RED file-symlink: preOpenLeafGuard accepted a name carrying a reparse point, so the open that follows it can still truncate whatever that link targets
+    openleaf_guard_322_windows_test.go:129: AC#3 RED directory-symlink: preOpenLeafGuard accepted a name carrying a reparse point, so the open that follows it can still truncate whatever that link targets
+    openleaf_guard_322_windows_test.go:131: AC#3 RED junction: preOpenLeafGuard accepted a name carrying a reparse point, so the open that follows it can still truncate whatever that link targets
+    openleaf_guard_322_windows_test.go:241: AC#3 RED instrument: 400 raced attempts produced guard-leg refusals=0 and racer flips=268 (flipErrs=0, firstFlipErr=""), so nothing below proves the guard is on this route
+w1 RESTORE sha=5cdef88183deb576e742da8bf42349063d6ed199b7279232222d5ee4e7740afa (must equal its BEFORE sha)
+=== w1-restore rc=0 filter='TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1|TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1'
+RUN=2 topPASS=2 topFAIL=0 topSKIP=0
+--- PASS: TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1 (0.14s)
+--- PASS: TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1 (1.27s)
+    openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=275 guardRefusals=12 otherRefusals=238 returnedNil=150 witnessTruncated=true witnessSize=35 witnessMode=-rw-rw-rw- firstGuardVerbatim="winsec: path is not provably resolved, refusing to seal: C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r11807037646\\001\\caller-name-322r1.bin: refusing to open for a private write: the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets (winsec: cannot apply a private security descriptor)"
+--- RED lines verbatim:
+(no RED line)
+TREE /d/tmp/probe322r1b/w2-blanket.GDVG8d: .go=1090 winsec/*.go=39
+w2 ANCHOR internal/winsec/winsec_windows.go:374; BEFORE sha=5cdef88183deb576e742da8bf42349063d6ed199b7279232222d5ee4e7740afa
+w2 AFTER line 375: 	return preOpenRefusal(path, "MUTANT w2: blanket refusal")
+w2 AFTER sha=cbf49697b749aa2e072c848f9130dfdee78e3213d33538a8e32bdfdcab44df15  hits-of-injected=1
+=== w2 rc=1 filter='TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1|TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1'
+RUN=2 topPASS=0 topFAIL=2 topSKIP=0
+--- FAIL: TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1 (0.19s)
+--- FAIL: TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1 (1.05s)
+    openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=158 guardRefusals=0 otherRefusals=400 returnedNil=0 witnessTruncated=false witnessSize=39 witnessMode=-rw-rw-rw- firstGuardVerbatim=""
+--- RED lines verbatim:
+    openleaf_guard_322_windows_test.go:119: AC#3 RED: the guard refused a real file (winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\Temp\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r13653046959\001\tree\plain-322r1.bin: refusing to open for a private write: MUTANT w2: blanket refusal (winsec: cannot apply a private security descriptor)), which would break every PrivateFile caller
+    openleaf_guard_322_windows_test.go:123: AC#3 RED: the guard refused a name that is not there yet (winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\Temp\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r13653046959\001\tree\not-created-yet-322r1.bin: refusing to open for a private write: MUTANT w2: blanket refusal (winsec: cannot apply a private security descriptor)), which would break every create
+    openleaf_guard_322_windows_test.go:127: AC#3 RED file-symlink: the refusal did not carry the guard's own reason "the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets", so some other leg answered; verbatim: winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\Temp\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r13653046959\001\tree\file-sym-322r1.lnk: refusing to open for a private write: MUTANT w2: blanket refusal (winsec: cannot apply a private security descriptor)
+    openleaf_guard_322_windows_test.go:129: AC#3 RED directory-symlink: the refusal did not carry the guard's own reason "the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets", so some other leg answered; verbatim: winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\Temp\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r13653046959\001\tree\dir-sym-322r1.lnk: refusing to open for a private write: MUTANT w2: blanket refusal (winsec: cannot apply a private security descriptor)
+    openleaf_guard_322_windows_test.go:131: AC#3 RED junction: the refusal did not carry the guard's own reason "the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets", so some other leg answered; verbatim: winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\Temp\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r13653046959\001\tree\junction-322r1.lnk: refusing to open for a private write: MUTANT w2: blanket refusal (winsec: cannot apply a private security descriptor)
+    openleaf_guard_322_windows_test.go:241: AC#3 RED instrument: 400 raced attempts produced guard-leg refusals=0 and racer flips=158 (flipErrs=0, firstFlipErr=""), so nothing below proves the guard is on this route
+w2 RESTORE sha=5cdef88183deb576e742da8bf42349063d6ed199b7279232222d5ee4e7740afa (must equal its BEFORE sha)
+=== w2-restore rc=0 filter='TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1|TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1'
+RUN=2 topPASS=2 topFAIL=0 topSKIP=0
+--- PASS: TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1 (0.16s)
+--- PASS: TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1 (1.35s)
+    openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=266 guardRefusals=12 otherRefusals=262 returnedNil=126 witnessTruncated=true witnessSize=35 witnessMode=-rw-rw-rw- firstGuardVerbatim="winsec: path is not provably resolved, refusing to seal: C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r13674521843\\001\\caller-name-322r1.bin: refusing to open for a private write: the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets (winsec: cannot apply a private security descriptor)"
+--- RED lines verbatim:
+(no RED line)
+### done 2026-10-16 09:41:13 +0800
+TREES kept (never removed): fixed=/d/tmp/probe322r1b/wfixed.oO5YLw w1=/d/tmp/probe322r1b/w1-teethout.oW9M6k w2=/d/tmp/probe322r1b/w2-blanket.GDVG8d

@@ -1,0 +1,32 @@
+=== RUN   TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1
+    openleaf_322_other_test.go:191: AC#1 paired reading on one screen: attempts=3000 flips=2402 flipErrs=0 damagedWitnesses=70 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+    openleaf_322_other_test.go:195: AC#1' leg that answered = placement floor before the act (platformVerifyPlacement) : 2379 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = pinPlacement sameObjectPinned link face (winsec_other.go:188) : 413 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = sealHandle inline link face (winsec_other.go:269) : 22 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = sealHandle inline SameFile face (winsec_other.go:272) : 56 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = link-chain ELOOP from a deeper openat (winsec_other.go pinPlacement), NOT this leg : 2 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = some other failure : 26 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = none: the call returned nil : 102 attempts
+    openleaf_322_other_test.go:199: AC#1 RED: 70 of 3000 foreign witnesses lost their own bytes or mtime, so the open in privateFile followed a leaf link swapped into the caller's name and truncated a file no caller named (first: foreign-witness-0005-322r1.bin: content is "", want its own bytes). This is ticket 322's shape and the outcome the leaf leg exists to prevent.
+    openleaf_322_other_test.go:205: AC#1 RED instrument: across 3000 raced attempts the leaf leg ("too many levels of symbolic links") answered 0 and the racer landed 2402 flips (0 errors, first ""), so the damaged count above is not evidence about a window that was never reached
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (2.07s)
+=== RUN   TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.01s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.03s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	2.135s
+FAIL
+go-test rc=1
