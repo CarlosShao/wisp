@@ -1,0 +1,17 @@
+票 327 落地（2/4）：AC#2 那对成对定向突变的靶子用例，六枚新增、既有断言一字未改
+
+`internal/panel/display_scrub_216_test.go` **只追加**（新增 `fmt` 一枚 import 与文末六枚用例）：
+- `TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired`＝写入侧靶子：输入里另带一枚
+  ESC，判据无论认不认 Cf 都必响，所以它**只可能因写入侧去牙而红**；
+- `TestNeedsDisplayWashNamesEveryWashedCfRune`＝判据侧靶子：只调 `needsDisplayWash`，
+  所以它**只可能因判据侧去牙而红**；
+- `TestEveryNamedCfRuneIsEscapedAndNeverDeleted`＝AC#3 逐枚转义＋幂等＋"两半不许拼成第三枚名字"；
+- `TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut`＝把裁定**没点名**的 7 枚钉成"照旧原样穿过"；
+- `TestABidiNameWalksTheRealBoundaryIntoAWashedRow`＝真 broker 收 `photo<U+202E>已允许.png`
+  ＋C26 解析出的 canonical 走 `NewComposerState`/`NewSnapshot`，快照字节里⛔ 再没有 `E2 80 AE`；
+- `TestTheBidiClaimInANameChangesNoVerdict`＝AC#4，真 `risk.NewRiskAssessor()`，
+  三名（干净名／带 U+202E 的名字／洗过的名字）判级与命中规则逐字同形＝`L2/[R1 R8]`。
+
+台面＝仓外导出树（锚 `c315980b` 八件套）：改前 `RUN 246/PASS 148/FAIL 8/SKIP 0`，
+改后 `RUN 252/PASS 154/FAIL 8/SKIP 0`，红名册 `diff` 作差＝0（8 枚起手红逐枚同名）。
+`^=== RUN`（含子测试）⇄ `^--- PASS`（只数顶层）两把尺口径已写明。

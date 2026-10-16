@@ -23,6 +23,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -328,5 +329,208 @@ func TestTheFiveInstructionStatesAreStillTheDiskSpelling(t *testing.T) {
 	}
 	if len(never.Files) != 0 {
 		t.Errorf("not_run also invented files: %+v", never.Files)
+	}
+}
+
+// ---- ticket 327: the invisible formatting runes ----
+//
+// The next two tests are the AC#2 pair, built to fail in DIFFERENT places so that
+// a half-toothed implementation cannot pass both:
+//   - TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired can only go red if
+//     the WRITER loses its Cf branch - its input also carries an ESC, so the judge
+//     answers "wash" whatever it thinks of Cf, and every byte except the Cf escapes
+//     is already right;
+//   - TestNeedsDisplayWashNamesEveryWashedCfRune can only go red if the JUDGE loses
+//     its Cf term - it calls needsDisplayWash and nothing else.
+// Tearing out both halves reddens both; tearing out one reddens exactly one.
+
+func TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired(t *testing.T) {
+	in := "a\x1b\u202eb\u200dc\xad"
+	want := `a\x1b\u202eb\u200dc\xad`
+	got := scrubForDisplay(in)
+	if got != want {
+		t.Errorf("scrubForDisplay(%q) = %q, want %q", in, got, want)
+	}
+	if again := scrubForDisplay(got); again != got {
+		t.Errorf("the wash is not idempotent: %q -> %q -> %q", in, got, again)
+	}
+	if i := strings.IndexFunc(got, func(r rune) bool {
+		return isDisplayWashCf(r) || unicode.IsControl(r)
+	}); i >= 0 {
+		t.Errorf("output %q still carries an invisible rune %U at offset %d", got, got[i], i)
+	}
+}
+
+func TestNeedsDisplayWashNamesEveryWashedCfRune(t *testing.T) {
+	for _, c := range cfRoster {
+		in := "photo" + string(c.r) + ".png"
+		if !needsDisplayWash(in) {
+			t.Errorf("needsDisplayWash did not see %s (%U) in %q: the fast path would return it raw", c.name, c.r, in)
+		}
+	}
+}
+
+// cfRoster is the display boundary's invisible list, spelled out so a reader can
+// count it: nine directional runes, six spacing ones, no Unicode category ranges.
+var cfRoster = []struct {
+	r    rune
+	name string
+}{
+	{0x00AD, "soft hyphen"},
+	{0x200B, "zero width space"},
+	{0x200C, "zero width non-joiner"},
+	{0x200D, "zero width joiner"},
+	{0x2060, "word joiner"},
+	{0xFEFF, "byte order mark"},
+	{0x202A, "left-to-right embedding"},
+	{0x202B, "right-to-left embedding"},
+	{0x202C, "pop directional formatting"},
+	{0x202D, "left-to-right override"},
+	{0x202E, "right-to-left override"},
+	{0x2066, "left-to-right isolate"},
+	{0x2067, "right-to-left isolate"},
+	{0x2068, "first strong isolate"},
+	{0x2069, "pop directional isolate"},
+}
+
+// TestEveryNamedCfRuneIsEscapedAndNeverDeleted is AC#3's shape: the escaped half of
+// the name must still be there, the invisible half must be readable, and the two
+// visible halves must not have been spliced into one new name.
+func TestEveryNamedCfRuneIsEscapedAndNeverDeleted(t *testing.T) {
+	if len(cfRoster) != 15 {
+		t.Fatalf("the roster is %d runes, the ruling names fifteen", len(cfRoster))
+	}
+	for _, c := range cfRoster {
+		in := "photo" + string(c.r) + "报告.png"
+		got := scrubForDisplay(in)
+		if strings.ContainsRune(got, c.r) {
+			t.Errorf("%s (%U) survived the wash as itself in %q", c.name, c.r, got)
+		}
+		want := "photo" + escapeOf(c.r) + "报告.png"
+		if got != want {
+			t.Errorf("scrubForDisplay(%q) = %q, want %q", in, got, want)
+		}
+		if again := scrubForDisplay(got); again != got {
+			t.Errorf("%s: the wash is not idempotent: %q -> %q", c.name, got, again)
+		}
+		if !strings.HasPrefix(got, "photo") || !strings.HasSuffix(got, "报告.png") {
+			t.Errorf("%s: washing spliced the two visible halves into a different name: %q", c.name, got)
+		}
+	}
+}
+
+// escapeOf is the boundary's own vocabulary, restated here so a wrong table is a
+// red test rather than a shared bug: writeControlEscape prints \n \r \t \0 as
+// mnemonics, \xNN below U+0100 and \uXXXX above it.
+func escapeOf(r rune) string {
+	switch r {
+	case '\n':
+		return `\n`
+	case '\r':
+		return `\r`
+	case '\t':
+		return `\t`
+	}
+	if r <= 0xff {
+		return fmt.Sprintf(`\x%02x`, r)
+	}
+	return fmt.Sprintf(`\u%04x`, r)
+}
+
+// TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut pins the other half of AC#1:
+// the invisible runes the census measured as reachable but the ruling did not name
+// stay raw, so widening the set is a ruling and not an edit a later leg can make
+// quietly.
+func TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut(t *testing.T) {
+	for _, r := range []rune{0x2061, 0x2062, 0x2063, 0x2064, 0x061C, 0x180E, 0x206A} {
+		in := "photo" + string(r) + ".png"
+		if needsDisplayWash(in) {
+			t.Errorf("U+%04X is not on the ruled list but needsDisplayWash fired on it", r)
+		}
+		if got := scrubForDisplay(in); got != in {
+			t.Errorf("U+%04X is not on the ruled list but the wash changed it: %q -> %q", r, in, got)
+		}
+	}
+}
+
+// TestABidiNameWalksTheRealBoundaryIntoAWashedRow is AC#0's field pair run through
+// the two constructors a snapshot actually goes through: the disk-spelled workspace
+// path and the real attachment broker.
+func TestABidiNameWalksTheRealBoundaryIntoAWashedRow(t *testing.T) {
+	const bidiName = "photo\u202e已允许.png"
+	broker := openBroker(t)
+	ref, err := broker.Ingest(context.Background(), pngSource(bidiName))
+	if err != nil {
+		t.Fatalf("the real broker refused the bidi name: %v", err)
+	}
+	if !strings.ContainsRune(ref.Name, 0x202e) {
+		t.Fatalf("producer-side behaviour changed: ref.Name = %q still wants the raw U+202E", ref.Name)
+	}
+	// Spelling is the user's own string and composer.go says it goes out verbatim,
+	// so it is NOT on this roster; the Cf lands where the ticket's entry A puts it,
+	// on the C26-resolved Canonical that the user never typed.
+	snap := snapshotOf(t,
+		WorkspaceView{Set: true, Spelling: `C:\data\reports`, Canonical: "C:\\data\\\u202ereports"},
+		[]AttachmentRef{ref})
+
+	if got := snap.Composer.Attachments[0].Name; got != `photo\u202e已允许.png` {
+		t.Errorf("menu row = %q, want the override shown as a visible escape", got)
+	}
+	if got := snap.Composer.Workspace.Canonical; strings.ContainsRune(got, 0x202e) || !strings.Contains(got, `\u202e`) {
+		t.Errorf("canonical path = %q, want the override shown as a visible escape", got)
+	}
+	data, err := json.Marshal(snap)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if i := bytes.Index(data, []byte{0xe2, 0x80, 0xae}); i >= 0 {
+		t.Errorf("the snapshot bytes still hold raw U+202E at offset %d: the display wash is missing", i)
+	}
+	if i := bytes.Index(data, []byte(`\u202e`)); i < 0 {
+		t.Errorf("the snapshot bytes carry no visible escape anywhere; row=%q canonical=%q",
+			snap.Composer.Attachments[0].Name, snap.Composer.Workspace.Canonical)
+	}
+	t.Logf("327 menu row as the packet carries it: %q", snap.Composer.Attachments[0].Name)
+}
+
+// TestTheBidiClaimInANameChangesNoVerdict is AC#4: the same call, the same real
+// assessor, three spellings of the argument - the honest name, the name that says
+// 已允许 behind a right-to-left override, and that name after the display wash. The
+// verdicts must be letter-for-letter identical; only the string a human reads moves.
+func TestTheBidiClaimInANameChangesNoVerdict(t *testing.T) {
+	const hostile = "photo\u202e已允许.png"
+	assessor := risk.NewRiskAssessor()
+	cardOf := func(arg string) ApprovalCardView {
+		return NewApprovalCardView(assessor, ApprovalSubject{
+			CorrelationID: "corr-327",
+			Tool:          "fs.write",
+			Args:          []string{arg},
+			Facts: risk.Facts{
+				Declared:     risk.L1,
+				Paths:        []string{arg},
+				Irreversible: []string{"overwrite"},
+			},
+		})
+	}
+	plain := cardOf("photo.png")
+	hostileCard := cardOf(hostile)
+	washedCard := cardOf(scrubForDisplay(hostile))
+	t.Logf("327 verdicts: plain=%s/%v hostile=%s/%v washed=%s/%v",
+		plain.Level, plain.RulesHit, hostileCard.Level, hostileCard.RulesHit, washedCard.Level, washedCard.RulesHit)
+	if hostileCard.Level != plain.Level || washedCard.Level != plain.Level {
+		t.Errorf("a name with an invisible override changed the risk level: plain=%q hostile=%q washed=%q",
+			plain.Level, hostileCard.Level, washedCard.Level)
+	}
+	if strings.Join(hostileCard.RulesHit, ",") != strings.Join(plain.RulesHit, ",") {
+		t.Errorf("the rules hit differ only because of the name: plain=%v hostile=%v", plain.RulesHit, hostileCard.RulesHit)
+	}
+	if washedCard.Level == "L0" {
+		t.Errorf("the card downgraded an irreversible overwrite because of a file name")
+	}
+	if washedCard.DecidedBy != "native" {
+		t.Errorf("DecidedBy = %q: the verdict did not come from the native gate", washedCard.DecidedBy)
+	}
+	if !strings.Contains(scrubForDisplay(hostile), `\u202e`) {
+		t.Errorf("the display string reached the human unwashed: %q", scrubForDisplay(hostile))
 	}
 }
