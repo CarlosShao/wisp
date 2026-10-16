@@ -1,0 +1,97 @@
+time=2026-10-16T10:57:16.562+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket90ThreeModesAndNoFourth
+--- PASS: TestTicket90ThreeModesAndNoFourth (0.00s)
+=== RUN   TestTicket90OnlyAutoCostsAConfirmAndAllThreeAreAudited
+--- PASS: TestTicket90OnlyAutoCostsAConfirmAndAllThreeAreAudited (0.00s)
+=== RUN   TestTicket90NoConfirmChannelMeansNoAuto
+--- PASS: TestTicket90NoConfirmChannelMeansNoAuto (0.00s)
+=== RUN   TestTicket90ConfirmRefusalLeavesModeAlone
+--- PASS: TestTicket90ConfirmRefusalLeavesModeAlone (0.00s)
+=== RUN   TestTicket90PersistFailureKeepsMemory
+--- PASS: TestTicket90PersistFailureKeepsMemory (0.00s)
+=== RUN   TestTicket90SnapshotIsReadOnly
+--- PASS: TestTicket90SnapshotIsReadOnly (0.00s)
+=== RUN   TestTicket90ScreenTable
+--- PASS: TestTicket90ScreenTable (0.00s)
+=== RUN   TestTicket90TaintFlagAndDenyAreNeverSilenced
+--- PASS: TestTicket90TaintFlagAndDenyAreNeverSilenced (0.00s)
+=== RUN   TestTicket90ParseModeIsLoud
+--- PASS: TestTicket90ParseModeIsLoud (0.00s)
+=== RUN   TestTicket90ManualSwitchSurvivesRestart
+time=2026-10-16T10:57:16.610+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+time=2026-10-16T10:57:16.618+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+--- PASS: TestTicket90ManualSwitchSurvivesRestart (0.05s)
+=== RUN   TestTicket90UntouchedConfigStartsAtTheDefault
+--- PASS: TestTicket90UntouchedConfigStartsAtTheDefault (0.01s)
+=== RUN   TestTicket90SessionGrantDoesNotSurviveRestart
+--- PASS: TestTicket90SessionGrantDoesNotSurviveRestart (0.72s)
+=== RUN   TestTicket90ConfigKeyChangesWhatTheChainAsks
+--- PASS: TestTicket90ConfigKeyChangesWhatTheChainAsks (0.02s)
+=== RUN   TestTicket90HandEditLooseningGoesThroughD36
+time=2026-10-16T10:57:17.423+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=risk keys=[risk.permission_mode]
+    ticket90_persist_test.go:365: t90dump file=2569 bytes err=<nil> report=&{Hot:[] Reload:[] Restart:[] Locked:[{Section:risk Direction:loosen Approved:true Keys:[risk.permission_mode]}]} locked=[{Section:risk Direction:loosen Approved:true Keys:[risk.permission_mode]}]
+time=2026-10-16T10:57:17.457+08:00 level=INFO msg="config: locked section tightened, hot-applied" section=risk keys=[risk.permission_mode]
+time=2026-10-16T10:57:17.461+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved)" key=risk.permission_mode wrote=[risk.permission_mode]
+--- PASS: TestTicket90HandEditLooseningGoesThroughD36 (0.08s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/perm	1.085s
+=== RUN   TestDisposeRunsInReverseOrder
+time=2026-10-16T10:57:16.550+08:00 level=INFO msg="scope disposed" scope=task-reverse completed=3 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestDisposeRunsInReverseOrder (0.01s)
+=== RUN   TestDisposeIsIdempotent
+time=2026-10-16T10:57:16.555+08:00 level=INFO msg="scope disposed" scope=task-idempotent completed=2 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestDisposeIsIdempotent (0.00s)
+=== RUN   TestDisposePanicDoesNotBlockOthers
+time=2026-10-16T10:57:16.558+08:00 level=ERROR msg="goroutine panic recovered" goroutine=disposal-worker owner=scope:task-panic root="" error_class=internal recovered="destroy failed: injected" stack="goroutine 31 [running]:\nruntime/debug.Stack()\n\tD:/work/base/go/src/runtime/debug/stack.go:26 +0x5e\ngithub.com/CarlosShao/wisp/internal/observe.(*Registry).run.func1()\n\tD:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:302 +0xbe\npanic({0x7ff755e11208?, 0x7ff755c4d230?})\n\tD:/work/base/go/src/runtime/panic.go:859 +0x125\ngithub.com/CarlosShao/wisp/internal/plugin.TestDisposePanicDoesNotBlockOthers.func1()\n\tD:/work/workspace/projects plans/Wisp/internal/plugin/disposal_test.go:87 +0x25\ngithub.com/CarlosShao/wisp/internal/plugin.(*DisposalScope).Dispose.func1({0x0?, 0x0?})\n\tD:/work/workspace/projects plans/Wisp/internal/plugin/disposal.go:297 +0x13\ngithub.com/CarlosShao/wisp/internal/observe.(*Registry).run(0x0?, 0x0?, {0x7ff755c3a8e6?, 0x351dda0d1fd0?}, {0x351dda10e7c0?, 0x0?}, 0x0?, 0x0?)\n\tD:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:340 +0x97\ncreated by github.com/CarlosShao/wisp/internal/observe.(*Registry).Spawn in goroutine 28\n\tD:/work/workspace/projects plans/Wisp/internal/observe/goroutine.go:281 +0x387\n" at=2026-10-16T02:57:16Z
+time=2026-10-16T10:57:16.558+08:00 level=ERROR msg="disposal step failed" scope=task-panic step=panics kind=panic err="internal: panic in goroutine \"disposal-worker\" (owner scope:task-panic): destroy failed: injected"
+time=2026-10-16T10:57:16.559+08:00 level=INFO msg="scope disposed" scope=task-panic completed=2 failed=1 disposal_incomplete=false timed_out=false
+--- PASS: TestDisposePanicDoesNotBlockOthers (0.00s)
+=== RUN   TestDisposeTimeoutMarksIncomplete
+time=2026-10-16T10:57:16.621+08:00 level=ERROR msg="disposal step failed" scope=task-timeout step=blocks kind=incomplete err="timed out after 60ms (total budget 60ms)"
+time=2026-10-16T10:57:16.621+08:00 level=ERROR msg="disposal step failed" scope=task-timeout step=never-runs kind=incomplete err="disposal budget exhausted before this step ran"
+time=2026-10-16T10:57:16.621+08:00 level=INFO msg="scope disposed" scope=task-timeout completed=0 failed=2 disposal_incomplete=true timed_out=true
+--- PASS: TestDisposeTimeoutMarksIncomplete (0.07s)
+=== RUN   TestDisposeTailOrder
+time=2026-10-16T10:57:16.627+08:00 level=INFO msg="scope disposed" scope=task-tail completed=1 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestDisposeTailOrder (0.00s)
+=== RUN   TestDeferAfterDisposeIsVisible
+time=2026-10-16T10:57:16.627+08:00 level=INFO msg="scope disposed" scope=task-late completed=0 failed=0 disposal_incomplete=false timed_out=false
+time=2026-10-16T10:57:16.627+08:00 level=ERROR msg="disposal_incomplete: Defer called after Dispose" scope=task-late step=step-1
+--- PASS: TestDeferAfterDisposeIsVisible (0.00s)
+=== RUN   TestGoGoroutineGetsScopeCtx
+time=2026-10-16T10:57:16.630+08:00 level=INFO msg="scope disposed" scope=task-go completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestGoGoroutineGetsScopeCtx (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/plugin	0.251s
+time=2026-10-16T10:57:16.556+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestRecordWithoutKeyFailsExplicitly
+--- PASS: TestRecordWithoutKeyFailsExplicitly (0.01s)
+=== RUN   TestRecordCapturesSSEAndWritesParsableGolden
+recorded C:\Users\swq\AppData\Local\Temp\wisp-orch-325v1\TestRecordCapturesSSEAndWritesParsableGolden3975779345\001\record-smoke.sse (167 bytes of SSE)
+--- PASS: TestRecordCapturesSSEAndWritesParsableGolden (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/llmrecord	0.217s
+time=2026-10-16T10:57:16.542+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestWalksUpFromWorkspaceInPriorityOrder
+--- PASS: TestWalksUpFromWorkspaceInPriorityOrder (0.05s)
+=== RUN   TestUpwardWalkTerminatesAtTheRoot
+--- PASS: TestUpwardWalkTerminatesAtTheRoot (0.02s)
+=== RUN   TestFileNamePriorityInsideOneDirectory
+--- PASS: TestFileNamePriorityInsideOneDirectory (0.01s)
+=== RUN   TestSameFileSeenTwiceIsInjectedOnce
+--- PASS: TestSameFileSeenTwiceIsInjectedOnce (0.01s)
+=== RUN   TestOverBudgetDropsBroadFirstAndTruncatesOnlyTheLast
+--- PASS: TestOverBudgetDropsBroadFirstAndTruncatesOnlyTheLast (0.02s)
+=== RUN   TestLoaderHasNoImportPathToPermOrConfig
+--- PASS: TestLoaderHasNoImportPathToPermOrConfig (0.00s)
+=== RUN   TestLoadedContentCarriesTheExistingC25SourceName
+--- PASS: TestLoadedContentCarriesTheExistingC25SourceName (0.01s)
+=== RUN   TestPanelCarrierCarriesTheManifest
+--- PASS: TestPanelCarrierCarriesTheManifest (0.01s)
+=== RUN   TestOffSwitchReadsNothingAndSaysWhy
+--- PASS: TestOffSwitchReadsNothingAndSaysWhy (0.04s)
+=== RUN   TestZeroBudgetIsStatedNotSilent
+--- PASS: TestZeroBudgetIsStatedNotSilent (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/projctx	0.377s
+rc=0
