@@ -1,0 +1,15 @@
+TOP_PASS=242 TOP_FAIL=0 TOP_SKIP=0 RUN=325 SUB_PASS=83
+--- PASS: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.14s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.17s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.23s)
+-- restored hashes (8 发跑完之后) --
+now internal/tools/subagent_197.go sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+now internal/tools/task.go sha256=91608259e5e963f851cec8f1f3e64ae474bae4e2ca233b0243ecc19c22ba0d35
+now internal/agent/loop.go sha256=57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4
+now internal/tools/subagent_depth_fixture_287_test.go sha256=02cbaf10da0cedd464fa7ebcd4465b42307a3a2b1fc30ecc829b90f7c6b505c0
+now internal/tools/bridge.go sha256=a0c0736c639276b0835be7c0f85df9dff517eef73039ee882842759d63accfdd
+-- 与仓内工作树逐枚比 --
+repo internal/tools/subagent_197.go sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+repo internal/tools/task.go sha256=91608259e5e963f851cec8f1f3e64ae474bae4e2ca233b0243ecc19c22ba0d35
+repo internal/agent/loop.go sha256=57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4
+repo internal/tools/subagent_depth_fixture_287_test.go sha256=02cbaf10da0cedd464fa7ebcd4465b42307a3a2b1fc30ecc829b90f7c6b505c0

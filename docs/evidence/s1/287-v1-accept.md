@@ -99,6 +99,11 @@
 **还原与复跑**：八发跑完，五枚受种件哈希逐枚＝起手基线，且与**仓内工作树**四枚同串；还原后整包复跑
 （`logs/v1b-12-after-restore-green-full.log`）＝**242/0/0、RUN 325、子 PASS 83**、三枚 287 用例逐枚 PASS ⇒ ⛔ 残留。
 
+**★独立复现（本腿自己算的，`23b-leg-mutants-reproduced.md`）**：本腿 V1／V2／V3 三发是**独立落种**（自己的锚、自己的仓外树），落种后字节与 287-r1 交回的
+`mutants/M1-disable-branch.go`／`M2-identity-to-corr.go`／`M3-overbroad-any-row.go` **同串**（`69087120ea40…`／`7c7185cc95d9…`／`5aaba840f472…`，尺＝`sha256sum`），
+`.bak`＝基线 `86de44c4b79b…`，`mutants/stale-crlf/` 三枚 CR＝**612**、现行五枚 CR＝**0**（＝287-v1 §4 那两把尺的形状，本腿复现）
+⇒ 腿那三发的"种"是真的、且本腿逐发的红名册与腿自报的后果逐枚对上；这一条把 `AC#2` 的"凭据"那一问从"读腿的日志"升成"本腿复跑同串"。
+
 ## 4. `AC#3`：只裁"甲形那句代价说实话没有"（⛔ 重裁形、⛔ 动产码一字）
 
 编排者已裁＝维持甲（口令「287 改裁乙」在案）。本腿做诚实审计，两问逐问用自己的尺量（`21-ac2-static-rulers.txt`）：
@@ -160,6 +165,11 @@
      以及 §2 前两枚树的 8/3 枚红＝树形状台面，⛔ 计入判据。
 - **f｜前任那 13 枚遗产的去向**：已按枚入库（笔 `1a651618`，tracked 0→13），字节零改写（sha256 名册＝`00-legacy-integrity-before-add.txt`），⛔ 删、⛔ 改写；
   入库时 git 对 9 枚 `.log`/`.rc` 发了 `LF will be replaced by CRLF` 提示＝仓库 `* text=auto` 的入库归一化（⛔ 本腿编辑它们），工作树字节复核仍逐枚同串。
+- **g｜本腿自抓（⛔ 落盘件那一发）**：写本件前那发门禁只跑了 `build`＋`d22scan` 两枚并**只把 rc 写进正文**（⛔ 像起手发那样落成 `.log`/`.rc` 成对件）
+  ⇒ 那一发的可复核性弱于其它发；交件后那发（`logs/r2-01..06`）已把**同一格五件**补齐成对落盘，故⛔ 动摇任何判语，只记本腿这一条流程缺陷。
+- **h｜本腿⛔ 复跑的东西一律写明**：`cmd/wisp` 整包（票 314 死亡区，且此刻该面有别腿在飞件）、`internal/panel`／`internal/perm`（共享编译面⛔ 本腿射程）、
+  287-r1 那五枚交回突变的**原始运行**（本腿只复量它们的字节面：5 枚 `.go`＋`mutants/stale-crlf/` 3 枚＋`.bak` 一枚与基线同串 `86de44c4…`、CR 计数 612/0 与前任 §4 同形）
+  ⇒ 这些都⛔ 进本件的判语列，只进"与前任比"的对照列。
 
 ## 7. 读数落点名册（哪枚文件是哪把尺；全部在 `.scratch/wisp/probes/287/v1b/`）
 
@@ -167,14 +177,18 @@
 - 仓外树建立与基线：`bench-setup.sh`／`.tree-path`／`08-baseline-tree-counts.txt`／`10-baseline-treeC-counts.txt`／`logs/v1b-08|09|10-*`。
 - 突变台件：`make-anchors.sh`＋`anchors/`（14 枚逐字节锚）／`mutate.py`／`mutate_v5.py`／`bench-run.sh`／`logs/v1b-V1..V8.meta.txt`＋同名 `-test.log`／`-test-full.log`／`make-roster.sh`＋`mutation-roster.txt`。
 - 改前复量：`logs/v1b-11-before-287-absent-full.log`＋`11-before-after-counts.txt`；还原复跑绿：`logs/v1b-12-after-restore-green-full.log`＋`12-after-restore-readings.txt`。
-- 只读尺两枚：`20-ac4-boundary-scan.txt`（越界扫＋票面三框原文）／`21-ac2-static-rulers.txt`（夹具自造枚数＋产码 Kind/装配/发布点位＋既有仪器四点位＋常量）。
+- 只读尺三枚：`20-ac4-boundary-scan.txt`（越界扫＋票面三框原文）／`21-ac2-static-rulers.txt`（夹具自造枚数＋产码 Kind/装配/发布点位＋既有仪器四点位＋常量）／
+  `22-gofumpt-absolute.txt`＋`.gofumpt-two.log`＋`.gofumpt-dir.log`（§6-b 那一发改判所用的绝对路径那把尺）。
+- 交件后台面复跑：`logs/r2-01..06` 的 `.log`+`.rc`（五件门禁第二落盘发＋`gofumpt` 绝对路径 0 枚列出）。
 
 ## 8. 本腿自证三把尺
 
-1. 提交号（本腿共五笔，全部⛔ push；尺＝`git log --grep=287-v1b` 现量）：`1a651618`（287-v1 遗产 13 枚按枚入库）／`96f3767d`（门禁五件复跑，18 枚件）／
-   `7dec3a6c`（突变台件八发＋只读尺，56 枚件）／`d378635d`（本件＋gofumpt 三枚读数）／票尾 bullet 那一笔（本件之后落，含本节这一行改正）；每笔 `git show --stat` 路径清单逐枚显式（`--pathspec-from-file` 里是一行一枚的具体路径，⛔ 目录形⛔ `-A`）。
+1. 提交号（至本腿最后一笔共六笔，全部⛔ push；尺＝`git log --grep=287-v1b` 现量）：`1a651618`（287-v1 遗产 13 枚按枚入库）／`96f3767d`（门禁五件复跑，18 枚件）／
+   `7dec3a6c`（突变台件八发＋只读尺，56 枚件）／`d378635d`（本件＋gofumpt 三枚读数）／`c4ecb2c8`（票尾 bullet＋本节这一行改正）／第六笔＝交件后台面复跑（`logs/r2-01..06`：五件门禁第二发 **rc 全 0**、`gofumpt` 绝对路径两枚件**列出 0 枚**、包级 `ok 18.240s`）；每笔 `git show --stat` 路径清单逐枚显式（`--pathspec-from-file` 里是一行一枚的具体路径，⛔ 目录形⛔ `-A`）。
 2. 判语表＝本件：`D:\work\workspace\projects plans\Wisp\docs\evidence\s1\287-v1-accept.md`；读数根＝
    `D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\287\v1b\`（74 枚件，逐枚 `wc -c` 在名册里）。
 3. 门禁逐枚 `rc=`：`GOFLAGS= go build ./...`＝**0**；`go test ./internal/tools/ -count=1 -v`＝**0**；`go vet ./internal/tools/`＝**0**；
    `sh scripts/d22scan.sh`＝**0**；`sh scripts/check-path-length-budget.sh --with-self-test`＝**0**；`gofmt -l`（两枚动过的件）＝**0**；
    `gofumpt -l`（走 PATH）＝**127**；`/d/work/base/gopath/bin/gofumpt.exe -l`（两枚动过的件）＝**0 枚列出**、整目录＝**1 枚**（同一枚 174-r7 存量件＝这把尺的正控）⇒ 见 §6-b。
+   门禁一共跑过**三发**：**两发落盘**＝起手发（`v1b-01..07`＋`07-test-counts.txt`）与交件后发（`logs/r2-01..06`，五件 rc 全 0，长度门此时现量 `tracked paths=13967`／`over-budget=60`／`roster=60`、包级 `ok github.com/CarlosShao/wisp/internal/tools 18.240s`）；
+   中间那发（写本件前）＝`GOFLAGS= go build ./...` rc=0＋`sh scripts/d22scan.sh` rc=0 两枚，**⛔ 单独落盘件、只在正文记录**＝本腿自抓，具名见 §6-g。
