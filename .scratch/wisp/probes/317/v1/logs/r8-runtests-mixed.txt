@@ -1,0 +1,41 @@
+== 317-v1 runtests.sh mixed-root measurements (shipped, unmutated tree) ==
+date=2026-10-16 09:06:56 +0800
+tree=D:\tmp\wisp317v1\tree
+--- the composition line as shipped, byte-exact ---
+0000000                                   g   o   t   m   p   _   r   u
+0000020   n   =   "   $   {   W   I   S   P   _   T   E   S   T   _   G
+0000040   O   T   M   P   _   R   O   O   T   :   -   "   $   L   O   C
+0000060   A   L   A   P   P   D   A   T   A   \   \   w   i   s   p   -
+0000100   t   e   s   t   -   g   o   t   m   p   "   }   /   d   2   2
+0000120   s   c   a   n   -   $   (   d   a   t   e       +   %   Y   %
+0000140   m   %   d   -   %   H   %   M   %   S   )   -   $   $   "  \n
+0000160
+### S1: runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows
+S1_RC=0
+runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp/d22scan-20261016-090656-522 - this run's t.TempDir() family lands here; nothing deletes it.
+time=2026-10-16T09:06:58.361+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPathResolverJunctionWindows
+--- PASS: TestPathResolverJunctionWindows (0.11s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.154s
+runtests.sh: OK - packages=[./internal/risk/ -run TestPathResolverJunctionWindows] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0
+### S2: runtests.sh ./internal/risk/ -run <the four 116/105 names>
+runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp/d22scan-20261016-090659-565 - this run's t.TempDir() family lands here; nothing deletes it.
+time=2026-10-16T09:07:01.248+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+    syncdirs_ancestor_actable_leg_116_test.go:182: precondition: deepestExistingAncestor("C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\d22scan-20261016-090659-565\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1162623206330\\001\\%WISP116ANC\\B%\\new.md") = "C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\d22scan-20261016-090659-565\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1162623206330\\001\\%WISP116ANC\\B%", want "C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp/d22scan-20261016-090659-565\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1162623206330\\001\\%WISP116ANC\\B%"
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+=== RUN   TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+    syncdirs_ancestor_actable_leg_116_test.go:286: precondition: the ~ spelling must resolve under the relocated home "C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp/d22scan-20261016-090659-565\\TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict1161595682756\\002", got "C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\d22scan-20261016-090659-565\\TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict1161595682756\\002\\wisp116-tilde-probe\\new.md"
+--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+=== RUN   TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+    syncdirs_ancestor_reparse_ticket105_windows_test.go:59: mklink /J C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261016-090659-565\TestSyncAncestorLegReResolvesThroughJunctionToRealTree4165684454\002\proj C:\Users\swq\AppData\Local\wisp-test-gotmp/d22scan-20261016-090659-565\TestSyncAncestorLegReResolvesThroughJunctionToRealTree4165684454\001 failed: exit status 1: Parameter format not correct - "d22scan-20261016-090659-565\TestSyncAncestorLegReResolvesThroughJunctionToRealTree4165684454\001".
+--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.10s)
+=== RUN   TestSyncAncestorLegNotExemptedStaysFailClosed
+    syncdirs_ancestor_reparse_ticket105_windows_test.go:116: mklink /J C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261016-090659-565\TestSyncAncestorLegNotExemptedStaysFailClosed1888932376\002\proj C:\Users\swq\AppData\Local\wisp-test-gotmp/d22scan-20261016-090659-565\TestSyncAncestorLegNotExemptedStaysFailClosed1888932376\001 failed: exit status 1: Parameter format not correct - "d22scan-20261016-090659-565\TestSyncAncestorLegNotExemptedStaysFailClosed1888932376\001".
+--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed (0.18s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.335s
+FAIL
+runtests.sh: go test exited 1 - packages=[./internal/risk/ -run TestSyncAncestorActableLegFailsClosedOnMovedAncestor116|TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116|TestSyncAncestorLegReResolvesThroughJunctionToRealTree|TestSyncAncestorLegNotExemptedStaysFailClosed] top-level: PASS=0 FAIL=4 SKIP=0, === RUN=4, '[no tests to run]'=0
+S2_RC=1
