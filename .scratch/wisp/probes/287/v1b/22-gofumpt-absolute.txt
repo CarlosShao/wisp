@@ -1,0 +1,6 @@
+=== 22-gofumpt-absolute.txt（本腿第二发：⛔ 走 PATH，用绝对路径把门禁名义那把尺跑起来）===
+path=/d/work/base/gopath/bin/gofumpt.exe
+version=usage: gofumpt [flags] [path ...]
+rc_two=0 listed=0 files=[]
+rc_dir=0 listed=1 files=[internal\tools\task_output_pointer_notice_errtext_174r7_test.go ]
+正控（同一把尺对一枚已知不合规形状应列件）: 见 .gofumpt-dir.log 枚数
