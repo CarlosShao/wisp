@@ -1,0 +1,109 @@
+33-a3 read-only survey rulers — pinned to commit c315980b (named anchor, NOT HEAD~n)
+============================================================================
+Yard = git grep <re> c315980b -- <pathspec> / git show c315980b:<file>.
+All counts are MEASURED (grep hit lines), not computed. rc shown per shot.
+A probe copy under .scratch/** is NEVER counted as production.
+
+--- SECTION 1: outbound forms Go -> WebView ------------------------------
+
+$ git grep -nE 'PostWebMessage' c315980b -- 'internal/**' 'cmd/**'   rc=0
+  internal/panel/composer_dispatch_test.go:461: func (w *CoreWebView2) PostWebMessageAsJson(json string) error { return nil }
+  => only a TEST STUB. production PostWebMessage* callers = 0.
+
+$ git grep -nE 'NavigateToString' c315980b -- 'cmd/**' 'internal/**'   rc=0
+  cmd/wisp/panel_control_windows.go:665: func (c *panelControl) SetHtml(html string) { c.browser.NavigateToString(html) }
+  SetHtml production call sites (non-test):
+  cmd/wisp/panel_host_windows.go:479  (fallback "panel assets unavailable" page)
+  cmd/wisp/panel_host_windows.go:968  (transient probe doc inside firstRoundTrip)
+  => both are bootstrap/fallback HTML, NOT a snapshot. real page is served
+     through the WebResourceRequested URL filter (panelEntryURL), not SetHtml.
+
+$ git grep -nE 'AddHostObjectToScript' c315980b -- 'cmd/**' 'internal/**'   rc=0
+  hits ONLY in internal/panel/bound_dispatch_door_114_test.go (:7/:8/:240 comments)
+  => production AddHostObjectToScript callers = 0 (page door uses Bind instead).
+
+$ git grep -nE 'Eval|PostWebMessage' c315980b -- 'cmd/wisp/*.go' 'internal/panel/*.go' ':!*_test.go'   rc=0
+  cmd/wisp/panel_control_windows.go:667: func (c *panelControl) Eval(js string) { c.browser.Eval(js) }
+  Eval production CALL SITES (all inside func (c *panelControl) msgcb, replying an RPC frame the PAGE sent):
+  cmd/wisp/panel_control_windows.go:737  c.Eval("window._rpc["+id+"].reject(...)")   (no bound door)
+  cmd/wisp/panel_control_windows.go:744  c.Eval("window._rpc["+id+"].reject(...)")   (callbinding err)
+  cmd/wisp/panel_control_windows.go:748  c.Eval("window._rpc["+id+"].reject(...)")   (marshal err)
+  cmd/wisp/panel_control_windows.go:752  c.Eval("window._rpc["+id+"].resolve(...)")  (success reply)
+  => every Eval carries an RPC RECEIPT for a page-initiated request (window._rpc[id]).
+     NOT ONE Eval call reads a panel.Snapshot / rt.lastSnapBytes and pushes it. (read panel_control_windows.go:711-757)
+
+$ git grep -nE 'ExecuteScript' c315980b -- 'cmd/**' 'internal/**'   rc=1 (0 hits)
+  POSITIVE CONTROL for the same ruler: git grep -cE 'Publish' c315980b -- 'internal/panel/pump.go' = 6, rc=0.
+
+--- SECTION 1b: snapshot bytes trail (Publish -> screen) -----------------
+
+pump.go Publish tail (git show c315980b:internal/panel/pump.go | sed -n '354,372p'):
+  if p.src.Out == nil { ... return snap, data, fmt.Errorf("panel: 快照已构造但没有出口（最后一公里在票 33/35 名下），本次未送达") }
+  if err := p.src.Out(snap, data); err != nil { ... }
+
+$ git grep -nE 'Out:' c315980b -- 'cmd/wisp/run.go'   rc=0
+  cmd/wisp/run.go:732:  Out: rt.bookPanelSnapshot,       => production exit IS wired to the run object.
+
+bookPanelSnapshot body (git show c315980b:cmd/wisp/panel_pump.go | sed -n '360,366p'):
+  rt.lastSnap, rt.lastSnapBytes, rt.snapSeen = snap, data, true   (stores fields)
+  rt.spec.sink.logger().Info(panelSnapshotSummary(snap, data))    (bounded 1-line ledger summary only)
+
+$ git grep -nE 'lastPanelSnapshot' c315980b -- '*.go' ':!*_test.go' ':!.scratch/**'   rc=0
+  cmd/wisp/panel_pump.go:417 (comment)
+  cmd/wisp/panel_pump.go:424 (func declaration = the reader itself)
+  => lastPanelSnapshot() PRODUCTION CALLERS = 0 (definition only). bytes never leave rt.
+
+$ git grep -nE 'PanelManager\)' ... exports  => 8 methods (IsCreated/IsShown/LastColdMs/LastHotMs/Show/HotShow/Hide/Destroy); none carries data into the page (see ticket 35 line :93 census, independently recorded).
+
+POSITIVE CONTROL that the chain is NOT "整条没接" (pump IS driven, bytes ARE booked in prod):
+$ git grep -nE 'publishPanelSnapshot|\.publish\b' c315980b -- 'cmd/wisp/*.go' ':!*_test.go'   rc=0
+  run.go:742  rt.ui.publish = rt.publishPanelSnapshot
+  run.go:1063 Sink: consoleSink{... publish: rt.publishPanelSnapshot}
+  run.go:1363 c.publish()   run.go:1452 u.publish()   run.go:1481 u.publish()
+  => Publish() runs on real state moves; Out()=bookPanelSnapshot stores fields + logs. The absent edge is onward-to-page ONLY.
+
+--- SECTION 2: page side -------------------------------------------------
+
+$ git grep -nE 'createRoot|<App' c315980b -- 'frontend/src/**'   rc=0
+  frontend/src/main.tsx:97  product: { area: "面板", node: <App /> }        (NO snapshot prop)
+  frontend/src/main.tsx:110 createRoot(...).render( <App/> )                 (mounted ONCE)
+  App.tsx:70 const EMPTY: PanelSnapshot = {pending:[],results:[],composer:EMPTY_COMPOSER,generatedAt:""}
+  App.tsx:91 export default function App({ snapshot = EMPTY })               (falls back to EMPTY)
+
+$ git grep -nE 'subscribe|setInterval|onmessage|addEventListener' c315980b -- 'frontend/src/lib/panel.ts'   rc=1 (0 hits)
+  POSITIVE CONTROL same ruler on window./wisp: panel.ts:147/149/155/161 = hits (rc=0).
+  => panel.ts declares ONLY page->Go doors (window.wispDispatch :155, hostBridge() :161 = wispBridge ?? chrome.webview).
+     NO Go->page receiver: no onMessage listener, no window.wispSnapshot callback, no polling timer in the product feed.
+     (only setInterval anywhere is components/ai-native/agent-screen.tsx:218, a demo clock — not a snapshot feed.)
+
+$ git show c315980b:frontend/src/main.tsx header (lines 10-14, verbatim intent):
+  "inside Wisp, WebView2 serves the embedded dist and Go pushes snapshots through the C17 bridge — no query string, so this file renders <App /> with its empty frame"
+  => design intent = 等推; current implementation = props-only, mounted once with EMPTY, no receiver, no pull.
+
+--- SECTION 3: bridge inbound roster -------------------------------------
+
+$ git show c315980b:internal/panel/bridge.go | grep -nE 'Method[A-Za-z]+ ='   rc=0  (count = 7, POSITIVE CONTROL)
+  MethodModeRequest      = "panel.mode.request"       (bridge.go:43 area)
+  MethodWorkspaceRequest = "panel.workspace.request"  :43
+  MethodAttachmentAdd    = "panel.attachment.add"
+  MethodMessageSend      = "panel.message.send"
+  MethodConfigGet        = "config.get"               :66
+  MethodConfigSet        = "config.set"               :67
+  MethodModelsList       = "config.models.list"       :75
+  => NO panel.snapshot.* / panel.resync Method* const exists.
+$ git grep -nE 'panel\.snapshot' c315980b -- 'internal/panel/*.go' ':!*_test.go'   rc=1 (0 hits; only composer.go:249 comment).
+
+Nails a NEW inbound method name would hit (truth paths, measured):
+$ git grep -nE 'whitelistMethodsFromSource' c315980b -- 'cmd/wisp/git_test.go'   rc=1  => dispatch's path cmd/wisp/git_test.go does NOT exist.
+$ git grep -nE 'whitelistMethodsFromSource' c315980b -- 'internal/panel/git_test.go'   rc=0
+  internal/panel/git_test.go:387  if got := whitelistMethodsFromSource(t, .../bridge.go); !equalStrings(got, wantMethods)
+  internal/panel/git_test.go:405  // func whitelistMethodsFromSource (declaration)
+  (positive-control len!=4 assert at git_test.go:517 per prior census 166-a1/248-a2; want set = the FOUR "panel.*" consts; config.* are deliberately prefixless so they do NOT count here)
+$ git grep -nE 'wantFullInboundRosterSize253' c315980b -- 'internal/panel/*.go'   rc=0
+  internal/panel/inbound_roster_253_test.go:63  wantFullInboundRosterSize253 = 7   (asserts at :449 and :791)
+$ git grep -nE 'panel\.resync|Go->前端推送|Go→前端推送' c315980b -- 'docs/specs/SPEC-08*.md'   rc=0
+  SPEC-08-ui-ball-panel.md:150 每次 show Go 侧推 panel.resync 全量状态
+  SPEC-08-ui-ball-panel.md:158 invoke(method,args)->result + Go→前端事件推送
+  SPEC-08-ui-ball-panel.md:163 | panel.resync | Go→前端推送 | — |
+  SPEC-08-ui-ball-panel.md:174 | 事件推送 task.delta/tool.chip/approval.request/ball.state/cost.tick | Go→前端 | — |
+  => SPEC-08 marks pushes (panel.resync, event push rows) in the "—" request column = they are OUTBOUND, not inbound-roster members.
