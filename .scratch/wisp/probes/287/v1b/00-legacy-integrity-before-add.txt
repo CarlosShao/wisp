@@ -1,0 +1,13 @@
+20810	4dbb1bac63c47212	.scratch/wisp/probes/287/v1/00-readings.md
+159832	6fb1cb1a3854f201	.scratch/wisp/probes/287/v1/v1-01-test-head-full.log
+5	93ff7811a209e2a8	.scratch/wisp/probes/287/v1/v1-01-test-head-full.rc
+23359	06bc96e401e8d552	.scratch/wisp/probes/287/v1/v1-02-d22scan.log
+5	93ff7811a209e2a8	.scratch/wisp/probes/287/v1/v1-02-d22scan.rc
+0	e3b0c44298fc1c14	.scratch/wisp/probes/287/v1/v1-03-gofmt.log
+64	2d928de695e8503e	.scratch/wisp/probes/287/v1/v1-03b-gofmt-tools.log
+0	e3b0c44298fc1c14	.scratch/wisp/probes/287/v1/v1-04-build.log
+5	93ff7811a209e2a8	.scratch/wisp/probes/287/v1/v1-04-build.rc
+0	e3b0c44298fc1c14	.scratch/wisp/probes/287/v1/v1-05-vet.log
+5	93ff7811a209e2a8	.scratch/wisp/probes/287/v1/v1-05-vet.rc
+2535	65af0a0b9571adbe	.scratch/wisp/probes/287/v1/v1-06-pathlength.log
+5	93ff7811a209e2a8	.scratch/wisp/probes/287/v1/v1-06-pathlength.rc

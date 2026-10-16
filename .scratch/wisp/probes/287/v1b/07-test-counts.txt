@@ -1,0 +1,14 @@
+TOP_PASS=242
+TOP_FAIL=0
+TOP_SKIP=0
+RUN=325
+SUB_PASS=83
+SUB_FAIL=0
+SUB_SKIP=0
+ok_line=1
+--- 287 fixture cases ---
+--- PASS: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.11s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.19s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.11s)
+--- fault tokens ---
+2
