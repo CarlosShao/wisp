@@ -1,0 +1,26 @@
+=== RUN   TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction
+time=2026-10-16T12:42:31.551+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction2107788925\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:42:31.560+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:42:31Z duration_ms=8
+time=2026-10-16T12:42:31.568+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction2107788925\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:42:31.573+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:42:31Z duration_ms=4
+time=2026-10-16T12:42:31.580+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction2107788925\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:42:31.586+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:42:31Z duration_ms=5
+time=2026-10-16T12:42:31.591+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:42:31.593+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_326v1_test.go:63: AppendSessionTurn succeeded while the session touch was forced to fail — the refresh error is being swallowed (ticket 326 landing criterion ③)
+--- FAIL: TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction (0.09s)
+=== RUN   TestAppendSessionTurn326v1TriggerBlocksNothingElse
+time=2026-10-16T12:42:31.624+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAppendSessionTurn326v1TriggerBlocksNothingElse2988121059\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:42:31.631+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:42:31Z duration_ms=6
+time=2026-10-16T12:42:31.637+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAppendSessionTurn326v1TriggerBlocksNothingElse2988121059\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:42:31.644+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:42:31Z duration_ms=6
+time=2026-10-16T12:42:31.650+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAppendSessionTurn326v1TriggerBlocksNothingElse2988121059\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:42:31.656+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:42:31Z duration_ms=5
+time=2026-10-16T12:42:31.660+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:42:31.662+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_326v1_test.go:110: premise broken: the trigger did not make the touch fail, so the determinism case above proves nothing
+--- FAIL: TestAppendSessionTurn326v1TriggerBlocksNothingElse (0.07s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	0.192s
+FAIL
+rc=1
