@@ -1,0 +1,25 @@
+# op=guard-off+jia-silent  台面=git archive HEAD 导出的仓外树 /d/work/workspace/wisp-270v1-adjudication-bench/repo  raw=/d/work/workspace/wisp-270v1-adjudication-bench/repo/raw-guard-off+jia-silent.txt
+# rc=1  突变后 sha256=4db1537e0b37c8faf0b893d4c03721b5d37c1222eaa9b9eadf6a88d0522cf3b6  GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\270v1gotmp
+# 尺: grep -c '^=== RUN' / '^--- PASS' / '^--- FAIL' / '^--- SKIP' / '^panic' 对 raw -v 日志(量的, 射程=internal/tools 单包)
+RUN=325
+PASS_TOP=238
+FAIL_TOP=4
+SKIP=0
+PANIC_LINES=0
+TAIL=FAIL	github.com/CarlosShao/wisp/internal/tools	20.854s|FAIL|
+# 红名册逐枚 + 红句原文(从 === RUN 到 --- FAIL 之间的 t.Errorf/Fatalf 行, 逐字)
+----- Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired
+    failclosed_236_teeth_test.go:192: ParentTools 没接线时 task.spawn 回了非拒绝："子代理 b8635382-97f0-4622-b61e-bf06920647f1（父工具面没接线）已结束，状态 Settling。\n结论：\n甲号子代理的结论甲甲甲 197-a"（guard 不在时子代理照样派生，只是拿到一个空目录）
+    failclosed_236_teeth_test.go:196: subagent_197.go:256 那一支的完整字面量没被原样说出（got "子代理 b8635382-97f0-4622-b61e-bf06920647f1（父工具面没接线）已结束，状态 Settling。\n结论：\n甲号子代理的结论甲甲甲 197-a", want "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）"）——这一支是 || 的 ParentTools 半边
+----- Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired
+    failclosed_236_teeth_test.go:216: BaseOptions 没接线时 task.spawn 回了非拒绝："这一轮没有子代理被派生。"
+    failclosed_236_teeth_test.go:219: subagent_197.go:256 那一支的完整字面量没被原样说出（got "这一轮没有子代理被派生。", want "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）"）——这一支是 || 的 BaseOptions 半边；got 以「panic」开头就是那道 guard 已经不在了
+----- Test270R1NilBaseOptionsRefusesWithTheAssemblySentence
+    nilbase_270_test.go:63: BaseOptions 是空函数值时 task.spawn 回了非拒绝："这一轮没有子代理被派生。"
+    nilbase_270_test.go:66: 空函数值没有走到那具名拒绝（got "这一轮没有子代理被派生。", want "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）"）
+----- Test270R1ThreeRefusalSentencesDoNotSubstitute
+    nilbase_270_test.go:132: 装配未接线 那一支说的不是自己那句（got "这一轮没有子代理被派生。", want "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）"）
+# 还原自证
+restored_tree_sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+repo_HEAD_blob_sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+MATCH=yes

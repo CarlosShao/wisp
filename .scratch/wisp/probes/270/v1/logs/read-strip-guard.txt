@@ -1,0 +1,17 @@
+# op=strip-guard  台面=git archive HEAD 导出的仓外树 /d/work/workspace/wisp-270v1-adjudication-bench/repo  raw=/d/work/workspace/wisp-270v1-adjudication-bench/repo/raw-strip-guard.txt
+# rc=1  突变后 sha256=a9fdc98c29e3cee5af862bf5285b7bb68722e75547e7592d874860b5fd08132f  GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\270v1gotmp
+# 尺: grep -c '^=== RUN' / '^--- PASS' / '^--- FAIL' / '^--- SKIP' / '^panic' 对 raw -v 日志(量的, 射程=internal/tools 单包)
+RUN=325
+PASS_TOP=241
+FAIL_TOP=1
+SKIP=0
+PANIC_LINES=0
+TAIL=FAIL	github.com/CarlosShao/wisp/internal/tools	19.283s|FAIL|
+# 红名册逐枚 + 红句原文(从 === RUN 到 --- FAIL 之间的 t.Errorf/Fatalf 行, 逐字)
+----- Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired
+    failclosed_236_teeth_test.go:192: ParentTools 没接线时 task.spawn 回了非拒绝："子代理 7ba09cc0-83f0-45eb-9626-4045145e934a（父工具面没接线）已结束，状态 Settling。\n结论：\n甲号子代理的结论甲甲甲 197-a"（guard 不在时子代理照样派生，只是拿到一个空目录）
+    failclosed_236_teeth_test.go:196: subagent_197.go:256 那一支的完整字面量没被原样说出（got "子代理 7ba09cc0-83f0-45eb-9626-4045145e934a（父工具面没接线）已结束，状态 Settling。\n结论：\n甲号子代理的结论甲甲甲 197-a", want "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）"）——这一支是 || 的 ParentTools 半边
+# 还原自证
+restored_tree_sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+repo_HEAD_blob_sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+MATCH=yes

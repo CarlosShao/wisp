@@ -1,0 +1,39 @@
+# AC#4 门禁五发＋代用尺＋面核（腿 270-v1，全部我自己现跑，⛔ 引别人交回的数）
+
+台面＝`git archive HEAD` 取出的**仓外导出树**
+`D:\work\workspace\wisp-270v1-adjudication-bench\repo`（＝`/d/work/workspace/wisp-270v1-adjudication-bench/repo`）
+HEAD＝`232f309e`；`find … -name '*.go' | wc -l`＝**1098 枚**（证树非空）；六件套 `go.mod go.sum internal cmd tools scripts` 逐枚 `ls -d` 在场。
+环境＝`GOTMPDIR='C:\Users\swq\AppData\Local\wisp-test-gotmp\270v1gotmp'`（原生反斜杠形，**先 `mkdir -p`**，跑前 `ls` 证在）＋
+`PATH="$PWD/third_party/sherpa-onnx:$PATH"` 前置；⛔ `go test ./cmd/wisp` 整包（票 314 死亡区＋写腿 `220-r2` 在那面）。
+导出树里 `subagent_197.go` 的 sha256＝`86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3`＝仓内 `git cat-file -p HEAD:internal/tools/subagent_197.go` 同串（＝突变起点的还原尺）。
+
+## 五发 rc（逐枚）
+
+| 尺 | 命令（射程） | rc | 原文读数 |
+|---|---|---|---|
+| 1 | `GOFLAGS= go build ./...`（导出树全包） | **0** | 无输出 |
+| 2 | `GOFLAGS= go vet ./internal/tools/` | **0** | 无输出 |
+| 3 | `sh scripts/d22scan.sh`（导出树全仓） | **0** | `clean - no D22 ban violations`；射程非空：`ban #7 internal/tools/=25`、`ban #8 internal/=573 Go files, comments and _test.go included`、`ban #8 cmd/=139`、`ban #8 frontend/=116`、`ban #8 design/=30` |
+| 4 | `sh scripts/check-path-length-budget.sh --with-self-test` | **0**（改在仓根跑，见下⚠） | `denominator: tracked paths=14113  over-budget=60  covered by roster=60  not in roster=0` ⇒ `VERDICT GREEN` |
+| 5 | `GOFLAGS= go test ./internal/tools/ -count=1` | **0** | `ok github.com/CarlosShao/wisp/internal/tools 22.101s`；同台件 `-count=1 -v` 四数＝`RUN=325 PASS_TOP=242 FAIL_TOP=0 SKIP=0`（见 `read-base.txt`） |
+
+⚠ **第 4 发具名记一句（是哪一行红的）**：同一条命令**在导出树里跑**回的是
+`check-path-length-budget.sh: not inside a git work tree - refusing to guess a denominator`（脚本 `:137 ROOT=$(git rev-parse --show-toplevel 2>/dev/null)`，导出树无 `.git`）＝**rc=2 台面读数，⛔ 计入判据**。
+⇒ 改在仓根跑；仓根那发的分母尺我先自证未被别腿污染：`git diff --cached --name-only | wc -l`＝**0**（索引＝HEAD 集合）、`git ls-files | wc -l`＝**14113**（与脚本读到的分母同数）。
+
+## 起手／终态红名册作差
+
+- 起手＝`read-base.txt`：`FAIL_TOP=0`（红名册空）。
+- 终态＝`read-restore-green.txt`（全部突变跑完、逐发还原之后，再跑一次同一台面）：`FAIL_TOP=0`、`MATCH=yes`。
+- **作差＝0 枚**；⛔ 本腿没有任何"顺手弄绿"的既有红可算（起手就 0 枚）。
+- ⚠ 台面归因读数（换树前后各一发）：第一枚导出树放在 `C:\Users\swq\AppData\Local\Temp\…` 时，`TestTicket252R1AlignmentAddsNoAuthorization` **红**，红句逐字
+  `paths_shortname_252_r1_test.go:166: 前置条件缺失：C:\Users\swq\AppData\Local\Temp 的短名回显 C:\Users\swq\AppData\Local\Temp 与长名同串（该名本身已合 8.3 或卷未生成别名），两形对比无从谈起。本探针不许 skip。`
+  ＝**台面故障（父目录无 8.3 别名），⛔ 计入判据**⇒ 台面迁到 `D:\work\workspace\wisp-270v1-adjudication-bench\repo`（父组件名 14 字符⇒别名真存在）后该枚 **PASS**，起手名册才是干净的。
+
+## 代用尺与面核（承票 310-v1 的同一口径，具名）
+
+- `gofmt -l` 对本波两件（导出树内的 `internal/tools/subagent_197.go`＋`internal/tools/nilbase_270_test.go`）＝**空列表**，rc=0。
+- `command -v gofumpt`＝**NOT_FOUND**（本机无该二进制；`~/go/bin` 空、`go get`/`go install` 属禁区）⇒ 上面那把 `gofmt` 是**代用尺**，比 gofumpt 松，"0 枚"这一半边⛔ 能推广到 gofumpt；这一格因此只作**具名欠账**，⛔ 当作已验。
+- 面核（本腿对产码/测试面零字节）：`git status --porcelain -- internal/tools/subagent_197.go internal/tools/nilbase_270_test.go`＝**0 行**；盘上两件的 sha256＝
+  `subagent_197.go 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3`（＝HEAD blob，还原无残留）
+  `nilbase_270_test.go d9df96b9861dd8c7b08715222c986935d4550a9b793254029eb3ff24e408a1e4`

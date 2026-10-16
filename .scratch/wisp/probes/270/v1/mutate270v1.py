@@ -53,6 +53,18 @@ JIA_BORROWED = (
     "\t\treturn Result{Text: \"" + ROSTER_SENT + "\", IsError: true}, nil\n"
     "\t}\n"
 )
+# the || split one half at a time (AC#2's shape, measured even though form 甲
+# leaves the branch unsplit - "半边摘" is still a question the tree can answer).
+GUARD_BASE_ONLY = (
+    "\tif t.d.BaseOptions == nil {\n"
+    "\t\treturn Result{Text: \"" + SENT + "\", IsError: true}, nil\n"
+    "\t}\n"
+)
+GUARD_PARENT_ONLY = (
+    "\tif t.d.ParentTools == nil {\n"
+    "\t\treturn Result{Text: \"" + SENT + "\", IsError: true}, nil\n"
+    "\t}\n"
+)
 
 # op -> list of (find, replace) applied in order; "strip-guard" prefixes are
 # combined so the anti-forms are REACHABLE (with the guard in place they never
@@ -65,6 +77,8 @@ OPS = {
     "guard-off+jia-silent": [(GUARD_BLOCK, ""), (JIA_BLOCK, JIA_SILENT)],
     "guard-off+jia-no-release": [(GUARD_BLOCK, ""), (JIA_BLOCK, JIA_NO_RELEASE)],
     "guard-off+jia-borrowed-sentence": [(GUARD_BLOCK, ""), (JIA_BLOCK, JIA_BORROWED)],
+    "guard-keeps-baseoptions-half": [(GUARD_BLOCK, GUARD_BASE_ONLY)],
+    "guard-keeps-parenttools-half": [(GUARD_BLOCK, GUARD_PARENT_ONLY)],
 }
 
 
