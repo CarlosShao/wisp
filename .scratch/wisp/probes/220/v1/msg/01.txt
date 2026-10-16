@@ -1,0 +1,1 @@
+220-v1 台面与台件落盘（裁决腿·读数一）：仓外三枚导出树建树（七件套带 frontend＋手工补 frontend/dist 4 枚与三枚 .dll 进 build/ third_party/ cmd/wisp/ 旁，三枚 go build ./cmd/wisp 退码 0）＋生产者计数尺两发同尺＝改前锚 fd01e7962 生产字节 0 枚 ⇄ HEAD 树 2 枚（cmd/wisp/panel_pump.go:108 reader 本体＋cmd/wisp/run.go:731 装配点）＋cmd/wisp 真腿用例在导出树基线绿（PASS 20.50s，lit bytes 同屏带 pending:[] 与 blockedOnApproval:true）

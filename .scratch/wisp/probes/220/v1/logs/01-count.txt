@@ -1,0 +1,22 @@
+2026-10-16 11:55:28 +0800
+尺=grep -rn L1Windows --include=*.go cmd  (射程=该导出树 cmd/ 全部 .go，含测试；量的)
+--- tree=pre ref= fd01e7962 ---
+(零命中 rc=1)
+  全部命中=0
+  非测试命中=0
+  装配点 run.go 'L1Windows:'=0
+0
+  reader 本体 'rt.gate.LiveL1Windows()'=0
+0
+--- tree=bench ref= HEAD ---
+/tmp/wisp220v1/bench/cmd/wisp/panel_l1_blocked_220_test.go:5:// L1Windows reader (internal/panel/pump.go:200, consumed :323-327) and the gate's
+/tmp/wisp220v1/bench/cmd/wisp/panel_l1_blocked_220_test.go:142:		if r.wins = rt.gate.LiveL1Windows(); len(r.wins) > 0 {
+/tmp/wisp220v1/bench/cmd/wisp/panel_l1_blocked_220_test.go:174:	for i := 0; i < 2000 && len(rt.gate.LiveL1Windows()) > 0; i++ {
+/tmp/wisp220v1/bench/cmd/wisp/panel_pump.go:83:// filed - Gate.LiveL1Windows (internal/agent/approval/window_read.go:63) walks
+/tmp/wisp220v1/bench/cmd/wisp/panel_pump.go:108:	wins := rt.gate.LiveL1Windows()
+/tmp/wisp220v1/bench/cmd/wisp/run.go:731:		L1Windows: rt.liveL1WindowWaits,
+  全部命中=6
+  非测试命中=3
+  装配点 run.go 'L1Windows:'=1
+  reader 本体 'rt.gate.LiveL1Windows()'=1
+正控：同一把尺在 HEAD 树上必须非零 ⇒见上；零命中那一发下面有已知存在的正控行号

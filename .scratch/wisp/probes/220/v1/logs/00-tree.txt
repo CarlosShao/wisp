@@ -1,0 +1,15 @@
+=== build start 2026-10-16 11:50:45 +0800 HEAD=ca0e30fce32425e31b9882c5d947e56a3b17d851 ===
+tree=/tmp/wisp220v1/bench ref=ca0e30fce32425e31b9882c5d947e56a3b17d851
+  go_files_total=743 go_files_internal=573
+  dist_files=4 third_party_dll=3 build_dll=3 cmdwisp_dll=3
+tree=/tmp/wisp220v1/full ref=ca0e30fce32425e31b9882c5d947e56a3b17d851
+  go_files_total=743 go_files_internal=573
+  dist_files=4 third_party_dll=3 build_dll=3 cmdwisp_dll=3
+tree=/tmp/wisp220v1/pre ref=fd01e7962
+  go_files_total=741 go_files_internal=572
+  dist_files=4 third_party_dll=3 build_dll=3 cmdwisp_dll=3
+=== go build check 2026-10-16 11:50:55 +0800 ===
+  tree=bench go_build_rc=0
+  tree=full go_build_rc=0
+  tree=pre go_build_rc=0
+=== build end 2026-10-16 11:51:29 +0800 ===

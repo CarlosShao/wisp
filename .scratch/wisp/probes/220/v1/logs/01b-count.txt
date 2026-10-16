@@ -1,0 +1,8 @@
+### 1b 生产调用点精算（同一把尺·排除注释与测试）###
+2026-10-16 11:56:52 +0800
+--- tree=pre ---
+  生产字节枚数=0
+--- tree=bench ---
+bench/cmd/wisp/panel_pump.go:108:	wins := rt.gate.LiveL1Windows()
+bench/cmd/wisp/run.go:731:		L1Windows: rt.liveL1WindowWaits,
+  生产字节枚数=2

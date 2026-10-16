@@ -1,0 +1,8 @@
+2026-10-16 11:55:43 +0800
+cmd=go test ./internal/agent/approval/ -count=1 -timeout 20m -run ^(TestLiveL1WindowsSeesAWindowInTheLoop|TestReadingL1WindowsMovesNoGateState|TestL1WindowIsPlainDataWithNoRouteToAnAnswer|TestStartedCallsAreNotReportedAsWaiting)$ (tree=bench)
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	0.055s
+rc=0
+--- counts: RUN=0 TOPPASS=0 FAIL=0 SKIP=0
+--- fail names ---
+(no FAIL lines)
+2026-10-16 11:55:46 +0800
