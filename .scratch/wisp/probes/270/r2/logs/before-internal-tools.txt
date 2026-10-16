@@ -1,0 +1,11 @@
+# op=before 台面=git archive HEAD(2e706255) 仓外导出树 /d/work/workspace/wisp-270r2-comment-bench/repo（八件套＋docs；raw=raw-before.txt）
+# 尺: grep -cE '^=== RUN'(含子测试) / '^--- PASS' / '^--- FAIL' / '^--- SKIP'(均只数顶层) 对 -v 原始日志；射程=internal/tools 单包；量的
+rc=0
+RUN=325
+PASS_TOP=242
+FAIL_TOP=0
+SKIP=0
+PANIC_LINES=0
+TAIL=PASS|ok  	github.com/CarlosShao/wisp/internal/tools	18.375s|
+# 红名册（终态）
+(0 枚)

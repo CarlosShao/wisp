@@ -1,0 +1,19 @@
+# op=half-off 台面=/d/work/workspace/wisp-270r2-comment-bench/repo（git archive HEAD 2e706255 的仓外导出树）raw=raw-mut-half-off.txt
+# rc=0 突变后 sha256=08378f755d2f2c5cf8484e10517849803c17ab7003a4c7bb006d6e2a37ac4a4f
+# 尺: grep -cE '^=== RUN'(含子测试) / '^--- PASS' / '^--- FAIL' / '^--- SKIP'(只数顶层) / '^panic'；射程=internal/tools 单包；量的
+RUN=325
+PASS_TOP=242
+FAIL_TOP=0
+SKIP=0
+PANIC_LINES=0
+# 两枚点名的 nil-BaseOptions 腿（谁答的那一句看它们的状态）
+--- PASS: Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired (0.00s)
+--- PASS: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)
+--- PASS: Test270R1NilBaseOptionsRefusesWithTheAssemblySentence (0.00s)
+# 红名册逐枚
+# 还原自证（导出树锚＝archive 的 2e706255；本腿 087936bc 只动整行注释，产码字节与它逐字同形）
+restored_tree_sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+archive_commit_blob_sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+MATCH=yes
+# 工作树那枚件本腿从未拿它当台面：git status 对该路径应为空
+0

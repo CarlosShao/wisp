@@ -1,0 +1,25 @@
+# op=half-off-no-jia 台面=/d/work/workspace/wisp-270r2-comment-bench/repo（git archive HEAD 2e706255 的仓外导出树）raw=raw-mut-half-off-no-jia.txt
+# rc=1 突变后 sha256=9df63797eda472dd9fbd93f85ebee354db406b03d654605299368e58460d5d56
+# 尺: grep -cE '^=== RUN'(含子测试) / '^--- PASS' / '^--- FAIL' / '^--- SKIP'(只数顶层) / '^panic'；射程=internal/tools 单包；量的
+RUN=325
+PASS_TOP=239
+FAIL_TOP=3
+SKIP=0
+PANIC_LINES=0
+# 两枚点名的 nil-BaseOptions 腿（谁答的那一句看它们的状态）
+--- PASS: Test236R2TaskSpawnRefusesWhenParentToolsIsUnwired (0.00s)
+--- FAIL: Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired (0.00s)
+--- FAIL: Test270R1NilBaseOptionsRefusesWithTheAssemblySentence (0.00s)
+# 红名册逐枚
+----- Test236R2TaskSpawnRefusesWhenBaseOptionsIsUnwired
+    failclosed_236_teeth_test.go:219: subagent_197.go:256 那一支的完整字面量没被原样说出（got "panic（guard 摘掉后不是拒绝而是崩）: runtime error: invalid memory address or nil pointer dereference", want "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）"）——这一支是 || 的 BaseOptions 半边；got 以「panic」开头就是那道 guard 已经不在了
+----- Test270R1NilBaseOptionsRefusesWithTheAssemblySentence
+    nilbase_270_test.go:60: 调用点没自己判空（摘掉上游 guard 后的旧形）："panic（guard 摘掉后不是拒绝而是崩）: runtime error: invalid memory address or nil pointer dereference"
+----- Test270R1ThreeRefusalSentencesDoNotSubstitute
+    nilbase_270_test.go:132: 装配未接线 那一支说的不是自己那句（got "panic（guard 摘掉后不是拒绝而是崩）: runtime error: invalid memory address or nil pointer dereference", want "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）"）
+# 还原自证（导出树锚＝archive 的 2e706255；本腿 087936bc 只动整行注释，产码字节与它逐字同形）
+restored_tree_sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+archive_commit_blob_sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+MATCH=yes
+# 工作树那枚件本腿从未拿它当台面：git status 对该路径应为空
+0

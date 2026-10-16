@@ -1,0 +1,11 @@
+# op=after 台面=git archive 087936bc 仓外导出树 /d/work/workspace/wisp-270r2-comment-bench/after（八件套＋docs）
+rc=0
+RUN=325
+PASS_TOP=242
+FAIL_TOP=0
+SKIP=0
+PANIC_LINES=0
+# 终态红名册
+(0 枚)
+# 起手名册 = /d/work/workspace/wisp-270r2-comment-bench/repo/raw-before.txt 的 ^--- FAIL；作差：
+diff-rc=0 ⇒ 作差枚数=0

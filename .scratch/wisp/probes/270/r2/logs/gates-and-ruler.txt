@@ -1,0 +1,56 @@
+# 270r2 尺与门禁逐字读数（2026-10-16，工作树跑；量＋算均具名）
+
+## 1. 产码字节零改动那把尺（锚＝改前提交 2e706255 ⇄ 现工作树）
+$ git show 2e706255:internal/tools/subagent_197.go | grep -vE "^[[:space:]]*//" > /tmp/270r2/a.nocomment
+$ grep -vE "^[[:space:]]*//" internal/tools/subagent_197.go > /tmp/270r2/b.nocomment
+$ diff -u /tmp/270r2/a.nocomment /tmp/270r2/b.nocomment; echo "rc=$?"
+11291 /tmp/270r2/a.nocomment
+11291 /tmp/270r2/b.nocomment
+22582 total
+rc=0
+
+## 1b. 正控（同一把尺，改的是副本的非注释行，⛔ 跟踪件）
+rc=1
+1709 /tmp/270r2/pos.diff
+--- /tmp/270r2/a.nocomment	2026-10-16 14:17:30.642189200 +0800
++++ /tmp/270r2/pos.nocomment	2026-10-16 12:42:06.480464900 +0800
+@@ -24,7 +24,7 @@
+ 
+ 	MaxConcurrentSubagents = 4
+ 
+-	MaxSubagentDepth = 1
++	MaxSubagentDepthZZ = 1
+ )
+ 
+ const (
+@@ -73,7 +73,7 @@
+
+## 2. 分母（编排者 12:1x 现量 vs 本腿起手／终态现量）
+起手 2e706255: 总 612 行／整行注释 258／非注释 354／尺两侧各 11291 字节
+现量起手: 612 行／整行注释 258 ／非注释 354（＝312 行代码＋42 行空白）／行尾注释形状 0
+★具名分歧（⛔ 抄编排者那个 9）：四把候选尺都复现不出"行尾注释形状 9 行"：
+  尺A grep -vE '^[[:space:]]*//' file | grep -c '//' = 0；尺B grep -cE '//.*//' = 0；
+  尺C 含 // 的总行数 258 == 整行注释行数 258 ⇒ 差 0；尺D grep -c '/\*' = 0。
+⇒ 本文件今天没有任何"产码后同行跟 //"形状＝那把零改动尺没有可漏的行尾注释；9 枚那一发归编排者核。
+现量终态(087936bc): 总 617 行／整行注释 263／非注释 354
+
+## 3. diff 每一行都是整行注释
+改动行数(不含 +++/---)= 31
+其中非整行注释= 0
+
+## 4. 门禁四数（只在工作树上跑；⛔ 部分导出树＝d22scan ban#8 射程声明 design/+frontend/，0 枚硬退出 rc=2）
+gofumpt 真身 /d/work/base/gopath/bin/gofumpt.exe -l internal/tools/subagent_197.go => rc=0（输出空）
+go vet ./internal/tools/ => rc=0（输出空）
+scripts/d22scan.sh（正控 runtests＋真扫）=> rc=0
+d22scan: clean - no D22 ban violations; examined 281 production Go files under internal/ and cmd/
+runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+ban #8 射程非空且含注释：internal/=577 Go files, comments and _test.go included；cmd/=139；design/=39；frontend/=116
+sh scripts/check-path-length-budget.sh => rc=0
+check-path-length-budget.sh: denominator: tracked paths=14325  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+
+## 5. 台面修正具名（本腿实测，供编排者记账）
+派单更正①的八件套仍不够：本包 paths_shortname_252_* 8 枚腿要仓根 docs/ 且要树所在路径有 8.3 短名别名。
+读数：/tmp（C 卷 8.3-clean）导出树＝FAIL_TOP=11（8 枚 252 说『短名回显与长名同串…本探针不许 skip』＋3 枚 172 说『no docs/PLAN.md above C:Users』）；
+补 docs 后＝FAIL_TOP=8；搬到 D:/work/workspace/wisp-270r2-comment-bench（名>8 字符⇒有 8.3 别名）＝FAIL_TOP=0、rc=0。
+⇒ 配方应记为：八件套＋docs＋手工三件＋★容器树放 D: 卷且目录名要产生 8.3 短名。与 A990/记忆中『容器树必须放 D: 卷』同源。
