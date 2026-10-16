@@ -1,0 +1,24 @@
+326-r1 票尾：一条 bullet（只追加，⛔ 翻框／⛔ 改票名／⛔ 动 Status:）
+
+改动尺＝`git diff --numstat` 该件＝**2 行新增、0 行删除**（一枚空行＋一条 bullet，正文⛔ 动上面任何一字）；
+票框尺复跑＝未勾 **6 枚**／已勾 **0 枚**（本腿一枚⛔ 翻，翻框归编排者按非实现者裁决定）。
+
+bullet 里交齐的四把自证尺：① 提交名册——交码笔 `86298e24` 只含 `internal/memory`＋`internal/session` 四件、
+读数笔 `d3f98938` 只含 `.scratch/wisp/probes/326/r1/`、判语笔与这一笔各一枚写面，⛔ 一枚 `cmd/wisp`／`internal/panel` 字节
+（本波那两面唯一写腿＝`220-r2`）；② 证据件绝对路径＋字节数＝
+`D:\work\workspace\projects plans\Wisp\docs\evidence\s1\326-append-updated.md`＝172 行／17568 字节，
+读数目录 `D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\326\r1\`；③ 未修码红句逐字
+（`appending a turn did not reach session.updated_at: sess-a.updated_at = 1777593660, want the appended turn's stamp
+1777593780 (before=1777593660, delta=0)`）＋改后成对绿（同一发里 `updated_at 1777593660 -> 1777593780 (delta=120)`
+与 `turn.created_at=1777593780` 同值＝同行证据）＋去牙四枚全红与还原绿（还原哈希
+`ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2`＝`git show 86298e24:internal/memory/dao_session.go`、`cmp` rc=0）。
+
+★没做完／⛔ 动的格子具名：AC#1–AC#5 五枚框一枚⛔ 翻（⛔ 由实现方自勾）；AC#2 的"要动那两行"⛔ 是缺陷、是票面明令射程外，
+只交暴露面读数（同一秒 200 对⇒touch 0/200 跨秒、硬币 90/200＝45%；跨秒 10 对⇒10/10 对）；
+读数缺口一枚＝"刷新挪到事务外"缺**确定性**判据（真杀台件 18/32＝56% 命中、交付字节同轮数 0 命中），
+要补需要一枚 tx 内故障注入接缝＝动 `Store.write`／DAO 函数体形状、超本票射程 ⇒ 请编排者拍。
+
+三形上交⛔ 自裁：缺母行那枚 `UPDATE` 影响 0 行要不要判 `ErrNotFound`（附 `foreign_keys` 0 命中与 `dsn()` pragma 名册两把尺）、
+迟到戳回写（`MAX(updated_at,?)` 之外的形状）、`updated_at = t.CreatedAt` 这枚落点判断本身。
+台面自纠三笔入账（双引号串里放反引号＝派单点名那枚陷阱本腿踩过、真杀台件第一版因全落同一秒在未修码上假绿、
+`git archive` 六件套⛔ 覆盖 `go build ./...`）。只 commit、⛔ push；add／commit 两处显式 pathspec。
