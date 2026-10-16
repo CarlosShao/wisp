@@ -1,0 +1,12 @@
+270-r2 更正自己那枚 `-F` 缺陷：具名两发指错 message 文件（⛔ 改历史，只追加）
+
+`9233fc19`（台件九枚）与 `0176ee19`（证据件＋commit-msg-2.txt）的 `git commit -F` 都传成了
+`commit-msg-1.txt` ⇒ 那两条 message 与产码提交 `087936bc` 逐字重复、说的不是自己那一发。
+成因＝复用同一条命令行、只换 pathspec 没换 `-F`。
+
+处置按本仓规矩：⛔ `--amend`／⛔ `reset`／⛔ `rebase`（共享工作树里会吞别人的活），只**追加**
+这一枚更正提交，并把 intended 正文逐枚落盘（`commit-msg-2.txt`／`commit-msg-3.txt` 随本批带上，
+`commit-msg-4.txt`＝本条、`commit-msg-5.txt`＝票尾那条）。缺陷写进
+`docs/evidence/s1/270-only-claims.md` §5 第 1 条，⛔ 抹、⛔ 只说"已完成"。
+
+内容面＝证据件 §5 那一节改字（同一枚件，行数 113⇒118，仍 ≤160）；⛔ 动产码、⛔ 翻框、⛔ push。

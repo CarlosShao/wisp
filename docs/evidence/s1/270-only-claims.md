@@ -84,9 +84,14 @@ internal/tools/=25、ban #8 internal/=577 含注释）／`sh scripts/check-path-
 
 ## 5. 具名上报（三笔，归编排者处置）
 
-1. **本腿自己的缺陷**：提交 `9233fc19`（台件与读数九枚）的 message 指错了文件 —— `-F` 传了
-   `commit-msg-1.txt`，正文与 `087936bc` 那条重复；**intended 正文**已随 `commit-msg-2.txt`
-   落盘并在下一条提交里带上。按"已推送历史不改写、要更正就追加"的规矩⛔ `--amend`／⛔ `reset`。
+1. **本腿自己的缺陷（同一枚错连犯两次，⛔ 抹、⛔ 改历史）**：`-F` 两次都指错了文件 ——
+   `9233fc19`（台件与读数九枚）与 `0176ee19`（本件＋`commit-msg-2.txt`）的 message 都是
+   `commit-msg-1.txt` 那段（＝与产码提交 `087936bc` 重复）。**intended 正文**逐枚在盘：
+   `commit-msg-2.txt`＝台件那一发、`commit-msg-3.txt`＝本件那一发、`commit-msg-4.txt`＝本处
+   更正那一发、`commit-msg-5.txt`＝票尾那一发。按"已推送历史⛔ 改写、要更正就追加"的规矩
+   ⛔ `--amend`／⛔ `reset`／⛔ `rebase`，只追加更正提交；这一处缺陷的成因是本腿复用同一条
+   命令行、只改了 pathspec 没改 `-F` 参数 ⇒ 已把"提交前逐枚对 `-F` 与 pathspec"记进票尾
+   bullet。
 2. **台面配方还缺一枚**：更正①的八件套（补 `models/`）**仍不够**——本包 `paths_shortname_252_*`
    那 8 枚腿要仓根 `docs/`，且导出树所在路径**必须有 8.3 短名别名**。读数：`/tmp`（C 卷、名已合
    8.3）那发 `FAIL_TOP=11`（8 枚 252 说"短名回显与长名同串……本探针不许 skip"＋3 枚 172 说
