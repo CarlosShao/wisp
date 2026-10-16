@@ -1,0 +1,14 @@
+216-r1 票 216 末尾追加一条 bullet（只追加，⛔ 翻任何 AC 框、⛔ 改票名／Status、⛔ 加 -done）
+
+改动尺＝git diff --numstat 该件：added 1 / deleted 0，且新增那一枚 bullet 落在文件末尾。
+bullet 内容＝本腿两笔提交号＋写面五枚文件名、AC#2 的纯函数形状与三条理由（转义不删、
+不用 strconv.Quote、洗落 NewSnapshot 显示边界而非各生产者，Canonical 在别处是当路径读的）、
+名册只装 AC#1 实测真出向又裸奔的两枚；AC#3 的正控（真 memory.Open＋真 ValidArtifactName＋真
+sniff）、去牙三枚红、还原哈希 6ea6d3ca…、判定三发同屏 L2/[R1 R8]；AC#4 的两句话盘上字节与
+盘上真值 not_run（⛔ 派单那个 na）；成对台面读数（改前 ca0e30fc 红 ⇄ 改后 92e8cc57 绿，同一枚
+探针）、整包带 -timeout 30m 的 141/8 ⇄ 148/8 与红名集合相减为空（引入新红 0 枚）、门禁四数
+各自 rc=0、必答项"动过的既有测试件＝零枚"；残余五枚具名（两份合一需新导出名＝契约面、
+Cf 类今天仍穿过、"attachments" 段要拆得加新键＝按规矩停手未加、ApprovalCardView 相邻面、
+cmd 侧 rt.workspaceView() 的坍缩）；AC#5 本腿零改动并给出两把尺的 0 命中＋一枚 903 命中的正控。
+
+本腿 ⛔ push：推送只由编排者做。
