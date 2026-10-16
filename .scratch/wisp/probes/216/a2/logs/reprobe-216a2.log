@@ -1,0 +1,194 @@
+=== 甲① 分母 ===
+### A1 Error() 站点·含测试 计数＝125
+### A2 Error() 站点·生产(去 _test)
+cmd/wisp/approval_reply.go:227:		s.record("REFUSED", corr, card.Tool, "native/allow", err.Error())
+cmd/wisp/approval_reply.go:272:		s.record("REFUSED", corr, card.Tool, "native/allow-session", err.Error())
+cmd/wisp/approval_reply.go:309:		s.record("REFUSED", corr, card.Tool, route+"/reject", err.Error())
+cmd/wisp/approval_reply.go:367:		s.record("REFUSED", corr, card.Tool, "native/veto", err.Error())
+cmd/wisp/config_reload.go:440:			err.Error())
+cmd/wisp/doctor.go:50:		fail("gcc (build-time)", "not found: "+err.Error())
+cmd/wisp/doctor.go:107:		fail("data dir resolvable ("+env+")", dirErr.Error())
+cmd/wisp/doctor.go:109:		fail("data dir writable ("+env+")", dir+": "+err.Error())
+cmd/wisp/panel_config_store.go:147:				row.CredentialError = err.Error()
+cmd/wisp/panel_control_windows.go:744:			c.Eval("window._rpc[" + id + "].reject(" + ctlJsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
+cmd/wisp/panel_control_windows.go:748:			c.Eval("window._rpc[" + id + "].reject(" + ctlJsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
+cmd/wisp/panel_models_320.go:111:		return "", fmt.Errorf("拉取失败（%s）：%s", provider, boundedFirstLine320(err.Error(), modelsListErrorCap320))
+cmd/wisp/panel_resident_windows.go:627:		return "panel thread could not start: " + err.Error()
+cmd/wisp/resident_audio_windows.go:186:			detail = devErr.Error()
+cmd/wisp/resident_audio_windows.go:284:		ra.verdict = "采集腿启动失败：" + startErr.Error()
+cmd/wisp/resident_audio_windows.go:285:		slog.Error("audio: capture leg refused to start", "err", startErr.Error())
+cmd/wisp/resident_audio_windows.go:311:			lastErr = devErr.Error()
+cmd/wisp/resident_audio_windows.go:366:		slog.Error("audio: capture leg stop returned an error", "err", err.Error())
+cmd/wisp/resident_audio_windows.go:399:		return err.Error()
+cmd/wisp/testdata/esclistener/main.go:316:	return e.Error()
+internal/panel/config_handlers.go:641:		return fmt.Sprintf("%s{\"payloadError\":%q}", SettingsPayloadMarker, err.Error())
+internal/panel/config_handlers.go:687:		line = err.Error()
+internal/panel/git.go:579:	return "git 这一维读取失败：" + err.Error()
+rc=0
+### A3 errors.Is/As 含测试 计数＝324
+### A4 errors.Is/As 生产 计数＝107
+### A5 生产里按错误串子串分支(类b)
+rc=1
+### A6 正控·同族尺(strings.Contains)在生产 internal/risk 计数＝37
+### A7 别名链：err.Error() 绑进变量(生产)
+cmd/wisp/panel_config_store.go:147:				row.CredentialError = err.Error()
+cmd/wisp/resident_audio_windows.go:186:			detail = devErr.Error()
+cmd/wisp/resident_audio_windows.go:311:			lastErr = devErr.Error()
+internal/agent/loop.go:947:	res.Message = err.Error()
+internal/audio/audio.go:150:	m.lastErr = err.Error()
+internal/llm/probe.go:229:		res.Detail = err.Error()
+internal/llm/probe.go:250:		res.Detail = streamErr.Error()
+internal/llm/probe.go:254:		res.Detail = err.Error()
+internal/panel/config_handlers.go:687:		line = err.Error()
+tools/d22scan/gitignore.go:384:			reason = err.Error()
+rc=0
+### A8 那些绑定变量被子串判定过吗(应 0)
+rc=1
+### A9 选句按码：switch on class / switch err
+cmd/wisp/run.go:83:	switch observe.ErrorClass(errClass) {
+internal/perm/store.go:225:	switch err {
+rc=0
+### A10 MessageKey 的生产消费者(应 0)
+internal/observe/errors.go:160:// MessageKey returns the stable user-visible copy key for the class. The copy
+internal/observe/errors.go:163:func (c ErrorClass) MessageKey() string {
+rc=0
+### A11 正控·MessageKey 消费者在测试里存在(全量)
+internal/llm/matrix_14_2_test.go:175:	if turn.Err.Class.MessageKey() == "" {
+internal/llm/matrix_14_2_test.go:249:	if qe.Class.MessageKey() == ne.Class.MessageKey() {
+internal/observe/errors.go:160:// MessageKey returns the stable user-visible copy key for the class. The copy
+internal/observe/errors.go:163:func (c ErrorClass) MessageKey() string {
+internal/observe/errors_test.go:186:// TestMessageKeys pins the user-visible copy hooks (the copy text itself is
+internal/observe/errors_test.go:188:func TestMessageKeys(t *testing.T) {
+internal/observe/errors_test.go:191:		if got := c.MessageKey(); got != want {
+internal/observe/errors_test.go:192:			t.Errorf("MessageKey(%s) = %q, want %q", c, got, want)
+rc=0
+=== 甲② 数字串被下游子串判定 ===
+### B1[413] 生产命中
+cmd/wisp/notify_windows.go:126:			// ERROR_CLASS_ALREADY_EXISTS (1413) is what a second registration
+cmd/wisp/panel_host_windows.go:644://     WSThickFrame and WSMaximizeBox (webview.go:408-413), which takes away the
+internal/llm/anthropic/stream.go:165:		status = 413
+internal/llm/errors.go:204:	case 413:
+rc=0
+### B1[too long] 生产命中
+internal/tools/task.go:102:	// decides whether that is too long for a context: this field is the
+rc=0
+### B1[exit status] 生产命中
+tools/d22scan/runtests.sh:103:        # and :116 with `mklink ... failed: exit status 1: Parameter format not correct
+rc=0
+### B2 正控·observe.ClassProvider 生产命中
+internal/llm/adaptertest/harness.go:4
+internal/llm/adaptertest/mockllm.go:1
+internal/llm/anthropic/adapter.go:3
+internal/llm/anthropic/stream.go:3
+internal/llm/chain.go:1
+internal/llm/discover.go:1
+internal/llm/errors.go:8
+internal/llm/openaichat/adapter.go:4
+internal/llm/openaichat/toolasm.go:4
+internal/llm/openairesponses/adapter.go:4
+internal/llm/openairesponses/stream.go:4
+internal/llm/provider.go:1
+internal/tools/bridge.go:1
+rc=0
+### B3 类型化退出码处理(类a 证据)
+cmd/balldebug/diff_windows.go:561:	if st.ExitCode() == 0 {
+cmd/balldebug/diff_windows.go:564:	return fmt.Sprintf("exit:%d", st.ExitCode())
+cmd/wisp/slo_windows.go:879:		return ps.Exited(), ps.ExitCode()
+rc=0
+=== 甲③ 反面教材件在本仓存在吗 ===
+### C1 工作树 find
+rc=0
+### C2 正控·同尺找 *.tsx(应非 0)
+90
+### C3 提交树 44f51fc8 名单
+rc=1
+### C4 正控·同尺已知存在件
+frontend/src/components/ai-native/chat-composer.tsx
+=== 乙 名字里的字当判级输入 ===
+### D1 判级包内所有字符串匹配(分母)
+internal/risk/blacklist.go:170:	return path == dir || strings.HasPrefix(path, dir+sepStr)
+internal/risk/blacklist.go:242:		case strings.HasPrefix(base, ".env"):
+internal/risk/blacklist.go:244:		case strings.HasSuffix(base, ".pem"):
+internal/risk/blacklist.go:246:		case strings.HasSuffix(base, ".p12"), strings.HasSuffix(base, ".pfx"):
+internal/risk/blacklist.go:248:		case strings.HasPrefix(base, "id_"):
+internal/risk/blacklist.go:250:		case strings.HasPrefix(base, "secrets."):
+internal/risk/blacklist.go:252:		case strings.Contains(base, "credentials") && strings.HasSuffix(base, ".json"):
+internal/risk/pathresolver.go:175:	for start := strings.Index(p, "%"); start >= 0; start = strings.Index(p[start+1:], "%") + start + 1 {
+internal/risk/pathresolver.go:176:		end := strings.Index(p[start+1:], "%")
+internal/risk/pathresolver.go:181:		if v := os.Getenv(name); v != "" && !strings.Contains(name, "%") {
+internal/risk/pathresolver.go:195:	if p == "~" || strings.HasPrefix(p, `~\`) || strings.HasPrefix(p, "~/") {
+internal/risk/pathresolver.go:249:	if !strings.HasPrefix(p, `\\`) && !strings.HasPrefix(p, `//`) {
+internal/risk/pathresolver.go:255:			if len(u) > len(prefix)+2 && strings.HasPrefix(strings.ToLower(u), strings.ToLower(prefix)) {
+internal/risk/pathresolver.go:257:				i := strings.Index(share, `\`)
+internal/risk/pathresolver.go:274:	if strings.HasPrefix(p, `\\?\UNC\`) {
+internal/risk/pathresolver.go:277:	if strings.HasPrefix(p, `\\?\`) {
+internal/risk/pathresolver.go:418:	if i := strings.Index(first, sepStr); i >= 0 {
+internal/risk/pathresolver_windows.go:69:	if strings.HasPrefix(rest, `?\`) { // \\?\X: form: volume includes the prefix
+internal/risk/pathresolver_windows.go:77:		if base != "" && !strings.HasSuffix(base, `\`) {
+internal/risk/provenance.go:996:		if len(lk) > len(suf) && strings.HasSuffix(lk, suf) {
+internal/risk/provenance.go:1010:	if t == "" || strings.ContainsAny(t, " \t\r\n") {
+internal/risk/provenance.go:1018:		if strings.HasPrefix(lower, pre) {
+internal/risk/rules_network.go:47:		if i := strings.Index(n.URL, "://"); i > 0 {
+internal/risk/rules_network.go:123:		if host == entry || strings.HasSuffix(host, "."+entry) {
+internal/risk/rules_shell.go:61:			if strings.ContainsRune(shellMetachars, r) {
+internal/risk/rules_shell.go:99:		if strings.EqualFold(argv0, entry) || strings.EqualFold(base, entry) {
+internal/risk/syncdirs.go:282:		if !strings.HasSuffix(next, sepStr) {
+internal/risk/syncdirs.go:326:	case strings.HasPrefix(u, `\\?\UNC\`):
+internal/risk/syncdirs.go:333:	case strings.HasPrefix(u, `\\?\`):
+internal/risk/syncdirs.go:338:	case strings.HasPrefix(u, `\\`):
+internal/risk/syncdirs.go:347:	case strings.HasPrefix(u, sepStr):
+internal/risk/syncdirs.go:362:	i := strings.Index(body, `\`)
+internal/risk/syncdirs.go:368:	j := strings.Index(rest, `\`)
+internal/risk/syncdirs.go:516:		if !strings.EqualFold(sk, "Personal") && !strings.HasPrefix(sk, "Business") {
+internal/risk/taintmatch.go:131:// strings.Contains, so no window the contract would call a fragment can be
+internal/risk/taintmatch.go:198:// with strings.Index over the raw content is the ticket 177 hard ordering
+internal/risk/taintmatch.go:245:			if strings.Contains(f.src, w) {
+rc=0
+### D2 判级包内 allow 语义行的子串匹配(逐枚看方向)
+internal/risk/rules_network.go:123:		if host == entry || strings.HasSuffix(host, "."+entry) {
+internal/risk/rules_shell.go:61:			if strings.ContainsRune(shellMetachars, r) {
+rc=0
+### D3 生产里对名字做'允许'类字面判定(应 0)
+rc=1
+### D4 正控·同尺去掉字面(名字子串判定确有)
+internal/risk/blacklist.go:240:		base := strings.ToLower(baseName(s))
+internal/risk/blacklist.go:242:		case strings.HasPrefix(base, ".env"):
+internal/risk/blacklist.go:244:		case strings.HasSuffix(base, ".pem"):
+internal/risk/blacklist.go:246:		case strings.HasSuffix(base, ".p12"), strings.HasSuffix(base, ".pfx"):
+internal/risk/blacklist.go:248:		case strings.HasPrefix(base, "id_"):
+internal/risk/blacklist.go:250:		case strings.HasPrefix(base, "secrets."):
+internal/risk/blacklist.go:252:		case strings.Contains(base, "credentials") && strings.HasSuffix(base, ".json"):
+rc=0
+### D5 Attachment 一词进判级包了吗(应 0)
+rc=1
+### D6 正控·同尺 params 确有
+internal/risk/assessor.go:8
+internal/risk/provenance.go:23
+internal/risk/rules_gateway.go:1
+rc=0
+### D7 显示名→路径 的唯一出口(生成名=内容哈希)
+internal/panel/attachments.go:260:	name := "attachment-" + shortHash(data) + "." + accepted.ext
+rc=0
+### D8 门控调用点(判定入口的生产 caller)
+internal/panel/approval.go:65:	decision := assessor.Assess(subject.Tool, paramsFromArgs(subject.Args), subject.Facts)
+internal/risk/provenance.go:40:// CheckText(scope, ChTTS|ChHTTP, text) directly; and any call whose tool is
+internal/risk/provenance.go:56:// prefer Inspect()/CheckText() directly (wiring lands with tickets 20/21/22/26).
+internal/risk/provenance.go:826:func (p *Provenance) CheckText(scopeID string, ch Channel, text string) (Hit, bool) {
+internal/risk/provenance.go:868:	h, ok := d.p.Inspect(d.scope, "", params)
+internal/risk/rules_gateway.go:77:		switch ctx.classifier.Classify(canonical) {
+internal/tools/mode.go:98:		d := risk.Gate(c, overrides)
+internal/tools/paths.go:381:	switch risk.Classify(canonical) {
+tools/d22scan/main.go:717:	ast.Inspect(f, func(n ast.Node) bool {
+rc=0
+### D9 internal/perm 非空目录(D5 的 0 不是空转)
+store.go
+store_test.go
+tempdir_resolved_124_test.go
+ticket90_persist_test.go
+=== 甲②′ 界面侧（只读，射程＝提交树 frontend/**；我零写面）===
+### F1 前端里 413 这个数字串
+rc=1
+### F2 前端按错误文案子串判定族(尺见上一行 F2P)
+rc=1
+### F3 正控·同族尺 includes 调用在 frontend/src 的枚数
+32

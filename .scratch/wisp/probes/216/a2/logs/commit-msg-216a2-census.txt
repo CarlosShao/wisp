@@ -1,0 +1,27 @@
+216-a2 只读普查件：AC#5 两半分开量（禁止那半 0/130 实测＋正控，必做那半无落地物＝MessageKey 生产消费者 0）＋ AC#3 后半可达性名册
+
+腿 216-a2（只读普查，⛔ 产码/测试件/判语/翻框/go test|build|vet）。
+锚＝具名提交 44f51fc8；全部尺读提交树，⛔ 混在飞工作树。
+
+写面（本笔只含这四枚，逐枚显式 pathspec）：
+- .scratch/wisp/probes/216/a2/census.md（90 行／16477 字节，占位符 0，⛔ 0 字节）
+- .scratch/wisp/probes/216/a2/logs/reprobe-216a2.sh（尺名册，bash -n 过，可整跑）
+- .scratch/wisp/probes/216/a2/logs/reprobe-216a2.log（逐字 stdout/stderr＋rc，194 行；落名 .log 因 .gitignore:8 是 *.out，⛔ 动 .gitignore）
+- .scratch/wisp/probes/216/a2/logs/commit-msg-216a2-census.txt（本消息，临时件只建不删）
+
+读数要点：
+甲① 分母＝Error() 生产 23 ＋ errors.Is/As 生产 107 ＝ 130；按码/类型 107、按子串 0（rc=1，
+      正控同族尺在 internal/risk 非 0）、原样透出 23。别名链另量：err.Error() 绑变量 10 枚，
+      绑后被子串判定 0 枚。
+甲② 413=4 命中（2 注释＋1 赋整型＋1 整型 case）／too long=1（注释）／exit status=1（CI 脚本注释），
+      无一枚子串判定；退出码走 ExitCode()/ProcessState 类型路。
+甲②′ 前端侧（只读提交树）413=0、按文案子串判定族=0，尺判别力当场喂样例验过（1 命中）。
+甲③ ChatInput.tsx 本仓不存在（工作树 find 0／提交树 0，两把正控 90 枚 tsx＋chat-composer.tsx）。
+甲④ 一句形：禁止那半已成立、必做那半没有落地物（internal/observe/errors.go:163 MessageKey 生产
+      消费者 0 枚，票面注释自陈推迟到 D23/S6）；⛔ 我翻框、⛔ 我改判据文字，判它归非实现者。
+乙   判级包内字符串匹配 37 枚逐枚归位：名字里的字确实进判定（blacklist.go:242-252 六枚基名图案），
+      但枚枚方向都是更严；ALLOW 侧三处一律全拼写相等或点锚定后缀、无一处任意子串；
+      票 216 正题那枚附件显示名到 risk/perm/tools/agent 可达性＝0（D5 rc=1＋D6 正控＋
+      attachments.go:69 注释＋:260 落盘名＝内容哈希）；perm 侧 0 枚字符串匹配。
+未量具名：前端在飞工作树那版（⛔ 读别腿在飞字节当凭据）。
+本笔 ⛔ push。
