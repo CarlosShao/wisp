@@ -1,0 +1,29 @@
+=== RUN   TestZZ166V1AppendTurnDoesNotSurfaceSession
+time=2026-10-16T10:28:51.013+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp-166v1\gotmp\TestZZ166V1AppendTurnDoesNotSurfaceSession3732552822\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T10:28:51.026+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1AppendTurnDoesNotSurfaceSession3732552822\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:28:51.030+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:28:51Z duration_ms=4
+time=2026-10-16T10:28:51.034+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1AppendTurnDoesNotSurfaceSession3732552822\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:28:51.037+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:28:51Z duration_ms=3
+time=2026-10-16T10:28:51.042+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1AppendTurnDoesNotSurfaceSession3732552822\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T10:28:51.046+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:28:51Z duration_ms=3
+time=2026-10-16T10:28:51.049+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:28:51.050+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+TIEBREAK-BASELINE list order = [sess_568ef079fa83f2a6936007371f35644f sess_e754a35a480f71408778bc50f5525a31] (old.updated_at=1777593660 fresh.updated_at=1777593720)
+TIEBREAK-AFTER appends=10 turns-in-db=10 | old.updated_at 1777593660 -> 1777593660 (delta=0) | list order = [sess_568ef079fa83f2a6936007371f35644f sess_e754a35a480f71408778bc50f5525a31]
+TIEBREAK-VERDICT continuing-a-chat does NOT surface it: list[0] is still "sess_568ef079fa83f2a6936007371f35644f" ("a session I created later"), while the
+conversation that just got 10 turns sits at list[1]
+--- PASS: TestZZ166V1AppendTurnDoesNotSurfaceSession (0.06s)
+=== RUN   TestZZ166V1SameSecondCoin
+time=2026-10-16T10:28:51.064+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp-166v1\gotmp\TestZZ166V1SameSecondCoin2565642376\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T10:28:51.073+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1SameSecondCoin2565642376\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:28:51.077+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:28:51Z duration_ms=4
+time=2026-10-16T10:28:51.081+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1SameSecondCoin2565642376\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:28:51.086+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:28:51Z duration_ms=4
+time=2026-10-16T10:28:51.090+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1SameSecondCoin2565642376\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T10:28:51.094+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:28:51Z duration_ms=4
+time=2026-10-16T10:28:51.098+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:28:51.100+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+TIEBREAK-COIN pairs=200 same-second=200 different-second=0 | order contradicts creation order in 91/200 = 45.5%
+--- PASS: TestZZ166V1SameSecondCoin (0.14s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	0.305s

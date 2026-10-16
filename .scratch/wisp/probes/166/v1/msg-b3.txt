@@ -1,0 +1,20 @@
+166-v1 AC#4／AC#6／tie-break 料落盘⇒AC#4 成立（两发去牙都响）·AC#6 ⓐ①成立＋★:84 那枚实测不是硬币
+
+- AC#4（分叉不许吞原件）＝成立：去牙反控两发都在仓外第三棵 tree-mut 上物理改字节（⛔ -overlay）。
+  M1"分叉时顺手清理"（复制后 DELETE 父轮次，sha f888b883…）⇒ 红句逐字 `manage_test.go:213: original lost turns (2 -> 0): the fork swallowed history`；
+  M2"分叉不带走历史"（复制加 AND 1=0，sha 38d8a021…）⇒ 红句 `manage_test.go:226: fork turns = [] (<nil>), want 2`；
+  还原 sha＝pristine 38bff760…、cmp 0 差异、复跑 `--- PASS`。
+  ★顺手量到一格：M1 打在存储层，`go test ./internal/memory/ -count=1` 仍 ok（12.429s）⇒ DAO 层⛔ 分叉用例，不变量今天单层把守（⛔ 本腿动，只上报）。
+- AC#6（同秒并列那一支）ⓐ＝成立：本腿自己复跑四发（台面 tree-mut、GOTMPDIR 非 %LOCALAPPDATA%）。
+  改后 `-run TestSessionListByWorkspace -count=20`⇒RUN=20/TOPPASS=20/TOPFAIL=0；
+  摘掉步进时钟（sha b958d176…）⇒RUN=20/TOPPASS=10/**TOPFAIL=10**＝牙响，红句逐字 `manage_test.go:89: workspace filter = [...] want [...]`；
+  还原 RUN=40/TP=40/TF=0 且 sha 回到交付字节 2bf320df…（与 166-r2 表里那枚同一）、cmp 0 差异；
+  再取 `c2b1ade5^` 的改前字节（sha 57fcf6ef…＝证据件那枚）跑 `-run TestSessionList -count=20`⇒TOPFAIL=12（落在实现腿 7/12 的同一散布里）。
+  ★不复述实现腿、自己量的那一处：同一枚做平时钟下 `-run TestSessionSearchTitleAndBody -count=20`⇒RUN=20/TP=20/**TF=0**
+  ⇒ `:84` 那枚**实测不是硬币**（它只断言命中 1/0 枚、⛔ 比先后）⇒ 本格真关掉的硬币只有 `:69` 一枚，`:84` 算防未来（⛔ 替实现腿抹平）。
+  ⓑ＝成立、答"看不见"，成因⛔ 是排错而是压根⛔ 链走到清单（本腿另跑一把：session.NewManager 全仓 .go rc=1、非测试 Manager 调用点 rc=1、
+  memory.Session 在三包之外 rc=1）；t.Skip 整包 0 命中、:86 那条断言逐字仍在、用例名册仍 5 枚⇒⛔ 放宽⛔ 删用例⛔ Skip 三项读盘核过。
+- tie-break 三形料上交（⛔ 裁⛔ 动 dao_session.go:125/:144）：AppendSessionTurn 十轮后 `updated_at delta=0`、列表次序不变＝"继续聊不把会话顶到前面"；
+  同秒 200 对会话实测**45.5%（91/200）列表次序与创建次序相反**；对照组 profile 的 id 是 AUTOINCREMENT⇒同形 SQL 一好一坏。
+
+⛔ push、⛔ 勾 AC 框、⛔ 动产码/测试件一字。

@@ -1,0 +1,15 @@
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+time=2026-10-16T10:24:58.886+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp-166v1\gotmp\TestSessionForkDoesNotSwallowOriginal1781747259\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T10:24:58.898+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestSessionForkDoesNotSwallowOriginal1781747259\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:24:58.903+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:24:58Z duration_ms=4
+time=2026-10-16T10:24:58.907+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestSessionForkDoesNotSwallowOriginal1781747259\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:24:58.911+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:24:58Z duration_ms=3
+time=2026-10-16T10:24:58.914+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestSessionForkDoesNotSwallowOriginal1781747259\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T10:24:58.918+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:24:58Z duration_ms=3
+time=2026-10-16T10:24:58.921+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:24:58.924+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    manage_test.go:226: fork turns = [] (<nil>), want 2
+--- FAIL: TestSessionForkDoesNotSwallowOriginal (0.05s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	0.084s
+FAIL

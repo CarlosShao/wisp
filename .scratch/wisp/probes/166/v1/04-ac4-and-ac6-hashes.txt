@@ -1,0 +1,20 @@
+# AC#4 / AC#6 去牙台件的字节账（sha256 全值，量于 /d/tmp/wisp-166v1）
+
+## internal/memory/dao_session.go
+pristine (=HEAD 与仓内工作树，cmp 0 差异) 38bff760eabb5bf9beb46eb55e5590675a3a33c8b5e6a231cf33442e9a642506
+M1 分叉时顺手清理（复制后 DELETE 父轮次）      f888b883e69bf4a4ed2a5ee3cccfac82609197e20bacdaef2a3849529fde80b9
+M2 分叉不带走历史（复制 WHERE 追加 AND 1=0）    38d8a02106be242c6fbe859dba32ccc21eee48bbc162acc045f98cd9c4e0c179
+还原后 (=pristine，RESTORE_CMP_RC=0 两枚)      38bff760eabb5bf9beb46eb55e5590675a3a33c8b5e6a231cf33442e9a642506
+
+## internal/session/manage_test.go
+交付字节＝HEAD＝仓内工作树 (166-r2 表里写 2bf320df04e2819a) 2bf320df04e2819a324d99756a8447a749b7e214910dcb89952b17f86f2cf74c
+AC#6 突变态：时钟做平（摘掉 tick.Add(time.Minute)）           b958d176146a761d3c9d017d033fd5b9f8b6b349a6b4aa58337064936c865474
+改前字节＝git show c2b1ade5^:internal/session/manage_test.go   57fcf6efc46244866bde963f19dce884f1d421f95f2268f691b6edb89548a66a
+还原后 (=交付字节，RESTORE_CMP_RC=0)                          2bf320df04e2819a324d99756a8447a749b7e214910dcb89952b17f86f2cf74c
+
+## internal/session/manage.go
+pristine＝HEAD＝工作树＝tree-mut 还原后 8bf052bbdc7ea4448c05f321c310f405dec1d39ee77f637ebaea5fa77a0257af（本腿⛔ 改过它，只作对照）
+
+## 尺（可逐字重跑）
+cd /d/tmp/wisp-166v1/tree-mut && sha256sum internal/memory/dao_session.go internal/session/manage_test.go
+cmp internal/session/manage_test.go /d/tmp/wisp-166v1/tree-head/internal/session/manage_test.go; echo $?

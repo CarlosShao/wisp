@@ -1,0 +1,76 @@
+AC#6 同秒并列那一支（ⓐ 仪器改成确定性＝**成立**·ⓑ 生产可见性＝**成立，答"看不见"**）
+——审计 `docs/evidence/s1/ticket166-ac6-166r2.md`（94 行／9363 字节）＋本腿自己复跑四发
+
+## 6.1 先核字节账（裁决的第一把尺：判语说的是哪一枚字节）
+- 盘上交付字节 `internal/session/manage_test.go`＝sha256 `2bf320df04e2819a324d99756a8447a749b7e214910dcb89952b17f86f2cf74c`
+  ——与那份证据件 §1 表里"交付字节 2bf320df04e2819a"**同一枚**（三处量的都是这枚：仓内工作树、`tree-head`、还原后的 `tree-mut`）。
+- 改前字节＝`git show c2b1ade5^:internal/session/manage_test.go`＝sha256 `57fcf6efc46244866bde963f19dce884f1d421f95f2268f691b6edb89548a66a`
+  ——与证据件"＝a9c7bea0 的字节 57fcf6efc4624486"**同一枚**；该字节里 `:69` 与 `:84` 两处确实是 `newTestManager(..., nil)`（本腿自己 `grep -n` 过）。
+- 放宽断言那一支：本腿读盘核过 `manage_test.go:86` 那条 `if len(got) != 2 || got[0].ID != c.ID || got[1].ID != a.ID` **逐字仍在**、
+  `git --no-pager grep -n "t.Skip" -- internal/session internal/memory/dao_session_test.go`＝**rc=1，整个 `internal/session` 包 0 枚命中**（连邻居 DAO 测试件一起数，一枚都⛔）、用例名册仍是 5 枚
+  （`TestSessionListByTime:51`／`TestSessionListByWorkspace:77`／`TestSessionSearchTitleAndBody:95`／`TestSessionRenameAndArchiveUndo:131`／`TestSessionForkDoesNotSwallowOriginal:181`）。
+  ⇒ 交付形状⛔ 靠放宽、⛔ 靠删用例、⛔ 靠 Skip。
+
+## 6.2 那份证据件的五发读数：审计结论
+把件里 `logs/*.filtered.txt` 十一枚抽取件自己数一遍（尺＝`grep -c '^=== RUN' / '^--- PASS' / '^--- FAIL'`）：
+
+| 件（probes/166/r2/logs/） | 文件里可复算的数 | 证据件表里写的数 | 对得上？ |
+|---|---|---|---|
+| before-count20 | RUN 40／TP 33／TF **7** | 40／33／7 | ✓ |
+| before-count20-round2 | RUN 40／TP 28／TF **12** | 40／28／12 | ✓（这一发正是"非恒定"的那一枚） |
+| after-list-count20 · -round2 · restore · final-green | 各 RUN 40／TP 40／TF **0** | 40／40／0 | ✓ |
+| after-search-count20 | RUN 20／TP 20／TF 0 | 20／20／0 | ✓ |
+| teeth-flatclock-list-count20 | RUN 40／TP 18／TF **22** | 40／18／22 | ✓ |
+| teeth-flatclock-list-count20-round2 | RUN 40／TP 13／TF **27** | 40／13／27 | ✓ |
+
+⇒ **审计层面那份件自洽**（数能从件本身复算，⛔ 只有一句话）。它的"台面同名、⛔ 跨台面"那句也核过：
+`01-surface.txt` 写的 `git archive HEAD | tar -x -C /d/tmp/wisp-166r2/tree`＋1087 枚 `.go`＝与它 §1 的自陈一致
+（本腿自己的台面是另一棵、另一枚 HEAD，数见 6.3，两棵树各数各的）。
+⛔ 需要挑出来的两处：那份件 §1 的红句第二条（`manage_test.go:87`）是**突变态**的行号，交付态那一条在 `:86`／报错打在 `:87`；
+本腿自己的复跑里同一枚断言因为又插了两行注释打在 `:89`——**行号随注释漂，别拿行号当身份**（身份用 §6.1 的 sha）。
+
+## 6.3 本腿自己复跑的四发（台面＝`tree-mut`，`git archive HEAD` 导出、1091 枚 `.go`、`GOTMPDIR=D:/tmp/wisp-166v1/gotmp`）
+口径先写清：`-run` 只命中一枚用例时 RUN＝20，命中两枚（`TestSessionList`＝ByTime＋ByWorkspace）时 RUN＝40；
+PASS/FAIL 数的是**顶层**行（`^--- PASS`／`^--- FAIL`）；这几枚用例⛔ 子测试（`^    --- ` 命中 0 枚）⇒ 两把尺在这里重合。
+逐字日志＝`logs/ac6-*.log` 四枚。
+
+1. **改后 20/20（复跑证据件那一发）**：`-run TestSessionListByWorkspace -count=20 -v` ⇒ rc=0，
+   `RUN=20 TOPPASS=20 TOPFAIL=0`，尾行 `ok github.com/CarlosShao/wisp/internal/session 1.487s`。
+2. **摘掉步进时钟＝必须红（复跑"牙"那一发）**：物理把 `manage_test.go:24` 的
+   `tick = tick.Add(time.Minute)` 改成 `return tick`（时钟做平，字节 sha `b958d176146a761d3c9d017d033fd5b9f8b6b349a6b4aa58337064936c865474`），
+   `-run TestSessionListByWorkspace -count=20 -v` ⇒ rc=1，`RUN=20 TOPPASS=10 TOPFAIL=10`＝**一枚硬币，牙成立**。红句逐字（第一条）：
+   ```
+       manage_test.go:89: workspace filter = [sess_b838e1d8c5407617c4fbdbe7c23aafac sess_2b232a742845c2da68a47e860676369b], want [sess_2b232a742845c2da68a47e860676369b sess_b838e1d8c5407617c4fbdbe7c23aafac]
+   ```
+   还原后复跑：`-run "TestSessionListByWorkspace|TestSessionSearchTitleAndBody" -count=20` ⇒ rc=0，`RUN=40 TOPPASS=40 TOPFAIL=0`，
+   `manage_test.go` 字节 sha 回到 `2bf320df04e2819a…`、`cmp` 与 pristine **0 差异**（`RESTORE_CMP_RC=0`）。
+3. **★`:84`（交付态 `:95` 那枚 `TestSessionSearchTitleAndBody`）到底⛔ 是硬币——本腿自己量，⛔ 替实现腿抹平**：
+   在**同一枚做平时钟的突变字节**上跑 `-run TestSessionSearchTitleAndBody -count=20 -v` ⇒ rc=**0**，`RUN=20 TOPPASS=20 TOPFAIL=0`
+   （逐字绿行：`--- PASS: TestSessionSearchTitleAndBody (0.18s)`）。
+   读码对得上：它对结果的断言只有"命中 1 枚／0 枚"（现 `:112`／`:119`／`:122`／`:125`），**⛔ 比两枚之间的先后** ⇒ 时钟做平它照样绿。
+   ⇒ **判语写清**：本格真关掉的硬币**只有 `:69`（`TestSessionListByWorkspace`）一枚**；`:84` 那一处改步进时钟＝**防未来**
+   （将来给 Search 加次序断言时⛔ 静默变硬币）。166-r2 在证据件 §4 里自报的这一处"与派单/票面前提不符"，
+   **本腿复跑支持它**——票面 AC#6 ⓐ 那句"`:69` 与 `:84` 两处传 nil 的改成用那枚步进时钟"作为**动作**是照做了的，
+   作为**"关掉两枚硬币"的成效**只关掉了一枚。本格⛔ 因这一处判红（ⓐ 的判据是"改前 FAIL>0 复现＋改后 20/20"，两发都在），
+   但把这句差异留在判语里、⛔ 写"两枚硬币已闭"。
+4. **改前那一发（自证，⛔ 引实现腿的数）**：把 `c2b1ade5^` 的字节（sha `57fcf6ef…`）放进 `tree-mut` 跑
+   `-run TestSessionList -count=20 -v` ⇒ rc=1，`RUN=40 TOPPASS=28 TOPFAIL=12`，红句打在 `manage_test.go:78`：
+   ```
+       manage_test.go:78: workspace filter = [sess_5c54e8bb61d3ee101241c58895238aac sess_1b984db587f6bb046c889d78d6061273], want [sess_1b984db587f6bb046c889d78d6061273 sess_5c54e8bb61d3ee101241c58895238aac]
+   ```
+   本腿这一枚 12 落在实现腿两发（7／12）的同一枚散布里 ⇒ "非恒定"这一条独立复现。
+
+## 6.4 ⓑ 生产可见性（只答不改，本腿另跑一把、⛔ 抄 `05-prod-visibility.txt`）
+**答＝看不见**，但"看不见"的成因本腿要说准：⛔ 是"排错了没人看"，是**压根⛔ 一条链走到那枚清单**。
+本腿自己的尺（见 `02-ac2-outlets-and-wiring.txt` §2.2）：`session.NewManager` 全仓 `.go` **0 命中**（rc=1，正控 `session.NewLedger` 3 命中）、
+非测试文件里 Manager 方法调用点 **0 命中**、`memory.Session` 型在 `internal/panel`/`internal/tools`/`cmd/wisp` **0 命中**、
+CLI 名册十枚⛔ sessions、面板快照 `PumpSources`/`Snapshot` 字段⛔ 会话读者。
+⇒ 次序随机这一形今天落在**盘上但产品走不到**的位置；界面腿或票 145 一接线就立刻可见（那时它是机主看得见的缺陷）。
+代价数字见 `07-tiebreak-material.txt`：同秒两枚会话，**45.5%**（91/200）的次数列表次序与创建次序相反。
+
+## 6.5 判语
+- **ⓐ 成立**：仪器改确定性了；判据两发本腿都自己复跑过（改前 12 红／改后 20 全绿），牙一发（摘步进 10 红）也复跑过，
+  还原字节 `cmp` 0 差异并复跑绿；⛔ 放宽／⛔ 删用例／⛔ Skip 三项本腿读盘核过。
+  ★成效范围按 6.3 第 3 发写：**真关掉的硬币只有 `:69` 一枚，`:84` 是防未来**。
+- **ⓑ 成立**（这一支本来就只许答、⛔ 改）：答＝看不见，成因＝⛔ 接线；tie-break 本体⛔ 动（`dao_session.go:125`/`:144` 一字未改），
+  上交的料在 `07-tiebreak-material.txt`。

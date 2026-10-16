@@ -1,0 +1,13 @@
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+time=2026-10-16T10:25:08.429+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp-166v1\gotmp\TestSessionForkDoesNotSwallowOriginal3163305100\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T10:25:08.444+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestSessionForkDoesNotSwallowOriginal3163305100\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:25:08.450+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:25:08Z duration_ms=5
+time=2026-10-16T10:25:08.454+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestSessionForkDoesNotSwallowOriginal3163305100\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:25:08.457+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:25:08Z duration_ms=2
+time=2026-10-16T10:25:08.461+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestSessionForkDoesNotSwallowOriginal3163305100\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T10:25:08.465+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:25:08Z duration_ms=4
+time=2026-10-16T10:25:08.469+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:25:08.471+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.06s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	0.095s

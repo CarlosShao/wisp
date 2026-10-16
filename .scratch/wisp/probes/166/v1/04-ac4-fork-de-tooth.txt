@@ -1,0 +1,57 @@
+AC#4 分叉不许吞原件（判语＝**成立**，两发去牙反控都响）
+
+## 4.0 台件与纪律
+- 突变只在仓外导出树 `tree-mut`（第三棵，`git archive HEAD | tar -x`，`.go`＝1091）上**物理改盘上字节**，⛔ `-overlay`、⛔ 共享工作树。
+- 三枚名册件都在盘上可查：`logs/ac4-M1-session.log`／`logs/ac4-M2-session.log`／`logs/ac4-restored-green.log`。
+- 字节账（sha256 全值）见 `04-ac4-hashes.txt`：
+  - 未突变 `internal/memory/dao_session.go`＝`38bff760eabb5bf9beb46eb55e5590675a3a33c8b5e6a231cf33442e9a642506`（＝仓内 HEAD 同路径字节，`cmp` 已核）
+  - M1（"分叉时顺手清理"）＝`f888b883e69bf4a4ed2a5ee3cccfac82609197e20bacdaef2a3849529fde80b9`
+  - M2（"分叉不复制轮次"）＝`38d8a02106be242c6fbe859dba32ccc21eee48bbc162acc045f98cd9c4e0c179`
+  - 还原后＝`38bff760eabb5bf9…`（与未突变逐字节同，`RESTORE_CMP_RC=0` 两枚都量过）
+
+## 4.1 M1＝票面点名的那一形："分叉时顺手清理"
+在 `ForkSession` 复制完轮次之后、事务返回之前插一条 `DELETE FROM session_turn WHERE session_id=?`（打的是 parentID）。
+
+红句逐字（连文案，`go test ./internal/session/ -run TestSessionFork -v -count=1`，`M1_SESSION_RC=1`）：
+```
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+    manage_test.go:213: original lost turns (2 -> 0): the fork swallowed history
+--- FAIL: TestSessionForkDoesNotSwallowOriginal (0.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	0.089s
+FAIL
+```
+⇒ 这一发**牙是真的**：`manage_test.go:212-214` 那条"原件轮数少了就 Fatalf"直接把"顺手清理"钉死，
+后面的逐枚比对 `:215-219`（`before[i].ID/Seq/Content` 三字段）与父行 `:220`（`Title=="orig" && ForkedFrom==""`）是第二层。
+
+## 4.2 M2＝反向那一形："分叉只开个新头、不带走历史"
+把复制那一句的 `WHERE session_id=?` 后面加 `AND 1=0`（父行父轮一枚不动，分叉带走 0 行）：
+```
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+    manage_test.go:226: fork turns = [] (<nil>), want 2
+--- FAIL: TestSessionForkDoesNotSwallowOriginal (0.05s)
+FAIL
+```
+⇒ 同一枚用例还钉住了"分叉必须带走历史"（`:224-227`）。
+另有一条"带走的是复制、⛔ 搬家"的断言在盘上（`:232-234` 比 `forkTurns[i].ID == before[i].ID` ⇒ 复用父行 rowid 就红），
+**本腿⛔ 为它单独做发突变**（要造它得让 `session_turn.id` 改成显式复用，超出"顺手清理"那一形）⇒ 这一条本件只交"断言在"，⛔ 交"牙验过"。
+
+## 4.3 还原复跑绿
+还原字节后 `go test ./internal/session/ -run TestSessionFork -v -count=1` ⇒ `RESTORED_RC=0`：
+```
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.06s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	0.095s
+```
+
+## 4.4 顺手量到的一枚缺口（⛔ 判成本格的红、写进台账材料）
+**M1 打在存储层，`internal/memory` 整包全绿**：`go test ./internal/memory/ -count=1` 在 M1 字节下 ⇒ `ok github.com/CarlosShao/wisp/internal/memory 12.429s`（`M1_MEMORY_RC=0`）。
+读码对上：`dao_session_test.go` 只有两枚用例（`:15 TestSessionSearchEscapesWildcards`、`:53 TestSessionMigrationCrashAtomicAndReplay`），
+**⛔ 一枚直接调 `ForkSession`**（`git grep` 全仓 `.go` 的 `ForkSession(` 调用点＝`manage.go:145` 一处产码＋`manage_test.go` 那一枚用例）。
+⇒ "分叉不吞原件"这枚不变量今天**只有会话层那一枚用例在守**，DAO 层裸调用（将来面板/工具直接调 `Store.ForkSession`）⛔ 网。
+这一格⛔ 阻断 AC#4（票面要的是"拿一发变异证"，交到了），但**接线之前值得补一枚 DAO 级用例**——⛔ 本腿动（写面⛔ 放开）。
+
+## 4.5 判语
+**AC#4 成立**：分叉后原件逐字仍在这一形有牙（M1 红在 `:213`）、复制语义有牙（M2 红在 `:226`、rowid 复用红在 `:232`）、
+字节可还原且还原后绿（`cmp` 0 差异＋`--- PASS`）。4.4 那格另记。

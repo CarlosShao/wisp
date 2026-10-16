@@ -1,0 +1,47 @@
+移交编排者裁的三形料（本腿只交读数与代价，⛔ 裁、⛔ 动 `dao_session.go:125`/`:144` 一字）
+
+台件＝`zz166v1tiebreak_bench_test.go`（跑在仓外 `tree-mut`，产码字节 pristine：`dao_session.go` sha `38bff760…`、
+`manage_test.go` sha `2bf320df…`；`gofmt -l`＝0 枚、`go vet ./internal/session/` rc=0、两枚用例 `--- PASS`）。
+逐字读数＝`logs/tiebreak.log`。
+
+## 料 1·★`AppendSessionTurn` 不刷新 `session.updated_at`（＝"继续聊不把会话顶到前面"）
+- 位置：`internal/memory/dao_session.go:253-279` 只 `INSERT INTO session_turn(...)`，**⛔ 碰 `session` 那一行**；
+  写 `session.updated_at` 的只有四枚点：`manage.go:93`（Create，`m.now().Unix()`）、
+  `dao_session.go:175`（Rename）、`:192`（SetSessionArchived）、`:218`（ForkSession 给新行）。
+- 读数（一发真库，两枚会话、给旧的那枚连发 10 轮）：
+  ```
+  TIEBREAK-BASELINE list order = [sess_568ef079… sess_e754a35a…] (old.updated_at=1777593660 fresh.updated_at=1777593720)
+  TIEBREAK-AFTER appends=10 turns-in-db=10 | old.updated_at 1777593660 -> 1777593660 (delta=0) | list order = [sess_568ef079… sess_e754a35a…]
+  TIEBREAK-VERDICT continuing-a-chat does NOT surface it: list[0] is still "a session I created later"
+  ```
+  ⇒ `delta=0`：发十轮，`updated_at` 一字未动，列表次序一字未动。**"按时间列"排的是最后一次"创建/改名/归档/分叉"，⛔ 最后一次说话。**
+- 代价（产品口径）：用户昨天那段对话今天继续聊，它⛔ 回到列表顶部——`List` 的语义与票面"明天再打开能回到昨天那次对话"（§这是什么）
+  对不上；界面腿/票 145 一接线就会把它画成一个"永远不挪的列表"。
+- ⛔ 本腿裁这一形该⛔ 该修（改 `AppendSessionTurn` 顺手 `UPDATE session SET updated_at=?`＝行为变更、且要定"轮次时间戳用谁的钟"），
+  只把"位置＋delta=0＋十轮后次序不变"三件交上去。
+
+## 料 2·同秒并列的次序＝一枚硬币（tie-break 本体）
+- 位置：`dao_session.go:125`（`ListSessions`）与 `dao_session.go:144`（`SearchSessions`）同一枚
+  `ORDER BY updated_at DESC, id DESC`；`updated_at` 是**秒**（`manage.go:93` `m.now().Unix()`），`id` 是随机 hex（`session.go:94-100 Mint`＝`rand.Read`＋`hex.EncodeToString`）。
+- 读数（生产时钟形状：`newTestManager(..., nil)`＝真 `time.Now`，200 对同秒创建的会话，各自一枚 workspace 里只有这两枚行）：
+  ```
+  TIEBREAK-COIN pairs=200 same-second=200 different-second=0 | order contradicts creation order in 91/200 = 45.5%
+  ```
+  ⇒ 同秒两枚会话，**45.5% 的次数列表头名不是后创建那一枚**（⛔ 是"次序稳定但方向怪"，是每次铸 id 时掷的硬币）。
+  仪器那一侧同一枚硬币在 6.2/6.3 也量到了：改前字节 `-count=20` ⇒ 顶层 FAIL 12（本腿）／7 与 12（实现腿两发）。
+- 代价：接线前机主看不见（料 3）；接线后机主每开一次面板就可能看到两段对话换个头。
+  修它要动的是**排序键**＝行为变更（可选形状⛔ 只有"加一枚单调列"一种：`seq`/`rowid`/写入时刻的毫秒列都还⛔ 定过）⇒ 交编排者拍。
+  ⚠ 本腿⛔ 动 `:125`/`:144` 一字，也⛔ 在本件里替它选一种。
+
+## 料 3·对照组：同形 SQL 在别的表上⛔ 是硬币（说明病灶是 id 形状、⛔ 是 ORDER BY 写法）
+- `dao_profile.go:86`（`ORDER BY updated_at ASC, id ASC`）与 `:111`（`ORDER BY updated_at DESC, id DESC`）——
+  本腿读码确认这两枚的 `id` 是 `INTEGER PRIMARY KEY AUTOINCREMENT`（`internal/memory/schema.go:31` 那段 ddlV1）⇒ 单调 ⇒ 同秒时次序确定。
+- `session.id` 是 `TEXT PRIMARY KEY`＋随机 hex（`schema.go:221` 的 ddlV3）⇒ 同秒时次序随机。
+  ⇒ 同一枚 `ORDER BY updated_at …, id …` 在两枚表上一好一坏：坏的那一半**换 tie-break 词治⛔ 了**（要的是单调列），
+  这一格仪器侧已由 166-r2 闭掉（`:69` 那枚硬币）。
+- 本腿补一句可见性：这条对照今天只对**写代码的人**成立——`profile` 那两支有面板读者，`session` 那一支⛔ 读者（`02-ac2-outlets-and-wiring.txt` §2.2）。
+
+## 料 4·本腿顺手量到、属"另记"的两格（⛔ 属本票 AC、⛔ 由本腿动）
+1. **接线缺口**（AC#2 判语的实体）：`session.Manager` 生产构造数 0 枚 ⇒ 四件出口今天产品走不到（料在 `02-ac2-outlets-and-wiring.txt`）。
+2. **DAO 层⛔ 分叉用例**：M1 突变（分叉时顺手清理父轮次）打在 `dao_session.go`，`internal/memory` 整包仍 `-count=1` 全绿（`ok … 12.429s`），
+   只有 `internal/session` 那一枚用例响（`04-ac4-fork-de-tooth.txt` §4.4）⇒ "不吞原件"这枚不变量今天单层把守。
