@@ -1,0 +1,16 @@
+166-v1 第 0／1／2／5 步读数落盘（AC#1 成立·AC#2 接线缺口·AC#5 成立＋一处 owner 轴上报）
+
+- 台面：两棵仓外导出树（head=feb7afae 1091 枚 .go、base=2f41a80cb 1003 枚 .go）＋六件套逐枚验在；
+  两发 go build ./... 都 rc=0；仓内工作树 go build 也 rc=0（工作树里 go.mod/.gitignore 是别腿脏改动，本腿未碰）；
+  go test ./internal/memory ./internal/session -count=1 在导出树 rc=0。
+- AC#1（未修码）＝成立：命令档 wisp sessions/history 都 rc=2 unknown command（第一发 rc=127 缺 sherpa DLL＝台面故障，补 DLL 后重跑）；
+  API 档五枚 Store 出口在基线 git grep rc=1＝0 命中、正控 HEAD＝5 命中；go doc Store 基线唯一含 session 的是 ListGrantsBySession（D45 台账）。
+- AC#2（四件最小出口）＝不成立，形状具名＝接线缺口：列/搜/改名/归档带撤销/分叉的函数与用例逐枚对号（manage.go:103/109/118/127+134/140
+  → dao_session.go:115/132/171/191/214，钉在 manage_test.go 五枚用例），但★生产调用者枚数＝0/0/0/0/0：
+  session.NewManager 全仓 .go rc=1（限域 internal cmd tools 亦 rc=1；正控 session.NewLedger＝3 命中）；
+  非测试文件里 Manager 方法调用点 rc=1；memory.Session 型在两包之外 rc=1；CLI 名册十枚无 sessions；面板快照源字段无会话读者。
+- AC#5（契约轴）＝成立：五枚笔并集名册 41 枚路径，15 枚命名 pattern 命中全 0；
+  ⚠"三枚冻结件"名册在 HANDOVER 6 处引用里无一处给出 ⇒ 按未定义即停只交命名 pattern 的数；
+  附上报（⛔ 本腿裁）：schema.go:139 抬 SchemaVersionTarget 2→3 ＋ ddlV3 两枚新表，contractSpec 11 枚 vs SPEC-02 §3 正文 9 枚。
+
+⛔ push、⛔ 勾 AC 框、⛔ 动产码/测试件一字。

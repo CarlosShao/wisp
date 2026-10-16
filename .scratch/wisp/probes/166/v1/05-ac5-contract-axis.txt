@@ -1,0 +1,56 @@
+AC#5 契约轴零字节·判语＝**成立（附一处 owner 轴上报）**
+
+## 5.1 名册算法（票面明令：按 commit 号集合算，`--no-walk`）
+实现笔集合＝`427c62d0a`（166-r1 产码＋测试）·`24e36406`（166-r1 注释改正）·`e1192509`（166-r1 读数件）·
+`c2b1ade5`＋`464f5549`（166-r2 仪器＋证据件＋读数件，编排者代提）。
+尺：`git --no-pager show --no-walk --name-only --format= <五枚> | sort -u | grep -v '^$'`
+⇒ **41 枚路径**（逐枚名册＝`05-ac5-union-roster-41.txt`，2125 字节；分笔命中数＝`05-ac5-commit-roster.txt`）。
+
+## 5.2 逐枚 pattern 命中数（全 0）
+
+| pattern | hits |
+|---|---|
+| `docs/PLAN.md` | 0 |
+| `docs/specs/` | 0 |
+| `internal/risk/` | 0 |
+| `internal/panel/` | 0 |
+| `internal/agent/approval/` | 0 |
+| `thresholds.go` | 0 |
+| `golden` | 0 |
+| `tools/d22scan/allowlist.txt` | 0 |
+| `frontend/` | 0 |
+| `design/` | 0 |
+| `.github/` | 0 |
+| `ci.yml` | 0 |
+| `go.mod` | 0 |
+| `go.sum` | 0 |
+| `.gitignore` | 0 |
+
+（尺＝`grep -F -c -- "<pattern>" 05-ac5-union-roster-41.txt`，15 枚 pattern 逐枚点名；命中全 0。）
+名册里落在产码/文档的只有 8 枚：
+`internal/memory/{dao_session.go,dao_session_test.go,migrate_v1seed_test.go,schema.go,schema_test.go}`、
+`internal/session/{manage.go,manage_test.go}`、`docs/evidence/s1/ticket166-ac6-166r2.md`，其余 33 枚在 `.scratch/wisp/**`。
+
+⚠ **`三枚冻结件` 这一条本腿量不到名册**：AGENTS.md／issues/README／HANDOVER 里"三枚冻结件"命中 6 处
+（`docs/reports/HANDOVER.md:496/520/531/541/1948` 等），⛔ 一处给出这三枚的文件名 ⇒ 本腿按"未定义即停"处理：
+⛔ 猜名册、⛔ 判它命中，只把上面 15 枚**命名** pattern 的读数交齐。要量这一格请另给名册。
+
+## 5.3 判语
+**成立**：AC#5 列出的每一条命名路径，在这五枚笔的并集名册上命中数＝0 ⇒ 契约轴零字节。
+
+## 5.4 附一处上报（⛔ 本腿裁、⛔ 改一字，交编排者/owner）
+零字节这一格⛔ 等于"契约⛔ 被碰"。本票确实动了 **D35 的表名册**，位置具名：
+- `internal/memory/schema.go:139` `const SchemaVersionTarget = 3`（原 `= 2`，`427c62d0a` 抬的）；
+- `internal/memory/schema.go:219-242` `ddlV3`（新增 `session` ＋ `session_turn` 两枚表＋三枚索引）；
+- `internal/memory/schema_test.go:44-52` 注释自陈"eleven tables / SPEC-02 §3 的正文仍列九表 ⇒ 后两枚条目是 ROSTER EXTENSION，
+  spec note 欠 owner（`probes/166/a2 §H2`）"，`:176` 与 `:188` 是新增的两枚名册条目，`:204` 把它们列进"恰好十一枚"的断言。
+- 166-r1 自己在票尾 bullet 里具名上报了这一形（"契约债——本腿动 D35 表名册…须 owner 拍"）。
+票面硬约束 1 逐字是"⛔ 新造存储…加**列**要走迁移"，交回来的是加**两枚表**（166-r1 也在 bullet 里自陈这处偏离）。
+**这一格落在"改契约＝人工批准"那条轴上（AGENTS.md §0 第 2 句／SPEC-12 §4.1），⛔ 由验收腿判成缺陷、⛔ 由本腿放行**——
+只把位置与文字交上去。两枚名册现量（`05-ac5-spec02-count.txt`）：
+`grep -c "^CREATE TABLE" docs/specs/SPEC-02-data-storage.md`＝**9**（`schema_meta/profile/memory/task_log/tool_call/approval_grant/cost_daily/plugin_state/provider_health`），
+`internal/memory/schema_test.go` 的 `contractSpec` 键＝**11**（上面九枚＋`session`＋`session_turn`，`:176`/`:188`）。
+⇒ 代码与 `docs/specs/SPEC-02 §3` 正文**枚数不一致**（9 vs 11），而 `schema.go:10-13` 那段注释自己写着
+"DDL 必须与 SPEC-02 §3 的 sql 块逐字节相同、⛔ 增删列/表/索引"——v3 之所以还守得住这句话，是因为它⛔ 改 `ddlV1/ddlV2` 一字、
+另起 `ddlV3`；**不一致的是 spec 正文的表名册、⛔ 是 DDL 文本**。要不要给 SPEC-02 补这一行＝人工批准轴，本腿⛔ 动。
+

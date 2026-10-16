@@ -1,0 +1,38 @@
+time=2026-10-16T10:01:43.116+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp: unknown command "sessions"
+
+wisp - personal voice agent for Windows
+
+Usage:
+  wisp             GUI resident process: boots the runtime skeleton, hosts the
+                   floating ball window, its tray icon and its four global hot
+                   keys in this same process, shows confirmation cards on that
+                   ball, and takes tasks from the operator's console when this
+                   process really owns one (ticket 246 AC#7: no interactive
+                   console means the task entry says so out loud and the ball
+                   keeps running; Ctrl+C stops the process, and the tray's Exit
+                   item still has no stop path attached to it)
+  wisp run "task"  run one task end to end through the agent loop (ticket 12:
+                   the S1 text path - streamed reply + notification + exit code
+                   that reflects the error class)
+  wisp providers   provider catalog path (ticket 12, ruling A11): discover
+                   <provider> lists /v1/models; probe <provider>/<model> runs
+                   the capability probe suite into provider_health
+  wisp secret      credential entry (ticket 63): set/get/list/unset a DPAPI
+                   blob without the key ever entering argv, a log line or chat
+  wisp models      signed model store (C29, ticket 121 AC#2): list the verified
+                   manifest, re-check an installed model, or make one available
+                   through the Downloading hand-off and its re-verification
+  wisp doctor      toolchain and native-DLL self-check, prints PASS/FAIL
+  wisp panel-assets  embedded panel bundle (ticket 77): -manifest lists what the
+                   binary carries, -render <path> writes the bytes the WebView2
+                   host would serve (proof the UI needs no node and no network)
+  wisp panel-inbound  inbound panel dispatch leg (ticket 33 AC#9): reads one raw
+                   composer envelope per stdin line and hands it to the inbound
+                   router; -data names the data root (this leg never resolves one)
+  wisp slo         SLO sampling driver (ticket 08): one state per run, JSON
+                   verdict; driven by scripts/slo-check.ps1
+  wisp version     print version information
+  wisp help        show this help
+
+Environment: WISP_ENV in {prod|dev|test}, default from build (SPEC-03 §5).

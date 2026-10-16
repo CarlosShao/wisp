@@ -1,0 +1,13 @@
+internal/panel/approval.go:31:	// CallChain is outermost-first, e.g. ["session", "agent-loop", "shell.run"].
+internal/panel/approval.go:53:	// SessionOverrideBlocked mirrors Decision.SessionOverrideBlocked (R4 taint).
+internal/panel/approval.go:54:	SessionOverrideBlocked bool     `json:"sessionOverrideBlocked"`
+internal/panel/approval.go:85:		SessionOverrideBlocked: decision.SessionOverrideBlocked,
+internal/panel/attachments.go:45:// user pick must not be able to evict a session's worth of tool evidence under
+internal/panel/composer.go:227:// WorkspaceRequest is the panel's intent to narrow the session to a folder.
+internal/panel/composer.go:244:	// declaration that matches it on the page side is not this session's to
+internal/panel/pump.go:84:	// honest empty, not a filler: inventing ["session","agent-loop",tool] here
+internal/panel/pump.go:90:	SessionOverrideBlocked bool
+internal/panel/pump.go:110:			SessionOverrideBlocked: v.SessionOverrideBlocked,
+internal/panel/subagent_roster_197.go:36://     the SAME conversation components over the child session - no host call
+internal/panel/subagent_roster_197.go:38://     "load session X into pane Y" would be a fifth composer method, which is a
+internal/panel/workspace.go:5:// The composer may show which folder the session is scoped to and ask for a

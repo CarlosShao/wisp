@@ -1,0 +1,72 @@
+package memory // import "github.com/CarlosShao/wisp/internal/memory"
+
+type Store struct {
+	// Has unexported fields.
+}
+    Store owns wisp.db and the artifacts directory. Create with Open; all
+    methods are safe for concurrent use.
+
+func Open(dir string, opts ...Option) (*Store, error)
+func (s *Store) AddMemory(ctx context.Context, content string, keywords ...string) (int64, error)
+func (s *Store) AppendSessionTurn(ctx context.Context, t SessionTurn) (int64, error)
+func (s *Store) ArtifactsDir() string
+func (s *Store) BumpCostDay(ctx context.Context, day string, tokensIn, tokensOut, costMicros int64) error
+func (s *Store) Close() error
+func (s *Store) CostDay(ctx context.Context, day string) (CostDaily, error)
+func (s *Store) DecideToolCall(ctx context.Context, id int64, decision string, grantID *int64) error
+func (s *Store) DeleteArtifact(ctx context.Context, name string) error
+func (s *Store) DeleteGrant(ctx context.Context, id int64) error
+func (s *Store) DeleteMemory(ctx context.Context, id int64) error
+func (s *Store) DeletePluginState(ctx context.Context, id string) error
+func (s *Store) DeletePrivacyItem(ctx context.Context, domain PrivacyDomain, id string) error
+func (s *Store) DeleteProfile(ctx context.Context, id int64) error
+func (s *Store) DeleteTaskLog(ctx context.Context, id string) error
+func (s *Store) DeleteToolCall(ctx context.Context, id int64) error
+func (s *Store) Dir() string
+func (s *Store) ExportPrivacy(ctx context.Context, domain PrivacyDomain) ([]byte, error)
+func (s *Store) FinishTaskLog(ctx context.Context, id, state, summary string, ...) error
+func (s *Store) FinishToolCall(ctx context.Context, id int64, outcome, errorClass string) error
+func (s *Store) ForkSession(ctx context.Context, parentID, newID string) (Session, error)
+func (s *Store) InsertGrant(ctx context.Context, g ApprovalGrant) (int64, error)
+func (s *Store) InsertSession(ctx context.Context, sess Session) error
+func (s *Store) InsertToolCall(ctx context.Context, tc ToolCall) (int64, error)
+func (s *Store) ListArtifacts(ctx context.Context) ([]Artifact, error)
+func (s *Store) ListCostDaily(ctx context.Context) ([]CostDaily, error)
+func (s *Store) ListGrants(ctx context.Context) ([]ApprovalGrant, error)
+func (s *Store) ListGrantsBySession(ctx context.Context, sessionID string) ([]ApprovalGrant, error)
+func (s *Store) ListMemories(ctx context.Context) ([]Memory, error)
+func (s *Store) ListPluginStates(ctx context.Context) ([]PluginState, error)
+func (s *Store) ListPrivacy(ctx context.Context, domain PrivacyDomain) ([]PrivacyItem, error)
+func (s *Store) ListProfiles(ctx context.Context) ([]Profile, error)
+func (s *Store) ListProviderHealth(ctx context.Context) ([]ProviderHealth, error)
+func (s *Store) ListSessionTurns(ctx context.Context, sessionID string) ([]SessionTurn, error)
+func (s *Store) ListSessions(ctx context.Context, opts SessionListOptions) ([]Session, error)
+func (s *Store) ListTaskLogs(ctx context.Context) ([]TaskLog, error)
+func (s *Store) ListToolCalls(ctx context.Context) ([]ToolCall, error)
+func (s *Store) ListToolCallsByTask(ctx context.Context, taskID string) ([]ToolCall, error)
+func (s *Store) MemoryByID(ctx context.Context, id int64) (Memory, error)
+func (s *Store) PluginStateByID(ctx context.Context, id string) (PluginState, error)
+func (s *Store) ProfileBySlot(ctx context.Context, slot string) (Profile, error)
+func (s *Store) ProviderHealthRow(ctx context.Context, provider, model string) (ProviderHealth, error)
+func (s *Store) PurgeArtifacts(ctx context.Context) (int, error)
+func (s *Store) PurgeMemories(ctx context.Context) (int64, error)
+func (s *Store) PurgePrivacy(ctx context.Context, domain PrivacyDomain) (int64, error)
+func (s *Store) PurgeProfiles(ctx context.Context) (int64, error)
+func (s *Store) PurgeTaskLogs(ctx context.Context) (int64, error)
+func (s *Store) PurgeToolCalls(ctx context.Context) (int64, error)
+func (s *Store) PutArtifact(ctx context.Context, name string, data []byte) error
+func (s *Store) RecordProviderError(ctx context.Context, provider, model, class, detail, quotaState string) error
+func (s *Store) RenameSession(ctx context.Context, id, title string) error
+func (s *Store) RevokeGrant(ctx context.Context, id int64) error
+func (s *Store) RunRetentionOnce(ctx context.Context, cfg RetentionConfig) RetentionResult
+func (s *Store) SearchMemory(ctx context.Context, query string, limit int) ([]Memory, error)
+func (s *Store) SearchSessions(ctx context.Context, q string, opts SessionListOptions) ([]Session, error)
+func (s *Store) SessionByID(ctx context.Context, id string) (Session, error)
+func (s *Store) SetSessionArchived(ctx context.Context, id string, archived bool) error
+func (s *Store) StartRetentionJob(scope *plugin.DisposalScope, cfg RetentionConfig)
+func (s *Store) StartTaskLog(ctx context.Context, tl TaskLog) error
+func (s *Store) TaskLogByID(ctx context.Context, id string) (TaskLog, error)
+func (s *Store) ToolCallByID(ctx context.Context, id int64) (ToolCall, error)
+func (s *Store) UpsertPluginState(ctx context.Context, p PluginState) error
+func (s *Store) UpsertProfile(ctx context.Context, slot, content string, source ProfileSource) (int64, error)
+func (s *Store) UpsertProviderProbe(ctx context.Context, provider, model string, flags ProbeFlags, ok bool, ...) error

@@ -1,0 +1,37 @@
+### R1 git grep -n session\.NewManager -- '*.go' (HEAD)
+rc=1
+
+### R2 positive control: git grep -n 'session\.Ledger' -- '*.go'
+.scratch/wisp/probes/198/v2/backup/run.go:282:	session *session.Ledger
+.scratch/wisp/probes/198/v2/backup/run.go:478:		ledger, lerr := session.NewLedger(session.LedgerOptions{
+.scratch/wisp/probes/198/v2/backup/run.go:570:	// The typed-nil guard is load-bearing: a nil *session.Ledger assigned into an
+cmd/wisp/resident_approval_windows.go:227:// *session.Ledger, would both land in h.target as a NON-nil interface value
+cmd/wisp/resident_approval_windows.go:239:// bindSessionLedger is the typed half of bind, the one a *session.Ledger - which
+cmd/wisp/resident_approval_windows.go:243:func (h *residentGrantHolder) bindSessionLedger(l *session.Ledger) {
+cmd/wisp/resident_approval_windows.go:285:func (ra *residentApproval) bindResidentGrantLedger(l *session.Ledger) {
+cmd/wisp/resident_grant_writer_265_windows_test.go:278:	// A nil *session.Ledger must not become a non-nil interface holding nil.
+cmd/wisp/run.go:282:	session *session.Ledger
+cmd/wisp/run.go:481:		ledger, lerr := session.NewLedger(session.LedgerOptions{
+cmd/wisp/run.go:573:	// The typed-nil guard is load-bearing: a nil *session.Ledger assigned into an
+internal/agent/approval/gate.go:64:// *session.Ledger; declared here as one method so this package never imports
+internal/agent/approval/ticket318_widening_marker_rulers_test.go:71:// whole card is refused - the any-path shape session.Ledger.Covering already
+internal/tools/ticket224_grantid_column_test.go:113:	// *session.Ledger returns, and it is the only way the join can be asserted.
+rc=0
+
+### R3 Store session-outlet call sites (all .go)
+internal/memory/dao_session_test.go:22:		if err := s.InsertSession(ctx, sess); err != nil {
+internal/memory/dao_session_test.go:26:	got, err := s.SearchSessions(ctx, "%", SessionListOptions{})
+internal/memory/dao_session_test.go:120:	if err := replayed.InsertSession(context.Background(),
+internal/session/manage.go:95:	if err := m.store.InsertSession(ctx, sess); err != nil {
+internal/session/manage.go:104:	return m.store.ListSessions(ctx, opts)
+internal/session/manage.go:113:	return m.store.SearchSessions(ctx, q, opts)
+internal/session/manage.go:123:	return m.store.RenameSession(ctx, id, title)
+internal/session/manage.go:128:	return m.store.SetSessionArchived(ctx, id, true)
+internal/session/manage.go:135:	return m.store.SetSessionArchived(ctx, id, false)
+internal/session/manage.go:145:	return m.store.ForkSession(ctx, id, newID.String())
+internal/session/manage.go:150:	return m.store.AppendSessionTurn(ctx, memory.SessionTurn{
+internal/session/manage.go:158:	return m.store.ListSessionTurns(ctx, sessionID)
+internal/session/manage_test.go:143:	row, err := store.SessionByID(ctx, s.ID)
+internal/session/manage_test.go:173:	if _, err := store.SessionByID(ctx, s.ID); err != nil {
+internal/session/manage_test.go:220:	if prow, err := store.SessionByID(ctx, parent.ID); err != nil || prow.Title != "orig" || prow.ForkedFrom != "" {
+rc=0

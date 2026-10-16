@@ -1,0 +1,9 @@
+### R9 session.NewManager production-path restricted (internal cmd tools, non-test)
+rc=1
+### R9b positive control: session\.NewLedger in same scope
+cmd/wisp/resident_approval_windows.go:260:			"（装配根还没走到 session.NewLedger，或那一发没铸出会话身份），本次「本会话内允许」没有记下任何规则")
+cmd/wisp/resident_grant_writer_265_windows_test.go:555:			if strings.Contains(line, "session.Mint(") || strings.Contains(line, "session.NewLedger(") {
+cmd/wisp/run.go:481:		ledger, lerr := session.NewLedger(session.LedgerOptions{
+rc=0
+### R10 Manager method call sites (non-test files under internal/cmd)
+rc=1

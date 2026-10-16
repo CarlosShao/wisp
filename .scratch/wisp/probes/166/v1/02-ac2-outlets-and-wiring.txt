@@ -1,0 +1,67 @@
+AC#2 四件最小出口（列／搜／改名／归档带撤销）·判语＝**不成立（接线缺口）**
+
+每格三问：① 落在哪个函数与哪枚用例；② **生产调用者枚数**；③ 未修码上响不响。
+②那一问⛔ 用 `go build`/`go vet` 的 rc=0 冒充接线（Go 不为未使用方法报错，本包全部方法的编译色与接线与否无关）；
+只认 `git grep` 的调用点枚数。下面每一把尺都自己复跑过，逐字命中在
+`02-ac2-greps-outlets.txt` / `02-ac2-greps-restricted.txt`（新manager＋类型面）/ `02-ac2-greps-newmanager-and-types.txt`（不限域的那把，噪声大，仅供核对）。
+
+## 2.1 四件＋第五件（分叉，AC#4 用）的落点与用例
+
+| 出口 | 会话层函数 | 存储层函数 | 钉它的用例（`internal/session/manage_test.go`） | 用例里的调用行 |
+|---|---|---|---|---|
+| 列（按时间） | `manage.go:103 Manager.List` | `dao_session.go:115 ListSessions`（`ORDER BY updated_at DESC, id DESC` 在 `:125`） | `TestSessionListByTime`（`:51`） | `:56` |
+| 列（按工作区） | 同上 | 同上（`workspace=?` 在 `:122`） | `TestSessionListByWorkspace`（`:77`） | `:82` |
+| 搜（标题＋正文） | `manage.go:109 Manager.Search`（空串⇒0 行，`:110-112`） | `dao_session.go:132 SearchSessions`（title LIKE ＋ EXISTS(session_turn.content LIKE)，`:134-135`） | `TestSessionSearchTitleAndBody`（`:95`）＋ DAO 侧 `dao_session_test.go:15 TestSessionSearchEscapesWildcards` | `:108/:115/:122/:125`；DAO `:26` |
+| 改名 | `manage.go:118 Manager.Rename` | `dao_session.go:171 RenameSession`（只写 `title,updated_at`） | `TestSessionRenameAndArchiveUndo`（`:131`，改名后逐字比对轮次 `:150`） | `:140` |
+| 归档带撤销 | `manage.go:127 Archive` ＋ `manage.go:134 Unarchive` | `dao_session.go:191 SetSessionArchived`（归档写 `archived_at`、撤销置回 NULL，两支都⛔ 删行） | 同一枚 `TestSessionRenameAndArchiveUndo`：归档后活动列表为空 `:157`、`IncludeArchived` 看得见 `:160`、撤销后回到活动列表 `:169`、行没被删 `:173` | `:154/:166` |
+| 分叉 | `manage.go:140 Manager.Fork` | `dao_session.go:214 ForkSession` | `TestSessionForkDoesNotSwallowOriginal`（`:181`） | `:197` |
+
+（行号＝本腿 HEAD `feb7afae` 现量，`internal/session/manage_test.go` 239 行、`manage.go` 159 行、`dao_session.go` 299 行。）
+
+## 2.2 ★生产调用者枚数（这是本格的判决读数）
+
+HEAD 现量，五把尺：
+
+1. `git --no-pager grep -n "session\.NewManager" -- '*.go'` ⇒ **rc=1，0 命中**（stderr 空）。
+   限域再来一把：`... -- internal cmd tools` ⇒ **rc=1，0 命中**。
+   ⇒ 生产里**从来没有构造过一枚 `*session.Manager`**。正控（证明这把尺是活的）：同域 `session\.NewLedger` ⇒ **3 命中**
+   （`cmd/wisp/run.go:481`、`cmd/wisp/resident_approval_windows.go:260`、一枚测试里的字符串匹配）。
+2. 非测试文件里的 Manager 方法调用点：
+   `git --no-pager grep -n -E "\.(List|Search|Rename|Archive|Unarchive|Fork|AppendTurn|Turns|Create)\(" -- internal/session cmd/wisp ":!*_test.go"`
+   ⇒ **rc=1，0 命中**。（`manage.go` 里那些是**定义** `func (m *Manager) List(`，⛔ 匹配 `.List(`；
+   所以 0 命中的意思是"⛔ 调用点"，⛔ 是"⛔ 实现"。）
+3. 存储层出口调用点（`02-ac2-greps-outlets.txt` 的 R3，全仓 `.go`）：命中 **15 行**＝
+   **9 行在 `internal/session/manage.go`（会话层自己往下调）、3 行在 `manage_test.go`（全 `SessionByID`）、3 行在 `dao_session_test.go`（`:22/:26/:120`）**
+   ⇒ **生产调用者＝0 枚**（`manage.go` 那 9 行是"会话层→存储层"，而会话层自己⛔ 被任何人构造，见尺 1）。
+4. 类型面：`git --no-pager grep -n -E "memory\.(Session|SessionTurn|SessionListOptions)" -- '*.go' ":!internal/memory" ":!internal/session"`
+   ⇒ **rc=1，0 命中** ⇒ `internal/panel`／`internal/tools`／`cmd/wisp` 的产码里⛔ 会话行类型。
+5. 出口名册面（本腿自己看盘，⛔ 抄 166-r2）：
+   - CLI 名册 HEAD 仍十枚（`cmd/wisp/main.go` 的 `switch args[0]`），⛔ `sessions`/`history` 任何一枚；
+   - 面板快照的源是 `internal/panel/pump.go:138 PumpSources` 的**读者字段**
+     （`Verdicts/Mode/Workspace/Git/Model/Credential/…`）与 `internal/panel/composer.go:57 Snapshot`
+     （`pending/results/composer/generatedAt/instructions`）⇒ ⛔ "把历史会话列出来"那一格；
+   - `internal/panel/**` 的产码里含 "session" 的行＝**13 枚**
+     （`git --no-pager grep -n -i "session" -- internal/panel ":(exclude)*_test.go"` ⇒ `/d/tmp/wisp-166v1/out/ac2-panel-nontest.txt`；
+     另 8 枚在测试件里，`02-ac2-greps-newmanager-and-types.txt` R8b 那把尺的排除式多写了一枚空格 ⇒ 21 行是把测试件算进去的脏数，只当索引看）。
+     这 13 枚全是 D45 授权/组合器语境的"session"词，`internal/panel/subagent_roster_197.go:38` 甚至明写
+     `"load session X into pane Y" would be a fifth composer method, which is a`（＝这一格⛔ 本切片的面）。
+   - `cmd/wisp/run.go:282/481` 与 `cmd/wisp/resident_approval_windows.go:243/285` 碰的是 `session.Ledger`/`session.Mint`（D45 台账），⛔ `Manager`。
+
+⇒ **列／搜／改名／归档（含撤销）四件的生产调用者枚数＝0／0／0／0；分叉＝0。**
+
+## 2.3 "这一发在未修码上响不响"（逐件）
+
+基线 `2f41a80cb` 上五枚存储层函数 **0 命中**（尺见 `01-ac1-unmodified-reading.txt` §1.2 尺 1，`GREP_BASE_RC=1`），
+`CREATE TABLE session` 在 `*.go` 里 **0 命中**，`go doc ./internal/memory Store` 里唯一含 "session" 的是 `ListGrantsBySession`。
+⇒ 四件出口＋分叉在未修码上**全部不存在**（⛔ 响＝没有这条路），本票写之前盘上确实列不出一段昨天的对话。
+
+## 2.4 判语（AC#2）
+
+**不成立**，缺陷形状具名＝**接线缺口（wiring gap）**：
+- 函数与用例都真在盘上（2.1 那一表逐枚可对号，`go test ./internal/session/ ./internal/memory/ -count=1` 在导出树上 **rc=0** 全绿），
+  但**没有任何一条生产调用链能走到它们**：`session.NewManager` 全仓 0 命中 ⇒ `Manager` 从未被装配根构造 ⇒
+  用户今天打开程序，仍然⛔ 一条路能回到"昨天那次对话"（命令档⛔ 子命令、面板⛔ 读者、审批链⛔ 类型）。
+- 票面 AC#2 说的是"四件最小出口"。**出口＝能被产品走到**。按这个口径本格⛔ 完成；
+  按"Go 侧函数与测试齐了"这个口径它是齐的——所以判语写成 **接线缺口**、⛔ 写成本票已完成（派单 §AC#2 那一支的明令）。
+- ⛔ 本票 AC#2 的缺口需要额外新代码才能闭：`Manager` 已把四件都写好了，缺的是**装配根构造＋一枚命令或面板读者**
+  （`cmd/wisp/**` 与 `internal/panel/**` 是别的写面的家，本腿只报位置、⛔ 提议改法）。

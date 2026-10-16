@@ -1,0 +1,58 @@
+=== 427c62d0a ===
+427c62d0a|2026-10-13 18:07|票 166-r1：Go 侧会话管理层（列/搜/改名/归档带撤销/分叉）＋ schema v3（session/session_turn）
+
+.scratch/wisp/probes/166/r1/ac1-census.txt
+.scratch/wisp/probes/166/r1/logs/00-head.txt
+internal/memory/dao_session.go
+internal/memory/dao_session_test.go
+internal/memory/migrate_v1seed_test.go
+internal/memory/schema.go
+internal/memory/schema_test.go
+internal/session/manage.go
+internal/session/manage_test.go
+=== c2b1ade5 ===
+c2b1ade56|2026-10-16 09:07|收 166-r2（腿死于断流、盘上唯一一枚中间态＝把会话列表那枚硬币仪器改成确定性）⇒ 代提，标〔未验证半成品·AC 框未翻〕＋★更正我上一发（8baec646）里写错的一句
+
+internal/session/manage_test.go
+=== 464f5549 ===
+464f5549b|2026-10-16 09:14|收 166-r2 补齐三处写面：证据件（94 行）＋读数件 23 枚＋票尾一条 bullet ⇒ ★更正 c2b1ade5 那句"盘上唯一一枚中间态"不实
+
+.scratch/wisp/issues/166-no-session-layer-list-search-rename-archive-fork-on-the-go-side.md
+.scratch/wisp/probes/166/r2/00-ruler.sh
+.scratch/wisp/probes/166/r2/01-surface.txt
+.scratch/wisp/probes/166/r2/02-before.txt
+.scratch/wisp/probes/166/r2/03-after.txt
+.scratch/wisp/probes/166/r2/04-teeth.txt
+.scratch/wisp/probes/166/r2/05-prod-visibility.txt
+.scratch/wisp/probes/166/r2/06-gates.txt
+.scratch/wisp/probes/166/r2/06-mutate-clock.sh
+.scratch/wisp/probes/166/r2/07-logindex-and-rulers.txt
+.scratch/wisp/probes/166/r2/logs/after-all-count20.filtered.txt
+.scratch/wisp/probes/166/r2/logs/after-fullpkg-count1.filtered.txt
+.scratch/wisp/probes/166/r2/logs/after-fullpkg-count20.filtered.txt
+.scratch/wisp/probes/166/r2/logs/after-list-count20-round2.filtered.txt
+.scratch/wisp/probes/166/r2/logs/after-list-count20.filtered.txt
+.scratch/wisp/probes/166/r2/logs/after-search-count20.filtered.txt
+.scratch/wisp/probes/166/r2/logs/before-count20-round2.filtered.txt
+.scratch/wisp/probes/166/r2/logs/before-count20.filtered.txt
+.scratch/wisp/probes/166/r2/logs/final-green-list-count20.filtered.txt
+.scratch/wisp/probes/166/r2/logs/restore-list-count20.filtered.txt
+.scratch/wisp/probes/166/r2/logs/sanity-count1.log
+.scratch/wisp/probes/166/r2/logs/teeth-flatclock-list-count20-round2.filtered.txt
+.scratch/wisp/probes/166/r2/logs/teeth-flatclock-list-count20.filtered.txt
+.scratch/wisp/probes/166/r2/logs/teeth-flatclock-search-count20.filtered.txt
+.scratch/wisp/probes/orch/20261016/txt/166r2-bullet.md
+.scratch/wisp/probes/orch/20261016/txt/msg-166r2-close.md
+docs/evidence/s1/ticket166-ac6-166r2.md
+=== 24e36406 ===
+24e364065|2026-10-13 18:10|票 166-r1 修：schema.go 注释里一枚 ban #9 幻影引用（docs/specs/SPEC-02 → SPEC-02 简写形，d22scan 自省红）
+
+internal/memory/schema.go
+=== e1192509 ===
+e11925096|2026-10-13 18:12|票 166-r1：交五枚读数件（门禁 rc／AC2 四件出口／AC3 迁移原子性／AC4 分叉不吞原件／AC5 契约轴）
+
+.scratch/wisp/probes/166/r1/ac2-outlets.txt
+.scratch/wisp/probes/166/r1/ac3-migration.txt
+.scratch/wisp/probes/166/r1/ac4-fork.txt
+.scratch/wisp/probes/166/r1/ac5-contract.txt
+.scratch/wisp/probes/166/r1/gates.txt

@@ -1,0 +1,42 @@
+166-v1 台件与台面（验收腿·裁决者·非实现者）·2026-10-16 09:5x–10:0x +08
+
+## 0.1 锚与读面
+- 本腿 HEAD 起手＝`feb7afae`（派单锚 `46007856` 之后 14 笔，全部属 322/325/317/324 与编排者自己的件）。
+  尺：`git log --oneline 46007856..HEAD`＝14 行；`git diff --stat 46007856 HEAD -- internal/session internal/memory`＝**空输出（0 行）**
+  ⇒ 本票的两枚写面（`internal/session/**`、`internal/memory/**`）在派单锚与本腿 HEAD 之间**一字未动**，
+  读哪一头都一样。判语一律按 `internal/session`+`internal/memory` 的现量字节＝
+  `manage.go` 159 行／`dao_session.go` 299 行／`schema.go` 277 行（含 v3 那段）／四件测试件。
+- 实现笔集合（AC#5 名册就按这五枚算）：`427c62d0a`（166-r1 产码＋测试）·`24e36406`（166-r1 注释改正）·
+  `e1192509`（166-r1 五枚读数件）·`c2b1ade5`＋`464f5549`（166-r2 仪器＋证据件＋读数件，编排者代提）。
+- 未修码基线＝`427c62d0a^`＝`2f41a80cb`（2026-10-13 18:05，186-a1 的件）。
+
+## 0.2 两棵仓外导出树（一切编译/测试/突变都在这两棵上跑，⛔ 共享工作树）
+- `git archive HEAD        | tar -x -C /d/tmp/wisp-166v1/tree-head`：六件套 `go.mod go.sum internal cmd tools scripts` 逐枚验在（OK×6），
+  `.go` 计数＝**1091**（证非空）。
+- `git archive 2f41a80cb   | tar -x -C /d/tmp/wisp-166v1/tree-base`：同样六枚 OK，`.go` 计数＝**1003**。
+- 编译（⛔ 从管道取退码，rc 都是命令后立刻 `echo $?`）：
+  - `tree-head` `go build ./...` ⇒ **BUILD_HEAD_RC=0**，输出空。
+  - `tree-base` `go build ./...` ⇒ **BUILD_BASE_RC=0**，输出空。
+  - 仓内共享工作树 `go build ./...` ⇒ **BUILD_WORKTREE_RC=0**（此刻没有别腿在飞的红句；
+    工作树里 `go.mod` 与 `.gitignore` 是**别人的脏改动**（`git diff -- go.mod` 显示 webview2 依赖从 indirect 提到 direct），
+    本腿⛔ 碰、⛔ 记进本票判语，只说明为什么一切读数走导出树）。
+- 环境：`go version go1.27.1 windows/amd64`；`GOTMPDIR=D:/tmp/wisp-166v1/gotmp`（先 `mkdir -p`，非 `%LOCALAPPDATA%` 卷）；
+  `TMPDIR=D:/tmp/wisp-166v1/gotmp`；GOCACHE=`E:\work\data\caches\go-build`。
+- `internal/memory` 的测试**全部走真 SQLite**（`Open` ⇒ 真 `wisp.db`＋真 WAL），本腿⛔ 引入 mock。
+
+## 0.3 起手门禁（导出树 head）
+`go test ./internal/memory/ ./internal/session/ -count=1` ⇒ **GATE_RC=0**
+```
+ok  	github.com/CarlosShao/wisp/internal/memory	13.084s
+ok  	github.com/CarlosShao/wisp/internal/session	1.235s
+```
+（原文逐字见 `00-gate-memory-session-headtree.txt`；这一格只是台面证明，⛔ 任何 AC 的凭据。）
+
+## 0.4 本腿用到的命令（可逐字重跑）
+- `git --no-pager grep -n -E "func \(s \*Store\) (ListSessions|SearchSessions|RenameSession|SetSessionArchived|ForkSession)" <rev> -- internal cmd`
+- `git --no-pager grep -n "session\.NewManager" -- '*.go'`（＋同形正控 `session\.NewLedger`）
+- `go doc ./internal/memory Store`（两棵树各一发）
+- 命令档：`wisp-base.exe sessions list -data <dir>` 与 `wisp-base.exe history`
+  （`wisp-base.exe`＝`go build -o /d/tmp/wisp-166v1/out/wisp-base.exe ./cmd/wisp` 出自 `tree-base`；
+  第一发撞 `rc=127 sherpa-onnx-c-api.dll: cannot open shared object file`＝**台面故障**（导出树里 `.dll` 计数＝0，三枚 sherpa DLL ⛔ tracked、进不了 `git archive`），
+  把仓内 `third_party/sherpa-onnx/*.dll` 三枚拷到 exe 旁边后重跑才拿到 rc=2 的真读数；两发都写在件里。）

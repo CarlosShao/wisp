@@ -1,0 +1,154 @@
+### R4 git grep -n NewManager -- '*.go'
+.scratch/wisp/probes/151-accept/run.shipped.go:26:// INJECTED into the decision chain (config.NewManager -> perm.Store ->
+.scratch/wisp/probes/151-accept/run.shipped.go:278:	mgr, err := config.NewManager(cfgPath, nil)
+.scratch/wisp/probes/151/run.head.go:26:// INJECTED into the decision chain (config.NewManager -> perm.Store ->
+.scratch/wisp/probes/151/run.head.go:278:	mgr, err := config.NewManager(cfgPath, nil)
+.scratch/wisp/probes/151/run.mut-noclose.go:26:// INJECTED into the decision chain (config.NewManager -> perm.Store ->
+.scratch/wisp/probes/151/run.mut-noclose.go:278:	mgr, err := config.NewManager(cfgPath, nil)
+.scratch/wisp/probes/197/r3b/pre/run.go:26:// INJECTED into the decision chain (config.NewManager -> perm.Store ->
+.scratch/wisp/probes/197/r3b/pre/run.go:312:	mgr, err := config.NewManager(cfgPath, nil)
+.scratch/wisp/probes/198/v2/backup/run.go:26:// INJECTED into the decision chain (config.NewManager -> perm.Store ->
+.scratch/wisp/probes/198/v2/backup/run.go:409:	mgr, err := config.NewManager(cfgPath, nil)
+.scratch/wisp/probes/223/v1/overlay/zz_v1probe_cmdwisp_test.go:8:// config.NewManager 装配一枚活 Manager → 手改文件 → CheckAndReload → 把错误交生产句子函数。
+.scratch/wisp/probes/223/v1/overlay/zz_v1probe_cmdwisp_test.go:55:			mgr, err := config.NewManager(path, nil)
+.scratch/wisp/probes/223/v1/overlay/zz_v1probe_cmdwisp_test.go:57:				t.Fatalf("NewManager on a canonical config must work: %v", err)
+.scratch/wisp/probes/223/v2/overlay/zz_v2probe_cmdwisp_test.go:35:	mgr, err := config.NewManager(path, nil)
+.scratch/wisp/probes/223/v2/overlay/zz_v2probe_cmdwisp_test.go:37:		t.Fatalf("NewManager on canonical config: %v", err)
+.scratch/wisp/probes/231/r1/mutation/config_reload_no_branch.go:93:// config.toml through config.NewManager and owns no tick, because it has no
+.scratch/wisp/probes/231/v1/mutation/config_reload_branch_after_prefix.go:93:// config.toml through config.NewManager and owns no tick, because it has no
+.scratch/wisp/probes/231/v1/mutation/config_reload_no_branch.go:93:// config.toml through config.NewManager and owns no tick, because it has no
+.scratch/wisp/probes/231/v1/mutation/config_sentences_223r2_pre_ac3_test.go:95:			mgr, err := config.NewManager(path, nil)
+.scratch/wisp/probes/231/v1/mutation/config_sentences_223r2_pre_ac3_test.go:97:				t.Fatalf("NewManager on a canonical config must work: %v", err)
+.scratch/wisp/probes/255/r6/mutations/baseline-panel_geometry_255_test.go:330:	for _, banned := range []string{"config.LoadFile", "config.NewManager", "configFileName", "config.toml"} {
+.scratch/wisp/probes/255/r6/mutations/baseline-panel_resident_windows.go:172:// config.NewManager exists, so what the assembly root hands the host is a closure
+.scratch/wisp/probes/255/r6/mutations/delivered-panel_geometry_255_test.go:330:	for _, banned := range []string{"config.LoadFile", "config.NewManager", "configFileName", "config.toml"} {
+.scratch/wisp/probes/255/r6/mutations/m1-panel_resident_windows.go:172:// config.NewManager exists, so what the assembly root hands the host is a closure
+.scratch/wisp/probes/255/r6/mutations/m2-panel_resident_windows.go:173:// config.NewManager exists, so what the assembly root hands the host is a closure
+.scratch/wisp/probes/257/r2/mut/M1/firstrun.go:145:	//      NewManager 第二参数全 nil），⛔ 不把它列成入口、也不回显任何值（AC#3）。
+.scratch/wisp/probes/257/r2/mut/M2/firstrun.go:145:	//      NewManager 第二参数全 nil），⛔ 不把它列成入口、也不回显任何值（AC#3）。
+.scratch/wisp/probes/257/r2/mut/M3/firstrun.go:145:	//      NewManager 第二参数全 nil），⛔ 不把它列成入口、也不回显任何值（AC#3）。
+.scratch/wisp/probes/257/r2/mut/M4/firstrun.go:148:	//      NewManager 第二参数全 nil），⛔ 不把它列成入口、也不回显任何值（AC#3）。
+.scratch/wisp/probes/257/r2/mut/M5/firstrun.go:145:	//      NewManager 第二参数全 nil），⛔ 不把它列成入口、也不回显任何值（AC#3）。
+.scratch/wisp/probes/257/r2/mut/M6/firstrun.go:145:	//      NewManager 第二参数全 nil），⛔ 不把它列成入口、也不回显任何值（AC#3）。
+.scratch/wisp/probes/257/r2/mut/M7/firstrun.go:145:	//      NewManager 第二参数全 nil），⛔ 不把它列成入口、也不回显任何值（AC#3）。
+.scratch/wisp/probes/257/r2/mut/M8/firstrun_257_nonpreset_test.go:24:// exported loader the production process itself uses (config.NewManager, the
+.scratch/wisp/probes/257/r2/mut/M8/firstrun_257_nonpreset_test.go:108:	_, err := config.NewManager(cfgPath, nil)
+.scratch/wisp/probes/257/r2/mut/M8/firstrun_257_nonpreset_test.go:129:	m, err := config.NewManager(cfgPath, nil)
+.scratch/wisp/probes/257/r2/snapshot-firstrun.go:145:	//      NewManager 第二参数全 nil），⛔ 不把它列成入口、也不回显任何值（AC#3）。
+.scratch/wisp/probes/257/r2/snapshot-firstrun_257_test.go:173:	m, err := config.NewManager(cfgPath, nil)
+.scratch/wisp/probes/257/r2/snapshot-firstrun_257_test.go:175:		t.Fatalf("NewManager over the created first config (production shape, res=nil per A560): %v", err)
+.scratch/wisp/probes/257/r2/snapshot-firstrun_257_test.go:247:	m, err := config.NewManager(cfgPath, nil)
+.scratch/wisp/probes/257/r2/snapshot-firstrun_257_test.go:287:	m, err := config.NewManager(cfgPath, nil)
+.scratch/wisp/probes/313/v1/zz313v1probe_test.go:27:	mgr, err := config.NewManager(filepath.Join(dir, configFileName), nil)
+.scratch/wisp/probes/313/v1/zz313v1probe_test.go:29:		t.Fatalf("config.NewManager: %v", err)
+.scratch/wisp/probes/319/r4/prechange-panel_resident_windows.go:172:// config.NewManager exists, so what the assembly root hands the host is a closure
+cmd/balldebug/main.go:231:		mgr, errC := config.NewManager(*configPath, nil)
+cmd/balldebug/main.go:233:			fmt.Fprintf(os.Stderr, "balldebug: config.NewManager(%s): %v\n", *configPath, errC)
+cmd/wisp/config_reload.go:97:// config.toml through config.NewManager and owns no tick, because it has no
+cmd/wisp/config_sentences_223r2_test.go:109:			mgr, err := config.NewManager(path, nil)
+cmd/wisp/config_sentences_223r2_test.go:111:				t.Fatalf("NewManager on a canonical config must work: %v", err)
+cmd/wisp/firstrun.go:147:	//      NewManager 第二参数全 nil），⛔ 不把它列成入口、也不回显任何值（AC#3）。
+cmd/wisp/firstrun_257_nonpreset_test.go:24:// exported loader the production process itself uses (config.NewManager, the
+cmd/wisp/firstrun_257_nonpreset_test.go:108:	_, err := config.NewManager(cfgPath, nil)
+cmd/wisp/firstrun_257_nonpreset_test.go:129:	m, err := config.NewManager(cfgPath, nil)
+cmd/wisp/firstrun_257_test.go:173:	m, err := config.NewManager(cfgPath, nil)
+cmd/wisp/firstrun_257_test.go:175:		t.Fatalf("NewManager over the created first config (production shape, res=nil per A560): %v", err)
+cmd/wisp/firstrun_257_test.go:247:	m, err := config.NewManager(cfgPath, nil)
+cmd/wisp/firstrun_257_test.go:287:	m, err := config.NewManager(cfgPath, nil)
+cmd/wisp/leg_sink_nail_131_windows_test.go:41:// models.NewManager, the D43 FirstRun/Downloading/Error walk, and the record
+cmd/wisp/models.go:148:// models.NewManager rejects a false (internal/models/downloader.go:104) and
+cmd/wisp/models.go:167:	mgr, err := models.NewManager(models.Options{
+cmd/wisp/panel_config_248_test.go:128:	mgr, err := config.NewManager(filepath.Join(dir, configFileName), nil)
+cmd/wisp/panel_config_248_test.go:130:		t.Fatalf("config.NewManager: %v", err)
+cmd/wisp/panel_geometry_255_test.go:331:	for _, banned := range []string{"config.LoadFile", "config.NewManager", "configFileName", "config.toml"} {
+cmd/wisp/panel_inbound.go:25:// THE ASSEMBLY IS THE PRODUCTION ONE. config.NewManager -> perm.New ->
+cmd/wisp/panel_inbound.go:242:	mgr, err := config.NewManager(cfgPath, nil)
+cmd/wisp/panel_inbound_33_test.go:20:// data root and read what came out - the same config.NewManager/perm.New/
+cmd/wisp/panel_inbound_33_test.go:73:// rather than comparing whole files because config.NewManager migrates a
+cmd/wisp/panel_models_320_test.go:69:	mgr, err := config.NewManager(filepath.Join(dir, configFileName), nil)
+cmd/wisp/panel_models_320_test.go:71:		t.Fatalf("config.NewManager: %v", err)
+cmd/wisp/panel_resident_windows.go:173:// config.NewManager exists, so what the assembly root hands the host is a closure
+cmd/wisp/restart_tier_keys_255r2_test.go:18:// the real config.Manager (SaveFile -> NewManager -> CheckAndReload), and must land
+cmd/wisp/restart_tier_keys_255r2_test.go:107:	mgr, err := config.NewManager(path, nil)
+cmd/wisp/restart_tier_keys_255r2_test.go:109:		t.Fatalf("NewManager on a config the app itself wrote: %v", err)
+cmd/wisp/run.go:26:// INJECTED into the decision chain (config.NewManager -> perm.Store ->
+cmd/wisp/run.go:412:	mgr, err := config.NewManager(cfgPath, nil)
+cmd/wisp/run_mode101_test.go:172:	mgr, err := config.NewManager(h.configPath(), nil)
+internal/ball/hotkey_live_test.go:186:	mgr, err := config.NewManager(path, nil)
+internal/ball/hotkey_live_test.go:188:		t.Fatalf("config.NewManager(%s): %v", path, err)
+internal/ball/hotkey_reload.go:15://	m, _ := config.NewManager(path, res)
+internal/config/loader.go:62:// has nothing to do with secrets, while NewManager/CheckAndReload keep using
+internal/config/loader.go:70:			// built through NewManager, so "no file" is refused before any row can
+internal/config/manager.go:99:// NewManager loads the initial config from path (first-run file creation is
+internal/config/manager.go:101:func NewManager(path string, res SecretResolver) (*Manager, error) {
+internal/config/manager_test.go:25:	m, err := NewManager(path, nil)
+internal/config/manager_test.go:283:	m, err := NewManager(path, nil)
+internal/config/settings_257_test.go:99:// every production NewManager call passes - ledger A560).
+internal/config/settings_257_test.go:111:	if _, err := NewManager(path, nil); err == nil {
+internal/config/settings_257_test.go:112:		t.Fatalf("NewManager succeeded with no config.toml at all")
+internal/config/settings_257_test.go:128:	m, err := NewManager(path, nil)
+internal/config/settings_257_test.go:130:		t.Fatalf("NewManager over the first default config: %v", err)
+internal/config/settings_257_test.go:230:	m, err := NewManager(path, nil)
+internal/config/settings_257_test.go:278:	_, err := NewManager(path, nil)
+internal/config/settings_257_test.go:280:		t.Fatal("NewManager succeeded with no file")
+internal/config/settings_257_test.go:327:	row, err := NewManager(path, nil)
+internal/config/settings_257_test.go:351:	m, err := NewManager(path, nil)
+internal/config/writeguard.go:136:		// (NewManager loads or fails); this is the hand-built case, and defaults
+internal/config/writeguard_226_test.go:366:	m, err := NewManager(path, nil)
+internal/models/doc.go:14://     NewManager double-checks at runtime.
+internal/models/downloader.go:50:// Options configures the Manager. See NewManager for invariants.
+internal/models/downloader.go:97:func NewManager(opts Options) (*Manager, error) {
+internal/models/downloader_test.go:152:	mgr, err := NewManager(Options{
+internal/models/downloader_test.go:308:	_, err := NewManager(Options{DataDir: t.TempDir(), Manifest: m, VerifySignature: false})
+internal/models/downloader_test.go:326:	mgr, err := NewManager(Options{
+internal/models/downloader_test.go:460:	mgr, err := NewManager(Options{
+internal/models/handoff_reuse_109_test.go:31:		mgr, err := NewManager(Options{
+internal/models/handoff_window_109_test.go:85:	mgr, err := NewManager(Options{
+internal/models/handoff_window_109_windows_test.go:79:	mgr, err := NewManager(Options{DataDir: store, Manifest: m, VerifySignature: true, Attempts: 2, BackoffBase: 0})
+internal/models/handoff_window_109_windows_test.go:113:	mgr2, err := NewManager(Options{
+internal/models/handoff_window_109_windows_test.go:160:	mgr, err := NewManager(Options{DataDir: store, Manifest: m, VerifySignature: true, Attempts: 2, BackoffBase: 0})
+internal/models/handoff_window_109_windows_test.go:177:	mgr2, err := NewManager(Options{DataDir: store2, Manifest: m2, VerifySignature: true, Attempts: 2, BackoffBase: 0})
+internal/models/manifest_real_test.go:128:	mgr, err := NewManager(Options{DataDir: dir, Manifest: m, VerifySignature: true})
+internal/models/manifest_real_test.go:155:	mgr, err := NewManager(Options{
+internal/models/manifest_real_test.go:180:	mgr, err := NewManager(Options{
+internal/models/verify_cost_121_bench_test.go:140:	mgr, err = NewManager(Options{
+internal/models/verify_tree_121_test.go:46:	m, err := NewManager(Options{
+internal/models/verify_tree_121_test.go:154:	mgr, err := NewManager(Options{
+internal/perm/ticket90_persist_test.go:50:	m, err := config.NewManager(path, nil)
+internal/perm/ticket90_persist_test.go:52:		t.Fatalf("NewManager(%s): %v", path, err)
+internal/session/manage.go:66:// NewManager composes the outlet set. A nil store is refused rather than
+internal/session/manage.go:68:func NewManager(o ManagerOptions) (*Manager, error) {
+internal/session/manage.go:70:		return nil, errors.New("session: NewManager 需要一枚存放会话行的 ManageStore")
+internal/session/manage_test.go:26:	m, err := NewManager(opts)
+internal/session/manage_test.go:28:		t.Fatalf("NewManager: %v", err)
+internal/tools/refusal_20r2_test.go:187:	mgr, err := config.NewManager(cfgPath, nil)
+internal/tools/refusal_20r2_test.go:189:		t.Fatalf("NewManager: %v", err)
+internal/tools/refusal_20r2_test.go:235:		next, err := config.NewManager(cfgPath, nil)
+internal/tools/refusal_20r2_test.go:237:			t.Fatalf("next-start NewManager: %v", err)
+internal/tools/refusal_20r2_test.go:281:	mgr, err := config.NewManager(cfgPath, nil)
+internal/tools/refusal_20r2_test.go:283:		t.Fatalf("NewManager: %v", err)
+rc=0
+### R5 memory.Session types outside internal/memory and internal/session
+rc=1
+### R8b session mentions in internal/panel production files
+internal/panel/approval.go:31:	// CallChain is outermost-first, e.g. ["session", "agent-loop", "shell.run"].
+internal/panel/approval.go:53:	// SessionOverrideBlocked mirrors Decision.SessionOverrideBlocked (R4 taint).
+internal/panel/approval.go:54:	SessionOverrideBlocked bool     `json:"sessionOverrideBlocked"`
+internal/panel/approval.go:85:		SessionOverrideBlocked: decision.SessionOverrideBlocked,
+internal/panel/approval_test.go:45:		CallChain:     []string{"session", "agent-loop", "fs.delete"},
+internal/panel/attachments.go:45:// user pick must not be able to evict a session's worth of tool evidence under
+internal/panel/composer.go:227:// WorkspaceRequest is the panel's intent to narrow the session to a folder.
+internal/panel/composer.go:244:	// declaration that matches it on the page side is not this session's to
+internal/panel/composer_dispatch_test.go:601:			// frontend/ and design/ are another session's ground and this slice reads
+internal/panel/frontend_hygiene_test.go:50:	"sessionStorage": regexp.MustCompile(`\bsessionStorage\b`),
+internal/panel/l2_grant_boundary_test.go:149:// union still contains "grant" by the frontend session's explicit choice, so an
+internal/panel/pump.go:84:	// honest empty, not a filler: inventing ["session","agent-loop",tool] here
+internal/panel/pump.go:90:	SessionOverrideBlocked bool
+internal/panel/pump.go:110:			SessionOverrideBlocked: v.SessionOverrideBlocked,
+internal/panel/pump_test.go:45:				SessionOverrideBlocked: true,
+internal/panel/pump_test.go:83:	if !card.SessionOverrideBlocked {
+internal/panel/pump_test.go:84:		t.Error("sessionOverrideBlocked was lost between the verdict and the card (R4's flag)")
+internal/panel/subagent_roster_197.go:36://     the SAME conversation components over the child session - no host call
+internal/panel/subagent_roster_197.go:38://     "load session X into pane Y" would be a fifth composer method, which is a
+internal/panel/workspace.go:5:// The composer may show which folder the session is scoped to and ask for a
+rc=0

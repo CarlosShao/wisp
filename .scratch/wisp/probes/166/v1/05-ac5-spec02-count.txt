@@ -1,0 +1,29 @@
+### 尺 A：spec 正文里的 CREATE TABLE 枚数（SPEC-02 §3）
+9
+grep rc=0
+### 命中的表名（9 枚）
+26:CREATE TABLE schema_meta 
+33:CREATE TABLE profile 
+43:CREATE TABLE memory 
+56:CREATE TABLE task_log 
+72:CREATE TABLE tool_call 
+92:CREATE TABLE approval_grant 
+105:CREATE TABLE cost_daily 
+114:CREATE TABLE plugin_state 
+136:CREATE TABLE provider_health 
+
+### 尺 B：代码名册 contractSpec 的键（schema_test.go）
+60:	"schema_meta": {
+66:	"profile": {
+76:	"memory": {
+88:	"task_log": {
+104:	"tool_call": {
+123:	"approval_grant": {
+136:	"cost_daily": {
+145:	"plugin_state": {
+161:	"provider_health": {
+176:	"session": {
+188:	"session_turn": {
+
+### 尺 D：新库 sqlite_master 表名册（head 导出树，见 03-ac3 件）
+（由 03-ac3-new-vs-old-roster.txt 产出，两形各 11 枚，逐枚同名）
