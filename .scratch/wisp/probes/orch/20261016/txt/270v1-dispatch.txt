@@ -1,0 +1,30 @@
+腿名：270-v1（非实现者终裁·只读）｜票：`.scratch/wisp/issues/270-task-spawn-assembly-guard-is-also-the-only-nil-protection*.md`（先读全文；现量票框＝**6 枚未勾／0 已勾**）
+角色＝**裁决者**，实现者＝`270-r1`（形＝甲，`A990` 裁③；写面两枚：`internal/tools/subagent_197.go` ＋ 新件 `internal/tools/nilbase_270_test.go`）。⛔ 你动任何产码/测试件一字、⛔ 翻任何 AC 框、⛔ 动 `Status:`/票名/`-done`、⛔ push。
+
+## 第 0 步（必做）
+1. `git rev-parse HEAD`＋`date '+%F %T %z'` 落每件抬头；现跑票框尺（`grep -c '^[[:space:]]*- \[ \]'`／`'- \[x\]'`）。
+2. **现读实现者改的那两处字节**（⛔ 用票面/交接里的行号，号只当读数）：`:290` 那支"取 `BaseOptions` 之前先判 nil ⇒ 先 `release()` 再走具名拒绝"，与 `:256` 上方那句 AC#5 注释；把两处的**当前行号**逐枚写进读数件（判据＝那一行真含那句判断／真含那条注释）。
+3. 台面＝`git archive <HEAD 或实现者落地点> | tar -x -C $(mktemp -d)` 的**仓外导出树**（六件套 `go.mod go.sum internal cmd tools scripts`，取出后 `find … -name '*.go' | wc -l` 证非空）。**所有突变打在物理树**上，⛔ `-overlay`（这类尺运行时读盘＝overlay 恒绿是假读数）。
+
+## 你要逐格裁的（判语只用三种：成立／不成立／不可判〔缺哪一发读数〕；⛔"附条件成立"）
+- **AC#1**：`BaseOptions == nil` 那支走到**具名拒绝**——① 复跑该用例（`go test ./internal/tools/ -run '<名>' -count=1 -v`，四数 `RUN=`／`PASS_TOP=`／`FAIL_TOP=`／`SKIP=`）；② **去牙反控**：把那句 nil 判断物理摘掉，点名哪些用例必须红、红句连文案逐字落盘；③ 反形检查：把拒绝换成 `panic`、换成"静默当成没孩子"，那两形会不会也红？哪一形放行就具名写"这把尺对⛔ 敏感"。⚠ 特别问一句：`release()` 真的在被摘的那条路径上执行了吗（拿"计数差"或第二次申请能成功来证，⛔ 只看注释）。
+- **AC#2**：票面写"只在选乙时适用"⇒ 本票走的是甲 ⇒ 裁**不适用**并把"甲形下这一格永远无人钉"这句说实话（⛔ 翻框、⛔ 判成立）。
+- **AC#3**：三句文案互不充当替身（装配未接线／池满／没有父任务）——现跑名册尺逐枚指到三条各自的产出点，并**构造一次**：走"装配未接线"那支，量屏幕上出现的是哪句（⛔ 复用即判不成立）。
+- **AC#4**：门禁你**自己现跑**、各落 `rc=`＝`go build ./...`／`go vet ./internal/tools/`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh --with-self-test`／`go test ./internal/tools/ -count=1` 四数＋**还原自证**（被种文件逐枚对 `git cat-file -p HEAD:<path>` MATCH，记还原哈希）。
+- **AC#5**：那条注释⛔ 许诺未来、只写现状；并问"这句会不会与同文件别处注释互相打脸"（引两枚原文）。
+- **能力类必答**：`task.spawn` 在生产链上的调用点枚数（尺＝`git grep -n '"task.spawn"' HEAD -- '*.go'` 分"产码/测试"两栏）；⛔ 拿 `go build` 的 rc=0 当"接上了"。
+
+## 写面（只许这三处，逐字）
+1) `docs/evidence/s1/270-assembly-guard.md`（短名、⛔ 长名⛔ 带 `§`）；2) `.scratch/wisp/probes/270/v1/`（含 `logs/`）；3) 票 270 末尾**一条** bullet（只追加）。
+
+## 台面与禁区
+- `GOTMPDIR` 用**原生反斜杠形**（`C:\…`）且**先 `mkdir -p`**（编排者今天自己踩了：没建目录 ⇒ `go: creating work dir … cannot find the file specified` 长得像"红"）；跑 go 前置 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`。
+- ⛔ `go test ./cmd/wisp` 整包（票 314 死亡区；本波那档归写腿 `220-r2`）；⛔ `go mod tidy`／`go get`。红句里有 `walk`／`build failed`／`no tests to run`／`0xc0000135`／`RUN=0` ⇒ **台面故障、⛔ 计入判据**，另具名写"是哪一行红的"。
+- `sh scripts/d22scan.sh` 若回 **rc=2 的票 311 GUARD 射程拒绝**＝⛔ 当红，换卷或 unset 再跑。
+- 禁区（零字节）：`docs/PLAN.md`、`docs/specs/**`、SLO 阈值／golden／`internal/observe/thresholds.go`、`tools/d22scan/allowlist.txt`、三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、`go.mod`／`go.sum`／`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动。⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`。
+- 并发在飞：写腿 `220-r2`（`cmd/wisp`＋`internal/panel`）＋`326-r1`（`internal/memory`＋`internal/session`）。⛔ 读它们的在飞件或未提交字节当凭据；全仓尺一律以 `git archive` 取出的树为准；若 `go build ./...` 因别腿在飞态红，改用导出树并具名记一句。
+- Git：只 commit、⛔ push；`git add`／`git commit` 两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 读数纪律：引数必带"哪把尺＋射程目录＋量的还是算的"；"几枚"必带单位；`RUN=`（`^=== RUN`）与 `PASS_TOP=`（`^--- PASS` 只数顶层）⛔ 混用；报"0 命中"前先看 stderr 并跑一枚已知存在的正控。
+- 预算：≤5 件、每件 ≤260 行；没做完的格具名写"没做完＋缺哪一发读数"；⛔ 静默产出 0 字节文件（交回前自己 `wc -c` 一遍）。轮次约 150 上限 ⇒ **每落一枚文件就 commit**（commit-first）。
+交件自证三把尺：① 提交号＋逐枚 `git show --stat`（应只含上面三处）；② 证据件绝对路径＋`wc -c`；③ 去牙必须红的那一发与还原后绿的那一发（含还原哈希）。⛔ 只说"已完成"。

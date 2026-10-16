@@ -1,0 +1,26 @@
+腿名：165-c2（普查·**只读**，⛔ 产码）｜票：`.scratch/wisp/issues/165-plan-first-then-act-a-brake-the-voice-entry-needs.md`（先读全文，重点＝票尾 11:0x 那条编排者 bullet 里具名的残余①「门铃零读数」）
+背景：非实现者腿 `165-v1` 判票 165 五格全成立，但钉了一句实话——**全仓跟踪件对 `plan.present` 命中 56 枚，同尺喂夹具面（`testdata/**`、`**/*.golden`、`**/*.sse`、`internal/llm/**`）＝0 枚** ⇒ "模型自己会调这枚刹车"今天没有任何凭据。这一格⛔ 是票 165 的 AC，是**下一枚落地腿的开工料**。你要回答的是"要装哪一枚仪器、装在哪、会顶红谁"，⛔ 你自己动手装。
+
+## 第 0 步（必做）
+1. `git rev-parse HEAD`＋`date '+%F %T %z'` 落每件抬头；⛔ 引本派单里任何数字当结论（那 56／0 两枚你要自己复跑，并写清尺口径：`git grep -l` 还是 `grep -rn`、射程目录、含不含 `_test.go`）。
+2. 全仓尺一律以 `git archive HEAD | tar -x -C $(mktemp -d)` 取出的**仓外导出树**为准（六件套 `go.mod go.sum internal cmd tools scripts`，取出后 `find … -name '*.go' | wc -l` 证非空）；⛔ 拿共享工作树读别人的在飞字节。
+
+## 要交的三问（每问都要"尺＋读数＋单位"，⛔ 含糊话）
+- **问 A｜进模型可见名册的那一跳通到哪一步**：从 `plan.present` 的注册点（`internal/tools/plan_present.go`）到"真被塞进发给 provider 的请求体"这条链，逐跳点名每跳的**生产调用者枚数**（尺＝`git grep -n` 分产码/测试两栏），把断口指到**文件∶行**。判据：哪一跳今天不存在（⛔ 用 `go build` rc=0 当"接上了"——Go 不为未使用的方法报错）。顺带答：请求体里那枚 tools 数组是由谁拼的、`BuiltinPlanEntries()` 的调用者是生产链还是只有测试。
+- **问 B｜现有夹具面有没有能表"模型在这一轮请求了这枚工具"的形状**：逐枚点名仓里**已有**的金样本／SSE 夹具／录制面（`cmd/llmrecord`、`internal/llm/**`、`testdata/**`、`*.golden`、`*.sse`）各自能不能表这一形，指到行；⛔ 只说"没有"——要给"扫过哪些目录、各多少枚文件"的分母。若有别枚工具（如 `web.search`／`task.spawn`／`plan.present` 之外的写类工具）**已有**这形仪器，具名指出来当可复用先例。
+- **问 C｜最小仪器候选三形（甲／乙／丙）＋代价表**：甲＝金样本 SSE 里带这枚 tool_call；乙＝装配面断言"名册含 `plan.present` 且真进请求体"；丙＝真窗/真云端跑一轮看会不会请求（若属〔仅本机可量〕或需凭据，具名说明并⛔ 把它排进派单资源）。每形要给：改动面（文件∶行，⛔ 猜）、会顶红谁现有的钉（引钉名与尺）、需要新增几枚用例、⛔ 是否碰 `cmd/wisp/**`＋`internal/panel/**`（**本波共享编译面唯一写腿＝`220-r2`**）、⛔ 是否碰 `.github/**`（CI＝禁区）。
+- **★附带报一句**（⛔ 你不动手）：`internal/tools/plan_present_165_test.go` 文件头那两行注释写作「两发变异（-overlay 注入、树零改）」，与同腿读数件自相矛盾且 `-overlay` 是本编队禁用形状——现读那两行逐字进你的件，处置归编排者（下一枚 `internal/tools` 面的腿）。
+
+## 写面（只许这两处，逐字）
+1) `docs/evidence/s1/165-doorbell-census.md`（短名、⛔ 长名⛔ 带 `§`）；2) `.scratch/wisp/probes/165/c2/`（含 `logs/`）。
+★本腿**零产码零测试件**：`.go` 文件一枚⛔ 新建⛔ 修改（本波两枚验收腿要独占 Go 编译面）；`go env`／`go list` 可以跑，但要在件里自报跑了哪几枚、⛔ 跑 `go test` 整包、⛔ `go build`（避免与 `270-v1`／`120-v2` 抢编译面与 CPU）。
+
+## 禁区与规矩
+- 禁区（零字节）：`docs/PLAN.md`、`docs/specs/**`、SLO 阈值／golden／`internal/observe/thresholds.go`、`tools/d22scan/allowlist.txt`、三枚冻结件、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、`go.mod`／`go.sum`／`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动；⛔ 新造状态名或工具名（要新能力＝回我由我裁开票）。
+- ⛔ "某包没被 CI 测到"这类话，引之前先 `git show` 那把 scope 脚本逐枚数；⛔ 把"写了没接"说成"做了"；能力类结论必问生产调用者。
+- 并发在飞：写腿 `220-r2`（`cmd/wisp`＋`internal/panel`）＋`326-r1`（`internal/memory`＋`internal/session`）＋只读验收腿 `270-v1`／`120-v2`。⛔ 读它们的在飞件当凭据、⛔ 把别腿新落的件算进自己的分母（分母要具名写"取自 HEAD 导出树"）。
+- Git：只 commit、⛔ push；`git add`／`git commit` 两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 读数纪律：引数必带尺与射程；"几枚"必带单位；报"0 命中"前先看 stderr 并跑一枚已知存在的正控（★编排者今天自己踩了一枚 `grep -F` 假 0）。
+- 预算：≤3 件、每件 ≤200 行；答不上的问就具名写"答不上＋缺哪一把尺"；⛔ 静默产出 0 字节文件（交回前 `wc -c`）。轮次约 150 上限 ⇒ 每落一枚文件就 commit。
+交件自证三把尺：① 提交号＋逐枚 `git show --stat`（应只含上面两处）；② 证据件绝对路径＋`wc -c`；③ 问 A 的断口 `文件∶行`＋问 B 的分母名册＋问 C 三形的改动面。⛔ 顺手写码、⛔ 翻任何框。
