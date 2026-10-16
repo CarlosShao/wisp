@@ -144,6 +144,17 @@
   名册渲染那枚函数＝`internal/panel/subagent_roster_197.go:198 taskRosterSectionFrom`（行装配 `:226-252`，排序 `:253`），
   沿路：`internal/panel/pump.go:323-327`（读 `L1Windows`⇒`taskRosterSectionFrom(p.src.Tasks(), cards, waits)`）⇒`:327`⇒上面那枚 `:198`
 
+## 门禁四数（本腿自己跑的，`logs/50-gates.txt`／`51-d22scan-detail.txt`／`52-gates-worktree.txt`）
+
+| # | 尺 | rc | 读数与归因 |
+|---|---|---|---|
+| 1 | `go build ./...`（仓外 `full` 导出树） | **0** | 全树编译面净 |
+| 2 | `sh scripts/d22scan.sh` | 导出树 **1** ⇄ 共享工作树 **0** | 导出树那一发全是 `[phantom-citation]`（ban #9／票 212）＝**台面形状**：`git archive` 那几枚目录里没有 `.scratch/**`，产码注释引用的探针件在树上不存在（逐名 15＋ 枚在 `51-d22scan-detail.txt`，红句自述 `repo HEAD violates: …`）；同一把尺在共享工作树逐枚 clean＝`d22scan: clean - no D22 ban violations`，射程＝bans #1-5 `internal/`240／`cmd/`41、ban #6 `frontend/`116、ban #7 `internal/tools/`25、ban #8 `design/`39＋`frontend/`116＋`internal/`577＋`cmd/`139 Go 件 ⇒ ⛔ 计入判据、⛔ 当代码红 |
+| 3 | `sh scripts/check-path-length-budget.sh --with-self-test` | 导出树 **2** ⇄ 工作树 **0** | 导出树那一发逐字自述 `check-path-length-budget.sh: not inside a git work tree - refusing to guess a denominator`＝那把尺**拒猜分母**（⛔ 冒充"门过了"）；工作树那一发 `VERDICT GREEN`：over-budget 60／名册覆盖 60／名册外 **0**、最长相对名 185 字符、字节视角与字符视角选中同一批 60 枚（现跑一致） |
+| 4 | `go vet ./cmd/wisp/` 与 `go vet ./internal/panel/`（导出树） | **0**／**0** | 无输出＝只证编译面，⛔ 用作任何一格的判据 |
+| 5 | `gofmt -l cmd/wisp internal/panel` | rc=0，列表非空 | 只点名存量件 `cmd\wisp\models.go`（与 `220-r2` 那发同名单）；本腿写面＝**零枚 Go 文件**，⛔ 代修存量债 |
+
+
 ## 残余（具名，⛔ 记进任何一格 AC）
 
 1. **卡片那一半在生产里今天点不亮行**（本腿现量，⛔ 本票判据、属能力缺口）：`internal/agent/loop.go:603-608 callCorr` 逐字

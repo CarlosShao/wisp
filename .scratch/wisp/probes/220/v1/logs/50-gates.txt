@@ -1,0 +1,12 @@
+=== 220-v1 门禁四数（台面＝仓外 full 导出树，HEAD ca0e30fce＋补 docs/design/models；GOTMPDIR＝C:\Users\swq\AppData\Local\Temp\wisp220v1\full\.gotmp 先 mkdir -p）2026-10-16 12:19:31 +0800
+1) go build ./... rc=0
+FAIL	github.com/CarlosShao/wisp/tools/d22scan	34.997s
+FAIL
+runtests.sh: go test exited 1 - packages=[./...] top-level: PASS=33 FAIL=2 SKIP=0, === RUN=77, '[no tests to run]'=0
+2) sh scripts/d22scan.sh rc=1
+check-path-length-budget.sh: not inside a git work tree - refusing to guess a denominator
+3) check-path-length-budget rc=2
+4) go vet ./cmd/wisp/ rc=0
+5) go vet ./internal/panel/ rc=0
+6) gofmt -l cmd/wisp internal/panel: 
+=== end 2026-10-16 12:20:25 +0800
