@@ -1,0 +1,41 @@
+票 165 落地腿 `165-r3`（写）——门铃仪器：给"模型真的会调 `plan.present`"这一维装上第一枚常驻判据（AC#6，选形已裁甲）
+================================================================================
+
+腿名 `165-r3`｜角色＝**落地腿（写码）**｜票＝`.scratch/wisp/issues/165-plan-first-then-act-a-brake-the-voice-entry-needs.md`
+★起手先读两份：① 票面**末尾我新开的 `- [ ] **AC#6**`**（三处断口逐枚具名＋选形已裁＝甲＋一枚硬约束）；② 只读普查腿的件 `docs/evidence/s1/165-doorbell-census.md`（105 行／18148 字节，`165-c2` 交，三问：断口在哪／分母多大／三形代价）。
+
+## 要落什么（只一格：AC#6）
+
+用**形甲**造那枚夹具：新建 `internal/agent/testdata/golden/plan-present.sse` ＋ 1 枚包内用例，把断口 ① 补上——★现在**零枚用例**把一次 `plan.present` 的 `tool_call` 打到 `internal/agent/loop.go:637-640` 那两行 sink 上。
+判据形状＝"喂进这枚 SSE 夹具 ⇒ 那枚 sink 的读数**必须非零**；摘掉夹具里的那一行 ⇒ 用例**必须红**"（去牙要你自己跑一遍证明它会响）。
+★普查现量给你当地基（⛔ 抄号，行号只当读数）：`.sse` 52 枚／`*/testdata/*` 56 枚／`internal/llm/**` 90 枚／`tools/mockllm/**` 14 枚／`*.golden` **真 0**（正控 `-iname '*golden*'`＝12）；**本仓注册的 11 枚工具名在夹具面逐枚 0 命中**；`internal/agent/testdata/golden/` 那目录**无孤儿钉**（`ReadDir` 三处全在 `t.TempDir()`）；可抄的先例具名在件里 §问 B 末（`harness_test.go:41 bodies`、`loop_golden_test.go:128`、`:138-144` 已断请求体字节、`adaptertest/mockllm.go:383 LastRequest`——已有人断 `sent["tools"]`：`protocol_test.go:66`）。
+
+## ★两枚硬约束（踩上就是白跑，先读第三条再动手）
+
+1. **导入环**：`internal/agent` 根 21 枚测试件逐枚 `package agent`、`agent_test` 全树 **0 枚**，而 `bridge.go:13` 已 import `agent` ⇒ **真桥进不去**。⇒ 本腿⛔ 试图在 `internal/agent` 里 import `internal/tools` 或 `cmd/*` 来"走一遍真桥"（那是 `tools → agent` 反边，编译不过）。要桥就得走 `cmd/wisp`，本波不归你。
+2. **`llm.Request.ToolChoice` 产码 0 枚写入**（断口 ③），且 `tools/mockllm/chat.go:172-185` 那枚"必发工具调用"的合成是**按位取 `Tools[0]`、⛔ 按名**。⇒ 你⛔ 顺手给 `ToolChoice` 加产码写入（那要扩到 `internal/llm` 三家 `request.go`＝超出本票射程，具名上交我裁）；⛔ 改 mockllm 的按位形状去迁就你的夹具（那会顶别人的钉）。**夹具要让"这一枚工具"被选中，靠的是 SSE 里的字节，⛔ 靠改合成器。**
+3. 若你发现按 1／2 之后 AC#6 仍**裁不干净**（缺的是"世界"而不是"用例"）：**具名写缺哪一形＋该由哪一枚落地腿补**（连"`cmd/wisp` 那一格"一起写清），回来交我，⛔ 自己动手补面。半件比假件值钱。
+
+## 写面（只许这四，逐字；超出一枚算越格、我退回）
+
+1) `internal/agent/**`（产码面**只有这一枚**，含新建 `testdata/golden/plan-present.sse`＋新建测试件）；2) `.scratch/wisp/probes/165/r3/**`（含 `logs/`）；3) `docs/evidence/s1/**` 一枚件（短名、⛔ 长名、⛔ 带 `§`）；4) 票 165 末尾**一条** bullet（只追加）。
+⛔ `cmd/wisp/**`、⛔ `internal/panel/**`（本波两枚腿在写／裁那两面）、⛔ `internal/llm/**`、⛔ `tools/mockllm/**`、⛔ `internal/tools/**`；⛔ 新增 C17 方法名／新导出的 `panel.*` 名／新增加进 Snapshot 名册的键（撞 313 那枚键钉）⇒ 需要就停手上报。
+⛔ `frontend/**`、`design/**`（归机主的外部前端 agent）；⛔ `PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden 既有件／`tools/d22scan/allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`；⛔ 三枚冻结件。⛔ 动 SLO 阈值。★⛔ 你以为可以顺手改 golden 既有件——新增一枚**你自己的** `testdata/golden/*.sse` 是本票给的对象，改既有的⛔。
+
+## 规矩（一条都不许漏）
+
+- **只 commit、⛔ push**（推送只有编排者做、只推 `origin/dev`）。`git add`／`git commit` 两处**逐枚显式 pathspec**；⛔ `add -A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ⛔ 翻任何 AC 框（含你自己这格 AC#6）、⛔ 改票名／`Status:`／加 `-done`。
+- ⛔ 为了变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 用 fixture 直喂代替真装配、⛔ 注释里指名一枚不存在的测试当凭据（这形本仓已入账五次）。
+- 改前／改后**同台面**：⛔ 拿共享工作树跑"改前那发"（那树里有别人的在飞活）；取改前用 `git archive` 建**仓外**导出树，★七件套 `go.mod go.sum internal cmd tools scripts frontend`（少 `frontend` ⇒ `no required module provides package …/frontend`＋`FAIL … [setup failed]`＝台面假红，**这是我今天自己犯的错，别复现**）；取出后先数 `.go` 证非空、再核 `go build ./internal/agent/` 退码 0 才开始量。
+- ★跑测试**必须显式带足超时**（如 `-timeout 30m`）并具名写你带了哪枚值：默认 10 分钟对本仓重包**不够**（我 11:2x 亲眼 `panic: test timed out after 10m0s`，那一发⛔ 算终态读数）。`GOTMPDIR` **先 `mkdir -p`** 且用**原生 `C:\…` 反斜杠形**（正斜杠把 `internal/risk` 那族成对尺打假红；指到不存在的目录＝`creating work dir … cannot find the file specified` 长得像红）。
+- ⛔ 跑 `./cmd/wisp` **整包**（本波那一格归 `220-v1`）；单跑用 `-run '^Test名$'`。`./internal/agent` 整包归你。
+- 门禁四数自己跑并**逐枚落 `rc=`**：`gofumpt`（PATH 里可能 rc=127，真身 `/d/work/base/gopath/bin/gofumpt.exe` v0.12.0）、`tools/d22scan`（`rc=2`＝GUARD 射程拒绝，⛔ 读成红；档拼写⛔ `--scope=`）、长度门、`go vet ./internal/agent/`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+- 读数纪律：引任何数必带"哪把尺＋射程目录＋量的还是算的"；单位写清（文件／顶层用例／子测试／调用点／写入点）；报"0 命中"前先看 stderr 并跑一枚已知存在的正控；★推翻任何旧尺／旧读数前先**逐字重放旧尺**（我今天差点用一把双前缀的尺造出一枚假 0）。
+- **输出预算**：≤5 枚件、每件 ≤260 行；⛔ 0 字节文件（交件前 `wc -c`）；轮次约 150 上限 ⇒ **每落一枚文件就 commit**（本仓今天两枚腿死在最后一步，边跑边交）。没裁完的格具名写"没裁＋缺哪一发读数"。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（编排者今天第三次踩、已入盘）；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 并发在飞：`216-r1`（写 `internal/panel/**`）∥ `220-v1`（裁决＋`cmd/wisp` 整包那一格）∥ `326-v1`（裁决，读 `internal/memory`／`internal/session`，⛔ 动产码）⇒ ① ⛔ 读它们的在飞字节当凭据；② `go test` 重包同一时刻只跑一枚，撞上了等一等再跑并具名写你等了。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+
+① 提交号逐枚 `git log --oneline` ＋逐枚 `git show --name-only`（应只含上面四处）；② 证据件绝对路径＋`wc -c`＋行数；③ 那对颜色：**改前那一发**（无夹具时 sink 读数＝0／或指名用例红）与**改后那一发**（sink 非零、用例绿），逐字红句＋"哪一行红的"；★**去牙那一发**（摘掉夹具里那一行 ⇒ 用例必须红）＋还原哈希＋还原后绿。另加我的必答题（⛔ 你自己盖章不算）：**这枚新用例是不是恒真**——请另跑一发"把 sink 的计数改成常量非零"，如果用例**不红**，就具名写"我对这件事不敏感"，⛔ 报成凭据。

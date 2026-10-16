@@ -1,0 +1,38 @@
+票 326 非实现者终裁腿 `326-v1`（裁决·只读）——"会话里继续聊不会把它顶到前面"修好没有、牙响不响
+================================================================================
+
+腿名 `326-v1`｜角色＝**裁决者**（⛔ 动产码；本票实现方＝`326-r1`，⛔ 你替它自证）。
+票面＝`.scratch/wisp/issues/326-append-session-turn-does-not-refresh-session-updated-so-a-live-chat-never-moves-up.md`（现量框＝**6 未勾／0 已勾**，起手自己重跑这把尺）。
+实现方五笔（逐枚 `git show --name-only` 自己核写面，⛔ 用区间尺）：`86298e24` 产码＋用例 → `d3f98938` 读数 → `a60da735` 判语件 → `f2787393` 票尾一条 bullet → `b4adfd0e` 名册自证。它的件＝`docs/evidence/s1/326-append-updated.md`（172 行／17568 字节）。
+
+## 第 0 步（必做，⛔ 跳）
+1. `git rev-parse HEAD`＋`date '+%F %T %z'` 落每件抬头；现跑票框尺；逐枚核实现方写面（应只含 `internal/memory/**`＋`internal/session/**`＋probes＋`docs/evidence/s1`＋票尾一条）。
+2. ⛔ 引本派单或实现方件里任何数字当结论：名册枚数、四数、红句、还原哈希，全部自己现跑，并标"哪把尺＋射程目录＋量的还是算的"。
+3. 台面＝`git archive` 的**仓外导出树**（★七件套 `go.mod go.sum internal cmd tools scripts frontend`，缺 `frontend` 会报 `no required module provides package …/frontend`＋`FAIL … [setup failed]`＝台面假红）。"改前那一发"必须打在 `86298e24^` 的树上，⛔ 拿共享工作树当改前。突变打物理字节，⛔ `-overlay`（这类尺运行时读盘＝overlay 恒绿是假读数）。
+4. `GOTMPDIR` 用**原生 `C:\…` 反斜杠形**且**先 `mkdir -p`**（没建目录＝`go: creating work dir … cannot find the file specified` 长得像红）。
+
+## 逐格要裁的（判语只用：成立／不成立／不可判〔缺哪一发读数〕；⛔"附条件成立"）
+- **AC#1（刷新真发生在写入那一枚事务里）**：① 指到那条 `UPDATE session SET updated_at=?` 的当前行号＋它所属事务句柄（内容锚，⛔ 只报号）；② **去牙**：把那行 `UPDATE` 摘掉 ⇒ 指名哪些用例必须红、红句逐字＋还原哈希；③ ★**反形**（这是我最想让你裁死的一格）：把刷新**挪到事务外**（先 INSERT 提交、再单独 `UPDATE`）——**今天的用例抓不抓得住？** 实现方自报"缺确定性判据、只有真杀台件 18/32＝56%"。你要是也抓不住，就具名写**〔缺世界〕＋该由哪种台件才抓得住**，⛔ 自己造产码、⛔ 把这格判成"成立"。
+- **AC#2（排序那两行逐字节不动）**：`ORDER BY updated_at DESC, id DESC` 的 diff 尺自己跑（应 0 命中）；★同秒先后的那一半病（`session.id` 是随机 hex）实现方⛔ 动并上交给我——你只要复认"本票没顺手治它"，⛔ 替我裁要不要治。
+- **AC#3（崩溃原子）**：真杀台件那一发你自己跑（父 `cmd.Process.Kill()`，逐枚杀点报 HALTED 计数）；★问一句**"这台件是不是恒过"**：把刷新挪回事务内但故意在两条语句之间 `os.Exit`，它必须报 `HALF-STATE`——不报＝这台件没牙，具名写。
+- **AC#4（门禁＋时钟一枚）**：`go test ./internal/memory/ ./internal/session/ -count=1 -v` 四数逐包点名（尺口径写清 `^=== RUN` 含子测试 ⇄ `^--- PASS` 只数顶层，⛔ 混用）；★**跑整包必须显式带 `-timeout 30m`**——默认 10 分钟对本仓重包**不够**（编排者今天亲眼 `panic: test timed out after 10m0s`，那一发⛔ 算终态读数）；时钟那一格：写进去的值必须是 `t.CreatedAt`（`orNow` 归一那一族），⛔ 事务内再读第二枚时钟；门禁四数逐枚落 `rc=`（`gofumpt` 真身 `/d/work/base/gopath/bin/gofumpt.exe`、`tools/d22scan` 的 `rc=2`＝GUARD 射程拒绝⛔ 读成红、长度门、`go vet`）。
+- **AC#5（说实话：界面上今天看不看得见）**：沿到消费者。★**我 12:1x 自己现跑的两把尺**（你可复认或推翻，都要带自己的尺）：① `git grep -nE 'ListSessions|SessionStore' HEAD -- cmd internal/panel internal/session`（滤掉 `_test`）只命中 **2 行**＝`internal/session/manage.go:40`（接口声明）与 `:104`（唯一转调 store 的那一行）⇒ **`cmd/` 与 `internal/panel/` 里零调用者**；② 库里那两行排序在 `internal/memory/dao_session.go:125` 与 `:144`（`ORDER BY updated_at DESC, id DESC`）。⇒ 结论＝**会话列表今天⛔ 接进产品**（那一跳属票 166 的接线缺口），所以"值对了"界面上仍然看不见。⛔ 把"库里的值对了"说成"用户看得见"；也⛔ 因为"界面看不见"就把这格判成修得不对——修的是 DAO 那一格。
+- **AC#6（若票面还有一格未列在上面）**：按票面原文逐字裁，⛔ 自造尺。
+- **能力类必答**：`AppendSessionTurn` 的**生产调用点枚数**自己数（⛔ 拿 `go build` rc=0 冒充接线——Go 不为未使用方法报错）。
+
+## 写面（只许这四，逐字）
+1) `docs/evidence/s1/326-v1-verdict.md`（短名、⛔ 长名⛔ 带 `§`）；2) `.scratch/wisp/probes/326/v1/**`（含 `logs/`）；3) 票 326 末尾**一条** bullet（只追加，⛔ 动实现方的句子、⛔ 翻任何 AC 框、⛔ 改 `Status:`／票名／`-done`）；4) ★若必须新加常驻判据才能裁死某格：只许**新建** `internal/memory/*_326v1_test.go` 或 `internal/session/*_326v1_test.go`（⛔ 改既有测试件、⛔ 动任何产码），并在件里具名写为什么需要它。
+
+## 并发与禁区
+- **读数纪律（缺一枚就当没量）**：引任何数必带"哪把尺＋射程目录＋量的还是算的"；单位写清（文件／顶层用例／子测试／调用点／写入点）；★报"0 命中"之前**先看 stderr**（`grep -E 'x('` 那种裸括号会让 grep 报错、`2>/dev/null` 把报错吞掉＝假 0），并**跑一枚已知存在的正控**证这把尺能命中；名册作差前⛔ 剥耗时（那会造出假差）；★推翻任何旧尺／旧读数前先**逐字重放旧尺**（我 11:3x 自己差点用一把路径双写了两层的尺读出一枚假 0）。
+- 此刻在飞：`216-r1`（写 `internal/panel/**`）∥ `220-v1`（裁决，`cmd/wisp` 整包那一格归它）∥ `165-r3`（写 `internal/agent/**`）⇒ 你⛔ 读它们的在飞字节当凭据、⛔ 跑 `./cmd/wisp` 整包（那格不是你的）。
+- 禁区零字节：`docs/PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、`go.mod`、`go.sum`、`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动。★工作树里 `go.mod` 有一枚六天前的未提交脏改动（mtime 2026-10-10 22:28）＝存量、归属不明 ⇒ ⛔ 你碰／⛔ 你提交／⛔ 你 revert，具名报"还脏"归我处置。
+- ⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 用 fixture 直喂代替真装配、⛔ 注释里指名一枚不存在的测试当凭据。
+- Git：只 commit、⛔ push（推送只有编排者做、只推 `origin/dev`）；`git add`／`git commit` 两处逐枚显式 pathspec；⛔ `add -A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删；仓内不建 worktree／checkout。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- **输出预算**：≤6 枚件、每件 ≤260 行；⛔ 0 字节文件（交件前逐枚 `wc -c`）；轮次约 150 上限 ⇒ **每落一枚文件就 commit**（本仓今天已有两枚腿死在这道帽上）；没裁完的格具名写"没裁＋缺哪一发读数"，⛔ 填空、⛔ 预测。
+- ★台面故障与判据分开写：凡红句里出现 `walk`／`build failed`／`no test files`／`setup failed`／`creating work dir`／`0xc0000135`／`panic: test timed out` ⇒ 先判台面故障、具名写是哪一行红的，⛔ 计入判据。
+- ★我这批**成对归因已闭**、你⛔ 重开：六枚 `./cmd/wisp` 红（`TestAC4FocusReturnToPriorWindowGap33r5`、`TestAC14GoSideEvalPushReachesThePage`、三枚 `Test258*`、`TestAC246DevLegIgnoresTheTestTaskInjection`）＝本机状态红（活实例 `wisp.exe` PID 21892 握热键与单实例锁＋前台被别窗握着），凭据＝`probes/orch/20261016/logs/orch-sixred-pair-pre.txt`／`…-post.txt`（改前 6 ⇄ 改后 6、同台面同红句）。⛔ 杀 PID 21892（机主 10-15 19:03 按台账 `A988` 自己起的）。若某格需要"没有活实例"的世界才能裁 ⇒ 具名写〔缺世界〕交我。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐笔提交号＋逐枚 `git show --name-only`（应只含上面四处）；② 判语件绝对路径＋`wc -c`＋行数＋每枚证据件非空自证；③ AC#1 的去牙红句逐字＋还原哈希、AC#3 那台件的 HALTED 计数、AC#4 两包四数（带你带的 `-timeout` 值）＋门禁四数各自 `rc=`、能力类调用点枚数。另加一枚我的必答题（⛔ 你自己盖章不算）：**你有没有把任何既有断言改松**——把你读过的每一枚既有测试件名＋"只读没动"逐枚列出来。
