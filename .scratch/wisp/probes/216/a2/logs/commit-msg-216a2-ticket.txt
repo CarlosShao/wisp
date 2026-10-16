@@ -1,0 +1,15 @@
+216-a2 票 216 末尾一条只追加 bullet（6 行只追加／删 0 行；⛔ 翻框、⛔ 动判据文字、⛔ 改 Status/票名/-done、⛔ push）
+
+本笔写面＝两处（逐枚显式 pathspec）：
+- .scratch/wisp/issues/216-menu-display-base-scrub-control-chars-and-two-sentences.md（末尾一条 bullet，numstat 6/0）
+- .scratch/wisp/probes/216/a2/logs/commit-msg-216a2-ticket.txt（本消息，临时件只建不删）
+
+框数自证：追加前后同＝4 枚 `- [x]`／1 枚 `- [ ]`（尺 `grep -c '^- \[x\]'` 与 `'^- \[ \]'`），
+diff 里删除行＝0 行（尺 `git diff | grep '^-' | grep -v '^---' | wc -l`）⇒ 只追加、判据文字一字未动。
+
+bullet 报的是普查读数（⛔ 判语）：甲＝AC#5 禁止那半实测 0/130（含别名链与前端侧，每把 0 配正控），
+必做那半无落地物（MessageKey 生产消费者 0）⇒ 翻勾无代码凭据，缺的东西归编排者裁；
+甲③＝ChatInput.tsx 本仓不存在（两尺两正控），那半句属外部仓 openchamber；
+乙＝AC#3 后半只量可达性：判级包 37 枚逐枚归位（名字进判定者枚枚更严；ALLOW 侧三处一律全等/点锚定），
+附件显示名到 risk/perm/tools/agent 可达性 0（落盘名＝内容哈希），"允许"字面判定 0 命中。
+具名边界四条（cmdutil 不存在／分母未去重／前端只读提交树／未动票名与框）。
