@@ -1,0 +1,15 @@
+# 322-r1b 起手第一发四数（本机 Windows/Git Bash，GOTMPDIR 未设＝走默认 TMP=C:\Users\swq\AppData\Local\Temp，C: 卷）
+date=2026-10-16 09:35:16 +0800
+尺＝go test ./internal/winsec/ -count=1 -v；日志=.scratch/wisp/probes/322/r1b/03-test-full-v.log
+rc_test=0
+RUN=110
+RUN_any_kind_of_RUN=112
+RUN_top_level (^=== RUN)=110
+PASS_TOP=^--- PASS: 61
+FAIL_TOP=^--- FAIL: 0
+SKIP_TOP=^--- SKIP: 0
+PASS_any(^    --- PASS+^--- PASS)=110
+FAIL_any=0
+SKIP_any=0
+go test 结果行: ok  	github.com/CarlosShao/wisp/internal/winsec	17.504s
+红名册:

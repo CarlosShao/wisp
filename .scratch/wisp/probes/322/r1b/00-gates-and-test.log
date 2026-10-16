@@ -1,0 +1,16 @@
+# 322-r1b 起手三把尺＋整包 -v（编排者 2026-10-16 09:3x 现跑，本机 Windows/Git Bash）
+date=2026-10-16 09:34:03 +0800
+host=MINGW64_NT-10.0-26100 DESKTOP-LVS7839 3.6.5-22c95533.x86_64 2025-10-10 12:02 UTC x86_64 Msys
+GOPATH/GOOS:
+windows
+amd64
+
+
+GOTMPDIR_shell=<unset> TMP=/tmp TEMP=/tmp
+TMP volume drive=/t
+
+rc_build=0
+rc_vet=0
+rc_gofmt=0  listed_files_below:
+(gofmt -l 列出枚数=0)
+gofumpt_absent

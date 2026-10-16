@@ -1,0 +1,252 @@
+commit 8baec64605eb5cf752bc597bf698d5407d024105
+Author: CarlosShao <1933942520@qq.com>
+Date:   Fri Oct 16 09:06:36 2026 +0800
+
+    收 322-r1（腿死于 150 轮上限、零提交，盘上遗产六枚：产码 +164/−7 与三枚新测试件）⇒ 编排者代提，标〔未验证半成品·AC 框一枚未翻〕
+    
+    ★这是什么状态（现量，⛔ 当"已交付"）
+    - 腿 `322-r1`（票 322 落地腿，面＝`internal/winsec`）于 09:0x 撞到 150 轮上限被强杀，最后一句自报是"注释里有个词打错了，正在改" ⇒ 交件正文与票尾 bullet 都没来得及写，盘上零提交。
+    - 遗产六枚：三枚改动 `winsec.go`／`winsec_other.go`／`winsec_windows.go`（合计 +164/−7，`git diff --stat -- internal/winsec` 现量；逐枚增减我没再取，⛔ 引用）＋三枚新建 `openleaf_322_other_test.go`／`openleaf_guard_322_windows_test.go`／`openleaf_overwrite_322_test.go`。
+    - 被删的 7 行里只有 1 行是代码（`f, err := os.OpenFile(resolved, flags, perm)`，被换成带守卫的开法），其余 6 行是它重写的那段注释（原文那句"O_TRUNC 那一形另立票 322、本锚未修"正是本票要消掉的那句）。⇒ 编排者尺：`git diff -- internal/winsec/ | grep '^-' | grep -v '^---'` 现量 7 行，逐枚读过。
+    
+    ★我复跑过的读数（⛔ 引腿的数＝我没量过）
+    - `go build ./...` rc=0；`go vet ./internal/winsec/` rc=0；`gofmt -l` 对这九枚列出 0 枚（这把尺退码恒 0，所以报的是"列出枚数"⛔ 退码）。
+    - `go test ./internal/winsec/ -count=1 -v` ⇒ `RUN=110 PASS_TOP=59 FAIL_TOP=2 SKIP=0`（两把尺口径具名：`^--- PASS` 只数顶层，含子测试那把另算）。
+    - ★那两枚红＝**存量、不是这批**：差集法现跑——`git archive HEAD` 取仓外导出树（取出 1087 枚 `.go` 证非空）后跑同两枚 `-run 'TestGateJudgesThePrivateSetByResolvedSID|TestSealNarrowsAndNamesThePrincipalItRemovedBySID'` ⇒ 改前同样 `--- FAIL` 两枚、名册逐字相同 ⇒ 本批改动的**新增红＝0**（按名集合作差，⛔ 只报枚数）。
+    - 门禁：`sh scripts/check-path-length-budget.sh --with-self-test` rc=0（VERDICT GREEN，over=60／in-roster=60）；`sh scripts/d22scan.sh` rc=0 clean（ban #8 internal/=571 枚）。⚠ 台面自纠一笔：我第一发 d22scan 把 `GOTMPDIR` 指到 D: 卷 ⇒ 拿到 rc=2 的 311 GUARD 射程拒绝，那是我自己的台面选择、⛔ 读数；按 GUARD 那句话 unset 后复跑才是 rc=0。
+    - ⛔ 我跑了票面要求的去牙反控（那属于验收腿），也⛔ 判任何一格成立。
+    
+    ★为什么现在提（不等的理由）
+    共享工作树里挂着一枚死腿的 164 行产码＝下一个动 `internal/winsec` 的人会把它当自己的中间态覆盖掉。按本仓先例（`33-r6`/`33-r8`/`33-r9` 同形＝死腿遗产代提＋标〔未验证半成品〕＋另派续程）先保住字节，判语全部留给续程腿与验收腿。
+    
+    ★还没做的（逐枚具名，⛔ 替腿追认）
+    1. 票 322 的 6 枚 AC 框一枚未翻，Status/票名未动。
+    2. 这批新测试件有没有牙（判据换成反形会不会也红）＝没人测过，归验收腿。
+    3. 腿自己有没有跑过票面要求的"覆盖写那四枚调用者"对照＝它的读数没落盘（`probes/322/r1/` 只有 1 枚 logs 目录）。
+    4. 三枚新件各自 ≤260 行的预算我核了（长度门 rc=0 已含它们），但**没有**核它们是不是该拆。
+    - ⛔ push。
+
+diff --git a/internal/winsec/winsec.go b/internal/winsec/winsec.go
+index 00d3b30ef..67783ae06 100644
+--- a/internal/winsec/winsec.go
++++ b/internal/winsec/winsec.go
+@@ -83,6 +83,15 @@ var ErrIsReparsePoint = errors.New("winsec: entry is a link to something else, n
+ // written. perm is what the mode means on POSIX and is ignored on Windows,
+ // where the descriptor decides - callers pass 0o600 for the readers of the
+ // source, not because Windows obeys it.
++//
++// "or replaces" is a promise with production dependants, not a figure of speech:
++// internal/secret/store.go rewrites the same id, internal/config/migrate.go names
++// this call as the repair path for a wide backup left by an older build,
++// internal/secret/migrate.go overwrites a temp left by a crash, and
++// internal/agent/spill.go overwrites a ".retry" temp. Turning a pre-existing name
++// into a refusal would break all four, so a refusal here is only ever for a name
++// this package can prove is unsafe (ticket 322's leaf link), never for a name that
++// merely already exists.
+ func PrivateFile(path string, data []byte, perm fs.FileMode) error {
+ 	return privateFile(path, data, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+ }
+@@ -105,13 +114,45 @@ func PrivateFileExclusive(path string, data []byte) error {
+ // The path is resolved before it is opened, not after: writing to a name the
+ // filesystem reads as some other object would place private bytes in public
+ // (ticket 94, same defect class as the directory leg below).
++//
++// Ticket 322 is the second half of that sentence, and it is only half closed.
++// resolveString answers for the spelling, and the open below is the FIRST act
++// on it, so a leaf link planted in the gap between the two was followed by the
++// open itself: O_WRONLY|O_TRUNC truncated whatever that link pointed at, and
++// the object was damaged before any check ran, whatever the seal then decided.
++// Two legs, and their states differ by platform:
++//
++//   - the LEAF leg is closed on POSIX, by O_NOFOLLOW carried on this open
++//     (oNoFollowPlatform), which makes the kernel answer "is the last component
++//     a link" inside the open rather than in a check that can go stale;
++//   - the ANCESTOR leg is still open on POSIX. O_NOFOLLOW is a property of the
++//     last component only, so an ancestor renamed into a link after
++//     resolveString returned is still followed by this open. Closing it needs a
++//     per-component open-at-time (openat/O_NOFOLLOW down the whole chain, or
++//     the handle pinning this package does for the seal), which is not what was
++//     adjudicated for this ticket. This window is not claimed closed anywhere.
++//   - on Windows O_NOFOLLOW does not exist (oNoFollowPlatform is 0), so the leaf
++//     leg is closed there by preOpenLeafGuard probing the name for a reparse
++//     point before the open. That probe answers a question, it does not lock the
++//     answer, so the leaf leg on Windows has a residual window of its own, and
++//     the ancestor leg is open there too. See the Windows file for its own
++//     statement; nothing here may be read as "the window is closed" on the
++//     shipped platform.
+ func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
+ 	resolved, err := resolveString(path)
+ 	if err != nil {
+ 		return err
+ 	}
+-	f, err := os.OpenFile(resolved, flags, perm)
++	if err := preOpenLeafGuard(resolved); err != nil {
++		return err
++	}
++	f, err := os.OpenFile(resolved, flags|oNoFollowPlatform, perm)
+ 	if err != nil {
++		// Returned verbatim, and deliberately NOT run through sealError: this is
++		// the open refusing, not a seal, and the entry that made it refuse is
++		// still standing untouched. The unlink below the seal failure is the only
++		// unlink on this route, and a leaf link must never be removed by a
++		// refusal that followed it (ticket 118's pin).
+ 		return err
+ 	}
+ 	if err := sealHandle(f); err != nil {
+diff --git a/internal/winsec/winsec_other.go b/internal/winsec/winsec_other.go
+index 22d0941d0..ac09d85d5 100644
+--- a/internal/winsec/winsec_other.go
++++ b/internal/winsec/winsec_other.go
+@@ -11,6 +11,33 @@ import (
+ 	"syscall"
+ )
+ 
++// oNoFollowPlatform is the leaf-link leg of ticket 322, carried on the open inside
++// privateFile (winsec.go). It is a constant rather than a bare syscall.O_NOFOLLOW
++// in that shared file because the flag has no Windows spelling: the compile matrix
++// in .scratch/wisp/probes/322/a1 measured syscall.O_NOFOLLOW defined across the
++// whole unix family and undefined on windows, js and plan9, so the portable file
++// has to split it and the Windows file defines it as 0 and answers the same
++// question a different way (see winsec_windows.go's preOpenLeafGuard).
++//
++// What it buys, measured rather than assumed: by-name, every leaf-link spelling
++// (relative, absolute, climbing out of the root, absolute with an out-of-root
++// target, dangling) answers ELOOP "too many levels of symbolic links" and the
++// object behind the link keeps its bytes, its size and its mtime bit for bit.
++// What it does not buy, and must never be written as bought: it speaks about the
++// LAST component only, so an ancestor planted as a link in the same gap is still
++// followed. That leg is open at this anchor.
++const oNoFollowPlatform = syscall.O_NOFOLLOW
++
++// preOpenLeafGuard is the POSIX half of the pre-open hook, and it does nothing.
++//
++// That is not a stub standing in for an unmeasured platform: on this platform the
++// question it would ask is already answered INSIDE the open, atomically with it, by
++// oNoFollowPlatform above. A probe run before the open would only add a verdict
++// that can go stale between the probe and the open - which is the exact shape this
++// package exists to delete (see applyDescriptorPOSIX's costs) - so the honest POSIX
++// answer is that there is nothing to check by name here.
++func preOpenLeafGuard(string) error { return nil }
++
+ // applyDescriptor is the same seam the Windows file exposes, and it is what the
+ // AC#5 failure-injection test replaces on either platform.
+ //
+@@ -74,12 +101,16 @@ var applyDescriptor = applyDescriptorPOSIX
+ //     is the window above.
+ //
+ // And one thing this does NOT fix, named so nobody reads the paragraph above as the
+-// end of the family: the OPEN inside privateFile (winsec.go, outside this ticket's
+-// write surface) still resolves a leaf link before this walk runs, so a link planted
+-// in that gap truncates somebody else's file on the way in. What the leg here stops
+-// is the private BYTES reaching that object - sealHandle refuses, privateFile writes
+-// nothing and unlinks the name - the O_TRUNC damage of that open is not undone. That
+-// shape is booked separately as ticket 322 and is unfixed at this anchor.
++// end of the family: the OPEN inside privateFile (winsec.go) resolves a leaf link
++// before this walk runs. Ticket 322 closed the LEAF leg of that open on this
++// platform by carrying O_NOFOLLOW on it (oNoFollowPlatform below), so a leaf link
++// planted in the gap now makes the open itself answer ELOOP instead of truncating
++// the object behind the link. What is still open, and stays open at this anchor,
++// is the ANCESTOR leg: O_NOFOLLOW speaks about the last component only, so an
++// ancestor swapped for a link after resolveString returned is still followed by
++// that open, and its O_TRUNC still lands on a file in somebody else's tree. The
++// seal legs below stop the private bytes from arriving there; they do not stop the
++// truncation. Nobody may read either sentence as the window being closed.
+ func applyDescriptorPOSIX(path string, dir bool) error {
+ 	mode := fs.FileMode(0o600)
+ 	if dir {
+diff --git a/internal/winsec/winsec_windows.go b/internal/winsec/winsec_windows.go
+index 73257ecfb..63714a83d 100644
+--- a/internal/winsec/winsec_windows.go
++++ b/internal/winsec/winsec_windows.go
+@@ -319,6 +319,91 @@ func applyDescriptorWindows(path string, dir bool) error {
+ 	return nil
+ }
+ 
++// oNoFollowPlatform is the Windows half of ticket 322's split constant, and it is
++// zero: syscall.O_NOFOLLOW has no Windows spelling (the compile matrix in
++// .scratch/wisp/probes/322/a1 measured it undefined on windows, js and plan9), so
++// the open inside privateFile changes flags by nothing here and the question has to
++// be asked this platform's way, which is preOpenLeafGuard below.
++//
++// It is NOT "Windows equals unmodified" either: without this function the leaf leg
++// was open on the shipped platform and measured as open (the local race run recorded
++// foreign files truncated AND the call reporting success). With it, the leaf leg is
++// answered before the open. What must not be over-read is the word "answered": this
++// probe is a judgment about a name, not a lock on it, so between its verdict and the
++// os.OpenFile that follows, the leaf can still be swapped, and the ANCESTOR leg is
++// not probed here at all. Both residuals are stated again at the guard.
++const oNoFollowPlatform = 0
++
++// preOpenLeafGuard refuses a name that carries a reparse point, before privateFile
++// opens it. This is the leaf leg of ticket 322 on Windows, and it is a CHECK, not a
++// non-following write:
++//
++//   - the handle is opened with FILE_FLAG_OPEN_REPARSE_POINT and OPEN_EXISTING, so
++//     it names the LINK itself. Measured locally: attrs report reparse=true, the
++//     file id differs from the target's, and a Write or a Truncate against this
++//     handle does not reach the target - which is exactly why the handle cannot be
++//     used as the write path (the caller's bytes would go nowhere while the call
++//     reported success), and why CREATE_ALWAYS with this flag is banned here: that
++//     variant was measured replacing the link entry itself with an empty regular
++//     file, a second kind of damage rather than a fix;
++//   - so the handle is asked one question and then closed: is this name a link? If
++//     it is, the open that would follow is the thing being prevented, and the
++//     refusal goes through this package's existing refusal shape (both sentinels,
++//     the path, and the reason);
++//   - a name that is not there yet returns nil: PrivateFileExclusive and the first
++//     write of PrivateFile both create, and creating names no link. Any probe
++//     failure other than "not there" is ALSO a refusal - the failure direction of
++//     this package is only ever to tighten (AC#5), so an unanswered question about a
++//     name is not taken as permission to truncate what may stand behind it.
++//
++// Two residuals, named instead of papered over:
++//
++//   - the probe cannot hold the answer. Between this verdict and the os.OpenFile in
++//     privateFile the name can be swapped for a link, and that open still follows
++//     it. Closing THAT needs a single non-following create-and-truncate, which this
++//     platform was measured not to offer through the flags Go exposes; it is booked,
++//     not claimed closed;
++//   - ancestors are not probed. This guard looks at the one name the open will use.
++//     An ancestor link is refused by the placement floor before it (platformVerify-
++//     Placement walks every prefix including this one), which covers the steady
++//     state and not the gap after the floor has answered.
++//
++// And one thing this deliberately does not touch: sealHandle above still goes by name
++// with no same-object re-check on this platform, so "private bytes land in a foreign
++// object" is a separate open leg and belongs to ticket 120's Windows half, not here.
++func preOpenLeafGuard(path string) error {
++	h, err := windows.CreateFile(windows.StringToUTF16Ptr(path),
++		windows.FILE_READ_ATTRIBUTES,
++		windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE|windows.FILE_SHARE_DELETE,
++		nil, windows.OPEN_EXISTING,
++		windows.FILE_FLAG_OPEN_REPARSE_POINT|windows.FILE_FLAG_BACKUP_SEMANTICS, 0)
++	if err != nil {
++		if errors.Is(err, syscall.ERROR_FILE_NOT_FOUND) || errors.Is(err, syscall.ERROR_PATH_NOT_FOUND) {
++			return nil // nothing stands at the name: this is a create, and creates name no link
++		}
++		return preOpenRefusal(path, fmt.Sprintf("the reparse-point probe could not read the name, so it cannot be proved not to be a link: %v", err))
++	}
++	defer func() { _ = windows.CloseHandle(h) }()
++	var info windows.ByHandleFileInformation
++	if err := windows.GetFileInformationByHandle(h, &info); err != nil {
++		return preOpenRefusal(path, fmt.Sprintf("the reparse-point probe could not read the handle it opened, so it cannot be proved not to be a link: %v", err))
++	}
++	if info.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT == 0 {
++		return nil
++	}
++	return preOpenRefusal(path, "the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets")
++}
++
++// preOpenRefusal is placementRefusal's Windows twin for a refusal that happens
++// BEFORE any act: it carries the same two sentinels, because "a refused write is not
++// a completed write" (AC#5) and "this spelling does not name the tree it claims" are
++// both properties of this answer, not of the seal route only. A caller must be able
++// to tell which leg refused it, so the reason text is the readable half of that.
++func preOpenRefusal(path, why string) error {
++	return fmt.Errorf("%w: %s: refusing to open for a private write: %s (%w)",
++		ErrUnresolvedPath, path, why, ErrNotSealable)
++}
++
+ // sealHandle seals a file that is open but still empty. It goes through the
+ // *name*, not the handle: SetSecurityInfo needs WRITE_DAC on the handle, while
+ // the handle os.OpenFile hands back only carries the access it asked for
