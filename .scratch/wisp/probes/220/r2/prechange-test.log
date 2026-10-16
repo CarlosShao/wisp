@@ -1,0 +1,8 @@
+=== RUN   TestRunPacketLightsTheRosterRowOfItsLiveL1Window
+2026/10/16 10:59:57 mockllm: serving on http://127.0.0.1:54301 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+    panel_l1_blocked_220_test.go:215: PRE-CHANGE / WIRING READING: an L1 window was live on task "e87919dd-aef8-4c9a-aba2-25b304202a09" (corr "l1-220-corr-1792119597202068100") and its roster row still read blockedOnApproval=false - the pump's reader is only as good as the producer the composition root points at it (cmd/wisp/run.go's PumpSources literal)
+    panel_l1_blocked_220_test.go:248: L1 window task=e87919dd-aef8-4c9a-aba2-25b304202a09 corr=l1-220-corr-1792119597202068100 | pre blocked=false | lit at publish #2 (was #1; pending 0, queue 0) | post blocked=false
+--- FAIL: TestRunPacketLightsTheRosterRowOfItsLiveL1Window (13.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	13.151s
+FAIL
