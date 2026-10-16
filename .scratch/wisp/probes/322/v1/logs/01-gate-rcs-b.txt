@@ -1,0 +1,5 @@
+d22scan rc=0
+length gate rc=0
+which gofumpt rc=1 (PATH presence)
+gofumpt.exe -l internal/winsec rc=0 listed=0
+gofumpt -l winsec+cmd rc=0 listed=2

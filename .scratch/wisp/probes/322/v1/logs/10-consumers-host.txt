@@ -1,0 +1,6 @@
+ok  	github.com/CarlosShao/wisp/internal/risk	10.400s
+ok  	github.com/CarlosShao/wisp/internal/secret	1.356s
+ok  	github.com/CarlosShao/wisp/internal/config	3.960s
+ok  	github.com/CarlosShao/wisp/internal/agent	4.702s
+ok  	github.com/CarlosShao/wisp/internal/memory	18.977s
+rc=0

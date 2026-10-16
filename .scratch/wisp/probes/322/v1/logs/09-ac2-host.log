@@ -1,0 +1,22 @@
+time=2026-10-16T10:23:03.027+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+    openleaf_overwrite_322_test.go:82: AC#2' mode read-back here is -rw-rw-rw- and is decorative by design; the descriptor is the promise on this platform, and acl_windows_test.go owns that leg
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+    openleaf_overwrite_322_test.go:82: AC#2' mode read-back here is -rw-rw-rw- and is decorative by design; the descriptor is the promise on this platform, and acl_windows_test.go owns that leg
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+    openleaf_overwrite_322_test.go:82: AC#2' mode read-back here is -rw-rw-rw- and is decorative by design; the descriptor is the promise on this platform, and acl_windows_test.go owns that leg
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+    openleaf_overwrite_322_test.go:82: AC#2' mode read-back here is -rw-rw-rw- and is decorative by design; the descriptor is the promise on this platform, and acl_windows_test.go owns that leg
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+    openleaf_overwrite_322_test.go:110: AC#2' read-back here is -rw-rw-rw- (decorative by design); the descriptor is this platform's promise
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.05s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.102s
