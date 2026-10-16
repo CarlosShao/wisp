@@ -1,0 +1,14 @@
+# op=strip-jia  台面=git archive HEAD 导出的仓外树 /d/work/workspace/wisp-270v1-adjudication-bench/repo  raw=/d/work/workspace/wisp-270v1-adjudication-bench/repo/raw-strip-jia.txt
+# rc=0  突变后 sha256=a92f816131f21218956c9e7eef320255d8ef1ea0c615addc69ac93f1faf6b23a  GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\270v1gotmp
+# 尺: grep -c '^=== RUN' / '^--- PASS' / '^--- FAIL' / '^--- SKIP' / '^panic' 对 raw -v 日志(量的, 射程=internal/tools 单包)
+RUN=325
+PASS_TOP=242
+FAIL_TOP=0
+SKIP=0
+PANIC_LINES=0
+TAIL=PASS|ok  	github.com/CarlosShao/wisp/internal/tools	18.360s|
+# 红名册逐枚 + 红句原文(从 === RUN 到 --- FAIL 之间的 t.Errorf/Fatalf 行, 逐字)
+# 还原自证
+restored_tree_sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+repo_HEAD_blob_sha256=86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+MATCH=yes
