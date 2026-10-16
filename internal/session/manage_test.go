@@ -175,6 +175,66 @@ func TestSessionRenameAndArchiveUndo(t *testing.T) {
 	}
 }
 
+// Ticket 326 AC#1, at the outlet the user actually touches: A is created first,
+// B a minute later, then the user says one more thing IN A. Listing by time must
+// put A back on top — and the same read must show the reason (A's stored
+// updated_at equals the stamp of the turn just appended, it did not stay at
+// A.created_at). Stepping clock for the same reason TestSessionListByWorkspace
+// uses it: same-second rows tie and fall through to "id DESC", which ticket 326
+// AC#2 declares out of scope, so nothing here may lean on that coin.
+func TestSessionAppendTurnMovesItBackToTheFront(t *testing.T) {
+	store := openStore(t, filepath.Join(t.TempDir(), "data"))
+	m := newTestManager(t, store, ptrTime(time.Date(2026, 5, 1, 0, 0, 0, 0, time.UTC)))
+	ctx := context.Background()
+
+	a := mustCreate(t, m, "the one I keep talking in", "wk")
+	b := mustCreate(t, m, "created a minute later", "wk")
+	if got, err := m.List(ctx, memory.SessionListOptions{Workspace: "wk"}); err != nil ||
+		len(got) != 2 || got[0].ID != b.ID {
+		t.Fatalf("premise broken: list = %v (%v), want %s first before the append",
+			sessionIDs(got), err, b.ID)
+	}
+
+	if _, err := m.AppendTurn(ctx, a.ID, "user", "still talking here"); err != nil {
+		t.Fatalf("AppendTurn: %v", err)
+	}
+
+	row, err := store.SessionByID(ctx, a.ID)
+	if err != nil {
+		t.Fatalf("SessionByID: %v", err)
+	}
+	turns, err := m.Turns(ctx, a.ID)
+	if err != nil || len(turns) != 1 {
+		t.Fatalf("Turns(%s) = %+v (%v), want 1", a.ID, turns, err)
+	}
+	got, err := m.List(ctx, memory.SessionListOptions{Workspace: "wk"})
+	if err != nil {
+		t.Fatalf("List: %v", err)
+	}
+	t.Logf("326 AC#1 outlet reading: %s.updated_at %d -> %d (delta=%d) for turn.created_at=%d | list = %v",
+		a.ID, a.UpdatedAt, row.UpdatedAt, row.UpdatedAt-a.UpdatedAt, turns[0].CreatedAt, sessionIDs(got))
+
+	if len(got) != 2 || got[0].ID != a.ID || got[1].ID != b.ID {
+		t.Errorf("continuing a conversation does not surface it: list = %v, want [%s %s] after one more turn in %s",
+			sessionIDs(got), a.ID, b.ID, a.ID)
+	}
+	if row.UpdatedAt <= a.UpdatedAt {
+		t.Errorf("AppendTurn wrote the child row only: %s.updated_at stayed %d, want it past %d",
+			a.ID, row.UpdatedAt, a.UpdatedAt)
+	}
+	if row.UpdatedAt != turns[0].CreatedAt {
+		t.Errorf("the touch and the turn disagree on the clock: updated_at = %d, want turn.created_at %d",
+			row.UpdatedAt, turns[0].CreatedAt)
+	}
+	if prow, err := store.SessionByID(ctx, b.ID); err != nil || prow.UpdatedAt != b.UpdatedAt {
+		t.Errorf("appending into %s disturbed %s: updated_at = %d, want %d (%v)",
+			a.ID, b.ID, prow.UpdatedAt, b.UpdatedAt, err)
+	}
+	if prow, err := store.SessionByID(ctx, a.ID); err != nil || prow.CreatedAt != a.CreatedAt {
+		t.Errorf("AppendTurn rewrote created_at: %d, want %d (%v)", prow.CreatedAt, a.CreatedAt, err)
+	}
+}
+
 // AC#4: a fork must not swallow the original. A "tidy up the parent while
 // forking" mutation (moving or deleting its turns) breaks the byte-for-byte
 // comparison below — that is the mutation this test is built to catch.

@@ -250,6 +250,26 @@ func (s *Store) ForkSession(ctx context.Context, parentID, newID string) (Sessio
 }
 
 // AppendSessionTurn adds one message to a conversation (seq auto-incremented).
+//
+// Appending a turn IS a touch of the conversation, so the same transaction
+// refreshes session.updated_at to the stamp of the turn it just wrote (ticket 326
+// AC#1): without it, "list newest-first" sorts by the last time the user renamed,
+// archived or forked the conversation and never by the last thing they said, so a
+// live chat cannot rise to the top of the list.
+//
+// Two constraints shape the how:
+//   - ONE transaction. The INSERT and the UPDATE share s.write, so a kill between
+//     them cannot leave a turn whose conversation still carries an older
+//     updated_at — the HALF-STATE ticket 326 AC#3 kills a subprocess to prove
+//     unreachable.
+//   - ONE clock. The value written is t.CreatedAt, already normalized by orNow
+//     (== observe.NowWallUTC().Unix() when the caller passed none), which is the
+//     family the row itself was stamped with; no second clock is read inside the
+//     transaction (D32/D38: never derive a timeout or a stamp from wall-clock
+//     differences).
+//
+// A failing refresh returns an error and rolls the whole transaction back: this
+// never degrades silently into "child row only".
 func (s *Store) AppendSessionTurn(ctx context.Context, t SessionTurn) (int64, error) {
 	t.CreatedAt = orNow(t.CreatedAt)
 	if err := validateTurn(t); err != nil {
@@ -270,6 +290,14 @@ func (s *Store) AppendSessionTurn(ctx context.Context, t SessionTurn) (int64, er
 			return err
 		}
 		id, err = res.LastInsertId()
+		if err != nil {
+			return err
+		}
+		// The touch half of "每一轮都算动过" (ticket 326). A conversation row that
+		// is not in the table is not this call's business to police — storage
+		// stores rows, the lifecycle policy lives in internal/session — so the
+		// statement's error is what propagates, nothing else.
+		_, err = tx.ExecContext(ctx, `UPDATE session SET updated_at=? WHERE id=?`, t.CreatedAt, t.SessionID)
 		return err
 	})
 	if err != nil {
