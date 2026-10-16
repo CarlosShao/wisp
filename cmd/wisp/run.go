@@ -725,7 +725,11 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// never arrive. This one reads the roster this process is running plus
 		// the stream log this process is writing - see panel_pump.go.
 		Tasks: rt.taskRosterState,
-		Out:   rt.bookPanelSnapshot,
+		// ticket 220 AC#2's second blockedOnApproval source, landed by 220-r2: the
+		// L1 confirmation windows this run's gate is holding open right now, read
+		// off the gate itself - see panel_pump.go's liveL1WindowWaits.
+		L1Windows: rt.liveL1WindowWaits,
+		Out:       rt.bookPanelSnapshot,
 	})
 	// The console surface publishes a packet when the approval state moves. A
 	// host whose cards go somewhere else (ticket 246 AC#7's injected gate) has no

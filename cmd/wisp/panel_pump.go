@@ -75,6 +75,47 @@ func (rt *agentRuntime) liveVerdicts() []panel.NativeVerdict {
 	return out
 }
 
+// liveL1WindowWaits is the pump's second blockedOnApproval source (ticket 220 AC#2,
+// landing 甲 as ruled by A562 §1): the L1 confirmation windows this process is
+// holding open at the instant the packet is built.
+//
+// IT IS A READ, NOT A JUDGEMENT. Every value is a copy of an id the gate already
+// filed - Gate.LiveL1Windows (internal/agent/approval/window_read.go:63) walks
+// g.windows and returns three id strings per live window, moving nothing. This
+// folds those three into the two a roster row can be joined by and drops the third
+// (Tool): panel.L1WindowWait carries correlation and task ids and no behaviour,
+// precisely so the window cannot arrive in the answerable section as a card. That
+// is 220-r1's rule, restated here at the producer side: the pending section stays
+// the queue's alone, so ticket 146's readings on LiveApprovals keep holding.
+//
+// WHY IT IS NON-EXPORTED, AND WHY THAT IS THE WHOLE POINT. A562 §2 puts this hop at
+// the composition root: one non-exported method value plus one line in run.go's
+// PumpSources literal, so there is zero new exported method name and zero new
+// panel.* name - no inbound door for a page, nothing for C17 to whitelist, and the
+// roster nails in cmd/wisp and internal/panel keep their exact sets. A reader a page
+// could call would have been a second route into an approval dimension, which is
+// what the closed six-name inbound set exists to refuse.
+//
+// nil IS HONEST IN ONE DIRECTION ONLY. A runtime with no gate returns nil, which the
+// pump documents as "this host did not read the dimension", never as "no window is
+// waiting" - the same rule pump.go writes for Instructions and Tasks. A host with a
+// gate and no live windows returns an empty list, which is a reading, and lights
+// nothing.
+func (rt *agentRuntime) liveL1WindowWaits() []panel.L1WindowWait {
+	if rt == nil || rt.gate == nil {
+		return nil
+	}
+	wins := rt.gate.LiveL1Windows()
+	if len(wins) == 0 {
+		return nil
+	}
+	out := make([]panel.L1WindowWait, 0, len(wins))
+	for _, w := range wins {
+		out = append(out, panel.L1WindowWait{CorrelationID: w.CorrelationID, TaskID: w.TaskID})
+	}
+	return out
+}
+
 // workspaceView reports the narrowing native resolved, through panel's own
 // renderer of the two states (set / unset-with-a-reason). The spelling and the
 // reparse/rewrite account live on the request path (RequestWorkspaceSwitch),
