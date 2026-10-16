@@ -1,0 +1,26 @@
+腿名：166-v1（验收腿·非实现者·只读产码）｜票：.scratch/wisp/issues/166-no-session-layer-list-search-rename-archive-fork-on-the-go-side.md（AC#1–AC#6 六格逐格判语，六枚框现量全未勾／0 已勾，编排者 09:2x 现跑 `grep -c '^[[:space:]]*- \['`＝6）
+裁决锚：实现笔两枚＝`427c62d0a`（166-r1，Go 侧会话管理层：`internal/session/manage.go` 159 行＋`internal/memory/dao_session.go` 299 行＋`schema.go` 63 行＋四件测试件，9 枚路径合计 +975/−40）∥`c2b1ade5`＋`464f5549`（166-r2 那枚"硬币仪器改确定性"＝`internal/session/manage_test.go` +14/−2，加它的三处写面补齐）；当前 HEAD＝`46007856`（2026-10-16 09:2x）
+
+★这单的**特殊处**＝实现腿 `166-r1` 在盘上**没有证据件**（`ls docs/evidence/s1/ | grep 166` 现量只命中 `ticket166-ac6-166r2.md` 一枚，那是 AC#6 的、出自另一条腿）。所以 AC#1–AC#4 的读数**要你自己跑出来**，⛔ 拿 `probes/166/r1/` 里那两枚件（`ac1-census.txt` 13 行＋`logs/00-head.txt` 1 行）当判语凭据——它们是过程件、不是裁决表。
+
+## 六格怎么判（每格都要答"这一发在未修码上响不响"）
+- **AC#1 未修码读数**：现量"今天能不能列出历史会话"——命令档与 API 档各一条，各带 `rc=` 与逐字输出；**量不到＝本票成立**，量到＝具名报回（别替编排者圆）。
+- **AC#2 四件最小出口**（列／搜／改名／**归档带撤销**）：每件都要①指名它落在哪个函数与哪枚用例，②★**必答生产调用者枚数**（`git grep -n` 那一把，⛔ 用 `go build`／`go vet` 的 rc=0 冒充接线——Go 不为未使用方法报错），③"未修码上响不响"。⚠ 已知线索（**你自己复一把、⛔ 照抄**）：`166-r2` 在其证据件 §2 交过 `git grep -n "session\.NewManager"` rc=1＝**零命中**、`Manager.List`/`Search` 的 9 枚调用点全在 `manage_test.go` ⇒ 出口"写了没接线"这一形如果成立，判语要写成**接线缺口**、⛔ 写成本票已完成。
+- **AC#3 迁移崩溃原子性**：中途被杀之后重开必须"要么全成要么全不成"。要一发**真把进程杀掉**的台件（⛔ 只在测试里调一次 migrate 就宣称原子）；数字前缀幂等键那一形要**新库／老库各推一遍缺哪列**。
+- **AC#4 分叉不许吞原件**：分叉后原会话历史逐字仍在＝拿一发"分叉时顺手清理"的**去牙反控**证（物理改盘上字节，⛔ `-overlay`；红句连文案逐字落盘＋还原复跑绿＋记还原哈希）。
+- **AC#5 契约轴零字节**：名册按 commit 号集合算（`git show --no-walk --name-only` 逐枚），对 `PLAN.md`／`specs/**`／`internal/risk/**`／`internal/panel/**`／`internal/agent/approval/**`／`thresholds.go`／golden／`allowlist.txt`／`frontend/**`／`design/**` 逐枚点名命中数。
+- **AC#6 同秒并列那一支**：审计 `docs/evidence/s1/ticket166-ac6-166r2.md`（94 行／9363 字节）那五发（改前 7 红／第二发 12 红证非恒定／改后 20/20×2＋Search 同形＋族内 100/100／摘步进的突变态 22 红／还原绿且 `cmp` 0 差异）＋**至少复两发**（建议复"改后 20/20"与"摘步进必红"这一对）；★还要答一句它自报的那处不符：`:84` 那枚 `TestSessionSearchTitleAndBody` 实测**不是硬币**（时钟做平仍 20/20 绿）， ⇒ 判语要写清"这一格真关掉的硬币只有 `:69` 一枚、`:84` 是防未来"，⛔ 替实现腿把那句抹平。
+- ★**移交给我裁的三形料**（票 166 面上⛔ 你动、台账我另记）：`AppendSessionTurn` 不刷新 `session.updated_at` ⇒ "继续聊不把会话顶到前面"是**行为**缺陷，你只交读数与代价，⛔ 裁、⛔ 改 `dao_session.go:125/:144` 的 tie-break。
+
+## 写面（只许这三处，逐字）
+1) `.scratch/wisp/probes/166/v1/`；2) **`docs/evidence/s1/166-session-verdict.md`**（短名、⛔ 长名⛔ 带 `§`；没有它＝六格在盘上等于没裁）；3) 票 166 末尾**一条** bullet。⛔ 勾任何 AC 框、⛔ 动 `Status:`／票名／`-done`、⛔ 改产码／测试件一字。
+
+## 台面与禁区
+- 同批三枚在飞：`322-r1b`（写 `internal/winsec/**`）∥ `325-r1`（写 `tools/d22scan/**`）∥ `287-v1b`（只读 `internal/tools`）。⛔ 读它们的在飞件当凭据。★`go build ./...` 若红且红句指 winsec／tools／d22scan ⇒ 那是别腿在飞态，改在**仓外导出树**（`git archive 46007856 | tar -x -C <仓外目录>`，六件套 `go.mod go.sum internal cmd tools scripts` 逐枚验在＋先数 `.go` 证非空）重跑，⛔ 记进本票判语。
+- `internal/memory` 的测试要碰真 SQLite：⛔ 用 mock 代替真的；`GOTMPDIR` 先 `mkdir -p`、⛔ 指到非 `%LOCALAPPDATA%` 卷（票 311 GUARD 的 rc=2 是**射程拒绝**、⛔ 当红）。⛔ `go test ./cmd/wisp` 整包（票 314 死亡区）；`cmd/wisp` 测试缺三枚 `third_party/sherpa-onnx/*.dll` 会回 `0xc0000135`＋`RUN=0`＝台面故障、⛔ 读数。
+- ⛔ 拿共享工作树跑"改前那一发"；改前基线一律 `git archive <rev>` 仓外成对树。读数纪律：`RUN=`/`PASS=` 必写口径（顶层 ⇄ 含子测试两把差约 11 枚）；⛔ 从管道取退码（`cmd | tail; echo $?` 拿的是 `tail` 的）；报"0 命中"前先看 stderr 并跑一枚已知存在的正控；红句里有 `walk`／`build failed`／`no tests to run`／`RUN=0` ⇒ 台面故障。
+- 禁区（零字节）：`PLAN.md`／`specs/**`／`internal/risk/**`／`internal/panel/**`／`internal/agent/approval/**`／`thresholds.go`／golden／`tools/d22scan/allowlist.txt`／三枚冻结件／`frontend/**`／`design/**`／`.github/**`／`ci.yml`／`go.mod`／`go.sum`／`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表。⛔ 为变绿放宽断言⛔ 删用例⛔ 加 `t.Skip`。
+- Git：只 commit、⛔ push；`add`／`commit` 两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 预算：≤150 轮 ⇒ **每落一枚文件就 commit**（commit-first）；判语只有三种（成立／不成立／证据不足＋缺哪一发读数）；AC#3 那发真杀进程的台件如果做不出来，具名写"缺哪一发"、⛔ 用"原子性应该没问题"糊过去。
+交件自证三把尺：① 提交号＋`git show --stat HEAD` 路径清单；② 裁决表与读数件的**绝对路径＋字节数**；③ 你至少复跑的两发 AC#6 逐字红句／绿句。⛔ 只说"已完成"。

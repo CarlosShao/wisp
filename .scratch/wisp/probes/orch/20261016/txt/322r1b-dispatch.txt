@@ -1,0 +1,35 @@
+腿名：322-r1b（落地腿·接手死腿的盘上中间态）｜票：.scratch/wisp/issues/322-privatefile-open-truncates-through-a-swapped-leaf.md（先读全文与 AC 框现量＝6 枚未勾／0 枚已勾，编排者 09:1x 现跑 `grep -c` 两把尺）
+前任＝`322-r1`：死于 **150 轮上限**（09:0x 强杀，最后一句自报是"注释里有个词打错了正在改"），**零提交、零证据件、票尾 bullet 没写**。它的字节由我代提＝`8baec646`（六枚：`internal/winsec/winsec.go`／`winsec_other.go`／`winsec_windows.go`＋三枚新测试件 `openleaf_322_other_test.go`(262 行)／`openleaf_guard_322_windows_test.go`(254 行)／`openleaf_overwrite_322_test.go`(131 行)，合计 +811/−7）。
+你的原派单＝`.scratch/wisp/probes/orch/20261015/txt/322r1-dispatch.txt`（判据、形、禁区、票面引用全部照它，⛔ 因为换了你这一版就丢掉里面的条款）。
+★与原版唯一的不同＝你的第 0 步不是"从零写"，而是"先读懂 8baec646 已经写了什么"。
+
+## 第 0 步（必做，⛔ 跳过）：把你前任的字节读明白并落一份读数
+1. `git show --stat 8baec646` ＋ 逐枚 `git show 8baec646 -- internal/winsec/<那六枚>` 读 diff：它到底把哪一处 `os.OpenFile` 换成了什么守卫、`winsec_windows.go` 那 +85 行是不是真的对应票面那一形。
+2. 现跑三把尺并落盘（`.scratch/wisp/probes/322/r1b/`，每把一枚、件里带 `rc=`）：
+   - `go build ./...`；`go vet ./internal/winsec/`；`gofmt -l` 对这六枚（⛔ 报退码，报"列出几枚＋件名"）。
+   - `go test ./internal/winsec/ -count=1 -v` ⇒ 数出来要写清口径：`RUN=`（含子测试）／`PASS_TOP=`（`^--- PASS` 只数顶层）／`FAIL_TOP=`／`SKIP=`。★编排者**两发现量、颜色不同**，你起手先自己再跑一发：09:0x＝**110／59／2／0**（rc=1）⇄ 09:1x＝**110／61／0／0**（rc=0，`GOTMPDIR` 未设、走默认 `TMP`）。
+   - ★**那两枚红的归属**：`TestGateJudgesThePrivateSetByResolvedSID` 与 `TestSealNarrowsAndNamesThePrincipalItRemovedBySID` ＝**存量**（凭据＝差集法：`git archive HEAD` 取仓外导出树、现量 1087 枚 `.go` 证非空，改前同两枚 `-run` 同样 `--- FAIL`、名册逐字相同）。⚠ 但**它们今天已经自己变绿**（上面 09:1x 那发＝0 FAIL）⇒ 这一族的颜色随卷/残留摆动（先例＝台账里"同一份码换枚盘 58/0⇄56/2"、`t.TempDir()` 收尾删不掉那一支）。因此：① ⛔ 把它们变绿算你的功劳、② ⛔ 让它们变红算你的病、③ 你要交的是**具名写清你那一发起手是几／几＋`GOTMPDIR` 写法＋卷**，并⛔ 动这两枚用例一字。要"改前基线"就⛔ 拿共享工作树、一律 `git archive` 仓外树成对跑。
+3. 把你前任**没做的事**逐枚列成"残余清单"（它没证据件、没票尾 bullet、没 mutation 自证、没写它自己那把尺的读数）——这份清单就是你这单的射程。
+4. ★**先代提你前任的读数遗产**：`.scratch/wisp/probes/322/r1/` 现量**盘上 66 枚、tracked 0 枚**＝322-r1 那 66 发读数全没入库（它零提交）。第 0 步做完第一件事＝把这些件按枚 `git add`（路径逐枚列，⛔ 目录形⛔ `-A`）＋一笔 commit，正文标〔322-r1 读数遗产·编排者代提〕。⛔ 删任何一枚（临时件只建不删），⛔ 改写它的字节（要更正就在你自己的 `r1b/` 目录里另写）。
+
+## 你要交的五件（顺序＝先保住再扩）
+- (a) **证据件**`docs/evidence/s1/322-openleaf.md`（短名、⛔ 长名⛔ 带 `§`）：内容＝这一格病是什么、8baec646 交的是什么形状、你补了什么、每把尺的 `rc=` 与红句逐字。**没有它这一格在盘上等于没交**（`AGENTS.md` §1.5 的落点）。
+- (b) **牙**（首要攻击点＝判据仪器自己）：对这三枚新测试件做**去牙反控**＝把守卫物理摘掉（改盘上字节，⛔ `-overlay`——这族尺运行时读盘，overlay 恒绿＝假读数），点名哪些用例必须红；红句连文案逐字落盘＋还原复跑绿＋记录还原哈希。⛔ 只做"改前必红"就交：还要问"换成反形会不会也红"（恒真三形之一＝一把尺两种形状都放行）。若某一支**夹具里根本没造出坏世界**，具名报"缺世界"＋说台件该怎么造，⛔ 假装测到了。
+- (c) 票面剩下的格子逐枚推进；每格都要答"这一发在未修码上响不响"。**⛔ 勾 AC 框**（翻框归编排者）。
+- (d) `openleaf_322_other_test.go` 现量 **262 行**＝超我自己那条 ≤260 预算 2 行（全仓没有件行数自动门，`grep -n 260 scripts/*.sh` 零命中，所以这是纪律⛔ 门禁）。处置权在你：**要么**按内容拆成两枚并保持判据一字不动，**要么**留着并具名写"为什么不拆"。⛔ 为了凑数删注释或删判据。
+- (e) 门禁五件自己跑、自己落 `rc=`：`go build ./...`／格式化尺／`go vet ./internal/winsec/`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh --with-self-test`。⚠ 具名两枚台面雷：d22scan 会把 `GOTMPDIR` 指到非 `LOCALAPPDATA` 卷时回 **rc=2 的 311 GUARD 射程拒绝**（⛔ 当红，按那句提示 unset 或换卷再跑）；本机现在 `gofumpt` 没装（rc=127）⇒ 跑 `gofmt -l` 并具名它更窄。
+
+## 写面（只许这三处，逐字）
+1) `.scratch/wisp/probes/322/r1b/`；2) `docs/evidence/s1/322-openleaf.md`；3) 票 322 末尾**一条** bullet（只追加）。
+另外允许你继续改 `internal/winsec/**`（这是你的写面，因为 322-r1 已死、我已把它的字节入库；⛔ 别碰 `internal/winsec` 之外的包）。
+
+## 台面与禁区
+- 同批另一枚在飞＝`317-v1`（只读验收腿，面＝`scripts/**` 读数＋`./internal/risk/` 两形对照）。⛔ 读它的在飞件当凭据；它⛔ 改产码，所以 `scripts/**` 不会动。
+- ⛔ `go test ./cmd/wisp` 整包＝票 314 死亡区；⛔ `go mod tidy`／`go get`（有一枚挂了多日的 `go.mod`）；`GOTMPDIR` 先 `mkdir -p` 再指；要"改前基线"一律 `git archive <rev> | tar -x -C <仓外目录>`（⛔ 拿共享工作树当改前那发、⛔ 仓内 worktree），取出后先数 `.go` 证非空再信它的 0。
+- 禁区（零字节）：`docs/PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、三枚冻结件、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、`go.mod`／`go.sum`／`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动。⛔ 为了变绿放宽任何断言、⛔ 删任何用例或加 `t.Skip`。
+- Git：只 commit、**⛔ push**；`git add`／`git commit` 两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（这族在本仓造过两次真事故）。中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 读数纪律：引数必带"哪把尺＋射程＋量的还是算的"；"几枚"必带单位（文件／顶层用例／子测试／调用点）；报"0 命中"前先看 stderr 并跑已知存在的正控；红句里有 `walk`／`build failed`／`no tests to run`／`0xc0000135`／`RUN=0` ⇒ 台面故障、⛔ 计入判据。
+- 预算：≤5 件、每件 ≤260 行；没做完的格子具名写"没做完＋缺哪一发读数"，⛔ 用含糊话糊过去。
+- 轮次约 150 上限 ⇒ **每落一枚文件就 commit**（commit-first）。你前任就是栽在"想一次做完"。
+交件自证三把尺：① 提交号＋`git show --stat HEAD` 路径清单；② 证据件与读数件绝对路径＋字节数；③ 牙（去牙反控）红句逐字＋还原后绿的那一发。⛔ 只说"已完成"。

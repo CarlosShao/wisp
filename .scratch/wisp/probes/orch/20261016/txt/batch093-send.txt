@@ -1,0 +1,14 @@
+放出记录：322-r1b ∥ 325-r1 ∥ 287-v1b ∥ 166-v1（四枚一批，2026-10-16 09:3x +08，编排者现跑三把尺后放出）
+
+派单存档＝`.scratch/wisp/probes/orch/20261016/txt/322r1b-dispatch.txt`／`325r1-dispatch.txt`／`287v1b-dispatch.txt`／`166v1-dispatch.txt`（本件＝同批 `-send.txt`，冲突以本件为准）。
+
+放腿前现量（全部自己跑，⛔ 引上一轮的数）：
+- 面空：`git status --porcelain` 对 `internal/winsec`＝**0 行**／`internal/tools`＝**0 行**／`tools/d22scan`＝**0 行**／`internal/session internal/memory`＝**0 行**。
+- 锚真在：`git log -1 8baec646`＝10-16 09:06（322-r1 遗产代提）／`git log -1 e1973191`＝10-15 22:09（287-r1 落地）／`git log -1 427c62d0a`＝10-13 18:07（166-r1）／HEAD＝`46007856`。
+- 件真在：`docs/evidence/s1/287-depth-fixture.md`＝13631 字节、`docs/evidence/s1/ticket166-ac6-166r2.md`＝9363 字节；`docs/evidence/s1/322-openleaf.md`＝**不存在**（＝322-r1b 第 (a) 件要补的那一枚，现量已写进它派单）；死腿读数遗产＝`probes/287/v1` 13 枚、`probes/322/r1` 66 枚（tracked 均 0 ⇒ 已写进各自派单第 0 步"按枚代提"）。
+- CPU＝`Get-Counter` 两发 **40%／40%**（＜70% ⇒ 允许补位；机主 10-13 与 10-15 两次点名"⛔ 一腿独跑"）。
+
+编队＝写 2（`322-r1b` winsec／`325-r1` tools）＋只读 2（`287-v1b` tools 读数／`166-v1` session+memory 裁决）。★为避免互污：`325-r1` 被明令把一切整树/整档读数放到**仓外导出树**上跑（它要跑 `--scope=windows` 八包，里面含 `322-r1b` 正在写的 winsec）。
+
+⛔ 现在 push 的具名理由沿用 §4.0ds：推会自启本机 `slo-full` 抢 CPU，而此刻 4 枚在飞；未推现量＝**23 笔**（`git rev-list --count origin/dev..HEAD`，origin/dev＝`adec1db1`）。释放条件＝这批写腿交完之后一次推＋推前核 fast-forward、⛔ force、只 `origin/dev`（机主授权 A813）。
+本轮我自己的两处偏差已具名进台账（下笔 A1001）：① `8baec646` 那句"≤260 由长度门核过"是假话（已在 `c2b1ade5` 更正）；② `c2b1ade5` 那句"盘上唯一一枚中间态"不实（已在 `464f5549` 更正并补齐）。

@@ -1,0 +1,28 @@
+腿名：287-v1b（验收腿·非实现者·只读产码）｜票：.scratch/wisp/issues/287-depth-guard-has-no-fixture-so-the-subagent-spawn-hop-is-unreachable-and-untested.md（AC#2／AC#3／AC#4 三格逐格判语；AC#1 已勾、归实现前普查，⛔ 你重开）
+裁决锚：实现笔＝`e1973191`（287-r1 落地腿，写面＝新件 `internal/tools/subagent_depth_fixture_287_test.go` 260 行／3 枚用例＋`docs/evidence/s1/287-depth-fixture.md` 现量 13631 字节）＋`e64294a0`（它按⛔ amend 规矩另发的台面登记）；当前 HEAD＝`46007856`（2026-10-16 09:2x）
+
+★你接的是**一枚死腿的中间态**：`287-v1`（同一格的上一任验收腿）死于"Model response interrupted"（23:31 后零动作、**零提交**）。它留下的东西⛔ 直接当凭据、⛔ 删：
+- `.scratch/wisp/probes/287/v1/00-readings.md`＝20810 字节，七节（§1 门禁五件／§2 d22scan 那枚 rc=1 归属／§3 AC#2 四问／§4 突变台件算不算凭据／§5 AC#3 甲形代价／§6 AC#4 越界扫／§7 没裁完五笔具名）＋`v1-01..06` 的 `.log`/`.rc` 成对件。现量＝盘上 13 枚、**tracked 0 枚**。
+- 它**没有**产出判语表（它自己写"判语在 `docs/evidence/s1/287-v1-accept.md`"＝那枚文件根本不存在）。⚠ 这条按你派的规矩：注释／读数件里指名的文件，交付判据是 `wc -c` 现量，不是它说了。
+
+## 第 0 步（必做，⛔ 跳过）
+1. 先**逐枚复跑**你前任 §1 那五件门禁（`GOFLAGS= go build ./...`／`go test ./internal/tools/ -count=1 -v` 四数／`go vet ./internal/tools/`／`sh scripts/d22scan.sh`／长度门 `--with-self-test`），把你的数写在旁边；**只有你复出来的数⛔ 能进你的判语表**，复跑对不上的地方具名写"与 287-v1 那发不同、成因＝……"。★引数必带"哪把尺＋射程＋量的还是算的"：`^--- PASS`（顶层）与含子测试那把差约 11 枚；`RUN=` 是 `^=== RUN`。
+2. ⚠ 台面归因两枚雷：① 同批 `322-r1b` 正在写 `internal/winsec/**`、`325-r1` 正在写 `tools/d22scan/runtests.sh` ⇒ `go build ./...` 若红且红句指这两面，**那是别腿在飞态**、⛔ 记成 287 的病，改在**仓外导出树**（`git archive 46007856 | tar -x -C <仓外目录>`，六件套 `go.mod go.sum internal cmd tools scripts` 逐枚验在、先数 `.go` 证非空）重跑；② `cmd/wisp` 测试缺三枚 `third_party/sherpa-onnx/*.dll` 会回 `0xc0000135`＋`RUN=0`＝台面故障、⛔ 读数（要跑就把该目录加进 PATH 并重跑）。
+3. 把前任那 13 枚读数遗产**按枚** `git add`（路径逐枚列，⛔ 目录形⛔ `-A`）＋一笔 commit，正文标〔287-v1 读数遗产·编排者代提〕；⛔ 改写其字节。
+
+## 你要交的三格（每格都要答"这一发在未修码上响不响"）
+- **AC#2 夹具**：判三问（前任 §3 已给读数，你⛔ 照抄结论）＝① 调用者那一行真拿到 `Kind == TaskKindSubagent` 了吗（生产构造路径，⛔ 夹具自填字段冒充装配）；② `corr != taskID` 那一维是**量出来的**还是注释里写的；③ 派发是否经**真 loop**（恒真检查＝把深度判定那一支物理摘掉，点名哪些用例必须红；⛔ `-overlay`，这族尺运行时读盘）。⚠ 前任 §7 具名两枚"无人钉／无突变落点"（`:180-182` 与 `:197-199`）＝你若也造不出那一发，判语写**证据不足**、⛔ 追认。
+- **AC#3 那句"要不要让它走到"**：只裁"甲形那句代价说实话没有"（⛔ 重裁形、⛔ 改产码一字）。
+- **AC#4 边界与门禁**：写面是否只 `internal/tools/**`、⛔ 碰 `internal/agent/loop.go` 的 `callCorr`/深度那一支；越界扫自己跑（前任 §6 那把你也要复）。
+
+## 写面（只许这三处，逐字）
+1) `.scratch/wisp/probes/287/v1b/`（新目录，⛔ 动 `v1/`）；2) **`docs/evidence/s1/287-v1-accept.md`**（短名、⛔ 长名⛔ 带 `§`；这是你上任欠下的那一枚，**没有它＝这格在盘上等于没交**，`AGENTS.md` §1.5）；3) 票 287 末尾**一条** bullet（只追加）。⛔ 勾任何 AC 框、⛔ 动 `Status:`／票名／`-done`。
+
+## 台面与禁区
+- 同批三枚在飞：`322-r1b`（写 `internal/winsec/**`）∥ `325-r1`（写 `tools/d22scan/**`）∥ `166-v1`（只读 `internal/session`+`internal/memory`）。你⛔ 读它们的在飞件当凭据。
+- ⛔ `go test ./cmd/wisp` 整包＝票 314 死亡区（174–212 s 且假分母）；⛔ `go mod tidy`／`go get`；`GOTMPDIR` 先 `mkdir -p` 且别指到非 `%LOCALAPPDATA%` 卷（票 311 GUARD 会给 rc=2 的**射程拒绝**、⛔ 当红）。
+- 禁区（零字节）：`PLAN.md`／`specs/**`／`thresholds.go`／golden／`tools/d22scan/allowlist.txt`／三枚冻结件／`frontend/**`／`design/**`／`.github/**`／`ci.yml`／`go.mod`／`go.sum`／`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表。⛔ 为变绿放宽断言⛔ 删用例⛔ 加 `t.Skip`。
+- Git：只 commit、⛔ push；`add`／`commit` 两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 预算：≤150 轮 ⇒ **每落一枚文件就 commit**（commit-first，本批已有两枚死在这条上）；判语只有三种（成立／不成立／证据不足＋缺哪一发读数），⛔ 用"基本"／"应该"糊。
+交件自证三把尺：① 提交号＋`git show --stat HEAD` 路径清单；② 判语表与读数件的**绝对路径＋字节数**；③ 你复跑的门禁五件逐枚 `rc=`。⛔ 只说"已完成"。

@@ -1,0 +1,28 @@
+腿名：325-r1（落地腿·测量完整性）｜票：.scratch/wisp/issues/325-runtests-sh-gotmp-tail-keeps-forward-slashes-so-d22scan-runs-on-a-mixed-shape-root.md（先读全文；五枚 AC 框现量全未勾，编排者 09:2x 现跑）
+起手锚：HEAD＝`46007856`（2026-10-16 09:2x）｜写面＝`tools/d22scan/**`（该面现量空：`git status --porcelain -- tools/d22scan`＝0 行）
+出身两枚我（编排者）已替你反查并核过：`git log -1 581dd252`＝10-14 13:58「编排者：微修 runtests.sh 第四处折法（镜像317-r1形）」＝尾接 `/d22scan-` 的来路；`git log -1 76b9e214`＝10-14 14:49「编排者：253-r6 收件＋自伤修复（runtests.sh 单反斜杠→双）」＝基座那半的来路（`git log -L 92,92:tools/d22scan/runtests.sh` 现读命中它）。⇒ **两枚都是编排者的手**，⛔ 把账记在任何腿上，也⛔ 拿去当"已经有人修过"。
+
+## 第 0 步（必做）：自己把三把尺重跑一遍，⛔ 抄票面
+1. `sed -n '92p' tools/d22scan/runtests.sh` ＋ `| od -c` ⇒ 逐字确认＝**混形**（基座 `\\`、尾接 `/`）。
+2. 已修三处对照（同尺）：`scripts/portable-tests.sh:155-156`／`scripts/winsec-tests.sh:69`／`scripts/wisp-cli-tests.sh:82` ⇒ 尾接都应是 `\\`。
+3. 病今天还活着：仓外导出树（`git archive 46007856 | tar -x -C <仓外目录>`，六件套 `go.mod go.sum internal cmd tools scripts` 逐枚 `[ -e ]` 验在、`find -name '*.go' | wc -l` 证非空之后才信它的 0），`-run` 那四枚 junction 族用例，成对两发**同一个目录只差分隔符**：`GOTMPDIR='C:\tmp\<你的名>\pair'` ⇄ `'C:/tmp/<你的名>/pair'` ⇒ 前者 4/0、后者 0/4（编排者 09:1x 现量＝`RUN=4 PASS=4 FAIL=0` rc=0 ⇄ `RUN=4 PASS=0 FAIL=4` rc=1，红句同行同号 `internal/risk/syncdirs_ancestor_actable_leg_116_test.go:182`／`:286`＋`syncdirs_ancestor_reparse_ticket105_windows_test.go:59`／`:116` 的 `Invalid switch - "tmp".`）。四枚真名以 `-list` 自证存在（⛔ 拿不存在的名字跑，那叫 `no tests to run`、⛔ 是读数）。
+
+## 你要交的五格（票面 AC#1–AC#5 逐格，每格都要答"这一发在未修码上响不响"）
+- **AC#1 改形**：把 `:92` 的尾接 `/d22scan-` 改成 `\\d22scan-`（与 `scripts/**` 那三处**逐字同形**），并留一条注释写清**为什么这里不许折成正斜杠**——要点名会炸的那族用例（`mklink /J` 把 `C:/…` 当开关），⛔ 只写"风格统一"。判据＝改前/改后各一发 `sh scripts/d22scan.sh`（干净台面：`GOTMPDIR` 与 `WISP_TEST_GOTMP_ROOT` 都抽干）都 rc=0 clean，且把那一行 `GOTMPDIR=` 的**逐字形状**（`od -c`）落在读数件里。
+  ⚠⚠ **射程护栏**：`wisp_311_ref_path` 那四处（`scripts/portable-tests.sh:818`／`scripts/winsec-tests.sh:174`／`scripts/wisp-cli-tests.sh:186`／`tools/d22scan/runtests.sh:155`，编排者 09:2x 现跑 `grep -rn` 的数）**是对照位显示值、不流向 `GOTMPDIR`**，票 317 已逐处判"不修" ⇒ ⛔ 顺手把它们"改一致"＝越界；真要动就停手上报。你⛔ 写 `scripts/**`（那三处已由 317 修毕并验过）。
+- **AC#2 成对反控（这族尺的牙）**：在仓外导出树上把 `:92` **物理退回混形**（⛔ `-overlay`——这族尺运行时读盘，overlay 恒绿＝假读数），点名哪些用例必须红、红句连文案逐字落盘；然后还原、复跑绿、记还原哈希。**还要答一句"射程里今天真含那四枚吗"**：`runtests.sh` 这一档如果被测集合里根本没有 `./internal/risk/` 的 junction 族 ⇒ 具名写成**缺世界**（坑活着、今天仪器看不见），⛔ 假装测到了、⛔ 为了凑红把 d22scan 的档位改成跑 `./internal/risk/`（那是改门、要批准）。
+- **AC#3 顺带交出票 317 的 AC#3**（同一台面、省一枚腿）：修完后跑一发 `bash scripts/portable-tests.sh --scope=windows`，三样齐＝① 那一行 `GOTMPDIR=` 逐字是 `C:\Users\…\wisp-test-gotmp\…` 原生形；② **八包四数逐包落盘**（⛔ 只报总数；口径要写：`RUN=`＝`^=== RUN`、`PASS_TOP=`＝`^--- PASS` 只数顶层，两把差约 11 枚）；③ 红名册（**名＋文案逐字**）与 10-14 那两发 CI 的 `Invalid switch` 名册作差＝**新增 0**。⚠ 这一发很长（多包连跑），先把 AC#1／AC#2 的 commit 落完再做；`--scope=cli` 与 `./cmd/wisp` 整包⛔ 碰（票 314 死亡区 174–212 s 且假分母）。
+- **AC#4 门禁**：`bash -n tools/d22scan/runtests.sh`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh --with-self-test`／`GOFLAGS= go build ./...` 逐枚自落 `rc=`。
+- **AC#5 账**：票 317 面上"同形、今天未爆"那句由**编排者**重述，⛔ 你改 317 的原文与框；你只在票 325 末尾追加一条 bullet。
+
+## 写面（只许这三处，逐字）
+1) `.scratch/wisp/probes/325/r1/`；2) `docs/evidence/s1/325-runtests-gotmp.md`（短名、⛔ 长名⛔ 带 `§`；**没有它＝这格在盘上等于没交**，`AGENTS.md` §1.5）；3) 票 325 末尾**一条** bullet（只追加）。⛔ 勾 AC 框（翻框归编排者）⛔ 动 `Status:`／票名／`-done`。
+
+## 台面与禁区
+- 同批三枚在飞：`322-r1b`（写 `internal/winsec/**`）∥`287-v1b`（只读 `internal/tools`）∥`166-v1`（只读 `internal/session`+`internal/memory`）。★所以你**任何"整树/整档"读数一律在仓外导出树上跑**（⛔ 拿共享工作树当改前那发、⛔ 仓内 worktree/checkout），否则你会把 `322-r1b` 的在飞态读成 325 的红。
+- ⛔ 动 `scripts/**`／`.github/**`／`ci.yml`／`thresholds.go`／golden／`tools/d22scan/allowlist.txt`／三枚冻结件／`frontend/**`／`design/**`／`PLAN.md`／`specs/**`／`go.mod`／`go.sum`／`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表。⛔ 为变绿放宽任何断言⛔ 删用例⛔ 加 `t.Skip`。⛔ `go mod tidy`／`go get`。
+- 台面雷三枚（具名，红句里见到就判台面故障、⛔ 计入判据）：① `GOTMPDIR`／`WISP_TEST_GOTMP_ROOT` 指到非 `%LOCALAPPDATA%` 卷 ⇒ `runtests.sh` 的票 311 GUARD 回 **rc=2 的射程拒绝**（按那句提示 unset 或换卷再跑，⛔ 当红）；② `cmd/wisp` 测试缺三枚 `third_party/sherpa-onnx/*.dll` ⇒ `0xc0000135`＋`RUN=0`（要么把该目录加进 PATH 要么⛔ 跑）；③ `gofumpt` 在这台机器的 PATH 里⛔ 在（`which` rc=127），但盘上真在＝按绝对路径跑那把更严的，⛔ 用 `gofmt` 的 0 冒充 `gofumpt` 的 0、也⛔ 用"本机不可用"了事。
+- Git：只 commit、⛔ push（推送归编排者、只 `origin/dev`）；`add`／`commit` 两处**逐枚显式 pathspec**；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（这族在本仓造过真事故）；中文 commit 正文先 Write 成文件再 `git commit -F`；⛔ 从管道取退码（`cmd | tail; echo $?` 拿的是 `tail` 的）。
+- 预算：≤150 轮 ⇒ **每落一枚文件就 commit**（commit-first；本批已有两枚死在这条上）；≤5 件、每件 ≤260 行；没做完的格具名写"没做完＋缺哪一发读数"，⛔ 含糊话糊。
+交件自证三把尺：① 提交号＋`git show --stat HEAD` 路径清单；② 证据件与读数件的绝对路径＋字节数；③ AC#2 那对反控的红句逐字＋还原后绿的那一发＋还原哈希。⛔ 只说"已完成"。
