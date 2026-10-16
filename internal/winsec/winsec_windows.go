@@ -319,6 +319,91 @@ func applyDescriptorWindows(path string, dir bool) error {
 	return nil
 }
 
+// oNoFollowPlatform is the Windows half of ticket 322's split constant, and it is
+// zero: syscall.O_NOFOLLOW has no Windows spelling (the compile matrix in
+// .scratch/wisp/probes/322/a1 measured it undefined on windows, js and plan9), so
+// the open inside privateFile changes flags by nothing here and the question has to
+// be asked this platform's way, which is preOpenLeafGuard below.
+//
+// It is NOT "Windows equals unmodified" either: without this function the leaf leg
+// was open on the shipped platform and measured as open (the local race run recorded
+// foreign files truncated AND the call reporting success). With it, the leaf leg is
+// answered before the open. What must not be over-read is the word "answered": this
+// probe is a judgment about a name, not a lock on it, so between its verdict and the
+// os.OpenFile that follows, the leaf can still be swapped, and the ANCESTOR leg is
+// not probed here at all. Both residuals are stated again at the guard.
+const oNoFollowPlatform = 0
+
+// preOpenLeafGuard refuses a name that carries a reparse point, before privateFile
+// opens it. This is the leaf leg of ticket 322 on Windows, and it is a CHECK, not a
+// non-following write:
+//
+//   - the handle is opened with FILE_FLAG_OPEN_REPARSE_POINT and OPEN_EXISTING, so
+//     it names the LINK itself. Measured locally: attrs report reparse=true, the
+//     file id differs from the target's, and a Write or a Truncate against this
+//     handle does not reach the target - which is exactly why the handle cannot be
+//     used as the write path (the caller's bytes would go nowhere while the call
+//     reported success), and why CREATE_ALWAYS with this flag is banned here: that
+//     variant was measured replacing the link entry itself with an empty regular
+//     file, a second kind of damage rather than a fix;
+//   - so the handle is asked one question and then closed: is this name a link? If
+//     it is, the open that would follow is the thing being prevented, and the
+//     refusal goes through this package's existing refusal shape (both sentinels,
+//     the path, and the reason);
+//   - a name that is not there yet returns nil: PrivateFileExclusive and the first
+//     write of PrivateFile both create, and creating names no link. Any probe
+//     failure other than "not there" is ALSO a refusal - the failure direction of
+//     this package is only ever to tighten (AC#5), so an unanswered question about a
+//     name is not taken as permission to truncate what may stand behind it.
+//
+// Two residuals, named instead of papered over:
+//
+//   - the probe cannot hold the answer. Between this verdict and the os.OpenFile in
+//     privateFile the name can be swapped for a link, and that open still follows
+//     it. Closing THAT needs a single non-following create-and-truncate, which this
+//     platform was measured not to offer through the flags Go exposes; it is booked,
+//     not claimed closed;
+//   - ancestors are not probed. This guard looks at the one name the open will use.
+//     An ancestor link is refused by the placement floor before it (platformVerify-
+//     Placement walks every prefix including this one), which covers the steady
+//     state and not the gap after the floor has answered.
+//
+// And one thing this deliberately does not touch: sealHandle above still goes by name
+// with no same-object re-check on this platform, so "private bytes land in a foreign
+// object" is a separate open leg and belongs to ticket 120's Windows half, not here.
+func preOpenLeafGuard(path string) error {
+	h, err := windows.CreateFile(windows.StringToUTF16Ptr(path),
+		windows.FILE_READ_ATTRIBUTES,
+		windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE|windows.FILE_SHARE_DELETE,
+		nil, windows.OPEN_EXISTING,
+		windows.FILE_FLAG_OPEN_REPARSE_POINT|windows.FILE_FLAG_BACKUP_SEMANTICS, 0)
+	if err != nil {
+		if errors.Is(err, syscall.ERROR_FILE_NOT_FOUND) || errors.Is(err, syscall.ERROR_PATH_NOT_FOUND) {
+			return nil // nothing stands at the name: this is a create, and creates name no link
+		}
+		return preOpenRefusal(path, fmt.Sprintf("the reparse-point probe could not read the name, so it cannot be proved not to be a link: %v", err))
+	}
+	defer func() { _ = windows.CloseHandle(h) }()
+	var info windows.ByHandleFileInformation
+	if err := windows.GetFileInformationByHandle(h, &info); err != nil {
+		return preOpenRefusal(path, fmt.Sprintf("the reparse-point probe could not read the handle it opened, so it cannot be proved not to be a link: %v", err))
+	}
+	if info.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT == 0 {
+		return nil
+	}
+	return preOpenRefusal(path, "the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets")
+}
+
+// preOpenRefusal is placementRefusal's Windows twin for a refusal that happens
+// BEFORE any act: it carries the same two sentinels, because "a refused write is not
+// a completed write" (AC#5) and "this spelling does not name the tree it claims" are
+// both properties of this answer, not of the seal route only. A caller must be able
+// to tell which leg refused it, so the reason text is the readable half of that.
+func preOpenRefusal(path, why string) error {
+	return fmt.Errorf("%w: %s: refusing to open for a private write: %s (%w)",
+		ErrUnresolvedPath, path, why, ErrNotSealable)
+}
+
 // sealHandle seals a file that is open but still empty. It goes through the
 // *name*, not the handle: SetSecurityInfo needs WRITE_DAC on the handle, while
 // the handle os.OpenFile hands back only carries the access it asked for

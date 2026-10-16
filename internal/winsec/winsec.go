@@ -83,6 +83,15 @@ var ErrIsReparsePoint = errors.New("winsec: entry is a link to something else, n
 // written. perm is what the mode means on POSIX and is ignored on Windows,
 // where the descriptor decides - callers pass 0o600 for the readers of the
 // source, not because Windows obeys it.
+//
+// "or replaces" is a promise with production dependants, not a figure of speech:
+// internal/secret/store.go rewrites the same id, internal/config/migrate.go names
+// this call as the repair path for a wide backup left by an older build,
+// internal/secret/migrate.go overwrites a temp left by a crash, and
+// internal/agent/spill.go overwrites a ".retry" temp. Turning a pre-existing name
+// into a refusal would break all four, so a refusal here is only ever for a name
+// this package can prove is unsafe (ticket 322's leaf link), never for a name that
+// merely already exists.
 func PrivateFile(path string, data []byte, perm fs.FileMode) error {
 	return privateFile(path, data, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
 }
@@ -105,13 +114,45 @@ func PrivateFileExclusive(path string, data []byte) error {
 // The path is resolved before it is opened, not after: writing to a name the
 // filesystem reads as some other object would place private bytes in public
 // (ticket 94, same defect class as the directory leg below).
+//
+// Ticket 322 is the second half of that sentence, and it is only half closed.
+// resolveString answers for the spelling, and the open below is the FIRST act
+// on it, so a leaf link planted in the gap between the two was followed by the
+// open itself: O_WRONLY|O_TRUNC truncated whatever that link pointed at, and
+// the object was damaged before any check ran, whatever the seal then decided.
+// Two legs, and their states differ by platform:
+//
+//   - the LEAF leg is closed on POSIX, by O_NOFOLLOW carried on this open
+//     (oNoFollowPlatform), which makes the kernel answer "is the last component
+//     a link" inside the open rather than in a check that can go stale;
+//   - the ANCESTOR leg is still open on POSIX. O_NOFOLLOW is a property of the
+//     last component only, so an ancestor renamed into a link after
+//     resolveString returned is still followed by this open. Closing it needs a
+//     per-component open-at-time (openat/O_NOFOLLOW down the whole chain, or
+//     the handle pinning this package does for the seal), which is not what was
+//     adjudicated for this ticket. This window is not claimed closed anywhere.
+//   - on Windows O_NOFOLLOW does not exist (oNoFollowPlatform is 0), so the leaf
+//     leg is closed there by preOpenLeafGuard probing the name for a reparse
+//     point before the open. That probe answers a question, it does not lock the
+//     answer, so the leaf leg on Windows has a residual window of its own, and
+//     the ancestor leg is open there too. See the Windows file for its own
+//     statement; nothing here may be read as "the window is closed" on the
+//     shipped platform.
 func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
 	resolved, err := resolveString(path)
 	if err != nil {
 		return err
 	}
-	f, err := os.OpenFile(resolved, flags, perm)
+	if err := preOpenLeafGuard(resolved); err != nil {
+		return err
+	}
+	f, err := os.OpenFile(resolved, flags|oNoFollowPlatform, perm)
 	if err != nil {
+		// Returned verbatim, and deliberately NOT run through sealError: this is
+		// the open refusing, not a seal, and the entry that made it refuse is
+		// still standing untouched. The unlink below the seal failure is the only
+		// unlink on this route, and a leaf link must never be removed by a
+		// refusal that followed it (ticket 118's pin).
 		return err
 	}
 	if err := sealHandle(f); err != nil {

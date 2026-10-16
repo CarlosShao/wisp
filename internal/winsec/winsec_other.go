@@ -11,6 +11,33 @@ import (
 	"syscall"
 )
 
+// oNoFollowPlatform is the leaf-link leg of ticket 322, carried on the open inside
+// privateFile (winsec.go). It is a constant rather than a bare syscall.O_NOFOLLOW
+// in that shared file because the flag has no Windows spelling: the compile matrix
+// in .scratch/wisp/probes/322/a1 measured syscall.O_NOFOLLOW defined across the
+// whole unix family and undefined on windows, js and plan9, so the portable file
+// has to split it and the Windows file defines it as 0 and answers the same
+// question a different way (see winsec_windows.go's preOpenLeafGuard).
+//
+// What it buys, measured rather than assumed: by-name, every leaf-link spelling
+// (relative, absolute, climbing out of the root, absolute with an out-of-root
+// target, dangling) answers ELOOP "too many levels of symbolic links" and the
+// object behind the link keeps its bytes, its size and its mtime bit for bit.
+// What it does not buy, and must never be written as bought: it speaks about the
+// LAST component only, so an ancestor planted as a link in the same gap is still
+// followed. That leg is open at this anchor.
+const oNoFollowPlatform = syscall.O_NOFOLLOW
+
+// preOpenLeafGuard is the POSIX half of the pre-open hook, and it does nothing.
+//
+// That is not a stub standing in for an unmeasured platform: on this platform the
+// question it would ask is already answered INSIDE the open, atomically with it, by
+// oNoFollowPlatform above. A probe run before the open would only add a verdict
+// that can go stale between the probe and the open - which is the exact shape this
+// package exists to delete (see applyDescriptorPOSIX's costs) - so the honest POSIX
+// answer is that there is nothing to check by name here.
+func preOpenLeafGuard(string) error { return nil }
+
 // applyDescriptor is the same seam the Windows file exposes, and it is what the
 // AC#5 failure-injection test replaces on either platform.
 //
@@ -74,12 +101,16 @@ var applyDescriptor = applyDescriptorPOSIX
 //     is the window above.
 //
 // And one thing this does NOT fix, named so nobody reads the paragraph above as the
-// end of the family: the OPEN inside privateFile (winsec.go, outside this ticket's
-// write surface) still resolves a leaf link before this walk runs, so a link planted
-// in that gap truncates somebody else's file on the way in. What the leg here stops
-// is the private BYTES reaching that object - sealHandle refuses, privateFile writes
-// nothing and unlinks the name - the O_TRUNC damage of that open is not undone. That
-// shape is booked separately as ticket 322 and is unfixed at this anchor.
+// end of the family: the OPEN inside privateFile (winsec.go) resolves a leaf link
+// before this walk runs. Ticket 322 closed the LEAF leg of that open on this
+// platform by carrying O_NOFOLLOW on it (oNoFollowPlatform below), so a leaf link
+// planted in the gap now makes the open itself answer ELOOP instead of truncating
+// the object behind the link. What is still open, and stays open at this anchor,
+// is the ANCESTOR leg: O_NOFOLLOW speaks about the last component only, so an
+// ancestor swapped for a link after resolveString returned is still followed by
+// that open, and its O_TRUNC still lands on a file in somebody else's tree. The
+// seal legs below stop the private bytes from arriving there; they do not stop the
+// truncation. Nobody may read either sentence as the window being closed.
 func applyDescriptorPOSIX(path string, dir bool) error {
 	mode := fs.FileMode(0o600)
 	if dir {
