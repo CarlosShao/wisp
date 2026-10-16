@@ -1,0 +1,29 @@
+腿名：220-v1（非实现者终裁·可写测试件但⛔ 动产码）｜票：`.scratch/wisp/issues/220-roster-blockedOnApproval-only-sees-L2-and-second-card-silently-drops.md`（先读全文；现量票框＝**5 枚未勾／0 已勾**）
+角色＝**裁决者**。实现方＝`220-r1`（名册 join 与 `L1WindowWait` 那一半，落地笔 `480b970d2`）＋`220-r2`（供数那一跳，落地两笔：接线 `2d10bd0f`＝`cmd/wisp/panel_pump.go` +41／`cmd/wisp/run.go` +6−1；真腿用例＋读数 `fc4f704b`＝`cmd/wisp/panel_l1_blocked_220_test.go` 260 行＋`probes/220/r2/02-wiring.md`）。★`220-r2` **撞 150 轮帽死在最后一步**（它死前把两笔都落了盘、工作树对 `cmd/wisp/**`＋`internal/panel/**` 干净），所以你要裁的是"死腿留下的已提交状态"，⛔ 假定它自己裁过。
+
+## 第 0 步（必做，⛔ 跳）
+1. `git rev-parse HEAD`＋`date '+%F %T %z'` 落每件抬头；现跑票框尺；**逐枚 `git show --name-only`** 核 `220-r1`／`220-r2` 每笔的写面（⛔ 用 `git log --name-only A..B` 区间尺——那会把别腿的提交扫进来＝假越界）。
+2. ⛔ 引本派单与 `probes/220/r2/02-wiring.md` 里任何数字当结论：名册枚数、`0→2` 那枚生产者计数、`lit at publish #2`、四数，全部自己现跑，并标"哪把尺＋射程目录＋量的还是算的"。
+3. 台面＝`git archive <HEAD> | tar -x -C $(mktemp -d)` 的**仓外导出树**（六件套 `go.mod go.sum internal cmd tools scripts`，取出后 `find … -name '*.go' | wc -l` 证非空）。突变打在物理字节，⛔ `-overlay`（这类尺运行时读盘＝overlay 恒绿是假读数）。
+
+## 逐格要裁的（判语只用：成立／不成立／不可判〔缺哪一发读数〕；⛔"附条件成立"）
+- **AC#1（join 读对：corr 与 taskID 双查，⛔ 新增导出方法）**：① 指到双查那两行的当前行号（内容锚，⛔ 只报号）；② **去牙反控**：把双查退成单查（只按 taskID），点名哪些用例必须红、红句逐字；③ 再问**反形**：只按 corr 查会不会也红？两形都放行＝这把尺对这一格不敏感，具名写；④ 现量本票射程内**导出方法新增枚数＝0** 的尺（`git grep -n '^func (g \*Gate)'` 之类，要带分母）。
+- **AC#2（让 L1 可见；落点已裁=甲）**：① 复现"改前 0 枚生产者 ⇄ 改后 2 枚"这枚计数（两发用同一把尺，改前那发在 `git archive` 的改前锚树上跑，⛔ 拿共享工作树当改前）；② ★那枚"真腿"用例必须是**经真 run**的（⛔ fixture 直喂）——查它怎么开窗：是否走 `rt.bridge.Execute` 的真 L1 路、`rt.gate.LiveL1Windows()` 是否现读为活；③ 去牙＝把 `run.go` 那一行 `L1Windows:` 供数摘掉，点名该用例必须红且**红在装配那一格**（⛔ 红在建窗失败／台面故障）；④ 反形＝供一个常量非空列表（让那一行恒 `true`），会不会被抓住？抓住它的判据是哪一枚字节（要求名册那行随窗口结束回到 `false` 这一发你也复跑）。
+- **AC#3（两形各有正控）**：L1 等待中／同任务第二张卡，逐枚"种 X 必响"；★并核一件本仓老账：**别把"没复现"读成"修法成立"**——每一发读数行要自带"坏世界真被造出来"的同屏证据（`pending`/`queue` 那两枚字节就在证据行里）。
+- **AC#4（不许把布尔改成态、不许新造 D43 名）**：越界尺现量——`internal/panel/**` 与 `cmd/wisp/**` 内**新增状态名/新 `panel.*` 方法名＝0 枚**（C17 白名单逐字未动：`git diff` 对 `internal/panel/tokens_fourway_test.go`、`l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go` 命中 0）；引 D43 那四枚编号的当前行号自证没动转移表。
+- **AC#5（整包终态读数）**：**你自己跑**这两发并把四数逐包落盘：`PATH="$PWD/third_party/sherpa-onnx:$PATH" go test ./cmd/wisp/ -count=1 -v` 与 `go test ./internal/... -count=1`（⚠ 前者是本仓票 314 的死亡区＝174–212 s 且**分母易假**：`RUN=`（`^=== RUN`，含子测试）与 `PASS_TOP=`（`^--- PASS`，只数顶层）⛔ 混用；若见 `0xc0000135`／`RUN=0`／`no tests to run`／`panic: test timed out` ⇒ **台面故障、⛔ 计入判据**，具名写"是哪一行红的"，并在同一台面上复跑一次）。编排者今日已跑过一发 `./cmd/wisp` 整包，读数在 `docs/evidence/s1/` 与本票尾——⛔ 照抄，我要你自己的那一发。
+- **能力类必答**：这一格在**产品界面上今天看得见的有几维**——沿到 `internal/panel/pump.go:323-327` → `taskRosterSectionFrom(...)` → 名册渲染那枚函数，指到行；⛔ 把"页面能读到的那包含这一格"说成"界面上看得见"（实现件 §3 已具名声明传输那一跳仍属票 33／35 地界，你复认或推翻都要带尺）。
+
+## 写面（只许这三处＋票尾一条，逐字）
+1) `docs/evidence/s1/220-v1-verdict.md`（短名、⛔ 长名⛔ 带 `§`）；2) `.scratch/wisp/probes/220/v1/`（含 `logs/`）；3) 票 220 末尾**一条** bullet（只追加，⛔ 动 `220-r1`／`220-r2` 的句子、⛔ 翻任何 AC 框、⛔ 改 `Status:`/票名/`-done`）；4) ★若你必须新加一枚常驻判据才能裁死某格：只许**新建** `cmd/wisp/*_220v1_test.go`（⛔ 改既有测试件、⛔ 动任何产码），并在件里具名写为什么需要它。
+
+## 台面与禁区
+- `GOTMPDIR` 用**原生反斜杠形**（`C:\…`）且**先 `mkdir -p`**（编排者今天自己踩：没建目录 ⇒ `go: creating work dir … cannot find the file specified` 长得像"红"）；跑 go 前置 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`。
+- ⛔ `go mod tidy`／`go get`；⛔ 动 `go.mod`／`go.sum`（★工作树里 `go.mod` 有一枚**未提交**改动、mtime `2026-10-10 22:28`＝六天前的存量，归属不明 ⇒ ⛔ 你碰、⛔ 你提交、⛔ 你 revert；具名报"还脏"即可，归我处置）。
+- 禁区（零字节）：`docs/PLAN.md`、`docs/specs/**`、SLO 阈值／golden／`internal/observe/thresholds.go`、`tools/d22scan/allowlist.txt`、三枚冻结件、`frontend/**`、`design/**`、`.github/**`、`ci.yml`；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动。⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`。
+- 并发在飞：写腿 `326-r1`（`internal/memory`＋`internal/session`，未提交字节可能正在变）＋只读腿 `270-v1`（`internal/tools`）／`120-v2`（`internal/winsec`）／`165-c2`（零产码普查）。⇒ ① ⛔ 读它们的在飞字节当凭据；② ★`go test ./internal/...` 整树那一发请按**导出树**跑并具名写"分母取自 HEAD 导出树"；③ 编排者自己此刻在跑 `./cmd/wisp` 整包，你那发错开或换台面，⛔ 互冒充读数。
+- Git：只 commit、⛔ push；`git add`／`git commit` 两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（编排者今天第三次踩、已入盘）；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 读数纪律：引数必带尺与射程；"几枚"必带单位（文件／顶层用例／子测试／调用点／写入点）；报"0 命中"前先看 stderr 并跑一枚已知存在的正控；★推翻任何旧尺／旧读数前先逐字重放旧尺。
+- 预算：≤6 件、每件 ≤260 行；没裁完的格具名写"没裁＋缺哪一发读数"；⛔ 静默产出 0 字节文件（交回前 `wc -c`）。轮次约 150 上限 ⇒ **每落一枚文件就 commit**（本仓今天已有一枚腿死在这道帽上，边跑边交）。
+交件自证三把尺：① 提交号＋逐枚 `git show --stat`（应只含上面四处）；② 证据件绝对路径＋`wc -c`；③ AC#2 那发的"改前 0 ⇄ 改后 2"你自己的计数＋去牙红句＋还原后绿（含还原哈希）＋`./cmd/wisp` 与 `./internal/...` 两发四数。⛔ 只说"已完成"。

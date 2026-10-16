@@ -1,0 +1,15 @@
+发送记录·第八波（编排者本人写；2026-10-16 11:2x 存档）
+
+待放一枚：**`220-v1`**（非实现者终裁；可新建 `cmd/wisp/*_220v1_test.go`，⛔ 动产码）＝票 220 五格。
+派单＝`.scratch/wisp/probes/orch/20261016/txt/220v1-dispatch.txt`（先存档、后启动）。
+
+★本波来路＝**写腿 `220-r2` 撞 150 轮帽死在最后一步**（通知原文停在"Restructuring:"）。盘上取证（⛔ 猜）：
+- 它**两笔都已落盘**：`2d10bd0f`（接线：`cmd/wisp/panel_pump.go` +41／`cmd/wisp/run.go` +6−1）＋`fc4f704b`（真腿用例 `cmd/wisp/panel_l1_blocked_220_test.go` 260 行＋`probes/220/r2/02-wiring.md` 73 行＋改前/改后两发日志）。
+- 工作树对 `cmd/wisp/**`＋`internal/panel/**`＝**干净**（`git status --porcelain` 零行）⇒ 没有半截未提交的字节留下。
+- 它**没写票 220 票尾 bullet**（写面清单里没有 issues 那件）⇒ 那条由我按"编排者收档"补，⛔ 代它自证。
+- 我自己现跑的核验（11:1x）：`go build ./...` rc=0／`go vet ./cmd/wisp/ ./internal/panel/` rc=0／`sh scripts/d22scan.sh` rc=0（`top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77`）／长度门 `--with-self-test` rc=0 GREEN（`tracked paths=14046 over-budget=60 covered=60 not-in-roster=0`）；接线名尺 `git grep -n 'L1Windows' HEAD` ⇒ `cmd/wisp/run.go:731`（装配供数）＋`cmd/wisp/panel_pump.go:108`（reader 本体）＝**生产 2 处**（改前那两处在 HEAD 之前不存在＝票 220 的最后一跳确实接上了）。
+- ★缺的那一发正在跑：`go test ./cmd/wisp/ -count=1 -v` **整包**（票 314 死亡区，174–212 s）＝同时补票 322 `AC#4` 欠的那枚整包读数，落 `.scratch/wisp/probes/orch/20261016/logs/orch-322v1-ac4-cmdwisp-full.txt`。
+
+放腿闸门：**CPU 现量 99%（11:2x 同尺复测）＞70% ⇒ ⛔ 现在不放 `220-v1`**。释放条件＝同一把尺复测 ≤70%（本波我自己的那发整包测试跑完会掉下来一大截），且放腿要另记 agentId 才算"放了腿"。
+
+★另记一笔共享工作树卫生（⛔ 我今天造成的、⛔ 归任何腿）：`go.mod` 有一枚**未提交**改动（把 `github.com/jchv/go-webview2` 从 indirect 提到直接依赖），文件 mtime＝**2026-10-10 22:28**＝六天前、不在今日任何一枚腿的窗口里；`go.sum` mtime 09-4。⇒ 归属不明＝**保留不碰**（`go.mod`／`go.sum` 本来就是禁区，⛔ 提交、⛔ revert、⛔ 猜主人），已具名写进 `220-v1` 的派单禁区里，处置与归口进台账 `A1005`。另仓根有一枚 **0 字节、名为 `-` 的未跟踪文件**，mtime 2026-10-03 10:20＝历史某次 shell 手滑（`> -`）留下的，同样只登记⛔ 删（临时件只建不删）。
