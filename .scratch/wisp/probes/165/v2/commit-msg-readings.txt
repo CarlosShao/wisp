@@ -1,0 +1,22 @@
+165-v2 读数件（裁决腿·票 165 AC#6 的尺与颜色，⛔ 判语件的替代品）
+
+台面＝仓外导出树 /d/tmp/165v2/t1（git archive 44f51fc8 八件套＋build dll×3＋sherpa dll×3＋frontend/dist；
+.go＝747，与同射程跟踪件 747 逐枚 diff＝0 行⇒我这棵树少件为零）；GOTMPDIR 在 D 卷；
+所有 go test 一律 -count=1 -timeout 30m；⛔ ./cmd/wisp 任何形、⛔ go test ./...；门禁四数只在**工作树**跑。
+
+七节：0 台面／1 两枚基线 sha256（我现量：.sse 7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be 28 行、
+.go 00c32049994c441c8927066bc4d4099c1b2977fc20ee9e602bb98f3670d37b75 221 行；每发之后当场还原并复量）／
+2 三发主尺（正向 rc=0 2/2/0；去牙 sed -i '12d' rc=1 红在 :138 读数 over 0 tool_call rows；整包 rc=0；
+整包 -v RUN=110 PASS_TOP=86 FAIL_TOP=0 SKIP=0 证常驻）／
+3 九枚定向突变（M-a 假名红 :138、M-a2 两头同改名**绿**＝G1、M-a3 只改夹具名红 :138、
+M-b Resident→false **绿**＝G2、M-b2 档位 L2→L1 红 :157（他做的是→L0）、
+M-c-A 常量计数绿、M-c-B 常量计数＋摘牙红 :143、M-e 不被注入红 :219、M-f 调用号红 :199/:220）／
+4 三枚缺口机理具名到行（G1 名字整对可换、镜像⇄真名册两半零枚对接；G2 inject.go:44-49＋bm25Select 172-224
+单候选目录 BM25 必中⇒驻留档失去区分力；G3 :131 那句 THE JUDGMENT 标在对牙不敏感的那枚门上）／
+5 落件前世界的我自己的尺（4366c1ca1：withJournal(store) 8 处／5 件、夹具名册只有 echo 18／sleep 7、
+plan.present 在 .sse＋testdata 面 0 件）⇒ 供裁"派单第 9 行 ⇄ AC#6 原文"那一问；
+6 门禁四数逐枚 rc（d22scan 0／长度门 0／go vet 0／gofumpt -l 与 -d 0 与 0）；
+7 实现者十枚提交的写面尺（越界命中 0）＋票框尺 5 勾 1 空＋c3f55651 numstat 2/0。
+
+本件⛔ 判决（判决在 docs/evidence/s1/165-v2-verdict.md）；⛔ 翻任何 AC 框；只 commit、⛔ push；
+写面只 .scratch/wisp/probes/165/v2/**；internal/**、cmd/** 跟踪字节零改动。
