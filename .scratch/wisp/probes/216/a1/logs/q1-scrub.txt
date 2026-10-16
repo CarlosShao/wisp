@@ -1,0 +1,9 @@
+71002d0:frontend/VENDORED.md:180:| `fine-tune-card.tsx` | FineTuneCard | no - it is a scrub-to-change inspector; the settings rows are read-mostly |
+71002d0:frontend/scripts/vendor-beautifului.mjs:109:    mounted: "NOT yet: it is a scrub-to-change inspector (drag the label, arrow keys, type) and the settings rows are read-mostly with two live controls. Using it would change the settings screen's interaction model, which is a call for the owner.",
+71002d0:frontend/src/components/ai-native/fine-tune-card.tsx:14:   Panel status   : NOT yet: it is a scrub-to-change inspector (drag the label, arrow keys, type) and the settings rows are read-mostly with two live controls. Using it would change the settings screen's interaction model, which is a call for the owner.
+71002d0:frontend/src/components/ai-native/fine-tune-card.tsx:22: * Number fields scrub: hover the label for an ↔ cursor and
+71002d0:frontend/src/components/ai-native/fine-tune-card.tsx:57:      {/* scrub handle */}
+71002d0:frontend/src/components/ai-native/fine-tune-card.tsx:120:/* A single scrub-able number property. `value` is the initial/default value. */
+71002d0:frontend/src/components/ai-native/fine-tune-card.tsx:173:  /** The scrub-able properties shown in the layout grid (rendered in pairs). */
+71002d0:frontend/src/components/ai-native/insight-cards.tsx:226:            scrub={false}
+71002d0:frontend/src/components/ai-native/insight-cards.tsx:324:            scrub={false}

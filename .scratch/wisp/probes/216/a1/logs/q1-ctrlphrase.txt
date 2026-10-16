@@ -1,0 +1,7 @@
+71002d0:cmd/wisp/approval_reply.go:602:// tool result verbatim (bridge.go's orDefault(why, …)), and a control character
+71002d0:cmd/wisp/approval_reply.go:604:// operator never typed. This is the same family as 票 216's control-character
+71002d0:cmd/wisp/approval_reply_201_test.go:300:		// A reply with control characters and a run of spaces in it: the reason
+71002d0:internal/panel/attachments.go:295:// composer must: an empty name and control characters (a NUL inside a name is a
+71002d0:internal/panel/attachments.go:302:		return errors.New("contains control characters")
+71002d0:internal/risk/rules_shell.go:10:// cmd.exe escape caret, and control characters. Presence of ANY of these in
+71002d0:internal/risk/rules_shell.go:56:// frozen shellMetachars order, with control characters escaped for display.

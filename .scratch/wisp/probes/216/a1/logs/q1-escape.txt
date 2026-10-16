@@ -1,0 +1,120 @@
+71002d0:cmd/llmrecord/main.go:133:			line = "# @" + line // escape directive-shaped body lines
+71002d0:cmd/wisp/panel_control_windows.go:84:// resolver can answer, so a request that ever escaped the filter would fail
+71002d0:cmd/wisp/panel_host_windows_test.go:10:// testing.Short() or an environment escape hatch to pretend green, and a window
+71002d0:cmd/wisp/panel_transport_35r2_test.go:95:// jsString (webview.go:137 = json.Marshal, HTML escaping left on exactly like the
+71002d0:cmd/wisp/panel_transport_35r2_test.go:1476:// match what a browser produces; the envelope the page posts needs no escaping, so this
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:229:// TestAC246TestTaskInjectionPredicate walks the escape hatch's own predicate.
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:409:// TestAC246DevLegIgnoresTheTestTaskInjection is the escape hatch's other edge, on
+71002d0:cmd/wisp/resident_task_source_windows.go:127:// testTaskTextEnv is ticket 246 AC#7's narrow test escape hatch, and the whole of
+71002d0:cmd/wisp/resident_task_source_windows.go:182:// residentTestTaskText reads the narrow escape hatch. It returns the text ONLY
+71002d0:cmd/wisp/secret_test.go:30:// is what escaped; it is not a credential.
+71002d0:cmd/wisp/secret_test.go:294:		{"traversal", []string{"set", "../escape", "--from-stdin"}, fakeKey},
+71002d0:cmd/wisp/secret_test.go:318:			for _, stray := range []string{"escape", "a b", "ok"} {
+71002d0:cmd/wisp/secret_test.go:326:	if _, err := os.Stat(filepath.Join(filepath.Dir(dir), "escape")); !errors.Is(err, os.ErrNotExist) {
+71002d0:cmd/wisp/secret_test.go:327:		t.Errorf("a name traversal escaped the secrets dir (stat err = %v)", err)
+71002d0:cmd/wisp/slo_report_144_windows_test.go:614:		{"bad-escape-at-10", []byte(`{"mode":"\q","pass":true}`), 11},
+71002d0:cmd/wisp/slo_windows.go:498:	// assignment fails), so a subject can never escape the Job and outlive the
+71002d0:frontend/package-lock.json:1822:    "node_modules/@radix-ui/react-use-escape-keydown": {
+71002d0:frontend/package-lock.json:1824:      "resolved": "https://registry.npmjs.org/@radix-ui/react-use-escape-keydown/-/react-use-escape-keydown-1.1.5.tgz",
+71002d0:frontend/package-lock.json:3459:        "@radix-ui/react-use-escape-keydown": "1.1.5",
+71002d0:frontend/scripts/render-composer.tsx:34:/** Same escaping React applies to a text node, so a match here is a match on
+71002d0:frontend/scripts/render-l2.tsx:44:/** Same escaping React applies to a text node - so a match here is a match on
+71002d0:frontend/scripts/render-l2.tsx:45:    screen, not a match on an unescaped substring that never renders. */
+71002d0:frontend/scripts/render-stream.tsx:116:  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+71002d0:frontend/scripts/render-stream.tsx:117:  const m = css.match(new RegExp(`^${escaped}\\s*\\{([^}]*)\\}`, "m"));
+71002d0:frontend/scripts/vendor-beautifului.mjs:180:// vendor.mjs, written with escapes so the table itself cannot reintroduce a
+71002d0:frontend/scripts/vendor.mjs:44:// Written with escapes rather than the glyphs themselves: internal/panel's
+71002d0:frontend/src/components/glide-highlight.tsx:131:    // Own parent, own lookup. CSS.escape because a key is caller-supplied and
+71002d0:frontend/src/components/glide-highlight.tsx:134:      `[data-glide-key="${CSS.escape(activeKey)}"]`,
+71002d0:internal/agent/guard_test.go:277:// or spacing escaped the brake entirely (a comment reading stronger than the
+71002d0:internal/agent/spill.go:256:// The encoding is percent-escaping (uppercase hex) of every byte outside
+71002d0:internal/agent/spill.go:259:// literal part keeps the artifacts dir debuggable. Upper-case letters escape too
+71002d0:internal/agent/spill.go:267:// on an escape boundary and a digest of the WHOLE id appended: escaping triples
+71002d0:internal/agent/spill.go:280:		// what closes that: the encoder escapes every dot, so no non-empty id can
+71002d0:internal/agent/spill.go:316:// %XX escape: half an escape would be a spelling no id encodes to, and the whole
+71002d0:internal/agent/spill_name_injectivity_test.go:109:		{"dotdot_id_then_word_id", "../../escape", "escape"},
+71002d0:internal/agent/spill_name_injectivity_test.go:164:				return "", false // any other byte must have been escaped
+71002d0:internal/agent/spill_name_injectivity_test.go:174:			return "", false // a literal that got escaped: the encoder is not canonical
+71002d0:internal/agent/spill_name_injectivity_test.go:205:		"../../escape", "%", "%2F", "%zz", "tool-output-x.txt", "\x00\x7f\xff",
+71002d0:internal/agent/spill_name_injectivity_test.go:243:	escapes := regexp.MustCompile(`%[0-9A-F]{2}`)
+71002d0:internal/agent/spill_name_injectivity_test.go:257:	stripped := escapes.ReplaceAllString(core, "")
+71002d0:internal/agent/spill_name_injectivity_test.go:259:		t.Errorf("name %q holds upper case outside a %%XX escape, so a case-insensitive "+
+71002d0:internal/agent/spill_name_injectivity_test.go:262:	// The escape-boundary cut: no name may end mid-escape.
+71002d0:internal/agent/spill_path_invariant_test.go:16://      provably can see an escape if one happened;
+71002d0:internal/agent/spill_path_invariant_test.go:70:			// Both spellings, because the encoder escapes them alike: the
+71002d0:internal/agent/spill_path_invariant_test.go:78:			// The pure escape spelling. Every dot escapes too, which is what
+71002d0:internal/agent/spill_path_invariant_test.go:82:			callID:   "../../escape",
+71002d0:internal/agent/spill_path_invariant_test.go:83:			wantName: "tool-output-%2E%2E%2F%2E%2E%2Fescape.txt",
+71002d0:internal/agent/spill_path_invariant_test.go:197:// listing would have seen an escape (so a green run is not an artifact of a
+71002d0:internal/agent/spill_path_invariant_test.go:216:	// hide the thing this test exists to measure - the LISTING after the escape.
+71002d0:internal/agent/spill_path_invariant_test.go:228:	// on whatever platform is running. The third round is the same escape spelled
+71002d0:internal/agent/spill_path_invariant_test.go:236:			errs = append(errs, fmt.Errorf("Prepare(escape id %q): %w", id, err))
+71002d0:internal/agent/spill_path_invariant_test.go:275:			t.Errorf("an escape landed above the data dir at %s", filepath.Join(root, m))
+71002d0:internal/agent/spill_path_invariant_test.go:282:	control := inv76aEscapeID(t, artifacts, root, "CONTROL-escape")
+71002d0:internal/agent/spill_path_invariant_test.go:284:	t.Logf("control: escape id %q resolves to %q (root is %q)", control, unsanitized, root)
+71002d0:internal/agent/spill_path_invariant_test.go:286:		t.Fatalf("control write failed (%s): %v - the escape id does not actually escape, so the control proves nothing", unsanitized, err)
+71002d0:internal/agent/spill_path_invariant_test.go:289:	if _, ok := afterControl["CONTROL-escape.txt"]; !ok {
+71002d0:internal/agent/spill_path_invariant_test.go:290:		t.Fatalf("the listing never saw the deliberate escape outside the data dir (it went to %q); AC#2 would be vacuous",
+71002d0:internal/agent/spill_path_invariant_test.go:301:	// escape and lands as ONE flat file name inside the artifacts dir. That
+71002d0:internal/agent/spill_path_invariant_test.go:325:			t.Errorf("a backslash-only path escaped the data dir on a platform where that is not a separator")
+71002d0:internal/agent/spill_path_invariant_test.go:333:	for _, m := range []string{"CONTROL-escape.txt", "CONTROL-literal.txt"} {
+71002d0:internal/agent/spill_path_invariant_test.go:373:		sub: "escape", callID: inv76aEscapeID(t, artifacts, root, "ESCAPE-E2E"), wantName: "x",
+71002d0:internal/agent/spill_path_invariant_test.go:567:// components below root, so an escape needs depth+2 groups. Verified by this
+71002d0:internal/agent/spill_path_invariant_test.go:570:// TICKET 79 note: the encoder now escapes every dot and separator, so feeding
+71002d0:internal/agent/spill_path_invariant_test.go:572:// escape below is only reachable through the hand-rolled join in the positive
+71002d0:internal/agent/spill_path_invariant_test.go:581:// inv76aEscapeIDWithSep is the same escape spelled with a separator of the
+71002d0:internal/agent/spill_test.go:235:// TestSpillArtifactRespectsRawCap closes the escape the review found (MINOR-1):
+71002d0:internal/agent/spill_test.go:260:		t.Errorf("artifact is %d bytes, over the %d-byte hard cap (escape reproduced)",
+71002d0:internal/audio/level_test.go:115:	// No legal frame escapes [0,1] - so no consumer ever needs to clamp.
+71002d0:internal/audio/parse_wave_format_300_windows_test.go:52:// escapes to the heap by construction (a make result that flows out of a
+71002d0:internal/ball/hotkey_windows.go:147:		case "esc", "escape":
+71002d0:internal/ball/statevisual.go:45:	// frozen SPEC-08 §2.1 reading, which is the escape hatch (`balldebug
+71002d0:internal/ball/statevisual.go:94:// and `balldebug -frozen` stay as the escape hatch back to the old frozen table.
+71002d0:internal/config/writeguard_226_test.go:335:	for _, bad := range []string{`D:\data\..\escape`, `..\who`} {
+71002d0:internal/config/writeguard_226_test.go:350:	if err := m.SetAllowedDirs([]string{`D:\data`, `..\escape`}); err == nil {
+71002d0:internal/llm/adaptertest/childjob_windows.go:38:	// if the assignment fails, so a child can never escape the job by accident.
+71002d0:internal/llm/adaptertest/harness.go:69:	// coverage test; there is no "not applicable" escape hatch, because every
+71002d0:internal/llm/golden/golden.go:29://   - A body line that must start with "# @" is escaped as "# @@".
+71002d0:internal/llm/golden/golden.go:129:		// Unescape body lines that legitimately start with "# @".
+71002d0:internal/llm/golden/golden.go:131:			line = "# @" + strings.TrimPrefix(line, "# @@") // unescape: "# @@x" -> "# @x"
+71002d0:internal/llm/golden/golden_test.go:82:		t.Errorf("body = %q, want escaped line unescaped", rs[0].Body)
+71002d0:internal/llm/ratelimit_pace_test.go:298:	go func() { // owner: this test; cancel only, no work escapes
+71002d0:internal/memory/artifacts_path_invariant_test.go:462:			t.Errorf("removal %s escaped the artifacts dir", r)
+71002d0:internal/memory/artifacts_path_invariant_test.go:553:// escapes them, so a long flat name is the CORRECT artifact of that route.
+71002d0:internal/memory/dao_memory.go:48:// (LIKE, wildcard-escaped), ordered most-recently-hit first, then by hit
+71002d0:internal/memory/dao_memory.go:65:		args = append(args, "%"+escapeLike(t)+"%")
+71002d0:internal/memory/dao_session.go:131:// wildcards in q are escaped, so a literal `%` searches for `%`).
+71002d0:internal/memory/dao_session.go:133:	like := "%" + escapeLike(q) + "%"
+71002d0:internal/memory/dao_session_test.go:14:// treated as literal text, not as a pattern (models.go escapeLike).
+71002d0:internal/memory/dao_session_test.go:31:		t.Errorf("searching a literal %% returned %d rows, want only s1 (wildcards must be escaped)", len(got))
+71002d0:internal/memory/dao_test.go:223:		t.Errorf("unescaped LIKE wildcard matched %d rows", len(hits))
+71002d0:internal/memory/models.go:215:// escapeLike escapes LIKE wildcards for use with the ESCAPE '\' clause.
+71002d0:internal/memory/models.go:216:func escapeLike(s string) string {
+71002d0:internal/models/downloader.go:67:	// LocalOverride maps model-id -> local directory (sideload escape hatch,
+71002d0:internal/models/manifest.go:281:// validRelPath rejects absolute paths, escapes, and separators that could
+71002d0:internal/models/manifest.go:282:// escape the model directory (zip-slip guard, C26 spirit applied to archives).
+71002d0:internal/models/manifest.go:295:		return fmt.Errorf("path escapes model dir: %q", p)
+71002d0:internal/panel/composer_test.go:166:			t.Error("a mode write placed after a comment opener escaped door 2 - the comment filter is a hole")
+71002d0:internal/proc/jobscope_windows.go:109:// can never escape the Job by accident.
+71002d0:internal/proc/jobscope_windows_test.go:197:// TestStartInJobRejectsBadCommand verifies the escape-proof contract: a
+71002d0:internal/risk/provenance.go:219:	// SyncRoots injects configured sync roots (user escape hatch for
+71002d0:internal/risk/provenance.go:1065:// is how a six-level wrapper escaped the generic scan.
+71002d0:internal/risk/provenance.go:1077:	case []byte: // byte payloads are text carriers too (B-2 type escape)
+71002d0:internal/risk/provenance_test.go:387:// --- B-2: parameter name / shape escapes --------------------------------------
+71002d0:internal/risk/provenance_test.go:545:	// key-name escape either).
+71002d0:internal/risk/rules_shell.go:10:// cmd.exe escape caret, and control characters. Presence of ANY of these in
+71002d0:internal/risk/rules_shell.go:56:// frozen shellMetachars order, with control characters escaped for display.
+71002d0:internal/risk/syncdirs.go:635:// fixture fallback (and the relocated-client user escape hatch fed by config).
+71002d0:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:83:	movedDir = "wisp116-escape"
+71002d0:internal/risk/syncdirs_test.go:485:		t.Error("ESCAPIABLE (N-10): fs.write through a folded `..` escaped the sync gate")
+71002d0:internal/secret/delete_test.go:74:// on: an id that could escape the secrets dir never reaches the filesystem.
+71002d0:internal/session/ticket224_pattern_dialect_test.go:153:			// regex - the observable difference is the hyphen and the escaping.
+71002d0:internal/tools/bridge.go:1176:	// here, and the joined form is printed unescaped because the entries already
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:127:			"escaping path can be trusted", cLegit, leg1, leg2, rf, ok, pc.Roots())
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:140:	t.Logf("escaping ask        : %q", via)
+71002d0:tools/d22scan/gitignore.go:99:// count depend on the machine again - A207's disease), backslash-escaped trailing
+71002d0:tools/d22scan/gitignore.go:746:// treated as a single '*'), '?', "[class]" and backslash escapes.
+71002d0:tools/d22scan/scan_test.go:1893:		t.Errorf("the reason must still name the stray, escaped, got %q", newline.why)
+71002d0:tools/d22scan/selftest.go:9:// numbered bans do ring today, and six narrower escapes plus three temperaments
+71002d0:tools/mockllm/goldenfmt.go:22://   - Body lines that must start with "# @" are escaped as "# @@".
+71002d0:tools/mockllm/goldenfmt.go:103:			line = "# @" + strings.TrimPrefix(line, "# @@") // unescape: "# @@x" -> "# @x"

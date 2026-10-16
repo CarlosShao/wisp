@@ -1,0 +1,1024 @@
+71002d0:cmd/wisp/always_write_no_clobber_226_test.go:14:// if the write simply refused to happen, so the stored rule is read back from the
+71002d0:cmd/wisp/approval_always_201_test.go:182:		t.Fatalf("config.toml gained an allowlist entry the second card refused (PLAN.md:1645-1646: 不得静默生效):\n%s", text)
+71002d0:cmd/wisp/approval_always_201_test.go:185:		t.Fatalf("the refused call still wrote: %s", w.target)
+71002d0:cmd/wisp/approval_always_201_test.go:188:		t.Errorf("a refused widening was not booked as a refusal:\n%s", w.h.err.String())
+71002d0:cmd/wisp/approval_reply.go:91:// direction: an evicted card has no grant held for it, so it can be refused but
+71002d0:cmd/wisp/approval_reply.go:327:// and gets back ErrPanelAllow plus a burned nonce: the answer is refused on the
+71002d0:cmd/wisp/approval_reply.go:407:// record books one answered-or-refused reply to the run's audit trail.
+71002d0:cmd/wisp/approval_reply.go:412:// an unanswered question, a refused answer and an applied one are three different
+71002d0:cmd/wisp/approval_reply.go:550:			// A refused reply is printed and the loop keeps going: a typo must
+71002d0:cmd/wisp/approval_reply_201_test.go:21://	    same decision, arriving on the panel route, is refused on the ROUTE; the
+71002d0:cmd/wisp/approval_reply_201_test.go:30://	    refused out loud and the window still expires into execution; with a host
+71002d0:cmd/wisp/approval_reply_201_test.go:317:		t.Errorf("the refused write still landed: %v", err)
+71002d0:cmd/wisp/approval_reply_201_test.go:381:		// is refused on the route; (3) the native allow that the burned grant can
+71002d0:cmd/wisp/approval_reply_201_test.go:515:	t.Run("console posture: veto refused, window still executes", func(t *testing.T) {
+71002d0:cmd/wisp/approval_reply_201_test.go:517:		// veto arrives at Gate.Veto and is refused there - loudly, audited - and
+71002d0:cmd/wisp/approval_reply_201_test.go:570:		// when the gate refused to take the cancel.
+71002d0:cmd/wisp/approval_seam_201_test.go:90:			seamErr = fmt.Errorf("the seam refused a native allow it must accept: %w", err)
+71002d0:cmd/wisp/approval_seam_201_test.go:166:		// (1) The panel route's allow is refused on the ROUTE, and the seam says
+71002d0:cmd/wisp/approval_seam_201_test.go:170:			fail = fmt.Errorf("PanelAllow must be refused on the route, got (%v,%v)", offered, err)
+71002d0:cmd/wisp/config_receipt_255_test.go:526:// Both fixtures are needed - a ruler that refused EVERYTHING would pass a refusal-only
+71002d0:cmd/wisp/config_reload.go:254:// previous values: no answer, no gate, no root, an abandoned card, a refused
+71002d0:cmd/wisp/config_reload_223_test.go:472:			t.Fatalf("a refused card did not resolve as a deny: %q", denied)
+71002d0:cmd/wisp/config_reload_223_test.go:476:			t.Errorf("a refused loosening is not booked as keeping the old values: %q", section)
+71002d0:cmd/wisp/config_reload_223_test.go:487:			t.Fatalf("a refused loosening moved memory: %v", dirs)
+71002d0:cmd/wisp/config_reload_223_test.go:495:			t.Errorf("the refused hand edit was erased from config.toml instead of left alone:\n%s", raw)
+71002d0:cmd/wisp/config_reload_223_test.go:742:	// 票 231 AC#2's cause joins the roster: a fifth "read refused" shape that is
+71002d0:cmd/wisp/dataroot_128_test.go:10:// directory reading an empty config), the resident leg refused with rc=1, and
+71002d0:cmd/wisp/dataroot_128_test.go:11:// `wisp secret list` refused with rc=2.
+71002d0:cmd/wisp/dataroot_128_test.go:110:	// "refused" onto 2, the class the command legs return.
+71002d0:cmd/wisp/dataroot_128_test.go:198:		t.Fatalf("AC#2: the test-env resolution refused as well: %v - the harness root is declared, not asked for", err)
+71002d0:cmd/wisp/dataroot_128_test.go:612:				t.Fatalf("AC#2 RED: leg %q refused correctly with a wisp-dev tree sitting in the start-up directory and the emptiness check said nothing. That is M-F exactly, and it is the shape that read green once this check was muted.", leg.entry)
+71002d0:cmd/wisp/dataroot_128_windows_test.go:18:// while the other two legs refused, so the same machine ended up with two
+71002d0:cmd/wisp/dataroot_128_windows_test.go:76:					t.Errorf("AC#2 RED: leg %q refused but its line never says %q:\n%s", leg.name, marker, out)
+71002d0:cmd/wisp/dispatch_hop_selfproof_133_test.go:35://	vacuous is the Y3 shape: refused, not counted). The fixture plants a pair of
+71002d0:cmd/wisp/early_log_nail_130_windows_test.go:16:// or refused - the single most auditable fact about the sealing seam.
+71002d0:cmd/wisp/firstrun.go:38:// "没有配置就当默认跑" stays refused.
+71002d0:cmd/wisp/firstrun_198_test.go:92:		t.Errorf("stage 1: stdout = %q, want empty (a refused run streams no task output)", stdoutText)
+71002d0:cmd/wisp/firstrun_198r2_test.go:321:	// It names the reason, not just the verdict: the data root that refused.
+71002d0:cmd/wisp/firstrun_198r2_test.go:324:			t.Errorf("AC#5: the failure sentence does not name %q, so the user cannot tell which root refused:\n%s", mustName, stderrText)
+71002d0:cmd/wisp/firstrun_257_nonpreset_test.go:102:	// "留空" half. The file must be refused, and refused for the reason the
+71002d0:cmd/wisp/firstrun_257_nonpreset_test.go:140:		t.Errorf("AC#1 RED: the credential-reference field refused an invented provider: %v", err)
+71002d0:cmd/wisp/firstrun_257_test.go:138:// refused writes says the same thing back.
+71002d0:cmd/wisp/firstrun_257_test.go:189:			t.Errorf("%s: a refused write still reported key paths %v", f.field, written)
+71002d0:cmd/wisp/firstrun_257_test.go:216:	t.Logf("AC#1 clean machine: 7 refused writes by reason: %v", byReason)
+71002d0:cmd/wisp/firstrun_257_test.go:259:			t.Errorf("%s: still refused after the operator followed the receipt: %v", f.field, err)
+71002d0:cmd/wisp/leg_dispatch_gate_133_test.go:1602:// //go:build expressions was refused on this ticket (AC#8) and on ticket 133: a second
+71002d0:cmd/wisp/leg_dispatch_gate_133_test.go:1614:		return nil, 0, fmt.Errorf("refused a nested run-roster read from inside the listing child")
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:42:// under test. AC#2's criterion is "盘上 jsonl 有 models: 记录", and a refused
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:44:// comment: "a refused hand-off nobody records is a security verdict that leaves
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:359:	// A refused hand-off is exit 1 and must not be softened into a warning
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:363:		t.Errorf("`wisp models ensure %s` exited %d, want 1 (refused hand-off)\n%s",
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:375:		t.Fatalf("records naming a refused hand-off = %d, want exactly 1; all records: %v",
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:380:		t.Errorf("the refusal record does not name the model it refused: %q", hit.Msg)
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:488:// and a broken log tree would turn a refused model hand-off into an exit code
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:517:			t.Errorf("the refused install produced %d jsonl file(s) anyway: %v", len(files), files)
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:548:			t.Errorf("the refused install produced %d jsonl file(s) anyway: %v", len(files), files)
+71002d0:cmd/wisp/logsink_test.go:101:		t.Errorf("the refused install changed the working directory: %d entries before, %d after", len(before), len(after))
+71002d0:cmd/wisp/main.go:107:		// refused-hand-off verdict has to be readable somewhere.
+71002d0:cmd/wisp/models.go:102:// including a refused hand-off, which is the security verdict this command
+71002d0:cmd/wisp/models.go:280:	// a refused hand-off nobody records is a security verdict that leaves no
+71002d0:cmd/wisp/models.go:313:		// Loud and classified: a refused hand-off is reported as the verdict it
+71002d0:cmd/wisp/panel_assets_143_test.go:251:				t.Errorf("stderr does not name the flag it refused: %s", stderr)
+71002d0:cmd/wisp/panel_assets_143_test.go:254:				t.Errorf("a refused flag must print no card, got:\n%s", stdout)
+71002d0:cmd/wisp/panel_config_248_test.go:164:		t.Fatalf("the credential write was refused: %v", err)
+71002d0:cmd/wisp/panel_config_248_test.go:428:		t.Errorf("exit = %d, want 1 (one accepted, one refused): stdout=%q stderr=%q", code, out, errLog)
+71002d0:cmd/wisp/panel_config_248_test.go:443:		t.Errorf("the unlisted name was not refused by name: stdout=%q", out)
+71002d0:cmd/wisp/panel_config_248_test.go:476:// field it refused - through the router, not around it.
+71002d0:cmd/wisp/panel_config_248_test.go:501:		t.Errorf("config.toml changed under a refused write:\n%s", after)
+71002d0:cmd/wisp/panel_config_248_test.go:504:		t.Error("a refused settings write left no audit line")
+71002d0:cmd/wisp/panel_config_248_test.go:518:		t.Fatalf("the reference write was refused: %v", err)
+71002d0:cmd/wisp/panel_config_313_test.go:80:		t.Fatalf("config.set was refused: %v\n%s", err, env)
+71002d0:cmd/wisp/panel_config_313_test.go:260:			t.Errorf("union member %q was refused by the door: %v", field, herr)
+71002d0:cmd/wisp/panel_config_313_test.go:276:// green: a two-element chain would have been refused (the whole comma string read
+71002d0:cmd/wisp/panel_config_320_test.go:61:			t.Errorf("the value was refused by the whole-file gate instead of the field's own pre-check: %v", err)
+71002d0:cmd/wisp/panel_config_320_test.go:65:		t.Errorf("config.toml changed under a refused billing value:\n%s", after)
+71002d0:cmd/wisp/panel_config_320_test.go:74:		t.Errorf("config.toml changed under a refused ghost-provider write:\n%s", after)
+71002d0:cmd/wisp/panel_config_320_test.go:108:// side the page already calls sees both, and a preset name is refused with the
+71002d0:cmd/wisp/panel_config_320_test.go:160:		t.Errorf("config.toml changed under the two refused custom-row writes:\n%s", after)
+71002d0:cmd/wisp/panel_config_320_test.go:213:		t.Errorf("config.toml changed under the two refused entry writes:\n%s", after)
+71002d0:cmd/wisp/panel_config_store.go:196:// that ONE key through the guarded path. The panel already refused any name this
+71002d0:cmd/wisp/panel_control_windows.go:734:		slog.Warn("panel host: inbound RPC frame names no bound door - received and refused instead of resolved null (ticket 253 AC#3)",
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:12:// thread ended. After that every gesture was refused with "panel gesture could
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:19://     refused and no window comes back. This assertion is deliberate and stays
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:85:// window and records the shape the ticket was filed about: dead thread, refused
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:99:		t.Fatalf("PostMessageW(hwnd 0x%X, WM_SYSCOMMAND, SC_CLOSE) was refused: %v", old, callErr)
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:134:		t.Fatalf("the holder refused the very first gesture, before any thread had died")
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:147:		t.Fatalf("PostMessageW(hwnd 0x%X, WM_SYSCOMMAND, SC_CLOSE) was refused: %v", old, callErr)
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:153:	refused := dead.RequestToggle("319-live-dead-refusal")
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:161:	if refused {
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:162:		t.Errorf("the dead thread accepted a gesture (RequestToggle=%v) - the refusal is the honest half of the defect and must stay", refused)
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:165:		t.Errorf("panelHolder.toggle refused the gesture after the panel thread had died; AC#1 says this gesture must make the holder start a fresh thread and the window must come back")
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:170:		t.Logf("319 live rebuild reading (the holder refused, so no window was asked for): old hwnd=0x%X closed via WM_SYSCOMMAND/SC_CLOSE (alive after the close=%v); after the close: mgr.IsCreated=%v mgr hwnd=0x%X dead-thread RequestToggle=%v",
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:171:			old, oldAliveAfterDeath, createdAfterDeath, hwndAfterDeath, refused)
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:182:		t.Errorf("the holder still answers with the dead thread (same thread=%v finished=%v) - the next gesture would be refused again", h.rp == dead, h.rp != nil && h.rp.isFinished())
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:188:		old, oldAliveAfterDeath, createdAfterDeath, hwndAfterDeath, refused, toggle, neu, mgr.IsCreated(), mgr.IsShown(), isLiveWindow(old))
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:347:		t.Fatalf("the holder refused the setup gesture whose whole job is to put the panel on screen")
+71002d0:cmd/wisp/panel_death_replay_319_winlive_test.go:420:		t.Fatalf("the sentinel post was refused by the panel thread, so the activation's own request cannot be assumed served either")
+71002d0:cmd/wisp/panel_delete_320_test.go:5:// row can be removed, and a row that something still points at is refused BY
+71002d0:cmd/wisp/panel_delete_320_test.go:38:	// The second click must be refused by name: "already gone" is a sentence, not
+71002d0:cmd/wisp/panel_delete_320_test.go:62:		t.Errorf("config.toml changed under a refused row delete:\n%s", after)
+71002d0:cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go:26:// never bound - the exact dead-door shape 票 253 AC#2 later refused to let "a name with no
+71002d0:cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go:383:			t.Errorf("AC#1 RED: doorRoster253r1 reviews door %q, but %s (%s:%d) binds no such name (bound: %v) - a rostered door with no Bind behind it is the dead door 票 253 AC#2 refused to call registration",
+71002d0:cmd/wisp/panel_holder_319_windows_test.go:13:// later gesture is refused by post() forever. The 2026-10-14 live log has both
+71002d0:cmd/wisp/panel_holder_319_windows_test.go:19:// dead thread - must stay refused (that is today's only path, verbatim, and the
+71002d0:cmd/wisp/panel_holder_319_windows_test.go:156:		t.Errorf("panelHolder.toggle returned false for a gesture after the panel thread had died - the dead thread's refusal reached the caller again, which is the 2026-10-14 field defect (every tray/ball gesture refused after 15:41:45); a dead thread must make the holder start a fresh one for this gesture")
+71002d0:cmd/wisp/panel_holder_319_windows_test.go:185:	t.Logf("319 holder rebuild reading: dead thread refused its own gesture; holder toggle=%v; spawns=%d; rebuilt thread queued requests=%d; same manager=%v",
+71002d0:cmd/wisp/panel_holder_319_windows_test.go:274:		t.Fatalf("the toggle control was refused by the holder around a live thread; the control reading would be about nothing")
+71002d0:cmd/wisp/panel_host_windows.go:72:// thread that refused and stayed alive took every later show request and refused it
+71002d0:cmd/wisp/panel_host_windows.go:173:	// verdict, and it is recorded so a refused raise can be reported instead of
+71002d0:cmd/wisp/panel_host_windows.go:385:	// still own, which is what 33-v2 问② refused. So the refusal stays the only
+71002d0:cmd/wisp/panel_host_windows.go:609:// refused - which of the two is answered by IsCreated/window state, not here.
+71002d0:cmd/wisp/panel_host_windows.go:748:// means the honest prior survives one refused sample, and a stale or already-closed
+71002d0:cmd/wisp/panel_inbound.go:39:// none: a request that widens the档 is refused, audited, and says which leg is
+71002d0:cmd/wisp/panel_inbound.go:63:// request was refused, 0 = every line that arrived was handled.
+71002d0:cmd/wisp/panel_inbound.go:157:	var arrived, accepted, refused int
+71002d0:cmd/wisp/panel_inbound.go:166:			refused++
+71002d0:cmd/wisp/panel_inbound.go:194:		arrived, accepted, refused, dir)
+71002d0:cmd/wisp/panel_inbound.go:195:	if refused > 0 {
+71002d0:cmd/wisp/panel_inbound.go:252:		// widening request is refused before Set is ever reached. Not an
+71002d0:cmd/wisp/panel_inbound.go:298:		// attachment = ticket 92, message = ticket 35, both still refused by name
+71002d0:cmd/wisp/panel_inbound_33_test.go:122:// name outside bridge.go's closed set is refused AND written to the audit -
+71002d0:cmd/wisp/panel_inbound_33_test.go:136:		t.Errorf("a refused request must not exit 0: exit=%d stdout=%q", code, out)
+71002d0:cmd/wisp/panel_inbound_33_test.go:139:		t.Errorf("the user-facing sentence does not name the refused method: stdout=%q", out)
+71002d0:cmd/wisp/panel_inbound_33_test.go:151:		t.Errorf("a refused request changed the档 on disk:\n before=%q\n after=%q", before, after)
+71002d0:cmd/wisp/panel_inbound_33_test.go:166:		t.Errorf("exit=%d want 1 (the request was refused): stdout=%q", code, out)
+71002d0:cmd/wisp/panel_inbound_33_test.go:406:		t.Errorf("the refusal does not name the argument it refused: %q", e.String())
+71002d0:cmd/wisp/panel_inbound_33_test.go:409:		t.Errorf("-data with no directory must be refused")
+71002d0:cmd/wisp/panel_inbound_guards_35r3_test.go:10:// carrying the correlationId, (d) an unregistered name still refused. The r1/r2 cases
+71002d0:cmd/wisp/panel_inbound_guards_35r3_test.go:50:// here is: the same name, arriving on the page's own postMessage edge, is refused by the
+71002d0:cmd/wisp/panel_models_320_test.go:43:		t.Fatalf("config.models.list for %q was refused: %v", provider, err)
+71002d0:cmd/wisp/panel_models_320_test.go:140:	// (a) an unknown provider: refused by name, no request.
+71002d0:cmd/wisp/panel_models_320_test.go:144:		t.Errorf("an unknown provider was not refused by name: %v", err)
+71002d0:cmd/wisp/panel_models_320_test.go:146:	// (b) a known row with no base_url: refused by name, no request.
+71002d0:cmd/wisp/panel_models_320_test.go:153:		t.Errorf("a row with no base_url was not refused by name: %v", err)
+71002d0:cmd/wisp/panel_models_320_test.go:155:	// (c) a row pointed at the test server but whose ref does not resolve: refused
+71002d0:cmd/wisp/panel_models_320_test.go:166:		t.Errorf("an unresolved key ref was not refused by name: %v", err)
+71002d0:cmd/wisp/panel_models_320_test.go:181:		t.Errorf("a fetch with no provider was not refused by name: %v", err)
+71002d0:cmd/wisp/panel_pump.go:107:// none found, config off, or refused by the rewrite account.
+71002d0:cmd/wisp/panel_reshow_255r1_windows_test.go:26://	    w.SetSize(...) - the shape 255-a2 refused to endorse because the repository
+71002d0:cmd/wisp/panel_reshow_255r8_winlive_test.go:154:		t.Fatalf("the panel thread refused the hide request (startUp error: %v)", rp.startUpErr())
+71002d0:cmd/wisp/panel_reshow_255r8_winlive_test.go:158:		t.Fatalf("the panel thread refused the re-show request (startUp error: %v)", rp.startUpErr())
+71002d0:cmd/wisp/panel_resident_windows.go:240:// refused before Store.Set is ever reached, and the panel side never produces an
+71002d0:cmd/wisp/panel_resident_windows.go:470:// no error to become this thread's state (a refused SetForegroundWindow is a
+71002d0:cmd/wisp/panel_resident_windows.go:597:// returned. Requests arriving after that are refused rather than queued forever.
+71002d0:cmd/wisp/panel_resident_windows_test.go:107:		t.Fatalf("RequestShow was refused by the panel thread (startUp error: %v)", rp.startUpErr())
+71002d0:cmd/wisp/panel_resident_windows_test.go:113:		t.Fatalf("the panel thread refused to bring up the window: %v", err)
+71002d0:cmd/wisp/panel_resident_windows_test.go:141:		t.Fatalf("the panel thread refused the editor request")
+71002d0:cmd/wisp/panel_resident_windows_test.go:179:		t.Fatalf("the panel thread refused the Eval request (startUp error: %v)", rp.startUpErr())
+71002d0:cmd/wisp/panel_resident_windows_test.go:661:		t.Errorf("bringUp refused the thread but the queued WM_CLOSE is gone - it cleaned somebody else's queue on the way out, which is the remove-only shape 33-r7 ① measured leaking a window per create and hanging 1 run in 3 inside GetMessageW")
+71002d0:cmd/wisp/panel_resident_windows_test.go:664:		t.Errorf("this test releases OS thread %d with windows=%d and queue head=%s; it refused to clean another owner's thread, so it must not leave one poisoned either", o.tid, o.leftWindows, o.head)
+71002d0:cmd/wisp/panel_resident_windows_test.go:714:// refused by name marks the thread fatal, which is the one consequence
+71002d0:cmd/wisp/panel_resident_windows_test.go:718:// the other way round is that nothing was eaten: the refused manager has no window,
+71002d0:cmd/wisp/panel_resident_windows_test.go:757:		t.Fatalf("the panel thread refused the plant request (startUp error: %v)", rp.startUpErr())
+71002d0:cmd/wisp/panel_resident_windows_test.go:777:		t.Fatalf("the first RequestShow was refused before the thread ever ran it (startUp error: %v)", rp.startUpErr())
+71002d0:cmd/wisp/panel_resident_windows_test.go:792:		t.Errorf("after a show request refused by name, startUpErr() = %v: the named refusal left no consequence on the panel thread. That is ticket 33 / 33-v2 问① - the thread stays up taking every later request and refusing each one, so the process can never open a panel and never says so outside a log line. Fix: showOnThread must recognise the sentinel bringUp returns (errPanelRefusedThread) and mark the thread fatal", err)
+71002d0:cmd/wisp/panel_resident_windows_test.go:795:		t.Errorf("the fatal state names the wrong thing: %v - a thread that refused because of a queued WM_CLOSE must carry that reason, because it is the only sentence the operator gets", err)
+71002d0:cmd/wisp/panel_resident_windows_test.go:799:	// learned nothing: the request was accepted, refused inside the thread, and lost.
+71002d0:cmd/wisp/panel_resident_windows_test.go:801:		t.Errorf("post() still accepts work on a thread that has refused this shape by name - the caller's 15-second wait is the only thing that ever reports the failure (33-v2 §9.1), which is the shape this case exists to end")
+71002d0:cmd/wisp/panel_resident_windows_test.go:804:	// Assertion 3: the second show does NOT walk the same road. It is refused where it
+71002d0:cmd/wisp/panel_resident_windows_test.go:810:		t.Errorf("a second show request was accepted onto a thread that already refused this shape by name - it will be refused again, which is the permanent-refusal road; RequestShow must answer false once the refusal is recorded")
+71002d0:cmd/wisp/panel_resident_windows_test.go:833:		t.Errorf("the panel thread that refused by name is still up %v later: it holds a queue whose only message is somebody else's WM_CLOSE and a task port nobody should be posting to", refusalSettleBudget)
+71002d0:cmd/wisp/panel_resident_windows_test.go:1093:	// Now force the refused-sample branch: put the panel in the foreground, then ask
+71002d0:cmd/wisp/panel_resident_windows_test.go:1108:		t.Errorf("Show replaced the honest prior 0x%x with 0x%x while the panel itself was foreground; the last reachable window the user came from must survive one refused sample", first, kept)
+71002d0:cmd/wisp/panel_transport_35r2_test.go:134:	// the old value stays, and the refused write is recorded so a yard can tell "the hook
+71002d0:cmd/wisp/panel_transport_35r2_test.go:138:	// ignoredWrites names every assignment this object refused (one entry per attempt).
+71002d0:cmd/wisp/panel_transport_35r2_test.go:1912:// assignment is silently refused, is no longer certified as a delivery". It does NOT buy
+71002d0:cmd/wisp/panel_transport_35r2_test.go:1990:		t.Fatalf("M-B1 RED (fixture blind to writability): the hook's assignment to a property this world marks NON-WRITABLE took effect unnoticed - ignoredWrites=%v, want exactly [postMessage]. This is the A684 §3 face this case exists to make bite: without a refused write the yard cannot tell an armed hook from a silently ignored override. %s",
+71002d0:cmd/wisp/panel_transport_35r2_test.go:1998:		t.Fatalf("M-B1 RED: with the native exit NOT writable the page's letter still reached the Go door (doorRounds=%d routerRuns=%d) - the model let a silently refused override behave like a successful hook. %s",
+71002d0:cmd/wisp/panel_transport_35r2_test.go:2014:		t.Fatalf("M-B1 CONTROL RED: the writable world refused %d assignment(s) (%v) - the台件 is not selecting on writability. %s",
+71002d0:cmd/wisp/panel_transport_35r2_test.go:2018:	t.Logf("M-B1 face has teeth: non-writable world refused the hook (doorRounds=0, unboundSlots=1), writable world armed it (doorRounds=%d)", bf2.doorRounds)
+71002d0:cmd/wisp/panel_unbound_253r6_windows_test.go:197://	    hook to the router, refused by the roster guard, and audited - so the fix above
+71002d0:cmd/wisp/resident_approval_246_windows_test.go:301:// the assembly root handed that window a cancel executor. Each half is refused
+71002d0:cmd/wisp/resident_approval_live_246_windows_test.go:266:		t.Fatalf("AC#4 FAIL: no ANSWER-REJECT audit line for the refused card:\n%s", audit.dump())
+71002d0:cmd/wisp/resident_approval_risk_256_windows_test.go:231:			winIsWhat: "the CLAMP, not the config: 99s is refused down to MaxL1Window, and that is exactly " +
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:6:// for "there is no config.toml" and "config.toml is there and the loader refused
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:7:// what it says", and the refused one has to reach a human eye.
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:22://      distinct literals, the refused shape still runs on the compiled constants
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:25://      planted file exists and is refused for a reason that is not "missing", so
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:41://   - They do not make the refused value take effect. AC#2 keeps the compiled
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:43://   - They do not name WHICH loader rule refused. "refused at load" is a class,
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:103:		t.Fatalf("setup: %s was accepted by the loader, so there is no refused branch to name; the seed is %q", refusedPath, risk268RefusedSeed)
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:111:		t.Fatalf("setup: the planted file was refused, but not by the band - the loader said %q. The ruler below would then be naming some other shape refused", loadErr)
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:114:	refused := newResidentApprovalWithConfig(refusedDir)
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:120:	if refused.riskProvenance != riskProvenanceRefusedAtLoad {
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:121:		t.Errorf("refused-file provenance = %q, want %q: AC#1 asks for a name of its own for the shape ticket 267's band created",
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:122:			refused.riskProvenance, riskProvenanceRefusedAtLoad)
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:124:	if missing.riskProvenance == refused.riskProvenance {
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:128:	if !strings.Contains(refused.riskProvenance, "present") {
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:129:		t.Errorf("refused-file provenance %q does not say out loud that the file is present, which is the whole difference from the missing shape",
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:130:			refused.riskProvenance)
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:153:	// refused number is NOT what the gate holds.
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:159:		{"refused config.toml", refused},
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:162:			t.Errorf("Queue().Timeout() with a %s = %v, want the compiled %v. AC#2: the fallback must not grow a value of its own, and the refused number must not sneak in through the door ticket 268 just opened (Q-77 is the owner's call, not this leg's)",
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:166:			t.Errorf("Queue().Timeout() = 20s: the value the band refused became live with %s", c.name)
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:174:	// the band the file reads, so "refused" above is the file's content talking
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:179:		t.Errorf("after repairing the seed in the same directory, provenance = %q, want %q - without this half the refused verdict above could be a property of the directory, not of the value",
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:197:		t.Fatalf("this case is about the refused branch, but the gate was built with provenance %q - nothing below measures what it claims to",
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:201:		t.Errorf("the refused branch wrote %d stdout lines carrying %q, want exactly 1. AC#1 asks that this shape reach a user's eye at least once from a terminal; one line is the shape resident_windows.go's [hotkey] fallback has carried since ticket 258",
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:212:	// opens the refused branch only - AC#3 forbids smoothing the legs' different
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:277:		t.Errorf("residentRiskGateValues makes %d errors.Is(err, fs.ErrNotExist) calls, want exactly 1: the missing/refused split has to rest on the sentinel, which is the one machine-readable fact the loader's chain carries (internal/config/loader.go keeps the original error in it, and config_reload.go's cause=missing branch already reads the same sentinel)",
+71002d0:cmd/wisp/resident_approval_windows.go:49://     refused by that registry, not by a branch in this file.
+71002d0:cmd/wisp/resident_approval_windows.go:198:// WHY NO SECOND MINT (hard constraint 3, and the reason A601 §4 refused ⓐ-Ⅲ by
+71002d0:cmd/wisp/resident_approval_windows.go:284:// belongs to the ⓐ-Ⅲ shape this ruling refused.
+71002d0:cmd/wisp/resident_approval_windows.go:449:	// failure is in what the file says, not in whether it exists. What "refused"
+71002d0:cmd/wisp/resident_approval_windows.go:457:	riskProvenanceRefusedAtLoad = "defaults (config.toml present but refused at load)"
+71002d0:cmd/wisp/resident_approval_windows.go:490:		// the refused value carries no marker type (observe.New leaves Error.Err
+71002d0:cmd/wisp/resident_approval_windows.go:494:		// ("present but refused"), and the verbatim loader answer travels with it
+71002d0:cmd/wisp/resident_approval_windows.go:497:		slog.Warn("resident gate: [risk] source present but refused at construction; the gate falls back to the compiled approval constants",
+71002d0:cmd/wisp/resident_approval_windows.go:511:		fmt.Printf("wisp: resident [risk]: config.toml is present but was refused at load (%v); "+
+71002d0:cmd/wisp/resident_approval_windows.go:711://  1. every card still awaiting a human is refused through the queue's own
+71002d0:cmd/wisp/resident_approval_windows.go:725:	refused, abandoned, failed := 0, 0, 0
+71002d0:cmd/wisp/resident_approval_windows.go:735:			refused++
+71002d0:cmd/wisp/resident_approval_windows.go:766:		"任务根已取消，无等待残留", refused, abandoned, failed)
+71002d0:cmd/wisp/resident_approval_windows.go:861:// ticket 245 removed. An L2 card is refused by the exit path (see cancelTasks)
+71002d0:cmd/wisp/resident_approval_windows.go:888:	// A card whose borrow Win32 refused is a card the user cannot cancel. The
+71002d0:cmd/wisp/resident_approval_windows.go:892:		// 档三: the borrow WAS attempted and Win32 refused it, so there is a key to
+71002d0:cmd/wisp/resident_audio_247_windows_test.go:268:			// The refusal to start stays refused: this leg never exits, never
+71002d0:cmd/wisp/resident_audio_windows.go:88:	// or the config read refused to guess).
+71002d0:cmd/wisp/resident_audio_windows.go:285:		slog.Error("audio: capture leg refused to start", "err", startErr.Error())
+71002d0:cmd/wisp/resident_ball_228_windows_test.go:14://   - the persistent log holds the matching booking (created XOR refused -
+71002d0:cmd/wisp/resident_ball_228_windows_test.go:119:		t.Errorf("AC#1 RED: the log books both a created ball (record %d) and a refused one (record %d).", createdIdx, refusedIdx)
+71002d0:cmd/wisp/resident_ball_228_windows_test.go:168:	t.Logf("AC#1 READING: console up=%d absent=%d; records created=%d refused=%d stopped=%d install=%d",
+71002d0:cmd/wisp/resident_ball_windows.go:87:// or the capture leg refused to assemble), and the caller says that instead of
+71002d0:cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:120:// refused to book overnight: with no ball window the channel is NOT loaded, and
+71002d0:cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:227:	// process never loads is refused, and the refusal sentence is built by
+71002d0:cmd/wisp/resident_grant_writer_265_windows_test.go:33://	              refused by name (gate writes under id-A, bridge reads under id-B).
+71002d0:cmd/wisp/resident_grant_writer_265_windows_test.go:511:			"(run.go:473-487). Anything else is the ⓐ-Ⅲ shape the ruling refused by name.", bindArg)
+71002d0:cmd/wisp/resident_hotkey_live_258_windows_test.go:203:	// combination, the child's first registration attempt must be refused.
+71002d0:cmd/wisp/resident_hotkey_live_258_windows_test.go:229:	// ticket 245, panel was refused). A 3/4 here means the child registered
+71002d0:cmd/wisp/resident_hotkey_v1probe_test.go:72:	// draft of this probe used Ctrl+Alt+W and the rebind was refused with
+71002d0:cmd/wisp/resident_mute_290_windows_test.go:162:// open the device refused must not come back as a success, because the sentence
+71002d0:cmd/wisp/resident_mute_290_windows_test.go:172:		t.Fatal("the gate claims it handed a refused device over")
+71002d0:cmd/wisp/resident_mute_290_windows_test.go:175:		t.Fatal("the leg's derived mirror says capture is running over a refused device")
+71002d0:cmd/wisp/resident_sink_nail_127_windows_test.go:547:		t.Errorf("the refused install produced %d jsonl file(s) anyway: %v", len(files), files)
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:26://     with the harness' own data root, refused everywhere else, and a refusal that
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:138:		t.Errorf("vetoByEsc with a refused card said %q", got)
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:171:				t.Errorf("%s: a refused assembly still loaded a channel", c.name)
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:248:	t.Run("refused outside test", func(t *testing.T) {
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:257:				t.Errorf("env %s refused silently: %q", env, refusal)
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:261:	t.Run("refused when the root is not the harness' own", func(t *testing.T) {
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:269:			t.Errorf("a data root that is not the injected one was not refused: %q", refusal)
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:356:// pipeline-refused claim, which together can only be printed by a process that
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:375:			"attempted and refused\"; any one of them missing means the branch is not what it reports.",
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:383:		t.Errorf("AC#7 RED: the predicate refused its own harness root:\n%s", out)
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:386:		t.Errorf("AC#7 RED: the boot report does not separate \"pipeline refused\" from \"no entry\" (%q):\n%s",
+71002d0:cmd/wisp/resident_task_source_windows.go:40:// the shape 246-a1 §5 reason 1 and ledger A481 refused. What that ordering costs,
+71002d0:cmd/wisp/resident_task_source_windows.go:110:	// refused injection must never be a quiet drop.
+71002d0:cmd/wisp/resident_task_source_windows.go:118:	// report can tell "no entry" apart from "entry refused to assemble" apart from
+71002d0:cmd/wisp/resident_task_source_windows.go:213:// redactTaskTextForLine keeps a refused injection readable without putting the
+71002d0:cmd/wisp/resident_task_source_windows.go:296:		// Non-nil with run == nil: the entry WAS offered and the pipeline refused,
+71002d0:cmd/wisp/resident_task_source_windows.go:323:	// shape is ⓐ-Ⅲ, refused by name).
+71002d0:cmd/wisp/resident_task_source_windows.go:451:// nobody can read. A second line while a task runs is refused out loud.
+71002d0:cmd/wisp/resident_tray_mute_293_windows_test.go:191:		t.Fatalf("the refused open was not reported as refused: %q", got)
+71002d0:cmd/wisp/resident_tray_mute_293_windows_test.go:193:	assertMirrorsGate(t, ra, rec, "refused device open")
+71002d0:cmd/wisp/resident_tray_mute_293_windows_test.go:290:	// A flip the gate refused to accept writes nothing (the gesture answered
+71002d0:cmd/wisp/resident_windows.go:192:	// source then binds nothing (its switches are refused by name rather than
+71002d0:cmd/wisp/resident_windows.go:199:	// same manager instead of being refused forever. See panelHolder above for
+71002d0:cmd/wisp/resident_windows.go:307:	// was killed by the OS instead of being refused, and the audit trail recorded
+71002d0:cmd/wisp/resident_windows.go:458:// refused by post() ("panel gesture could not be handed over", 9 entries that
+71002d0:cmd/wisp/resident_windows.go:568:// refused by the thread, the caller sees false and the activation takes its
+71002d0:cmd/wisp/resident_windows.go:685:// When the hand-off itself was refused - no panel host, or a thread that will
+71002d0:cmd/wisp/run.go:159:	// refused below rather than patched over, because a second ledger next to a
+71002d0:cmd/wisp/run.go:205:			// already refused the same shape, so refusing here is what makes
+71002d0:cmd/wisp/run.go:627:		// what it says: cards are recorded, an undeliverable veto is refused by the
+71002d0:cmd/wisp/run_mode101_test.go:447:		// relaxed now that a grant source exists: a B-tier `.env` write stays refused
+71002d0:cmd/wisp/run_mode101_test.go:453:		// grant it must be refused" has to keep measuring cards, not refusals, or the
+71002d0:cmd/wisp/run_mode101_test.go:472:		refused  bool
+71002d0:cmd/wisp/run_mode101_test.go:485:		_, why, refused = t101call(rt, 1, "fs.write", env)
+71002d0:cmd/wisp/run_mode101_test.go:502:	if !refused {
+71002d0:cmd/wisp/run_mode101_test.go:569:	if !strings.Contains(line, "result=refused-confirm") &&
+71002d0:cmd/wisp/run_mode101_test.go:571:		t.Errorf("the unanswered L2 left no refused audit line, got %q", line)
+71002d0:cmd/wisp/run_test.go:17://	                                          out-of-allowlist read is refused
+71002d0:cmd/wisp/run_test.go:293:		t.Error("the out-of-allowlist read was not refused as an error outcome")
+71002d0:cmd/wisp/run_test.go:379:		t.Error("a task that never went through AdmitTextTask must be refused (D47)")
+71002d0:cmd/wisp/run_test.go:402:	var gated, refused *memory.ToolCall
+71002d0:cmd/wisp/run_test.go:408:			refused = &rows[i]
+71002d0:cmd/wisp/run_test.go:415:	if refused == nil || refused.Decision != agent.DecisionReject ||
+71002d0:cmd/wisp/run_test.go:416:		refused.ErrorClass != "user_rejected" || refused.Outcome != agent.OutcomeError {
+71002d0:cmd/wisp/secret.go:125:// refused (AC#1 measured rc=2) - what it refused with was two prefixes and no fix
+71002d0:cmd/wisp/secret.go:140:	// sealing call refused it: measured on one and the same binary, `wisp doctor`
+71002d0:cmd/wisp/secret_argv_windows_test.go:364:// one argv shape that would leak: a value-carrying flag. It must be refused,
+71002d0:cmd/wisp/secret_dataroot_119b_test.go:127:		t.Fatalf("AC#1 RED: secret.NewStore refused the dev data root the secret route announced: %v", err)
+71002d0:cmd/wisp/secret_dataroot_119b_test.go:199:// must still be refused - otherwise "make `wisp secret` work" would have bought
+71002d0:cmd/wisp/secret_dataroot_119b_test.go:215:		t.Fatalf("AC#3: the route refused to seal its own tree: %v", err)
+71002d0:cmd/wisp/secret_dataroot_119b_test.go:254:		t.Errorf("AC#3 RED: PrivateFile refused a plain path inside the resolved root: %v", err)
+71002d0:cmd/wisp/secret_test.go:423:	// Positional overflow is refused the same way: the extra argument is a
+71002d0:cmd/wisp/secret_test.go:581:	// A refused entry leaves nothing behind either: the failure paths are where
+71002d0:cmd/wisp/secret_test.go:585:	if code := q.cmd.run([]string{"set", "refused"}); code == 0 {
+71002d0:cmd/wisp/secret_test.go:589:		t.Errorf("a refused set changed the data dir contents to %v", files)
+71002d0:cmd/wisp/secret_test.go:593:		t.Errorf("a refused set left the plaintext on disk: %v", hits)
+71002d0:cmd/wisp/secret_test.go:786:	t.Run("refused while referenced", func(t *testing.T) {
+71002d0:cmd/wisp/secret_test.go:789:			t.Fatal("unset of a referenced blob must be refused")
+71002d0:cmd/wisp/secret_test.go:792:			t.Error("a refused unset must leave the blob in place")
+71002d0:cmd/wisp/secret_test.go:806:	t.Run("refused for a voice.realtime reference too", func(t *testing.T) {
+71002d0:cmd/wisp/subagent_selfapproval_197_test.go:199:// task identity, every assemblable self-approval route refused, and the host's own
+71002d0:cmd/wisp/ticket224_assembly_test.go:240:// refused" says nothing about whether anything was asked. That is the polarity trap
+71002d0:frontend/src/components/composer.tsx:87:  // The native verdicts, in the order Go reported them: stored rows and refused
+71002d0:frontend/src/components/panel-sidebar.tsx:48:    = refused, accent dot = streaming, nothing = done. */
+71002d0:frontend/src/fixtures/harness-app.ts:372:          detail: ['{"refused": true, "reason": "批量删除命中 R3，需 L2 原生批准"}'],
+71002d0:frontend/src/fixtures/harness-app.ts:463:          detail: ['{"refused": true, "reason": "R6：脚本包含管道、重定向与元字符，写入系统临时目录，需逐条确认"}'],
+71002d0:frontend/src/fixtures/harness.ts:357:  { name: "fs.delete", status: "denied" as const, summary: "被拒：未授权批量删除", detail: ['{"refused": true, "reason": "批量删除命中 R3，需 L2 原生批准"}'] },
+71002d0:frontend/src/lib/panel-views.ts:92: * then a screen change is asked for and refused, so what is on screen stays
+71002d0:frontend/src/lib/panel.ts:94:/** One attachment as the native side stored (or refused) it. */
+71002d0:internal/agent/approval/approval.go:549:// for exactly the calls both guards would have refused. The cases that reach
+71002d0:internal/agent/approval/cancel_key_label_260r4_test.go:9:// produced a NEW contradiction the orchestrator refused to book overnight:
+71002d0:internal/agent/approval/gate.go:124:// refused", which is the same posture NoGate had - so wiring this type in is
+71002d0:internal/agent/approval/gate.go:189:// task registered. An approval request for an unregistered task is refused
+71002d0:internal/agent/approval/gate.go:225:// evicted while still running gets refused, not waved through.
+71002d0:internal/agent/approval/gate.go:254:		g.logf("approval: L1 refused by D47 guard task=%q tool=%s: %v", d.TaskID, d.Tool, err)
+71002d0:internal/agent/approval/gate.go:319:			// refused to run EXCEPT the one that stopped a write mid-window.
+71002d0:internal/agent/approval/gate.go:504:		g.logf("approval: L2 refused by D47 guard task=%q tool=%s: %v", d.TaskID, d.Tool, err)
+71002d0:internal/agent/approval/gate.go:642:// 「本会话内」 arrives at DecideFromPanel and is refused there.
+71002d0:internal/agent/approval/gate.go:734:// refused even if it is real and live, and a Source claiming "native" changes
+71002d0:internal/agent/approval/gate.go:751:// Replay re-displays a refused or expired L2 request under a fresh
+71002d0:internal/agent/approval/queue.go:125:	// DefaultMaxPending bounds the FIFO. Overflow is refused fail-closed: a
+71002d0:internal/agent/approval/queue.go:476:// reject closes one item as refused. No proof is required: refusing is the
+71002d0:internal/agent/approval/queue.go:597:// (or refused) on the first display cannot carry over.
+71002d0:internal/agent/approval/queue_test.go:87:// route. All three are refused, and the item stays pending so nothing silently
+71002d0:internal/agent/approval/queue_test.go:165:	// this is the only attack an outsider has, and it is refused.
+71002d0:internal/agent/approval/queue_test.go:267:// C18 一键重放: a refused request can be re-displayed, but re-displaying is
+71002d0:internal/agent/approval/replies.go:47:// direction: an evicted card has no grant held for it, so it can be refused but
+71002d0:internal/agent/approval/replies.go:98://	PanelAllow                       reaches DecideFromPanel and is refused THERE
+71002d0:internal/agent/approval/replies.go:424:// refused on the ROUTE, before any grant is looked at, and a grant that surfaced
+71002d0:internal/agent/approval/replies.go:493:// refused rather than guessed at, because a stored rule the operator did not read
+71002d0:internal/agent/approval/replies.go:496:// A card whose paths carry the C26 "无法规范化" marker is refused WHOLE, before
+71002d0:internal/agent/approval/replies.go:509:// would offer a rule exactly where the pre-fix code refused one — wider, in the
+71002d0:internal/agent/approval/replies_201_test.go:107:		t.Errorf("a refused allow must not retire the card it was asked about")
+71002d0:internal/agent/approval/ticket224_reply_grant_test.go:248:		t.Fatalf("%d rows recorded across 4 refused answers: a refused answer is not an answer, "+
+71002d0:internal/agent/approval/ticket242_binding_test.go:174:		t.Fatalf("AC#1 RED: the refused cross-card spend left %d live grant(s) on A - a rejected answer must still consume the proof, or its holder can retry it", itA.grants.live())
+71002d0:internal/agent/approval/ticket242_binding_test.go:184:		t.Fatalf("AC#1 RED: the positive control was refused too (%s) - item A's own live grant against item A's own binding digest must spend, otherwise the cross-card refusal above could come from any cause", d.label())
+71002d0:internal/agent/approval/ticket259_denial_rulers_test.go:174:	// The retry killer stays the retry killer under the new shape: a refused
+71002d0:internal/agent/approval/ticket259_panel_capability_rulers_test.go:167:// field whose KIND can express a state verdict is refused whatever it is called,
+71002d0:internal/agent/approval/ticket259_panel_capability_rulers_test.go:281:// face was refused on must still be openable by the native grant, so a pass here
+71002d0:internal/agent/approval/ticket259_panel_capability_rulers_test.go:308:		t.Fatalf("AC#3 RED: the panel-observable values were refused, but so was the live native grant (%v) - the card stopped being answerable before the control ran, which makes the pass above meaningless", err)
+71002d0:internal/agent/approval/ticket259_panel_capability_rulers_test.go:312:	// allow is refused on the route alone. Y stays pending through this: a grant
+71002d0:internal/agent/approval/ticket285_route_denial_name_rulers_test.go:135:		t.Errorf("AC#1 RED: one refused answer booked %d GRANT-DENY lines, want exactly 1; a second line means another guard answered this call too\naudit:\n%s", n, dump)
+71002d0:internal/agent/approval/ticket285_route_denial_name_rulers_test.go:148:	// Positive control, and it is the load-bearing one: the refused attempt burned
+71002d0:internal/agent/approval/ticket285_route_denial_name_rulers_test.go:156:		t.Fatalf("AC#1 RED: card A refused its own live grant after a foreign answer aimed at B (%v); the proof the cross-card call carried was live, so the control says the denial above was not about the value", err)
+71002d0:internal/agent/approval/ticket285_route_denial_name_rulers_test.go:167:// reading "a denial was refused" off the unknown-correlation case and calling
+71002d0:internal/agent/approval/ticket318_widening_marker_rulers_test.go:11:// renders a raw path C26 refused as `p + " (无法规范化: " + err.Error() + ")"`,
+71002d0:internal/agent/approval/ticket318_widening_marker_rulers_test.go:26:// canonicalization error today's C26 emits for a refused reparse traversal:
+71002d0:internal/agent/approval/ticket318_widening_marker_rulers_test.go:68:// anything wider is refused rather than guessed at": a card that is only
+71002d0:internal/agent/approval/ticket318_widening_marker_rulers_test.go:71:// whole card is refused - the any-path shape session.Ledger.Covering already
+71002d0:internal/agent/approval/ticket318_widening_marker_rulers_test.go:75:// pre-fix tree (two distinct "dirs" already refused), so this pin's teeth are
+71002d0:internal/agent/approval/ticket84_no_owner_test.go:198:		t.Errorf("refused only after %v, want an immediate refusal", el)
+71002d0:internal/agent/approval/ticket84_no_owner_test.go:240:		t.Errorf("(a) refused only after %v: 界面缺失应当立即拒绝，不是等下去", ael)
+71002d0:internal/agent/approval/ticket97_alias_direction_test.go:27:// ticket97Gate: an L2 deadline long enough that "refused now" and "timed out"
+71002d0:internal/agent/approval/window_test.go:109:	// An attempt to use the unloaded channel is refused with the same honest
+71002d0:internal/agent/approval/zz_201_a1_junction_marker_windows_test.go:6:// measured live. QUESTION: a junction-refused fs call raises an L2 card whose
+71002d0:internal/agent/approval/zz_201_a1_junction_marker_windows_test.go:113:// the dispatch's chain — junction refused → card face carries the marker → the
+71002d0:internal/agent/control_test.go:136:		t.Fatal("steering refused (agent.steering_enabled?)")
+71002d0:internal/agent/declared_l0_risk_179_test.go:6:// tools.levelString's default arm) was refused with the "unclassified"
+71002d0:internal/agent/declared_l0_risk_179_test.go:20://     ToolInfo) must STILL be refused with the same verbatim sentence. Green
+71002d0:internal/agent/declared_l0_risk_179_test.go:77:// refused: the provider ran it, its produced body came back to the model, and
+71002d0:internal/agent/forensics_test.go:77:// handed an ALREADY-CANCELLED ctx, memory's writer refused them at BeginTx, and
+71002d0:internal/agent/guard_test.go:44:	// Rounds 1..7 executed; the 8th was refused before execution.
+71002d0:internal/agent/loop.go:78:	Rejected   bool // gate/pass-through refused before execution
+71002d0:internal/agent/loop.go:803://     refused on any host that left the switch off, i.e. every real one).
+71002d0:internal/agent/spill.go:222:// clear - "will be refused" is only true of the no-approval case.
+71002d0:internal/agent/spill_name_injectivity_test.go:298:		t.Errorf("the incumbent's bytes are %q, want FIRST untouched by a refused write", body)
+71002d0:internal/agent/spill_path_invariant_test.go:392:	// on Windows. Both are refused on both platforms - ticket 81 AC#1 keeps the
+71002d0:internal/audio/captureopt.go:35:// the false-green shape 247-a1 census E6 refused (P4 form 甲: "no two
+71002d0:internal/audio/captureopt_test.go:206:	// A frame that is not one seam frame is refused out loud and emits nothing.
+71002d0:internal/ball/ball_windows.go:893:			// The borrow was refused: say it on the report (Problems() names it)
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:5:// Ticket 260 AC#2, leg 260-r5: a ruler that can HEAR the borrow being refused.
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:85:	// attempted-but-refused branch (hotkey_windows.go:399-402) and takeEscWithAcc's
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:90:	t260r5RefusedLogWord  = "cancel takeover refused by Win32"
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:147:// is the leg that keeps the refused-borrow assertions from being a standing
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:255:		t.Fatalf("IsWindow(0x%X) says the planted handle is a live window, so it is not a refused handle and this "+
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:298:// out, Win32 refused it, and the step that says so is the one production runs.
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:308:		t.Fatalf("the rig did not reach a refused borrow (IsWindow=%d entered=%t the-ball-claims-the-key=%t): either the "+
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:309:			"plant stopped being a refusal or the wiring claims a key Win32 refused - in both readings the receipt below "+
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:314:		t.Fatal("the refused borrow left no cancel line in the report: the receipt write never ran")
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:325:		t.Fatalf("problem lines after a borrow Win32 refused = %d (%q), want the 1 that says so: the seed said %q, "+
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:335:			t.Errorf("the refused-borrow line does not say %q; it reads: %s", want, said)
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:339:		t.Errorf("cancel line after a refused borrow = %q (attempted=%t), want HotkeyError and attempted: the "+
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:357:		t.Errorf("the refused borrow reports %q / %+v, want %q / %+v - the line names a key that was not the one "+
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:363:		t.Errorf("escTakenOver reads true after a refused borrow: the ball claims a key Win32 never lent, and " +
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:375:			t.Errorf("the refused borrow moved the %s line from %+v to %+v (present=%t): a receipt write that "+
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:383:		t.Errorf("the refused borrow logged nothing naming %q; error-level output captured was %q",
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:386:	t.Logf("260-r5 refused borrow: line=%+v problems=%q logged=%q", line, probs, o.logged)
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:415:		t.Errorf("a held cancel key reports problems (%q); Problems() then cannot tell a refused borrow from a "+
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:79:			t.Fatalf("cancel = %q: the default borrow was refused by the fake registry: %v", bind, err)
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:139:			t.Fatalf("%s: the fake registry refused the borrow: %v", c.name, err)
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:180:		t.Fatalf("the fallback borrow was refused by the fake registry: %v", err)
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:231:			t.Fatalf("cancel = %q: borrow refused: %v", bind, err)
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:269:		t.Fatalf("the refused attempt was for %+v, want the configured %+v", got, borrow.Acc)
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:278:		t.Errorf("the refused borrow does not name the key it tried: %q", probs)
+71002d0:internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:96:			t.Errorf("%s: a valid seed reported a refused binding: %v", c.name, wish.Refused)
+71002d0:internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:103:			t.Fatalf("%s: the fake registry refused the borrow: %v", c.name, err)
+71002d0:internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:146:		t.Fatalf("the default borrow was refused by the fake registry: %v", err)
+71002d0:internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:166:		t.Errorf("the refused seed expects %+v (Default=%v), want the default pair %+v", wish.Acc, wish.Default, wantDefaultBorrow260r2)
+71002d0:internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:178:		t.Fatalf("the fallback borrow was refused by the fake registry: %v", err)
+71002d0:internal/ball/hotkey_live_test.go:121:// Win32 refused it (a foreign app holds that combination on this machine -
+71002d0:internal/ball/hotkey_live_test.go:138:			t.Logf("SKIP-LOUD: the cancel borrow was ATTEMPTED and refused by Win32 (%v) - another program on "+
+71002d0:internal/ball/hotkey_live_test.go:274:		t.Skipf("SKIP-LOUD: injection refused on the second press, so this run did not prove the retired " +
+71002d0:internal/ball/hotkey_live_test.go:434:		t.Skipf("SKIP-LOUD: keybd_event injection was refused, so this run did not prove the shell dispatch " +
+71002d0:internal/ball/hotkey_status_test.go:211:		t.Fatalf("borrow refused by the fake registry: %v", err)
+71002d0:internal/ball/hotkey_status_test.go:256:	// still up: the second attempt must be refused by the registry that already
+71002d0:internal/ball/hotkey_status_test.go:283:		t.Error("a refused borrow must be an attempted status")
+71002d0:internal/ball/hotkey_status_test.go:343:	// mute: ATTEMPTED and refused with 1409 => occupied.
+71002d0:internal/ball/hotkey_windows.go:248:	// accelerator (ParseAccelerator refused it).
+71002d0:internal/ball/hotkey_windows.go:250:	// HotkeyTaken: attempted and refused by Win32 with
+71002d0:internal/ball/hotkey_windows.go:254:	// HotkeyError: attempted and refused for any other Win32 reason.
+71002d0:internal/ball/hotkey_windows.go:292:// were attempted and refused; HotkeyDisabled/HotkeyUnparsable were never
+71002d0:internal/ball/hotkey_windows.go:310:	// it necessary - a cancel binding the parser refused still gets the card its
+71002d0:internal/ball/hotkey_windows.go:374:// for no key). Occupied, unparsable and refused all still print.
+71002d0:internal/ball/hotkey_windows.go:553:// resolveCancelBorrow of an unset or refused binding returns exactly this pair.
+71002d0:internal/ball/hotkey_windows.go:566:	Fallback error       // non-nil = the configured binding was refused and the default was taken (P6)
+71002d0:internal/ball/hotkey_windows.go:612:		slog.Error("cancel takeover refused by Win32; Confirming will have no cancel key",
+71002d0:internal/ball/hotkey_windows.go:669:// ticket 260 AC#1 condition 2. A refused configured binding shows up here as
+71002d0:internal/ball/hotkey_windows.go:692:// refused: attempted, so Problems() says it out loud instead of leaving the
+71002d0:internal/ball/hotkey_windows.go:702:// cancelFailedLine is the DEFAULT-档 refused-borrow line.
+71002d0:internal/ball/interaction_live_test.go:327:		t.Skipf("SKIP-LOUD: SetCursorPos was refused, so this run did NOT click the orb with the physical "+
+71002d0:internal/ball/live_windows_test.go:123:	// only available when the attempt is on the report as refused (HotkeyError /
+71002d0:internal/ball/live_windows_test.go:488:	// A background process can be refused cursor input; that is an environment
+71002d0:internal/ball/live_windows_test.go:495:			t.Skipf("SKIP-LOUD: SetCursorPos refused (the pointer is owned elsewhere): asked (%d,%d), at (%d,%d). "+
+71002d0:internal/config/allowdirs.go:65:		return observe.New(observe.ClassConfig, "config: refused to persist an empty allowed_dirs entry")
+71002d0:internal/config/allowdirs.go:72:			"config: refused to persist an allowed_dirs entry containing \"..\": "+d)
+71002d0:internal/config/allowdirs.go:118:				"config: refused to persist an allowed_dirs entry containing \"..\": "+s)
+71002d0:internal/config/c26_seam_posix_125_test.go:60:			"seam guard refused it and every seal in this process is on the built-in floor")
+71002d0:internal/config/c26_seam_posix_125_test.go:77:		t.Fatalf("AC#1 RED: the installed %T refused its own probe-shaped input %q: %v - the built-in floor "+
+71002d0:internal/config/enabled_261_test.go:73:		t.Fatalf("LoadFile refused the hand-written file: %v", err)
+71002d0:internal/config/loader.go:70:			// built through NewManager, so "no file" is refused before any row can
+71002d0:internal/config/loader_test.go:32:// root), so a migration that rewrites this file through SaveFile is not refused
+71002d0:internal/config/schema.go:488:	// that would otherwise be refused (per path, not per pattern).
+71002d0:internal/config/settings.go:21:// field the power to turn the NEXT start into an Unconfigured process. A refused
+71002d0:internal/config/settings.go:31:// refused for three different reasons and the page must never fold them into one
+71002d0:internal/config/settings.go:96:// config already declares. An unknown provider is refused rather than created: a
+71002d0:internal/config/settings.go:141:// refused here before validate() ever sees it, so the reason the page gets back
+71002d0:internal/config/settings.go:251:// body adds no fourth: an unreadable file is still a refused write, a file that
+71002d0:internal/config/settings.go:292:			"config: refused to write "+ownedKey+"; the value would not survive validation, so config.toml is unchanged。"+
+71002d0:internal/config/settings.go:296:	// Memory first, then the file, then memory back if the file refused - the same
+71002d0:internal/config/settings_248_test.go:89:	// The second field of the same save is refused by AC#7's gate (a plaintext key
+71002d0:internal/config/settings_248_test.go:97:		t.Errorf("a refused write reported key paths %v, want none: nothing landed", second)
+71002d0:internal/config/settings_248_test.go:104:		t.Errorf("the refused value reached the file:\n%s", body)
+71002d0:internal/config/settings_248_test.go:107:		t.Errorf("a refused write rewrote the reference it did not accept:\n%s", body)
+71002d0:internal/config/settings_248_test.go:111:// AC#7: a value that would not survive the start-up validation is refused BEFORE
+71002d0:internal/config/settings_248_test.go:146:				t.Errorf("a refused write reported key paths %v, want none", written)
+71002d0:internal/config/settings_248_test.go:149:				t.Errorf("config.toml changed under a refused write.\nbefore:\n%s\nafter:\n%s", before, after)
+71002d0:internal/config/settings_248_test.go:154:				t.Errorf("the file this process refused is not the file the next start reads: %+v", got.LLM.Providers)
+71002d0:internal/config/settings_248_test.go:158:				t.Errorf("memory diverged from the file under a refused write: chat model = %q", got)
+71002d0:internal/config/settings_257_test.go:152:			t.Errorf("%s: a refused write reported key paths %v, want none", f.field, written)
+71002d0:internal/config/settings_257_test.go:178:		t.Errorf("seven refused writes still changed config.toml:\n%s", after)
+71002d0:internal/config/settings_257_test.go:181:		t.Errorf("a refused role write still moved memory: chat model = %q", got)
+71002d0:internal/config/settings_257_test.go:242:			t.Errorf("%s: still refused after the hand add: %v", f.field, err)
+71002d0:internal/config/settings_313.go:12:// whose provider/model pair is not in the catalog is refused by validateCatalog,
+71002d0:internal/config/settings_313.go:103:// load). The local sherpa cascade is refused by that ruler too - it is the
+71002d0:internal/config/settings_313.go:112:				"config: refused to write "+keyPath+"。 "+refusalRowMissing+
+71002d0:internal/config/settings_313.go:145:// asked for by name: an existing row is refused rather than rewritten, because
+71002d0:internal/config/settings_313_test.go:54:		t.Error("the created model entry is not enabled: an entry without enabled=true is treated as off and is refused at start-up")
+71002d0:internal/config/settings_313_test.go:98:				t.Errorf("a refused create reported %v, want none", written)
+71002d0:internal/config/settings_313_test.go:104:				t.Errorf("config.toml changed under a refused create:\n%s", after)
+71002d0:internal/config/settings_313_test.go:112:		t.Fatalf("the provider-only control was refused: %v", err)
+71002d0:internal/config/settings_313_test.go:119:// The cloud voice chains (A877 ruling 1): refused while the pair is not in the
+71002d0:internal/config/settings_313_test.go:131:		t.Errorf("a refused chain write reported %v, want none", written)
+71002d0:internal/config/settings_313_test.go:137:		t.Errorf("config.toml changed under a refused chain write:\n%s", after)
+71002d0:internal/config/settings_313_test.go:165:		t.Errorf("a refused local-sherpa write changed the file:\n%s", after)
+71002d0:internal/config/settings_313_test.go:167:	// And an empty element is refused rather than skipped.
+71002d0:internal/config/settings_313_test.go:184:	// is refused (there is no provider to pair it with).
+71002d0:internal/config/settings_313_test.go:194:		t.Errorf("a refused pair write changed the file:\n%s", after)
+71002d0:internal/config/settings_313_test.go:220:// does not list is refused with the file untouched.
+71002d0:internal/config/settings_313_test.go:225:		t.Fatalf("a provider-only realtime write on a disabled head was refused: %v (%v)", err, written)
+71002d0:internal/config/settings_313_test.go:231:		t.Fatalf("the model half on a disabled head was refused: %v (%v)", err, written)
+71002d0:internal/config/settings_313_test.go:240:	// provider the config does not declare is refused and the file is untouched.
+71002d0:internal/config/settings_313_test.go:261:		t.Errorf("a refused enabled-head write changed the file:\n%s", after)
+71002d0:internal/config/settings_320.go:33:// value is one of the schema's two billing modes; anything else is refused before
+71002d0:internal/config/settings_320.go:160:// false enabled would be treated as off and refused at start-up, which is the
+71002d0:internal/config/settings_320.go:239:// by the chat role or by one of the voice chains is refused BY NAME rather than
+71002d0:internal/config/settings_320_test.go:37:		t.Fatalf("the second enum word was refused: %v", err)
+71002d0:internal/config/settings_320_test.go:51:		t.Errorf("a refused billing write reported %v, want none", written)
+71002d0:internal/config/settings_320_test.go:63:		t.Errorf("config.toml changed under a refused billing write:\n%s", after)
+71002d0:internal/config/settings_320_test.go:76:		t.Errorf("config.toml changed under a refused ghost-provider write:\n%s", after)
+71002d0:internal/config/settings_320_test.go:116:		t.Error("the created model entry is not enabled: an entry without enabled=true is treated as off and is refused at start-up")
+71002d0:internal/config/settings_320_test.go:131:		t.Fatalf("the provider-only control was refused: %v", err)
+71002d0:internal/config/settings_320_test.go:161:				t.Errorf("a refused create reported %v, want none", written)
+71002d0:internal/config/settings_320_test.go:167:				t.Errorf("config.toml changed under a refused create:\n%s", after)
+71002d0:internal/config/settings_320_test.go:203:		t.Error("the created entry is not enabled: an entry without enabled=true is treated as off and is refused at start-up")
+71002d0:internal/config/settings_320_test.go:246:				t.Errorf("a refused create reported %v, want none", written)
+71002d0:internal/config/settings_320_test.go:252:				t.Errorf("config.toml changed under a refused create:\n%s", after)
+71002d0:internal/config/tempdir_resolved_124_test.go:16:// unresolved TMPDIR is refused before the bytes are ever compared: on macOS the
+71002d0:internal/config/validate_267_test.go:66:	// At the lead: the config must be refused, not loaded-and-degraded.
+71002d0:internal/config/validate_267_test.go:68:		t.Fatalf("confirm_timeout_sec = %d must be refused: it equals approval.DefaultApprovalWarning (%v), so gate.go's `lead := Timeout() - WarningLead()` is <= 0 and the C18 warning never arms", lead, approval.DefaultApprovalWarning)
+71002d0:internal/config/validate_267_test.go:99:				t.Fatalf("confirm_timeout_sec = %d must be refused at load", bad)
+71002d0:internal/config/validate_test.go:174:// refused as "this config is invalid" instead of reaching the approval gate,
+71002d0:internal/config/writeguard.go:27://     divergence in place forever: every later 「一直」 answer would be refused
+71002d0:internal/config/writeguard.go:121:				"config: refused to write config.toml; the file it holds cannot be read back, "+
+71002d0:internal/config/writeguard.go:130:			"config: refused to write config.toml; it cannot be stat'ed, so its contents are unknown")
+71002d0:internal/config/writeguard_226_test.go:19:// refused, and a failed write rolls the in-memory value back.
+71002d0:internal/config/writeguard_226_test.go:161:// AC#2's other half: an unreadable file is refused, loudly, and nothing is
+71002d0:internal/config/writeguard_226_test.go:179:		t.Errorf("the refused write still changed the file:\n%s", got)
+71002d0:internal/config/writeguard_226_test.go:182:		t.Errorf("a refused write must roll the in-memory list back, got %v", m.Config().FS.AllowedDirs)
+71002d0:internal/config/writeguard_226_test.go:329:// root and is refused before anything is read or written.
+71002d0:internal/config/writeguard_226_test.go:345:		t.Errorf("a refused entry changed the file:\n%s", got)
+71002d0:internal/config/writeguard_226_test.go:348:		t.Errorf("a refused entry changed memory: %v", m.Config().FS.AllowedDirs)
+71002d0:internal/llm/enabled_gate_261_r1_test.go:71:// entry through text_chain must be refused with the disabled wording - NOT a
+71002d0:internal/llm/enabled_gate_261_r1_test.go:97:	// turn it back on" - so an operator refused by the gate knows the way back
+71002d0:internal/llm/enabled_gate_261_r1_test.go:126:// be refused, not silently skipped over - skipping would re-order the chain
+71002d0:internal/llm/enabled_reach_261_test.go:96:		t.Fatalf("LoadFile refused the hand-written file: %v", err)
+71002d0:internal/llm/enabled_reach_261_test.go:215:	// The hand-written missing-key shape is refused identically: it decodes
+71002d0:internal/llm/enabled_reach_261_test.go:300:// refused / unreachable / zero cost; flipped true -> all four reverse. A ghost
+71002d0:internal/llm/enabled_reach_261_test.go:337:		t.Errorf("selection: the disabled entry resolved, want refused")
+71002d0:internal/llm/enabled_reach_261_test.go:355:	// Live control, wording split: a model ABSENT from the catalog is refused
+71002d0:internal/llm/errors.go:29://	network (connect_failed)     - DNS / refused / unreachable
+71002d0:internal/llm/errors.go:143:	// Connection refused / unreachable.
+71002d0:internal/llm/llm_test.go:227:	// Connection refused (wrapped the way net/http does).
+71002d0:internal/llm/llm_test.go:228:	refused := &net.OpError{Op: "dial", Err: errors.New("connection refused")}
+71002d0:internal/llm/llm_test.go:229:	if e := ClassifyTransportError(refused); e.Class != observe.ClassNetwork ||
+71002d0:internal/llm/llm_test.go:231:		t.Errorf("refused = %+v", e)
+71002d0:internal/llm/probe_health.go:123:// capability the wire refused to demonstrate. The seam emits DATA; the ball and
+71002d0:internal/llm/probe_health_test.go:342:				t.Errorf("%s: provider_health claims a capability the wire refused: %+v", protocol, row.Probe)
+71002d0:internal/llm/resolver.go:125:	// and refused here (distinct from the unknown-model error above: the entry
+71002d0:internal/models/acl_sid_121_test.go:192:				t.Fatalf("the filter refused to answer: %v", err)
+71002d0:internal/models/downloader.go:148:			fmt.Sprintf("model %s is P3-BLOCKED (license: %s); download refused, replacement decision pending", id, entry.License))
+71002d0:internal/models/downloader.go:577:		// already refused any path that is not its own cleaned form
+71002d0:internal/models/handoff_reuse_109_test.go:48:		t.Fatalf("AC#2 reverse leg, normal install: the hand-off check refused a clean model: %v", err)
+71002d0:internal/models/handoff_window_109_test.go:109:		t.Logf("hand-off refused the swapped model: %v", err)
+71002d0:internal/models/handoff_window_109_windows_test.go:18://	the write itself     : a swap made through that right is refused at the
+71002d0:internal/models/handoff_window_109_windows_test.go:123:		t.Logf("hand-off refused the swap made through that right: %v", err)
+71002d0:internal/models/manifest.go:46:	Status    string     `json:"status,omitempty"` // "" or "ok" = shippable; "blocked-p3" = license block (P3), downloads refused
+71002d0:internal/models/verify_cost_121_bench_test.go:54:			b.Fatalf("clean install refused at sample %d: %v", i, err)
+71002d0:internal/models/verify_tree_121_other_test.go:69:	t.Logf("refused and named: %v", err)
+71002d0:internal/models/verify_tree_121_other_test.go:91:	t.Logf("refused and named: %v", err)
+71002d0:internal/models/verify_tree_121_other_test.go:109:		t.Fatalf("the hand-off refused a clean install (state=%s): %v", state, err)
+71002d0:internal/models/verify_tree_121_test.go:138:			t.Logf("refused and named: %v", err)
+71002d0:internal/models/verify_tree_121_test.go:171:	t.Logf("hand-off refused at %s: %v", state, err)
+71002d0:internal/observe/earlylog_130_test.go:196:// the byte budget each: the first two fit, the third is refused.
+71002d0:internal/observe/errors_test.go:120:	cause := errors.New("dial tcp: connection refused")
+71002d0:internal/observe/errors_test.go:123:	if got := err.Error(); got != "network: provider unreachable: dial tcp: connection refused" {
+71002d0:internal/observe/logging.go:474:// never be seen on disk (over the cap, or refused by the handler). The caller
+71002d0:internal/observe/sampler_faketree_guard_136_test.go:66:		t.Fatalf("a refused read must not carry invented metrics: %+v", m)
+71002d0:internal/observe/sampler_settle_gate_136_test.go:75:// fixture, not a measurement, and is refused through the error channel (the
+71002d0:internal/panel/assets.go:84:		return nil, "", fmt.Errorf("panel: refused request path %q", requestPath)
+71002d0:internal/panel/assets.go:162:// contentTypeOf covers the shapes Vite emits. Anything unlisted is refused by
+71002d0:internal/panel/assets_test.go:154:			// "." normalises to the entry file and must NOT be refused.
+71002d0:internal/panel/attachments.go:12://     path - "\" or "/" or ".." - is refused before a byte is read, so the
+71002d0:internal/panel/attachments.go:19://     a 2 GB pick is refused without streaming it into memory. The read is then
+71002d0:internal/panel/attachments.go:66:// have its bytes read, which is also what lets a 2 GB pick be refused in
+71002d0:internal/panel/attachments.go:205:	// Guard 1: a file name that spells a path is refused, and refused before
+71002d0:internal/panel/attachments.go:308:// refused anything spelling a path, so this only trims what a human would not
+71002d0:internal/panel/attachments_test.go:137:	t.Run("empty file is refused, not dropped", func(t *testing.T) {
+71002d0:internal/panel/attachments_test.go:143:	t.Run("exe disguised as png is refused and named as an executable", func(t *testing.T) {
+71002d0:internal/panel/attachments_test.go:149:	t.Run("unknown type without a declared mime is refused", func(t *testing.T) {
+71002d0:internal/panel/attachments_test.go:156:	t.Run("lying declared mime is refused even when the bytes are a png", func(t *testing.T) {
+71002d0:internal/panel/attachments_test.go:162:	t.Run("path-injection file name is refused and nothing is written", func(t *testing.T) {
+71002d0:internal/panel/attachments_test.go:182:	t.Run("2 GB is refused on its declared size without reading a byte", func(t *testing.T) {
+71002d0:internal/panel/attachments_test.go:207:	t.Run("a source lying about its size is refused mid-read, not truncated", func(t *testing.T) {
+71002d0:internal/panel/attachments_test.go:228:	t.Run("nil source and nil sink are refused at construction, not at send", func(t *testing.T) {
+71002d0:internal/panel/attachments_test.go:293:		t.Errorf("the refused attachment vanished from the message - the user's intent was eaten:\n%s", line)
+71002d0:internal/panel/attachments_test.go:308:		t.Fatalf("refused nothing: ref=%+v err=<nil> - a silent drop is AC#2's forbidden shape", ref)
+71002d0:internal/panel/attachments_test.go:317:		t.Errorf("a refused attachment still reports mime=%q kind=%q - a caller's claim is not a verdict",
+71002d0:internal/panel/attachments_test.go:330:// damaged trip must be refused instead of becoming a shorter file.
+71002d0:internal/panel/attachments_test.go:359:	t.Run("undecodable base64 is refused, not stored as nothing", func(t *testing.T) {
+71002d0:internal/panel/attachments_test.go:371:	t.Run("a truncated payload is refused, not stored short", func(t *testing.T) {
+71002d0:internal/panel/attachments_test.go:382:	t.Run("an empty payload is refused", func(t *testing.T) {
+71002d0:internal/panel/backpressure_bound_35r8_test.go:131:// page never picks up, every refused attempt is required to still be counted by
+71002d0:internal/panel/backpressure_bound_35r8_test.go:155:	pushed, attempts, refused := 0, 0, 0
+71002d0:internal/panel/backpressure_bound_35r8_test.go:164:					refused++
+71002d0:internal/panel/backpressure_bound_35r8_test.go:175:		t.Fatalf("blocked consumer: the pump counted %d publishes for %d attempts - a refused exit that stops being counted is a silent drop", n, attempts)
+71002d0:internal/panel/backpressure_bound_35r8_test.go:177:	if refused != attempts {
+71002d0:internal/panel/backpressure_bound_35r8_test.go:178:		t.Fatalf("blocked consumer: %d of %d snapshots were picked up while no page was reading, want 0 (reads=%d)", attempts-refused, attempts, reads)
+71002d0:internal/panel/bridge.go:79:var ErrComposerRequest = errors.New("panel: composer request refused")
+71002d0:internal/panel/bridge.go:113:	// config_handlers.go's field table, and anything else is refused before the
+71002d0:internal/panel/bridge_test.go:68:			t.Errorf("%s refused: %v", tc.method, err)
+71002d0:internal/panel/bridge_test.go:80:		// the card. It must be refused at the door, and refused as "not a
+71002d0:internal/panel/bridge_test.go:90:	t.Run("a missing requestId is refused", func(t *testing.T) {
+71002d0:internal/panel/bridge_test.go:98:	t.Run("a forged or absent source is refused", func(t *testing.T) {
+71002d0:internal/panel/bridge_test.go:105:				t.Errorf("source %q refused for the wrong reason: %v", src, err)
+71002d0:internal/panel/bridge_test.go:110:	t.Run("undecodable and non-object payloads are refused, not defaulted", func(t *testing.T) {
+71002d0:internal/panel/bridge_test.go:122:			t.Errorf("refusal %q does not name what was refused", line)
+71002d0:internal/panel/composer.go:64:	// is (off / none_found / refused / not_run / loaded). 200-r2 replaced the
+71002d0:internal/panel/composer.go:183:// spelling is an error rather than a default. The empty string is refused here
+71002d0:internal/panel/composer.go:302:// every refused one is repeated verbatim, because AC#2's judgement is "do not
+71002d0:internal/panel/composer.go:312:	var refused []string
+71002d0:internal/panel/composer.go:315:			refused = append(refused, fmt.Sprintf("%s: %s", a.Name, a.Reason))
+71002d0:internal/panel/composer.go:327:	if len(refused) > 0 {
+71002d0:internal/panel/composer.go:329:		b.WriteString(strings.Join(refused, "; "))
+71002d0:internal/panel/composer.go:336:// re-resolve or act on anything - the store already refused a name that is not
+71002d0:internal/panel/composer_dispatch.go:30:// matches no case is refused and audited, never accepted quietly. Today the
+71002d0:internal/panel/composer_dispatch_test.go:109:// hop33Audit collects the audit lines so "refused AND audited" is one assertion
+71002d0:internal/panel/composer_dispatch_test.go:140:		t.Fatalf("a well-formed narrowing request was refused: %v (reply=%q)", err, reply)
+71002d0:internal/panel/composer_dispatch_test.go:295:			t.Errorf("%s: the stub handler refused but Handle reported success", m)
+71002d0:internal/panel/composer_dispatch_test.go:328:			t.Fatalf("source %q accepted or refused by the wrong door: %v", src, err)
+71002d0:internal/panel/composer_dispatch_test.go:331:			t.Errorf("source %q refused for %v, which does not name the source: a whitelist refusal "+
+71002d0:internal/panel/composer_dispatch_test.go:355:		t.Fatalf("valid request refused: %v", err)
+71002d0:internal/panel/composer_handlers.go:87:	// Modes is the single write leg. nil = every request is refused.
+71002d0:internal/panel/composer_handlers.go:129:		refused := fmt.Errorf("%w: 无法判断 %q 比现在更宽还是更严，按 fail-closed 拒绝", ErrNoCurrentMode, to)
+71002d0:internal/panel/composer_handlers.go:130:		h.record(req, refused, "(不可读)", to.String())
+71002d0:internal/panel/composer_handlers.go:131:		return refused
+71002d0:internal/panel/composer_handlers.go:134:		refused := fmt.Errorf("%w: 请求 %q 要把档位从 %s 放宽到 %s，而本机没有接入 L2 确认腿（R20/M4：只有变宽要确认）",
+71002d0:internal/panel/composer_handlers.go:136:		h.record(req, refused, from.String(), to.String())
+71002d0:internal/panel/composer_handlers.go:137:		return refused
+71002d0:internal/panel/composer_handlers.go:155:// record writes the one audit line a refused request deserves. A nil sink is
+71002d0:internal/panel/composer_handlers_test.go:124:	refused := 0
+71002d0:internal/panel/composer_handlers_test.go:149:				t.Fatalf("%s -> %s: refusal wrote %d audit line(s), want exactly 1 (a refused switch must not be silent)",
+71002d0:internal/panel/composer_handlers_test.go:153:				t.Fatalf("audit line %q does not name the requestId it refused", audit.joined())
+71002d0:internal/panel/composer_handlers_test.go:155:			refused++
+71002d0:internal/panel/composer_handlers_test.go:162:	if want := len(ladder) * (len(ladder) - 1) / 2; refused != want {
+71002d0:internal/panel/composer_handlers_test.go:163:		t.Fatalf("%d widening pairs asserted, want %d: some direction of the ladder went untested", refused, want)
+71002d0:internal/panel/composer_handlers_test.go:223:				t.Fatalf("%s -> %s (stricter) was refused: %v", names[fromIdx], names[toIdx], err)
+71002d0:internal/panel/composer_handlers_test.go:241:			t.Fatalf("%s -> %s (unchanged) was refused: %v", names[idx], names[idx], err)
+71002d0:internal/panel/composer_test.go:206:		t.Error("ModeRequest{To:\"yolo\"} parsed without error - an unknown mode must be refused, not defaulted")
+71002d0:internal/panel/composer_test.go:846:// snapshot yet, and an attachment the native side refused.
+71002d0:internal/panel/composer_test.go:896:			t.Errorf("a refused attachment is not told to the user verbatim:\n%s", b)
+71002d0:internal/panel/composer_test.go:899:			t.Errorf("a refused attachment ALSO renders as stored - the user cannot tell what happened:\n%s", b)
+71002d0:internal/panel/config_313_test.go:78:			t.Errorf("field %q was refused by the door: %v", tc.field, err)
+71002d0:internal/panel/config_313_test.go:102:		t.Errorf("a refused name still reached the leg: %+v", leg)
+71002d0:internal/panel/config_313_test.go:149:// test is a locked-family name, which must still be refused.
+71002d0:internal/panel/config_handlers.go:15:// typo, a dotted path, a name from a locked family - is refused by name before
+71002d0:internal/panel/config_handlers.go:51:// ErrConfigFieldRefused is every way one settings write can be refused before it
+71002d0:internal/panel/config_handlers.go:316:	// Store is the single leg. nil = every settings request is refused.
+71002d0:internal/panel/config_handlers.go:353:		refused := fmt.Errorf("panel: 配置读取失败（requestId=%q）：%w", req.RequestID, err)
+71002d0:internal/panel/config_handlers.go:354:		h.record(req, refused, "read-failed")
+71002d0:internal/panel/config_handlers.go:355:		return "", refused
+71002d0:internal/panel/config_handlers.go:405:			h.record(req, err, "credential-refused")
+71002d0:internal/panel/config_handlers.go:423:		h.record(req, err, "write-refused")
+71002d0:internal/panel/config_route_248_test.go:127:// AC#1's negative half with its control: a name off the roster is refused and the
+71002d0:internal/panel/config_route_248_test.go:145:			t.Errorf("refusal for %q does not say what it refused: %q", name, reply)
+71002d0:internal/panel/config_route_248_test.go:149:		t.Errorf("a refused name still reached the leg: read=%d apply=%d cred=%d",
+71002d0:internal/panel/config_route_248_test.go:158:		t.Fatalf("the control request was refused too: %v", err)
+71002d0:internal/panel/config_route_248_test.go:190:// lists must be refused, not accepted - reached only through dispatch directly, and
+71002d0:internal/panel/config_route_248_test.go:213:// AC#0 Q1 / J5: the field table is a whitelist, and the locked families are refused
+71002d0:internal/panel/config_route_248_test.go:256:// refused, and every listed field is refused if the leg has no row for it (checked
+71002d0:internal/panel/git.go:182:// what the filesystem says, including "I was refused".
+71002d0:internal/panel/git.go:577:// is kept: "读不到" without a name is the "未知" ticket 147 refused.
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:113:// field, the free-text field) across accepted AND refused routes, and require
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:133:			t.Fatalf("the credential write was refused, so a clean reading below would be silence: %v", err)
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:157:			t.Fatalf("write refused: %v", err)
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:165:	t.Run("refused-unlisted-method-carrying-content", func(t *testing.T) {
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:175:		checkArtifacts35r7(t, "refused-unlisted-method-carrying-content", reply, err, audit)
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:178:	t.Run("refused-forged-source-carrying-content", func(t *testing.T) {
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:188:		checkArtifacts35r7(t, "refused-forged-source-carrying-content", reply, err, audit)
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:191:	t.Run("refused-unattached-handler-carrying-content", func(t *testing.T) {
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:201:		checkArtifacts35r7(t, "refused-unattached-handler-carrying-content", reply, err, audit)
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:239:		t.Fatalf("legal traffic was refused: %v", err)
+71002d0:internal/panel/instructions_200.go:33:	// InstructionsStatusRefused: the host refused to read any directory at all
+71002d0:internal/panel/instructions_200.go:37:	InstructionsStatusRefused = "refused"
+71002d0:internal/panel/instructions_200_test.go:14://     loaded", "refused" and "no reading yet" must not collapse into one absent
+71002d0:internal/panel/instructions_200_test.go:85:				"which tree was refused: %q", want, req.Refused)
+71002d0:internal/panel/instructions_200_test.go:101:		t.Errorf("the refused loader still built a block: %q", b.Block)
+71002d0:internal/panel/instructions_200_test.go:104:		t.Errorf("the refused loader still read files: %+v", b.Files)
+71002d0:internal/panel/instructions_200_test.go:168:		{"refused", projctx.Options{
+71002d0:internal/panel/instructions_200_test.go:207:	// The complaint this cell closes: at r1 off / none_found / refused all
+71002d0:internal/panel/instructions_200_test.go:213:		{"refused", "off"},
+71002d0:internal/panel/instructions_200_test.go:214:		{"refused", "none_found"},
+71002d0:internal/panel/instructions_200_test.go:226:	if !strings.Contains(wire["refused"], "rewritten=true") {
+71002d0:internal/panel/instructions_200_test.go:227:		t.Errorf("the refused state lost the account that refused it: %s", wire["refused"])
+71002d0:internal/panel/l2_grant_boundary_test.go:57://	(3) behaviour: the historical wire shape is refused by ParseComposerRequest,
+71002d0:internal/panel/l2_grant_boundary_test.go:1401:			t.Errorf("%s no longer carries %q while this file still keeps %q as its witness: the sweep stopped asking the %d names that piece built, and a panel-side door spelled that way is now unasked rather than refused (F-R4-2)",
+71002d0:internal/panel/l2_grant_boundary_test.go:1418:			t.Errorf("the running guard answers %q, the witness name for the %s entry %q: this row stands as proof that the grid that piece builds is refused, and it is not (D33/F2, R20, AGENTS.md §1.2 ban #6)", row.route, listName, row.factor)
+71002d0:internal/panel/l2_grant_boundary_test.go:1457:// neighbourhood around them is still refused.
+71002d0:internal/panel/l2_grant_boundary_test.go:1479:// The control that proves "hits=[] means refused" and not "means never asked" is
+71002d0:internal/panel/l2_grant_boundary_test.go:1538:		t.Errorf("the refused name plant F plants is now answered by the guard, so facet 4's plant F subtest and facet 1's answeredElsewhere half are describing different trees")
+71002d0:internal/panel/l2_grant_boundary_test.go:1649:	// at run time must read as an approval door and be refused by the RUNNING
+71002d0:internal/panel/l2_grant_boundary_test.go:1650:	// guard, and the written-out route must be refused by it too. That refusal is
+71002d0:internal/panel/l2_grant_boundary_test.go:1666:			t.Errorf("the running guard answers %q, the witness name for the vocabulary word %q: this row stands as evidence that a panel-side allow door spelled that way is refused, and it is not (D33/F2, R20, AGENTS.md §1.2 ban #6)", row.route, row.word)
+71002d0:internal/panel/l2_grant_boundary_test.go:1960:	t.Run("the historical wire shape is refused because Go does not answer its route", func(t *testing.T) {
+71002d0:internal/panel/l2_grant_boundary_test.go:1976:				t.Errorf("%q refused with an unexpected error type: %v", raw, err)
+71002d0:internal/panel/l2_grant_boundary_test.go:1993:				t.Logf("%s refused outright: %v", method, err)
+71002d0:internal/panel/l2_grant_boundary_test.go:2216:	// must be refused BY THE ROSTER DERIVATION, not only by the scan below. If
+71002d0:internal/panel/pump.go:371:// including the ones the exit refused. A count that never moves is how a caller
+71002d0:internal/panel/pump_test.go:259:		t.Errorf("publishes = %d, want the attempt counted even though the exit refused it", pump.Publishes())
+71002d0:internal/panel/subagent_roster_197.go:242:			// A name the host's judge refused never travels as a status. This is
+71002d0:internal/panel/subagent_roster_197_test.go:244:// pins what the carrier does with a reading that was refused: the name is dropped
+71002d0:internal/panel/subagent_roster_197_test.go:284:	// The refused reading: a legacy word (ticket 196's vocabulary) handed over as
+71002d0:internal/panel/subagent_roster_197_test.go:298:		t.Errorf("status = %q: a name the host's judge refused still reached the wire, "+
+71002d0:internal/panel/subagent_roster_197_test.go:302:		t.Error("statusKnown = true for a refused name")
+71002d0:internal/panel/workspace.go:21://     another tree is refused, because selecting a workspace AUTHORIZES a tree.
+71002d0:internal/panel/workspace.go:128:			audit("workspace: SWITCH-REFUSED from=%q requested=%q err=%v result=refused "+
+71002d0:internal/panel/workspace.go:132:		return currentAfter(scope, previous), fmt.Errorf("panel: workspace switch refused: %w", err)
+71002d0:internal/panel/workspace_handlers.go:87:	// Scope is the runtime's path scope. nil = every request is refused with a
+71002d0:internal/panel/workspace_handlers.go:119:	// The empty path is NOT refused here on purpose: ResolveWorkspace already
+71002d0:internal/panel/workspace_handlers.go:165:// refused for the approval gate one ticket earlier. So the handler holds this
+71002d0:internal/panel/workspace_handlers.go:170:// `wisp panel-inbound` seam, or a resident boot where the pipeline refused to
+71002d0:internal/panel/workspace_handlers.go:185:// refused rather than silently replacing the tree every later judgement reads;
+71002d0:internal/panel/workspace_handlers_test.go:43:		t.Fatalf("a clean in-scope switch was refused: %v", err)
+71002d0:internal/panel/workspace_handlers_test.go:102:		t.Errorf("a refused switch narrowed the scope anyway: %v", scope.setArgs)
+71002d0:internal/panel/workspace_handlers_test.go:168:		t.Fatalf("a switch through the holder was refused: %v", err)
+71002d0:internal/panel/workspace_handlers_test.go:179:// false - a rewritten spelling is refused by the resolver long before the
+71002d0:internal/panel/workspace_handlers_test.go:189:		t.Fatalf("the real resolver refused a clean switch to its own allowlisted root: %v", err)
+71002d0:internal/panel/workspace_handlers_test.go:197:	// ② that spelling is refused by the resolver itself, with C26's own reason.
+71002d0:internal/panel/workspace_handlers_test.go:205:		t.Errorf("rewritten spelling refused with %v, want risk.ErrRewrittenPath so the two gates agree on the reason", err)
+71002d0:internal/panel/workspace_test.go:91:		t.Errorf("a refused switch was not audited:\n%s", log.joined())
+71002d0:internal/panel/workspace_test.go:148:		t.Errorf("the panel was told beta is in force while the scope refused it: %+v", view)
+71002d0:internal/perm/store.go:54:// user tried to go全自动 and the card was refused" and "the mode is now auto"
+71002d0:internal/perm/store.go:61:	ResultRefused      Result = "refused-confirm"
+71002d0:internal/perm/store_test.go:124:		t.Errorf("the refused fourth-mode switch was not audited: %v", rec.all())
+71002d0:internal/perm/store_test.go:193:		t.Errorf("refused switch was not audited as %s: %v", ResultRefused, rec.all())
+71002d0:internal/perm/store_test.go:196:		t.Errorf("mode = %v after a refused switch, want ask_every_step", s.PermissionMode())
+71002d0:internal/perm/store_test.go:205:		t.Fatal("Set succeeded although the confirmation was refused")
+71002d0:internal/perm/store_test.go:208:		t.Errorf("a refused confirmation still persisted (%d writes)", saves)
+71002d0:internal/proc/boot_windows.go:252:// has already started, are each refused. See shutdown_hooks.go for why each one
+71002d0:internal/proc/envfork.go:106://     refused by the placement floor, and is refused without creating anything.
+71002d0:internal/proc/envfork.go:156:// succeeds on the spelling it was given or is refused loudly by winsec;
+71002d0:internal/proc/shutdown_hooks.go:32://     registered during or after shutdown is refused rather than silently missed.
+71002d0:internal/proc/shutdown_hooks_test.go:75:			t.Fatalf("Registered() = %v after a refused registration", got)
+71002d0:internal/proc/shutdown_hooks_test.go:79:	t.Run("steps without a slot are refused", func(t *testing.T) {
+71002d0:internal/proc/shutdown_hooks_test.go:107:	t.Run("registration after the sequence started is refused", func(t *testing.T) {
+71002d0:internal/proc/singleinstance_windows.go:146:// SetForegroundWindow is refused by Windows' foreground lock, and the ONE moment
+71002d0:internal/proc/singleinstance_windows.go:171:		slog.Warn("proc: AllowSetForegroundWindow(ASFW_ANY) was refused; the resident's SetForegroundWindow may be denied by the foreground lock",
+71002d0:internal/projctx/projctx.go:108:// refused to read that tree" from "we looked and found none" without parsing
+71002d0:internal/projctx/projctx.go:249:		// The host refused: no directory is walked, no file is opened, and the
+71002d0:internal/risk/blacklist.go:303:// below a component that exists but refused to open (a deny-filtered
+71002d0:internal/risk/hostpath_185.go:8:// rules_hit=[], second call kind=refused rules_hit=[R4] reason="R4: 包含来自
+71002d0:internal/risk/mode.go:14:// refused):
+71002d0:internal/risk/mode.go:23://	PLAN.md:1629  irreversible operations must be refused or asked about in
+71002d0:internal/risk/mode.go:143:	// Kept names the red line that refused to silence the verdict ("" when the
+71002d0:internal/risk/pathresolver.go:319:	// that exists but refused to open (deny-filtered directory, dangling
+71002d0:internal/risk/pathresolver.go:409:// resolveHandle already refused every prefix of the tail, so an existing
+71002d0:internal/risk/pathresolver_expansion_test.go:44:		t.Logf("%s: refused as required: %v", leg, err)
+71002d0:internal/risk/pathresolver_rewrite_account_test.go:71:			t.Errorf("Actable() refused a path that was never rewritten: %v", err)
+71002d0:internal/risk/pointer_185_test.go:12:// same path is refused by R4, and the blocker is no longer task.output's stub —
+71002d0:internal/risk/provenance.go:691:// cannot land here any more — it is refused by Scope.Close before it touches
+71002d0:internal/risk/provenance_test.go:340:// report anything, so a refused close would have passed silently.
+71002d0:internal/risk/provenance_test.go:913:		t.Fatalf("a handle that no longer owns the id must be refused, got %v", err)
+71002d0:internal/risk/provenance_test.go:917:		t.Fatalf("refused close still dropped marks: ScopeTaints=%d want 1", got)
+71002d0:internal/risk/provenance_test.go:944:		t.Fatal("refused close removed the registration: the empty case is not fail-closed")
+71002d0:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:229:		t.Errorf("Why = %q: an ancestor C26 moved onto another tree must be refused WITH the expansion account in "+
+71002d0:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:258:			"refused, fail-closed sync-suspect verdict; ticket 116's ancestor case may not have relaxed it", raw, st)
+71002d0:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:261:		t.Errorf("Why = %q: want the refused expansion named in the write verdict too", st.Why)
+71002d0:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:294:		t.Errorf("IsSyncPath(%q) = %+v: a ~-spelled write target must stay a refused sync-suspect verdict", raw, st)
+71002d0:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:297:		t.Errorf("Why = %q: want the home expansion named as the reason this write was refused", st.Why)
+71002d0:internal/risk/winsec_c26.go:19:// caller can tell "C26 refused" from "this package is unwired" (ErrNoPathResolver).
+71002d0:internal/risk/winsec_c26.go:31:// traversal check, so a nonexistent leaf under an existing junction is refused
+71002d0:internal/risk/winsec_c26.go:37:// caller named (ticket 102 / PROBE B2) is refused here and propagates through
+71002d0:internal/secret/store_test.go:120:// live in the environment (nothing to persist), empty secrets are refused,
+71002d0:internal/session/grants.go:248:// requested path must never be refused for looking like a pattern.
+71002d0:internal/session/manage.go:66:// NewManager composes the outlet set. A nil store is refused rather than
+71002d0:internal/session/ticket224_pattern_dialect_test.go:175:			// later case's refused path, and sharing one table would make those hits
+71002d0:internal/session/ticket224_pattern_dialect_test.go:242:// path.Match cannot compile is refused before it becomes a row, and if it is on
+71002d0:internal/tools/audit_allowlist_scope_173_test.go:9:// all, or the call was refused before C19 ran - the line still printed
+71002d0:internal/tools/audit_allowlist_scope_173_test.go:25:// `false` was refused on purpose (票面原话): it says "judged, and out of
+71002d0:internal/tools/audit_allowlist_scope_173_test.go:130:			t.Fatalf("an out-of-scope read the human refused must be an error outcome: %+v", out)
+71002d0:internal/tools/audit_allowlist_scope_173_test.go:152:// (approval-timeout vs refused). No production byte changed for this item; the
+71002d0:internal/tools/audit_allowlist_scope_173_test.go:190:	if !strings.Contains(rejectLine, "kind=refused") || !strings.Contains(rejectLine, "decision="+agent.DecisionReject) {
+71002d0:internal/tools/audit_allowlist_scope_173_test.go:191:		t.Errorf("a human no must stay kind=refused decision=reject: %s", rejectLine)
+71002d0:internal/tools/bridge.go:262:// （不是报错，是拒绝）": an undeclared capability is refused, not reported. So
+71002d0:internal/tools/bridge.go:265:// continues, the model learns the call was refused, and the row records the
+71002d0:internal/tools/bridge.go:488:// dispositionOf names a refused call's disposition for the audit line.
+71002d0:internal/tools/bridge.go:996:// ruled shape B and refused a second fixture for this family, so these lines are the register,
+71002d0:internal/tools/bridge.go:1051:	OutcomeKindRefused         OutcomeKind = "refused" // gate said no
+71002d0:internal/tools/bridge.go:1087:// reject books a refused call and returns what the model sees. Signature note:
+71002d0:internal/tools/bridge.go:1235:// it, a tool may declare no path parameter at all, or the call was refused
+71002d0:internal/tools/bridge_junction_windows_test.go:40:// side of a junction, because the card cannot show what the resolver refused
+71002d0:internal/tools/bridge_junction_windows_test.go:219:// assertJunctionRefused is the shared teeth: refused, booked as an approved
+71002d0:internal/tools/bridge_junction_windows_test.go:563:	// 8.3 is deliberately NOT a resolver-refused class: once a human approves an
+71002d0:internal/tools/bridge_junction_windows_test.go:585:// target the resolver refused. The bytes are safe (asserted), but the row
+71002d0:internal/tools/bridge_path_account_ticket105_test.go:154:	// A real tool call on a path outside every root: refused or not, the call is
+71002d0:internal/tools/bridge_test.go:364:		t.Fatalf("a C3 violation must be refused, got a success: %+v", out)
+71002d0:internal/tools/bridge_test.go:628:		t.Fatalf("out-of-scope read must be refused by the gate: %+v", out)
+71002d0:internal/tools/bridge_test.go:648:// executed path as well as for the refused ones.
+71002d0:internal/tools/bridge_test.go:663:		// An L2 the user refused: rejected, booked L2, class user_rejected
+71002d0:internal/tools/failclosed_236_teeth_test.go:19:// fall-through keeps the call refused and a substring/IsError ruler still
+71002d0:internal/tools/failclosed_236_teeth_test.go:42:// refused, which is the whole claim 票 221's security conclusion rests on
+71002d0:internal/tools/fs_edit.go:205:	// the resolved batch, and the whole call is refused - never "first one wins".
+71002d0:internal/tools/fs_edit_ac34_test.go:223:	// CRLF-spelled old on an LF file: refused, untouched, and the refusal is the
+71002d0:internal/tools/fs_edit_ac34_test.go:267://     i.e. it was a good call that is being refused. A row that would not match
+71002d0:internal/tools/fs_edit_ac3b_test.go:193:// asserting it: the partial-BOM old is refused as a 0-hit miss, NOT as a BOM
+71002d0:internal/tools/fs_edit_ac3b_test.go:279:// refused - it has no single convention, so "which shape is the right one" has no
+71002d0:internal/tools/fs_edit_ac3b_test.go:315:			t.Fatalf("a file with no single convention must not be refused: out=%+v err=%v", out, err)
+71002d0:internal/tools/fs_edit_ac5_gate_r4_test.go:104:// the disposition (refused, class user_rejected), and the state of the disk
+71002d0:internal/tools/fs_edit_ac5_gate_r4_test.go:396:		t.Errorf("a refused call left %d entries under the root: %v", len(entries), entries)
+71002d0:internal/tools/fs_edit_test.go:73:		t.Fatalf("a refused call must not move one byte:\n before=%q\n  after=%q", want, got)
+71002d0:internal/tools/fs_edit_test.go:175:// 判据形状 4 (first half): an empty old is refused
+71002d0:internal/tools/fs_test.go:155:// bridge: the call is refused outright and NO gate is consulted, because an
+71002d0:internal/tools/fs_write.go:61:	// stopped is set by the first boundary that refused to continue.
+71002d0:internal/tools/fs_write.go:766:// would be refused. D34 asks for exactly that.
+71002d0:internal/tools/fs_write_test.go:554:// 4. fs.delete: absent, not merely refused
+71002d0:internal/tools/fs_write_test.go:614:			t.Fatal("a refused delete must not delete")
+71002d0:internal/tools/gate.go:28:	// (a), see refusal.go). Empty means the call was not refused, or was
+71002d0:internal/tools/gate.go:29:	// refused for a reason with no askable counterpart. It is set by the
+71002d0:internal/tools/gate.go:48:	// ModeKept names the red line that refused to silence the verdict, empty
+71002d0:internal/tools/gate.go:143:// L0 is refused. This is the same fail-closed posture the loop already runs
+71002d0:internal/tools/loop_approval_test.go:243:		t.Fatalf("the call must be refused before execution:\n%s", dumpToolLog(res))
+71002d0:internal/tools/nilbase_270_test.go:47:// AC#1's reachable half: a BaseOptions that holds no function is refused with
+71002d0:internal/tools/paths.go:46:	// refused at switch time - so no workspace choice can widen authority.
+71002d0:internal/tools/paths.go:75:		// step 1), so a rewrite is not refused outright - but a root that C26
+71002d0:internal/tools/paths_shortname_252_probe_test.go:205:			t.Errorf("POSITIVE CONTROL RED for %s: same-shape ask was refused, so this probe's carrier is broken and no negative reading from it can be trusted", c.name)
+71002d0:internal/tools/paths_shortname_252_r1_test.go:219:	// the allowed root, so leg 1 says yes, and it is refused only because the
+71002d0:internal/tools/paths_shortname_252_r1_test.go:252:		t.Errorf("AC#2 RED: the short spelling of a new file was still refused under its own root (%q): "+
+71002d0:internal/tools/paths_ticket107b_probes_test.go:89:		t.Logf("Canonicalize(%q) refused: %v (judging the lexical spelling instead)", path, err)
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:133:	// task.go:838 would carry if C26 had not refused the reparse traversal
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:143:	t.Logf("LEG2 resolved       : %v (refused because ok=false, or because the answer is outside the root)", leg2)
+71002d0:internal/tools/paths_twocontainments_252_r2_windows_test.go:109:				t.Errorf("POSITIVE CONTROL RED for W1: %q through the production round trip is still refused "+
+71002d0:internal/tools/paths_workspace.go:19://     whose %VAR% or ~ expansion moved it onto another tree is refused outright
+71002d0:internal/tools/paths_workspace.go:59:// neither refusal moves: a %VAR% or ~ spelling is still refused here at
+71002d0:internal/tools/paths_workspace.go:111:// belongs to it (ticket 181 AC#7). A root outside the allowlist is refused here
+71002d0:internal/tools/paths_workspace.go:117:// is refused. Before this ticket the setter took a bare string, so an account
+71002d0:internal/tools/paths_workspace_account_181r3_test.go:100:		// refused as a workspace, and nothing is recorded. This sub-case is the
+71002d0:internal/tools/paths_workspace_account_181r3_test.go:114:			t.Errorf("a refused switch left a workspace set: %+v", got)
+71002d0:internal/tools/paths_workspace_test.go:110:		t.Errorf("a refused switch left a workspace set: %q", canon.WorkspaceRoot().Canonical)
+71002d0:internal/tools/paths_workspace_test.go:188:		t.Errorf("a refused switch left a workspace set: %q", canon.WorkspaceRoot().Canonical)
+71002d0:internal/tools/paths_workspace_test.go:190:	t.Logf("expanded spelling refused as required: %v", err)
+71002d0:internal/tools/paths_workspace_test.go:218:		t.Errorf("a refused switch left a workspace set: %q", canon.WorkspaceRoot().Canonical)
+71002d0:internal/tools/paths_workspace_test.go:220:	t.Logf("junction workspace refused with C26's reason: %v", err)
+71002d0:internal/tools/pointer_185_cli_seam_test.go:14:// undeclared mark, so the SECOND one is refused (真机 183-r1 log: kind=refused
+71002d0:internal/tools/refusal.go:40://     "8.3 is deliberately NOT a resolver-refused class", and the long and
+71002d0:internal/tools/refusal.go:45:// The refusal classes. RefusalNone is the zero value: the call was not refused
+71002d0:internal/tools/refusal.go:46:// (or was refused for a reason with no askable counterpart, e.g. a missing
+71002d0:internal/tools/refusal.go:55:	// C26 resolver refused a path (junction/symlink traversal without an
+71002d0:internal/tools/refusal.go:65:// call - the call is already refused - it only names WHICH refusal happened,
+71002d0:internal/tools/refusal.go:68:// level is the EFFECTIVE level routing refused on (ticket 90's screened
+71002d0:internal/tools/refusal.go:88:			// The resolver refused this path. Whatever it was, it is not the
+71002d0:internal/tools/refusal_20r2_test.go:22:// asserts BOTH halves honestly: the bridge that already refused keeps refusing
+71002d0:internal/tools/refusal_20r2_test.go:204:	t.Run("refused: the refusal is the askable class", func(t *testing.T) {
+71002d0:internal/tools/refusal_20r2_test.go:212:	t.Run("denied: nothing is appended and the next call is still refused", func(t *testing.T) {
+71002d0:internal/tools/refusal_20r2_test.go:242:		// No silent in-run widening: the bridge that already refused still
+71002d0:internal/tools/refusal_20r2_test.go:294:	// Rejected by the hook: still empty, same path still refused.
+71002d0:internal/tools/refusal_20r2_windows_test.go:13:// an allow-all gate the junction call is refused LATER, by the tool's own second
+71002d0:internal/tools/refusal_20r2_windows_test.go:111:// verbatim that "8.3 is deliberately NOT a resolver-refused class" and that an
+71002d0:internal/tools/registry.go:161:// answer ErrSlotNotLanded rather than being silently refused, so the gap is
+71002d0:internal/tools/subagent_197.go:90:	// "reachable but refused" is a weaker guarantee than "not offered".
+71002d0:internal/tools/subagent_197.go:137:	// wrapped so task.spawn is not merely refused but absent from its directory.
+71002d0:internal/tools/subagent_197.go:576:// not see is refused with the reason rather than dispatched.
+71002d0:internal/tools/subagent_197_test.go:615:	// The refused call did not park anything either: the real children still
+71002d0:internal/tools/subagent_197_test.go:630:// all, a child that asks for it by name is refused with the reason, and the
+71002d0:internal/tools/subagent_222_test.go:284:	// child asking for this tool by name could be refused before the call ever
+71002d0:internal/tools/subagent_222_test.go:328:				// task.output under the PARENT's id) were refused right there.
+71002d0:internal/tools/task_backfill.go:72:	// word (done / cancelled / running / succeeded) gets its filing refused with
+71002d0:internal/tools/task_cancel_221_legs_test.go:15:// task.cancel call (D34 freezes it at L1, PLAN.md:2564) would be refused by the
+71002d0:internal/tools/task_cancel_221_legs_test.go:17:// authority check, and a "refused" leg that never reached Execute would be a
+71002d0:internal/tools/task_cancel_221_legs_test.go:515:// which several existing harnesses use - the call is refused BEFORE Execute.
+71002d0:internal/tools/task_output_ac2_before_test.go:56:		t.Fatalf("expected the pre-implementation call to be refused, got a success: %+v", out)
+71002d0:internal/tools/task_output_leg_test.go:123:		t.Fatalf("missing task_id must be refused, got %+v", out)
+71002d0:internal/tools/task_output_pointer_notice_test.go:416:// criterion. The branch may say that C26 refused the path and that the copy
+71002d0:internal/tools/task_output_pointer_notice_test.go:540:// junction is refused" though - it is "the canonicalize-error notice must not
+71002d0:internal/tools/task_pointer_authority_ac3_174r4_windows_test.go:164:		t.Fatalf("the notice says fs.read is refused; same bridge says %+v", rd2)
+71002d0:internal/tools/task_pointer_authority_ac3_174r4_windows_test.go:173:// and fs.read really is refused. The reply must follow C26.
+71002d0:internal/tools/task_state_188_test.go:14://	      memory.TaskLog.State, models.go:62 with no CHECK at :57) are refused
+71002d0:internal/tools/task_state_188_test.go:90:	// The legacy family, refused by name. Each one is a string a caller COULD
+71002d0:internal/tools/task_state_188_test.go:92:	// close this door), and each one is refused at the two doors this ticket
+71002d0:internal/tools/task_state_188_test.go:179:		t.Fatalf("backfill with no configured state was refused: %q", why)
+71002d0:internal/tools/task_state_188_test.go:192:		t.Fatalf("backfill with a D43 state was refused: %q", why)
+71002d0:internal/tools/task_state_188_test.go:202:	// words and the filing is refused before the table is touched - no record,
+71002d0:internal/tools/task_state_188_test.go:211:			t.Errorf("refused backfill still returned a record for %q: %+v", w, got)
+71002d0:internal/tools/task_state_188_test.go:221:		t.Errorf("refused filings changed the table: %d records before, %d after", before, after)
+71002d0:internal/tools/tempdir_resolved_124_test.go:9:// is refused, because an ancestor is a link. The refusal is correct behaviour
+71002d0:internal/tools/wiring_test.go:110:// declares L1 is NOT refused for lack of a gate and NOT executed without one.
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:74:		t.Errorf("CONTROL RED: builtinVerifier refused the absolute spelling %q: %v", abs129, err)
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:140:		t.Fatalf("ResolvePath(%q) refused the spelling that was just sealed: %v", child, err)
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:231:			// refused today, so the admission above is not "the guard never looks".
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:262:		refused := reason != ""
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:277:		if refused != leg.wantRefused {
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:298:		t.Errorf("CONTROL RED: the built-in floor answers the probe parent and child with the caller's own absolute spellings, one inside the other, and is now refused by its own tree-ownership probe: %s", reason)
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:315:			t.Errorf("CONTROL RED: an honest answer pair for the 8.3 spelling %q is now refused: %s", short, reason)
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:33:// treeMovingResolver108 shape, refused today by the equal-answers leg), and the
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:194:			t.Logf("AC#1 pipeline reading: ResolvePath(%q) refused: %v", rel, rErr)
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:263:// because a table that only asserts "some error" cannot tell a refused spelling
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:293:			t.Logf("AC#2 reading: %s %q refused: %v", r.name, r.spelling, rErr)
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:383:		t.Logf("AC#1 the candidate was refused; reason on record: %s", strings.TrimSpace(logged.String()))
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:431:// a second one, which is not a spelling of anything (the OS refused it, and
+71002d0:internal/winsec/acl_windows_test.go:317:				t.Fatalf("write refused: %v", err)
+71002d0:internal/winsec/ancestor_separator_108_other_test.go:25:// claim about. The leg "a root that reaches itself through a link is refused" is
+71002d0:internal/winsec/ancestor_separator_108_other_test.go:103:		t.Errorf("AC#2 RED: RemoveUnlinked(%q) refused with %v, which does not credit the link this case planted at %q: an ambient link above the tree can answer for the refusal while the guard under test never reaches this spelling",
+71002d0:internal/winsec/ancestor_separator_108_other_test.go:133:		t.Errorf("AC#2 RED: POSIX folded the backslash in %q into a separator and refused the tree's own file: %v", stray, err)
+71002d0:internal/winsec/ancestor_separator_108_other_test.go:169:		t.Errorf("AC#2 RED: RemoveUnlinked(%q) refused with %v, which does not credit the link this case planted at %q: an ambient link above the tree can answer for the refusal while the guard under test never reaches this spelling",
+71002d0:internal/winsec/ancestor_separator_108_other_test.go:209:		t.Logf("parent-pointer spelling refused as: %v", err)
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:26:// nobody resolved must still be refused (option 2 is not "the floor got
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:28:// be refused, or the fix would have traded the leg away on exactly the route it
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:137:// sealing call refused and `wisp run`/`wisp providers` died in
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:200:// on purpose: a caller that hands the floor an unresolved root is refused, and
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:234:		t.Fatalf("premise broke: the resolved base %s is itself refused by the floor (%v), so the link planted here is not the only link in these spellings", base, err)
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:258:// names, and still gets refused with the foreign tree untouched.
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:268:		t.Fatalf("AC#3: PrivateDirAll refused its own tree: %v", err)
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:301:		t.Errorf("AC#3 RED: PrivateFile refused a plain path inside the resolved root: %v", err)
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:309:// other caller - resolved spellings seal, links get refused. Rewriting an
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:316://     refused by the floor and create nothing;
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:318://     declared too, and must seal - so the rule is "as declared", not "refused".
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:328:// temp dir is behind a link the floor refused leg one at that ambient component,
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:372:	// which is what keeps leg one from being read as "injections are refused".
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:379:		t.Errorf("AC#2 RED: a clean injected data root was refused: %v", err)
+71002d0:internal/winsec/export_test.go:30:// makes "install the floor again" a refused operation rather than a reset.
+71002d0:internal/winsec/notice_attribution_115_windows_test.go:118:		t.Fatalf("this leg cannot be asked at all: ResolvePath(%q) refused to vouch for the spelling it was handed: %v", spelling, err)
+71002d0:internal/winsec/openleaf_322_other_test.go:10:// racer: a leaf link planted before the call is refused by the placement floor before the open
+71002d0:internal/winsec/openleaf_322_other_test.go:40:	legLeafOpen322r1  = "ticket 322 leaf leg: open carrying O_NOFOLLOW refused a link at the name"
+71002d0:internal/winsec/openleaf_guard_322_windows_test.go:119:		t.Errorf("AC#3 RED: the guard refused a real file (%v), which would break every PrivateFile caller", err)
+71002d0:internal/winsec/openleaf_guard_322_windows_test.go:123:		t.Errorf("AC#3 RED: the guard refused a name that is not there yet (%v), which would break every create", err)
+71002d0:internal/winsec/openleaf_overwrite_322_test.go:33:// being refused is asserted on both, and that is the half the four callers depend on.
+71002d0:internal/winsec/openleaf_overwrite_322_test.go:53:			"internal/secret/migrate.go:189", "a pre-rename temp left by a crash is overwritten, not refused",
+71002d0:internal/winsec/openleaf_overwrite_322_test.go:70:				t.Errorf("AC#2 RED: PrivateFile refused an existing name (%v), which breaks %s", err, tc.promise)
+71002d0:internal/winsec/openleaf_overwrite_322_test.go:98:			t.Errorf("AC#2 RED: rewrite of a name the caller itself created was refused: %v", err)
+71002d0:internal/winsec/openleaf_overwrite_322_test.go:128:			t.Errorf("AC#2 RED: the refused exclusive create replaced the artifact with %q", got)
+71002d0:internal/winsec/placement_symlink_113_other_test.go:14:// the reverse half (AC#3) - a guard that refused everything would pass the
+71002d0:internal/winsec/placement_symlink_113_other_test.go:198:		t.Errorf("AC#1: %s(%q) refused with %v, which does not name ErrUnresolvedPath: a refusal this call did not make cannot be attributed to the floor",
+71002d0:internal/winsec/placement_symlink_113_other_test.go:202:		t.Errorf("AC#1 RED: %s(%q) refused with %v, which does not credit the link this case planted at %q. An ambient link above the tree (the harness's own TMPDIR link is the real shape) can answer for it while the leg under test never runs, so this refusal is not evidence about %s.",
+71002d0:internal/winsec/placement_symlink_113_other_test.go:335:		t.Errorf("AC#3 RED: a plain file inside the named tree was refused: %v", err)
+71002d0:internal/winsec/placement_symlink_113_other_test.go:364:		t.Fatalf("AC#3 RED: PrivateDirAll refused its own tree: %v", err)
+71002d0:internal/winsec/placement_symlink_113_other_test.go:377:		t.Fatalf("AC#3 RED: PrivateFile refused a plain path inside the named tree: %v", err)
+71002d0:internal/winsec/placement_symlink_113_other_test.go:383:		t.Errorf("AC#3 RED: SealDir refused its own directory: %v", err)
+71002d0:internal/winsec/placement_symlink_113_other_test.go:391:		t.Errorf("AC#3 RED: SealDir refused a directory that merely has a link among its children: %v", err)
+71002d0:internal/winsec/placement_symlink_113_other_test.go:421:		t.Errorf("AC#3 RED: POSIX folded the backslash in %q into a separator and refused the tree's own file: %v", mine, err)
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:30:// the hits and never in place of them: the floor has to have refused at least once,
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:33:// dead, and dead is RED here - r1's first cut produced refused=0 and sealed-own=100
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:38:// between "the check before the act caught it" and "the pinned act refused to be
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:39:// moved": refused-at-check carries only ErrUnresolvedPath (resolve.go's floor),
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:40:// refused-at-act carries ErrUnresolvedPath and ErrNotSealable together
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:41:// (winsec_other.go's identity gate). A run with refused>0 and refused-at-act==0 has
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:130:	refused      int // a refusal: the pre-act floor or the pinned act's gate
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:138:	return fmt.Sprintf("attempts=%d hit-foreign=%d of-which-reported-nil=%d refused-at-check=%d of-which-refused-at-act=%d sealed-own-object=%d other=%d",
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:139:		r.attempts, r.hitForeign, r.hitAndReport, r.refused, r.refusedAct, r.sealedOwn, r.other)
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:153:	r.refused += o.refused
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:182:			r.refused++
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:215:// or a run in which the floor never refused and the seal never sealed its own
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:231:	if totals.refused == 0 || totals.sealedOwn == 0 {
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:233:			t.Errorf("AC#1 RED instrument is dead shape=%s: refused=%d, sealed-own=%d - a zero window reading here proves nothing",
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:234:				totals.shape, totals.refused, totals.sealedOwn)
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:236:			t.Logf("AC#1 INSTRUMENT DEAD reading shape=%s: refused=%d, sealed-own=%d", totals.shape, totals.refused, totals.sealedOwn)
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:239:	if totals.refused > 0 && totals.refusedAct == 0 {
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:240:		t.Logf("AC#1 shape=%s: every refusal came from the check before the act (refused-at-act=0), so this run does NOT exercise the pinned identity gate", totals.shape)
+71002d0:internal/winsec/private_fail_test.go:35:			t.Fatal("the write succeeded although the seal was refused")
+71002d0:internal/winsec/private_fail_test.go:48:			t.Fatal("PrivateFile accepted a refused seal")
+71002d0:internal/winsec/private_fail_test.go:82:// that leaves the artifact readable-by-everyone on the floor has not refused
+71002d0:internal/winsec/private_fail_test.go:88:		t.Errorf("refused write left %d bytes on disk at %s", info.Size(), filepath.Base(path))
+71002d0:internal/winsec/private_set_sid_windows_test.go:22:// name table, and so a descriptor this package built itself was refused by this
+71002d0:internal/winsec/private_set_sid_windows_test.go:67:	// be refused for a reason that has nothing to do with the private set.
+71002d0:internal/winsec/private_set_sid_windows_test.go:154:			t.Fatalf("gate refused a descriptor whose every trustee resolves inside the private set: %v (trustees %v, set %v, LA=%s is current user: %v)",
+71002d0:internal/winsec/private_set_sid_windows_test.go:391:		t.Fatalf("the control descriptor - the private set and nobody else - was refused: %v (trustees %v)", err, resolvedTrustees(t, control))
+71002d0:internal/winsec/reparse_windows_test.go:133:		t.Fatalf("RemoveUnlinked refused to clear the symlink: %v", err)
+71002d0:internal/winsec/reparse_windows_test.go:150:	deleteLink = func(string) error { return errors.New("injected: disposition refused") }
+71002d0:internal/winsec/reparse_windows_test.go:256:		t.Fatalf("RemoveUnlinked refused to clear the link: %v", err)
+71002d0:internal/winsec/reparse_windows_test.go:290:	deleteLink = func(string) error { return errors.New("injected: disposition refused") }
+71002d0:internal/winsec/resolve.go:103://  1. nil is refused once a resolver has ever been installed. The old comment
+71002d0:internal/winsec/resolve.go:109://     refused whether the slot currently reads nil or not;
+71002d0:internal/winsec/resolve.go:190:// names depends on what the parent is *behind a link*. Both are refused by the
+71002d0:internal/winsec/resolve.go:233:// spelling nobody resolved is still refused by platformVerifyPlacement; and the
+71002d0:internal/winsec/resolve.go:236:// it through is still refused - now on a root that names a real tree on every
+71002d0:internal/winsec/resolve.go:355:// and the single containment check below read that as a moved seal and refused to
+71002d0:internal/winsec/resolve.go:377:// refused at the moment it matters rather than at install time only.
+71002d0:internal/winsec/resolve.go:442:// one that was previously refused. Nothing here widens a guard, and the
+71002d0:internal/winsec/resolve.go:504:// was refused becomes admitted.
+71002d0:internal/winsec/resolve.go:618:	// neither second-guessed nor believed - the seal is refused, the same direction
+71002d0:internal/winsec/resolve.go:619:	// internal/risk's Result.Actable() takes, but refused *here*, so it holds for
+71002d0:internal/winsec/resolve.go:630:	// seal is refused here rather than taken on the resolver's word.
+71002d0:internal/winsec/resolve.go:690:// (the spelling Clean would have eaten, which is the thing being refused), and a
+71002d0:internal/winsec/resolve_windows_test.go:54:// else's directory. A missing leaf is refused by the old code too, for an
+71002d0:internal/winsec/resolve_windows_test.go:136:// refused, it said which resolver refused, the foreign directory kept every ACE
+71002d0:internal/winsec/resolve_windows_test.go:147:		t.Errorf("the refusal names neither C26 nor the built-in verifier, so it refused by accident: %v", err)
+71002d0:internal/winsec/sealhandle_identity_120_other_test.go:13:// both controls. Case 4 is the direction a leg that refused everything would fake:
+71002d0:internal/winsec/sealhandle_identity_120_other_test.go:135:// refused everything would pass the cases above and be worthless. With the name
+71002d0:internal/winsec/sealhandle_identity_120_other_test.go:142:		t.Errorf("AC#1 RED: the honest path was refused: %v (leg that spoke = %s)", err, spokeLeg120r3(err))
+71002d0:internal/winsec/sealhandle_privateroute_120_other_test.go:33:// refused seal the payload must not be readable under any name in the tree - and reading
+71002d0:internal/winsec/sealhandle_privateroute_120_other_test.go:55:			t.Errorf("AC#1 RED: the refused write left the payload in %s (kind %s, mode %s)",
+71002d0:internal/winsec/sealhandle_privateroute_120_other_test.go:68:// object renamed onto the name. The write must be refused by :272, and privateFile
+71002d0:internal/winsec/sealhandle_privateroute_120_other_test.go:69:// must unlink the name it refused.
+71002d0:internal/winsec/sealhandle_privateroute_120_other_test.go:85:		t.Errorf("AC#1 RED: the refused write left the name carrying a %s, want it unlinked; err=%v", got, err)
+71002d0:internal/winsec/sealhandle_privateroute_120_other_test.go:115:		t.Errorf("AC#1 RED: the witness is no longer readable, so the refused write reached through it: %v", rErr)
+71002d0:internal/winsec/sealhandle_privateroute_120_other_test.go:117:		t.Errorf("AC#1 RED: the witness holds %q, so the refused write landed in it", body)
+71002d0:internal/winsec/sealhandle_privateroute_120_other_test.go:120:		t.Errorf("AC#1 RED: the refused write left the name carrying a %s, want the link unlinked; err=%v", got, err)
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:43:// answer the tree question at all: the type-level door. It is refused for a
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:65:// marker proving that a refused seal left it alone and an accepted one stripped
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:129:		t.Errorf("AC#1 RED: the refused install left no audit record naming the fake; log was: %s", logged.String())
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:132:	// Leg 3: the outcome judgement. With the fake refused, the seal has to land
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:138:		t.Errorf("AC#1 RED: SealFile(%s) failed even though the fake was refused, so the refusal broke the seal instead of the fake: %v", blob, err)
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:156:		t.Errorf("AC#1: the seal did not narrow the file the caller actually named: %s is still in %v - the fake was refused but so was the work",
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:192:		t.Logf("the tree-moving fake was refused; seam stayed %s", got)
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:210:// answer itself is refused, on every entry point, because nothing here can tell
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:222:		t.Logf("PrivateDirAll refused as: %v", err)
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:231:		t.Logf("SealFile refused as: %v", err)
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:270:				t.Logf("refused, reason: %v", err)
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:285:				t.Errorf("the junction itself must survive a refused seal: %v", lErr)
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:294:// error" cannot tell a refused spelling from an accidentally failing one.
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:350:					t.Errorf("AC#2: a relative spelling must be refused because no tree names it, got: %v", err)
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:352:				t.Logf("refused, but not with ErrIsReparsePoint: %v", err)
+71002d0:internal/winsec/seam_guard_windows_test.go:39:// it is still refused because it passes a hostile spelling straight through.
+71002d0:internal/winsec/seam_guard_windows_test.go:152:// be refused, and "nothing happened" has to be *measured*, not assumed - so the
+71002d0:internal/winsec/seam_guard_windows_test.go:171:	// Leg 1: the registration itself must be refused, loudly.
+71002d0:internal/winsec/seam_guard_windows_test.go:183:	// refused for the right reason. The reason is asserted because today this
+71002d0:internal/winsec/seam_guard_windows_test.go:193:		t.Logf("PrivateDirAll through the junction refused as: %v", err)
+71002d0:internal/winsec/seam_guard_windows_test.go:211:		t.Errorf("AC#1 leg 3 RED: SealFile refused for an unrelated reason, so this leg measures nothing: %v", err)
+71002d0:internal/winsec/seam_guard_windows_test.go:234:	t.Logf("icacls(victim) after the refused install:\n%s", icaclsRaw(t, victim))
+71002d0:internal/winsec/seam_guard_windows_test.go:271:		t.Errorf("AC#1: the refused release left no audit record; log was: %s", logged.String())
+71002d0:internal/winsec/seam_guard_windows_test.go:285:// a refused registration is a refusal, not a wedge - after it the installed
+71002d0:internal/winsec/seam_guard_windows_test.go:303:		t.Fatalf("a clean path must still seal after a refused registration: %v", err)
+71002d0:internal/winsec/seam_guard_windows_test.go:310:		t.Error("the junction path must still be refused after a refused registration")
+71002d0:internal/winsec/seam_guard_windows_test.go:314:		t.Errorf("the foreign DACL changed across the refused-install sequence: before=%v after=%v", sidsBefore, sidsAfter)
+71002d0:internal/winsec/seam_guard_windows_test.go:347:		t.Errorf("the junction itself must survive a refused removal: %v", lErr)
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:22://     refuse every candidate shape ever refused here - pass through, constant,
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:180:// second half, refused before any probe runs.
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:251:				t.Logf("reading: shape=%s candidate=%s refused=%v reason=%q", tc.name, c.name, reason != "", reason)
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:255:						"previously refused: that is the trade ticket 107 and MUT-119-E were both sent back for: %s",
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:262:			// refused" cannot be what makes it green.
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:264:				t.Errorf("AC#2: the guard refused its own built-in floor (%q), so the refusals above prove nothing", reason)
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:293:		t.Logf("reading: TMPDIR=%q shapes=%q refused=%v reason=%q", planted.linked, shapes, reason != "", reason)
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:303:			t.Errorf("AC#2: the guard refused a POSIX-honest candidate on the plain temp shape (%q), so the fix did "+
+71002d0:internal/winsec/tree_ownership_112_windows_test.go:132:			t.Fatalf("the pipeline refused the planted short spelling %q: %v", short, err)
+71002d0:internal/winsec/tree_ownership_112_windows_test.go:136:			t.Fatalf("the pipeline refused the missing child %q: %v", child, err)
+71002d0:internal/winsec/tree_ownership_112_windows_test.go:145:			t.Fatalf("the instrument measured nothing: the pipeline expanded the missing child to %q, so this box's pipeline does not have the asymmetry that refused the install on the runner", childAns)
+71002d0:internal/winsec/tree_ownership_112_windows_test.go:167:			t.Logf("the tree-moving candidate is still refused: %s", reason)
+71002d0:internal/winsec/tree_ownership_112_windows_test.go:175:			t.Errorf("a candidate that refuses the probe was refused by the guard: %q", reason)
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:40:		t.Fatalf("this instrument cannot be asked at all: ResolvePath(%q) refused to vouch for it: %v", existing, err)
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:85:		t.Fatalf("this leg cannot be asked at all: ResolvePath(%q) refused to vouch for the spelling it was handed: %v", spelling, err)
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:203:		roots, refused := writableVolumeRoots126(t)
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:207:			t.Skipf("this machine has %d volume root(s) that accept a directory (%v; %d refused), so two real trees with one tail cannot be planted",
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:208:				len(roots), roots, len(refused))
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:374:		refused := reason != ""
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:389:		if refused != leg.wantRefused {
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:412:	refused := map[string]string{}
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:417:			refused[root] = err.Error()
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:433:	return roots, refused
+71002d0:internal/winsec/winsec.go:26:// cannot be applied the write is refused and the half-made file is removed.
+71002d0:internal/winsec/winsec.go:67:// package is always to tighten, so a failed seal means the write is refused,
+71002d0:internal/winsec/winsec.go:200:// sealed, and a path C26 refuses to traverse is refused here too
+71002d0:internal/winsec/winsec.go:291:// relative spelling is refused (ticket 108's per-shape reading of AC#2): it
+71002d0:internal/winsec/winsec.go:419:// "a refused seal is not a completed write" is a contract for callers, so it
+71002d0:internal/winsec/winsec_other.go:84://     repair its mode" to "refused". This is a tightening, and it was accepted by
+71002d0:internal/winsec/winsec_other.go:137:// directions of that interleaving. Either way the object that comes back is refused
+71002d0:internal/winsec/winsec_other.go:147:// an already-refused path to name a filesystem type in an error message; it cannot
+71002d0:internal/winsec/winsec_other.go:242:// is what the ticket 120 instrument counts as refused-at-check - and ErrNotSealable
+71002d0:internal/winsec/winsec_other.go:243:// keeps this package's contract ("a refused seal is not a completed write", AC#5)
+71002d0:internal/winsec/winsec_other.go:273:// untagged and asserts that a refused handle seal stops the bytes), and then adds
+71002d0:internal/winsec/winsec_other.go:398://     still refused here, pinned on that route by ticket 119's
+71002d0:internal/winsec/winsec_windows.go:81:// modified, and ResolvePath has already refused any answer its own pipeline
+71002d0:internal/winsec/winsec_windows.go:367://     An ancestor link is refused by the placement floor before it (platformVerify-
+71002d0:internal/winsec/winsec_windows.go:398:// BEFORE any act: it carries the same two sentinels, because "a refused write is not
+71002d0:internal/winsec/winsec_windows.go:401:// to tell which leg refused it, so the reason text is the readable half of that.
+71002d0:internal/winsec/winsec_windows.go:589:// box where the job runs as an ordinary account and refused the descriptor this
+71002d0:tools/d22scan/runtests.sh:133:# refused): the VOLUME this run's test temp root sits on is part of this gate's
+71002d0:tools/d22scan/runtests.sh:144:# list; D22). Shape A is refused by that same reading: what moved between the two
+71002d0:tools/d22scan/scan_test.go:1677:// full read assembles fine (so "refused" is not "always refused"); block 4 demands
+71002d0:tools/d22scan/scan_test.go:1769:		t.Fatalf("a quiescent pair was refused (%q) - the subset check fires on more than the race and every real "+
+71002d0:tools/d22scan/scan_test.go:1861:		t.Errorf("runGitIndex refused a quiescent index (%q) - every scan of a normal tree would now lose its ignore filter", ix.why)
+71002d0:tools/d22scan/selftest.go:538://	  a vacuous case, or a fixture the tool refused to scan)
+71002d0:tools/d22scan/selftest_test.go:112:	// side - must be refused too, or the table would keep "testing" a dead ban.
+71002d0:tools/mockllm/capability_test.go:99:	// One field good, one field garbage -> the whole request must be refused.

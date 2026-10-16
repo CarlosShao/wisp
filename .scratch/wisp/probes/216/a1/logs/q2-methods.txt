@@ -1,0 +1,10 @@
+71002d0:cmd/wisp/resident_task_source_windows.go:313:				"err", bErr, "effect", "panel.workspace.request 会按名字拒绝，直到本进程重启")
+71002d0:internal/panel/bridge.go:42:	MethodModeRequest      = "panel.mode.request"
+71002d0:internal/panel/bridge.go:43:	MethodWorkspaceRequest = "panel.workspace.request"
+71002d0:internal/panel/bridge.go:44:	MethodAttachmentAdd    = "panel.attachment.add"
+71002d0:internal/panel/bridge.go:45:	MethodMessageSend      = "panel.message.send"
+71002d0:internal/statemachine/table.go:103:		SideEffects: []string{"panel.stream-push"},
+71002d0:internal/statemachine/table.go:109:		SideEffects: []string{"panel.stream-push"},
+71002d0:internal/statemachine/table.go:147:		SideEffects: []string{"panel.queue-waiting"},
+71002d0:internal/statemachine/table.go:188:		SideEffects: []string{"mic.keep-off", "panel.keep-alive"},
+71002d0:internal/statemachine/table.go:228:		SideEffects: []string{"session.dispose-scope", "speech.unload-asr-tts", "mem.free-os-memory", "panel.destroy-or-hide"},

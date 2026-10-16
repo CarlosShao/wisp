@@ -1,0 +1,10 @@
+216-a1 票216 AC#1 控制字符洗普查（只读·提交树快照 71002d0）
+
+只做票 216 AC#1：出四问的逐枚名册，让实现腿照着进。尺一律 git grep ... 71002d0（pin 提交树，无视 cmd/wisp 在飞写腿 220-r2）。
+
+问1：无"显示前统一洗"底座；自家已有两份互不相同的控制字符处理（sanitizeReplyText 换空格 / findMetachars 三字符可见转义）＋1 处只挡 NUL/CR/LF/TAB 的拒绝＋若干名叫 sanitize 却不洗控制字符的改名件。unicode.IsPrint/ANSI \x1b/\p{C} 全仓 0。
+问2：附件名(AttachmentRef.Name)与目录名(WorkspaceView.Canonical)今天真出向且裸奔；插件/技能/命令说明零源零出向（票 213/215 待派）。
+问3：五态是 instructions_200.go 真代码；派单写的 na 与盘上不符，第五枚真值=not_run。显示段已主动反坍缩。
+问4：产码 0 枚按错误子串分支（Contains/Index/HasPrefix/regexp/switch on Error() 实测 0，均配正控）；票面 ChatInput.tsx:2205/413 属外部 openchamber，我方无此文件。
+
+只新建 docs/evidence/s1/216-census.md；不改任何产码；frontend/internal 零字节；不产 .go。

@@ -1,0 +1,677 @@
+71002d0:cmd/balldebug/main.go:111:	tour := flag.Bool("tour", false, "guided walk for owner sign-off, in one run: liquid flow -> voice-driven "+
+71002d0:cmd/balldebug/main.go:220:	// a whole sign-off run (A1b).
+71002d0:cmd/balldebug/main.go:438:// runTour is the owner-facing walkthrough for ticket 62 sign-off: one run, one
+71002d0:cmd/wisp/approval_always.go:109:// runWidening raises the second card, waits for it off the listener's goroutine,
+71002d0:cmd/wisp/approval_reply.go:86:// maxTrackedCards is the ledger's own ceiling, read off the seam that enforces
+71002d0:cmd/wisp/approval_reply.go:131:// record books one displayed card straight off the Prompt the gate handed this
+71002d0:cmd/wisp/approval_reply.go:151:// forget drops one entry (answered, dismissed, or handed off to execution).
+71002d0:cmd/wisp/approval_reply.go:168:// deserves, read off the live queue and this host's own ledger rather than
+71002d0:cmd/wisp/approval_reply_stdin_other.go:5:// interactiveStdin has no answer stream to hand out off Windows.
+71002d0:cmd/wisp/approval_reply_stdin_windows.go:27:// The trade-off, written down because it is a cost and not a bug: a run whose
+71002d0:cmd/wisp/approval_seam_201_test.go:23:// Both also read AC#6 off the same ledger: the waiting state has to be a fact
+71002d0:cmd/wisp/config_readers_255.go:13:// reported "已立即生效" off a memory write. 票 255's 现量 says the same thing in
+71002d0:cmd/wisp/config_readers_255.go:125:	"models": hotClaimOtherProcess + "cmd/wisp/models.go:163 [cfg.Models.Mirror] - only the wisp models subcommands read it, in their own process, off a fresh LoadFile",
+71002d0:cmd/wisp/config_readers_255.go:206:	"voice.tts.speed":            hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the TTS knobs are not threaded to the voice path yet",
+71002d0:cmd/wisp/config_readers_255.go:207:	"voice.punctuation":          hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the punctuation switch has no consumer yet",
+71002d0:cmd/wisp/config_readers_255.go:208:	"voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet",
+71002d0:cmd/wisp/config_readers_255.go:209:	"voice.wake_word.veto_words": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the veto list is not consumed by the KWS path yet",
+71002d0:cmd/wisp/config_readers_255.go:240:	// cmd/wisp/panel_config_store.go reads the cloud chains and realtime keys off
+71002d0:cmd/wisp/config_readers_255.go:251:	// h.mgr.Config()` on the request hop and reads `cfg.LLM.Providers[provider]` off
+71002d0:cmd/wisp/config_receipt_255_test.go:41:// named by that sentence - plus a reading off that live leg proving the panel gets
+71002d0:cmd/wisp/config_receipt_255_test.go:271:	// every scanned section must resolve to a non-trivial member set off the schema.
+71002d0:cmd/wisp/config_receipt_255_test.go:331:// The section's member names are read off the schema ONCE per field, outside the walk,
+71002d0:cmd/wisp/config_receipt_255_test.go:389:// takes the whole section off a config object: `.Panel.Width`, `Config().Hotkey`,
+71002d0:cmd/wisp/config_receipt_255_test.go:399:// `d.Models.HandleModelsListRequest(ctx, req)` reads a dispatch HANDLER hanging off
+71002d0:cmd/wisp/config_receipt_255_test.go:460:// configSectionMembers reads the section's own member names off internal/config's
+71002d0:cmd/wisp/config_receipt_255_test.go:593:		t.Errorf("the Config()-rooted section-level line stopped counting: a whole section taken off the live Manager is a read of it")
+71002d0:cmd/wisp/config_receipt_255_test.go:607:// positive control, read off a live process: hand-edit [panel] width while
+71002d0:cmd/wisp/config_receipt_255_test.go:655:		// reading off the trail and not an inference from the console.
+71002d0:cmd/wisp/config_receipt_255_test.go:679:// in the shape the ticket asked for, moved off [panel] by AC#4.
+71002d0:cmd/wisp/config_receipt_255_test.go:754:		// The reader itself, read off the live leg while the process is up.
+71002d0:cmd/wisp/config_receipt_255_test.go:820:		// off the product, not retyped from the format strings.
+71002d0:cmd/wisp/config_reload.go:169:// locked section, so "did my edit take effect" is a reading off the ledger and
+71002d0:cmd/wisp/config_reload.go:173:// by internal/config/manager.go's plan() off "the values differed and the memory
+71002d0:cmd/wisp/config_reload.go:280:	// moved the ask off the Manager's mutex; on the old shape this line
+71002d0:cmd/wisp/config_reload_223_test.go:283:// tick's clock is read off the product instead of assumed.
+71002d0:cmd/wisp/config_reload_223_test.go:400:		// reason field, so the naming is asserted off the console.
+71002d0:cmd/wisp/config_reload_223_test.go:619:		// operator's sentence and stay green off the audit trail alone. The
+71002d0:cmd/wisp/config_reload_223_test.go:658:		// The count is taken off a re-read made AFTER the audit line
+71002d0:cmd/wisp/config_reload_perm_223_windows_test.go:11:// four sentences off the *error the filesystem actually returned* - so the case
+71002d0:cmd/wisp/console_other.go:5:// attachParentConsole is a no-op off Windows.
+71002d0:cmd/wisp/dataroot_128_test.go:60:// the way syscall.Getenv spells it (AC#1 read it live off a real process).
+71002d0:cmd/wisp/dataroot_128_test.go:244:		{"where the data root belongs, on the no-fallback statement it hangs off", "数据根本应是 " + filepath.Join("<用户配置目录>", "wisp-dev") + "，而 Wisp 拒绝把它回落到当前工作目录"},
+71002d0:cmd/wisp/dataroot_128_test.go:585:// M-F shape kept as a standing case rather than as a one-off mutation. M-F left
+71002d0:cmd/wisp/early_log_nail_130_windows_test.go:15:// holding one JSONL off a disk could not tell whether the resolver was accepted
+71002d0:cmd/wisp/early_log_nail_130_windows_test.go:23:// ahead of the install record. The stderr pass is never switched off, so the
+71002d0:cmd/wisp/early_log_nail_130_windows_test.go:37://     timestamp off the persisted record (not off the file's mtime) is what
+71002d0:cmd/wisp/early_log_nail_130_windows_test.go:260:				"switched off to make the file copy cheap, which is the failure mode (a-with-mirror) exists to rule out.\n%s", console())
+71002d0:cmd/wisp/early_log_nail_130_windows_test.go:278:// off this leg instead of inferred from it.
+71002d0:cmd/wisp/exec_holder_toggle_321_test.go:152:	// silence every gesture hanging off this line would fall into.
+71002d0:cmd/wisp/firstrun_198r2_test.go:26://     names is a command func main really dispatches (read off the package's
+71002d0:cmd/wisp/firstrun_198r2_test.go:360:// the text tells the user to run must be one func main dispatches, read off the
+71002d0:cmd/wisp/firstrun_257_test.go:400:// TestTicket257R2AC3CredentialSurfaceUntouched is AC#3 read off the two
+71002d0:cmd/wisp/instructions_200r2_test.go:19:// claim is that "off" and "nothing there" are now two different readings on the
+71002d0:cmd/wisp/instructions_200r2_test.go:182:// TestRunPacketSaysOffAndSaysItDifferentlyThanNothingFound is AC#8 read off the
+71002d0:cmd/wisp/instructions_200r2_test.go:183:// wire, and the reverse half of §2(b): the off switch and an empty tree used to
+71002d0:cmd/wisp/instructions_200r2_test.go:189:	off := newRunFixture(t, "openai-chat")
+71002d0:cmd/wisp/instructions_200r2_test.go:190:	writeInstrFile(t, off.dir, body)
+71002d0:cmd/wisp/instructions_200r2_test.go:191:	disableProjectInstructions(t, off.dir)
+71002d0:cmd/wisp/instructions_200r2_test.go:193:	off.rtHook = func(rt *agentRuntime) { rtOff = rt }
+71002d0:cmd/wisp/instructions_200r2_test.go:194:	if code := off.run("总结一下 这份笔记"); code != 0 {
+71002d0:cmd/wisp/instructions_200r2_test.go:195:		t.Fatalf("exit %d\nstdout:\n%s\nstderr:\n%s", code, off.out.String(), off.err.String())
+71002d0:cmd/wisp/instructions_200r2_test.go:203:		t.Errorf("off-switch status = %q, want %q", secOff.Status, panel.InstructionsStatusOff)
+71002d0:cmd/wisp/instructions_200r2_test.go:206:		t.Errorf("the off state lost the sentence that names the switch: %q", secOff.Reason)
+71002d0:cmd/wisp/instructions_200r2_test.go:209:		t.Errorf("the off state still lists files: %+v", secOff.Files)
+71002d0:cmd/wisp/instructions_200r2_test.go:211:	if !strings.Contains(off.err.String(), "已按你的配置跳过") {
+71002d0:cmd/wisp/instructions_200r2_test.go:212:		t.Errorf("the disabled run stayed silent on stderr:\n%s", off.err.String())
+71002d0:cmd/wisp/instructions_200r2_test.go:216:	// same directory now reads as loaded. Without this the off assertions above
+71002d0:cmd/wisp/instructions_200r2_test.go:231:		t.Fatalf("control status = %q, want %q (reason %q): the off reading above "+
+71002d0:cmd/wisp/instructions_200r2_test.go:249:		t.Error("off and on produced the same bytes, so one of the two readings is a constant")
+71002d0:cmd/wisp/instructions_200r2_test.go:251:	t.Logf("off packet section: %s", secOff.asLine())
+71002d0:cmd/wisp/leg_dispatch_gate_133_test.go:966:// production symbol that reaches installLogSink, or the ticket 121 hand-off root,
+71002d0:cmd/wisp/leg_sink_gate_131_test.go:384:		// read off the sources, which every GOOS in this repository compiles the
+71002d0:cmd/wisp/leg_sink_gate_131_test.go:695:		// ruling marker to? Read off the bytes, not off the AST doc the ledger's ruled
+71002d0:cmd/wisp/leg_sink_gate_131_test.go:815:	// installLogSink, does this nail read the sink off disk) are computed from this
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:5:// the same entry point main.go dispatches to, with the verdict read off the disk
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:43:// hand-off is exactly the record this leg exists to keep - models.go's own
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:44:// comment: "a refused hand-off nobody records is a security verdict that leaves
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:47:// WHAT IS NOT CLAIMED here: that the success branch of the hand-off books a
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:50:// test tree; ticket 109's success-path hand-off tests live in internal/models.
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:67:// therefore referenced symbols that do not exist off Windows, and a real ubuntu
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:133:	modelsRecordPrefix = "models: hand-off "
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:359:	// A refused hand-off is exit 1 and must not be softened into a warning
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:363:		t.Errorf("`wisp models ensure %s` exited %d, want 1 (refused hand-off)\n%s",
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:375:		t.Fatalf("records naming a refused hand-off = %d, want exactly 1; all records: %v",
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:488:// and a broken log tree would turn a refused model hand-off into an exit code
+71002d0:cmd/wisp/logsink.go:168:	// Position here is the claim being made: a reader holding one file off a disk
+71002d0:cmd/wisp/logsink.go:174:	// Book the install itself: a reader holding one file off a disk has to be
+71002d0:cmd/wisp/logsink_windows_test.go:132:// by the production assembly root, and the record of it comes off disk.
+71002d0:cmd/wisp/main.go:42:                   through the Downloading hand-off and its re-verification
+71002d0:cmd/wisp/main.go:103:		// Ticket 121 AC#2: the model hand-off chain (models.Manager ->
+71002d0:cmd/wisp/main.go:107:		// refused-hand-off verdict has to be readable somewhere.
+71002d0:cmd/wisp/main.go:137:// per-session single instance, event loop - none of which exist off Windows.
+71002d0:cmd/wisp/models.go:4:// AC#2 put the model hand-off chain into the product.
+71002d0:cmd/wisp/models.go:10:// once: models.Manager, models.VerifyInstalled (ticket 109's hand-off
+71002d0:cmd/wisp/models.go:22:// is therefore the hand-off point that DOES exist - a real process, a real
+71002d0:cmd/wisp/models.go:68:                              then re-verify it at the hand-off point (ticket
+71002d0:cmd/wisp/models.go:102:// including a refused hand-off, which is the security verdict this command
+71002d0:cmd/wisp/models.go:135:// modelStore is the assembled hand-off chain for one process: the signature-
+71002d0:cmd/wisp/models.go:146:// internal/models is in this binary's dependency graph at all. C29 has no off
+71002d0:cmd/wisp/models.go:258:// modelsEnsure performs the full walk: download-or-reuse, then the hand-off
+71002d0:cmd/wisp/models.go:280:	// a refused hand-off nobody records is a security verdict that leaves no
+71002d0:cmd/wisp/models.go:313:		// Loud and classified: a refused hand-off is reported as the verdict it
+71002d0:cmd/wisp/models.go:319:			logf("hand-off REFUSED id=%s state=%s err=%v", id, state, err)
+71002d0:cmd/wisp/models.go:326:		logf("hand-off OK id=%s state=%s root=%s", id, state, ms.root)
+71002d0:cmd/wisp/panel_assets_299_windows_test.go:132:// ac299Satisfied is the ticket's completion criterion, read off the page's own
+71002d0:cmd/wisp/panel_config_320_test.go:24:// readConfigBody320 reads config.toml off a settings dir. The refusals below
+71002d0:cmd/wisp/panel_config_store.go:17:// is readable from the message route too; keeping this key off that struct is the
+71002d0:cmd/wisp/panel_config_store.go:63:	// CredentialValue holds the secret between "read off the wire" and "handed to
+71002d0:cmd/wisp/panel_config_store.go:292:// StoreCredential is the write-only half of the settings path: bind the value off
+71002d0:cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go:31:// one name, "wispDispatch". The ruler judges four things against it, all read off disk:
+71002d0:cmd/wisp/panel_geometry_255_test.go:311:	// reading three other files by name, so it pins the dir off runtime.Caller the
+71002d0:cmd/wisp/panel_geometry_255_winlive_test.go:181:		t.Errorf("the recreated window is %d px wide, want %.0f (= %d at the scale %.4f the first window showed) +/- 2: the number reached the create call but the window is not sized off it",
+71002d0:cmd/wisp/panel_geometry_255r6_range_windows_test.go:15:// RETOOLED BY 299-r1 (2026-10-13): ticket 299 AC#1 moved the create site off the
+71002d0:cmd/wisp/panel_holder_319_windows_test.go:304:		t.Errorf("the activation hook answered %q, which is not the hand-off branch sentence; the counters above say the request was taken, so the receipt and the request disagree", receipt)
+71002d0:cmd/wisp/panel_holder_319_windows_test.go:382:		t.Errorf("the activation hook answered %q, which is not the hand-off branch sentence; the counters above say the request was taken, so the receipt and the request disagree", receipt)
+71002d0:cmd/wisp/panel_host_windows.go:85:	// window is sized off [panel]. These two still answer for every construction
+71002d0:cmd/wisp/panel_host_windows.go:124:// can move window messages off the queue. Only the fields the pump hands back to
+71002d0:cmd/wisp/panel_host_windows.go:521:// that already existed", and 票 255 AC#4's 甲形 hangs off that split: a create
+71002d0:cmd/wisp/panel_host_windows.go:741:// Hide takes the window off screen without destroying it, and hands focus back to
+71002d0:cmd/wisp/panel_host_windows_test.go:500:		// 56 bytes per row, state at 48, owning pid at 52 (measured, not read off
+71002d0:cmd/wisp/panel_host_windows_test.go:866://     must not be the panel itself (read off the product's own field,
+71002d0:cmd/wisp/panel_inbound.go:14:// reads the cmd/wisp call sites off the disk rather than off this paragraph,
+71002d0:cmd/wisp/panel_locked_naming_33r11_windows_test.go:38:// never planted in production: they show the census bites on a bad name, stays off an
+71002d0:cmd/wisp/panel_locked_naming_33r11_windows_test.go:100:// (including inside a closure it hands off, which is a worse shape, not a milder one).
+71002d0:cmd/wisp/panel_pump.go:23:// EVERY VALUE COMES FROM AN OBJECT THIS PROCESS IS RUNNING. pending is read off
+71002d0:cmd/wisp/panel_pump.go:107:// none found, config off, or refused by the rewrite account.
+71002d0:cmd/wisp/panel_pump.go:199:	// The cap the refusal measures against, read off the same constant the tool
+71002d0:cmd/wisp/panel_pump.go:222:// success off a tree the operator never named.
+71002d0:cmd/wisp/panel_pump.go:370:// being improbable and short enough to read off a log line.
+71002d0:cmd/wisp/panel_pump_test.go:412:// calls. The count is read off the pump, which only Publish() moves.
+71002d0:cmd/wisp/panel_reshow_255r1_windows_test.go:29://	(c) WHICH hint? HintNone, asserted as a value at every recorded call AND read off
+71002d0:cmd/wisp/panel_reshow_255r1_windows_test.go:412:		t.Errorf("the resize is posted with hint %s, want webview2.HintNone - HintFixed would clear WSThickFrame/WSMaximizeBox and switch off the user dragging the window edge, which is an interface behaviour change outside 票 255", selectorText255r1(call.Args[2]))
+71002d0:cmd/wisp/panel_reshow_255r8_winlive_test.go:96:// on a real desktop session: the window is born off [panel] width, the config is
+71002d0:cmd/wisp/panel_reshow_255r8_winlive_test.go:129:	// First show: the window is born off [panel] (the create hop, OUTER semantics).
+71002d0:cmd/wisp/panel_resident_windows_test.go:101:// trip and the entry hand-off are done, so waiting on IsCreated alone would race
+71002d0:cmd/wisp/panel_transport_35r2_test.go:318:// jsProp is the property read of JS: reading anything off a missing base throws, which is
+71002d0:cmd/wisp/panel_transport_35r2_test.go:1475:// jsonGlobal35r2 gives the scripts JSON.stringify. Escaping is turned off so the bytes
+71002d0:cmd/wisp/panel_transport_live_35v2_windows_test.go:50:// EVERY JUDGEMENT IS MADE GO-SIDE, off the recorder attached to
+71002d0:cmd/wisp/panel_unbound_253r6_windows_test.go:81:// criterion ① (a readable Go-side record) is read off the shipping sink rather than
+71002d0:cmd/wisp/panel_unbound_253r6_windows_test.go:102:// asserted verbatim instead of being read off a console nobody keeps.
+71002d0:cmd/wisp/plan_assembled_165r2_test.go:88:// grantsByMinted165r2 reads this boot's session grant rows back off disk.
+71002d0:cmd/wisp/resident_approval_risk_256_windows_test.go:33://      the landing site, measured off the syntax tree rather than off words: the
+71002d0:cmd/wisp/resident_approval_risk_256_windows_test.go:35://      read off approval's own Options declaration. Comments are invisible to it
+71002d0:cmd/wisp/resident_approval_risk_256_windows_test.go:68:// risk256Dir is this package's own directory, resolved off the caller's file so
+71002d0:cmd/wisp/resident_approval_risk_256_windows_test.go:216:			winIsWhat: "a genuine move off the compiled 3s default, AND it is inside the band, so it is " +
+71002d0:cmd/wisp/resident_approval_risk_256_windows_test.go:378:// declaredOptionsFields256 reads the denominator off approval's own declaration
+71002d0:cmd/wisp/resident_approval_risk_256_windows_test.go:418:// resident leg's real Options field set, counted off the syntax tree. Before
+71002d0:cmd/wisp/resident_approval_risk_256_windows_test.go:515:// config-fed constructor. Measured off the tree of resident_windows.go, so a
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:33://      the shape of the branch, read off the syntax tree: the split is made by
+71002d0:cmd/wisp/resident_approval_windows.go:136:// it. The value is read off the ball's own hotkey report: the cancel line is the
+71002d0:cmd/wisp/resident_approval_windows.go:378:	// The receipt is read OFF THE GATE, not off the arithmetic above: what is
+71002d0:cmd/wisp/resident_approval_windows.go:417:// hotkeyProvenance* trio: the tests read them off the constructed object, and a
+71002d0:cmd/wisp/resident_approval_windows.go:614:		// 档二: the key named here is the one this card's borrow used, read off the
+71002d0:cmd/wisp/resident_approval_windows.go:906:		// passed off as zero drift.
+71002d0:cmd/wisp/resident_audio_247_live_windows_test.go:21:// heard. If the speakers are off, routed to an endpoint this microphone cannot
+71002d0:cmd/wisp/resident_audio_247_live_windows_test.go:196:			" (speakers off, or routed to an endpoint this microphone cannot hear)",
+71002d0:cmd/wisp/resident_audio_247_windows_test.go:348:// not claim the orb breathes on screen, because while prototypeVisuals is off
+71002d0:cmd/wisp/resident_audio_247_windows_test.go:352:// The reading is taken off the exported flag, not off a comment.
+71002d0:cmd/wisp/resident_audio_247_windows_test.go:355:		t.Fatal("prototypeVisuals is ON in this assembly: the shipped default is off, and a leg that says it turned it on has crossed AC#10")
+71002d0:cmd/wisp/resident_audio_windows.go:55:// "the user sees the ball breathe". prototypeVisuals defaults to off
+71002d0:cmd/wisp/resident_audio_windows.go:57:// while it is off (internal/ball/liquid_windows.go:52). Turning that default is
+71002d0:cmd/wisp/resident_audio_windows.go:98:	// saw. Nothing here writes a default: both values come off the file, or off
+71002d0:cmd/wisp/resident_audio_windows.go:177:		// error class and the guidance the capture side ended with, off the same
+71002d0:cmd/wisp/resident_audio_windows.go:196:// [audio] off this process's own data root. It never stops the boot: every
+71002d0:cmd/wisp/resident_audio_windows.go:237:	// and [audio] are read off the file rather than held.
+71002d0:cmd/wisp/resident_audio_windows.go:259:	// P1 甲, second half: voice off means no collector is constructed at all -
+71002d0:cmd/wisp/resident_audio_windows.go:281:	// posture below is read off the gate and the counters, not off this error.
+71002d0:cmd/wisp/resident_audio_windows.go:291:	// P5 甲: the device posture, said loudly off measured state.
+71002d0:cmd/wisp/resident_audio_windows.go:302:		// The class comes off the error object the capture thread posted
+71002d0:cmd/wisp/resident_audio_windows.go:303:		// (WASAPIMicrophone.Err), not off the meter's string: the string is the
+71002d0:cmd/wisp/resident_ball_live_228_windows_test.go:151:	//         which is exactly how A1b survived a sign-off run;
+71002d0:cmd/wisp/resident_ball_windows.go:48:// muteGesture, whose sentence is read back off the gate after the write.
+71002d0:cmd/wisp/resident_ball_windows.go:86:// executed=false means "there was no gate to turn in this process" (voice off,
+71002d0:cmd/wisp/resident_ball_windows.go:198:// ("hotkeys from ..."), and the ticket-258 tests read them off the running
+71002d0:cmd/wisp/resident_ball_windows.go:520:// it reads gate.Muted() back off the capture leg - never off a flag this host
+71002d0:cmd/wisp/resident_ball_windows.go:521:// keeps, never off what the gesture hoped for - and hands that single bool to
+71002d0:cmd/wisp/resident_ball_windows.go:556:		// This process owns no gate (voice off, or a leg that never assembled),
+71002d0:cmd/wisp/resident_ball_windows.go:576:// back here: this sentence, like the outcome it prints, is still taken off the
+71002d0:cmd/wisp/resident_ball_windows.go:608:		// (voice off, or the leg never assembled). The gesture is not a mute.
+71002d0:cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:217:// ever prints a key it did not read off the ball's report. Without this assertion
+71002d0:cmd/wisp/resident_grant_writer_265_windows_test.go:26://	CONNECTION  - both wiring sites are read off the syntax tree: the value behind
+71002d0:cmd/wisp/resident_grant_writer_265_windows_test.go:443:// CONNECTION: the two wiring sites, read off the syntax tree
+71002d0:cmd/wisp/resident_grant_writer_265_windows_test.go:624:// packageDir265 resolves this package's own directory off the caller's file, the
+71002d0:cmd/wisp/resident_hotkey_258_windows_test.go:8:// WHAT THIS FILE MEASURES. Three rulers, one per AC, all read off production
+71002d0:cmd/wisp/resident_hotkey_258_windows_test.go:13://     drives it the way the assembly root does - a config.LoadFile read off a
+71002d0:cmd/wisp/resident_hotkey_258_windows_test.go:246:// family greps them off the shipped binary's stdout. Renaming one of these
+71002d0:cmd/wisp/resident_hotkey_258_windows_test.go:377:	// rule only holds when the file moved at least one slot off the compiled
+71002d0:cmd/wisp/resident_hotkey_296_windows_test.go:48:// and anything in internal/ball. The none/off family is Q-82 (owner's list,
+71002d0:cmd/wisp/resident_hotkey_live_258_windows_test.go:112:// grep the console equals shape (summon=VALUE) off the sink, but the sink is a
+71002d0:cmd/wisp/resident_mute_290_windows_test.go:99:// booted muted, the state is read back off the gate (never off the ball host), and
+71002d0:cmd/wisp/resident_mute_294_test.go:8:// the reading is taken off the AST the way Test258AssemblyRootWiresTheChainAnd-
+71002d0:cmd/wisp/resident_mute_294_windows_test.go:88:// binding, and read the mute id's own registration row off HotkeyReport.
+71002d0:cmd/wisp/resident_other.go:10:// runResident refuses to start the resident process off Windows.
+71002d0:cmd/wisp/resident_sink_nail_127_windows_test.go:491:	// the file keeps its first one. Zero means the mirror was switched off to
+71002d0:cmd/wisp/resident_sink_nail_127_windows_test.go:495:			"(a-with-mirror: never switched off, never doubled).\n%s", n, leg.console())
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:22://     shipped resident process with no console says its task entry is off AND does
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:98:		t.Error("runSpec.taskCtx did not reach the runtime, so execute() would park the task off the root " +
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:292:// interactive console must (a) say the entry is off, (b) NOT open the pipeline
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:307:		t.Fatalf("AC#7 RED: the shipped leg with no console said %v that its entry is off and %v that it "+
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:439:		t.Fatalf("AC#7 RED: dev leg: refusal=%v entry-off=%v loop=%v.\n%s\nA production-shaped environment that "+
+71002d0:cmd/wisp/resident_task_source_live_246_windows_test.go:180:	// The gate's own record, read off the shipped process's on-disk ledger.
+71002d0:cmd/wisp/resident_task_source_live_246_windows_test.go:204:	// roster, taken off the registration rather than off a comment.
+71002d0:cmd/wisp/resident_task_source_windows.go:54:// sentence with no mechanism behind it: the loop's ctx would hang off
+71002d0:cmd/wisp/resident_tray_mute_293_windows_test.go:80:// the way the assembly root attaches them (read off the capture leg, push into the
+71002d0:cmd/wisp/resident_tray_mute_293_windows_test.go:158:		t.Fatalf("audio.mic_muted_default moved off the shipped true, and this test's premise with it: %v",
+71002d0:cmd/wisp/resident_tray_mute_293_windows_test.go:182:// optimistic reading of the request. Reading the checkmark off the outcome sentence
+71002d0:cmd/wisp/resident_tray_mute_293_windows_test.go:183:// (or off a hoped-for flip) passes nothing here.
+71002d0:cmd/wisp/resident_windows.go:44:// owner's machine (an empty [hotkey] slot means "unset", not "turned off").
+71002d0:cmd/wisp/resident_windows.go:414:	// The boot report names the steps this process really owns, taken off the
+71002d0:cmd/wisp/resident_windows.go:415:	// registration rather than off a comment (AC#4's "不许撒谎" half).
+71002d0:cmd/wisp/resident_windows.go:423:	// Ticket 247 AC#6/AC#10: the capture posture gets its own line, taken off
+71002d0:cmd/wisp/resident_windows.go:426:	// claim the ball is visibly breathing: with prototypeVisuals off, which is
+71002d0:cmd/wisp/resident_windows.go:684:// panel thread), so this sentence reports the hand-off, never the window's fate.
+71002d0:cmd/wisp/resident_windows.go:685:// When the hand-off itself was refused - no panel host, or a thread that will
+71002d0:cmd/wisp/run.go:311:	// handed off to execution.
+71002d0:cmd/wisp/run.go:1098:	// The switch is agent.project_instructions_enabled, default on; off means the
+71002d0:cmd/wisp/run.go:1457:	// left the queue, and a started one handed off to execution, so a reply
+71002d0:cmd/wisp/run_mode101_test.go:167:// readMode returns the档 as the NEXT process would read it straight off disk -
+71002d0:cmd/wisp/run_mode101_test.go:504:			"asks - the B-tier write went through (%q). Reading a grant back off disk is the "+
+71002d0:cmd/wisp/run_test.go:422:// internal/llm's own adapter, and the assertion reads the header off the
+71002d0:cmd/wisp/run_test.go:423:// server's capture of that request - not off a client this test wrote.
+71002d0:cmd/wisp/secret.go:236:// stays off for the whole read, so nothing the user types is reflected into a
+71002d0:cmd/wisp/slo_exit_os_156_windows_test.go:84:// test (measured: probes/156/mut-156/case15-off.log, red=17,18 with the shipped
+71002d0:cmd/wisp/slo_exit_os_156_windows_test.go:95:// .scratch/wisp/probes/156/mut-156-first-run-summaries.txt, line `case15-off` -
+71002d0:cmd/wisp/slo_other.go:10:// cmdSLO refuses to run off Windows, with a nonzero exit.
+71002d0:cmd/wisp/slo_windows.go:612:	// that keeps the fill off the two legs that have no decoder error.
+71002d0:cmd/wisp/subagent_selfapproval_197_test.go:374:// records, it never fails: a t.Fatal off the test goroutine would abort the wrong
+71002d0:cmd/wisp/ticket224_assembly_test.go:363:// t224r2row reads one tool_call row off the real store by (task, correlation). The
+71002d0:cmd/wisp/versioninfo_other.go:5:// dllFileVersion has no implementation off Windows: it reads a PE
+71002d0:frontend/VENDORED.md:98:Every mount checks `html[data-motion="off"]` (theme.css) **before** rendering and falls back to the static end state - the vendored files never read the switch themselves.
+71002d0:frontend/VENDORED.md:102:| `src/components/react-bits/count-up.tsx` | `src/content/TextAnimations/CountUp/CountUp.jsx` | CountUp | header; JSX→TSX: props interface, typed span ref and decimals helper - runtime statements verbatim | **yes** - Showcase 09 成本三数. CountUp has no decimals/prefix/suffix props: decimals derive from `to` (0.31 formats as two places), and the ¥ / % signs ride as static text beside the span at the mount. `html[data-motion="off"]` renders the fixture string instead |
+71002d0:frontend/VENDORED.md:103:| `src/components/react-bits/blur-text.tsx` | `src/content/TextAnimations/BlurText/BlurText.jsx` | BlurText | header; JSX→TSX: props interface, typed p ref, `Transition` on the per-span transition, `Record` widening inside buildKeyframes (motion's Target has no index signature) | **yes** - Showcase page-header title, one-shot entrance with `animateBy="characters"` (a Chinese title has no spaces for words mode) and `delay={60}`. `html[data-motion="off"]` keeps the static span |
+71002d0:frontend/VENDORED.md:104:| `src/components/react-bits/magnet.tsx` | `src/content/Animations/Magnet/Magnet.jsx` | Magnet | header; JSX→TSX: props interface over `HTMLAttributes<HTMLDivElement>`, typed div ref and MouseEvent param - runtime statements verbatim | **yes** - Showcase 10 磁吸按钮 demo card carrying the 下一步/完成 vocabulary (`padding={60}`). The real first-run action buttons live inside `firstrun-screen.tsx`, which that round's named-file scope did not open - wrap them there when approved. `html[data-motion="off"]` leaves the bare button |
+71002d0:frontend/scripts/render-composer.tsx:22:   screenshot pass stays open until the orchestrator calls the sign-off window.
+71002d0:frontend/scripts/vendor-beautifului.mjs:78:    manual: "its glide span carries class m-glide, which is what the motion tiers in styles/theme.css address (data-motion=off pins it). The positioning context became opt-out for the reason in the code comment - the right rail's tab dropdown passes absolute and a hardcoded relative silently turned that menu into a block.",
+71002d0:frontend/scripts/vendor-beautifului.mjs:102:    manual: "three hex dots in the demo FILTERS -> var(--orange)/var(--accent)/var(--green); the grid-line token -> var(--line) (this theme defines no grid-line, so every one of those borders was rendering at no colour); the filter-status-* pills, undefined here, -> the tint utilities that are; max-w-105 is not a Tailwind step -> explicit 420px. The table body is wrapped in GlideMenu and the chips carry data-menu-row, so its rows take the same hover as every other list in the panel - that wrap is why this dest is marked adapted. (Note for the next person writing a header here: do not write a token reference out in prose, even to warn someone off it. gen-tokens.mjs matches that shape across the whole file, comments included, so a header that spells one fails the gate on the shape alone.)",
+71002d0:frontend/src/components/ai-native/button.tsx:26:                    variants key off the [data-theme="dark"] custom variant.
+71002d0:frontend/src/components/ai-native/filter-table.tsx:25:                    prose, even to warn someone off it. gen-tokens.mjs matches
+71002d0:frontend/src/components/ai-native/flowchart.tsx:401:    const off = offsets[n.id];
+71002d0:frontend/src/components/ai-native/flowchart.tsx:404:      cx: n.x * cw + (off?.dx ?? 0),
+71002d0:frontend/src/components/ai-native/flowchart.tsx:405:      top: rowY[rows.indexOf(n.row)] + (off?.dy ?? 0),
+71002d0:frontend/src/components/ai-native/flowchart.tsx:428:    const off = offsets[node.id];
+71002d0:frontend/src/components/ai-native/flowchart.tsx:433:      baseDx: off?.dx ?? 0,
+71002d0:frontend/src/components/ai-native/flowchart.tsx:434:      baseDy: off?.dy ?? 0,
+71002d0:frontend/src/components/ai-native/value-pill.tsx:33:/** Inline value badge — a plain value (a date, a name, a count) set off in
+71002d0:frontend/src/components/config-screen.tsx:125:  // Read the tier back off the document rather than mirroring it: a tier set
+71002d0:frontend/src/components/firstrun-screen.tsx:27:     keyLabel / keyNote /      the masked key row (font-mono + an eye-off slot
+71002d0:frontend/src/components/glide-highlight.tsx:36:   data-motion="off" pins it, and "lite" lets it glide (it only moves when the
+71002d0:frontend/src/components/harness/main.tsx:54:   Motion policy: html[data-motion="off"] (theme.css) already silences every
+71002d0:frontend/src/components/harness/main.tsx:57:   so the streaming flag is forced false under motion-off and the static end
+71002d0:frontend/src/components/harness/main.tsx:84:/* RevealText 的逐段计时器不读 html[data-motion="off"]，挂载点在这里代读：
+71002d0:frontend/src/components/harness/main.tsx:85:   off 时 streaming=false，直接渲染静态终值（一行条件）。 */
+71002d0:frontend/src/components/harness/main.tsx:87:  return document.documentElement.dataset.motion === "off";
+71002d0:frontend/src/components/react-bits/animated-list.tsx:22:                    destructures off the bare EventTarget, and the KeyboardEvent
+71002d0:frontend/src/components/react-bits/blur-text.tsx:25:                    html[data-motion="off"] before rendering and keeps the
+71002d0:frontend/src/components/react-bits/count-up.tsx:20:                    figures). The mount checks html[data-motion="off"] before
+71002d0:frontend/src/components/react-bits/magnet.tsx:22:                    checks html[data-motion="off"] before wrapping and leaves
+71002d0:frontend/src/components/react-bits/shiny-text.tsx:53:  /** Seconds the sheen holds off-screen between sweeps. */
+71002d0:frontend/src/components/react-bits/shiny-text.tsx:125:        // Delay phase - hold at end (shine off-screen)
+71002d0:frontend/src/components/react-bits/shiny-text.tsx:138:  // Transform: p=0 -> 150% (shine off right), p=100 -> -50% (shine off left)
+71002d0:frontend/src/components/showcase.tsx:130:/* JS-driven animation switch. html[data-motion="off"] (theme.css) silences
+71002d0:frontend/src/components/showcase.tsx:136:  return document.documentElement.dataset.motion === "off";
+71002d0:frontend/src/components/showcase.tsx:139:/* Section 09's cost figure: the fixture string when motion is off, a CountUp
+71002d0:frontend/src/components/showcase.tsx:150:/* Section 10's action button inside a Magnet. When motion is off the button
+71002d0:frontend/src/components/turn-rail.tsx:16:   survives a 60-turn session without pushing the conversation off screen.
+71002d0:frontend/src/fixtures/harness.ts:13:        "不得造假数据当真实字段"). The approval rows are shaped off the demo's
+71002d0:frontend/src/fixtures/harness.ts:14:        approval screen and off genuine verdicts; the ball-state rows are
+71002d0:frontend/src/fixtures/harness.ts:81:      names: ["strict", "auto", "off"],
+71002d0:frontend/src/lib/config-feedback.ts:4:   WHY THIS FILE EXISTS. The v1 pages were built straight off the interface
+71002d0:frontend/src/lib/motion.ts:7:   ones off without giving up all of them. Three tiers fix that:
+71002d0:frontend/src/lib/motion.ts:16:     off    nothing runs. The floor, and what the OS-level
+71002d0:frontend/src/lib/motion.ts:39:const TIER_ATTR: Record<MotionTier, "full" | "lite" | "off"> = {
+71002d0:frontend/src/lib/motion.ts:42:  关闭: "off",
+71002d0:frontend/src/lib/motion.ts:62:  if (v === "off") return "关闭";
+71002d0:frontend/src/styles/theme.css:274:     off   (data-motion="off")   everything stops.
+71002d0:frontend/src/styles/theme.css:324:/* tier: off - the floor. One selector, every keyframe in the tree goes still,
+71002d0:frontend/src/styles/theme.css:328:[data-motion="off"] *,
+71002d0:frontend/src/styles/theme.css:329:[data-motion="off"] *::before,
+71002d0:frontend/src/styles/theme.css:330:[data-motion="off"] *::after {
+71002d0:frontend/src/styles/theme.css:335:[data-motion="off"] .nav-glide,
+71002d0:frontend/src/styles/theme.css:336:[data-motion="off"] .m-glide {
+71002d0:frontend/src/styles/theme.css:339:[data-motion="off"] .screen-enter {
+71002d0:internal/agent/approval/fakes_test.go:203:// runWindow calls PendingWindow off the test goroutine and returns a channel
+71002d0:internal/agent/approval/gate.go:16:// nothing here can switch an enforcement off.
+71002d0:internal/agent/approval/gate.go:546:				// An approved L2 has now handed off to execution exactly like an
+71002d0:internal/agent/approval/pending_read_test.go:27:// reads off Decision set to a value that differs per item, so a returned row
+71002d0:internal/agent/approval/replies.go:74:	Level         string // "L1" | "L2", verbatim off the Prompt
+71002d0:internal/agent/approval/replies.go:81:	// the rule text comes off the card rather than off a re-derivation.
+71002d0:internal/agent/approval/replies.go:209:// Forget drops one entry (answered, dismissed, or handed off to execution), so no
+71002d0:internal/agent/approval/replies_201_test.go:11:// the part that must stay red when a rule is invented rather than read off the
+71002d0:internal/agent/approval/report.go:48:// handed off, nothing in the gate can reach into the tool.
+71002d0:internal/agent/approval/report.go:63:	// Started reports whether the L1 window for this id handed off to
+71002d0:internal/agent/approval/report.go:179:// window handed off, which is precisely the case where a veto is a stop request
+71002d0:internal/agent/approval/ticket285_route_denial_name_rulers_test.go:167:// reading "a denial was refused" off the unknown-correlation case and calling
+71002d0:internal/agent/approval/ticket285_route_denial_name_rulers_test.go:183:		t.Fatalf("AC#1 RED: the unknown-correlation route booked %d GRANT-DENY line(s); once it names a denial too, reading a denial name off that call is no longer proof of the two-live-card shape\naudit:\n%s", n, a.dump())
+71002d0:internal/agent/approval/ticket87_veto_l2_test.go:113:		t.Errorf("no dismissed event: the card was never taken off screen")
+71002d0:internal/agent/approval/window_test.go:205:// D31: cancellation is not atomic. A veto after hand-off must produce the
+71002d0:internal/agent/control_test.go:160:		t.Error("Steer must report false when agent.steering_enabled is off")
+71002d0:internal/agent/declared_l0_risk_179_test.go:7:// sentence whenever the host left Config.PassThroughUnclassifiedRisk off -
+71002d0:internal/agent/declared_l0_risk_179_test.go:203:			l := &Loop{} // zero Options: AdmitTask == nil, pass-through off
+71002d0:internal/agent/loop.go:134:	// with the flag off an unclassified call fails closed instead.
+71002d0:internal/agent/loop.go:803://     refused on any host that left the switch off, i.e. every real one).
+71002d0:internal/agent/loop.go:832:		// declares no tier for; both fail closed while the switch is off.
+71002d0:internal/agent/spill.go:130:	// marker baked into the text right off the stub.
+71002d0:internal/agent/spill_path_invariant_test.go:568:// test's own positive control, which fails loudly if the guess is off by one.
+71002d0:internal/agent/tools.go:23:// Config.PassThroughUnclassifiedRisk is true. With the flag off, an
+71002d0:internal/audio/captureopt_test.go:147:// green shape this ruling (P4 form 甲) refuses, because a roster read off the
+71002d0:internal/audio/gate.go:15://     the inner source is Stop()ed (device off, D16 "关闭麦克风", not a
+71002d0:internal/audio/gate_test.go:46:// actually stopped (device off, D16), not merely discarded; reopen restores.
+71002d0:internal/audio/hotplug_test.go:160:	for off := 0; off < len(samples); off += periodSamples {
+71002d0:internal/audio/hotplug_test.go:161:		end := off + periodSamples
+71002d0:internal/audio/hotplug_test.go:165:		chunks = append(chunks, samples[off:end])
+71002d0:internal/audio/level_test.go:136:		t.Fatalf("full-scale sine level = %.10f, want %.10f (1/sqrt(2)) within the named tolerance %v (off by %.3e)",
+71002d0:internal/audio/level_test.go:142:		t.Fatalf("half-amplitude sine level = %.10f, want %.10f (1/(2*sqrt(2))) within %v (off by %.3e)",
+71002d0:internal/audio/resample_test.go:54:// against gross errors like off-by-one phase or DC bias, not perfection).
+71002d0:internal/audio/resample_test.go:94:	for off := 0; off < len(in); {
+71002d0:internal/audio/resample_test.go:96:		if off+size > len(in) {
+71002d0:internal/audio/resample_test.go:97:			size = len(in) - off
+71002d0:internal/audio/resample_test.go:99:		streamed = append(streamed, r.Process(in[off:off+size])...)
+71002d0:internal/audio/resample_test.go:100:		off += size
+71002d0:internal/audio/wasapi_other.go:14:// WASAPIMicrophone is unavailable off Windows; Start fails loudly.
+71002d0:internal/audio/wasapi_other.go:20:// Start always fails off Windows.
+71002d0:internal/audio/wasapi_other.go:25:// Stop is a no-op off Windows.
+71002d0:internal/audio/wasapi_other.go:28:// Stats reports no counters off Windows.
+71002d0:internal/audio/wave_format_float_300_windows_test.go:96:// and is off-limits to AC#6. A data1At below zero means "do not write
+71002d0:internal/audio/wave_format_float_300_windows_test.go:183:			consequence: "waveFormatExt is the tag parseWaveFormat tests before it expands SubFormat; off 0xFFFE every " +
+71002d0:internal/audio/wave_format_float_300_windows_test.go:227:						"so one of those two constants has moved off the value copied from mmreg.h:2418/2110/2376",
+71002d0:internal/audio/wave_format_float_300_windows_test.go:253:	// exercised through the parser instead of being read off the declaration, and
+71002d0:internal/audio/wave_format_float_300_windows_test.go:263:				"compares that tag against, so waveFormatExt off 0xFFFE switches the extensible branch off and the "+
+71002d0:internal/audio/wavinjector.go:122:	for off := 0; off < len(w.samples); off += FrameSamples {
+71002d0:internal/audio/wavinjector.go:124:			target := start.Add(time.Duration(off/FrameSamples+1) * w.pace)
+71002d0:internal/audio/wavinjector.go:138:		frame := EncodeFrame(w.samples[off:min(off+FrameSamples, len(w.samples))])
+71002d0:internal/audio/wavinjector.go:175:	off := 12
+71002d0:internal/audio/wavinjector.go:176:	for off+8 <= len(data) {
+71002d0:internal/audio/wavinjector.go:177:		id := string(data[off : off+4])
+71002d0:internal/audio/wavinjector.go:178:		size := int(binary.LittleEndian.Uint32(data[off+4 : off+8]))
+71002d0:internal/audio/wavinjector.go:179:		body := off + 8
+71002d0:internal/audio/wavinjector.go:202:		off = body + size + (size & 1) // chunks are word-aligned
+71002d0:internal/audio/wavinjector_test.go:58:	for off := 0; off < len(samples); off += FrameSamples {
+71002d0:internal/audio/wavinjector_test.go:59:		end := off + FrameSamples
+71002d0:internal/audio/wavinjector_test.go:66:		for _, s := range samples[off:end] {
+71002d0:internal/ball/ball_windows.go:282:// persistence; off-screen / detached-monitor falls back to the primary).
+71002d0:internal/ball/ball_windows.go:715:		// tab stranded off-screen).
+71002d0:internal/ball/ball_windows.go:772:// reclampPosition re-places the window when it would be off-screen (monitor
+71002d0:internal/ball/dock.go:11://     goes (dockProximity: the ramp is read off the gap, so the squeeze is
+71002d0:internal/ball/dock.go:100:// (SPEC-08/D42#3: no docking under the taskbar or off a secondary screen).
+71002d0:internal/ball/dock.go:112:// dockProgressOf reads the squeeze off the gap: nothing beyond triggerPx of the
+71002d0:internal/ball/dock.go:138:// crossX/crossY are the drag's own off-axis coordinates, clamped so the window
+71002d0:internal/ball/dock.go:141:	off := int(float32(orbR) * DockSquash(p))
+71002d0:internal/ball/dock.go:146:	// Cross axis first: a tab must never sit off the top/bottom (or side) of
+71002d0:internal/ball/dock.go:170:		x = work.L + off - half
+71002d0:internal/ball/dock.go:172:		x = work.R - off - half
+71002d0:internal/ball/dock.go:174:		y = work.T + off - half
+71002d0:internal/ball/dock.go:176:		y = work.B - off - half
+71002d0:internal/ball/dock.go:183:// keeps "near an edge but not docked" reachable instead of half off-screen.
+71002d0:internal/ball/dock_test.go:202:// TestDockFreePosKeepsTheBallReachable: a drag that ends half off-screen must
+71002d0:internal/ball/dock_test.go:289:	off := int(float32(R) * DockSquash(p))
+71002d0:internal/ball/dock_test.go:292:		return Rect{L: cx - off, T: cy - int(R), R: cx + off, B: cy + int(R)}
+71002d0:internal/ball/dock_test.go:294:	return Rect{L: cx - int(R), T: cy - off, R: cx + int(R), B: cy + off}
+71002d0:internal/ball/dock_test.go:386:				t.Fatalf("%s: the popped-out orb is partly off-screen: %+v in %+v", name, full, work)
+71002d0:internal/ball/dock_test.go:396:				t.Fatalf("%s: a clicked-out ball may not hang off its monitor: %+v", name, win)
+71002d0:internal/ball/hit.go:27:// window rect and the ball read as a framed square (owner 09-30 sign-off).
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:74:	// even a misread Win32 could not take a bare key off the desktop.
+71002d0:internal/ball/hotkey_borrow_refused_260r5_test.go:432:// t260r5Config is the planted [hotkey] section: cancel moved off the shipped default
+71002d0:internal/ball/hotkey_cancel_borrow_live_260_test.go:99:	// point of 形ⓐ is that a user who moved off Esc does not also lose Esc.
+71002d0:internal/ball/hotkey_live_test.go:117://     of 形ⓐ is that a user who moved off Esc does not also lose Esc.
+71002d0:internal/ball/hotkey_live_test.go:122:// reported, never passed off as a borrow). A ball that never attempted the borrow
+71002d0:internal/ball/hotkey_status_test.go:288:// statuses apart: the user turning a key off, a binding that is junk, and the
+71002d0:internal/ball/hotkey_status_test.go:302:	off := registerAllWith(0, HotkeyConfig{Summon: "Ctrl+Alt+Q"}, (&fakeRegistry{}).register)
+71002d0:internal/ball/hotkey_status_test.go:303:	if c, _ := off.Binding(hkCancel); c.Status != HotkeyDisabled {
+71002d0:internal/ball/hotkey_status_test.go:362:	off := registerAllWith(0, HotkeyConfig{Summon: "Ctrl+Alt+Q"}, (&fakeRegistry{}).register)
+71002d0:internal/ball/hotkey_status_test.go:363:	if d, _ := off.Binding(hkMute); d.Status != HotkeyDisabled || d.Status.Attempted() {
+71002d0:internal/ball/hotkey_status_test.go:366:	if off.IsLive(hkMute) || off.IsLive(hkCancel) || off.IsLive(hkPanel) {
+71002d0:internal/ball/hotkey_status_test.go:367:		t.Errorf("unset bindings reported live: %+v", off.Bindings())
+71002d0:internal/ball/hotkey_windows.go:84:// through here; a config with summon = "none"/"off" is the host's business
+71002d0:internal/ball/hotkey_windows.go:283:		// failure, and it must not read like the user turned the key off
+71002d0:internal/ball/interaction_live_test.go:281:// human does not FEEL the focus move - is the owner sign-off, not this test.
+71002d0:internal/ball/liquid_windows.go:26:// the frozen SPEC-08 visuals are in force (prototypeVisuals off) the whole seam
+71002d0:internal/ball/live_windows_test.go:466:// pointer walks onto a docked tab and the ball slides out, then walks off and
+71002d0:internal/ball/monitors_windows.go:102:// foregroundRect returns the virtual screen bounds (for off-screen checks).
+71002d0:internal/ball/position.go:115:// monitor's work area clamped inside when partially off-screen, and the
+71002d0:internal/ball/position.go:151:			// Saved monitor exists but the point is off it entirely: fall
+71002d0:internal/ball/position_test.go:75:	t.Run("saved partially off right edge: clamped", func(t *testing.T) {
+71002d0:internal/ball/position_test.go:99:		// Device still exists but the point drifted far off it: the ball
+71002d0:internal/ball/sta_release_windows_test.go:52:	// t33r8PmRemove is PM_REMOVE: take the message off the queue and dispatch it.
+71002d0:internal/ball/sta_windows.go:23:// pmRemove is PeekMessage's PM_REMOVE: take the message off the queue, as
+71002d0:internal/ball/statevisual.go:17:	IconWifiOff                // NoNetwork (wifi-off)
+71002d0:internal/ball/statevisual.go:44:	// EnablePrototypeVisuals). With the mode off every field below keeps the
+71002d0:internal/ball/statevisual.go:112:// While the mode is off this is the frozen SPEC-08 §2.1 reading: Sleeping is
+71002d0:internal/ball/tokens.go:389:	// read off the gap, so no timer is needed to animate it.
+71002d0:internal/ball/tokens.go:393:	// trigger makes auto-dock unreachable at rest (09-30 sign-off raised the
+71002d0:internal/ball/tokens.go:411:	// sign-off) but the prototype no longer renders them: the rest body is the
+71002d0:internal/ball/tokens_table_test.go:64:	goRef    string // "Palette.Accent" / "looks[aurora].BlobA" (backticks off)
+71002d0:internal/ball/tokens_table_test.go:295:// c21ConstInfo is one exported package-level constant read off tokens.go.
+71002d0:internal/ball/tokens_table_test.go:1368:	value string // normalized: whitespace off, lowercase
+71002d0:internal/ball/tokens_test.go:143:	// today (prototypeVisuals off) - that is precisely what ticket 68 AC#2
+71002d0:internal/ball/tokens_test.go:184:// off the pure mapping only (no window, no desktop, no -tags winlive):
+71002d0:internal/config/defaults.go:189:// unwrapInterface peels interface wrapping off a reflect.Value (MapRange /
+71002d0:internal/config/loader.go:74:			// reads fs.ErrNotExist off it for cause=missing, and 票 223 AC#4
+71002d0:internal/config/manager.go:312:// CheckAndReload once the hook has answered, so the ask happens off the lock.
+71002d0:internal/config/manager_223_test.go:121:	// D36 rule 1's "不得静默生效", read off the live object while the card is up.
+71002d0:internal/config/schema.go:85:	ThinkingOff    = "off"
+71002d0:internal/config/schema.go:290:	// ThinkingIntensity is one of off|low|medium|high (enum enforced).
+71002d0:internal/config/schema.go:291:	ThinkingIntensity string `toml:"thinking_intensity" default:"off"`
+71002d0:internal/config/schema.go:358:	// (off|low|medium|high; enum enforced on every element).
+71002d0:internal/config/schema.go:443:	// Default on; off means not one file is read and the loader says why.
+71002d0:internal/config/settings_257_test.go:284:	// The classifier cmd/wisp reads cause=missing off this chain (票 223 AC#4):
+71002d0:internal/config/settings_313_test.go:54:		t.Error("the created model entry is not enabled: an entry without enabled=true is treated as off and is refused at start-up")
+71002d0:internal/config/settings_320.go:160:// false enabled would be treated as off and refused at start-up, which is the
+71002d0:internal/config/settings_320_test.go:116:		t.Error("the created model entry is not enabled: an entry without enabled=true is treated as off and is refused at start-up")
+71002d0:internal/config/settings_320_test.go:203:		t.Error("the created entry is not enabled: an entry without enabled=true is treated as off and is refused at start-up")
+71002d0:internal/config/unwired.go:93:		missing: "R5's private-range verdict is unconditional in internal/risk/rules_network.go, so there is no switch to turn off",
+71002d0:internal/config/unwired.go:94:		lands:   "switching it off would mean a new relaxation seam in the frozen risk layer: SPEC-06 sec 6.3 pins the SSRF check, so this needs a contract decision (D22), not a consumer",
+71002d0:internal/config/unwired_test.go:205:models."gpt-4o-mini".thinking_levels = ["off", "low"]
+71002d0:internal/config/validate_267_test.go:27:// warningLeadSec is the C18 pre-timeout warning lead, read off the symbol it
+71002d0:internal/config/writeguard.go:20:// This is 甲, chosen over 乙 on two measured costs, both read off this repo
+71002d0:internal/llm/anthropic/adapter.go:19://     off/"" -> omitted (provider default), low -> budget_tokens 1024,
+71002d0:internal/llm/anthropic/request.go:112:	if intensity := strings.ToLower(strings.TrimSpace(req.ThinkingIntensity)); intensity != "" && intensity != "off" {
+71002d0:internal/llm/anthropic/request.go:116:				fmt.Sprintf("anthropic: unknown thinking_intensity %q (want off|low|medium|high)", req.ThinkingIntensity))
+71002d0:internal/llm/anthropic/request.go:129:	} else if intensity == "off" {
+71002d0:internal/llm/enabled_gate_261_r1_test.go:40:				"m-off": {Enabled: false},
+71002d0:internal/llm/enabled_gate_261_r1_test.go:57:	if strings.Contains(joined, "m-off") {
+71002d0:internal/llm/enabled_gate_261_r1_test.go:77:	res.TextChain = []string{"p261/m-off"}
+71002d0:internal/llm/enabled_gate_261_r1_test.go:89:	if !strings.Contains(msg, "p261") || !strings.Contains(msg, "m-off") {
+71002d0:internal/llm/enabled_gate_261_r1_test.go:96:	// "an entry without an enabled key counts as off; write enabled = true to
+71002d0:internal/llm/enabled_gate_261_r1_test.go:130:	res.TextChain = []string{"p261/m-off", "p261/m-on"}
+71002d0:internal/llm/enabled_reach_261_test.go:58:text_chain = ["mock261/t261-off"]
+71002d0:internal/llm/enabled_reach_261_test.go:67:[llm.providers.mock261.models.t261-off]
+71002d0:internal/llm/enabled_reach_261_test.go:71:[llm.providers.mock261.models.t261-off.price]
+71002d0:internal/llm/enabled_reach_261_test.go:164:	if models["t261-off"].Enabled || models["t261-nokey"].Enabled {
+71002d0:internal/llm/enabled_reach_261_test.go:165:		t.Fatalf("precondition broken: off/nokey entries loaded as enabled = true")
+71002d0:internal/llm/enabled_reach_261_test.go:181:	for _, banned := range []string{"t261-off", "t261-nokey"} {
+71002d0:internal/llm/enabled_reach_261_test.go:187:	// Selection hop: text_chain already names t261-off; the resolver must
+71002d0:internal/llm/enabled_reach_261_test.go:189:	// so an operator can tell "no such entry" from "the user turned it off".
+71002d0:internal/llm/enabled_reach_261_test.go:290:	offCard := cfg.LLM.Providers["mock261"].Models["t261-off"].Price
+71002d0:internal/llm/enabled_reach_261_test.go:309:	off := reachReading(t, cfgOff, "t261-off", mock)
+71002d0:internal/llm/enabled_reach_261_test.go:323:	if !cfgOn.LLM.Providers["mock261"].Models["t261-off"].Enabled {
+71002d0:internal/llm/enabled_reach_261_test.go:327:	on := reachReading(t, cfgOn, "t261-off", mock)
+71002d0:internal/llm/enabled_reach_261_test.go:330:	if off.listed {
+71002d0:internal/llm/enabled_reach_261_test.go:336:	if off.resolved {
+71002d0:internal/llm/enabled_reach_261_test.go:342:	if off.reachedProvider {
+71002d0:internal/llm/enabled_reach_261_test.go:348:	if off.micros != 0 {
+71002d0:internal/llm/enabled_reach_261_test.go:349:		t.Errorf("cost-hop: the disabled entry produced %d micros, want 0", off.micros)
+71002d0:internal/llm/enabled_reach_261_test.go:357:	// refusal an operator sees for an entry that exists but is switched off.
+71002d0:internal/llm/errors.go:235:// retryAfterFallback so pace-limiting still backs off (see retryAfterFallback).
+71002d0:internal/llm/llm_test.go:178:	// Missing hint falls back so pace limiting still backs off.
+71002d0:internal/llm/openairesponses/adapter.go:17://     with summary="auto" so reasoning summaries stream; "off"/"" omits the
+71002d0:internal/llm/openairesponses/protocol_test.go:142:		{in: "off", blank: true},
+71002d0:internal/llm/openairesponses/request.go:127:	if intensity := strings.ToLower(strings.TrimSpace(req.ThinkingIntensity)); intensity != "" && intensity != "off" {
+71002d0:internal/llm/openairesponses/request.go:131:				fmt.Sprintf("openai-responses: unknown thinking_intensity %q (want off|low|medium|high)", req.ThinkingIntensity))
+71002d0:internal/llm/probe_thinking_test.go:117:// against the same fixture: with the mode off the record, the identical request
+71002d0:internal/llm/provider.go:75:	ThinkingIntensity string // off|low|medium|high (config enum; "" = default)
+71002d0:internal/llm/resolver.go:124:	// schema.go's Enabled promise: an entry switched off in settings is named
+71002d0:internal/llm/resolver.go:126:	// IS in the catalog, the user turned it off), so a disabled model can
+71002d0:internal/llm/retry.go:204:			return err // ctx died while backing off: report the real failure
+71002d0:internal/models/acl_sid_121_test.go:6:// Ticket 109's Windows leg measures who actually holds the write in the hand-off
+71002d0:internal/models/acl_sid_121_windows_test.go:7:// (handoff_window_109_windows_test.go's "who holds the write in the hand-off
+71002d0:internal/models/assembly_reachability_121_test.go:11:// had no production listener, and ticket 109's hand-off guard - green inside
+71002d0:internal/models/bridge.go:51:	// Ticket 109's hand-off check. Ensure verified the bytes *before* it
+71002d0:internal/models/bridge.go:60:			return b.record(), fmt.Errorf("models: exit Downloading after the hand-off check: %w (re-verify err: %v)", derr, verr)
+71002d0:internal/models/downloader.go:223:// hand-off site does not have.
+71002d0:internal/models/downloader.go:226:// pass. Cost is one more full read of the installed files at hand-off, the same
+71002d0:internal/models/downloader.go:238:		return observeWrap(ClassModel, "hand-off re-verification",
+71002d0:internal/models/handoff_reuse_109_test.go:48:		t.Fatalf("AC#2 reverse leg, normal install: the hand-off check refused a clean model: %v", err)
+71002d0:internal/models/handoff_reuse_109_test.go:55:		t.Fatalf("instance 2 hand-off check on the shared cache: %v", err)
+71002d0:internal/models/handoff_reuse_109_test.go:66:	// And the hand-off point itself, on a clean shared cache.
+71002d0:internal/models/handoff_reuse_109_test.go:68:		t.Fatalf("hand-off on a clean shared cache: %v", err)
+71002d0:internal/models/handoff_reuse_109_test.go:102:		t.Fatalf("AC#3: a file that reached its place through wide-temp+rename was then swapped and the hand-off point said nothing - "+
+71002d0:internal/models/handoff_reuse_109_test.go:105:	t.Logf("rename-into-place covered by the hand-off re-verify: %v", err)
+71002d0:internal/models/handoff_window_109_test.go:15:// Verification happens *before* the hand-off, use happens *after* it, and
+71002d0:internal/models/handoff_window_109_test.go:21:// AC#2 closes it with direction (b), re-verify at the hand-off point, because
+71002d0:internal/models/handoff_window_109_test.go:70:// changes hands (meter passes) verified, and reaches the hand-off point
+71002d0:internal/models/handoff_window_109_test.go:71:// tampered. A hand-off that reports the model available is the window.
+71002d0:internal/models/handoff_window_109_test.go:105:		t.Fatalf("AC#1/AC#2 (AC95-R1): the hand-off reported a model available whose file was swapped after Ensure "+
+71002d0:internal/models/handoff_window_109_test.go:109:		t.Logf("hand-off refused the swapped model: %v", err)
+71002d0:internal/models/handoff_window_109_windows_test.go:19://	                       hand-off point (AC#2's forward leg)
+71002d0:internal/models/handoff_window_109_windows_test.go:91:	t.Logf("BEFORE the hand-off guard - install dir %s: %v", filepath.Base(dir), beforeDir)
+71002d0:internal/models/handoff_window_109_windows_test.go:92:	t.Logf("BEFORE the hand-off guard - installed file %s: %v", filepath.Base(target), beforeFile)
+71002d0:internal/models/handoff_window_109_windows_test.go:103:	// window is open: after Ensure verified, before the hand-off announced it.
+71002d0:internal/models/handoff_window_109_windows_test.go:120:		t.Errorf("AC#2 forward leg: the hand-off announced a model available although a swap made through that inherited "+
+71002d0:internal/models/handoff_window_109_windows_test.go:123:		t.Logf("hand-off refused the swap made through that right: %v", err)
+71002d0:internal/models/handoff_window_109_windows_test.go:126:		t.Fatal("the fixture never reached the hand-off point, so the two readings above measure nothing")
+71002d0:internal/models/handoff_window_109_windows_test.go:134:	t.Logf("AFTER the hand-off guard ran - install dir: %v", afterDir)
+71002d0:internal/models/handoff_window_109_windows_test.go:135:	t.Logf("AFTER the hand-off guard ran - installed file: %v", afterFile)
+71002d0:internal/models/verify_cost_121_bench_test.go:3:// Ticket 121 AC#6 - the cost of the hand-off re-verification, measured rather
+71002d0:internal/models/verify_cost_121_bench_test.go:10:// cache-hit branch already hashes the whole installed tree, and the hand-off
+71002d0:internal/models/verify_cost_121_bench_test.go:68:// same bytes, so "the hand-off is the same order as what startup already pays"
+71002d0:internal/models/verify_cost_121_bench_test.go:108:// whose cache hit and hand-off both land on those bytes.
+71002d0:internal/models/verify_tree_121_other_test.go:109:		t.Fatalf("the hand-off refused a clean install (state=%s): %v", state, err)
+71002d0:internal/models/verify_tree_121_test.go:6:// Ticket 109's hand-off guard re-hashes the files the signed manifest names.
+71002d0:internal/models/verify_tree_121_test.go:131:				t.Fatalf("AC#4/R-109-2: the hand-off verified a model directory holding bytes the signed "+
+71002d0:internal/models/verify_tree_121_test.go:146:// the model available, because Ensure's re-download path and the hand-off
+71002d0:internal/models/verify_tree_121_test.go:165:		t.Fatalf("AC#4/R-109-2: the hand-off announced a model available whose directory holds an unnamed "+
+71002d0:internal/models/verify_tree_121_test.go:171:	t.Logf("hand-off refused at %s: %v", state, err)
+71002d0:internal/observe/earlylog_130_test.go:212:// off the early tee must contribute the SAME record to the buffer that it
+71002d0:internal/observe/earlylog_130_test.go:288:		t.Fatalf("mirror saw %d records after the drain, want 4: the console pass never switches off", n)
+71002d0:internal/observe/logging.go:475:// books both counts; a reader holding one file off a disk should be able to tell
+71002d0:internal/observe/logging.go:592:// and groups added by With/WithGroup so a logger captured off the default before
+71002d0:internal/observe/logging_test.go:41:	// Zero-value redactor already redacts: there is no off switch.
+71002d0:internal/observe/logging_test.go:106:	off := Redactor{}
+71002d0:internal/observe/logging_test.go:107:	if got := off.String("opened C:\\Users\\swq\\notes.txt today"); !strings.Contains(got, "C:\\Users\\swq\\notes.txt") {
+71002d0:internal/observe/logging_test.go:163:	// for the REAL today and the "one file per day" count is off by one on
+71002d0:internal/observe/redact.go:17:// off (D22: an off switch would be the "loosen the gate instead of meet it"
+71002d0:internal/observe/redact.go:44:// already redacts (only path masking is off by default).
+71002d0:internal/observe/sampler_test.go:295:	debugFreeOSMemory = func() {} // keep the test off the real GC release
+71002d0:internal/observe/window_wait_136_test.go:96:// out that this shape closes off.
+71002d0:internal/panel/bound_dispatch_door_114_test.go:17:// This file pins the third method as a capability read off the bytes, both ways:
+71002d0:internal/panel/bridge.go:65:	//     (AGENTS.md §1.2 keeps panel-side L2 "allow" off the table entirely).
+71002d0:internal/panel/bridge_test.go:177:// The name list is read off bridge.go through the same prefix-agnostic extractor
+71002d0:internal/panel/composer.go:64:	// is (off / none_found / refused / not_run / loaded). 200-r2 replaced the
+71002d0:internal/panel/composer_dispatch.go:106:// other field this route reads comes off the parsed req.
+71002d0:internal/panel/composer_handlers.go:65:// every widening request into a narrowing one and switch this whole gate off.
+71002d0:internal/panel/composer_handlers_test.go:28:	currentOK bool // false = PermissionMode() answers something off the ladder
+71002d0:internal/panel/composer_handlers_test.go:282:		if err := h.HandleModeRequest(context.Background(), modeReq("off", "rid-bad")); err == nil {
+71002d0:internal/panel/composer_test.go:283:// way in. Three readings, all off the sources rather than off the constants:
+71002d0:internal/panel/composer_test.go:683:// half so it cannot rot back into a one-off edit: the text-type whitelist of
+71002d0:internal/panel/composer_test.go:848:// It is not a screenshot. The differential-screenshot pass for owner's sign-off
+71002d0:internal/panel/config_313_test.go:4:// payload the settings page reads off config.get.
+71002d0:internal/panel/config_handlers.go:66:	// envelope at all, so the leg reads it off the raw bytes and this route can only
+71002d0:internal/panel/config_handlers.go:98:// reads the table off here rather than copying it, so a field added to the switch
+71002d0:internal/panel/config_handlers.go:297:	// StoreCredential takes the raw envelope, binds the credential value off the
+71002d0:internal/panel/config_route_248_test.go:127:// AC#1's negative half with its control: a name off the roster is refused and the
+71002d0:internal/panel/config_route_248_test.go:255:// The table's own shape, read off the code rather than copied: an unlisted field is
+71002d0:internal/panel/config_write_313.go:128:// the 313 twin of WritableFields, and a test reads the roster off here rather
+71002d0:internal/panel/git_test.go:81:	// The expectation is the string this test wrote, not a name read off the
+71002d0:internal/panel/git_test.go:131:// line, which the census read off this repository's own worktree
+71002d0:internal/panel/git_test.go:360:// Three doors, all read off the tree rather than asserted from memory:
+71002d0:internal/panel/git_test.go:405:// whitelistMethodsFromSource reads the method names off the file that declares
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:23:// TestDecisionRulesMirrorTicket248Ruler35r7 reads the original file off disk and
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:256:// The anti-drift nail for the mirror: read the original ruler off disk and fail
+71002d0:internal/panel/inbound_roster_253_test.go:14:// roster read off the production source by STRUCTURE, never by a namespace prefix,
+71002d0:internal/panel/inbound_roster_253_test.go:319:		problems = append(problems, "func "+funcName+" has no default branch at all: a route off this roster would reach a case that does not exist and be handled by nothing")
+71002d0:internal/panel/inbound_roster_253_test.go:677:		t.Errorf("the copied guard plant also produced structural problems %s; this case is about an answered name off the roster and should stay readable", quoteNames(problems))
+71002d0:internal/panel/instructions_200.go:14:// feature off", "it is on but the tree holds no instruction file", and "there
+71002d0:internal/panel/instructions_200.go:29:	// hold no instruction file. This is NOT the same fact as "off".
+71002d0:internal/panel/instructions_200.go:32:	InstructionsStatusOff = "off"
+71002d0:internal/panel/instructions_200_test.go:13://   - §2(b), the carrier's states: "off", "on but nothing there", "on and
+71002d0:internal/panel/instructions_200_test.go:22:// this file can switch off.
+71002d0:internal/panel/instructions_200_test.go:108:			"config-off without it", b.SkipReason, projctx.SkipRewriteRefused)
+71002d0:internal/panel/instructions_200_test.go:154:			"off",
+71002d0:internal/panel/instructions_200_test.go:207:	// The complaint this cell closes: at r1 off / none_found / refused all
+71002d0:internal/panel/instructions_200_test.go:210:		{"off", "none_found"},
+71002d0:internal/panel/instructions_200_test.go:211:		{"off", "loaded"},
+71002d0:internal/panel/instructions_200_test.go:213:		{"refused", "off"},
+71002d0:internal/panel/instructions_200_test.go:220:	if !strings.Contains(wire["off"], "已按你的配置跳过") {
+71002d0:internal/panel/instructions_200_test.go:221:		t.Errorf("the off state lost the sentence that names the switch: %s", wire["off"])
+71002d0:internal/panel/l2_grant_boundary_test.go:87:// runtime (out of config, or off the wire) appears in no literal pool and no
+71002d0:internal/panel/l2_grant_boundary_test.go:1528:// grantRoutePrefixes x grantRouteWords ("wisp.review.ok", or one read off config)
+71002d0:internal/panel/l2_grant_boundary_test.go:1819:			{"sizeBytes", "sizeBytes", true, "sizeBytes", "the caller already split the options off the tag"},
+71002d0:internal/panel/l2_grant_boundary_test.go:2198:	// The guard's own roster, read off the source instead of spelled out here.
+71002d0:internal/panel/pump.go:70:// NativeVerdict is one live approval as the host reads it off its own queue.
+71002d0:internal/panel/pump.go:152:	// 145 AC#2b's "which model is answering". It is one live string read off the
+71002d0:internal/panel/pump.go:175:	// r1 behaviour (empty list, omitempty, no key) made "you turned it off" and
+71002d0:internal/panel/subagent_blocked_220_test.go:42:// card197 is one pending L2 card as the host reads it off its own queue: the
+71002d0:internal/panel/subagent_blocked_220_test.go:90:// assertBlocked reads one row off the wire and states what it found in BOTH
+71002d0:internal/panel/subagent_roster_197.go:79:	// cost, read off the live StreamLog by the host. They say how much of this
+71002d0:internal/panel/subagent_roster_197.go:193:// AC#2's enumeration, read off the host's gate). The exported signature is left
+71002d0:internal/panel/workspace_handlers_test.go:125:		t.Errorf("the route the page sends is not in the C17 whitelist read off bridge.go: %v", got)
+71002d0:internal/proc/activation_hook_319_windows_test.go:83:	// hook must not run again off the same signal.
+71002d0:internal/proc/boot_windows.go:263:// fact taken off the registration, not off a comment.
+71002d0:internal/proc/systemprocs_windows_test.go:39:// the terminator would read real (non-zero) offsets instead of falling off
+71002d0:internal/proc/systemprocs_windows_test.go:48:		off := i * stride
+71002d0:internal/proc/systemprocs_windows_test.go:49:		binary.LittleEndian.PutUint32(buf[off+0:], e.next)
+71002d0:internal/proc/systemprocs_windows_test.go:50:		binary.LittleEndian.PutUint32(buf[off+4:], e.threads)
+71002d0:internal/proc/systemprocs_windows_test.go:51:		binary.LittleEndian.PutUint64(buf[off+8:], uint64(e.privateWS))
+71002d0:internal/proc/systemprocs_windows_test.go:52:		binary.LittleEndian.PutUint64(buf[off+40:], uint64(e.user100ns))
+71002d0:internal/proc/systemprocs_windows_test.go:53:		binary.LittleEndian.PutUint64(buf[off+48:], uint64(e.kernel100ns))
+71002d0:internal/proc/systemprocs_windows_test.go:54:		binary.LittleEndian.PutUint64(buf[off+80:], e.pid)
+71002d0:internal/proc/systemprocs_windows_test.go:55:		binary.LittleEndian.PutUint32(buf[off+96:], e.handles)
+71002d0:internal/proc/systemprocs_windows_test.go:175:// check survives the reordering: an entry header that runs off the end of
+71002d0:internal/proc/treemetrics_windows.go:285:				off := 4 + uintptr(i)*tcpRowOwnerPIDSize + tcpOwningPidOffset
+71002d0:internal/proc/treemetrics_windows.go:286:				pid := *(*uint32)(unsafe.Add(unsafe.Pointer(&buf[0]), off))
+71002d0:internal/projctx/projctx.go:107:// because the panel must be able to tell "you turned this off" from "the host
+71002d0:internal/projctx/projctx.go:181:	// feature off, and the two states must not print the same sentence.
+71002d0:internal/projctx/projctx.go:251:		// switch on purpose - a refusal is not the user turning the feature off,
+71002d0:internal/projctx/projctx_test.go:9:// a red test), AC#7 (the panel carrier) and AC#8 (the off switch prints why).
+71002d0:internal/projctx/projctx_test.go:103:// instead of running off, and one file per directory only.
+71002d0:internal/projctx/projctx_test.go:393:// AC#8: the off switch reads nothing AND prints why - and the paired control
+71002d0:internal/projctx/projctx_test.go:398:	off := newLoader(projctx.Options{
+71002d0:internal/projctx/projctx_test.go:402:	b := off.Turn()
+71002d0:internal/projctx/projctx_test.go:420:		t.Fatal("control run loaded nothing: the off-switch result above proves nothing")
+71002d0:internal/risk/blacklist.go:161:			out += p // never build "//" off the POSIX root
+71002d0:internal/risk/mode.go:13:// The three modes (R20/M1, exactly three - "switch everything off" was
+71002d0:internal/risk/pathresolver.go:87:// the path off the caller's own tree turns into ErrRewrittenPath instead of
+71002d0:internal/risk/pathresolver_rewrite_account_test.go:156:		t.Errorf("complete=true: a rewritten root alone switched off the fail-closed sync-suspect net")
+71002d0:internal/risk/pointer_185_test.go:10:// The defect (ticket 185 本体, read verbatim off 183-r1's CLI log): the FIRST
+71002d0:internal/risk/pointer_185_test.go:27:// by-value pass (ticket 183 AC#5 (1)), taking fs.read off the C25 marking roster
+71002d0:internal/risk/provenance.go:791:				// write: nothing in it can carry content off the machine, so
+71002d0:internal/risk/provenance.go:809:		// M-4: the scan was cut off by the nesting budget. Model-controlled
+71002d0:internal/risk/provenance_test.go:139:		t.Fatal("taint from an off-list source must still gate")
+71002d0:internal/risk/provenance_test.go:142:		t.Errorf("off-list marking must be logged, got %v", logged)
+71002d0:internal/risk/provenance_test.go:464:// under-profile net off, including for a plain target that IS inside the
+71002d0:internal/risk/provenance_test.go:587:	// Positive controls: the gate is per-call, not switched off. The same
+71002d0:internal/risk/provenance_test.go:598:	// off-contract key on a local write is scanned. That asymmetry points the
+71002d0:internal/risk/provenance_test.go:603:		t.Error("N-8 regression: fs.write with an off-contract payload key must stay scanned (fail-closed side)")
+71002d0:internal/risk/provenance_test.go:984:// id off a handle is fine, and it is not a capability. There is no by-id close
+71002d0:internal/risk/rules_irreversible.go:17:// power off or restart / close-window / send-class operations -> L2.
+71002d0:internal/risk/rules_network.go:38://     configured = domain gate off; the [net] config owns that choice)
+71002d0:internal/risk/syncdirs.go:31:// switches that net off — otherwise one decoy `~\OneDrive` folder would
+71002d0:internal/risk/syncdirs_test.go:170:	// single decoy root switch the safety net off.
+71002d0:internal/risk/syncdirs_test.go:267:// env evidence switches the under-profile net off — because on POSIX no root is
+71002d0:internal/risk/syncdirs_windows_test.go:38:// switch the under-profile suspect net off. Windows-only today for the reason
+71002d0:internal/risk/winsec_c26.go:36:// through Result.Actable: an expansion that moved the path off the tree the
+71002d0:internal/secret/ctime_other.go:10:// createdTime falls back to the modification time off Windows: the creation
+71002d0:internal/session/ticket224_pattern_dialect_test.go:92:	// regex: the blast radius is readable off the row.
+71002d0:internal/statemachine/table.go:188:		SideEffects: []string{"mic.keep-off", "panel.keep-alive"},
+71002d0:internal/statemachine/table_test.go:194:		name: "#26 speak done (default, mic stays off)", from: StateSpeaking, event: EvSpeakDone,
+71002d0:internal/statemachine/table_test.go:195:		facts: &Facts{}, want: StateWarm, effects: []string{"mic.keep-off", "panel.keep-alive"},
+71002d0:internal/tools/bridge.go:31:// default in every case; nothing here can switch enforcement off.
+71002d0:internal/tools/bridge.go:920:// this task's taint off the table, and was there anything on it" is exactly the
+71002d0:internal/tools/bridge_path_account_ticket105_test.go:22:// back off disk and asserts the CONTENT of the record: the config spelling,
+71002d0:internal/tools/cancel.go:10:// only: once the bridge has handed off, nothing in the gate can reach into the
+71002d0:internal/tools/cancel.go:25:	// Started reports whether the call was handed off to execution.
+71002d0:internal/tools/fs_staging.go:53:// The trade-off is stated on purpose: an orphan whose <owner> no longer matches
+71002d0:internal/tools/fs_staging_windows_test.go:26:// allow-all gate), because the sweeper hangs off fs.write's own path and a unit
+71002d0:internal/tools/fs_staging_windows_test.go:225:	// The link's NAME is the orphan shape: a sweeper that keys off the name and
+71002d0:internal/tools/fs_write.go:764:// fs.delete's ABSENCE when the flag is off is the enforcement: a tool the model
+71002d0:internal/tools/gate.go:144:// with its PassThroughUnclassifiedRisk flag off (agent/tools.go:20-24), now
+71002d0:internal/tools/grant_test.go:9:// the real tool_call.grant_id column back off disk - see
+71002d0:internal/tools/helpers_test.go:70:// mustStartTask books the task_log row the tool_call rows hang off.
+71002d0:internal/tools/loop_approval_test.go:126:			// unclassified: the pass-through flag stays off, which keeps the
+71002d0:internal/tools/paths.go:213:	// cannot tell "inside the allowed tree" from "inside a link that hangs off
+71002d0:internal/tools/paths_shortname_252_r1_test.go:196:			name: "N5 one character off the root's tail", rootsCfg: []string{long},
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:251:// TestTicket252R2BothContainmentsReachable is S1: the ban read off the call
+71002d0:internal/tools/plan_present.go:116:// never run off a 2-3 second unopposed L1 window (a window is exactly what a
+71002d0:internal/tools/pointer_183_cli_seam_test.go:21://	       "task.output" taken off the C25 marking roster (ticket 175's gate in
+71002d0:internal/tools/recycle_windows.go:124:	// goroutine can be rescheduled off its thread mid-call, so the thread is
+71002d0:internal/tools/recycle_windows_test.go:25:	if off := unsafe.Offsetof(op.fAnyOperationsAborted); off != 36 {
+71002d0:internal/tools/recycle_windows_test.go:26:		t.Errorf("fAnyOperationsAborted sits at %d, want 36 (the WORD FILEOP_FLAGS must keep its 2-byte pad)", off)
+71002d0:internal/tools/recycle_windows_test.go:66:	// Re-read the record the tool claimed, straight off the volume.
+71002d0:internal/tools/spawn_roster_census_229_test.go:5:// signal ("this goroutine is not accounted for"); each accidental off-roster
+71002d0:internal/tools/spawn_roster_census_229_test.go:12://     the live roster: off-roster and not on the documented-debt list => red;
+71002d0:internal/tools/staging_live_other.go:25:// stagingIsReparse has no reparse-point concept off Windows; Lstat's mode check
+71002d0:internal/tools/subagent_197.go:36://     an off-register source would be exactly the unowned channel D30 warns about.
+71002d0:internal/tools/subagent_222_test.go:450:	// Every result taken off h.parents is held here and handed back on the way
+71002d0:internal/tools/task_output_canonicalize_fail_174_test.go:60:// passing it off as healthy.
+71002d0:internal/tools/taskid_source_236r4_teeth_test.go:76:// a string the MODEL gives, off the same wire production reads.
+71002d0:internal/tools/ticket175r2_stamp_live_test.go:20://	    -> taking "task.output" back off the roster (i.e. this ticket's own
+71002d0:internal/tools/ticket176r1_start_port_test.go:142:	// "agent-task-<id>" in the D38 roster) must be readable off the file name,
+71002d0:internal/tools/ticket224_grantid_column_test.go:72:// back off disk needs a key that identifies ONE dispatch.
+71002d0:internal/tools/ticket90_test.go:428:// This test fails if anyone later hangs an authority field off the decision or
+71002d0:internal/tools/wiring_test.go:179:// off, so the answer must be approval.CancellationReport's wording - including
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:20:// tail hangs off*, and it predates 126 and is untouched by it: sameVolume gives
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:44:	// abs129 is the absolute spelling: tail hangs off the volume root.
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:46:	// rel129 is the drive-relative spelling: tail hangs off the process's own
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:79:		t.Errorf("AC#1/AC#3 RED: sameTree(%q, %q) = true, but a drive-relative spelling hangs its tail off the process's current directory on C: and an absolute one off C:\\ - two objects, one tree in this comparison's eyes", rel129, abs129)
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:214:			// tree only in a spelling that hangs off the process's C: directory.
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:31:// off the guard's own questions rather than hand-written: pass one installs a
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:62:	t.Logf("AC#1 probe pair read off the guard's own asks: parent=%q child=%q (absolute parent: %v)", parent, child, filepath.IsAbs(parent))
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:310:// tail off different roots, so the candidate has vouched for nothing - and the
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:439:// driveAbsolute129 hangs tail off the volume root: the absolute spelling, the one
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:443:// driveRelative129 hangs the same tail off whatever directory the process
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:162:// dev/prod data root hangs off os.UserConfigDir. Same instrument as above, on
+71002d0:internal/winsec/notice_attribution_115_windows_test.go:220:		// The mechanism of the four reds, read off the same object: the short
+71002d0:internal/winsec/notice_kind_and_everyone_118_windows_test.go:180:// this token, and each bucket must name exactly the principals the seal took off
+71002d0:internal/winsec/openleaf_322_other_test.go:211:		t.Errorf("AC#1 RED: %d foreign witnesses hold a raced private payload and %d were narrowed off 0666, so a "+
+71002d0:internal/winsec/placement_leaf_118_other_test.go:57:// nothing foreign in it, used as the anchor the leaf link hangs off.
+71002d0:internal/winsec/placement_windows.go:34:		return "", fmt.Errorf("%w: %s uses an extended-length prefix, which turns off path normalization",
+71002d0:internal/winsec/posix_seal_window_120_other_test.go:110:// Promoted to the default by next=4 of r1's hand-off, which is what "the instrument
+71002d0:internal/winsec/private_set_sid_windows_test.go:297:	// So the candidate list is now read off this machine instead of hard-coded: a
+71002d0:internal/winsec/reparse_windows_test.go:55:// conditional - a box with developer mode off and no SeCreateSymbolicLinkPrivilege
+71002d0:internal/winsec/resolve.go:451:// about which volume it hangs off, and it had not learned that a tail says
+71002d0:internal/winsec/resolve.go:452:// nothing about whether it hangs off that volume's root or off the process's own
+71002d0:internal/winsec/resolve.go:487:// sameAbsoluteness reports whether two spellings hang their tails off the same
+71002d0:internal/winsec/resolve.go:617:	// resolver that says "this answer moved off the tree the caller named" is
+71002d0:internal/winsec/resolve.go:622:		return ResolvedPath{}, fmt.Errorf("winsec: refusing to seal %s: the installed %s answered %q and accounted that answer as a rewrite off the tree the caller named: %w",
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:54:// real directory where it meant to plant a symlink and reported a false green off
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:34:// have. The tail is read off the answer rather than hand-written, so the pair is
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:300:// prose off a log line.
+71002d0:internal/winsec/winsec_other.go:366://     dir this repository's data root hangs off.
+71002d0:internal/winsec/winsec_windows.go:62:	// Principals are the SDDL trustee tokens cleared off this object, e.g. "WD"
+71002d0:internal/winsec/winsec_windows.go:82:// accounts as a move off the tree the caller named (see applyDescriptorWindows).
+71002d0:internal/winsec/winsec_windows.go:230:// readDACL pulls the DACL back off the object by name. Reading it back is the
+71002d0:tools/d22scan/main.go:536://     off one function body instead of hiding behind a walk that never runs.
+71002d0:tools/d22scan/scan_test.go:1681:// may not pass by having ignore filtering switched off globally.
+71002d0:tools/d22scan/scan_test.go:1976:		t.Errorf("an index-less run that reports clean must still say the rules were off, got %q", nc)
+71002d0:tools/mockllm/server.go:21:	truncate int               // cut streaming responses after N chunks (0 = off)

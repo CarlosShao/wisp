@@ -1,0 +1,25 @@
+71002d0:cmd/wisp/firstrun_198r2_test.go:213:		" (byte " + strconv.Itoa(i) + "): want " + strconv.Quote(w) +
+71002d0:cmd/wisp/firstrun_198r2_test.go:214:		", got " + strconv.Quote(g) +
+71002d0:cmd/wisp/leg_dispatch_gate_133_test.go:1196:					resolved = ", which resolves to the literal " + strconv.Quote(v)
+71002d0:cmd/wisp/leg_sink_gate_131_test.go:1400:		found = append(found, strconv.Quote(un))
+71002d0:cmd/wisp/panel_unbound_253r6_windows_test.go:166:})();`, reportJSEnv(reportID, `s.replace(/["\\]/g, "'")`), strconv.Quote(envelope))
+71002d0:cmd/wisp/panel_unbound_253r6_windows_test.go:181:})();`, strconv.Quote(envelope),
+71002d0:internal/panel/bound_dispatch_door_114_test.go:221:		out = append(out, b.site+" binds "+strconv.Quote(name)+" via "+b.arg)
+71002d0:internal/panel/bound_dispatch_door_114_test.go:511:		renamed[b.valueRel] = valueText[:b.valueStart] + strconv.Quote(b.name+"X") + valueText[b.valueEnd:]
+71002d0:internal/panel/inbound_roster_253_test.go:416:		quoted = append(quoted, strconv.Quote(n))
+71002d0:internal/panel/inbound_roster_253_test.go:647:				tc.name, quoteNames(ext), strconv.Quote(tc.want))
+71002d0:internal/panel/l2_grant_boundary_test.go:686:			typeText = strconv.Quote(typeText)
+71002d0:internal/panel/l2_grant_boundary_test.go:696:				": decodes into "+strconv.Quote(d.TypeName)+", a type from another package or not a struct: "+
+71002d0:internal/panel/l2_grant_boundary_test.go:714:	return strconv.Quote(s)
+71002d0:internal/panel/l2_grant_boundary_test.go:1133:			answeredElsewhere = append(answeredElsewhere, strconv.Quote(name)+" (written at "+where+")")
+71002d0:internal/panel/l2_grant_boundary_test.go:1136:			answeredGrantDoor = append(answeredGrantDoor, strconv.Quote(name)+" (written at "+where+")")
+71002d0:internal/panel/l2_grant_boundary_test.go:1153:			out = append(out, strconv.Quote(name))
+71002d0:internal/panel/l2_grant_boundary_test.go:1176:				What: "Go answers the inbound route " + strconv.Quote(route) + ", whose own name is an approval decision - a panel-side allow door (AGENTS.md §1.2 ban #6, D33/F2)",
+71002d0:internal/panel/l2_grant_boundary_test.go:1192:				what := "inbound envelope " + name + " can bind the JSON key " + strconv.Quote(f.JSONKey) +
+71002d0:internal/panel/l2_grant_boundary_test.go:1555:			lines = append(lines, h.GoPath+" binds "+strconv.Quote(h.Key))
+71002d0:internal/panel/l2_grant_boundary_test.go:1566:				lines = append(lines, h.GoPath+" binds "+strconv.Quote(h.Key))
+71002d0:internal/panel/l2_grant_boundary_test.go:1626:			t.Logf("flagged as required: %s binds %s", hits[0].GoPath, strconv.Quote(hits[0].Key))
+71002d0:internal/panel/l2_grant_boundary_test.go:1780:	doc := "{" + strconv.Quote(key) + ":\"grant\"}"
+71002d0:internal/tools/refusal_20r2_test.go:288:		"allowed_dirs = ["+strconv.Quote(outside)+"]", 1)
+71002d0:tools/d22scan/gitignore.go:362:		out = append(out, strconv.Quote(p))
+71002d0:tools/mockllm/sse.go:123:			route, strconv.Quote("injected_"+strconv.Itoa(f.status)))

@@ -1,0 +1,3 @@
+71002d0:internal/memory/schema.go:264:		body := strings.Map(func(r rune) rune {
+71002d0:internal/risk/provenance_test.go:765:	fw := strings.Map(func(r rune) rune { // full-width spelling of the marker
+71002d0:internal/secret/migrate.go:221:	return strings.Map(func(r rune) rune {

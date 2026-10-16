@@ -1,0 +1,3 @@
+71002d0:internal/agent/approval/ticket84_no_owner_test.go:235:	na, ael := callApprovalTimed(t, noUI, d, "(a) 默认门（UI 未接入）")
+71002d0:internal/agent/approval/ticket84_no_owner_test.go:236:	if na.a != tools.AnswerReject {
+71002d0:internal/agent/approval/ticket84_no_owner_test.go:237:		t.Errorf("(a) answer=%v why=%q, want an immediate %v", na.a, na.why, tools.AnswerReject)

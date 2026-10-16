@@ -1,0 +1,145 @@
+71002d0:cmd/wisp/always_write_no_clobber_226_test.go:104:			"(got %q, want the dark this run loaded): reading a hand edit back is ticket 223", got)
+71002d0:cmd/wisp/approval_reply.go:57:// no fifth channel and claims no loaded one, so nothing here can render an
+71002d0:cmd/wisp/approval_reply.go:436:// marks it loaded through Gate.Channels() in the same step, because the two
+71002d0:cmd/wisp/approval_reply.go:437:// belong together: a loaded-but-unproduced channel over-promises on the card
+71002d0:cmd/wisp/approval_reply_201_test.go:590:		// assembly then marks that channel loaded (approval_reply.go), because a
+71002d0:cmd/wisp/approval_reply_201_test.go:597:		target := filepath.Join(h.dir, "l1-window-vetoed-by-a-loaded-channel.txt")
+71002d0:cmd/wisp/approval_reply_201_test.go:618:				t.Error("declaring a cancel transport failed to mark that veto channel loaded")
+71002d0:cmd/wisp/config_receipt_255_test.go:625:			t.Fatalf("this case's premise moved: the loaded config already carries width %d", plantedWidth)
+71002d0:cmd/wisp/firstrun_198_test.go:228:		t.Fatalf("a config first-run wrote cannot be loaded: %v", err)
+71002d0:cmd/wisp/firstrun_257_nonpreset_test.go:110:		t.Fatal("AC#1 RED: a non-preset provider row with no protocol loaded, so the receipt's warning is describing a gate that is not there")
+71002d0:cmd/wisp/instructions_200r2_test.go:177:		t.Errorf("no projctx: manifest line for the loaded file on stderr:\n%s", f.err.String())
+71002d0:cmd/wisp/instructions_200r2_test.go:216:	// same directory now reads as loaded. Without this the off assertions above
+71002d0:cmd/wisp/panel_pump.go:106:// dropping the key), and after that whatever the loader actually did - loaded,
+71002d0:cmd/wisp/resident_approval_246_windows_test.go:60:// loaded-but-no-ball inconsistency the census named. bindBallHost is the only
+71002d0:cmd/wisp/resident_approval_246_windows_test.go:74:		t.Fatal("Esc got loaded with no ball window")
+71002d0:cmd/wisp/resident_approval_246_windows_test.go:83:			t.Fatalf("channel %s loaded in the resident leg: ticket 246 AC#6 says only Esc is wired", ch)
+71002d0:cmd/wisp/resident_approval_246_windows_test.go:310:// still a real assertion - it is the loaded flag that must stay false either way.
+71002d0:cmd/wisp/resident_approval_246_windows_test.go:319:		t.Fatalf("bindBallHost loaded the cancel channel with no executor behind it (ball up = %v)", rb.b != nil)
+71002d0:cmd/wisp/resident_approval_live_246_windows_test.go:104:		t.Fatal("Esc is not loaded with a real ball attached")
+71002d0:cmd/wisp/resident_approval_windows.go:119:	escLoad bool // the Esc channel was loaded (only ever with a real ball)
+71002d0:cmd/wisp/resident_approval_windows.go:559:		// 档一 for the same reason: the channel is not loaded, so no key is named.
+71002d0:cmd/wisp/resident_approval_windows.go:569:	// 档二: the channel IS loaded here, so the sentence names a key - and it names
+71002d0:cmd/wisp/resident_approval_windows.go:793:// what exists (a gate, one loaded channel) and what does not (a task source),
+71002d0:cmd/wisp/resident_approval_windows.go:798:	loaded := ra.escLoad
+71002d0:cmd/wisp/resident_approval_windows.go:800:	if !loaded {
+71002d0:cmd/wisp/resident_approval_windows.go:983:			out += "loaded"
+71002d0:cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:38:	// oldR4CardLine is the loaded cancel-channel line as approval rendered it
+71002d0:cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:83:	// The channel gets loaded the way production loads it (bindBallHost with a
+71002d0:cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:120:// refused to book overnight: with no ball window the channel is NOT loaded, and
+71002d0:cmd/wisp/resident_cancel_key_label_260r4_windows_test.go:169:		// Channel not loaded in a fresh gate -> the slot form. If this ever reads
+71002d0:cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:31:// The three 档一 sentences (no channel loaded at all) are a THIRD shape, per
+71002d0:cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go:154:// sentences printed when the cancel channel is NOT loaded must say the slot is
+71002d0:cmd/wisp/resident_sink_nail_127_windows_test.go:596:	// running this package's full suite on a loaded host, the child took the
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:171:				t.Errorf("%s: a refused assembly still loaded a channel", c.name)
+71002d0:cmd/wisp/resident_task_source_windows.go:568:// having loaded Esc behind a real window, because approval_reply.go's rule is that
+71002d0:cmd/wisp/resident_task_source_windows.go:573:	loaded := ra.escLoad
+71002d0:cmd/wisp/resident_task_source_windows.go:575:	if !loaded {
+71002d0:cmd/wisp/run.go:146:	// here and marks it loaded in the same step.
+71002d0:cmd/wisp/run.go:554:	// The approval layer (A13). Channels loaded here are the honest set for a
+71002d0:cmd/wisp/run.go:719:		// reports what was loaded (or which of the five states stopped it)
+71002d0:frontend/src/main.tsx:11: * The host page is loaded three ways and only one of them carries data:
+71002d0:frontend/vite.config.ts:7:// The panel is loaded by WebView2 from embedded bytes, not over HTTP
+71002d0:internal/agent/approval/approval.go:103:// line prints when the channel is NOT loaded, i.e. when there is no key to
+71002d0:internal/agent/approval/approval.go:143:// through a channel it never loaded, and cannot make an unloaded channel look
+71002d0:internal/agent/approval/approval.go:185:// cancelKeyLabel is the loaded form of the cancel channel's label: the key this
+71002d0:internal/agent/approval/approval.go:190:// live or DID happen: the availability line of a loaded channel, and the three
+71002d0:internal/agent/approval/approval.go:204:// claims: loaded -> name the key this host holds; not loaded -> name the SLOT,
+71002d0:internal/agent/approval/approval.go:209:func channelStatusLabel(ch Channel, loaded bool) string {
+71002d0:internal/agent/approval/approval.go:210:	if ch == ChannelEsc && !loaded {
+71002d0:internal/agent/approval/approval.go:234:		// reached ONLY when the channel is not loaded, so there is no key to
+71002d0:internal/agent/approval/approval.go:247:// loaded. It is returned, not swallowed: a silently ignored cancel attempt is
+71002d0:internal/agent/approval/approval.go:265:// are loaded. Loadedness is NOT taken from the veto request: the caller cannot
+71002d0:internal/agent/approval/approval.go:267:// the flag only when the backing subsystem is really up (KWS model loaded,
+71002d0:internal/agent/approval/approval.go:271:	loaded map[Channel]bool
+71002d0:internal/agent/approval/approval.go:274:// NewChannels builds a registry from the channels that are loaded today.
+71002d0:internal/agent/approval/approval.go:275:func NewChannels(loaded ...Channel) *ChannelRegistry {
+71002d0:internal/agent/approval/approval.go:280:	for _, ch := range loaded {
+71002d0:internal/agent/approval/approval.go:285:	return &ChannelRegistry{loaded: m}
+71002d0:internal/agent/approval/approval.go:301:	return r.loaded[ch]
+71002d0:internal/agent/approval/approval.go:313:		r.loaded[ch] = ok
+71002d0:internal/agent/approval/approval.go:321:		loaded := r.Loaded(ch)
+71002d0:internal/agent/approval/approval.go:322:		st := ChannelStatus{Channel: ch, Loaded: loaded}
+71002d0:internal/agent/approval/approval.go:323:		if loaded {
+71002d0:internal/agent/approval/approval.go:334:// loaded. Every veto path in this package goes through here.
+71002d0:internal/agent/approval/cancel_key_label_260r4_test.go:47:	// oldR4EscLabel is the string this package printed for the loaded cancel
+71002d0:internal/agent/approval/cancel_key_label_260r4_test.go:211:// the default nor the configured one - while the loaded half keeps naming the
+71002d0:internal/agent/approval/cancel_key_label_260r4_test.go:238:		// may read as "loaded": the loaded form must not appear in the unloaded
+71002d0:internal/agent/approval/cancel_key_label_260r4_test.go:244:	// And the loaded branch of the same registry says the OPPOSITE, so the two
+71002d0:internal/agent/approval/cancel_key_label_260r4_test.go:247:	loaded := escStatus(t, approval.NewChannels(approval.ChannelEsc))
+71002d0:internal/agent/approval/cancel_key_label_260r4_test.go:248:	if !strings.Contains(loaded.Text, r4SeededKey) || strings.Contains(loaded.Text, "不可用") {
+71002d0:internal/agent/approval/cancel_key_label_260r4_test.go:249:		t.Errorf("已加载那行不再是「念当前那枚键」：%q", loaded.Text)
+71002d0:internal/agent/approval/cancel_key_label_260r4_test.go:296:	// window either: only the loaded channel can, and it answers with a refusal.
+71002d0:internal/agent/approval/cancel_key_label_260r4_test.go:298:		t.Fatalf("loaded-channel veto: %v", err)
+71002d0:internal/agent/approval/cancel_key_wording_260r3_test.go:7:// channel is not loaded, so there is no borrowed key to print. The unavailable
+71002d0:internal/agent/approval/cancel_key_wording_260r3_test.go:12:// The loaded-channel label (the 第十枚 of A595's ten) is the ONE string 260-r3 did
+71002d0:internal/agent/approval/gate.go:23:	// Channels states which veto channels are really loaded. nil means
+71002d0:internal/agent/approval/gate.go:415:// wording) for a channel the host never loaded, ErrUnknownCorrelation when the
+71002d0:internal/agent/approval/window_test.go:82:// The ticket's demanded assertion: a channel that is not loaded must be
+71002d0:internal/agent/approval/window_test.go:86:	// Ball + Esc loaded, KWS (ticket 41) and panel (ticket 37) not.
+71002d0:internal/agent/instructions_test.go:3:// Ticket 200 acceptance instruments on the agent side: AC#1 (the loaded text
+71002d0:internal/agent/instructions_test.go:64:// AC#1: the loaded block is in the request BODY that went over the wire, not
+71002d0:internal/agent/instructions_test.go:101:		t.Error("nothing printed about what was loaded")
+71002d0:internal/agent/instructions_test.go:105:		t.Errorf("loop manifest does not name the loaded file: %v", lines)
+71002d0:internal/agent/instructions_test.go:226:	loaded := newHarness(t, "text-reply")
+71002d0:internal/agent/instructions_test.go:230:	loaded.loop.AttachProjectInstructions(loaderFor(t, dir, loaded.loop.Budgets(), prov, nil))
+71002d0:internal/agent/instructions_test.go:232:	loaded.run("按项目规矩删掉临时目录")
+71002d0:internal/agent/instructions_test.go:234:	if !reflect.DeepEqual(plain.loop.guard, loaded.loop.guard) {
+71002d0:internal/agent/instructions_test.go:236:			plain.loop.guard, loaded.loop.guard)
+71002d0:internal/agent/instructions_test.go:238:	a, b := plain.loop.opt.Config, loaded.loop.opt.Config
+71002d0:internal/agent/instructions_test.go:253:	if !reflect.DeepEqual(plain.loop.Budgets(), loaded.loop.Budgets()) {
+71002d0:internal/agent/instructions_test.go:259:	if !bytes.Contains(bytes.Join(loaded.requestBodies(), []byte(" ")), []byte("WISP200HOSTILEBLOCK")) {
+71002d0:internal/ball/hotkey_live_test.go:425:	// Un-mute with the same key (D43 #10, KWS loaded -> Armed).
+71002d0:internal/config/boundary_test.go:210:		t.Fatalf("loaded struct differs from saved struct")
+71002d0:internal/config/loader.go:26:// Resolved carries the plaintext secrets of one loaded config, keyed for the
+71002d0:internal/config/settings.go:7:// process loaded at start-up, so any key the operator hand-edited while the process
+71002d0:internal/config/settings.go:300:		return nil, observe.New(observe.ClassConfig, "config: no loaded config in this Manager, refusing to write one")
+71002d0:internal/config/validate_267_test.go:66:	// At the lead: the config must be refused, not loaded-and-degraded.
+71002d0:internal/config/validate_267_test.go:80:		t.Fatalf("loaded confirm_timeout_sec = %d, want %d", c.Risk.ConfirmTimeoutSec, lead+1)
+71002d0:internal/config/writeguard.go:10:// rewrote config.toml from the values this process loaded at startup - and with
+71002d0:internal/config/writeguard.go:118:		loaded, err := readConfigFile(m.path)
+71002d0:internal/config/writeguard.go:124:		disk = loaded
+71002d0:internal/config/writeguard.go:135:		// A Manager built without a loaded config cannot exist in production
+71002d0:internal/config/writeguard_226_test.go:86:	// still holds what it loaded at startup (reading them back is ticket 223's
+71002d0:internal/config/writeguard_226_test.go:90:			"setting nobody confirmed: got %d, want the 56 this process loaded", m.Config().Ball.Size)
+71002d0:internal/llm/enabled_reach_261_test.go:165:		t.Fatalf("precondition broken: off/nokey entries loaded as enabled = true")
+71002d0:internal/llm/enabled_reach_261_test.go:168:		t.Fatalf("precondition broken: the explicit true entry loaded as false")
+71002d0:internal/llm/enabled_reach_261_test.go:306:	// pass 1: as loaded from the hand-written file - enabled=false.
+71002d0:internal/panel/composer.go:64:	// is (off / none_found / refused / not_run / loaded). 200-r2 replaced the
+71002d0:internal/panel/instructions_200.go:27:	InstructionsStatusLoaded = "loaded"
+71002d0:internal/panel/instructions_200.go:38:	// InstructionsStatusNotRun: a loader is wired but no turn has loaded yet -
+71002d0:internal/panel/instructions_200.go:43:// ProjectInstructionFile is one loaded instruction file, as the panel sees it.
+71002d0:internal/panel/instructions_200.go:74:	// Reason is the loader's own sentence for a non-loaded state, verbatim from
+71002d0:internal/panel/instructions_200.go:75:	// the place that made the decision. Omitted when the run loaded files,
+71002d0:internal/panel/instructions_200.go:78:	// Files is this turn's manifest. Empty array when nothing was loaded.
+71002d0:internal/panel/instructions_200.go:200:// WithInstructions returns s carrying the loaded-instruction list. Snapshots
+71002d0:internal/panel/instructions_200_test.go:14://     loaded", "refused" and "no reading yet" must not collapse into one absent
+71002d0:internal/panel/instructions_200_test.go:129:		t.Fatalf("the control loaded neither file (%+v): the refusal case above proves nothing", b2.Files)
+71002d0:internal/panel/instructions_200_test.go:164:			"loaded",
+71002d0:internal/panel/instructions_200_test.go:211:		{"off", "loaded"},
+71002d0:internal/panel/instructions_200_test.go:212:		{"none_found", "loaded"},
+71002d0:internal/panel/instructions_200_test.go:230:	if strings.Contains(wire["loaded"], "STATE200R2HEAD") {
+71002d0:internal/panel/instructions_200_test.go:231:		t.Errorf("instruction BODY leaked into the snapshot wire: %s", wire["loaded"])
+71002d0:internal/panel/instructions_200_test.go:256:	// give (no turn yet / one file loaded) are two statuses, not one status and
+71002d0:internal/perm/ticket90_persist_test.go:319:		t.Fatal("an unparsable permission_mode loaded without error; it would then silently mean " +
+71002d0:internal/projctx/projctx.go:13://   - the loaded set is printed per turn (pi's loadedResourcesContainer);
+71002d0:internal/projctx/projctx.go:53:// inside one directory, and only ONE file per directory is ever loaded: a
+71002d0:internal/projctx/projctx.go:71:// stay untrusted data. It is emitted in front of every loaded body, and it is
+71002d0:internal/projctx/projctx.go:219:// nothing was loaded). The loop calls it once per assembled request, i.e. once
+71002d0:internal/projctx/projctx.go:341:// stamp marks the loaded content with an EXISTING C25 source name (AC#6).
+71002d0:internal/projctx/projctx_test.go:303:// AC#6: the loaded content is stamped into C25 with an EXISTING source name.
+71002d0:internal/projctx/projctx_test.go:322:		t.Fatal("nothing loaded")
+71002d0:internal/projctx/projctx_test.go:394:// proves the same directory is loaded when the switch is on.
+71002d0:internal/projctx/projctx_test.go:420:		t.Fatal("control run loaded nothing: the off-switch result above proves nothing")
+71002d0:internal/risk/pathresolver.go:401:		if _, loaded := anchorCache.LoadOrStore(key, f); !loaded {
+71002d0:internal/statemachine/events.go:70:	KwsLoaded        bool // rows #10, #32: KWS loaded?
+71002d0:internal/statemachine/table.go:76:		Guard: "kws-loaded", GuardFn: func(f *Facts) bool { return f.KwsLoaded },
+71002d0:internal/statemachine/table.go:80:		Guard: "kws-not-loaded", GuardFn: func(f *Facts) bool { return !f.KwsLoaded },
+71002d0:internal/statemachine/table.go:232:		Guard: "kws-not-loaded", GuardFn: func(f *Facts) bool { return !f.KwsLoaded },
+71002d0:internal/statemachine/table.go:237:		Guard:       "kws-loaded",
+71002d0:internal/tools/subagent_222_test.go:65:// a loaded machine cannot turn a post-fix run into a false red. No assertion here
+71002d0:tools/d22scan/gitignore.go:129://     holds() keeps being loaded from the FULL list for exactly that reason.
+71002d0:tools/d22scan/gitignore.go:189:// a half-loaded index would be a new blindfold, so any failure yields
+71002d0:tools/d22scan/gitignore.go:288:// it, and a half-loaded index must not be assembled anywhere.
+71002d0:tools/d22scan/scan_test.go:1635:		t.Error("holds() does not know a path the index plainly holds: the guard leg is being loaded from `git ls-files -i -c --exclude-standard` instead of `git ls-files -z`, which cannot see a tracked path git does not match a rule against - precisely the matcher-over-skips class F3 ① and F3 ② are two instances of")
+71002d0:tools/d22scan/selftestsamples.go:145:			"var loaded = cfg{APIKey: \"PROBE161NOTACREDENTIAL0002\"}\n",

@@ -1,0 +1,14 @@
+71002d0:cmd/wisp/resident_hotkey_258_windows_test.go:253:		if strings.ContainsAny(w, "%\n") {
+71002d0:cmd/wisp/secret.go:613:	if strings.ContainsAny(v, "\r\n") {
+71002d0:internal/agent/spill_pointer_honesty_174_test.go:237:			if strings.ContainsAny(notice, `/\`) {
+71002d0:internal/ball/tokens_table_test.go:1166:		if !strings.ContainsAny(r.reason, "`0123456789") {
+71002d0:internal/config/parse.go:108:		if strings.ContainsAny(k, "/") {
+71002d0:internal/panel/approval_test.go:74:		if strings.ContainsAny(view.Reason, "\x00") {
+71002d0:internal/panel/attachments.go:301:	if strings.ContainsAny(name, "\x00\r\n\t") {
+71002d0:internal/risk/provenance.go:1010:	if t == "" || strings.ContainsAny(t, " \t\r\n") {
+71002d0:internal/secret/refs.go:39:		if name == "" || len(name) > 128 || strings.ContainsAny(name, " \t\r\n=:") {
+71002d0:internal/tools/fs_staging.go:162:	if strings.ContainsAny(random, `\/*:`) {
+71002d0:internal/winsec/notice_kind_and_everyone_118_windows_test.go:484:		if body == "" || !strings.ContainsAny(body, "(:") {
+71002d0:tools/d22scan/main.go:991:	if strings.ContainsAny(raw, " \t\n") {
+71002d0:tools/d22scan/main.go:999:	hasDigit := strings.ContainsAny(raw, "0123456789")
+71002d0:tools/mockllm/chat.go:413:	if name == "" || strings.ContainsAny(name, "/\\") || strings.Contains(name, "..") {

@@ -1,0 +1,11 @@
+71002d0:cmd/wisp/run_test.go:131:			f.notices = append(f.notices, title+"\x00"+body)
+71002d0:internal/agent/spill_name_injectivity_test.go:205:		"../../escape", "%", "%2F", "%zz", "tool-output-x.txt", "\x00\x7f\xff",
+71002d0:internal/panel/approval_test.go:74:		if strings.ContainsAny(view.Reason, "\x00") {
+71002d0:internal/panel/attachments.go:301:	if strings.ContainsAny(name, "\x00\r\n\t") {
+71002d0:internal/panel/attachments_test.go:86:	webpBytes = append([]byte("RIFF\x00\x00\x00\x00WEBPVP8 "), bytes.Repeat([]byte{0}, 16)...)
+71002d0:internal/panel/inbound_roster_253_test.go:533:			dst[k] = "\x00ambiguous:" + old + "/" + v
+71002d0:internal/risk/rules_shell.go:12:const shellMetachars = "|;&><`$()^\n\r\x00"
+71002d0:internal/tools/fs_staging.go:92:	sum := sha256.Sum256([]byte(strings.Join([]string{exe, user, tempPrefix}, "\x00")))
+71002d0:tools/d22scan/gitignore.go:429:	for _, p := range strings.Split(z, "\x00") {
+71002d0:tools/d22scan/scan_test.go:2159:		for _, p := range strings.Split(stdout.String(), "\x00") {
+71002d0:tools/d22scan/selftest.go:359:func (c selfCase) hash() string { return c.file + "\x00" + c.src + "\x00" + c.allow }

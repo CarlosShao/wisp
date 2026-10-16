@@ -1,0 +1,32 @@
+71002d0:cmd/wisp/approval_always.go:9:// and the stored rule widens the allowlist for every future call. This file makes
+71002d0:cmd/wisp/approval_always.go:43:// is still judged by the old allowlist - the promise 一直 makes is "next time", and
+71002d0:cmd/wisp/approval_reply.go:563:// not a wire protocol, and nothing here is a C17 method name.
+71002d0:cmd/wisp/config_reload.go:87:// the model can call. Neither is a C4 registration and neither is a C17 method.
+71002d0:cmd/wisp/panel_config_store.go:195:// ApplySetting maps one whitelisted field onto the config key it owns and writes
+71002d0:cmd/wisp/panel_host_windows.go:415:	// panel.ParseComposerRequest inside Handle, whose whitelist is fixed at the
+71002d0:cmd/wisp/panel_host_windows.go:856:// Touches no page file, binds nothing new, and leaves C17's roster unchanged.
+71002d0:cmd/wisp/panel_inbound.go:55://   - it answers two of the six whitelisted methods. The mode write is ticket
+71002d0:cmd/wisp/run.go:497:	// C26 canonicalizer over the [fs] allowlist; the same instance is shared
+71002d0:cmd/wisp/run.go:993:// the sibling child's own first allowlisted fs.read land on a real card and
+71002d0:internal/panel/approval.go:25:// correlationId (C17); the caller supplies the same Facts it gave the assessor
+71002d0:internal/panel/attachments.go:106:// attachmentType is one whitelisted content type: the sniff rule that recognises
+71002d0:internal/panel/attachments.go:115:// attachmentTypes is the whitelist. It is a table, not a switch, so AC#2's
+71002d0:internal/panel/attachments.go:151:// AcceptedMIMETypes lists the whitelist for the composer UI, so the panel can
+71002d0:internal/panel/bridge.go:6:// pipe (C17), the same envelope the approval card already uses. This file does
+71002d0:internal/panel/composer_dispatch.go:12:// hop: raw in, method + args out, one door per whitelisted method. Four when
+71002d0:internal/panel/composer_dispatch.go:17:// The whitelist decision is made exactly once, inside ParseComposerRequest, and
+71002d0:internal/panel/composer_dispatch.go:34:// whitelisted name that nobody handles is a request the user made and no one
+71002d0:internal/panel/composer_dispatch.go:63:// ErrNoHandlerAttached is the refusal for a method the whitelist answers while
+71002d0:internal/panel/composer_dispatch.go:128:// name is on the whitelist, so an assembly with no fetch leg must say so by name).
+71002d0:internal/panel/composer_dispatch.go:153:	// whitelist, so a machine with no settings leg attached must say so by name.
+71002d0:internal/panel/composer_dispatch.go:253:// the whitelist answered but this file has no case for.
+71002d0:internal/panel/config_handlers.go:10:// THE FIELD TABLE IS A WHITELIST, NOT A PARSER. A settings route that accepted a
+71002d0:internal/panel/doc.go:2:// window (hidden, not destroyed), PanelBridge (C17) with method whitelist,
+71002d0:internal/panel/doc.go:9://   - PanelBridge method whitelist + capability annotations + correlationId
+71002d0:internal/panel/git.go:19:// through the C17 route the router already serves) and it narrows a scope rather
+71002d0:internal/panel/subagent_roster_197.go:31://   - not a new C17 method. Clicking a row is navigation inside data the host
+71002d0:internal/panel/subagent_roster_197.go:39://     contract change (C17) and is handed back, not made.
+71002d0:internal/panel/workspace.go:36:// to a scripted set of verdicts without building a whole allowlist.
+71002d0:internal/panel/workspace.go:49:	// ResolveWorkspace applies C26 + existence + allowlist containment and
+71002d0:internal/panel/workspace_handlers.go:13:// route the panel already sends - panel.workspace.request, C17's second name at
+71002d0:internal/panel/workspace_handlers.go:226:// ResolveWorkspace refuses by name while unbound: there is no allowlist to

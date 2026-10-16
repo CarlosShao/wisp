@@ -1,0 +1,29 @@
+71002d0:cmd/wisp/approval_reply.go:571:		return s.reject(corr, sanitizeReplyText(arg))
+71002d0:cmd/wisp/approval_reply.go:575:		return s.panelReject(corr, sanitizeReplyText(arg))
+71002d0:cmd/wisp/approval_reply.go:599:// sanitizeReplyText washes one operator-typed reason.
+71002d0:cmd/wisp/approval_reply.go:609:func sanitizeReplyText(s string) string {
+71002d0:cmd/wisp/approval_reply_201_test.go:302:		// while its words are not (sanitizeReplyText).
+71002d0:internal/agent/spill_path_invariant_test.go:15://      control that deliberately performs the unsanitized join so the listing
+71002d0:internal/agent/spill_path_invariant_test.go:130:					t.Errorf("sanitized name %q still contains %q", sp.Name, bad)
+71002d0:internal/agent/spill_path_invariant_test.go:214:	// Errors are collected, not fatal: under the AC#3 mutation the sanitizer is
+71002d0:internal/agent/spill_path_invariant_test.go:266:	// API resolves it - minus the sanitizer.
+71002d0:internal/agent/spill_path_invariant_test.go:279:	// (c) POSITIVE CONTROL: perform the very same join with the sanitizer
+71002d0:internal/agent/spill_path_invariant_test.go:283:	unsanitized := filepath.Join(artifacts, "tool-output-"+control+".txt")
+71002d0:internal/agent/spill_path_invariant_test.go:284:	t.Logf("control: escape id %q resolves to %q (root is %q)", control, unsanitized, root)
+71002d0:internal/agent/spill_path_invariant_test.go:285:	if err := os.WriteFile(unsanitized, []byte("deliberate"), 0o644); err != nil {
+71002d0:internal/agent/spill_path_invariant_test.go:286:		t.Fatalf("control write failed (%s): %v - the escape id does not actually escape, so the control proves nothing", unsanitized, err)
+71002d0:internal/agent/spill_path_invariant_test.go:291:			unsanitized)
+71002d0:internal/agent/spill_path_invariant_test.go:293:	if err := os.Remove(unsanitized); err != nil {
+71002d0:internal/agent/spill_path_invariant_test.go:471:	// s.dir and the sanitizer artifactName(.
+71002d0:internal/agent/spill_path_invariant_test.go:537:				t.Errorf("%s(%s): the name half is not produced by the sanitizer artifactName()", sinkName, arg)
+71002d0:internal/agent/spill_path_invariant_test.go:553:// unsanitized - resolves to <root>\<marker>.txt ON THE PLATFORM RUNNING THE TEST.
+71002d0:internal/panel/attachments.go:85:	// Name is the sanitized display name (for humans only).
+71002d0:internal/panel/attachments.go:256:	ref.MIME, ref.Kind, ref.Name = accepted.mime, accepted.kind, sanitizeDisplayName(src.DisplayName)
+71002d0:internal/panel/attachments.go:307:// sanitizeDisplayName keeps a display name displayable: the store already
+71002d0:internal/panel/attachments.go:310:func sanitizeDisplayName(name string) string {
+71002d0:internal/secret/migrate.go:141:		ref := RefPrefixDPAPI + sanitizeBlobID(f.dotted)
+71002d0:internal/secret/migrate.go:214:// sanitizeBlobID maps a dotted TOML path to a safe blob file name: anything
+71002d0:internal/secret/migrate.go:217:func sanitizeBlobID(dotted string) string {
+71002d0:internal/tools/bridge.go:1201:		ArgsJSON:      sanitizeArgs(req.Args),
+71002d0:internal/tools/bridge.go:1288:// sanitizeArgs keeps the forensics column useful without letting it carry an
+71002d0:internal/tools/bridge.go:1290:func sanitizeArgs(raw json.RawMessage) string {

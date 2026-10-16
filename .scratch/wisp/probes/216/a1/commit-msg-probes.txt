@@ -1,0 +1,3 @@
+216-a1 归档普查工作面（probes/216/a1：README＋45 枚原始尺转写＋两枚 commit 正文）
+
+票 216 AC#1 只读普查腿的写面之一。来源锚=提交树快照 71002d0。交付正文已在 docs/evidence/s1/216-census.md；本目录是每把尺的 stdout/stderr 原始转写与过程件。临时件只建不删；不产 .go；frontend/internal 零字节。

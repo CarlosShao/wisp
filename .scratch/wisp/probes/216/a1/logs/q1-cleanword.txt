@@ -1,0 +1,512 @@
+71002d0:cmd/balldebug/diff_windows.go:562:		return "clean"
+71002d0:cmd/balldebug/main.go:402:// turn a panic into a clean exit and the registry would report nothing. The
+71002d0:cmd/wisp/approval_reply_201_test.go:100:	cleaner   []func()
+71002d0:cmd/wisp/approval_reply_201_test.go:162:		for _, fn := range h.cleaner {
+71002d0:cmd/wisp/approval_reply_201_test.go:197:	h.cleaner = append(h.cleaner, func() { _ = st.Close() })
+71002d0:cmd/wisp/config_receipt_255_test.go:273:	// line and this ruler would report "no readers anywhere" as a clean reading - the
+71002d0:cmd/wisp/config_reload.go:337:// this cleanup onto 255-r2): the reader was zero outside this file. It is now
+71002d0:cmd/wisp/config_sentences_223r2_test.go:120:				t.Fatalf("the planted file must fail the reload, got a clean one")
+71002d0:cmd/wisp/dataroot_128_test.go:519:	// directory would declare every leg clean.
+71002d0:cmd/wisp/dataroot_128_test.go:523:		t.Errorf("AC#1 RED (the instrument): walking a directory that does not exist produced no report at all, so a leg can be called clean by a start-up directory nobody could read")
+71002d0:cmd/wisp/dataroot_128_test.go:535:// cleanup can undo.
+71002d0:cmd/wisp/dispatch_hop_selfproof_133_test.go:331:	cleanRoster := map[string]bool{"TestFixtureAlphaDrivesTheLeg": true, self: true}
+71002d0:cmd/wisp/dispatch_hop_selfproof_133_test.go:332:	if got := pkg.runRosterReds135(legs, self, cleanRoster, len(cleanRoster), nil); len(got) != 0 {
+71002d0:cmd/wisp/firstrun.go:58://     stand-in, run_mode101_test.go:621-633) stats clean, so it is not missing
+71002d0:cmd/wisp/firstrun_257_nonpreset_test.go:44:// t257npCleanMachine is this file's own clean machine: empty temp root, premise
+71002d0:cmd/wisp/firstrun_257_nonpreset_test.go:53:		t.Fatalf("AC#1 premise broke: the clean machine already holds %q", cfgPath)
+71002d0:cmd/wisp/firstrun_257_test.go:77:		t.Fatalf("AC#1 premise broke: the clean machine already holds %q (stat err %v)", cfgPath, err)
+71002d0:cmd/wisp/firstrun_257_test.go:86:		t.Fatalf("first run created no config.toml, so there is no clean machine to walk: %v", err)
+71002d0:cmd/wisp/firstrun_257_test.go:109:			return m.SetProviderBaseURL(t257Provider, "https://clean-machine.example.invalid/v1")
+71002d0:cmd/wisp/firstrun_257_test.go:185:			t.Errorf("%s: the clean machine accepted the write (%v) - nothing was left to explain", f.field, written)
+71002d0:cmd/wisp/firstrun_257_test.go:216:	t.Logf("AC#1 clean machine: 7 refused writes by reason: %v", byReason)
+71002d0:cmd/wisp/leg_dispatch_gate_133_test.go:1604:// the audited object proving itself clean. The roster below comes from the binary's own
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:82:// rather than as a clean ledger. Measured on the same linux build, that gate runs
+71002d0:cmd/wisp/panel_config_248_test.go:50:// the SAME code path - a ruler that is only ever pointed at clean trees proves
+71002d0:cmd/wisp/panel_config_248_test.go:153:// whole artifact surface stays clean.
+71002d0:cmd/wisp/panel_config_248_test.go:202:	// And the write itself happened, or the clean reading above is just a silence.
+71002d0:cmd/wisp/panel_control_windows.go:41:// tree's port reads rc=0 (vet-clean.txt beside it). The case below therefore
+71002d0:cmd/wisp/panel_control_windows.go:509:// (measured: attempt 2 returns clean in every failing run so far). The bounded
+71002d0:cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go:264:// failure, never a clean pass: a census that read no files proves nothing about any door.
+71002d0:cmd/wisp/panel_dispatch_binding_roster_253r1_windows_test.go:544:// -visible branch, self-owned strings): the honest binding is clean, and each of the three
+71002d0:cmd/wisp/panel_geometry_255r6_range_windows_test.go:53:// that read no files proves nothing and must never report a clean zero.
+71002d0:cmd/wisp/panel_host_gate_test.go:396:		t.Fatalf("go toolchain not on PATH for the clean-checkout build: %v", err)
+71002d0:cmd/wisp/panel_host_gate_test.go:402:	// clean build can never find its main module.
+71002d0:cmd/wisp/panel_host_gate_test.go:413:		t.Fatalf("clean-checkout: go.mod not at %s after extract (%v)", tmp, err)
+71002d0:cmd/wisp/panel_host_gate_test.go:421:		t.Fatalf("clean-checkout go build ./... failed: %v\n%s", err, tail(string(out), 4000))
+71002d0:cmd/wisp/panel_host_gate_test.go:423:	t.Logf("clean-checkout go build ./... ok in %s", tmp)
+71002d0:cmd/wisp/panel_host_windows.go:357:	// by name, instead of creating on a thread it cannot make clean - the alternative
+71002d0:cmd/wisp/panel_host_windows.go:379:	// Destroyed it and this thread dispatched that close) reads clean and creates
+71002d0:cmd/wisp/panel_host_windows.go:871:// call - still reported a clean native exit. So the flag is now raised where a frame is
+71002d0:cmd/wisp/panel_host_windows.go:1046:	slog.Warn("panel host: pre-create quit-drain hit its cap before the queue was clean",
+71002d0:cmd/wisp/panel_host_windows_test.go:39:// owns itself, recovers anything the pump raises, and stops cleanly when
+71002d0:cmd/wisp/panel_host_windows_test.go:831:	// Destroy for good leaves no window (the recreate path starts clean).
+71002d0:cmd/wisp/panel_locked_naming_33r11_windows_test.go:398:	t.Logf("33-r11 positive control: planted %s reported with %v, honest name clean, unsuffixed self-locker untouched",
+71002d0:cmd/wisp/panel_locked_naming_33r11_windows_test.go:411:		t.Fatalf("the old shape (Locked suffix, body takes m.mu) came out clean: the pin cannot bite the very shape ticket 33 recorded")
+71002d0:cmd/wisp/panel_reshow_255r8_winlive_test.go:120:	// still be flushing, and that race reddens the cleanup rather than the reading
+71002d0:cmd/wisp/panel_reshow_255r8_winlive_test.go:122:	// the panel thread had already exited cleanly). startPanelForTest uses the same
+71002d0:cmd/wisp/panel_resident_windows.go:28:// thread's clean exit an observable fact instead of a hope.
+71002d0:cmd/wisp/panel_resident_windows.go:418:// say bringUp may NOT clean the queue itself: the message it refuses on can belong to
+71002d0:cmd/wisp/panel_resident_windows.go:558:		slog.Info("panel thread exited cleanly", "shows", rp.shows.Load(), "toggles", rp.toggles.Load(), "disposals", rp.disposals.Load())
+71002d0:cmd/wisp/panel_resident_windows_test.go:57:// dir, the real fail-closed dispatch chain) and returns it with the cleanups
+71002d0:cmd/wisp/panel_resident_windows_test.go:519:// test now releases its thread clean and checks that it did: dispatch to empty, then
+71002d0:cmd/wisp/panel_resident_windows_test.go:592:// it hung 1 run in 3 inside that same GetMessageW. So bringUp neither cleans nor
+71002d0:cmd/wisp/panel_resident_windows_test.go:661:		t.Errorf("bringUp refused the thread but the queued WM_CLOSE is gone - it cleaned somebody else's queue on the way out, which is the remove-only shape 33-r7 ① measured leaking a window per create and hanging 1 run in 3 inside GetMessageW")
+71002d0:cmd/wisp/panel_resident_windows_test.go:664:		t.Errorf("this test releases OS thread %d with windows=%d and queue head=%s; it refused to clean another owner's thread, so it must not leave one poisoned either", o.tid, o.leftWindows, o.head)
+71002d0:cmd/wisp/panel_resident_windows_test.go:707:// thread dispatched that close itself - reads clean and creates fine ("PRE-CREATE
+71002d0:cmd/wisp/panel_transport_35r2_test.go:9:// (forwardingInstalled(), three strings.Contains) and then handed msgcb a clean RPC
+71002d0:cmd/wisp/resident_approval_246_windows_test.go:262:		t.Errorf("AC#4 RED: the console does not report a clean 10-step exit: %q",
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:106:		t.Fatalf("setup: the loader answered with the not-exist sentinel (%v) on a file that stats clean - the split this ticket lands is built on exactly that sentinel, so the premise has to hold", loadErr)
+71002d0:cmd/wisp/resident_audio_windows.go:348:// if any, so the shutdown record carries it instead of a clean-looking nil.
+71002d0:cmd/wisp/resident_ball_228_windows_test.go:206:		t.Errorf("AC#1 RED: the child answered a boot-time Ctrl+C with %v, want a clean exit 0 through the "+
+71002d0:cmd/wisp/resident_ball_228_windows_test.go:221:	t.Logf("AC#1 READING: boot-time break exited clean; install=%d shutdown trail starts at %d of %d record(s); ball records created=%d stopped=%d",
+71002d0:cmd/wisp/resident_ball_windows.go:385:	// a clean boot here prints nothing and still holds no Esc.
+71002d0:cmd/wisp/resident_hotkey_live_258_windows_test.go:241:// the locked thread's queue and released in cleanup); nothing pumps it.
+71002d0:cmd/wisp/resident_hotkey_live_258_windows_test.go:290:	return "held by THIS test process (squatted on a locked thread before the child booted, released in cleanup)"
+71002d0:cmd/wisp/resident_sink_nail_127_windows_test.go:216:// which is why that case can ask for a clean exit at all.
+71002d0:cmd/wisp/resident_sink_nail_127_windows_test.go:289:	// hears about through the case that asked for a clean exit, not a hang.
+71002d0:cmd/wisp/resident_task_source_live_246_windows_test.go:231:		t.Errorf("AC#7 LIVE RED: exit %v on a clean leg.\n%s", leg.waitErr, leg.console())
+71002d0:cmd/wisp/resident_task_source_live_246_windows_test.go:240:		t.Errorf("AC#7 LIVE RED: no clean 10-step exit: %q", tailLine(leg.stdout.String(), "shutdown order"))
+71002d0:cmd/wisp/resident_windows.go:442:		fmt.Printf("wisp: resident event loop running (task source: %s); %s (Ctrl+C exits cleanly)\n",
+71002d0:cmd/wisp/run.go:470:	// construction rather than by a cleanup step somebody might forget.
+71002d0:cmd/wisp/run_mode101_test.go:631:			// leave t.TempDir's cleanup unable to delete the tree).
+71002d0:cmd/wisp/secret_dataroot_119b_test.go:57:	clean string // the kernel's own spelling of that same tree
+71002d0:cmd/wisp/secret_dataroot_119b_test.go:79:	p.clean, err = filepath.EvalSymlinks(p.link)
+71002d0:cmd/wisp/secret_dataroot_119b_test.go:86:	if p.clean == p.link {
+71002d0:cmd/wisp/secret_dataroot_119b_test.go:157:	cleanCfg := filepath.Join(p.clean, ".config")
+71002d0:cmd/wisp/secret_dataroot_119b_test.go:171:	assertSecretRouteSeals119b(t, cfg, cleanCfg)
+71002d0:cmd/wisp/secret_dataroot_119b_test.go:192:	assertSecretRouteSeals119b(t, cfg, p.clean)
+71002d0:cmd/wisp/slo_report_144_windows_test.go:664:// follow it), and a document that parsed cleanly but carries no state report
+71002d0:cmd/wisp/slo_report_144_windows_test.go:696:	// Parsed cleanly, complete, and not a subject report: field carries the end
+71002d0:cmd/wisp/slo_windows.go:499:	// observer's cleanup.
+71002d0:cmd/wisp/slo_windows.go:550:	// that parsed cleanly and carries no state report. No amount of waiting
+71002d0:cmd/wisp/slo_windows.go:600:	// second value after the first, or a document that parsed cleanly and carries
+71002d0:cmd/wisp/slo_windows.go:757:		// Parsed cleanly, complete, and still not a subject report: this is the
+71002d0:cmd/wisp/task_scope_close_151_test.go:92:		out2, err2 := rt.bridge.Execute(ctx, req151("host-151-clean", "fs.read", plain))
+71002d0:cmd/wisp/ticket224_assembly_test.go:510:		// cleanup step somebody could forget (SPEC-02 §4 keeps it for the audit).
+71002d0:frontend/.gitignore:10:# in a clean checkout, so the single anchor file stays tracked (ticket 77 AC#1,
+71002d0:frontend/VENDORED.md:251:  > （`header(job, commit, cleaned.replaced)`），所以**手改那几行是徒劳的**——一次 re-vendor 会整段重写。
+71002d0:frontend/embed.go:11:// embed pattern in a clean checkout that has not run the frontend build. With
+71002d0:frontend/scripts/render-nav.tsx:40:   clean checkout where those files exist. A gate that depends on which of us
+71002d0:frontend/scripts/vendor-beautifului.mjs:225:      const cleaned = specifiers
+71002d0:frontend/scripts/vendor-beautifului.mjs:231:      return `import { ${cleaned} } from "@/components/ai-native/${kebab(comp)}"`;
+71002d0:frontend/scripts/vendor-beautifului.mjs:300:  const cleaned = asciiize(body, job.dest);
+71002d0:frontend/scripts/vendor-beautifului.mjs:301:  writeFileSync(join(frontendRoot, job.dest), header(job, commit, cleaned.replaced) + cleaned.text, "utf8");
+71002d0:frontend/scripts/vendor-beautifului.mjs:303:    `vendored ${job.dest}  (${job.component}, upstream ${commit}, glyphs ASCII-ized: ${cleaned.replaced}, subs: ${(job.subs ?? []).length})\n`,
+71002d0:frontend/scripts/vendor.mjs:125:  const cleaned = asciiize(body, job.dest);
+71002d0:frontend/scripts/vendor.mjs:126:  writeFileSync(join(frontendRoot, job.dest), header(job, commit, cleaned.replaced) + cleaned.text, "utf8");
+71002d0:frontend/scripts/vendor.mjs:127:  stdout.write(`vendored ${job.dest}  (${job.component}, upstream ${commit.slice(0, 12)}, glyphs ASCII-ized: ${cleaned.replaced})\n`);
+71002d0:frontend/src/components/harness/right-rail.tsx:153:    // to the token by name is both honest and gate-clean.
+71002d0:frontend/src/components/react-bits/line-sidebar.tsx:49:       the cancel is already in the cleanup effect.
+71002d0:frontend/src/fixtures/harness-app.ts:31:        denied clean.ps1), not newly invented verdicts.
+71002d0:frontend/src/fixtures/harness-app.ts:436:  id: "sess-cleanup",
+71002d0:frontend/src/fixtures/harness-app.ts:454:    { role: "user", id: "m-c1", text: "运行 clean.ps1 清理 C:\\Windows\\Temp。" },
+71002d0:frontend/src/fixtures/harness-app.ts:548:    id 即 SESSIONS 的 id：点击直接打开对应会话；sess-cleanup 的会话状态是
+71002d0:frontend/src/fixtures/harness-app.ts:552:  { id: "sess-cleanup", title: "磁盘清理脚本", status: "failed" },
+71002d0:frontend/src/fixtures/harness-app.ts:571:  { id: "rt-cleanup", title: "磁盘清理脚本", meta: "昨天 16:05", status: "denied" },
+71002d0:frontend/src/fixtures/harness.ts:48:      // demo approval.js's second queue entry (clean.ps1), as argv elements.
+71002d0:frontend/src/fixtures/harness.ts:55:        "clean.ps1",
+71002d0:frontend/src/fixtures/harness.ts:60:        "clean.log",
+71002d0:frontend/src/fixtures/harness.ts:138:      "clean.ps1",
+71002d0:frontend/src/fixtures/harness.ts:143:      "clean.log",
+71002d0:frontend/src/styles/theme.css:125:   fix, not a cleanup. Both were dead - no component ever put either class on
+71002d0:internal/agent/approval/doc.go:37://     longer reached; the deletion is dead-code cleanup now, not a live fix.
+71002d0:internal/agent/approval/fakes_test.go:175:// cleanup. No test goroutine is allowed to outlive its test (the repo rule is
+71002d0:internal/agent/approval/report.go:13:// The contract has one law - never render a cancelled call as a clean undo.
+71002d0:internal/agent/approval/report.go:133:		// or a timeout. Still not a clean undo, and saying 「未进入执行阶段」
+71002d0:internal/agent/approval/report.go:134:		// over a list of side effects would be the fake-clean-cancel wording D31
+71002d0:internal/agent/approval/ticket220_l1_window_read_test.go:193:// purpose: releasing it is the case's last step, never a cleanup the case relies
+71002d0:internal/agent/approval/ticket259_denial_rulers_test.go:102:			_ = q.reject(it.Corr, "259 fixture cleanup")
+71002d0:internal/agent/approval/ticket259_denial_rulers_test.go:219:		t.Fatalf("AC#2 fixture: %d pending item(s) after cleanup", n)
+71002d0:internal/agent/approval/window_test.go:206:// applied-steps report shape, and must never read like a clean undo.
+71002d0:internal/agent/approval/zz_201_a1_junction_marker_windows_test.go:244:	// ---- negative control: the same derivation on a clean card -------------
+71002d0:internal/agent/approval/zz_201_a1_junction_marker_windows_test.go:248:	// clean cards, which is the regression direction the fix must not have.
+71002d0:internal/agent/approval/zz_201_a1_junction_marker_windows_test.go:249:	clean := filepath.Join(outside, "victim.txt")
+71002d0:internal/agent/approval/zz_201_a1_junction_marker_windows_test.go:252:	cargs, err := json.Marshal(map[string]any{"path": strings.ReplaceAll(clean, `\`, "/")})
+71002d0:internal/agent/compress_trace_test.go:328:		t.Fatalf("run status = %s (%s), want completed: the trace test needs a clean pass",
+71002d0:internal/agent/loop.go:87:	// Message is the user-visible status line for non-clean endings (Stuck,
+71002d0:internal/agent/loop.go:1002:// just like the clean paths do - so a cancelled task must still be able to
+71002d0:internal/agent/spill_name_injectivity_test.go:200:// decode, so a clean sweep here is a 1:1 proof over the corpus.
+71002d0:internal/agent/spill_path_invariant_test.go:294:		t.Errorf("cleaning up the control file: %v", err)
+71002d0:internal/agent/spill_path_invariant_test.go:329:		t.Errorf("cleaning up the literal-backslash control file: %v", err)
+71002d0:internal/agent/spill_path_invariant_test.go:599:// inv76aKeyOf is how the probe names a physical path: root-relative, cleaned and
+71002d0:internal/audio/mmdevice_windows.go:213:// vet-cleanly from Go. So QI declines everything - a normal COM outcome for
+71002d0:internal/audio/mmdevice_windows.go:250:// registry (no uintptr->pointer conversion; vet-clean).
+71002d0:internal/audio/wasapi_windows.go:10:// unsafe discipline (vet-clean, same as internal/ball): COM object pointers
+71002d0:internal/audio/wasapi_windows.go:128:// here (vet-clean; unsafeptr check).
+71002d0:internal/ball/d2d_windows.go:105:// vtable deref below then needs no uintptr->pointer conversions (vet-clean
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:47:// cleanReport260 is an idle report over cfg with its cancel line replaced, which
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:49:func cleanReport260(cfg HotkeyConfig, line HotkeyBinding) HotkeyReport {
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:95:		if p := cleanReport260(ApplyHotkeyDefaults(HotkeyConfig{}), line).Problems(); len(p) != 0 {
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:153:		if p := cleanReport260(cfg, line).Problems(); len(p) != 0 {
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:196:	probs := cleanReport260(cfg, line).Problems()
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:209:	clean := cleanReport260(DefaultHotkeys(), cancelBorrowedLineFor(resolveCancelBorrow(DefaultHotkeys().Cancel)))
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:210:	if p := clean.Problems(); len(p) != 0 {
+71002d0:internal/ball/hotkey_cancel_borrow_260_test.go:276:	probs := strings.Join(cleanReport260(ApplyHotkeyDefaults(HotkeyConfig{Cancel: want}), line).Problems(), "\n")
+71002d0:internal/ball/hotkey_cancel_borrow_expect_260r2_test.go:162:		t.Fatalf("seed %q parsed cleanly; the ruler would then expect the user's key while production borrows %+v",
+71002d0:internal/ball/hotkey_live_test.go:215:		t.Fatalf("problems on a clean boot: %v", p)
+71002d0:internal/ball/hotkey_live_test.go:546:	// the set is clean, either the UnregisterHotKey did not reach Win32 or
+71002d0:internal/ball/hotkey_live_test.go:553:		"set is clean: the return never reached Win32, or the key was taken again mid-run - this run cannot tell "+
+71002d0:internal/ball/hotkey_status_test.go:164:		t.Errorf("problems on a clean run: %v", p)
+71002d0:internal/ball/hotkey_status_test.go:252:		t.Error("AllLive false after a clean return")
+71002d0:internal/ball/renderer_windows.go:12:// COM object pointers are stored as unsafe.Pointer (vet-clean provenance);
+71002d0:internal/ball/sta_release_windows_test.go:238:			// Two plants, because they are cleaned by two different things and the
+71002d0:internal/ball/sta_release_windows_test.go:542:// proves the thread went back clean.
+71002d0:internal/ball/sta_release_windows_test.go:652:		t.Errorf("control leg: a pump that reached an empty queue must not warn; it logged %q. A warning on a clean drain makes the cap leg's warning assertion unfalsifiable", under.logged)
+71002d0:internal/ball/sta_windows.go:93:	// Message pump. GetMessage returns 0 on WM_QUIT (clean exit), -1 on
+71002d0:internal/ball/tray_windows.go:104:	// close the menu cleanly.
+71002d0:internal/config/allowdirs.go:110:	cleaned := make([]string, 0, len(dirs))
+71002d0:internal/config/allowdirs.go:120:		cleaned = append(cleaned, s)
+71002d0:internal/config/allowdirs.go:124:	return m.writeAllowedDirs(cleaned, func(base *Config) {
+71002d0:internal/config/allowdirs.go:125:		base.FS.AllowedDirs = append([]string(nil), cleaned...)
+71002d0:internal/config/c26_seam_posix_125_test.go:35:// normalizer), so an answer that folds a ".." shape into a clean spelling is
+71002d0:internal/config/c26_seam_posix_125_test.go:142:	if clean, err := filepath.EvalSymlinks(linked); err != nil || clean != realRoot {
+71002d0:internal/config/c26_seam_posix_125_test.go:143:		t.Fatalf("fixture: %q resolves to %q (err %v), want %q", linked, clean, err, realRoot)
+71002d0:internal/config/loader.go:69:			// sentence a clean machine answers with - the panel's settings leg is
+71002d0:internal/config/migrate_test.go:102:	// A reload of the migrated file loads cleanly (idempotent).
+71002d0:internal/config/settings_257_test.go:3:// Ticket 257 - the clean machine, and the three ways a settings write says no.
+71002d0:internal/config/settings_257_test.go:35:// guidance. Neither exists on a clean machine, which is the point of AC#1.
+71002d0:internal/config/settings_257_test.go:37:	cleanProvider = "deepseek"
+71002d0:internal/config/settings_257_test.go:38:	cleanModel    = "deepseek-chat"
+71002d0:internal/config/settings_257_test.go:56:				return m.SetProviderBaseURL(cleanProvider, "https://clean-machine.example.invalid/v1")
+71002d0:internal/config/settings_257_test.go:62:				return m.SetProviderAPIKeyRef(cleanProvider, "env:T257_R1_ENV_NAME")
+71002d0:internal/config/settings_257_test.go:68:				return m.SetModelContextWindow(cleanProvider, cleanModel, 128000)
+71002d0:internal/config/settings_257_test.go:74:				return m.SetModelPriceIn(cleanProvider, cleanModel, 3500000)
+71002d0:internal/config/settings_257_test.go:80:				return m.SetModelPriceOut(cleanProvider, cleanModel, 12000000)
+71002d0:internal/config/settings_257_test.go:90:				return m.SetProviderAPIKeyRef(cleanProvider, "dpapi:t257r1canaryblob01")
+71002d0:internal/config/settings_257_test.go:96:// cleanMachineManager builds the state AC#1 names: a temporary data root, no
+71002d0:internal/config/settings_257_test.go:100:func cleanMachineManager(t *testing.T) (*Manager, string, string) {
+71002d0:internal/config/settings_257_test.go:138:// AC#1, first half: the clean machine refuses all seven, and every refusal is
+71002d0:internal/config/settings_257_test.go:142:	m, path, before := cleanMachineManager(t)
+71002d0:internal/config/settings_257_test.go:148:			t.Errorf("%s: the clean machine accepted the write (reported %v) - the ticket is not closed", f.field, written)
+71002d0:internal/config/settings_257_test.go:183:	t.Logf("clean machine, seven refusals by reason: %v (fields: %d)", seenReasons, len(writableRosterWalk()))
+71002d0:internal/config/settings_257_test.go:234:	if got := len(m.Config().LLM.Providers[cleanProvider].Models); got != 2 {
+71002d0:internal/config/settings_257_test.go:257:		"https://clean-machine.example.invalid/v1",
+71002d0:internal/config/settings_257_test.go:298:	m, _, _ := cleanMachineManager(t)
+71002d0:internal/config/settings_257_test.go:300:	_, err := m.SetProviderBaseURL(cleanProvider, "https://row-gate.example.invalid/v1")
+71002d0:internal/config/settings_257_test.go:314:	_, err = m.SetModelContextWindow(cleanProvider, cleanModel, 32000)
+71002d0:internal/config/settings_257_test.go:331:	if _, err := row.SetModelContextWindow(cleanProvider, "ghost-model", 32000); err != nil {
+71002d0:internal/config/settings_257_test.go:342:// because role_chat_model is the field whose clean-machine answer changed to
+71002d0:internal/config/settings_257_test.go:357:	if _, err := m.SetProviderAPIKeyRef(cleanProvider, "no-reference-prefix-here"); err != nil {
+71002d0:internal/config/validate_267_test.go:74:	// it must load clean.
+71002d0:internal/config/writeguard_226_test.go:144:// AC#2's clean half: with nothing diverging, the report is one key at Info and
+71002d0:internal/config/writeguard_226_test.go:154:		t.Errorf("a clean write must report the one key it wrote at Info; log:\n%s", text)
+71002d0:internal/config/writeguard_226_test.go:157:		t.Errorf("a clean write reported kept hand edits; log:\n%s", text)
+71002d0:internal/config/writeguard_226_test.go:195:		t.Fatalf("CheckAndReload after a clean write: %v", err)
+71002d0:internal/config/writeguard_226_test.go:289:	// The clean half: with nothing diverging the switch is still claimed as our
+71002d0:internal/config/writeguard_226_test.go:293:		t.Fatalf("SetPermissionMode (clean): %v", err)
+71002d0:internal/config/writeguard_226_test.go:300:		t.Errorf("a clean mode switch was read back as somebody else's edit: %+v", rep)
+71002d0:internal/llm/adaptertest/childjob_windows.go:19:// killed by `go test -timeout` (a panic that skips cleanup) or by an external
+71002d0:internal/llm/adaptertest/harness.go:270:			Desc: "cancellation is a clean end: Stop{cancelled}, no Error event",
+71002d0:internal/llm/adaptertest/harness.go:601:		t.Fatalf("cancellation is a clean end, got: %v", err)
+71002d0:internal/llm/adaptertest/mockllm.go:32:// mockllmJoinBudget is how long cleanup waits for the stdout reader spawn to
+71002d0:internal/llm/adaptertest/mockllm.go:108:			t.Errorf("mockllm stdout reader still pending after cleanup: %d", left)
+71002d0:internal/llm/adaptertest/mockllm.go:119:		// The reader exited without a clean handoff. Either its recover
+71002d0:internal/llm/adaptertest/registry_test.go:212:	// The loose run must at least terminate cleanly (the compat switch is part
+71002d0:internal/llm/openaichat/wire.go:14:// so the event emitter stays clean.
+71002d0:internal/llm/probe_health_test.go:75:// (state read-back), after a reset so the request counters start clean.
+71002d0:internal/memory/artifacts.go:19:// LRU cleanup by file modification time (Windows often has last-ACCESS time
+71002d0:internal/memory/artifacts.go:226:// size is compliant (strictly over triggers cleanup).
+71002d0:internal/memory/artifacts.go:271:	s.logger.Info("artifacts LRU cleanup",
+71002d0:internal/memory/artifacts_path_invariant_test.go:646:// root, cleaned and separator-normalised, as a set.
+71002d0:internal/memory/artifacts_stray_test.go:125:	if !strings.Contains(buf.String(), "artifacts LRU cleanup") {
+71002d0:internal/memory/artifacts_stray_test.go:126:		t.Errorf("LRU cleanup not logged: %s", buf.String())
+71002d0:internal/memory/concurrent_test.go:175:		t.Errorf("WAL not truncated on clean close: %d bytes", fi.Size())
+71002d0:internal/memory/dao_session_test.go:47:// table and the watermark unmoved, and a later clean open replays it whole.
+71002d0:internal/memory/open.go:258:		// Best-effort final checkpoint so a clean exit leaves no WAL growth
+71002d0:internal/memory/retention.go:136:// runRetention executes one cleanup pass. Windows: task_log/tool_call older
+71002d0:internal/memory/retention.go:167:		s.logger.Error("retention pass db cleanup failed",
+71002d0:internal/memory/retention.go:174:		s.logger.Error("retention pass artifacts cleanup failed",
+71002d0:internal/memory/retention_test.go:260:	if !strings.Contains(buf.String(), "artifacts LRU cleanup") {
+71002d0:internal/memory/retention_test.go:261:		t.Error("LRU cleanup not logged")
+71002d0:internal/memory/schema_test.go:412:// run. It mutates the package chain and restores it at cleanup.
+71002d0:internal/models/archive.go:17:// every member path must be a clean relative path inside destDir; a single
+71002d0:internal/models/downloader.go:94:// for installed models and cancel cleanup has exactly one place to look.
+71002d0:internal/models/downloader.go:199:			return "", observeNew(ClassCancelled, fmt.Sprintf("download of %s cancelled; staging cleaned", id))
+71002d0:internal/models/downloader.go:244:// Cancel aborts an in-flight Ensure for id. The aborted run cleans its
+71002d0:internal/models/downloader.go:577:		// already refused any path that is not its own cleaned form
+71002d0:internal/models/downloader.go:612:		// filepath.Rel already returns a cleaned path, so ToSlash below changes
+71002d0:internal/models/downloader_test.go:263:		t.Fatal("staging must be cleaned after integrity failure")
+71002d0:internal/models/downloader_test.go:365:		t.Fatal("staging must be cleaned after success")
+71002d0:internal/models/handoff_reuse_109_test.go:48:		t.Fatalf("AC#2 reverse leg, normal install: the hand-off check refused a clean model: %v", err)
+71002d0:internal/models/handoff_reuse_109_test.go:66:	// And the hand-off point itself, on a clean shared cache.
+71002d0:internal/models/handoff_reuse_109_test.go:68:		t.Fatalf("hand-off on a clean shared cache: %v", err)
+71002d0:internal/models/handoff_reuse_109_test.go:107:		t.Errorf("after restoring the byte, the clean tree no longer verifies: %v", err)
+71002d0:internal/models/handoff_window_109_windows_test.go:142:		t.Errorf("after restore, the clean install no longer verifies: %v", err)
+71002d0:internal/models/manifest.go:288:		return fmt.Errorf("not a clean relative path: %q", p)
+71002d0:internal/models/manifest.go:293:	clean := filepath.ToSlash(filepath.Clean(p))
+71002d0:internal/models/manifest.go:294:	if clean != p || strings.HasPrefix(clean, "../") || clean == ".." || strings.Contains(clean, "/../") {
+71002d0:internal/models/no_seal_ruling_test.go:71:		t.Fatalf("the clean install dir must verify: %v", err)
+71002d0:internal/models/verify_cost_121_bench_test.go:54:			b.Fatalf("clean install refused at sample %d: %v", i, err)
+71002d0:internal/models/verify_tree_121_other_test.go:86:		t.Fatal("AC#4/R-109-2: an unnamed symlink in the install directory verified clean")
+71002d0:internal/models/verify_tree_121_other_test.go:109:		t.Fatalf("the hand-off refused a clean install (state=%s): %v", state, err)
+71002d0:internal/models/verify_tree_121_test.go:67:		t.Fatalf("AC#4 reverse leg: a clean install no longer verifies, so the unnamed-entry check "+
+71002d0:internal/models/verify_tree_121_test.go:73:	t.Logf("clean install verifies: %s holds exactly the manifest's 4 named files plus dict/", dir)
+71002d0:internal/observe/diagnostics.go:50:	// internal/buildinfo; this package stays dependency-clean).
+71002d0:internal/observe/diagnostics.go:121:			clean := red.String(string(data))
+71002d0:internal/observe/diagnostics.go:122:			if err := writeZipEntry(zw, "logs/"+name, []byte(clean)); err != nil {
+71002d0:internal/observe/diagnostics.go:139:		clean, ok := red.ConfigSnapshot(string(raw))
+71002d0:internal/observe/diagnostics.go:144:		if err := writeZipEntry(zw, "config.redacted.toml", []byte(clean)); err != nil {
+71002d0:internal/observe/diagnostics_test.go:121:	_, clean := Redactor{}.ConfigSnapshot(cfg)
+71002d0:internal/observe/diagnostics_test.go:122:	if clean {
+71002d0:internal/observe/redact.go:219:// a snapshot it could not fully clean (fail-closed; the detector is
+71002d0:internal/observe/sampler.go:553:// about the shape changed. Nine clean settle runs backed it (sample_errors 0,
+71002d0:internal/observe/sampler_settle_coverage_136_test.go:267:	// is exactly what vetoes this window's pass bit. Nine clean settle runs
+71002d0:internal/observe/sampler_test.go:85:	// A clean skeleton tree: everything under the frozen caps.
+71002d0:internal/observe/sampler_test.go:115:		t.Fatalf("clean tree must pass, verdicts: %+v", rep.Verdicts)
+71002d0:internal/observe/sampler_zerosample_136_test.go:178:		t.Fatalf("a clean measurable window must pass, verdicts=%+v", rep.Verdicts)
+71002d0:internal/panel/assets.go:63:// to just the anchor file that keeps the go:embed pattern valid in a clean
+71002d0:internal/panel/assets_test.go:23:	// Exactly what a clean checkout carries: the tracked anchor, nothing else.
+71002d0:internal/panel/assets_test.go:108:		// The clean-checkout branch: legal, loud, and never a skip - a
+71002d0:internal/panel/composer_test.go:14://	   and asserts the rule fires, then asserts the real frontend/src is clean.
+71002d0:internal/panel/composer_test.go:140:	// And the real tree must be clean under BOTH doors.
+71002d0:internal/panel/composer_test.go:605:// shows the clean half still passes.
+71002d0:internal/panel/composer_test.go:761:// offending lines (empty = clean).
+71002d0:internal/panel/config_handlers.go:584:// view's only credential-bearing field and requires this line to stay clean).
+71002d0:internal/panel/git_test.go:401:	// was clean.
+71002d0:internal/panel/git_test.go:501:	if clean := gitToolNamesUnder(filepath.Join(panelRepoRoot(t), "internal", "tools")); len(clean) != 0 {
+71002d0:internal/panel/git_test.go:502:		t.Errorf("the tool door fires on the real tree too: %v", clean)
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:36:// the channel really fired, because a clean reading from a hop that did nothing
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:114:// every artifact the hop itself produces to stay shape-clean.
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:133:			t.Fatalf("the credential write was refused, so a clean reading below would be silence: %v", err)
+71002d0:internal/panel/inbound_raw_leak_35r7_test.go:207:// zero-hit reading above could mean the mirror is blind, not the route clean.
+71002d0:internal/panel/inbound_roster_253_test.go:595:// the clean half at the end is the unplanted reading under the same helper.
+71002d0:internal/panel/l2_grant_boundary_test.go:132:// deliberate: the file refuses to call the boundary clean over bytes it cannot
+71002d0:internal/panel/l2_grant_boundary_test.go:691:				"a destination this instrument cannot enumerate keys for is not a clean boundary")
+71002d0:internal/panel/l2_grant_boundary_test.go:706:			". Judge it in a test that can see that type, or route the bytes through a same-package struct - do not let this file report the boundary clean"
+71002d0:internal/panel/l2_grant_boundary_test.go:775:				// report a clean boundary it has stopped looking at - that is
+71002d0:internal/panel/l2_grant_boundary_test.go:969:			": the instrument can no longer tell which methods Go answers, so a clean report here would be silence, not safety"
+71002d0:internal/panel/l2_grant_boundary_test.go:974:			". This scan reads string literals and package-level string constants; a route reaching through a var, a call, or a concatenation is a door facet 1 cannot see, and it will not be reported as clean. Give the label a const, or teach routeNameOf the expression - and if it was deliberate, say so in the test that owns it (D33/F2, AGENTS.md ban #6)"
+71002d0:internal/panel/l2_grant_boundary_test.go:977:		return "the route guard under " + dir + " resolved to 0 answered routes - the enumeration is broken, not clean"
+71002d0:internal/panel/l2_grant_boundary_test.go:983:		return "no JSON decode call under " + dir + ": the inbound-envelope scan has no destination to start from, so it judges nothing and reports that as a clean boundary"
+71002d0:internal/panel/l2_grant_boundary_test.go:1282:		t.Errorf("knownComposerMethod answers %s but the guard's own case list, which is what this file enumerates, never named it: a route answered through another function, or another expression, is a door no vocabulary in this package reviewed - the answered set read here is INCOMPLETE, not clean (D33/F2, R20)", hit)
+71002d0:internal/panel/l2_grant_boundary_test.go:1354:// clean with ".now" gone. The product assertion cannot see this: asked= always
+71002d0:internal/panel/l2_grant_boundary_test.go:1429:// step left the control green and the sweep reporting hits=[] as a clean
+71002d0:internal/panel/l2_grant_boundary_test.go:1474:// the sweep ask 0 or 264 names and still report a clean boundary. All three
+71002d0:internal/panel/l2_grant_boundary_test.go:1484:		t.Fatalf("the sweep vocabulary is empty (grantRouteWords=%d, grantRoutePrefixes=%d, grantRouteSuffixes=%d): a sweep that asks nothing answers clean forever",
+71002d0:internal/panel/l2_grant_boundary_test.go:1500:		t.Fatalf("the running guard answers %v of the %d names sweepAssembledNames builds from the four declared route namespaces (got %v, want %v): a sweep whose ask-or-accumulate step has been short-circuited reports hits=[] and reads as a clean boundary, which is not the same fact (F-R4-1)",
+71002d0:internal/panel/l2_grant_boundary_test.go:1525:// anything while a clean tree answers none of it.
+71002d0:internal/panel/l2_grant_boundary_test.go:1697:			t.Fatalf("grantRouteWords carries %q with no witness row in grantRouteWordWitnesses: no name built from it has been put to the running guard here, so this file cannot claim the grid it multiplies that word into is clean", word)
+71002d0:internal/panel/l2_grant_boundary_test.go:2019:// both sides of it: the pristine package must read clean, and a plant that
+71002d0:internal/panel/l2_grant_boundary_test.go:2184:	// The pristine copy must read clean, or every plant below would be red for
+71002d0:internal/panel/l2_grant_boundary_test.go:2288:	// and the boundary read clean, which is how acceptance r1 got four facets to
+71002d0:internal/panel/l2_grant_boundary_test.go:2313:			t.Fatal("an unreadable case label produced no problem: facet 1 would report this boundary clean")
+71002d0:internal/panel/l2_grant_boundary_test.go:2482:	// verbatim deleted button in a tree whose Go is clean, and the instrument
+71002d0:internal/panel/l2_grant_boundary_test.go:2496:			t.Errorf("a clean Go snapshot carrying only the historical button must yield 0 findings from this instrument, got:%s", joinFindings(hits))
+71002d0:internal/panel/workspace_account_181r3_test.go:52:	t.Run("clean_answer_is_the_ordinary_road", func(t *testing.T) {
+71002d0:internal/panel/workspace_account_181r3_test.go:66:			t.Errorf("a clean account rendered as an accounted one: %+v", v)
+71002d0:internal/panel/workspace_handlers_test.go:43:		t.Fatalf("a clean in-scope switch was refused: %v", err)
+71002d0:internal/panel/workspace_handlers_test.go:189:		t.Fatalf("the real resolver refused a clean switch to its own allowlisted root: %v", err)
+71002d0:internal/panel/workspace_handlers_test.go:193:		t.Fatalf("after the switch the scope reports %+v, want the clean coordinate with rewritten=false", acc)
+71002d0:internal/panel/workspace_handlers_test.go:263:			"the clean reading above is decoration")
+71002d0:internal/panel/workspace_test.go:57:		t.Fatalf("a clean in-scope switch failed: %v", err)
+71002d0:internal/plugin/disposal_test.go:202:		t.Fatalf("clean dispose marked incomplete: %+v", res)
+71002d0:internal/plugin/disposal_test.go:247:		t.Fatalf("clean dispose marked incomplete: %+v", res)
+71002d0:internal/proc/crossvet_test.go:28:// is welcome, but only with a package that is actually clean under this exact
+71002d0:internal/proc/crossvet_test.go:38:// cleanly on a Windows developer machine and on the Windows CI jobs, because
+71002d0:internal/proc/envfork.go:148:// cleans, never absolutizes, never case-folds, and nothing in internal/winsec
+71002d0:internal/proc/shutdown_hooks_test.go:60:			t.Fatalf("record for %s = %+v, want executed and clean", want.Name(), rec)
+71002d0:internal/proc/shutdown_test.go:58:			t.Fatalf("record %d = %+v, want step %s executed cleanly", i, rec, wantRecords[i].Name())
+71002d0:internal/proc/singleinstance_windows.go:45:// OS fiat; Release exists for tests and clean hand-back.
+71002d0:internal/risk/assessor.go:23://	                                  allowlisted clean argv -> L1
+71002d0:internal/risk/assessor.go:120:	// ShellAllowlist lists allowlisted shell programs (R6: clean argv -> L1).
+71002d0:internal/risk/assessor_test.go:115:			name: "clean L0 call",
+71002d0:internal/risk/pathresolver.go:55:	// path does not exist yet, it is the lexically cleaned spelling —
+71002d0:internal/risk/pathresolver.go:109:	p = lexCanonical(p)      // re-clean after prefix rewriting
+71002d0:internal/risk/pathresolver.go:427:// pathExists is a fail-toward-exists stat: only a clean "no such file" reads
+71002d0:internal/risk/pathresolver_anchor_spelling_windows_test.go:342:// side cannot be PROVEN expanded, the answer is A, never "looks clean". The
+71002d0:internal/risk/pathresolver_junction_windows_test.go:132:		t.Fatalf("short name is not a reparse point, want clean resolve: %v", err)
+71002d0:internal/risk/pathresolver_rewrite_account_test.go:56:	t.Run("clean_absolute_is_not_marked", func(t *testing.T) {
+71002d0:internal/risk/pointer_183_test.go:58:	// removed. It is the attribution control: it must be clean on UNFIXED code,
+71002d0:internal/risk/pointer_183_test.go:168:// stub whose body carries NO twin fragment is already clean today (this is
+71002d0:internal/risk/pointer_183_test.go:180:		t.Fatalf("control: twin-free host stub must be clean on unfixed code (otherwise the referee is red for the wrong reason), got hit %s", h.String())
+71002d0:internal/risk/pointer_185_test.go:258:		t.Fatal("precondition broken: the referee's own scope must be the clean one before Close means anything")
+71002d0:internal/risk/provenance_test.go:117:		t.Fatal("clean notify must not hit")
+71002d0:internal/risk/provenance_test.go:252:		t.Fatalf("clean notify: got %v/%v", d.Level, d.RulesHit)
+71002d0:internal/risk/provenance_test.go:307:	// every taint; the new session's scope starts clean (AC #5).
+71002d0:internal/risk/provenance_test.go:442:	// Clean calls on named channels stay clean.
+71002d0:internal/risk/provenance_test.go:444:		t.Fatal("clean notify must not hit")
+71002d0:internal/risk/provenance_test.go:605:	// And a clean call stays clean everywhere.
+71002d0:internal/risk/rules_shell.go:19://   - clean argv, program in the allowlist -> L1
+71002d0:internal/risk/rules_shell.go:20://   - clean argv, program not in the allowlist -> L2
+71002d0:internal/risk/rules_test.go:118:		t.Fatalf("clean path: want L0/no hits, got %v/%v", d.Level, d.RulesHit)
+71002d0:internal/risk/rules_test.go:166:		{"allowlisted https -> clean", NetTarget{Protocol: "https", Host: "api.example.com", Allowlist: []string{"example.com"}}, L0, false},
+71002d0:internal/risk/rules_test.go:177:			t.Fatalf("%s: want clean L0, got %v/%v (%s)", tc.name, d.Level, d.RulesHit, d.Reason)
+71002d0:internal/risk/rules_test.go:197:		{"clean allowlisted -> L1", Facts{ShellArgv: []string{"git", "status"}, ShellAllowlist: []string{"git"}}, L1},
+71002d0:internal/risk/rules_test.go:198:		{"clean allowlisted full path -> L1", Facts{ShellArgv: []string{`C:\Program Files\Git\bin\git.exe`, "status"}, ShellAllowlist: []string{"git.exe"}}, L1},
+71002d0:internal/risk/rules_test.go:199:		{"clean not allowlisted -> L2", Facts{ShellArgv: []string{"powershell", "-Command", "Get-Date"}, ShellAllowlist: []string{"git"}}, L2},
+71002d0:internal/risk/rules_test.go:224:		{"49 -> clean (edge)", Facts{BatchCount: 49}, L0},
+71002d0:internal/risk/rules_test.go:227:		{"fallback to len(Paths) at 3 -> clean", Facts{Paths: []string{"a", "b", "c"}}, L0},
+71002d0:internal/risk/rules_test.go:250:		{"no classes -> clean", Facts{}, L0},
+71002d0:internal/risk/shape_a_exemption_test.go:57:// clean. Goes red if the exemption is silently dropped (177-m1 §3: "nothing
+71002d0:internal/risk/shape_a_exemption_test.go:65:		t.Fatalf("A: host re-read of its OWN declared path must be clean, got hit %s", h.String())
+71002d0:internal/risk/shape_a_exemption_test.go:119:// leaves no window to hit through, so this leg is the attribution-clean
+71002d0:internal/risk/shape_a_exemption_test.go:176:		t.Fatal("baseline of this leg: declared host path must be clean while open")
+71002d0:internal/risk/syncdirs.go:42:// never classified at all — cleaning erases the segments the reparse audit
+71002d0:internal/risk/syncdirs.go:258:// deepestExistingAncestor splits an absolute, lexically cleaned path into the
+71002d0:internal/risk/syncdirs.go:270:// `Resolve(raw)` over the whole cleaned chain, which runs first and denies a
+71002d0:internal/risk/syncdirs.go:301:// i.e. a segment that lexical cleaning (C26's lexCanonical, and Windows' own
+71002d0:internal/risk/syncdirs.go:303:// Such a spelling cannot be classified from its cleaned form, so the caller
+71002d0:internal/risk/syncdirs.go:394:		// is removed by lexical cleaning BEFORE anything is audited, so the
+71002d0:internal/risk/syncdirs.go:402:			Why:  "write target folds a '..' component: cleaning erases the segments the reparse check audits; fail-closed as sync-suspect (N-10)",
+71002d0:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:95:// NOT under the sync root, and installs the env var that only the cleaned
+71002d0:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:158:	// 1. The RAW spelling resolves clean and is not handle-resolvable, so the
+71002d0:internal/risk/syncdirs_redteam_windows_test.go:27:// that is already 8.3-clean, means there is none). Spellings are always read
+71002d0:internal/risk/syncdirs_redteam_windows_test.go:234:		t.Logf("no 8.3 alias exists for the live root %s (name is already 8.3-clean); the \\\\?\\ legs below still cross the boundary", root)
+71002d0:internal/risk/syncdirs_test.go:444:// (R2/R5): `link\..\x` is folded by lexical cleaning BEFORE reparseComponents
+71002d0:internal/risk/syncdirs_test.go:456:// "plain write stays clean" control could not be satisfied by luck; on POSIX
+71002d0:internal/risk/syncdirs_test.go:463:	folded := filepath.Join(e.work, "x.md") // what the raw spelling below cleans to
+71002d0:internal/risk/syncdirs_test.go:466:		t.Fatalf("test premise broken: %q does not clean to %q", raw, folded)
+71002d0:internal/risk/syncdirs_test.go:479:	// (this is the false-positive side: a normal new-file write stays clean).
+71002d0:internal/risk/taintmatch_test.go:202:			b.Fatal("clean param must not hit")
+71002d0:internal/secret/migrate_test.go:227:// TestMigratePlaintextNoConfigIsNoOp: no config yet -> clean no-op.
+71002d0:internal/session/session.go:30:// rather than by a cleanup step somewhere else.
+71002d0:internal/tools/bridge.go:1174:	// read and came back clean, which is precisely what a reader cannot recover
+71002d0:internal/tools/bridge_a18_kill_windows_test.go:20:// `Hooks.Kill`, which returns an error and therefore RUNS the Go cleanup — so
+71002d0:internal/tools/bridge_path_account_ticket105_test.go:174:// record must still be there so a reader can tell "read and clean" apart from
+71002d0:internal/tools/bridge_path_account_ticket105_test.go:189:		t.Fatalf("a clean account wrote no record, so an operator cannot tell it apart from an unwired one:\n%s", readBack())
+71002d0:internal/tools/fs_edit_ac4b_kill_windows_test.go:9:// through `Hooks.Kill`, which RETURNS AN ERROR - so it walks Go's own cleanup:
+71002d0:internal/tools/fs_edit_ac4b_kill_windows_test.go:123:	// there is nothing to clean: this test issues NO delete of its own (只建不删),
+71002d0:internal/tools/fs_edit_ac4b_kill_windows_test.go:175:// named instead of swept under a "clean directory" claim.
+71002d0:internal/tools/fs_staging.go:23:// runs no Go cleanup, so nothing removes it. 761447f measured it with a real
+71002d0:internal/tools/fs_staging.go:59:// What the sweep NEVER does: follow a reparse point (that is how a cleanup
+71002d0:internal/tools/fs_staging_windows_test.go:230:	t.Cleanup(func() { _ = os.Remove(link) }) // drop the link before TempDir cleanup
+71002d0:internal/tools/fs_write.go:26:// a cancel is never rendered as a clean undo.
+71002d0:internal/tools/fs_write.go:113:// with the ledger attached, never a claim of a clean undo.
+71002d0:internal/tools/fs_write.go:283:	// A18 / ticket 73: a real taskkill runs no Go cleanup, so the staging file an
+71002d0:internal/tools/fs_write_test.go:116:// noStagingFilesLeft asserts the D31 cleanup contract: a killed write leaves
+71002d0:internal/tools/fs_write_test.go:670:// A report claiming a clean cancel here would be the ticket's named failure.
+71002d0:internal/tools/fs_write_test.go:826:	// The report is the point: it must carry the ledger, not a clean-cancel line.
+71002d0:internal/tools/paths.go:283:// something else. It is NOT a normalization - it neither cleans nor absolutizes,
+71002d0:internal/tools/paths.go:359:// a COMPARISON fold, not a normalization - it neither cleans nor absolutizes,
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:85:// hole and not a cleanup.
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:262://	d. exactly ONE of them is clean, i.e. derived from the parameter without
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:326:		clean, dirty := 0, 0
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:331:				clean++
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:334:		if clean != 1 || dirty != 1 {
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:336:				"clean=%d tainted=%d (keys %q / %q, tainted-name set %v, guards %v). The pair exists because the "+
+71002d0:internal/tools/paths_twocontainments_252_r2_test.go:338:				"one, only one tree is ever being asked about.", clean, dirty, x.keyText, y.keyText,
+71002d0:internal/tools/refusal.go:36://   - A path that canonicalized cleanly and simply sits under no allowed root
+71002d0:internal/tools/refusal.go:89:			// "cleanly resolved and merely out of scope" shape that an ask is
+71002d0:internal/tools/staging_live_windows.go:51:// reaches. Deleting what sits beyond a junction would turn a 4-byte cleanup into
+71002d0:internal/tools/task.go:826://	               becoming a cleanup path.
+71002d0:internal/tools/task_cancel_221_legs_test.go:425:	// is also this leg's cleanup.
+71002d0:internal/tools/task_output_pointer_notice_test.go:24://	    *PathCanonicalizer fs.read is judged by). Nothing here cleans or
+71002d0:internal/tools/task_pointer_authority_ac3_174r4_windows_test.go:22:// string instead of the canonical one) passes d22scan clean. So a token scan is
+71002d0:internal/tools/task_state_188_test.go:248:// scan whose denominator is zero reports "clean" for a tree it never read.
+71002d0:internal/tools/ticket175r2_stamp_live_test.go:261:	// mark must be clean - otherwise this leg would pass on "block everything".
+71002d0:internal/tools/ticket175r2_stamp_live_test.go:264:	clean, cp := stamp175r2Bridge(t, alone, nil, dir)
+71002d0:internal/tools/ticket175r2_stamp_live_test.go:266:	if got := call175r2(t, clean, aloneTask, "fs.read",
+71002d0:internal/tools/ticket175r2_stamp_live_test.go:271:	clean.CloseTask(aloneTask)
+71002d0:internal/tools/ticket175r2_stamp_live_test.go:303:	// The stamp must be there, or "clean" means nothing (票 164 的两枚续读腿
+71002d0:internal/tools/tool.go:56:	// never claim a clean undo. No builtin tool in this segment fills it
+71002d0:internal/tools/toolrequest_nail_309_test.go:33:// "a scan whose denominator is zero reports clean for a tree it never read"）：旧钉现量 245
+71002d0:internal/tools/toolrequest_nail_309_test.go:296:// "scanned and clean".
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:135:					t.Errorf("AC#5 cleanup RED: RemoveAll(%s): %v", target, rmErr)
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:139:					t.Errorf("AC#5 cleanup RED: %s still names something after RemoveAll (err=%v)", target, lErr)
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:222:				t.Errorf("AC#5 cleanup RED: RemoveAll(%s): %v", target, rmErr)
+71002d0:internal/winsec/absoluteness_seam_landing_129_windows_test.go:226:				t.Errorf("AC#5 cleanup RED: %s still names something after RemoveAll (err=%v)", target, lErr)
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:38://     filesystem with filepath.EvalSymlinks, see cleanSpelling119) or against the
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:120:// cleanSpelling119 asks the filesystem how the kernel spells a path that already
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:124:func cleanSpelling119(t *testing.T, path string) string {
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:126:	clean, err := filepath.EvalSymlinks(path)
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:130:	return clean
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:213://   - the base is resolved (cleanSpelling119, the same precedent as the AC#3 case
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:225:	base := cleanSpelling119(t, t.TempDir())
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:264:	// clean spelling is asked of the filesystem, not of proc.SealableRoot (see
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:265:	// cleanSpelling119).
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:266:	root := filepath.Join(cleanSpelling119(t, base), "data")
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:317://   - the same tree declared by its clean spelling must come back exactly as
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:337:	base := cleanSpelling119(t, t.TempDir())
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:343:	asTheKernelSpellsIt := filepath.Join(cleanSpelling119(t, shape.link), "harness", "picked")
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:371:	// declares it. Declared-and-clean still comes back untouched and still seals,
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:373:	injected := filepath.Join(cleanSpelling119(t, shape.real), "harness", "picked")
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:376:		t.Errorf("AC#2 RED: a clean injected data root was rewritten: got %q, want the declared %q", got, injected)
+71002d0:internal/winsec/dataroot_symlink_119_other_test.go:379:		t.Errorf("AC#2 RED: a clean injected data root was refused: %v", err)
+71002d0:internal/winsec/resolve.go:32://     rewrite (builtinVerifier): an absolute, segment-clean, reparse-free spelling
+71002d0:internal/winsec/resolve.go:68:// was a clean spelling but never ask whether it still named the tree the caller
+71002d0:internal/winsec/resolve.go:250:// no cleaning, no absolutizing, no case folding, and nothing that could turn a
+71002d0:internal/winsec/resolve.go:325:// to R-103-1: ticket 103's probe asked only whether an answer is a *clean
+71002d0:internal/winsec/resolve.go:326:// spelling*, so a resolver that answers every input with one fixed clean
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:26:// with one fixed clean absolute path in somebody else's tree. It passes today's
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:27:// conformance probe because the fixed answer is itself floor-clean (the probe
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:29:// different clean tree falls through the second leg) - which is R-103-1.
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:175:// floor-clean". The answer also has to stay in the tree the caller named, and a
+71002d0:internal/winsec/seam_guard_windows_test.go:286:// pipeline still seals clean paths and still refuses hostile ones.
+71002d0:internal/winsec/seam_guard_windows_test.go:301:	clean := filepath.Join(dataRoot, "private")
+71002d0:internal/winsec/seam_guard_windows_test.go:302:	if err := winsec.PrivateDirAll(clean, 0o700); err != nil {
+71002d0:internal/winsec/seam_guard_windows_test.go:303:		t.Fatalf("a clean path must still seal after a refused registration: %v", err)
+71002d0:internal/winsec/seam_guard_windows_test.go:305:	assertPrivateACL(t, clean)
+71002d0:internal/winsec/seam_guard_windows_test.go:306:	if _, err := os.Stat(clean); err != nil {
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:84:	if clean, err := filepath.EvalSymlinks(linked); err != nil || clean != realRoot {
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:85:		t.Fatalf("fixture: %q resolves to %q (err %v), want %q", linked, clean, err, realRoot)
+71002d0:internal/winsec/seam_probe_root_125_other_test.go:155:// constantResolver125 answers every input with one fixed clean spelling: ticket
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:219:					t.Errorf("AC#6 cleanup RED: RemoveAll(%s): %v", target, err)
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:223:					t.Errorf("AC#6 cleanup RED: %s still names something after RemoveAll (err=%v)", target, err)
+71002d0:internal/winsec/volume_attribution_126_windows_test.go:429:				t.Errorf("AC#6 cleanup RED: the enumeration probe %s still exists: %v", probe, err)
+71002d0:internal/winsec/winsec.go:52:// under a clean spelling, so it is invisible for the same reason - and
+71002d0:internal/winsec/winsec_other.go:412:// so a resolver that answers each tree with a clean, mutually contained spelling
+71002d0:tools/d22scan/gitignore.go:13:// go:embed needs the directory to exist in a clean checkout (ticket 77 AC#1).
+71002d0:tools/d22scan/gitignore.go:62:// quiet green: a scanner that could not ask does not get to claim a clean count.
+71002d0:tools/d22scan/gitignore.go:522:// run is otherwise green (a quiet "clean" from a scanner that could not ask is the
+71002d0:tools/d22scan/main.go:10://	                      `go func(` and "clean" therefore meant "no bare
+71002d0:tools/d22scan/main.go:96://     quiet clean - see gitignore.go's note().
+71002d0:tools/d22scan/main.go:106:// every ban walks zero files and the tool would print "clean" while having
+71002d0:tools/d22scan/main.go:156:	// read 43 on a built worktree and 40 on a clean checkout, which made 37/40/43
+71002d0:tools/d22scan/main.go:493:// it did NOT check instead of implying total coverage (A30's "clean was a lie"
+71002d0:tools/d22scan/main.go:589:// "clean" line out of this string, so the sentence cannot claim a scope the
+71002d0:tools/d22scan/main.go:822:	// is 0 (212-v2 §3, clean-tree fixed/mut token difference empty), which is why
+71002d0:tools/d22scan/main.go:1321:// expose under internal/ + cmd/ for a clean verdict to mean anything. The
+71002d0:tools/d22scan/main.go:1323:// an empty tree and report "clean" (same guard shape as
+71002d0:tools/d22scan/main.go:1390:// finding outranks the clean sentence, because a 2 is "do not trust anything
+71002d0:tools/d22scan/main.go:1469:	fmt.Fprintf(out, "d22scan: clean - no D22 ban violations; live scope work: %s; ban #8 emoji coverage: %s",
+71002d0:tools/d22scan/main.go:1482:// scopeSummary renders "label=N" for every live scope, used in the clean line.
+71002d0:tools/d22scan/main.go:1496:		"0 every ban ranged on its bad sample and stayed silent on its clean one, 1 a direction failed, "+
+71002d0:tools/d22scan/runtests.sh:139:# D:/tmp root, and those two reds are Go's own t.TempDir cleanup failing
+71002d0:tools/d22scan/runtests.sh:140:# (testing.go:1617 "TempDir RemoveAll cleanup: ... Access is denied"), not an
+71002d0:tools/d22scan/runtests.sh:145:# shots was the cleanup, not the gate's judgement, so no fixture changes here.
+71002d0:tools/d22scan/runtests.sh:198:        echo "runtests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-$wisp_311_ref_vol root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not." >&2
+71002d0:tools/d22scan/scan_test.go:135:		t.Fatalf("clean fixture must be green, got: %v", findings)
+71002d0:tools/d22scan/scan_test.go:172:// cannot contain any banned pattern must be a loud error, never a clean verdict.
+71002d0:tools/d22scan/scan_test.go:214:// nothing to scan returns zero findings, i.e. the old "clean" was compatible
+71002d0:tools/d22scan/scan_test.go:229:		t.Fatal("checkRoot must reject the root that Scan just declared clean")
+71002d0:tools/d22scan/scan_test.go:434:			name:         "trailing comment after clean code",
+71002d0:tools/d22scan/scan_test.go:695:			t.Errorf("the clean verdict line would not name scope %s it actually scanned: %q", sc.label, report)
+71002d0:tools/d22scan/scan_test.go:737:	// instrument. The content is clean: ban #6 must be able to examine files and
+71002d0:tools/d22scan/scan_test.go:1008:// ledger entry, which would otherwise print a confident "clean".
+71002d0:tools/d22scan/scan_test.go:1050:		t.Fatal("ban #8 examined 0 files under frontend/: the panel's tree is uncovered again (ticket 96), and a run that examines nothing does not get to print \"clean\"")
+71002d0:tools/d22scan/scan_test.go:1091:		t.Errorf("the clean line's scope summary omits ban #8 frontend/=%d, got %q", front, sum)
+71002d0:tools/d22scan/scan_test.go:1806:	//    the same coverage as a clean one, and says so.
+71002d0:tools/d22scan/scan_test.go:1818:		t.Errorf("ban #6 counted %d frontend/ files on the torn index and %d on a clean one, want +1 - the torn read "+
+71002d0:tools/d22scan/scan_test.go:1822:		t.Errorf("ban #8 counted %d frontend/ files on the torn index and %d on a clean one, want +1", got, want)
+71002d0:tools/d22scan/scan_test.go:1847:		t.Errorf("verdict on the clean index must also be 1 (the delivered byte is a finding either way), got %d err=%s", code, errOut)
+71002d0:tools/d22scan/scan_test.go:1849:	// And the clean run must not complain about this ticket's guard: the loud line
+71002d0:tools/d22scan/scan_test.go:1915:// clean.
+71002d0:tools/d22scan/scan_test.go:1965:	// 4. the shape a quiet green would take: a clean index-less tree with paths the
+71002d0:tools/d22scan/scan_test.go:1967:	clean := liveFixture(t)
+71002d0:tools/d22scan/scan_test.go:1968:	seedFile(t, clean, ".gitignore", "frontend/dist/*\n!frontend/dist/.gitkeep\n")
+71002d0:tools/d22scan/scan_test.go:1969:	seedFile(t, clean, "frontend/dist/bundle.js", "export const Panel = () => null;\n")
+71002d0:tools/d22scan/scan_test.go:1970:	sc := scanFixture(t, clean)
+71002d0:tools/d22scan/scan_test.go:1971:	out, errOut, code := runVerdict(t, clean, sc)
+71002d0:tools/d22scan/scan_test.go:1976:		t.Errorf("an index-less run that reports clean must still say the rules were off, got %q", nc)
+71002d0:tools/d22scan/scan_test.go:2213:	if !strings.Contains(out, "clean") {
+71002d0:tools/d22scan/scan_test.go:2214:		t.Errorf("the clean line must be there, got %q", out)
+71002d0:tools/d22scan/scan_test.go:2225:			t.Errorf("clean line omits live scope %s with its real count (%q)", sc.label, want)
+71002d0:tools/d22scan/scan_test.go:2229:		t.Errorf("the clean line must carry ban #6's real count, got %q", out)
+71002d0:tools/d22scan/scan_test.go:2302:		// the verdict instead of reading as "the panel got clean".
+71002d0:tools/d22scan/scan_test.go:2344:			wantAll: []string{"clean", "ban #6 frontend/="},
+71002d0:tools/d22scan/selftest.go:29:// deleted walk, a mistyped tag and a genuinely clean file all print. So every
+71002d0:tools/d22scan/selftest.go:66:	// wantSilent: the clean (or deliberately pinned) sample must produce none.
+71002d0:tools/d22scan/selftest.go:364:// clean" and "the walk had nowhere to walk".
+71002d0:tools/d22scan/selftest.go:452:// the same fixture, a human sees that too instead of inferring a clean tree.
+71002d0:tools/d22scan/selftest.go:539://	1 a direction failed: a ban that should have rung stayed silent, or a clean
+71002d0:tools/d22scan/selftest.go:606:	fmt.Fprintf(out, "d22scan -self-test: clean - all %d direction checks passed (%d expect-ring, %d expect-silent)\n",
+71002d0:tools/d22scan/selftest_test.go:57:	if !strings.Contains(out, "clean - all") {
+71002d0:tools/d22scan/selftest_test.go:58:		t.Errorf("missing the clean line:\n%s", out)
+71002d0:tools/d22scan/selftest_test.go:73:	// Positive control first: the shipped table must audit clean.
+71002d0:tools/d22scan/selftest_test.go:75:		t.Fatalf("the shipped table must audit clean, got %d hole(s):\n  %s", len(holes), strings.Join(holes, "\n  "))
+71002d0:tools/d22scan/selftest_test.go:207:		if !strings.Contains(joined, "d22scan -self-test: clean - all") {
+71002d0:tools/d22scan/selftest_test.go:208:			t.Errorf("%v printed no self-test clean line:\n%s", args, joined)
+71002d0:tools/d22scan/selftestsamples.go:50:		note:    "161-r1 §3 cell b1-named-bad. Before R16#1 the matcher saw only `go func(`, so a clean report meant \"no bare closures\", not \"nothing bypasses Spawn\".",
+71002d0:tools/d22scan/selftestsamples.go:103:		note:    "161-r1 §3 cell b2-clean: the ban is a C26 PathResolver bypass, not a ban on the filepath package.",
+71002d0:tools/d22scan/selftestsamples.go:298:		note:    "Q-46(c) exemption, signed by the owner (ticket 141). 161-r1 §3 cell b8-comment-clean measured all four scopes silent on this shape.",
+71002d0:tools/d22scan/selftestsamples.go:426:		note:    "Why this is silent and not a hole to hide: shorthandPathStarts() marks the byte offset where an abbreviation REGION starts, and ban #9 skips every repoPathRe token that starts there. Here repoPathRe's own token (docs/evidence/s1/probe-tail-ellipsis.md, without the mark) starts on exactly that offset, so a complete path whose page does not exist goes free because someone typed one glyph after it. 212-v2 measured the live count of this shape in the repo at 0 (its clean-tree fixed/mut token difference is empty), which is the only reason the orchestrator accepted the range instead of narrowing it. NARROWING is a scope change needing an owner (口令 「212 收窄豁免」 on the ticket face) - and the moment someone does it, THIS case rings while it is marked expect-silent, which is the loud flip the pin is for. Readings of the paired mutation: .scratch/wisp/probes/212/r3/fix-and-readings.md §2.",

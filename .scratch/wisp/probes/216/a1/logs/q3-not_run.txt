@@ -1,0 +1,4 @@
+71002d0:cmd/wisp/panel_pump.go:105:// attached one (the pump then reports not_run, with a reason, rather than
+71002d0:internal/panel/composer.go:64:	// is (off / none_found / refused / not_run / loaded). 200-r2 replaced the
+71002d0:internal/panel/instructions_200.go:40:	InstructionsStatusNotRun = "not_run"
+71002d0:internal/panel/instructions_200_test.go:270:		t.Errorf("a wired reader with no bundle yet lost the not_run state: %s", data)

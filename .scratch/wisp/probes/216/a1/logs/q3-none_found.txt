@@ -1,0 +1,10 @@
+71002d0:internal/panel/composer.go:64:	// is (off / none_found / refused / not_run / loaded). 200-r2 replaced the
+71002d0:internal/panel/instructions_200.go:30:	InstructionsStatusNoneFound = "none_found"
+71002d0:internal/panel/instructions_200.go:204:// An empty list is NOT an absent key: it is the none_found section.
+71002d0:internal/panel/instructions_200_test.go:159:			"none_found",
+71002d0:internal/panel/instructions_200_test.go:207:	// The complaint this cell closes: at r1 off / none_found / refused all
+71002d0:internal/panel/instructions_200_test.go:210:		{"off", "none_found"},
+71002d0:internal/panel/instructions_200_test.go:212:		{"none_found", "loaded"},
+71002d0:internal/panel/instructions_200_test.go:214:		{"refused", "none_found"},
+71002d0:internal/panel/instructions_200_test.go:223:	if strings.Contains(wire["none_found"], "已按你的配置跳过") {
+71002d0:internal/panel/instructions_200_test.go:224:		t.Errorf("the nothing-found state claims a switch nobody flipped: %s", wire["none_found"])

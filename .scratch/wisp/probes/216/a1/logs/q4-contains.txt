@@ -1,0 +1,247 @@
+71002d0:cmd/llmrecord/main_test.go:26:		if !strings.Contains(err.Error(), want) {
+71002d0:cmd/wisp/always_write_no_clobber_226_test.go:94:	if !strings.Contains(w.h.err.String(), "approval: REPLY WIDEN-APPLIED") {
+71002d0:cmd/wisp/approval_always_201_test.go:187:	if !strings.Contains(w.h.err.String(), "approval: REPLY WIDEN-REFUSED") {
+71002d0:cmd/wisp/approval_always_201_test.go:270:		if strings.Contains(h.err.String(), needle) {
+71002d0:cmd/wisp/approval_reply_201_test.go:689:		if strings.Contains(h.out.String(), needle) || strings.Contains(h.err.String(), needle) {
+71002d0:cmd/wisp/config_reload_223_test.go:512:		if strings.Contains(r.h.err.String(), "config: D36-CONFIRM") {
+71002d0:cmd/wisp/config_reload_223_test.go:524:		if strings.Contains(r.h.err.String(), "state=denied") {
+71002d0:cmd/wisp/config_reload_223_test.go:789:	if !strings.Contains(errLog, "config: HOT-RELOAD state=disabled host=panel-inbound") {
+71002d0:cmd/wisp/config_reload_223_test.go:793:		if strings.Contains(errLog, other) {
+71002d0:cmd/wisp/dataroot_128_test.go:170:				if !strings.Contains(err.Error(), marker) {
+71002d0:cmd/wisp/dataroot_128_test.go:178:			if !strings.Contains(err.Error(), want) {
+71002d0:cmd/wisp/dataroot_128_test.go:181:			if !strings.Contains(err.Error(), planted128Cause.Error()) {
+71002d0:cmd/wisp/firstrun_198_test.go:98:	if !strings.Contains(stderrText, "新建默认配置") || !strings.Contains(stderrText, cfgPath) {
+71002d0:cmd/wisp/firstrun_198_test.go:129:	if strings.Contains(stderr2, "新建默认配置") {
+71002d0:cmd/wisp/firstrun_198_test.go:167:	if strings.Contains(stderrText, "新建默认配置") {
+71002d0:cmd/wisp/firstrun_198_test.go:170:	if !strings.Contains(stderrText, "配置未就绪") {
+71002d0:cmd/wisp/firstrun_198_test.go:240:	if !strings.Contains(stderrText, "新建默认配置") {
+71002d0:cmd/wisp/firstrun_198_test.go:248:		if strings.Contains(stderrText, borrowed) {
+71002d0:cmd/wisp/firstrun_198r2_test.go:315:	if !strings.Contains(stderrText, "首次配置建不出来") {
+71002d0:cmd/wisp/firstrun_198r2_test.go:323:		if !strings.Contains(stderrText, mustName) {
+71002d0:cmd/wisp/firstrun_198r2_test.go:340:	if strings.Contains(stderrText, "新建默认配置") {
+71002d0:cmd/wisp/firstrun_198r2_test.go:383:		if !strings.Contains(stderrText, mustName) {
+71002d0:cmd/wisp/firstrun_198r2_test.go:415:	if strings.Contains(stderr2, "新建默认配置") || strings.Contains(stderr2, "wisp secret set") {
+71002d0:cmd/wisp/firstrun_198r2_test.go:452:	if strings.Contains(errb.String(), "新建默认配置") {
+71002d0:cmd/wisp/firstrun_198r2_test.go:470:	if !strings.Contains(runStderr, "新建默认配置") {
+71002d0:cmd/wisp/firstrun_257_nonpreset_test.go:59:	if !strings.Contains(stderrText, "新建默认配置") {
+71002d0:cmd/wisp/firstrun_257_nonpreset_test.go:113:		if !strings.Contains(err.Error(), mustBlame) {
+71002d0:cmd/wisp/firstrun_257_test.go:88:	if !strings.Contains(stderrText, "新建默认配置") {
+71002d0:cmd/wisp/firstrun_257_test.go:437:	if !strings.Contains(string(source), "func ensureFirstRunConfig(dataDir string, stderr io.Writer) (bool, error) {") {
+71002d0:cmd/wisp/instructions_200r2_test.go:175:	if !strings.Contains(f.err.String(), "projctx:") ||
+71002d0:cmd/wisp/instructions_200r2_test.go:176:		!strings.Contains(f.err.String(), filepath.Base(note)) {
+71002d0:cmd/wisp/instructions_200r2_test.go:211:	if !strings.Contains(off.err.String(), "已按你的配置跳过") {
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:385:	if !strings.Contains(hit.Msg, "state=Error") {
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:393:	if !strings.Contains(stderr, "wisp models ensure: 交还被拒绝") {
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:445:	if !strings.Contains(setErr, secretStoredMsg) {
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:505:		if !strings.Contains(stderr.String(), modelsRefusalNotice) {
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:510:		if !strings.Contains(stderr.String(), degradationConsole) {
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:536:		if !strings.Contains(stderr, secretRefusalNotice) {
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:540:		if !strings.Contains(stderr, degradationPromise) {
+71002d0:cmd/wisp/leg_sink_nail_131_windows_test.go:550:		if strings.Contains(stdout, fakeKey) || strings.Contains(stderr, fakeKey) {
+71002d0:cmd/wisp/panel_assets_143_test.go:224:	if !strings.Contains(stderr, "-taint-source") {
+71002d0:cmd/wisp/panel_assets_143_test.go:227:	if !strings.Contains(stderr, "INPUT FACT") {
+71002d0:cmd/wisp/panel_assets_143_test.go:230:	if !strings.Contains(stderr, "no verdict") {
+71002d0:cmd/wisp/panel_assets_143_test.go:250:			if !strings.Contains(stderr, "-taint-source") {
+71002d0:cmd/wisp/panel_config_248_test.go:452:	if !strings.Contains(string(errLog), "INBOUND-DISPATCH") {
+71002d0:cmd/wisp/panel_config_248_test.go:469:		if _, err := disp.Handle(context.Background(), raw); !strings.Contains(err.Error(), "处理器未接入") {
+71002d0:cmd/wisp/panel_config_248_test.go:493:	if !strings.Contains(err.Error(), "model_context_window") {
+71002d0:cmd/wisp/panel_config_320_test.go:55:		if !strings.Contains(err.Error(), "billing") {
+71002d0:cmd/wisp/panel_config_320_test.go:60:		if strings.Contains(err.Error(), "第 3 种拒因") {
+71002d0:cmd/wisp/panel_config_320_test.go:70:	} else if !strings.Contains(err.Error(), "行不存在") {
+71002d0:cmd/wisp/panel_config_320_test.go:150:	} else if !strings.Contains(err.Error(), "provider_row_create") {
+71002d0:cmd/wisp/panel_config_320_test.go:156:	} else if !strings.Contains(err.Error(), "base_url") {
+71002d0:cmd/wisp/panel_config_320_test.go:204:	} else if !strings.Contains(err.Error(), "行不存在") {
+71002d0:cmd/wisp/panel_config_320_test.go:209:	} else if !strings.Contains(err.Error(), "already exists") {
+71002d0:cmd/wisp/panel_delete_320_test.go:42:	} else if !strings.Contains(err.Error(), "不在这个目录里") {
+71002d0:cmd/wisp/panel_delete_320_test.go:58:	} else if !strings.Contains(err.Error(), "默认聊天模型") {
+71002d0:cmd/wisp/panel_inbound_33_test.go:141:	if !strings.Contains(errLog, "INBOUND-DISPATCH") {
+71002d0:cmd/wisp/panel_inbound_33_test.go:144:	if !strings.Contains(errLog, inboundRid) {
+71002d0:cmd/wisp/panel_inbound_33_test.go:147:	if strings.Contains(errLog, "panel: MODE-REFUSED") {
+71002d0:cmd/wisp/panel_inbound_33_test.go:171:	if !strings.Contains(errLog, "panel.workspace.request") {
+71002d0:cmd/wisp/panel_models_320_test.go:143:	if err == nil || !strings.Contains(err.Error(), "ghost") {
+71002d0:cmd/wisp/panel_models_320_test.go:152:	if err == nil || !strings.Contains(err.Error(), "base_url") {
+71002d0:cmd/wisp/panel_models_320_test.go:165:	if err == nil || !strings.Contains(err.Error(), "密钥") {
+71002d0:cmd/wisp/panel_models_320_test.go:180:	if err == nil || !strings.Contains(err.Error(), "configProvider") {
+71002d0:cmd/wisp/panel_resident_windows_test.go:654:	if o.err == nil || !strings.Contains(o.err.Error(), "WM_CLOSE") {
+71002d0:cmd/wisp/panel_resident_windows_test.go:794:	if err != nil && !strings.Contains(err.Error(), "WM_CLOSE") {
+71002d0:cmd/wisp/providers_test.go:145:	if !strings.Contains(errb, "能力实测不符") || !strings.Contains(errb, "thinking") {
+71002d0:cmd/wisp/providers_test.go:187:	if strings.Contains(pf.err.String(), "能力实测不符") {
+71002d0:cmd/wisp/providers_test.go:246:	if !strings.Contains(pf.err.String(), "Unconfigured") {
+71002d0:cmd/wisp/resident_approval_risk_268_windows_test.go:110:	if !strings.Contains(loadErr.Error(), "out of range [31, 3600]") {
+71002d0:cmd/wisp/resident_grant_writer_265_windows_test.go:339:	} else if !strings.Contains(err.Error(), "账本写不进去") {
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:125:	if !strings.Contains(out.Text, errResidentNoBall.Error()) {
+71002d0:cmd/wisp/resident_task_source_246_windows_test.go:167:			if !strings.Contains(f.err.String(), "注入的审批门必须连同它自己的界面与会话账本一起递进来") {
+71002d0:cmd/wisp/run_test.go:223:	if !strings.Contains(errb, "error_class=provider") {
+71002d0:cmd/wisp/run_test.go:441:		strings.Contains(f.err.String(), fakeStoreKey) {
+71002d0:cmd/wisp/run_test.go:467:	if !strings.Contains(f.err.String(), "Unconfigured") {
+71002d0:cmd/wisp/run_test.go:473:	if strings.Contains(f.err.String(), fakeStoreKey) ||
+71002d0:cmd/wisp/secret_argv_windows_test.go:354:		if strings.Contains(stdout.String(), fakeKey) || strings.Contains(stderr.String(), fakeKey) {
+71002d0:cmd/wisp/secret_argv_windows_test.go:385:	if strings.Contains(stdout.String(), fakeKey) || strings.Contains(stderr.String(), fakeKey) {
+71002d0:cmd/wisp/secret_test.go:209:	if strings.Contains(p.errb.String(), fakeKey) {
+71002d0:cmd/wisp/secret_test.go:312:			if strings.Contains(p.out.String(), fakeKey) || strings.Contains(p.errb.String(), fakeKey) {
+71002d0:cmd/wisp/secret_test.go:418:			if !strings.Contains(p.errb.String(), form) && !strings.Contains(p.errb.String(), strings.TrimPrefix(form, "-")) {
+71002d0:cmd/wisp/secret_test.go:429:		} else if strings.Contains(p.errb.String(), fakeKey) {
+71002d0:cmd/wisp/secret_test.go:618:		if !strings.Contains(p2.errb.String(), "dpapi:corrupt") {
+71002d0:cmd/wisp/secret_test.go:637:		if !strings.Contains(p2.errb.String(), "env:") {
+71002d0:cmd/wisp/secret_test.go:678:		if !strings.Contains(q.errb.String(), "never-stored") {
+71002d0:cmd/wisp/secret_test.go:703:		if !strings.Contains(q.errb.String(), "dpapi:late") {
+71002d0:cmd/wisp/secret_test.go:817:		if !strings.Contains(q.errb.String(), "voice.realtime.api_key_ref") {
+71002d0:cmd/wisp/secret_test.go:1178:		if !strings.Contains(p.errb.String(), "Usage") {
+71002d0:cmd/wisp/secret_test.go:1186:	if !strings.Contains(p.errb.String(), "from-stdin") || !strings.Contains(p.errb.String(), "WISP_ENV=") {
+71002d0:cmd/wisp/slo_report_144_windows_test.go:156:			if !strings.Contains(obs.err.Error(), tc.wantReason) {
+71002d0:cmd/wisp/slo_report_144_windows_test.go:159:			if !strings.Contains(obs.err.Error(), fmt.Sprintf("%d bytes", len(tc.body))) {
+71002d0:cmd/wisp/slo_report_144_windows_test.go:249:		if !strings.Contains(err.Error(), want) {
+71002d0:cmd/wisp/slo_report_144_windows_test.go:253:	if strings.Contains(err.Error(), "within 20s") {
+71002d0:cmd/wisp/slo_report_144_windows_test.go:303:	if !strings.Contains(err.Error(), "corrupt") || !strings.Contains(err.Error(), "no state report") {
+71002d0:cmd/wisp/slo_report_144_windows_test.go:493:	if strings.Contains(err.Error(), "offset") {
+71002d0:cmd/wisp/slo_report_144_windows_test.go:792:	if strings.Contains(unknown.Error(), "at offset "+strconv.FormatInt(offsetUnknown, 10)) {
+71002d0:cmd/wisp/task_scope_close_151_test.go:61:	if !strings.Contains(f.err.String(), want) {
+71002d0:cmd/wisp/ticket224_assembly_test.go:189:	if !strings.Contains(h.err.String(),
+71002d0:cmd/wisp/ticket224_assembly_test.go:194:	if strings.Contains(h.err.String(), "GRANT-DROPPED") {
+71002d0:cmd/wisp/ticket224_assembly_test.go:331:	if !strings.Contains(h.err.String(),
+71002d0:cmd/wisp/zz315a1probe_test.go:685:	if !strings.Contains(f.errb.String(), instr) || !strings.Contains(f.errb.String(), "tier=global") {
+71002d0:internal/audio/level_test.go:260:		if !strings.Contains(err.Error(), strconv.Itoa(len(tc.frame))) {
+71002d0:internal/config/catalog_test.go:47:		if !strings.Contains(err.Error(), el) {
+71002d0:internal/config/catalog_test.go:50:		if !strings.Contains(err.Error(), "text_chain") {
+71002d0:internal/config/catalog_test.go:69:		if err == nil || !strings.Contains(err.Error(), "acme/ghost") ||
+71002d0:internal/config/catalog_test.go:70:			!strings.Contains(err.Error(), "cloud_asr_chain") {
+71002d0:internal/config/catalog_test.go:76:		if err == nil || !strings.Contains(err.Error(), "ghostcorp/tts-1") ||
+71002d0:internal/config/catalog_test.go:77:			!strings.Contains(err.Error(), "cloud_tts_chain") {
+71002d0:internal/config/catalog_test.go:85:		if err == nil || !strings.Contains(err.Error(), "local-sherpa") {
+71002d0:internal/config/catalog_test.go:102:		if err == nil || !strings.Contains(err.Error(), "llm.roles.chat") {
+71002d0:internal/config/catalog_test.go:110:		if err == nil || !strings.Contains(err.Error(), "llm.roles.chat") {
+71002d0:internal/config/catalog_test.go:119:		if err == nil || !strings.Contains(err.Error(), "ghost") {
+71002d0:internal/config/catalog_test.go:128:		if err == nil || !strings.Contains(err.Error(), "acme/ghost") {
+71002d0:internal/config/catalog_test.go:155:		if err == nil || !strings.Contains(err.Error(), "acme/ghost") {
+71002d0:internal/config/catalog_test.go:163:		if err == nil || !strings.Contains(err.Error(), "voice.realtime") {
+71002d0:internal/config/enabled_261_test.go:128:	} else if !strings.Contains(err.Error(), "refusing to invent one") {
+71002d0:internal/config/loader_test.go:96:	if !strings.Contains(err.Error(), "app.nope") {
+71002d0:internal/config/loader_test.go:99:	if !strings.Contains(err.Error(), "line 6") {
+71002d0:internal/config/loader_test.go:111:	if !strings.Contains(err.Error(), "line 2") {
+71002d0:internal/config/loader_test.go:127:	if !strings.Contains(err.Error(), "line 5") {
+71002d0:internal/config/loader_test.go:140:	if err == nil || !strings.Contains(err.Error(), "audio.half_duplex") {
+71002d0:internal/config/loader_test.go:183:	if err == nil || !strings.Contains(err.Error(), "llm.providers.acme.protocol") {
+71002d0:internal/config/loader_test.go:248:	if !strings.Contains(err.Error(), "env:MISSING_KEY") {
+71002d0:internal/config/loader_test.go:273:	if !strings.Contains(err.Error(), "99") {
+71002d0:internal/config/migrate_test.go:131:	if !strings.Contains(err.Error(), "migrat") {
+71002d0:internal/config/migrate_test.go:150:	if !strings.Contains(err.Error(), "7") {
+71002d0:internal/config/migrate_test.go:160:	if err == nil || !strings.Contains(err.Error(), "newer build") {
+71002d0:internal/config/settings_257_test.go:113:	} else if !strings.Contains(err.Error(), refusalFileMissing) {
+71002d0:internal/config/settings_257_test.go:333:		if !strings.Contains(err.Error(), "refusing to invent one") {
+71002d0:internal/config/settings_313_test.go:100:			if !strings.Contains(err.Error(), tc.mustSay) {
+71002d0:internal/config/settings_313_test.go:133:	if !strings.Contains(err.Error(), "行不存在") {
+71002d0:internal/config/settings_320_test.go:53:	if !strings.Contains(err.Error(), "billing") {
+71002d0:internal/config/settings_320_test.go:59:	if strings.Contains(err.Error(), refusalInvalid) {
+71002d0:internal/config/settings_320_test.go:72:	if !strings.Contains(err.Error(), "行不存在") {
+71002d0:internal/config/settings_320_test.go:163:			if !strings.Contains(err.Error(), tc.mustSay) {
+71002d0:internal/config/settings_320_test.go:248:			if !strings.Contains(err.Error(), tc.mustSay) {
+71002d0:internal/config/unwired_test.go:136:	} else if !strings.Contains(err.Error(), "risk.shell_allowlist") {
+71002d0:internal/config/unwired_test.go:254:	if !strings.Contains(err.Error(), "unknown key") {
+71002d0:internal/config/unwired_test.go:257:	if strings.Contains(err.Error(), "does nothing") {
+71002d0:internal/config/unwired_test.go:279:	} else if !strings.Contains(err.Error(), "risk.shell_enabled") {
+71002d0:internal/config/validate_267_test.go:69:	} else if !strings.Contains(err.Error(), "risk.confirm_timeout_sec") {
+71002d0:internal/config/validate_267_test.go:101:			if !strings.Contains(err.Error(), "risk.confirm_timeout_sec") || !strings.Contains(err.Error(), "out of range") {
+71002d0:internal/config/validate_test.go:71:			if !strings.Contains(err.Error(), tc.path) {
+71002d0:internal/config/validate_test.go:149:			if !strings.Contains(err.Error(), tc.path) {
+71002d0:internal/config/validate_test.go:202:			if !strings.Contains(err.Error(), "risk.confirm_timeout_sec") {
+71002d0:internal/config/validate_test.go:205:			if !strings.Contains(err.Error(), band) {
+71002d0:internal/config/validate_test.go:208:			if !strings.Contains(err.Error(), fmt.Sprintf("%d out of range", bad)) {
+71002d0:internal/config/validate_test.go:274:			if !tc.wantOK && !strings.Contains(err.Error(), "llm.providers.acme.api_key_ref") {
+71002d0:internal/config/validate_test.go:288:	if !strings.Contains(err.Error(), "voice.realtime.api_key_ref") {
+71002d0:internal/config/writeguard_226_test.go:172:	if !strings.Contains(err.Error(), "cannot be read back") {
+71002d0:internal/config/writeguard_226_test.go:175:	if !strings.Contains(err.Error(), "keeping the previous allowlist in memory") {
+71002d0:internal/config/writeguard_226_test.go:340:		if !strings.Contains(err.Error(), "..") {
+71002d0:internal/config/writeguard_226_test.go:377:	} else if !strings.Contains(err.Error(), "keeping the previous allowlist in memory") {
+71002d0:internal/llm/anthropic/cache_test.go:259:	} else if !strings.Contains(err.Error(), "exceed the protocol maximum") {
+71002d0:internal/llm/anthropic/cache_test.go:264:		!strings.Contains(err.Error(), "dial tcp") {
+71002d0:internal/llm/anthropic/cache_test.go:271:		!strings.Contains(err.Error(), "out of range") {
+71002d0:internal/llm/catalog_test.go:141:		!strings.Contains(err.Error(), "google-generativeai") {
+71002d0:internal/llm/enabled_gate_261_r1_test.go:113:	if !strings.Contains(ghostErr.Error(), "unknown model") {
+71002d0:internal/llm/enabled_gate_261_r1_test.go:116:	if strings.Contains(ghostErr.Error(), "disabled") {
+71002d0:internal/llm/enabled_gate_261_r1_test.go:119:	if strings.Contains(ghostErr.Error(), "缺 enabled 键") {
+71002d0:internal/llm/enabled_gate_261_r1_test.go:131:	if _, _, err := res.ResolveRole(llm.RoleChat); err == nil || !strings.Contains(err.Error(), "disabled") {
+71002d0:internal/llm/enabled_reach_261_test.go:194:	if !strings.Contains(err.Error(), "disabled") {
+71002d0:internal/llm/enabled_reach_261_test.go:200:		if !strings.Contains(err.Error(), guidance) {
+71002d0:internal/llm/enabled_reach_261_test.go:204:	if strings.Contains(err.Error(), "unknown model") {
+71002d0:internal/llm/enabled_reach_261_test.go:212:	if _, _, err := res.ResolveRole(llm.RoleChat); err == nil || !strings.Contains(err.Error(), "disabled") {
+71002d0:internal/llm/enabled_reach_261_test.go:219:	if _, err := res.ResolveChain(); err == nil || !strings.Contains(err.Error(), "disabled") {
+71002d0:internal/llm/enabled_reach_261_test.go:221:	} else if !strings.Contains(err.Error(), "enabled = true") {
+71002d0:internal/llm/enabled_reach_261_test.go:364:	if !strings.Contains(ghostErr.Error(), "unknown model") {
+71002d0:internal/llm/enabled_reach_261_test.go:367:	if strings.Contains(ghostErr.Error(), "disabled") {
+71002d0:internal/llm/llm_test.go:509:	if !strings.Contains(err.Error(), "exhausted too") {
+71002d0:internal/llm/openairesponses/protocol_test.go:170:		!strings.Contains(err.Error(), "stop-sequence") {
+71002d0:internal/llm/probe_health_test.go:400:	} else if !strings.Contains(err.Error(), "HealthSink") {
+71002d0:internal/llm/probe_health_test.go:408:	} else if !strings.Contains(err.Error(), "mismatch") {
+71002d0:internal/llm/probe_thinking_test.go:44:	} else if !strings.Contains(err.Error(), "no reasoning delta") {
+71002d0:internal/memory/dao_test.go:581:		strings.Contains(err.Error(), "context deadline exceeded")
+71002d0:internal/memory/privacy_test.go:150:		!strings.Contains(err.Error(), "unknown privacy domain") {
+71002d0:internal/memory/schema_test.go:633:	if !strings.Contains(err.Error(), "no schema_meta") {
+71002d0:internal/models/acl_sid_121_test.go:253:	if !strings.Contains(err.Error(), "nobody-here") {
+71002d0:internal/models/downloader_test.go:255:	if !strings.Contains(err.Error(), "sha256 MISMATCH") {
+71002d0:internal/models/downloader_test.go:298:	if !strings.Contains(err.Error(), "FAILED") {
+71002d0:internal/models/downloader_test.go:312:	if !strings.Contains(err.Error(), "NOT disableable") {
+71002d0:internal/models/downloader_test.go:430:	if !strings.Contains(err.Error(), "cancel") {
+71002d0:internal/models/manifest_real_test.go:191:	if !strings.Contains(err.Error(), "P3-BLOCKED") {
+71002d0:internal/models/verify_tree_121_other_test.go:66:	if !strings.Contains(err.Error(), "model.onnx") || !strings.Contains(err.Error(), "symlink") {
+71002d0:internal/models/verify_tree_121_other_test.go:88:	if !strings.Contains(err.Error(), "tokens.conf") {
+71002d0:internal/models/verify_tree_121_test.go:135:			if !strings.Contains(err.Error(), tc.want) {
+71002d0:internal/models/verify_tree_121_test.go:168:	if !strings.Contains(err.Error(), "extra.bin") {
+71002d0:internal/observe/sampler_faketree_guard_136_test.go:62:	if !strings.Contains(err.Error(), "no scripted reads") {
+71002d0:internal/observe/sampler_settle_coverage_136_test.go:162:	if !strings.Contains(rep.LastSampleError, "settle probe: transient tree read failure") {
+71002d0:internal/observe/sampler_settle_coverage_136_test.go:185:	if !strings.Contains(coverage.Measured, " errors") || !strings.Contains(coverage.Note, "sample_errors=") {
+71002d0:internal/observe/sampler_settle_coverage_136_test.go:259:	if !strings.Contains(rep.LastSampleError, "settle probe: transient tree read failure") {
+71002d0:internal/observe/sampler_settle_coverage_136_test.go:285:	if !strings.Contains(coverage.Measured, " errors") || !strings.Contains(coverage.Note, "sample_errors=") {
+71002d0:internal/observe/sampler_settle_coverage_136_test.go:355:	if !strings.Contains(coverage.Measured, " errors") || !strings.Contains(coverage.Note, "sample_errors=") {
+71002d0:internal/observe/sampler_settle_gate_136_test.go:183:	if !strings.Contains(row.Limit, "sample_errors") {
+71002d0:internal/observe/sampler_settle_gate_136_test.go:186:	if !strings.Contains(row.Note, "sample_errors=0") {
+71002d0:internal/observe/sampler_settle_gate_136_test.go:235:	if !strings.Contains(row.Note, fmt.Sprintf("sample_errors=%d", lost)) {
+71002d0:internal/observe/sampler_settle_gate_136_test.go:401:		if v.Metric == settleCoverageMetric || strings.Contains(v.Limit, "sample_errors") {
+71002d0:internal/observe/sampler_zerosample_136_test.go:77:	if !strings.Contains(rep.LastSampleError, "zero private working set") {
+71002d0:internal/panel/assets_test.go:30:	if _, _, err := assets.Resolve("/"); err == nil || !strings.Contains(err.Error(), "not built") {
+71002d0:internal/panel/assets_test.go:33:	if _, err := assets.Check(); err == nil || !strings.Contains(err.Error(), "not built") {
+71002d0:internal/panel/assets_test.go:54:	if !strings.Contains(err.Error(), "index-BBB.js") {
+71002d0:internal/panel/assets_test.go:111:		if _, _, err := assets.Resolve("/"); err == nil || !strings.Contains(err.Error(), "not built") {
+71002d0:internal/panel/assets_test.go:114:		if _, err := assets.Check(); err == nil || !strings.Contains(err.Error(), "not built") {
+71002d0:internal/panel/attachments_test.go:323:	if !strings.Contains(err.Error(), wantInReason) {
+71002d0:internal/panel/attachments_test.go:366:		if !strings.Contains(err.Error(), "无法解码") {
+71002d0:internal/panel/attachments_test.go:377:		if err == nil || !strings.Contains(err.Error(), "截断") {
+71002d0:internal/panel/attachments_test.go:388:			!strings.Contains(err.Error(), "0 字节") {
+71002d0:internal/panel/bridge_test.go:85:			!strings.Contains(err.Error(), "不是面板 composer 通路") {
+71002d0:internal/panel/bridge_test.go:93:			!strings.Contains(err.Error(), "requestId") {
+71002d0:internal/panel/bridge_test.go:104:			} else if !strings.Contains(err.Error(), "伪造") {
+71002d0:internal/panel/composer_dispatch_test.go:330:		if !strings.Contains(err.Error(), "来源") {
+71002d0:internal/panel/config_313_test.go:98:	if err != nil && !strings.Contains(err.Error(), FieldVoiceCloudTTSChain) {
+71002d0:internal/panel/config_route_248_test.go:235:		if err != nil && !strings.Contains(err.Error(), tc.mustSay) {
+71002d0:internal/panel/l2_grant_boundary_test.go:1787:	case strings.Contains(err.Error(), "unknown field"):
+71002d0:internal/panel/l2_grant_boundary_test.go:1789:	case strings.Contains(err.Error(), "cannot unmarshal"):
+71002d0:internal/panel/pump_test.go:249:	if !strings.Contains(err.Error(), "没有出口") {
+71002d0:internal/perm/store_test.go:353:	} else if !strings.Contains(err.Error(), "ask_every_step|ask_high_risk|auto_approve") {
+71002d0:internal/perm/ticket90_persist_test.go:321:	} else if !strings.Contains(err.Error(), "risk.permission_mode") {
+71002d0:internal/proc/envfork_test.go:356:	if !strings.Contains(err.Error(), "user config dir") {
+71002d0:internal/secret/delete_test.go:57:	if strings.Contains(err.Error(), testSecret) {
+71002d0:internal/secret/store_test.go:218:		if !strings.Contains(err.Error(), "env:") {
+71002d0:internal/secret/store_test.go:221:		if strings.Contains(err.Error(), testSecret) {
+71002d0:internal/secret/store_test.go:244:		if strings.Contains(err.Error(), testSecret) {
+71002d0:internal/tools/bridge_test.go:338:	} else if !strings.Contains(err.Error(), "undeclared capability") {
+71002d0:internal/tools/fs_edit_ac5_gate_r4_test.go:208:		if !strings.Contains(line, "outcome=error") {
+71002d0:internal/tools/paths_workspace_test.go:106:	} else if !strings.Contains(err.Error(), "allowed_dirs") {
+71002d0:internal/tools/refusal_20r2_windows_test.go:89:	if !out.IsError || strings.Contains(out.Text, secret) || out.ErrorClass != "permission_denied" {
+71002d0:internal/winsec/absoluteness_attribution_129_windows_test.go:70:	if _, err := (builtinVerifier{}).Resolve(rel129); err == nil || !strings.Contains(err.Error(), "is not absolute") {
+71002d0:internal/winsec/openleaf_flag_322_other_test.go:57:		} else if !errors.Is(err, syscall.ELOOP) || !strings.Contains(err.Error(), whyOpenELOOP322r1) {
+71002d0:internal/winsec/openleaf_guard_322_windows_test.go:76:	if !strings.Contains(err.Error(), whyGuardRefusal322r1) {
+71002d0:internal/winsec/openleaf_guard_322_windows_test.go:221:		case strings.Contains(err.Error(), whyGuardRefusal322r1):
+71002d0:internal/winsec/placement_symlink_113_other_test.go:158:// contains the planted link as a substring, so a bare strings.Contains(err.Error(),
+71002d0:internal/winsec/private_set_sid_windows_test.go:397:	if !strings.Contains(err.Error(), everyoneSID) {
+71002d0:internal/winsec/reparse_windows_test.go:159:	if !strings.Contains(err.Error(), link) {
+71002d0:internal/winsec/reparse_windows_test.go:300:	if !strings.Contains(err.Error(), link) {
+71002d0:internal/winsec/sealhandle_identity_120_other_test.go:125:	if err == nil || strings.Contains(err.Error(), whyHandleLink120r3) {
+71002d0:internal/winsec/sealhandle_window_120_other_test.go:117:	if !strings.Contains(err.Error(), want) {
+71002d0:internal/winsec/seam_bypass_108_windows_test.go:268:			} else if !strings.Contains(strings.ToLower(err.Error()), "reparse") &&
+71002d0:internal/winsec/seam_guard_windows_test.go:189:	} else if !strings.Contains(strings.ToLower(err.Error()), "reparse") &&
+71002d0:internal/winsec/seam_guard_windows_test.go:209:	} else if !strings.Contains(strings.ToLower(err.Error()), "reparse") &&
+71002d0:tools/d22scan/scan_test.go:661:	if !strings.Contains(errOut, "ban #8 scope frontend/") {
+71002d0:tools/d22scan/scan_test.go:699:	// `if strings.Contains(report, "frontend") { t.Errorf(...) }`, because at
+71002d0:tools/d22scan/scan_test.go:837:	if !strings.Contains(errOut, "ban #7 internal/tools/") {
+71002d0:tools/d22scan/scan_test.go:865:	if !strings.Contains(errOut, "bans #1-5 cmd/") {
+71002d0:tools/d22scan/scan_test.go:946:	if !strings.Contains(errOut, exempt.label) {
+71002d0:tools/d22scan/scan_test.go:1020:	if !strings.Contains(errOut, "some-future-ban") {

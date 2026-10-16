@@ -1,0 +1,3 @@
+71002d0:internal/agent/spill_path_invariant_test.go:282:	control := inv76aEscapeID(t, artifacts, root, "CONTROL-escape")
+71002d0:internal/agent/spill_path_invariant_test.go:305:	lit := inv76aEscapeIDWithSep(t, artifacts, root, "CONTROL-literal", `\`)
+71002d0:internal/memory/models.go:216:func escapeLike(s string) string {
