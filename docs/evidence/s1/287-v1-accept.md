@@ -171,8 +171,8 @@
 
 ## 8. 本腿自证三把尺
 
-1. 提交号（本腿共 3 笔，全部⛔ push）：`1a651618`（287-v1 遗产 13 枚按枚入库）／`96f3767d`（门禁五件复跑，18 枚件）／
-   `7dec3a6c`（突变台件八发＋只读尺，56 枚件）；每笔 `git show --stat` 路径清单逐枚显式（`--pathspec-from-file` 里是一行一枚的具体路径，⛔ 目录形⛔ `-A`）。
+1. 提交号（本腿共五笔，全部⛔ push；尺＝`git log --grep=287-v1b` 现量）：`1a651618`（287-v1 遗产 13 枚按枚入库）／`96f3767d`（门禁五件复跑，18 枚件）／
+   `7dec3a6c`（突变台件八发＋只读尺，56 枚件）／`d378635d`（本件＋gofumpt 三枚读数）／票尾 bullet 那一笔（本件之后落，含本节这一行改正）；每笔 `git show --stat` 路径清单逐枚显式（`--pathspec-from-file` 里是一行一枚的具体路径，⛔ 目录形⛔ `-A`）。
 2. 判语表＝本件：`D:\work\workspace\projects plans\Wisp\docs\evidence\s1\287-v1-accept.md`；读数根＝
    `D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\287\v1b\`（74 枚件，逐枚 `wc -c` 在名册里）。
 3. 门禁逐枚 `rc=`：`GOFLAGS= go build ./...`＝**0**；`go test ./internal/tools/ -count=1 -v`＝**0**；`go vet ./internal/tools/`＝**0**；
