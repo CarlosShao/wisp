@@ -1,0 +1,27 @@
+325-r1 证据件落盘：docs/evidence/s1/325-runtests-gotmp.md（五格自陈·179 行）
+
+AGENTS.md §1.5 要求的那枚裁决落点件（短名、无 `§`）。内容＝本腿五格的自陈＋逐字读数指针，
+**不是裁决**：翻框与判语权归非实现者验收腿，文首已具名声明。
+
+- §0 台面：三枚仓外导出树（pre＝锚 46007856 混形／post＝428ef21e 原生／revert＝反控副本），
+  六件套逐枚验在＋`find -name '*.go'`＝1090 非空；唯一在仓内跑的一发＝长度门（它要 git 索引）
+- §1 AC#1：改前/改后各一发 `sh scripts/d22scan.sh` 都 rc=0 clean、正控制四数逐字同形
+  （`PASS=35 FAIL=0 SKIP=0 === RUN=77`）⇒ **这一格在未修码上"不响"**；发射根两行逐字只差分隔符；
+  与 scripts 三处的同形对拉串；护栏复认（⛔ scripts/**、⛔ 四处对照位，其中 runtests.sh 那处
+  因注释位移 :155→:178、字节未变）
+- §2 AC#2：四枚真名 `-list` 逐枚 1/1 自证 ⇒ **未修码那一发真红**（rc=1、RUN=4 PASS=0 FAIL=4），
+  四行红句逐字（:182/:286/:59/:116），并具名分清两种 cmd 措辞（混形＝`Parameter format not correct`，
+  纯正斜杠＝`Invalid switch`）；物理退回混形的反控链带突变自证（mixed-hits=1/native=0）＋还原
+  sha256 回到提交态 `ad6f6a8d…`＋复跑 4/0；**射程答＝缺世界**（scripts/d22scan.sh 只交 tools/d22scan，
+  全仓 mklink 只在 internal/ 七枚；ci.yml:831 那步的 -run 只盖 TestPathResolverJunctionWindows，
+  本腿亲测它在混形根下 rc=0 PASS=1＝filepath.Join 归一化吃得下混形）；⛔ 为凑红改档位
+- §3 AC#3：`--scope=windows` rc=0；GOTMPDIR 行逐字原生形；**逐包四数 11 枚**（派单"八包"＝过期计数，
+  已具名更正）总计 RUN=662 PASS=462 FAIL=0 SKIP=0，与脚本自打印行一致、risk 那行与 317-v1 同形；
+  红名册＝空 ⇒ 与 10-14 两发 CI 的 Invalid switch 名册（四枚 Sync/116 族，账＝A922）作差＝新增 0
+- §4 AC#4：四枚门逐枚 rc=0＋台面具名；gofumpt 据实写"which rc=1、四处候选目录无真身、
+  本腿写面 0 枚 .go ⇒ 射程 0"，⛔ 拿 gofmt 的 0 冒充
+- §5 AC#5：票 317 那句重述归编排者，本腿只在票 325 尾追加一条 bullet
+- §6 没做完三件（CI 换色那一发／cli 档是禁跑不是忘跑／纯正斜杠基座那发只有别人两份）
+- §7 临时根名册（只建不删）
+
+只 commit，push 归编排者。
