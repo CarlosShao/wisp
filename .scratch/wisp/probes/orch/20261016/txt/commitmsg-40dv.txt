@@ -1,0 +1,8 @@
+停车点 4.0dv：推送前提复尺（那枚按住两周的红现跑绿了，但仍按到写腿收完再推）＋第十一波五枚在飞＋★机械手册补两条（门禁⛔ 打在部分导出树上＝d22scan 自己声明 design/＋frontend/ 射程、空射程硬退出 rc=2；git mv 后⛔ 把旧路径再放进 git add＝整条 && 链断掉）
+
+- 盘上：HEAD 1bb2fcee（A1007 收档笔）、台账末节 A1007、本地领先 origin/dev 127 枚
+- 复尺：TestTicket255RosterStillMatchesTheActualReadSites 补 PATH 后 --- PASS (0.73s)、14/14 段 match=true、rc=0；第一次拿回的 exit status 0xc0000135＋rc=1＋零枚 --- FAIL ＝那包根本没跑（少 DLL 的台面形），⛔ 当判据
+- 在飞五枚：270-r2（写 internal/tools 只注释）∥ 165-v2（裁票 165 AC#6，独占 internal/agent 编译面）∥ 327-a1／328-a1／216-a2（三枚只读普查，⛔ 跑 Go）；放腿判据＝CPU 三发 44/42/43 ≤70% ＋ 除机主 PID 21892 外 Go 进程 0
+- cmd/wisp 与 internal/panel 两枚共享编译面本波零写腿＝下一波必须补写腿；313 那三格未勾是界面侧（归机主的外部前端 agent，本编队⛔ 动 frontend/**）
+- 待人项照旧只 Q-85；另具名：工作树 go.mod 有一枚不是任何腿的活的脏改动（webview2 indirect→direct、mtime 10-10 22:28），go.mod 是禁区，只留给机主
+- 追加纪律：只加节不改旧节（numstat 18/0，五枚节头 4.0dr/ds/dt/du/dv 逐名各 1 枚）；改前后 HANDOVER 拷贝留档
