@@ -1,0 +1,56 @@
+### 326-r1 交件自证·名册与禁区（现跑 2026-10-16 11:3x +08，HEAD＝`f2787393`）
+
+本腿四笔提交＝`86298e24`（产码＋用例）／`d3f98938`（读数件）／`a60da735`（判语件）／`f2787393`（票尾 bullet）。
+★**这一件本身＝本腿第五笔**（只落 `probes/326/r1/` 一枚写面、⛔ 再动票 326：派单把票面写面限定为"末尾**一条** bullet"，
+所以票数不在这件里追改；上面"四枚"那一句是第四笔落盘时的现量，按⛔ 改写已入库文字规矩⛔ 回填，只在这里具名）。
+尺＝`for c in <本腿各笔>; do git show --name-only --format= $c; done | grep -v '^$' | sort -u`（⛔ 拿
+`git diff <锚>..<HEAD>` 冒充——那一把把别腿在同一区间里的提交也算进来，本腿第一次跑错过这一枚，
+读数里 `cmd/wisp/panel_pump.go` 等三枚＝`220-r2` 的笔、⛔ 属本腿账）。
+
+- 并集枚数＝**29 枚**（单位＝文件，尺＝前四笔）：`internal/memory/**` 3 枚＋`internal/session/manage_test.go` 1 枚＋
+  `.scratch/wisp/probes/326/r1/**` 23 枚（含 `logs/` 十二枚、两枚可重放脚本、一枚 bench 件、四枚 commit 正文件）＋
+  `docs/evidence/s1/326-append-updated.md` 1 枚＋票 326 1 枚。逐枚名册见本件末尾。
+  ★第五笔（本件＋`msg-c5.txt`）再＋2 枚＝**31 枚**，两枚都落在 `probes/326/r1/` ⇒ 越界尺同样 **0 命中**（重跑那把尺即可）。
+- 越界尺＝`grep -vcE '^(internal/memory/|internal/session/|\.scratch/wisp/probes/326/r1/|docs/evidence/s1/326-append-updated\.md$|\.scratch/wisp/issues/326-append)'`
+  ⇒ **0 枚、rc=1**；正控（同一把尺的 `^(internal/memory/|internal/session/)` 形）⇒ **4 枚、rc=0** ⇒ "0 命中"⛔ 是尺坏。
+- 禁区尺＝对上面那枚并集 grep `cmd/wisp/｜internal/panel/｜internal/winsec/｜internal/risk/｜scripts/｜tools/｜docs/PLAN.md｜
+  docs/specs/｜go.mod｜go.sum｜.github/｜frontend/｜design/｜.gitignore｜internal/observe/thresholds.go｜
+  三枚冻结件（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go）`
+  ⇒ **命中 0 枚、rc=1**。
+- 票框尺＝未勾 **6 枚**／已勾 **0 枚**（本腿一枚⛔ 翻）。
+- 票面改动尺＝`git diff --numstat` 该票 ＝ **2 行新增／0 行删除**（一枚空行＋一条 bullet，上面正文⛔ 动一字）。
+- 判语件尺度＝`wc -l -c docs/evidence/s1/326-append-updated.md` ⇒ **172 行／17568 字节**。
+- 剩余未提交＝`git status --porcelain=v1 -- internal/memory internal/session .scratch/wisp/probes/326 docs/evidence/s1 <票 326>`
+  ⇒ **空**（本腿写面全部入库；⛔ push，推送归编排者）。
+
+#### 29 枚逐枚名册（现跑输出）```
+.scratch/wisp/issues/326-append-session-turn-does-not-refresh-session-updated-so-a-live-chat-never-moves-up.md
+.scratch/wisp/probes/326/r1/00-setup-and-trees.txt
+.scratch/wisp/probes/326/r1/20-ac2-orderby-untouched.txt
+.scratch/wisp/probes/326/r1/40-de-tooth-and-teeth.txt
+.scratch/wisp/probes/326/r1/60-open-shapes-and-landing.txt
+.scratch/wisp/probes/326/r1/de-tooth.sh
+.scratch/wisp/probes/326/r1/de-tooth2.sh
+.scratch/wisp/probes/326/r1/logs/00-step0-measure.txt
+.scratch/wisp/probes/326/r1/logs/10-red-before-fix.txt
+.scratch/wisp/probes/326/r1/logs/11-red-before-crash.txt
+.scratch/wisp/probes/326/r1/logs/12-green-after-fix.txt
+.scratch/wisp/probes/326/r1/logs/13-baseline-wholepackage.txt
+.scratch/wisp/probes/326/r1/logs/30-ac4-gates-exported.txt
+.scratch/wisp/probes/326/r1/logs/31-ac4-gates-repotree.txt
+.scratch/wisp/probes/326/r1/logs/40-mutations-batch1.txt
+.scratch/wisp/probes/326/r1/logs/41-mutations-batch2.txt
+.scratch/wisp/probes/326/r1/logs/42-delivered-hashes.txt
+.scratch/wisp/probes/326/r1/logs/50-ac2-tiebreak-exposure.txt
+.scratch/wisp/probes/326/r1/logs/append-body.txt
+.scratch/wisp/probes/326/r1/msg-c1.txt
+.scratch/wisp/probes/326/r1/msg-c2.txt
+.scratch/wisp/probes/326/r1/msg-c3.txt
+.scratch/wisp/probes/326/r1/msg-c4.txt
+.scratch/wisp/probes/326/r1/zz326r1-tiebreak_bench_test.go
+docs/evidence/s1/326-append-updated.md
+internal/memory/dao_session.go
+internal/memory/dao_session_append_326_test.go
+internal/memory/dao_session_test.go
+internal/session/manage_test.go
+```
