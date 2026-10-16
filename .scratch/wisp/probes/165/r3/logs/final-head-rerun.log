@@ -1,0 +1,13 @@
+# 终态那一发：git archive f6c76b91897ead14e2717f4209c9f5422a9098eb（七件套导出树，第三棵）
+本腿两枚字节 sha256（必须仍是 00c3204/7d26fa8）
+00c32049994c441c8927066bc4d4099c1b2977fc20ee9e602bb98f3670d37b75 *internal/agent/plan_present_doorbell_165r3_test.go
+7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be *internal/agent/testdata/golden/plan-present.sse
+BUILD rc=0
+=== RUN   TestPlanPresentCallBooksTheToolCallRow165r3
+--- PASS: TestPlanPresentCallBooksTheToolCallRow165r3 (0.13s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.186s
+SINGLE rc=0
+ok  	github.com/CarlosShao/wisp/internal/agent	2.250s
+FULL rc=0
+VET rc=0
