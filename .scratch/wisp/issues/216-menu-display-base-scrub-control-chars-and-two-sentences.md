@@ -19,7 +19,7 @@
 
 ## 判据
 
-- [ ] **AC#1**：先做**现量普查**（我们到底有没有这枚底座、有几处各写一份），出逐枚名册；**没名册不许进实现**（这条是本仓加尺的固定前置，见票 212 同形）。
+- [x] **AC#1**：先做**现量普查**（我们到底有没有这枚底座、有几处各写一份），出逐枚名册；**没名册不许进实现**（这条是本仓加尺的固定前置，见票 212 同形）。
 - [ ] **AC#2**：**一枚纯函数**（洗控制字符／可选可见转义），**菜单里所有非用户手打的字段都过它**：附件名、插件名、技能名、目录名、命令说明、错误原因。
   ⚠ **落点选"显示前统一洗"，不选"每个生产者各自洗"**——后者会长出 N 份互不相同的实现（别家已经是两份）。
 - [ ] **AC#3（正控，必须有）**：造一枚文件名里带控制字符（如 `ESC`＋"已允许"）的附件／插件 ⇒ 菜单里那一行**必须原样不可信**（洗过），且**不许因为这个名字里出现了"允许"两个字而改变任何判定**。
@@ -33,3 +33,4 @@
 `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt` 一字不动；只 commit 不 push、显式 pathspec、禁 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；仓内不删东西。
 — 2026-10-09 12:0x 编排者腿 boxes-1 搬框：本节原为散句 bullet，现改成 - [ ] 形以进全勾尺；⛔ 判据文字一字未改、⛔ 未翻任何框。
 - **AC#1 现量普查已交（只读腿 `216-a1`，`2026-10-16`，尺读提交树快照 `71002d0`）**：名册见 `docs/evidence/s1/216-census.md`。三句头条——① **无"显示前统一洗"底座，且自家已长出两份互不相同的控制字符处理**（`sanitizeReplyText` 换空格 vs `findMetachars` 只转 `\n\r\0` 三字符可见转义），`unicode.IsPrint`／ANSI `\x1b`／`\p{C}` 全仓 0；② 今天真出向又裸奔的菜单字段＝**附件名 `AttachmentRef.Name`**（上游拒绝 `ContainsAny(name,"\x00\r\n\t")` 只挡 4 字符、**ESC/C1 穿过不洗**）与**目录名 `WorkspaceView.Canonical`**；插件/技能/命令说明三枚零源零出向（票 213/215 待派）。③ **"没有 vs 读不到"在显示段已是两句话**（先例五态是 `internal/panel/instructions_200.go` 真代码，非仅票面），但**派单把第五枚状态写成 `na`、盘上真值是 `not_run`**——实现腿按 `not_run` 走；产码里**按错误子串分支 0 枚**（`Contains/Index/HasPrefix/regexp/switch on Error()` 实测 0，票面 `ChatInput.tsx:2205`/`413` 属外部 openchamber、我方无此文件）。⛔ 本腿未做 AC#2/3/4/5、未翻任何框、未改任何产码。
+- [2026-10-16 10:4x +08] 编排者翻 **AC#1**（这一格是"先出名册"的普查格，凭据＝只读腿 `216-a1` 名册件 `docs/evidence/s1/216-census.md` 现量 **134 行／14673 字节** ＋我逐条复跑；尺一律读**提交树快照 `71002d0`**，⛔ 混在飞工作树）：四条复现＝① `unicode.IsControl` 整树（`internal`＋`cmd`＋`tools`＋`frontend`）命中 **1 枚**＝`cmd/wisp/approval_reply.go:617`（在 `sanitizeReplyText` 内，2 枚生产调用者）；② 第二份各写各的＝`findMetachars`（`internal/risk/rules_shell.go:57`，只把 `\n\r\0` 转成可见转义）；③ 今天真出向又裸奔的那枚＝附件显示名：上游 `checkDisplayName` 的拒绝只挡 `"\x00\r\n\t"` **四枚字符**（`internal/panel/attachments.go:301`），而 `sanitizeDisplayName`（同件 `:310`）只做 trim＋取末段 ⇒ **ESC／C1 类控制字符今天能穿过进菜单**；④ 插件名／技能名／命令说明三枚今天**零源零出向**（`internal/panel/composer.go` 里 `plugin|skill|command` 命中 0 枚，属票 213／215 的射程）。★**它顶回我派单的一处错、我复跑同意**：我把票 200 那五状态的第五枚写成 `na`，盘上真值＝**`not_run`**（尺＝`git grep -nE 'InstructionsStatus[A-Za-z]+ =' 71002d0 -- internal/panel/instructions_200.go` ⇒ `loaded`／`none_found`／`off`／`refused`／`not_run` 五枚逐枚对上；全仓 `\bna\b` 只命中 `ticket84_no_owner_test.go` 里的测试局部变量）⇒ 名册按盘上真值算、我派单那句⛔ 抹平、只在这里更正。另注口径：腿的正控写作"`.Error()` 114"，我这两把尺读出的是 **374 行／144 枚文件**（`git grep -n` 数行 vs `-c` 数文件）⇒ 只证"这条尺不是恒 0"，⛔ 与它的数相减。next＝**`216-r1` 落地腿（待派，⛔ 现在放）**：面收成 `internal/panel/**` 一枚纯函数＋菜单字段过它＋正控；⛔ 动 `cmd/wisp`、⛔ 新增加出的名册键＝会动 313 键钉与 JSON 键钉 ⇒ 要加先停手上报。**释放条件具名＝本波唯一写腿 `220-r2` 交件之后**（`cmd/wisp/**` 与 `internal/panel/**` 是同一块共享编译面、每波只许一枚写腿，这条是我自己立的规矩，⛔ 我自己破）。

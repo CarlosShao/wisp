@@ -1,0 +1,9 @@
+166-v1 (e) 票 166 末尾追加一条 bullet（只追加一枚、⛔ 翻任何 AC 框）⇒ 六格判语口径入账
+
+- 现量：追加前后 `grep -c '^[[:space:]]*- \[ \]'`＝6、`- [x]`＝0 不变；`git diff --numstat`＝1 加／0 删；`Status:` 行⛔ 动、票名⛔ 动、`-done` ⛔ 加。
+- bullet 内容＝六格判语（AC#1 成立／AC#2 不成立＝接线缺口／AC#3 成立／AC#4 成立／AC#5 成立／AC#6 ⓐ成立＋范围修正、ⓑ成立）
+  ＋上交编排者裁的五形料（`AppendSessionTurn` ⛔ 刷新 `updated_at` 的 delta=0 读数、同秒 45.5% 硬币、profile 对照组、
+  SPEC-02 九表 vs contractSpec 十一枚的 owner 轴、"复制⛔ 搬家"那枚断言本腿⛔ 验牙）＋台面（票 311 GUARD rc=2＝射程拒绝⛔ 当红、
+  授权卷补跑 d22scan rc=0 clean 与 path-length rc=0 GREEN、起手三处 go build 皆 rc=0）。
+- 交件指回：`docs/evidence/s1/166-session-verdict.md`（98 行／13583 字节）＋`.scratch/wisp/probes/166/v1/`。
+- ⛔ push（本腿五枚提交：28e37882／e396301d／fb157e95／2c679634／这一枚）。

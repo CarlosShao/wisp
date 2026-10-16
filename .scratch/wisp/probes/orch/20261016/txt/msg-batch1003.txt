@@ -1,0 +1,7 @@
+台账 A1003＋翻框十一格（票 322 五格／票 166 五格／票 216 一格）＋新立票 326＋存档 326-r1 派单
+
+收件三枚（166-v1 死于 150 轮帽、裁决表已在盘上）：322-v1 判语件 163 行／16776 字节、216-a1 名册件 134 行／14673 字节、166-v1 裁决表 98 行／13583 字节；我自己复跑的尺写在票尾与台账里（调用点 5＋2、booked separately HEAD 0 命中⇄正控 1 命中、AC#3 本机 witnessTruncated=true witnessSize=35 同色、TestSessionListByWorkspace -count=20 ⇒ 20/20 rc=0、NewManager 生产 0 命中＋正控 1 枚）。
+两格按判语⛔ 翻：票 322 AC#4（缺 cmd/wisp 整包那一发）、票 166 AC#2（接线缺口）⇒ 两枚票都⛔ -done。
+我自抓三笔：① 跑用例前没先 mkdir GOTMPDIR ⇒ creating work dir 假红（故障件留档、当场作废）；② 拿区间 git log --name-only 当单腿路径清单 ⇒ 读出假"139 枚越界"，改逐枚 show 作差＝55 枚路径 0 越界；③ 派单把票 200 第五状态写成 na、盘上真值 not_run，被 216-a1 顶回。
+新立票 326＝AppendSessionTurn 只插子表、不刷新 session.updated_at ⇒ 列表排序看不见"你在用它"；落点约束我裁＝只做"每轮都算动过"、⛔ 顺手治同秒 tie-break、⛔ 碰共享编译面。326-r1 派单已存档、⛔ 本笔还没放腿（放腿要另记 agentId）。
+零产码、只 commit ⛔ push、两处逐枚显式 pathspec。

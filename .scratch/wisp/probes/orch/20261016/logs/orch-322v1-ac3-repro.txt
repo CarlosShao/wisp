@@ -1,0 +1,2 @@
+go: creating work dir: GetFileAttributesEx C:\Users\swq\AppData\Local\Temp\gotmp-orch-322v1: The system cannot find the file specified.
+rc=1

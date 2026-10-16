@@ -1,0 +1,33 @@
+腿名：326-r1（落地腿·写）｜票：.scratch/wisp/issues/326-append-session-turn-does-not-refresh-session-updated-so-a-live-chat-never-moves-up.md（先读全文，AC 框现量＝6 枚未勾／0 已勾）
+立票来源＝非实现者验收腿 `166-v1` 交回来的第三形＋编排者自己现跑（票尾有尺）。★编排者已裁的落点约束：这一枚**只做"每一轮都算动过"**，⛔ 顺手治同秒先后的 tie-break（那是 AC#2 明令的射程外，见下）。
+
+## 第 0 步（必做，⛔ 跳过）
+1. `git rev-parse HEAD`＋`date '+%F %T %z'` 落每件抬头；现量票框尺（`grep -c '^[[:space:]]*- \[ \]'`／`...'- \[x\]'`）。
+2. 复算票面那四行现量（⛔ 用票里的号，号只当读数）：① `AppendSessionTurn` 函数体内**零条** `UPDATE session`；② 写 `session.updated_at` 的既有四处（建／改名／归档／分叉另建）；③ 两处 `ORDER BY updated_at DESC, id DESC`；④ 时间源＝`observe.NowWallUTC().Unix()`（秒）与 `internal/session/manage.go` 默认 `time.Now`。四把尺各落 `rc=`。
+3. 起"未修码基线"用 `git archive <起树锚> | tar -x -C $(mktemp -d)` 取**仓外导出树**（六件套 `go.mod go.sum internal cmd tools scripts`，取出后先数 `.go` 证非空），⛔ 拿共享工作树当改前那发。
+
+## 你要交的四件
+- (a) **AC#1 成对读数**（首要）：种一个形状——会话 A 先建、会话 B 后建，然后在 **A** 里追加一轮 ⇒ 改前列表首位仍是 B（这一发**在未修码上必红**，红句连文案逐字落盘）；改后首位是 A。判据同发同屏、⛔ 跨台面。★还要一发**同行证据**证明"追加真的写进了 `updated_at`"（例如读回那一行的秒值与追加前的差），⛔ 只报"列表顺序对了"。
+- (b) **牙**（判据仪器自己）：去牙反控＝把那条 `UPDATE` 物理摘掉（改盘上字节，⛔ `-overlay`；改前基线在仓外树、还原复跑绿＋记还原哈希），点名哪些用例必须红；再问**反形**（例如"刷新了但刷成常量 0／刷成 created_at"）会不会也红——如果那一形放行，具名写"这把尺对反形⛔ 敏感"。
+- (c) **AC#2 ⛔ 顺手治 tie-break**：`ORDER BY` 那两行**逐字节不动**（判据＝`git diff` 对那两行命中 0 枚）；同秒先后是随机 hex id 的另一半病，要动由我另裁，你只具名上报。
+- (d) **AC#3 原子性**＋**AC#4 门禁**：多这一条 `UPDATE` 要在**同一枚事务**里，中途被杀的形状沿票 166 `AC#3` 已立的真杀进程台件形（要么全有要么全无）；门禁六把自己跑、各落 `rc=`＝`go build ./...`／`go vet ./internal/memory/ ./internal/session/`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh --with-self-test`／格式化尺（本机 `gofumpt` ⛔ 在 PATH＝rc=127，但盘上有 `/d/work/base/gopath/bin/gofumpt.exe` ⇒ 按绝对路径跑那把更严的、⛔ 拿 `gofmt -l` 的 0 冒充）／`go test ./internal/memory/ ./internal/session/ -count=1` 逐包四数（`RUN=`／`PASS_TOP=`／`FAIL_TOP=`／`SKIP=`）。
+
+## 落点（我已裁的约束，形状你自己现读后选并具名理由）
+ⓐ 在 `AppendSessionTurn` 的同一枚事务里补 `UPDATE session SET updated_at=? WHERE id=?`；ⓑ 复用既有写侧助手（如果有）。
+判据：① ⛔ 动既有签名（要动就停手上报）；② 时间源沿既有那一族，⛔ 新造第三种时钟、⛔ 用墙钟时间差实现任何超时；③ 写失败要 propagate，⛔ 静默退化成"只插子表"；④ `AC#5` 那格要说实话：会话列表今天⛔ 接进产品（票 166 `AC#2`＝接线缺口），所以本票修完**界面上仍看不见**，那一跳属 `cmd/wisp`＋`internal/panel`，本腿⛔ 碰。
+
+## 写面（只许这三处＋那两个包，逐字）
+1) `internal/memory/**`；2) `internal/session/**`（含测试件）；3) `.scratch/wisp/probes/326/r1/`；4) `docs/evidence/s1/326-append-updated.md`（短名、⛔ 长名⛔ 带 `§`）；5) 票 326 末尾**一条** bullet（只追加）。
+⛔ 动 `cmd/wisp/**` 与 `internal/panel/**` 一个字节（共享编译面本波唯一写腿＝`220-r2`）；⛔ 动 `internal/winsec`／`internal/risk`／`scripts/**`／`tools/**`。
+
+## 台面与禁区
+- `GOTMPDIR` 用**原生反斜杠形**（`C:\...`）且**先 `mkdir -p`**（编排者今天自己踩了：没建目录 ⇒ `go: creating work dir ... cannot find the file specified` 长得像"红"）；跑 go 前置 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`。
+- ⛔ `go test ./cmd/wisp` 整包（票 314 死亡区）；⛔ `go mod tidy`／`go get`；红句里有 `walk`／`build failed`／`no tests to run`／`0xc0000135`／`RUN=0` ⇒ 台面故障、⛔ 计入判据。
+- `sh scripts/d22scan.sh` 若回 **rc=2 的 311 GUARD 射程拒绝**（`GOTMPDIR` 指向非 `%LOCALAPPDATA%` 卷）＝⛔ 当红，换卷或 unset 再跑。
+- 禁区（零字节）：`docs/PLAN.md`、`docs/specs/**`、SLO 阈值／golden／`internal/observe/thresholds.go`、`tools/d22scan/allowlist.txt`、三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、`go.mod`／`go.sum`／`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动（⛔ 新造状态名、⛔ 改状态拼写）。⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`。
+- 并发：同时在飞＝`220-r2`（唯一碰 `cmd/wisp` 的写腿）、`325-v1`／`165-v1`／`287-v1b`（只读）。⛔ 读它们的在飞件或工作树状态当凭据；全仓尺一律以 `git archive` 取出的树为准。
+- Git：只 commit、⛔ push；`git add`／`git commit` 两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（编排者今天第三次踩、已入盘）；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 读数纪律：引数必带"哪把尺＋射程＋量的还是算的"；"几枚"必带单位（文件／顶层用例／子测试／调用点／写入点）；`RUN=`（`^=== RUN`）与 `PASS_TOP=`（`^--- PASS` 只数顶层）⛔ 混用；报"0 命中"前先看 stderr 并跑一枚已知存在的正控。
+- 预算：≤5 件、每件 ≤260 行；没做完的格子具名写"没做完＋缺哪一发读数"。轮次约 150 上限 ⇒ **每落一枚文件就 commit**（commit-first；本仓已有一枚腿死在"想一次做完"）。
+交件自证三把尺：① 提交号＋`git show --stat HEAD` 路径清单（应只含上面五处）；② 证据件绝对路径＋`wc -c` 字节数；③ 未修码红句逐字＋改后成对读数＋去牙后必须红与还原后绿的那一发（含还原哈希）。⛔ 只说"已完成"、⛔ 翻任何 AC 框。
