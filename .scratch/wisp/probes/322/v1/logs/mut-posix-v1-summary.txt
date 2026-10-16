@@ -1,0 +1,102 @@
+### 322-v1 POSIX teeth run, started 2026-10-16 10:25:27 +0800 HEAD=e396301d4905fee3a0da25ee3dceb50e36432f3b
+TREE /d/tmp/probe322v1/base.A9XC3y (rev=8baec646^): .go=1091 winsec/*.go=40
+=== base-v1 rc=127
+RUN=0 topPASS=0 topFAIL=0 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=0 buildfailed=0 noteststorun=0 setupfailed=0
+NO AC#1 PAIRED ROW in base-v1
+--- top-level result lines:
+--- RED lines verbatim:
+(no RED line)
+TREE /d/tmp/probe322v1/fixed.Ti4jeF (rev=HEAD): .go=1094 winsec/*.go=40
+FIXED-BYTES 41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d */d/tmp/probe322v1/fixed.Ti4jeF/internal/winsec/winsec.go
+FIXED-BYTES 19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2 */d/tmp/probe322v1/fixed.Ti4jeF/internal/winsec/winsec_other.go
+=== fixed-v1 rc=127
+RUN=0 topPASS=0 topFAIL=0 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=0 buildfailed=0 noteststorun=0 setupfailed=0
+NO AC#1 PAIRED ROW in fixed-v1
+--- top-level result lines:
+--- RED lines verbatim:
+(no RED line)
+=== fullfixed-v1 rc=0
+RUN=71 topPASS=43 topFAIL=0 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=1 buildfailed=0 noteststorun=0 setupfailed=0
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1446 flipErrs=0 damagedWitnesses=0 leafLegRefusals=34 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- top-level result lines:
+--- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (1.48s)
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.03s)
+--- PASS: TestAC2AncestorPrefixesForEverySeparatorShape (0.00s)
+--- PASS: TestAC2ComponentsAndTraversalPerSeparatorShape (0.00s)
+--- PASS: TestAC5FailedSealRefusesTheWrite (0.01s)
+--- PASS: TestAC5FailureIsNotSwallowedByTheHappyPath (0.00s)
+--- PASS: TestPOSIXPrivateFileIsReally0600 (0.00s)
+--- PASS: TestPOSIXPrivateDirIsReally0700 (0.01s)
+--- PASS: TestPOSIXSymlinkAtArtifactPositionIsNotRecursed (0.01s)
+--- PASS: TestPOSIXMissingFileIsNotAnError (0.00s)
+--- PASS: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.01s)
+--- PASS: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandlePlainObjectStillSeals120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.46s)
+--- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125 (0.03s)
+--- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125 (0.01s)
+--- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125 (0.01s)
+--- PASS: TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink (0.02s)
+--- PASS: TestAC2POSIXDoesNotFoldABackslashIntoASeparator (0.01s)
+--- PASS: TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor (0.01s)
+--- PASS: TestAC4POSIXFloorAnswersInsideTheNamedTree (0.00s)
+--- PASS: TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119 (0.02s)
+--- PASS: TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119 (0.02s)
+--- PASS: TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 (0.02s)
+--- PASS: TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119 (0.02s)
+--- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.01s)
+--- PASS: TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed (0.01s)
+--- PASS: TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed (0.02s)
+--- PASS: TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone (0.01s)
+--- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth (0.05s)
+--- PASS: TestAC1POSIXSealDirThroughASymlinkRefuses (0.02s)
+--- PASS: TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing (0.01s)
+--- PASS: TestAC1POSIXSealFileThroughABackslashNamedLink (0.01s)
+--- PASS: TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree (0.01s)
+--- PASS: TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks (0.02s)
+--- PASS: TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator (0.02s)
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.44s)
+--- PASS: TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed (0.96s)
+--- PASS: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed (0.99s)
+--- RED lines verbatim:
+(no RED line)
+TREE /d/tmp/probe322v1/m1-teethout.uFeBIY (rev=HEAD): .go=1094 winsec/*.go=40
+ANCHOR M1 open line: 149:	f, err := os.OpenFile(resolved, flags|oNoFollowPlatform, perm)
+M1-BEFORE sha=41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d
+M1-AFTER line=	f, err := os.OpenFile(resolved, flags, perm) hits-in-open=0
+=== m1-v1 rc=127
+RUN=0 topPASS=0 topFAIL=0 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=0 buildfailed=0 noteststorun=0 setupfailed=0
+NO AC#1 PAIRED ROW in m1-v1
+--- top-level result lines:
+--- RED lines verbatim:
+(no RED line)
+M1-RESTORE sha=41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d (must equal M1-BEFORE)
+=== m1-restore-v1 rc=127
+RUN=0 topPASS=0 topFAIL=0 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=0 buildfailed=0 noteststorun=0 setupfailed=0
+NO AC#1 PAIRED ROW in m1-restore-v1
+--- top-level result lines:
+--- RED lines verbatim:
+(no RED line)
+TREE /d/tmp/probe322v1/m2-blanket.mGNGul (rev=HEAD): .go=1094 winsec/*.go=40
+ANCHOR M2 posix guard body: 39:func preOpenLeafGuard(string) error { return nil }
+M2-BEFORE sha=19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2
+M2-AFTER body: 39:func preOpenLeafGuard(path string) error { return fmt.Errorf("%w: MUTANT blanket refusal on every name, fixed or not: %s", ErrUnresolvedPath, path) }
+=== m2-v1 rc=127
+RUN=0 topPASS=0 topFAIL=0 topSKIP=0
+tooling-word check (any hit = table fault, not a reading): walk=0 buildfailed=0 noteststorun=0 setupfailed=0
+NO AC#1 PAIRED ROW in m2-v1
+--- top-level result lines:
+--- RED lines verbatim:
+(no RED line)
+M2-RESTORE sha=19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2 (must equal M2-BEFORE)
+### done 2026-10-16 10:27:39 +0800
+TREES kept (never removed): base=/d/tmp/probe322v1/base.A9XC3y fixed=/d/tmp/probe322v1/fixed.Ti4jeF m1=/d/tmp/probe322v1/m1-teethout.uFeBIY m2=/d/tmp/probe322v1/m2-blanket.mGNGul

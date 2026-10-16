@@ -1,0 +1,34 @@
+time=2026-10-16T10:25:55.364+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1
+    openleaf_guard_322_windows_test.go:127: AC#3 RED file-symlink: preOpenLeafGuard accepted a name carrying a reparse point, so the open that follows it can still truncate whatever that link targets
+    openleaf_guard_322_windows_test.go:128: os.Symlink ok: dir-sym-322r1.lnk -> C:\Users\swq\AppData\Local\Temp\gotmp322v1\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r13635729028\002\outside-tree (Lstat mode Lrw-rw-rw-, FILE_ATTRIBUTE_REPARSE_POINT set)
+    openleaf_guard_322_windows_test.go:129: AC#3 RED directory-symlink: preOpenLeafGuard accepted a name carrying a reparse point, so the open that follows it can still truncate whatever that link targets
+    openleaf_guard_322_windows_test.go:130: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\gotmp322v1\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r13635729028\001\tree\junction-322r1.lnk <<===>> C:\Users\swq\AppData\Local\Temp\gotmp322v1\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r13635729028\002\outside-tree
+    openleaf_guard_322_windows_test.go:131: AC#3 RED junction: preOpenLeafGuard accepted a name carrying a reparse point, so the open that follows it can still truncate whatever that link targets
+--- FAIL: TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1 (0.75s)
+=== RUN   TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1
+    openleaf_guard_322_windows_test.go:241: AC#3 RED instrument: 400 raced attempts produced guard-leg refusals=0 and racer flips=274 (flipErrs=0, firstFlipErr=""), so nothing below proves the guard is on this route
+    openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=274 guardRefusals=0 otherRefusals=233 returnedNil=167 witnessTruncated=true witnessSize=35 witnessMode=-rw-rw-rw- firstGuardVerbatim=""
+--- FAIL: TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1 (5.43s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+    openleaf_overwrite_322_test.go:82: AC#2' mode read-back here is -rw-rw-rw- and is decorative by design; the descriptor is the promise on this platform, and acl_windows_test.go owns that leg
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+    openleaf_overwrite_322_test.go:82: AC#2' mode read-back here is -rw-rw-rw- and is decorative by design; the descriptor is the promise on this platform, and acl_windows_test.go owns that leg
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+    openleaf_overwrite_322_test.go:82: AC#2' mode read-back here is -rw-rw-rw- and is decorative by design; the descriptor is the promise on this platform, and acl_windows_test.go owns that leg
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+    openleaf_overwrite_322_test.go:82: AC#2' mode read-back here is -rw-rw-rw- and is decorative by design; the descriptor is the promise on this platform, and acl_windows_test.go owns that leg
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+    openleaf_overwrite_322_test.go:110: AC#2' read-back here is -rw-rw-rw- (decorative by design); the descriptor is this platform's promise
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.15s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.03s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.02s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.07s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	6.443s
+FAIL
