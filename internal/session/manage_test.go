@@ -12,6 +12,10 @@ import (
 // Ticket 166 AC#2/AC#4: the four outlets and the fork invariant, run against a
 // real wisp.db (openStore lives in grants_test.go, same package).
 
+// newTestManager builds a Manager over a real store. A non-nil clock advances
+// one minute per call, so rows get DISTINCT second-resolution stamps; nil means
+// the real time.Now, which is fine when a case compares sets, but makes any case
+// that compares ORDER a coin flip (same second -> tie -> random hex id).
 func newTestManager(t *testing.T, store *memory.Store, clock *time.Time) *Manager {
 	t.Helper()
 	opts := ManagerOptions{Store: store}
@@ -65,8 +69,13 @@ func TestSessionListByTime(t *testing.T) {
 }
 
 // Outlet #1 (by workspace).
+// The two wk1 rows are compared BY ORDER, so this case rides the stepping clock
+// (the shape TestSessionListByTime already uses): on a wall clock both rows land
+// in the same second (manage.go:93 keeps a Unix SECOND), "ORDER BY updated_at
+// DESC, id DESC" (dao_session.go:125) then breaks the tie on a random hex id
+// (session.go:96), and the case turns into a coin flip. Ticket 166 AC#6.
 func TestSessionListByWorkspace(t *testing.T) {
-	m := newTestManager(t, openStore(t, filepath.Join(t.TempDir(), "data")), nil)
+	m := newTestManager(t, openStore(t, filepath.Join(t.TempDir(), "data")), ptrTime(time.Date(2026, 5, 1, 0, 0, 0, 0, time.UTC)))
 	a := mustCreate(t, m, "alpha", "wk1")
 	_ = mustCreate(t, m, "beta", "wk2")
 	c := mustCreate(t, m, "gamma", "wk1")
@@ -80,8 +89,11 @@ func TestSessionListByWorkspace(t *testing.T) {
 }
 
 // Outlet #2: search over title AND body.
+// Same instrument rule as the two list cases: no wall clock here, so the rows
+// the store hands back are stamped in the order the case created them and a
+// future order-sensitive assertion cannot quietly become a coin flip.
 func TestSessionSearchTitleAndBody(t *testing.T) {
-	m := newTestManager(t, openStore(t, filepath.Join(t.TempDir(), "data")), nil)
+	m := newTestManager(t, openStore(t, filepath.Join(t.TempDir(), "data")), ptrTime(time.Date(2026, 5, 1, 0, 0, 0, 0, time.UTC)))
 	ctx := context.Background()
 	notes := mustCreate(t, m, "Meeting notes", "")
 	other := mustCreate(t, m, "Shopping list", "")
