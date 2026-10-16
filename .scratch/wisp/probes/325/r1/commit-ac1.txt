@@ -1,0 +1,22 @@
+325-r1 AC#1：runtests.sh:92 尾接折成反斜杠（第四处混形收口）
+
+tools/d22scan/runtests.sh 的测试临时根生成行，基座早已是反斜杠、尾接名字用的是
+正斜杠（`"}/d22scan-…"`），半对半错＝混形。本笔把尾接改成 `\\d22scan-`，与票 317
+修毕的三处（scripts/portable-tests.sh:156／winsec-tests.sh:69／wisp-cli-tests.sh:82）
+逐字同形，并在旁边留一条注释写清为什么这里不许折回正斜杠。
+
+理由不是风格：这一行导出的 GOTMPDIR 会逐字进到 t.TempDir() 的路径里，
+internal/risk 的 sync-ancestor 家族把它直接交给 `cmd /c mklink /J`，mklink 把参数
+内部的正斜杠读成开关 ⇒ 未修码上现量四枚顶层红（同一次跑，别的什么都没动）：
+syncdirs_ancestor_reparse_ticket105_windows_test.go:59／:116 回
+`Parameter format not correct - "d22scan-…"`，
+syncdirs_ancestor_actable_leg_116_test.go:182／:286 在前置条件文案里回显分隔符不一致。
+纯正斜杠根则同一族回 `Invalid switch - "tmp".`（票 317 的测量，编排者为本票复跑）。
+
+射程账（票 325 AC#2）：scripts/d22scan.sh 只把 `tools/d22scan ./...` 交给这个 runner，
+tools/d22scan 里零 mklink ⇒ 今天没有任何一道经由本入口的门能看见那四枚＝坑活着、
+仪器看不见。本笔不改任何档位、不放宽任何断言、不动 `wisp_311_ref_path` 那四处对照位
+（票 317 已逐处判过它们不流向 GOTMPDIR；本笔使 runtests.sh 内那处从 :155 移到 :178，
+纯行数位移，字节未变）。
+
+只 commit，push 归编排者。

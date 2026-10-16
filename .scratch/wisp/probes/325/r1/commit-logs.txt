@@ -1,0 +1,31 @@
+325-r1 读数件与仪器落盘：未修码四真红＋物理退回反控＋还原哈希＋AC#3/AC#4 全量
+
+写面＝`.scratch/wisp/probes/325/r1/`（现量 22 枚＝根 5 枚＋logs/ 17 枚，只建不删）。
+台面＝仓外导出树（`git archive 46007856 | tar -x` 到仓外 pre、`428ef21e` 到 post；
+六件套 go.mod/go.sum/internal/cmd/tools/scripts 逐枚 `[ -e ]` 验在，
+`find -name '*.go' | wc -l`＝1090 非空之后才信它的 0）。共享工作树此刻有 `322-r1b`
+在写 internal/winsec ⇒ 整树/整档读数一律没在仓里跑（唯一例外＝长度门，它要 git 索引、
+`git archive` 不带，故在仓内只读跑并在件里具名标了台面）。
+
+现量摘要（逐枚在 logs/）：
+- AC#1 成对：改前（混形）`sh scripts/d22scan.sh` rc=0 clean＋发射行
+  `GOTMPDIR=…\wisp-test-gotmp/d22scan-…`；改后 rc=0 clean＋`…\wisp-test-gotmp\d22scan-…`；
+  两发的正控制四数同形 `PASS=35 FAIL=0 SKIP=0 === RUN=77`
+- AC#2 未修码那发：同一名册（`-list` 自证四枚真名存在）走 `runtests.sh ./internal/risk/`
+  ⇒ rc=1、`RUN=4 PASS=0 FAIL=4 SKIP=0`，四行＝`_116_test.go:182`／`:286`＋
+  `ticket105_windows_test.go:59`／`:116`（mklink 措辞＝`Parameter format not correct`）
+- AC#2 反控：在导出树上**物理**把那一行退回混形（⛔ -overlay），先自证突变真落
+  （mixed-shape-hits=1／native-shape-hits=0）⇒ 四红 rc=1 ⇒ 用 `git show 428ef21e` 的
+  字节还原 ⇒ sha256 回到提交态那枚 `ad6f6a8d…` ⇒ 复跑 rc=0、PASS=4
+- AC#2 射程答：`scripts/d22scan.sh` 只交 `tools/d22scan ./...`，tools/d22scan 零 mklink
+  ⇒ **缺世界**（坑活着、这一档今天看不见那四枚）
+- AC#3：`bash scripts/portable-tests.sh --scope=windows` rc=0；`GOTMPDIR=` 行逐字原生形；
+  逐包四数＝11 枚（派单写"八包"＝过期计数，本腿按现量报并具名），总计
+  `=== RUN=662 --- PASS=462 --- FAIL=0 --- SKIP=0`；红名册＝空 ⇒ 与 10-14 两发 CI 的
+  `Invalid switch` 名册（四枚 Sync/116 族）作差＝新增 0
+- AC#4：`bash -n` rc=0／`sh scripts/d22scan.sh` rc=0／长度门 `--with-self-test` rc=0
+  `VERDICT GREEN`（over-budget=60 covered=60 not-in-roster=0）／`GOFLAGS= go build ./...` rc=0
+- gofumpt 这笔不装：`which gofumpt` rc=1，四处候选目录零命中；本腿写面 0 枚 .go
+  ⇒ gofumpt 射程 0，⛔ 拿 `gofmt` 的 0 冒充它的 0
+
+⛔ 未动 `scripts/**`／`wisp_311_ref_path` 四处对照位／任何断言或 skip／`-overlay`；未 push。

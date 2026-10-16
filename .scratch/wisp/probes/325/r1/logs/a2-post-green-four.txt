@@ -1,0 +1,17 @@
+runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261016-093836-772 - this run's t.TempDir() family lands here; nothing deletes it.
+time=2026-10-16T09:38:39.886+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+    syncdirs_ancestor_actable_leg_116_test.go:218: raw="C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\d22scan-20261016-093836-772\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor116132698918\\001\\%WISP116ANC\\\\B%\\new.md"
+         anc="C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\d22scan-20261016-093836-772\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor116132698918\\001\\%WISP116ANC\\B%"
+         moved="C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\d22scan-20261016-093836-772\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor116132698918\\wisp116-escape"
+        verdict: Sync=true Root={Provider:sync-suspect Path: Source:suspect-fallback} Why="write target spelling could not be anchored on a C26-verifiable ancestor (8.3/\\\\?\\/missing chain); fail-closed as sync-suspect: risk: expansion moved this path onto a tree the caller did not name: C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\d22scan-20261016-093836-772\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor116132698918\\001\\%WISP116ANC\\B% expands to C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\d22scan-20261016-093836-772\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor116132698918\\wisp116-escape (env); act on the expanded tree only if you asked for it by name"
+--- PASS: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+=== RUN   TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+=== RUN   TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+--- PASS: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.16s)
+=== RUN   TestSyncAncestorLegNotExemptedStaysFailClosed
+--- PASS: TestSyncAncestorLegNotExemptedStaysFailClosed (0.07s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.285s
+runtests.sh: OK - packages=[./internal/risk/ -run ^(TestSyncAncestorActableLegFailsClosedOnMovedAncestor116|TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116|TestSyncAncestorLegReResolvesThroughJunctionToRealTree|TestSyncAncestorLegNotExemptedStaysFailClosed)$] top-level: PASS=4 FAIL=0 SKIP=0, === RUN=4, '[no tests to run]'=0

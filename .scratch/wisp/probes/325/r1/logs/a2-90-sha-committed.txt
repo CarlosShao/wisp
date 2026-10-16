@@ -1,0 +1,1 @@
+ad6f6a8d72cbe2a3fc9b7036774b8e16ddf92bfd64ea6055cbf12dde55164bf6 *tools/d22scan/runtests.sh

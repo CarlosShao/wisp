@@ -1,0 +1,12 @@
+github.com/CarlosShao/wisp/internal/proc             RUN=48   PASS=40   FAIL=0   SKIP=0  
+github.com/CarlosShao/wisp/internal/secret           RUN=29   PASS=21   FAIL=0   SKIP=0  
+github.com/CarlosShao/wisp/internal/config           RUN=185  PASS=104  FAIL=0   SKIP=0  
+github.com/CarlosShao/wisp/internal/risk             RUN=200  PASS=132  FAIL=0   SKIP=0  
+github.com/CarlosShao/wisp/internal/ball             RUN=75   PASS=69   FAIL=0   SKIP=0  
+github.com/CarlosShao/wisp/internal/perm             RUN=14   PASS=14   FAIL=0   SKIP=0  
+github.com/CarlosShao/wisp/internal/plugin           RUN=7    PASS=7    FAIL=0   SKIP=0  
+github.com/CarlosShao/wisp/cmd/llmrecord             RUN=2    PASS=2    FAIL=0   SKIP=0  
+github.com/CarlosShao/wisp/internal/session          RUN=36   PASS=19   FAIL=0   SKIP=0  
+github.com/CarlosShao/wisp/internal/projctx          RUN=10   PASS=10   FAIL=0   SKIP=0  
+github.com/CarlosShao/wisp/internal/audio            RUN=56   PASS=44   FAIL=0   SKIP=0  
+TOTALS  RUN=662 PASS=462 FAIL=0 SKIP=0

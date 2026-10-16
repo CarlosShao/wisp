@@ -1,0 +1,38 @@
+== step 1: exported file as committed ==
+ad6f6a8d72cbe2a3fc9b7036774b8e16ddf92bfd64ea6055cbf12dde55164bf6 *tools/d22scan/runtests.sh
+0000000                                   g   o   t   m   p   _   r   u
+0000020   n   =   "   $   {   W   I   S   P   _   T   E   S   T   _   G
+0000040   O   T   M   P   _   R   O   O   T   :   -   "   $   L   O   C
+0000060   A   L   A   P   P   D   A   T   A   \   \   w   i   s   p   -
+0000100   t   e   s   t   -   g   o   t   m   p   "   }   \   \   d   2
+0000120   2   s   c   a   n   -   $   (   d   a   t   e       +   %   Y
+0000140   %   m   %   d   -   %   H   %   M   %   S   )   -   $   $   "
+0000160  \n
+0000161
+== step 2: physically fold :115 back to the mixed shape ==
+0000000                                   g   o   t   m   p   _   r   u
+0000020   n   =   "   $   {   W   I   S   P   _   T   E   S   T   _   G
+0000040   O   T   M   P   _   R   O   O   T   :   -   "   $   L   O   C
+0000060   A   L   A   P   P   D   A   T   A   \   \   w   i   s   p   -
+0000100   t   e   s   t   -   g   o   t   m   p   "   }   /   d   2   2
+0000120   s   c   a   n   -   $   (   d   a   t   e       +   %   Y   %
+0000140   m   %   d   -   %   H   %   M   %   S   )   -   $   $   "  \n
+0000160
+6319065990c0fa2c374d5bb789d5fbc2702293fe57d5000f4366ca675e853240 *tools/d22scan/runtests.sh
+mixed-shape-hits=1 native-shape-hits=0
+== step 3: run the four through the mixed-shape runner (expect red) ==
+step3-rc=1
+== step 4: restore the committed bytes ==
+ad6f6a8d72cbe2a3fc9b7036774b8e16ddf92bfd64ea6055cbf12dde55164bf6 *tools/d22scan/runtests.sh
+0000000                                   g   o   t   m   p   _   r   u
+0000020   n   =   "   $   {   W   I   S   P   _   T   E   S   T   _   G
+0000040   O   T   M   P   _   R   O   O   T   :   -   "   $   L   O   C
+0000060   A   L   A   P   P   D   A   T   A   \   \   w   i   s   p   -
+0000100   t   e   s   t   -   g   o   t   m   p   "   }   \   \   d   2
+0000120   2   s   c   a   n   -   $   (   d   a   t   e       +   %   Y
+0000140   %   m   %   d   -   %   H   %   M   %   S   )   -   $   $   "
+0000160  \n
+0000161
+after-restore: mixed-shape-hits=0 native-shape-hits=1
+== step 5: rerun the four (expect green) ==
+step5-rc=0
