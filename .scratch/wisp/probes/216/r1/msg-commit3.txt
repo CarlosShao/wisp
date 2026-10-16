@@ -1,0 +1,19 @@
+216-r1 读数件（票 216 AC#2／AC#3／AC#4 落地腿自证，⛔ 裁决）
+
+docs/evidence/s1/216-display-scrub-r1.md（176 行／15799 字节）：写面逐枚 git show 名册、
+纯函数形状与三条理由（转义不删／不用 strconv.Quote／落在 NewSnapshot 那枚显示边界而不落
+生产者）、AC#2 的成对台面读数（同一枚探针两枚仓外导出树：改前 ca0e30fc 红句逐字 U+001B at
+offset 5 ⇄ 改后 92e8cc57 绿），并具名写清一处口径：JSON 自己会转义 ESC，所以"快照字节无裸
+ESC"那枚改前也成立、它不是牙，真正的尺是解码后的值。AC#3 的去牙红句逐枚＋还原哈希
+6ea6d3ca…（与提交树同 blob）＋判定三发同屏 plain/hostile/washed = L2/[R1 R8]。AC#4 的两句话
+盘上字节与 not_run 那枚状态钉。另附 ./internal/panel 整包带 -timeout 30m 的成对四数（改前
+141/8 ⇄ 改后 148/8，红名集合相减为空 ⇒ 引入新红 0 枚）与 8 枚既有红的逐枚归因（3 枚导出树
+缺件、2 枚本机内存仪器、3 枚 by-design 键钉），门禁四数逐枚 rc=（gofumpt 0／d22scan 0／
+长度门 0／go vet ./internal/panel 0）。
+
+必答项写在件 §0：本腿动过的既有测试件＝零枚，⛔ 改松任何一枚既有断言。
+残余五枚具名上交（件 §7）：两份合一需新导出名＝契约面、Cf 类今天仍穿过（U+202E 那形）、
+"attachments" 段要拆得加新键＝按规矩停手未加、ApprovalCardView 相邻面未动、cmd 侧
+rt.workspaceView() 的坍缩不在本腿写面。
+
+本笔只新增这枚证据件；⛔ 翻框、⛔ 改票名／Status、⛔ push。

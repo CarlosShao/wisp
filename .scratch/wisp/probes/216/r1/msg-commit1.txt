@@ -1,0 +1,22 @@
+216-r1 产码第一笔（AC#2 纯函数＋显示边界统一洗＋AC#4 两句话）
+
+internal/panel/display_scrub_216.go：一枚包内纯函数 scrubForDisplay（控制字符转
+可见转义，非删；\n \r \t \0 用助记形、其余 C0/C1 用 \xNN、非法 UTF-8 字节用原始
+字节 \xNN；不用 strconv.Quote 因为双反斜杠会把菜单里每一枚 Windows 路径洗成读不
+懂的字；幂等），加显示边界唯一调用点 scrubComposerForDisplay，名册只装 AC#1 普查
+实测今天真出向又裸奔的两枚：AttachmentRef.Name 与 WorkspaceView.Canonical；返回
+副本不改caller 的切片。
+
+composer.go 的 NewSnapshot（票面所说「显示前统一洗」那一格）过它一枚：落在快照出
+去之前的最后一站，不落在各生产者，因为 WorkspaceView.Canonical 在别处是当路径读
+的（ProjectInstructionLoadRequestFor／ReadGitForWorkspace），在生产者侧洗会把功能
+面改掉。AC#4 同处补一句：工作区行既无内容又无原因时写 workspaceNoReadingReason，
+⛔ 让空白替产品决定这行读起来像「没有」。
+
+workspace.go／pump.go：把「读了·没有」与「没读数腿·读不到」拆成两句（常量对
+workspaceNotChosenReason／workspaceNoReadingReason＋unreadWorkspaceView），泵没有
+读数腿时走后者；⛔ 改任何判定，Set 仍 false、Canonical 仍空。
+
+本笔未动 cmd/wisp（sanitizeReplyText 与本件的「两份合一」需导出名＝契约面，具名
+写成残余上交）；⛔ 新增 Snapshot 名册的键／C17 方法名／新导出 panel.* 名；⛔ 翻
+任何 AC 框、⛔ 改票名或 Status；本腿只 commit、⛔ push。

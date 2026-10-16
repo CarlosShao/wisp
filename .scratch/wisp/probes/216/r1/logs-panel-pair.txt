@@ -1,0 +1,42 @@
+216-r1 panel-pair log summary (trimmed from the two full -v runs; full dumps left on disk at $S/panel-full-before.log / panel-full-after.log)
+ruler: go test ./internal/panel/ -v -timeout 30m  (GOTMPDIR=C:\Users\swq\AppData\Local\Temp\wisp216r1, native backslash form)
+tree-before = git archive ca0e30fc go.mod go.sum internal cmd tools scripts frontend  (743 .go files, go build ./internal/panel/ rc=0)
+tree-after  = git archive 92e8cc57 (same 7 pieces)                          (744 .go files, go build ./internal/panel/ rc=0)
+===== before =====
+FAIL	github.com/CarlosShao/wisp/internal/panel	10.862s
+FAIL
+rc=1
+top-PASS=141 top-FAIL=8 sub-PASS=76 SKIP=0
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    backpressure_bound_35r8_test.go:309: flood under a blocked consumer with no fan-out (3 streams, so the key bound never engages): 1x pinned 1200000 text runes over 3 rows (live heap +1201
+    backpressure_bound_35r8_test.go:336: blocked consumer, fan-out past the ceiling: 1x opened 4000 streams and pins 3936 names (50058 runes, live heap +153792 bytes), 4x opened 16000 and pi
+    composer_test.go:78: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    composer_test.go:78: Go ComposerState emits [git currentModel modelKnown credentialState credentialKnown] that interface ComposerState does not declare
+    composer_test.go:873: the render fixture has no block for "no host attached" - the harness and this test disagree about which states are evidenced
+    composer_test.go:873: the render fixture has no block for "workspace chosen, video stored" - the harness and this test disagree about which states are evidenced
+    composer_test.go:873: the render fixture has no block for "unsupported attachment told to the user" - the harness and this test disagree about which states are evidenced
+    git_test.go:369: read docs/PLAN.md: open C:\Users\swq\AppData\Local\Temp\wisp216r1\tree-baseline\docs\PLAN.md: The system cannot find the path specified.
+    git_test.go:600: kind = "not_a_repo" reason = "这棵工作区目录及其以上都没有 .git，所以没有分支可显示": this repository has a .git directory
+===== after =====
+FAIL	github.com/CarlosShao/wisp/internal/panel	11.183s
+FAIL
+rc=1
+top-PASS=148 top-FAIL=8 sub-PASS=90 SKIP=0
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    backpressure_bound_35r8_test.go:309: flood under a blocked consumer with no fan-out (3 streams, so the key bound never engages): 1x pinned 1200000 text runes over 3 rows (live heap +1201
+    backpressure_bound_35r8_test.go:336: blocked consumer, fan-out past the ceiling: 1x opened 4000 streams and pins 3936 names (50058 runes, live heap +154064 bytes), 4x opened 16000 and pi
+    composer_test.go:78: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    composer_test.go:78: Go ComposerState emits [git currentModel modelKnown credentialState credentialKnown] that interface ComposerState does not declare
+    composer_test.go:873: the render fixture has no block for "no host attached" - the harness and this test disagree about which states are evidenced
+    composer_test.go:873: the render fixture has no block for "workspace chosen, video stored" - the harness and this test disagree about which states are evidenced
+    composer_test.go:873: the render fixture has no block for "unsupported attachment told to the user" - the harness and this test disagree about which states are evidenced
+    git_test.go:369: read docs/PLAN.md: open C:\Users\swq\AppData\Local\Temp\wisp216r1\tree-final\docs\PLAN.md: The system cannot find the path specified.
+    git_test.go:600: kind = "not_a_repo" reason = "这棵工作区目录及其以上都没有 .git，所以没有分支可显示": this repository has a .git directory
+===== failing-name set diff (before vs after) =====
+(empty diff => 本腿引入新红 0 枚)
+===== paired probe (same file, same ruler, two trees) =====
+BEFORE ca0e30fc: rc=1
+  probe_216_pair_test.go:79: PROBE go-row="photo\x1b已允许.png" raw-ESC-in-go-row=true wire-row="photo\x1b已允许.png" raw-ESC-in-wire-row=true
+  probe_216_pair_test.go:84: the menu row reached the page with a live control character U+001B at offset 5: "photo\x1b已允许.png" (this is the AC#2 穿过 reading; the display boundary washed nothing in this tree)
+AFTER 92e8cc57: rc=0
+  PROBE go-row="photo\x1b已允许.png" raw-ESC-in-go-row=false wire-row="photo\x1b已允许.png" raw-ESC-in-wire-row=false  => --- PASS

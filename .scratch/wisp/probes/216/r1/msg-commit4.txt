@@ -1,0 +1,21 @@
+216-r1 台件落盘（探针＋原始日志＋还原副本，⛔ 读数件的替代品）
+
+.scratch/wisp/probes/216/r1/ 九枚，逐枚具名：
+
+- pair/probe_216_pair_test.go：AC#2 的成对探针。它⛔ 指名任何一枚 216 新增符号，所以同一份
+  文件能原样放进改前（ca0e30fc）与改后（92e8cc57）两枚仓外导出树、同一把尺跑：改前红
+  （live U+001B at offset 5＝穿过），改后绿（洗掉）。读数件 §1 那两发就是它出的。
+- logs-panel-pair.txt：两发整包与探针的压缩摘要（含建树七件套、两侧 .go 枚数与
+  go build ./internal/panel/ rc=0、红名集合相减为空的 diff rc=0）。
+- logs-panel-full-before.txt／logs-panel-full-after.txt：那两发 `go test ./internal/panel/
+  -v -timeout 30m` 的原始 -v 输出（已剥 go test 不打的 INFO 行），⛔ 摘要件当凭据用，
+  要复核"8 枚既有红同名同句"就读这两枚。
+- logs-d22scan.txt：`sh scripts/d22scan.sh` 的全文输出（rc=0，
+  含 ban #8 把 internal/ 575 枚 Go 件连注释与 _test.go 一起扫的那两行射程）。
+- restore-copy-display_scrub_216.go：去牙那一发之前 `cp` 出来的还原源。还原后的
+  git hash-object＝6ea6d3ca04d7eb07a0ae9f2f8cfc6f4d96b346c0＝提交树同名 blob，
+  这一枚就是那条断言的可复跑物证。
+- msg-commit1.txt／msg-commit2.txt／msg-commit3.txt：三笔 commit 的中文正文原文
+  （git commit -F 用的就是它们，⛔ 双引号串里塞中文与反引号）。
+
+本笔⛔ 动任何产码、⛔ 动任何测试件、⛔ 翻框、⛔ push。

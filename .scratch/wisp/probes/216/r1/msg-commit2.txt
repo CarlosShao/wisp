@@ -1,0 +1,26 @@
+216-r1 第二笔（票 216 的测试件：AC#2 洗＋AC#3 正控＋AC#4 两句话）
+
+internal/panel/display_scrub_216_test.go（新件，本笔唯一改动面；⛔ 动过任何一枚既有
+测试件、⛔ 改过任何一枚既有断言）：
+
+- TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse：C0／C1／DEL／NUL／
+  CR LF TAB／非法 UTF-8 字节逐枚过一遍，并逐枚断言输出里 unicode.IsControl 零命中＋
+  幂等（洗过的字再过一遍不变）。
+- TestTheWashReturnsTheSameStringWhenThereIsNothingToWash：一枚干净路径必须原样返回
+  （「洗过」不等于「重新编码」）。
+- TestTheSnapshotBoundaryWashesBothRosterFieldsAndCopiesTheRows：名册两枚（附件显示名
+  与 WorkspaceView.Canonical）出到 Snapshot 时都已可见转义，且 ⛔ 就地改调用方的切片；
+  再按页面真读的那一发 JSON 往返一遍复测。
+- TestAHostileAttachmentNameWalksTheRealBrokerIntoAWashedMenuRow＝AC#3 正控：真
+  memory.Store＋真 memory.ValidArtifactName＋真 sniff，把 ESC＋「已允许」的名字从入口
+  走到 Snapshot 字节；另断言入口那侧仍带原始 ESC（证明洗落在显示边界、没落到生产者）。
+- TestTheClaimInANameChangesNoVerdict：同一把字节两枚店，除显示名外判定逐项相等；
+  权限那一支用真 risk.NewRiskAssessor()（工具桥跑的那枚）三发同读数——原始名／含
+  「已允许」名／洗过的名，Level 与 RulesHit 全相同（实测 L2/[R1 R8] 三发一致）。
+- TestWorkspaceAbsentAndWorkspaceUnreadAreTwoSentences＝AC#4：泵没接读数腿那句与读数
+  腿答「未选择工作区」那句必须不同，且空 ComposerState 也必给一句。
+- TestTheFiveInstructionStatesAreStillTheDiskSpelling：五态字面钉盘上值
+  loaded/none_found/off/refused/not_run（⛔ 派单那个 na），并把 none_found 与 not_run
+  拆成两段。
+
+台面自证：gofumpt -l 本件零输出；本笔只 commit、⛔ push。
