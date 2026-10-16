@@ -1,0 +1,69 @@
+# 328-a1 关键尺逐字输出（每条带命令＋rc；射程目录见各命令）
+
+$ git diff --stat 44f51fc8 HEAD -- internal/agent internal/panel
+rc=0
+
+$ grep -n 'callCorr' internal/agent/*.go
+internal/agent/loop.go:367:	// id per tool call at the dispatch hop (callCorr), so the request-side corr
+internal/agent/loop.go:594:// callCorr mints the correlation id of ONE tool call (ticket 242). C18 defines
+internal/agent/loop.go:603:func callCorr(taskID, callID string, index int) string {
+internal/agent/loop.go:676:			TaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i),
+internal/agent/loop_golden_test.go:69:	// Ticket 242 mints one correlation id per tool call (loop.go:603 callCorr,
+internal/agent/ticket285_corr_distinct_rulers_test.go:5:// 这一枚补的是 callCorr 的两支各自都要"作差"的洞：
+internal/agent/ticket285_corr_distinct_rulers_test.go:11:// 落点甲的理由：callCorr 是小写未导出，形状只能在 package agent 内测；
+internal/agent/ticket285_corr_distinct_rulers_test.go:42:// of callCorr: two calls of ONE task must never land on the same routing key,
+internal/agent/ticket285_corr_distinct_rulers_test.go:51:		{"first call", callCorr(task, "call-285-a", 0)},
+internal/agent/ticket285_corr_distinct_rulers_test.go:52:		{"second call", callCorr(task, "call-285-b", 1)},
+internal/agent/ticket285_corr_distinct_rulers_test.go:58:		{"first id-less call", callCorr(task, "", 0)},
+internal/agent/ticket285_corr_distinct_rulers_test.go:59:		{"second id-less call", callCorr(task, "", 1)},
+internal/agent/ticket285_corr_distinct_rulers_test.go:60:		{"third id-less call", callCorr(task, "", 2)},
+rc=0
+
+$ grep -rn 'executeCalls' internal/ --include=*.go | grep -v _test.go
+internal/agent/loop.go:504:		l.executeCalls(ctx, root, j, taskID, guard, turn, &res)
+internal/agent/loop.go:610:// executeCalls runs a turn's tool calls: risk policy first (pass-through until
+internal/agent/loop.go:615:func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJournal,
+internal/agent/loop.go:770:		// made executeCalls prefer it, so the model saw a bare "context
+internal/agent/loop.go:812:// caller (executeCalls) currently DISCARDS that value - it drops no row, and
+rc=0
+
+$ grep -rn '\.RunAsync(' internal/tools cmd/wisp --include=*.go | grep -v _test.go
+internal/tools/subagent_197.go:372:	bg := child.RunAsync(childCtx, prompt)
+cmd/wisp/run.go:1164:	bg := loop.RunAsync(ctx, task)
+rc=0
+
+$ grep -rn 'splitClashSuffix' internal/ --include=*.go
+internal/panel/subagent_roster_197.go:267:	if base, ok := splitClashSuffix(key); ok && base != "" {
+internal/panel/subagent_roster_197.go:272:// splitClashSuffix recognises the queue's rewrite and nothing else: a final '#'
+internal/panel/subagent_roster_197.go:277:func splitClashSuffix(id string) (base string, ok bool) {
+rc=0
+
+$ grep -c 'TaskID' internal/panel/approval.go
+0
+rc=1
+
+$ grep -rnoE '"[^"]*#[0-9]+"' internal/panel/subagent_blocked_220_test.go
+15:"task-7#9"
+108:"child-1#9"
+112:"child-1#9"
+130:"child-1#9"
+131:"child-1#147"
+132:"other-1#9"
+186:"child-1#9"
+rc=0
+
+$ grep -n 'orDefaultText(d.CorrelationID' internal/agent/approval/gate.go
+281:	corr := orDefaultText(d.CorrelationID, d.TaskID)
+521:	incoming := orDefaultText(d.CorrelationID, d.TaskID)
+rc=0
+
+$ grep -nE 'corr = fmt.Sprintf|approval-|"#replay"' internal/agent/approval/queue.go
+165:		corr = "approval-" + strconv.FormatUint(q.seq, 10)
+168:		corr = fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)
+614:		d.CorrelationID = corr + "#replay"
+rc=0
+
+$ git rev-parse --verify bd124b2a
+bd124b2ae0a58fd5ee85f4032c05e96e76c3db96
+rc=0
+
