@@ -1,0 +1,7 @@
+# github.com/CarlosShao/wisp/cmd/wisp
+package github.com/CarlosShao/wisp/cmd/wisp
+	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+	imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in /gomod/github.com/k2-fsa/sherpa-onnx-go-linux@v1.13.8
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [setup failed]
+FAIL
+go-test rc=1

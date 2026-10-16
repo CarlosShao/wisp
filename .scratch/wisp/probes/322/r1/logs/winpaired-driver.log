@@ -1,0 +1,3 @@
+### 322-r1 Windows paired readings, host go version go1.27.1 windows/amd64
+tar: /d/tmp/probe322r1/basewin.ukdf7d: Cannot open: No such file or directory
+tar: Error is not recoverable: exiting now

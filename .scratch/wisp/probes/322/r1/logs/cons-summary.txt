@@ -1,0 +1,13 @@
+=== cons2-base rc=0 tree=/d/tmp/probe322r1/base.ExxJlL
+    per-package rows: ok  	github.com/CarlosShao/wisp/internal/risk	8.476s|ok  	github.com/CarlosShao/wisp/internal/secret	0.013s|ok  	github.com/CarlosShao/wisp/internal/config	0.716s|ok  	github.com/CarlosShao/wisp/internal/agent	2.026s|ok  	github.com/CarlosShao/wisp/internal/memory	13.021s|
+    setup-failed count=0 connection-refused count=0
+=== cons2-fixed rc=0 tree=/d/tmp/probe322r1/fixed.0NjETw
+    per-package rows: ok  	github.com/CarlosShao/wisp/internal/risk	7.004s|ok  	github.com/CarlosShao/wisp/internal/secret	0.016s|ok  	github.com/CarlosShao/wisp/internal/config	1.098s|ok  	github.com/CarlosShao/wisp/internal/agent	3.042s|ok  	github.com/CarlosShao/wisp/internal/memory	14.600s|
+    setup-failed count=0 connection-refused count=0
+=== cons2-cmdwisp-base rc=1 tree=/d/tmp/probe322r1/base.ExxJlL
+    per-package rows: FAIL	github.com/CarlosShao/wisp/cmd/wisp [setup failed]|FAIL|
+    setup-failed count=1 connection-refused count=0
+=== cons2-cmdwisp-fixed rc=1 tree=/d/tmp/probe322r1/fixed.0NjETw
+    per-package rows: FAIL	github.com/CarlosShao/wisp/cmd/wisp [setup failed]|FAIL|
+    setup-failed count=1 connection-refused count=0
+### consumer colour done 2026-10-15 23:21:31 +0800

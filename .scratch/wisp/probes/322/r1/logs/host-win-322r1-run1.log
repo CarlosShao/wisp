@@ -1,0 +1,33 @@
+time=2026-10-15T23:08:00.485+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1
+    openleaf_guard_322_windows_test.go:117: AC#3' file-symlink: leg that spoke = preOpenLeafGuard, verbatim: winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\wisp-test-gotmp\322r1gotmp\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1440728870\001\file-sym-322r1.lnk: refusing to open for a private write: the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets (winsec: cannot apply a private security descriptor)
+    openleaf_guard_322_windows_test.go:118: os.Symlink ok: dir-sym-322r1.lnk -> C:/Users/swq/AppData/Local/wisp-test-gotmp/322r1gotmp\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1440728870\002 (Lstat mode Lrw-rw-rw-, FILE_ATTRIBUTE_REPARSE_POINT set)
+    openleaf_guard_322_windows_test.go:119: AC#3' directory-symlink: leg that spoke = preOpenLeafGuard, verbatim: winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\wisp-test-gotmp\322r1gotmp\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1440728870\001\dir-sym-322r1.lnk: refusing to open for a private write: the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets (winsec: cannot apply a private security descriptor)
+    openleaf_guard_322_windows_test.go:120: cmd [/c mklink /J C:\Users\swq\AppData\Local\wisp-test-gotmp\322r1gotmp\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1440728870\001\junction-322r1.lnk C:/Users/swq/AppData/Local/wisp-test-gotmp/322r1gotmp\TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1440728870\002]: exit status 1
+        Invalid switch - "Users".
+--- FAIL: TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1 (0.10s)
+=== RUN   TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1
+    openleaf_guard_322_windows_test.go:241: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=265 guardRefusals=11 otherRefusals=261 returnedNil=128 witnessTruncated=true witnessSize=35 witnessMode=-rw-rw-rw- firstGuardVerbatim="winsec: path is not provably resolved, refusing to seal: C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\322r1gotmp\\TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r11283008194\\001\\caller-name-322r1.bin: refusing to open for a private write: the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets (winsec: cannot apply a private security descriptor)"
+--- PASS: TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1 (0.64s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+    openleaf_overwrite_322_test.go:58: AC#2 RED: mode is -rw-rw-rw-, want the replacement to land private (0600)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+    openleaf_overwrite_322_test.go:58: AC#2 RED: mode is -rw-rw-rw-, want the replacement to land private (0600)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+    openleaf_overwrite_322_test.go:58: AC#2 RED: mode is -rw-rw-rw-, want the replacement to land private (0600)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+    openleaf_overwrite_322_test.go:58: AC#2 RED: mode is -rw-rw-rw-, want the replacement to land private (0600)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+    openleaf_overwrite_322_test.go:79: AC#2' mode after rewrite on this platform is -rw-rw-rw- (err <nil>); on Windows the descriptor decides, so this row is a reading, not a judgement
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.04s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.01s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.01s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.01s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.830s
+FAIL

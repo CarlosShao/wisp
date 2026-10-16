@@ -1,0 +1,34 @@
+=== RUN   TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1
+    openleaf_322_other_test.go:191: AC#1 paired reading on one screen: attempts=800 flips=482 flipErrs=0 damagedWitnesses=4 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+    openleaf_322_other_test.go:195: AC#1' leg that answered = placement floor before the act (platformVerifyPlacement) : 665 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = pinPlacement sameObjectPinned link face (winsec_other.go:188) : 112 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = sealHandle inline link face (winsec_other.go:269) : 18 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = sealHandle inline SameFile face (winsec_other.go:272) : 2 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = some other failure : 1 attempts
+    openleaf_322_other_test.go:195: AC#1' leg that answered = none: the call returned nil : 2 attempts
+    openleaf_322_other_test.go:199: AC#1 RED: 4 of 800 foreign witnesses lost their own bytes or mtime, so the open in privateFile followed a leaf link swapped into the caller's name and truncated a file no caller named (first: foreign-witness-0084-322r1.bin: content is "", want its own bytes). This is ticket 322's shape and the outcome the leaf leg exists to prevent.
+    openleaf_322_other_test.go:205: AC#1 RED instrument: across 800 raced attempts the leaf leg ("too many levels of symbolic links") answered 0 and the racer landed 482 flips (0 errors, first ""), so the damaged count above is not evidence about a window that was never reached
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.17s)
+=== RUN   TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1
+    openleaf_322_other_test.go:240: AC#1 RED relative sibling: the open carrying oNoFollowPlatform took a leaf link, want ELOOP
+    openleaf_322_other_test.go:240: AC#1 RED dangling, target never created: the open carrying oNoFollowPlatform took a leaf link, want ELOOP
+    openleaf_322_other_test.go:249: AC#1 RED: the dangling-leaf spelling created an object outside the tree
+--- FAIL: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.190s
+FAIL
+go-test rc=1

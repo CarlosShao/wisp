@@ -1,0 +1,18 @@
+go: downloading github.com/k2-fsa/sherpa-onnx-go v1.13.8
+go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+go: downloading golang.org/x/term v0.46.0
+go: downloading golang.org/x/crypto v0.57.0
+go: downloading modernc.org/sqlite v1.59.0
+# github.com/CarlosShao/wisp/cmd/wisp
+internal/secret/configrefs.go:10:2: mkdir /gomod/cache: read-only file system
+# github.com/CarlosShao/wisp/cmd/wisp
+internal/memory/open.go:19:2: mkdir /gomod/cache: read-only file system
+# github.com/CarlosShao/wisp/cmd/wisp
+internal/models/minisign.go:13:2: mkdir /gomod/cache: read-only file system
+# github.com/CarlosShao/wisp/cmd/wisp
+cmd/wisp/doctor.go:14:2: mkdir /gomod/cache: read-only file system
+# github.com/CarlosShao/wisp/cmd/wisp
+cmd/wisp/secret.go:51:2: mkdir /gomod/cache: read-only file system
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [setup failed]
+FAIL
+go-test rc=1

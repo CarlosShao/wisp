@@ -1,0 +1,50 @@
+=== container -count=2 -v ./internal/winsec/ (delivered bytes) docker-and-test rc=0
+    tree=/d/tmp/probe322r1/fixed.0NjETw  .go=1090  winsec/*.go=39
+    RUN=142 topPASS=86 topFAIL=0 topSKIP=0
+    allrows PASS=142 FAIL=0 SKIP=0
+    AC#1 paired rows (both counts, -count=2 means two samples):
+          openleaf_322_other_test.go:186: AC#1 paired reading on one screen: attempts=800 flips=554 flipErrs=0 damagedWitnesses=0 leafLegRefusals=24 foreignsNarrowed=0 foreignsHoldingPayload=0
+          openleaf_322_other_test.go:186: AC#1 paired reading on one screen: attempts=800 flips=528 flipErrs=0 damagedWitnesses=0 leafLegRefusals=15 foreignsNarrowed=0 foreignsHoldingPayload=0
+    tooling-word check inside this log: walk=0 buildfailed=0 notestfiles=0 setupfailed=0
+=== roster runfilter='322r1$' docker-and-test rc=0
+    RUN=9 topPASS=3 topFAIL=0 topSKIP=0
+    named top-level cases:
+      --- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.28s)
+      --- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+      --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.02s)
+=== roster runfilter='TestAC[1-4]POSIX' docker-and-test rc=0
+    RUN=39 topPASS=28 topFAIL=0 topSKIP=0
+    named top-level cases:
+      --- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.18s)
+      --- PASS: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.01s)
+      --- PASS: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+      --- PASS: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+      --- PASS: TestAC1POSIXSealHandlePlainObjectStillSeals120r3 (0.00s)
+      --- PASS: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)
+      --- PASS: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+      --- PASS: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.21s)
+      --- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125 (0.00s)
+      --- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125 (0.00s)
+      --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125 (0.00s)
+      --- PASS: TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink (0.00s)
+      --- PASS: TestAC2POSIXDoesNotFoldABackslashIntoASeparator (0.01s)
+      --- PASS: TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor (0.00s)
+      --- PASS: TestAC4POSIXFloorAnswersInsideTheNamedTree (0.00s)
+      --- PASS: TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119 (0.00s)
+      --- PASS: TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119 (0.00s)
+      --- PASS: TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 (0.00s)
+      --- PASS: TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119 (0.00s)
+      --- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.00s)
+      --- PASS: TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone (0.00s)
+      --- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth (0.01s)
+      --- PASS: TestAC1POSIXSealDirThroughASymlinkRefuses (0.00s)
+      --- PASS: TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing (0.00s)
+      --- PASS: TestAC1POSIXSealFileThroughABackslashNamedLink (0.00s)
+      --- PASS: TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree (0.00s)
+      --- PASS: TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks (0.01s)
+      --- PASS: TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator (0.00s)
+=== host cmdwisp-host-base go-test rc=1 tree=/d/tmp/probe322r1/base.ExxJlL
+    FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.062s|FAIL|
+=== host cmdwisp-host-fixed go-test rc=1 tree=/d/tmp/probe322r1/fixed.0NjETw
+    FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.215s|FAIL|
+### final readings done 2026-10-15 23:23:21 +0800

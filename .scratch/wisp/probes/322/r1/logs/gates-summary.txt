@@ -1,0 +1,29 @@
+build-go-all rc=0
+  build ./... output bytes=0 (0 = silent success)
+vet-linux rc=0
+vet-darwin-env rc=0
+vet-windows-env rc=0
+gofmt -l [mine] rc=0 listed-files=0
+  names: 
+gofumpt -l [mine] rc=0 listed-files=1
+  names: internal\winsec\openleaf_overwrite_322_test.go 
+gofmt -l [all-winsec] rc=0 listed-files=0
+  names: 
+gofumpt -l [all-winsec] rc=0 listed-files=1
+  names: internal\winsec\openleaf_overwrite_322_test.go 
+d22scan rc=0
+d22scan: scope ban #8 internal/         examined 571 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 138 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=239, bans #1-5 cmd/=41, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=571, ban #8 cmd/=138; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 571 Go files, comments and _test.go included; cmd/ 138 Go files, comments and _test.go included
+  d22scan tail: d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=239, bans #1-5 cmd/=41, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=571, ban #8 cmd/=138; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 571 Go files, comments and _test.go included; cmd/ 138 Go files, comments and _test.go included
+path-length-budget rc=0
+  budget tail: check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 60 paths on this tree, recomputed just now in both units
+=== cons-base rc=1 tree=/d/tmp/probe322r1/base.ExxJlL
+FAIL	github.com/CarlosShao/wisp/internal/risk [setup failed]|FAIL	github.com/CarlosShao/wisp/internal/secret [setup failed]|FAIL	github.com/CarlosShao/wisp/internal/config [setup failed]|FAIL	github.com/CarlosShao/wisp/internal/agent [setup failed]|FAIL	github.com/CarlosShao/wisp/internal/memory [setup failed]|FAIL|
+=== cons-fixed rc=1 tree=/d/tmp/probe322r1/fixed.0NjETw
+FAIL	github.com/CarlosShao/wisp/internal/risk [setup failed]|FAIL	github.com/CarlosShao/wisp/internal/secret [setup failed]|FAIL	github.com/CarlosShao/wisp/internal/config [setup failed]|FAIL	github.com/CarlosShao/wisp/internal/agent [setup failed]|FAIL	github.com/CarlosShao/wisp/internal/memory [setup failed]|FAIL|
+=== cmdwisp-fixed rc=1 tree=/d/tmp/probe322r1/fixed.0NjETw
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [setup failed]|FAIL|
+=== cmdwisp-base rc=1 tree=/d/tmp/probe322r1/base.ExxJlL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [setup failed]|FAIL|
+### gates done 2026-10-15 23:17:34 +0800

@@ -1,0 +1,23 @@
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "secret-value-two, longer than the replacement" (err <nil>), want "secret-value-two" - storing the same id twice replaces the blob in place
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "narrow backup left by an older build, longer than the replacement" (err <nil>), want "narrow" - this call is the repair path for a wide backup left by an older build
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "tmp body from this runthat crashed" (err <nil>), want "tmp body from this run" - a pre-rename temp left by a crash is overwritten, not refused
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "retry spill bytesneeded a retry" (err <nil>), want "retry spill bytes" - a leftover .retry temp is overwritten (D31 last-writer-wins)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+    openleaf_overwrite_322_test.go:101: AC#2 RED: content is "NEW bytes longer than the repair", want NEW
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.01s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.014s
+FAIL
+go-test rc=1

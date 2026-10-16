@@ -1,0 +1,39 @@
+### 322-r1 paired readings, started 2026-10-15 23:12:21 +0800
+HEAD=a9c7bea03bb8be34c0caac886da6456e67646187
+TREE /d/tmp/probe322r1/base.ExxJlL: .go=1092 internal/winsec/*.go=41
+TREE /d/tmp/probe322r1/fixed.0NjETw: .go=1090 internal/winsec/*.go=39
+DELIVERED-BYTES 41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d *internal/winsec/winsec.go
+DELIVERED-BYTES 21139cdd9dc9f570fd9690f5634f3484da2dc2fcf2d2e233dc99275fdab7bcf1 *internal/winsec/winsec_other.go
+DELIVERED-BYTES 5cdef88183deb576e742da8bf42349063d6ed199b7279232222d5ee4e7740afa *internal/winsec/winsec_windows.go
+SNAPSHOT MATCHES REPO for all three product files
+NOTRUNC-BYTES before: 41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d
+LANDS: tooth notrunc targets line 96, before: 	return privateFile(path, data, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+LANDS: after: 	return privateFile(path, data, os.O_WRONLY|os.O_CREATE, perm)
+LANDS: isolated - 0 line(s) still carry os.O_TRUNC in internal/winsec/winsec.go (winsec.go keeps one in the doc comment)
+TREE /d/tmp/probe322r1/notrunc.cw9Ts3: .go=1090 internal/winsec/*.go=39
+=== base-ac1 runfilter='TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1|TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1|TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1' docker-and-test rc=1
+RUN=9 (=== RUN rows, subtests included)
+top-level (anchored ^---): PASS=1 FAIL=2 SKIP=0
+all-rows (unanchored): PASS=7 FAIL=2 SKIP=0
+    openleaf_322_other_test.go:186: AC#1 paired reading on one screen: attempts=800 flips=530 flipErrs=0 damagedWitnesses=9 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+go-test rc=1
+=== fixed-ac1 runfilter='TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1|TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1|TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1' docker-and-test rc=0
+RUN=9 (=== RUN rows, subtests included)
+top-level (anchored ^---): PASS=3 FAIL=0 SKIP=0
+all-rows (unanchored): PASS=9 FAIL=0 SKIP=0
+    openleaf_322_other_test.go:186: AC#1 paired reading on one screen: attempts=800 flips=500 flipErrs=0 damagedWitnesses=0 leafLegRefusals=24 foreignsNarrowed=0 foreignsHoldingPayload=0
+go-test rc=0
+=== notrunc-ac2 runfilter='TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1' docker-and-test rc=1
+RUN=7 (=== RUN rows, subtests included)
+top-level (anchored ^---): PASS=0 FAIL=1 SKIP=0
+all-rows (unanchored): PASS=3 FAIL=4 SKIP=0
+NO AC#1 PAIRED ROW in notrunc-ac2
+go-test rc=1
+=== fixed-full runfilter='.' docker-and-test rc=0
+RUN=71 (=== RUN rows, subtests included)
+top-level (anchored ^---): PASS=43 FAIL=0 SKIP=0
+all-rows (unanchored): PASS=71 FAIL=0 SKIP=0
+    openleaf_322_other_test.go:186: AC#1 paired reading on one screen: attempts=800 flips=422 flipErrs=0 damagedWitnesses=0 leafLegRefusals=10 foreignsNarrowed=0 foreignsHoldingPayload=0
+go-test rc=0
+### done 2026-10-15 23:13:25 +0800
+TREES (kept on disk, never removed): base=/d/tmp/probe322r1/base.ExxJlL fixed=/d/tmp/probe322r1/fixed.0NjETw notrunc=/d/tmp/probe322r1/notrunc.cw9Ts3

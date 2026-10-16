@@ -1,0 +1,16 @@
+### 322-r1 Windows paired readings, host go version go1.27.1 windows/amd64
+TREE /d/tmp/probe322r1/basewin.r8VsJa: .go=1091 winsec/*.go=40
+=== win-base go-test rc=1 (tree /d/tmp/probe322r1/basewin.r8VsJa)
+RUN=2
+top-level (anchored ^---): PASS=0 FAIL=2 SKIP=0
+    openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=294 guardRefusals=0 otherRefusals=193 returnedNil=207 witnessTruncated=true witnessSize=35 witnessMode=-rw-rw-rw- firstGuardVerbatim=""
+    openleaf_guard_322_windows_test.go:127: AC#3 RED file-symlink: preOpenLeafGuard accepted a name carrying a reparse point, so the open that follows it can still truncate whatever that link targets
+    openleaf_guard_322_windows_test.go:129: AC#3 RED directory-symlink: preOpenLeafGuard accepted a name carrying a reparse point, so the open that follows it can still truncate whatever that link targets
+    openleaf_guard_322_windows_test.go:131: AC#3 RED junction: preOpenLeafGuard accepted a name carrying a reparse point, so the open that follows it can still truncate whatever that link targets
+    openleaf_guard_322_windows_test.go:241: AC#3 RED instrument: 400 raced attempts produced guard-leg refusals=0 and racer flips=294 (flipErrs=0, firstFlipErr=""), so nothing below proves the guard is on this route
+TREE /d/tmp/probe322r1/fixedwin.ahCU0H: .go=1090 winsec/*.go=39
+=== win-fixed go-test rc=0 (tree /d/tmp/probe322r1/fixedwin.ahCU0H)
+RUN=2
+top-level (anchored ^---): PASS=2 FAIL=0 SKIP=0
+    openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=276 guardRefusals=7 otherRefusals=263 returnedNil=130 witnessTruncated=true witnessSize=35 witnessMode=-rw-rw-rw- firstGuardVerbatim="winsec: path is not provably resolved, refusing to seal: C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\322r1gotmp\\TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1135105549\\001\\caller-name-322r1.bin: refusing to open for a private write: the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets (winsec: cannot apply a private security descriptor)"
+TREES kept: base=/d/tmp/probe322r1/basewin.r8VsJa fixed=/d/tmp/probe322r1/fixedwin.ahCU0H
