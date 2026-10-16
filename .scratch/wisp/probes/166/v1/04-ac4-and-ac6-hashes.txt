@@ -18,3 +18,7 @@ pristine＝HEAD＝工作树＝tree-mut 还原后 8bf052bbdc7ea4448c05f321c310f40
 ## 尺（可逐字重跑）
 cd /d/tmp/wisp-166v1/tree-mut && sha256sum internal/memory/dao_session.go internal/session/manage_test.go
 cmp internal/session/manage_test.go /d/tmp/wisp-166v1/tree-head/internal/session/manage_test.go; echo $?
+
+## AC#6 做平时钟那两枚字节（卷不同、注释行数不同⇒sha 不同，同一形）
+b958d176146a761d3c9d017d033fd5b9f8b6b349a6b4aa58337064936c865474  D 卷台面（两行注释版）⇒RUN=20 TOPPASS=10 TOPFAIL=10
+7cfe34ee258fb19ae953f71f89f540423bc05c43e52c733de7bffc5dd6173fb4  C 卷台面（一行注释版）⇒RUN=20 TOPPASS=11 TOPFAIL=9

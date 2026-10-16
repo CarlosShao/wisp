@@ -1,0 +1,22 @@
+166-v1 裁决表落盘：docs/evidence/s1/166-session-verdict.md⇒六格判语（AC#2 不成立＝接线缺口，其余五格成立）＋票尾一笔
+
+判语一览（详数全在 .scratch/wisp/probes/166/v1/，本表逐格指向）：
+- AC#1 成立：基线（2f41a80cb）命令档 wisp sessions/history 都 rc=2 unknown command；API 档五枚 Store 出口 git grep rc=1（正控 HEAD 5 命中）；go doc Store 基线唯一含 session 的是 ListGrantsBySession。
+- AC#2 不成立＝接线缺口：函数与用例逐枚对号，★生产调用者枚数 0/0/0/0/0（session.NewManager 全仓 .go rc=1、正控 session.NewLedger 3 命中；
+  非测试 Manager 调用点 rc=1；memory.Session 在 panel/tools/cmd 产码 rc=1；CLI 十枚名册无 sessions；PumpSources/Snapshot 无会话读者）。
+  ⛔ 拿 go build/go vet 的 rc=0 冒充接线（Go 不为未使用方法报错）；口径分歧具名交回：只按"函数与用例齐"读它是成立的，判语分量在"出口"两字。
+- AC#3 成立：真杀进程（父 cmd.Process.Kill＝TerminateProcess）六枚定点＋十二枚随机，合法只有 NOTHING(v2-untouched)/ALL(v3-complete) 两形、无 HALF-STATE；
+  ★spill 一发在同一事务里做出 wisp.db-wal size=13962712 的未提交帧，杀后重开仍 v2 原形、integrity_check=ok；新老库名册 diff rc=0（11 表/10 索引），老库升级前缺整张 session/session_turn＋三枚 idx。
+- AC#4 成立：物理改字节的两发去牙都响（M1 红 manage_test.go:213 "original lost turns (2 -> 0)"、M2 红 :226 "fork turns = [] (<nil>), want 2"），
+  还原 sha 38bff760…、cmp 0 差异、复跑 PASS；★顺手量到 M1 下 internal/memory 整包仍 ok（12.429s）⇒ DAO 层无分叉用例，单层把守（只上报）。
+- AC#5 成立：五枚笔并集 41 路径、15 枚命名 pattern 命中全 0；⚠"三枚冻结件"名册在 HANDOVER 6 处引用里无一处给出⇒按未定义即停只交命名 pattern；
+  owner 轴上报：SchemaVersionTarget 2→3＋ddlV3 两枚新表 vs SPEC-02 §3 正文 grep -c ^CREATE TABLE＝9（contractSpec＝11）。
+- AC#6 ⓐ成立＋范围修正：改后 20/20（D 卷与 C 卷同色 RUN=20 TOPPASS=20 TOPFAIL=0）；摘步进必红（D 卷 TOPFAIL=10／C 卷 TOPFAIL=9）；
+  改前字节 TOPFAIL=12；★:84（TestSessionSearchTitleAndBody）在做平时钟下 RUN=20 TOPPASS=20 TOPFAIL=0＝实测不是硬币⇒真关掉的只有 :69 一枚，:84 算防未来（⛔ 抹平）；
+  ⓑ成立：答"看不见"，成因＝压根无链（＝AC#2），t.Skip 整包 0 命中、:86 断言逐字仍在、用例名册仍 5 枚。
+
+台面补记：GOTMPDIR=D:/tmp 时 scripts/d22scan.sh 撞票 311 GUARD rc=2＝射程拒绝（⛔ 当红）⇒ 授权卷 C 重跑：d22scan rc=0 clean（bans #1-5 internal/=239、cmd/=41｜#6 frontend/=116｜#7 tools/=25｜#8 design/=30、frontend/=116、internal/=573、cmd/=138）、
+check-path-length-budget --with-self-test（仓根）rc=0 VERDICT GREEN（越帽 60＝名册 60、worst 229）；两枚 rc 覆盖整棵树含别腿在飞字节，只当台面读数。
+起手 go build ./... 三处（tree-head/tree-base/工作树）都 rc=0，此刻未撞上 winsec/tools 在飞红；工作树 go.mod/.gitignore 是别腿脏改动，本腿未碰。
+
+⛔ 勾任何 AC 框、⛔ 动 Status:/票名/-done、⛔ 改产码或测试件一字、⛔ push；本腿至此第四笔（票尾那一笔是第五枚）。

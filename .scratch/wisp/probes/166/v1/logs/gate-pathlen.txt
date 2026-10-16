@@ -1,0 +1,1 @@
+check-path-length-budget.sh: not inside a git work tree - refusing to guess a denominator
