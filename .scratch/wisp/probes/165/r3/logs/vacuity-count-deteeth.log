@@ -1,0 +1,8 @@
+# 必答题 M-B：常量非零的 sink 计数（n := 1）+ 摘掉夹具第 12 行（去牙）
+fixture lines=27  tool-call-lines=0
+--- FAIL: TestPlanPresentCallBooksTheToolCallRow165r3 (0.14s)
+    plan_present_doorbell_165r3_test.go:143: no tool_call row was booked for "plan.present" (rows read back = 0): the call never reached internal/agent/loop.go:637-640
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.209s
+FAIL
+VACUITY-B rc=1

@@ -1,0 +1,13 @@
+# 改前 B：同一枚台面、同一枚用例体，只把夹具名换成既有的 tool-then-text（既有回放真打了 sink，但打的是 echo）
+--- FAIL: TestPlanPresentCallBooksTheToolCallRow165r3 (0.17s)
+    plan_present_doorbell_165r3_test.go:138: doorbell sink reading = 0 rows for "plan.present" over 1 tool_call rows: the replay never reached internal/agent/loop.go:637-640
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.245s
+FAIL
+PRE-B rc=1
+# 还原后逐枚 sha256（必须回到 00c3204/7d26fa8）
+00c32049994c441c8927066bc4d4099c1b2977fc20ee9e602bb98f3670d37b75 *internal/agent/plan_present_doorbell_165r3_test.go
+7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be *internal/agent/testdata/golden/plan-present.sse
+# 改后那一发（同台面复跑）
+ok  	github.com/CarlosShao/wisp/internal/agent	0.284s
+POST rc=0

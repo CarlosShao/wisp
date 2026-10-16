@@ -1,0 +1,16 @@
+# 提交后台面复跑：git archive f7d6dbc9802d9f5c9b11286fc59318809dbc7b43（七件套）导出树
+go file count=746
+本腿两枚在不在树上：internal/agent/testdata/golden/plan-present.sse / internal/agent/plan_present_doorbell_165r3_test.go
+7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be *internal/agent/testdata/golden/plan-present.sse
+00c32049994c441c8927066bc4d4099c1b2977fc20ee9e602bb98f3670d37b75 *internal/agent/plan_present_doorbell_165r3_test.go
+go build ./internal/agent/
+BUILD rc=0
+单跑本用例
+=== RUN   TestPlanPresentCallBooksTheToolCallRow165r3
+--- PASS: TestPlanPresentCallBooksTheToolCallRow165r3 (0.13s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.186s
+SINGLE rc=0
+整包 ./internal/agent
+ok  	github.com/CarlosShao/wisp/internal/agent	3.108s
+FULL rc=0

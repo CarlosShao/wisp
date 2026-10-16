@@ -1,0 +1,8 @@
+# 全部突变还原后那一发（两枚文件逐枚 sha256）
+00c32049994c441c8927066bc4d4099c1b2977fc20ee9e602bb98f3670d37b75 *internal/agent/plan_present_doorbell_165r3_test.go
+7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be *internal/agent/testdata/golden/plan-present.sse
+expect 00c3204999... / 7d26fa889b...
+0
+mutation-hits-rc=1 (1 = 零命中)
+ok  	github.com/CarlosShao/wisp/internal/agent	0.167s
+FINAL-RESTORE rc=0

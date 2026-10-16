@@ -1,0 +1,4 @@
+# 必答题 M-A：sink 的计数改成常量非零（n := 1），夹具牙完好（28 行）
+fixture lines=28
+ok  	github.com/CarlosShao/wisp/internal/agent	0.251s
+VACUITY-A rc=0

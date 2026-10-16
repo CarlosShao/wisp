@@ -1,0 +1,8 @@
+# 改前 A：导出树 c9ba5254（无 plan-present.sse），只放用例那一发
+internal/agent/testdata/golden/plan-present.sse
+--- FAIL: TestPlanPresentCallBooksTheToolCallRow165r3 (0.09s)
+    plan_present_doorbell_165r3_test.go:125: load golden plan-present: golden: read D:\tmp\165r3\t1\internal\agent\testdata\golden\plan-present.sse: open D:\tmp\165r3\t1\internal\agent\testdata\golden\plan-present.sse: The system cannot find the file specified.
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.144s
+FAIL
+PRE-A rc=1

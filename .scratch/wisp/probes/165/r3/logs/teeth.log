@@ -1,0 +1,9 @@
+# 去牙那一发：摘掉 plan-present.sse 第 12 行（唯一一行 tool_calls delta），其余一字未动
+wc -l 28 -> 27
+
+--- FAIL: TestPlanPresentCallBooksTheToolCallRow165r3 (0.12s)
+    plan_present_doorbell_165r3_test.go:138: doorbell sink reading = 0 rows for "plan.present" over 0 tool_call rows: the replay never reached internal/agent/loop.go:637-640
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.184s
+FAIL
+DETEETH rc=1

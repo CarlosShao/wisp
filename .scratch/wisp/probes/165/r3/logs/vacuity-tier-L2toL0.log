@@ -1,0 +1,11 @@
+# 反控 M-C：名册里镜像的档位 L2 改成 L0（夹具牙完好、计数是真读的）
+--- FAIL: TestPlanPresentCallBooksTheToolCallRow165r3 (0.10s)
+    plan_present_doorbell_165r3_test.go:157: row.risk_level = "L0", want "L2" (the frozen tier must survive the trip to the row)
+    plan_present_doorbell_165r3_test.go:184: row.decision = "allow", want "reject" (an ungated host must not run an L2 write)
+    plan_present_doorbell_165r3_test.go:191: row.error_class = "tool", want "permission_denied"
+    plan_present_doorbell_165r3_test.go:199: tool log entry = {CallID:call_pp1 Name:plan.present Outcome:error ErrorClass:tool Text:unknown tool plan.present Spilled:false Artifact: Truncated:false Rejected:false}, want a rejected plan.present/call_pp1
+    plan_present_doorbell_165r3_test.go:208: executed tool calls = 1, want 0 (an ungated L2 call must never execute)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.153s
+FAIL
+TIER-MUTATION rc=1

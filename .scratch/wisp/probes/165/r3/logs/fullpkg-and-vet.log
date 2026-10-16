@@ -1,0 +1,6 @@
+# 整包 ./internal/agent（导出树 c9ba5254 + 本腿两枚新件），-timeout 30m -count=1
+ok  	github.com/CarlosShao/wisp/internal/agent	2.856s
+FULL-PKG rc=0
+
+# go vet ./internal/agent/
+VET rc=0

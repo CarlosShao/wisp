@@ -1,0 +1,25 @@
+# 落件后分母复跑（尺逐字抄普查腿 §问 B：git grep -F -l <name> HEAD -- '*.sse' '*/testdata/*' 'tools/mockllm/**'）
+锚=f7d6dbc9
+
+## internal/agent/testdata/golden 的 .sse 枚数（普查量得 11）
+12
+
+## 11 枚真注册名在夹具面的逐枚命中（单位＝枚文件）
+fs.read 0
+fs.list 0
+fs.edit 0
+fs.write 0
+fs.trash 0
+fs.move 0
+fs.delete 0
+plan.present 1
+task.spawn 0
+task.output 0
+task.cancel 0
+
+## 正控（同一把尺、同射程）
+echo 17
+get_weather 8
+sleep 3
+get_time 4
+tool_calls 16
