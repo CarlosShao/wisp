@@ -23,6 +23,12 @@ logs/ 现量（逐枚）：
 - a4-gates-stdout.txt＋a4-g2/g3/g4-*.txt：四枚门禁逐枚 rc=0（bash -n／d22scan.sh／
   长度门 --with-self-test VERDICT GREEN／go build ./...）；gofumpt 这台机器 which rc=1、
   四处候选目录零命中 ⇒ 本腿写面 0 枚 .go，⛔ 用 gofmt 的 0 冒充它的 0
+- a2-93-list-four-names.txt：四枚 116/105 名＋第五枚 TestPathResolverJunctionWindows，逐枚
+  `go test ./internal/risk/ -run '^<名>$' -list '^<名>$'` 命中 1/1（⛔ 拿不存在的名字跑＝
+  `no tests to run`，不是读数）
+- a2-94-ci-shape-mixed-root.txt：射程那一格的自证——CI 直呼本 runner 的那档（ci.yml:831 形状）
+  在**未修混形码**下 rc=0、`PASS=1 FAIL=0 SKIP=0 === RUN=1` ⇒ 那枚用例的 mklink 目标走
+  filepath.Join 归一化、吃得下混形 ⇒ 它绿不代表坑没，只代表 -run 名册盖不到那四枚（缺世界）
 - 仪器＝ac2-counter-control.sh／ac4-gates.sh（只建不删）；commit-ac1.txt＝AC#1 那笔正文
 
 只 commit，push 归编排者。
