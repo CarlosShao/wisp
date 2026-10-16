@@ -62,3 +62,10 @@
 
 - 断口② `cmd/wisp/plan_assembled_165r2_test.go:123` 只断到名册出口，跳 6/7/8（`Inject` → `prompt.go:251` → 各适配器 `request.go`）仍零用例——本腿那发请求体断言只覆盖了 round 1 的 `tools` 数组里有没有这枚门（`mustContain ... "name":"plan.present"`），⛔ 等于"装配面断言"；写面 `cmd/wisp/**` 此刻归 `220-v1`/`220-r2`，本腿一枚字节没碰。
 - 断口③ `llm.Request.ToolChoice` 产码 0 枚写入 ⇒ `tools/mockllm/chat.go:172-185` 那枚"必发工具调用"的合成仍从装配面按不到；本腿按派单硬约束⛔ 加写入（要扩到 `internal/llm` 三家 `request.go`）、⛔ 改合成器的按位形状。这一格缺的是**世界**（产码写入＋合成器按名选），⛔ 一枚包内用例能补。
+
+## 7. 终态名册与最后一发（补笔）
+
+- 本腿八枚提交（逐枚 `git show --name-only` 的路径名册共 **23 枚**，全在四处写面之内，越界尺命中 **0**）：`4f2470703` 夹具／`f7d6dbc98` 用例／`d498a73c` 读数件／`78fe125f` logs 15 枚／`3e4ca0e3` 证据件／`c3f55651` 票尾一条 bullet／`f6c76b91` 三枚正文源台件／本笔（读数件＋证据件各一枚补笔）。⛔ push（本地领先 `origin/dev`，推送归编排者）。
+- 终态锚＝`f6c76b91897ead14e2717f4209c9f5422a9098eb`；其间别腿又落了两枚（`83a6f15c`／`7f31bd2b`，220-v1），⛔ 与本腿写面零交集。
+- 终态那一发（★第三棵导出树 `git archive f6c76b91` 七件套，原始日志 `logs/final-head-rerun.log`）：两枚字节 sha256 仍逐位等于基线（`00c32049994c441c...`／`7d26fa889b59fc3a...`）；`go build ./internal/agent/` rc=0；单跑 `-run '^TestPlanPresentCallBooksTheToolCallRow165r3$' -timeout 30m -count=1`＝`--- PASS ... (0.13s)` rc=0；整包 `./internal/agent -timeout 30m -count=1`＝`ok 2.250s` rc=0；`go vet ./internal/agent/` rc=0。
+- 票框尺交回（⛔ 本腿一枚没翻，翻法归编排者）：`grep -c '^- \[x\]'`＝**5**（AC#1–AC#5，落件前后同数）、`grep -c '^- \[ \]'`＝**1**（AC#6 仍空）；票名与两行 `Status:` 一字未动；票面 diff＝**2 加／0 删**（纯追加一条 bullet）。

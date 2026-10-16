@@ -41,7 +41,7 @@
 
 ## 5. 写面自证（逐枚提交、⛔ 目录形）
 
-`4f2470703`（夹具 1 枚）→ `f7d6dbc98`（用例 1 枚）→ `d498a73c`（读数件）→ `78fe125f`（logs 15 枚）。逐枚 `git show --name-only` 只含四处写面之内：`internal/agent/**`、`.scratch/wisp/probes/165/r3/**`、`docs/evidence/s1/**`、票 165 末尾一条 bullet。⛔ `cmd/wisp/**`、⛔ `internal/panel/**`、⛔ `internal/llm/**`、⛔ `tools/mockllm/**`、⛔ `internal/tools/**`、⛔ 既有 golden 件、⛔ 阈值/`allowlist.txt`/`PLAN.md`/`docs/specs/**`/三枚冻结件。⛔ 翻任何 AC 框、⛔ 改票名/`Status:`、⛔ 加 `-done`、⛔ `add -A`／amend／reset／rebase／stash／checkout ./clean。
+`4f2470703`（夹具 1 枚）→ `f7d6dbc98`（用例 1 枚）→ `d498a73c`（读数件）→ `78fe125f`（logs 15 枚）→ `3e4ca0e3`（本件）→ `c3f55651`（票尾一条 bullet）→ `f6c76b91`（三枚正文源台件）→ 本笔补发（读数件 §7＋本句）。★票尾那条 bullet 里"提交五枚"那句是**它落盘那一发**的数，终态名册以本件与 `00-readings.md` §7 为准（别腿 `7f31bd2b`／`83a6f15c` 220-v1 在此期间也落了盘，见 §0 漂移）。逐枚 `git show --name-only` 只含四处写面之内：`internal/agent/**`、`.scratch/wisp/probes/165/r3/**`、`docs/evidence/s1/**`、票 165 末尾一条 bullet。⛔ `cmd/wisp/**`、⛔ `internal/panel/**`、⛔ `internal/llm/**`、⛔ `tools/mockllm/**`、⛔ `internal/tools/**`、⛔ 既有 golden 件、⛔ 阈值/`allowlist.txt`/`PLAN.md`/`docs/specs/**`/三枚冻结件。⛔ 翻任何 AC 框、⛔ 改票名/`Status:`、⛔ 加 `-done`、⛔ `add -A`／amend／reset／rebase／stash／checkout ./clean。
 
 ## 6. 本件量到／⛔ 量到的（先把尺说清，别让下一枚腿误读）
 
