@@ -1,0 +1,18 @@
+form=psx GOTMPDIR=0000000   C   :   /   t   m   p   /   w   i   s   p   3   1   7   o   r 0000020   c   h   /   p   a   i   r 0000027 
+time=2026-10-16T09:19:22.448+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+    syncdirs_ancestor_actable_leg_116_test.go:182: precondition: deepestExistingAncestor("C:\\tmp\\wisp317orch\\pair\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor116571440345\\001\\%WISP116ANC\\B%\\new.md") = "C:\\tmp\\wisp317orch\\pair\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor116571440345\\001\\%WISP116ANC\\B%", want "C:/tmp/wisp317orch/pair\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor116571440345\\001\\%WISP116ANC\\B%"
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+=== RUN   TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+    syncdirs_ancestor_actable_leg_116_test.go:286: precondition: the ~ spelling must resolve under the relocated home "C:/tmp/wisp317orch/pair\\TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116739580023\\002", got "C:\\tmp\\wisp317orch\\pair\\TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116739580023\\002\\wisp116-tilde-probe\\new.md"
+--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.01s)
+=== RUN   TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+    syncdirs_ancestor_reparse_ticket105_windows_test.go:59: mklink /J C:\tmp\wisp317orch\pair\TestSyncAncestorLegReResolvesThroughJunctionToRealTree5876117\002\proj C:/tmp/wisp317orch/pair\TestSyncAncestorLegReResolvesThroughJunctionToRealTree5876117\001 failed: exit status 1: Invalid switch - "tmp".
+--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.13s)
+=== RUN   TestSyncAncestorLegNotExemptedStaysFailClosed
+    syncdirs_ancestor_reparse_ticket105_windows_test.go:116: mklink /J C:\tmp\wisp317orch\pair\TestSyncAncestorLegNotExemptedStaysFailClosed794162953\002\proj C:/tmp/wisp317orch/pair\TestSyncAncestorLegNotExemptedStaysFailClosed794162953\001 failed: exit status 1: Invalid switch - "tmp".
+--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed (0.13s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	3.002s
+FAIL
+rc=1

@@ -1,0 +1,17 @@
+form=nat GOTMPDIR=0000000   C   :   \   t   m   p   \   w   i   s   p   3   1   7   o   r 0000020   c   h   \   p   a   i   r 0000027 
+time=2026-10-16T09:19:17.140+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+    syncdirs_ancestor_actable_leg_116_test.go:218: raw="C:\\tmp\\wisp317orch\\pair\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161938626729\\001\\%WISP116ANC\\\\B%\\new.md"
+         anc="C:\\tmp\\wisp317orch\\pair\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161938626729\\001\\%WISP116ANC\\B%"
+         moved="C:\\tmp\\wisp317orch\\pair\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161938626729\\wisp116-escape"
+        verdict: Sync=true Root={Provider:sync-suspect Path: Source:suspect-fallback} Why="write target spelling could not be anchored on a C26-verifiable ancestor (8.3/\\\\?\\/missing chain); fail-closed as sync-suspect: risk: expansion moved this path onto a tree the caller did not name: C:\\tmp\\wisp317orch\\pair\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161938626729\\001\\%WISP116ANC\\B% expands to C:\\tmp\\wisp317orch\\pair\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1161938626729\\wisp116-escape (env); act on the expanded tree only if you asked for it by name"
+--- PASS: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+=== RUN   TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+=== RUN   TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+--- PASS: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.11s)
+=== RUN   TestSyncAncestorLegNotExemptedStaysFailClosed
+--- PASS: TestSyncAncestorLegNotExemptedStaysFailClosed (0.10s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	1.728s
+rc=0

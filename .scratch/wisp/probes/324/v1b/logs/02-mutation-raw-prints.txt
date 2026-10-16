@@ -1,0 +1,254 @@
+(注：mutA 未突变那一发＝同目录 `head-ruler.log`（HEAD 树同把尺）逐枚同数：rc=0、顶层 3 枚 PASS、14 行 SECTION、match=false 0 枚；)
+       本件的 `mutA-4-restored`／`mutA-6-restored-again` 两发就是它，故删去重复的第一发原始打印（删的⛔ 是读数，⛔ 删件）。
+
+
+===== RAW PRINT mutA-3-dropgate-real.log =====
+time=2026-10-15T23:30:21.875+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+    config_receipt_255_test.go:293: SECTION 1/14 section="agent" field=Agent roster=[cmd/wisp/run.go] scan=[cmd/wisp/run.go] match=true
+    config_receipt_255_test.go:293: SECTION 2/14 section="app" field=App roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 3/14 section="audio" field=Audio roster=[cmd/wisp/resident_audio_windows.go] scan=[cmd/wisp/resident_audio_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 4/14 section="ball" field=Ball roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 5/14 section="cost" field=Cost roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 6/14 section="hotkey" field=Hotkey roster=[cmd/wisp/resident_windows.go cmd/balldebug/main.go] scan=[cmd/balldebug/main.go cmd/wisp/resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 7/14 section="llm" field=LLM roster=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] match=true
+    config_receipt_255_test.go:293: SECTION 8/14 section="memory" field=Memory roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 9/14 section="models" field=Models roster=[cmd/wisp/models.go] scan=[cmd/wisp/models.go internal/panel/composer_dispatch.go] match=false
+    config_receipt_255_test.go:295: section "models" (field Models) is read by [cmd/wisp/models.go internal/panel/composer_dispatch.go] in production, the roster names [cmd/wisp/models.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    config_receipt_255_test.go:293: SECTION 10/14 section="observe" field=Observe roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 11/14 section="panel" field=Panel roster=[cmd/wisp/panel_resident_windows.go] scan=[cmd/wisp/panel_resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 12/14 section="privacy" field=Privacy roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 13/14 section="session" field=Session roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 14/14 section="voice" field=Voice roster=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] match=true
+--- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.73s)
+=== RUN   TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite
+    config_receipt_255_test.go:560: FIXTURE root=D:/tmp/324v1b/gotmp\TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite935316102\001 scan=[cmd/wisp/schembsite_fixture.go internal/panel/samename_fixture.go] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=false
+    config_receipt_255_test.go:562: the scan read [cmd/wisp/schembsite_fixture.go internal/panel/samename_fixture.go] for section field Models over the two fixtures, want [cmd/wisp/schembsite_fixture.go]: d.Models.HandleModelsListRequest in internal/panel/samename_fixture.go is 票 324's same-named NON-config field shape (a dispatch handler, not a value the [models] section declares) and must not be counted as a config reader, while cfg.Models.Mirror must be - a scan that named both has no judgement, and a scan that named neither is 摘尺
+--- FAIL: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+=== RUN   TestTicket324SectionMembersAreReadOffTheSchema
+    config_receipt_255_test.go:587: internal/panel/composer_dispatch.go's handler line "return d.Models.HandleModelsListRequest(ctx, req)" is judged a read of [models] again: the schema-member evidence was dropped, so a same-named field of any other struct counts as a config reader
+--- FAIL: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+FAIL
+===== END mutA-3-dropgate-real =====
+
+===== RAW PRINT mutA-4-restored.log =====
+time=2026-10-15T23:30:56.402+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+    config_receipt_255_test.go:293: SECTION 1/14 section="agent" field=Agent roster=[cmd/wisp/run.go] scan=[cmd/wisp/run.go] match=true
+    config_receipt_255_test.go:293: SECTION 2/14 section="app" field=App roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 3/14 section="audio" field=Audio roster=[cmd/wisp/resident_audio_windows.go] scan=[cmd/wisp/resident_audio_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 4/14 section="ball" field=Ball roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 5/14 section="cost" field=Cost roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 6/14 section="hotkey" field=Hotkey roster=[cmd/wisp/resident_windows.go cmd/balldebug/main.go] scan=[cmd/balldebug/main.go cmd/wisp/resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 7/14 section="llm" field=LLM roster=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] match=true
+    config_receipt_255_test.go:293: SECTION 8/14 section="memory" field=Memory roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 9/14 section="models" field=Models roster=[cmd/wisp/models.go] scan=[cmd/wisp/models.go] match=true
+    config_receipt_255_test.go:293: SECTION 10/14 section="observe" field=Observe roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 11/14 section="panel" field=Panel roster=[cmd/wisp/panel_resident_windows.go] scan=[cmd/wisp/panel_resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 12/14 section="privacy" field=Privacy roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 13/14 section="session" field=Session roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 14/14 section="voice" field=Voice roster=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] match=true
+--- PASS: TestTicket255RosterStillMatchesTheActualReadSites (0.71s)
+=== RUN   TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite
+    config_receipt_255_test.go:562: FIXTURE root=D:/tmp/324v1b/gotmp\TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite420072302\001 scan=[cmd/wisp/schembsite_fixture.go] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=true
+--- PASS: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+=== RUN   TestTicket324SectionMembersAreReadOffTheSchema
+--- PASS: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+PASS
+===== END mutA-4-restored =====
+
+===== RAW PRINT mutA-5-blind.log =====
+time=2026-10-15T23:31:16.617+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+    config_receipt_255_test.go:277: section field "Agent" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "App" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Audio" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Ball" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Cost" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Hotkey" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "LLM" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Memory" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Models" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Observe" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Panel" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Privacy" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Session" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:277: section field "Voice" resolves to 0 schema member names, want at least 2: the judgement in readsFieldAccess has nothing to match against, so it can only refuse (摘尺当修尺)
+    config_receipt_255_test.go:293: SECTION 1/14 section="agent" field=Agent roster=[cmd/wisp/run.go] scan=[] match=false
+    config_receipt_255_test.go:295: section "agent" (field Agent) is read by [] in production, the roster names [cmd/wisp/run.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    config_receipt_255_test.go:293: SECTION 2/14 section="app" field=App roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 3/14 section="audio" field=Audio roster=[cmd/wisp/resident_audio_windows.go] scan=[] match=false
+    config_receipt_255_test.go:295: section "audio" (field Audio) is read by [] in production, the roster names [cmd/wisp/resident_audio_windows.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    config_receipt_255_test.go:293: SECTION 4/14 section="ball" field=Ball roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 5/14 section="cost" field=Cost roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 6/14 section="hotkey" field=Hotkey roster=[cmd/wisp/resident_windows.go cmd/balldebug/main.go] scan=[cmd/balldebug/main.go] match=false
+    config_receipt_255_test.go:295: section "hotkey" (field Hotkey) is read by [cmd/balldebug/main.go] in production, the roster names [cmd/wisp/resident_windows.go cmd/balldebug/main.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    config_receipt_255_test.go:293: SECTION 7/14 section="llm" field=LLM roster=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] scan=[] match=false
+    config_receipt_255_test.go:295: section "llm" (field LLM) is read by [] in production, the roster names [cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    config_receipt_255_test.go:293: SECTION 8/14 section="memory" field=Memory roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 9/14 section="models" field=Models roster=[cmd/wisp/models.go] scan=[] match=false
+    config_receipt_255_test.go:295: section "models" (field Models) is read by [] in production, the roster names [cmd/wisp/models.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    config_receipt_255_test.go:293: SECTION 10/14 section="observe" field=Observe roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 11/14 section="panel" field=Panel roster=[cmd/wisp/panel_resident_windows.go] scan=[] match=false
+    config_receipt_255_test.go:295: section "panel" (field Panel) is read by [] in production, the roster names [cmd/wisp/panel_resident_windows.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    config_receipt_255_test.go:293: SECTION 12/14 section="privacy" field=Privacy roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 13/14 section="session" field=Session roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 14/14 section="voice" field=Voice roster=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] scan=[] match=false
+    config_receipt_255_test.go:295: section "voice" (field Voice) is read by [] in production, the roster names [cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+--- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.58s)
+=== RUN   TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite
+    config_receipt_255_test.go:565: FIXTURE root=D:/tmp/324v1b/gotmp\TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite2643988323\001 scan=[] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=false
+    config_receipt_255_test.go:567: the scan read [] for section field Models over the two fixtures, want [cmd/wisp/schembsite_fixture.go]: d.Models.HandleModelsListRequest in internal/panel/samename_fixture.go is 票 324's same-named NON-config field shape (a dispatch handler, not a value the [models] section declares) and must not be counted as a config reader, while cfg.Models.Mirror must be - a scan that named both has no judgement, and a scan that named neither is 摘尺
+--- FAIL: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+=== RUN   TestTicket324SectionMembersAreReadOffTheSchema
+    config_receipt_255_test.go:581: the [models] schema reading lost its Mirror member (got map[]): the real reader line would stop counting, which is 摘尺当修尺
+    config_receipt_255_test.go:588: cmd/wisp/models.go's real read line "mirrors = cfg.Models.Mirror" is no longer judged a read of [models]: the ruler went blind instead of going strict
+    config_receipt_255_test.go:603: cmd/wisp/panel_models_320.go's cfg.LLM.Providers line must count as a read of [llm]; schema members = map[]
+--- FAIL: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+FAIL
+===== END mutA-5-blind =====
+
+===== RAW PRINT mutA-6-restored-again.log =====
+time=2026-10-15T23:31:34.277+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+    config_receipt_255_test.go:293: SECTION 1/14 section="agent" field=Agent roster=[cmd/wisp/run.go] scan=[cmd/wisp/run.go] match=true
+    config_receipt_255_test.go:293: SECTION 2/14 section="app" field=App roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 3/14 section="audio" field=Audio roster=[cmd/wisp/resident_audio_windows.go] scan=[cmd/wisp/resident_audio_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 4/14 section="ball" field=Ball roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 5/14 section="cost" field=Cost roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 6/14 section="hotkey" field=Hotkey roster=[cmd/wisp/resident_windows.go cmd/balldebug/main.go] scan=[cmd/balldebug/main.go cmd/wisp/resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 7/14 section="llm" field=LLM roster=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] match=true
+    config_receipt_255_test.go:293: SECTION 8/14 section="memory" field=Memory roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 9/14 section="models" field=Models roster=[cmd/wisp/models.go] scan=[cmd/wisp/models.go] match=true
+    config_receipt_255_test.go:293: SECTION 10/14 section="observe" field=Observe roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 11/14 section="panel" field=Panel roster=[cmd/wisp/panel_resident_windows.go] scan=[cmd/wisp/panel_resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 12/14 section="privacy" field=Privacy roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 13/14 section="session" field=Session roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 14/14 section="voice" field=Voice roster=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] match=true
+--- PASS: TestTicket255RosterStillMatchesTheActualReadSites (0.67s)
+=== RUN   TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite
+    config_receipt_255_test.go:562: FIXTURE root=D:/tmp/324v1b/gotmp\TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite3909651233\001 scan=[cmd/wisp/schembsite_fixture.go] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=true
+--- PASS: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.00s)
+=== RUN   TestTicket324SectionMembersAreReadOffTheSchema
+--- PASS: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+PASS
+===== END mutA-6-restored-again =====
+
+===== RAW PRINT mutB-1-honest.log =====
+time=2026-10-16T09:00:03.072+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+    config_receipt_255_test.go:293: SECTION 1/14 section="agent" field=Agent roster=[cmd/wisp/run.go] scan=[cmd/wisp/run.go] match=true
+    config_receipt_255_test.go:293: SECTION 2/14 section="app" field=App roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 3/14 section="audio" field=Audio roster=[cmd/wisp/resident_audio_windows.go] scan=[cmd/wisp/resident_audio_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 4/14 section="ball" field=Ball roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 5/14 section="cost" field=Cost roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 6/14 section="hotkey" field=Hotkey roster=[cmd/wisp/resident_windows.go cmd/balldebug/main.go] scan=[cmd/balldebug/main.go cmd/wisp/resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 7/14 section="llm" field=LLM roster=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] match=true
+    config_receipt_255_test.go:293: SECTION 8/14 section="memory" field=Memory roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 9/14 section="models" field=Models roster=[cmd/wisp/models.go] scan=[cmd/wisp/models.go] match=true
+    config_receipt_255_test.go:293: SECTION 10/14 section="observe" field=Observe roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 11/14 section="panel" field=Panel roster=[cmd/wisp/panel_resident_windows.go] scan=[cmd/wisp/panel_resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 12/14 section="privacy" field=Privacy roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 13/14 section="session" field=Session roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 14/14 section="voice" field=Voice roster=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go tools/probe324/p2_mirror_member.go] match=false
+    config_receipt_255_test.go:295: section "voice" (field Voice) is read by [cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go tools/probe324/p2_mirror_member.go] in production, the roster names [cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+--- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (1.06s)
+=== RUN   TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite
+    config_receipt_255_test.go:562: FIXTURE root=D:/tmp/324v1b/gotmp\TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite4011342042\001 scan=[cmd/wisp/schembsite_fixture.go] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=true
+--- PASS: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+=== RUN   TestTicket324SectionMembersAreReadOffTheSchema
+--- PASS: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+FAIL
+===== END mutB-1-honest =====
+
+===== RAW PRINT mutB-2-dropgate.log =====
+time=2026-10-16T09:00:30.133+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+    config_receipt_255_test.go:293: SECTION 1/14 section="agent" field=Agent roster=[cmd/wisp/run.go] scan=[cmd/wisp/run.go] match=true
+    config_receipt_255_test.go:293: SECTION 2/14 section="app" field=App roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 3/14 section="audio" field=Audio roster=[cmd/wisp/resident_audio_windows.go] scan=[cmd/wisp/resident_audio_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 4/14 section="ball" field=Ball roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 5/14 section="cost" field=Cost roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 6/14 section="hotkey" field=Hotkey roster=[cmd/wisp/resident_windows.go cmd/balldebug/main.go] scan=[cmd/balldebug/main.go cmd/wisp/resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 7/14 section="llm" field=LLM roster=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go tools/probe324/p3_method_hop.go] match=false
+    config_receipt_255_test.go:295: section "llm" (field LLM) is read by [cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go tools/probe324/p3_method_hop.go] in production, the roster names [cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    config_receipt_255_test.go:293: SECTION 8/14 section="memory" field=Memory roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 9/14 section="models" field=Models roster=[cmd/wisp/models.go] scan=[cmd/wisp/models.go internal/panel/composer_dispatch.go tools/probe324/p1_samename_nonmember.go] match=false
+    config_receipt_255_test.go:295: section "models" (field Models) is read by [cmd/wisp/models.go internal/panel/composer_dispatch.go tools/probe324/p1_samename_nonmember.go] in production, the roster names [cmd/wisp/models.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+    config_receipt_255_test.go:293: SECTION 10/14 section="observe" field=Observe roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 11/14 section="panel" field=Panel roster=[cmd/wisp/panel_resident_windows.go] scan=[cmd/wisp/panel_resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 12/14 section="privacy" field=Privacy roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 13/14 section="session" field=Session roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 14/14 section="voice" field=Voice roster=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go tools/probe324/p2_mirror_member.go] match=false
+    config_receipt_255_test.go:295: section "voice" (field Voice) is read by [cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go tools/probe324/p2_mirror_member.go] in production, the roster names [cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+--- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.63s)
+=== RUN   TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite
+    config_receipt_255_test.go:560: FIXTURE root=D:/tmp/324v1b/gotmp\TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite867643664\001 scan=[cmd/wisp/schembsite_fixture.go internal/panel/samename_fixture.go] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=false
+    config_receipt_255_test.go:562: the scan read [cmd/wisp/schembsite_fixture.go internal/panel/samename_fixture.go] for section field Models over the two fixtures, want [cmd/wisp/schembsite_fixture.go]: d.Models.HandleModelsListRequest in internal/panel/samename_fixture.go is 票 324's same-named NON-config field shape (a dispatch handler, not a value the [models] section declares) and must not be counted as a config reader, while cfg.Models.Mirror must be - a scan that named both has no judgement, and a scan that named neither is 摘尺
+--- FAIL: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+=== RUN   TestTicket324SectionMembersAreReadOffTheSchema
+    config_receipt_255_test.go:587: internal/panel/composer_dispatch.go's handler line "return d.Models.HandleModelsListRequest(ctx, req)" is judged a read of [models] again: the schema-member evidence was dropped, so a same-named field of any other struct counts as a config reader
+--- FAIL: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+FAIL
+===== END mutB-2-dropgate =====
+
+===== RAW PRINT mutB-3-restored.log =====
+time=2026-10-16T09:00:46.167+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+    config_receipt_255_test.go:293: SECTION 1/14 section="agent" field=Agent roster=[cmd/wisp/run.go] scan=[cmd/wisp/run.go] match=true
+    config_receipt_255_test.go:293: SECTION 2/14 section="app" field=App roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 3/14 section="audio" field=Audio roster=[cmd/wisp/resident_audio_windows.go] scan=[cmd/wisp/resident_audio_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 4/14 section="ball" field=Ball roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 5/14 section="cost" field=Cost roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 6/14 section="hotkey" field=Hotkey roster=[cmd/wisp/resident_windows.go cmd/balldebug/main.go] scan=[cmd/balldebug/main.go cmd/wisp/resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 7/14 section="llm" field=LLM roster=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] match=true
+    config_receipt_255_test.go:293: SECTION 8/14 section="memory" field=Memory roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 9/14 section="models" field=Models roster=[cmd/wisp/models.go] scan=[cmd/wisp/models.go] match=true
+    config_receipt_255_test.go:293: SECTION 10/14 section="observe" field=Observe roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 11/14 section="panel" field=Panel roster=[cmd/wisp/panel_resident_windows.go] scan=[cmd/wisp/panel_resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 12/14 section="privacy" field=Privacy roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 13/14 section="session" field=Session roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 14/14 section="voice" field=Voice roster=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go tools/probe324/p2_mirror_member.go] match=false
+    config_receipt_255_test.go:295: section "voice" (field Voice) is read by [cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go tools/probe324/p2_mirror_member.go] in production, the roster names [cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated
+--- FAIL: TestTicket255RosterStillMatchesTheActualReadSites (0.64s)
+=== RUN   TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite
+    config_receipt_255_test.go:562: FIXTURE root=D:/tmp/324v1b/gotmp\TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite2713875485\001 scan=[cmd/wisp/schembsite_fixture.go] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=true
+--- PASS: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+=== RUN   TestTicket324SectionMembersAreReadOffTheSchema
+--- PASS: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+FAIL
+===== END mutB-3-restored =====
+
+===== RAW PRINT head2-ruler.log =====
+time=2026-10-16T09:07:41.614+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket255RosterStillMatchesTheActualReadSites
+    config_receipt_255_test.go:293: SECTION 1/14 section="agent" field=Agent roster=[cmd/wisp/run.go] scan=[cmd/wisp/run.go] match=true
+    config_receipt_255_test.go:293: SECTION 2/14 section="app" field=App roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 3/14 section="audio" field=Audio roster=[cmd/wisp/resident_audio_windows.go] scan=[cmd/wisp/resident_audio_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 4/14 section="ball" field=Ball roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 5/14 section="cost" field=Cost roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 6/14 section="hotkey" field=Hotkey roster=[cmd/wisp/resident_windows.go cmd/balldebug/main.go] scan=[cmd/balldebug/main.go cmd/wisp/resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 7/14 section="llm" field=LLM roster=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/panel_models_320.go cmd/wisp/providers.go cmd/wisp/run.go internal/llm/resolver.go] match=true
+    config_receipt_255_test.go:293: SECTION 8/14 section="memory" field=Memory roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 9/14 section="models" field=Models roster=[cmd/wisp/models.go] scan=[cmd/wisp/models.go] match=true
+    config_receipt_255_test.go:293: SECTION 10/14 section="observe" field=Observe roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 11/14 section="panel" field=Panel roster=[cmd/wisp/panel_resident_windows.go] scan=[cmd/wisp/panel_resident_windows.go] match=true
+    config_receipt_255_test.go:293: SECTION 12/14 section="privacy" field=Privacy roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 13/14 section="session" field=Session roster=[] scan=[] match=true
+    config_receipt_255_test.go:293: SECTION 14/14 section="voice" field=Voice roster=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] scan=[cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go internal/panel/config_handlers.go] match=true
+--- PASS: TestTicket255RosterStillMatchesTheActualReadSites (0.74s)
+=== RUN   TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite
+    config_receipt_255_test.go:562: FIXTURE root=D:/tmp/324v1b/gotmp\TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite220654660\001 scan=[cmd/wisp/schembsite_fixture.go] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=true
+--- PASS: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+=== RUN   TestTicket324SectionMembersAreReadOffTheSchema
+--- PASS: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+PASS
+===== END head2-ruler =====
+
+===== SHA LEDGER (mutate324.py stdout, verbatim) =====
+pristine (git archive 136606724 == git show blob == worktree file) = bf02e902354914850bd643270310e6370d848b03dadd42a0fd7a0e9d2b70e106
+dropgate mutant  sha_after = 4ada00e6d45fdb38230e8e5a546ed5b1961087cb01ed39b7b6e2367dca45af6e (mutA + mutB, same string both trees)
+blind mutant   sha_after = a25affb4446e7a7bc88bafc3500b82de5a9fb710b5ff0bc07299d2f90213e6e5
+restore mutA #1 sha_after = bf02e902... match=YES ; restore mutA #2 sha_after = bf02e902... match=YES ; restore mutB sha_after = bf02e902... match=YES
+head2 tree (8baec646) test file sha = bf02e902... (unchanged across both HEADs)
+⚠ 探针件源三枚＋突变脚本逐字副本＝同目录 `03-mutation-script-and-probes.txt`（本件只装仪器打印与哈希台账）。

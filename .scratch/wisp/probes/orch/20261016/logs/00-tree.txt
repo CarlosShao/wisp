@@ -1,0 +1,7 @@
+exported_tree_go_files=1090
+sixpiece_ok=go.mod
+sixpiece_ok=go.sum
+sixpiece_ok=internal
+sixpiece_ok=cmd
+sixpiece_ok=tools
+sixpiece_ok=scripts

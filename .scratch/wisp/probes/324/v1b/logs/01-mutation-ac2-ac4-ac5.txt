@@ -1,0 +1,142 @@
+票 324 验收腿 324-v1b — 读数件 01：突变台（正控／反形／物理探针）＋AC#2 调用点＋AC#4 面核＋AC#5 门禁
+时刻＝2026-10-15 23:2x 起、2026-10-16 00:0x 收（`date` 现读）｜锚＝起手 `136606724`，终态补一发 `8baec646`（别腿在这段窗口里落了 4 笔：317-v1 读数／322-r1 遗产代提（winsec 产码 +164 −7）／A1000 台账）
+
+────────────────────────────────────────────────────────────────
+1. 突变台规矩（本腿怎么避免"假读数"）
+- ⛔ `-overlay`：这把尺的 `scanReadFiles`（`config_receipt_255_test.go:360`）运行时 `os.ReadFile` 读盘 ⇒ overlay 恒绿＝假读数。
+- 全部走**物理改写＋sha256 还原**。⛔ 改共享工作树：台件树＝仓外导出树
+  `/d/tmp/324v1b/mutA`（`git archive 136606724`，无探针）与 `/d/tmp/324v1b/mutB`（同一发 archive ＋本腿三枚探针件）。
+- 台件基线哈希（三处**同一串**，所以"工作树＝导出树＝blob"这一层也对上了）：
+  `bf02e902354914850bd643270310e6370d848b03dadd42a0fd7a0e9d2b70e106`（⚠ 逐字以盘上为准，见下）
+  实测三发：`git archive` 落的件 / `git show 136606724:cmd/wisp/config_receipt_255_test.go | sha256sum` /
+  工作树 `sha256sum cmd/wisp/config_receipt_255_test.go` ＝ `bf02e902…0e106`（三串逐字相同），
+  且＝实现者证据件 §5 那枚基线（`logs/mutation-baseline-sha.txt`）⇒ **本腿的还原尺与他那两发可对接**。
+- 突变脚本＝`/d/tmp/324v1b/scripts/mutate324.py`（枚数锚点＝"anchor occurs 1 times"，锚不中即 `exit 3`⛔ 静默）；
+  台件源⛔ 入库（仓外），留底 pristine＝`/d/tmp/324v1b/pristine/config_receipt_255_test.go`。
+- exe 定式＝`go test -c` 编到 `bin/`、三枚 sherpa DLL 与 exe 同目录、cwd＝`<tree>/cmd/wisp`、`GOTMPDIR=D:/tmp/324v1b/gotmp`（先 `mkdir -p`）。
+  本腿全部 12 发里**零枚** `0xc0000135`、零枚 `RUN=0`。
+
+2. 正控（AC#1①／派单"退化一枚可见的形状"）＝**突变 dropgate**：摘掉"那一跳必须是段结构体自己声明的导出字段"那一道门
+物理改动＝`readsFieldAccess` 里这三行整块换成一行注释（`config_receipt_255_test.go:431-433`）：
+    -		if sectionMembers[identName(rest)] == false {
+    -			continue
+    -		}
+    +		/* MUTATION 324-v1b dropgate: schema-member evidence removed */
+- `mutA` 台：**红 3 枚顶层用例**（尺＝`^--- FAIL`，只数顶层；`--- PASS`＝0 枚）⇒ `rc=1`：
+  `TestTicket255RosterStillMatchesTheActualReadSites`（0.63s）／
+  `TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite`（0.01s）／
+  `TestTicket324SectionMembersAreReadOffTheSchema`（0.00s）
+  红句逐字（原始打印＝`mutA-3-dropgate-real.log`，本目录同名件）：
+    `config_receipt_255_test.go:295: section "models" (field Models) is read by [cmd/wisp/models.go internal/panel/composer_dispatch.go] in production, the roster names [cmd/wisp/models.go]: something moved and cmd/wisp/config_readers_255.go has not been re-adjudicated`
+    `config_receipt_255_test.go:562: the scan read [cmd/wisp/schembsite_fixture.go internal/panel/samename_fixture.go] for section field Models over the two fixtures, want [cmd/wisp/schembsite_fixture.go]: … a scan that named both has no judgement, and a scan that named neither is 摘尺`
+    `config_receipt_255_test.go:587: internal/panel/composer_dispatch.go's handler line "return d.Models.HandleModelsListRequest(ctx, req)" is judged a read of [models] again: the schema-member evidence was dropped, so a same-named field of any other struct counts as a config reader`
+  ⚠ 与实现者 `mutant-A-ruler.txt` 对照：**同一枚 3 枚红名册、同一批文案**（他那一发还多打了 `:295` 同句）⇒ 复跑成立。
+  ⚠ 一行**台面故障具名**：我第一次跑这发时脚本用了默认编码读 UTF-8 源 ⇒ `UnicodeDecodeError: 'gbk' codec can't decode byte 0x8d`、
+    突变**没落上**、随后那发跑出 `rc=0 / 3 枚 PASS`（件＝`mutA-2-dropgate.log`）。那枚绿⛔ 是读数（脚本没改盘）。
+    修脚本后重跑＝上面 `mutA-3-dropgate-real.log`。⛔ 计入判据、⛔ 删件。
+  还原＝`python mutate324.py restore` ⇒ `sha_after=bf02e902…0e106 match=YES`；重编重跑 ⇒ `rc=0`、3 枚顶层 PASS、
+    `match=false`＝0 枚、14 行 SECTION（`mutA-4-restored.log`／`mutA-6-restored-again.log` 两发同色）。
+
+3. 反形（派单点名"换成反形会不会也红"／"只做改前必红不够"）＝**突变 blind**：把成员名册那枚**读数摘死**
+物理改动＝`configSectionMembers` 的 `out := map[string]bool{}` 之后插 `if true { return out }`（恒空＝尺瞎）。
+- `mutA` 台：`rc=1`、`^--- FAIL`＝**3 枚顶层用例**（同一批三枚）、`--- PASS`＝0 枚。逐枚红（`mutA-5-blind.log`）：
+  ① 成员数地板红 **14 枚逐枚点名**（尺＝`grep -c 'resolves to 0 schema member names'`＝14）：
+     `config_receipt_255_test.go:277: section field "Agent" resolves to 0 schema member names, want at least 2: … (摘尺当修尺)`（其余 13 枚同句换段名）
+  ② 段名册红 **7 枚**（`agent／audio／hotkey／llm／models／panel／voice`＝名册里非空的那 7 枚）：
+     例 `section "llm" (field LLM) is read by [] in production, the roster names […5 枚…]: something moved …`
+  ③ 探针形：`hotkey` 那一发 `scan=[cmd/balldebug/main.go]` **残留**＝`Config().Field` 那一支⛔ 受成员读数支配（本腿实测，与读数件 00 §4 的"那一支零字节改动"对上）
+  ④ 反控件自己红：`FIXTURE … scan=[] want=[cmd/wisp/schembsite_fixture.go] fakeSiteRefused=false` ＋
+     `the [models] schema reading lost its Mirror member (got map[])` ＋
+     `cmd/wisp/models.go's real read line "mirrors = cfg.Models.Mirror" is no longer judged a read of [models]: the ruler went blind instead of going strict` ＋
+     `cmd/wisp/panel_models_320.go's cfg.LLM.Providers line must count as a read of [llm]; schema members = map[]`
+⇒ 结论：正控与反形**都红**、且红在**具名**用例上 ⇒ AC#1"正反两形都有牙"这一格**成立**。
+   实现者 §5 那句"甲证明不挡假命中＝红，乙证明把一切都挡掉也＝红"＝**本腿独立复跑复现**（不是引他的话）。
+
+4. ★本腿自己造的坏世界（派单"构造那枚票面声称要防的结局＝同名非配置字段站进扫描射程"）
+⛔ 用 `-overlay`、⛔ 往共享工作树塞假字段、⛔ 改任何既有件。三枚**新建**探针件落在仓外导出树 `mutB/tools/probe324/`
+（`tools/` 在尺的射程四目录里；`go test -c ./cmd/wisp` ⛔ 编译它们 ⇒ 不需要能编译，尺读的是**文本**）：
+  P1 `p1_samename_nonmember.go`＝票 324 那一形：一枚 `struct{ Models … }` ＋ `d.Models.HandleModelsListRequestV1B()`（成员名⛔ 在 `[models]` schema 里）
+  P2 `p2_mirror_member.go`＝镜像形：一枚 `struct{ Voice … }` ＋ `v.Voice.CloudASRChain`（那枚名字**是** `VoiceSection` 的真成员）
+  P3 `p3_method_hop.go`＝方法／深跳形：`r.LLM.Enabled()`（`Enabled` ⛔ 是 `LLMSection` 声明的字段）
+读数一｜HEAD 判定＋三枚探针（`mutB-1-honest.log`，⛔ 未突变）⇒ `rc=1`：
+  `[llm]` **match=true** ⇒ P3 **没被算成读者**（误拒那一维＝今天真的会漏，见 §6）
+  `[models]` **match=true**、scan＝`[cmd/wisp/models.go]` ⇒ **P1 ⛔ 没进名册＝尺真的把票面那枚坏世界挡在射程外**（核心那格）
+  `[voice]` **match=false**、scan 多出 `tools/probe324/p2_mirror_member.go` ⇒ **P2 被算成读者＝乙′ 的误认那一维本腿亲手复现**
+  顶层色：`TestTicket255RosterStillMatchesTheActualReadSites` **FAIL**／两枚 324 件 **PASS**
+  ⇒ 这一发的红**是我造的探针造成的**、⛔ 是 HEAD 的红（HEAD 树同把尺 `rc=0`，读数件 00 §3 与 §7）。
+读数二｜HEAD 判定＋`dropgate` 突变＋三枚探针（`mutB-2-dropgate.log`）⇒ `rc=1`、三枚顶层全 FAIL：
+  `[llm]` scan  gains `tools/probe324/p3_method_hop.go`｜`[models]` scan＝`[cmd/wisp/models.go internal/panel/composer_dispatch.go tools/probe324/p1_samename_nonmember.go]`｜
+  `[voice]` scan gains `p2_mirror_member.go` ⇒ **P1／P3 只有摘掉那一跳才会被算成读者**＝那一跳不是装饰（正控的第二重）。
+读数三｜还原后（`mutB-3-restored.log`）⇒ 尺回到 HEAD 判定：`p1`／`p3` 退出 scan、`p2` **仍在** scan（`[voice]` match=false 复现）
+  ⇒ 与读数一同形＝还原证明；且这一发把"乙′ 认的是字段名形状"这件事钉成读数：**P2 那一类今天仍在场上**（活例＝`internal/panel/config_handlers.go:609-610`）。
+
+5. AC#2 能力格：`cmd/wisp/panel_models_320.go` 进名册之后，**今天真有人读它吗**
+尺＝`grep -rn -E '<六个符号名>' --include=*.go cmd internal tools scripts`（⛔ `_test.go`、**显式剥定义行**），
+定义行逐枚点名（这几枚⛔ 算调用点）：`:37`/`:44`/`:50`/`:58`/`:126` 注释行、`:42`/`:48` 两枚 `const` 定义、
+`:53`/`:62`/`:67` 三枚 `type` 定义、`:73` 方法定义、`:128` 函数定义。
+- 定义件**之外**的生产调用点＝**1 处**：`cmd/wisp/panel_inbound.go:286  modelsList := &modelsListHandler320{mgr: mgr, secrets: secrets}`
+  （尺＝同一把 grep 的 `grep -vc` 计数＝1；这枚是**构造点**＝整条边的入口，Go 里方法调用经接口，所以这就是"接进了生产"的凭据）
+- 那枚构造点下游＝完整接线链（逐枚行号＝本腿 `grep -n` 现跑，工作树）：
+  `cmd/wisp/panel_inbound.go:286` 造 handler → `:295-306` 挂进 `panel.ComposerDispatch{… Models: modelsList …}`（`:306`＝`Models: modelsList`）
+  → 路由名 `internal/panel/bridge.go:75  MethodModelsList = "config.models.list"`（`:156` 的白名单 case 里枚着它）
+  → `internal/panel/composer_dispatch.go:230 case MethodModelsList:` → `:234 return d.Models.HandleModelsListRequest(ctx, req)`；
+  共享装配体 `cmd/wisp/panel_inbound.go:240 newComposerDispatchChain` 的**两枚生产调用者**＝
+  `cmd/wisp/panel_inbound.go:223`（`newPanelInboundDispatch` 体内，它自己的调用者＝`panel_inbound.go:147`，即 `wisp panel-inbound` 那条命令）
+  与 `cmd/wisp/panel_resident_windows.go:228`（`newResidentComposerDispatch` 体内，它的调用者＝`:255`＝常驻面板）。
+  ⇒ 一条从命令／常驻宿主到那一行的边今天**在**（4 枚调用点＋1 枚构造点＋1 枚路由名）；
+  ⛔ 本腿⛔ 跑过 `wisp` 进程真发一次 `config.models.list`（那要窗台件），所以这一格交的是**接线上身**、⛔ 运行时回执。
+
+- ⇒ **接线上身**：`go build ./...` rc=0／`go vet ./cmd/wisp/` rc=0 **⛔ 证明不了**这一条（Go 不为未使用方法报错）；
+  认的是上面那 1 处调用点＋接口方法名 `HandleModelsListRequest`（`internal/panel/composer_dispatch.go:130` 声明、`:234` 调用）。
+- 名册那一行：`cmd/wisp/config_readers_255.go:259`（`"LLM"` 行第 2 枚＝`cmd/wisp/panel_models_320.go`）；
+  尺的绿句（HEAD 树读数）＝`SECTION 7/14 section="llm" … match=true`。
+- `hotClaim*` 档由（AC#2 要"选哪档要写理由"）：`hotRowClaims["llm"]` 保持 `hotClaimConsumed` 一字未动（§6 的 blob 哈希证明），
+  理由复认成立＝`:81 h.mgr.Config()` 每请求现读活 Manager、与同行已裁的 `panel_config_store.go` 同类；⛔ snapshot-only（它没读 boot 拷贝）、⛔ other-process（它在 `wisp` 进程内被面板那一跳调用）。
+
+6. AC#4 名册件没被写脏（尺＝`git diff aa1427f6 9c5916e8` ＋ blob 切片哈希）
+- `rosterScanSkipFiles`＝**一枚没加**：那 4 枚 `^-` 行里⛔ 有它（全名册见读数件 00 §4），
+  且 blob 两侧逐字相同（`git show aa1427f6:` 与工作树都＝`map[string]bool{"config_readers_255.go": true}`，现量两块）。
+- `hotRowClaims` 整块（`/var hotRowClaims/,/^}/`）blob↔工作树 **sha256 相同**＝`527e3f7f…5b23ef` ⇒ 判定句**一字未扩写**；
+  `git diff` 里 `hotRowClaims` 命中行数＝**0 行**（尺＝`grep -c 'hotRowClaims'` 打在那枚 diff 上）。
+- 名册件 diff＝`+11 −1`（尺＝`git diff --numstat`）：唯一一枚删除行＝旧 `"LLM"` 行，11 枚新增＝1 枚新 `"LLM"` 行＋上方 10 行注释。
+  ⚠ 实现者证据件 §2 那句"名册件 diff＝＋10 −1"与现量差 1 行（他按 `git show --stat` 的 `12` 记的口径），
+    ⛔ 影响判语、具名登记即可；尺的 diff 他写"＋203 行"、现量 `+199 −4`（`--numstat`）＝同一枚件两种口径，**两把都对**，⛔ 互相取代。
+
+7. AC#5 门禁五件（本腿自己跑、逐枚 `rc=`；台面＝共享工作树，⛔ 只跑读数）
+- `go build ./...` → **rc=0**（起手 `136606724` 那一发）。⚠ 别腿在飞态另节具名：那一发时 `internal/winsec` 有 6 行未提交改动（322-r1），
+  后来编排者代提＝`8baec646`（产码 +164 −7）⇒ 本腿这发 rc=0⛔ 覆盖那一枚在飞改动，⛔ 归我账也⛔ 归 322-r1 账。
+- `go vet ./cmd/wisp/` → **rc=0**。
+- 格式化两把（⛔ 拿 gofmt 的 0 冒充 gofumpt 的 0；`-l` 退码恒 0＝空尺 ⇒ 逐枚件名）：
+  ★**更正派单那格**：`gofumpt` 本机**在**——`GOBIN=D:\work\base\gopath\bin` 现量三枚 `dlv.exe`／`gofumpt.exe`／`staticcheck.exe`，
+    绝对路径 `/d/work/base/gopath/bin/gofumpt.exe` 跑通（⛔ rc=127 那格已过期，那是 22:4x 的读数）。
+  ① `gofmt -l cmd internal tools scripts` 工作树＝**列出 5 枚**：
+     `cmd/wisp/models.go`／`internal/agent/approval/pending_read.go`／`internal/agent/tools.go`／`internal/risk/provenance.go`／
+     `internal/tools/task_output_pointer_notice_errtext_174r7_test.go`；
+  ② 同一把尺跑**仓外导出树**（`git archive 136606724`）＝**列出 1 枚**：`internal/tools/task_output_pointer_notice_errtext_174r7_test.go`
+     ⇒ 差的那 4 枚＝`core.autocrlf` 的工作树渲染（尺＝python 数字节：`cmd/wisp/models.go` 工作树 14213 字节／334 枚 CRLF，
+     导出件 13879 字节、`git status -- cmd/wisp/models.go` **空**＝内容未改）＝A996 记过的结账假枚同一族；
+  ③ `gofumpt -l cmd/wisp` 工作树＝**列出 2 枚**：`cmd/wisp/models.go`（＝②那枚假枚）＋`cmd/wisp/panel_transport_35r2_test.go`（`gofmt` ⛔ 报它＝gofumpt 比 gofmt 宽，两把⛔ 互换）；
+     导出树 `cmd internal tools scripts`＝**列出 2 枚**：`cmd/wisp/panel_transport_35r2_test.go`＋`internal/tools/…174r7_test.go`
+     ⇒ 这 2 枚＝存量旧账（`174-r7`／`35-r2`，A996 已登记、退码仍 0 ⇒ 门不红）。
+  ④ ★**本票写面那两枚件**＝`cmd/wisp/config_receipt_255_test.go`＋`cmd/wisp/config_readers_255.go`：
+     `gofmt -l` 与 `gofumpt -l` 各跑工作树与导出树**四发，列出 0 枚**（逐枚件名列了，空清单＝0 枚）。
+- `sh scripts/d22scan.sh` → 工作树 **rc=0 clean**（examined 280 枚生产 Go／ban #7 internal/tools 25 枚／ban #8 internal 571 枚、cmd 138 枚）。
+  ⚠ 两格具名：① 我第一发 `rc=2`＝**我自己的台面故障**——我把 `GOTMPDIR=D:/tmp/…` 带进了这一步，被 `runtests.sh` 的票 311 AC#1 shape B
+    跨卷守卫**拒跑**（红句逐字"GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA% … Refusing to run is the fix"）⇒
+    `rc=2`⛔ 是这枚门的判据，`unset GOTMPDIR` 后重跑＝上面那发 rc=0。⛔ 计入判据。
+  ② 实现者那一发 `rc=1` 的归因（未跟踪的 `internal/tools/subagent_depth_fixture_287_test.go:249 [emoji] ban #8`＝287-r1 面）
+    **本腿不复现**：`287-r1` 已入库（`e1973191b`）且本发 rc=0 clean ⇒ 那枚红已被 287-r1 自己收掉；⚠ `internal/` 分母从我起手的 568→现量 571＝别腿新测试件，⛔ 当红⛔ 归我。
+- `sh scripts/check-path-length-budget.sh --with-self-test`（**只在仓根跑**）→ **rc=0**：
+  `denominator: tracked paths=13470  over-budget=60  covered by roster=60  not in roster=0`、`VERDICT GREEN`、
+  `longest=185 chars relative`（＝`.scratch/wisp/issues/252-…-r2-l2-done.md`，⛔ 本票件）、`worst full path=229 chars`（帽 165、墙区间命中 0 枚）。
+  ⚠ 分母 13470 vs 实现者那两发的 13330／13350＝**别腿在这窗口里新入库的跟踪件**（322-r1／287-r1／票 252 那批），⛔ 当红。
+  ⚠ 我在仓根以外⛔ 跑过它（那只会回 `not inside a git work tree`＝射程拒绝、rc=2）。
+- `go test ./cmd/wisp` **定向**（⛔ 整包＝票 314 死亡区，本腿全程没跑整包）：
+  `TestTicket255RosterStillMatchesTheActualReadSites|TestTicket324` 在 HEAD 导出树＝`rc=0`、`^--- PASS`（顶层）＝**3 枚**、`SECTION` 行数＝**14**、`match=false`＝**0 枚**；
+  终态补发（`8baec646` 导出树，含别腿 winsec 代提）＝同色同数（`rc=0`／3 枚顶层 PASS／14 行／0 枚 false）。
+  两把 PASS 尺并列具名：本腿只跑了顶层那把（`^--- PASS`＝3）；含子测试那把⛔ 跑过（这枚用例族**无子测试**，两把同数＝3，仍具名）。
+  ⛔ 窗口／stdout 族（`TestTicket255Receipt*`／`SentenceAssembly`＝同文件那 8 枚顶层件）**本腿没跑**＝缺窗台件＋⛔ 整包 ⇒ 具名留编排者（见验收表"没裁完"一节）。
+- `git status --porcelain -- internal cmd`：起手（23:1x）＝**7 行**（`M internal/session/manage_test.go`＋`M` winsec 三枚＋`??` winsec 三枚）；
+  终态（00:0x，我的三批件只落 `.scratch/wisp/probes/324/v1b/**` 与 `docs/evidence/s1/**`）＝**1 行**（`M internal/session/manage_test.go`＝166-r2 在飞）。
+  ⇒ 差的 6 行＝**编排者代提 322-r1 遗产那笔**（`8baec646`）把 winsec 那 6 行收进了 HEAD，⛔ 我的写面、⛔ 我改的字节。
+  本腿自己的面核尺：`git status --porcelain -- cmd/wisp` 起手与终态都＝**0 行**（全程⛔ 写产码面）。

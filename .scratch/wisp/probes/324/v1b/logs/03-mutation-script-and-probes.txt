@@ -1,0 +1,142 @@
+票 324 验收腿 324-v1b — 读数件 03：突变脚本逐字副本＋三枚探针件源（本腿造的坏世界）
+用途：让编排者/下一枚腿能**逐字节重放**读数件 01 §2–§4 那三发突变与那三枚探针。
+⛔ 这些件源⛔ 在共享工作树里、⛔ 在仓库里（只活在仓外导出树 `/d/tmp/324v1b/mutA`、`/d/tmp/324v1b/mutB`）；
+   本件是它们的**副本**（读数用），落盘只为"临时件只建不删＋可重放"。
+
+────────────────────────────────────────────────────────────────
+A. 突变台脚本 `/d/tmp/324v1b/scripts/mutate324.py`（逐字）
+
+    import hashlib
+    import os
+    import sys
+
+    REL = "cmd/wisp/config_receipt_255_test.go"
+
+    DROP_OLD = (
+        "\t\tif sectionMembers[identName(rest)] == false {\n"
+        "\t\t\tcontinue\n"
+        "\t\t}\n"
+    )
+    DROP_NEW = "\t\t/* MUTATION 324-v1b dropgate: schema-member evidence removed */\n"
+
+    BLIND_OLD = (
+        "\tout := map[string]bool{}\n"
+        "\tft := reflect.TypeOf(config.Config{})\n"
+    )
+    BLIND_NEW = (
+        "\tout := map[string]bool{}\n"
+        "\tif true {\n"
+        "\t\treturn out /* MUTATION 324-v1b blind: member reading pinned empty */\n"
+        "\t}\n"
+        "\tft := reflect.TypeOf(config.Config{})\n"
+    )
+
+
+    def sha(path):
+        with open(path, "rb") as fh:
+            return hashlib.sha256(fh.read()).hexdigest()
+
+
+    def apply(tree, old, new, tag):
+        path = os.path.join(tree, REL)
+        before = sha(path)
+        with open(path, "r", newline="", encoding="utf-8") as fh:
+            text = fh.read()
+        n = text.count(old)
+        if n != 1:
+            print("ABORT %s: anchor occurs %d times (want 1)" % (tag, n))
+            sys.exit(3)
+        with open(path, "w", newline="", encoding="utf-8") as fh:
+            fh.write(text.replace(old, new))
+        print("MUTATE %s tree=%s sha_before=%s sha_after=%s" % (tag, tree, before, sha(path)))
+
+
+    def restore(tree, pristine):
+        path = os.path.join(tree, REL)
+        before = sha(path)
+        with open(pristine, "rb") as src, open(path, "wb") as dst:
+            dst.write(src.read())
+        a, b = sha(path), sha(pristine)
+        print("RESTORE tree=%s sha_before=%s sha_after=%s pristine=%s match=%s"
+              % (tree, before, a, b, "YES" if a == b else "NO"))
+        sys.exit(0 if a == b else 4)
+
+
+    if __name__ == "__main__":
+        mode = sys.argv[1]
+        if mode == "dropgate":
+            apply(sys.argv[2], DROP_OLD, DROP_NEW, "dropgate")
+        elif mode == "blind":
+            apply(sys.argv[2], BLIND_OLD, BLIND_NEW, "blind")
+        elif mode == "restore":
+            restore(sys.argv[2], sys.argv[3])
+        elif mode == "sha":
+            print("SHA tree=%s file=%s sha=%s" % (sys.argv[2], REL, sha(os.path.join(sys.argv[2], REL))))
+
+⚠ 两枚台面事故具名（都⛔ 计入判据，都⛔ 删件）：
+ ① 第一版 `apply()` 用 `open(path,"r",newline="")` ⛔ 指 encoding ⇒ Windows 默认 `gbk` 解 UTF-8 源 ⇒
+    `UnicodeDecodeError: 'gbk' codec can't decode byte 0x8d in position 80`，脚本在**读**阶段就退 3，
+    盘上⛔ 没改 ⇒ 我随后那一发 `go test -c` 编的是**未突变**的源、跑出 `rc=0 / 3 枚顶层 PASS`
+    （件＝`/d/tmp/324v1b/mutA-2-dropgate.log`）。那枚绿⛔ 是"突变后仍绿"的读数＝假读数。
+    定式＝**突变台件的脚本自己也要一发正控**：跑完必须回读 `sha_after`，⛔ 看测试色就认定突变落了盘。
+    改正＝两处 `open` 都带 `encoding="utf-8"`；重跑 ⇒ `sha_after=4ada00e6…af6e`＋三枚红（读数件 02 的 `mutA-3-dropgate-real`）。
+ ② 台件脚本用 `printf '----- xxx -----\n'` 起头打了三枚分隔行 ⇒ bash 把开头的 `--` 当选项
+    （`printf: --: invalid option`），那三枚标记⛔ 进了文件（正文没丢）。本件的标记是手写的。
+
+────────────────────────────────────────────────────────────────
+B. 三枚探针件源（落点＝`/d/tmp/324v1b/mutB/tools/probe324/`，⛔ 仓库内、⛔ 工作树内）
+设计口径：尺射程四目录＝`cmd internal tools scripts` ⇒ `tools/` 在射程内；
+`go test -c ./cmd/wisp` ⛔ 编译这三枚（⛔ 在 cmd/wisp 的导入图里）⇒ 它们只被**文本扫**读到＝票面要的那一形。
+三枚**分件**放（⛔ 合一枚）：尺的读数是**按文件**给的，一枚文件里混两形就⛔ 分不出"哪一形被挡"。
+
+B1 `tools/probe324/p1_samename_nonmember.go`＝票 324 声称要防的那一枚（同名非配置字段＋段⛔ 声明的成员名）
+
+    package probe324
+
+    type v1bModelsHandler interface {
+    	HandleModelsListRequestV1B() error
+    }
+
+    type v1bDispatch struct{ Models v1bModelsHandler }
+
+    func (d *v1bDispatch) run() error { return d.Models.HandleModelsListRequestV1B() }
+
+  判定行＝最后那一行（`d.Models.HandleModelsListRequestV1B()`）：`.Models.` 命中、后续首字母大写、
+  而 `HandleModelsListRequestV1B` ⛔ 在 `ModelsSection` 的四枚导出字段（`Dir`/`Mirror`/`VerifySignature`/`LocalOverride`）里。
+
+B2 `tools/probe324/p2_mirror_member.go`＝**误认形**（非配置结构体**镜像**了一枚真成员名）
+
+    package probe324
+
+    type v1bVoiceMirror struct {
+    	CloudASRChain []string
+    }
+
+    type v1bSettingsMirror struct{ Voice v1bVoiceMirror }
+
+    func (v *v1bSettingsMirror) render() []string { return v.Voice.CloudASRChain }
+
+  `CloudASRChain` **是** `VoiceSection` 声明的导出字段（尺＝`sed -n '244,266p' internal/config/schema.go`，声明枚在 `:263`，同段另有 `:265 CloudTTSChain`）⇒
+  HEAD 那把尺**把它算成 `[voice]` 的读者**（读数件 01 §4 读数一：`[voice]` `match=false`、scan 多出这一枚件）。
+  ⇒ 这一形⛔ 是 324-r1 注释里写明的"残余"，本腿把它**造出来了**（活例＝`internal/panel/config_handlers.go:609-610`）。
+
+B3 `tools/probe324/p3_method_hop.go`＝**误拒形**（段上方法／schema 没声明的那一跳）
+
+    package probe324
+
+    type v1bSection interface {
+    	Enabled() bool
+    }
+
+    type v1bReader struct{ LLM v1bSection }
+
+    func (r *v1bReader) on() bool { return r.LLM.Enabled() }
+
+  `Enabled` ⛔ 是 `LLMSection` 的导出字段（现量五枚＝`TextChain`/`Roles`/`TimeoutMS`/`Retry`/`Providers`）⇒
+  HEAD 那把尺⛔ 把它算成读者（`[llm]` `match=true`＝**静默漏**），摘掉那一跳后**才算**（读数一 vs 读数二对照）。
+  ⇒ 今天生产里这一形零命中。本腿自己的尺（两把，都带射程）：
+    ① `internal/config/**` 里带接收者的方法＝**38 枚**（尺＝python 逐行 `^func \(([^)]*)\)`，⛔ `_test.go`，17 枚非测试件），
+       接收者分布＝`m *Manager` 35 枚／`c *Config` 2 枚（`allowdirs.go:42 AllowedDirs`／`permmode.go:36 PermissionMode`）／`p *reloadPlan` 1 枚
+       ⇒ **挂在 14 枚段结构体（`VoiceSection`／`LLMSection`／`ModelsSection`…）上的方法＝0 枚**，且这 38 枚全在 `internal/config` 自己包里（尺的射程⛔ 扫它）；
+    ② 匿名内嵌字段＝**0 枚**（尺＝同一件逐行看结构体字段行，字段名只有一个标识符者算内嵌；命中 0 行）
+    ⇒ 所以"方法读／内嵌提升名会被误拒"是**登记的残余**、⛔ 今天的漏判（与实现者 §2 那格同判，本腿⛔ 引他的话、自己量的）。

@@ -1,0 +1,4 @@
+/c/tmp/wisp317orch/logs/10-psx.txt:--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+/c/tmp/wisp317orch/logs/10-psx.txt:--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.01s)
+/c/tmp/wisp317orch/logs/10-psx.txt:--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.13s)
+/c/tmp/wisp317orch/logs/10-psx.txt:--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed (0.13s)
