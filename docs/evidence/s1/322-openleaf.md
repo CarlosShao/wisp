@@ -165,14 +165,22 @@ POSIX 有（base 63 枚见证被截）、Windows 有（w1 的 268 次翻转、`w
    从这里往后每一笔（`d9e1498b`／`d425d951`／`1fbc9067`）都是逐枚 pathspec，已复量。
 2. `mut-posix.sh` 第一版把 base 树导出自 `HEAD`，会与 `HEAD` 里已有的同名符号重复声明⇒ 已在脚本里改成 `8baec646^` 并把踩坑原因写进注释；
    改前那一发的 `base` 树从未产生过读数（它连编译都没过），⛔ 被上面任何数引用。
+3. 本枚证据件第一版 §9 的**枚数自己算错**（"logs/ 21 枚／00~11 十一枚"，现量＝`logs/` 25 枚、顶层 24 枚、共 49 枚／680790 字节）
+   ⇒ 由本腿复量后改正，改正只动文档计数、⛔ 动任何判据与读数；这一条按"自抓不等谁来抓"记在这里。
+   ⚠ 票 322 那条 bullet（本腿同批写的）里也带着错的那个数"logs/ 21 枚"⇒ **不回改**（Progress log 只追加、且本单只许追加**一条** bullet），
+   以本件 §9 的现量为准；编排者翻框要引枚数请引这里。
 
 ## 9. 落点索引（本腿交的全部字节）
 
 - 证据件：`docs/evidence/s1/322-openleaf.md`（这一枚）。
-- 读数件：`.scratch/wisp/probes/322/r1b/`——`00`～`11` 十一枚门/env/色件、`8baec646-prod-code.diff.txt`（死腿产码 diff 副本）、
-  `mut-posix.sh`／`mut-win.sh`（去牙台件）＋两份 driver 日志、`logs/` 21 枚（容器壳＋容器内正文＋两族 summary＋`final-count2`/`cons2`）。
+- 读数件：`.scratch/wisp/probes/322/r1b/`——共 **49 枚文件、680790 字节**（`find -type f`＋`du -sb` 现量）：
+  顶层 24 枚（`00`～`11` 的门/env/色/四数件 13 枚、`8baec646-prod-code.diff.txt`、`mut-posix.sh`／`mut-win.sh` 两台件、
+  两份 driver 日志、六枚提交正文 `msg-*.txt`）＋`logs/` 25 枚（容器壳与容器内正文、两族 summary、`final-count2`/`cons2`）。
+  ⚠ 本枚证据件第一版这里写的是"logs/ 21 枚／00~11 十一枚"＝**枚数算错**，由本腿自己复量后改正（改动只在文档计数，⛔ 判据、⛔ 读数）。
   树只建不删：`/d/tmp/probe322r1b/{base,fixed,m1-teethout,m2-blanket,split-worktree,final-count2,wfixed,w1-teethout,w2-blanket}.*`。
 - 产码面：`internal/winsec/openleaf_flag_322_other_test.go`（新，78 行）、
   `openleaf_322_other_test.go`（214 行，只剩 race 一族＋常量）、`winsec_other.go`（一枚方位词）。
 - 票面：`.scratch/wisp/issues/322-…md` 末尾**追加一条** bullet（⛔ 翻框、⛔ 动 Status/票名）。
-- 提交：`1ef8c485`（死腿 66 枚读数遗产）／`d9e1498b`（起手三把尺＋两件台件）／`d425d951`（去牙读数 20 枚）／`1fbc9067`（拆分＋注释改正＋门禁五件）。⛔ push。
+- 提交：`1ef8c485`（死腿 66 枚读数遗产）／`d9e1498b`（起手三把尺＋两件台件）／`d425d951`（去牙读数 20 枚）／
+  `1fbc9067`（拆分＋注释改正＋门禁五件）／`443a2fa7`（这一枚证据件＋AC#4 余下读数）／`a12eb185`（票尾一条 bullet）／
+  本腿最后一笔（枚数自纠＋提交正文入库）。⛔ push。
