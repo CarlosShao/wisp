@@ -1,0 +1,55 @@
+票 270 归一微腿 `270-r2`（写·注释面一枚）——把 `internal/tools/subagent_197.go` 里那对互顶的 "only" 说法改成说实话
+================================================================================
+
+腿名 `270-r2`｜角色＝**落地腿（只改注释，⛔ 动一字产码字节）**｜票＝`.scratch/wisp/issues/270-task-spawn-assembly-guard-is-also-the-only-nil-protection-for-line-278.md`
+（现量：六格**全已勾**、`Status:` 未改 `-done`。⛔ 你翻框、⛔ 改名、⛔ 动 `Status:`——六格是我按非实现者腿 `270-v1` 的判语翻的，这枚腿交完**由我**按票 `:74`/`:76` 那两行预告过的规矩结最后一格残余。）
+
+## 要清的那一枚缺陷（我已在票面具名，这里给全文）
+
+同一块注释里现在有**两枚互顶的 "only"**：
+- `subagent_197.go:254-264` 那段（判据行 `:265` `if t.d.BaseOptions == nil || t.d.ParentTools == nil`）里 `:257` 写着
+  "it is also **the only site** that keeps the `t.d.BaseOptions()` call below from being reached with an empty func value"；
+- 再往下 `:291-296` 那段（它护的是 `:301` `base, wired := t.d.BaseOptions()`）自己写着
+  "this line is **the only thing left** that cannot be called empty"。
+
+★**起手先自己重跑这两把尺**（⛔ 抄我上面的行号——本仓 10-15 已定案：行号只当读数，加了行不打红）：
+`grep -n 'only' internal/tools/subagent_197.go` ＋ `sed -n '250,305p' internal/tools/subagent_197.go`。
+
+**裁给你了（⛔ 重新发明，照这个改）**：`:265` 那支**不是**唯一保护——甲形（台账 `A990` 裁定 3）之后有**两支**：`:265` 的 `||` 支在本包今天所有装配里**先响**，`:297` 那枚 `BaseOptions == nil` 是**后备**（`||` 被拆或被放宽时它是唯一还拦着那枚 nil 调用的东西）。⇒ `:257` 那句 "the only site" 要改成说实话的**两支关系**，同时 `:291-296` 那句 "the only thing left" 要**限定条件**（只在"上面那支被拆/放宽"的世界里才是唯一）。两句话不许再互相把对方顶成假话。
+⚠ 票 270 `AC#5` 那句硬约束照旧生效：**⛔ 在注释里许诺未实现的能力**——上面这两句只许写"今天谁先响、谁兜底、为什么"，⛔ 写成"将来也永远拦得住"。
+
+## 写面（只许这四，逐字；超出一枚算越格、我退回）
+
+1) `internal/tools/subagent_197.go`——**只有注释行**（`//` 开头的整行；⛔ 动任何非注释行一个字节）；
+2) `.scratch/wisp/probes/270/r2/**`（含 `logs/`）；3) `docs/evidence/s1/**` 一枚件（短名、⛔ 长名、⛔ 件名带 `§`）；4) 票 270 末尾**一条**只追加 bullet。
+⛔ 其它一切面：`internal/tools/**` 的**测试件**（含 `failclosed_236_teeth_test.go`、`taskid_source_236r4_teeth_test.go`、`spawn_roster_census_229_test.go`）、`cmd/wisp/**`、`internal/panel/**`、`internal/agent/**`、`internal/memory`、`internal/session`（本波四枚腿在写／在裁那几面）；⛔ `frontend/**`、`design/**`（归机主的外部前端 agent）；⛔ `PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden 既有件／`tools/d22scan/allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`／三枚冻结件。
+
+★**★本腿最重要的一把尺＝"产码字节零改动"自证**（交件必带，逐字跑）：
+```
+git show HEAD:internal/tools/subagent_197.go | grep -vE '^[[:space:]]*//' > /tmp/270r2/a.nocomment
+grep -vE '^[[:space:]]*//' internal/tools/subagent_197.go > /tmp/270r2/b.nocomment
+diff -u /tmp/270r2/a.nocomment /tmp/270r2/b.nocomment; echo "rc=$?"
+```
+⇒ 那把 `diff` 必须**零输出、rc=0**（＝滤掉整行注释后前后逐字同形）。⚠ 若你的改写**必须**碰到行尾注释（`code // ...` 这种同列形状），上面这把尺会把它算进非注释行 ⇒ 那就**别改那一行**，回来告诉我；本票那两句都在整行注释块里，没这个借口。
+
+★**我自己 12:1x 现量过的分母（当基线用，⛔ 抄进判据，起手自己重跑）**：`internal/tools/subagent_197.go` 现量 **总 612 行／整行注释 258 行／非注释 354 行／行尾注释形状 9 行**；那把尺对 HEAD⇄工作树（此刻还没人动它）＝**两侧各 11291 字节、diff 空、rc=0**。
+★**正控（先证这把尺有牙，再拿它的"空"当证据）**：把 `a.nocomment` 复制一份、在**副本的非注释行**上改一枚字面量（⛔ 别改跟踪件），跑同一把 `diff` ⇒ **必须非空、rc=1**。这把尺如果两种形状都放行＝它失明，⛔ 用它的零输出交件。
+
+## 规矩（一条都不许漏）
+
+- **只 commit、⛔ push**（推送只有编排者做、只推 `origin/dev`）。`git add`／`git commit` 两处**逐枚显式 pathspec**；⛔ `add -A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- **⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`**（裁决者≠实现者；这票六格已经由非实现者腿裁过并翻了，你只补"过期文字"那一枚残余）。
+- **⛔ 跑整包 `./cmd/wisp`，也⛔ 跑全树 `go test ./...`**（`cmd/wisp` 那一格归在飞的 `220-v1`；全树那形会把它再跑一遍、且不带 `-timeout` 时默认 10 分钟帽 `panic: test timed out after 10m0s`＝台面故障长得像"包红了"，⛔ 计入判据）。
+- 颜色尺：改前／改后各一发 `go test ./internal/tools/ -count=1 -timeout 30m`，四数逐枚点名（尺口径写清 `^=== RUN` 含子测试 ⇄ `^--- PASS` 只数顶层，⛔ 混用），终态红名册**与起手名册作差＝0**。改前那一发⛔ 用共享工作树跑（那树里有别人在飞的活）⇒ 用 `git archive` 建**仓外**导出树，★七件套 `go.mod go.sum internal cmd tools scripts frontend`（少 `frontend` ⇒ `[setup failed]` 假红）；取出后先数 `.go` 证非空。
+- 门禁四数自己跑并**逐枚落 `rc=`**：`gofumpt`（真身 `/d/work/base/gopath/bin/gofumpt.exe`，PATH 里可能 rc=127）、`tools/d22scan`（`rc=2`＝GUARD 射程拒绝，⛔ 读成红；档拼写⛔ `--scope=`）、长度门、`go vet ./internal/tools/`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+- ⛔ 为了变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 在注释里指名一枚不存在的测试当凭据（本仓已入账五次）。
+- ⛔ 杀 `wisp.exe` **PID 21892**（机主 10-15 19:03 自起的常驻实例，台账 `A988`；它握着全局热键与单实例锁，会让某些真窗用例红＝本机状态，⛔ 为它动任何东西）。
+- 读数纪律：引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先看 stderr 并跑一枚已知存在的正控。
+- **输出预算**：≤4 枚件、每件 ≤160 行；⛔ 0 字节文件（交件前 `wc -c`）；轮次帽约 150 ⇒ 落一枚文件就 commit。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 并发在飞：`216-r1`（写 `internal/panel/**`，此刻正跑全树 `./...`）∥ `220-v1`（裁决＋`cmd/wisp` 整包那一格）∥ `326-v1`（裁决 `internal/memory`／`internal/session`）∥ `165-r3`（写 `internal/agent/**`）⇒ ⛔ 读它们的在飞字节当凭据；`go test` 重包撞上了等一等再跑并具名写你等了。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含上面四处，且 `internal/tools/subagent_197.go` 的 diff **每一行都是注释**）；② 证据件绝对路径＋`wc -c`＋行数；③ 上面那把**"产码字节零改动"尺**的逐字输出（含 `rc=`）＋改前／改后两发 `internal/tools` 四数＋门禁四数 `rc=`。
+另加我的必答题（⛔ 你自己盖章不算）：改完之后，把 `:265` 那支的 `BaseOptions == nil` 半边**摘掉**（台件、当场还原、报还原哈希），你新写的注释里那句"谁先响"还站得住吗？⛔ 要求你把产码改动留下——**摘完必须还原**，且这一发只用来验证注释文字与行为一致，⛔ 报成"我装了牙"。
