@@ -1,0 +1,17 @@
+326-r1 判语件落盘：docs/evidence/s1/326-append-updated.md（172 行／17568 字节，⛔ 翻框）
+
+件＝`docs/evidence/s1/326-append-updated.md`（短名、⛔ 长名、⛔ 带 `§`）。九节：0 落点／1 AC#0 四行现量／
+2 AC#1 成对读数（未修码红句逐字＋改后同行证据 `updated_at 1777593660 -> 1777593780 (delta=120)`＋整包四数两色）／
+3 AC#2 那两行 `ORDER BY` 的三把尺（diff 0 枚 rc=1、切片 sha 与锚同值 `6a4e5322…`、正控 2 枚）＋修完后 tie-break 暴露面／
+4 牙八发（M00 正控／M01 去牙／M02 常量 0／M03a 台面故障／M03b created_at／M04 事务外／M99 还原＋哈希／M99b 交付态 0 命中）
+＋具名的不敏感／5 AC#3 真杀台件与迁移族／6 AC#4 门禁八把逐 rc／7 AC#5 五把尺说实话／8 上交的三形／9 交件自证三把尺。
+
+★写给裁者的三处判断（本腿⛔ 自裁）：① 值取 `t.CreatedAt`（⛔ 再读一枚墙钟）是把"这一轮真的算动过"钉成同源的唯一办法，
+但它同时把落点钉死了——要换成"另读 `observe.NowWallUTC()`"只需改 `TestAppendSessionTurnSurfacesTheConversation`
+那一枚 `updated_at == turn.created_at` 断言，真杀台件（`updated_at >= max(turn.created_at)`）两形都放行；
+② "刷新挪到事务外"那一形只有真杀台件管、命中率 18/32＝56%（交付字节同轮数 0 命中⇒⛔ 假红），要确定性判据得开一枚
+tx 内故障注入接缝＝动 `Store.write`／DAO 函数体形状、⛔ 本票射程；③ 母表行不存在时那条 `UPDATE` 影响 0 行、
+今天净效果仍是"只多一行子表"——本腿按未定义即停⛔ 自填失败模式，只把形状与两把尺（`foreign_keys` 0 命中、`dsn()` pragma 名册）交上去。
+
+只落判语件：⛔ 动产码一字、⛔ 翻 AC 框（尺复跑＝未勾 6／已勾 0）、⛔ 改票名与 `Status:`、只 commit、⛔ push；
+add／commit 两处显式 pathspec＝两枚（判语件＋本 commit 正文件）。
