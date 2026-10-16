@@ -1,0 +1,154 @@
+# 327-a1 决定性尺逐字转储（腿 327-a1，锚 44f51fc8，2026-10-16）
+# 每段前有 "$ <命令>" 与 [rc=]。命令一律在仓根执行；frontend/** 那批读数取自工作树（该树此刻在飞）。
+# 全量转储（同一次运行、497 行）留在仓外 D:/tmp/327a1/logs/readings-raw.txt —— 只建不删，具名自证。
+# 本件＝**决定性尺的摘录**（受"每件 ≤160 行"预算约束）；§①／§② 里每条结论旁的命令＋命中行＋rc 已在件内逐条同屏，raw 里都有对应段。
+# 探针（仓外 /d/tmp/327a1/cfprobe/main.go，纯 stdlib）原始 stdout＝同目录 logs/cfprobe-02.txt，stderr 0 字节。
+$ grep -rnE 'scrubComposerForDisplay|scrubForDisplay|needsDisplayWash' --include=*.go internal cmd tools | grep -v _test.go
+internal/panel/composer.go:145:		Composer:    scrubComposerForDisplay(composer),
+internal/panel/display_scrub_216.go:72:// scrubForDisplay turns the characters a human cannot see into characters a human
+internal/panel/display_scrub_216.go:100:func scrubForDisplay(s string) string {
+internal/panel/display_scrub_216.go:101:	if !needsDisplayWash(s) {
+internal/panel/display_scrub_216.go:149:// needsDisplayWash reports whether scrubForDisplay would change s. It is the same
+internal/panel/display_scrub_216.go:152:func needsDisplayWash(s string) bool {
+internal/panel/display_scrub_216.go:163:// scrubComposerForDisplay is the display boundary's whole roster, in one call. It
+internal/panel/display_scrub_216.go:168:func scrubComposerForDisplay(c ComposerState) ComposerState {
+internal/panel/display_scrub_216.go:169:	c.Workspace.Canonical = scrubForDisplay(c.Workspace.Canonical)
+internal/panel/display_scrub_216.go:175:		a.Name = scrubForDisplay(a.Name)
+[rc=0]
+$ sed -n '168,179p' internal/panel/display_scrub_216.go
+func scrubComposerForDisplay(c ComposerState) ComposerState {
+	c.Workspace.Canonical = scrubForDisplay(c.Workspace.Canonical)
+	if len(c.Attachments) == 0 {
+		return c
+	}
+	rows := make([]AttachmentRef, len(c.Attachments))
+	for i, a := range c.Attachments {
+		a.Name = scrubForDisplay(a.Name)
+		rows[i] = a
+	}
+	c.Attachments = rows
+	return c
+[rc=0]
+
+$ sed -n '50,58p' internal/panel/display_scrub_216.go
+//     only), and the two sides disagree on the OUTPUT SHAPE (space vs escape), so
+//     the merge is a ruling, not an edit;
+//   - it does not wash Cf (format) characters such as U+202E RTL OVERRIDE or
+//     U+200B ZERO WIDTH SPACE. unicode.IsControl is category Cc only, and "控制字符"
+//     is what AC#2 says. Widening to Cf is a real question - U+202E is exactly the
+//     "盖掉后半段名字" attack the ticket's rationale names - and the honest answer
+//     for this leg is to record it as residual for the verifying leg to rule on,
+//     not to silently widen a security-relevant character set in the same commit
+//     that claims to implement the narrower one;
+[rc=0]
+
+$ sed -n '37,45p;55,62p' internal/risk/taintmatch.go
+// in the *normalized* text the contract matches on, not the semantic
+// paraphrase residual of 16.9#1 (adversarial report M-6).
+func isIgnorableTaintRune(r rune) bool {
+	switch r {
+	case 0x00AD, 0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF:
+		return true
+	}
+	return unicode.Is(unicode.Mn, r)
+}
+		// dropped as whitespace below).
+		if r >= 0xFF01 && r <= 0xFF5E {
+			r -= 0xFEE0
+		}
+		if unicode.IsSpace(r) || isIgnorableTaintRune(r) {
+			continue
+		}
+		b.WriteRune(unicode.ToLower(r))
+[rc=0]
+
+$ grep -rn 'normalizeTaint\|isIgnorableTaintRune' --include=*.go internal cmd | grep -v _test.go
+internal/risk/hostpath_185.go:67:	on := normalizeTaint(origin)
+internal/risk/provenance.go:495://	     []rune(norm)), because normalizeTaint drops whitespace and zero-width
+internal/risk/provenance.go:559:	norm := normalizeTaint(content)
+internal/risk/provenance.go:578:	if hp := normalizeTaint(hostPath); hp != "" {
+internal/risk/provenance.go:841:	norm := normalizeTaint(text)
+internal/risk/taintmatch.go:32:// isIgnorableTaintRune reports the invisible characters that must be dropped
+internal/risk/taintmatch.go:39:func isIgnorableTaintRune(r rune) bool {
+internal/risk/taintmatch.go:47:// normalizeTaint applies the contract normalization to s and returns the
+$ grep -rn '.Ingest(' --include=*.go . | grep -c -v _test.go
+1
+[rc=0]
+
+$ grep -rn '.Ingest(' --include=*.go . | wc -l
+21
+[rc=0]
+
+$ sed -n '124,131p' internal/panel/workspace.go
+		view.Reason = "已收窄到该工作区，但这条路径被 C26 的展开步改写过（" +
+			strings.Join(res.Rewrites, "+") + "）：下面的坐标 " + res.Canonical +
+			" 是改写后的树，不是使用者命名的那串 " + res.Spelling + "，范围外的路径按 R2 判定"
+	}
+	if res.Reparse {
+		view.Reason += "；这条路径穿过了 [fs] reparse_point_exceptions 上明列的联接点"
+	}
+	return view
+[rc=0]
+
+$ grep -rn 'lastPanelSnapshot' --include=*.go cmd internal | wc -l
+17
+[rc=0]
+
+$ grep -rn 'lastPanelSnapshot' --include=*.go cmd internal | grep -v _test.go
+cmd/wisp/panel_pump.go:417:// lastPanelSnapshot returns the most recent packet this run built and the bytes
+cmd/wisp/panel_pump.go:424:func (rt *agentRuntime) lastPanelSnapshot() (panel.Snapshot, []byte, bool) {
+[rc=0]
+
+$ grep -rnE 'ExecuteScript|CallJs|PostWebMessage|NavigateToString|evalScript' --include=*.go cmd/wisp | wc -l
+6
+[rc=0]
+
+$ grep -rnE 'ExecuteScript|CallJs|PostWebMessage|NavigateToString|evalScript' --include=*.go cmd/wisp
+cmd/wisp/panel_control_windows.go:665:func (c *panelControl) SetHtml(html string) { c.browser.NavigateToString(html) }
+cmd/wisp/panel_transport_35r2_test.go:1206:	evalScripts    []string
+cmd/wisp/panel_transport_35r2_test.go:1446:	bf.evalScripts = append(bf.evalScripts, script)
+cmd/wisp/panel_transport_35r2_test.go:1719:		t.Errorf("AC#6 RED: the page got %d receipt(s) via window._rpc[id].resolve, want %d (msgcb's reply scripts: %v)", bf.resolved, wantPosts, bf.evalScripts)
+cmd/wisp/panel_transport_35r2_test.go:1887:	if len(bf.evalScripts) != 1 || bf.evalScripts[0] != `window._rpc[0].resolve(null); window._rpc[0] = undefined` {
+cmd/wisp/panel_transport_35r2_test.go:1888:		t.Fatalf("calibration: the reply script is %v, want the library's resolve(null) form (webview.go:157)", bf.evalScripts)
+[rc=0]
+
+$ grep -rn 'AddHostObjectToScript' --include=*.go cmd/wisp
+[rc=1]
+
+$ grep -rn 'Method[A-Za-z0-9]* *= *"' --include=*.go internal/panel
+internal/panel/bridge.go:42:	MethodModeRequest      = "panel.mode.request"
+internal/panel/bridge.go:43:	MethodWorkspaceRequest = "panel.workspace.request"
+internal/panel/bridge.go:44:	MethodAttachmentAdd    = "panel.attachment.add"
+internal/panel/bridge.go:45:	MethodMessageSend      = "panel.message.send"
+internal/panel/bridge.go:66:	MethodConfigGet = "config.get"
+internal/panel/bridge.go:67:	MethodConfigSet = "config.set"
+internal/panel/bridge.go:75:	MethodModelsList = "config.models.list"
+internal/panel/composer_test.go:311:	if !strings.Contains(bridgeSrc, `MethodWorkspaceRequest = "panel.workspace.request"`) {
+[rc=0]
+
+$ grep -rniE 'MethodSnapshot|snapshot.*= *"panel\.' --include=*.go internal cmd
+[rc=1]
+
+$ sed -n '300,302p' cmd/wisp/panel_inbound.go
+		Workspace:  workspace,
+		Attachment: nil,
+		Message:    nil,
+[rc=0]
+
+$ cd /d/tmp/327a1 && sed -n '/AC#0 THREE-FORM/,/encoding\/json/p' logs/cfprobe-02.txt
+== AC#0 THREE-FORM READINGS (bytes as they leave NewSnapshot) ==
+len(bytes)=19  runes=17  utf8=70 68 6F 74 6F E2 80 AE 64 6E 6F 6D 65 6C 2E 78 74 6E 70
+len(bytes)=16  runes=14  utf8=70 68 6F 74 6F E2 80 8B 6E 61 6D 65 2E 70 6E 67
+len(bytes)=10  runes=10  utf8=72 65 70 6F 72 74 2E 70 6E 67
+len(bytes)=13  runes=11  utf8=72 65 70 6F 72 74 E2 80 8B 2E 70 6E 67
+c1 vs c2 byte-identical? false   same DISPLAY WIDTH? see note
+c2 after scrubForDisplay (retyped) = "report\u200b.png"
+
+== encoding/json (pump.go:344/359 json.Marshal) ==
+[rc=0]
+
+# 探针的 json 段（仓外 readings-raw.txt:486-491）里有 2 行带**字面** U+200B/U+202E，⛔ 抄进本审计件——
+# 按字节改写如下（结论逐字不变）：
+#   U+200B  marshalled="photo<E2 80 8B>.png"   err=<nil>  escaped=false
+#   U+202E  marshalled="photo<E2 80 AE>.png"   err=<nil>  escaped=false
+#   正控   U+001B  marshalled="photo\\u001b.png"  err=<nil>  escaped=true

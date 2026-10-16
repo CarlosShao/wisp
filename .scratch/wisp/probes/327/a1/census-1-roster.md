@@ -1,7 +1,7 @@
 # 327-a1 §① 字段名册：今天真能带着 `Cf` 走到界面上的字段
 
 腿 `327-a1`（只读普查）｜锚＝具名提交 `44f51fc8`（读数一律取自**工作树现行字节**，票面 33 行点名）｜2026-10-16
-⛔ 本件不含判语、⛔ 不含修法建议（修法三形归票 327 `AC#1`，由编排者裁）；尺的逐字转储在 `logs/readings.txt`。
+⛔ 本件不含判语、⛔ 不含修法建议（修法三形归票 327 `AC#1`，由编排者裁）；决定性尺的逐字转储在 `logs/readings.txt`（摘录），全量 497 行在同一次运行的仓外件 `D:\tmp\327a1\logs\readings-raw.txt`。
 原始命令逐枚同屏附在下面。凡"屏幕上哪一行"那一列引的 `frontend/**` 行号＝**读数不是判据**：那棵树此刻由机主的外部前端 agent 在飞改写（起手 `git status` 可见 ` M frontend/**`）。
 
 ## 0. 显示边界今天到底洗了什么（尺 R1，`grep -rnE 'scrubComposerForDisplay|scrubForDisplay|needsDisplayWash|writeControlEscape' --include=*.go .`，rc=0）
