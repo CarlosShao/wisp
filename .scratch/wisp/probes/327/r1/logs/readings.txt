@@ -1,0 +1,75 @@
+327-r1 读数转储（腿 327-r1，2026-10-16，锚＝具名提交 c315980b／起手 c315980ba3a6d1dad17b275635de65b47255971f）
+台面＝仓外导出树 D:/tmp/327r1/bench（八件套 go.mod go.sum internal cmd tools scripts frontend models
+＋手工拷 build/*.dll／third_party/sherpa-onnx/*.dll／frontend/dist）；取出后 .go 枚数＝747（非空证明）。
+★门禁四数只在工作树 D:/work/workspace/projects plans/Wisp 上跑（导出台⛔ 当门禁台面：d22scan 自己声明
+design/＋frontend/ 射程，部分树＝rc=2 GUARD 拒绝）。
+
+[1] 尺口径：`^=== RUN`＝含子测试；`^--- PASS`／`^--- FAIL`／`^--- SKIP`＝只数顶层行。两把尺⛔ 混用。
+
+[2] 改前（bench＝c315980b 原字节，go test ./internal/panel/ -v -count=1 -timeout 30m）rc=1
+    === RUN 246 / --- PASS 148 / --- FAIL 8 / --- SKIP 0
+    红名册（logs/fails-before.txt，8 枚）：
+      TestApprovalCardViewJSONKeysMatchFrontendTypes
+      TestC21DesignTokensFourWayAgree
+      TestComposerContractTypesMatchFrontend
+      TestComposerRenderFixtureTellsTheTruth
+      TestGitDimensionHasNoModelCallableTool
+      TestReadGitOnThisRepositoryIsSelfConsistent
+      TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+      TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+    具名台面读数（⛔ 计入判据）：TestC21DesignTokensFourWayAgree 的红句写
+      tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\tmp\327r1\bench\design\assets\tokens.css:
+      The system cannot find the path specified. ＝导出台八件套里没有 design/，那枚红＝台面射程不是判据；
+      改前改后**同一枚台面**、同一把尺 ⇒ 名册作差仍可比。其余 7 枚红句均为本包既有设计红
+      （"red as required"／背压台账自陈），与本腿写面无关。
+
+[3] 改后（bench-after＝同一导出树＋本腿两枚改动件）rc=1
+    === RUN 252 / --- PASS 154 / --- FAIL 8 / --- SKIP 0
+    红名册（logs/fails-after.txt）＝与改前逐枚同名：
+      $ diff logs/fails-before.txt logs/fails-after.txt →（空输出）diff_rc=0 ⇒ 本腿引入新红 0 枚
+    RUN 246→252 ＝本腿新增 6 枚顶层用例；PASS 148→154 ＝那 6 枚全绿。
+
+[4] AC#2 成对定向突变（只在仓外 D:/tmp/327r1/m1／m2 两枚**导出台副本**里做，⛔ 碰工作树／⛔ 碰 internal/risk）
+    件头哈希（工作树现行字节＝两发还原后逐字同串）：
+      sha256 internal/panel/display_scrub_216.go = 8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd
+    发一 m1＝只摘**写入侧**（删 scrubForDisplay 里 `case isDisplayWashCf(r):` 那 7 行支，判据侧留着）
+      突变件 sha256 = e3bb5a1ce50e33ecb9214594dd17d3707c6152f62444de030eff7133da4598db
+      go test ./internal/panel/ -v -count=1 -timeout 30m → rc=1，RUN 252／PASS 150／FAIL 12／SKIP 0
+      比改后名册多出 4 枚红（logs/fails-m1.txt comm 作差）：
+        TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired   ← 唯一"写入侧去牙才红"的靶子
+            display_scrub_216_test.go:352: scrubForDisplay("a\x1b\u202eb\u200dc\xad") = "a\\x1b<U+202E>b<U+200D>c\\xad", want "a\\x1b\\u202eb\\u200dc\\xad"
+        TestEveryNamedCfRuneIsEscapedAndNeverDeleted
+            display_scrub_216_test.go:407: soft hyphen (U+00AD) survived the wash as itself
+        TestABidiNameWalksTheRealBoundaryIntoAWashedRow
+            display_scrub_216_test.go:477: menu row = "photo<U+202E>已允许.png", want the override shown as a visible escape
+        TestTheBidiClaimInANameChangesNoVerdict
+            display_scrub_216_test.go:534: the display string reached the human unwashed
+      m1 里判据侧靶子 TestNeedsDisplayWashNamesEveryWashedCfRune＝**绿**（判据没被摘）
+      还原：cp 工作树件 → sha256 = 8050f22d…（与[4]头串逐字相同）
+    发二 m2＝只摘**判据侧**（needsDisplayWash 里删 `|| isDisplayWashCf(r)` 一枚 term，写入侧留着）
+      突变件 sha256 = 579e02d544c1d6f3f2801a5b50c62d6a981cccdaf50d3aef40dea654d058e5e7
+      同一条命令 → rc=1，RUN 252／PASS 150／FAIL 12／SKIP 0
+      比改后名册多出 4 枚红（logs/fails-m2.txt）：
+        TestNeedsDisplayWashNamesEveryWashedCfRune                    ← 唯一"判据侧去牙才红"的靶子
+            display_scrub_216_test.go:368: needsDisplayWash did not see soft hyphen (U+00AD) in "photo\u00ad.png": the fast path would return it raw
+        TestEveryNamedCfRuneIsEscapedAndNeverDeleted
+        TestABidiNameWalksTheRealBoundaryIntoAWashedRow
+        TestTheBidiClaimInANameChangesNoVerdict
+      m2 里写入侧靶子 TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired＝**绿**（写入侧没被摘）
+      还原：cp 工作树件 → sha256 = 8050f22d…（逐字同串）
+    两发名册作差（diff logs/fails-m1.txt logs/fails-m2.txt）＝
+      只在 m1 红：TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired
+      只在 m2 红：TestNeedsDisplayWashNamesEveryWashedCfRune
+      ⇒ 两发各红在**不同枚用例、不同枚断言行**，非"一发整支去牙"、非同一名册。
+
+[5] 门禁四数（全部在工作树上跑，逐枚落 rc）
+      gofumpt -l internal/panel/display_scrub_216.go internal/panel/display_scrub_216_test.go → rc=0，零输出
+      sh scripts/d22scan.sh                        → rc=0，`clean - no D22 ban violations`；
+        examined 281 production Go files；ban #8 internal/ 577 Go files（注释与 _test.go 在射程）、cmd/ 139
+      sh scripts/check-path-length-budget.sh --with-self-test → rc=0，VERDICT GREEN；
+        tracked paths=14393 over-budget=60 covered=60 not-in-roster=0
+      go vet ./internal/panel/                     → rc=0（零输出）
+
+[6] ⛔ 跑过的：整包 `go test ./cmd/wisp`（⛔ 本波写面）、全树 `go test ./...`（⛔）、任何 push（⛔）、
+    任何 AC 框翻转（⛔）、任何既有断言改动（测试件 diff＝204/0，零删除行）。
+    ⛔ 杀 wisp.exe PID 21892（全程未碰）。
