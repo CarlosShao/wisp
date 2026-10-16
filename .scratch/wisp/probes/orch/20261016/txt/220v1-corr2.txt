@@ -1,0 +1,11 @@
+
+---
+
+## ★★归因已闭（编排者 11:4x 追加，接上面第 (3) 条；权威以本节为准）
+
+那六枚 `cmd/wisp` 红的归因我跑完了，**不用你裁、也不许你重开**：
+
+- **成对台件（同台面）**：两枚仓外 `git archive` 导出树，改前锚＝`fd01e7962`（正好是接线 `2d10bd0f` 的父提交）、改后锚＝HEAD；两枚树**逐件同法补齐台面**（七件套建树带 `frontend` ＋ 手工拷 `frontend/dist`（导出树里只有 1 枚跟踪件＝页面是空的）＋ 拷 `build/*.dll` 与 `third_party/sherpa-onnx/*.dll`（这两枚目录 `git ls-files` 零跟踪件，任何导出树都取不到））。尺与日志＝`.scratch/wisp/probes/orch/20261016/logs/orch-sixred-pair-pre.txt` 与 `…-post.txt`。
+- **读数**：改前 `FAIL_COUNT=6 PASS_COUNT=0 rc=1` ⇄ 改后 `FAIL_COUNT=6 PASS_COUNT=0 rc=1`，**名集合逐枚同、红句除 HWND 句柄数字外同句**。⇒ **接线那两跳一枚红都没引入**（票 220 的 AC#5 这一格因此⛔ 写"本波新增红"）。
+- **六枚为何红（具名，两形）**：① **本机有一枚活的 `wisp.exe`**＝PID 21892、命令行 `"D:\work\workspace\projects plans\Wisp\build\wisp.exe"`、起于 `2026-10-15 19:03`（＝台账 `A988` 机主自己按重启档起的那一枚，⛔ 谁都不许杀它）⇒ 它握着热键与单实例锁，打死四枚：`Test258BridgeMutationNoSrcKeepsOldBinding`、`Test258OccupiedCombinationNamesTheNewValue`、`Test258V1ProbeSummonEditRebindsLiveBall`（红句 `live slots after the rebind = 1, want 2` ＋ `mute=Ctrl+Alt+M occupied by another app`）、`TestAC246DevLegIgnoresTheTestTaskInjection`（红句**自己就说实话**：`AC#7 RED (desktop state, not our code): a dev Wisp is already running in this session, so this leg handed its activation over and exited. Stop it and re-run.`）；② **前台被别的窗握着**打死两枚真窗：`TestAC4FocusReturnToPriorWindowGap33r5`（`the panel did not take the foreground on Show: foreground 0x50102`）、`TestAC14GoSideEvalPushReachesThePage`（`the page reports its title as ""`）。
+- ⇒ 这两形都是〔本机可量·真机状态〕，与票 111 `AC#11` 那类 winlive 编译门同理：⛔ 计入本票判据、⛔ 为它们动任何断言、⛔ 在判语里写成"代码红"。你裁 AC#5 时按**达终态那发的名册**如实写"整包含 6 枚红＋逐名归因如上（凭据＝我这两枚件，具名引）"，并且**必须显式带足 `-timeout`**（默认 10 分钟不够，我今天亲眼 `panic: test timed out after 10m0s` 那一发⛔ 算终态）。
