@@ -1,0 +1,26 @@
+165-v2 判语件（裁决腿·票 165 AC#6 终裁）：成立但带三枚具名缺口，⛔ 翻框
+
+判决一行＝**AC#6 成立、带具名缺口**。两维各有牙（我自己重跑）："请求里带没带这枚工具"＝M-e 红在 :219；
+"tool_call 那一跳真被走过"＝去牙那一发（sed -i '12d'，28→27）红在 :138 读数 over 0 tool_call rows、
+M-c-B（假计数＋摘牙）红在 :143；常驻性＝整包 -v 默认跑到（RUN=110／PASS_TOP=86／FAIL_TOP=0／SKIP=0，⛔ tag ⛔ Skip）。
+三枚缺口逐枚具名带凭据：G1（重）名字整对可换——M-a2 把常量与夹具**一起**改成 plan.presentX ⇒ **绿 rc=0**，
+"镜像 ⇄ 真名册"两半今天零枚用例对接；G2（中）镜像条目 Resident 是装饰——M-b true→false ⇒ **绿 rc=0**，
+机理＝inject.go:44-49 切两支＋bm25Select(172-224) score>0 即入选，单候选目录里查询与描述共用 unigram 我/一/下 ⇒ 非驻留也被注入；
+对照 Declared **有牙**（M-b2 L2→L1 唯一红在 :157）⇒ 派单那句"两枚字段都⛔ 红"要收窄成一枚装饰一枚有牙；
+G3（轻）:131 那句 THE JUDGMENT 标在对牙不敏感的那枚门上（M-c-A 常量计数绿＝⛔ 携带信息；M-c-B 红在 :143＝缺牙仍响）
+⇒ 必答题的答＝**⛔ 算恒真、算一枚冗余门＋一句误导注释**；G4＝票面自设射程（⛔ 丙形当仪器），记射程⛔ 记缺陷。
+并排列（我的 vs 实现者的）：正向同 PASS（仅耗时差）、去牙同红同读数；台面差具名＝他七件套 c9ba5254 报 744／746，
+我用同一把尺在 c9ba5254 现量 745、在 f7d6dbc98 现量 747、我这棵八件套树 747＝同射程跟踪件（名册两列 diff 0 行）⇒ 他的分母口径各少 1 枚、⛔ 影响颜色。
+还原自证＝9 枚突变逐枚当场还原，两串 sha256 逐位回基线（.sse 7d26fa889b59fc3a…／.go 00c32049994c441c…，我现量的基线同串）；
+git status --porcelain -- internal cmd＝**0 行**。
+断口②③只答复核（⛔ 裁归属）：② **属实**（:123 逐字＝rt.bridge.Tools()；同文件 requestBodies|LastRequest|sent["tools"]|adaptertest 命中 0；
+ask165r2 :67-69 走 bridge.Execute 直接喂名 ⇒ 那枚行⛔ 由 loop.go:640 写）；③ **一半⛔ 属实**——严格"产码 0 枚写入"被
+internal/llm/probe.go:91 那枚 ToolChoiceRequired 顶穿（非 _test，走 wisp probe CLI），但"agent／装配支 0 枚"属实
+（git grep -n ToolChoice 44f51fc8 -- internal/agent cmd/wisp＝0 行）＋mockllm 按位取 Tools[0] 属实 ⇒ 建议措辞收窄。
+派单第 9 行独立裁定＝165r3-dispatch.txt:9 **已带 plan.present 限定词**、与 AC#6 原文同形 ⇒ 就那一句⛔ 需要更正；
+r3 bullet 引成无限定形那一句现量不真；他补的读数我复跑属实（4366c1ca1：withJournal(store) 8 处／5 件、golden 面只有 echo 18／sleep 7、
+plan.present 在 .sse＋testdata 面 0 件）⇒ 下一波该派的形＝"那两行走得过（8 处），但零枚用例带名册里的真工具名打到它"。
+只能补一件事＝**G1 那枚"镜像 ⇄ 真名册"对接钉**（落 cmd/wisp 面、本票写面外，正控＝两头同改而真名不动也必须红）。
+门禁四数只在**工作树**逐枚落 rc：d22scan 0（ban #8 射程 design/39 frontend/116 internal/577 cmd/139）、长度门 0（14330／60／60／0）、
+go vet ./internal/agent 0、gofumpt -l 与 -d 0 与 0。实现者十枚提交写面尺越界 0、票框 5 勾 1 空、c3f55651 numstat 2/0。
+只 commit、⛔ push；写面只本件＋.scratch/wisp/probes/165/v2/**（＋下一枚票尾 bullet）；⛔ 动 internal/**、cmd/** 任何跟踪字节。
