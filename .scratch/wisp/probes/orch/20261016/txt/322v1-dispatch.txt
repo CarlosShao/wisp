@@ -1,0 +1,43 @@
+腿名：322-v1（非实现者验收腿·只读）｜票：.scratch/wisp/issues/322-privatefile-open-truncates-through-a-swapped-leaf.md
+实现者＝`322-r1`（死于 150 轮帽、字节由编排者代提 `8baec646`）＋`322-r1b`（八笔提交，盘上 HEAD 起树）。你⛔ 是他们的任何一枚：D22 双角色＋`SPEC-12 §4.3` #1 ⇒ 六枚 AC 框成不成立由你裁、翻框归编排者。
+证据件（实现者自陈，⛔ 你的凭据）＝`docs/evidence/s1/322-openleaf.md`；读数件根＝`.scratch/wisp/probes/322/r1b/`。**它的每一句都当未验证**：你要自己现跑才能写判语。
+
+## 起手（必做，⛔ 跳过）
+1. `git rev-parse HEAD` 记为起树锚（写进你每件读数的抬头）；`date '+%F %T %z'` 同时记时刻。
+2. 现量票框尺：`grep -c '^[[:space:]]*- \[ \]' <票 322 路径>` 与 `...'- \[x\]'` ⇒ 应为 **6 未勾／0 已勾**；与你读到这句话时的实际数不符 ⇒ 具名上报再动手（有别的腿在动这枚票＝台面异常）。
+3. 读 `git show --stat 8baec646` ＋ `git log --oneline 96fc2343..HEAD`（`322-r1b` 那八笔）＋逐枚读 `internal/winsec/openleaf_*_322*.go` 四枚新测试件与 `winsec.go:140-155`、`winsec_other.go:20-35`、`winsec_windows.go:325-395`。
+
+## 六格逐格要答的（每格都要落"这一发在未修码上响不响"）
+- **AC#0 三形代价表**：普查件＝`.scratch/wisp/probes/322/a1/`（`index.md`＋`logs.md`＋三枚探针源副本）。你要答的是**这张表与最终落的那一形是否同一件事**（实现落的是"甲＋Windows 前置守卫"这一形：`oNoFollowPlatform` 常量＋`preOpenLeafGuard`）。⛔ 重做代价表。
+- **AC#1 截断窗口关死**：自己现跑成对读数（同发同屏、⛔ 跨台面）。尺＝容器台件 `openleaf_overwrite_322_test.go`（实现者报 `leafRaceAttempts322r1=3000`：base `git archive 8baec646^` 仓外树 `damagedWitnesses=63/3000`＋rc=1 ⇄ fixed `damaged=0` 且 `liveness=48`＋rc=0）。你要独立复现两发，并核**那一发真的到达过链接态**（`liveness>0` 同行证据；⛔ 拿 `damaged=0` 单独当凭据＝恒真第一形）。
+- **AC#2 覆盖写语义不破**：现跑调用点名册尺（`grep -rn "privateFile" internal/ --include=*.go` 类，⛔ 用实现者给的数）＋`openleaf_overwrite_322_test.go` 的既有承诺那一支。要答："允许覆盖"仍在、还是被具名改成拒绝；两种都点名消费者。
+- **AC#3 Windows 那一半**：★这格是实现者**具名未闭合**的那一枚——他们说已修码上本机仍量到 `witnessTruncated=true`（台件位置＝`openleaf_guard_322_windows_test.go:249-253` 附近，⛔ 信行号，自己 `grep -n witnessTruncated` 定位）。你要：① 自己现跑那枚用例并**连文案逐字**落盘；② 判这一形算"Windows 防护成立"／"须降格〔仅本机可量〕＋登记 CI 覆盖不到"／"不成立"，并写清你的判据是什么；③ ⛔ 用 POSIX 绿冒充 Windows 结论。
+- **AC#4 门禁＋消费者不推红**：六道自己跑并各落 `rc=`（`go build ./...`／`go vet ./internal/winsec/`＋`GOOS=linux`/`GOOS=darwin` 两档 vet／`sh scripts/d22scan.sh`／长度门 `--with-self-test`／格式化尺）。★格式化那把：本机 `gofumpt` ⛔ 在 PATH（rc=127），但**盘上有**＝`/d/work/base/gopath/bin/gofumpt.exe` ⇒ 按绝对路径跑，⛔ 拿 `gofmt -l` 的 0 冒充 `gofumpt` 的 0，也⛔ 用"本机不可用"了事。消费者维度里 **`cmd/wisp` 那一档本波归另一枚写腿（220-r1）＝⛔ 你跑 `go test ./cmd/wisp` 整包**（票 314 死亡区＋同一时刻只许一枚）；要这一档的数就具名写"缺这一发、由编排者向 220-r1 取"。
+- **AC#5 注释说实话**：核 `winsec_other.go` 那句"booked separately as ticket 322 and is unfixed"现在说什么、与票的终态是否还相符；不符就判不成立并给出应改成的那句（⛔ 你自己动 `internal/winsec/**` 一字）。
+
+## 牙（首要攻击点＝判据仪器自己）
+三形都要问：改前必红、**反形也红**、还原复跑绿。你对这三枚测试件自己做**去牙反控**与**反形**：
+- 去牙＝物理摘守卫（POSIX 摘 `|oNoFollowPlatform`；Windows 令 `preOpenLeafGuard` 恒答"不是链接"），点名哪些用例必须红，红句连文案逐字落盘。
+- 反形＝把守卫换成"逢名就拒"（恒真第三形），要看仪器**仍然红**（`liveness=0`／AC#2 子项红／`guardRefusals` 对不上），⛔ 一把尺两种形状都放行。
+- ⛔ `-overlay` 做这一族突变（这族尺运行时读盘，overlay 恒绿＝假读数）；**所有突变都在 `git archive <rev>` 取出的仓外导出树里做**，共享工作树一字节⛔ 改（本波有写腿在动别的包）。
+- 若某一支夹具里**根本没造出坏世界** ⇒ 具名报"缺世界"＋说台件该怎么造，⛔ 假装测到了。
+
+## 存量红的归属（我判过，你⛔ 重判）
+`TestGateJudgesThePrivateSetByResolvedSID` 与 `TestSealNarrowsAndNamesThePrincipalItRemovedBySID` ＝**存量红**，且这一族**会变颜色**：编排者 10-16 09:5x 亲跑 `go test ./internal/winsec/ -count=1 -v` 得 `RUN=110 PASS_TOP=61 FAIL_TOP=0 SKIP=0` rc=0，早前另一发同尺得 `RUN=110 PASS_TOP=59 FAIL_TOP=2 SKIP=0` rc=1，差在 `GOTMPDIR` 那一档（票 310/311 那一族换卷形状）。你的起手必自己跑一发并把**四数＋GOTMPDIR 写法＋卷**同行落盘；⛔ 让这两枚变绿（本票不裁它们），⛔ 把它们算成本票的红。
+
+## 写面（只许这三处，逐字）
+1) `.scratch/wisp/probes/322/v1/`（含 `logs/`）；2) `docs/evidence/s1/322-v1-acceptance.md`（短名、⛔ 长名⛔ 带 `§`）；3) 票 322 末尾**一条** bullet（只追加）。
+⛔ 产码、⛔ `scripts/**`、⛔ `tools/**`、⛔ 勾任何 AC 框。
+
+## 台面与禁区
+- 要"改前基线"一律 `git archive <rev> | tar -x -C <仓外目录>`（⛔ 拿共享工作树当改前那发、⛔ 仓内 worktree）；导出树必带六件套 `go.mod go.sum internal cmd tools scripts`，取出后**先数 `.go` 证非空**再信它的 0。
+- `GOTMPDIR` 用**原生反斜杠形**（`C:\...`）且先 `mkdir -p`；正斜杠形会让 windows 链接族假红（票 317/325 那一族，现量在 `docs/evidence/s1/317-gotmp-separator.md`＋`325-runtests-gotmp.md`）。
+- 跑 winsec 前置 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`；红句里出现 `walk`／`build failed`／`no tests to run`／`0xc0000135`／`RUN=0` ⇒ 台面故障、⛔ 计入判据。
+- `sh scripts/d22scan.sh` 若回 **rc=2 的 311 GUARD 射程拒绝**（`GOTMPDIR` 指向非 `%LOCALAPPDATA%` 卷）＝⛔ 当红，按提示换卷或 unset 再跑。
+- 禁区（零字节）：`docs/PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、三枚冻结件、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、`go.mod`/`go.sum`/`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动。⛔ 为变绿放宽任何断言、⛔ 删用例或加 `t.Skip`。
+- 并发：同时在飞的另三枚＝`325-v1`（`tools/d22scan`＋`scripts/**` 读数）、`313-v1`（config/panel 只读）、`220-r1`（**唯一写手**，动 `internal/agent/approval`／`internal/panel`／`cmd/wisp`）。⛔ 读它们的在飞件或工作树状态当凭据；⛔ `git add -A`。
+- Git：只 commit、⛔ push；`git add`／`git commit` 两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（编排者 10-16 09:5x 第三次踩这条、已自抓入盘）；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 读数纪律：引数必带"哪把尺＋射程＋量的还是算的"；"几枚"必带单位（文件／顶层用例／子测试／调用点）；`RUN=`（`^=== RUN`）与 `PASS_TOP=`（`^--- PASS` 只数顶层）⛔ 混用；报"0 命中"前先跑一枚已知存在的正控、并看 stderr。
+- 预算：≤5 件、每件 ≤260 行；没裁完的格子具名写"没裁完＋缺哪一发读数"，⛔ 含糊话糊过去。轮次约 150 上限 ⇒ **每落一枚文件就 commit**（commit-first）。
+交件自证三把尺：① 提交号＋`git show --stat HEAD` 路径清单；② 证据件绝对路径＋字节数；③ 你自己现跑的成对读数与突变红句逐字（含还原后绿的那发）。⛔ 只说"已完成"、⛔ 翻框。

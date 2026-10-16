@@ -1,0 +1,31 @@
+腿名：220-r2（落地腿·写）｜票：.scratch/wisp/issues/220-roster-blockedOnApproval-only-sees-L2-and-second-card-silently-drops.md
+★这一单不是"把票 220 做完"，是**只补最后一跳**：给面板泵供上 L1 那一支的生产数据。前面的格子已经由 `220-r1` 落过了（提交 `480b970d2`＝corr 与 taskID 双查＋同任务第二张卡接回；`internal/agent/approval/window_read.go:63`＝`func (g *Gate) LiveL1Windows()`；`internal/panel/pump.go:200`＝`PumpSources.L1Windows func() []L1WindowWait`，`:324-327` 已消费）。
+落点甲的批准在台账 **`A562` §1**（编排者具名批准），⛔ 你再要批准；§2 写的落面＝`cmd/wisp/panel_pump.go` 一枚**非导出** reader＋`run.go` 一行 ⇒ **零新 `panel.*` 方法名、零新导出 API、不触 C17**。
+
+## 起手（必做，⛔ 跳过）
+1. `git rev-parse HEAD`＋`date '+%F %T %z'` 落每件抬头；`git show --stat 480b970d2` 读回已落的那一半，⛔ 重写它。
+2. 现量票框尺：`grep -c '^[[:space:]]*- \[ \]' <票 220 路径>` 与 `...'- \[x\]'` ⇒ 应为 **5 未勾／0 已勾**（勾不勾归非实现者，⛔ 你翻）。
+3. 现量"没人填"那一格（编排者 10-13 量过一次＝`grep -c L1Windows cmd/wisp/run.go`＝0）：**你自己重跑**并逐枚写清射程（哪几枚 `cmd/wisp/*.go`、命中几枚）。这发是"改前基线"，⛔ 拿共享工作树里别人的在飞字节当基线。
+
+## 你要交的四件
+- (a) **接线**：`cmd/wisp/panel_pump.go` 加一枚**非导出** reader（把 `rt` 手里的 gate 的 `LiveL1Windows()` 折成 `panel.L1WindowWait` 列表），装配处 `run.go` 那一行把 `PumpSources.L1Windows` 指上它。两形必给读数：① 生产调用点尺（改前 0 枚 ⇄ 改后 ≥1 枚，且**沿到 pump 的读者**：`internal/panel/pump.go:324-327`）② 快照真色：种一枚 L1 等待的窗口 ⇒ 那一行 `blockedOnApproval` 为真。★⛔ `go build`／`go vet` 的 rc=0 当"接上了"（Go 不为未使用的方法报错），只认调用点枚数或整包颜色。
+- (b) **真腿用例**（写面＝`cmd/wisp` 里**一枚**新测试件）：走**装配那一形**（不是 fixture 直喂）。⚠ 票面写死的两条禁区：⛔ 不许把 `internal/panel/subagent_blocked_220_test.go:151-152` 那枚 fixture 读成生产可达；⛔ 不许顺手给渲染层改语义（corr＋taskID 双查已落地，那是 `220-r1` 的格子）。
+- (c) **牙**（首要攻击点＝判据自己）：去牙反控＝把 reader 恒回 `nil`／把装配那一行摘掉（**物理改字节**，⛔ `-overlay`），点名哪些用例必须红、红句连文案逐字落盘、还原复跑绿、记还原哈希。再加一发反形：reader 恒回"有一枚窗口"（坏方向＝假阻塞）⇒ 要看仪器是否也响；不响就具名写"这把尺对假阻塞⛔ 敏感"，⛔ 藏起来。
+- (d) **门禁五件**自己跑、各落 `rc=`：`go build ./...`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh --with-self-test`／格式化尺（`gofmt -l` 具名它比 `gofumpt` 窄；`gofumpt` ⛔ 在 PATH＝rc=127，但盘上有 `/d/work/base/gopath/bin/gofumpt.exe` ⇒ 按绝对路径跑那把更严的、⛔ 冒充）／`go vet ./cmd/wisp/`＋`./internal/panel/`。⚠ 具名两枚台面雷：d22scan 把 `GOTMPDIR` 指到非 `%LOCALAPPDATA%` 卷会回 **rc=2 的 311 GUARD 射程拒绝**（⛔ 当红）；`go test ./cmd/wisp` **整包＝票 314 死亡区**（174–212 s、假分母、`0xc0000135` 那形）⇒ 只跑靶向 `-run`，整包那一发归编排者。
+
+## 写面（只许这五处，逐字）
+1) `cmd/wisp/panel_pump.go`；2) `cmd/wisp/run.go`；3) `cmd/wisp/` 下**一枚**新测试件（名字带 `220`）；4) `.scratch/wisp/probes/220/r2/`；5) `docs/evidence/s1/220-wiring.md`（短名、⛔ 长名⛔ 带 `§`）＋票 220 末尾**一条** bullet（只追加）。
+⛔ 动 `internal/panel/**`（渲染与 `PumpSources` 结构都不动）、⛔ 动 `internal/agent/approval/**`（`LiveL1Windows` 已存在）、⛔ 动别的包。
+
+## 台面与禁区
+- 会动的钉要先查再动：`cmd/wisp` 那几枚名册钉（313 的**方法名册键钉＝313 枚**、`want-4` 两枚锚、`TestApprovalCardViewJSONKeysMatchFrontendTypes`）⇒ **零新导出方法名／零新 `panel.*` 名**就是为绕开它们；如果你发现必须加名才能接上 ⇒ **停手具名上报**，⛔ 自己动名册钉。
+- 要"改前基线"一律 `git archive <rev> | tar -x -C <仓外目录>`（⛔ 仓内 worktree）；六件套 `go.mod go.sum internal cmd tools scripts`；取出后先数 `.go` 证非空。
+- `GOTMPDIR` 用**原生反斜杠形**且先 `mkdir -p`（正斜杠形＝票 317/325 那族假红）；跑 go 前置 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`。
+- 红句里有 `walk`／`build failed`／`no tests to run`／`0xc0000135`／`RUN=0` ⇒ 台面故障、⛔ 计入判据。
+- 禁区（零字节）：SLO 阈值／golden／`internal/observe/thresholds.go`／`tools/d22scan/allowlist.txt`／三枚冻结件／`frontend/**`／`design/**`／`.github/**`／`ci.yml`／`go.mod`／`go.sum`／`.gitignore`；D1–D47／C1–C32／R1–R9／**D43 转移表** ⛔ 动（票 220 AC#4 就是把这条写死的：⛔ 把布尔改成态、⛔ 新造状态名）。⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`。
+- 并发：同时在飞＝`322-v1`／`325-v1`／`165-v1`／`216-a1` 四枚只读腿。★你是本波**唯一写手**、独占 `cmd/wisp` 编译面 ⇒ **本波没有别人跑 `go test ./cmd/wisp`**；你落笔期间它们会把工作树当"在飞态"，所以你的中间态不必自证干净，但**每落一枚文件就 commit**（commit-first）。
+- Git：只 commit、⛔ push；`git add`／`git commit` 两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（编排者 10-16 09:5x 第三次踩、已自抓入盘）；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 读数纪律：引数必带"哪把尺＋射程＋量的还是算的"；"几枚"必带单位（文件／顶层用例／子测试／调用点）；报"0 命中"前先看 stderr 并跑一枚已知存在的正控。
+- 预算：≤5 件、每件 ≤260 行；没做完的格子具名写"没做完＋缺哪一发读数"。轮次约 150 上限。
+交件自证三把尺：① 提交号＋`git show --stat HEAD` 路径清单（应只含上面五处）；② 证据件绝对路径＋字节数；③ 改前／改后**调用点枚数两发**＋去牙红句逐字＋还原后绿的那发。⛔ 只说"已完成"。

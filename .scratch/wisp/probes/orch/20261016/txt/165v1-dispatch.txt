@@ -1,0 +1,34 @@
+腿名：165-v1（非实现者验收腿·只读）｜票：.scratch/wisp/issues/165-plan-first-then-act-a-brake-the-voice-entry-needs.md
+实现者＝`165-r1`（`internal/tools/plan_present.go`＋`plan_present_165_test.go`＝提交 `4a49480d`）与 `165-r2`（装配接线，证据件 `docs/evidence/s1/165-wiring.md`、读数件 `.scratch/wisp/probes/165/r2/00..11`）。你⛔ 是他们任何一枚：D22 双角色 ⇒ 五枚 AC 框成不成立由你裁，翻框归编排者。票面那五格的**每一句自陈都当未验证**。
+
+## 起手（必做）
+1. `git rev-parse HEAD`＋`date '+%F %T %z'` 写进每件读数抬头；起树锚之后的 `git log --oneline <锚>..HEAD` 逐枚看**有没有别的腿在动 `internal/tools`**（本波只有一枚写腿 `216-r1`，面＝`internal/panel`，⛔ 动 tools）。
+2. 现量票框尺：`grep -c '^[[:space:]]*- \[ \]' <票 165 路径>` 与 `...'- \[x\]'` ⇒ 应为 **5 未勾／0 已勾**。
+3. 读 `git show --stat 4a49480d` ＋ 逐枚读 `internal/tools/plan_present.go`／`plan_present_165_test.go` ＋ `165-r2` 的接线那几枚件（自己 `git log --oneline --all --grep='165'` 取号，⛔ 用我这里的号当现量）。
+
+## 五格逐格要答的
+- **AC#1 未修码读数**：这一格答的是"今天只读地出一份方案能不能做到"。凭据＝**名册尺**（`plan.present` 在 D34 名册／`internal/tools` 注册表里存在与否）＋**未修码那发**（`git archive <r1 起手锚>` 的仓外树里跑）。⛔ 把"应该做不到"写成交件。
+- **AC#2 复用形状**：`165-r1` 报"零新增状态/通道/模式、`Declared=L2 → R1 → 现成 `Gate.PendingApproval`（D43 #17/#23/#24/#25）、Gate 仍 2 回调、`GrantSource` 仍 1 只读方法"。你要自己现跑这几把尺：`--name-only` 名册证 `internal/risk/**` 与状态机文件零动＋`grep -n 'type Gate interface'` 那段的回调枚数＋D43 转移表那四行的引用点。**这格的判据是"没新增状态"，⛔ 顺手把它读成"功能做全了"。**
+- **AC#3 批准只批这一批**：两发变异都要你**自己重放**（⛔ 只做"改前必红"）：① 批完方案后再来一发不在清单里的写 ⇒ 必须响；② 摘掉"批过的范围"那一味 ⇒ 是否存在一发越界从此打不红。`165-r1` 报了 M1/M2/M3 三发（M2 摘范围句 ⇒ 唯一红 `Test165ScopeClauseNamesTheBatch`；M3 L1 支不再问 ⇒ 唯一红 `Test165PlanApprovalRingsAgainForAnUnlistedWrite`）——你要么复现"唯一红"，要么具名报它哪一发不成立。**突变只在仓外导出树里物理改字节**（⛔ `-overlay`、⛔ 改共享工作树），每发记还原哈希。
+- **AC#4 面板不许代答**：★这一格按"能力类判据必问生产调用者"来裁。你要现跑：`plan.present` 的 **Decl 与参数面**有没有 `allow`/`approve`/`grant` 那三名（词面尺＋射程具名）；再问**接线**——`git grep -n "plan" -- cmd/wisp internal/panel` 类尺数生产调用点枚数，⛔ 拿 `go build` 的 rc=0 当"接上了"（Go 不为未使用的东西报错）。
+- **AC#5 契约轴零字节**：`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`internal/panel/**`、`internal/agent/approval/**`、`thresholds.go`、golden、`allowlist.txt`、`frontend/**`、`design/**` ⇒ 你要对 **`165-r1`＋`165-r2` 两腿的全部提交**跑逐枚 pathspec 越界尺（`git show --name-only` 作差），命中 0 才算成立；⚠ 同一区间里**别腿的提交**要逐枚具名归属（这波的 `216-r1`／`325-r1`／`322-r1b` 都在动别的包），⛔ 把别人的路径算成 165 的账。
+
+## 恒真三形（首要攻击点＝判据仪器自己）
+每格都问三句：未修码上响不响／**反形（换一种坏法）响不响**／一把尺两种形状是否都放行。若某一支夹具里**根本没造出坏世界** ⇒ 具名报"缺世界"＋说台件该怎么造，⛔ 假装测到了。
+
+## 写面（只许这三处，逐字）
+1) `.scratch/wisp/probes/165/v1/`（含 `logs/`）；2) `docs/evidence/s1/165-v1-acceptance.md`（短名、⛔ 长名⛔ 带 `§`）；3) 票 165 末尾**一条** bullet（只追加）。
+⛔ 产码、⛔ 勾任何 AC 框、⛔ 动 `docs/PLAN.md` 那行 `plan.present` 的冻结文字。
+
+## 台面与禁区
+- "改前基线"一律 `git archive <rev> | tar -x -C <仓外目录>`（⛔ 共享工作树、⛔ 仓内 worktree）；六件套 `go.mod go.sum internal cmd tools scripts`；取出后**先数 `.go` 证非空**再信它的 0。
+- `GOTMPDIR` 用**原生反斜杠形**（`C:\...`）且先 `mkdir -p`；正斜杠形会让 windows 链接族假红（票 317/325 那一族）。跑 go 前置 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`。
+- 红句里有 `walk`／`build failed`／`no tests to run`／`0xc0000135`／`RUN=0` ⇒ 台面故障、⛔ 计入判据。
+- ⛔ `go test ./cmd/wisp` 整包＝票 314 死亡区，本波那一档归编排者（`220-v1` 的 AC#5 也因写腿在飞而按住）⇒ 要 cmd/wisp 的数就用**靶向 `-run`** 并具名射程；⛔ `go mod tidy`／`go get`。
+- 禁区（零字节）：SLO 阈值／golden／`internal/observe/thresholds.go`／`tools/d22scan/allowlist.txt`／三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）／`frontend/**`／`design/**`／`.github/**`／`ci.yml`／`go.mod`／`go.sum`／`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动。⛔ 为变绿放宽断言、⛔ 删用例或加 `t.Skip`。
+- 并发：同时在飞＝`322-v1`（winsec 只读）／`325-v1`（scripts＋`tools/d22scan` 只读）／`220-v1`（panel 只读）／`216-r1`（**唯一写手**，面＝`internal/panel`）。⛔ 读它们的在飞件当凭据；全仓尺一律以你 `git archive` 取出的树为准。
+- Git：只 commit、⛔ push；两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（编排者 10-16 09:5x 第三次踩这条、已自抓入盘）；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 读数纪律：引数必带"哪把尺＋射程＋量的还是算的"；"几枚"必带单位（文件／顶层用例／子测试／调用点）；`RUN=`（`^=== RUN`）与 `PASS_TOP=`（`^--- PASS` 只数顶层）⛔ 混用；报"0 命中"前先看 stderr 并跑一枚已知存在的正控。
+- 预算：≤5 件、每件 ≤260 行；没裁完的格子具名写"没裁完＋缺哪一发读数"。轮次约 150 上限 ⇒ **每落一枚文件就 commit**。
+交件自证三把尺：① 提交号＋`git show --stat HEAD` 路径清单；② 证据件绝对路径＋字节数；③ 你自己重放的变异红句逐字＋还原哈希＋越界 pathspec 尺的命中数（应为 0，并带分母）。⛔ 只说"已完成"。

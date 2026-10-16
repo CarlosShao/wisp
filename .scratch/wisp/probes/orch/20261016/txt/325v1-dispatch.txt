@@ -1,0 +1,32 @@
+腿名：325-v1（非实现者验收腿·只读）｜票：.scratch/wisp/issues/325-runtests-sh-gotmp-tail-keeps-forward-slashes-so-d22scan-runs-on-a-mixed-shape-root.md
+实现者＝`325-r1`（五笔提交：`428ef21e` 改形／`73131d29` 读数＋仪器／`c7190b27` 证据件／`1e53de91` 票尾 bullet／`a916bf6f` 补档）。你⛔ 是它：D22 双角色 ⇒ 五枚 AC 框成不成立由你裁，翻框归编排者。
+证据件＝`docs/evidence/s1/325-runtests-gotmp.md`（179 行）；读数件根＝`.scratch/wisp/probes/325/r1/`。**全部当未验证**，你要自己现跑。
+
+## 起手（必做）
+1. `git rev-parse HEAD`（起树锚）＋`date '+%F %T %z'`，写进每件读数抬头。
+2. 现量票框尺：`grep -c '^[[:space:]]*- \[ \]' <票 325 路径>` 与 `...'- \[x\]'` ⇒ 应为 **5 未勾／0 已勾**。
+3. ★**票面与派单里那句"八包"是过期计数、编排者已更正**：`windows` 档现量＝**11 包**。尺＝`sed -n '329,336p' scripts/portable-tests.sh` 那段 scope 数组逐枚数（proc／secret／config／risk／ball／perm／plugin／`cmd/llmrecord`／session／projctx／audio）。票 317 与你票面 AC#3 的原文⛔ 改，读数一律按 **11 枚逐包四数** 写。
+
+## 五格逐格要答的
+- **AC#1 改形**：`tools/d22scan/runtests.sh` 的 GOTMP 尾接现在必须与 `scripts/**` 那三处**逐字同形**（反斜杠）。自己现跑形状尺：⛔ 用 `grep -rn` 的正则形数命中（正则吃一层反斜杠＝假 0，这是编排者自己踩过的假尺），用 `grep -F` 固定串＋一枚**已知存在的正控**同发落盘。
+- **AC#2 成对反控（这族的牙）**：在**仓外导出树**里把那一行物理退回混形（⛔ `-overlay`，这族尺运行时读盘），跑一次能让 `./internal/risk/` 那四枚用例红的构造；红句连文案逐字落盘＋还原复跑绿＋记还原哈希。**同时回答实现者具名报的那格**：他们说混形那一发的红是"仪器自红"还是"判据红"？若结论要落在"混形今天炸／正斜杠不炸"，必须给出两形同屏的发。
+- **AC#3 顺带交出票 317 AC#3 那一发**：跑 `bash scripts/portable-tests.sh --scope=windows`（导出树里跑），三样齐＝① `GOTMPDIR=` 行逐字原生形 ② **11 包逐包**四数（`RUN=`／`PASS_TOP=`／`FAIL_TOP=`／`SKIP=`，⛔ 只报总数）③ 红名册逐枚连文案。**若整档跑不完**（时间／与在飞写腿抢编译面）⇒ 具名写"跑到第几包、缺哪几包的四数"交回编排者，⛔ 把抽样写成整族、⛔ 降格判据。这一发是票 317 能不能 `-done` 的唯一门，别当附加题。
+- **AC#4 门禁**：`bash -n tools/d22scan/runtests.sh`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh --with-self-test`／`go build ./...` 逐枚自落 `rc=`。⚠ 两枚台面雷：d22scan 把 `GOTMPDIR` 指到非 `%LOCALAPPDATA%` 卷时回 **rc=2 的 311 GUARD 射程拒绝**＝⛔ 当红；本机 `gofumpt` ⛔ 在 PATH（rc=127）但盘上有＝`/d/work/base/gopath/bin/gofumpt.exe` ⇒ 按绝对路径跑那把更严的，⛔ 拿 `gofmt -l` 的 0 冒充它的 0。
+- **AC#5 账（那一格归编排者，你只需验它）**：票 317 面上那句"同形、今天未爆"由我重述；你要答的是**"这一处该不该立新票"这件事本身成不成立**，以及有没有**第四处之外的第五处**同形写法（自己现跑尺：全仓 `grep -rnF` 那几处 `GOTMPDIR` 赋值逐枚列，含 `scripts/**`／`tools/**`，写清每处"当值用"还是"只当展示用"——展示用那类（如 `wisp_311_ref_path`）有意为之、⛔ 算病）。
+
+## 写面（只许这三处，逐字）
+1) `.scratch/wisp/probes/325/v1/`（含 `logs/`）；2) `docs/evidence/s1/325-v1-acceptance.md`（短名、⛔ 长名⛔ 带 `§`）；3) 票 325 末尾**一条** bullet（只追加）。
+⛔ 改任何产码或脚本（`tools/d22scan/runtests.sh` 一字都不许动——突变只在导出树里做）、⛔ 勾任何 AC 框、⛔ 动票 317 原文。
+
+## 台面与禁区
+- 要"改前基线"一律 `git archive <rev> | tar -x -C <仓外目录>`（⛔ 共享工作树当改前那发、⛔ 仓内 worktree）；六件套 `go.mod go.sum internal cmd tools scripts`；取出后**先数 `.go` 证非空**。每棵树 `mktemp -d` 独立。
+- `GOTMPDIR` 用原生反斜杠形且先 `mkdir -p`（⛔ 不存在的目录＝creating work dir 红长得像"没复现"）。跑 go 前置 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`。
+- 红句里有 `walk`／`build failed`／`no tests to run`／`0xc0000135`／`RUN=0` ⇒ 台面故障、⛔ 计入判据。
+- ⛔ `go test ./cmd/wisp` 整包＝票 314 死亡区，且本波那一档归写腿 `220-r1`；⛔ `go mod tidy`／`go get`。
+- 禁区（零字节）：`docs/PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、三枚冻结件、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、`go.mod`/`go.sum`/`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动。⛔ 为变绿放宽断言、⛔ 删用例或加 `t.Skip`。
+- 并发：同时另三枚＝`322-v1`（winsec 只读）、`313-v1`（config/panel 只读）、`220-r1`（**唯一写手**，动 `internal/agent/approval`／`internal/panel`／`cmd/wisp`）。⛔ 读它们的在飞件当凭据；本波写手在动那三包 ⇒ 你做全仓形状尺时**以 `git archive` 取出的树为准**，⛔ 把工作树里别人的在飞字节算成"第五处同形"。
+- Git：只 commit、⛔ push；两处逐枚显式 pathspec；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删。
+- shell 规矩：进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`（编排者 10-16 09:5x 第三次踩、已自抓入盘）；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 读数纪律：引数必带"哪把尺＋射程＋量的还是算的"；"几枚"必带单位（文件／脚本／顶层用例／子测试／调用点）；`RUN=` 与 `PASS_TOP=` ⛔ 混用；报"0 命中"前先看 stderr 并跑正控。
+- 预算：≤5 件、每件 ≤260 行；没裁完的格子具名写"没裁完＋缺哪一发读数"。轮次约 150 上限 ⇒ **每落一枚文件就 commit**。
+交件自证三把尺：① 提交号＋`git show --stat HEAD` 路径清单；② 证据件绝对路径＋字节数；③ 你自己现跑的去牙红句逐字＋还原后绿的那发＋11 包逐包四数（或具名的缺包清单）。⛔ 只说"已完成"。
