@@ -1,0 +1,22 @@
+165-v2 票 165 末尾一条 bullet（只追加，numstat 1/0；★票框尺＝5 勾／1 未勾＝本腿一枚没翻，AC#6 仍空）
+
+判语＝**AC#6 成立、带三枚具名缺口**（G1 名字整对可换：M-a2 常量与夹具一起改 plan.presentX ⇒ 绿 rc=0，
+"镜像 ⇄ 真名册"零枚用例对接｜G2 镜像 Resident 是装饰：M-b true→false ⇒ 绿 rc=0，机理 inject.go:44-49＋bm25Select 172-224
+单候选目录 BM25 必中 ⇒ 按派单口径写"缺世界"；对照 M-b2 档位 L2→L1 唯一红 :157 ⇒ 那两枚字段要收窄成"一枚装饰一枚有牙"｜
+G3 :131 那句 THE JUDGMENT 标在对牙不敏感的门上：M-c-A 常量计数绿⛔ 携带信息、M-c-B 常量计数＋摘牙红 :143 ⇒
+必答题的答＝⛔ 算恒真、算一枚冗余门＋注释误导｜G4 记票面自设射程：⛔ 量"生产里今天会不会有人按"，AC#6 已⛔ 丙形当仪器）。
+我自己重跑：正向 rc=0（--- PASS … 165r3 (0.07s)）、去牙 sed -i '12d' rc=1 红 :138 读数 over 0 tool_call rows、
+整包 -v RUN=110／PASS_TOP=86／FAIL_TOP=0／SKIP=0 证常驻；九枚定向突变逐枚当场还原，两枚字节 sha256 逐位回基线
+（.sse 7d26fa889b59fc3a…／.go 00c32049994c441c…＝我现量的基线同串）。
+断口②③只答复核（⛔ 裁归属）：② 属实（:123＝rt.bridge.Tools()；requestBodies|LastRequest|sent["tools"]|adaptertest 命中 0；
+ask165r2 :67-69 走 bridge.Execute 直接喂名）；③ 一半⛔ 属实（严格"产码 0 枚写入"被 internal/llm/probe.go:91 顶穿，
+"agent／装配支 0 枚"属实＝git grep -n ToolChoice 44f51fc8 -- internal/agent cmd/wisp 0 行）。
+派单第 9 行独立裁定＝165r3-dispatch.txt:9 已带 plan.present 限定词、与 AC#6 原文同形 ⇒ 就那句⛔ 需更正；
+r3 补的读数我复跑属实（4366c1ca1：withJournal(store) 8 处／5 件、golden 面只有 echo 18／sleep 7、plan.present 0 件）
+⇒ 下一波该派的形＝"那两行走得过（8 处），但零枚用例带名册里的真工具名打到它"。
+门禁四数只在**工作树**：d22scan 0／长度门 0／go vet ./internal/agent 0／gofumpt -l 与 -d 0 与 0；
+具名⛔ 计入判据的台面坑＝d22scan 指七件套树 exit 2（ban #8 design/ 射程 0 枚）。
+与实现者台面的具名差＝我同尺现量 c9ba5254＝745、f7d6dbc98＝747，他报 744／746 ⇒ 他分母口径各少 1 枚、⛔ 改变一发颜色。
+只能补一件事＝G1 的"镜像 ⇄ 真名册"对接钉（cmd/wisp/**，本票写面外）。
+⛔ 改 Status／票名／-done、⛔ 动台账与 HANDOVER、⛔ push；git status --porcelain -- internal cmd＝0 行（编译面零字节）。
+正文源＝.scratch/wisp/probes/165/v2/ticket-bullet-165v2.txt（本件同批落盘）。

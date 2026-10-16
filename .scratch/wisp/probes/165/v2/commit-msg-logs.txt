@@ -1,0 +1,19 @@
+165-v2 裁决腿台件落盘（突变器＋原始逐发日志 20 枚，⛔ 读数件的替代品）
+
+起手锚＝具名提交 44f51fc8；台面＝仓外导出树 /d/tmp/165v2/t1（git archive 44f51fc8 八件套
+go.mod go.sum internal cmd tools scripts frontend models ＋ build/*.dll ＋
+third_party/sherpa-onnx/*.dll ＋ frontend/dist；.go＝747，与同射程跟踪件逐枚 diff＝0 行）。
+GOTMPDIR＝D:\tmp\165v2\gotmp（D 卷）。所有 go test 一律 -count=1 -timeout 30m。
+
+件：txt/mut.sh＝突变器（打进一发→跑 scoped 那一发→落日志→当场还原→报两枚 sha256）；
+logs/f01-forward＝正向；f02-defang-line12＝去牙那一发（主凭据）；f03-fullpkg-anchor／
+f04-fullpkg-v＝整包（证常驻：RUN=110 PASS_TOP=86 FAIL_TOP=0 SKIP=0）；
+logs/mut-*＝M-a 假名／M-a2 两头同改名／M-a3 只改夹具名／M-b Resident 改 false／
+M-b2 档位 L2→L1／M-c-A 常量计数／M-c-B 常量计数＋摘牙／M-e 不被注入／M-f 调用号；
+logs/g01..g04b＝门禁四数（工作树）；tracked-go／tree-go＝七百四十七枚名册两列。
+
+被裁两枚字节基线（我自己 sha256sum 现量，每发之后都复量）：
+.sse 7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be（28 行）
+.go  00c32049994c441c8927066bc4d4099c1b2977fc20ee9e602bb98f3670d37b75（221 行）
+
+只 commit、⛔ push；写面只 .scratch/wisp/probes/165/v2/**；⛔ 动 internal/**、cmd/** 任何跟踪字节。
