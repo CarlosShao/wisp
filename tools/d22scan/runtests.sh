@@ -89,7 +89,30 @@ fi
 # keep the loud-degradation shape; revocation phrase "310 改 fail-closed").
 if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ]; then
     if [ -n "${LOCALAPPDATA:-}" ]; then
-        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}/d22scan-$(date +%Y%m%d-%H%M%S)-$$"
+        # TICKET 325 AC#1: the separator that joins the entry name onto this root is a
+        # BACKSLASH (\\d22scan-), not a forward slash, and that is NOT a style choice.
+        # Whatever this line exports becomes GOTMPDIR for every test binary this runner
+        # starts, and Go keeps the spelling verbatim: t.TempDir() then hands a case
+        # "<root>\d22scan-<stamp>-<pid>\TestX<rand>\001", and the internal/risk
+        # sync-ancestor family passes that string straight to `cmd /c mklink /J <link>
+        # <target>`. mklink reads a forward slash anywhere inside the argument as a
+        # SWITCH, so a mixed root makes those cases red on code that is fine - the ruler
+        # malformed its own path. Measured on 2026-10-16 on a git-archive export of the
+        # previous mixed shape (base backslash, tail forward slash), four top-level reds
+        # and nothing else moving: syncdirs_ancestor_reparse_ticket105_windows_test.go:59
+        # and :116 with `mklink ... failed: exit status 1: Parameter format not correct
+        # - "d22scan-..."`, plus syncdirs_ancestor_actable_leg_116_test.go:182 and :286
+        # with the separator mismatch printed inside their own precondition text. A pure
+        # forward-slash root fails the same four with mklink's other wording, `Invalid
+        # switch - "tmp".` (ticket 317's measurement, reproduced by the orchestrator for
+        # this ticket). The three entries ticket 317 fixed - scripts/portable-tests.sh,
+        # scripts/winsec-tests.sh, scripts/wisp-cli-tests.sh - all join with \\; this is
+        # the fourth and last one that really starts tests. Do not "simplify" it back to
+        # /: scripts/d22scan.sh only scopes tools/d22scan, so no gate that runs through
+        # THIS entry reaches ./internal/risk/ today (ticket 325 AC#2 books that as an
+        # invisible-live trap), and the day a scope does reach it, the mixed shape is a
+        # false red nobody can explain.
+        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}\\d22scan-$(date +%Y%m%d-%H%M%S)-$$"
         if mkdir -p "$gotmp_run" 2>/dev/null; then
             export GOTMPDIR="$gotmp_run"
             echo "runtests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
