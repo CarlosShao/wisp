@@ -1,0 +1,27 @@
+### 逐包四数 @ 2026-10-16 12:22:51 +0800  尺＝^=== RUN 含子测试 ⇄ ^--- PASS/FAIL/SKIP 只数顶层；-timeout 30m 显式带上
+--- A) WITH the 326-v1 instrument (state after commit c2e1c07a) ---
+rc_memory_with=0
+  internal/memory : RUN=80 PASS_TOP=43 FAIL_TOP=0 SKIP=2
+ok  	github.com/CarlosShao/wisp/internal/memory	17.259s
+rc_session_with=0
+  internal/session: RUN=37 PASS_TOP=20 FAIL_TOP=0 SKIP=0
+ok  	github.com/CarlosShao/wisp/internal/session	1.933s
+--- B) WITHOUT it (delivered bytes as committed by 326-r1) ---
+0
+rc_memory_wo=0
+  internal/memory : RUN=78 PASS_TOP=41 FAIL_TOP=0 SKIP=2
+ok  	github.com/CarlosShao/wisp/internal/memory	17.401s
+rc_session_wo=0
+  internal/session: RUN=37 PASS_TOP=20 FAIL_TOP=0 SKIP=0
+ok  	github.com/CarlosShao/wisp/internal/session	2.269s
+file back: 1
+--- the 2 skips named (尺＝^--- SKIP 行) ---
+--- SKIP: TestSubprocessCrashWriter (0.00s)
+--- SKIP: TestAppendSessionTurnCrashChild (0.00s)
+--- SKIP: TestSubprocessCrashWriter (0.00s)
+--- SKIP: TestAppendSessionTurnCrashChild (0.00s)
+--- new top-level names this leg added ---
+--- PASS: TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction
+--- PASS: TestAppendSessionTurn326v1TriggerBlocksNothingElse
+--- go test list of 326-owned cases (proves they are in the package roster) ---
+TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction TestAppendSessionTurn326v1TriggerBlocksNothingElse ok  	github.com/CarlosShao/wisp/internal/memory	0.137s 

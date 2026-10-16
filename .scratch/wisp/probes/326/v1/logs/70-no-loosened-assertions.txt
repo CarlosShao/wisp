@@ -1,0 +1,22 @@
+### 必答题尺：有没有把任何既有断言改松 @ 2026-10-16 12:28:12 +0800
+--- 尺1: 实现笔 86298e24 的删除行数（逐件）---
+28	0	internal/memory/dao_session.go
+181	0	internal/memory/dao_session_append_326_test.go
+120	0	internal/memory/dao_session_test.go
+60	0	internal/session/manage_test.go
+--- 尺2: 该笔 diff 里新增的 t.Skip / 放宽词（^+.*t.Skip）---
+2
+rc=0
+  +		t.Skip("crash child for TestAppendSessionTurnCrashAtomicAcrossKill")
+  +		t.Skip("parent role; the child is TestAppendSessionTurnCrashChild")
+--- 尺3: 该笔 diff 里被删除的断言行（^-.*(Errorf|Fatalf|Assert)）---
+0
+rc=1
+--- 尺4: 三枚冻结件与禁区在 86298e24^..HEAD 全程的字节差 ---
+rc=0  (空＝零字节差)
+--- 尺5: 本腿写面逐笔（只应含授权四面）---
+c2e1c07ab 326-v1 常驻判据件：internal/memory/dao_session_326v1_test.go（裁决腿新加·写面4）
+
+internal/memory/dao_session_326v1_test.go
+--- 尺6: 86298e24..HEAD 两目录内的名册差（应只有本腿那一枚新件）---
+125	0	internal/memory/dao_session_326v1_test.go

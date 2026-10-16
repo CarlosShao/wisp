@@ -1,0 +1,31 @@
+### MU-D real @ 2026-10-16 12:19:36 +0800
+--- restore first ---
+restored sha256=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 cmp_pristine=MATCH
+--- apply mode D ---
+mode=D sha_before=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 sha_after=21dd5d710b6b2093d8c61487145f6947d377b472048e9a95a2ec01f2447738f6 bytes=12175
+re-read-from-disk sha256=21dd5d710b6b2093d8c61487145f6947d377b472048e9a95a2ec01f2447738f6 equal=True
+--- gate region (lines 296-306) ---
+		}
+		// The touch half of "每一轮都算动过" (ticket 326). A conversation row that
+		// is not in the table is not this call's business to police — storage
+		// stores rows, the lifecycle policy lives in internal/session — so the
+		// statement's error is what propagates, nothing else.
+		if os.Getenv("WISP_326V1_EXIT_MID_TX") == "1" {
+			// 326-v1 MU-D: die between the two statements of the SAME transaction.
+			os.Exit(7)
+		}
+		_, err = tx.ExecContext(ctx, `UPDATE session SET updated_at=? WHERE id=?`, t.CreatedAt, t.SessionID)
+		return err
+--- UPDATE line still in the tx? ---
+305:		_, err = tx.ExecContext(ctx, `UPDATE session SET updated_at=? WHERE id=?`, t.CreatedAt, t.SessionID)
+--- build ---
+rc_build=0
+=== control: env var UNSET (same binary, must behave as delivered) ===
+ok  	github.com/CarlosShao/wisp/internal/memory	2.043s
+=== probe: WISP_326V1_EXIT_MID_TX=1 (child dies BETWEEN the two statements inside the tx) ===
+=== RUN   TestAppendSessionTurnCrashAtomicAcrossKill
+    dao_session_append_326_test.go:86: child announced 0 commits within 60s, want >= 2 (台件故障，不是判据)
+--- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (60.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	60.107s
+FAIL

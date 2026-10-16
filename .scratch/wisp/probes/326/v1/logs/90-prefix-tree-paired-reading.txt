@@ -1,0 +1,55 @@
+### 真未修树那一发（git archive 86298e24^ ＋交付的三枚测试件）@ 2026-10-16 12:29:05 +0800
+--- 建树（只建一次；已建则跳过）---
+prefix .go 枚数=742
+38bff760eabb5bf9beb46eb55e5590675a3a33c8b5e6a231cf33442e9a642506 */d/tmp/w326v1/prefix/internal/memory/dao_session.go
+--- 该 dao_session.go 与 fd01e796 的同名件是否逐字节相同（实现方未修树用的那枚锚）---
+38bff760eabb5bf9beb46eb55e5590675a3a33c8b5e6a231cf33442e9a642506 *-
+cmp_prefix_vs_fd01e796_rc=0
+--- 搬进交付的三枚测试件（⛔ 动产码：只是把已提交的判据件放进未修树）---
+rc_build=0
+=== 四枚用例打在未修码上（票面：这一发必红）===
+    dao_session_append_326_test.go:86: half state after kill at 2 commits: session_turn has 5 rows (maxSeq 5, newest turn stamp 1777636804) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3604s lag or a torn seq)
+    dao_session_append_326_test.go:86: half state after kill at 4 commits: session_turn has 4 rows (maxSeq 4, newest turn stamp 1777636803) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3603s lag or a torn seq)
+    dao_session_append_326_test.go:86: half state after kill at 9 commits: session_turn has 16 rows (maxSeq 16, newest turn stamp 1777636815) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3615s lag or a torn seq)
+    dao_session_append_326_test.go:86: half state after kill at 20 commits: session_turn has 21 rows (maxSeq 21, newest turn stamp 1777636820) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3620s lag or a torn seq)
+    dao_session_append_326_test.go:86: half state after kill at 45 commits: session_turn has 50 rows (maxSeq 50, newest turn stamp 1777636849) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3649s lag or a torn seq)
+    dao_session_append_326_test.go:89: half state after kill at 11 commits: session_turn has 13 rows (maxSeq 13, newest turn stamp 1777636812) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3612s lag or a torn seq)
+    dao_session_append_326_test.go:89: half state after kill at 6 commits: session_turn has 14 rows (maxSeq 14, newest turn stamp 1777636813) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3613s lag or a torn seq)
+    dao_session_append_326_test.go:89: half state after kill at 12 commits: session_turn has 16 rows (maxSeq 16, newest turn stamp 1777636815) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3615s lag or a torn seq)
+--- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (1.34s)
+    dao_session_test.go:114: 326 AC#1 same-row evidence: sess-a.updated_at 1777593660 -> 1777593660 (delta=0) for turn.created_at=1777593780 | list = [sess-b sess-a]
+    dao_session_test.go:118: appending a turn did not reach session.updated_at: sess-a.updated_at = 1777593660, want the appended turn's stamp 1777593780 (before=1777593660, delta=0)
+    dao_session_test.go:122: continuing a chat does not surface it: list = [sess-b sess-a], want sess-a first after one more turn in it
+--- FAIL: TestAppendSessionTurnSurfacesTheConversation (0.08s)
+    dao_session_test.go:154: 326 AC#1 clock family: turn.created_at = 1792124954, sess.updated_at 1775001600 -> 1775001600 (delta=0)
+    dao_session_test.go:157: refresh used a different clock than the turn it wrote: updated_at = 1775001600, want turn.created_at 1792124954
+    dao_session_test.go:161: updated_at did not move forward: 1775001600 -> 1775001600 (appending is a touch)
+--- FAIL: TestAppendSessionTurnRefreshUsesStoredClockFamily (0.08s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	1.555s
+FAIL
+    manage_test.go:214: 326 AC#1 outlet reading: sess_e3311e847dfd60297fda7b6c32de1bfe.updated_at 1777593660 -> 1777593660 (delta=0) for turn.created_at=1777593780 | list = [sess_0a8435cd9b9403cc24b1db99d8b98448 sess_e3311e847dfd60297fda7b6c32de1bfe]
+    manage_test.go:218: continuing a conversation does not surface it: list = [sess_0a8435cd9b9403cc24b1db99d8b98448 sess_e3311e847dfd60297fda7b6c32de1bfe], want [sess_e3311e847dfd60297fda7b6c32de1bfe sess_0a8435cd9b9403cc24b1db99d8b98448] after one more turn in sess_e3311e847dfd60297fda7b6c32de1bfe
+    manage_test.go:222: AppendTurn wrote the child row only: sess_e3311e847dfd60297fda7b6c32de1bfe.updated_at stayed 1777593660, want it past 1777593660
+    manage_test.go:226: the touch and the turn disagree on the clock: updated_at = 1777593660, want turn.created_at 1777593780
+--- FAIL: TestSessionAppendTurnMovesItBackToTheFront (0.23s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	0.286s
+FAIL
+=== 逐包四数（应与实现方未修码那一发同数）===
+rc=1
+internal/memory : RUN=78 PASS_TOP=38 FAIL_TOP=3 SKIP=2
+  红名: --- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (1.48s)
+  红名: --- FAIL: TestAppendSessionTurnSurfacesTheConversation (0.09s)
+  红名: --- FAIL: TestAppendSessionTurnRefreshUsesStoredClockFamily (0.10s)
+rc=1
+internal/session: RUN=37 PASS_TOP=19 FAIL_TOP=1 SKIP=0
+  红名: --- FAIL: TestSessionAppendTurnMovesItBackToTheFront (0.08s)
+=== 本腿新增的两枚确定性仪器打在未修码上（预期红）===
+    dao_session_326v1_test.go:63: AppendSessionTurn succeeded while the session touch was forced to fail — the refresh error is being swallowed (ticket 326 landing criterion ③)
+--- FAIL: TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction (0.09s)
+    dao_session_326v1_test.go:110: premise broken: the trigger did not make the touch fail, so the determinism case above proves nothing
+--- FAIL: TestAppendSessionTurn326v1TriggerBlocksNothingElse (0.08s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	0.213s
+FAIL

@@ -1,0 +1,47 @@
+### MU-A 与 86298e24^ 的函数体形状是否等价 @ 2026-10-16 12:28:37 +0800
+mode=A sha_before=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 sha_after=ee48c311d1925a2b7188203239a051cba968668884804e9f8e1b731ab3a9dd95 bytes=11923
+re-read-from-disk sha256=ee48c311d1925a2b7188203239a051cba968668884804e9f8e1b731ab3a9dd95 equal=True
+--- diff 未修码 ⇄ 我的去牙突变（差异应只有注释与本票新增文字）---
++//
++// Appending a turn IS a touch of the conversation, so the same transaction
++// refreshes session.updated_at to the stamp of the turn it just wrote (ticket 326
++// AC#1): without it, "list newest-first" sorts by the last time the user renamed,
++// archived or forked the conversation and never by the last thing they said, so a
++// live chat cannot rise to the top of the list.
++//
++// Two constraints shape the how:
++//   - ONE transaction. The INSERT and the UPDATE share s.write, so a kill between
++//     them cannot leave a turn whose conversation still carries an older
++//     updated_at — the HALF-STATE ticket 326 AC#3 kills a subprocess to prove
++//     unreachable.
++//   - ONE clock. The value written is t.CreatedAt, already normalized by orNow
++//     (== observe.NowWallUTC().Unix() when the caller passed none), which is the
++//     family the row itself was stamped with; no second clock is read inside the
++//     transaction (D32/D38: never derive a timeout or a stamp from wall-clock
++//     differences).
++//
++// A failing refresh returns an error and rolls the whole transaction back: this
++// never degrades silently into "child row only".
++		if err != nil {
++			return err
++		}
++		// The touch half of "每一轮都算动过" (ticket 326). A conversation row that
++		// is not in the table is not this call's business to police — storage
++		// stores rows, the lifecycle policy lives in internal/session — so the
++		// statement's error is what propagates, nothing else.
+--- 该 diff 里有没有非注释的增删行（^+ 且不是注释/空行）---
+  +++ internal/memory/dao_session.go	2026-10-16 12:28:37.852815300 +0800
+  +		if err != nil {
+  +			return err
+  +		}
+rc=0  (1＝零枚：去牙发与未修码的可执行形状相同)
+--- 函数体逐字节对照：两边 AppendSessionTurn 的语句序列 ---
+/d/tmp/f_prefix.txt /d/tmp/f_muA.txt differ: byte 707, line 21
+cmp_function_body_rc=1  (0＝剥掉注释后函数体逐字节相同)
+restored sha256=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 cmp_pristine=MATCH
+--- 工作树 go.mod 仍脏（存量，归属不明，⛔ 本腿碰）---
+-rw-r--r-- 17 swq 197609 996 Oct 10 22:28 go.mod
+warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next time Git touches it
+ go.mod | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+2026-10-16 12:28:39 +0800

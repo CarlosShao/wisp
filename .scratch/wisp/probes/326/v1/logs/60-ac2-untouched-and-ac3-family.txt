@@ -1,0 +1,26 @@
+### AC#2 未顺手治＋AC#3 迁移族与兄弟台件 @ 2026-10-16 12:27:31 +0800  HEAD=3e4ca0e3
+--- AC#2 尺1: diff 对那两行 ORDER BY (射程＝86298e24 一笔，四件) ---
+rc=1  (1＝零命中；同尺正控见 00 读数件第三节)
+--- AC#2 尺2: id 形状/铸法在本笔 diff 里被动过吗 ---
++// updated_at and the ORDER BY falls through to "id DESC", where id is random hex
++// uses it: same-second rows tie and fall through to "id DESC", which ticket 326
+rc=0  (1＝零命中)
+--- AC#2 尺2 正控: 这两把词在库里能命中 ---
+internal/session/session.go:96:	if _, err := rand.Read(buf); err != nil {
+--- AC#2 尺3: tie-break 两行今天的字节 ---
+	q += ` ORDER BY updated_at DESC, id DESC`
+	sqlText += ` ORDER BY updated_at DESC, id DESC`
+--- AC#3 尺1: 迁移那族 diff (applyV3|ddlV3|migrationChain|SchemaVersionTarget) ---
+0
+rc=1
+--- AC#3 尺2: 兄弟台件同发复跑（迁移崩溃原子＋task_log 真杀＋本票真杀）---
+--- SKIP: TestSubprocessCrashWriter (0.00s)
+--- PASS: TestCrashRecoveryKillMidWrite (0.19s)
+--- PASS: TestAppendSessionTurnCrashAtomicAcrossKill (1.57s)
+--- PASS: TestSessionMigrationCrashAtomicAndReplay (0.17s)
+ok  	github.com/CarlosShao/wisp/internal/memory	1.983s
+--- AC#5 附尺: task_log 的生产写入点（证明我⛔ 把'聊天没落库'说成绝对）---
+HEAD:cmd/wisp/run.go:1193:		if err := rt.store.StartTaskLog(c, tl); err != nil {
+HEAD:internal/agent/journal.go:19:	StartTaskLog(ctx context.Context, tl memory.TaskLog) error
+HEAD:internal/agent/journal.go:129:	return j.StartTaskLog(ctx, memory.TaskLog{
+rc=0

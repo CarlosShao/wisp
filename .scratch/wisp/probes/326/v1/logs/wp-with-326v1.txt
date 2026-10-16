@@ -1,0 +1,654 @@
+=== RUN   TestAC2ReclaimWalkNeverDescendsIntoAJunction
+time=2026-10-16T12:22:17.489+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAC2ReclaimWalkNeverDescendsIntoAJunction4189585961\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:17.503+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:17Z duration_ms=11
+time=2026-10-16T12:22:17.512+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAC2ReclaimWalkNeverDescendsIntoAJunction4189585961\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:17.522+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:17Z duration_ms=9
+time=2026-10-16T12:22:17.533+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAC2ReclaimWalkNeverDescendsIntoAJunction4189585961\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:17.541+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:17Z duration_ms=7
+time=2026-10-16T12:22:17.548+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:17.552+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    artifacts_junction_tripwire_windows_test.go:40: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAC2ReclaimWalkNeverDescendsIntoAJunction4189585961\001\data\artifacts\junklink <<===>> C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAC2ReclaimWalkNeverDescendsIntoAJunction4189585961\001\data\someone-elses-tree
+    artifacts_junction_tripwire_windows_test.go:60: walk over the junction entry reported [C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAC2ReclaimWalkNeverDescendsIntoAJunction4189585961\001\data\artifacts\junklink]
+--- PASS: TestAC2ReclaimWalkNeverDescendsIntoAJunction (0.28s)
+=== RUN   TestArtifactsAPITakesNoCallerControlledDestinationPath
+    artifacts_path_invariant_test.go:270: audited 3 filesystem-mutating call(s), all rooted at s.artifactsDir
+    artifacts_path_invariant_test.go:298: audited 3 listArtifactsDir call site(s), all fed s.artifactsDir
+--- PASS: TestArtifactsAPITakesNoCallerControlledDestinationPath (0.02s)
+=== RUN   TestDeleteArtifactRejectsTheFourHostileShapes
+=== RUN   TestDeleteArtifactRejectsTheFourHostileShapes/separator
+=== RUN   TestDeleteArtifactRejectsTheFourHostileShapes/separator_backslash_literal
+=== RUN   TestDeleteArtifactRejectsTheFourHostileShapes/dotdot
+=== RUN   TestDeleteArtifactRejectsTheFourHostileShapes/dotdot_backslash_literal
+=== RUN   TestDeleteArtifactRejectsTheFourHostileShapes/drive_letter
+=== RUN   TestDeleteArtifactRejectsTheFourHostileShapes/unc
+=== RUN   TestDeleteArtifactRejectsTheFourHostileShapes/dotdot/bare_and_empty
+--- PASS: TestDeleteArtifactRejectsTheFourHostileShapes (0.11s)
+    --- PASS: TestDeleteArtifactRejectsTheFourHostileShapes/separator (0.00s)
+    --- PASS: TestDeleteArtifactRejectsTheFourHostileShapes/separator_backslash_literal (0.00s)
+    --- PASS: TestDeleteArtifactRejectsTheFourHostileShapes/dotdot (0.00s)
+    --- PASS: TestDeleteArtifactRejectsTheFourHostileShapes/dotdot_backslash_literal (0.00s)
+    --- PASS: TestDeleteArtifactRejectsTheFourHostileShapes/drive_letter (0.00s)
+    --- PASS: TestDeleteArtifactRejectsTheFourHostileShapes/unc (0.00s)
+    --- PASS: TestDeleteArtifactRejectsTheFourHostileShapes/dotdot/bare_and_empty (0.00s)
+=== RUN   TestDeletePrivacyItemRejectsTheFourHostileShapes
+=== RUN   TestDeletePrivacyItemRejectsTheFourHostileShapes/separator
+=== RUN   TestDeletePrivacyItemRejectsTheFourHostileShapes/separator_backslash_literal
+=== RUN   TestDeletePrivacyItemRejectsTheFourHostileShapes/dotdot
+=== RUN   TestDeletePrivacyItemRejectsTheFourHostileShapes/dotdot_backslash_literal
+=== RUN   TestDeletePrivacyItemRejectsTheFourHostileShapes/drive_letter
+=== RUN   TestDeletePrivacyItemRejectsTheFourHostileShapes/unc
+--- PASS: TestDeletePrivacyItemRejectsTheFourHostileShapes (0.10s)
+    --- PASS: TestDeletePrivacyItemRejectsTheFourHostileShapes/separator (0.00s)
+    --- PASS: TestDeletePrivacyItemRejectsTheFourHostileShapes/separator_backslash_literal (0.00s)
+    --- PASS: TestDeletePrivacyItemRejectsTheFourHostileShapes/dotdot (0.00s)
+    --- PASS: TestDeletePrivacyItemRejectsTheFourHostileShapes/dotdot_backslash_literal (0.00s)
+    --- PASS: TestDeletePrivacyItemRejectsTheFourHostileShapes/drive_letter (0.00s)
+    --- PASS: TestDeletePrivacyItemRejectsTheFourHostileShapes/unc (0.00s)
+=== RUN   TestArtifactsContainmentByDirectoryListing
+--- PASS: TestArtifactsContainmentByDirectoryListing (0.12s)
+=== RUN   TestArtifactsLiteralBackslashKeepsItsAsymmetry
+    artifacts_path_invariant_test.go:637: GOOS=windows separator='\\': literal-backslash names living as ONE flat file name in the artifacts dir: []
+--- PASS: TestArtifactsLiteralBackslashKeepsItsAsymmetry (0.10s)
+=== RUN   TestStraySubdirectoryCannotHideBytesFromTheQuota
+--- PASS: TestStraySubdirectoryCannotHideBytesFromTheQuota (0.10s)
+=== RUN   TestStraySubdirectorySharesTheQuotasLRUQueue
+time=2026-10-16T12:22:18.287+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestStraySubdirectorySharesTheQuotasLRUQueue765714041\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.299+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=12
+time=2026-10-16T12:22:18.310+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestStraySubdirectorySharesTheQuotasLRUQueue765714041\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.317+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=6
+time=2026-10-16T12:22:18.325+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestStraySubdirectorySharesTheQuotasLRUQueue765714041\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.334+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.340+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.346+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:22:18.353+08:00 level=INFO msg="artifacts LRU cleanup" component=memory files_removed=1 bytes_freed=500 quota_bytes=150 stray_entries=1
+--- PASS: TestStraySubdirectorySharesTheQuotasLRUQueue (0.10s)
+=== RUN   TestPurgeArtifactsReclaimsStraySubdirectory
+--- PASS: TestPurgeArtifactsReclaimsStraySubdirectory (0.13s)
+=== RUN   TestStrayRemovalDoesNotFollowLinks
+time=2026-10-16T12:22:18.518+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestStrayRemovalDoesNotFollowLinks2177944907\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.528+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=10
+time=2026-10-16T12:22:18.537+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestStrayRemovalDoesNotFollowLinks2177944907\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.544+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=6
+time=2026-10-16T12:22:18.557+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestStrayRemovalDoesNotFollowLinks2177944907\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.566+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.572+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.574+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestStrayRemovalDoesNotFollowLinks (0.10s)
+=== RUN   TestConcurrentWritersReaders
+time=2026-10-16T12:22:18.626+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestConcurrentWritersReaders3429029412\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.635+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=9
+time=2026-10-16T12:22:18.650+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestConcurrentWritersReaders3429029412\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.656+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=6
+time=2026-10-16T12:22:18.667+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestConcurrentWritersReaders3429029412\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.675+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=7
+time=2026-10-16T12:22:18.682+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.685+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    concurrent_test.go:167: 10s run: 11188 writes, 16304 read-cycles, wal=4190072 bytes (page=4096)
+--- PASS: TestConcurrentWritersReaders (10.15s)
+=== RUN   TestSubprocessCrashWriter
+    concurrent_test.go:186: crash-writer subprocess; runs under TestCrashRecoveryKillMidWrite
+--- SKIP: TestSubprocessCrashWriter (0.00s)
+=== RUN   TestCrashRecoveryKillMidWrite
+time=2026-10-16T12:22:28.928+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    concurrent_test.go:312: crash recovery: 33 committed rows recovered, integrity ok, wal=0 bytes
+--- PASS: TestCrashRecoveryKillMidWrite (0.19s)
+=== RUN   TestProviderHealthProbeRoundTrip
+time=2026-10-16T12:22:28.959+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProviderHealthProbeRoundTrip2351314066\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:28.967+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:28Z duration_ms=7
+time=2026-10-16T12:22:28.974+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProviderHealthProbeRoundTrip2351314066\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:28.981+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:28Z duration_ms=6
+time=2026-10-16T12:22:28.991+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProviderHealthProbeRoundTrip2351314066\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:28.997+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:28Z duration_ms=6
+time=2026-10-16T12:22:29.003+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:29.005+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProviderHealthProbeRoundTrip (0.09s)
+=== RUN   TestProviderHealthRecordErrorAndList
+time=2026-10-16T12:22:29.050+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProviderHealthRecordErrorAndList1935459287\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:29.060+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:29Z duration_ms=9
+time=2026-10-16T12:22:29.068+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProviderHealthRecordErrorAndList1935459287\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:29.073+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:29Z duration_ms=5
+time=2026-10-16T12:22:29.084+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProviderHealthRecordErrorAndList1935459287\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:29.091+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:29Z duration_ms=7
+time=2026-10-16T12:22:29.097+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:29.100+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProviderHealthRecordErrorAndList (0.10s)
+=== RUN   TestProviderHealthMissingRowIsNoRows
+time=2026-10-16T12:22:29.141+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProviderHealthMissingRowIsNoRows3594509678\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:29.149+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:29Z duration_ms=7
+time=2026-10-16T12:22:29.157+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProviderHealthMissingRowIsNoRows3594509678\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:29.163+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:29Z duration_ms=5
+time=2026-10-16T12:22:29.171+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProviderHealthMissingRowIsNoRows3594509678\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:29.177+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:29Z duration_ms=5
+time=2026-10-16T12:22:29.182+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:29.184+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProviderHealthMissingRowIsNoRows (0.07s)
+=== RUN   TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction
+time=2026-10-16T12:22:29.214+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction2986685582\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:29.222+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:29Z duration_ms=7
+time=2026-10-16T12:22:29.231+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction2986685582\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:29.237+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:29Z duration_ms=5
+time=2026-10-16T12:22:29.244+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction2986685582\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:29.252+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:29Z duration_ms=7
+time=2026-10-16T12:22:29.258+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:29.262+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_326v1_test.go:75: 326-v1 determinism reading: append err=memory: append session turn: constraint failed: 326v1 injected refresh failure (1811) | session_turn rows=0 | updated_at=1777593600 (born 1777593600)
+--- PASS: TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction (0.09s)
+=== RUN   TestAppendSessionTurn326v1TriggerBlocksNothingElse
+time=2026-10-16T12:22:29.302+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurn326v1TriggerBlocksNothingElse2586232273\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:29.311+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:29Z duration_ms=7
+time=2026-10-16T12:22:29.318+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurn326v1TriggerBlocksNothingElse2586232273\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:29.325+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:29Z duration_ms=6
+time=2026-10-16T12:22:29.334+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurn326v1TriggerBlocksNothingElse2586232273\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:29.342+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:29Z duration_ms=7
+time=2026-10-16T12:22:29.348+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:29.352+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_326v1_test.go:124: 326-v1 premise control: blocked with trigger, refreshed without it (updated_at=1777593660)
+--- PASS: TestAppendSessionTurn326v1TriggerBlocksNothingElse (0.10s)
+=== RUN   TestAppendSessionTurnCrashChild
+    dao_session_append_326_test.go:46: crash child for TestAppendSessionTurnCrashAtomicAcrossKill
+--- SKIP: TestAppendSessionTurnCrashChild (0.00s)
+=== RUN   TestAppendSessionTurnCrashAtomicAcrossKill
+time=2026-10-16T12:22:29.573+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_append_326_test.go:86: 326 AC#3 kill@2: announced=3 turns=3 maxSeq=3 updated_at=1777636802 created_at=1777633200 max(turn.created_at)=1777636802 lag=0s => ALL
+time=2026-10-16T12:22:29.751+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_append_326_test.go:86: 326 AC#3 kill@4: announced=4 turns=4 maxSeq=4 updated_at=1777636803 created_at=1777633200 max(turn.created_at)=1777636803 lag=0s => ALL
+time=2026-10-16T12:22:29.909+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_append_326_test.go:86: 326 AC#3 kill@9: announced=9 turns=9 maxSeq=9 updated_at=1777636808 created_at=1777633200 max(turn.created_at)=1777636808 lag=0s => ALL
+time=2026-10-16T12:22:30.060+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_append_326_test.go:86: 326 AC#3 kill@20: announced=22 turns=22 maxSeq=22 updated_at=1777636821 created_at=1777633200 max(turn.created_at)=1777636821 lag=0s => ALL
+time=2026-10-16T12:22:30.264+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_append_326_test.go:86: 326 AC#3 kill@45: announced=47 turns=47 maxSeq=47 updated_at=1777636846 created_at=1777633200 max(turn.created_at)=1777636846 lag=0s => ALL
+time=2026-10-16T12:22:30.500+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_append_326_test.go:89: 326 AC#3 kill@11: announced=11 turns=11 maxSeq=11 updated_at=1777636810 created_at=1777633200 max(turn.created_at)=1777636810 lag=0s => ALL
+time=2026-10-16T12:22:30.718+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_append_326_test.go:89: 326 AC#3 kill@6: announced=6 turns=6 maxSeq=6 updated_at=1777636805 created_at=1777633200 max(turn.created_at)=1777636805 lag=0s => ALL
+time=2026-10-16T12:22:30.912+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_append_326_test.go:89: 326 AC#3 kill@12: announced=15 turns=15 maxSeq=15 updated_at=1777636814 created_at=1777633200 max(turn.created_at)=1777636814 lag=0s => ALL
+--- PASS: TestAppendSessionTurnCrashAtomicAcrossKill (1.56s)
+=== RUN   TestSessionSearchEscapesWildcards
+time=2026-10-16T12:22:30.968+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionSearchEscapesWildcards1728321852\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:30.976+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:30Z duration_ms=8
+time=2026-10-16T12:22:30.987+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionSearchEscapesWildcards1728321852\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:30.994+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:30Z duration_ms=7
+time=2026-10-16T12:22:31.003+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionSearchEscapesWildcards1728321852\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:31.011+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:31Z duration_ms=8
+time=2026-10-16T12:22:31.019+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:31.022+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestSessionSearchEscapesWildcards (0.10s)
+=== RUN   TestAppendSessionTurnSurfacesTheConversation
+time=2026-10-16T12:22:31.064+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurnSurfacesTheConversation1238796902\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:31.073+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:31Z duration_ms=8
+time=2026-10-16T12:22:31.082+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurnSurfacesTheConversation1238796902\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:31.089+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:31Z duration_ms=7
+time=2026-10-16T12:22:31.097+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurnSurfacesTheConversation1238796902\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:31.104+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:31Z duration_ms=6
+time=2026-10-16T12:22:31.110+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:31.113+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_test.go:114: 326 AC#1 same-row evidence: sess-a.updated_at 1777593660 -> 1777593780 (delta=120) for turn.created_at=1777593780 | list = [sess-a sess-b]
+--- PASS: TestAppendSessionTurnSurfacesTheConversation (0.09s)
+=== RUN   TestAppendSessionTurnRefreshUsesStoredClockFamily
+time=2026-10-16T12:22:31.151+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurnRefreshUsesStoredClockFamily525741400\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:31.158+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:31Z duration_ms=6
+time=2026-10-16T12:22:31.166+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurnRefreshUsesStoredClockFamily525741400\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:31.171+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:31Z duration_ms=5
+time=2026-10-16T12:22:31.178+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestAppendSessionTurnRefreshUsesStoredClockFamily525741400\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:31.185+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:31Z duration_ms=6
+time=2026-10-16T12:22:31.189+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:31.193+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_test.go:154: 326 AC#1 clock family: turn.created_at = 1792124551, sess.updated_at 1775001600 -> 1792124551 (delta=17122951)
+--- PASS: TestAppendSessionTurnRefreshUsesStoredClockFamily (0.08s)
+=== RUN   TestSessionMigrationCrashAtomicAndReplay
+time=2026-10-16T12:22:31.234+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionMigrationCrashAtomicAndReplay2498599654\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:31.243+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:31Z duration_ms=8
+time=2026-10-16T12:22:31.252+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionMigrationCrashAtomicAndReplay2498599654\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:31.259+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:31Z duration_ms=7
+time=2026-10-16T12:22:31.264+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-16T12:22:31.268+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:22:31.289+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionMigrationCrashAtomicAndReplay2498599654\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:31.316+08:00 level=WARN msg="migration backup already exists, keeping it" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionMigrationCrashAtomicAndReplay2498599654\001\data\backup\wisp.db.bak-2-3
+time=2026-10-16T12:22:31.324+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:31Z duration_ms=7
+time=2026-10-16T12:22:31.330+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:31.338+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestSessionMigrationCrashAtomicAndReplay (0.15s)
+=== RUN   TestProfileUpsertAndLRUEvictionLogs
+--- PASS: TestProfileUpsertAndLRUEvictionLogs (0.12s)
+=== RUN   TestProfileDeleteAndPurge
+time=2026-10-16T12:22:31.499+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProfileDeleteAndPurge2552071528\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:31.509+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:31Z duration_ms=9
+time=2026-10-16T12:22:31.521+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProfileDeleteAndPurge2552071528\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:31.528+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:31Z duration_ms=7
+time=2026-10-16T12:22:31.537+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestProfileDeleteAndPurge2552071528\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:31.546+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:31Z duration_ms=8
+time=2026-10-16T12:22:31.551+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:31.554+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProfileDeleteAndPurge (0.10s)
+=== RUN   TestMemoryAddSearchDeletePurge
+time=2026-10-16T12:22:31.604+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMemoryAddSearchDeletePurge3691037744\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:31.616+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:31Z duration_ms=10
+time=2026-10-16T12:22:31.634+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMemoryAddSearchDeletePurge3691037744\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:31.643+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:31Z duration_ms=9
+time=2026-10-16T12:22:31.655+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMemoryAddSearchDeletePurge3691037744\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:31.663+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:31Z duration_ms=8
+time=2026-10-16T12:22:31.671+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:31.675+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestMemoryAddSearchDeletePurge (0.12s)
+=== RUN   TestTaskLogLifecycleAndErrorClassValidation
+time=2026-10-16T12:22:31.722+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTaskLogLifecycleAndErrorClassValidation1954714429\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:31.733+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:31Z duration_ms=10
+time=2026-10-16T12:22:31.745+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTaskLogLifecycleAndErrorClassValidation1954714429\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:31.754+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:31Z duration_ms=8
+time=2026-10-16T12:22:31.766+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTaskLogLifecycleAndErrorClassValidation1954714429\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:31.775+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:31Z duration_ms=8
+time=2026-10-16T12:22:31.781+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:31.784+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTaskLogLifecycleAndErrorClassValidation (0.11s)
+=== RUN   TestToolCallLifecycleAndValidation
+time=2026-10-16T12:22:32.093+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestToolCallLifecycleAndValidation1047684099\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:32.103+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:32Z duration_ms=9
+time=2026-10-16T12:22:32.112+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestToolCallLifecycleAndValidation1047684099\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:32.119+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:32Z duration_ms=6
+time=2026-10-16T12:22:32.127+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestToolCallLifecycleAndValidation1047684099\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:32.134+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:32Z duration_ms=6
+time=2026-10-16T12:22:32.140+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:32.143+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestToolCallLifecycleAndValidation (0.35s)
+=== RUN   TestGrantCostPluginStateDAO
+time=2026-10-16T12:22:32.179+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestGrantCostPluginStateDAO1973534900\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:32.187+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:32Z duration_ms=7
+time=2026-10-16T12:22:32.199+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestGrantCostPluginStateDAO1973534900\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:32.206+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:32Z duration_ms=6
+time=2026-10-16T12:22:32.214+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestGrantCostPluginStateDAO1973534900\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:32.221+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:32Z duration_ms=6
+time=2026-10-16T12:22:32.226+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:32.228+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestGrantCostPluginStateDAO (0.09s)
+=== RUN   TestWriteQueueLazyLifecycle
+--- PASS: TestWriteQueueLazyLifecycle (0.09s)
+=== RUN   TestAdvPanicWedge
+--- PASS: TestAdvPanicWedge (0.10s)
+=== RUN   TestMigrateSeededV1DatabaseToV2
+time=2026-10-16T12:22:32.453+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrateSeededV1DatabaseToV23615458027\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:32.462+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:32Z duration_ms=8
+time=2026-10-16T12:22:32.467+08:00 level=INFO msg="schema migration complete" component=memory schema_version=1
+time=2026-10-16T12:22:32.469+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:22:32.495+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrateSeededV1DatabaseToV23615458027\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:32.502+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:32Z duration_ms=6
+time=2026-10-16T12:22:32.512+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrateSeededV1DatabaseToV23615458027\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:32.519+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:32Z duration_ms=7
+time=2026-10-16T12:22:32.524+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:32.526+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestMigrateSeededV1DatabaseToV2 (0.11s)
+=== RUN   TestPrivacyOpsAllDomains
+time=2026-10-16T12:22:32.565+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestPrivacyOpsAllDomains4186078163\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:32.574+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:32Z duration_ms=8
+time=2026-10-16T12:22:32.582+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestPrivacyOpsAllDomains4186078163\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:32.590+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:32Z duration_ms=7
+time=2026-10-16T12:22:32.598+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestPrivacyOpsAllDomains4186078163\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:32.605+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:32Z duration_ms=7
+time=2026-10-16T12:22:32.610+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:32.613+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:22:32.626+08:00 level=INFO msg="artifacts purged" component=memory files_removed=1 stray_entries=0 stray_bytes=0
+--- PASS: TestPrivacyOpsAllDomains (0.09s)
+=== RUN   TestRetentionBoundaries
+time=2026-10-16T12:22:32.657+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestRetentionBoundaries2127837773\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:32.667+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:32Z duration_ms=9
+time=2026-10-16T12:22:32.674+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestRetentionBoundaries2127837773\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:32.680+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:32Z duration_ms=5
+time=2026-10-16T12:22:32.691+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestRetentionBoundaries2127837773\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:32.700+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:32Z duration_ms=9
+time=2026-10-16T12:22:32.706+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:32.709+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:22:32.718+08:00 level=INFO msg="retention pass started" component=memory
+time=2026-10-16T12:22:32.718+08:00 level=INFO msg="retention pass done" component=memory task_log_deleted=1 tool_call_deleted=3 cost_day_deleted=1 grant_deleted=2 artifact_files_removed=0 artifact_bytes_removed=0 duration_ms=0
+--- PASS: TestRetentionBoundaries (0.10s)
+=== RUN   TestRetentionSchedule
+time=2026-10-16T12:22:32.920+08:00 level=INFO msg="scope disposed" scope=test-retention completed=0 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestRetentionSchedule (0.44s)
+=== RUN   TestArtifactsLRUQuota
+--- PASS: TestArtifactsLRUQuota (0.09s)
+=== RUN   TestArtifactsDeleteAndPurgeAndGuards
+time=2026-10-16T12:22:33.285+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestArtifactsDeleteAndPurgeAndGuards3518325322\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:33.295+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:33Z duration_ms=9
+time=2026-10-16T12:22:33.305+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestArtifactsDeleteAndPurgeAndGuards3518325322\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:33.311+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:33Z duration_ms=6
+time=2026-10-16T12:22:33.321+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestArtifactsDeleteAndPurgeAndGuards3518325322\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:33.328+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:33Z duration_ms=7
+time=2026-10-16T12:22:33.336+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:33.341+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:22:33.344+08:00 level=INFO msg="artifacts purged" component=memory files_removed=1 stray_entries=0 stray_bytes=0
+--- PASS: TestArtifactsDeleteAndPurgeAndGuards (0.09s)
+=== RUN   TestSchemaContractIntrospection
+time=2026-10-16T12:22:33.376+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSchemaContractIntrospection460612179\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:33.383+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:33Z duration_ms=7
+time=2026-10-16T12:22:33.392+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSchemaContractIntrospection460612179\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:33.399+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:33Z duration_ms=6
+time=2026-10-16T12:22:33.409+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSchemaContractIntrospection460612179\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:33.417+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:33Z duration_ms=8
+time=2026-10-16T12:22:33.424+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:33.427+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestSchemaContractIntrospection/columns/provider_health
+=== RUN   TestSchemaContractIntrospection/indexes/provider_health
+=== RUN   TestSchemaContractIntrospection/columns/session
+=== RUN   TestSchemaContractIntrospection/indexes/session
+=== RUN   TestSchemaContractIntrospection/columns/session_turn
+=== RUN   TestSchemaContractIntrospection/indexes/session_turn
+=== RUN   TestSchemaContractIntrospection/columns/schema_meta
+=== RUN   TestSchemaContractIntrospection/indexes/schema_meta
+=== RUN   TestSchemaContractIntrospection/columns/profile
+=== RUN   TestSchemaContractIntrospection/indexes/profile
+=== RUN   TestSchemaContractIntrospection/columns/memory
+=== RUN   TestSchemaContractIntrospection/indexes/memory
+=== RUN   TestSchemaContractIntrospection/columns/tool_call
+=== RUN   TestSchemaContractIntrospection/indexes/tool_call
+=== RUN   TestSchemaContractIntrospection/columns/approval_grant
+=== RUN   TestSchemaContractIntrospection/indexes/approval_grant
+=== RUN   TestSchemaContractIntrospection/columns/plugin_state
+=== RUN   TestSchemaContractIntrospection/indexes/plugin_state
+=== RUN   TestSchemaContractIntrospection/columns/task_log
+=== RUN   TestSchemaContractIntrospection/indexes/task_log
+=== RUN   TestSchemaContractIntrospection/columns/cost_daily
+=== RUN   TestSchemaContractIntrospection/indexes/cost_daily
+--- PASS: TestSchemaContractIntrospection (0.09s)
+    --- PASS: TestSchemaContractIntrospection/columns/provider_health (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/provider_health (0.00s)
+    --- PASS: TestSchemaContractIntrospection/columns/session (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/session (0.00s)
+    --- PASS: TestSchemaContractIntrospection/columns/session_turn (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/session_turn (0.00s)
+    --- PASS: TestSchemaContractIntrospection/columns/schema_meta (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/schema_meta (0.00s)
+    --- PASS: TestSchemaContractIntrospection/columns/profile (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/profile (0.00s)
+    --- PASS: TestSchemaContractIntrospection/columns/memory (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/memory (0.00s)
+    --- PASS: TestSchemaContractIntrospection/columns/tool_call (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/tool_call (0.00s)
+    --- PASS: TestSchemaContractIntrospection/columns/approval_grant (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/approval_grant (0.00s)
+    --- PASS: TestSchemaContractIntrospection/columns/plugin_state (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/plugin_state (0.00s)
+    --- PASS: TestSchemaContractIntrospection/columns/task_log (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/task_log (0.00s)
+    --- PASS: TestSchemaContractIntrospection/columns/cost_daily (0.00s)
+    --- PASS: TestSchemaContractIntrospection/indexes/cost_daily (0.00s)
+=== RUN   TestMigrateFreshDatabaseCreatesCurrentVersion
+time=2026-10-16T12:22:33.465+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrateFreshDatabaseCreatesCurrentVersion3006079776\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:33.477+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:33Z duration_ms=11
+time=2026-10-16T12:22:33.489+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrateFreshDatabaseCreatesCurrentVersion3006079776\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:33.496+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:33Z duration_ms=7
+time=2026-10-16T12:22:33.506+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrateFreshDatabaseCreatesCurrentVersion3006079776\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:33.513+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:33Z duration_ms=6
+time=2026-10-16T12:22:33.518+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:33.520+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:22:33.541+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestMigrateFreshDatabaseCreatesCurrentVersion (0.11s)
+=== RUN   TestMigrationChainWithBackup
+time=2026-10-16T12:22:33.585+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationChainWithBackup2269930446\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:33.599+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:33Z duration_ms=11
+time=2026-10-16T12:22:33.611+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationChainWithBackup2269930446\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:33.619+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:33Z duration_ms=7
+time=2026-10-16T12:22:33.627+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationChainWithBackup2269930446\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:33.636+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:33Z duration_ms=8
+time=2026-10-16T12:22:33.642+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:33.645+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:22:33.676+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationChainWithBackup2269930446\001\data\backup\wisp.db.bak-3-4 from=3 to=4
+time=2026-10-16T12:22:33.684+08:00 level=INFO msg="schema migration step applied" component=memory from=3 to=4 started_at=2026-10-16T04:22:33Z duration_ms=8
+time=2026-10-16T12:22:33.689+08:00 level=INFO msg="schema migration complete" component=memory schema_version=4
+time=2026-10-16T12:22:33.692+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestMigrationChainWithBackup (0.15s)
+=== RUN   TestMigrationFailedStepIsAtomic
+time=2026-10-16T12:22:33.729+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationFailedStepIsAtomic1812204307\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:33.737+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:33Z duration_ms=8
+time=2026-10-16T12:22:33.747+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationFailedStepIsAtomic1812204307\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:33.754+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:33Z duration_ms=6
+time=2026-10-16T12:22:33.765+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationFailedStepIsAtomic1812204307\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:33.772+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:33Z duration_ms=7
+time=2026-10-16T12:22:33.778+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:33.781+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:22:33.799+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationFailedStepIsAtomic1812204307\001\data\backup\wisp.db.bak-3-4 from=3 to=4
+--- PASS: TestMigrationFailedStepIsAtomic (0.11s)
+=== RUN   TestMigrationNewerSchemaIsUnmigratable
+time=2026-10-16T12:22:33.836+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationNewerSchemaIsUnmigratable972918054\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:33.844+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:33Z duration_ms=7
+time=2026-10-16T12:22:33.853+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationNewerSchemaIsUnmigratable972918054\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:33.859+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:33Z duration_ms=5
+time=2026-10-16T12:22:33.868+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestMigrationNewerSchemaIsUnmigratable972918054\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:33.875+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:33Z duration_ms=6
+time=2026-10-16T12:22:33.880+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:33.882+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestMigrationNewerSchemaIsUnmigratable (0.10s)
+=== RUN   TestMigrationForeignDatabaseIsUnmigratable
+--- PASS: TestMigrationForeignDatabaseIsUnmigratable (0.03s)
+=== RUN   TestParseVersionStrict
+--- PASS: TestParseVersionStrict (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/memory	16.590s
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+time=2026-10-16T12:22:17.470+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224RecordWritesOneRowPerAnswer1207057610\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:17.486+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:17Z duration_ms=13
+time=2026-10-16T12:22:17.501+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224RecordWritesOneRowPerAnswer1207057610\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:17.509+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:17Z duration_ms=8
+time=2026-10-16T12:22:17.523+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224RecordWritesOneRowPerAnswer1207057610\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:17.531+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:17Z duration_ms=8
+time=2026-10-16T12:22:17.537+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:17.541+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.14s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+time=2026-10-16T12:22:17.590+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224RecordRefusesUnusableSubjects775750183\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:17.606+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:17Z duration_ms=15
+time=2026-10-16T12:22:17.617+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224RecordRefusesUnusableSubjects775750183\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:17.626+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:17Z duration_ms=9
+time=2026-10-16T12:22:17.637+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224RecordRefusesUnusableSubjects775750183\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:17.645+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:17Z duration_ms=7
+time=2026-10-16T12:22:17.651+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:17.656+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.12s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+time=2026-10-16T12:22:17.705+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224CoveringMatchesItsOwnSession373641401\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:17.716+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:17Z duration_ms=10
+time=2026-10-16T12:22:17.725+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224CoveringMatchesItsOwnSession373641401\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:17.732+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:17Z duration_ms=6
+time=2026-10-16T12:22:17.742+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224CoveringMatchesItsOwnSession373641401\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:17.750+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:17Z duration_ms=8
+time=2026-10-16T12:22:17.756+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:17.761+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.10s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+time=2026-10-16T12:22:17.805+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224CoveringDoesNotCrossToANewSession2844133732\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:17.818+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:17Z duration_ms=12
+time=2026-10-16T12:22:17.832+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224CoveringDoesNotCrossToANewSession2844133732\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:17.838+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:17Z duration_ms=6
+time=2026-10-16T12:22:17.851+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224CoveringDoesNotCrossToANewSession2844133732\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:17.860+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:17Z duration_ms=8
+time=2026-10-16T12:22:17.866+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:17.869+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.11s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+time=2026-10-16T12:22:17.916+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224ExpiredOrRevokedRowIsNotLive1353213948\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:17.923+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:17Z duration_ms=7
+time=2026-10-16T12:22:17.931+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224ExpiredOrRevokedRowIsNotLive1353213948\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:17.938+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:17Z duration_ms=5
+time=2026-10-16T12:22:17.946+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224ExpiredOrRevokedRowIsNotLive1353213948\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:17.952+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:17Z duration_ms=6
+time=2026-10-16T12:22:17.960+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:17.962+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.09s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+time=2026-10-16T12:22:18.007+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224NewLedgerRefusesHandWrittenIDs4088662872\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.016+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=9
+time=2026-10-16T12:22:18.028+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224NewLedgerRefusesHandWrittenIDs4088662872\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.035+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=6
+time=2026-10-16T12:22:18.044+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224NewLedgerRefusesHandWrittenIDs4088662872\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.051+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=6
+time=2026-10-16T12:22:18.056+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.060+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.09s)
+=== RUN   TestSessionListByTime
+time=2026-10-16T12:22:18.091+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionListByTime1306028013\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.100+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.111+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionListByTime1306028013\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.119+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.130+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionListByTime1306028013\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.137+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=7
+time=2026-10-16T12:22:18.142+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.145+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestSessionListByTime (0.10s)
+=== RUN   TestSessionListByWorkspace
+time=2026-10-16T12:22:18.189+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionListByWorkspace3163001588\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.196+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=7
+time=2026-10-16T12:22:18.206+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionListByWorkspace3163001588\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.213+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=7
+time=2026-10-16T12:22:18.225+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionListByWorkspace3163001588\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.232+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=7
+time=2026-10-16T12:22:18.238+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.242+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestSessionListByWorkspace (0.10s)
+=== RUN   TestSessionSearchTitleAndBody
+time=2026-10-16T12:22:18.283+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionSearchTitleAndBody296193538\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.292+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.304+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionSearchTitleAndBody296193538\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.310+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=6
+time=2026-10-16T12:22:18.321+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionSearchTitleAndBody296193538\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.328+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=6
+time=2026-10-16T12:22:18.334+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.337+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestSessionSearchTitleAndBody (0.10s)
+=== RUN   TestSessionRenameAndArchiveUndo
+time=2026-10-16T12:22:18.384+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionRenameAndArchiveUndo1320887813\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.395+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=11
+time=2026-10-16T12:22:18.407+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionRenameAndArchiveUndo1320887813\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.418+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=11
+time=2026-10-16T12:22:18.431+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionRenameAndArchiveUndo1320887813\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.441+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=9
+time=2026-10-16T12:22:18.446+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.451+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestSessionRenameAndArchiveUndo (0.12s)
+=== RUN   TestSessionAppendTurnMovesItBackToTheFront
+time=2026-10-16T12:22:18.505+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionAppendTurnMovesItBackToTheFront1499497260\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.513+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.524+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionAppendTurnMovesItBackToTheFront1499497260\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.532+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.542+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionAppendTurnMovesItBackToTheFront1499497260\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.551+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.558+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.563+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    manage_test.go:214: 326 AC#1 outlet reading: sess_b34e64b70b97d4212640e86fd144cc4e.updated_at 1777593660 -> 1777593780 (delta=120) for turn.created_at=1777593780 | list = [sess_b34e64b70b97d4212640e86fd144cc4e sess_9568436c05e42e61307c06dd74e983c0]
+--- PASS: TestSessionAppendTurnMovesItBackToTheFront (0.11s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+time=2026-10-16T12:22:18.605+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionForkDoesNotSwallowOriginal4099677807\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.624+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=18
+time=2026-10-16T12:22:18.634+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionForkDoesNotSwallowOriginal4099677807\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.644+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=10
+time=2026-10-16T12:22:18.656+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestSessionForkDoesNotSwallowOriginal4099677807\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.663+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=6
+time=2026-10-16T12:22:18.668+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.672+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.11s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+time=2026-10-16T12:22:18.722+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224WildcardRowCoversAConcretePath3325631225\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.733+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=10
+time=2026-10-16T12:22:18.744+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224WildcardRowCoversAConcretePath3325631225\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.753+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.766+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224WildcardRowCoversAConcretePath3325631225\002\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.783+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=17
+time=2026-10-16T12:22:18.790+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.793+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.12s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+time=2026-10-16T12:22:18.838+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224DialectIsPathMatchNotRegexquestion_mark_is_a_singl3004725732\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.848+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=9
+time=2026-10-16T12:22:18.858+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224DialectIsPathMatchNotRegexquestion_mark_is_a_singl3004725732\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.867+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.878+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224DialectIsPathMatchNotRegexquestion_mark_is_a_singl3004725732\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.887+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.892+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.895+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+time=2026-10-16T12:22:18.935+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224DialectIsPathMatchNotRegexbracket_is_a_class_over_3696436958\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:18.943+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:18Z duration_ms=8
+time=2026-10-16T12:22:18.954+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224DialectIsPathMatchNotRegexbracket_is_a_class_over_3696436958\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:18.964+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:18Z duration_ms=10
+time=2026-10-16T12:22:18.974+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224DialectIsPathMatchNotRegexbracket_is_a_class_over_3696436958\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:18.988+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:18Z duration_ms=13
+time=2026-10-16T12:22:18.994+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:18.998+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+time=2026-10-16T12:22:19.041+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224DialectIsPathMatchNotRegexa_regex-shaped_row_is_ho3822792791\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:19.050+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:19Z duration_ms=9
+time=2026-10-16T12:22:19.063+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224DialectIsPathMatchNotRegexa_regex-shaped_row_is_ho3822792791\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:19.073+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:19Z duration_ms=10
+time=2026-10-16T12:22:19.086+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224DialectIsPathMatchNotRegexa_regex-shaped_row_is_ho3822792791\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:19.095+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:19Z duration_ms=8
+time=2026-10-16T12:22:19.101+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:19.105+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.31s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.10s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.10s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.11s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+time=2026-10-16T12:22:19.152+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224PatternWithoutStarIsNeverReinterpreted2644966007\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:19.161+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:19Z duration_ms=9
+time=2026-10-16T12:22:19.203+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224PatternWithoutStarIsNeverReinterpreted2644966007\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:19.214+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:19Z duration_ms=11
+time=2026-10-16T12:22:19.225+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224PatternWithoutStarIsNeverReinterpreted2644966007\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:19.233+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:19Z duration_ms=7
+time=2026-10-16T12:22:19.239+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:19.241+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.13s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+time=2026-10-16T12:22:19.293+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk273992419\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:19.303+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:19Z duration_ms=10
+time=2026-10-16T12:22:19.313+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk273992419\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:19.321+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:19Z duration_ms=8
+time=2026-10-16T12:22:19.337+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk273992419\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:19.346+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:19Z duration_ms=9
+time=2026-10-16T12:22:19.353+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:19.359+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-16T12:22:19.403+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk273992419\002\ghost-data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:22:19.418+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:22:19Z duration_ms=14
+time=2026-10-16T12:22:19.430+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk273992419\002\ghost-data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:22:19.437+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:22:19Z duration_ms=7
+time=2026-10-16T12:22:19.449+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326v1\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk273992419\002\ghost-data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:22:19.461+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:22:19Z duration_ms=11
+time=2026-10-16T12:22:19.467+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:22:19.470+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.24s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	2.142s

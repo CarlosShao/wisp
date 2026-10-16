@@ -1,0 +1,117 @@
+### MU-B anti-form: refresh moved into its own s.write AFTER the turn commit @ 2026-10-16 12:17:46 +0800
+--- apply mode B ---
+mode=B sha_before=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 sha_after=c31e1750690993a76270b86891da3499550d692b3de3ce0d52432aa9aa13b1b5 bytes=12263
+re-read-from-disk sha256=c31e1750690993a76270b86891da3499550d692b3de3ce0d52432aa9aa13b1b5 equal=True
+--- show the mutated function body (lines 273-320) ---
+func (s *Store) AppendSessionTurn(ctx context.Context, t SessionTurn) (int64, error) {
+	t.CreatedAt = orNow(t.CreatedAt)
+	if err := validateTurn(t); err != nil {
+		return 0, err
+	}
+	var id int64
+	err := s.write(ctx, func(ctx context.Context, tx *sql.Tx) error {
+		if t.Seq == 0 {
+			if err := tx.QueryRowContext(ctx,
+				`SELECT COALESCE(MAX(seq),0)+1 FROM session_turn WHERE session_id=?`, t.SessionID).Scan(&t.Seq); err != nil {
+				return err
+			}
+		}
+		res, err := tx.ExecContext(ctx,
+			`INSERT INTO session_turn(session_id, seq, role, content, created_at) VALUES(?,?,?,?,?)`,
+			t.SessionID, t.Seq, t.Role, t.Content, t.CreatedAt)
+		if err != nil {
+			return err
+		}
+		id, err = res.LastInsertId()
+		if err != nil {
+			return err
+		}
+		// The touch half of "每一轮都算动过" (ticket 326). A conversation row that
+		// is not in the table is not this call's business to police — storage
+		// stores rows, the lifecycle policy lives in internal/session — so the
+		// statement's error is what propagates, nothing else.
+		return err
+	})
+	if err != nil {
+		return 0, fmt.Errorf("memory: append session turn: %w", err)
+	}
+	// 326-v1 MU-B: the touch moved OUT of the turn transaction.
+	if werr := s.write(ctx, func(c context.Context, touch *sql.Tx) error {
+		_, e := touch.ExecContext(c, `UPDATE session SET updated_at=? WHERE id=?`, t.CreatedAt, t.SessionID)
+		return e
+	}); werr != nil {
+		return 0, fmt.Errorf("memory: append session turn touch: %w", werr)
+	}
+	return id, nil
+}
+
+// ListSessionTurns returns one conversation's turns in order.
+func (s *Store) ListSessionTurns(ctx context.Context, sessionID string) ([]SessionTurn, error) {
+	rows, err := s.reader.QueryContext(ctx,
+		`SELECT id, session_id, seq, role, content, created_at
+		 FROM session_turn WHERE session_id=? ORDER BY seq, id`, sessionID)
+	if err != nil {
+--- go build ---
+rc_build=0
+=== RUN 1: the three AC#1 final-state cases (expect PASS = blind) ===
+    dao_session_test.go:114: 326 AC#1 same-row evidence: sess-a.updated_at 1777593660 -> 1777593780 (delta=120) for turn.created_at=1777593780 | list = [sess-a sess-b]
+--- PASS: TestAppendSessionTurnSurfacesTheConversation (0.09s)
+    dao_session_test.go:154: 326 AC#1 clock family: turn.created_at = 1792124272, sess.updated_at 1775001600 -> 1792124272 (delta=17122672)
+--- PASS: TestAppendSessionTurnRefreshUsesStoredClockFamily (0.09s)
+ok  	github.com/CarlosShao/wisp/internal/memory	0.225s
+=== RUN 2: internal/session outlet case (expect PASS = blind) ===
+    manage_test.go:214: 326 AC#1 outlet reading: sess_2c3c2d520a676acdc39c2f0216136da9.updated_at 1777593660 -> 1777593780 (delta=120) for turn.created_at=1777593780 | list = [sess_2c3c2d520a676acdc39c2f0216136da9 sess_42ae1e10c65399c45e969ab400c5030a]
+--- PASS: TestSessionAppendTurnMovesItBackToTheFront (0.11s)
+ok  	github.com/CarlosShao/wisp/internal/session	0.151s
+=== RUN 3: my 326-v1 determinism instruments (expect RED = catches the anti-form) ===
+=== RUN   TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction
+    dao_session_326v1_test.go:75: 326-v1 determinism reading: append err=memory: append session turn touch: constraint failed: 326v1 injected refresh failure (1811) | session_turn rows=1 | updated_at=1777593600 (born 1777593600)
+    dao_session_326v1_test.go:78: the touch and the turn do not share one transaction: the refresh failed (memory: append session turn touch: constraint failed: 326v1 injected refresh failure (1811)) yet 1 session_turn row(s) stayed committed while session.updated_at = 1777593600 — a committed turn with an untouched parent row is the HALF-STATE ticket 326 AC#3 kills a subprocess to look for, and the shape AC#1's final-state cases cannot see
+--- FAIL: TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction (0.14s)
+=== RUN   TestAppendSessionTurn326v1TriggerBlocksNothingElse
+    dao_session_326v1_test.go:117: ListSessionTurns = [{ID:1 SessionID:s326v1b Seq:1 Role:user Content:blocked CreatedAt:1777593630} {ID:2 SessionID:s326v1b Seq:2 Role:user Content:allowed again CreatedAt:1777593660}] (<nil>), want the one allowed turn
+--- FAIL: TestAppendSessionTurn326v1TriggerBlocksNothingElse (0.11s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	0.302s
+FAIL
+=== RUN 4: the real kill bench, 4 rounds x 8 kill points ===
+--- round 1 ---
+  kill@2: announced=7 turns=7 maxSeq=7 updated_at=1777636806 created_at=1777633200 max(turn.created_at)=1777636806 lag=0s => ALL
+  kill@4: announced=7 turns=7 maxSeq=7 updated_at=1777636806 created_at=1777633200 max(turn.created_at)=1777636806 lag=0s => ALL
+  kill@9: announced=9 turns=10 maxSeq=10 updated_at=1777636808 created_at=1777633200 max(turn.created_at)=1777636809 lag=1s => HALF-STATE
+  kill@20: announced=22 turns=23 maxSeq=23 updated_at=1777636822 created_at=1777633200 max(turn.created_at)=1777636822 lag=0s => ALL
+  kill@45: announced=46 turns=47 maxSeq=47 updated_at=1777636845 created_at=1777633200 max(turn.created_at)=1777636846 lag=1s => HALF-STATE
+  kill@11: announced=15 turns=15 maxSeq=15 updated_at=1777636814 created_at=1777633200 max(turn.created_at)=1777636814 lag=0s => ALL
+  kill@6: announced=6 turns=7 maxSeq=7 updated_at=1777636805 created_at=1777633200 max(turn.created_at)=1777636806 lag=1s => HALF-STATE
+  kill@12: announced=14 turns=15 maxSeq=15 updated_at=1777636813 created_at=1777633200 max(turn.created_at)=1777636814 lag=1s => HALF-STATE
+  --- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill
+--- round 2 ---
+  kill@2: announced=4 turns=5 maxSeq=5 updated_at=1777636803 created_at=1777633200 max(turn.created_at)=1777636804 lag=1s => HALF-STATE
+  kill@4: announced=5 turns=5 maxSeq=5 updated_at=1777636804 created_at=1777633200 max(turn.created_at)=1777636804 lag=0s => ALL
+  kill@9: announced=11 turns=11 maxSeq=11 updated_at=1777636810 created_at=1777633200 max(turn.created_at)=1777636810 lag=0s => ALL
+  kill@20: announced=21 turns=21 maxSeq=21 updated_at=1777636820 created_at=1777633200 max(turn.created_at)=1777636820 lag=0s => ALL
+  kill@45: announced=48 turns=49 maxSeq=49 updated_at=1777636847 created_at=1777633200 max(turn.created_at)=1777636848 lag=1s => HALF-STATE
+  kill@11: announced=13 turns=13 maxSeq=13 updated_at=1777636812 created_at=1777633200 max(turn.created_at)=1777636812 lag=0s => ALL
+  kill@6: announced=9 turns=10 maxSeq=10 updated_at=1777636808 created_at=1777633200 max(turn.created_at)=1777636809 lag=1s => HALF-STATE
+  kill@12: announced=15 turns=15 maxSeq=15 updated_at=1777636814 created_at=1777633200 max(turn.created_at)=1777636814 lag=0s => ALL
+  --- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill
+--- round 3 ---
+  kill@2: announced=2 turns=3 maxSeq=3 updated_at=1777636801 created_at=1777633200 max(turn.created_at)=1777636802 lag=1s => HALF-STATE
+  kill@4: announced=6 turns=6 maxSeq=6 updated_at=1777636805 created_at=1777633200 max(turn.created_at)=1777636805 lag=0s => ALL
+  kill@9: announced=9 turns=9 maxSeq=9 updated_at=1777636808 created_at=1777633200 max(turn.created_at)=1777636808 lag=0s => ALL
+  kill@20: announced=22 turns=23 maxSeq=23 updated_at=1777636821 created_at=1777633200 max(turn.created_at)=1777636822 lag=1s => HALF-STATE
+  kill@45: announced=45 turns=46 maxSeq=46 updated_at=1777636844 created_at=1777633200 max(turn.created_at)=1777636845 lag=1s => HALF-STATE
+  kill@11: announced=13 turns=13 maxSeq=13 updated_at=1777636812 created_at=1777633200 max(turn.created_at)=1777636812 lag=0s => ALL
+  kill@6: announced=9 turns=9 maxSeq=9 updated_at=1777636808 created_at=1777633200 max(turn.created_at)=1777636808 lag=0s => ALL
+  kill@12: announced=14 turns=14 maxSeq=14 updated_at=1777636813 created_at=1777633200 max(turn.created_at)=1777636813 lag=0s => ALL
+  --- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill
+--- round 4 ---
+  kill@2: announced=7 turns=8 maxSeq=8 updated_at=1777636806 created_at=1777633200 max(turn.created_at)=1777636807 lag=1s => HALF-STATE
+  kill@4: announced=6 turns=7 maxSeq=7 updated_at=1777636805 created_at=1777633200 max(turn.created_at)=1777636806 lag=1s => HALF-STATE
+  kill@9: announced=9 turns=10 maxSeq=10 updated_at=1777636809 created_at=1777633200 max(turn.created_at)=1777636809 lag=0s => ALL
+  kill@20: announced=22 turns=22 maxSeq=22 updated_at=1777636821 created_at=1777633200 max(turn.created_at)=1777636821 lag=0s => ALL
+  kill@45: announced=45 turns=46 maxSeq=46 updated_at=1777636844 created_at=1777633200 max(turn.created_at)=1777636845 lag=1s => HALF-STATE
+  kill@11: announced=14 turns=15 maxSeq=15 updated_at=1777636813 created_at=1777633200 max(turn.created_at)=1777636814 lag=1s => HALF-STATE
+  kill@6: announced=7 turns=7 maxSeq=7 updated_at=1777636806 created_at=1777633200 max(turn.created_at)=1777636806 lag=0s => ALL
+  kill@12: announced=16 turns=16 maxSeq=16 updated_at=1777636815 created_at=1777633200 max(turn.created_at)=1777636815 lag=0s => ALL
+  --- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill

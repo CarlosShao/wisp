@@ -1,0 +1,15 @@
+### restore after MU-A @ 2026-10-16 12:17:19 +0800
+restored sha256=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 cmp_pristine=MATCH
+--- cmp against HEAD blob ---
+cmp_rc=0
+--- UPDATE line back (positive control ruler) ---
+1
+--- re-run the 6 red cases, expect green ---
+--- PASS: TestAppendSessionTurn326v1RefreshSharesTheTurnTransaction (0.11s)
+--- PASS: TestAppendSessionTurn326v1TriggerBlocksNothingElse (0.09s)
+--- PASS: TestAppendSessionTurnCrashAtomicAcrossKill (1.34s)
+--- PASS: TestAppendSessionTurnSurfacesTheConversation (0.10s)
+--- PASS: TestAppendSessionTurnRefreshUsesStoredClockFamily (0.10s)
+ok  	github.com/CarlosShao/wisp/internal/memory	1.788s
+--- PASS: TestSessionAppendTurnMovesItBackToTheFront (0.11s)
+ok  	github.com/CarlosShao/wisp/internal/session	0.156s

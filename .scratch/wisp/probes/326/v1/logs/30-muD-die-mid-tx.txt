@@ -1,0 +1,58 @@
+### MU-D: refresh stays INSIDE the tx, process os.Exit between the two statements @ 2026-10-16 12:18:28 +0800
+--- apply mode D (adds a gated os.Exit + the os import) ---
+Traceback (most recent call last):
+  File "D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\326\v1\mutate326v1.py", line 90, in <module>
+    main()
+  File "D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\326\v1\mutate326v1.py", line 70, in main
+    assert UPDATE_LINE in body, "UPDATE statement line not found verbatim -- wrong tree?"
+           ^^^^^^^^^^^^^^^^^^^
+AssertionError: UPDATE statement line not found verbatim -- wrong tree?
+--- show gate region ---
+		// The touch half of "每一轮都算动过" (ticket 326). A conversation row that
+		// is not in the table is not this call's business to police — storage
+		// stores rows, the lifecycle policy lives in internal/session — so the
+		// statement's error is what propagates, nothing else.
+		return err
+	})
+	if err != nil {
+		return 0, fmt.Errorf("memory: append session turn: %w", err)
+	}
+	// 326-v1 MU-B: the touch moved OUT of the turn transaction.
+	if werr := s.write(ctx, func(c context.Context, touch *sql.Tx) error {
+		_, e := touch.ExecContext(c, `UPDATE session SET updated_at=? WHERE id=?`, t.CreatedAt, t.SessionID)
+		return e
+--- go build ---
+rc_build=0
+=== control 1: same binary WITHOUT the env var (must behave as delivered) ===
+  kill@2: announced=5 turns=6 maxSeq=6 updated_at=1777636804 created_at=1777633200 max(turn.created_at)=1777636805 lag=1s => HALF-STATE
+  kill@4: announced=8 turns=9 maxSeq=9 updated_at=1777636807 created_at=1777633200 max(turn.created_at)=1777636808 lag=1s => HALF-STATE
+  kill@9: announced=11 turns=11 maxSeq=11 updated_at=1777636810 created_at=1777633200 max(turn.created_at)=1777636810 lag=0s => ALL
+  kill@20: announced=24 turns=24 maxSeq=24 updated_at=1777636823 created_at=1777633200 max(turn.created_at)=1777636823 lag=0s => ALL
+  kill@45: announced=45 turns=46 maxSeq=46 updated_at=1777636844 created_at=1777633200 max(turn.created_at)=1777636845 lag=1s => HALF-STATE
+  kill@11: announced=14 turns=14 maxSeq=14 updated_at=1777636813 created_at=1777633200 max(turn.created_at)=1777636813 lag=0s => ALL
+  kill@6: announced=8 turns=9 maxSeq=9 updated_at=1777636807 created_at=1777633200 max(turn.created_at)=1777636808 lag=1s => HALF-STATE
+  kill@12: announced=12 turns=13 maxSeq=13 updated_at=1777636811 created_at=1777633200 max(turn.created_at)=1777636812 lag=1s => HALF-STATE
+  --- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill
+=== probe: same binary WITH WISP_326V1_EXIT_MID_TX=1 (child dies between the two statements) ===
+=== RUN   TestAppendSessionTurnCrashAtomicAcrossKill
+    dao_session_append_326_test.go:86: 326 AC#3 kill@2: announced=3 turns=4 maxSeq=4 updated_at=1777636802 created_at=1777633200 max(turn.created_at)=1777636803 lag=1s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 2 commits: session_turn has 4 rows (maxSeq 4, newest turn stamp 1777636803) while session.updated_at = 1777636802 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 1s lag or a torn seq)
+    dao_session_append_326_test.go:86: 326 AC#3 kill@4: announced=4 turns=4 maxSeq=4 updated_at=1777636803 created_at=1777633200 max(turn.created_at)=1777636803 lag=0s => ALL
+    dao_session_append_326_test.go:86: 326 AC#3 kill@9: announced=12 turns=12 maxSeq=12 updated_at=1777636811 created_at=1777633200 max(turn.created_at)=1777636811 lag=0s => ALL
+    dao_session_append_326_test.go:86: 326 AC#3 kill@20: announced=22 turns=23 maxSeq=23 updated_at=1777636822 created_at=1777633200 max(turn.created_at)=1777636822 lag=0s => ALL
+    dao_session_append_326_test.go:86: 326 AC#3 kill@45: announced=45 turns=46 maxSeq=46 updated_at=1777636844 created_at=1777633200 max(turn.created_at)=1777636845 lag=1s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 45 commits: session_turn has 46 rows (maxSeq 46, newest turn stamp 1777636845) while session.updated_at = 1777636844 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 1s lag or a torn seq)
+    dao_session_append_326_test.go:89: 326 AC#3 kill@11: announced=11 turns=11 maxSeq=11 updated_at=1777636810 created_at=1777633200 max(turn.created_at)=1777636810 lag=0s => ALL
+    dao_session_append_326_test.go:89: 326 AC#3 kill@6: announced=8 turns=9 maxSeq=9 updated_at=1777636807 created_at=1777633200 max(turn.created_at)=1777636808 lag=1s => HALF-STATE
+    dao_session_append_326_test.go:89: half state after kill at 6 commits: session_turn has 9 rows (maxSeq 9, newest turn stamp 1777636808) while session.updated_at = 1777636807 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 1s lag or a torn seq)
+    dao_session_append_326_test.go:89: 326 AC#3 kill@12: announced=13 turns=14 maxSeq=14 updated_at=1777636812 created_at=1777633200 max(turn.created_at)=1777636813 lag=1s => HALF-STATE
+    dao_session_append_326_test.go:89: half state after kill at 12 commits: session_turn has 14 rows (maxSeq 14, newest turn stamp 1777636813) while session.updated_at = 1777636812 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 1s lag or a torn seq)
+--- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (1.43s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	1.475s
+FAIL
+rc_of_that_run_pipeline_note=see above
+
+★作废标注（本腿自己写入，⛔ 抹原始行）：模式 D 的 python 断言失败＝树上还是 MU-B 字节，
+  上面 control/probe 两发都打在 MU-B 上，只当 MU-B 的第 5、6 轮杀点计数用（control 6/8 HALF-STATE，probe 5/8），
+  ⛔ 当作 MU-D 的读数。真正的 MU-D 见 31-muD-real.txt。原因＝脚本没先 restore 就上下一枚突变。

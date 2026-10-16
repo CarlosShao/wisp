@@ -1,0 +1,70 @@
+### AC#0 起手复算四行＋AC#5 票面尺逐字 @ 2026-10-16 12:26:40 +0800  HEAD=78fe125f 射程注明在每把尺后
+--- AC#0 row2: grep -n 'updated_at' internal/memory/dao_session.go (整文件) ---
+70:const sessionCols = `id, title, workspace, created_at, updated_at, archived_at, COALESCE(forked_from,'')`
+84:			`INSERT INTO session(id, title, workspace, created_at, updated_at, archived_at, forked_from)
+125:	q += ` ORDER BY updated_at DESC, id DESC`
+144:	sqlText += ` ORDER BY updated_at DESC, id DESC`
+177:		res, err := tx.ExecContext(ctx, `UPDATE session SET title=?, updated_at=? WHERE id=?`, title, now, id)
+198:		res, err := tx.ExecContext(ctx, `UPDATE session SET archived_at=?, updated_at=? WHERE id=?`, stamp, now, id)
+231:			`INSERT INTO session(id, title, workspace, created_at, updated_at, archived_at, forked_from)
+255:// refreshes session.updated_at to the stamp of the turn it just wrote (ticket 326
+263://     updated_at — the HALF-STATE ticket 326 AC#3 kills a subprocess to prove
+300:		_, err = tx.ExecContext(ctx, `UPDATE session SET updated_at=? WHERE id=?`, t.CreatedAt, t.SessionID)
+rc=0
+--- AC#0 row1 (改前事实，今天应已翻面): AppendSessionTurn 函数体内 UPDATE 枚数 ---
+1
+rc=0  (正控＝对 86298e24^ 的同一段跑同一把尺)
+0
+rc_neg=1  (1＝改前该段零枚，与票面行1一致)
+--- AC#0 row3: ORDER BY 两行 ---
+125:	q += ` ORDER BY updated_at DESC, id DESC`
+144:	sqlText += ` ORDER BY updated_at DESC, id DESC`
+rc=0
+--- AC#0 row4: 时间源一枚族 ---
+175:	now := observe.NowWallUTC().Unix()
+192:	now := observe.NowWallUTC().Unix()
+218:	now := observe.NowWallUTC().Unix()
+266://     (== observe.NowWallUTC().Unix() when the caller passed none), which is the
+14:func orNow(v int64) int64 {
+15-	if v != 0 {
+16-		return v
+17-	}
+18-	return observe.NowWallUTC().Unix()
+19-}
+20-
+63:	Now   func() time.Time
+77:		m.now = time.Now
+--- AC#5 ticket ruler 1: git grep -c 'session\.NewManager' -- '*.go' ---
+rc=1  (1＝零命中)
+    正控: git grep -n 'func NewManager' -- internal/session
+internal/session/manage.go:68:func NewManager(o ManagerOptions) (*Manager, error) {
+rc=0
+--- AC#5 ticket ruler 2: grep -cE '\"sessions\"|\"history\"' cmd/wisp/main.go ---
+0
+rc=1
+    正控: grep -cE '"config"|"models"' cmd/wisp/main.go (这把尺在该文件能命中吗)
+89:	case "run":
+92:	case "providers":
+95:	case "doctor":
+100:	case "secret":
+102:	case "models":
+110:	case "slo":
+rc=0
+--- AC#5 ticket ruler 3: git grep -n 'memory\.Session' -- cmd/ internal/panel/ internal/tools/ internal/agent/ ---
+rc=1
+    正控: 同尺打 internal/session/
+internal/session/manage.go:18
+rc=0
+--- 追加尺：会话列表读者今天在产品里有几处（ListSessions/SearchSessions 非测试命中，全树）---
+internal/memory/dao_session.go:40:// SessionListOptions filters ListSessions. The zero value lists every ACTIVE
+internal/memory/dao_session.go:113:// ListSessions returns conversations newest-first, optionally narrowed to one
+internal/memory/dao_session.go:115:func (s *Store) ListSessions(ctx context.Context, opts SessionListOptions) ([]Session, error) {
+internal/memory/dao_session.go:129:// SearchSessions returns conversations whose TITLE or any TURN CONTENT contains
+internal/memory/dao_session.go:132:func (s *Store) SearchSessions(ctx context.Context, q string, opts SessionListOptions) ([]Session, error) {
+internal/session/manage.go:40:	ListSessions(ctx context.Context, opts memory.SessionListOptions) ([]memory.Session, error)
+internal/session/manage.go:41:	SearchSessions(ctx context.Context, q string, opts memory.SessionListOptions) ([]memory.Session, error)
+internal/session/manage.go:104:	return m.store.ListSessions(ctx, opts)
+internal/session/manage.go:113:	return m.store.SearchSessions(ctx, q, opts)
+rc=0
+--- 追加尺：cmd/wisp/main.go 的子命令名册（有没有 sessions/history）---
+rc=0

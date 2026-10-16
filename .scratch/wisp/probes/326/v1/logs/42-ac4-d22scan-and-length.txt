@@ -1,0 +1,30 @@
+### 门禁另两把 @ 2026-10-16 12:23:57 +0800
+--- d22scan in the EXPORT tree (committed bytes only, + 本腿判据件) ---
+=== RUN   TestSelfTestFlagIsWiredInTheBuiltBinary
+--- PASS: TestSelfTestFlagIsWiredInTheBuiltBinary (8.07s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/tools/d22scan	30.283s
+FAIL
+runtests.sh: go test exited 1 - packages=[./...] top-level: PASS=32 FAIL=3 SKIP=0, === RUN=77, '[no tests to run]'=0
+rc_d22scan_tree=1
+--- d22scan at repo root (includes 别腿在飞字节＝台面读数) ---
+d22scan: scope ban #7 internal/tools/   examined  25 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 116 text files
+d22scan: scope ban #8 internal/         examined 577 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 139 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=240, bans #1-5 cmd/=41, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=577, ban #8 cmd/=139; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 577 Go files, comments and _test.go included; cmd/ 139 Go files, comments and _test.go included
+rc_d22scan_root=0
+--- length budget --with-self-test at repo root ---
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 14264 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=14264  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 60 paths on this tree, recomputed just now in both units
+rc_length_root=0
+--- length budget in the export tree (对照：树里没有 .git ⇒ 预期它自己拒绝＝台面读数，⛔ 判据) ---
+check-path-length-budget.sh: not inside a git work tree - refusing to guess a denominator
+rc_length_tree=2

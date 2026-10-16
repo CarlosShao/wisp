@@ -1,0 +1,31 @@
+### AC#4 门禁＋两包四数 @ 2026-10-16 12:21:46 +0800  tree=/d/tmp/w326v1/a (git archive 45c4c03e + 本腿判据件 c2e1c07a)
+--- restore after MU-D ---
+restored sha256=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 cmp_pristine=MATCH
+cmp_head_blob_rc=0
+--- delivered bench, 3 more rounds (expect 0 HALF-STATE) ---
+0
+0
+0
+--- GATE 1: go build ./... (rc) ---
+rc_build_all=0
+--- GATE 2: go vet two packages ---
+rc_vet=0
+--- GATE 3: gofumpt real binary, list mode, two packages + my file ---
+rc_gofumpt_list_empty_expected=0
+--- GATE 3b: bare gofumpt control (expect not found rc=127) ---
+/usr/bin/bash: line 49: gofumpt: command not found
+rc_bare=0
+--- WHOLE PACKAGE 1/2: WITH the 326-v1 instrument present ---
+rc_test_with=0
+pkg=memory RUN=117
+pkg=session RUN=117
+  (逐包名册见下)
+  line: ok  	github.com/CarlosShao/wisp/internal/memory	16.590s
+  line: ok  	github.com/CarlosShao/wisp/internal/session	2.142s
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/wp_with.txt'
+117
+63
+0
+2
