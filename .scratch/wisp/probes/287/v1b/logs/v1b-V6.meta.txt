@@ -1,0 +1,41 @@
+SHOT=V6 FILE=internal/agent/loop.go KIND=v6 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/agent/loop.go sha256=78f164e32db3fd24
+cr_before=0 cr_after=0
+mutate_rc=0
+POST-SHA 78f164e32db3fd24e7882be3516c7195ea1464f621e27219025898213c29852c
+hunks=1
+changed_lines=2
+--- diff-body ---
+--- /d/work/tmp/287v1b-mutation-bench/tree-C/internal/agent/loop.go.bak	2026-10-16 10:29:20.737732200 +0800
++++ /d/work/tmp/287v1b-mutation-bench/tree-C/internal/agent/loop.go	2026-10-16 10:29:21.234545000 +0800
+@@ -673,7 +673,7 @@
+ 		}
+ 		timeout := guard.PerToolTimeout()
+ 		req := ToolRequest{
+-			TaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i),
++			TaskID: taskID, CorrelationID: taskID,
+ 			CallID: p.call.ID,
+ 			Name:   p.call.Name, Args: p.call.Args, Timeout: timeout,
+ 		}
+test_rc=1
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.13s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.09s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.09s)
+--- red-points ---
+subagent_depth_fixture_287_test.go:176 subagent_depth_fixture_287_test.go:229 
+fault-tokens=0
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:176: task.spawn 的行 corr = "c1c278b6-6b10-4709-a530-e2eab2081af9", want 非空、以 task id "c1c278b6-6b10-4709-a530-e2eab2081af9" 为前缀且不等于它（派发没经真 loop）
+22:    subagent_depth_fixture_287_test.go:229: task.spawn 的行 corr = "d64a02d2-dbb3-4044-a860-d50993bf0e99", want 非空、以 task id "d64a02d2-dbb3-4044-a860-d50993bf0e99" 为前缀且不等于它（派发没经真 loop）
+full_rc=1
+full_TOP_PASS=237 full_TOP_FAIL=5 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.15s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.10s)
+--- FAIL: Test283IdentityChainThroughTheRealLoop (0.11s)
+--- FAIL: Test285RosterRowsCarryDistinctCorrPerCall (0.14s)
+--- FAIL: TestLoopPassesDeclaredL1WriteThroughTheGate (3.13s)
+RESTORED-EQUAL-OK 57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4

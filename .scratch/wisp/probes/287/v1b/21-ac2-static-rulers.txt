@@ -1,0 +1,34 @@
+### AC#2 静态尺＋既有仪器现量（尺＝grep -c/-n，射程＝逐枚件）
+-- 夹具自造行形状的枚数（应为 0＝夹具不手搓 TaskOutput/Record）--
+TaskOutput{ = 0
+.Record( = 0
+Kind: = 0
+roster. 调用枚数与清单：
+  76:				x.h.roster.PublishSubagent(taskID, parent197, callerSub287)
+  78:				x.h.roster.MarkRoot(taskID, callerRoot287)
+  158:	rec, ok := x.h.roster.Look(callerID)
+  188:	if grand := x.h.roster.Descendants(callerID); len(grand) != 0 {
+  191:	if kids := x.h.roster.Descendants(parent197); len(kids) != 1 {
+  197:	if n := x.h.roster.InFlightSubagents(); n != 0 {
+  206:	rec, ok := x.h.roster.Look(callerID)
+  219:	kids := x.h.roster.Descendants(callerID)
+  243:		release, ok := x.h.roster.TryAcquireSubagentSlot(MaxConcurrentSubagents)
+  249:	if n := x.h.roster.InFlightSubagents(); n != MaxConcurrentSubagents {
+-- 夹具经的产码 API 定义处现量 --
+342:func (r *TaskRoster) PublishSubagent(taskID, parentTaskID, label string) {
+355:func (r *TaskRoster) MarkRoot(taskID, label string) {
+-- 既有仪器四点位（AC#3 问A：硬拒可见且有人钉）--
+  subagent_197_test.go:648				t.Errorf("孩子的工具目录里还有 %s（深度 1 要靠结构保证，不靠运行期计数）", info.Name)
+  subagent_197_test.go:652			t.Errorf("孩子的目录少了不该少的工具：%+v", list)
+  subagent_197_test.go:663			t.Errorf("孩子派孙没有被拒并说明原因：%+v", out)
+  subagent_197_test.go:667				t.Errorf("被拒的那一枚还是打到了父目录上：%v", h.dir.calls())
+-- 名字闸与目录过滤现量 --
+-- 拒句今天在 _test.go 的命中（AC#1 尺①的前置已被夹具自己打破，记为读数）--
+internal/tools/subagent_depth_fixture_287_test.go:1
+-- 产码里那句 --
+279:				"子代理不许再派子代理。", MaxSubagentDepth, parentID, rec.Kind), IsError: true}, nil
+-- MaxSubagentDepth 与池上限常量 --
+85:	MaxConcurrentSubagents = 4
+91:	MaxSubagentDepth = 1
+-- 工作树未动（本腿只读产码；突变全在仓外树）--
+status internal cmd tools = 1 行

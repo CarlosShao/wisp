@@ -1,0 +1,8 @@
+TOP_PASS=234
+TOP_FAIL=8
+TOP_SKIP=0
+RUN=315
+SUB_PASS=73
+--- PASS: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.12s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.11s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.11s)

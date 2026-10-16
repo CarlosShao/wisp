@@ -1,0 +1,44 @@
+SHOT=V8 FILE=internal/agent/loop.go KIND=v8 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/agent/loop.go sha256=1d656ebffba76f2f
+cr_before=0 cr_after=0
+mutate_rc=0
+POST-SHA 1d656ebffba76f2f02c911ed12fe466883ff47655268b4345e5b3b2d78318bf7
+hunks=1
+changed_lines=2
+--- diff-body ---
+--- /d/work/tmp/287v1b-mutation-bench/tree-C/internal/agent/loop.go.bak	2026-10-16 10:29:20.737732200 +0800
++++ /d/work/tmp/287v1b-mutation-bench/tree-C/internal/agent/loop.go	2026-10-16 10:30:26.404524800 +0800
+@@ -371,7 +371,7 @@
+ 	// call can reach a gate. The revocation runs when the task ends, so an
+ 	// admitted id cannot outlive the task that earned it.
+ 	revokeAdmission := func() {}
+-	if l.opt.AdmitTask != nil {
++	if false && l.opt.AdmitTask != nil {
+ 		if r := l.opt.AdmitTask(taskID); r != nil {
+ 			revokeAdmission = r
+ 		}
+test_rc=1
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.09s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.07s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.08s)
+--- red-points ---
+subagent_depth_fixture_287_test.go:157 subagent_depth_fixture_287_test.go:205 subagent_depth_fixture_287_test.go:252 
+fault-tokens=0
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:157: 夹具自己没站住：AdmitTask 跑了 0 次，callerID="", res.TaskID="9033c446-59ee-4a58-9e83-8449378c3620"
+22:    subagent_depth_fixture_287_test.go:205: 夹具自己没站住：AdmitTask 跑了 0 次，callerID="", res.TaskID="1ed93526-10c1-41b5-aedf-458f3521f51a"
+33:    subagent_depth_fixture_287_test.go:252: 夹具自己没站住：AdmitTask 跑了 0 次，callerID="", res.TaskID="585d13f3-d1a6-4616-b7f2-268a74e72ebc"
+full_rc=1
+full_TOP_PASS=235 full_TOP_FAIL=7 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test197SubagentHasNoSelfApprovalOutlet (0.00s)
+--- FAIL: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+--- FAIL: Test222CeilingStillCapsExecutedCallsWhileParentsWait (0.00s)
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.10s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.09s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.10s)
+--- FAIL: TestLoopPassesDeclaredL1WriteThroughTheGate (0.14s)
+RESTORED-EQUAL-OK 57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4

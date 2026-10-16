@@ -1,0 +1,10 @@
+TOP_PASS=242
+TOP_FAIL=0
+TOP_SKIP=0
+RUN=325
+SUB_PASS=83
+-- red roster --
+-- Test287 colors --
+--- PASS: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.10s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.08s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.07s)

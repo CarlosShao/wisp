@@ -1,0 +1,46 @@
+SHOT=V2 FILE=internal/tools/subagent_197.go KIND=v2 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/subagent_197.go sha256=7c7185cc95d9b098
+cr_before=0 cr_after=0
+mutate_rc=0
+POST-SHA 7c7185cc95d9b098662aad4830243e77f22f822fcd3f085701b297ff54cbf25c
+hunks=1
+changed_lines=2
+--- diff-body ---
+--- /d/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/subagent_197.go.bak	2026-10-16 10:14:16.298439100 +0800
++++ /d/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/subagent_197.go	2026-10-16 10:17:00.982582000 +0800
+@@ -268,7 +268,7 @@
+ 	// The task-level id of the caller: since ticket 242 the correlation id is
+ 	// minted per call (C18 routes approval replies by it), so it can no longer
+ 	// name a task; the roster is keyed by task ids.
+-	parentID := TaskID(ctx)
++	parentID := CorrelationID(ctx)
+ 	if parentID == "" {
+ 		return Result{Text: "这条调用没有宿主给的任务 id（fail-closed：不知道父任务是谁，" +
+ 			"就没法登记父子关系，也没法把结论盖戳进父任务的 C25 作用域）", IsError: true}, nil
+test_rc=1
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.11s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.09s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.09s)
+--- red-points ---
+subagent_depth_fixture_287_test.go:169 subagent_depth_fixture_287_test.go:173 subagent_depth_fixture_287_test.go:179 subagent_depth_fixture_287_test.go:185 subagent_depth_fixture_287_test.go:195 subagent_depth_fixture_287_test.go:221 subagent_depth_fixture_287_test.go:255 subagent_depth_fixture_287_test.go:258 
+fault-tokens=0
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:169: subagent_197.go:278 那句「拒绝派生：深度上限是 1」没有出现在 task.spawn 的回执里＝深度判定那一支没跑到（种坏 M1/M2 就是这个读数形）：text="子代理 08b12072-c18a-46c7-b096-f3c98a8d8761（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+12:    subagent_depth_fixture_287_test.go:173: subagent_197.go:279 那句 "子代理不许再派子代理。"（AC#1 尺①数出来全部 *_test.go 零命中）没被说出口：text="子代理 08b12072-c18a-46c7-b096-f3c98a8d8761（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+13:    subagent_depth_fixture_287_test.go:179: :278 那句里的「派生者 <task id>」抽不出来＝身份这一维没有读数：text="子代理 08b12072-c18a-46c7-b096-f3c98a8d8761（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+14:    subagent_depth_fixture_287_test.go:185: 父 kind 那一枚 = [], want "subagent"（判定读的不是调用者自己的子代理行）：text="子代理 08b12072-c18a-46c7-b096-f3c98a8d8761（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+15:    subagent_depth_fixture_287_test.go:195: task.spawn 的 outcome = "success", want "error"：被判定拒掉的那一发必须是错误回执，模型才改得动
+26:    subagent_depth_fixture_287_test.go:221: 孩子行 = 0 枚 [], want 1：{CallID:call-197-spawn Name:task.spawn Outcome:success ErrorClass: Text:子代理 1c0518b2-6128-4e72-9e62-b83264bcd12d（孙代理）已结束，状态 Settling。
+39:    subagent_depth_fixture_287_test.go:255: 深度判定没有在池位判定之前拦住（池已满，回执是另一句）：text="拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：c77b42b5-76fc-48d8-b181-a4d084551a7d）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+40:    subagent_depth_fixture_287_test.go:258: 调用者自己是子代理，却先读到池满那句＝:276 那一支没跑："拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：c77b42b5-76fc-48d8-b181-a4d084551a7d）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+full_rc=1
+full_TOP_PASS=238 full_TOP_FAIL=4 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.10s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.09s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.09s)
+--- FAIL: Test283IdentityChainThroughTheRealLoop (0.10s)
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3

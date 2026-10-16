@@ -1,0 +1,256 @@
+===== V1 =====
+SHOT=V1 FILE=internal/tools/subagent_197.go KIND=v1 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/subagent_197.go sha256=69087120ea40590e
+mutate_rc=0
+POST-SHA 69087120ea40590e545449688abf038049d4ec01deab02eb59e113e6bfe71e56
+hunks=1
+changed_lines=2
+test_rc=1
+fault-tokens=0
+full_rc=1
+full_TOP_PASS=240 full_TOP_FAIL=2 full_TOP_SKIP=0 full_RUN=325
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.11s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.09s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.08s)
+--- red-points ---
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:169: subagent_197.go:278 那句「拒绝派生：深度上限是 1」没有出现在 task.spawn 的回执里＝深度判定那一支没跑到（种坏 M1/M2 就是这个读数形）：text="子代理 50d6dabc-54db-4bf3-b025-d868011f6aa4（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+12:    subagent_depth_fixture_287_test.go:173: subagent_197.go:279 那句 "子代理不许再派子代理。"（AC#1 尺①数出来全部 *_test.go 零命中）没被说出口：text="子代理 50d6dabc-54db-4bf3-b025-d868011f6aa4（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+13:    subagent_depth_fixture_287_test.go:179: :278 那句里的「派生者 <task id>」抽不出来＝身份这一维没有读数：text="子代理 50d6dabc-54db-4bf3-b025-d868011f6aa4（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+14:    subagent_depth_fixture_287_test.go:185: 父 kind 那一枚 = [], want "subagent"（判定读的不是调用者自己的子代理行）：text="子代理 50d6dabc-54db-4bf3-b025-d868011f6aa4（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+15:    subagent_depth_fixture_287_test.go:189: 名册里出现第二代（1 枚 [50d6dabc-54db-4bf3-b025-d868011f6aa4]）＝深度上限 1 被走到并破掉；调用者=8bb5067d-925c-4fbe-816e-416f27b36408
+16:    subagent_depth_fixture_287_test.go:192: parent197 的孩子行 = 2 枚 [50d6dabc-54db-4bf3-b025-d868011f6aa4 8bb5067d-925c-4fbe-816e-416f27b36408], want 1（夹具只登记调用者自己那一枚）
+17:    subagent_depth_fixture_287_test.go:195: task.spawn 的 outcome = "success", want "error"：被判定拒掉的那一发必须是错误回执，模型才改得动
+38:    subagent_depth_fixture_287_test.go:255: 深度判定没有在池位判定之前拦住（池已满，回执是另一句）：text="拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：dfbcd9e1-b2c8-4548-a523-64f3df39b71a）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+39:    subagent_depth_fixture_287_test.go:258: 调用者自己是子代理，却先读到池满那句＝:276 那一支没跑："拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：dfbcd9e1-b2c8-4548-a523-64f3df39b71a）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+full_rc=1
+full_TOP_PASS=240 full_TOP_FAIL=2 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.09s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.10s)
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+===== V2 =====
+SHOT=V2 FILE=internal/tools/subagent_197.go KIND=v2 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/subagent_197.go sha256=7c7185cc95d9b098
+mutate_rc=0
+POST-SHA 7c7185cc95d9b098662aad4830243e77f22f822fcd3f085701b297ff54cbf25c
+hunks=1
+changed_lines=2
+test_rc=1
+fault-tokens=0
+full_rc=1
+full_TOP_PASS=238 full_TOP_FAIL=4 full_TOP_SKIP=0 full_RUN=325
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.11s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.09s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.09s)
+--- red-points ---
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:169: subagent_197.go:278 那句「拒绝派生：深度上限是 1」没有出现在 task.spawn 的回执里＝深度判定那一支没跑到（种坏 M1/M2 就是这个读数形）：text="子代理 08b12072-c18a-46c7-b096-f3c98a8d8761（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+12:    subagent_depth_fixture_287_test.go:173: subagent_197.go:279 那句 "子代理不许再派子代理。"（AC#1 尺①数出来全部 *_test.go 零命中）没被说出口：text="子代理 08b12072-c18a-46c7-b096-f3c98a8d8761（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+13:    subagent_depth_fixture_287_test.go:179: :278 那句里的「派生者 <task id>」抽不出来＝身份这一维没有读数：text="子代理 08b12072-c18a-46c7-b096-f3c98a8d8761（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+14:    subagent_depth_fixture_287_test.go:185: 父 kind 那一枚 = [], want "subagent"（判定读的不是调用者自己的子代理行）：text="子代理 08b12072-c18a-46c7-b096-f3c98a8d8761（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+15:    subagent_depth_fixture_287_test.go:195: task.spawn 的 outcome = "success", want "error"：被判定拒掉的那一发必须是错误回执，模型才改得动
+26:    subagent_depth_fixture_287_test.go:221: 孩子行 = 0 枚 [], want 1：{CallID:call-197-spawn Name:task.spawn Outcome:success ErrorClass: Text:子代理 1c0518b2-6128-4e72-9e62-b83264bcd12d（孙代理）已结束，状态 Settling。
+39:    subagent_depth_fixture_287_test.go:255: 深度判定没有在池位判定之前拦住（池已满，回执是另一句）：text="拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：c77b42b5-76fc-48d8-b181-a4d084551a7d）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+40:    subagent_depth_fixture_287_test.go:258: 调用者自己是子代理，却先读到池满那句＝:276 那一支没跑："拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：c77b42b5-76fc-48d8-b181-a4d084551a7d）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+full_rc=1
+full_TOP_PASS=238 full_TOP_FAIL=4 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.10s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.09s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.09s)
+--- FAIL: Test283IdentityChainThroughTheRealLoop (0.10s)
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+===== V3 =====
+SHOT=V3 FILE=internal/tools/subagent_197.go KIND=v3 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/subagent_197.go sha256=5aaba840f472d410
+mutate_rc=0
+POST-SHA 5aaba840f472d410c1b30cec88019b8900343025ff3afae81d0cf3ec5dd7d24e
+hunks=1
+changed_lines=2
+test_rc=1
+fault-tokens=0
+full_rc=1
+full_TOP_PASS=146 full_TOP_FAIL=5 full_TOP_SKIP=0 full_RUN=235
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+--- case-colors ---
+--- PASS: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.15s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.10s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.11s)
+--- red-points ---
+--- red-sentences（逐字，含文件:行）---
+21:    subagent_depth_fixture_287_test.go:213: 父 kind=root 的调用者被深度判定拒了（那一支已经宽到认不出 kind）：refusal="拒绝派生：深度上限是 " 出现在 text="拒绝派生：深度上限是 1，而派生者 65b150dd-94db-4d61-ad1f-b3cf252931dc 自己就是一枚子代理（父 kind=root）。子代理不许再派子代理。"
+22:    subagent_depth_fixture_287_test.go:213: 父 kind=root 的调用者被深度判定拒了（那一支已经宽到认不出 kind）：refusal="子代理不许再派子代理。" 出现在 text="拒绝派生：深度上限是 1，而派生者 65b150dd-94db-4d61-ad1f-b3cf252931dc 自己就是一枚子代理（父 kind=root）。子代理不许再派子代理。"
+23:    subagent_depth_fixture_287_test.go:217: task.spawn 的 outcome = "error", want "success"：正控必须真的派出来一枚
+24:    subagent_depth_fixture_287_test.go:221: 孩子行 = 0 枚 [], want 1：{CallID:call-197-spawn Name:task.spawn Outcome:error ErrorClass:tool Text:拒绝派生：深度上限是 1，而派生者 65b150dd-94db-4d61-ad1f-b3cf252931dc 自己就是一枚子代理（父 kind=root）。子代理不许再派子代理。 Spilled:false Artifact: Truncated:false Rejected:false}
+full_rc=1
+full_TOP_PASS=146 full_TOP_FAIL=5 full_TOP_SKIP=0 full_RUN=235
+--- full-red-roster ---
+--- FAIL: Test236R2TaskCancelRefusesWhenHostGaveNoCallerID (0.00s)
+--- FAIL: Test270R1ThreeRefusalSentencesDoNotSubstitute (0.00s)
+--- FAIL: Test270R1WiredBaseOptionsIsNotRefused (0.00s)
+--- FAIL: Test229FinishWatcherIsRosterNamedWhileChildRuns (10.00s)
+--- FAIL: Test197SpawnPublishesIdentityRow (0.00s)
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+===== V4 =====
+SHOT=V4 FILE=internal/tools/subagent_197.go KIND=v4 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/subagent_197.go sha256=2a0d66cfe1af67e4
+mutate_rc=0
+POST-SHA 2a0d66cfe1af67e47f8f6fe39d3930c426f14f05cebd14fa5d921cfe8db9cd63
+hunks=1
+changed_lines=2
+test_rc=1
+fault-tokens=0
+full_rc=1
+full_TOP_PASS=241 full_TOP_FAIL=1 full_TOP_SKIP=0 full_RUN=325
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.15s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.12s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.10s)
+--- red-points ---
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:181: 深度判定读的身份 = "68724e6d-e265-4bc9-b452-1dc18942e578#call-197-spawn", want task id "68724e6d-e265-4bc9-b452-1dc18942e578"；这一发的 per-call corr = "68724e6d-e265-4bc9-b452-1dc18942e578#call-197-spawn"（corr != taskID）：把 :271 改读 CorrelationID(ctx) 就是这个读数
+full_rc=1
+full_TOP_PASS=241 full_TOP_FAIL=1 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.10s)
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+===== V5 =====
+SHOT=V5 FILE=internal/tools/subagent_197.go KIND=v5 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+MOVED depth_block_lines=5 pool_block_lines=7 hunks_shape=1-move
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/subagent_197.go sha256=9ba11cbdd736b303
+mutate_rc=0
+POST-SHA 9ba11cbdd736b303c784aa003eb125a7c607ca090feccf8e15bdab85f557f9a5
+hunks=2
+changed_lines=10
+test_rc=1
+fault-tokens=0
+full_rc=1
+full_TOP_PASS=240 full_TOP_FAIL=2 full_TOP_SKIP=0 full_RUN=325
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.10s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.07s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.08s)
+--- red-points ---
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:198: 深度拒绝发生之后还占着 1 枚池位：那一支必须在 TryAcquireSubagentSlot 之前返回
+32:    subagent_depth_fixture_287_test.go:255: 深度判定没有在池位判定之前拦住（池已满，回执是另一句）：text="拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：9aa4d526-9e82-47fe-b8b0-e5d7fd92e715）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+33:    subagent_depth_fixture_287_test.go:258: 调用者自己是子代理，却先读到池满那句＝:276 那一支没跑："拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：9aa4d526-9e82-47fe-b8b0-e5d7fd92e715）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+full_rc=1
+full_TOP_PASS=240 full_TOP_FAIL=2 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.09s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.08s)
+RESTORED-EQUAL-OK 86de44c4b79b35172c5ca4bd42862f3659e1d9268ab992f975c282eaa6b172e3
+===== V6 =====
+SHOT=V6 FILE=internal/agent/loop.go KIND=v6 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/agent/loop.go sha256=78f164e32db3fd24
+mutate_rc=0
+POST-SHA 78f164e32db3fd24e7882be3516c7195ea1464f621e27219025898213c29852c
+hunks=1
+changed_lines=2
+test_rc=1
+fault-tokens=0
+full_rc=1
+full_TOP_PASS=237 full_TOP_FAIL=5 full_TOP_SKIP=0 full_RUN=325
+RESTORED-EQUAL-OK 57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.13s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.09s)
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.09s)
+--- red-points ---
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:176: task.spawn 的行 corr = "c1c278b6-6b10-4709-a530-e2eab2081af9", want 非空、以 task id "c1c278b6-6b10-4709-a530-e2eab2081af9" 为前缀且不等于它（派发没经真 loop）
+22:    subagent_depth_fixture_287_test.go:229: task.spawn 的行 corr = "d64a02d2-dbb3-4044-a860-d50993bf0e99", want 非空、以 task id "d64a02d2-dbb3-4044-a860-d50993bf0e99" 为前缀且不等于它（派发没经真 loop）
+full_rc=1
+full_TOP_PASS=237 full_TOP_FAIL=5 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.15s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.10s)
+--- FAIL: Test283IdentityChainThroughTheRealLoop (0.11s)
+--- FAIL: Test285RosterRowsCarryDistinctCorrPerCall (0.14s)
+--- FAIL: TestLoopPassesDeclaredL1WriteThroughTheGate (3.13s)
+RESTORED-EQUAL-OK 57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4
+===== V7 =====
+SHOT=V7 FILE=internal/tools/task.go KIND=v7 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 91608259e5e963f851cec8f1f3e64ae474bae4e2ca233b0243ecc19c22ba0d35
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/task.go sha256=b39a982eba2c37de
+mutate_rc=0
+POST-SHA b39a982eba2c37dee6b54be1e149390b1bbd218d5c3e75e0b460213f68c8e58d
+hunks=1
+changed_lines=2
+test_rc=1
+fault-tokens=0
+full_rc=1
+full_TOP_PASS=237 full_TOP_FAIL=5 full_TOP_SKIP=0 full_RUN=325
+RESTORED-EQUAL-OK 91608259e5e963f851cec8f1f3e64ae474bae4e2ca233b0243ecc19c22ba0d35
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.15s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.13s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.09s)
+--- red-points ---
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:160: 前置一没落地：调用者 ef6947a5-d5a1-4fd1-a331-4cdea5f8c69c 的行 ok=true Kind="root", want "subagent"
+32:    subagent_depth_fixture_287_test.go:255: 深度判定没有在池位判定之前拦住（池已满，回执是另一句）：text="拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+33:    subagent_depth_fixture_287_test.go:258: 调用者自己是子代理，却先读到池满那句＝:276 那一支没跑："拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+full_rc=1
+full_TOP_PASS=237 full_TOP_FAIL=5 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test197SubagentPoolCapsAtBridgeCeiling (0.00s)
+--- FAIL: Test197FullPoolRefusesNextSpawnWithReadableReason (0.00s)
+--- FAIL: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.13s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.11s)
+RESTORED-EQUAL-OK 91608259e5e963f851cec8f1f3e64ae474bae4e2ca233b0243ecc19c22ba0d35
+===== V8 =====
+SHOT=V8 FILE=internal/agent/loop.go KIND=v8 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/agent/loop.go sha256=1d656ebffba76f2f
+mutate_rc=0
+POST-SHA 1d656ebffba76f2f02c911ed12fe466883ff47655268b4345e5b3b2d78318bf7
+hunks=1
+changed_lines=2
+test_rc=1
+fault-tokens=0
+full_rc=1
+full_TOP_PASS=235 full_TOP_FAIL=7 full_TOP_SKIP=0 full_RUN=325
+RESTORED-EQUAL-OK 57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.09s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.07s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.08s)
+--- red-points ---
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:157: 夹具自己没站住：AdmitTask 跑了 0 次，callerID="", res.TaskID="9033c446-59ee-4a58-9e83-8449378c3620"
+22:    subagent_depth_fixture_287_test.go:205: 夹具自己没站住：AdmitTask 跑了 0 次，callerID="", res.TaskID="1ed93526-10c1-41b5-aedf-458f3521f51a"
+33:    subagent_depth_fixture_287_test.go:252: 夹具自己没站住：AdmitTask 跑了 0 次，callerID="", res.TaskID="585d13f3-d1a6-4616-b7f2-268a74e72ebc"
+full_rc=1
+full_TOP_PASS=235 full_TOP_FAIL=7 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test197SubagentHasNoSelfApprovalOutlet (0.00s)
+--- FAIL: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+--- FAIL: Test222CeilingStillCapsExecutedCallsWhileParentsWait (0.00s)
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.10s)
+--- FAIL: Test287RootCallerWithTheSameShapeStillDerives (0.09s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.10s)
+--- FAIL: TestLoopPassesDeclaredL1WriteThroughTheGate (0.14s)
+RESTORED-EQUAL-OK 57b734ebd448aae38850130bc8f4e33445d491391fbd9ece124bd2ea82dff3f4

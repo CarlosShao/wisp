@@ -1,0 +1,43 @@
+### AC#4 越界扫（尺＝git show --name-only --format=，射程＝两枚提交的父项清单，⛔ 工作树）
+HEAD=8b8fa0be7dce4f323c4f8304cb48d71b43a6249c
+-- e1973191 文件枚数=35
+-- 落点分类 --
+probes/287/r1 = 32
+docs/evidence/s1/287-depth-fixture.md = 1
+ticket287 = 1
+internal/tools 新件 = internal/tools/subagent_depth_fixture_287_test.go 
+-- 剔掉四处合法落点后剩余 --
+internal/tools/subagent_depth_fixture_287_test.go
+-- 禁区逐枚求命中（e1973191＋e64294a0 合并清单）--
+ban internal/agent/loop.go = 0
+ban internal/approval/ = 0
+ban internal/risk/ = 0
+ban internal/panel/ = 0
+ban internal/perm/ = 0
+ban internal/observe/thresholds.go = 0
+ban internal/panel/tokens_fourway_test.go = 0
+ban internal/panel/l2_grant_boundary_test.go = 0
+ban internal/perm/ticket90_persist_test.go = 0
+ban frontend/ = 0
+ban design/ = 0
+ban .github/ = 0
+ban ci.yml = 0
+ban docs/PLAN.md = 0
+ban docs/specs/ = 0
+ban allowlist.txt = 0
+ban cmd/wisp = 0
+ban go.mod = 0
+ban go.sum = 0
+ban .gitignore = 0
+-- 两笔 numstat --
+2	0	.scratch/wisp/issues/287-depth-guard-has-no-fixture-so-the-subagent-spawn-hop-is-unreachable-and-untested.md
+3
+-- e64294a0 清单 --
+.scratch/wisp/probes/287/r1/00-readings.md
+docs/evidence/s1/287-depth-fixture.md
+-- 三枚 AC 框现状（票面逐字）--
+17:- [ ] **AC#2 造那枚夹具**：让**调用者那一行**的 `Kind == TaskKindSubagent`、派发经**真 loop**（因而 `corr != taskID`）、请求 `task.spawn` ——三件缺一都作不出读数（方法学前置＝票 282 那条：`TaskID != CorrelationID` 必须真在红句里同屏）。判据＝**新增用例今天必须是"能红"的**：把它种坏（把 `:267` 那一支的深度判定摘掉／改成恒通过）⇒ **指名用例必须红**，四件套齐（种前 hash／`sed -n` 复量／红句 `文件:行` 逐字／还原 hash 等值＋`git status --porcelain -- internal cmd` 空）。⛔ 不许用"字段非空"充当判据、⛔ 不许 `t.Skip`。
+18:- [ ] **AC#3 顺手答一句"要不要让它走到"**（⛔ 不改产码）：孩子的 `task.spawn` 被 `subagentToolProvider` 硬拒 ＝ **设计如此**（深度 1）还是**挡住了一枚本该走到的检查**？两形各写"要动哪几枚文件＋会不会把深度上限放开"，交编排者裁。⚠ 这一格交的是**代价表**，⛔ 本票不许落地。
+19:- [ ] **AC#4 边界与门禁**：写面只许 `internal/tools/**`（夹具＋用例）；⛔ 不碰 `internal/agent/loop.go` 的 `callCorr`、⛔ 不碰 `approval/gate.go`、⛔ 三枚冻结件一字不动（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）；`GOFLAGS= go build ./...`、`go test ./internal/tools/ -count=1` 改前改后各一次（**PASS/FAIL/SKIP 三数并排＋红名册差集**）、`gofmt -l`／`gofumpt -l` 对动过的件空、`sh scripts/d22scan.sh` 纯净树 rc=0；`frontend/**`／`design/**` 零读零写零转述；⛔ 零 push、commit 必带显式 pathspec。
+-- Status 行 --
+1

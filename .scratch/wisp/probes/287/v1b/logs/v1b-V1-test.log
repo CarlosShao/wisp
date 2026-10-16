@@ -1,0 +1,43 @@
+time=2026-10-16T10:16:39.216+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop
+time=2026-10-16T10:16:39.256+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealL440156763\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:16:39.268+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:16:39Z duration_ms=11
+time=2026-10-16T10:16:39.277+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealL440156763\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:16:39.283+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:16:39Z duration_ms=6
+time=2026-10-16T10:16:39.294+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealL440156763\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T10:16:39.300+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:16:39Z duration_ms=6
+time=2026-10-16T10:16:39.305+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:16:39.307+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    subagent_depth_fixture_287_test.go:169: subagent_197.go:278 那句「拒绝派生：深度上限是 1」没有出现在 task.spawn 的回执里＝深度判定那一支没跑到（种坏 M1/M2 就是这个读数形）：text="子代理 50d6dabc-54db-4bf3-b025-d868011f6aa4（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:173: subagent_197.go:279 那句 "子代理不许再派子代理。"（AC#1 尺①数出来全部 *_test.go 零命中）没被说出口：text="子代理 50d6dabc-54db-4bf3-b025-d868011f6aa4（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:179: :278 那句里的「派生者 <task id>」抽不出来＝身份这一维没有读数：text="子代理 50d6dabc-54db-4bf3-b025-d868011f6aa4（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:185: 父 kind 那一枚 = [], want "subagent"（判定读的不是调用者自己的子代理行）：text="子代理 50d6dabc-54db-4bf3-b025-d868011f6aa4（孙代理）已结束，状态 Settling。\n结论：\n孙代理的结论（深度 1 的树里不该出现这一行）"
+    subagent_depth_fixture_287_test.go:189: 名册里出现第二代（1 枚 [50d6dabc-54db-4bf3-b025-d868011f6aa4]）＝深度上限 1 被走到并破掉；调用者=8bb5067d-925c-4fbe-816e-416f27b36408
+    subagent_depth_fixture_287_test.go:192: parent197 的孩子行 = 2 枚 [50d6dabc-54db-4bf3-b025-d868011f6aa4 8bb5067d-925c-4fbe-816e-416f27b36408], want 1（夹具只登记调用者自己那一枚）
+    subagent_depth_fixture_287_test.go:195: task.spawn 的 outcome = "success", want "error"：被判定拒掉的那一发必须是错误回执，模型才改得动
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.11s)
+=== RUN   Test287RootCallerWithTheSameShapeStillDerives
+time=2026-10-16T10:16:39.346+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287RootCallerWithTheSameShapeStillDerives1759358586\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:16:39.353+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:16:39Z duration_ms=7
+time=2026-10-16T10:16:39.363+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287RootCallerWithTheSameShapeStillDerives1759358586\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:16:39.371+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:16:39Z duration_ms=7
+time=2026-10-16T10:16:39.380+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287RootCallerWithTheSameShapeStillDerives1759358586\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T10:16:39.387+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:16:39Z duration_ms=6
+time=2026-10-16T10:16:39.393+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:16:39.398+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.09s)
+=== RUN   Test287DepthRefusalWinsOverThePoolRefusal
+time=2026-10-16T10:16:39.432+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287DepthRefusalWinsOverThePoolRefusal1905244960\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:16:39.443+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:16:39Z duration_ms=10
+time=2026-10-16T10:16:39.456+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287DepthRefusalWinsOverThePoolRefusal1905244960\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:16:39.462+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:16:39Z duration_ms=6
+time=2026-10-16T10:16:39.472+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287DepthRefusalWinsOverThePoolRefusal1905244960\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T10:16:39.479+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:16:39Z duration_ms=6
+time=2026-10-16T10:16:39.483+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:16:39.485+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    subagent_depth_fixture_287_test.go:255: 深度判定没有在池位判定之前拦住（池已满，回执是另一句）：text="拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：dfbcd9e1-b2c8-4548-a523-64f3df39b71a）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+    subagent_depth_fixture_287_test.go:258: 调用者自己是子代理，却先读到池满那句＝:276 那一支没跑："拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：dfbcd9e1-b2c8-4548-a523-64f3df39b71a）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.08s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.333s
+FAIL

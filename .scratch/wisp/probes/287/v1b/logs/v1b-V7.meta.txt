@@ -1,0 +1,42 @@
+SHOT=V7 FILE=internal/tools/task.go KIND=v7 TREE=/d/work/tmp/287v1b-mutation-bench/tree-C FULL=1
+PRE-SHA 91608259e5e963f851cec8f1f3e64ae474bae4e2ca233b0243ecc19c22ba0d35
+anchor_hits=1
+WROTE D:/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/task.go sha256=b39a982eba2c37de
+cr_before=0 cr_after=0
+mutate_rc=0
+POST-SHA b39a982eba2c37dee6b54be1e149390b1bbd218d5c3e75e0b460213f68c8e58d
+hunks=1
+changed_lines=2
+--- diff-body ---
+--- /d/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/task.go.bak	2026-10-16 10:29:54.946644100 +0800
++++ /d/work/tmp/287v1b-mutation-bench/tree-C/internal/tools/task.go	2026-10-16 10:29:55.410657600 +0800
+@@ -341,7 +341,7 @@
+ // model call either way.
+ func (r *TaskRoster) PublishSubagent(taskID, parentTaskID, label string) {
+ 	r.Record(taskID, TaskOutput{
+-		ParentTaskID: parentTaskID, Label: label, Kind: TaskKindSubagent,
++		ParentTaskID: parentTaskID, Label: label, Kind: TaskKindRoot,
+ 		State: statemachine.State(subagentStateRunning),
+ 	})
+ }
+test_rc=1
+--- case-colors ---
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.15s)
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.13s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.09s)
+--- red-points ---
+subagent_depth_fixture_287_test.go:160 subagent_depth_fixture_287_test.go:255 subagent_depth_fixture_287_test.go:258 
+fault-tokens=0
+--- red-sentences（逐字，含文件:行）---
+11:    subagent_depth_fixture_287_test.go:160: 前置一没落地：调用者 ef6947a5-d5a1-4fd1-a331-4cdea5f8c69c 的行 ok=true Kind="root", want "subagent"
+32:    subagent_depth_fixture_287_test.go:255: 深度判定没有在池位判定之前拦住（池已满，回执是另一句）：text="拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+33:    subagent_depth_fixture_287_test.go:258: 调用者自己是子代理，却先读到池满那句＝:276 那一支没跑："拒绝派生：同时在跑的子代理已达上限 4 枚（在跑的：）。这是硬拒，不是排队——等哪一枚结束了再派，或者把任务并成一枚子代理。"
+full_rc=1
+full_TOP_PASS=237 full_TOP_FAIL=5 full_TOP_SKIP=0 full_RUN=325
+--- full-red-roster ---
+--- FAIL: Test197SubagentPoolCapsAtBridgeCeiling (0.00s)
+--- FAIL: Test197FullPoolRefusesNextSpawnWithReadableReason (0.00s)
+--- FAIL: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.13s)
+--- FAIL: Test287DepthRefusalWinsOverThePoolRefusal (0.11s)
+RESTORED-EQUAL-OK 91608259e5e963f851cec8f1f3e64ae474bae4e2ca233b0243ecc19c22ba0d35

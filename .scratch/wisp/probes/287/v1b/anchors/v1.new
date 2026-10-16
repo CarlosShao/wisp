@@ -1,0 +1,1 @@
+if rec, ok := t.d.Roster.Look(parentID); false && ok && rec.Kind == TaskKindSubagent {

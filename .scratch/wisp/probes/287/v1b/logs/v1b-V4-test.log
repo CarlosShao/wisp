@@ -1,0 +1,35 @@
+time=2026-10-16T10:28:08.337+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop
+time=2026-10-16T10:28:08.387+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealL3577643555\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:28:08.398+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:28:08Z duration_ms=11
+time=2026-10-16T10:28:08.410+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealL3577643555\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:28:08.416+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:28:08Z duration_ms=6
+time=2026-10-16T10:28:08.433+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealL3577643555\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T10:28:08.442+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:28:08Z duration_ms=9
+time=2026-10-16T10:28:08.449+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:28:08.456+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    subagent_depth_fixture_287_test.go:181: 深度判定读的身份 = "68724e6d-e265-4bc9-b452-1dc18942e578#call-197-spawn", want task id "68724e6d-e265-4bc9-b452-1dc18942e578"；这一发的 per-call corr = "68724e6d-e265-4bc9-b452-1dc18942e578#call-197-spawn"（corr != taskID）：把 :271 改读 CorrelationID(ctx) 就是这个读数
+--- FAIL: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.15s)
+=== RUN   Test287RootCallerWithTheSameShapeStillDerives
+time=2026-10-16T10:28:08.519+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287RootCallerWithTheSameShapeStillDerives2420963588\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:28:08.529+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:28:08Z duration_ms=10
+time=2026-10-16T10:28:08.540+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287RootCallerWithTheSameShapeStillDerives2420963588\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:28:08.548+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:28:08Z duration_ms=7
+time=2026-10-16T10:28:08.558+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287RootCallerWithTheSameShapeStillDerives2420963588\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T10:28:08.566+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:28:08Z duration_ms=8
+time=2026-10-16T10:28:08.573+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:28:08.577+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test287RootCallerWithTheSameShapeStillDerives (0.12s)
+=== RUN   Test287DepthRefusalWinsOverThePoolRefusal
+time=2026-10-16T10:28:08.636+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287DepthRefusalWinsOverThePoolRefusal1577116657\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:28:08.645+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:28:08Z duration_ms=9
+time=2026-10-16T10:28:08.658+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287DepthRefusalWinsOverThePoolRefusal1577116657\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:28:08.668+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:28:08Z duration_ms=10
+time=2026-10-16T10:28:08.678+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test287DepthRefusalWinsOverThePoolRefusal1577116657\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T10:28:08.687+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:28:08Z duration_ms=8
+time=2026-10-16T10:28:08.692+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:28:08.695+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test287DepthRefusalWinsOverThePoolRefusal (0.10s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.443s
+FAIL
