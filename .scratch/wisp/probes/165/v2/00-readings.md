@@ -21,7 +21,7 @@
 | `plan-present.sse` | `7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be` | 28 |
 | `plan_present_doorbell_165r3_test.go` | `00c32049994c441c8927066bc4d4099c1b2977fc20ee9e602bb98f3670d37b75` | 221 |
 
-两串与他报的前缀（`7d26fa889b59fc3a`／`00c32049994c441c`）逐位相符。**每一发（含 9 枚突变）跑完当场还原，还原后两串全部回到上表**；
+两串与他报的前缀（`7d26fa889b59fc3a`／`00c32049994c441c`）逐位相符。**每一发（含 10 枚突变）跑完当场还原，还原后两串全部回到上表**；
 最后一次复量记在 `logs/f03-fullpkg-anchor.txt` 同轮的 `sha256sum` 输出里。交件时 `git status --porcelain -- internal cmd` ＝ **0 行**（本腿在编译面零字节）。
 
 ## 2. 三发主尺（我自己重跑）
@@ -38,7 +38,11 @@
 ⚠ `-run '^TestAC|^TestPlanPresent'` 在本包命中 **2 枚**（他那枚＋别腿的 `TestAC3SpillArtifactLandsPrivate`）＝我 `-list` 现量，⛔ 把 2/2 读成"他一人两枚"。
 真名尺＝`grep -n '^func Test' internal/agent/plan_present_doorbell_165r3_test.go` → `117:func TestPlanPresentCallBooksTheToolCallRow165r3`。
 
-## 3. 定向突变（他⛔ 做过；9 枚全在导出树，逐枚还原）
+## 3. 定向突变（10 发，全在导出树、逐枚还原）
+
+口径收窄：其中**他没做过的形＝7 枚**（M-a／M-a2／M-a3／M-b／M-b2／M-e／M-f）；**复算他的＝3 枚**（M-c-A＝他的 M-A、M-c-B＝他的 M-B、M-g＝他的 M-C）。
+⚠ 本腿票尾那条 bullet 写的是"九枚定向突变（他⛔ 做过的形）"——那句口径偏松（M-c-A／M-c-B 本是派单第 3(c) 项点名的复算），
+更正记在这里与判语件 §四；派单只许票尾**一条**bullet ⇒ 本腿⛔ 追加第二条、⛔ 改已落那一句。
 
 | 形 | 打什么 | rc | 颜色与红句 |
 |---|---|---|---|
@@ -51,6 +55,7 @@
 | M-c-B | 同处常量计数 ＋ `sed -i '12d'` 摘牙 | 1 | `:143: no tool_call row was booked for "plan.present" (rows read back = 0): the call never reached internal/agent/loop.go:637-640` ⇒ 假计数顶不掉缺牙 |
 | M-e | `Resident→false` ＋ 描述换成与查询无共同字（`先交付方案待批`） | 1 | `:219: round 1 body: missing "\"name\":\"plan.present\"" in "{\"model\":\"mock-small\",…"` ⇒ "请求里带没带"那一半有牙 |
 | M-f | `planPresentCallID165r3`→`call_ppX` | 1 | `:199: tool log entry = {CallID:call_pp1 …}, want a rejected plan.present/call_ppX` ＋ `:220: round 2 body: missing "\"tool_call_id\":\"call_ppX\""` ⇒ 调用号真从线上来 |
+| M-g | 镜像档位 `RiskL2`→`RiskL0`＝**复跑他的 M-C** | 1 | 五枚红逐行相符：`:157 …"L0", want "L2"`／`:184 row.decision = "allow", want "reject"`／`:191 row.error_class = "tool", want "permission_denied"`／`:199 …Rejected:false`／`:208: executed tool calls = 1, want 0 (an ungated L2 call must never execute)` ⇒ "工具体一枚没跑"那一格我**自己**有凭据 |
 
 ## 4. 两枚字段缺口的机理（具名到行）
 

@@ -1,0 +1,22 @@
+165-v2 收口补笔（复跑他的 M-C＝M-g 五枚红逐行相符 ⇒ "工具体一枚没跑"那一格本腿自己有凭据；另具名自纠票尾那句"九枚"的口径）
+
+新增一发（导出树 44f51fc8，-count=1 -timeout 30m，跑完当场还原、两枚字节 sha256 逐位回基线）：
+M-g＝把镜像条目档位 RiskL2 改 RiskL0（＝实现者 M-C 那一形，本腿⛔ 抄颜色）⇒ rc=1、五枚红逐行相符：
+:157 row.risk_level = "L0", want "L2" ／ :184 row.decision = "allow", want "reject" ／
+:191 row.error_class = "tool", want "permission_denied" ／ :199 tool log … Rejected:false ／
+:208 executed tool calls = 1, want 0 (an ungated L2 call must never execute)。
+⇒ 判语件 §一 那张表里"工具体一枚没跑"那一格从"未复核"改为**已复核**（凭据＝本发，原始日志
+.scratch/wisp/probes/165/v2/logs/mut-M-g-risk-l0.txt）；§四 并排表新增"复算他三发"一行
+（M-c-A 绿 rc=0／M-c-B 红 :143／M-g 五枚红，与他的 M-A／M-B／M-C 逐行相符）。
+
+一处本腿口径自纠（⛔ 改已落的票尾那一句、⛔ 追加第二条 bullet：派单只许一条）：票尾写"定向突变九枚（他⛔ 做过的形）"
+口径偏松；准确形＝**十发**，其中他没做过的 **7** 枚（M-a／M-a2／M-a3／M-b／M-b2／M-e／M-f）、复算他的 **3** 枚
+（M-c-A＝M-A、M-c-B＝M-B、M-g＝M-C）。更正记在判语件 §四 末段与读数件 §3 抬头。
+顺带把 G2 那段补时机理：M-b2（L2→L1）**唯一红**在 :157＝loop.go:818-826 让 L1 与 L2 同支（AdmitTask==nil 一律拒），
+换到 L1 只改表上那一列、⛔ 改判决；M-g（→L0）才换支、五枚同红 ⇒ "Declared 有牙"这句现在带牙的形状。
+
+件面＝docs/evidence/s1/165-v2-verdict.md（77 行／13890 B，占位符尺 0 命中，帽 160 行内）＋
+.scratch/wisp/probes/165/v2/00-readings.md（87 行／10444 B）＋logs/mut-M-g-risk-l0.txt（3868 B，⛔ 0 字节）＋本 msg 源。
+判决一字未动＝**AC#6 成立、带三枚具名缺口（G1／G2／G3，另记 G4 射程）**；只能补一件事＝G1 的"镜像 ⇄ 真名册"对接钉。
+票框尺复跑＝5 勾／1 未勾（本腿一枚没翻）；git status --porcelain -- internal cmd＝0 行（编译面零字节）；
+⛔ 动 internal/**、cmd/** 任何跟踪字节；只 commit、⛔ push。
