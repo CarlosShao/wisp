@@ -1,0 +1,5 @@
+winsec: 142 RUN / 86 topPASS / 0 topFAIL / 0 topSKIP
+winsec-rc=0
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1850 flipErrs=0 damagedWitnesses=0 leafLegRefusals=68 foreignsNarrowed=0 foreignsHoldingPayload=0
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1690 flipErrs=0 damagedWitnesses=0 leafLegRefusals=53 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- consumers:

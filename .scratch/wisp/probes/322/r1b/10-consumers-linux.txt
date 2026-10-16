@@ -1,0 +1,8 @@
+# 322-r1b AC#4 消费者色（容器 linux 档，宿主模块缓存只读挂 /gomod、GOPROXY=off）2026-10-16 09:49:48 +0800
+上一发用命名卷 probe322mod 时五包全 [setup failed]（mkdir /gomod/cache: read-only file system）＝台面故障、⛔ 计入判据；本发按 322-r1/cons.sh 的挂法重跑：
+ok  	github.com/CarlosShao/wisp/internal/risk	4.437s
+ok  	github.com/CarlosShao/wisp/internal/secret	0.014s
+ok  	github.com/CarlosShao/wisp/internal/config	0.747s
+ok  	github.com/CarlosShao/wisp/internal/agent	2.115s
+ok  	github.com/CarlosShao/wisp/internal/memory	12.696s
+cons-rc=0

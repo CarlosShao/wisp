@@ -1,0 +1,13 @@
+322-r1b (a) 证据件 docs/evidence/s1/322-openleaf.md 落盘＋AC#4 余下两发读数（容器 -count=2 四数＝142/86/0/0、消费者五包 Linux 档全 ok、三档跨 OS vet 全 rc=0）
+
+- 证据件 178 行：这一格的病、8baec646 交的形状（分平台两半＝A996 那一形）、本腿补的七件、
+  AC#1 成对读数（base 63/3000 红 ⇄ fixed 0 且 liveness 48 绿，同发同屏）、
+  去牙反控两形（摘牙：POSIX damaged=70、Windows 三枚具名链接红＋instrument 红；反形：两平台都仍红⇒非恒真）、
+  红句逐字、还原 sha（41ba9a9b…／5cdef881… 逐字相同）、AC 格子逐枚（每枚答"未修码上响不响"）、
+  一枚单边尺具名（flag 那枚不经 privateFile，接线归 race 那发）、本腿两处偏差自纠（其中一枚 commit 用了目录形 pathspec，形状违规成立）。
+- ⚠ 一笔不是判语、是本腿量到的残留：Windows 三发（含已修码那发）AC#3 那行 witnessTruncated=true（witnessSize=0／35），
+  用例把它写成"报告"而不是"闸门"（测试件 :249-253 逐字）⇒ 本腿⛔ 改判据、⛔ 翻框，只把数交出去。
+- AC#4 那一格里 cmd/wisp 那一维本腿零读数：派单具名票 314 整包死亡区、只许定向 -run ⇒ 具名写"没跑"，不用含糊话糊。
+- 台面自纠：消费者那一发第一跑把 GOMODCACHE 挂成命名卷只读 ⇒ 五包全 [setup failed]（read-only file system）＝台面故障、⛔ 计入判据；
+  按 322-r1/cons.sh 的挂法（宿主 /d/work/base/gopath/pkg/mod:ro）重跑才是入库那一发。
+- 本笔⛔ 翻 AC 框（复量仍 6 枚未勾／0 枚已勾）、⛔ Status/票名/台账、⛔ push；两枚别的腿的面（docs/evidence/s1/325-runtests-gotmp.md、go.mod、.gitignore、design/**）一字未碰。

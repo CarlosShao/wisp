@@ -1,0 +1,23 @@
+go: downloading modernc.org/sqlite v1.59.0
+go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+# github.com/CarlosShao/wisp/internal/risk
+internal/secret/configrefs.go:10:2: mkdir /gomod/cache: read-only file system
+FAIL	github.com/CarlosShao/wisp/internal/risk [setup failed]
+# github.com/CarlosShao/wisp/internal/secret
+internal/secret/configrefs.go:10:2: mkdir /gomod/cache: read-only file system
+FAIL	github.com/CarlosShao/wisp/internal/secret [setup failed]
+# github.com/CarlosShao/wisp/internal/config
+internal/secret/configrefs.go:10:2: mkdir /gomod/cache: read-only file system
+FAIL	github.com/CarlosShao/wisp/internal/config [setup failed]
+# github.com/CarlosShao/wisp/internal/agent
+internal/secret/configrefs.go:10:2: mkdir /gomod/cache: read-only file system
+# github.com/CarlosShao/wisp/internal/agent
+internal/memory/open.go:19:2: mkdir /gomod/cache: read-only file system
+FAIL	github.com/CarlosShao/wisp/internal/agent [setup failed]
+# github.com/CarlosShao/wisp/internal/memory
+internal/secret/configrefs.go:10:2: mkdir /gomod/cache: read-only file system
+# github.com/CarlosShao/wisp/internal/memory
+internal/memory/open.go:19:2: mkdir /gomod/cache: read-only file system
+FAIL	github.com/CarlosShao/wisp/internal/memory [setup failed]
+FAIL
+cons-rc=1

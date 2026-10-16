@@ -1,0 +1,29 @@
+322-r1b (d) 262 行那枚文件按内容拆成两枚＋两处过期注释改正⇒ 拆后 POSIX 复跑同色、本机四数不变、门禁五件 rc 全 0
+
+★拆分决断（派单第 (d) 件，处置权在本腿：选"按内容拆"，不选"留着写理由"）
+- openleaf_322_other_test.go 现量 262 行＝超 ≤260 预算 2 行。全仓没有件行数自动门
+  （grep -n 260 scripts/*.sh 现量 0 命中）⇒ 这是纪律、⛔ 门禁；本腿按内容拆，判据一字未动。
+- 拆法＝按"确定性 by-name 钉"与"概率性 race 钉"分家：
+  新增 openleaf_flag_322_other_test.go（78 行，//go:build !windows）收下 TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1
+  的整段字节（断言、消息、阈值、常量引用一律逐字搬，⛔ 删注释、⛔ 删判据、⛔ 加 t.Skip）；
+  openleaf_322_other_test.go 留下 race 那一族＋legs322r1/spokeLeg322r1/常量＝214 行。
+  两枚都 ≤260；openleaf_guard_322_windows_test.go=254、openleaf_overwrite_322_test.go=131 本来就在预算内，未动。
+- 拆后新文件头里具名写了它的射程（这条是本轮去牙反控量出来的、不是猜的）：它自己按名 os.OpenFile、不经 privateFile，
+  所以 m1（摘掉 open 里的 |oNoFollowPlatform）与 m2（探针逢名就拒）两发里它都绿，接线由 AC#1 race 那发钉。
+
+★拆后复跑（本腿自己跑，⛔ 引用别人的数）
+- 容器（golang:1.27，工作树字节覆盖导出树，.go=1091 数过才信）：三枚 322r1 用例全 PASS，rc=0，
+  AC#1 同屏两数 attempts=3000 damagedWitnesses=0 leafLegRefusals=56 flips=2066 ⇒ 拆分对判据是惰性的。
+- 本机 go test ./internal/winsec/ -count=1 -v：RUN=110 / PASS_TOP=61 / FAIL_TOP=0 / SKIP_TOP=0 / rc=0
+  ⇒ 与拆分前那一发四数一字不变（那两枚 SID 存量用例今天仍绿，本腿⛔ 认领为功劳）。
+- 门禁五件 rc 全 0：go build ./... / gofmt -l internal/winsec/（列出 0 枚；本机无 gofumpt，which 无命中⇒具名换更窄的这把尺）/
+  go vet ./internal/winsec/ / sh scripts/d22scan.sh / sh scripts/check-path-length-budget.sh --with-self-test。
+  ⚠ 具名一枚数变了：d22scan ban #8 的 internal/ 覆盖面 571→572 枚 Go 文件＝本腿新增那枚测试件，阈值与词表一字未动。
+
+★两处过期注释（都在本腿写面 internal/winsec/** 内，只改字面、不改判据）
+- winsec_other.go 那句 "(oNoFollowPlatform below)" 指错了方向：常量在本文件 :29、在那句话的上面 ⇒ 改 above。
+  （这就是死腿 322-r1 最后一句"注释里有个词打错了正在改"那一处，本腿补完。）
+- openleaf_322_other_test.go 头里指向 docs/evidence/s1/322-open-nofollow.md＝原派单的旧名，
+  本单权威名是 322-openleaf.md（现量盘上只存在后者要写的那一枚、前者 0 枚）⇒ 改正引用。
+
+⛔ 翻 AC 框（仍是 6 枚未勾／0 枚已勾）、⛔ Status/票名/-done、⛔ push；读数件 logs/split-322.* 与 04~09 六枚同笔入库。

@@ -1,0 +1,6 @@
+GOOS=darwin go vet ./internal/winsec/
+rc=0
+GOOS=windows go vet ./internal/winsec/
+rc=0
+GOOS=linux go vet ./internal/winsec/
+rc=0

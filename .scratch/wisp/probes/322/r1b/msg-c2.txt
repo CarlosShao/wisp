@@ -1,0 +1,14 @@
+322-r1b 第 0 步读数＋去牙台件两件落盘（本机 Windows 起手四数＝110/61/0/0 rc=0，与编排者 09:1x 那发同色）
+
+- 00-gates-and-test.log：go build rc=0、go vet rc=0、gofmt -l 列出 0 枚（这把尺退码恒 0，报的是列出枚数）；
+  gofumpt 本机没装（which 无命中）⇒ 按派单具名改跑 gofmt -l 并写明它更窄。
+- 03-test-full-v.log＋03-test-full-v.counts.txt：起手那一发 RUN=110（^=== RUN 口径）／PASS_TOP=61／FAIL_TOP=0／SKIP=0／rc=0，
+  GOTMPDIR 未设、TMP 解析到 C:\Users\swq\AppData\Local\Temp（C: 卷）。
+  ★具名归属：编排者 09:0x 那发的两枚红（TestGateJudgesThePrivateSetByResolvedSID／TestSealNarrowsAndNamesThePrincipalItRemovedBySID）
+  今天这一发自己变绿 ⇒ 本腿⛔ 把它算自己的功劳、也⛔ 把它的红算本腿的病，那两枚用例一字未动。
+- 8baec646-prod-code.diff.txt：死腿三枚产码的完整 diff 副本（本腿第 0 步第 1 项读物）。
+- mut-posix.sh／mut-win.sh：去牙反控台件。两形各测＝牙摘掉（POSIX 撤 |oNoFollowPlatform、Windows 令探针恒答"不是链接"）
+  与反形（POSIX/Windows 令探针恒拒绝）；POSIX 那发还顺带替死腿补跑它改到 3000 之后从未跑过的那一发
+  （它 23:29 最后一发容器读数是 fixed-ac1 damagedWitnesses=0 但 leafLegRefusals=0 ⇒ 仪器自己判"没到达链接态"，rc=1）。
+  规矩照抄 paired.sh：git archive 仓外导出树、物理改字节、.bak 只建不删、sha256 前后、还原复跑、⛔ -overlay。
+- ⛔ 动 AC 框／Status／禁区；⛔ push。

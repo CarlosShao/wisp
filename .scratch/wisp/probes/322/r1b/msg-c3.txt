@@ -1,0 +1,34 @@
+322-r1b 去牙反控读数落盘（POSIX 四发＋Windows 五发，全部在仓外导出树上物理改字节，⛔ -overlay）
+
+台面：POSIX＝golang:1.27 容器（D 卷导出树，GOMODCACHE=/gomod 只读宿主缓存、GOPROXY=off、容器内 GOTMPDIR=/tmp/gotmp322r1b）；
+Windows＝本机 go1.27.1 windows/amd64，GOTMPDIR 未设、TMP 解析到 C:\Users\swq\AppData\Local\Temp。
+两族尺的 base 都是 git archive 8baec646^ 的导出树（.go=1090 已数过、非空才信它的数），
+改前基线⛔ 用共享工作树；本腿对 internal/winsec 的工作树字节一字未动（git status 该面 0 行）。
+
+★AC#1 成对读数（同一台件、同一发、一屏两数，leafRaceAttempts322r1=3000 那一版——死腿改到 3000 后从未跑过的那一发，本腿补跑）：
+  base-322  rc=1 damagedWitnesses=63/3000  leafLegRefusals=0  flips=2164   ⇒ 坏世界真被造出来（分子 > 0）
+  fixed-322 rc=0 damagedWitnesses=0        leafLegRefusals=48 flips=1772   ⇒ 0 且 liveness 非零
+  工具词自检（walk/build failed/no tests to run/setup failed）四发全 0 ⇒ 不是台面故障冒充的红。
+
+★去牙（牙摘掉必响）：
+  m1-322（POSIX：把 open 里的 |oNoFollowPlatform 物理摘掉，其余字节同 HEAD）
+        rc=1 damagedWitnesses=70/3000 leafLegRefusals=0 ⇒ AC#1 红，还原 sha=41ba9a9b… 与摘前逐字相同，m1-restore rc=0 damaged=0 liveness=52
+  w1（Windows：preOpenLeafGuard 首行注入 return nil）
+        rc=1 topFAIL=2：file-symlink/directory-symlink/junction 三枚具名红＋instrument 行（guardRefusals=0）
+        还原 sha=5cdef881… 与注入前逐字相同，w1-restore rc=0
+
+★反形（⛔ 只做"改前必红"就交：换成"逢名就拒"会不会也红）：
+  m2-322（POSIX 探针恒拒绝）rc=1：AC#1 分子=0 但 instrument 仍红（leafLegRefusals=0）＋AC#2 四枚调用者全红
+        ⇒ AC#1 那一族不吃"只要报错就算防住"，反形同样红＝非恒真
+  w2（Windows 探针恒拒绝）rc=1 topFAIL=2：guardRefusals=0 而 otherRefusals=400
+        ⇒ 路由那枚用例按守卫自己的原句词判（不是"有任何 error 就算"），反形也红＝非恒真
+  ⚠ 一枚单边尺具名：TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 在 m1 与 m2 两发里都绿——
+        它自己按名 os.OpenFile，不经 privateFile，所以它钉的是常量的内核效果，接线由 AC#1 那发 race 钉。
+
+⚠ 一笔本机读数不是判语、是本腿量到的残留：w-fixed 与 w1-restore、w2-restore 三发里
+   AC#3 那一行 witnessTruncated=true（witnessSize=0 或 35），即 Windows 探针答完话之后到 open 之间那扇窗今天真能把外来文件截断；
+   用例把这一步写成"报告"而不是"闸门"（openleaf_guard_322_windows_test.go:249-253 逐字），本腿不改它、只把它抄进证据件。
+
+件：logs/ 17 枚（base/fixed/m1/m1-restore/m2 的 docker 壳与容器内正文、w-* 五发正文、两族 summary）＋两份 driver 日志
+    ＋ mut-posix.sh 的更正版（base 树改用 git archive 8baec646^；用 HEAD 会和产码里已有的同名符号重复声明——已具名写进脚本注释）。
+⛔ 翻 AC 框（现量 6 枚未勾／0 枚已勾）、⛔ Status/票名、⛔ push；树只建不删。
