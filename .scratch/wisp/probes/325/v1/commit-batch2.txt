@@ -1,0 +1,25 @@
+325-v1 读数第二批：AC#2 的牙（我第一发自己的 sed 没落、具名作废）＋射程那一格＋AC#4 四枚门＋AC#1 改前那发
+
+- v1-ac2-three-shapes-pair.txt＝**作废的一发**（保留不删）：我的 sed 串在双引号里被吃掉一枚反斜杠，
+  突变静默 no-op（sha 未变），那一栏"B-mixed"跑的其实是正形 ⇒ 读数无效；同一文件里 A 正形绿、
+  C 纯正斜杠四红（Invalid switch - "tmp".）、D 还原绿 三段仍有效。
+- v1-ac2-mixed-tail-pair2.sh＋.txt＝修好牙的第二发：突变加硬门（mixed_hits 必须 1、native 必须 0，
+  否则 exit 3 不跑测试）⇒ 四形同屏 A 绿 rc=0／B 混形 rc=1 四红（:182 :286 前置条件文案里分隔符分家＋
+  :59 :116 Parameter format not correct - "d22scan-…"）／C 纯正斜杠 rc=1 四红（Invalid switch - "tmp".）／
+  D 还原 rc=0 四绿；突变态 sha=6319065990c0…3240 ＝ 325-r1 那枚 a2-91 逐字同值（跨腿复认），
+  还原态 sha=ad6f6a8d72cb…4bf6 ＝ 提交态。
+- v1-ac2-range-probe.sh＋.txt＝射程那一格：d22scan.sh:51 只交 -C tools/d22scan ./...；
+  tools/ 里真 mklink 调用＝0（grep -rnF 现量 4 枚命中全在 428ef21e 自己新加的注释 :97 :98 :103 :106
+  ⇒ **325-r1 证据件 §2 那句"grep -rn mklink tools/＝0"在 HEAD 上已过期，要说成"可执行 0 枚、注释 4 枚"**）；
+  CI 那步 ci.yml:831 在**混形码**上跑 -run TestPathResolverJunctionWindows＝rc=0 PASS=1（发射根逐字混形）
+  ⇒ 缺世界成立。
+- v1-ac4-gates.sh＋五枚捕获＝四枚门全 rc=0（bash -n 0 字节／d22scan.sh clean＋正控制 PASS=35 RUN=77 与
+  325-r1 同值／长度门 VERDICT GREEN over-budget=60 covered=60 not-in-roster=0／go build 0 字节）；
+  ★**gofumpt 真身在盘上**＝/d/work/base/gopath/bin/gofumpt.exe v0.12.0（which rc=1＝不在 PATH，
+  325-r1 那句"四处候选目录零命中真身"＝它没看 GOPATH=/d/work/base/gopath/bin 这一处）；
+  按绝对路径跑 gofumpt -l tools scripts＝0 枚，本票 diff 里 .go＝0 枚；票 311 rc=2 GUARD 零命中（有正控）。
+- v1-ac1-pre-gate.sh＋两枚捕获＝票面 AC#1 要的"改前那发"补上：混形码上 sh scripts/d22scan.sh rc=0 clean、
+  发射根逐字 …wisp-test-gotmp/d22scan-…，同屏改后那发 rc=0 clean、…wisp-test-gotmp\d22scan-…，
+  两发正控制四数逐字同形 PASS=35 RUN=77。
+
+只 commit，⛔ push；⛔ 翻 AC 框；产码一字未动（突变只在仓外导出树的字节上，且已还原复尺）。

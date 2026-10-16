@@ -1,0 +1,42 @@
+V1 AC#4 gates
+start=2026-10-16 10:44:30 +0800   tree=/c/tmp/wisp325v1/head3   repo=D:/work/workspace/projects plans/Wisp
+
+@@@@ bash-n-runtests
+  RC=0   bytes=0
+
+@@@@ d22scan-sh
+  RC=0   bytes=24210
+  | d22scan: scope ban #7 internal/tools/   examined  25 production Go files
+  | d22scan: scope ban #8 design/           examined  30 text files
+  | d22scan: scope ban #8 frontend/         examined 116 text files
+  | d22scan: scope ban #8 internal/         examined 572 Go files, comments and _test.go included
+  | d22scan: scope ban #8 cmd/              examined 138 Go files, comments and _test.go included
+  | d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=239, bans #1-5 cmd/=41, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=30, ban #8 frontend/=116, ban #8 internal/=572, ban #8 cmd/=138; ban #8 emoji coverage: design/ 30 text files; frontend/ 116 text files; internal/ 572 Go files, comments and _test.go included; cmd/ 138 Go files, comments and _test.go included
+
+@@@@ go-build-all
+  RC=0   bytes=0
+
+@@@@ length-budget gate --with-self-test  (NEEDS the git index, so this one runs read-only IN THE REPO)
+  RC=0   bytes=2535
+  | check-path-length-budget.sh: control 2/3 ok - the planted over-budget tracked path is rejected and named verbatim:
+  | check-path-length-budget.sh: denominator: tracked paths=13967  over-budget=60  covered by roster=60  not in roster=0
+  | check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+
+@@@@ gofumpt: the strict ruler - find its real body first
+  which gofumpt rc=1   (1 = not on PATH, which is why 325-r1 wrote 找不到真身)
+  absolute body present? YES  -> /d/work/base/gopath/bin/gofumpt.exe
+  | v0.12.0 (go1.27.1)
+  .go files touched by the ticket commit 428ef21e = 0   (the diff is one .sh)
+  gofumpt -l over tools/ scripts/ (pre-existing repo volume, NOT this ticket's debt):
+    RC=0  offenders=0
+  contrast ruler (the one that must NOT be passed off): gofmt -l over the same dirs gives 0 files
+
+@@@@ ticket 311 volume guard: did any run above get the rc=2 refusal?
+
+@@@@ table-fault holes scan over every gate capture
+  pat=walk                 hits=1
+  pat=build failed         hits=0
+  pat=no tests to run      hits=1
+  pat=0xc0000135           hits=0
+  (positive control for the line above: captures that DO contain text: 1)
+end=2026-10-16 10:45:24 +0800

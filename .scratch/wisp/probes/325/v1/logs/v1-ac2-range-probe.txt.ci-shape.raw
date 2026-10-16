@@ -1,0 +1,7 @@
+runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp/d22scan-20261016-104234-1715 - this run's t.TempDir() family lands here; nothing deletes it.
+time=2026-10-16T10:42:35.982+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPathResolverJunctionWindows
+--- PASS: TestPathResolverJunctionWindows (0.09s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.143s
+runtests.sh: OK - packages=[./internal/risk/ -run ^TestPathResolverJunctionWindows$] top-level: PASS=1 FAIL=0 SKIP=0, === RUN=1, '[no tests to run]'=0

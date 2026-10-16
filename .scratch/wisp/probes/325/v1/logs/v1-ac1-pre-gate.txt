@@ -1,0 +1,18 @@
+V1 AC#1 pre-fix gate shot (d22scan.sh on the MIXED code)
+start=2026-10-16 10:46:31 +0800
+pristine sha=ad6f6a8d72cbe2a3fc9b7036774b8e16ddf92bfd64ea6055cbf12dde55164bf6  native_hits=1 mixed_hits=0
+after mutate: native_hits=0 mixed_hits=1 sha=6319065990c0fa2c374d5bb789d5fbc2702293fe57d5000f4366ca675e853240
+--- sh scripts/d22scan.sh on the mixed code:
+  PRE_RC=0  bytes=24201
+  | runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp/d22scan-20261016-104634-390 - this run's t.TempDir() family lands here; nothing deletes it.
+  |         d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+  | runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+  | d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=239, bans #1-5 cmd/=41, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=30, ban #8 frontend/=116, ban #8 internal/=572, ban #8 cmd/=138; ban #8 emoji coverage: design/ 30 text files; frontend/ 116 text files; internal/ 572 Go files, comments and _test.go included; cmd/ 138 Go files, comments and _test.go included
+after restore: native_hits=1 mixed_hits=0 sha=ad6f6a8d72cbe2a3fc9b7036774b8e16ddf92bfd64ea6055cbf12dde55164bf6
+--- same gate on the restored (native) code, for the two-shots-on-one-screen read:
+  POST_RC=0  bytes=24204
+  | runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261016-104730-496 - this run's t.TempDir() family lands here; nothing deletes it.
+  |         d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+  | runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+  | d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=239, bans #1-5 cmd/=41, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=30, ban #8 frontend/=116, ban #8 internal/=572, ban #8 cmd/=138; ban #8 emoji coverage: design/ 30 text files; frontend/ 116 text files; internal/ 572 Go files, comments and _test.go included; cmd/ 138 Go files, comments and _test.go included
+end=2026-10-16 10:48:13 +0800
