@@ -65,7 +65,7 @@
 
 ## 7. 终态名册与最后一发（补笔）
 
-- 本腿八枚提交（逐枚 `git show --name-only` 的路径名册共 **23 枚**，全在四处写面之内，越界尺命中 **0**）：`4f2470703` 夹具／`f7d6dbc98` 用例／`d498a73c` 读数件／`78fe125f` logs 15 枚／`3e4ca0e3` 证据件／`c3f55651` 票尾一条 bullet／`f6c76b91` 三枚正文源台件／本笔（读数件＋证据件各一枚补笔）。⛔ push（本地领先 `origin/dev`，推送归编排者）。
-- 终态锚＝`f6c76b91897ead14e2717f4209c9f5422a9098eb`；其间别腿又落了两枚（`83a6f15c`／`7f31bd2b`，220-v1），⛔ 与本腿写面零交集。
+- 本腿提交名册（前七枚逐枚具名）：`4f2470703` 夹具／`f7d6dbc98` 用例／`d498a73c` 读数件／`78fe125f` logs 15 枚／`3e4ca0e3` 证据件／`c3f55651` 票尾一条 bullet／`f6c76b91` 三枚正文源台件，之后 `77553c9e` 补笔（读数件＋证据件），与 `16d4b225`（终态日志台件），加本段自身那一枚＝**10 枚**。★枚数与路径名册都会随再补笔而再长，**引用前请现跑这两把尺**：`git log --format='%h %s' c9ba5254..HEAD | grep -c "165-r3"`（本笔收口后现量 **10**）；路径名册＝对该名册逐枚 `git show --name-only --format=''` 去重（现量 **26**），越界判定＝`grep -v` 四处写面前缀（`internal/agent/`／`.scratch/wisp/probes/165/r3/`／`docs/evidence/s1/165-doorbell-instrument-r3.md`／票 165 那一枚）后计数＝**0** ⇒ 全在写面之内。⛔ push（本地领先 `origin/dev`，推送归编排者）。
+- 终态锚（§7 前八枚写就时）＝`f6c76b91897ead14e2717f4209c9f5422a9098eb`，本腿收口锚＝`16d4b225`；其间别腿又落了 `83a6f15c`／`7f31bd2b`（220-v1），⛔ 与本腿写面零交集。
 - 终态那一发（★第三棵导出树 `git archive f6c76b91` 七件套，原始日志 `logs/final-head-rerun.log`）：两枚字节 sha256 仍逐位等于基线（`00c32049994c441c...`／`7d26fa889b59fc3a...`）；`go build ./internal/agent/` rc=0；单跑 `-run '^TestPlanPresentCallBooksTheToolCallRow165r3$' -timeout 30m -count=1`＝`--- PASS ... (0.13s)` rc=0；整包 `./internal/agent -timeout 30m -count=1`＝`ok 2.250s` rc=0；`go vet ./internal/agent/` rc=0。
 - 票框尺交回（⛔ 本腿一枚没翻，翻法归编排者）：`grep -c '^- \[x\]'`＝**5**（AC#1–AC#5，落件前后同数）、`grep -c '^- \[ \]'`＝**1**（AC#6 仍空）；票名与两行 `Status:` 一字未动；票面 diff＝**2 加／0 删**（纯追加一条 bullet）。
