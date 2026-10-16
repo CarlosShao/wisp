@@ -1,0 +1,202 @@
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.06s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.06s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.06s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.06s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.23s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.08s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.04s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.04s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.06s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.15s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.04s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.06s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.07s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.06s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.06s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.06s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	5.325s

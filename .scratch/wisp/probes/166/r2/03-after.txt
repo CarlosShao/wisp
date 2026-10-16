@@ -1,0 +1,69 @@
+# 166-r2 · 03 改后读数（同一棵树、同一枚尺、-count=20）
+
+形态＝改后交付字节（sha256 前缀 2bf320df04e2819a；:69/:84 两处改传 ptrTime(...) 步进时钟）
+台面＝01 §1.1 那一棵（⛔ 换台面：与 02 那两发同一棵树、同卷 D:、同 GOTMPDIR 写法）
+判据（派单硬款）＝FAIL=0 **且** `TestSessionListByWorkspace` 那一枚 PASS＝20；`TestSessionSearchTitleAndBody` 同形复跑一发。
+
+## 3.1 判据那一发
+
+rc=0  sh 00-ruler.sh after-list-count20 /d/tmp/wisp-166r2/tree 20 'TestSessionList'
+RUN=40 PASS_TOP=40 FAIL_TOP=0 SKIP=0 SUBTEST_LINES=0
+  TestSessionListByWorkspace   ＝ PASS 20 枚／FAIL 0 枚（顶层，-count=20） ← 20/20 ✓
+  TestSessionListByTime        ＝ PASS 20 枚／FAIL 0 枚（顶层）
+pkg_fail_line=0  surface_markers=0  ws_fail_bodies=0
+日志＝logs/after-list-count20.filtered.txt（raw_sha 前缀 703982e1c5d4e343）
+
+## 3.2 判据那一发再掷一次（⛔ 拿一发当"从此恒绿"）
+
+rc=0  sh 00-ruler.sh after-list-count20-round2 … 20 'TestSessionList'
+RUN=40 PASS_TOP=40 FAIL_TOP=0 SKIP=0｜ByWorkspace PASS 20／FAIL 0｜ByTime PASS 20／FAIL 0
+日志＝logs/after-list-count20-round2.filtered.txt（raw_sha 前缀 a3222eb23bed91cb）
+
+## 3.3 TestSessionSearchTitleAndBody 同形复跑（-count=20）
+
+rc=0  sh 00-ruler.sh after-search-count20 … 20 'TestSessionSearch'
+RUN=20 PASS_TOP=20 FAIL_TOP=0 SKIP=0｜SearchTitleAndBody PASS 20／FAIL 0
+日志＝logs/after-search-count20.filtered.txt（raw_sha 前缀 b552d45b13e05ec0）
+★这一枚的牙是**缺的**，具名报回（⛔ 我自己判"顺手也算测到了"）：把时钟再做平（04 那一形）它**照旧 20/20 绿**
+  → 见 04 §4.4。原因（读码）＝它对结果的断言只有"命中 1 枚／0 枚"，从不比两枚之间的次序，
+    所以它本来就不是次序的仪器；本程改它只是让它不再靠墙上时钟（防未来加次序断言时静默变硬币），
+    ⛔ 把它算成"又一枚硬币被关掉"。
+
+## 3.4 本包名册（改后整包，两把尺并列：顶层 ⇄ 含子测试）
+
+rc=0  sh 00-ruler.sh after-all-count20 … 20 'TestSession'（票 166 那五枚出口用例）
+RUN=100 PASS_TOP=100 FAIL_TOP=0 SKIP=0 SUBTEST_LINES=0 ＝ 5 枚顶层用例 × 20 轮
+日志＝logs/after-all-count20.filtered.txt（raw_sha 前缀 bdeee7fe88b93bb2）
+
+rc=0  go test ./internal/session/ -count=1（整包、⛔ -run 过滤）
+        → ok  github.com/CarlosShao/wisp/internal/session  1.866s
+日志＝logs/after-fullpkg-count1.filtered.txt（raw_sha 前缀 88ad1a60b42d7f75；-count=1 不带 -v ⇒ RUN=0 是"没发 -v"，⛔ 是判据）
+
+rc=0  go test ./internal/session/ -count=20 -v（整包＋-v，本包全名册）
+RUN=720 PASS_TOP=380 FAIL_TOP=0 SKIP=0 SUBTESTS=340
+  尺 A（只数顶层 `^--- PASS`）＝380 枚 ＝ 19 枚顶层用例 × 20 轮
+  尺 B（数 RUN 行 `^=== RUN`，含子测试）＝720 枚 ＝ 顶层 380 ＋子测试 340
+  两把⛔ 相加⛔ 互替；本用例（ByWorkspace）在两把尺下的顶层数都是 20。
+  名册（每枚 20/20 绿）：TestSessionForkDoesNotSwallowOriginal／TestSessionListByTime／TestSessionListByWorkspace／
+    TestSessionRenameAndArchiveUndo／TestSessionSearchTitleAndBody／TestTicket224CoveringDoesNotCrossToANewSession／
+    TestTicket224CoveringMatchesItsOwnSession／TestTicket224DialectIsPathMatchNotRegex／TestTicket224ExpiredOrRevokedRowIsNotLive／
+    TestTicket224LedgerFailsClosedOnStoreErrors／TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk／
+    TestTicket224MintIsRandomAndValid／TestTicket224NewLedgerRefusesHandWrittenIDs／TestTicket224PatternCoversIsTheOnlyMatcher／
+    TestTicket224PatternWithoutStarIsNeverReinterpreted／TestTicket224RecordRefusesUnusableSubjects／
+    TestTicket224RecordWritesOneRowPerAnswer／TestTicket224TestLiteralsAreOutsideTheMintedShape／
+    TestTicket224WildcardRowCoversAConcretePath（＝19 枚）
+日志＝logs/after-fullpkg-count20.filtered.txt（raw_sha 前缀 074d495723e248ec，4682 行原始）
+
+## 3.5 突变全做完之后的最后一发还原绿（盘上此刻的字节）
+
+rc=0  sh 00-ruler.sh final-green-list-count20 … 20 'TestSessionList'
+RUN=40 PASS_TOP=40 FAIL_TOP=0 SKIP=0｜ByWorkspace PASS 20／FAIL 0｜ByTime PASS 20／FAIL 0
+test_file_sha256_tree=2bf320df04e2819a（＝交付形态；再 cmp 工作树＝0 差异，见 04 §4.3）
+日志＝logs/final-green-list-count20.filtered.txt（raw_sha 前缀 9d52e4f8ab602b79）
+
+## 3.6 有没有放宽断言（自查，尺＝git diff）
+
+rc=0  git diff --numstat -- internal/session/manage_test.go ＝ 14 加／2 删
+叙述：删掉的两枚＝两行 `nil` 实参；加进来的 14 行＝两行 ptrTime(...) 实参 ＋ 12 行注释（三处文档）。
+  `want`/`if len(got)!=2`/`t.Errorf` 那三枚断言**一行未动**；t.Skip 命中 0 枚；用例名册 5 枚未减（3.4 那张名册即尺）；
+  ⛔ 改成"只比集合不比次序"——次序那句 `got[0].ID != c.ID || got[1].ID != a.ID` 逐字仍在盘上（:86）。

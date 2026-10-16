@@ -1,0 +1,8 @@
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_febbb4e791b76e95871e751ccc6cd93b sess_554ce1f1f576e4fb19fec370c3708ccd], want [sess_554ce1f1f576e4fb19fec370c3708ccd sess_febbb4e791b76e95871e751ccc6cd93b]
+--- FAIL: TestSessionListByWorkspace (0.04s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	0.130s
+FAIL

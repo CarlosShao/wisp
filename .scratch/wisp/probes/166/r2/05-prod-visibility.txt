@@ -1,0 +1,64 @@
+# 166-r2 · 05 AC#6 ⓑ 只答不改：这一形机主看不看得见
+
+答案（一句）：**看不见。今天零生产可达——⛔ 因为它安全，是因为压根没有一条调用链走到那枚清单。**
+下面每一步都带尺（尺名＋射程＋单位）；⛔ 我动 `internal/memory/dao_session.go`（tie-break＝行为变更，归编排者裁）。
+
+## 5.1 链条（从 SQL 往上走到屏幕，每一跳一个 file:line）
+
+rc=1  尺 A＝git grep -n "session\.NewManager" -- '*.go'   → **0 行命中**（退码 1＝零枚；射程＝全仓 tracked .go）
+      ⇒ `Manager`（那四枚出口）在产码里⛔ 被构造过；包内唯一构造点＝manage_test.go:26（经 newTestManager）
+rc=0  尺 B＝grep -rn "ListSessions(\|SearchSessions(" --include=*.go .（排 .scratch）→ 7 行命中＝
+      2 枚定义（internal/memory/dao_session.go:115／:132）＋2 枚接口声明（internal/session/manage.go:40／:41）
+      ＋2 枚调用（internal/session/manage.go:104／:113）＋1 枚 memory 侧测试（dao_session_test.go:26）
+      ⇒ 那两枚 SQL 出口的**唯一**产码调用方是 `Manager.List`／`Manager.Search`（manage.go:103／:109）
+rc=0  尺 C＝grep -rn "\.List(ctx\|\.List(context\|\.Search(ctx\|\.Search(context" --include=*.go .（排 .scratch）
+      → 9 行命中，**全部**在 internal/session/manage_test.go（交付字节上的行号：56／82／108／115／122／125／157／160／169）
+      ⇒ `Manager.List`／`Manager.Search` 的调用点⛔ 产码 0 枚
+rc=0  尺 D＝git grep -l "wisp/internal/session\"" -- '*.go'（排 .scratch）→ 2 枚文件：cmd/wisp/run.go／cmd/wisp/resident_approval_windows.go
+      这两枚用的是什么（尺＝grep -n "session\." cmd/wisp/run.go cmd/wisp/resident_approval_windows.go）：
+        run.go:282 `session *session.Ledger`、run.go:476 `session.Mint()`、run.go:481 `session.NewLedger(session.LedgerOptions{`
+        resident_approval_windows.go:243 `func (h *residentGrantHolder) bindSessionLedger(l *session.Ledger)`
+        resident_approval_windows.go:285 `func (ra *residentApproval) bindResidentGrantLedger(l *session.Ledger)`
+      ⇒ 生产碰的是 **D45 授权台账那枚 Ledger**，⛔ 会话清单那个 Manager（两者同住 internal/session，别混）
+rc=0  尺 E＝符号名册：grep -rn "session\.[A-Z][A-Za-z]*" --include=*.go internal cmd tools（排 _test 与包内）
+      ＋ sed 取符号 ＋ sort|uniq -c → session.ID 1 行／session.Ledger 7 行／session.LedgerOptions 1 行／
+      session.Mint 1 行／session.NewLedger 1 行；`session.Manager` **0 行**、`session.ManagerOptions` **0 行**
+rc=0  尺 F＝grep -rn "memory\.Session" --include=*.go internal/panel internal/tools cmd/wisp（排 _test）→ **0 行**
+      ⇒ 面板侧、工具侧、CLI 侧连那个**类型**都没碰过
+rc=0  尺 G＝子命令名册：cmd/wisp/main.go:89-124 的 case → run／providers／doctor／secret／models／slo／
+      panel-assets／panel-inbound／version／help（10 枚）＝⛔ 一枚"把历史会话列出来"
+rc=0  尺 H＝屏幕数据面：internal/panel/composer.go:57-61 `type Snapshot struct{ Pending; Results; Composer; GeneratedAt }`
+      ＋ :74 Instructions ＋ Tasks 那节；internal/panel/pump.go:138-155 `PumpSources`＝Verdicts/Mode/Workspace/Git/Model
+      ⇒ 快照里⛔ 会话清单字段、泵里⛔ 读会话的那枚源
+rc=0  尺 I＝ORDER BY updated_at 全仓名册：internal/memory/dao_session.go:125（List）／:144（Search）
+      ＋ internal/memory/dao_profile.go:86／:111（profile 那支同形，本票⛔ 射程，具名只为说清"我没漏扫"）
+
+## 5.2 但这一形在**数据里**已经造得出来（屏上看不见⛔ 等于不存在）
+
+rc=0  写 updated_at 的四枚点，逐枚（尺＝grep -n "updated_at" internal/memory/dao_session.go ＋读码）：
+  dao_session.go:84   InsertSession（经 manage.go:95 `Manager.Create`）＝ manage.go:93 `now := m.now().Unix()`（秒；默认 time.Now，manage.go:76-77）
+  dao_session.go:177  RenameSession       ＝ dao_session.go:175 `observe.NowWallUTC().Unix()`（秒）
+  dao_session.go:198  SetSessionArchived  ＝ dao_session.go:192 `observe.NowWallUTC().Unix()`（秒；归档与撤销都写）
+  dao_session.go:231  ForkSession         ＝ dao_session.go:218 `observe.NowWallUTC().Unix()`（秒）
+⇒ 界面腿或票 145 那格一旦接线，"同一秒内动过两条"是**日常形状**（连着改两条名字、建两条、归档两条），
+   那两枚的 updated_at 相等 ⇒ `ORDER BY ... id DESC` 拿随机 hex（session.go:96 `rand.Read`）当 tie-break ⇒ 次序一枚硬币。
+   到那一天这一形就可见了——今天不可见只因为出口没接线。
+
+## 5.3 读 ⓑ 时撞见的两形，具名上交（⛔ 我改、⛔ 我裁）
+
+(1) `AppendSessionTurn`（internal/memory/dao_session.go:253-278）**不**刷新 `session.updated_at`
+    （尺＝同一把 `grep -n "updated_at"`：那枚函数里 0 处出现；INSERT 只进 session_turn，:267）
+    ⇒ "按时间列"排的其实是"最后一次 创建/改名/归档/分叉"，⛔ "最后一次说话"。
+    在会话里继续聊⛔ 把它顶到列表前面。这一形与 tie-break 同一张裁决面（裁 tie-break 时请一并看）。
+(2) Search 那一支（dao_session.go:144）同一枚 `ORDER BY updated_at DESC, id DESC`
+    ⇒ 两枚命中会话同秒 ⇒ 先后同样一枚硬币；今天同样⛔ 生产可达（5.1 尺 A/B/C 一并管它）。
+(3) 顺带一句正面事实（⛔ 我加严、⛔ 我放宽）：`session_turn` 那支排的是 `ORDER BY seq, id`
+    （dao_session.go:238／:285，seq 由 :262 那句 `SELECT COALESCE(MAX(seq),0)+1 FROM session_turn WHERE session_id=?` 单调铸）
+    ⇒ 会话**内部**轮次次序与随机 id 无关，本票 AC#4 那枚"分叉不吞原件"的用例测的正是这一支，它不在硬币射程里。
+
+## 5.4 这一格的判据自查
+
+叙述：ⓑ 只答不改——本程对 `internal/memory/**`、`internal/session/session.go`、`internal/panel/**`、
+  `cmd/wisp/**`、`frontend/**` 落盘字节 ＝ **0**（尺＝git status ＋ 本程 commit 名册，见 07 §7.4）。
+  排序 tie-break 该不该改、改成什么（例如 `updated_at DESC, created_at DESC, id DESC` 或加单调列）
+  ＝**行为变更**，⛔ 本腿替编排者裁；上面 5.2／5.3 三形是给那一裁的料。

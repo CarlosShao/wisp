@@ -1,0 +1,67 @@
+# 166-r2 · 04 牙的自证（正控：物理把改后的时钟再做平 ⇒ 那枚用例必须红）
+
+问题这一发要回答的是："你这把尺到底在量次序，还是在量运气。"
+台面＝01 §1.1 那一棵；形态起点＝改后交付字节（2bf320df04e2819a）。
+⛔ -overlay、⛔ build tag、⛔ 任何"没落到盘上的替换"——突变是把 <导出树>/internal/session/manage_test.go
+   这枚**真文件**重写一遍（件 06-mutate-clock.sh），编译器与测试二进制读的就是改后的字节。
+
+## 4.1 突变机制（尺＝06-mutate-clock.sh 自己打的数）
+
+rc=0  sh 06-mutate-clock.sh /d/tmp/wisp-166r2/tree mut
+  advance_lines_before ＝ 1 枚（原文 `tick = tick.Add(time.Minute); return tick`）
+  advance_lines_in_mut ＝ 0 枚（那句被摘掉 ⇒ opts.Now 每次返回**同一个时刻**）
+  return_tick_lines_in_mut ＝ 1 枚（`func() time.Time { return tick }` 在场）
+  lines_in_mut ＝ 238 行（与改后同样枚数＝只摘句子、⛔ 删行）
+  sha_before＝2bf320df04e2819a → sha_after＝28f683c77893474d（枚一枚，文件真变了）
+叙述：这一形等价于"生产上两条会话落在同一秒"——`updated_at` 被再做平，
+  次序回到 `ORDER BY updated_at DESC, id DESC` 里那枚随机 hex id（dao_session.go:125／session.go:96）。
+
+## 4.2 突变态读数（两发，都要红）
+
+rc=1  sh 00-ruler.sh teeth-flatclock-list-count20 … 20 'TestSessionList'（站 28f683c77893474d）
+RUN=40 PASS_TOP=18 FAIL_TOP=22 SKIP=0
+  TestSessionListByWorkspace   ＝ PASS 12 枚／**FAIL 8 枚**（顶层，-count=20） ← 红 ✓
+  TestSessionListByTime        ＝ PASS 6 枚／**FAIL 14 枚**（顶层）  ← 步进时钟同样是它的承重墙
+  ws_fail_bodies＝8 枚，全部站在 :87；bytime_order_fail_bodies＝33 枚，站在 :66
+日志＝logs/teeth-flatclock-list-count20.filtered.txt（raw_sha 前缀 2cc2102bf9329dfe）
+
+rc=1  sh 00-ruler.sh teeth-flatclock-list-count20-round2 … 20 'TestSessionList'（同一枚突变态）
+RUN=40 PASS_TOP=13 FAIL_TOP=27 SKIP=0
+  TestSessionListByWorkspace   ＝ PASS 11 枚／**FAIL 9 枚**
+  TestSessionListByTime        ＝ PASS 2 枚／**FAIL 18 枚**
+日志＝logs/teeth-flatclock-list-count20-round2.filtered.txt（raw_sha 前缀 82c738a9d4cc2f89）
+叙述：两发红数 8⇄9（ByWorkspace）＝同一枚突变态下颜色仍在漂＝**突变态本身是硬币**，
+  这正是"平戳 ⇒ 次序落到随机 id"的形状；⛔ 我把它写成"突变必红"这种通则，判据只要求 FAIL>0，两发都满足。
+
+红句逐字（连文案，从上面两发各取一枚）：
+    manage_test.go:87: workspace filter = [sess_b8d775c6561e8bdf60f0d2f24fff92f3 sess_afa3e90f0f538446da3409cc42fb143b], want [sess_afa3e90f0f538446da3409cc42fb143b sess_b8d775c6561e8bdf60f0d2f24fff92f3]
+    manage_test.go:66: List[0] = sess_f8c00ae9635a530882505f5b6822e942, want sess_452e977327c40f1615c9f68c56bf4ee2 (order [sess_f8c00ae9635a530882505f5b6822e942 sess_452e977327c40f1615c9f68c56bf4ee2 sess_353e85dda1c53585c2738a22142203df])
+
+## 4.3 还原（必须绿，且要证明是同一枚字节回来了）
+
+rc=0  sh 06-mutate-clock.sh /d/tmp/wisp-166r2/tree restore
+  rc_cp_restore=0  rc_cmp_vs_orig=0（cp .orig 回去后与备份逐字节相同）
+  sha_restored＝2bf320df04e2819a（＝改后交付形态）  advance_lines_restored＝1 枚
+rc=0  cmp <导出树>/internal/session/manage_test.go <工作树>/internal/session/manage_test.go ＝ 0 差异
+rc=0  sh 00-ruler.sh restore-list-count20 … 20 'TestSessionList'（还原后第一发）
+RUN=40 PASS_TOP=40 FAIL_TOP=0｜ByWorkspace PASS 20／FAIL 0｜ByTime PASS 20／FAIL 0
+日志＝logs/restore-list-count20.filtered.txt（raw_sha 前缀 a22d637002623f6b）
+（全做完突变／还原三循环之后的最后一发绿＝03 §3.5，同一枚字节、同一把尺。）
+
+## 4.4 缺的那颗牙，具名（⛔ 我自己判成"顺手也测到了"）
+
+rc=0  sh 06-mutate-clock.sh … mut（第二次进突变态）
+rc=0  sh 00-ruler.sh teeth-flatclock-search-count20 … 20 'TestSessionSearch'
+RUN=20 PASS_TOP=20 **FAIL_TOP=0**｜TestSessionSearchTitleAndBody PASS 20／FAIL 0
+rc=0  sh 06-mutate-clock.sh … restore ＋ cmp 工作树 ＝ 0 差异
+叙述：把时钟再做平，**枚举 Search 那枚用例照旧全绿** ⇒ 它对"次序"没有牙（读码：它只断言命中 1 枚／0 枚，
+  ⛔ 比两枚之间的先后，manage_test.go:112/119 那两枚断言即尺）。⇒ :84 那一处改步进时钟＝防未来，
+  ⛔ 算"关掉一枚硬币"。这一格买到的硬币只有 :69 那一枚（ByWorkspace）。
+日志＝logs/teeth-flatclock-search-count20.filtered.txt（raw_sha 前缀 a8ff440eaa10a24c）
+
+## 4.5 本程自抓的一枚坏尺（具名留档，⛔ 抹平）
+
+叙述：00-ruler.sh 第一版把红句体按**行号**数（`grep -c 'manage_test.go:78'`）。本程那 14 行注释把断言从 :78
+  挪到 :87 ⇒ 同一发突变态里真红 8 枚，那把旧尺回 0＝**"0 命中"⛔ 等于"0 问题"**（台账里同族教训第 N 次）。
+处置：改成按文案模式数（`workspace filter =`／`List[N] = …(order …)`）并另发一枚"红句站在那几行"的名册；
+  §4.2 里那两个 bodies 数＝新尺在**原始日志**上重算所得（⛔ 重掷硬币，同一发日志、同一把尺）。

@@ -1,0 +1,1442 @@
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.22s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.15s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.15s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.11s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.12s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.09s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.08s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.09s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.10s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.10s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.07s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.13s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.40s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.11s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.14s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.16s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.25s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.19s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.09s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.15s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.17s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.16s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.10s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.11s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.11s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.09s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.14s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.13s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.09s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.24s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.08s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.08s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.08s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.14s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.01s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.14s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.06s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.08s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.12s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.07s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.08s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.09s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.10s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.09s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.09s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.10s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.11s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.16s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.24s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.06s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.09s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.09s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.09s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.21s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.09s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.16s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.10s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.08s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.09s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.08s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.09s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.07s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.09s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.08s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.07s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.12s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.29s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.10s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.09s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.10s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.10s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.36s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.13s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.15s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.10s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.10s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.11s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.07s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.10s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.08s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.07s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.30s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.07s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.14s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.09s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.11s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.16s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.06s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.06s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.07s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.07s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.08s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.13s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.09s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.12s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.10s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.09s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.07s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.27s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.10s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.08s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.09s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.07s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.22s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.11s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.08s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.22s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.08s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.07s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.08s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.09s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.09s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.11s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.09s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.16s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.09s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.34s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.18s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.08s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.08s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.16s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.26s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.13s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.10s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.10s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.08s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.08s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.08s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.20s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.08s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.07s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.31s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.08s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.10s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.13s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.09s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.17s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.10s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.06s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.11s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.06s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.22s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.18s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.12s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.10s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.11s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.12s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.09s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.23s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.33s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.14s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.09s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.09s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.08s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.15s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.08s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.06s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.06s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.07s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.09s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.08s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.08s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.09s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.07s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.07s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.24s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.07s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.09s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.09s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.08s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.13s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.06s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.07s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.07s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.07s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.06s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.07s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.07s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.08s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.10s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.07s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.23s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.07s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.08s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.08s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.08s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.20s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.18s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.08s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.08s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.08s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.07s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.08s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.08s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.11s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.09s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.09s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.09s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.27s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.11s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.09s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.07s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.06s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.15s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.07s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.07s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.14s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.13s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.07s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.08s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.09s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.08s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.07s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.07s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.07s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.20s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.06s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.06s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.07s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.08s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.19s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.07s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.07s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.11s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.25s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.09s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.08s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.08s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.10s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.08s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.07s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.06s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.22s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.07s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.08s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.07s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.10s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.24s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.08s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.07s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.08s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.06s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.06s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.07s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.07s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.07s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.06s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.06s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.29s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.16s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.07s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.06s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.13s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.20s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.14s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.14s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.07s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.10s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.07s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.06s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.07s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.06s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.07s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.21s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.06s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.08s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.07s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.07s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.15s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.10s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.07s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.08s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.07s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.07s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.08s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.09s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.08s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.07s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.07s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.07s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.06s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.21s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.06s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.07s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.07s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.08s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.01s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.13s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.09s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.07s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.07s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.06s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.05s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.06s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.06s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.06s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.07s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.17s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.06s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.06s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.06s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.06s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.12s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.07s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.07s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.08s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.10s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.09s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.09s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.13s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.08s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.08s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.09s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.07s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.29s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.06s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.05s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.17s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.10s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.15s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.06s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.07s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.06s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.07s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.07s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.06s)
+=== RUN   TestSessionRenameAndArchiveUndo
+--- PASS: TestSessionRenameAndArchiveUndo (0.05s)
+=== RUN   TestSessionForkDoesNotSwallowOriginal
+--- PASS: TestSessionForkDoesNotSwallowOriginal (0.08s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.08s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.18s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.07s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.05s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.06s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.06s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.21s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+--- PASS: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	32.547s

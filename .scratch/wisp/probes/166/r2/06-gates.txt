@@ -1,0 +1,50 @@
+# 166-r2 · 06 门禁（自己跑、自己落 rc；⛔ 交回"应该都绿"）
+
+时刻＝2026-10-15 23:1x–23:3x +08，dev 分支，开工锚 HEAD a9c7bea0。
+"两枚台面"＝共享工作树（别人也在写）与 01 §1.1 那棵导出树（站着我交付的字节）。
+
+## 6.1 六道门
+
+rc=0  go build ./...                                   （工作树；stderr＝0 字节）
+rc=0  go build ./...                                   （导出树＝交付字节那一棵；stderr＝0 字节）
+rc=0  go vet ./internal/session/                       （工作树；输出 0 字节）
+rc=0  go vet ./internal/session/                       （导出树；输出 0 字节）
+rc=0  go test ./internal/memory/ -count=1              （导出树）→ ok github.com/CarlosShao/wisp/internal/memory 12.820s
+        ★这一枚不是本票判据，是**邻包控制**：我的用例真跑到那枚 ORDER BY 上，本程⛔ 动它一字，它照旧绿。
+rc=0  sh scripts/d22scan.sh                            （工作树）→ d22scan: clean - no D22 ban violations
+        分母逐字（单位＝枚文件）：bans#1-5 internal/=239、cmd/=41｜ban#6 frontend/=116｜ban#7 internal/tools/=25｜
+        ban#8 design/=39、frontend/=116、internal/=571（注释与 _test.go 都算）、cmd/=138
+        另响亮自陈 skipped as git-ignored: 1 file under frontend/dist/assets/（决定于 frontend/.gitignore，2 path(s)）
+rc=0  sh scripts/check-path-length-budget.sh --with-self-test   （**在仓根**跑）
+        → VERDICT GREEN；分母＝13453 枚 tracked 路径；越帽 60 枚、在册 60 枚、不在册 0 枚；
+          positive control 3/3 ok（那句 "RED - over budget and NOT in the roster: ...seeded-...-over-the-hat.md"
+          是**种下去的**自控股，不是红；末行 "positive control PASSED" 才是判据）
+        本程新增最长相对路径＝59 字符（.scratch/wisp/probes/166/r2/teeth-flatclock-list-count20-round2.filtered.txt）
+        ＋ 证据件 39 字符（docs/evidence/s1/ticket166-ac6-166r2.md）＝帽内（relative+44>165 才越）。
+rc=0  gofmt -l internal/session/manage_test.go         ＝ 列出 **0 枚**文件（空尺：命令＋枚数＋逐枚件名＝无）
+rc=0  gofmt -l internal/session/                       ＝ 列出 **0 枚**文件（同上）
+
+## 6.2 gofumpt 这一把：派单前提与盘上不符，两把都报
+
+rc=1  which gofumpt                                    ＝ PATH 里⛔ 那枚（派单写的"本机没装"在**这一维**成立）
+叙述  但二进制真在盘上：ls /d/work/base/gopath/bin/ → gofumpt.exe 5,028,352 bytes（mtime 10 月 7 日 14:17）
+      ⇒ 本腿按盘上事实**跑了绝对路径那一把**，⛔ 拿 gofmt 的 0 冒充 gofumpt 的 0，也⛔ 报"本机不可用"了事。
+rc=0  /d/work/base/gopath/bin/gofumpt.exe -l internal/session/manage_test.go ＝ 列出 **0 枚**文件
+rc=0  /d/work/base/gopath/bin/gofumpt.exe -l internal/session/               ＝ 列出 **0 枚**文件
+rc=0  /d/work/base/gopath/bin/gofumpt.exe -l .scratch/wisp/probes/166/r2/    ＝ 列出 **0 枚**文件（该目录⛔ .go 件，射程内有 0 枚＝⛔ 为凑名册编数）
+叙述  射程差具名：gofmt ⊂ gofumpt（gofumpt 更严）。两把都 0 枚＝本程字节对**更严那把**也干净。
+
+## 6.3 ⛔ 本程没跑的门（写清楚，免得被当成跑过）
+
+叙述  ⛔ go test ./...（全仓，本编队波次规矩）｜⛔ go test ./cmd/wisp/ 整包（票 314 死亡区，本票用不到）
+      ⛔ 在共享工作树跑任何一发 go test（322-r1 的 internal/winsec 在飞 ⇒ 见 6.4）
+      ⛔ CI 色：本腿无推送权（推送归编排者），所以本程⛔ 任何 run 号。
+
+## 6.4 在飞邻居核（现跑，⛔ 记成我的红、⛔ 去修它）
+
+rc=0  git status --short internal/winsec        → 3 枚 M（winsec.go／winsec_other.go／winsec_windows.go）＝322-r1 在写
+叙述  ★派单预告"它中途可能让全仓 go build／go vet 红"——**本程这一分钟没红**：6.1 那两发 build/vet 全 rc=0。
+      ⇒ 如实报"没赶上那一分钟"，⛔ 把别人在飞态的绿算成我的凭据，也⛔ 反过来说我验过它。
+      我的判据一发⛔ 依赖工作树那一分钟的颜色：所有 go test 读数都站在 01 §1.1 那棵仓外导出树上。
+rc=0  git status --short cmd/wisp               → 324-v1 的面：本程未读它的具体字节，只确认自己⛔ 碰（见 07 §7.4 名册）
+rc=0  tasklist //FI "IMAGENAME eq wisp.exe"     → 0 枚；balldebug.exe → 0 枚（无孤儿 exe 在跑，台面干净）

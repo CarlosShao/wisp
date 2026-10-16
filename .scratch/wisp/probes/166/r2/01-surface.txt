@@ -1,0 +1,48 @@
+# 166-r2 · 01 台面（每一发读数都站在这一节定义的那一棵树上）
+
+腿名 166-r2｜票 .scratch/wisp/issues/166-no-session-layer-list-search-rename-archive-fork-on-the-go-side.md AC#6 ⓐ＋ⓑ
+开工锚 HEAD a9c7bea0（dev，2026-10-15 23:0x +08；派单写的开工锚 17ca21ee 是它的前一笔，本程起树用**当时盘上 HEAD**＝a9c7bea0）
+生成时刻 2026-10-15 23:1x–23:3x +08
+
+## 1.1 唯一的那棵测量树（改前／改后／正控／还原＝同一棵，⛔ 跨台面）
+
+rc=0  mkdir -p /d/tmp/wisp-166r2/tree /d/tmp/wisp-166r2/gotmp                     （先建再指，防 creating work dir）
+rc=0  git archive --format=tar HEAD | tar -x -C /d/tmp/wisp-166r2/tree
+rc=0  find /d/tmp/wisp-166r2/tree -name '*.go' | wc -l            ＝ 1087 枚 .go 文件（先证树非空，再信它的 0）
+rc=0  git rev-parse HEAD                                          ＝ a9c7bea03bb8be34c0caac886da6456e67646187
+rc=0  cmp <导出树>/internal/session/manage_test.go <工作树>/internal/session/manage_test.go  ＝ 改前逐字节相同
+rc=0  go version                                                  ＝ go1.27.1 windows/amd64
+rc=0  go env GOCACHE                                              ＝ E:\work\data\caches\go-build（共享缓存，⛔ 本程没清）
+
+台面全名（每一发旁边抄一次）：
+  树      = /d/tmp/wisp-166r2/tree（git archive a9c7bea0 导出，仓外，1087 枚 .go）
+  GOTMPDIR= D:/tmp/wisp-166r2/gotmp（预先 mkdir -p；go test 会把 TMPDIR 传给测试子进程，
+            所以 t.TempDir() 也落在这枚目录下——日志里的 path=D:\tmp\wisp-166r2\gotmp\Test... 是证据）
+  尺      = sh .scratch/wisp/probes/166/r2/00-ruler.sh <label> <tree> <count> <run-regex>
+  命令    = go test ./internal/session/ -count=<20> -run <regex> -v（本程唯一一把 go test 尺）
+  原始日志= /d/tmp/wisp-166r2/logs/<label>.log（仓外，机器本地，会被清；逐枚 raw_sha 前缀与行数见 07 §7.1）
+  在仓日志= .scratch/wisp/probes/166/r2/logs/<label>.filtered.txt（只留计数所依赖的那几形行，
+            逐枚与原始日志四个数核过相等，核法见 07 §7.1）
+
+## 1.2 ⛔ 在共享工作树跑任何一发 go test（322-r1 的 internal/winsec 在飞）
+
+rc=0  git status --short internal/winsec                          ＝ 3 枚 M（winsec.go／winsec_other.go／winsec_windows.go）
+叙述：本程全部 go test 读数都站在 1.1 那棵导出树上；工作树只跑了 build／vet／gofmt／门禁（见 05），没跑过一发测试。
+
+## 1.3 三枚文件形态（sha256 前 16 位＝哪一发站在哪个形态上）
+
+rc=0  改前（= a9c7bea0 的 manage_test.go，:69/:84 传 nil）        ＝ 57fcf6efc4624486
+rc=0  改后（本程交付字节，两处传 ptrTime(...) 步进时钟）           ＝ 2bf320df04e2819a
+rc=0  正控突变态（改后 ＋ 摘掉时钟步进＝updated_at 再做平）        ＝ 28f683c77893474d
+rc=0  还原后（cp .orig 回原位，再 cmp 工作树）                     ＝ 2bf320df04e2819a（＝改后，逐字节回来）
+rc=0  sha256sum <工作树>/internal/session/manage_test.go          ＝ 2bf320df04e2819a...（交付形态与树一致）
+
+## 1.4 台面自检（第一发必须先证那枚用例真发出了颜色）
+
+rc=1  首跑一发（sanity，改前形态、-count=1 -run 'TestSessionList' -v）
+        → 具名两枚用例都发出 === RUN ＋ --- PASS/FAIL：TestSessionListByTime PASS／TestSessionListByWorkspace FAIL
+        → 红句逐字（台面在此确认可用，⛔ 拿 rc 或行数当"跑过了"）：
+          manage_test.go:78: workspace filter = [sess_febbb4e791b76e95871e751ccc6cd93b sess_554ce1f1f576e4fb19fec370c3708ccd], want [sess_554ce1f1f576e4fb19fec370c3708ccd sess_febbb4e791b76e95871e751ccc6cd93b]
+        ⚠ 这一发的日志名为 logs/sanity-count1.log（本程第一发跑在建 logs/ 目录之前，日志当场落在
+          /d/tmp/wisp-166r2/logs-sanity.txt，事后按同一把抽取尺搬进仓＝件名少了 .filtered 后缀，具名在此）。
+rc=0  全仓 build 在这一分钟也绿（见 06 §6.1）＝导出树里 internal/session 能编译，RUN≠0 有分母。

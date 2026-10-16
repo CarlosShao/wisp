@@ -1,0 +1,42 @@
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.08s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.05s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+=== RUN   TestSessionSearchTitleAndBody
+--- PASS: TestSessionSearchTitleAndBody (0.04s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	0.967s

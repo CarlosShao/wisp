@@ -1,0 +1,64 @@
+# 166-r2 · 07 日志索引 · 自抓坏尺 · 台面分类 · 写面名册
+
+## 7.1 每一发的日志（原始在仓外、抽取件在仓内；两把尺四个数逐枚相等）
+
+抽取尺（逐字可重跑）＝ grep -E '^(=== RUN|--- |    --- |    manage_test|ok |FAIL|PASS)' <原始日志> > logs/<label>.filtered.txt
+四个数＝ RUN（`^=== RUN`）／PASS_TOP（`^--- PASS`）／FAIL_TOP（`^--- FAIL`）／SKIP（`^--- SKIP`）；
+单位＝枚**顶层用例**行（SUB 那一列另算**子测试**行 `^    --- `；bodies＝`^    manage_test` 那几形红句体枚数）。
+
+| label（= 00-ruler.sh 的第一参数） | 形态 sha16 | raw 行 | raw sha16 | filtered 行 | filtered 字节 | RUN | PASS_TOP | FAIL_TOP | SKIP | SUB | bodies |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| sanity-count1（⛔ 走尺，手跑的第一发） | 57fcf6ef… | 见下 | 25f19ed5efd51d18 | 8 | 424 | 2 | 1 | 1 | 0 | 0 | 1 |
+| before-count20 | 57fcf6efc4624486 | 450 | 61816327c005eb00 | 90 | 4574 | 40 | 33 | **7** | 0 | 0 | 7 |
+| before-count20-round2 | 57fcf6efc4624486 | 455 | f1dfc1612da44a4b | 95 | 5594 | 40 | 28 | **12** | 0 | 0 | 12 |
+| after-list-count20 | 2bf320df04e2819a | 442 | 703982e1c5d4e343 | 82 | 3141 | 40 | 40 | 0 | 0 | 0 | 0 |
+| after-list-count20-round2 | 2bf320df04e2819a | 442 | a3222eb23bed91cb | 82 | 3141 | 40 | 40 | 0 | 0 | 0 | 0 |
+| after-search-count20 | 2bf320df04e2819a | 222 | b552d45b13e05ec0 | 42 | 1821 | 20 | 20 | 0 | 0 | 0 | 0 |
+| after-all-count20（-run TestSession） | 2bf320df04e2819a | 1102 | bdeee7fe88b93bb2 | 202 | 8821 | 100 | 100 | 0 | 0 | 0 | 0 |
+| after-fullpkg-count1（⛔ -v ⇒ RUN=0 是"没发 -v"） | 2bf320df04e2819a | 1 | 88ad1a60b42d7f75 | 1 | 56 | 0 | 0 | 0 | 0 | 0 | 0 |
+| after-fullpkg-count20（整包 -v） | 2bf320df04e2819a | 4682 | 074d495723e248ec | 1442 | 95742 | 720 | 380 | 0 | 0 | 340 | 0 |
+| teeth-flatclock-list-count20 | 28f683c77893474d | 484 | 2cc2102bf9329dfe | 124 | 12665 | 40 | 18 | **22** | 0 | 0 | 41 |
+| teeth-flatclock-list-count20-round2 | 28f683c77893474d | 498 | 82c738a9d4cc2f89 | 138 | 15976 | 40 | 13 | **27** | 0 | 0 | 55 |
+| teeth-flatclock-search-count20（那颗缺的牙） | 28f683c77893474d | 222 | a8ff440eaa10a24c | 42 | 1821 | 20 | 20 | 0 | 0 | 0 | 0 |
+| restore-list-count20 | 2bf320df04e2819a | 442 | a22d637002623f6b | 82 | 3141 | 40 | 40 | 0 | 0 | 0 | 0 |
+| final-green-list-count20（突变全做完后的最后一发） | 2bf320df04e2819a | 442 | 9d52e4f8ab602b79 | 82 | 3141 | 40 | 40 | 0 | 0 | 0 | 0 |
+
+rc=0  等价核法（逐枚原始 vs 抽取件比那四个数，13 枚全相等）＝上面这张表的两组列；
+      核它的那把尺＝同一条 grep -c 分别打在原始与抽取件上（⛔ 我拿抽取件的 40 说原始也是 40）。
+叙述  原始日志留在 /d/tmp/wisp-166r2/logs/（机器本地、会腐），sha16 就是"抽取件没漏掉被数的那些行"的对合凭证；
+      sanity 那一发的原始件在 /d/tmp/wisp-166r2/logs-sanity.txt（4014 字节，sha16 25f19ed5efd51d18）。
+
+## 7.2 本程自抓的坏尺（3 枚，具名留档，原句⛔ 抹平）
+
+(1) 行号尺：00-ruler.sh 第一版按 `manage_test.go:78` 数红句体。本程那 14 行注释把断言挪到 :87 ⇒
+    突变态真红 8 枚、那把尺回 0＝**"0 命中"⛔ 等于"0 问题"**。已改成按文案模式数（详见 04 §4.5）。
+(2) which 尺：`which gofumpt` rc=1 被派单读成"本机没装"。盘上事实＝`/d/work/base/gopath/bin/gofumpt.exe` 真在
+    （5,028,352 字节，mtime 10 月 7 日 14:17，166-r1 也用过它）⇒ 两把并报（PATH 那把 rc=1、绝对路径那把 rc=0／0 枚），
+    ⛔ 二选一。（见 06 §6.2）
+(3) awk 索引尺：我给 §7.1 那张表写过一把 8 列 printf 的 awk，END 段少一个 %d ⇒
+    rc_awk=2、最后一枚文件⛔ 进表（`teeth-flatclock-search-count20` 那行是我另跑一把补的）。
+    ⇒ 表里**没有一格**来自那把坏尺；每格都可逐字用 §7.1 上面那条抽取尺重算。
+
+## 7.3 台面故障分类（判据里⛔ 计入的那一类）
+
+叙述  本程 14 发 go test 里，**0 发**出现 walk／build failed／no tests to run／0xc0000135／
+      connection refused／creating work dir，也** 0 发** RUN=0 且带 -v（唯一 RUN=0 的两发是
+      after-fullpkg-count1，那发⛔ 带 -v，已具名标"没发 -v"，⛔ 当判据）。
+      所以：本程⛔ 另节归类面故障的必要；01 §1.1 那三枚 mkdir 就是防这一类的。
+
+## 7.4 写面名册（本腿到底动了哪些字节）
+
+叙述  允许三处＋票尾一条：
+  1) internal/session/manage_test.go                      ← 唯一产码面（14 加／2 删，逐字见 03 §3.6）
+  2) .scratch/wisp/probes/166/r2/**                       ← 读数目录：9 枚件（00-ruler.sh／01…07 七枚 .txt／06-mutate-clock.sh）
+     ＋ logs/ 14 枚抽取件（13 枚 .filtered.txt ＋ sanity-count1.log），逐枚行数字节见 §7.1 那张表
+  3) docs/evidence/s1/ticket166-ac6-166r2.md              ← 本票那份读数/裁决件（39 字符，帽内）
+     ＋ .scratch/wisp/issues/166-…-on-the-go-side.md 末尾**一条** bullet（⛔ 勾任何 AC 框）
+rc=0  尺＝git diff --name-only（提交前一发）→ 除上面四形之⛔ 0 枚改动；
+      三枚冻结件、docs/PLAN.md、docs/specs/**、internal/risk/**、internal/panel/**、
+      internal/agent/approval/**、internal/observe/thresholds.go、golden、tools/d22scan/allowlist.txt、
+      frontend/**、design/**、.github/**、ci.yml、internal/memory/**、internal/session/session.go
+      ＝逐枚 0 字节（名册与退码见本 commit 之后编排者那一把；本腿交的是"我没写它们"这一句＋可复算的名册）。
+叙述  ⛔ push（推送归编排者，只推 origin/dev）；⛔ --amend／reset／rebase／stash／checkout .／clean；
+      `git add` 与 `git commit` 两处都逐枚列文件（⛔ -A／.／目录形）；临时件只建不删
+      （/d/tmp/wisp-166r2/** 全留着，仓内⛔ 删过一枚）。

@@ -1,0 +1,82 @@
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.04s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	1.992s

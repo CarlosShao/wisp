@@ -1,0 +1,95 @@
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_bfe5c42f17dba7f0304102e08ed1a6e2 sess_34dce9a3a8b3fd555bab66bad840c158], want [sess_34dce9a3a8b3fd555bab66bad840c158 sess_bfe5c42f17dba7f0304102e08ed1a6e2]
+--- FAIL: TestSessionListByWorkspace (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_cab559265642d871f58fe17b0662d5ad sess_7b7f3e0c1c7b71193ec1e6b814fd44e1], want [sess_7b7f3e0c1c7b71193ec1e6b814fd44e1 sess_cab559265642d871f58fe17b0662d5ad]
+--- FAIL: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_78db3fa20cc0f3a3ef7579bd55e077a2 sess_00250dc9c3aa67f8427d22294027365e], want [sess_00250dc9c3aa67f8427d22294027365e sess_78db3fa20cc0f3a3ef7579bd55e077a2]
+--- FAIL: TestSessionListByWorkspace (0.04s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_1512799eb55421f77ae9baef347ad8e5 sess_0f90f05b5240a7010aa61e878e8a36a3], want [sess_0f90f05b5240a7010aa61e878e8a36a3 sess_1512799eb55421f77ae9baef347ad8e5]
+--- FAIL: TestSessionListByWorkspace (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_f9f13c381d58e6b30affe419b6135e99 sess_19a2f47f7cbd2e2d0915cf466abdfc98], want [sess_19a2f47f7cbd2e2d0915cf466abdfc98 sess_f9f13c381d58e6b30affe419b6135e99]
+--- FAIL: TestSessionListByWorkspace (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_63ee811e9d5a73c3f676a041b3270233 sess_366e4962c5252b9d5eb72b8b66497a10], want [sess_366e4962c5252b9d5eb72b8b66497a10 sess_63ee811e9d5a73c3f676a041b3270233]
+--- FAIL: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.17s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_b6d06a7a4d85f76c32beb5ac0c4d7669 sess_098db79e6f7e412e90a167da34363b4c], want [sess_098db79e6f7e412e90a167da34363b4c sess_b6d06a7a4d85f76c32beb5ac0c4d7669]
+--- FAIL: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_cf807c98260e5470d81e532b0c052ad1 sess_32061f043d3c7e1b36f351beeb1c4475], want [sess_32061f043d3c7e1b36f351beeb1c4475 sess_cf807c98260e5470d81e532b0c052ad1]
+--- FAIL: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_784ee6c7108194fe210165fdae579cbb sess_49423b828d6c6ca247ed13b005845837], want [sess_49423b828d6c6ca247ed13b005845837 sess_784ee6c7108194fe210165fdae579cbb]
+--- FAIL: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_821e1d6f2229294bfec8785a614471ef sess_5e059fc9a8996656177d97bed5960a0a], want [sess_5e059fc9a8996656177d97bed5960a0a sess_821e1d6f2229294bfec8785a614471ef]
+--- FAIL: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_ab8b4572a657cb50c49a8438b9db9521 sess_7a4785e9d60da7bfeb3ce39eed9d77d0], want [sess_7a4785e9d60da7bfeb3ce39eed9d77d0 sess_ab8b4572a657cb50c49a8438b9db9521]
+--- FAIL: TestSessionListByWorkspace (0.11s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_d484a369ca8d0725a222e52a989592ea sess_5b08dcc7df3c36e5c48f4d9f241cb574], want [sess_5b08dcc7df3c36e5c48f4d9f241cb574 sess_d484a369ca8d0725a222e52a989592ea]
+--- FAIL: TestSessionListByWorkspace (0.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	2.459s
+FAIL

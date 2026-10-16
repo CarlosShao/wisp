@@ -1,0 +1,90 @@
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_5efe0ab090be1ce123fb8f59c4aa8ec4 sess_2d5404295ef429ff8313a516ea339a2e], want [sess_2d5404295ef429ff8313a516ea339a2e sess_5efe0ab090be1ce123fb8f59c4aa8ec4]
+--- FAIL: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_628a555aae2a24e09c11e44fc84e43f1 sess_2e65f02ef1e984e3ad90551274e9b93f], want [sess_2e65f02ef1e984e3ad90551274e9b93f sess_628a555aae2a24e09c11e44fc84e43f1]
+--- FAIL: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_682c41e6baab3f7d52640d712867adbd sess_633ea7c045568aae85bd31e951596ce9], want [sess_633ea7c045568aae85bd31e951596ce9 sess_682c41e6baab3f7d52640d712867adbd]
+--- FAIL: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.08s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_5373884f144ff6c7af928b4be1251dee sess_109754343908b40f7612922a64ccdba2], want [sess_109754343908b40f7612922a64ccdba2 sess_5373884f144ff6c7af928b4be1251dee]
+--- FAIL: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_695ae4c293105644b859f67952a2d0e9 sess_54cf258e33905fa7db05b19199bd9f03], want [sess_54cf258e33905fa7db05b19199bd9f03 sess_695ae4c293105644b859f67952a2d0e9]
+--- FAIL: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.07s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.07s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.06s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_bcef2c9a4d110fedecb8ba317dbc607d sess_b400150fc87148d6ef2f1d9cc90d56c7], want [sess_b400150fc87148d6ef2f1d9cc90d56c7 sess_bcef2c9a4d110fedecb8ba317dbc607d]
+--- FAIL: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.06s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+    manage_test.go:78: workspace filter = [sess_49d0d867b1a59453ea02616ad81458e2 sess_1831b8b1cf6b9ba17fbf4f312c74a385], want [sess_1831b8b1cf6b9ba17fbf4f312c74a385 sess_49d0d867b1a59453ea02616ad81458e2]
+--- FAIL: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+=== RUN   TestSessionListByTime
+--- PASS: TestSessionListByTime (0.05s)
+=== RUN   TestSessionListByWorkspace
+--- PASS: TestSessionListByWorkspace (0.05s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	2.346s
+FAIL

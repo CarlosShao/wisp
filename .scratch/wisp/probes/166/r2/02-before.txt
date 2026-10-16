@@ -1,0 +1,42 @@
+# 166-r2 · 02 改前复现（"那个坏世界真在盘上"那一发）
+
+台面＝01 §1.1 那一棵（导出树 a9c7bea0、GOTMPDIR=D:/tmp/wisp-166r2/gotmp、尺＝00-ruler.sh）
+形态＝改前 manage_test.go（sha256 前缀 57fcf6efc4624486；:69/:84 两处传 nil＝墙上时钟）
+判据（派单硬款）＝名册里 `TestSessionListByWorkspace` 必须 **FAIL>0**，单位＝顶层用例（`^--- FAIL: TestSessionListByWorkspace`）。
+
+## 2.1 第一发（-count=1，台面自检那一发）
+
+rc=1  go test ./internal/session/ -count=1 -run 'TestSessionList' -v
+RUN=2 PASS_TOP=1 FAIL_TOP=1 SKIP=0 SUBTEST=0
+  TestSessionListByTime        ＝ 1 枚顶层 PASS
+  TestSessionListByWorkspace   ＝ 1 枚顶层 FAIL          ← FAIL>0 ✓
+日志（仓内，逐字抽取件）＝logs/sanity-count1.log（原始 /d/tmp/wisp-166r2/logs-sanity.txt，raw_sha 前缀 25f19ed5efd51d18）
+红句逐字（连文案，⛔ 改写）：
+    manage_test.go:78: workspace filter = [sess_febbb4e791b76e95871e751ccc6cd93b sess_554ce1f1f576e4fb19fec370c3708ccd], want [sess_554ce1f1f576e4fb19fec370c3708ccd sess_febbb4e791b76e95871e751ccc6cd93b]
+
+## 2.2 第二发（-count=20＝判据那一发）
+
+rc=1  sh 00-ruler.sh before-count20 /d/tmp/wisp-166r2/tree 20 'TestSessionList'
+RUN=40 PASS_TOP=33 FAIL_TOP=7 SKIP=0 SUBTEST_LINES=0      （RUN=40＝2 枚顶层用例 × 20 轮；分母在，四个 0 ⛔ 不是"没跑"）
+  TestSessionListByWorkspace   ＝ PASS 13 枚／FAIL 7 枚（顶层，-count=20） ← FAIL>0 ✓ 判据满足
+  TestSessionListByTime        ＝ PASS 20 枚／FAIL 0 枚（顶层，同一发里）  ← 它用步进时钟＝恒绿＝正控的天然对照组
+pkg_fail_line=1（`FAIL	github.com/CarlosShao/wisp/internal/session`）
+surface_markers=0（walk／build failed／no tests to run／0xc0000135／connection refused／creating work dir 全 0 命中）
+红句体（`workspace filter =` 那一形）命中 7 枚，全部站在 :78
+日志＝logs/before-count20.filtered.txt（原始 raw_sha 前缀 61816327c005eb00，450 行）
+
+## 2.3 第三发（同形态再掷一次＝证"非恒定"，⛔ 把一发当通则）
+
+rc=1  sh 00-ruler.sh before-count20-round2 /d/tmp/wisp-166r2/tree 20 'TestSessionList'
+RUN=40 PASS_TOP=28 FAIL_TOP=12 SKIP=0
+  TestSessionListByWorkspace   ＝ PASS 8 枚／FAIL 12 枚（顶层，-count=20）
+  TestSessionListByTime        ＝ PASS 20 枚／FAIL 0 枚
+test_file_sha256_tree=57fcf6efc4624486 ← 与 2.2 同一枚形态（⛔ 我把红写成"这次必红"的那类通则）
+两发同一棵树一枚尺，FAIL 数 7 枚 ⇄ 12 枚＝**颜色随轮漂**＝与编排者现量的 HEAD 10/10、推前 7/13 同族（硬币，⛔ 恒定）。
+日志＝logs/before-count20-round2.filtered.txt（raw_sha 前缀 f1dfc1612da44a4b）
+
+## 2.4 编排者那两发（引文，⛔ 我复跑，只作背景）
+
+叙述：HEAD＝PASS 10／FAIL 10、推前基线 `0ab64fe9`＝PASS 7／FAIL 13（同一台面、两棵仓外导出树、-count=20）
+出处＝票 166 AC#6 正文（`git show a9c7bea0 -- .scratch/wisp/issues/166-...md` 可见）＋台账 A998 第四节
+本程 2.2／2.3 的 7 枚与 12 枚＝**我自己现量的两个独立样本**，落盘在此，不引经据典。
