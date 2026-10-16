@@ -1,0 +1,11 @@
+270-r2 复跑补记：门禁终态数（长度门 14386==60==60 GREEN、gofumpt rc=0）
+
+本腿五枚提交之后现跑复量，⛔ 抄自己起手那发：
+`sh scripts/check-path-length-budget.sh` ⇒ **rc=0**，tracked paths 14325⇒**14386**（＋61 枚＝
+本腿落的证据件＋台件＋message），over-budget=60 == roster=60、not in roster=0、VERDICT GREEN。
+`gofumpt.exe -l internal/tools/subagent_197.go` ⇒ **rc=0**（输出空）。
+Go 面自第一次 d22scan 之后一字未动（其后四枚提交只带 `.md`/`.txt`/`.py`/`.sh`）⇒ d22scan
+那一发（clean、ban#7 internal/tools/=25、ban#8 internal/=577 含注释）仍对得上现行字节。
+
+写面＝同一枚读数件（`.scratch/wisp/probes/270/r2/logs/gates-and-ruler.txt` §4 末补一段）＋
+本 message 件。⛔ 动产码、⛔ 翻框、⛔ push。

@@ -48,6 +48,10 @@ ban #8 射程非空且含注释：internal/=577 Go files, comments and _test.go 
 sh scripts/check-path-length-budget.sh => rc=0
 check-path-length-budget.sh: denominator: tracked paths=14325  over-budget=60  covered by roster=60  not in roster=0
 check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+★终态复跑（本腿五枚提交之后，⛔ 抄旧数）：`sh scripts/check-path-length-budget.sh` **rc=0**、
+  tracked paths=**14386**（＋61 枚＝本腿新落的件与台件）、over-budget=60==roster=60、VERDICT GREEN；
+  `gofumpt.exe -l internal/tools/subagent_197.go` 复跑 **rc=0**（输出空）。Go 面自第一次 d22scan
+  之后一字未动（其后四枚提交只带 `.md`／`.txt`／`.py`／`.sh`）⇒ d22scan 那一发仍对得上。
 
 ## 5. 台面修正具名（本腿实测，供编排者记账）
 派单更正①的八件套仍不够：本包 paths_shortname_252_* 8 枚腿要仓根 docs/ 且要树所在路径有 8.3 短名别名。
