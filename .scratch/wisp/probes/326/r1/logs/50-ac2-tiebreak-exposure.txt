@@ -1,0 +1,27 @@
+### 326-r1 AC#2 上交料：修完之后 tie-break 的暴露面（只测不改）
+when=2026-10-16 11:25:16 +0800 tree=/d/tmp/w326/after-86298e2 dao_session.go sha=ec6ee530b190（交付字节）
+/usr/bin/bash: line 1: .scratch: command not found
+件＝.scratch/wisp/probes/326/r1/zz326r1-tiebreak_bench_test.go（盘上 cp 进导出树跑、⛔ 进仓产码面、⛔ 改产码一字； 目录以点开头＝go 工具链不编译它）
+尺①＝200 对会话、生产时钟（newTestManager(...,nil)＝time.Now 秒级）、建两枚后立刻在 first 里追加一轮 ⇒ 三笔操作多半落在同一秒
+尺②＝10 对、追加前睡 1.1s ⇒ 那一笔 touch 一定跨秒
+$ go test ./internal/session/ -run 'TestZZ326R1Touch' -count=1 -v
+rc=0
+=== RUN   TestZZ326R1TouchTiesAfterFix
+TIEBREAK-AFTERFIX pairs=200 | touch advanced the second=0 (order wrong in 0 of those) | still tied with the neighbour=200 (coin landed against the touched one in 90)
+--- PASS: TestZZ326R1TouchTiesAfterFix (0.72s)
+=== RUN   TestZZ326R1TouchAcrossSecondIsDeterministic
+TIEBREAK-AFTERFIX-SLOW pairs=10 | touch advanced the second=10 (order wrong in 0) | still tied=0
+--- PASS: TestZZ326R1TouchAcrossSecondIsDeterministic (11.16s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/session	11.945s
+
+### 同一把尺①在未修码树上的对照（基线 fd01e799 树＋本腿测试件）
+（见 10-red-before-fix.txt：改前那形是"永远错"，不是"一半错"——delta=0、list 仍是 [B A]）
+
+### 本件自纠（追加、⛔ 抹掉上面原始行）
+1. 第 3 行那句 `bash: line 1: .scratch: command not found` ＝ 本腿自己踩了派单点名的台面陷阱：echo 的**双引号串里放了反引号**
+   ⇒ 那枚路径被当成命令替换执行、第 4 行因此少打了 `.scratch` 一词。读数本体（rc、四数、两行 TIEBREAK-*）⛔ 受影响，
+   它们来自同一次 go test 的 stdout。教训入账：**进 shell 的正文一律单引号或加引号 heredoc**。
+2. 第 18 行 `fd01e799` 是笔误，基线锚＝`fd01e796`（尺见 00-setup-and-trees.txt）。
+3. 两枚尺的名字与件本体在盘＝`.scratch/wisp/probes/326/r1/zz326r1-tiebreak_bench_test.go`（⛔ 编译进产码面：
+   `.scratch` 以点开头，go 工具链整目录跳过；跑它靠 `cp` 进导出树的 `internal/session/`）。

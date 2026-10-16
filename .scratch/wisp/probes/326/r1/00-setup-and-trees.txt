@@ -1,0 +1,37 @@
+### 326-r1 起手件（腿＝326-r1 落地腿·写；票＝.scratch/wisp/issues/326-append-session-turn-does-not-refresh-session-updated-so-a-live-chat-never-moves-up.md）
+
+现量时刻 2026-10-16 10:53 – 11:20 +08（每件抬头各带自己的时间戳）
+起树锚（本腿动手前 HEAD）＝`fd01e79628fdf4c8bb8f3eec42983d52295db12d`
+本腿交码提交＝`86298e240a2fd4c0…`（父＝`ce8df8b6`；父里含 `220-r2` 的 `cmd/wisp` 已提交字节，⛔ 本腿写面）
+
+#### 票框尺（现跑，⛔ 用票里的号）
+- 未勾框 `- [ ]` ＝ **6 枚**（尺＝`grep -c '^[[:space:]]*- \[ \]' <票>`，rc=0）
+- 已勾框 `- [x]` ＝ **0 枚**（同一把尺的 `- [x]` 形，rc=1＝零命中）
+- 本腿一枚没翻（AC 框归编排者按非实现者裁决定）。
+
+#### 票面那四行现量（逐枚复算，原始输出＝logs/00-step0-measure.txt）
+| 尺 | 射程 | 读数 | rc |
+|---|---|---|---|
+| ① `AppendSessionTurn` 函数体内 `UPDATE session` | 该函数体 27 行整块（logs/append-body.txt，awk NR 切出） | **0 枚** | grep rc=1（零命中） |
+| ② 写 `session.updated_at` 的位置 | `grep -n 'updated_at' internal/memory/dao_session.go` | 7 行：`:70` 列名册、`:84` 建、`:125`/`:144` 两枚 ORDER BY、`:177` 改名、`:198` 归档、`:231` 分叉另建 ⇒ 写侧**四处**，说话不在里面 | 0 |
+| ③ `ORDER BY updated_at DESC, id DESC` | 同文件 | **2 枚**（`:125` 列表、`:144` 搜索） | 0 |
+| ④ 时间源 | `dao_session.go` `observe.NowWallUTC().Unix()` 3 处（:175/:192/:218）＋ `orNow`（dao_tasklog.go:14，零值那支＝同一枚 NowWallUTC）＋ `internal/session/manage.go:77` 默认 `time.Now` | 秒精度、同一族；⛔ 第三种时钟 | 0 / 0 / 0 |
+
+#### 两棵仓外导出树（⛔ 拿共享工作树当改前那发）
+- 基线（未修码）＝`/d/tmp/w326/base-fd01e79`
+  ＝`git archive fd01e796 go.mod go.sum internal cmd tools scripts | tar -x`；`.go` 枚数＝**740**（证非空）
+  尺重抽后（补 `frontend` 那枚内部包，为让 `go build ./...` 有分母）＝742 枚；
+  `internal/memory/dao_session.go` sha256＝`38bff760eabb5bf9…` ＝ `git show fd01e796:…` 的 blob，逐字节同。
+  本腿三枚测试件（`dao_session_test.go`／`dao_session_append_326_test.go`／`manage_test.go`）以**盘上 cp** 放进该树，
+  产码⛔ 未动 ⇒ 红的那一发量的是"测试在、修码不在"。
+- 交付（修码后）＝`/d/tmp/w326/after-86298e2` ＝`git archive 86298e24 … | tar -x`；`.go` 枚数＝**743**；
+  `dao_session.go` sha256＝`ec6ee530b1907950…`（＝HEAD blob；四件逐枚哈希＝logs/42-delivered-hashes.txt）。
+- **同屏控制**：`git diff --numstat fd01e796 ce8df8b6 -- internal/memory internal/session` 输出为**空**
+  ⇒ 两棵树里我这两包除"本腿那一枚 UPDATE"外逐字节相同 ⇒ 红/绿之差只有那一枚改动，⛔ 跨台面。
+
+#### 台面
+- `GOTMPDIR=C:\Users\swq\AppData\Local\Temp\wisp326r1`（**原生反斜杠形**，先 `mkdir -p`；两棵树同一枚写法）
+- 跑 go 前置 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`（绝对路径形，指向仓里那三枚 DLL；本腿两包⛔ 加载它们，照规程带上防 0xc0000135）
+- ⛔ `go test ./cmd/wisp` 整包（票 314 死亡区）；⛔ `go mod tidy`／`go get`
+- 并发：`220-r2` 在写 `cmd/wisp`／`internal/panel`（本腿⛔ 碰），`325-v1`／`165-v1`／`287-v1b` 只读 ⇒
+  本腿⛔ 读它们的在飞件当凭据，全仓尺以 `git archive` 取出的树为准。

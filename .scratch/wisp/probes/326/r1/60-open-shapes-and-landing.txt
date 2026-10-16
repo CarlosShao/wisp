@@ -1,0 +1,71 @@
+### 326-r1 (c)/(d) 剩余面具名上报＋AC#5 说实话
+
+#### 1. AC#5：修完之后界面上还差哪一跳（现跑，HEAD＝`f4b62861`，2026-10-16 11:23–11:26 +08）
+| 尺 | 读数 | rc |
+|---|---|---|
+| `git grep -c 'session\.NewManager' -- '*.go'` | **0 枚**（生产里⛔ 一枚构造者） | 1 |
+| 同域正控 `git grep -n 'func NewManager' -- internal/session/manage.go` | 1 枚（`:68`）⇒ 尺抓得到 | 0 |
+| `grep -cE '"sessions"\|"history"' cmd/wisp/main.go` | **0 枚**（CLI ⛔ 那两枚子命令） | 1 |
+| `git grep -n 'ListSessions\|SearchSessions' -- '*.go'` 里非 `_test.go` 的命中 | 只有 `internal/memory/dao_session.go` 的定义自身＋`.scratch/**` 里别腿的 bench 件 ⇒ **产码调用点 0 枚** | 0（过滤后） |
+| `git grep -n 'memory\.Session' -- cmd/ internal/panel/ internal/tools/ internal/agent/` | **0 枚、0 行** | 1 |
+| 同尺正控 `git grep -c 'memory\.Session' -- internal/session/manage.go` | 18 枚 ⇒ 尺抓得到 | 0 |
+
+⇒ **本票修完，产品面上仍然看不见**：会话列表今天压根没接进 `cmd/wisp`／`internal/panel`（票 166 AC#2 判的"接线缺口"）。
+差的那一跳＝装配根里构造一枚 `session.NewManager` ＋一枚读者（子命令或面板快照）。那一跳属
+`cmd/wisp/**`＋`internal/panel/**`＝本波唯一写腿 `220-r2` 的面，**本腿⛔ 碰、一个字节没动**（自证尺见
+logs/31-ac4-gates-repotree.txt 第 5 节：本笔提交名册只有四件、全在上面五处写面内）。
+
+#### 2. 落点选择具名理由（候选 ⓐ vs ⓑ）
+- 选 ⓐ：同一枚事务里补 `UPDATE session SET updated_at=? WHERE id=?`（票面原文形状）。
+- 排除 ⓑ（"复用既有写侧助手"）：现读结论＝**仓里没有这样一枚助手**。既有四处写 `updated_at` 的形状是
+  各自内联一条语句（`:84` 建／`:177` 改名／`:198` 归档／`:231` 分叉），把它们抽成一枚 `touchSession` 属于
+  **动既有代码面**（新增跨函数依赖、并要回头改那四处），⛔ 本票射程；要抽由编排者另裁。
+- 值＝`t.CreatedAt`（已经 `orNow` 归一）而不是再读一枚 `observe.NowWallUTC()`：
+  ① 一次写入只读一枚时钟，写进母表的戳与写进子表的戳**必然同源**（否则同一轮会出现两个"动过时间"）；
+  ② `orNow` 的零值那支本来就是 `observe.NowWallUTC().Unix()`（`dao_tasklog.go:14`）⇒ 沿既有那一族、⛔ 第三种时钟；
+  ③ `InsertSession` 已用同一条关系（`UpdatedAt == CreatedAt` 当调用方没给第二个戳，`:76-78`）。
+  ⚠ 这一枚是**落点判断**、⛔ 票面明写：`TestAppendSessionTurnSurfacesTheConversation` 把"刷成哪一秒"钉成
+  "所写那一轮的戳"（`updated_at == turn.created_at`）。若裁次要改成"另读墙钟"，只需改这一枚断言，
+  真杀台件那枚判据（`updated_at >= max(turn.created_at)`）两形都放行。
+- ⛔ 动既有签名：`func (s *Store) AppendSessionTurn(ctx, t SessionTurn) (int64, error)` 入参／返回逐字未动（尺＝diff 里那行只加了注释、函数名行⛔ 变更）。
+- 写失败 propagate：那条 `UPDATE` 的 `err` 直接 `return err` ⇒ 整枚事务回滚（`open.go:280` `write` 的既定语义），
+  ⛔ 静默退化成"只插子表"。M01/M02/M03b 三形各自把这条链钉了一发红（见 40-de-tooth-and-teeth.txt）。
+
+#### 3. 本腿⛔ 治、具名上交的三形
+1. **母表行不存在那一形（⛔ 新造失败模式，故⛔ 拦）**：那条 `UPDATE` 在 `session` 里没有该 id 时影响 **0 行**，
+   今天的净效果＝子表多一行、⛔ 人知道。要不要把它判成 `ErrNotFound`（像 `RenameSession:181`／`SetSessionArchived:202` 那样查
+   `RowsAffected()==0`）＝**新增一枚失败模式**，票面判据只说"写失败要 propagate"、⛔ 说"缺母行要拒绝"，
+   且 `dao_session.go` 头部明写"this layer only stores rows"（生命周期策略归 `internal/session`）⇒ 按**未定义即停**，
+   本腿⛔ 自己填，只把形状交上去。
+   附现跑尺：`git grep -n 'foreign_keys' -- '*.go'` ＝ **0 命中、rc=1**；`dsn()`（`open.go:146`）挂的 pragma 只有
+   `busy_timeout / journal_mode(WAL) / synchronous(NORMAL) / wal_autocheckpoint`（写侧另有 `_txlock=immediate`）
+   ⇒ `session_turn.session_id REFERENCES session(id)`（`schema.go` ddlV3）**今天根本不生效**，孤儿轮次行在本票之前就可达。
+2. **回填/迟到戳那一形**：值取 `t.CreatedAt` ⇒ 若某枚调用方给一轮**过去的**时间戳（导入历史、补写），
+   `updated_at` 会被写回那一秒，该会话在"按时间列"里可能**下沉**。今天的调用者只有一枚
+   （`internal/session/manage.go:149 AppendTurn` 传 `m.now().Unix()`）⇒ 生产不可达；要防它得写
+   `updated_at=MAX(updated_at,?)`，那是票面 ⓐ 形状之外的 SQL ⇒ ⛔ 自造，交裁。
+3. **tie-break（AC#2 明令射程外）**：`ORDER BY updated_at DESC, id DESC` 两行逐字节未动（20-ac2-orderby-untouched.txt：
+   diff 命中 0 枚、两行切片 sha256 与锚同值 `6a4e53226589a6fb…`、正控证明该尺抓得到）。
+   本腿只交"修完之后这一形的暴露面"读数（50-ac2-tiebreak-exposure.txt）：
+   - 同一秒内的连发（200 对，建＋建＋追加都在一秒里）⇒ touch **0/200 跨秒**、200/200 仍并列 ⇒ 次序落到随机 hex 的倒序，
+     硬币 90/200＝**45%** 判给了没被碰过的那枚（与票 166 `166-v1` 量的 45.5% 同量级）；
+   - 追加那一笔跨了秒（10 对、每对睡 1.1s）⇒ **10/10 跨秒、0/10 判错**＝确定性正确。
+   ⇒ 一句话给编排者：**本票把"永远错"改成了"跨秒即对、同秒仍掷硬币"**；要连同秒一起治，动的是那两行ⓐ或 `session.id` 的形状，
+   本腿一枚⛔ 动。
+
+#### 4. 台面自纠（入账）
+- 本腿**自己踩了**派单点名的 shell 陷阱一枚：`echo` 的双引号串里放了反引号 ⇒ 路径被当命令替换执行，
+  读数件 `logs/50-ac2-tiebreak-exposure.txt` 第 4 行因此少打一词（该件末尾已追加自纠、⛔ 抹原始行）。
+- 第一次去牙台件的 M03 那一发＝`sed` 把行尾反引号一起吃掉 ⇒ `[build failed]`＝台面故障、⛔ 计入判据；
+  改用 python 精确替换重做为 M03b（有效红）。两处都写在 40-de-tooth-and-teeth.txt。
+- `git archive` 六件套（`go.mod go.sum internal cmd tools scripts`）取出的树里 `go build ./...` 会撞
+  `internal/panel/assets.go` → `github.com/CarlosShao/wisp/frontend`（那枚包在六件套之外）；本腿补抽 `frontend`
+  路径作为 `go build` 的分母（只读、⛔ 写面）。**这一条建议抄进规程**：六件套⛔ 覆盖 `go build ./...`。
+
+#### 5. 判据①"⛔ 动既有签名"的尺（现跑，2026-10-16 11:2x +08）
+- 尺＝`git diff fd01e796 86298e24 -- internal/memory/dao_session.go | grep -E '^[-+].*func \(s \*Store\) AppendSessionTurn'`
+  ⇒ **rc=1、命中 0 枚**（那行逐字未动，⛔ 增⛔ 删）；`internal/session` 侧本笔只动 `manage_test.go`
+  （尺＝`git diff --name-only fd01e796 86298e24 -- internal/session/` 输出**一枚**），`manage.go` 与 `ManageStore` 接口⛔ 动。
+- 同一把尺的正控（对函数体新增语句的抓取力）＝`grep -cE '^\+.*UPDATE session SET updated_at'` ⇒ **1 枚**、rc=0
+  ⇒ "0 命中"⛔ 是尺坏了。
+

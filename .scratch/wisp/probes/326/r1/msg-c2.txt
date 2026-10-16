@@ -1,0 +1,24 @@
+326-r1 读数件落盘：四枚判据读数＋十二枚原始输出＋两枚可重放突变脚本
+
+目录＝`.scratch/wisp/probes/326/r1/`（本腿写面第三处）。
+- `00-setup-and-trees.txt`＝第 0 步四行现量（各落 rc）＋票框尺（未勾 6／已勾 0）＋两棵仓外导出树的构造与同屏控制
+  （`git diff --numstat fd01e796 ce8df8b6 -- internal/memory internal/session` 输出为空 ⇒ 红/绿只差那一枚 UPDATE）。
+- `20-ac2-orderby-untouched.txt`＝AC#2 那两行 `ORDER BY` 的三把尺：diff 命中 0 枚、两行切片 sha256 与锚同值
+  `6a4e53226589a6fb…`、正控（同一把尺打在仓外副本的假改动上）命中 2 枚。
+- `40-de-tooth-and-teeth.txt`＝牙：M00 正控／M01 去牙（整行删）／M02 常量 0／M03a 台面故障（sed 吃掉反引号⇒
+  `[build failed]`，⛔ 计入判据）／M03b 刷成 created_at／M04 挪出事务／M99 还原（sha `ec6ee530…`＝HEAD blob、`cmp` rc=0）／
+  M99b 交付态同轮数 0 命中。★具名的不敏感＝AC#1 三枚对"事务外刷新"⛔ 敏感，只有真杀台件抓得到（18/32＝56%）。
+- `60-open-shapes-and-landing.txt`＝落点理由（ⓐ／排除 ⓑ 的现读结论）＋⛔ 治的三形（缺母行 0 行影响、迟到戳回写、
+  tie-break）＋AC#5 五把尺现跑（`session\.NewManager` 0 枚 rc=1、CLI 子命令 0 枚、`memory.Session` 在四个产码面 0 枚）＋
+  签名行零变更尺（命中 0 枚 rc=1，正控 1 枚）＋台面自纠。
+- `logs/`＝红句与成对绿、整包四数、门禁八把 rc、两批突变的逐字原始输出、交付四件哈希。
+- `de-tooth.sh`／`de-tooth2.sh`＝可重放突变脚本（⛔ 跑在仓外导出树的盘上字节，⛔ `-overlay`）；
+  `zz326r1-tiebreak_bench_test.go`＝只测不改的 tie-break 暴露面 bench（`.scratch` 以点开头＝go 工具链整目录跳过，
+  跑法＝`cp` 进导出树）。
+
+规程级自纠入账：① 双引号串里放反引号＝本腿自己踩了派单点名那枚陷阱（`logs/50-*` 末尾追加自纠、⛔ 抹原始行）；
+② 第一版真杀台件因循环全落同一秒在未修码上假绿，改成调用方自铸每秒一枚戳后才判出 `HALF-STATE`（两版读数都留）；
+③ `git archive` 六件套⛔ 覆盖 `go build ./...`（`internal/panel/assets.go` 要 `frontend` 那枚包）。
+
+只落读数：⛔ 改产码一字、⛔ 翻 AC 框（尺复跑＝未勾 6／已勾 0）、⛔ 动票名与 `Status:`、只 commit、⛔ push；
+add／commit 两处显式 pathspec＝本目录一枚。

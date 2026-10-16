@@ -1,0 +1,24 @@
+### 326-r1 未修码整包颜色（基线树＋本腿三枚测试件、⛔ 修码）
+when=2026-10-16 11:19:31 +0800 tree=/d/tmp/w326/base-fd01e79 (.go 枚数 742)
+dao_session.go sha256=38bff760eabb5bf9beb46eb55e5590675a3a33c8b5e6a231cf33442e9a642506 ＝ fd01e796 blob（未修码）
+
+--- go build ./... ---
+rc=0
+--- go vet ./internal/memory/ ./internal/session/ ---
+rc=0
+--- go test ./internal/memory/ -count=1 -v ---
+rc=1
+RUN=78 PASS_TOP=38 FAIL_TOP=3 SKIP=2
+--- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (2.72s)
+--- FAIL: TestAppendSessionTurnSurfacesTheConversation (0.14s)
+--- FAIL: TestAppendSessionTurnRefreshUsesStoredClockFamily (0.11s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	18.393s
+FAIL
+--- go test ./internal/session/ -count=1 -v ---
+rc=1
+RUN=37 PASS_TOP=19 FAIL_TOP=1 SKIP=0
+--- FAIL: TestSessionAppendTurnMovesItBackToTheFront (0.12s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	2.236s
+FAIL

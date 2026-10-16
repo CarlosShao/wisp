@@ -1,0 +1,32 @@
+326-r1 产码＋用例：AppendSessionTurn 在同一枚事务里刷新 session.updated_at
+
+落点＝候选 ⓐ（票 326 §落点）：`internal/memory/dao_session.go` 的 `AppendSessionTurn` 在**同一枚
+`s.write` 事务**里补一条 `UPDATE session SET updated_at=? WHERE id=?`；值＝`t.CreatedAt`（已经过
+`orNow` 归一，零值那支就是 `observe.NowWallUTC().Unix()`）⇒ 一次写入只读一枚时钟，⛔ 事务内再起一枚。
+候选 ⓑ 现读后排除：仓里既有的写侧形状是 `RenameSession`/`SetSessionArchived` 各自内联一条
+`UPDATE session ... updated_at=?`（`dao_session.go` 那两处），**没有**一枚可复用的"touch"助手，
+造一枚即新代码面、超出本票射程，故按 ⓐ。
+
+改前未修码那一发（真红，仓外导出树 `/d/tmp/w326/base-fd01e79`＝`git archive fd01e796 go.mod go.sum
+internal cmd tools scripts`，740 枚 `.go` 证非空；该树里 `dao_session.go` sha256 `38bff760eabb5bf9…`
+＝HEAD blob；⛔ 拿共享工作树当改前那发）：
+- `TestAppendSessionTurnSurfacesTheConversation` ⇒ `appending a turn did not reach session.updated_at:
+  sess-a.updated_at = 1777593660, want the appended turn's stamp 1777593780 (before=1777593660, delta=0)`
+  ＋ `continuing a chat does not surface it: list = [sess-b sess-a], want sess-a first after one more turn in it`
+- `TestAppendSessionTurnRefreshUsesStoredClockFamily` ⇒ `updated_at did not move forward: 1775001600 -> 1775001600`
+- `TestSessionAppendTurnMovesItBackToTheFront`（Manager 出口面）⇒ `AppendTurn wrote the child row only: …updated_at stayed 1777593660`
+- `TestAppendSessionTurnCrashAtomicAcrossKill`（真杀进程：父 `cmd.Process.Kill()`）⇒ 8 枚杀点全判
+  `lag=3602s..3645s => HALF-STATE`（子表有 3–46 行、母表 updated_at 仍是出生那一秒）
+
+改后（同一台面、同一 `GOTMPDIR` 写法）四发皆绿；逐包四数与五把门禁另件落盘。
+
+AC#2 ⛔ 顺手治 tie-break：`ORDER BY updated_at DESC, id DESC` 两行逐字节不动（判据尺＝
+`git diff <起树锚>..HEAD` 对那两行命中 0 枚，读数见 `probes/326/r1/20-ac2-orderby-untouched.txt`）。
+同秒先后的那一半病（`session.id` 是 `rand.Read` 铸的随机 hex）⛔ 本腿动，具名上交编排者另裁。
+
+射程：只动 `internal/memory/**`＋`internal/session/**`（含测试件）。⛔ `cmd/wisp/**`、⛔ `internal/panel/**`
+一个字节（本波唯一写腿＝`220-r2`）；AC#5 那格说实话＝会话列表今天⛔ 接进产品（票 166 AC#2 接线缺口），
+本票修完界面上仍看不见。⛔ 动既有签名（`AppendSessionTurn` 的入参与返回逐字未动）；⛔ 新造时钟、
+⛔ 用墙钟时间差实现超时；写失败 propagate（那条 `UPDATE` 的 err 直接返回⇒整枚事务回滚，⛔ 静默退化成
+"只插子表"）。⛔ 放宽断言、⛔ 删用例、⛔ 加 `t.Skip`（本腿新增用例只用了"父/子角色互斥"那两枚既有台件形状）。
+⛔ 翻票 326 任何 AC 框（六枚仍全未勾，翻框归编排者）；只 commit、⛔ push；add／commit 两处显式 pathspec。

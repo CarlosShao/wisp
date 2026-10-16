@@ -1,0 +1,43 @@
+### 326-r1 (b) 牙——去牙反控＋反形突变（判据仪器自己）
+
+台面：全部打在仓外导出树 `/d/tmp/w326/after-86298e2`（交付字节 86298e24）的**盘上字节**上，
+⛔ `-overlay`、⛔ 动共享工作树。每一发先记 sha256、跑完 `cp` 还原再复跑。
+原始输出全量＝logs/40-mutations-batch1.txt、logs/41-mutations-batch2.txt；脚本本体（可重放）＝
+`.scratch/wisp/probes/326/r1/de-tooth.sh`＋`de-tooth2.sh`。
+
+被牙的四枚用例（下称"四枚"）＝
+`TestAppendSessionTurnSurfacesTheConversation`／`TestAppendSessionTurnRefreshUsesStoredClockFamily`（`internal/memory`）
+`TestAppendSessionTurnCrashAtomicAcrossKill`（真杀进程，`internal/memory`）
+`TestSessionAppendTurnMovesItBackToTheFront`（Manager 出口面，`internal/session`）
+
+| 发 | 改的是什么字节 | sha256(dao_session.go) | 四枚的颜色 |
+|---|---|---|---|
+| M00 正控 | 未突变（交付态） | `ec6ee530b1907950…` | 四枚全绿：memory `rc=0 ok …2.097s`／session `rc=0 ok …0.149s` |
+| **M01 去牙** | 那条 `UPDATE session SET updated_at=? WHERE id=?` **整行物理删除** | `ee48c311d1925a2b…` | **四枚全红**（memory rc=1 三枚 FAIL＋session rc=1 一枚 FAIL） |
+| M02 反形 | 刷新的值换成常量 `0` | `e3b23fe9d34c3b37…` | **四枚全红**：`sess-a.updated_at 1777593660 -> 0 (delta=-1777593660)`；真杀台件 8/8 `updated_at=0 … lag=1777636804s => HALF-STATE` |
+| M03a ⚠台面 | sed 把行尾反引号一起吃掉 ⇒ `[build failed]` | `646a0ce00a8c500b…` | **⛔ 计入判据**（红句里有 `build failed`＝台面故障，规程明令）；改在 M03b 用 python 精确替换重做 |
+| **M03b 反形** | `SET updated_at=created_at`（刷新成母表自己的出生那一秒＝永不前进） | `1aa46bc0c5cd7fb2…` | **四枚全红**：出口面 `AppendTurn wrote the child row only: …stayed 1777593660`；真杀台件 8/8 `lag=3607s..3645s => HALF-STATE` |
+| **M04 反形** | 同一条 `UPDATE` **挪出事务**（事务体改 `return nil`，事务提交后另起一枚 `s.write`） | `3c3fda6ce0605e46…` | **真杀台件红**：4 轮×8 枚杀点＝**32 枚杀点里 18 枚判 `HALF-STATE`**（lag=1s）、4/4 轮 `--- FAIL`；**其余三枚放行**（`TestAppendSessionTurnSurfacesTheConversation`／`Refresh…`／出口面全绿，session rc=0） |
+| M99 还原 | `cp` 还原交付字节 | `ec6ee530b1907950…` | 四枚复绿；`cmp` 对 pristine **rc=0**（逐字节同）；对 `git show 86298e24:internal/memory/dao_session.go` 的 sha256 **同值** |
+| M99b 假红对照 | 交付字节跑 M04 同一轮数（4 轮＝32 枚杀点） | `ec6ee530b1907950…` | **`HALF-STATE` 命中 0 枚**、4/4 轮 `--- PASS` ⇒ 那 18 枚红⛔ 是仪器自己造的 |
+
+#### 具名结论：这把牙管得住什么、管不住什么
+1. **管得住**："根本没有那条 `UPDATE`"（M01）、"刷成常量"（M02）、"刷成 created_at"（M03b）——
+   三形都是**四枚全红**，且红句连文案逐字在盘（logs/40、logs/41）。⇒ 对票面那一形（"只插子表、不算动过"）
+   这把尺是**响的**，⛔ 只靠"列表顺序对了"：同屏那行 `updated_at 1777593660 -> 1777593780 (delta=120)`
+   与 `sess-a.updated_at = 0 / = created_at` 的红句是**同一枚读数的两面**。
+2. **对 M04（刷新挪到事务外）这一形：AC#1 那三枚 ⛔ 敏感**（它们只看最终状态、⛔ 看事务边界）——
+   **具名上报**：管这一形的是真杀台件 `TestAppendSessionTurnCrashAtomicAcrossKill`，命中率 **18/32＝56%**（⛔ 100%，
+   杀点落在"事务已提交、刷新还没写"那个窗口里才算得中；同秒内两枚戳相等时那形会躲过去）。
+   要把这一形钉成**确定性**的红，需要一枚"事务内第 N 句之后可注入失败"的接缝，
+   那要动 `Store.write`/DAO 的函数体形状＝超出本票射程（本票判据①⛔ 动既有签名、落点ⓐ只准补一条语句），
+   ⇒ 交给编排者裁：(α) 接受"56% 命中＋交付态 0 命中"这一发；(β) 另立一票开一枚故障注入接缝（`test-only hook`）。
+3. **⛔ 放宽、⛔ 删用例、⛔ 加 t.Skip 逃这一形**：`t.Skip` 只出现在父/子角色互斥那一枚
+   （`TestAppendSessionTurnCrashChild`，形状照抄仓里既有的 `TestSubprocessCrashWriter`），
+   整包读数里它记作 `SKIP=2`（另一枚＝既有的 `TestSubprocessCrashWriter`）。
+
+#### AC#3 的另一半：迁移那族⛔ 破
+- 尺＝`git diff fd01e796 86298e24 -- internal/memory/dao_session.go | grep -cE '^[+-].*(applyV3|ddlV3|migrationChain|SchemaVersionTarget)'` ⇒ **命中 0 枚、rc=1**。
+- 既有那枚迁移崩溃原子用例在交付态复跑：**`--- PASS: TestSessionMigrationCrashAtomicAndReplay (0.55s)`**（logs/../gate 全文＝
+  `/d/tmp/w326/gate-memory.txt`，整包 `RUN=78 PASS_TOP=41 FAIL_TOP=0 SKIP=2 rc=0`）。
+- 同包的兄弟台件 `--- PASS: TestCrashRecoveryKillMidWrite (0.19s)` 照旧绿 ⇒ 本腿没碰它的行为。

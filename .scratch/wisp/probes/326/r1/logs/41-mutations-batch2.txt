@@ -1,0 +1,79 @@
+=== 326-r1 第二批突变（2026-10-16 11:14:11 +0800）===
+ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 */d/tmp/w326/mutations/dao_session.go.pristine
+#### M03b-to-created-at（刷新成母表自己的 created_at）
+M03b written
+sha256=1aa46bc0c5cd7fb2075a4724e66ad88019a599315177e651a5b3a34891d1a996
+memory rc=1
+=== RUN   TestAppendSessionTurnCrashAtomicAcrossKill
+    dao_session_append_326_test.go:86: 326 AC#3 kill@2: announced=8 turns=8 maxSeq=8 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636807 lag=3607s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 2 commits: session_turn has 8 rows (maxSeq 8, newest turn stamp 1777636807) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3607s lag or a torn seq)
+    dao_session_append_326_test.go:86: 326 AC#3 kill@4: announced=7 turns=7 maxSeq=7 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636806 lag=3606s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 4 commits: session_turn has 7 rows (maxSeq 7, newest turn stamp 1777636806) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3606s lag or a torn seq)
+    dao_session_append_326_test.go:86: 326 AC#3 kill@9: announced=11 turns=11 maxSeq=11 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636810 lag=3610s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 9 commits: session_turn has 11 rows (maxSeq 11, newest turn stamp 1777636810) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3610s lag or a torn seq)
+    dao_session_append_326_test.go:86: 326 AC#3 kill@20: announced=20 turns=20 maxSeq=20 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636819 lag=3619s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 20 commits: session_turn has 20 rows (maxSeq 20, newest turn stamp 1777636819) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3619s lag or a torn seq)
+    dao_session_append_326_test.go:86: 326 AC#3 kill@45: announced=46 turns=46 maxSeq=46 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636845 lag=3645s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 45 commits: session_turn has 46 rows (maxSeq 46, newest turn stamp 1777636845) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3645s lag or a torn seq)
+    dao_session_append_326_test.go:89: 326 AC#3 kill@11: announced=14 turns=14 maxSeq=14 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636813 lag=3613s => HALF-STATE
+    dao_session_append_326_test.go:89: half state after kill at 11 commits: session_turn has 14 rows (maxSeq 14, newest turn stamp 1777636813) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3613s lag or a torn seq)
+    dao_session_append_326_test.go:89: 326 AC#3 kill@6: announced=8 turns=8 maxSeq=8 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636807 lag=3607s => HALF-STATE
+    dao_session_append_326_test.go:89: half state after kill at 6 commits: session_turn has 8 rows (maxSeq 8, newest turn stamp 1777636807) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3607s lag or a torn seq)
+    dao_session_append_326_test.go:89: 326 AC#3 kill@12: announced=13 turns=13 maxSeq=13 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636812 lag=3612s => HALF-STATE
+    dao_session_append_326_test.go:89: half state after kill at 12 commits: session_turn has 13 rows (maxSeq 13, newest turn stamp 1777636812) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3612s lag or a torn seq)
+--- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (1.27s)
+=== RUN   TestAppendSessionTurnSurfacesTheConversation
+    dao_session_test.go:114: 326 AC#1 same-row evidence: sess-a.updated_at 1777593660 -> 1777593660 (delta=0) for turn.created_at=1777593780 | list = [sess-b sess-a]
+    dao_session_test.go:118: appending a turn did not reach session.updated_at: sess-a.updated_at = 1777593660, want the appended turn's stamp 1777593780 (before=1777593660, delta=0)
+    dao_session_test.go:122: continuing a chat does not surface it: list = [sess-b sess-a], want sess-a first after one more turn in it
+--- FAIL: TestAppendSessionTurnSurfacesTheConversation (0.09s)
+=== RUN   TestAppendSessionTurnRefreshUsesStoredClockFamily
+    dao_session_test.go:154: 326 AC#1 clock family: turn.created_at = 1792120455, sess.updated_at 1775001600 -> 1775001600 (delta=0)
+    dao_session_test.go:157: refresh used a different clock than the turn it wrote: updated_at = 1775001600, want turn.created_at 1792120455
+    dao_session_test.go:161: updated_at did not move forward: 1775001600 -> 1775001600 (appending is a touch)
+--- FAIL: TestAppendSessionTurnRefreshUsesStoredClockFamily (0.08s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	1.501s
+FAIL
+session rc=1
+=== RUN   TestSessionAppendTurnMovesItBackToTheFront
+    manage_test.go:214: 326 AC#1 outlet reading: sess_3c0563f2d9fbf50270ab992f7a30bc23.updated_at 1777593660 -> 1777593660 (delta=0) for turn.created_at=1777593780 | list = [sess_08872bd625495ae24a31e927de71b7c7 sess_3c0563f2d9fbf50270ab992f7a30bc23]
+    manage_test.go:218: continuing a conversation does not surface it: list = [sess_08872bd625495ae24a31e927de71b7c7 sess_3c0563f2d9fbf50270ab992f7a30bc23], want [sess_3c0563f2d9fbf50270ab992f7a30bc23 sess_08872bd625495ae24a31e927de71b7c7] after one more turn in sess_3c0563f2d9fbf50270ab992f7a30bc23
+    manage_test.go:222: AppendTurn wrote the child row only: sess_3c0563f2d9fbf50270ab992f7a30bc23.updated_at stayed 1777593660, want it past 1777593660
+    manage_test.go:226: the touch and the turn disagree on the clock: updated_at = 1777593660, want turn.created_at 1777593780
+--- FAIL: TestSessionAppendTurnMovesItBackToTheFront (0.09s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	0.130s
+FAIL
+RESTORE sha256=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 (want ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2)
+#### M04b-outside-txn 命中率（真杀台件 4 轮＝32 枚杀点）
+M04b written
+sha256=3c3fda6ce0605e466de8407fb02736df326d847089ad57483ee77f10bcad375a
+crash rc=1
+M04b 杀点总数 = 32
+M04b HALF-STATE 命中 = 18
+--- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (1.73s)
+--- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (2.50s)
+--- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (2.36s)
+--- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (1.80s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	8.446s
+FAIL
+session(AC#1 出口面) rc=0
+--- PASS: TestSessionAppendTurnMovesItBackToTheFront (0.11s)
+ok  	github.com/CarlosShao/wisp/internal/session	0.156s
+RESTORE sha256=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 (want ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2)
+#### 交付字节同轮数对照（⛔ 假红：同一台件跑 4 轮应 0 命中）
+sha256=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2
+crash rc=0
+交付态杀点总数 = 32
+交付态 HALF-STATE 命中 = 0
+grep rc=1 (1＝零命中)
+--- PASS: TestAppendSessionTurnCrashAtomicAcrossKill (1.73s)
+--- PASS: TestAppendSessionTurnCrashAtomicAcrossKill (1.29s)
+--- PASS: TestAppendSessionTurnCrashAtomicAcrossKill (1.36s)
+--- PASS: TestAppendSessionTurnCrashAtomicAcrossKill (1.51s)
+ok  	github.com/CarlosShao/wisp/internal/memory	5.936s
+cmp rc=0
+还原后 sha256=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2
+ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2 *-

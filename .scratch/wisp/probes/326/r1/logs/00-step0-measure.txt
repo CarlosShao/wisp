@@ -1,0 +1,46 @@
+### 326-r1 第 0 步现量（2026-10-16 10:58:34 +0800）
+HEAD=fd01e79628fdf4c8bb8f3eec42983d52295db12d branch=dev
+GOTMPDIR=C:\Users\swq\AppData\Local\Temp\wisp326r1 (native backslash, dir pre-created; ls rc below)
+ls -d GOTMPDIR rc=0
+
+### 票框尺（现量）
+uncheck boxes = 6
+rc=0
+checked boxes   = 0
+rc=1
+
+### 尺① AppendSessionTurn 函数体内 UPDATE session 枚数
+253:func (s *Store) AppendSessionTurn(ctx context.Context, t SessionTurn) (int64, error) {
+rc=0
+UPDATE-in-body rc=1 (1 = 零命中)
+UPDATE-in-body hits = 0
+
+### 尺② 写 session.updated_at 的既有四处
+70:const sessionCols = `id, title, workspace, created_at, updated_at, archived_at, COALESCE(forked_from,'')`
+84:			`INSERT INTO session(id, title, workspace, created_at, updated_at, archived_at, forked_from)
+125:	q += ` ORDER BY updated_at DESC, id DESC`
+144:	sqlText += ` ORDER BY updated_at DESC, id DESC`
+177:		res, err := tx.ExecContext(ctx, `UPDATE session SET title=?, updated_at=? WHERE id=?`, title, now, id)
+198:		res, err := tx.ExecContext(ctx, `UPDATE session SET archived_at=?, updated_at=? WHERE id=?`, stamp, now, id)
+231:			`INSERT INTO session(id, title, workspace, created_at, updated_at, archived_at, forked_from)
+rc=0
+
+### 尺③ 两处 ORDER BY updated_at DESC, id DESC
+125:	q += ` ORDER BY updated_at DESC, id DESC`
+144:	sqlText += ` ORDER BY updated_at DESC, id DESC`
+rc=0
+
+### 尺④ 时间源
+175:	now := observe.NowWallUTC().Unix()
+192:	now := observe.NowWallUTC().Unix()
+218:	now := observe.NowWallUTC().Unix()
+rc=0
+14:func orNow(v int64) int64 {
+15-	if v != 0 {
+16-		return v
+17-	}
+18-	return observe.NowWallUTC().Unix()
+19-}
+rc=0
+77:		m.now = time.Now
+rc=0

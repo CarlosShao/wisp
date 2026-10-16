@@ -1,0 +1,22 @@
+### 326-r1 AC#2 尺：ORDER BY 那两行逐字节不动（2026-10-16 11:09:23 +0800）
+锚＝fd01e796（本腿起树锚；f146781→fd01e796 之间 internal/memory＋internal/session 零 diff）
+尺＝git diff fd01e796 -- <本腿四件> | grep -E '^[+-].*ORDER BY updated_at DESC, id DESC'
+git diff rc=0  diff 行数＝255
+ORDER BY 命中枚数 = 0
+grep rc=1 (1＝零命中)
+
+### 逐字节对撞：锚与盘上那两行（sha256 of the two-line slice）
+6a4e53226589a6fb7005e5f8647c9eea75fcfc5fb0d43c2f710ed0ac2274b3ef *-
+6a4e53226589a6fb7005e5f8647c9eea75fcfc5fb0d43c2f710ed0ac2274b3ef *-
+两行现文（行号只当读数）：
+125:	q += ` ORDER BY updated_at DESC, id DESC`
+144:	sqlText += ` ORDER BY updated_at DESC, id DESC`
+
+### 正控（同一把尺能不能抓到被动过的 ORDER BY）＝在仓外导出树的副本上造一枚假改动
+diff rc=1 (1＝有差异，正常)
+同一把尺在假改动上的命中枚数 = 2
+grep rc=0 ⇒ >0 证明这把尺抓得到
+
+### 本腿四件里 ORDER BY 字样只出现在注释/读数、⛔ 出现在增删行：
+internal/memory/dao_session_test.go:69:// updated_at and the ORDER BY falls through to "id DESC", where id is random hex
+internal/session/manage_test.go:74:// in the same second (manage.go:93 keeps a Unix SECOND), "ORDER BY updated_at

@@ -1,0 +1,28 @@
+### 326-r1 AC#3 真杀台件在未修码上的那一发（应判 HALF-STATE）
+when=2026-10-16 11:07:26 +0800  tree=/d/tmp/w326/base-fd01e79 dao_session.go sha=38bff760eabb (=HEAD 未修码)
+$ go test ./internal/memory/ -run 'TestAppendSessionTurnCrash' -count=1 -v   (INFO/WARN 日志行已 grep -v 剥掉，红句逐字保留)
+=== RUN   TestAppendSessionTurnCrashChild
+    dao_session_append_326_test.go:46: crash child for TestAppendSessionTurnCrashAtomicAcrossKill
+--- SKIP: TestAppendSessionTurnCrashChild (0.00s)
+=== RUN   TestAppendSessionTurnCrashAtomicAcrossKill
+    dao_session_append_326_test.go:86: 326 AC#3 kill@2: announced=3 turns=3 maxSeq=3 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636802 lag=3602s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 2 commits: session_turn has 3 rows (maxSeq 3, newest turn stamp 1777636802) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3602s lag or a torn seq)
+    dao_session_append_326_test.go:86: 326 AC#3 kill@4: announced=5 turns=5 maxSeq=5 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636804 lag=3604s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 4 commits: session_turn has 5 rows (maxSeq 5, newest turn stamp 1777636804) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3604s lag or a torn seq)
+    dao_session_append_326_test.go:86: 326 AC#3 kill@9: announced=10 turns=10 maxSeq=10 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636809 lag=3609s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 9 commits: session_turn has 10 rows (maxSeq 10, newest turn stamp 1777636809) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3609s lag or a torn seq)
+    dao_session_append_326_test.go:86: 326 AC#3 kill@20: announced=22 turns=22 maxSeq=22 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636821 lag=3621s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 20 commits: session_turn has 22 rows (maxSeq 22, newest turn stamp 1777636821) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3621s lag or a torn seq)
+    dao_session_append_326_test.go:86: 326 AC#3 kill@45: announced=46 turns=46 maxSeq=46 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636845 lag=3645s => HALF-STATE
+    dao_session_append_326_test.go:86: half state after kill at 45 commits: session_turn has 46 rows (maxSeq 46, newest turn stamp 1777636845) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3645s lag or a torn seq)
+    dao_session_append_326_test.go:89: 326 AC#3 kill@11: announced=15 turns=15 maxSeq=15 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636814 lag=3614s => HALF-STATE
+    dao_session_append_326_test.go:89: half state after kill at 11 commits: session_turn has 15 rows (maxSeq 15, newest turn stamp 1777636814) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3614s lag or a torn seq)
+    dao_session_append_326_test.go:89: 326 AC#3 kill@6: announced=9 turns=9 maxSeq=9 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636808 lag=3608s => HALF-STATE
+    dao_session_append_326_test.go:89: half state after kill at 6 commits: session_turn has 9 rows (maxSeq 9, newest turn stamp 1777636808) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3608s lag or a torn seq)
+    dao_session_append_326_test.go:89: 326 AC#3 kill@12: announced=17 turns=17 maxSeq=17 updated_at=1777633200 created_at=1777633200 max(turn.created_at)=1777636816 lag=3616s => HALF-STATE
+    dao_session_append_326_test.go:89: half state after kill at 12 commits: session_turn has 17 rows (maxSeq 17, newest turn stamp 1777636816) while session.updated_at = 1777633200 — the touch and the turn did not share one transaction (want NOTHING or ALL, got a 3616s lag or a torn seq)
+--- FAIL: TestAppendSessionTurnCrashAtomicAcrossKill (1.35s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	1.392s
+FAIL
+rc=1

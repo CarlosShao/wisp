@@ -1,0 +1,27 @@
+func (s *Store) AppendSessionTurn(ctx context.Context, t SessionTurn) (int64, error) {
+	t.CreatedAt = orNow(t.CreatedAt)
+	if err := validateTurn(t); err != nil {
+		return 0, err
+	}
+	var id int64
+	err := s.write(ctx, func(ctx context.Context, tx *sql.Tx) error {
+		if t.Seq == 0 {
+			if err := tx.QueryRowContext(ctx,
+				`SELECT COALESCE(MAX(seq),0)+1 FROM session_turn WHERE session_id=?`, t.SessionID).Scan(&t.Seq); err != nil {
+				return err
+			}
+		}
+		res, err := tx.ExecContext(ctx,
+			`INSERT INTO session_turn(session_id, seq, role, content, created_at) VALUES(?,?,?,?,?)`,
+			t.SessionID, t.Seq, t.Role, t.Content, t.CreatedAt)
+		if err != nil {
+			return err
+		}
+		id, err = res.LastInsertId()
+		return err
+	})
+	if err != nil {
+		return 0, fmt.Errorf("memory: append session turn: %w", err)
+	}
+	return id, nil
+}

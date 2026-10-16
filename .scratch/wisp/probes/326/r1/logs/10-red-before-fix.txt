@@ -1,0 +1,57 @@
+### 326-r1 改前未修码那一发（RED on baseline tree）
+when=2026-10-16 11:05:05 +0800
+tree=/d/tmp/w326/base-fd01e79 (git archive fd01e796 go.mod go.sum internal cmd tools scripts | tar -x, 740 .go)
+dao_session.go sha256 = 38bff760eabb5bf9beb46eb55e5590675a3a33c8b5e6a231cf33442e9a642506 (= HEAD blob 38bff760..., 未修码)
+GOTMPDIR=C:\Users\swq\AppData\Local\Temp\wisp326r1
+
+$ go test ./internal/memory/ -run 'TestAppendSessionTurnSurfacesTheConversation|TestAppendSessionTurnRefreshUsesStoredClockFamily' -count=1 -v
+=== RUN   TestAppendSessionTurnSurfacesTheConversation
+time=2026-10-16T11:05:08.398+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326r1\TestAppendSessionTurnSurfacesTheConversation3931158589\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T11:05:08.406+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T03:05:08Z duration_ms=7
+time=2026-10-16T11:05:08.415+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326r1\TestAppendSessionTurnSurfacesTheConversation3931158589\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T11:05:08.422+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T03:05:08Z duration_ms=6
+time=2026-10-16T11:05:08.430+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326r1\TestAppendSessionTurnSurfacesTheConversation3931158589\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T11:05:08.437+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T03:05:08Z duration_ms=7
+time=2026-10-16T11:05:08.447+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T11:05:08.451+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_test.go:114: 326 AC#1 same-row evidence: sess-a.updated_at 1777593660 -> 1777593660 (delta=0) for turn.created_at=1777593780 | list = [sess-b sess-a]
+    dao_session_test.go:118: appending a turn did not reach session.updated_at: sess-a.updated_at = 1777593660, want the appended turn's stamp 1777593780 (before=1777593660, delta=0)
+    dao_session_test.go:122: continuing a chat does not surface it: list = [sess-b sess-a], want sess-a first after one more turn in it
+--- FAIL: TestAppendSessionTurnSurfacesTheConversation (0.11s)
+=== RUN   TestAppendSessionTurnRefreshUsesStoredClockFamily
+time=2026-10-16T11:05:08.498+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326r1\TestAppendSessionTurnRefreshUsesStoredClockFamily2379085804\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T11:05:08.508+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T03:05:08Z duration_ms=9
+time=2026-10-16T11:05:08.516+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326r1\TestAppendSessionTurnRefreshUsesStoredClockFamily2379085804\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T11:05:08.524+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T03:05:08Z duration_ms=7
+time=2026-10-16T11:05:08.533+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326r1\TestAppendSessionTurnRefreshUsesStoredClockFamily2379085804\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T11:05:08.539+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T03:05:08Z duration_ms=6
+time=2026-10-16T11:05:08.544+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T11:05:08.547+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    dao_session_test.go:154: 326 AC#1 clock family: turn.created_at = 1792119908, sess.updated_at 1775001600 -> 1775001600 (delta=0)
+    dao_session_test.go:157: refresh used a different clock than the turn it wrote: updated_at = 1775001600, want turn.created_at 1792119908
+    dao_session_test.go:161: updated_at did not move forward: 1775001600 -> 1775001600 (appending is a touch)
+--- FAIL: TestAppendSessionTurnRefreshUsesStoredClockFamily (0.10s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	0.258s
+FAIL
+rc=1
+
+$ go test ./internal/session/ -run TestSessionAppendTurnMovesItBackToTheFront -count=1 -v
+=== RUN   TestSessionAppendTurnMovesItBackToTheFront
+time=2026-10-16T11:05:10.090+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326r1\TestSessionAppendTurnMovesItBackToTheFront1152130782\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T11:05:10.097+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T03:05:10Z duration_ms=6
+time=2026-10-16T11:05:10.104+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326r1\TestSessionAppendTurnMovesItBackToTheFront1152130782\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T11:05:10.109+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T03:05:10Z duration_ms=4
+time=2026-10-16T11:05:10.120+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\wisp326r1\TestSessionAppendTurnMovesItBackToTheFront1152130782\001\data\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T11:05:10.125+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T03:05:10Z duration_ms=4
+time=2026-10-16T11:05:10.129+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T11:05:10.132+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    manage_test.go:214: 326 AC#1 outlet reading: sess_71a846bb847b450056f828cf8eb63e3f.updated_at 1777593660 -> 1777593660 (delta=0) for turn.created_at=1777593780 | list = [sess_c78d0af96790c68cba5051c90bc817a5 sess_71a846bb847b450056f828cf8eb63e3f]
+    manage_test.go:218: continuing a conversation does not surface it: list = [sess_c78d0af96790c68cba5051c90bc817a5 sess_71a846bb847b450056f828cf8eb63e3f], want [sess_71a846bb847b450056f828cf8eb63e3f sess_c78d0af96790c68cba5051c90bc817a5] after one more turn in sess_71a846bb847b450056f828cf8eb63e3f
+    manage_test.go:222: AppendTurn wrote the child row only: sess_71a846bb847b450056f828cf8eb63e3f.updated_at stayed 1777593660, want it past 1777593660
+    manage_test.go:226: the touch and the turn disagree on the clock: updated_at = 1777593660, want turn.created_at 1777593780
+--- FAIL: TestSessionAppendTurnMovesItBackToTheFront (0.08s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	0.115s
+FAIL
+rc=1

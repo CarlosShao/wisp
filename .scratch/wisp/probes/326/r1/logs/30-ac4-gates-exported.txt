@@ -1,0 +1,27 @@
+### 326-r1 AC#4 门禁·第一组＝仓外导出树（交付字节 86298e24）
+when=2026-10-16 11:16:36 +0800 tree=/d/tmp/w326/after-86298e2
+树＝git archive 86298e24 go.mod go.sum internal cmd tools scripts frontend | tar -x（.go 枚数 743；frontend 是内部包、⛔ 本腿写面、只为让 go build ./... 有分母）
+dao_session.go sha256=ec6ee530b190795093829eca07e6003bf866db5da3e64c47e6d0b0b1bcd1d2b2
+GOTMPDIR=C:\Users\swq\AppData\Local\Temp\wisp326r1
+
+--- 1) go build ./...（rc＝直接取 go 的 $?，输出重定向到文件、⛔ 管道到 tail 拿它的 rc）---
+rc=0
+
+--- 2) go vet ./internal/memory/ ./internal/session/ ---
+rc=0
+
+--- 3) go test ./internal/memory/ -count=1 -v（逐包四数）---
+rc=0
+RUN=78 PASS_TOP=41 FAIL_TOP=0 SKIP=2
+--- SKIP: TestSubprocessCrashWriter (0.00s)
+--- SKIP: TestAppendSessionTurnCrashChild (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/memory	21.148s
+
+--- 4) go test ./internal/session/ -count=1 -v（逐包四数）---
+rc=0
+RUN=37 PASS_TOP=20 FAIL_TOP=0 SKIP=0
+ok  	github.com/CarlosShao/wisp/internal/session	2.351s
+
+--- 5) gofumpt 真身·绝对路径（整包）---
+rc=0  列出枚数=0
+裸名 gofumpt 对照：⛔ 在 PATH
