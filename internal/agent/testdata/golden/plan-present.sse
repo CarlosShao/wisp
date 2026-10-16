@@ -1,0 +1,28 @@
+# wisp golden sse v1
+# @scenario agent loop, ticket 165 AC#6 (the doorbell): the voice entry asks for
+# @scenario a messy project to be tidied and the model knocks on the brake
+# @scenario first - ONE plan.present tool call, then the text it gives back
+# @scenario after the loop fed that call's answer into the history. Response 1
+# @scenario is the tool call, response 2 is text. These are recorded bytes
+# @scenario replayed by the genuine openai-chat adapter (C5 seam), never a
+# @scenario function mock: the point is that the tool_call hop itself is walked.
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_pp1","type":"function","function":{"name":"plan.present","arguments":"{\"summary\":\"先把项目收拾成能跑的样子，这一轮只出清单不动手\",\"steps\":[\"列出根目录里散落的构建产物\",\"把三处过期脚本改名并同步 README\"]}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":210,"completion_tokens":42,"total_tokens":252}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"清单已经交给你了，等你点头我再动手。"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":280,"completion_tokens":12,"total_tokens":292,"prompt_tokens_details":{"cached_tokens":210}}}
+
+data: [DONE]
