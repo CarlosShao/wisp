@@ -1,0 +1,13 @@
+165-r3 落夹具（票 165 AC#6·形甲第一枚）：internal/agent/testdata/golden/plan-present.sse
+
+录下的 SSE 两发：response 1 ＝一枚 plan.present 的 tool_call（id call_pp1／
+arguments 填 summary＋两步清单），response 2 ＝循环把那一跳的答灌回历史之后模型
+给的文本。形状照 internal/agent/testdata/golden/tool-then-text.sse，只把
+function.name 换成本仓名册里那枚真工具（docs/PLAN.md:2567）。
+
+参数面故意只留一枚 tool_calls delta 行（第 12 行）＝这把仪器的牙：摘掉那一行，
+sink 一行都读不出来，用例即红；分形参数那一形已由 tool-then-text.sse 与
+TestGoldenSingleToolCall 覆盖，本件不重复开面。
+
+⛔ 改任何既有 golden 件（本件是新增）；⛔ 动 tools/mockllm 的按位合成；
+⛔ 碰 internal/llm/**。台面＝git archive c9ba5254 的仓外导出树七件套。

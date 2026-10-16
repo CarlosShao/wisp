@@ -1,0 +1,21 @@
+165-r3 落用例（票 165 AC#6·形甲第二枚）：internal/agent/plan_present_doorbell_165r3_test.go
+
+package agent（包内形状，⛔ 新建外测包）。真装配：golden Replayer 把
+plan-present.sse 的字节交给 httptest 上的真 openai-chat 适配器（C5 接缝），
+喂给真 Loop，Journal 是真 memory.Store。跑完之后只做一件事——把
+internal/agent/loop.go:637-640 那两行的 sink 读回来：tool_call 表里必须存在
+一枚 tool='plan.present' 的行（判据在 :138 那行，读数 0 即 Fatalf）。
+
+名册那枚条目是镜像出来的（Resident true／Declared L2／参数面同 C1 schema），
+出处＝docs/PLAN.md:2567 与 internal/tools/plan_present.go:72,:123-132。镜像而
+非 import 的原因是导入环：internal/tools/bridge.go:13 已经 import agent，而
+internal/agent 全树零枚 package agent_test ⇒ 真桥进不去（票 165 AC#6 那句硬
+约束）。桥那一半归 cmd/wisp 的腿。
+
+工具体一枚都没跑：h.echo().CallCount() 断言为 0，因为这台宿主没接审批通道
+（Options.AdmitTask==nil），decideRisk 对声明 L2 的调用只能拒（loop.go:820-823），
+而拒之前那两行已经先把行记进表里。⛔ 用 mock 顶真的报成功——本用例的判据只有
+"表里读没读得出那一行"。
+
+另断同一发运行的请求体：round 1 的 tools 数组里带着这枚门，round 2 带着
+tool_call_id（先例＝TestGoldenToolResultFeedsNextTurn）。
