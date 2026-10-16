@@ -1,0 +1,19 @@
+270-r2 台件与读数：两枚 "only" 的自证、门禁四数、必答那两发突变（只 commit、⛔ push）
+
+写面＝`.scratch/wisp/probes/270/r2/**`（派单写面 2）。逐枚：
+- logs/gates-and-ruler.txt：产码字节零改动那把尺（两侧各 11291 字节、diff 空、rc=0）＋正控
+  （副本非注释行改一枚字面量 ⇒ 非空、rc=1）＋分母＋门禁四数 rc=＋台面修正具名。
+- logs/before-internal-tools.txt／logs/after-internal-tools.txt：改前／改后各一发
+  `go test ./internal/tools/ -count=1 -v` 四数＝325／242／0／0 两发逐字同形、红名册作差＝0。
+  尺口径具名：^=== RUN 含子测试，^--- PASS／FAIL／SKIP 只数顶层，⛔ 混用。
+- logs/mut-half-off.txt／logs/mut-half-off-no-jia.txt：必答题两发（仓外导出树物理字节，
+  ⛔ 碰工作树）：摘 `:265` 的 BaseOptions 半边 ⇒ rc=0／0 枚红＝后备接住；
+  再摘 `:297` 那支 ⇒ rc=1／3 枚具名红（panic 形）＝证明前一发答话的正是 `:297`。
+  两发还原 sha256 均 `86de44c4…` == archive 锚 blob，MATCH=yes，工作树该路径 git status 空。
+- mutate_270r2.py／run-mut.sh：上面两发的台件（锚文本非恰 1 枚命中即拒绝突变）。
+- commit-msg-1.txt：上一枚提交的正文。
+
+★具名台面分歧两笔交编排者核：① 更正①的八件套仍不足——本包 paths_shortname_252_* 8 枚腿
+要仓根 `docs/` 且树所在路径要有 8.3 短名别名（/tmp 那发 FAIL_TOP=11，搬到 D 卷长目录名后＝0）；
+② 派单记"行尾注释形状 9 行"，本腿四把候选尺都复现不出（一律 0），已在读数里具名。
+临时件只建不删：那一发 922 行 raw 留在仓外／未跟踪，⛔ 提交、⛔ 删除。
