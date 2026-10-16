@@ -1,0 +1,20 @@
+time=2026-10-16T12:44:56.754+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPlanPresentCallBooksTheToolCallRow165r3
+time=2026-10-16T12:44:56.785+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\165v2\gotmp\TestPlanPresentCallBooksTheToolCallRow165r33454587120\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T12:44:56.807+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\165v2\gotmp\TestPlanPresentCallBooksTheToolCallRow165r33454587120\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T12:44:56.816+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T04:44:56Z duration_ms=8
+time=2026-10-16T12:44:56.823+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\165v2\gotmp\TestPlanPresentCallBooksTheToolCallRow165r33454587120\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T12:44:56.828+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T04:44:56Z duration_ms=3
+time=2026-10-16T12:44:56.836+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\165v2\gotmp\TestPlanPresentCallBooksTheToolCallRow165r33454587120\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-16T12:44:56.842+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T04:44:56Z duration_ms=6
+time=2026-10-16T12:44:56.845+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T12:44:56.849+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestPlanPresentCallBooksTheToolCallRow165r3 (0.11s)
+=== RUN   TestAC3SpillArtifactLandsPrivate
+time=2026-10-16T12:44:56.879+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\165v2\gotmp\TestAC3SpillArtifactLandsPrivate1493989525\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    spill_acl_windows_test.go:29: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:30: icacls artifacts -> [NT AUTHORITY\SYSTEM NT AUTHORITY\SYSTEM BUILTIN\Administrators BUILTIN\Administrators DESKTOP-LVS7839\swq DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:37: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+--- PASS: TestAC3SpillArtifactLandsPrivate (0.14s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.340s

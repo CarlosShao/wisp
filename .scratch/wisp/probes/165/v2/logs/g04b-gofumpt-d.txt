@@ -1,0 +1,2 @@
+cmd: /d/work/base/gopath/bin/gofumpt.exe -d internal/agent/plan_present_doorbell_165r3_test.go  （工作树）
+rc=0  -d 零差异＝无待格式化 diff；原始输出为空，本件为具名替代（⛔ 0 字节交付）

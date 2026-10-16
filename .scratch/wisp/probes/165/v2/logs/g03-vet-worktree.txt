@@ -1,0 +1,2 @@
+cmd: cd "D:\work\workspace\projects plans\Wisp" && go vet ./internal/agent/  （工作树，非导出树）
+rc=0  原始 stdout／stderr 皆空＝clean；本件为"空输出"的具名替代，⛔ 0 字节交付
