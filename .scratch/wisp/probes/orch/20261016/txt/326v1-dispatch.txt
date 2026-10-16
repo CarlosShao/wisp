@@ -25,7 +25,7 @@
 
 ## 并发与禁区
 - **读数纪律（缺一枚就当没量）**：引任何数必带"哪把尺＋射程目录＋量的还是算的"；单位写清（文件／顶层用例／子测试／调用点／写入点）；★报"0 命中"之前**先看 stderr**（`grep -E 'x('` 那种裸括号会让 grep 报错、`2>/dev/null` 把报错吞掉＝假 0），并**跑一枚已知存在的正控**证这把尺能命中；名册作差前⛔ 剥耗时（那会造出假差）；★推翻任何旧尺／旧读数前先**逐字重放旧尺**（我 11:3x 自己差点用一把路径双写了两层的尺读出一枚假 0）。
-- 此刻在飞：`216-r1`（写 `internal/panel/**`）∥ `220-v1`（裁决，`cmd/wisp` 整包那一格归它）∥ `165-r3`（写 `internal/agent/**`）⇒ 你⛔ 读它们的在飞字节当凭据、⛔ 跑 `./cmd/wisp` 整包（那格不是你的）。
+- 此刻在飞：`216-r1`（写 `internal/panel/**`）∥ `220-v1`（裁决，`cmd/wisp` 整包那一格归它）∥ `165-r3`（写 `internal/agent/**`）⇒ 你⛔ 读它们的在飞字节当凭据、⛔ 跑 `./cmd/wisp` 整包（那格不是你的）。★**同样⛔ 跑全树 `go test ./...`**——那形会把 `cmd/wisp` 整包再跑一遍（撞上面那格），而且不带 `-timeout` 时默认 10 分钟帽会让它 `panic: test timed out after 10m0s`＝**台面故障长得像"包红了"**，⛔ 计入判据（这一枚是编排者 12:0x 自查派单缺条款补上的，本仓今天有一枚在飞腿正是吃了这条的亏）。
 - 禁区零字节：`docs/PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）、`frontend/**`、`design/**`、`.github/**`、`ci.yml`、`go.mod`、`go.sum`、`.gitignore`；D1–D47／C1–C32／R1–R9／D43 转移表 ⛔ 动。★工作树里 `go.mod` 有一枚六天前的未提交脏改动（mtime 2026-10-10 22:28）＝存量、归属不明 ⇒ ⛔ 你碰／⛔ 你提交／⛔ 你 revert，具名报"还脏"归我处置。
 - ⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 用 fixture 直喂代替真装配、⛔ 注释里指名一枚不存在的测试当凭据。
 - Git：只 commit、⛔ push（推送只有编排者做、只推 `origin/dev`）；`git add`／`git commit` 两处逐枚显式 pathspec；⛔ `add -A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；临时件只建不删；仓内不建 worktree／checkout。

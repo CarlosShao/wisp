@@ -29,7 +29,7 @@
 - ⛔ 为了变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 用 fixture 直喂代替真装配、⛔ 注释里指名一枚不存在的测试当凭据（这形本仓已入账五次）。
 - 改前／改后**同台面**：⛔ 拿共享工作树跑"改前那发"（那树里有别人的在飞活）；取改前用 `git archive` 建**仓外**导出树，★七件套 `go.mod go.sum internal cmd tools scripts frontend`（少 `frontend` ⇒ `no required module provides package …/frontend`＋`FAIL … [setup failed]`＝台面假红，**这是我今天自己犯的错，别复现**）；取出后先数 `.go` 证非空、再核 `go build ./internal/agent/` 退码 0 才开始量。
 - ★跑测试**必须显式带足超时**（如 `-timeout 30m`）并具名写你带了哪枚值：默认 10 分钟对本仓重包**不够**（我 11:2x 亲眼 `panic: test timed out after 10m0s`，那一发⛔ 算终态读数）。`GOTMPDIR` **先 `mkdir -p`** 且用**原生 `C:\…` 反斜杠形**（正斜杠把 `internal/risk` 那族成对尺打假红；指到不存在的目录＝`creating work dir … cannot find the file specified` 长得像红）。
-- ⛔ 跑 `./cmd/wisp` **整包**（本波那一格归 `220-v1`）；单跑用 `-run '^Test名$'`。`./internal/agent` 整包归你。
+- ⛔ 跑 `./cmd/wisp` **整包**（本波那一格归 `220-v1`）；单跑用 `-run '^Test名$'`。`./internal/agent` 整包归你。★**同样⛔ 跑全树 `go test ./...`**——那形会把 `cmd/wisp` 整包再跑一遍（撞上面那格），不带 `-timeout` 时默认 10 分钟帽会 `panic: test timed out after 10m0s`＝**台面故障长得像"包红了"**，⛔ 计入判据（编排者 12:0x 自查派单缺条款补上的）。
 - 门禁四数自己跑并**逐枚落 `rc=`**：`gofumpt`（PATH 里可能 rc=127，真身 `/d/work/base/gopath/bin/gofumpt.exe` v0.12.0）、`tools/d22scan`（`rc=2`＝GUARD 射程拒绝，⛔ 读成红；档拼写⛔ `--scope=`）、长度门、`go vet ./internal/agent/`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
 - 读数纪律：引任何数必带"哪把尺＋射程目录＋量的还是算的"；单位写清（文件／顶层用例／子测试／调用点／写入点）；报"0 命中"前先看 stderr 并跑一枚已知存在的正控；★推翻任何旧尺／旧读数前先**逐字重放旧尺**（我今天差点用一把双前缀的尺造出一枚假 0）。
 - **输出预算**：≤5 枚件、每件 ≤260 行；⛔ 0 字节文件（交件前 `wc -c`）；轮次约 150 上限 ⇒ **每落一枚文件就 commit**（本仓今天两枚腿死在最后一步，边跑边交）。没裁完的格具名写"没裁＋缺哪一发读数"。
