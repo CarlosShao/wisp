@@ -1,0 +1,65 @@
+TREE=D:/work/workspace/projects plans/Wisp
+--- FILE BYTE GROUND TRUTH (od -c of the gotmp_run line, one per entry)
+tools/d22scan/runtests.sh:115  0000000 g o t m p _ r u
+0000020 n = " $ { W I S P _ T E S T _ G
+0000040 O T M P _ R O O T : - " $ L O C
+0000060 A L A P P D A T A \ \ w i s p -
+0000100 t e s t - g o t m p " } \ \ d 2
+0000120 2 s c a n - $ ( d a t e + % Y
+0000140 % m % d - % H % M % S ) - $ $ "
+0000160 \n
+
+scripts/portable-tests.sh:156  0000000 g o t m
+0000020 p _ r u n = " $ g o t m p _ b a
+0000040 s e \ \ p o r t a b l e - $ ( d
+0000060 a t e + % Y % m % d - % H % M
+0000100 % S ) - $ $ " \n
+0000110
+
+scripts/winsec-tests.sh:69  0000000 g o t m p _ r u
+0000020 n = " $ { W I S P _ T E S T _ G
+0000040 O T M P _ R O O T : - " $ L O C
+0000060 A L A P P D A T A \ \ w i s p -
+0000100 t e s t - g o t m p " } \ \ w i
+0000120 n s e c - $ ( d a t e + % Y %
+0000140 m % d - % H % M % S ) - $ $ " \n
+0000160
+
+scripts/wisp-cli-tests.sh:82  0000000 g o t m p _ r u
+0000020 n = " $ { W I S P _ T E S T _ G
+0000040 O T M P _ R O O T : - " $ L O C
+0000060 A L A P P D A T A \ \ w i s p -
+0000100 t e s t - g o t m p " } \ \ c l
+0000120 i - $ ( d a t e + % Y % m % d
+0000140 - % H % M % S ) - $ $ " \n
+0000155
+
+--- POSITIVE CONTROL: grep -cF of a two-backslash string that MUST be present in the root builder
+tools/d22scan/runtests.sh        pos_two_bs_hits=1   pos_one_bs_hits=1
+scripts/portable-tests.sh        pos_two_bs_hits=1   pos_one_bs_hits=1
+scripts/winsec-tests.sh          pos_two_bs_hits=1   pos_one_bs_hits=1
+scripts/wisp-cli-tests.sh        pos_two_bs_hits=1   pos_one_bs_hits=1
+
+--- TARGET: tail-join separator on the gotmp_run line (fixed strings)
+tools/d22scan/runtests.sh        line=115  native_join_hits=1  slash_join_hits=0
+scripts/portable-tests.sh        line=156  native_join_hits=0  slash_join_hits=0
+scripts/winsec-tests.sh          line=69  native_join_hits=1  slash_join_hits=0
+scripts/wisp-cli-tests.sh        line=82  native_join_hits=1  slash_join_hits=0
+
+--- VERBATIM CROSS-CHECK: "}\\<name>-$(date"
+tools/d22scan/runtests.sh        pat=\\d22scan-     hits=1
+scripts/winsec-tests.sh          pat=\\winsec-      hits=1
+scripts/wisp-cli-tests.sh        pat=\\cli-         hits=1
+scripts/portable-tests.sh        pat=\\portable-    hits=1
+
+--- FALSE-RULER DEMONSTRATION (why the regex form is banned for this shape)
+F_two_backslashes      hits=1   <- trustworthy
+regex_eight_backslashes hits=0   <- BRE reads 4 literal = FALSE 0
+regex_four_backslashes  hits=2   <- BRE reads 2 literal = true 1
+regex_two_backslashes   hits=3   <- BRE reads 1 literal = 1 by substring
+
+--- REPO-WIDE MIXED-TAIL HUNT (fixed strings; 0 must always be read next to the control above)
+pat=}/d22scan-     files=
+pat=}/winsec-      files=
+pat=}/cli-         files=
+pat=}/portable-    files=

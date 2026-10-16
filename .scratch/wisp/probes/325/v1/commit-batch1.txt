@@ -1,0 +1,18 @@
+325-v1 验收腿读数第一批：AC#1 形状尺（固定串＋正控）／AC#3 整档 windows 十一包逐包四数／AC#5 全仓 GOTMPDIR 赋值清单
+
+仪器四枚＋日志九枚（只建不删，含我两次导出树缺件的红：缺 frontend 与缺 design 各一发，
+都落在 logs/ 里当"我这把台面也会错"的记录，⛔ 计进判据）。
+
+- AC#1：v1-ac1-shape-ruler.sh 在仓内工作树与仓外导出树 head3 各跑一发，逐字同形尺用
+  grep -F（'}/d22scan-' 与 '}\\d22scan-'），正控＝基座那枚 '\\wisp-test-gotmp' 四处都 1；
+  同屏示范正则形的假 0（八枚反斜杠读成四枚字面＝0，而固定串读成 1）。
+- AC#3：v1-ac3-run-windows.sh 跑 bash scripts/portable-tests.sh --scope=windows（head3，
+  env -u GOTMPDIR -u WISP_TEST_GOTMP_ROOT，sherpa DLL 已放进导出树）⇒ rc=0，
+  GOTMPDIR 行逐字原生形，总计 === RUN=662 --- PASS=462 --- FAIL=0 --- SKIP=0，
+  逐包四数 11 枚（切块归因＋三枚小包独立复跑验这把切块尺：perm 14/14、llmrecord 2/2、plugin 7/7 全对上）。
+- AC#5：v1-ac5-gotmpdir-inventory.sh 在导出树上列全仓 GOTMPDIR 赋值＝当值用 4 枚
+  （portable/winsec/cli/runtests 四处 export GOTMPDIR，尾接全是反斜杠），
+  只当展示用 4 枚（wisp_311_ref_path 那组 ${LOCALAPPDATA//\\//}，⛔ 流向 GOTMPDIR），
+  混形尾接hunt＝0（正控＝那 4 枚对照串现量 4 命中），第五处同形写法＝没有。
+
+只 commit，⛔ push；⛔ 翻任何 AC 框；产码一字未动。

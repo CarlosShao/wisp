@@ -1,0 +1,34 @@
+V1 AC#3 per-package four numbers
+tree=/c/tmp/wisp325v1/head3
+log=D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/325/v1/logs/v1-ac3-scope-windows-head3.txt  lines=1897
+totals line: portable-tests.sh: four numbers (all from -v output): === RUN=662  --- PASS=462  --- FAIL=0  --- SKIP=0
+
+===== A. SEGMENTED ATTRIBUTION (awk, block per package result line)
+github.com/CarlosShao/wisp/internal/proc       RUN=48    PASS=40    FAIL=      SKIP=     
+github.com/CarlosShao/wisp/internal/secret     RUN=29    PASS=21    FAIL=      SKIP=     
+github.com/CarlosShao/wisp/internal/config     RUN=185   PASS=104   FAIL=      SKIP=     
+github.com/CarlosShao/wisp/internal/risk       RUN=200   PASS=132   FAIL=      SKIP=     
+github.com/CarlosShao/wisp/internal/ball       RUN=75    PASS=69    FAIL=      SKIP=     
+github.com/CarlosShao/wisp/internal/perm       RUN=14    PASS=14    FAIL=      SKIP=     
+github.com/CarlosShao/wisp/internal/plugin     RUN=7     PASS=7     FAIL=      SKIP=     
+github.com/CarlosShao/wisp/cmd/llmrecord       RUN=2     PASS=2     FAIL=      SKIP=     
+github.com/CarlosShao/wisp/internal/session    RUN=36    PASS=19    FAIL=      SKIP=     
+github.com/CarlosShao/wisp/internal/projctx    RUN=10    PASS=10    FAIL=      SKIP=     
+github.com/CarlosShao/wisp/internal/audio      RUN=56    PASS=44    FAIL=      SKIP=     
+BLOCKS=11  SUM RUN=662 PASS=462 FAIL=0 SKIP=0
+
+===== B. RED ROSTER (every top-level --- FAIL line, verbatim, with its message block)
+  (empty: zero top-level --- FAIL lines in this run)
+  top-level FAIL lines=0   package FAIL lines=0
+  positive control for section B: --- PASS lines=462 (a ruler that can see lines must not read 0 here)
+
+===== C. INDEPENDENT CHECK OF THE SEGMENTATION RULER: three small packages run alone through the strict runner
+  ./internal/perm/ runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261016-103551-922 - this run's t.TempDir() family lands here; nothing deletes it.
+  ./internal/perm/ runtests.sh: OK - packages=[./internal/perm/ -count=1] top-level: PASS=14 FAIL=0 SKIP=0, === RUN=14, '[no tests to run]'=0
+  ./cmd/llmrecord/ runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261016-103554-961 - this run's t.TempDir() family lands here; nothing deletes it.
+  ./cmd/llmrecord/ runtests.sh: OK - packages=[./cmd/llmrecord/ -count=1] top-level: PASS=2 FAIL=0 SKIP=0, === RUN=2, '[no tests to run]'=0
+  ./internal/plugin/ runtests.sh: ticket 310 AC#1: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\d22scan-20261016-103557-998 - this run's t.TempDir() family lands here; nothing deletes it.
+  ./internal/plugin/ runtests.sh: OK - packages=[./internal/plugin/ -count=1] top-level: PASS=7 FAIL=0 SKIP=0, === RUN=7, '[no tests to run]'=0
+
+===== D. THE FOUR RISK CASES AND THE TWO WORDINGS ARE ABSENT HERE (no Invalid switch / Parameter format in a green run)
+  Invalid_switch_hits=0  Parameter_format_hits=0   (positive control: PASS lines above are non-zero)

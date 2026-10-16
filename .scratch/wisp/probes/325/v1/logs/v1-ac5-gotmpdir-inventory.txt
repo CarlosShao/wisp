@@ -1,0 +1,154 @@
+V1 AC#5 GOTMPDIR assignment inventory
+tree=/c/tmp/wisp325v1/head3  start=2026-10-16 10:37:29 +0800
+sha(tools/d22scan/runtests.sh)=ad6f6a8d72cbe2a3fc9b7036774b8e16ddf92bfd64ea6055cbf12dde55164bf6
+
+===== A. PRODUCTION SURFACE (scripts/ tools/ cmd/ internal/) : every line mentioning GOTMPDIR or the root vars
+  scripts/portable-tests.sh:113:# WHY GOTMPDIR AND NOT TMP/TEMP. testing's makeTempDir calls
+  scripts/portable-tests.sh:114:# os.MkdirTemp(os.Getenv("GOTMPDIR"), pattern) (this host's GOROOT,
+  scripts/portable-tests.sh:115:# src/testing/testing.go:1613), so GOTMPDIR moves exactly the t.TempDir()/
+  scripts/portable-tests.sh:117:# does NOT read GOTMPDIR, so a test that reads os.TempDir() literally keeps its
+  scripts/portable-tests.sh:150:# is composed with the native separator, and an explicit WISP_TEST_GOTMP_ROOT is
+  scripts/portable-tests.sh:152:if [ -z "${GOTMPDIR:-}" ]; then
+  scripts/portable-tests.sh:155:            gotmp_base=${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}
+  scripts/portable-tests.sh:156:            gotmp_run="$gotmp_base\\portable-$(date +%Y%m%d-%H%M%S)-$$"
+  scripts/portable-tests.sh:158:                export GOTMPDIR="$gotmp_run"
+  scripts/portable-tests.sh:159:                echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+  scripts/portable-tests.sh:164:                    "$gotmp_run, so GOTMPDIR stays unset and a test binary that dies will" \
+  scripts/portable-tests.sh:171:                "the winsec seal cases red, see the note above). GOTMPDIR stays unset." >&2
+  scripts/portable-tests.sh:174:        echo "portable-tests.sh: ticket 310 AC#1: GOTMPDIR left as-is on GOOS=$(go env GOOS)" \
+  scripts/portable-tests.sh:791:# in order: [310 DEGRADED/GOTMPDIR line] -> [311 GUARD line] -> [no test process at
+  scripts/portable-tests.sh:797:# WISP_TEST_GOTMP_ROOT unset (the factory default), a root on the SAME volume under a
+  scripts/portable-tests.sh:821:    for wisp_311_probe in "GOTMPDIR=${GOTMPDIR:-}" "WISP_TEST_GOTMP_ROOT=${WISP_TEST_GOTMP_ROOT:-}"; do
+  scripts/portable-tests.sh:839:        echo "portable-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+  scripts/winsec-tests.sh:46:# ---- TICKET 310 AC#1 (shape A-G): claim the dedicated GOTMPDIR root at THIS
+  scripts/winsec-tests.sh:49:# GOTMPDIR is still empty, so the delegated run inherits this root instead of
+  scripts/winsec-tests.sh:51:# the root is for, why GOTMPDIR rather than TMP/TEMP, why it is never under the OS
+  scripts/winsec-tests.sh:58:# GOTMPDIR line, no DEGRADED line, nothing said that the redirection did not
+  scripts/winsec-tests.sh:66:# WISP_TEST_GOTMP_ROOT is still taken verbatim.
+  scripts/winsec-tests.sh:67:if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ]; then
+  scripts/winsec-tests.sh:69:        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}\\winsec-$(date +%Y%m%d-%H%M%S)-$$"
+  scripts/winsec-tests.sh:71:            export GOTMPDIR="$gotmp_run"
+  scripts/winsec-tests.sh:72:            echo "winsec-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+  scripts/winsec-tests.sh:76:                "so GOTMPDIR stays unset and a test binary that dies leaves its temp dir in" \
+  scripts/winsec-tests.sh:82:            "red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset." >&2
+  scripts/winsec-tests.sh:147:# in order: [310 DEGRADED/GOTMPDIR line] -> [311 GUARD line] -> [no test process at
+  scripts/winsec-tests.sh:153:# WISP_TEST_GOTMP_ROOT unset (the factory default), a root on the SAME volume under a
+  scripts/winsec-tests.sh:177:    for wisp_311_probe in "GOTMPDIR=${GOTMPDIR:-}" "WISP_TEST_GOTMP_ROOT=${WISP_TEST_GOTMP_ROOT:-}"; do
+  scripts/winsec-tests.sh:195:        echo "winsec-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+  scripts/wisp-cli-tests.sh:60:# ---- TICKET 310 AC#1 (shape A-G): claim the dedicated GOTMPDIR root at THIS
+  scripts/wisp-cli-tests.sh:63:# delegated portable-tests.sh builds a root only while GOTMPDIR is still empty, so
+  scripts/wisp-cli-tests.sh:64:# it reuses this one instead of opening a second root. Rationale (GOTMPDIR vs
+  scripts/wisp-cli-tests.sh:71:# GOTMPDIR line, no DEGRADED line, nothing said the redirection did not happen. It
+  scripts/wisp-cli-tests.sh:79:# WISP_TEST_GOTMP_ROOT is still taken verbatim.
+  scripts/wisp-cli-tests.sh:80:if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ]; then
+  scripts/wisp-cli-tests.sh:82:        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}\\cli-$(date +%Y%m%d-%H%M%S)-$$"
+  scripts/wisp-cli-tests.sh:84:            export GOTMPDIR="$gotmp_run"
+  scripts/wisp-cli-tests.sh:85:            echo "wisp-cli-tests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+  scripts/wisp-cli-tests.sh:89:                "so GOTMPDIR stays unset and a test binary that dies leaves its temp dir in" \
+  scripts/wisp-cli-tests.sh:95:            "red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset." >&2
+  scripts/wisp-cli-tests.sh:159:# in order: [310 DEGRADED/GOTMPDIR line] -> [311 GUARD line] -> [no test process at
+  scripts/wisp-cli-tests.sh:165:# WISP_TEST_GOTMP_ROOT unset (the factory default), a root on the SAME volume under a
+  scripts/wisp-cli-tests.sh:189:    for wisp_311_probe in "GOTMPDIR=${GOTMPDIR:-}" "WISP_TEST_GOTMP_ROOT=${WISP_TEST_GOTMP_ROOT:-}"; do
+  scripts/wisp-cli-tests.sh:207:        echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+  tools/d22scan/runtests.sh:75:# contract: when scripts/portable-tests.sh has already exported GOTMPDIR and then
+  tools/d22scan/runtests.sh:77:# the outermost entry; the delegated run inherits it. Why GOTMPDIR and not
+  tools/d22scan/runtests.sh:90:if [ -z "${GOTMPDIR:-}" ] && [ "$(go env GOOS)" = windows ]; then
+  tools/d22scan/runtests.sh:94:        # Whatever this line exports becomes GOTMPDIR for every test binary this runner
+  tools/d22scan/runtests.sh:115:        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}\\d22scan-$(date +%Y%m%d-%H%M%S)-$$"
+  tools/d22scan/runtests.sh:117:            export GOTMPDIR="$gotmp_run"
+  tools/d22scan/runtests.sh:118:            echo "runtests.sh: ticket 310 AC#1: GOTMPDIR=$GOTMPDIR - this run's" \
+  tools/d22scan/runtests.sh:122:                "so GOTMPDIR stays unset and a test binary that dies leaves its temp dir in" \
+  tools/d22scan/runtests.sh:128:            "cases red, see the note in scripts/portable-tests.sh). GOTMPDIR stays unset." >&2
+  tools/d22scan/runtests.sh:151:# in order: [310 DEGRADED/GOTMPDIR line] -> [311 GUARD line] -> [no test process at
+  tools/d22scan/runtests.sh:157:# WISP_TEST_GOTMP_ROOT unset (the factory default), a root on the SAME volume under a
+  tools/d22scan/runtests.sh:181:    for wisp_311_probe in "GOTMPDIR=${GOTMPDIR:-}" "WISP_TEST_GOTMP_ROOT=${WISP_TEST_GOTMP_ROOT:-}"; do
+  tools/d22scan/runtests.sh:199:        echo "runtests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume $wisp_311_ref_vol, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green." >&2
+  internal/winsec/openleaf_guard_322_windows_test.go:95:	// inherits the separator style of GOTMPDIR, and a forward-slash spelling handed to
+
+===== B. CLASS-LEVEL COUNTS in the production surface (fixed strings)
+  class_total_lines=61
+  export_GOTMPDIR_lines=4   # 当值用：只有这些真的把根交给子进程
+  gotmp_run_assign=4
+  gotmp_base_assign=1
+
+===== C. THE FIVE ENTRIES THAT REALLY START go test (each export site + the line that builds the root)
+--- scripts/portable-tests.sh
+    155:            gotmp_base=${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}
+    156:            gotmp_run="$gotmp_base\\portable-$(date +%Y%m%d-%H%M%S)-$$"
+    158:                export GOTMPDIR="$gotmp_run"
+--- scripts/winsec-tests.sh
+    69:        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}\\winsec-$(date +%Y%m%d-%H%M%S)-$$"
+    71:            export GOTMPDIR="$gotmp_run"
+--- scripts/wisp-cli-tests.sh
+    82:        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}\\cli-$(date +%Y%m%d-%H%M%S)-$$"
+    84:            export GOTMPDIR="$gotmp_run"
+--- tools/d22scan/runtests.sh
+    115:        gotmp_run="${WISP_TEST_GOTMP_ROOT:-"$LOCALAPPDATA\\wisp-test-gotmp"}\\d22scan-$(date +%Y%m%d-%H%M%S)-$$"
+    117:            export GOTMPDIR="$gotmp_run"
+--- scripts/d22scan.sh
+
+===== D. DISPLAY-ONLY SITE (ticket 311 guard reference path, folded to / ON PURPOSE)
+  scripts/portable-tests.sh:818:    wisp_311_ref_path=${LOCALAPPDATA//\\//}
+  scripts/portable-tests.sh:819:    wisp_311_ref_vol=$(wisp_311_volume_of "$wisp_311_ref_path")
+  scripts/portable-tests.sh:829:            echo "portable-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+  scripts/portable-tests.sh:837:        echo "portable-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+  scripts/winsec-tests.sh:174:    wisp_311_ref_path=${LOCALAPPDATA//\\//}
+  scripts/winsec-tests.sh:175:    wisp_311_ref_vol=$(wisp_311_volume_of "$wisp_311_ref_path")
+  scripts/winsec-tests.sh:185:            echo "winsec-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+  scripts/winsec-tests.sh:193:        echo "winsec-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+  scripts/wisp-cli-tests.sh:186:    wisp_311_ref_path=${LOCALAPPDATA//\\//}
+  scripts/wisp-cli-tests.sh:187:    wisp_311_ref_vol=$(wisp_311_volume_of "$wisp_311_ref_path")
+  scripts/wisp-cli-tests.sh:197:            echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+  scripts/wisp-cli-tests.sh:205:        echo "wisp-cli-tests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+  tools/d22scan/runtests.sh:178:    wisp_311_ref_path=${LOCALAPPDATA//\\//}
+  tools/d22scan/runtests.sh:179:    wisp_311_ref_vol=$(wisp_311_volume_of "$wisp_311_ref_path")
+  tools/d22scan/runtests.sh:189:            echo "runtests.sh: ticket 311 AC#1 shape B: INCONCLUSIVE - no volume can be read from $wisp_311_name=$wisp_311_value (reference %LOCALAPPDATA%=$wisp_311_ref_path), so nothing is judged here and this step runs on the root as given. This is NOT the check passing: registered as debt Q-311-r1-1 on ticket 311." >&2
+  tools/d22scan/runtests.sh:197:        echo "runtests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume $wisp_311_ref_vol (path $wisp_311_ref_path), offender:$wisp_311_cross" >&2
+
+===== E. MIXED-TAIL HUNT OVER THE WHOLE PRODUCTION SURFACE (fixed strings)
+  CONTROL FIRST (a / -fold string that really is in these files, 4 occurrences expected):
+      control  ${LOCALAPPDATA//\//}  hits=4
+  (the 0s below are only readable because that control is 4, i.e. the same grep -rnF ruler sees these files)
+  pat=}/d22scan-       hits=0
+  pat=}/winsec-        hits=0
+  pat=}/cli-           hits=0
+  pat=}/portable-      hits=0
+  pat=/wisp-test-gotmp hits=0
+
+===== F. THE SAME HUNT OVER .github/ ci.yml (the CI leg writes WISP_TEST_GOTMP_ROOT with / by design)
+
+===== F2. FIFTH MENTIONS THAT ARE NOT ASSIGNMENT SITES (comments/registrations, listed so nobody counts them as a new wound)
+  internal/winsec/openleaf_guard_322_windows_test.go:96:	// cmd's mklink was measured here failing as `Invalid switch - "Users"` - a fixture
+  internal/winsec/reparse_windows_test.go:21:// are out of reach here (and this file needs them for mklink).
+  internal/winsec/reparse_windows_test.go:41:	t.Logf("mklink /J: %s", strings.TrimSpace(mustExec(t, "cmd", "/c", "mklink", "/J", link, target)))
+  internal/winsec/resolve_windows_test.go:190:	cmd := exec.Command("cmd", "/c", "mklink", "/J", link, target)
+  internal/winsec/resolve_windows_test.go:193:		t.Fatalf("mklink /J %s %s: %v\n%s", link, target, err, out.String())
+  internal/winsec/seam_guard_windows_test.go:100:// makeJunction103 builds a directory junction with mklink /J, which needs no
+  internal/winsec/seam_guard_windows_test.go:104:	cmd := exec.Command("cmd", "/c", "mklink", "/J", link, target)
+  internal/winsec/seam_guard_windows_test.go:106:	t.Logf("mklink /J %s -> %s: %s", filepath.Base(link), filepath.Base(target), strings.TrimSpace(string(out)))
+  internal/winsec/seam_guard_windows_test.go:108:		t.Fatalf("mklink /J failed: %v (%s)", err, out)
+  internal/winsec/seam_guard_windows_test.go:112:		t.Fatalf("lstat(%s) after mklink: %v", link, lErr)
+
+===== G. .scratch PROBE CODE (not a production entry; listed only so the 全仓 claim is auditable)
+  .scratch/wisp/probes/120/r2/index.md
+  .scratch/wisp/probes/120/r3/gates.sh
+  .scratch/wisp/probes/287/r1/run-form-b-census.sh
+  .scratch/wisp/probes/287/r1/run-mutations.sh
+  .scratch/wisp/probes/310/r1/10-impl.md
+  .scratch/wisp/probes/310/r2/10-impl.md
+  .scratch/wisp/probes/310/r2/30-gates.md
+  .scratch/wisp/probes/310/r2/logs/38-cli-inertness-verdict.txt
+  .scratch/wisp/probes/310/v1/10-ac1-verdicts.md
+  .scratch/wisp/probes/310/v1/20-ac2-paired.md
+  .scratch/wisp/probes/310/v1/block-bytes-310v1.sh
+  .scratch/wisp/probes/310/v1/logs/10-gotmpdir-lines.txt
+  .scratch/wisp/probes/311/r1/10-entry-census.md
+  .scratch/wisp/probes/311/r1/logs/01-entry-census.txt
+  .scratch/wisp/probes/311/r1b/logs/40-a862-310block-check.txt
+  .scratch/wisp/probes/317/v1/r2-pair.sh
+  .scratch/wisp/probes/322/a1/logs.md
+  .scratch/wisp/probes/322/r1/final.sh
+  .scratch/wisp/probes/322/r1/gates.sh
+  .scratch/wisp/probes/322/r1/winpaired.sh
+  files_in_.scratch_exporting_GOTMPDIR=29
+end=2026-10-16 10:37:46 +0800
