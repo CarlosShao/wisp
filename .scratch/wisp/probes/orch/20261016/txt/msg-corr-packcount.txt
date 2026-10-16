@@ -1,0 +1,14 @@
+更正两枚票面的"八包"过期计数（腿 325-r1 顶回、编排者复跑同意）＋自抓第三次踩自己那条 shell 元字符规矩
+
+现量尺＝取 scripts/portable-tests.sh 第 329-336 行那段 windows scope 数组逐枚数＝**11 包**
+（proc／secret／config／risk／ball／perm／plugin／cmd 下 llmrecord／session／projctx／audio），
+不是我在票 317 AC#3 与 325 派单里写的"八包"。
+处置＝原句⛔ 抹平、两枚票尾各加一条更正 bullet；票 317 AC#3 判据按现量收紧为"逐包四数十一枚、⛔ 只报总数"。
+
+★同时入账我自己造的一次事故（第 109 条规矩，第三次踩）：用双引号串把更正正文直接喂 shell，
+串里的反引号真的被执行了（三条 command not found）。后果核实＝那次 append 重定向到 /dev/null、
+票 325 没落笔；票 317 那条走的是先 Write 成文件再 cat，字节完好。
+本次两枚更正全部改走 Write＋cat 的形，盘上已复读尾部验证。
+
+盘上控制：AC 框枚数未动（票 317 未勾 1／已勾 2＝AC#3 那道门仍在；票 325 未勾 5／已勾 0＝本腿⛔ 翻框）。
+写面＝两枚票尾＋两枚 txt 存档，零产码。⛔ push。
