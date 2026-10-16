@@ -124,10 +124,25 @@ func NewSnapshot(pending []ApprovalCardView, results []ResultChunk,
 		// stated as unread, never as an empty section that renders as "no repo".
 		composer.Git = GitViewNotProbed()
 	}
+	if !composer.Workspace.Set && composer.Workspace.Canonical == "" &&
+		strings.TrimSpace(composer.Workspace.Reason) == "" {
+		// Ticket 216 AC#4's half of the same rule: an empty workspace row is a
+		// row the page would render as blank, and blank reads as "nothing" to a
+		// human whether the truth was "no workspace was chosen" or "no reading of
+		// that dimension ever arrived". Say the second sentence out loud instead
+		// of letting the absence of words decide it (票 200's not_run is the
+		// precedent: an absence WITH a reason is not a silent empty).
+		composer.Workspace.Reason = workspaceNoReadingReason
+	}
 	return Snapshot{
-		Pending:     pending,
-		Results:     results,
-		Composer:    composer,
+		Pending: pending,
+		Results: results,
+		// Ticket 216 AC#2: the display boundary is here, at the one push the panel
+		// receives per state change, so a menu row cannot carry an invisible
+		// control character no matter which producer filled the field. See
+		// display_scrub_216.go for the roster and for why washing sits here and
+		// not in the producers (whose Canonical is read as a PATH elsewhere).
+		Composer:    scrubComposerForDisplay(composer),
 		GeneratedAt: now.UTC().Format(time.RFC3339),
 	}
 }

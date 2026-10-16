@@ -59,11 +59,40 @@ type PathScope interface {
 // root keeps one format for every permission event.
 type AuditFunc func(format string, args ...any)
 
+// workspaceNoReadingReason is ticket 216 AC#4's SECOND sentence, and the sentence
+// below it is the first one. They are written next to each other on purpose: AC#4
+// is not a feature, it is the rule that these two facts may never be said by the
+// same words - or by the absence of words.
+//
+//	workspaceNotChosenReason  读了，答案是没有工作区
+//	workspaceNoReadingReason  这一维没有读数腿，所以没人读过它
+//
+// The second is NOT a stronger phrasing of the first. A host with no reader has
+// not established that the run is unscoped; it has established that nobody looked.
+// Rendering that as "未选择工作区" tells the user the config's [fs] allowed_dirs
+// are merely invisible instead of unexamined, which is the collapse ticket 200's
+// fifth state exists to prevent (its not_run sentence: 这是没有读数，不是没有说明
+// 文件 - the same pair, on the instruction dimension).
+const (
+	workspaceNotChosenReason = "未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定"
+	workspaceNoReadingReason = "工作区这一维没有读数：本机的快照泵没有被接入工作区读数腿" +
+		"（PumpSources.Workspace=nil），所以「未选择工作区」这句话我没有资格说——" +
+		"这里是没有读数，不是没有工作区（票 216 AC#4；票 200 的 not_run 是同一纪律）"
+)
+
 // UnsetWorkspaceView renders "no workspace chosen" with a reason, which AC#4
 // needs: an input row that shows nothing invites the user to believe the config
 // roots are invisible rather than absent.
 func UnsetWorkspaceView() WorkspaceView {
-	return WorkspaceView{Reason: "未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定"}
+	return WorkspaceView{Reason: workspaceNotChosenReason}
+}
+
+// unreadWorkspaceView is the OTHER sentence of the same pair, and the one the pump
+// renders when it has no workspace reader at all. Set stays false and Canonical
+// stays empty - the pump must not invent a scope either way - but the row says who
+// did not read it instead of leaving the silence to be read as "no workspace".
+func unreadWorkspaceView() WorkspaceView {
+	return WorkspaceView{Reason: workspaceNoReadingReason}
 }
 
 // WorkspaceViewFromRoot renders the current narrowing for a snapshot, from the

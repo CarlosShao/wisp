@@ -140,7 +140,9 @@ type PumpSources struct {
 	Verdicts func() []NativeVerdict
 	// Mode reads the permission mode in force (perm.Store.PermissionMode).
 	Mode func() risk.Mode
-	// Workspace reads the narrowed root as native resolved it.
+	// Workspace reads the narrowed root as native resolved it. nil is the AC#4
+	// case the row must not answer with the other sentence: a pump with no reader
+	// says "this dimension was not read", never "no workspace was chosen".
 	Workspace func() WorkspaceView
 	// Git reads the host-side git dimension for that same root (ticket 181). It
 	// is a reader, not a value, so a pump assembled without one reports
@@ -258,7 +260,11 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		mode = p.src.Mode()
 		modeReadable = mode.Valid()
 	}
-	workspace := UnsetWorkspaceView()
+	// Ticket 216 AC#4 put this one line on the two-sentence rule the mode and the
+	// git dimension already follow: with no reader attached the row says "这一维
+	// 没有读数", which is a different fact from the reader's own "未选择工作区",
+	// and the pair is pinned by TestWorkspaceAbsentAndWorkspaceUnreadAreTwoSentences.
+	workspace := unreadWorkspaceView()
 	if p.src.Workspace != nil {
 		workspace = p.src.Workspace()
 	}
