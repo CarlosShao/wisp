@@ -1,0 +1,171 @@
+=== RUN   TestZZ166V1CrashParent
+=== RUN   TestZZ166V1CrashParent/midstep-after-stmt0-create-table-session
+time=2026-10-16T10:17:18.198+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt0-create-table-session4207315199\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T10:17:18.212+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt0-create-table-session4207315199\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:17:18.217+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:17:18Z duration_ms=4
+time=2026-10-16T10:17:18.222+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt0-create-table-session4207315199\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:17:18.226+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:17:18Z duration_ms=3
+time=2026-10-16T10:17:18.227+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-16T10:17:18.229+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-BEFORE midstep-after-stmt0-create-table-session | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+V166-KILL midstep-after-stmt0-create-table-session | wait-error=exit status 1
+child-log:
+V166-PLAN role=midstep:0 stmts=5
+V166-READY midstep:0 after-statement=1/5
+V166-DIRLIST midstep-after-stmt0-create-table-session
+backup/wisp.db.bak-0-1 size=4096
+backup/wisp.db.bak-1-2 size=98304
+backup/wisp.db.bak-2-3 size=106496
+wisp.db size=106496
+wisp.db-shm size=32768
+wisp.db-wal size=0
+V166-AFTER midstep-after-stmt0-create-table-session | class=NOTHING(v2-untouched) legal=true pre-backup-2-3=true | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+time=2026-10-16T10:17:18.309+08:00 level=WARN msg="migration backup already exists, keeping it" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt0-create-table-session4207315199\001\data\backup\wisp.db.bak-2-3
+time=2026-10-16T10:17:18.313+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:17:18Z duration_ms=4
+time=2026-10-16T10:17:18.316+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:17:18.318+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-REOPEN midstep-after-stmt0-create-table-session | class=ALL(v3-complete) legal=true | wm=3 session=true session_turn=true cols(session)=7 cols(session_turn)=6 idx=[idx_session_turn_session idx_session_updated idx_session_workspace] integrity=ok
+V166-SEED midstep-after-stmt0-create-table-session | profile content="seeded-by-166-v1"
+=== RUN   TestZZ166V1CrashParent/midstep-after-stmt2-index-workspace
+time=2026-10-16T10:17:18.329+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt2-index-workspace3076431959\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T10:17:18.342+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt2-index-workspace3076431959\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:17:18.348+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:17:18Z duration_ms=6
+time=2026-10-16T10:17:18.353+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt2-index-workspace3076431959\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:17:18.356+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:17:18Z duration_ms=3
+time=2026-10-16T10:17:18.359+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-16T10:17:18.360+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-BEFORE midstep-after-stmt2-index-workspace | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+V166-KILL midstep-after-stmt2-index-workspace | wait-error=exit status 1
+child-log:
+V166-PLAN role=midstep:2 stmts=5
+V166-READY midstep:2 after-statement=3/5
+V166-DIRLIST midstep-after-stmt2-index-workspace
+backup/wisp.db.bak-0-1 size=4096
+backup/wisp.db.bak-1-2 size=98304
+backup/wisp.db.bak-2-3 size=106496
+wisp.db size=106496
+wisp.db-shm size=32768
+wisp.db-wal size=0
+V166-AFTER midstep-after-stmt2-index-workspace | class=NOTHING(v2-untouched) legal=true pre-backup-2-3=true | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+time=2026-10-16T10:17:18.461+08:00 level=WARN msg="migration backup already exists, keeping it" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt2-index-workspace3076431959\001\data\backup\wisp.db.bak-2-3
+time=2026-10-16T10:17:18.468+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:17:18Z duration_ms=5
+time=2026-10-16T10:17:18.471+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:17:18.474+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-REOPEN midstep-after-stmt2-index-workspace | class=ALL(v3-complete) legal=true | wm=3 session=true session_turn=true cols(session)=7 cols(session_turn)=6 idx=[idx_session_turn_session idx_session_updated idx_session_workspace] integrity=ok
+V166-SEED midstep-after-stmt2-index-workspace | profile content="seeded-by-166-v1"
+=== RUN   TestZZ166V1CrashParent/midstep-after-stmt3-create-table-session_turn
+time=2026-10-16T10:17:18.490+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt3-create-table-session_369223913\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T10:17:18.504+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt3-create-table-session_369223913\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:17:18.510+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:17:18Z duration_ms=6
+time=2026-10-16T10:17:18.516+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt3-create-table-session_369223913\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:17:18.520+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:17:18Z duration_ms=3
+time=2026-10-16T10:17:18.522+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-16T10:17:18.524+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-BEFORE midstep-after-stmt3-create-table-session_turn | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+V166-KILL midstep-after-stmt3-create-table-session_turn | wait-error=exit status 1
+child-log:
+V166-PLAN role=midstep:3 stmts=5
+V166-READY midstep:3 after-statement=4/5
+V166-DIRLIST midstep-after-stmt3-create-table-session_turn
+backup/wisp.db.bak-0-1 size=4096
+backup/wisp.db.bak-1-2 size=98304
+backup/wisp.db.bak-2-3 size=106496
+wisp.db size=106496
+wisp.db-shm size=32768
+wisp.db-wal size=0
+V166-AFTER midstep-after-stmt3-create-table-session_turn | class=NOTHING(v2-untouched) legal=true pre-backup-2-3=true | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+time=2026-10-16T10:17:18.596+08:00 level=WARN msg="migration backup already exists, keeping it" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentmidstep-after-stmt3-create-table-session_369223913\001\data\backup\wisp.db.bak-2-3
+time=2026-10-16T10:17:18.601+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:17:18Z duration_ms=4
+time=2026-10-16T10:17:18.603+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:17:18.606+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-REOPEN midstep-after-stmt3-create-table-session_turn | class=ALL(v3-complete) legal=true | wm=3 session=true session_turn=true cols(session)=7 cols(session_turn)=6 idx=[idx_session_turn_session idx_session_updated idx_session_workspace] integrity=ok
+V166-SEED midstep-after-stmt3-create-table-session_turn | profile content="seeded-by-166-v1"
+=== RUN   TestZZ166V1CrashParent/precommit-all-ddl-run-watermark-missing
+time=2026-10-16T10:17:18.617+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentprecommit-all-ddl-run-watermark-missing2213129910\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T10:17:18.626+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentprecommit-all-ddl-run-watermark-missing2213129910\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:17:18.629+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:17:18Z duration_ms=3
+time=2026-10-16T10:17:18.634+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentprecommit-all-ddl-run-watermark-missing2213129910\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:17:18.638+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:17:18Z duration_ms=3
+time=2026-10-16T10:17:18.639+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-16T10:17:18.641+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-BEFORE precommit-all-ddl-run-watermark-missing | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+V166-KILL precommit-all-ddl-run-watermark-missing | wait-error=exit status 1
+child-log:
+V166-READY precommit all-ddl-done
+V166-DIRLIST precommit-all-ddl-run-watermark-missing
+backup/wisp.db.bak-0-1 size=4096
+backup/wisp.db.bak-1-2 size=98304
+backup/wisp.db.bak-2-3 size=106496
+wisp.db size=106496
+wisp.db-shm size=32768
+wisp.db-wal size=0
+V166-AFTER precommit-all-ddl-run-watermark-missing | class=NOTHING(v2-untouched) legal=true pre-backup-2-3=true | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+time=2026-10-16T10:17:18.708+08:00 level=WARN msg="migration backup already exists, keeping it" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentprecommit-all-ddl-run-watermark-missing2213129910\001\data\backup\wisp.db.bak-2-3
+time=2026-10-16T10:17:18.712+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:17:18Z duration_ms=3
+time=2026-10-16T10:17:18.715+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:17:18.716+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-REOPEN precommit-all-ddl-run-watermark-missing | class=ALL(v3-complete) legal=true | wm=3 session=true session_turn=true cols(session)=7 cols(session_turn)=6 idx=[idx_session_turn_session idx_session_updated idx_session_workspace] integrity=ok
+V166-SEED precommit-all-ddl-run-watermark-missing | profile content="seeded-by-166-v1"
+=== RUN   TestZZ166V1CrashParent/spill-uncommitted-wal-frames-then-kill
+time=2026-10-16T10:17:18.726+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentspill-uncommitted-wal-frames-then-kill3590502086\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T10:17:18.737+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentspill-uncommitted-wal-frames-then-kill3590502086\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:17:18.741+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:17:18Z duration_ms=4
+time=2026-10-16T10:17:18.746+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentspill-uncommitted-wal-frames-then-kill3590502086\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:17:18.749+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:17:18Z duration_ms=2
+time=2026-10-16T10:17:18.751+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-16T10:17:18.753+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-BEFORE spill-uncommitted-wal-frames-then-kill | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+V166-KILL spill-uncommitted-wal-frames-then-kill | wait-error=exit status 1
+child-log:
+V166-SPILL-PROGRESS 0/3000
+V166-SPILL-PROGRESS 500/3000
+V166-SPILL-PROGRESS 1000/3000
+V166-SPILL-PROGRESS 1500/3000
+V166-SPILL-PROGRESS 2000/3000
+V166-SPILL-PROGRESS 2500/3000
+V166-READY spill rows=3000
+V166-DIRLIST spill-uncommitted-wal-frames-then-kill
+backup/wisp.db.bak-0-1 size=4096
+backup/wisp.db.bak-1-2 size=98304
+backup/wisp.db.bak-2-3 size=106496
+wisp.db size=106496
+wisp.db-shm size=32768
+wisp.db-wal size=13962712
+V166-AFTER spill-uncommitted-wal-frames-then-kill | class=NOTHING(v2-untouched) legal=true pre-backup-2-3=true | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+time=2026-10-16T10:17:19.027+08:00 level=WARN msg="migration backup already exists, keeping it" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentspill-uncommitted-wal-frames-then-kill3590502086\001\data\backup\wisp.db.bak-2-3
+time=2026-10-16T10:17:19.033+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-16T02:17:19Z duration_ms=6
+time=2026-10-16T10:17:19.037+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-16T10:17:19.039+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-REOPEN spill-uncommitted-wal-frames-then-kill | class=ALL(v3-complete) legal=true | wm=3 session=true session_turn=true cols(session)=7 cols(session_turn)=6 idx=[idx_session_turn_session idx_session_updated idx_session_workspace] integrity=ok
+V166-SEED spill-uncommitted-wal-frames-then-kill | profile content="seeded-by-166-v1"
+=== RUN   TestZZ166V1CrashParent/postcommit-committed-then-killed
+time=2026-10-16T10:17:19.055+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentpostcommit-committed-then-killed2510272698\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-16T10:17:19.068+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentpostcommit-committed-then-killed2510272698\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-16T10:17:19.073+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-16T02:17:19Z duration_ms=5
+time=2026-10-16T10:17:19.079+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\wisp-166v1\gotmp\TestZZ166V1CrashParentpostcommit-committed-then-killed2510272698\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-16T10:17:19.084+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-16T02:17:19Z duration_ms=4
+time=2026-10-16T10:17:19.086+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-16T10:17:19.087+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-BEFORE postcommit-committed-then-killed | wm=2 session=false session_turn=false cols(session)=0 cols(session_turn)=0 idx=[] integrity=ok
+V166-KILL postcommit-committed-then-killed | wait-error=exit status 1
+child-log:
+V166-READY postcommit committed-open-store
+V166-DIRLIST postcommit-committed-then-killed
+backup/wisp.db.bak-0-1 size=4096
+backup/wisp.db.bak-1-2 size=98304
+backup/wisp.db.bak-2-3 size=106496
+wisp.db size=131072
+wisp.db-shm size=32768
+wisp.db-wal size=0
+V166-AFTER postcommit-committed-then-killed | class=ALL(v3-complete) legal=true pre-backup-2-3=true | wm=3 session=true session_turn=true cols(session)=7 cols(session_turn)=6 idx=[idx_session_turn_session idx_session_updated idx_session_workspace] integrity=ok
+time=2026-10-16T10:17:19.188+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+V166-REOPEN postcommit-committed-then-killed | class=ALL(v3-complete) legal=true | wm=3 session=true session_turn=true cols(session)=7 cols(session_turn)=6 idx=[idx_session_turn_session idx_session_updated idx_session_workspace] integrity=ok
+V166-SEED postcommit-committed-then-killed | profile content="seeded-by-166-v1"
+--- PASS: TestZZ166V1CrashParent (1.01s)
+    --- PASS: TestZZ166V1CrashParent/midstep-after-stmt0-create-table-session (0.14s)
+    --- PASS: TestZZ166V1CrashParent/midstep-after-stmt2-index-workspace (0.16s)
+    --- PASS: TestZZ166V1CrashParent/midstep-after-stmt3-create-table-session_turn (0.13s)
+    --- PASS: TestZZ166V1CrashParent/precommit-all-ddl-run-watermark-missing (0.11s)
+    --- PASS: TestZZ166V1CrashParent/spill-uncommitted-wal-frames-then-kill (0.33s)
+    --- PASS: TestZZ166V1CrashParent/postcommit-committed-then-killed (0.14s)
+=== RUN   TestZZ166V1CrashSweep

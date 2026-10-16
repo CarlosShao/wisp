@@ -1,0 +1,74 @@
+AC#3 迁移崩溃原子性＋数字前缀幂等键（判语＝**成立**，读数＝本腿自己的台件，⛔ 引用 166-r1 的过程件）
+
+## 3.0 为什么要另起台件
+票面这一格逐字要的是"**中途被杀之后重开必须要么全成要么全不成**"。
+仓里 166-r1 交的那枚 `internal/memory/dao_session_test.go:53 TestSessionMigrationCrashAtomicAndReplay`
+是**按错误中止**那一形（注入一条 `INSERT ... title=NULL` 让 apply 返回错误 ⇒ `applyMigrationStep` 走 `tx.Rollback()`，
+`open.go:398-400`），它证的是"错误⇒回滚"，**⛔ 证"进程被杀"**（被杀时没人返回错误、没人执行 Rollback）。
+所以本腿另做一发真杀进程的台件；仓里已有的真杀形状是 `internal/memory/concurrent_test.go:217 TestCrashRecoveryKillMidWrite`
+（父进程 `cmd.Process.Kill()` 杀子进程），本台件沿用同一形。
+
+## 3.1 台件（⛔ 共享工作树，全在仓外导出树 `tree-head`）
+- 源＝本目录 `zz166v1crash_bench_test.go`（落在 `tree-head/internal/memory/`，`package memory`，⛔ 产码、⛔ 进本仓）。
+  `gofmt -l` 列出 **0 枚**；`go vet ./internal/memory/` **VET_RC=0**。
+- 真杀：父测试 `exec.Command(os.Args[0], "-test.run=^TestZZ166V1CrashChild$")` 拉起**另一枚进程**，
+  子进程走**生产 `memory.Open`**（读水位⇒计划 2→3⇒写 pre-backup⇒`applyMigrationStep` 的真 `BeginTx`/`Commit`，
+  `open.go:324-341`/`:390-418`），到指定点后由父进程 `cmd.Process.Kill()`（Windows＝TerminateProcess）打死；
+  每一发的 `wait-error=exit status 1` 都逐字落在 `ac3-crash-parent.log` 里。
+  ⚠ 诚实边界：注入的**只有"死在哪一刻"**（子进程在 2→3 那枚 step 的 `apply` 里喊一声 READY）；
+  DDL 跑的是真 `applyV3`／真 `splitSQLStatements(ddlV3)`，事务与 watermark 写入是真 `applyMigrationStep` 的机器。
+- 判据 `classify()`（写死在台件里）：合法只有两形——
+  `ALL(v3-complete)`＝wm=3 ∧ 两枚表都在 ∧ `session` 7 列 ∧ `session_turn` 6 列 ∧ 三枚 `idx_session*` ∧ `integrity_check=ok`；
+  `NOTHING(v2-untouched)`＝wm=2 ∧ 两枚表都不在 ∧ 列数为 0 ∧ 索引为 0 ∧ integrity ok。
+  其余一律 `HALF-STATE`＝本格的红。重开读形用的是裸 `sql.Open(DriverName, dsn(...))`，**⛔ 跑迁移代码**。
+
+## 3.2 六发定点杀（逐字读数在 `logs/ac3-crash-parent.log`，171 行）
+
+| 发 | 死点 | kill 后盘上（重开读到的） | pre-backup 2→3 | class | 生产重开后 |
+|---|---|---|---|---|---|
+| midstep-after-stmt0-create-table-session | `ddlV3` 第 1/5 句后（事务内） | wm=2 两表都不在 列 0/0 索引 [] | 有 | `NOTHING(v2-untouched)` legal=true | `ALL(v3-complete)` legal=true |
+| midstep-after-stmt2-index-workspace | 第 3/5 句后（两张索引已建，事务内） | 同上 | 有 | `NOTHING(v2-untouched)` | `ALL(v3-complete)` |
+| midstep-after-stmt3-create-table-session_turn | 第 4/5 句后（`session_turn` 已建，事务内） | 同上 | 有 | `NOTHING(v2-untouched)` | `ALL(v3-complete)` |
+| precommit-all-ddl-run-watermark-missing | 真 `applyV3` 全部跑完、watermark 尚未写、Commit 尚未执行 | 同上 | 有 | `NOTHING(v2-untouched)` | `ALL(v3-complete)` |
+| **spill-uncommitted-wal-frames-then-kill** | 同 precommit，但同一枚事务里再塞 3000 行×4 KiB ⇒ 脏页**真落进 WAL** | `wisp.db-wal size=13962712`（≈13.9 MB 未提交帧）＋`wisp.db-shm size=32768`，而 `wisp.db size=106496` 与 pre-backup 逐字节同量 | 有 | `NOTHING(v2-untouched)` legal=true | `ALL(v3-complete)` |
+| postcommit-committed-then-killed | step 已 Commit、store 仍开着时杀 | wm=3 两表都在 列 7/6 索引 3 枚 integrity=ok | 有 | `ALL(v3-complete)` legal=true | `ALL(v3-complete)` |
+
+- 这一枚 `spill` 是专门用来堵"事务内的话压根没写到盘上，所以杀了也不算证据"这一句反驳的：
+  未提交帧**确实以 13.9 MB 的体量躺在 `wisp.db-wal` 里**，重开读到的仍是 `NOTHING(v2-untouched)`（帧被 WAL 恢复丢掉），
+  且 `integrity_check=ok`。
+- 每一发之后都跑了"生产重开"（`Open(dir)` 走真链），全部落到 `ALL(v3-complete)`＝**可重放**；
+  种进 v2 里的那行 `profile(slot='v166.slot')` 六发**一枚未丢**（`V166-SEED ... content="seeded-by-166-v1"`）；
+  重开时那枚 WARN `migration backup already exists, keeping it` ＝ pre-backup 不被重放覆盖（`open.go:506-510`）。
+- 台件自身的断言（`legal`、role 对应的期望 class、种子行、`InsertSession`＋`ListSessions` 可用）全部响着：
+  `--- PASS: TestZZ166V1CrashParent (1.01s)`。
+
+## 3.3 十二发"不打招呼"的随机杀（`logs/ac3-crash-sweep.log`）
+父进程不等任何 marker，起子进程后睡 `150+rng(2850)ms` 直接杀（seed＝`1792117039198721100`，逐发延时与读数和 `V166-SWEEP-SUMMARY kills-inside-the-step=2/12` 都在件里）：
+12/12 发重开读到 `NOTHING(v2-untouched)`，12/12 发生产重开读到 `ALL(v3-complete)`，`legal=true` 无一例外，⛔ 一枚 `HALF-STATE`。
+
+## 3.4 数字前缀幂等键那一形：新库／老库各推一遍，缺的是哪几枚
+水位是**整数** `schema_version`（`schema_meta` 那行，`parseVersion` 严格逐字符判数字，`open.go:475-490`），
+迁移按 `from→to` 逐步推进。两形各推一遍：
+
+- **老库**＝票 166 **之前那版二进制**（`tree-base`＝`2f41a80cb`，`SchemaVersionTarget=2`）写的真文件：
+  `mkv2.exe` ⇒ `MKV2 schema_version=2 tables=9 hasTable(session)=0 hasTable(session_turn)=0`。
+  用 HEAD 的 `dumpdb.exe pre`（**⛔ 跑迁移**，裸读）⇒ `ac3-old-pre.txt`：**9 枚表＋7 枚索引**，
+  ⇒ 缺的整张是 `session`（7 列）与 `session_turn`（6 列），缺的索引是 `idx_session_updated`/`idx_session_workspace`/`idx_session_turn_session`。
+  ⛔ "某张表少了半列"这一形：这两枚表在 v2 上**整张不存在**，`ddlV3` ⛔ 用 `ALTER TABLE ... ADD COLUMN`，
+  老库九张表的列名册与 `ddlV1/ddlV2` 逐字节相同（166-r1 ⛔ 改那两段一字，见 `05-ac5-commit-roster.txt` 里 `schema.go` 的 diff 形状）。
+- **同一枚老库**用 HEAD 二进制 `dumpdb.exe post` ⇒ `schema_version=3`、**11 枚表＋10 枚索引**、`integrity_check=ok`、
+  种子行 `POST seeded-profile="zh-CN"` 仍在，并在这枚升级来的文件上跑通了出口：`POST ListSessions(wk-up) rows=1 first="upgraded-db"`。
+- **新库**＝空目录直接由 HEAD 二进制 `Open` ⇒ `ac3-new-fresh.txt`，同样 **11 枚表＋10 枚索引**。
+- 两形的名册逐字节比：`diff`（去掉标签行后的 23 行）⇒ **ROSTER_DIFF_RC=0＝逐字节相同** ⇒ 新库与老库⛔ 分叉（`ddlV3` 走同一枚 2→3 步）。
+- 台件里的同一条断言也响着：`--- PASS: TestZZ166V1NewVsOldRoster` ⇒ `V166-ROSTER-CMP body(new)==body(old)=true`。
+
+## 3.5 判语
+**AC#3 成立**。三条都得有据：① 真杀进程（TerminateProcess，六枚定点＋十二枚随机）之后重开，
+读数只有 `NOTHING(v2-untouched)` 与 `ALL(v3-complete)` 两形，⛔ 一枚 `HALF-STATE`，未提交 WAL 帧被丢掉、`integrity_check` 全 ok；
+② 数字水位作为幂等键，新库（0→1→2→3）与老库（2→3）推出来的名册**逐字节相同**（11 表／10 索引），
+老库在升级前缺的是**整张 `session`/`session_turn`＋三枚索引**，⛔ 缺半列；③ 崩溃后重放可行（每发都重开成功并可用出口）。
+
+⚠ 两处与本腿台件有关、⛔ 属于产码缺陷的观察，写在台账材料里就好：
+(a) 166-r1 的 AC#3 自陈交的是"错误中止"那一形（3.0），票面要的"中途被杀"此前**盘上没有证据件**——现在有了，就是本件；
+(b) 票面 AC#3 逐字说"加**列**的迁移"，实现交的是加**表**（166-r1 自己在票尾具名报过这一处偏离），
+    本格的判语按"崩溃原子性＋新老库不分叉"这两条实质量，⛔ 按"是不是加列"这一字面翻案。

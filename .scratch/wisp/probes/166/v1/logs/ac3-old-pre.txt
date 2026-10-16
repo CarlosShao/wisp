@@ -1,0 +1,23 @@
+[PRE-no-migration] schema_version=3
+  table approval_grant (id,scope,tool,pattern,session_id,created_at,expires_at,revoked_at)
+  table cost_daily (day,tokens_in,tokens_out,cost_micros,tasks)
+  table memory (id,kind,content,keywords,created_at,last_hit_at,hit_count)
+  table plugin_state (id,version,enabled,capabilities_json,net_allowlist_json,installed_at,hash,exe_hash)
+  table profile (id,slot,content,source,updated_at)
+  table provider_health (provider,model,probe_json,last_probe_at,last_error,last_error_at,latency_ms_p50,quota_state)
+  table schema_meta (key,value)
+  table session (id,title,workspace,created_at,updated_at,archived_at,forked_from)
+  table session_turn (id,session_id,seq,role,content,created_at)
+  table task_log (id,started_at,ended_at,state,query_text,summary_text,cost_tokens_in,cost_tokens_out,cost_amount_micro,currency,error_class)
+  table tool_call (id,task_id,seq,tool,args_json,risk_level,decision,decided_at,started_at,ended_at,outcome,error_class,correlation_id,grant_id)
+  index idx_grant_session
+  index idx_memory_keywords
+  index idx_memory_last_hit
+  index idx_profile_updated
+  index idx_session_turn_session
+  index idx_session_updated
+  index idx_session_workspace
+  index idx_task_log_started
+  index idx_tool_call_corr
+  index idx_tool_call_task
+[PRE-no-migration] integrity_check=ok

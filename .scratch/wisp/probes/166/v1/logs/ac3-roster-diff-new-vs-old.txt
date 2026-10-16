@@ -1,0 +1,4 @@
+# 新库（0->1->2->3，空目录由 HEAD 二进制 Open）与老库（票 166 之前的二进制写的 v2 文件，再由 HEAD 二进制 2->3）
+# 两形的名册逐字节比：各取 dump 的前 23 行（第 1 行是标签＋水位，其余 22 行是表/列/索引名册）
+# 尺＝head -23 ac3-new-fresh.txt > n.txt; head -23 ac3-old-upgraded.txt > o.txt; diff n.txt o.txt
+ROSTER_DIFF_RC=0（0＝逐字节相同；两形各 11 枚表＋10 枚索引）

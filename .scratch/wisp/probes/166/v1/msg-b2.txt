@@ -1,0 +1,19 @@
+166-v1 AC#3 真杀进程台件落盘⇒判语成立（六发定点杀＋十二发随机杀＋新老库名册逐字节同）
+
+- 台件＝仓外导出树 tree-head/internal/memory/zz166v1crash_bench_test.go（源码随件入库 zz166v1crash_bench_test.go）：
+  父进程 exec 另一枚进程走生产 memory.Open，到点 cmd.Process.Kill()（TerminateProcess，wait-error=exit status 1），
+  重开用裸 sql.Open 读形（⛔ 跑迁移代码），合法只认两形 ALL(v3-complete)/NOTHING(v2-untouched)，第三形 HALF-STATE 即红。
+- 六发定点杀全绿：midstep 1/5、3/5、4/5（事务内）＋precommit（真 applyV3 全跑完、watermark 未写）⇒ 全部 NOTHING，
+  pre-backup 2→3 逐发都在；★spill 一发在同一事务里塞 3000×4KiB 行⇒杀后盘上 wisp.db-wal size=13962712（未提交帧真在盘上）、
+  wisp.db 与 pre-backup 同量，重开仍 NOTHING＋integrity_check=ok⇒堵死"事务内的话压根没落盘所以不算证据"那句反驳；
+  postcommit（已 Commit 再杀）⇒ ALL(v3-complete)。六发之后生产重开一律 ALL，种进去的 profile 行一枚未丢。
+- 十二发"不打招呼"随机杀（seed=1792117039198721100，延时 150–3000ms）：12/12 NOTHING、12/12 重开 ALL，⛔ 一枚 HALF。
+- 数字前缀幂等键那一形：老库＝票 166 之前那版二进制（tree-base=2f41a80cb，target 2）写的真文件，
+  HEAD 裸读⇒9 枚表＋7 枚索引，缺的是整张 session(7 列)/session_turn(6 列)＋三枚 idx_session*（⛔ 半列形，ddlV3 不用 ALTER）；
+  同一枚老库经 HEAD Open⇒11 表＋10 索引、integrity ok、种子行仍在、出口可用（ListSessions rows=1）；
+  新库（空目录 0→1→2→3）⇒11 表＋10 索引；两形名册 diff⇒ROSTER_DIFF_RC=0 逐字节同（logs/ac3-roster-diff-new-vs-old.txt）。
+- 具名上报：166-r1 的 AC#3 证据（dao_session_test.go:53）是"按错误中止"那一形（注入 title=NULL⇒Rollback），
+  证的是错误⇒回滚、⛔ 进程被杀⇒票面这一格此前盘上缺"真杀"那一发，本腿补齐；
+  台件里 gofmt 列 0 枚、go vet rc=0、--- PASS: TestZZ166V1CrashParent/Sweep/NewVsOldRoster 三枚齐。
+
+⛔ push、⛔ 勾 AC 框、⛔ 动产码/测试件一字（突变只在仓外导出树）。
