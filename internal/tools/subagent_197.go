@@ -254,14 +254,17 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 		return Result{Text: "任务名册未接线（fail-closed：拒绝派生子代理，派生了也没有地方登记它）", IsError: true}, nil
 	}
 	// ONE branch, TWO duties (ticket 270): it refuses an assembly the host never
-	// wired, and it is also the only site that keeps the t.d.BaseOptions() call
-	// below from being reached with an empty func value - calling that is not an
-	// error but a panic that ends the whole internal/tools run, which is the
-	// reading internal/tools/failclosed_236_teeth_test.go records as its own red.
-	// Form 甲 (ledger A990, decision 3) put a nil check of its own at that call,
-	// so deleting this branch now lands on the same named refusal instead of on
-	// that panic; the sentence below stays the one this branch of the || speaks
-	// for both of its fields.
+	// wired, and it is the FIRST of the two sites that keep the t.d.BaseOptions()
+	// call below from being reached with an empty func value. Form 甲 (ledger
+	// A990, decision 3) added the second one at that call, so this || is not the
+	// only protection, and it is only the first one while its left half still
+	// names BaseOptions. Calling an empty func value is not an error but a panic
+	// that ends the whole internal/tools run: that is the reading
+	// internal/tools/failclosed_236_teeth_test.go records as its own red, and
+	// internal/tools/nilbase_270_test.go's header states the ordering outright -
+	// the upstream guard fires first, so a nil BaseOptions never reaches that
+	// call in the tree as committed. The Text below stays the sentence this
+	// branch speaks for both of its fields.
 	if t.d.BaseOptions == nil || t.d.ParentTools == nil {
 		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
 	}
@@ -289,11 +292,13 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 
 	// Form 甲: the call protects itself. BaseOptions is a func value, so the next
 	// line is a nil call, not a nil read, and a nil call panics instead of
-	// refusing. The guard above fires first in every wiring this package builds
-	// today, which is why this check has no ordinary caller - it is here because
-	// that guard is one branch of an ||, and if it is ever split or loosened this
-	// line is the only thing left that cannot be called empty. The Text is the
-	// same sentence as that guard's, so one missing assembly gets one reason.
+	// refusing. This is the SECOND of the two sites, the backstop behind the ||
+	// above: that guard carries a BaseOptions half today, so it answers first in
+	// every wiring this package builds today, which is why this check has no
+	// ordinary caller. Only in the world where that || is split or loosened does
+	// this line become the only thing left that cannot be called empty - today it
+	// is one of two. The Text is the same sentence as that guard's, so one
+	// missing assembly gets one reason.
 	if t.d.BaseOptions == nil {
 		release()
 		return Result{Text: "宿主没有给出派生用的装配（BaseOptions/ParentTools 未接线，fail-closed：不起第二套运行时）", IsError: true}, nil
