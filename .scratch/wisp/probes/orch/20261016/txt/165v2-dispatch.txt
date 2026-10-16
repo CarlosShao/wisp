@@ -1,0 +1,54 @@
+非实现者终裁腿 `165-v2`——裁票 165 `AC#6` 那一格成不成立（实现者＝`165-r3`，⛔ 你盖章不算、也⛔ 让他自己裁）
+=================================================================================================
+
+腿名 `165-v2`｜角色＝**裁决腿（对抗验收）**｜票＝`.scratch/wisp/issues/165-*.md`（现量 **5 已勾／1 未勾**，未勾那枚＝`AC#6`）｜起手锚＝**具名提交 `44f51fc8`**（⛔ `HEAD~n`）
+实现者那侧的件（**只读、⛔ 当凭据**）：`docs/evidence/s1/165-doorbell-instrument-r3.md`（10666 B／70 行）、`.scratch/wisp/probes/165/r3/00-readings.md`（11099 B／71 行）、`.scratch/wisp/probes/165/r3/logs/`（16＋3 枚）、票尾一条 bullet。
+实现者提交名册（逐枚 `git show --name-only` 自己核写面）：`4f2470703` 夹具／`f7d6dbc98` 用例／`d498a73c` 读数件／`78fe125f` logs／`3e4ca0e3` 证据件／`c3f55651` 票尾 bullet／`f6c76b91` 正文源台件／`77553c9e`＋`16d4b225`＋`6b18b1d4` 收口补笔。
+
+## 被裁的东西（一句话）
+
+新增一枚真腿用例 `internal/agent/plan_present_doorbell_165r3_test.go`（221 行、1 枚顶层、0 子测试、0 `t.Skip`）＋夹具 `internal/agent/testdata/golden/plan-present.sse`（28 行），把 `internal/agent/loop.go:637-640` 那两行的 sink **读回来**：真 SSE 字节 → 真 openai-chat 适配器（C5）→ 真 `Loop` → 真 `memory.Store`，然后 `ListToolCallsByTask` 里必须存在一枚 `tool="plan.present"` 的行（判定据称在 `:138`）。名册条目是**镜像**的（因导入环去 import `internal/tools`）。
+
+## 你必须自己重跑的三发（⛔ 抄他的颜色）
+
+1. **正向**：`-run '^TestAC|^TestPlanPresent|^Test<他自己件里那枚顶层名>'` 先 `grep -n '^func Test' internal/agent/plan_present_doorbell_165r3_test.go` 拿真名，别信任何转述。
+2. **去牙那一发（本案主凭据）**：他报的是 `sed -i '12d'` 把夹具从 28 行改成 27 行 ⇒ 红在 `:138`、读数掉到 `over 0 tool_call rows`。**你在仓外导出树上重跑同一形**，并**核还原**：两枚 sha256 逐位回基线（他给的是 `.sse 7d26fa889b59fc3a…`／`.go 00c32049994c441c…`，⛔ 直接信——自己 `sha256sum` 现量并在判语件里具名报两串）。
+3. **★定向突变（必答题，这格判你在行）**：他把"这枚用例是不是恒真"的凭据押在 `:143`（`rowOfTool165r3` 独立又遍历一遍行）。请自己选**至少一枚他没做过的**形，逐枚做：
+   (a) 把用例里期望的工具名换成一枚**不在名册里**的假名（如 `plan.presentX`）⇒ 该红吗？红了才说明"名册里那枚真工具"这件事被钉住；
+   (b) 把镜像名册条目的 `Resident` 改 `false`（或 `Declared` 换档）⇒ 红不红？**都不红＝那两枚字段是装饰**，具名写"缺世界"而不是"判据成立"；
+   (c) 复算他的 **M-A**（只把计数喂成常量 `n := 1`、牙完好＝**绿**）与 **M-B**（同处常量计数＋摘牙＝红在 `:143`）：这两发要**分开算**，⛔ 把 M-A 的绿写成凭据，也⛔ 因为"M-B 红了"就判整枚用例不是恒真——请明确回答：**`n` 那一枚门自身对牙不敏感，这算不算这枚仪器的缺陷？**
+
+## 裁的范围与不许裁的
+
+- 只裁 `AC#6` 那一格：先 `sed -n` 逐字读**票面原文**（⛔ 读实现者的转述），再判**成立／不成立／成立但带具名缺口**。判语里每一格都要带你自己重跑的尺。
+- ⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`（翻框只有我做，凭据＝你的判语）。
+- ⛔ 动 `internal/agent/**`、`cmd/wisp/**`、`internal/panel/**` 的任何**跟踪字节**（含 `_test.go`）——所有突变只准在**仓外导出树**里做，做完当场具名还原并报 `sha256sum`；`git status --porcelain -- internal cmd` 在你交件时必须**没有**你这枚腿留下的字节。
+- 实现者交回的**断口②**（`cmd/wisp/plan_assembled_165r2_test.go:123` 只到名册出口）与**断口③**（`ToolChoice` 产码 0 写入）归**我**裁归属，⛔ 你替他答；你只补一句"这两条我复核过属实／不属实"，带尺。
+- 实现者对我派单第 9 行措辞的更正（"零枚用例打到它"⇄"走得过、但表里读不出真工具名"）：**请独立裁哪一形与 AC#6 原文一致**——这条会决定我下一波怎么派料。
+
+## 台面（⛔ 用共享工作树跑改前那一发）
+
+仓外导出树＝`git archive <具名 sha> go.mod go.sum internal cmd tools scripts frontend models | tar -x -C <树>`——**八件套**，少 `models/` ⇒ `internal/models` 三枚假红 `committed models/manifest.json not found`（`internal/models/manifest.go:317` 运行时读）；少 `frontend` ⇒ `[setup failed]`。另需拷：`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`（否则 `0xc0000135`／"no native DLLs"）。取出后先 `find <树> -name '*.go' | wc -l` 证非空再信任何"0"。
+`go test` 一律 `-count=1 -timeout 30m`；⛔ 跑整包 `./cmd/wisp`；⛔ 跑全树 `go test ./...`（会重跑 `cmd/wisp` 且默认 10 分钟帽 ⇒ `panic: test timed out after 10m0s`＝台面故障长得像红）。
+**门禁⛔ 在那棵部分树上跑**：`tools/d22scan` 的 ban #8 声明了 `design/`＋`frontend/`（`tools/d22scan/main.go:581-582`），射程扫到 0 枚是**硬退出 `exit 2`**，长得像红 ⇒ 门禁四数只在**工作树**（或 `git archive` 不带 pathspec 的全树）上跑，逐枚落 `rc=`。
+台面变量：容器/树必须放 `D:` 卷；`internal/winsec` 的颜色随 `GOTMPDIR` 所在卷变（C 卷 58/0、D 卷 56/2）⇒ 改前改后**同一台面**，不同台面的两发⛔ 相减。
+
+## 写面（只许这四，逐字）
+
+1) `docs/evidence/s1/**` 一枚判语件（**短名**、⛔ 长名、⛔ 件名带 `§`——长度门会为别家腿的拷贝件红）；2) `.scratch/wisp/probes/165/v2/**`（含 `logs/`）；3) 票 165 末尾**一条**只追加 bullet（`numstat` 必须 `N/0`）；4) 上面那些的正文源台件。
+⛔ 其它一切面（产码、测试件、`frontend/**`、`design/**`、`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`／三枚冻结件）。
+
+## 规矩
+
+- **只 commit、⛔ push**；`add`／`commit` 两处**逐枚显式 pathspec**；⛔ `-A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ⛔ 为了变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 在注释/判语里指名一枚不存在的测试当凭据（本仓入账五次）。
+- ⛔ 杀 `wisp.exe` **PID 21892**（机主 10-15 19:03 自起，台账 `A988`）。
+- 读数纪律：尺口径写清 `^=== RUN`（含子测试）⇄ `^--- PASS`（只数顶层），⛔ 混用；每个数带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先看 stderr＋跑正控。
+- **输出预算**：判语件 ≤160 行、其它 ≤3 枚、每件 ≤160 行；⛔ 0 字节（`wc -c` 逐枚）；轮次帽约 150 ⇒ **每落一枚就 commit**；`completed` 通知不算交件，只认盘上。
+- shell：正文一律单引号或加引号 heredoc；⛔ 双引号串里反引号或 `$`；中文 commit 先 Write 成文件再 `-F`。
+- 并发在飞：`326-v1`（裁 `internal/memory`／`internal/session`）∥ `327-a1`／`328-a2` 只读普查（⛔ 跑 Go）∥ `270-r2`（写 `internal/tools` 注释）∥ `216-a2`（只读普查）⇒ `internal/agent` 编译面这波只有你在跑；⛔ 读别人的在飞字节当凭据。
+
+## 交件自证（三把尺）
+
+① 逐枚提交号＋逐枚 `git show --name-only`（只含上面四处）；② 判语件绝对路径＋`wc -c`＋行数＋占位符计数 0；③ 你**自己重跑**的每发颜色（命令＋`rc=`＋红句逐字原文）与实现者那发**并排列**，不同处具名解释（⛔ 拿他的数当你的数）。
+判决格式：`AC#6` 一行结论（成立／不成立／成立带缺口）＋缺口逐枚具名＋**如果只能补一件事，补哪件**。
