@@ -1,0 +1,236 @@
+### 322-v1 POSIX rerun (quote-fixed), started 2026-10-16 10:29:33 +0800 HEAD=0683074e62546e64fc18057345e2a893d9b60216
+TREE /d/tmp/probe322v1/base1b.OBdSIE (rev=8baec646^): .go=1091 winsec/*.go=40
+=== base1b rc=1 filter=''
+RUN=71 topPASS=41 topFAIL=2 topSKIP=0
+tooling-word check: walk=1 buildfailed=0 noteststorun=0 setupfailed=0
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=2242 flipErrs=0 damagedWitnesses=67 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- top-level result lines:
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (1.77s)
+--- FAIL: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.02s)
+--- PASS: TestAC2AncestorPrefixesForEverySeparatorShape (0.00s)
+--- PASS: TestAC2ComponentsAndTraversalPerSeparatorShape (0.00s)
+--- PASS: TestAC5FailedSealRefusesTheWrite (0.01s)
+--- PASS: TestAC5FailureIsNotSwallowedByTheHappyPath (0.00s)
+--- PASS: TestPOSIXPrivateFileIsReally0600 (0.01s)
+--- PASS: TestPOSIXPrivateDirIsReally0700 (0.00s)
+--- PASS: TestPOSIXSymlinkAtArtifactPositionIsNotRecursed (0.01s)
+--- PASS: TestPOSIXMissingFileIsNotAnError (0.00s)
+--- PASS: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.01s)
+--- PASS: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandlePlainObjectStillSeals120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.01s)
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.40s)
+--- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125 (0.01s)
+--- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125 (0.01s)
+--- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125 (0.01s)
+--- PASS: TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink (0.01s)
+--- PASS: TestAC2POSIXDoesNotFoldABackslashIntoASeparator (0.02s)
+--- PASS: TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor (0.01s)
+--- PASS: TestAC4POSIXFloorAnswersInsideTheNamedTree (0.00s)
+--- PASS: TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119 (0.01s)
+--- PASS: TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119 (0.01s)
+--- PASS: TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 (0.02s)
+--- PASS: TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119 (0.01s)
+--- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.01s)
+--- PASS: TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed (0.02s)
+--- PASS: TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed (0.01s)
+--- PASS: TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone (0.01s)
+--- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth (0.05s)
+--- PASS: TestAC1POSIXSealDirThroughASymlinkRefuses (0.01s)
+--- PASS: TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing (0.01s)
+--- PASS: TestAC1POSIXSealFileThroughABackslashNamedLink (0.01s)
+--- PASS: TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree (0.00s)
+--- PASS: TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks (0.01s)
+--- PASS: TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator (0.01s)
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.37s)
+--- PASS: TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed (0.62s)
+--- PASS: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed (0.74s)
+--- RED lines verbatim:
+    openleaf_322_other_test.go:200: AC#1 RED: 67 of 3000 foreign witnesses lost their own bytes or mtime, so the open in privateFile followed a leaf link swapped into the caller's name and truncated a file no caller named (first: foreign-witness-0007-322r1.bin: content is "", want its own bytes). This is ticket 322's shape and the outcome the leaf leg exists to prevent.
+    openleaf_322_other_test.go:206: AC#1 RED instrument: across 3000 raced attempts the leaf leg ("too many levels of symbolic links") answered 0 and the racer landed 2242 flips (0 errors, first ""), so the damaged count above is not evidence about a window that was never reached
+    openleaf_flag_322_other_test.go:56: AC#1 RED relative sibling: the open carrying oNoFollowPlatform took a leaf link, want ELOOP
+    openleaf_flag_322_other_test.go:56: AC#1 RED dangling, target never created: the open carrying oNoFollowPlatform took a leaf link, want ELOOP
+    openleaf_flag_322_other_test.go:65: AC#1 RED: the dangling-leaf spelling created an object outside the tree
+TREE /d/tmp/probe322v1/fixed1b.8l9hKI (rev=HEAD): .go=1094 winsec/*.go=40
+FIXED-BYTES 41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d */d/tmp/probe322v1/fixed1b.8l9hKI/internal/winsec/winsec.go
+=== fixed1b rc=0 filter=''
+RUN=71 topPASS=43 topFAIL=0 topSKIP=0
+tooling-word check: walk=1 buildfailed=0 noteststorun=0 setupfailed=0
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1828 flipErrs=0 damagedWitnesses=0 leafLegRefusals=50 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- top-level result lines:
+--- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (1.01s)
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.01s)
+--- PASS: TestAC2AncestorPrefixesForEverySeparatorShape (0.00s)
+--- PASS: TestAC2ComponentsAndTraversalPerSeparatorShape (0.00s)
+--- PASS: TestAC5FailedSealRefusesTheWrite (0.00s)
+--- PASS: TestAC5FailureIsNotSwallowedByTheHappyPath (0.00s)
+--- PASS: TestPOSIXPrivateFileIsReally0600 (0.00s)
+--- PASS: TestPOSIXPrivateDirIsReally0700 (0.00s)
+--- PASS: TestPOSIXSymlinkAtArtifactPositionIsNotRecursed (0.01s)
+--- PASS: TestPOSIXMissingFileIsNotAnError (0.00s)
+--- PASS: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandlePlainObjectStillSeals120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.19s)
+--- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125 (0.00s)
+--- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125 (0.01s)
+--- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125 (0.00s)
+--- PASS: TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink (0.00s)
+--- PASS: TestAC2POSIXDoesNotFoldABackslashIntoASeparator (0.01s)
+--- PASS: TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor (0.00s)
+--- PASS: TestAC4POSIXFloorAnswersInsideTheNamedTree (0.00s)
+--- PASS: TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119 (0.00s)
+--- PASS: TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119 (0.01s)
+--- PASS: TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 (0.00s)
+--- PASS: TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119 (0.00s)
+--- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.01s)
+--- PASS: TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed (0.00s)
+--- PASS: TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed (0.00s)
+--- PASS: TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone (0.01s)
+--- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth (0.02s)
+--- PASS: TestAC1POSIXSealDirThroughASymlinkRefuses (0.00s)
+--- PASS: TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing (0.00s)
+--- PASS: TestAC1POSIXSealFileThroughABackslashNamedLink (0.00s)
+--- PASS: TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree (0.00s)
+--- PASS: TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks (0.01s)
+--- PASS: TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator (0.00s)
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.24s)
+--- PASS: TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed (0.39s)
+--- PASS: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed (0.42s)
+--- RED lines verbatim:
+(no RED line)
+TREE /d/tmp/probe322v1/m1b-teethout.pu8XeM (rev=HEAD): .go=1094 winsec/*.go=40
+ANCHOR M1 open line: 149:	f, err := os.OpenFile(resolved, flags|oNoFollowPlatform, perm)
+M1-BEFORE sha=41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d
+M1-AFTER open-line=	f, err := os.OpenFile(resolved, flags, perm) hits=0
+=== m1b rc=1 filter=''
+RUN=71 topPASS=42 topFAIL=1 topSKIP=0
+tooling-word check: walk=1 buildfailed=0 noteststorun=0 setupfailed=0
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=2470 flipErrs=0 damagedWitnesses=84 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- top-level result lines:
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (1.14s)
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.02s)
+--- PASS: TestAC2AncestorPrefixesForEverySeparatorShape (0.00s)
+--- PASS: TestAC2ComponentsAndTraversalPerSeparatorShape (0.00s)
+--- PASS: TestAC5FailedSealRefusesTheWrite (0.01s)
+--- PASS: TestAC5FailureIsNotSwallowedByTheHappyPath (0.00s)
+--- PASS: TestPOSIXPrivateFileIsReally0600 (0.00s)
+--- PASS: TestPOSIXPrivateDirIsReally0700 (0.00s)
+--- PASS: TestPOSIXSymlinkAtArtifactPositionIsNotRecursed (0.01s)
+--- PASS: TestPOSIXMissingFileIsNotAnError (0.00s)
+--- PASS: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandlePlainObjectStillSeals120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.31s)
+--- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125 (0.01s)
+--- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125 (0.01s)
+--- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125 (0.01s)
+--- PASS: TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink (0.01s)
+--- PASS: TestAC2POSIXDoesNotFoldABackslashIntoASeparator (0.01s)
+--- PASS: TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor (0.01s)
+--- PASS: TestAC4POSIXFloorAnswersInsideTheNamedTree (0.00s)
+--- PASS: TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119 (0.01s)
+--- PASS: TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119 (0.01s)
+--- PASS: TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 (0.01s)
+--- PASS: TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119 (0.01s)
+--- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.01s)
+--- PASS: TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed (0.01s)
+--- PASS: TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed (0.01s)
+--- PASS: TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone (0.01s)
+--- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth (0.04s)
+--- PASS: TestAC1POSIXSealDirThroughASymlinkRefuses (0.00s)
+--- PASS: TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing (0.01s)
+--- PASS: TestAC1POSIXSealFileThroughABackslashNamedLink (0.01s)
+--- PASS: TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree (0.00s)
+--- PASS: TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks (0.01s)
+--- PASS: TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator (0.01s)
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.29s)
+--- PASS: TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed (0.70s)
+--- PASS: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed (0.70s)
+--- RED lines verbatim:
+    openleaf_322_other_test.go:200: AC#1 RED: 84 of 3000 foreign witnesses lost their own bytes or mtime, so the open in privateFile followed a leaf link swapped into the caller's name and truncated a file no caller named (first: foreign-witness-0010-322r1.bin: content is "", want its own bytes). This is ticket 322's shape and the outcome the leaf leg exists to prevent.
+    openleaf_322_other_test.go:206: AC#1 RED instrument: across 3000 raced attempts the leaf leg ("too many levels of symbolic links") answered 0 and the racer landed 2470 flips (0 errors, first ""), so the damaged count above is not evidence about a window that was never reached
+M1-RESTORE sha=41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d (must equal M1-BEFORE)
+TREE /d/tmp/probe322v1/m2b-blanket.BZAkIw (rev=HEAD): .go=1094 winsec/*.go=40
+ANCHOR M2 posix guard body: 39:func preOpenLeafGuard(string) error { return nil }
+M2-BEFORE sha=19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2
+M2-AFTER body=39:func preOpenLeafGuard(path string) error { return fmt.Errorf("%w: MUTANT blanket refusal on every name, fixed or not: %s", ErrUnresolvedPath, path) }
+=== m2b rc=1 filter=''
+RUN=71 topPASS=34 topFAIL=9 topSKIP=0
+tooling-word check: walk=1 buildfailed=0 noteststorun=0 setupfailed=0
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=276 flipErrs=0 damagedWitnesses=0 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+--- top-level result lines:
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.97s)
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+--- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.02s)
+--- PASS: TestAC2AncestorPrefixesForEverySeparatorShape (0.00s)
+--- PASS: TestAC2ComponentsAndTraversalPerSeparatorShape (0.00s)
+--- FAIL: TestAC5FailedSealRefusesTheWrite (0.00s)
+--- FAIL: TestAC5FailureIsNotSwallowedByTheHappyPath (0.00s)
+--- FAIL: TestPOSIXPrivateFileIsReally0600 (0.00s)
+--- PASS: TestPOSIXPrivateDirIsReally0700 (0.00s)
+--- PASS: TestPOSIXSymlinkAtArtifactPositionIsNotRecursed (0.01s)
+--- PASS: TestPOSIXMissingFileIsNotAnError (0.00s)
+--- PASS: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+--- PASS: TestAC1POSIXSealHandlePlainObjectStillSeals120r3 (0.00s)
+--- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)
+--- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+--- PASS: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.07s)
+--- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125 (0.00s)
+--- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125 (0.00s)
+--- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125 (0.00s)
+--- PASS: TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink (0.01s)
+--- PASS: TestAC2POSIXDoesNotFoldABackslashIntoASeparator (0.01s)
+--- PASS: TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor (0.01s)
+--- PASS: TestAC4POSIXFloorAnswersInsideTheNamedTree (0.01s)
+--- PASS: TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119 (0.01s)
+--- PASS: TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119 (0.01s)
+--- PASS: TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 (0.01s)
+--- FAIL: TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119 (0.00s)
+--- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.01s)
+--- PASS: TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed (0.01s)
+--- PASS: TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed (0.01s)
+--- PASS: TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone (0.01s)
+--- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth (0.02s)
+--- PASS: TestAC1POSIXSealDirThroughASymlinkRefuses (0.01s)
+--- PASS: TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing (0.01s)
+--- PASS: TestAC1POSIXSealFileThroughABackslashNamedLink (0.01s)
+--- PASS: TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree (0.00s)
+--- FAIL: TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks (0.02s)
+--- PASS: TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator (0.01s)
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.33s)
+--- PASS: TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed (1.14s)
+--- PASS: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed (0.80s)
+--- RED lines verbatim:
+    openleaf_322_other_test.go:206: AC#1 RED instrument: across 3000 raced attempts the leaf leg ("too many levels of symbolic links") answered 0 and the racer landed 276 flips (0 errors, first ""), so the damaged count above is not evidence about a window that was never reached
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern4258125502/001/blob-322r1.bin), which breaks storing the same id twice replaces the blob in place
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "secret-value-one, longer than the replacement" (err <nil>), want "secret-value-two" - storing the same id twice replaces the blob in place
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern3636794395/001/config-backup-322r1.toml), which breaks this call is the repair path for a wide backup left by an older build
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "a wide backup left by an older build, longer than the replacement" (err <nil>), want "narrow" - this call is the repair path for a wide backup left by an older build
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern4100872318/001/wisp-secrets-322r1.toml.tmp), which breaks a pre-rename temp left by a crash is overwritten, not refused
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "tmp body from the run that crashed" (err <nil>), want "tmp body from this run" - a pre-rename temp left by a crash is overwritten, not refused
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern3122995801/001/artifact-322r1.bin.retry), which breaks a leftover .retry temp is overwritten (D31 last-writer-wins)
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "first spill that needed a retry" (err <nil>), want "retry spill bytes" - a leftover .retry temp is overwritten (D31 last-writer-wins)
+    sealhandle_privateroute_120_other_test.go:83: AC#1 RED private-file-route-name-carries-another-real-object: the refusal does not carry ErrNotSealable: winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject12297684999/001/caller-object-120r3.bin
+    sealhandle_privateroute_120_other_test.go:83: AC#1 RED private-file-route-name-carries-another-real-object: refusal came from some other failure, want the leg carrying "this descriptor is not the object the name carries now, so the bytes would not land in what was just sealed"; verbatim: winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject12297684999/001/caller-object-120r3.bin
+    sealhandle_privateroute_120_other_test.go:85: AC#1 RED: the refused write left the name carrying a file, want it unlinked; err=winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject12297684999/001/caller-object-120r3.bin
+    sealhandle_privateroute_120_other_test.go:110: AC#1 RED private-file-route-name-becomes-a-sibling-link: the refusal does not carry ErrNotSealable: winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal603891906/001/caller-object-120r3.bin
+    sealhandle_privateroute_120_other_test.go:110: AC#1 RED private-file-route-name-becomes-a-sibling-link: refusal came from some other failure, want the leg carrying "the name carries a link, so this descriptor is not the object the caller named"; verbatim: winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal603891906/001/caller-object-120r3.bin
+    sealhandle_privateroute_120_other_test.go:120: AC#1 RED: the refused write left the name carrying a file, want the link unlinked; err=winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal603891906/001/caller-object-120r3.bin
+    dataroot_symlink_119_other_test.go:301: AC#3 RED: PrivateFile refused a plain path inside the resolved root: winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused1193503227969/001/data/artifact.txt
+    placement_symlink_113_other_test.go:377: AC#3 RED: PrivateFile refused a plain path inside the named tree: winsec: path is not provably resolved, refusing to seal: MUTANT blanket refusal on every name, fixed or not: /tmp/gotmp322v1b/TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLink2515568502/002/data/a/b/c/artifact.txt
+M2-RESTORE sha=19f3c211055011cc699a8d8027ef49ff543ede0da5c863f58aaaad21a640d3e2 (must equal M2-BEFORE)
+### done 2026-10-16 10:31:13 +0800

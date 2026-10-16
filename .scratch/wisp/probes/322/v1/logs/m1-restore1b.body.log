@@ -1,0 +1,28 @@
+=== RUN   TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1870 flipErrs=0 damagedWitnesses=0 leafLegRefusals=56 foreignsNarrowed=0 foreignsHoldingPayload=0
+    openleaf_322_other_test.go:196: AC#1' leg that answered = placement floor before the act (platformVerifyPlacement) : 2444 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = pinPlacement sameObjectPinned link face (winsec_other.go:188) : 393 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = sealHandle inline link face (winsec_other.go:269) : 28 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = sealHandle inline SameFile face (winsec_other.go:272) : 28 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = some other failure : 14 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = none: the call returned nil : 37 attempts
+--- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (1.26s)
+=== RUN   TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.02s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	1.295s
+go-test rc=0
