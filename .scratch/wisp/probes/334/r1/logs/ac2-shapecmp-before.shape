@@ -1,0 +1,14 @@
+SHAPE334 id_ed25519已允许‮ class=A allow=false needL2=false
+SHAPE334 notes*a1已允许‮ class=A allow=false needL2=false
+SHAPE334 score?b1已允许‮ class=A allow=false needL2=false
+SHAPE334 plain-note.txt class=none allow=true needL2=false
+SHAPE334 hostile-in-real-temp class=A allow=false needL2=false
+SHAPE334 hostile-under-appdata-wisp-logs class=A allow=false needL2=false
+SHAPE334 census:id_ed25519已允许‮ class=A allow=false needL2=false
+SHAPE334 census:notes*a1已允许‮ class=A allow=false needL2=false
+SHAPE334 census:score?b1已允许‮ class=A allow=false needL2=false
+SHAPE334 census:config已允许‮ class=A allow=false needL2=false
+SHAPE334 census:readme已允许‮ class=A allow=false needL2=false
+SHAPE334 in-home-cand class=A allow=false needL2=false
+SHAPE334 off-home-cand class=B allow=false needL2=true
+SHAPE334 lad-elsewhere-cand class=A allow=false needL2=false

@@ -1,0 +1,71 @@
+time=2026-10-17T11:34:45.906+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe334LstatErrorString
+    zz_probe_334r1_test.go:49: probe_dir="C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\portable-20261017-113445-1135\\TestProbe334LstatErrorString20734608\\001" home="C:\\Users\\swq" TMP="C:\\Users\\swq\\AppData\\Local\\Temp" TEMP="C:\\Users\\swq\\AppData\\Local\\Temp" GOTMPDIR="C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\portable-20261017-113445-1135"
+    zz_probe_334r1_test.go:54: LSTAT334 name="id_ed25519已允许\x1b\u202e" err=<CreateFile C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-20261017-113445-1135\TestProbe334LstatErrorString20734608\001\id_ed25519已允许‮: The filename, directory name, or volume label syntax is incorrect.> is_FS_ErrNotExist=false is_OS_ErrNotExist=false
+    zz_probe_334r1_test.go:56: FORMS334 id_ed25519已允许‮ raw="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001\\id_ed25519已允许\x1b\u202e" real="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001\\id_ed25519已允许\x1b\u202e" root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001" partial=true certain=false spellings=[c:\users\swq\appdata\local\wisp-test-gotmp\portable-20261017-113445-1135\testprobe334lstaterrorstring20734608\001\id_ed25519已允许‮]
+    zz_probe_334r1_test.go:57: SHAPE334 id_ed25519已允许‮ class=A allow=false needL2=false
+    zz_probe_334r1_test.go:58: REASON334 id_ed25519已允许‮ reason="A-list sensitive path (non-overridable): ~/.aws/credentials"
+    zz_probe_334r1_test.go:54: LSTAT334 name="notes*a1已允许\x1b\u202e" err=<CreateFile C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-20261017-113445-1135\TestProbe334LstatErrorString20734608\001\notes*a1已允许‮: The filename, directory name, or volume label syntax is incorrect.> is_FS_ErrNotExist=false is_OS_ErrNotExist=false
+    zz_probe_334r1_test.go:56: FORMS334 notes*a1已允许‮ raw="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001\\notes*a1已允许\x1b\u202e" real="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001\\notes*a1已允许\x1b\u202e" root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001" partial=true certain=false spellings=[c:\users\swq\appdata\local\wisp-test-gotmp\portable-20261017-113445-1135\testprobe334lstaterrorstring20734608\001\notes*a1已允许‮]
+    zz_probe_334r1_test.go:57: SHAPE334 notes*a1已允许‮ class=A allow=false needL2=false
+    zz_probe_334r1_test.go:58: REASON334 notes*a1已允许‮ reason="A-list sensitive path (non-overridable): ~/.aws/credentials"
+    zz_probe_334r1_test.go:54: LSTAT334 name="score?b1已允许\x1b\u202e" err=<CreateFile C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-20261017-113445-1135\TestProbe334LstatErrorString20734608\001\score?b1已允许‮: The filename, directory name, or volume label syntax is incorrect.> is_FS_ErrNotExist=false is_OS_ErrNotExist=false
+    zz_probe_334r1_test.go:56: FORMS334 score?b1已允许‮ raw="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001\\score?b1已允许\x1b\u202e" real="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001\\score?b1已允许\x1b\u202e" root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001" partial=true certain=false spellings=[c:\users\swq\appdata\local\wisp-test-gotmp\portable-20261017-113445-1135\testprobe334lstaterrorstring20734608\001\score?b1已允许‮]
+    zz_probe_334r1_test.go:57: SHAPE334 score?b1已允许‮ class=A allow=false needL2=false
+    zz_probe_334r1_test.go:58: REASON334 score?b1已允许‮ reason="A-list sensitive path (non-overridable): ~/.aws/credentials"
+    zz_probe_334r1_test.go:54: LSTAT334 name="plain-note.txt" err=<GetFileAttributesEx C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-20261017-113445-1135\TestProbe334LstatErrorString20734608\001\plain-note.txt: The system cannot find the file specified.> is_FS_ErrNotExist=true is_OS_ErrNotExist=true
+    zz_probe_334r1_test.go:56: FORMS334 plain-note.txt raw="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001\\plain-note.txt" real="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001\\plain-note.txt" root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334lstaterrorstring20734608\\001" partial=false certain=true spellings=[c:\users\swq\appdata\local\wisp-test-gotmp\portable-20261017-113445-1135\testprobe334lstaterrorstring20734608\001\plain-note.txt]
+    zz_probe_334r1_test.go:57: SHAPE334 plain-note.txt class=none allow=true needL2=false
+    zz_probe_334r1_test.go:58: REASON334 plain-note.txt reason=""
+--- PASS: TestProbe334LstatErrorString (0.01s)
+=== RUN   TestProbe334RealMachineAnchors
+    zz_probe_334r1_test.go:70: ENV334 home="C:\\Users\\swq" appdata="C:\\Users\\swq\\AppData\\Roaming" localappdata="C:\\Users\\swq\\AppData\\Local"
+    zz_probe_334r1_test.go:74: LEAF334 C:\Users\swq\.git-credentials exists=true lstat_err=<<nil>>
+    zz_probe_334r1_test.go:74: LEAF334 C:\Users\swq\.ssh exists=true lstat_err=<<nil>>
+    zz_probe_334r1_test.go:74: LEAF334 C:\Users\swq\.aws exists=false lstat_err=<GetFileAttributesEx C:\Users\swq\.aws: The system cannot find the file specified.>
+    zz_probe_334r1_test.go:74: LEAF334 C:\Users\swq\.aws\credentials exists=false lstat_err=<GetFileAttributesEx C:\Users\swq\.aws\credentials: The system cannot find the path specified.>
+    zz_probe_334r1_test.go:74: LEAF334 C:\Users\swq\.kube exists=false lstat_err=<GetFileAttributesEx C:\Users\swq\.kube: The system cannot find the file specified.>
+    zz_probe_334r1_test.go:74: LEAF334 C:\Users\swq\.kube\config exists=false lstat_err=<GetFileAttributesEx C:\Users\swq\.kube\config: The system cannot find the path specified.>
+    zz_probe_334r1_test.go:78: FORMS334 anchor:.git-credentials raw="c:\\users\\swq\\.git-credentials" real="c:\\users\\swq\\.git-credentials" root="c:\\users\\swq\\.git-credentials" partial=false certain=true spellings=[c:\users\swq\.git-credentials]
+    zz_probe_334r1_test.go:78: FORMS334 anchor:.ssh raw="c:\\users\\swq\\.ssh" real="c:\\users\\swq\\.ssh" root="c:\\users\\swq\\.ssh" partial=false certain=true spellings=[c:\users\swq\.ssh]
+    zz_probe_334r1_test.go:78: FORMS334 anchor:.aws\credentials raw="c:\\users\\swq\\.aws\\credentials" real="c:\\users\\swq\\.aws\\credentials" root="c:\\users\\swq" partial=false certain=true spellings=[c:\users\swq\.aws\credentials]
+    zz_probe_334r1_test.go:78: FORMS334 anchor:.kube\config raw="c:\\users\\swq\\.kube\\config" real="c:\\users\\swq\\.kube\\config" root="c:\\users\\swq" partial=false certain=true spellings=[c:\users\swq\.kube\config]
+    zz_probe_334r1_test.go:81: FORMS334 hostile-candidate raw="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334realmachineanchors143258992\\001\\id_ed25519已允许\x1b\u202e" real="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334realmachineanchors143258992\\001\\id_ed25519已允许\x1b\u202e" root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334realmachineanchors143258992\\001" partial=true certain=false spellings=[c:\users\swq\appdata\local\wisp-test-gotmp\portable-20261017-113445-1135\testprobe334realmachineanchors143258992\001\id_ed25519已允许‮]
+    zz_probe_334r1_test.go:82: SHAPE334 hostile-in-real-temp class=A allow=false needL2=false
+    zz_probe_334r1_test.go:83: REASON334 hostile-in-real-temp reason="A-list sensitive path (non-overridable): ~/.aws/credentials"
+    zz_probe_334r1_test.go:85: LEAF334 wisp_logs_exists=true
+    zz_probe_334r1_test.go:87: SHAPE334 hostile-under-appdata-wisp-logs class=A allow=false needL2=false
+    zz_probe_334r1_test.go:88: REASON334 hostile-under-appdata-wisp-logs reason="A-list sensitive path (non-overridable): %APPDATA%\\wisp\\config.toml"
+--- PASS: TestProbe334RealMachineAnchors (0.00s)
+=== RUN   TestProbe334ConstructedDenyCensus
+    zz_probe_334r1_test.go:106: SHAPE334 census:id_ed25519已允许‮ class=A allow=false needL2=false
+    zz_probe_334r1_test.go:107: DENY334 id_ed25519已允许‮ reason="A-list sensitive path (non-overridable): ~/.aws/credentials"
+    zz_probe_334r1_test.go:106: SHAPE334 census:notes*a1已允许‮ class=A allow=false needL2=false
+    zz_probe_334r1_test.go:107: DENY334 notes*a1已允许‮ reason="A-list sensitive path (non-overridable): ~/.aws/credentials"
+    zz_probe_334r1_test.go:106: SHAPE334 census:score?b1已允许‮ class=A allow=false needL2=false
+    zz_probe_334r1_test.go:107: DENY334 score?b1已允许‮ reason="A-list sensitive path (non-overridable): ~/.aws/credentials"
+    zz_probe_334r1_test.go:106: SHAPE334 census:config已允许‮ class=A allow=false needL2=false
+    zz_probe_334r1_test.go:107: DENY334 config已允许‮ reason="A-list sensitive path (non-overridable): ~/.aws/credentials"
+    zz_probe_334r1_test.go:106: SHAPE334 census:readme已允许‮ class=A allow=false needL2=false
+    zz_probe_334r1_test.go:107: DENY334 readme已允许‮ reason="A-list sensitive path (non-overridable): ~/.aws/credentials"
+    zz_probe_334r1_test.go:110: CENSUS334 constructed=5 classA=5 control(ordinary_file_in_same_dir)=none scope="C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\portable-20261017-113445-1135\\TestProbe334ConstructedDenyCensus831877541\\001" (只数这一批具名构造，⛔ 全称句)
+--- PASS: TestProbe334ConstructedDenyCensus (0.00s)
+=== RUN   TestProbe334NecessityMatrix
+=== RUN   TestProbe334NecessityMatrix/candidate-inside-fake-home
+    zz_probe_334r1_test.go:129: FORMS334 in-home-cand raw="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334necessitymatrixcandidate-inside-fake-home2861627847\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" real="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334necessitymatrixcandidate-inside-fake-home2861627847\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334necessitymatrixcandidate-inside-fake-home2861627847\\001\\profile\\work" partial=true certain=false spellings=[c:\users\swq\appdata\local\wisp-test-gotmp\portable-20261017-113445-1135\testprobe334necessitymatrixcandidate-inside-fake-home2861627847\001\profile\work\id_ed25519已允许‮]
+    zz_probe_334r1_test.go:130: SHAPE334 in-home-cand class=A allow=false needL2=false
+    zz_probe_334r1_test.go:131: REASON334 in-home-cand reason="A-list sensitive path (non-overridable): ~/.git-credentials"
+=== RUN   TestProbe334NecessityMatrix/candidate-outside-fake-home
+    zz_probe_334r1_test.go:147: FORMS334 off-home-cand raw="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334necessitymatrixcandidate-outside-fake-home3728436464\\001\\work\\id_ed25519已允许\x1b\u202e" real="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334necessitymatrixcandidate-outside-fake-home3728436464\\001\\work\\id_ed25519已允许\x1b\u202e" root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-20261017-113445-1135\\testprobe334necessitymatrixcandidate-outside-fake-home3728436464\\001\\work" partial=true certain=false spellings=[c:\users\swq\appdata\local\wisp-test-gotmp\portable-20261017-113445-1135\testprobe334necessitymatrixcandidate-outside-fake-home3728436464\001\work\id_ed25519已允许‮]
+    zz_probe_334r1_test.go:148: SHAPE334 off-home-cand class=B allow=false needL2=true
+    zz_probe_334r1_test.go:149: REASON334 off-home-cand reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+=== RUN   TestProbe334NecessityMatrix/localappdata-moves-nothing
+    zz_probe_334r1_test.go:166: SHAPE334 lad-elsewhere-cand class=A allow=false needL2=false
+    zz_probe_334r1_test.go:167: REASON334 lad-elsewhere-cand reason="A-list sensitive path (non-overridable): ~/.git-credentials"
+--- PASS: TestProbe334NecessityMatrix (0.01s)
+    --- PASS: TestProbe334NecessityMatrix/candidate-inside-fake-home (0.00s)
+    --- PASS: TestProbe334NecessityMatrix/candidate-outside-fake-home (0.00s)
+    --- PASS: TestProbe334NecessityMatrix/localappdata-moves-nothing (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.056s
+rc=0 run=7 pass_top=4 fail_top=0 skip=0

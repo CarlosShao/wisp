@@ -1,0 +1,2 @@
+MUT_TAG=baseline rc=0
+RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0

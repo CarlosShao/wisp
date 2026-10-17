@@ -1,0 +1,16 @@
+probe_src_hash=e852ce630dcd7270813841b6c6ad5e8809affba3
+before blacklist.go=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5 probe=e852ce630dcd7270813841b6c6ad5e8809affba3 anchor=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5
+after blacklist.go=c1799cd24afce19e6accef23db23a7d7ee746dec probe=e852ce630dcd7270813841b6c6ad5e8809affba3 anchor=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5
+before rc=0 RUN=7 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+after rc=0 RUN=7 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+### 三值尺：改前 ⇄ 改后 SHAPE 行 diff（必须空）
+THREE_VALUE_IDENTICAL=YES lines=14
+### 那句 reason：改前 ⇄ 改后（各三行，取规则尾巴）
+-- before --
+reason="A-list sensitive path (non-overridable): %APPDATA%wispconfig.toml
+reason="A-list sensitive path (non-overridable): ~/.aws/credentials
+reason="A-list sensitive path (non-overridable): ~/.git-credentials
+-- after --
+reason="A-list sensitive path (non-overridable): %APPDATA%wispconfig.toml [fail-closed, NOT a match on this rule]: the candidate 
+reason="A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate 
+reason="A-list sensitive path (non-overridable): ~/.git-credentials [fail-closed, NOT a match on this rule]: the candidate 

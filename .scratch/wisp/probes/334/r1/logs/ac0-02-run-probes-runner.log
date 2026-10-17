@@ -1,0 +1,11 @@
+date=2026-10-17 11:34:41 +0800 root=/d/W334R1TreeBefore
+probe_src_hash=e852ce630dcd7270813841b6c6ad5e8809affba3
+probe_installed=/d/W334R1TreeBefore/internal/risk/zz_probe_334r1_test.go
+vet_rc=0
+### surface D: GOTMPDIR=D:\W334R1Gotmp\probe TMP=/tmp(不动)
+rc=0 run=7 pass_top=4 fail_top=0 skip=0
+mkdir_ci_gotmp_rc=0
+### surface CI-shape: GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-20261017-113445-1135 TMP=/tmp(不动) TEMP=/tmp(不动)
+rc=0 run=7 pass_top=4 fail_top=0 skip=0
+shared_worktree_risk_status=0 (应为 0＝本腿没在共享树里写过)
+done=2026-10-17 11:34:46 +0800

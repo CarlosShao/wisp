@@ -1,0 +1,6 @@
+MUT_TAG=M-C rc=1
+RUN=10 PASS_TOP=1 FAIL_TOP=2 SKIP=0
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.04s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so (0.01s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube (0.01s)
+--- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.02s)

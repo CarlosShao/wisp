@@ -1,0 +1,43 @@
+time=2026-10-17T11:52:03.404+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so
+    anchor_miss_reason_334_test.go:134: the reason is back to naming only the anchor, which is the false accusation ticket 334 is about: "A-list sensitive path (non-overridable): ~/.aws/credentials"
+    anchor_miss_reason_334_test.go:136: reason must name the REAL candidate being rejected ("c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334r1-mut-115159\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2466183164\\001\\profile\\work\\id_ed25519已允许\x1b\u202e"), got:
+        	A-list sensitive path (non-overridable): ~/.aws/credentials
+    anchor_miss_reason_334_test.go:137: reason must name the REAL absent anchor ("C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\portable-334r1-mut-115159\\TestAnchorMissReasonNamesCandidateAndMissingAnchorabsent-aws-le2466183164\\001\\profile\\.aws\\credentials"), got:
+        	A-list sensitive path (non-overridable): ~/.aws/credentials
+    anchor_miss_reason_334_test.go:138: reason must name where the candidate's own walk stopped ("C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\portable-334r1-mut-115159\\TestAnchorMissReasonNamesCandidateAndMissingAnchorabsent-aws-le2466183164\\001\\profile\\work"), got:
+        	A-list sensitive path (non-overridable): ~/.aws/credentials
+    anchor_miss_reason_334_test.go:141: reason must name the home the un-installed anchor collapsed to ("C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\portable-334r1-mut-115159\\TestAnchorMissReasonNamesCandidateAndMissingAnchorabsent-aws-le2466183164\\001\\profile"), got:
+        	A-list sensitive path (non-overridable): ~/.aws/credentials
+    anchor_miss_reason_334_test.go:144: reason must carry the word "fail-closed" so a reader cannot take it for a match, got:
+        	A-list sensitive path (non-overridable): ~/.aws/credentials
+    anchor_miss_reason_334_test.go:144: reason must carry the word "NOT a match" so a reader cannot take it for a match, got:
+        	A-list sensitive path (non-overridable): ~/.aws/credentials
+    anchor_miss_reason_334_test.go:147: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube
+    anchor_miss_reason_334_test.go:158: reason must name the now-missing kube anchor ("C:\\Users\\swq\\AppData\\Local\\wisp-test-gotmp\\portable-334r1-mut-115159\\TestAnchorMissReasonNamesCandidateAndMissingAnchorinstalling-aw2523392457\\001\\profile\\.kube\\config"), got:
+        	A-list sensitive path (non-overridable): ~/.kube/config
+    anchor_miss_reason_334_test.go:159: reason must name the REAL candidate ("c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334r1-mut-115159\\testanchormissreasonnamescandidateandmissinganchorinstalling-aw2523392457\\001\\profile\\work\\id_ed25519已允许\x1b\u202e"), got:
+        	A-list sensitive path (non-overridable): ~/.kube/config
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.02s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so (0.01s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube (0.01s)
+    --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal (0.01s)
+=== RUN   TestAnchorMissKeepsNonOverridableClassAndNeedL2
+    anchor_miss_reason_334_test.go:208: SHAPE-READING334 inside-profile=class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+--- PASS: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.01s)
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.*
+--- PASS: TestFileBaseNameClaimChangesNoClassOrReason (0.01s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.089s
+FAIL

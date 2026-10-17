@@ -1,0 +1,5 @@
+MUT_TAG=M-B rc=1
+RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.03s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so (0.01s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube (0.01s)

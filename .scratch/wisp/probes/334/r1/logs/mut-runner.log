@@ -1,0 +1,37 @@
+### 0 基线（未突变，应全绿）
+MUT_TAG=baseline rc=0
+RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+### 1 突变前哈希
+pre_tree_hash=c1799cd24afce19e6accef23db23a7d7ee746dec committed_blob=c1799cd24afce19e6accef23db23a7d7ee746dec
+### 2 M-A：reason 拼装那一处（分支守卫）⇒ 永远退回今天那枚裸字面串
+326:	if true { // MUTATION 334 M-A reason-assembly branch: always the bare literal
+MUT_TAG=M-A rc=1
+RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.02s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so (0.01s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube (0.01s)
+restored_tree_hash=c1799cd24afce19e6accef23db23a7d7ee746dec committed_blob=c1799cd24afce19e6accef23db23a7d7ee746dec
+### 3 M-B：锚展开那一行 ⇒ 换成不带 root 的裸形
+325:	anchor := pathForms{raw: normPath(anchorSpelling)} // MUTATION 334 M-B anchor-expansion line
+MUT_TAG=M-B rc=1
+RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.03s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so (0.01s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube (0.01s)
+restored_tree_hash=c1799cd24afce19e6accef23db23a7d7ee746dec committed_blob=c1799cd24afce19e6accef23db23a7d7ee746dec
+### 4 M-C：判级放松（正控，必须把 AC#2 咬红）
+360:	return false // MUTATION 334 M-C level relaxation
+MUT_TAG=M-C rc=1
+RUN=10 PASS_TOP=1 FAIL_TOP=2 SKIP=0
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.04s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so (0.01s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube (0.01s)
+--- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.02s)
+restored_tree_hash=c1799cd24afce19e6accef23db23a7d7ee746dec committed_blob=c1799cd24afce19e6accef23db23a7d7ee746dec
+### 5 收尾核对：三枚件全部等于交件字节
+blacklist.go tree=c1799cd24afce19e6accef23db23a7d7ee746dec blob=c1799cd24afce19e6accef23db23a7d7ee746dec
+anchor_miss_reason_334_test.go tree=8f683b04d19c2bbe6956620f1d96338915b48cdd blob=8f683b04d19c2bbe6956620f1d96338915b48cdd
+name_claim_two_arm_216_test.go tree=cbc0a610ae08628a764fb89dde6468a25b5eab61 blob=cbc0a610ae08628a764fb89dde6468a25b5eab61
+### 6 共享工作树未被本腿写过（应空）
+### trap 兜底还原
+restored_tree_hash=c1799cd24afce19e6accef23db23a7d7ee746dec committed_blob=c1799cd24afce19e6accef23db23a7d7ee746dec

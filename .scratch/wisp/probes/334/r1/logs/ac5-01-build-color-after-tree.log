@@ -1,0 +1,8 @@
+date=2026-10-17 11:48:06 +0800 anchor=3a118226 root=/d/W334R1TreeColorAfter
+anchor_full=3a118226bef739dd83df2dd0a55b8b76131d28be Sat Oct 17 11:47:57 2026 +0800
+go_files=746 (取出后先数 .go 证非空)
+top_level_dirs=build cmd docs frontend go.mod go.sum internal models scripts third_party tools 
+docs_plan=present
+dlls_build=3 dlls_sherpa=3 dist=present
+alias83=2026/10/17  11:48    <DIR>          W35CBC~1     W334R1TreeColorAfter
+build_export_tree_rc=0

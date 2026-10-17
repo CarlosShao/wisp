@@ -1,0 +1,8 @@
+date=2026-10-17 11:32:51 +0800 anchor=03f7e7a6 root=/d/W334R1TreeBefore
+anchor_full=03f7e7a63036e22521f630bc18785b31c859a8bb Sat Oct 17 11:16:51 2026 +0800
+go_files=742 (取出后先数 .go 证非空)
+top_level_dirs=build cmd docs frontend go.mod go.sum internal models scripts third_party tools 
+docs_plan=present
+dlls_build=3 dlls_sherpa=3 dist=present
+alias83=
+build_export_tree_rc=0
