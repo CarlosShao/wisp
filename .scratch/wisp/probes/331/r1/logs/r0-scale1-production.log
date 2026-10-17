@@ -1,0 +1,2 @@
+72b65c614af0a8441f0c2d31ddbe4569c42d4d20:internal/observe/errors.go:160:// MessageKey returns the stable user-visible copy key for the class. The copy
+72b65c614af0a8441f0c2d31ddbe4569c42d4d20:internal/observe/errors.go:163:func (c ErrorClass) MessageKey() string {

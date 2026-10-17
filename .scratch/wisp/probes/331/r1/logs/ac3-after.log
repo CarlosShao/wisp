@@ -1,0 +1,145 @@
+=== RUN   TestTimeoutIsMonotonic
+--- PASS: TestTimeoutIsMonotonic (0.09s)
+=== RUN   TestWallTimestampUTC
+--- PASS: TestWallTimestampUTC (0.00s)
+=== RUN   TestDiagnosticsBundleCollectsAndRedacts
+--- PASS: TestDiagnosticsBundleCollectsAndRedacts (0.01s)
+=== RUN   TestDiagnosticsBundleFailClosedOnSurvivingKey
+--- PASS: TestDiagnosticsBundleFailClosedOnSurvivingKey (0.00s)
+=== RUN   TestDiagnosticsBundleRecordsMissingPieces
+--- PASS: TestDiagnosticsBundleRecordsMissingPieces (0.00s)
+=== RUN   TestEarlyLogBufferReplaysInCaptureOrderThenStops
+--- PASS: TestEarlyLogBufferReplaysInCaptureOrderThenStops (0.00s)
+=== RUN   TestEarlyLogBufferOverflowIsABookedFact
+--- PASS: TestEarlyLogBufferOverflowIsABookedFact (0.00s)
+=== RUN   TestEarlyLogBufferByteCapAlsoStopsAppending
+--- PASS: TestEarlyLogBufferByteCapAlsoStopsAppending (0.00s)
+=== RUN   TestEarlyLogBufferCarriesTheWithChain
+--- PASS: TestEarlyLogBufferCarriesTheWithChain (0.00s)
+=== RUN   TestEarlyTeeNeverStopsMirroring
+--- PASS: TestEarlyTeeNeverStopsMirroring (0.00s)
+=== RUN   TestEarlyTeeLevelGateIsTheConsoles
+--- PASS: TestEarlyTeeLevelGateIsTheConsoles (0.00s)
+=== RUN   TestInstalledEarlyTeeMirrorsToAConcreteHandler
+--- PASS: TestInstalledEarlyTeeMirrorsToAConcreteHandler (0.00s)
+=== RUN   TestAllClassesHasExactly17
+--- PASS: TestAllClassesHasExactly17 (0.00s)
+=== RUN   TestClassMappingAndRetry
+--- PASS: TestClassMappingAndRetry (0.00s)
+=== RUN   TestMappedStatesAreValidBallStates
+--- PASS: TestMappedStatesAreValidBallStates (0.00s)
+=== RUN   TestErrorTypeAndClassOf
+--- PASS: TestErrorTypeAndClassOf (0.00s)
+=== RUN   TestValidateErrorClass
+--- PASS: TestValidateErrorClass (0.00s)
+=== RUN   TestMessageKeys
+--- PASS: TestMessageKeys (0.00s)
+=== RUN   TestNoopTaskReturnsToBaseline
+--- PASS: TestNoopTaskReturnsToBaseline (0.01s)
+=== RUN   TestPanicInWorkerSurvivesAndCancelsRoot
+--- PASS: TestPanicInWorkerSurvivesAndCancelsRoot (0.00s)
+=== RUN   TestUnknownNameIsLeakSymptom
+time=2026-10-17T09:52:40.297+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mystery-worker owner=test
+--- PASS: TestUnknownNameIsLeakSymptom (0.00s)
+=== RUN   TestRootWaitTimeout
+--- PASS: TestRootWaitTimeout (0.06s)
+=== RUN   TestClassifyGoroutine
+--- PASS: TestClassifyGoroutine (0.00s)
+=== RUN   TestRedactSecretAttrKeepsLast4Only
+--- PASS: TestRedactSecretAttrKeepsLast4Only (0.00s)
+=== RUN   TestRedactInlineKeyShapes
+--- PASS: TestRedactInlineKeyShapes (0.00s)
+=== RUN   TestRedactAudioBufferNeverLogged
+--- PASS: TestRedactAudioBufferNeverLogged (0.00s)
+=== RUN   TestRedactFetchBodyNeverLogged
+--- PASS: TestRedactFetchBodyNeverLogged (0.00s)
+=== RUN   TestRedactLongArgTruncated
+--- PASS: TestRedactLongArgTruncated (0.00s)
+=== RUN   TestRedactPathsOptIn
+--- PASS: TestRedactPathsOptIn (0.00s)
+=== RUN   TestRedactBakedInAttrsRedacted
+--- PASS: TestRedactBakedInAttrsRedacted (0.00s)
+=== RUN   TestRollingWriterSizeRoll
+--- PASS: TestRollingWriterSizeRoll (0.00s)
+=== RUN   TestRollingWriterDayRoll
+--- PASS: TestRollingWriterDayRoll (0.00s)
+=== RUN   TestRollingWriterRetentionSweep
+--- PASS: TestRollingWriterRetentionSweep (0.00s)
+=== RUN   TestLogPipelineEndToEnd
+--- PASS: TestLogPipelineEndToEnd (0.00s)
+=== RUN   TestLogPipelineConcurrentWrites
+--- PASS: TestLogPipelineConcurrentWrites (0.00s)
+=== RUN   TestNoBareGoFuncInProductionCode
+--- PASS: TestNoBareGoFuncInProductionCode (0.14s)
+=== RUN   TestInTreeCPURowRecordedNeverGated
+--- PASS: TestInTreeCPURowRecordedNeverGated (0.00s)
+=== RUN   TestOutOfTreeCPURowStillGatesAtSameLimit
+--- PASS: TestOutOfTreeCPURowStillGatesAtSameLimit (0.06s)
+=== RUN   TestInTreeDemotionTouchesOnlyTheCPURow
+--- PASS: TestInTreeDemotionTouchesOnlyTheCPURow (0.00s)
+=== RUN   TestFakeTreeEmptyScriptFailsClosedAndNotPanics
+--- PASS: TestFakeTreeEmptyScriptFailsClosedAndNotPanics (0.00s)
+=== RUN   TestFakeTreeScriptedReadsStillRepeatLastReading
+--- PASS: TestFakeTreeScriptedReadsStillRepeatLastReading (0.00s)
+=== RUN   TestBareFakeTreeNormalSamplingCaseGoesRedThroughErrorChannel
+--- PASS: TestBareFakeTreeNormalSamplingCaseGoesRedThroughErrorChannel (0.00s)
+=== RUN   TestCheckSettleSingleTrustworthyReadReportsItsLoss
+--- PASS: TestCheckSettleSingleTrustworthyReadReportsItsLoss (0.10s)
+=== RUN   TestCheckSettleHalfTheReadsFailedReportsItsLoss
+--- PASS: TestCheckSettleHalfTheReadsFailedReportsItsLoss (0.10s)
+=== RUN   TestCheckSettleZeroFootprintDropsAreCountedToo
+--- PASS: TestCheckSettleZeroFootprintDropsAreCountedToo (0.10s)
+=== RUN   TestCheckSettleFullyMeasuredWindowReportsNoLoss
+--- PASS: TestCheckSettleFullyMeasuredWindowReportsNoLoss (0.10s)
+=== RUN   TestSettleCoverageRowExistsAndPassesWhenFullyMeasured
+--- PASS: TestSettleCoverageRowExistsAndPassesWhenFullyMeasured (0.20s)
+=== RUN   TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed
+--- PASS: TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed (0.20s)
+=== RUN   TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured
+--- PASS: TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured (0.40s)
+=== RUN   TestFoldSettlePassOnlyGateRowsVeto
+--- PASS: TestFoldSettlePassOnlyGateRowsVeto (0.00s)
+=== RUN   TestSettleReportPassNeverContradictsItsGateRows
+--- PASS: TestSettleReportPassNeverContradictsItsGateRows (0.80s)
+=== RUN   TestStateReportVerdictBuilderStaysSinglePurpose
+--- PASS: TestStateReportVerdictBuilderStaysSinglePurpose (0.00s)
+=== RUN   TestCheckSettleZeroTrustworthySamplesFailsClosed
+--- PASS: TestCheckSettleZeroTrustworthySamplesFailsClosed (0.10s)
+=== RUN   TestCheckSettleTrustworthyReadsAreRecorded
+--- PASS: TestCheckSettleTrustworthyReadsAreRecorded (0.10s)
+=== RUN   TestSLOStateNamesPinnedToMachineStates
+--- PASS: TestSLOStateNamesPinnedToMachineStates (0.00s)
+=== RUN   TestSampleStateAllMetricsAndVerdicts
+--- PASS: TestSampleStateAllMetricsAndVerdicts (0.12s)
+=== RUN   TestSampleStateSleepingDiskWriteGateFails
+--- PASS: TestSampleStateSleepingDiskWriteGateFails (0.06s)
+=== RUN   TestSampleStateSleepingTCPGateFails
+--- PASS: TestSampleStateSleepingTCPGateFails (0.04s)
+=== RUN   TestSampleStateHandleGateUsesRulingLimit
+--- PASS: TestSampleStateHandleGateUsesRulingLimit (0.04s)
+=== RUN   TestSampleStateWorkPeakMemoryIsTargetNotGate
+--- PASS: TestSampleStateWorkPeakMemoryIsTargetNotGate (0.04s)
+=== RUN   TestSampleStateLeakFixtureFlipsRed
+--- PASS: TestSampleStateLeakFixtureFlipsRed (0.04s)
+=== RUN   TestSampleStateCPUTotalDrivenMean
+--- PASS: TestSampleStateCPUTotalDrivenMean (0.10s)
+=== RUN   TestSampleStateUnknownStateAndReaderError
+--- PASS: TestSampleStateUnknownStateAndReaderError (0.00s)
+=== RUN   TestMarkTransitionTimestamps
+--- PASS: TestMarkTransitionTimestamps (0.00s)
+=== RUN   TestCheckSettleVerifiesReleaseCounter
+--- PASS: TestCheckSettleVerifiesReleaseCounter (0.20s)
+=== RUN   TestCheckSettleNeverReachesCap
+--- PASS: TestCheckSettleNeverReachesCap (0.08s)
+=== RUN   TestSamplerGoroutineAccountingFollowsRegistry
+--- PASS: TestSamplerGoroutineAccountingFollowsRegistry (0.03s)
+=== RUN   TestLiveRegistryBaselineWithinSleepingGate
+--- PASS: TestLiveRegistryBaselineWithinSleepingGate (0.00s)
+=== RUN   TestThresholdTableCoversAllStates
+--- PASS: TestThresholdTableCoversAllStates (0.00s)
+=== RUN   TestSampleStateZeroSampleWindowFailsClosed
+--- PASS: TestSampleStateZeroSampleWindowFailsClosed (0.05s)
+=== RUN   TestSampleStateTrustworthyWindowNotMarkedUnmeasurable
+--- PASS: TestSampleStateTrustworthyWindowNotMarkedUnmeasurable (0.06s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/observe	3.603s

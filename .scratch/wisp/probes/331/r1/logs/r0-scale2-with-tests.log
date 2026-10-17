@@ -1,0 +1,8 @@
+72b65c614af0a8441f0c2d31ddbe4569c42d4d20:internal/llm/matrix_14_2_test.go:175:	if turn.Err.Class.MessageKey() == "" {
+72b65c614af0a8441f0c2d31ddbe4569c42d4d20:internal/llm/matrix_14_2_test.go:249:	if qe.Class.MessageKey() == ne.Class.MessageKey() {
+72b65c614af0a8441f0c2d31ddbe4569c42d4d20:internal/observe/errors.go:160:// MessageKey returns the stable user-visible copy key for the class. The copy
+72b65c614af0a8441f0c2d31ddbe4569c42d4d20:internal/observe/errors.go:163:func (c ErrorClass) MessageKey() string {
+72b65c614af0a8441f0c2d31ddbe4569c42d4d20:internal/observe/errors_test.go:186:// TestMessageKeys pins the user-visible copy hooks (the copy text itself is
+72b65c614af0a8441f0c2d31ddbe4569c42d4d20:internal/observe/errors_test.go:188:func TestMessageKeys(t *testing.T) {
+72b65c614af0a8441f0c2d31ddbe4569c42d4d20:internal/observe/errors_test.go:191:		if got := c.MessageKey(); got != want {
+72b65c614af0a8441f0c2d31ddbe4569c42d4d20:internal/observe/errors_test.go:192:			t.Errorf("MessageKey(%s) = %q, want %q", c, got, want)

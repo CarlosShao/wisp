@@ -1,0 +1,8 @@
+票331 落地腿331-r1 判据AC#1：internal/observe/errors.go 只改整行注释面
+
+把自称 "UI and logs embed the key" 的三行过期注释改成说实话三件事实：
+① 键是为 D23/S6 文案层预备的；② 2026-10-17 现读生产嵌键 0 枚
+（消费者只有 errors_test.go TestMessageKeys 与 matrix_14_2_test.go）；
+③ 文案层仍归 SPEC-12 §5 DEFERRED。AC#2 尺：滤整行注释后锚 blob ⇄
+工作树同串（sha 两侧同值 rc=0），正控非注释改一枚字面量回 rc=1；
+逐行核改动 10 枚、非整行注释 0 枚。MessageKey() 一字未动。

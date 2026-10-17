@@ -1,0 +1,9 @@
+}
+
+// MessageKey returns the stable user-visible copy key for the class. The copy
+// text itself is deferred (D23 error-copy work, S6); UI and logs embed the key
+// so copy can be added later without re-touching error sites.
+func (c ErrorClass) MessageKey() string {
+	return "error." + string(c)
+}
+
