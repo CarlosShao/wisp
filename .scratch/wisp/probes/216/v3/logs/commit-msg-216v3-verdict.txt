@@ -1,0 +1,17 @@
+票 216 裁腿 216-v3 判语件：docs/evidence/s1/216-v3-verdict.md（58 行／10913 字节／短名⛔带§／占位符尺五枚分词形 0 命中＋宽形 0，同尺在 docs/evidence/s1 三枚既有件看得见 TODO＝尺不瞎的正控）
+
+十二格判语（判语只用 成立／不成立／不适用／不可判）：
+· J1 ⓐ 算子钉有牙＝成立（我自己重放 M1：EqualFold→Contains ⇒ allow_substring_pin_216_test.go:83 回 1，窗 12 行 markers=1）
+· J2 ⓑ 两臂差试有牙＝成立（M2：B 循环插"含 已允许 就 ClassNone" ⇒ name_claim_two_arm_216_test.go:105 hostile "= none" 三枚子用例红，ⓐ 三窗仍 0/0/0＝两发落点不同互为盲证）
+· J3 必答题（shellAllowlisted 整枚改名 3 处同改、编译不断）＝成立：ⓐ 红不静默，红句归位 :68
+· J4 "C 卷那枚红＝名字里的『已允许』改了判定"＝不成立（探针：声明单飞／Cf 单飞皆仍 B、与 plain 逐字全等；改档的只有 U+001B）
+· J5 "那枚红＝ⓑ 的牙（M2 那一形）"＝不成立（M2 打在 C 台面四数与未突变同，红句 hostile 读 = A ＝ fail-closed 抢在 B 循环前 ⇒ 会冒充牙证）
+· J6 reason 在哪枚匹配下返回＝成立，逐环 file:line＝tailExistsBelow→pathExists（Lstat 报 syntax incorrect ⇒ partial=true）→certain()=false→aRelates 回落 uncertainAnchorMiss→blacklist.go:223-224（锚的 .aws 今天缺位 ⇒ anchor.root 停在主目录 ⇒ isUnder 真）
+· J7 "%LOCALAPPDATA% 是必要条件"＝不成立（C:\Users\swq\wisp216v3-home 红 ⇄ C:\Users\Public\wisp216v3-pub 绿，同卷）
+· J8 "主目录祖先链是必要条件"＝成立（假主目录全在 D 卷照样红；补造 .aws 后 reason 换成 ~/.kube/config ⇒ reason 说的是哪枚锚缺位，⛔ 候选身份）
+· J9 "机主今天真实会撞"＝成立（Resolve.err=nil ⇒ Classify=A、Gate=A；%APPDATA%\wisp\logs 盘上在场；生产点 internal/tools/mode.go:98 与 paths.go:380→rules_gateway.go:77 TierA⇒Deny 不可豁免）
+· J10 "ⓐ 恒 0 ⇒ 判级链没有子串放行"＝不成立（M2 实测；要全链钉住得 def-use 级仪器，⛔ 本腿造）
+· J11 AC#6 两枚必做钉今天落地＝成立（载体＝可达四枚；本腿现跑 attachment 进 risk/perm/tools/agent＝rc=1 0 文件、正控 params 3 枚在场 ⇒ ⛔ 恒绿装饰那形没犯）
+· J12 整包另一枚红 TestC26RewriteAccountIsConsumedAtEverySecurityLeg＝不适用（两把台面都红、具名 internal/panel/composer.go:127＋display_scrub_216.go:26/37/228＝216-r1 面，216-r2 已具名上交归 A##）
+★新抓一条给编排者的后果：CI 那把台面会红——portable-tests.sh:155-159 把 GOTMPDIR 钉在 %LOCALAPPDATA%\wisp-test-gotmp（主目录链内）、./internal/risk/ 在 test-windows 射程（:331），本腿照该形复跑＝24/5/1/0；挪卷躲不掉（ticket 311 AC#1 GUARD 要求同卷）。
+⛔ 翻框 ⛔ 改判据文字 ⛔ 动断言 ⛔ 产码 ⛔ push；写面＝本件＋.scratch/wisp/probes/216/v3/**＋票尾一条。
