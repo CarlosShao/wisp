@@ -1,0 +1,479 @@
+332-a1 本腿唯一执行过的代码＝下面四枚仓外单文件纯 stdlib 探针（⛔ import 本仓包、⛔ go test/go build/go vet；一律 go run，GOTMPDIR=D:\tmp\332a1\gotmp，go1.27.1 windows/amd64）
+落盘路径逐枚具名：D:\tmp\332a1\cfprobe\main.go／D:\tmp\332a1\carrier\main.go／D:\tmp\332a1\diskroster\main.go／D:\tmp\332a1\mncount\main.go
+===== 1) cfprobe/main.go（起手尺②＋名单⇄行为一致性自证）=====
+// 332-a1 起手尺②探针：独立复跑「全标量 unicode.Is(unicode.Cf, r) 枚数」。
+// 纯 stdlib、⛔ import 本仓任何包、⛔ 本仓包参与编译。唯一执行过的代码＝本枚文件。
+//
+// 下面四个函数（isDisplayWashCf / writeControlEscape / scrubForDisplay /
+// needsDisplayWash）是从具名提交树 7535d83b 的
+// internal/panel/display_scrub_216.go 第 106-136、164-175、179-199、211-220 行
+// **逐字重打**（函数体一字未改，仅 package 头与注释换成本文件）。
+package main
+
+import (
+	"fmt"
+	"strings"
+	"unicode"
+	"unicode/utf8"
+)
+
+// ---- 逐字重打自 display_scrub_216.go:164-175 ----
+func isDisplayWashCf(r rune) bool {
+	switch r {
+	case 0x00AD,
+		0x200B, 0x200C, 0x200D,
+		0x2060, 0xFEFF,
+		0x202A, 0x202B, 0x202C, 0x202D, 0x202E,
+		0x2066, 0x2067, 0x2068, 0x2069:
+		return true
+	default:
+		return false
+	}
+}
+
+// ---- 逐字重打自 display_scrub_216.go:179-199 ----
+func writeControlEscape(b *strings.Builder, r rune) {
+	switch r {
+	case '\n':
+		b.WriteString(`\n`)
+	case '\r':
+		b.WriteString(`\r`)
+	case '\t':
+		b.WriteString(`\t`)
+	case '\x00':
+		b.WriteString(`\0`)
+	default:
+		if r <= 0xff {
+			fmt.Fprintf(b, `\x%02x`, r)
+			return
+		}
+		fmt.Fprintf(b, `\u%04x`, r)
+	}
+}
+
+// ---- 逐字重打自 display_scrub_216.go:106-136 ----
+func scrubForDisplay(s string) string {
+	if !needsDisplayWash(s) {
+		return s
+	}
+	var b strings.Builder
+	b.Grow(len(s) + 16)
+	for i := 0; i < len(s); {
+		r, size := utf8.DecodeRuneInString(s[i:])
+		switch {
+		case r == utf8.RuneError && size == 1:
+			fmt.Fprintf(&b, `\x%02x`, s[i])
+			i++
+		case unicode.IsControl(r):
+			writeControlEscape(&b, r)
+			i += size
+		case isDisplayWashCf(r):
+			writeControlEscape(&b, r)
+			i += size
+		default:
+			b.WriteRune(r)
+			i += size
+		}
+	}
+	return b.String()
+}
+
+// ---- 逐字重打自 display_scrub_216.go:211-220 ----
+func needsDisplayWash(s string) bool {
+	for i := 0; i < len(s); {
+		r, size := utf8.DecodeRuneInString(s[i:])
+		if (r == utf8.RuneError && size == 1) || unicode.IsControl(r) || isDisplayWashCf(r) {
+			return true
+		}
+		i += size
+	}
+	return false
+}
+
+func main() {
+	fmt.Printf("GO_UNICODE_VERSION=%s\n", unicode.Version)
+	total := 0
+	washed := 0
+	var lines []string
+	for r := rune(0); r <= utf8.MaxRune; r++ {
+		if r >= 0xD800 && r <= 0xDFFF { // ⛔ 代理区：不是标量值
+			continue
+		}
+		if !unicode.Is(unicode.Cf, r) {
+			continue
+		}
+		total++
+		inRoster := isDisplayWashCf(r)
+		if inRoster {
+			washed++
+		}
+		// 逐枚自证：把单独一枚 Cf 送进 scrubForDisplay，看它是否被换成可见转义形。
+		single := string(r)
+		out := scrubForDisplay(single)
+		changed := out != single
+		mark := "RAW"
+		if changed {
+			mark = "WASHED"
+		}
+		tag := "N"
+		if inRoster {
+			tag = "Y"
+		}
+		// 一致性自证：名单判定 ⇄ 实际行为 必须一致，否则这枚读数不可用。
+		consist := "OK"
+		if inRoster != changed {
+			consist = "MISMATCH"
+		}
+		lines = append(lines, fmt.Sprintf("%04X\tcat=Cf\troster=%s\tout=%q\t%s\t%s", r, tag, out, mark, consist))
+	}
+	fmt.Printf("CF_TOTAL=%d\n", total)
+	fmt.Printf("CF_IN_ROSTER=%d\n", washed)
+	fmt.Printf("CF_OUTSIDE_ROSTER=%d\n", total-washed)
+	// 名单里但不是 Cf 的枚数（应为 0，除 U+00AD 之外都在 Cf；U+00AD 是 Cf，验证）
+	nonCfInRoster := 0
+	for _, r := range []rune{0x00AD, 0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF, 0x202A, 0x202B, 0x202C, 0x202D, 0x202E, 0x2066, 0x2067, 0x2068, 0x2069} {
+		if !unicode.Is(unicode.Cf, r) {
+			nonCfInRoster++
+			fmt.Printf("ROSTER_RUNE_NOT_CF=%04X\n", r)
+		}
+	}
+	fmt.Printf("ROSTER_SIZE=15 ROSTER_NOT_CF=%d\n", nonCfInRoster)
+	fmt.Println("--- ROSTER BEGIN ---")
+	for _, l := range lines {
+		fmt.Println(l)
+	}
+	fmt.Println("--- ROSTER END ---")
+	// MISMATCH 计数（必须为 0 才能用这张表当读数）
+	mism := 0
+	for _, l := range lines {
+		if strings.Contains(l, "MISMATCH") {
+			mism++
+		}
+	}
+	fmt.Printf("MISMATCH_COUNT=%d\n", mism)
+}
+===== 2) carrier/main.go（AC#3 真盘＋marshal dump＋四把筛检尺）=====
+// 332-a1 AC#3 载体正控探针：两枚名单外 Cf（U+2061 / U+206B）走一遍真盘＋真 marshal。
+// 纯 stdlib、⛔ import 本仓任何包。唯一执行过的代码＝本枚文件与同目录 main.go。
+//
+// scrubForDisplay / isDisplayWashCf / writeControlEscape / needsDisplayWash 四段
+// ＝具名提交树 7535d83b 的 internal/panel/display_scrub_216.go 第 106-136、
+// 164-175、179-199、211-220 行的**逐字重打**（函数体一字未改）。
+package main
+
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+	"unicode"
+	"unicode/utf8"
+)
+
+func isDisplayWashCf(r rune) bool {
+	switch r {
+	case 0x00AD,
+		0x200B, 0x200C, 0x200D,
+		0x2060, 0xFEFF,
+		0x202A, 0x202B, 0x202C, 0x202D, 0x202E,
+		0x2066, 0x2067, 0x2068, 0x2069:
+		return true
+	default:
+		return false
+	}
+}
+
+func writeControlEscape(b *strings.Builder, r rune) {
+	switch r {
+	case '\n':
+		b.WriteString(`\n`)
+	case '\r':
+		b.WriteString(`\r`)
+	case '\t':
+		b.WriteString(`\t`)
+	case '\x00':
+		b.WriteString(`\0`)
+	default:
+		if r <= 0xff {
+			fmt.Fprintf(b, `\x%02x`, r)
+			return
+		}
+		fmt.Fprintf(b, `\u%04x`, r)
+	}
+}
+
+func scrubForDisplay(s string) string {
+	if !needsDisplayWash(s) {
+		return s
+	}
+	var b strings.Builder
+	b.Grow(len(s) + 16)
+	for i := 0; i < len(s); {
+		r, size := utf8.DecodeRuneInString(s[i:])
+		switch {
+		case r == utf8.RuneError && size == 1:
+			fmt.Fprintf(&b, `\x%02x`, s[i])
+			i++
+		case unicode.IsControl(r):
+			writeControlEscape(&b, r)
+			i += size
+		case isDisplayWashCf(r):
+			writeControlEscape(&b, r)
+			i += size
+		default:
+			b.WriteRune(r)
+			i += size
+		}
+	}
+	return b.String()
+}
+
+func needsDisplayWash(s string) bool {
+	for i := 0; i < len(s); {
+		r, size := utf8.DecodeRuneInString(s[i:])
+		if (r == utf8.RuneError && size == 1) || unicode.IsControl(r) || isDisplayWashCf(r) {
+			return true
+		}
+		i += size
+	}
+	return false
+}
+
+// isIgnorableTaintRune ＝具名提交树 7535d83b 的 internal/risk/taintmatch.go:39-45
+// 逐字重打（只为量"判定层那张表对 155 枚里哪几枚响"，⛔ 动它一字）。
+func isIgnorableTaintRune(r rune) bool {
+	switch r {
+	case 0x00AD, 0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF:
+		return true
+	}
+	return unicode.Is(unicode.Mn, r)
+}
+
+type cfProbe struct {
+	CP     rune `json:"-"`
+	Name   string
+	Carrier string
+}
+
+func main() {
+	base := os.Getenv("WISP332_BASE")
+	if base == "" {
+		base = `D:\tmp\332a1\disk`
+	}
+	// ---- ① 真盘上正控：两枚名单外 Cf 作真名写到 NTFS，再读回 ----
+	if err := os.MkdirAll(base, 0o755); err != nil {
+		fmt.Println("MKDIR_FAIL", err)
+		os.Exit(1)
+	}
+	cases := []cfProbe{
+		{CP: 0x2061, Name: "FUNCTION APPLICATION", Carrier: "名单外（数学作用符）"},
+		{CP: 0x206B, Name: "ACTIVATE SYMMETRIC SWAPPING", Carrier: "名单外（已弃用换形符）"},
+		{CP: 0x202E, Name: "RIGHT-TO-LEFT OVERRIDE", Carrier: "名单内正控（应被洗成可见转义）"},
+		{CP: 0x001B, Name: "ESCAPE", Carrier: "Cc 正控（应被洗成 \\x1b）"},
+	}
+	for _, c := range cases {
+		fname := fmt.Sprintf("photo%creport.txt", c.CP)
+		full := filepath.Join(base, fname)
+		if err := os.WriteFile(full, []byte("x"), 0o644); err != nil {
+			fmt.Printf("DISK_WRITE_FAIL cp=U+%04X err=%v\n", c.CP, err)
+			continue
+		}
+		entries, err := os.ReadDir(base)
+		if err != nil {
+			fmt.Println("READDIR_FAIL", err)
+			continue
+		}
+		var found []string
+		for _, e := range entries {
+			if e.Name() == fname {
+				found = append(found, e.Name())
+			}
+		}
+		h := sha256.Sum256([]byte(fname))
+		fmt.Printf("DISK cp=U+%04X name=%q created=%v readdir_hit=%d raw_utf8_hex=%s name_sha256=%x\n",
+			c.CP, fname, true, len(found), strings.ToUpper(hex.EncodeToString([]byte(fname))), h)
+	}
+	names, _ := os.ReadDir(base)
+	var listed []string
+	for _, n := range names {
+		listed = append(listed, n.Name())
+	}
+	sort.Strings(listed)
+	fmt.Printf("DISK_ROSTER_COUNT=%d\n", len(listed))
+
+	// ---- ② 过显示边界（逐字重打的 scrubForDisplay）＋ json.Marshal（同 pump.go:359 那把尺）----
+	for _, c := range cases {
+		raw := fmt.Sprintf("photo%creport.txt", c.CP)
+		need := needsDisplayWash(raw)
+		washed := scrubForDisplay(raw)
+		bRaw, _ := json.Marshal(raw)
+		bWashed, _ := json.Marshal(washed)
+		fmt.Printf("BOUNDARY cp=U+%04X needsDisplayWash=%v washed_changed=%v washed=%q\n", c.CP, need, washed != raw, washed)
+		fmt.Printf("  MARSHAL_RAW    hex=%s\n", strings.ToUpper(hex.EncodeToString(bRaw)))
+		fmt.Printf("  MARSHAL_WASHED hex=%s\n", strings.ToUpper(hex.EncodeToString(bWashed)))
+		fmt.Printf("  MARSHAL_WASHED_STR %s\n", string(bWashed))
+		fmt.Printf("  MARSHAL_WASHED_SHA256 %x\n", sha256.Sum256(bWashed))
+	}
+
+	// ---- ③ 逐枚筛检尺：155 枚名单外 Cf 对四把生产者侧筛检各自响不响 ----
+	var nSpace, nTaint, nJSONEsc, nControl, nRaw uint64
+	var exJSONEsc []string
+	for r := rune(0); r <= utf8.MaxRune; r++ {
+		if r >= 0xD800 && r <= 0xDFFF {
+			continue
+		}
+		if !unicode.Is(unicode.Cf, r) || isDisplayWashCf(r) {
+			continue
+		}
+		s := string(r)
+		raw := "photo" + s + "report.txt"
+		after := scrubForDisplay(raw)
+		if after == raw {
+			nRaw++
+		}
+		if unicode.IsSpace(r) {
+			nSpace++
+		}
+		if isIgnorableTaintRune(r) {
+			nTaint++
+		}
+		if unicode.IsControl(r) {
+			nControl++
+		}
+		b, _ := json.Marshal(map[string]string{"canonical": raw})
+		if strings.Contains(string(b), fmt.Sprintf(`\u%04x`, r)) {
+			nJSONEsc++
+			if len(exJSONEsc) < 6 {
+				exJSONEsc = append(exJSONEsc, fmt.Sprintf("U+%04X", r))
+			}
+		}
+	}
+	fmt.Printf("SCREEN total_outside=155 scrub_leaves_raw=%d unicode_is_space=%d taint_ignores=%d unicode_is_control=%d json_escapes=%d json_escape_examples=%s\n",
+		nRaw, nSpace, nTaint, nControl, nJSONEsc, strings.Join(exJSONEsc, ","))
+}
+===== 3) diskroster/main.go（155 枚逐枚真盘尺＋8 枚对照）=====
+// 332-a1 载体 (a) 逐枚真盘尺：155 枚名单外 Cf 一枚一枚真往 NTFS 上写名、读回、比对，
+// 再删；另加 8 枚对照（Cc 与名单内 Cf）。纯 stdlib、⛔ import 本仓任何包。
+package main
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"unicode"
+	"unicode/utf8"
+)
+
+func isDisplayWashCf(r rune) bool {
+	switch r {
+	case 0x00AD, 0x200B, 0x200C, 0x200D,
+		0x2060, 0xFEFF,
+		0x202A, 0x202B, 0x202C, 0x202D, 0x202E,
+		0x2066, 0x2067, 0x2068, 0x2069:
+		return true
+	default:
+		return false
+	}
+}
+
+func tryName(base, name string) string {
+	full := filepath.Join(base, name)
+	f, err := os.Create(full)
+	if err != nil {
+		return "WRITE_FAIL: " + strings.TrimSpace(err.Error())
+	}
+	f.Close()
+	entries, err := os.ReadDir(base)
+	if err != nil {
+		return "READDIR_FAIL: " + err.Error()
+	}
+	for _, e := range entries {
+		if e.Name() == name {
+			// 读回＝逐枚字节比对；★只建不删——155 枚同时躺在一张目录里这一事实本身
+			// 也是一枚读数（末行 DISK_REMAINING 就是它的尺）。
+			return "READBACK_OK"
+		}
+	}
+	return "READBACK_MISS"
+}
+
+func main() {
+	base := `D:\tmp\332a1\diskroster`
+	if err := os.MkdirAll(base, 0o755); err != nil {
+		fmt.Println("MKDIR_FAIL", err)
+		return
+	}
+	var ok, fail int
+	var fails []string
+	for r := rune(0); r <= utf8.MaxRune; r++ {
+		if r >= 0xD800 && r <= 0xDFFF {
+			continue
+		}
+		if !unicode.Is(unicode.Cf, r) || isDisplayWashCf(r) {
+			continue
+		}
+		name := fmt.Sprintf("p%cq.txt", r)
+		res := tryName(base, name)
+		if res == "READBACK_OK" {
+			ok++
+			fmt.Printf("U+%04X\tDISK_A\t%s\n", r, res)
+		} else {
+			fail++
+			fails = append(fails, fmt.Sprintf("U+%04X\t%s", r, res))
+			fmt.Printf("U+%04X\tDISK_F\t%s\n", r, res)
+		}
+	}
+	fmt.Printf("DISK_ROSTER_SUM outside=155 ok=%d fail=%d\n", ok, fail)
+	if len(fails) > 0 {
+		fmt.Printf("DISK_ROSTER_FAILS=%s\n", strings.Join(fails, " "))
+	}
+	fmt.Println("--- 8 枚对照（Cc 与名单内 Cf）---")
+	for _, r := range []rune{0x0000, 0x0009, 0x000A, 0x000D, 0x001B, 0x001F, 0x0085, 0x009B, 0x202E, 0x200B, 0xFEFF} {
+		name := fmt.Sprintf("c%cq.txt", r)
+		fmt.Printf("CONTROL U+%04X\t%s\n", r, tryName(base, name))
+	}
+	left, _ := os.ReadDir(base)
+	fmt.Printf("DISK_REMAINING=%d\n", len(left))
+}
+===== 4) mncount/main.go（起手尺④补尺：Mn 族枚数与两表交集）=====
+// 332-a1 起手尺④补尺：internal/risk/taintmatch.go:39-45 那张判定表的真实射程
+// ＝6 枚显名码位＋整个 unicode.Mn 族；这里只量 Mn 族的枚数与两表交集。纯 stdlib。
+package main
+
+import (
+	"fmt"
+	"unicode"
+	"unicode/utf8"
+)
+
+func main() {
+	mn := 0
+	mnCf := 0
+	var named = []rune{0x00AD, 0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF}
+	for r := rune(0); r <= utf8.MaxRune; r++ {
+		if r >= 0xD800 && r <= 0xDFFF {
+			continue
+		}
+		if unicode.Is(unicode.Mn, r) {
+			mn++
+			if unicode.Is(unicode.Cf, r) {
+				mnCf++
+			}
+		}
+	}
+	fmt.Printf("MN_TOTAL=%d MN_INTERSECT_CF=%d\n", mn, mnCf)
+	display := map[rune]bool{0x00AD: true, 0x200B: true, 0x200C: true, 0x200D: true, 0x2060: true, 0xFEFF: true,
+		0x202A: true, 0x202B: true, 0x202C: true, 0x202D: true, 0x202E: true, 0x2066: true, 0x2067: true, 0x2068: true, 0x2069: true}
+	in := 0
+	for _, r := range named {
+		if display[r] {
+			in++
+		}
+	}
+	fmt.Printf("TAINT_NAMED=%d TAINT_NAMED_ALSO_IN_DISPLAY=%d JUDGEMENT_TABLE_SIZE=6+%d=%d\n", len(named), in, mn, 6+mn)
+}
