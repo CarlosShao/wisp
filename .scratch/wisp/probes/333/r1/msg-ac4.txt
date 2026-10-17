@@ -1,0 +1,14 @@
+票 333 产码腿 333-r1·AC#4＝新建两侧同集钉（整族逐枚，⛔ 抽样冒充整族）
+
+新建 internal/panel/display_scrub_333_333r1_test.go（126 行＝帽内，gofumpt 干净）：
+- TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies：Cf 整族逐枚 ⇄ Cc 整族逐枚
+  ＋22 枚具名边界（同一份 boundary 名册＝327-r2 nail 3 那 22 枚），三臂三枚不同断言行：
+  臂1 判据必须"响"（快路哑＝写入侧根本不会跑）、臂2 写入侧必须真转义、臂3 两臂不许分歧。
+  补一枚正控：Cf==0 或 Cc==0 直接红（射程空转不当通过）＝"⛔ 抽样冒充整族"的牙；
+- TestDisplayWashEscapesAndNeverDeletesAcrossTheWholeCategory：对扩集后的 Cf 整族逐枚
+  钉"转义⛔ 删除"（原位精确形状＋两半可见字节不许接成新名字）与幂等，并用
+  examined==len(washSetOver(isDisplayWashCf)) 钉住"这一臂真的跑满了产品洗集"；
+- 现跑（logs/ac4-new-nails.log，-run TestDisplayWash 五枚）：RUN=5 PASS_TOP=5 FAIL_TOP=0 SKIP=0；
+  读数 AC#4 scope: full Cf=170, full Cc=65, boundaries=22, failures=0；
+  AC#8 arm: examined=170, product washes=170, failures=0（display_scrub_333_333r1_test.go:82/:120）。
+- 这两枚同时是 AC#5 发二（快路短路）的靶子；发一（范畴判定换回名册）打 327r2 的关系钉。
