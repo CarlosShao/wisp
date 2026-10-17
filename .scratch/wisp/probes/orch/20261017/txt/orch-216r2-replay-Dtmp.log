@@ -1,0 +1,13 @@
+time=2026-10-17T10:28:13.431+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.*
+--- PASS: TestFileBaseNameClaimChangesNoClassOrReason (0.01s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.078s
