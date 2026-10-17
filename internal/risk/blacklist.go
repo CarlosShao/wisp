@@ -1,6 +1,7 @@
 package risk
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -210,26 +211,31 @@ func classifyForms(cand pathForms) (Class, string) {
 	// (ticket 75). The human-readable rule strings below stay as written.
 
 	// ---- A tier (absolute, non-overridable) ----
+	// Ticket 334 AC#1: every case below returns through aRuleReason, so the
+	// sentence printed with a deny describes the relation that actually made
+	// the case fire. The conditions are byte-for-byte the ones this switch has
+	// always had - the level, the tier and the non-overridability are NOT what
+	// changed, only the honesty of the reason (AC#2 pins that).
 	switch {
 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.git-credentials`))):
-		return ClassA, "~/.git-credentials"
+		return ClassA, aRuleReason("~/.git-credentials", anchorPath(homeS, `.git-credentials`), cand, eqPath)
 	case aAnyForm(cand, hasGitConfigSegment):
 		return ClassA, ".git/config"
 	case aUnder(cand, anchorForms(anchorPath(appDataS, `wisp`))) &&
 		aEq(cand, anchorForms(anchorPath(appDataS, `wisp`, `config.toml`))):
-		return ClassA, "%APPDATA%\\wisp\\config.toml"
+		return ClassA, aRuleReason("%APPDATA%\\wisp\\config.toml", anchorPath(appDataS, `wisp`, `config.toml`), cand, eqPath)
 	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
-		return ClassA, "~/.ssh/**"
+		return ClassA, aRuleReason("~/.ssh/**", anchorPath(homeS, `.ssh`), cand, isUnder)
 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.aws`, `credentials`))):
-		return ClassA, "~/.aws/credentials"
+		return ClassA, aRuleReason("~/.aws/credentials", anchorPath(homeS, `.aws`, `credentials`), cand, eqPath)
 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`))):
-		return ClassA, "~/.kube/config"
+		return ClassA, aRuleReason("~/.kube/config", anchorPath(homeS, `.kube`, `config`), cand, eqPath)
 	case aAnyForm(cand, func(s string) bool { return isBrowserCredentialStore(baseName(s)) }):
 		return ClassA, "browser credential store"
 	case appDataS != "" && aUnder(cand, anchorForms(anchorPath(appDataS, `microsoft`, `protect`))):
-		return ClassA, "%APPDATA%\\Microsoft\\Protect\\** (DPAPI master keys)"
+		return ClassA, aRuleReason("%APPDATA%\\Microsoft\\Protect\\** (DPAPI master keys)", anchorPath(appDataS, `microsoft`, `protect`), cand, isUnder)
 	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
-		return ClassA, "%LOCALAPPDATA%\\Microsoft\\Credentials\\**"
+		return ClassA, aRuleReason("%LOCALAPPDATA%\\Microsoft\\Credentials\\**", anchorPath(localAppDataS, `microsoft`, `credentials`), cand, isUnder)
 	}
 
 	// ---- B tier (default deny + single-file override) ----
@@ -269,6 +275,18 @@ func eqPath(p, dir string) bool { return p == dir }
 // comparison form of the anchor, and — when that finds nothing — asks whether
 // the miss is even trustworthy (uncertainAnchorMiss).
 func aRelates(cand, anchor pathForms, rel func(p, dir string) bool) bool {
+	if anchorMatches(cand, anchor, rel) {
+		return true
+	}
+	return uncertainAnchorMiss(cand, anchor)
+}
+
+// anchorMatches is aRelates WITHOUT R17's tie-breaker: a relation actually
+// proven between two comparison forms. Ticket 334 needs the two apart, because
+// they say different things about the candidate (see aRuleReason); splitting
+// them changes no verdict, since aRelates still returns match-then-clause in
+// exactly the order it always did.
+func anchorMatches(cand, anchor pathForms, rel func(p, dir string) bool) bool {
 	for _, c := range cand.spellings() {
 		if c == "" {
 			continue
@@ -282,7 +300,34 @@ func aRelates(cand, anchor pathForms, rel func(p, dir string) bool) bool {
 			}
 		}
 	}
-	return uncertainAnchorMiss(cand, anchor)
+	return false
+}
+
+// aRuleReason is the ONE place an A-tier reason string is assembled (ticket 334
+// AC#1), and it reads nothing but the reason: fires()/aRelates above decided
+// the class, the tier and the overridability before this function is ever
+// called, and nothing here can move them (AC#2 pins that with a positive
+// control that goes red the moment someone relaxes the level).
+//
+// When a comparison form matched, the rule's own literal is a true sentence
+// about the candidate. When nothing matched and the case STILL fired, it fired
+// on uncertainAnchorMiss - R17's fail-closed tie-breaker - and the candidate is
+// then NOT known to be that credential file. Printing the bare literal there
+// tells the operator "this path is ~/.aws/credentials" when the real finding is
+// "this path's own spelling could not be proven expanded, and this anchor is
+// not installed on this machine, so the two might be one tree" (ticket 334: the
+// rejection was honest, the sentence was not).
+//
+// cand.raw / anchor.root are the comparison-folded shapes (normPath), the same
+// shapes Gate's own log line prints; they name the thing being denied, and are
+// never handed to the OS.
+func aRuleReason(literal, anchorSpelling string, cand pathForms, rel func(p, dir string) bool) string {
+	anchor := anchorForms(anchorSpelling)
+	if anchorMatches(cand, anchor, rel) || !uncertainAnchorMiss(cand, anchor) {
+		return literal
+	}
+	return fmt.Sprintf("%s [fail-closed, NOT a match on this rule]: the candidate %q is not proven handle-expanded (its own walk stopped at %q) and the anchor %q is not installed here (its expansion stopped at %q), so R17 protects the ancestry chain the two share instead of proving a miss",
+		literal, cand.raw, cand.root, anchorSpelling, anchor.root)
 }
 
 // aAnyForm applies a shape test (path segments, base name) to every
