@@ -1,0 +1,33 @@
+# 334-v1 起手三件（2026-10-17）
+Sat Oct 17 12:57:27 CST 2026
+git rev-parse --short HEAD = 0a030cea
+git rev-parse --abbrev-ref HEAD = dev
+
+## 尺1: git status --porcelain --untracked-files=no （跟踪件是否脏）
+ M .scratch/wisp/issues/328-l2-card-corr-shape-never-matches-the-roster-join-key.md
+ M .scratch/wisp/issues/334-anchor-missing-leaf-reason-names-another-path-and-ci-surface-reds-216-instrument.md
+ M .scratch/wisp/issues/335-ticket327-roster-nail-red-after-category-widening-and-three-stale-comments.md
+rc=0  ← 空输出＝跟踪件零脏
+
+## 尺2: git status --porcelain 的 ?? 行枚数（未跟踪件计数，含机主/别腿在飞件）
+untracked_lines=1177
+
+## 尺3: 起手锚对撞（派单要我复跑那把）
+git diff --stat 6e4abaf1 03f7e7a6 -- internal/risk/ = 空输出 rc=0 → 两枚号下 internal/risk/** 字节全等，成立
+
+## 尺4: 票 334 框数
+未勾=7 已勾=0
+
+## 被裁腿四枚产码/证据笔的 name-only 全集（现跑）
+--- e052b11a
+e052b11a7 11:47:14 票 334 产码腿 334-r1·AC#1＝A 档回落支那句拒绝的理由说实话（指名真实候选＋真实缺位的锚），判级链一字未动
+
+internal/risk/blacklist.go
+--- 4711955f
+4711955f2 11:47:40 票 334 产码腿 334-r1·AC#1＋AC#2 仪器＝anchor_miss_reason_334_test.go（世界自己造，⛔ 继承本机装了什么）
+
+internal/risk/anchor_miss_reason_334_test.go
+--- 3a118226
+3a118226b 11:47:57 票 334 产码腿 334-r1·AC#3＝给票 216 那枚两臂差试补世界（候选挪出 A 锚的祖先链），⛔ 动任何断言
+
+internal/risk/name_claim_two_arm_216_test.go
