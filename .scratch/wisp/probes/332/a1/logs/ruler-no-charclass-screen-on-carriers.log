@@ -1,0 +1,18 @@
+7535d83b:cmd/wisp/panel_control_windows.go:539:	if cut := strings.IndexAny(path, "?#"); cut >= 0 {
+7535d83b:cmd/wisp/panel_models_320.go:129:	if i := strings.IndexAny(s, "\r\n"); i >= 0 {
+7535d83b:cmd/wisp/secret.go:613:	if strings.ContainsAny(v, "\r\n") {
+7535d83b:internal/agent/approval/batch.go:93:	if i := strings.LastIndexAny(t, `/\`); i > 0 {
+7535d83b:internal/agent/approval/replies.go:500:// internal/risk/pathresolver.go:36), so dirOf's LastIndexAny would split inside
+7535d83b:internal/config/parse.go:108:		if strings.ContainsAny(k, "/") {
+7535d83b:internal/config/parse.go:198:	if i := strings.LastIndexAny(path, `/\`); i >= 0 {
+7535d83b:internal/memory/artifacts.go:336:	if strings.ContainsRune(name, '/') || strings.ContainsRune(name, '\\') ||
+7535d83b:internal/memory/artifacts.go:337:		strings.ContainsRune(name, ':') || name == "." || name == ".." ||
+7535d83b:internal/observe/redact.go:154:		i := strings.LastIndexAny(m, " \t_-")
+7535d83b:internal/panel/assets.go:146:		if cut := strings.IndexAny(ref, "?#"); cut >= 0 {
+7535d83b:internal/panel/attachments.go:301:	if strings.ContainsAny(name, "\x00\r\n\t") {
+7535d83b:internal/panel/attachments.go:318:	if i := strings.LastIndexAny(s, `/\`); i >= 0 {
+7535d83b:internal/risk/provenance.go:1010:	if t == "" || strings.ContainsAny(t, " \t\r\n") {
+7535d83b:internal/risk/rules_shell.go:61:			if strings.ContainsRune(shellMetachars, r) {
+7535d83b:internal/risk/rules_shell.go:95:	if i := strings.LastIndexAny(argv0, `/\`); i >= 0 {
+7535d83b:internal/secret/refs.go:39:		if name == "" || len(name) > 128 || strings.ContainsAny(name, " \t\r\n=:") {
+7535d83b:internal/tools/fs_staging.go:162:	if strings.ContainsAny(random, `\/*:`) {
