@@ -1,0 +1,159 @@
+# 332-v1 AC#2: census-2 carrier citations re-read at the named commit tree 7535d83b
+leg=332-v1 date=2026-10-17 11:44:54 +0800  blob(display_scrub_216.go@7535d83b)=9d94b46ec0a52b9d7f3fe8a8d414d8edf09fdbbd
+claim under test: each of the 155 unwashed Cf runes can reach THE MARSHALED SNAPSHOT BYTES (not pixels).
+
+### (a) disk / workspace real name
+OK       a1-workspaceview               cmd/wisp/panel_pump.go:128,132p has [WorkspaceViewFromRoot]
+OK       a2-view-fields                 internal/panel/workspace.go:114,119p has [Canonical]
+OK       a3-nil-attachment-arg          internal/panel/pump.go:275p has [NewComposerState(mode, workspace, nil, maxAttachment)]
+OK       a4-newsnapshot-call            internal/panel/pump.go:309p has [NewSnapshot]
+OK       a5-run-git-field               cmd/wisp/run.go:718p has [Git:]
+OK       a6-run-instructions            cmd/wisp/run.go:733p has [Instructions:]
+OK       a7-instructions-path-assign    internal/panel/instructions_200.go:147p has [Path:]
+OK       a8-instructions-after-snapshot internal/panel/pump.go:314p has [Instructions]
+OK       a9-git-reader                  internal/panel/git.go:251p has [ReadGitForWorkspace]
+OK       a10-git-worktree-row           internal/panel/git.go:543p has [GitWorktree]
+OK       a11-git-no-external-process    internal/panel/git.go:24p has [NO EXTERNAL PROCESS]
+-- the Git carrier: census cites pump.go:281, the assignment itself sits 3 lines lower (defect note at the bottom)
+OK       a12-cited-line                 internal/panel/pump.go:281p has [p.src.Git]
+OK       a13-assignment-line            internal/panel/pump.go:284p has [composer.Git = p.src.Git()]
+OK       a14-boundary-call-site         internal/panel/composer.go:145p has [scrubComposerForDisplay]
+      		Composer:    scrubComposerForDisplay(composer),
+OK       a15-washed-field-1             internal/panel/display_scrub_216.go:228p has [c.Workspace.Canonical = scrubForDisplay]
+OK       a16-washed-field-2             internal/panel/display_scrub_216.go:234p has [a.Name = scrubForDisplay]
+OK       a17-marshal-in-publish         internal/panel/pump.go:359p has [json.Marshal(snap)]
+      	data, err := json.Marshal(snap)
+OK       a18-marshal-in-marshal         internal/panel/pump.go:344p has [json.Marshal(p.Snapshot())]
+
+### (b) model body / tool reason  (hop #1 the orchestrator told this leg to attack)
+OK       b1-llm-event-text              internal/llm/events.go:121,124p has [Text]
+OK       b2-run-appends-delta           cmd/wisp/run.go:1343p has [Append]
+OK       b3-streamlog-append-signature  internal/panel/pump.go:524p has [func (s *StreamLog) Append]
+OK       b4-streamlog-stores-text       internal/panel/pump.go:532p has [ResultChunk{CorrelationID: key, Text: text}]
+OK       b5-results-field-of-snapshot   internal/panel/composer.go:59p has [Results]
+OK       b6-tool-reason-into-decision   internal/tools/bridge.go:301p has [dec.Reason]
+OK       b7-approval-card-fields        internal/panel/approval.go:77,83p has [Reason:]
+      	view := ApprovalCardView{
+      		CorrelationID:          subject.CorrelationID,
+      		Tool:                   subject.Tool,
+      		Args:                   append([]string(nil), subject.Args...),
+      		Level:                  decision.Level.String(),
+      		RulesHit:               rules,
+      		Reason:                 decision.Reason,
+OK       b8-run-verdicts-field          cmd/wisp/run.go:715p has [Verdicts:]
+OK       b9-live-approvals-source       cmd/wisp/panel_pump.go:62,66p has [LiveApprovals]
+OK       b10-cardview-appended          internal/panel/pump.go:241,247p has [CardView]
+-- proof by reading the snapshot assembly: the scrub call touches ONLY composer, Pending and Results go out raw
+      		Pending: pending,
+      		Results: results,
+      		// Ticket 216 AC#2: the display boundary is here, at the one push the panel
+      		// receives per state change, so a menu row cannot carry an invisible
+      		// control character no matter which producer filled the field. See
+      		// display_scrub_216.go for the roster and for why washing sits here and
+      		// not in the producers (whose Canonical is read as a PATH elsewhere).
+      		Composer:    scrubComposerForDisplay(composer),
+      		GeneratedAt: now.UTC().Format(time.RFC3339),
+-- the only wash touching the (b) branch, and what it screens (Cc only, operator-typed text only)
+OK       b11-reply-sanitize-site        cmd/wisp/approval_reply.go:571p has [sanitizeReplyText]
+OK       b12-reason-sanitize-site       cmd/wisp/approval_reply.go:575p has [sanitizeReplyText]
+sanitizeReplyText body as read at the anchor (its only character screen is unicode.IsControl = Cc; Cf untouched):
+      func sanitizeReplyText(s string) string {
+      	if s == "" {
+      		return ""
+      	}
+      	var b strings.Builder
+      	runes := 0
+      	pendingSpace := false
+      	for _, r := range s {
+      		if unicode.IsControl(r) {
+      			r = ' '
+
+### (c) page / inbound (hop #2 the orchestrator told this leg to attack)
+OK       c1-dispatch-binding            cmd/wisp/panel_host_windows.go:80p has [wispDispatch]
+OK       c2-dispatchraw-callback        cmd/wisp/panel_host_windows.go:930p has [dispatchRaw]
+OK       c3-dispatch-into-panel         cmd/wisp/panel_host_windows.go:948p has [disp.Handle]
+OK       c4-handle-entry                internal/panel/composer_dispatch.go:176p has [func]
+OK       c5-workspace-request-handoff   internal/panel/composer_dispatch.go:209p has [HandleWorkspaceRequest]
+OK       c6-handler-entry               internal/panel/workspace_handlers.go:108p has [func]
+OK       c7-request-workspace-switch    internal/panel/workspace_handlers.go:125p has [RequestWorkspaceSwitch]
+      	if _, err := RequestWorkspaceSwitch(h.Scope, req.Path, h.Audit); err != nil {
+OK       c8-view-builder                internal/panel/workspace.go:140p has [func]
+OK       c9-spelling-and-canonical      internal/panel/workspace.go:160,172p has [Spelling]
+      		}
+      		return currentAfter(scope, previous), fmt.Errorf("panel: workspace switch refused: %w", err)
+      	}
+      	if audit != nil {
+      		audit("workspace: SWITCH from=%q to=%q spelling=%q reparse=%v rewritten=%v rewrites=%v result=ok",
+      			previous.Canonical, res.Canonical, res.Spelling, res.Reparse, res.Rewritten,
+      			strings.Join(res.Rewrites, "+"))
+      	}
+      	view := WorkspaceView{
+      		Set: true, Spelling: res.Spelling, Canonical: res.Canonical,
+      		Reparse: res.Reparse, Rewritten: res.Rewritten,
+      		Reason: "已收窄到该工作区：范围外的路径按 R2 判定",
+      	}
+OK       c10-resident-dispatch-wired    cmd/wisp/panel_resident_windows.go:223,228p has [newResidentComposerDispatch]
+OK       c11-cli-nil-dispatch           cmd/wisp/panel_inbound.go:223p has [nil]
+inbound method-name roster at bridge.go:42,43,44,45,66,67,75 = 7 lines mentioning Method (census says 7 names)
+-- an exit the census never cites, found by re-reading the (b) chain end to end (this legs own finding):
+   the model deltas go to the OPERATORS TERMINAL verbatim, with no character screen at all:
+OK       z1-sink-wired-into-stdout      cmd/wisp/run.go:1075p has [consoleSink{out: rt.stdout]
+OK       z2-text-delta-printed          cmd/wisp/run.go:1341p has [fmt.Fprint(c.out, e.Text)]
+OK       z3-reasoning-printed           cmd/wisp/run.go:1351p has [fmt.Fprint(c.out, e.Text)]
+   screens between the llm event and that print, measured with the same no-character-screen ruler: 0.
+   => for shape (b) the census under-claims: it stops its own scope at the marshal bytes, while the terminal
+      branch of the same event reaches human eyes today. Nothing over-claimed; one carrier left out.
+
+
+### the one field the census writes as having no known carrier (a FIELD, not a rune)
+OK       d1-ingest-definition           internal/panel/attachments.go:199p has [func]
+ruler: non-test .Ingest( callers at 7535d83b = 0  (census says 0)
+  all 19 hits of this ruler live in test files; first two:
+      7535d83b:internal/panel/attachments_test.go:108:			ref, err := b.Ingest(context.Background(), src)
+      7535d83b:internal/panel/attachments_test.go:139:		ref, err := b.Ingest(context.Background(), src)
+positive control, same ruler shape and scope: json.Marshal lines = 37  (census says 37)
+OK       d2-inbound-nil-attachment      cmd/wisp/panel_inbound.go:301,302p has [nil]
+
+### decisive no-character-screen ruler, re-run by this leg
+cmd: git grep -n -e ContainsAny -e IndexAny -e ContainsRune 7535d83b -- internal cmd | grep -v _test.go:
+hits=18   (census 18; without the two-directory glob the same filter reads 108 lines, which include other legs probe copies and the tools/ instruments => the 18 is a scoped number)
+      7535d83b:cmd/wisp/panel_control_windows.go:539:	if cut := strings.IndexAny(path, "?#"); cut >= 0 {
+      7535d83b:cmd/wisp/panel_models_320.go:129:	if i := strings.IndexAny(s, "\r\n"); i >= 0 {
+      7535d83b:cmd/wisp/secret.go:613:	if strings.ContainsAny(v, "\r\n") {
+      7535d83b:internal/agent/approval/batch.go:93:	if i := strings.LastIndexAny(t, `/\`); i > 0 {
+      7535d83b:internal/agent/approval/replies.go:500:// internal/risk/pathresolver.go:36), so dirOf's LastIndexAny would split inside
+      7535d83b:internal/config/parse.go:108:		if strings.ContainsAny(k, "/") {
+      7535d83b:internal/config/parse.go:198:	if i := strings.LastIndexAny(path, `/\`); i >= 0 {
+      7535d83b:internal/memory/artifacts.go:336:	if strings.ContainsRune(name, '/') || strings.ContainsRune(name, '\\') ||
+      7535d83b:internal/memory/artifacts.go:337:		strings.ContainsRune(name, ':') || name == "." || name == ".." ||
+      7535d83b:internal/observe/redact.go:154:		i := strings.LastIndexAny(m, " \t_-")
+      7535d83b:internal/panel/assets.go:146:		if cut := strings.IndexAny(ref, "?#"); cut >= 0 {
+      7535d83b:internal/panel/attachments.go:301:	if strings.ContainsAny(name, "\x00\r\n\t") {
+      7535d83b:internal/panel/attachments.go:318:	if i := strings.LastIndexAny(s, `/\`); i >= 0 {
+      7535d83b:internal/risk/provenance.go:1010:	if t == "" || strings.ContainsAny(t, " \t\r\n") {
+      7535d83b:internal/risk/rules_shell.go:61:			if strings.ContainsRune(shellMetachars, r) {
+      7535d83b:internal/risk/rules_shell.go:95:	if i := strings.LastIndexAny(argv0, `/\`); i >= 0 {
+      7535d83b:internal/secret/refs.go:39:		if name == "" || len(name) > 128 || strings.ContainsAny(name, " \t\r\n=:") {
+      7535d83b:internal/tools/fs_staging.go:162:	if strings.ContainsAny(random, `\/*:`) {
+character-class screens inside internal/risk/pathresolver.go = 0 ; positive control with the same regex against display_scrub_216.go = 5
+
+### last hop: bytes vs pixels (mandatory answer 1)
+ruler: git grep -c wispOnPanelSnapshot 7535d83b -- frontend => files with hits = 0
+positive control, same ruler without the directory limit = 16 lines
+OK       e1-first-production-reader     cmd/wisp/panel_snapshot_deliver_329.go:95p has [lastPanelSnapshot]
+      	_, data, seen := rt.lastPanelSnapshot()
+OK       e2-eval-handoff                cmd/wisp/panel_snapshot_deliver_329.go:105p has [evalPanelJS]
+OK       e3-global-and-wrapper          cmd/wisp/panel_snapshot_deliver_329.go:57,66p has [window.wispOnPanelSnapshot]
+OK       e4-dispatch-eval               cmd/wisp/panel_host_windows.go:336p has [Eval]
+OK       e5-run-out-field               cmd/wisp/run.go:744p has [bookPanelSnapshot]
+OK       e6-publish-caller              cmd/wisp/panel_pump.go:447p has [publishPanelSnapshot]
+OK       e7-push-caller                 cmd/wisp/panel_pump.go:463p has [pushPanelSnapshotToHost]
+the file itself states the pixel half is still missing, deliver_329.go:28-31:
+      // window.wispOnPanelSnapshot does not exist yet (frontend/src/main.tsx renders
+      // without a snapshot and frontend/src/lib/panel.ts declares only page-to-Go doors),
+      // so until the machine owner's front-end agent lands that receiver a push here is
+      // a call into a page that ignores it. The exact contract - global name, argument
+
+TALLY: citation checks OK=53 MISMATCH=0
+defect named by this leg (precision, not substance): census-2 (a) cites internal/panel/pump.go:281 for the Git carrier; at 7535d83b
+  that line is the guard, and the assignment composer.Git = p.src.Git() sits at pump.go:284. The carrier exists; the number is 3 lines early.
