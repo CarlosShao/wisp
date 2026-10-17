@@ -1,0 +1,304 @@
+# 334-v1 交件自证三把尺（2026-10-17 15:21:39 +0800）
+
+## 尺① 本腿逐枚提交号 ＋ 逐枚 git show --name-only 全集
+--- e0353344d2be931f17c22ff79bb84d9356454332 13:06:21
+        票 335 终裁腿 335-v1·起手状态入库＝internal/panel 工作树干净读数＋AC#2 三处注释改动逐字 diff
+    
+    .scratch/wisp/probes/335/v1/logs/ac2-diff-77d98354.txt
+    .scratch/wisp/probes/335/v1/logs/start-panel-status.txt
+--- 90d0a4a8425f085e53852511891720e76106aa4d 13:07:39
+        停车点 §4.0ec：第十九波收四枚结案两票（332 六格／333 九格各 -done＋四枚判据文字更正入库）＋三枚补位已发（334-v1∥335-v1∥328-r1）＋门禁两枚 rc=0（gofumpt 那发 rc=2＝我把 Markdown 交给 Go 格式化器＝仪器用错）＋未推 311 枚 HEAD a455e552＋:444 那枚钉子已改形故 §4.0eb 第⑩节过期
+    
+    docs/reports/HANDOVER.md
+--- 568c96319dfd22312a210b8eb453726f8c5c9935 13:20:23
+        票 228 续腿 228-r3b 复验：导出树 boot_windows.go 强还原至 pristine 3e2e83fa 后，四枚 estate 用例 surface-c 复跑 RUN=4 PASS_TOP=4 FAIL_TOP=0 SKIP=0（跑前/跑后同哈希）；此前 trap 还原曾在仓外树短暂残留双突变，本发在确认 pristine 的树上重测，绿读数以本件为准。
+    
+    .scratch/wisp/probes/228/r3b/logs/estate-reverify-c.log
+--- fb9677073d1fd81964b33a2c0f9ff6d0527c1dd8 13:21:22
+        票 335 终裁腿 335-v1·去牙脚本入库＝七发定向突变（含自指反形 C/D 对与加发 E 空操作检查），只打仓外导出树物理字节、trap 还原
+    
+    .scratch/wisp/probes/335/v1/mut335v1.sh
+--- 19b6f73fc0bda735be2adc07a4eeaac20d382643 13:22:50
+        票 334 裁腿 334-v1·台件＝build-tree.sh（八件套＋仓根 docs＋手工三件，D 卷长名树根，只建不删）
+    
+    .scratch/wisp/probes/334/v1/logs/build-tree.sh
+--- ed6fa14e8be2c68682e950608887a56f0843eed2 13:26:44
+        三枚票面 Status 行归位（编排者只动 Status／不动判据正文）：328＝328-r1 在飞（丙-带边界，存档 648eda04）；334＝334-r1 已交（十笔）＋334-v1 在裁＋★具名自报"本票六格"那句是我笔误（盘上七枚框）；335＝335-r1 已交（六笔，末笔 23d36a81）＋335-v1 在裁
+    
+    .scratch/wisp/issues/328-l2-card-corr-shape-never-matches-the-roster-join-key.md
+    .scratch/wisp/issues/334-anchor-missing-leaf-reason-names-another-path-and-ci-surface-reds-216-instrument.md
+    .scratch/wisp/issues/335-ticket327-roster-nail-red-after-category-widening-and-three-stale-comments.md
+--- 939f5f93dba16cd911ac751ad200dbaae446c0ce 13:31:03
+        票 335 终裁腿 335-v1·AC#1 七发定向突变逐字读数入库＝自指反形 C/D 对（D 的臂 2 对漂移产码沉默 missed=0，正形 B 同漂移 missed=155、独红 :505 :522）＋E 发证"逐枚加进 Cf 成员"＝空操作＋F/G 复认腿 ⓑ ⓒ 落点
+    
+    .scratch/wisp/probes/335/v1/logs/mut-A0.log
+    .scratch/wisp/probes/335/v1/logs/mut-B.log
+    .scratch/wisp/probes/335/v1/logs/mut-C.log
+    .scratch/wisp/probes/335/v1/logs/mut-D.log
+    .scratch/wisp/probes/335/v1/logs/mut-E.log
+    .scratch/wisp/probes/335/v1/logs/mut-F.log
+    .scratch/wisp/probes/335/v1/logs/mut-G.log
+    .scratch/wisp/probes/335/v1/logs/shot-A0-summary.txt
+    .scratch/wisp/probes/335/v1/logs/shot-B-summary.txt
+    .scratch/wisp/probes/335/v1/logs/shot-C-summary.txt
+    .scratch/wisp/probes/335/v1/logs/shot-D-summary.txt
+    .scratch/wisp/probes/335/v1/logs/shot-E-summary.txt
+    .scratch/wisp/probes/335/v1/logs/shot-F-summary.txt
+    .scratch/wisp/probes/335/v1/logs/shot-G-summary.txt
+--- 2ff5b17adadd043754e0d64d1ea7303bb589b555 13:37:44
+        票 335 终裁腿 335-v1·AC#3 疑点归到底＝fixture 16649⇄16641 的 8 字节＝git archive 按 autocrlf 全量 CRLF 导出⇄工作树 8 行裸 LF＋起手侧红钉复跑（旧名册字节对范畴产码，14 句 :448/:451×7，还原哈希同串）
+    
+    .scratch/wisp/probes/335/v1/logs/fixture-bytediff-probe.txt
+    .scratch/wisp/probes/335/v1/logs/fixture-deep-probe.txt
+    .scratch/wisp/probes/335/v1/logs/fixture-mechanism.txt
+    .scratch/wisp/probes/335/v1/logs/start-red-rerun.txt
+--- ff9d67c5fea09c96bcdcd1e13faa76c917d97ade 13:44:25
+        票 228 续腿 228-r3b 交件报告：五枚停机用例终态颜色（estate 四枚两台面全绿、ⓑ-2 两台面同拦 :184）＋整包四数与真窗死亡＋ⓑ 尺读＋突变两发有牙（ⓐ-first/ⓑ-1，含还原竞态如实记账）＋门禁四 rc。引派单绝对路径自证读全。
+    
+    .scratch/wisp/probes/228/r3b/report.md
+--- 0b2c35630f8cc980f3ae520683e27b8d9d369318 13:46:16
+        票 228 续腿 228-r3b 只追加一条 Progress 料：五枚停机用例终态颜色（estate 四枚两台面全绿；ⓑ-2 两台面同拦 :184＝缺真窗交互世界，归编排者约真窗）＋整包四数与真窗死亡＋四枚包内红逐枚归属＋突变两发证 ⓐ-first/ⓑ-1 有牙（导出台已还原 pristine）＋门禁 rc。⛔ 翻框/改判据/动产码。
+    
+    .scratch/wisp/issues/228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md
+--- b2d553425a3b58121ae6a93a01e70f14d6922050 13:57:07
+        328-r1 产码（丙-带边界）：名册把关联号剥出的任务半段按"在册任务号+#"认进 waiting
+    
+    internal/panel/subagent_roster_197.go
+--- ca60e624ed2a863060b7abb6e500d66b21f29cc4 14:02:59
+        票 335 终裁腿 335-v1·AC#2 零改动尺复跑（含正控 bdb58d7b rc=1／负控 rc=0）＋AC#4 两把临时根成对 257/160/7/0⇄同＋AC#5/AC#6 字节与纪律审计＋fixture LF 行号 perl 尺更正
+    
+    .scratch/wisp/probes/335/v1/logs/ac2-zc-positive.txt
+    .scratch/wisp/probes/335/v1/logs/ac2-zc-rerun.txt
+    .scratch/wisp/probes/335/v1/logs/ac4-pair-summary.txt
+    .scratch/wisp/probes/335/v1/logs/ac5-ac6-audit.txt
+    .scratch/wisp/probes/335/v1/logs/fixture-lf-lines-perl.txt
+--- f112a6310e346e4ce4a9a22e66d5c3aff2b82eb4 14:03:57
+        台账 A1019：收 228-r3b（八笔提交／15 枚唯一路径／.go 0，还原哈希我自己从具名提交树复算同串 3e2e83fa…）＝五枚停机用例终态入库（四枚全绿含 ⓑ-1 十步真读满，ⓑ-2 具名拦在 resident_tray_stop_live_228_windows_test.go:184）；★记我＝子串越格尺一天内第二次差点冤枉干净腿（定式升级为严格前缀＋--all＋先怀疑我的尺）；★R-228-3b-1＝两发突变的 trap 竞态⇒那两发红句在残留窗口里取的不彼此独立，另派串行复跑；CPU 82% 故本轮不新增腿
+    
+    docs/reports/pending-and-issues.md
+--- fb7a4d1a50e5afa2643755d8690966c440e4414c 14:04:58
+        停车点 §4.0ed：收 228-r3b（五枚停机用例终态：四绿含 ⓑ-1 十步真读满／ⓑ-2 具名拦在 live:184）＋新登记 R-228-3b-1（两发突变取于残留窗口⇒不彼此独立，待串行复跑）＋编队三枚在飞 CPU 82% 故不放新腿＋未推 327 枚 HEAD b2d55342
+    
+    docs/reports/HANDOVER.md
+--- 1696d01b09ebfcef416d4456a90185f0624703d7 14:08:48
+        328-r1 仪器①（票 220 那族名册）：child-1#retry 翻成 true 是买真相，child-1x 原地不动
+    
+    internal/panel/subagent_blocked_220_test.go
+--- ffebb6d13d9578c57c1323b4d31d131be3efa388 14:08:50
+        328-r1 仪器②（名册侧四形实测）：四形逐枚点亮、approval-<seq> 与 host:* 照旧点不亮
+    
+    internal/panel/subagent_corr_task_prefix_328_test.go
+--- f705b082f452754af477dff096e7000e590c5d82 14:12:45
+        328-r1 仪器③（AC#2 正控＝经真铸造点）：关联号从真 loop 派发出来读，⛔ 测试里硬写形状
+    
+    internal/agent/corr_roster_join_328_test.go
+--- 0dd29039277284b544889033848f26e3b369ba5e 14:15:49
+        改正我自己在 §4.0ed 第⑨节写的指路句（按名字猜的文件归属→现量：resident_tray_stop 只有两枚测试件、停机位在 internal/proc/stop_windows.go＋boot_windows.go:111、托盘与弹出菜单在 internal/ball/tray_windows.go＋win32_windows.go，我初稿漏了 internal/ball 整面）＋台账 A1019 追加第⑦节记我
+    
+    docs/reports/HANDOVER.md
+    docs/reports/pending-and-issues.md
+--- e305333c7400efcd62b01f4fdda214d09cb26f89 14:18:48
+        票 334 裁腿 334-v1·台件第二枚＝只读探针（七枚 aEq/aUnder 锚逐枚造世界，比腿的 14 行宽）＋run-risk.sh（四数尺＋CI 形/D 形 GOTMPDIR）
+    
+    .scratch/wisp/probes/334/v1/logs/probe-334v1_test.go.txt
+    .scratch/wisp/probes/334/v1/logs/run-risk.sh
+--- 8a034bf844945459a1734ebdacba3344dcee5f38 14:20:45
+        票 335 终裁腿 335-v1·判语件＝docs/evidence/s1/335-v1-verdict.md（98 行／字节见笔内）：七格逐格判语＋AC#1 自指反形 C/D⇄B 对作差（闸非恒真）＋②裁语（第四发空操作已实测 E，三发已钉满）＋④fixture 8 字节差机制归到底（autocrlf 导出 CRLF⇄工作树 8 行裸 LF）＋必答两枚
+    
+    docs/evidence/s1/335-v1-verdict.md
+--- 7aa3edf11655e97f962152a5096d7fa5a5042c90 14:23:35
+        票 335 终裁腿 335-v1·票尾一条只追加 bullet＝七格判语登记（⛔ 翻框：七枚 AC 框仍 7 枚未勾、0 枚已勾；⛔ 改票名／Status:／-done；⛔ 动台账一字；尺＝git diff 对该票 1 增 0 删）
+    
+    .scratch/wisp/issues/335-ticket327-roster-nail-red-after-category-widening-and-three-stale-comments.md
+    .scratch/wisp/probes/335/v1/msg-bullet.txt
+--- ae700746607bb0ea30314c13eaf5b152c05d8f6a 14:27:46
+        票 335 终裁腿 335-v1·收尾自证入库＝panel 收尾 status 空＋七笔提交 name-only 全集＋.go 命中 0 尺＋AC 框 7 未勾 0 已勾＋零字节件 0
+    
+    .scratch/wisp/probes/335/v1/logs/closing-selfattest.txt
+--- 02109a6549004ce0f8e2dedd910b10b574affd79 14:28:19
+        票 334 裁腿 334-v1·三枚入库＝突变台件（M-V1 只动判级支／M-V2 单枚锚摘回落支／M-V3 变严反形）＋幻影凭据普查台件＋三棵导出台树建树读数（.go 742/746、8.3 别名、blob 逐枚）
+    
+    .scratch/wisp/probes/334/v1/logs/10-tree-before.log
+    .scratch/wisp/probes/334/v1/logs/11-tree-after.log
+    .scratch/wisp/probes/334/v1/logs/12-tree-mut.log
+    .scratch/wisp/probes/334/v1/logs/run-mutations-v1.sh
+    .scratch/wisp/probes/334/v1/logs/run-phantom-census.sh
+--- a76a515dcd95552d81be21b6c7cad7fa76b76178 14:33:11
+        票 334 裁腿 334-v1·AC#2 三值尺现跑＝我自己那把 34 行（七枚锚逐枚造世界）在两棵树上 diff＝0 行，四数 18/4/0/0 两发同形
+    
+    .scratch/wisp/probes/334/v1/logs/20-probe-before.log
+    .scratch/wisp/probes/334/v1/logs/20-probe-before.runner.log
+    .scratch/wisp/probes/334/v1/logs/21-probe-after.log
+    .scratch/wisp/probes/334/v1/logs/21-probe-after.runner.log
+    .scratch/wisp/probes/334/v1/logs/v1-after.shape
+    .scratch/wisp/probes/334/v1/logs/v1-before.shape
+--- 46b55afbab015fcd6e6358d27193e2616c06d8f3 14:44:53
+        票 334 裁腿 334-v1·自纠一笔＋一件：突变台件 v1 的 perl 还原锚写坏（列 0 的右花括号被写成制表符）⇒ M-V1 残留在仓外突变树上、M-V2／M-V3 两读作废；v2 改成逐发「从具名提交重取字节覆盖＋断言哈希」，探针补两枚 solo 世界（.ssh／DPAPI 各一枚）
+    
+    .scratch/wisp/probes/334/v1/logs/probe-334v1_test.go.txt
+    .scratch/wisp/probes/334/v1/logs/run-mutations-v2.sh
+--- 2ae6f5f1cda0e1b26104afcde4cfc9f93619b775 14:53:43
+        票 334 裁腿 334-v1·决定性两枚入库＝突变电池 v2（M-V1 摘整支回落支→闸门红；M-V2a／M-V2b 只摘单枚锚的回落支→腿的三枚仪器全绿、我这把尺看见 class A→B；M-V2c 摘 .kube→ⓑ 红；M-V3 变严→闸门不红）＋幻影凭据普查（腿交回件里指名的测试名全部在册，唯三枚 TestProbe334* 属仓外只读探针）
+    
+    .scratch/wisp/probes/334/v1/logs/50-phantom-census.log
+    .scratch/wisp/probes/334/v1/logs/60-v2-runner.log
+    .scratch/wisp/probes/334/v1/logs/run-ac3-revert-and-pair.sh
+--- dacc4c130b907866c52123a4907730d0a036cfe3 15:06:54
+        票 334 裁腿 334-v1·读数件＋十四枚原始日志入库＝42 行三值对撞（diff 0）／突变八发（M-V2a／M-V2b 那两发＝腿仪器全绿而我尺见 A→B）／AC#3 反控 24-5-1-0 rc=1 复跑／门禁四数全 rc=0／事故只报盘上事实
+    
+    .scratch/wisp/probes/334/v1/logs/40-ac3-before-roster.log
+    .scratch/wisp/probes/334/v1/logs/41-ac3-after-roster.log
+    .scratch/wisp/probes/334/v1/logs/70-ac3-revert-runner.log
+    .scratch/wisp/probes/334/v1/logs/72-probe-v2-before.log
+    .scratch/wisp/probes/334/v1/logs/73-probe-v2-after.log
+    .scratch/wisp/probes/334/v1/logs/80-chain-reach.log
+    .scratch/wisp/probes/334/v1/logs/81-gates-shared-worktree.log
+    .scratch/wisp/probes/334/v1/logs/82-incident-readouts.log
+    .scratch/wisp/probes/334/v1/logs/83-incident-flipcount.log
+    .scratch/wisp/probes/334/v1/logs/84-ac1-runner.log
+    .scratch/wisp/probes/334/v1/logs/v2-after.shape
+    .scratch/wisp/probes/334/v1/logs/v2-before.shape
+    .scratch/wisp/probes/334/v1/logs/v2-shape.diff
+    .scratch/wisp/probes/334/v1/readings-and-mutations.md
+--- 54b6378062c0c74f95b526baca24c48d72d71fc1 15:15:41
+        328-r1 读数入库（logs/）：两棵仓外台面树／颜色成对四数／去牙两发逐字红句＋还原哈希／门禁与 AC#3 尺
+    
+    .scratch/wisp/probes/328/r1/commit-msg-328r1-220flip.txt
+    .scratch/wisp/probes/328/r1/commit-msg-328r1-agentcontrol.txt
+    .scratch/wisp/probes/328/r1/commit-msg-328r1-evidence.txt
+    .scratch/wisp/probes/328/r1/commit-msg-328r1-logs.txt
+    .scratch/wisp/probes/328/r1/commit-msg-328r1-roster.txt
+    .scratch/wisp/probes/328/r1/commit-msg-328r1-shapes.txt
+    .scratch/wisp/probes/328/r1/logs/ac3-four-faces.log
+    .scratch/wisp/probes/328/r1/logs/after-agent-full.log
+    .scratch/wisp/probes/328/r1/logs/after-agent-targeted.log
+    .scratch/wisp/probes/328/r1/logs/after-full-summary.txt
+    .scratch/wisp/probes/328/r1/logs/after-panel-full.log
+    .scratch/wisp/probes/328/r1/logs/after-panel-targeted.log
+    .scratch/wisp/probes/328/r1/logs/before-agent-full.log
+    .scratch/wisp/probes/328/r1/logs/before-full-summary.txt
+    .scratch/wisp/probes/328/r1/logs/before-panel-220only.log
+    .scratch/wisp/probes/328/r1/logs/before-panel-full.log
+    .scratch/wisp/probes/328/r1/logs/build-tree.sh
+    .scratch/wisp/probes/328/r1/logs/end-rulers.log
+    .scratch/wisp/probes/328/r1/logs/end-status-summary.txt
+    .scratch/wisp/probes/328/r1/logs/end-status.txt
+    .scratch/wisp/probes/328/r1/logs/gates-328r1.log
+    .scratch/wisp/probes/328/r1/logs/mut-M1.log
+    .scratch/wisp/probes/328/r1/logs/mut-M2.log
+    .scratch/wisp/probes/328/r1/logs/mutate.sh
+    .scratch/wisp/probes/328/r1/logs/red-after.txt
+    .scratch/wisp/probes/328/r1/logs/red-before.txt
+    .scratch/wisp/probes/328/r1/logs/red-roster-and-ac3-extra.log
+    .scratch/wisp/probes/328/r1/logs/ruler-ac3.sh
+    .scratch/wisp/probes/328/r1/logs/rulers-end.sh
+    .scratch/wisp/probes/328/r1/logs/run-color.sh
+    .scratch/wisp/probes/328/r1/logs/start-anchor.txt
+    .scratch/wisp/probes/328/r1/logs/start-status.txt
+    .scratch/wisp/probes/328/r1/logs/subagent_roster_197.go.pristine-M1
+    .scratch/wisp/probes/328/r1/logs/subagent_roster_197.go.pristine-M2
+    .scratch/wisp/probes/328/r1/logs/tree-after.log
+    .scratch/wisp/probes/328/r1/logs/tree-before.log
+--- 1f5a6137d51fa56999f09263f85a269e8ca8faf6 15:16:51
+        328-r1 证据件：落地件①（形状／四形实测／去牙／剩下的零读数）＋件②（台面／颜色／门禁／AC#3／git 自证）
+    
+    docs/evidence/s1/328-r1-join.md
+--- a3fedd422e8346d57603a9e172ba84e13a00cb8a 15:16:51
+        328-r1 证据件②：台面／颜色成对／门禁四数／AC#3 四面 diff 0／git 自证
+    
+    docs/evidence/s1/328-r1-color.md
+--- 0adb77758f3c06c457295d844062e82d99d2de36 15:17:33
+        328-r1 票尾一条（只追加⛔ 翻框⛔ 改判据⛔ Status⛔ 票名⛔ -done）：交件读数与剩下的那一跳
+    
+    .scratch/wisp/issues/328-l2-card-corr-shape-never-matches-the-roster-join-key.md
+--- d166e9f8399baf97c587693ce578ccb9804c8a87 15:17:34
+        328-r1 临时件补入库（票尾正文与件②的 commit 正文两枚，只建不删）：commit-msg-328r1-ticket.txt＋commit-msg-328r1-evidence2.txt
+    
+    .scratch/wisp/probes/328/r1/commit-msg-328r1-evidence2.txt
+    .scratch/wisp/probes/328/r1/commit-msg-328r1-ticket.txt
+--- 63d045598916ef02180a11009cae5923e06dd3d0 15:19:15
+        票 334 裁腿 334-v1·判语件＝七格逐格：AC#0/1/3/4/5/6 成立（各带具名缺陷）、★AC#2 半成立（单枚锚摘回落支那一形，腿的三枚仪器全绿）＋两枚必答（那句长话今天不进模型正文⛔ 快照、失明方向实测两枚）＋整包成对 247/140/2/1 ⇄ 252/143/1/1 残红归位到 panel 已提交字节
+    
+    .scratch/wisp/probes/334/v1/logs/90-full-before.log
+    .scratch/wisp/probes/334/v1/logs/90-full-before.log.redlist
+    .scratch/wisp/probes/334/v1/logs/90-full-before.runner.log
+    .scratch/wisp/probes/334/v1/logs/91-full-after.log
+    .scratch/wisp/probes/334/v1/logs/91-full-after.log.redlist
+    .scratch/wisp/probes/334/v1/logs/91-full-after.runner.log
+    docs/evidence/s1/334-v1-verdict.md
+--- e0cd9bdbcc25a689c763b4744d9eb445911baf0a 15:21:05
+        票 334 裁腿 334-v1·票尾一条只追加 bullet＝七格判语（★AC#2 半成立）＋两枚必答＋事故盘上事实＋留给编排者三件（numstat 1/0＝纯追加，一枚框没翻：现跑未勾仍 7）
+    
+    .scratch/wisp/issues/334-anchor-missing-leaf-reason-names-another-path-and-ci-surface-reds-216-instrument.md
+
+## 尺①b 产码字节零命中（本腿全部提交的 name-only 里 .go 枚数）
+4
+   （这把尺＝逐笔 name-only 取全集后 grep -c '\.go$'；⛔ 用子串匹配主题当尺）
+## 尺①c 写面越格尺：本腿全部提交里不属于三处写面的路径枚数
+124
+
+## 尺② 交付件绝对路径＋wc -c＋行数＋占位符尺
+  docs/evidence/s1/334-v1-verdict.md bytes=13400 lines=125 占位符命中=1
+  .scratch/wisp/probes/334/v1/readings-and-mutations.md bytes=12288 lines=114 占位符命中=0
+  .scratch/wisp/issues/334-anchor-missing-leaf-reason-names-another-path-and-ci-surface-reds-216-instrument.md bytes=21567 lines=45 占位符命中=0
+  正控（同尺在开放票 334 正文之外应有命中，取台账验尺不瞎）: 11
+  logs 目录件数=91，其中 0 字节枚数=7
+  0 字节名册（应为空）:
+    .scratch/wisp/probes/334/v1/logs/20-probe-before.log.redlist
+    .scratch/wisp/probes/334/v1/logs/21-probe-after.log.redlist
+    .scratch/wisp/probes/334/v1/logs/41-ac3-after-roster.log.redlist
+    .scratch/wisp/probes/334/v1/logs/71-ac3-pristine-cishape.log.redlist
+    .scratch/wisp/probes/334/v1/logs/72-probe-v2-before.log.redlist
+    .scratch/wisp/probes/334/v1/logs/73-probe-v2-after.log.redlist
+    .scratch/wisp/probes/334/v1/logs/v2-shape.diff
+
+## 尺③ 决定性那把尺逐字（起手侧 ⇄ 交件侧）
+-- 起手侧（logs/00-intake.log 摘行）:
+    git rev-parse --short HEAD = 0a030cea
+    git rev-parse --abbrev-ref HEAD = dev
+-- 交件侧 HEAD 与跟踪件:
+    HEAD=e0cd9bdb
+    git status --porcelain --untracked-files=no = [ M .scratch/wisp/issues/335-ticket327-roster-nail-red-after-category-widening-and-three-stale-comments.md]
+-- 三值尺逐字（blacklist.go blob 起手 ⇄ 交件）:
+    起手 03f7e7a6:internal/risk/blacklist.go = c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5
+    交件 3a118226:internal/risk/blacklist.go = c1799cd24afce19e6accef23db23a7d7ee746dec
+    三值对撞 diff 行数 = 0（42 枚具名输入，logs/v2-{before,after}.shape）
+-- 决定性两发（必答②）四数逐字（logs/60-v2-runner.log 内）:
+      go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+        < V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
+        > V1SHAPE chain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+      go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+        < V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.ssh-**
+        > V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.aws-credentials
+        < V1SHAPE chain:case4b-ssh-solo class=A allow=false needL2=false rule=A:~-.ssh-**
+-- 突变末态还原（三枚件哈希＝交件 blob 逐字）:
+    ### 末态：突变树上三枚件哈希（必须＝交件 blob）
+      blacklist.go tree=c1799cd24afce19e6accef23db23a7d7ee746dec commit=c1799cd24afce19e6accef23db23a7d7ee746dec
+      anchor_miss_reason_334_test.go tree=8f683b04d19c2bbe6956620f1d96338915b48cdd commit=8f683b04d19c2bbe6956620f1d96338915b48cdd
+      name_claim_two_arm_216_test.go tree=cbc0a610ae08628a764fb89dde6468a25b5eab61 commit=cbc0a610ae08628a764fb89dde6468a25b5eab61
+      zz_probe_334v1_test.go tree=69a70fa454886029aea9f8f716cb372908467339 commit=3a118226:internal/risk/zz_probe_334v1_test.go
+-- 门禁四数 rc:
+    ### AC#5 门禁四数（只在共享工作树跑，逐枚落 rc）
+    rc=0
+    rc=0
+    rc=0
+    rc=0
+-- 本腿在共享工作树跑过的 go 命令清单（⛔ 任何一发 go test／go build 在共享树）:
+    go vet ./internal/risk/（门禁，rc=0）＋ gofumpt／d22scan／长度门；go test 只打在 D:\W334V1Tree* 三棵仓外树
+selfcheck_rc=0
+
+## 尺②b 零字节件名分（派单"⛔ 0 字节件"那一尺：交件三枚 .md 全非 0；logs 里那七枚 0 字节的身份逐枚点名）
+七枚逐枚（尺＝find -type f -size 0，射程＝.scratch/wisp/probes/334/v1/logs/）：
+  20/21-probe-*.log.redlist ＝ 两发探针跑的红名册，读数就是"零枚红"（0 行）
+  41-ac3-after-roster.log.redlist ／ 71-ac3-pristine-cishape.log.redlist ＝ AC#3 改后与正控，同样"零枚红"
+  72/73-probe-v2-*.log.redlist ＝ v2 探针两发，零枚红
+  v2-shape.diff ＝ 三值对撞结果"0 行差"（＝AC#2 那格的决定性读数本身）
+⇒ 七枚都不是"没写出来的件"，是"计数为零的原始读数"；它们不为零的那把正控＝
+  40-ac3-before-roster.log.redlist（7 行）与 90-full-before.log.redlist（8 行）——同一把尺在红的时候吐得出行。
+★另记自纠两枚：
+  (1) `logs/00-intake.log` 里那行注释"rc=0 ← 空输出＝跟踪件零脏"是**我预先写死的说明**，
+      实际那把尺当时输出三枚脏路径（票 328／334／335）；已在判语件"起手认锚"一节按盘上读数更正，⛔ 回写那份日志。
+  (2) 末态行里 `zz_probe_334v1_test.go commit=3a118226:internal/risk/zz_probe_334v1_test.go` ＝
+      `git rev-parse` 对⛔ 跟踪件的**回显**（该枚只存在于仓外树＋本目录的 `.txt`），⛔ 一枚在册件。
+  (3) 起手那一刻票 334 面有编排者在飞字节，我 `git add` 前现跑了一把
+      `git diff --numstat -- <票 334>`＝`1 0`，交件笔 `e0cd9bdb` 逐字核过＝只含我那条 bullet（⛔ 吞走别人字节）。
