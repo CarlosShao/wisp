@@ -1,0 +1,65 @@
+332-a1 逐枚 git show --name-only（尺＝git log --format=%h 7535d83b..HEAD -- .scratch/wisp/probes/332/a1，射程＝本腿写面）
+===== 4f897c7ab =====
+4f897c7ab 2026-10-17 10:36:36 +0800 332-a1 件2 一处措辞更正（占位符尺扫到自己写的转义词汇名 XXXX 形，改为"反斜杠加 u 加四位十六进制"逐字描述；读数一字未动）
+
+.scratch/wisp/probes/332/a1/census-2-carriers-and-readers.md
+===== 2e9fa82af =====
+2e9fa82af 2026-10-17 10:36:10 +0800 332-a1 本腿唯一执行过的四枚仓外纯 stdlib 探针逐字源码入库（cfprobe/carrier/diskroster/mncount 四枚 main.go，含逐字重打四段显示边界函数与一段判定层函数的出处行号声明）
+
+.scratch/wisp/probes/332/a1/logs/probe-sources.log
+===== 3e33285b8 =====
+3e33285b8 2026-10-17 10:35:54 +0800 332-a1 0 命中三枚尺的成对正控原始读数：Ingest 读者 0 ⇄ json.Marshal 同尺形同射程 37；frontend wispOnPanelSnapshot 0 ⇄ 去目录限定 16；pathresolver 字符类拒绝 0 ⇄ display_scrub 同正则 5；exec.Command 非 test 5 行
+
+.scratch/wisp/probes/332/a1/logs/ruler-ingest-zero-with-control.log
+===== 0f5b44b17 =====
+0f5b44b17 2026-10-17 10:35:53 +0800 332-a1 载体无字符类筛尺的原始名册：git grep ContainsAny/IndexAny/ContainsRune @7535d83b 非 test 命中 18 行逐行原文（含 rules_shell.go:12 的 shellMetachars 常量字面集）
+
+.scratch/wisp/probes/332/a1/logs/ruler-no-charclass-screen-on-carriers.log
+===== 73bef2995 =====
+73bef2995 2026-10-17 10:35:53 +0800 332-a1 件2＝AC#2 逐枚可达性：三形入口逐环 file:line 现量（a 磁盘/b 模型/c 页面），155 枚分 11 族逐族给三形载体枚数（齐平原因＝18 行 ContainsAny 尺逐行只点 ASCII、pathresolver 字符类拒绝 0 处且正控 5 行）；＋AC#3 两枚名单外字符真盘正控与 marshal 字节逐字＋四把筛检尺（scrub_leaves_raw=155、IsSpace=0、taint_ignores=0、IsControl=0、json_escapes=0）；＋票 329 之后 327-a1 五条腐烂/未腐烂读数逐枚具名
+
+.scratch/wisp/probes/332/a1/census-2-carriers-and-readers.md
+===== 5c8cf05a9 =====
+5c8cf05a9 2026-10-17 10:32:04 +0800 332-a1 件1＝AC#0 起手四把尺逐枚现跑（名单15／Cf全集170 独立复跑＋UnicodeData17.0.0 对合／显示边界生产调用点1／判定层相反名单6枚显名+Mn族2059枚且取向相反逐字引它自己注释）＋AC#1 整族170枚名册、未被洗155枚分11族求和=155 LEFTOVER空
+
+.scratch/wisp/probes/332/a1/census-1-cf-155-roster.md
+===== 224fc5b82 =====
+224fc5b82 2026-10-17 10:29:12 +0800 332-a1 载体链转储：cmd/wisp/panel_snapshot_deliver_329.go 全文@7535d83b（票 329 接上的最后一跳：:95 读记账字节、:105 evalPanelJS、:66 逐字包裹 marshal 字节，全局名 window.wispOnPanelSnapshot）
+
+.scratch/wisp/probes/332/a1/logs/carrier-329-deliver-at-7535d83b.log
+===== 7637fbb8c =====
+7637fbb8c 2026-10-17 10:29:12 +0800 332-a1 载体链转储：cmd/wisp/panel_inbound.go 全文@7535d83b（CLI 形入向：:301 Attachment nil／:302 Message nil）
+
+.scratch/wisp/probes/332/a1/logs/carrier-inbound-at-7535d83b.log
+===== ab32ca709 =====
+ab32ca709 2026-10-17 10:29:11 +0800 332-a1 载体链转储：internal/panel/pump.go 全文@7535d83b（显示边界唯一生产调用点上游的装配：:275 传 nil 附件、:281 Git、:309 NewSnapshot、:314 Instructions、:333 Tasks、:344/:359 两处 json.Marshal）
+
+.scratch/wisp/probes/332/a1/logs/carrier-panel-pump-internal-at-7535d83b.log
+===== 64cf447d9 =====
+64cf447d9 2026-10-17 10:29:10 +0800 332-a1 载体链转储：cmd/wisp/panel_pump.go 全文@7535d83b（workspaceView:128-132、gitView:273、instructionBundle:153、publishPanelSnapshot:447→463 推宿主）
+
+.scratch/wisp/probes/332/a1/logs/carrier-pump-at-7535d83b.log
+===== 7e7642d83 =====
+7e7642d83 2026-10-17 10:29:10 +0800 332-a1 起手尺④读数：具名提交树 7535d83b 的 internal/risk/taintmatch.go 全文（isIgnorableTaintRune＝6 枚显名码位＋unicode.Mn 一族，第 39-45 行；取向相反的自陈在第 32-38 行注释）
+
+.scratch/wisp/probes/332/a1/logs/roster-taintmatch-at-7535d83b.log
+===== 22ce10717 =====
+22ce10717 2026-10-17 10:28:54 +0800 332-a1 AC#3 两枚名单外字符（U+2061／U+206B）真盘＋marshal 字节 dump：盘上 E281A1／E281AB 在位、needsDisplayWash=false 走快路、marshal 字节仍是 E2 81 A1／E2 81 AB 原样＋逐枚 sha256；同屏内正控 U+202E／ESC 各自被洗成可见转义形
+
+.scratch/wisp/probes/332/a1/logs/ac3-carrier-disk-and-marshal-dump.log
+===== 254201793 =====
+254201793 2026-10-17 10:28:42 +0800 332-a1 载体(a) 逐枚真盘尺：155 枚名单外 Cf 一枚一枚写真名读回＝155/155 READBACK_OK；8 枚对照里 C0（U+0000/09/0A/0D/1B/1F）全部 WRITE_FAIL、C1（U+0085/009B）与名单内三枚 READBACK_OK（NUL 字节已 tr 剥除，出处＝U+0000 那一枚的错误串）
+
+.scratch/wisp/probes/332/a1/logs/ac2a-disk-legality-per-cf-codepoint.log
+===== e1dbd5ddf =====
+e1dbd5ddf 2026-10-17 10:28:41 +0800 332-a1 AC#1 名册底表：170 枚 Cf 逐枚码位＋Unicode17.0.0 官方名＋Category＋名单内外＋洗/穿行为（名取自 unicode.org 的 UnicodeData.txt，与 Go 计数逐枚对合＝IN_GO_NOT_UD 空、IN_UD_NOT_GO 空）
+
+.scratch/wisp/probes/332/a1/logs/ac1-cf-170-roster-with-unicode-names.log
+===== 01dedff3e =====
+01dedff3e 2026-10-17 10:28:40 +0800 332-a1 起手尺②读数：仓外纯 stdlib 探针独立复跑 Cf 全集＝170 枚（GO_UNICODE_VERSION=17.0.0，尺＝逐标量 unicode.Is(unicode.Cf,r) 计数、跳过代理区；另算 CF_IN_ROSTER=15／CF_OUTSIDE_ROSTER=155／MISMATCH=0，MISMATCH＝名单判定与 scrubForDisplay 实际行为不符的枚数）
+
+.scratch/wisp/probes/332/a1/logs/ruler2-cf-170-census-go-probe.log
+===== 37741f052 =====
+37741f052 2026-10-17 10:18:32 +0800 332-a1 起手尺①③④原始转储（一）：具名提交树 7535d83b 的 internal/panel/display_scrub_216.go 全文（isDisplayWashCf 名单逐枚＝15 枚，尺＝git show <锚>:<路径> | 数 case 支里的码面枚数，非 grep -c 'case 0x'＝1 因为那是跨行单条 case）
+
+.scratch/wisp/probes/332/a1/logs/roster-display-scrub-216-at-7535d83b.log
