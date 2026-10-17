@@ -1,0 +1,4 @@
+票 334 腿 334-r1·事故自报一枚＝我的裸 git commit 吞了 332 结案腿 staged 的重命名（内容零损失，账目归属要补）
+  现象/因/损害面/安全形见 incident-swallowed-index-entry.md：R100 纯改名落进我 8823549f；
+  他们随后 dc367a2a 在同一枚件上翻六格，盘上现状干净、零行丢失；⛔ reset/rebase/amend/revert 遮它＝只追加更正。
+  本腿余下 commit 一律改用 git commit -F <正文> -- <逐枚显式件名>（这笔就是），⛔ 裸 commit、⛔ -- .。
