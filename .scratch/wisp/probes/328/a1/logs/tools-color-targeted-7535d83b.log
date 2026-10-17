@@ -1,0 +1,49 @@
+time=2026-10-17T11:26:17.245+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop
+time=2026-10-17T11:26:17.267+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328a1-gotmp\Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealL4213462955\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T11:26:17.282+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealL4213462955\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T11:26:17.289+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T03:26:17Z duration_ms=7
+time=2026-10-17T11:26:17.294+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealL4213462955\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T11:26:17.298+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T03:26:17Z duration_ms=4
+time=2026-10-17T11:26:17.304+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealL4213462955\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T11:26:17.309+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T03:26:17Z duration_ms=4
+time=2026-10-17T11:26:17.312+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T11:26:17.314+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test287SubagentCallerRefusedAtTheRosterDepthCheckThroughTheRealLoop (0.07s)
+=== RUN   Test283TaskIDAccessorIsTheTaskIDNotTheCorr
+--- PASS: Test283TaskIDAccessorIsTheTaskIDNotTheCorr (0.00s)
+=== RUN   Test283IdentityChainThroughTheRealLoop
+time=2026-10-17T11:26:17.331+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328a1-gotmp\Test283IdentityChainThroughTheRealLoop2610116020\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T11:26:17.341+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\Test283IdentityChainThroughTheRealLoop2610116020\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T11:26:17.347+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T03:26:17Z duration_ms=6
+time=2026-10-17T11:26:17.352+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\Test283IdentityChainThroughTheRealLoop2610116020\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T11:26:17.356+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T03:26:17Z duration_ms=3
+time=2026-10-17T11:26:17.361+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\Test283IdentityChainThroughTheRealLoop2610116020\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T11:26:17.366+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T03:26:17Z duration_ms=4
+time=2026-10-17T11:26:17.369+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T11:26:17.370+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test283IdentityChainThroughTheRealLoop (0.05s)
+=== RUN   Test285RosterRowsCarryDistinctCorrPerCall
+time=2026-10-17T11:26:17.383+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328a1-gotmp\Test285RosterRowsCarryDistinctCorrPerCall4123676059\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T11:26:17.392+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\Test285RosterRowsCarryDistinctCorrPerCall4123676059\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T11:26:17.397+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T03:26:17Z duration_ms=4
+time=2026-10-17T11:26:17.402+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\Test285RosterRowsCarryDistinctCorrPerCall4123676059\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T11:26:17.406+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T03:26:17Z duration_ms=3
+time=2026-10-17T11:26:17.411+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\Test285RosterRowsCarryDistinctCorrPerCall4123676059\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T11:26:17.415+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T03:26:17Z duration_ms=4
+time=2026-10-17T11:26:17.417+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T11:26:17.419+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: Test285RosterRowsCarryDistinctCorrPerCall (0.05s)
+=== RUN   TestLoopPassesDeclaredL1WriteThroughTheGate
+time=2026-10-17T11:26:17.434+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328a1-gotmp\TestLoopPassesDeclaredL1WriteThroughTheGate3273399287\001\db kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T11:26:17.446+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\TestLoopPassesDeclaredL1WriteThroughTheGate3273399287\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T11:26:17.451+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T03:26:17Z duration_ms=4
+time=2026-10-17T11:26:17.455+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\TestLoopPassesDeclaredL1WriteThroughTheGate3273399287\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T11:26:17.459+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T03:26:17Z duration_ms=3
+time=2026-10-17T11:26:17.464+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328a1-gotmp\TestLoopPassesDeclaredL1WriteThroughTheGate3273399287\001\db\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T11:26:17.469+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T03:26:17Z duration_ms=4
+time=2026-10-17T11:26:17.471+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T11:26:17.473+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestLoopPassesDeclaredL1WriteThroughTheGate (3.07s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	3.302s

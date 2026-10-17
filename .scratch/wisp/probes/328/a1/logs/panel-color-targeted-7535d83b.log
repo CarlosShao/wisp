@@ -1,0 +1,31 @@
+GOTMPDIR=D:\tmp\328a1-gotmp
+time=2026-10-17T11:17:14.858+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestApprovalCardViewJSONKeysMatchFrontendTypes
+    approval_test.go:134: ApprovalCardView <-> ApprovalCardView: 10 JSON keys reconciled
+    approval_test.go:134: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    approval_test.go:134: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+=== RUN   TestASecondCardForTheSameTaskStillLightsItsRow
+--- PASS: TestASecondCardForTheSameTaskStillLightsItsRow (0.00s)
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_suffix_is_not_the_queue's_form
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row
+--- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_suffix_is_not_the_queue's_form (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row (0.00s)
+=== RUN   TestAL1WindowInWaitingLightsItsRow
+--- PASS: TestAL1WindowInWaitingLightsItsRow (0.00s)
+=== RUN   TestABlockedRowKeepsItsRunningDimension
+--- PASS: TestABlockedRowKeepsItsRunningDimension (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.052s
+FAIL

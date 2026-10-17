@@ -1,0 +1,13 @@
+time=2026-10-17T11:26:06.113+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCorrPerCallTwoAsksSameTask242
+--- PASS: TestCorrPerCallTwoAsksSameTask242 (0.01s)
+=== RUN   TestGoldenSingleToolCall
+--- PASS: TestGoldenSingleToolCall (0.00s)
+=== RUN   TestGoldenParallelToolCalls
+--- PASS: TestGoldenParallelToolCalls (0.00s)
+=== RUN   Test285CallCorrIsDistinctPerCall
+--- PASS: Test285CallCorrIsDistinctPerCall (0.00s)
+=== RUN   Test285LoopDispatchesOneCorrPerCall
+--- PASS: Test285LoopDispatchesOneCorrPerCall (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.063s
