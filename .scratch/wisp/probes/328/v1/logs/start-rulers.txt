@@ -1,0 +1,47 @@
+date=2026-10-17 16:1x +0800 leg=328-v1 (非实现者终裁腿)
+
+## 起手锚（现跑，⛔ 抄派单号）
+$ git log -1 --format='%H %ad %s' --date=iso
+78d3b46aea2a2c6e5309b8649bf1da9b101aed78 2026-10-17 16:00:50 +0800 编排者代提 334-v1 未入库读数（46 枚原始日志）…
+$ git rev-parse --abbrev-ref HEAD
+dev
+★派单里那枚 d175e483 已被编排者自己后续三枚（ed2ab16d…78d3b46a）盖过 ⇒ 我的锚＝78d3b46a。
+
+## 框数尺（尺＝派单自己指定的那条）
+$ grep -n '^[[:space:]]*- \[' .scratch/wisp/issues/328-l2-card-corr-shape-never-matches-the-roster-join-key.md
+31:- [x] AC#0   32:- [x] AC#1   33:- [ ] AC#2   34:- [ ] AC#3   35:- [ ] AC#4
+未勾=3（AC#2/AC#3/AC#4）／已勾=2／总=5 ⇒ 派单那句"盘上现量＝五枚"成立，腿那句"七格"与 A1020 那句"七格"都作废（本尺逐字在上）。
+
+## 共享编译面 status 尺
+$ git status --porcelain -- internal/panel cmd/wisp
+（空，rc=0）
+$ git status --porcelain | wc -l
+1181            ← 全仓在飞枚数（别的写面；与我无关，git add 一律逐枚显式 pathspec）
+
+## 落地腿九枚提交（严格前缀尺）
+$ git log --all --grep='^328-r1 ' --oneline | wc -l
+11              ← 派单说 11 笔，成立（产码/仪器四枚＝b2d55342 1696d01b ffebb6d1 f705b082；末笔 46d815d9；另 e9d8ba94 自纠）
+
+## 代码代表性尺（我要裁的是盘上今天这份字节）
+$ git diff --name-only f705b082..78d3b46a -- internal/panel internal/agent
+（空＝0 行）⇒ 交件侧 f705b082 的那两包字节 == 我的锚 78d3b46a ⇒ 导出台树以 78d3b46a 取，可代 HEAD。
+
+## 锚存在性尺
+$ for a in 648eda04 b2d55342 1696d01b ffebb6d1 f705b082 46d815d9 e9d8ba94 78d3b46a; do git cat-file -t $a; done
+commit ×8
+$ git merge-base --is-ancestor 648eda04 78d3b46a  ⇒ YES（腿的起手锚在我历史里）
+
+## 台面件可用性尺（正控，先证存在再信 rc）
+$ ls -d design                        ⇒ design（共享工作树有 ⇒ d22scan 的 ban #8 射程不缺这一味）
+$ ls -l /d/work/base/gopath/bin/gofumpt.exe ⇒ 5028352 字节，2026-10-07
+
+## ★派单前提的一处盘上不符（具名上报，⛔ 我自己填假设）
+派单 AC#2③ 称"把第三臂 strings.HasPrefix(key, task+"#") 换成 strings.HasPrefix(key, task) 这一发＝腿没发的反形"，
+并称腿的 M1"抹的是分隔符本身、⛔ 打在这一半上"。盘上腿的脚本逐字（尺＝git show 46d815d9:.scratch/wisp/probes/328/r1/logs/mutate.sh，:30-31）：
+  M1) # 抹掉分隔符那一半 ⇒ 纯前缀匹配
+    sed -i 's/strings.HasPrefix(key, task+"#")/strings.HasPrefix(key, task)/' "$F"
+⇒ 那一发的替换串与派单点名要我补的那一发**逐字节同一形**；腿日志 mut-M1.log:6 读出突变后行
+  312:		if strings.HasPrefix(key, task) {
+并在 :21 记录 `--- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light`。
+⇒ 我仍**自己现跑**这一发（完成通知一律当未验证；腿的日志不是我的读数）。判语按**我的读数**写，
+  并把"派单前提与腿交件不符"这一处作为**对编排者**的具名发现上报（⛔ 据此退腿的那一发）。
