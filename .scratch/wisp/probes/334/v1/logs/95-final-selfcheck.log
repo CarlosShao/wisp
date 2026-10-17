@@ -356,3 +356,8 @@ selfcheck_rc=0
     docs/evidence/s1/334-v1-verdict.md
   收尾 git status --porcelain --untracked-files=no ＝ [ M .scratch/wisp/probes/334/v1/logs/95-final-selfcheck.log]（空＝本腿交件时跟踪件面零脏，别腿那枚 335 票尾已被他们自己归位）
 selfcheck_amended_rc=0
+
+## 收尾真读数（那一行括号里我写的"空"当时并不空——它抓到的是本件自己正在被追加＝自指；现补一发干净的）
+  git status --porcelain --untracked-files=no = []
+  票 334 未勾=7 已勾=0
+  HEAD=a892907c
