@@ -1,0 +1,9 @@
+328-r1 票尾一条（只追加⛔ 翻框⛔ 改判据⛔ Status⛔ 票名⛔ -done）：交件读数与剩下的那一跳
+
+.scratch/wisp/issues/328-l2-card-corr-shape-never-matches-the-roster-join-key.md：末尾追加**一条** bullet（+2 行＝
+一空行＋我那一枚；`git diff` 逐字看过⛔ 第二个人的字节 —— 起手时那一枚在飞的 `Status:` 改动已由编排者 `ed6fa14e` 入库，
+本腿追加前跑尺证该文件对 HEAD 为空）。内容＝料不是判语：四枚提交号／硬框 ⓐⓑⓒ⓭⓮ 逐枚落点／去牙两发逐字红句与还原哈希／
+颜色四数与红名册作差 0／门禁四数 rc／AC#2-#4 三枚框**一枚没翻**等非实现者裁。
+★据实登记那一跳仍差：屏幕那一行今天仍不会亮（本腿现量 frontend 里 blockedOnApproval 命中文件数 0），
+并★更正票面与普查件的一个数（同尺族 correlationId 本腿量到 11 枚文件／frontend/src 内 7 枚，⛔ 复现"4 枚"），
+＋新交一格零读数（队列撞名改写全仓无用例真产过）与 cmd/wisp 整包未跑的具名缺口。

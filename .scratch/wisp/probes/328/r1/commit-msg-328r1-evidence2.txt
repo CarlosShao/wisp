@@ -1,0 +1,13 @@
+328-r1 证据件②：台面／颜色成对／门禁四数／AC#3 四面 diff 0／git 自证
+
+docs/evidence/s1/328-r1-color.md（新增）：两棵仓外导出树逐项读数（八件套＋仓根 docs/＋手工三件、
+8.3 别名 WI8846~1／WI98B9~1、.go 746⇄748 证非空、GOTMPDIR 先建）；颜色四数改前⇄改后成对（panel 257/160/7/0
+⇄ 268/163/7/0，agent 112/88/0/0 ⇄ 114/90/0/0；定点三发单列；⛔ 混两把尺、⛔ 相减当判据）；
+★终态红名册与起手作差＝0，七枚起手即红逐名归位（两枚前端契约键族＝普查件点名的那两枚，两枚＝导出树缺
+.git／缺 design/ 的台面局限，一枚＝render fixture 缺块；⛔ 为它们放宽任何断言）；门禁四数逐枚 rc=0
+（gofumpt 真身／d22scan clean 且射程现量非空／长度门 GREEN tracked 15035／go vet 两包）；
+AC#3＝硬框 ⓮：四枚提交 × 四面＝16 格逐格 diff_lines=0，另附归属尺与 ApprovalCardView 字段名册未多任务号
+（TaskID 0 命中＋正控 CorrelationID 3 命中）；git 自证（起手锚 648eda04 现认、逐枚提交与 name-only 行数、
+收尾 status 1238 行里跟踪改动 2 枚＝本腿票面一枚＋别腿票 335 一枚⛔ 带走）；末节具名清单"本腿没做的事"。
+
+件①见上一笔（docs/evidence/s1/328-r1-join.md）。本笔⛔ 翻框 ⛔ push。
