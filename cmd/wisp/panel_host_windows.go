@@ -312,6 +312,30 @@ func (m *PanelManager) currentWindow() webview2.WebView {
 	return m.w
 }
 
+// evalPanelJS is ticket 329 form 甲's host half of the snapshot hop: it routes one
+// already-assembled JS sentence to the panel thread and returns immediately. The
+// pump calls this from the gate's and the sink's goroutines, while the control
+// lives on the thread that created it, so the sentence goes through the library's
+// own Dispatch queue - the same post-back-to-thread shape residentPanel.post has
+// used since ticket 33 (panel_resident_windows.go), and the Eval it eventually
+// runs is the same panelControl.Eval the four RPC receipts ride, which makes this
+// the FIFTH use of that primitive and changes none of those four.
+//
+// NO WINDOW, NO PUSH. currentWindow is nil before the first bring-up and after
+// Destroy; a snapshot published while no window exists is then simply not pushed -
+// the bytes stay booked in the run exactly as they did before ticket 329,
+// and this is a skip, never a second destination. The page-side receiver for the
+// pushed global is still missing (see probes/329/r1/page-contract.md); a push into
+// a page that has not declared the receiver is a no-op there, and neither half of
+// that sentence may be quietly read as the other.
+func (m *PanelManager) evalPanelJS(js string) {
+	w := m.currentWindow()
+	if w == nil {
+		return
+	}
+	w.Dispatch(func() { w.Eval(js) })
+}
+
 // bringUp creates the ONE window on the calling thread and returns once the
 // control is alive and the entry bytes have been handed to it. It must run on a
 // thread that will pump the window's messages (ui-sta in the resident process, a
