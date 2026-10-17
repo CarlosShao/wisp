@@ -1,0 +1,150 @@
+# 335-v1 AC#5/AC#6 byte-and-discipline audit 2026-10-17 13:43:19 +0800
+## blob identity, three named trees, prod file (ruler: git rev-parse tree:path blob id + git hash-object of extracted byte)
+blob[a06a73d8]=git230d3443d7105b1856c557aa9579a7fe8ab077d8
+blob[77d98354]=git6ab8ad85c5ad6452b7df9de4691cad384f3ce378
+blob[23d36a81]=git6ab8ad85c5ad6452b7df9de4691cad384f3ce378
+hash-object[extracted 77d98354 bytes]=6ab8ad85c5ad6452b7df9de4691cad384f3ce378
+sha256[physical file in export tree T after all shots, must equal leg 5c68a930...]=5c68a930ae33e70b92a8ff4fefd107c0c6281f2264df16bcbc13d5026813157a
+## predicate byte check: prod file, isDisplayWashCf body + case-0x census (ruler: grep on the named-tree extraction)
+164:	return unicode.Is(unicode.Cf, r)
+case_0x_hits=0 (floor: prod lists no Cf codepoints)
+## six commits: name-only full set (expect only internal/panel two files + probes/335/r1 + ticket file)
+--- 9567b094 ---
+
+internal/panel/display_scrub_216_test.go
+--- 77d98354 ---
+
+internal/panel/display_scrub_216.go
+--- a58b12dc ---
+
+.scratch/wisp/probes/335/r1/delivery.md
+.scratch/wisp/probes/335/r1/logs/ac0-arm3-sample-premise.log
+.scratch/wisp/probes/335/r1/logs/ac0-cf-category-probe.log
+.scratch/wisp/probes/335/r1/logs/ac0-nail-anchor.log
+.scratch/wisp/probes/335/r1/logs/ac1-pair-summary.log
+.scratch/wisp/probes/335/r1/logs/ac1-reshaped-green-post.log
+.scratch/wisp/probes/335/r1/logs/ac1-reshaped-green.log
+.scratch/wisp/probes/335/r1/logs/ac2-zero-change-ruler.log
+.scratch/wisp/probes/335/r1/logs/colours-and-roster.log
+.scratch/wisp/probes/335/r1/logs/final-shared-tree.log
+.scratch/wisp/probes/335/r1/logs/gates-four.log
+.scratch/wisp/probes/335/r1/logs/mut-A.log
+.scratch/wisp/probes/335/r1/logs/mut-B.log
+.scratch/wisp/probes/335/r1/logs/mut-C.log
+.scratch/wisp/probes/335/r1/logs/mut-nail-lines.txt
+.scratch/wisp/probes/335/r1/logs/placeholders.log
+.scratch/wisp/probes/335/r1/logs/post-T3-c.log
+.scratch/wisp/probes/335/r1/logs/post-T3-d.log
+.scratch/wisp/probes/335/r1/logs/pre-T1-c.log
+.scratch/wisp/probes/335/r1/logs/pre-T1-d.log
+.scratch/wisp/probes/335/r1/msg-ac1.txt
+.scratch/wisp/probes/335/r1/msg-ac2.txt
+.scratch/wisp/probes/335/r1/msg-ev.txt
+.scratch/wisp/probes/335/r1/mut335r1.sh
+.scratch/wisp/probes/335/r1/readings.md
+.scratch/wisp/probes/335/r1/zc335r1.sh
+--- ce7224c2 ---
+
+.scratch/wisp/probes/335/r1/logs/gates-four-final.log
+.scratch/wisp/probes/335/r1/msg-gates.txt
+--- 64265f0e ---
+
+.scratch/wisp/issues/335-ticket327-roster-nail-red-after-category-widening-and-three-stale-comments.md
+.scratch/wisp/probes/335/r1/msg-bullet-commit.txt
+.scratch/wisp/probes/335/r1/msg-bullet.txt
+--- 23d36a81 ---
+
+.scratch/wisp/probes/335/r1/logs/ac1-final-targeted-shared.log
+.scratch/wisp/probes/335/r1/logs/placeholders-final.log
+.scratch/wisp/probes/335/r1/msg-final.txt
+## subject strict-prefix ruler: ^票 335 space
+9567b094 PREFIX_OK
+77d98354 PREFIX_OK
+a58b12dc PREFIX_OK
+ce7224c2 PREFIX_OK
+64265f0e PREFIX_OK
+23d36a81 PREFIX_OK
+## substring trap: which commits match substring but not prefix (range a06a73d8..23d36a81)
+03b827d81|票 333 结案：九格全翻＋改 -done（凭非实现者裁腿 333-v1＝AC#0…AC#8 皆成立；★四枚判据文字更正全采并原文留原地、:444 那枚过钉处方＝改形翻向落票 335 AC#1；我自己复跑三把尺＝写面 45 枚路径/.go 0、HEAD 树谓词逐字 unicode.Is(unicode.Cf,r) 且 case 0x 命中 0、判语件现量 132/15931）
+e3333c13d|票 333 裁决腿 333-v1 判语件＝docs/evidence/s1/333-v1-verdict.md（129 行／15480 字节，短名⛔带节号，五词空尺 0 命中）：九格 AC#0…AC#8 全判**成立**，★AC#3 自指攻击＝M1 产码退回名册→关系钉红（:72/:76）⇄ M3 同发换反形→同钉绿（:66 读 170），反形与正形读数不同＝本格非恒真；AC#6 四发 255/158/7/0 ⇄ 257/159/8/0、两卷名行序列只差耗时列、多的那一枚＝:444 旧钉（本腿确认那枚红的成因不在 333 的产码，归票 335）；AC#5 两发红名册 comm 作差 M1 独有关系钉／M2 独有 nail 3＋pristine M0 绿；AC#4 全集枚数由本腿仓外探针独立取（Cf=170／Cc=65＝IsControl 恰等 Cc），U+180E 在 22 枚边界里且 want 跟 Go 的表；AC#8 翻向＝更严（两条判据），三处过期散文留原地有硬理由（:92 自己写着 U+202E／U+00AD，改它撞 AC#2 那把尺）；必答三句＋四判据文字更正建议交裁，本腿一枚框没翻、⛔ 产码一字、⛔ push
+## t.Skip additions in the leg's two code commits (ruler: git show | grep ^+.*t.Skip)
+skip_additions[9567b094]=0
+skip_additions[77d98354]=0
+## deleted func Test lines in 9567b094 (rename/loss check)
+minus_funcTest_9567b094=0
+## nail present by name at terminal tree?
+23d36a81:internal/panel/display_scrub_216_test.go:1
+## who else references the nail name anywhere at 23d36a81 (rename-catcher ruler: repo-wide git grep)
+  23d36a81:.scratch/wisp/issues/327-display-boundary-washes-cc-only-so-cf-invisible-chars-still-pass-through.md
+  23d36a81:.scratch/wisp/issues/333-display-boundary-wash-cf-category-not-hand-roster-done.md
+  23d36a81:.scratch/wisp/issues/335-ticket327-roster-nail-red-after-category-widening-and-three-stale-comments.md
+  23d36a81:.scratch/wisp/probes/327/r1/msg-commit2.txt
+  23d36a81:.scratch/wisp/probes/327/v1/logs/readings.log
+  23d36a81:.scratch/wisp/probes/332/v1/logs/ac3-replay-teeth-and-gates.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/ac3-nails-final.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/ac3-nails-reshaped.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/ac3-nails-targeted.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/ac5-pair-summary.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/delivery-colours.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/mut-M0-control.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/mut-M1.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/mut-M2.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/post-c.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/post-d.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/pre-anchor-c.log
+  23d36a81:.scratch/wisp/probes/333/r1/logs/pre-anchor-d.log
+  23d36a81:.scratch/wisp/probes/333/r1/msg-ac3.txt
+  23d36a81:.scratch/wisp/probes/333/r1/msg-ac5.txt
+  23d36a81:.scratch/wisp/probes/333/r1/mut333r1.sh
+  23d36a81:.scratch/wisp/probes/333/v1/logs/bullet-333v1.md
+  23d36a81:.scratch/wisp/probes/333/v1/logs/col-del-c.failnames.txt
+  23d36a81:.scratch/wisp/probes/333/v1/logs/col-del-c.log
+  23d36a81:.scratch/wisp/probes/333/v1/logs/col-del-c.seq.txt
+  23d36a81:.scratch/wisp/probes/333/v1/logs/col-del-d.failnames.txt
+  23d36a81:.scratch/wisp/probes/333/v1/logs/col-del-d.log
+  23d36a81:.scratch/wisp/probes/333/v1/logs/col-del-d.seq.txt
+  23d36a81:.scratch/wisp/probes/333/v1/logs/col-pre-c.log
+  23d36a81:.scratch/wisp/probes/333/v1/logs/col-pre-c.seq.txt
+  23d36a81:.scratch/wisp/probes/333/v1/logs/col-pre-d.log
+  23d36a81:.scratch/wisp/probes/333/v1/logs/col-pre-d.seq.txt
+  23d36a81:.scratch/wisp/probes/333/v1/logs/mut-M0-control.failnames.txt
+  23d36a81:.scratch/wisp/probes/333/v1/logs/mut-M0-control.log
+  23d36a81:.scratch/wisp/probes/333/v1/logs/mut-M1-roster.log
+  23d36a81:.scratch/wisp/probes/333/v1/logs/mut-M2-fastpath.log
+  23d36a81:.scratch/wisp/probes/333/v1/logs/mut-M3-selfcopy.log
+  23d36a81:.scratch/wisp/probes/333/v1/logs/mut-M4-selfcopy-only.failnames.txt
+  23d36a81:.scratch/wisp/probes/333/v1/logs/mut-M4-selfcopy-only.log
+  23d36a81:.scratch/wisp/probes/333/v1/logs/mut333v1.sh
+  23d36a81:.scratch/wisp/probes/333/v1/logs/readings-final.log
+  23d36a81:.scratch/wisp/probes/335/r1/delivery.md
+  23d36a81:.scratch/wisp/probes/335/r1/logs/ac0-nail-anchor.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/ac1-final-targeted-shared.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/ac1-pair-summary.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/ac1-reshaped-green-post.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/ac1-reshaped-green.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/colours-and-roster.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/final-shared-tree.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/mut-A.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/mut-B.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/mut-C.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/mut-nail-lines.txt
+  23d36a81:.scratch/wisp/probes/335/r1/logs/post-T3-c.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/post-T3-d.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/pre-T1-c.log
+  23d36a81:.scratch/wisp/probes/335/r1/logs/pre-T1-d.log
+  23d36a81:.scratch/wisp/probes/335/r1/msg-ac1.txt
+  23d36a81:.scratch/wisp/probes/335/r1/msg-bullet.txt
+  23d36a81:.scratch/wisp/probes/335/r1/msg-final.txt
+  23d36a81:.scratch/wisp/probes/335/r1/mut335r1.sh
+  23d36a81:.scratch/wisp/probes/335/r1/readings.md
+  23d36a81:.scratch/wisp/probes/orch/20261017/txt/327.before-bullet.md
+  23d36a81:.scratch/wisp/probes/orch/20261017/txt/335r1-dispatch.txt
+  23d36a81:.scratch/wisp/probes/orch/20261017/txt/335r1-head.txt
+  23d36a81:docs/evidence/s1/327-r1-display-cf-wash.md
+  23d36a81:docs/evidence/s1/327-r2-nail.md
+  23d36a81:docs/evidence/s1/327-v1-verdict.md
+  23d36a81:docs/evidence/s1/333-r1-display-cf-category.md
+  23d36a81:docs/evidence/s1/333-v1-verdict.md
+  23d36a81:docs/reports/HANDOVER.md
+  23d36a81:docs/reports/pending-and-issues.md
+  23d36a81:internal/panel/display_scrub_216_test.go

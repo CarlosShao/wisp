@@ -1,0 +1,16 @@
+# 335-v1 fixture LF-line correction (perl ruler; awk ruler above was CR-lossy, kept as trail) 2026-10-17 13:38:50 +0800
+ruler: perl -ne line-by-line /\r\n$/ test
+worktree LF-only lines:
+  line 1 len=26
+  line 14 len=1118
+  line 15 len=1
+  line 16 len=40
+  line 30 len=1550
+  line 31 len=1
+  line 32 len=49
+  line 45 len=1568
+worktree_lf_only_count=8
+archive copy LF-only count:
+  archive_lf_only_count=0
+blob LF-only count (expect 45):
+  blob_lf_only_count=45

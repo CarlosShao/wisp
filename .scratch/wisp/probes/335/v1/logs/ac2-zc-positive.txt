@@ -1,0 +1,9 @@
+--- positive control RETRY (first perl one-liner had a compile error, rc=255, recorded above as the failed attempt; occurrence census of the token in prod file first) ---
+token_count=1
+pc_copy_bytes=11404 orig=11404 diffbytes=2
+anchor=a06a73d8 file=internal/panel/display_scrub_216.go candidate=/d/V335V1/zc/pc-noncomment.go
+anchor-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+cand-stripped-sha256=bdb58d7bd7c536a46d45f5571262e2b0021ea208a8db700673dc5b600b3f3080
+same_sha=no diff-nonempty=yes diff-rc=1
+TMPD=/tmp/zc335.v3ta1z
+pc_rc=1 (expect nonzero = ruler bites)

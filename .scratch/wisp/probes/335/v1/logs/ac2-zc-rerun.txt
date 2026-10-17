@@ -1,0 +1,27 @@
+# 335-v1 AC#2 zero-change ruler rerun (script = r1's zc335r1.sh verbatim, inputs = named commit trees, worktree untouched) 2026-10-17 13:41:31 +0800
+--- main: anchor a06a73d8 vs candidate=git-show(77d98354) ---
+anchor=a06a73d8 file=internal/panel/display_scrub_216.go candidate=/d/V335V1/prod_77d98354.go
+anchor-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+cand-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+same_sha=yes diff-nonempty=no diff-rc=0
+TMPD=/tmp/zc335.Jzp1ix
+rc=0
+--- terminal-state: anchor a06a73d8 vs candidate=git-show(23d36a81) ---
+anchor=a06a73d8 file=internal/panel/display_scrub_216.go candidate=/d/V335V1/prod_23d36a81.go
+anchor-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+cand-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+same_sha=yes diff-nonempty=no diff-rc=0
+TMPD=/tmp/zc335.1Kezrc
+rc=0
+--- positive control: one non-comment byte Cf->Cc in copy ---
+Can't modify logical and (&&) in scalar assignment at -e line 1, at EOF
+Can't modify not in scalar assignment at -e line 1, at EOF
+Execution of -e aborted due to compilation errors.
+rc=255 (expect nonzero)
+--- negative control: move one whole-line comment in copy ---
+anchor=a06a73d8 file=internal/panel/display_scrub_216.go candidate=/d/V335V1/zc/nc-comment.go
+anchor-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+cand-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+same_sha=yes diff-nonempty=no diff-rc=0
+TMPD=/tmp/zc335.m3ZW5W
+rc=0 (expect zero, ruler blind to whole-line comments by construction)

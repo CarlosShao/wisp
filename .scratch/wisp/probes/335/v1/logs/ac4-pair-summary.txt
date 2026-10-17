@@ -1,0 +1,14 @@
+# 335-v1 AC#4 pair-run summary (tree /d/V335V1/T = git archive 23d36a81, 758 .go, docs+manual three; raw logs kept out-of-repo at /d/V335V1/mut/full-{c,d}.log) 2026-10-17 13:55:58 +0800
+ruler: grep -c of the four line-anchors, counted; same command both sides: go test -v ./internal/panel/ -count=1 -timeout 30m
+c-side TMP/TEMP=/tmp(C:), GOTMPDIR unset: RUN=257 PASS_TOP=160 FAIL_TOP=7 SKIP=0 rc=1
+d-side TMP/TEMP/GOTMPDIR=/d/V335V1/gotmp(pre-mkdir): RUN=257 PASS_TOP=160 FAIL_TOP=7 SKIP=0 rc=1
+red-name lists identical (diff empty = SAME_REDNAMES, see trail):
+  --- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+  --- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+  --- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+  --- FAIL: TestComposerContractTypesMatchFrontend
+  --- FAIL: TestComposerRenderFixtureTellsTheTruth
+  --- FAIL: TestReadGitOnThisRepositoryIsSelfConsistent
+  --- FAIL: TestC21DesignTokensFourWayAgree
+gates note: no zero-FAIL setup failure strings; red sentences containing walk/build failed/no test files/setup failed/0xc0000135 counted: 1
+leg comparison (their T3 pair, same four numbers): pre-T1 257/159/8/0 post-T3 257/160/7/0; my tree=23d36a81 terminal state reads 7 = same 5 content-red + 2 export-bench-red (no .git + fixture CRLF, mechanism in fixture-mechanism.txt)
