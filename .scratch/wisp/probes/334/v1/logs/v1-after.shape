@@ -1,0 +1,34 @@
+V1SHAPE real-temp-i0 class=A allow=false needL2=false rule=A:~-.aws-credentials
+V1SHAPE real-temp-i1 class=A allow=false needL2=false rule=A:~-.aws-credentials
+V1SHAPE real-temp-i2 class=A allow=false needL2=false rule=A:~-.aws-credentials
+V1SHAPE real-temp-i3 class=none allow=true needL2=false rule=empty
+V1SHAPE real-appdata-wisp-logs class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+V1OVERRIDE real-appdata-wisp-logs class=A allow=false needL2=false
+V1SHAPE chain:case1-gitcreds class=A allow=false needL2=false rule=A:~-.git-credentials
+V1OVERRIDE chain:case1-gitcreds class=A allow=false needL2=false
+V1SHAPE chain-clean:case1-gitcreds class=none allow=true needL2=false rule=empty
+V1SHAPE chain:case3-wisp-config class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+V1OVERRIDE chain:case3-wisp-config class=A allow=false needL2=false
+V1SHAPE chain-clean:case3-wisp-config class=none allow=true needL2=false rule=empty
+V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.ssh-**
+V1OVERRIDE chain:case4-ssh class=A allow=false needL2=false
+V1SHAPE chain-clean:case4-ssh class=none allow=true needL2=false rule=empty
+V1SHAPE chain:case5-aws class=A allow=false needL2=false rule=A:~-.aws-credentials
+V1OVERRIDE chain:case5-aws class=A allow=false needL2=false
+V1SHAPE chain-clean:case5-aws class=none allow=true needL2=false rule=empty
+V1SHAPE chain:case6-kube class=A allow=false needL2=false rule=A:~-.kube-config
+V1OVERRIDE chain:case6-kube class=A allow=false needL2=false
+V1SHAPE chain-clean:case6-kube class=none allow=true needL2=false rule=empty
+V1SHAPE chain:case8-dpapi class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+V1OVERRIDE chain:case8-dpapi class=A allow=false needL2=false
+V1SHAPE chain-clean:case8-dpapi class=none allow=true needL2=false rule=empty
+V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
+V1OVERRIDE chain:case9-local-creds class=A allow=false needL2=false
+V1SHAPE chain-clean:case9-local-creds class=none allow=true needL2=false rule=empty
+V1SHAPE offchain:case1-gitcreds class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case3-wisp-config class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case4-ssh class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case5-aws class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case6-kube class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case8-dpapi class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case9-local-creds class=B allow=false needL2=true rule=B-tier
