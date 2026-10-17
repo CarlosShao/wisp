@@ -1,0 +1,14 @@
+票 334 产码腿 334-r1·AC#1＝A 档回落支那句拒绝的理由说实话（指名真实候选＋真实缺位的锚），判级链一字未动
+
+internal/risk/blacklist.go：classifyForms 的九枚 A 档 case 条件字节一字未改，
+只把 return 的第二个返回值改走一枚新的唯一拼装点 aRuleReason(literal, 锚拼写, cand, rel)：
+
+- 拼写真的比中了（anchorMatches）⇒ 仍返回那条规则自己的字面串，逐字同今天；
+- 只有 R17 的 uncertainAnchorMiss 回落支命中 ⇒ 不再单说"AWS 凭据"，而是说出
+  "这枚候选自己的拼法我证明不了（它的走链停在 X）＋这枚锚本机没装（它的展开停在 Y）
+  ⇒ 两侧祖先链相关，按受保护处理"，并明写 fail-closed / NOT a match；
+- aRelates 拆成 anchorMatches ＋ uncertainAnchorMiss 两段，短路顺序与返回值不变。
+
+⛔ 改判级：class／tier／needL2／可否豁免一律不动（票 334 AC#2 那格就是钉这件事，
+"放宽判级"那一支属改契约、要人工批准，不在本票射程）。
++53/-8 全落在 reason 拼装与其注释；internal/risk/rules_gateway.go 与 internal/tools/** 零字节。

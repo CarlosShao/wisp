@@ -1,0 +1,169 @@
+package risk
+
+import (
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+// zz_probe_334r1_test.go — 票 334 的只读探针（⛔ 跟踪件、⛔ 判据；它只打印实值）。
+// 由 logs/build-probe.sh 拷进仓外导出树的 internal/risk/ 跑，专门量四件事：
+//   1. 触发那一跳的 Lstat 错串（AC#0 行 2）；
+//   2. 本机今天的锚展开实值 + 那句 reason（AC#0 行 1/3/5）；
+//   3. 具名构造的、今天真会撞这一形的路径数（AC#0 末行＋"能数得出的分母"）；
+//   4. 必要条件矩阵：主目录祖先链 vs LOCALAPPDATA（AC#0 行 4）。
+// 它同时是 AC#2 那把"改前⇄改后三值逐字相同"的尺：SHAPE334 行只带 class/allow/needL2，
+// REASON334 行单独带 reason，两棵树各跑一次，前者必须逐字相等、后者必须换成说实话那形。
+
+const (
+	noise334p     = "已允许\x1b\u202e" // U+001B + U+202E：Windows 路径非法字符
+	claim334p     = "id_ed25519" + noise334p
+	starName334p  = "notes*a1" + noise334p
+	questName334p = "score?b1" + noise334p
+	bogus334p     = "plain-note.txt"
+)
+
+func probeForms334(t *testing.T, tag, p string) {
+	t.Helper()
+	f := formsOf(p)
+	t.Logf("FORMS334 %s raw=%q real=%q root=%q partial=%v certain=%v spellings=%v",
+		tag, f.raw, f.real, f.root, f.partial, f.certain(), f.spellings())
+}
+
+func probeShape334(tag, p string) string {
+	c := Classify(p)
+	d := Gate(p, nil)
+	return fmt.Sprintf("SHAPE334 %s class=%s allow=%v needL2=%v", tag, c, d.Allow, d.NeedL2)
+}
+
+func probeReason334(tag, p string) string {
+	return fmt.Sprintf("REASON334 %s reason=%q", tag, Gate(p, nil).Reason)
+}
+
+// TestProbe334LstatErrorString = AC#0 行 2：那一跳拿到的到底是哪个错。
+func TestProbe334LstatErrorString(t *testing.T) {
+	dir := t.TempDir()
+	t.Logf("probe_dir=%q home=%q TMP=%q TEMP=%q GOTMPDIR=%q",
+		dir, os.Getenv("USERPROFILE"), os.Getenv("TMP"), os.Getenv("TEMP"), os.Getenv("GOTMPDIR"))
+	for _, name := range []string{claim334p, starName334p, questName334p, bogus334p} {
+		p := filepath.Join(dir, name)
+		_, err := os.Lstat(p)
+		t.Logf("LSTAT334 name=%q err=<%v> is_FS_ErrNotExist=%v is_OS_ErrNotExist=%v",
+			name, err, errors.Is(err, fs.ErrNotExist), errors.Is(err, os.ErrNotExist))
+		probeForms334(t, name, p)
+		t.Log(probeShape334(name, p))
+		t.Log(probeReason334(name, p))
+	}
+}
+
+// TestProbe334RealMachineAnchors = AC#0 行 1/3/5：不改任何环境，读本机今天的锚展开。
+func TestProbe334RealMachineAnchors(t *testing.T) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		t.Fatalf("UserHomeDir: %v", err)
+	}
+	appData := os.Getenv("APPDATA")
+	localAppData := os.Getenv("LOCALAPPDATA")
+	t.Logf("ENV334 home=%q appdata=%q localappdata=%q", home, appData, localAppData)
+	for _, leaf := range []string{`.git-credentials`, `.ssh`, `.aws`, `.aws\credentials`, `.kube`, `.kube\config`} {
+		full := home + string(filepath.Separator) + leaf
+		_, statErr := os.Lstat(full)
+		t.Logf("LEAF334 %s exists=%v lstat_err=<%v>", full, statErr == nil, statErr)
+	}
+	for _, parts := range [][]string{{`.git-credentials`}, {`.ssh`}, {`.aws`, `credentials`}, {`.kube`, `config`}} {
+		spell := anchorPath(normDir(home), parts...)
+		probeForms334(t, "anchor:"+filepath.Join(parts...), spell)
+	}
+	cand := filepath.Join(t.TempDir(), claim334p)
+	probeForms334(t, "hostile-candidate", cand)
+	t.Log(probeShape334("hostile-in-real-temp", cand))
+	t.Log(probeReason334("hostile-in-real-temp", cand))
+	wispLogs := filepath.Join(appData, "wisp", "logs")
+	t.Logf("LEAF334 wisp_logs_exists=%v", pathExists(wispLogs))
+	under := filepath.Join(wispLogs, claim334p)
+	t.Log(probeShape334("hostile-under-appdata-wisp-logs", under))
+	t.Log(probeReason334("hostile-under-appdata-wisp-logs", under))
+}
+
+// TestProbe334ConstructedDenyCensus = AC#0 末格：只数具名构造出来的那几枚。
+func TestProbe334ConstructedDenyCensus(t *testing.T) {
+	dir := t.TempDir()
+	names := []string{claim334p, starName334p, questName334p, "config" + noise334p, "readme" + noise334p}
+	if err := os.WriteFile(filepath.Join(dir, bogus334p), []byte("x"), 0o600); err != nil {
+		t.Fatalf("setup: write control file: %v", err)
+	}
+	checked, denied := 0, 0
+	for _, name := range names {
+		p := filepath.Join(dir, name)
+		c := Classify(p)
+		checked++
+		if c == ClassA {
+			denied++
+		}
+		t.Log(probeShape334("census:"+name, p))
+		t.Logf("DENY334 %s reason=%q", name, Gate(p, nil).Reason)
+	}
+	control := Classify(filepath.Join(dir, bogus334p))
+	t.Logf("CENSUS334 constructed=%d classA=%d control(ordinary_file_in_same_dir)=%s "+
+		"scope=%q (只数这一批具名构造，⛔ 全称句)", checked, denied, control, dir)
+}
+
+// TestProbe334NecessityMatrix = AC#0 行 4：主目录祖先链是必要条件，LOCALAPPDATA 不是。
+func TestProbe334NecessityMatrix(t *testing.T) {
+	t.Run("candidate-inside-fake-home", func(t *testing.T) {
+		profile := filepath.Join(t.TempDir(), "profile")
+		work := filepath.Join(profile, "work")
+		for _, d := range []string{profile, work} {
+			if err := os.MkdirAll(d, 0o755); err != nil {
+				t.Fatalf("setup mkdir %s: %v", d, err)
+			}
+		}
+		t.Setenv("USERPROFILE", profile)
+		t.Setenv("HOME", profile)
+		t.Setenv("APPDATA", filepath.Join(profile, "AppData", "Roaming"))
+		t.Setenv("LOCALAPPDATA", filepath.Join(profile, "AppData", "Local"))
+		cand := filepath.Join(work, claim334p)
+		probeForms334(t, "in-home-cand", cand)
+		t.Log(probeShape334("in-home-cand", cand))
+		t.Log(probeReason334("in-home-cand", cand))
+	})
+	t.Run("candidate-outside-fake-home", func(t *testing.T) {
+		base := t.TempDir()
+		profile := filepath.Join(base, "profile")
+		work := filepath.Join(base, "work")
+		for _, d := range []string{profile, work} {
+			if err := os.MkdirAll(d, 0o755); err != nil {
+				t.Fatalf("setup mkdir %s: %v", d, err)
+			}
+		}
+		t.Setenv("USERPROFILE", profile)
+		t.Setenv("HOME", profile)
+		t.Setenv("APPDATA", filepath.Join(profile, "AppData", "Roaming"))
+		t.Setenv("LOCALAPPDATA", filepath.Join(profile, "AppData", "Local"))
+		cand := filepath.Join(work, claim334p)
+		probeForms334(t, "off-home-cand", cand)
+		t.Log(probeShape334("off-home-cand", cand))
+		t.Log(probeReason334("off-home-cand", cand))
+	})
+	t.Run("localappdata-moves-nothing", func(t *testing.T) {
+		base := t.TempDir()
+		profile := filepath.Join(base, "profile")
+		work := filepath.Join(profile, "work")
+		elsewhere := filepath.Join(base, "lad")
+		for _, d := range []string{profile, work, elsewhere} {
+			if err := os.MkdirAll(d, 0o755); err != nil {
+				t.Fatalf("setup mkdir %s: %v", d, err)
+			}
+		}
+		t.Setenv("USERPROFILE", profile)
+		t.Setenv("HOME", profile)
+		t.Setenv("APPDATA", elsewhere)
+		t.Setenv("LOCALAPPDATA", elsewhere)
+		cand := filepath.Join(work, claim334p)
+		t.Log(probeShape334("lad-elsewhere-cand", cand))
+		t.Log(probeReason334("lad-elsewhere-cand", cand))
+	})
+}

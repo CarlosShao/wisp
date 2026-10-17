@@ -1,0 +1,18 @@
+票 334 产码腿 334-r1·AC#1＋AC#2 仪器＝anchor_miss_reason_334_test.go（世界自己造，⛔ 继承本机装了什么）
+
+三枚世界（newWorld334）：假主目录＋逐枚点名装上的锚叶子＋候选放在
+"主目录链内"或"主目录旁"。哪枚锚缺位＝用例说哪枚，⛔ 看本机今天装没装。
+
+- TestAnchorMissReasonNamesCandidateAndMissingAnchor（AC#1）
+  ⓐ只缺 .aws ⇒ 句子必须同时点名真实候选、缺位的 .aws\credentials、候选自己停住的
+    work、锚塌回去的那枚主目录，并带 fail-closed / NOT a match 字样；
+  ⓑ补上 .aws ⇒ 句子换成 .kube\config（票 334 现量第 3 行那枚翻转，这里用造的世界复现，
+    ⛔ 在机主配置文件目录里建目录）；
+  ⓒ候选真的就是那枚凭据文件 ⇒ reason 逐字仍是那句裸字面串（诚实匹配一支没被碰）。
+  正控形状＝把 reason 生成退回今天这形 ⇒ ⓐⓑ 全红（突变 M-A，读数见 logs/）。
+
+- TestAnchorMissKeepsNonOverridableClassAndNeedL2（AC#2 闸门）
+  同一枚 hostile 输入钉 class=A／needL2=false／allow=false，外加一枚 B 档单文件豁免
+  key 也买不到放行（不可豁免）。判级放松哪怕一档 ⇒ 这枚用例咬红（突变 M-C）。
+  主目录链内那发的"过严形状"按票面要求另存为具名读数（SHAPE-READING334 一行 t.Logf，
+  链内 A ⇄ 链外 B 同屏），⛔ 留成一枚恒红断言给后续程继承。

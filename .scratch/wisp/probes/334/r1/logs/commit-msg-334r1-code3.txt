@@ -1,0 +1,16 @@
+票 334 产码腿 334-r1·AC#3＝给票 216 那枚两臂差试补世界（候选挪出 A 锚的祖先链），⛔ 动任何断言
+
+internal/risk/name_claim_two_arm_216_test.go 只加台面、只改一行取材：
+dir := t.TempDir()  ⇒  dir := candidateOffAnchorChain334(t)（+20/-1，那 1 行删除就是这句取材，
+四对断言、want 值、名册一字未动；⛔ t.Skip、⛔ 删用例、⛔ 把期望改成"红也算对"）。
+
+为什么要补世界：CI 的 test-windows 台面把 GOTMPDIR 按 %LOCALAPPDATA% 组
+（scripts/portable-tests.sh:152-159，TMP/TEMP 不动），t.TempDir() 因此落在主目录链内；
+hostile 那臂带 U+001B ⇒ Lstat 报"路径语法不正确"（⛔ 等于"没有这个文件"）⇒ 候选自己那枚
+拼法证明不了，叠上任一枚 A 锚叶子本机没装 ⇒ uncertainAnchorMiss 判两侧祖先相关 ⇒ 报不可豁免
+的 A。那枚仪器在 CI 上响的是"锚没装"，⛔ 是"名字里的声明"，票 216 的 AC#3 半句于是冒充成
+"仪器有牙且咬到了"。补世界之后候选与假主目录同边不成祖先，能移动的只有名字里那句声明。
+
+判级那一支今天一字没动（AC#2）；链内那发的过严形状另存为具名读数，见
+anchor_miss_reason_334_test.go 的 SHAPE-READING334。成对读数＝CI 形台面该枚名册
+改前 RUN24／PASS_TOP5／FAIL_TOP1／SKIP0（rc=1）⇄ 改后同一名册，logs/ 逐枚入库。
