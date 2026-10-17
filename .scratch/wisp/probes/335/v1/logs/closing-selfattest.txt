@@ -1,0 +1,63 @@
+# 335-v1 closing self-attestation 2026-10-17 14:23:54 +0800
+HEAD=7aa3edf1
+## end-panel-status ruler: git status --porcelain -- internal/panel
+rc=0 (empty above = never touched in-flight bytes; start twin in logs/start-panel-status.txt)
+## my commits this leg (ruler: git log a06a73d8..HEAD --since-today prefix 票 335 终裁腿)
+7aa3edf1|票 335 终裁腿 335-v1·票尾一条只追加 bullet＝七格判语登记（⛔ 翻框：七枚 AC 框仍 7 枚未勾、0 枚已勾；⛔ 改票名／Status:／-done；⛔ 动台账一字；尺＝git diff 对该票 1 增 0 删）
+8a034bf8|票 335 终裁腿 335-v1·判语件＝docs/evidence/s1/335-v1-verdict.md（98 行／字节见笔内）：七格逐格判语＋AC#1 自指反形 C/D⇄B 对作差（闸非恒真）＋②裁语（第四发空操作已实测 E，三发已钉满）＋④fixture 8 字节差机制归到底（autocrlf 导出 CRLF⇄工作树 8 行裸 LF）＋必答两枚
+e305333c|票 334 裁腿 334-v1·台件第二枚＝只读探针（七枚 aEq/aUnder 锚逐枚造世界，比腿的 14 行宽）＋run-risk.sh（四数尺＋CI 形/D 形 GOTMPDIR）
+0dd29039|改正我自己在 §4.0ed 第⑨节写的指路句（按名字猜的文件归属→现量：resident_tray_stop 只有两枚测试件、停机位在 internal/proc/stop_windows.go＋boot_windows.go:111、托盘与弹出菜单在 internal/ball/tray_windows.go＋win32_windows.go，我初稿漏了 internal/ball 整面）＋台账 A1019 追加第⑦节记我
+f705b082|328-r1 仪器③（AC#2 正控＝经真铸造点）：关联号从真 loop 派发出来读，⛔ 测试里硬写形状
+ffebb6d1|328-r1 仪器②（名册侧四形实测）：四形逐枚点亮、approval-<seq> 与 host:* 照旧点不亮
+1696d01b|328-r1 仪器①（票 220 那族名册）：child-1#retry 翻成 true 是买真相，child-1x 原地不动
+## .go-hit-0 ruler over my seven commits' name-only full set:
+0
+  (counted above; expect 0)
+## full name-only union of my seven commits:
+[%c]
+
+.scratch/wisp/probes/335/v1/logs/ac2-diff-77d98354.txt
+.scratch/wisp/probes/335/v1/logs/start-panel-status.txt
+[%c]
+
+.scratch/wisp/probes/335/v1/mut335v1.sh
+[%c]
+
+.scratch/wisp/probes/335/v1/logs/mut-A0.log
+.scratch/wisp/probes/335/v1/logs/mut-B.log
+.scratch/wisp/probes/335/v1/logs/mut-C.log
+.scratch/wisp/probes/335/v1/logs/mut-D.log
+.scratch/wisp/probes/335/v1/logs/mut-E.log
+.scratch/wisp/probes/335/v1/logs/mut-F.log
+.scratch/wisp/probes/335/v1/logs/mut-G.log
+.scratch/wisp/probes/335/v1/logs/shot-A0-summary.txt
+.scratch/wisp/probes/335/v1/logs/shot-B-summary.txt
+.scratch/wisp/probes/335/v1/logs/shot-C-summary.txt
+.scratch/wisp/probes/335/v1/logs/shot-D-summary.txt
+.scratch/wisp/probes/335/v1/logs/shot-E-summary.txt
+.scratch/wisp/probes/335/v1/logs/shot-F-summary.txt
+.scratch/wisp/probes/335/v1/logs/shot-G-summary.txt
+[%c]
+
+.scratch/wisp/probes/335/v1/logs/fixture-bytediff-probe.txt
+.scratch/wisp/probes/335/v1/logs/fixture-deep-probe.txt
+.scratch/wisp/probes/335/v1/logs/fixture-mechanism.txt
+.scratch/wisp/probes/335/v1/logs/start-red-rerun.txt
+[%c]
+
+.scratch/wisp/probes/335/v1/logs/ac2-zc-positive.txt
+.scratch/wisp/probes/335/v1/logs/ac2-zc-rerun.txt
+.scratch/wisp/probes/335/v1/logs/ac4-pair-summary.txt
+.scratch/wisp/probes/335/v1/logs/ac5-ac6-audit.txt
+.scratch/wisp/probes/335/v1/logs/fixture-lf-lines-perl.txt
+[%c]
+
+docs/evidence/s1/335-v1-verdict.md
+[%c]
+
+.scratch/wisp/issues/335-ticket327-roster-nail-red-after-category-widening-and-three-stale-comments.md
+.scratch/wisp/probes/335/v1/msg-bullet.txt
+## ticket AC boxes still untouched: unchecked=7 checked=0
+## deliverable file sizes: verdict=12669 bytes / 98 lines; script=4993 bytes / 113 lines
+## zero-byte check over v1 tree: empty_files=0 (expect 0)
+## out-of-repo temp estate kept (只建不删): D:\V335V1\{T,gotmp,mut,zc} + extracted prod/test copies
