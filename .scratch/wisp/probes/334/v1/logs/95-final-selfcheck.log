@@ -302,3 +302,57 @@ selfcheck_rc=0
       `git rev-parse` 对⛔ 跟踪件的**回显**（该枚只存在于仓外树＋本目录的 `.txt`），⛔ 一枚在册件。
   (3) 起手那一刻票 334 面有编排者在飞字节，我 `git add` 前现跑了一把
       `git diff --numstat -- <票 334>`＝`1 0`，交件笔 `e0cd9bdb` 逐字核过＝只含我那条 bullet（⛔ 吞走别人字节）。
+
+## 尺① 更正（追加笔，⛔ 改写历史）：上面那段"逐枚提交"用错了射程
+错因＝我用 git rev-list 5aa02580..HEAD 取区间，这段时间别腿与编排者落了 29 笔，那把尺量到的是【全编队】的面（所以它吐出 .go=4、越格=95——那是别人的字节，⛔ 本腿的）。
+改正尺＝按本子射取本腿自己的笔：git log --grep='^票 334 裁腿 334-v1'
+  本腿笔数=11
+  逐枚号：5aa025802 19b6f73fc e305333c7 02109a654 a76a515dc 46b55afba 2ae6f5f1c dacc4c130 63d045598 e0cd9bdbc 7187c52e1 
+  唯一路径枚数=42
+  .go 命中枚数=0  ← 派单要的那把尺，零枚
+  越格枚数（严格前缀：三处写面之外）=0
+  唯一路径全集（45 枚去重后前 45 行）:
+    .scratch/wisp/issues/334-anchor-missing-leaf-reason-names-another-path-and-ci-surface-reds-216-instrument.md
+    .scratch/wisp/probes/334/v1/logs/00-intake.log
+    .scratch/wisp/probes/334/v1/logs/10-tree-before.log
+    .scratch/wisp/probes/334/v1/logs/11-tree-after.log
+    .scratch/wisp/probes/334/v1/logs/12-tree-mut.log
+    .scratch/wisp/probes/334/v1/logs/20-probe-before.log
+    .scratch/wisp/probes/334/v1/logs/20-probe-before.runner.log
+    .scratch/wisp/probes/334/v1/logs/21-probe-after.log
+    .scratch/wisp/probes/334/v1/logs/21-probe-after.runner.log
+    .scratch/wisp/probes/334/v1/logs/40-ac3-before-roster.log
+    .scratch/wisp/probes/334/v1/logs/41-ac3-after-roster.log
+    .scratch/wisp/probes/334/v1/logs/50-phantom-census.log
+    .scratch/wisp/probes/334/v1/logs/60-v2-runner.log
+    .scratch/wisp/probes/334/v1/logs/70-ac3-revert-runner.log
+    .scratch/wisp/probes/334/v1/logs/72-probe-v2-before.log
+    .scratch/wisp/probes/334/v1/logs/73-probe-v2-after.log
+    .scratch/wisp/probes/334/v1/logs/80-chain-reach.log
+    .scratch/wisp/probes/334/v1/logs/81-gates-shared-worktree.log
+    .scratch/wisp/probes/334/v1/logs/82-incident-readouts.log
+    .scratch/wisp/probes/334/v1/logs/83-incident-flipcount.log
+    .scratch/wisp/probes/334/v1/logs/84-ac1-runner.log
+    .scratch/wisp/probes/334/v1/logs/90-full-before.log
+    .scratch/wisp/probes/334/v1/logs/90-full-before.log.redlist
+    .scratch/wisp/probes/334/v1/logs/90-full-before.runner.log
+    .scratch/wisp/probes/334/v1/logs/91-full-after.log
+    .scratch/wisp/probes/334/v1/logs/91-full-after.log.redlist
+    .scratch/wisp/probes/334/v1/logs/91-full-after.runner.log
+    .scratch/wisp/probes/334/v1/logs/95-final-selfcheck.log
+    .scratch/wisp/probes/334/v1/logs/build-tree.sh
+    .scratch/wisp/probes/334/v1/logs/probe-334v1_test.go.txt
+    .scratch/wisp/probes/334/v1/logs/run-ac3-revert-and-pair.sh
+    .scratch/wisp/probes/334/v1/logs/run-mutations-v1.sh
+    .scratch/wisp/probes/334/v1/logs/run-mutations-v2.sh
+    .scratch/wisp/probes/334/v1/logs/run-phantom-census.sh
+    .scratch/wisp/probes/334/v1/logs/run-risk.sh
+    .scratch/wisp/probes/334/v1/logs/v1-after.shape
+    .scratch/wisp/probes/334/v1/logs/v1-before.shape
+    .scratch/wisp/probes/334/v1/logs/v2-after.shape
+    .scratch/wisp/probes/334/v1/logs/v2-before.shape
+    .scratch/wisp/probes/334/v1/logs/v2-shape.diff
+    .scratch/wisp/probes/334/v1/readings-and-mutations.md
+    docs/evidence/s1/334-v1-verdict.md
+  收尾 git status --porcelain --untracked-files=no ＝ [ M .scratch/wisp/probes/334/v1/logs/95-final-selfcheck.log]（空＝本腿交件时跟踪件面零脏，别腿那枚 335 票尾已被他们自己归位）
+selfcheck_amended_rc=0
