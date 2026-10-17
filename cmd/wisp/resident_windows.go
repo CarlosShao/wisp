@@ -147,6 +147,20 @@ func runResident() {
 	signal.Notify(bootExit, os.Interrupt, syscall.SIGTERM)
 	defer signal.Stop(bootExit)
 
+	// Ticket 228 AC#11 ⓐ (mount 1 of the two this cell owes): the tray's door into
+	// this same window is taken HERE, next to the console handler, and on the same
+	// terms. proc.Boot built the stop-request bit, so a click of the tray's Exit
+	// item from the moment the window exists is a recorded request, and the handle
+	// captured on this line is what lets the check below see it. Taking the handle
+	// inside RunEventLoop instead is the hole A493 named: the ball path runs in
+	// front of that call (268 ms measured above), and every request made in front
+	// of a handler that does not exist yet is a request nobody heard.
+	//
+	// The bit is a latch rather than an event, so nothing here has to be armed
+	// "in time": a recorded request closes the channel once, and both this
+	// window's check below and the loop's own select read the same record.
+	bootStop := rt.StopSignal()
+
 	// Ticket 246 AC#1, form 乙 (orchestrator ruling, ledger A481): the approval
 	// gate is BUILT HERE, by the assembly root, and handed down as a function
 	// value and a binding. The resident file does not compose a gate of its own -
@@ -267,7 +281,7 @@ func runResident() {
 	hotReload258 := func() ball.HotkeyConfig { return hotkeyReloadSource296(rt.Layout.DataDir) }
 	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withPanelHost(func(via string) bool {
 		return holder.toggle(via)
-	}))
+	}), withStopRequest(residentTrayStop228(rt)))
 	defer rb.stop()
 
 	// The gate is bound to the ball only if the ball exists, and it is detached
@@ -447,17 +461,72 @@ func runResident() {
 	// never entering the loop would be exactly the kind of sentence AC#7 exists
 	// for. The ball status and the task-source posture are true in either branch,
 	// so they print in either.
+	//
+	// Since ticket 228 AC#11 there are TWO sources that can have arrived by now,
+	// and the answer lives in residentBootWindowExit228 rather than in a literal
+	// here: a test that re-typed this select would read green whichever way the
+	// gap was wired, which is the reading tickets 258 and 296 already refused for
+	// the two halves of the [hotkey] chain.
 	var reason string
-	select {
-	case sig := <-bootExit:
-		reason = "exit request (" + sig.String() + ") arrived during boot; the event loop was never entered"
+	if why, left := residentBootWindowExit228(rt, bootExit, bootStop); left {
+		reason = why
 		fmt.Printf("wisp: %s; %s\n", reason, rb.statusLine())
-	default:
-		fmt.Printf("wisp: resident event loop running (task source: %s); %s (Ctrl+C exits cleanly)\n",
+	} else {
+		fmt.Printf("wisp: resident event loop running (task source: %s); %s (Ctrl+C and the tray's Exit item both exit cleanly)\n",
 			src.taskPosture(), rb.statusLine())
 		reason = rt.RunEventLoop()
 	}
 	fmt.Printf("wisp: event loop ending (%s); running the D38(e) shutdown order\n", reason)
+}
+
+// residentBootWindowExit228 is AC#11 ⓐ's second mount, and the whole of the
+// decision runResident makes BEFORE it enters internal/proc's loop: has an exit
+// request already arrived during the ball path, and if so, which one. It answers
+// the reason to print and whether the loop may be entered at all.
+//
+// Both doors are read here, and the shape of each is why neither can be dropped.
+// The console half has always been the latched one: signal.Notify registered
+// bootExit above, so a Ctrl+C delivered while the window was being built sits in
+// that buffered channel until this line takes it. The tray half is the same kind
+// of latch by construction - proc.Boot built the stop bit, RequestStop closed it
+// when the Exit item was picked, and rt.StopReason says who asked - so an empty
+// window between the two of them is the only shape in which "按了退出没反应"
+// could still happen in this process, and this select is what closes it.
+//
+// It is a non-blocking check on purpose: entering RunEventLoop is the default
+// answer, and RunEventLoop's own select reads the same bit from ticket 228
+// AC#11 onward, so a request that lands between these two lines costs no more
+// than the few instructions the console branch already documented above.
+func residentBootWindowExit228(rt *proc.Runtime, bootExit chan os.Signal, bootStop <-chan struct{}) (string, bool) {
+	select {
+	case sig := <-bootExit:
+		return "exit request (" + sig.String() + ") arrived during boot; the event loop was never entered", true
+	case <-bootStop:
+		return "stop request (" + rt.StopReason() + ") arrived during boot; the event loop was never entered", true
+	default:
+		return "", false
+	}
+}
+
+// residentTrayStop228 is the function value the assembly root hands the ball host
+// for the tray's Exit item (ticket 228 AC#11, form 乙-1): the runtime's own
+// stop-request bit, reached through one method value and nothing else.
+//
+// It is a hoisted accessor rather than `rt.RequestStop` written inline for the
+// reason tickets 258 and 296 set for the [hotkey] chain: a case that re-typed the
+// injection inside itself would read green whichever way production changed, and
+// this hop's whole claim is WHAT the assembly root injects. The nail in
+// resident_tray_stop_228_windows_test.go drives the value this function returns,
+// so deleting or rewiring the mount moves the reading and not just the comment.
+//
+// The value waits on nothing. That is not a style preference: the callback it is
+// handed to runs ON the ui-sta thread, and Ball.Close - like every teardown step
+// in this process - posts to that thread and waits on a done channel, so a
+// callback that tried to finish the stop itself would be the thread waiting on
+// itself. Recording the request and returning is the shape vetoByEsc already
+// uses for the cancel key (cmd/wisp/resident_approval_windows.go).
+func residentTrayStop228(rt *proc.Runtime) stopRequestFunc {
+	return rt.RequestStop
 }
 
 // panelHolder is the assembly root's handle on the panel thread, and it exists

@@ -18,14 +18,28 @@ package main
 // Object holder as ONE resident main process; orchestrator ruling 228 AC#0
 // picked that leg ("走甲"), and this file is that ruling's first installment.
 //
-// What this installment deliberately is NOT. The resident leg has no task
-// pipeline and no microphone, so this file starts no state machine of its own and
-// answers no card on the user's behalf: every gesture the ball surfaces except one
-// is recorded by name and said out loud as unhosted.
-// Advancing the orb into Listening because a click arrived would be this process
-// claiming a listen path it does not have - the same shape that made the run
-// leg's empty runSpec.replyVeto a load-bearing choice rather than a missing
-// assignment (cmd/wisp/run.go:141-147, ledger A472).
+// What this installment deliberately is NOT, re-derived by ticket 228 AC#10
+// because the ticket-228 wording ("the resident leg has no task pipeline and no
+// microphone") became false on the disk two tickets later: 246-r1's
+// startResidentTaskSource assembles the task pipeline in this very process, and
+// 247-r1's startResidentAudio mounted a real capture leg. What is still true,
+// conditionally and by time:
+//
+//   - AT THE MOMENT THIS FILE BUILDS THE BALL, neither exists yet. The order in
+//     the assembly root is fixed: startResidentBall runs first (its window is
+//     where the audio level would have to land), the task source and the capture
+//     leg are attached after it. That is why the sentences printed from here say
+//     "prints before the attach" instead of claiming a permanent lack.
+//   - THIS FILE still starts no state machine of its own and answers no card on
+//     the user's behalf, because nothing in it was handed a gate or a task - the
+//     executors it does have came in as function values from the assembly root.
+//     Advancing the orb into Listening because a click arrived would be this
+//     process claiming a listen path THIS FILE does not hold, the same shape
+//     that made the run leg's empty runSpec.replyVeto a load-bearing choice
+//     rather than a missing assignment (cmd/wisp/run.go:141-147, ledger A472).
+//   - The gestures this file records as unhosted are listed by name, with their
+//     reason, in ballGestureWhy below - and since AC#11 the tray's Exit item is
+//     no longer one of them: it has an executor, and it says which.
 //
 // What changed since (ticket 246, the sentence above is the ticket-228 wording
 // and it is kept because it is still most of the truth): the assembly root now
@@ -88,6 +102,23 @@ type escVetoFunc func() string
 // reporting a mute nobody asked for.
 type muteGestureFunc func() (outcome string, executed bool)
 
+// stopRequestFunc is the whole of what the ball host knows about how this process
+// is asked to leave (ticket 228 AC#11, form 乙-1, orchestrator ruling A493):
+// somebody handed this file a function that RECORDS a stop request and answers
+// whether this call was the one on record. It is a function value and not a
+// *proc.Runtime for the same reason escVetoFunc is one - this file keeps no
+// dependency edge on the approval side or on the process's own teardown, and the
+// assembly root is the one object that knows which runtime this process booted.
+//
+// The one thing a stop executor may never do is wait. Ball.fire calls its
+// callbacks inline ON the ui-sta thread (internal/ball/ball_windows.go's wndproc,
+// contract "quick and non-blocking"), and every teardown step in this process
+// posts back to that same thread and waits on a done channel (Ball.Close is
+// PostTask + <-done), so a callback that tried to close the process would be the
+// thread waiting on itself. Requesting and returning is the shape vetoByEsc
+// already sets for the cancel key (cmd/wisp/resident_approval_windows.go).
+type stopRequestFunc func(why string) bool
+
 // ballHostHook is how the assembly root hands the ball host one capability it does
 // not know how to build. It follows the shape ticket 246's ruling (ledger A481) set
 // for the cancel executor: the resident ball file receives a function value and
@@ -95,10 +126,19 @@ type muteGestureFunc func() (outcome string, executed bool)
 // per thing instead of importing the panel host from here.
 type ballHostHook func(*panelHostHooks)
 
-// panelHostHooks holds the panel-side executors, all optional. A nil showPanel is
-// the pre-ticket-33 shape: the gesture is recorded and said out loud as unhosted.
+// panelHostHooks is the bag of executors the assembly root hands this host, all
+// optional. The name is ticket 33's, because the panel was the first thing in it;
+// ticket 228 AC#11 adds the tray's stop executor to the SAME bag rather than
+// growing a second hook shape - the ball is built once, and both of these have to
+// exist before its window can be clicked, so a late setter would re-open exactly
+// the swallowing window AC#11 ⓐ exists to close.
+//
+// A nil showPanel is the pre-ticket-33 shape: the gesture is recorded and said
+// out loud as unhosted. A nil requestStop is the pre-AC#11 shape, and
+// recordTrayExit says that instead of pretending it stopped something.
 type panelHostHooks struct {
-	showPanel func(via string) bool
+	showPanel   func(via string) bool
+	requestStop stopRequestFunc
 }
 
 // withPanelHost hands the ball host the thing that opens the panel window
@@ -106,6 +146,21 @@ type panelHostHooks struct {
 // two-argument call sites of startResidentBall keep compiling untouched.
 func withPanelHost(showPanel func(via string) bool) ballHostHook {
 	return func(h *panelHostHooks) { h.showPanel = showPanel }
+}
+
+// withStopRequest hands the ball host the tray's 退出 executor (ticket 228
+// AC#11). The assembly root's own call site is what pins it: see the
+// residentStopExecutor228 accessor in cmd/wisp/resident_windows.go.
+func withStopRequest(requestStop stopRequestFunc) ballHostHook {
+	return func(h *panelHostHooks) { h.requestStop = requestStop }
+}
+
+// trayExit is the tray 退出 item's callback, mounted as Events.OnTrayExit. It is
+// a method on the hook bag for the same reason requestPanelOpen is one: the
+// closure a gesture drives has to be the one the assembly root handed over, not
+// a name this file looked up itself.
+func (h *panelHostHooks) trayExit() func() {
+	return func() { recordTrayExit(h.requestStop) }
 }
 
 // requestPanelOpen answers one of the two panel gestures. Without an executor it
@@ -330,8 +385,13 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 			OnTrayPanel:     hs.requestPanelOpen("tray-open-panel"),
 			OnTrayMute:      func() { rb.muteGesture("tray-mute") },
 			OnTrayPauseWake: func() { recordBallGesture("tray-pause-wake") },
-			OnTrayExit:      recordTrayExit,
-			OnDragEnd:       func() { recordBallDragEnd() },
+			// Ticket 228 AC#11: the tray's Exit item is the one gesture in this host
+			// that both has an executor and says which. hs.requestStop is the value
+			// the assembly root injected (residentTrayStop228 in
+			// cmd/wisp/resident_windows.go); nil is the pre-AC#11 shape and is
+			// reported as such by recordTrayExit.
+			OnTrayExit: hs.trayExit(),
+			OnDragEnd:  func() { recordBallDragEnd() },
 		},
 	})
 	if err != nil {
@@ -393,8 +453,9 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 	slog.Info("ball: the resident leg created the floating ball window",
 		"hotkeys_provenance", provenance,
 		"hotkeys_live", len(rep.Live()), "hotkeys", hotkeySummary(b),
-		"gestures", "recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246) "+
-			"and the panel gestures (ticket 33); the two mute gestures turn this process's capture gate once that leg is "+
+		"gestures", "recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246), "+
+			"the panel gestures (ticket 33) and the tray's Exit item, whose request goes to the stop bit this boot "+
+			"built (ticket 228 AC#11); the two mute gestures turn this process's capture gate once that leg is "+
 			"assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four "+
 			"veto channels stay reduced here to the one the assembly root injected")
 	return rb
@@ -660,17 +721,52 @@ func recordBallDragEnd() {
 	fmt.Printf("wisp: ball moved: %s\n", why)
 }
 
-// recordTrayExit is the tray's 退出 item. The request is recorded; the stop is
-// not performed, because the decision to leave this process lives inside
-// internal/proc's event loop, which today takes input from a console signal
-// only. Giving this item an executor needs either a stop-request hook in
-// internal/proc or a seventh live goroutine that is not in the frozen D38b
-// resident roster (observe.ResidentNames) - both are new contracts, and ticket
-// 228 AC#1 does not authorize either, so it is reported instead of assumed.
-func recordTrayExit() {
-	const why = "this process leaves when its event loop returns, which today only a console signal (Ctrl+C) asks for; the tray Exit item has no stop path attached to it"
-	slog.Warn("tray exit requested", "outcome", "ignored", "why", why)
-	fmt.Printf("wisp: tray exit requested: %s\n", why)
+// trayExitStopWhy is the reason booked WITH the request, so the string the event
+// loop returns names which item asked this process to leave. One const, because
+// the console line and the log record must never drift apart.
+const trayExitStopWhy = "tray Exit item selected in this process"
+
+// recordTrayExit is the tray's 退出 item, and since ticket 228 AC#11 it has an
+// executor: it hands the request to the stop bit the assembly root injected
+// (internal/proc's Runtime.RequestStop, ruling A493's form 乙-1) and returns
+// without waiting on anything.
+//
+// WHY THE OTHER SHAPE WAS NEVER PARALLEL TO THIS ONE - the correction A495's F5
+// demanded of the comment that stood here. It said giving this item an executor
+// needed "either a stop-request hook in internal/proc or a seventh live
+// goroutine", as though the two were two ways to the same end. They are not: a
+// seventh goroutine on its own CANNOT complete a stop. To stop this process it
+// would have to either call a proc-side method anyway (that is the request bit
+// again, with a goroutine bolted on and a false leak WARN every boot), or run
+// rt.Shutdown plus os.Exit from the callback - which skips every defer
+// runResident hangs the frozen D38(e) order on - or wait on the ui-sta thread's
+// own queue, which is the thread already executing this callback. The recorded
+// request is the trigger; the event loop is the only thing in this process that
+// ends it, and the ten steps stay exactly where they are.
+//
+// The nil branch is not a stub and not a fallback that hides anything: a host the
+// assembly root handed no executor to reports that, the way recordCancelHotkey
+// reports a missing gate, because a gesture that silently did nothing is the
+// defect class tickets 245 and 246 were filed about.
+func recordTrayExit(onStop stopRequestFunc) {
+	if onStop == nil {
+		const why = "the assembly root handed this ball host no stop executor, so the request is recorded and nothing else happens; this process leaves when its event loop returns, and here only a console signal (Ctrl+C) can ask for that"
+		slog.Warn("tray exit requested", "outcome", "ignored", "why", why)
+		fmt.Printf("wisp: tray exit requested: %s\n", why)
+		return
+	}
+	if onStop(trayExitStopWhy) {
+		const outcome = "recorded; the event loop ends this process through the D38(e) order"
+		slog.Info("tray exit requested", "outcome", outcome, "why", trayExitStopWhy)
+		fmt.Printf("wisp: tray exit requested: %s\n", outcome)
+		return
+	}
+	// A second pick of the same item before the loop was scheduled is not a
+	// second teardown: the first request is the one on record, and saying so is
+	// cheaper than letting a reader count two.
+	const outcome = "already on record; the first request stands"
+	slog.Info("tray exit requested again", "outcome", outcome, "why", trayExitStopWhy)
+	fmt.Printf("wisp: tray exit requested again: %s\n", outcome)
 }
 
 // hotkeySourceName reports where this host's four bindings came from (ticket

@@ -1,0 +1,28 @@
+票 228 AC#11 产码②（cmd/wisp）：托盘「退出」那枚按钮接上执行者＋空窗那一半一起接
+
+- resident_ball_windows.go：新增 stopRequestFunc（球宿主对"如何离开本进程"的全部知识，
+  与 escVetoFunc / muteGestureFunc 同形）、withStopRequest 钩子、panelHostHooks.requestStop
+  字段与 (h *panelHostHooks).trayExit() 挂载方法；Events.OnTrayExit 由裸 recordTrayExit 改成
+  hs.trayExit()——键名一枚未增未减（A498 F6 裁的就是复用现成 OnTrayExit，⛔ 新增 Events 键）。
+- recordTrayExit(onStop stopRequestFunc)：有执行者时把请求记进 runtime 的停机位并立刻返回，
+  结果句由 outcome=ignored 改成 recorded / already-on-record；nil 分支保留一句实话
+  （装配根没交执行者）。同处把 ⓒ 那段"两形并列都能给执行者"的注释按 A495 改口：
+  第七枚协程形单独完不成停机——它要么仍然调一枚 proc 侧方法（那就还是本形）、
+  要么 rt.Shutdown＋os.Exit 跳过 runResident 全部 defer（十步一步不走）、
+  要么在回调里等 ui-sta 自己的队列（自等待死锁）。
+- AC#10 同批：文件头那处「The resident leg has no task pipeline and no microphone」改口成
+  带时间条件的事实句（任务管线由 246-r1 的 startResidentTaskSource、采集腿由 247-r1 的
+  startResidentAudio 在同一进程装配，但都晚于本文件建球那一刻）；真打印的 slog 字段
+  "gestures" 那处按 AC#11 补上托盘 Exit 一支。另两处的盘上现状（ballGestureWhy 常量与
+  那句 gestures 属性）早由票 290 的产码重推过，守它的仪器是现成的
+  TestAC290UnhostedGestureWordingStillSaysTrueThing——逐枚读数与改口前后并排原文写在
+  本腿证据件里；未新增任何扫注释票号的词面型仪器，未挪任何打印时刻。
+- resident_windows.go：ⓐ 两处挂载落地——signal.Notify(bootExit) 那一段旁边取
+  bootStop := rt.StopSignal()（挂载①），进环路前那个 select 换成 hoisted 的
+  residentBootWindowExit228(rt, bootExit, bootStop)（挂载②，控制台那一支的句子一字未改）；
+  residentTrayStop228(rt) 是装配根交给球宿主的停机执行者（照 258/296 的 hoist 规矩，
+  用例驱动的就是产码那枚值）；环路运行那句报告由「Ctrl+C exits cleanly」改口成
+  「Ctrl+C 与托盘 Exit 都有序退出」——只加了一枚真存在的触发。
+- 十步顺序、defer 链、hookableRoster 闭集八枚、thresholds、golden 一律未碰。
+
+本笔只含产码三枚文件；配套用例与读数另笔。
