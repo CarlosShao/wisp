@@ -1,0 +1,10 @@
+test(risk): 票 216 AC#6 甲＝算子钉（ALLOW 侧三处按函数名取窗，子串算子恒 0）
+
+AC#3 那半句"不许因为名字里出现『允许』二字而改变任何判定"今天没有任何用例攻过。
+本件补第一枚仪器：按函数名（⛔ 绝对行号）取 shellAllowlisted / hostAllowlisted /
+overrideApplies 三枚函数体窗，断言窗内 strings.(Contains|ContainsAny|ContainsRune|
+Index|IndexAny) 枚数恒 0；函数改名或挪位＝用例直接报"找不到函数"，窗口里没有那枚
+精确比较构造＝报"窗取错了"，两形都⛔ 静默。另附一枚计数器自身的正控用例，证明那个 0
+是看见之后的 0，不是尺瞎。零产码改动。
+
+起手锚 72b65c61；AC#6 甲现量 0/0/0（两把尺：Go 钉与 shell 尺各自复跑）。
