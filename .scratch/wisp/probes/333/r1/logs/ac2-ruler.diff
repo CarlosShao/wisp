@@ -1,0 +1,91 @@
+diff --git a/internal/panel/display_scrub_216.go b/internal/panel/display_scrub_216.go
+index 9d94b46ec..230d3443d 100644
+--- a/internal/panel/display_scrub_216.go
++++ b/internal/panel/display_scrub_216.go
+@@ -49,11 +49,12 @@ package panel
+ //     contract-face change (AGENTS.md 1.1 / this leg's write face is internal/panel
+ //     only), and the two sides disagree on the OUTPUT SHAPE (space vs escape), so
+ //     the merge is a ruling, not an edit;
+-//   - it does not wash the Cf characters that the display ruling did not name. See
+-//     isDisplayWashCf below for the fifteen it DOES wash; the seven the census
+-//     measured as reachable but AC#1's ruling leaves out (U+2061-U+2064 the
+-//     mathematical operators, U+061C, U+180E, U+206A) stay raw on purpose until a
+-//     ruling names them;
++//   - it does not narrow the invisible-rune family any more. Until ticket 333 this
++//     file hand-maintained a roster of Cf characters and named, here, the ones it
++//     left raw on purpose. The ruling now asks the Unicode category, so a rune is
++//     washed because it is a format control character and this file lists no runes
++//     at all; there is no longer a family member that stays invisible by standing
++//     outside a list someone has to remember to extend;
+ //   - it does not touch ApprovalCardView.Tool/Args[]/Reason. Those also go out
+ //     verbatim today (census 问 2's 相邻面 note) but sit outside this ticket's
+ //     composer roster, so naming them here is all this leg does;
+@@ -135,43 +136,32 @@ func scrubForDisplay(s string) string {
+ 	return b.String()
+ }
+ 
+-// isDisplayWashCf is the display boundary's invisible-rune roster, written out
+-// rune by rune and NOT derived from a Unicode category: unicode.Is(unicode.Cf, r)
+-// would sweep in the mathematical operators (U+2061-U+2064), U+061C, U+180E and
+-// the deprecated U+206A-U+206B, and AC#1's ruling is that only the named runes
+-// below get washed. It is equally NOT internal/risk's isIgnorableTaintRune: that
+-// table serves the judgement axis (make an invisible character stop changing the
+-// word shape a rule looks at), this one serves the display axis (make an invisible
+-// character stop changing what a human reads). The two lists overlap on six runes
+-// and disagree on the bidi family, which is exactly why they stay in separate
+-// files - see ticket 327's boundary section and AGENTS.md 1.2.
+-//
+-// Fifteen runes, each with the name it is audited under:
+-//
+-//	U+00AD  soft hyphen          U+202A  left-to-right embedding
+-//	U+200B  zero width space     U+202B  right-to-left embedding
+-//	U+200C  zero width non-joiner        U+202C  pop directional formatting
+-//	U+200D  zero width joiner    U+202D  left-to-right override
+-//	U+2060  word joiner          U+202E  right-to-left override
+-//	U+2066  left-to-right isolate        U+FEFF  byte order mark / ZWNBSP
+-//	U+2067  right-to-left isolate        U+2068  first strong isolate
+-//	U+2069  pop directional isolate
+-//
+-// The nine directional ones (U+202A-U+202E, U+2066-U+2069) are the "cover up the
+-// back half of the name" family; the six spacing ones (U+200B, U+200C, U+200D,
+-// U+2060, U+FEFF, U+00AD) are the "two names that look identical but are not"
+-// family. Nine plus six is the whole list.
++// isDisplayWashCf is the display boundary's invisible-rune test, asked of the
++// Unicode CATEGORY rather than of a hand-kept roster: a rune is washed exactly when
++// this toolchain's unicode.Cf table says it is a format control character.
++//
++// WHY THE CATEGORY (ticket 333's ruling; it replaces the fifteen runes this function
++// spelled out rune by rune until then). Cf means "invisible when rendered", so
++// "every one of them must be shown" is ONE judgement about that family, not fifteen
++// separate ones. A hand roster makes the next Unicode version's new Cf character an
++// unannounced pass-through into the menu, and no ruler in this repository could see
++// it happen. Asking the category means the wash set moves with the table, and the
++// relation nail in display_scrub_327r2_test.go compares this predicate against the
++// category over every scalar value, so a table move reddens a test instead of
++// quietly reopening the hole. Two consequences of that shape, both accepted by the
++// ruling: the size of the wash set is a READING of the toolchain's table and is
++// never written down here as a number, and this file's table disagreement with
++// Unicode's own category notes (the Mongolian vowel separator is one) belongs to the
++// table, not to an exception in this function.
++//
++// It is equally NOT internal/risk's isIgnorableTaintRune: that table serves the
++// judgement axis (make an invisible character stop changing the word shape a rule
++// looks at), this one serves the display axis (make an invisible character stop
++// changing what a human reads). The two axes disagree on the bidi family, which is
++// exactly why they stay in separate files - see ticket 327's boundary section and
++// AGENTS.md 1.2.
+ func isDisplayWashCf(r rune) bool {
+-	switch r {
+-	case 0x00AD,
+-		0x200B, 0x200C, 0x200D,
+-		0x2060, 0xFEFF,
+-		0x202A, 0x202B, 0x202C, 0x202D, 0x202E,
+-		0x2066, 0x2067, 0x2068, 0x2069:
+-		return true
+-	default:
+-		return false
+-	}
++	return unicode.Is(unicode.Cf, r)
+ }
+ 
+ // writeControlEscape is the vocabulary above, kept apart from the scan so the

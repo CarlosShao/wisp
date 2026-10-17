@@ -1,0 +1,12 @@
+票 333 产码腿 333-r1·AC#2＝显示边界的 Cf 判定改按范畴（甲-全，撤销口令「333 改裁乙」）
+
+internal/panel/display_scrub_216.go 一枚文件：
+- isDisplayWashCf 的函数体由"手写 15 枚码位 switch"（一条跨行 case）换成
+  unicode.Is(unicode.Cf, r)；写侧 scrubForDisplay 与判侧 needsDisplayWash 仍各调
+  这同一枚函数，Cc 那一支（unicode.IsControl）一字未动；
+- 本文件头"deliberately does not do"那条名册 bullet 改写成范畴口径（⛔ 再逐枚点名
+  留下的码位）；isDisplayWashCf 的注释重写为范畴理由，含"表尺寸是读数不是常量"
+  与 U+180E 那一支的归属归表、不归本函数；
+- AC#2 尺（现跑，日志 .scratch/wisp/probes/333/r1/logs/ac2-ruler.log）：
+  git diff ae710c49 -- 本文件的**新增行** 32 枚，case 0x 命中 0／0x 命中 0／U+ 命中 0；
+  正控＝被删侧 42 行里 case 0x 命中 1、U+ 命中 15（同一把尺，反向不哑）。

@@ -1,0 +1,14 @@
+ANCHOR=ae710c49  FILE=internal/panel/display_scrub_216.go  RULER=git diff <anchor> -- file | grep '^+' | count hits
+worked_at=2026-10-17 11:06 +08
+added_lines=32
+ADDED_side_hits_case_0x=0
+ADDED_side_hits_0x=0
+ADDED_side_hits_Uplus=0
+POSITIVE CONTROL (removed side, same ruler, must be non-zero):
+removed_lines=42
+REMOVED_side_hits_case_0x=1
+REMOVED_side_hits_Uplus=15
+--- the new function body, verbatim ---
+func isDisplayWashCf(r rune) bool {
+	return unicode.Is(unicode.Cf, r)
+}
