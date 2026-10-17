@@ -1,0 +1,43 @@
+331-v1 AC#0 · 起手四把尺独立复跑（非实现者腿自己跑，⛔ 抄票面也⛔ 抄实现腿）
+所有读数取具名提交树 blob，⛔ 读共享工作树在飞字节。台面尺逐字附在下面（可重跑）。
+
+$ git -C "D:\work\workspace\projects plans\Wisp" grep -n "MessageKey" 72b65c61 -- internal cmd tools ':(exclude)*_test.go'
+rc=0  stderr=空
+72b65c61:internal/observe/errors.go:160:// MessageKey returns the stable user-visible copy key for the class. The copy
+72b65c61:internal/observe/errors.go:163:func (c ErrorClass) MessageKey() string {
+⇒ 生产嵌键 = 0 枚（只剩自家注释＋声明两行）   [与票面 :12 相符、与实现腿 §2-R1 相符]
+
+$ git -C "..." grep -n "MessageKey" 72b65c61 -- internal cmd tools        （去 exclude＝正控）
+rc=0  共 8 行；真调用点 4 枚：
+72b65c61:internal/llm/matrix_14_2_test.go:175:   if turn.Err.Class.MessageKey() == "" {
+72b65c61:internal/llm/matrix_14_2_test.go:249:   if qe.Class.MessageKey() == ne.Class.MessageKey() {
+72b65c61:internal/observe/errors_test.go:191:         if got := c.MessageKey(); got != want {
+72b65c61:internal/observe/errors_test.go:192:            t.Errorf("MessageKey(%s) = %q, want %q", c, got, want)
+外加同名行 4 枚（errors.go:160 注释、errors.go:163 声明、errors_test.go:186 注释、errors_test.go:188 func TestMessageKeys）
+⇒ 尺不瞎；票面 :13 那四行逐字对上，行号未漂
+
+$ git -C "..." grep -nE 'strings\.(Contains|ContainsAny|HasPrefix|HasSuffix|EqualFold|Index)' 72b65c61 -- internal/risk ':(exclude)*_test.go' | wc -l
+= 37        [票面 :14 的"同族尺在 internal/risk 出 37 枚"——实现腿没重跑这一把，本腿代跑，相符]
+
+$ git -C "..." show 72b65c61:internal/observe/errors.go | sed -n '160,162p'
+rc=0
+// MessageKey returns the stable user-visible copy key for the class. The copy
+// text itself is deferred (D23 error-copy work, S6); UI and logs embed the key
+// so copy can be added later without re-touching error sites.
+⇒ 票面 :11 三行逐字相符，"UI and logs embed the key" 确在 161 行
+
+★票面锚 0e944d93 vs 实现腿起手锚 72b65c61（本腿两枚锚都跑了同一把尺）
+git merge-base --is-ancestor 0e944d93 72b65c61 ⇒ yes（票面锚是起手锚的祖先）
+0e944d93 上同尺同读数（:160 注释＋:163 声明、三行注释逐字同）⇒ 票面数字在两个锚上都不过期
+
+★新注释引证的反幽灵核（票面 AC#1 要"逐枚具名"，具名的东西必须真在树上）
+docs/specs/SPEC-12-roadmap-governance.md section 5 = "## 5. 推迟项登记表（M0 要求①：五字段缺一不可）"
+  该节 :77 逐字 "| DEFERRED | 完整错误文案体系 | D23 | 所有用户可见错误有人话文案+建议（含 D37 全 17 类） | S6 | 部分错误暴露技术细节 |"  ⇒ 在场
+internal/observe/errors_test.go:188 func TestMessageKeys(t *testing.T)  ⇒ 在场（新注释点名的测试函数）
+internal/llm/matrix_14_2_test.go                                                     ⇒ 在场（git cat-file -e rc=0）
+
+★落地后（e09187e1）与今天 HEAD（37741f05）上那句"生产仍 0 枚"还没过期吗
+git grep -n "MessageKey" e09187e1 -- internal cmd tools ':(exclude)*_test.go' ⇒ 3 行＝注释 2＋声明 1，消费者仍 0
+git grep -n "MessageKey" HEAD  -- internal cmd tools ':(exclude)*_test.go' ⇒ 同上，消费者仍 0
+git grep -niE 'message_?key' HEAD -- frontend internal cmd tools ':(exclude)*_test.go'（大小写＋下划线形全扫）
+  ⇒ 非注释行只剩 errors.go:167 声明一枚 ⇒ 前端/面板侧也没有别的嵌键形状

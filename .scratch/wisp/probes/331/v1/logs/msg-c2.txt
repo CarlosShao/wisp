@@ -1,0 +1,7 @@
+票331 裁决腿331-v1（2/6）：AC#2 独立复跑台件＋三枚失明对照台件＋逐格读数入库
+
+ac2-replay.sh（主尺复跑/正控/反向写/对偶改注释/逐行核/还原核）＋ac2-blindness.sh（B1 空转·B2 整段删注释·B3 注释里塞 U+2713·B4 非注释牙尺）
+logs/ac0-rerun.log＝起手四把尺本腿逐枚复跑（生产嵌键 0·含测试 4 枚·同族尺 internal/risk=37·三行注释逐字·两枚锚同色）
+logs/ac34-rerun.log＝台面构造逐字＋AC#3 两发四数 71/71/0/0＋名册作差 0＋AC#4 四门 rc=0（含红句 7 命中逐行判读）
+logs/ac2-replay.log·ac2-blindness.log·ac4-gates.log＝三把尺原始输出；v1-before/after.log＝两发 go test 原文
+★硬读数：滤整行注释后两侧同串 f51f944c rc=0；正控非注释改一枚字面量 990b3297 rc=1；反向写（实话件⇄说谎件，全字节不等）尺回同一串 rc=0；空转试（锚⇄锚自己）也 rc=0

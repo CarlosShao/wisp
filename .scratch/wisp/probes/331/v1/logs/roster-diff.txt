@@ -1,0 +1,1 @@
+diff of the two sorted result-name lists: EMPTY (0 bytes) = identical rosters, diff rc=0.

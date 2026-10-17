@@ -1,0 +1,14 @@
+### B1 空转试：锚 blob ⇄ 锚 blob 自己（一枚字节都没改的腿）
+[B1] diff-rc=0 (预期 0＝绿 ⇒ 一把什么都没干的腿也照样过 AC#2 的这把尺)  非空diff=no
+### B2 整段删注释：把 MessageKey 那七行实话注释全删掉（产码字节仍零改动）
+  删掉的行数=7（after=160..166），副本比 after.go 少 7 行
+[B2] diff-rc=0 (预期 0＝绿 ⇒ 注释被整段抹掉这把尺也不响)  非空diff=no
+### B3 在整行注释里塞一枚 U+2713（d22scan ban #8 的射程内形，本尺的射程外）
+  落点: 161:// verified checkmark: ✓
+[B3] diff-rc=0 (预期 0＝绿 ⇒ 注释里的 emoji/幽灵引用这类形，这把尺一概看不见（归 d22scan，不归根本尺）)  非空diff=no
+### B4 牙尺（正控）：同一算子在非注释行必须响，证 B1/B2/B3 的绿是射程不是恒真
+  B4 前置：非注释行确实改了
+[B4] diff-rc=1 (预期 1＝红（该响）)  非空diff=yes
+### B5 跟踪字节还原核对
+  HEAD-blob: ef90aa588a40c6e359b15c7f887755b8bfa10293186aca784dc684ea365488aa *-
+  e09187e1-blob: ef90aa588a40c6e359b15c7f887755b8bfa10293186aca784dc684ea365488aa */d/V331V1/exp2/after.go

@@ -1,0 +1,62 @@
+### A0 两侧 blob 全字节身份（未滤注释，作还原基线）
+  515f410f5a9d9a0ffef63cb74bc8933ff04a2ebc6ac46acac30b4031da6e95f0 */d/V331V1/exp/base.go
+  ef90aa588a40c6e359b15c7f887755b8bfa10293186aca784dc684ea365488aa */d/V331V1/exp/after.go
+### A1 主尺：锚 blob 72b65c61 ⇄ 落地 blob e09187e1，滤整行注释后（票面要 sha 同值 + diff 空 + rc=0）
+[A1] shaA=f51f944c8aaf1d7a7c708a50dcabcf7408ce2cc82c470ccd4591bc408efd5539
+[A1] shaB=f51f944c8aaf1d7a7c708a50dcabcf7408ce2cc82c470ccd4591bc408efd5539
+[A1] same=yes diff-nonempty=no diff-rc=0
+  A1_rc=0
+### A2 正控（必做，否则 A1 的空不算证据）：只在非注释行改一枚字面量
+  落点尺＝内容锚（函数体内那枚 token），⛔ 绝对行号
+  落点: 168:	return "errorX." + string(c)
+[A2] shaA=f51f944c8aaf1d7a7c708a50dcabcf7408ce2cc82c470ccd4591bc408efd5539
+[A2] shaB=990b32975783cdb6b65a843f2dd237cdde18e43063726fef64b9819b1b32168d
+[A2] same=no diff-nonempty=yes diff-rc=1
+  A2_rc=1 (期望 1)
+### A3 必答实验·反向写：把落地件的注释块整块换回改前那三行谎（UI and logs embed the key）
+  block-lines: base=160..162  after=160..166
+  反向写副本里那段注释（证谎确实被写回去了）：
+    // MessageKey returns the stable user-visible copy key for the class. The copy
+    // text itself is deferred (D23 error-copy work, S6); UI and logs embed the key
+    // so copy can be added later without re-touching error sites.
+    func (c ErrorClass) MessageKey() string {
+    	return "error." + string(c)
+    }
+    
+  反向写副本 vs after.go 的差（应只有注释块那几行）：
+    160,166c160,162
+    < // MessageKey returns the stable user-visible copy key reserved for the
+    < // deferred error-copy layer (D23 error-copy work, S6; registered DEFERRED in
+    < // docs/specs/SPEC-12-roadmap-governance.md section 5). As read on 2026-10-17
+    < // (ticket 331) no production code embeds this key: its only callers are the
+    < // tests internal/observe/errors_test.go (TestMessageKeys) and
+    < // internal/llm/matrix_14_2_test.go. Whether UI and logs embed the key is
+    < // that deferred layer's decision, not a promise made here.
+    ---
+    > // MessageKey returns the stable user-visible copy key for the class. The copy
+    > // text itself is deferred (D23 error-copy work, S6); UI and logs embed the key
+    > // so copy can be added later without re-touching error sites.
+[A3] shaA=f51f944c8aaf1d7a7c708a50dcabcf7408ce2cc82c470ccd4591bc408efd5539
+[A3] shaB=f51f944c8aaf1d7a7c708a50dcabcf7408ce2cc82c470ccd4591bc408efd5539
+[A3] same=yes diff-nonempty=no diff-rc=0
+  A3_rc=0 (尺对注释内容失明 ⇒ 仍 0)
+### A3b 决定性对偶：实话件 after.go ⇄ 说谎件 mut-lie.go，注释内容相反，尺却回同一串
+[A3b] shaA=f51f944c8aaf1d7a7c708a50dcabcf7408ce2cc82c470ccd4591bc408efd5539
+[A3b] shaB=f51f944c8aaf1d7a7c708a50dcabcf7408ce2cc82c470ccd4591bc408efd5539
+[A3b] same=yes diff-nonempty=no diff-rc=0
+  A3b_rc=0 (期望 0＝这把尺分不开'实话'与'谎')
+  A3b 前置校验：两副本全字节【不等】（注释内容确实相反），尺却同串 ⇒ 失明成立
+  A3_mutation-copy-hash(反向写副本全字节): 515f410f5a9d9a0ffef63cb74bc8933ff04a2ebc6ac46acac30b4031da6e95f0 */d/V331V1/exp/mut-lie.go
+  还原核对：after.go 全字节哈希（⛔ 突变没留在任何跟踪件上）
+  A3-restore: ef90aa588a40c6e359b15c7f887755b8bfa10293186aca784dc684ea365488aa */d/V331V1/exp/after.go
+### A4 失明方向的对偶：把整行注释再改一次（改向另一句真话），尺同样看不见
+  A4 全字节 cmp：不等（证注释确实被改过）
+[A4] shaA=f51f944c8aaf1d7a7c708a50dcabcf7408ce2cc82c470ccd4591bc408efd5539
+[A4] shaB=f51f944c8aaf1d7a7c708a50dcabcf7408ce2cc82c470ccd4591bc408efd5539
+[A4] same=yes diff-nonempty=no diff-rc=0
+  A4_rc=0 (期望 0＝尺对整行注释改动不敏感)
+### A5 差尺·逐行核改动枚数（票面 AC#2 末句：非整行注释改动枚数必为 0）
+  changed_total=10  whole-comment=10  non-whole-comment=0 (票面要求 0)
+### A6 还原核对（跟踪字节全程零改动，⛔ 任何突变没落进仓）
+  restore-baseline: 515f410f5a9d9a0ffef63cb74bc8933ff04a2ebc6ac46acac30b4031da6e95f0 */d/V331V1/exp/base.go
+  restore-baseline: ef90aa588a40c6e359b15c7f887755b8bfa10293186aca784dc684ea365488aa */d/V331V1/exp/after.go

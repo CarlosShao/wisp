@@ -1,0 +1,42 @@
+331-v1 AC#3／AC#4 · 本腿自己重跑的读数（四数尺逐枚点名，⛔ 与 -v 混用）
+
+== 台面（本腿自建，⛔ 复用实现腿的树）==
+配方：git archive <锚> go.mod go.sum internal cmd tools scripts frontend models ＋ docs（八件套＋仓根 docs）
+手工三件：build/*.dll、third_party/sherpa-onnx/*.dll、frontend/dist（三处都⛔ 跟踪，archive 取不到）
+T1 = /d/V331V1/T1（锚 72b65c61 原样）    T2 = /d/V331V1/T2（e09187e1 同件套）
+非空证：T1_gocount=750  T2_gocount=750（实现腿报的也是 750/750，同尺同色）
+两棵树的差异面尺：diff -rq T1 T2 ⇒ 唯一一行
+  "Files /d/V331V1/T1/internal/observe/errors.go and /d/V331V1/T2/internal/observe/errors.go differ"
+  ⇒ 差枚数＝1，且差的就是本票唯一被允许碰的那枚文件（实现腿 §5 同读数）
+8.3 短名尺（powershell -File，Scripting.FileSystemObject）：
+  D:\V331V1\T1 => 同串 same=True；\T2 => same=True；\tmp => same=True
+  D:\V331V1\T1\internal\observe\errors.go => same=True（⛔ 落 C 卷 Temp）
+GOTMPDIR=D:/V331V1/tmp（先 mkdir -p）
+
+== AC#3 两发（命令＝go test ./internal/observe/ -count=1 -timeout 30m -v，⛔ 整包 ./cmd/wisp、⛔ ./... ）==
+改前 T1：rc=0  RUN=71  PASS_TOP=71  FAIL_TOP=0  SKIP=0  panic=0   尾 "ok .../internal/observe 3.566s"  stderr 0 字节
+改后 T2：rc=0  RUN=71  PASS_TOP=71  FAIL_TOP=0  SKIP=0  panic=0   尾 "ok .../internal/observe 3.561s"  stderr 0 字节
+两发四数逐枚同值；红名册（^--- FAIL / panic）两侧都空 ⇒ 作差＝0
+名册作差尺（本腿自己的）：把两侧 ^(--- PASS|--- FAIL|--- SKIP|=== RUN) 去时长后排序相减
+  logs/roster-before.txt=142 行  logs/roster-after.txt=142 行  logs/roster-diff.txt=0 字节（diff rc=0）
+结构尺对号（防"四数看着对其实是别的东西"）：T1 里 `grep -c '^func Test' internal/observe/*_test.go` = 71
+  ＋ `grep -c '^    --- '`（缩进的子测试行）= 0 ⇒ 这一包今天⛔ 子测试，
+  所以 RUN(含子测试)⇄PASS_TOP(只顶层) 两个数相等是**真形**、⛔ 是把两把尺相减出来的假形
+⇒ 与实现腿 §5 报的 71/71/0/0 同色（它的时长 3.562/3.603s，本腿 3.566/3.561s＝计时差不算判据）
+
+== AC#4 门禁四数（★只在共享工作树跑，⛔ 部分导出树；工作树的 errors.go 与 e09187e1 同哈希）==
+先证工作树＝被裁的字节：git diff --stat e09187e1 -- internal/observe/errors.go ⇒ 空；
+  sha256sum internal/observe/errors.go = ef90aa58…（＝A0 的落地 blob 哈希，同串）
+G1 /d/work/base/gopath/bin/gofumpt.exe -l internal/observe/errors.go   rc=0  输出空
+G2 sh scripts/d22scan.sh                                              rc=0  "clean - no D22 ban violations"
+     射程在场证：ban #8 design/ examined 39 text files、frontend/ 116、internal/ 580 Go files（comments and _test.go included）、cmd/ 141
+     ⇒ ⛔ 缺 design/ 的 exit 2＝GUARD 射程拒绝这一形今天没发生，四门都是真跑
+G3 sh scripts/check-path-length-budget.sh                             rc=0  "VERDICT GREEN"（denominator=14579 tracked paths、over-budget 60 全在名册、not in roster 0）
+G4 go vet ./internal/observe/                                          rc=0  输出空
+红句尺（规矩块那句"含 walk/build failed/no test files/setup failed/0xc0000135 ⇒ 台面故障"）：
+  grep -niE 'walk|build failed|no test files|setup failed|0xc0000135' 命中 7 行，逐行看过＝
+    97/98、119/127、128/130 是 d22scan **自带自检**的用例名与 PASS 行（逐字＝
+    TestDeclaredEmojiScopeCannotWalkZeroFiles、TestLedgerCountsMatchAnIndependentWalk、TestWalksSkipGitIgnoredPaths，三枚全是 `--- PASS`）；
+    194 行是 selftest 里**期望的 stderr 样本**（缩在 stdout= 引文内，属被断言的文本）
+  ⇒ 7 命中⛔ 一枚是本次运行的红句；四门 FAIL 行尺 `grep -cE '^--- FAIL|^FAIL'` = 0（rc=1）
+⇒ 与实现腿 §6 报的四枚 rc=0 同色
