@@ -1,0 +1,136 @@
+### 0 起手：先把 v1 残留还原干净
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [restored-from-commit]
+  go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  go_test_rc=0 RUN=19 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  baseline_chain_lines=18
+### M-V1 只动判级支（aRelates 尾行＝回落支 -> false），reason 生成一字未动
+  落点逐字（⇄ 交件 blob 的行差）:
+    281c281
+    < 	return uncertainAnchorMiss(cand, anchor)
+    ---
+    > 	return false
+  go_test_rc=1 RUN=10 PASS_TOP=1 FAIL_TOP=2 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  RED --- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 
+  go_test_rc=0 RUN=19 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V1]
+### M-V2a 只摘 %LOCALAPPDATA%\Microsoft\Credentials 那一枚 case 的回落支
+  落点逐字（⇄ 交件 blob 的行差）:
+    237c237
+    < 	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
+    ---
+    > 	case localAppDataS != "" && anchorMatches(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`)), isUnder):
+  go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  go_test_rc=0 RUN=19 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  我这把尺看到的行差（baseline ⇄ M-V2a）:
+    7c7
+    < V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
+    ---
+    > V1SHAPE chain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V2a]
+### M-V2b 只摘 ~/.ssh 那一枚 case 的回落支
+  落点逐字（⇄ 交件 blob 的行差）:
+    227c227
+    < 	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.ssh`)), isUnder):
+  go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  go_test_rc=0 RUN=19 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  我这把尺看到的行差（baseline ⇄ M-V2b）:
+    3c3
+    < V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.ssh-**
+    ---
+    > V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.aws-credentials
+    8c8
+    < V1SHAPE chain:case4b-ssh-solo class=A allow=false needL2=false rule=A:~-.ssh-**
+    ---
+    > V1SHAPE chain:case4b-ssh-solo class=B allow=false needL2=true rule=B-tier
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V2b]
+### M-V2c 只摘 ~/.kube/config 那一枚 case 的回落支
+  落点逐字（⇄ 交件 blob 的行差）:
+    231c231
+    < 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.kube`, `config`)), eqPath):
+  go_test_rc=1 RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  go_test_rc=0 RUN=19 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  我这把尺看到的行差（baseline ⇄ M-V2c）:
+    5c5
+    < V1SHAPE chain:case6-kube class=A allow=false needL2=false rule=A:~-.kube-config
+    ---
+    > V1SHAPE chain:case6-kube class=B allow=false needL2=true rule=B-tier
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V2c]
+### M-V3 反形（变严）：回落支去掉祖先关系界＝任何候选都算命中
+  落点逐字（⇄ 交件 blob 的行差）:
+    366c366
+    < 	return isUnder(cand.root, anchor.root) || isUnder(anchor.root, cand.root)
+    ---
+    > 	return true
+  go_test_rc=1 RUN=10 PASS_TOP=1 FAIL_TOP=2 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  RED --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* 
+  go_test_rc=0 RUN=19 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  我这把尺看到的行差（baseline ⇄ M-V3）:
+    2,18c2,18
+    < V1SHAPE chain:case3-wisp-config class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+    < V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.ssh-**
+    < V1SHAPE chain:case5-aws class=A allow=false needL2=false rule=A:~-.aws-credentials
+    < V1SHAPE chain:case6-kube class=A allow=false needL2=false rule=A:~-.kube-config
+    < V1SHAPE chain:case8-dpapi class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+    < V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
+    < V1SHAPE chain:case4b-ssh-solo class=A allow=false needL2=false rule=A:~-.ssh-**
+    < V1SHAPE chain:case8b-dpapi-solo class=A allow=false needL2=false rule=A:Microsoft-Protect
+    < V1SHAPE offchain:case1-gitcreds class=B allow=false needL2=true rule=B-tier
+    < V1SHAPE offchain:case3-wisp-config class=B allow=false needL2=true rule=B-tier
+    < V1SHAPE offchain:case4-ssh class=B allow=false needL2=true rule=B-tier
+    < V1SHAPE offchain:case5-aws class=B allow=false needL2=true rule=B-tier
+    < V1SHAPE offchain:case6-kube class=B allow=false needL2=true rule=B-tier
+    < V1SHAPE offchain:case8-dpapi class=B allow=false needL2=true rule=B-tier
+    < V1SHAPE offchain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+    < V1SHAPE offchain:case4b-ssh-solo class=B allow=false needL2=true rule=B-tier
+    < V1SHAPE offchain:case8b-dpapi-solo class=B allow=false needL2=true rule=B-tier
+    ---
+    > V1SHAPE chain:case3-wisp-config class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE chain:case5-aws class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE chain:case6-kube class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE chain:case8-dpapi class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE chain:case4b-ssh-solo class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE chain:case8b-dpapi-solo class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE offchain:case1-gitcreds class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE offchain:case3-wisp-config class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE offchain:case4-ssh class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE offchain:case5-aws class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE offchain:case6-kube class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE offchain:case8-dpapi class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE offchain:case9-local-creds class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE offchain:case4b-ssh-solo class=A allow=false needL2=false rule=A:~-.git-credentials
+    > V1SHAPE offchain:case8b-dpapi-solo class=A allow=false needL2=false rule=A:~-.git-credentials
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V3]
+### AC#3 成对反控：把 AC#3 那枚新夹具改回 t.TempDir() ⇒ 必须回到 24／5／1／0 rc=1
+  夹具反控落点行差:
+    89c89
+    < 	dir := candidateOffAnchorChain334(t)
+    ---
+    > 	dir := t.TempDir()
+  go_test_rc=0 RUN=24 PASS_TOP=6 FAIL_TOP=0 SKIP=0
+  夹具还原 hash=cbc0a610ae08628a764fb89dde6468a25b5eab61 交件 blob=cbc0a610ae08628a764fb89dde6468a25b5eab61
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [final-blacklist]
+### 末态：突变树上三枚件哈希（必须＝交件 blob）
+  blacklist.go tree=c1799cd24afce19e6accef23db23a7d7ee746dec commit=c1799cd24afce19e6accef23db23a7d7ee746dec
+  anchor_miss_reason_334_test.go tree=8f683b04d19c2bbe6956620f1d96338915b48cdd commit=8f683b04d19c2bbe6956620f1d96338915b48cdd
+  name_claim_two_arm_216_test.go tree=cbc0a610ae08628a764fb89dde6468a25b5eab61 commit=cbc0a610ae08628a764fb89dde6468a25b5eab61
+  zz_probe_334v1_test.go tree=69a70fa454886029aea9f8f716cb372908467339 commit=3a118226:internal/risk/zz_probe_334v1_test.go
+（探针非跟踪件）
+  共享工作树 internal/** cmd/** 是否被本腿动过：git status --porcelain --untracked-files=no → [ M .scratch/wisp/issues/335-ticket327-roster-nail-red-after-category-widening-and-three-stale-comments.md]

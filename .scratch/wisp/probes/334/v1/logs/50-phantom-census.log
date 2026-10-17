@@ -1,0 +1,62 @@
+date=2026-10-17 14:46:04 +0800 anchor=3a118226
+roster_testfuncs=1944 (尺＝git grep '^func Test' 射程＝3a118226 全仓 *_test.go)
+roster_files=14816
+
+## 正控（先证明这把尺看得见真东西）
+  正控 TestFileBaseNameClaimChangesNoClassOrReason in 名册? 1
+  正控 TestAnchorMissKeepsNonOverridableClassAndNeedL2 in 名册? 1
+  正控 internal/risk/blacklist.go in 树? 1
+
+## 待验对象＝注释与读数件里指名的测试名／件名
+scan_bytes=66502
+refs_found=38
+
+### A. 指名的测试名，逐枚验在册（NO＝幻影）
+  test:TestAllowSideFunctionsCarryNoSubstringOperator 在册=1
+  test:TestAnchorMissKeepsNonOverridableClassAndNeedL2 在册=1
+  test:TestAnchorMissReasonNamesCandidateAndMissingAnchor 在册=1
+  test:TestArgvZeroClaimChangesNoShellVerdict 在册=1
+  test:TestC26RewriteAccountIsConsumedAtEverySecurityLeg 在册=1
+  test:TestFileBaseNameClaimChangesNoClassOrReason 在册=1
+  test:TestHostClaimChangesNoNetworkVerdict 在册=1
+  test:TestOverrideKeySpelledWithClaimDoesNotUnlock 在册=1
+  test:TestProbe334 在册=0
+  test:TestProbe334NecessityMatrix 在册=0
+  test:TestProbe334RealMachineAnchors 在册=0
+  test:TestSubstringOperatorCounter216IsNotBlind 在册=1
+  test:TestSyncRegistryProbeLive 在册=1
+  test:TestTierAAnchorsMatchNativeSpelling 在册=1
+
+### B. 指名的 .go 件，逐枚验在树（NO＝幻影）
+  file:anchor_miss_reason_334_test.go 命中=internal/risk/anchor_miss_reason_334_test.go 
+  file:assessor.go 命中=.scratch/wisp/probes/309/a1/logs/assessor.go internal/risk/assessor.go 
+  file:blacklist.go 命中=internal/risk/blacklist.go 
+  file:cmd/wisp/run.go 命中=cmd/wisp/run.go 
+  file:cmd/wisp/slo_report_144_windows_test.go 命中=cmd/wisp/slo_report_144_windows_test.go 
+  file:composer.go 命中=internal/panel/composer.go 
+  file:display_scrub_216.go 命中=internal/panel/display_scrub_216.go 
+  file:internal/risk/anchor_miss_reason_334_test.go 命中=internal/risk/anchor_miss_reason_334_test.go 
+  file:internal/risk/blacklist.go 命中=internal/risk/blacklist.go 
+  file:internal/risk/name_claim_two_arm_216_test.go 命中=internal/risk/name_claim_two_arm_216_test.go 
+  file:internal/risk/rules_gateway.go 命中=internal/risk/rules_gateway.go 
+  file:internal/tools/bridge.go 命中=.scratch/wisp/probes/212/v1/fix/r2probe/internal/tools/bridge.go internal/tools/bridge.go 
+  file:internal/tools/mode.go 命中=internal/tools/mode.go 
+  file:internal/tools/paths.go 命中=internal/tools/paths.go 
+  file:internal/tools/rules_gateway.go 命中=NONE
+  file:logs/probe-334r1_test.go 命中=NONE
+  file:name_claim_two_arm_216_test.go 命中=internal/risk/name_claim_two_arm_216_test.go 
+  file:pathresolver.go 命中=internal/risk/pathresolver.go 
+  file:pathresolver_anchor_spelling_windows_test.go 命中=internal/risk/pathresolver_anchor_spelling_windows_test.go 
+  file:pathresolver_other.go 命中=internal/risk/pathresolver_other.go 
+  file:pathshape_portable_test.go 命中=internal/risk/pathshape_portable_test.go internal/tools/pathshape_portable_test.go 
+  file:probe-334r1_test.go 命中=NONE
+  file:rules_gateway.go 命中=internal/risk/rules_gateway.go 
+  file:thresholds.go 命中=internal/observe/thresholds.go 
+
+### C. 编排者点名的那枚中途报告引用（blacklist_test.go ＋ 那个用例名）
+  internal/risk/blacklist_test.go 在 3a118226 树里? NO
+  用例名 TestApprovalSensitivePathIsNotOverridable 全仓命中枚数=0
+  同一枚名在 HEAD 树里命中=3 笔提交动过该串
+  四枚读数件里是否也写了这枚名? 0 处
+  'non-overridable' 这个词在 3a118226 的命中文件: 3a118226:internal/risk/anchor_miss_reason_334_test.go 3a118226:internal/risk/blacklist.go 3a118226:internal/risk/name_claim_two_arm_216_test.go 3a118226:internal/tools/mode.go 
+census_rc=0
