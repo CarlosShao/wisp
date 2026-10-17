@@ -128,7 +128,9 @@ func TestPlanPresentCallBooksTheToolCallRow165r3(t *testing.T) {
 		withConfig(func(c *Config) { c.ArtifactsDir = filepath.Join(dir, "artifacts") }))
 	res := h.run("帮我把这个项目收拾一下")
 
-	// --- THE JUDGMENT: the sink reading must be non-zero. ---
+	// REDUNDANT NON-ZERO GATE, not THE JUDGMENT: 165-v2 measured that feeding
+	// sinkCount165r3 a constant keeps this green, because the tooth of this case
+	// is the independent row walk at line 145 below (rowOfTool165r3, :95-105).
 	rows, err := store.ListToolCallsByTask(context.Background(), res.TaskID)
 	if err != nil {
 		t.Fatalf("ListToolCallsByTask: %v", err)
