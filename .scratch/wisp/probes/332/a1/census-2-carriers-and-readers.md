@@ -111,7 +111,7 @@
 `SCREEN total_outside=155 scrub_leaves_raw=155 unicode_is_space=0 taint_ignores=0 unicode_is_control=0 json_escapes=0`
 ⇒ 名单外那 155 枚里：被 `scrubForDisplay` 换形的 **0** 枚；被任何 `TrimSpace` 一类去掉的 **0** 枚；
 被判定层 `isIgnorableTaintRune` 忽略的 **0** 枚（＝两表在 `Cf` 轴上只交在那 6 枚，尺④）；
-是 `Cc` 的 **0** 枚；被 `encoding/json` 转义成 `\uXXXX` 的 **0** 枚。
+是 `Cc` 的 **0** 枚；被 `encoding/json` 转义成反斜杠加 `u` 加四位十六进制那一形的 **0** 枚。
 
 ## ④ 最后一跳今天走到哪儿＋票 327 普查件的腐烂清单（★增量料）
 
