@@ -1,0 +1,16 @@
+$ git grep -n "\.Ingest(" 7535d83b -- cmd internal | grep -v _test | wc -l
+0
+$ git grep -n "json\.Marshal" 7535d83b -- cmd internal | grep -v _test | wc -l   <== 同尺形同射程正控
+37
+$ git grep -c "wispOnPanelSnapshot" 7535d83b -- frontend | wc -l
+0
+$ git grep -n "wispOnPanelSnapshot" 7535d83b | wc -l   <== 去目录限定正控
+16
+$ git grep -n "exec\.Command" 7535d83b -- internal cmd | grep -v _test | wc -l
+5
+$ git show 7535d83b:internal/risk/pathresolver.go | grep -c "unicode\.|IsPrint|ContainsAny|IndexAny"
+0
+$ git show 7535d83b:internal/panel/display_scrub_216.go | grep -c 同上正则   <== 正控
+5
+$ git grep -n "shellMetachars" ... 定义行
+12:const shellMetachars = "|;&><`$()^\n\r\x00"
