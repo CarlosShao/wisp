@@ -1,0 +1,75 @@
+### 329-v1 AC#0 name册复跑（尺＝git show --name-only + --numstat，逐枚具名提交） 2026-10-17 10:26:47 +0800
+### HEAD now = c27d5909e6350f80dc464f4d8e9b08da0fd7fa37
+--- 60e82f11 ---
+SUBJ 票 329 落地（1/5）：交付腿本体与 snapHost 字段——形甲的 Go 半边
+106	0	cmd/wisp/panel_snapshot_deliver_329.go
+12	3	cmd/wisp/run.go
+--- bed1c348 ---
+SUBJ 票 329 落地（2/5）：publishPanelSnapshot 挂上推那一跳（只挂既有驱�
+24	11	cmd/wisp/panel_pump.go
+7	4	cmd/wisp/run.go
+--- a0a2f440 ---
+SUBJ 票 329 落地（3/5）：PanelManager.evalPanelJS 宿主半边——Eval 走回面�
+24	0	cmd/wisp/panel_host_windows.go
+--- 8e1ea71d ---
+SUBJ 票 329 落地（4/5）：常驻装配根把本进程唯一的面板宿主挂进任�
+14	0	cmd/wisp/resident_windows.go
+--- 2c4f829a ---
+SUBJ 票 329 落地（5/5）：AC#3 的逐位相等尺——三枚尺（marshal 侧 ⇄ �
+177	0	cmd/wisp/panel_snapshot_deliver_329_test.go
+--- 1d1261e0 ---
+SUBJ 票 329 追加更正：交付件头注里被换行截断的路径引用改齐整（d2
+5	5	cmd/wisp/panel_snapshot_deliver_329.go
+--- a0d6ec85 ---
+SUBJ 票 329 交件（探针面·一）：page-contract.md（AC#5 页面侧合同：具名
+1	0	.scratch/wisp/probes/329/r1/logs/ac4-roster-nails-diff.log
+3	0	.scratch/wisp/probes/329/r1/logs/gate-1-gofumpt.log
+253	0	.scratch/wisp/probes/329/r1/logs/gate-2-d22scan-after-fix.log
+254	0	.scratch/wisp/probes/329/r1/logs/gate-2-d22scan.log
+12	0	.scratch/wisp/probes/329/r1/logs/gate-3-pathlength.log
+22	0	.scratch/wisp/probes/329/r1/logs/mutation-1-defang.log
+21	0	.scratch/wisp/probes/329/r1/logs/mutation-2-counter.log
+22	0	.scratch/wisp/probes/329/r1/logs/mutation-3-reader-removal.log
+3	0	.scratch/wisp/probes/329/r1/logs/pristine-hashes-B-resync.log
+6	0	.scratch/wisp/probes/329/r1/logs/pristine-hashes-B.log
+4	0	.scratch/wisp/probes/329/r1/logs/ruler-lastPanelSnapshot-after-worktree.log
+3	0	.scratch/wisp/probes/329/r1/logs/ruler-lastPanelSnapshot-before-A.log
+2	0	.scratch/wisp/probes/329/r1/logs/targeted-green-after-resync-B.log
+65	0	.scratch/wisp/probes/329/r1/page-contract.md
+7	0	.scratch/wisp/probes/329/r1/txt/msg-1-deliver.txt
+5	0	.scratch/wisp/probes/329/r1/txt/msg-2-publish-hop.txt
+1	0	.scratch/wisp/probes/329/r1/txt/msg-4-attach.txt
+1	0	.scratch/wisp/probes/329/r1/txt/msg-5-test.txt
+1	0	.scratch/wisp/probes/329/r1/txt/msg-6-probe-contract.txt
+
+### cmd/wisp A..B 全量 diff（尺＝git diff --numstat feab45e3 1d1261e0 -- cmd/wisp）
+24	0	cmd/wisp/panel_host_windows.go
+24	11	cmd/wisp/panel_pump.go
+106	0	cmd/wisp/panel_snapshot_deliver_329.go
+177	0	cmd/wisp/panel_snapshot_deliver_329_test.go
+14	0	cmd/wisp/resident_windows.go
+19	7	cmd/wisp/run.go
+### 七笔里是否混进票面或证据件（尺＝逐枚 name-only 过滤 issues/evidence）
+  60e82f11 issues-or-evidence-files=0
+  bed1c348 issues-or-evidence-files=0
+  a0a2f440 issues-or-evidence-files=0
+  8e1ea71d issues-or-evidence-files=0
+  2c4f829a issues-or-evidence-files=0
+  1d1261e0 issues-or-evidence-files=0
+  a0d6ec85 issues-or-evidence-files=0
+
+### 死腿 §1 幽灵引用复量：probes/329/r1/logs/commits-roster.log 在盘上？
+ls: cannot access '.scratch/wisp/probes/329/r1/logs/commits-roster.log': No such file or directory
+ls_rc=2
+
+### 桌面卫生尺（死腿 §83 待填那一格，我现跑）：活实例 wisp.exe PID 21892
+
+
+Id          : 21892
+ProcessName : wisp
+StartTime   : 2026/10/15 19:03:14
+Path        : D:\work\workspace\projects plans\Wisp\build\wisp.exe
+
+
+
+### 本腿全程未触碰该 PID（⛔ 杀），且未放宽任何断言
