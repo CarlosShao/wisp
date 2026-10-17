@@ -336,6 +336,20 @@ func runResident() {
 	// bind happens inside, on the first line where that object exists.
 	src := startResidentTaskSource(rt, ra, panelScope)
 
+	// Ticket 329 form 甲: the one panel host this process owns becomes the
+	// destination of the task pipeline's booked snapshot packets. This is the
+	// attach, and it is the whole of the wiring - publishPanelSnapshot pushes
+	// through whatever host is set here, and PanelManager.evalPanelJS routes each
+	// push to the panel thread (no window open, nothing pushed; the packet stays
+	// booked as before). It sits on this line because src.run is the first moment
+	// the runtime exists here, and every later line is a process whose pumps could
+	// already publish. A refused assembly (src nil or src.run nil) and a boot whose
+	// panel host never built (rp nil) each leave the host unset, which is the
+	// honest statement that this process has no page to push to.
+	if src != nil && src.run != nil && rp != nil {
+		src.run.setPanelSnapshotHost(rp)
+	}
+
 	// Ticket 247 AC#1/AC#5: the capture leg. This is the line that makes
 	// internal/audio have a non-test importer - before it the whole stack
 	// (real WASAPI shared mode, the D38d bounded frame path, the gate, ticket
