@@ -1,0 +1,5 @@
+# 335-v1 start snapshot 2026-10-17 12:59:26 +0800
+HEAD=0a030cea branch=dev
+ruler: git status --porcelain -- internal/panel
+output:
+rc=0 (empty output above = worktree clean at start, 328-r1 bytes all committed)
