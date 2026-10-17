@@ -118,9 +118,17 @@ func TestASecondCardForTheSameTaskStillLightsItsRow(t *testing.T) {
 
 // TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt is the sensitivity half: the
 // widened key must be exactly the queue's own rewrite ("<id>#<decimal seq>",
-// queue.go:152-154), not "anything that starts with my task id". Drop the digit
-// test and a prefix match passes; drop the other-task test and a blanket match
-// passes.
+// queue.go:152-154) or a correlation built on a task id THIS render filed
+// ("<taskID>#<tail>", loop.go:603 - ticket 328's ruling), never "anything that
+// starts with my task id". Drop the digit test and a prefix match passes; drop the
+// other-task test and a blanket match passes; drop the delimiter half of 328's arm
+// and "child-1x" - a different task's own name - passes too.
+//
+// ★ The fourth row flipped with ticket 328 and that flip BUYS TRUTH, it is not a
+// green bought cheaply: "child-1#retry" is the shape the loop's callCorr mints for
+// a task whose card was re-filed, so the row IS waiting on it and reading false
+// was the defect this ticket was filed over. The fifth row did NOT move and is the
+// guard rail between 328's widened join and "two tasks merged into one".
 func TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt(t *testing.T) {
 	cases := []struct {
 		name string
@@ -130,7 +138,7 @@ func TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt(t *testing.T) {
 		{"the queue's own rewrite lights", "child-1#9", true},
 		{"a multi-digit seq lights", "child-1#147", true},
 		{"another task's rewrite does not light", "other-1#9", false},
-		{"a non-numeric suffix is not the queue's form", "child-1#retry", false},
+		{"a non-numeric tail on a filed task id lights (328)", "child-1#retry", true},
 		{"a task id that merely prefixes does not light", "child-1x", false},
 		{"an empty correlation id names no row", "", false},
 	}
