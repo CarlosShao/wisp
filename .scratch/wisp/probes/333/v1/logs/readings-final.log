@@ -1,0 +1,146 @@
+# 333-v1 decisive readings (adjudication leg; every number below is THIS leg's own measurement)
+
+Trees (out of the repository, created by `mktemp -d` on the D: volume; both generate 8.3 aliases:
+`dir /x D:` printed W333V1~1 / W333V2~1 / and the third stem likewise):
+  A = D:/W333V1-SuqCO8  = git archive 859026d2f9f18e875b579eba372fec5b850c7a06  (delivery), .go files = 757
+  P = D:/W333V2-hLzM9f  = git archive ae710c492b74188f6a25e23bcc19479bc426948f  (pre-anchor), .go files = 753
+  M = D:/W333V3-b3pHjd  = a second archive of 859026d2, used ONLY as the mutation surface
+  recipe used for all three: go.mod go.sum internal cmd tools scripts frontend models + docs/ + design/
+  + the three untracked pieces (build/*.dll, third_party/sherpa-onnx/*.dll, frontend/dist)
+  caveat recorded: an archive tree has NO .git and the archived html fixture is byte-different from the
+  checked-out one; both effects are named in the colour section below.
+
+## AC#1 / AC#2 / AC#4 independent counts (stdlib probes, out of repo, rc=0, stderr empty)
+D:/wisp-333v1-tmp/cfcheck  : GO_UNICODE_VERSION=17.0.0  CF_COUNT=170  CC_COUNT=65  MN_COUNT=2059  ZS_COUNT=17
+                             FIFTEEN_ALL_IN_CF=15 of 15
+                             EIGHT U+2061/2062/2063/2064/061C/180E/206A/206B -> cf=true zs=false cc=true/false per line:
+                               all eight cf=true, all eight zs=false, all eight cc=false
+                             PC_U202B_cf=true PC_U0041_cf=false PC_U0000_cc=true PC_U007F_cc=true PC_U0080_cc=true
+D:/wisp-333v1-tmp/ctlexp   : CC_CATEGORY=65  ISCONTROL_TOTAL=65  ISCONTROL_AND_NOT_CF=65
+                             ISCONTROL_BUT_NEITHER_Cc_NOR_Cf=0   U2028_iscontrol=false U2029_iscontrol=false
+                             => in go1.27.1 unicode.IsControl is exactly the Cc category, so the test's
+                                "full Cc=65" arm counts Cc and nothing else.
+Anchor roster (tree P, internal/panel/display_scrub_216.go:164): the switch body holds 15 unique hex
+  literals (awk over the function body only, sort -u | wc -l = 15); the ticket's trap reproduced:
+  whole-file grep -c 'case 0x' in tree P = 1.
+Delivery predicate (tree A, same file, :163-165) verbatim:
+  func isDisplayWashCf(r rune) bool {
+        return unicode.Is(unicode.Cf, r)
+  }
+  second-source hunt: grep -rn 'unicode.Cf' over tree A's non-test product code = 2 hits, the predicate
+  body :164 and one prose line :141; the writer asks the same symbol at :124, the fast path at :204.
+
+## AC#2 ruler (git diff ae710c49 859026d2 -- internal/panel/display_scrub_216.go)
+added lines = 31, deleted lines = 41 (this leg's convention: the +++/--- header lines excluded; the leg
+reported 32/42 for the same hunk = one header line each, the two pairs are NOT to be subtracted).
+ADDED side:  'case 0x' = 0   '0x' = 0   'U+' = 0   hex literals extracted = 0
+DELETED side (positive control, same ruler): 'case 0x' = 1  '0x' = 5  'U+' = 15
+=> the ruler is not blind and the widened function carries no literal roster.
+
+## AC#3 the self-reference attack (tree M; product file sha256 first 16, test file sha256 first 16)
+PRE-BASELINE  dc86d19ce9fdf52b  ddf652a42a0e5f70
+M0 pristine control, -run 'TestDisplayWashRoster|TestDisplayWashJudgeAndWriter|TestDisplayWashFastPath|
+   TestDisplayWashEscapes|TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut'
+   FOUR M0-control: RUN=6 PASS_TOP=5 FAIL_TOP=1 SKIP=0 rc=1  (the single FAIL is
+   TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut = the out-of-design nail at
+   display_scrub_216_test.go:444; all five 333 nails are GREEN on the untouched tree)
+M1 product predicate put BACK to the anchor's 15-rune switch, test untouched (mutation diff = the 9 body
+   lines lifted verbatim from tree P by awk):
+   MUT 8c12e7223cf148d5  ddf652a42a0e5f70
+   FOUR M1-roster: RUN=6 PASS_TOP=2 FAIL_TOP=4 SKIP=0
+   nail 1 red, verbatim:
+     display_scrub_327r2_test.go:66: nail 1: product-washed=15, unicode.Cf=170
+     display_scrub_327r2_test.go:72: a Cf-table rune is not washed by the product: [U+0600 ... U+FFF9 U+FFFA U+FFFB] (product=15 category=170)
+     display_scrub_327r2_test.go:76: product roster cardinality=15, want the category's 170
+M3 SAME product mutation, but the test's actual side rewritten to the reverse form (self-copy of the
+   expected expression, content anchor 'washSetOver(isDisplayWashCf)'):
+   MUT 8c12e7223cf148d5  59fb54bc4e2b118f
+   FOUR M3-selfcopy: RUN=6 PASS_TOP=3 FAIL_TOP=3 SKIP=0
+   nail 1 in that shape: display_scrub_327r2_test.go:66: nail 1: product-washed=170, unicode.Cf=170
+                        --- PASS: TestDisplayWashRosterIsExactlyTheCfCategory (0.04s)
+   => the reverse form is blind to exactly the mutation the delivered form reddens on.
+M4 reverse form alone (test self-copied, product left correct):
+   MUT dc86d19ce9fdf52b  59fb54bc4e2b118f
+   FOUR M4-selfcopy-only: RUN=6 PASS_TOP=5 FAIL_TOP=1 SKIP=0 (only the :444 nail red, as in M0)
+
+## AC#5 the paired teeth (tree M, different functions, different assertion lines)
+M2 fast path short-circuited: 'return false // MUTANT 333v1 M2' inserted right after the signature token
+   'func needsDisplayWash(s string) bool {' (content anchor, not a line number):
+   MUT 7626aa28a2c5646e  ddf652a42a0e5f70
+   FOUR M2-fastpath: RUN=6 PASS_TOP=2 FAIL_TOP=4 SKIP=0
+   red sentences verbatim (first of each):
+     display_scrub_333_333r1_test.go:82: AC#4 scope: full Cf=170, full Cc=65, boundaries=22, failures=488
+     display_scrub_333_333r1_test.go:87: Cc U+0000: needsDisplayWash stayed silent, so scrubForDisplay never runs
+     display_scrub_333_333r1_test.go:120: AC#8 category arm: examined=170, product washes=170, failures=170
+     display_scrub_333_333r1_test.go:125: U+00AD: "photo\u00ad报告.png" came back untouched
+     display_scrub_327r2_test.go:147: nail 3 scope: full Cf=170, full Cc=65, boundary sample=22, disagreements=0
+     display_scrub_327r2_test.go:158: positive control failed: U+202E did not surface as a visible escape in "a\x1bp\u202eqb"
+   note: under M2 nail 3's SAME-SET arm reads disagreements=0 (both arms go quiet together), so what
+   reddens it is its own positive control; the direction arms of AC#4's new file are what carry the tooth.
+comm over the two rosters (files mut-M1-roster.failnames.txt / mut-M2-fastpath.failnames.txt):
+   M1-ONLY TestDisplayWashRosterIsExactlyTheCfCategory
+   M2-ONLY TestDisplayWashJudgeAndWriterAgreeOnBothFamiliesAndBoundaries
+   BOTH    TestDisplayWashEscapesAndNeverDeletesAcrossTheWholeCategory
+   BOTH    TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies
+   BOTH    TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded
+restore after every shot (cp from pristine tree A inside the shot function, no early exit path):
+   RESTORE hashes printed per shot in mut-*.log; final state of tree M after the last shot:
+   sha256(M/internal/panel/display_scrub_216.go) = dc86d19ce9fdf52b  == PRE and == tree A
+   sha256(M/internal/panel/display_scrub_327r2_test.go) = ddf652a42a0e5f70 == PRE and == tree A
+   diff -r A/internal/panel M/internal/panel = no output => TREES IDENTICAL AFTER RESTORE
+
+## AC#6 colour, four shots, one command: go test -v ./internal/panel/ -count=1 -timeout 30m
+label        temp root                                     RUN  PASS_TOP  FAIL_TOP  SKIP  rc
+col-pre-c    C:/Users/swq/AppData/Local/Temp, GOTMPDIR unset  255   158   7   0   1
+col-pre-d    D:/wisp-333v1-tmp/tmp + GOTMPDIR (mkdir -p first) 255   158   7   0   1
+col-del-c    C: same                                          257   159   8   0   1
+col-del-d    D: same                                          257   159   8   0   1
+surface pairing per anchor: the stripped name-line sequences (.seq.txt) differ ONLY in the package
+summary's elapsed column (diff = 1 hunk, the FAIL ... 11.871s vs 11.165s line) => no cross-volume
+single-red family in THIS package on THIS recipe. Scope note: A1013's family was measured on other
+faces (internal/risk, cmd/wisp), not here.
+pre-anchor red roster (7): TestApprovalCardViewJSONKeysMatchFrontendTypes, TestC21DesignTokensFourWayAgree,
+  TestComposerContractTypesMatchFrontend, TestComposerRenderFixtureTellsTheTruth,
+  TestReadGitOnThisRepositoryIsSelfConsistent, TestStreamLogDroppedNamingLedgerIsNotBounded35r8,
+  TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+delivery red roster (8) = the seven above, byte-identical, plus exactly one:
+  TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut   (display_scrub_216_test.go:444)
+     display_scrub_216_test.go:448: U+2061 is not on the ruled list but needsDisplayWash fired on it
+     display_scrub_216_test.go:451: U+2061 is not on the ruled list but the wash changed it: "photo\u2061.png" -> "photo\\u2061.png"
+  nothing left the roster: 7 -> 8, 枚也没少. Top-level names 165 -> 167 (the two new AC#4 nails, both green).
+the two reds this leg sees above the leg's five are archive-surface artifacts, named and not counted:
+  git_test.go:600  kind = "not_a_repo" ... "这棵工作区目录及其以上都没有 .git" (no .git in an archive tree)
+  composer_test.go:873 + :902 "render fixture verified across 0 painted states" (the archived copy of
+    frontend/fixtures/composer-states.html is byte-different from the checked-out one: 16649 in tree A,
+    16641 in the worktree; the block parser in composer_test.go:858 splits on "<!-- " and cuts " -->\\n").
+    This leg did NOT finish attributing that byte delta; it is present identically on both anchors, so it
+    cancels in the 作差 and is excluded from every judgement above it.
+
+## AC#8 diff-level rulers over internal/panel (git diff ae710c49 859026d2)
+added 't.Skip' lines = 0; removed 'func Test' lines = 2; added 'func Test' lines = 4;
+removed assertion/log lines = 8; added = 15.
+name mapping proved by the colour logs: pre shows TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen
+and TestDisplayWashRosterExcludesTheEightNamedRunes (both PASS); delivery shows
+TestDisplayWashRosterIsExactlyTheCfCategory and TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded
+(both PASS) => renamed, not deleted.
+internal/risk bytes in the range = 0 files; thresholds/golden/allowlist/go.mod/go.sum/frontend/design/
+docs/specs/PLAN.md in the range = 0 files (count run over git diff --name-only ae710c49 859026d2).
+display_scrub_216_test.go byte delta in the range = none (git diff --stat prints nothing);
+its len(cfRoster) != 15 assertion is still at :400 in BOTH trees.
+stale prose the leg left in place, delivery line numbers: :90 "(the ticket 327 Cf roster)",
+:92 "the invisible roster", :193 "the invisible formatting roster in isDisplayWashCf" - all three are
+comment lines; :92 itself contains "U+202E" and "U+00AD".
+
+## gates, shared working tree only, one number each
+gofumpt.exe -l .scratch/wisp/probes/333/v1/ = empty list, rc=0 (this leg authors no Go byte)
+sh scripts/d22scan.sh = "clean - no D22 ban violations", rc=0 (ban #8 internal/=584, cmd/=143,
+  design/=39, frontend/=116 -- 584 vs the leg's 583 is two moments of the same denominator, not a delta)
+sh scripts/check-path-length-budget.sh = "VERDICT GREEN", rc=0 (over the hat=60, roster entries=60)
+go vet ./internal/panel/ = silent, rc=0
+
+## placeholder ruler re-run by this leg, form = grep -c -E word-boundary triple + the two CJK words
+docs/evidence/s1/333-r1-display-cf-category.md => 1 (line 73, the sentence that writes the ruler itself)
+internal/panel/display_scrub_216.go => 0
+internal/panel/display_scrub_327r2_test.go => 0
+internal/panel/display_scrub_333_333r1_test.go => 0
+ticket 333 unchecked boxes at the time this leg wrote: 9 (lines 19-27). No box was flipped by this leg.

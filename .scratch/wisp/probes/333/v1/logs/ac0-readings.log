@@ -1,0 +1,82 @@
+# 333-v1 AC#0 name roster (per-commit git show --name-only, re-walked independently)
+### AC#0 : the six 333-r1 commits, per-commit name-only
+--- 3f3dde46f 票 333 产码腿 333-r1·AC#2＝显示�
+.scratch/wisp/probes/333/r1/logs/ac2-ruler.diff
+.scratch/wisp/probes/333/r1/logs/ac2-ruler.log
+.scratch/wisp/probes/333/r1/msg-ac2.txt
+internal/panel/display_scrub_216.go
+--- dbaad267d 票 333 产码腿 333-r1·AC#6 起手侧
+.scratch/wisp/probes/333/r1/logs/pre-anchor-c.log
+.scratch/wisp/probes/333/r1/logs/pre-anchor-c.log.sha256
+.scratch/wisp/probes/333/r1/logs/pre-anchor-d.log
+.scratch/wisp/probes/333/r1/logs/pre-anchor-d.log.sha256
+.scratch/wisp/probes/333/r1/logs/pre-anchor-surface-diff.log
+.scratch/wisp/probes/333/r1/msg-pre-baseline.txt
+.scratch/wisp/probes/333/r1/run-surface.sh
+--- 5f4f7945 票 333 产码腿 333-r1·AC#3＝327-r2 
+.scratch/wisp/probes/333/r1/logs/ac3-nails-final.log
+.scratch/wisp/probes/333/r1/logs/ac3-nails-reshaped.log
+.scratch/wisp/probes/333/r1/msg-ac3.txt
+internal/panel/display_scrub_327r2_test.go
+--- 9574e794 票 333 产码腿 333-r1·AC#4＝新建�
+.scratch/wisp/probes/333/r1/logs/ac4-new-nails.log
+.scratch/wisp/probes/333/r1/msg-ac4.txt
+internal/panel/display_scrub_333_333r1_test.go
+--- 04f2e847 票 333 产码腿 333-r1·AC#5＝成对�
+.scratch/wisp/probes/333/r1/logs/ac3-nails-targeted.log
+.scratch/wisp/probes/333/r1/logs/ac5-pair-summary.log
+.scratch/wisp/probes/333/r1/logs/mut-M0-control.log
+.scratch/wisp/probes/333/r1/logs/mut-M1.log
+.scratch/wisp/probes/333/r1/logs/mut-M2.log
+.scratch/wisp/probes/333/r1/msg-ac5.txt
+.scratch/wisp/probes/333/r1/mut333r1.sh
+--- 859026d2 票 333 产码腿 333-r1·交件＝证�
+.scratch/wisp/issues/333-display-boundary-wash-cf-category-not-hand-roster.md
+.scratch/wisp/probes/333/r1/logs/delivery-colours.log
+.scratch/wisp/probes/333/r1/logs/gates-four.log
+.scratch/wisp/probes/333/r1/logs/placeholders.log
+.scratch/wisp/probes/333/r1/logs/post-c.log
+.scratch/wisp/probes/333/r1/logs/post-c.log.sha256
+.scratch/wisp/probes/333/r1/logs/post-d.log
+.scratch/wisp/probes/333/r1/logs/post-d.log.sha256
+.scratch/wisp/probes/333/r1/msg-delivery.txt
+docs/evidence/s1/333-r1-display-cf-category.md
+### AC#0 : union of paths touched, checked against the allowed surfaces
+.scratch/wisp/issues/333-display-boundary-wash-cf-category-not-hand-roster.md
+.scratch/wisp/probes/333/r1/logs/ac2-ruler.diff
+.scratch/wisp/probes/333/r1/logs/ac2-ruler.log
+.scratch/wisp/probes/333/r1/logs/ac3-nails-final.log
+.scratch/wisp/probes/333/r1/logs/ac3-nails-reshaped.log
+.scratch/wisp/probes/333/r1/logs/ac3-nails-targeted.log
+.scratch/wisp/probes/333/r1/logs/ac4-new-nails.log
+.scratch/wisp/probes/333/r1/logs/ac5-pair-summary.log
+.scratch/wisp/probes/333/r1/logs/delivery-colours.log
+.scratch/wisp/probes/333/r1/logs/gates-four.log
+.scratch/wisp/probes/333/r1/logs/mut-M0-control.log
+.scratch/wisp/probes/333/r1/logs/mut-M1.log
+.scratch/wisp/probes/333/r1/logs/mut-M2.log
+.scratch/wisp/probes/333/r1/logs/placeholders.log
+.scratch/wisp/probes/333/r1/logs/post-c.log
+.scratch/wisp/probes/333/r1/logs/post-c.log.sha256
+.scratch/wisp/probes/333/r1/logs/post-d.log
+.scratch/wisp/probes/333/r1/logs/post-d.log.sha256
+.scratch/wisp/probes/333/r1/logs/pre-anchor-c.log
+.scratch/wisp/probes/333/r1/logs/pre-anchor-c.log.sha256
+.scratch/wisp/probes/333/r1/logs/pre-anchor-d.log
+.scratch/wisp/probes/333/r1/logs/pre-anchor-d.log.sha256
+.scratch/wisp/probes/333/r1/logs/pre-anchor-surface-diff.log
+.scratch/wisp/probes/333/r1/msg-ac2.txt
+.scratch/wisp/probes/333/r1/msg-ac3.txt
+.scratch/wisp/probes/333/r1/msg-ac4.txt
+.scratch/wisp/probes/333/r1/msg-ac5.txt
+.scratch/wisp/probes/333/r1/msg-delivery.txt
+.scratch/wisp/probes/333/r1/msg-pre-baseline.txt
+.scratch/wisp/probes/333/r1/mut333r1.sh
+.scratch/wisp/probes/333/r1/run-surface.sh
+docs/evidence/s1/333-r1-display-cf-category.md
+internal/panel/display_scrub_216.go
+internal/panel/display_scrub_327r2_test.go
+internal/panel/display_scrub_333_333r1_test.go
+-- OFF-SURFACE hunt: any path not in the four allowed shapes --
+off-surface count = 0
+-- display_scrub_216_test.go bytes changed across the six? --

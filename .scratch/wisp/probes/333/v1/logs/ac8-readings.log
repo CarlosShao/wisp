@@ -1,0 +1,87 @@
+# 333-v1 AC#8 rulers (no loosening / no deleted case / no t.Skip; the 327-r2 nail flip bodies)
+### AC#8 : diff-level rulers over internal/panel
+-- added t.Skip / Run(. / Parallel : --
+0
+-- removed test functions (deleted cases) --
+2
+-- added test functions --
+4
+-- removed assertion lines vs added assertion lines (whole panel pkg) --
+removed t.Error/t.Fatal lines = 8
+added   t.Error/t.Fatal lines = 15
+### AC#8 : the 327-r2 nail flip, anchor vs delivery, side by side
+--- ANCHOR nail 1 body ---
+func TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen(t *testing.T) {
+	actual := productWashedRunes()
+	ruled := map[rune]bool{}
+	for _, r := range ruledRoster327r2 {
+		ruled[r] = true
+	}
+	extra, missing := map[rune]bool{}, map[rune]bool{}
+	for r := range actual {
+		if !ruled[r] {
+			extra[r] = true
+		}
+	}
+	for r := range ruled {
+		if !actual[r] {
+			missing[r] = true
+		}
+	}
+	t.Logf("nail 1: product-washed=%d, ruled-list=%d", len(actual), len(ruled))
+	if len(extra) != 0 { // reddens on a silent ADD (shot 1)
+		t.Errorf("the product washes Cf runes the ruling never named: %v (ruled=%d product=%d)",
+			names327r2(extra), len(ruled), len(actual))
+	}
+	if len(missing) != 0 { // reddens on a silent REMOVE (shot 2), a different line
+		t.Errorf("a ruled rune is no longer washed by the product: %v (ruled=%d product=%d)",
+			names327r2(missing), len(ruled), len(actual))
+	}
+	if len(actual) != len(ruled) {
+		t.Errorf("product roster cardinality=%d, want %d", len(actual), len(ruled))
+	}
+}
+--- ANCHOR nail 2 body ---
+func TestDisplayWashRosterExcludesTheEightNamedRunes(t *testing.T) {
+	for _, r := range excludedRoster327r2 {
+		if !unicode.Is(unicode.Cf, r) {
+			t.Errorf("%s is not unicode.Cf - the exclusion lost its meaning", name327r2(r))
+		}
+		if isDisplayWashCf(r) {
+			t.Errorf("%s is off the ruled list but isDisplayWashCf washed it", name327r2(r))
+		}
+		in := "photo" + string(r) + ".png"
+		if needsDisplayWash(in) {
+			t.Errorf("%s is off the ruled list but needsDisplayWash fired on %q", name327r2(r), in)
+		}
+		if got := scrubForDisplay(in); got != in {
+			t.Errorf("%s is off the ruled list but the wash changed it: %q -> %q", name327r2(r), in, got)
+		}
+	}
+}
+### AC#8 : the len(cfRoster) != 15 assertion the leg says is untouched
+/d/W333V1-SuqCO8/internal/panel/display_scrub_216_test.go:400:	if len(cfRoster) != 15 {
+/d/W333V2-hLzM9f/internal/panel/display_scrub_216_test.go:400:	if len(cfRoster) != 15 {
+### AC#8 : stale prose the leg deliberately left (delivery tree line numbers)
+//	other C0 and C1    -> \xNN, lowercase hex, the same spelling Go uses
+//	invalid UTF-8 byte -> \xNN of the raw byte, never U+FFFD
+//	format rune above U+00FF (the ticket 327 Cf roster) -> \uXXXX, lowercase hex
+//
+// The last shape is the one the invisible roster lands in: U+202E prints as
+// `\u202e`, U+00AD soft hyphen - which is below U+00FF - prints as `\xad`. Both
+
+// needsDisplayWash reports whether scrubForDisplay would change s. It is the same
+// character set as the writer, read once: unicode.IsControl (C0 U+0000-U+001F and
+// C1 U+007F-U+009F), the invisible formatting roster in isDisplayWashCf, plus any
+// byte that is not a valid UTF-8 sequence.
+//
+// AC#2 of ticket 327 is the reason the roster lives in ONE function that both
+// sides call: this fast path decides whether the writer runs at all, so a rune
+### AC#8 : the escape-not-delete sentence
+
+// scrubForDisplay turns the characters a human cannot see into characters a human
+// can read, and changes nothing else.
+//
+// The shape is VISIBLE ESCAPE, not deletion, for one reason: deletion splices.
+// "photo\x1b已允许.png" with the control character removed reads
+// "photo已允许.png" - still a claim no code made, and now with the only evidence

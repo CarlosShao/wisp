@@ -1,0 +1,90 @@
+# 333-v1 AC#2 ruler (script ac2-ruler.sh). Trees: delivery=git archive 859026d2 -> D:/W333V1-SuqCO8 ; pre-anchor=git archive ae710c49 -> D:/W333V2-hLzM9f
+== anchor full shas ==
+ae710c492b74188f6a25e23bcc19479bc426948f
+859026d2f9f18e875b579eba372fec5b850c7a06
+== added line count =
+31
+== deleted line count =
+41
+== RULER on ADDED side (must be 0) ==
+added  hits for [case 0x] = 0
+added  hits for [0x] = 0
+added  hits for [U+] = 0
+added  hits for [\\x] = 0
+== POSITIVE CONTROL: same ruler on DELETED side (must be > 0) ==
+deleted hits for [case 0x] = 1
+deleted hits for [0x] = 5
+deleted hits for [U+] = 15
+deleted hits for [\\x] = 0
+== the changed function body verbatim (hunk around isDisplayWashCf) ==
+-//     isDisplayWashCf below for the fifteen it DOES wash; the seven the census
+-//     measured as reachable but AC#1's ruling leaves out (U+2061-U+2064 the
+-//     mathematical operators, U+061C, U+180E, U+206A) stay raw on purpose until a
+-//     ruling names them;
++//   - it does not narrow the invisible-rune family any more. Until ticket 333 this
++//     file hand-maintained a roster of Cf characters and named, here, the ones it
++//     left raw on purpose. The ruling now asks the Unicode category, so a rune is
++//     washed because it is a format control character and this file lists no runes
++//     at all; there is no longer a family member that stays invisible by standing
++//     outside a list someone has to remember to extend;
+-// isDisplayWashCf is the display boundary's invisible-rune roster, written out
+-// rune by rune and NOT derived from a Unicode category: unicode.Is(unicode.Cf, r)
+-// would sweep in the mathematical operators (U+2061-U+2064), U+061C, U+180E and
+-// the deprecated U+206A-U+206B, and AC#1's ruling is that only the named runes
+-// below get washed. It is equally NOT internal/risk's isIgnorableTaintRune: that
+-// table serves the judgement axis (make an invisible character stop changing the
+-// word shape a rule looks at), this one serves the display axis (make an invisible
+-// character stop changing what a human reads). The two lists overlap on six runes
+-// and disagree on the bidi family, which is exactly why they stay in separate
+-// files - see ticket 327's boundary section and AGENTS.md 1.2.
+-//
+-// Fifteen runes, each with the name it is audited under:
+-//
+-//	U+00AD  soft hyphen          U+202A  left-to-right embedding
+-//	U+200B  zero width space     U+202B  right-to-left embedding
+-//	U+200C  zero width non-joiner        U+202C  pop directional formatting
+-//	U+200D  zero width joiner    U+202D  left-to-right override
+--
++// isDisplayWashCf is the display boundary's invisible-rune test, asked of the
++// Unicode CATEGORY rather than of a hand-kept roster: a rune is washed exactly when
++// this toolchain's unicode.Cf table says it is a format control character.
++//
++// WHY THE CATEGORY (ticket 333's ruling; it replaces the fifteen runes this function
++// spelled out rune by rune until then). Cf means "invisible when rendered", so
++// "every one of them must be shown" is ONE judgement about that family, not fifteen
++// separate ones. A hand roster makes the next Unicode version's new Cf character an
++// unannounced pass-through into the menu, and no ruler in this repository could see
++// it happen. Asking the category means the wash set moves with the table, and the
++// relation nail in display_scrub_327r2_test.go compares this predicate against the
++// category over every scalar value, so a table move reddens a test instead of
+== per-codepoint ruler on ADDED side: any hex literal at all? ==
+0
+== second-source hunt inside isDisplayWashCf body (delivery tree) ==
+// category over every scalar value, so a table move reddens a test instead of
+// quietly reopening the hole. Two consequences of that shape, both accepted by the
+// ruling: the size of the wash set is a READING of the toolchain's table and is
+// never written down here as a number, and this file's table disagreement with
+// Unicode's own category notes (the Mongolian vowel separator is one) belongs to the
+// table, not to an exception in this function.
+//
+// It is equally NOT internal/risk's isIgnorableTaintRune: that table serves the
+// judgement axis (make an invisible character stop changing the word shape a rule
+// looks at), this one serves the display axis (make an invisible character stop
+// changing what a human reads). The two axes disagree on the bidi family, which is
+// exactly why they stay in separate files - see ticket 327's boundary section and
+// AGENTS.md 1.2.
+func isDisplayWashCf(r rune) bool {
+	return unicode.Is(unicode.Cf, r)
+}
+
+// writeControlEscape is the vocabulary above, kept apart from the scan so the
+// character set has exactly one place to look at.
+func writeControlEscape(b *strings.Builder, r rune) {
+	switch r {
+== package-level identifiers referenced by the predicate ==
+func isDisplayWashCf(r rune) bool {
+	return unicode.Is(unicode.Cf, r)
+}
+== grep: any hand roster left anywhere in the file (hex literals) ==
+183:0xff
+stderr bytes = 0 (see leg note)

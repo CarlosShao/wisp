@@ -1,0 +1,110 @@
+# 333-v1 AC#1 + AC#7 rulers (script ac1-ac7-rulers.sh); all tree paths are the out-of-repo export stems named above
+### RULER 1: literal codepoint roster in the ANCHOR version of isDisplayWashCf
+func isDisplayWashCf(r rune) bool {
+	switch r {
+	case 0x00AD,
+		0x200B, 0x200C, 0x200D,
+		0x2060, 0xFEFF,
+		0x202A, 0x202B, 0x202C, 0x202D, 0x202E,
+		0x2066, 0x2067, 0x2068, 0x2069:
+		return true
+	default:
+		return false
+	}
+}
+-- hex literals counted one by one (awk over the function body only) --
+15
+-- case-line count inside the body (cross-line case trap) --
+1
+-- whole-file grep -c 'case 0x' (the trap the ticket names: reads 1) --
+1
+
+### RULER 3: washed fields + production call sites (delivery tree)
+-- non-test hits of scrubComposerForDisplay --
+/d/W333V1-SuqCO8/internal/panel/composer.go:145:		Composer:    scrubComposerForDisplay(composer),
+/d/W333V1-SuqCO8/internal/panel/display_scrub_216.go:212:// scrubComposerForDisplay is the display boundary's whole roster, in one call. It
+/d/W333V1-SuqCO8/internal/panel/display_scrub_216.go:217:func scrubComposerForDisplay(c ComposerState) ComposerState {
+-- test hits (for the denominator) --
+0
+-- composer.go:145 verbatim --
+		// display_scrub_216.go for the roster and for why washing sits here and
+		// not in the producers (whose Canonical is read as a PATH elsewhere).
+		Composer:    scrubComposerForDisplay(composer),
+		GeneratedAt: now.UTC().Format(time.RFC3339),
+	}
+-- display_scrub_216.go:218 / :224 verbatim --
+func scrubComposerForDisplay(c ComposerState) ComposerState {
+	c.Workspace.Canonical = scrubForDisplay(c.Workspace.Canonical)
+	if len(c.Attachments) == 0 {
+	for i, a := range c.Attachments {
+		a.Name = scrubForDisplay(a.Name)
+		rows[i] = a
+
+### AC#7 chain, each file:line re-read with sed (delivery tree)
+cmd/wisp/run.go:714 -> 	rt.pump = panel.NewSnapshotPump(panel.PumpSources{
+cmd/wisp/panel_pump.go:451 -> 	snap, _, err := rt.pump.Publish()
+internal/panel/pump.go:354 -> func (p *SnapshotPump) Publish() (Snapshot, []byte, error) {
+internal/panel/pump.go:309 -> 	snap := NewSnapshot(cards, results, composer, now())
+internal/panel/composer.go:106 -> func NewSnapshot(pending []ApprovalCardView, results []ResultChunk,
+internal/panel/composer.go:145 -> 		Composer:    scrubComposerForDisplay(composer),
+internal/panel/display_scrub_216.go:218 -> 	c.Workspace.Canonical = scrubForDisplay(c.Workspace.Canonical)
+internal/panel/display_scrub_216.go:224 -> 		a.Name = scrubForDisplay(a.Name)
+internal/panel/pump.go:359 -> 	data, err := json.Marshal(snap)
+internal/panel/composer.go:231 -> 	Canonical string `json:"canonical"`
+internal/panel/attachments.go:86 -> 	Name string `json:"name"`
+
+### AC#7 front-end: renderer vs receiver (delivery tree, frontend/src)
+-- renderer: canonical reads --
+/d/W333V1-SuqCO8/frontend/src/App.tsx:59:    canonical: "",
+/d/W333V1-SuqCO8/frontend/src/App.tsx:243:                    { label: "工作区", value: composer.workspace.set ? composer.workspace.canonical : "尚未收到" },
+/d/W333V1-SuqCO8/frontend/src/App.tsx:303:              workspacePath={composer.workspace.set ? composer.workspace.canonical : "尚未收到工作区"}
+/d/W333V1-SuqCO8/frontend/src/components/ai-native/button.tsx:60:        /* canonical action pill — 27px tall, roomy sides */
+/d/W333V1-SuqCO8/frontend/src/components/composer.tsx:150:          title={state.workspace.set ? state.workspace.canonical : state.workspace.reason}
+/d/W333V1-SuqCO8/frontend/src/components/composer.tsx:152:          {state.workspace.set ? state.workspace.canonical : state.workspace.reason}
+/d/W333V1-SuqCO8/frontend/src/fixtures/harness.ts:87:      canonical: "D:\\work\\project",
+/d/W333V1-SuqCO8/frontend/src/lib/panel.ts:85:  canonical: string;
+HITS_canonical=8
+PC_HITS_composer=81
+-- receiver candidates --
+onmessage -> 0
+chrome.webview -> 0
+chrome\.webview -> 0
+addEventListener -> 14
+hostObject -> 1
+window\.external -> 0
+-- addEventListener("message") specifically --
+0
+/d/W333V1-SuqCO8/frontend/src/App.tsx:169:    document.addEventListener("keydown", onKey);
+/d/W333V1-SuqCO8/frontend/src/App.tsx:393:    window.addEventListener("resize", onResize);
+/d/W333V1-SuqCO8/frontend/src/components/ai-native/agent-screen.tsx:226:    document.addEventListener("keydown", onKey);
+/d/W333V1-SuqCO8/frontend/src/components/ai-native/flowchart.tsx:275:    document.addEventListener("pointerdown", close);
+/d/W333V1-SuqCO8/frontend/src/components/ai-native/records-table.tsx:553:    document.addEventListener("pointerdown", close);
+/d/W333V1-SuqCO8/frontend/src/components/ai-native/records-table.tsx:609:    window.addEventListener("pointermove", move);
+/d/W333V1-SuqCO8/frontend/src/components/ai-native/records-table.tsx:610:    window.addEventListener("pointerup", finish);
+/d/W333V1-SuqCO8/frontend/src/components/ai-native/records-table.tsx:611:    window.addEventListener("pointercancel", finish);
+/d/W333V1-SuqCO8/frontend/src/components/harness/app-harness.tsx:108:    document.addEventListener("keydown", onKey);
+/d/W333V1-SuqCO8/frontend/src/components/react-bits/animated-list.tsx:150:    window.addEventListener('keydown', handleKeyDown);
+-- main.tsx mount line --
+ * lib/panel.ts and throw when no native host is attached). Those need their
+ * own handling; see error-boundary.tsx for the same note on the other side.
+ *
+ * The area label is what the fallback says, so the three read differently
+ * instead of all three saying "出错了".
+ */
+const ROOTS = {
+  product: { area: "面板", node: <App /> },
+  app: { area: "演示应用", node: <AppHarness /> },
+  showcase: { area: "组件总览", node: <Showcase /> },
+} as const;
+-- App.tsx EMPTY default --
+
+/** Narrower than this and the sidebar stops fitting a session title, so it
+    collapses to its icon rail. 640px is the DEFAULT panel width, not an edge
+    case - see the header. */
+const SIDEBAR_COLLAPSE_BELOW = 860;
+
+export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) {
+  const composer = snapshot.composer ?? EMPTY_COMPOSER;
+
+  // ONE state object. The gate pins the count, and the reason is in the
+  // render-nav header: a gate derived from what it checks cannot catch that
