@@ -1,0 +1,9 @@
+### surface=c pwd=/d/wisp228r3b GOTMPDIR=/d/wisp228r3b/tmp TMP=/tmp 2026-10-17 12:59:56 +0800
+time=2026-10-17T13:00:06.335+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC11StopBitIsBuiltAtBoot
+    resident_tray_stop_228_windows_test.go:137: AC#11 RED: a runtime built through proc.Boot has no stop-request bit (StopSignal() answers nil), so the tray's Exit item has nothing to record into before the event loop exists
+--- FAIL: TestAC11StopBitIsBuiltAtBoot (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.102s
+FAIL
+### go-test-rc=1 surface=c 2026-10-17 13:00:06 +0800

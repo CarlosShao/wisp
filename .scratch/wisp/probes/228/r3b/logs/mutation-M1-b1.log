@@ -1,0 +1,11 @@
+### surface=c pwd=/d/wisp228r3b GOTMPDIR=/d/wisp228r3b/tmp TMP=/tmp 2026-10-17 12:59:33 +0800
+time=2026-10-17T12:59:42.333+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC11TrayExitTriggerWalksTheTenSteps
+time=2026-10-17T12:59:42.339+08:00 level=INFO msg="tray exit requested" outcome="recorded; the event loop ends this process through the D38(e) order" why="tray Exit item selected in this process"
+wisp: tray exit requested: recorded; the event loop ends this process through the D38(e) order
+    resident_tray_stop_228_windows_test.go:310: AC#11 RED: RunEventLoop never returned, although a stop request is recorded on this runtime (waited 5s). internal/proc's loop select is the only thing in this package that turns a recorded request into a return, so this is the clause that reads that check.
+--- FAIL: TestAC11TrayExitTriggerWalksTheTenSteps (5.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	5.100s
+FAIL
+### go-test-rc=1 surface=c 2026-10-17 12:59:47 +0800
