@@ -1,0 +1,5 @@
+########## 建树 wisp216r2-head <- f24cb937
+tree wisp216r2-head sha=f24cb937 go_files=740 dll_build=3 dll_sherpa=3 dist_entries=2 docs_dir=yes
+########## build 门 wisp216r2-head
+build-wisp216r2-head rc=0
+########## done  ROOT=/d/tmp/leg216r2trees
