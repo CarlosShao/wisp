@@ -1,0 +1,13 @@
+票 216 裁腿 216-v3 探针面·三＝归因那枚只在主目录祖先链内响的红（只读探针＋门禁四数＋假主目录两发）
+
+一 只读探针（⛔ 交付物⛔ 进仓：它只被拷进第二枚仓外树 D:\W216V3PROBE 跑一次；探针源码以 .go.txt 形存在本目录，锚上四枚件 tree 哈希＝blob 已逐枚复认＝突变没串台）
+  实值＝formsOf/anchorForms/uncertainAnchorMiss 逐环打印，两把台面各一发（probe-216v3-chain-Cdefault.log／-Dtmp.log）：
+  · 锚 ~/.aws/credentials 的 root＝c:\users\swq（那枚 .aws 今天缺位，展开停在主目录）；锚 ~/.git-credentials 的 root＝它自己（文件在场）⇒ 只有前者能当"祖先"
+  · 名字只含"已允许"（无控制字符）⇒ lstat=ErrNotExist ⇒ partial=false ⇒ certain=true ⇒ miss=false ⇒ 仍 B/id_* ⇒ 与 plain 臂全等＝票面那半句没有被违反
+  · 名字含 U+202E（Cf 单飞）⇒ 同上，仍 B ⇒ 触发的不是 Cf
+  · 名字含 U+001B（ESC 单飞）⇒ lstat="The filename, directory name, or volume label syntax is incorrect" ⇒ isNotExist=false ⇒ partial=true ⇒ uncertainAnchorMiss=true ⇒ A，reason=~/.aws/credentials
+  · 同一枚 ESC 形落在主目录之外（C:\Users\Public\…／D 卷 temp）⇒ miss=false ⇒ none/B ⇒ ★必要条件＝落在主目录祖先链内，⛔ 落在 %LOCALAPPDATA%，⛔ 落在 C 卷
+  · 生产那一路（probe-216v3-route-Cdefault.log）：Resolve.err=nil、Rewritten=false ⇒ Classify(Canonical)=A、Gate=A；且 %APPDATA%\wisp 与 %APPDATA%\wisp\logs 盘上在场 ⇒ 机主真会撞
+二 假主目录两发（home-ancestry-fakehome.sh，全在 D 卷）：USERPROFILE 指 D:\W216V3FHOME、TMP 指其下 tempdir ⇒ 同一份码同一枚用例 **在 D 卷照样红**，reason=~/.aws/credentials；第二发只在假主目录里补造 .aws ⇒ 同一枚红、reason 换成 ~/.kube/config ⇒ reason 说的是"哪一枚锚今天缺位"，⛔ 候选路径自己的身份
+三 门禁四数（只在共享工作树）＝gofumpt 0（本腿零 .go 跟踪件；两枚探针 .txt 同尺亦空列表）／d22scan 第一发 rc=0 clean（本机 GOTMPDIR 默认就落在 %LOCALAPPDATA% 同卷＝没撞那枚 GUARD；env -u GOTMPDIR 第二发同 rc=0，两发都具名记）／check-path-length-budget rc=0 GREEN（tracked 14721／over 60／在册 60／not in roster 0）／go vet ./internal/risk/ rc=0
+本腿零产码、⛔ 动任何断言、⛔ 翻框、⛔ push；写面＝.scratch/wisp/probes/216/v3/logs/**。

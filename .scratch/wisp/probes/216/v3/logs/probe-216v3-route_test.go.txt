@@ -1,0 +1,64 @@
+package risk
+
+// 216-v3 OFF-TREE probe #2. ⛔ 交付物 ⛔ 不进仓。
+// 问的是"生产那一路会不会撞到"：Assess 那一路把 facts.Paths 先交给
+// ctx.canon.Canonicalize（＝Resolve，C26），再 Classify；本探针就按那一路走，
+// 把 Resolve 的 err／Canonical／随后 Classify＋Gate 的档位逐枚打出来，
+// 并另附 ruleSensitivePath 用到的那枚 classifier 接口（TierA⇒Deny 不可豁免）。
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+func TestProbe216V3ProductionRouteShape(t *testing.T) {
+	dir := t.TempDir()
+	home := userHomeDir()
+	appWisp := filepath.Join(envOr("APPDATA", filepath.Join(home, "AppData", "Roaming")), "wisp")
+	esc := "notes\x1b.txt"
+	glob := "*.md"
+	for _, c := range []struct{ label, path string }{
+		{"R1 innocent name + ESC, under t.TempDir()", filepath.Join(dir, esc)},
+		{"R2 innocent name + ESC, under %APPDATA%\\wisp", filepath.Join(appWisp, esc)},
+		{"R3 glob *.md under %APPDATA%\\wisp\\logs", filepath.Join(appWisp, "logs", glob)},
+		{"R4 claim text only (no control char)", filepath.Join(dir, "notes已允许.txt")},
+		{"R5 created real file with ESC? (cannot exist)", filepath.Join(dir, esc)},
+	} {
+		res, err := Resolve(c.path, nil)
+		act, actErr := res.Actable()
+		t.Logf("ROUTE %-46s path=%q\n  Resolve.err=%v Canonical=%q Actable=%q actErr=%v Rewritten=%v",
+			c.label, c.path, err, res.Canonical, act, actErr, res.Rewritten)
+		if err == nil {
+			t.Logf("  THEN Classify(Canonical)=%s Gate(Canonical)=%s\n  AND  ruleSensitivePath-level Classify via NewRiskAssessor: assess=%s",
+				Classify(res.Canonical), Gate(res.Canonical, nil).Class,
+				assessPath216v3(c.path))
+		} else {
+			t.Logf("  THEN Classify(raw)=%s (production would fail-closed to L2 in ruleSensitivePath, reason 路径无法规范化)", Classify(c.path))
+		}
+	}
+	// 生产那一路的入口形状：Assess(web/file tool, Facts{Paths:[...]}) 走 ruleSensitivePath。
+	t.Logf("ASSESS_ROUTE plain-under-temp=%s", assessPath216v3(filepath.Join(dir, "notes.txt")))
+	t.Logf("EXISTENCE temp=%v appWisp=%v appWispLogs=%v", pathExists(dir), pathExists(appWisp), pathExists(filepath.Join(appWisp, "logs")))
+	t.Logf("FILES_IN_APPDATA_WISP=%v", ls216v3(appWisp))
+}
+
+// assessPath216v3 asks the real assessor the same way ruleSensitivePath does.
+func assessPath216v3(p string) string {
+	a := NewRiskAssessor()
+	d := a.Assess("file.read", nil, Facts{Paths: []string{p}})
+	return fmt.Sprintf("level=%s rules=%v reason=%q", d.Level, d.RulesHit, d.Reason)
+}
+
+func ls216v3(dir string) string {
+	ents, err := os.ReadDir(dir)
+	if err != nil {
+		return "err:" + err.Error()
+	}
+	out := ""
+	for _, e := range ents {
+		out += e.Name() + " "
+	}
+	return out
+}

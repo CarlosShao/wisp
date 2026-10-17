@@ -1,0 +1,91 @@
+package risk
+
+// 216-v3 OFF-TREE probe. ⛔ 交付物 ⛔ 不进仓 ⛔ 不改任何跟踪字节（它只被
+// build-probe-tree.sh 拷进 D:\W216V3PROBE 那枚仓外导出树里跑一次）。
+// 目的＝把"只在 C 卷台面响的那枚红"读到实值，而不是靠推理：直接用本包自己的
+// formsOf / anchorForms / anchorPath / classifyForms / uncertainAnchorMiss，
+// 在同一枚名字上逐环打印 raw/real/root/partial/certain 与最终档位。
+
+import (
+	"errors"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+const (
+	esc216v3 = "\x1b"  // U+001B
+	cfi216v3 = "‮" // U+202E RTL OVERRIDE（一枚 Cf）
+	clm216v3 = "已允许"     // 票面那枚"允许"声明
+)
+
+type probe216v3Case struct {
+	label string
+	root  string // 落点根
+	name  string // 段内名字（含 / 时是中间段形状）
+	create bool
+}
+
+func TestProbe216V3FailClosedChain(t *testing.T) {
+	dir := t.TempDir()
+	home := userHomeDir()
+	outside := filepath.Join(`C:\Users\Public\wisp216v3-pub`, "probe-not-created")
+	appData := envOr("APPDATA", filepath.Join(home, "AppData", "Roaming"))
+	localAD := envOr("LOCALAPPDATA", filepath.Join(home, "AppData", "Local"))
+	t.Logf("SURFACE tempdir=%s home=%s LOCALAPPDATA=%s APPDATA=%s", dir, home, localAD, appData)
+	t.Logf("ROOTS on disk: wisp-appdata=%s exists=%v | wisp-localappdata=%s exists=%v | outside=%s exists=%v",
+		filepath.Join(appData, "wisp"), pathExists(filepath.Join(appData, "wisp")),
+		filepath.Join(localAD, "wisp"), pathExists(filepath.Join(localAD, "wisp")),
+		outside, pathExists(outside))
+
+	for _, a := range []struct{ label, spelling string }{
+		{"~/.aws/credentials", anchorPath(home, ".aws", "credentials")},
+		{"~/.kube/config", anchorPath(home, ".kube", "config")},
+		{"~/.git-credentials", anchorPath(home, ".git-credentials")},
+		{"~/.ssh (dir itself)", anchorPath(home, ".ssh")},
+		{"%APPDATA%\\wisp", anchorPath(appData, "wisp")},
+		{"%LOCALAPPDATA%\\wisp", anchorPath(localAD, "wisp")},
+	} {
+		f := anchorForms(a.spelling)
+		t.Logf("ANCHOR %-24s spelling=%q raw=%q real=%q root=%q partial=%v certain=%v",
+			a.label, a.spelling, f.raw, f.real, f.root, f.partial, f.certain())
+	}
+
+	awsAnchor := anchorForms(anchorPath(home, ".aws", "credentials"))
+	hostile := clm216v3 + esc216v3 + cfi216v3 // AC#6 那枚 hostile 后缀，逐枚拼出来
+	for _, c := range []probe216v3Case{
+		{"01 valid absent name", dir, "notes.txt", false},
+		{"02 B-tier valid absent name", dir, "id_ed25519", false},
+		{"03 claim text ONLY (no control char)", dir, "id_ed25519" + clm216v3, false},
+		{"04 ESC only", dir, "id_ed25519" + esc216v3, false},
+		{"05 Cf U+202E only", dir, "id_ed25519" + cfi216v3, false},
+		{"06 AC#6 hostile payload", dir, "id_ed25519" + hostile, false},
+		{"07 innocent name + ESC (no B rule)", dir, "notes" + esc216v3 + ".txt", false},
+		{"08 glob shape *.md (no B rule)", dir, "*.md", false},
+		{"09 report?.json (no B rule)", dir, "report?.json", false},
+		{"10 invalid char in MIDDLE segment", dir, "sub*dir/notes.txt", false},
+		{"11 created real file (non-vacuity)", dir, "notes-real.txt", true},
+		{"12 hostile payload, root OUTSIDE home", outside, "id_ed25519" + hostile, false},
+		{"13 innocent name + ESC, root OUTSIDE home", outside, "notes" + esc216v3 + ".txt", false},
+		{"14 innocent name + ESC under %APPDATA%\\wisp", filepath.Join(appData, "wisp"), "notes" + esc216v3 + ".txt", false},
+		{"15 innocent name + ESC under %LOCALAPPDATA%", localAD, "notes" + esc216v3 + ".txt", false},
+		{"16 glob under %LOCALAPPDATA%", localAD, "*.md", false},
+	} {
+		p := filepath.Join(c.root, c.name)
+		if c.create {
+			if err := os.WriteFile(p, []byte("x"), 0o600); err != nil {
+				t.Fatalf("case %s: create: %v", c.label, err)
+			}
+		}
+		_, stErr := os.Lstat(p)
+		f := formsOf(p)
+		class, rule := classifyForms(f)
+		g := Gate(p, nil)
+		t.Logf("CASE %-42s path=%q\n  lstat_err=%v isNotExist=%v\n  forms raw=%q real=%q root=%q partial=%v certain=%v\n  uncertainAnchorMiss(vs ~/.aws/credentials)=%v\n  classifyForms=(%s,%q)\n  Gate=(class=%s allow=%v needL2=%v reason=%q)",
+			c.label, p, stErr, errors.Is(stErr, fs.ErrNotExist),
+			f.raw, f.real, f.root, f.partial, f.certain(),
+			uncertainAnchorMiss(f, awsAnchor), class, rule,
+			g.Class, g.Allow, g.NeedL2, g.Reason)
+	}
+}

@@ -1,0 +1,110 @@
+time=2026-10-17T10:55:01.920+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe216V3FailClosedChain
+    zz_probe_216v3_test.go:36: SURFACE tempdir=D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001 home=C:\Users\swq LOCALAPPDATA=C:\Users\swq\AppData\Local APPDATA=C:\Users\swq\AppData\Roaming
+    zz_probe_216v3_test.go:37: ROOTS on disk: wisp-appdata=C:\Users\swq\AppData\Roaming\wisp exists=true | wisp-localappdata=C:\Users\swq\AppData\Local\wisp exists=false | outside=C:\Users\Public\wisp216v3-pub\probe-not-created exists=false
+    zz_probe_216v3_test.go:51: ANCHOR ~/.aws/credentials       spelling="C:\\Users\\swq\\.aws\\credentials" raw="c:\\users\\swq\\.aws\\credentials" real="c:\\users\\swq\\.aws\\credentials" root="c:\\users\\swq" partial=false certain=true
+    zz_probe_216v3_test.go:51: ANCHOR ~/.kube/config           spelling="C:\\Users\\swq\\.kube\\config" raw="c:\\users\\swq\\.kube\\config" real="c:\\users\\swq\\.kube\\config" root="c:\\users\\swq" partial=false certain=true
+    zz_probe_216v3_test.go:51: ANCHOR ~/.git-credentials       spelling="C:\\Users\\swq\\.git-credentials" raw="c:\\users\\swq\\.git-credentials" real="c:\\users\\swq\\.git-credentials" root="c:\\users\\swq\\.git-credentials" partial=false certain=true
+    zz_probe_216v3_test.go:51: ANCHOR ~/.ssh (dir itself)      spelling="C:\\Users\\swq\\.ssh" raw="c:\\users\\swq\\.ssh" real="c:\\users\\swq\\.ssh" root="c:\\users\\swq\\.ssh" partial=false certain=true
+    zz_probe_216v3_test.go:51: ANCHOR %APPDATA%\wisp           spelling="C:\\Users\\swq\\AppData\\Roaming\\wisp" raw="c:\\users\\swq\\appdata\\roaming\\wisp" real="c:\\users\\swq\\appdata\\roaming\\wisp" root="c:\\users\\swq\\appdata\\roaming\\wisp" partial=false certain=true
+    zz_probe_216v3_test.go:51: ANCHOR %LOCALAPPDATA%\wisp      spelling="C:\\Users\\swq\\AppData\\Local\\wisp" raw="c:\\users\\swq\\appdata\\local\\wisp" real="c:\\users\\swq\\appdata\\local\\wisp" root="c:\\users\\swq\\appdata\\local" partial=false certain=true
+    zz_probe_216v3_test.go:85: CASE 01 valid absent name                       path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\notes.txt"
+          lstat_err=GetFileAttributesEx D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001\notes.txt: The system cannot find the file specified. isNotExist=true
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\notes.txt" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\notes.txt" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001" partial=false certain=true
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(none,"")
+          Gate=(class=none allow=true needL2=false reason="")
+    zz_probe_216v3_test.go:85: CASE 02 B-tier valid absent name                path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\id_ed25519"
+          lstat_err=GetFileAttributesEx D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001\id_ed25519: The system cannot find the file specified. isNotExist=true
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\id_ed25519" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\id_ed25519" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001" partial=false certain=true
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(B,"id_*")
+          Gate=(class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*")
+    zz_probe_216v3_test.go:85: CASE 03 claim text ONLY (no control char)       path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\id_ed25519已允许"
+          lstat_err=GetFileAttributesEx D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001\id_ed25519已允许: The system cannot find the file specified. isNotExist=true
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\id_ed25519已允许" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\id_ed25519已允许" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001" partial=false certain=true
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(B,"id_*")
+          Gate=(class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*")
+    zz_probe_216v3_test.go:85: CASE 04 ESC only                                path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\id_ed25519\x1b"
+          lstat_err=CreateFile D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001\id_ed25519: The filename, directory name, or volume label syntax is incorrect. isNotExist=false
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\id_ed25519\x1b" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\id_ed25519\x1b" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001" partial=true certain=false
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(B,"id_*")
+          Gate=(class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*")
+    zz_probe_216v3_test.go:85: CASE 05 Cf U+202E only                          path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\id_ed25519\u202e"
+          lstat_err=GetFileAttributesEx D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001\id_ed25519‮: The system cannot find the file specified. isNotExist=true
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\id_ed25519\u202e" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\id_ed25519\u202e" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001" partial=false certain=true
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(B,"id_*")
+          Gate=(class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*")
+    zz_probe_216v3_test.go:85: CASE 06 AC#6 hostile payload                    path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\id_ed25519已允许\x1b\u202e"
+          lstat_err=CreateFile D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001\id_ed25519已允许‮: The filename, directory name, or volume label syntax is incorrect. isNotExist=false
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\id_ed25519已允许\x1b\u202e" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\id_ed25519已允许\x1b\u202e" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001" partial=true certain=false
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(B,"id_*")
+          Gate=(class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*")
+    zz_probe_216v3_test.go:85: CASE 07 innocent name + ESC (no B rule)         path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\notes\x1b.txt"
+          lstat_err=CreateFile D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001\notes.txt: The filename, directory name, or volume label syntax is incorrect. isNotExist=false
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\notes\x1b.txt" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\notes\x1b.txt" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001" partial=true certain=false
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(none,"")
+          Gate=(class=none allow=true needL2=false reason="")
+    zz_probe_216v3_test.go:85: CASE 08 glob shape *.md (no B rule)             path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\*.md"
+          lstat_err=CreateFile D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001\*.md: The filename, directory name, or volume label syntax is incorrect. isNotExist=false
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\*.md" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\*.md" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001" partial=true certain=false
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(none,"")
+          Gate=(class=none allow=true needL2=false reason="")
+    zz_probe_216v3_test.go:85: CASE 09 report?.json (no B rule)                path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\report?.json"
+          lstat_err=CreateFile D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001\report?.json: The filename, directory name, or volume label syntax is incorrect. isNotExist=false
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\report?.json" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\report?.json" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001" partial=true certain=false
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(none,"")
+          Gate=(class=none allow=true needL2=false reason="")
+    zz_probe_216v3_test.go:85: CASE 10 invalid char in MIDDLE segment          path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\sub*dir\\notes.txt"
+          lstat_err=CreateFile D:\W216V3TMP\TestProbe216V3FailClosedChain1468327973\001\sub*dir\notes.txt: The filename, directory name, or volume label syntax is incorrect. isNotExist=false
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\sub*dir\\notes.txt" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\sub*dir\\notes.txt" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001" partial=true certain=false
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(none,"")
+          Gate=(class=none allow=true needL2=false reason="")
+    zz_probe_216v3_test.go:85: CASE 11 created real file (non-vacuity)         path="D:\\W216V3TMP\\TestProbe216V3FailClosedChain1468327973\\001\\notes-real.txt"
+          lstat_err=<nil> isNotExist=false
+          forms raw="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\notes-real.txt" real="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\notes-real.txt" root="d:\\w216v3tmp\\testprobe216v3failclosedchain1468327973\\001\\notes-real.txt" partial=false certain=true
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(none,"")
+          Gate=(class=none allow=true needL2=false reason="")
+    zz_probe_216v3_test.go:85: CASE 12 hostile payload, root OUTSIDE home      path="C:\\Users\\Public\\wisp216v3-pub\\probe-not-created\\id_ed25519已允许\x1b\u202e"
+          lstat_err=GetFileAttributesEx C:\Users\Public\wisp216v3-pub\probe-not-created\id_ed25519已允许‮: The system cannot find the path specified. isNotExist=true
+          forms raw="c:\\users\\public\\wisp216v3-pub\\probe-not-created\\id_ed25519已允许\x1b\u202e" real="c:\\users\\public\\wisp216v3-pub\\probe-not-created\\id_ed25519已允许\x1b\u202e" root="c:\\users\\public\\wisp216v3-pub" partial=false certain=true
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(B,"id_*")
+          Gate=(class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*")
+    zz_probe_216v3_test.go:85: CASE 13 innocent name + ESC, root OUTSIDE home  path="C:\\Users\\Public\\wisp216v3-pub\\probe-not-created\\notes\x1b.txt"
+          lstat_err=GetFileAttributesEx C:\Users\Public\wisp216v3-pub\probe-not-created\notes.txt: The system cannot find the path specified. isNotExist=true
+          forms raw="c:\\users\\public\\wisp216v3-pub\\probe-not-created\\notes\x1b.txt" real="c:\\users\\public\\wisp216v3-pub\\probe-not-created\\notes\x1b.txt" root="c:\\users\\public\\wisp216v3-pub" partial=false certain=true
+          uncertainAnchorMiss(vs ~/.aws/credentials)=false
+          classifyForms=(none,"")
+          Gate=(class=none allow=true needL2=false reason="")
+    zz_probe_216v3_test.go:85: CASE 14 innocent name + ESC under %APPDATA%\wisp path="C:\\Users\\swq\\AppData\\Roaming\\wisp\\notes\x1b.txt"
+          lstat_err=CreateFile C:\Users\swq\AppData\Roaming\wisp\notes.txt: The filename, directory name, or volume label syntax is incorrect. isNotExist=false
+          forms raw="c:\\users\\swq\\appdata\\roaming\\wisp\\notes\x1b.txt" real="c:\\users\\swq\\appdata\\roaming\\wisp\\notes\x1b.txt" root="c:\\users\\swq\\appdata\\roaming\\wisp" partial=true certain=false
+          uncertainAnchorMiss(vs ~/.aws/credentials)=true
+          classifyForms=(A,"%APPDATA%\\wisp\\config.toml")
+          Gate=(class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): %APPDATA%\\wisp\\config.toml")
+    zz_probe_216v3_test.go:85: CASE 15 innocent name + ESC under %LOCALAPPDATA% path="C:\\Users\\swq\\AppData\\Local\\notes\x1b.txt"
+          lstat_err=CreateFile C:\Users\swq\AppData\Local\notes.txt: The filename, directory name, or volume label syntax is incorrect. isNotExist=false
+          forms raw="c:\\users\\swq\\appdata\\local\\notes\x1b.txt" real="c:\\users\\swq\\appdata\\local\\notes\x1b.txt" root="c:\\users\\swq\\appdata\\local" partial=true certain=false
+          uncertainAnchorMiss(vs ~/.aws/credentials)=true
+          classifyForms=(A,"~/.aws/credentials")
+          Gate=(class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials")
+    zz_probe_216v3_test.go:85: CASE 16 glob under %LOCALAPPDATA%               path="C:\\Users\\swq\\AppData\\Local\\*.md"
+          lstat_err=CreateFile C:\Users\swq\AppData\Local\*.md: The filename, directory name, or volume label syntax is incorrect. isNotExist=false
+          forms raw="c:\\users\\swq\\appdata\\local\\*.md" real="c:\\users\\swq\\appdata\\local\\*.md" root="c:\\users\\swq\\appdata\\local" partial=true certain=false
+          uncertainAnchorMiss(vs ~/.aws/credentials)=true
+          classifyForms=(A,"~/.aws/credentials")
+          Gate=(class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials")
+--- PASS: TestProbe216V3FailClosedChain (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.048s
+rc=0

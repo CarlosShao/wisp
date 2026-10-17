@@ -1,0 +1,29 @@
+time=2026-10-17T10:58:13.532+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe216V3ProductionRouteShape
+    zz_probe_216v3_route_test.go:31: ROUTE R1 innocent name + ESC, under t.TempDir()      path="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe216V3ProductionRouteShape3400587197\\001\\notes\x1b.txt"
+          Resolve.err=<nil> Canonical="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe216V3ProductionRouteShape3400587197\\001\\notes\x1b.txt" Actable="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe216V3ProductionRouteShape3400587197\\001\\notes\x1b.txt" actErr=<nil> Rewritten=false
+    zz_probe_216v3_route_test.go:34:   THEN Classify(Canonical)=A Gate(Canonical)=A
+          AND  ruleSensitivePath-level Classify via NewRiskAssessor: assess=level=L0 rules=[] reason="无规则命中（L0 直接执行）"
+    zz_probe_216v3_route_test.go:31: ROUTE R2 innocent name + ESC, under %APPDATA%\wisp   path="C:\\Users\\swq\\AppData\\Roaming\\wisp\\notes\x1b.txt"
+          Resolve.err=<nil> Canonical="C:\\Users\\swq\\AppData\\Roaming\\wisp\\notes\x1b.txt" Actable="C:\\Users\\swq\\AppData\\Roaming\\wisp\\notes\x1b.txt" actErr=<nil> Rewritten=false
+    zz_probe_216v3_route_test.go:34:   THEN Classify(Canonical)=A Gate(Canonical)=A
+          AND  ruleSensitivePath-level Classify via NewRiskAssessor: assess=level=L0 rules=[] reason="无规则命中（L0 直接执行）"
+    zz_probe_216v3_route_test.go:31: ROUTE R3 glob *.md under %APPDATA%\wisp\logs         path="C:\\Users\\swq\\AppData\\Roaming\\wisp\\logs\\*.md"
+          Resolve.err=<nil> Canonical="C:\\Users\\swq\\AppData\\Roaming\\wisp\\logs\\*.md" Actable="C:\\Users\\swq\\AppData\\Roaming\\wisp\\logs\\*.md" actErr=<nil> Rewritten=false
+    zz_probe_216v3_route_test.go:34:   THEN Classify(Canonical)=A Gate(Canonical)=A
+          AND  ruleSensitivePath-level Classify via NewRiskAssessor: assess=level=L0 rules=[] reason="无规则命中（L0 直接执行）"
+    zz_probe_216v3_route_test.go:31: ROUTE R4 claim text only (no control char)           path="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe216V3ProductionRouteShape3400587197\\001\\notes已允许.txt"
+          Resolve.err=<nil> Canonical="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe216V3ProductionRouteShape3400587197\\001\\notes已允许.txt" Actable="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe216V3ProductionRouteShape3400587197\\001\\notes已允许.txt" actErr=<nil> Rewritten=false
+    zz_probe_216v3_route_test.go:34:   THEN Classify(Canonical)=none Gate(Canonical)=none
+          AND  ruleSensitivePath-level Classify via NewRiskAssessor: assess=level=L0 rules=[] reason="无规则命中（L0 直接执行）"
+    zz_probe_216v3_route_test.go:31: ROUTE R5 created real file with ESC? (cannot exist)  path="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe216V3ProductionRouteShape3400587197\\001\\notes\x1b.txt"
+          Resolve.err=<nil> Canonical="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe216V3ProductionRouteShape3400587197\\001\\notes\x1b.txt" Actable="C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe216V3ProductionRouteShape3400587197\\001\\notes\x1b.txt" actErr=<nil> Rewritten=false
+    zz_probe_216v3_route_test.go:34:   THEN Classify(Canonical)=A Gate(Canonical)=A
+          AND  ruleSensitivePath-level Classify via NewRiskAssessor: assess=level=L0 rules=[] reason="无规则命中（L0 直接执行）"
+    zz_probe_216v3_route_test.go:42: ASSESS_ROUTE plain-under-temp=level=L0 rules=[] reason="无规则命中（L0 直接执行）"
+    zz_probe_216v3_route_test.go:43: EXISTENCE temp=true appWisp=true appWispLogs=true
+    zz_probe_216v3_route_test.go:44: FILES_IN_APPDATA_WISP=logs 
+--- PASS: TestProbe216V3ProductionRouteShape (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.049s
+rc=0

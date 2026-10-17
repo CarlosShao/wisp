@@ -1,0 +1,15 @@
+########## 0 起手：树里两枚被突变件仍等于锚上 blob
+rules_shell.go tree=e4485625265847523534bcabd8267553e9e53338 blob=e4485625265847523534bcabd8267553e9e53338
+blacklist.go tree=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5 blob=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5
+########## 1 造假主目录（照真机摆：.ssh 与 .git-credentials 在场＝全展开锚；.aws/.kube 缺位）
+. .. .git-credentials .ssh tempdir
+########## 2 发一：USERPROFILE=假主目录，TMP=假主目录\tempdir（全在 D 卷）
+  RUN=24 PASS_TOP=5 FAIL_TOP=1 SKIP=0 red=--- FAIL: TestFileBaseNameClaimChangesNoClassOrReason
+  红句里的锚 reason: A-list sensitive path (non-overridable): ~/.aws/credentials
+  落点具名: 
+########## 3 发二：同一棵假主目录里补造 .aws（那枚锚改成全展开，reason 该换到下一枚缺位锚）
+  RUN=24 PASS_TOP=5 FAIL_TOP=1 SKIP=0 red=--- FAIL: TestFileBaseNameClaimChangesNoClassOrReason
+  红句里的锚 reason: A-list sensitive path (non-overridable): ~/.kube/config
+########## 4 收尾：跟踪字节未动（应空）、树内无 MUTATION 残留
+mutation_residual=/d/W216V3MUT/internal/risk/rules_shell.go:0 /d/W216V3MUT/internal/risk/blacklist.go:0
+########## done

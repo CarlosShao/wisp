@@ -1,0 +1,13 @@
+GOTMPDIR_in_env=[<unset>]
+########## 0 建探针树（锚 7a94c3bd）
+go_files=740
+probe_installed=/d/W216V3PROBE/internal/risk/zz_probe_216v3_test.go
+########## 1 探针·C 卷默认台面（t.TempDir() 在主目录祖先链内）
+########## 2 探针·D 台面（t.TempDir() 在主目录之外）
+########## 3 探针树里被裁那两枚件仍等于锚上 blob（突变没串台）
+rules_shell.go tree=e4485625265847523534bcabd8267553e9e53338 blob=e4485625265847523534bcabd8267553e9e53338
+blacklist.go tree=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5 blob=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5
+allow_substring_pin_216_test.go tree=c49d743808e7d4dd0946dfcfb39e13f1051b1bb8 blob=c49d743808e7d4dd0946dfcfb39e13f1051b1bb8
+name_claim_two_arm_216_test.go tree=7df1cd45ce7270e787560f3fccd79ba9d5613c4b blob=7df1cd45ce7270e787560f3fccd79ba9d5613c4b
+########## 4 共享工作树仍空（应空）
+########## done
