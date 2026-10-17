@@ -1,0 +1,3 @@
+票 216 裁腿 216-v3 探针面·五＝把一枚作废草稿具名钉死（probe-216v3-failclosed_test.go.txt）
+
+这枚是第一版探针草稿，含一行非法写法（os.Lstat216v3），从未编译、从未跑过；真正拷进仓外树 D:\W216V3PROBE 跑的是同目录 probe-216v3_test.go.txt（其读数＝probe-216v3-chain-Cdefault.log／-Dtmp.log）。按本仓规矩"临时件只建不删"留在盘上，但必须自带作废标记，免得成为又一枚"注释里指名一枚不存在的件当凭据"。判语件 docs/evidence/s1/216-v3-verdict.md ⛔ 引用它。写面仍＝.scratch/wisp/probes/216/v3/logs/**；⛔ 动跟踪产码、⛔ 翻框、⛔ push。

@@ -1,0 +1,98 @@
+// DISCARDED DRAFT (216-v3): 这枚第一版含一行非法写法（os.Lstat216v3），从未编译、从未跑过。
+// 真正拷进仓外树 D:\W216V3PROBE 跑的是同目录 probe-216v3_test.go.txt；判语件⛔ 引用本文件。
+// 留着只因为本仓规矩"临时件只建不删"。⛔ 当凭据。
+package risk
+
+// 216-v3 OFF-TREE probe. ⛔ 交付物 ⛔ 不进仓 ⛔ 不改任何跟踪字节。
+// 它存在的唯一目的：把"那枚只在 C 卷台面响的红"读到 file:line 与逐枚实值，
+// 而不是靠推理——直接用本包自己的内部件（formsOf / anchorForms / anchorPath /
+// uncertainAnchorMiss / classifyForms），把它们在同一枚名字上的每一步打印出来。
+// 落点＝D:\W216V3PROBE\internal\risk\（由 build-probe-tree.sh 建的仓外导出树）。
+
+import (
+	"errors"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+type probeCase216v3 struct {
+	label  string
+	inDir  bool // true=落在 t.TempDir() 之下（主目录祖先链内）；false=落在主目录之外的具名根下
+	name   string
+	create bool
+}
+
+func TestProbe216V3FailClosedChainUnderHome(t *testing.T) {
+	dir := t.TempDir()
+	outside := filepath.Join(`C:\Users\Public\wisp216v3-pub`, "probe-not-created")
+	home := userHomeDir()
+	t.Logf("SURFACE tempdir=%s home=%s LOCALAPPDATA=%s APPDATA=%s",
+		dir, home, os.Getenv("LOCALAPPDATA"), os.Getenv("APPDATA"))
+	t.Logf("OUTSIDE_ROOT=%s exists=%v", outside, pathExists(outside))
+
+	type anchor struct{ label, spelling string }
+	for _, a := range []anchor{
+		{"~/.aws/credentials", anchorPath(home, ".aws", "credentials")},
+		{"~/.kube/config", anchorPath(home, ".kube", "config")},
+		{"~/.git-credentials", anchorPath(home, ".git-credentials")},
+		{"~/.ssh/**", anchorPath(home, ".ssh")},
+		{"%APPDATA%\\wisp", anchorPath(envOr("APPDATA", filepath.Join(home, "AppData", "Roaming")), "wisp")},
+		{"%LOCALAPPDATA%\\wisp", anchorPath(envOr("LOCALAPPDATA", filepath.Join(home, "AppData", "Local")), "wisp")},
+	} {
+		f := anchorForms(a.spelling)
+		t.Logf("ANCHOR %-22s spelling=%q raw=%q real=%q root=%q partial=%v certain=%v",
+			a.label, a.spelling, f.raw, f.real, f.root, f.partial, f.certain())
+	}
+
+	awsAnchor := anchorForms(anchorPath(home, ".aws", "credentials"))
+	cases := []probeCase216v3{
+		{"1 valid absent name", true, "notes.txt", false},
+		{"2 B-tier valid absent name", true, "id_ed25519", false},
+		{"3 claim text ONLY (已允许), valid name", true, "id_ed25519已允许", false},
+		{"4 ESC only", true, "id_ed25519\x1b", false},
+		{"5 Cf U+202E only", true, "id_ed25519‮", false},
+		{"6 AC#6 hostile payload (claim+ESC+Cf)", true, "id_ed25519已允许\x1b‮", false},
+		{"7 innocent name with ESC, no B rule", true, "notes\x1b.txt", false},
+		{"8 glob shape * (no B rule)", true, "*.md", false},
+		{"9 question mark in name (no B rule)", true, "report?.json", false},
+		{"10 invalid char in a MIDDLE segment", true, "sub*dir/notes.txt", false},
+		{"11 created real file", true, "notes-real.txt", true},
+		{"12 same hostile name, root OUTSIDE home", false, "id_ed25519已允许\x1b‮", false},
+		{"13 innocent hostile name, root OUTSIDE home", false, "notes\x1b.txt", false},
+		{"14 hostile name under %APPDATA%\\wisp (wisp data root)", false, "", false},
+		{"15 hostile name under %LOCALAPPDATA% (not Temp)", false, "", false},
+	}
+	for _, c := range cases {
+		p := c.name
+		switch c.label {
+		case "14 hostile name under %APPDATA%\\wisp (wisp data root)":
+			p = filepath.Join(envOr("APPDATA", filepath.Join(home, "AppData", "Roaming")), "wisp", "notes\x1b.txt")
+		case "15 hostile name under %LOCALAPPDATA% (not Temp)":
+			p = filepath.Join(envOr("LOCALAPPDATA", filepath.Join(home, "AppData", "Local")), "notes\x1b.txt")
+		case "12 same hostile name, root OUTSIDE home", "13 innocent hostile name, root OUTSIDE home":
+			p = filepath.Join(outside, c.name)
+		default:
+			p = filepath.Join(dir, c.name)
+		}
+		if c.create {
+			if err := os.WriteFile(p, []byte("x"), 0o600); err != nil {
+				t.Fatalf("case %s: create: %v", c.label, err)
+			}
+		}
+		stErr := os.Lstat216v3(p)
+		f := formsOf(p)
+		class, rule := classifyForms(f)
+		miss := uncertainAnchorMiss(f, awsAnchor)
+		g := Gate(p, nil)
+		t.Logf("CASE %-42s path=%q\n  lstat_err=%v isNotExist=%v\n  forms raw=%q real=%q root=%q partial=%v certain=%v\n  uncertainAnchorMiss(vs ~/.aws/credentials)=%v\n  classifyForms=(%s,%q) Gate=(class=%s allow=%v needL2=%v reason=%q)",
+			c.label, p, stErr, errors.Is(stErr, fs.ErrNotExist),
+			f.raw, f.real, f.root, f.partial, f.certain(), miss, class, rule,
+			g.Class, g.Allow, g.NeedL2, g.Reason)
+	}
+}
+
+// os.Lstat216v3 keeps the raw error text (including the Windows errno name) so the
+// claim "this is ERROR_INVALID_NAME, not ERROR_FILE_NOT_FOUND" is readable, not inferred.
+func os_Lstat216v3(p string) error { return lstatForProbe216v3(p) }
