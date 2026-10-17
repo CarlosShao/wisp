@@ -84,6 +84,11 @@ whole-range 作差只当归属读数用）：四枚提交 × 四面＝16 格，*
 | `ffebb6d1` | `internal/panel/subagent_corr_task_prefix_328_test.go`（新增） | +89 |
 | `f705b082` | `internal/agent/corr_roster_join_328_test.go`（新增） | +171 |
 
+其余六枚（料面，⛔ 产码）＝`54b63780`（`logs/**` 36 枚，逐枚显式 pathspec）／`1f5a6137`（件①）／
+`a3fedd42`（件②）／`0adb7775`（票 328 尾一条 bullet，`git diff` 逐字＝+2 行）／`d166e9f8`（两枚 commit 正文）／
+`46d815d9`（收尾三枚读数）；九枚提交的 `--name-only` 去重逐枚列在 `logs/scope-and-ac3-final.log`，
+越格自查尺（同一日志）＝**out_of_scope_lines=0**（本笔第十枚也一并计入尺，交裁腿重跑）。
+
 期间别的提交在飞（例：编排者 `fb7a4d1a` 落 `docs/reports/HANDOVER.md`，就夹在我第 1、2 笔之间）⇒ 每笔都只用
 逐枚显式 pathspec，`git add -- <一枚文件>` ＋ `git commit -F <正文文件> -- <同一枚文件>`；正文先 Write 成
 `.scratch/wisp/probes/328/r1/commit-msg-*.txt`（中文正文走 `-F`，⛔ 双引号内联）。
@@ -91,7 +96,10 @@ whole-range 作差只当归属读数用）：四枚提交 × 四面＝16 格，*
 `internal/agent/approval/queue.go`、`internal/agent/approval/pending_read.go`、`cmd/wisp/panel_snapshot_deliver_329.go`，
 全部 `git show f705b082:…`／`git show 648eda04:…`，⛔ 工作树在飞字节）。
 
-收尾（`logs/end-status.txt`＝**1238 行**，其中跟踪改动 2 枚，见 `logs/end-status-summary.txt`）：
+收尾（`logs/end-status.txt`＝**1238 行**，其中跟踪改动 2 枚，见 `logs/end-status-summary.txt`；
+**真·收尾另跑一次**＝`logs/end-status-final.txt`＝**1230 行、跟踪改动 1 枚**（只剩别腿的票 335 那一枚在飞），
+尺与逐枚输出＝`logs/end-verify.txt`，越格自查与 AC#3 × 九枚提交＝`logs/scope-and-ac3-final.log`，
+入库笔＝`46d815d9`）：
 ` M .scratch/wisp/issues/328-…-join-key.md`＝**本腿那一枚只追加的 bullet**（`git diff` 逐字＝+2 行：一空行＋我那一枚，
 ⛔ 第二个人的字节；那一枚 `Status:` 改动已由编排者在 `ed6fa14e` 入库，本腿追加前先跑一把尺证该文件对 HEAD 为空）；
 ` M .scratch/wisp/issues/335-….md`＝**别腿在飞字节，本腿⛔ add ⛔ commit**（逐枚 pathspec 挡住）。
