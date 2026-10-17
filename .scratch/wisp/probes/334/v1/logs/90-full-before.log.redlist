@@ -1,0 +1,8 @@
+--- FAIL: TestFileBaseNameClaimChangesNoClassOrReason 
+    --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* 
+    --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* 
+    --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* 
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	5.478s
+FAIL
