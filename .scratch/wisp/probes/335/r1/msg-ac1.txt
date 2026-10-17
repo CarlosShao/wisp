@@ -1,0 +1,9 @@
+票 335 落地腿 335-r1·AC#1＝把票 327 那枚旧排除钉改形成"名册的形状由规则回答"的闸（改形，⛔ 删、⛔ Skip、⛔ 留恒红）
+
+- internal/panel/display_scrub_216_test.go：TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+  的断言由"那七枚⛔ 洗"翻成"那七枚必须被洗"（更严方向，⛔ 放宽任何断言），
+  并把它原本要钉的那件事重述成三臂＝①七枚现在被洗（转义⛔ 删除＋幂等）
+  ②洗集⛔ 是一份手抄名册（按范畴收集的产品谓词必须严格大于本文件 cfRoster 的 15 枚，
+  且对 unicode.Cf 双向不多不少）③范畴外的样本人⛔ 动（堵住"往清单里加一枚"那一向）。
+- 产码零字节：isDisplayWashCf 仍按范畴（票 333 裁甲-全，台账 A1015，撤销口令「333 改裁乙」）。
+- 起手红逐字复认（rc=1，14 句＝:448+:451×7 枚）；改形后同一条尺 rc=0（arm 2 读数 product=170 category=170）。

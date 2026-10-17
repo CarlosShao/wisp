@@ -1,0 +1,101 @@
+AC#1 paired de-fang (+1 bonus shot), leg 335-r1, 2026-10-17 12:1x +08.
+All three shots hit the PHYSICAL BYTES of the out-of-repo export tree D:/V335R1/T3 (anchor a06a73d8 + this leg's two files);
+script = .scratch/wisp/probes/335/r1/mut335r1.sh (trap-restore), roster = the same -run string in every shot,
+command = go test -v ./internal/panel/ -count=1 -timeout 30m -run 'TestDisplayWash|TestEveryNamedCfRuneIsEscapedAndNeverDeleted|TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut|TestScrubForDisplay'
+
+SHOT A (prescribed a) = isDisplayWashCf's body token replaced by the 15-rune hand roster ticket 333 removed.
+SHOT B (prescribed b) = per-rune exception for U+2061 inserted after 'func isDisplayWashCf(r rune) bool {' - a
+                        different content anchor AND a different line than A.
+SHOT C (bonus)         = per-rune exception that WASHES U+00A0, which the category does not name - the other
+                        direction a hand list can be wrong, so arm 2/3 of the nail get their own red line.
+
+===== SHOT A (full stdout of the script) =====
+SHOT=A
+PRE_HASH=5c68a930ae33e70b92a8ff4fefd107c0c6281f2264df16bcbc13d5026813157a
+MUT_HASH=a2d4c1132b33e65a2ab20ad9b2aa4cbeb02d57db5cf87a2771daa3552e0be291
+MUT_CHANGED_LINES=11
+MUTATED_BODY_LINES=12
+TEST_RC=1
+RESTORE_HASH=5c68a930ae33e70b92a8ff4fefd107c0c6281f2264df16bcbc13d5026813157a
+RESTORE_VERIFIED=YES
+RUN=22
+PASS_TOP=3
+FAIL_TOP=5
+SKIP=0
+RED_NAMES:
+  --- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+  --- FAIL: TestDisplayWashRosterIsExactlyTheCfCategory
+  --- FAIL: TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded
+  --- FAIL: TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies
+  --- FAIL: TestDisplayWashEscapesAndNeverDeletesAcrossTheWholeCategory
+RED_LINES_IN_RESHAPED_NAIL:
+  display_scrub_216_test.go:480
+  display_scrub_216_test.go:484
+  display_scrub_216_test.go:505
+  display_scrub_216_test.go:519
+  display_scrub_216_test.go:522
+
+===== SHOT B (full stdout of the script) =====
+SHOT=B
+PRE_HASH=5c68a930ae33e70b92a8ff4fefd107c0c6281f2264df16bcbc13d5026813157a
+MUT_HASH=2feeb59f17cd27420bf344b6b6b94f9eb6625dea50f895d431f10b8f6dcf6f84
+MUT_CHANGED_LINES=1
+MUTATED_BODY_LINES=4
+TEST_RC=1
+RESTORE_HASH=5c68a930ae33e70b92a8ff4fefd107c0c6281f2264df16bcbc13d5026813157a
+RESTORE_VERIFIED=YES
+RUN=22
+PASS_TOP=3
+FAIL_TOP=5
+SKIP=0
+RED_NAMES:
+  --- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+  --- FAIL: TestDisplayWashRosterIsExactlyTheCfCategory
+  --- FAIL: TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded
+  --- FAIL: TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies
+  --- FAIL: TestDisplayWashEscapesAndNeverDeletesAcrossTheWholeCategory
+RED_LINES_IN_RESHAPED_NAIL:
+  display_scrub_216_test.go:480
+  display_scrub_216_test.go:484
+  display_scrub_216_test.go:519
+  display_scrub_216_test.go:522
+
+===== SHOT C (full stdout of the script) =====
+SHOT=C
+PRE_HASH=5c68a930ae33e70b92a8ff4fefd107c0c6281f2264df16bcbc13d5026813157a
+MUT_HASH=aa53cde161f146042d5328241261a572ec098863cbf553674e7da21f7affba93
+MUT_CHANGED_LINES=1
+MUTATED_BODY_LINES=4
+TEST_RC=1
+RESTORE_HASH=5c68a930ae33e70b92a8ff4fefd107c0c6281f2264df16bcbc13d5026813157a
+RESTORE_VERIFIED=YES
+RUN=22
+PASS_TOP=4
+FAIL_TOP=4
+SKIP=0
+RED_NAMES:
+  --- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+  --- FAIL: TestDisplayWashRosterIsExactlyTheCfCategory
+  --- FAIL: TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies
+  --- FAIL: TestDisplayWashEscapesAndNeverDeletesAcrossTheWholeCategory
+RED_LINES_IN_RESHAPED_NAIL:
+  display_scrub_216_test.go:519
+  display_scrub_216_test.go:526
+  display_scrub_216_test.go:540
+  display_scrub_216_test.go:543
+
+===== assertion lines of the reshaped nail hit per shot (LOG line 519 excluded: it is the arm-2 reading) =====
+  SHOT A: display_scrub_216_test.go:480 display_scrub_216_test.go:484 display_scrub_216_test.go:505 display_scrub_216_test.go:522 
+  SHOT B: display_scrub_216_test.go:480 display_scrub_216_test.go:484 display_scrub_216_test.go:522 
+  SHOT C: display_scrub_216_test.go:526 display_scrub_216_test.go:540 display_scrub_216_test.go:543 
+  A-only vs B  = display_scrub_216_test.go:505 
+  B-only vs A  = 
+  C vs (A union B), shared = (empty = disjoint)
+
+Reading of the pair (honest): B's error set is a strict subset of A's, because A removes 155 category members
+while B removes exactly 1 - every assertion B can fail, A also fails. The line that separates them is the
+hand-roster tripwire, hit by A only: display_scrub_216_test.go:505. The symmetric difference is carried by
+the bonus shot C, whose three lines (526, 540, 543) are hit by neither A nor B.
+
+Restore proof: PRE_HASH == RESTORE_HASH == 5c68a930ae33e70b92a8ff4fefd107c0c6281f2264df16bcbc13d5026813157a
+in all three shots, and that string is byte-identical to the committed file (git show 77d98354:internal/panel/display_scrub_216.go).

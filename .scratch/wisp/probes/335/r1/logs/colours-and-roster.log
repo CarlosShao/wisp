@@ -1,0 +1,56 @@
+AC#4 surfaces and AC#3 red roster, leg 335-r1, 2026-10-17 12:0x-12:1x +08.
+One command line everywhere, only the temp root moved; -count=1 -timeout 30m; NO -run filter on the four
+colour shots (the whole-package roster IS the same -run name册 in all four, 257 top-level+sub RUN lines):
+  go test -v ./internal/panel/ -count=1 -timeout 30m
+
+surface c = TMP/TEMP=/tmp (C volume default), GOTMPDIR unset
+surface d = TMP/TEMP=D:/V335R1/tmp and GOTMPDIR=D:/V335R1/gotmp, both created with mkdir -p BEFORE the run
+
+pre  = export tree D:/V335R1/T1  = git archive a06a73d8 (anchor), 757 .go counted after extraction
+post = export tree D:/V335R1/T3  = the same anchor tree with ONLY this leg's two files copied in
+       (diff -rq T1 T3 = exactly internal/panel/display_scrub_216_test.go plus display_scrub_216.go)
+
+  pre-T1-c: RUN=257 PASS_TOP=159 FAIL_TOP=8 SKIP=0 bytes=62552 sha256=ee2d63747c82fb60cba78473a832597c6ae9b84a2c7f8644cf8314c243ab7e52
+  pre-T1-d: RUN=257 PASS_TOP=159 FAIL_TOP=8 SKIP=0 bytes=64179 sha256=a0eb449ae0a024d9708abed2ecb1db8cbb8f80a83cf076da615a6634e3d834e8
+  post-T3-c: RUN=257 PASS_TOP=160 FAIL_TOP=7 SKIP=0 bytes=61044 sha256=f74f3af9a739fc671f9aace5560109b2bc2d0930a26df6c441b9fa7bf64e9241
+  post-T3-d: RUN=257 PASS_TOP=160 FAIL_TOP=7 SKIP=0 bytes=62664 sha256=82dd2c68d763997e565639169eecded6f2e6c70836180f4f5ddfc6b11a4e1e94
+
+four numbers are never mixed and never subtracted; the two surfaces agree name-for-name inside each state:
+  post c vs d name lines: IDENTICAL (diff empty)
+  pre  c vs d name lines: IDENTICAL (diff empty)
+
+AC#3 red roster, comm of the '^--- FAIL' name lists (elapsed stripped first, sort, comm):
+  pre names  (8):
+    TestApprovalCardViewJSONKeysMatchFrontendTypes
+    TestC21DesignTokensFourWayAgree
+    TestComposerContractTypesMatchFrontend
+    TestComposerRenderFixtureTellsTheTruth
+    TestReadGitOnThisRepositoryIsSelfConsistent
+    TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+    TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+    TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+  post names (7):
+    TestApprovalCardViewJSONKeysMatchFrontendTypes
+    TestC21DesignTokensFourWayAgree
+    TestComposerContractTypesMatchFrontend
+    TestComposerRenderFixtureTellsTheTruth
+    TestReadGitOnThisRepositoryIsSelfConsistent
+    TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+    TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+  GAINED (post not in pre) = => none
+  LOST   (pre not in post) = TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+
+The two names on this export surface that the ticket's 起手 5 does not carry are surface artefacts, not
+verdicts: the archive recipe has no .git, so the two tests that shell out to the repository's own git
+history fail on a missing path. Cross-check on a .git-bearing surface at the SAME final state:
+  shared working tree (HEAD=ea64b5e0, internal/panel files byte-identical to 77d98354,
+  ruler: git diff 77d98354 -- internal/panel/display_scrub_216.go internal/panel/display_scrub_216_test.go = empty):
+    RUN=257 PASS_TOP=162 FAIL_TOP=5 SKIP=0 rc=1 (log: logs/final-shared-tree.log)
+    --- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+    --- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+    --- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+    --- FAIL: TestComposerContractTypesMatchFrontend
+    --- FAIL: TestC21DesignTokensFourWayAgree
+  => the two .git-dependent names are GREEN there, and what is left is exactly the ticket's 5, name for
+     name, with TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut gone. gained 0, lost 0.
+  this leg ran NO ./cmd/wisp package (shared or exported) and did not touch PID 21892.

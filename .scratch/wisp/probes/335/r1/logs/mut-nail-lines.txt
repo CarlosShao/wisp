@@ -1,0 +1,37 @@
+===== SHOT A: reshaped-nail lines, LOG vs ERROR separated =====
+ERROR display_scrub_216_test.go:480: U+2061 is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+ERROR display_scrub_216_test.go:484: U+2061 is a member of the category the ruling chose but the wash left it: "photo\u2061.png" -> "photo\u2061.png", want "photo\\u2061.png"
+ERROR display_scrub_216_test.go:480: U+2062 is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+ERROR display_scrub_216_test.go:484: U+2062 is a member of the category the ruling chose but the wash left it: "photo\u2062.png" -> "photo\u2062.png", want "photo\\u2062.png"
+ERROR display_scrub_216_test.go:480: U+2063 is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+ERROR display_scrub_216_test.go:484: U+2063 is a member of the category the ruling chose but the wash left it: "photo\u2063.png" -> "photo\u2063.png", want "photo\\u2063.png"
+ERROR display_scrub_216_test.go:480: U+2064 is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+ERROR display_scrub_216_test.go:484: U+2064 is a member of the category the ruling chose but the wash left it: "photo\u2064.png" -> "photo\u2064.png", want "photo\\u2064.png"
+ERROR display_scrub_216_test.go:480: U+061C is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+ERROR display_scrub_216_test.go:484: U+061C is a member of the category the ruling chose but the wash left it: "photo\u061c.png" -> "photo\u061c.png", want "photo\\u061c.png"
+ERROR display_scrub_216_test.go:480: U+180E is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+ERROR display_scrub_216_test.go:484: U+180E is a member of the category the ruling chose but the wash left it: "photo\u180e.png" -> "photo\u180e.png", want "photo\\u180e.png"
+ERROR display_scrub_216_test.go:480: U+206A is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+ERROR display_scrub_216_test.go:484: U+206A is a member of the category the ruling chose but the wash left it: "photo\u206a.png" -> "photo\u206a.png", want "photo\\u206a.png"
+ERROR display_scrub_216_test.go:505: the boundary washes 15 runes, no more than the 15 this file could hand-copy: the wash set is a hand-kept roster again, so the next Cf character the table
+LOG   display_scrub_216_test.go:519: arm 2: product-washed=15, unicode.Cf=170, missed=155, extra=0, this file's cfRoster=15
+ERROR display_scrub_216_test.go:522: a rune the Cf category names is not washed, so the answer came from a list rather than the rule: U+0600 U+0601 U+0602 U+0603 U+0604 U+0605 U+061C U+06DD 
+shot_A error_line_count=16
+shot_A distinct_error_lines=display_scrub_216_test.go:480 display_scrub_216_test.go:484 display_scrub_216_test.go:505 display_scrub_216_test.go:522 
+shot_A nail_verdict=--- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.01s)
+===== SHOT B: reshaped-nail lines, LOG vs ERROR separated =====
+ERROR display_scrub_216_test.go:480: U+2061 is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+ERROR display_scrub_216_test.go:484: U+2061 is a member of the category the ruling chose but the wash left it: "photo\u2061.png" -> "photo\u2061.png", want "photo\\u2061.png"
+LOG   display_scrub_216_test.go:519: arm 2: product-washed=169, unicode.Cf=170, missed=1, extra=0, this file's cfRoster=15
+ERROR display_scrub_216_test.go:522: a rune the Cf category names is not washed, so the answer came from a list rather than the rule: U+2061
+shot_B error_line_count=3
+shot_B distinct_error_lines=display_scrub_216_test.go:480 display_scrub_216_test.go:484 display_scrub_216_test.go:522 
+shot_B nail_verdict=--- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.02s)
+===== SHOT C: reshaped-nail lines, LOG vs ERROR separated =====
+LOG   display_scrub_216_test.go:519: arm 2: product-washed=171, unicode.Cf=170, missed=0, extra=1, this file's cfRoster=15
+ERROR display_scrub_216_test.go:526: the boundary washes runes the Cf category does not name, so the answer came from a list rather than the rule: U+00A0
+ERROR display_scrub_216_test.go:540: U+00A0 is neither Cf nor Cc but needsDisplayWash fired on it
+ERROR display_scrub_216_test.go:543: U+00A0 is neither Cf nor Cc but the wash changed it: "photo\u00a0.png" -> "photo\\xa0.png"
+shot_C error_line_count=3
+shot_C distinct_error_lines=display_scrub_216_test.go:526 display_scrub_216_test.go:540 display_scrub_216_test.go:543 
+shot_C nail_verdict=--- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.02s)

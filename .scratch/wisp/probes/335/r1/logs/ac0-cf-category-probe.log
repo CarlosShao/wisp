@@ -1,0 +1,16 @@
+GO_UNICODE_VERSION=17.0.0
+CF_COUNT=170 CC_COUNT=65 (Cc positive control wants 65)
+U+2061 cf=true zs=false
+U+2062 cf=true zs=false
+U+2063 cf=true zs=false
+U+2064 cf=true zs=false
+U+061C cf=true zs=false
+U+180E cf=true zs=false
+U+206A cf=true zs=false
+U+206B cf=true zs=false
+old-roster U+200B cf=true
+old-roster U+202E cf=true
+old-roster U+00AD cf=true
+old-roster U+FEFF cf=true
+old-roster U+2060 cf=true
+control U+0041 cf=false cc=false (both must be false)

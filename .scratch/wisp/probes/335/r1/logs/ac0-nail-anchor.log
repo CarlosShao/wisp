@@ -1,0 +1,20 @@
+time=2026-10-17T11:51:31.216+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+    display_scrub_216_test.go:448: U+2061 is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+2061 is not on the ruled list but the wash changed it: "photo\u2061.png" -> "photo\\u2061.png"
+    display_scrub_216_test.go:448: U+2062 is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+2062 is not on the ruled list but the wash changed it: "photo\u2062.png" -> "photo\\u2062.png"
+    display_scrub_216_test.go:448: U+2063 is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+2063 is not on the ruled list but the wash changed it: "photo\u2063.png" -> "photo\\u2063.png"
+    display_scrub_216_test.go:448: U+2064 is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+2064 is not on the ruled list but the wash changed it: "photo\u2064.png" -> "photo\\u2064.png"
+    display_scrub_216_test.go:448: U+061C is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+061C is not on the ruled list but the wash changed it: "photo\u061c.png" -> "photo\\u061c.png"
+    display_scrub_216_test.go:448: U+180E is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+180E is not on the ruled list but the wash changed it: "photo\u180e.png" -> "photo\\u180e.png"
+    display_scrub_216_test.go:448: U+206A is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+206A is not on the ruled list but the wash changed it: "photo\u206a.png" -> "photo\\u206a.png"
+--- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.171s
+FAIL

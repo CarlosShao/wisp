@@ -1,0 +1,10 @@
+票 335 落地腿 335-r1·AC#2＝清 display_scrub_216.go 三处过期注释（字节已按范畴判定、文字还在说手抄名册），产码字节零改动自证
+
+- 三处全按内容锚定位（⛔ 行号判据）：escape 词表行 "(the ticket 327 Cf roster)"→"(any member of the Cf category)"；
+  "the last shape is the one the invisible roster lands in"→"…every invisible Cf-category rune lands in"；
+  needsDisplayWash 文档 "the invisible formatting roster in isDisplayWashCf"→"the invisible formatting category read by isDisplayWashCf"。
+- 零改动尺（照票 331 先例，滤掉整行注释后锚 blob ⇄ 工作树逐字节同串）：
+  anchor-stripped-sha256=cand-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305，diff 空，rc=0。
+- 正控：副本里把 isDisplayWashCf 一枚非注释字节 Cf→Cc ⇒ 同一把尺 rc=1、哈希分叉（bdb58d7b…）。
+  负控：锚副本里只动一枚整行注释 ⇒ 同一把尺 rc=0（本尺对整行注释按构造失明，射程已在件里如实声明）。
+- git diff -U0 实体＝6 行（3 删 3 加）全部整行注释，非注释改动行数 0。

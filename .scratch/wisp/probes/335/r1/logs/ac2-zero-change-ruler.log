@@ -1,0 +1,27 @@
+== AC#2 ruler: anchor a06a73d8 vs working tree after the three comment edits ==
+-- (main) candidate = working tree file --
+anchor=a06a73d8 file=internal/panel/display_scrub_216.go candidate=internal/panel/display_scrub_216.go
+anchor-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+cand-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+same_sha=yes diff-nonempty=no diff-rc=0
+TMPD=/tmp/zc335.4ayFGS
+rc=0
+-- (positive control) one NON-comment byte moved in a copy: isDisplayWashCf's Cf -> Cc --
+control_changed_lines=2
+anchor=a06a73d8 file=internal/panel/display_scrub_216.go candidate=/d/V335R1/pc/pos-noncomment.go
+anchor-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+cand-stripped-sha256=bdb58d7bd7c536a46d45f5571262e2b0021ea208a8db700673dc5b600b3f3080
+same_sha=no diff-nonempty=yes diff-rc=1
+TMPD=/tmp/zc335.9uXTeP
+rc=1 (wants nonzero = ruler has teeth)
+-- (negative control) anchor copy with ONLY a whole-line comment moved --
+control_changed_lines=2
+anchor=a06a73d8 file=internal/panel/display_scrub_216.go candidate=/d/V335R1/pc/neg-comment-only.go
+anchor-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+cand-stripped-sha256=5274713dead6a3f5b4b2c06970697bbaff50eff4c9dda2a4e33410cb7178b305
+same_sha=yes diff-nonempty=no diff-rc=0
+TMPD=/tmp/zc335.ROdwpx
+rc=0 (wants zero = ruler blind to comments by construction)
+-- how many non-comment changed lines does the real diff have? --
+6
+0
