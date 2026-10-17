@@ -1,0 +1,31 @@
+票 228 AC#11 产码③（cmd/wisp 台件）：ⓐ 两半＋ⓑ-1 十步＋执行者挂载钉，四枚默认档用例落盘
+
+新增 cmd/wisp/resident_tray_stop_228_windows_test.go（//go:build windows，默认档，零窗口）：
+
+- TestAC11StopBitIsBuiltAtBoot —— ⓐ 第一句：proc.Boot 建好的位，**请求之前**取到的
+  handle 才被请求 close（位在环路里建就答不了这一维）；含首次 true／二次 false、
+  reason 只留第一枚、未经 Boot 的 Runtime 与 nil runtime 两个不炸的形状。
+- TestAC11TrayExitExecutorIsMountedAtTheBallHost —— 派单要的那枚「执行者被挂上」钉：
+  (1) 拿产码的 residentTrayStop228(rt) 那枚函数值直接调 recordTrayExit，断位被记、
+  reason 逐枚＝trayExitStopWhy；(2) 走 runResident 的 AST，断 startResidentBall 的
+  实参里恰有一枚 withStopRequest(residentTrayStop228(rt))（0 枚＝装配根拆线，
+  2 枚＝一枚手势两个主人）；(3) 现挂的 hs.trayExit() 在 nil 袋上不炸也不记、
+  挂上执行者后记进同一枚位。
+- TestAC11TrayExitTriggerWalksTheTenSteps —— ⓑ-1：真 proc.Boot＋真 RegisterShutdownHook
+  （三枚在册槽 scheduler-close / stop-hotkey-kws / cancel-task-roots）＋托盘那支触发，
+  RunEventLoop 必须返回且 reason 点名停机请求与请求者，随后 Shutdown(false) 的
+  []StepRecord **十枚逐名断序**（名册按 internal/proc/shutdown.go 的 shutdownStepNames
+  逐字抄成 literal，同 resident_ball_228_windows_test.go 抄句子的规矩），
+  注册过的那三步既不得记 skipped 也必须各真跑一次。
+  环路用 bounded 等待（5s，环路自身一拍 50ms）——摘掉 stop 检查的那一发是**阻塞**不是失败，
+  没有这把尺就会拿整包超时当读数。
+- TestAC11StopRequestDuringTheBootWindowIsNotSwallowed —— ⓐ 第二句：控制台那一支的孪生件
+  TestAC228ExitRequestDuringBootStillLeavesThroughD38E 的托盘门；先正控（没人请求时
+  必须答"进环路"），再触发，再断 residentBootWindowExit228 答出停机请求＋请求者＋
+  "the event loop was never entered"，并断读一次不把闩读空。
+
+⛔ 本件不声称"托盘被点过一次"：菜单选择值只从 TrackPopupMenu 的同步返回拿
+（internal/ball/tray_windows.go 的 showMenu，同文件注释明写不走 WM_COMMAND，
+A495 已把"投 WM_COMMAND＋菜单 id"那条取巧路关掉），真点一次只许由
+resident_tray_stop_live_228_windows_test.go 那枚 winlive 说，且它只钉退出码与审计尾巴、
+⛔ 不钉盘上 1..10 全序（internal/proc/shutdown.go 只为 skipped／失败／fast 出声）。
