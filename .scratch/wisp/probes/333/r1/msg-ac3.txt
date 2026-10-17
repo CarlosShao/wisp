@@ -1,0 +1,22 @@
+票 333 产码腿 333-r1·AC#3＝327-r2 基数钉换形成关系钉＋排除钉整批翻向（两枚⛔ 删、逐枚具名）
+
+internal/panel/display_scrub_327r2_test.go 一枚文件（numstat vs ae710c49＝46/46，160 行＝帽内）：
+- 基数钉改名：TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen
+  → TestDisplayWashRosterIsExactlyTheCfCategory（名里⛔ 再留枚数词 Fifteen）；
+  期望侧从"15 枚字面清单 ruledRoster327r2"改成按范畴收集（washSetOver(unicode.Is(unicode.Cf,r))），
+  实际侧仍读产码（washSetOver(isDisplayWashCf)，谓词＝产码那枚函数本身，⛔ 期望侧自抄实际侧）；
+  双向差集两臂落在两枚不同断言行：extra（产品洗了表外的）／missing（产品漏了表内的）。
+  ruledRoster327r2 已删，未留作常量（名册形＝本票要买的缺陷）；
+- 排除钉改名：TestDisplayWashRosterExcludesTheEightNamedRunes
+  → TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded；断言方向逐枚翻成"被洗＝true"
+  （isDisplayWashCf／needsDisplayWash／转义后的精确形状＋⛔ 删除：ContainsRune 那枚点名），
+  excludedRoster327r2 八枚逐枚进证据件；
+- nail 3（同集钉）与三枚 R4 装饰断言⛔ 一字未动：尺＝logs/ac3-nails-reshaped.log 第 2 条
+  （^// Nail 3 起至文件末与锚点逐字 IDENTICAL）＋第 6 条（红句只落 :448/:451，不落 :416/:357/:400 三带）。
+- 现跑颜色（logs/ac3-nails-final.log，-run 名册七枚）：RUN=7 PASS_TOP=6 FAIL_TOP=1 SKIP=0；
+  两枚改名钉绿，nail 1 读数 product-washed=170 ⇄ unicode.Cf=170（display_scrub_327r2_test.go:66）。
+- ★上报一枚设计外红（⛔ 本腿写面、⛔ 本腿放宽）：display_scrub_216_test.go:444
+  TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut —— 327-r1 自己写的"照旧原样穿过"钉，
+  点名 7 枚"⛔ 在裁定内"，扩集后 14 句红（:448＋:451 各 7 枚）。票 333 与派单只把设计内红
+  划给 327r2 那两枚，这一枚未定义＝按 D22 闸门③ 停手上报，等编排者裁（它正是 327 当年
+  "纳入与否请拍一纸"那一纸要落的第二处）。

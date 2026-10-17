@@ -1,0 +1,37 @@
+AC#3 RULER SET at the final bytes, 2026-10-17 11:17 +08, shared working tree. Colour source = logs/ac3-nails-final.log.
+1) budget+format
+   lines=160 (cap 160)
+   numstat vs anchor ae710c49: 46	46	internal/panel/display_scrub_327r2_test.go
+   gofumpt -l output: [] -> empty = formatted
+   go vet ./internal/panel/ rc=0
+2) nail 3 untouched from the anchor:
+   IDENTICAL
+3) fifteen literals off the EXPECTED side; the only surviving 0x00AD is nail 3's 22-boundary sample (positive control that the ruler is not blind):
+   140:		0x0000, 0x001F, 0x007F, 0x0080, 0x009F, 0x00A0, 0x00AD, 0x061C, 0x180E,
+   excludedRoster327r2 kept, verbatim: 22:var excludedRoster327r2 = []rune{0x2061, 0x2062, 0x2063, 0x2064, 0x061C, 0x180E, 0x206A, 0x206B}
+4) the seven colours:
+   --- PASS: TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired (0.00s)
+   --- PASS: TestNeedsDisplayWashNamesEveryWashedCfRune (0.00s)
+   --- PASS: TestEveryNamedCfRuneIsEscapedAndNeverDeleted (0.00s)
+   --- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.00s)
+   --- PASS: TestDisplayWashRosterIsExactlyTheCfCategory (0.02s)
+   --- PASS: TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded (0.00s)
+   --- PASS: TestDisplayWashJudgeAndWriterAgreeOnBothFamiliesAndBoundaries (0.01s)
+   nail 1 reads (file:line verbatim from the log): display_scrub_327r2_test.go:66: nail 1: product-washed=170, unicode.Cf=170
+5) the ONE out-of-design red, 14 lines = 7 runes x 2 assertions, in a file outside this leg's write face:
+       display_scrub_216_test.go:448: U+2061 is not on the ruled list but needsDisplayWash fired on it
+       display_scrub_216_test.go:451: U+2061 is not on the ruled list but the wash changed it: "photo\u2061.png" -> "photo\\u2061.png"
+       display_scrub_216_test.go:448: U+2062 is not on the ruled list but needsDisplayWash fired on it
+       display_scrub_216_test.go:451: U+2062 is not on the ruled list but the wash changed it: "photo\u2062.png" -> "photo\\u2062.png"
+       display_scrub_216_test.go:448: U+2063 is not on the ruled list but needsDisplayWash fired on it
+       display_scrub_216_test.go:451: U+2063 is not on the ruled list but the wash changed it: "photo\u2063.png" -> "photo\\u2063.png"
+       display_scrub_216_test.go:448: U+2064 is not on the ruled list but needsDisplayWash fired on it
+       display_scrub_216_test.go:451: U+2064 is not on the ruled list but the wash changed it: "photo\u2064.png" -> "photo\\u2064.png"
+       display_scrub_216_test.go:448: U+061C is not on the ruled list but needsDisplayWash fired on it
+       display_scrub_216_test.go:451: U+061C is not on the ruled list but the wash changed it: "photo\u061c.png" -> "photo\\u061c.png"
+       display_scrub_216_test.go:448: U+180E is not on the ruled list but needsDisplayWash fired on it
+       display_scrub_216_test.go:451: U+180E is not on the ruled list but the wash changed it: "photo\u180e.png" -> "photo\\u180e.png"
+       display_scrub_216_test.go:448: U+206A is not on the ruled list but needsDisplayWash fired on it
+       display_scrub_216_test.go:451: U+206A is not on the ruled list but the wash changed it: "photo\u206a.png" -> "photo\\u206a.png"
+6) R4 decorative bands named by the dispatch (:416-417 / :357-360 / :400-401) are NOT among the red lines above; ruler = grep of the red file:line set:
+display_scrub_216_test.go:448 display_scrub_216_test.go:451 

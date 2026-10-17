@@ -1,12 +1,12 @@
 package panel
 
-// Ticket 327 residual R1, in-repo by leg 327-r2: the off-tree bench caught a silently
-// added U+206B, the shipped suite did not. APPEND-ONLY. Nails: (1) cardinality - the
-// roster read ONLY from isDisplayWashCf over every scalar, compared against the
-// ruling's list BOTH ways (extra=rune added, missing=rune removed, different lines;
-// the literals are the EXPECTED side, never the ACTUAL side, so no hand-copy compared
-// to itself); (2) exclusion - the eight named runes washed=false; (3) same-set -
-// needsDisplayWash and scrubForDisplay agree: Cf/Cc run FULL family, the rest SAMPLE.
+// 327 residual R1, in-repo by leg 327-r2; reshaped for ticket 333 by leg 333-r1, which
+// deleted ruledRoster327r2 (nail 1's fifteen-literal EXPECTED side) and flipped nail 2
+// from excluded to washed. Old test names, both flips and the eight runes itemised by
+// name: docs/evidence/s1/333-r1-display-cf-category.md. Nail 1 is a RELATION now - the
+// product's predicate over every scalar against this toolchain's unicode.Cf table, so
+// a Go or Unicode table move reddens instead of silently reopening the hole. Nail 3 is
+// the anchor's own text; whole-category idempotence moved to ticket 333's file beside it.
 
 import (
 	"fmt"
@@ -17,12 +17,9 @@ import (
 	"unicode/utf8"
 )
 
-var ruledRoster327r2 = []rune{ // EXPECTED side only (the ruling's list, hand-copied).
-	0x00AD, 0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF,
-	0x202A, 0x202B, 0x202C, 0x202D, 0x202E, 0x2066, 0x2067, 0x2068, 0x2069,
-}
-
-var excludedRoster327r2 = []rune{0x2061, 0x2062, 0x2063, 0x2064, 0x061C, 0x180E, 0x206A, 0x206B} // off-ruling eight; U+206B was the omitted one (R1)
+// excludedRoster327r2 is 327's off-ruling eight (U+206B was the omitted one, R1).
+// Ticket 333 turns all eight into WASHED; nail 2 reads them one by one.
+var excludedRoster327r2 = []rune{0x2061, 0x2062, 0x2063, 0x2064, 0x061C, 0x180E, 0x206A, 0x206B}
 
 func name327r2(r rune) string { return fmt.Sprintf("U+%04X", r) }
 
@@ -35,67 +32,70 @@ func names327r2(m map[rune]bool) []string {
 	return out
 }
 
-// productWashedRunes is the ACTUAL side: the product predicate over every scalar.
-func productWashedRunes() map[rune]bool {
-	washed := map[rune]bool{}
+// washSetOver collects every scalar a predicate names, skipping the surrogates. Nail 1
+// hands it two DIFFERENT predicates, so neither side is a copy of the other.
+func washSetOver(names func(rune) bool) map[rune]bool {
+	set := map[rune]bool{}
 	for r := rune(0); r <= utf8.MaxRune; r++ {
 		if r >= 0xD800 && r <= 0xDFFF {
 			continue
 		}
-		if isDisplayWashCf(r) {
-			washed[r] = true
+		if names(r) {
+			set[r] = true
 		}
 	}
-	return washed
+	return set
 }
 
-// Nail 1: cardinality, read from the product.
-func TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen(t *testing.T) {
-	actual := productWashedRunes()
-	ruled := map[rune]bool{}
-	for _, r := range ruledRoster327r2 {
-		ruled[r] = true
-	}
+// Nail 1: the product's wash set IS the Cf table, in both directions. ACTUAL = the
+// product's own predicate, EXPECTED = stdlib's category: two sources, not a self-copy.
+func TestDisplayWashRosterIsExactlyTheCfCategory(t *testing.T) {
+	actual := washSetOver(isDisplayWashCf)
+	expected := washSetOver(func(r rune) bool { return unicode.Is(unicode.Cf, r) })
 	extra, missing := map[rune]bool{}, map[rune]bool{}
 	for r := range actual {
-		if !ruled[r] {
+		if !expected[r] {
 			extra[r] = true
 		}
 	}
-	for r := range ruled {
+	for r := range expected {
 		if !actual[r] {
 			missing[r] = true
 		}
 	}
-	t.Logf("nail 1: product-washed=%d, ruled-list=%d", len(actual), len(ruled))
-	if len(extra) != 0 { // reddens on a silent ADD (shot 1)
-		t.Errorf("the product washes Cf runes the ruling never named: %v (ruled=%d product=%d)",
-			names327r2(extra), len(ruled), len(actual))
+	t.Logf("nail 1: product-washed=%d, unicode.Cf=%d", len(actual), len(expected))
+	if len(extra) != 0 { // reddens if the product washes beyond the category
+		t.Errorf("the product washes runes the Cf table does not name: %v (product=%d category=%d)",
+			names327r2(extra), len(actual), len(expected))
 	}
-	if len(missing) != 0 { // reddens on a silent REMOVE (shot 2), a different line
-		t.Errorf("a ruled rune is no longer washed by the product: %v (ruled=%d product=%d)",
-			names327r2(missing), len(ruled), len(actual))
+	if len(missing) != 0 { // reddens if the product skips any of the category, other line
+		t.Errorf("a Cf-table rune is not washed by the product: %v (product=%d category=%d)",
+			names327r2(missing), len(actual), len(expected))
 	}
-	if len(actual) != len(ruled) {
-		t.Errorf("product roster cardinality=%d, want %d", len(actual), len(ruled))
+	if len(actual) != len(expected) {
+		t.Errorf("product roster cardinality=%d, want the category's %d", len(actual), len(expected))
 	}
 }
 
-// Nail 2: the eight named exclusions, read off the product.
-func TestDisplayWashRosterExcludesTheEightNamedRunes(t *testing.T) {
+// Nail 2: the eight the old ruling kept raw are washed now - escaped, never deleted.
+func TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded(t *testing.T) {
 	for _, r := range excludedRoster327r2 {
 		if !unicode.Is(unicode.Cf, r) {
-			t.Errorf("%s is not unicode.Cf - the exclusion lost its meaning", name327r2(r))
+			t.Errorf("%s is not unicode.Cf - this nail lost its reason for existing", name327r2(r))
 		}
-		if isDisplayWashCf(r) {
-			t.Errorf("%s is off the ruled list but isDisplayWashCf washed it", name327r2(r))
+		if !isDisplayWashCf(r) { // direction flipped from false to true at ticket 333
+			t.Errorf("%s is Cf but isDisplayWashCf still skips it", name327r2(r))
 		}
 		in := "photo" + string(r) + ".png"
-		if needsDisplayWash(in) {
-			t.Errorf("%s is off the ruled list but needsDisplayWash fired on %q", name327r2(r), in)
+		if !needsDisplayWash(in) {
+			t.Errorf("%s is Cf but the fast path would return %q raw", name327r2(r), in)
 		}
-		if got := scrubForDisplay(in); got != in {
-			t.Errorf("%s is off the ruled list but the wash changed it: %q -> %q", name327r2(r), in, got)
+		got := scrubForDisplay(in)
+		if strings.ContainsRune(got, r) {
+			t.Errorf("%s survived as itself in %q: the shape is escape, not deletion", name327r2(r), got)
+		}
+		if want := "photo" + escapeOf(r) + ".png"; got != want {
+			t.Errorf("%s washed to %q, want the boundary vocabulary's %q (unchanged input is the other failure)", name327r2(r), got, want)
 		}
 	}
 }
