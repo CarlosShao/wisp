@@ -1,0 +1,242 @@
+package risk
+
+// zz_probe_334v1_test.go — 票 334 裁腿 334-v1 的只读探针（⛔ 跟踪件、⛔ 判据）。
+// 它只打印实值，⛔ 断言。两台目的：
+//   1. 改前⇄改后同一批具名输入的 class／allow／needL2＋那句 reason 点名的规则，
+//      逐字对撞（AC#2 那把三值尺，我自己重跑）；
+//   2. 把**七枚**走 aEq/aUnder 的 A 档锚逐枚造出"叶子缺位×候选拼法证明不了"
+//      那一形（腿的 14 行只经过其中三枚锚）⇒ "只松某一枚锚的回落支"这种降级
+//      必须在我这把尺上显形。
+// 输出全 ASCII：reason 带真路径与控制字符，这里只取"它点名了哪枚规则"。
+
+import (
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+const (
+	noiseV1 = "已允许\x1b\u202e" // U+001B + U+202E：Windows 路径非法字符
+	claimV1 = "id_ed25519" + noiseV1
+	starV1  = "notes*a1" + noiseV1
+	questV1 = "score?b1" + noiseV1
+	cleanV1 = "plain-note.txt"
+
+	wispDir  = `AppData/Roaming/wisp`
+	localDir = `AppData/Local`
+)
+
+// ruleTagV1 folds a reason into an ASCII tag naming WHICH rule it points at.
+func ruleTagV1(reason string) string {
+	switch {
+	case reason == "":
+		return "empty"
+	case strings.HasPrefix(reason, "B-list"):
+		return "B-tier"
+	case strings.HasPrefix(reason, "A-list"):
+		for _, lit := range []string{
+			`~/.git-credentials`, `.git/config`, `%APPDATA%\wisp\config.toml`,
+			`~/.ssh/**`, `~/.aws/credentials`, `~/.kube/config`,
+			`browser credential store`, `Microsoft\Protect`, `Microsoft\Credentials`,
+		} {
+			if strings.Contains(reason, lit) {
+				return "A:" + strings.NewReplacer(`\`, `-`, `/`, `-`, ` `, `_`).Replace(lit)
+			}
+		}
+		return "A:unknown"
+	default:
+		return "other"
+	}
+}
+
+func shapeLineV1(tag, p string) string {
+	d := Gate(p, nil)
+	return fmt.Sprintf("V1SHAPE %s class=%s allow=%v needL2=%v rule=%s",
+		tag, Classify(p), d.Allow, d.NeedL2, ruleTagV1(d.Reason))
+}
+
+func overrideLineV1(tag, p string) string {
+	u := Gate(p, map[string]bool{normPath(p): true})
+	return fmt.Sprintf("V1OVERRIDE %s class=%s allow=%v needL2=%v", tag, u.Class, u.Allow, u.NeedL2)
+}
+
+// worldV1 builds a self-contained profile world; installed lists slash-form
+// leaves really created under the profile (anything absent collapses that
+// anchor's expansion short, which is the point).
+func worldV1(t *testing.T, inside bool, installed ...string) (profile, work string) {
+	t.Helper()
+	base := t.TempDir()
+	profile = filepath.Join(base, "profile")
+	work = filepath.Join(base, "work")
+	if inside {
+		work = filepath.Join(profile, "work")
+	}
+	for _, d := range []string{profile, work} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatalf("setup mkdir %s: %v", d, err)
+		}
+	}
+	for _, leaf := range installed {
+		full := filepath.Join(profile, filepath.FromSlash(leaf))
+		if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+			t.Fatalf("setup mkdir parent %s: %v", full, err)
+		}
+		if err := os.WriteFile(full, []byte("installed\n"), 0o600); err != nil {
+			t.Fatalf("setup write %s: %v", full, err)
+		}
+	}
+	t.Setenv("USERPROFILE", profile)
+	t.Setenv("HOME", profile)
+	t.Setenv("APPDATA", filepath.Join(profile, "AppData", "Roaming"))
+	t.Setenv("LOCALAPPDATA", filepath.Join(profile, "AppData", "Local"))
+	return profile, work
+}
+
+// TestProbe334V1RealMachine = AC#0 行 2/3/5，本机真环境，⛔ 改任何 env。
+func TestProbe334V1RealMachine(t *testing.T) {
+	dir := t.TempDir()
+	names := []string{claimV1, starV1, questV1, cleanV1}
+	for i, name := range names {
+		p := filepath.Join(dir, name)
+		_, err := os.Lstat(p)
+		t.Logf("V1LSTAT i=%d err_is_FS_ErrNotExist=%v err=<%s>",
+			i, errors.Is(err, fs.ErrNotExist), sanitizeV1(fmt.Sprint(err)))
+		t.Log(shapeLineV1(fmt.Sprintf("real-temp-i%d", i), p))
+	}
+	appData := os.Getenv("APPDATA")
+	wispLogs := filepath.Join(appData, "wisp", "logs")
+	t.Logf("V1ENV wisp_logs_exists=%v", pathExists(wispLogs))
+	under := filepath.Join(wispLogs, claimV1)
+	t.Log(shapeLineV1("real-appdata-wisp-logs", under))
+	t.Log(overrideLineV1("real-appdata-wisp-logs", under))
+}
+
+// TestProbe334V1PerAnchorChain = AC#2 的射程尺：七枚走 aEq/aUnder 的锚逐枚造世界。
+// earlier anchors are installed honestly so the FIRST fail-closed hit is the
+// anchor under test.
+func TestProbe334V1PerAnchorChain(t *testing.T) {
+	cases := []struct {
+		anchor    string
+		installed []string
+		relCand   string // profile-relative dir the candidate is placed in
+	}{
+		{"case1-gitcreds", nil, "work"},
+		{"case3-wisp-config", []string{".git-credentials", wispDir + "/logs/note.txt"}, wispDir + "/logs"},
+		{"case4-ssh", []string{".git-credentials", wispDir + "/config.toml"}, "work"},
+		{"case5-aws", []string{".git-credentials", wispDir + "/config.toml", ".ssh/id_ed25519"}, "work"},
+		{"case6-kube", []string{".git-credentials", wispDir + "/config.toml", ".ssh/id_ed25519", ".aws/credentials"}, "work"},
+		{"case8-dpapi", []string{".git-credentials", wispDir + "/config.toml", ".ssh/id_ed25519", ".aws/credentials", ".kube/config"}, "AppData/Roaming"},
+		{"case9-local-creds", []string{".git-credentials", wispDir + "/config.toml", ".ssh/id_ed25519", ".aws/credentials", ".kube/config", `AppData/Roaming/Microsoft/Protect/marker.txt`}, localDir},
+	}
+	for _, tc := range cases {
+		t.Run(tc.anchor, func(t *testing.T) {
+			profile, work := worldV1(t, true, tc.installed...)
+			candDir := filepath.Join(profile, filepath.FromSlash(tc.relCand))
+			if err := os.MkdirAll(candDir, 0o755); err != nil {
+				t.Fatalf("mkdir candDir: %v", err)
+			}
+			if tc.relCand == "work" {
+				candDir = work
+			}
+			cand := filepath.Join(candDir, claimV1)
+			t.Log(shapeLineV1("chain:"+tc.anchor, cand))
+			t.Log(overrideLineV1("chain:"+tc.anchor, cand))
+			// same world, clean existing file: both sides certain → no clause.
+			t.Log(shapeLineV1("chain-clean:"+tc.anchor, filepath.Join(candDir, cleanV1)))
+		})
+	}
+	for _, tc := range cases {
+		t.Run("off/"+tc.anchor, func(t *testing.T) {
+			profile, _ := worldV1(t, false, tc.installed...)
+			candDir := filepath.Join(profile, filepath.FromSlash(tc.relCand))
+			if err := os.MkdirAll(candDir, 0o755); err != nil {
+				t.Fatalf("mkdir candDir: %v", err)
+			}
+			base := filepath.Dir(profile)
+			offDir := filepath.Join(base, "work")
+			if err := os.MkdirAll(offDir, 0o755); err != nil {
+				t.Fatalf("mkdir offDir: %v", err)
+			}
+			t.Log(shapeLineV1("offchain:"+tc.anchor, filepath.Join(offDir, claimV1)))
+		})
+	}
+}
+
+// TestProbe334V1SinkReach = 必答①的一跳：那句长话除了返回值还从哪一出口出去。
+func TestProbe334V1SinkReach(t *testing.T) {
+	var sink []string
+	prev := Logf
+	Logf = func(format string, args ...any) { sink = append(sink, fmt.Sprintf(format, args...)) }
+	defer func() { Logf = prev }()
+	_, work := worldV1(t, true, ".git-credentials", wispDir+"/config.toml", ".ssh/id_ed25519")
+	cand := filepath.Join(work, claimV1)
+	d := Gate(cand, nil)
+	joined := strings.Join(sink, "\n")
+	t.Logf("V1SINK returned_reason_bytes=%d sink_lines=%d sink_has_long_sentence=%v sink_names_candidate=%v sink_names_anchor=%v",
+		len(d.Reason), len(sink), strings.Contains(joined, "fail-closed"),
+		strings.Contains(strings.ToLower(joined), strings.ToLower(claimV1)),
+		strings.Contains(strings.ToLower(joined), ".aws"))
+	for _, line := range sink {
+		t.Logf("V1SINKLINE %s", sanitizeV1(line))
+	}
+}
+
+func sanitizeV1(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		if r < 0x20 || r == 0x7f || r == 0x1b || r == 0x202e {
+			fmt.Fprintf(&b, "\\u%04x", r)
+			continue
+		}
+		b.WriteRune(r)
+	}
+	return b.String()
+}
+
+// commonPrefixSegsV1 counts leading path components two paths share.
+func commonPrefixSegsV1(a, b string) int {
+	sa := strings.Split(normPath(a), sepStr)
+	sb := strings.Split(normPath(b), sepStr)
+	n := 0
+	for n < len(sa) && n < len(sb) && sa[n] == sb[n] {
+		n++
+	}
+	return n
+}
+
+// TestProbe334V1FixturePrefix = AC#3(b)：新夹具真把候选放在 A 锚祖先链之外了吗。
+// 尺＝候选 root 与每枚锚展开 root 的公共前缀段数＋那条回落支的实值。
+func TestProbe334V1FixturePrefix(t *testing.T) {
+	base := t.TempDir()
+	home := filepath.Join(base, "profile")
+	work := filepath.Join(base, "work") // 与 AC#3 夹具同形：profile 的兄弟，不是孩子
+	for _, d := range []string{home, work} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatalf("mkdir: %v", err)
+		}
+	}
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("HOME", home)
+	t.Setenv("APPDATA", filepath.Join(home, "AppData", "Roaming"))
+	t.Setenv("LOCALAPPDATA", filepath.Join(home, "AppData", "Local"))
+	f := formsOf(filepath.Join(work, claimV1))
+	for _, sp := range []string{
+		anchorPath(home, `.git-credentials`),
+		anchorPath(filepath.Join(home, "AppData", "Roaming"), `wisp`, `config.toml`),
+		anchorPath(home, `.ssh`),
+		anchorPath(home, `.aws`, `credentials`),
+		anchorPath(home, `.kube`, `config`),
+		anchorPath(filepath.Join(home, "AppData", "Roaming"), `microsoft`, `protect`),
+		anchorPath(filepath.Join(home, "AppData", "Local"), `microsoft`, `credentials`),
+	} {
+		a := anchorForms(sp)
+		t.Logf("V1PREFIX anchor_root=%s shared_segments=%d anchor_certain=%v cand_certain=%v clause=%v",
+			sanitizeV1(fmt.Sprintf("%q", a.root)), commonPrefixSegsV1(f.root, a.root),
+			a.certain(), f.certain(), uncertainAnchorMiss(f, a))
+	}
+	t.Logf("V1PREFIX cand_root=%s", sanitizeV1(fmt.Sprintf("%q", f.root)))
+}
