@@ -1,0 +1,21 @@
+### surface=C-default TMP=<默认 /tmp -> C:\Users\swq\AppData\Local\Temp>
+  full   RUN=225 PASS_TOP=136 FAIL_TOP=2 SKIP=1 panic=0 rc=rc=1  tempdir_seen=
+  216only RUN=24 PASS_TOP=5 FAIL_TOP=1 SKIP=0 panic=0 rc=rc=1
+  red_roster_full=--- FAIL: TestFileBaseNameClaimChangesNoClassOrReason (0.01s) --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.09s)
+  red_roster_216=--- FAIL: TestFileBaseNameClaimChangesNoClassOrReason (0.01s)
+### surface=D-redirect TMP=D:\wisp-216v3-tmp
+  full   RUN=225 PASS_TOP=137 FAIL_TOP=1 SKIP=1 panic=0 rc=rc=1  tempdir_seen=
+  216only RUN=24 PASS_TOP=6 FAIL_TOP=0 SKIP=0 panic=0 rc=rc=0
+  red_roster_full=--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.06s)
+  red_roster_216=
+### surface=C-home-nonLAD TMP=C:\Users\swq\wisp216v3-home
+  full   RUN=225 PASS_TOP=136 FAIL_TOP=2 SKIP=1 panic=0 rc=rc=1  tempdir_seen=
+  216only RUN=24 PASS_TOP=5 FAIL_TOP=1 SKIP=0 panic=0 rc=rc=1
+  red_roster_full=--- FAIL: TestFileBaseNameClaimChangesNoClassOrReason (0.02s) --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.07s)
+  red_roster_216=--- FAIL: TestFileBaseNameClaimChangesNoClassOrReason (0.03s)
+### surface=C-outside-home TMP=C:\Users\Public\wisp216v3-pub
+  full   RUN=225 PASS_TOP=137 FAIL_TOP=1 SKIP=1 panic=0 rc=rc=1  tempdir_seen=
+  216only RUN=24 PASS_TOP=6 FAIL_TOP=0 SKIP=0 panic=0 rc=rc=0
+  red_roster_full=--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.06s)
+  red_roster_216=
+### done

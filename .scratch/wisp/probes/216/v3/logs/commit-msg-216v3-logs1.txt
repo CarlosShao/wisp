@@ -1,0 +1,10 @@
+票 216 裁腿 216-v3 探针面·一＝台面矩阵四发（同一枚命令、同一份码，只挪 t.TempDir() 落点）
+
+尺＝go test ./internal/risk/ -count=1 -timeout 20m -v（整包）＋同一条 -run 只打 AC#6 那六枚仪器。
+四数逐枚点名在 surfaces-matrix.log：
+  C 卷默认台面      整包 225/136/2/1 rc=1 ⇄ 216only 24/5/1/0 rc=1  ← 编排者那枚红在场
+  D 卷台面          整包 225/137/1/1 rc=1 ⇄ 216only 24/6/0/0 rc=0
+  C 卷主目录内、非 %LOCALAPPDATA%（C:\Users\swq\wisp216v3-home）整包 225/136/2/1 rc=1 ⇄ 216only 24/5/1/0 rc=1 ⇒ %LOCALAPPDATA% 不是必要条件
+  C 卷主目录外（C:\Users\Public\wisp216v3-pub）整包 225/137/1/1 rc=1 ⇄ 216only 24/6/0/0 rc=0 ⇒ "在 C 卷上"不是充分条件
+两枚台面里都红的另一枚＝TestC26RewriteAccountIsConsumedAtEverySecurityLeg（红句具名 internal/panel/composer.go:127 ＋ display_scrub_216.go:26/37/228＝216-r1 显示层件，⛔ 本腿那两枚仪器，在册归 216-r2 具名上交）。
+本腿零产码字节、⛔ 动任何断言、⛔ 翻框、⛔ push；写面＝.scratch/wisp/probes/216/v3/logs/**。
