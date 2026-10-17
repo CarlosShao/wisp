@@ -35,14 +35,14 @@
 ## 验收（⛔ 实现者自勾；本腿只交料，翻框归编排者＋非实现者）
 
 - [ ] **AC#0 交件三把尺**：逐枚提交号＋逐枚 `git show --name-only`（名册只许含 `cmd/wisp/**`／`.scratch/wisp/probes/329/r1/**`／`docs/evidence/s1/**` 一枚短名件／本票末尾**一条** bullet）；证据件 `wc -c`＋行数＋占位符 0；⛔ 0 字节件。
-- [ ] **AC#1 起手先自己复认那三把尺**（⛔ 抄本票读数）：`lastPanelSnapshot` 非测试调用者＝**0**、`publishPanelSnapshot` 生产调用点在（⇒ ⛔ 把本票读成"整条没接"）、`bridge.go` 入向名＝**7**。三把各自带正控（同尺去一个已知存在的名字必须出数）。
-- [ ] **AC#2 落地那一跳**：新增**一条生产代码**，在泵真的 publish 时把快照字节交给宿主；★判据尺＝`grep -rn 'lastPanelSnapshot' --include='*.go' internal cmd | grep -v '_test.go' | grep -v '^cmd/wisp/panel_pump.go:4'` **非空**（＝至少一枚非测试读者，且不是定义行自己）。
-- [ ] **AC#3 逐位相等，不是"调用过"**：用例必须断**桩宿主收到的那串字节 ⇄ 泵 marshal 出的那串字节逐位相等**（⛔ 只断 `Eval` 被调过一次）；★去牙一发＝把推出去的字节换成空串或日志摘要，**指名那枚用例必须红**；★反控一发＝把 marshal 侧换一个字段（例如少一条待批），用例也必须红（证明它真在比字节、不是比长度）。
-- [ ] **AC#4 ⛔ 撞那两枚名册钉**：交件时 `git diff --stat <起手锚> -- internal/panel/bridge.go internal/panel/inbound_roster_253_test.go internal/panel/git_test.go` 必须**为空**；⛔ 为了让新名字过关去改名册数／加白名单。
-- [ ] **AC#5 页面侧合同写成文件**：新增一枚 `.scratch/wisp/probes/329/r1/page-contract.md`，逐字写清**具名 JS 全局／参数形状（就是那串快照 JSON）／触发时机**，供机主转给他的前端 agent；★票面必须**另起一行**具名"页面接收器今天缺位＝`main.tsx:97/110`＋`lib/panel.ts` 无 onmessage/订阅"⇒ ⛔ 本票任何一句不许写成"屏幕上已经会动了"。⛔ 动 `frontend/**`／`design/**` 一字。
-- [ ] **AC#6 ⛔ 发明合并/背压**：只允许挂在既有 publish 调用点（`run.go:1363/1452/1481` 那三形）；红句不许出现"每个 delta 推一次"。若确实需要节流规则，**停下来上报**，⛔ 自己定。
+- [x] **AC#1 起手先自己复认那三把尺**（⛔ 抄本票读数）：`lastPanelSnapshot` 非测试调用者＝**0**、`publishPanelSnapshot` 生产调用点在（⇒ ⛔ 把本票读成"整条没接"）、`bridge.go` 入向名＝**7**。三把各自带正控（同尺去一个已知存在的名字必须出数）。
+- [x] **AC#2 落地那一跳**：新增**一条生产代码**，在泵真的 publish 时把快照字节交给宿主；★判据尺＝`grep -rn 'lastPanelSnapshot' --include='*.go' internal cmd | grep -v '_test.go' | grep -v '^cmd/wisp/panel_pump.go:4'` **非空**（＝至少一枚非测试读者，且不是定义行自己）。
+- [x] **AC#3 逐位相等，不是"调用过"**：用例必须断**桩宿主收到的那串字节 ⇄ 泵 marshal 出的那串字节逐位相等**（⛔ 只断 `Eval` 被调过一次）；★去牙一发＝把推出去的字节换成空串或日志摘要，**指名那枚用例必须红**；★反控一发＝把 marshal 侧换一个字段（例如少一条待批），用例也必须红（证明它真在比字节、不是比长度）。
+- [x] **AC#4 ⛔ 撞那两枚名册钉**：交件时 `git diff --stat <起手锚> -- internal/panel/bridge.go internal/panel/inbound_roster_253_test.go internal/panel/git_test.go` 必须**为空**；⛔ 为了让新名字过关去改名册数／加白名单。
+- [x] **AC#5 页面侧合同写成文件**：新增一枚 `.scratch/wisp/probes/329/r1/page-contract.md`，逐字写清**具名 JS 全局／参数形状（就是那串快照 JSON）／触发时机**，供机主转给他的前端 agent；★票面必须**另起一行**具名"页面接收器今天缺位＝`main.tsx:97/110`＋`lib/panel.ts` 无 onmessage/订阅"⇒ ⛔ 本票任何一句不许写成"屏幕上已经会动了"。⛔ 动 `frontend/**`／`design/**` 一字。
+- [x] **AC#6 ⛔ 发明合并/背压**：只允许挂在既有 publish 调用点（`run.go:1363/1452/1481` 那三形）；红句不许出现"每个 delta 推一次"。若确实需要节流规则，**停下来上报**，⛔ 自己定。
 - [ ] **AC#7 台面与颜色**：`cmd/wisp` 整包那一格＝★必须带 DLL 路径＋显式超时（`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -timeout 30m`），四数逐枚点名（`^=== RUN` 含子测试 ⇄ `^--- PASS` 只数顶层），终态红名册与起手**作差＝0**；⛔ `go test ./...`；⛔ 用默认 10 分钟帽判死活。起手那一发⛔ 用共享工作树跑 ⇒ `git archive` 仓外导出树**八件套** `go.mod go.sum internal cmd tools scripts frontend models`＋手工补 `build/*.dll`／`third_party/sherpa-onnx/*.dll`／`frontend/dist`，树放 `D:` 卷且目录名要产生 8.3 短名别名（`/tmp` 那形会把 `paths_shortname_252_*` 那族打红＝台面故障，⛔ 计入判据）。
-- [ ] **AC#8 门禁四数只在工作树跑**：`gofumpt.exe -l`（真身 `/d/work/base/gopath/bin/gofumpt.exe`）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./cmd/wisp/`，逐枚落 `rc=`；⛔ 把门禁指向部分导出树（`design/`／`.git` 缺 ⇒ `exit 2` 的 GUARD 射程拒绝，长得像红）。
+- [x] **AC#8 门禁四数只在工作树跑**：`gofumpt.exe -l`（真身 `/d/work/base/gopath/bin/gofumpt.exe`）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./cmd/wisp/`，逐枚落 `rc=`；⛔ 把门禁指向部分导出树（`design/`／`.git` 缺 ⇒ `exit 2` 的 GUARD 射程拒绝，长得像红）。
 
 ## 已知会一起变旧的句子（⛔ 本票动它一字，只登记）
 
