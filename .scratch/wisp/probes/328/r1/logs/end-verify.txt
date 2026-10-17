@@ -1,0 +1,17 @@
+date=2026-10-17 15:22:55 +0800
+end_status_final_lines=1230
+tracked_modified=1
+ M .scratch/wisp/issues/335-ticket327-roster-nail-red-after-category-widening-and-three-stale-comments.md
+=== 写面（应空） ===
+=== 我的落点（应空） ===
+?? .scratch/wisp/probes/328/r1/logs/end-status-final.txt
+?? .scratch/wisp/probes/328/r1/logs/end-verify.txt
+?? .scratch/wisp/probes/328/r1/logs/scope-and-ac3-final.log
+=== HEAD ===
+e0cd9bdb 2026-10-17 15:21:05 +0800 票 334 裁腿 334-v1·票尾一条只追加 bullet＝七格判语（★AC#2 半成立）＋两枚必答＋事故盘上事实＋留给编排者三件（numstat 1/0＝纯追加，一枚框没翻：现跑未勾仍 7）
+=== 件字节与行数 ===
+  112 12108 docs/evidence/s1/328-r1-join.md
+  106  9490 docs/evidence/s1/328-r1-color.md
+  218 21598 total
+=== 未推枚数（本腿⛔ push） ===
+350

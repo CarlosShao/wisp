@@ -1,0 +1,65 @@
+date=2026-10-17 15:19:59 +0800
+== 颜色台面对 HEAD 的代表性：本腿 Go 字节自 f705b082 起未再变 ==
+cmd: git diff f705b082..HEAD -- internal/panel internal/agent | wc -l
+0
+
+== AC#3 四面 × 本腿九枚提交（含文档笔）逐格 diff_lines ==
+  b2d55342 ac3_four_faces_diff_lines=0 rc=0
+  1696d01b ac3_four_faces_diff_lines=0 rc=0
+  ffebb6d1 ac3_four_faces_diff_lines=0 rc=0
+  f705b082 ac3_four_faces_diff_lines=0 rc=0
+  54b63780 ac3_four_faces_diff_lines=0 rc=0
+  1f5a6137 ac3_four_faces_diff_lines=0 rc=0
+  a3fedd42 ac3_four_faces_diff_lines=0 rc=0
+  0adb7775 ac3_four_faces_diff_lines=0 rc=0
+  d166e9f8 ac3_four_faces_diff_lines=0 rc=0
+
+== 九枚提交的 name-only 去重（全部路径） ==
+  .scratch/wisp/issues/328-l2-card-corr-shape-never-matches-the-roster-join-key.md
+  .scratch/wisp/probes/328/r1/commit-msg-328r1-220flip.txt
+  .scratch/wisp/probes/328/r1/commit-msg-328r1-agentcontrol.txt
+  .scratch/wisp/probes/328/r1/commit-msg-328r1-evidence.txt
+  .scratch/wisp/probes/328/r1/commit-msg-328r1-evidence2.txt
+  .scratch/wisp/probes/328/r1/commit-msg-328r1-logs.txt
+  .scratch/wisp/probes/328/r1/commit-msg-328r1-roster.txt
+  .scratch/wisp/probes/328/r1/commit-msg-328r1-shapes.txt
+  .scratch/wisp/probes/328/r1/commit-msg-328r1-ticket.txt
+  .scratch/wisp/probes/328/r1/logs/ac3-four-faces.log
+  .scratch/wisp/probes/328/r1/logs/after-agent-full.log
+  .scratch/wisp/probes/328/r1/logs/after-agent-targeted.log
+  .scratch/wisp/probes/328/r1/logs/after-full-summary.txt
+  .scratch/wisp/probes/328/r1/logs/after-panel-full.log
+  .scratch/wisp/probes/328/r1/logs/after-panel-targeted.log
+  .scratch/wisp/probes/328/r1/logs/before-agent-full.log
+  .scratch/wisp/probes/328/r1/logs/before-full-summary.txt
+  .scratch/wisp/probes/328/r1/logs/before-panel-220only.log
+  .scratch/wisp/probes/328/r1/logs/before-panel-full.log
+  .scratch/wisp/probes/328/r1/logs/build-tree.sh
+  .scratch/wisp/probes/328/r1/logs/end-rulers.log
+  .scratch/wisp/probes/328/r1/logs/end-status-summary.txt
+  .scratch/wisp/probes/328/r1/logs/end-status.txt
+  .scratch/wisp/probes/328/r1/logs/gates-328r1.log
+  .scratch/wisp/probes/328/r1/logs/mut-M1.log
+  .scratch/wisp/probes/328/r1/logs/mut-M2.log
+  .scratch/wisp/probes/328/r1/logs/mutate.sh
+  .scratch/wisp/probes/328/r1/logs/red-after.txt
+  .scratch/wisp/probes/328/r1/logs/red-before.txt
+  .scratch/wisp/probes/328/r1/logs/red-roster-and-ac3-extra.log
+  .scratch/wisp/probes/328/r1/logs/ruler-ac3.sh
+  .scratch/wisp/probes/328/r1/logs/rulers-end.sh
+  .scratch/wisp/probes/328/r1/logs/run-color.sh
+  .scratch/wisp/probes/328/r1/logs/start-anchor.txt
+  .scratch/wisp/probes/328/r1/logs/start-status.txt
+  .scratch/wisp/probes/328/r1/logs/subagent_roster_197.go.pristine-M1
+  .scratch/wisp/probes/328/r1/logs/subagent_roster_197.go.pristine-M2
+  .scratch/wisp/probes/328/r1/logs/tree-after.log
+  .scratch/wisp/probes/328/r1/logs/tree-before.log
+  docs/evidence/s1/328-r1-color.md
+  docs/evidence/s1/328-r1-join.md
+  internal/agent/corr_roster_join_328_test.go
+  internal/panel/subagent_blocked_220_test.go
+  internal/panel/subagent_corr_task_prefix_328_test.go
+  internal/panel/subagent_roster_197.go
+
+== 越格自查：写面之外的路径枚数（应只含票面＋证据件＋probes） ==
+out_of_scope_lines=0
