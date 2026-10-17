@@ -1,4 +1,17 @@
-332-a1 逐枚 git show --name-only（尺＝git log --format=%h 7535d83b..HEAD -- .scratch/wisp/probes/332/a1，射程＝本腿写面）
+332-a1 逐枚 git show --name-only（尺＝git log --format=%h 7535d83b..HEAD -- 本腿四处写面，交件末段最后一次重跑为准）
+提交枚数＝20：8fab44f50 0ded45496 b790fae99 4f897c7ab 2e9fa82af 3e33285b8 0f5b44b17 73bef2995 5c8cf05a9 224fc5b82 7637fbb8c ab32ca709 64cf447d9 7e7642d83 22ce10717 254201793 e1dbd5ddf 01dedff3e 37741f052 ba4fe25dd 
+===== 8fab44f50 =====
+8fab44f50 2026-10-17 10:40:31 +0800 332-a1 票 332 末尾追加一条 bullet（纯追加 0 删 1 增；⛔ 翻任何 AC 框、⛔ 改票名/Status:；料＝起手四把尺现量＋整族170枚名册155枚分11族求和＋逐枚三形载体file:line＋两枚真盘正控与marshal逐字＋票329之后五条腐烂/两条未腐烂更正）
+
+.scratch/wisp/issues/332-cf-invisible-runes-outside-display-boundary-reachability-census.md
+===== 0ded45496 =====
+0ded45496 2026-10-17 10:38:58 +0800 332-a1 证据件＝票 332 只读普查交件自证三把尺＋AC#3 真盘与 marshal 逐字＋成对反向读数＋两枚必答题（判定层相反名单 6+2059 枚与其取向理由逐字引它自己注释；票 329 之后 327-a1 最后一跳那条读数已腐烂并给出今天准确的射程）
+
+docs/evidence/s1/332-a1-cf-reachability.md
+===== b790fae99 =====
+b790fae99 2026-10-17 10:38:57 +0800 332-a1 名册件：本腿逐枚 git show --name-only（尺＝git log 7535d83b..HEAD 限本腿写面，16 个块、越格写面命中 0）
+
+.scratch/wisp/probes/332/a1/logs/commits-roster.log
 ===== 4f897c7ab =====
 4f897c7ab 2026-10-17 10:36:36 +0800 332-a1 件2 一处措辞更正（占位符尺扫到自己写的转义词汇名 XXXX 形，改为"反斜杠加 u 加四位十六进制"逐字描述；读数一字未动）
 
@@ -63,3 +76,21 @@ e1dbd5ddf 2026-10-17 10:28:41 +0800 332-a1 AC#1 名册底表：170 枚 Cf 逐枚
 37741f052 2026-10-17 10:18:32 +0800 332-a1 起手尺①③④原始转储（一）：具名提交树 7535d83b 的 internal/panel/display_scrub_216.go 全文（isDisplayWashCf 名单逐枚＝15 枚，尺＝git show <锚>:<路径> | 数 case 支里的码面枚数，非 grep -c 'case 0x'＝1 因为那是跨行单条 case）
 
 .scratch/wisp/probes/332/a1/logs/roster-display-scrub-216-at-7535d83b.log
+===== ba4fe25dd =====
+ba4fe25dd 2026-10-17 10:15:39 +0800 第十六波派单存档（六枚）＋立票 332：228-r3 接托盘「退出」真执行者（cmd/wisp＋internal/proc，修法乙-1）∥ 327-r2 把名册基数常钉搬进仓内（internal/panel 测试面，残余 R1）∥ 329-v1／330-v1／331-v1 三枚非实现者终裁（★各自必须重放落地铁没跑或在仓外才跑的那几发）∥ 332-a1 只读普查 Cf 全族 170 枚里边界外那 155 枚的可达性（残余 R2 欠的那一纸所需料）
+
+.scratch/wisp/issues/332-cf-invisible-runes-outside-display-boundary-reachability-census.md
+.scratch/wisp/probes/orch/20261017/txt/228r3-dispatch.txt
+.scratch/wisp/probes/orch/20261017/txt/228r3-head.txt
+.scratch/wisp/probes/orch/20261017/txt/327r2-dispatch.txt
+.scratch/wisp/probes/orch/20261017/txt/327r2-head.txt
+.scratch/wisp/probes/orch/20261017/txt/329v1-dispatch.txt
+.scratch/wisp/probes/orch/20261017/txt/329v1-head.txt
+.scratch/wisp/probes/orch/20261017/txt/330v1-dispatch.txt
+.scratch/wisp/probes/orch/20261017/txt/330v1-head.txt
+.scratch/wisp/probes/orch/20261017/txt/331v1-dispatch.txt
+.scratch/wisp/probes/orch/20261017/txt/331v1-head.txt
+.scratch/wisp/probes/orch/20261017/txt/332a1-dispatch.txt
+.scratch/wisp/probes/orch/20261017/txt/332a1-head.txt
+.scratch/wisp/probes/orch/20261017/txt/msg-wave16.txt
+.scratch/wisp/probes/orch/20261017/txt/wave16-common.txt
