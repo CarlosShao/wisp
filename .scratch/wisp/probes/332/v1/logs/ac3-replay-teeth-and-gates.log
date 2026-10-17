@@ -1,0 +1,110 @@
+# 332-v1 AC#3 replay (two off-roster controls) + AC#1/AC#2 teeth (two mutations) + gates
+leg=332-v1 date=2026-10-17 11:41:36 +0800  everything read from named commit trees, never the working tree.
+
+## part 1 - AC#3, this legs own disk + marshal replay
+anchor=7535d83b  boundary extract sha256=24effc03b02658eb30629eadaad11589dd10131c4cde3529f745635106ed217c (display_scrub_216.go lines 106-136,164-175,179-199,211-220)
+probe = D:\W332V1EXP\diskprobe\main.go sha256=1ff0ccc494919357fc22b83b09492aa7386f7e5b55679f7356d5da31d162d501 = the verbatim extract + own tail (sha256=c199e1398a16a362c185ce782329b4eec356536d8faa7d0d1b22ef3cd4300b09); stdlib only, zero repo imports
+run   = go run ./main.go (go version go1.27.1 windows/amd64) rc=0 stderr_bytes=0; disk = NTFS on D:, dirs outside the repo; name shape copied from the census: photo+<rune>+report.txt
+  SUBJECT-U+2061 cp=U+2061 on_disk_hit=1 disk_hex=70686f746fe281a17265706f72742e747874 rune_hex=E281A1 needsDisplayWash=false changed_by_boundary=false
+  SUBJECT-U+2061   MARSHAL_RAW    hex=2270686f746fe281a17265706f72742e74787422 sha256=da1e771280e63fd92d26d37464bfc6cfd6611f8f8e7dab4dda7a6767b3af889b
+  SUBJECT-U+2061   MARSHAL_WASHED hex=2270686f746fe281a17265706f72742e74787422 sha256=da1e771280e63fd92d26d37464bfc6cfd6611f8f8e7dab4dda7a6767b3af889b text="photo⁡report.txt"
+  SUBJECT-U+2061   rune_bytes_present_in_MARSHAL_RAW=true present_in_MARSHAL_WASHED=true
+  SUBJECT-U+206B cp=U+206B on_disk_hit=1 disk_hex=70686f746fe281ab7265706f72742e747874 rune_hex=E281AB needsDisplayWash=false changed_by_boundary=false
+  SUBJECT-U+206B   MARSHAL_RAW    hex=2270686f746fe281ab7265706f72742e74787422 sha256=bb7a8ae1915fe249edc6b8b6165788e4b7140337f38f038966f90a352ffdd4db
+  SUBJECT-U+206B   MARSHAL_WASHED hex=2270686f746fe281ab7265706f72742e74787422 sha256=bb7a8ae1915fe249edc6b8b6165788e4b7140337f38f038966f90a352ffdd4db text="photo⁫report.txt"
+  SUBJECT-U+206B   rune_bytes_present_in_MARSHAL_RAW=true present_in_MARSHAL_WASHED=true
+  POSCTRL-IN-ROSTER-U+202E cp=U+202E on_disk_hit=1 disk_hex=70686f746fe280ae7265706f72742e747874 rune_hex=E280AE needsDisplayWash=true changed_by_boundary=true
+  POSCTRL-IN-ROSTER-U+202E   MARSHAL_RAW    hex=2270686f746fe280ae7265706f72742e74787422 sha256=3a30557b3b5941fc32a8cf3af9419935d16494896c557ebeabd36e677a32a77a
+  POSCTRL-IN-ROSTER-U+202E   MARSHAL_WASHED hex=2270686f746f5c5c75323032657265706f72742e74787422 sha256=158adf0dba164bed530679ebffe7ea4ad0555e568497c7edf31b5f8d29c29bb5 text="photo\\u202ereport.txt"
+  POSCTRL-IN-ROSTER-U+202E   rune_bytes_present_in_MARSHAL_RAW=true present_in_MARSHAL_WASHED=false
+  POSCTRL-ADJACENT-U+206A cp=U+206A on_disk_hit=1 disk_hex=70686f746fe281aa7265706f72742e747874 rune_hex=E281AA needsDisplayWash=false changed_by_boundary=false
+  POSCTRL-ADJACENT-U+206A   MARSHAL_RAW    hex=2270686f746fe281aa7265706f72742e74787422 sha256=08e72d39e82daa734e304527a906f2aab2b3352df7ecdfc2554de8f0dce86360
+  POSCTRL-ADJACENT-U+206A   MARSHAL_WASHED hex=2270686f746fe281aa7265706f72742e74787422 sha256=08e72d39e82daa734e304527a906f2aab2b3352df7ecdfc2554de8f0dce86360 text="photo⁪report.txt"
+  POSCTRL-ADJACENT-U+206A   rune_bytes_present_in_MARSHAL_RAW=true present_in_MARSHAL_WASHED=true
+  POSCTRL-Cc-ESCAPABLE-U+0085 cp=U+0085 on_disk_hit=1 disk_hex=70686f746fc2857265706f72742e747874 rune_hex=C285 needsDisplayWash=true changed_by_boundary=true
+  POSCTRL-Cc-ESCAPABLE-U+0085   MARSHAL_RAW    hex=2270686f746fc2857265706f72742e74787422 sha256=6a2e8b4dd7f9e8903487129b44b8dc820f7a44ad96fe883fc1354cf4cf585fa6
+  POSCTRL-Cc-ESCAPABLE-U+0085   MARSHAL_WASHED hex=2270686f746f5c5c7838357265706f72742e74787422 sha256=516fc4c4df1900f8ed82a555b237692bd902c983108479b420d14175239d8d3a text="photo\\x85report.txt"
+  POSCTRL-Cc-ESCAPABLE-U+0085   rune_bytes_present_in_MARSHAL_RAW=true present_in_MARSHAL_WASHED=false
+  NEGCTRL-Cc-ESC-U+001B cp=U+001B WRITE_OR_READBACK_FAIL err=open D:\W332V1EXP\disk2061\photoreport.txt: The filename, directory name, or volume label syntax is incorrect.
+-- independent reproduction of the census values (its log vs mine, sha256 of the emitted marshal bytes)
+  cp      census_sha_set  v1_sha_set  bit_for_bit_reproduced  value
+  U+2061   1               1           True                  ['da1e771280e63fd92d26d37464bfc6cfd6611f8f8e7dab4dda7a6767b3af889b']
+  U+206B   1               1           True                  ['bb7a8ae1915fe249edc6b8b6165788e4b7140337f38f038966f90a352ffdd4db']
+  U+202E   1               2           True                  ['158adf0dba164bed530679ebffe7ea4ad0555e568497c7edf31b5f8d29c29bb5']
+  marshal_hex_strings_of_the_photo_rune_report_dot_txt_shape: census=6 v1=7 shared=4
+  shared = ['2270686f746f5c5c75323032657265706f72742e74787422', '2270686f746fe280ae7265706f72742e74787422', '2270686f746fe281a17265706f72742e74787422', '2270686f746fe281ab7265706f72742e74787422']
+  only_in_v1 (controls this leg added: neighbour U+206A, C1 control U+0085) = ['2270686f746f5c5c7838357265706f72742e74787422', '2270686f746fc2857265706f72742e74787422', '2270686f746fe281aa7265706f72742e74787422']
+  only_in_census (its own ESC-family controls) = ['2270686f746f5c5c7831627265706f72742e74787422', '2270686f746f5c75303031627265706f72742e74787422']
+-- the controls in the same run: IN-ROSTER U+202E is washed to the visible escape (raw e280ae then ABSENT from the
+   washed bytes, PRESENT in the unwashed ones); NEIGHBOUR U+206A (off roster) behaves like the two subjects;
+   C1 U+0085 is washed by the unicode.IsControl arm; C0 U+001B cannot even be an NTFS name (volume-label syntax error).
+certifies: real name -> readback -> the verbatim 7535d83b boundary -> encoding/json leaves both subjects untouched, bit for bit.
+does not certify: that a human saw anything (see part 2 and the last-hop ruler in logs/ac2-carrier-citations-at-7535d83b.log).
+
+## part 2 - teeth: two mutations, both on the PHYSICAL BYTES of the off-tree export copy (no tracked file, no -overlay)
+table = git archive eb82a4d5 go.mod go.sum internal cmd tools scripts frontend models + repo-root docs/ + three manual
+        pieces (build/*.dll, third_party/sherpa-onnx/*.dll, frontend/dist) into D:\W332V1EXP\tree
+        (D: volume, 8.3 alias D:\W332V1~1; a bare /tmp copy would land on C: Temp and redden the short-name family).
+go files in the table=753 ; internal/panel go files=44 (0 would be a broken table, not a reading)
+the exported body is the roster body this leg rules on: git hash-object tree/internal/panel/display_scrub_216.go = 9d94b46ec0a52b9d7f3fe8a8d414d8edf09fdbbd
+and eb82a4d5:internal/panel/display_scrub_216.go = 9d94b46ec0a52b9d7f3fe8a8d414d8edf09fdbbd = 7535d83b:the same file
+temp-root pair (the legs reading touches t.TempDir() inside ./internal/panel): TMP/TEMP+GOTMPDIR on D: => RUN=255 PASS_TOP=158 FAIL_TOP=7 SKIP=0 rc=1
+                                         TMP/TEMP unset (C: default) => RUN=255 PASS_TOP=158 FAIL_TOP=7 SKIP=0 rc=1
+  fail-name set identical between the two roots: yes
+  the 7 baseline reds are台面-attributed and none is a display-boundary test: TestApprovalCardViewJSONKeysMatchFrontendTypes TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 TestStreamLogDroppedNamingLedgerIsNotBounded35r8 TestComposerContractTypesMatchFrontend TestComposerRenderFixtureTellsTheTruth TestReadGitOnThisRepositoryIsSelfConsistent TestC21DesignTokensFourWayAgree 
+  (four read frontend/design sources that the archive does not carry whole, two are the 35r8 live-heap instruments,
+   one needs a .git directory the export tree has not got: TestReadGitOnThisRepositoryIsSelfConsistent).
+-- scoped baseline at the unmutated body (-run TestDisplayWash|TestEveryNamedCfRune|TestNeedsDisplayWash|TestTheRosterIsClosed|TestTheWriterBranch): RUN=7 PASS_TOP=7 FAIL_TOP=0 SKIP=0 rc=0
+
+### SHOT M1 - silent ADD of U+2061, i.e. break the census OUT/RAW row for the very rune its AC#3 names
+content anchor: the case line '0x2066, 0x2067, 0x2068, 0x2069:' -> '0x2061, 0x2066, 0x2067, 0x2068, 0x2069:'
+scoped after the shot: RUN=7 PASS_TOP=4 FAIL_TOP=3 SKIP=0 rc=1
+  --- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.00s)
+  --- FAIL: TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen (0.00s)
+  --- FAIL: TestDisplayWashRosterExcludesTheEightNamedRunes (0.00s)
+  RED     display_scrub_216_test.go:448: U+2061 is not on the ruled list but needsDisplayWash fired on it
+  RED     display_scrub_216_test.go:451: U+2061 is not on the ruled list but the wash changed it: "photo\u2061.png" -> "photo\\u2061.png"
+  RED     display_scrub_327r2_test.go:70: nail 1: product-washed=16, ruled-list=15
+  RED     display_scrub_327r2_test.go:72: the product washes Cf runes the ruling never named: [U+2061] (ruled=15 product=16)
+  RED     display_scrub_327r2_test.go:80: product roster cardinality=16, want 15
+  RED     display_scrub_327r2_test.go:91: U+2061 is off the ruled list but isDisplayWashCf washed it
+  RED     display_scrub_327r2_test.go:95: U+2061 is off the ruled list but needsDisplayWash fired on "photo\u2061.png"
+  RED     display_scrub_327r2_test.go:98: U+2061 is off the ruled list but the wash changed it: "photo\u2061.png" -> "photo\\u2061.png"
+  RED     display_scrub_327r2_test.go:147: nail 3 scope: full Cf=170, full Cc=65, boundary sample=22, disagreements=0
+full package after the shot: RUN=255 PASS_TOP=155 FAIL_TOP=10 SKIP=0 rc=1 ; new fail names vs baseline: TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen, TestDisplayWashRosterExcludesTheEightNamedRunes, TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+  three nails catch the ADD: nail 1 (cardinality both ways), nail 2 (the eight named exclusions) and the 216-era
+  TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut. nail 3 (judge-vs-writer one-set) stayed GREEN - disagreements=0 -
+  because both arms read the same predicate, so it pins the two-sides-are-one-set property, never the roster membership.
+restore: the harness wrote the pristine bytes back in a finally block and compared them (matches_pristine=True printed
+  for BOTH shots); re-measured now, git hash-object of the table file = 9d94b46ec0a52b9d7f3fe8a8d414d8edf09fdbbd
+  = the 7535d83b/eb82a4d5 blob, so the table is byte-identical to the body this verdict rules on.
+
+### SHOT M2 - silent REMOVE of U+FEFF, a DIFFERENT landing line and the opposite direction (breaks an IN/WASHED row)
+content anchor: the case line '0x2060, 0xFEFF,' -> '0x2060,'
+scoped after the shot: RUN=7 PASS_TOP=4 FAIL_TOP=3 SKIP=0 rc=1
+  --- FAIL: TestNeedsDisplayWashNamesEveryWashedCfRune (0.00s)
+  --- FAIL: TestEveryNamedCfRuneIsEscapedAndNeverDeleted (0.00s)
+  --- FAIL: TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen (0.00s)
+  RED     display_scrub_216_test.go:368: needsDisplayWash did not see byte order mark (U+FEFF) in "photo\ufeff.png": the fast path would return it raw
+  RED     display_scrub_216_test.go:407: byte order mark (U+FEFF) survived the wash as itself in "photo\ufeff报告.png"
+  RED     display_scrub_216_test.go:411: scrubForDisplay("photo\ufeff报告.png") = "photo\ufeff报告.png", want "photo\\ufeff报告.png"
+  RED     display_scrub_327r2_test.go:70: nail 1: product-washed=14, ruled-list=15
+  RED     display_scrub_327r2_test.go:76: a ruled rune is no longer washed by the product: [U+FEFF] (ruled=15 product=14)
+  RED     display_scrub_327r2_test.go:80: product roster cardinality=14, want 15
+  RED     display_scrub_327r2_test.go:147: nail 3 scope: full Cf=170, full Cc=65, boundary sample=22, disagreements=0
+full package after the shot: RUN=255 PASS_TOP=155 FAIL_TOP=10 SKIP=0 rc=1 ; new fail names vs baseline: TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen, TestEveryNamedCfRuneIsEscapedAndNeverDeleted, TestNeedsDisplayWashNamesEveryWashedCfRune
+restore hash: same as above. Full package after all restores: RUN=255 PASS_TOP=158 FAIL_TOP=7 SKIP=0 rc=1 (fail-name set identical to baseline)
+
+### what the two shots buy this verdict
+M1 reddens exactly the tests that read the product over every scalar and compare against the ruling list, and M2 reddens
+the named-Cf escape tests, on DIFFERENT lines. So the census tables WASHED/RAW column is not a reading of a comment: it is
+pinned by in-repo nails that go red in both directions. The census claim '名单外不洗' therefore has teeth, and its 155-row
+OUT set is what those nails would have contradicted had the boundary covered the whole Cf category.
+
+## part 3 - gates, run in the SHARED working tree (this leg ships zero Go bytes)
+gofumpt -l over this legs surfaces: rc=0 (no .go file to format)
+scripts/d22scan.sh: rc=0 ; verdict line: d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=583, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 583 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+scripts/check-path-length-budget.sh: rc=0 ; verdict line: check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+go vet: NOT RUN and recorded as 不适用 - this leg produces no Go package, and vetting ./internal/panel/ or ./cmd/wisp/ in the
+  shared tree would compile 333-r1 / 228-r3 in-flight bytes, which the dispatch forbids.
+no go test / go build / go vet was run in the shared working tree; the only test runs happened in D:\W332V1EXP\tree.
