@@ -67,7 +67,26 @@ func toStrings216(in []RuleID) []string {
 
 // TestFileBaseNameClaimChangesNoClassOrReason is carrier 1, both tiers.
 func TestFileBaseNameClaimChangesNoClassOrReason(t *testing.T) {
-	dir := t.TempDir()
+	// Ticket 334 AC#3 added this world; NO assertion below was touched, and the
+	// tier each pair must agree on is still the one the table says.
+	//
+	// Why it was needed: on the CI surface (GOTMPDIR built from %LOCALAPPDATA%,
+	// scripts/portable-tests.sh:152-159, TMP/TEMP untouched) t.TempDir() roots
+	// the candidate INSIDE the profile. The hostile arm carries U+001B, which
+	// Lstat refuses to parse - "syntax is incorrect", not "no such file" - so
+	// pathExists leaves its spelling unproven (partial), and any A anchor whose
+	// leaf is not installed here (say ~/.aws) has its own expansion stopped at
+	// the home. uncertainAnchorMiss then sees two ancestry-related roots with an
+	// unproven side and fail-closes to a non-overridable A. That is a reading of
+	// ANCHORS, not of the claim in the name: the instrument was observing
+	// something other than what it claims, and going red on CI for it.
+	//
+	// candidateOffAnchorChain334 relocates the profile beside the candidate, so
+	// no A anchor shares an ancestry chain with it and the claim differential is
+	// the only thing left observable. The inside-profile shape is not dropped:
+	// ticket 334 keeps it as a named reading plus a pinned level (see
+	// anchor_miss_reason_334_test.go).
+	dir := candidateOffAnchorChain334(t)
 	cases := []struct {
 		name           string
 		plain, hostile string
