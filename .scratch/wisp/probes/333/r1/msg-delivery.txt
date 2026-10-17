@@ -1,0 +1,26 @@
+票 333 产码腿 333-r1·交件＝证据件＋票尾一条 bullet＋AC#6 双色四发与门禁四数入库
+
+docs/evidence/s1/333-r1-display-cf-category.md（78 行／14238 字节，短名、⛔ 带 §、⛔ 0 字节）＝
+AC#0–AC#8 逐格读数与尺，含 AC#3 两枚钉的旧名→新名映射、排除八枚逐枚带 Unicode 正名、
+AC#5 两发的落点／哈希／红名册作差、AC#7 全链 file:line 与"最后一跳"的据实修正。
+.scratch/wisp/issues/333-…-not-hand-roster.md＝票尾**只追加一条** bullet（numstat＝2/0，零删除行；
+未翻任何 AC 框：现跑 grep -c '^[[:space:]]*- \[ \]'＝9、'- \[x\]'＝0；- Status 行命中 0）。
+
+AC#6 交付侧两发（同一条 go test -v ./internal/panel/ -count=1 -timeout 30m，只挪临时根所在卷）：
+  post-c（C:\Users\swq\AppData\Local\Temp，GOTMPDIR 未设）RUN=257 PASS_TOP=161 FAIL_TOP=6 SKIP=0
+  post-d（D:\wisp-333r1-tmp\tmp ＋ GOTMPDIR …\gotmp，先 mkdir -p）同 257/161/6/0
+成对核对＝两枚台面名行序列剥耗时 424⇄424、差异名行 0 ⇒ 本包这一波没有 A1013 那一族差一枚红。
+红名册 comm 作差（改前 5 ⇄ 交件 6）：gone＝空（⛔ 一枚也没少）、new＝TestTheRosterIsClosedAgainstThe
+RunesTheRulingLeftOut（★上报那枚，⛔ 本腿写面、⛔ 我放宽）、kept＝改前五枚逐字同名。
+算式：顶层名数 165→167＝我新增两枚用例且两枚都绿；PASS_TOP 160→161＝+2 新绿 −1 枚绿转红；
+FAIL_TOP 5→6＝正是那枚绿转红。四数⛔ 混台面、⛔ 相减。
+
+门禁四数（只在共享工作树，logs/gates-four.log，逐枚落 rc）：
+  gate1 gofumpt -l（三枚件）rc=0 列表空 / gate2 d22scan rc=0 clean（ban #8 internal/=583＋cmd/=143
+  ＋design/=39＋frontend/=116，ban #1-5 internal/=241＋cmd/=42，ban #6 116，ban #7 25）
+  / gate3 path-length-budget rc=0 VERDICT GREEN（tracked=14782 over-budget=60 covered=60 not-in-roster=0）
+  / gate4 go vet ./internal/panel/ rc=0
+占位符尺（logs/placeholders.log）＝三枚代码件 0／证据件 1（那一枚是写下这把尺的那一行自己，逐行点名）。
+★上报待裁两笔（本腿⛔ 自裁）：① 设计外红一枚（见上，处方＝翻向或作废，请拍一纸）；
+② display_scrub_216.go :90/:92/:193 三处过期散文（改了会把码位界尺带进 AC#2 新增行、与那把尺对撞），
+   账同 R4 那一形，归编排者另裁。⛔ push（推送只由编排者做）。

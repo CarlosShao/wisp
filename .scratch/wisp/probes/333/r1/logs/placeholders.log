@@ -1,0 +1,13 @@
+PLACEHOLDER RULER, form = grep -c -E '\b(TODO|FIXME|XXX)\b|待补|占位', per file, 0 means clean:
+  internal/panel/display_scrub_216.go => 0
+  internal/panel/display_scrub_327r2_test.go => 0
+  internal/panel/display_scrub_333_333r1_test.go => 0
+  docs/evidence/s1/333-r1-display-cf-category.md => 1
+self-reference disclosed: the 1 hit in the evidence file is this ruler's own sentence:
+  73:占位符尺（分词形四类词，逐件跑，日志 `logs/placeholders.log`）：三
+byte sizes (no 0-byte artifact):
+  11380 internal/panel/display_scrub_216.go
+   5909 internal/panel/display_scrub_327r2_test.go
+   4875 internal/panel/display_scrub_333_333r1_test.go
+  14238 docs/evidence/s1/333-r1-display-cf-category.md
+  36402 total

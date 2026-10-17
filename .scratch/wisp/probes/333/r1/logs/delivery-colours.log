@@ -1,0 +1,15 @@
+DELIVERY COLOURS, 2026-10-17 11:32 +08, shared working tree, command identical to the pre pair (only TMP/TEMP/GOTMPDIR moved).
+  post-c: RUN=257 PASS_TOP=161 FAIL_TOP=6 SKIP=0  bytes=61946
+  post-d: RUN=257 PASS_TOP=161 FAIL_TOP=6 SKIP=0  bytes=63707
+surface pair check (post): name-line sequences c vs d, elapsed stripped, diff must be 0
+  name_lines_c=424 name_lines_d=424 DIFFERENT=0
+red roster delta pre(5) vs post(6), ruler = comm of the two FAIL name lists:
+  gone (must be empty):
+  new:
+     TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+  kept:
+     TestApprovalCardViewJSONKeysMatchFrontendTypes
+     TestC21DesignTokensFourWayAgree
+     TestComposerContractTypesMatchFrontend
+     TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+     TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
