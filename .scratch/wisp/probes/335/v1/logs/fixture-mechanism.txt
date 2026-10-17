@@ -1,0 +1,56 @@
+# 335-v1 fixture mechanism closed 2026-10-17 13:37:43 +0800
+ruler: awk EOL census per line (counted not grepped)
+worktree LF-only line numbers (no CR before NL):
+  line 1 len=25
+  line 2 len=1116
+  line 3 len=86
+  line 4 len=163
+  line 5 len=72
+  line 6 len=474
+  line 7 len=76
+  line 8 len=203
+  line 9 len=87
+  line 10 len=691
+  line 11 len=87
+  line 12 len=176
+  line 13 len=72
+  line 14 len=1060
+  line 15 len=0
+  line 16 len=39
+  line 17 len=236
+  line 18 len=1854
+  line 19 len=86
+  line 20 len=166
+  line 21 len=72
+  line 22 len=474
+  line 23 len=76
+  line 24 len=203
+  line 25 len=87
+  line 26 len=735
+  line 27 len=87
+  line 28 len=176
+  line 29 len=72
+  line 30 len=1464
+  line 31 len=0
+  line 32 len=48
+  line 33 len=1974
+  line 34 len=86
+  line 35 len=166
+  line 36 len=72
+  line 37 len=474
+  line 38 len=76
+  line 39 len=203
+  line 40 len=87
+  line 41 len=735
+  line 42 len=87
+  line 43 len=176
+  line 44 len=72
+  line 45 len=1482
+archive copy LF-only lines:
+  count=45
+
+MECHANISM (three layers, all measured this leg):
+  blob(23d36a81)=16604 all-LF; git archive with core.autocrlf=true + '* text=auto' smudges to CRLF on export => archive=16604+45CR=16649;
+  worktree checkout copy has 37 CRLF + 8 bare-LF lines => 16604+37=16641;
+  delta 16649-16641 = 8 CR bytes = the 8 LF-only lines above (external frontend-agent writes normalized those lines to LF; git status stays clean because autocrlf diff strips CR and content is otherwise identical (cmp proof in fixture-deep-probe.txt)).
+  consequence for the fixture nail: red in export tree = CRLF-vs-LF byte shape at the read, not ticket-335 content; in shared tree it reads the mixed-LF copy and passes (legs final run FAIL=5 includes not this nail).

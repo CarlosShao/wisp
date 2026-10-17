@@ -1,0 +1,29 @@
+# 335-v1 fixture deep probe 2026-10-17 13:36:08 +0800
+--- CR/LF byte census (ruler: tr -d inverse-count, counted not grepped) ---
+FILE=frontend/fixtures/composer-states.html bytes=16641 CR=37 LF=45
+FILE=/d/V335V1/T/frontend/fixtures/composer-states.html bytes=16649 CR=45 LF=45
+BLOB_23d36a81: bytes=16604 CR=0 LF=45
+--- worktree-vs-blob content (normalize CRLF->LF both, then cmp) ---
+WORKTREE==BLOB_AFTER_CRLF_STRIP
+ARCHIVE==BLOB_AFTER_CRLF_STRIP
+--- archive-vs-worktree direct diff first 40 lines ---
+1c1$
+< <!-- no host attached -->$
+---$
+> <!-- no host attached -->^M$
+14,16c14,16$
+<               enabled:active:scale-[0.94] disabled:pointer-events-none disabled:opacity-50" disabled="" style="background:var(--line-strong);color:var(--ink-2)" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send size-4" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg></button></div></div><div class="flex flex-wrap items-center justify-between gap-2"><div aria-label="M-fM-^]M-^CM-iM-^YM-^PM-fM-!M-#M-dM-=M-^MM-oM-<M-^HM-eM-^OM-*M-hM-/M-;M-fM-^XM->M-gM-$M-:M-oM-<M-^LM-gM-^BM-9M-eM-^GM-;M-dM-;M-^EM-eM-^OM-^QM-hM-5M-7M-eM-^HM-^GM-fM-^MM-"M-hM-/M-7M-fM-1M-^BM-oM-<M-^I" class="flex flex-wrap items-center gap-1.5" role="group"><button class="inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium transition-colors duration-100 bg-accent-tint text-accent-ink" type="button">M-fM-!M-#M-dM-=M-^MM-fM-^\M-*M-gM-^_M-%</button></div><span class="shrink-0 text-[11px] text-ink-3">Enter M-eM-^OM-^QM-iM-^@M-^A M-BM-7 Shift+Enter M-fM-^MM-"M-hM-!M-^L</span></div></div>$
+< $
+< <!-- workspace chosen, video stored -->$
+---$
+>               enabled:active:scale-[0.94] disabled:pointer-events-none disabled:opacity-50" disabled="" style="background:var(--line-strong);color:var(--ink-2)" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send size-4" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg></button></div></div><div class="flex flex-wrap items-center justify-between gap-2"><div aria-label="M-fM-^]M-^CM-iM-^YM-^PM-fM-!M-#M-dM-=M-^MM-oM-<M-^HM-eM-^OM-*M-hM-/M-;M-fM-^XM->M-gM-$M-:M-oM-<M-^LM-gM-^BM-9M-eM-^GM-;M-dM-;M-^EM-eM-^OM-^QM-hM-5M-7M-eM-^HM-^GM-fM-^MM-"M-hM-/M-7M-fM-1M-^BM-oM-<M-^I" class="flex flex-wrap items-center gap-1.5" role="group"><button class="inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium transition-colors duration-100 bg-accent-tint text-accent-ink" type="button">M-fM-!M-#M-dM-=M-^MM-fM-^\M-*M-gM-^_M-%</button></div><span class="shrink-0 text-[11px] text-ink-3">Enter M-eM-^OM-^QM-iM-^@M-^A M-BM-7 Shift+Enter M-fM-^MM-"M-hM-!M-^L</span></div></div>^M$
+> ^M$
+> <!-- workspace chosen, video stored -->^M$
+--- ls-files -v flag check ---
+H frontend/fixtures/composer-states.html
+--- autocrlf + safe-crlf ---
+true
+--- blob touched when? ---
+424ac84d9 2026-09-25 23:46:36 feat(frontend beautiful-ui 转向): demo 路线废弃，收编库主题为 token 第四代 + 全组件 props 化 + 主流 showcase harness
+ab7afcada 2026-09-25 20:34:14 feat(frontend 第一批·demo 重构): token 第三代 + 窗口骨架 + 对话/审批/输入行按 demo 重建
+a21336ea3 2026-09-25 11:19:08 fix(前端·收回我自己的错): 3b59512 把 <= 直接写进 JSX 文本，typecheck 从那天起是红的

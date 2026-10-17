@@ -1,0 +1,31 @@
+# 335-v1 fixture byte-diff probe 2026-10-17 13:33:20 +0800
+ruler: wc -c of three sources for frontend/fixtures/composer-states.html
+worktree_now=16641
+blob_23d36a81=16604
+blob_a06a73d8=16604
+blob_859026d2=16604
+archive_copy_23d36a81=16649
+---git status of file---
+---worktree-vs-blob-equal---
+DIFF
+---diff-bytes-ls-files-stage---
+100644 e1457697078fef84a85a33db98d628e82cda15df 0	frontend/fixtures/composer-states.html
+---gitattributes/core.autocrlf---
+true
+.gitattributes
+* text=auto
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.go text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+*.sse text eol=lf
+models/manifest.json -text
+models/manifest.json.minisig -text
+docker/model-mirror/fixtures/** binary
+---CRLF-count-in-worktree---
+0
+---linecount---
+   45 frontend/fixtures/composer-states.html
+   45 /d/V335V1/T/frontend/fixtures/composer-states.html
+   90 total
