@@ -1,0 +1,70 @@
+### 330-v1 gates + zero-production-byte ruler (shared worktree, run 2026-10-17 ~10:2x +08)
+### scope note: every colour/mutation number in this leg was measured on my OWN out-of-repo
+### export tree D:\tmp\w330v1 (git archive b9069dfa, delivery tip). Gates below run in the
+### shared worktree per dispatch (门禁四数只在共享工作树). Do NOT cross-subtract these with
+### 330-r2's or the orchestrator's numbers - three different tables.
+
+# ---- gate 1: gofumpt -l on the two delivered 330-r2 files ----
+cmd: /d/work/base/gopath/bin/gofumpt.exe -l internal/agent/plan_present_doorbell_165r3_test.go internal/agent/plan_present_crowded_world_330r2_test.go
+output: (empty)
+gofumpt_specific_rc=0
+
+# ---- gate 1b: gofumpt -l internal/agent/ (dir) ----
+output:
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+gofumpt_dir_rc=0
+note: the two listed files are pre-existing drift, NOT touched by feab45e3..b9069dfa; 330-r2's
+      two files are absent from the list => clean. Matches 330-r2 evidence section 7.
+
+# ---- gate 2: sh scripts/d22scan.sh ----
+d22_rc=0
+findings mentioning internal/agent or 330: (none)
+note: at 330-r2's delivery time d22scan returned rc=1 with the single finding
+      cmd/wisp/panel_snapshot_deliver_329.go:14 (parallel leg 329-r1's in-flight byte, NOT 330-r2's
+      file). That byte has since landed; on today's shared worktree d22scan is fully clean rc=0.
+      Either way the finding never belonged to 330-r2's internal/agent face.
+
+# ---- gate 3: sh scripts/check-path-length-budget.sh ----
+tail: VERDICT GREEN - every over-budget tracked path is rostered by name; roster equals the tree
+length_rc=0
+
+# ---- gate 4: go vet ./internal/agent/ ----
+output: (0 bytes)
+vet_rc=0
+
+# ---- zero-production-byte ruler (committed delivery range) ----
+cmd: git diff --name-only feab45e3..b9069dfa -- internal/agent
+  internal/agent/plan_present_crowded_world_330r2_test.go
+  internal/agent/plan_present_doorbell_165r3_test.go
+cmd: ... | grep -vE '(_test\.go|^internal/agent/testdata/)'
+output: (empty)
+zero_prod_ruler_rc=1   # grep -vE found 0 non-test lines => 330-r2 touched ZERO production bytes
+
+# ---- positive control (proves the ruler is not blind to production bytes) ----
+# shape A: does the filter let a production filename through?
+printf 'internal/agent/inject.go\ninternal/agent/foo_test.go\n' | grep -vE '(_test\.go|^internal/agent/testdata/)'
+  internal/agent/inject.go            # <-- inject.go survives the filter
+filter_passes_prod_rc=0
+# shape B: clone --local b9069dfa, edit PRODUCTION inject.go (MaxRetrievedTools 5 -> 5+1), diff working tree
+git diff --name-only feab45e3 -- internal/agent | grep -vE '(_test\.go|^internal/agent/testdata/)'
+  internal/agent/inject.go            # <-- ruler FLAGS the production edit
+posctl_rc=0
+conclusion: the ruler reports empty for 330-r2 (zero prod bytes) AND non-empty when a production
+            byte really changes => both shapes distinguishable, the ruler is NOT 恒真/失明.
+
+# ---- AC#3 vacuity replay (independent, my tree) ----
+# needle: replace `n := sinkCount165r3(rows, planPresentName165r3)` with a constant `n := 1`
+# on the 165 doorbell case, run only TestPlanPresentCallBooksTheToolCallRow165r3
+rc=0   # stays GREEN even with the sink count faked => the :131 count gate is truly redundant
+restored_doorbell_sha=6542773d3d2edcc6d554a47f091ce2dffe35586a92c1f948f79c361454683fca matches_baseline=True
+=> the new :131 comment ("REDUNDANT NON-ZERO GATE, not THE JUDGMENT ... tooth ... line 145
+   below (rowOfTool165r3, :95-105)") is honest; the real tooth is the independent row walk at :145.
+
+# ---- production wiring spot-checks (file:line, all real, none phantom) ----
+internal/agent/loop.go:573        -> inj := Inject(latestUserText(l.History()), dir, l.b)   # prod caller
+internal/agent/inject.go:47       -> if t.Resident {                                        # arm split
+internal/agent/inject.go:55       -> scored := bm25Select(query, candidates, MaxRetrievedTools, b.SectionToolIndex)
+internal/agent/inject.go:238      -> if used+cost > budget && len(out) > 0 {                # budget clip
+internal/tools/plan_present.go:72 -> func (planPresent) Name() string { return "plan.present" }  # real roster name
+internal/tools/bridge.go:13       -> "github.com/CarlosShao/wisp/internal/agent"            # the import-cycle constraint cited by 330-r2

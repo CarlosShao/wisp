@@ -1,0 +1,30 @@
+### rc=0
+time=2026-10-17T10:22:05.317+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCrowdedWorldStillOffersTheBrake330r2
+time=2026-10-17T10:22:05.339+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\w330v1tmp\TestCrowdedWorldStillOffersTheBrake330r21255487316\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T10:22:05.374+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\w330v1tmp\TestCrowdedWorldStillOffersTheBrake330r21255487316\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T10:22:05.388+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T02:22:05Z duration_ms=12
+time=2026-10-17T10:22:05.400+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\w330v1tmp\TestCrowdedWorldStillOffersTheBrake330r21255487316\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T10:22:05.409+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T02:22:05Z duration_ms=9
+time=2026-10-17T10:22:05.420+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\w330v1tmp\TestCrowdedWorldStillOffersTheBrake330r21255487316\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T10:22:05.439+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T02:22:05Z duration_ms=17
+time=2026-10-17T10:22:05.446+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T10:22:05.451+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestCrowdedWorldStillOffersTheBrake330r2 (0.16s)
+=== RUN   TestResidencyTierDecidesTheInjectionArm330r2
+--- PASS: TestResidencyTierDecidesTheInjectionArm330r2 (0.00s)
+=== RUN   TestPlanPresentCallBooksTheToolCallRow165r3
+time=2026-10-17T10:22:05.484+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\w330v1tmp\TestPlanPresentCallBooksTheToolCallRow165r3790790324\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T10:22:05.515+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\w330v1tmp\TestPlanPresentCallBooksTheToolCallRow165r3790790324\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T10:22:05.524+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T02:22:05Z duration_ms=8
+time=2026-10-17T10:22:05.531+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\w330v1tmp\TestPlanPresentCallBooksTheToolCallRow165r3790790324\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T10:22:05.541+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T02:22:05Z duration_ms=9
+time=2026-10-17T10:22:05.550+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\w330v1tmp\TestPlanPresentCallBooksTheToolCallRow165r3790790324\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T10:22:05.559+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T02:22:05Z duration_ms=8
+time=2026-10-17T10:22:05.563+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T10:22:05.568+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestPlanPresentCallBooksTheToolCallRow165r3 (0.11s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.368s
+
+[stderr]
