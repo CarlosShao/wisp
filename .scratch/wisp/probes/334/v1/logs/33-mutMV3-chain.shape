@@ -1,0 +1,14 @@
+V1SHAPE chain:case1-gitcreds class=B allow=false needL2=true rule=B-tier
+V1SHAPE chain:case3-wisp-config class=B allow=false needL2=true rule=B-tier
+V1SHAPE chain:case4-ssh class=B allow=false needL2=true rule=B-tier
+V1SHAPE chain:case5-aws class=B allow=false needL2=true rule=B-tier
+V1SHAPE chain:case6-kube class=B allow=false needL2=true rule=B-tier
+V1SHAPE chain:case8-dpapi class=B allow=false needL2=true rule=B-tier
+V1SHAPE chain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case1-gitcreds class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case3-wisp-config class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case4-ssh class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case5-aws class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case6-kube class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case8-dpapi class=B allow=false needL2=true rule=B-tier
+V1SHAPE offchain:case9-local-creds class=B allow=false needL2=true rule=B-tier

@@ -1,0 +1,46 @@
+date=2026-10-17 14:54:05 +0800 tree=D:\W334V1TreeAfter roster=TestProbe334V1 shape=--ci-shape
+mkdir_gotmp_rc=0 GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-334v1-20261017-145405-1785 TMP=/tmp TEMP=/tmp
+blacklist_blob_on_disk=c1799cd24afce19e6accef23db23a7d7ee746dec
+go_test_rc=0
+FOURCOUNT RUN=22 PASS_TOP=4 FAIL_TOP=0 SKIP=0 rc=0
+redlist=0
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case4b-ssh-solo
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case4b-ssh-solo class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case8b-dpapi-solo
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case8b-dpapi-solo class=B allow=false needL2=true rule=B-tier
+--- PASS: TestProbe334V1PerAnchorChain (0.28s)
+    --- PASS: TestProbe334V1PerAnchorChain/case1-gitcreds (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case3-wisp-config (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case4-ssh (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case5-aws (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case6-kube (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/case8-dpapi (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/case9-local-creds (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/case4b-ssh-solo (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/case8b-dpapi-solo (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case1-gitcreds (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case3-wisp-config (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case4-ssh (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case5-aws (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case6-kube (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case8-dpapi (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case9-local-creds (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case4b-ssh-solo (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case8b-dpapi-solo (0.03s)
+=== RUN   TestProbe334V1SinkReach
+    zz_probe_334v1_test.go:185: V1SINK returned_reason_bytes=916 sink_lines=1 sink_has_long_sentence=true sink_names_candidate=true sink_names_anchor=true
+    zz_probe_334v1_test.go:190: V1SINKLINE risk: A-list DENY path=c:\users\swq\appdata\local\wisp-test-gotmp\portable-334v1-20261017-145405-1785\testprobe334v1sinkreach2929475365\001\profile\work\id_ed25519已允许\u001b\u202e rule=~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1sinkreach2929475365\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1sinkreach2929475365\\001\\profile\\work") and the anchor "c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1sinkreach2929475365\\001\\profile\\.aws\\credentials" is not installed here (its expansion stopped at "c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1sinkreach2929475365\\001\\profile"), so R17 protects the ancestry chain the two share instead of proving a miss (non-overridable)
+--- PASS: TestProbe334V1SinkReach (0.01s)
+=== RUN   TestProbe334V1FixturePrefix
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1fixtureprefix2263774657\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1fixtureprefix2263774657\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1fixtureprefix2263774657\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1fixtureprefix2263774657\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1fixtureprefix2263774657\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1fixtureprefix2263774657\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1fixtureprefix2263774657\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:247: V1PREFIX cand_root="c:\\users\\swq\\appdata\\local\\wisp-test-gotmp\\portable-334v1-20261017-145405-1785\\testprobe334v1fixtureprefix2263774657\\001\\work"
+--- PASS: TestProbe334V1FixturePrefix (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.356s

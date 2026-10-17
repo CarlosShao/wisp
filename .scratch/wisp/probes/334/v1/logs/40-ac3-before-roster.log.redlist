@@ -1,0 +1,7 @@
+--- FAIL: TestFileBaseNameClaimChangesNoClassOrReason 
+    --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* 
+    --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* 
+    --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* 
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.167s
+FAIL

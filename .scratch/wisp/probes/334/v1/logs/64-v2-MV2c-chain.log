@@ -1,0 +1,77 @@
+time=2026-10-17T14:46:45.205+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe334V1PerAnchorChain
+=== RUN   TestProbe334V1PerAnchorChain/case1-gitcreds
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case1-gitcreds class=A allow=false needL2=false rule=A:~-.git-credentials
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case1-gitcreds class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case1-gitcreds class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case3-wisp-config
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case3-wisp-config class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case3-wisp-config class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case3-wisp-config class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case4-ssh
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.ssh-**
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case4-ssh class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case4-ssh class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case5-aws
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case5-aws class=A allow=false needL2=false rule=A:~-.aws-credentials
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case5-aws class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case5-aws class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case6-kube
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case6-kube class=B allow=false needL2=true rule=B-tier
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case6-kube class=B allow=true needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case6-kube class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case8-dpapi
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case8-dpapi class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case8-dpapi class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case8-dpapi class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case9-local-creds
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case9-local-creds class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case9-local-creds class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case4b-ssh-solo
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case4b-ssh-solo class=A allow=false needL2=false rule=A:~-.ssh-**
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case4b-ssh-solo class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case4b-ssh-solo class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case8b-dpapi-solo
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case8b-dpapi-solo class=A allow=false needL2=false rule=A:Microsoft-Protect
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case8b-dpapi-solo class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case8b-dpapi-solo class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/off/case1-gitcreds
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case1-gitcreds class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case3-wisp-config
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case3-wisp-config class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case4-ssh
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case4-ssh class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case5-aws
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case5-aws class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case6-kube
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case6-kube class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case8-dpapi
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case8-dpapi class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case9-local-creds
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case4b-ssh-solo
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case4b-ssh-solo class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case8b-dpapi-solo
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case8b-dpapi-solo class=B allow=false needL2=true rule=B-tier
+--- PASS: TestProbe334V1PerAnchorChain (0.21s)
+    --- PASS: TestProbe334V1PerAnchorChain/case1-gitcreds (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case3-wisp-config (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case4-ssh (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case5-aws (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case6-kube (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/case8-dpapi (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case9-local-creds (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case4b-ssh-solo (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/case8b-dpapi-solo (0.02s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case1-gitcreds (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case3-wisp-config (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case4-ssh (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case5-aws (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case6-kube (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case8-dpapi (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case9-local-creds (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case4b-ssh-solo (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case8b-dpapi-solo (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.259s

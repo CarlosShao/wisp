@@ -1,0 +1,80 @@
+### 0 pristine
+  hash_now=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES (before-any-mutation)
+  [2026-10-17 14:31:32 +0800 → 14:31:37] go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  [2026-10-17 14:31:38 +0800 → 14:31:40] go_test_rc=0 RUN=15 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+### M-V1 只动判级支（aRelates 尾行回落支 -> false），reason 生成一字未动
+0
+0
+  [2026-10-17 14:31:41 +0800 → 14:31:46] go_test_rc=1 RUN=10 PASS_TOP=1 FAIL_TOP=2 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  RED --- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 
+  [2026-10-17 14:31:47 +0800 → 14:31:49] go_test_rc=0 RUN=15 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  hash_now=83638e4998a416d44b2a8993bd2b1643ecc7f2c7 expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=NO (after-M-V1-restore)
+### M-V2 只把 ~/.ssh 那一枚 case 的判级换成不带回落支的 anchorMatches
+1
+  [2026-10-17 14:31:50 +0800 → 14:31:54] go_test_rc=1 RUN=10 PASS_TOP=1 FAIL_TOP=2 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  RED --- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 
+  [2026-10-17 14:31:55 +0800 → 14:31:57] go_test_rc=0 RUN=18 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+  chain_diff_lines=23
+1,7c1,14
+< V1SHAPE chain:case1-gitcreds class=A allow=false needL2=false rule=A:~-.git-credentials
+< V1SHAPE chain:case3-wisp-config class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+< V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.ssh-**
+< V1SHAPE chain:case5-aws class=A allow=false needL2=false rule=A:~-.aws-credentials
+< V1SHAPE chain:case6-kube class=A allow=false needL2=false rule=A:~-.kube-config
+< V1SHAPE chain:case8-dpapi class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+< V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
+---
+> V1SHAPE chain:case1-gitcreds class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case3-wisp-config class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case4-ssh class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case5-aws class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case6-kube class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case8-dpapi class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case1-gitcreds class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case3-wisp-config class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case4-ssh class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case5-aws class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case6-kube class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case8-dpapi class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+  hash_now=83638e4998a416d44b2a8993bd2b1643ecc7f2c7 expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=NO (after-M-V2-restore)
+### M-V3 反向（变严）：回落支去掉祖先关系界＝任何候选都算命中
+  [2026-10-17 14:31:59 +0800 → 14:32:03] go_test_rc=1 RUN=10 PASS_TOP=1 FAIL_TOP=2 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  RED --- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 
+  [2026-10-17 14:32:04 +0800 → 14:32:06] go_test_rc=0 RUN=15 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  chain_diff_lines=23
+< V1SHAPE chain:case1-gitcreds class=A allow=false needL2=false rule=A:~-.git-credentials
+< V1SHAPE chain:case3-wisp-config class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+< V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.ssh-**
+< V1SHAPE chain:case5-aws class=A allow=false needL2=false rule=A:~-.aws-credentials
+< V1SHAPE chain:case6-kube class=A allow=false needL2=false rule=A:~-.kube-config
+< V1SHAPE chain:case8-dpapi class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+< V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
+> V1SHAPE chain:case1-gitcreds class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case3-wisp-config class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case4-ssh class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case5-aws class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case6-kube class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case8-dpapi class=B allow=false needL2=true rule=B-tier
+> V1SHAPE chain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case1-gitcreds class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case3-wisp-config class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case4-ssh class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case5-aws class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case6-kube class=B allow=false needL2=true rule=B-tier
+> V1SHAPE offchain:case8-dpapi class=B allow=false needL2=true rule=B-tier
+  hash_now=83638e4998a416d44b2a8993bd2b1643ecc7f2c7 expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=NO (after-M-V3-restore-final)
+### 4 收尾：交件树三枚件哈希（⛔ 任何一发残留在突变树上）
+  blacklist.go tree=83638e4998a416d44b2a8993bd2b1643ecc7f2c7 commit=c1799cd24afce19e6accef23db23a7d7ee746dec
+  anchor_miss_reason_334_test.go tree=8f683b04d19c2bbe6956620f1d96338915b48cdd commit=8f683b04d19c2bbe6956620f1d96338915b48cdd
+  name_claim_two_arm_216_test.go tree=cbc0a610ae08628a764fb89dde6468a25b5eab61 commit=cbc0a610ae08628a764fb89dde6468a25b5eab61

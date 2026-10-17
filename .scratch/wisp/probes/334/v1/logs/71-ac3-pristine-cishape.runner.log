@@ -1,0 +1,46 @@
+date=2026-10-17 14:53:59 +0800 tree=D:\W334V1TreeMut roster=TestAllowSideFunctionsCarryNoSubstringOperator|TestSubstringOperatorCounter216IsNotBlind|TestFileBaseNameClaimChangesNoClassOrReason|TestArgvZeroClaimChangesNoShellVerdict|TestHostClaimChangesNoNetworkVerdict|TestOverrideKeySpelledWithClaimDoesNotUnlock shape=--ci-shape
+mkdir_gotmp_rc=0 GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-334v1-20261017-145358-1746 TMP=/tmp TEMP=/tmp
+blacklist_blob_on_disk=c1799cd24afce19e6accef23db23a7d7ee746dec
+go_test_rc=0
+FOURCOUNT RUN=24 PASS_TOP=6 FAIL_TOP=0 SKIP=0 rc=0
+redlist=0
+=== RUN   TestSubstringOperatorCounter216IsNotBlind/ContainsAny
+=== RUN   TestSubstringOperatorCounter216IsNotBlind/ContainsRune
+=== RUN   TestSubstringOperatorCounter216IsNotBlind/Index
+=== RUN   TestSubstringOperatorCounter216IsNotBlind/IndexAny
+=== RUN   TestSubstringOperatorCounter216IsNotBlind/lookalikes-are-not-operators
+--- PASS: TestSubstringOperatorCounter216IsNotBlind (0.00s)
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/Contains (0.00s)
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/ContainsAny (0.00s)
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/ContainsRune (0.00s)
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/Index (0.00s)
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/IndexAny (0.00s)
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/lookalikes-are-not-operators (0.00s)
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.*
+--- PASS: TestFileBaseNameClaimChangesNoClassOrReason (0.02s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* (0.00s)
+=== RUN   TestArgvZeroClaimChangesNoShellVerdict
+=== RUN   TestArgvZeroClaimChangesNoShellVerdict/allowlisted-program-with-claim-in-its-directory
+=== RUN   TestArgvZeroClaimChangesNoShellVerdict/claim-glued-onto-an-allowlisted-program-buys-nothing
+=== RUN   TestArgvZeroClaimChangesNoShellVerdict/two-unlisted-programs-one-claiming
+--- PASS: TestArgvZeroClaimChangesNoShellVerdict (0.00s)
+    --- PASS: TestArgvZeroClaimChangesNoShellVerdict/allowlisted-program-with-claim-in-its-directory (0.00s)
+    --- PASS: TestArgvZeroClaimChangesNoShellVerdict/claim-glued-onto-an-allowlisted-program-buys-nothing (0.00s)
+    --- PASS: TestArgvZeroClaimChangesNoShellVerdict/two-unlisted-programs-one-claiming (0.00s)
+=== RUN   TestHostClaimChangesNoNetworkVerdict
+=== RUN   TestHostClaimChangesNoNetworkVerdict/allowlisted-subdomain-with-claim-inside-a-label
+=== RUN   TestHostClaimChangesNoNetworkVerdict/claim-glued-onto-an-allowlisted-domain-buys-nothing
+--- PASS: TestHostClaimChangesNoNetworkVerdict (0.00s)
+    --- PASS: TestHostClaimChangesNoNetworkVerdict/allowlisted-subdomain-with-claim-inside-a-label (0.00s)
+    --- PASS: TestHostClaimChangesNoNetworkVerdict/claim-glued-onto-an-allowlisted-domain-buys-nothing (0.00s)
+=== RUN   TestOverrideKeySpelledWithClaimDoesNotUnlock
+--- PASS: TestOverrideKeySpelledWithClaimDoesNotUnlock (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.098s

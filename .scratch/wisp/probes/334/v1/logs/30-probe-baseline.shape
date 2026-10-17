@@ -1,0 +1,7 @@
+V1SHAPE chain:case1-gitcreds class=A allow=false needL2=false rule=A:~-.git-credentials
+V1SHAPE chain:case3-wisp-config class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.ssh-**
+V1SHAPE chain:case5-aws class=A allow=false needL2=false rule=A:~-.aws-credentials
+V1SHAPE chain:case6-kube class=A allow=false needL2=false rule=A:~-.kube-config
+V1SHAPE chain:case8-dpapi class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
