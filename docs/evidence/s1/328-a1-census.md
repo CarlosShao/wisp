@@ -15,9 +15,9 @@
 
 - **唯一铸造点**：`internal/agent/loop.go:676` `TaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i)`，两支＝`:605`（`callID==""` ⇒ `taskID#call-<i>`）／`:607`（⇒ `taskID#<provider号>`）。
 - 父链（逐枚现跑）：`executeCalls` 只被 `loop.go:504` 调 ⇐ `run`（`:346`）⇐ `RunAsync`（`:328`→`:333`）与 `Run`（`:339`→`:340`）；`taskID`＝`newTaskID()`（`:1157`，UUIDv4 形、**不含 `#`**，尺＝探针①真实实例值 `e2bbeaab-2b94-4a9e-ac59-ec13ce118077`）。
-- 生产入口两枚（尺＝`git grep -nE '\.RunAsync\(|\.Run\(ctx' 7535d83b -- internal cmd` 去掉 `_test` 与 `bridge.Run`）：
+- 生产入口两枚（尺＝`git grep -nE '\.RunAsync\(|\.Run\(ctx' 7535d83b -- internal cmd` 去掉 `_test`、四行 `bridge.Run`（`cmd/balldebug/main.go:252`、`cmd/wisp/models.go:311`、`cmd/wisp/resident_ball_windows.go:362` 等，另 `cmd/balldebug/main.go:662` 是注释）与 `internal/ball/hotkey_reload.go:22/:125` 两行注释）：
   1. `cmd/wisp/run.go:1176` `bg := loop.RunAsync(ctx, task)`；2. `internal/tools/subagent_197.go:372` `bg := child.RunAsync(childCtx, prompt)`。
-  ⚠ **票面/前腿那两个行号已漂**（前腿记 `run.go:1164`、`subagent_197.go:367`；本锚实测 `1176`／`372`）。`ToolRequest{` 非测试构造点全仓只有 `loop.go:675` 一枚（尺同上）⇒ 生产 corr 只有 `callCorr` 一个出处。
+  ⚠ **票面/前腿那两个行号已漂**（前腿记 `run.go:1164`、`subagent_197.go:367`；本锚实测 `1176`／`372`）。`ToolRequest{` 非测试构造点全仓只有 `internal/agent/loop.go:675` 一枚（尺＝`git grep -n 'ToolRequest{' 7535d83b -- internal cmd`，另一枚命中 `internal/tools/bridge.go:890` 是注释）⇒ 生产 corr 只有 `callCorr` 一个出处。
 - 到不到的两支（量的）：陪聊全双工与 realtime 到不了 —— `approval/gate.go:229-241` `admitCheck` 对未登记任务逐字回 `"实时语音（Path C）不具备工具权限；该任务未经文本循环登记（AdmitTextTask），已 fail-closed 拒绝"`，而 `AdmitTextTask` 只由文本循环侧持（`gate.go:182-194`、`loop.go` 的 `opt.AdmitTask`）。
 
 每形 corr 逐字节 ＋ 那把尺剥不剥（量的＝探针①，射程＝`logs/corr-shape-probe-run.log`；`T`＝探针①现生成的真实例值）：
@@ -36,7 +36,7 @@
 | 宿主发起卡（`run.go:889`＋`approval_always.go:64`＋`config_reload.go:89`；corr 落 `gate.go:281` 的 `orDefaultText(d.CorrelationID, d.TaskID)`） | `host:mode-switch`／`host:fs-allow-widen`／`host:config-reload` | false | `""` | **false**（`panel_pump.go:232-239` 的名册行要 `rt.tasks.Look(id)` 有记录，`host:*` 从不入册） |
 | **正控·名册今天认的那一形**（队列对**裸任务号**的撞名改写） | `T#9` | **true** | `T` | **true**（唯一点亮形，而生产不产它） |
 
-★另数一发（AC#0 附带，量的）：派单给的起评尺 `git grep -nE 'CorrelationID:[[:space:]]*"[^"]*"' 7535d83b -- internal cmd`＝**62** 枚，其中尾部是撞名形（`…#<数字>"`）＝**0 枚** —— 硬写撞名形不在这把尺的射程里，它们经夹具 `card197()` 传参。换一把尺才数到（`git grep -nE '"[A-Za-z0-9_.-]+#[0-9]+"' 7535d83b -- internal cmd`，量的）：**6 枚值＋1 枚注释**，全在 `internal/panel/subagent_blocked_220_test.go`：`:108`／`:112`／`:130`／`:131`／`:132`／`:186` 各一枚 `child-1#9`/`child-1#147`/`other-1#9`，注释 `:15` 提 `task-7#9`；假阳（`"AC#3"` 那一族）已逐枚剔。⇒ 涉及用例 4 枚顶层：`TestASecondCardForTheSameTaskStillLightsItsRow`、`TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt`、`TestABlockedRowKeepsItsRunningDimension`（＋名册侧 `subagent_roster_197_test.go:108` 用的是**裸任务号形** `CorrelationID: "child-1"`，不经 `callCorr`）。
+★另数一发（AC#0 附带，量的）：派单给的起评尺 `git grep -nE 'CorrelationID:[[:space:]]*"[^"]*"' 7535d83b -- internal cmd`＝**62** 枚，其中尾部是撞名形（`…#<数字>"`）＝**0 枚** —— 硬写撞名形不在这把尺的射程里，它们经夹具 `card197()` 传参。换一把尺才数到（`git grep -nE '"[A-Za-z0-9_.-]+#[0-9]+"' 7535d83b -- internal cmd`，量的）：**6 枚值＋1 枚注释**，全在 `internal/panel/subagent_blocked_220_test.go`：`:108`／`:112`／`:130`／`:131`／`:132`／`:186` 各一枚 `child-1#9`/`child-1#147`/`other-1#9`，注释 `:15` 提 `task-7#9`；假阳（`"AC#3"` 那一族）已逐枚剔。⇒ 涉及硬写撞名形的顶层用例 **3 枚**：`TestASecondCardForTheSameTaskStillLightsItsRow`（`:108/:112`）、`TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt`（`:130/:131/:132`）、`TestABlockedRowKeepsItsRunningDimension`（`:186`）（＋名册侧 `subagent_roster_197_test.go:108` 用的是**裸任务号形** `CorrelationID: "child-1"`，不经 `callCorr`，今天量到 `--- PASS`，见 `logs/panel-color-keynails-7535d83b.log`）。
 
 ## 二、三形代价表（每形同一条尺；⛔ 推荐，只列代价）
 
