@@ -1,0 +1,4 @@
+=== send 记录 2026-10-17 15:56 +08（编排者）===
+发送方式＝Qoder 后台子代理（Agent 工具，general-purpose，run_in_background=true），正文＝本文件上方的 328v1-dispatch.txt 全文逐字
+发出前 CPU 现量 43%；派单字节＝13803／行＝62
+起手锚现认＝ca675225 15:48
