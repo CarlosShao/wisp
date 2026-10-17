@@ -1,0 +1,1 @@
+发送件（328-a1）：正文＝328a1-dispatch.txt 逐字（head 24 行＋规矩块 26 行＝50 行／10884 字节）。启动动作＝本会话 Agent 工具 background 一发，写面三处＝docs/evidence/s1/328-a1-census.md ＋ .scratch/wisp/probes/328/a1/** ＋ 票 328 尾一条 bullet。⛔ 编译面（cmd/wisp＝228-r3、internal/panel＝333-r1 在写）。

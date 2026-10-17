@@ -1,0 +1,1 @@
+发送件（332-v1）：正文＝332v1-dispatch.txt 逐字（head 47 行＋规矩块＝48 行／10927 字节）。启动动作＝本会话 Agent 工具 background 一发，写面三处＝docs/evidence/s1/332-v1-verdict.md ＋ .scratch/wisp/probes/332/v1/** ＋ 票 332 尾一条 bullet。★含"工作树正在变形"具名句：internal/panel/display_scrub_216.go 由 333-r1 改写中，读数取具名提交树。
