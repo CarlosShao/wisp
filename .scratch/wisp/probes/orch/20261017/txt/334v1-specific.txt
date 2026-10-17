@@ -1,0 +1,38 @@
+# 派单 `334-v1`（非实现者终裁腿）＝票 334 七格：那句"锚缺位时 fail-closed"的长话到底有没有牙、有没有新破口
+
+**角色**＝裁决者，⛔ 实现者。⛔ 动 `internal/**`／`cmd/**` 一字、⛔ 翻任何 AC 框、⛔ 改判据文字／票名／`Status:`／`-done`、⛔ push。
+只交 `.md`／`.log`／`.sh`。写面三处逐字＝`.scratch/wisp/probes/334/v1/**` ＋ `docs/evidence/s1/334-v1-verdict.md`（短名、⛔ `§`）＋ 票 334 末尾**一条**只追加 bullet。
+
+**被裁对象**＝落地腿 `334-r1`。它的起手锚现认＝**`03f7e7a6`**（Sat Oct 17 11:16:51 +0800；它具名自报"派单与票面写的 `6e4abaf1` 与它差 3 分钟、`internal/risk/**` 字节全等"⇒ 这枚"两号同份"你自己复跑那把 `git diff --stat` 再信）。
+它的产码／仪器三笔＝`e052b11a`（`blacklist.go` +53/−8）／`4711955f`（新仪器 `anchor_miss_reason_334_test.go` +209）／`3a118226`（`name_claim_two_arm_216_test.go` +20/−1）；读数件四枚＝`.scratch/wisp/probes/334/r1/{ac0-ac4-readings.md,ac1-ac2-ac3-ac5-readings.md,selfcheck-answers.md,incident-swallowed-index-entry.md}`＋`logs/**`。
+
+**名册**＝盘上七枚框（`AC#0`…`AC#6`，现跑未勾 **7**／已勾 **0**）。★票面 `AC#6` 正文里"本票六格"那句是**我（编排者）的笔误**，你具名报出来、按七枚裁，别照那句少裁一格。
+
+## 六格重点（每格都要你自己的读数，⛔ 抄腿、⛔ 抄我）
+
+**① `AC#2` 那枚闸门到底有没有牙（本票最硬的一格，先做这格）**
+腿的凭据＝改前⇄改后同一枚 hostile 输入的 `class`／`needL2`／`Gate` 三值逐字相同（件里印 14 行、`THREE_VALUE_IDENTICAL=YES`）。⛔ 只 diff 它留下的 `.shape` 文件——你要在**一对仓外导出树**（起手锚 ⇄ 交件）上自己跑出那 14 行再对撞。
+★再加一发腿没发的**方向突变**：只把**判级**那一支换成反形（A 档降成可豁免的 B 档），reason 一字不动 ⇒ 闸门格**必须红**。腿的 `M-C` 是把 `uncertainAnchorMiss` 首行插 `return false`——你要核那一发打到的到底是"回落支"还是整条 A 档判定链（红句里 `class: got B, want A` 与 `Gate: … needL2=true` 是同一次降级的两半，还是一枚更窄的短路？）。若存在"改 class 而闸门不红"的形状 ⇒ 具名判 `AC#2` **不成立或只半成立**，⛔ 替它圆。
+
+**② `AC#1` 那句长话的生产者射程（能力类，⛔ 用"用例绿"背书"真到人"）**
+改后的 reason 现在带**真实候选路径逐字节**（腿的样张里含 `\001` 与 `U+202E` 那形）。必答那一句要环环 `file:line`：`classifyForms` 的第二返回值 → `Gate`（`blacklist.go:77/:80`）→ `PathDecision.Reason` → `assessor.go:306`（它 `:13` 那句注释自陈"renders `Decision.RulesHit` and `Decision.Reason` **verbatim**"）→ 再往外是谁。
+★关键一问，具名回答，⛔ 推理：**这句话今天会不会进模型正文**（票 174／264 那一族＝路径进模型文本是本仓立过的账），或者进面板快照字节（票 332 那条出向面）。若只到操作员终端／日志 ⇒ 写清是哪几跳；若真有一条进模型或进快照 ⇒ **这是本票修法新引入的泄露面**，停手上报、⛔ 自己改产码。
+
+**③ 幻影凭据普查（本仓已入账七次的高危形）**
+腿的**中途报告**引用过 `internal/risk/blacklist_test.go:104 TestApprovalSensitivePathIsNotOverridable`——我已现量：那枚**文件在 HEAD 不存在**、那个**用例名全仓零命中**（`non-overridable` 这个词只出现在 `anchor_miss_reason_334_test.go`／`blacklist.go`／`name_claim_two_arm_216_test.go`）。
+你要扫的是**已入库的字节**：`internal/risk/**` 的注释＋上面那四枚 `.md`，凡"指名一枚测试／件当凭据"的写法逐枚 `git show <锚>:<文件>` 验名真在册、真会跑（`go test -run <名>` 在仓外树上跑，⛔ 共享树）。抓到不实 ⇒ 具名列出，⛔ 因它追认任何一格。
+
+**④ `AC#3` 补世界那发（票 216 那枚仪器在 CI 台面上的红）**
+腿的改动＝`t.TempDir()` 换成 `candidateOffAnchorChain334(t)`，自报"四对断言、`want` 值、名册一字未动"。两问都要你实测：(a) **成对反控**＝把夹具改回 `t.TempDir()` ⇒ 必须回到 `24/5/1/0 rc=1` 且红的是**同枚名册同枚用例**（腿报 CI 形改后 `24/6/0/0 rc=0`；四数我自己重数过它的 `.log`，那只是**读日志**、不是独立凭据，你要真跑）；(b) **那枚新夹具是不是把世界造对了**——候选真在 A 锚的祖先链**之外**吗（尺＝打印候选与该锚的公共前缀段数，别只信它绿）。若两臂同哑（333-v1 抓到过"两臂一起哑同集不红"那一形）⇒ 具名写。
+
+**⑤ `AC#0`／`AC#4`／`AC#5` 复跑与归位**
+`AC#0` 起手六行逐枚现跑（一律具名提交树，★此刻 `internal/panel/**` 与 `internal/agent/**` 有 `328-r1` 在飞，⛔ 读工作树字节；`git status --porcelain` 起手收尾各跑一次并入库）；`AC#4` 那句 reason 字面串的消费者普查你自己定尺并**带射程**（golden／面板文案／`internal/perm`／`internal/tools`／任何 `wantReason`），命中⇒具名，0 命中⇒同批发一枚正控证明尺不瞎；`AC#5` 门禁四数只在共享工作树跑（`gofumpt.exe` 真身、`d22scan`、长度门、`go vet ./internal/risk/`）。
+
+**⑥ 事故那一枚只报盘上事实，纪律结论归我**
+`8823549f` 里那行 `{…census.md → …-done.md} | 0`＝我 332 结案腿 staged 的纯改名被它的裸 `git commit` 吞进它自己那笔。你要给的只有读数：`git show --stat 8823549f` 那行、`git log --follow` 对 `-done` 那枚名的名册是否连续、我随后 `dc367a2a` 在同一枚件上翻了六格、行丢失枚数。⛔ 判"该怎么处置"，那归我落账。
+
+## 两枚必答（⛔ 你自己盖章不算）
+① 那句 fail-closed 长话，**今天到人眼的射程**是哪几跳、其中有没有一跳落进模型正文或快照字节（带尺与 `file:line`）。
+② `AC#2` 那枚闸门：**什么样的产码改动能让它不红、而 `M-A`／`M-B` 全绿**——找到它的失明方向；找不到就说找不到，并给"它买的到底是哪一件事"那句的尺。
+
+交件自证三把尺照下面通用块；另加：本腿**零产码字节**的证明＝`git show --name-only` 全集里 `.go` 命中 **0 枚**（⛔ 用子串匹配主题当尺，那形我 10-17 踩过、差点造出假指控）。

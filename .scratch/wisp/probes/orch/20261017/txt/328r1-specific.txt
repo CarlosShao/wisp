@@ -1,0 +1,30 @@
+# 派单 `328-r1`（落地腿）＝票 328 的 **丙-带边界**：L2 卡片那串关联号，让名册按"剥出来的段逐字节等于一枚已知任务号"来认
+
+**形状不是我在这份派单里重述——去读票 328 末尾那条 `编排者裁形＝丙-带边界` 的 bullet（第 50 行起），硬框 ⓐ…⓮ 逐枚照做，缺一枚我不收这笔。** 撤销口令＝「328 改裁甲」／「328 改裁乙」。
+料＝只读普查腿 `328-a1` 交件（`docs/evidence/s1/328-a1-census.md`，锚 `7535d83b`）＋票面"现量"那张表。★票面 `AC#1` 里我举的乙形那一例 `task#<seq>#<callID>` **已被普查当场量废**（实测点不亮）⇒ 那条例子只当历史，⛔ 按它写代码。
+
+**写面（每波只许你一枚碰这两面）**＝`internal/panel/**` ＋ `internal/agent/**`。⛔ `cmd/wisp/**`（`228-r3b` 正在取证）、⛔ `internal/risk/**`（`334-r1` 刚落、`334-v1` 在裁）、⛔ `frontend/**`／`design/**`（机主外部 agent，本编队零写面）。
+⛔ 新加进 Snapshot／审批名册的 JSON 键（＝甲形的代价，要先落 `A##` 人工批准）；⛔ 新 C17 方法名、⛔ 新导出 `panel.*` 名 ⇒ **撞到就停手上报**，⛔ 自己开新名。
+证据件落 `docs/evidence/s1/328-r1-*.md`（短名、⛔ `§`）＋`.scratch/wisp/probes/328/r1/**`；票 328 末尾**只追加一条** bullet（⛔ 翻任何 AC 框：七枚未勾一律等**非实现者**裁）。
+
+## 起手必做的三件事（⛔ 抄票面、⛔ 抄我，逐枚现跑）
+① `git log -1` 现认起手锚并入库（此刻 HEAD 是我那笔 `8844ffa0` 之后，**别用我这句里的号**）；② `git status --porcelain` 起手/收尾各一次，证明你没把别腿在飞字节扫进你的台面或提交；③ 那三枚位置的当前字节逐枚现取（`internal/agent/loop.go` 的 `callCorr` 两支＋唯一调用点、`internal/panel/subagent_roster_197.go` 的 `indexWaitingKey`／`splitClashSuffix` 与 L1⇄卡片那两枚索引臂、`internal/panel/approval.go` 的 `ApprovalCardView` 字段名册）。**行号只当读数**，一律以你现量为准。
+
+## 本票的判据形状，三枚最容易做错的地方
+**（一）`AC#2` 那发正控必须经真的铸造点。** 票面写死了：⛔ 测试里硬写 `task#3`／`#2` 那种撞名形——那正是这票"缺世界"的病根（普查数到硬写形只在 `subagent_blocked_220_test.go`，经夹具 `card197()` 手造、不经 `callCorr`）。
+★如果你撞语言层撞不过去（`callCorr` 非导出、跨包不可达），⛔ 为此新加导出名。可查的候选形（**只当线索，先 `git show` 验它真在**）＝在 `internal/agent` 侧跑真的 `run`→`executeCalls` 造出一条带真 corr 的 `ToolRequest`/decision，再用 `internal/panel` 已有的构造函数（普查点名过 `approval.go` 的 `CardViewFromDecision`）搬成卡片，喂给真名册，断言那一行 `BlockedOnApproval` 为 **true**。三选一都不成立 ⇒ 停手上报，别硬造。
+**（二）放宽的那把尺要留护栏。** `subagent_blocked_220_test.go:133`（`child-1#retry`）**允许翻向**，但要在证据件逐枚具名写"翻成 true 是买真相"；★`:134`（`child-1x`＝有前缀、无分隔符）**必须继续为 false**，那是"把两枚任务混起来"的禁手形状，它一红＝你裁宽了。`:132`（`other-1#9`）仍 false。
+**（三）★四形全亮＝实测，⛔ 推理。** `T#call_e1`（支A）／`T#call-0`（支B）／`T#call-0#7`（队列叠改）／`T#9`（撞名形）四形逐枚点亮，且 `approval-<seq>`（空 corr 回退）与 `host:*`（宿主发起）**继续点不亮**。每一形都要一条真跑出来的读数（用例名＋断言行），⛔ 按代码推。
+
+## 不许动的语义（`AC#3`，完成判据＝这四面 diff 行数逐枚报 0）
+⛔ 改门控档位、⛔ 让面板侧来源变成 L2 的合法出处（AGENTS §1.2 那条禁令）、⛔ 动 D43 转移表、⛔ 动三枚冻结件（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`ticket90_persist_test.go`）；⛔ 为对上号而把 L2 卡片的文案复用权限判定的文案（票 242／244 那族）。
+★`git diff` 那四面的尺要带射程并逐枚印 `rc=`，⛔ 用"我看过了"当读数。
+
+## 台面与颜色（`AC#4`）
+`./internal/panel` 与 `./internal/agent` 两包，改前⇄改后**同一台面**成对（仓外 `git archive` 八件套＋仓根 `docs/`＋手工三件，树放 `D:` 卷要 8.3 别名、`GOTMPDIR` 先 `mkdir -p`），★显式 `-timeout 30m`、四数逐枚点名（⛔ 混 `^=== RUN` 与 `^--- PASS`、⛔ 相减）；终态红名册与起手作差＝0（那两枚前端契约键红 `approval_test.go:105`／`composer_test.go:52` **起手即红**、红句已具名在普查件里 ⇒ 它们进名册但不算你造成的新红，逐名归位）。
+⛔ 跑 `./cmd/wisp` 整包（`228-r3b` 在取证，重包同一时刻只跑一个）、⛔ `go test ./...`。门禁四数只在共享工作树跑（`gofumpt.exe` 真身／`d22scan`／长度门／`go vet ./internal/panel/ ./internal/agent/`），逐枚落 `rc=`。
+突变只打仓外导出树的物理字节、内容锚（函数体内那枚 token，⛔ 绝对行号）、`finally` 里当场还原并报还原哈希；成对两发落点必须不同。
+
+## 必答两题（⛔ 你自己盖章不算）
+① 落地后那**四形**（`T#call_e1`／`T#call-0`／`T#call-0#7`／`T#9`）逐枚点不亮＝实测读数给我，⛔ 从谓词文字推。
+② 拆完之后**还剩哪几格零读数**，具名给尺。★至少这一格必须照抄进你的件里、不许美化：屏幕上那一行今天**仍不会亮**——`frontend` 里 `blockedOnApproval` 命中文件数 **0**（正控＝同尺族 `correlationId` 命中 4 枚文件），且 `panel_snapshot_deliver_329.go` 自陈页面侧 `window.wispOnPanelSnapshot` 接收器不存在（那条自陈的行号你自己现量）。本票买的是"名册 join 得上了"那一跳，不是"人看见了"。
