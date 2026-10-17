@@ -1,0 +1,30 @@
+票 327 非实现者终裁腿 `327-v1`（裁决者·只读，独占 `internal/panel` 那包 `go test`）——裁 `AC#1`–`AC#4` 四格有牙没有，★**必须自己重放那对成对定向突变**（编排者⛔ 复跑过这两发）
+
+票＝`.scratch/wisp/issues/327-display-boundary-washes-cc-only-so-cf-invisible-chars-still-pass-through.md`（现量：**未勾 6／已勾 0**，一枚框都没人翻）。被裁的落地＝写腿 `327-r1` 三笔提交 `c2f9310bd`（`internal/panel/display_scrub_216.go` **72/13**）＋`0eaf5a6a2`（`display_scrub_216_test.go` **204/0**＝只追加、既有断言零删除）＋`60c328686`（证据件＋读数），第四笔（票尾 bullet）由编排者代提＝`0438b84d`。⚠ 那枚腿**死于 Chat 日额度帽**（105 分钟／80 次工具），⛔ 把它没交完当成本票的欠账——它交完的料在盘上，缺的是**你这一枚非实现者**。
+
+## 编排者已经自己复跑过的（⛔ 你重复审这几件，去审我没审的）
+- 名册尺逐枚 `git show --name-only`＝越界 0 枚；三枚被裁字节的 `numstat` 如上；票面框尺＝未勾 6（腿一枚没翻，对）。
+- 形状尺我自己读了码：新增 `isDisplayWashCf`（`internal/panel/display_scrub_216.go:164`）**逐枚写死 15 枚字符**、注释自陈⛔ 从 `unicode.Cf` 类别推导（会扫进 `U+2061-2064`／`U+061C`／`U+180E`／`U+206A-206B`）、⛔ 复用 `internal/risk` 那枚判级忽略表；★**写入侧 `:123`（`scrubForDisplay`）与判据侧 `:214`（`needsDisplayWash`）调同一枚函数**＝票 `AC#2` 要的"两把尺同一字符集"。
+- ★**记我一笔（引数前必读）**：编排者在 `A1008` 与本票派单里写的"**22 枚**"是**我的加法错**，枚举清单逐枚数＝**15 枚**（方向 `202A–202E` 5＋`2066–2069` 4＋零宽/连接 `200B/200C/200D/2060` 4＋`FEFF` 1＋`00AD` 1）⇒ **以枚举清单为准**；你要裁的是"这 15 枚对不对得上 `AC#1` 的裁定"，⛔ 引用"22"。
+
+## ★你要做的、我没做的四件事（判语格式＝成立／不成立／不适用／不可判，⛔"附条件成立"）
+1. **`AC#1` 射程**：那 15 枚是否恰为裁定那批（多一枚／少一枚都算不成立）；★**⛔ `unicode.Mn`**（组合重音是合法可见字形）；★⛔ 动判级轴那张表。正控＝逐枚现跑一把"这 15 枚之外的 Cf 不被洗"的尺（`U+2061`/`U+061C`/`U+180E` 至少三枚）。
+2. ★**`AC#2` 那对成对定向突变——我必须请你重放**（编排者⛔ 复跑，件在 `probes/327/r1/logs/readings.txt`，⛔ 抄它的数）：台面＝**仓外导出树**，**只摘写入侧**（把 `:123` 那支 `case isDisplayWashCf(r)` 摘掉）⇄ **只摘判据侧**（把 `:214` 里那半 `isDisplayWashCf(r)` 摘掉），★**两发各自必须红、且红句/红名册必须不同**（同名册响＝两把尺其实在同一处、那"成对"就是假的）。两发当场还原＋各报还原哈希（`finally` 里还原）。★**再加一把"两把尺失明"的反证**：若你发现存在一发把**整个函数**摘掉而两侧都还绿 ⇒ 具名写是哪枚用例该响没响。
+3. **`AC#3`/`AC#4`**：腿新增 204 行用例里，★**逐枚点名哪些是常驻（⛔ build tag、⛔ `t.Skip`、⛔ 只在 `-v` 下跑）**、哪枚真断"转义⛔ 删"（洗后仍看得见 `\uXXXX` 那一形）、哪枚只是形状装饰。★问一句"这枚用例换反形还响不响"＝恒真尺（本仓已入账多次：⛔ 用例存在＝有牙）。
+4. **能力类必答**：这 15 枚今天**在生产路径上真被读到**吗？★自己跑调用点尺（`grep -rn 'scrubForDisplay|needsDisplayWash' --include='*.go' internal cmd | grep -v _test`），具名写"几枚产码调用者、在哪个文件哪一行"，⛔ 拿 `go build` 的 rc=0 当"接上了"。若零产码读者 ⇒ 判语写**未闭合**并具名归口，⛔ 判成立。
+
+## 判语与写面（只许这四处）
+1) `docs/evidence/s1/327-v1-verdict.md`（★短名、⛔ `§`）；2) `.scratch/wisp/probes/327/v1/**`（台件＋`logs/`，原始读数一律 **`.log`** 形，`.gitignore:8` 是 `*.out`）；3) 票 327 末尾**一条**只追加 bullet（`numstat` 必为 N/0）；4) 你自己的 commit-msg 源件放 `probes/327/v1/` 内。
+⛔ **翻任何 AC 框**（翻框归编排者，凭你判语）、⛔ 改票名／`Status:`／加 `-done`、⛔ 动台账／`HANDOVER`（那两面归编排者）、⛔ 动 `internal/**` 或 `cmd/**` 任何**跟踪**字节（突变只打仓外树）、⛔ 动 `frontend/**`／`design/**`／`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／三枚冻结件。
+
+## 规矩
+- **只 commit、⛔ push**；`git add`／`git commit` 两处**逐枚显式 pathspec**；⛔ `-A`／`.`／目录形／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- ★**本波 `internal/panel` 的 `go test` 归你独占**（那面⛔ 写腿；`329-r1` 在写 `cmd/wisp/**`、`330-r2` 在写 `internal/agent/**` 的测试面）：⛔ 拿共享工作树跑"改前那一发"（里面有别腿在飞的字节）⇒ 一律**仓外导出树**；★台面配方＝`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models` **八件套**＋**仓根 `docs/`**＋手工三件（`build/*.dll`／`third_party/sherpa-onnx/*.dll`／`frontend/dist`）＋树放 **`D:` 卷、目录名要有 8.3 短名别名**；取出后先数 `.go` 证非空。`GOTMPDIR` 指 `D:` 卷并先 `mkdir -p`。
+- 颜色尺口径逐枚点名（`^=== RUN` 含子测试 ⇄ `^--- PASS` 只数顶层，⛔ 混用）；⛔ 跑整包 `./cmd/wisp`（归 `329-r1`）；⛔ `go test ./...`；一律 `-count=1 -timeout 30m`。★若 `internal/panel` 整包出现 `0xc0000135`／`setup failed`／`walk …`／`build failed` ⇒ 判**台面故障**、具名写哪一行，⛔ 计入判据（引那包红之前先补 PATH：`third_party/sherpa-onnx`＋`build`）。
+- ⛔ 为了"看起来更强"而放宽任何断言；⛔ 把别腿的在飞字节当凭据；⛔ 因证据件写了枚数就采信——自己重跑。
+- ⛔ 杀 `wisp.exe` **PID 21892**（机主自起的常驻实例，台账 `A988`）。
+- **输出预算**：≤4 枚件、每件 ≤160 行、⛔ 0 字节件（交件前 `wc -c`）、⛔ 占位符（尺＝`TODO|待填|占位|TBD|FIXME`）；轮次帽约 150 ⇒ 每落一枚件就 commit。
+- shell 规矩：正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+
+## 交件自证（三把尺）
+① 逐枚提交号＋逐枚 `git show --name-only`（只含上面四处）；② 判语件绝对路径＋`wc -c`＋行数＋占位符 0；③ ★成对两发的**逐字红句＋红名册＋两发红句不同的证据**＋两发还原哈希＋起手⇄终态四数＋调用点尺的逐字输出；另具名回报：本票面／派单里你查到的**任何一处不实**（含我上面那枚"22 枚"），⛔ 替我圆。

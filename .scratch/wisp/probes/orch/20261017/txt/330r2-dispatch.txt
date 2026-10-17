@@ -1,0 +1,47 @@
+票 330 落地腿 `330-r2`（写·★**只许测试面**）——给 165 那枚门铃仪器造出"多候选"那个世界，让镜像条目的 `Resident` 从装饰变成有牙（缺口 `G2`）＋把 `:131` 那句标错的注释改成说实话（缺口 `G3`）
+
+票＝`.scratch/wisp/issues/330-doorbell-instrument-mirror-roster-never-reconciled.md`（现量：八格全未勾）。★**本腿⛔ 碰产码字节**——只许新建/追加 `internal/agent/**` 里的 `_test.go` 与 `testdata/` 夹具；`AC#1`/`AC#2`（镜像⇄真名册那枚对接钉）归**下一波**的 `330-r1`（那面是 `cmd/wisp/**`，本波被 `329-r1` 占着），⛔ 你这波去碰它。
+
+## 来路（一枚非实现者裁决腿报的缺口，⛔ 你重新发明）
+`165-v2` 的定向突变读数（判语件 `docs/evidence/s1/165-v2-verdict.md`＝118 行／13890 字节）：
+- **`G2`（本腿的正题）**＝把镜像条目 `Resident: true → false` ⇒ **整包全绿、rc=0**。机理（腿具名、你现跑复认）＝`internal/agent/inject.go:44-49` 切驻留／检索两支、`bm25Select`（`:172-224`）`score>0` 即入选，而该用例目录**只有 1 枚候选**、查询"帮我把这个项目收拾一下"与描述共用 unigram `我/一/下` ⇒ 非驻留照样被注入 ⇒ `:219` 看不见档位换了。⇒ 这一格按本仓口径写**缺世界**（要造的那个世界＝**同目录再造一枚不驻留的候选**，让档位真的决定谁被注入），⛔ 写成"判据成立"。
+- ★**对照已量过**：镜像的 `Declared` **有牙**（`RiskL2→L1` ⇒ 唯一红 `:157 row.risk_level = "L1", want "L2"`；`RiskL2→L0` ⇒ 五枚红 `:157/:184/:191/:199/:208`）。⇒ ⛔ 顺手把 `Declared` 那一支也"再装一次牙"，那是重复钉。
+- **`G3`（随批）**＝`internal/agent/plan_present_doorbell_165r3_test.go:131` 把 `THE JUDGMENT` 标在了一扇对牙不敏感的门上（只把 sink 计数喂成常量 `n := 1`、牙完好 ⇒ 绿）；真牙在 `:143`（`rowOfTool165r3` 独立遍历行、不复用那个计数）。⇒ 处置＝**只改注释那一句**成"冗余非零门，牙在 `:143`"，⛔ 删那枚门（它作者 `:78-82` 已自陈射程，⛔ 记谎、记误导）。
+
+## 起手先自己跑的三把尺（⛔ 抄我的行号——行号只当读数，加了行⛔ 不打红）
+1. `sha256sum internal/agent/testdata/golden/plan-present.sse internal/agent/plan_present_doorbell_165r3_test.go` ⇒ 基线＝`7d26fa88…`（28 行）／`00c32049…`（221 行）；★你**只许追加**，交件时这两枚（或你改注释那一枚的新串）逐枚点名，并具名写"改了哪几行、删除几行"。
+2. `grep -n 'Resident' internal/agent/plan_present_doorbell_165r3_test.go` ＋ `sed -n '30,60p'` ⇒ 自己看清那枚镜像条目怎么喂 `inject.go` 那两支。
+3. `grep -rn 'func bm25Select' internal/agent` ＋ 读 `:172-224` ⇒ 自己确认"`score>0` 即入选"这一句**今天**在不在（在 ⇒ `G2` 成立；不在 ⇒ **停下具名上报**，⛔ 按我写的做）。
+
+## ★判据与牙（本腿最重要的一把尺＝成对定向突变，⛔ 一发冒充两发）
+- 造出那个世界之后，★**去牙发**＝把新夹具里那枚**不驻留**候选的 `Resident` 拨成 `true`（或把驻留支的判定摘掉）⇒ **指名那枚用例必须红**；★**反控发**＝把查询串换成与那枚候选**无共同字**（或直接删掉新增候选）⇒ 用例**也必须以另一种形状响**（红句不同＝证明响的是档位、⛔ 恒响）。两发红句逐字贴回、各带 `file:line`。
+- ★两发都打在**仓外导出树**的字节上（⛔ 改跟踪文件、⛔ `-overlay`），逐发当场还原＋报还原哈希（`finally` 里还原；中途炸把突变留在跟踪件＝本仓高危事故）。
+- ⛔ 为了让新的多候选世界变绿而**放宽任何既有断言**、⛔ 删用例、⛔ 加 `t.Skip`。若新夹具把**同包别枚用例**打红（`inject`/`bm25` 那族共享候选目录是最可能的撞车点），⇒ ⛔ 改它们的期望值，**停下来具名上报是哪几枚、红句逐字**，交我裁。
+
+## 写面（只许这四处，逐字；超出一枚算越格、我退回）
+1) `internal/agent/**` 里**只有** `*_test.go` 与 `testdata/**`（新建或追加；⛔ 任何产码文件、⛔ 既有 golden 件的内容——要新夹具就**新文件**）；2) `.scratch/wisp/probes/330/r2/**`（含 `logs/`，原始读数一律 **`.log`** 形，`.gitignore:8` 是 `*.out`）；3) `docs/evidence/s1/**` 一枚件（★短名、⛔ 长名、⛔ 件名带 `§`）；4) 票 330 末尾**一条**只追加 bullet。
+⛔ 其它一切面：`cmd/wisp/**`（`329-r1` 在写）、`internal/panel/**`（`327-v1` 的只读射程）、`internal/tools/**`、`internal/memory/**`、`internal/session/**`、`frontend/**`、`design/**`、`PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／`tools/d22scan/allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`／三枚冻结件。
+
+## ★产码字节零改动那把自证尺（交件必带，逐字跑）
+```
+ANCHOR=$(git rev-parse HEAD)     # 起手第一件事：把这枚锚逐字记进读数件，后面所有"改前"都对着它取
+git diff --numstat "$ANCHOR" HEAD -- internal/agent   # 逐枚点名：每一行都必须落在 *_test.go 或 testdata/ 下
+```
+★再加一把：`git diff --name-only <起手锚> HEAD -- internal/agent | grep -vE '(_test\.go|^internal/agent/testdata/)'` ⇒ **必须空、rc=1**（非空＝你动了产码，本腿退回）。★**正控**：在**副本**的非注释/非测试字节上改一枚字面量跑同尺 ⇒ 必须非空（这把尺两种形状都放行＝它失明，⛔ 用它的零输出交件）。
+
+## 规矩（一条都不许漏）
+- **只 commit、⛔ push**；`git add`／`git commit` 两处**逐枚显式 pathspec**；⛔ `add -A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree／checkout；临时件**只建不删**。
+- **⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`**（裁决者≠实现者）。
+- 颜色尺：改前／改后各一发 `go test ./internal/agent/ -count=1 -timeout 30m -v`，四数逐枚点名（`^=== RUN` 含子测试 ⇄ `^--- PASS` 只数顶层）；★**起手分母（编排者 10-17 自己在仓外树复跑过，当基线用、⛔ 抄进判据、起手自己重跑）**＝`rc=0／RUN 110／PASS_TOP 86／FAIL_TOP 0／SKIP 0／PANIC 0`；★正控这把尺我刚用它出过这组数，件＝`.scratch/wisp/probes/orch/20261016/txt/orch-165v2-verify.txt`。终态红名册与起手**作差＝0**。⛔ 跑整包 `./cmd/wisp`（归 `329-r1`）、⛔ 跑 `go test ./...`。
+- ★**台面配方（现行完整版，缺一味就假红）**：仓外导出树＝`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models` **八件套**＋**仓根 `docs/`**＋手工三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`）＋树放 **`D:` 卷、目录名要产生 8.3 短名别名**；`GOTMPDIR` 指到 `D:` 卷且**先 `mkdir -p`**；取出后**先数 `.go` 证非空**。
+- 门禁四数**只在共享工作树**跑（⛔ 部分导出树＝`d22scan` 的 `design/`／`frontend/` 射程空会 `exit 2` 长得像红；长度门要 `.git`）：`gofumpt.exe -l`（真身 `/d/work/base/gopath/bin/gofumpt.exe`）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./internal/agent/`，逐枚落 `rc=`。红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写哪一行，⛔ 计入判据。
+- ⛔ 在注释/票面指名一枚不存在的测试当凭据（本仓已入账六次）、⛔ 许诺未实现的能力。
+- ⛔ 杀 `wisp.exe` **PID 21892**（机主 10-15 19:03 自起，握全局热键＋单实例锁＝台账 `A988`）。
+- 读数纪律：引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先看 `stderr` 并跑一枚已知存在的正控。
+- **输出预算**：≤4 枚件、每件 ≤160 行；⛔ 0 字节文件（交件前 `wc -c`）；轮次帽约 150 ⇒ **每落一枚文件就 commit**（⛔ 攒着）。
+- shell 规矩：进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 并发在飞：`329-r1`（写 `cmd/wisp/**` 产码）∥ `327-v1`（裁 `internal/panel`）∥ `216-v2`（只读）∥ 你（写 `internal/agent/**` 测试面）⇒ ⛔ 读别腿在飞字节当凭据；`go test` 撞上了等一等再跑并具名写你等了。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含上面四处）；② 证据件绝对路径＋`wc -c`＋行数＋占位符 0；③ 上面那把**"零产码字节"尺**逐字输出（含 `rc=`）＋成对两发红句逐字＋还原哈希＋改前改后四数⇄起手 110/86/0/0 的对照＋门禁四数 `rc=`。
+另加我的必答题（⛔ 你自盖不算）：造完那个多候选世界后，把**新增的那枚候选删掉**（只删你自己加的夹具，当场还原），`G2` 那发突变（`Resident` 拨 `false`）是不是又变回绿了？答"是"＝你的牙确实挂在新世界上、⛔ 挂在了别处；答"否"＝具名说明是谁接住了它。

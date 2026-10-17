@@ -1,0 +1,45 @@
+票 329 落地腿 `329-r1`（写·`cmd/wisp/**` 产码）——把快照字节从"记进账"接到"交给宿主"，形甲＝经 `Eval` 推已 marshal 的那串字节
+
+你是 `329-r1`（上一枚写这面的腿 `327-r1` 死于额度帽、它写的是 `internal/panel`，与本票无关）。本波你是 `cmd/wisp/**` **唯一一枚碰产码的写腿**。票＝`.scratch/wisp/issues/329-panel-snapshot-last-mile-never-delivered.md`（现量：九格全未勾、`Status:` 已写"派 `329-r1`"）。
+
+## 起手锚与"断点"（★必答题的靶子，⛔ 抄我的行号——先自己重跑那三把尺）
+编排者 10-16 自己在**工作树**复认过的形状（你逐枚现跑对号）：
+1. `grep -rn 'bookPanelSnapshot' --include='*.go' internal cmd` ⇒ 定义 `cmd/wisp/panel_pump.go:360`；生产唯一挂载 `cmd/wisp/run.go:732`（`Out: rt.bookPanelSnapshot`）。
+2. `grep -rn 'lastPanelSnapshot' --include='*.go' internal cmd tools` ⇒ 16 枚命中＝**定义/注释 2 枚 ＋ 其余全在 `_test.go`** ⇒ **非测试读者 0 枚**。★这一枚就是本票要挪的分母：交件后这一把尺必须**非空**（新增的生产读者具名 `file:line`）。
+3. `grep -rn 'publishPanelSnapshot' --include='*.go' internal cmd | grep -v _test` ⇒ 生产挂在 `run.go:742`（`rt.ui.publish`）＋`run.go:1063`（consoleSink），驱动点 `run.go:1363/1452/1481`。⇒ ★**⛔ 把本票读成"整条没接"**：泵在生产里确实跑、字节确实被 book；死的只有"从 book 到页面"那一跳。
+4. `grep -n 'Eval(' cmd/wisp/panel_control_windows.go` ⇒ 定义 `:667`，生产 4 枚调用全在 `msgcb` 里回 `window._rpc` 的**RPC 回执**（`:737/:744/:748/:752`）。⇒ 你新增的是**第五种用途**（主动推快照），⛔ 改动那四枚回执。
+
+## 裁给你了（⛔ 重新发明，照这个做）
+**形甲**＝泵真的 publish 时，经宿主把**已经 marshal 好的那串字节**推给页面（沿用既有 `panelControl.Eval`，推一枚具名全局调用）。
+- ★**⛔ 新增任何入向 `Method*` 常量**（不往 `internal/panel/bridge.go` 加名字）。那会同时撞两枚名册钉＝`internal/panel/git_test.go:387`（`whitelistMethodsFromSource`）与 `internal/panel/inbound_roster_253_test.go:63`（`wantFullInboundRosterSize253` 现量 **7**）⇒ 为了让新名过关去改名册数＝改自己的尺，**本票直接退回**。
+- 契约轴（甲⛔ 碰它）：出向推送在 `docs/specs/SPEC-08-ui-ball-panel.md:150/158/163/174` 早已写成一列"请求＝—"的**出向**行，C17（`docs/PLAN.md:1367`）本就要求"Go→前端事件推送"⇒ 你这是**兑现冻结契约**、⛔ 改它一字。⛔ 动 `PLAN.md`／`docs/specs/**`／三枚冻结件。
+- ★**⛔ 发明合并/背压规则**：只许挂在既有那三个 publish 驱动点（状态真动那一形），⛔ 逐 token delta 推；D38d 那条"多久推一次"的合并规则**仍属票 35 名下**。若你判断非加节流不可 ⇒ **停下来上报**，⛔ 自己定。
+- ★**⛔ 动 `frontend/**`／`design/**` 一字**（页面侧接收器今天缺位，写权归机主的外部前端 agent）。你要做的另一件事＝把**合同写成文件**（票 `AC#5`）：具名 JS 全局名＋参数形状（就是那串快照 JSON）＋触发时机，落 `.scratch/wisp/probes/329/r1/page-contract.md`，供机主转给他的前端 agent。
+
+## 写面（只许这四处，逐字；超出一枚算越格、我退回）
+1) `cmd/wisp/**`（本波唯一一枚碰这面产码的腿＝你）；2) `.scratch/wisp/probes/329/r1/**`（含 `logs/`，原始读数一律 **`.log`** 形——`.gitignore:8` 是 `*.out`，那种名字落不进提交树）；3) `docs/evidence/s1/**` 一枚件（★短名、⛔ 长名、⛔ 件名带 `§`）；4) 票 329 末尾**一条**只追加 bullet。
+⛔ 其它一切面：`internal/panel/**`（本波归裁决腿 `327-v1` 的只读射程，⛔ 你写它）、`internal/agent/**`（`330-r2` 在写测试面）、`internal/tools/**`、`internal/memory/**`、`internal/session/**`、`frontend/**`、`design/**`、`PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden 既有件／`tools/d22scan/allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`／三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）。
+
+## ★判据与牙（票 `AC#2`/`AC#3` 的形，交件必带）
+- 判据**不许是"Eval 被调过一次"**：用例必须断**桩宿主收到的那串字节 ⇄ 泵 marshal 出的那串字节逐位相等**。仓里已有可抄的形状＝`internal/panel/composer_dispatch_test.go:461` 那种 fake `CoreWebView2`（`PostWebMessageAsJson` 桩），以及 `cmd/wisp/panel_pump_test.go` 现成的 driven runtime 形状（`:176`/`:310`/`:363` 那三处已经在读 `lastPanelSnapshot()`）——⛔ 改它们任何一行既有断言，你**只追加**用例。
+- ★**去牙一发**（必跑）：把推出去的字节换成空串／换成那行日志摘要 ⇒ **指名那枚用例必须红**（红句逐字贴回，带 `file:line`）。
+- ★**反控一发**（必跑，与去牙**不是同一发**）：改 marshal 侧一个字段（例如少一条待批）⇒ 用例**也必须红**。少任一发＝那把尺对字节不敏感，⛔ 用它的绿当凭据。
+- ★两发都打在**仓外导出树**的字节上（⛔ 改跟踪文件、⛔ `-overlay`：那形对读盘的尺失明），逐发**当场还原并报还原哈希**；`finally` 里还原（中途炸过＝突变留在跟踪件是这本仓的高危事故）。
+
+## 规矩（一条都不许漏）
+- **只 commit、⛔ push**；`git add`／`git commit` 两处**逐枚显式 pathspec**；⛔ `add -A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree／checkout。
+- **⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`**（裁决者≠实现者；票 329 的九格由**非实现者**裁＋我翻）。
+- ★**`cmd/wisp` 那一格归你**（本波唯一写这面的腿）：颜色尺＝`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -timeout 30m`，改前／改后各一发、四数逐枚点名（`^=== RUN` 含子测试 ⇄ `^--- PASS` 只数顶层，⛔ 混用），终态红名册与起手**作差＝0**。★⛔ 不带那两枚 DLL 目录进 `PATH` 会得到 `exit status 0xc0000135`＋rc=1＋**零枚 `--- FAIL`**＝那包**根本没跑**（台面故障，⛔ 计入判据）。★⛔ 用默认超时判重包死活（无 `-timeout` ⇒ `panic: test timed out after 10m0s` 长得像"包红了"）。⛔ 跑 `go test ./...`。
+- 已知本机状态那一格：`cmd/wisp` 整包今天有 **6 枚红＝本机状态**（活实例 `wisp.exe` PID 21892 握全局热键＋单实例锁打死 4 枚、前台被别窗握着打死 2 枚真窗）。⛔ 为它们动断言、⛔ 杀那枚 PID；你的判据＝**名册作差**（起手 6 ⇄ 终态 6，红句同、只差 HWND 数字算同形）。
+- ★**台面配方（现行完整版，缺一味就假红）**：`git archive <起手锚> go.mod go.sum internal cmd tools scripts frontend models` **八件套** ＋ ★**仓根 `docs/`**（`paths_shortname_252_*` 那族要它）＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`——都⛔ 跟踪）＋树放 **`D:` 卷且目录名要产生 8.3 短名别名**（放 `/tmp`＝C 卷 Temp 会被挂成空目录／短名判定变形 ⇒ 那族打红＝台面故障）；取出后**先数 `.go` 证非空**（"0"⛔ 是读数）。少 `frontend` ⇒ `[setup failed]`；少 `models` ⇒ `internal/models` 三枚假红。
+- **门禁四数只在共享工作树上跑**（⛔ 部分导出树）：`gofumpt.exe -l`（真身 `/d/work/base/gopath/bin/gofumpt.exe`，PATH 里可能 rc=127）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./cmd/wisp/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 `exit 2`＋`ban #8 scope design/ examined 0 files`＝**GUARD 射程拒绝，⛔ 读成红**；长度门要 `.git`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+- ⛔ 为了变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 在注释里指名一枚不存在的测试当凭据（本仓已入账六次）。⛔ 在注释/票面许诺未实现的能力。
+- ⛔ 杀 `wisp.exe` **PID 21892**（机主 10-15 19:03 自起的常驻实例，台账 `A988`）。
+- 读数纪律：引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先看 `stderr` 并跑一枚已知存在的正控。
+- **输出预算**：≤4 枚件、每件 ≤160 行；⛔ 0 字节文件（交件前 `wc -c`）；轮次帽约 150 ⇒ **每落一枚文件就 commit**（⛔ 攒着，昨天那枚写腿就是攒到第四笔死在半路）。
+- shell 规矩：进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 并发在飞：`329-r1`（你，`cmd/wisp` 产码）∥ `330-r2`（写 `internal/agent/**` 的**测试面**）∥ `327-v1`（裁 `internal/panel`）∥ `216-v2`（只读、⛔ Go）⇒ ⛔ 读别腿在飞字节当凭据；`go test` 重包撞上了等一等再跑并具名写你等了。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含上面四处；产码那笔逐枚点名"改了哪几枚文件、各几行"）；② 证据件绝对路径＋`wc -c`＋行数＋占位符尺 0 命中；③ ★**`lastPanelSnapshot` 非测试读者那一把尺的逐字输出**（起手＝0 ⇄ 交件＝非空，两侧都带 `file:line`）＋去牙／反控两发红句逐字＋还原哈希＋改前改后四数＋门禁四数 `rc=`。
+另加我的必答题（⛔ 你自己盖章不算）：把你新增的那一枚生产读者**摘掉**（台件、当场还原、报还原哈希），你那句"字节逐位相等"的用例还响不响？若它**不响**＝它对这一跳不敏感，具名写出来交我裁。
