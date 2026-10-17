@@ -1,0 +1,5 @@
+票 335 落地腿 335-r1·票尾一条只追加 bullet＝交件登记（⛔ 翻框：七枚 AC 框仍 7 枚未勾、0 枚已勾；⛔ 改票名／Status:／-done；⛔ 动台账／HANDOVER／333 票一字）
+
+- 尺＝git diff --numstat 本票＝2 增 0 删（一枚空行＋一条 bullet）；unchecked 框现数＝grep -c '^[[:space:]]*- \[ \]'＝7。
+- bullet 内容＝起手四行逐枚复认（含一处台面差具名更正）＋AC#1 三臂改形与成对两发＋加分发ⓒ的逐字红句与还原哈希＋AC#2 零改动尺与正负控＋AC#3 五枚起手红逐枚归谁＋AC#4 成对四数与门禁四数＋AC#5 禁区自证＋交回三件。
+- ⛔ push；本笔 pathspec 只两枚文件（本票＋msg-bullet.txt＋msg-bullet-commit.txt），别腿在飞的 333 票 10/10 字节⛔ 计入本笔。
