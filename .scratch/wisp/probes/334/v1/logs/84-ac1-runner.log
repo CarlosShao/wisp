@@ -1,0 +1,42 @@
+### M-V4＝腿的 M-A 形：reason 拼装那一处改成永不产出说实话那句
+    326c326
+    < 	if anchorMatches(cand, anchor, rel) || !uncertainAnchorMiss(cand, anchor) {
+    ---
+    > 	if true {
+  go_test_rc=1 RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  hash=d66141f69267be4ff70308d1dbc03a61d6b9d000 match=NO [after-M-V4]
+### M-V5＝腿的 M-B 形：锚展开那一行换成丢掉 root 的裸形
+    325c325
+    < 	anchor := anchorForms(anchorSpelling)
+    ---
+    > 	anchor := pathForms{raw: normPath(anchorSpelling)}
+  go_test_rc=1 RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  hash=08a305570e4385b6d386cdea072c1d51b5c358d1 match=NO [after-M-V5]
+### M-V6＝只把那句假话换成另一种假话（不提候选、不提缺位锚，仍带 fail-closed 字样）
+    329,330c329,330
+    < 	return fmt.Sprintf("%s [fail-closed, NOT a match on this rule]: the candidate %q is not proven handle-expanded (its own walk stopped at %q) and the anchor %q is not installed here (its expansion stopped at %q), so R17 protects the ancestry chain the two share instead of proving a miss",
+    < 		literal, cand.raw, cand.root, anchorSpelling, anchor.root)
+    ---
+    > 	return fmt.Sprintf("%s [fail-closed, NOT a match on this rule]: this anchor is not installed here, so the shared ancestry chain is protected",
+    > 		literal)
+  go_test_rc=1 RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  hash=869dfb58c413ae01e89c5d2a1e617abf9d4b0d35 match=NO [after-M-V6]
+### 末态
+  blacklist.go tree=c1799cd24afce19e6accef23db23a7d7ee746dec commit=c1799cd24afce19e6accef23db23a7d7ee746dec
+  anchor_miss_reason_334_test.go tree=8f683b04d19c2bbe6956620f1d96338915b48cdd commit=8f683b04d19c2bbe6956620f1d96338915b48cdd
+  name_claim_two_arm_216_test.go tree=cbc0a610ae08628a764fb89dde6468a25b5eab61 commit=cbc0a610ae08628a764fb89dde6468a25b5eab61
+-- M-V1 那发的红句逐字（判级支单独动、reason 未动）
+--- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.02s)
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env*

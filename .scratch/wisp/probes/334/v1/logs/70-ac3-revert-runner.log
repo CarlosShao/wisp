@@ -1,0 +1,31 @@
+### 1 AC#3 反控（CI 形台面）：交件字节＋夹具改回 t.TempDir()
+  落点行差（⇄ 交件 blob）:
+    89c89
+    < 	dir := candidateOffAnchorChain334(t)
+    ---
+    > 	dir := t.TempDir()
+blacklist_blob_on_disk=c1799cd24afce19e6accef23db23a7d7ee746dec
+go_test_rc=1
+FOURCOUNT RUN=24 PASS_TOP=5 FAIL_TOP=1 SKIP=0 rc=1
+redlist=7
+  RED --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* 
+  RED FAIL
+  RED FAIL	github.com/CarlosShao/wisp/internal/risk	0.159s
+  RED FAIL
+  夹具还原 hash=cbc0a610ae08628a764fb89dde6468a25b5eab61 交件 blob=cbc0a610ae08628a764fb89dde6468a25b5eab61
+### 2 交件字节在同一把 CI 形台面上的正控（夹具未动 ⇒ 必须 24/6/0/0 rc=0）
+go_test_rc=0
+FOURCOUNT RUN=24 PASS_TOP=6 FAIL_TOP=0 SKIP=0 rc=0
+redlist=0
+### 3 v2 探针的三值对撞重跑（T_BEFORE ⇄ T_AFTER，solo 世界已含）
+blacklist_blob_on_disk=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5
+FOURCOUNT RUN=22 PASS_TOP=4 FAIL_TOP=0 SKIP=0 rc=0
+blacklist_blob_on_disk=c1799cd24afce19e6accef23db23a7d7ee746dec
+FOURCOUNT RUN=22 PASS_TOP=4 FAIL_TOP=0 SKIP=0 rc=0
+  42 D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/334/v1/logs/v2-before.shape
+  42 D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/334/v1/logs/v2-after.shape
+  84 total
+  THREE_VALUE_DIFF_lines=0 rc=0  (0＝逐字相同)

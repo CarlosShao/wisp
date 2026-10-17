@@ -1,0 +1,35 @@
+### 必答① 逐跳 file:line（全部尺＝git grep -n 射程＝3a118226）
+-- 1 classifyForms 的第二返回值（九枚 A case 走 aRuleReason）
+3a118226:internal/risk/blacklist.go:221:		return ClassA, aRuleReason("~/.git-credentials", anchorPath(homeS, `.git-credentials`), cand, eqPath)
+3a118226:internal/risk/blacklist.go:226:		return ClassA, aRuleReason("%APPDATA%\\wisp\\config.toml", anchorPath(appDataS, `wisp`, `config.toml`), cand, eqPath)
+3a118226:internal/risk/blacklist.go:228:		return ClassA, aRuleReason("~/.ssh/**", anchorPath(homeS, `.ssh`), cand, isUnder)
+-- 2 aRuleReason 拼装点
+3a118226:internal/risk/blacklist.go:329:	return fmt.Sprintf("%s [fail-closed, NOT a match on this rule]: the candidate %q is not proven handle-expanded (its own walk stopped at %q) and the anchor %q is not installed here (its expansion stopped at %q), so R17 protects the ancestry chain the two share instead of proving a miss",
+-- 3 Gate 把它接进 PathDecision.Reason
+3a118226:internal/risk/blacklist.go:77:func Gate(canonical string, bOverrides map[string]bool) PathDecision {
+3a118226:internal/risk/blacklist.go:84:		return PathDecision{Class: ClassA, Reason: "A-list sensitive path (non-overridable): " + rule}
+-- 4 risk.Gate 的全部生产调用点
+3a118226:internal/tools/mode.go:98:		d := risk.Gate(c, overrides)
+-- 5 BlacklistNote.Reason 的写入与读者
+3a118226:internal/tools/mode.go:111:			n.Reason = d.Reason
+3a118226:internal/agent/approval/pending_read.go:73:	out.Blacklist.Absolute = cloneBacking(d.Blacklist.Absolute)
+3a118226:internal/agent/approval/pending_read.go:74:	out.Blacklist.Unlockable = cloneBacking(d.Blacklist.Unlockable)
+3a118226:internal/agent/approval/pending_read.go:75:	out.Blacklist.AlreadyUnlocked = cloneBacking(d.Blacklist.AlreadyUnlocked)
+3a118226:internal/tools/bridge.go:316:		dec.Blacklist = b.readBlacklist(rawPaths)
+-- 6 blacklistedSensitive 调用点枚数
+   callers=3a118226:internal/tools/mode.go:2   ← 只有定义处
+-- 7 risk.Logf 生产注入点枚数（⛔ 测试）
+-- 8 R3 那句（真正到模型的那句）在 rules_gateway.go 的行号
+3a118226:internal/risk/rules_gateway.go:78:		case TierA:
+3a118226:internal/risk/rules_gateway.go:82:				reason: fmt.Sprintf("R3: 命中 A 档敏感路径，拒绝（不可豁免）: %s", canonical),
+-- 9 bridge：verdict.Reason → route → reject → ToolOutcome.Text
+3a118226:internal/tools/bridge.go:301:	dec.Reason = verdict.Reason
+3a118226:internal/tools/bridge.go:439:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+3a118226:internal/tools/bridge.go:1106:		Text:       why,
+-- 10 loop：ToolOutcome.Text 进对话正文
+3a118226:internal/agent/loop.go:745:		l.append(toolResultMessage(c.ID, log.Text, log.Outcome != OutcomeSuccess))
+-- 11 面板那两跳
+3a118226:cmd/wisp/panel_pump.go:75:			Reason:                 it.Decision.Reason,
+3a118226:cmd/wisp/run.go:785:				d.Tool, d.LevelString(), d.RulesHit, d.Reason)
+-- 12 冻结契约自陈（卡片逐字渲染 RulesHit/Reason）
+3a118226:internal/risk/assessor.go:13:// renders Decision.RulesHit and Decision.Reason verbatim.

@@ -1,0 +1,35 @@
+### AC#6 事故那一格：只报盘上事实（纪律结论归编排者）
+-- 1 git show --stat 8823549f（全量）
+8823549f6 12:06:48 票 334 腿 334-r1·证据五＝终局门禁四数＋交件树交叉核对（整枚交件树 3a118226 里那六枚名册仍 24/6/0/0 rc=0 ⇒ 别腿字节不移这色）
+
+ ...e-display-boundary-reachability-census-done.md} |  0
+ .../r1/logs/ac3-aftercommit3a118226-roster.err.log |  0
+ .../334/r1/logs/ac3-aftercommit3a118226-roster.log | 64 ++++++++++++++++++++++
+ .../logs/ac3-aftercommit3a118226-roster.log.body   | 54 ++++++++++++++++++
+ .../ac3-aftercommit3a118226-roster.log.redlist     |  0
+ .../r1/logs/ac5-03-final-gates-and-selfcheck.log   | 18 ++++++
+ 6 files changed, 136 insertions(+)
+
+-- 2 同一枚件的 name-status
+R100	.scratch/wisp/issues/332-cf-invisible-runes-outside-display-boundary-reachability-census.md	.scratch/wisp/issues/332-cf-invisible-runes-outside-display-boundary-reachability-census-done.md
+-- 3 numstat（R100 那行的行丢失枚数）
+0	0	.scratch/wisp/issues/{332-cf-invisible-runes-outside-display-boundary-reachability-census.md => 332-cf-invisible-runes-outside-display-boundary-reachability-census-done.md}
+-- 4 dc367a2a 的 parent
+dc367a2a3 parent=8823549f6
+-- 5 dc367a2a 在那枚件上翻了几个框（diff 里 +/- 的框数）
+0
+0
+-- 6 -done 那枚名的 --follow 名册（是否连续）
+dc367a2a 12:06:57 票 332 结案：六格全翻＋改 -done（凭非实现者裁腿 332-v1 判语＝AC#0…AC#5 皆成立，各带具名缺陷）
+8823549f 12:06:48 票 334 腿 334-r1·证据五＝终局门禁四数＋交件树交叉核对（整枚交件树 3a118226 里那六枚名册仍 24/6/0/0 rc=0 ⇒ 别腿字节不移这色）
+17e9347b 12:03:21 票 332 裁腿 332-v1 票尾一条只追加 bullet（numstat 1/0＝纯追加；六格判语＋五枚缺陷逐枚＋两枚必答＋牙与台面）：AC#0/AC#1/AC#2/AC#3/AC#4/AC#5 皆成立（各带具名缺陷与不可盘核的那半格），⛔ 翻框（现跑未勾仍 6）、⛔ 改票名/Status:、⛔ 产码、⛔ push
+2deb5441 10:58:33 台账 A1015：收 332-a1（24 笔／18 枚唯一路径，越格 0；★我自己那把越格尺用了子串匹配＝差点造出假指控，改正尺重打）＋收 327-r2（160/0 一枚文件，三枚新用例我复跑 rc=0 3/3/0/0）＋裁票 327 残余 R2＝甲-全·按范畴⇒立票 333 放 333-r1；含我复跑四把（Cf=170 自跑探针、名册 15、调用点 1＋字段两枚的 file:line 归属改正、字符类筛尺 41⇄18 射程作差逐名归位）＋我自抓三枚（子串尺、字段出处记错、"既有断言⛔ 动"写成全称会钉死腿）＋票 327/332 尾各一条（2/0、框未动）
+8fab44f5 10:40:31 332-a1 票 332 末尾追加一条 bullet（纯追加 0 删 1 增；⛔ 翻任何 AC 框、⛔ 改票名/Status:；料＝起手四把尺现量＋整族170枚名册155枚分11族求和＋逐枚三形载体file:line＋两枚真盘正控与marshal逐字＋票329之后五条腐烂/两条未腐烂更正）
+ba4fe25d 10:15:39 第十六波派单存档（六枚）＋立票 332：228-r3 接托盘「退出」真执行者（cmd/wisp＋internal/proc，修法乙-1）∥ 327-r2 把名册基数常钉搬进仓内（internal/panel 测试面，残余 R1）∥ 329-v1／330-v1／331-v1 三枚非实现者终裁（★各自必须重放落地铁没跑或在仓外才跑的那几发）∥ 332-a1 只读普查 Cf 全族 170 枚里边界外那 155 枚的可达性（残余 R2 欠的那一纸所需料）
+-- 7 HEAD 树里 332 那一枚的名字枚数（防重领键唯一性尺）
+1
+.scratch/wisp/issues/332-cf-invisible-runes-outside-display-boundary-reachability-census-done.md
+-- 8 现盘上那枚 -done 件的框数
+   未勾=0 已勾=6
+-- 9 那枚旧名（无 -done）在最后哪一笔还在
+8823549f 票 334 腿 334-r1·证据五＝终局门禁四数＋交件树交叉核对（整枚交件树 3a118226 里那六枚名册仍 24/6/0/0 rc=0 ⇒ 别腿字节不移这色）
