@@ -1,0 +1,16 @@
+anchor=60c32868
+go_files=747
+=== forward targeted run
+=== RUN   TestPlanPresentCallBooksTheToolCallRow165r3
+--- PASS: TestPlanPresentCallBooksTheToolCallRow165r3 (0.13s)
+ok  	github.com/CarlosShao/wisp/internal/agent	0.207s
+rc_forward=0
+=== whole package -v denominators
+rc_full=0
+RUN=110
+PASS_TOP=86
+FAIL_TOP=0
+SKIP=0
+PANIC=0
+7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be *internal/agent/testdata/golden/plan-present.sse
+00c32049994c441c8927066bc4d4099c1b2977fc20ee9e602bb98f3670d37b75 *internal/agent/plan_present_doorbell_165r3_test.go
