@@ -131,6 +131,12 @@ func TestProbe334V1PerAnchorChain(t *testing.T) {
 		{"case6-kube", []string{".git-credentials", wispDir + "/config.toml", ".ssh/id_ed25519", ".aws/credentials"}, "work"},
 		{"case8-dpapi", []string{".git-credentials", wispDir + "/config.toml", ".ssh/id_ed25519", ".aws/credentials", ".kube/config"}, "AppData/Roaming"},
 		{"case9-local-creds", []string{".git-credentials", wispDir + "/config.toml", ".ssh/id_ed25519", ".aws/credentials", ".kube/config", `AppData/Roaming/Microsoft/Protect/marker.txt`}, localDir},
+		// Solo worlds: every OTHER fail-closed-capable anchor is installed honestly, so
+		//摘掉这一枚 case 的回落支必然把 class 从 A 挪走（腿的仪器只经过 .aws／.kube 两枚）。
+		{"case4b-ssh-solo", []string{".git-credentials", wispDir + "/config.toml", ".aws/credentials", ".kube/config",
+			`AppData/Roaming/Microsoft/Protect/marker.txt`, `AppData/Local/Microsoft/Credentials/marker.txt`}, "work"},
+		{"case8b-dpapi-solo", []string{".git-credentials", wispDir + "/config.toml", ".ssh/id_ed25519", ".aws/credentials", ".kube/config",
+			`AppData/Roaming/Microsoft/Windows/marker.txt`, `AppData/Local/Microsoft/Credentials/marker.txt`}, "AppData/Roaming/Microsoft/Windows"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.anchor, func(t *testing.T) {
