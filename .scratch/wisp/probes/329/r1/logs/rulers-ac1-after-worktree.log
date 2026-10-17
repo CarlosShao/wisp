@@ -1,0 +1,26 @@
+== 尺1 bookPanelSnapshot（工作树，交付后） ==
+cmd/wisp/panel_pump.go:335:// bookPanelSnapshot is the exit's far end, and it is where this repository's
+cmd/wisp/panel_pump.go:365:func (rt *agentRuntime) bookPanelSnapshot(snap panel.Snapshot, data []byte) error {
+cmd/wisp/panel_snapshot_deliver_329.go:7:// the bytes to src.Out, and out.bookPanelSnapshot retains them on the runtime
+cmd/wisp/run.go:744:		Out:       rt.bookPanelSnapshot,
+rc=0
+== 尺3 publishPanelSnapshot 生产挂载 ==
+cmd/wisp/panel_pump.go:438:// publishPanelSnapshot puts one snapshot on the wire. Called where a state the
+cmd/wisp/panel_pump.go:447:func (rt *agentRuntime) publishPanelSnapshot() {
+cmd/wisp/panel_snapshot_deliver_329.go:6:// publishPanelSnapshot calls pump.Publish, Publish marshals the snapshot and hands
+cmd/wisp/panel_snapshot_deliver_329.go:18:// no new publish drive point was invented (this hop hangs ONLY inside publishPanelSnapshot, which every
+cmd/wisp/panel_snapshot_deliver_329.go:88:// pushed bytes pin the same packet. It is called only from publishPanelSnapshot,
+cmd/wisp/resident_windows.go:341:	// attach, and it is the whole of the wiring - publishPanelSnapshot pushes
+cmd/wisp/run.go:754:		rt.ui.publish = rt.publishPanelSnapshot
+cmd/wisp/run.go:1075:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+rc=0
+== 尺4 Eval 定义与生产调用 ==
+667:func (c *panelControl) Eval(js string)      { c.browser.Eval(js) }
+737:			c.Eval("window._rpc[" + id + "].reject(" + ctlJsString(refusal) + "); window._rpc[" + id + "] = undefined")
+744:			c.Eval("window._rpc[" + id + "].reject(" + ctlJsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
+748:			c.Eval("window._rpc[" + id + "].reject(" + ctlJsString(err.Error()) + "); window._rpc[" + id + "] = undefined")
+752:			c.Eval("window._rpc[" + id + "].resolve(" + string(b) + "); window._rpc[" + id + "] = undefined")
+rc=0
+== 尺5 bridge.go 入向名册＝7 ＋正控 panel.mode.request ==
+7
+1

@@ -1,0 +1,4 @@
+time=2026-10-17T10:00:58.370+08:00 level=INFO msg="MARK299 wndproc hwnd=0x99a0a52 msg=0xc0f9 known=true"
+time=2026-10-17T10:00:58.376+08:00 level=INFO msg="MARK299 wndproc hwnd=0x99a0a52 msg=0xc053 known=true"
+--- PASS: TestBallPanelGesturesReachThePanelThread (1.03s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.240s

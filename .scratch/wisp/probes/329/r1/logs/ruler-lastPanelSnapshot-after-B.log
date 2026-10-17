@@ -1,0 +1,3 @@
+cmd/wisp/panel_snapshot_deliver_329.go:9:// that retention: lastPanelSnapshot had zero non-test callers, so the bytes stopped
+cmd/wisp/panel_snapshot_deliver_329.go:83:// lastPanelSnapshot: read the bytes this run just booked, and hand them to the
+cmd/wisp/panel_snapshot_deliver_329.go:95:	_, data, seen := rt.lastPanelSnapshot()
