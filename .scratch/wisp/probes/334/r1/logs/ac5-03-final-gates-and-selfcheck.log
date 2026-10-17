@@ -1,0 +1,18 @@
+### 终局门禁四数（共享工作树，HEAD=3da81781）
+gofumpt_rc=0
+d22scan_rc=0
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-
+lenbudget_rc=0
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by
+go_vet_rc=0
+### 票框未勾数（⛔ 翻框）
+7
+### 占位符尺（全写面＋证据件）
+ph_rc=1
+### AC#2 三值尺逐字（决定性）
+before rc=0 RUN=7 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+after rc=0 RUN=7 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+THREE_VALUE_IDENTICAL=YES lines=14
+### 交件侧新仪器（改后整包内的两枚 PASS）
+--- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.04s)
+--- PASS: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.02s)
