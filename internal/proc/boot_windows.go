@@ -53,6 +53,21 @@ type Runtime struct {
 	// the lock makes the handoff as race-free as the shape allows.
 	activationMu   sync.Mutex
 	activationHook func() string
+
+	// stopReq is ticket 228 AC#11's stop-request bit (form 乙-1, ruling A493).
+	// Boot always fills it, for the same reason shutdownHooks is always filled:
+	// the thing that RECORDS a request is a callback the assembly root installs
+	// long before the loop runs - the tray's Exit item is handed to ball.New by
+	// startResidentBall, hundreds of milliseconds before RunEventLoop is called -
+	// so a bit created inside the loop would drop every request that arrives in
+	// that window. It is a latch and not a waiter: see stop_windows.go for why a
+	// callback on the ui-sta thread may not wait on anything.
+	//
+	// It adds a TRIGGER and no STEP. RunShutdownSequence still walks 1..10
+	// (shutdown.go), the ten-step chain still hangs off the resident leg
+	// returning normally, and hookableRoster keeps its closed eight slots
+	// (shutdown_hooks.go).
+	stopReq *stopRequest
 }
 
 // BootOption adjusts Boot (tests, embedders).
@@ -88,6 +103,12 @@ func Boot(env buildinfo.Env, opts ...BootOption) (*Runtime, error) {
 
 	rt := &Runtime{Env: env, StartedAt: observe.NowWallUTC()}
 	rt.shutdownHooks = &ShutdownHookSet{}
+	// Ticket 228 AC#11 ⓐ: the stop-request bit is built HERE, not inside the event
+	// loop, because the callback that records into it is installed by the assembly
+	// root before the loop exists. A runtime nobody booted keeps a nil bit and the
+	// nil-safe answers in stop_windows.go, which is the honest "nothing can ask
+	// this runtime to stop" shape rather than a panic.
+	rt.stopReq = newStopRequest()
 	if cfg.registry != nil {
 		rt.Registry = cfg.registry
 	} else {
@@ -134,25 +155,48 @@ func Boot(env buildinfo.Env, opts ...BootOption) (*Runtime, error) {
 	return rt, nil
 }
 
-// RunEventLoop is the empty event loop of ticket 03: it blocks until an exit
-// signal (Ctrl+C / console close / WM_ENDSESSION landing in ticket 43) and
-// pumps the activation event without a dedicated goroutine (a short
-// WaitForSingleObject per iteration keeps the loop responsive while the D38b
-// resident roster stays at its frozen baseline). Returns the shutdown reason.
+// RunEventLoop blocks until this runtime is asked to leave, and pumps the
+// activation event without a dedicated goroutine (a short WaitForSingleObject per
+// iteration keeps the loop responsive while the D38b resident roster stays at its
+// frozen baseline). Returns the shutdown reason.
 //
-// Since ticket 319 the activation round is handleActivation - still in this
-// loop, still no goroutine, still one 50 ms wait per tick.
+// THE COMPLETE ROSTER OF WHAT CAN END THIS LOOP, since ticket 228 AC#11 (the
+// doc used to enumerate "Ctrl+C / console close / WM_ENDSESSION landing in ticket
+// 43", which stopped being the whole list the moment the tray got an executor):
+//
+//   - os.Interrupt, which is what a console Ctrl+C becomes;
+//   - SIGTERM, registered on the same signal.NotifyContext below;
+//   - a stop request recorded on this runtime (Runtime.RequestStop) - ticket
+//     228 AC#11's tray Exit item is its only production caller today, and the
+//     reason the request is a bit rather than a call into Shutdown is in
+//     stop_windows.go: the requester runs on the ui-sta thread and may wait on
+//     nothing;
+//   - console close and WM_ENDSESSION, which still land in ticket 43: this loop
+//     has no handler for either, and saying so here is why AC#11's executor ends
+//     the loop instead of calling os.Exit on the user's window.
+//
+// Every one of them leaves the same way: this function returns and the caller's
+// deferred chain runs the frozen D38(e) order. Since ticket 319 the activation
+// round is handleActivation - still in this loop, still no goroutine, still one
+// 50 ms wait per tick.
 func (rt *Runtime) RunEventLoop() string {
 	sigCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+	stopSignal := rt.StopSignal()
 
 	for {
 		rt.handleActivation()
 		select {
 		case <-sigCtx.Done():
 			return "signal"
+		case <-stopSignal:
+			// Ticket 228 AC#11: the request is a latch, so a stop asked for before
+			// this select existed is still honoured here. The return value names
+			// who asked, because the line cmd/wisp prints off it is the only
+			// sentence the trail has for "why did this process leave".
+			return "stop request (" + rt.StopReason() + ")"
 		case <-time.After(50 * time.Millisecond):
-			// loop tick: activation pump + signal check
+			// loop tick: activation pump + signal check + stop-request check
 		}
 	}
 }

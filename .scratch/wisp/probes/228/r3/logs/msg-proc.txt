@@ -1,0 +1,18 @@
+票 228 AC#11 产码①（internal/proc，修法乙-1）：常驻 runtime 终于有了停机请求位
+
+- 新增 internal/proc/stop_windows.go：stopRequest 是一枚闩（首次 RequestStop 记因由并
+  close 一个通道、立刻返回），Runtime 面上四个方法 RequestStop / StopSignal /
+  StopRequested / StopReason，全部 nil-安全——记请求的那个人跑在 ui-sta 线程上，
+  按 Ball.Close 那种 PostTask+<-done 的形状等下去就是本线程等自己（vetoByEsc 早把
+  合法形状写明了）。
+- boot_windows.go：Boot 建位（AC#11 ⓐ 第一句「必须在 boot 时建好」——托盘回调在
+  startResidentBall 就装上了，早于 RunEventLoop 数百毫秒，位在环路里建就吞掉这段）；
+  RunEventLoop 的 select 加读这枚闩，返回 "stop request (<谁请求的>)"；十步一字未动、
+  hookableRoster 闭集八枚一字未动（A493 划的界：加触发≠改契约，要加第九枚槽我当场停手）。
+- RunEventLoop 的 doc 按 A493 的落地义务改口成**完整**退出触发名册：os.Interrupt /
+  SIGTERM / 记录在案的停机请求（今天唯一产码调用者是托盘 Exit 那枚）三类真触发，
+  console close 与 WM_ENDSESSION 仍然写明是落票 43——过期句子不留。
+
+尺（内部/包门，共享工作树）：go build ./internal/proc/ rc=0；go vet ./internal/proc/ rc=0；
+gofumpt -l 本腿三枚产码文件 0 行；scripts/d22scan.sh rc=0（clean，bans #1-5 internal/ 241 枚、
+cmd/ 42 枚产码文件，ban #8 internal/ 582 枚含注释与 _test.go）。
