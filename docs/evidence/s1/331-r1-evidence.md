@@ -88,3 +88,27 @@ promise made here" deliberately avoids any "we will always ..." guarantee (AC#5 
 - Deliverable placeholder scan: the pattern and its command are written verbatim in
   `.scratch/wisp/probes/331/r1/logs/ac-selfcheck.log` (tokens kept out of this sentence on
   purpose, so the file cannot self-trigger its own scan); outcome 0 hits, grep rc=1.
+- `git show e09187e1` production-file diff, pasted raw per dispatch (every +/- line is a
+  whole-line `//` comment; hunk context shows the function body untouched):
+
+  ```diff
+  --- a/internal/observe/errors.go
+  +++ b/internal/observe/errors.go
+  @@ -157,9 +157,13 @@ func (c ErrorClass) MappedStates() []string {
+    	}
+   }
+   
+  -// MessageKey returns the stable user-visible copy key for the class. The copy
+  -// text itself is deferred (D23 error-copy work, S6); UI and logs embed the key
+  -// so copy can be added later without re-touching error sites.
+  +// MessageKey returns the stable user-visible copy key reserved for the
+  +// deferred error-copy layer (D23 error-copy work, S6; registered DEFERRED in
+  +// docs/specs/SPEC-12-roadmap-governance.md section 5). As read on 2026-10-17
+  +// (ticket 331) no production code embeds this key: its only callers are the
+  +// tests internal/observe/errors_test.go (TestMessageKeys) and
+  +// internal/llm/matrix_14_2_test.go. Whether UI and logs embed the key is
+  +// that deferred layer's decision, not a promise made here.
+   func (c ErrorClass) MessageKey() string {
+   	return "error." + string(c)
+   }
+  ```
