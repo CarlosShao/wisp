@@ -1,0 +1,12 @@
+docs(evidence): 票 216 AC#6 两枚仪器＝216-r2 读数件（现量/四数/三发突变/门禁/残余）
+
+件 89 行／约 11 KB，逐枚带"哪把尺＋射程＋量的还是算的"：
+AC#6 甲现跑 0/0/0（两把独立尺）＋"attachment 进不了判级链"的 rc=1 与正控 params 三枚在场；
+改前⇄改后四数 201/131/1/1/0 ⇄ 225/137/1/1/0、红名册 comm -3 作差 0 行（既有红
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg 逐字归因到 216-r1 那两枚 panel 件，⛔ 我动那面）；
+M1（rules_shell.go）让 ⓐ 响回 1、M2（blacklist.go）让 ⓑ 那臂响而 ⓐ 三窗仍 0/0/0、
+R1（整枚改名）＝必答题：算子钉**红**且具名报"找不到函数"，⛔ 静默；三发还原哈希逐枚 MATCH=yes、残留 0；
+门禁四数 rc（d22scan 第一发 rc=2＝GOTMPDIR 指 D: 撞票 311 那枚水位 GUARD，按处方 env -u 重跑 rc=0 clean）；
+ban #8 分母 578→580＝+2，两枚完整导出树文件清单作差逐名；
+残余与边界具名：ⓐ 看不见 classifyForms 那一形、ⓑ 的 host 与覆盖键两臂对 M1/M2 惰性。
+⛔ 翻框、⛔ 改产码、⛔ push。
