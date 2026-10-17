@@ -1,0 +1,1 @@
+发送件（334-r1）：正文＝334r1-dispatch.txt 逐字。启动动作＝本会话 Agent 工具 background 一发。写面三处＝internal/risk/** ＋ .scratch/wisp/probes/334/r1/** ＋ 票 334 尾一条 bullet。★编排者裁＝甲-二（只修 reason 说实话＋给仪器补世界，判级那一支今天不动、需人工批准）。
