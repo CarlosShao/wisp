@@ -1,0 +1,123 @@
+327-v1 裁决腿读数（本人现跑，⛔ 抄 327-r1 的任何数）｜锚＝60c328686（327-r1 的 3/4）｜起手对照＝7c9d7ebe（c2f9310b 的父）
+台面＝仓外导出树 D:/tmp/w327v1/bench：git archive 60c328686 八件套（go.mod go.sum internal cmd tools scripts frontend models）
+      ＋仓根 docs/ ＋手工三件（build/*.dll／third_party/sherpa-onnx/*.dll／frontend/dist）；D: 卷、目录名 8.3 相容；GOTMPDIR=/d/tmp/gotmp327v1
+取出后 .go 枚数＝747（非空证明）｜被裁字节 sha256：工作树＝导出台＝8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd（逐字同串）
+命令一律＝go test -v -count=1 -timeout 30m ./internal/panel/（PATH 补 third_party/sherpa-onnx＋build）
+
+[A] 尺口径：^=== RUN 含子测试 ⇄ ^--- PASS/^--- FAIL/^--- SKIP 只数顶层（⛔ 混用）
+    终态未突变：RUN=252 PASS_TOP=155 FAIL_TOP=7 SKIP=0 rc=1
+    顶层红名册（7 枚）：TestApprovalCardViewJSONKeysMatchFrontendTypes TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 TestStreamLogDroppedNamingLedgerIsNotBounded35r8 TestComposerContractTypesMatchFrontend TestComposerRenderFixtureTellsTheTruth TestReadGitOnThisRepositoryIsSelfConsistent TestC21DesignTokensFourWayAgree 
+    台面故障尺：0xc0000135／setup failed／build failed／walk 命中＝0 枚
+    具名台面差（⛔ 判据差）：327-r1 名册 8 枚 ⊃ 本人 7 枚，多出的 TestGitDimensionHasNoModelCallableTool 读 docs/PLAN.md
+      （internal/panel/git_test.go:367 os.ReadFile(filepath.Join(root,"docs","PLAN.md"))）＝它那份台⛔ 带 docs/（旧配方）。它两发 FAIL 12 ⇄ 本人 11，差值恰＝1。
+
+[B] ★AC#2 成对定向突变＝本人重放（台件 ../v1-mutate.sh；还原写在 trap=finally；七发全 RESTORE_OK；⛔ 碰仓内跟踪字节）
+  发[m1] 只摘写入侧＝scrubForDisplay 的 case isDisplayWashCf(r) 那 7 行支（判据留着）
+      m1_removed_lines=7
+      mutated_sha256=e3bb5a1ce50e33ecb9214594dd17d3707c6152f62444de030eff7133da4598db
+      go_test_rc=1 RUN=252 PASS_TOP=151 FAIL_TOP=11 SKIP=0
+      比终态名册多出的红（comm -13 roster-base roster-m1）：TestABidiNameWalksTheRealBoundaryIntoAWashedRow TestEveryNamedCfRuneIsEscapedAndNeverDeleted TestTheBidiClaimInANameChangesNoVerdict TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired 
+      只在发[m1] 红（comm 对发[m2]）：TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired
+      另一发的靶子在本发＝绿（上两行的名册互不含对方靶子）
+      逐字红句：display_scrub_216_test.go:352: scrubForDisplay("a\x1b\u202eb\u200dc\xad") = "a\\x1b\u202eb\u200dc\\xad", want "a\\x1b\\u202eb\\u200dc\\xad"
+      本发 :368 逐枚命中＝0 行／还原 8050f22d… RESTORE_OK
+  发[m2] 只摘判据侧＝needsDisplayWash 里 || isDisplayWashCf(r) 一枚 term（写入侧留着）
+      m2_removed_term=|| isDisplayWashCf(r) (one term, one line)
+      mutated_sha256=579e02d544c1d6f3f2801a5b50c62d6a981cccdaf50d3aef40dea654d058e5e7
+      go_test_rc=1 RUN=252 PASS_TOP=151 FAIL_TOP=11 SKIP=0
+      比终态名册多出的红（comm -13 roster-base roster-m2）：TestABidiNameWalksTheRealBoundaryIntoAWashedRow TestEveryNamedCfRuneIsEscapedAndNeverDeleted TestNeedsDisplayWashNamesEveryWashedCfRune TestTheBidiClaimInANameChangesNoVerdict 
+      只在发[m2] 红（comm 对发[m1]）：TestNeedsDisplayWashNamesEveryWashedCfRune
+      另一发的靶子在本发＝绿（上两行的名册互不含对方靶子）
+      逐字红句：display_scrub_216_test.go:368: needsDisplayWash did not see soft hyphen (U+00AD) in "photo\u00ad.png": the fast path would return it raw
+      本发 :368 逐枚命中＝15 行／还原 8050f22d… RESTORE_OK
+
+[C] 五发加测（同台面、同一把尺）
+  [m3] 整枚谓词失明（isDisplayWashCf=>false）＝两把尺同时失明
+      m3_replaced_body_lines=9
+      mutated_sha256=472b5a74becc4151a3cc34c3d4cf35975d101a57988b4f2d89286bdf7aa84369
+      go_test_rc=1 RUN=252 PASS_TOP=150 FAIL_TOP=12 SKIP=0
+      RESTORE_OK
+      多出的红：TestABidiNameWalksTheRealBoundaryIntoAWashedRow TestEveryNamedCfRuneIsEscapedAndNeverDeleted TestNeedsDisplayWashNamesEveryWashedCfRune TestTheBidiClaimInANameChangesNoVerdict TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired 
+      ⇒ 名册＝发[m1]∪发[m2] 全部 5 枚 ⇒『两把尺都失明』没有任何一枚该响没响（派单要的反证已找过，找不到）
+  [m4] 洗集改 unicode.Is(unicode.Cf,r)＝多洗（AC#1 的加宽反形）
+      m4_replaced_body_lines=9
+      mutated_sha256=28b5cbac0129bd9224c206bc7160af1438b65bc8a4796b2dacf439ebddcfff53
+      go_test_rc=1 RUN=252 PASS_TOP=154 FAIL_TOP=8 SKIP=0
+      RESTORE_OK
+      多出的红：TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut 
+      逐字红句：display_scrub_216_test.go:448: U+2061 is not on the ruled list but needsDisplayWash fired on it ⇒ 排除钉有牙
+  [m5] 票 AC#4 点名要的那发＝internal/risk Assess 里 facts.Paths 含 已允许 即判 L0（改导出台副本的 risk 件，⛔ 仓内字节）
+      m5_mutated=internal/risk/assessor.go Assess(): a path containing U+5DF2 U+5141 U+8BB8 decides L0
+      mutated_sha256=8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd
+      mutated_risk_sha256=f135f6cb53d2b072812c282a123acf186427782d025ae0314615144658bc89ce
+      go_test_rc=1 RUN=252 PASS_TOP=153 FAIL_TOP=9 SKIP=0
+      restored_risk_sha256=9e73889b33147458f43ac546272711d1d72ecdbdfc31c12dece6b0d725a0e76d
+      RESTORE_OK
+      多出的红：TestTheBidiClaimInANameChangesNoVerdict TestTheClaimInANameChangesNoVerdict 
+      逐字红句：display_scrub_216_test.go:252: a name that says 已允许 changed the risk level: plain="L2" hostile="L0" washed="L0"|display_scrub_216_test.go:521: a name with an invisible override changed the risk level: plain="L2" hostile="L0" washed="L0"|
+  [m6] 静默加一枚裁定没点名的 U+206B（既不在 15 枚也不在 7 枚排除里）
+      m6_added_rune=U+206B (not ruled, not among the seven named exclusions)
+      mutated_sha256=a80bf0c083557ba8aa9013e322217f9c5d369d65b05e032e427f3cc9f03c8260
+      go_test_rc=1 RUN=252 PASS_TOP=155 FAIL_TOP=7 SKIP=0
+      RESTORE_OK
+      多出的红：
+      ⇒ 多出的红＝0 枚（FAIL_TOP 与终态逐枚同名）＝现有名册抓不到这枚静默加宽；本人补尺抓得到（[D] 末）
+  [m7] AC#3 反形＝Cf 那支删字符（去掉 writeControlEscape 行）而不逃
+      m7_removed_line=writeControlEscape(&b, r) from the Cf branch only (deletion, not escape)
+      mutated_sha256=fadabcedeb6b9c850cd165c6af8907470f3c179f6de6a7389e33e934f0fc8b94
+      go_test_rc=1 RUN=252 PASS_TOP=151 FAIL_TOP=11 SKIP=0
+      RESTORE_OK
+      多出的红：TestABidiNameWalksTheRealBoundaryIntoAWashedRow TestEveryNamedCfRuneIsEscapedAndNeverDeleted TestTheBidiClaimInANameChangesNoVerdict TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired 
+      逐字红句：display_scrub_216_test.go:411: scrubForDisplay("photo\u00ad报告.png") = "photo报告.png", want "photo\\xad报告.png"
+[D] 三把补尺（台件 ../zz_v1_exhaustive_test.go＝160 行、gofmt -l 零输出；只装进第二份导出台 D:/tmp/w327v1/bench-ex，
+    ⇒ 被测台 D:/tmp/w327v1/bench 的名册⛔ 被它们污染。两份台的 display_scrub_216.go 逐字同哈希 8050f22d…）
+    未突变副本：
+      zz_v1_exhaustive_test.go:92: v1 sweep: unicode.Cf cardinality=170, boundary-washed Cf cardinality=15
+      --- PASS: TestV1CfSweepIsExactlyTheRuledFifteen (0.01s)
+      --- PASS: TestV1NamedExclusionsPassThroughRaw (0.00s)  逐枚：U+2061 U+2062 U+2063 U+2064 U+061C U+180E U+206A U+206B 全 Cf=true washed=false
+      zz_v1_exhaustive_test.go:144: v1 sweep: scalars=1112063, rule-disagreements=0, fastpath-fires-but-write-unchanged=0
+      --- PASS: TestV1JudgeAndWriterAgreeOnEveryScalarValue (0.75s)
+    同一枚台件打在 [m6] 加宽后的副本（当场还原＝restored_sha256=8050f22d…、RESTORE_OK）：
+      zz_v1_exhaustive_test.go:92: boundary-washed Cf cardinality=16  /  :94: the boundary washes Cf runes the ruling did not name: [U+206B]  --- FAIL
+      :108: U+206B is off the ruled list but needsDisplayWash fired  /  :111: ... but the wash changed it: 含那枚原始 U+206B 的输入串被洗成 backslash-u-2-0-6-b 六个可见字符  --- FAIL
+      :144: rule-disagreements=2  /  :151: needsDisplayWash disagrees with the ruled set at U+206B (Cc=false Cf=true)  /  :151: scrubForDisplay disagrees ... U+206B  --- FAIL
+      ⇒ 判据侧与写入侧【一起】错到同一枚没被裁定的字符＝两把尺仍同一集、集本身错；现有交付名册对这一形 0 命中（见 [C] 的 m6）
+
+[E] 调用点尺（锚＝60c328686，git grep；非 _test 口径逐枚点名）
+      尺E1 grep -rn 'scrubForDisplay|needsDisplayWash' --include='*.go' internal cmd | grep -v _test ⇒ 工作树⇄锚点逐字相同，7 行命中，其中：
+        定义/注释 4 行（:70 :106 :201 :211）＋产码调用点 3 行＝display_scrub_216.go:107（needsDisplayWash←scrubForDisplay 自己）
+        ＋:228（Workspace.Canonical）＋:234（Attachments[].Name）＝scrubForDisplay 的产码调用者 2 枚，全在 scrubComposerForDisplay 内
+      尺E2 scrubComposerForDisplay 的产码调用者＝1 枚：internal/panel/composer.go:145（在 NewSnapshot＝composer.go:106 体内）
+      尺E3 NewSnapshot 产码调用者＝2 枚：internal/panel/pump.go:238、pump.go:309；NewComposerState 产码调用者＝1 枚：pump.go:275（第三枚实参＝nil）
+      尺E4 泵的产码装配＝4 枚，全在 cmd/wisp/run.go:702（NewSnapshotPump）:732（Out=bookPanelSnapshot）:742（ui.publish）:1063（consoleSink.publish）
+      尺E5 publishPanelSnapshot 体＝rt.pump.Publish()（cmd/wisp/panel_pump.go:447）⇒ 每次 publish 都走 scrubComposerForDisplay ⇒ 那 15 枚确实被产码读到
+      尺E6 出口的远端＝bookPanelSnapshot（panel_pump.go:360）只存字段＋记一条摘要日志；读它的 lastPanelSnapshot（:424）产码读者＝0 枚（尺只剩定义行）
+      尺E7 入向读快照那枚方法常量＝无：git grep -c MethodSnapshot ⇒ rc=1；出向 Eval 产码 4 枚（panel_control_windows.go:737/744/748/752）逐枚都是 window._rpc 回执
+      尺E8 被洗两枚字段的产码源：Attachments＝泵传 nil（pump.go:275）⇒ 源 0；Workspace＝run.go:705 Workspace: rt.workspaceView（源在 panel_pump.go:124）⇒ 源在
+
+[F] 断言命中表（逐枚断言行在八次运行里各命中几次；口径＝日志里该行的出现次数）
+断言行          :360   :407   :411   :417   :401   :368
+终态              0      0      0      0      0      0
+m1                  1     15     15      0      0      0
+m2                  0     15     15      0      0     15
+m3                  0     15     15      0      0     15
+m4                  0      0      0      0      0      0
+m5                  0      0      0      0      0      0
+m6                  0      0      0      0      0      0
+m7                  0      0     15      0      0      0
+      读法：:360 只在发[m1] 响 1 次、发[m3]（谓词自己失明）0 次＝那半句的裁判是被测函数本身（圈回）
+      读法：:417（两半不许拼成第三枚名字）八次全 0——包括 [m7] 那发正是它自称防的形＝恒不响
+      读法：:411（逐枚 want 相等）响在 m1/m2/m3/m7 各 15 次＝真正在把关的那句；:401（len(cfRoster)!=15）全 0＝钉的是测试件自己那份抄本
+
+[G] 非 Go 尺
+      G1 名册尺：三枚被裁提交的 git show --name-only 越界 0 枚；git diff --name-only 7c9d7ebe 60c328686＝7 条路径（probes/327/r1×4＋docs/evidence/s1×1＋internal/panel×2）
+      G2 numstat：c2f9310bd＝72/13、0eaf5a6a2＝204/0、60c328686＝75/7/91 相加件、0438b84d（编排者代提）票尾 1/0
+      G3 被删的 13 行＝12 行注释＋1 行旧判据条件（被替换）⇒ 产码语义零删除（尺＝git diff 7c9d7ebe 60c328686 -- 该件 | grep '^-'）
+      G4 ⛔ unicode.Mn：git grep -n 'unicode\.Mn' 60c328686 -- internal/panel ⇒ rc=1（零命中）
+      G5 判级轴那张表：git diff --stat 7c9d7ebe 60c328686 -- internal/risk internal/perm cmd/wisp ⇒ 空；isIgnorableTaintRune（taintmatch.go:39-45）仍是 6 枚＋unicode.Mn
+      G6 ⛔ 新导出 panel.*／⛔ 新 Snapshot 键：新增行里 ^func [A-Z] 命中 6 枚＝全是 Test*；json: 标签新增 0 枚
+      G7 票面框尺：未勾 6／已勾 0（本人⛔ 翻框）
+      G8 票面 20 行那把'全树认得双向控制符＝0 枚文件'尺，今天重跑＝2 枚文件（display_scrub_216.go×3 行＋_test.go×14 行）＝现量表按设计过期
+
+[H] ⛔ 跑过／⛔ 碰过：整包 ./cmd/wisp、go test ./...、任何 push、任何 AC 框、任何 internal|cmd 跟踪字节（含 design/）、wisp.exe PID 21892。
+    唯一执行过的代码＝导出台里的 go test（panel 包）＋本人补尺；突变七发的还原逐行见 [B][C]。
