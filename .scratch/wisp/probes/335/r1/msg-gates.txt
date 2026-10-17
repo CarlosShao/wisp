@@ -1,0 +1,4 @@
+票 335 落地腿 335-r1·终态门禁四数补交（只追加一枚日志，交付件已入库＝a58b12dc）
+
+- 四数逐枚 rc＝gofumpt.exe 真身 -l 两枚件 rc=0（空列表）／sh scripts/d22scan.sh rc=0（clean - no D22 ban violations，ban #8 internal/=584 cmd/=143 design/=39 frontend/=116）／sh scripts/check-path-length-budget.sh rc=0（VERDICT GREEN）／go vet ./internal/panel/ rc=0。
+- 发面＝共享工作树（唯一允许的门禁面），HEAD 现认；与前一笔 AC#3/AC#4 读数无关，⛔ 新色、⛔ 红名册变化。
