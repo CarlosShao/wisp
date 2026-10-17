@@ -1,0 +1,19 @@
+time=2026-10-17T10:20:11.766+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestBookedSnapshotReachesHostBitForBit329
+time=2026-10-17T10:20:13.315+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/17 10:20:13 mockllm: serving on http://127.0.0.1:56055 (golden dir D:\W329VB\internal\llm\testdata\golden)
+time=2026-10-17T10:20:13.358+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\wisp-gotmp-329v1\TestBookedSnapshotReachesHostBitForBit3292334978398\002\secrets kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T10:20:13.365+08:00 level=INFO msg="wisp: persistent log sink installed" dir=D:\wisp-gotmp-329v1\TestBookedSnapshotReachesHostBitForBit3292334978398\002\logs min_level=info early_records=3 early_dropped=0
+time=2026-10-17T10:20:13.369+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\wisp-gotmp-329v1\TestBookedSnapshotReachesHostBitForBit3292334978398\002 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T10:20:13.384+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\wisp-gotmp-329v1\TestBookedSnapshotReachesHostBitForBit3292334978398\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T10:20:13.389+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T02:20:13Z duration_ms=5
+time=2026-10-17T10:20:13.395+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\wisp-gotmp-329v1\TestBookedSnapshotReachesHostBitForBit3292334978398\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T10:20:13.399+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T02:20:13Z duration_ms=3
+time=2026-10-17T10:20:13.404+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\wisp-gotmp-329v1\TestBookedSnapshotReachesHostBitForBit3292334978398\002\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T10:20:13.408+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T02:20:13Z duration_ms=4
+time=2026-10-17T10:20:13.411+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T10:20:13.413+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestBookedSnapshotReachesHostBitForBit329 (1.73s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.914s
+RC=0

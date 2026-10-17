@@ -1,0 +1,1 @@
+票 329 裁腿 329-v1 探针面·一：起手两把尺复认（tree A=feab45e3 非测试读者 0 命中、正控同尺不去滤＝定义/注释 2；tree B=1d1261e0 AC#2 尺三命中含真读者 deliver_329.go:95）＋名册钉尺（bridge.go Method*=7、wantFullInboundRosterSize253=7 两侧同值、panel_control_windows.go A..B numstat 空＝那四枚 window._rpc 回执一字未动）＋突变回放脚本本体（三发出牙点全打在仓外导出树物理字节、trap 里还原、逐发报还原哈希）＋tree B 定向绿基线（--- PASS 1.73s，RUN/PASS_TOP/FAIL_TOP/SKIP=1/1/0/0）

@@ -1,0 +1,37 @@
+=== 329-v1 AC#1/AC#2 starting-side rulers, tree A = git archive feab45e3 (D:/W329VA) ===
+date: 2026-10-17 10:20:30 +0800
+
+--- A1: lastPanelSnapshot NON-TEST readers, tree A (issue AC#2 exact ruler, relative paths) ---
+rc_grep_pipe=1  count=0
+--- A1 positive control: same ruler WITHOUT the pump.go filter, tree A (definition+comment lines only) ---
+cmd/wisp/panel_pump.go:417:// lastPanelSnapshot returns the most recent packet this run built and the bytes
+cmd/wisp/panel_pump.go:424:func (rt *agentRuntime) lastPanelSnapshot() (panel.Snapshot, []byte, bool) {
+--- A1 positive control #2: a known-existing symbol read the same way (bookPanelSnapshot, tree A) ---
+cmd/wisp/panel_pump.go:331:// bookPanelSnapshot is the exit's far end, and it is where this repository's
+cmd/wisp/panel_pump.go:360:func (rt *agentRuntime) bookPanelSnapshot(snap panel.Snapshot, data []byte) error {
+cmd/wisp/run.go:732:		Out:       rt.bookPanelSnapshot,
+
+--- A2: publishPanelSnapshot production mount present in tree A (=> ticket not 'whole chain dead') ---
+cmd/wisp/panel_pump.go:433:// publishPanelSnapshot puts one snapshot on the wire. Called where a state the
+cmd/wisp/panel_pump.go:442:func (rt *agentRuntime) publishPanelSnapshot() {
+cmd/wisp/run.go:742:		rt.ui.publish = rt.publishPanelSnapshot
+cmd/wisp/run.go:1063:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+
+--- A3: inbound roster size tree A (bridge.go Method* = ) ---
+7
+63:	wantFullInboundRosterSize253 = 7
+
+=== tree B = git archive 1d1261e0 (D:/W329VB) ===
+--- B1: AC#2 exact ruler, tree B ---
+cmd/wisp/panel_snapshot_deliver_329.go:9:// that retention: lastPanelSnapshot had zero non-test callers, so the bytes stopped
+cmd/wisp/panel_snapshot_deliver_329.go:83:// lastPanelSnapshot: read the bytes this run just booked, and hand them to the
+cmd/wisp/panel_snapshot_deliver_329.go:95:	_, data, seen := rt.lastPanelSnapshot()
+count=3
+--- B1b: orchestrator ruler (internal cmd tools, -v _test, no pump filter), tree B = 5 lines ---
+cmd/wisp/panel_pump.go:422:// lastPanelSnapshot returns the most recent packet this run built and the bytes
+cmd/wisp/panel_pump.go:429:func (rt *agentRuntime) lastPanelSnapshot() (panel.Snapshot, []byte, bool) {
+cmd/wisp/panel_snapshot_deliver_329.go:9:// that retention: lastPanelSnapshot had zero non-test callers, so the bytes stopped
+cmd/wisp/panel_snapshot_deliver_329.go:83:// lastPanelSnapshot: read the bytes this run just booked, and hand them to the
+cmd/wisp/panel_snapshot_deliver_329.go:95:	_, data, seen := rt.lastPanelSnapshot()
+--- B3: inbound roster tree B ---
+7
