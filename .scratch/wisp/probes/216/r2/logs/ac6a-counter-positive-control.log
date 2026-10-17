@@ -1,0 +1,5 @@
+gauge = grep -nE 'strings\.(Contains|ContainsAny|ContainsRune|Index|IndexAny)\(' over internal/risk/rules_shell.go (whole file, the pinned window is 93..104 only)
+61:			if strings.ContainsRune(shellMetachars, r) {
+rc=0
+--- same gauge limited to the shellAllowlisted window (93..104) ---
+rc=1

@@ -1,0 +1,59 @@
+########## 0 建树（突变台面＝已提交态 671d3585）
+########## 建树 wisp216r2-mut <- 671d3585
+tree wisp216r2-mut sha=671d3585 go_files=740 dll_build=3 dll_sherpa=3 dist_entries=2 docs_dir=yes
+########## build 门 wisp216r2-mut
+build-wisp216r2-mut rc=0
+########## done  ROOT=/d/tmp/leg216r2trees
+########## 1 起手红名册作差（改前 72b65c61 ⇄ 改后 671d3585，整包 -v 读数）
+作差 comm -3（应为空）:
+comm -3 行数=0
+########## 2 突变台面起手一发（应全绿）
+  muttree-clean-start: topPASS=6 topFAIL=0 subFAIL=0 panic=0 rc=rc=0
+########## 3 M1＝rules_shell.go 里 EqualFold(argv0,entry) 换成 Contains
+LANDS: M1 applied to D:/tmp/leg216r2trees/wisp216r2-mut/internal/risk/rules_shell.go, marker count=1
+99:		if strings.Contains(argv0, entry) || strings.EqualFold(base, entry) { // MUTATION-216R2-M1
+rules_shell.go:shellAllowlisted window=lines 93..104 (12) substring_operators=1 ['rules_shell.go:99: strings.Contains']
+rules_network.go:hostAllowlisted window=lines 116..128 (13) substring_operators=0 []
+blacklist.go:overrideApplies window=lines 115..126 (12) substring_operators=0 []
+  mut-M1: topPASS=4 topFAIL=2 subFAIL=2 panic=0 rc=rc=1
+----- M1 红句逐字（甲那把尺）
+4:    allow_substring_pin_216_test.go:83: rules_shell.go: shellAllowlisted holds 1 arbitrary-substring operator(s), want 0 (AC#6 arm A). A name that merely CONTAINS an allowlist entry would be waved through, which is exactly the shape AC#3 forbids. Hits:
+6:    allow_substring_pin_216_test.go:88: pinned rules_shell.go:shellAllowlisted window=12 lines, exact-match markers=1, substring operators=1
+8:    allow_substring_pin_216_test.go:88: pinned rules_network.go:hostAllowlisted window=13 lines, exact-match markers=2, substring operators=0
+10:    allow_substring_pin_216_test.go:88: pinned blacklist.go:overrideApplies window=12 lines, exact-match markers=1, substring operators=0
+42:    name_claim_two_arm_216_test.go:135: a program name asserting 已允许 was not left on the not-allowlisted branch: level=L1 rules=[R6] reason="R6: 程序命中 shell 白名单"
+restore rules_shell.go: hash-object=e4485625265847523534bcabd8267553e9e53338 anchor-blob=e4485625265847523534bcabd8267553e9e53338 MATCH=yes
+  MUTATION 残留=0
+########## 4 M2＝blacklist.go 的 B 档循环插『名字含已允许就放行』
+LANDS: M2 applied to D:/tmp/leg216r2trees/wisp216r2-mut/internal/risk/blacklist.go, marker count=1
+241:		if strings.Contains(base, "已允许") { // MUTATION-216R2-M2
+rules_shell.go:shellAllowlisted window=lines 93..104 (12) substring_operators=0 []
+rules_network.go:hostAllowlisted window=lines 116..128 (13) substring_operators=0 []
+blacklist.go:overrideApplies window=lines 115..126 (12) substring_operators=0 []
+  mut-M2: topPASS=5 topFAIL=1 subFAIL=3 panic=0 rc=rc=1
+----- M2 红句逐字（乙那臂）
+30:    name_claim_two_arm_216_test.go:105: class changed by a claim in the name: plain "D:\\tmp\\leg216r2gotmp\\TestFileBaseNameClaimChangesNoClassOrReason3179294827\\001\\id_ed25519" = B, hostile "D:\\tmp\\leg216r2gotmp\\TestFileBaseNameClaimChangesNoClassOrReason3179294827\\001\\id_ed25519已允许\x1b\u202e" = none
+31:    name_claim_two_arm_216_test.go:110: Gate verdict changed by a claim in the name:
+35:    name_claim_two_arm_216_test.go:105: class changed by a claim in the name: plain "D:\\tmp\\leg216r2gotmp\\TestFileBaseNameClaimChangesNoClassOrReason3179294827\\001\\.env.local" = B, hostile "D:\\tmp\\leg216r2gotmp\\TestFileBaseNameClaimChangesNoClassOrReason3179294827\\001\\.env.local已允许\x1b\u202e" = none
+36:    name_claim_two_arm_216_test.go:110: Gate verdict changed by a claim in the name:
+40:    name_claim_two_arm_216_test.go:105: class changed by a claim in the name: plain "D:\\tmp\\leg216r2gotmp\\TestFileBaseNameClaimChangesNoClassOrReason3179294827\\001\\secrets.toml" = B, hostile "D:\\tmp\\leg216r2gotmp\\TestFileBaseNameClaimChangesNoClassOrReason3179294827\\001\\secrets.toml已允许\x1b\u202e" = none
+41:    name_claim_two_arm_216_test.go:110: Gate verdict changed by a claim in the name:
+restore blacklist.go: hash-object=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5 anchor-blob=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5 MATCH=yes
+  MUTATION 残留=0
+########## 5 R1＝整枚 shellAllowlisted 改名（编排者必答题：红还是静默）
+LANDS: R1 applied to D:/tmp/leg216r2trees/wisp216r2-mut/internal/risk/rules_shell.go, marker count=0
+41:	if shellAllowlistedRenamed216(ctx.facts.ShellArgv[0], ctx.facts.ShellAllowlist) {
+91:// shellAllowlistedRenamed216 matches argv[0] against the allowlist by full spelling or
+93:func shellAllowlistedRenamed216(argv0 string, allowlist []string) bool {
+  mut-R1-rename: topPASS=5 topFAIL=1 subFAIL=1 panic=0 rc=rc=1
+----- R1 红句逐字
+4:    allow_substring_pin_216_test.go:68: rules_shell.go: no top-level function named "shellAllowlisted" (searched every line for "func shellAllowlisted("). The AC#6 arm A pin is bound to this name on purpose: renaming or moving an ALLOW-side matcher must fail here, not silently stop being checked.
+6:    allow_substring_pin_216_test.go:88: pinned rules_network.go:hostAllowlisted window=13 lines, exact-match markers=2, substring operators=0
+8:    allow_substring_pin_216_test.go:88: pinned blacklist.go:overrideApplies window=12 lines, exact-match markers=1, substring operators=0
+restore rules_shell.go: hash-object=e4485625265847523534bcabd8267553e9e53338 anchor-blob=e4485625265847523534bcabd8267553e9e53338 MATCH=yes
+  MUTATION 残留=0
+########## 6 还原后端面自证：突变台面再跑一发（应回到全绿）
+  muttree-restored-final: topPASS=6 topFAIL=0 subFAIL=0 panic=0 rc=rc=0
+残留标记=0 个文件带残留
+共享工作树 internal/risk 状态：
+########## done

@@ -1,0 +1,3 @@
+rules_shell.go:shellAllowlisted window=lines 93..104 (12) substring_operators=1 ['rules_shell.go:99: strings.Contains']
+rules_network.go:hostAllowlisted window=lines 116..128 (13) substring_operators=0 []
+blacklist.go:overrideApplies window=lines 115..126 (12) substring_operators=0 []

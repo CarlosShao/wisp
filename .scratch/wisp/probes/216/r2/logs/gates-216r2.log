@@ -1,0 +1,32 @@
+########## 1 gofumpt.exe -l（真身 /d/work/base/gopath/bin/gofumpt.exe）
+rc=0 (本腿两枚文件：空列表＝干净)
+--- 同尺扫整包（一枚既有件在册，非本腿所改）---
+internal\risk\provenance.go
+rc=0
+--- 那枚既有件归因：锚上的 blob 用同一把尺＝干净（⇒ 工作树 CRLF 检出形，不是源码缺陷）
+rc=0 (空＝锚上那版干净)
+internal/risk/provenance.go:                  Unicode text, UTF-8 text, with CRLF line terminators
+/d/tmp/leg216r2gotmp/provenance-at-anchor.go: Unicode text, UTF-8 text
+rc=0
+########## 2 sh scripts/d22scan.sh（含正控 runtests.sh）
+d22scan.sh: positive control - runtests.sh -C tools/d22scan ./...
+runtests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume C (path C:/Users/swq/AppData/Local), offender: GOTMPDIR=D:\tmp\leg216r2gotmp(volume D)
+runtests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-C root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not.
+runtests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume C, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green.
+rc=2
+########## 3 sh scripts/check-path-length-budget.sh
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=C.UTF-8 LC_ALL=C.UTF-8)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 14525 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=14525  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 60 paths on this tree, recomputed just now in both units
+rc=0
+########## 4 go vet ./internal/risk/
+rc=0
+########## done

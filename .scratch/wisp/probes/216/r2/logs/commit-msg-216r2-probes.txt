@@ -1,0 +1,10 @@
+chore(probes): 票 216-r2 台件与原始读数（两枚仪器的全部复现尺）
+
+台面配方逐味落在仓外 D: 卷 leg216r2trees/：build-trees-216r2.sh（八件套＋仓根 docs/
+＋手工补三件＋先数 .go 证非空）、ac6a-present-state.sh（AC#6 甲的独立 shell 尺：按函数名
+取窗数五枚子串算子）、mutation-teeth-216r2.sh（M1 rules_shell.go EqualFold→Contains／
+M2 blacklist.go 插"名字含已允许就放行"／R1 整枚函数改名＝编排者必答题；逐发还原并报
+还原哈希）、gates-216r2.sh（门禁四数逐枚 rc）、ban8-denominator-pair.sh（ban #8 分母
+578→580＝+2，两枚完整导出树文件清单作差逐名）。其余 .log 是原始读数：改前 201 RUN/131 顶层
+PASS/1 顶层 FAIL/1 SKIP/0 panic ⇄ 改后 225/137/1/1/0，红名册 comm -3 作差 0 行。
+⛔ 产码字节、⛔ 翻框、⛔ push。
