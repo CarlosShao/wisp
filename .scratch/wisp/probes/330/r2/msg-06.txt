@@ -1,0 +1,6 @@
+票 330 落地（补2·330-r2）：交件三把尺的终态读数落盘（零产码尺在最终 HEAD 复跑＝空 rc=1＋逐枚提交面名册＋基线哈希与行数）
+
+- .scratch/wisp/probes/330/r2/logs/delivery-rulers.log：HEAD=7c28110a 处复跑 ruler1/ruler2（过滤后空、rc=1），
+  五枚提交名册逐枚点名（只含 internal/agent 测试面／probes/330/r2／docs/evidence/s1 一枚短名件／票 330 末尾一条），
+  终态哈希：新用例 891fbf5c…（272 行）／165 件 6542773d…（223 行）／golden 仍 7d26fa88…（28 行，一字未动）／
+  产码 inject.go 仍 937bcc11…（⛔ 本腿字节）。

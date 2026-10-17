@@ -1,0 +1,53 @@
+### final delivery rulers (run at HEAD=7c28110a, anchor feab45e3)
+
+--- ruler 1: numstat scoped to internal/agent
+272	0	internal/agent/plan_present_crowded_world_330r2_test.go
+3	1	internal/agent/plan_present_doorbell_165r3_test.go
+--- ruler 2: filtered name-only, must be EMPTY + rc=1
+filtered_rc=1
+
+--- per-commit file lists (must only contain the four allowed surfaces)
+== af2752d8
+
+internal/agent/plan_present_crowded_world_330r2_test.go
+== 560945c2
+
+internal/agent/plan_present_doorbell_165r3_test.go
+== 66e7efd0
+
+.scratch/wisp/probes/330/r2/export-and-run.sh
+.scratch/wisp/probes/330/r2/gates-330r2.sh
+.scratch/wisp/probes/330/r2/logs/gates.log
+.scratch/wisp/probes/330/r2/logs/m0-forward-unmutated.log
+.scratch/wisp/probes/330/r2/logs/m1-g2-replay.log
+.scratch/wisp/probes/330/r2/logs/m2-defang.log
+.scratch/wisp/probes/330/r2/logs/m3-control.log
+.scratch/wisp/probes/330/r2/logs/m4-deleted-only.log
+.scratch/wisp/probes/330/r2/logs/m5-deleted-plus-g2-replay.log
+.scratch/wisp/probes/330/r2/logs/self-rulers.log
+.scratch/wisp/probes/330/r2/logs/tree-final-hashes.log
+.scratch/wisp/probes/330/r2/msg-01.txt
+.scratch/wisp/probes/330/r2/msg-02.txt
+.scratch/wisp/probes/330/r2/msg-03.txt
+.scratch/wisp/probes/330/r2/mutations-330r2.py
+.scratch/wisp/probes/330/r2/self-rulers.sh
+== 8f907275
+
+.scratch/wisp/probes/330/r2/msg-04.txt
+docs/evidence/s1/330-r2-g2-teeth.md
+== 7c28110a
+
+.scratch/wisp/issues/330-doorbell-instrument-mirror-roster-never-reconciled.md
+.scratch/wisp/probes/330/r2/append-ticket-bullet.py
+.scratch/wisp/probes/330/r2/msg-05.txt
+
+--- hashes at final HEAD
+891fbf5ccc9bdcd23f5075538c2a590e441dc87a100c2634a45d29cbbdd2b59d *internal/agent/plan_present_crowded_world_330r2_test.go
+6542773d3d2edcc6d554a47f091ce2dffe35586a92c1f948f79c361454683fca *internal/agent/plan_present_doorbell_165r3_test.go
+7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be *internal/agent/testdata/golden/plan-present.sse
+937bcc113b6018b70ecc2d124505b226c0ccf35ddf9dd2ea5dd76d0db62a064a *internal/agent/inject.go
+  272 internal/agent/plan_present_crowded_world_330r2_test.go
+  223 internal/agent/plan_present_doorbell_165r3_test.go
+   45 .scratch/wisp/issues/330-doorbell-instrument-mirror-roster-never-reconciled.md
+  102 docs/evidence/s1/330-r2-g2-teeth.md
+  642 total
