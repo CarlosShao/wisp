@@ -1,0 +1,35 @@
+216-v2 裁决件（只读·非实现者）：AC#5ⓐ 成立但没牙（别名/正则形＝缺世界）＋ⓑ 不成立（无落地物，形状建议未闭合）＋票面 ChatInput.tsx 判不适用＋AC#3 后半给两枚攻法形状
+
+腿 216-v2（裁决者·只读）。⛔ 任何 go 命令（go test/build/vet/list/env 一枚都没跑）；⛔ 翻任何 AC 框；
+⛔ 改判据文字/票名/Status/-done；⛔ push。
+锚＝起手 git rev-parse --short HEAD ⇒ feab45e3；复现锚＝44f51fc8（216-a2 自己的锚）。
+全部尺读**具名提交树**两枚，⛔ 取工作树在飞字节（台件跑时活 HEAD 已前进到 6197dceb，读数不受影响）。
+
+写面（本笔只含这四枚，逐枚显式 pathspec）：
+- docs/evidence/s1/216-v2-verdict.md（判语件，短名；⛔ 件名带 §）
+- .scratch/wisp/probes/216/v2/logs/replay-216v2.sh（尺名册 157 行，bash -n 过，可整跑）
+- .scratch/wisp/probes/216/v2/logs/replay-216v2.log（逐字 pat/rng/rc＋stderr 并流，534 行／49001 字节）
+- .scratch/wisp/probes/216/v2/logs/commit-msg-216v2-verdict.txt（本消息，临时件只建不删）
+
+判语四件：
+ⓐ 成立——A5 字面重放两枚锚都 rc=1（0 命中，stderr 空），本腿宽形尺 A5W 亦 rc=1；分母本腿
+   补成并集 230（Error() 123 ＋ errors.Is/As 107，同行无交叠，两枚锚同），ⓐ 的 0 不靠窄分母。
+   ★没牙：六枚违规形喂尺的矩阵实测——直接在 .Error() 上子串/switch 三形 A5 会红（fired=0），
+   同线别名／regexp.MatchString／错误结构体字段三形 A5 与 A5W 都看不见（fired=1）；F10＝
+   d22scan 九枚禁令与 scripts/CI 里零枚管错误串分支 ⇒ 别名/正则形按"缺世界"写，⛔ 读成已钉。
+ⓑ 不成立——MessageKey 生产消费者 0（两枚锚都只剩 errors.go:160 注释＋:163 声明；正控＝测试
+   里 errors_test.go:191-192／matrix_14_2_test.go:175/249）；run.go:83 分的是退出码，CLI 那几句
+   是写死前缀＋%v 原样串。形状建议（⛔ 本腿决定）：读成未闭合、另立接线票；若走"不适用"必须
+   与 SPEC-12:77（DEFERRED 完整错误文案体系→S6）／PLAN.md:182 的"不做"对上，那格归票 225。
+票面 ChatInput.tsx:2205 不适用——提交树两枚锚 ls-tree|grep -i chatinput 都 rc=1；正控
+   chat-composer.tsx 在场；★新现量：本仓 survey :378-381 已有该形的逐字抄件（三枚子串 OR，
+   票面只引了 413 一枚），"未逐字复核"在仓内即可闭合；⛔ 改票面原文，只在票尾记现量。
+AC#3 后半 可达性 0 复现成立——D5 rc=1（0 文件）＋D6 正控（params 3 枚）＋perm 目录 4 枚件；
+   attachments.go:69/:260 在我锚上仍逐字对得上。攻法两枚形状交编排者：① ALLOW 侧三处函数体
+   行窗的子串算子钉（今天 0/0/0，变异窗＝1＝有牙且现在不红），② 名字载体的两臂差试。
+   ★恒真尺那枚具名反对：把正控架在附件显示名上今天必恒绿＝装饰。
+
+本腿自抓与具名不实（详见判语件 §5）：派单"正控 *.tsx＝90"是工作树口径（提交树＝82）；派单
+"分母 130"偏低（真并集 230）；起点 internal/cmdutil 两枚锚上都不存在（判不适用）；本腿第一版
+一枚 a|b 形尺漏 -E 造出假 0，已把假 0 与正解（24 枚在场）并列留痕。
+internal/**／cmd/**／frontend/**／design/**／PLAN.md／docs/specs/** 零字节。本笔 ⛔ push。

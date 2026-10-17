@@ -1,0 +1,534 @@
+=== V0 锚（⚠ 本腿起手记的是 feab45e3；这行是脚本运行那一刻的活 HEAD，尺不依赖它）===
+6197dceb
+T1=44f51fc8 T2=feab45e3
+=== N 分母（补 a2 自报不足①：并集、逐行去重）===
+    pat=Error\(\)
+    rng=internal cmd tools :(exclude)*_test.go
+    count=123 rc=0
+    pat=errors\.Is\(|errors\.As\(
+    rng=internal cmd tools :(exclude)*_test.go
+    count=107 rc=0
+    pat=Error\(\)|errors\.Is\(|errors\.As\(
+    rng=internal cmd tools :(exclude)*_test.go
+    count=230 rc=0
+    pat=Error\(\)
+    rng=internal/panel cmd/wisp :(exclude)*_test.go
+    count=23 rc=0
+    pat=Error\(\)
+    rng=internal cmd tools :(exclude)*_test.go
+    count=123 rc=0
+    pat=errors\.Is\(|errors\.As\(
+    rng=internal cmd tools :(exclude)*_test.go
+    count=107 rc=0
+    pat=Error\(\)|errors\.Is\(|errors\.As\(
+    rng=internal cmd tools :(exclude)*_test.go
+    count=230 rc=0
+    pat=Error\(\)
+    rng=internal/panel cmd/wisp :(exclude)*_test.go
+    count=23 rc=0
+=== F 禁止那半ⓐ：按错误串子串/正则分支 ===
+### F1 ＝a2 的 A5 逐字重放（两枚锚都该 0）
+    pat=strings\.(Contains|Index|HasPrefix|HasSuffix)\([^,]*(Error\(\)|[a-zA-Z_]*[Ee]rr[a-zA-Z_]*\b)|switch .*\.Error\(\)|Error\(\) *==
+    rng=internal cmd tools :(exclude)*_test.go
+    rc=1
+    pat=strings\.(Contains|Index|HasPrefix|HasSuffix)\([^,]*(Error\(\)|[a-zA-Z_]*[Ee]rr[a-zA-Z_]*\b)|switch .*\.Error\(\)|Error\(\) *==
+    rng=internal cmd tools :(exclude)*_test.go
+    rc=1
+### F2 变异正控：6 枚候选违规形喂 A5（fired=0＝尺抓到了；fired=1＝尺看不见那一形）
+    [A5]
+      fired=0  <<if strings.Contains(err.Error(), "413") {>>
+      fired=0  <<if strings.Contains(strings.ToLower(oe.Error()), "too long") {>>
+      fired=0  <<switch err.Error() {>>
+      fired=1  <<if msg := err.Error(); strings.Contains(msg, "413") {>>
+      fired=1  <<if regexp.MustCompile("4[0-9][0-9]").MatchString(err.Error()) {>>
+      fired=1  <<if strings.Contains(e.Message, "413") {>>
+### F2b 同 6 枚喂本腿的宽形尺 A5W
+    [A5W]
+      fired=0  <<if strings.Contains(err.Error(), "413") {>>
+      fired=0  <<if strings.Contains(strings.ToLower(oe.Error()), "too long") {>>
+      fired=0  <<switch err.Error() {>>
+      fired=1  <<if msg := err.Error(); strings.Contains(msg, "413") {>>
+      fired=0  <<if regexp.MustCompile("4[0-9][0-9]").MatchString(err.Error()) {>>
+      fired=1  <<if strings.Contains(e.Message, "413") {>>
+### F3 宽形尺 A5W 的生产命中（本腿自加）
+    pat=Error\(\)[^;]*(Contains|HasPrefix|HasSuffix|EqualFold|MatchString|Index)|(Contains|HasPrefix|HasSuffix|EqualFold|MatchString|Index|switch|==|!=)[^;]*Error\(\)
+    rng=internal cmd tools :(exclude)*_test.go
+    rc=1
+### F4 正控·同族子串尺在判级包出数（a2 的 A6）
+    pat=strings\.(Contains|ContainsAny|HasPrefix|HasSuffix|EqualFold|Index)
+    rng=internal/risk :(exclude)*_test.go
+    count=37 rc=0
+### F5 别名链绑定数（a2 的 A7 字面）
+    pat=(:?|\+)= *[a-zA-Z_.]*[Ee]rr(or)?\.Error\(\)
+    rng=internal cmd tools :(exclude)*_test.go
+cmd/wisp/panel_config_store.go:147:				row.CredentialError = err.Error()
+cmd/wisp/resident_audio_windows.go:186:			detail = devErr.Error()
+cmd/wisp/resident_audio_windows.go:311:			lastErr = devErr.Error()
+internal/agent/loop.go:947:	res.Message = err.Error()
+internal/audio/audio.go:150:	m.lastErr = err.Error()
+internal/llm/probe.go:229:		res.Detail = err.Error()
+internal/llm/probe.go:250:		res.Detail = streamErr.Error()
+internal/llm/probe.go:254:		res.Detail = err.Error()
+internal/panel/config_handlers.go:687:		line = err.Error()
+tools/d22scan/gitignore.go:384:			reason = err.Error()
+    rc=0
+### F6 ＝a2 的 A8 字面（射程＝它枚举的 6 枚文件）
+    pat=strings\.(Contains|HasPrefix|HasSuffix|Index)\((line|detail|lastErr|reason|msg|text)
+    rng=internal/agent/loop.go internal/audio/audio.go internal/llm/probe.go internal/panel/config_handlers.go cmd/wisp/panel_config_store.go cmd/wisp/resident_audio_windows.go
+    rc=1
+### F7 本腿补的别名链尺（射程＝全生产树，不枚举文件）
+    pat=strings\.(Contains|HasPrefix|HasSuffix|EqualFold|Index)\((line|detail|lastErr|reason|msg|text|message|errMsg|errText)\b
+    rng=internal cmd tools :(exclude)*_test.go
+cmd/llmrecord/main.go:132:		if strings.HasPrefix(line, "# @") {
+cmd/wisp/approval_reply.go:540:		if line == "" || strings.HasPrefix(line, "#") {
+cmd/wisp/resident_task_source_windows.go:404:		if line == "" || strings.HasPrefix(line, "#") {
+internal/llm/anthropic/adapter.go:219:		case strings.HasPrefix(line, ":"):
+internal/llm/anthropic/adapter.go:221:		case strings.HasPrefix(line, "event:"):
+internal/llm/anthropic/adapter.go:223:		case strings.HasPrefix(line, "data:"):
+internal/llm/golden/golden.go:123:			if strings.HasPrefix(line, "#") {
+internal/llm/golden/golden.go:130:		if strings.HasPrefix(line, "# @@") {
+internal/llm/golden/golden.go:171:				if strings.HasPrefix(line, "# @") {
+internal/llm/golden/golden.go:182:	return strings.HasPrefix(line, "# @") && !strings.HasPrefix(line, "# @@")
+internal/llm/openaichat/adapter.go:134:		if line == "" || strings.HasPrefix(line, ":") {
+internal/llm/openaichat/adapter.go:137:		if !strings.HasPrefix(line, "data:") {
+internal/llm/openairesponses/adapter.go:166:		if line == "" || strings.HasPrefix(line, ":") {
+internal/llm/openairesponses/adapter.go:169:		if !strings.HasPrefix(line, "data:") {
+tools/d22scan/gitignore.go:684:		if line == "" || strings.HasPrefix(line, "#") {
+tools/d22scan/gitignore.go:688:		if strings.HasPrefix(line, "!") {
+tools/d22scan/gitignore.go:692:		if strings.HasSuffix(line, "/") {
+tools/d22scan/gitignore.go:696:		if strings.HasPrefix(line, "/") {
+tools/d22scan/gitignore.go:699:		} else if strings.Contains(line, "/") {
+tools/d22scan/main.go:626:		if line == "" || strings.HasPrefix(line, "#") {
+tools/d22scan/main.go:1255:			if k := strings.Index(line, closer); k >= 0 {
+tools/d22scan/main.go:1269:			if k := strings.Index(line[indent:], "*/"); k >= 0 {
+tools/d22scan/main.go:1276:			if k := strings.Index(line[indent:], "-->"); k >= 0 {
+tools/mockllm/goldenfmt.go:32:	return strings.HasPrefix(line, "# @") && !strings.HasPrefix(line, "# @@")
+tools/mockllm/goldenfmt.go:96:			if strings.HasPrefix(line, "#") {
+tools/mockllm/goldenfmt.go:102:		if strings.HasPrefix(line, "# @@") {
+tools/mockllm/messages.go:113:	if strings.Contains(text, "[think]") {
+tools/mockllm/responses.go:330:		if it.Role == "user" && strings.Contains(text, "[think]") {
+    rc=0
+### F9 测试面拿带数字错误串做断言的枚数（a2 报 16）
+    pat=Contains\([^,]*(Error\(\)|[a-zA-Z_]*[Ee]rr[a-zA-Z_]*\b), *"[^"]*[0-9][^"]*"
+    rng=internal cmd tools
+    count=15 rc=0
+### F10 有没有任何尺/钉已把'⛔ 按错误串分支'写成 CI 禁令或脚本断言（该 0）
+    pat=error-text|errortext|错误串|错误文案
+    rng=tools/d22scan scripts .github :(exclude)*_test.go
+    rc=1
+### F11 别名字段的子串判定（a2 的尺只认裸变量名，不认 res.Detail 这类字段）
+    pat=strings\.(Contains|HasPrefix|HasSuffix|EqualFold|Index|ContainsAny)[(][a-zA-Z_]+\.(Detail|Message|CredentialError|Reason|Text|Error)[,)]
+    rng=internal cmd tools :(exclude)*_test.go
+internal/agent/compress.go:369:		if t, ok := p.(llm.TextPart); ok && strings.HasPrefix(t.Text, summaryMarker) {
+internal/llm/adaptertest/mockllm.go:342:		if !strings.Contains(turn.Text, "ping-ticket11") {
+tools/mockllm/chat.go:133:			if strings.Contains(p.Text, "[think]") {
+    rc=0
+### F12 变异正控：三枚别名/字段违规形逐尺喂（哪把尺看得见哪形，逐行标尺名）
+      [A5]  fired=1 <<if strings.Contains(res.Detail, "413") {>>
+      [A5W] fired=1 <<if strings.Contains(res.Detail, "413") {>>
+      [F11] fired=0 <<if strings.Contains(res.Detail, "413") {>>
+      [A5]  fired=0 <<if strings.Contains(row.CredentialError, "auth") {>>
+      [A5W] fired=1 <<if strings.Contains(row.CredentialError, "auth") {>>
+      [F11] fired=0 <<if strings.Contains(row.CredentialError, "auth") {>>
+      [A5]  fired=1 <<if strings.Contains(strings.ToLower(msg), "413") {>>
+      [A5W] fired=1 <<if strings.Contains(strings.ToLower(msg), "413") {>>
+      [F11] fired=1 <<if strings.Contains(strings.ToLower(msg), "413") {>>
+### F8 三个数字 token 在生产里的命中（a2 甲②）
+    pat=413
+    rng=internal cmd tools :(exclude)*_test.go
+cmd/wisp/notify_windows.go:126:			// ERROR_CLASS_ALREADY_EXISTS (1413) is what a second registration
+cmd/wisp/panel_host_windows.go:644://     WSThickFrame and WSMaximizeBox (webview.go:408-413), which takes away the
+internal/llm/anthropic/stream.go:165:		status = 413
+internal/llm/errors.go:204:	case 413:
+    rc=0
+    pat=too long
+    rng=internal cmd tools :(exclude)*_test.go
+internal/tools/task.go:102:	// decides whether that is too long for a context: this field is the
+    rc=0
+    pat=exit status
+    rng=internal cmd tools :(exclude)*_test.go
+tools/d22scan/runtests.sh:103:        # and :116 with `mklink ... failed: exit status 1: Parameter format not correct
+    rc=0
+=== M 必做那半ⓑ：按码选一句用户可见文案 ===
+### M1 MessageKey 生产消费者（两枚锚都该只剩声明＋注释）
+    pat=MessageKey
+    rng=internal cmd tools :(exclude)*_test.go
+internal/observe/errors.go:160:// MessageKey returns the stable user-visible copy key for the class. The copy
+internal/observe/errors.go:163:func (c ErrorClass) MessageKey() string {
+    rc=0
+    pat=MessageKey
+    rng=internal cmd tools :(exclude)*_test.go
+internal/observe/errors.go:160:// MessageKey returns the stable user-visible copy key for the class. The copy
+internal/observe/errors.go:163:func (c ErrorClass) MessageKey() string {
+    rc=0
+### M2 正控·MessageKey 含测试全量
+    pat=MessageKey
+    rng=internal cmd tools
+internal/llm/matrix_14_2_test.go:175:	if turn.Err.Class.MessageKey() == "" {
+internal/llm/matrix_14_2_test.go:249:	if qe.Class.MessageKey() == ne.Class.MessageKey() {
+internal/observe/errors.go:160:// MessageKey returns the stable user-visible copy key for the class. The copy
+internal/observe/errors.go:163:func (c ErrorClass) MessageKey() string {
+internal/observe/errors_test.go:186:// TestMessageKeys pins the user-visible copy hooks (the copy text itself is
+internal/observe/errors_test.go:188:func TestMessageKeys(t *testing.T) {
+internal/observe/errors_test.go:191:		if got := c.MessageKey(); got != want {
+internal/observe/errors_test.go:192:			t.Errorf("MessageKey(%s) = %q, want %q", c, got, want)
+    rc=0
+### M3 正控·MessageKey 扩到 frontend docs（看有没有别处消费者）
+    pat=MessageKey
+    rng=internal cmd tools frontend docs
+internal/llm/matrix_14_2_test.go:175:	if turn.Err.Class.MessageKey() == "" {
+internal/llm/matrix_14_2_test.go:249:	if qe.Class.MessageKey() == ne.Class.MessageKey() {
+internal/observe/errors.go:160:// MessageKey returns the stable user-visible copy key for the class. The copy
+internal/observe/errors.go:163:func (c ErrorClass) MessageKey() string {
+internal/observe/errors_test.go:186:// TestMessageKeys pins the user-visible copy hooks (the copy text itself is
+internal/observe/errors_test.go:188:func TestMessageKeys(t *testing.T) {
+internal/observe/errors_test.go:191:		if got := c.MessageKey(); got != want {
+internal/observe/errors_test.go:192:			t.Errorf("MessageKey(%s) = %q, want %q", c, got, want)
+    rc=0
+### M4 生产里按 Class 分支的行（分的是句、状态还是退出码，逐枚眼看）
+    pat=switch [^;]*\.Class|\.Class *==|observe\.ErrorClass\(
+    rng=internal cmd tools :(exclude)*_test.go
+cmd/wisp/run.go:83:	switch observe.ErrorClass(errClass) {
+internal/audio/device.go:131:	return e.Class == observe.ClassAudioDevice && e.ProviderCode == hresultString(hrAUDCLNTDeviceInv)
+internal/llm/anthropic/adapter.go:211:				if ferr, ok := err.(*observe.Error); ok && ferr.Class == observe.ClassCancelled {
+internal/llm/chain.go:75:		if ctx.Err() != nil || oe.Class == observe.ClassCancelled {
+internal/risk/rules_gateway.go:77:		switch ctx.classifier.Classify(canonical) {
+internal/tools/mode.go:99:		switch d.Class {
+internal/tools/paths.go:381:	switch risk.Classify(canonical) {
+    rc=0
+### M5 声明行逐字现场（feab45e3:internal/observe/errors.go 158-165）
+     1	}
+     2	
+     3	// MessageKey returns the stable user-visible copy key for the class. The copy
+     4	// text itself is deferred (D23 error-copy work, S6); UI and logs embed the key
+     5	// so copy can be added later without re-touching error sites.
+     6	func (c ErrorClass) MessageKey() string {
+     7		return "error." + string(c)
+     8	}
+=== C 票面反面教材 ChatInput.tsx ===
+### C1 提交树两枚锚的名单里找 chatinput（都该 rc=1）
+    tree=44f51fc8
+      rc=1
+    tree=feab45e3
+      rc=1
+### C2 正控·同尺 *.tsx 枚数：提交树两枚锚 vs 工作树（a2 报的 90 是工作树口径）
+      commit-tree 44f51fc8 count=82
+      commit-tree feab45e3 count=82
+      working-tree find count=90
+### C3 正控·同尺找 chat-composer
+frontend/src/components/ai-native/chat-composer.tsx
+      rc=0
+### C5 openchamber 在本仓文档面的出现处（射程＝那枚调研件）
+    pat=openchamber
+    rng=docs/reports/survey-2026-09-28-composer-plus-menu.md
+docs/reports/survey-2026-09-28-composer-plus-menu.md:181:  - 命令级：`dispatch` 找不到就不处理；**没有"未知命令"的统一红字**，未识别的 `/xxx` 会作为普通文本发出去（与 openchamber 同形，见 §4.2）。⚠ 这条只说明"Pi 这么做"，**不能写成"三家都这样"**：DSH 明确拒绝降级（§1.2）。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:322:## 5. openchamber——**加号菜单最像 owner 截图的一家**，但它把"名册权威"写成了一条不变量
+docs/reports/survey-2026-09-28-composer-plus-menu.md:324:openchamber 是 GUI（`packages/ui`，React＋CodeMirror），有真正的 `+` 按钮与下拉。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:348:  ⇒ **解析失败的用户可见结果＝那一行保持普通文本，不弹提示。** 这与 DSH（§1.2，明确报错、绝不静默降级）**是相反的选择**。⚠ 我们票 213 AC#3 要"拒了要说为什么"，所以 **openchamber 这一形不能当"业界共识"引**；它是"不拒、只是不当命令"。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:366:  ⇒ **内置是硬编码；命令与技能来自 store（`useCommandsStore` / `useSkillsStore`，按工作目录选：`selectCommandsForDirectory(s, currentDirectory)`）**——**"哪一目录下的命令"是名册的一维**，这一维五家里只有 openchamber 有。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:368:  ⚠ **这与 Pi 的诊断形（§2.1）正好相反**：Pi 会出警告，openchamber 静默丢。**两形并存 ⇒ "扩展命令撞名"没有业界标准做法，我们必须自己选一种并写进票面。**
+docs/reports/survey-2026-09-28-composer-plus-menu.md:373:  ⇒ **openchamber 的多数"命令"根本不是动作，而是"给用户看一句话 ＋ 偷偷给模型一段指令"的成对模板**（`visiblePrompt` / `instructionsPrompt`，`:22-24`）。参数用 `buildVariables` 织进两半里（`:31-56`，`/summary rate limiting` 的例子）。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:374:  ⚠ **这一形对我们是个警报**：票 213 明写"命令≠工具，别把 `/compact` 做成模型可自调的工具"；openchamber 恰恰是**把命令实现成"往这次提交里塞一段模型指令"**。这是"面板侧来源给模型下指令"的另一面，**不能照抄**，只能当反面参照。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:395:- ⚠ **本轮未读到 openchamber 有"斜杠命令改权限档位"这一形**，也未读到"严格档下某条命令被拒"的代码。⇒ 问题 6 在 openchamber 这一家**给不出答案**，不编。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:403:| 问题 | DSH | pi-upstream | Step-Code | minimax-code | openchamber |
+docs/reports/survey-2026-09-28-composer-plus-menu.md:435:6. **openchamber 的 skills/commands store 的上游**：`useSkillsStore` / `useCommandsStore` 的数据是从 OpenCode 服务端还是本地文件来的，**没往上游追**（只读到 `selectCommandsForDirectory(s, currentDirectory)` 这一层）。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:436:7. **openchamber 服务端上传上限的具体数字**：只读到客户端如何把 413 翻成 toast，**没读到服务端在哪里设的 body limit**（`packages/web/src/api` 内 `grep -iE "MAX_UPLOAD|bodyLimit|413"` ⇒ 无输出）。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:437:8. **Step-Code 的加号/GUI**：Step-Code 只有 `apps/cli`＋`packages/tui`，**没有 GUI 加号菜单**；owner 截图 3（`Seed-Code` 模型＋飞书文档/通讯录二级项）**在五家克隆里都找不到对应代码**（推导式：`grep -rln -iE "飞书\|lark\|feishu" Step-Code/packages minimax-code/packages openchamber/packages pi-upstream/packages` ⇒ 命中的 10 个文件全是 `lark` 作为英文词根/无关命中，无一处是"飞书文档"菜单项）。⇒ **截图 2、3 是别家（疑似 Qoder/TRAE 一类商业产品）的界面，只能当"形状参考"，不能当"某家实现"引用。**
+docs/reports/survey-2026-09-28-composer-plus-menu.md:452:   实情：MCP 在 DSH 走设置页；在 Step-Code 是 `/mcp` **只读回显**（`step/slash-commands.ts:45-55`）；在 Pi/minimax/openchamber 本轮**未读到任何 `/mcp` 命令**。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:455:   实情：五家分三派。DSH＝报错不降级（§1.2）；minimax＝拒＋人话 reason＋连退出路径一起给（§4.2）；**openchamber＝根本不拒，未知名册的 `/token` 保持普通文本**（§5.2）；Pi＝命令级不拦、参数级报错（§2.2）。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:457:5. **"扩展命令撞内置名"没有标准做法，两形直接矛盾**：Pi 出**警告诊断**（`interactive-mode.ts:668-679`），openchamber **静默忽略**（`ChatInput.tsx:793-795`）。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:461:7. **"命令≠工具"这条禁区（票 213）在 openchamber 有一处看起来像反例，要提防被当成依据**：openchamber 的多数斜杠命令实现为"给用户看一句话＋给模型塞一段指令"（`composer/submit/slashCommands.ts:1-13, 22-24`）。
+docs/reports/survey-2026-09-28-composer-plus-menu.md:480:3. **判断"这一行是不是命令"的那段代码，只能有一份，界面上用来高亮、回车时用来执行，都调它。**（minimax §4.2 的设计声明；openchamber 的反面历史 bug：`@` 规则被写了四遍、`/` 被写了三遍，导致"高亮成了引用但解析不成引用"，§5.2）
+docs/reports/survey-2026-09-28-composer-plus-menu.md:488:7. **命令名字撞了内置命令时，"拒绝"和"要不要出声"必须一次定死。** 别家两种做法直接矛盾（Pi 出声警告、openchamber 静默忽略，§8 第 5 条）。**建议照 Pi：不进名册，但留一条警告，和 `unwired.go` 一个脾气。**
+docs/reports/survey-2026-09-28-composer-plus-menu.md:501:3. **被拒时给的话要三样齐全：哪一个文件、为什么、怎么办；而且"为什么"要用错误码，不用错误文字去匹配。**（反面教材：openchamber 靠英文串里有没有 `413` 来决定弹哪句提示，服务端换个措辞提示就永远不弹，§5.4；正面：同仓另一处用 `code === 'too-large'` 映射文案）
+docs/reports/survey-2026-09-28-composer-plus-menu.md:509:7. **@引用工作区文件，和拖进来一个文件，必须走同一台受理器。**（openchamber 就是这么做的：粘贴、拖拽共用 `attachFilesWithCitation`，§5.4）
+docs/reports/survey-2026-09-28-composer-plus-menu.md:554:- 证据强度：五家里有**两家各写了一份**、写法还不一样（Step-Code 把控制字符转成可见转义 `consent.ts:73-92`，minimax 直接删/替换 `terminal-text.ts:15-26`），而且**两家都专门对"文件名"这一枚下手**（§3.4、§4.4）。openchamber 那一族的反面证据也在：靠英文错误串决定弹哪句提示（§5.4）。
+    rc=0
+### C7 票面那形的在仓逐字抄件（survey :376-382）
+### 5.4 附件被拒时给用户看什么（问题 5）
+
+- **上限判在服务端，客户端靠错误文本嗅探回一句本地化提示**：`ChatInput.tsx:2205-2206`
+  ```ts
+  if (normalized.includes('payload too large') || normalized.includes('413') || normalized.includes('entity too large')) {
+      toast.error(t('chat.chatInput.toast.attachmentsTooLarge'));
+  ```
+### C8 本仓 212-a3 假引用尺对这枚件名的归类
+    pat=ChatInput
+    rng=.scratch/wisp/probes/212/a3/work/roster2.tsv
+.scratch/wisp/probes/212/a3/work/roster2.tsv:1627:docs/reports/missing-features-2026-09-29-v4.md:102	packages/ui/src/components/chat/ChatInput.tsx	true-absent
+.scratch/wisp/probes/212/a3/work/roster2.tsv:1898:docs/reports/pending-and-issues.md:8858	openchamber/packages/ui/src/components/chat/ChatInput.tsx	true-absent
+.scratch/wisp/probes/212/a3/work/roster2.tsv:2024:docs/reports/survey-2026-09-28-composer-plus-menu.md:358	packages/ui/src/components/chat/ChatInput.tsx	true-absent
+    rc=0
+### C9 d22scan phantom-citation 禁令的射程
+    pat=phantom-citation
+    rng=tools/d22scan/main.go
+tools/d22scan/main.go:50://	9 phantom-citation    a production-file comment citing a repo-relative
+tools/d22scan/main.go:872:				s.add("phantom-citation", path, pos.Line,
+    rc=0
+### C6 前端侧 413 与按文案选句族（射程＝提交树）＋正控 includes 枚数
+    pat=413
+    rng=frontend
+    rc=1
+    pat=\.(includes|indexOf|startsWith|match|search|test)\(.{0,3}(rror|too long|exit status|413|429)
+    rng=frontend/src frontend/scripts
+    rc=1
+    pat=[.]includes[(]
+    rng=frontend/src
+    count=32 rc=0
+=== G 推迟登记（裁ⓑ形状要用：这一层是不是已登记推迟）===
+### G1 产码里的 DEFERRED 标记逐枚（⛔ 管道接 head，rc 才是 git grep 的）
+    pat=DEFERRED(
+    rng=internal cmd tools :(exclude)*_test.go
+cmd/wisp/panel_assets.go:164:// DEFERRED(C25-loop-wiring) item 1); a CLI probe has no task, so it names one
+internal/agent/approval/approval.go:220:// DEFERRED(kws-veto, B1): the veto word is functional at ticket 41 and the
+internal/agent/approval/doc.go:13:// DEFERRED(queue): minimal gates landed in ticket 21 (this package), the
+internal/agent/compress.go:27:// DEFERRED(D28-1): move the call into the Warm window hook; keep this
+internal/agent/compress.go:53:// Warm-window hook DEFERRED(D28-1) installs will get it for free); it pairs
+internal/agent/control.go:15:// this ticket (DEFERRED(D11-3), see the ticket report).
+internal/agent/doc.go:14:// DEFERRED(loop): implemented by ticket 10. This ticket only freezes the
+internal/agent/loop.go:407:			// DEFERRED(D28-1): the Warm-window hook owns this call; the
+internal/agent/scheduler/doc.go:13:// DEFERRED(scheduler): implemented by ticket 47. This ticket only freezes the
+internal/audio/doc.go:27:// DEFERRED(playback): TTS output lands with ticket 26 on the same WASAPI
+internal/config/doc.go:14:// DEFERRED(schema/hot-reload/migration): implemented by ticket 05. This
+internal/llm/probe.go:22:// DEFERRED(audio, ticket 09): C7 (SPEC-05 sec 3.3) has no audio content
+internal/memory/doc.go:17:// DEFERRED(sqlite/schema): the storage core landed with ticket 04 (schema v1,
+internal/observe/doc.go:22:// DEFERRED(JSONL sink/redaction/diagnostics/CostMeter): implemented by
+internal/panel/doc.go:16:// DEFERRED(host/bridge): implemented by ticket 33 (host), ticket 35 (bridge).
+internal/plugin/doc.go:17:// DEFERRED(manifest/goja): implemented by tickets 50 (Tier-1) and 51 (Tier-2
+internal/proc/doc.go:22:// DEFERRED(update/rollback): D41(b) staging/atomic replace/rollback lands
+internal/risk/doc.go:15:// DEFERRED(R1-R9/PathResolver/Provenance): implemented by tickets 17, 18 and
+internal/risk/pathresolver_other.go:5:// DEFERRED(macOS/Linux): SPEC-06 §4 requires realpath + lstat symlink reject
+internal/risk/provenance.go:58:// DEFERRED(C25-loop-wiring): the agent loop / tool providers (tickets 10, 20,
+internal/risk/syncdirs_other.go:17:// DEFERRED(P12-macos): sync-client probing for the macOS port (ticket 55) —
+internal/session/doc.go:16:// DEFERRED(SessionScope): implemented by ticket 28. This ticket only freezes
+internal/speech/doc.go:19:// DEFERRED(engines): implemented by ticket 15 (ASR + CER harness), ticket 26
+internal/tools/bridge.go:843:// DEFERRED(C25-loop-wiring) item (1), landed as a shape by ticket 160:
+internal/tools/doc.go:47:// DEFERRED(tools): implemented from ticket 20 (host bridge + fs tools) onward
+internal/watchdog/doc.go:18:// DEFERRED(watchdog loop/thresholds): implemented by ticket 42. This ticket
+    rc=0
+### G2 自陈推迟那三行有没有 DEFERRED 码（errors.go 155-165 全窗）
+    pat=DEFERRED|deferred
+    rng=internal/observe/errors.go
+    rc=1
+### G3 SPEC-12 §5 登记表里那一行逐字
+    pat=完整错误文案体系
+    rng=docs/specs/SPEC-12-roadmap-governance.md
+docs/specs/SPEC-12-roadmap-governance.md:77:| DEFERRED | 完整错误文案体系 | D23 | 所有用户可见错误有人话文案+建议（含 D37 全 17 类） | S6 | 部分错误暴露技术细节 |
+    rc=0
+### G4 PLAN.md 里 D23/S6 与错误文案的授权句（枚数＋前几枚）
+    pat=错误文案
+    rng=docs/PLAN.md docs/specs
+    count=9 rc=0
+    pat=错误文案
+    rng=docs/PLAN.md
+docs/PLAN.md:182:- 不做：面向非技术用户的首次运行向导、人话化错误文案体系（属 C 选项，工量会挤占核心质量）
+docs/PLAN.md:804:| 完整错误文案体系 | 悬浮球体验（产品脸面） |
+docs/PLAN.md:1528:| DEFERRED | 完整错误文案体系 | D23 | 所有用户可见错误有人话文案 + 可操作建议（**含 D37 全部 17 个 `error_class`**） | S6 状态机 | 部分错误直接暴露技术细节 |
+docs/PLAN.md:1594:| **`input.type` 受 Windows UIPI 限制**（§16.11 第 2 条） | 无法向管理员权限窗口注入 → **场景③口述成文在这类窗口内直接失效**，且**无解**（不得提权绕过） | 明示为平台限制 + 明确错误文案；文档与 README 写清；**引导用户把目标应用以普通权限运行** |
+docs/PLAN.md:1679:    确认错误文案明确（§16.11 第 2 条）
+docs/PLAN.md:2028:| 7 | ~~**`input.type` 默认 L2 + 会话授权降级**~~ → ✅ **已定案（2026-09-18）** | **用户选定：「按目标进程分会话授权」** | **定案内容**：① `input.type` **默认 L2** ② 首次向某应用注入时确认一次，确认卡提供**三档**：<br>  · 「仅本次」（L2 逐次）<br>  · **「本会话内允许向此应用注入」**（绑定 `(工具, 目标进程名, 会话)`，**推荐档，卡片上视觉最突出**）<br>  · 「本会话内允许向所有应用注入」（**必须显式标注为更危险**，视觉降级、需二次点击展开，不得与推荐档并列）<br>③ **换目标应用要重新确认**（Word → 终端 不共用授权）—— 这是有意的：不同应用的注入后果差异极大 ④ 会话结束授权失效；面板「安全」页可查、可一键撤销 ⑤ **C25 污染命中（R4）不受本授权覆盖** ⑥ 落 **S3**（授权机制本体随 D45-2 落 S7，S3 阶段先只做「仅本次」档）。<br>**已知局限（必须写进错误文案）**：受 Windows UIPI 限制，**无法向管理员权限窗口注入**，且无解（§16.11 第 2 条） |
+docs/PLAN.md:3224:| 2 | **`input.type` 无法向管理员权限窗口注入** | **Windows UIPI 平台硬限制**：非提权进程不能向更高完整性级别窗口发送输入。**无解** | 必须在文档与错误文案明示（`permission_denied` +「目标程序以管理员身份运行，Wisp 无法向其输入」）。**不得尝试提权绕过** |
+    rc=0
+### G5 工单池里有没有别的票已经认领这层（按码选句/文案）
+    pat=错误文案|按码选|MessageKey
+    rng=.scratch/wisp/issues
+.scratch/wisp/issues/100-appcontainer-landing-ticket-gated-by-trigger.md:53:- [ ] **AC#5 体验面**：`%TEMP%`、`%LOCALAPPDATA%`、HKCU 三处各有**明确错误文案**用例，**禁止"看起来成功了"**。
+.scratch/wisp/issues/128-resolvedatadir-falls-back-to-current-directory-when-appdata-is-missing-moving-config-dpapi-and-memory.md:72:- [2026-09-23T02:17:01Z] agent=T128-ac23 did=AC#2 落地：`resolveDataDir` 签名改 `(string, error)`，`os.UserConfigDir()` 报错时**不再 `base="."`**、返回 `errDataDirUnresolved` 一类错误并带自救文案（缺哪个变量/数据根本应落在哪/怎么设）；四个消费者逐条改成响亮拒绝——`run.go:153`（rc=2，**在 installLogSink 之前**，所以 CWD 一个字节都不许多）、`models.go:109`（rc=2）、`providers.go:80`（rc=2，在 `secret.NewStore` 之前）、`doctor.go:102`（`[FAIL] data dir resolvable (dev) …`，rc=1）；`secret.go:124` 那第二条腿的 OS 读改走同一枚 seam、错误文案统一（它本来就拒，但原文是双前缀 `wisp secret: wisp secret: user config dir:`、没有自救句）；顺手删掉零调用者的 `dataDirForDisplay`（R-121-1 同族：它唯一的额外行为是"解析失败时退回静态 fork 表"，正是 AC#2 拒绝的形状）。新用例两枚文件：`cmd/wisp/dataroot_128_test.go`（进程内 seam 注入，六条腿表 + 从调用图现算的分母 + marker 清单的长度下限与严格前缀负断言=R-121-2 那一格）与 `cmd/wisp/dataroot_128_windows_test.go`（**真进程**：编译 wisp.exe、子进程环境里真删 APPDATA、四枚 CWD 各一枚空目录）。实测改后行为：run rc=2 / secret list rc=2 / doctor rc=1 / 常驻 rc=1，四枚的 CWD 全空 next=AC#3 变异自证（把 `base="."` 放回去，读红名清单；再还原复绿）+ 门禁四数
+.scratch/wisp/issues/216-menu-display-base-scrub-control-chars-and-two-sentences.md:49:  - **必做那半＝今天没有落地物**：按码选句的钩子在仓里（`internal/observe/errors.go:163 MessageKey()`），但**生产消费者 0 枚**（`A10` rc 只剩声明＋注释；正控 `A11` 同尺在 `errors_test.go:191-192`／`matrix_14_2_test.go:175/249` 有消费者），文件注释自己写着 copy 推迟到 D23/S6；同类先例已由 `198/a1` 名册 §L4 具名记过 `MappedStates` 也是"生产侧 0 枚调用者"。⇒ **若按今天的事实翻勾，凭据不是任何一行代码**（唯一两枚候选各自不足：`errors.go:163` 空转、`cmd/wisp/run.go:83` 分的是退出码不是那句提示）；**缺的那枚东西＝"消费错误码去选用户可见文案"那层落地物 ＋ 一枚"⛔ 后来者许 `Contains` 错误串里的数字"的钉 ⇒ 归编排者裁**（⛔ 我替他排程）。三形里我最贴近"已成立、缺的是钉"，但"缺"不止缺一枚测试——**判它成立/不适用/未闭合归非实现者**（票 41 行已把这格交 `216-v2`）。
+.scratch/wisp/issues/225-deferred-markers-do-not-match-the-spec12-registry-and-nothing-checks-it.md:30:> - **表二（反向）**：12 行 DEFERRED 里**只有 2 行**有代码标记 ⇒ **10 行"登记了而代码查无此人"**，最危险 5 行＝剪贴板历史／`doc.read` xlsx-OCR／`system.eject`／完整错误文案／i18n（编排者用自己那份 22 枚名册交叉核过：这五件事一枚标记都没有，而相邻代码是活的）。
+.scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md:37:- **乙：`nothing written` 那支真的不动文件**（AC#2 乙形）。代价：要把 `readConfigFile` 内部的迁移行为与"写路径重读"这件事分开，**动到 `internal/config/loader.go` 的管线顺序**（票 226 已把 `LoadFile` 拆成 `readConfigFile`＋`resolveRefs` 并承诺"管线顺序与错误文案一字未动"），所以这一支要连那条承诺一起重议。
+.scratch/wisp/issues/236-six-cells-that-only-surface-at-the-reading-layer.md:104:  - **乙（不推荐）**＝逐枚把 8 枚脏样整理干净。⛔ 这会把**别人证据件的字节**改掉，而且 census 已证明票 185 的"防恒绿自证"正是靠 `fs_broken.go:4:1 imports must appear before other declarations` **那句错误文本**（`docs/evidence/s1/185-reread-owner-census-c1.md:48` 具名引用它）；甲形修完之后错误行变成 `undefined: undefinedSymbol185c1`，**rc=1 仍在但理由换句** ⇒ 后程复算 185 会判"凭据对不上"。票面原先写"改字节会洗掉字节数/md5 引用"——**现查是 0 枚字节数或 md5 引用**，真正的引用面是**行列与错误文案**（腿尺：`grep -rn "fs_broken" docs .scratch/wisp/issues`＝13 命中，其中 3 处以上引用 `4:1` 那句）。这条也顶正本票 AC#6 甲段的措辞。
+.scratch/wisp/issues/236-six-cells-that-only-surface-at-the-reading-layer.md:118:- **AC#6a（"先逐枚列名＋归属＋引用面"）＝已满足**：8 枚逐枚给了脏因（**7 枚是纯格式**、只有 `185/c1/mut/fs_broken.go` 是解析错误 `:4:1`，尺 rc=2 而其余 rc=1）、归属票、以及逐枚引用面判定（谁引的是**行列/错误文案**、谁只是路径提及、**零枚被引字节数或 md5**）。⇒ 本票"现量"表第 4 行那句"改字节会洗掉别人引用的读数"至此**彻底改口径**：真实风险不是字节数，是**"这枚文件是不是别人的逐字节可复核副本"**。
+.scratch/wisp/issues/236-six-cells-that-only-surface-at-the-reading-layer.md:167:- 2026-10-14 19:3x 写腿 `236s`（票 236 **AC#6 甲案**＝`fs_broken.go` 只排 import 顺序、保"未定义符号"坏点；实现者；**agent=236s did=AC#6 甲案**；⛔ 一枚框未碰、`Status:`／票名未动、零 push、零 `add -A`、未碰他腿脏件）交回＝夹具改 `4961c3b5`（**只 1 枚文件、+2/−1**：import 块挪到 marker 行之前）＋件 `.scratch/wisp/probes/236/s/00-anchor-and-gates.md`（88 行）＋`logs/01-census.txt`..`06-gates.txt`（6 枚、逐枚 ≤200 行）＝`e915413a`；起手锚 `81730cea`→编辑窗 HEAD `da389ca5`（漂移 8 笔、零笔与夹具重叠；cand1..4 仓外演练件留盘未提交）。**引用普查（步骤 1 硬闸判读＝不咬）**：机械钉 **0**（`git grep "fs_broken\|undefinedSymbol185c1\|probe185c1BrokenMarker" -- "*_test.go" "scripts/*" ".github/*"` **rc=1 零命中**）；逐字节可复核副本 claim **0**（a2 表头口径"产品码快照？"＝**否**）；**185 名下 md5／字节／行引用 0 处**（该名下只有 overlay 路径＋错误文案）；全仓 digest 级**历史读数**两处具名＝`probes/232/v1/verdict.md:152`（md5 `f5c325e0…`）与 `probes/269/a1/census.md:101/:159`（blob `ee583853…`，"本腿现读"）＋字节/行数读数（`236/a1:185`／`236/a2:21`／`275/a1` 两处 ls）⇒ 判为 H 档历史读数（269 §6 分级）、与已获接受的错误文案同级 ⇒ 继续甲；★**具名自认**：若编排者判这两处 digest 读数属"硬引用"，请径改判（退法＝对 `4961c3b5` 追加反向 commit；判读五条与建议全在件 §1 第 4/5 条）。**读数四条**：①改前 `gofumpt -l`（v0.12.0）rc=2 逐字 `.scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: imports must appear before other declarations` → 改后**空 rc=0**（`-d` 亦空）；②**符号坏证法＝按票 185 原仪器 overlay 重放**：改后 `go build -overlay=.scratch/wisp/probes/185/c1/overlay-proof.json ./internal/tools/` **rc=1** 逐字 `.\.scratch\wisp\probes\185\c1\mut\fs_broken.go:17:30: undefined: undefinedSymbol185c1`（改前同命令＝`:4:1 syntax error: imports must appear before other declarations`，rc=1 不变）；同批 `overlay-muta.json` 正控改前改后**各 rc=0**；③**gofumpt 干净形必然 +1 分隔空行**（仓外 cand1/cand3/cand4 三形皆被判要格式，唯一干净＝cand2、`cmp` 与落盘 IDENTICAL）：`338→339 行／11041→11042 字节`（顶掉 a1 `:185`"字节总数与行数不变"预测）、md5 `f5c325e0…→c43e4b1e…`、sha256 `6db34456…→a14dbcc9…`、blob `ee583853…→20f5ae54…`；④门禁＝`sh scripts/d22scan.sh` **rc=0**（正控 35/0/0 先绿；ban #8 internal/=**556**）／长度门 **GREEN 60=60**（over-budget 60＝roster 60、not-in-roster 0）／tracked 集 gofumpt 尺里 `fs_broken` 命中 **0**（其余 14+ 枚 A-ROSTER 一枚未动、原样在册）／`internal cmd`・`scripts .github` porcelain 各 **0 行**。**具名没做**：其余 14+ 枚夹具／门的分母（未改 CI、未加 `if:`）／`.github/**`／`tools/d22scan/**`／`scripts/attrib.sh`／185 名下其它件（三枚 overlay json＋`logs/**`＋`mut/fs.go`＋`mut/taintmatch.go`＋证据件∶含 `:169` 那句现已失真的"never a tracked file"注释，未碰）／台账／`docs/evidence/**` 全零触碰；未删件、未跑 CI 复读、未 push。**next＝编排者收件**；建议台账更正 1 条同时覆盖"错误文本换句＋digest 两个值＋字节/行数三件事"（建议原文＝件 §5 第 1 条）。
+.scratch/wisp/issues/261-the-model-enabled-key-promises-removal-from-discovery-and-selection-but-no-production-code-reads-it-while-the-default-true-tag-is-inert-for-map-entries-done.md:94:**⚠ v1 的新钉（本票欠账的下一格，已裁归 `261-r2`）**：**firstrun 引导教的"缺 `enabled` 键"形状会被新门拒**（引导文案通篇零提 enabled、预设不带 `Enabled`）⇒ 跟引导走的新用户会把模型配成被拒形状。修法三选一（Ⓐ firstrun 引导与预设带 `Enabled: true`／Ⓑ 错误文案里加"缺键视为关闭，把 `enabled = true` 写进条目即可"一句指路／Ⓒ `defaults.go` 的 map 分支补默认执法＝原"第二件事"）——**我裁 Ⓑ＋Ⓐ 同批落（Ⓒ 仍另格）**：Ⓑ 让被拒的人立刻知道怎么回来，Ⓐ 让新形状不再产生。⛔ `defaults.go` 不许动。
+.scratch/wisp/issues/329-panel-snapshot-last-mile-never-delivered.md:11:这一跳缺的不是 API，是"**有人去调它**"：`internal/panel/pump.go` 里那句错误文案自己就写着"最后一公里在票 33/35 名下"，本票就是去把那一跳接上。
+.scratch/wisp/issues/76-artifacts-no-caller-path-invariant-done.md:107:  顺带新增哨兵 `ErrInvalidArtifactName`（纯 additive，旧错误文案一字未变），因为"拒了"必须**机器可辨**，
+.scratch/wisp/issues/83-config-keys-that-lie-must-fail-loudly-done.md:285:错误文案 = 键路径 + "哪个消费者不存在"（点名到符号）+ "由谁落地"（票号 / SPEC 行 / 需 D22）。
+    rc=0
+=== D AC#3 没被打的那半：名字→判定的可达性 ===
+### D1 判级包生产字符串匹配总数（a2 的 D1 字面）
+    pat=strings\.(Contains|ContainsAny|HasPrefix|HasSuffix|EqualFold|Index)
+    rng=internal/risk internal/perm :(exclude)*_test.go
+    count=37 rc=0
+### D2 ALLOW 侧两枚件里的字符串比较逐枚
+    pat=strings\.(Contains|ContainsAny|HasPrefix|HasSuffix|EqualFold|Index)
+    rng=internal/risk/rules_shell.go internal/risk/rules_network.go :(exclude)*_test.go
+internal/risk/rules_network.go:47:		if i := strings.Index(n.URL, "://"); i > 0 {
+internal/risk/rules_network.go:123:		if host == entry || strings.HasSuffix(host, "."+entry) {
+internal/risk/rules_shell.go:61:			if strings.ContainsRune(shellMetachars, r) {
+internal/risk/rules_shell.go:99:		if strings.EqualFold(argv0, entry) || strings.EqualFold(base, entry) {
+    rc=0
+### D3 变异正控（算子尺）：今天那行 vs 改成 Contains 那行
+    [今日 EqualFold 行]
+      fired=1  <<return strings.EqualFold(argv0, entry) || strings.EqualFold(base, entry)>>
+    [变异 Contains 行]
+      fired=0  <<return strings.Contains(argv0, entry) || strings.Contains(base, entry)>>
+### D14 ALLOW 侧三处函数体行窗里的子串算子枚数（今天该 0）
+      win=internal/risk/rules_shell.go:91,104 substring_ops=0
+      win=internal/risk/rules_network.go:114,128 substring_ops=0
+      win=internal/risk/blacklist.go:115,128 substring_ops=0
+      变异窗（喂那枚算子尺）ops=1
+### D15 名字真进判定的那枚 Contains 在哪一侧（逐字）
+		case strings.Contains(base, "credentials") && strings.HasSuffix(base, ".json"):
+### D10 现有代码/测试里有没有钉已盯住 ALLOW 侧那三枚函数
+    pat=shellAllowlisted|hostAllowlisted|overrideApplies
+    rng=internal/risk
+internal/risk/blacklist.go:66:// the ALLOW side is deliberately narrower (see overrideApplies), because the
+internal/risk/blacklist.go:85:		if overrideApplies(cand, bOverrides) {
+internal/risk/blacklist.go:96:// overrideApplies reports whether the operator confirmed this exact file.
+internal/risk/blacklist.go:115:func overrideApplies(cand pathForms, bOverrides map[string]bool) bool {
+internal/risk/pathresolver_anchor_spelling_windows_test.go:317:	// short form; overrideApplies deliberately refuses to unlock anything that
+internal/risk/pathresolver_junction_windows_test.go:321:	// an aliased volume, and overrideApplies refuses every spelling that is
+internal/risk/rules_network.go:74:	if host != "" && len(n.Allowlist) > 0 && !hostAllowlisted(host, n.Allowlist) {
+internal/risk/rules_network.go:114:// hostAllowlisted matches the host exactly or as a subdomain of an allowlist
+internal/risk/rules_network.go:116:func hostAllowlisted(host string, allowlist []string) bool {
+internal/risk/rules_shell.go:41:	if shellAllowlisted(ctx.facts.ShellArgv[0], ctx.facts.ShellAllowlist) {
+internal/risk/rules_shell.go:91:// shellAllowlisted matches argv[0] against the allowlist by full spelling or
+internal/risk/rules_shell.go:93:func shellAllowlisted(argv0 string, allowlist []string) bool {
+    rc=0
+### D11 ALLOW 侧三处比较算子的逐字现场（行窗）
+// shellAllowlisted matches argv[0] against the allowlist by full spelling or
+// base name (last / or \ segment), case-insensitively.
+func shellAllowlisted(argv0 string, allowlist []string) bool {
+	base := argv0
+	if i := strings.LastIndexAny(argv0, `/\`); i >= 0 {
+		base = argv0[i+1:]
+	}
+	for _, entry := range allowlist {
+		if strings.EqualFold(argv0, entry) || strings.EqualFold(base, entry) {
+			return true
+		}
+	}
+	return false
+}
+// hostAllowlisted matches the host exactly or as a subdomain of an allowlist
+// entry (entry "example.com" covers "api.example.com"), case-insensitively.
+func hostAllowlisted(host string, allowlist []string) bool {
+	host = strings.ToLower(host)
+	for _, entry := range allowlist {
+		entry = strings.ToLower(strings.TrimSpace(entry))
+		if entry == "" {
+			continue
+		}
+		if host == entry || strings.HasSuffix(host, "."+entry) {
+			return true
+		}
+	}
+	return false
+}
+func overrideApplies(cand pathForms, bOverrides map[string]bool) bool {
+	if len(bOverrides) == 0 {
+		return false
+	}
+	if cand.real == "" {
+		return cand.raw != "" && bOverrides[cand.raw]
+	}
+	if cand.raw != cand.real {
+		return false // spelled differently from its own real path: confirm again
+	}
+	return bOverrides[cand.real]
+}
+
+// normPath folds a path into the comparison form: alternate separators unified
+### D12 基名图案六枚的逐字现场（deny 侧）
+	// The first form is exactly the spelling the caller handed in (which is
+	// what this function has always matched), so no B verdict can be lost;
+	// later forms only add hits, which for this tier means "asks first".
+	for _, s := range cand.spellings() {
+		base := strings.ToLower(baseName(s))
+		switch {
+		case strings.HasPrefix(base, ".env"):
+			return ClassB, ".env*"
+		case strings.HasSuffix(base, ".pem"):
+			return ClassB, "*.pem"
+		case strings.HasSuffix(base, ".p12"), strings.HasSuffix(base, ".pfx"):
+			return ClassB, "*.p12|*.pfx"
+		case strings.HasPrefix(base, "id_"):
+			return ClassB, "id_*"
+		case strings.HasPrefix(base, "secrets."):
+			return ClassB, "secrets.*"
+		case strings.Contains(base, "credentials") && strings.HasSuffix(base, ".json"):
+			return ClassB, "*credentials*.json"
+		}
+### D13 显示名入口与洗函数（含本腿自抓的假 0 一例）
+    pat=ContainsAny\(name
+    rng=internal/panel/attachments.go
+internal/panel/attachments.go:301:	if strings.ContainsAny(name, "\x00\r\n\t") {
+    rc=0
+    pat=scrubForDisplay|scrubComposerForDisplay
+    rng=internal/panel
+internal/panel/composer.go:145:		Composer:    scrubComposerForDisplay(composer),
+internal/panel/display_scrub_216.go:70:// scrubForDisplay turns the characters a human cannot see into characters a human
+internal/panel/display_scrub_216.go:106:func scrubForDisplay(s string) string {
+internal/panel/display_scrub_216.go:201:// needsDisplayWash reports whether scrubForDisplay would change s. It is the same
+internal/panel/display_scrub_216.go:222:// scrubComposerForDisplay is the display boundary's whole roster, in one call. It
+internal/panel/display_scrub_216.go:227:func scrubComposerForDisplay(c ComposerState) ComposerState {
+internal/panel/display_scrub_216.go:228:	c.Workspace.Canonical = scrubForDisplay(c.Workspace.Canonical)
+internal/panel/display_scrub_216.go:234:		a.Name = scrubForDisplay(a.Name)
+internal/panel/display_scrub_216_test.go:71:			got := scrubForDisplay(c.in)
+internal/panel/display_scrub_216_test.go:73:				t.Errorf("scrubForDisplay(%q) = %q, want %q", c.in, got, c.want)
+internal/panel/display_scrub_216_test.go:78:			if again := scrubForDisplay(got); again != got {
+internal/panel/display_scrub_216_test.go:89:	if got := scrubForDisplay(in); got != in {
+internal/panel/display_scrub_216_test.go:90:		t.Errorf("scrubForDisplay changed an ordinary path: %q -> %q", in, got)
+internal/panel/display_scrub_216_test.go:248:	washedCard := cardOf(scrubForDisplay(escAllowedName))
+internal/panel/display_scrub_216_test.go:350:	got := scrubForDisplay(in)
+internal/panel/display_scrub_216_test.go:352:		t.Errorf("scrubForDisplay(%q) = %q, want %q", in, got, want)
+internal/panel/display_scrub_216_test.go:354:	if again := scrubForDisplay(got); again != got {
+internal/panel/display_scrub_216_test.go:405:		got := scrubForDisplay(in)
+internal/panel/display_scrub_216_test.go:411:			t.Errorf("scrubForDisplay(%q) = %q, want %q", in, got, want)
+internal/panel/display_scrub_216_test.go:413:		if again := scrubForDisplay(got); again != got {
+internal/panel/display_scrub_216_test.go:450:		if got := scrubForDisplay(in); got != in {
+internal/panel/display_scrub_216_test.go:517:	washedCard := cardOf(scrubForDisplay(hostile))
+internal/panel/display_scrub_216_test.go:533:	if !strings.Contains(scrubForDisplay(hostile), `\u202e`) {
+internal/panel/display_scrub_216_test.go:534:		t.Errorf("the display string reached the human unwashed: %q", scrubForDisplay(hostile))
+    rc=0
+      ↓ 同一枚尺去掉 -E ＝假 0（BRE 里竖线是字面量）
+    pat=scrubForDisplay|scrubComposerForDisplay
+    rng=internal/panel
+    rc=1
+### D4 '允许'类字面当判据（该 0）＋正控（名字子串判定确有）
+    pat=strings\.[A-Za-z]+\([^,]*(name|Name|base|baseName)[^,]*, *"(允许|已允许|approved|allowed)"
+    rng=internal cmd tools :(exclude)*_test.go
+    rc=1
+    pat=strings\.[A-Za-z]+\(base
+    rng=internal/risk/blacklist.go
+internal/risk/blacklist.go:240:		base := strings.ToLower(baseName(s))
+internal/risk/blacklist.go:242:		case strings.HasPrefix(base, ".env"):
+internal/risk/blacklist.go:244:		case strings.HasSuffix(base, ".pem"):
+internal/risk/blacklist.go:246:		case strings.HasSuffix(base, ".p12"), strings.HasSuffix(base, ".pfx"):
+internal/risk/blacklist.go:248:		case strings.HasPrefix(base, "id_"):
+internal/risk/blacklist.go:250:		case strings.HasPrefix(base, "secrets."):
+internal/risk/blacklist.go:252:		case strings.Contains(base, "credentials") && strings.HasSuffix(base, ".json"):
+    rc=0
+### D5 附件显示名到判级包可达性（该 0）＋正控 D6＋非空目录 D7
+    pat=attachment
+    rng=internal/risk internal/perm internal/tools internal/agent :(exclude)*_test.go
+    rc=1
+    pat=params
+    rng=internal/risk :(exclude)*_test.go
+internal/risk/assessor.go:8
+internal/risk/provenance.go:23
+internal/risk/rules_gateway.go:1
+    rc=0
+store.go
+store_test.go
+tempdir_resolved_124_test.go
+ticket90_persist_test.go
+      rc=0
+### D8 a2 引的 attachments.go:69/:260 在两枚锚上是否仍对得上
+    pat=never used to build a path
+    rng=internal/panel/attachments.go
+internal/panel/attachments.go:69:	// DisplayName is what the user sees; it is never used to build a path.
+    rc=0
+    pat=name := "attachment-
+    rng=internal/panel/attachments.go
+internal/panel/attachments.go:260:	name := "attachment-" + shortHash(data) + "." + accepted.ext
+    rc=0
+    pat=never used to build a path
+    rng=internal/panel/attachments.go
+internal/panel/attachments.go:69:	// DisplayName is what the user sees; it is never used to build a path.
+    rc=0
+    pat=name := "attachment-
+    rng=internal/panel/attachments.go
+internal/panel/attachments.go:260:	name := "attachment-" + shortHash(data) + "." + accepted.ext
+    rc=0
