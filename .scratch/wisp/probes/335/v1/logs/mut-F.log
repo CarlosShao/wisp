@@ -1,0 +1,10 @@
+time=2026-10-17T13:30:46.013+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+    display_scrub_216_test.go:480: U+2061 is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+    display_scrub_216_test.go:484: U+2061 is a member of the category the ruling chose but the wash left it: "photo\u2061.png" -> "photo\u2061.png", want "photo\\u2061.png"
+    display_scrub_216_test.go:519: arm 2: product-washed=169, unicode.Cf=170, missed=1, extra=0, this file's cfRoster=15
+    display_scrub_216_test.go:522: a rune the Cf category names is not washed, so the answer came from a list rather than the rule: U+2061
+--- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.066s
+FAIL

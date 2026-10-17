@@ -1,0 +1,6 @@
+time=2026-10-17T13:30:40.680+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+    display_scrub_216_test.go:519: arm 2: product-washed=170, unicode.Cf=170, missed=0, extra=0, this file's cfRoster=15
+--- PASS: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.064s

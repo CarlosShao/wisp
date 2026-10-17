@@ -1,0 +1,23 @@
+time=2026-10-17T13:25:45.043+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+    display_scrub_216_test.go:480: U+2061 is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+    display_scrub_216_test.go:484: U+2061 is a member of the category the ruling chose but the wash left it: "photo\u2061.png" -> "photo\u2061.png", want "photo\\u2061.png"
+    display_scrub_216_test.go:480: U+2062 is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+    display_scrub_216_test.go:484: U+2062 is a member of the category the ruling chose but the wash left it: "photo\u2062.png" -> "photo\u2062.png", want "photo\\u2062.png"
+    display_scrub_216_test.go:480: U+2063 is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+    display_scrub_216_test.go:484: U+2063 is a member of the category the ruling chose but the wash left it: "photo\u2063.png" -> "photo\u2063.png", want "photo\\u2063.png"
+    display_scrub_216_test.go:480: U+2064 is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+    display_scrub_216_test.go:484: U+2064 is a member of the category the ruling chose but the wash left it: "photo\u2064.png" -> "photo\u2064.png", want "photo\\u2064.png"
+    display_scrub_216_test.go:480: U+061C is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+    display_scrub_216_test.go:484: U+061C is a member of the category the ruling chose but the wash left it: "photo\u061c.png" -> "photo\u061c.png", want "photo\\u061c.png"
+    display_scrub_216_test.go:480: U+180E is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+    display_scrub_216_test.go:484: U+180E is a member of the category the ruling chose but the wash left it: "photo\u180e.png" -> "photo\u180e.png", want "photo\\u180e.png"
+    display_scrub_216_test.go:480: U+206A is a member of the category the ruling chose but needsDisplayWash stayed silent on it
+    display_scrub_216_test.go:484: U+206A is a member of the category the ruling chose but the wash left it: "photo\u206a.png" -> "photo\u206a.png", want "photo\\u206a.png"
+    display_scrub_216_test.go:505: the boundary washes 15 runes, no more than the 15 this file could hand-copy: the wash set is a hand-kept roster again, so the next Cf character the table adds is an unannounced pass-through into the menu
+    display_scrub_216_test.go:519: arm 2: product-washed=15, unicode.Cf=170, missed=155, extra=0, this file's cfRoster=15
+    display_scrub_216_test.go:522: a rune the Cf category names is not washed, so the answer came from a list rather than the rule: U+0600 U+0601 U+0602 U+0603 U+0604 U+0605 U+061C U+06DD U+070F U+0890 U+0891 U+08E2 U+110BD U+110CD U+13430 U+13431 U+13432 U+13433 U+13434 U+13435 (+135 more)
+--- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.076s
+FAIL

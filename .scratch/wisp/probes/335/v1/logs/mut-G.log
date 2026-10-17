@@ -1,0 +1,10 @@
+time=2026-10-17T13:31:02.354+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+    display_scrub_216_test.go:519: arm 2: product-washed=171, unicode.Cf=170, missed=0, extra=1, this file's cfRoster=15
+    display_scrub_216_test.go:526: the boundary washes runes the Cf category does not name, so the answer came from a list rather than the rule: U+00A0
+    display_scrub_216_test.go:540: U+00A0 is neither Cf nor Cc but needsDisplayWash fired on it
+    display_scrub_216_test.go:543: U+00A0 is neither Cf nor Cc but the wash changed it: "photo\u00a0.png" -> "photo\\xa0.png"
+--- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.060s
+FAIL
