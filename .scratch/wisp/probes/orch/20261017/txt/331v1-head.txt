@@ -1,0 +1,24 @@
+票 331 非实现者终裁腿 `331-v1`（裁·`internal/observe/**` 只读射程）——六格逐格判语＋★必答：那把"零改动尺"对注释内容**结构性失明**，所以 `AC#2` 到底钉住了什么
+
+你是 `331-v1`＝**非实现者裁决者**。票＝`.scratch/wisp/issues/331-message-key-comment-says-ui-embeds-it-production-zero.md`（现量：六枚 `- [ ]`，落地腿一枚没翻，对）。⛔ 产码 ⛔ 改任何跟踪字节 ⛔ 翻框 ⛔ 改判据文字／票名／`Status:`／`-done` ⛔ push。
+
+## 被裁对象
+料＝`docs/evidence/s1/331-r1-evidence.md`（114 行／8082 字节，★它自己追加更正过两处正文行数失准：`adcbe8f3` 写 97 实 90、`d4a1da8b` 写 113 实 114——均以追加、⛔ amend，这是对的）＋探针面 `.scratch/wisp/probes/331/r1/**`（台件＋`.log` 读数，含 `logs/ac-selfcheck.log`）。六笔＝`e09187e1`（★唯一一笔碰产码面：`internal/observe/errors.go` **只改整行注释**）／`5cbec52d`／`adcbe8f3`／`7ab51937`／`47f7a6a3`（票尾一条）／`d4a1da8b`。起手锚＝`72b65c61`，现 HEAD＝`7535d83b`。★读数取**具名提交树**，⛔ 读工作树在飞字节。
+
+## 背景一句话（本票为什么存在）
+`internal/observe/errors.go` 的 `MessageKey()` 那段注释原话自称 "UI and logs embed the key so copy can be added later without re-touching error sites"，而**生产里嵌这枚键的站点＝0 枚**（凭据＝`216-v2` 判语件 `docs/evidence/s1/216-v2-verdict.md` 的 `M1` 尺：`MessageKey` 生产消费者 0，两枚锚同）。⇒ 票 331 要的是**把注释改成说实话**这一件事；那层"按错误码选一句人话文案"的活**不在本票**（归口＝`docs/specs/SPEC-12-roadmap-governance.md` §5 那行 DEFERRED／票 225 名下，接线要另立票）。
+
+## 你要逐格给的判语（只用 成立／不成立／不适用／不可判）
+- **`AC#1`（改口是否说实话）**：★这是本票唯一实质的一格。把改前／改后那三行注释**原文并排**贴出，逐句问："这句现在被树支撑吗？"⛔ 判语里不许出现任何"以后会做"的承诺当已实现；⛔ 让它把"生产仍零消费者"这件事洗成"没问题"——改口的正确方向是**承认缺接线**，不是删掉许诺。
+- **`AC#2`（那把零改动尺）**：★**必答题（落地腿自己已答，你要独立复核并裁）**——滤掉整行注释后锚 blob ⇄ 工作树两侧逐字节同串、正控一发（非注释改一枚字面量 ⇒ 尺必红、`rc=1`）。这一把尺的射程**只到"整行注释以外的产码字节没动"**，它对"注释被改过"与"注释诚实"都**失明**。⇒ 请裁：`AC#2` 该判**成立（钉的是产码零改动这一维）**、还是**不成立／不可判（因为票面那句话读起来像在钉注释内容）**？如果你判"票面文字与尺的射程不符"，具名写清哪一句、并说明**⛔ 让下一枚写腿去改判据文字**（判据文字归编排者与裁者，不归实现者）。
+- **`AC#3`（行为不变）**：核它改前／改后各一发 `internal/observe` 的四数（它报 `71／71／0／0` 两台同值），★自己重跑一发对号；⛔ 把 `-v` 与非 `-v` 两把尺的 PASS 数混报。
+- **`AC#4`（门禁四数）**：只认共享工作树那批，逐枚 `rc=`；`d22scan` 指到缺 `design/` 的树回 `exit 2`＝GUARD 射程拒绝，⛔ 计红。
+- **`AC#5`（纪律格）**：核它写面＝四处（`internal/observe/errors.go`＋probes＋`docs/evidence/s1/**` 一枚短名件＋票尾一条），逐枚 `git show --name-only`；⛔ 翻框／改 `Status:`／push。
+- **`AC#0`（料格）**：核它起手那四把尺是真现跑的（⛔ 抄票面），并把票面那四枚读数与它交回的读数**逐枚对**——不一致就具名指出来（**这包括指票面我自己写的数**：票面如果过期，判"票面不实"记我，⛔ 让腿背）。
+- ★**顺带一笔别记在本票**：`internal/observe/errors.go` 里那枚 `DEFERRED(` 代码标记缺失（生产 26 枚 `DEFERRED(` 里它 0 枚、只在注释里用英文写 "deferred (D23 … S6)"）＝**票 225 的射程**（`216-v2` 判语件已具名归口），⛔ 为本票二次开票。
+
+## 写面（只许这三处）
+`docs/evidence/s1/331-v1-verdict.md`（★短名、⛔ 带 `§`）＋`.scratch/wisp/probes/331/v1/**`＋票 331 末尾**一条**只追加 bullet。⛔ 其它一切路径零字节。
+
+## 台面
+`go test ./internal/observe/ -count=1 -timeout 30m`，台面＝`git archive 72b65c61 go.mod go.sum internal cmd tools scripts frontend models` 八件套＋仓根 `docs/`＋手工三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`），树放 `D:` 卷且目录名产生 8.3 短名别名、`GOTMPDIR` 指 `D:` 并先 `mkdir -p`；取出后先数 `.go` 证非空。⛔ 跑整包 `./cmd/wisp`（归 `228-r3`／`329-v1`）、⛔ `go test ./...`；⛔ 杀 `wisp.exe` PID **21892**。并发在飞＝`228-r3`／`216-r2`／`327-r2`（写）∥ `329-v1`／`330-v1`／`332-a1`（读裁）。

@@ -1,0 +1,50 @@
+票 329 非实现者终裁腿 `329-v1`（裁·`cmd/wisp/**` 只读射程）——九格逐格判语＋★必须自己重放那三发（落地腿死于 150 轮帽、成对颜色那两格它自己写着"待填"）
+
+你是 `329-v1`＝**非实现者裁决者**。票＝`.scratch/wisp/issues/329-panel-snapshot-last-mile-never-delivered.md`（现量：九枚 `- [ ]`，实现腿一枚没翻，对）。⛔ 产码 ⛔ 新增/修改任何跟踪测试件 ⛔ 翻框 ⛔ 改判据文字 ⛔ 改票名／`Status:`／`-done` ⛔ push。
+
+## 你要裁的对象（先读这三件，逐字）
+1) 判语料＝`docs/evidence/s1/329-snapshot-delivery-r1.md`（100 行／11184 字节）——★**末尾"§8 编排者代提注"是我加的**，里面已具名：两处 `待填`（§表 68/69 行改前改后四数、§83 桌面卫生尺）＋一处**幽灵引用**（§1 指的 `logs/commits-roster.log` 盘上没有）＋整进程死亡的读数口径。
+2) 实现腿票尾那条 bullet＝票 329 末尾一条（我代提入库 `7535d83b`）。
+3) 产码七笔＝`60e82f11`／`bed1c348`／`a0a2f440`／`8e1ea71d`／`2c4f829a`／`1d1261e0`／`a0d6ec85`，被裁尖＝`1d1261e0`，起手对照＝`feab45e3`，现 HEAD＝`7535d83b`。★读数一律取**具名提交树**，⛔ 取工作树在飞字节（`228-r3` 正在写 `cmd/wisp`）。
+
+## 我替你算过的一枚起手（你现跑复认，⛔ 抄）
+`grep -rn 'lastPanelSnapshot' --include='*.go' internal cmd tools | grep -v '_test'` ⇒ 起手 0 命中 ⇄ 现量 5 行（定义 `cmd/wisp/panel_pump.go:422`/`:429`＋注释 3 枚＋**生产读者 `cmd/wisp/panel_snapshot_deliver_329.go:95`**）。⇒ `AC#2` 的"有非测试读者"这半我已背书；★**"字节逐位相等"那半我没跑**，归你。
+
+## ★你必须自己跑的（缺一发我就退回这份判语）
+- **三发成对突变**，都打在**仓外导出树**、落点互不相同、逐发当场还原＋报还原哈希、`finally` 里还原：① 去牙＝把推出去的那串字节换成空串／换成日志摘要 ⇒ 那枚逐位相等用例（`cmd/wisp/panel_snapshot_deliver_329_test.go:76` `TestBookedSnapshotReachesHostBitForBit329`）**必须红**；② 反控＝改 marshal 侧一个字段（少一条待批之类）⇒ **也必须红**（①②不是同一发）；③ 摘掉生产读者 `:95` ⇒ 红句应落在 `:141`／`:164`／`:167`（死腿盘上那发就红在这三行、`host=""`、"received 0 pushes"）。★派单当初问过落地腿的必答题就是这一发，它跑了但没重放第二次。
+- **`AC#4` 那枚名册钉**：`git diff --stat feab45e3 1d1261e0 -- internal/panel/bridge.go internal/panel/inbound_roster_253_test.go internal/panel/git_test.go` 必须**为空**；入向名册现量仍 **7**（尺＝`internal/panel/inbound_roster_253_test.go` 那个 `wantFullInboundRosterSize253`）；出向 `Eval` 那四枚 `window._rpc` 回执一字未动。
+- **改前／改后 `cmd/wisp` 颜色那一格**：死腿两发（`logs/full-before-anchor-feab45e3-run2.log`＝`RUN 203／PASS_TOP 148／FAIL_TOP 0` ⇄ `logs/full-after-tip-1d1261e0-skipset2.log`＝`206／151／0`，我都用 `grep -c` 逐枚数过）**都包回 `FAIL` 却零枚 `--- FAIL`、零枚 `ok`、尾停 `MARK299 wndproc` 之后**＝整进程真窗区死亡 ⇒ ★**名册作差这条路今天取不到**。你要做的不是重跑整包赌一把，而是**另路取数**（具名 `-run` 名册那一发＋把死亡那发具名写成台面），然后判 `AC#7` 那格是**成立／不成立／不可判**中的哪一枚，并说清"缺的是哪一维"。⛔ 把死掉的整包读成"全绿"，⛔ 读成"329 的字节把包打红"。
+- **能力必答**：这一跳今天①**被产码读到**＝逐环 `file:line`（`deliver_329.go:95`←`publishPanelSnapshot`←三个既有驱动点←泵←装配根）；②**被人眼读到**＝★页面侧**接收器今天缺位**（`frontend/**` 归机主的外部前端 agent、本编队零写面）⇒ 后半那半怎么判由你裁，但**⛔ 判语里不许出现"已在屏幕上"**。
+- **`AC#5` 那枚合同件**（`.scratch/wisp/probes/329/r1/page-contract.md`，4434 字节）：核它写的 JS 全局名／参数形状／触发时机**与产码逐字一致**（不一致＝不实，具名指出来）；⚠ 它是**给机主转交外部前端 agent 的料**，不是本仓已实现能力。
+- **`AC#6`**：核它⛔ 新增 publish 驱动点、⛔ 逐 token delta 推、⛔ 发明合并／背压规则（D38d 那条"多久推一次"仍属票 35 名下）。
+
+## 写面（只许这三处，逐字）
+`docs/evidence/s1/329-v1-verdict.md`（★短名、⛔ 带 `§`）＋`.scratch/wisp/probes/329/v1/**`（含 `logs/`，原始读数一律 `.log`）＋票 329 末尾**一条**只追加 bullet。⛔ 一切其它路径零字节（`cmd/wisp/**`／`internal/**`／`frontend/**`／`design/**`／`PLAN.md`／`docs/specs/**`／台账／`HANDOVER`／三枚冻结件／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`）。
+
+## 台面与命令
+`cmd/wisp` 那包必须带 DLL 路径＋显式超时：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -timeout 30m`；⛔ 默认超时（`panic: test timed out after 10m0s` 长得像"包红了"）；⛔ `go test ./...`。★**重包同一时刻只跑一个**——`228-r3` 在写 `cmd/wisp`，撞上就等并在读数里具名写你等了。⛔ 杀 `wisp.exe` PID **21892**。门禁四数只在共享工作树跑（★那四数里若混进 `228-r3` 的在飞字节，具名写清是哪一行，⛔ 计入判据）。
+## 规矩块（本波通用，逐条都是现行铁律；缺一条我就退回你那笔交件）
+
+**git**：⛔ **push**（推送只由编排者做）；`git add` 与 `git commit` 两处都要**逐枚显式 pathspec**——⛔ `add -A`／`add .`／目录形、★**⛔ `git commit -F <正文> -- .`**（编排者自己 10-17 刚踩过：那个 `.` 把机主在飞的 24 枚工作树字节记进了一笔提交，台账 `A1011` 第⑧节）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree 或 checkout。临时件**只建不删**。
+
+**票面**：⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`（裁决者≠实现者，你交的是料不是判语）。只许在票尾**追加一条** bullet。
+
+**台面配方**（缺一味就假红）：`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models`（**八件套**）＋★仓根 `docs/`（`internal/tools/paths_shortname_252_*` 那一族与 `internal/panel/git_test.go:364` 的 `TestGitDimensionHasNoModelCallableTool` 要读 `docs/PLAN.md`）＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`——都⛔ 跟踪）。树放 **`D:` 卷且目录名要产生 8.3 短名别名**（放 `/tmp`＝C 卷 Temp ⇒ 那族打红＝台面故障）；★`GOTMPDIR` 指到 `D:` 上**先 `mkdir -p`**（没建＝`creating work dir` 红，长得像判据响）。取出后**先数 `.go` 证非空**（"0"⛔ 是读数）。
+
+**颜色尺**：`RUN=`＝`grep -c '^=== RUN'`（**含子测试**）⇄ `PASS_TOP=`＝`grep -c '^--- PASS'`（**只顶层**）⇄ `FAIL_TOP=`＝`^--- FAIL` ⇄ `SKIP=`。**四数不许混用、不许相减**。一律 `-count=1 -timeout 30m`（⛔ 默认超时＝`panic: test timed out after 10m0s` 长得像"包红了"）；⛔ `go test ./...`。★跑 `cmd/wisp` 必须带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，否则 `exit status 0xc0000135`＋rc=1＋**零枚 `--- FAIL`**＝那包根本没跑（台面故障，⛔ 计入判据）。★已知本机那一格：`cmd/wisp` 整包有**真窗区整进程死亡**（改前改后都死在同一处、包回 `FAIL` 却零枚 `FAIL:`／零枚 `ok`）⇒ ⛔ 拿它当"我的字节把包打红"、也⛔ 当"全绿"，具名写清是哪一发死在哪一行；活实例 `wisp.exe` PID **21892** 握全局热键＋单实例锁会打死几枚，⛔ 为它们动断言、⛔ 杀那枚 PID。
+
+**门禁四数只在共享工作树跑**（⛔ 部分导出树）：`/d/work/base/gopath/bin/gofumpt.exe -l <你的文件>`（PATH 里可能 rc=127 ⇒ 用真身）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./<你的包>/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 `exit 2`＋`ban #8 scope design/ examined 0 files`＝**GUARD 射程拒绝，⛔ 读成红**；长度门要 `.git`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+
+**突变（牙）**：只打在**仓外导出树**的字节上——⛔ 改跟踪文件、⛔ `-overlay`（那形对读盘的尺失明）；逐发**当场还原并报还原哈希**、`finally` 里还原（中途炸过＝突变留在跟踪件是这本仓的高危事故）。成对两发的**落点必须不同**（不同用例、不同断言行），少任一发＝那把尺对这件事不敏感，⛔ 用它的绿当凭据。★落点要**内容锚**（函数体内那枚 token），⛔ 绝对行号（夹具一插就腐烂）。
+
+**判据形状**：⛔ 为了变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 在注释里指名一枚不存在的测试或件当凭据（本仓已入账七次，本波又抓到一枚）、⛔ 许诺未实现的能力。
+
+**输出预算**：≤4 枚件、每件 ≤160 行；⛔ 0 字节文件（交件前 `wc -c`）；★**每落一枚文件就 commit**（⛔ 攒着——本波已有一枚写腿攒到第 6 笔死于 150 轮帽，遗产要我代提）。轮次帽 150：先做判据最硬的那格，把 `logs/` 逐枚提前入库。
+
+**shell**：进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`（那是真会跑的）；中文 commit 正文先 Write 成文件再 `git commit -F`。内联 PowerShell 里⛔ `$_`／`$b`（被 bash 吃掉 ⇒ 机主屏幕反复弹"选择一个应用打开"），要 PS 就 Write 成 `.ps1` 再 `-File`。
+
+**读数纪律**：引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先看 `stderr` 并跑一枚已知存在的正控；`grep -c` 命中 0 会回 rc=1 ⇒ 在 `$( )` 里 `|| true`，⛔ 让 `&&` 链被截断。
+
+**写面纪律**：写面之外的每一面都算越格，我逐枚 `git show --name-only` 核；并发在飞的别腿字节⛔ 当凭据（读**具名提交树**，⛔ 读工作树在飞字节）。
+
+**交件自证（三把尺，⛔ 只说"已完成"）**：① 逐枚提交号＋逐枚 `git show --name-only`（应只含你被允许的写面；产码那笔逐枚点名改了哪几枚文件、各几行）；② 证据件**绝对路径**＋`wc -c`＋行数＋占位符尺（分词形）0 命中；③ 决定性那把尺的**逐字输出**（起手侧 ⇄ 交件侧都带 `file:line`）＋成对两发红句逐字＋还原哈希＋改前改后四数＋门禁四数 `rc=`。另加派单里的**必答题**（⛔ 你自己盖章不算）。

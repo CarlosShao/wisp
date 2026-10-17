@@ -1,0 +1,36 @@
+票 228 `AC#11` 落地腿 `228-r3`（写·`cmd/wisp/**`＋`internal/proc/**`）——托盘「退出」那枚按钮今天只有记录、没有执行者；把停机请求位接上，让常驻腿自己去结束环路
+
+你是 `228-r3`。票＝`.scratch/wisp/issues/228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md` 的 **`AC#11`** 那一格（★先把整格逐字读完，里面含 10-01 我自己写空又就地更正的那一节，⛔ 只读前半）。
+
+## 起手锚（★先自己现跑三把尺对号，⛔ 抄我的行号）
+1. `grep -rn 'recordTrayExit' --include='*.go' cmd internal` ⇒ 挂载 `cmd/wisp/resident_ball_windows.go` 的 `OnTrayExit:` ＋ 函数体（今天**只记录不执行**：打 `outcome=ignored` 那句 `why`）。
+2. `grep -rn 'RequestStop\|StopRequest' internal/proc/` ⇒ 票面记号＝**零命中**（`RunEventLoop` 的 `sigCtx` 是函数内局部变量，`internal/proc/boot_windows.go` 那一支）。这一枚就是你新增的东西。
+3. `grep -rn 'os.Interrupt\|signal.Notify' cmd/wisp/resident_windows.go` ⇒ 今天**唯一真停机入口**；有序退出全挂在 `runResident` 正常返回的那串 `defer` 上（十步）。⇒ ★**本票要做的只有一件事：让 `RunEventLoop()` 返回**，⛔ 改十步任何一字的顺序。
+4. 选择值只从 `internal/ball/tray_windows.go` 里 `TrackPopupMenu` 的**同步返回**拿（`tpmRightButton|tpmReturnCMD|tpmNoActivate`，⛔ `WM_COMMAND`）⇒ ★**⛔ 从测试里投 `WM_COMMAND`＋菜单 id 模拟托盘选择**（票面已把这条取巧路证伪并关掉，谁造谁退回）。
+
+## 裁给你了（⛔ 重新发明、⛔ 自己挑形）
+**修法＝乙-1**＝`internal/proc` 的 **stop-request 位**（记一笔请求、立刻返回）。⛔ 协程形（乙-2c）＝要改 `docs/PLAN.md` 的 D38(b) 冻结名册＋动 `internal/observe/thresholds.go` ⇒ **人工批准，本票射程内做不到自洽**。⛔ 在托盘回调里 `rt.Shutdown(…)`＋`os.Exit(…)`（跳过全部 defer＝十步一步不走）；⛔ 在回调里同步收口（回调跑在 `ui-sta` 线程内、`Ball.Close()` 是 `PostTask+<-done` ⇒ 自等待死锁）；合法形状照 `vetoByEsc`（`cmd/wisp/resident_approval_windows.go` 里那句"runs ON the ui-sta thread…waits on nothing"）。
+
+**三条完成判据（缺一格不算落地，逐字在票面）**：ⓐ 停机请求位**必须在 boot 时建好**，并**同时接进 `RunEventLoop` 之前那段空窗**（`signal.Notify(bootExit)` 与进入环路前那个 `select` 两处）——只接环路＝球起来之后、环路之前按"退出"会被吞掉，而 `resident_ball_228_windows_test.go` 那枚用例的存在理由就是这段空窗；ⓑ **两枚分开的钉**＝ⓑ-1 进程内（照 `resident_approval_246_windows_test.go` 那形：真 `proc.Boot`＋真 `RegisterShutdownHook`＋`Shutdown(false)` 后**在进程内读满 10 条 `[]StepRecord` 逐名断顺序**，⛔ 用它声称"托盘那一次点击被验过"）＋ⓑ-2 真机 `winlive`（只钉"那一次触发导致进程以**退出码 0** 结束＋审计里仍有 install 记录与 D38(e) 尾巴"，★**⛔ 写成"读到 1..10 全序"**——`internal/proc/shutdown.go` 只为 skipped／失败／fast 出声，成功那几步在盘上**结构性读不到**，补日志＝动 D38(e) 观测面，本票不许）；ⓒ `resident_ball_windows.go` 那段"两形并列都能给执行者"的注释**不准确** ⇒ 随 AC#10 一起改口，具名说"协程形单独完不成停机"。
+★**契约面那一格我已裁**（`A493`）：加一枚**触发**不改那十步顺序 ⇒ 不算契约变更、不摆机主；但落地那发必须①把 `boot_windows.go` 那句被**逐字枚举过**的退出触发名册 doc **改口成完整**（⛔ 留过期句子），②⛔ 动 `hookableRoster` 那**闭集八枚**（`internal/proc/shutdown_hooks.go`）——若发现必须加第九枚槽才能做成 ⇒ **当场停手上报**，那就是从"加触发"滑成"改契约"。
+`AC#10` 那一格（三处"我没有任务管线"自述改口成带条件的事实句，其中一处是**真打印**的 slog 字段）**同批做**；⛔ 新增扫注释票号的词面型仪器；⛔ 靠"把打印挪到装配之后"来糊（破 D38(e) 时序）。
+
+## 写面（只许这四处，逐字）
+1) `cmd/wisp/**`（★本波唯一一枚碰这面产码的腿——`329-r1` 已于 09:58 撞 150 轮帽、遗产我已代提 `7535d83b`，它的面现在交给你）＋`internal/proc/**`（stop 位那一小块）；2) `.scratch/wisp/probes/228/r3/**`（含 `logs/`，原始读数一律 `.log` 形——`.gitignore:8` 是 `*.out`）；3) `docs/evidence/s1/**` 一枚件（★短名、⛔ 长名、⛔ 件名带 `§`）；4) 票 228 末尾**一条**只追加 bullet。
+⛔ 其它一切面：`internal/panel/**`（本波归 `327-r2`／`332-a1`）、`internal/risk/**`（`216-r2` 在写）、`internal/agent/**`（`330-v1` 在裁）、`internal/observe/**`（`331-r1` 刚改过注释、`331-v1` 在裁）、`internal/ball/**`（★如果非动它不可 ⇒ **先停下上报**，别自己扩）、`frontend/**`、`design/**`、`PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden 既有件／`tools/d22scan/allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`／三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）。
+
+## ★判据与牙（交件必带）
+- 判据⛔ 不许是"stop 位被置过一次"：ⓑ-1 那枚用例必须断**触发之后十步真走满且逐名顺序对**；另加一枚钉「托盘那支的**执行者被挂上**」＝在装配处拿那枚被注入的函数值**直接调**（票面 F6 那格已认可复用现成 `OnTrayExit`、⛔ 为让钉响去把名册断言扩到行为维）。
+- ★**成对两发**（仓外导出树、落点不同、逐发还原＋报还原哈希、`finally` 里还原）：发一把 stop 位检查摘掉（或"置位但不传给环路"）⇒ 指名那枚用例必红；发二把请求位的**空窗那半**摘掉（只接环路不接 `bootExit` 那一段）⇒ 空窗那枚用例必红。少任一发＝那把尺对这一维不敏感，⛔ 用它的绿当凭据。
+- ★`cmd/wisp` 那一格的颜色尺：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -timeout 30m`，改前／改后各一发、四数逐枚点名、终态红名册与起手**作差＝0**。⚠ 已知本机这一形：改前改后都可能**整进程在真窗区死亡**（包回 `FAIL`、零枚 `--- FAIL`、尾停 `MARK299` 之后，`329-r1` 两发都撞上）⇒ 撞上就具名写清是哪一行、并**另交一发 `-run` 有名字集**的四数，⛔ 用死掉的整包冒充判据、⛔ 拿它当"我的字节打红"。
+- ★ⓑ-2 那枚 `winlive`：机主今天给了常驻权限（"抢我的鼠标都没事，只要你不断推进任务"）⇒ 可以跑真窗；跑前一条命令量三件（没有别的 `wisp.exe` 是我起的／CI 空／`build\wisp.exe` 不比源码旧），跑完把桌面还给机主。⛔ 杀 PID **21892**（机主 10-15 19:03 自起的常驻实例）。真窗拿不到 ⇒ 具名写成〔本机可量、今天没量到〕并说哪一步断，⛔ 交一张没做的判据当已做。
+
+## 并发在飞（⛔ 读别腿在飞字节当凭据）
+`228-r3`（你，`cmd/wisp`＋`internal/proc` 产码）∥ `216-r2`（写 `internal/risk/**` 测试面）∥ `327-r2`（写 `internal/panel/**` 测试面）∥ `329-v1`／`330-v1`／`331-v1`（裁决腿，只读）∥ `332-a1`（只读普查）。★`cmd/wisp` 重包同一时刻只跑一个 ⇒ 和 `329-v1` 撞上就等一等，并在证据件里具名写你等了。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含上面四处；产码那笔逐枚点名改了哪几枚文件、各几行）；② 证据件绝对路径＋`wc -c`＋行数＋占位符尺 0 命中；③ ★**`AC#11` 那三条判据逐条的盘上凭据**（ⓐ 两处挂载各一枚 `file:line`／ⓑ-1 十步逐名读数原样贴／ⓑ-2 退出码与审计记录读数或〔没量到〕具名／ⓒ 改口前后三行注释原文并排）＋成对两发红句逐字＋还原哈希＋改前改后四数＋门禁四数 `rc=`。
+必答题：把你 ⓑ-1 那枚用例的**触发源摘掉**（台件、当场还原、报还原哈希）——它还响不响？若它不响＝它对"是谁触发的"不敏感，具名写出来交我裁。
+
+## 起手锚（本波存档，腿自己现跑对号）
+HEAD＝`7535d83b`（dev）；票 327 六格已由我翻完（`A1011`）；`329-r1` 遗产代提＝`7535d83b`；CPU 我放出前连测三发＝41／43／48（%）。

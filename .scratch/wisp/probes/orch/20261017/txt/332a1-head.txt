@@ -1,0 +1,24 @@
+票 332 只读普查腿 `332-a1`（⛔ 产码 ⛔ 测试件 ⛔ `go test`/`go build`/`go vet`）——`Cf` 全族 170 枚里，显示边界外那 155 枚**今天有哪几枚真能走到用户眼前**
+
+你是 `332-a1`＝**只读普查腿**。票＝`.scratch/wisp/issues/332-cf-invisible-runes-outside-display-boundary-reachability-census.md`（★整张票逐字读完，AC#0–AC#5 就是你要交的料；现量六枚 `- [ ]` 全未勾）。⛔ 判语、⛔ 修法建议、⛔ "建议纳入名单"那一类结论（那是我与裁决腿的活）、⛔ 翻框、⛔ 改票名／`Status:`、⛔ 排程、⛔ push。
+
+## 这枚票为什么存在（一句话）
+票 327 把显示边界扩成"`Cc` ＋ 15 枚 `Cf`"（名单在 `internal/panel/display_scrub_216.go` 的 `isDisplayWashCf`），而 `Cf` 全集今天＝**170 枚** ⇒ **155 枚照旧原样穿过**。我在票 327 的 `AC#1` 里写过一句"`U+2061`–`U+2064` 具名裁要不要"、**那一纸我一直没裁**，因为缺的就是你这次要取的料：**逐枚可达性**。
+
+## 起手四把尺（★一律取具名提交树，锚＝`7535d83b`；⛔ 读工作树在飞字节——`internal/panel` 有 `327-r2` 在写、`cmd/wisp` 有 `228-r3` 在写）
+1. `grep -n 'case 0x' internal/panel/display_scrub_216.go` 那一族 ⇒ 名单逐枚枚数（期望 **15**，若不同具名写）。
+2. 全 `Cf` 枚数＝**170** 这一枚**你要独立复跑**（`327-v1` 的台件在 `.scratch/wisp/probes/327/v1/**`，⛔ 抄它的数、可以照它的形状自己在仓外重跑）。
+3. 显示边界的生产调用点枚数（`grep -rn 'scrubComposerForDisplay\|scrubForDisplay' --include='*.go' internal cmd | grep -v _test`）。
+4. 判定层那张相反名单（`internal/risk/taintmatch.go` 的 `isIgnorableTaintRune`）枚数＋它**为什么取向相反**（只读它的注释与调用者，⛔ 动它一字）。
+
+## 三形入口（AC#2 的每一行都必须落到这三条之一的 `file:line`，或写明"无已知载体"）
+**(a) 磁盘／工作区真名** → `cmd/wisp/panel_pump.go` → `internal/panel/workspace.go` → `display_scrub_216.go`；**(b) 模型正文／工具 reason** → `internal/llm/events.go` → `internal/tools/bridge.go` → 泵 → `internal/panel/approval.go`；**(c) 页面／入向** → `cmd/wisp/panel_inbound.go`。★票 327 普查件（`.scratch/wisp/probes/327/a1/census-1-roster.md`／`census-2-cf-and-upstream.md`）已经把这三条链逐环画过一遍——**读它、复跑它、指出它今天已过期的那一环**（★注意票 329 刚把"快照字节交给宿主"那一跳接上了：`cmd/wisp/panel_snapshot_deliver_329.go:95` ⇒ `327-a1` 那句"最后一公里没接"的读数**已经腐烂**，你这条更正就是增量料）。
+
+## ★AC#3 那两枚载体正控（不许只写"按代码读应该会出现"）
+挑两枚名单外的 `Cf`（建议 `U+2061`、`U+206B`），在**仓外**构造输入、把**marshal 出来的快照字节** dump 下来，证它们**原样出现**（`E2 81 A1`／`E2 81 AB` 字节序列在位、且⛔ 转义形）。★形状可照 `329` 那一族的桩（读代码即可，⛔ 跑别腿在飞的包）；若你只能用一枚仓外单文件纯 stdlib 探针（照 `327-a1` 先例：`go run` 一枚临时 `main.go`、⛔ import 本仓包），那就在件里**具名写"我唯一执行过的代码是哪一枚、在哪个路径"**，并把那段逻辑说是从哪几行逐字重打的。
+
+## 写面（只许三处）
+`.scratch/wisp/probes/332/a1/**`（含 `logs/`，原始读数一律 `.log` 形——`.gitignore:8` 是 `*.out`，那种名字落不进提交树）＋`docs/evidence/s1/**` 一枚件（★短名、⛔ 带 `§`）＋票 332 末尾**一条**只追加 bullet。⛔ 其它一切路径零字节：`internal/**`／`cmd/**`／`frontend/**`／`design/**`／`PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`／三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）。⛔ 跑任何门禁（四门归写腿与裁决腿；你这波⛔ `gofumpt`／⛔ `d22scan` ⇒ 也别因此红）。
+
+## 并发在飞
+`228-r3`（写 `cmd/wisp`＋`internal/proc`）∥ `327-r2`（写 `internal/panel` 测试面）∥ `216-r2`（写 `internal/risk` 测试面）∥ `329-v1`／`330-v1`／`331-v1`（裁决腿）。⇒ ★你⛔ 跑 `go test`／`go build`／`go vet`／任何 `-timeout` 的包级命令（编译面与重包归它们），⛔ `go env`／`go list` 这类只读命令可以但要自报；⛔ 杀 `wisp.exe` PID **21892**。

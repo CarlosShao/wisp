@@ -1,0 +1,49 @@
+票 331 非实现者终裁腿 `331-v1`（裁·`internal/observe/**` 只读射程）——六格逐格判语＋★必答：那把"零改动尺"对注释内容**结构性失明**，所以 `AC#2` 到底钉住了什么
+
+你是 `331-v1`＝**非实现者裁决者**。票＝`.scratch/wisp/issues/331-message-key-comment-says-ui-embeds-it-production-zero.md`（现量：六枚 `- [ ]`，落地腿一枚没翻，对）。⛔ 产码 ⛔ 改任何跟踪字节 ⛔ 翻框 ⛔ 改判据文字／票名／`Status:`／`-done` ⛔ push。
+
+## 被裁对象
+料＝`docs/evidence/s1/331-r1-evidence.md`（114 行／8082 字节，★它自己追加更正过两处正文行数失准：`adcbe8f3` 写 97 实 90、`d4a1da8b` 写 113 实 114——均以追加、⛔ amend，这是对的）＋探针面 `.scratch/wisp/probes/331/r1/**`（台件＋`.log` 读数，含 `logs/ac-selfcheck.log`）。六笔＝`e09187e1`（★唯一一笔碰产码面：`internal/observe/errors.go` **只改整行注释**）／`5cbec52d`／`adcbe8f3`／`7ab51937`／`47f7a6a3`（票尾一条）／`d4a1da8b`。起手锚＝`72b65c61`，现 HEAD＝`7535d83b`。★读数取**具名提交树**，⛔ 读工作树在飞字节。
+
+## 背景一句话（本票为什么存在）
+`internal/observe/errors.go` 的 `MessageKey()` 那段注释原话自称 "UI and logs embed the key so copy can be added later without re-touching error sites"，而**生产里嵌这枚键的站点＝0 枚**（凭据＝`216-v2` 判语件 `docs/evidence/s1/216-v2-verdict.md` 的 `M1` 尺：`MessageKey` 生产消费者 0，两枚锚同）。⇒ 票 331 要的是**把注释改成说实话**这一件事；那层"按错误码选一句人话文案"的活**不在本票**（归口＝`docs/specs/SPEC-12-roadmap-governance.md` §5 那行 DEFERRED／票 225 名下，接线要另立票）。
+
+## 你要逐格给的判语（只用 成立／不成立／不适用／不可判）
+- **`AC#1`（改口是否说实话）**：★这是本票唯一实质的一格。把改前／改后那三行注释**原文并排**贴出，逐句问："这句现在被树支撑吗？"⛔ 判语里不许出现任何"以后会做"的承诺当已实现；⛔ 让它把"生产仍零消费者"这件事洗成"没问题"——改口的正确方向是**承认缺接线**，不是删掉许诺。
+- **`AC#2`（那把零改动尺）**：★**必答题（落地腿自己已答，你要独立复核并裁）**——滤掉整行注释后锚 blob ⇄ 工作树两侧逐字节同串、正控一发（非注释改一枚字面量 ⇒ 尺必红、`rc=1`）。这一把尺的射程**只到"整行注释以外的产码字节没动"**，它对"注释被改过"与"注释诚实"都**失明**。⇒ 请裁：`AC#2` 该判**成立（钉的是产码零改动这一维）**、还是**不成立／不可判（因为票面那句话读起来像在钉注释内容）**？如果你判"票面文字与尺的射程不符"，具名写清哪一句、并说明**⛔ 让下一枚写腿去改判据文字**（判据文字归编排者与裁者，不归实现者）。
+- **`AC#3`（行为不变）**：核它改前／改后各一发 `internal/observe` 的四数（它报 `71／71／0／0` 两台同值），★自己重跑一发对号；⛔ 把 `-v` 与非 `-v` 两把尺的 PASS 数混报。
+- **`AC#4`（门禁四数）**：只认共享工作树那批，逐枚 `rc=`；`d22scan` 指到缺 `design/` 的树回 `exit 2`＝GUARD 射程拒绝，⛔ 计红。
+- **`AC#5`（纪律格）**：核它写面＝四处（`internal/observe/errors.go`＋probes＋`docs/evidence/s1/**` 一枚短名件＋票尾一条），逐枚 `git show --name-only`；⛔ 翻框／改 `Status:`／push。
+- **`AC#0`（料格）**：核它起手那四把尺是真现跑的（⛔ 抄票面），并把票面那四枚读数与它交回的读数**逐枚对**——不一致就具名指出来（**这包括指票面我自己写的数**：票面如果过期，判"票面不实"记我，⛔ 让腿背）。
+- ★**顺带一笔别记在本票**：`internal/observe/errors.go` 里那枚 `DEFERRED(` 代码标记缺失（生产 26 枚 `DEFERRED(` 里它 0 枚、只在注释里用英文写 "deferred (D23 … S6)"）＝**票 225 的射程**（`216-v2` 判语件已具名归口），⛔ 为本票二次开票。
+
+## 写面（只许这三处）
+`docs/evidence/s1/331-v1-verdict.md`（★短名、⛔ 带 `§`）＋`.scratch/wisp/probes/331/v1/**`＋票 331 末尾**一条**只追加 bullet。⛔ 其它一切路径零字节。
+
+## 台面
+`go test ./internal/observe/ -count=1 -timeout 30m`，台面＝`git archive 72b65c61 go.mod go.sum internal cmd tools scripts frontend models` 八件套＋仓根 `docs/`＋手工三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`），树放 `D:` 卷且目录名产生 8.3 短名别名、`GOTMPDIR` 指 `D:` 并先 `mkdir -p`；取出后先数 `.go` 证非空。⛔ 跑整包 `./cmd/wisp`（归 `228-r3`／`329-v1`）、⛔ `go test ./...`；⛔ 杀 `wisp.exe` PID **21892**。并发在飞＝`228-r3`／`216-r2`／`327-r2`（写）∥ `329-v1`／`330-v1`／`332-a1`（读裁）。
+## 规矩块（本波通用，逐条都是现行铁律；缺一条我就退回你那笔交件）
+
+**git**：⛔ **push**（推送只由编排者做）；`git add` 与 `git commit` 两处都要**逐枚显式 pathspec**——⛔ `add -A`／`add .`／目录形、★**⛔ `git commit -F <正文> -- .`**（编排者自己 10-17 刚踩过：那个 `.` 把机主在飞的 24 枚工作树字节记进了一笔提交，台账 `A1011` 第⑧节）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree 或 checkout。临时件**只建不删**。
+
+**票面**：⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`（裁决者≠实现者，你交的是料不是判语）。只许在票尾**追加一条** bullet。
+
+**台面配方**（缺一味就假红）：`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models`（**八件套**）＋★仓根 `docs/`（`internal/tools/paths_shortname_252_*` 那一族与 `internal/panel/git_test.go:364` 的 `TestGitDimensionHasNoModelCallableTool` 要读 `docs/PLAN.md`）＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`——都⛔ 跟踪）。树放 **`D:` 卷且目录名要产生 8.3 短名别名**（放 `/tmp`＝C 卷 Temp ⇒ 那族打红＝台面故障）；★`GOTMPDIR` 指到 `D:` 上**先 `mkdir -p`**（没建＝`creating work dir` 红，长得像判据响）。取出后**先数 `.go` 证非空**（"0"⛔ 是读数）。
+
+**颜色尺**：`RUN=`＝`grep -c '^=== RUN'`（**含子测试**）⇄ `PASS_TOP=`＝`grep -c '^--- PASS'`（**只顶层**）⇄ `FAIL_TOP=`＝`^--- FAIL` ⇄ `SKIP=`。**四数不许混用、不许相减**。一律 `-count=1 -timeout 30m`（⛔ 默认超时＝`panic: test timed out after 10m0s` 长得像"包红了"）；⛔ `go test ./...`。★跑 `cmd/wisp` 必须带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，否则 `exit status 0xc0000135`＋rc=1＋**零枚 `--- FAIL`**＝那包根本没跑（台面故障，⛔ 计入判据）。★已知本机那一格：`cmd/wisp` 整包有**真窗区整进程死亡**（改前改后都死在同一处、包回 `FAIL` 却零枚 `FAIL:`／零枚 `ok`）⇒ ⛔ 拿它当"我的字节把包打红"、也⛔ 当"全绿"，具名写清是哪一发死在哪一行；活实例 `wisp.exe` PID **21892** 握全局热键＋单实例锁会打死几枚，⛔ 为它们动断言、⛔ 杀那枚 PID。
+
+**门禁四数只在共享工作树跑**（⛔ 部分导出树）：`/d/work/base/gopath/bin/gofumpt.exe -l <你的文件>`（PATH 里可能 rc=127 ⇒ 用真身）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./<你的包>/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 `exit 2`＋`ban #8 scope design/ examined 0 files`＝**GUARD 射程拒绝，⛔ 读成红**；长度门要 `.git`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+
+**突变（牙）**：只打在**仓外导出树**的字节上——⛔ 改跟踪文件、⛔ `-overlay`（那形对读盘的尺失明）；逐发**当场还原并报还原哈希**、`finally` 里还原（中途炸过＝突变留在跟踪件是这本仓的高危事故）。成对两发的**落点必须不同**（不同用例、不同断言行），少任一发＝那把尺对这件事不敏感，⛔ 用它的绿当凭据。★落点要**内容锚**（函数体内那枚 token），⛔ 绝对行号（夹具一插就腐烂）。
+
+**判据形状**：⛔ 为了变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 在注释里指名一枚不存在的测试或件当凭据（本仓已入账七次，本波又抓到一枚）、⛔ 许诺未实现的能力。
+
+**输出预算**：≤4 枚件、每件 ≤160 行；⛔ 0 字节文件（交件前 `wc -c`）；★**每落一枚文件就 commit**（⛔ 攒着——本波已有一枚写腿攒到第 6 笔死于 150 轮帽，遗产要我代提）。轮次帽 150：先做判据最硬的那格，把 `logs/` 逐枚提前入库。
+
+**shell**：进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`（那是真会跑的）；中文 commit 正文先 Write 成文件再 `git commit -F`。内联 PowerShell 里⛔ `$_`／`$b`（被 bash 吃掉 ⇒ 机主屏幕反复弹"选择一个应用打开"），要 PS 就 Write 成 `.ps1` 再 `-File`。
+
+**读数纪律**：引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先看 `stderr` 并跑一枚已知存在的正控；`grep -c` 命中 0 会回 rc=1 ⇒ 在 `$( )` 里 `|| true`，⛔ 让 `&&` 链被截断。
+
+**写面纪律**：写面之外的每一面都算越格，我逐枚 `git show --name-only` 核；并发在飞的别腿字节⛔ 当凭据（读**具名提交树**，⛔ 读工作树在飞字节）。
+
+**交件自证（三把尺，⛔ 只说"已完成"）**：① 逐枚提交号＋逐枚 `git show --name-only`（应只含你被允许的写面；产码那笔逐枚点名改了哪几枚文件、各几行）；② 证据件**绝对路径**＋`wc -c`＋行数＋占位符尺（分词形）0 命中；③ 决定性那把尺的**逐字输出**（起手侧 ⇄ 交件侧都带 `file:line`）＋成对两发红句逐字＋还原哈希＋改前改后四数＋门禁四数 `rc=`。另加派单里的**必答题**（⛔ 你自己盖章不算）。

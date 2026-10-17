@@ -1,0 +1,25 @@
+票 329 非实现者终裁腿 `329-v1`（裁·`cmd/wisp/**` 只读射程）——九格逐格判语＋★必须自己重放那三发（落地腿死于 150 轮帽、成对颜色那两格它自己写着"待填"）
+
+你是 `329-v1`＝**非实现者裁决者**。票＝`.scratch/wisp/issues/329-panel-snapshot-last-mile-never-delivered.md`（现量：九枚 `- [ ]`，实现腿一枚没翻，对）。⛔ 产码 ⛔ 新增/修改任何跟踪测试件 ⛔ 翻框 ⛔ 改判据文字 ⛔ 改票名／`Status:`／`-done` ⛔ push。
+
+## 你要裁的对象（先读这三件，逐字）
+1) 判语料＝`docs/evidence/s1/329-snapshot-delivery-r1.md`（100 行／11184 字节）——★**末尾"§8 编排者代提注"是我加的**，里面已具名：两处 `待填`（§表 68/69 行改前改后四数、§83 桌面卫生尺）＋一处**幽灵引用**（§1 指的 `logs/commits-roster.log` 盘上没有）＋整进程死亡的读数口径。
+2) 实现腿票尾那条 bullet＝票 329 末尾一条（我代提入库 `7535d83b`）。
+3) 产码七笔＝`60e82f11`／`bed1c348`／`a0a2f440`／`8e1ea71d`／`2c4f829a`／`1d1261e0`／`a0d6ec85`，被裁尖＝`1d1261e0`，起手对照＝`feab45e3`，现 HEAD＝`7535d83b`。★读数一律取**具名提交树**，⛔ 取工作树在飞字节（`228-r3` 正在写 `cmd/wisp`）。
+
+## 我替你算过的一枚起手（你现跑复认，⛔ 抄）
+`grep -rn 'lastPanelSnapshot' --include='*.go' internal cmd tools | grep -v '_test'` ⇒ 起手 0 命中 ⇄ 现量 5 行（定义 `cmd/wisp/panel_pump.go:422`/`:429`＋注释 3 枚＋**生产读者 `cmd/wisp/panel_snapshot_deliver_329.go:95`**）。⇒ `AC#2` 的"有非测试读者"这半我已背书；★**"字节逐位相等"那半我没跑**，归你。
+
+## ★你必须自己跑的（缺一发我就退回这份判语）
+- **三发成对突变**，都打在**仓外导出树**、落点互不相同、逐发当场还原＋报还原哈希、`finally` 里还原：① 去牙＝把推出去的那串字节换成空串／换成日志摘要 ⇒ 那枚逐位相等用例（`cmd/wisp/panel_snapshot_deliver_329_test.go:76` `TestBookedSnapshotReachesHostBitForBit329`）**必须红**；② 反控＝改 marshal 侧一个字段（少一条待批之类）⇒ **也必须红**（①②不是同一发）；③ 摘掉生产读者 `:95` ⇒ 红句应落在 `:141`／`:164`／`:167`（死腿盘上那发就红在这三行、`host=""`、"received 0 pushes"）。★派单当初问过落地腿的必答题就是这一发，它跑了但没重放第二次。
+- **`AC#4` 那枚名册钉**：`git diff --stat feab45e3 1d1261e0 -- internal/panel/bridge.go internal/panel/inbound_roster_253_test.go internal/panel/git_test.go` 必须**为空**；入向名册现量仍 **7**（尺＝`internal/panel/inbound_roster_253_test.go` 那个 `wantFullInboundRosterSize253`）；出向 `Eval` 那四枚 `window._rpc` 回执一字未动。
+- **改前／改后 `cmd/wisp` 颜色那一格**：死腿两发（`logs/full-before-anchor-feab45e3-run2.log`＝`RUN 203／PASS_TOP 148／FAIL_TOP 0` ⇄ `logs/full-after-tip-1d1261e0-skipset2.log`＝`206／151／0`，我都用 `grep -c` 逐枚数过）**都包回 `FAIL` 却零枚 `--- FAIL`、零枚 `ok`、尾停 `MARK299 wndproc` 之后**＝整进程真窗区死亡 ⇒ ★**名册作差这条路今天取不到**。你要做的不是重跑整包赌一把，而是**另路取数**（具名 `-run` 名册那一发＋把死亡那发具名写成台面），然后判 `AC#7` 那格是**成立／不成立／不可判**中的哪一枚，并说清"缺的是哪一维"。⛔ 把死掉的整包读成"全绿"，⛔ 读成"329 的字节把包打红"。
+- **能力必答**：这一跳今天①**被产码读到**＝逐环 `file:line`（`deliver_329.go:95`←`publishPanelSnapshot`←三个既有驱动点←泵←装配根）；②**被人眼读到**＝★页面侧**接收器今天缺位**（`frontend/**` 归机主的外部前端 agent、本编队零写面）⇒ 后半那半怎么判由你裁，但**⛔ 判语里不许出现"已在屏幕上"**。
+- **`AC#5` 那枚合同件**（`.scratch/wisp/probes/329/r1/page-contract.md`，4434 字节）：核它写的 JS 全局名／参数形状／触发时机**与产码逐字一致**（不一致＝不实，具名指出来）；⚠ 它是**给机主转交外部前端 agent 的料**，不是本仓已实现能力。
+- **`AC#6`**：核它⛔ 新增 publish 驱动点、⛔ 逐 token delta 推、⛔ 发明合并／背压规则（D38d 那条"多久推一次"仍属票 35 名下）。
+
+## 写面（只许这三处，逐字）
+`docs/evidence/s1/329-v1-verdict.md`（★短名、⛔ 带 `§`）＋`.scratch/wisp/probes/329/v1/**`（含 `logs/`，原始读数一律 `.log`）＋票 329 末尾**一条**只追加 bullet。⛔ 一切其它路径零字节（`cmd/wisp/**`／`internal/**`／`frontend/**`／`design/**`／`PLAN.md`／`docs/specs/**`／台账／`HANDOVER`／三枚冻结件／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`）。
+
+## 台面与命令
+`cmd/wisp` 那包必须带 DLL 路径＋显式超时：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -timeout 30m`；⛔ 默认超时（`panic: test timed out after 10m0s` 长得像"包红了"）；⛔ `go test ./...`。★**重包同一时刻只跑一个**——`228-r3` 在写 `cmd/wisp`，撞上就等并在读数里具名写你等了。⛔ 杀 `wisp.exe` PID **21892**。门禁四数只在共享工作树跑（★那四数里若混进 `228-r3` 的在飞字节，具名写清是哪一行，⛔ 计入判据）。
