@@ -1,0 +1,11 @@
+docs(issues): 票 216 尾追加一条＝216-r2 交件自证（AC#6 两枚仪器落地）
+
+尺＝`git diff --numstat` 该件 **1 added／0 deleted**；`^- [x]` 4 枚／`^- [ ]` 2 枚与起手同色
+⇒ **AC#6 一枚框没翻**、判据文字一字未改、票名与 `Status:` 未动、未加 `-done`、⛔ push。
+那一行里逐枚写死：起手锚 72b65c61＋五枚提交号、ⓐ 现量 0/0/0 与正控 1 命中（:61 ContainsRune）、
+ⓑ 四枚可达载体＋"attachment 进不了判级链 rc=1"的现跑、整包四数改前⇄改后与红名册作差 0 行
+（既有红 TestC26RewriteAccountIsConsumedAtEverySecurityLeg 归因到 216-r1 那两枚 panel 件）、
+三发仓外突变（M1 让 ⓐ 响回 1、M2 让 ⓑ 那臂响而 ⓐ 仍 0/0/0、R1 改名＝必答题"红、不静默"）
+＋逐发还原哈希 MATCH=yes、门禁四数 rc（含 d22scan 那发 rc=2 的票 311 GUARD 与按处方重跑的 rc=0）、
+ban #8 分母 578→580＝+2、以及三枚具名边界（ⓐ 看不见 classifyForms 那一形／ⓑ 的 host 与覆盖键臂惰性／
+A 档臂对 M2 惰性）。
