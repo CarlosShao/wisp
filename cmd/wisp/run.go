@@ -367,7 +367,8 @@ type agentRuntime struct {
 	// for the same reason consoleApprovalUI.cards is kept: the production path
 	// records what it did, and a reader asks afterwards. The ledger cannot hold
 	// the packet (internal/observe bounds one logged string at 512 chars), so
-	// this is where the bytes are while the transport is still missing.
+	// this is where the bytes are - booked first, then read back verbatim by the
+	// ticket 329 host hop (panel_snapshot_deliver_329.go) on every publish.
 	snapMu        sync.Mutex
 	lastSnap      panel.Snapshot
 	lastSnapBytes []byte
@@ -704,9 +705,11 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// live object this process is actually running - the approval queue, the perm
 	// store, the C26 canonicalizer, the stream this run is writing - so the
 	// packet is built from state, not from a test's arguments. What it does NOT
-	// have is a page to go to: this tree carries no WebView2 host (tickets 33/35),
-	// so the bytes are booked to the run's persistent ledger and the last mile is
-	// still open. panel_pump.go states the whole rule.
+	// have is a page that renders it: ticket 329 landed the host half (a booked
+	// packet is pushed verbatim through the panel window's Eval when one exists),
+	// and the renderer's receiver for that push is still the contract in
+	// .scratch/wisp/probes/329/r1/page-contract.md. Every run also keeps booking
+	// to the ledger, exactly as panel_pump.go says.
 	rt.stream = panel.NewStreamLog(panel.DefaultStreamKeys)
 	rt.pump = panel.NewSnapshotPump(panel.PumpSources{
 		Verdicts:  rt.liveVerdicts,

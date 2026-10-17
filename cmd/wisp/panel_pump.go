@@ -9,16 +9,20 @@ package main
 // named the disease this closes: "a view model that only a test can build is a
 // view model production never sends".
 //
-// WHAT IT IS NOT: the transport. There is no Go -> page channel in this tree -
-// no WebView2 host (ticket 33 is unclaimed), no postMessage writer, no local
-// HTTP/SSE server, and D29 through assets.go:8 forbids the last one. So the
-// bytes this assembles are booked into the run's persistent ledger, which is the
-// one in-tree production destination for a record this process emits about
-// itself (internal/agent's audit lines, the winsec notices, ticket 117's whole
-// reason for existing). Re-pointing that one line at ticket 33's host is the
-// last mile, and it is still open. Nothing here pretends otherwise, and nothing
-// here invents a substitute channel: a file the renderer would poll is exactly
-// the second channel composer.go:14 refuses.
+// WHAT IT IS NOT: the page. The transport hop landed by ticket 329 (form 甲,
+// orchestrator ruling A1009) lives in panel_snapshot_deliver_329.go: when a
+// publish below really books a packet, the booked bytes are also handed verbatim
+// to the one panel window this process owns, through the host's existing Eval and
+// as a named global call. What still does NOT exist is the receiver on the page -
+// frontend/src/main.tsx renders without a snapshot and lib/panel.ts declares only
+// page-to-Go doors - so this hop makes the bytes arrive at a host, and the front-
+// end half is the contract written in .scratch/wisp/probes/329/r1/page-contract.md
+// for the machine owner's agent. Neither statement may be read as the other. The
+// booking below also stays: a run with no window (console `wisp run`) keeps the
+// pre-ticket shape, and every run keeps the durable ledger summary. There is still
+// no postMessage writer, no local HTTP/SSE server - D29 through assets.go:8
+// forbids the last one, and a file the renderer would poll is exactly the second
+// channel composer.go:14 refuses.
 //
 // EVERY VALUE COMES FROM AN OBJECT THIS PROCESS IS RUNNING. pending is read off
 // the live approval queue (approval.Queue.LiveApprovals), which carries the
@@ -356,7 +360,8 @@ func stringList(v any) ([]string, bool) {
 // chunks) plus the packet's byte length and sha256. The digest makes any later
 // claim about "what the panel would have shown" checkable against the retained
 // packet below, and a mismatch is visible instead of silent. The full bytes stay
-// with the process until the transport that delivers them exists.
+// with the process - and from ticket 329 they also go to the run's panel host,
+// verbatim, whenever this process owns one (panel_snapshot_deliver_329.go).
 func (rt *agentRuntime) bookPanelSnapshot(snap panel.Snapshot, data []byte) error {
 	rt.snapMu.Lock()
 	rt.lastSnap, rt.lastSnapBytes, rt.snapSeen = snap, data, true
@@ -448,6 +453,14 @@ func (rt *agentRuntime) publishPanelSnapshot() {
 		// The packet was built and did not get out. That is never silent.
 		fmt.Fprintf(rt.stderr, "wisp run: 面板快照未送达（待审批 %d 条）：%v\n", len(snap.Pending), err)
 	}
+	// Ticket 329 form 甲: the bytes this publish just booked go to the attached
+	// host in the same call, verbatim (panel_snapshot_deliver_329.go). This is
+	// NOT a new publish drive point - every state-move trigger that already
+	// called this function now reaches the host through it, and nothing here
+	// pushes on streamed deltas or merges anything (the merge rule stays ticket
+	// 35's D38d line). A run with no panel window pushes nothing and stays in
+	// the pre-ticket shape: booked only.
+	rt.pushPanelSnapshotToHost()
 }
 
 // snapshotCount reports how many packets this run put through the exit, so a
