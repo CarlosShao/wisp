@@ -1,0 +1,6 @@
+票 216 裁腿 216-v3 探针面·四＝交件自证三把尺整跑一遍（final-check-216v3.sh／.log，读数现取、⛔ 手抄）
+
+尺一：本腿逐枚提交号 6feaa41d／b0deec82／c3995bbc／18436906／2a3b9ff8，逐枚 git show --name-only 全落在被允许的三处（.scratch/wisp/probes/216/v3/logs/** 三笔＋docs/evidence/s1/216-v3-verdict.md 一笔＋票尾一条一笔），逐枚 numstat 删行皆 0。
+尺二：判语件绝对路径 D:\work\workspace\projects plans\Wisp\docs\evidence\s1\216-v3-verdict.md＝58 行／11015 字节（工作树 ⇄ 18436906 的 blob 同数）；占位符尺五枚分词形＋宽形皆 0 命中，两把正控同屏（同尺读本件"成立"=12、同尺族在 docs/evidence/s1 看得见 TODO 的件=4）；本腿交件套件 0 字节数=0。★自抓并已具名更正：18436906 那笔的 commit-msg 写 10913 字节＝我在两处测量之间改了一行引用号，落笔前未复量，盘上真值＝11015（历史不改写，只在本文追加）。
+尺三：决定性那把尺起手侧⇄交件侧都带 file:line——C 默认台面 24/5/1/0 ⇄ D 台面 24/6/0/0（整包 225/136/2/1 ⇄ 225/137/1/1，多出的那枚红两把台面都在册＝TestC26RewriteAccountIsConsumedAtEverySecurityLeg，⛔ 本格射程）；三发突变逐发 LANDS＋还原哈希 e4485625…／c2bcd2c8…＋残留 0；R1 必答题红句归位 allow_substring_pin_216_test.go:68；假主目录两发 reason 由 ~/.aws/credentials 换成 ~/.kube/config；CI 形台面（GOTMPDIR 落 %LOCALAPPDATA%）＝24/5/1/0。门禁四数 rc＝gofumpt 0／d22scan 0（两发）／path-length 0／vet 0。票面现跑：未勾仍 2（第 28、29 行）／已勾 4＝本腿一枚框没翻；internal/risk porcelain 空、diff 7a94c3bd..HEAD 空＝零产码字节。⛔ push。
+另：logs/logs/ 里是第一发（台件 HERE 路径写错那发）的副本，按"临时件只建不删"留在盘上、未入库。

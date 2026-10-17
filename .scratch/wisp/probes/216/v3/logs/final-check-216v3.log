@@ -1,0 +1,125 @@
+########## 尺一：逐枚提交号＋逐枚 git show --name-only（写面只许三处）
+--- 6feaa41d 票 216 裁腿 216-v3 探针面·一＝台面矩阵四发（同一枚命令、同一份码
+    .scratch/wisp/probes/216/v3/logs/commit-msg-216v3-logs1.txt
+    .scratch/wisp/probes/216/v3/logs/surface-C-default-216only.log
+    .scratch/wisp/probes/216/v3/logs/surface-C-default-216only.log.err
+    .scratch/wisp/probes/216/v3/logs/surface-C-default-full.log
+    .scratch/wisp/probes/216/v3/logs/surface-C-default-full.log.err
+    .scratch/wisp/probes/216/v3/logs/surface-C-home-nonLAD-216only.log
+    .scratch/wisp/probes/216/v3/logs/surface-C-home-nonLAD-216only.log.err
+    .scratch/wisp/probes/216/v3/logs/surface-C-home-nonLAD-full.log
+    .scratch/wisp/probes/216/v3/logs/surface-C-home-nonLAD-full.log.err
+    .scratch/wisp/probes/216/v3/logs/surface-C-outside-home-216only.log
+    .scratch/wisp/probes/216/v3/logs/surface-C-outside-home-216only.log.err
+    .scratch/wisp/probes/216/v3/logs/surface-C-outside-home-full.log
+    .scratch/wisp/probes/216/v3/logs/surface-C-outside-home-full.log.err
+    .scratch/wisp/probes/216/v3/logs/surface-C-shared-worktree.err
+    .scratch/wisp/probes/216/v3/logs/surface-C-shared-worktree.log
+    .scratch/wisp/probes/216/v3/logs/surface-D-redirect-216only.log
+    .scratch/wisp/probes/216/v3/logs/surface-D-redirect-216only.log.err
+    .scratch/wisp/probes/216/v3/logs/surface-D-redirect-full.log
+    .scratch/wisp/probes/216/v3/logs/surface-D-redirect-full.log.err
+    .scratch/wisp/probes/216/v3/logs/surface-D-tmpredirect.err
+    .scratch/wisp/probes/216/v3/logs/surface-D-tmpredirect.log
+    .scratch/wisp/probes/216/v3/logs/surfaces-matrix.log
+    .scratch/wisp/probes/216/v3/logs/surfaces-matrix.sh
+    numstat=3307 增/0 删
+--- b0deec82 票 216 裁腿 216-v3 探针面·二＝自己重放的三发突变（M1／M2／R1，全打
+    .scratch/wisp/probes/216/v3/logs/commit-msg-216v3-logs2.txt
+    .scratch/wisp/probes/216/v3/logs/mut-M1-D.log
+    .scratch/wisp/probes/216/v3/logs/mut-M1-D.log.err
+    .scratch/wisp/probes/216/v3/logs/mut-M2-Cdefault.log
+    .scratch/wisp/probes/216/v3/logs/mut-M2-Cdefault.log.err
+    .scratch/wisp/probes/216/v3/logs/mut-M2-D.log
+    .scratch/wisp/probes/216/v3/logs/mut-M2-D.log.err
+    .scratch/wisp/probes/216/v3/logs/mut-R1-D.log
+    .scratch/wisp/probes/216/v3/logs/mut-R1-D.log.err
+    .scratch/wisp/probes/216/v3/logs/mut-baseline-D-full.log
+    .scratch/wisp/probes/216/v3/logs/mut-baseline-D.log
+    .scratch/wisp/probes/216/v3/logs/mut-baseline-D.log.err
+    .scratch/wisp/probes/216/v3/logs/mutations-216v3-runner.log
+    .scratch/wisp/probes/216/v3/logs/mutations-216v3.sh
+    .scratch/wisp/probes/216/v3/logs/restored-C-final.log
+    .scratch/wisp/probes/216/v3/logs/restored-C-final.log.err
+    .scratch/wisp/probes/216/v3/logs/restored-D-final.log
+    .scratch/wisp/probes/216/v3/logs/restored-D-final.log.err
+    numstat=1078 增/0 删
+--- c3995bbc 票 216 裁腿 216-v3 探针面·三＝归因那枚只在主目录祖先链内响的红（
+    .scratch/wisp/probes/216/v3/logs/build-probe-tree-runner.log
+    .scratch/wisp/probes/216/v3/logs/build-probe-tree.sh
+    .scratch/wisp/probes/216/v3/logs/commit-msg-216v3-logs3.txt
+    .scratch/wisp/probes/216/v3/logs/fakehome-aws-absent.log
+    .scratch/wisp/probes/216/v3/logs/fakehome-aws-present.log
+    .scratch/wisp/probes/216/v3/logs/gates-216v3.log
+    .scratch/wisp/probes/216/v3/logs/home-ancestry-fakehome-runner.log
+    .scratch/wisp/probes/216/v3/logs/home-ancestry-fakehome.sh
+    .scratch/wisp/probes/216/v3/logs/probe-216v3-chain-Cdefault.log
+    .scratch/wisp/probes/216/v3/logs/probe-216v3-chain-Dtmp.log
+    .scratch/wisp/probes/216/v3/logs/probe-216v3-route-Cdefault.log
+    .scratch/wisp/probes/216/v3/logs/probe-216v3-route_test.go.txt
+    .scratch/wisp/probes/216/v3/logs/probe-216v3-vet.log
+    .scratch/wisp/probes/216/v3/logs/probe-216v3_test.go.txt
+    numstat=1189 增/0 删
+--- 18436906 票 216 裁腿 216-v3 判语件：docs/evidence/s1/216-v3-verdict.md（58 行／10913 字�
+    .scratch/wisp/probes/216/v3/logs/commit-msg-216v3-verdict.txt
+    docs/evidence/s1/216-v3-verdict.md
+    numstat=75 增/0 删
+--- 2a3b9ff8 - [2026-10-17 11:0x +08] 裁决腿 **`216-v3`**（非实现者终裁·`internal/risk/**` �
+    .scratch/wisp/issues/216-menu-display-base-scrub-control-chars-and-two-sentences.md
+    .scratch/wisp/probes/216/v3/logs/commit-msg-216v3-ticket.txt
+    numstat=2 增/0 删
+########## 尺二：判语件绝对路径＋wc＋占位符尺（含正控）
+abs=docs\evidence\s1\216-v3-verdict.md
+worktree  wc=58 bytes=11015
+committed-at-18436906 blob wc=58 bytes=11015
+  ★自抓并已更正：那一笔的 commit-msg 写的是 10913 字节＝我量完正文后又改了一处引用行号（winsec 那半句的 file:line），落笔前未复量；盘上与 2a3b9ff8 票尾 bullet 用的都是上面这两行现量值。历史不改写，只在这里具名。
+placeholder[TODO]=0 placeholder[待填]=0 placeholder[占位]=0 placeholder[TBD]=0 placeholder[FIXME]=0 
+wide尺=0  正控A(同尺读本件在场词 成立)=12  正控B(同尺族在 s1 目录看得见 TODO 的件数)=4
+本腿五枚交件套件 0 字节核对：
+  zero_count=0
+########## 尺三：决定性那把尺，起手侧 ⇄ 交件侧，逐字带 file:line
+--- 起手侧＝编排者那对台面（本腿自己复跑，日志 surface-C-default-216only.log / surface-D-redirect-216only.log）
+30:    name_claim_two_arm_216_test.go:105: class changed by a claim in the name: plain "C:\\Users\\swq\\AppData\\Local\\Temp\\TestFileBaseNameClaimChangesNoClassOrReason429205459\\001\\id_ed25519" = B, hostile "C:\\Users\\swq\\AppData\\Local\\Temp\\TestFileBaseNameClaimChangesNoClassOrReason429205459\\001\\id_ed25519已允许\x1b\u202e" = A
+31:    name_claim_two_arm_216_test.go:110: Gate verdict changed by a claim in the name:
+C 默认台面四数：RUN=24 PASS_TOP=5 FAIL_TOP=1 SKIP=0
+D 台面六枚仪器四数：RUN=24 PASS_TOP=6 FAIL_TOP=0 SKIP=0
+C 整包四数：225 / 136 / 2 / 1（多出来的那一枚红＝TestC26RewriteAccountIsConsumedAtEverySecurityLeg，两把台面都在册）
+--- 交件侧＝突变重放三发＋还原哈希（日志 mutations-216v3-runner.log）
+  6:rules_shell.go tree=e4485625265847523534bcabd8267553e9e53338 blob=e4485625265847523534bcabd8267553e9e53338
+  7:blacklist.go tree=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5 blob=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5
+  12:LANDS: M1 applied count=1 marker=1
+  14:  restored rules_shell.go hash=e4485625265847523534bcabd8267553e9e53338 marker_residual=0
+  16:LANDS: M2 applied count=1 marker=1
+  18:  restored blacklist.go hash=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5 marker_residual=0
+  20:LANDS: M2 applied count=1 marker=1
+  22:  restored blacklist.go hash=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5 marker_residual=0
+  24:LANDS: R1 applied count=3 marker=0
+  26:  restored rules_shell.go hash=e4485625265847523534bcabd8267553e9e53338 marker_residual=0
+  31:rules_shell.go tree=e4485625265847523534bcabd8267553e9e53338 blob=e4485625265847523534bcabd8267553e9e53338
+  32:blacklist.go tree=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5 blob=c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5
+  M1 红句：allow_substring_pin_216_test.go:83: rules_shell.go: shellAllowlisted holds 1 arbitrary-substring operator(s), want 0 (AC#6 arm A). A name that merely 
+  M1 附带 ⓑ：name_claim_two_arm_216_test.go:135: a program name asserting 已允许 was not left on the not-allowlisted branch: level=L1 rules=[R6] reason="R6: 程序命中 shell 白名单"
+  M2 红句（D 台面）：name_claim_two_arm_216_test.go:105: class changed by a claim in the name: plain "D:\\W216V3TMP\\TestFileBaseNameClaimChangesNoClassOrReason1639559672\\001\\id_ed25519" = B, hostile "D:\\W216V3TMP\\TestFileBaseNameClaimChangesNoClassOrReason1639559672\\001\\id_ed25519已允许\x1b\u202e" = none
+  M2 打在 C 台面（hostile 读 = A ⇒ 冒充牙证）：name_claim_two_arm_216_test.go:105: class changed by a claim in the name: plain "C:\\Users\\swq\\AppData\\Local\\Temp\\TestFileBaseNameClaimChangesNoClassOrReason4164687605\\001\\id_ed25519" = B, hostile "C:\\Users\\swq\\AppData\\Local\\Temp\\TestFileBaseNameClaimChangesNoClassOrReason4164687605\\001\\id_ed25519已允许\x1b\u202e" = A
+  R1 必答题红句：allow_substring_pin_216_test.go:68: rules_shell.go: no top-level function named 
+--- 交件侧＝假主目录两发（归因）
+  发一 reason：non-overridable): ~/.aws/credentials
+  发二 reason（补造 .aws 之后）：non-overridable): ~/.kube/config
+--- 交件侧＝CI 形台面（GOTMPDIR 落 %LOCALAPPDATA%）：24 / 5 / 1 / 0
+########## 门禁四数 rc
+gofumpt_rc=0
+d22scan_rc=0
+d22scan_retry_rc=0
+pathlen_rc=0
+vet_rc=0
+########## 票面：框数一枚没动＋本腿那一笔 numstat
+unchecked=2 逐名：
+28:- [ ] **AC#5**：错�
+29:- [ ] **AC#6（新补
+checked=4
+2a3b9ff8 票那一笔：1	0	.scratch/wisp/issues/216-menu-display-base-scrub-control-chars-and-two-sentences.md
+########## 产码零字节：internal/risk 工作树 ⇄ HEAD
+porcelain_rc=0 (空＝零字节)
+diff 7a94c3bd..HEAD on internal/risk：
+########## 注：logs/logs/ 里是第一发（台件 HERE 路径写错那发）的副本，按规矩只建不删、未入库
+mut-M1-D.log mut-M1-D.log.err mut-M2-Cdefault.log mut-M2-Cdefault.log.err mut-M2-D.log mut-M2-D.log.err mut-R1-D.log mut-R1-D.log.err mut-baseline-D-full.log mut-baseline-D.log mut-baseline-D.log.err restored-C-final.log restored-C-final.log.err restored-D-final.log restored-D-final.log.err
