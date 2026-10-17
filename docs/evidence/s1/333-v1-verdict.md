@@ -9,6 +9,9 @@
   **本腿读数取自 `859026d2` 树**（`git status --porcelain -- internal/panel` 本腿起手与收尾各量一次＝皆空）。
 - 全部原始读数：`.scratch/wisp/probes/333/v1/logs/`（`readings-final.log` 是决定性那一份，脚本 `build-tree.sh`／
   `ac2-ruler.sh`／`ac1-ac7-rulers.sh`／`ac0-ac8-rulers.sh`／`colors.sh`／`mut333v1.sh` 可逐字重跑）。
+- ★本腿自纠一枚数：本件起笔自测 15480 字节，随后把标题行那枚节号改成"第 4.3 节"，字节数随之变（现值逐字见
+  `logs/final-check.log` 的 ruler 2，⛔ 在本件里钉死字节数＝那行自己也在分母里）。票尾那条 bullet 写的 15480 是改前旧值，
+  两数⛔ 相减、本条具名留下更正；票面一字没动过，框一枚没翻（现跑未勾仍 9＝第 19–27 行）。
 
 ## AC#0 交件三把尺 ＝ **成立**
 六笔逐枚 `git show --name-only` 本腿独立再走一遍：`3f3dde46`／`dbaad267`／`5f4f7945`／`9574e794`／`04f2e847`／`859026d2`

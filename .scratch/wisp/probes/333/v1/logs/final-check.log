@@ -1,0 +1,141 @@
+# 333-v1 delivery self-check, readings taken live by final-check.sh (stderr of the whole run: 0 bytes)
+### ruler 1 : my own commits, per-commit name-only
+--- 4bdacd4a
+4bdacd4aa1fdb03a783299d5cccf5f54234126e7 票 333 裁决腿 3
+.scratch/wisp/probes/333/v1/logs/ac0-ac8-rulers.sh
+.scratch/wisp/probes/333/v1/logs/ac0-readings.log
+.scratch/wisp/probes/333/v1/logs/ac1-ac7-readings.log
+.scratch/wisp/probes/333/v1/logs/ac1-ac7-rulers.sh
+.scratch/wisp/probes/333/v1/logs/ac2-readings.log
+.scratch/wisp/probes/333/v1/logs/ac2-ruler.sh
+.scratch/wisp/probes/333/v1/logs/ac8-readings.log
+.scratch/wisp/probes/333/v1/logs/build-tree.sh
+.scratch/wisp/probes/333/v1/logs/col-del-c.failnames.txt
+.scratch/wisp/probes/333/v1/logs/col-del-c.log
+.scratch/wisp/probes/333/v1/logs/col-del-c.log.sha256
+.scratch/wisp/probes/333/v1/logs/col-del-c.seq.txt
+.scratch/wisp/probes/333/v1/logs/col-del-d.failnames.txt
+.scratch/wisp/probes/333/v1/logs/col-del-d.log
+.scratch/wisp/probes/333/v1/logs/col-del-d.log.sha256
+.scratch/wisp/probes/333/v1/logs/col-del-d.seq.txt
+.scratch/wisp/probes/333/v1/logs/col-pre-c.failnames.txt
+.scratch/wisp/probes/333/v1/logs/col-pre-c.log
+.scratch/wisp/probes/333/v1/logs/col-pre-c.log.sha256
+.scratch/wisp/probes/333/v1/logs/col-pre-c.seq.txt
+.scratch/wisp/probes/333/v1/logs/col-pre-d.failnames.txt
+.scratch/wisp/probes/333/v1/logs/col-pre-d.log
+.scratch/wisp/probes/333/v1/logs/col-pre-d.log.sha256
+.scratch/wisp/probes/333/v1/logs/col-pre-d.seq.txt
+.scratch/wisp/probes/333/v1/logs/colors.sh
+.scratch/wisp/probes/333/v1/logs/msg-logs1.txt
+.scratch/wisp/probes/333/v1/logs/mut-M0-control.failnames.txt
+.scratch/wisp/probes/333/v1/logs/mut-M0-control.log
+.scratch/wisp/probes/333/v1/logs/mut-M1-roster.failnames.txt
+.scratch/wisp/probes/333/v1/logs/mut-M1-roster.log
+.scratch/wisp/probes/333/v1/logs/mut-M2-fastpath.failnames.txt
+.scratch/wisp/probes/333/v1/logs/mut-M2-fastpath.log
+.scratch/wisp/probes/333/v1/logs/mut-M3-selfcopy.failnames.txt
+.scratch/wisp/probes/333/v1/logs/mut-M3-selfcopy.log
+.scratch/wisp/probes/333/v1/logs/mut-M4-selfcopy-only.failnames.txt
+.scratch/wisp/probes/333/v1/logs/mut-M4-selfcopy-only.log
+.scratch/wisp/probes/333/v1/logs/mut333v1.sh
+.scratch/wisp/probes/333/v1/logs/readings-final.log
+.scratch/wisp/probes/333/v1/logs/shortname.bat
+--- e3333c13
+e3333c13d13bd656c0cf53ecc4c998e464df8f55 票 333 裁决腿 3
+.scratch/wisp/probes/333/v1/logs/msg-verdict.txt
+docs/evidence/s1/333-v1-verdict.md
+--- ea64b5e0
+ea64b5e022f1a1e6ec9f2c1402ea3239d84480f8 票 333 裁决腿 3
+.scratch/wisp/issues/333-display-boundary-wash-cf-category-not-hand-roster.md
+.scratch/wisp/probes/333/v1/logs/bullet-333v1.md
+### off-surface hunt over my three commits
+.scratch/wisp/issues/333-display-boundary-wash-cf-category-not-hand-roster.md
+.scratch/wisp/probes/333/v1/logs/ac0-ac8-rulers.sh
+.scratch/wisp/probes/333/v1/logs/ac0-readings.log
+.scratch/wisp/probes/333/v1/logs/ac1-ac7-readings.log
+.scratch/wisp/probes/333/v1/logs/ac1-ac7-rulers.sh
+.scratch/wisp/probes/333/v1/logs/ac2-readings.log
+.scratch/wisp/probes/333/v1/logs/ac2-ruler.sh
+.scratch/wisp/probes/333/v1/logs/ac8-readings.log
+.scratch/wisp/probes/333/v1/logs/build-tree.sh
+.scratch/wisp/probes/333/v1/logs/bullet-333v1.md
+.scratch/wisp/probes/333/v1/logs/col-del-c.failnames.txt
+.scratch/wisp/probes/333/v1/logs/col-del-c.log
+.scratch/wisp/probes/333/v1/logs/col-del-c.log.sha256
+.scratch/wisp/probes/333/v1/logs/col-del-c.seq.txt
+.scratch/wisp/probes/333/v1/logs/col-del-d.failnames.txt
+.scratch/wisp/probes/333/v1/logs/col-del-d.log
+.scratch/wisp/probes/333/v1/logs/col-del-d.log.sha256
+.scratch/wisp/probes/333/v1/logs/col-del-d.seq.txt
+.scratch/wisp/probes/333/v1/logs/col-pre-c.failnames.txt
+.scratch/wisp/probes/333/v1/logs/col-pre-c.log
+.scratch/wisp/probes/333/v1/logs/col-pre-c.log.sha256
+.scratch/wisp/probes/333/v1/logs/col-pre-c.seq.txt
+.scratch/wisp/probes/333/v1/logs/col-pre-d.failnames.txt
+.scratch/wisp/probes/333/v1/logs/col-pre-d.log
+.scratch/wisp/probes/333/v1/logs/col-pre-d.log.sha256
+.scratch/wisp/probes/333/v1/logs/col-pre-d.seq.txt
+.scratch/wisp/probes/333/v1/logs/colors.sh
+.scratch/wisp/probes/333/v1/logs/msg-logs1.txt
+.scratch/wisp/probes/333/v1/logs/msg-verdict.txt
+.scratch/wisp/probes/333/v1/logs/mut-M0-control.failnames.txt
+.scratch/wisp/probes/333/v1/logs/mut-M0-control.log
+.scratch/wisp/probes/333/v1/logs/mut-M1-roster.failnames.txt
+.scratch/wisp/probes/333/v1/logs/mut-M1-roster.log
+.scratch/wisp/probes/333/v1/logs/mut-M2-fastpath.failnames.txt
+.scratch/wisp/probes/333/v1/logs/mut-M2-fastpath.log
+.scratch/wisp/probes/333/v1/logs/mut-M3-selfcopy.failnames.txt
+.scratch/wisp/probes/333/v1/logs/mut-M3-selfcopy.log
+.scratch/wisp/probes/333/v1/logs/mut-M4-selfcopy-only.failnames.txt
+.scratch/wisp/probes/333/v1/logs/mut-M4-selfcopy-only.log
+.scratch/wisp/probes/333/v1/logs/mut333v1.sh
+.scratch/wisp/probes/333/v1/logs/readings-final.log
+.scratch/wisp/probes/333/v1/logs/shortname.bat
+docs/evidence/s1/333-v1-verdict.md
+off-surface = 0
+### ruler 2 : the verdict artifact
+abs = /d/work/workspace/projects plans/Wisp/docs/evidence/s1/333-v1-verdict.md
+15931 docs/evidence/s1/333-v1-verdict.md
+132 docs/evidence/s1/333-v1-verdict.md
+placeholder ruler (word-boundary triple + the two CJK words):
+0
+stderr bytes of that grep = 0
+positive control, same ruler over a file that does contain the words:
+1
+### ruler 3 : product bytes untouched by this leg, shared worktree
+git status --porcelain -- internal/panel  =>
+(empty above = clean)
+git status --porcelain -- internal cmd tools scripts docs/PLAN.md =>
+### ticket state: boxes this leg did NOT flip
+unchecked = 9  checked = 0
+5	0	.scratch/wisp/issues/333-display-boundary-wash-cf-category-not-hand-roster.md
+### export trees still on disk (temp artifacts: created, never deleted)
+/d/W333V1-SuqCO8
+/d/W333V2-hLzM9f
+/d/W333V3-b3pHjd
+/d/wisp-333v1-tmp
+### final byte identity of the mutation surface vs the delivery tree
+M == A (no mutation left behind)
+dc86d19ce9fdf52b
+dc86d19ce9fdf52b
+final-check stderr bytes = 0
+### gates re-run on the final state, shared working tree only
+gofumpt -l over my surface:
+docs\evidence\s1\333-v1-verdict.md:1:1: illegal character U+0023 '#'
+gofumpt_rc=2
+d22scan_rc=0
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=584, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 584 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+path_length_rc=0
+VERDICT GREEN
+go_vet_rc=0
+# CORRECTION to the gofumpt line above: rc=2 there is THIS leg's own invocation error (a markdown file was handed to gofumpt ->
+# "illegal character U+0023", that is the instrument used wrong, NOT a red verdict). Correct form, Go-only surface, re-run:
+gofumpt_rc=0 (empty list above)
+placeholder ruler over the four artifacts this leg wrote (form = the same one 333-r1 used, see its logs/placeholders.log):
+docs/evidence/s1/333-v1-verdict.md => 0
+.scratch/wisp/probes/333/v1/logs/readings-final.log => 0
+.scratch/wisp/probes/333/v1/logs/final-check.log => 0
+.scratch/wisp/probes/333/v1/logs/final-check.sh => 2
+the 2 hits in final-check.sh are that script's own ruler line and its positive-control line (self-reference,
+disclosed); the verdict, readings-final.log and this log read 0.
