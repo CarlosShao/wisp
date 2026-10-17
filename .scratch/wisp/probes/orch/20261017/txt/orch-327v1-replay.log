@@ -1,0 +1,36 @@
+anchor=72b65c614af0a8441f0c2d31ddbe4569c42d4d20
+go_files=750
+orig_sha256=8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd
+### RUN baseline
+rc=0
+RUN=18
+PASS_TOP=4
+FAIL_TOP=0
+SKIP=0
+RESTORE_OK sha=8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd
+MUT1_LANDS lines=7
+### RUN m1_writer_branch_removed
+rc=1
+RUN=18
+PASS_TOP=3
+FAIL_TOP=1
+SKIP=0
+--- FAIL: TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired (0.00s)
+    display_scrub_216_test.go:352: scrubForDisplay("a\x1b\u202eb\u200dc\xad") = "a\\x1b\u202eb\u200dc\\xad", want "a\\x1b\\u202eb\\u200dc\\xad"
+    display_scrub_216_test.go:360: output "a\\x1b\u202eb\u200dc\\xad" still carries an invisible rune U+00E2 at offset 5
+RESTORE_OK sha=8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd
+MUT2_LANDS hits=1
+### RUN m2_judge_term_removed
+rc=1
+RUN=18
+PASS_TOP=3
+FAIL_TOP=1
+SKIP=0
+--- FAIL: TestNeedsDisplayWashNamesEveryWashedCfRune (0.00s)
+    display_scrub_216_test.go:368: needsDisplayWash did not see soft hyphen (U+00AD) in "photo\u00ad.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see zero width space (U+200B) in "photo\u200b.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see zero width non-joiner (U+200C) in "photo\u200c.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see zero width joiner (U+200D) in "photo\u200d.png": the fast path would return it raw
+RESTORE_OK sha=8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd
+worktree_target_status=0
+mutated_copies_left=/d/work/workspace/wisp-327v1-orch-094846（只建不删）
