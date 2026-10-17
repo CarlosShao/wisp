@@ -1,0 +1,22 @@
+票 333 产码腿 333-r1·AC#6 起手侧＝改前两发（同一枚命令，只挪临时根所在卷）
+
+命令逐字两发相同：go test -v ./internal/panel/ -count=1 -timeout 30m
+台面＝共享工作树（本仓有 .git/docs/design，门禁四数也只在这一面跑）
+- c 发：TMP=TEMP=C:\Users\swq\AppData\Local\Temp（=MSYS /tmp），GOTMPDIR 未设
+- d 发：TMP=TEMP=D:\wisp-333r1-tmp\tmp，GOTMPDIR=D:\wisp-333r1-tmp\gotmp（两枚先 mkdir -p）
+
+四数（改前·起手锚 ae710c49，两枚台面各自现跑，未混台、未相减）：
+  c 发 RUN=255 PASS_TOP=160 FAIL_TOP=5 SKIP=0
+  d 发 RUN=255 PASS_TOP=160 FAIL_TOP=5 SKIP=0
+起手锚红名册（两枚台面逐字同一批 5 枚，⛔ 本腿字节）：
+  TestApprovalCardViewJSONKeysMatchFrontendTypes
+  TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+  TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+  TestComposerContractTypesMatchFrontend
+  TestC21DesignTokensFourWayAgree
+⇒ 本包这一波**没有** A1013 那一族差一枚红的现象：两枚临时根台面的四数与红名册全等。
+  尺＝logs/pre-anchor-surface-diff.log（把两枚日志的 ^=== RUN / ^--- PASS|FAIL|SKIP 名行剥掉
+  耗时后缀后逐行比对：各 420 名行，差异名行 0；红名册 paste 逐字对齐）。
+  两枚 .log 字节差 59806 vs 61563 只由三形造成，同一把尺分类：30 行点名临时根、
+  80 行带耗时/堆读数、70 行带墙钟时间戳（合计≥154 因部分行同属两形；原始 diff 154 行）。
+run-surface.sh 是这两发的载体，命令体固定，只有 if 分支挪临时根。

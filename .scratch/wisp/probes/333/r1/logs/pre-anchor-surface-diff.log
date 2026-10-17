@@ -1,0 +1,19 @@
+RULER: are the two pre-change surfaces the same COLOUR-NAME sequence? Extract every top-level/subtest name line, strip the elapsed-time suffix, then diff.
+method: grep -E '^(-{3} (PASS|FAIL|SKIP)|=== RUN)' <log> | sed 's/ ([0-9.]*s)*$//' | diff -
+name_lines_c=420
+name_lines_d=420
+DIFFERENT_NAME_LINES=0
+(positive control for the same ruler: c vs a file with one extra red = non-zero)
+
+raw log diff classification (why bytes differ though the sequence is identical):
+changed_lines_total=154
+  naming_a_temp_root=30
+  carrying_an_elapsed_time_or_heap_reading=80
+  the_first_line_is_a_wall_clock_timestamp=70
+
+FAIL roster c vs d, pasted side by side:
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes	--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8	--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8	--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+--- FAIL: TestComposerContractTypesMatchFrontend	--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestC21DesignTokensFourWayAgree	--- FAIL: TestC21DesignTokensFourWayAgree
