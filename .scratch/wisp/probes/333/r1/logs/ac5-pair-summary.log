@@ -1,0 +1,57 @@
+AC#5 paired mutation shots, tree=D:\W333R1MUT (out-of-repo export of 9574e794: 八件套+docs+手工三件, .go counted 757 at extract). Five shots ran the SAME -run roster, spelled out on the next line.
+provenance: sha256(tree file) = sha256(git show 9574e794:internal/panel/display_scrub_216.go) = sha256(work tree file) = dc86d19ce9fdf52b6dc4d226ef02087524e85905660201e0f12221d267d552d0
+
+MODE  R=roster-run  same command all three: go test -v ./internal/panel/ -count=1 -timeout 30m -run 'TestDisplayWash|TestEveryNamedCfRuneIsEscapedAndNeverDeleted|TestNeedsDisplayWashNamesEveryWashedCfRune|TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired|TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut'
+  M0-control: RUN=9 PASS_TOP=8 FAIL_TOP=1 SKIP=0
+  M1: RUN=9 PASS_TOP=5 FAIL_TOP=4 SKIP=0
+  M2: RUN=9 PASS_TOP=2 FAIL_TOP=7 SKIP=0
+
+RED NAMES BY SHOT:
+  [M0-control]
+     TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+  [M1]
+     TestDisplayWashRosterIsExactlyTheCfCategory
+     TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded
+     TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies
+     TestDisplayWashEscapesAndNeverDeletesAcrossTheWholeCategory
+  [M2]
+     TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired
+     TestNeedsDisplayWashNamesEveryWashedCfRune
+     TestEveryNamedCfRuneIsEscapedAndNeverDeleted
+     TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded
+     TestDisplayWashJudgeAndWriterAgreeOnBothFamiliesAndBoundaries
+     TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies
+     TestDisplayWashEscapesAndNeverDeletesAcrossTheWholeCategory
+
+SET DIFFERENCE (names, ruler = grep -f of the two rosters):
+  M1 only:
+     TestDisplayWashRosterIsExactlyTheCfCategory
+  M2 only:
+     TestDisplayWashJudgeAndWriterAgreeOnBothFamiliesAndBoundaries
+     TestEveryNamedCfRuneIsEscapedAndNeverDeleted
+     TestNeedsDisplayWashNamesEveryWashedCfRune
+     TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired
+  both:
+     TestDisplayWashEscapesAndNeverDeletesAcrossTheWholeCategory
+     TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies
+     TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded
+
+LANDING POINTS (content anchors, different function + different assertion line):
+  M1 = isDisplayWashCf's body token 'return unicode.Is(unicode.Cf, r)' -> the anchor's 10-line roster switch (diff lines vs pristine: 11)
+  M2 = needsDisplayWash's signature line -> insert 'return false' (diff lines vs pristine: 1)
+
+HASHES (pre / mutated / restore per shot, verbatim from each runner block):
+  M1 PRE=dc86d19ce9fdf52b6dc4d226ef02087524e85905660201e0f12221d267d552d0 MUT=8c12e7223cf148d5d7078165c188e9622c90536b429a82e46fcfb407a361379b RESTORE=dc86d19ce9fdf52b6dc4d226ef02087524e85905660201e0f12221d267d552d0 YES
+  M2 PRE=dc86d19ce9fdf52b6dc4d226ef02087524e85905660201e0f12221d267d552d0 MUT=d71c1ab2167236bc5ddc8de79aa6d88d8d4663a1266ba97ddd5dc1fb40d0109e RESTORE=dc86d19ce9fdf52b6dc4d226ef02087524e85905660201e0f12221d267d552d0 YES
+
+REQUIRED TARGET REDDENS, verbatim:
+  [M1 -> AC#3 relation nail]
+     === RUN   TestDisplayWashRosterIsExactlyTheCfCategory
+         display_scrub_327r2_test.go:66: nail 1: product-washed=15, unicode.Cf=170
+         display_scrub_327r2_test.go:72: a Cf-table rune is not washed by the product: [U+0600 U+0601 U+0602 U+0603 U+0604 U+0605 U+061C U+06DD U+070F U+0890 U+0891 U+08E2 U+110BD U+110CD U+13430 U+13431 U+13432 U+13433 U+13434 U+13435 U+13436 U+13437 U+13438 U+13439 U+1343A U+1343B U+1343C U+1343D U+1343E U+1343F U+180E U+1BCA0 U+1BCA1 U+1BCA2 U+1BCA3 U+1D173 U+1D174 U+1D175 U+1D176 U+1D177 U+1D178 U+1D179 U+1D17A U+200E U+200F U+2061 U+2062 U+2063 U+2064 U+206A U+206B U+206C U+206D U+206E U+206F U+E0001 U+E0020 U+E0021 U+E0022 U+E0023 U+E0024 U+E0025 U+E0026 U+E0027 U+E0028 U+E0029 U+E002A U+E002B U+E002C U+E002D U+E002E U+E002F U+E0030 U+E0031 U+E0032 U+E0033 U+E0034 U+E0035 U+E0036 U+E0037 U+E0038 U+E0039 U+E003A U+E003B U+E003C U+E003D U+E003E U+E003F U+E0040 U+E0041 U+E0042 U+E0043 U+E0044 U+E0045 U+E0046 U+E0047 U+E0048 U+E0049 U+E004A U+E004B U+E004C U+E004D U+E004E U+E004F U+E0050 U+E0051 U+E0052 U+E0053 U+E0054 U+E0055 U+E0056 U+E0057 U+E0058 U+E0059 U+E005A U+E005B U+E005C U+E005D U+E005E U+E005F U+E0060 U+E0061 U+E0062 U+E0063 U+E0064 U+E0065 U+E0066 U+E0067 U+E0068 U+E0069 U+E006A U+E006B U+E006C U+E006D U+E006E U+E006F U+E0070 U+E0071 U+E0072 U+E0073 U+E0074 U+E0075 U+E0076 U+E0077 U+E0078 U+E0079 U+E007A U+E007B U+E007C U+E007D U+E007E U+E007F U+FFF9 U+FFFA U+FFFB] (product=15 category=170)
+         display_scrub_327r2_test.go:76: product roster cardinality=15, want the category's 170
+  [M2 -> AC#4 same-set nail]
+     === RUN   TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies
+         display_scrub_333_333r1_test.go:82: AC#4 scope: full Cf=170, full Cc=65, boundaries=22, failures=488
+         display_scrub_333_333r1_test.go:87: Cc U+0000: needsDisplayWash stayed silent, so scrubForDisplay never runs
+         display_scrub_333_333r1_test.go:87: Cc U+0000: scrubForDisplay left the rune visible

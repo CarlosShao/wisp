@@ -1,0 +1,140 @@
+time=2026-10-17T11:22:37.304+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired
+    display_scrub_216_test.go:352: scrubForDisplay("a\x1b\u202eb\u200dc\xad") = "a\x1b\u202eb\u200dc\xad", want "a\\x1b\\u202eb\\u200dc\\xad"
+    display_scrub_216_test.go:360: output "a\x1b\u202eb\u200dc\xad" still carries an invisible rune U+001B at offset 1
+--- FAIL: TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired (0.00s)
+=== RUN   TestNeedsDisplayWashNamesEveryWashedCfRune
+    display_scrub_216_test.go:368: needsDisplayWash did not see soft hyphen (U+00AD) in "photo\u00ad.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see zero width space (U+200B) in "photo\u200b.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see zero width non-joiner (U+200C) in "photo\u200c.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see zero width joiner (U+200D) in "photo\u200d.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see word joiner (U+2060) in "photo\u2060.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see byte order mark (U+FEFF) in "photo\ufeff.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see left-to-right embedding (U+202A) in "photo\u202a.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see right-to-left embedding (U+202B) in "photo\u202b.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see pop directional formatting (U+202C) in "photo\u202c.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see left-to-right override (U+202D) in "photo\u202d.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see right-to-left override (U+202E) in "photo\u202e.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see left-to-right isolate (U+2066) in "photo\u2066.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see right-to-left isolate (U+2067) in "photo\u2067.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see first strong isolate (U+2068) in "photo\u2068.png": the fast path would return it raw
+    display_scrub_216_test.go:368: needsDisplayWash did not see pop directional isolate (U+2069) in "photo\u2069.png": the fast path would return it raw
+--- FAIL: TestNeedsDisplayWashNamesEveryWashedCfRune (0.00s)
+=== RUN   TestEveryNamedCfRuneIsEscapedAndNeverDeleted
+    display_scrub_216_test.go:407: soft hyphen (U+00AD) survived the wash as itself in "photo\u00ad报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u00ad报告.png") = "photo\u00ad报告.png", want "photo\\xad报告.png"
+    display_scrub_216_test.go:407: zero width space (U+200B) survived the wash as itself in "photo\u200b报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u200b报告.png") = "photo\u200b报告.png", want "photo\\u200b报告.png"
+    display_scrub_216_test.go:407: zero width non-joiner (U+200C) survived the wash as itself in "photo\u200c报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u200c报告.png") = "photo\u200c报告.png", want "photo\\u200c报告.png"
+    display_scrub_216_test.go:407: zero width joiner (U+200D) survived the wash as itself in "photo\u200d报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u200d报告.png") = "photo\u200d报告.png", want "photo\\u200d报告.png"
+    display_scrub_216_test.go:407: word joiner (U+2060) survived the wash as itself in "photo\u2060报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u2060报告.png") = "photo\u2060报告.png", want "photo\\u2060报告.png"
+    display_scrub_216_test.go:407: byte order mark (U+FEFF) survived the wash as itself in "photo\ufeff报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\ufeff报告.png") = "photo\ufeff报告.png", want "photo\\ufeff报告.png"
+    display_scrub_216_test.go:407: left-to-right embedding (U+202A) survived the wash as itself in "photo\u202a报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u202a报告.png") = "photo\u202a报告.png", want "photo\\u202a报告.png"
+    display_scrub_216_test.go:407: right-to-left embedding (U+202B) survived the wash as itself in "photo\u202b报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u202b报告.png") = "photo\u202b报告.png", want "photo\\u202b报告.png"
+    display_scrub_216_test.go:407: pop directional formatting (U+202C) survived the wash as itself in "photo\u202c报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u202c报告.png") = "photo\u202c报告.png", want "photo\\u202c报告.png"
+    display_scrub_216_test.go:407: left-to-right override (U+202D) survived the wash as itself in "photo\u202d报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u202d报告.png") = "photo\u202d报告.png", want "photo\\u202d报告.png"
+    display_scrub_216_test.go:407: right-to-left override (U+202E) survived the wash as itself in "photo\u202e报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u202e报告.png") = "photo\u202e报告.png", want "photo\\u202e报告.png"
+    display_scrub_216_test.go:407: left-to-right isolate (U+2066) survived the wash as itself in "photo\u2066报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u2066报告.png") = "photo\u2066报告.png", want "photo\\u2066报告.png"
+    display_scrub_216_test.go:407: right-to-left isolate (U+2067) survived the wash as itself in "photo\u2067报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u2067报告.png") = "photo\u2067报告.png", want "photo\\u2067报告.png"
+    display_scrub_216_test.go:407: first strong isolate (U+2068) survived the wash as itself in "photo\u2068报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u2068报告.png") = "photo\u2068报告.png", want "photo\\u2068报告.png"
+    display_scrub_216_test.go:407: pop directional isolate (U+2069) survived the wash as itself in "photo\u2069报告.png"
+    display_scrub_216_test.go:411: scrubForDisplay("photo\u2069报告.png") = "photo\u2069报告.png", want "photo\\u2069报告.png"
+--- FAIL: TestEveryNamedCfRuneIsEscapedAndNeverDeleted (0.00s)
+=== RUN   TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+--- PASS: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.00s)
+=== RUN   TestDisplayWashRosterIsExactlyTheCfCategory
+    display_scrub_327r2_test.go:66: nail 1: product-washed=170, unicode.Cf=170
+--- PASS: TestDisplayWashRosterIsExactlyTheCfCategory (0.04s)
+=== RUN   TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded
+    display_scrub_327r2_test.go:91: U+2061 is Cf but the fast path would return "photo\u2061.png" raw
+    display_scrub_327r2_test.go:95: U+2061 survived as itself in "photo\u2061.png": the shape is escape, not deletion
+    display_scrub_327r2_test.go:98: U+2061 washed to "photo\u2061.png", want the boundary vocabulary's "photo\\u2061.png" (unchanged input is the other failure)
+    display_scrub_327r2_test.go:91: U+2062 is Cf but the fast path would return "photo\u2062.png" raw
+    display_scrub_327r2_test.go:95: U+2062 survived as itself in "photo\u2062.png": the shape is escape, not deletion
+    display_scrub_327r2_test.go:98: U+2062 washed to "photo\u2062.png", want the boundary vocabulary's "photo\\u2062.png" (unchanged input is the other failure)
+    display_scrub_327r2_test.go:91: U+2063 is Cf but the fast path would return "photo\u2063.png" raw
+    display_scrub_327r2_test.go:95: U+2063 survived as itself in "photo\u2063.png": the shape is escape, not deletion
+    display_scrub_327r2_test.go:98: U+2063 washed to "photo\u2063.png", want the boundary vocabulary's "photo\\u2063.png" (unchanged input is the other failure)
+    display_scrub_327r2_test.go:91: U+2064 is Cf but the fast path would return "photo\u2064.png" raw
+    display_scrub_327r2_test.go:95: U+2064 survived as itself in "photo\u2064.png": the shape is escape, not deletion
+    display_scrub_327r2_test.go:98: U+2064 washed to "photo\u2064.png", want the boundary vocabulary's "photo\\u2064.png" (unchanged input is the other failure)
+    display_scrub_327r2_test.go:91: U+061C is Cf but the fast path would return "photo\u061c.png" raw
+    display_scrub_327r2_test.go:95: U+061C survived as itself in "photo\u061c.png": the shape is escape, not deletion
+    display_scrub_327r2_test.go:98: U+061C washed to "photo\u061c.png", want the boundary vocabulary's "photo\\u061c.png" (unchanged input is the other failure)
+    display_scrub_327r2_test.go:91: U+180E is Cf but the fast path would return "photo\u180e.png" raw
+    display_scrub_327r2_test.go:95: U+180E survived as itself in "photo\u180e.png": the shape is escape, not deletion
+    display_scrub_327r2_test.go:98: U+180E washed to "photo\u180e.png", want the boundary vocabulary's "photo\\u180e.png" (unchanged input is the other failure)
+    display_scrub_327r2_test.go:91: U+206A is Cf but the fast path would return "photo\u206a.png" raw
+    display_scrub_327r2_test.go:95: U+206A survived as itself in "photo\u206a.png": the shape is escape, not deletion
+    display_scrub_327r2_test.go:98: U+206A washed to "photo\u206a.png", want the boundary vocabulary's "photo\\u206a.png" (unchanged input is the other failure)
+    display_scrub_327r2_test.go:91: U+206B is Cf but the fast path would return "photo\u206b.png" raw
+    display_scrub_327r2_test.go:95: U+206B survived as itself in "photo\u206b.png": the shape is escape, not deletion
+    display_scrub_327r2_test.go:98: U+206B washed to "photo\u206b.png", want the boundary vocabulary's "photo\\u206b.png" (unchanged input is the other failure)
+--- FAIL: TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded (0.00s)
+=== RUN   TestDisplayWashJudgeAndWriterAgreeOnBothFamiliesAndBoundaries
+    display_scrub_327r2_test.go:147: nail 3 scope: full Cf=170, full Cc=65, boundary sample=22, disagreements=0
+    display_scrub_327r2_test.go:158: positive control failed: U+202E did not surface as a visible escape in "a\x1bp\u202eqb"
+--- FAIL: TestDisplayWashJudgeAndWriterAgreeOnBothFamiliesAndBoundaries (0.02s)
+=== RUN   TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies
+    display_scrub_333_333r1_test.go:82: AC#4 scope: full Cf=170, full Cc=65, boundaries=22, failures=488
+    display_scrub_333_333r1_test.go:87: Cc U+0000: needsDisplayWash stayed silent, so scrubForDisplay never runs
+    display_scrub_333_333r1_test.go:87: Cc U+0000: scrubForDisplay left the rune visible
+    display_scrub_333_333r1_test.go:87: Cc U+0001: needsDisplayWash stayed silent, so scrubForDisplay never runs
+    display_scrub_333_333r1_test.go:87: Cc U+0001: scrubForDisplay left the rune visible
+    display_scrub_333_333r1_test.go:87: Cc U+0002: needsDisplayWash stayed silent, so scrubForDisplay never runs
+    display_scrub_333_333r1_test.go:87: Cc U+0002: scrubForDisplay left the rune visible
+    display_scrub_333_333r1_test.go:87: Cc U+0003: needsDisplayWash stayed silent, so scrubForDisplay never runs
+    display_scrub_333_333r1_test.go:87: Cc U+0003: scrubForDisplay left the rune visible
+    display_scrub_333_333r1_test.go:87: Cc U+0004: needsDisplayWash stayed silent, so scrubForDisplay never runs
+    display_scrub_333_333r1_test.go:87: Cc U+0004: scrubForDisplay left the rune visible
+    display_scrub_333_333r1_test.go:87: Cc U+0005: needsDisplayWash stayed silent, so scrubForDisplay never runs
+    display_scrub_333_333r1_test.go:87: Cc U+0005: scrubForDisplay left the rune visible
+    display_scrub_333_333r1_test.go:87: Cc U+0006: needsDisplayWash stayed silent, so scrubForDisplay never runs
+    display_scrub_333_333r1_test.go:87: Cc U+0006: scrubForDisplay left the rune visible
+    display_scrub_333_333r1_test.go:87: Cc U+0007: needsDisplayWash stayed silent, so scrubForDisplay never runs
+    display_scrub_333_333r1_test.go:87: Cc U+0007: scrubForDisplay left the rune visible
+    display_scrub_333_333r1_test.go:87: Cc U+0008: needsDisplayWash stayed silent, so scrubForDisplay never runs
+    display_scrub_333_333r1_test.go:87: Cc U+0008: scrubForDisplay left the rune visible
+    display_scrub_333_333r1_test.go:87: Cc U+0009: needsDisplayWash stayed silent, so scrubForDisplay never runs
+    display_scrub_333_333r1_test.go:87: Cc U+0009: scrubForDisplay left the rune visible
+    display_scrub_333_333r1_test.go:87: ... and 468 more wash failures
+--- FAIL: TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies (0.03s)
+=== RUN   TestDisplayWashEscapesAndNeverDeletesAcrossTheWholeCategory
+    display_scrub_333_333r1_test.go:120: AC#8 category arm: examined=170, product washes=170, failures=170
+    display_scrub_333_333r1_test.go:125: U+00AD: "photo\u00ad报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+0600: "photo\u0600报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+0601: "photo\u0601报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+0602: "photo\u0602报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+0603: "photo\u0603报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+0604: "photo\u0604报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+0605: "photo\u0605报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+061C: "photo\u061c报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+06DD: "photo\u06dd报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+070F: "photo\u070f报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+0890: "photo\u0890报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+0891: "photo\u0891报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+08E2: "photo\u08e2报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+180E: "photo\u180e报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+200B: "photo\u200b报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+200C: "photo\u200c报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+200D: "photo\u200d报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+200E: "photo\u200e报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+200F: "photo\u200f报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: U+202A: "photo\u202a报告.png" came back untouched
+    display_scrub_333_333r1_test.go:125: ... and 150 more wash failures
+--- FAIL: TestDisplayWashEscapesAndNeverDeletesAcrossTheWholeCategory (0.04s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.279s
+FAIL

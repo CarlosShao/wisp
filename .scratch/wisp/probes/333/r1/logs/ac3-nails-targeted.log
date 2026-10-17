@@ -1,0 +1,34 @@
+time=2026-10-17T11:14:06.298+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired
+--- PASS: TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired (0.00s)
+=== RUN   TestNeedsDisplayWashNamesEveryWashedCfRune
+--- PASS: TestNeedsDisplayWashNamesEveryWashedCfRune (0.00s)
+=== RUN   TestEveryNamedCfRuneIsEscapedAndNeverDeleted
+--- PASS: TestEveryNamedCfRuneIsEscapedAndNeverDeleted (0.00s)
+=== RUN   TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut
+    display_scrub_216_test.go:448: U+2061 is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+2061 is not on the ruled list but the wash changed it: "photo\u2061.png" -> "photo\\u2061.png"
+    display_scrub_216_test.go:448: U+2062 is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+2062 is not on the ruled list but the wash changed it: "photo\u2062.png" -> "photo\\u2062.png"
+    display_scrub_216_test.go:448: U+2063 is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+2063 is not on the ruled list but the wash changed it: "photo\u2063.png" -> "photo\\u2063.png"
+    display_scrub_216_test.go:448: U+2064 is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+2064 is not on the ruled list but the wash changed it: "photo\u2064.png" -> "photo\\u2064.png"
+    display_scrub_216_test.go:448: U+061C is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+061C is not on the ruled list but the wash changed it: "photo\u061c.png" -> "photo\\u061c.png"
+    display_scrub_216_test.go:448: U+180E is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+180E is not on the ruled list but the wash changed it: "photo\u180e.png" -> "photo\\u180e.png"
+    display_scrub_216_test.go:448: U+206A is not on the ruled list but needsDisplayWash fired on it
+    display_scrub_216_test.go:451: U+206A is not on the ruled list but the wash changed it: "photo\u206a.png" -> "photo\\u206a.png"
+--- FAIL: TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut (0.00s)
+=== RUN   TestDisplayWashRosterIsExactlyTheCfCategory
+    display_scrub_327r2_test.go:67: nail 1: product-washed=170, unicode.Cf=170
+--- PASS: TestDisplayWashRosterIsExactlyTheCfCategory (0.04s)
+=== RUN   TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded
+--- PASS: TestDisplayWashRosterWashesTheEightRunesTheOldRulingExcluded (0.00s)
+=== RUN   TestDisplayWashJudgeAndWriterAgreeOnBothFamiliesAndBoundaries
+    display_scrub_327r2_test.go:148: nail 3 scope: full Cf=170, full Cc=65, boundary sample=22, disagreements=0
+--- PASS: TestDisplayWashJudgeAndWriterAgreeOnBothFamiliesAndBoundaries (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.143s
+FAIL

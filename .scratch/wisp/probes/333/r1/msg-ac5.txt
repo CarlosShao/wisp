@@ -1,0 +1,24 @@
+票 333 产码腿 333-r1·AC#5＝成对两发突变（牙，落点不同函数／不同断言行，逐发当场还原＋报还原哈希）
+
+突变只打在仓外导出树 D:\W333R1MUT 的物理字节上（git archive 9574e794 八件套＋仓根 docs/＋手工三件；
+取出即数 .go＝757 枚，"0"⛔ 是读数）。字节同源三向逐字同串：
+sha256(树内件)＝sha256(git show 9574e794:internal/panel/display_scrub_216.go)＝sha256(工作树件)
+＝dc86d19ce9fdf52b6dc4d226ef02087524e85905660201e0f12221d267d552d0
+载体＝.scratch/wisp/probes/333/r1/mut333r1.sh（同一枚 -run 名册 5 枚 × 三发，restore 在 test 之后无条件执行）
+
+发一 M1＝落点 isDisplayWashCf 体内那枚 token（内容锚，⛔ 绝对行号）：换回锚点那 10 行名册 switch
+  PRE=dc86d19ce9fdf5…  MUT=8c12e7223cf148…  RESTORE=dc86d19ce9fdf5…  RESTORE_VERIFIED=YES  diff=11 行
+  必红的靶子＝AC#3 关系钉：display_scrub_327r2_test.go:72 "a Cf-table rune is not washed by the product:
+  [U+0600 … U+FFF9 U+FFFA U+FFFB] (product=15 category=170)" ＋ :76 基数行 ⇒ 关系钉真读产码（⛔ 自指）
+发二 M2＝落点 needsDisplayWash 签名行后插 return false（快路短路，另一枚函数、另一枚断言行）
+  PRE=dc86d19ce9fdf5…  MUT=d71c1ab2167236…  RESTORE=dc86d19ce9fdf5…  RESTORE_VERIFIED=YES  diff=1 行
+  必红的靶子＝AC#4 同集钉：display_scrub_333_333r1_test.go:87 "Cc U+0000: needsDisplayWash stayed silent,
+  so scrubForDisplay never runs"，:82 读数行点名 failures=488（整族 235 枚 × 两臂）
+
+颜色（同一条命令、同一枚名册，M0＝未突变对照）：M0 9/8/1/0 ⇄ M1 9/5/4/0 ⇄ M2 9/2/7/0
+红名册 comm 作差＝M1 独有关系钉；M2 独有那对成对靶子用例（WriterBranch／NeedsDisplayWashNames）
+＋TestEveryNamedCfRuneIsEscapedAndNeverDeleted＋nail 3；两发共有＝排除钉＋AC#4 两枚新钉
+⇒ 少任一发，另一发的绿都不算凭据（logs/ac5-pair-summary.log 逐名带文案）。
+M0 那一枚红＝上报那枚（TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut），三发恒在、⛔ 我碰过它。
+顺带入库 logs/ac3-nails-targeted.log＝AC#3 改名后、注释收帽前那一发的中间读数，已被
+logs/ac3-nails-final.log 取代，留作历史（临时件只建不删）。
