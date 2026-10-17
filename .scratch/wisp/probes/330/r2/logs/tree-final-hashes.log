@@ -1,0 +1,10 @@
+### final export-tree hashes after all five shots (each must equal the committed baseline)
+6542773d3d2edcc6d554a47f091ce2dffe35586a92c1f948f79c361454683fca *internal/agent/plan_present_doorbell_165r3_test.go
+891fbf5ccc9bdcd23f5075538c2a590e441dc87a100c2634a45d29cbbdd2b59d *internal/agent/plan_present_crowded_world_330r2_test.go
+7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be *internal/agent/testdata/golden/plan-present.sse
+937bcc113b6018b70ecc2d124505b226c0ccf35ddf9dd2ea5dd76d0db62a064a *internal/agent/inject.go
+### committed baseline for comparison (worktree, HEAD)
+6542773d3d2edcc6d554a47f091ce2dffe35586a92c1f948f79c361454683fca *internal/agent/plan_present_doorbell_165r3_test.go
+891fbf5ccc9bdcd23f5075538c2a590e441dc87a100c2634a45d29cbbdd2b59d *internal/agent/plan_present_crowded_world_330r2_test.go
+7d26fa889b59fc3a2b39ff18883ee331f8ff1c06ddb45a5a23bc6820af9079be *internal/agent/testdata/golden/plan-present.sse
+937bcc113b6018b70ecc2d124505b226c0ccf35ddf9dd2ea5dd76d0db62a064a *internal/agent/inject.go

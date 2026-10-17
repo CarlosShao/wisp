@@ -1,0 +1,34 @@
+### ruler 1: git diff --numstat $ANCHOR HEAD -- internal/agent   (every line must be *_test.go or testdata/)
+272	0	internal/agent/plan_present_crowded_world_330r2_test.go
+3	1	internal/agent/plan_present_doorbell_165r3_test.go
+numstat_rc=0
+
+### ruler 2 (the delivery ruler): name-only filtered, must be EMPTY and rc=1
+filtered_rc=1  (1 = no line survived = zero production byte)
+
+### whole-tree view for the record (other legs are in flight in this worktree; their files are NOT mine)
+.scratch/wisp/issues/216-menu-display-base-scrub-control-chars-and-two-sentences.md
+.scratch/wisp/probes/216/v2/logs/commit-msg-216v2-ticket.txt
+.scratch/wisp/probes/216/v2/logs/commit-msg-216v2-verdict.txt
+.scratch/wisp/probes/216/v2/logs/replay-216v2.log
+.scratch/wisp/probes/216/v2/logs/replay-216v2.sh
+.scratch/wisp/probes/orch/20261017/txt/handover-40dw.md
+.scratch/wisp/probes/orch/20261017/txt/wave14-send.txt
+cmd/wisp/panel_host_windows.go
+cmd/wisp/panel_pump.go
+cmd/wisp/panel_snapshot_deliver_329.go
+cmd/wisp/panel_snapshot_deliver_329_test.go
+cmd/wisp/resident_windows.go
+cmd/wisp/run.go
+docs/evidence/s1/216-v2-verdict.md
+docs/reports/HANDOVER.md
+internal/agent/plan_present_crowded_world_330r2_test.go
+internal/agent/plan_present_doorbell_165r3_test.go
+
+### positive control of ruler 2, run on a --local clone (a fresh dir under /d/tmp, never deleted, never in the shared worktree)
+clone_dir=/d/tmp/w330pos.JMT7zO
+clone_rc=0
+positive-control edit applied to a NON-comment production byte: internal/agent/inject.go
+control_commit_rc=0
+internal/agent/inject.go
+control_filtered_rc=0  (0 with a listed file = the ruler is armed)

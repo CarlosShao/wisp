@@ -1,0 +1,26 @@
+### gate 1: gofumpt -l internal/agent/  (empty list = clean)
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+gofumpt_rc=0
+
+### gate 2: sh scripts/d22scan.sh
+d22scan_sh_rc=1
+    scan_test.go:269: repo HEAD violates: cmd/wisp/panel_snapshot_deliver_329.go:14: [phantom-citation] comment cites repo path "cmd/wisp/panel_control_" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+--- FAIL: TestScannerSelfScanOfRealRepoIsGreen (2.50s)
+--- FAIL: TestRealRepoLedgerIsHonest (2.49s)
+  findings above are cmd/wisp bytes of the concurrent leg 329-r1, not this leg's:
+  mentions_of_this_legs_new_file=0
+
+### gate 2b: the scan proper (d22scan.sh step 2, run standalone)
+d22scan_real_rc=1
+cmd/wisp/panel_snapshot_deliver_329.go:14: [phantom-citation] comment cites repo path "cmd/wisp/panel_control_" which does not exist on disk (ticket 212 ban #9): fix the citation or create the file; shorthand forms are a separate prescription, not a violation
+exit status 1
+
+### gate 3: sh scripts/check-path-length-budget.sh
+pathlen_rc=0
+check-path-length-budget.sh: denominator read: 14425 tracked paths
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+
+### gate 4: go vet ./internal/agent/
+vet_rc=0
+vet_output_bytes=0

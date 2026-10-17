@@ -1,0 +1,14 @@
+票 330 落地（1/4·330-r2）：G2 那枚缺世界——门铃仪器多候选夹具，驻留档位换成有牙（★只碰测试面、⛔ 任何产码字节）
+
+- internal/agent/plan_present_crowded_world_330r2_test.go：新建两枚用例与一枚检索用长尾候选。
+  机理＝inject.go:232-243 的检索支按 SectionToolIndex（128k 参考窗 300 token）削名额，
+  第一名无条件入选、其后 used+cost 超预算即断；本夹具那枚长尾候选占 291、镜像条目占 20，
+  两枚合计 311 超预算 ⇒ 镜像条目一旦从驻留支换到检索支就抢不过长尾、整枚不上线。
+- TestCrowdedWorldStillOffersTheBrake330r2 走真 Loop／真 openai-chat 适配／真 store，
+  只断言第一轮请求体里必须出现那扇门（165 那枚 :219 判据的线上形状），断言里⛔ 提名长尾候选
+  ⇒ 把新增那枚候选删掉后本用例逐字退回 165 的单候选世界（＝证明牙挂世界上而非挂硬编码）。
+- TestResidencyTierDecidesTheInjectionArm330r2 首枚直接读 Inject 两支臂的用例（本锚点
+  grep 'Inject(' 过 *_test.go 为空），门序＝夹具前提／镜像条目驻留臂／长尾不入驻留臂／长尾入检索臂，
+  三发突变各打在不同一行（成对两发的红句与行号见 probes/330/r2/logs）。
+- 随批 G3：长尾候选只作检索夹具，⛔ 声称是真名册条目（G1 归 330-r1 的 cmd/wisp 面）；
+  Declared 那一支按 165-v2 已有牙，本文件⛔ 重复装钉。

@@ -1,0 +1,13 @@
+票 330 落地（3/4·330-r2）：读数件与驱动器落盘（成对突变五发原始 .log＋零产码尺与正控＋门禁四数；临时件只建不删）
+
+- probes/330/r2/mutations-330r2.py＋logs/m1..m5：五发定向突变全部只打在仓外导出树 D:\tmp\w330pst 的字节上，
+  逐发 finally 当场还原并核回提交内 sha256（门面前置＝两枚目标文件起手即等于 560945c2 的基线串）。
+- probes/330/r2/self-rulers.sh＋logs/self-rulers.log：零产码那把尺的负控（过滤后空、rc=1）与
+  ★正控（在 git clone --local 的副本里把 internal/agent/inject.go 一处非注释字面量 MaxRetrievedTools 改+1，
+  同尺必须列出该文件、rc=0）；副本落在 mktemp 出的 /d/tmp/w330pos.*，⛔ 碰共享工作树、⛔ 删。
+- probes/330/r2/gates-330r2.sh＋logs/gates.log：门禁四数只在共享工作树现跑 ——
+  gofumpt 列出两枚本锚点既存漂移件（本腿两枚文件不在名单）、d22scan rc=1 唯一 finding 在
+  cmd/wisp/panel_snapshot_deliver_329.go:14（并行腿 329-r1 的字节、本腿新文件 0 提及）、
+  长度门 rc=0 VERDICT GREEN、go vet ./internal/agent/ rc=0 输出 0 字节。
+- probes/330/r2/export-and-run.sh＋logs/m0-forward-unmutated.log＋logs/tree-final-hashes.log：
+  台面配方与改前改后四数的驱动器、未突变正控一发、五发跑完的树内字节＝提交内字节凭证。
