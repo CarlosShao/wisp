@@ -26,3 +26,5 @@
 ## 禁区
 
 ⛔ 动 `MessageKey()` 函数体或签名一字（本票零产码改动，AC#2 就是钉这件事）；⛔ 动 `internal/observe/thresholds.go`、golden、`tools/d22scan/allowlist.txt`、`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`、三枚冻结件、`frontend/**`、`design/**`、`PLAN.md`、`docs/specs/**`；⛔ 为"让注释说满"去补一条生产调用（那是 `D23`／`S6` 那层 DEFERRED 的活，不归本票）；⛔ 跑整包 `./cmd/wisp`、⛔ `go test ./...`。
+
+- **331-r1（实现者·只改注释）交件，2026-10-17**：起手锚 `72b65c61`（票面 `0e944d93` 为开票日旧锚，本腿三把尺现跑：生产嵌键 0、测试调用 4 枚在场、改前三行注释逐字已档，行号未漂）。提交四枚＝`e09187e1`（`internal/observe/errors.go` 整行注释面，AC#1 三件事实：键为文案层预备／今天生产 0 嵌、消费者只有 `errors_test.go` `TestMessageKeys` 与 `matrix_14_2_test.go`／文案层仍归 D23·S6 DEFERRED，末句明写"非此处许诺"）、`5cbec52d`（探针＋台件 `zero-change-check.sh`）、`adcbe8f3`＋`7ab51937`（证据件 `docs/evidence/s1/331-r1-evidence.md` 90 行＋占位自尺追加更正）。AC#2 尺两侧同 sha `f51f944c…` rc=0、正控非注释改一枚字面量回非空 rc=1（一发因 sed 行号锚旧空跑、已具名重做）；反向写实验（注释改口"已嵌键"）此尺**不红 rc=0**＝其射程只测整行注释外字节、不测注释真伪，答案全文与还原哈希 `ef90aa58…` 在证据件 §4。AC#3 两发仓外导出树同形 71/71/0/0、红名册作差 0；AC#4 四门共享工作树 rc=0。六枚 AC 框与 `Status:` 未动，归非实现者裁；⛔ push。
