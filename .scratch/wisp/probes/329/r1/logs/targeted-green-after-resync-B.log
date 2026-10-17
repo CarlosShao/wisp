@@ -1,0 +1,2 @@
+--- PASS: TestBookedSnapshotReachesHostBitForBit329 (1.84s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.937s

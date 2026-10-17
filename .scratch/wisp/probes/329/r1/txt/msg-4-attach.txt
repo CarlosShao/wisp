@@ -1,0 +1,1 @@
+票 329 落地（4/5）：常驻装配根把本进程唯一的面板宿主挂进任务管线的快照推跳（src.run.setPanelSnapshotHost(rp)）；装配失败／宿主未建的那两形＝不挂，publish 停在记账

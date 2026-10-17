@@ -1,0 +1,7 @@
+票 329 落地（1/5）：交付腿本体与 snapHost 字段——形甲的 Go 半边（⛔ 新增入向 Method* 常量、⛔ 新 publish 驱动点）
+
+- cmd/wisp/panel_snapshot_deliver_329.go：panelSnapshotHost 窄接口（一枚 evalPanelJS，形状＝既有 panelControl.Eval）、
+  panelSnapshotGlobal＝window.wispOnPanelSnapshot（出向推送，不进出向名册）、
+  panelSnapshotEvalJS 把泵 marshal 的字节逐字包进具名全局调用（同 :752 回执的 raw-JSON 形状），
+  setPanelSnapshotHost／pushPanelSnapshotToHost（lastPanelSnapshot 的第一枚生产读者）。
+- cmd/wisp/run.go：agentRuntime 加 snapHostMu/snapHost 两字段；nil＝本机没有可推的窗口，publish 停在记账（console `wisp run` 那一形）。

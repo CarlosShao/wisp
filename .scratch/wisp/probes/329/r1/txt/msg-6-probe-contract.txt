@@ -1,0 +1,1 @@
+票 329 交件（探针面·一）：page-contract.md（AC#5 页面侧合同：具名全局 window.wispOnPanelSnapshot＋参数形状＝快照 JSON 四必选键两可选键＋触发时机＝每次 publish 一发、⛔ 逐 token）＋起手三把尺逐字读数（AC#2 尺起手侧＝空、交付侧三命中含真读者 deliver_329.go:95；票面"16 枚命中"实为 17 枚＝其列举自身求和，具名登记不抹原文）＋名册钉尺（AC#4 空 diff rc=0）

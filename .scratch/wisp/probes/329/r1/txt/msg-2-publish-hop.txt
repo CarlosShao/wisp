@@ -1,0 +1,5 @@
+票 329 落地（2/5）：publishPanelSnapshot 挂上推那一跳（只挂既有驱动点，⛔ 新驱动点、⛔ 逐 token delta 推、⛔ 发明合并/背压）
+
+- cmd/wisp/panel_pump.go：Publish 记账之后同一次调用里 rt.pushPanelSnapshotToHost()；
+  文件头与 bookPanelSnapshot 尾注里"transport 仍缺位"的两段过期陈述改成与盘上一致的形状（⛔ 许诺页面已动）。
+- cmd/wisp/run.go：泵装配处与 lastSnap 字段注释两处同步改旧句（"最后一公里仍开着"那两枚 10-07 句）。
