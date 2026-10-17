@@ -1,0 +1,5 @@
+票 335 落地腿 335-r1·终态两枚日志补交（只追加）＝HEAD 上那枚钉子的定向一发＋空槽尺复跑
+
+- logs/ac1-final-targeted-shared.log＝共享工作树、HEAD=64265f0e、`go test -v ./internal/panel/ -run 'TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut' -count=1 -timeout 30m` ⇒ rc=0、`--- PASS`、`arm 2: product-washed=170, unicode.Cf=170, missed=0, extra=0`（别腿在飞的 internal/risk 已入库字节⛔ 影响这枚钉子）。
+- logs/placeholders-final.log＝尺 v2（分词形逐件），六枚射程件各 0 命中，delivery.md 字节数按现值 10346 更正（v1 件 logs/placeholders.log 原样留着，⛔ 改写）。
+- 写面仍＝internal/panel 测试面＋整行注释面＋本探针目录；⛔ push、⛔ 翻框、⛔ 动 333 票与台账。
