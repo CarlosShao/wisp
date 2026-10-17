@@ -1,0 +1,30 @@
+date=2026-10-17 14:57:43 +0800 root=D:/work/workspace/wisp-328r1-before-tree pkg=internal/panel pattern=TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt|TestASecondCardForTheSameTaskStillLightsItsRow
+gofiles=746
+time=2026-10-17T14:57:45.305+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestASecondCardForTheSameTaskStillLightsItsRow
+--- PASS: TestASecondCardForTheSameTaskStillLightsItsRow (0.00s)
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_suffix_is_not_the_queue's_form
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row
+--- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_suffix_is_not_the_queue's_form (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.062s
+go_test_rc=0
+RUN=8
+PASS_TOP=2
+FAIL_TOP=0
+SKIP=0
+--- red roster ---
+NO_TOP_FAIL
+--- package verdict lines ---
+ok  	github.com/CarlosShao/wisp/internal/panel	0.062s

@@ -1,0 +1,16 @@
+328-r1 仪器②（名册侧四形实测）：四形逐枚点亮、approval-<seq> 与 host:* 照旧点不亮
+
+internal/panel/subagent_corr_task_prefix_328_test.go（新增，package panel）：
+- TestProductionCorrelationShapesLightTheirRows：支A "<T>#call_e1"（loop.go:607）／支B
+  "<T>#call-0"（loop.go:605）／队列叠改 "<T>#call-0#7"（queue.go:168）／裸任务号被撞名改写
+  "<T>#9" 四形逐枚 true，另加 "<T>#call_e1#7"；两形照旧 false＝空关联号回退 "approval-7"
+  （queue.go:165）与宿主发起卡 "host:mode-switch"（gate.go:281 orDefaultText 那一族），
+  再加一枚"建在没人登记过的任务号上"的 "ghost-9#call-0" false。每一枚同场断言另一行 root-1 仍 false。
+- TestEachCorrelationLightsOnlyTheRowItIsBuiltOn：一张卡只搬动它建在其上的那一行。
+- TestAnL1WindowCorrelationIsMatchedByTheSameArm：L1 窗口的关联号走同一枚 indexWaitingKey，
+  "<T>#call-0" 亮、child-1x 仍不亮。
+- 文件头写明这些字节为什么写在这里：形状的出处由 internal/agent/corr_roster_join_328_test.go 经
+  真 loop 的派发读数证明（callCorr 非导出、跨包不可达，⛔ 为此新加导出名⇒撞到即停手上报），
+  本包量的是名册接不接。逐枚标注铸造点 file:line，⛔ 按谓词文字推。
+
+读的是真名册真台面：blockedPacket → NewSnapshotPump(...).Publish() → 线内 JSON 逐枚读行。

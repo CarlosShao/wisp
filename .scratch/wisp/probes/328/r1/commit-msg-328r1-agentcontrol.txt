@@ -1,0 +1,17 @@
+328-r1 仪器③（AC#2 正控＝经真铸造点）：关联号从真 loop 派发出来读，⛔ 测试里硬写形状
+
+internal/agent/corr_roster_join_328_test.go（新增，package agent；panel 非 agent 依赖闭包＝
+现量 panel 非导出测试外只 import projctx/risk/streamkey，无回环 ⇒ ⛔ 新导出名 也 ⛔ 新 panel.* 名）：
+- TestACorrelationTheLoopActuallyMintedLightsItsRosterRow：真 golden SSE（tool-then-text）走真
+  C5 适配器 → run → executeCalls → loop.go:676 callCorr，corr 是从 h.echo().Calls()[0].Req
+  读出来的（先四把尺钉住它就是 "<taskID>#<callID>" 那一形、且尾段等于该调用自己的号），再经
+  真搬运 hop panel.NativeVerdict{...}.CardView()（pump.go:98 → approval.go:72，与宿主 liveVerdicts
+  同一枚纯函数）喂给真名册渲染（TaskRosterSectionFrom → 同文件 taskRosterSectionFrom＝pump.go:333
+  那一行调的函数；本笔改完现量 :207＝原 :198 下移，⛔ 行号当判据），断言那一行 BlockedOnApproval
+  为 true。同一张卡⛔ 点亮兄弟行，且行上 host 登记的 Status 原样带着（AC#3：D43 转移表不动）。
+  ★本票 ⛔ 的是"测试里硬写 task#3／#2 那种撞名形"（票 328 现量那张表的病根）：这里没有一枚
+  硬写的 corr。
+- TestTheLoopMintsTheShapesTheRosterAccepts：把 callCorr 两支的输出逐枚钉成名册侧那张表喂的字节
+  （"<T>#call-0"／"<T>#call_e1"），并逐枚经真名册点亮自己那一行。文件头写明支B 为什么只能在此量：
+  openai-chat 在 loop 看到空号之前先换成 call_unnamed_<n>（internal/llm/openaichat/toolasm.go:114），
+  本仓任何 golden 都到不了那一支。

@@ -1,0 +1,13 @@
+328-r1 仪器①（票 220 那族名册）：child-1#retry 翻成 true 是买真相，child-1x 原地不动
+
+internal/panel/subagent_blocked_220_test.go：
+- 子用例 "a non-numeric tail on a filed task id lights (328)"（原 "a non-numeric suffix is not the
+  queue's form"）期望 false → true。★这一发是买真相、⛔ 不是为变绿：child-1#retry 正是 loop.go:603
+  callCorr 给一枚在册任务拼出的形状，那一行本来就在等这张卡，读 false 就是票 328 立票的缺陷本体。
+  硬框 ⓑ：用例没删、⛔ t.Skip、判据文字与票名/Status/AC 框一字未动。
+- 子用例 "a task id that merely prefixes does not light"（child-1x）期望与文本原地不动＝丙与
+  "把两枚任务混起来"之间唯一的隔板（硬框 ⓒ：它同时是去牙那一发的落点，抹掉分隔符 ⇒ 这一枚必须红）。
+- 用例头与表头散文改为说实话：recognised 的形现在是两族（队列自己的数字改写 ⇄ 关联号建在本 render
+  已登记的任务号上且紧跟 '#'），并点名"抹掉分隔符那一半 ⇒ child-1x 也过"这条敏感性问题。
+
+门禁：gofumpt -l rc=0；go vet ./internal/panel/ ./internal/agent/ rc=0（共享工作树，四枚文件一起过）。

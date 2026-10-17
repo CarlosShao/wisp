@@ -1,0 +1,21 @@
+date=2026-10-17 15:12:24 +0800
+end_status_lines=1238
+tracked_modified_vs_head=2
+=== 跟踪改动逐枚（应只含本腿待提的票面＋两枚件） ===
+ M .scratch/wisp/issues/328-l2-card-corr-shape-never-matches-the-roster-join-key.md
+ M .scratch/wisp/issues/335-ticket327-roster-nail-red-after-category-widening-and-three-stale-comments.md
+=== 我的写面必须为空 ===
+internal_clean_rc=0
+=== 占位符尺（分词形，两枚件） ===
+-- docs/evidence/s1/328-r1-join.md
+0
+0 命中(rc=1 ⇒ || true)
+-- docs/evidence/s1/328-r1-color.md
+0
+0 命中(rc=1 ⇒ || true)
+=== 正控（同尺族在两枚件里应命中真词） ===
+2
+=== 行数／字节 ===
+  112 12108 docs/evidence/s1/328-r1-join.md
+  103  9085 docs/evidence/s1/328-r1-color.md
+  215 21193 total

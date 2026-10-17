@@ -1,0 +1,60 @@
+date=2026-10-17 14:57:40 +0800  anchors: start=648eda04  end=f705b082
+
+== 尺1 起（必答②那格）：frontend 里 blockedOnApproval 命中文件数（量的） ==
+cmd: git grep -l 'blockedOnApproval' f705b082 -- frontend | wc -l
+0
+正控（同尺族）: git grep -l 'correlationId' f705b082 -- frontend | wc -l
+11
+正控 2（大小写不敏感同族，防我读错名）: git grep -il 'blockedonapproval' f705b082 -- frontend | wc -l
+0
+
+== 尺2 页面侧接收器自陈的行号（现量，⛔ 抄普查件） ==
+f705b082:cmd/wisp/panel_snapshot_deliver_329.go:28:// window.wispOnPanelSnapshot does not exist yet (frontend/src/main.tsx renders
+f705b082:cmd/wisp/panel_snapshot_deliver_329.go:57:const panelSnapshotGlobal = "window.wispOnPanelSnapshot"
+
+== 尺3 生产包那句自陈 ==
+f705b082:cmd/wisp/subagent_carrier_197_test.go:598://  1. blockedOnApproval is never asserted on a production packet. The join has two
+
+== 尺4 名册那把尺今天的直呼者（量的，交件侧） ==
+f705b082:internal/panel/subagent_roster_197.go:308:	if base, ok := splitClashSuffix(key); ok && base != "" {
+f705b082:internal/panel/subagent_roster_197.go:318:// splitClashSuffix recognises the queue's own rewrite and nothing el
+f705b082:internal/panel/subagent_roster_197.go:333:func splitClashSuffix(id string) (base string, ok bool) {
+正控（同尺族应命中）: git grep -n 'indexWaitingKey' f705b082 -- internal | wc -l
+8
+
+== 尺5 队列撞名改写有没有任何用例真产过它（量的，⛔ 抄普查件） ==
+0
+正控（同尺族，全仓）: git grep -nE '"[A-Za-z0-9_.-]+#[0-9]+"' f705b082 -- internal cmd | wc -l
+   f705b082:cmd/wisp/resident_audio_windows.go:15:// Shape, all of it ruled by the orchestrator in the ticket's "AC#0" section and
+   f705b082:cmd/wisp/slo_report_144_windows_test.go:873:// by grepping this file for "AC#3" to find its ruling. The sentence "// Case 13 -
+   f705b082:internal/panel/subagent_blocked_220_test.go:15://     and a lookup by "task-7" cannot find "task-7#9". The busier a task is, the
+   f705b082:internal/panel/subagent_blocked_220_test.go:108:	data := blockedPacket(t, []NativeVerdict{card197("child-1#9")}, nil)
+   f705b082:internal/panel/subagent_blocked_220_test.go:112:	data = blockedPacket(t, []NativeVerdict{card197("child-1"), card197("child-1#9")}, nil)
+   f705b082:internal/panel/subagent_blocked_220_test.go:138:		{"the queue's own rewrite lights", "child-1#9", true},
+   f705b082:internal/panel/subagent_blocked_220_test.go:139:		{"a multi-digit seq lights", "child-1#147", true},
+   f705b082:internal/panel/subagent_blocked_220_test.go:140:		{"another task's rewrite does not light", "other-1#9", false},
+   f705b082:internal/panel/subagent_blocked_220_test.go:194:	data := blockedPacket(t, []NativeVerdict{card197("child-1#9")},
+   f705b082:internal/panel/subagent_corr_task_prefix_328_test.go:20://   "child-1#9"          queue.go:168 rewriting a corr that was the bare task id
+   f705b082:internal/panel/subagent_corr_task_prefix_328_test.go:42:		{"the queue rewrite of a bare task id lights its task", "child-1#9", true},
+
+== 尺6 cmd/wisp 那包卡片 corr 里带 # 的用例枚数（静态界，本腿⛔ 跑该包） ==
+2
+正控（同尺族在 internal/panel）: git grep -nE '"[A-Za-z0-9_.-]+#[0-9]+"' f705b082 -- internal/panel | wc -l
+9
+
+== 尺7 internal/tools 里断言 BlockedOnApproval 的用例枚数（本腿没跑那包 ⇒ 静态界） ==
+0
+
+== 尺8 本腿四枚提交只碰写面（逐枚 name-only） ==
+-- b2d55342
+      b2d553425 Sat Oct 17 13:57:07 2026 +0800 328-r1 产码（丙-带边界）：名册把关联号剥出的任务半段按"在册任务号+#"认进 waiting
+   
+   internal/panel/subagent_roster_197.go
+-- 1696d01b
+      1696d01b0 Sat Oct 17 14:08:48 2026 +0800 328-r1 仪器①（票 220 那族名册）：child-1#retry 翻成 true 是买真相，child-1x 原地不动
+   
+   internal/panel/subagent_blocked_220_test.go
+-- ffebb6d1
+      ffebb6d13 Sat Oct 17 14:08:50 2026 +0800 328-r1 仪器②（名册侧四形实测）：四形逐枚点亮、approval-<seq> 与 host:* 照旧点不亮
+   
+   internal/panel/subagent_corr_task_prefix_328_test.go

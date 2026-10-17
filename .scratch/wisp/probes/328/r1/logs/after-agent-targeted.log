@@ -1,0 +1,18 @@
+date=2026-10-17 14:43:37 +0800 root=D:/work/workspace/wisp-328r1-after-tree pkg=internal/agent pattern=TestACorrelationTheLoopActuallyMintedLightsItsRosterRow|TestTheLoopMintsTheShapesTheRosterAccepts
+gofiles=748
+time=2026-10-17T14:43:42.420+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestACorrelationTheLoopActuallyMintedLightsItsRosterRow
+--- PASS: TestACorrelationTheLoopActuallyMintedLightsItsRosterRow (0.04s)
+=== RUN   TestTheLoopMintsTheShapesTheRosterAccepts
+--- PASS: TestTheLoopMintsTheShapesTheRosterAccepts (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.166s
+go_test_rc=0
+RUN=2
+PASS_TOP=2
+FAIL_TOP=0
+SKIP=0
+--- red roster ---
+NO_TOP_FAIL
+--- package verdict lines ---
+ok  	github.com/CarlosShao/wisp/internal/agent	0.166s

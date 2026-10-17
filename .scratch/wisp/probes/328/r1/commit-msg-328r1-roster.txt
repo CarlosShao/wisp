@@ -1,0 +1,16 @@
+328-r1 产码（丙-带边界）：名册把关联号剥出的任务半段按"在册任务号+#"认进 waiting
+
+票 328 编排者裁形＝丙-带边界（裁定 bullet 在票 328 尾，凭据＝328-a1 普查件 docs/evidence/s1/328-a1-census.md，锚 7535d83b）。
+
+internal/panel/subagent_roster_197.go：
+- 新增非导出 rosteredTaskIDs：成员＝本次渲染自己那批行的 TaskID，空号不入集（空号会匹配一切关联号）。
+- indexWaitingKey 多一个入参 known，多第三臂：strings.HasPrefix(key, task+"#") 才把 task 记进 waiting。
+  两半都是判据本身：任务半段必须逐字节等于一枚在册任务号，且原串里紧跟其后的是 '#'。
+  抹掉分隔符＝"child-1x" 点亮 "child-1" 的行（两枚任务混成一枚）；抹掉在册要求＝这一臂不再是 join。
+- 名册两侧自陈改为说实话（硬框 ⓭）：TaskRosterSectionFrom 的头补上 328 那一族（loop.go:603/:676 产的
+  "<taskID>#<callID>" 今天真落在这把尺上）；splitClashSuffix 那句 "a wider match than any code in this
+  tree produces" 就地过期，改写为"变的不是这枚数字测试，而是 join 还接受哪一形"。数字臂一字未动。
+
+⛔ 改门控档位 ⛔ 面板侧来源变 L2 合法出处 ⛔ 动 D43 转移表 ⛔ 动三枚冻结件（AC#3，交件逐枚报 diff 0）。
+⛔ 新 JSON 键 ⛔ 新导出 panel.* 名 ⛔ 新 C17 方法名（这一笔新增的两枚标识符都是非导出）。
+门禁：gofumpt -l rc=0；go vet ./internal/panel/ rc=0（共享工作树）。

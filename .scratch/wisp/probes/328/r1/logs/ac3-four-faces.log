@@ -1,0 +1,30 @@
+date=2026-10-17 14:46:56 +0800
+=== commit b2d55342 (328-r1 产码（丙-带边界）：名�) ===
+  face=gate-mode diff_lines=0 rc=0 paths=[internal/risk/mode.go internal/agent/approval/gate.go internal/agent/approval/queue.go]
+  face=panel-l2-source diff_lines=0 rc=0 paths=[internal/risk/provenance.go internal/panel/approval.go]
+  face=d43-table diff_lines=0 rc=0 paths=[internal/statemachine]
+  face=frozen-three diff_lines=0 rc=0 paths=[internal/panel/tokens_fourway_test.go internal/panel/l2_grant_boundary_test.go internal/perm/ticket90_persist_test.go]
+=== commit 1696d01b (328-r1 仪器①（票 220 那族名册�) ===
+  face=gate-mode diff_lines=0 rc=0 paths=[internal/risk/mode.go internal/agent/approval/gate.go internal/agent/approval/queue.go]
+  face=panel-l2-source diff_lines=0 rc=0 paths=[internal/risk/provenance.go internal/panel/approval.go]
+  face=d43-table diff_lines=0 rc=0 paths=[internal/statemachine]
+  face=frozen-three diff_lines=0 rc=0 paths=[internal/panel/tokens_fourway_test.go internal/panel/l2_grant_boundary_test.go internal/perm/ticket90_persist_test.go]
+=== commit ffebb6d1 (328-r1 仪器②（名册侧四形实测) ===
+  face=gate-mode diff_lines=0 rc=0 paths=[internal/risk/mode.go internal/agent/approval/gate.go internal/agent/approval/queue.go]
+  face=panel-l2-source diff_lines=0 rc=0 paths=[internal/risk/provenance.go internal/panel/approval.go]
+  face=d43-table diff_lines=0 rc=0 paths=[internal/statemachine]
+  face=frozen-three diff_lines=0 rc=0 paths=[internal/panel/tokens_fourway_test.go internal/panel/l2_grant_boundary_test.go internal/perm/ticket90_persist_test.go]
+=== commit f705b082 (328-r1 仪器③（AC#2 正控＝经真�) ===
+  face=gate-mode diff_lines=0 rc=0 paths=[internal/risk/mode.go internal/agent/approval/gate.go internal/agent/approval/queue.go]
+  face=panel-l2-source diff_lines=0 rc=0 paths=[internal/risk/provenance.go internal/panel/approval.go]
+  face=d43-table diff_lines=0 rc=0 paths=[internal/statemachine]
+  face=frozen-three diff_lines=0 rc=0 paths=[internal/panel/tokens_fourway_test.go internal/panel/l2_grant_boundary_test.go internal/perm/ticket90_persist_test.go]
+=== whole-range attribution: which commits touched each face since 648eda04 ===
+-- face=gate-mode
+-- face=panel-l2-source
+-- face=d43-table
+-- face=frozen-three
+=== worktree dirty check on those faces (must be empty) ===
+status_rc=0
+=== my four files vs HEAD (must be clean) ===
+done rc=0

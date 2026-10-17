@@ -1,0 +1,18 @@
+328-r1 读数入库（logs/）：两棵仓外台面树／颜色成对四数／去牙两发逐字红句＋还原哈希／门禁与 AC#3 尺
+
+.scratch/wisp/probes/328/r1/**（只建不删；逐枚显式 pathspec）：
+- 台面脚本与两棵树读数：logs/build-tree.sh＋tree-before.log（锚 648eda04，.go=746，8.3 别名 WI8846~1）
+  ／tree-after.log（锚 f705b082，.go=748，别名 WI98B9~1）。
+- 颜色脚本 logs/run-color.sh＋六发红名册：panel 整包改前 257/160/7/0 rc=1 ⇄ 改后 268/163/7/0 rc=1；
+  agent 整包 112/88/0/0 rc=0 ⇄ 114/90/0/0 rc=0；panel 定点 19/5/0/0、agent 定点 2/2/0/0、改前定点 8/2/0/0。
+- 红名册作差：logs/red-before.txt／red-after.txt（各 7 枚名字，diff rc=0）＋red-roster-and-ac3-extra.log。
+- 去牙两发：logs/mutate.sh＋mut-M1.log（抹分隔符 ⇒ child-1x 红）／mut-M2.log（第三臂改回今天形状 ⇒ 正控红），
+  两发 pristine 与还原同串 sha256=450e1d1c…／git hash-object=2da6c596…＝锚 f705b082 的 blob；
+  还原件 logs/subagent_roster_197.go.pristine-M1／-M2 留档（⛔ 删）。
+- 门禁四数 gates-328r1.log（gofumpt rc=0／d22scan rc=0 clean／长度门 rc=0 GREEN tracked 15035／go vet rc=0）；
+  AC#3 四面 ruler-ac3.sh＋ac3-four-faces.log（四枚提交 × 四面＝16 格逐格 diff_lines=0）；
+  交件侧零读数 rulers-end.sh＋end-rulers.log；起手三件 start-anchor.txt／start-status.txt（1179 行）
+  ／收尾 end-status.txt（1238 行）＋end-status-summary.txt。
+- 四枚中文提交正文 commit-msg-328r1-*.txt（正文先 Write 成文件再 git commit -F，⛔ 内联双引号）。
+
+本笔⛔ 产码 ⛔ 判语 ⛔ 翻框 ⛔ push。

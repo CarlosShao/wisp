@@ -1,0 +1,333 @@
+date=2026-10-17 14:45:38 +0800 root=D:/work/workspace/wisp-328r1-after-tree pkg=internal/agent pattern=ALL
+gofiles=748
+time=2026-10-17T14:45:40.882+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCompressFoldsOldestKeepsLastThreePreservesIDs
+time=2026-10-17T14:45:40.886+08:00 level=INFO msg="agent: history compressed" tokens_before=30090 tokens_after=6586 threshold=12000 msgs_before=45 msgs_after=10 compressed_msgs=36 kept_raw_rounds=3 history_changed=true
+--- PASS: TestCompressFoldsOldestKeepsLastThreePreservesIDs (0.00s)
+=== RUN   TestCompressPreservesIDsEvenWhenSummarizerDropsThem
+time=2026-10-17T14:45:40.887+08:00 level=INFO msg="agent: history compressed" tokens_before=30090 tokens_after=6108 threshold=12000 msgs_before=45 msgs_after=10 compressed_msgs=36 kept_raw_rounds=3 history_changed=true
+--- PASS: TestCompressPreservesIDsEvenWhenSummarizerDropsThem (0.00s)
+=== RUN   TestCompressTriggerScalesWithWindow
+time=2026-10-17T14:45:40.887+08:00 level=INFO msg="agent: history compressed" tokens_before=505 tokens_after=401 threshold=384 msgs_before=10 msgs_after=7 compressed_msgs=4 kept_raw_rounds=3 history_changed=true
+--- PASS: TestCompressTriggerScalesWithWindow (0.00s)
+=== RUN   TestCompressNoopUnderThreshold
+--- PASS: TestCompressNoopUnderThreshold (0.00s)
+=== RUN   TestCompressionTraceBooksCountsOnSuccess
+--- PASS: TestCompressionTraceBooksCountsOnSuccess (0.00s)
+=== RUN   TestCompressionTraceSilentWhenNothingFolded
+--- PASS: TestCompressionTraceSilentWhenNothingFolded (0.00s)
+=== RUN   TestCompressionTraceSurvivesTheLoopWiring
+--- PASS: TestCompressionTraceSurvivesTheLoopWiring (0.01s)
+=== RUN   TestCompressionTraceDoesNotAlterTheFold
+time=2026-10-17T14:45:40.898+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true
+--- PASS: TestCompressionTraceDoesNotAlterTheFold (0.00s)
+=== RUN   TestCompressionTraceSilentWhenNothingFoldableOverThreshold
+--- PASS: TestCompressionTraceSilentWhenNothingFoldableOverThreshold (0.00s)
+=== RUN   TestCompressionTraceCarriesTheOwningTaskID
+--- PASS: TestCompressionTraceCarriesTheOwningTaskID (0.00s)
+=== RUN   TestCompressionTraceNeverInventsATaskID
+--- PASS: TestCompressionTraceNeverInventsATaskID (0.00s)
+=== RUN   TestControlWordsNeverReachTheProvider
+--- PASS: TestControlWordsNeverReachTheProvider (0.01s)
+=== RUN   TestNearMissUtterancesGoToTheLoop
+--- PASS: TestNearMissUtterancesGoToTheLoop (0.01s)
+=== RUN   TestDefaultControlCancelsRunningTask
+--- PASS: TestDefaultControlCancelsRunningTask (0.01s)
+=== RUN   TestControlWithoutAConsumerIsVisible
+--- PASS: TestControlWithoutAConsumerIsVisible (0.00s)
+=== RUN   TestSteeringInsertsIntoNextRound
+--- PASS: TestSteeringInsertsIntoNextRound (0.41s)
+=== RUN   TestSteeringDisabled
+--- PASS: TestSteeringDisabled (0.00s)
+=== RUN   TestRecordSinkToleratesConcurrentPublishers
+--- PASS: TestRecordSinkToleratesConcurrentPublishers (0.00s)
+=== RUN   TestCorrPerCallTwoAsksSameTask242
+--- PASS: TestCorrPerCallTwoAsksSameTask242 (0.01s)
+=== RUN   TestACorrelationTheLoopActuallyMintedLightsItsRosterRow
+--- PASS: TestACorrelationTheLoopActuallyMintedLightsItsRosterRow (0.01s)
+=== RUN   TestTheLoopMintsTheShapesTheRosterAccepts
+--- PASS: TestTheLoopMintsTheShapesTheRosterAccepts (0.01s)
+=== RUN   TestDeclaredL0RunsWhenPassThroughIsOff179
+time=2026-10-17T14:45:41.382+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestDeclaredL0RunsWhenPassThroughIsOff1793188350895\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestDeclaredL0RunsWhenPassThroughIsOff179 (0.11s)
+=== RUN   TestUnclassifiedCallStillRefusedWhenPassThroughIsOff179
+time=2026-10-17T14:45:41.468+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestUnclassifiedCallStillRefusedWhenPassThroughIsOff179432527813\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestUnclassifiedCallStillRefusedWhenPassThroughIsOff179 (0.08s)
+=== RUN   TestDeclaredL1L2RoutingUnchanged179
+time=2026-10-17T14:45:41.545+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestDeclaredL1L2RoutingUnchanged1791857645883\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L1/no-approval-layer
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L1/with-approval-layer
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L2/no-approval-layer
+=== RUN   TestDeclaredL1L2RoutingUnchanged179/L2/with-approval-layer
+--- PASS: TestDeclaredL1L2RoutingUnchanged179 (0.07s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L1/no-approval-layer (0.01s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L1/with-approval-layer (0.00s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L2/no-approval-layer (0.00s)
+    --- PASS: TestDeclaredL1L2RoutingUnchanged179/L2/with-approval-layer (0.00s)
+=== RUN   TestFailedTaskBooksOpenCallRowWithDecision
+time=2026-10-17T14:45:41.616+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestFailedTaskBooksOpenCallRowWithDecision446620153\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestFailedTaskBooksOpenCallRowWithDecision (0.06s)
+=== RUN   TestCancelledTaskPersistsTerminalRows
+time=2026-10-17T14:45:41.680+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestCancelledTaskPersistsTerminalRows1701629818\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestCancelledTaskPersistsTerminalRows (0.08s)
+=== RUN   TestLoopGuardLadderRemindersThenStuck
+--- PASS: TestLoopGuardLadderRemindersThenStuck (0.01s)
+=== RUN   TestLoopGuardLadderIsConfigurable
+--- PASS: TestLoopGuardLadderIsConfigurable (0.00s)
+=== RUN   TestLoopGuardResetsOnDifferentCall
+--- PASS: TestLoopGuardResetsOnDifferentCall (0.00s)
+=== RUN   TestLoopGuardTokenBudgetScalesWithWindow
+--- PASS: TestLoopGuardTokenBudgetScalesWithWindow (0.00s)
+=== RUN   TestPerToolTimeoutFires
+time=2026-10-17T14:45:41.772+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestPerToolTimeoutFires499908659\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestPerToolTimeoutFires (0.12s)
+=== RUN   TestPerToolTimeoutOfContractHonestToolIsToolClass
+time=2026-10-17T14:45:41.891+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestPerToolTimeoutOfContractHonestToolIsToolClass3903570075\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestPerToolTimeoutOfContractHonestToolIsToolClass (0.12s)
+=== RUN   TestLoopGuardCanonicalizesEquivalentArgs
+--- PASS: TestLoopGuardCanonicalizesEquivalentArgs (0.00s)
+=== RUN   TestLoopGuardKeepsDistinctArgsDistinct
+--- PASS: TestLoopGuardKeepsDistinctArgsDistinct (0.00s)
+=== RUN   TestLoopGuardRepeatsNonJSONArgs
+--- PASS: TestLoopGuardRepeatsNonJSONArgs (0.00s)
+=== RUN   TestProjectInstructionsReachTheWireRequestBody
+--- PASS: TestProjectInstructionsReachTheWireRequestBody (0.01s)
+=== RUN   TestAssemblySplitsGuidanceFromUntrustedData
+--- PASS: TestAssemblySplitsGuidanceFromUntrustedData (0.00s)
+=== RUN   TestHostileInstructionFileMovesNoAuthorityKnob
+--- PASS: TestHostileInstructionFileMovesNoAuthorityKnob (0.01s)
+=== RUN   TestProjectInstructionsAreNotANewD39Section
+--- PASS: TestProjectInstructionsAreNotANewD39Section (0.00s)
+=== RUN   TestGoldenTextReply
+--- PASS: TestGoldenTextReply (0.00s)
+=== RUN   TestGoldenSingleToolCall
+--- PASS: TestGoldenSingleToolCall (0.01s)
+=== RUN   TestGoldenParallelToolCalls
+--- PASS: TestGoldenParallelToolCalls (0.00s)
+=== RUN   TestGoldenToolResultFeedsNextTurn
+--- PASS: TestGoldenToolResultFeedsNextTurn (0.00s)
+=== RUN   TestGoldenConcurrencyCeiling
+--- PASS: TestGoldenConcurrencyCeiling (0.12s)
+=== RUN   TestToolExecutionRunsFourAcross
+--- PASS: TestToolExecutionRunsFourAcross (0.01s)
+=== RUN   TestGoldenBudgetExhaustionStuck
+--- PASS: TestGoldenBudgetExhaustionStuck (0.00s)
+=== RUN   TestGoldenCancellationEndToEnd
+--- PASS: TestGoldenCancellationEndToEnd (0.00s)
+=== RUN   TestGoroutineBudgetDrains
+--- PASS: TestGoroutineBudgetDrains (0.00s)
+=== RUN   TestTaskLogAndToolCallRows
+time=2026-10-17T14:45:42.207+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestTaskLogAndToolCallRows3025462330\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T14:45:42.220+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestTaskLogAndToolCallRows3025462330\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T14:45:42.226+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T06:45:42Z duration_ms=6
+time=2026-10-17T14:45:42.232+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestTaskLogAndToolCallRows3025462330\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T14:45:42.236+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T06:45:42Z duration_ms=4
+time=2026-10-17T14:45:42.242+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestTaskLogAndToolCallRows3025462330\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T14:45:42.249+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T06:45:42Z duration_ms=6
+time=2026-10-17T14:45:42.251+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T14:45:42.255+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTaskLogAndToolCallRows (0.06s)
+=== RUN   TestGoldenProviderFailureIsVisible
+--- PASS: TestGoldenProviderFailureIsVisible (0.00s)
+=== RUN   TestCrowdedWorldStillOffersTheBrake330r2
+time=2026-10-17T14:45:42.277+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestCrowdedWorldStillOffersTheBrake330r21544554033\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T14:45:42.289+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestCrowdedWorldStillOffersTheBrake330r21544554033\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T14:45:42.297+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T06:45:42Z duration_ms=7
+time=2026-10-17T14:45:42.302+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestCrowdedWorldStillOffersTheBrake330r21544554033\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T14:45:42.307+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T06:45:42Z duration_ms=5
+time=2026-10-17T14:45:42.315+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestCrowdedWorldStillOffersTheBrake330r21544554033\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T14:45:42.321+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T06:45:42Z duration_ms=5
+time=2026-10-17T14:45:42.324+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T14:45:42.328+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestCrowdedWorldStillOffersTheBrake330r2 (0.07s)
+=== RUN   TestResidencyTierDecidesTheInjectionArm330r2
+--- PASS: TestResidencyTierDecidesTheInjectionArm330r2 (0.00s)
+=== RUN   TestPlanPresentCallBooksTheToolCallRow165r3
+time=2026-10-17T14:45:42.347+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestPlanPresentCallBooksTheToolCallRow165r33300477377\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T14:45:42.362+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestPlanPresentCallBooksTheToolCallRow165r33300477377\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T14:45:42.369+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T06:45:42Z duration_ms=7
+time=2026-10-17T14:45:42.376+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestPlanPresentCallBooksTheToolCallRow165r33300477377\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T14:45:42.382+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T06:45:42Z duration_ms=5
+time=2026-10-17T14:45:42.389+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestPlanPresentCallBooksTheToolCallRow165r33300477377\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T14:45:42.395+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T06:45:42Z duration_ms=5
+time=2026-10-17T14:45:42.398+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T14:45:42.400+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestPlanPresentCallBooksTheToolCallRow165r3 (0.07s)
+=== RUN   TestCachePrefixIsByteStableAcrossTurns
+--- PASS: TestCachePrefixIsByteStableAcrossTurns (0.00s)
+=== RUN   TestPromptSectionCanonicalOrder
+--- PASS: TestPromptSectionCanonicalOrder (0.00s)
+=== RUN   TestVolatileSuffixPutsSceneLast
+--- PASS: TestVolatileSuffixPutsSceneLast (0.00s)
+=== RUN   TestD39SectionBudgetsAndTotalCeiling
+--- PASS: TestD39SectionBudgetsAndTotalCeiling (0.00s)
+=== RUN   TestEnforceTotalTerminatesAtEveryWindow
+--- PASS: TestEnforceTotalTerminatesAtEveryWindow (0.00s)
+=== RUN   TestEnforceTotalTerminatesOnABelowBudgetSection
+--- PASS: TestEnforceTotalTerminatesOnABelowBudgetSection (0.00s)
+=== RUN   TestAC3SpillArtifactLandsPrivate
+time=2026-10-17T14:45:42.416+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestAC3SpillArtifactLandsPrivate1247644317\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    spill_acl_windows_test.go:29: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:30: icacls artifacts -> [NT AUTHORITY\SYSTEM NT AUTHORITY\SYSTEM BUILTIN\Administrators BUILTIN\Administrators DESKTOP-LVS7839\swq DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:37: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+--- PASS: TestAC3SpillArtifactLandsPrivate (0.26s)
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_pq
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/p_backslash_vs_pq
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%5Cq.txt:p\q tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_p_backslash
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-p%5Cq.txt:p\q]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/the_whole_report_triple
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-p%5Cq.txt:p\q tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/dot_and_dotdot_vs_empty
+    spill_name_injectivity_test.go:90: names: map[tool-output-%2E%2E.txt:.. tool-output-%2E.txt:. tool-output-seq.1.txt:]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/colon_and_unc_shape
+    spill_name_injectivity_test.go:90: names: map[tool-output-%5C%5Ca%5Cb.txt:\\a\b tool-output-a%3Ab.txt:a:b]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/underscore_dash_and_percent
+    spill_name_injectivity_test.go:90: names: map[tool-output-a%25b.txt:a%b tool-output-a-b.txt:a-b tool-output-a_b.txt:a_b]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/case_folding
+    spill_name_injectivity_test.go:90: names: map[tool-output-%50%51.txt:PQ tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/digits_vs_letters
+    spill_name_injectivity_test.go:90: names: map[tool-output-0o.txt:0o tool-output-o0.txt:o0]
+--- PASS: TestArtifactNameDoesNotFoldDistinctIDs (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_pq (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/p_backslash_vs_pq (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_p_backslash (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/the_whole_report_triple (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/dot_and_dotdot_vs_empty (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/colon_and_unc_shape (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/underscore_dash_and_percent (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/case_folding (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/digits_vs_letters (0.00s)
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide/slash_id_then_bare_id
+time=2026-10-17T14:45:42.679+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpilledBytesSurviveANameThatUsedToCollide1152889788\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide/bare_id_then_backslash_id
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide/dotdot_id_then_word_id
+--- PASS: TestSpilledBytesSurviveANameThatUsedToCollide (0.03s)
+    --- PASS: TestSpilledBytesSurviveANameThatUsedToCollide/slash_id_then_bare_id (0.01s)
+    --- PASS: TestSpilledBytesSurviveANameThatUsedToCollide/bare_id_then_backslash_id (0.01s)
+    --- PASS: TestSpilledBytesSurviveANameThatUsedToCollide/dotdot_id_then_word_id (0.01s)
+=== RUN   TestArtifactNameRoundTripsToTheExactID
+--- PASS: TestArtifactNameRoundTripsToTheExactID (0.00s)
+=== RUN   TestArtifactNameIsCanonicalAndBounded
+--- PASS: TestArtifactNameIsCanonicalAndBounded (0.00s)
+=== RUN   TestWriteFileExclusiveIsExclusive
+time=2026-10-17T14:45:42.708+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestWriteFileExclusiveIsExclusive408643016\001\artifact.txt kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestWriteFileExclusiveIsExclusive (0.00s)
+=== RUN   TestSpillSameIDRetryOverwrites
+time=2026-10-17T14:45:42.712+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillSameIDRetryOverwrites3482089659\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillSameIDRetryOverwrites (0.01s)
+=== RUN   TestSpillAcrossRestartsKeepsRetrySemantics
+time=2026-10-17T14:45:42.723+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillAcrossRestartsKeepsRetrySemantics3674035151\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillAcrossRestartsKeepsRetrySemantics (0.01s)
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/separator
+time=2026-10-17T14:45:42.734+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillCallIDHostileShapesSanitizedToBareNames1003184383\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/dotdot
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/drive_letter
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/unc
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/encoded_shapes_stay_bare_and_empty_id_falls_back_to_sequence
+time=2026-10-17T14:45:42.765+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillCallIDHostileShapesSanitizedToBareNames1003184383\001\fallback kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames (0.07s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/separator (0.01s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/dotdot (0.01s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/drive_letter (0.01s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/unc (0.01s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/encoded_shapes_stay_bare_and_empty_id_falls_back_to_sequence (0.03s)
+=== RUN   TestSpillContainmentByDirectoryListing
+time=2026-10-17T14:45:42.802+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillContainmentByDirectoryListing2915018493\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    spill_path_invariant_test.go:284: control: escape id "..\\..\\..\\..\\CONTROL-escape" resolves to "D:\\tmp\\328r1-gotmp\\TestSpillContainmentByDirectoryListing2915018493\\001\\CONTROL-escape.txt" (root is "D:\\tmp\\328r1-gotmp\\TestSpillContainmentByDirectoryListing2915018493\\001")
+    spill_path_invariant_test.go:307: literal-backslash control: id "..\\..\\..\\..\\CONTROL-literal" resolves to "D:\\tmp\\328r1-gotmp\\TestSpillContainmentByDirectoryListing2915018493\\001\\CONTROL-literal.txt"
+--- PASS: TestSpillContainmentByDirectoryListing (0.06s)
+=== RUN   TestSpillIntoRealStoreThenDeleteStaysUnderDataDir
+time=2026-10-17T14:45:42.858+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillIntoRealStoreThenDeleteStaysUnderDataDir2973976532\001\data kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillIntoRealStoreThenDeleteStaysUnderDataDir (0.10s)
+=== RUN   TestSpillAPITakesNoCallerControlledDestinationPath
+    spill_path_invariant_test.go:545: audited 3 filesystem-mutating call(s) in spill.go
+--- PASS: TestSpillAPITakesNoCallerControlledDestinationPath (0.00s)
+=== RUN   TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r4
+time=2026-10-17T14:45:42.956+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r41457998562\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    spill_pointer_authority_ac3_174r4_test.go:87: arm 1 verbatim: Text="[…输出已落文件：省略 65221 字符，总长 68021 字节 / 约 17005 token，全文见 D:\\tmp\\328r1-gotmp\\TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r41457998562\\001\\tool-output-call_honesty.txt…]"
+time=2026-10-17T14:45:42.962+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r41457998562\002 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    spill_pointer_authority_ac3_174r4_test.go:110: arm 2 verbatim: Text="[…输出已落文件：省略 65221 字符，总长 68021 字节 / 约 17005 token；注意：这条路径现在读不到，它不在你被授权的目录范围内：fs.read 会要一张 L2 卡，没人批就是直接拒；回来的路有两条——要么用户把所属目录加进 [fs] allowed_dirs，要么批下那一张卡，全文见 D:\\tmp\\328r1-gotmp\\TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r41457998562\\002\\tool-output-call_honesty.txt…]"
+--- PASS: TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r4 (0.01s)
+=== RUN   TestSpillPointerUnwiredJudgeFailsClosed174
+time=2026-10-17T14:45:42.971+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillPointerUnwiredJudgeFailsClosed174166676667\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillPointerUnwiredJudgeFailsClosed174 (0.01s)
+=== RUN   TestSpillPointerOutsideAllowlistNamesBothRoadsBack174
+time=2026-10-17T14:45:42.980+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillPointerOutsideAllowlistNamesBothRoadsBack1742420296643\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillPointerOutsideAllowlistNamesBothRoadsBack174 (0.01s)
+=== RUN   TestSpillPointerCanonicalizeFailureQuotesNoUpstreamText174
+time=2026-10-17T14:45:42.986+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillPointerCanonicalizeFailureQuotesNoUpstreamText1741589530443\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillPointerCanonicalizeFailureQuotesNoUpstreamText174 (0.01s)
+=== RUN   TestSpillHealthyPointerStillMatchesThePreFixSentence174
+time=2026-10-17T14:45:42.993+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillHealthyPointerStillMatchesThePreFixSentence1741084294717\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillHealthyPointerStillMatchesThePreFixSentence174 (0.01s)
+=== RUN   TestSpillPointerNoticeAddsNoSecondPath174
+=== RUN   TestSpillPointerNoticeAddsNoSecondPath174/canonErr
+time=2026-10-17T14:45:42.998+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillPointerNoticeAddsNoSecondPath174canonErr923459870\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+=== RUN   TestSpillPointerNoticeAddsNoSecondPath174/unwired
+time=2026-10-17T14:45:43.003+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillPointerNoticeAddsNoSecondPath174unwired3207009163\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+=== RUN   TestSpillPointerNoticeAddsNoSecondPath174/outRoot
+time=2026-10-17T14:45:43.008+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillPointerNoticeAddsNoSecondPath174outRoot315402080\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillPointerNoticeAddsNoSecondPath174 (0.02s)
+    --- PASS: TestSpillPointerNoticeAddsNoSecondPath174/canonErr (0.00s)
+    --- PASS: TestSpillPointerNoticeAddsNoSecondPath174/unwired (0.01s)
+    --- PASS: TestSpillPointerNoticeAddsNoSecondPath174/outRoot (0.00s)
+=== RUN   TestSpillPointerNoticeKeepsHeadTailAndBudget174
+time=2026-10-17T14:45:43.013+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillPointerNoticeKeepsHeadTailAndBudget1743689695582\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T14:45:43.016+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillPointerNoticeKeepsHeadTailAndBudget1743689695582\002 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillPointerNoticeKeepsHeadTailAndBudget174 (0.01s)
+=== RUN   TestLoopSpillNoticeReachesHistoryUnwired174
+time=2026-10-17T14:45:43.025+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestLoopSpillNoticeReachesHistoryUnwired1742767280313\001\artifacts kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestLoopSpillNoticeReachesHistoryUnwired174 (0.01s)
+=== RUN   TestLoopHonorsConfigPointerJudgeQuietly174
+time=2026-10-17T14:45:43.042+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestLoopHonorsConfigPointerJudgeQuietly174135776828\001\artifacts kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestLoopHonorsConfigPointerJudgeQuietly174 (0.01s)
+=== RUN   TestSpillThresholdScalesWithWindow
+time=2026-10-17T14:45:43.054+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillThresholdScalesWithWindow902078090\002 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillThresholdScalesWithWindow (0.01s)
+=== RUN   TestSpillTokenBoundary
+time=2026-10-17T14:45:43.063+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillTokenBoundary182507474\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillTokenBoundary (0.01s)
+=== RUN   TestSpillArtifactAndStubShape
+time=2026-10-17T14:45:43.068+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillArtifactAndStubShape3379112795\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillArtifactAndStubShape (0.00s)
+=== RUN   TestSpillRawHardCap
+--- PASS: TestSpillRawHardCap (0.00s)
+=== RUN   TestSpillThroughLoop
+time=2026-10-17T14:45:43.080+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillThroughLoop3209553306\002\artifacts kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillThroughLoop (0.01s)
+=== RUN   TestSpillArtifactRespectsRawCap
+time=2026-10-17T14:45:43.088+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestSpillArtifactRespectsRawCap1963482755\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSpillArtifactRespectsRawCap (0.01s)
+=== RUN   Test285CallCorrIsDistinctPerCall
+--- PASS: Test285CallCorrIsDistinctPerCall (0.00s)
+=== RUN   Test285LoopDispatchesOneCorrPerCall
+--- PASS: Test285LoopDispatchesOneCorrPerCall (0.00s)
+=== RUN   TestMaxTokensFailsAllToolCallsOfThatMessage
+time=2026-10-17T14:45:43.097+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\328r1-gotmp\TestMaxTokensFailsAllToolCallsOfThatMessage2467305017\001 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-17T14:45:43.116+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestMaxTokensFailsAllToolCallsOfThatMessage2467305017\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-17T14:45:43.123+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-17T06:45:43Z duration_ms=6
+time=2026-10-17T14:45:43.129+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestMaxTokensFailsAllToolCallsOfThatMessage2467305017\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-17T14:45:43.135+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-17T06:45:43Z duration_ms=5
+time=2026-10-17T14:45:43.141+08:00 level=INFO msg="pre-migration backup written" component=memory backup=D:\tmp\328r1-gotmp\TestMaxTokensFailsAllToolCallsOfThatMessage2467305017\001\backup\wisp.db.bak-2-3 from=2 to=3
+time=2026-10-17T14:45:43.147+08:00 level=INFO msg="schema migration step applied" component=memory from=2 to=3 started_at=2026-10-17T06:45:43Z duration_ms=5
+time=2026-10-17T14:45:43.150+08:00 level=INFO msg="schema migration complete" component=memory schema_version=3
+time=2026-10-17T14:45:43.153+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestMaxTokensFailsAllToolCallsOfThatMessage (0.09s)
+=== RUN   TestOpenToolCallAfterFailureIsFailed
+--- PASS: TestOpenToolCallAfterFailureIsFailed (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	2.368s
+go_test_rc=0
+RUN=114
+PASS_TOP=90
+FAIL_TOP=0
+SKIP=0
+--- red roster ---
+NO_TOP_FAIL
+--- package verdict lines ---
+ok  	github.com/CarlosShao/wisp/internal/agent	2.368s

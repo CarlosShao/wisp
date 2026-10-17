@@ -1,0 +1,25 @@
+date=2026-10-17 15:09:18 +0800
+== 红名册作差（改前 ⇄ 改后，整包 ./internal/panel） ==
+before_names=7 after_names=7
+redroster_diff_rc=0
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestC21DesignTokensFourWayAgree
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestComposerRenderFixtureTellsTheTruth
+--- FAIL: TestReadGitOnThisRepositoryIsSelfConsistent
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+
+== agent 两侧红名册 ==
+-- before-agent-full: 0
+-- after-agent-full: 0
+
+== AC#3 补尺：ApprovalCardView 字段名册没多任务号（量的） ==
+cmd: git grep -c 'TaskID' f705b082 -- internal/panel/approval.go
+0 命中（grep -c 无匹配 ⇒ rc=1，此处 || true）
+正控（同文件同尺族）: git grep -c 'CorrelationID' f705b082 -- internal/panel/approval.go
+f705b082:internal/panel/approval.go:3
+
+== 票 328 Status 那枚字节是谁入库的（归属） ==
+ed6fa14e 三枚票面 Status 行归位（编排者只动 Status／不动判据正文）：328＝328-r1 在飞（丙-带边界，存档 648ed
+8cbaf43e 裁票 328 落点＝丙-带边界（撤销口令「328 改裁甲」／「328 改裁乙」）＋翻 AC#0/AC#1 两枚框：甲撞 C17

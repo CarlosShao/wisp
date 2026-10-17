@@ -1,0 +1,8 @@
+date=2026-10-17 14:32:30 +0800 anchor=f705b082 root=D:/work/workspace/wisp-328r1-after-tree
+anchor_full=f705b082f452754af477dff096e7000e590c5d82 Sat Oct 17 14:12:45 2026 +0800 328-r1 仪器③（AC#2 正控＝经真铸造点）：关联号从真 loop 派发出来读，⛔ 测试里硬写形状
+go_files=748
+docs_plan=present
+dlls_build=3 dlls_sherpa=3 dist=present
+roster_blob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb
+alias83=2026/10/17  14:32    <DIR>          WI98B9~1     wisp-328r1-after-tree
+build_tree_rc=0

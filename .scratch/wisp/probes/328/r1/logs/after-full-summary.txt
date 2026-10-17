@@ -1,0 +1,26 @@
+=== AFTER panel full ===
+--- red roster ---
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (1.53s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.64s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.01s)
+--- FAIL: TestComposerRenderFixtureTellsTheTruth (0.00s)
+--- FAIL: TestReadGitOnThisRepositoryIsSelfConsistent (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+--- package verdict lines ---
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	10.132s
+FAIL
+=== AFTER agent full ===
+--- PASS: TestOpenToolCallAfterFailureIsFailed (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	2.368s
+go_test_rc=0
+RUN=114
+PASS_TOP=90
+FAIL_TOP=0
+SKIP=0
+--- red roster ---
+NO_TOP_FAIL
+--- package verdict lines ---
+ok  	github.com/CarlosShao/wisp/internal/agent	2.368s
