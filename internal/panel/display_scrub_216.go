@@ -87,9 +87,9 @@ import (
 //	\n \r \t          -> the two-character mnemonic Go itself prints
 //	other C0 and C1    -> \xNN, lowercase hex, the same spelling Go uses
 //	invalid UTF-8 byte -> \xNN of the raw byte, never U+FFFD
-//	format rune above U+00FF (the ticket 327 Cf roster) -> \uXXXX, lowercase hex
+//	format rune above U+00FF (any member of the Cf category) -> \uXXXX, lowercase hex
 //
-// The last shape is the one the invisible roster lands in: U+202E prints as
+// The last shape is the one every invisible Cf-category rune lands in: U+202E prints as
 // `\u202e`, U+00AD soft hyphen - which is below U+00FF - prints as `\xad`. Both
 // spellings are the vocabulary writeControlEscape already had; ticket 327 widened
 // WHICH runes enter that vocabulary, not how the vocabulary spells them, so the
@@ -190,7 +190,7 @@ func writeControlEscape(b *strings.Builder, r rune) {
 
 // needsDisplayWash reports whether scrubForDisplay would change s. It is the same
 // character set as the writer, read once: unicode.IsControl (C0 U+0000-U+001F and
-// C1 U+007F-U+009F), the invisible formatting roster in isDisplayWashCf, plus any
+// C1 U+007F-U+009F), the invisible formatting category read by isDisplayWashCf, plus any
 // byte that is not a valid UTF-8 sequence.
 //
 // AC#2 of ticket 327 is the reason the roster lives in ONE function that both
