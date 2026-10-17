@@ -1,0 +1,9 @@
+331-v1 self-check ruler, spelled out here so the verdict file can stay free of the tokens it scans for.
+target: docs/evidence/s1/331-v1-verdict.md
+lines=160  bytes=12147
+--- strict (split tokens, shell-evaluated so this log holds no live token either) ---
+strict_rc=1 (1 = 0 命中)
+--- angle-bracket token form ---
+angle_rc=1 (1 = 0 命中)
+--- emoji-band ruler (AGENTS 1.2 instrument bands, docs not in d22scan scope but checked anyway) ---
+|hits (empty = 0 命中)
