@@ -1,0 +1,7 @@
+cmd: go run main.go (仓外纯 stdlib 探针②，⛔ import 本仓包; dir=D:\tmp\328a1\formprobe; date 2026-10-17T11:29:47+08:00)
+ticket 328 AC#1 form 乙 example task#<seq>#<callID>   corr=e2bbeaab-2b94-4a9e-ac59-ec13ce118077#0#call_e1 strip ok=false base==T? false lights row? false
+form 乙 variant callID last T#<callID>#<seq>          corr=e2bbeaab-2b94-4a9e-ac59-ec13ce118077#call_e1#0 strip ok=true  base==T? false lights row? false
+form 乙 usable shape T#<per-call digits>              corr=e2bbeaab-2b94-4a9e-ac59-ec13ce118077#3         strip ok=true  base==T? true  lights row? true
+form 乙 seq shared with queue q.seq namespace         corr=e2bbeaab-2b94-4a9e-ac59-ec13ce118077#7         strip ok=true  base==T? true  lights row? true
+queue clash rewrite of a form-乙 corr                 corr=e2bbeaab-2b94-4a9e-ac59-ec13ce118077#3#7       strip ok=true  base==T? false lights row? false
+rc=0

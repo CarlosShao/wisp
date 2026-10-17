@@ -1,0 +1,77 @@
+=== 328-a1 起手四把尺＋AC#0 尺（射程＝git show 7535d83b:<路径>，⛔ 工作树在飞字节；时刻 2026-10-17T11:27:58+08:00）
+--- 尺1 票 328 未勾框数（工作树文件）
+UNCHECKED=5
+31:- [ ] **AC#0 现量普查（⛔ 没�
+32:- [ ] **AC#1 选一形并写清代价
+33:- [ ] **AC#2 ★正控必须有**：�
+34:- [ ] **AC#3 判定与批准语义不
+35:- [ ] **AC#4 门禁四数＋颜色**�
+--- 尺2 卡片只带关联号：ApprovalCardView 结构头＋首字段（git show 7535d83b:internal/panel/approval.go）
+39:type ApprovalCardView struct {
+	CorrelationID string   `json:"correlationId"`
+--- 尺3 grep -n TaskID approval.go（应 0 命中；正控＝CorrelationID）
+TaskID_HITS=0
+28:	CorrelationID string
+40:	CorrelationID string   `json:"correlationId"`
+78:		CorrelationID:          subject.CorrelationID,
+--- 尺4 名册两枚索引不对称（subagent_roster_197.go:212-221）
+212		waiting := make(map[string]bool, len(pending)+2*len(l1Windows))
+213		for _, card := range pending {
+214			indexWaitingKey(waiting, card.CorrelationID)
+215		}
+216		for _, w := range l1Windows {
+217			// Both halves of one window: an L1 window is keyed by its correlation, and
+218			// the row it blocks is named by its task.
+219			indexWaitingKey(waiting, w.CorrelationID)
+220			indexWaitingKey(waiting, w.TaskID)
+221		}
+--- 尺5 那把认号的尺（:262-288）
+277	func splitClashSuffix(id string) (base string, ok bool) {
+278		i := strings.LastIndexByte(id, '#')
+279		if i <= 0 || i == len(id)-1 {
+280			return "", false
+281		}
+282		for _, r := range id[i+1:] {
+283			if r < '0' || r > '9' {
+284				return "", false
+285			}
+286		}
+287		return id[:i], true
+288	}
+--- 尺6 callCorr 两支＋唯一生产调用点
+603	func callCorr(taskID, callID string, index int) string {
+604		if callID == "" {
+605			return fmt.Sprintf("%s#call-%d", taskID, index)
+606		}
+607		return taskID + "#" + callID
+608	}
+676				TaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i),
+--- 尺7 callCorr 全仓命中枚数（7535d83b，射程 internal cmd）
+9
+命中行：
+4
+--- 尺8 CorrelationID: 硬写值里有没有撞名形（射程 internal cmd）
+LITERAL_ASSIGN_HITS=62
+CLASH_FORM_IN_LITERAL_ASSIGN=0
+正控（同尺族在 card197 那一族命中）：
+7
+--- 尺9 唯一生产 ToolRequest 构造点
+:internal/agent/loop.go:675:		req := ToolRequest{
+:internal/tools/bridge.go:890:// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+--- 尺10 lastPanelSnapshot 生产读者（票 329 那一跳）
+PROD_READERS=5
+--- 尺11 frontend 里 blockedOnApproval／tasks 读者
+FRONTEND_BLOCKED_HITS=0
+--- 尺10 更正（逐枚点名，⛔ 只用计数）
+:cmd/wisp/panel_pump.go:422:// lastPanelSnapshot returns the most recent packet this run built and the bytes
+:cmd/wisp/panel_pump.go:429:func (rt *agentRuntime) lastPanelSnapshot() (panel.Snapshot, []byte, bool) {
+:cmd/wisp/panel_snapshot_deliver_329.go:9:// that retention: lastPanelSnapshot had zero non-test callers, so the bytes stopped
+:cmd/wisp/panel_snapshot_deliver_329.go:83:// lastPanelSnapshot: read the bytes this run just booked, and hand them to the
+:cmd/wisp/panel_snapshot_deliver_329.go:95:	_, data, seen := rt.lastPanelSnapshot()
+⇒ 非 _test 行＝上面这些：定义 panel_pump.go:429 ＋注释 :422；调用者全在 _test.go 内 ⇒ 生产读者＝0 枚
+--- 尺11 正控（同尺族在 frontend 命中 correlationId）
+:frontend/src/App.tsx:4
+:frontend/src/components/approval-screen.tsx:2
+:frontend/src/components/l2-approval-card.tsx:3
+:frontend/src/components/result-stream.tsx:1
+blockedOnApproval 在 frontend 命中文件数＝0

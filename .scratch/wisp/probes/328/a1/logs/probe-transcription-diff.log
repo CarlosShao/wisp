@@ -1,0 +1,10 @@
+尺＝diff -B <(探针 BEGIN/END 之间那段) <(git show 7535d83b:<文件> | sed -n '<范围>p')；-B 忽略的只有标记块尾那一枚空行（第一次不带 -B 的差异全在这枚空行上，见本件下方原始输出）
+
+### callCorr vs 7535d83b:internal/agent/loop.go (603,608p)
+FIDELITY callCorr: IDENTICAL(-B) rc=0
+### newTaskID vs 7535d83b:internal/agent/loop.go (1157,1170p)
+FIDELITY newTaskID: IDENTICAL(-B) rc=0
+### indexWaitingKey vs 7535d83b:internal/panel/subagent_roster_197.go (262,270p)
+FIDELITY indexWaitingKey: IDENTICAL(-B) rc=0
+### splitClashSuffix vs 7535d83b:internal/panel/subagent_roster_197.go (277,288p)
+FIDELITY splitClashSuffix: IDENTICAL(-B) rc=0
