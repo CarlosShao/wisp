@@ -131,3 +131,19 @@ SCREEN total_outside=155 scrub_leaves_raw=155 unicode_is_space=0 taint_ignores=0
 - ⛔ push；`git add` 与 `git commit` 两处逐枚显式 pathspec（⛔ `add -A`／⛔ `-- .`／⛔ amend／⛔ reset／⛔ stash／⛔ checkout ．／⛔ clean）。
 - 活实例 `wisp.exe` **PID 21892 完好未动**（交件时点现量＝`tasklist /FI "PID eq 21892"` 命中该行，Mem 65,376 K）。
 - ⛔ 结论／建议／"建议纳入名单"那一类判语：本件通篇只有读数与尺；155 枚的三形载体齐平这一事实**不**被本腿写成任何"该扩／不该扩"。
+
+## 七、补尺记录（交件后本腿自己复跑时抓到的两处，追加不删）
+
+1. **§一 那把"越格写面"尺的射程有一处自触，已改正。** 原尺＝`git log --format='%h' 7535d83b..HEAD -- <四处写面>`，
+   其中"票 332 文件"那一枚路径**是编排者的 `ba4fe25dd`（立票＋派单存档）创建的** ⇒ 该笔被扫进名册，
+   连带列出 `.scratch/wisp/probes/orch/20261017/txt/*` 13 枚**编排者的字节**（不是本腿写的）。
+   ★改正尺＝`git log --format='%h|%s' ba4fe25dd..HEAD | grep '|332-a1'`（按主题前缀只取本腿自己的提交），
+   现量＝**20 笔提交 / 18 枚唯一路径**，逐枚 `git show --name-only` 的路径全集落在
+   `.scratch/wisp/probes/332/a1/**`（16 枚）＋`.scratch/wisp/issues/332-…md`（1 枚）＋`docs/evidence/s1/332-a1-cf-reachability.md`（1 枚），
+   **越格命中 0**；`logs/commits-roster.log` 已按改正尺重打并入库。
+2. **§二 那把分词形尺在"本件自己"身上自触两处，如实报。** 尺对两枚 census 件＝**0 命中**（`rc=1`，已逐字记在 §二）；
+   对本件复跑时命中 2 行＝`:22` 与 `:31`，两处都是**这句尺自己的名字与它引用的模式串**（"占位符尺"这个词、
+   以及 §二 里逐字写着的 `TODO|TBD|FIXME|…` 模式），⛔ 任何一处是未填的空槽。
+   本腿不为此改 §二 的措辞（改了那把尺就不再可逐字复跑）；把这两行留在这里当该尺的射程说明。
+3. 终量复核（量的）：`census-1` 79 行／9136 字节，`census-2` 137 行／15586 字节，本件 145 行（含本节），
+   `find .scratch/wisp/probes/332/a1 -type f -size 0`＝**0 枚**（无空件）。
