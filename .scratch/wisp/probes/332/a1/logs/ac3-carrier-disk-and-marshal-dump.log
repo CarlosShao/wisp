@@ -1,0 +1,26 @@
+DISK cp=U+2061 name="photo\u2061report.txt" created=true readdir_hit=1 raw_utf8_hex=70686F746FE281A17265706F72742E747874 name_sha256=489854e3f23f15a2a68e588572ea1e97c15c8e9d25fe26d1eac550294b59bb51
+DISK cp=U+206B name="photo\u206breport.txt" created=true readdir_hit=1 raw_utf8_hex=70686F746FE281AB7265706F72742E747874 name_sha256=ceeeb9cbc756b58a64d8abea280b73d176d320c3ec12aa3b996f98f4d667eef4
+DISK cp=U+202E name="photo\u202ereport.txt" created=true readdir_hit=1 raw_utf8_hex=70686F746FE280AE7265706F72742E747874 name_sha256=d2a6e06eca3739d7fc37f1ac28d81e732cb56915f2ef29037ae94e724f95ece6
+DISK_WRITE_FAIL cp=U+001B err=open D:\tmp\332a1\disk\photoreport.txt: The filename, directory name, or volume label syntax is incorrect.
+DISK_ROSTER_COUNT=3
+BOUNDARY cp=U+2061 needsDisplayWash=false washed_changed=false washed="photo\u2061report.txt"
+  MARSHAL_RAW    hex=2270686F746FE281A17265706F72742E74787422
+  MARSHAL_WASHED hex=2270686F746FE281A17265706F72742E74787422
+  MARSHAL_WASHED_STR "photo⁡report.txt"
+  MARSHAL_WASHED_SHA256 da1e771280e63fd92d26d37464bfc6cfd6611f8f8e7dab4dda7a6767b3af889b
+BOUNDARY cp=U+206B needsDisplayWash=false washed_changed=false washed="photo\u206breport.txt"
+  MARSHAL_RAW    hex=2270686F746FE281AB7265706F72742E74787422
+  MARSHAL_WASHED hex=2270686F746FE281AB7265706F72742E74787422
+  MARSHAL_WASHED_STR "photo⁫report.txt"
+  MARSHAL_WASHED_SHA256 bb7a8ae1915fe249edc6b8b6165788e4b7140337f38f038966f90a352ffdd4db
+BOUNDARY cp=U+202E needsDisplayWash=true washed_changed=true washed="photo\\u202ereport.txt"
+  MARSHAL_RAW    hex=2270686F746FE280AE7265706F72742E74787422
+  MARSHAL_WASHED hex=2270686F746F5C5C75323032657265706F72742E74787422
+  MARSHAL_WASHED_STR "photo\\u202ereport.txt"
+  MARSHAL_WASHED_SHA256 158adf0dba164bed530679ebffe7ea4ad0555e568497c7edf31b5f8d29c29bb5
+BOUNDARY cp=U+001B needsDisplayWash=true washed_changed=true washed="photo\\x1breport.txt"
+  MARSHAL_RAW    hex=2270686F746F5C75303031627265706F72742E74787422
+  MARSHAL_WASHED hex=2270686F746F5C5C7831627265706F72742E74787422
+  MARSHAL_WASHED_STR "photo\\x1breport.txt"
+  MARSHAL_WASHED_SHA256 59fc78ba9ca0b01d1469a9bc56da3bf099d3a8c0e075db1ade5b80589c813661
+SCREEN total_outside=155 scrub_leaves_raw=155 unicode_is_space=0 taint_ignores=0 unicode_is_control=0 json_escapes=0 json_escape_examples=
