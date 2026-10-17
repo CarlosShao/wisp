@@ -1,0 +1,15 @@
+### MUTATION 1 (de-fang, empty payload): deliver_329.go push -> panelSnapshotEvalJS(nil)
+### time: 2026-10-17 10:26:24 +0800
+### mutated file: /d/W329VB/cmd/wisp/panel_snapshot_deliver_329.go   marker count after mutation = 1
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+cmd\wisp\panel_snapshot_deliver_329.go:95:5: declared and not used: data
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL
+RC=1
+FAIL_NAMES:
+(none)
+RED_LEAD_LINES:
+RESTORE deliver329=e7a11ceb04039e07eeef961542d21ecf31bf369279ebed3e2cae14c6ac39d3e9  match_pristine=YES
+RESTORE pump=72889100892790483503604a8fc4e43daa381a04f7df11eddde3c4a9c9ba6491  match_pristine=YES
+MUTANT_MARKER_LEFTOVER=/d/W329VB/cmd/wisp/panel_snapshot_deliver_329.go:0 /d/W329VB/internal/panel/pump.go:0 
+

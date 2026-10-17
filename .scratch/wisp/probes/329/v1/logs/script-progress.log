@@ -1,0 +1,11 @@
+grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/329/v1/logs/roster-named-before-feab45e3.log’ is also the output
+grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/329/v1/logs/roster-named-before-feab45e3.log’ is also the output
+grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/329/v1/logs/roster-named-after-1d1261e0.log’ is also the output
+grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/329/v1/logs/roster-named-after-1d1261e0.log’ is also the output
+grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/329/v1/logs/mutation-v1-defang-empty.log’ is also the output
+grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/329/v1/logs/mutation-v1-defang-lastbyte.log’ is also the output
+grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/329/v1/logs/mutation-v2-counter-marshal.log’ is also the output
+grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/329/v1/logs/mutation-v3-reader-removal.log’ is also the output
+grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/329/v1/logs/targeted-green-after-all-mutations.log’ is also the output
+grep: input file ‘/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/329/v1/logs/targeted-green-after-all-mutations.log’ is also the output
+SCRIPT_RC=0
