@@ -184,6 +184,15 @@ type TaskRosterSection struct {
 // was on the queue. A host that pairs cards with a correlation of its own, with no
 // task id in it, still shows those rows as not blocked; that remains a statement
 // about the pairing, not a guess to paper over.
+//
+// Ticket 328 closed the family this render used to miss: the correlation the loop
+// actually mints is "<taskID>#<callID>" (loop.go:603, its only call site :676),
+// which carries a task id but is never equal to one, so no row lit while a card
+// for that very task was pending. indexWaitingKey now also files the rostered task
+// id a correlation is built on, and only that one - the '#' after the id is part
+// of the match, so "child-1x" stays a different task rather than a rewrite of
+// "child-1". Nothing about the verdict, the level, or who may answer changed: this
+// is the pairing hop, and it stays a read.
 func TaskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView) *TaskRosterSection {
 	return taskRosterSectionFrom(state, pending, nil)
 }
@@ -209,15 +218,22 @@ func taskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView, l1
 		// without a nil check that a renderer will skip.
 		sect.DroppedStreamKeys = []string{}
 	}
+	// Ticket 328's ruled boundary (丙-带边界): the join below can only file a
+	// correlation's task half when that half is byte-for-byte one of THIS
+	// render's own rows. Building the set from state.Rows is what keeps the
+	// widened match honest - an id nobody filed a row under stays inert, and the
+	// delimiter requirement (a '#' right after the task id) is what keeps a
+	// host's own "<task>suffix" naming from being read as a second task.
+	known := rosteredTaskIDs(state)
 	waiting := make(map[string]bool, len(pending)+2*len(l1Windows))
 	for _, card := range pending {
-		indexWaitingKey(waiting, card.CorrelationID)
+		indexWaitingKey(waiting, known, card.CorrelationID)
 	}
 	for _, w := range l1Windows {
 		// Both halves of one window: an L1 window is keyed by its correlation, and
 		// the row it blocks is named by its task.
-		indexWaitingKey(waiting, w.CorrelationID)
-		indexWaitingKey(waiting, w.TaskID)
+		indexWaitingKey(waiting, known, w.CorrelationID)
+		indexWaitingKey(waiting, known, w.TaskID)
 	}
 	dropped := make(map[string]bool, len(state.DroppedStreamKeys))
 	for _, k := range state.DroppedStreamKeys {
@@ -254,12 +270,37 @@ func taskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView, l1
 	return sect
 }
 
+// rosteredTaskIDs is the set of task ids this render's own rows are filed under.
+// An empty id is never a member: a row nobody named would then match every
+// correlation, which is the opposite of what a join is for.
+func rosteredTaskIDs(state TaskRosterState) map[string]bool {
+	known := make(map[string]bool, len(state.Rows))
+	for _, row := range state.Rows {
+		if row.TaskID == "" {
+			continue
+		}
+		known[row.TaskID] = true
+	}
+	return known
+}
+
 // indexWaitingKey files one waiting approval's id under every name a roster row
 // can be addressed by for it: the id as filed, plus the original correlation when
-// the id is the queue's own clash rewrite ("<id>#<decimal seq>", queue.go:152-154).
-// An empty id names nothing and is not filed - "no correlation on the card" is not
-// the same thing as an id that is the empty string.
-func indexWaitingKey(set map[string]bool, key string) {
+// the id is the queue's own clash rewrite ("<id>#<decimal seq>", queue.go:152-154),
+// plus - since ticket 328 - the rostered task id a correlation was built on
+// ("<taskID>#<tail>", loop.go:603, sole call site :676). An empty id names nothing
+// and is not filed - "no correlation on the card" is not the same thing as an id
+// that is the empty string.
+//
+// The third arm is bounded by two things at once, and both halves are the point:
+// the task half must be byte-for-byte one of THIS render's filed ids, and the
+// correlation must have a '#' right after it. Drop the delimiter and "child-1x" -
+// one host's own naming for a different task - lights "child-1"'s row, i.e. two
+// tasks read as one; that shape is pinned false by
+// TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt. Drop the filed-id
+// requirement and the arm stops being a join at all. Cost, stated not assumed: one
+// pass over this render's own row ids per filed id, bounded by the host's roster.
+func indexWaitingKey(set map[string]bool, known map[string]bool, key string) {
 	if key == "" {
 		return
 	}
@@ -267,13 +308,28 @@ func indexWaitingKey(set map[string]bool, key string) {
 	if base, ok := splitClashSuffix(key); ok && base != "" {
 		set[base] = true
 	}
+	for task := range known {
+		if strings.HasPrefix(key, task+"#") {
+			set[task] = true
+		}
+	}
 }
 
-// splitClashSuffix recognises the queue's rewrite and nothing else: a final '#'
-// whose remainder is at least one ASCII digit. Cutting at the FIRST '#' would
+// splitClashSuffix recognises the queue's own rewrite and nothing else: a final
+// '#' whose remainder is at least one ASCII digit. Cutting at the FIRST '#' would
 // eat a correlation id that legitimately contains one, and accepting a non-numeric
 // tail would treat a host's own "<task>-suffix" naming as if the queue had
-// rewritten it - which is a wider match than any code in this tree produces.
+// rewritten it - so this function still answers only the one question the queue's
+// numbering answers, whoever else asks.
+//
+// What ticket 328 changed is NOT this digit test. The correlations production
+// actually mints carry non-numeric tails ("<taskID>#<callID>", and the queue's
+// rewrite stacked on one of those: "<taskID>#<callID>#<seq>"), and the claim this
+// doc used to finish with - that such a tail is a wider match than any code in
+// this tree produces - stopped being true the day loop.go:603 started minting
+// them. Those shapes are now matched by indexWaitingKey's rostered-task arm, which
+// names the ids it accepts instead of guessing a cut, and loosening this function
+// would only make "who rewrote this id" unreadable again.
 func splitClashSuffix(id string) (base string, ok bool) {
 	i := strings.LastIndexByte(id, '#')
 	if i <= 0 || i == len(id)-1 {
