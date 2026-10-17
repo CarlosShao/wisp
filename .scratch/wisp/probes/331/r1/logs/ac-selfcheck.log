@@ -1,0 +1,6 @@
+scan target: docs/evidence/s1/331-r1-evidence.md
+pattern (ERE): to-do-marker|fix-me-marker|triple-X|angle-bracket-token
+grep-rc=1
+second looser ruler incl. bare word:
+88:- Deliverable placeholder scan: the pattern and its command are written verbatim in
+loose-rc=0

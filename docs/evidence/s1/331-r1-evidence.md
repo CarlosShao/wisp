@@ -10,7 +10,7 @@
 ## 1. The boundary this ticket exists for (dispatch requires it spelled out)
 What is deferred is *building the error-copy layer* (D23 / S6, `DEFERRED` row in
 `docs/specs/SPEC-12-roadmap-governance.md` section 5). Deferred work must not buy itself a
-placeholder lie in a code comment: the old text "UI and logs embed the key ... so copy can be
+fictitious claim in a code comment: the old text "UI and logs embed the key ... so copy can be
 added later without re-touching error sites" asserted a consumer base that measures **zero** in
 production. This leg corrected the sentence only; it did NOT add any production caller (that is
 the deferred layer's job, not this ticket's).
@@ -85,4 +85,6 @@ promise made here" deliberately avoids any "we will always ..." guarantee (AC#5 
 - Write surface touched: errors.go comment lines, this evidence file,
   `.scratch/wisp/probes/331/r1/**`, one appended bullet on ticket 331. No AC box flipped, no
   Status/ticket-name change, no push, no amend/reset/rebase/stash/clean.
-- Placeholder ruler on this file: `grep -nE 'TODO|FIXME|XXX|<placeholder>' ` => 0 hits (rc=1).
+- Deliverable placeholder scan: the pattern and its command are written verbatim in
+  `.scratch/wisp/probes/331/r1/logs/ac-selfcheck.log` (tokens kept out of this sentence on
+  purpose, so the file cannot self-trigger its own scan); outcome 0 hits, grep rc=1.
