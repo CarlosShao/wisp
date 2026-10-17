@@ -1,0 +1,111 @@
+# 332-v1 AC#0 four rulers + AC#1 whole-family alignment (verdict leg, read-only)
+leg=332-v1 date=2026-10-17 11:19:34 +0800
+repo=/d/work/workspace/projects plans/Wisp branch=dev HEAD-at-this-moment=04e3d9030b53d75e365498dd1281ec05a1292b74
+anchor-for-all-code-readings=7535d83b blob(internal/panel/display_scrub_216.go@7535d83b)=9d94b46ec0a52b9d7f3fe8a8d414d8edf09fdbbd
+same-blob-at-eb82a4d5=9d94b46ec0a52b9d7f3fe8a8d414d8edf09fdbbd ; HEAD-blob=230d3443d7105b1856c557aa9579a7fe8ab077d8  <- 333-r1 category body, deliberately NOT read as this anchors body
+
+== RULER 1 (measured on the named commit tree; working tree untouched) ==
+cmd: git show 7535d83b:internal/panel/display_scrub_216.go -> awk NR>=164&&NR<=175 -> grep -oE hex-tokens -> wc -l
+15
+unique=15
+list=0x00AD 0x200B 0x200C 0x200D 0x2060 0xFEFF 0x202A 0x202B 0x202C 0x202D 0x202E 0x2066 0x2067 0x2068 0x2069 
+decl/case lines:
+164:func isDisplayWashCf(r rune) bool {
+166:	case 0x00AD,
+the only two washed-field assignments (228 / 234):
+	c.Workspace.Canonical = scrubForDisplay(c.Workspace.Canonical)
+		a.Name = scrubForDisplay(a.Name)
+
+== RULER 2 + 4 execution surface: the ONLY code executed by this leg ==
+probe=D:\W332V1EXP\cfprobe\main.go sha256=469f61f3195e0bf00bccc0949173311d223c3ffcb4a81cd797cc71fe218bcb0f
+assembled from display_scrub_216.go lines 106-136,164-175,179-199,211-220 sha256=24effc03b02658eb30629eadaad11589dd10131c4cde3529f745635106ed217c
+plus taintmatch.go lines 39-45 sha256=cb36df1a4e8d4811562d9b434742f86ab319b0a0ae2b304cba9f333d1e59a076
+plus v1 tail sha256=3ea5bfaf9ac768d55ab9add3cfdb9921ae84b44588fdf5464d76419f257bfea4
+anchor copy sha256=8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd ; git hash-object of that copy=9d94b46ec0a52b9d7f3fe8a8d414d8edf09fdbbd = the 7535d83b blob, so the extract is provably that commits bytes
+go=go version go1.27.1 windows/amd64 ; cmd: GOTMPDIR=D:\W332V1EXP\gotmp go run ./main.go -> rc=0, stderr_bytes=0
+--- verbatim stdout, summary lines ---
+GO_UNICODE_VERSION=17.0.0
+CF_TOTAL=170
+MN_TOTAL=2059
+MN_INTERSECT_CF=0
+ROSTER_SIZE=15 ROSTER_NOT_CF=0 BEHAVIOUR_MISMATCH=65
+MISMATCH_ATTRIBUTION ccTotal=65 mismatchIsControl=65 mismatchOther=[]
+CF_IN_ROSTER=15 CF_OUTSIDE_ROSTER=155
+ROSTER_LIST U+00AD U+200B U+200C U+200D U+202A U+202B U+202C U+202D U+202E U+2060 U+2066 U+2067 U+2068 U+2069 U+FEFF
+PARTITION familySum=155 familiesDistinct=155 outsideSet=155 LEFTOVER=[] GHOST=[] BOGUS=[]
+INVISIBLE_OR_ZEROWIDTH_arm E+G+K=104 DIRECTION_arm B+D=3 B=1 D=2
+SCREEN total_outside=155 scrub_leaves_raw=155 unicode_is_space=0 taint_ignores=0 unicode_is_control=0 json_escapes=0
+--- per-Cf consistency audit over the 170 printed rows (measured) ---
+CFP_LINES=170 CONSISTENCY_BAD=[]
+note on BEHAVIOUR_MISMATCH=65: that counter compares boundary behaviour with isDisplayWashCf over EVERY scalar, so the
+65 Cc runes (32 C0 + 33 C1, washed by the separate unicode.IsControl arm) are counted by design:
+mismatchIsControl=65 and mismatchOther[] is empty => zero disagreement on the Cf axis; restricted to the 170 Cf rows the
+audit line above prints CONSISTENCY_BAD=[ ] (empty). 332-a1 printed the same fact as MISMATCH_COUNT=0.
+
+== RULER 3 (measured) production call sites of the display boundary ==
+cmd: git grep -n -e scrubComposerForDisplay -e scrubForDisplay 7535d83b -- internal cmd | grep -v _test.go:   (colon matters, see the note)
+total_lines=24 test_lines=16 non_test_lines=8
+  7535d83b:internal/panel/composer.go:145:		Composer:    scrubComposerForDisplay(composer),
+  7535d83b:internal/panel/display_scrub_216.go:70:// scrubForDisplay turns the characters a human cannot see into characters a human
+  7535d83b:internal/panel/display_scrub_216.go:106:func scrubForDisplay(s string) string {
+  7535d83b:internal/panel/display_scrub_216.go:201:// needsDisplayWash reports whether scrubForDisplay would change s. It is the same
+  7535d83b:internal/panel/display_scrub_216.go:222:// scrubComposerForDisplay is the display boundary's whole roster, in one call. It
+  7535d83b:internal/panel/display_scrub_216.go:227:func scrubComposerForDisplay(c ComposerState) ComposerState {
+  7535d83b:internal/panel/display_scrub_216.go:228:	c.Workspace.Canonical = scrubForDisplay(c.Workspace.Canonical)
+  7535d83b:internal/panel/display_scrub_216.go:234:		a.Name = scrubForDisplay(a.Name)
+call_sites_outside_the_boundary_file=1 (internal/panel/composer.go:145). The other 7 non-test lines live inside display_scrub_216.go:
+  3 comments (:70 :201 :222) + 2 definitions (:106 :227) + 2 invocations (:228 :234 = the only two washed fields).
+v1 self-correction kept on purpose: the first cut of this block used grep -v _test.go$ , which strips nothing because a git grep
+  line never ends with the file name (it ends with the matched code) => it printed non_test_lines=24. With the corrected filter the
+  number is 8, and the census split (1 production caller + 7 same-file lines) is CONFIRMED, not corrected.
+
+== RULER 4 (measured) judgement-layer list, read-only, zero bytes changed ==
+func isIgnorableTaintRune(r rune) bool {
+	switch r {
+	case 0x00AD, 0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF:
+		return true
+	}
+	return unicode.Is(unicode.Mn, r)
+}
+named_runes=6 list=0x00AD 0x200B 0x200C 0x200D 0x2060 0xFEFF 
+plus the whole unicode.Mn family: MN_TOTAL=2059 MN_INTERSECT_CF=0 measured in the RULER 2 run => list reach 6+2059=2065, on the Cf axis only those 6
+opposite orientation, quoted from its own comment, taintmatch.go:32-38:
+  // isIgnorableTaintRune reports the invisible characters that must be dropped
+  // by normalization. U+00AD/U+200B..U+200D/U+2060/U+FEFF and the combining
+  // marks (Mn) render as nothing (or as a diacritic on the previous rune) but
+  // are NOT unicode.IsSpace, so leaving them in place lets an exfiltrator cut a
+  // tainted fragment into sub-8-rune pieces with zero-width characters — a gap
+  // in the *normalized* text the contract matches on, not the semantic
+  // paraphrase residual of 16.9#1 (adversarial report M-6).
+where the judgement axis USES it (deletion):
+  32:// isIgnorableTaintRune reports the invisible characters that must be dropped
+  39:func isIgnorableTaintRune(r rune) bool {
+  59:		if unicode.IsSpace(r) || isIgnorableTaintRune(r) {
+the display axis states the opposite about deletion, display_scrub_216.go:126-133 (the Cf branch comment):
+  			// them - is the attack this ticket is about. "abc" + U+202E + "def"
+  			// deleted reads "abcdef", a name no file ever had.
+  			writeControlEscape(&b, r)
+  			i += size
+  		default:
+  			b.WriteRune(r)
+  			i += size
+  		}
+taintmatch blob 7535d83b=07bc9815086520b6dd7116c8faae9483b30e04d2 HEAD=07bc9815086520b6dd7116c8faae9483b30e04d2 (unchanged at both; 333-r1 never touched this file)
+
+== AC#1 alignment: my table vs the census 170-row table (measured, both directions) ==
+census file=.scratch/wisp/probes/332/a1/logs/ac1-cf-170-roster-with-unicode-names.log normalised_rows=170
+my normalised_rows=170
+diff_rows=0 (0 = the two 170-row tables agree on every codepoint AND on both label columns)
+codepoint sets identical (170 vs 170; nothing printed above)
+sha256 census_labels=f01c05b59b5f4b7da99693c5539eabfe77c5a4779323aebcc343f9c601126411
+sha256 v1_labels    =f01c05b59b5f4b7da99693c5539eabfe77c5a4779323aebcc343f9c601126411
+census IN/OUT:      15 IN     155 OUT 
+v1     IN/OUT:      15 IN     155 OUT 
+census WASHED/RAW:     155 RAW      15 WASHED 
+v1     WASHED/RAW:     155 RAW      15 WASHED 
+v1 denominator measured independently: CF_TOTAL(170) - ROSTER_SIZE(15) = 155 = CF_OUTSIDE_ROSTER(155)
+family partition (ranges copied verbatim from census-1 rows A..K, counted by my probe against the real Cf set):
+FAMILY A count=13 FAMILY B count=1 FAMILY C count=1 FAMILY D count=2 FAMILY E count=4 FAMILY F count=6 FAMILY G count=3 FAMILY H count=16 FAMILY I count=4 FAMILY J count=8 FAMILY K count=97 PARTITION familySum=155 familiesDistinct=155 outsideSet=155 LEFTOVER=[] GHOST=[] BOGUS=[] INVISIBLE_OR_ZEROWIDTH_arm E+G+K=104 DIRECTION_arm B+D=3 B=1 D=2 
+arithmetic defect caught in census-1 (repeated in the ticket bullet): it prints the direction arm as B+D = 2 枚, while its own
+  table gives B=1 (U+061C) and D=2 (U+200E, U+200F) => 1+2 = 3 枚. The 155 total and the A..K sums are untouched.
+  named: .scratch/wisp/probes/332/a1/census-1-cf-155-roster.md:78
