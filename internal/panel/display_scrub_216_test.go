@@ -437,18 +437,110 @@ func escapeOf(r rune) string {
 	return fmt.Sprintf(`\u%04x`, r)
 }
 
-// TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut pins the other half of AC#1:
-// the invisible runes the census measured as reachable but the ruling did not name
-// stay raw, so widening the set is a ruling and not an edit a later leg can make
+// TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut is ticket 327-r1's gate,
+// reshaped by leg 335-r1 for ticket 333's ruling. What it used to pin, in its own
+// words: the invisible runes the census measured as reachable but the ruling did not
+// name stay raw, so widening the set is a ruling and not an edit a later leg can make
 // quietly.
+//
+// That ruling has since been made - ticket 333 chose shape 甲-全: the wash set is the
+// Unicode CATEGORY, not the fifteen runes the 327 ruling hand-listed (ledger A1015,
+// undo word "333 改裁乙"), and the seven named below are all members of it. So the
+// nail went red on its own out-of-date text while the product was correct; the fix is
+// the assertion, and the direction is stricter (seven more runes washed, nothing let
+// go). The gate itself stays, restated in the only form that still means something
+// now: WHO gets washed must be answered by the RULE, never by a list a leg can edit
+// one rune at a time. Three arms, covering both ways a hand list is wrong:
+//
+//	arm 1  the seven the 327 roster left out are washed now - escaped, never deleted,
+//	       and washing twice is a no-op;
+//	arm 2  the set is not a hand-kept roster: collected over every scalar from the
+//	       product's own predicate it must be strictly bigger than this file's 15-rune
+//	       cfRoster, and it must neither skip a member of unicode.Cf nor wash a rune
+//	       the category does not name;
+//	arm 3  a rune outside both washed families still comes back byte-identical, so a
+//	       later leg cannot quietly hand-list one in either.
+//
+// 327-r2's TestDisplayWashRosterIsExactlyTheCfCategory holds the same product-vs-table
+// relation at the predicate level and 333-r1's
+// TestDisplayWashFastPathAndWriterBothAnswerWashAcrossBothFamilies holds fast path and
+// writer over both whole families; what stays unique here is the roster-source tripwire
+// of arm 2, which is the thing ticket 327 pinned this nail for.
 func TestTheRosterIsClosedAgainstTheRunesTheRulingLeftOut(t *testing.T) {
+	// Arm 1. The seven are named as a READING of what ticket 333 moved in, not as the
+	// definition of the wash set (U+206B, the eighth that batch missed, is itemised by
+	// 327-r2's nail 2 beside this file).
 	for _, r := range []rune{0x2061, 0x2062, 0x2063, 0x2064, 0x061C, 0x180E, 0x206A} {
+		if !unicode.Is(unicode.Cf, r) {
+			t.Errorf("U+%04X is not unicode.Cf, so this arm lost its reason for existing", r)
+			continue
+		}
+		in := "photo" + string(r) + ".png"
+		if !needsDisplayWash(in) {
+			t.Errorf("U+%04X is a member of the category the ruling chose but needsDisplayWash stayed silent on it", r)
+		}
+		want := "photo" + escapeOf(r) + ".png"
+		if got := scrubForDisplay(in); got != want {
+			t.Errorf("U+%04X is a member of the category the ruling chose but the wash left it: %q -> %q, want %q", r, in, got, want)
+		}
+		if again := scrubForDisplay(want); again != want {
+			t.Errorf("U+%04X: washing an already-washed name is not a no-op: %q -> %q", r, want, again)
+		}
+	}
+
+	// Arm 2: the rule owns the set, or a hand list does.
+	show := func(ns []string) string {
+		if len(ns) > 20 {
+			return strings.Join(ns[:20], " ") + fmt.Sprintf(" (+%d more)", len(ns)-20)
+		}
+		return strings.Join(ns, " ")
+	}
+	product := washSetOver(isDisplayWashCf)
+	category := washSetOver(func(r rune) bool { return unicode.Is(unicode.Cf, r) })
+	if len(category) == 0 || len(product) == 0 {
+		t.Fatalf("arm 2 examined nothing (product=%d category=%d): an empty set is not a pass",
+			len(product), len(category))
+	}
+	if len(product) <= len(cfRoster) {
+		t.Errorf("the boundary washes %d runes, no more than the %d this file could hand-copy: the wash set is a hand-kept roster again, so the next Cf character the table adds is an unannounced pass-through into the menu",
+			len(product), len(cfRoster))
+	}
+	missed, extra := map[rune]bool{}, map[rune]bool{}
+	for r := range category {
+		if !product[r] {
+			missed[r] = true
+		}
+	}
+	for r := range product {
+		if !category[r] {
+			extra[r] = true
+		}
+	}
+	t.Logf("arm 2: product-washed=%d, unicode.Cf=%d, missed=%d, extra=%d, this file's cfRoster=%d",
+		len(product), len(category), len(missed), len(extra), len(cfRoster))
+	if len(missed) != 0 {
+		t.Errorf("a rune the Cf category names is not washed, so the answer came from a list rather than the rule: %s",
+			show(names327r2(missed)))
+	}
+	if len(extra) != 0 {
+		t.Errorf("the boundary washes runes the Cf category does not name, so the answer came from a list rather than the rule: %s",
+			show(names327r2(extra)))
+	}
+
+	// Arm 3: outside both washed families, nothing moves. Premise self-check below, so
+	// a table move that pulls one of these samples into a family reddens here instead
+	// of turning the arm vacuous.
+	for _, r := range []rune{0x0020, 0x00A0, 0x2028, 0x2029, 0x0300, 0x2192, 'a', 0x4E2D, 0x1F600, 0xFE0F} {
+		if unicode.Is(unicode.Cf, r) || unicode.IsControl(r) {
+			t.Errorf("sample U+%04X is inside a washed family: arm 3 lost its premise", r)
+			continue
+		}
 		in := "photo" + string(r) + ".png"
 		if needsDisplayWash(in) {
-			t.Errorf("U+%04X is not on the ruled list but needsDisplayWash fired on it", r)
+			t.Errorf("U+%04X is neither Cf nor Cc but needsDisplayWash fired on it", r)
 		}
 		if got := scrubForDisplay(in); got != in {
-			t.Errorf("U+%04X is not on the ruled list but the wash changed it: %q -> %q", r, in, got)
+			t.Errorf("U+%04X is neither Cf nor Cc but the wash changed it: %q -> %q", r, in, got)
 		}
 	}
 }
