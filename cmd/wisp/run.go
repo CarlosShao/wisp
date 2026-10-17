@@ -372,9 +372,18 @@ type agentRuntime struct {
 	lastSnap      panel.Snapshot
 	lastSnapBytes []byte
 	snapSeen      bool
-	notify        notifyPoster
-	stdout        io.Writer
-	stderr        io.Writer
+	// snapHost is ticket 329 form 甲's destination for the booked bytes: the one
+	// panel window this process owns, attached by the assembly root after this
+	// runtime is built and read by pushPanelSnapshotToHost on every publish. Nil
+	// means this run has no window to push to - a console `wisp run` is exactly
+	// that shape - and the publish then stops at the booking, as it did before
+	// the ticket. snapHostMu guards it because the resident leg writes it while
+	// the gate's and the sink's goroutines read it on every publish.
+	snapHostMu sync.Mutex
+	snapHost   panelSnapshotHost
+	notify     notifyPoster
+	stdout     io.Writer
+	stderr     io.Writer
 	// logf receives the bridge's audit lines.
 	logf func(string, ...any)
 }
