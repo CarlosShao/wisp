@@ -1,0 +1,7 @@
+票 331 裁决腿 331-v1（1/6）：台面构造台件 build-trees.sh
+
+两棵仓外导出树（T1=锚 72b65c61、T2=T1+落地件 e09187e1 的 internal/observe/errors.go）；
+配方=派单八件套 go.mod go.sum internal cmd tools scripts frontend models ＋仓根 docs/
+＋手工三件 build/*.dll、third_party/sherpa-onnx/*.dll、frontend/dist（⛔ 跟踪）。
+树放 D: 卷 D:\V331V1（目录名产生 8.3 短名别名、无空格），GOTMPDIR=D:\V331V1\tmp 先建。
+现量：T1/T2 各 750 枚 .go（非空证）；diff -rq 两侧只差一枚文件=本票唯一产码面文件。
