@@ -1,0 +1,57 @@
+327-r2 paired-mutation + ablation readings. ALL land ONLY on the OUT-OF-REPO export
+tree (/d/tmp/w327r2/bench); no tracked byte is touched. Each shot restores the scrub
+file from the named commit tree in a finally trap and re-reads its sha256. Content
+anchors (a token inside the function body), never an absolute line number.
+
+PRISTINE sha256(internal/panel/display_scrub_216.go)=
+  8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd  (= verdict terminal)
+
+=== SHOT 1: silently ADD the unruled U+206B to the product roster ===
+mutation: sed 's/0x2060, 0xFEFF,/0x2060, 0x206B, 0xFEFF,/'  (case list now 16)
+four-numbers: RUN=255 PASS_TOP=156 FAIL_TOP=9 SKIP=0  (+2 red over the AFTER roster)
+the two new reds are exactly the two new nails; verbatim red sentences (file:line):
+  display_scrub_327r2_test.go:72: the product washes Cf runes the ruling never named: [U+206B] (ruled=15 product=16)
+  display_scrub_327r2_test.go:80: product roster cardinality=16, want 15
+  display_scrub_327r2_test.go:91: U+206B is off the ruled list but isDisplayWashCf washed it
+  display_scrub_327r2_test.go:95: U+206B is off the ruled list but needsDisplayWash fired on "photo\u206b.png"
+  display_scrub_327r2_test.go:98: U+206B is off the ruled list but the wash changed it: "photo\u206b.png" -> "photo\\u206b.png"
+=> the基数钉 (extra arm :72) AND the排除钉 both bite on a silent widening to U+206B.
+   This is the exact mutation the verdict (R1) showed reddened ZERO cases in the
+   delivered suite; it now reddens two, both mine, both standing in the repo.
+restore: RESTORE_OK sha256=8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd
+
+=== SHOT 2: silently REMOVE the existing U+00AD from the product roster ===
+mutation: sed 's/^\tcase 0x00AD,/\tcase/'  (case list now 14)
+four-numbers: RUN=255 PASS_TOP=155 FAIL_TOP=10 SKIP=0  (+3 red over the AFTER roster)
+my基数钉 red at a DIFFERENT assertion line than shot 1 (missing arm, not extra arm):
+  display_scrub_327r2_test.go:76: a ruled rune is no longer washed by the product: [U+00AD] (ruled=15 product=14)
+  display_scrub_327r2_test.go:80: product roster cardinality=14, want 15
+existing AC#2 targets also bite on the same removal (different cases from shot 1):
+  display_scrub_216_test.go:368: needsDisplayWash did not see soft hyphen (U+00AD) in "photo\u00ad.png": the fast path would return it raw
+  display_scrub_216_test.go:411: scrubForDisplay("photo\u00ad报告.png") = "photo\u00ad报告.png", want "photo\\xad报告.png"
+restore: FINALLY scrub_sha256=8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd
+
+=== SHOT1 vs SHOT2 RED-ROSTER DIFF (the two shots must NOT share one roster) ===
+  shot2 has, shot1 lacks:
+    TestNeedsDisplayWashNamesEveryWashedCfRune     (display_scrub_216_test.go:368)
+    TestEveryNamedCfRuneIsEscapedAndNeverDeleted   (display_scrub_216_test.go:411)
+  shot1 has, shot2 lacks:
+    TestDisplayWashRosterExcludesTheEightNamedRunes (display_scrub_327r2_test.go:91)
+  shared case, DIFFERENT assertion line:
+    TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen
+      shot1 red at :72 (extra arm = widened) / shot2 red at :76 (missing arm = narrowed)
+=> the基数钉 reddens in BOTH directions on two different lines, and the two shots
+   carry two different rosters, satisfying the paired-mutation rule.
+
+=== ABLATION (R4-style self-reference control) ===
+change the基数钉's ACTUAL side from a product read to a copy of the EXPECTED roster
+(sed: `actual := productWashedRunes()` -> a loop that re-adds ruledRoster327r2), keep
+shot 2's product mutation (U+00AD removed) in place.
+four-numbers: RUN=255 PASS_TOP=156 FAIL_TOP=9 SKIP=0
+  --- PASS: TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen   (was FAIL in shot 2)
+=> with the product read neutered to a self-copy, the基数钉 goes GREEN even though the
+   product is mutated -> the shipped nail's redness comes ONLY from reading
+   isDisplayWashCf over the full scalar space, not from a hand-copy compared to
+   itself. The literals are the EXPECTED side only; this is the opposite of the
+   :400 shape R4 flagged. R1 closed without a self-reference.
+restore: FINALLY scrub_sha256=8050f22d14203bba006cbfabcfb2a748081286d492691109c3a35a7a435ff8fd

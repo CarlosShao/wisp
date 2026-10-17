@@ -1,0 +1,38 @@
+327-r2 color rulers (go test ./internal/panel/ -count=1 -timeout 30m -v, RULER:
+RUN=grep -c '^=== RUN' incl subtests; PASS_TOP=grep -c '^--- PASS' top-only;
+FAIL_TOP=grep -c '^--- FAIL' top-only; SKIP=grep -c '^--- SKIP'. Never mixed, never
+subtracted. One bench, one台面: OUT-OF-REPO export tree D:/tmp/w327r2/bench =
+`git archive 7535d83b` eight-piece set + docs/ + manual build//third_party/
+sherpa-onnx/ + frontend/dist; 750 .go files (counted on extract, non-zero). design/
+is deliberately absent, so TestC21DesignTokensFourWayAgree is a台面-scope red in
+EVERY reading below and is NOT counted as判据 (it never changes across shots).
+
+--- BEFORE (anchor 7535d83b, no 327-r2 file) ---
+RUN=252 PASS_TOP=155 FAIL_TOP=7 SKIP=0
+red roster (7, top-level):
+  TestApprovalCardViewJSONKeysMatchFrontendTypes
+  TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+  TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+  TestComposerContractTypesMatchFrontend
+  TestComposerRenderFixtureTellsTheTruth
+  TestReadGitOnThisRepositoryIsSelfConsistent
+  TestC21DesignTokensFourWayAgree        (台面-scope, design/ absent)
+
+--- AFTER (same bench + internal/panel/display_scrub_327r2_test.go) ---
+RUN=255 PASS_TOP=158 FAIL_TOP=7 SKIP=0
+red roster: byte-identical to BEFORE (7, same names). diff(before,after)=EMPTY.
+RUN +3 / PASS_TOP +3 = exactly the three new top-level cases; FAIL_TOP unchanged.
+  --- PASS: TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen
+  --- PASS: TestDisplayWashRosterExcludesTheEightNamedRunes
+  --- PASS: TestDisplayWashJudgeAndWriterAgreeOnBothFamiliesAndBoundaries
+nail 1 log: product-washed=15, ruled-list=15
+nail 3 log: full Cf=170, full Cc=65, boundary sample=22, disagreements=0
+
+RED-ROSTER DIFF (before <=> after) = 0. The three added cases only raise RUN and
+PASS_TOP; they move no existing verdict. The 15-rune product roster and the 170-rune
+unicode.Cf family both read the same as the terminal state the verdict recorded.
+
+NOTE: these BEFORE/AFTER four-numbers are the deliverable color gate. The paired
+mutation shots below are SEPARATE (they mutate the export-tree product bytes and are
+restored per shot; see mutations.log). All numbers are from the export-tree台面, as
+the dispatch requires ("改前/改后各一发同一台面").
