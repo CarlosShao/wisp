@@ -1,5 +1,5 @@
 # 332-v1 AC#3 replay (two off-roster controls) + AC#1/AC#2 teeth (two mutations) + gates
-leg=332-v1 date=2026-10-17 11:41:36 +0800  everything read from named commit trees, never the working tree.
+leg=332-v1 date=2026-10-17 12:00:37 +0800  everything read from named commit trees, never the working tree.
 
 ## part 1 - AC#3, this legs own disk + marshal replay
 anchor=7535d83b  boundary extract sha256=24effc03b02658eb30629eadaad11589dd10131c4cde3529f745635106ed217c (display_scrub_216.go lines 106-136,164-175,179-199,211-220)
@@ -51,9 +51,33 @@ and eb82a4d5:internal/panel/display_scrub_216.go = 9d94b46ec0a52b9d7f3fe8a8d414d
 temp-root pair (the legs reading touches t.TempDir() inside ./internal/panel): TMP/TEMP+GOTMPDIR on D: => RUN=255 PASS_TOP=158 FAIL_TOP=7 SKIP=0 rc=1
                                          TMP/TEMP unset (C: default) => RUN=255 PASS_TOP=158 FAIL_TOP=7 SKIP=0 rc=1
   fail-name set identical between the two roots: yes
-  the 7 baseline reds are台面-attributed and none is a display-boundary test: TestApprovalCardViewJSONKeysMatchFrontendTypes TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 TestStreamLogDroppedNamingLedgerIsNotBounded35r8 TestComposerContractTypesMatchFrontend TestComposerRenderFixtureTellsTheTruth TestReadGitOnThisRepositoryIsSelfConsistent TestC21DesignTokensFourWayAgree 
-  (four read frontend/design sources that the archive does not carry whole, two are the 35r8 live-heap instruments,
-   one needs a .git directory the export tree has not got: TestReadGitOnThisRepositoryIsSelfConsistent).
+  none of the 7 baseline reds is a display-boundary test. Their names, then the attribution this leg re-read line by line:
+      TestApprovalCardViewJSONKeysMatchFrontendTypes
+      TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+      TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+      TestComposerContractTypesMatchFrontend
+      TestComposerRenderFixtureTellsTheTruth
+      TestReadGitOnThisRepositoryIsSelfConsistent
+      TestC21DesignTokensFourWayAgree
+  2 are台面 faults of the export table (it cannot see those faces at all): TestC21DesignTokensFourWayAgree opens
+     design/assets/tokens.css - design/ is untracked, so the archive has no such path (red line tokens_fourway_test.go:441);
+     TestReadGitOnThisRepositoryIsSelfConsistent asserts the repository carries a .git directory (git_test.go:600).
+  5 are pins written into the shipped test bodies at this anchor. Their own red sentences are the evidence:
+     the two JSON-key pins name the keys the frontend interfaces do not declare (approval_test.go:129 Go Snapshot emits
+     [instructions tasks], composer_test.go:78 same shape for ComposerState, and composer_test.go:136 prints the words
+     red as required); the render-fixture pin lists the states its fixture lacks (composer_test.go:873); the two 35r8
+     flood instruments report the live heap they pinned (backpressure_bound_35r8_test.go:309 and :336).
+  cross-check with the precedent, not with this leg: the 216 landing leg recorded eight pre-existing reds on the same kind of
+     table (3 missing faces / 2 memory instruments / 3 by-design key pins, .scratch/wisp/issues/216-*.md, the 216-r1 bullet).
+     This leg copied the repo-root docs/ into the table, so the missing-face group is 2 here (design/, .git) and the seven
+     reds map one-to-one onto that eight minus one; the two flood instruments and the three pins stay. This leg never ran
+     those five in the shared working tree (internal/panel there = 333-r1 in flight), so the split rests on the red
+     sentences above plus that recorded family - and on one thing it does measure: not one of the seven is a display-boundary test.
+     interfaces and say so (composer_test.go:78/129, approval_test.go:134; one of them prints red as required), the render
+     fixture pin names the states its fixture lacks (composer_test.go:873), and the two 35r8 flood instruments report the
+     live-heap they pinned (backpressure_bound_35r8_test.go:309/:336). None of the five is a display-boundary test.
+  ★the sentence this replaces (kept for the record): four read frontend/design sources the archive does not carry whole,
+   two are the 35r8 live-heap instruments, one needs a .git - that was an unverified guess and is wrong in the split.
 -- scoped baseline at the unmutated body (-run TestDisplayWash|TestEveryNamedCfRune|TestNeedsDisplayWash|TestTheRosterIsClosed|TestTheWriterBranch): RUN=7 PASS_TOP=7 FAIL_TOP=0 SKIP=0 rc=0
 
 ### SHOT M1 - silent ADD of U+2061, i.e. break the census OUT/RAW row for the very rune its AC#3 names

@@ -1,5 +1,5 @@
 # 332-v1 AC#2: census-2 carrier citations re-read at the named commit tree 7535d83b
-leg=332-v1 date=2026-10-17 11:44:54 +0800  blob(display_scrub_216.go@7535d83b)=9d94b46ec0a52b9d7f3fe8a8d414d8edf09fdbbd
+leg=332-v1 date=2026-10-17 11:55:09 +0800  blob(display_scrub_216.go@7535d83b)=9d94b46ec0a52b9d7f3fe8a8d414d8edf09fdbbd
 claim under test: each of the 155 unwashed Cf runes can reach THE MARSHALED SNAPSHOT BYTES (not pixels).
 
 ### (a) disk / workspace real name
@@ -18,11 +18,9 @@ OK       a11-git-no-external-process    internal/panel/git.go:24p has [NO EXTERN
 OK       a12-cited-line                 internal/panel/pump.go:281p has [p.src.Git]
 OK       a13-assignment-line            internal/panel/pump.go:284p has [composer.Git = p.src.Git()]
 OK       a14-boundary-call-site         internal/panel/composer.go:145p has [scrubComposerForDisplay]
-      		Composer:    scrubComposerForDisplay(composer),
 OK       a15-washed-field-1             internal/panel/display_scrub_216.go:228p has [c.Workspace.Canonical = scrubForDisplay]
 OK       a16-washed-field-2             internal/panel/display_scrub_216.go:234p has [a.Name = scrubForDisplay]
 OK       a17-marshal-in-publish         internal/panel/pump.go:359p has [json.Marshal(snap)]
-      	data, err := json.Marshal(snap)
 OK       a18-marshal-in-marshal         internal/panel/pump.go:344p has [json.Marshal(p.Snapshot())]
 
 ### (b) model body / tool reason  (hop #1 the orchestrator told this leg to attack)
@@ -76,22 +74,8 @@ OK       c4-handle-entry                internal/panel/composer_dispatch.go:176p
 OK       c5-workspace-request-handoff   internal/panel/composer_dispatch.go:209p has [HandleWorkspaceRequest]
 OK       c6-handler-entry               internal/panel/workspace_handlers.go:108p has [func]
 OK       c7-request-workspace-switch    internal/panel/workspace_handlers.go:125p has [RequestWorkspaceSwitch]
-      	if _, err := RequestWorkspaceSwitch(h.Scope, req.Path, h.Audit); err != nil {
 OK       c8-view-builder                internal/panel/workspace.go:140p has [func]
-OK       c9-spelling-and-canonical      internal/panel/workspace.go:160,172p has [Spelling]
-      		}
-      		return currentAfter(scope, previous), fmt.Errorf("panel: workspace switch refused: %w", err)
-      	}
-      	if audit != nil {
-      		audit("workspace: SWITCH from=%q to=%q spelling=%q reparse=%v rewritten=%v rewrites=%v result=ok",
-      			previous.Canonical, res.Canonical, res.Spelling, res.Reparse, res.Rewritten,
-      			strings.Join(res.Rewrites, "+"))
-      	}
-      	view := WorkspaceView{
-      		Set: true, Spelling: res.Spelling, Canonical: res.Canonical,
-      		Reparse: res.Reparse, Rewritten: res.Rewritten,
-      		Reason: "已收窄到该工作区：范围外的路径按 R2 判定",
-      	}
+OK       c9-spelling-and-canonical      internal/panel/workspace.go:169p has [Set: true, Spelling: res.Spelling, Canonical: res.Canonical,]
 OK       c10-resident-dispatch-wired    cmd/wisp/panel_resident_windows.go:223,228p has [newResidentComposerDispatch]
 OK       c11-cli-nil-dispatch           cmd/wisp/panel_inbound.go:223p has [nil]
 inbound method-name roster at bridge.go:42,43,44,45,66,67,75 = 7 lines mentioning Method (census says 7 names)
@@ -103,6 +87,13 @@ OK       z3-reasoning-printed           cmd/wisp/run.go:1351p has [fmt.Fprint(c.
    screens between the llm event and that print, measured with the same no-character-screen ruler: 0.
    => for shape (b) the census under-claims: it stops its own scope at the marshal bytes, while the terminal
       branch of the same event reaches human eyes today. Nothing over-claimed; one carrier left out.
+
+-- two more rulers the census cites, re-run here:
+   call sites of RequestWorkspaceSwitch (non-test, non-comment, at 7535d83b):
+      7535d83b:internal/panel/workspace.go:140:func RequestWorkspaceSwitch(scope PathScope, input string, audit AuditFunc) (WorkspaceView, error) {
+      7535d83b:internal/panel/workspace_handlers.go:125:	if _, err := RequestWorkspaceSwitch(h.Scope, req.Path, h.Audit); err != nil {
+   => 1 production call site (workspace_handlers.go:125) + 1 definition (workspace.go:140); the census number is CONFIRMED.
+   exec.Command non-test lines = 5 (census: 5), of which inside internal/panel = 0 (census: 0; positive control cmd/wisp/doctor.go:316 is in the list)
 
 
 ### the one field the census writes as having no known carrier (a FIELD, not a rune)
@@ -154,6 +145,10 @@ the file itself states the pixel half is still missing, deliver_329.go:28-31:
       // so until the machine owner's front-end agent lands that receiver a push here is
       // a call into a page that ignores it. The exact contract - global name, argument
 
+
+note on scope: the terminal-exit finding (z1-z3) and the two rulers above are this legs own additions on top of the census
+  table (they add carriers and re-measure two of its rulers; they correct nothing in it). Its one real self-correction is
+  recorded in logs/ac0-ac1-rulers-and-setdiff.log (RULER 3 filter), plus the baseline-red attribution in the teeth log.
 TALLY: citation checks OK=53 MISMATCH=0
 defect named by this leg (precision, not substance): census-2 (a) cites internal/panel/pump.go:281 for the Git carrier; at 7535d83b
   that line is the guard, and the assignment composer.Git = p.src.Git() sits at pump.go:284. The carrier exists; the number is 3 lines early.
