@@ -11,11 +11,11 @@ package main
 // and this file closes the Go half of it.
 //
 // THE SHAPE WAS RULED, NOT INVENTED HERE (orchestrator ruling A1009). The push
-// rides the host's existing Eval primitive - the same one cmd/wisp/panel_control_
-// windows.go's msgcb uses for the four RPC receipts - as one named global call
-// wrapping the pump's own marshal bytes verbatim. No new inbound Method* constant
-// was added (the bridge.go roster stays at its pinned size), no new publish drive
-// point was invented (this hop hangs ONLY inside publishPanelSnapshot, which every
+// rides the host's existing Eval primitive - the same one msgcb uses in
+// cmd/wisp/panel_control_windows.go for the four RPC receipts - as one named
+// global call wrapping the pump's own marshal bytes verbatim. No new inbound
+// Method* constant was added (the bridge.go roster stays at its pinned size),
+// no new publish drive point was invented (this hop hangs ONLY inside publishPanelSnapshot, which every
 // existing state-move trigger already calls), and no merge or backpressure rule is
 // claimed here - the "how often may a panel be pushed" rule belongs to ticket 35's
 // D38d line and this leg deliberately does not touch it. The outbound rows this hop
