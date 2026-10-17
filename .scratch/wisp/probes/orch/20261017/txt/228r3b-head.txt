@@ -1,0 +1,21 @@
+票 228 续腿 `228-r3b`（写面＝**只有新建 `.md`／`.log`**＋票尾一条 bullet；⛔ 动产码一字、⛔ 改任何断言）——前任 `228-r3` 死于 150 轮帽，本腿唯一任务＝**把那五枚停机用例跑到终态颜色**＋读票 `AC#11` 的 ⓑ 那把尺
+
+你是 `228-r3b`＝**取证／读数腿**（⛔ 翻框、⛔ 改判据文字／票名／`Status:`／`-done`、⛔ push）。票＝`.scratch/wisp/issues/228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md`（未勾 **11**，你自己 `grep -c '^[[:space:]]*- \[ \]'` 现跑点名，⛔ 抄我）。起手先 `git log -1 --format=%h%n%ad` 现认锚。
+
+## 前任留下的盘上形状（⛔ 当成"已验证"）
+- 产码两笔**已入库**：`f4d4fda9`＝`internal/proc/boot_windows.go` 52/8＋`stop_windows.go` 137/0（停机请求位）；`2327a7e7`＝`cmd/wisp/resident_ball_windows.go` 122/26＋`resident_windows.go` 75/6（托盘「退出」接执行者＋空窗那一半）。
+- 测试面两枚由**我代提**＝`04e3d903`：`cmd/wisp/resident_tray_stop_228_windows_test.go`（393 行）与 `resident_tray_stop_live_228_windows_test.go`（255 行）。★顶层用例五枚＝我 12:0x 现跑 `git grep -h '^func Test' HEAD -- 那两枚件` 抽出来的名册，逐枚点名：`TestAC11StopBitIsBuiltAtBoot`／`TestAC11TrayExitExecutorIsMountedAtTheBallHost`／`TestAC11TrayExitTriggerWalksTheTenSteps`／`TestAC11StopRequestDuringTheBootWindowIsNotSwallowed`／`TestLive228R3TrayExitStopsTheShippedProcessWithCodeZero`（★**这五个名是"存在"的读数、⛔ "会跑／会过"的读数**——那正是本腿要还的债，你自己再跑一把名册复认）。
+- ★**我这把尺只证编译**：`go vet ./cmd/wisp/` **rc=0**（11:18:35）。`vet`／`build` 绿**证明不了那五枚跑过、更证明不了过**——那正是本腿要还的债。
+## 本腿要交的三样
+1. **四数到终态**：`go test ./cmd/wisp/ -count=1 -timeout 30m -v`（★**必须**带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，否则 `exit status 0xc0000135`＋rc=1＋**零枚 `--- FAIL`**＝那包根本没跑＝台面故障、⛔ 计入判据）；四数＝`^=== RUN`（含子）⇄ `^--- PASS`（只顶层）⇄ `^--- FAIL` ⇄ `^--- SKIP`，⛔ 混用、⛔ 相减。那五枚逐枚点名颜色，红的**连文案逐字引**。
+2. **两把临时根台面成对**（默认 C 卷 ⇄ `TMP`/`TEMP` 指 `D:` 上先 `mkdir -p` 那一发；台账 `A1013` 那族＝换卷会翻身，⛔ 单台面那发判"没有红"）。
+3. **`AC#11` 的 ⓑ 那把尺**：判据原文在票面（`:91` 起，逐字自己读，⛔ 抄我的转述）。★那一支要的是**真机那发**（托盘「退出」真把常驻进程停掉、退出码为真值）；如果这台机器上当下跑不出那个世界 ⇒ **具名写"是哪一行拦的"＋最小说明**，⛔ 用"缺世界"当通过、⛔ 把没跑写成跑过；那一格归编排者约真窗。
+
+## 台面与并发（本波硬约束）
+⛔ 在共享工作树跑 `./cmd/wisp`：`internal/panel/**` 有 `335-r1` 在飞、`internal/risk/**` 有 `334-r1` 在飞 ⇒ 读代码取**具名提交树**，颜色两发在你**自己新建的仓外导出台树**里跑（八件套＋仓根 `docs/`＋手工三件；`D:` 卷、目录名要产生 8.3 短名；`GOTMPDIR` 先 `mkdir -p`；取出后先数 `.go` 证非空）。改前⇄改后**同一台面**。⛔ `go test ./...`、⛔ 杀 `wisp.exe` PID **21892**（活实例握全局热键＋单实例锁会打死几枚——那是本机状态，⛔ 为它们动断言）。★已知另一格：`cmd/wisp` 整包在**真窗区有整进程死亡**（包回 `FAIL` 却零枚 `FAIL:`／零枚 `ok`）⇒ 具名写清哪一发死在哪一行，⛔ 当"我的字节把包打红"、也⛔ 当"全绿"。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名是哪一行。
+
+## 写面（只许这三处，其它一切路径零字节）
+**新建**的 `.md`／`.log` 只落 `.scratch/wisp/probes/228/r3b/**`（★短名、⛔ 带 `§`、⛔ 落 `docs/evidence/s1/`——那是裁决者的面）＋票 228 末尾**一条**只追加 bullet＋（如你需要脚本）该目录里的 `.sh`。⛔ 产码字节（`cmd/**`、`internal/**` 一字都不许动，含那两枚 estate 测试件——它们已经入库，改动＝⛔ 报告不许自己动手）；⛔ `docs/specs/**`、`PLAN.md`、台账、`HANDOVER`、`frontend/**`、`design/**`、三枚冻结件、`thresholds.go`、golden、`allowlist.txt`、`go.mod`／`go.sum`／`.gitignore`／`ci.yml`。
+
+## 交件自证（三把尺＋必答两题）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含上面三处；★证明**产码零字节**）；② 读数件绝对路径＋`wc -c`＋行数＋占位符尺（分词形）0 命中并带 `stderr`；③ 决定性那把尺**逐字输出**（四数行＋那五枚逐枚名册，起手侧⇄交件侧）＋两把台面各自四数＋门禁 `rc=`（`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 只在共享工作树跑；`gofumpt`＝本腿零 `.go` 跟踪件 ⇒ 同尺空列表，⛔ 当"过了"；`go vet ./cmd/wisp/` 只在导出台树跑）。★必答两题（⛔ 你自己盖章不算）：**(i)** 那五枚里有没有哪一枚**换成反形也照样绿**（例：请求位根本没被读、或断言恒真）？你实测了哪一发？没实测就写"本腿未验"、⛔ 说它没牙。**(ii)** 终态红名册逐枚点名**各自归谁**（本机状态／别腿在飞／票 228 本案／台面故障），⛔ 把别人的账当本腿债、也⛔ 当"全绿"。
