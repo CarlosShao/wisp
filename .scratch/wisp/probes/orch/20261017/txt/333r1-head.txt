@@ -1,0 +1,19 @@
+票 333 落地腿 `333-r1`（写·靶子＝把显示边界的 `Cf` 判定从手写名册改成按范畴，★并给"名册随表走"装上会响的牙）
+
+你是 `333-r1`＝**产码腿**（只交料：⛔ 翻任何 AC 框、⛔ 改判据文字／票名／`Status:`／加 `-done`、⛔ push）。票＝`.scratch/wisp/issues/333-display-boundary-wash-cf-category-not-hand-roster.md`（AC#0–AC#8 共 **9** 枚未勾，起手自己 `grep -c '^[[:space:]]*- \[ \]'` 现跑点名，⛔ 抄我这枚数）。★判据正文全在票面，本派单**不重述判据**，只补台面、边界、与我这一步相关的三件事。
+
+## 我裁的形状（已写进票面"我裁的形状"一节，逐字以票面为准）
+`isDisplayWashCf`（现＝`internal/panel/display_scrub_216.go:164` 那枚手写 15 码位 `switch`，注意它是一条**跨行 `case`**）改成**按范畴问** `unicode.Is(unicode.Cf, r)`。撤销口令＝「333 改裁乙」；今天按甲-全跑。
+
+## ★三件事最容易做错，先说在前面
+1. **基数钉要换形，⛔ 留着当常量**：`internal/panel/display_scrub_327r2_test.go` 里 `TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen` 的期望侧现在是"15 枚字面清单"，扩集后它**必然红**——那是**规矩变了**、不是你把包打红了。处方＝改成**关系钉**（实际侧遍历全标量收集被洗集 ⇄ 期望侧按 `unicode.Is(unicode.Cf, r)` 收集，双向差集皆空、两臂不同断言行），★并保留"实际侧真读产码"那一味（`327-r2` 交回的摘除对照已证它读的是产码，⛔ 退回成期望侧自抄本那种自指）。改名后的用例名里⛔ 再留 `Fifteen` 这种枚数词。
+2. **同文件的排除钉 `TestDisplayWashRosterExcludesTheEightNamedRunes` 是第二枚"设计内会红"**：它现在断那八枚（变量名册在 `:25`，逐枚＝`0x2061 2062 2063 2064 061C 180E 206A 206B`）"不被洗"，扩集后这八枚**全变成被洗**（我那发 stdlib 探针逐枚读数：八枚 `Cf=true`）。★这一枚**按票面 AC#3 翻形**＝断言方向改成"被洗＝true"、逐枚具名写进证据件，⛔ 整枚删掉。
+3. **除上面那两枚，⛔ 动任何既有断言**。具名划出这两枚之外的红＝停下来上报（未定义即停），⛔ 自己放宽、⛔ 改期望值换绿、⛔ 加 `t.Skip`。★尤其：`display_scrub_216_test.go` 里票 327 残余 R4 点名的**三处装饰断言**（`327-v1` 判语件第 6 节写的是 `:416-417`／`:357-360`／`:400-401` 三带，其中 `:400` 那枚是 `if len(cfRoster) != 15`——它钉的是测试件自己那份抄本，扩集后**不会**变红，⛔ 顺手删它或改它，那笔账归我另裁）与那对成对靶子用例 `TestTheWriterBranchWashesCfEvenWhenTheFastPathAlreadyFired`（`:347`）／`TestNeedsDisplayWashNamesEveryWashedCfRune`（`:364`）——★这三处＋两枚用例名我今天逐枚 `sed`/`grep` 复跑过，行号只当读数、**认名字不认号**。
+
+## 台面（本腿硬要求，缺一味就假红）
+★**两把临时根台面成对**是本波新账（`A1013`：同一枚 `-run` 名册、只换 `TMP` 所在卷，`internal/risk` 那族差一枚红）。`go test ./internal/panel/ -count=1 -timeout 30m` 改前（起手锚）⇄ 交件两发，每发都要 C 卷一发＋`TMP`/`TEMP`/`GOTMPDIR` 指 `D:` 上一枚 `mkdir -p` 建好的目录一发，四数逐枚点名（`RUN` 含子测试 ⇄ `PASS_TOP` 只顶层 ⇄ `FAIL_TOP` ⇄ `SKIP`，⛔ 混台面相减），红名册两侧作差要具名写清。⛔ 整包 `./cmd/wisp`（本波写面归在飞的 `228-r3`）、⛔ `go test ./...`、⛔ 杀 `wisp.exe` PID **21892**。仓外树若要用来打突变＝八件套＋仓根 `docs/`＋手工三件，`.go` 先数证非空。
+
+## 写面（只许这四处）
+`internal/panel/display_scrub_216.go`（产码那一枚函数）＋`internal/panel/display_scrub_327r2_test.go`（基数钉换形）＋一枚**新建** `internal/panel/display_scrub_333_*_test.go`（AC#4 两侧同集／AC#5 成对两发的载体）＋`.scratch/wisp/probes/333/r1/**`（含 `logs/`，读数一律 `.log` 形）＋`docs/evidence/s1/333-r1-*.md`（★短名、⛔ 带 `§`）＋票 333 末尾**一条**只追加 bullet。⛔ 其它一切路径零字节：`cmd/wisp/**`、`internal/risk/**`（`216-v3` 正在只读它）、`frontend/**`、`design/**`、三枚冻结件、`thresholds.go`、golden、`allowlist.txt`、`go.mod`／`go.sum`／`.gitignore`／`ci.yml`、`docs/specs/**`、`PLAN.md`、台账、`HANDOVER`。
+
+★输出预算：≤4 枚件、每件 ≤160 行；每落一枚文件就 commit（本波已有一枚写腿攒到第 6 笔死于 150 轮帽，遗产要我代提）；轮次帽 150 ⇒ 先做 AC#2＋AC#5（判据最硬），把 `logs/` 逐枚提前入库。
