@@ -1,0 +1,11 @@
+票 216 裁腿 216-v3 探针面·二＝自己重放的三发突变（M1／M2／R1，全打在仓外导出树 D:\W216V3MUT 的物理字节上）
+
+锚＝7a94c3bd（被裁对象 216-r2 的终态）。建树＝八件套＋仓根 docs/＋手工三件；go_files=740 证非空、go build ./internal/risk/ rc=0、起手两枚件 tree 哈希＝锚上 blob（e4485625265847523534bcabd8267553e9e53338／c2bcd2c8191b95f585a36dcd03dbbfa0d8676fc5）。
+落点全用内容锚（函数体内那枚 token），逐枚 LANDS 自证 count、finally 还原＝git archive 该枚文件回锚上字节、还原哈希逐枚对回上列两枚 blob、MUTATION-216V3 残留 0。
+台面＝TMP/TEMP 指 D:\W216V3TMP（t.TempDir() 落主目录祖先链之外＝那枚 C 卷特红不在场，突变红才可归因）；基线 24/6/0/0 绿。
+  M1 rules_shell.go EqualFold→Contains        ⇒ 24/4/2/0：ⓐ 红在 allow_substring_pin_216_test.go:83（窗 12 行、markers=1、operators=1），ⓑ argv0 臂同红在 name_claim_two_arm_216_test.go:135 ⇒ 两枚仪器都有牙
+  M2 blacklist.go B 档循环插"含 已允许 就 ClassNone" ⇒ 24/5/1/0：ⓑ 三枚 B 档子用例红（:105 hostile "= none"、:110），ⓐ 三窗仍 0/0/0 ⇒ ⓐ 对这一形看不见、ⓑ 咬住（与 216-r2 交代同色）
+  M2 另打在 C 卷默认台面 ⇒ 四数与未突变的 C 台面一模一样（24/5/1/0），但红句里 hostile 读的是 "= A"（fail-closed 抢先），不是 M2 的 "= none" ⇒ C 卷那枚特红会冒充 M2 的信号，牙证必须在主目录祖先链之外的台面上读
+  R1 shellAllowlisted 整枚改名（3 处同改，编译不断）⇒ 24/5/1/0：ⓐ 红不静默，红句归位 allow_substring_pin_216_test.go:68
+还原后两把台面复跑：D 台面 24/6/0/0 ⇄ C 台面 24/5/1/0（＝起手基线色）。共享工作树 internal/risk porcelain 空＝本腿零字节。
+本腿零产码、⛔ 动任何断言、⛔ 翻框、⛔ push；写面＝.scratch/wisp/probes/216/v3/logs/**。
