@@ -1,0 +1,22 @@
+票 327 残余 R1：把名册基数常钉从仓外台件搬进 internal/panel 测试面（327-r2，只追加）
+
+判语件 docs/evidence/s1/327-v1-verdict.md 第 5 节具名残余 R1：静默往
+isDisplayWashCf 加一枚 U+206B，整包多红＝0 枚（PASS_TOP 155／FAIL_TOP 7 与终态
+逐枚同名）——今天抓得到它的只有判语腿那份仓外台件 zz_v1_exhaustive_test.go，
+它只装进临时那台，⛔ 是仓内常钉。本笔把这枚钉做进 internal/panel/_test.go。
+
+新增 internal/panel/display_scrub_327r2_test.go（160 行，纯新建、⛔ 动既有断言），
+三枚常驻用例：
+  1) 基数钉 TestDisplayWashRosterCardinalityIsExactlyTheRuledFifteen——只从产码
+     isDisplayWashCf 读实际集合，与裁定期望名册双向成对比较（extra＝多洗／
+     missing＝少洗，两枚不同断言行＝成对两发落点），字面量只当期望侧、⛔ 当实际侧。
+  2) 排除钉 TestDisplayWashRosterExcludesTheEightNamedRunes——判语件点名的 8 枚
+     （含被交付套件漏掉的 U+206B）逐枚断 washed=false。
+  3) 两侧同集钉 TestDisplayWashJudgeAndWriterAgreeOnBothFamiliesAndBoundaries——
+     needsDisplayWash ⇄ scrubForDisplay（含 ESC 强开快路径那一半）零分歧；
+     unicode.Cf／Cc 走全族、其余为具名边界抽样（写明哪枚全族、哪枚抽样）。
+
+成对两发在仓外导出树复跑（见 probes/327/r2/logs）：发一加 U+206B ⇒ 基数钉 extra
+臂红；发二摘 U+00AD ⇒ 基数钉 missing 臂＋既有写入侧／判据侧用例红、断言行不同。
+⛔ 扩名单（15 枚外 155 枚 Cf 归票 332）、⛔ 动 unicode.Mn、⛔ 动 risk/
+taintmatch.go、⛔ 动三枚冻结件、⛔ 动判语件 R4 三处装饰断言。只 commit、⛔ push。
