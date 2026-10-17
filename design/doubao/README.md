@@ -2,7 +2,7 @@
 
 > 纯静态 HTML/CSS/JS，双击 `demo/index.html` 即可在浏览器中打开（file:// 可用，无需构建、无需联网）。
 > 视觉语言：**Wisp Minimal · 磨砂极简**——Linear/Notion/shadcn 文档风，克制留白，轻 Acrylic/Mica 磨砂。
-> 当前版本：v4 全面对齐 BeautifulUI 21 组件 + ReactBits 动画体系（Sidebar 滑翔/Spotlight/磁吸/屏切换）。
+> 当前版本：v5 harness 扩展——首屏 home + 可展开左侧边栏(240px) + 右侧边栏(上下文/活动/审批三 tab)；v4 全面对齐 BeautifulUI 21 组件 + ReactBits 动画体系。
 
 ## 打开方式
 
@@ -32,7 +32,10 @@ demo/
 │   ├── security.js     # 安全（权限模式/授权撤销/黑名单/taint时间线/注入拦截）
 │   ├── privacy.js      # 隐私（5tab真实字段/保留期/麦克风开关/存储位置）
 │   ├── cost.js         # 成本（超限态/日月视图/Top5/柱状图/token分解）
-│   └── firstrun.js     # 首次引导（真实模型清单/校验/目录授权/DPAPI）
+│   ├── firstrun.js     # 首次引导（真实模型清单/校验/目录授权/DPAPI）
+│   └── home.js         # 首屏（问候/大composer/快捷chips/推荐卡/最近任务）
+├── sidebar.js          # 左侧边栏展开内容（logo/导航组/项目/最近/用户）
+├── rightbar.js         # 右侧边栏（上下文/活动/审批三tab）
 └── screenshots/        # 逐屏验证截图（v1/ v2/ v3/ v4/）
 ```
 
@@ -40,7 +43,9 @@ demo/
 
 | 操作 | 效果 |
 |---|---|
-| 点击左侧导航图标 | 切换屏幕（9 屏） |
+| 点击左侧导航图标 | 切换屏幕（10 屏，默认落地 home） |
+| 点击导航顶部 panel-left 按钮 | 展开/折叠左侧边栏（60px 图标轨 <-> 240px 完整栏，窗口平滑加宽） |
+| 点击标题栏 panel-right 按钮 | 开关右侧边栏（上下文/活动/审批三 tab） |
 | 点击右缘悬浮球 | 显示/隐藏主窗口 |
 | Ctrl+K | 唤起交互式命令面板（搜索/上下导航/Enter执行/Esc关闭） |
 | 点击标题栏太阳/月亮 | 浅色/深色主题切换（localStorage 持久化） |
@@ -56,6 +61,7 @@ demo/
 
 | 屏 | 深化后的真实功能 | 对应工单/规格 |
 |---|---|---|
+| 首屏 home | 时间问候(早/午/晚/深夜)、居中大 composer(@工作区//命令/模式切换/模型chip/麦克风/发送)、快捷动作 chips 5 个(跳对应屏)、为你推荐 4 卡、最近任务 3 行 | harness 扩展探索（偏离 SPEC-08） |
 | 对话 | 流式回复+停止按钮、工具chip四态（等待/执行中/完成/被拒）可展开参数结果、结果分流标识（面板/TTS/通知）、附件缩略图可删、工作区路径、干活/陪聊/自动模式切换（陪聊出红环）、历史按日期分组、推理折叠 | 92 composer、30 结果路由D10、26 TTS、28 会话预热、36 结果历史、D10/D11/D47 |
 | 审批 | 5条队列选中联动详情、每条引用R规则+风险等级、L1轻确认(2-3s倒计时)与L2强确认(300s)视觉区分、完整参数展开、面板仅拒绝+查看无允许键、批量拒绝、队列9/10接近容量上限+满额fail-closed说明 | 21 审批最小集、37 L2卡、48 队列满、49 会话授权D45-2、SPEC-06、D45/D31 |
 | 命令 | 5组（快捷指令/工具带L0L1L2 chip/设置/跳转/最近任务）、每项kbd快捷键、搜索过滤+空态（回车提交为自由文本）、最近任务按时间倒序、可点击跳转 | 38 命令面板、SPEC-08 palette、D12 |
@@ -157,6 +163,30 @@ agent 工作流部分以 BeautifulUI ai-native 组件为基座（工单 77 AC#7�
 | Tailwind play CDN | Tailwind v4 + @tailwindcss/vite |
 | Lucide UMD | lucide-react 1.47 |
 
+## 验证记录（v5 harness 扩展版）
+
+- **首屏 home**：默认落地屏，窗口 1040x820，时间问候（早/午/下午/晚/深夜五段）、居中大 composer（@工作区//命令/模式切换/模型chip/麦克风/发送）、5 快捷 chips 跳对应屏、4 推荐卡、3 最近任务行；发送/回车/Ctrl+Enter 换行均绑定
+- **左侧边栏**：60px 图标轨顶部 panel-left 按钮展开为 240px，窗口平滑加宽；展开态含 logo+折叠钮、导航组（6 项带 kbd）、项目组（Wisp 可展开子任务+Personal+Archive）、最近组（3 条）、底部用户卡；折叠回图标轨正常
+- **右侧边栏**：标题栏 panel-right 按钮开关，280px 三 tab（上下文/活动/审批）；上下文含工作目录+附件删除+预算 meter 42%；活动 5 条时间轴 feed；审批 9/10 队列缩略+查看全部跳 approval；shimmer 加载 300ms 后落真实内容
+- **窗口自适应**：home=1040px(mode-home)，panel 屏=720px(mode-panel)，右栏开时 home=1320px/panel=1000px；宽度 300ms cubic-bezier 过渡
+- **现有 10 屏不回退**：chat/approval/palette/tasks/ball/config/security/privacy/cost/firstrun 全部正常渲染，glide/思考态/任务行/自定义下拉均保持
+- 控制台零报错；全文件（含新增 home.js/sidebar.js/rightbar.js）禁扫字符扫描 0 匹配；全部 node --check 通过
+- prefers-reduced-motion 下降级为无过渡
+## v5.1 右侧边栏重做（图标轨 + 7 面板）
+
+右栏从 3 tab 改为 VS Code 式「44px 图标轨 + 面板内容区」结构，总宽约 300px。
+
+| 面板 | 图标 | 文件 | 内容 |
+|---|---|---|---|
+| 文件 | folder-open | rb-files.js | 工作区文件树（可展开折叠）、CWD 面包屑、路径锁说明（risk.PathResolver） |
+| 上下文 | layers | rightbar.js | 工作目录、附件列表（可删）、上下文预算 meter（IN/OUT/CACHED） |
+| 审阅 | git-pull-request | rb-review.js | Diff Table：改动文件列表（新增/修改/删除）、unified diff 行号样式、Apply 按钮 |
+| 终端 | square-terminal | rb-terminal.js | 拟真命令行（git status / rg 输出）、tab 切换、输入回显、D46 Tier-1 说明 |
+| 活动 | activity | rightbar.js | 时间轴 feed（工具调用/任务状态/审批） |
+| 审批 | shield-check | rightbar.js | 队列缩略 9/10、L1/L2 项、查看全部跳审批屏 |
+| 插件 | puzzle | rb-plugins.js | 已装插件/技能/伙伴分组、L1/L2 权限徽标、启用开关、D19 信任态说明 |
+
+注册接口：`RbPanels.register(id, {icon, label, render(app), onMount(app, el)})`，由 app.js 的 `buildRbRail()` 构建图标轨、`openRbPanel(id)` 切换面板。
 ## 验证记录（v4 全面对齐版）
 
 - v4 全局：Sidebar Nav 滑翔指示条平滑滑动、屏切换淡入上滑、card-spotlight 悬停高光、窗口分层投影
@@ -174,6 +204,20 @@ agent 工作流部分以 BeautifulUI ai-native 组件为基座（工单 77 AC#7�
 - 全部 10 文件 + app.js node --check 语法通过
 - 成本页柱状图用内联 style（height 像素 + background-color 色值）
 
+
+## v5 规格偏离声明（harness 扩展探索）
+
+> **重要**：v5 新增的宽布局、首屏 home、可展开左侧边栏(240px)、右侧边栏属于**对现行 SPEC-08 冻结规格的偏离探索**。
+> SPEC-08 冻结的是 720x780 小面板 + 60px 图标轨架构。本扩展仅供 owner 评估 harness 形态参考，**不构成规格变更**。
+> 如后续决定采纳，需走 SPEC-12 契约变更流程（人工批准 D/C 编号）。
+
+| 偏离项 | SPEC-08 冻结值 | v5 探索值 | 状态 |
+|---|---|---|---|
+| 窗口尺寸 | 720x780 固定 | home 1040x820，panel 720x780，右栏开时加宽 | 探索中 |
+| 左侧导航 | 60px 图标轨固定 | 60px 图标轨 <-> 240px 可展开侧边栏 | 探索中 |
+| 右侧边栏 | 无 | 280px 上下文/活动/审批三 tab | 探索中 |
+| 默认落地屏 | 对话 chat | 首屏 home（新建任务落地页） | 探索中 |
+| 首屏形态 | 无独立首屏 | 问候+大 composer+推荐卡+最近任务 | 探索中 |
 ## 归档说明
 
 - `01-ball-states.jpg`：用户满意的球状态定稿图，保留在本目录（ball.js 引用）

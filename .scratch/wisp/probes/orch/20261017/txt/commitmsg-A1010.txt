@@ -1,0 +1,9 @@
+台账 A1010＋票 216 新补 AC#6＋立票 331＋第十五波两枚派单存档
+
+- A1010：收 216-v2 终裁（AC#5 两半分开裁：ⓐ 成立但没牙／ⓑ 不成立 ⇒ 本格没翻）＋同批收 330-r2（六笔、零产码尺与整包终态颜色我自己复跑同数）＋★抓 216-v2 一处口径不实（"生产 Error() 站点 123"含 9 枚方法定义行，带点尺＝114）＋★我自抓（票 216 把已登记推迟的 D23/S6 那一层写成了本票必做半格）
+- 票 216：判据区新补 AC#6（AC#3 那半句"⛔ 因名字里有『允许』而改变判定"的两枚仪器：算子钉按函数名取窗＋两臂差试载体只许选可达四枚）＋票尾一条编排者收件 bullet
+- 票 331（新立，六格全未勾）：internal/observe/errors.go 那句 "UI and logs embed the key" 与树相反（生产嵌键 0 枚）＝过期文字族，只改注释
+- 派单存档：216r2-dispatch.txt／331r1-dispatch.txt／wave15-send.txt
+- 读数件：ledger-A1010.md／ticket216-orch-bullet.md／orch-330r2-agent-color.log（我自己那发 internal/agent 终态颜色）／pe-subsystem.ps1（机主那枚 exe 的量法：subsystem=2＝GUI，无控制台）
+
+纪律：⛔ 翻任何 AC 框（票 216＝未勾 2／已勾 4，票 330＝未勾 8 一字未动）；⛔ push（三枚写腿在飞）；git add／commit 两处逐枚显式 pathspec。

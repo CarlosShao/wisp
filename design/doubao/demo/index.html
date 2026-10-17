@@ -90,6 +90,12 @@
       <span class="text-[13px] font-medium text-foreground/80">一缕</span>
     </div>
     <div class="flex items-center gap-1">
+      <button id="rightbar-toggle" class="title-bar-btn" title="右侧边栏">
+        <i data-lucide="panel-right" class="w-4 h-4"></i>
+      </button>
+      <button id="history-btn" class="title-bar-btn" title="历史记录" onclick="toast('演示原型，仅作展示')">
+        <i data-lucide="history" class="w-4 h-4"></i>
+      </button>
       <button id="theme-toggle" class="title-bar-btn" title="切换主题">
         <i data-lucide="sun" class="w-4 h-4 icon-light"></i>
         <i data-lucide="moon" class="w-4 h-4 icon-dark hidden"></i>
@@ -108,10 +114,17 @@
 
   <!-- 窗口主体 -->
   <div class="window-body">
-    <!-- 左侧导航 -->
-    <nav id="side-nav" class="side-nav"></nav>
+    <!-- 左侧导航（图标轨 + 展开态侧边栏内容） -->
+    <nav id="side-nav" class="side-nav">
+      <div id="sidebar-full" class="sidebar-full"></div>
+    </nav>
     <!-- 内容区 -->
     <main id="app" class="content-area"></main>
+    <!-- 右侧边栏（图标轨 + 面板） -->
+    <aside id="right-bar" class="right-bar">
+      <div id="rb-rail" class="rb-rail"></div>
+      <div id="rb-panel" class="rb-panel"></div>
+    </aside>
   </div>
 </div>
 
@@ -155,6 +168,13 @@
 <script src="screens/privacy.js"></script>
 <script src="screens/cost.js"></script>
 <script src="screens/firstrun.js"></script>
+<script src="screens/home.js"></script>
+<script src="sidebar.js"></script>
+<script src="rightbar.js"></script>
+<script src="rb-files.js"></script>
+<script src="rb-review.js"></script>
+<script src="rb-terminal.js"></script>
+<script src="rb-plugins.js"></script>
 <script>
   // 启动
   document.addEventListener('DOMContentLoaded', function() {

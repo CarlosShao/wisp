@@ -64,6 +64,11 @@ RENDERER_NEVER_PRINTS_POSITION = spec("cmd/wisp/slo_windows.go",
 CASE14_NOT_A_TEST = spec("cmd/wisp/slo_report_144_windows_test.go",
                          "func TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne(t *testing.T) {",
                          "func notATEST_152_case14_neutralised(t *testing.T) {")
+# Deleting the whole exited arm (not just its summary half): the reading that
+# answers "would anything at all notice if that branch did not exist".
+EXITED_BRANCH_DELETED = spec("cmd/wisp/slo_windows.go",
+                             "\t\tif s.exited() {\n\t\t\treturn nil, fmt.Errorf(\"wisp slo: subject %d exited (code %d) without writing its report (%s)\",\n\t\t\t\ts.pid, s.exitCode(), last.summary())\n\t\t}\n",
+                             "")
 
 
 def apply_muts(base, name, specs):
@@ -168,6 +173,13 @@ if __name__ == "__main__":
         "g2-case14-not-a-test-only": [CASE14_NOT_A_TEST],
         "g3-renderer-always-prints-position": [RENDERER_ALWAYS_PRINTS_POSITION],
         "g4-renderer-never-prints-position": [RENDERER_NEVER_PRINTS_POSITION],
+        # --- the literal "delete that line" AC#3 offered as the other choice ---
+        "i1-delete-the-fallback-arm": [spec("cmd/wisp/slo_windows.go",
+                                            "\treturn offsetUnknown\n}",
+                                            "}")],
+        # --- the exited arm as a whole, on the bytes this ticket ships ---
+        "h1-exited-arm-deleted": [EXITED_BRANCH_DELETED],
+        "h2-exited-arm-deleted-case13off": [EXITED_BRANCH_DELETED, CASE13_NOT_A_TEST],
     }
     for cell in cells:
         if cell not in M:

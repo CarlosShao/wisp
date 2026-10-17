@@ -5,6 +5,7 @@ go 1.27
 toolchain go1.27.1
 
 require (
+	github.com/jchv/go-webview2 v0.0.0-20260205173254-56598839c808
 	github.com/k2-fsa/sherpa-onnx-go v1.13.8
 	github.com/pelletier/go-toml/v2 v2.2.4
 	golang.org/x/crypto v0.57.0
@@ -16,7 +17,6 @@ require (
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/jchv/go-webview2 v0.0.0-20260205173254-56598839c808 // indirect
 	github.com/jchv/go-winloader v0.0.0-20250406163304-c1995be93bd1 // indirect
 	github.com/k2-fsa/sherpa-onnx-go-linux v1.13.8 // indirect
 	github.com/k2-fsa/sherpa-onnx-go-macos v1.13.8 // indirect

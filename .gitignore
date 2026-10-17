@@ -44,6 +44,15 @@ secrets/
 coverage*
 testdata/local/
 
+# --- Git worktrees ---
+# A worktree is a full second checkout of this repo. It must never show up as
+# untracked noise in the main checkout's `git status`, and it must never be
+# scanned: the D22 and panel hygiene instruments walk fixed paths from the repo
+# root, and a nested copy of the tree under it would double their scope.
+# `/` anchors to the root so a nested `.worktrees` inside a subproject is not
+# swallowed by this rule.
+.worktrees/
+
 # --- IDE / OS ---
 .vscode/
 .idea/

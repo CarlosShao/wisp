@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    Wisp Minimal Demo · app.js
    路由 / 导航 / Toast / 命令面板 / Modal / 主题切换
    ============================================================ */
@@ -13,8 +13,17 @@ window.Screens = {
   all() { return this._registry; }
 };
 
+// ---------- 右栏面板注册表 ----------
+window.RbPanels = {
+  _registry: {},
+  register(id, config) { this._registry[id] = config; },
+  get(id) { return this._registry[id]; },
+  all() { return this._registry; }
+};
+
 // ---------- 导航配置 ----------
 const NAV_ITEMS = [
+  { id: 'home',     icon: 'home',                label: '首页' },
   { id: 'chat',     icon: 'message-square-text', label: '对话' },
   { id: 'approval', icon: 'shield-check',        label: '审批' },
   { id: 'palette',  icon: 'command',             label: '命令' },
@@ -28,19 +37,23 @@ const NAV_ITEMS = [
 
 // ---------- App 主体 ----------
 const App = {
-  currentScreen: 'chat',
+  currentScreen: 'home',
   theme: 'light',
+  leftExpanded: false,
+  rightOpen: false,
+  activeRbPanel: "files",
+  rbRailBuilt: false,
 
   init() {
     this.loadTheme();
     this.buildNav();
     this.bindEvents();
-    this.showScreen('chat');
-    // 首次加载弹 firstrun
+    this.showScreen('home');
+    if (window.Sidebar && typeof Sidebar.init === 'function') Sidebar.init(this);
+    if (window.RightBar && typeof RightBar.init === 'function') RightBar.init(this);
     if (!localStorage.getItem('wisp-firstrun-done')) {
       setTimeout(() => this.showFirstRun(), 400);
     }
-    // 首载 Preloader：1.1s 后淡出（仅首次，切屏不闪）
     setTimeout(() => {
       const pl = document.getElementById('preloader');
       if (pl) pl.classList.add('hidden-loader');
@@ -66,7 +79,17 @@ const App = {
   // ---------- 导航 ----------
   buildNav() {
     const nav = document.getElementById('side-nav');
+    const sidebarFull = document.getElementById('sidebar-full');
     nav.innerHTML = '';
+    if (sidebarFull) nav.appendChild(sidebarFull);
+    // 展开/折叠按钮（图标轨顶部）
+    const expandBtn = document.createElement('button');
+    expandBtn.className = 'nav-expand-btn';
+    expandBtn.id = 'nav-expand-btn';
+    expandBtn.title = '展开侧边栏';
+    expandBtn.innerHTML = '<i data-lucide="panel-left"></i>';
+    expandBtn.onclick = () => this.toggleLeftSidebar();
+    nav.appendChild(expandBtn);
     // 滑翔指示条
     const glide = document.createElement('div');
     glide.className = 'nav-glide';
@@ -77,7 +100,7 @@ const App = {
       btn.className = 'nav-item' + (item.id === this.currentScreen ? ' active' : '');
       btn.dataset.screen = item.id;
       btn.title = item.label;
-      btn.innerHTML = `<i data-lucide="${item.icon}"></i>`;
+      btn.innerHTML = `<i data-lucide="${item.icon}"></i><span class="nav-label">${item.label}</span>`;
       btn.onclick = () => this.showScreen(item.id);
       nav.appendChild(btn);
     });
@@ -88,7 +111,7 @@ const App = {
     const helpBtn = document.createElement('button');
     helpBtn.className = 'nav-item';
     helpBtn.title = '首次引导';
-    helpBtn.innerHTML = `<i data-lucide="life-buoy"></i>`;
+    helpBtn.innerHTML = `<i data-lucide="life-buoy"></i><span class="nav-label">引导</span>`;
     helpBtn.onclick = () => this.showFirstRun();
     nav.appendChild(helpBtn);
     this.updateNavGlide();
@@ -123,19 +146,105 @@ const App = {
     }
     this.currentScreen = id;
     this.updateNavActive(id);
+    this.updateLayout();
     const app = document.getElementById('app');
     app.style.animation = 'none';
-    app.offsetHeight; // reflow
+    app.offsetHeight;
     app.style.animation = '';
     app.innerHTML = screen.html;
     app.classList.remove('screen-enter');
-    app.offsetHeight; // reflow
+    app.offsetHeight;
     app.classList.add('screen-enter');
     this.refreshIcons();
-    // 屏幕级初始化钩子
     if (typeof screen.onMount === 'function') {
       try { screen.onMount(this); } catch(e) { console.warn('screen onMount error:', e); }
     }
+  },
+
+  // ---------- 右栏面板 ----------
+  buildRbRail() {
+    const rail = document.getElementById('rb-rail');
+    if (!rail || this.rbRailBuilt) return;
+    rail.innerHTML = '';
+    const order = ['files','context','review','terminal','activity','approval','plugins'];
+    const self = this;
+    order.forEach(function(id) {
+      const panel = RbPanels.get(id);
+      if (!panel) return;
+      const btn = document.createElement('button');
+      btn.className = 'rb-rail-item' + (id === self.activeRbPanel ? ' active' : '');
+      btn.dataset.panel = id;
+      btn.title = panel.label || id;
+      btn.innerHTML = '<i data-lucide="' + panel.icon + '"></i>';
+      btn.onclick = function() { self.openRbPanel(id); };
+      rail.appendChild(btn);
+    });
+    this.rbRailBuilt = true;
+    this.refreshIcons();
+  },
+
+  openRbPanel(id) {
+    const panel = RbPanels.get(id);
+    if (!panel) return;
+    this.activeRbPanel = id;
+    document.querySelectorAll('.rb-rail-item').forEach(function(el) {
+      el.classList.toggle('active', el.dataset.panel === id);
+    });
+    const container = document.getElementById('rb-panel');
+    if (!container) return;
+    container.innerHTML = '';
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'flex:1;display:flex;flex-direction:column;min-height:0;';
+    container.appendChild(wrapper);
+    if (typeof panel.render === 'function') {
+      wrapper.innerHTML = panel.render(this);
+    }
+    this.refreshIcons();
+    if (typeof panel.onMount === 'function') {
+      try { panel.onMount(this, wrapper); } catch(e) { console.warn('rb panel onMount:', e); }
+    }
+  },
+
+  // ---------- 布局：窗口宽度 / 左右栏 ----------
+  updateLayout() {
+    const win = document.getElementById('main-window');
+    const isHome = this.currentScreen === 'home';
+    win.classList.toggle('mode-home', isHome);
+    win.classList.toggle('mode-panel', !isHome);
+    win.classList.toggle('right-open', this.rightOpen);
+    // 左栏展开时 home 保持宽，panel 也适当加宽
+    if (this.leftExpanded && !isHome) {
+      win.style.width = '900px';
+    } else if (!this.leftExpanded && !isHome && !this.rightOpen) {
+      win.style.width = '';
+    }
+  },
+
+  toggleLeftSidebar() {
+    this.leftExpanded = !this.leftExpanded;
+    const nav = document.getElementById('side-nav');
+    nav.classList.toggle('expanded', this.leftExpanded);
+    const btn = document.getElementById('nav-expand-btn');
+    if (btn) {
+      btn.title = this.leftExpanded ? '折叠侧边栏' : '展开侧边栏';
+      const icon = btn.querySelector('i, svg');
+      if (icon) icon.setAttribute('data-lucide', this.leftExpanded ? 'panel-left-close' : 'panel-left');
+    }
+    this.updateLayout();
+    this.refreshIcons();
+    // 通知 sidebar 内容刷新 active
+    if (window.Sidebar && typeof Sidebar.refresh === 'function') Sidebar.refresh(this);
+  },
+
+  toggleRightBar() {
+    this.rightOpen = !this.rightOpen;
+    const rb = document.getElementById('right-bar');
+    rb.classList.toggle('open', this.rightOpen);
+    if (this.rightOpen) {
+      this.buildRbRail();
+      this.openRbPanel(this.activeRbPanel);
+    }
+    this.updateLayout();
   },
 
   refreshIcons() {
@@ -252,7 +361,9 @@ const App = {
   bindEvents() {
     // 主题切换
     document.getElementById('theme-toggle').onclick = () => this.toggleTheme();
-
+    // 右侧边栏开关
+    const rbToggle = document.getElementById('rightbar-toggle');
+    if (rbToggle) rbToggle.onclick = () => this.toggleRightBar();
     // 悬浮球
     document.getElementById('floating-ball').onclick = () => this.toggleWindow();
 
@@ -306,6 +417,8 @@ const App = {
 window.App = App;
 window.toast = (msg) => App.toast(msg);
 window.toggleWindow = () => App.toggleWindow();
+window.toggleLeftSidebar = () => App.toggleLeftSidebar();
+window.toggleRightBar = () => App.toggleRightBar();
 
 /* ===== bu-select: global custom dropdown component ===== */
 window.BUSelect = (function () {

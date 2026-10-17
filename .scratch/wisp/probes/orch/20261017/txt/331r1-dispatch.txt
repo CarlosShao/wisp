@@ -1,0 +1,36 @@
+票 331 落地腿 `331-r1`（写·**只 `internal/observe/errors.go` 的整行注释面**）——把那句 "UI and logs embed the key" 改成说实话
+
+你是 `331-r1`，一枚**微腿**。票＝`.scratch/wisp/issues/331-message-key-comment-says-ui-embeds-it-production-zero.md`（六格全未勾，判据正文在票的判据区，**逐字读它再开工**）。来料：非实现者裁决腿 `216-v2` §5 第 5 条抓到 `internal/observe/errors.go:160-162` 那句注释与树相反；账 `A1010`。
+
+## 这件事的形状（⛔ 扩大射程）
+- **只改注释文字**。`MessageKey()` 的函数体、签名、返回值一字不许动；⛔ 顺手补一条生产调用去"让注释说满"——那是 `D23`／`S6` 那层 DEFERRED 的活（`docs/specs/SPEC-12-roadmap-governance.md:77` 逐字 `| DEFERRED | 完整错误文案体系 | D23 | … | S6 | … |`），**不归本票**。
+- ★**推迟的是"做那层文案"，不是"注释可以替它说假话"**——这两句的区别就是本票存在的全部理由，证据件里要有一节把这条分界写清。
+- 改口必须含三件事实（票 `AC#1` 逐字）：① 那枚键是为文案层**预备**的；② **今天生产没有任何地方嵌它**（消费者只有测试，逐枚具名）；③ 文案层仍归 `D23`／`S6` 的 DEFERRED。⛔ 写成"将来也永远拦得住"式许诺（本仓 `AC#5` 那条纪律同形）。
+
+## 起手锚与三把尺（⛔ 抄票面的数——起手先自己现跑）
+1. `git grep -n "MessageKey" <起手锚> -- internal cmd tools ':(exclude)*_test.go'` ⇒ 编排者 10-17 复跑＝**只剩 `:160` 注释＋`:163` 声明两行＝生产消费者 0**；你重跑不同 ⇒ 当场具名更正并写进件。
+2. 同尺去掉 `:(exclude)` ⇒ 测试消费者在场（我复跑到的形＝`internal/observe/errors_test.go:191-192`、`internal/llm/matrix_14_2_test.go:175`／`:249`）⇒ **正控，证尺不瞎**。
+3. `sed -n '158,166p' <起手锚 版>` 取那三行注释**逐字**存档（改前原文必须留档，⛔ 只贴改后）。
+
+## 写面（只许这五处，逐字；超出一枚算越格、我退回）
+1) **`internal/observe/errors.go` 的整行注释面**（★只这一枚文件、★只整行 `//` 注释行）；2) `.scratch/wisp/probes/331/r1/**`（含 `logs/`；原始读数一律 `.log`，⛔ `.out`——`.gitignore:8` 不收）；3) `docs/evidence/s1/**` 一枚件（★短名、⛔ 长名、⛔ 件名带 `§`）；4) 票 331 末尾**一条**只追加 bullet；5) 台件本身（突变／比对脚本，放 2) 里面）。
+⛔ 其它一切面：`internal/observe/**` 的**非注释行**、`cmd/wisp/**`（本波 `329-r1` 在写产码）、`internal/panel/**`（`327-v1` 只读射程）、`internal/agent/**`（`330-r2` 在写测试面）、`internal/risk/**`（`216-r2` 在写测试面）、`internal/tools/**`、`internal/memory/**`、`internal/session/**`、`frontend/**`、`design/**`、`PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden 既有件／`tools/d22scan/allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`／三枚冻结件。
+
+## 判据（`AC#2` 是这枚腿的命，⛔ 跳过）
+- ★**产码字节零改动那把尺**：把两侧**滤掉整行注释**后比字节 ⇒ 锚 blob ⇄ 工作树**同串**（`sha256` 两侧同值＋`diff` 空、`rc=0`）。**正控必做（缺一把尺就不算证据）**＝只在**副本**的非注释行改一枚字面量 ⇒ 同一把尺必回**非空、rc=1**。★"空"只有在正控能造出"非空"之后才是证据（本仓入账的恒真形＝"一把尺两种形状都放行"）。另附逐行核：改动枚数、其中**非整行注释枚数必为 0**。
+- **行为不变**（`AC#3`）：`go test ./internal/observe/ -count=1 -timeout 30m -v` 两发**都在仓外导出树**（一棵＝起手锚原样＝改前，一棵＝起手锚＋你那三行注释＝改后；⛔ 用共享工作树跑"改前那一发"，里面有别腿在飞字节）；四数逐枚点名（`^=== RUN` 含子测试 ⇄ `^--- PASS` 只数顶层、⛔ 混用）＋ `^panic` 枚数；两发红名册**作差＝0**。⛔ 跑整包 `./cmd/wisp`、⛔ `go test ./...`。
+- ★**台面配方**：`git archive <起手锚> go.mod go.sum internal cmd tools scripts frontend models` **八件套**＋**仓根 `docs/`**＋手工补 `build/*.dll`／`third_party/sherpa-onnx/*.dll`／`frontend/dist`；树放 **`D:` 卷、目录名要有 8.3 短名别名**（`/tmp`＝11 枚假红）；取出后**先数 `.go` 证非空**；`GOTMPDIR` 指 `D:` 并先 `mkdir -p`。
+- **门禁四数只在共享工作树跑**（⛔ 部分导出树）：`gofumpt.exe -l`（真身 `/d/work/base/gopath/bin/gofumpt.exe`）／`sh scripts/d22scan.sh`（缺 `design/` 的树会 `exit 2`＝GUARD 拒绝，⛔ 读成红）／`sh scripts/check-path-length-budget.sh`（要 `.git`）／`go vet ./internal/observe/`，逐枚 `rc=`。红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写哪一行，⛔ 计入判据。
+
+## 规矩（一条都不许漏）
+- **只 commit、⛔ push**；`git add`／`git commit` 两处**逐枚显式 pathspec**；⛔ `add -A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 仓内建 worktree／checkout。
+- **⛔ 翻任何 AC 框（本票六枚全归非实现者裁）、⛔ 改 `Status:`／票名／加 `-done`**；⛔ 动票 216／225 的任何件（`DEFERRED(` 标记缺失那笔账**归票 225**，你在件里只可指名、⛔ 去补）。
+- ⛔ 放宽断言／删用例／`t.Skip`；⛔ 在注释里指名一枚不存在的测试当凭据（本仓入账六次）；⛔ 杀 `wisp.exe` **PID 21892**（台账 `A988`）。
+- 读数纪律：引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先看 `stderr`＋跑正控（入账形：漏 `-E` 造假 0；`cmd | head; echo $?` 取的是 `head` 的退码）。
+- **输出预算**：≤3 枚件、每件 ≤120 行；⛔ 0 字节（交件前 `wc -c`）；轮次帽约 150 ⇒ 每落一枚文件就 commit。
+- shell 规矩：正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 并发在飞（10:0x 现量）：`329-r1`（`cmd/wisp`）∥ `327-v1`（裁 `internal/panel`）∥ `216-r2`（`internal/risk` 测试面）；`330-r2` **已交、已收**⇒ `internal/agent` 那面现在是已提交态。⇒ ⛔ 读别腿在飞字节当凭据；撞车了就等并具名写你等了谁。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（★其中动到产码文件的那一笔必须**只有** `internal/observe/errors.go`，且 `git show` 的 diff 行**逐枚都是整行注释**——把这枚 diff 原文贴进件里）；② 证据件绝对路径＋`wc -c`＋行数＋占位符尺 0 命中；③ ★**零改动尺＋它的正控**两侧 `rc=`/`sha256` 逐字 ＋ 两发颜色四数 ＋ 门禁四数 `rc=` ＋ 改前三行注释原文。
+另加我的必答题（⛔ 你自己盖章不算）：**你这枚改口如果反过来写会怎样**——把注释改成"生产已经嵌了键"（仓外副本、当场还原、报还原哈希），你上面那把"零改动尺"**该不该红**？如果它也红＝它测的是"注释被改过"而不是"产码字节没动"，具名写清这把尺的真实射程交我裁。

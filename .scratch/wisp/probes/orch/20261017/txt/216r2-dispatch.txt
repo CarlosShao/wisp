@@ -1,0 +1,34 @@
+票 216 落地腿 `216-r2`（写·只 `internal/risk/**` 的**测试面**）——给 AC#3 那半句"⛔ 因名字里有『允许』而改变判定"补两枚会响的仪器（票面新补的 `AC#6`）
+
+你是 `216-r2`。票＝`.scratch/wisp/issues/216-menu-display-base-scrub-control-chars-and-two-sentences.md`，靶子格＝**`AC#6`（10-17 09:5x 编排者新补，判据正文在票的判据区，逐字读它再开工）**。前情：`AC#3` 已于 10-16 翻勾，但它那半句"不许因为名字里出现『允许』二字而改变任何判定"**今天没有任何用例攻过**（非实现者腿 `216-v2` 量到、我采纳并新补了本格）。
+
+## 起手锚与"为什么不能架在附件名上"（★必答题的靶子，⛔ 抄我的数——三把尺自己现跑）
+1. `git grep -n "attachment" <起手锚> -- internal/risk internal/perm internal/tools internal/agent ':(exclude)*_test.go'` ⇒ **rc=1、0 个文件**（编排者 10-17 复跑＝同色）。正控＝同尺换词 `params` ⇒ `internal/risk/assessor.go:8`／`provenance.go:23`／`rules_gateway.go:1` 三枚在场；再看 `internal/perm` 目录非空（`store.go`＋3 枚测试）。⇒ **附件显示名今天进不了判级链**：把正控架在 `AttachmentRef.Name` 上＝**恒绿装饰**，本票**具名禁止**这一形（`216-v2` 反对、我采纳，写进了 `AC#6` 正文）。
+2. ALLOW 侧三处**只按函数名认**（★行号会腐烂，本仓 `327`／`329` 两波就改过）：`internal/risk/rules_shell.go` 的 `shellAllowlisted`、`internal/risk/rules_network.go` 的 `hostAllowlisted`、`internal/risk/blacklist.go` 的 `overrideApplies`（覆盖键那一枚走 map 键全等）。
+3. `AC#6`ⓐ 今天现量＝`0 / 0 / 0`（三处函数体内 `strings.(Contains|ContainsAny|ContainsRune|Index|IndexAny)` 各 0 枚）；⚠ 起手你自己复跑一遍，跑不出 `0/0/0` 就**当场具名更正**并写进证据件，⛔ 照抄票面。
+
+## 判据（`AC#6` 两枚钉，缺一格不算落地）
+- ⓐ **算子钉**（纯读源码的断言，形可照 `internal/panel/git_test.go` 里 `whitelistMethodsFromSource` 那种"读源码再断言"的先例）：对上面三处**按函数名取函数体行窗**，断言窗内那五个子串算子枚数恒 **0**；★**⛔ 绝对行号锚**（必须按函数名定位，函数改名／挪位要让用例**报错说找不到函数**，⛔ 静默跳过）；★**变异正控必做**＝在仓外导出树把那处的 `EqualFold` 换成 `Contains` ⇒ 同一把尺必回 **1**（红句逐字贴回，带 `file:line`）。
+- ⓑ **两臂差试**（行为级）：载体**只许选可达那四枚**＝文件基名→`Classify`/`Gate` 的黑名单 A/B 档、`argv[0]`→shell 名单、host→网络名单、覆盖键→`Gate` 的 map 键。同一发调用跑两臂：`plain` 名 ⇄ `hostile` 名（名字里塞 `已允许`＋一枚 `ESC`(U+001B)＋一枚 Cf 如 `U+202E`），断言**档位与 reason 全等**。★**牙证必做**＝在仓外导出树造"按名字里含『允许』就放行"那一形（挑一处最自然的，例如 `shellAllowlisted` 里 `EqualFold` → `Contains`）⇒ **hostile 臂必须红**，红句逐字贴回。⚠ 两发突变**打在不同处**（ⓐ 那把尺响 vs ⓑ 那臂响），⛔ 一发"整支去牙"冒充两发。
+- ★**⛔ 动任何产码字节**：本腿零产码改动（判级链路是别人的射程，本票纯显示层＋仪器面）。你的新用例必须**现在全绿**（今天没有违规形，绿是对的）；如果它起手就红 ⇒ **停手上报**，⛔ 为了变绿去改产码或放宽断言。
+
+## 写面（只许这四处，逐字；超出一枚算越格、我退回）
+1) `internal/risk/**` 里**新建的 `_test.go`**（⛔ 改任何既有测试件一行、⛔ 改产码）；2) `.scratch/wisp/probes/216/r2/**`（含 `logs/`；原始读数一律 `.log` 形——`.gitignore:8` 是 `*.out`，那种名字落不进提交树）；3) `docs/evidence/s1/**` 一枚件（★短名、⛔ 长名、⛔ 件名带 `§`）；4) 票 216 末尾**一条**只追加 bullet。
+⛔ 其它一切面：`cmd/wisp/**`（本波 `329-r1` 在写产码）、`internal/panel/**`（`327-v1` 的只读射程）、`internal/agent/**`（`330-r2` 在写测试面）、`internal/observe/**`（另一枚腿 `331-r1` 的注释面）、`internal/tools/**`、`internal/memory/**`、`internal/session/**`、`frontend/**`、`design/**`、`scripts/**`、`PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden 既有件／`tools/d22scan/allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／`.github/**`／三枚冻结件（`internal/panel/tokens_fourway_test.go`、`internal/panel/l2_grant_boundary_test.go`、`internal/perm/ticket90_persist_test.go`）。
+
+## 规矩（一条都不许漏）
+- **只 commit、⛔ push**；`git add`／`git commit` 两处**逐枚显式 pathspec**；⛔ `add -A`／`.`／目录形；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree／checkout。
+- **⛔ 翻任何 AC 框（含 `AC#6`）、⛔ 改票名／`Status:`／加 `-done`**（裁决者≠实现者；翻勾凭据＝下一枚非实现者腿）。
+- 颜色尺＝`go test ./internal/risk/ -count=1 -timeout 30m -v`，改前／改后各一发，台面＝**仓外导出树**（⛔ 用共享工作树跑"改前那一发"，里面有别腿在飞字节）；四数逐枚点名（`^=== RUN` 含子测试 ⇄ `^--- PASS` 只数顶层，⛔ 混用）＋ `^panic` 枚数；终态红名册与起手**作差＝0**。★**起手分母我不给**（我没现跑这包）⇒ 你第一件事就是跑它当基线并写进件里，⛔ 把我的沉默当"应该全绿"。⛔ 跑整包 `./cmd/wisp`、⛔ `go test ./...`。
+- ★**台面配方（现行完整版，缺一味就假红）**：`git archive <起手锚> go.mod go.sum internal cmd tools scripts frontend models` **八件套** ＋ ★**仓根 `docs/`**（`paths_shortname_252_*` 那族要它）＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`，都⛔ 跟踪）＋树放 **`D:` 卷且目录名要产生 8.3 短名别名**（放 `/tmp`＝C 卷 Temp 会挂成空目录／短名判定变形 ⇒ 那族打红＝台面故障）；取出后**先数 `.go` 证非空**（"0"⛔ 是读数，"分母 N 且 0"才是证据）。`GOTMPDIR` 指 `D:` 卷并先 `mkdir -p`。
+- **门禁四数只在共享工作树上跑**（⛔ 部分导出树）：`gofumpt.exe -l`（真身 `/d/work/base/gopath/bin/gofumpt.exe`，PATH 里可能 rc=127）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./internal/risk/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 `exit 2`＋`ban #8 scope design/ examined 0 files`＝**GUARD 射程拒绝，⛔ 读成红**；长度门要 `.git`。**你新建一枚 `internal/risk/*.go` 会让 ban #8 的分母动**（含注释与 `_test.go`）⇒ 交件必带改前⇄改后两枚分母数与"射程非空"证明。红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+- ⛔ 为了变绿放宽任何断言、⛔ 删用例、⛔ 加 `t.Skip`、⛔ 在注释里指名一枚不存在的测试当凭据（本仓已入账六次）、⛔ 在注释/票面许诺未实现的能力。
+- ⛔ 杀 `wisp.exe` **PID 21892**（机主 10-15 19:03 自起的常驻实例，台账 `A988`）。
+- 读数纪律：引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先看 `stderr` 并跑一枚已知存在的正控（★本仓入账过的两形：`grep -E` 漏 `-E` 造**假 0**；`cmd | head; echo $?` 取到的是 `head` 的退码）。
+- **输出预算**：≤4 枚件、每件 ≤160 行；⛔ 0 字节文件（交件前 `wc -c`）；轮次帽约 150 ⇒ **每落一枚文件就 commit**（⛔ 攒着，昨天那枚写腿就是攒到第四笔死在半路）。
+- shell 规矩：进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`；中文 commit 正文先 Write 成文件再 `git commit -F`。
+- 并发在飞（10:0x 现量）：`329-r1`（`cmd/wisp` 产码）∥ `327-v1`（裁 `internal/panel`，独占那包 `go test`）∥ `331-r1`（`internal/observe` 注释面）；`330-r2` **已交、已收**⇒ `internal/agent` 那面的测试字节现在是**已提交态**，⛔ 把它当"别腿在飞"绕、也⛔ 去动它。⇒ ⛔ 读别腿在飞字节当凭据；撞车了就等一等并具名写你等了谁。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含上面四处；新建件逐枚点名行数）；② 证据件绝对路径＋`wc -c`＋行数＋占位符尺 0 命中；③ ★**两枚变异的逐字红句**（ⓐ 尺响的那发 ⇄ ⓑ 臂响的那发，两枚不同处）＋**还原哈希**（逐发 `MATCH=yes`，与 `git cat-file -p <锚>:internal/risk/<文件>` 同串）＋改前改后四数＋门禁四数 `rc=`＋`AC#6`ⓐ 那三处 `0/0/0` 的现跑输出。
+另加我的必答题（⛔ 你自己盖章不算）：**ⓐ 那把尺对"函数名找不到"这一形是什么行为**——把 `shellAllowlisted` 改个名（仓外树、当场还原），你那枚算子钉是**红**还是**静默跳过**？静默＝它对"窗口取空"不敏感，具名写出来交我裁。
