@@ -1,0 +1,88 @@
+# 338-v1 · AC#3 颜色读数（我自己复跑点名＝编排者欠账 A1035 那一发）
+
+台面＝仓外导出树（`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models`＋`docs`＋手工三件），
+落点 `D:\tmp\wisp\20261018\338v1\ac3nest-150700\`（父目录名不合 8.3⇒卷生别名，`dir /x` 逐枚坐实：
+`AC3NES~1`／`TREE-B~1 tree-before-panel`／`TREE-A~1 tree-after-panel`／`TREE-B~2`／`TREE-A~2`）。
+单差异自证（`diff -r -q`）＝panel 对只差 `cmd/wisp/panel_transport_35r2_test.go`、tools 对只差 `internal/tools/…174r7_test.go`；
+逐枚 `git hash-object` 台面字节 ⇄ 仓库 blob 同串（tools `cb40ecde→13fea5ea`、panel `52d3c1b2→bd131498`）。
+`-count=1 -timeout 40m -v`，四数逐枚点名⛔ 混用⛔ 相减。★⛔ `go test ./...`。
+
+## [lane] 车道确认（三发各现验一次，读数入库）
+`Get-CimInstance Win32_Process -Filter "Name='go.exe' OR Name='go-test.exe' OR Name LIKE '%test%.exe'"` ⇒ **空表**（21:59:46／22:05:18／22:05:35 三发同形）。
+常驻 `wisp.exe` PID **21892**（`StartTime 2026/10/15 19:03:14`）在册＝⛔ 杀（票 338 射程⛔ 动它）。
+
+## ★我这一发先撞上的台面故障（具名＝本票最贵的一条定式）
+第一发（`q9`）两侧都＝`exit status 0xc0000135`、四数 **0/0/0/0**、零枚 `--- FAIL`、log 仅 76 字节。
+按颜色尺那一句判＝**台面故障、整发作废、⛔ 计入判据**（不是"我的字节让包没跑"）。
+机制我自己归到底了：`PATH` 用 POSIX 形（`/d/…` ＋冒号分隔）传给 Windows 测试二进制 ⇒ DLL 搜索路径无效。
+实验（`q12`）＝exp1 原样 `0xc0000135`；exp2 `cygpath -w`＋分号 ⇒ `ok [no tests to run]`；exp3 导出同形 ⇒ `ok`。
+★定式建议入库＝**共享树外的 Windows `.exe` 用 `PATH` 取 DLL 时，必须 `cygpath -w`＋`;`；POSIX 形会造出"零枚 FAIL 的整包死"，长得像判据响、其实是台损。**
+（腿 `338-r1` 用同一份 POSIX 形跑成功了 ⇒ 差异在我的 shell 链、不在它的读数；这一条我只登记形状，⛔ 判它的台件作假。）
+
+## [A] `./cmd/wisp/` 整包成对（★A1035 交我复跑那一名）
+| 侧 | rc | RUN | PASS_TOP | FAIL_TOP | SKIP | 台面故障尺 | 最后一枚顶层判定 | 最后一枚 RUN |
+|---|---|---|---|---|---|---|---|---|
+| before-panel（panel＝归位**前**字节） | 1 | **203** | **145** | 3 | 0 | none | `--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe` | `=== RUN TestAC13BringUpSurvivesAReusedThreadQuit` |
+| after-panel（panel＝归位**后**字节） | 1 | **203** | **146** | 2 | 0 | none | 同左同枚 | 同左同枚 |
+
+FAIL 逐名：before＝`TestTicket223ModeLooseningChangesTheRunningModeAfterAllow`／`TestAC2SealNoticeLandsInTheRunLegLogFile`／`TestCleanCheckoutBuilds_AC11`；after＝后两枚。
+★红因逐字（⛔ 采腿，取我自己的 log，两侧同串）＝
+- `TestAC2SealNoticeLandsInTheRunLegLogFile`：`logsink_windows_test.go:175: records naming "winsec: seal cleared principals that stood on this object" = 2, want 1`（两侧同，只有秒数与 PID 目录名变）＝winsec 驻留族。
+- `TestCleanCheckoutBuilds_AC11`：`panel_host_gate_test.go:404: git rev-parse --show-toplevel: exit status 128`＝导出树无 `.git`＝台面形状。
+- `TestTicket223…`：`config_reload_223_test.go:545: the card does not name risk.permission_mode`（只在 before 侧出现一次）＝在册既有间歇族。
+共有 2 枚两侧同串，另 before 侧多 1 枚＝间歇族（详见下）。
+
+名册尺（逐枚 hash 取名集，⛔ 子串前缀；剥子测试取顶层名）＝
+- RUN 顶层名集：before **149** ⇄ after **149**，`only_before=0`／`only_after=0`。
+- 判定名集（`^--- PASS`＋`^--- FAIL`＋SKIP）：before **148** ⇄ after **148**，`only_before=0`／`only_after=0`。
+- 正控（尺没失明）＝每侧 `verdict_without_run=0`（判定名集 ⊆ RUN 名集）。
+- ★交叉尺（死亡位置内证）＝每侧 `RUN−判定` **恰 1 枚、且两侧同名**＝`TestAC13BringUpSurvivesAReusedThreadQuit` ⇒ 两侧都死在驻留窗族同一枚上。
+
+### ★点名归位那 4 枚（腿点的名册逐枚对我自己的两侧）
+| 用例 | 我 before 侧 RUN/PASS/FAIL | 我 after 侧 RUN/PASS/FAIL |
+|---|---|---|
+| `TestAC13BringUpRefusesAThreadWithAQueuedClose` | 0/0/0 | 0/0/0 |
+| `TestAC13BringUpSurvivesAReusedThreadQuit` | 1/0/0 | 1/0/0 |
+| `TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever` | 0/0/0 | 0/0/0 |
+| `TestAC14AwaitedBindingReplyReachesThePage` | 0/0/0 | 0/0/0 |
+
+⇒ **裁决＝"截断差"这一判成立、且我拿到的比它更强**（三条独立支撑）：
+① 我这发**根本复现不出** 4 枚之差：两侧名集逐名同串、`only_before=0`。
+② ★决定性＝**我这发单差异对里两侧 RUN 同为 203**（before＝未归位字节 ⇄ after＝归位后字节，其余 763 枚 `.go` 逐枚同串）。
+   若那 −4 由字节造成，我这发的 before 侧必须比 after 侧高；它不高 ⇒ **RUN 枚数在这一枚字节上不是字节的函数**。
+   旁证（⛔ 当主证）＝我 before 侧 203 恰好＝腿 after 侧 203（腿 207⇄203）；两棵台面的锚不同（我＝`fac6c918`⇄`93d0f39c`，腿＝它的 ctrl 对），
+   故这一枚同号只算"同一计数能在未归位字节上出现"的形状佐证，⛔ 跨台面当成算术。
+③ 我这发还多撞出一枚**第四数差**（`TestTicket223…` 只在 before 侧红）＝台账在册的**既有间歇族**
+   （`pending-and-issues.md:10834`"5 发读数里整包红只 1 次、⛔ 不读成回归"、`:13507`、`:14857` 裁语"⛔ 不把转绿记成任何人的功劳"）
+   ⇒ 整包 `cmd/wisp` 的四数在这一族上**本来就不由字节决定**；腿那 4 枚差与我这 1 枚差是同一类东西。
+票面 `AC#3` 那句"已知真窗区整进程死亡＝具名归位"**够用**（在册出处＝票 314＋台账 `A1035`；票 322 结案笔 `274da78a` 已把该句收窄为"只在整进程真窗区死亡的台面成立"，我这发两侧都落在该台面内）。
+★⛔ 读成"我的字节让 4 枚测试消失"＝**判否**（上面②是直接反证）。
+
+## [B] `./cmd/wisp/` 定向成对（甲形条件③＝panel 那枚文件自己的 9 枚顶层用例）
+名册从 HEAD blob 现抽（`grep -oE '^func Test…'`＝9 枚，逐名入库）；`-run '^(9 枚全串)$'`（★⛔ 以 `/` 开头＝腿自纠过的那形）。
+两侧＝`rc=0`／**9/9/0/0** ⇄ **9/9/0/0**；台面故障尺 none；判定名集 sha256 前 12 位同串（`34079105a000`）；`only_before=0`／`only_after=0`。
+⇒ token 级改动语义零位移（0 枚新增红）。
+
+## [C] `./internal/tools/` 整包成对
+两侧＝`rc=1`／**323/235/7/0** ⇄ **323/235/7/0**；FAIL 名册逐名同串（`FAIL_roster_symdiff=0`，7 枚＝junction 族 5＋跨卷 1＋`dirOf` 分隔符 1）。
+★本票那枚用例两侧逐字＝`--- PASS: TestCanonicalizeErrorNoticeRelaysNoUpstreamErrorText174r7` ⇄ 同。
+（⚠ 具名一枚我这段尺的形状差：我这里作差**没剥子测试**⇒ 出 `only_before=1／only_after=1`＝
+`TestTicket252R1AlignmentAddsNoAuthorization/<树名>` 那一枚**子测试名带台面目**的假差；剥子测试后 `top-level only_before=0 only_after=0`＝真读数。⛔ 拿未剥子测试那一对数当判据。）
+
+## ★票 314 在册死亡签名在我两侧的复现（这一发＝把"截断差"从推断升成同签名实证）
+票 314（`314-cmdwisp-suite-process-death-in-window-zone.md`）`:24` 逐字写死死法共同特征＝
+「**无 Go panic 输出、无 `--- FAIL`、无 `exit status` 行——整进程消失；死点全落在 `CreateWindowExW` 返回到首几条 wndproc 之间」，
+`:46` 更把死点用例逐名点出＝「死点仅 2 枚测试：3×`TestAC13BringUpSurvivesAReusedThreadQuit`＋2×`TestAC14GoSideEvalPushReachesThePage`」。
+我这一发尺＝`grep -c '^panic:'`／`grep -c '^exit status'`／`grep -cE '^\s*--- (PASS|FAIL): TestAC13BringUpSurvives…'`／`MARK299` 行数＋末 4 行逐字。
+| 侧 | panic 尺 | exit-status 尺 | 该枚有判定行 | MARK299 行 | 末两行逐字 |
+|---|---|---|---|---|---|
+| before-panel | **0** | **0** | **0** | 217 | `MARK299 wndproc hwnd=0x326c0dc4 msg=0x7f known=true` ⇄ `FAIL github.com/CarlosShao/wisp/cmd/wisp 157.285s` |
+| after-panel | **0** | **0** | **0** | 214 | `MARK299 wndproc hwnd=0x13261200 msg=0x86 known=true` ⇄ `FAIL … 156.492s` |
+⇒ 两侧都**逐字命中票 314 那条形征**（无 panic／无 exit status／该枚无 verdict／`MARK299 wndproc` 后直接 `FAIL`），
+且两侧死点**同一枚**＝`TestAC13BringUpSurvivesAReusedThreadQuit`（＝票 314 在册点名的那枚）。
+这就是"死亡位置不同造成的截断差"的**同签名实证**，⛔ 停在推断层。
+（`A1035` 交我"看两侧末行逐字"那一问 ⇒ 逐字已在此：before 末判定行＝`TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe`，after 同枚同串。）
+
+## 红名册合计
+
+**本票新增红＝0 枚**（tools 7 枚两侧同串；wisp 共有 2 枚两侧同串＝别票＋台面形状；before 侧多出的 1 枚＝在册间歇族；那 4 枚名差＝我这发不存在）。
