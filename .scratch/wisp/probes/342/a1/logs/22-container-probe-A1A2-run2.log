@@ -1,0 +1,16 @@
+=== RUN   TestCensus342a1A1AncestorLinkFollowedByTheLeafFlaggedOpen
+    census342a1_probe_test.go:103: CENSUS A1: open err=<nil>; witness before(size=45)="foreign bytes are not yours to truncate 342a1" after(size=27)="raced private payload 342a1"
+    census342a1_probe_test.go:106: CENSUS A1 VERDICT: OPENED THROUGH the ancestor link while oNoFollowPlatform was carried, and the private payload now stands in the FOREIGN object = the ancestor leg is open by name on this platform (the flag speaks about the last component only)
+    census342a1_probe_test.go:123: CENSUS A1 contrast row: leaf open err=open /tmp/TestCensus342a1A1AncestorLinkFollowedByTheLeafFlaggedOpen184320128/001/leaf-position.lnk: too many levels of symbolic links (want ELOOP wording), leaf victim size=45 body-unchanged=true
+--- PASS: TestCensus342a1A1AncestorLinkFollowedByTheLeafFlaggedOpen (0.01s)
+=== RUN   TestCensus342a1A2PrivateFileAncestorSwapRace
+    census342a1_probe_test.go:276: CENSUS A2: attempts=1500 flips=358 flipErrs=16 damage=106 firstDamage=attempt 14 before(size=45)="foreign bytes are no" after(size=-1)="unreadable:open /tmp" leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1A2PrivateFil
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1A2PrivateFil : 127
+    census342a1_probe_test.go:278: CENSUS A2 leg=nil : 260
+    census342a1_probe_test.go:278: CENSUS A2 leg=placement floor before the act : 858
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:open /tmp/TestCensus342a1A2PrivateFileAncestorSwapRace1456939040/001/root/data/sub/b : 252
+    census342a1_probe_test.go:278: CENSUS A2 leg=pinPlacement sameObjectPinned : 3
+--- PASS: TestCensus342a1A2PrivateFileAncestorSwapRace (0.26s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.324s
+rc=0

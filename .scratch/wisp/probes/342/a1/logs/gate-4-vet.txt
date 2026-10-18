@@ -1,0 +1,1 @@
+go vet ./internal/winsec/ on the SHARED working tree, run before commits, GOTMPDIR/TMPDIR/TEMP/TMP unset => rc=0, no output lines (clean). This proves the package I measured is byte-untouched by this leg (my write face contains no .go).

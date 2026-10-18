@@ -1,0 +1,4 @@
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1
+--- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+--- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3
+--- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3

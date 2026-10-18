@@ -1,0 +1,21 @@
+time=2026-10-18T22:08:51.250+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCensus342a1WindowsAncestorJunctionFollowedByTodayOpen
+    census342a1_windows_test.go:80: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsAncestorJunctionFollowedByTodayOpen2211090149\001\data\sub <<===>> C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsAncestorJunctionFollowedByTodayOpen2211090149\002
+    census342a1_windows_test.go:97: CENSUS W1-junction VERDICT: open by name SUCCEEDED through the ancestor junction (err=nil); witness size 49->13 intact=false
+    census342a1_windows_test.go:99: CENSUS W1-junction: DAMAGED => the ancestor leg is live on Windows WITH the shipped leaf guard in force (the guard looks at the one name, winsec_windows.go says ancestors are not probed)
+--- PASS: TestCensus342a1WindowsAncestorJunctionFollowedByTodayOpen (0.07s)
+=== RUN   TestCensus342a1WindowsAncestorDirSymlinkFollowedByTodayOpen
+    census342a1_windows_test.go:127: CENSUS W1-dirsym VERDICT: witness size 49->13 intact=false => DAMAGED=true
+--- PASS: TestCensus342a1WindowsAncestorDirSymlinkFollowedByTodayOpen (0.01s)
+=== RUN   TestCensus342a1WindowsReparseFlagOnAncestors
+    census342a1_windows_test.go:137: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsReparseFlagOnAncestors3599599365\001\data\sub <<===>> C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsReparseFlagOnAncestors3599599365\002
+    census342a1_windows_test.go:143: CENSUS W2 rows: full-plain{attrs=0x20 reparse=false size=0:49 index=3327213901:634556} full+REPARSE{attrs=0x20 reparse=false size=0:49 index=3327213901:634556 flagSaysReparse=false} anc-plain{attrs=0x10 reparse=false size=0:0 index=3327213901:634447} anc+REPARSE{attrs=0x410 reparse=true size=0:0 index=3327213901:639088 flagSaysReparse=true}
+    census342a1_windows_test.go:148: CENSUS W2 VERDICT (this leg, this machine): FILE_FLAG_OPEN_REPARSE_POINT carried on the full spelling resolved THROUGH the ancestor junction and named the TARGET file (reparse=false) => 322-a1's 'only the leaf' sentence REPRODUCED for ancestors; the flag answers for a name only when opened AT that name (junction itself: reparse=true)
+--- PASS: TestCensus342a1WindowsReparseFlagOnAncestors (0.05s)
+=== RUN   TestCensus342a1WindowsOsRootJunctionAncestor
+    census342a1_windows_test.go:163: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsOsRootJunctionAncestor2176817858\001\data\sub <<===>> C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsOsRootJunctionAncestor2176817858\002
+    census342a1_windows_test.go:167: CENSUS W3-Root: os.Root.OpenFile REFUSED err=openat data\sub\blob.bin: path escapes from parent; witness intact=true
+--- PASS: TestCensus342a1WindowsOsRootJunctionAncestor (0.05s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.221s
+rc=0

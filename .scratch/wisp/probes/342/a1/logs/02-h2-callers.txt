@@ -1,0 +1,35 @@
+== 342-a1 H1 ROW4 + H2: production callers, re-run from HEAD tree ==
+尺A: git grep -n 'winsec\.PrivateFile(' HEAD -- '*.go'  (production = non _test files)
+HEAD:.scratch/wisp/probes/174/r4/pristine-spill.go:166:		if wErr := winsec.PrivateFile(tmp, []byte(capped), 0o600); wErr != nil {
+HEAD:cmd/wisp/secret_dataroot_119b_test.go:253:	if err := winsec.PrivateFile(filepath.Join(l.DataDir, "artifact.txt"), []byte("tool output"), 0o600); err != nil {
+HEAD:internal/agent/spill.go:166:		if wErr := winsec.PrivateFile(tmp, []byte(capped), 0o600); wErr != nil {
+HEAD:internal/config/migrate.go:93:	if err := winsec.PrivateFile(backup, raw, 0o600); err != nil {
+HEAD:internal/secret/migrate.go:169:		if werr := winsec.PrivateFile(backupPath, raw, 0o600); werr != nil {
+HEAD:internal/secret/migrate.go:189:	if werr := winsec.PrivateFile(tmpPath, out, 0o600); werr != nil {
+HEAD:internal/secret/store.go:79:	if err := winsec.PrivateFile(s.blobPath(id), blob, 0o600); err != nil {
+HEAD:internal/winsec/acl_windows_test.go:307:			return winsec.PrivateFile(p, []byte("dpapi-shaped blob"), 0o600)
+HEAD:internal/winsec/acl_windows_test.go:310:			return winsec.PrivateFile(p, []byte("downloaded bytes"), 0o644)
+HEAD:internal/winsec/dataroot_symlink_119_other_test.go:300:	if err := winsec.PrivateFile(mine, []byte("tool output"), 0o600); err != nil {
+HEAD:internal/winsec/placement_leaf_118_other_test.go:106:	err = winsec.PrivateFile(link, []byte("top secret"), 0o600)
+HEAD:internal/winsec/placement_symlink_113_other_test.go:286:	assertRefused113(t, "PrivateFile", spelled, link, winsec.PrivateFile(spelled, []byte("top secret"), 0o600))
+HEAD:internal/winsec/placement_symlink_113_other_test.go:376:	if err := winsec.PrivateFile(file, []byte("tool output"), 0o644); err != nil {
+
+尺B: git grep -n 'winsec\.PrivateFileExclusive(' HEAD -- '*.go'
+HEAD:.scratch/wisp/probes/174/r4/pristine-spill.go:343:	return winsec.PrivateFileExclusive(path, data)
+HEAD:internal/agent/spill.go:343:	return winsec.PrivateFileExclusive(path, data)
+HEAD:internal/memory/artifacts.go:75:	if err := winsec.PrivateFileExclusive(filepath.Join(s.artifactsDir, name), data); err != nil {
+HEAD:internal/winsec/acl_windows_test.go:304:			return winsec.PrivateFileExclusive(p, []byte("tool output"))
+
+尺C (positive control, must be non-zero): git grep -c 'winsec\.' HEAD -- internal/agent/spill.go
+HEAD:internal/agent/spill.go:3
+
+尺D: also catch unqualified internal-package calls PrivateFile( / PrivateFileExclusive( anywhere outside internal/winsec
+HEAD:.scratch/wisp/probes/174/r4/pristine-spill.go:166:		if wErr := winsec.PrivateFile(tmp, []byte(capped), 0o600); wErr != nil {
+HEAD:.scratch/wisp/probes/174/r4/pristine-spill.go:343:	return winsec.PrivateFileExclusive(path, data)
+HEAD:internal/agent/spill.go:166:		if wErr := winsec.PrivateFile(tmp, []byte(capped), 0o600); wErr != nil {
+HEAD:internal/agent/spill.go:343:	return winsec.PrivateFileExclusive(path, data)
+HEAD:internal/config/migrate.go:93:	if err := winsec.PrivateFile(backup, raw, 0o600); err != nil {
+HEAD:internal/memory/artifacts.go:75:	if err := winsec.PrivateFileExclusive(filepath.Join(s.artifactsDir, name), data); err != nil {
+HEAD:internal/secret/migrate.go:169:		if werr := winsec.PrivateFile(backupPath, raw, 0o600); werr != nil {
+HEAD:internal/secret/migrate.go:189:	if werr := winsec.PrivateFile(tmpPath, out, 0o600); werr != nil {
+HEAD:internal/secret/store.go:79:	if err := winsec.PrivateFile(s.blobPath(id), blob, 0o600); err != nil {

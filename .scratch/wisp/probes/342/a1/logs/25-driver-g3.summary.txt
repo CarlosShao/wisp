@@ -1,0 +1,55 @@
+=== (a) hypothetical landing v2 FULL roster (⚠ the descent names its failures open <comp>/ELOOP-wording = NOT the landing-leg shape; this row exists to show WHICH pins a mis-shaped landing breaks) ===
+rc=0
+RUN=71 PASS_TOP=43 FAIL_TOP=0 SKIP=0
+failnames:
+=== (b) cheap variant: pinned parent + leaf O_EXCL (乙's flag-face wrong way) ===
+rc=1
+RUN=71 PASS_TOP=39 FAIL_TOP=4 SKIP=0
+failnames:
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1
+--- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+--- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3
+--- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3
+=== (c) landed-form paired racer: production PrivateFile on the two POSIX landings ===
+rc=0
+--- mut-jia-linux:
+    census342a1_probe_test.go:276: CENSUS A2: attempts=1500 flips=312 flipErrs=26 damage=66 firstDamage=attempt 0 before(size=45)="foreign bytes are no" after(size=-1)="unreadable:open /tmp" leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1A2PrivateFil
+    census342a1_probe_test.go:278: CENSUS A2 leg=placement floor before the act : 960
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:openat descent sub: no such file or directory : 143
+    census342a1_probe_test.go:278: CENSUS A2 leg=nil : 276
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:open /tmp/TestCensus342a1A2PrivateFileAncestorSwapRace1028298950/001/root/data/sub/b : 6
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:openat descent sub: not a directory : 16
+    census342a1_probe_test.go:278: CENSUS A2 leg=pinPlacement sameObjectPinned : 3
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1A2PrivateFil : 96
+--- PASS: TestCensus342a1A2PrivateFileAncestorSwapRace (0.44s)
+3c786d1df368b26c848b6feddc0ef6013ff47dd3283324a0614766191d4b808a */d/tmp/wisp/20261018/342a1/mut-jia-linux/internal/winsec/winsec.go
+rc=0
+--- mut-yi-linux:
+    census342a1_probe_test.go:276: CENSUS A2: attempts=1500 flips=365 flipErrs=27 damage=59 firstDamage=attempt 2 before(size=45)="foreign bytes are no" after(size=-1)="unreadable:open /tmp" leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1A2PrivateFil
+    census342a1_probe_test.go:278: CENSUS A2 leg=placement floor before the act : 1017
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:open /tmp/TestCensus342a1A2PrivateFileAncestorSwapRace960223989/001/root/data/sub/bl : 4
+    census342a1_probe_test.go:278: CENSUS A2 leg=pinPlacement sameObjectPinned : 1
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1A2PrivateFil : 221
+    census342a1_probe_test.go:278: CENSUS A2 leg=nil : 257
+--- PASS: TestCensus342a1A2PrivateFileAncestorSwapRace (0.35s)
+3c786d1df368b26c848b6feddc0ef6013ff47dd3283324a0614766191d4b808a */d/tmp/wisp/20261018/342a1/mut-yi-linux/internal/winsec/winsec.go
+=== (d) consumers on the two POSIX landing faces ===
+rc=1
+--- consumers mut-jia-linux:
+--- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+    writeguard_handedit_227_test.go:136: mtime did not move on a stale-schema file that logged 'added nothing' - the migration-on-read boundary is no longer being exercised
+time=2026-10-18T14:44:42.440Z level=INFO msg="config: config.toml already carries this key; this write added nothing (the file's bytes and mtime stayed put only because its schema_version was already current; a file behind on schema_version had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	1.242s
+ok  	github.com/CarlosShao/wisp/internal/agent	3.781s
+FAIL
+rc=1
+--- consumers mut-yi-linux:
+--- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+    writeguard_handedit_227_test.go:136: mtime did not move on a stale-schema file that logged 'added nothing' - the migration-on-read boundary is no longer being exercised
+time=2026-10-18T14:45:32.470Z level=INFO msg="config: config.toml already carries this key; this write added nothing (the file's bytes and mtime stayed put only because its schema_version was already current; a file behind on schema_version had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	1.057s
+ok  	github.com/CarlosShao/wisp/internal/agent	3.906s
+FAIL
+DRIVER-G3-DONE

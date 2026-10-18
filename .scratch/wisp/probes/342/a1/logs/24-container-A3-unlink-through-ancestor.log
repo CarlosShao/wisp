@@ -1,0 +1,8 @@
+=== RUN   TestCensus342a1A3RefusalPathUnlinkRemovesThroughAnAncestorLink
+    census342a1_a3_test.go:52: A3 row1: sealHandle-style refusal err=winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1A3RefusalPathUnlinkRemovesThroughAnAncestorLink187091621/001/data/sub/blob.bin: openat sub: path escapes from parent witness-readable=true
+    census342a1_a3_test.go:58: A3 row2: os.Remove(/tmp/TestCensus342a1A3RefusalPathUnlinkRemovesThroughAnAncestorLink187091621/001/data/sub/blob.bin) err=<nil> ; foreign witness now readable=false ; ancestor link still standing=true(<nil>)
+    census342a1_a3_test.go:61: A3 VERDICT: the refusal-path unlink resolved THROUGH the ancestor link and deleted the FOREIGN object (damage shape 2). The route's seal refusal came from the identity gate, so nothing above protected this name.
+--- PASS: TestCensus342a1A3RefusalPathUnlinkRemovesThroughAnAncestorLink (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.028s
+rc=0

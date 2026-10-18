@@ -1,0 +1,8 @@
+FAIL	github.com/CarlosShao/wisp/internal/winsec [build failed]
+# github.com/CarlosShao/wisp/internal/winsec [github.com/CarlosShao/wisp/internal/winsec.test]
+internal/winsec/census342a1_forms_linux_test.go:163:21: pinned.File undefined (type *os.File has no field or method File, but does have unexported field file)
+internal/winsec/census342a1_forms_linux_test.go:312:34: too many arguments in call to pinned.Stat
+	have (string)
+	want ()
+FAIL
+rc=1

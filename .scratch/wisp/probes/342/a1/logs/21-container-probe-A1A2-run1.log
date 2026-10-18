@@ -1,0 +1,12 @@
+=== RUN   TestCensus342a1A1AncestorLinkFollowedByTheLeafFlaggedOpen
+    census342a1_probe_test.go:101: CENSUS A1: open err=<nil>; witness before(size=45)="foreign bytes are not yours to truncate 342a1" after(size=45)="foreign bytes are not yours to truncate 342a1"
+    census342a1_probe_test.go:108: CENSUS A1 ambiguous row: err=<nil> after="foreign bytes are not yours to truncate 342a1"
+    census342a1_probe_test.go:121: CENSUS A1 contrast row: leaf open err=open /tmp/TestCensus342a1A1AncestorLinkFollowedByTheLeafFlaggedOpen3482326190/001/leaf-position.lnk: too many levels of symbolic links (want ELOOP wording), leaf victim size=45 body-unchanged=true
+--- PASS: TestCensus342a1A1AncestorLinkFollowedByTheLeafFlaggedOpen (0.01s)
+=== RUN   TestCensus342a1A2PrivateFileAncestorSwapRace
+    census342a1_probe_test.go:182: seed real state: open /tmp/TestCensus342a1A2PrivateFileAncestorSwapRace1675665266/001/staged-real/blob.bin: no such file or directory
+--- FAIL: TestCensus342a1A2PrivateFileAncestorSwapRace (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.021s
+FAIL
+rc=1

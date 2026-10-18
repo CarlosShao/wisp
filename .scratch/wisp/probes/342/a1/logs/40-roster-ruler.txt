@@ -1,0 +1,35 @@
+== 342-a1 H4 roster ruler: who calls the open under census (HEAD = c596df55; per-file grep on HEAD blob snapshots, POSITIVE CONTROLS in each) ==
+--- placement_symlink_113_other_test.go
+  calls-into-privateFile count=2 ; control-calls-elsewhere count=9
+    placement_symlink_113_other_test.go:286: assertRefused113(t, "PrivateFile", spelled, link, winsec.PrivateFile(spelled, []byte("top secret"), 0o600))
+    placement_symlink_113_other_test.go:376: if err := winsec.PrivateFile(file, []byte("tool output"), 0o644); err != nil {
+--- ancestor_separator_108_other_test.go
+  calls-into-privateFile count=0 ; control-calls-elsewhere count=12
+--- dataroot_symlink_119_other_test.go
+  calls-into-privateFile count=1 ; control-calls-elsewhere count=12
+    dataroot_symlink_119_other_test.go:300: if err := winsec.PrivateFile(mine, []byte("tool output"), 0o600); err != nil {
+--- seam_probe_root_125_other_test.go
+  CONTROL-3 (anchors known to stand in 125): builtinVerifier/ResolvePath/resolverProbeShapes count=5
+    125:15: //     resolverProbeShapes, an entry point that exists on both sides, so the red
+    125:127: shapes := resolverProbeShapes()
+    125:263: if reason := resolverConformanceFailure(builtinVerifier{}); reason != "" {
+  calls-into-privateFile count=0 ; control-calls-elsewhere count=0
+--- posix_seal_window_120_other_test.go
+  calls-into-privateFile count=0 ; control-calls-elsewhere count=2
+--- openleaf_322_other_test.go
+  calls-into-privateFile count=1 ; control-calls-elsewhere count=0
+    openleaf_322_other_test.go:159: counts[spokeLeg322r1(PrivateFile(name, []byte(leafRacePayload322r1), 0o600))]++
+--- openleaf_flag_322_other_test.go
+  CONTROL (the ruler for THIS file = the by-name open itself): os.OpenFile/oNoFollowPlatform count=2 (:53 by-name open, :10-11 header names it)
+  calls-into-privateFile count=0 ; control-calls-elsewhere count=0
+--- openleaf_guard_322_windows_test.go
+  calls-into-privateFile count=1 ; control-calls-elsewhere count=5
+    openleaf_guard_322_windows_test.go:217: err := PrivateFile(name, []byte(winRacePayload322r1), 0o600)
+--- openleaf_overwrite_322_test.go
+  calls-into-privateFile count=5 ; control-calls-elsewhere count=0
+    openleaf_overwrite_322_test.go:69: if err := PrivateFile(p, []byte(tc.second), 0o600); err != nil {
+    openleaf_overwrite_322_test.go:94: if err := PrivateFile(p, []byte("OLD bytes longer than the repair"), 0o644); err != nil {
+    openleaf_overwrite_322_test.go:97: if err := PrivateFile(p, []byte("NEW"), 0o644); err != nil {
+    openleaf_overwrite_322_test.go:121: if err := PrivateFileExclusive(p, []byte("FIRST")); err != nil {
+    openleaf_overwrite_322_test.go:124: if err := PrivateFileExclusive(p, []byte("SECOND")); !errors.Is(err, fs.ErrExist) {
+=== per-file POSITIVE CONTROLS for the two zero-hit files (ruler=Select-String on HEAD blob snapshot, 125 anchors are in-file):

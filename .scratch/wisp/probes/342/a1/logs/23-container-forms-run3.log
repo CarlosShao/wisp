@@ -1,0 +1,30 @@
+=== RUN   TestCensus342a1FJiaOpenatChainClosesTheAncestorLeg
+    census342a1_forms_linux_test.go:283: CENSUS JIA: attempts=1500 flips=362 flipErrs=142 damage=0 firstDamage=
+    census342a1_forms_linux_test.go:283: CENSUS JIA leg=other:openat sub: not a directory : 470
+    census342a1_forms_linux_test.go:283: CENSUS JIA leg=other:openat sub: no such file or directory : 267
+    census342a1_forms_linux_test.go:283: CENSUS JIA leg=other:openat leaf blob.bin: no such file or directory : 10
+    census342a1_forms_linux_test.go:283: CENSUS JIA leg=nil : 753
+--- PASS: TestCensus342a1FJiaOpenatChainClosesTheAncestorLeg (0.42s)
+=== RUN   TestCensus342a1FYiPinnedParentFdRelative
+    census342a1_forms_linux_test.go:287: CENSUS YIa: attempts=1500 flips=506 flipErrs=168 damage=0 firstDamage=
+    census342a1_forms_linux_test.go:287: CENSUS YIa leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1FYiPinnedPar : 615
+    census342a1_forms_linux_test.go:287: CENSUS YIa leg=ELOOP : 6
+    census342a1_forms_linux_test.go:287: CENSUS YIa leg=sameObjectPinned refusal : 1
+    census342a1_forms_linux_test.go:287: CENSUS YIa leg=nil : 852
+    census342a1_forms_linux_test.go:287: CENSUS YIa leg=other:openat on pinned parent: no such file or directory : 26
+--- PASS: TestCensus342a1FYiPinnedParentFdRelative (0.50s)
+=== RUN   TestCensus342a1FYiDetectAfterOpenCannotUntruncate
+    census342a1_forms_linux_test.go:321: CENSUS YIb: attempts=1500 flips=748 flipErrs=71 damage=589 firstDamage=attempt 2 before(size=47)="foreign bytes are no" after(size=0)="" leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1FYiDetectAft
+    census342a1_forms_linux_test.go:321: CENSUS YIb leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1FYiDetectAft : 652
+    census342a1_forms_linux_test.go:321: CENSUS YIb leg=other:open /tmp/TestCensus342a1FYiDetectAfterOpenCannotUntruncate493592917/001/root/data/s : 234
+    census342a1_forms_linux_test.go:321: CENSUS YIb leg=ELOOP : 2
+    census342a1_forms_linux_test.go:321: CENSUS YIb leg=nil : 612
+--- PASS: TestCensus342a1FYiDetectAfterOpenCannotUntruncate (0.65s)
+=== RUN   TestCensus342a1FBaseByNameOpen
+    census342a1_forms_linux_test.go:327: CENSUS BASE: attempts=1500 flips=519 flipErrs=179 damage=242 firstDamage=attempt 6 before(size=47)="foreign bytes are no" after(size=29)="raced private payloa" leg=nil
+    census342a1_forms_linux_test.go:327: CENSUS BASE leg=nil : 1378
+    census342a1_forms_linux_test.go:327: CENSUS BASE leg=other:open /tmp/TestCensus342a1FBaseByNameOpen3525973396/001/root/data/sub/blob.bin: no su : 122
+--- PASS: TestCensus342a1FBaseByNameOpen (0.58s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	2.162s
+rc=0

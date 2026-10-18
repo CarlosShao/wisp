@@ -1,0 +1,10 @@
+=== REPETITION 1 ===
+--- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (1.09s)
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.24s)
+=== REPETITION 2 ===
+--- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.93s)
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.27s)
+=== REPETITION 3 ===
+--- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.71s)
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.19s)
+rc=0

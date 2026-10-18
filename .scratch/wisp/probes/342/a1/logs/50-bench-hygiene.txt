@@ -1,0 +1,8 @@
+== 342-a1 bench hygiene: exported tree census + snapshot==HEAD proof (HEAD=c596df55) ==
+git archive c596df55 go.mod go.sum internal cmd tools scripts frontend models docs | tar -x => treeA rc=0, treeB rc=0 (★八件套＋仓根 docs/)
+treeA .go files = 765 (证非空；尺 = Get-ChildItem -Recurse -Filter *.go | Count)
+manual three (build/*.dll, third_party/sherpa-onnx/*.dll, frontend/dist): NOT needed for ./internal/winsec/ runs (no DLL-loading test in this package on the taken faces); they gate cmd/wisp only => ⛔ 本腿禁跑，登记为不需要而非缺失
+snap==HEAD proof: for each of 20 files, git rev-parse HEAD:internal/winsec/<f> vs git hash-object snap/<f> => MISMATCH COUNT = 0
+treeA-vs-HEAD after probe removal: file-list symmetric-diff empty (40==40), per-file git hash-object mismatch=0 => pristine re-proved
+mut trees: winsec.go sha256 after cut = 3c786d1df368b26c848b6feddc0ef6013ff47dd3283324a0614766191d4b808a (all four, same anchor cut), old-anchor 1->0 + new-anchor 0->1 censuses in build logs below
+GOTMPDIR= treeA\gotmp host run10 => FAIL=2 = 票 311 具名卷形红（TestGateJudgesThePrivateSetByResolvedSID/TestSealNarrowsAndNamesThePrincipalItRemovedBySID，TempDir RemoveAll cleanup Access is denied）＝台面既有形状、⛔ 记成祖先新红；此后 host 档全部 unset GOTMPDIR（run11 起 61/0）

@@ -1,0 +1,25 @@
+time=2026-10-18T22:16:39.058+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCensus342a1WindowsRootDescentDebug
+    census342a1_wdebug_test.go:28: D0 fixture spelling=C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsRootDescentDebug1454470462\001\root\data\sub\blob.bin
+    census342a1_wdebug_test.go:30: D0 pathComponents=[Users swq AppData Local Temp TestCensus342a1WindowsRootDescentDebug1454470462 001 root data sub blob.bin] volumeName="C:"
+    census342a1_wdebug_test.go:41: D1 step 0 OpenRoot("swq") under depth 0 ERR=openat swq: The system cannot find the path specified.
+    census342a1_wdebug_test.go:54: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsRootDescentDebug1454470462\001\root\data\junc <<===>> C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsRootDescentDebug1454470462\001\outside-abs
+    census342a1_wdebug_test.go:69: D2 OpenRoot on a JUNCTION child (absolute target): err=openat junc: path escapes from parent
+    census342a1_wdebug_test.go:76: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsRootDescentDebug1454470462\001\root\data\rejunc <<===>> C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsRootDescentDebug1454470462\001\root\data\sibdir
+    census342a1_wdebug_test.go:78: D3 OpenRoot on a JUNCTION child (relative sibling-inside-root target): err=openat rejunc: path escapes from parent
+    census342a1_wdebug_test.go:84: D4 pinned-parent OpenFile through relative junction: err=openat rejunc\blob.bin: path escapes from parent
+--- PASS: TestCensus342a1WindowsRootDescentDebug (0.14s)
+=== RUN   TestCensus342a1WindowsFormsRace
+=== RUN   TestCensus342a1WindowsFormsRace/yi-osroot-descent
+    census342a1_winforms_test.go:339: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRaceyi-osroot-descent3188810865\001\staged-link <<===>> C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRaceyi-osroot-descent3188810865\002\fdir
+    census342a1_winforms_test.go:339: CENSUS W-RACE YI-W: attempts=1500 linkStateFlips=89 flipErrs=1 damage=0 firstDamage= firstFlipErr=remove C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRaceyi-osroot-descent3188810865\001\root\data\sub: The directory is not empty.
+    census342a1_winforms_test.go:339: CENSUS W-RACE YI-W leg=refused:descend sub: openat sub: too many levels of symbolic links : 3
+    census342a1_winforms_test.go:339: CENSUS W-RACE YI-W leg=refused:leaf on pinned parent: openat blob.bin: Access is denied. : 6
+    census342a1_winforms_test.go:339: CENSUS W-RACE YI-W leg=refused:descend sub: openat sub: The system cannot find the path specified. : 134
+    census342a1_winforms_test.go:339: CENSUS W-RACE YI-W leg=nil : 45
+    census342a1_winforms_test.go:339: CENSUS W-RACE YI-W leg=refused:descend sub: openat sub: path escapes from parent : 1312
+--- PASS: TestCensus342a1WindowsFormsRace (2.37s)
+    --- PASS: TestCensus342a1WindowsFormsRace/yi-osroot-descent (2.37s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	2.577s
+rc=0

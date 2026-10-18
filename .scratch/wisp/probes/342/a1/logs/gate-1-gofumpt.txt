@@ -1,0 +1,2 @@
+gofumpt -l on .scratch/wisp/probes/342/a1 = empty (my face has 0 .go objects => nothing to judge) ; rc=0
+POSITIVE CONTROL: gofumpt -l internal/winsec/winsec.go also printed nothing, rc=0 => the ruler ran and the file is clean; 6 pre-existing CRLF-dirty files elsewhere in the tree are NOT mine and were NOT reordered (存量, per dispatch).

@@ -1,0 +1,123 @@
+342-a1 key-row extraction (verbatim lines) from raw=/d/tmp/wisp/20261018/342a1/logs/11-host-winsec-baseline-defaultroot.log (raw stays on disk, built-only, never deleted)
+ruler=grep -E of raw; four numbers computed on the RAW file with RUN=/PASS_TOP=/FAIL_TOP=/SKIP= patterns
+FOUR_NUMBERS raw: RUN=110 PASS_TOP=61 FAIL_TOP=0 SKIP=0
+=== RUN   TestAC2InheritedNoticeHasANoiseBound
+=== RUN   TestAC2InheritedNoticeHasANoiseBound/a_private_tree_with_only_the_private_set_stays_quiet
+=== RUN   TestAC2InheritedNoticeHasANoiseBound/parent_policy_change_propagates_without_a_per_child_storm
+=== RUN   TestAC2InheritedNoticeHasANoiseBound/sealing_only_children_reports_each_of_them_once
+--- PASS: TestAC2InheritedNoticeHasANoiseBound (0.16s)
+    --- PASS: TestAC2InheritedNoticeHasANoiseBound/a_private_tree_with_only_the_private_set_stays_quiet (0.02s)
+    --- PASS: TestAC2InheritedNoticeHasANoiseBound/parent_policy_change_propagates_without_a_per_child_storm (0.07s)
+    --- PASS: TestAC2InheritedNoticeHasANoiseBound/sealing_only_children_reports_each_of_them_once (0.07s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.04s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.01s)
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/native-backslash
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/all-forward-slash
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/mixed-separators
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/trailing-separator
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/doubled-separator
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/posix-backslash-is-a-name-character
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/extended-length-prefix
+--- PASS: TestAC2AncestorPrefixesForEverySeparatorShape (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/native-backslash (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/all-forward-slash (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/mixed-separators (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/trailing-separator (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/doubled-separator (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/posix-backslash-is-a-name-character (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/extended-length-prefix (0.00s)
+=== RUN   TestAC2ComponentsAndTraversalPerSeparatorShape
+--- PASS: TestAC2ComponentsAndTraversalPerSeparatorShape (0.00s)
+=== RUN   TestAC2NoSealEverActsOnAGloballyDifferentAbsoluteness
+    absoluteness_seam_landing_129_windows_test.go:298: AC#2 reading: existing absolute file "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2NoSealEverActsOnAGloballyDifferentAbsoluteness2785196455\\001\\artifact.txt" answered "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2NoSealEverActsOnAGloballyDifferentAbsoluteness2785196455\\001\\artifact.txt" (absolute)
+    absoluteness_seam_landing_129_windows_test.go:298: AC#2 reading: existing file, slash separators "C:/Users/swq/AppData/Local/Temp/TestAC2NoSealEverActsOnAGloballyDifferentAbsoluteness2785196455/001/artifact.txt" answered "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2NoSealEverActsOnAGloballyDifferentAbsoluteness2785196455\\001\\artifact.txt" (absolute)
+--- PASS: TestAC2NoSealEverActsOnAGloballyDifferentAbsoluteness (0.01s)
+=== RUN   TestAC2SealedDirCoversFilesItNeverTouched
+    acl_windows_test.go:337: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealedDirCoversFilesItNeverTouched1848659225\\001\\data"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealedDirCoversFilesItNeverTouched1848659225\001\data NT AUTHORITY\SYSTEM:(F)
+    acl_windows_test.go:355: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealedDirCoversFilesItNeverTouched1848659225\\001\\data\\sqlite-like-sidecar.tmp"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealedDirCoversFilesItNeverTouched1848659225\001\data\sqlite-like-sidecar.tmp NT AUTHORITY\SYSTEM:(I)(F)
+time=2026-10-18T21:50:10.309+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2SealedDirCoversFilesItNeverTouched1848659225\001\data\artifacts kind=explicit cleared=S-1-1-0(A;OICI;0x1200a9;;;WD) cleared_inherited="" policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    acl_windows_test.go:371: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealedDirCoversFilesItNeverTouched1848659225\\001\\data\\artifacts"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealedDirCoversFilesItNeverTouched1848659225\001\data\artifacts NT AUTHORITY\SYSTEM:(F)
+    acl_windows_test.go:372: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealedDirCoversFilesItNeverTouched1848659225\\001\\data\\artifacts\\by-someone-else.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealedDirCoversFilesItNeverTouched1848659225\001\data\artifacts\by-someone-else.txt NT AUTHORITY\SYSTEM:(F)
+    acl_windows_test.go:378: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealedDirCoversFilesItNeverTouched1848659225\\001\\data\\artifacts\\by-someone-else.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealedDirCoversFilesItNeverTouched1848659225\001\data\artifacts\by-someone-else.txt NT AUTHORITY\SYSTEM:(F)
+--- PASS: TestAC2SealedDirCoversFilesItNeverTouched (0.20s)
+=== RUN   TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs
+    acl_windows_test.go:403: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\\001\\data"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data NT AUTHORITY\SYSTEM:(F)
+    acl_windows_test.go:442: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\\001\\data\\operator-widened-file.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-file.txt Everyone:(RX)
+    acl_windows_test.go:442: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\\001\\data\\operator-widened-dir"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-dir Everyone:(OI)(CI)(RX)
+    acl_windows_test.go:442: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\\001\\data\\operator-widened-dir\\inside.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-dir\inside.txt Everyone:(I)(RX)
+time=2026-10-18T21:50:10.626+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data kind=explicit cleared=S-1-1-0(A;OICI;0x1200a9;;;WD) cleared_inherited="" policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T21:50:10.627+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-dir kind=explicit cleared=S-1-1-0(A;OICI;0x1200a9;;;WD) cleared_inherited="" policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T21:50:10.629+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-file.txt kind=explicit cleared=S-1-1-0(A;;0x1200a9;;;WD) cleared_inherited="" policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    acl_windows_test.go:454: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\\001\\data\\operator-widened-file.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-file.txt NT AUTHORITY\SYSTEM:(F)
+    acl_windows_test.go:455: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\\001\\data\\operator-widened-file.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-file.txt NT AUTHORITY\SYSTEM:(F)
+    acl_windows_test.go:454: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\\001\\data\\operator-widened-dir"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-dir NT AUTHORITY\SYSTEM:(F)
+    acl_windows_test.go:455: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\\001\\data\\operator-widened-dir"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-dir NT AUTHORITY\SYSTEM:(F)
+    acl_windows_test.go:454: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\\001\\data\\operator-widened-dir\\inside.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-dir\inside.txt NT AUTHORITY\SYSTEM:(F)
+    acl_windows_test.go:455: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\\001\\data\\operator-widened-dir\\inside.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs4042897666\001\data\operator-widened-dir\inside.txt NT AUTHORITY\SYSTEM:(F)
+--- PASS: TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs (0.41s)
+=== RUN   TestAC2MigrationBackupIsPrivate
+    migrate_windows_test.go:80: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2MigrationBackupIsPrivate2136103384\\001\\root\\config.toml"
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\config.toml Everyone:(I)(RX)
+time=2026-10-18T21:50:10.863+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\secrets kind=inherited cleared="" cleared_inherited=S-1-1-0(A;OICIID;0x1200a9;;;WD) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T21:50:10.870+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\config.toml.bak-plaintext kind=inherited cleared="" cleared_inherited=S-1-1-0(A;ID;0x1200a9;;;WD) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T21:50:10.875+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\config.toml.migrate-tmp kind=inherited cleared="" cleared_inherited=S-1-1-0(A;ID;0x1200a9;;;WD) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T21:50:10.875+08:00 level=WARN msg="plaintext api_key migrated to DPAPI-protected references (D33)" config=C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\config.toml fields=2 paths=llm.providers.openai.api_key,voice.realtime.api_key backup=C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\config.toml.bak-plaintext
+    migrate_windows_test.go:91: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2MigrationBackupIsPrivate2136103384\\001\\root\\config.toml.bak-plaintext"
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\config.toml.bak-plaintext NT AUTHORITY\SYSTEM:(F)
+    migrate_windows_test.go:92: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2MigrationBackupIsPrivate2136103384\\001\\root\\config.toml.bak-plaintext"
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\config.toml.bak-plaintext NT AUTHORITY\SYSTEM:(F)
+    migrate_windows_test.go:101: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2MigrationBackupIsPrivate2136103384\\001\\root\\config.toml"
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\config.toml NT AUTHORITY\SYSTEM:(F)
+    migrate_windows_test.go:104: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2MigrationBackupIsPrivate2136103384\\001\\root\\secrets"
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\secrets NT AUTHORITY\SYSTEM:(F)
+    migrate_windows_test.go:104: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2MigrationBackupIsPrivate2136103384\\001\\root\\secrets\\llm.providers.openai.api_key"
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\secrets\llm.providers.openai.api_key NT AUTHORITY\SYSTEM:(F)
+    migrate_windows_test.go:104: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2MigrationBackupIsPrivate2136103384\\001\\root\\secrets\\voice.realtime.api_key"
+        C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\secrets\voice.realtime.api_key NT AUTHORITY\SYSTEM:(F)
+    migrate_windows_test.go:104: sweep checked 3 entries under C:\Users\swq\AppData\Local\Temp\TestAC2MigrationBackupIsPrivate2136103384\001\root\secrets, all private
+--- PASS: TestAC2MigrationBackupIsPrivate (0.23s)
+=== RUN   TestAC2PreExistingMigrationBackupIsRepaired
+    migrate_windows_test.go:124: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2PreExistingMigrationBackupIsRepaired1838138509\\001\\root\\config.toml.bak-plaintext"
+        C:\Users\swq\AppData\Local\Temp\TestAC2PreExistingMigrationBackupIsRepaired1838138509\001\root\config.toml.bak-plaintext Everyone:(RX)
+    migrate_windows_test.go:125: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2PreExistingMigrationBackupIsRepaired1838138509\\001\\root\\config.toml.bak-plaintext"
+        C:\Users\swq\AppData\Local\Temp\TestAC2PreExistingMigrationBackupIsRepaired1838138509\001\root\config.toml.bak-plaintext Everyone:(RX)
+time=2026-10-18T21:50:11.154+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2PreExistingMigrationBackupIsRepaired1838138509\001\root\secrets kind=inherited cleared="" cleared_inherited=S-1-1-0(A;OICIID;0x1200a9;;;WD) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T21:50:11.162+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2PreExistingMigrationBackupIsRepaired1838138509\001\root\config.toml.bak-plaintext kind=explicit+inherited cleared=S-1-1-0(A;;0x1200a9;;;WD) cleared_inherited=S-1-1-0(A;ID;0x1200a9;;;WD) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T21:50:11.166+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2PreExistingMigrationBackupIsRepaired1838138509\001\root\config.toml.migrate-tmp kind=inherited cleared="" cleared_inherited=S-1-1-0(A;ID;0x1200a9;;;WD) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T21:50:11.166+08:00 level=WARN msg="plaintext api_key migrated to DPAPI-protected references (D33)" config=C:\Users\swq\AppData\Local\Temp\TestAC2PreExistingMigrationBackupIsRepaired1838138509\001\root\config.toml fields=2 paths=voice.realtime.api_key,llm.providers.openai.api_key backup=C:\Users\swq\AppData\Local\Temp\TestAC2PreExistingMigrationBackupIsRepaired1838138509\001\root\config.toml.bak-plaintext
+    migrate_windows_test.go:145: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2PreExistingMigrationBackupIsRepaired1838138509\\001\\root\\config.toml.bak-plaintext"
+        C:\Users\swq\AppData\Local\Temp\TestAC2PreExistingMigrationBackupIsRepaired1838138509\001\root\config.toml.bak-plaintext NT AUTHORITY\SYSTEM:(F)
+    migrate_windows_test.go:146: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2PreExistingMigrationBackupIsRepaired1838138509\\001\\root\\config.toml.bak-plaintext"
+        C:\Users\swq\AppData\Local\Temp\TestAC2PreExistingMigrationBackupIsRepaired1838138509\001\root\config.toml.bak-plaintext NT AUTHORITY\SYSTEM:(F)
+--- PASS: TestAC2PreExistingMigrationBackupIsRepaired (0.19s)
+=== RUN   TestAC2AncestorGuardHoldsForEverySeparatorSpelling
+=== RUN   TestAC2AncestorGuardHoldsForEverySeparatorSpelling/native-backslash
+    seam_bypass_108_windows_test.go:330: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2AncestorGuardHoldsForEverySeparatorSpellingnative-backsl1115323481\\001\\victim"

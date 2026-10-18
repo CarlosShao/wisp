@@ -1,0 +1,13 @@
+== 342-a1 landing diffstats (ruler: git diff --no-index --numstat treeB vs mut-<form>; exported trees ONLY; line refs @ c596df55) ==
+--- mut-jia-linux:
+  41	0	/dev/null => D:/tmp/wisp/20261018/342a1/mut-jia-linux/internal/winsec/simlanding_openat_linux.go
+  1	1	D:/tmp/wisp/20261018/342a1/{treeB => mut-jia-linux}/internal/winsec/winsec.go
+--- mut-yi-linux:
+  34	0	/dev/null => D:/tmp/wisp/20261018/342a1/mut-yi-linux/internal/winsec/simlanding_pin_linux.go
+  1	1	D:/tmp/wisp/20261018/342a1/{treeB => mut-yi-linux}/internal/winsec/winsec.go
+--- mut-jia-win:
+  53	0	/dev/null => D:/tmp/wisp/20261018/342a1/mut-jia-win/internal/winsec/simlanding_jia_windows.go
+  1	1	D:/tmp/wisp/20261018/342a1/{treeB => mut-jia-win}/internal/winsec/winsec.go
+--- mut-yi-win:
+  47	0	/dev/null => D:/tmp/wisp/20261018/342a1/mut-yi-win/internal/winsec/simlanding_yi_windows.go
+  1	1	D:/tmp/wisp/20261018/342a1/{treeB => mut-yi-win}/internal/winsec/winsec.go

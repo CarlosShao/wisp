@@ -1,0 +1,34 @@
+GOOS=linux rc=0  
+GOOS=darwin rc=0  
+GOOS=freebsd rc=0  
+GOOS=openbsd rc=1 # github.com/CarlosShao/wisp/internal/winsec internal/winsec/winsec_other.go:314:40: st.Type undefined (type syscall.Statfs_t has no field or method Type) 
+GOOS=netbsd rc=1 # github.com/CarlosShao/wisp/internal/winsec internal/winsec/winsec_other.go:311:20: undefined: syscall.Statfs 
+GOOS=dragonfly rc=0  
+GOOS=solaris rc=1 # github.com/CarlosShao/wisp/internal/winsec internal/winsec/winsec_other.go:310:17: undefined: syscall.Statfs_t 
+GOOS=windows rc=1 go: downloading golang.org/x/sys v0.48.0 internal/winsec/winsec_windows.go:18:2: module lookup disabled by GOPROXY=off 
+GOOS=js rc=2 go: unsupported GOOS/GOARCH pair js/amd64 
+GOOS=plan9 rc=1 # github.com/CarlosShao/wisp/internal/winsec internal/winsec/winsec_other.go:29:35: undefined: syscall.O_NOFOLLOW 
+face=/src
+  run1: ok  	github.com/CarlosShao/wisp/internal/config	0.834s 
+  run2: ok  	github.com/CarlosShao/wisp/internal/config	0.851s 
+  run3: --- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.01s) FAIL FAIL	github.com/CarlosShao/wisp/internal/config	0.761s FAIL 
+face=/jia
+  run1: --- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.01s) FAIL FAIL	github.com/CarlosShao/wisp/internal/config	0.666s FAIL 
+  run2: --- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.01s) FAIL FAIL	github.com/CarlosShao/wisp/internal/config	0.702s FAIL 
+  run3: --- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.01s) FAIL FAIL	github.com/CarlosShao/wisp/internal/config	0.650s FAIL 
+face=/yi
+  run1: --- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.01s) FAIL FAIL	github.com/CarlosShao/wisp/internal/config	0.686s FAIL 
+  run2: ok  	github.com/CarlosShao/wisp/internal/config	0.711s 
+  run3: --- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.01s) FAIL FAIL	github.com/CarlosShao/wisp/internal/config	0.664s FAIL 
+face=/src
+  run1: --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (1.38s) FAIL FAIL	github.com/CarlosShao/wisp/internal/risk	1.388s FAIL 
+  run2: --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (1.74s) FAIL FAIL	github.com/CarlosShao/wisp/internal/risk	1.755s FAIL 
+  run3: --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (2.20s) FAIL FAIL	github.com/CarlosShao/wisp/internal/risk	2.217s FAIL 
+face=/jia
+  run1: --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (1.74s) FAIL FAIL	github.com/CarlosShao/wisp/internal/risk	1.750s FAIL 
+  run2: --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (1.61s) FAIL FAIL	github.com/CarlosShao/wisp/internal/risk	1.624s FAIL 
+  run3: --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (1.27s) FAIL FAIL	github.com/CarlosShao/wisp/internal/risk	1.278s FAIL 
+face=/yi
+  run1: --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (1.70s) FAIL FAIL	github.com/CarlosShao/wisp/internal/risk	1.718s FAIL 
+  run2: --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (1.25s) FAIL FAIL	github.com/CarlosShao/wisp/internal/risk	1.255s FAIL 
+  run3: --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (1.32s) FAIL FAIL	github.com/CarlosShao/wisp/internal/risk	1.325s FAIL 

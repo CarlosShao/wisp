@@ -1,0 +1,12 @@
+--- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.038s
+FAIL
+--- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.043s
+FAIL
+--- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.031s
+FAIL

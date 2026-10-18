@@ -1,0 +1,5 @@
+# github.com/CarlosShao/wisp/internal/winsec [github.com/CarlosShao/wisp/internal/winsec.test]
+FAIL	github.com/CarlosShao/wisp/internal/winsec [build failed]
+internal\winsec\census342a1_winforms_test.go:115:2: declared and not used: info
+FAIL
+rc=1

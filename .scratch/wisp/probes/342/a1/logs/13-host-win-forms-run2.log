@@ -1,0 +1,35 @@
+time=2026-10-18T22:12:22.204+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCensus342a1WindowsFormsRace
+=== RUN   TestCensus342a1WindowsFormsRace/base
+    census342a1_winforms_test.go:331: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRacebase2273628845\001\staged-link <<===>> C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRacebase2273628845\002\fdir
+    census342a1_winforms_test.go:331: CENSUS W-RACE BASE-W: attempts=1500 linkStateFlips=132 flipErrs=30 damage=897 firstDamage=attempt 6 before(size=47) after(size=15)="342a1-W payload" leg=nil firstFlipErr=remove C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRacebase2273628845\001\root\data\sub: The directory is not empty.
+    census342a1_winforms_test.go:331: CENSUS W-RACE BASE-W leg=nil : 1062
+    census342a1_winforms_test.go:331: CENSUS W-RACE BASE-W leg=refused:open C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRacebase2273628845\001\ : 438
+=== RUN   TestCensus342a1WindowsFormsRace/prod-PrivateFile
+    census342a1_winforms_test.go:333: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRaceprod-PrivateFile3232583183\001\staged-link <<===>> C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRaceprod-PrivateFile3232583183\002\fdir
+    census342a1_winforms_test.go:333: CENSUS W-RACE PROD-W: attempts=1500 linkStateFlips=99 flipErrs=159 damage=3 firstDamage=attempt 266 before(size=47) after(size=15)="342a1-W payload" leg=nil firstFlipErr=remove C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRaceprod-PrivateFile3232583183\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    census342a1_winforms_test.go:333: CENSUS W-RACE PROD-W leg=refused:open C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRaceprod-PrivateFile323 : 106
+    census342a1_winforms_test.go:333: CENSUS W-RACE PROD-W leg=nil : 56
+    census342a1_winforms_test.go:333: CENSUS W-RACE PROD-W leg=refused:winsec: refusing to seal C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRac : 1336
+    census342a1_winforms_test.go:333: CENSUS W-RACE PROD-W leg=refused:winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\Tem : 2
+=== RUN   TestCensus342a1WindowsFormsRace/jia-prefix-descent
+    census342a1_winforms_test.go:335: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRacejia-prefix-descent1590023097\001\staged-link <<===>> C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRacejia-prefix-descent1590023097\002\fdir
+    census342a1_winforms_test.go:335: CENSUS W-RACE JIA-W: attempts=1500 linkStateFlips=72 flipErrs=4 damage=0 firstDamage= firstFlipErr=remove C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRacejia-prefix-descent1590023097\001\root\data\sub: The directory is not empty.
+    census342a1_winforms_test.go:335: CENSUS W-RACE JIA-W leg=refused:open C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRacejia-prefix-descent1 : 132
+    census342a1_winforms_test.go:335: CENSUS W-RACE JIA-W leg=nil : 39
+    census342a1_winforms_test.go:335: CENSUS W-RACE JIA-W leg=refused:winsec: path is not provably resolved, refusing to seal: C:\Users\swq\AppData\Local\Tem : 1329
+=== RUN   TestCensus342a1WindowsFormsRace/yi-osroot-descent
+    census342a1_winforms_test.go:336: mklink /J: Junction created for C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRaceyi-osroot-descent8860185\001\staged-link <<===>> C:\Users\swq\AppData\Local\Temp\TestCensus342a1WindowsFormsRaceyi-osroot-descent8860185\002\fdir
+    census342a1_winforms_test.go:336: CENSUS W-RACE YI-W: attempts=1500 linkStateFlips=36 flipErrs=0 damage=0 firstDamage= firstFlipErr=
+    census342a1_winforms_test.go:336: CENSUS W-RACE YI-W leg=refused:descend swq: openat swq: The system cannot find the path specified. : 1500
+--- PASS: TestCensus342a1WindowsFormsRace (6.45s)
+    --- PASS: TestCensus342a1WindowsFormsRace/base (2.38s)
+    --- PASS: TestCensus342a1WindowsFormsRace/prod-PrivateFile (1.71s)
+    --- PASS: TestCensus342a1WindowsFormsRace/jia-prefix-descent (1.57s)
+    --- PASS: TestCensus342a1WindowsFormsRace/yi-osroot-descent (0.78s)
+=== RUN   TestCensus342a1WindowsOsRootRelativeSymlink
+    census342a1_winforms_test.go:369: CENSUS W-ROOTSYM VERDICT: Root.OpenFile returned nil; victim now "X"; link-still-there=true => followed=true (same answer as POSIX r1 measured)
+--- PASS: TestCensus342a1WindowsOsRootRelativeSymlink (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	6.500s
+rc=0

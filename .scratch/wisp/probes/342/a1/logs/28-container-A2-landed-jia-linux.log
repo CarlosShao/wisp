@@ -1,0 +1,12 @@
+=== RUN   TestCensus342a1A2PrivateFileAncestorSwapRace
+    census342a1_probe_test.go:276: CENSUS A2: attempts=1500 flips=312 flipErrs=26 damage=66 firstDamage=attempt 0 before(size=45)="foreign bytes are no" after(size=-1)="unreadable:open /tmp" leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1A2PrivateFil
+    census342a1_probe_test.go:278: CENSUS A2 leg=placement floor before the act : 960
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:openat descent sub: no such file or directory : 143
+    census342a1_probe_test.go:278: CENSUS A2 leg=nil : 276
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:open /tmp/TestCensus342a1A2PrivateFileAncestorSwapRace1028298950/001/root/data/sub/b : 6
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:openat descent sub: not a directory : 16
+    census342a1_probe_test.go:278: CENSUS A2 leg=pinPlacement sameObjectPinned : 3
+    census342a1_probe_test.go:278: CENSUS A2 leg=other:winsec: cannot apply a private security descriptor: /tmp/TestCensus342a1A2PrivateFil : 96
+--- PASS: TestCensus342a1A2PrivateFileAncestorSwapRace (0.44s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.447s

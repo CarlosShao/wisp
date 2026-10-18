@@ -1,0 +1,18 @@
+== 342-a1 H0 opening measurements (taken at shell, verbatim) ==
+$ git log -1 --format='%H %s'
+c596df55028c8fcca7f7f0394d3a98e5a47fa1a3 第三波放出＝4 枚腿（真实启动动作：4 次 spawn 调用，全部返回 id）
+HEAD short = c596df55
+$ git rev-parse --abbrev-ref HEAD
+dev
+$ git status --porcelain -- internal/winsec cmd/wisp internal
+--- output follows (empty output = clean) ---
+(empty: 0 lines)
+dirty line count = 0
+$ git log --all --oneline --grep='342-a1'
+c596df55 第三波放出＝4 枚腿（真实启动动作：4 次 spawn 调用，全部返回 id）
+98dbf20a 第三波派单写档＝4 枚腿（先存档再发）｜放出前逐面现量（21:1x）＝internal/config⇄internal/risk⇄internal/tools⇄cmd/wisp⇄internal/winsec 40 分钟内零枚文件被动、在飞腿 0、共享树跟踪件脏 0 行；★腿身份三键（注册名＋主题前缀＋写面根）逐枚现跑＝票 341 落地腿 341-r1／票 339 终裁腿 339-v1／票 338 终裁腿 338-v1／票 342 普查腿 342-a1 各 0 笔＋probes 目录各不存在
+grep hit count = 2
+NOTE: the single hit is the ORCHESTRATOR dispatch-archiving commit 98dbf20a (its commit BODY names the leg id), files touched = .scratch/wisp/probes/orch/20261018/txt/* only; git log --all --oneline -- .scratch/wisp/probes/342 = empty => no 342 leg commit exists.
+$ git log --all --oneline -- .scratch/wisp/probes/342
+--- output follows (empty = none) ---
+(empty: 0 commits)

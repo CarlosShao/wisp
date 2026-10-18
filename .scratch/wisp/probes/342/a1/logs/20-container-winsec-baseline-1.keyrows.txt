@@ -1,0 +1,109 @@
+342-a1 key-row extraction (verbatim lines) from raw=/d/tmp/wisp/20261018/342a1/logs/20-container-winsec-baseline-1.log (raw stays on disk, built-only, never deleted)
+ruler=grep -E of raw; four numbers computed on the RAW file with RUN=/PASS_TOP=/FAIL_TOP=/SKIP= patterns
+FOUR_NUMBERS raw: RUN=71 PASS_TOP=43 FAIL_TOP=0 SKIP=0
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.04s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.00s)
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/native-backslash
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/all-forward-slash
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/mixed-separators
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/trailing-separator
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/doubled-separator
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/posix-backslash-is-a-name-character
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/extended-length-prefix
+--- PASS: TestAC2AncestorPrefixesForEverySeparatorShape (0.01s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/native-backslash (0.01s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/all-forward-slash (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/mixed-separators (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/trailing-separator (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/doubled-separator (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/posix-backslash-is-a-name-character (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/extended-length-prefix (0.00s)
+=== RUN   TestAC2ComponentsAndTraversalPerSeparatorShape
+--- PASS: TestAC2ComponentsAndTraversalPerSeparatorShape (0.00s)
+=== RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125
+=== RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/control_plain_temp
+    seam_probe_root_125_other_test.go:128: reading: TMPDIR="/tmp/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1251362768085/001/real125/tmproot125" shapes=["/tmp/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1251362768085/001/real125/tmproot125/../wisp-103-conformance-probe"]
+=== RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp
+    seam_probe_root_125_other_test.go:128: reading: TMPDIR="/tmp/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1251362768085/001/varlink125/tmproot125" shapes=["/tmp/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1251362768085/001/real125/tmproot125/../wisp-103-conformance-probe"]
+--- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125 (0.01s)
+    --- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/control_plain_temp (0.00s)
+    --- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp (0.00s)
+=== RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125
+=== RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/control_plain_temp
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=pass_through refused=true reason="it answered the hostile shape \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125/../wisp-103-conformance-probe\" by passing it through unchanged, which is the bypass this seam exists to close"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=constant refused=true reason="it answered \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125\" and \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with the same single spelling \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/002/constant-leaf\", i.e. it does not resolve the tree the caller named at all"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=tree_moving refused=true reason="it answered \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with \"/wisp125-foreign-tree/wisp-108-tree-ownership-probe\", which is neither inside the tree \"/wisp125-foreign-tree/tmproot125\" it answered for that path's own parent \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125\" nor inside the tree that answer names once the candidate is asked about it directly (\"/wisp125-foreign-tree/wisp125-foreign-tree\" for \"/wisp125-foreign-tree\"): the seam may not be used to move a seal into another tree"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=answer_through_the_link refused=true reason="it answered \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125/../wisp-103-conformance-probe\" with \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/varlink125/tmproot125/../wisp-103-conformance-probe\", a spelling the built-in floor itself refuses: winsec: path is not provably resolved, refusing to seal: /tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/varlink125/tmproot125/../wisp-103-conformance-probe traverses \"..\""
+=== RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/measured_symlink_spelled_temp
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=pass_through refused=true reason="it answered the hostile shape \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125/../wisp-103-conformance-probe\" by passing it through unchanged, which is the bypass this seam exists to close"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=constant refused=true reason="it answered \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125\" and \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with the same single spelling \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/002/constant-leaf\", i.e. it does not resolve the tree the caller named at all"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=tree_moving refused=true reason="it answered \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with \"/wisp125-foreign-tree/wisp-108-tree-ownership-probe\", which is neither inside the tree \"/wisp125-foreign-tree/tmproot125\" it answered for that path's own parent \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125\" nor inside the tree that answer names once the candidate is asked about it directly (\"/wisp125-foreign-tree/wisp125-foreign-tree\" for \"/wisp125-foreign-tree\"): the seam may not be used to move a seal into another tree"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=answer_through_the_link refused=true reason="it answered \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/real125/tmproot125/../wisp-103-conformance-probe\" with \"/tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/varlink125/tmproot125/../wisp-103-conformance-probe\", a spelling the built-in floor itself refuses: winsec: path is not provably resolved, refusing to seal: /tmp/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125374678025/001/varlink125/tmproot125/../wisp-103-conformance-probe traverses \"..\""
+--- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125 (0.03s)
+    --- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/control_plain_temp (0.00s)
+    --- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/measured_symlink_spelled_temp (0.01s)
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_unresolved_root_still_refused_by_the_floor_itself
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp
+    seam_probe_root_125_other_test.go:293: reading: TMPDIR="/tmp/TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer1252579157353/001/varlink125/tmproot125" shapes=["/tmp/TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer1252579157353/001/real125/tmproot125/../wisp-103-conformance-probe"] refused=false reason=""
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_plain_temp
+--- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125 (0.01s)
+    --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_unresolved_root_still_refused_by_the_floor_itself (0.00s)
+    --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp (0.00s)
+    --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_plain_temp (0.00s)
+=== RUN   TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink
+    ancestor_separator_108_other_test.go:92: AC#2 RemoveUnlinked("/tmp/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink4242852106/002/root/link/keep-me.txt") -> err=winsec: entry is a link to something else, not private data /tmp/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink4242852106/002/root/link/keep-me.txt: the spelling reaches it through the link at /tmp/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink4242852106/002/root/link, and whatever lives behind that link is not this tree's data to delete (link this case planted: "/tmp/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink4242852106/002/root/link")
+--- PASS: TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink (0.02s)
+=== RUN   TestAC2POSIXDoesNotFoldABackslashIntoASeparator
+--- PASS: TestAC2POSIXDoesNotFoldABackslashIntoASeparator (0.02s)
+=== RUN   TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor
+    ancestor_separator_108_other_test.go:159: AC#2 RemoveUnlinked("/tmp/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor1827966170/002/root/x\\y/keep-me.txt") -> err=winsec: entry is a link to something else, not private data /tmp/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor1827966170/002/root/x\y/keep-me.txt: the spelling reaches it through the link at /tmp/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor1827966170/002/root/x\y, and whatever lives behind that link is not this tree's data to delete (link this case planted: "/tmp/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor1827966170/002/root/x\\y")
+--- PASS: TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor (0.02s)
+=== RUN   TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+    dataroot_symlink_119_other_test.go:358: AC#2 PrivateDirAll("/tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1191080657515/001/injlink119/harness/picked") -> winsec: refusing to seal /tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1191080657515/001/injlink119/harness/picked: winsec: path is not provably resolved, refusing to seal: /tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1191080657515/001/injlink119/harness/picked reaches it through the link at /tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1191080657515/001/injlink119, which is not the tree this call names
+--- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.02s)
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=382 of-which-refused-at-act=1 sealed-own-object=105 other=13
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed1637191955/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=365 of-which-refused-at-act=3 sealed-own-object=127 other=8
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed1637191955/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=424 of-which-refused-at-act=0 sealed-own-object=70 other=6
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed1637191955/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=347 of-which-refused-at-act=1 sealed-own-object=138 other=15
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed1637191955/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=1518 of-which-refused-at-act=5 sealed-own-object=440 other=42
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowLeafSwapIsClosed1637191955/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:393: AC#1 sample 1/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=23 of-which-refused-at-act=0 sealed-own-object=14 other=463
+    posix_seal_window_120_other_test.go:393: AC#1 sample 1/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed1934027348/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 sample 2/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=133 of-which-refused-at-act=2 sealed-own-object=21 other=346
+    posix_seal_window_120_other_test.go:393: AC#1 sample 2/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed1934027348/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 sample 3/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=13 of-which-refused-at-act=1 sealed-own-object=34 other=453
+    posix_seal_window_120_other_test.go:393: AC#1 sample 3/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed1934027348/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 sample 4/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=34 of-which-refused-at-act=0 sealed-own-object=9 other=457
+    posix_seal_window_120_other_test.go:393: AC#1 sample 4/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed1934027348/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 total shape=ancestor-swap-absolute-link: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=203 of-which-refused-at-act=3 sealed-own-object=78 other=1719
+    posix_seal_window_120_other_test.go:393: AC#1 shape=ancestor-swap-absolute-link last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed1934027348/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 sample 1/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=43 of-which-refused-at-act=3 sealed-own-object=20 other=437
+    posix_seal_window_120_other_test.go:419: AC#1 sample 1/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed510192312/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 sample 2/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=9 of-which-refused-at-act=2 sealed-own-object=60 other=431
+    posix_seal_window_120_other_test.go:419: AC#1 sample 2/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed510192312/001/root/data/sub/blob.bin: openat blob.bin: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 sample 3/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=31 of-which-refused-at-act=2 sealed-own-object=53 other=416
+    posix_seal_window_120_other_test.go:419: AC#1 sample 3/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed510192312/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 sample 4/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=42 of-which-refused-at-act=3 sealed-own-object=34 other=424
+    posix_seal_window_120_other_test.go:419: AC#1 sample 4/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed510192312/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 total shape=ancestor-swap-relative-sibling-link: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=125 of-which-refused-at-act=10 sealed-own-object=167 other=1708
+    posix_seal_window_120_other_test.go:419: AC#1 shape=ancestor-swap-relative-sibling-link last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed510192312/001/root/data/sub/blob.bin: openat sub: no such file or directory
+ok  	github.com/CarlosShao/wisp/internal/winsec	5.885s
+rc=0

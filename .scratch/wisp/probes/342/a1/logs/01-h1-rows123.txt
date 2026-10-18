@@ -1,0 +1,18 @@
+== 342-a1 H1 ticket 现量 six rows re-measured from named commit tree (HEAD = c596df55) ==
+MEASUREMENT NOTE: every line number below came from 'git show HEAD:<path>' snapshots written to D:\tmp\wisp\20261018\342a1\snap (working tree verified identical: 'git diff --stat HEAD -- internal/winsec/winsec.go winsec_other.go winsec_windows.go' = empty).
+
+--- ROW1: scale = Select-String on HEAD blob of internal/winsec/winsec.go, pattern 'preOpenLeafGuard\(resolved\)|os\.OpenFile\(resolved' ---
+winsec.go:146: if err := preOpenLeafGuard(resolved); err != nil {
+winsec.go:149: f, err := os.OpenFile(resolved, flags|oNoFollowPlatform, perm)
+
+--- ROW2: self-report block anchors in HEAD blob winsec.go ---
+winsec.go:118: // Ticket 322 is the second half of that sentence, and it is only half closed.
+winsec.go:125: //   - the LEAF leg is closed on POSIX, by O_NOFOLLOW carried on this open
+winsec.go:128: //   - the ANCESTOR leg is still open on POSIX. O_NOFOLLOW is a property of the
+winsec.go:133: //     adjudicated for this ticket. This window is not claimed closed anywhere.
+winsec.go:134: //   - on Windows O_NOFOLLOW does not exist (oNoFollowPlatform is 0), so the leaf
+winsec.go:138: //     the ancestor leg is open there too. See the Windows file for its own
+
+--- ROW3: caller-side flag lines in HEAD blob winsec.go ---
+winsec.go:96: return privateFile(path, data, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+winsec.go:106: return privateFile(path, data, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
