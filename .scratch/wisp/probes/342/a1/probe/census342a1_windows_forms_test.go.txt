@@ -1,0 +1,374 @@
+//go:build windows
+
+// Ticket 342, leg 342-a1 READ-ONLY CENSUS PROBE (Windows descent forms, exported tree
+// only; never tracked). Same racer shape as the POSIX A2/F rows, on this platform, on
+// the ANCESTOR swap (the branch ticket 322 left open and ticket 342 owns).
+// Forms simulated:
+//   BASE-W : the shipped by-name open (os.OpenFile p, O_WRONLY|O_CREATE|O_TRUNC,
+//            oNoFollowPlatform here is 0) = what privateFile does today after its guard
+//   PROD-W : the shipped production route PrivateFile(p) with the racing ancestor
+//   JIA-W  : per-COMPONENT CreateFile with FILE_FLAG_OPEN_REPARSE_POINT over every
+//            pathPieces prefix, refuse any prefix reporting reparse, THEN open by name
+//            (check-then-act, the guard's own API widened to ancestors)
+//   YI-W   : per-component os.Root descent (OpenRoot on the volume, OpenRoot each
+//            ancestor) and the leaf opened ON the pinned child Root (act-time, like
+//            pinPlacement does on POSIX)
+// Liveness rule: a flip only counts when reparseAt(ancestor) reads true right after
+// planting, so flips is evidence the name entered the LINK state, not just that the
+// racer ran a command.
+package winsec
+
+import (
+	"bytes"
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"testing"
+
+	"golang.org/x/sys/windows"
+)
+
+const (
+	c342WRaceAttempts = 1500
+	c342WPayload      = "342a1-W payload"
+	c342WWitnessFix   = "foreign bytes are not yours to truncate 342a1-W"
+	c342WOwnBlob      = "the tree's own blob"
+)
+
+type c342WWorld struct {
+	dir, outside, target, witness, realStage, linkStage, ancestor, name string
+}
+
+func c342WRunMklinkJ(link, target string) error {
+	var out bytes.Buffer
+	cmd := exec.Command("cmd", "/c", "mklink", "/J", link, target)
+	cmd.Stdout, cmd.Stderr = &out, &out
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("%w: %s", err, strings.TrimSpace(out.String()))
+	}
+	return nil
+}
+
+func c342WStage(t *testing.T) c342WWorld {
+	t.Helper()
+	w := c342WWorld{}
+	w.dir = SealableTempDirForTest124(t)
+	w.outside = SealableTempDirForTest124(t)
+	w.target = filepath.Join(w.outside, "fdir")
+	if err := os.MkdirAll(w.target, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.witness = filepath.Join(w.target, "blob.bin")
+	if err := os.WriteFile(w.witness, []byte(c342WWitnessFix), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	w.realStage = filepath.Join(w.dir, "staged-real")
+	if err := os.MkdirAll(w.realStage, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(w.realStage, "blob.bin"), []byte(c342WOwnBlob), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	w.linkStage = filepath.Join(w.dir, "staged-link")
+	mkJunction(t, w.linkStage, w.target)
+	data := filepath.Join(w.dir, "root", "data")
+	if err := os.MkdirAll(data, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.ancestor = filepath.Join(data, "sub")
+	w.name = filepath.Join(w.ancestor, "blob.bin")
+	return w
+}
+
+// clearAncestor removes whatever stands at the ancestor name BY KIND: a reparse entry
+// is unlinked directly (never followed), a real directory is emptied then rmdir'ed.
+func c342WClearAncestor(name string) error {
+	info, err := os.Lstat(name)
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if info.IsDir() && !reparseAt(name) {
+		if err := os.Remove(filepath.Join(name, "blob.bin")); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			return err
+		}
+	}
+	return os.Remove(name)
+}
+
+func (w c342WWorld) restockStages() error {
+	if err := os.Mkdir(w.realStage, 0o700); err != nil && !errors.Is(err, fs.ErrExist) {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(w.realStage, "blob.bin"), []byte(c342WOwnBlob), 0o600); err != nil {
+		return err
+	}
+	_, err := os.Lstat(w.linkStage)
+	if errors.Is(err, fs.ErrNotExist) {
+		return c342WRunMklinkJ(w.linkStage, w.target)
+	}
+	if err != nil || !reparseAt(w.linkStage) {
+		_ = os.RemoveAll(w.linkStage)
+		return c342WRunMklinkJ(w.linkStage, w.target)
+	}
+	return nil
+}
+
+func (w c342WWorld) toReal() error {
+	if err := c342WClearAncestor(w.ancestor); err != nil {
+		return err
+	}
+	if err := os.Rename(w.realStage, w.ancestor); err != nil {
+		return err
+	}
+	return w.restockStages()
+}
+
+func (w c342WWorld) toLink() error {
+	if err := c342WClearAncestor(w.ancestor); err != nil {
+		return err
+	}
+	if err := os.Rename(w.linkStage, w.ancestor); err != nil {
+		return err
+	}
+	if !reparseAt(w.ancestor) {
+		return fmt.Errorf("ancestor %s is not a reparse point after the flip", w.ancestor)
+	}
+	return w.restockStages()
+}
+
+func c342WWitnessRead(t *testing.T, w c342WWorld) (string, int64) {
+	t.Helper()
+	body, rErr := os.ReadFile(w.witness)
+	info, sErr := os.Lstat(w.witness)
+	if rErr != nil || sErr != nil {
+		return "unreadable:" + fmt.Sprint(rErr, sErr), -1
+	}
+	return string(body), info.Size()
+}
+
+func c342WRunRace(t *testing.T, shape string, call func(string) error) {
+	t.Helper()
+	w := c342WStage(t)
+	if err := w.toReal(); err != nil {
+		t.Fatalf("seed real: %v", err)
+	}
+	var flips, flipErrs int32
+	var mu sync.Mutex
+	var firstFlip string
+	note := func(err error) {
+		if err == nil {
+			atomic.AddInt32(&flips, 1)
+			return
+		}
+		atomic.AddInt32(&flipErrs, 1)
+		mu.Lock()
+		if firstFlip == "" {
+			firstFlip = err.Error()
+		}
+		mu.Unlock()
+	}
+	stop, done := make(chan struct{}), make(chan struct{})
+	var once sync.Once
+	stopRacer := func() { once.Do(func() { close(stop) }); <-done }
+	go func() {
+		defer close(done)
+		defer func() {
+			if p := recover(); p != nil {
+				note(fmt.Errorf("racer panic: %v", p))
+			}
+		}()
+		wantLink := false
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+			}
+			if wantLink {
+				note(w.toLink())
+			} else {
+				note(w.toReal())
+			}
+			wantLink = !wantLink
+		}
+	}()
+	defer stopRacer()
+
+	counts := map[string]int{}
+	damage := 0
+	firstDamage := ""
+	for i := 0; i < c342WRaceAttempts; i++ {
+		before, sizeBefore := c342WWitnessRead(t, w)
+		err := call(w.name)
+		leg := "nil"
+		if err != nil {
+			leg = "refused:" + err.Error()
+			if len(leg) > 95 {
+				leg = leg[:95]
+			}
+		}
+		counts[leg]++
+		after, sizeAfter := c342WWitnessRead(t, w)
+		damaged := after != c342WWitnessFix || sizeAfter != sizeBefore || strings.HasPrefix(after, "unreadable") || before != c342WWitnessFix
+		if damaged {
+			damage++
+			if firstDamage == "" {
+				firstDamage = fmt.Sprintf("attempt %d before(size=%d) after(size=%d)=%.20q leg=%s", i, sizeBefore, sizeAfter, after, leg)
+			}
+			if rErr := os.WriteFile(w.witness, []byte(c342WWitnessFix), 0o666); rErr != nil {
+				stopRacer()
+				t.Fatalf("re-stage witness: %v", rErr)
+			}
+		}
+	}
+	stopRacer()
+	flipsN, errsN := atomic.LoadInt32(&flips), atomic.LoadInt32(&flipErrs)
+	t.Logf("CENSUS W-RACE %s: attempts=%d linkStateFlips=%d flipErrs=%d damage=%d firstDamage=%s firstFlipErr=%s",
+		shape, c342WRaceAttempts, flipsN, errsN, damage, firstDamage, firstFlip)
+	for leg, n := range counts {
+		if n > 0 {
+			t.Logf("CENSUS W-RACE %s leg=%s : %d", shape, leg, n)
+		}
+	}
+	if flipsN == 0 {
+		t.Errorf("CENSUS W-RACE %s DEAD INSTRUMENT: 0 link-state flips (firstErr=%q) => damage=%d proves nothing", shape, firstFlip, damage)
+	}
+}
+
+func c342WOpenToday(p string) error {
+	f, err := os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	if err != nil {
+		return err
+	}
+	_, wErr := f.Write([]byte(c342WPayload))
+	_ = f.Close()
+	return wErr
+}
+
+// jiaWindowsDescent: probe every ancestor prefix with the reparse flag (the shipped
+// guard's own call, widened per component), refuse on reparse, then open by name.
+func c342WJiaOpen(p string) error {
+	pieces := pathPieces(p)
+	if len(pieces) < 2 {
+		return fmt.Errorf("unexpected spelling %q", p)
+	}
+	for _, prefix := range pieces[:len(pieces)-1] {
+		h, err := windows.CreateFile(windows.StringToUTF16Ptr(prefix),
+			windows.FILE_READ_ATTRIBUTES,
+			windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE|windows.FILE_SHARE_DELETE,
+			nil, windows.OPEN_EXISTING,
+			windows.FILE_FLAG_OPEN_REPARSE_POINT|windows.FILE_FLAG_BACKUP_SEMANTICS, 0)
+		if err != nil {
+			if errors.Is(err, syscall.ERROR_FILE_NOT_FOUND) || errors.Is(err, syscall.ERROR_PATH_NOT_FOUND) {
+				continue // an ancestor that is not there yet is not a link (the floor's own rule)
+			}
+			return fmt.Errorf("prefix probe %s: %w", prefix, err)
+		}
+		var info windows.ByHandleFileInformation
+		gErr := windows.GetFileInformationByHandle(h, &info)
+		_ = windows.CloseHandle(h)
+		if gErr != nil {
+			return fmt.Errorf("prefix attrs %s: %w", prefix, gErr)
+		}
+		if info.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0 {
+			return fmt.Errorf("%w: %s traverses a reparse point at %s, refused by the descent (JIA-W shape)",
+				ErrUnresolvedPath, p, prefix)
+		}
+	}
+	f, err := os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		return err
+	}
+	_, wErr := f.Write([]byte(c342WPayload))
+	_ = f.Close()
+	return wErr
+}
+
+// yiWindowsDescent: pin every ancestor with os.Root (OpenRoot chain) and open the leaf
+// ON the pinned parent — the stdlib's act-time shape, 乙's mechanism candidate here.
+func c342WYiOpen(p string) error {
+	comps := pathComponents(p)
+	if len(comps) < 2 {
+		return fmt.Errorf("unexpected spelling %q", p)
+	}
+	root, err := os.OpenRoot(filepath.VolumeName(p) + string(os.PathSeparator))
+	if err != nil {
+		return fmt.Errorf("open volume root: %w", err)
+	}
+	defer root.Close()
+	cur := root
+	// pathComponents EXCLUDES the volume, so every listed component is a descent step
+	// under the volume root; the last one is the leaf. (First cut of this row wrongly
+	// dropped comps[0] — the same off-by-one class 322-a1 booked as probe defects.)
+	for _, comp := range comps[:len(comps)-1] {
+		next, err := cur.OpenRoot(comp)
+		if err != nil {
+			return fmt.Errorf("descend %s: %w", comp, err)
+		}
+		if cur != root {
+			_ = cur.Close()
+		}
+		cur = next
+	}
+	defer cur.Close()
+	f, err := cur.OpenFile(filepath.Base(p), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		return fmt.Errorf("leaf on pinned parent: %w", err)
+	}
+	_, wErr := f.Write([]byte(c342WPayload))
+	_ = f.Close()
+	return wErr
+}
+
+func TestCensus342a1WindowsFormsRace(t *testing.T) {
+	t.Run("base", func(t *testing.T) { c342WRunRace(t, "BASE-W", c342WOpenToday) })
+	t.Run("prod-PrivateFile", func(t *testing.T) {
+		c342WRunRace(t, "PROD-W", func(p string) error { return PrivateFile(p, []byte(c342WPayload), 0o600) })
+	})
+	t.Run("jia-prefix-descent", func(t *testing.T) { c342WRunRace(t, "JIA-W", c342WJiaOpen) })
+	t.Run("yi-osroot-descent", func(t *testing.T) { c342WRunRace(t, "YI-W", c342WYiOpen) })
+}
+
+// Does os.Root on Windows follow an IN-ROOT relative file symlink? POSIX Root does
+// (120-r1's measured defeat of the walk through Root). The answer decides whether a
+// YI-W landing needs the sameObjectPinned identity re-check as on POSIX.
+func TestCensus342a1WindowsOsRootRelativeSymlink(t *testing.T) {
+	dir := SealableTempDirForTest124(t)
+	victim := filepath.Join(dir, "victim.bin")
+	if err := os.WriteFile(victim, []byte("victim-body-342a1-W"), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	linkName := filepath.Join(dir, "link.bin")
+	if err := os.Symlink("victim.bin", linkName); err != nil {
+		t.Skipf("no symlink privilege here: %v", err)
+	}
+	root, err := os.OpenRoot(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer root.Close()
+	f, err := root.OpenFile("link.bin", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		got, _ := os.ReadFile(victim)
+		t.Logf("CENSUS W-ROOTSYM: Root.OpenFile on the in-root RELATIVE leaf link REFUSED err=%v; victim=%q intact=%v",
+			err, got, string(got) == "victim-body-342a1-W")
+		return
+	}
+	_, _ = f.Write([]byte("X"))
+	_ = f.Close()
+	got, _ := os.ReadFile(victim)
+	li, _ := os.Lstat(linkName)
+	followed := string(got) != "victim-body-342a1-W"
+	t.Logf("CENSUS W-ROOTSYM VERDICT: Root.OpenFile returned nil; victim now %q; link-still-there=%v => followed=%v (same answer as POSIX r1 measured)",
+		got, li != nil && li.Mode()&os.ModeSymlink != 0, followed)
+}

@@ -1,0 +1,41 @@
+//go:build linux
+
+// SIMULATED LANDING for the cost table — exists ONLY in exported trees under
+// D:\tmp\wisp\20261018\342a1\mut-*. Never tracked; the repository's internal/** bytes
+// were never touched by this leg (342-a1 is read-only).
+//
+// 甲 on POSIX: per-component openat(O_NOFOLLOW) from "/" down the whole chain, the
+// leaf opened ON the pinned parent descriptor (the shape winsec.go's comment names).
+package winsec
+
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"syscall"
+)
+
+func openPrivateAt(path string, flags int, perm fs.FileMode) (*os.File, error) {
+	comps := pathComponents(path)
+	if len(comps) == 0 {
+		return nil, fmt.Errorf("openat descent: no components in %q", path)
+	}
+	fd, err := syscall.Open("/", syscall.O_RDONLY|syscall.O_DIRECTORY|syscall.O_NOFOLLOW, 0)
+	if err != nil {
+		return nil, fmt.Errorf("openat descent root %s: %w", path, err)
+	}
+	for _, comp := range comps[:len(comps)-1] {
+		next, err := syscall.Openat(fd, comp, syscall.O_RDONLY|syscall.O_DIRECTORY|syscall.O_NOFOLLOW, 0)
+		_ = syscall.Close(fd)
+		if err != nil {
+			return nil, fmt.Errorf("openat descent %s: %w", comp, err)
+		}
+		fd = next
+	}
+	lfd, err := syscall.Openat(fd, comps[len(comps)-1], flags|syscall.O_NOFOLLOW, uint32(perm.Perm()))
+	_ = syscall.Close(fd)
+	if err != nil {
+		return nil, &os.PathError{Op: "open", Path: path, Err: err}
+	}
+	return os.NewFile(uintptr(lfd), path), nil
+}

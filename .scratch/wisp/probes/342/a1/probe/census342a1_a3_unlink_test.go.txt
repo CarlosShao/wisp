@@ -1,0 +1,77 @@
+//go:build !windows
+
+// Ticket 342, leg 342-a1 READ-ONLY CENSUS PROBE (deterministic, no racer).
+// It isolates the SECOND damage shape on the privateFile route that the race readings
+// mixed with truncation: the refusal path's own unlink. winsec.go:158-161 (bytes @
+// c596df55) seals the handle and, on a seal refusal, runs the package's ONLY unlink on
+// this route by NAME (_ = os.Remove(resolved)). os.Remove does not follow the LEAF, but
+// it DOES resolve ancestor links — the very asymmetry ancestorIsLink/firstLinkAncestor
+// exist to guard on the RemoveUnlinked route (ticket 103's AC#2).
+//
+// Shape driven directly here (equivalent to the production failure path, because the
+// floor's refusal is bypassed by calling the primitives the route calls): open by name
+// through a PRE-PLANTED ancestor link, get the identity-gate refusal, then unlink by
+// name and read the foreign witness.
+package winsec
+
+import (
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func TestCensus342a1A3RefusalPathUnlinkRemovesThroughAnAncestorLink(t *testing.T) {
+	dir, outside := SealableTempDirForTest124(t), SealableTempDirForTest124(t)
+	witness := filepath.Join(outside, "blob.bin")
+	const body = "foreign bytes are not yours to delete 342a1-A3"
+	if err := os.WriteFile(witness, []byte(body), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	inner := filepath.Join(dir, "data")
+	if err := os.MkdirAll(inner, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	anc := filepath.Join(inner, "sub")
+	if err := os.Symlink(outside, anc); err != nil {
+		t.Fatal(err)
+	}
+	resolved := filepath.Join(anc, "blob.bin")
+
+	// step 1: the act privateFile would perform (leaf flag carried, ancestor followed).
+	f, err := os.OpenFile(resolved, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	if err != nil {
+		t.Fatalf("A3 setup: the open refused (%v), want it to follow the ancestor", err)
+	}
+	_, _ = f.Write([]byte("342a1 A3 payload"))
+	_ = f.Close()
+
+	// step 2: the seal the route runs next (sealHandle == applyDescriptor + identity).
+	sealErr := sealHandleByNameForProbe(resolved)
+	_, statAfterSeal := os.Lstat(witness)
+	t.Logf("A3 row1: sealHandle-style refusal err=%v witness-readable=%v", sealErr, statAfterSeal == nil)
+
+	// step 3: the route's ONLY unlink on a seal failure, verbatim in shape.
+	rmErr := os.Remove(resolved)
+	_, statAfterRm := os.Lstat(witness)
+	ancStill, statAnc := os.Lstat(anc)
+	t.Logf("A3 row2: os.Remove(%s) err=%v ; foreign witness now readable=%v ; ancestor link still standing=%v(%v)",
+		resolved, rmErr, statAfterRm == nil, ancStill != nil, statAnc)
+	if statAfterRm != nil && strings.Contains(statAfterRm.Error(), "no such file") {
+		t.Logf("A3 VERDICT: the refusal-path unlink resolved THROUGH the ancestor link and deleted the FOREIGN object (damage shape 2). The route's seal refusal came from the identity gate, so nothing above protected this name.")
+	} else if statAfterRm == nil {
+		bodyAfter, _ := os.ReadFile(witness)
+		t.Logf("A3 VERDICT: witness survived the unlink; it now reads %q", bodyAfter)
+	}
+}
+
+// sealHandleByNameForProbe re-opens the name read-only and drives the shipped sealHandle
+// on that descriptor, which is what privateFile does; it must not fake the verdict.
+func sealHandleByNameForProbe(path string) error {
+	f, err := os.OpenFile(path, os.O_RDONLY, 0)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return sealHandle(f)
+}

@@ -1,0 +1,175 @@
+//go:build windows
+
+// Ticket 342, leg 342-a1 READ-ONLY CENSUS PROBE (Windows half, exported tree only).
+// Never tracked in the repository; physical bytes live only under
+// D:\tmp\wisp\20261018\342a1\. Reuses the package's own Windows helpers
+// (mkJunction / reparseAt from reparse_windows_test.go, same package + build tag).
+//
+// What it measures, on this machine, by act:
+//   W1: the ANCESTOR branch today — a junction / dir-symlink ancestor, then
+//     os.OpenFile by name with O_WRONLY|O_CREATE|O_TRUNC|oNoFollowPlatform (the exact
+//     flag set privateFile composes here, where oNoFollowPlatform is 0) -> does the
+//     truncating open follow the ancestor into the foreign object?
+//   W2: reproduce (or explicitly fail to reproduce) 322-a1's sentence "FILE_FLAG_OPEN_
+//     REPARSE_POINT answers for the leaf only", pointed at ANCESTORS: the flag on a
+//     full path behind a junction vs the flag on the junction's own name.
+//   W3: what per-component descent would need: os.Root's answer when an ancestor of
+//     the relative spelling is a junction (the stdlib pinning shape, 乙's candidate
+//     mechanism on this platform).
+package winsec
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"testing"
+
+	"golang.org/x/sys/windows"
+)
+
+func c342WAttrs(t *testing.T, path string, extraFlags uint32) (bool, string) {
+	t.Helper()
+	h, err := windows.CreateFile(windows.StringToUTF16Ptr(path),
+		windows.FILE_READ_ATTRIBUTES,
+		windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE|windows.FILE_SHARE_DELETE,
+		nil, windows.OPEN_EXISTING,
+		windows.FILE_FLAG_BACKUP_SEMANTICS|extraFlags, 0)
+	if err != nil {
+		return false, fmt.Sprintf("CreateFile err=%v", err)
+	}
+	defer func() { _ = windows.CloseHandle(h) }()
+	var info windows.ByHandleFileInformation
+	if err := windows.GetFileInformationByHandle(h, &info); err != nil {
+		return false, fmt.Sprintf("ByHandleInfo err=%v", err)
+	}
+	isLink := info.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0
+	return isLink, fmt.Sprintf("attrs=0x%x reparse=%v size=%d:%d index=%d:%d",
+		info.FileAttributes, isLink, info.FileSizeHigh, info.FileSizeLow,
+		info.VolumeSerialNumber, info.FileIndexHigh*65536+info.FileIndexLow)
+}
+
+func c342WFixture(t *testing.T) (dir, outside, witness, body string) {
+	t.Helper()
+	dir = SealableTempDirForTest124(t)
+	outside = SealableTempDirForTest124(t)
+	body = "foreign bytes are not yours to truncate 342a1-win"
+	witness = filepath.Join(outside, "blob.bin")
+	if err := os.WriteFile(witness, []byte(body), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	return dir, outside, witness, body
+}
+
+func c342WWitness(t *testing.T, witness, body string) (int64, bool) {
+	t.Helper()
+	got, rErr := os.ReadFile(witness)
+	info, sErr := os.Lstat(witness)
+	if rErr != nil || sErr != nil {
+		return -1, false
+	}
+	return info.Size(), string(got) == body
+}
+
+func TestCensus342a1WindowsAncestorJunctionFollowedByTodayOpen(t *testing.T) {
+	dir, outside, witness, body := c342WFixture(t)
+	inner := filepath.Join(dir, "data")
+	if err := os.MkdirAll(inner, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	anc := filepath.Join(inner, "sub")
+	mkJunction(t, anc, outside)
+	name := filepath.Join(anc, "blob.bin")
+	size0, _ := c342WWitness(t, witness, body)
+	f, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	if err != nil {
+		size1, intact := c342WWitness(t, witness, body)
+		t.Logf("CENSUS W1-junction: open REFUSED err=%v; witness size %d->%d intact=%v", err, size0, size1, intact)
+		if !intact {
+			t.Errorf("CENSUS W1-junction: the refusal still damaged the foreign witness")
+		}
+		return
+	}
+	if _, wErr := f.Write([]byte("342a1 payload")); wErr != nil {
+		t.Fatalf("write: %v", wErr)
+	}
+	_ = f.Close()
+	size1, intact := c342WWitness(t, witness, body)
+	t.Logf("CENSUS W1-junction VERDICT: open by name SUCCEEDED through the ancestor junction (err=nil); witness size %d->%d intact=%v", size0, size1, intact)
+	if !intact {
+		t.Logf("CENSUS W1-junction: DAMAGED => the ancestor leg is live on Windows WITH the shipped leaf guard in force (the guard looks at the one name, winsec_windows.go says ancestors are not probed)")
+	}
+}
+
+func TestCensus342a1WindowsAncestorDirSymlinkFollowedByTodayOpen(t *testing.T) {
+	dir, outside, witness, body := c342WFixture(t)
+	inner := filepath.Join(dir, "data")
+	if err := os.MkdirAll(inner, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	anc := filepath.Join(inner, "sub")
+	if err := os.Symlink(outside, anc); err != nil {
+		t.Skipf("cannot construct a dir symlink here: %v (needs developer mode / SeCreateSymbolicLinkPrivilege)", err)
+	}
+	if !reparseAt(anc) {
+		t.Fatalf("%s is not a reparse point; measured nothing", anc)
+	}
+	name := filepath.Join(anc, "blob.bin")
+	size0, _ := c342WWitness(t, witness, body)
+	f, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	if err != nil {
+		_, intact := c342WWitness(t, witness, body)
+		t.Logf("CENSUS W1-dirsym: open REFUSED err=%v; intact=%v", err, intact)
+		return
+	}
+	_, _ = f.Write([]byte("342a1 payload"))
+	_ = f.Close()
+	size1, intact := c342WWitness(t, witness, body)
+	t.Logf("CENSUS W1-dirsym VERDICT: witness size %d->%d intact=%v => DAMAGED=%v", size0, size1, intact, !intact)
+}
+
+func TestCensus342a1WindowsReparseFlagOnAncestors(t *testing.T) {
+	dir, outside, _, _ := c342WFixture(t)
+	inner := filepath.Join(dir, "data")
+	if err := os.MkdirAll(inner, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	anc := filepath.Join(inner, "sub")
+	mkJunction(t, anc, outside)
+	full := filepath.Join(anc, "blob.bin")
+	_, plainFull := c342WAttrs(t, full, 0)
+	flagFull, withFlag := c342WAttrs(t, full, windows.FILE_FLAG_OPEN_REPARSE_POINT)
+	_, plainAnc := c342WAttrs(t, anc, 0)
+	flagAnc, withFlagAnc := c342WAttrs(t, anc, windows.FILE_FLAG_OPEN_REPARSE_POINT)
+	t.Logf("CENSUS W2 rows: full-plain{%s} full+REPARSE{%s flagSaysReparse=%v} anc-plain{%s} anc+REPARSE{%s flagSaysReparse=%v}",
+		plainFull, withFlag, flagFull, plainAnc, withFlagAnc, flagAnc)
+	if flagFull {
+		t.Errorf("CENSUS W2: on the FULL path behind a junction the REPARSE flag named a reparse object at the LEAF (want false: the leaf is the foreign plain file; the flag cannot speak for the ancestor)")
+	} else {
+		t.Logf("CENSUS W2 VERDICT (this leg, this machine): FILE_FLAG_OPEN_REPARSE_POINT carried on the full spelling resolved THROUGH the ancestor junction and named the TARGET file (reparse=false) => 322-a1's 'only the leaf' sentence REPRODUCED for ancestors; the flag answers for a name only when opened AT that name (junction itself: reparse=%v)", flagAnc)
+	}
+}
+
+func TestCensus342a1WindowsOsRootJunctionAncestor(t *testing.T) {
+	dir, outside, witness, body := c342WFixture(t)
+	root, err := os.OpenRoot(dir)
+	if err != nil {
+		t.Fatalf("OpenRoot: %v", err)
+	}
+	defer root.Close()
+	if err := root.Mkdir("data", 0o700); err != nil {
+		t.Fatal(err)
+	}
+	anc := filepath.Join(dir, "data", "sub")
+	mkJunction(t, anc, outside)
+	f, err := root.OpenFile(filepath.Join("data", "sub", "blob.bin"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		_, intact := c342WWitness(t, witness, body)
+		t.Logf("CENSUS W3-Root: os.Root.OpenFile REFUSED err=%v; witness intact=%v", err, intact)
+		return
+	}
+	_, _ = f.Write([]byte("342a1 payload"))
+	_ = f.Close()
+	size1, intact := c342WWitness(t, witness, body)
+	t.Logf("CENSUS W3-Root VERDICT: os.Root.OpenFile on a relative spelling whose ancestor (under the root) is a junction returned nil and the witness now size=%d intact=%v => Root FOLLOWED the ancestor junction=%v", size1, intact, !intact)
+}
+

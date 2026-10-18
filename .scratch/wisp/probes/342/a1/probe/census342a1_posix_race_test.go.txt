@@ -1,0 +1,283 @@
+//go:build unix
+
+// Ticket 342, leg 342-a1 READ-ONLY CENSUS PROBE. This file is NOT tracked by the
+// repository: it is placed only into exported trees under D:\tmp\wisp\20261018\342a1\
+// (physical bytes of a git archive, never the shared working tree) and the copy stored
+// next to it in .scratch/wisp/probes/342/a1/probe/ is the same bytes.
+//
+// What it measures, by act and not by prose:
+//
+//   - A1 deterministic: an ancestor ALREADY swapped for a link before the call, opened
+//     by name with the exact flag set privateFile composes (O_WRONLY|O_CREATE|O_TRUNC
+//     plus oNoFollowPlatform). Shows the leaf flag answers the last component only.
+//   - A2 production route with a racing ancestor: PrivateFile over a spelling whose
+//     ANCESTOR flips between a real directory and a link at a foreign directory. This
+//     is ticket 342's window, on the shipped route, with the ticket 322 leaf pin in
+//     force. Damage is counted from the foreign witness, per attempt.
+package winsec
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"testing"
+)
+
+const (
+	c342DefaultAttempts = 1500
+	c342Payload         = "raced private payload 342a1"
+	c342WitnessBody     = "foreign bytes are not yours to truncate 342a1"
+	c342OwnBody         = "the tree's own blob"
+)
+
+func c342Attempts() int {
+	if v := os.Getenv("C342_ATTEMPTS"); v != "" {
+		var n int
+		if _, err := fmt.Sscanf(v, "%d", &n); err == nil && n > 0 {
+			return n
+		}
+	}
+	return c342DefaultAttempts
+}
+
+// c342Witness reads the foreign object's own state.
+func c342Witness(t *testing.T, witness string) (string, int64) {
+	t.Helper()
+	body, rErr := os.ReadFile(witness)
+	info, sErr := os.Lstat(witness)
+	if rErr != nil || sErr != nil {
+		return "unreadable:" + rErr.Error() + "/" + sErr.Error(), -1
+	}
+	return string(body), info.Size()
+}
+
+func c342Clear(name string) error {
+	info, err := os.Lstat(name)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return os.Remove(name)
+	}
+	if info.IsDir() {
+		_ = os.Remove(filepath.Join(name, "blob.bin"))
+		return os.Remove(name)
+	}
+	return os.Remove(name)
+}
+
+// TestCensus342a1A1AncestorLinkFollowedByTheLeafFlaggedOpen is the deterministic shape.
+func TestCensus342a1A1AncestorLinkFollowedByTheLeafFlaggedOpen(t *testing.T) {
+	dir, outside := SealableTempDirForTest124(t), SealableTempDirForTest124(t)
+	// Same leaf name inside the foreign dir as the spelling names below the swapped
+	// ancestor: the open's resolution lands on THIS object (120's fixture rule).
+	witness := filepath.Join(outside, "blob.bin")
+	if err := os.WriteFile(witness, []byte(c342WitnessBody), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	inner := filepath.Join(dir, "data")
+	if err := os.MkdirAll(inner, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	anc := filepath.Join(inner, "sub")
+	if err := os.Symlink(outside, anc); err != nil {
+		t.Fatalf("stage ancestor link: %v", err)
+	}
+	name := filepath.Join(anc, "blob.bin")
+	before, sizeBefore := c342Witness(t, witness)
+	f, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	if err == nil {
+		if _, wErr := f.Write([]byte(c342Payload)); wErr != nil {
+			t.Fatalf("write through the followed ancestor: %v", wErr)
+		}
+		_ = f.Close()
+	}
+	after, sizeAfter := c342Witness(t, witness)
+	t.Logf("CENSUS A1: open err=%v; witness before(size=%d)=%q after(size=%d)=%q",
+		err, sizeBefore, before, sizeAfter, after)
+	if err == nil && after == c342Payload && sizeAfter == int64(len(c342Payload)) {
+		t.Logf("CENSUS A1 VERDICT: OPENED THROUGH the ancestor link while oNoFollowPlatform was carried, and the private payload now stands in the FOREIGN object = the ancestor leg is open by name on this platform (the flag speaks about the last component only)")
+	} else if err == nil {
+		t.Errorf("CENSUS A1 UNEXPECTED: the open succeeded but the witness reads %q (size %d), want the payload => instrument shape is wrong, not a verdict", after, sizeAfter)
+	} else {
+		t.Errorf("CENSUS A1 CONTRADICTS the self-report: err=%v and the witness reads %q (size %d); who refused? a refusal here would mean the shipped comment about the ancestor leg is wrong", err, after, sizeAfter)
+	}
+	// Contrast row: the LEAF position with the same flags answers ELOOP (322's pin).
+	leafLink := filepath.Join(dir, "leaf-position.lnk")
+	victim := filepath.Join(outside, "leaf-victim.bin")
+	if err := os.WriteFile(victim, []byte(c342WitnessBody), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(victim, leafLink); err != nil {
+		t.Fatal(err)
+	}
+	_, err2 := os.OpenFile(leafLink, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	vAfter, vSize := c342Witness(t, victim)
+	t.Logf("CENSUS A1 contrast row: leaf open err=%v (want ELOOP wording), leaf victim size=%d body-unchanged=%v",
+		err2, vSize, vAfter == c342WitnessBody)
+	if err2 == nil || !strings.Contains(err2.Error(), "too many levels") {
+		t.Errorf("CENSUS A1 CONTRADICTION: oNoFollowPlatform did not answer ELOOP at the leaf (%v) => the constant does not carry what the shipped comment says", err2)
+	}
+}
+
+// TestCensus342a1A2PrivateFileAncestorSwapRace is the production route.
+func TestCensus342a1A2PrivateFileAncestorSwapRace(t *testing.T) {
+	base := SealableTempDirForTest124(t)
+	target := filepath.Join(base, "foreign-dir")
+	if err := os.MkdirAll(target, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	witness := filepath.Join(target, "blob.bin")
+	if err := os.WriteFile(witness, []byte(c342WitnessBody), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	realStage := filepath.Join(base, "staged-real")
+	if err := os.MkdirAll(realStage, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	linkStage := filepath.Join(base, "staged-link")
+	if err := os.Symlink(target, linkStage); err != nil {
+		t.Fatal(err)
+	}
+	data := filepath.Join(base, "root", "data")
+	if err := os.MkdirAll(data, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	ancestor := filepath.Join(data, "sub")
+	name := filepath.Join(ancestor, "blob.bin")
+
+	toReal := func() error {
+		if err := c342Clear(ancestor); err != nil {
+			return err
+		}
+		// The stage carries its blob BEFORE the rename so the destination is never
+		// observed empty; then the stage is re-created (the rename consumed it).
+		if err := os.WriteFile(filepath.Join(realStage, "blob.bin"), []byte(c342OwnBody), 0o600); err != nil {
+			return err
+		}
+		if err := os.Rename(realStage, ancestor); err != nil {
+			return err
+		}
+		if err := os.Mkdir(realStage, 0o700); err != nil && !errors.Is(err, os.ErrExist) {
+			return err
+		}
+		return nil
+	}
+	restockLink := func() error {
+		if err := os.Symlink(target, linkStage); err != nil && !errors.Is(err, os.ErrExist) {
+			return err
+		}
+		return nil
+	}
+	toLink := func() error {
+		if err := c342Clear(ancestor); err != nil {
+			return err
+		}
+		if err := os.Rename(linkStage, ancestor); err != nil {
+			return err
+		}
+		return restockLink()
+	}
+	if err := toReal(); err != nil {
+		t.Fatalf("seed real state: %v", err)
+	}
+
+	var flips, flipErrs int32
+	var flipMu sync.Mutex
+	var firstFlip string
+	note := func(err error) {
+		if err == nil {
+			atomic.AddInt32(&flips, 1)
+			return
+		}
+		atomic.AddInt32(&flipErrs, 1)
+		flipMu.Lock()
+		if firstFlip == "" {
+			firstFlip = err.Error()
+		}
+		flipMu.Unlock()
+	}
+	stop, done := make(chan struct{}), make(chan struct{})
+	var stopOnce sync.Once
+	stopRacer := func() { stopOnce.Do(func() { close(stop) }); <-done }
+	go func() {
+		defer close(done)
+		defer func() {
+			if p := recover(); p != nil {
+				note(fmt.Errorf("racer panic: %v", p))
+			}
+		}()
+		wantLink := false
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+			}
+			if wantLink {
+				note(toLink())
+			} else {
+				note(toReal())
+			}
+			wantLink = !wantLink
+		}
+	}()
+	defer stopRacer()
+
+	attempts := c342Attempts()
+	counts := map[string]int{}
+	damage := 0
+	firstDamage := ""
+	for i := 0; i < attempts; i++ {
+		before, sizeBefore := c342Witness(t, witness)
+		err := PrivateFile(name, []byte(c342Payload), 0o600)
+		leg := "nil"
+		switch {
+		case err == nil:
+		case strings.Contains(err.Error(), "too many levels"):
+			if strings.Contains(err.Error(), "open ") && !strings.Contains(err.Error(), "openat ") {
+				leg = "ELOOP-at-open(leaf leg, 322's pin)"
+			} else {
+				leg = "ELOOP-elsewhere"
+			}
+		case strings.Contains(err.Error(), "reaches it through the link at"):
+			leg = "placement floor before the act"
+		case strings.Contains(err.Error(), "pinned object at"):
+			leg = "pinPlacement sameObjectPinned"
+		default:
+			leg = "other:" + err.Error()
+			if len(leg) > 90 {
+				leg = leg[:90]
+			}
+		}
+		counts[leg]++
+		after, sizeAfter := c342Witness(t, witness)
+		damaged := after != c342WitnessBody || sizeAfter != sizeBefore || strings.HasPrefix(after, "unreadable") || before != c342WitnessBody
+		if damaged {
+			damage++
+			if firstDamage == "" {
+				firstDamage = fmt.Sprintf("attempt %d before(size=%d)=%.20q after(size=%d)=%.20q leg=%s", i, sizeBefore, before, sizeAfter, after, leg)
+			}
+			if wErr := os.WriteFile(witness, []byte(c342WitnessBody), 0o666); wErr != nil {
+				stopRacer()
+				t.Fatalf("re-stage witness: %v", wErr)
+			}
+		}
+	}
+	stopRacer()
+	flipsN, errsN := atomic.LoadInt32(&flips), atomic.LoadInt32(&flipErrs)
+	t.Logf("CENSUS A2: attempts=%d flips=%d flipErrs=%d damage=%d firstDamage=%s", attempts, flipsN, errsN, damage, firstDamage)
+	for leg, n := range counts {
+		t.Logf("CENSUS A2 leg=%s : %d", leg, n)
+	}
+	if flipsN == 0 {
+		t.Errorf("CENSUS A2 DEAD INSTRUMENT: the racer landed 0 flips (firstErr=%q), so damage=%d proves nothing", firstFlip, damage)
+	}
+}

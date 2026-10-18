@@ -1,0 +1,88 @@
+//go:build windows
+
+// Ticket 342, leg 342-a1 probe DEBUG (exported tree only). Walks os.Root component by
+// component over the fixture spelling and prints each step's answer, then answers the
+// cost questions 必答 (iii) needs for a Windows per-component descent:
+//  D1: OpenRoot chain over a plain absolute spelling (where does YI-W's refusal come from?)
+//  D2: OpenRoot on a component that IS a junction (does the stdlib refuse at descent time?)
+//  D3: same with a junction whose target is a RELATIVE sibling inside the same root
+//      (POSIX's Root follows that one; does Windows?)
+package winsec
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+func TestCensus342a1WindowsRootDescentDebug(t *testing.T) {
+	base := SealableTempDirForTest124(t)
+	full := filepath.Join(base, "root", "data", "sub", "blob.bin")
+	if err := os.MkdirAll(filepath.Join(base, "root", "data"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(base, "root", "data", "blob.bin"), []byte("x"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("D0 fixture spelling=%s", full)
+	comps := pathComponents(full)
+	t.Logf("D0 pathComponents=%v volumeName=%q", comps, filepath.VolumeName(full))
+	root, err := os.OpenRoot(filepath.VolumeName(full) + string(os.PathSeparator))
+	if err != nil {
+		t.Logf("D1 OpenRoot(%q) err=%v", filepath.VolumeName(full)+"\\", err)
+		return
+	}
+	defer root.Close()
+	cur := root
+	for i, comp := range comps[1:] {
+		next, err := cur.OpenRoot(comp)
+		if err != nil {
+			t.Logf("D1 step %d OpenRoot(%q) under depth %d ERR=%v", i, comp, i, err)
+			break
+		}
+		t.Logf("D1 step %d OpenRoot(%q) OK", i, comp)
+		if cur != root {
+			_ = cur.Close()
+		}
+		cur = next
+		_ = os.WriteFile // keep import tidy
+	}
+	_ = cur.Close()
+	// D2: junction child, absolute target.
+	junc := filepath.Join(base, "root", "data", "junc")
+	mkJunction(t, junc, filepath.Join(base, "outside-abs"))
+	if err := os.MkdirAll(filepath.Join(base, "outside-abs"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	r2, err := os.OpenRoot(filepath.Join(base, "root"))
+	if err != nil {
+		t.Fatalf("OpenRoot(root): %v", err)
+	}
+	defer r2.Close()
+	d1, err := r2.OpenRoot("data")
+	if err != nil {
+		t.Fatalf("OpenRoot(data): %v", err)
+	}
+	defer d1.Close()
+	_, err = d1.OpenRoot("junc")
+	t.Logf("D2 OpenRoot on a JUNCTION child (absolute target): err=%v", err)
+	// D3: junction child whose target is a RELATIVE sibling INSIDE the same root.
+	sib := filepath.Join(base, "root", "data", "sibdir")
+	if err := os.MkdirAll(sib, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	relJunc := filepath.Join(base, "root", "data", "rejunc")
+	mkJunction(t, relJunc, sib)
+	_, err3 := d1.OpenRoot("rejunc")
+	t.Logf("D3 OpenRoot on a JUNCTION child (relative sibling-inside-root target): err=%v", err3)
+	// D4: leaf OpenFile on a pinned parent Root whose name is now the junction:
+	f, err4 := d1.OpenFile(filepath.Join("rejunc", "blob.bin"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err4 == nil {
+		_ = f.Close()
+	}
+	t.Logf("D4 pinned-parent OpenFile through relative junction: err=%v", err4)
+	// D5: the same via the FULL-path Root that privateFile could build: OpenRoot(volume)
+	// then OpenFile(abs-ish) — shows what "path escapes from parent" fired on earlier.
+	fmt.Fprint(os.Stderr, "")
+}

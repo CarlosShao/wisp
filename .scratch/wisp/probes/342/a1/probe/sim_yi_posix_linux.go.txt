@@ -1,0 +1,34 @@
+//go:build linux
+
+// SIMULATED LANDING for the cost table — exists ONLY in exported trees under
+// D:\tmp\wisp\20261018\342a1\mut-*. Never tracked; the repository's internal/** bytes
+// were never touched by this leg (342-a1 is read-only).
+//
+// 乙 on POSIX: reuse the package's OWN pinning walk (pinPlacement, the sealHandle /
+// applyDescriptorPOSIX family) to pin the PARENT directory, then open the leaf ON that
+// pinned descriptor (fd-relative, O_NOFOLLOW). No new exported names, no new syscalls
+// beyond what winsec_other.go already reaches for (syscall.Openat exists on linux only
+// — that reach limit is stated in the cost table).
+package winsec
+
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"syscall"
+)
+
+func openPrivatePinned(path string, flags int, perm fs.FileMode) (*os.File, error) {
+	parent := filepath.Dir(path)
+	pinned, err := pinPlacement(parent)
+	if err != nil {
+		return nil, err
+	}
+	defer pinned.Close()
+	lfd, err := syscall.Openat(int(pinned.Fd()), filepath.Base(path), flags|syscall.O_NOFOLLOW, uint32(perm.Perm()))
+	if err != nil {
+		return nil, &os.PathError{Op: "open", Path: path, Err: fmt.Errorf("on the pinned parent: %w", err)}
+	}
+	return os.NewFile(uintptr(lfd), path), nil
+}

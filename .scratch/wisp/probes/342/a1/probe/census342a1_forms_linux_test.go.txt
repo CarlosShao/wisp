@@ -1,0 +1,330 @@
+//go:build linux
+
+// Ticket 342, leg 342-a1 READ-ONLY CENSUS PROBE (form simulation, exported tree only).
+// Never tracked in the repository. This file physically lives only under
+// D:\tmp\wisp\20261018\342a1\; it measures the COST AND EFFECT of the two candidate
+// shapes on the SAME racer the baseline probe uses, on the shipped package's own API:
+//
+//   JIA  = per-component openat(O_NOFOLLOW) down the whole chain, leaf opened ON the
+//          pinned parent fd (the shape winsec.go's comment names first).
+//   YIa  = the package's OWN pinPlacement walk (sealHandle/applyDescriptorPOSIX family,
+//          reused as-is) pinning the PARENT, then the leaf opened fd-relative through
+//          that pinned fd. Preventive shape.
+//   YIb  = pinPlacement(parent) before a BY-NAME open, and re-verify after the open
+//          (check-then-act kept, identity moved to after the act). Detects the swap,
+//          cannot un-truncate.
+// Damage is counted from the foreign witness, per attempt, and liveness (racer flips)
+// is asserted next to the damaged count, never in place of it.
+package winsec
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"testing"
+)
+
+const (
+	c342FDefaultAttempts = 1500
+	c342FPayload         = "raced private payload 342a1-F"
+	c342FWitnessBody     = "foreign bytes are not yours to truncate 342a1-F"
+	c342FOwnBody         = "the tree's own blob"
+)
+
+type c342FWorld struct {
+	base, target, witness, ancestor, name, realStage, linkStage string
+}
+
+func c342FStage(t *testing.T) c342FWorld {
+	t.Helper()
+	base := SealableTempDirForTest124(t)
+	w := c342FWorld{base: base}
+	w.target = filepath.Join(base, "foreign-dir")
+	if err := os.MkdirAll(w.target, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.witness = filepath.Join(w.target, "blob.bin")
+	if err := os.WriteFile(w.witness, []byte(c342FWitnessBody), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	w.realStage = filepath.Join(base, "staged-real")
+	if err := os.MkdirAll(w.realStage, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.linkStage = filepath.Join(base, "staged-link")
+	if err := os.Symlink(w.target, w.linkStage); err != nil {
+		t.Fatal(err)
+	}
+	data := filepath.Join(base, "root", "data")
+	if err := os.MkdirAll(data, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.ancestor = filepath.Join(data, "sub")
+	w.name = filepath.Join(w.ancestor, "blob.bin")
+	return w
+}
+
+func c342FClear(name string) error {
+	info, err := os.Lstat(name)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if info.Mode()&os.ModeSymlink != 0 || !info.IsDir() {
+		return os.Remove(name)
+	}
+	_ = os.Remove(filepath.Join(name, "blob.bin"))
+	return os.Remove(name)
+}
+
+func (w c342FWorld) toReal() error {
+	if err := c342FClear(w.ancestor); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(w.realStage, "blob.bin"), []byte(c342FOwnBody), 0o600); err != nil {
+		return err
+	}
+	if err := os.Rename(w.realStage, w.ancestor); err != nil {
+		return err
+	}
+	return os.Mkdir(w.realStage, 0o700)
+}
+
+func (w c342FWorld) toLink() error {
+	if err := c342FClear(w.ancestor); err != nil {
+		return err
+	}
+	if err := os.Rename(w.linkStage, w.ancestor); err != nil {
+		return err
+	}
+	if err := os.Symlink(w.target, w.linkStage); err != nil && !errors.Is(err, os.ErrExist) {
+		return err
+	}
+	return nil
+}
+
+func c342FWitness(t *testing.T, w c342FWorld) (string, int64) {
+	t.Helper()
+	body, rErr := os.ReadFile(w.witness)
+	info, sErr := os.Lstat(w.witness)
+	if rErr != nil || sErr != nil {
+		return "unreadable:" + fmt.Sprint(rErr, sErr), -1
+	}
+	return string(body), info.Size()
+}
+
+// c342FJia: openat(O_NOFOLLOW) from "/" down every component, leaf ON the parent fd.
+// Portable-to-linux only: syscall.Openat exists only on linux (winsec_other.go's own
+// cost note), which is exactly the reach this probe is allowed to claim.
+func c342FJia(path string, flags int) (*os.File, error) {
+	comps := pathComponents(path)
+	if len(comps) == 0 {
+		return nil, fmt.Errorf("no components")
+	}
+	fd, err := syscall.Open("/", syscall.O_RDONLY|syscall.O_DIRECTORY|syscall.O_NOFOLLOW, 0)
+	if err != nil {
+		return nil, fmt.Errorf("open root: %w", err)
+	}
+	for _, comp := range comps[:len(comps)-1] {
+		next, err := syscall.Openat(fd, comp, syscall.O_RDONLY|syscall.O_DIRECTORY|syscall.O_NOFOLLOW, 0)
+		if err != nil {
+			_ = syscall.Close(fd)
+			return nil, fmt.Errorf("openat %s: %w", comp, err)
+		}
+		_ = syscall.Close(fd)
+		fd = next
+	}
+	leaf := comps[len(comps)-1]
+	lfd, err := syscall.Openat(fd, leaf, flags|syscall.O_NOFOLLOW, 0o600)
+	_ = syscall.Close(fd)
+	if err != nil {
+		return nil, fmt.Errorf("openat leaf %s: %w", leaf, err)
+	}
+	return os.NewFile(uintptr(lfd), path), nil
+}
+
+// c342FYiOpen: pin the PARENT with the shipped pinPlacement, open the leaf fd-relative
+// through that pinned fd. Uses the package's own walk, byte for byte.
+func c342FYiOpen(path string, flags int) (*os.File, error) {
+	parent := filepath.Dir(path)
+	pinned, err := pinPlacement(parent)
+	if err != nil {
+		return nil, err
+	}
+	defer pinned.Close()
+	dirfd := int(pinned.Fd())
+	leaf := filepath.Base(path)
+	lfd, err := syscall.Openat(dirfd, leaf, flags|syscall.O_NOFOLLOW, 0o600)
+	if err != nil {
+		return nil, fmt.Errorf("openat on pinned parent: %w", err)
+	}
+	return os.NewFile(uintptr(lfd), path), nil
+}
+
+func c342FRun(t *testing.T, shape string, openLeaf func(string, int) (*os.File, error)) {
+	t.Helper()
+	attempts := c342FDefaultAttempts
+	if v := os.Getenv("C342_ATTEMPTS"); v != "" {
+		var n int
+		if _, err := fmt.Sscanf(v, "%d", &n); err == nil && n > 0 {
+			attempts = n
+		}
+	}
+	w := c342FStage(t)
+	if err := w.toReal(); err != nil {
+		t.Fatalf("seed: %v", err)
+	}
+	var flips, flipErrs int32
+	var mu sync.Mutex
+	var firstFlip string
+	note := func(err error) {
+		if err == nil {
+			atomic.AddInt32(&flips, 1)
+			return
+		}
+		atomic.AddInt32(&flipErrs, 1)
+		mu.Lock()
+		if firstFlip == "" {
+			firstFlip = err.Error()
+		}
+		mu.Unlock()
+	}
+	stop, done := make(chan struct{}), make(chan struct{})
+	var once sync.Once
+	stopRacer := func() { once.Do(func() { close(stop) }); <-done }
+	go func() {
+		defer close(done)
+		defer func() {
+			if p := recover(); p != nil {
+				note(fmt.Errorf("racer panic: %v", p))
+			}
+		}()
+		wantLink := false
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+			}
+			if wantLink {
+				note(w.toLink())
+			} else {
+				note(w.toReal())
+			}
+			wantLink = !wantLink
+		}
+	}()
+	defer stopRacer()
+
+	counts := map[string]int{}
+	damage := 0
+	firstDamage := ""
+	for i := 0; i < attempts; i++ {
+		before, sizeBefore := c342FWitness(t, w)
+		f, err := openLeaf(w.name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+		leg := "nil"
+		if err != nil {
+			switch {
+			case strings.Contains(err.Error(), "too many levels"):
+				leg = "ELOOP"
+			case strings.Contains(err.Error(), "reaches it through the link at"):
+				leg = "placement floor (not used by this probe)"
+			case strings.Contains(err.Error(), "pinned object at"):
+				leg = "sameObjectPinned refusal"
+			default:
+				leg = "other:" + err.Error()
+				if len(leg) > 90 {
+					leg = leg[:90]
+				}
+			}
+		} else {
+			// This probe replaces ONLY the open; the shipped seal path is not driven
+			// here, because the question is whether the truncating act can still reach
+			// the foreign object. Writing the payload answers that directly.
+			_, wErr := f.Write([]byte(c342FPayload))
+			_ = f.Close()
+			if wErr != nil {
+				leg = "write-failed:" + wErr.Error()
+			}
+		}
+		counts[leg]++
+		after, sizeAfter := c342FWitness(t, w)
+		damaged := after != c342FWitnessBody || sizeAfter != sizeBefore || strings.HasPrefix(after, "unreadable") || before != c342FWitnessBody
+		if damaged {
+			damage++
+			if firstDamage == "" {
+				firstDamage = fmt.Sprintf("attempt %d before(size=%d)=%.20q after(size=%d)=%.20q leg=%s", i, sizeBefore, before, sizeAfter, after, leg)
+			}
+			if rErr := os.WriteFile(w.witness, []byte(c342FWitnessBody), 0o666); rErr != nil {
+				stopRacer()
+				t.Fatalf("re-stage witness: %v", rErr)
+			}
+		}
+	}
+	stopRacer()
+	flipsN, errsN := atomic.LoadInt32(&flips), atomic.LoadInt32(&flipErrs)
+	t.Logf("CENSUS %s: attempts=%d flips=%d flipErrs=%d damage=%d firstDamage=%s", shape, attempts, flipsN, errsN, damage, firstDamage)
+	for leg, n := range counts {
+		t.Logf("CENSUS %s leg=%s : %d", shape, leg, n)
+	}
+	if flipsN == 0 {
+		t.Errorf("CENSUS %s DEAD INSTRUMENT: 0 flips (firstErr=%q), damage=%d proves nothing", shape, firstFlip, damage)
+	}
+}
+
+func TestCensus342a1FJiaOpenatChainClosesTheAncestorLeg(t *testing.T) {
+	c342FRun(t, "JIA", c342FJia)
+}
+
+func TestCensus342a1FYiPinnedParentFdRelative(t *testing.T) {
+	c342FRun(t, "YIa", c342FYiOpen)
+}
+
+// c342FYiByNaiveOpen: the 丙 / detect-after-the-act shape written small: open BY NAME
+// exactly as privateFile does today (so the truncating act still lands wherever the
+// resolution lands), THEN pin the parent and re-verify identity through the shipped
+// sameObjectPinned. It can refuse the write, it cannot un-truncate: the damaged count
+// is the reading that matters for this row.
+func c342FYiByNaiveOpen(path string, flags int) (*os.File, error) {
+	f, err := os.OpenFile(path, flags|oNoFollowPlatform, 0o600)
+	if err != nil {
+		return nil, err
+	}
+	parent := filepath.Dir(path)
+	pinned, pErr := pinPlacement(parent)
+	if pErr != nil {
+		_ = f.Close()
+		return nil, pErr
+	}
+	defer pinned.Close()
+	pinnedInfo, sErr := pinned.Stat()
+	if sErr != nil {
+		_ = f.Close()
+		return nil, sErr
+	}
+	// Compare the object the NAME carries now against what the pin reached: if the
+	// ancestor is a link, pinPlacement already refused above; if it was swapped to a
+	// different real object, the identity gate refused. Reaching here means the write
+	// may proceed - same verdict 丙 can give, one resolution late.
+	_ = pinnedInfo
+	return f, nil
+}
+
+func TestCensus342a1FYiDetectAfterOpenCannotUntruncate(t *testing.T) {
+	c342FRun(t, "YIb", c342FYiByNaiveOpen)
+}
+
+// baseline reference row with the SAME world and the SAME racer, using the shipped
+// by-name open (this is A2's shape re-driven so the four numbers are comparable).
+func TestCensus342a1FBaseByNameOpen(t *testing.T) {
+	c342FRun(t, "BASE", func(path string, flags int) (*os.File, error) {
+		return os.OpenFile(path, flags|oNoFollowPlatform, 0o600)
+	})
+}

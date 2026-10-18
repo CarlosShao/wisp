@@ -1,0 +1,47 @@
+//go:build windows
+
+// SIMULATED LANDING for the cost table — exists ONLY in exported trees under
+// D:\tmp\wisp\20261018\342a1\mut-*. Never tracked; the repository's internal/** bytes
+// were never touched by this leg (342-a1 is read-only).
+//
+// 乙 on Windows: the package has NO handle-pinning family on this platform
+// (pinPlacement / sameObjectPinned / applyDescriptorPOSIX are //go:build !windows;
+// winsec_windows.go's sealHandle goes by name), so "reuse the seal's pinning" is not a
+// reuse here — it is a NEW walk. The only act-time walk this platform offers is
+// os.Root: open the volume root, descend every ancestor with Root.OpenRoot, and open
+// the leaf ON the pinned child. Measured in this leg's probes: Root refuses a junction
+// ancestor at act time ("path escapes from parent") and follows an in-root relative
+// FILE symlink at the leaf position, so this shape pins ancestors and not the leaf.
+package winsec
+
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+)
+
+func openPrivateAt(path string, flags int, perm fs.FileMode) (*os.File, error) {
+	comps := pathComponents(path)
+	if len(comps) < 2 {
+		return nil, &os.PathError{Op: "open", Path: path, Err: fmt.Errorf("the pinning walk expects a rooted spelling, got %q", path)}
+	}
+	root, err := os.OpenRoot(filepath.VolumeName(path) + string(os.PathSeparator))
+	if err != nil {
+		return nil, &os.PathError{Op: "open", Path: path, Err: fmt.Errorf("the walk could not open the volume root: %w", err)}
+	}
+	defer root.Close()
+	cur := root
+	for _, comp := range comps[:len(comps)-1] {
+		next, err := cur.OpenRoot(comp)
+		if err != nil {
+			return nil, &os.PathError{Op: "open", Path: path, Err: fmt.Errorf("the walk could not pin the ancestor %q: %w", comp, err)}
+		}
+		if cur != root {
+			_ = cur.Close()
+		}
+		cur = next
+	}
+	defer cur.Close()
+	return cur.OpenFile(filepath.Base(path), flags, perm)
+}

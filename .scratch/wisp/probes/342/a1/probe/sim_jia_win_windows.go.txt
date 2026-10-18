@@ -1,0 +1,53 @@
+//go:build windows
+
+// SIMULATED LANDING for the cost table — exists ONLY in exported trees under
+// D:\tmp\wisp\20261018\342a1\mut-*. Never tracked; the repository's internal/** bytes
+// were never touched by this leg (342-a1 is read-only).
+//
+// 甲 on Windows: probe every ancestor prefix with CreateFile carrying
+// FILE_FLAG_OPEN_REPARSE_POINT (the shipped guard's own call, widened per component),
+// refuse any prefix that reports a reparse point, then open by name. This is
+// check-then-act by construction — the platform offers no per-component
+// open-at-time for a write (see the census's W rows), and the residual between probe
+// and open is what the readings measure.
+package winsec
+
+import (
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"syscall"
+
+	"golang.org/x/sys/windows"
+)
+
+func openPrivateAt(path string, flags int, perm fs.FileMode) (*os.File, error) {
+	pieces := pathPieces(path)
+	if len(pieces) < 2 {
+		return nil, &os.PathError{Op: "open", Path: path, Err: fmt.Errorf("the descent expects a rooted spelling, got %q", path)}
+	}
+	for _, prefix := range pieces[:len(pieces)-1] {
+		h, err := windows.CreateFile(windows.StringToUTF16Ptr(prefix),
+			windows.FILE_READ_ATTRIBUTES,
+			windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE|windows.FILE_SHARE_DELETE,
+			nil, windows.OPEN_EXISTING,
+			windows.FILE_FLAG_OPEN_REPARSE_POINT|windows.FILE_FLAG_BACKUP_SEMANTICS, 0)
+		if err != nil {
+			if errors.Is(err, syscall.ERROR_FILE_NOT_FOUND) || errors.Is(err, syscall.ERROR_PATH_NOT_FOUND) {
+				continue // an ancestor that is not there yet is not a link (the floor's own rule)
+			}
+			return nil, &os.PathError{Op: "open", Path: path, Err: fmt.Errorf("the descent could not probe the ancestor %s: %w", prefix, err)}
+		}
+		var info windows.ByHandleFileInformation
+		gErr := windows.GetFileInformationByHandle(h, &info)
+		_ = windows.CloseHandle(h)
+		if gErr != nil {
+			return nil, &os.PathError{Op: "open", Path: path, Err: fmt.Errorf("the descent could not read the ancestor %s it opened: %w", prefix, gErr)}
+		}
+		if info.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0 {
+			return nil, preOpenRefusal(path, fmt.Sprintf("the ancestor %s carries a reparse point at open-at-time, so the open would truncate through that link (甲-W descent)", prefix))
+		}
+	}
+	return os.OpenFile(path, flags, perm)
+}
