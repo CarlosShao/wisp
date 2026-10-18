@@ -1,0 +1,24 @@
+票 341 落地腿 341-r1·AC#1 四格常驻用例＝P2／P3／P5／P6 逐格补牙（只加测试面，⛔ 动任何产码非注释字节）
+
+新增 internal/config/writeguard_unnailed_341_test.go：票 227 矩阵表如实报"仍未覆盖"的
+四格各一枚以上，每格自带去牙反形，成对正控在未突变树上必须绿。
+
+- P2 TestHandDeletedDefaultValuedLineIsRestoredInvisibly＝删一枚值本就是 schema 默认的行。
+  判据＝这一形在报告里"看不出差别"（走 Info 支、无 kept_in_file_not_in_memory），
+  所以它钉的是"那句仍要把丢了什么说清"＝writeguard.go:172-176 那句删行人话。
+  ⛔ 与 P1 合并（AC#2 明令：两形结果不同＝合并＝造谎）。
+- P3 TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory＝删整节（连 [ball] 表头）。
+  节级删除从标签默认整节复活（含操作者从没写过的 opacity_idle／click_through），
+  而报告只点名 ball.size 一枚叶子＝这一形今天零回归防护。
+- P5 TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed＝删 schema_version
+  且走【写】支（与 227 钉的 P5′ nothing-written 支是两条路径）。
+  钉＝SaveFile 把版本号强行钉回当前值、迁移备份 .bak-1 逐字保留被毁注释、
+  且报告⛔ 把 schema_version 认领成它写的或它保的键。
+- P6 TestHandDeletedProviderBaseUrlComesBackAsThePresetValue＝删 provider 的 base_url 行，
+  补回来既不是操作者写的也不是内存值，而是本构建自带的 preset 端点（loader.go:202-218）。
+  成对正控＝TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile（无 preset 可补，
+  文件落成显式 base_url = ""）：去牙那一发摘掉 preset 填充时，正控必须仍绿。
+
+写面＝internal/config 测试面一枚新件；writeguard.go／loader.go／migrate.go 非注释字节零改动
+（起手锚 98dbf20a 与现 HEAD 之间该面 blob 同一性已现验，见 logs/01-start-gauges.txt）。
+"迁移-on-读真写盘"＝乙形＝属票 345，⛔ 在本票顺手做。

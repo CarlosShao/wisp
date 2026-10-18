@@ -1,0 +1,23 @@
+票 341 落地腿 341-r1·report＋必答分件＋EOL/禁字两把尺＋21 枚台件脚本入库（并具名更正三处）
+
+本笔只动 `.scratch/wisp/probes/341/r1/**`；⛔ 任何 `.go` 字节、⛔ 票面任何框。
+
+- `report.md`＝起手两读数原样＋名册尺＋AC#0 逐格现量表＋AC#1 四格逐格表（用例名/载体 file:line/
+  未突变读数/去牙落点/去牙红句逐字）＋AC#4 四数成对与门禁 rc＋AC#2 差分证据＋AC#3 指认。
+- `report-answers.md`＝五条必答题逐条给盘上尺（⛔ 本腿盖章算）：(i) 四发红句与落点、(ii) P2⇄P1
+  写侧同函数异支用两发交叉的红名册交集＝0 来量、(iii) 缺世界＝零枚（并具名 P2 报告侧无可指认差别）、
+  (iv) 没有一枚在未修码上红＋"真有牙"的凭据只剩去牙那一发（⛔ 糊）、(v) numstat 逐笔产码 0/0＋
+  三枚产码 blob 同一性＝一字未动含注释。
+- `logs/16-eol-proof.txt`＝派单"新字节必须 LF"的现量：工作树 CR 0／committed blob CR 0／
+  `git archive` 重现的检出件 CR 0，三处 gofumpt rc=0（⚠ 本机 core.autocrlf=true 会打警告，blob 存 LF）。
+- `logs/17-banned-char-ruler.txt`＝写面禁字与禁形尺：U+00A7 枚数逐枚点名（含我把裁决件逐字摘录的三枚
+  日志：5＋4＋4＝13 处换成可还原 token 并在此具名，⛔ 动 `docs/evidence/**` 一字）；
+  `t.Skip`／TODO／新导出名／`panel.`／新 JSON 键＝各 0 命中；d22scan rc=0。
+- ★三处具名更正（本腿自己的尺缺陷，原件⛔ 删、只建不删）：
+  ① `fd82f786` 主题写"48 枚"、该笔实含 33 枚（余在本笔）；
+  ② `logs/11-gates-final.txt` 的越界读数 16 枚＝名册尺用了子串，吃了编排者的派单笔 ⇒
+     严格主题前缀重跑＝越界 **0**（`logs/12-roster-strict.txt`）＝正是派单"三键"警告的那形；
+  ③ `logs/00-start.txt`＋`logs/10-…`／`logs/11-…` 的 `-rulerdefect` 件＝同一处 `cut -c` 截多字节
+     病灶（把证据件自己写成非 UTF-8），改⛔ 截断后重跑。
+- 另记一枚：`logs/01` gauge 3 的 P4 命中 0 是我锚转义坏的**假读数**，已用断言形锚重量＝载体 1 枚
+  （`writeguard_handedit_227_test.go:92`），并给 P3/P6 的 0 配同形正控（`logs/09`／`logs/13`）。

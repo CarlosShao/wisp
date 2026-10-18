@@ -1,0 +1,23 @@
+票 341 落地腿 341-r1·起手三把尺＋台面/门禁/普查/突变台件与证据件入库（48 枚，逐枚非 0 字节）
+
+本笔只动 `.scratch/wisp/probes/341/r1/**`（我的证据面）；⛔ 任何 `.go` 字节，⛔ 票面任何框。
+
+读数要点（原始输出逐枚在件，⛔ 这里当凭据）：
+- `logs/00-start.txt`＝起手第一笔的两个原样读数（`git log -1`＝98dbf20a…、
+  `git status --porcelain -- internal/config cmd/wisp`＝零行）。它同时是一枚**尺缺陷件**：
+  `$'\r'` 嵌在双引号串里破坏 bash 解析（gauge 3 起就没执行）＋`cut -c` 把多字节中文截断
+  ⇒ 该件自身非合法 UTF-8。⛔ 删（临时件只建不删），改跑 `01-start-gauges.txt`。
+- `logs/01-start-gauges.txt`＝AC#0 自加尺逐格命中枚数＋载体 file:line；票面四行与它相容。
+  ★其中 **P4 那一节命中 0＝我这把尺的缺陷**（转义写坏），⛔ 当读数；已在
+  `logs/09-census-p4-p3-remeasure.txt` 用断言形锚重量＝载体 1 枚（`writeguard_handedit_227_test.go:92`，
+  用例起于 `:70`），并给 P3/P6 各配同形正控（P1/P5′ 同尺回 1）⇒ 它们的 0 才是读数。
+- `logs/03-trees.txt`＝台面：`git archive` 八件套＋`docs` 导出到 D:/tmp/wisp/20261018/341r1/{base,deliv}，
+  `.go` 枚数 765⇄766 证非空；三枚产码 pristine sha256 逐枚在件。
+- `logs/04-gates-start.txt`＋`11-gates-final.txt`＝共享工作树门禁四数，跑前 `unset GOTMPDIR TMPDIR`：
+  gofumpt 空输出 rc=0／d22scan rc=0 clean／长度门 rc=0 VERDICT GREEN／go vet rc=0。
+  ★`11-gates-final-run1-rulerdefect.txt`＝同一处 `cut -c` 病灶的第二犯，具名留盘。
+- `logs/05-color-*.txt`＝四数成对（base 190/109/0/0 ⇄ deliv 195/114/0/0，两把临时根一致＝⛔ 新增红）。
+  ★第一发 deliv 是 2 枚红，红在我自己的引号形状（本仓 canonical 序列化输出单引号字面串）＝
+  用例缺陷、已改；改前红句在 `06-red-analysis.txt`／`07-p6-raw.txt` 逐字留档。
+- `logs/05-mu-p2.txt`…`05-mu-p6.txt`＝四发去牙：落刀前锚命中数＝期望 1、落刀后＝0、新锚≥1、
+  存活锚不变；逐发当场还原并报还原哈希＝pristine（YES 逐发在件）。

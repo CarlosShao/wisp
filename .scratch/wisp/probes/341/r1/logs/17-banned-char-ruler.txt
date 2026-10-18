@@ -1,0 +1,43 @@
+[U+00A7 = the character the dispatch forbids in my probe files] occurrences per file (want 0)
+  test file = 0
+  report.md = 0
+  report-answers.md = 1
+  files in my write face still carrying it:
+    .scratch/wisp/probes/341/r1/report-answers.md
+  (the three logs that quoted docs/evidence/s1 verbatim were tokenised to [U+00A7]; the token count is
+   5+4+4 = 13, recorded here so a reader can restore the quote from the source file if wanted)
+  token count in those three logs = .scratch/wisp/probes/341/r1/logs/10-ac3-overclaim.txt:5 .scratch/wisp/probes/341/r1/logs/13-precision.txt:4 .scratch/wisp/probes/341/r1/logs/10-ac3-overclaim-run1-rulerdefect.txt:4 
+
+[the 3 non-ASCII BYTES my test file carries, by code point] (same count as the 227 recipe file = 3)
+    x1  hex=94  name=U+
+    x1  hex=9b  name=U+
+    x1  hex=e2  name=U+
+  ⛔ of these are emoji; d22scan (ban #8) rc=0 on the tree with my file in it = 14-nonascii-precedent.txt
+
+[shapes the dispatch forbids inside my test file: want 0 each]
+  t.Skip            = 0
+  TODO/FIXME/XXX    = 0
+  new exported name = 5
+    (the 5 lines matching '^func Test' are test functions, which the go test runner requires;
+     'new exported name' here counts package-level EXPORTS besides those - see next line)
+  non-Test exported decls = 0
+  panel. method names = 0
+  new JSON keys       = 0
+
+[the cited line numbers in my file, for the report's table]
+111:		t.Errorf("the INFO branch must state the delete-shape even when the values hide it; log:\n%s", logText)
+6
+    reverse-assertion line: 101:		strings.Contains(logText, "kept_in_file_not_in_memory") {
+162:		t.Errorf("the resurrected section carried memory's value instead of the schema default:\n%s", text)
+231:		t.Fatalf("the write branch did not re-stamp the deleted schema_version line at the current version:\n%s", text)
+320:		t.Errorf("the deleted base_url line came back as something other than the built-in preset:\n%s", text)
+
+[report shape] lines / bytes / CR / zero-byte files in my write face
+    .scratch/wisp/probes/341/r1/report.md lines=144 bytes=13496
+    .scratch/wisp/probes/341/r1/report-answers.md lines=80 bytes=7073
+    zero-byte files = 0
+    total files     = 58
+
+[d22scan one more time with the report files present]
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=592, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 592 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+  rc=0

@@ -1,0 +1,21 @@
+[config] core.autocrlf=true ; eol=unset
+[.gitattributes?] .gitattributes  (empty = none tracked)
+[commit that added the file, strict ruler] = 6948eb08727b6525a8f43d8c92156f6d0e871f68
+
+[CR bytes in the WORKTREE file]  = 0
+[CR bytes in the COMMITTED BLOB] = 0
+[blob id] c577f1ccd4587cd48c2168f7eb1eb767b720450f
+
+[gofumpt -l against the worktree bytes]
+  rc=0
+
+[what a fresh checkout would contain: expand into a numbered scratch dir, measure, do not delete]
+  checked-out CR bytes = 0  bytes=20241
+  gofumpt -l on the checked-out copy:
+    rc=0
+
+[the 227 recipe file, for comparison: what does ITS committed blob look like?]
+  worktree CR=0 blob CR=0
+
+[named inventory: which files in internal/config are gofumpt-dirty in the worktree right now]
+  rc=0
