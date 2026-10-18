@@ -1,0 +1,13 @@
+票 340 普查腿 340-a1·交付主体＝census.md（75 行／帽 160，只读普查，零 .go 字节）
+
+八节：AC#0 起手现量（票面四行逐枚重跑＋正控逐字）／AC#1 三形代价表（甲乙丙×五列，⛔ 选形⛔ 推荐）／既存先例的射程边界／必答 (i)–(iv) 逐字／AC#3-AC#4 前置料／AC#5 前置料／未定义即停两处（含编排者 12:3x 两答）／纪律自证。
+
+★AC#0 那处具名更正（票面第四行"链起来要新导出名"在盘上过窄）：交集硬尺响 1 枚＝internal/tools/loop_approval_test.go 今天已同时装配真 loop（agent.New :142）＋真桥（tools.New :103）＋真 Gate（approval.New :94），这一跳四道门逐枚是导出名（Gate.PendingApproval gate.go:502 → g.q.push :507／Gate.Queue :169／Queue.LiveApprovals pending_read.go:113＋读出口 :125／panel.TaskRosterSectionFrom :196）。尺＝支 L 27 枚 ∩ 支 P 12 枚＝1 枚（正控＝支 P 名册逐名 12 枚，⛔ 空交集读成尺没响）。编排者独立复跑坐实。★⛔ 由此写成"端到端已被覆盖"：该件今天 risk.L2 与 PendingApproval 命中各 0＝走 L1（bridge.go:451 PendingWindow）而 L1 不经 push（gate.go:252 ⇄ :502）＝撞名改写那一支没被它踩到；且该件在 internal/tools/**＝票面射程外，落哪一包归编排者裁。
+
+必答读数（逐字在件内）：(i) 正控＝同尺换射程 internal/panel 13 行、再扩 internal cmd tools scripts 19 行，原尺原射程三锚各 0；并具名作废一枚假正控（#[A-Z] 形打到 approval＝0 命中 rc=1＝该射程真无此形）；(ii) queue.go:168 corr = fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)，token＝%s#%d，同形第二枚 :616，queue.go blob 66fec7ae 三锚同一串；(iii) 甲真／乙真／丙假（甲乙各触 AC#2 硬门，批准今天没开；两形的半侧队列／铸造盘上已零新导出名，缺口都在跨包那一跳，具名行号在表内）；(iv) 换分隔符与 seq 前置＝覆盖得到（尺＝内容锚存在性断言）；覆盖不到那一维＝叠改的触发条件与消费端接线，具名 queue.go:167 byID 判定 ⇄ :301 delete ⇄ :168 拼入参而⛔ 局部 corr ⇄ roster:252 消费点。
+
+臂分账（本腿独立给，⛔ 抄腿）：摘第三臂会红 12 枚逐枚点名（表项＋直投形＋断言点）；摘第三臂不红＝child-1#9／#147 那一族（数字臂与第三臂两枚都认）＋全部期望 false 表项；★新增一味＝splitClashSuffix 的 base 恒为"最后一个 # 前整段"（:334 ⇄ :343）⇒ base 若在册则该键已以 base+"#" 开头 ⇒ 第三臂同时命中 ⇒ 摘数字臂单独不红任何一枚＝数字臂今天被第三臂包含。
+
+丙形"没牙"的字节凭据＝approval 测试档带 # 的 corr 字面串断言 0 命中（正控＝同尺族 internal/panel 测试档 20 行）＋39 枚符号化读 .Corr（queue_test:283/:290 只比"不等"）⇒ 改写串换成任何别的形状，全仓无一枚既存用例红＝票面"缺世界"复认。
+
+纪律：⛔ 翻框／⛔ 改票名与 Status／⛔ push／⛔ go test／go build（颜色一律"读码推的"＋具名尺）／⛔ 动台账·停车点·别的票·票 328 判据文字／⛔ 新建票件；件内零分节符、CR＝0；数 AC 框只用判据区射程 ^- \[ \] \*\*AC#＝7、已勾 0（⛔ 全档形，A1031）。
