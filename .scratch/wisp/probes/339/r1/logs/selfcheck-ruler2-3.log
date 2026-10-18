@@ -1,0 +1,34 @@
+### 尺② report 绝对路径＋wc -c＋行数＋空槽尺 0 命中带正控 ###
+abs=D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/339/r1/report.md
+report bytes=12232 lines=102 (帽=160)
+positive-control(空槽词，必=1)=1
+report+logs 空槽命中=0? YES
+logs 0 字节枚数=0 (must be 0)
+### 尺③ 决定性读数逐字 ###
+-- Linux 起手⇄交件（同容器配方）--
+linux-ac0-fullpkg.log: RUN=199 PASS_TOP=114 FAIL_TOP=3 SKIP=1 GO_TEST_RC=1
+linux-final-fullpkg.log: RUN=195 PASS_TOP=115 FAIL_TOP=1 SKIP=1 GO_TEST_RC=1
+-- Windows 起手⇄交件（原生 PowerShell）--
+win-ac0-fullpkg-psnative.log: RUN=247 PASS_TOP=140 FAIL_TOP=1 SKIP=1 
+win-final-fullpkg-psnative.log: RUN=247 PASS_TOP=140 FAIL_TOP=1 SKIP=1 
+-- 去牙反控（Windows，三发串行的四数）--
+win-ac2-positive-unmutated.log: RUN=22 PASS_TOP=3 FAIL_TOP=0 SKIP=0 
+win-ac2-deteeth-fallback.log: RUN=22 PASS_TOP=0 FAIL_TOP=3 SKIP=0 
+win-ac2-positive-after-restore.log: RUN=22 PASS_TOP=3 FAIL_TOP=0 SKIP=0 
+-- 去牙 Linux 半格＋绊线敏感度 --
+linux-ac2-deteeth.log: RUN=1 PASS_TOP=1 FAIL_TOP=0 SKIP=0 GO_TEST_RC=0
+RC=1
+-- 去牙两枚红句逐字（final 行号）--
+    anchor_miss_reason_334_test.go:152: fixture guard: the fail-closed shape must still be A here, got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_miss_reason_334_test.go:177: fixture guard: want A from the fail-closed clause, got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_miss_reason_334_test.go:214: class: got B, want A (the fail-closed tier is unchanged by AC#1)
+    anchor_miss_reason_334_test.go:218: Gate: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want class=A needL2=false allow=false (non-overridable)
+    anchor_miss_reason_334_test.go:222: an A deny from the fail-closed clause was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+-- 还原哈希三处 --
+blacklist.go 起手 blob＝还原＝c1799cd24afce19e6accef23db23a7d7ee746dec（尺＝git rev-parse e6fd0f50:internal/risk/blacklist.go ⇄ git hash-object 导出树，件内 P0/MUT_BEGIN/restored/final 四处 match=YES 见 stdout 记录）
+-- 门禁 rc --
+gofumpt_rc=0
+d22_rc=0
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+len_rc=0
+vet_rc=0

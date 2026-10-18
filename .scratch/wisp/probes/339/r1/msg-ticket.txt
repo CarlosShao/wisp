@@ -1,0 +1,3 @@
+票 339 落地腿 339-r1·票尾一条只追加 bullet（写锚 e6fd0f50、七格一枚没翻＝判据区尺现跑未勾 7）
+
+bullet 内容＝起手锚现认＋票面机制更正现量（:86 已设 HOME，真机制＝pathresolver_other.go:10 resolveHandle 恒空⇒uncertainAnchorMiss 结构不可达）＋甲形拆分落码 7437ef88＋AC#0/AC#4 两平台成对四数＋AC#2 去牙三发串行还原哈希 c1799cd2×3＋具名停手上报（两平台都点名红本票写面不可达＝logs/01-blocked-bing-not-reachable.log）＋自纠一枚 rm -f 违例。⛔ 翻框、⛔ 改 Status/票名/-done、⛔ push。

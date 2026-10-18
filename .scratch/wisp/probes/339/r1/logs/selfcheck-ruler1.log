@@ -1,0 +1,52 @@
+== 7c27945356 票 339 落地腿 339-r1·AC#0 起手现跑入库（两平� ==
+.scratch/wisp/probes/339/r1/logs/linux-ac0-fullpkg.log
+.scratch/wisp/probes/339/r1/logs/win-ac0-fullpkg-psnative.log
+.scratch/wisp/probes/339/r1/logs/win-ac0-fullpkg.log
+.scratch/wisp/probes/339/r1/scripts/jia-denom.sh
+.scratch/wisp/probes/339/r1/scripts/linux.sh
+.scratch/wisp/probes/339/r1/scripts/tree.sh
+.scratch/wisp/probes/339/r1/scripts/win.ps1
+.scratch/wisp/probes/339/r1/scripts/win.sh
+  -> out-of-face=0  bad-go=0
+== 7437ef882f 票 339 落地腿 339-r1·AC#1 甲形落码＝334 仪器加  ==
+internal/risk/anchor_miss_reason_334_test.go
+internal/risk/anchor_miss_reason_339_other_test.go
+  -> out-of-face=0  bad-go=0
+== 149b265aeb 票 339 落地腿 339-r1·证据入库（report 三形表＋ ==
+.scratch/wisp/probes/339/r1/logs/01-blocked-bing-not-reachable.log
+.scratch/wisp/probes/339/r1/logs/bing-staleness-pair.log
+.scratch/wisp/probes/339/r1/logs/jia-naive-buildbreak.log
+.scratch/wisp/probes/339/r1/logs/linux-ac2-deteeth.log
+.scratch/wisp/probes/339/r1/logs/linux-after-fullpkg.log
+.scratch/wisp/probes/339/r1/logs/linux-final-fullpkg.log
+.scratch/wisp/probes/339/r1/logs/linux-final-vet.log
+.scratch/wisp/probes/339/r1/logs/probe339-posix-root.log
+.scratch/wisp/probes/339/r1/logs/tripwire-sensitivity.log
+.scratch/wisp/probes/339/r1/logs/win-ac2-deteeth-fallback.log
+.scratch/wisp/probes/339/r1/logs/win-ac2-positive-after-restore.log
+.scratch/wisp/probes/339/r1/logs/win-ac2-positive-unmutated.log
+.scratch/wisp/probes/339/r1/logs/win-after-fullpkg-psnative.log
+.scratch/wisp/probes/339/r1/logs/win-final-fullpkg-psnative.log
+.scratch/wisp/probes/339/r1/msg-ac0.txt
+.scratch/wisp/probes/339/r1/msg-code.txt
+.scratch/wisp/probes/339/r1/msg-evidence.txt
+.scratch/wisp/probes/339/r1/report.md
+.scratch/wisp/probes/339/r1/scripts/ac2-deteeth-linux.sh
+.scratch/wisp/probes/339/r1/scripts/ac2-deteeth-win.ps1
+.scratch/wisp/probes/339/r1/scripts/ac2-deteeth-win.sh
+.scratch/wisp/probes/339/r1/scripts/apply.sh
+.scratch/wisp/probes/339/r1/scripts/bing-staleness.sh
+.scratch/wisp/probes/339/r1/scripts/buildcheck.ps1
+.scratch/wisp/probes/339/r1/scripts/linuxtree.sh
+.scratch/wisp/probes/339/r1/scripts/tripwire-sensitivity.sh
+.scratch/wisp/probes/339/r1/scripts/wintree.ps1
+  -> out-of-face=0  bad-go=0
+== 2bf64afa69 票 339 落地腿 339-r1·票尾一条只追加 bullet（写 ==
+.scratch/wisp/issues/339-ticket334-anchor-miss-instrument-runs-on-linux-but-its-fake-home-is-windows-only.md
+  -> out-of-face=0  bad-go=0
+== 5d1ae702ef 票 339 落地腿 339-r1·交件末态门禁四数原件尺� ==
+.scratch/wisp/probes/339/r1/logs/99-final-gates.log
+  -> out-of-face=0  bad-go=0
+ALL-5-COMMITS-FACES=PASS
+UNIQUE-PATHS-ACROSS-5-COMMITS=39
+POSITIVE-CONTROL other-leg out-of-face=1 (must be > 0)
