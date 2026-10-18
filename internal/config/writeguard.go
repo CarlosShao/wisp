@@ -149,7 +149,10 @@ func (m *Manager) mergeWrite(ownedKey string, setOn func(base *Config)) error {
 	if disk != nil {
 		written = diffKeyPaths(disk, base)
 		if len(written) == 0 {
-			slog.Info("config: config.toml already carries this key; nothing written",
+			slog.Info("config: config.toml already carries this key; this write added nothing (the "+
+				"file's bytes and mtime stayed put only because its schema_version was already current; "+
+				"a file behind on schema_version had already been re-laid in canonical form by the "+
+				"re-read, so comments and hand-chosen key order are not preserved)",
 				"key", ownedKey)
 			return nil
 		}
@@ -168,7 +171,8 @@ func (m *Manager) mergeWrite(ownedKey string, setOn func(base *Config)) error {
 	if len(diverged) == 0 {
 		slog.Info("config: wrote merged change into config.toml (ticket 226: only the keys listed "+
 			"changed value, every other key keeps the value the file already held; the file is re-laid "+
-			"in canonical form, so comments and hand-chosen key order are not preserved)",
+			"in canonical form, so comments and hand-chosen key order are not preserved; a key line the "+
+			"operator deleted by hand comes back at its schema default value)",
 			"key", ownedKey, "wrote", truncateKeys(written))
 		// AC#3: the bytes on disk are exactly the bytes this process holds, so
 		// adopting their stat claims only what this write produced.
@@ -181,7 +185,8 @@ func (m *Manager) mergeWrite(ownedKey string, setOn func(base *Config)) error {
 		"does not hold (ticket 226); the file was NOT claimed as our own write, so the next "+
 		"reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). "+
 		"Only the keys listed under wrote changed value; the file is re-laid in canonical form, "+
-		"so comments and hand-chosen key order are not preserved",
+		"so comments and hand-chosen key order are not preserved; a key line the operator deleted by "+
+		"hand comes back at its schema default value",
 		"key", ownedKey, "wrote", truncateKeys(written), "kept_in_file_not_in_memory", truncateKeys(diverged))
 	return nil
 }
