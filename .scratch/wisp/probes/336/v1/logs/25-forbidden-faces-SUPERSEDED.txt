@@ -1,0 +1,1 @@
+superseded-by: 27-forbidden-faces-corrected.log  (my first AC#5 pass used NON-EXISTENT paths internal/tools/rules_gateway.go + internal/risk/thresholds.go + internal/risk/tokens_fourway_test.go; those same=NO / distinct=19 lines are a broken ruler, not a finding)

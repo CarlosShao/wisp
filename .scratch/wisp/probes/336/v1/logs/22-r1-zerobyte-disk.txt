@@ -1,0 +1,6 @@
+0	.scratch/wisp/probes/336/r1/logs/ac4-09-final-anchor-dshape.log.redlist
+0	.scratch/wisp/probes/336/r1/logs/ac4-full-after-dshape-a.rednames
+0	.scratch/wisp/probes/336/r1/logs/ac4-full-after-dshape-b.rednames
+0	.scratch/wisp/probes/336/r1/logs/ac4-full-before-dshape-a.rednames
+0	.scratch/wisp/probes/336/r1/logs/ac4-full-before-dshape-b.rednames
+0	.scratch/wisp/probes/336/r1/logs/teeth-01-pristine-dshape.log.redlist

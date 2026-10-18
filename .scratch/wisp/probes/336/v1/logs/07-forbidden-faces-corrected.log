@@ -1,0 +1,27 @@
+### (a3) path ruler that produced the corrected names:
+    .scratch/wisp/probes/212/v1/fix/r2probe/tools/d22scan/allowlist.txt
+    .scratch/wisp/probes/248/v1b/l2_grant_boundary_test.go.pristine
+    internal/observe/thresholds.go
+    internal/panel/l2_grant_boundary_test.go
+    internal/panel/tokens_fourway_test.go
+    internal/perm/ticket90_persist_test.go
+    internal/risk/rules_gateway.go
+    tools/d22scan/allowlist.txt
+### (a4) corrected per-commit blob census across the leg's 18 commits + anchor equality
+internal/observe/thresholds.go             distinct_blobs_in_18=1 anchor_same=YES blob=e2677b11b5
+internal/risk/rules_gateway.go             distinct_blobs_in_18=1 anchor_same=YES blob=d1ccba84b1
+internal/panel/tokens_fourway_test.go      distinct_blobs_in_18=1 anchor_same=YES blob=b60acc6145
+internal/panel/l2_grant_boundary_test.go   distinct_blobs_in_18=1 anchor_same=YES blob=6668f19bc1
+internal/perm/ticket90_persist_test.go     distinct_blobs_in_18=1 anchor_same=YES blob=f923c19b69
+tools/d22scan/allowlist.txt                distinct_blobs_in_18=1 anchor_same=YES blob=6b61fad570
+internal/risk/blacklist.go                 distinct_blobs_in_18=1 anchor_same=YES blob=c1799cd24a
+go.mod                                     distinct_blobs_in_18=1 anchor_same=YES blob=fdfd14668a
+go.sum                                     distinct_blobs_in_18=1 anchor_same=YES blob=014556cef2
+.gitignore                                 distinct_blobs_in_18=1 anchor_same=YES blob=c6e6a85621
+.github/workflows/ci.yml                   distinct_blobs_in_18=1 anchor_same=YES blob=8b023ac931
+docs/PLAN.md                               distinct_blobs_in_18=1 anchor_same=YES blob=8255cf7877
+### (a5) positive controls for the rulers above:
+  control-1 (a file the leg DID add => distinct must be 1 and anchor_same NO):
+    internal/risk/anchor_fallback_teeth_336_windows_test.go distinct_blobs_in_18=4 anchor_same=NO (before=ed8ff551 after=a429cdae)
+  control-2 (blacklist.go blob list, all 18 lines): c1799cd24afce19e6accef23db23a7d7ee746dec 
+ac5c_rc=0

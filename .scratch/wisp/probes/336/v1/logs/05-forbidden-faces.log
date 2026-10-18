@@ -1,0 +1,43 @@
+### 1. internal/risk numstat, before(ed8ff551) -> teeth commit(8c36c23c)
+160	0	internal/risk/anchor_fallback_teeth_336_windows_test.go
+### 2. whole leg span (ed8ff551 -> e5021339) numstat for risk / tools / panel / cmd-wisp
+34	20	cmd/wisp/panel_transport_35r2_test.go
+92	0	internal/risk/anchor_fallback_teeth_336_other_test.go
+160	0	internal/risk/anchor_fallback_teeth_336_windows_test.go
+5	5	internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+### 3. frozen + gate-semantic files: blob equality across the span
+internal/risk/thresholds.go                    same=NO before=ed8ff551:i
+internal/tools/rules_gateway.go                same=NO before=ed8ff551:i
+internal/risk/tokens_fourway_test.go           same=NO before=ed8ff551:i
+internal/risk/l2_grant_boundary_test.go        same=NO before=ed8ff551:i
+internal/risk/ticket90_persist_test.go         same=NO before=ed8ff551:i
+go.mod                                         same=YES before=fdfd14668a
+go.sum                                         same=YES before=014556cef2
+.gitignore                                     same=YES before=c6e6a85621
+.github/workflows/ci.yml                       same=YES before=8b023ac931
+docs/PLAN.md                                   same=YES before=8255cf7877
+### 4. allowlist / golden / threshold files touched by the 18 commits (want 0)
+0
+  positive control (the same file greps non-zero for a token that IS there): 2
+### 5. new exported names in the two test files (want: Test* only)
+-- internal/risk/anchor_fallback_teeth_336_windows_test.go
+    func TestAnchorFallbackTeethPerAnchor336(t *testing.T) {
+-- internal/risk/anchor_fallback_teeth_336_other_test.go
+    func TestFallbackBranchHasNoWorldOnThisPlatform336(t *testing.T) {
+### 6. t.Skip in the two test files (want 0) + positive control that grep works here
+internal/risk/anchor_fallback_teeth_336_windows_test.go t_Skip=0 t_Log=1 build_tag=//go:build windows
+internal/risk/anchor_fallback_teeth_336_other_test.go t_Skip=0 t_Log=1 build_tag=//go:build !windows
+### 7. stale-comment reading: blacklist.go:193 names aEquiv — is there such a function? (production bytes, NOT the leg's)
+e5021339:internal/risk/blacklist.go:1
+  definition hits:  (want 0 => the comment names an absent helper)
+  positive control: func aEq definitions = e5021339:internal/risk/blacklist.go:1
+### 8. the two A-tier cases that do NOT go through aEq/aUnder: who pins them (AC#1 completeness)
+-- browser credential store:
+    internal/risk/blacklist.go:234:		return ClassA, "browser credential store"
+    internal/risk/pathshape_portable_test.go:140:		{"browser credential store", filepath.Join(home, "AppData", "Login Data")},
+-- .git/config A rule:
+    internal/risk/name_claim_two_arm_216_test.go:96:			"A tier .git/config", filepath.Join(dir, "repo", ".git", "config"),
+    internal/risk/pathshape_portable_test.go:136:		{".git/config", filepath.Join(home, "repo", ".git", "config")},
+### 9. A-tier case count vs operand count (my own ruler, scope = the switch at blacklist.go)
+0
+ac5_rc=0

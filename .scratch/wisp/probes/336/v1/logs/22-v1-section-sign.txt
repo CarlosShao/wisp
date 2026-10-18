@@ -1,0 +1,1 @@
+.scratch/wisp/probes/336/v1/logs/02-blacklist-at-start-anchor.txt

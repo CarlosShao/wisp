@@ -1,0 +1,1 @@
+ZEROWAYTE_TRACKED_COUNT=0 (ruler: git ls-tree -r -l e5021339 -- .scratch/wisp/probes/336/r1 | awk $5==0 ; positive control: same ruler without the size filter lists 77 entries, see 22-r1-zerobyte-disk.txt for the 6 zero-byte files that exist on disk but are NOT tracked)

@@ -1,0 +1,6 @@
+blocked-1 (raised 2026-10-18 13:3x +08 by 336-v1) — 未定义即停的形状＝写面禁区清单里的包路径与树不符
+问题：派单 specific AC#5 那一格（dispatch:67）与票 336 AC#5（issues/336…:25）列禁区时写作 thresholds.go / rules_gateway.go / tokens_fourway_test.go 等，读者会按 internal/risk/ 去取；盘上真身（尺＝git ls-tree -r --name-only e5021339 | grep -iE …，逐字在 logs/07-forbidden-faces-corrected.log 第 (a3) 节）＝
+  internal/observe/thresholds.go ; internal/risk/rules_gateway.go ; internal/panel/tokens_fourway_test.go ; internal/panel/l2_grant_boundary_test.go ; internal/perm/ticket90_persist_test.go
+我自己因此先产出一枚坏尺（同一批 missing-vs-missing 比较，same=NO / distinct=19）＝已具名作废（logs/25-forbidden-faces-SUPERSEDED.txt），改正版在 logs/07-forbidden-faces-corrected.log。
+我做了什么（不停腿）：按真名量同一件事，逐枚带正控；票面一字未动；⛔ 改任何人的清单文字。
+交给编排者的具体一句：下一版派单／票面里那三枚冻结件与 thresholds.go / rules_gateway.go 要不要冠上真包路径（＝票面文字改动，归你，⛔ 我动）。

@@ -1,0 +1,28 @@
+### A. leg artefacts: tracked at e5021339 vs on disk now (HEAD drifts; tracked is authoritative)
+tracked_at_e5021339=77
+on_disk_now=83
+### B. zero-byte files ON DISK in the leg write face (the 6 the leg self-reported)
+zerobyte_disk_count=6
+0	.scratch/wisp/probes/336/r1/logs/ac4-09-final-anchor-dshape.log.redlist
+0	.scratch/wisp/probes/336/r1/logs/ac4-full-after-dshape-a.rednames
+0	.scratch/wisp/probes/336/r1/logs/ac4-full-after-dshape-b.rednames
+0	.scratch/wisp/probes/336/r1/logs/ac4-full-before-dshape-a.rednames
+0	.scratch/wisp/probes/336/r1/logs/ac4-full-before-dshape-b.rednames
+0	.scratch/wisp/probes/336/r1/logs/teeth-01-pristine-dshape.log.redlist
+### C. any of those TRACKED (that would be the real 0-byte=没交 violation)? want 0
+zerobyte_tracked_count=0
+  positive control for the same awk ruler (size column present for all): total=77
+### D. section-sign census in the leg's report + logs (needle built from bytes)
+sec_in_r1_report=0
+sec_files_in_r1_logs=0
+  positive control: sec_files_found_when_grepping_a_token_that_exists=26
+### E. section-sign in MY write face (want 0 files)
+my_sec_files=1
+### F. longest path in my write face (char count)
+65
+### G. AC-box flip census on ticket 336 (judgment area only, lines 20-26) — want unchecked 7 / checked 0
+unchecked=7
+checked=0
+### H. ticket name / Status line untouched by me: diff vs e5021339 for lines 1-2
+  lines1-2=IDENTICAL
+ac6_rc=0

@@ -1,0 +1,28 @@
+### (a) per-commit blob equality for the frozen / gate-semantic files ACROSS THE LEG'S OWN 18 COMMITS
+fatal: path 'internal/risk/thresholds.go' does not exist in 'e5021339'
+fatal: path 'internal/risk/thresholds.go' does not exist in 'ed8ff551'
+internal/risk/thresholds.go                    distinct_blobs_in_18_commits=19 want=1 same_as_anchor=NO (another leg moved it in the range, not this one — see (a2))
+fatal: path 'internal/tools/rules_gateway.go' does not exist in 'e5021339'
+fatal: path 'internal/tools/rules_gateway.go' does not exist in 'ed8ff551'
+internal/tools/rules_gateway.go                distinct_blobs_in_18_commits=19 want=1 same_as_anchor=NO (another leg moved it in the range, not this one — see (a2))
+fatal: path 'internal/risk/tokens_fourway_test.go' does not exist in 'e5021339'
+fatal: path 'internal/risk/tokens_fourway_test.go' does not exist in 'ed8ff551'
+internal/risk/tokens_fourway_test.go           distinct_blobs_in_18_commits=19 want=1 same_as_anchor=NO (another leg moved it in the range, not this one — see (a2))
+fatal: path 'internal/risk/l2_grant_boundary_test.go' does not exist in 'e5021339'
+fatal: path 'internal/risk/l2_grant_boundary_test.go' does not exist in 'ed8ff551'
+internal/risk/l2_grant_boundary_test.go        distinct_blobs_in_18_commits=19 want=1 same_as_anchor=NO (another leg moved it in the range, not this one — see (a2))
+fatal: path 'internal/risk/ticket90_persist_test.go' does not exist in 'e5021339'
+fatal: path 'internal/risk/ticket90_persist_test.go' does not exist in 'ed8ff551'
+internal/risk/ticket90_persist_test.go         distinct_blobs_in_18_commits=19 want=1 same_as_anchor=NO (another leg moved it in the range, not this one — see (a2))
+internal/risk/blacklist.go                     distinct_blobs_in_18_commits=1 want=1 same_as_anchor=YES
+### (a2) who actually moved those files in ed8ff551..e5021339 (subject prefixes, so attribution is by leg, not by me guessing)
+-- internal/risk/thresholds.go
+-- internal/tools/rules_gateway.go
+-- internal/risk/tokens_fourway_test.go
+### (b) aEquiv: the only hit in the package is a COMMENT naming a helper that has no definition. Provenance:
+  f1033e1e 2026-09-21 fix(72): A 表锚点必须和候选路径走同一条句柄管线——拼写不得改变安全分类
+### (c) A-tier case count in classifyForms (literal tab ruler):
+9
+  and of those, how many carry an aEq/aUnder operand (the branch-capable ones):
+8
+ac5b_rc=0
