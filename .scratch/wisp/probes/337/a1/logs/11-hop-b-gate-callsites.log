@@ -9,3 +9,8 @@ c11163c8:internal/tools/mode.go:98:		d := risk.Gate(c, overrides)
 c11163c8:internal/tools/paths.go:116:	res, err := risk.Resolve(raw, p.exceptions)
 正控非测试命中行数＝1
 ⇒ 尺子没坏（正控命中≥1），本跳读数＝生产调用点恰 1 枚＝internal/tools/mode.go:98
+
+### ★本腿自报读数更正（hop b 正控枚数）：上面尺三那行写「确有 ≥2 枚调用点」＝我的预期错，实尺读数＝非测试 1 枚（internal/tools/paths.go:116）、全仓含测试 7 枚。正控只需 ≥1 即成立（尺在同形状下认得到调用点），本跳结论不受影响，但预期句作废。
+重跑尺＝git grep -n "risk\.Resolve(" $R -- "*.go" | grep -v .scratch（7 行）／再 grep -v _test.go（1 行）：
+7
+c11163c8:internal/tools/paths.go:116:	res, err := risk.Resolve(raw, p.exceptions)

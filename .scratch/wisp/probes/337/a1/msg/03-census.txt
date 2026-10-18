@@ -1,0 +1,8 @@
+票 337 普查腿 337-a1·census 正文件＋AC#1/AC#3/AC#4 现量入库
+
+census.md＝74 行（帽 ≤160 内）／字节尺见 logs；占位符尺 0 命中，正控＝同尺在
+docs/evidence/s1/334-v1-verdict.md 命中 1 枚（尺＝grep -cE 'TODO|FIXME|placeholder|占位'）。
+logs/16＝hop a 分母（9 枚 A case 中 7 枚走 aRuleReason、2 枚裸串；★成因＝blacklist.go:214 注释自陈过期，
+本腿零 .go、只上报给本波 internal/risk 写腿 336-r1）；logs/20-23＝三形现量＋必答④的最远字节；
+logs/90＝适用门禁 rc（d22scan rc=0、长度门 rc=0；gofumpt/go vet 对零 .go 普查腿具名不适用）＋逐枚 CR 尺。
+本腿零写码／零 go test／零 go build／零 push／零翻框。零导出树（机主新铁律：盘符根目录零污染）。

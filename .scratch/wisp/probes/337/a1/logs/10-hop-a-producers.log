@@ -20,3 +20,5 @@ c11163c8:internal/risk/blacklist.go:80:	class, rule := classifyForms(cand)
 c11163c8:internal/risk/blacklist.go:184:	return classifyForms(formsOf(canonical))
 c11163c8:internal/risk/blacklist.go:187:// classifyForms does the actual matching, on the comparison forms of one path
 c11163c8:internal/risk/blacklist.go:195:func classifyForms(cand pathForms) (Class, string) {
+
+### ★本腿自报第二处句错（不改原句、只追加）：上面第 15 行标签写「同 switch 里另三支」＝错，下面列出的实尺命中是 2 行（blacklist.go:223／:234）。以 logs/16-hop-a-denominator.log 的分母为准：9 枚 A 档 case＝7 走 aRuleReason＋2 走裸字面串。
