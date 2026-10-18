@@ -1,0 +1,41 @@
+227-v1 AC#3 独立名册尺（本腿自己现量，⛔ 抄表）
+
+射程＝bcf90e06 的 internal/config/** ＋ cmd/wisp/** 里全部 *_test.go（参与名册 121 枚件）
+问法＝逐格问"有没有任何 *_test.go 断这一形的结果"（命中枚数＋载体 file:line）；尺＝git grep -nE ＋ 单行形态锚
+分母＝226-v1 的 b2 P1–P6（⛔ 重造）；b2 台件在盘（.scratch/wisp/probes/226/v1/b2-probe-deleted-shapes.txt，52 行，
+      ★该件**未入任何提交**＝git ls-tree 全仓 0 命中，只有盘上副本 ⇒ 本腿引用的行区间按盘上件现量）
+
+[逐格读数（量的）]
+P0 改值（size 56→60）
+   命中＝多处；常驻载体逐名现验（writeguard_226_test.go 的 ^func Test 起始行，本腿 sed -n 逐枚读）：
+     :63 TestAC1AllowedDirsWriteKeepsAHandEditedKey / :102 TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit
+     / :117 TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept / :187 TestAC3AdoptionClaimsOnlyWhatThisWriteProduced
+     / :269 TestAC4PermissionModeWriteKeepsAHandEditedKey
+   ⇒ 有用例（＝与腿表逐字同，含 P0 那行的五枚载体行号）
+P1 删非默认值标量行  锚 'size = 60  # my size\n", ""' ⇒ 命中 **1**＝writeguard_handedit_227_test.go:31
+   ⇒ 有用例（载体 :23）＝与腿表同
+P2 删"值本就是默认"的标量行  锚 'size = 56\n", ""' ⇒ 命中 **1**＝writeguard_handedit_227_test.go:184
+   ★本腿与腿表的**唯一分歧**：这一枚是 TestDeletedLineRestorationIsNotClaimedAsAWrittenKey（:181），
+     它只断 wrote=[fs.allowed_dirs] 与 ⛔ wrote=[ball.size 两枚**认领**形状；
+     ⛔ 断"补回来的值＝默认 ⇔ 内存那枚"的分野（P1 用例 :42/:49 才断那一条），也⛔ 断注释／⛔ 断 kept_in_…
+     ⇒ 对 P2 这一格而言：形状在场、**P2 独有的那一判**（补回值与内存值同为 56 ⇒ 看不出差别）没被断
+     ⇒ 本腿判 P2＝"形状被一枚认领用例路过，结果三断未钉"⇒ 三态记〔只有台件〕⛔ 违规；腿表写〔只有台件（本腿未补）〕
+       与盘上事实**相容**（那枚用例的目的⛔ 覆盖 P2 的判点）；本腿把这一枚**具名加进 P2 行的载体**，⛔ 改腿的三态。
+P3 删整节（[ball] 连表头）  ⇒ 命中 **0**（全名册无任何用例删过整节）＝与腿表"什么都没有"同
+P4 删 map 条目（[llm.providers.deepseek]）  锚 'Providers["deepseek"]' ⇒ 18 处命中，但其中**断"删了不补回"**的只一枚
+   ＝writeguard_handedit_227_test.go:92（:70 那枚用例）；其余 17 处是 loader/settings 的读侧断言，与删形无关
+   ⇒ 有用例（载体 :70）＝与腿表同；★反向断言形状本腿另用 MU-2 去牙复现（那枚用例在该发点名红）
+P5 删 schema_version 且走【写】支  ⇒ 命中 **0**（名册里没有任何用例让 schema 落后⇄与内存分叉⇒走写支）
+   ⇒ 只有台件（b2 :38-44）＝与腿表同
+P5′ 删 schema_version 且走 nothing-written 支  锚 'schema_version = 2\n", ""' ⇒ 命中 **1**＝同件 :110
+   ⇒ 有用例（载体 :106）＝与腿表同
+P6 删 provider 的 base_url 行  锚 'base_url[^"]*\n", ""' ⇒ 命中 **0**
+   ⇒ 什么都没有（b2 :46-52）＝与腿表同
+
+[对 b2 台件四段区间的现验]  P2＝:12-18 ✓（那段逐字是 "delete a line whose value WAS the default"）
+  P3＝:20-27 ✓ / P5＝:38-44 ✓ / P6＝:46-52 ✓（四段标题行逐枚 sed -n 读出，与腿表引用的载体行区间对得上）
+
+[结论] 腿的八行表逐格三态与盘上事实**相容**，8/8 格本腿独立复现；唯一要加的一句＝P2 行现在多一枚
+  "路过形"载体（:181/:184），⛔ 由此把 P2 升成〔有用例〕（那＝把没做的说成做了）。
+  ★未覆盖四格 P2/P3/P5/P6 的归属＝票 341（.scratch/wisp/issues/341-…md 现量在盘：Status 逐字"已立，未派"、
+  其 AC#1 逐字点名 P2/P3/P5/P6 四格、AC#2⛔ 把没覆盖改成覆盖）⇒ ⛔ 记票 227 欠账，成立。
