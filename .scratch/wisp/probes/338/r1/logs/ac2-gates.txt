@@ -1,0 +1,58 @@
+GOTMPDIR=[unset] TMPDIR=[unset]  (unset 后)
+HEAD=87521cb4
+===== [1] sh scripts/d22scan.sh =====
+rc_d22scan=0
+=== RUN   TestSelfTestRosterAuditRejectsAHollowTable
+--- PASS: TestSelfTestRosterAuditRejectsAHollowTable (0.00s)
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers
+--- PASS: TestSelfTestRefusesToAuditAnEmptyRoster (0.01s)
+    --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster (0.00s)
+    --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers (0.00s)
+=== RUN   TestSelfTestFlagIsWiredInTheBuiltBinary
+--- PASS: TestSelfTestFlagIsWiredInTheBuiltBinary (10.28s)
+PASS
+ok  	github.com/CarlosShao/wisp/tools/d22scan	36.689s
+runtests.sh: OK - packages=[./...] top-level: PASS=35 FAIL=0 SKIP=0, === RUN=77, '[no tests to run]'=0
+d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 283 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 241 production Go files
+d22scan: scope bans #1-5 cmd/           examined  42 production Go files
+d22scan: scope ban #6 frontend/         examined 116 text files
+d22scan: scope ban #7 internal/tools/   examined  25 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 116 text files
+d22scan: scope ban #8 internal/         examined 590 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=590, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 590 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+===== [2] sh scripts/check-path-length-budget.sh =====
+rc_len=0
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=bytes (probe: length of the 5-byte sample "a U+25FF b" = 5; LANG=unset LC_ALL=unset)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 15516 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=15516  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+===== [3] gofumpt -l internal cmd（交件侧复量，逐名） =====
+cmd/wisp/models.go
+cmd/wisp/panel_transport_35r2_test.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+rc_gofumpt_list=0
+===== [4] go vet ./internal/tools/ =====
+rc_vet_tools=0
+===== [5] go vet ./cmd/wisp/ =====
+rc_vet_wisp=0
+===== [6] CRLF 四枚 + panel 枚：门跑完后再验一字未动 =====
+internal/agent/approval/pending_read.go | wt_sha=ff26e84cbaf1663e2d5440a62b187e4f1e485cee1a4000f199f0fea7dd9d946f
+internal/agent/tools.go | wt_sha=14b2c067a21f713a54bad84857883a1520c7dccc3e3d0d9cde163e926405b0d9
+internal/risk/provenance.go | wt_sha=958364fa9775ab7a84256c4d56cec143b1d078f0c25a1ddfec858574552f6c53
+cmd/wisp/models.go | wt_sha=ad839c103367554e081b72be859112ae0396e9451810279942e52cce8ad42f99
+cmd/wisp/panel_transport_35r2_test.go | wt_sha=df5f4a9fe179fd5b6a98616db149a128c2a5d8fcb424c237de275916c5221eec
