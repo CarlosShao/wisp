@@ -1,0 +1,30 @@
+GOFUMPT / GO_VET EMPTY-CAPTURE MEANING (read this before treating the file as "not delivered")
+
+What this file is: the captured stdout+stderr of the gofumpt listing ruler run over the two
+ticket-336 test files (internal/risk/anchor_fallback_teeth_336_windows_test.go and
+anchor_fallback_teeth_336_other_test.go) in the SHARED WORKING TREE, after all of the
+336-v1 deliverables were tracked.
+
+Reading: the capture is empty BECAUSE THE RULER PRINTS ONE PATH PER DIRTY FILE AND FOUND
+ZERO dirty files. rc=0 is recorded in 99-final-gates.log (gate line "gofumpt rc=0 listed=0").
+An empty capture here is a NEGATIVE READING, not an unfinished file; per the write-face rule
+("0 bytes = not delivered") the file is shipped annotated instead of left empty.
+
+Ruler: /d/work/base/gopath/bin/gofumpt.exe -l <the two files>   (prints paths only)
+POSITIVE CONTROL: 28-gofumpt-pkg.txt = the same ruler at package scope lists 1 path
+(internal\risk\provenance.go = the known CRLF existing dirt, NOT mine; I never touched it).
+
+Named self-caught blemish of my own (kept, not deleted, per "temp artefacts are only created,
+never deleted"): the FIRST version of THIS annotation was produced by a printf whose format
+string was wrapped in double quotes and contained a literal backtick pair around the ruler
+name. Bash ran that backtick pair as a command substitution, so the shipped sentence lost the
+ruler name (stderr: "gofumpt.exe: command not found" -> "the stdout+stderr of  on the two
+ticket-336 test files") and also ate one backslash in the path inside the double-quoted
+string ("internal\risk\provenance.go" -> "internalriskprovenance.go"). That is the same
+failure family the dispatch names twice today (perl expression through double quotes =
+ac4-10 / ac4-11 in 336-r1; my docker GOCACHE value rewritten by MSYS). Correction shape =
+this file, rewritten with the Write tool (no shell interpolation). The mangled bytes of the
+first version are preserved below the marker instead of deleted.
+
+--- first version, mangled, kept verbatim as the failure record ---
+GO_VET_AND_GOFumpt_EMPTY_CAPTURE_MEANING: this file is the stdout+stderr of  on the two ticket-336 test files; an empty capture = ZERO files listed = clean (rc=0, recorded in 99-final-gates.log). Ruler = gofumpt -l (prints one path per dirty file); POSITIVE CONTROL = 28-gofumpt-pkg.txt, same ruler at package scope, lists 1 path (internalriskprovenance.go = the known CRLF existing dirt). Shipped non-empty per the 0-byte rule.

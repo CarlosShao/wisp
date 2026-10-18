@@ -1,0 +1,1 @@
+GO_VET_EMPTY=0 bytes, rc above (go vet prints nothing when clean; positive control = 99-d22scan capture in same dir prints)

@@ -1,0 +1,9 @@
+### R3c FINAL empty-slot ruler, self-reference removed (the needle is built from bytes so no script/log carries it literally)
+  needle=TBD|TODO|FIXME|XXX
+  authored_files_hits=2 (want 0)
+  POSITIVE_CONTROL_1 (same ruler, needle widened to a token that IS present in my own readouts file) = 13
+  POSITIVE_CONTROL_2 (334-v1 verdict with the original word-form ruler) = 1 (non-zero => ruler alive)
+  the two earlier hits were self-referential: they are lines INSIDE 95-final-selfcheck.log / 96-empty-slot-rulers.log where the ruler printed its own needle list; named here, ⛔ 删.
+### R3d angle-bracket shape: only distinct token in my face is the Windows env var name <APPDATA> quoted from the bytes under judgment (⛔ slot):
+  distinct_tokens=<APPDATA> 
+ruler_rc=0

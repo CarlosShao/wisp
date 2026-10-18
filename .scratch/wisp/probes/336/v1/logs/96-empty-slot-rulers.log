@@ -1,0 +1,14 @@
+### R3a empty-slot WORD-FORM ruler (needle = placeholder words only; the broad <[A-Z_]+> shape is reported separately because it collides with real Windows env-var spellings)
+  authored_files_hits=2 (want 0; run-selfcheck.sh excluded = the needle lives in that script itself, named below)
+  POSITIVE CONTROL same ruler on 334-v1 verdict = 1 (non-zero => ruler alive); on 336-r1 report = 0
+  self-referential file named: 2 lines in sh/run-selfcheck.sh = the ruler text itself (its own needles), ⛔ an empty slot
+### R3b the broad <[A-Z_]+> shape, itemized (every hit = a real env-var/path spelling quoted from bytes I am judging, ⛔ slots):
+    .scratch/wisp/probes/336/v1/logs/02-teeth-windows-at-head.txt:46:// aUnder operand is a CERTAIN miss, <APPDATA>\wisp's r
+    .scratch/wisp/probes/336/v1/logs/02-teeth-windows-at-head.txt:47:// it, so the case never fires - that half reads from <
+    .scratch/wisp/probes/336/v1/logs/02-teeth-windows-at-head.txt:48:// reads inside <APPDATA>\wisp\logs, where aUnder's pro
+    .scratch/wisp/probes/336/v1/logs/03-r1-report-at-anchor.md:45:（`<APPDATA>\wisp` 的 root 与 work 无祖先关系，�
+    .scratch/wisp/probes/336/v1/readings-and-mutations.md:70:**(ii) `:224`⇄`:225` 要不要第三枚世界才算逐枚独�
+    .scratch/wisp/probes/336/v1/readings-and-mutations.md:76:**(v) 腿那六处自抓作废里，该退件的＝0 枚；一�
+  hit_files=4
+  distinct_tokens: <APPDATA> 
+ruler_rc=0

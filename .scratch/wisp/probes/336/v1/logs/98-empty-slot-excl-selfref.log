@@ -1,0 +1,4 @@
+### R3e the same ruler minus the self-describing ruler outputs (95/96/97 是尺自己打印 needle 的件，具名不算空槽):
+  hits_excluding_ruler_self_description=0 (want 0)
+  files_in_face_total=138
+  zero_byte_excluding_ruler_outputs=0 (want 0)

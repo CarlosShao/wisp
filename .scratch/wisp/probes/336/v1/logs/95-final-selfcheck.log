@@ -1,0 +1,23 @@
+### R1 per-commit proof: strict prefix ruler -> every commit -> its name-only set
+### (must be ⊆ the three allowed write faces, and .go hits = 0)
+count=9
+total_unique_paths=133
+out_of_three_faces=0
+go_hits=0
+blacklist_hits=0
+ledger_or_handover_or_other_tickets=0 (want 0; positive control: same ruler without the [^3] guard on my two tickets = 2)
+### R2 deliverable proof: absolute paths + wc -c + line count
+verdict=36 lines / 15714 bytes / cap 130
+readouts=83 lines / 16369 bytes
+probe_files=134 zero_byte=0 total_bytes=714340
+abs_root=D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/336/v1
+### R3 empty-slot word-form ruler (0 hits, with positive control)
+  my_files_placeholder_hits=4 files (want 0)
+  POSITIVE CONTROL same ruler on 334-v1 verdict = 1 (non-zero => ruler alive)
+  section_sign_in_my_face=0 (want 0)
+  POSITIVE CONTROL same-shape xargs ruler on token TEETH336 = 67 files
+### AC box census after my tail commit (judgment-area ruler)
+  336 unchecked=7 checked=0
+  334 unchecked=1 checked=6
+### shared worktree: internal/cmd dirty by me (want 0) = 0
+selfcheck_rc=0

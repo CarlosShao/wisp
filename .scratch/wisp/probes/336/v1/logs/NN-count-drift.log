@@ -1,0 +1,9 @@
+### count-drift record v2 (fresh readings at 2026-10-18 14:13:03 +0800)
+  face_files_on_disk=143   face_files_tracked_now=130   zero_byte=0
+  verdict_lines=36 bytes=16068
+### the three numbers my own committed text carries, and the ruler that supersedes each:
+  1) ticket-336 tail bullet: 129 枚  = on-disk count at that instant (before the 95..99 self-check family existed) => LIVE-AT-MOMENT reading. ⛔ 我改写那条 bullet：票尾规矩＝只许一条只追加 bullet，已入库正文⛔ 重写（同 336-r1 那条 69/84 枚的先例，编排者在票 334 尾也是这么处理的：以尺现跑为准）。
+  2) verdict.md 头段与 AC#6: the same face count was written as a number => CORRECTED IN THE FILE ITSELF in the commit that carries this record (now: 枚数一律以尺现跑 = find | wc -l vs git ls-files | wc -l; the file no longer states a face count).
+  3) my msg9 body: 九笔 => superseded by the strict prefix ruler run fresh: git log --all --grep=^票 336 终裁腿 336-v1 --format=%h | wc -l
+### why nothing was deleted: 临时件只建不删 (issues/README rule 8). The 0-byte captures were annotated with ruler + positive control instead (see 99-gofumpt-after-tracking.txt, g1/g4, the .rednames family, 50-ac4-full-roster.diff, 00-out-of-scope.txt).
+drift_rc=0
