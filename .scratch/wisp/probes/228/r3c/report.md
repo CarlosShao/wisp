@@ -72,6 +72,16 @@
 ⛔ 落 `docs/evidence/s1/`（那是裁决者的面）；⛔ 翻框／改票名／`Status:`／`-done`／push ⇒ **票 228 未勾仍 11 枚、`AC#11` 十一格里一枚没翻**（尺＝`grep -c '^[[:space:]]*- \[ \]'`＝11，现跑）。
 `cmd/wisp/**`／`internal/panel/**` 零写腿自证：`git status --porcelain -- cmd internal tools scripts go.mod go.sum frontend docs` 现量只吐别腿在飞字节（`internal/winsec/…`、`internal/session/manage.go`＝`322-r2`／`166-r1` 写腿），⛔ 我一枚。
 
+## 7. 枚数尺就地更正（⛔ 改写票面，按"追加＋具名"）
+
+票 228 尾那条 bullet（笔 `7b1b22d8`）里写 `logs/`＝**10 枚**，交件收笔时现量＝**11 枚**（`log-count=11`、0 字节枚数＝0）：
+多出的那枚＝`logs/closing-final.txt`＝**写它的那一笔晚于票尾 bullet**，枚数尺按构造数不到自己（同 `A1020` §④ 那一形，⛔ 判腿谎报）。
+票面一字不改（⛔ 删行／⛔ 改写），以本节为准；该件里另具名两把本腿写坏的尺：
+① `for f in $T/logs/*` 未加引号 ⇒ 被含空格路径词分割＝吐 "No such file"，改正后逐枚 `wc -c` 见该件尾段；
+② `df -BG /d | tail -1 | awk '{print $2}'` 读 501G＝取到 Size 列，与 PowerShell `(Get-PSDrive D).Free`＝**198.3 GB free** 矛盾 ⇒ 按"两把尺矛盾先假定新那把坏"，以 PowerShell 那把为准（与 `A1024` 第④节"170→199GB"同向），本腿⛔ 据那枚假读数下任何结论。
+终态尺（同件）＝导出树 `sha256=3e2e83fa…`／`blob1=531060a5…`（与每发 log 的还原哈希同串、独立现跑）、`RESIDUE=0`（正控 token 命中 1＝这把尺会响）、
+票 228 `unchecked=11 / checked=5`、本腿 `.go` 命中＝**0**、`D:/wisp228r3b exists=NO`（＝机主 10-18 清理已过账 `A1024` 第④节；本腿⛔ 建、⛔ 删任何盘符根件，全程只写 `D:\tmp\wisp\20261018\228r3c\**`）。
+
 ## 7. 必答 (i)–(iv)
 
 **(i) `R-228-3b-1` 是否已被本腿重做成两发独立读数＝成立。**

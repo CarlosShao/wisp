@@ -1,0 +1,54 @@
+### 228-r3c 收笔终态尺 date=2026-10-18 10:41:24 +0800
+--- 导出树终态（独立于每发 log，收笔现跑）---
+tree-sha256=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7
+tree-blob1=531060a55c080ebd535b426b8c60dcd9011785fc
+--- 盘符根零污染自证：我没在 D:\ 根或 C:\ 根建过东西（旧 228r3b 树我没动、也没删）---
+--- 新落点内容 ---
+anchor-blob.go
+gotmp
+logs
+logs-setup.txt
+msg
+pf-show.txt
+probe-longdirname-228r3c
+tdst
+tree
+--- 残留尺终读 ---
+RESIDUE=0 (expect 0)
+POSCTRL-token=1
+--- 票 228 未勾/已勾终读 ---
+unchecked=11 checked=5
+--- logs 逐枚 wc -c ---
+/usr/bin/bash: line 17: /d/work/workspace/projects: No such file or directory
+          projects
+/usr/bin/bash: line 17: plans/Wisp/.scratch/wisp/probes/228/r3c/logs/*: No such file or directory
+          *
+find: '/d/work/workspace/projects': No such file or directory
+find: 'plans/Wisp/.scratch/wisp/probes/228/r3c/logs': No such file or directory
+zero-byte-count=0
+--- 本腿 .go 命中终尺 ---
+go-hits=0
+--- logs 逐枚 wc -c（改正：/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/228/r3c 加引号，⛔ 让含空格路径被词分割）---
+    1191  closing-final.txt
+    5273  estate-postboth-c.log
+    5301  estate-postboth-d.log
+    5273  estate-pristine-c.log
+    5301  estate-pristine-d.log
+    2132  gate-and-residue.log
+    1778  gate2-residue.log
+    1025  hashes-pristine.txt
+    5339  mutation-M1-b1.log
+    3686  mutation-M2-stopbit.log
+     414  setup-tree.log
+log-count=11
+zero-byte-count=0
+--- 盘符根零污染终尺（改正上面那把哑尺：Test-Path 那形我在 sh 里用了 ls -1d，旧树不存在时它静默失败）---
+old-root-tree D:/wisp228r3b exists=NO (False＝机主 10-18 清理已过账 A1024 第④节；本腿⛔ 建、⛔ 删任何盘符根件)
+--- D: 根现量目录名（自证本腿没在根上新建）---
+$RECYCLE.BIN 333v1-tree-a.txt 333v1-tree-m.txt 333v1-tree-p.txt ? AI AliWorkbenchData BOOTNXT BOOTSECT.BAK Boot Config.Msi DisIndex.log DumpStack.log DumpStack.log.tmp KuGou Program Files ProgramData Recovery System Volume Information V355R1-x WindowsApps ac0-ac8.err ac0-ac8.raw ac1-ac7.err ac1-ac7.raw ac1-cfcount.err ac1-cfcount.raw ac2-ruler.err ac2-ruler.raw bootmgr colors-four.log config.db final-check.err final-check.raw fix-blob.html g-d22.log g-len.log g-vet.log https_sunlogin.oray.com.localstorage logs mut-run.log myserver.txt other self-descipline soft_home soft_linux tmp tools work wt 
+D-free-GB=501G
+--- ⚠ 上面那把 df 尺读数与 PowerShell 矛盾 ⇒ 按两把尺矛盾先假定新那把坏：df -BG|tail -1|awk{print } 取到的是 Size 列不是 Avail。以 PowerShell (Get-PSDrive D).Free 那把为准＝198.3 GB free（与 A1024 第④节170→199GB同向）。本腿不据那枚假读数下任何结论。
+--- report 现量（本笔落盘后；⛔ 改写票面，故票尾那句 90 行随 §7 追加尺读）---
+  100 12659 /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/228/r3c/report.md
+--- 票面 vs HEAD 必须为空（未改写）---
+(空＝票面＝已提交那一版)
