@@ -1,0 +1,15 @@
+票 337 普查腿 337-a1·AC#0 逐跳 g＋h（含正控与两枚具名差异）
+
+hop g：risk.Logf（blacklist.go:51 导出包级 var）生产注入点＝0 枚（9 枚赋值命中全在 _test.go）。
+  正控＝同一把尺形状换 opt.Sink／opt.Logger 族（非测试 24 枚）⇒ 尺认得生产赋值形状，这个 0 是真 0。
+  本腿第一发正控（risk.NowFunc 形）落空＝尺不可信，旧发原样留作对照件 15-*.log，决定性读数以 17-*.log 为准。
+  ★补一枚尺盲区并具名：尺一只认 Logf = 形，不认结构体字面量 Logf: 形——后者在本仓确有 6 枚生产注入
+  （cmd/wisp 六处把 auditf 交给 tools.Options.Logf，bridge.go:73 字段），但那是另一枚同名 sink、不是 risk.Logf；
+  risk.Logf 是包级 var，注入只能取 risk.Logf = 形 ⇒ 生产 0 枚成立。两枚 sink 分工写进 22-*.log。
+
+hop h：到模型那句逐跳对撞（rules_gateway.go:82 → assessor.go:316-352 → bridge.go:301 → :439 →
+  reject(:1090) 的 ToolOutcome{Text: why}(:1106) → loop.go:745 进对话正文）。
+  ★差异 1（具名更正）：票面 13 行与 334-v1 判语件都引了 ToolOutcomeText(:1105)——这枚标识符全仓 0 命中
+  （尺＝git grep -n ToolOutcomeText c11163c8 剔 .scratch＝0 行），真身＝reject 返回的 agent.ToolOutcome.Text 字段。
+
+零 go test／零 go build／零动 .go／零翻框／零 push；读数一律取具名提交树 c11163c8。

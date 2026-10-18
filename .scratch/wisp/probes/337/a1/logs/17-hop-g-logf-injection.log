@@ -1,0 +1,48 @@
+### hop g) risk.Logf（sink 定义 blacklist.go:51）生产注入点枚数 rev=c11163c8（射程＝全仓 *.go，剔 .scratch/**）
+尺一＝git grep -nE "(risk::)?Logf[[:space:]]*=[^=]" $R -- "*.go" | grep -v .scratch（★=[^=] 排除定义行与 == 比较）
+c11163c8:internal/agent/approval/fakes_test.go:271:			o.Logf = opts[0].Logf
+c11163c8:internal/risk/pathresolver_junction_windows_test.go:314:	Logf = func(f string, a ...any) { logs = append(logs, sprintf(f, a...)) }
+c11163c8:internal/risk/pathresolver_junction_windows_test.go:315:	defer func() { Logf = nil }()
+c11163c8:internal/risk/provenance_test.go:131:	Logf = func(f string, a ...any) { logged = append(logged, f) }
+c11163c8:internal/risk/provenance_test.go:132:	defer func() { Logf = old }()
+c11163c8:internal/risk/provenance_test.go:825:	Logf = func(f string, a ...any) { logged = append(logged, f) }
+c11163c8:internal/risk/provenance_test.go:826:	defer func() { Logf = old }()
+c11163c8:internal/tools/ticket90_test.go:509:	risk.Logf = func(format string, args ...any) {
+c11163c8:internal/tools/ticket90_test.go:512:	t.Cleanup(func() { risk.Logf = prev })
+赋值命中行数（含测试）=9
+其中 _test.go 命中=9
+★生产注入点（非测试）行数=0 ⇒ 票面那句「生产码无注入点」在 c11163c8 上成立
+
+尺二（★正控，同一把尺的形状＝导出 sink 变量在生产码的赋值；换成今天确实存在的 opt.Sink / opt.Logger 注入族）
+  git grep -nE "\b(opt|opts|options)\.[A-Z][A-Za-z0-9]*[[:space:]]*=[^=]" $R -- "*.go" | grep -v .scratch | grep -v _test.go
+c11163c8:internal/agent/loop.go:206:		opt.Tools = NewEchoProvider()
+c11163c8:internal/agent/loop.go:209:		opt.Sink = NopSink{}
+c11163c8:internal/agent/loop.go:212:		opt.Registry = observe.Default
+c11163c8:internal/agent/loop.go:215:		opt.Logger = slog.Default()
+c11163c8:internal/ball/ball_windows.go:145:		opts.SizePx = BallSizeDefaultPx
+c11163c8:internal/ball/ball_windows.go:148:		opts.SizePx = BallSizeMinPx
+c11163c8:internal/ball/ball_windows.go:151:		opts.SizePx = BallSizeMaxPx
+c11163c8:internal/ball/ball_windows.go:154:		opts.Hotkeys = DefaultHotkeys()
+c11163c8:internal/ball/ball_windows.go:157:		opts.Initial = statemachine.StateSleeping
+c11163c8:internal/ball/ball_windows.go:160:		opts.Registry = observe.Default
+c11163c8:internal/models/downloader.go:111:		opts.Attempts = 3
+c11163c8:internal/models/downloader.go:114:		opts.BackoffBase = 500 * time.Millisecond
+正控非测试命中行数=24 ⇒ ≥1，尺认得生产赋值形状，hop g 的 0 是真 0
+⚠ 本腿第一发正控用 risk\.NowFunc 那形落空（正控 0 行＝尺不可信），已换 opt.Sink/opt.Logger 族，具名登记在旧对照件 15-hop-g-logf-injection.log（本腿第一发原样，含那枚落空的尺三）
+
+尺三（risk.Logf 全仓逐字命中，证明只有测试在注入）=
+c11163c8:internal/tools/ticket90_test.go:508:	prev := risk.Logf
+c11163c8:internal/tools/ticket90_test.go:509:	risk.Logf = func(format string, args ...any) {
+c11163c8:internal/tools/ticket90_test.go:512:	t.Cleanup(func() { risk.Logf = prev })
+c11163c8:internal/tools/ticket90_test.go:554:			"one that logs A denies and B decisions (risk.Logf sink)")
+
+尺四（logf 调用点＝日志点今天在哪：blacklist.go 三枚 + provenance.go + syncdirs.go，共 20 行含定义）
+20
+
+尺五（host 侧现成的日志设施，甲形落地时的注入位候选，只点名不设计）=
+c11163c8:cmd/wisp/logsink.go:153:	slog.SetDefault(slog.New(teeHandler{
+c11163c8:cmd/wisp/logsink.go:122:func (s *logSink) logger() *slog.Logger {
+c11163c8:cmd/wisp/models.go:288:		sinkLogger := sink.logger()
+c11163c8:cmd/wisp/models.go:290:			sinkLogger.Info("models: " + fmt.Sprintf(format, args...))
+读数＝cmd/wisp/logsink.go:153 立进程级 slog 默认，cmd/wisp/models.go:288 有 sinkLogger := sink.logger() 的先例（别的包把自己的注入点接到它）
+⛔ 本腿不判甲形该接在哪：那是写腿的活

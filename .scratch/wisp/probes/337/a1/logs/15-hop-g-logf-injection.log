@@ -1,0 +1,51 @@
+## 【对照件·本腿第一发 hop g：尺三正控落空那一发原样保留（opt.Sink 族之前用的 risk.NowFunc 形＝0 命中＝尺不可信）⇒ 决定性读数以 17-hop-g-logf-injection.log 为准】
+### hop g) risk.Logf（sink 变量定义 blacklist.go:51）生产码注入点枚数 rev=c11163c8（★剔 .scratch/**）
+尺一（sink 定义自陈）＝git show c11163c8:internal/risk/blacklist.go | sed -n 49,57p
+// Logf is the host-injected security log sink (nil = drop). Every A deny and
+// every B decision (deny->L2 or single-file override) is logged here.
+var Logf func(format string, args ...any)
+
+func logf(format string, args ...any) {
+	if Logf != nil {
+		Logf(format, args...)
+	}
+}
+
+尺二（全仓对 Logf 赋值的形状）＝git grep -nE "(risk::)?Logf\s*=" c11163c8 -- "*.go" | grep -v .scratch
+c11163c8:internal/agent/approval/fakes_test.go:271:			o.Logf = opts[0].Logf
+c11163c8:internal/risk/pathresolver_junction_windows_test.go:314:	Logf = func(f string, a ...any) { logs = append(logs, sprintf(f, a...)) }
+c11163c8:internal/risk/pathresolver_junction_windows_test.go:315:	defer func() { Logf = nil }()
+c11163c8:internal/risk/provenance_test.go:131:	Logf = func(f string, a ...any) { logged = append(logged, f) }
+c11163c8:internal/risk/provenance_test.go:132:	defer func() { Logf = old }()
+c11163c8:internal/risk/provenance_test.go:825:	Logf = func(f string, a ...any) { logged = append(logged, f) }
+c11163c8:internal/risk/provenance_test.go:826:	defer func() { Logf = old }()
+c11163c8:internal/tools/ticket90_test.go:509:	risk.Logf = func(format string, args ...any) {
+c11163c8:internal/tools/ticket90_test.go:512:	t.Cleanup(func() { risk.Logf = prev })
+赋值命中行数（含测试）＝9
+其中非测试（生产注入点）＝0
+
+尺三（★正控：同一把尺的形状换成今天确实有生产注入点的 risk.NowFunc / 别的 sink 变量，证明尺认得赋值）＝
+正控命中行数（生产）＝0
+
+尺四（另一路：整包内 logf 的调用点枚数＝真日志点在哪）＝git grep -nE "logf\(" c11163c8 -- internal/risk
+c11163c8:internal/risk/blacklist.go:53:func logf(format string, args ...any) {
+c11163c8:internal/risk/blacklist.go:83:		logf("risk: A-list DENY path=%s rule=%s (non-overridable)", p, rule)
+c11163c8:internal/risk/blacklist.go:87:			logf("risk: B-list OVERRIDE (single-file, L2 confirmed) path=%s rule=%s", p, rule)
+c11163c8:internal/risk/blacklist.go:90:		logf("risk: B-list default DENY -> L2 path=%s rule=%s", p, rule)
+c11163c8:internal/risk/provenance.go:561:		logf("risk/C25: mark %s origin=%q skipped: empty after normalization", tool, origin)
+c11163c8:internal/risk/provenance.go:567:		logf("risk/C25: mark %s origin=%q has only %d normalized chars (< floor %d): indexed anyway as shorter fragments are impossible (documented residual)", tool, origin, len(rp), p.minChars)
+c11163c8:internal/risk/provenance.go:574:		logf("risk/C25: Mark tool %q is not a SPEC-06 §5 source; recorded fail-closed as sensitive anyway (origin=%q)", tool, origin)
+c11163c8:internal/risk/provenance.go:585:			logf("risk/C25: 177 shape-A exemption excludes normalized span [%d,%d) of the host-minted path from mark %s origin=%q; every other window of this mark stays indexed", lo, lo+len(nhp), tool, origin)
+c11163c8:internal/risk/provenance.go:589:			logf("risk/C25: declared host path absent from mark %s origin=%q content after normalization: nothing excluded", tool, origin)
+c11163c8:internal/risk/provenance.go:603:			logf("risk/C25: 185 host-minted-path roster matches origin=%q of mark %s (declared by this scope's own marks); the path's >=%d-rune spellings are not evidence from THIS mark only - every other window, and every other mark, stays indexed", origin, tool, p.minChars)
+c11163c8:internal/risk/provenance.go:627:		logf("risk/C25: scope %q not open (no OpenScope for it, or its handle already closed); taint stored — it cannot leak into other scopes", scopeID)
+c11163c8:internal/risk/provenance.go:634:		logf("risk/C25: scope %q holds %d tainted sources (MaxScopeSources=%d, D32 budget); keeping every taint — index memory grows past the budget, see docs/PRECHECK.md", scopeID, n, p.maxMarks)
+c11163c8:internal/risk/provenance.go:639:		logf("risk/C25: source %s origin=%q truncated to MaxSourceRunes=%d; fragments past the cap can be missed (documented residual)", tool, origin, p.maxSrc)
+c11163c8:internal/risk/provenance.go:706:			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
+c11163c8:internal/risk/provenance.go:812:		logf("risk/C25: params of tool %q nest deeper than MaxParamDepth=%d; tail unscanned, fail-closed R4", tool, p.maxDepth)
+c11163c8:internal/risk/provenance.go:844:		logf("risk/C25: exfil candidate truncated to MaxScanRunes=%d; the tail is not scanned (documented residual)", p.maxScan)
+c11163c8:internal/risk/syncdirs.go:134:		logf("risk/C25: sync-dir detection has no confirmed (env/registry/config) location — paths under the user profile fall back to sync-suspect (P12 safe default)")
+c11163c8:internal/risk/syncdirs.go:153:		logf("risk/C25: sync root %q was rewritten by expansion (%s); it guards %s but does not count as canonical evidence",
+c11163c8:internal/risk/syncdirs.go:639:		logf("risk/C25: sync fixture %s unreadable (fail-closed path: fewer confirmed roots): %v", path, err)
+c11163c8:internal/risk/syncdirs.go:644:		logf("risk/C25: sync fixture %s malformed: %v", path, err)
+logf 调用点行数＝20
