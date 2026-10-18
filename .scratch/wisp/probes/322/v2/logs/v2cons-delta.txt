@@ -1,0 +1,18 @@
+### 322-v2 消费者 Linux 档 RUN 增量归因尺（cc2-head(r2,锚c11163c8) ⇄ v2cons(本腿,HEAD)） 2026-10-18 13:25:36 +0800
+r2 RUN 行=1160 v2 RUN 行=1172（count=2 ⇒ 每名 2 行）
+-- v2 not in r2（新增用例名，去顶层名）:
+      2 TestDeletedLineRestorationIsNotClaimedAsAWrittenKey
+      2 TestFallbackBranchHasNoWorldOnThisPlatform336
+      2 TestHandDeletedMapEntryIsNotRestored
+      2 TestHandDeletedScalarLineComesBackAtSchemaDefault
+      2 TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent
+      2 TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+-- r2 not in v2（消失用例名）枚数:
+0
+-- 红名册对撞:
+红名册一字不变（唯一名=3：票 339 两枚＋A380 一枚，⛔ 本票）
+TestAnchorMissKeepsNonOverridableClassAndNeedL2
+TestAnchorMissReasonNamesCandidateAndMissingAnchor
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+-- SKIP 对撞:
+SKIP 名册一字不变

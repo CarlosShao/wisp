@@ -1,0 +1,572 @@
+=== RUN   TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1994 flipErrs=0 damagedWitnesses=0 leafLegRefusals=59 foreignsNarrowed=0 foreignsHoldingPayload=0
+    openleaf_322_other_test.go:196: AC#1' leg that answered = placement floor before the act (platformVerifyPlacement) : 2409 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = pinPlacement sameObjectPinned link face (winsec_other.go:188) : 447 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = sealHandle inline link face (winsec_other.go:269) : 26 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = sealHandle inline SameFile face (winsec_other.go:272) : 31 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = some other failure : 7 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = none: the call returned nil : 21 attempts
+--- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.99s)
+=== RUN   TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.00s)
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/native-backslash
+    pathpieces_108_test.go:85: native-backslash: pathPieces("C:\\a\\b\\keep.txt") = ["C:\\a\\b\\keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/all-forward-slash
+    pathpieces_108_test.go:85: all-forward-slash: pathPieces("C:/a/b/keep.txt") = ["C:" "C:/a" "C:/a/b" "C:/a/b/keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/mixed-separators
+    pathpieces_108_test.go:85: mixed-separators: pathPieces("C:\\a/b\\keep.txt") = ["C:\\a" "C:\\a/b\\keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/trailing-separator
+    pathpieces_108_test.go:85: trailing-separator: pathPieces("/a/b/keep.txt/") = ["/a" "/a/b" "/a/b/keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/doubled-separator
+    pathpieces_108_test.go:85: doubled-separator: pathPieces("/a/b//keep.txt") = ["/a" "/a/b" "/a/b//keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/posix-backslash-is-a-name-character
+    pathpieces_108_test.go:85: posix-backslash-is-a-name-character: pathPieces("/a/b\\c/keep.txt") = ["/a" "/a/b\\c" "/a/b\\c/keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/extended-length-prefix
+    pathpieces_108_test.go:85: extended-length-prefix: pathPieces("\\\\?\\C:\\a\\b\\keep.txt") = ["\\\\?\\C:\\a\\b\\keep.txt"]
+--- PASS: TestAC2AncestorPrefixesForEverySeparatorShape (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/native-backslash (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/all-forward-slash (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/mixed-separators (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/trailing-separator (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/doubled-separator (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/posix-backslash-is-a-name-character (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/extended-length-prefix (0.00s)
+=== RUN   TestAC2ComponentsAndTraversalPerSeparatorShape
+    pathpieces_108_test.go:129: a dot-dot the Windows parser would honour: lexicalTraversal("C:/a/../b") -> found=true (traverses "..")
+    pathpieces_108_test.go:129: a portable dot-dot: lexicalTraversal("/a/../b") -> found=true (traverses "..")
+    pathpieces_108_test.go:129: backslash-dot-dot: one real component name on POSIX, two separators on Windows: lexicalTraversal("/a/b\\..\\c") -> found=false ()
+    pathpieces_108_test.go:129: an empty segment: lexicalTraversal("/a/b//c") -> found=true (has an empty path segment (index 4))
+    pathpieces_108_test.go:129: a self reference: lexicalTraversal("/a/./b") -> found=true (traverses ".")
+--- PASS: TestAC2ComponentsAndTraversalPerSeparatorShape (0.00s)
+=== RUN   TestAC5FailedSealRefusesTheWrite
+=== RUN   TestAC5FailedSealRefusesTheWrite/exclusive_artifact
+=== RUN   TestAC5FailedSealRefusesTheWrite/replacement_write
+=== RUN   TestAC5FailedSealRefusesTheWrite/directory_chain
+=== RUN   TestAC5FailedSealRefusesTheWrite/seal_file_and_dir_direct
+--- PASS: TestAC5FailedSealRefusesTheWrite (0.00s)
+    --- PASS: TestAC5FailedSealRefusesTheWrite/exclusive_artifact (0.00s)
+    --- PASS: TestAC5FailedSealRefusesTheWrite/replacement_write (0.00s)
+    --- PASS: TestAC5FailedSealRefusesTheWrite/directory_chain (0.00s)
+    --- PASS: TestAC5FailedSealRefusesTheWrite/seal_file_and_dir_direct (0.00s)
+=== RUN   TestAC5FailureIsNotSwallowedByTheHappyPath
+--- PASS: TestAC5FailureIsNotSwallowedByTheHappyPath (0.00s)
+=== RUN   TestPOSIXPrivateFileIsReally0600
+--- PASS: TestPOSIXPrivateFileIsReally0600 (0.00s)
+=== RUN   TestPOSIXPrivateDirIsReally0700
+--- PASS: TestPOSIXPrivateDirIsReally0700 (0.00s)
+=== RUN   TestPOSIXSymlinkAtArtifactPositionIsNotRecursed
+--- PASS: TestPOSIXSymlinkAtArtifactPositionIsNotRecursed (0.01s)
+=== RUN   TestPOSIXMissingFileIsNotAnError
+--- PASS: TestPOSIXMissingFileIsNotAnError (0.00s)
+=== RUN   TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3
+    sealhandle_identity_120_other_test.go:44: AC#1' world: fd and name = two different objects; name kind=file mode=-rw-rw-rw-
+    sealhandle_identity_120_other_test.go:48: AC#1' name-carries-another-real-object: leg that spoke = sealHandle inline SameFile face (winsec_other.go:272)
+    sealhandle_identity_120_other_test.go:53: AC#1' read-back: name's object=-rw-------, caller's object=-rw-rw-rw-
+--- PASS: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.00s)
+=== RUN   TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3
+    sealhandle_identity_120_other_test.go:86: AC#1' name-becomes-a-sibling-link-after-the-pinned-seal: leg that spoke = sealHandle inline link face (winsec_other.go:269)
+    sealhandle_identity_120_other_test.go:91: AC#1' read-back: name kind=link, caller's object=-rw-------, witness=-rw-rw-rw-
+--- PASS: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+=== RUN   TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3
+    sealhandle_identity_120_other_test.go:120: AC#1' world: the name carries a link at a relative sibling; the fd and the name hold the same object
+    sealhandle_identity_120_other_test.go:124: AC#1' pre-planted-link-is-answered-by-the-walk: leg that spoke = pinPlacement sameObjectPinned link face (winsec_other.go:188)
+--- PASS: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+=== RUN   TestAC1POSIXSealHandlePlainObjectStillSeals120r3
+--- PASS: TestAC1POSIXSealHandlePlainObjectStillSeals120r3 (0.00s)
+=== RUN   TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3
+    sealhandle_privateroute_120_other_test.go:83: AC#1' private-file-route-name-carries-another-real-object: leg that spoke = sealHandle inline SameFile face (winsec_other.go:272)
+    sealhandle_privateroute_120_other_test.go:87: AC#1' tree after the refusal: 1 readable entries, none carrying the payload
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)
+=== RUN   TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3
+    sealhandle_privateroute_120_other_test.go:110: AC#1' private-file-route-name-becomes-a-sibling-link: leg that spoke = sealHandle inline link face (winsec_other.go:269)
+    sealhandle_privateroute_120_other_test.go:122: AC#1' tree after the refusal: 1 readable entries, none carrying the payload
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+=== RUN   TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3
+    sealhandle_privateroute_120_other_test.go:203: AC#1' natural-window reading, denominator=2000, attempts classified by the leg that answered:
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   floor before the act (winsec_other.go platformVerifyPlacement) = 1731
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   other failure = 32
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   pinPlacement sameObjectPinned SameFile face (winsec_other.go:191) = 3
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   pinPlacement sameObjectPinned link face (winsec_other.go:188) = 202
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   returned nil: the flip missed every check = 5
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   sealHandle inline SameFile face (winsec_other.go:272) = 18
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   sealHandle inline link face (winsec_other.go:269) = 9
+    sealhandle_privateroute_120_other_test.go:209: AC#1' natural-window reading, first other-failure verbatim: open /tmp/gt-v2winsec/TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r33862051635/001/caller-object-120r3.bin: too many levels of symbolic links
+    sealhandle_privateroute_120_other_test.go:225: AC#1' witness holds its own bytes after 2000 raced attempts: no open, seal or write reached it through a flipped link
+--- PASS: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.21s)
+=== RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125
+=== RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/control_plain_temp
+    seam_probe_root_125_other_test.go:128: reading: TMPDIR="/tmp/gt-v2winsec/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1252587545348/001/real125/tmproot125" shapes=["/tmp/gt-v2winsec/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1252587545348/001/real125/tmproot125/../wisp-103-conformance-probe"]
+=== RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp
+    seam_probe_root_125_other_test.go:128: reading: TMPDIR="/tmp/gt-v2winsec/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1252587545348/001/varlink125/tmproot125" shapes=["/tmp/gt-v2winsec/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1252587545348/001/real125/tmproot125/../wisp-103-conformance-probe"]
+--- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125 (0.00s)
+    --- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/control_plain_temp (0.00s)
+    --- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp (0.00s)
+=== RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125
+=== RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/control_plain_temp
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=pass_through refused=true reason="it answered the hostile shape \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125/../wisp-103-conformance-probe\" by passing it through unchanged, which is the bypass this seam exists to close"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=constant refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125\" and \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with the same single spelling \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/002/constant-leaf\", i.e. it does not resolve the tree the caller named at all"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=tree_moving refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with \"/wisp125-foreign-tree/wisp-108-tree-ownership-probe\", which is neither inside the tree \"/wisp125-foreign-tree/tmproot125\" it answered for that path's own parent \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125\" nor inside the tree that answer names once the candidate is asked about it directly (\"/wisp125-foreign-tree/wisp125-foreign-tree\" for \"/wisp125-foreign-tree\"): the seam may not be used to move a seal into another tree"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=no_account refused=true reason="it cannot answer the tree-ownership question at all: without ResolveAccounted this package would have to seal whatever tree its answers name, which is ticket 103's R-103-1"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=answer_through_the_link refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125/../wisp-103-conformance-probe\" with \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/varlink125/tmproot125/../wisp-103-conformance-probe\", a spelling the built-in floor itself refuses: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/varlink125/tmproot125/../wisp-103-conformance-probe traverses \"..\""
+=== RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/measured_symlink_spelled_temp
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=pass_through refused=true reason="it answered the hostile shape \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125/../wisp-103-conformance-probe\" by passing it through unchanged, which is the bypass this seam exists to close"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=constant refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125\" and \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with the same single spelling \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/002/constant-leaf\", i.e. it does not resolve the tree the caller named at all"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=tree_moving refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with \"/wisp125-foreign-tree/wisp-108-tree-ownership-probe\", which is neither inside the tree \"/wisp125-foreign-tree/tmproot125\" it answered for that path's own parent \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125\" nor inside the tree that answer names once the candidate is asked about it directly (\"/wisp125-foreign-tree/wisp125-foreign-tree\" for \"/wisp125-foreign-tree\"): the seam may not be used to move a seal into another tree"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=no_account refused=true reason="it cannot answer the tree-ownership question at all: without ResolveAccounted this package would have to seal whatever tree its answers name, which is ticket 103's R-103-1"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=answer_through_the_link refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/real125/tmproot125/../wisp-103-conformance-probe\" with \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/varlink125/tmproot125/../wisp-103-conformance-probe\", a spelling the built-in floor itself refuses: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1252811072138/001/varlink125/tmproot125/../wisp-103-conformance-probe traverses \"..\""
+--- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125 (0.01s)
+    --- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/control_plain_temp (0.00s)
+    --- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/measured_symlink_spelled_temp (0.00s)
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_unresolved_root_still_refused_by_the_floor_itself
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp
+    seam_probe_root_125_other_test.go:293: reading: TMPDIR="/tmp/gt-v2winsec/TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer1252223272598/001/varlink125/tmproot125" shapes=["/tmp/gt-v2winsec/TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer1252223272598/001/real125/tmproot125/../wisp-103-conformance-probe"] refused=false reason=""
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_plain_temp
+--- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125 (0.01s)
+    --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_unresolved_root_still_refused_by_the_floor_itself (0.00s)
+    --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp (0.00s)
+    --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_plain_temp (0.00s)
+=== RUN   TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink
+    ancestor_separator_108_other_test.go:92: AC#2 RemoveUnlinked("/tmp/gt-v2winsec/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink3106998350/002/root/link/keep-me.txt") -> err=winsec: entry is a link to something else, not private data /tmp/gt-v2winsec/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink3106998350/002/root/link/keep-me.txt: the spelling reaches it through the link at /tmp/gt-v2winsec/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink3106998350/002/root/link, and whatever lives behind that link is not this tree's data to delete (link this case planted: "/tmp/gt-v2winsec/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink3106998350/002/root/link")
+--- PASS: TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink (0.00s)
+=== RUN   TestAC2POSIXDoesNotFoldABackslashIntoASeparator
+--- PASS: TestAC2POSIXDoesNotFoldABackslashIntoASeparator (0.00s)
+=== RUN   TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor
+    ancestor_separator_108_other_test.go:159: AC#2 RemoveUnlinked("/tmp/gt-v2winsec/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor2388049134/002/root/x\\y/keep-me.txt") -> err=winsec: entry is a link to something else, not private data /tmp/gt-v2winsec/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor2388049134/002/root/x\y/keep-me.txt: the spelling reaches it through the link at /tmp/gt-v2winsec/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor2388049134/002/root/x\y, and whatever lives behind that link is not this tree's data to delete (link this case planted: "/tmp/gt-v2winsec/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor2388049134/002/root/x\\y")
+--- PASS: TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor (0.00s)
+=== RUN   TestAC4POSIXFloorAnswersInsideTheNamedTree
+    ancestor_separator_108_other_test.go:209: parent-pointer spelling refused as: winsec: refusing to seal /tmp/gt-v2winsec/TestAC4POSIXFloorAnswersInsideTheNamedTree312076659/001/data/../elsewhere: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC4POSIXFloorAnswersInsideTheNamedTree312076659/001/data/../elsewhere traverses ".."
+--- PASS: TestAC4POSIXFloorAnswersInsideTheNamedTree (0.00s)
+=== RUN   TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119
+    dataroot_symlink_119_other_test.go:150: AC#1 TMPDIR=/tmp/gt-v2winsec/TestAC1POSIXSymlinkedTempDirRouteBecomesSealable1193545249520/001/varlink119/w119tmp (a link) -> proc.TestDataDir()=/tmp/gt-v2winsec/TestAC1POSIXSymlinkedTempDirRouteBecomesSealable1193545249520/001/varreal119/w119tmp/wisp-test-2255
+--- PASS: TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119 (0.00s)
+=== RUN   TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119
+    dataroot_symlink_119_other_test.go:189: AC#1 HOME=/tmp/gt-v2winsec/TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable1193805706586/001/homelink119/user (a link) -> prod data root=/tmp/gt-v2winsec/TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable1193805706586/001/homereal119/user/.config/wisp
+--- PASS: TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119 (0.01s)
+=== RUN   TestAC1POSIXUnresolvedSymlinkedRootStillRefused119
+    dataroot_symlink_119_other_test.go:238: AC#1 PrivateDirAll("/tmp/gt-v2winsec/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1192664291886/001/varlink119/data") -> winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1192664291886/001/varlink119/data: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1192664291886/001/varlink119/data reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1192664291886/001/varlink119, which is not the tree this call names
+--- PASS: TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 (0.01s)
+=== RUN   TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119
+    dataroot_symlink_119_other_test.go:288: AC#3 SealFile("/tmp/gt-v2winsec/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119241881284/001/data/out/keep-me.txt") -> winsec: refusing to seal /tmp/gt-v2winsec/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119241881284/001/data/out/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119241881284/001/data/out/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119241881284/001/data/out, which is not the tree this call names
+--- PASS: TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119 (0.01s)
+=== RUN   TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+    dataroot_symlink_119_other_test.go:358: AC#2 PrivateDirAll("/tmp/gt-v2winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119272323209/001/injlink119/harness/picked") -> winsec: refusing to seal /tmp/gt-v2winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119272323209/001/injlink119/harness/picked: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119272323209/001/injlink119/harness/picked reaches it through the link at /tmp/gt-v2winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119272323209/001/injlink119, which is not the tree this call names
+--- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.00s)
+=== RUN   TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed
+    placement_leaf_118_other_test.go:76: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed2074132719/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed2074132719/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_leaf_118_other_test.go:81: AC#1 SealFile("/tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed2074132719/002/root/artifact.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed2074132719/002/root/artifact.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed2074132719/002/root/artifact.txt reaches it through the link at /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed2074132719/002/root/artifact.txt, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed2074132719/002/root/artifact.txt")
+    placement_leaf_118_other_test.go:86: AC#6 SealFile on a leaf link: /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed2074132719/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_leaf_118_other_test.go:86: AC#6 SealFile on a leaf link: /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed2074132719/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed (0.00s)
+=== RUN   TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed
+    placement_leaf_118_other_test.go:97: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName544756231/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName544756231/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_leaf_118_other_test.go:107: AC#1 PrivateFile("/tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName544756231/002/root/artifact.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName544756231/002/root/artifact.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName544756231/002/root/artifact.txt reaches it through the link at /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName544756231/002/root/artifact.txt, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName544756231/002/root/artifact.txt")
+    placement_leaf_118_other_test.go:120: AC#6 PrivateFile on a leaf link: /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName544756231/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_leaf_118_other_test.go:120: AC#6 PrivateFile on a leaf link: /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName544756231/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed (0.01s)
+=== RUN   TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone
+    placement_symlink_113_other_test.go:211: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre339267169/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre339267169/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:219: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre339267169/002/root/link/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre339267169/002/root/link/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre339267169/002/root/link/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre339267169/002/root/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre339267169/002/root/link")
+    placement_symlink_113_other_test.go:221: AC#1 the foreign tree behind the link: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre339267169/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:221: AC#1 the foreign tree behind the link: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre339267169/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone (0.00s)
+=== RUN   TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth
+=== RUN   TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-1
+    placement_symlink_113_other_test.go:234: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep63196359/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep63196359/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:250: AC#1 depth 1: spelled=/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep63196359/002/root/link/keep-me.txt (pieces below root: 2)
+    placement_symlink_113_other_test.go:252: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep63196359/002/root/link/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep63196359/002/root/link/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep63196359/002/root/link/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep63196359/002/root/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep63196359/002/root/link")
+    placement_symlink_113_other_test.go:253: AC#1 depth 1: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep63196359/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:253: AC#1 depth 1: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep63196359/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+=== RUN   TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-2
+    placement_symlink_113_other_test.go:234: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2657277707/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2657277707/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:250: AC#1 depth 2: spelled=/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2657277707/002/root/dir1/link/keep-me.txt (pieces below root: 3)
+    placement_symlink_113_other_test.go:252: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2657277707/002/root/dir1/link/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2657277707/002/root/dir1/link/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2657277707/002/root/dir1/link/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2657277707/002/root/dir1/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2657277707/002/root/dir1/link")
+    placement_symlink_113_other_test.go:253: AC#1 depth 2: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2657277707/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:253: AC#1 depth 2: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2657277707/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+=== RUN   TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-3
+    placement_symlink_113_other_test.go:234: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3815979635/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3815979635/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:250: AC#1 depth 3: spelled=/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3815979635/002/root/dir1/dir2/link/keep-me.txt (pieces below root: 4)
+    placement_symlink_113_other_test.go:252: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3815979635/002/root/dir1/dir2/link/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3815979635/002/root/dir1/dir2/link/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3815979635/002/root/dir1/dir2/link/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3815979635/002/root/dir1/dir2/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3815979635/002/root/dir1/dir2/link")
+    placement_symlink_113_other_test.go:253: AC#1 depth 3: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3815979635/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:253: AC#1 depth 3: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3815979635/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+=== RUN   TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-4
+    placement_symlink_113_other_test.go:234: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3550289010/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3550289010/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:250: AC#1 depth 4: spelled=/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3550289010/002/root/dir1/dir2/dir3/link/keep-me.txt (pieces below root: 5)
+    placement_symlink_113_other_test.go:252: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3550289010/002/root/dir1/dir2/dir3/link/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3550289010/002/root/dir1/dir2/dir3/link/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3550289010/002/root/dir1/dir2/dir3/link/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3550289010/002/root/dir1/dir2/dir3/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3550289010/002/root/dir1/dir2/dir3/link")
+    placement_symlink_113_other_test.go:253: AC#1 depth 4: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3550289010/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:253: AC#1 depth 4: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep3550289010/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth (0.03s)
+    --- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-1 (0.01s)
+    --- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-2 (0.01s)
+    --- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-3 (0.01s)
+    --- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-4 (0.01s)
+=== RUN   TestAC1POSIXSealDirThroughASymlinkRefuses
+    placement_symlink_113_other_test.go:262: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3322982196/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3322982196/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:269: AC#1 SealDir("/tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3322982196/002/root/link") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3322982196/002/root/link: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3322982196/002/root/link reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3322982196/002/root/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3322982196/002/root/link")
+    placement_symlink_113_other_test.go:270: AC#1 the foreign directory behind the link: /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3322982196/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:270: AC#1 the foreign directory behind the link: /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3322982196/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC1POSIXSealDirThroughASymlinkRefuses (0.00s)
+=== RUN   TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing
+    placement_symlink_113_other_test.go:278: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing3923307801/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing3923307801/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:286: AC#1 PrivateFile("/tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing3923307801/002/root/link/secret.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing3923307801/002/root/link/secret.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing3923307801/002/root/link/secret.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing3923307801/002/root/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing3923307801/002/root/link")
+    placement_symlink_113_other_test.go:288: AC#1 the foreign tree behind the link: /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing3923307801/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:288: AC#1 the foreign tree behind the link: /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing3923307801/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing (0.00s)
+=== RUN   TestAC1POSIXSealFileThroughABackslashNamedLink
+    placement_symlink_113_other_test.go:303: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink3254688672/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink3254688672/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:311: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink3254688672/002/root/x\\y/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink3254688672/002/root/x\y/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink3254688672/002/root/x\y/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink3254688672/002/root/x\y, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink3254688672/002/root/x\\y")
+    placement_symlink_113_other_test.go:312: AC#2 the foreign tree behind a backslash-named link: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink3254688672/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:312: AC#2 the foreign tree behind a backslash-named link: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink3254688672/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC1POSIXSealFileThroughABackslashNamedLink (0.01s)
+=== RUN   TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree
+    placement_symlink_113_other_test.go:332: AC#3 before: /tmp/gt-v2winsec/TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree834990601/001/data/blob.bin = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:338: AC#3 after: /tmp/gt-v2winsec/TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree834990601/001/data/blob.bin = mode=600 uid=0 gid=0
+--- PASS: TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree (0.00s)
+=== RUN   TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks
+    placement_symlink_113_other_test.go:354: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLink2951859481/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLink2951859481/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:393: AC#3 the foreign tree pointed at by a sibling link: /tmp/gt-v2winsec/TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLink2951859481/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:393: AC#3 the foreign tree pointed at by a sibling link: /tmp/gt-v2winsec/TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLink2951859481/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks (0.01s)
+=== RUN   TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator
+    placement_symlink_113_other_test.go:402: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator377602023/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator377602023/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:425: AC#3 the symlink target that shares a prefix once a backslash is folded: /tmp/gt-v2winsec/TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator377602023/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:425: AC#3 the symlink target that shares a prefix once a backslash is folded: /tmp/gt-v2winsec/TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator377602023/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator (0.01s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=222 of-which-refused-at-act=5 sealed-own-object=243 other=35
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowLeafSwapIsClosed3963510763/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=236 of-which-refused-at-act=4 sealed-own-object=228 other=36
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowLeafSwapIsClosed3963510763/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=221 of-which-refused-at-act=6 sealed-own-object=237 other=42
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowLeafSwapIsClosed3963510763/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=252 of-which-refused-at-act=2 sealed-own-object=215 other=33
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowLeafSwapIsClosed3963510763/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=931 of-which-refused-at-act=17 sealed-own-object=923 other=146
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowLeafSwapIsClosed3963510763/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.24s)
+=== RUN   TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed
+    posix_seal_window_120_other_test.go:393: AC#1 sample 1/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=32 of-which-refused-at-act=2 sealed-own-object=20 other=448
+    posix_seal_window_120_other_test.go:393: AC#1 sample 1/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed3009784116/001/root/data/sub/blob.bin: openat blob.bin: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 sample 2/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=28 of-which-refused-at-act=2 sealed-own-object=19 other=453
+    posix_seal_window_120_other_test.go:393: AC#1 sample 2/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed3009784116/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 sample 3/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=31 of-which-refused-at-act=0 sealed-own-object=20 other=449
+    posix_seal_window_120_other_test.go:393: AC#1 sample 3/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed3009784116/001/root/data/sub/blob.bin: openat sub: path escapes from parent
+    posix_seal_window_120_other_test.go:393: AC#1 sample 4/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=29 of-which-refused-at-act=0 sealed-own-object=36 other=435
+    posix_seal_window_120_other_test.go:393: AC#1 sample 4/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed3009784116/001/root/data/sub/blob.bin: openat blob.bin: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 total shape=ancestor-swap-absolute-link: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=120 of-which-refused-at-act=4 sealed-own-object=95 other=1785
+    posix_seal_window_120_other_test.go:393: AC#1 shape=ancestor-swap-absolute-link last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed3009784116/001/root/data/sub/blob.bin: openat blob.bin: no such file or directory
+--- PASS: TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed (0.39s)
+=== RUN   TestPOSIX120SealWindowAncestorRelativeLinkIsClosed
+    posix_seal_window_120_other_test.go:419: AC#1 sample 1/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=21 of-which-refused-at-act=4 sealed-own-object=51 other=428
+    posix_seal_window_120_other_test.go:419: AC#1 sample 1/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed3911632760/001/root/data/sub/blob.bin: openat blob.bin: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 sample 2/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=23 of-which-refused-at-act=1 sealed-own-object=50 other=427
+    posix_seal_window_120_other_test.go:419: AC#1 sample 2/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed3911632760/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 sample 3/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=28 of-which-refused-at-act=5 sealed-own-object=49 other=423
+    posix_seal_window_120_other_test.go:419: AC#1 sample 3/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed3911632760/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 sample 4/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=28 of-which-refused-at-act=3 sealed-own-object=42 other=430
+    posix_seal_window_120_other_test.go:419: AC#1 sample 4/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed3911632760/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 total shape=ancestor-swap-relative-sibling-link: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=100 of-which-refused-at-act=13 sealed-own-object=192 other=1708
+    posix_seal_window_120_other_test.go:419: AC#1 shape=ancestor-swap-relative-sibling-link last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed3911632760/001/root/data/sub/blob.bin: openat blob.bin: no such file or directory
+--- PASS: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed (0.42s)
+=== RUN   TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1678 flipErrs=0 damagedWitnesses=0 leafLegRefusals=52 foreignsNarrowed=0 foreignsHoldingPayload=0
+    openleaf_322_other_test.go:196: AC#1' leg that answered = placement floor before the act (platformVerifyPlacement) : 2518 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = pinPlacement sameObjectPinned link face (winsec_other.go:188) : 373 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = sealHandle inline link face (winsec_other.go:269) : 14 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = sealHandle inline SameFile face (winsec_other.go:272) : 15 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = some other failure : 6 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = none: the call returned nil : 22 attempts
+--- PASS: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 (0.79s)
+=== RUN   TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1
+--- PASS: TestAC322LeafFlagRefusesALeafLinkWithoutTouchingTheTarget322r1 (0.00s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.00s)
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/native-backslash
+    pathpieces_108_test.go:85: native-backslash: pathPieces("C:\\a\\b\\keep.txt") = ["C:\\a\\b\\keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/all-forward-slash
+    pathpieces_108_test.go:85: all-forward-slash: pathPieces("C:/a/b/keep.txt") = ["C:" "C:/a" "C:/a/b" "C:/a/b/keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/mixed-separators
+    pathpieces_108_test.go:85: mixed-separators: pathPieces("C:\\a/b\\keep.txt") = ["C:\\a" "C:\\a/b\\keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/trailing-separator
+    pathpieces_108_test.go:85: trailing-separator: pathPieces("/a/b/keep.txt/") = ["/a" "/a/b" "/a/b/keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/doubled-separator
+    pathpieces_108_test.go:85: doubled-separator: pathPieces("/a/b//keep.txt") = ["/a" "/a/b" "/a/b//keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/posix-backslash-is-a-name-character
+    pathpieces_108_test.go:85: posix-backslash-is-a-name-character: pathPieces("/a/b\\c/keep.txt") = ["/a" "/a/b\\c" "/a/b\\c/keep.txt"]
+=== RUN   TestAC2AncestorPrefixesForEverySeparatorShape/extended-length-prefix
+    pathpieces_108_test.go:85: extended-length-prefix: pathPieces("\\\\?\\C:\\a\\b\\keep.txt") = ["\\\\?\\C:\\a\\b\\keep.txt"]
+--- PASS: TestAC2AncestorPrefixesForEverySeparatorShape (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/native-backslash (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/all-forward-slash (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/mixed-separators (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/trailing-separator (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/doubled-separator (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/posix-backslash-is-a-name-character (0.00s)
+    --- PASS: TestAC2AncestorPrefixesForEverySeparatorShape/extended-length-prefix (0.00s)
+=== RUN   TestAC2ComponentsAndTraversalPerSeparatorShape
+    pathpieces_108_test.go:129: a dot-dot the Windows parser would honour: lexicalTraversal("C:/a/../b") -> found=true (traverses "..")
+    pathpieces_108_test.go:129: a portable dot-dot: lexicalTraversal("/a/../b") -> found=true (traverses "..")
+    pathpieces_108_test.go:129: backslash-dot-dot: one real component name on POSIX, two separators on Windows: lexicalTraversal("/a/b\\..\\c") -> found=false ()
+    pathpieces_108_test.go:129: an empty segment: lexicalTraversal("/a/b//c") -> found=true (has an empty path segment (index 4))
+    pathpieces_108_test.go:129: a self reference: lexicalTraversal("/a/./b") -> found=true (traverses ".")
+--- PASS: TestAC2ComponentsAndTraversalPerSeparatorShape (0.00s)
+=== RUN   TestAC5FailedSealRefusesTheWrite
+=== RUN   TestAC5FailedSealRefusesTheWrite/exclusive_artifact
+=== RUN   TestAC5FailedSealRefusesTheWrite/replacement_write
+=== RUN   TestAC5FailedSealRefusesTheWrite/directory_chain
+=== RUN   TestAC5FailedSealRefusesTheWrite/seal_file_and_dir_direct
+--- PASS: TestAC5FailedSealRefusesTheWrite (0.00s)
+    --- PASS: TestAC5FailedSealRefusesTheWrite/exclusive_artifact (0.00s)
+    --- PASS: TestAC5FailedSealRefusesTheWrite/replacement_write (0.00s)
+    --- PASS: TestAC5FailedSealRefusesTheWrite/directory_chain (0.00s)
+    --- PASS: TestAC5FailedSealRefusesTheWrite/seal_file_and_dir_direct (0.00s)
+=== RUN   TestAC5FailureIsNotSwallowedByTheHappyPath
+--- PASS: TestAC5FailureIsNotSwallowedByTheHappyPath (0.00s)
+=== RUN   TestPOSIXPrivateFileIsReally0600
+--- PASS: TestPOSIXPrivateFileIsReally0600 (0.00s)
+=== RUN   TestPOSIXPrivateDirIsReally0700
+--- PASS: TestPOSIXPrivateDirIsReally0700 (0.00s)
+=== RUN   TestPOSIXSymlinkAtArtifactPositionIsNotRecursed
+--- PASS: TestPOSIXSymlinkAtArtifactPositionIsNotRecursed (0.00s)
+=== RUN   TestPOSIXMissingFileIsNotAnError
+--- PASS: TestPOSIXMissingFileIsNotAnError (0.00s)
+=== RUN   TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3
+    sealhandle_identity_120_other_test.go:44: AC#1' world: fd and name = two different objects; name kind=file mode=-rw-rw-rw-
+    sealhandle_identity_120_other_test.go:48: AC#1' name-carries-another-real-object: leg that spoke = sealHandle inline SameFile face (winsec_other.go:272)
+    sealhandle_identity_120_other_test.go:53: AC#1' read-back: name's object=-rw-------, caller's object=-rw-rw-rw-
+--- PASS: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3 (0.00s)
+=== RUN   TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3
+    sealhandle_identity_120_other_test.go:86: AC#1' name-becomes-a-sibling-link-after-the-pinned-seal: leg that spoke = sealHandle inline link face (winsec_other.go:269)
+    sealhandle_identity_120_other_test.go:91: AC#1' read-back: name kind=link, caller's object=-rw-------, witness=-rw-rw-rw-
+--- PASS: TestAC1POSIXSealHandleNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+=== RUN   TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3
+    sealhandle_identity_120_other_test.go:120: AC#1' world: the name carries a link at a relative sibling; the fd and the name hold the same object
+    sealhandle_identity_120_other_test.go:124: AC#1' pre-planted-link-is-answered-by-the-walk: leg that spoke = pinPlacement sameObjectPinned link face (winsec_other.go:188)
+--- PASS: TestAC1POSIXSealHandleNotReachedByAPrePlantedLink120r3 (0.00s)
+=== RUN   TestAC1POSIXSealHandlePlainObjectStillSeals120r3
+--- PASS: TestAC1POSIXSealHandlePlainObjectStillSeals120r3 (0.00s)
+=== RUN   TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3
+    sealhandle_privateroute_120_other_test.go:83: AC#1' private-file-route-name-carries-another-real-object: leg that spoke = sealHandle inline SameFile face (winsec_other.go:272)
+    sealhandle_privateroute_120_other_test.go:87: AC#1' tree after the refusal: 1 readable entries, none carrying the payload
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3 (0.00s)
+=== RUN   TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3
+    sealhandle_privateroute_120_other_test.go:110: AC#1' private-file-route-name-becomes-a-sibling-link: leg that spoke = sealHandle inline link face (winsec_other.go:269)
+    sealhandle_privateroute_120_other_test.go:122: AC#1' tree after the refusal: 1 readable entries, none carrying the payload
+--- PASS: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3 (0.00s)
+=== RUN   TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3
+    sealhandle_privateroute_120_other_test.go:203: AC#1' natural-window reading, denominator=2000, attempts classified by the leg that answered:
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   floor before the act (winsec_other.go platformVerifyPlacement) = 1794
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   other failure = 27
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   pinPlacement sameObjectPinned SameFile face (winsec_other.go:191) = 4
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   pinPlacement sameObjectPinned link face (winsec_other.go:188) = 166
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   returned nil: the flip missed every check = 4
+    sealhandle_privateroute_120_other_test.go:206: AC#1'   sealHandle inline SameFile face (winsec_other.go:272) = 5
+    sealhandle_privateroute_120_other_test.go:209: AC#1' natural-window reading, first other-failure verbatim: open /tmp/gt-v2winsec/TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r32648263291/001/caller-object-120r3.bin: too many levels of symbolic links
+    sealhandle_privateroute_120_other_test.go:225: AC#1' witness holds its own bytes after 2000 raced attempts: no open, seal or write reached it through a flipped link
+--- PASS: TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3 (0.16s)
+=== RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125
+=== RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/control_plain_temp
+    seam_probe_root_125_other_test.go:128: reading: TMPDIR="/tmp/gt-v2winsec/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1253980872158/001/real125/tmproot125" shapes=["/tmp/gt-v2winsec/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1253980872158/001/real125/tmproot125/../wisp-103-conformance-probe"]
+=== RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp
+    seam_probe_root_125_other_test.go:128: reading: TMPDIR="/tmp/gt-v2winsec/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1253980872158/001/varlink125/tmproot125" shapes=["/tmp/gt-v2winsec/TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot1253980872158/001/real125/tmproot125/../wisp-103-conformance-probe"]
+--- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125 (0.00s)
+    --- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/control_plain_temp (0.00s)
+    --- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp (0.00s)
+=== RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125
+=== RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/control_plain_temp
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=pass_through refused=true reason="it answered the hostile shape \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125/../wisp-103-conformance-probe\" by passing it through unchanged, which is the bypass this seam exists to close"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=constant refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125\" and \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with the same single spelling \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/002/constant-leaf\", i.e. it does not resolve the tree the caller named at all"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=tree_moving refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with \"/wisp125-foreign-tree/wisp-108-tree-ownership-probe\", which is neither inside the tree \"/wisp125-foreign-tree/tmproot125\" it answered for that path's own parent \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125\" nor inside the tree that answer names once the candidate is asked about it directly (\"/wisp125-foreign-tree/wisp125-foreign-tree\" for \"/wisp125-foreign-tree\"): the seam may not be used to move a seal into another tree"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=no_account refused=true reason="it cannot answer the tree-ownership question at all: without ResolveAccounted this package would have to seal whatever tree its answers name, which is ticket 103's R-103-1"
+    seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=answer_through_the_link refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125/../wisp-103-conformance-probe\" with \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/varlink125/tmproot125/../wisp-103-conformance-probe\", a spelling the built-in floor itself refuses: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/varlink125/tmproot125/../wisp-103-conformance-probe traverses \"..\""
+=== RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/measured_symlink_spelled_temp
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=pass_through refused=true reason="it answered the hostile shape \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125/../wisp-103-conformance-probe\" by passing it through unchanged, which is the bypass this seam exists to close"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=constant refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125\" and \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with the same single spelling \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/002/constant-leaf\", i.e. it does not resolve the tree the caller named at all"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=tree_moving refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with \"/wisp125-foreign-tree/wisp-108-tree-ownership-probe\", which is neither inside the tree \"/wisp125-foreign-tree/tmproot125\" it answered for that path's own parent \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125\" nor inside the tree that answer names once the candidate is asked about it directly (\"/wisp125-foreign-tree/wisp125-foreign-tree\" for \"/wisp125-foreign-tree\"): the seam may not be used to move a seal into another tree"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=no_account refused=true reason="it cannot answer the tree-ownership question at all: without ResolveAccounted this package would have to seal whatever tree its answers name, which is ticket 103's R-103-1"
+    seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=answer_through_the_link refused=true reason="it answered \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/real125/tmproot125/../wisp-103-conformance-probe\" with \"/tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/varlink125/tmproot125/../wisp-103-conformance-probe\", a spelling the built-in floor itself refuses: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251389093788/001/varlink125/tmproot125/../wisp-103-conformance-probe traverses \"..\""
+--- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125 (0.00s)
+    --- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/control_plain_temp (0.00s)
+    --- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/measured_symlink_spelled_temp (0.00s)
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_unresolved_root_still_refused_by_the_floor_itself
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp
+    seam_probe_root_125_other_test.go:293: reading: TMPDIR="/tmp/gt-v2winsec/TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125330649940/001/varlink125/tmproot125" shapes=["/tmp/gt-v2winsec/TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125330649940/001/real125/tmproot125/../wisp-103-conformance-probe"] refused=false reason=""
+=== RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_plain_temp
+--- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125 (0.00s)
+    --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_unresolved_root_still_refused_by_the_floor_itself (0.00s)
+    --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp (0.00s)
+    --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/control_plain_temp (0.00s)
+=== RUN   TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink
+    ancestor_separator_108_other_test.go:92: AC#2 RemoveUnlinked("/tmp/gt-v2winsec/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink1295654728/002/root/link/keep-me.txt") -> err=winsec: entry is a link to something else, not private data /tmp/gt-v2winsec/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink1295654728/002/root/link/keep-me.txt: the spelling reaches it through the link at /tmp/gt-v2winsec/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink1295654728/002/root/link, and whatever lives behind that link is not this tree's data to delete (link this case planted: "/tmp/gt-v2winsec/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink1295654728/002/root/link")
+--- PASS: TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink (0.00s)
+=== RUN   TestAC2POSIXDoesNotFoldABackslashIntoASeparator
+--- PASS: TestAC2POSIXDoesNotFoldABackslashIntoASeparator (0.00s)
+=== RUN   TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor
+    ancestor_separator_108_other_test.go:159: AC#2 RemoveUnlinked("/tmp/gt-v2winsec/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor2385222612/002/root/x\\y/keep-me.txt") -> err=winsec: entry is a link to something else, not private data /tmp/gt-v2winsec/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor2385222612/002/root/x\y/keep-me.txt: the spelling reaches it through the link at /tmp/gt-v2winsec/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor2385222612/002/root/x\y, and whatever lives behind that link is not this tree's data to delete (link this case planted: "/tmp/gt-v2winsec/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor2385222612/002/root/x\\y")
+--- PASS: TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor (0.00s)
+=== RUN   TestAC4POSIXFloorAnswersInsideTheNamedTree
+    ancestor_separator_108_other_test.go:209: parent-pointer spelling refused as: winsec: refusing to seal /tmp/gt-v2winsec/TestAC4POSIXFloorAnswersInsideTheNamedTree1088435431/001/data/../elsewhere: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC4POSIXFloorAnswersInsideTheNamedTree1088435431/001/data/../elsewhere traverses ".."
+--- PASS: TestAC4POSIXFloorAnswersInsideTheNamedTree (0.00s)
+=== RUN   TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119
+    dataroot_symlink_119_other_test.go:150: AC#1 TMPDIR=/tmp/gt-v2winsec/TestAC1POSIXSymlinkedTempDirRouteBecomesSealable1193590253020/001/varlink119/w119tmp (a link) -> proc.TestDataDir()=/tmp/gt-v2winsec/TestAC1POSIXSymlinkedTempDirRouteBecomesSealable1193590253020/001/varreal119/w119tmp/wisp-test-2255
+--- PASS: TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119 (0.00s)
+=== RUN   TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119
+    dataroot_symlink_119_other_test.go:189: AC#1 HOME=/tmp/gt-v2winsec/TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable1192287671065/001/homelink119/user (a link) -> prod data root=/tmp/gt-v2winsec/TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable1192287671065/001/homereal119/user/.config/wisp
+--- PASS: TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119 (0.00s)
+=== RUN   TestAC1POSIXUnresolvedSymlinkedRootStillRefused119
+    dataroot_symlink_119_other_test.go:238: AC#1 PrivateDirAll("/tmp/gt-v2winsec/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1191439545347/001/varlink119/data") -> winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1191439545347/001/varlink119/data: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1191439545347/001/varlink119/data reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1191439545347/001/varlink119, which is not the tree this call names
+--- PASS: TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 (0.00s)
+=== RUN   TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119
+    dataroot_symlink_119_other_test.go:288: AC#3 SealFile("/tmp/gt-v2winsec/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused1194122690932/001/data/out/keep-me.txt") -> winsec: refusing to seal /tmp/gt-v2winsec/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused1194122690932/001/data/out/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused1194122690932/001/data/out/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused1194122690932/001/data/out, which is not the tree this call names
+--- PASS: TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119 (0.00s)
+=== RUN   TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+    dataroot_symlink_119_other_test.go:358: AC#2 PrivateDirAll("/tmp/gt-v2winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119799263589/001/injlink119/harness/picked") -> winsec: refusing to seal /tmp/gt-v2winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119799263589/001/injlink119/harness/picked: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119799263589/001/injlink119/harness/picked reaches it through the link at /tmp/gt-v2winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119799263589/001/injlink119, which is not the tree this call names
+--- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.00s)
+=== RUN   TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed
+    placement_leaf_118_other_test.go:76: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed1168200851/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed1168200851/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_leaf_118_other_test.go:81: AC#1 SealFile("/tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed1168200851/002/root/artifact.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed1168200851/002/root/artifact.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed1168200851/002/root/artifact.txt reaches it through the link at /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed1168200851/002/root/artifact.txt, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed1168200851/002/root/artifact.txt")
+    placement_leaf_118_other_test.go:86: AC#6 SealFile on a leaf link: /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed1168200851/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_leaf_118_other_test.go:86: AC#6 SealFile on a leaf link: /tmp/gt-v2winsec/TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed1168200851/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed (0.00s)
+=== RUN   TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed
+    placement_leaf_118_other_test.go:97: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName297726082/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName297726082/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_leaf_118_other_test.go:107: AC#1 PrivateFile("/tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName297726082/002/root/artifact.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName297726082/002/root/artifact.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName297726082/002/root/artifact.txt reaches it through the link at /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName297726082/002/root/artifact.txt, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName297726082/002/root/artifact.txt")
+    placement_leaf_118_other_test.go:120: AC#6 PrivateFile on a leaf link: /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName297726082/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_leaf_118_other_test.go:120: AC#6 PrivateFile on a leaf link: /tmp/gt-v2winsec/TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasName297726082/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed (0.00s)
+=== RUN   TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone
+    placement_symlink_113_other_test.go:211: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre2410505939/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre2410505939/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:219: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre2410505939/002/root/link/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre2410505939/002/root/link/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre2410505939/002/root/link/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre2410505939/002/root/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre2410505939/002/root/link")
+    placement_symlink_113_other_test.go:221: AC#1 the foreign tree behind the link: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre2410505939/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:221: AC#1 the foreign tree behind the link: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre2410505939/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone (0.00s)
+=== RUN   TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth
+=== RUN   TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-1
+    placement_symlink_113_other_test.go:234: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2027357529/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2027357529/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:250: AC#1 depth 1: spelled=/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2027357529/002/root/link/keep-me.txt (pieces below root: 2)
+    placement_symlink_113_other_test.go:252: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2027357529/002/root/link/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2027357529/002/root/link/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2027357529/002/root/link/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2027357529/002/root/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2027357529/002/root/link")
+    placement_symlink_113_other_test.go:253: AC#1 depth 1: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2027357529/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:253: AC#1 depth 1: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep2027357529/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+=== RUN   TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-2
+    placement_symlink_113_other_test.go:234: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1609655485/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1609655485/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:250: AC#1 depth 2: spelled=/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1609655485/002/root/dir1/link/keep-me.txt (pieces below root: 3)
+    placement_symlink_113_other_test.go:252: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1609655485/002/root/dir1/link/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1609655485/002/root/dir1/link/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1609655485/002/root/dir1/link/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1609655485/002/root/dir1/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1609655485/002/root/dir1/link")
+    placement_symlink_113_other_test.go:253: AC#1 depth 2: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1609655485/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:253: AC#1 depth 2: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1609655485/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+=== RUN   TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-3
+    placement_symlink_113_other_test.go:234: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep760434641/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep760434641/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:250: AC#1 depth 3: spelled=/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep760434641/002/root/dir1/dir2/link/keep-me.txt (pieces below root: 4)
+    placement_symlink_113_other_test.go:252: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep760434641/002/root/dir1/dir2/link/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep760434641/002/root/dir1/dir2/link/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep760434641/002/root/dir1/dir2/link/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep760434641/002/root/dir1/dir2/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep760434641/002/root/dir1/dir2/link")
+    placement_symlink_113_other_test.go:253: AC#1 depth 3: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep760434641/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:253: AC#1 depth 3: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep760434641/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+=== RUN   TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-4
+    placement_symlink_113_other_test.go:234: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1899279206/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1899279206/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:250: AC#1 depth 4: spelled=/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1899279206/002/root/dir1/dir2/dir3/link/keep-me.txt (pieces below root: 5)
+    placement_symlink_113_other_test.go:252: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1899279206/002/root/dir1/dir2/dir3/link/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1899279206/002/root/dir1/dir2/dir3/link/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1899279206/002/root/dir1/dir2/dir3/link/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1899279206/002/root/dir1/dir2/dir3/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1899279206/002/root/dir1/dir2/dir3/link")
+    placement_symlink_113_other_test.go:253: AC#1 depth 4: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1899279206/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:253: AC#1 depth 4: /tmp/gt-v2winsec/TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepthlink-at-dep1899279206/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth (0.02s)
+    --- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-1 (0.00s)
+    --- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-2 (0.00s)
+    --- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-3 (0.00s)
+    --- PASS: TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/link-at-depth-4 (0.00s)
+=== RUN   TestAC1POSIXSealDirThroughASymlinkRefuses
+    placement_symlink_113_other_test.go:262: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3087780790/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3087780790/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:269: AC#1 SealDir("/tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3087780790/002/root/link") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3087780790/002/root/link: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3087780790/002/root/link reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3087780790/002/root/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3087780790/002/root/link")
+    placement_symlink_113_other_test.go:270: AC#1 the foreign directory behind the link: /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3087780790/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:270: AC#1 the foreign directory behind the link: /tmp/gt-v2winsec/TestAC1POSIXSealDirThroughASymlinkRefuses3087780790/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC1POSIXSealDirThroughASymlinkRefuses (0.00s)
+=== RUN   TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing
+    placement_symlink_113_other_test.go:278: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing2306619776/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing2306619776/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:286: AC#1 PrivateFile("/tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing2306619776/002/root/link/secret.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing2306619776/002/root/link/secret.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing2306619776/002/root/link/secret.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing2306619776/002/root/link, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing2306619776/002/root/link")
+    placement_symlink_113_other_test.go:288: AC#1 the foreign tree behind the link: /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing2306619776/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:288: AC#1 the foreign tree behind the link: /tmp/gt-v2winsec/TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing2306619776/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing (0.00s)
+=== RUN   TestAC1POSIXSealFileThroughABackslashNamedLink
+    placement_symlink_113_other_test.go:303: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink626461230/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink626461230/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:311: AC#1 SealFile("/tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink626461230/002/root/x\\y/keep-me.txt") -> err=winsec: refusing to seal /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink626461230/002/root/x\y/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink626461230/002/root/x\y/keep-me.txt reaches it through the link at /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink626461230/002/root/x\y, which is not the tree this call names (link this case planted: "/tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink626461230/002/root/x\\y")
+    placement_symlink_113_other_test.go:312: AC#2 the foreign tree behind a backslash-named link: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink626461230/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:312: AC#2 the foreign tree behind a backslash-named link: /tmp/gt-v2winsec/TestAC1POSIXSealFileThroughABackslashNamedLink626461230/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC1POSIXSealFileThroughABackslashNamedLink (0.00s)
+=== RUN   TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree
+    placement_symlink_113_other_test.go:332: AC#3 before: /tmp/gt-v2winsec/TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree3263670931/001/data/blob.bin = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:338: AC#3 after: /tmp/gt-v2winsec/TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree3263670931/001/data/blob.bin = mode=600 uid=0 gid=0
+--- PASS: TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree (0.00s)
+=== RUN   TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks
+    placement_symlink_113_other_test.go:354: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLink4280028346/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLink4280028346/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:393: AC#3 the foreign tree pointed at by a sibling link: /tmp/gt-v2winsec/TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLink4280028346/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:393: AC#3 the foreign tree pointed at by a sibling link: /tmp/gt-v2winsec/TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLink4280028346/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks (0.01s)
+=== RUN   TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator
+    placement_symlink_113_other_test.go:402: AC#1 foreign tree before: dir /tmp/gt-v2winsec/TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator3821495864/001/foreign = mode=777 uid=0 gid=0, victim /tmp/gt-v2winsec/TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator3821495864/001/foreign/keep-me.txt = mode=666 uid=0 gid=0
+    placement_symlink_113_other_test.go:425: AC#3 the symlink target that shares a prefix once a backslash is folded: /tmp/gt-v2winsec/TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator3821495864/001/foreign before=mode=777 uid=0 gid=0 after=mode=777 uid=0 gid=0
+    placement_symlink_113_other_test.go:425: AC#3 the symlink target that shares a prefix once a backslash is folded: /tmp/gt-v2winsec/TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator3821495864/001/foreign/keep-me.txt before=mode=666 uid=0 gid=0 after=mode=666 uid=0 gid=0
+--- PASS: TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator (0.00s)
+=== RUN   TestPOSIX120SealWindowLeafSwapIsClosed
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=249 of-which-refused-at-act=4 sealed-own-object=214 other=37
+    posix_seal_window_120_other_test.go:365: AC#1 sample 1/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowLeafSwapIsClosed2587156476/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=233 of-which-refused-at-act=5 sealed-own-object=224 other=43
+    posix_seal_window_120_other_test.go:365: AC#1 sample 2/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowLeafSwapIsClosed2587156476/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=234 of-which-refused-at-act=0 sealed-own-object=234 other=32
+    posix_seal_window_120_other_test.go:365: AC#1 sample 3/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowLeafSwapIsClosed2587156476/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=227 of-which-refused-at-act=2 sealed-own-object=236 other=37
+    posix_seal_window_120_other_test.go:365: AC#1 sample 4/4 shape=leaf-swap other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowLeafSwapIsClosed2587156476/001/root/blob.bin: openat blob.bin: path escapes from parent
+    posix_seal_window_120_other_test.go:370: AC#1 total shape=leaf-swap: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=943 of-which-refused-at-act=11 sealed-own-object=908 other=149
+    posix_seal_window_120_other_test.go:370: AC#1 shape=leaf-swap last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowLeafSwapIsClosed2587156476/001/root/blob.bin: openat blob.bin: path escapes from parent
+--- PASS: TestPOSIX120SealWindowLeafSwapIsClosed (0.22s)
+=== RUN   TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed
+    posix_seal_window_120_other_test.go:393: AC#1 sample 1/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=29 of-which-refused-at-act=1 sealed-own-object=29 other=442
+    posix_seal_window_120_other_test.go:393: AC#1 sample 1/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed1079341958/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 sample 2/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=38 of-which-refused-at-act=1 sealed-own-object=18 other=444
+    posix_seal_window_120_other_test.go:393: AC#1 sample 2/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed1079341958/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 sample 3/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=27 of-which-refused-at-act=2 sealed-own-object=25 other=448
+    posix_seal_window_120_other_test.go:393: AC#1 sample 3/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed1079341958/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 sample 4/4 shape=ancestor-swap-absolute-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=26 of-which-refused-at-act=0 sealed-own-object=23 other=451
+    posix_seal_window_120_other_test.go:393: AC#1 sample 4/4 shape=ancestor-swap-absolute-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed1079341958/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:393: AC#1 total shape=ancestor-swap-absolute-link: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=120 of-which-refused-at-act=4 sealed-own-object=95 other=1785
+    posix_seal_window_120_other_test.go:393: AC#1 shape=ancestor-swap-absolute-link last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed1079341958/001/root/data/sub/blob.bin: openat sub: no such file or directory
+--- PASS: TestPOSIX120SealWindowAncestorAbsoluteLinkIsClosed (0.36s)
+=== RUN   TestPOSIX120SealWindowAncestorRelativeLinkIsClosed
+    posix_seal_window_120_other_test.go:419: AC#1 sample 1/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=41 of-which-refused-at-act=3 sealed-own-object=34 other=425
+    posix_seal_window_120_other_test.go:419: AC#1 sample 1/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed92079751/001/root/data/sub/blob.bin: openat blob.bin: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 sample 2/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=32 of-which-refused-at-act=3 sealed-own-object=36 other=432
+    posix_seal_window_120_other_test.go:419: AC#1 sample 2/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed92079751/001/root/data/sub/blob.bin: openat blob.bin: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 sample 3/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=29 of-which-refused-at-act=5 sealed-own-object=42 other=429
+    posix_seal_window_120_other_test.go:419: AC#1 sample 3/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed92079751/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 sample 4/4 shape=ancestor-swap-relative-sibling-link: attempts=500 hit-foreign=0 of-which-reported-nil=0 refused-at-check=54 of-which-refused-at-act=6 sealed-own-object=41 other=405
+    posix_seal_window_120_other_test.go:419: AC#1 sample 4/4 shape=ancestor-swap-relative-sibling-link other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed92079751/001/root/data/sub/blob.bin: openat sub: no such file or directory
+    posix_seal_window_120_other_test.go:419: AC#1 total shape=ancestor-swap-relative-sibling-link: attempts=2000 hit-foreign=0 of-which-reported-nil=0 refused-at-check=156 of-which-refused-at-act=17 sealed-own-object=153 other=1691
+    posix_seal_window_120_other_test.go:419: AC#1 shape=ancestor-swap-relative-sibling-link last-seen other-shape example: winsec: cannot apply a private security descriptor: /tmp/gt-v2winsec/TestPOSIX120SealWindowAncestorRelativeLinkIsClosed92079751/001/root/data/sub/blob.bin: openat blob.bin: no such file or directory
+--- PASS: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed (0.41s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	4.504s
+go-test-rc=0

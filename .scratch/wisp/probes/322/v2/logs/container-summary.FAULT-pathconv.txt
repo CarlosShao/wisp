@@ -1,0 +1,14 @@
+### 322-v2 container started 2026-10-18 12:52:10 +0800 HEAD=b84dedd0b676ca5571dbcf2ad854660d7617c692
+TREE=D:/tmp/wisp/20261018/322v2/tree.v2A  MODCACHE=D:/work/base/gopath/pkg/mod
+GO-VERSION-IMAGE: go version go1.27.1 linux/amd64
+docker: Error response from daemon: the working directory 'D:/work/soft/Git/work' is invalid, it needs to be an absolute path
+
+Run 'docker run --help' for more information
+=== v2winsec host-rc=125
+  NO BODY at /d/tmp/wisp/20261018/322v2/tree.v2A/v2winsec.log 台面故障
+docker: Error response from daemon: the working directory 'D:/work/soft/Git/work' is invalid, it needs to be an absolute path
+
+Run 'docker run --help' for more information
+=== v2cons host-rc=125
+  NO BODY at /d/tmp/wisp/20261018/322v2/tree.v2A/v2cons.log 台面故障
+### done 2026-10-18 12:52:13 +0800

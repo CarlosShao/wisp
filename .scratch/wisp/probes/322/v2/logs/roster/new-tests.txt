@@ -1,0 +1,6 @@
+      2 TestDeletedLineRestorationIsNotClaimedAsAWrittenKey
+      2 TestFallbackBranchHasNoWorldOnThisPlatform336
+      2 TestHandDeletedMapEntryIsNotRestored
+      2 TestHandDeletedScalarLineComesBackAtSchemaDefault
+      2 TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent
+      2 TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent

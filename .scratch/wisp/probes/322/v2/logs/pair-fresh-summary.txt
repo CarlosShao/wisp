@@ -1,0 +1,12 @@
+### 322-v2 fresh pair 2026-10-18 13:06:47 +0800
+=== v2head host-rc=0
+RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0 fault: c0000135=0 buildfailed=0 noteststorun=0 setupfailed=0
+ok  	github.com/CarlosShao/wisp/internal/winsec	3.884s
+AC#1 paired reading on one screen: attempts=3000 flips=1382 flipErrs=0 damagedWitnesses=0 leafLegRefusals=17
+AC#1 paired reading on one screen: attempts=3000 flips=1348 flipErrs=0 damagedWitnesses=0 leafLegRefusals=14
+=== v2mine host-rc=0
+RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0 fault: c0000135=0 buildfailed=0 noteststorun=0 setupfailed=0
+ok  	github.com/CarlosShao/wisp/internal/winsec	4.196s
+AC#1 paired reading on one screen: attempts=3000 flips=1736 flipErrs=0 damagedWitnesses=0 leafLegRefusals=42
+AC#1 paired reading on one screen: attempts=3000 flips=1856 flipErrs=0 damagedWitnesses=0 leafLegRefusals=56
+### done 2026-10-18 13:07:02 +0800

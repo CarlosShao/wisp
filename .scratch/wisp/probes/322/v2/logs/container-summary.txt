@@ -1,0 +1,22 @@
+### 322-v2 container started 2026-10-18 12:54:28 +0800 HEAD=b4844295ec8a93594824356f80f081fd74e4c66d
+TREE=D:/tmp/wisp/20261018/322v2/tree.v2A  MODCACHE=D:/work/base/gopath/pkg/mod
+GO-VERSION-IMAGE: go version go1.27.1 linux/amd64
+=== v2winsec host-rc=0
+RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0c0000135=0 buildfailed=0 noteststorun=0 setupfailed=0ok  	github.com/CarlosShao/wisp/internal/winsec	4.504s
+AC#1 paired reading on one screen: attempts=3000 flips=1994 flipErrs=0 damagedWitnesses=0 leafLegRefusals=59
+AC#1 paired reading on one screen: attempts=3000 flips=1678 flipErrs=0 damagedWitnesses=0 leafLegRefusals=52
+go-test-rc=0
+=== v2cons host-rc=1
+RUN=1172 PASS_TOP=714 FAIL_TOP=6 SKIP=6c0000135=0 buildfailed=0 noteststorun=0 setupfailed=0FAIL	github.com/CarlosShao/wisp/internal/risk	9.355s
+ok  	github.com/CarlosShao/wisp/internal/secret	0.031s
+ok  	github.com/CarlosShao/wisp/internal/config	1.811s
+ok  	github.com/CarlosShao/wisp/internal/agent	4.872s
+ok  	github.com/CarlosShao/wisp/internal/memory	26.698s
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.04s)
+--- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.02s)
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (2.50s)
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.02s)
+--- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.01s)
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (2.10s)
+go-test-rc=1
+### done 2026-10-18 12:56:38 +0800
