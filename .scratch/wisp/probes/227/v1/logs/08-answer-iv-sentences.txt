@@ -1,0 +1,59 @@
+227-v1 必答(iv) 探针读数（三句日志字面串今天是否说实话＝我自己造的一枚探针量出来的，⛔ 抄腿）
+
+探针形状＝一枚**恒绿**的 t.Logf 只读探针（⛔ 新增判据、⛔ 改任何断言），
+  只打在仓外导出树 treeB 的物理字节上，跑完当场从树里移出（移出＝改名挪到仓外 logs 侧，⛔ rm），
+  移出后复验 writeguard.go pristine sha256＝efe12661e71b940f…逐字回原 ⇄ 整包复跑 RUN=190 PASS_TOP=109 FAIL_TOP=0 SKIP=0。
+  ★⛔ 入库成 .go：本件是 .txt（`.go` 命中必须 0）。探针源码逐字＝logs/09-probe-dump-source.txt
+
+[句子清单（逐字，载体＝交件 writeguard.go 现量行号）]
+ ① :152-155（nothing-written 支，slog.Info，实参 "key", ownedKey）
+   "config: config.toml already carries this key; this write added nothing (the file's bytes and mtime
+    stayed put only because its schema_version was already current; a file behind on schema_version
+    had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order
+    are not preserved)"
+ ② :172-175（无分叉那支，slog.Info）尾部追加 "; a key line the operator deleted by hand comes back
+    at its schema default value)"
+ ③ :184-189（有分叉那支，slog.Warn）尾部追加 "; a key line the operator deleted by hand comes back
+    at its schema default value"
+
+[PROBE-A＝P4 世界（删 map 条目 [llm.providers.deepseek] ⇒ 走③那支）]
+  providers-restored=false ／ sentence3-kept-branch-printed=true ／ sentence3-delete-claim-printed=true
+  file-still-mentions-deepseek=false ／ file-has-base_url-line=true
+ ⇒ ③ 的**主句**（"只列出的键变了值、其余保持文件已有值、文件被重排成 canonical、注释与自选键序不保"）
+   在这一发上＝**说实话**（重排与丢注释都是事实；b2 P4 台件同向）。
+ ⇒ ③ 追加的那半句在这一发上是**过度认领**：这一世界删的正是 map 条目，而它**没被补回**（providers-restored=false）；
+   文件里出现的 base_url 行是**另一枚键回落到默认 ''**（b2 P4 逐字如此）。
+   ⇒ 该半句读成"本程序的语义＝删一行回落默认"＝真；读成"你删的那一行这次回来了"＝在这一发上假。
+
+[PROBE-B＝P1 世界（删非默认标量行 size = 60 # my size ⇒ 走③那支）]
+  size-line-back=true（size = 56 回到文件）／ comment-gone=true ／ sentence3-delete-claim-printed=true
+ ⇒ ③ 的追加半句在这一发＝**完全说实话**：删的行回来了、回来的值是 schema 默认、注释丢了、日志把这三件都说清。
+   且这条正是票面 AC#1③ 逐字要求的那句"用户看得见的文案要说清'删一行＝回落默认'是本程序的语义"＝**在场、非源码注释**。
+
+[PROBE-C＝P5′ 世界（schema 落后⇄文件已带该键 ⇒ 走①那支）]
+  sentence1-printed=true ／ sentence1-stays-put-clause-printed=true
+  bytes-or-mtime-actually-moved=true ／ comment-survived=false
+ ⇒ ① 的后半句（"a file behind on schema_version had already been re-laid … comments … not preserved"）
+   在这一发＝**说实话**（文件确实被迁移-on-读重排、注释确实没了）。
+ ⇒ ① 的**前半句**在这一发＝**残缺一处**：它把 "the file's bytes and mtime stayed put" 当既成事实说出来，
+   而这一发的量是 moved=true。整句虽是"只在 schema 已是当前版时才 stay put"的条件式写法，
+   前半句本身没有条件词 ⇒ 在 schema 落后那一发上，日志仍然（错误地）断言了"字节与 mtime 没动"。
+   ★修法仍在甲的射程内＝只动字面串（把前半句改成"if the bytes and mtime did not move here, that is only
+   because…"那形），⛔ 分支⛔ 条件⛔ 等级⛔ 实参；本腿⛔ 实现（裁决者≠实现者），具名交回编排者。
+
+[PROBE-D＝P2 世界（删"值本就是默认"的标量行 size = 56 ⇒ 走②那支）]  ★补量，⛔ 推理
+  sentence2-info-branch-printed=true ／ sentence3-warn-branch-printed=false
+  sentence-delete-claim-printed=true ／ size-line-back-in-file=true ／ memory-still-56=true
+  kept-in-file-not-in-memory-present=false
+  ⇒ ② 的追加半句在这一发＝**说实话**：删的那行确实回来、回来的值＝schema 默认 56（内存也 56＝看不出差别，
+    这正是票面把 P2 单列一格、归票 341 的道理）。
+  ⇒ ★本腿在此更正自己第一版写的一句（"② 这一支⛔ 由删行触发"＝⛔ 实测被推翻）：
+    ② 会被删行形状走到（删的行不影响分叉时），且那句在那一发上为真。
+
+[本腿裁（逐句）]
+ ① ＝**部分说实话**：比交件前的 "nothing written" 已经**收窄到接近真实**（承认 schema 落后那一支会被重排、注释不保），
+    但前半句仍无条件断言 stayed put，在 P5′ 那一发上是假的 ⇒ 具名残留缺陷一枚。
+ ② ＝**说实话**（PROBE-D 那一发删行⇒走②、行回来、值＝默认；票面 AC#1③ 要的那句人话在这一支也在场）。
+ ③ ＝**说实话**（就票面要的那句语义而言），但在 P4 那一发上有"过度认领"的歧义 ⇒ 具名残留缺陷一枚（⛔ 判级/⛔ 行为面）
+ 三句合判＝票面"让文案说实话"这一条**达成方向正确、达成程度未到底**（两处残留都是字面串活，⛔ 退腿：
+   红/牙/还原/名册四类硬判据全部独立复现；这两处⛔ 在票 227 六格里任何一格的判据文本上被要求过）。
