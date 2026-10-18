@@ -1,0 +1,140 @@
+227-v1 探针源码逐字存档（⛔ 判据件：恒绿 t.Logf 只出读数；只打在仓外导出树 treeB 上，跑完当场移出，⛔ 入库成 .go ⇒ 本件＝.txt）
+
+探针 A/B/C＝probe A（P4 map 删除世界）／B（P1 非默认标量删除世界）／C（P5′ schema 落后世界）
+探针 D＝P2 默认值标量删除世界（量②那支会不会被删行形状走到）
+探针 E＝把 P4 世界落盘后的文件正文整段打出来
+
+读数见 08-answer-iv-sentences.txt ⇄ logs/probe-branch-readings.log ⇄ logs/probe-D-p2world.log ⇄ logs/probe-E-p4body.log
+（三份 .log 在仓外 D:\tmp\wisp\20261018\227v1\v1\logs\，本件把探针源码入库＝读数可复跑）
+
+---------- probe A/B/C ----------
+---------- probe A/B/C（源＝/d/tmp/wisp/20261018/227v1/v1/probe-v1-dump.txt）----------
+package config
+
+// 227-v1 终裁腿专用探针：⛔ 入库、⛔ 是判据，只打在仓外导出树的物理字节上。
+// 目的＝量"那三句日志字面串在它们各自被打印的那一发上是否说实话"。
+// 断言一律是 t.Log（恒绿）⇒ 本件不新增判据，只出读数。
+
+import (
+	"strings"
+	"testing"
+)
+
+// 世界 A＝P4（删 map 条目，本腿实测不补回）⇒ 走的是 diverged 那支＝句子③打印。
+func TestV1ProbeLogInMapDeleteWorld(t *testing.T) {
+	logs := captureSlog(t)
+	start := matrixBase + `
+[llm]
+[llm.providers.deepseek]
+base_url = "https://api.deepseek.com/v1"
+`
+	m, path, mutate := newTestManager(t, start)
+	noTable := strings.Replace(start,
+		"\n[llm]\n[llm.providers.deepseek]\nbase_url = \"https://api.deepseek.com/v1\"\n", "\n", 1)
+	mutate(noTable)
+	if err := m.AddAllowedDir(testDir); err != nil {
+		t.Fatalf("AddAllowedDir: %v", err)
+	}
+	got := readLoaded(t, path)
+	_, restored := got.LLM.Providers["deepseek"]
+	text := logs.String()
+	t.Logf("PROBE-A providers-restored=%v", restored)
+	t.Logf("PROBE-A sentence3-kept-branch-printed=%v", strings.Contains(text, "kept hand edits this process does not hold"))
+	t.Logf("PROBE-A sentence3-delete-claim-printed=%v",
+		strings.Contains(text, "a key line the operator deleted by hand comes back at its schema default value"))
+	t.Logf("PROBE-A file-still-mentions-deepseek=%v", strings.Contains(readText(t, path), "deepseek"))
+	t.Logf("PROBE-A file-has-base_url-line=%v", strings.Contains(readText(t, path), "base_url"))
+}
+
+// 世界 B＝P1（删非默认标量行）⇒ 同样走 diverged 支＝句子③打印，且这一次它说的是实话。
+func TestV1ProbeLogInScalarDeleteWorld(t *testing.T) {
+	logs := captureSlog(t)
+	start := strings.Replace(matrixBase, "size = 56", "size = 60  # my size", 1)
+	m, path, mutate := newTestManager(t, start)
+	mutate(strings.Replace(start, "size = 60  # my size\n", "", 1))
+	if err := m.AddAllowedDir(testDir); err != nil {
+		t.Fatalf("AddAllowedDir: %v", err)
+	}
+	text := logs.String()
+	body := readText(t, path)
+	t.Logf("PROBE-B size-line-back=%v", strings.Contains(body, "size = 56"))
+	t.Logf("PROBE-B comment-gone=%v", !strings.Contains(body, "my size"))
+	t.Logf("PROBE-B sentence3-delete-claim-printed=%v",
+		strings.Contains(text, "a key line the operator deleted by hand comes back at its schema default value"))
+}
+
+// 世界 C＝句子①在 schema 落后那一支上到底有没有被打印（而那一世界文件字节确实被迁移改了）。
+func TestV1ProbeLogInStaleSchemaWorld(t *testing.T) {
+	logs := captureSlog(t)
+	hand := strings.Replace(matrixBase,
+		"allowed_dirs = []", `allowed_dirs = ["D:\\data"]  # hand set`, 1)
+	noVersion := strings.Replace(hand, "schema_version = 2\n", "", 1)
+	m, path, mutate := newTestManager(t, matrixBase)
+	mutate(noVersion)
+	before := readText(t, path)
+	mb := statMod(t, path)
+	if err := m.AddAllowedDir(testDir); err != nil {
+		t.Fatalf("AddAllowedDir: %v", err)
+	}
+	text := logs.String()
+	moved := readText(t, path) != before || !statMod(t, path).Equal(mb)
+	t.Logf("PROBE-C sentence1-printed=%v", strings.Contains(text, "already carries this key"))
+	t.Logf("PROBE-C sentence1-stays-put-clause-printed=%v",
+		strings.Contains(text, "the file's bytes and mtime stayed put only because"))
+	t.Logf("PROBE-C bytes-or-mtime-actually-moved=%v", moved)
+	t.Logf("PROBE-C comment-survived=%v", strings.Contains(readText(t, path), "hand set"))
+}
+---------- probe D（源＝/d/tmp/wisp/20261018/227v1/v1/probe-v1-dumpD.txt）----------
+package config
+
+// 227-v1 探针 D（⛔ 入库、⛔ 判据）：量 P2 世界（删值本就是默认的标量行）走哪一支、
+// 句子②（Info 支那句）会不会被打印、以及那一行回没回来。恒绿 t.Logf，只出读数。
+
+import (
+	"strings"
+	"testing"
+)
+
+func TestV1ProbeLogInDefaultScalarDeleteWorld(t *testing.T) {
+	logs := captureSlog(t)
+	m, path, mutate := newTestManager(t, matrixBase)
+	mutate(strings.Replace(matrixBase, "size = 56\n", "", 1))
+	if err := m.AddAllowedDir(testDir); err != nil {
+		t.Fatalf("AddAllowedDir: %v", err)
+	}
+	text := logs.String()
+	body := readText(t, path)
+	t.Logf("PROBE-D sentence2-info-branch-printed=%v", strings.Contains(text, "wrote merged change into config.toml (ticket 226: only the keys listed"))
+	t.Logf("PROBE-D sentence3-warn-branch-printed=%v", strings.Contains(text, "kept hand edits this process does not hold"))
+	t.Logf("PROBE-D sentence-delete-claim-printed=%v", strings.Contains(text, "a key line the operator deleted by hand comes back at its schema default value"))
+	t.Logf("PROBE-D size-line-back-in-file=%v", strings.Contains(body, "size = 56"))
+	t.Logf("PROBE-D memory-still-56=%v", m.Config().Ball.Size == 56)
+	t.Logf("PROBE-D kept-in-file-not-in-memory-present=%v", strings.Contains(text, "kept_in_file_not_in_memory"))
+}
+---------- probe E（源＝/d/tmp/wisp/20261018/227v1/v1/probe-v1-dumpE.txt）----------
+package config
+
+// 227-v1 探针 E（⛔ 入库、⛔ 判据）：把 P4 世界（删 map 条目）落盘后的文件正文整段打出来，
+// 量"③ 那句在 P4 那一发上到底对不对"——恒绿 t.Logf，只出读数。
+
+import (
+	"strings"
+	"testing"
+)
+
+func TestV1ProbeFileBodyInMapDeleteWorld(t *testing.T) {
+	start := matrixBase + `
+[llm]
+[llm.providers.deepseek]
+base_url = "https://api.deepseek.com/v1"
+`
+	m, path, mutate := newTestManager(t, start)
+	noTable := strings.Replace(start,
+		"\n[llm]\n[llm.providers.deepseek]\nbase_url = \"https://api.deepseek.com/v1\"\n", "\n", 1)
+	mutate(noTable)
+	if err := m.AddAllowedDir(testDir); err != nil {
+		t.Fatalf("AddAllowedDir: %v", err)
+	}
+	t.Logf("PROBE-E-BODY-BEGIN\n%s\nPROBE-E-BODY-END", readText(t, path))
+	t.Logf("PROBE-E-START-BEGIN\n%s\nPROBE-E-START-END", start)
+}
