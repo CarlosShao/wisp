@@ -1,0 +1,63 @@
+===== [A] HEAD blob（仓外 LF 形）gofmt -l ⇄ gofumpt -l 对照 =====
+internal/tools/task_output_pointer_notice_errtext_174r7_test.go | gofmt_l_rows=1 | gofumpt_l_rows=1
+cmd/wisp/panel_transport_35r2_test.go | gofmt_l_rows=0 | gofumpt_l_rows=1
+===== [B] panel 枚 gofumpt -w 幂等性：连跑三发逐发哈希（起点＝工作树字节，工作树是 LF） =====
+w1 sha=726b761f75c1a8f5 gofumpt_l_rows=1 gofmt_l_rows=0 bytes=73494
+w2 sha=17d4f3a36ba3451d gofumpt_l_rows=0 gofmt_l_rows=0 bytes=73497
+w3 sha=17d4f3a36ba3451d gofumpt_l_rows=0 gofmt_l_rows=0 bytes=73497
+--- 第三发之后 gofumpt -d 全文（＝仍不收敛的那部分） ---
+gofumpt_d_rc=0
+===== [C] panel 枚：非空白尺逐字输出（blob 起点 ⇄ 一发 -w） =====
+--- diff <(tr -d " \t" < before) <(tr -d " \t" < after) ---
+403,405c403,406
+< typejsIdentstruct{namestring}
+< typejsLitstruct{vjsValue}
+< typejsMemberstruct{
+---
+> type(
+> jsIdentstruct{namestring}
+> jsLitstruct{vjsValue}
+> jsMemberstruct{
+409,410c410,413
+< typejsIndexstruct{obj,indexjsNode}
+< typejsCallNodestruct{
+---
+> )
+> type(
+> jsIndexstruct{obj,indexjsNode}
+> jsCallNodestruct{
+414a418
+> )
+424,426c428,431
+< typejsAssignNodestruct{target,valuejsNode}
+< typejsPostIncstruct{targetjsNode}
+< typejsFuncExprstruct{
+---
+> type(
+> jsAssignNodestruct{target,valuejsNode}
+> jsPostIncstruct{targetjsNode}
+> jsFuncExprstruct{
+429a435
+> )
+701,702c707,710
+< varjsPuncts=[]string{"===","!==","=>","==","!=","&&","||","++",
+< "(",")","{","}","[","]",";",",",".","=","!","+","-",":"}
+---
+> varjsPuncts=[]string{
+> "===","!==","=>","==","!=","&&","||","++",
+> "(",")","{","}","[","]",";",",",".","=","!","+","-",":",
+> }
+812a821
+> 
+816a826
+> 
+823a834
+> 
+RULER_RC=1
+nonblank_bytes before=62106 after=62104
+===== [D] panel 枚：手工版最小改动（只把注释列对齐）是否足够 =====
+0
+gofmt_l_on_blob=0 rows=0
+===== [E] tools 枚：同一把尺（对照，必须空输出＋收敛） =====
+RULER_RC=0 gofumpt_l_after=0
+second_w_identical=YES

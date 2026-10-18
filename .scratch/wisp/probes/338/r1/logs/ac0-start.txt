@@ -1,0 +1,60 @@
+HEAD=631a04ba
+===== [0] env at start =====
+GOTMPDIR=[unset] TMPDIR=[unset]
+===== [1] 工作树名册：gofumpt -l internal cmd =====
+cmd/wisp/models.go
+cmd/wisp/panel_transport_35r2_test.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/config/writeguard_handedit_227_test.go
+internal/risk/provenance.go
+internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+rows_worktree=7 rc=0
+===== [2] 同名册按跟踪集过滤（CI 的分母＝跟踪件） =====
+cmd/wisp/models.go
+cmd/wisp/panel_transport_35r2_test.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+rows_tracked=6
+internal/config/writeguard_handedit_227_test.go  <== UNTRACKED(不在分母)
+===== [3] 逐枚 blob 定性：git show HEAD:<f> -> 仓外文件 -> gofumpt -l =====
+tr: warning: an unescaped backslash at end of string is not portable
+cmd/wisp/models.go | bytes=13879 | crlf_lines=0 | gofumpt_l_rows=0 | BLOB_CLEAN_fake_dirty
+tr: warning: an unescaped backslash at end of string is not portable
+cmd/wisp/panel_transport_35r2_test.go | bytes=73470 | crlf_lines=0 | gofumpt_l_rows=1 | BLOB_DIRTY_real_dirty
+tr: warning: an unescaped backslash at end of string is not portable
+internal/agent/approval/pending_read.go | bytes=6235 | crlf_lines=0 | gofumpt_l_rows=0 | BLOB_CLEAN_fake_dirty
+tr: warning: an unescaped backslash at end of string is not portable
+internal/agent/tools.go | bytes=7356 | crlf_lines=0 | gofumpt_l_rows=0 | BLOB_CLEAN_fake_dirty
+tr: warning: an unescaped backslash at end of string is not portable
+internal/risk/provenance.go | bytes=46608 | crlf_lines=0 | gofumpt_l_rows=0 | BLOB_CLEAN_fake_dirty
+tr: warning: an unescaped backslash at end of string is not portable
+internal/tools/task_output_pointer_notice_errtext_174r7_test.go | bytes=5914 | crlf_lines=0 | gofumpt_l_rows=1 | BLOB_DIRTY_real_dirty
+===== [4] 两枚目标：仓外副本 gofumpt -w 后跑非空白尺（⛔ 不碰工作树） =====
+tr: warning: an unescaped backslash at end of string is not portable
+--- internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+    rc_w=0 before_bytes=5914 after_bytes=5838
+    nonblank_bytes before=4966 after=4966
+    gofumpt_l_after_rows=0 crlf_lines_after=0
+    RULER(diff <(tr -d ' \t' <before>) <(tr -d ' \t' <after>)):
+    RULER_RC=0 EMPTY_OUTPUT=YES  <-- 纯空白改动，放行
+    numstat_shape: added=5 removed=5
+tr: warning: an unescaped backslash at end of string is not portable
+--- cmd/wisp/panel_transport_35r2_test.go
+    rc_w=0 before_bytes=73470 after_bytes=73494
+    nonblank_bytes before=62106 after=62104
+    gofumpt_l_after_rows=1 crlf_lines_after=0
+    RULER(diff <(tr -d ' \t' <before>) <(tr -d ' \t' <after>)):
+    RULER_RC=1 EMPTY_OUTPUT=NO  <-- 非空白字节变了（本腿禁区）
+    numstat_shape: added=31 removed=20
+===== [5] 另四枚 CRLF 件：逐字节自证未动（hash of HEAD blob vs worktree content） =====
+tr: warning: an unescaped backslash at end of string is not portable
+internal/agent/approval/pending_read.go | blob_sha1=5a69d90230a24e0a040fbd064600be2f95d030a8 | wt_lf_normalized_sha1=5a69d90230a24e0a040fbd064600be2f95d030a8 | match=YES | raw_wt_sha1=683284937231bb4e5da8d2266e84ccae401fecfa
+tr: warning: an unescaped backslash at end of string is not portable
+internal/agent/tools.go | blob_sha1=b67e06aa44f904465460c702ee768f1655594dda | wt_lf_normalized_sha1=b67e06aa44f904465460c702ee768f1655594dda | match=YES | raw_wt_sha1=38d2bd5706f5bde4d4b4a3142123f87d1ab7039c
+tr: warning: an unescaped backslash at end of string is not portable
+internal/risk/provenance.go | blob_sha1=fa365bf91dee581ead14db017b0fc6cb19d06fcf | wt_lf_normalized_sha1=fa365bf91dee581ead14db017b0fc6cb19d06fcf | match=YES | raw_wt_sha1=3452f253882ac521a99c18e0589979989f5ba513
+tr: warning: an unescaped backslash at end of string is not portable
+cmd/wisp/models.go | blob_sha1=9218526b6696bfd7fa50510b1f08ab8fa5803536 | wt_lf_normalized_sha1=9218526b6696bfd7fa50510b1f08ab8fa5803536 | match=YES | raw_wt_sha1=baf5ae68e43f5ac2e11569e12b8c483eb2cee778
