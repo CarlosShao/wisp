@@ -1,6 +1,10 @@
-### 336-r1 交件侧三把尺（2026-10-18 12:08:39 +0800）
-head_now=0b1d1f0b74084ad5cf92bc56205759345d56dcab 2026-10-18T12:06:57+08:00
+### 336-r1 交件侧三把尺（2026-10-18 12:17:06 +0800）
+head_now=bb2471687f71f5466eec060d4906ea55b42c773e 2026-10-18T12:14:13+08:00
 ## 尺①提交真在（严格前缀名册＋逐笔 name-only 枚数）
+  bb247168 files=1
+  985929d0 files=2
+  3c535952 files=1
+  14121a91 files=2
   ae8040a1 files=1
   28da3a7e files=7
   90dafe77 files=20
@@ -10,8 +14,12 @@ head_now=0b1d1f0b74084ad5cf92bc56205759345d56dcab 2026-10-18T12:06:57+08:00
   c55e32b1 files=1
   f67048d9 files=8
   ff56a9e0 files=1
-  count=9
+  count=13
 ## 尺②件真在：写面越界普查（逐笔 ⊆ internal/risk/*_test.go ∪ probes/336/r1 ∪ 票 336）
+  bb247168 out_of_scope=0
+  985929d0 out_of_scope=0
+  3c535952 out_of_scope=0
+  14121a91 out_of_scope=0
   ae8040a1 out_of_scope=0
   28da3a7e out_of_scope=0
   90dafe77 out_of_scope=0
@@ -23,6 +31,10 @@ head_now=0b1d1f0b74084ad5cf92bc56205759345d56dcab 2026-10-18T12:06:57+08:00
   ff56a9e0 out_of_scope=0
   .go 非测试命中总数=0
 ## 尺③自己复跑：blacklist.go 逐枚提交 blob（期望全＝c1799cd2…＝起手同串）
+  bb247168 c1799cd24afce19e6accef23db23a7d7ee746dec
+  985929d0 c1799cd24afce19e6accef23db23a7d7ee746dec
+  3c535952 c1799cd24afce19e6accef23db23a7d7ee746dec
+  14121a91 c1799cd24afce19e6accef23db23a7d7ee746dec
   ae8040a1 c1799cd24afce19e6accef23db23a7d7ee746dec
   28da3a7e c1799cd24afce19e6accef23db23a7d7ee746dec
   90dafe77 c1799cd24afce19e6accef23db23a7d7ee746dec
@@ -48,5 +60,5 @@ head_now=0b1d1f0b74084ad5cf92bc56205759345d56dcab 2026-10-18T12:06:57+08:00
   /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/336/r1/report.md bytes=13313 lines=113
   /d/work/workspace/projects plans/Wisp/internal/risk/anchor_fallback_teeth_336_windows_test.go bytes=7839 lines=160
   /d/work/workspace/projects plans/Wisp/internal/risk/anchor_fallback_teeth_336_other_test.go bytes=4108 lines=92
-  logs 枚数=69 非 0 字节枚数=64
+  logs 枚数=80 非 0 字节枚数=74
 selfcheck_rc=0

@@ -1,0 +1,13 @@
+### 交件锚一发确认红（tree-final＝bb247168 导出字节；摘 MU-1h 那一枚 :237）
+  hash_before=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec
+/usr/bin/bash: line 5: microsoft: command not found
+/usr/bin/bash: line 5: credentials: command not found
+/usr/bin/bash: line 5: microsoft: command not found
+/usr/bin/bash: line 5: credentials: command not found
+  落点命中=0
+  rc=0 RUN=17 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  还原哈希=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES
+  还原后复跑：
+  rc=0 RUN=17 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  末态哈希=c1799cd24afce19e6accef23db23a7d7ee746dec
+confirm_rc=0

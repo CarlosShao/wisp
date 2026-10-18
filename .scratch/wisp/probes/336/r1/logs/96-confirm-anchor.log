@@ -1,0 +1,21 @@
+### 交件锚确认发 anchor=bb247168 tree=/d/tmp/wisp/20261018/336r1/tree-final pristine=c1799cd24afce19e6accef23db23a7d7ee746dec
+  ① 起手哈希=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES
+  teeth_on_tree=a429cdae29723adfa99de95f0f98cc52ac0fdf08
+  ① pristine 读数（成对正控＝必绿）:
+  rc=0 RUN=27 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+  落点逐字:
+    237c237
+    < 	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
+    ---
+    > 	case localAppDataS != "" && anchorMatches(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`)), isUnder):
+  ② 落点命中枚数=1（期望 1）hash=5f8789548f624e12ba2527c016f0f9b040c36e3a
+  ② 摘 MU-1h 那一枚的读数（⇒必红）:
+  rc=1 RUN=27 PASS_TOP=3 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials 
+  ③ 还原哈希=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES
+  ③ 还原后复跑（必回绿）:
+  rc=0 RUN=27 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+  末态哈希=c1799cd24afce19e6accef23db23a7d7ee746dec
+  共享树 internal/cmd 脏行=1
+confirm_anchor_rc=0
