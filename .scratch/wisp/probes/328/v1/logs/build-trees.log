@@ -1,0 +1,9 @@
+GOTMPDIR=D:\tmp\328v1-gotmp exists=yes
+TREE D:/work/workspace/w328v1b anchor=648eda04 go_files=758
+  docsPLAN=yes
+  dll=3/3 dist=yes
+  gitblob=35ce6ffb8603172e3c1143c56a0cb165cac12e32 ondiskblob=35ce6ffb8603172e3c1143c56a0cb165cac12e32
+TREE D:/work/workspace/w328v1a anchor=78d3b46a go_files=760
+  docsPLAN=yes
+  dll=3/3 dist=yes
+  gitblob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb ondiskblob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb

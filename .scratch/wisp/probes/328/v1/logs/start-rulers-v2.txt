@@ -1,0 +1,82 @@
+date=2026-10-18 10:13:06 +0800 leg=328-v1 (非实现者终裁腿·第二程)
+
+## 0. ★落点改判（机主 2026-10-18 10:1x 亲口新铁律＝盘符根目录零污染，覆盖派单台面配方两行；lead 10:1x 转达，我已回执）
+本腿新建仓外导出树只落 D:\tmp\wisp\20261018\328v1\{before,after}；GOTMPDIR 同根下 gotmp。
+⛔ 复用/⛔ 删除：wisp-328r1-before-tree、wisp-328r1-after-tree（上一程落地腿旧形）、w328v1a、w328v1b（第一程我这条腿建在别处的两棵）——一律只读不动。
+  untouched_old_tree D:/work/workspace/wisp-328r1-before-tree exists=yes
+  untouched_old_tree D:/work/workspace/wisp-328r1-after-tree exists=yes
+  untouched_old_tree D:/work/workspace/w328v1a exists=yes
+  untouched_old_tree D:/work/workspace/w328v1b exists=yes
+  new_base=D:\tmp\wisp\20261018 存在（机主既有工作根，非我新建）
+
+## 1. 起手锚（现跑）
+ed8ff551b32f7e6e353c2f1180e004dc64299c59 2026-10-18 10:05:35 +0800 第一波放出笔：6 腿全部真启动（spawn 回执 running）＋-send 六枚入库｜328-v1 第二次发出＝存档 62 行原样重放｜形状＝总 6≤8、写 3≥3、cmd-wisp/panel 零写腿、cmd/wisp 唯一持跑者＝228-r3c｜推送仍按住
+branch=dev
+★派单里那枚 d175e483 与第一程的 78d3b46a 都已被后续盖过 ⇒ 我的锚＝上面这枚（编排者补的那句 c11163c8 现跑对上）。
+c59d0354_is_ancestor=YES
+46d815d9_is_ancestor=YES
+f705b082_is_ancestor=YES
+648eda04_is_ancestor=YES
+
+## 2. 框数尺（尺＝派单指定的那条 grep，射程＝票 328 一枚文件，量的）
+31:- [x] **AC#0 现量普查（⛔ 没名册不许进实现）**…
+32:- [x] **AC#1 选一形并写清代价**（三形起评，⛔ …
+33:- [ ] **AC#2 ★正控必须有**：造一发**用生产真�…
+34:- [ ] **AC#3 判定与批准语义不许动**：本票只修*…
+35:- [ ] **AC#4 门禁四数＋颜色**：`gofumpt`／`tools/d22…
+50:- [2026-10-17 11:5x +08] **编排者裁形＝丙-带边界**�…
+59:- [2026-10-17 15:1x +08] **`328-r1` 交件（料⛔ 判语：…
+boxes_total=7
+boxes_unchecked=3
+boxes_checked=2
+⇒ 盘上现量＝五枚框（AC#0…AC#4），未勾 3＝AC#2/AC#3/AC#4，已勾 2＝AC#0/AC#1（裁形那轮编排者翻的）。派单那句"五枚"成立；腿那句"七格"作废。
+
+## 3. 共享编译面 status 尺（本波写面互斥的入场复核）
+$ git status --porcelain -- internal/panel cmd/wisp
+  输出枚数=0 rc=0
+⇒ 空＝internal/panel 与 cmd/wisp 起手零在飞字节（编排者派单那句"零写腿"在我这侧对盘上成立）。
+
+## 4. 代码代表性尺（我要裁的是盘上今天这份字节）
+$ git diff --name-only f705b082..HEAD -- internal/panel internal/agent
+diff_lines=0
+⇒ 0 行：落地腿交件侧 f705b082 的那两包字节 == 我的锚（编排者 10-18 10:0x 现跑的 78d3b46a..HEAD=0 我入场重验同读数）。after 侧树以我的锚取即代腿的字节。
+$ git diff --name-only 648eda04..HEAD -- internal（改前⇄改后的归属尺）
+internal/agent/corr_roster_join_328_test.go
+internal/panel/subagent_blocked_220_test.go
+internal/panel/subagent_corr_task_prefix_328_test.go
+internal/panel/subagent_roster_197.go
+⇒ 那 648eda04..HEAD 之间 internal 面只有腿自己四枚文件 ⇒ 成对两把临时根台面的差异＝本票那一改，无别腿字节混进来。
+
+## 5. 落地腿提交尺（严格前缀，派单说 11 笔）
+$ git log --all --grep='^328-r1 ' --oneline | wc -l
+11
+  e9d8ba94 328-r1 件②自纠一笔（追加新 commit⛔ amend）：收尾那节补真·…
+  46d815d9 328-r1 收尾读数入库：越格自查（九枚提交 name-only 去重＝写�…
+  d166e9f8 328-r1 临时件补入库（票尾正文与件②的 commit 正文两枚，只�…
+  0adb7775 328-r1 票尾一条（只追加⛔ 翻框⛔ 改判据⛔ Status⛔ 票名⛔ -…
+  a3fedd42 328-r1 证据件②：台面／颜色成对／门禁四数／AC#3 四面 diff 0…
+  1f5a6137 328-r1 证据件：落地件①（形状／四形实测／去牙／剩下的零…
+  54b63780 328-r1 读数入库（logs/）：两棵仓外台面树／颜色成对四数／�…
+  f705b082 328-r1 仪器③（AC#2 正控＝经真铸造点）：关联号从真 loop 派�…
+  ffebb6d1 328-r1 仪器②（名册侧四形实测）：四形逐枚点亮、approval-<se…
+  1696d01b 328-r1 仪器①（票 220 那族名册）：child-1#retry 翻成 true 是买�…
+  b2d55342 328-r1 产码（丙-带边界）：名册把关联号剥出的任务半段按"�…
+
+## 6. 台面件可用性正控（先证存在再信任何 0 读数）
+design_dir=present
+gofumpt_real=5028352 字节
+docs_plan_shared=present
+scripts_d22scan=present scripts_lenbudget=present
+⇒ 门禁四数那把 gofumpt 真身与 d22scan 射程的 design/ 都在；凡红句含 walk/build failed/no test files/setup failed/0xc0000135 ⇒ 判台面故障，不计入判据。
+
+## 7. ★具名上报（复认第一程 c59d0354 那处，我自己现跑，⛔ 抄它）
+$ git show 46d815d9:.scratch/wisp/probes/328/r1/logs/mutate.sh | grep -n -A2 "M1)"
+30:  M1) # 抹掉分隔符那一半 ⇒ 纯前缀匹配
+31-    sed -i 's/strings.HasPrefix(key, task+"#")/strings.HasPrefix(key, task)/' "$F"
+32-    grep -n 'strings.HasPrefix(key, task' "$F" >> "$LOG"
+33-    ( cd "$TREE" && go test -v ./internal/panel/ -count=1 -timeout 30m \
+$ 派单 AC#2③ 要我补的那一发（逐字）：strings.HasPrefix(key, task+"#") → strings.HasPrefix(key, task)
+⇒ 盘上腿 M1 的替换串与派单点名要我补的那一发逐字节同形（同一枚函数体内 token、同一枚去处）。
+   ⇒ 我仍自己现跑这一发（完成通知一律当未验证；腿的日志不是我的读数），判语按我的读数写。
+   ⇒ 对编排者的具名发现：派单把这一发描述成"腿没发的反形"与盘上不符；⛔ 据此退腿那一发（腿件①第三节发一确实打了 :142 那一枚）。
+   ⇒ 派单真正的判据我照打：第三臂单独敏感性（去边界＝纯前缀）必须让 :142 child-1x 红，这一发的读数只有我自己跑出来才算。
