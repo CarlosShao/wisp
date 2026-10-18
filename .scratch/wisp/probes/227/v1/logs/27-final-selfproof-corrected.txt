@@ -1,0 +1,43 @@
+== [cross-check of the roster] listed (six hashes recorded at commit time) vs derived (path key) ==
+  listed  173796c4  appearsInDerived=1
+  listed  a13c87fa  appearsInDerived=1
+  listed  88338d6a  appearsInDerived=1
+  listed  bc4a3fbb  appearsInDerived=1
+  listed  65558bb1  appearsInDerived=1
+  listed  761681de  appearsInDerived=1
+  derived count = 6
+  derived-but-not-listed (a miss would mean my listed roster is incomplete):
+  listed-but-not-derived (would mean a listed commit touched ⛔ my own unique paths):
+
+== [per-commit verification: ancestry, author, subject] ==
+  173796c4  CarlosShao 16:00  anc=yes  票 227 终裁腿 227-v1·起手三把尺与读料�
+  a13c87fa  CarlosShao 16:01  anc=yes  票 227 终裁腿 227-v1·读料与 AC#3 独立名�
+  88338d6a  CarlosShao 16:02  anc=yes  票 227 终裁腿 227-v1·AC#1/AC#2 色尺与决定�
+  bc4a3fbb  CarlosShao 16:03  anc=yes  票 227 终裁腿 227-v1·AC#4/AC#5/AC#6 读数＋�
+  65558bb1  CarlosShao 16:19  anc=yes  票 227 终裁腿 227-v1·判语定稿＋票尾一�
+  761681de  CarlosShao 16:20  anc=yes  票 227 终裁腿 227-v1·交件自证收尾（台�
+  count = 6 (cap 4-8)
+
+== [union paths over MY six commits] = 90 枚 ==
+  .go hits (want 0) = 0
+  outside the three allowed write surfaces (want 0) = 0
+  [any outside hits, listed]:
+   (none)
+  [per-commit outside count]:
+   173796c4 outside=0
+   a13c87fa outside=0
+   88338d6a outside=0
+   bc4a3fbb outside=0
+   65558bb1 outside=0
+   761681de outside=0
+  [positive control A] out-of-scope ruler with the allowed set narrowed to internal/config/ only, over 227-r1's 8 commits = 15 (want 15 => 尺能开火)
+  [positive control B] .go ruler over 227-r1's union = 2 (want 2)
+
+== [ticket gauge] AC-unchecked=6 AC-checked=0 my-v1-bullet=1 leg-r1-bullet=1 ==
+== [verdict] lines=36 bytes=17732 (cap 130 lines) ==
+== [slot ruler] verdict=0 (want 0) | posctrl HANDOVER=5 (want >0) | negctrl=0 (want 0)
+== [zero-byte census over MY six commits' files] zero=0 (want 0)
+   tracked files under my probes dir = 96, of which MINE = 88
+   NOTE: that tracked set also holds the DUPLICATE leg's 00-*..07-* (it committed those itself: d1da6386..b578fa71) = ⛔ mine, ⛔ touched by me.
+   kept OUT (named, 只建不删): logs/tree-ledger.txt 5,233,854 B (whole-ledger mirror of another party's file; cited section = 14-a1033-extract.txt 9,400 B)
+   kept OUT, never committed (foreign in-flight): logs/00-start-anchors.txt 01-table-and-pristine.txt 02-ac2-decisive-shot.txt 08-answer-iv-sentences.txt

@@ -1,0 +1,106 @@
+== [roster, path-based] commits touching MY unique files (⛔ subject-prefix ruler: 12 hits = 4 mine + 8 the duplicate leg)
+65558bb1 16:19 票 227 终裁腿 227-v1·判语定稿＋票尾一条 bullet＋未定义即停四枚�
+bc4a3fbb 16:03 票 227 终裁腿 227-v1·AC#4/AC#5/AC#6 读数＋门禁四数入库
+88338d6a 16:02 票 227 终裁腿 227-v1·AC#1/AC#2 色尺与决定性那一发（自己重打）入�
+173796c4 16:00 票 227 终裁腿 227-v1·起手三把尺与读料入库＝全部自己现跑（⛔ �
+32a70e2f 12:25 票 227 落地腿 227-r1·票尾一条 bullet（只追加、⛔ 翻框、⛔ 改票�
+fac60ad4 17:47 ledger(A444 收 223-v2：票 223 翻 5 留 2＋A445 收 done-check-1：6 枚翻勾／
+c774f8da 16:20 ledger(A439 一次收三枚交件)＋票 228 方向由我裁死＝走甲（撤销口�
+7ffa9520 14:30 A437 票 226 终裁（六格：AC#1/2/3/4/6 勾、两格带硬注；AC#5 按字面不
+  count = 8
+
+== [out-of-scope ruler, corrected form] union of paths over my commits ==
+   .scratch/wisp/issues/132-log-files-are-never-sealed-sealdirdir-has-zero-production-callers.md
+   .scratch/wisp/issues/201-nobody-can-answer-an-approval-l1-runs-by-itself-l2-dies-on-timeout.md
+   .scratch/wisp/issues/223-checkandreload-has-zero-production-callers-hot-reload-never-runs.md
+   .scratch/wisp/issues/226-always-answer-rewrites-the-whole-config-snapshot-and-hides-hand-edits.md
+   .scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md
+   .scratch/wisp/issues/228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md
+   .scratch/wisp/issues/229-subagent-spawns-an-unregistered-goroutine-name-and-drowns-the-leak-alarm.md
+   .scratch/wisp/issues/230-four-cells-left-unfinished-inside-closed-tickets.md
+   .scratch/wisp/issues/231-a-config-written-by-a-newer-build-is-reported-to-the-operator-as-a-validation-failure.md
+   .scratch/wisp/issues/232-the-restart-tier-test-pins-that-the-sentence-exists-not-that-it-carries-the-why.md
+   .scratch/wisp/issues/233-d36-three-tier-enum-is-tagged-on-no-key-and-the-reload-tier-has-neither-producer-nor-consumer.md
+   .scratch/wisp/probes/201/c2/census.md
+   .scratch/wisp/probes/223/v1/orchestrator-recheck.txt
+   .scratch/wisp/probes/226/v2/orchestrator-full-suite.log
+   .scratch/wisp/probes/226/v2/rerun1-unconditional-adopt.txt
+   .scratch/wisp/probes/227/v1/logs/00-start-gauges.txt
+   .scratch/wisp/probes/227/v1/logs/01-base-config-head.txt
+   .scratch/wisp/probes/227/v1/logs/01-base-config.txt
+   .scratch/wisp/probes/227/v1/logs/01-deliv-config-head.txt
+   .scratch/wisp/probes/227/v1/logs/01-deliv-config.txt
+   .scratch/wisp/probes/227/v1/logs/03-mu1-full.txt
+   .scratch/wisp/probes/227/v1/logs/03-mu1.txt
+   .scratch/wisp/probes/227/v1/logs/04-mu2-full.txt
+   .scratch/wisp/probes/227/v1/logs/04-mu2.txt
+   .scratch/wisp/probes/227/v1/logs/05-mu2b-full.txt
+   .scratch/wisp/probes/227/v1/logs/05-mu2b.txt
+   .scratch/wisp/probes/227/v1/logs/07-ac6-readings.txt
+   .scratch/wisp/probes/227/v1/logs/08-ac6-fix-and-iv-gauges.txt
+   .scratch/wisp/probes/227/v1/logs/09-mua-full.txt
+   .scratch/wisp/probes/227/v1/logs/09-mua.txt
+   .scratch/wisp/probes/227/v1/logs/09-mub-full.txt
+   .scratch/wisp/probes/227/v1/logs/09-mub.txt
+   .scratch/wisp/probes/227/v1/logs/10-gates-final.txt
+   .scratch/wisp/probes/227/v1/logs/11-probe-iv-branch-truth.txt
+   .scratch/wisp/probes/227/v1/logs/12-ac5-internal-all.txt
+   .scratch/wisp/probes/227/v1/logs/13-one-line-gap.txt
+   .scratch/wisp/probes/227/v1/logs/16-ac5-internal-base.txt
+   .scratch/wisp/probes/227/v1/logs/16-base-failnames.txt
+   .scratch/wisp/probes/227/v1/logs/16-deliv-failnames.txt
+   .scratch/wisp/probes/227/v1/logs/17-ac5-contention-remeasure.txt
+   .scratch/wisp/probes/227/v1/logs/17-pkg-base.txt
+   .scratch/wisp/probes/227/v1/logs/17-pkg-deliv.txt
+   .scratch/wisp/probes/227/v1/logs/17-quiet-base-1.txt
+   .scratch/wisp/probes/227/v1/logs/17-quiet-base-2.txt
+   .scratch/wisp/probes/227/v1/logs/17-quiet-base-3.txt
+   .scratch/wisp/probes/227/v1/logs/17-quiet-deliv-1.txt
+   .scratch/wisp/probes/227/v1/logs/17-quiet-deliv-2.txt
+   .scratch/wisp/probes/227/v1/logs/17-quiet-deliv-3.txt
+   .scratch/wisp/probes/227/v1/logs/20-ac5-red-attribution.txt
+   .scratch/wisp/probes/227/v1/logs/21-unattributed-file.log
+   .scratch/wisp/probes/227/v1/logs/22-parallel-writer-same-legname.log
+   .scratch/wisp/probes/227/v1/logs/23-ticket-bullet-append.txt
+   .scratch/wisp/probes/227/v1/logs/24-blocked-duplicate-leg-name.log
+   .scratch/wisp/probes/227/v1/logs/25-foreign-inflight-increment.log
+   .scratch/wisp/probes/227/v1/scripts/msg-m5.txt
+   .scratch/wisp/probes/227/v1/scripts/probe-227v1_test.go.txt
+   .scratch/wisp/probes/227/v1/scripts/run1-deliv-base.sh
+   .scratch/wisp/probes/227/v1/scripts/run10-probe.sh
+   .scratch/wisp/probes/227/v1/scripts/run11-ac5.sh
+   .scratch/wisp/probes/227/v1/scripts/run12-gap.sh
+   .scratch/wisp/probes/227/v1/scripts/run17-ac5-base.sh
+   .scratch/wisp/probes/227/v1/scripts/run18-quiet.sh
+   .scratch/wisp/probes/227/v1/scripts/run20-final.sh
+   .scratch/wisp/probes/227/v1/scripts/run21-attrib.sh
+   .scratch/wisp/probes/227/v1/scripts/run3-mu1.sh
+   .scratch/wisp/probes/227/v1/scripts/run4-mu2.sh
+   .scratch/wisp/probes/227/v1/scripts/run5-mu2b.sh
+   .scratch/wisp/probes/227/v1/scripts/run6-ac6.sh
+   .scratch/wisp/probes/227/v1/scripts/run7-fixiv.sh
+   .scratch/wisp/probes/227/v1/scripts/run8-mua-mub.sh
+   .scratch/wisp/probes/227/v1/scripts/run9-gates.sh
+   docs/evidence/s1/226-config-write-no-clobber-r1.md
+   docs/evidence/s1/227-v1-verdict.md
+   docs/reports/HANDOVER.md
+   docs/reports/missing-features-2026-09-29-v4.md
+   docs/reports/pending-and-issues.md
+  paths = 76
+  .go hits (want 0) = 0
+  outside three write surfaces (want 0) = 18
+  [positive control] same .go ruler over 227-r1's prefix roster = 2 (want 2 => 尺⛔ 空转)
+
+== [verdict] 36 lines / 17732 bytes (cap 130) ==
+== [slot ruler, bracket form] verdict hits = 0 (want 0)
+   [posctrl] HANDOVER.md = 5 (want >0)
+   [negctrl] '[Z][Z][Z]absent' = 0 (want 0)
+
+== [ticket gauge] AC-unchecked=6 AC-checked=0 ; my-v1-bullets=1 (want 1); leg-r1-bullets=1 (want 1) ==
+
+== [zero-byte census over my write surface] files=103 zero-byte=0 (want 0) ==
+   kept OUT (named in logs + verdict): logs/tree-ledger.txt = 5233854 bytes (whole-ledger mirror of another party's file; the cited section is 14-a1033-extract.txt)
+   kept OUT (never committed, foreign in-flight bytes): logs/00-start-anchors.txt 01-table-and-pristine.txt 02-ac2-decisive-shot.txt 08-answer-iv-sentences.txt  <- those four are the DUPLICATE leg's (it committed its own copies itself: d1da6386..b578fa71)
+
+== [absolute paths] verdict = /d/work/workspace/projects plans/Wisp/docs/evidence/s1/227-v1-verdict.md
+   probes dir = /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/227/v1
