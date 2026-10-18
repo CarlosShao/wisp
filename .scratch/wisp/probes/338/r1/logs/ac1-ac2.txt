@@ -1,0 +1,91 @@
+HEAD_at_start=0b1d1f0b
+===== [0] 起手：两枚目标相对 HEAD 无本地脏（否则归位会把别腿字节卷进来） =====
+status_rows=0
+GOTMPDIR=[unset] TMPDIR=[unset]
+===== [1] 改前名册（同台面，逐名） =====
+cmd/wisp/models.go
+cmd/wisp/panel_transport_35r2_test.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+pre_rows_total=6
+cmd/wisp/models.go
+cmd/wisp/panel_transport_35r2_test.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+pre_rows_tracked=6
+===== [2] 改前字节留档＋哈希（仓外） =====
+tools_before_sha=0b01a9442a63ceb2da902be891e87228b1e55f6f05a0fccbd1fb3945f1a61e1e bytes=5914
+panel_before_sha=df5f4a9fe179fd5b6a98616db149a128c2a5d8fcb424c237de275916c5221eec bytes=73470
+crlf4|internal/agent/approval/pending_read.go|wt_sha=ff26e84cbaf1663e2d5440a62b187e4f1e485cee1a4000f199f0fea7dd9d946f|head_lf_sha=da323606f756951b068295a9d2d9436579fd8091cd320c635603a582bde9026b
+crlf4|internal/agent/tools.go|wt_sha=14b2c067a21f713a54bad84857883a1520c7dccc3e3d0d9cde163e926405b0d9|head_lf_sha=68244de808421045d82d6d060c04807d7636e6d5200a999ecb4cc8ed03088796
+crlf4|internal/risk/provenance.go|wt_sha=958364fa9775ab7a84256c4d56cec143b1d078f0c25a1ddfec858574552f6c53|head_lf_sha=a870b5f1a46bb4c9e602f771806934d1ca734a0026ef50e0e3e782faac162612
+crlf4|cmd/wisp/models.go|wt_sha=ad839c103367554e081b72be859112ae0396e9451810279942e52cce8ad42f99|head_lf_sha=18e70fa8b1511dad17080a6f8595e8ba957c64cade3c58908049114248a04469
+===== [3] 唯一写操作：gofumpt -w 只打这一枚字面路径 =====
+rc_w=0
+===== [4] ★非空白零变化尺（改前⇄改后逐字，必须空输出） =====
+RULER_RC=0
+RULER_BYTES=0 RULER_ROWS=0
+--- ruler 逐字输出（应为空） ---
+--- 逐字结束 ---
+nonblank_bytes before=4966 after=4966
+===== [5] 逐枚 gofumpt -l 复量（目标枚必须 0 行）＋幂等二发 =====
+tools_l_rows=0
+panel_l_rows=1
+idempotent_second_w=YES
+===== [6] git 面自证：numstat / eol / diff 形状 =====
+5	5	internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+panel_numstat_rows=0 (必须 0＝一字未动)
+--- ls-files --eol 交件侧 ---
+i/lf    w/lf    attr/text eol=lf      	cmd/wisp/panel_transport_35r2_test.go
+i/lf    w/lf    attr/text eol=lf      	internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+--- 新字节 CR 计数（必须 0） ---
+tools_CR_lines=0
+--- 改后逐字 diff（只此一枚） ---
+diff --git a/internal/tools/task_output_pointer_notice_errtext_174r7_test.go b/internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+index cb40ecde..13fea5ea 100644
+--- a/internal/tools/task_output_pointer_notice_errtext_174r7_test.go
++++ b/internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+@@ -100,12 +100,12 @@ func TestCanonicalizeErrorNoticeRelaysNoUpstreamErrorText174r7(t *testing.T) {
+ 	// wrapper (risk.PathResolver, an fs wrapper) is caught by class, not by one
+ 	// copy of today's string.
+ 	for _, banned := range []string{
+-		canonicalizeFailsHere,                          // the filed literal, as filed
+-		fmt.Sprintf("%q", canonicalizeFailsHere),       // ...or in its quoted spelling
+-		rootA, rootB,                                   // the authorized root list, entry by entry
++		canonicalizeFailsHere,                    // the filed literal, as filed
++		fmt.Sprintf("%q", canonicalizeFailsHere), // ...or in its quoted spelling
++		rootA, rootB,                             // the authorized root list, entry by entry
+ 		strings.ToLower(rootA), strings.ToLower(rootB), // ...as the comparison fold spells it
+-		upstream,                                       // C26's own error text, verbatim
+-		"tools:", "risk:",                              // ...and the packages' error prefixes
++		upstream,          // C26's own error text, verbatim
++		"tools:", "risk:", // ...and the packages' error prefixes
+ 	} {
+ 		if strings.Contains(notice, banned) {
+ 			t.Errorf("the canonicalize-error notice must not relay %q: notice %q", banned, notice)
+===== [7] 改后名册（同台面，逐名）＋作差 =====
+cmd/wisp/models.go
+cmd/wisp/panel_transport_35r2_test.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+post_rows_total=5
+cmd/wisp/models.go
+cmd/wisp/panel_transport_35r2_test.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+post_rows_tracked=5
+--- 作差：改前有改后无（＝被归位） ---
+internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+--- 作差：改后有改前无（＝多动的，必须空） ---
+===== [8] CRLF 四枚：写操作后复量（一字未动的尺） =====
+crlf4|internal/agent/approval/pending_read.go|wt_sha=ff26e84cbaf1663e2d5440a62b187e4f1e485cee1a4000f199f0fea7dd9d946f
+crlf4|internal/agent/tools.go|wt_sha=14b2c067a21f713a54bad84857883a1520c7dccc3e3d0d9cde163e926405b0d9
+crlf4|internal/risk/provenance.go|wt_sha=958364fa9775ab7a84256c4d56cec143b1d078f0c25a1ddfec858574552f6c53
+crlf4|cmd/wisp/models.go|wt_sha=ad839c103367554e081b72be859112ae0396e9451810279942e52cce8ad42f99
+--- git status（四枚相对 HEAD 的形状必须与改前同一） ---

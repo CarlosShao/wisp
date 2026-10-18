@@ -100,12 +100,12 @@ func TestCanonicalizeErrorNoticeRelaysNoUpstreamErrorText174r7(t *testing.T) {
 	// wrapper (risk.PathResolver, an fs wrapper) is caught by class, not by one
 	// copy of today's string.
 	for _, banned := range []string{
-		canonicalizeFailsHere,                          // the filed literal, as filed
-		fmt.Sprintf("%q", canonicalizeFailsHere),       // ...or in its quoted spelling
-		rootA, rootB,                                   // the authorized root list, entry by entry
+		canonicalizeFailsHere,                    // the filed literal, as filed
+		fmt.Sprintf("%q", canonicalizeFailsHere), // ...or in its quoted spelling
+		rootA, rootB,                             // the authorized root list, entry by entry
 		strings.ToLower(rootA), strings.ToLower(rootB), // ...as the comparison fold spells it
-		upstream,                                       // C26's own error text, verbatim
-		"tools:", "risk:",                              // ...and the packages' error prefixes
+		upstream,          // C26's own error text, verbatim
+		"tools:", "risk:", // ...and the packages' error prefixes
 	} {
 		if strings.Contains(notice, banned) {
 			t.Errorf("the canonicalize-error notice must not relay %q: notice %q", banned, notice)
