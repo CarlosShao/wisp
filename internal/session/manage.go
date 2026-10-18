@@ -46,6 +46,21 @@ type ManageStore interface {
 	ListSessionTurns(ctx context.Context, sessionID string) ([]memory.SessionTurn, error)
 }
 
+// ManageAssemblyGuard is the compile-time proof that the host shape assembles:
+// the value a production root gets from memory.Open is a concrete *memory.Store
+// (cmd/wisp/run.go:463 today), and this line asserts it satisfies ManageStore
+// with NO adapter — so the one production line ticket 166 AC#2 still waits for,
+//
+//	session.NewManager(session.ManagerOptions{Store: mem})
+//
+// compiles the moment the shared compile surface (cmd/wisp) gets its own wave.
+// It lives in production code, not a test, because 166-v1's ruling is that
+// "tests green + functions complete" is NOT wiring (生产调用者 0/0/0/0/0): only
+// a byte that the compiler enforces on every build belongs on the assembly
+// axis. If *memory.Store ever drifts from ManageStore, this is the line that
+// fails the build before any host can be written against the drift.
+var _ ManageStore = (*memory.Store)(nil)
+
 // Manager is the session-management outlet set. Every method is safe for
 // concurrent use: the rows are the state and SQLite owns them.
 type Manager struct {
