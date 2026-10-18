@@ -1,0 +1,32 @@
+=== AC#4 name-only roster gauge, per commit (own files only) ===
+---- b72d7391 ----
+commit=b72d739112628e3830d3adec420a383dc9044d5a subject=票 227 落地腿 227-r1·AC#1③＋AC#2甲·三句日志字面串说实话（⛔ 任何逻辑分支/条件/签名/diverged 算法）
+
+internal/config/writeguard.go
+8	3	internal/config/writeguard.go
+---- 3b8c114e ----
+commit=3b8c114e9aa1b680fe83cef31588b0d0418feebc subject=票 227 落地腿 227-r1·AC#1＋AC#2·删行形状与"什么都不写"射程边界的常驻用例（internal/config 测试面）
+
+internal/config/writeguard_handedit_227_test.go
+227	0	internal/config/writeguard_handedit_227_test.go
+---- dd0e489d ----
+commit=dd0e489dc1fbad135a8b0992b7653425d7f014b5 subject=票 227 落地腿 227-r1·AC#1＋AC#2＋AC#4·定稿用例件（编排者收回 ≤160 行帽对 *_test.go 的适用，注释复原＋补一枚 AC#4 守卫）
+
+internal/config/writeguard_handedit_227_test.go
+52	84	internal/config/writeguard_handedit_227_test.go
+--- per-commit bytes outside internal/config/** (this leg's 3 code commits) ---
+b72d7391 outside-internal-config = 0 []
+3b8c114e outside-internal-config = 0 []
+dd0e489d outside-internal-config = 0 []
+--- cumulative range diff vs anchor feac8f77 (leg commits only) ---
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
+internal/config/writeguard.go
+internal/config/writeguard_handedit_227_test.go
+rc=0
+
+--- NOTE (reading this gauge right) ---
+AC#4's roster gauge is the PER-COMMIT measure above: each of this leg's three code commits
+touches 0 paths outside internal/config/**. The cumulative range diff below is NOT this leg's
+roster: feac8f77..dd0e489d also contains OTHER legs' interleaved commits (322-r2/336-r1), whose
+bytes appear there and belong to them, not to 227-r1.
