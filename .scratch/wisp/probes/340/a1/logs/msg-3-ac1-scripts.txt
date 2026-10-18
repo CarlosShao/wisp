@@ -1,0 +1,22 @@
+票 340 普查腿 340-a1·AC#1·台件＝三形代价表的现量尺两枚（ac1.sh／ac1b.sh，只读，⛔ 动 .go）
+
+ac1.sh（逐字重跑＝sh .scratch/wisp/probes/340/a1/scripts/ac1.sh）射程＝具名树 feac8f77：
+1 既存跨包装配先例（tools 测试包名册＝53 in-package／3 external；同 import agent＋approval＋tools 的测试逐枚点名；该先例三枚装配入口全是导出名 agent.New/approval.New/tools.New）；
+2 这条链上 CorrelationID 的搬运工逐枚 file:line（loop.go:676 → bridge.go:383 → gate.go:507 push）＋L1⇄L2 边界（gate.go:252 不走 push／:502 走 push）；
+3 叠改触发条件（Gate.Replay:755 ⇄ Queue.replay:598 ⇄ #replay:614）＋撞名判定 :167 逐字；
+4 丙形的形状先例＝包内测试读自己源文件（tools 的 os.ReadFile("task.go")，⛔ 整段摘录别人件字节）；
+5 禁名词表那族的射程＝只扫 internal/panel 且 goSourceFiles 排除 _test.go ⇒ 三形新增件落 agent／approval／panel 测试面＝射程外（量的）＋routeShapedName 认"点分段"＋两枚词表逐字＋七枚候选名撞词根＝全 0（算的）；
+6 丙形两枚去牙落点候选（queue.go:168 ⇄ :616）＋名册侧两枚臂（roster:308/:312）；
+7 AC#5 前置料＝三包测试/产码枚数分母（agent 24 测 13 产、approval 22 测 10 产、panel 29 测 17 产，⛔ 跑）；
+8 本腿写面自检（逐笔 git show --name-only，.go 命中＝0）。
+
+ac1b.sh（逐字重跑＝sh .scratch/wisp/probes/340/a1/scripts/ac1b.sh）＝★交集硬尺＋决定性价表原料：
+1 交集尺＝同一枚测试文件里既有真铸造侧调用形（callCorr(/agent.New(/h.run(/loop.Run(）又有真队列侧调用形（q.push(/.PendingApproval(/Queue().LiveApprovals()/gate.Replay(/approval.New(）⇒ 交集响 1 枚＝internal/tools/loop_approval_test.go（正控＝队列侧名册 12 枚逐名，⛔ 空交集被读成"尺没响"）；
+2 甲形盘上现状＝approval 包名册逐枚（21 枚：12 枚 package approval ⇄ 9 枚 approval_test）＋直呼 q.push( 的测试逐枚点名（pending_read_test／ticket242_binding／ticket259，全 in-package ⇒ 队列半侧零新导出名）＋agent 侧 23 枚全 in-package、callCorr 已被测试直呼（corr_roster_join_328:116/:152/:157、ticket285_corr_distinct:51-60）；
+3 全导出名的端到端通路逐扇（Gate.PendingApproval:502／Gate.Replay:755／Gate.Queue:169／Queue.LiveApprovals:113＋:125 读出口／bridge 搬运 :383/:1206／AdmitTextTask:194／panel.TaskRosterSectionFrom:196）；
+4 push 撞名支完整字节（:154-184）＋callCorr 两臂格式串（loop.go:603-608，含 `%s#call-%d`）；
+5 臂承重名册原料＝两枚名册全部带 # 表项逐枚（220 六枚／328 八枚）＋直投形 11 枚＋数字臂判据字节（roster:333-344）；
+6 丙形有没有牙的原料＝approval 测试里带 # 的 corr 字面串断言＝0 命中（正控＝同尺族 internal/panel 测试档 20 行）＋符号化读 it.Corr 断言 39 枚＋既存 replay 那一发的断言形（queue_test:283/:290＝比"不等"、不比字面串）；
+7 AC#4 去牙落点候选具名（queue.go:167/:168/:614/:616 ⇄ roster:312，⛔ 同一枚断言行两处落点）。
+
+纪律：零 .go 字节／零新导出名／⛔ go test／go build／⛔ 翻框／⛔ push；件内零分节符、CR＝0。所有颜色句一律标"读码推的"。
