@@ -1,0 +1,56 @@
+227-v1 AC#1 牙＋五枚用例复量（我自己现跑，⛔ 抄腿）
+
+[尺 A] 五枚逐名，台树＝treeA（bcf90e06 仓外导出，未突变）
+  --- PASS: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.03s)
+  --- PASS: TestHandDeletedMapEntryIsNotRestored (0.02s)
+  --- PASS: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+  --- PASS: TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent (0.01s)
+  --- PASS: TestDeletedLineRestorationIsNotClaimedAsAWrittenKey (0.01s)
+  ok github.com/CarlosShao/wisp/internal/config  RC=0
+  ⇒ 成对正控方向坐实＝未突变树上五枚全绿 ⇒ ⛔ 恒红（票面 AC#1"如果它天生恒绿先证它测的不是自己"的反面也一并排除）
+
+[尺 B] AC#1 三断逐条（载体＝writeguard_handedit_227_test.go，行号我现量）
+  ①那一行回没回来／回来的值＝schema 默认还是内存那枚 ⇒ :42 断 got.Ball.Size != 56 红 ＋ :46 断文件里确有 size = 56
+     ＋ :49 反向断内存仍 60（受守卫写没把回落塞进内存）＝**三件齐全，成立**
+  ②kept_in_file_not_in_memory 有没有把这枚算进去 ⇒ :55 断 "kept_in_file_not_in_memory=[ball.size]" ＝成立
+  ③用户看得见的那句文案（不许只在源码注释里）⇒ :63 断日志那句人话 ＝成立；★那句真在产码里（writeguard.go:175 与 :189），
+     且本腿用去牙那一发（尺 C）证明"改掉这句 ⇒ :64 点名红"＝这句⛔ 装饰
+  ⚠ 另补一枚 map 条目反向断言（票面 AC#1 末句，P4）⇒ :92 断 Providers["deepseek"] 不回来＝成立（本腿尺 C2 证它有牙）
+
+[尺 C] 去牙那一发（★成对落点之一＝文案侧；只打仓外树字节，内容锚）
+  锚＝"hand comes back at its schema default value" 命中 2 枚（:175 与 :189 两处字面串尾部）⇒ 全替换成占位
+  ANCHOR_HITS=2（⛔ 0＝那发是空操作，见下"我自己踩的那一发"）
+  ⇒ --- FAIL: TestHandDeletedScalarLineComesBackAtSchemaDefault  SHOT_RC=1
+     红句逐字  writeguard_handedit_227_test.go:64: the log must state the delete-shape plainly; log:
+  还原 sha256 = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd ＝发前逐字同串
+
+[尺 C 的第一发＝本腿自己踩的空操作，具名入账（⛔ 删、只建不删）]
+  锚＝整句 "a key line the operator deleted by hand comes back at its schema default value" ⇒ 命中 **0**
+  原因＝产码里这句跨了两枚字符串字面续行（:174 末尾 `... a key line the "+` ／ :175 `"operator deleted ...`），
+       单行 sed 打不着 ⇒ 替换 0 字节 ⇒ 那发的 rc=0/"PASS" 是【假读数】，⛔ 当凭据。
+  ⇒ 定式＝去牙之前先量 ANCHOR_HITS 并要求非 0（本腿第二发起每条都带这个闸）。件＝logs/05-mu-falsegreen-first-attempt.txt
+
+[尺 C2] 收窄句那枚正控的去牙（★成对落点之二＝另一处字面串）
+  锚＝"only because its schema_version was already current" 命中 1 枚（writeguard.go:153）⇒ 替换
+  ⇒ --- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent  SHOT_RC=1
+     红句逐字  writeguard_handedit_227_test.go:129: the nothing-written sentence must state the schema-current condition; log:
+     同发另两枚仍 PASS（:150 那枚正控⇄:23 那枚）＝红得精确，⛔ 连带打红别枚
+  整包四数（该突变态）RUN=190 PASS_TOP=108 FAIL_TOP=1 SKIP=0
+  还原 sha256 逐字回原。
+
+[尺 D] 未改产码 ⇄ 只留交件用例（成对⇄腿报的 190/107/2/0）
+  writeguard.go 换成基线锚 feac8f77 那枚（sha bf82226988b83fdc…），用例保持交件形
+  ⇒ RUN=190 PASS_TOP=107 **FAIL_TOP=2** SKIP=0  rc=1
+     两枚红＝TestHandDeletedScalarLineComesBackAtSchemaDefault ＋ TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+     红句逐字＝:64（那句人话缺席）⇄ :129（收窄条件句缺席）＝两枚都指**文案**，⛔ 指字节或行为
+  ⇒ ★复现腿报的 190/107/2/0 逐字同；且这一发同时＝"文案没写实话时这五枚会不会恒绿"的反证＝会点名红。
+  还原 writeguard.go sha256 = efe12661…（pristine 一致 YES）；终态复验 RUN=190 PASS_TOP=109 FAIL_TOP=0 SKIP=0。
+
+[尺 E] 两处既有产码牙（★成对两发，落点⛔ 相同；我现量，与腿报同数）
+  MU-1 报告侧 diverged := diffKeyPaths(m.cur, base) → []string{}  ⇒ RUN=190 PASS_TOP=105 FAIL_TOP=4 SKIP=0 rc=1
+       红名册＝TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept / TestAC3AdoptionClaimsOnlyWhatThisWriteProduced
+              / TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory / TestHandDeletedScalarLineComesBackAtSchemaDefault
+  MU-2 合并基准侧 base = deepCopyConfig(disk) → deepCopyConfig(m.cur) ⇒ RUN=190 PASS_TOP=100 FAIL_TOP=9 SKIP=0 rc=1
+       红名册含 TestHandDeletedMapEntryIsNotRestored（＝P4 那枚的牙也在这发上响）
+  ★两发落点不同（:169⇄:141）、每发前后 pristine sha256 逐字一致（efe12661…47bd）、各发当场还原。
+  ⇒ 腿报 MU-1＝4⇄MU-2＝9 逐字复现。
