@@ -228,14 +228,14 @@ func TestAC1POSIXPrivateFileWindowIsRacedWithoutTheSeam120r3(t *testing.T) {
 		t.Errorf("AC#1 RED: a raced payload landed IN the foreign object the flipped link pointed at: %q", body)
 	default:
 		// Counted and named, NOT judged: an attempt whose flip landed before the open
-		// gets O_TRUNC through that link. That is ticket 322's booked leg and it is
-		// stated as unfixed at this anchor in winsec_other.go:78-82 - "what the leg
-		// here stops is the private BYTES reaching that object ... the O_TRUNC damage
-		// of that open is not undone". This fixture therefore reports the shape and
-		// does not claim the open, which is nobody's gate today.
+		// gets O_TRUNC through that link. Since ticket 322 the POSIX LEAF leg of that
+		// open is closed by oNoFollowPlatform (winsec_other.go:103-113), so a leaf link
+		// swapped into the name answers ELOOP instead of truncating. What stays open on
+		// this route is the ANCESTOR leg - O_NOFOLLOW speaks only the last name - and
+		// that is nobody's gate either. Nobody may read any of this as the window closed.
 		t.Logf("AC#1' R-322 SHAPE OBSERVED, counted and not judged: the witness now holds %q, so at least "+
-			"one open truncated it through a flipped leaf link (ticket 322, unfixed at this anchor; "+
-			"winsec_other.go:78-82). The sealHandle legs answered the write: see the rows above.", body)
+			"one open truncated it through a flipped link (ticket 322 closed only the POSIX leaf leg; "+
+			"the ancestor leg stays open). The sealHandle legs answered the write: see the rows above.", body)
 	}
 }
 
