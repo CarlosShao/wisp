@@ -1,0 +1,37 @@
+[correction 1] ruler 3's case-name regex dropped the fifth case.
+  I wrote 'HandDeletedBaseUrlOfUnknown'; the case is TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile
+  ('An' between 'of' and 'Unknown'), so grep printed 4 of 5 names. The named reading, re-run with the exact name:
+    Adflt deliv: --- PASS: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.04s)
+    Adflt base : 0  (0 = the case did not exist at the baseline = the census reading)
+    Bdtemp deliv: --- PASS: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)
+    Bdtemp base : 0  (0 = the case did not exist at the baseline = the census reading)
+  and all five together, from 15-carrier-table.txt (which used the full names): 5 PASS x 2 surfaces.
+
+[correction 2] 'placeholder hits = 6 files' counted my OWN rulers, which contain the pattern text.
+  Re-measured: the pattern search runs over files that themselves grep for TODO|FIXME|XXX.
+    files hit by the placeholder pattern = 9
+    which ones, and what they are:
+      .scratch/wisp/probes/341/r1/logs/15-carrier-table.txt  -> 11:[placeholder ruler: any TODO/FIXME/XXX/⛔-as-claim in my file = 0 wanted]|
+      .scratch/wisp/probes/341/r1/logs/17-banned-char-ruler.txt  -> 19:  TODO/FIXME/XXX    = 0|
+      .scratch/wisp/probes/341/r1/logs/20-selfproof-final.txt  -> 94:  placeholder ruler (TODO|FIXME|XXX|待补) hits across my face = 6 files|
+      .scratch/wisp/probes/341/r1/logs/21-selfproof-corrections.txt  -> 11:  Re-measured: the pattern search runs over files that themselves grep for TODO|FIXME|XXX.|14:      .scratch/wisp/probes/341/r1/logs/15-carrier-table.txt  -> 11:[placeholder ruler: any TODO/FIXME/XXX/⛔-as-clai|
+      .scratch/wisp/probes/341/r1/scripts/msg-3-report.txt  -> 15:  `t.Skip`／TODO／新导出名／`panel.`／新 JSON 键＝各 0 命中；d22scan rc=0。|
+      .scratch/wisp/probes/341/r1/scripts/run16-table.sh  -> 14:  echo "[placeholder ruler: any TODO/FIXME/XXX/⛔-as-claim in my file = 0 wanted]"|15:  grep -cnE 'TODO|FIXME|XXX|placeholder|待补' "$f" || true|
+      .scratch/wisp/probes/341/r1/scripts/run18-bannedchar.sh  -> 33:  printf '  TODO/FIXME/XXX    = '; grep -cE 'TODO|FIXME|XXX' "$f" || true|
+      .scratch/wisp/probes/341/r1/scripts/run22-selfproof.sh  -> 32:  echo "  placeholder ruler (TODO|FIXME|XXX|待补) hits across my face = $(grep -rlE 'TODO|FIXME|XXX' "$P" 2>/dev/nu|
+      .scratch/wisp/probes/341/r1/scripts/run23-corrections.sh  -> 19:  echo "  Re-measured: the pattern search runs over files that themselves grep for TODO|FIXME|XXX."|21:  grep -rlE 'TODO|FIXME|XXX' "$P" 2>/dev/null | wc -l|
+  delivery-side reading (⛔ the ruler text itself): my TEST FILE's placeholder hits = 
+    0
+
+[correction 3] ruler 1's per-commit list is now five commits, not four: the delivery commit that
+  contains these two scripts + logs/20 + logs/21 is written AFTER 20-selfproof-final.txt was measured,
+  so that file cannot list itself (self-reference). Rerun on the收件 side:
+    git log --perl-regexp --grep="^票 341 落地腿 341-r1·" --format="%h %s"
+  and the 越界尺 per commit:
+    for c in $(git log --perl-regexp --grep="^票 341 落地腿 341-r1·" --format=%H); do
+      git show --name-only --format= $c | sed "/^$/d" | grep -vcE "^(internal/config/[^/]*_test.go|.scratch/wisp/probes/341/r1/|.scratch/wisp/issues/341-)"
+    done   (every line must read 0)
+
+[the push reading, restated with its ruler] git rev-list --count origin/dev..HEAD = 28
+  that number is the WHOLE branch's unpushed backlog (the machine owner is holding pushes), ⛔ mine:
+  of those, my commits = 4; this leg never ran git push.

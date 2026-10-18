@@ -1,0 +1,144 @@
+HEAD at delivery = 920537ee ; start anchor = 98dbf20a
+
+=== ruler 1: per-commit id + git show --name-only (must contain ONLY my write face) ===
+--- 920537ee 票 341 落地腿 341-r1·票尾一条 bullet＋本腿纪律违规登记（事故现量＋垃圾件名册）＝第四笔
+      .scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md
+      .scratch/wisp/probes/341/r1/logs/18-mistake-and-statecheck.txt
+      .scratch/wisp/probes/341/r1/logs/19-runaway-junk-files.txt
+      .scratch/wisp/probes/341/r1/report.md
+      .scratch/wisp/probes/341/r1/scripts/bullet-341-append.txt
+      .scratch/wisp/probes/341/r1/scripts/msg-4-bullet.txt
+      .scratch/wisp/probes/341/r1/scripts/msg-5-bullet-final.txt
+      .scratch/wisp/probes/341/r1/scripts/run19-mistakecheck.sh
+      .scratch/wisp/probes/341/r1/scripts/run20-junkcheck.sh
+      OUTSIDE-SIDE count = 0  (want 0)
+--- f710d104 票 341 落地腿 341-r1·report＋必答分件＋EOL/禁字两把尺＋21 枚台件脚本入库（并具名更正三处）
+      .scratch/wisp/probes/341/r1/logs/10-ac3-overclaim-run1-rulerdefect.txt
+      .scratch/wisp/probes/341/r1/logs/10-ac3-overclaim.txt
+      .scratch/wisp/probes/341/r1/logs/13-precision.txt
+      .scratch/wisp/probes/341/r1/logs/16-eol-proof.txt
+      .scratch/wisp/probes/341/r1/logs/17-banned-char-ruler.txt
+      .scratch/wisp/probes/341/r1/report-answers.md
+      .scratch/wisp/probes/341/r1/report.md
+      .scratch/wisp/probes/341/r1/scripts/msg-1-testfile.txt
+      .scratch/wisp/probes/341/r1/scripts/msg-2-start.txt
+      .scratch/wisp/probes/341/r1/scripts/msg-3-report.txt
+      .scratch/wisp/probes/341/r1/scripts/run0-start.sh
+      .scratch/wisp/probes/341/r1/scripts/run1-start-gauges.sh
+      .scratch/wisp/probes/341/r1/scripts/run10-census2.sh
+      .scratch/wisp/probes/341/r1/scripts/run11-ac3.sh
+      .scratch/wisp/probes/341/r1/scripts/run12-final-gates.sh
+      .scratch/wisp/probes/341/r1/scripts/run13-roster-strict.sh
+      .scratch/wisp/probes/341/r1/scripts/run14-precision.sh
+      .scratch/wisp/probes/341/r1/scripts/run15-nonascii.sh
+      .scratch/wisp/probes/341/r1/scripts/run16-table.sh
+      .scratch/wisp/probes/341/r1/scripts/run17-eol.sh
+      .scratch/wisp/probes/341/r1/scripts/run18-bannedchar.sh
+      .scratch/wisp/probes/341/r1/scripts/run2-selfcheck.sh
+      .scratch/wisp/probes/341/r1/scripts/run3-trees.sh
+      .scratch/wisp/probes/341/r1/scripts/run4-gates.sh
+      .scratch/wisp/probes/341/r1/scripts/run5-color.sh
+      .scratch/wisp/probes/341/r1/scripts/run6-red.sh
+      .scratch/wisp/probes/341/r1/scripts/run7-p6raw.sh
+      .scratch/wisp/probes/341/r1/scripts/run8-mu.sh
+      .scratch/wisp/probes/341/r1/scripts/run9-prescan.sh
+      OUTSIDE-SIDE count = 0  (want 0)
+--- fd82f786 票 341 落地腿 341-r1·起手三把尺＋台面/门禁/普查/突变台件与证据件入库（48 枚，逐枚非 0 字节）
+      .scratch/wisp/probes/341/r1/logs/00-start.txt
+      .scratch/wisp/probes/341/r1/logs/01-start-gauges.txt
+      .scratch/wisp/probes/341/r1/logs/02-newfile-selfcheck.txt
+      .scratch/wisp/probes/341/r1/logs/03-trees.txt
+      .scratch/wisp/probes/341/r1/logs/04-gates-start.txt
+      .scratch/wisp/probes/341/r1/logs/05-color-Adflt-base-head.txt
+      .scratch/wisp/probes/341/r1/logs/05-color-Adflt-base.txt
+      .scratch/wisp/probes/341/r1/logs/05-color-Adflt-deliv-head.txt
+      .scratch/wisp/probes/341/r1/logs/05-color-Adflt-deliv.txt
+      .scratch/wisp/probes/341/r1/logs/05-color-Bdtemp-base-head.txt
+      .scratch/wisp/probes/341/r1/logs/05-color-Bdtemp-base.txt
+      .scratch/wisp/probes/341/r1/logs/05-color-Bdtemp-deliv-head.txt
+      .scratch/wisp/probes/341/r1/logs/05-color-Bdtemp-deliv.txt
+      .scratch/wisp/probes/341/r1/logs/05-mu-p2-full.txt
+      .scratch/wisp/probes/341/r1/logs/05-mu-p2.txt
+      .scratch/wisp/probes/341/r1/logs/05-mu-p3-full.txt
+      .scratch/wisp/probes/341/r1/logs/05-mu-p3.txt
+      .scratch/wisp/probes/341/r1/logs/05-mu-p5-full.txt
+      .scratch/wisp/probes/341/r1/logs/05-mu-p5.txt
+      .scratch/wisp/probes/341/r1/logs/05-mu-p6-full.txt
+      .scratch/wisp/probes/341/r1/logs/05-mu-p6.txt
+      .scratch/wisp/probes/341/r1/logs/06-red-analysis.txt
+      .scratch/wisp/probes/341/r1/logs/07-p6-raw.txt
+      .scratch/wisp/probes/341/r1/logs/08-anchor-prescan.txt
+      .scratch/wisp/probes/341/r1/logs/09-census-p4-p3-remeasure.txt
+      .scratch/wisp/probes/341/r1/logs/10-ac3-overclaim-run1-rulerdefect.txt
+      .scratch/wisp/probes/341/r1/logs/10-ac3-overclaim.txt
+      .scratch/wisp/probes/341/r1/logs/11-gates-final-run1-rulerdefect.txt
+      .scratch/wisp/probes/341/r1/logs/11-gates-final.txt
+      .scratch/wisp/probes/341/r1/logs/12-roster-strict.txt
+      .scratch/wisp/probes/341/r1/logs/13-precision.txt
+      .scratch/wisp/probes/341/r1/logs/14-nonascii-precedent.txt
+      .scratch/wisp/probes/341/r1/logs/15-carrier-table.txt
+      OUTSIDE-SIDE count = 0  (want 0)
+--- 6948eb08 票 341 落地腿 341-r1·AC#1 四格常驻用例＝P2／P3／P5／P6 逐格补牙（只加测试面，⛔ 动任何产码非注释字节）
+      internal/config/writeguard_unnailed_341_test.go
+      OUTSIDE-SIDE count = 0  (want 0)
+commit count = 4
+  (枚数帽按公共块口径＝参考值、⛔ 判据；本腿按'每落一枚就 commit'落到这个数)
+
+=== ruler 2: absolute paths + wc -c + lines + placeholder ruler (0 hits wanted) ===
+  main test file: /d/work/workspace/projects plans/Wisp/internal/config/writeguard_unnailed_341_test.go
+    bytes=20241 lines=389 CR=0 funcTest=5
+  my five files under .scratch/wisp/probes/341/r1:
+    /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/341/r1/report.md bytes=15545 lines=164
+    /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/341/r1/report-answers.md bytes=7116 lines=80
+  file census: logs=38 scripts=29 total=69 zero-byte=0
+  placeholder ruler (TODO|FIXME|XXX|待补) hits across my face = 6 files
+  banned character U+00A7 across my face = 0 files
+  .out extension misuse (dispatch forbids it) = 0 files
+
+=== ruler 3: the decisive gauges, verbatim, with file:line on both sides ===
+[unmutated, both temp-root surfaces, named]
+    Adflt --- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+    Adflt --- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+    Adflt --- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+    Adflt --- PASS: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.03s)
+    Bdtemp --- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+    Bdtemp --- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+    Bdtemp --- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+    Bdtemp --- PASS: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+[baseline vs delivery four numbers]
+    Adflt base: rc=0 RUN=190 PASS_TOP=109 FAIL_TOP=0 SKIP=0
+    Adflt deliv: rc=0 RUN=195 PASS_TOP=114 FAIL_TOP=0 SKIP=0
+    Bdtemp base: rc=0 RUN=190 PASS_TOP=109 FAIL_TOP=0 SKIP=0
+    Bdtemp deliv: rc=0 RUN=195 PASS_TOP=114 FAIL_TOP=0 SKIP=0
+[four de-gum shots: red sentence + restore hash]
+    p2 landing: after shot: killed anchor=0 (want 0)  new anchor [are not preserved)"]=2 (want >=1)  survivor=1 (want 1)
+      red     writeguard_unnailed_341_test.go:111: the INFO branch must state the delete-shape even when the values hide it; log:
+      RESTORED hash = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd   restored==pristine ? YES
+    p3 landing: after shot: killed anchor=0 (want 0)  new anchor [base = deepCopyConfig(m.cur)]=1 (want >=1)  survivor=2 (want 2)
+      red     writeguard_unnailed_341_test.go:162: the resurrected section carried memory's value instead of the schema default:
+      RESTORED hash = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd   restored==pristine ? YES
+    p5 landing: after shot: killed anchor=0 (want 0)  new anchor [cp.SchemaVersion = 1]=1 (want >=1)  survivor=1 (want 1)
+      red     writeguard_unnailed_341_test.go:231: the write branch did not re-stamp the deleted schema_version line at the current version:
+      RESTORED hash = 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb   restored==pristine ? YES
+    p6 landing: after shot: killed anchor=0 (want 0)  new anchor [p.BaseURL = ""]=1 (want >=1)  survivor=1 (want 1)
+      red     writeguard_unnailed_341_test.go:320: the deleted base_url line came back as something other than the built-in preset:
+      RESTORED hash = 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb   restored==pristine ? YES
+[gates, shared worktree, after unset GOTMPDIR TMPDIR]
+    [gate 1] gofumpt -l on MY file (empty + rc=0 = clean)
+    rc=0
+    [gate 1b] gofumpt -l on the whole package: the pre-existing CRLF inventory, named only
+    rc=0   (⛔ of these are mine: my file is the only one I wrote and it is clean above)
+    [gate 2] go vet ./internal/config/
+    rc=0
+    [gate 3] sh scripts/d22scan.sh  (last line is the verdict; the self-test inside prints seeded violations)
+    rc=0
+    [gate 4] sh scripts/check-path-length-budget.sh
+    rc=0
+
+[ticket discipline]
+    lines=44 (43 at start) ; my bullet occurrences=1
+    boxes unchecked=7 checked=0
+    status line untouched=0 deleted lines (want 0)
+    forbidden prod blobs: writeguard=0ebc415b0565 loader=9100ba92e220 migrate=78d85e22e951
+      anchor values were 0ebc415b0565 / 9100ba92e220 / 78d85e22e951  => same=?
+    push status: 28 commits ahead of origin/dev (⛔ pushed by this leg)

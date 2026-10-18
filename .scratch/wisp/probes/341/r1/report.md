@@ -162,3 +162,9 @@ git status --porcelain -- internal/config cmd/wisp
   三笔 name-only 都不含它们（`logs/19` 第 [4] 项）＝公共块那条定式在这里真救了场。
 - 事后门禁四数复跑＝gofumpt rc=0／`go vet ./internal/config/` rc=0／d22scan rc=0 clean／长度门 rc=0 GREEN
   （`logs/18` 第 [7] 项）。改法已照定式重做：中文正文先写成文件再 `git commit -F`（`scripts/msg-4-bullet.txt`）。
+
+## 10. 交件自证（三把尺）与本腿三处尺缺陷的具名更正
+
+读数件＝`logs/20-selfproof-final.txt`（三把尺逐枚现跑）＋`logs/21-selfproof-corrections.txt`（本腿自己的
+尺缺陷三处，逐处给改后的交付侧读数：第五枚用例名被我的正则漏印、占位符尺扫到了尺自身、`logs/20` 名册
+自指只列到四笔）。⇒ **收件侧请现跑 `logs/21` 第 [correction 3] 项那两把尺**，⛔ 信任何一枚件里的名册。
