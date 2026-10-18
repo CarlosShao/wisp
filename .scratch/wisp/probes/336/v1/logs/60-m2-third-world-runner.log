@@ -1,0 +1,34 @@
+### mandatory-(ii) third-world probe: anchor=e5021339 tree=/d/tmp/wisp/20261018/336v1/tree-final
+  probe_blob=ccb5f42b0491a99207334ec2e18ae07c0a0a5c63 lines=88
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [start]
+### leg 1 UNMUTATED:
+  rc=0 RUN=18 PASS_TOP=2 FAIL_TOP=0 SKIP=0
+        zz_probe_336v1_test.go:72: V3WORLD tag=shipped-under-row class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml under_operand=match=false clause=true eq_operand=match=false clause=true
+        zz_probe_336v1_test.go:80: V3WORLD tag=deep-under-row class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml under_operand=match=false clause=true eq_operand=match=false clause=true
+        zz_probe_336v1_test.go:87: V3WORLD tag=deep-under-row-2 class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml under_operand=match=false clause=true eq_operand=match=false clause=true
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-pristine]
+### leg 2 MU-1b only (drop the :224 aUnder operand's fallback branch):
+  needle_before=1
+  needle_after=0 branch_removals=1 (want 1)
+  mutated_hash=698ee0260ac718eb001b60018378e6bedcc1e3c0
+  rc=1 RUN=18 PASS_TOP=1 FAIL_TOP=1 SKIP=0
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336 (0.16s)
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.01s)
+        zz_probe_336v1_test.go:72: V3WORLD tag=shipped-under-row class=A allow=false needL2=false rule=A:Microsoft-Protect under_operand=match=false clause=true eq_operand=match=false clause=true
+        zz_probe_336v1_test.go:80: V3WORLD tag=deep-under-row class=B allow=false needL2=true rule=B-tier under_operand=match=false clause=true eq_operand=match=false clause=true
+        zz_probe_336v1_test.go:87: V3WORLD tag=deep-under-row-2 class=B allow=false needL2=true rule=B-tier under_operand=match=false clause=true eq_operand=match=false clause=true
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU1b]
+### leg 3 MU-1c only (the aEq half of the same case), same probe, for the pair:
+  needle_before=1
+  needle_after=0 branch_removals=1 (want 1)
+  mutated_hash=13e058add1d7c2da89330a89227b2232b6804b20
+  rc=1 RUN=18 PASS_TOP=1 FAIL_TOP=1 SKIP=0
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336 (0.19s)
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.01s)
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq (0.01s)
+        zz_probe_336v1_test.go:72: V3WORLD tag=shipped-under-row class=A allow=false needL2=false rule=A:Microsoft-Protect under_operand=match=false clause=true eq_operand=match=false clause=true
+        zz_probe_336v1_test.go:80: V3WORLD tag=deep-under-row class=B allow=false needL2=true rule=B-tier under_operand=match=false clause=true eq_operand=match=false clause=true
+        zz_probe_336v1_test.go:87: V3WORLD tag=deep-under-row-2 class=B allow=false needL2=true rule=B-tier under_operand=match=false clause=true eq_operand=match=false clause=true
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU1c]
+### probe stays in the exported tree (repo untouched): repo_hits=0 dirty_internal_cmd=0
+m2_rc=0

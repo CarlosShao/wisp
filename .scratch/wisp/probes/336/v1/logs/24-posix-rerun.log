@@ -1,0 +1,22 @@
+### judge Linux run: tree=D:/tmp/wisp/20261018/336v1/tree-ac2 anchor=e5021339
+### go version: go version go1.27.1 linux/amd64
+  docker_rc=0
+### four counts on the Linux leg (RUN/PASS_TOP/FAIL_TOP/SKIP):
+  RUN=11 PASS_TOP=2 FAIL_TOP=2 SKIP=0 rc=rc_test=1
+### top-level result lines:
+    --- PASS: TestFallbackBranchHasNoWorldOnThisPlatform336 (0.01s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.02s)
+    --- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.01s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason (0.01s)
+    FAIL
+    FAIL	github.com/CarlosShao/wisp/internal/risk	0.067s
+    FAIL
+### tripwire's own readouts (cand_root / verdict per placement):
+        anchor_fallback_teeth_336_other_test.go:89: TEETH336-OTHER relCand=work cand_root=EMPTY verdict=B (the branch cannot fire here; see pathresolver_other.go)
+        anchor_fallback_teeth_336_other_test.go:89: TEETH336-OTHER relCand=AppData/Roaming cand_root=EMPTY verdict=B (the branch cannot fire here; see pathresolver_other.go)
+        anchor_fallback_teeth_336_other_test.go:89: TEETH336-OTHER relCand=AppData/Roaming/wisp/logs cand_root=EMPTY verdict=B (the branch cannot fire here; see pathresolver_other.go)
+        anchor_fallback_teeth_336_other_test.go:89: TEETH336-OTHER relCand=AppData/Local cand_root=EMPTY verdict=B (the branch cannot fire here; see pathresolver_other.go)
+### positive control that the roster really executed on Linux:
+  RUN_lines_for_tripwire=1 (want >=1)  teeth_windows_lines=0 (want 0: build-tagged windows)
+### any compile/setup failure named (want none):
+posix_rc=0

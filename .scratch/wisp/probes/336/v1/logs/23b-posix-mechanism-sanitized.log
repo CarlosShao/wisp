@@ -1,0 +1,41 @@
+note: the production comment at internal/risk/pathresolver_other.go:5 names a spec section with U+00A7 (octal 302 247). The write-face rule forbids that character in THIS face, so every verbatim quote below renders it as the escape OCT-302-247. Authoritative bytes = git show e5021339:internal/risk/pathresolver_other.go
+note: see header above. U+00A7 rendered as OCT-302-247.
+### (iii) POSIX mechanism, measured by the judge on the named tree (static reading rulers)
+-- pathresolver_other.go resolveHandle:
+    1://go:build !windows
+    2:
+    3:package risk
+    4:
+    5:// DEFERRED(macOS/Linux): SPEC-06 OCT-302-2474 requires realpath + lstat symlink reject
+    6:// for non-Windows platforms. Until that ticket lands, handle-based resolution
+    7:// is unsupported here and Resolve falls back to the lexical pipeline, which
+    8:// still classifies (fail-closed for the blacklist) but does not detect
+    9:// reparse traversal on these platforms.
+    10:func resolveHandle(p string) (string, bool) { return "", false }
+    11:
+    12:func reparseComponents(p string) []string { return nil }
+-- root-filling path on windows side for contrast:
+    e5021339:internal/risk/pathresolver_other.go:10:func resolveHandle(p string) (string, bool) { return "", false }
+    e5021339:internal/risk/pathresolver_windows.go:25:func resolveHandle(p string) (string, bool) {
+-- uncertainAnchorMiss early return (the guard that makes no POSIX world):
+    func uncertainAnchorMiss(cand, anchor pathForms) bool {
+    	if cand.root == "" || anchor.root == "" {
+    		return false
+    	}
+    	if cand.certain() && anchor.certain() {
+    		return false
+    	}
+    	return isUnder(cand.root, anchor.root) || isUnder(anchor.root, cand.root)
+    }
+### 339 debt attribution: which file carries the Linux reds the leg named (line numbers as READINGS only)
+    			t.Fatalf("fixture guard: the fail-closed shape must still be A here, got %s", gateShape216(d))
+    			t.Fatalf("fixture guard: want A from the fail-closed clause, got %s", gateShape216(d))
+    		t.Errorf("class: got %s, want A (the fail-closed tier is unchanged by AC#1)", got)
+    		t.Errorf("Gate: got %s, want class=A needL2=false allow=false (non-overridable)", gateShape216(d))
+    		t.Errorf("an A deny from the fail-closed clause was unlocked by an override key: %s", gateShape216(u))
+  touched by the leg 18 commits? 0 (want 0)
+  first commit that introduced that file:     4711955f 2026-10-17 票 334 产码腿 334-r1·AC#1＋AC#2 仪器＝anchor_miss_reason_334_test.go（世界自己造�
+### docker availability for a POSIX re-run (named limitation if absent)
+docker=present
+podman=absent_on_PATH
+mech_rc=0

@@ -1,0 +1,88 @@
+package risk
+
+// zz_probe_336v1_test.go — read-only probe shipped by ticket 336's FINAL JUDGE (336-v1).
+// NOT a tracked file, NOT an assertion in the repo: it is copied into the judge's
+// exported tree only. Purpose = answer mandatory question (ii) with a measurement
+// instead of reasoning: is there a world in which the %APPDATA%\wisp case's aUnder
+// operand (blacklist.go ":224") is the ONLY branch-carried case, so that removing
+// that one operand moves the CLASS (not just the reason sentence)?
+//
+// The hypothesis (measured, not assumed): the shipped under-row world puts the
+// candidate directly in %APPDATA%, so its root is an ancestor of the two LATER
+// branch-capable anchors (Microsoft\Protect, Microsoft\Credentials); when ":224"
+// stops firing, the ordered switch simply reports a later anchor - class stays A.
+// One level DEEPER, in a directory that is not wisp, the candidate root is
+// ancestry-UNRELATED to those later anchors, so nothing downstream catches it.
+//
+// Output is ASCII only (the reason string carries real paths and control chars, so
+// it is folded to "which rule does it name").
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func thirdWorldRuleTag336(reason string) string {
+	switch {
+	case reason == "":
+		return "empty"
+	case strings.HasPrefix(reason, "B-list"):
+		return "B-tier"
+	case strings.HasPrefix(reason, "A-list"):
+		for _, lit := range []string{
+			`~/.git-credentials`, `.git/config`, `%APPDATA%\wisp\config.toml`,
+			`~/.ssh/**`, `~/.aws/credentials`, `~/.kube/config`,
+			`browser credential store`, `Microsoft\Protect`, `Microsoft\Credentials`,
+		} {
+			if strings.Contains(reason, lit) {
+				return "A:" + strings.NewReplacer(`\`, `-`, `/`, `-`, ` `, `_`).Replace(lit)
+			}
+		}
+		return "A:unknown"
+	default:
+		return "other"
+	}
+}
+
+func thirdWorldLine336(t *testing.T, tag, cand string) {
+	t.Helper()
+	f := formsOf(cand)
+	aUnder := anchorForms(anchorPath(normDir(envOr("APPDATA", filepath.Join(userHomeDir(), "AppData", "Roaming"))), `wisp`))
+	aEq := anchorForms(anchorPath(normDir(envOr("APPDATA", filepath.Join(userHomeDir(), "AppData", "Roaming"))), `wisp`, `config.toml`))
+	d := Gate(cand, nil)
+	t.Logf("V3WORLD tag=%s class=%s allow=%v needL2=%v rule=%s under_operand=%s eq_operand=%s",
+		tag, d.Class, d.Allow, d.NeedL2, thirdWorldRuleTag336(d.Reason),
+		fmt.Sprintf("match=%v clause=%v", anchorMatches(f, aUnder, isUnder), uncertainAnchorMiss(f, aUnder)),
+		fmt.Sprintf("match=%v clause=%v", anchorMatches(f, aEq, eqPath), uncertainAnchorMiss(f, aEq)))
+}
+
+// TestProbe336V1ThirdWorld places the hostile candidate (an unprovable spelling) one
+// level deeper than the shipped under-row world does, with the two later
+// branch-capable anchors honestly installed.
+func TestProbe336V1ThirdWorld(t *testing.T) {
+	// shipped under-row world for comparison: candidate directly in %APPDATA%.
+	w := newWorld334(t, true, teeth336Installed(wispCfgLeaf334)...)
+	shipped := filepath.Join(w.profile, "AppData", "Roaming", hostile334)
+	if err := os.MkdirAll(filepath.Dir(shipped), 0o755); err != nil {
+		t.Fatalf("setup mkdir: %v", err)
+	}
+	thirdWorldLine336(t, "shipped-under-row", shipped)
+
+	// the candidate one level deeper, under a directory that is not "wisp".
+	deepDir := filepath.Join(w.profile, "AppData", "Roaming", "subfolder", "nest")
+	if err := os.MkdirAll(deepDir, 0o755); err != nil {
+		t.Fatalf("setup mkdir deep: %v", err)
+	}
+	deep := filepath.Join(deepDir, hostile334)
+	thirdWorldLine336(t, "deep-under-row", deep)
+
+	// and one level deeper again, to show the shape is not about that exact depth.
+	nest := filepath.Join(deepDir, "deeper", hostile334)
+	if err := os.MkdirAll(filepath.Dir(nest), 0o755); err != nil {
+		t.Fatalf("setup mkdir nest: %v", err)
+	}
+	thirdWorldLine336(t, "deep-under-row-2", nest)
+}

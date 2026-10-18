@@ -1,0 +1,40 @@
+/tmp/gocache
+/tmp/gomod
+go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+time=2026-10-18T05:25:18.144Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+=== RUN   TestFallbackBranchHasNoWorldOnThisPlatform336
+    anchor_fallback_teeth_336_other_test.go:89: TEETH336-OTHER relCand=work cand_root=EMPTY verdict=B (the branch cannot fire here; see pathresolver_other.go)
+    anchor_fallback_teeth_336_other_test.go:89: TEETH336-OTHER relCand=AppData/Roaming cand_root=EMPTY verdict=B (the branch cannot fire here; see pathresolver_other.go)
+    anchor_fallback_teeth_336_other_test.go:89: TEETH336-OTHER relCand=AppData/Roaming/wisp/logs cand_root=EMPTY verdict=B (the branch cannot fire here; see pathresolver_other.go)
+    anchor_fallback_teeth_336_other_test.go:89: TEETH336-OTHER relCand=AppData/Local cand_root=EMPTY verdict=B (the branch cannot fire here; see pathresolver_other.go)
+--- PASS: TestFallbackBranchHasNoWorldOnThisPlatform336 (0.01s)
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so
+    anchor_miss_reason_334_test.go:131: fixture guard: the fail-closed shape must still be A here, got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube
+    anchor_miss_reason_334_test.go:156: fixture guard: want A from the fail-closed clause, got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.02s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so (0.01s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube (0.01s)
+    --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal (0.01s)
+=== RUN   TestAnchorMissKeepsNonOverridableClassAndNeedL2
+    anchor_miss_reason_334_test.go:193: class: got B, want A (the fail-closed tier is unchanged by AC#1)
+    anchor_miss_reason_334_test.go:197: Gate: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want class=A needL2=false allow=false (non-overridable)
+    anchor_miss_reason_334_test.go:201: an A deny from the fail-closed clause was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_miss_reason_334_test.go:208: SHAPE-READING334 inside-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+--- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.01s)
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.*
+--- PASS: TestFileBaseNameClaimChangesNoClassOrReason (0.01s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.067s
+FAIL
+rc_test=1
