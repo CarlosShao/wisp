@@ -1,0 +1,27 @@
+227-v1 台面与 pristine（终裁腿自己现跑，2026-10-18 15:0x–15:5x）
+
+[台面] 两棵仓外导出树，锚＝bcf90e06（＝227-r1 交件末笔，bcf90e06 是 HEAD 的祖先，已现验）
+  配方＝git archive bcf90e06 go.mod go.sum internal cmd tools scripts frontend models docs ＋手工补
+        build/*.dll(3) ＋ third_party/sherpa-onnx/*.dll(3) ＋ frontend/dist
+  落点＝D:\tmp\wisp\20261018\227v1\v1\A（只跑只读复量）／\B（突变腿）；GOTMPDIR 先 mkdir -p，指 D: 卷，非盘符根
+  取出后先数 .go 证非空＝treeA 764 ／ treeB 764（⛔ "0"当读数）
+  基线对照树＝\base2（git archive feac8f77 同配方，.go＝762）
+
+[pristine sha256（我现量，两棵树逐字同串）]
+  internal/config/manager_test.go                  201dc786570dbb2ffeaf8cc09a6c7bc48cb1ee6047b9f2f28a02e18163aa56a1
+  internal/config/writeguard_226_test.go           49960da670dbe1350478a7f710900b52a5127dcfc24735250be1e4104cbef9b8
+  internal/config/writeguard.go                    efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+  internal/config/writeguard_handedit_227_test.go  9b430e3b68ad3be3d5692972faa10364f71c248a80f66dc452dda4836ac87edb
+  （基线锚 feac8f77 的 writeguard.go 字节 sha＝bf82226988b83fdc…，与交件 efe12661… 不同＝字面串确实动过）
+
+[blob 尺（一律具名提交树，⛔ 读别腿在飞字节）]
+  manager_test.go            feac8f77＝bcf90e06＝e6fd0f50＝HEAD 四号同串 9f7a476ace…
+  writeguard_226_test.go     五号（feac8f77/3b8c114e/dd0e489d/bcf90e06/e6fd0f50）全同串 29dbd968f3…（＝456 行）
+  writeguard.go              feac8f77＝eab383bf… → b72d7391 起＝0ebc415b…（＝唯一被动的产码件）
+  loader.go / migrate.go / manager.go  feac8f77⇄HEAD 三枚全同串＝乙形那支一字未动
+  git diff --name-only feac8f77 bcf90e06 -- internal/config ＝只有 writeguard.go ＋ writeguard_handedit_227_test.go
+
+[四数（⛔ 混用⛔ 相减；RUN=^=== RUN 含子测试／PASS_TOP=^--- PASS 只顶层／FAIL_TOP=^--- FAIL／SKIP）]
+  基线 internal/config（锚 feac8f77 原样）      RUN=185  PASS_TOP=104  FAIL_TOP=0   SKIP=0   rc=0
+  交件 internal/config（锚 bcf90e06 原样）      RUN=190  PASS_TOP=109  FAIL_TOP=0   SKIP=0   rc=0
+  （作差＝RUN+5／PASS_TOP+5／FAIL_TOP+0 ⇒ 本腿复现"零枚新增红"）
