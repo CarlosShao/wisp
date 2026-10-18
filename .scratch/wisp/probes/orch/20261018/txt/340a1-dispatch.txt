@@ -1,0 +1,66 @@
+派单 340a1-head — 票 340 只读普查腿（叠改形端到端；AC#2 硬门未开）2026-10-18 第二波
+- 起手锚＝你自己 `git log -1` 现认（我 11:2x 见 `130b1475` 系）。
+- 目标：票 340 的 **AC#0 起手现量**＋**AC#1 三形代价表**。票面全文照读：`.scratch/wisp/issues/340-stacked-queue-rewrite-of-a-card-corr-has-no-real-producer-test.md`。来历＝票 328 已结案（`-done`），它交回的那半格＝队列撞名改写作用在"卡片 corr"上会叠出 `<corr>#<seq>`（两枚 `#`），而这一形**全仓只有夹具造过**：真产要链两枚跨包非导出铸造点（`internal/agent/loop.go` 的 `callCorr` ⇄ `internal/agent/approval/queue.go` 的 `Queue.push`）。
+- ★★**AC#2 硬门（编排者设的，⛔ 任何腿绕过、⛔ 腿自己选形）**：甲＝`internal/agent/approval` 侧加测试注入口、乙＝`internal/agent` 侧开 `callCorr` 的包外测试别名 ⇒ **两形都要新导出名／跨包入口＝语言层越界＝须台账 `A##` 具名批准**（记文件／行／理由／边界／撤销口令）。**批准今天没开** ⇒ 本腿只做只读量，且**默认先量丙形**（不链、改为钉住 `queue.go` 那枚改写格式串的内容锚，令"格式一变即红"）＝零新导出名。
+- 写面（只两处）：`.scratch/wisp/probes/340/a1/**`（census＋logs＋可逐字重跑的脚本；短名、⛔ `§`、⛔ 落 `docs/evidence/s1/`）＋票 340 末尾**一条**只追加 bullet。★**⛔ 动任何 `.go`**（普查阶段零产码，票面 AC#6 明文）；⛔ 动台账／停车点／别的票（⛔ 回头改票 328 的判据文字——它已 `-done`，要更正只追加）；⛔ 新建票件（名册归我）。
+- 一律取**具名提交树**（`git show <rev>:<path>`／`git grep <pat> <rev> -- <path>`）；本波在飞写腿＝`336-r1`（`internal/risk/**` 测试面）∥`227-r1`（`internal/config/**`）⇒ ⛔ 读它们的在飞字节。⛔ 跑 `go test`／`go build`（只读普查；引用任何颜色一律标"读码推的"＋具名尺）。⛔ 翻框／改票名／`-done`／push。
+派单公共块（2026-10-18 第一波，编排者＝新任 harness；逐条都是现行铁律，缺一条我就退回你那笔交件）
+
+## 编队规则（本波）
+本波总代理 6 条（≤8）；写代理 3 条（336-r1／166-r1／322-r2）。写面互斥：`cmd/wisp/**` 与 `internal/panel/**` 本波零写腿、任何腿⛔ 写这两面；`go test ./cmd/wisp` 同一时刻只跑一个（本波唯一持跑者＝228-r3c）；`internal/risk/**` 本波唯一写腿＝336-r1；`internal/session/**`＝166-r1；`internal/winsec/**`＝322-r2；`frontend/**`、`design/**` 本编队零写面（归机主外部 agent）。
+
+## git
+⛔ **push**（推送只由编排者做，且现在被机主按住）。`git add` 与 `git commit` 两处都要**逐枚显式 pathspec**——⛔ `add -A`／`add .`／目录形、★⛔ `git commit -F <正文> -- .`（那个 `.` 曾把机主在飞的 24 枚工作树字节记进历史，台账 `A1011` 第⑧节）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree 或 checkout。临时件**只建不删**。撞 `.git/index.lock`：⛔ 删锁，等它自己散再重试同一笔。
+
+## 票面
+⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`（裁决者≠实现者；翻框只由编排者凭非实现者判语做）。只许在你被指定的票尾**追加一条** bullet。
+
+## 台面配方（仓外导出树，缺一味就假红）
+`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models`（**八件套**）＋★仓根 `docs/`（有些测试读 `docs/PLAN.md`；`internal/panel/git_test.go` 一族要它）＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`——都⛔ 跟踪）。树放 **`D:` 卷且目录名要产生 8.3 短名别名**（放 C 卷 Temp ⇒ 短名族打红＝台面故障）；`GOTMPDIR` 指到 `D:` 上**先 `mkdir -p`**（没建＝`creating work dir` 红，长得像判据响）。取出后**先数 `.go` 证非空**（"0"⛔ 是读数）。⛔ 在共享工作树跑 `go test`／`go build`。
+
+## 颜色尺
+`RUN=`＝`grep -c '^=== RUN'`（含子测试）⇄ `PASS_TOP=`＝`grep -c '^--- PASS'`（只顶层）⇄ `FAIL_TOP=`＝`^--- FAIL` ⇄ `SKIP=`。**四数不许混用、不许相减**。一律 `-count=1 -timeout 30m` 或更长；⛔ `go test ./...`。★跑 `cmd/wisp` 必须带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，否则 `0xc0000135`＋零枚 `--- FAIL`＝那包根本没跑（台面故障，⛔ 计入判据）。已知本机一格：`cmd/wisp` 整包有真窗区整进程死亡（`resident_*` 在整包从不执行）⇒ estate 颜色取自定向 `-run`，⛔ 拿整包当"全绿"或"我的字节把包打红"。
+
+## 门禁四数（只在共享工作树）
+`/d/work/base/gopath/bin/gofumpt.exe -l <你的文件>`（⚠ 本机工作树 6 枚既有件因 CRLF 被标脏＝存量，**你的新字节必须 LF**，⛔ 顺手重排别腿文件；具名登记即可）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./<你的包>/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 exit 2＝GUARD 射程拒绝⛔ 读成红；长度门要 `.git`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+★**跑这四道门之前先 `unset GOTMPDIR TMPDIR`**（2026-10-18 编排者坐实的定式，台账 `A1027` 第⑤节）：本波落点新铁律把测试临时根指到 `D:`，而 `d22scan` 里票 311 AC#1 shape B 那道 GUARD 要求"测试临时根与 `%LOCALAPPDATA%` 同卷"⇒ 带 env 时 **rc=2 射程拒绝**（offender 逐字 `GOTMPDIR=…(volume D)`），**⛔ 读成红**；unset 后 rc=0 clean。⛔ 为它放宽任何断言、⛔ 把落点搬回盘符根。
+
+## 共享 index 那一枚今天咬过的坑（10-18 实测，台账 `A1027`）
+`git commit -F <正文> -- $(git diff --cached --name-only)` **＝违规形状**：它从**共享 index** 反推路径，会把别腿已 `git add` 未 commit 的件卷进你这一笔（今天 `322-r2` 就这样替 `328-v1` 代提了一枚）。⇒ **`add` 与 `commit` 两处都要写死字面路径**（逐枚列全；⛔ 任何"从 index／从目录反推"的形，含 `xargs`、`git status --porcelain | cut`、通配 `*.log`）。
+
+## 突变（牙）
+只打在**仓外导出树**的物理字节上——⛔ 改跟踪文件、⛔ `-overlay`（那形对读盘的尺失明）；**内容锚**（函数体内那枚 token），⛔ 绝对行号；逐发**当场还原并报还原哈希**，跑前跑后各验一次 pristine 哈希；跨 shell 的 `trap`/`finally` 有竞态 ⇒ **两发串行**，⛔ 信 echo。成对两发落点必须不同，少任一发＝那把尺不敏感，⛔ 用它的绿当凭据。
+
+## 判据形状
+⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ `t.Skip`、⛔ 在注释里指名一枚不存在的测试或件当凭据、⛔ 许诺未实现的能力、⛔ 动 SLO 阈值／golden／`thresholds.go`／`allowlist.txt`／三枚冻结件（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`ticket90_persist_test.go`）／D1–D47／C1–C32／R1–R9／D43 转移表／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`。⛔ 新导出名、⛔ 新 `panel.*` 方法名、⛔ 新 JSON 键。碰到未定义的事**停手上报**（写进交件具名），⛔ 自行假设。
+
+## 输出预算
+≤4 枚正文件、每件 ≤160 行；⛔ 0 字节文件（落笔前后 `wc -c`）；**每落一枚文件就 commit**（⛔ 攒着）。轮次帽：先做判据最硬的那格，把 `logs/` 逐枚提前入库；到帽前把最新状态 commit＋票尾 bullet 落盘。
+
+## shell
+进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`。中文 commit 正文先 Write 成文件再 `git commit -F`。PowerShell 内联⛔ `$_`／裸 `$b`。
+
+## 读数纪律
+引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先跑一枚已知存在的正控并看 `stderr`；`grep -c` 命中 0 会回 rc=1 ⇒ 在 `$( )` 里 `|| true`。两把尺矛盾时先假定新那把坏。**完成通知一律当未验证**——编排者收件只认盘上三把尺（提交真在／件真在／自己复跑）。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含你被允许的写面）；② 证据件**绝对路径**＋`wc -c`＋行数＋占位符尺 0 命中；③ 决定性那把尺的逐字输出（起手侧⇄交件侧都带 `file:line`）＋成对红句逐字＋还原哈希＋四数＋门禁 `rc=`。另加派单里的**必答题**（⛔ 你自己盖章不算）。
+派单 340a1-specific — 本腿判据（只读；⛔ 抄票面/本块任何数，逐枚现跑带 `file:line`）
+
+AC#0 起手现量（票面那张表四行逐枚重跑）：
+ a) 真产叠改形的用例枚数＝`git grep -nE '"[^"]*#[0-9]+"' <rev> -- internal/agent/approval`（票面记 0，锚 `f705b082`）＋★自加一把更宽的尺：全仓（含 `cmd/`、`internal/panel`）有没有任何用例让**真 `Queue.push` 的撞名改写**作用在**真 `callCorr` 产出的 corr** 上（预期 0；报 0 前先跑一枚已知存在的正控，⛔ 交一把两种形状都放行的尺）。
+ b) 第三臂侧那一形实测点亮的凭据＝`internal/panel/subagent_corr_task_prefix_328_test.go` 里 `arm B with the queue clash rewrite stacked…` 那枚子用例（具名 `file:line`；⛔ 你跑它，只读点名）。
+ c) ★⛔ 读成"已被钉住"那一维：腿 `328-r1` 的 M2 读数里 `child-1#9`／`#147` 仍绿＝**数字臂**在承重。你要独立给出"数字臂 vs 第三臂"各自承重的名册（逐枚点名哪些用例在摘掉第三臂后会红、哪些不会），⛔ 抄腿的结论。
+ d) 两枚铸造点的非导出性现量＝`callCorr` def 行＋唯一调用枚数；`Queue.push`（`queue.go` 一带）def 行＋撞名改写那枚格式串（票面写 `%s#%d`、`:168` 一带）逐字现读。★格式串**今天真实长什么样**是本票丙形的承重，必须逐字。
+ 任何一跳与票面不符 ⇒ 当场具名更正（票面 AC#0 明文要的就是这个）。
+
+AC#1 三形代价表（只量、⛔ 选形、⛔ 推荐）：
+ 甲＝`internal/agent/approval` 侧测试注入口（`export_test.go` 形或包内 `_test.go` 可见）；乙＝`internal/agent` 侧 `callCorr` 包外测试别名；丙＝不链，钉住那枚格式串内容锚（一变即红）。
+ 每形现量：动几枚文件∶几行、要不要新导出名（★甲／乙＝要 ⇒ 触 AC#2 硬门，具名写"须 `A##` 批准"）、会不会被 `l2_grant_boundary_test.go` 那族**禁名词表**咬（★票面点名：新增可解码结构体⛔ 放 `internal/panel`；尺＝该表词根×两拼的射程现读）、丙形那枚钉"有没有牙"的反形是什么（把格式串改掉 ⇒ 谁红；⛔ 你跑，只写形状）。
+ ★另量一维给裁腿用：丙形能否覆盖"改写规则换了别的分隔符（例 `#`→`_`）"与"seq 放前面"这两形——如果钉格式串覆盖不到，具名写"缺哪一味"。
+
+AC#3/AC#4 前置料（⛔ 提改法）：若将来端到端那一发落地，判据形状该断哪三件（票面 AC#3 已写：corr 逐字节含两枚 `#`／剥出的段仍是生产 corr⛔ 裸任务号／名册点亮原任务行）＋去牙落点候选（具名 `file:line`，⛔ 同一枚断言行两处落点）。
+AC#5 前置料：本票落地后会落到哪几包的成对台面（`internal/agent`／`internal/agent/approval`／`internal/panel`），点名列出、⛔ 跑。
+
+交件＝`.scratch/wisp/probes/340/a1/census.md`（≤160 行）＋`logs/**` 逐枚入库＋票 340 尾一条 bullet（写锚、写"七枚框一枚没翻"）。每落一枚文件就 commit；pathspec 逐枚写死字面路径（⛔ `$(git diff --cached --name-only)` 从共享 index 反推）；主题前缀 `票 340 普查腿 340-a1·<节>`。⛔ push／⛔ 翻框／⛔ 改票名。
+必答：(i) 那把"真产枚数 0"尺的正控逐字读数；(ii) 格式串今天的逐字（含所在行现读行号＋内容锚 token）；(iii) 三形"要不要新导出名"逐形真／假；(iv) 丙形覆盖不到的那一维具名（覆盖得到就明写"覆盖得到，尺＝…"）。

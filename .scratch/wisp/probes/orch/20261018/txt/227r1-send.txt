@@ -1,0 +1,6 @@
+=== send 记录 2026-10-18 11:3x +08（编排者）===
+腿＝227-r1（票 227 落地腿·写，第二波补位凑"写腿 ≥3"）
+启动动作＝`spawn_teammate(name="leg-227-r1", description="票 227 落地腿（写·internal/config 测试面）", context="fresh")` ⇒ target `leg-227-r1`，回执 **running**（真启动）。
+正文＝`orch/20261018/txt/227r1-dispatch.txt`（62 行／13349 字节＝head＋common-20261018（本波已补两条：跑门前 `unset GOTMPDIR TMPDIR`＋⛔ 从共享 index 反推 pathspec）＋specific 拼装）。
+写面＝`internal/config/**` 测试面（＋必要时那两句日志字面串，⛔ 逻辑）＋`.scratch/wisp/probes/227/r1/**`＋票 227 尾一条。
+发出前 CPU 现量 42/40/50（≤70）；在飞另三枚＝`336-r1`∥`322-r2`∥`340-a1`；`cmd/wisp`＋`internal/panel` 零写腿；`go test ./cmd/wisp` 唯一持跑者＝`322-r2`。⛔ push（授权在手、窗口未到）。

@@ -17,6 +17,10 @@
 
 ## 门禁四数（只在共享工作树）
 `/d/work/base/gopath/bin/gofumpt.exe -l <你的文件>`（⚠ 本机工作树 6 枚既有件因 CRLF 被标脏＝存量，**你的新字节必须 LF**，⛔ 顺手重排别腿文件；具名登记即可）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./<你的包>/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 exit 2＝GUARD 射程拒绝⛔ 读成红；长度门要 `.git`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+★**跑这四道门之前先 `unset GOTMPDIR TMPDIR`**（2026-10-18 编排者坐实的定式，台账 `A1027` 第⑤节）：本波落点新铁律把测试临时根指到 `D:`，而 `d22scan` 里票 311 AC#1 shape B 那道 GUARD 要求"测试临时根与 `%LOCALAPPDATA%` 同卷"⇒ 带 env 时 **rc=2 射程拒绝**（offender 逐字 `GOTMPDIR=…(volume D)`），**⛔ 读成红**；unset 后 rc=0 clean。⛔ 为它放宽任何断言、⛔ 把落点搬回盘符根。
+
+## 共享 index 那一枚今天咬过的坑（10-18 实测，台账 `A1027`）
+`git commit -F <正文> -- $(git diff --cached --name-only)` **＝违规形状**：它从**共享 index** 反推路径，会把别腿已 `git add` 未 commit 的件卷进你这一笔（今天 `322-r2` 就这样替 `328-v1` 代提了一枚）。⇒ **`add` 与 `commit` 两处都要写死字面路径**（逐枚列全；⛔ 任何"从 index／从目录反推"的形，含 `xargs`、`git status --porcelain | cut`、通配 `*.log`）。
 
 ## 突变（牙）
 只打在**仓外导出树**的物理字节上——⛔ 改跟踪文件、⛔ `-overlay`（那形对读盘的尺失明）；**内容锚**（函数体内那枚 token），⛔ 绝对行号；逐发**当场还原并报还原哈希**，跑前跑后各验一次 pristine 哈希；跨 shell 的 `trap`/`finally` 有竞态 ⇒ **两发串行**，⛔ 信 echo。成对两发落点必须不同，少任一发＝那把尺不敏感，⛔ 用它的绿当凭据。

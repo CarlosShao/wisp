@@ -1,0 +1,11 @@
+派单 227r1-head — 票 227 落地腿（写·`internal/config/**` 测试面）2026-10-18 第二波补位
+- 编排者＝新任 harness；起手锚＝你自己 `git log -1` 现认（我 11:2x 见 `130b1475` 系，⛔ 拿我的号当锚）。
+- 目标：票 227 的 **AC#1／AC#2／AC#3／AC#4** 四格（受守卫写的两种"手改形状"今天**零回归防护**：① 手删一枚非默认值标量行 ⇒ 受守卫写会把它补成 **schema 默认值**而不是内存那枚；② schema 落后时那句 `nothing written` 会说谎，因为文件其实被重排、注释丢光）。票面全文照读：`.scratch/wisp/issues/227-*.md`（含「现量」那张表与「落点候选」甲／乙／丙三支）。
+- ★**本格只补仪器＋让文案说实话，⛔ 改行为**：票面 `AC#4` 逐字写着"本票不改判级、不动 `allowed_dirs` 的语义、不把任何『补回』改成『不补回』以外的新行为；要改成文本级 patch 式改写以保住注释＝另立一票"。⇒ 你若判明"要让文案说实话必须动产码那两句日志"，**停手上报**（把最小缺口写清），⛔ 自己扩面。
+- 写面（逐路径，只四处）：
+  1) `internal/config/**` 的**测试面**＝新建/修改 `*_test.go`（建议 `writeguard_handedit_227_test.go` 一族，短名）；
+  2) 若 AC#2 选"让文案说实话"那一支 ⇒ 允许动 `internal/config/writeguard.go` 里**那两句日志字符串本身**（⛔ 任何逻辑分支／条件表达式／函数签名，⛔ 改 `diverged` 的算法）；★动它之前先跑一把"读者尺"入库＝`git grep -n` 那两句字面串在全仓（含 `scripts/**`、`tools/**`、`*_test.go`）有没有被当判据计数，**有 ⇒ 当场停手上报**；
+  3) `.scratch/wisp/probes/227/r1/**`（report＋logs，短名、⛔ `§`、⛔ 落 `docs/evidence/s1/`）；
+  4) 票 227 末尾**一条**只追加 bullet。
+- ★⛔ 写面（本波冲突或禁区）：`cmd/wisp/**`（`go test ./cmd/wisp` 唯一持跑者＝`322-r2`，且票 227 `AC#5`/`AC#6` 那两格要 cmd/wisp 整包＝**具名交回我排程、⛔ 你跑**）；`internal/panel/**`（零写腿）；`internal/risk/**`（`336-r1` 在写）；`internal/session/**`（`166-r1` 已交、本波无人写但你⛔ 动）；`internal/ball/**`；`frontend/**`／`design/**`（机主外部 agent）；`docs/specs/**`（一字不改）；`docs/PLAN.md`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／D1–D47／C1–C32／R1–R9／D43 转移表。
+- ⛔ 翻框（票 227 现量 6 未勾／0 已勾？——**自己现跑**，尺＝`grep -c '^[[:space:]]*- \[ \]'`；本票六格由非实现者裁）／⛔ 改票名／`Status:`／`-done`／⛔ push。

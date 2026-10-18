@@ -1,0 +1,6 @@
+派单 340a1-head — 票 340 只读普查腿（叠改形端到端；AC#2 硬门未开）2026-10-18 第二波
+- 起手锚＝你自己 `git log -1` 现认（我 11:2x 见 `130b1475` 系）。
+- 目标：票 340 的 **AC#0 起手现量**＋**AC#1 三形代价表**。票面全文照读：`.scratch/wisp/issues/340-stacked-queue-rewrite-of-a-card-corr-has-no-real-producer-test.md`。来历＝票 328 已结案（`-done`），它交回的那半格＝队列撞名改写作用在"卡片 corr"上会叠出 `<corr>#<seq>`（两枚 `#`），而这一形**全仓只有夹具造过**：真产要链两枚跨包非导出铸造点（`internal/agent/loop.go` 的 `callCorr` ⇄ `internal/agent/approval/queue.go` 的 `Queue.push`）。
+- ★★**AC#2 硬门（编排者设的，⛔ 任何腿绕过、⛔ 腿自己选形）**：甲＝`internal/agent/approval` 侧加测试注入口、乙＝`internal/agent` 侧开 `callCorr` 的包外测试别名 ⇒ **两形都要新导出名／跨包入口＝语言层越界＝须台账 `A##` 具名批准**（记文件／行／理由／边界／撤销口令）。**批准今天没开** ⇒ 本腿只做只读量，且**默认先量丙形**（不链、改为钉住 `queue.go` 那枚改写格式串的内容锚，令"格式一变即红"）＝零新导出名。
+- 写面（只两处）：`.scratch/wisp/probes/340/a1/**`（census＋logs＋可逐字重跑的脚本；短名、⛔ `§`、⛔ 落 `docs/evidence/s1/`）＋票 340 末尾**一条**只追加 bullet。★**⛔ 动任何 `.go`**（普查阶段零产码，票面 AC#6 明文）；⛔ 动台账／停车点／别的票（⛔ 回头改票 328 的判据文字——它已 `-done`，要更正只追加）；⛔ 新建票件（名册归我）。
+- 一律取**具名提交树**（`git show <rev>:<path>`／`git grep <pat> <rev> -- <path>`）；本波在飞写腿＝`336-r1`（`internal/risk/**` 测试面）∥`227-r1`（`internal/config/**`）⇒ ⛔ 读它们的在飞字节。⛔ 跑 `go test`／`go build`（只读普查；引用任何颜色一律标"读码推的"＋具名尺）。⛔ 翻框／改票名／`-done`／push。

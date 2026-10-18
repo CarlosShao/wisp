@@ -1,0 +1,10 @@
+派单 227r1-specific — 本腿判据（逐格可机读；⛔ 抄票面任何数，一律现跑）
+
+AC#1 删行形状要有常驻用例＋一句人话：种一发"手删一枚非默认值标量行"⇒ 跑一次受守卫写 ⇒ 用例必须断三件（票面逐字）：① 那一行回没回来、回来的值等于 **schema 默认** 还是等于 **内存那枚**；② `kept_in_file_not_in_memory` 有没有把这枚算进去；③ 文件里那行的**注释**还在不在。★成对正控＝未改动的树上同一发必须**绿**（⛔ 恒红）。
+AC#2 把"什么都不写"那枚用例的射程边界钉住：票面指的名字是 `TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt`（`internal/config/writeguard_226_test.go:393` 一带，行号只当读数）——★**先证这枚用例真存在**（`git grep -n 'func TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt'`＋正控），⛔ 指名一枚不存在的测试当凭据（本仓入账多次）。种一发 fixture 里删掉 `schema_version`（或塞 `schema_version = 1`）⇒ 那枚用例**必须红**（红＝它今天恒绿的原因被暴露）。然后**二选一并具名写出代价**（甲＝用例射程加边界＋文案说实话；乙＝真让"nothing written"那支不动文件＝要动迁移行为，属票面「落点候选」乙，量级大 ⇒ 停手上报）。
+AC#3 四种手改形状一张矩阵表：改值／删标量行／删整节／删 map 条目，分母直接取 `226-v1` 的 `b2` P1–P6（⛔ 重造），每格标〔有用例／只有台件／什么都没有〕三态之一。**这张表是本票的交付主体**，落 `.scratch/wisp/probes/227/r1/report.md`。
+AC#4 不许顺手扩大射程（见 head 的★行）；完成判据＝对**你的每一笔提交**跑名册尺：`internal/config/**` 之外零字节（⛔ 动 `allowed_dirs` 语义、⛔ 动判级、⛔ 改 `readConfigFile` 的迁移行为）。
+AC#5／AC#6：⛔ 你跑 `cmd/wisp` 整包（车道归 `322-r2`）；把这两格**具名交回编排者**（票面原文要求的两维：整包终态红名册＋`always_write_no_clobber_226_test.go:43-44` 那句 "nothing polls" 是否已过期）。★另有一枚**挂在票面的欠账你必须先归因**：`245-v1` 报"`cmd/wisp` 默认层读到 1 红 2 绿、用例名丢了"——你⛔ 跑那包，但如果你判明必须跑，**先问我要放行**，⛔ 与 `322-r2` 同时跑。
+颜色与门禁：`go test ./internal/config/` 成对（基线＝你起手锚的 `git archive` 仓外树 ⇄ 交件、同一台面、两把临时根台面默认 C 卷 ⇄ `D:` 预建、`-count=1 -timeout 30m`、四数逐枚点名⛔ 混用⛔ 相减、红名册**逐名**作差）。门禁四数只在共享工作树，★**跑前先 `unset GOTMPDIR TMPDIR`**（否则 `d22scan` 触发票 311 AC#1 shape B GUARD＝rc=2 射程拒绝，⛔ 读成红）：`/d/work/base/gopath/bin/gofumpt.exe -l <你的件>`（新字节必须 LF；本机存量 6 枚脏⛔ 动）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./internal/config/`，逐枚 `rc=`。
+交件＝`report.md`（≤160 行，含 AC#3 那张矩阵表）＋`logs/**` 逐枚入库＋票 227 尾一条 bullet（写锚、写"框一枚没翻"）。每落一枚文件就 commit；pathspec **逐枚写死字面路径**（★⛔ `git commit -F 正文 -- $(git diff --cached --name-only)`——共享 index 今天已咬过一枚腿）；主题前缀 `票 227 落地腿 227-r1·<格>`。⛔ push／⛔ add -A／⛔ amend／reset／rebase／stash／checkout .／clean。
+必答：(i) AC#2 你走甲还是判明要走乙（走乙＝停手上报，给最小缺口 `file:line`）；(ii) 那两句日志字面串在全仓的读者尺逐字读数；(iii) AC#1 那枚用例在**未改动树**上的绿读数逐字（证它⛔ 恒红）；(iv) 四格各自的"未修码响不响"逐件成对读数。

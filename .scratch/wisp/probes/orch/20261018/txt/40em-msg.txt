@@ -1,0 +1,1 @@
+收 166-r1⇒票 166 AC#2 仍不成立（腿自判＋我两棵树复跑：HEAD 四枚 PASS ⇄ 基线 no tests to run）｜第二波补两枚已放＝227-r1（写·internal/config 测试面）∥340-a1（只读·票 340 三形表，AC#2 人工批准门未开）｜形状＝在飞 4≤8、写腿 3≥3、cmd-wisp/panel 零写腿｜★派单公共块补两条定式：跑门前 unset GOTMPDIR/TMPDIR＋add/commit 两处 pathspec 写死字面路径｜账 A1028＋停车点 4.0em｜推送已授权仍未执行
