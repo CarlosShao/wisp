@@ -1,0 +1,20 @@
+## A1041（2026-10-18 21:4x +08，编排者）★推送后取 CI 逐名册**我自己做了两遍归因**⇒ 抓到两枚"blob 一字未动却 PASS⇄FAIL 翻脸"的弃权形仪器⇒ 立票 346｜★第三波 4 枚腿已放（写腿 1＜3 按交接书 13.1 节例外、理由具名）｜公共块再升级两处（⛔ `.out` 存证据＝票 275 腿自抓那枚；派单里凡列禁区路径放出前逐枚 `cat-file -e`）｜记我一枚：我把"⛔ 分节符那枚字符"这条禁令**写成了那枚字符本身**＝描述它的字占一枚（同形第三次、这回还是我）
+
+**① CI 取数与逐名归因（20:3x–20:5x 我自己跑，⛔ 抄腿⛔ 抄交接书）**
+- `run 39124122121`（锚 `a5080612`，push 事件）＝作业级 `test-windows`／`test-core`／`lint` failure，`slo-full`／`slo-smoke`／`lint-frontend` success；用例级 **12 枚唯一名**（`test-core` 9＋`test-windows` 3）。★票 339 那两枚 Linux 红**已不在名册**＝`339-r1` 那一发在 CI 上坐实转绿（我 18:2x 只是容器复跑，这一发才是 CI 档；两把尺同结论）。
+- 10 枚逐名对回在册票＝344（`TestC21*` 两枚）／机主侧 `frontend/**` 缺席（`TestApprovalCardViewJSONKeys…`＋`TestComposerContractTypes…`）／`A380`·票 200·票 216（`TestC26Rewrite…`）／票 35r8（`TestStreamLog*NotBounded35r8` 两枚）／票 303·305·314（`TestTicket223PermissionDenied…`＋`TestAC14GoSideEvalPush…`）⇒ ⛔ 一枚新账。
+- `lint` 那步点名 **20 枚**、两枚 run **逐名相同**、★全在 `.scratch/wisp/probes/**`＝票 275／276 存量（⛔ 归我今天那一推）。
+- ★**残下 2 枚我归不出来**＝`TestPOSIX120SealWindowLeafSwapIsClosed` ⇄ `TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1`。三把尺定它：① 两枚文件＋`winsec.go`＋`winsec_other.go` 在 `a42b35af`⇄`a5080612` 两锚上 **blob 逐串同**（⛔ 字节带起来的）；② run 39101060753（`a42b35af`）两枚 **PASS**、run 39124122121（`a5080612`）两枚 **FAIL**；③ 红句逐字自陈＝**弃权**（`…not evidence about a window that was never reached`／`RED instrument is dead … a zero window reading here proves nothing`／`every refusal came from the check before the act … does NOT exercise the pinned identity gate`）⇒ **CI 争态下抢不到窗口就红**。
+
+**② 立票 346**＝`.scratch/wisp/issues/346-two-race-window-instruments-red-on-abstention-under-ci-contention-blob-identical-flip.md`（名 92 字符≤100、★开票前跑过两门＝长度门 VERDICT GREEN／d22scan rc=0 clean；六格、第一趟⛔ 动码只许普查）。★**边界我先钉死**：⛔ 把它们改成 SKIP／改成绿／把重试拉到"总能过"＝**摘牙**（弃权那一支是票 322 `AC#1` 逐字要求的）；⛔ 与票 342 混记（342＝真敞口"祖先那一支还开着"，346＝测量稳性）。AC#3 那格是**我的欠账**＝把"CI 红名册逐名对回在册票"做成可重跑台件（今天我做两遍、每遍吃我十几步）。
+**为什么不派**＝`internal/winsec/**` 此刻在飞腿 `342-a1` 正读它（⛔ 同刻两腿抢同一包读数＝`TestResolvePerCallBudget` 那一族定式）。
+
+**③ 第三波放出（21:3x，4 枚腿，真实启动动作＝4 次 subagent 调用各返 id；存档 `98dbf20a` 在先、放行动 `c596df55` 在后）**
+- `341-r1`＝2e2d5c3d（写·`internal/config` 测试面，票 227 如实报未覆盖的四格 P2/P3/P5/P6）／`339-v1`＝c62fe720（裁·`internal/risk`，★必答(vi)＝现跑推翻⇄坐实我那段机制更正）／`338-v1`＝f4de7da5（裁·`internal/tools`⇄`cmd/wisp`，★本波 `go test ./cmd/wisp` 整包唯一持跑者；裁 `only_before=4` 截断差＝`A1035` 我的欠账）／`342-a1`＝7246a829（普查·`internal/winsec`，⛔ 落任何一形）。
+- ★通道＝subagent：`spawn_teammate` 返回 **Team member limit 8 reached**（第一波那 8 枚队友仍占名册）⇒ 本波 4 枚⛔ 出现在 `list_agents`。⇒ 定式补一句：**收件尺一律按主题前缀＋写面根认，⛔ 按注册名认**（否则"list 里查无此腿"会被读成"腿没跑"）。
+- 写腿 **1＜3**＝交接书 13.1 节例外，理由具名进公共块：其余可派写票全卡人工批准门或裁腿前置＝340（AC#2 新导出名须 `A##`）／345（AC#5 批准门）／344（AC#1 卡机主一拍）／342 落地腿（须先有本波 342-a1 产的三形表）／343（与 339 同一枚 `blacklist.go`）／338·339（已交件等裁）。⛔ 为凑数派一枚撞批准门的写腿＝比"写腿不足"更坏（先例＝`322-r1` 死于 150 轮帽、遗产要我代提）。
+- 释放前置现跑＝CPU 44／`go test` 进程 0（盘上那两枚 `cargo.exe` 是别的程序、⛔ 我方编队）／共享树跟踪件脏 0 行／逐面 40 分钟内零枚文件被动／4 枚腿身份三键各 0 笔＋probes 目录各不存在／派单里 13 枚禁区路径＋342 那六枚在册钉逐枚 `cat-file -e` rc=0。
+
+**④ 记我一枚（同族第三次、这回还是我）**：我在公共块与三枚 head/specific 里把禁令写成"⛔ 分节符 **那枚字符本身**"＝描述它的字占一枚（同形先例＝`336-r1` 的 `55f0ac49`、`322-v2` 的 `96-selfcheck` 那枚"needle 写进尺文件"）。改法＝`perl` 把 6 枚件里的 U+00A7 全换成字面串 `U+00A7`、重拼 dispatch、逐枚 grep 复验**命中 0** ⇒ 入库的 `98dbf20a` 已⛔ 含该字符。⛔ 掩盖：形状记进公共块＝**凡禁令要禁一枚字面字符，⛔ 在派单正文里写那枚字符，写码位**。
+
+**⑤ 编队（21:4x 现量）**：在飞 **4**（全 subagent 通道）；已收 **14**；结案 **4 票**（328／322／336／334）；★**未推 2**（`98dbf20a`＋`c596df55`，本波含 1 枚写腿 ⇒ ⛔ 推；下一窗口＝写腿交件后）。票 227 现 4 勾／2 未勾（AC#5／AC#6 缺 `cmd/wisp` 那一发＝★已交给在飞的 `338-v1` 走车道，但它⛔ 翻框＝翻勾仍归我凭裁腿判语）。
