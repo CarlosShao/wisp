@@ -1,0 +1,14 @@
+### SHOT1 landingA(LINUX) run=TestAnchorMissReasonNamesCandidateAndMissingAnchor|TestAnchorMissKeepsNonOverridableClassAndNeedL2|TestAnchorMissHasNoWorldOnThisPlatform339|TestAnchorFallbackTeethPerAnchor336
+P0=c1799cd24afce19e6accef23db23a7d7ee746dec expect=c1799cd24afce19e6accef23db23a7d7ee746dec
+old_hits_before=1 (must be 1)
+KIND=A MUT=7b3c995767bcd5618ad5943e7bb8fb99ea6d34c6
+old_hits_before_check=0 (must be 0 after)
+new_hits_after=1 (must be 1)
+time=2026-10-18T13:53:40.132Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+=== RUN   TestAnchorMissHasNoWorldOnThisPlatform339
+    anchor_miss_reason_339_other_test.go:152: ANCHORMISS339-OTHER cand.root=EMPTY anchor.root=EMPTY clause=false class=B shape=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*" (ticket 334's non-overridable A has no world on this platform; see pathresolver_other.go:10)
+--- PASS: TestAnchorMissHasNoWorldOnThisPlatform339 (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.019s
+RC=0
+R=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES

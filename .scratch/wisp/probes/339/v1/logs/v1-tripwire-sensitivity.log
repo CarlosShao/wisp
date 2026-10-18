@@ -1,0 +1,19 @@
+# 339-v1 自打：把 pathresolver_other.go 的 resolveHandle stub 换成可解析 ⇒ POSIX 绊线必须当场点名红
+anchor=7437ef882fac5b427bf17c4bf590819c58d0b375 tree=/d/tmp/wisp/20261018/339v1/trip/tree
+P0=37c42e9471101c8eedacfad6b7c539a5d4bc4c46 expect=37c42e9471101c8eedacfad6b7c539a5d4bc4c46
+old_anchor_hits_before=1 (must be 1)
+MUT=48f26a7c372018d91b2438345504f7692cd9ab66
+old_anchor_hits_after=0 (must be 0)
+new_anchor_hits_after=0
+1 (must be 1)
+time=2026-10-18T13:53:01.476Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+=== RUN   TestAnchorMissHasNoWorldOnThisPlatform339
+    anchor_miss_reason_339_other_test.go:140: tripwire: this platform now resolves a candidate root ("/tmp/gt/testanchormisshasnoworldonthisplatform3391194089059/001/profile/work/id_ed25519已允许\x1b\u202e") - pathresolver_other.go has grown a real resolver, so the windows-tagged fail-closed teeth in anchor_miss_reason_334_test.go must be ported here (ticket 339 AC#1 shape A's own condition)
+    anchor_miss_reason_339_other_test.go:143: tripwire: this platform now resolves an anchor root ("/tmp/gt/testanchormisshasnoworldonthisplatform3391194089059/001/profile/.aws/credentials"); port the teeth named above
+    anchor_miss_reason_339_other_test.go:152: ANCHORMISS339-OTHER cand.root=EMPTY anchor.root=EMPTY clause=false class=B shape=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*" (ticket 334's non-overridable A has no world on this platform; see pathresolver_other.go:10)
+--- FAIL: TestAnchorMissHasNoWorldOnThisPlatform339 (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.016s
+FAIL
+RC=1
+R=37c42e9471101c8eedacfad6b7c539a5d4bc4c46 match=YES

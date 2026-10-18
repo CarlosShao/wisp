@@ -1,0 +1,110 @@
+### SHOT2 landingA(WINDOWS) run=TestAnchorMissReasonNamesCandidateAndMissingAnchor|TestAnchorMissKeepsNonOverridableClassAndNeedL2|TestAnchorMissHasNoWorldOnThisPlatform339|TestAnchorFallbackTeethPerAnchor336
+P0=c1799cd24afce19e6accef23db23a7d7ee746dec expect=c1799cd24afce19e6accef23db23a7d7ee746dec
+old_hits_before=1 (must be 1)
+KIND=A MUT=7b3c995767bcd5618ad5943e7bb8fb99ea6d34c6
+old_hits_before_check=0 (must be 0 after)
+new_hits_after=1 (must be 1)
+time=2026-10-18T21:53:49.448+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAnchorFallbackTeethPerAnchor336
+=== RUN   TestAnchorFallbackTeethPerAnchor336/git-credentials
+    anchor_fallback_teeth_336_windows_test.go:129: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of ~/.git-credentials carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:132: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:135: an A deny carried by ~/.git-credentials was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "~/.git-credentials" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:141: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=B matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-under
+    anchor_fallback_teeth_336_windows_test.go:129: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of %APPDATA%\wisp\config.toml carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:132: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:135: an A deny carried by %APPDATA%\wisp\config.toml was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "%APPDATA%\\wisp\\config.toml" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:141: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=B matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-eq
+    anchor_fallback_teeth_336_windows_test.go:129: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of %APPDATA%\wisp\config.toml carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:132: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:135: an A deny carried by %APPDATA%\wisp\config.toml was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "%APPDATA%\\wisp\\config.toml" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:141: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=B matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/ssh
+    anchor_fallback_teeth_336_windows_test.go:129: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of ~/.ssh/** carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:132: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:135: an A deny carried by ~/.ssh/** was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "~/.ssh/**" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:141: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=B matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/ssh/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/aws
+    anchor_fallback_teeth_336_windows_test.go:129: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of ~/.aws/credentials carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:132: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:135: an A deny carried by ~/.aws/credentials was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "~/.aws/credentials" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:141: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=B matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/aws/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/kube
+    anchor_fallback_teeth_336_windows_test.go:129: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of ~/.kube/config carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:132: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:135: an A deny carried by ~/.kube/config was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "~/.kube/config" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:141: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=B matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/kube/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/dpapi-protect
+    anchor_fallback_teeth_336_windows_test.go:129: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of %APPDATA%\Microsoft\Protect\** (DPAPI master keys) carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:132: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:135: an A deny carried by %APPDATA%\Microsoft\Protect\** (DPAPI master keys) was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "%APPDATA%\\Microsoft\\Protect\\** (DPAPI master keys)" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:141: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=B matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/local-credentials
+    anchor_fallback_teeth_336_windows_test.go:129: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of %LOCALAPPDATA%\Microsoft\Credentials\** carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:132: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:135: an A deny carried by %LOCALAPPDATA%\Microsoft\Credentials\** was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "%LOCALAPPDATA%\\Microsoft\\Credentials\\**" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:141: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=B matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain
+--- FAIL: TestAnchorFallbackTeethPerAnchor336 (0.19s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/git-credentials (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/ssh (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/aws (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/kube (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/kube/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/dpapi-protect (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain (0.01s)
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so
+    anchor_miss_reason_334_test.go:153: fixture guard: the fail-closed shape must still be A here, got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube
+    anchor_miss_reason_334_test.go:178: fixture guard: want A from the fail-closed clause, got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.02s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so (0.01s)
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube (0.01s)
+    --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal (0.01s)
+=== RUN   TestAnchorMissKeepsNonOverridableClassAndNeedL2
+    anchor_miss_reason_334_test.go:215: class: got B, want A (the fail-closed tier is unchanged by AC#1)
+    anchor_miss_reason_334_test.go:219: Gate: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want class=A needL2=false allow=false (non-overridable)
+    anchor_miss_reason_334_test.go:223: an A deny from the fail-closed clause was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_miss_reason_334_test.go:230: SHAPE-READING334 inside-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+--- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.278s
+FAIL
+RC=1
+R=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES

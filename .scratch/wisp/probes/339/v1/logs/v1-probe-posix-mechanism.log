@@ -1,0 +1,19 @@
+GO_TEST_RC=0
+time=2026-10-18T13:49:46.133Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+=== RUN   TestZZ339V1ProbeMechanism
+    zz339v1probe_test.go:46: V1PROBE goos=/tmp/gt/TestZZ339V1ProbeMechanism3293649885/001/profile runtime.GOOS=linux homeSaw="/tmp/gt/TestZZ339V1ProbeMechanism3293649885/001/profile" profile="/tmp/gt/TestZZ339V1ProbeMechanism3293649885/001/profile" fakeHomeEffective=true
+    zz339v1probe_test.go:54: V1PROBE cand raw="/tmp/gt/testzz339v1probemechanism3293649885/001/profile/work/id_ed25519\x1b\u202e" real="" root="" partial=false certain=false
+    zz339v1probe_test.go:57: V1PROBE anchor-aws(absent leaf) raw="/tmp/gt/testzz339v1probemechanism3293649885/001/profile/.aws/credentials" real="" root="" certain=false
+    zz339v1probe_test.go:60: V1PROBE anchor-gitcred(installed) real="" root="" certain=false
+    zz339v1probe_test.go:62: V1PROBE uncertainAnchorMiss(cand,aws)=false
+    zz339v1probe_test.go:63: V1PROBE Classify(cand)=B
+    zz339v1probe_test.go:65: V1PROBE Gate class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    zz339v1probe_test.go:70: V1PROBE resolveHandle(existing profile)=("",false) resolveHandle(existing work)=("",false)
+    zz339v1probe_test.go:72: V1PROBE formsOf(real existing dir) real="" root=""
+    zz339v1probe_test.go:74: V1PROBE formsOf(installed anchor leaf) real="" root=""
+    zz339v1probe_test.go:78: V1PROBE guard-expr cand.root==""||anchor.root=="" = true
+    zz339v1probe_test.go:79: V1PROBE cand.certain()=false anchor.certain()=false isUnder(cand,anchor)=true isUnder(anchor,cand)=true
+    zz339v1probe_test.go:84: V1PROBE formsOf(tempdir root) real="" root=""
+--- PASS: TestZZ339V1ProbeMechanism (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.016s
