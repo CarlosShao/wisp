@@ -1,0 +1,16 @@
+派单增补 227r1-amend-01（2026-10-18 11:5x +08，编排者）★写面边界裁定＝(A)，扩到 `writeguard.go:152` 那枚日志字面串
+
+**为什么增补**：腿 `227-r1` 在起手阶段停手上报一枚写面边界（⛔ 自扩＝做对了）：票 227 `AC#2` 的甲支逐字写「**日志**/注释/票面都改成"只在 schema 已是当前版时不动文件"」，而"会说谎的那句"是 `internal/config/writeguard.go:152` 的 `slog.Info("config: config.toml already carries this key; nothing written", "key", ownedKey)`——它⛔ 在我派单写面第 2 项授权的"那两句日志"（`:170-172`＋`:181-186` 那两句 `re-laid…`）里。
+
+**裁定＝(A)：以票面为准，授权扩到 `:152`。** 记我一枚（⛔ 抹本笔）：我派单写面第 2 项写得**比票面的甲窄**；AGENTS 首段"任何一处与权威文件不一致 ⇒ 以那些文件为准"同形适用到我自己的派单 ⇒ 派单这一处按本增补更正。
+
+**四条硬边界（一条不许松）**：
+1. **只改字符串字面**：⛔ 动分支／条件表达式／函数签名／`slog` 等级（`Info` 保持 `Info`）／`"key", ownedKey` 那对实参。
+2. ⛔ 动属性名 `kept_in_file_not_in_memory`（腿读者尺查到它是全仓**唯一被当判据**的那枚＝`writeguard_226_test.go:132/:156`；改它＝改别人已勾判据的形状）。
+3. ★动 `:152` 前**补一发它自己那句的读者尺**（腿上一把量的是两句 `re-laid` 的共享尾串＋片段 `re-laid`／`hand-chosen key order`）：`git grep -n "already carries this key"` ＋ `git grep -n "nothing written"`，全仓含 `scripts tools .github *_test.go`，逐名点出有没有人按这句计数／断言。**若某枚用例正按这句断 ⇒ 当场停手上报**（＝那句是判据不是文案，改它＝改判据）。
+4. **码位纪律**：`internal/` 的字符串在 `d22scan` ban#8 射程内**不豁免**（注释才豁免）⇒ 新句 ⛔ `§ ≤ ✓ ⚠ ✗ →`，纯 ASCII 或 CJK；改完跑 `sh scripts/d22scan.sh` 落 `rc=`（★先 `unset GOTMPDIR TMPDIR`，否则触发票 311 AC#1 shape B 那道卷闸＝rc=2 射程拒绝，⛔ 读成红）。
+
+**新句要说什么**：把"什么都不写／不动文件"收窄成**带条件的事实句**＝只在 schema 已是当前版时那支才真的不动文件；否则迁移-on-读会重排。⛔ 许诺"注释保住了"（`:181-186` 那句 `re-laid…` 已说实话，注释保不住）。
+
+**腿交回编排者排程的三件（我收下、具名记账）**：① `AC#5` 整包终态（`cmd/wisp` 车道）＝归我；② `AC#6` 那句 `cmd/wisp/always_write_no_clobber_226_test.go:43-44` 的「nothing polls」过期＝归我（那文件在 `cmd/wisp/**`＝共享编译面，⛔ 腿动）；③ `245-v1` 那枚"默认层 1 红 2 绿、用例名丢了"的欠账＝归我，写进下一枚碰 `cmd/wisp` 的腿的派单（＝票 338 那枚，待 CPU 回落才放）。
+⇒ 腿的 `AC#2` 按"用例射程边界＋两句 `re-laid`＋`:152`"三处交料，`AC#5`／`AC#6` 具名留空，⛔ 翻框。

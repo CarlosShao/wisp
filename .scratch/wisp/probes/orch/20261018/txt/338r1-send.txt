@@ -1,0 +1,9 @@
+=== send 记录 2026-10-18 11:5x +08（编排者）===
+腿＝338-r1（票 338 落地腿·两枚跟踪件格式归位）
+★启动机制＝`subagent(prompt=…)` ⇒ job id `f706a44e-ccfd-44e7-8daf-18e110c7a454`（**不是** `spawn_teammate`）。
+  原因具名：`spawn_teammate` 回执 `Error: Team member limit 8 reached`（当前名册＝lead＋8 枚，其中 5 枚已收工仍占位）⇒ 改用 subagent 通道，**同样是真实启动动作**（回执 started），派单正文与判据逐字未变。⛔ 把这次记成"放了腿"之外的任何东西；也⛔ 因机制不同就降低收件标准。
+  ⇒ 定式补一句：**名册满时先 release/收工旧腿或改走 subagent，两处都算"启动动作"，只有回执（running／started）算在飞**。
+正文＝`orch/20261018/txt/338r1-dispatch.txt`（58 行／12192 字节）逐字＋subagent 版把关键约束原文重述（写面／非空白尺／⛔ 另四枚 CRLF／车道／unset 两 env／落点 `D:\tmp\wisp\20261018\338r1\`／pathspec 两处逐枚手打＋每笔自证／⛔ push）。
+放行前置（我现跑）＝CPU 连发 68/44/52/40（≤70✓）＋`Get-Process go` 计数 **0**（`cmd/wisp` 车道确认空，`322-r2` 已收工）＋`336-r1` 压在暂存区的 21 枚已自提（`git diff --cached | grep -c probes/336`＝**0**，我 11:3x 催过）。
+同刻另收一笔：`322-r2` 收工通知已发（四数我原始 log 复数逐字同、两处旧口径我复跑收下、`9c372800` 代提按"代提＋字节同原稿"入 `A1029`）。
+⛔ push（未推 424；推送窗口仍排在 `338-r1` 交件之后）。
