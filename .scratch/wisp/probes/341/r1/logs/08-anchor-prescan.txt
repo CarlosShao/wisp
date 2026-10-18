@@ -1,0 +1,29 @@
+[INFO branch literal bytes, writeguard.go lines 171-177]
+	if len(diverged) == 0 {
+		slog.Info("config: wrote merged change into config.toml (ticket 226: only the keys listed "+
+			"changed value, every other key keeps the value the file already held; the file is re-laid "+
+			"in canonical form, so comments and hand-chosen key order are not preserved; a key line the "+
+			"operator deleted by hand comes back at its schema default value)",
+			"key", ownedKey, "wrote", truncateKeys(written))
+		// AC#3: the bytes on disk are exactly the bytes this process holds, so
+
+[WARN branch literal bytes, lines 184-190]
+	slog.Warn("config: wrote merged change into config.toml and kept hand edits this process "+
+		"does not hold (ticket 226); the file was NOT claimed as our own write, so the next "+
+		"reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). "+
+		"Only the keys listed under wrote changed value; the file is re-laid in canonical form, "+
+		"so comments and hand-chosen key order are not preserved; a key line the operator deleted by "+
+		"hand comes back at its schema default value",
+		"key", ownedKey, "wrote", truncateKeys(written), "kept_in_file_not_in_memory", truncateKeys(diverged))
+
+[anchor hit counts]
+P2 anchor  not-preserved; a key line the "+  = 1
+P2 clause  operator deleted by hand comes back at its schema default value  = 1
+P3 anchor  base = deepCopyConfig(disk)  = 1
+P5 anchor  cp.SchemaVersion = SchemaVersionCurrent  = 1
+P6 anchor  p.BaseURL = pre.BaseURL  = 1
+
+[the two branches' tail strings verbatim, to pick a UNIQUE INFO anchor]
+155:				"re-read, so comments and hand-chosen key order are not preserved)",
+174:			"in canonical form, so comments and hand-chosen key order are not preserved; a key line the "+
+188:		"so comments and hand-chosen key order are not preserved; a key line the operator deleted by "+

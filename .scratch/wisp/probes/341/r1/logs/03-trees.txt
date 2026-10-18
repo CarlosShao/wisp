@@ -1,0 +1,48 @@
+[0] 8.3 short name check on the D: volume (dispatch: 目录名要产生 8.3 短名)
+ Volume in drive D is SWQ
+ Volume Serial Number is 682D-FE5E
+
+ Directory of D:\tmp\wisp\20261018
+
+2026/10/18  21:55    <DIR>                       .
+2026/10/18  10:25    <DIR>                       ..
+2026/10/18  10:45    <DIR>                       166r1
+2026/10/18  14:43    <DIR>                       227r1
+2026/10/18  16:32    <DIR>                       227v1
+2026/10/18  10:32    <DIR>                       228r3c
+2026/10/18  11:54    <DIR>                       322r2
+2026/10/18  13:06    <DIR>                       322v2
+2026/10/18  10:55    <DIR>                       328v1
+2026/10/18  12:16    <DIR>                       336r1
+2026/10/18  12:51    <DIR>                       336v1
+2026/10/18  13:07    <DIR>                       338r1
+2026/10/18  22:08    <DIR>                       338v1
+2026/10/18  17:08    <DIR>                       339r1
+2026/10/18  21:58    <DIR>                       339v1
+
+[1] what exists in the repo for the three manual pieces (untracked):
+    build  DIR present  dllfiles=3  bytes=245930875
+    third_party/sherpa-onnx  DIR present  dllfiles=3  bytes=22665006
+    frontend/dist  DIR present  dllfiles=0  bytes=691165
+
+[2] archive: git archive 98dbf20a35027a9290f52649d8ab2634646cb14e go.mod go.sum internal cmd tools scripts frontend models  (+ docs)
+  base = anchor as-is;  deliv = base + my new test file copied in from the worktree
+
+[3] prove the trees are non-empty (a 0 count is a bench failure, not a reading):
+    base: go files = 765   config pkg files = 38
+    base: my file present = NO  sha256=
+    deliv: go files = 766   config pkg files = 39
+    deliv: my file present = YES  sha256=2833c45586b7edbb1e6bdc9e0b9d5090d49619a38b6b8ec3df3dcb8d4fa1db65
+  worktree sha256 = 2833c45586b7edbb1e6bdc9e0b9d5090d49619a38b6b8ec3df3dcb8d4fa1db65
+
+[4] pristine hashes of the three production files (de-gum targets are verified against these):
+    internal/config/writeguard.go  base=efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+    internal/config/writeguard.go deliv=efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+    internal/config/loader.go  base=40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
+    internal/config/loader.go deliv=40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
+    internal/config/migrate.go  base=43857a141bc9743df5d4b83c9ca9f8be0b3061db099d83fca75c078572186fbe
+    internal/config/migrate.go deliv=43857a141bc9743df5d4b83c9ca9f8be0b3061db099d83fca75c078572186fbe
+
+[5] anchor of each tree's writeguard_handedit_227_test.go (must be identical to the anchor blob)
+f60b308b6b2e
+  base copy sha=9b430e3b68ad3be3d5692972faa10364f71c248a80f66dc452dda4836ac87edb

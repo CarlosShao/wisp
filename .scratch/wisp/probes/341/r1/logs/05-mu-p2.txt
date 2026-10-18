@@ -1,0 +1,18 @@
+=== SHOT p2  internal/config/writeguard.go ===
+tree=D:/tmp/wisp/20261018/341r1/mu_p2 (exported, outside the repo; tracked files untouched)
+tree copy hash  = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+delivery hash   = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd    tree==delivery ? YES
+killed anchor   [are not preserved; a key line the "]  BEFORE=1  want=1
+survivor anchor [a key line the operator deleted by "]  BEFORE=1  want=1  (proves the shot does not eat the other branch)
+after shot: killed anchor=0 (want 0)  new anchor [are not preserved)"]=2 (want >=1)  survivor=1 (want 1)
+landed hash = ba4adc5ff4c9ca3e7b00c74a91aff84e0fef2ed586ae1d59d3e84855a5b05b88 bytes=14843
+go test rc=1
+RUN=195 PASS_TOP=113 FAIL_TOP=1 SKIP=0
+---- full red roster (⛔ mine only; other legs' cases reddening is a legitimate reading of a dead guard) ----
+--- FAIL: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+---- the ticket-341 case this shot targets, named ----
+--- FAIL: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+---- verbatim red sentences in writeguard_unnailed_341_test.go ----
+    writeguard_unnailed_341_test.go:111: the INFO branch must state the delete-shape even when the values hide it; log:
+RESTORED hash = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd   restored==pristine ? YES
+re-check killed anchor after restore = 1 (want 1)

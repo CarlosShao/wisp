@@ -1,0 +1,19 @@
+=== SHOT p5  internal/config/loader.go ===
+tree=D:/tmp/wisp/20261018/341r1/mu_p5 (exported, outside the repo; tracked files untouched)
+tree copy hash  = 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
+delivery hash   = 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb    tree==delivery ? YES
+killed anchor   [cp.SchemaVersion = SchemaVersionCurrent]  BEFORE=1  want=1
+survivor anchor [data, err := MarshalCanonical(cp)]  BEFORE=1  want=1  (proves the shot does not eat the other branch)
+after shot: killed anchor=0 (want 0)  new anchor [cp.SchemaVersion = 1]=1 (want >=1)  survivor=1 (want 1)
+landed hash = 95fddf8f032623738d1c11a31f5cff57f482402f3d9fce4a381bf92259df870d bytes=10675
+go test rc=1
+RUN=195 PASS_TOP=112 FAIL_TOP=2 SKIP=0
+---- full red roster (⛔ mine only; other legs' cases reddening is a legitimate reading of a dead guard) ----
+--- FAIL: TestTicket257R1AC1CleanMachineRefusesAllSevenFields (0.02s)
+--- FAIL: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+---- the ticket-341 case this shot targets, named ----
+--- FAIL: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+---- verbatim red sentences in writeguard_unnailed_341_test.go ----
+    writeguard_unnailed_341_test.go:231: the write branch did not re-stamp the deleted schema_version line at the current version:
+RESTORED hash = 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb   restored==pristine ? YES
+re-check killed anchor after restore = 1 (want 1)

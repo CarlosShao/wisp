@@ -1,0 +1,13 @@
+[ruler] wc -l / CR bytes / gofumpt -l / gofumpt -d  on internal/config/writeguard_unnailed_341_test.go (shared worktree, read-only for the repo)
+lines=357
+bytes=18399
+CR bytes = 0  (want 0: 本机 6 枚 CRLF 存量件是别腿的，我的新字节必须 LF)
+func Test count = 5
+
+[gofumpt -l] (empty output + rc=0 = clean)
+rc=0
+
+[gofumpt -d] (any diff = I must fix the file before committing)
+rc_diff=0
+
+[non-ASCII bytes in the new file] = 81  (want 0: 本仓注释一律 ASCII)

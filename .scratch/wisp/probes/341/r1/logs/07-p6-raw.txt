@@ -1,0 +1,76 @@
+[A] every failure line naming my file, with its line number
+467:    writeguard_unnailed_341_test.go:314: the deleted base_url line came back as something other than the built-in preset:
+662:    writeguard_unnailed_341_test.go:368: the deleted line of an unpresetted provider did not come back as an explicit empty string:
+855:    writeguard_unnailed_341_test.go:374: the untouched key of the same table did not survive the re-lay:
+
+[B] the dumped file bodies: only llm / provider / base_url / protocol lines around those failures
+528:        api_key_ref = ''
+529:        base_url = ''
+537:        [llm]
+538:        text_chain = []
+541:        [llm.roles]
+542:        [llm.roles.chat]
+549:        [llm.roles.memory_extract]
+556:        [llm.roles.handoff]
+563:        [llm.roles.summarize]
+570:        [llm.retry]
+574:        [llm.providers]
+575:        [llm.providers.deepseek]
+576:        protocol = 'openai-chat'
+577:        base_url = 'https://api.deepseek.com/v1'
+578:        api_key_ref = ''
+584:        [llm.providers.deepseek.compat]
+723:        api_key_ref = ''
+724:        base_url = ''
+732:        [llm]
+733:        text_chain = []
+736:        [llm.roles]
+737:        [llm.roles.chat]
+744:        [llm.roles.memory_extract]
+751:        [llm.roles.handoff]
+758:        [llm.roles.summarize]
+765:        [llm.retry]
+769:        [llm.providers]
+770:        [llm.providers.mycustom]
+771:        protocol = 'openai-chat'
+772:        base_url = ''
+773:        api_key_ref = ''
+779:        [llm.providers.mycustom.compat]
+916:        api_key_ref = ''
+917:        base_url = ''
+925:        [llm]
+926:        text_chain = []
+929:        [llm.roles]
+930:        [llm.roles.chat]
+937:        [llm.roles.memory_extract]
+944:        [llm.roles.handoff]
+951:        [llm.roles.summarize]
+958:        [llm.retry]
+962:        [llm.providers]
+963:        [llm.providers.mycustom]
+964:        protocol = 'openai-chat'
+965:        base_url = ''
+966:        api_key_ref = ''
+972:        [llm.providers.mycustom.compat]
+
+[C] the exact 30 lines following the first failure message (line numbers from grep -n above)
+[C] context around line 662 (body of the unknown-provider failure):
+    writeguard_unnailed_341_test.go:368: the deleted line of an unpresetted provider did not come back as an explicit empty string:
+        [app]
+        [ball]
+        [ball.position]
+        [hotkey]
+        [session]
+        [voice]
+        [voice.wake_word]
+
+[D] context around the FIRST failure of the preset case:
+start=467
+    writeguard_unnailed_341_test.go:314: the deleted base_url line came back as something other than the built-in preset:
+        [app]
+        [ball]
+        [ball.position]
+        [hotkey]
+        [session]
+        [voice]
+        [voice.wake_word]

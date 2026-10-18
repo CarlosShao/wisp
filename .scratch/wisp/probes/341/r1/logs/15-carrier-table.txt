@@ -1,0 +1,61 @@
+[my five cases: the exact '^func Test' line numbers in the committed file]
+58:func TestHandDeletedDefaultValuedLineIsRestoredInvisibly(t *testing.T) {
+138:func TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory(t *testing.T) {
+209:func TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed(t *testing.T) {
+289:func TestHandDeletedProviderBaseUrlComesBackAsThePresetValue(t *testing.T) {
+349:func TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile(t *testing.T) {
+
+[file shape] lines=389 bytes=20241 CR=0 nonASCII=3
+  (for comparison the recipe file 227 used: writeguard_handedit_227_test.go lines=195 nonASCII=3)
+
+[placeholder ruler: any TODO/FIXME/XXX/⛔-as-claim in my file = 0 wanted]
+0
+
+[unmutated readings, named, from the delivery tree runs (both temp-root surfaces)]
+  Adflt/TestHandDeletedDefaultValuedLineIsRestoredInvisibly = --- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+  Adflt/TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = --- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+  Adflt/TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed = --- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+  Adflt/TestHandDeletedProviderBaseUrlComesBackAsThePresetValue = --- PASS: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.03s)
+  Adflt/TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile = --- PASS: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.04s)
+  Bdtemp/TestHandDeletedDefaultValuedLineIsRestoredInvisibly = --- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+  Bdtemp/TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = --- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+  Bdtemp/TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed = --- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+  Bdtemp/TestHandDeletedProviderBaseUrlComesBackAsThePresetValue = --- PASS: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+  Bdtemp/TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile = --- PASS: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)
+
+[the same five on the BASELINE tree (my file absent) = must be absent, which is the census reading]
+0
+
+[de-gum red lines, verbatim, per shot (the FIRST red sentence of the targeted case = the判点)]
+  ---- p2 ----
+    writeguard_unnailed_341_test.go:111: the INFO branch must state the delete-shape even when the values hide it; log:
+  ---- p3 ----
+    writeguard_unnailed_341_test.go:162: the resurrected section carried memory's value instead of the schema default:
+    writeguard_unnailed_341_test.go:174: the size divergence was not reported; log:
+    writeguard_unnailed_341_test.go:180: a reload reads size=60 click_through=true, want 56 and true
+  ---- p5 ----
+    writeguard_unnailed_341_test.go:231: the write branch did not re-stamp the deleted schema_version line at the current version:
+  ---- p6 ----
+    writeguard_unnailed_341_test.go:320: the deleted base_url line came back as something other than the built-in preset:
+    writeguard_unnailed_341_test.go:330: a reload reads "", want the preset endpoint the file now carries
+
+[differential reading for AC#2/必答(ii): under the P3 shot (merge base removed), does the P2 case go red?]
+0
+  0 above = P2 stays GREEN when the file-based merge base is removed, while its own shot reddens ONLY it (FAIL_TOP=1 in 05-mu-p2.txt)
+
+[必答(ii) production line numbers, at HEAD (= anchor, blob identical)]
+111:func (m *Manager) mergeWrite(ownedKey string, setOn func(base *Config)) error {
+141:		base = deepCopyConfig(disk)
+169:	diverged := diffKeyPaths(m.cur, base)
+171:	if len(diverged) == 0 {
+172:		slog.Info("config: wrote merged change into config.toml (ticket 226: only the keys listed "+
+184:	slog.Warn("config: wrote merged change into config.toml and kept hand edits this process "+
+139:func (m *Manager) writeAllowedDirs(next []string, setOn func(base *Config)) error {
+internal/config/allowdirs.go:142:	if err := m.mergeWrite(keyFSAllowedDirs, setOn); err != nil {
+internal/config/permmode.go:79:	if err := m.mergeWrite(keyRiskPermissionMode, func(base *Config) {
+
+[blob identity of the committed file vs the tree I measured]
+  git blob      = c577f1ccd4587cd48c2168f7eb1eb767b720450f
+  worktree sha  = b3714edb5f22478b6947c8f7817ab328c893afefb73e3632758fb2c531a68dea
+  bench tree    = b3714edb5f22478b6947c8f7817ab328c893afefb73e3632758fb2c531a68dea
+  mu_p2 tree    = b3714edb5f22478b6947c8f7817ab328c893afefb73e3632758fb2c531a68dea

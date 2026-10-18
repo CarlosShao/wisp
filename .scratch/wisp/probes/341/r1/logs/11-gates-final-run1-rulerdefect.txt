@@ -1,0 +1,76 @@
+HEAD at measurement = a217add5
+
+[gate 1] gofumpt -l on MY file (empty + rc=0 = clean)
+rc=0
+
+[gate 1b] gofumpt -l on the whole package: the pre-existing CRLF inventory, named only
+rc=0   (⛔ of these are mine: my file is the only one I wrote and it is clean above)
+
+[gate 2] go vet ./internal/config/
+rc=0
+
+[gate 3] sh scripts/d22scan.sh  (last line is the verdict; the self-test inside prints seeded violations)
+d22scan: scope ban #8 internal/         examined 592 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=592, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 592 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+rc=0
+
+[gate 4] sh scripts/check-path-length-budget.sh
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+rc=0
+
+[必答 v] git diff --numstat per commit of this leg: production .go added/deleted MUST be 0/0
+  --- commit 98dbf20a 第三波派单写档＝4 枚腿（先存档再发）｜放出前逐面
+      OTHER 112	0	.scratch/wisp/probes/orch/20261018/txt/338v1-dispatch.txt
+      OTHER 28	0	.scratch/wisp/probes/orch/20261018/txt/338v1-head.txt
+      OTHER 28	0	.scratch/wisp/probes/orch/20261018/txt/338v1-specific.txt
+      OTHER 118	0	.scratch/wisp/probes/orch/20261018/txt/339v1-dispatch.txt
+      OTHER 28	0	.scratch/wisp/probes/orch/20261018/txt/339v1-head.txt
+      OTHER 34	0	.scratch/wisp/probes/orch/20261018/txt/339v1-specific.txt
+      OTHER 118	0	.scratch/wisp/probes/orch/20261018/txt/341r1-dispatch.txt
+      OTHER 25	0	.scratch/wisp/probes/orch/20261018/txt/341r1-head.txt
+      OTHER 37	0	.scratch/wisp/probes/orch/20261018/txt/341r1-specific.txt
+      OTHER 127	0	.scratch/wisp/probes/orch/20261018/txt/342a1-dispatch.txt
+      OTHER 41	0	.scratch/wisp/probes/orch/20261018/txt/342a1-head.txt
+      OTHER 30	0	.scratch/wisp/probes/orch/20261018/txt/342a1-specific.txt
+      OTHER 6	0	.scratch/wisp/probes/orch/20261018/txt/assemble-wave3.sh
+      OTHER 56	0	.scratch/wisp/probes/orch/20261018/txt/common-20261018b.txt
+      OTHER 9	0	.scratch/wisp/probes/orch/20261018/txt/fix-sig.sh
+      OTHER 12	0	.scratch/wisp/probes/orch/20261018/txt/wave3-msg.txt
+      production .go paths changed = 0  (want 0)
+  --- commit 6948eb08 票 341 落地腿 341-r1·AC#1 四格常驻用例＝P2／P3／P5／P6 �
+      TEST  389	0	internal/config/writeguard_unnailed_341_test.go
+      production .go paths changed = 0  (want 0)
+
+[write-face ruler] every path touched by my commits, union:
+.scratch/wisp/probes/orch/20261018/txt/338v1-dispatch.txt
+.scratch/wisp/probes/orch/20261018/txt/338v1-head.txt
+.scratch/wisp/probes/orch/20261018/txt/338v1-specific.txt
+.scratch/wisp/probes/orch/20261018/txt/339v1-dispatch.txt
+.scratch/wisp/probes/orch/20261018/txt/339v1-head.txt
+.scratch/wisp/probes/orch/20261018/txt/339v1-specific.txt
+.scratch/wisp/probes/orch/20261018/txt/341r1-dispatch.txt
+.scratch/wisp/probes/orch/20261018/txt/341r1-head.txt
+.scratch/wisp/probes/orch/20261018/txt/341r1-specific.txt
+.scratch/wisp/probes/orch/20261018/txt/342a1-dispatch.txt
+.scratch/wisp/probes/orch/20261018/txt/342a1-head.txt
+.scratch/wisp/probes/orch/20261018/txt/342a1-specific.txt
+.scratch/wisp/probes/orch/20261018/txt/assemble-wave3.sh
+.scratch/wisp/probes/orch/20261018/txt/common-20261018b.txt
+.scratch/wisp/probes/orch/20261018/txt/fix-sig.sh
+.scratch/wisp/probes/orch/20261018/txt/wave3-msg.txt
+internal/config/writeguard_unnailed_341_test.go
+
+[越界尺] paths outside internal/config test face + probes/341/r1 + ticket 341 = 
+16
+
+[non-comment byte check on the three forbidden files] blob id anchor-vs-HEAD (must be identical all through)
+    internal/config/writeguard.go anchor=0ebc415b05651104fa13d6e71c76e61ba8fdd93c HEAD=0ebc415b05651104fa13d6e71c76e61ba8fdd93c same=YES
+    internal/config/loader.go anchor=9100ba92e220e6a839142893b54429cb435fa80e HEAD=9100ba92e220e6a839142893b54429cb435fa80e same=YES
+    internal/config/migrate.go anchor=78d85e22e9518aeec84362ec68a784c01dc06afe HEAD=78d85e22e9518aeec84362ec68a784c01dc06afe same=YES
+
+[ticket box ruler] must still be 7 unchecked / 0 checked (⛔ 翻框)
+  unchecked=7 checked=0 lines=43

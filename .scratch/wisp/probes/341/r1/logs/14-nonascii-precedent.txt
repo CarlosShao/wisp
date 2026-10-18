@@ -1,0 +1,52 @@
+[files under internal/ + cmd/ whose comments carry non-ASCII bytes, at HEAD]
+  6450 bytes  cmd/wisp/firstrun.go
+  5273 bytes  cmd/wisp/subagent_selfapproval_197_test.go
+  4472 bytes  cmd/wisp/config_reload.go
+  2937 bytes  cmd/wisp/task_output_pointer_notice_174r8_test.go
+  2825 bytes  cmd/wisp/approval_reply.go
+  2762 bytes  cmd/wisp/resident_task_source_windows.go
+  2724 bytes  cmd/wisp/plan_assembled_165r2_test.go
+  2630 bytes  cmd/wisp/run.go
+  2428 bytes  cmd/wisp/resident_approval_windows.go
+  2117 bytes  cmd/wisp/plan_wiring_165r2_test.go
+  2027 bytes  internal/agent/approval/ticket97_alias_direction_test.go
+  1912 bytes  cmd/wisp/resident_cancel_key_wording_260r3_windows_test.go
+  1844 bytes  internal/agent/approval/cancel_key_label_260r4_test.go
+  1787 bytes  internal/agent/approval/ticket146_liveapprovals_backing_test.go
+  1785 bytes  internal/agent/approval/window_test.go
+  1677 bytes  internal/agent/approval/queue_test.go
+  1610 bytes  internal/memory/schema.go
+  1587 bytes  internal/agent/approval/gate.go
+  1518 bytes  cmd/wisp/resident_audio_windows.go
+  1424 bytes  cmd/wisp/approval_always.go
+  1416 bytes  cmd/wisp/task_scope_close_151_test.go
+  1332 bytes  internal/agent/plan_present_crowded_world_330r2_test.go
+  1242 bytes  internal/agent/approval/zz_201_a1_junction_marker_windows_test.go
+  1123 bytes  cmd/wisp/zz315a1probe_test.go
+  1086 bytes  internal/agent/loop.go
+
+count of non-ASCII-bearing .go files = 532
+total .go files tracked              = 736
+
+[the recipe file 227 used: writeguard_handedit_227_test.go non-ASCII bytes]
+  3
+[mine, for comparison]
+  3
+
+[d22scan verdict on the current tree, with my file in it]
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=592, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 592 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+rc=0
+
+[does d22scan exempt comments for ban #8? cite its own words]
+13://	                      file-level exemption is internal/observe/goroutine.go,
+27://	                      the exemption ticket 67 registered ("the tree does not
+43://	                      cmd/ - comments and
+50://	9 phantom-citation    a production-file comment citing a repo-relative
+61://	                      the exemption is keyed to the abbreviation REGION's
+67://	                      it on the same comment line. All three are pinned
+127:	"strings"
+180:// the ban exists to prevent - of the non-comment occurrences of U+2265,
+191:	var cur strings.Builder
+391:// moment frontend/ reappears while the entry is still exempt - the exemption
+399:// exemption became the lie it was invented to prevent - driftedAbsentScope fired
+420:				"frontend/ at 63ef895 - ticket 67 had registered this scope exempt on the " +

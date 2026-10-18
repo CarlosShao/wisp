@@ -1,0 +1,40 @@
+HEAD at measurement = 062dbe44   my start anchor = 98dbf20a
+strict ruler = git log <anchor>..HEAD --format='%H' --grep="^票 341 落地腿 341-r1·"  (--perl-regexp, anchored at subject start)
+
+[roster] my commits only:
+  6948eb08 票 341 落地腿 341-r1·AC#1 四格常驻用例＝P2／P3／P5／P6 逐格补牙（只加测试面，⛔ 动任何产码非注释字节）
+count=1
+
+[POSITIVE CONTROL 1] the SAME ruler with the loose substring (run12's form) matches the orchestrator's
+  dispatch commit too: count=2 vs strict 1
+  loose-hit 6948eb08 票 341 落地腿 341-r1·AC#1 四格常驻用例＝P2／P3／P5／P6 逐格补牙（只加测试面，⛔ 动任何产码非注释字节）
+  loose-hit 98dbf20a 第三波派单写档＝4 枚腿（先存档再发）｜放出前逐面现量（21:1x）＝internal/config⇄internal/risk⇄internal/tools⇄cmd/wisp⇄internal/winsec 40 分钟内零枚文件被动、在飞腿 0、共享树跟踪件脏 0 行；★腿身份三键（注册名＋主题前缀＋写面根）逐枚现跑＝票 341 落地腿 341-r1／票 339 终裁腿 339-v1／票 338 终裁腿 338-v1／票 342 普查腿 342-a1 各 0 笔＋probes 目录各不存在
+
+[POSITIVE CONTROL 2] strict ruler against another leg's prefix must find ITS commits (ruler fires):
+  322-r1 strict hits=0
+
+[per-commit name-only + numstat, strict roster]
+  --- 6948eb08 票 341 落地腿 341-r1·AC#1 四格常驻用例＝P2／P3／P5／P6 逐格补牙（只加测试面，⛔ 动任何产码非注释字节）
+        internal/config/writeguard_unnailed_341_test.go
+      numstat:
+        389	0	internal/config/writeguard_unnailed_341_test.go
+      production .go paths changed = 0  (want 0)
+
+[union of my paths, strict roster] and the 越界 count:
+    internal/config/writeguard_unnailed_341_test.go
+  outside (internal/config/**_test.go | probes/341/r1/** | issues/341-*) = 0
+
+[the three forbidden production files, blob identity start-anchor vs HEAD]
+    internal/config/writeguard.go same=YES 0ebc415b05651104fa13d6e71c76e61ba8fdd93c
+    internal/config/loader.go same=YES 9100ba92e220e6a839142893b54429cb435fa80e
+    internal/config/migrate.go same=YES 78d85e22e9518aeec84362ec68a784c01dc06afe
+
+[collision re-check: is anyone else landing on internal/config right now?]
+  files newer than 45 min:
+    internal/config/writeguard_unnailed_341_test.go
+  (my own new file writeguard_unnailed_341_test.go will appear there = mine)
+  worktree status of the face:
+[end status]
+
+[ticket box ruler] unchecked/checked must stay 7/0:
+  unchecked=7 checked=0 lines=43

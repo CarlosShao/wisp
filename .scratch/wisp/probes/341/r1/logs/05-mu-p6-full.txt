@@ -1,0 +1,768 @@
+time=2026-10-18T22:27:16.597+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestBoundaryNoPlaintextSecretFields
+--- PASS: TestBoundaryNoPlaintextSecretFields (0.00s)
+=== RUN   TestBoundaryNoRuntimeObservationFields
+--- PASS: TestBoundaryNoRuntimeObservationFields (0.00s)
+=== RUN   TestRoundTripLoadMarshalLoad
+time=2026-10-18T22:27:16.611+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestRoundTripLoadMarshalLoad3401071590\001\.wisp-config-1157910141.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:16.615+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestRoundTripLoadMarshalLoad3401071590\001\.wisp-config-2009605914.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestRoundTripLoadMarshalLoad (0.02s)
+=== RUN   TestRoundTripBytes
+--- PASS: TestRoundTripBytes (0.00s)
+=== RUN   TestResolvedNeverPersists
+time=2026-10-18T22:27:16.620+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestResolvedNeverPersists110644340\001\.wisp-config-3443760866.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestResolvedNeverPersists (0.01s)
+=== RUN   TestValidateTextChainValid
+--- PASS: TestValidateTextChainValid (0.00s)
+=== RUN   TestValidateTextChainUnknownElement
+--- PASS: TestValidateTextChainUnknownElement (0.00s)
+=== RUN   TestValidateVoiceCloudChains
+=== RUN   TestValidateVoiceCloudChains/valid_cloud_chains
+=== RUN   TestValidateVoiceCloudChains/unknown_element_named
+=== RUN   TestValidateVoiceCloudChains/local-sherpa_never_in_chains
+--- PASS: TestValidateVoiceCloudChains (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/valid_cloud_chains (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/unknown_element_named (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/local-sherpa_never_in_chains (0.00s)
+=== RUN   TestValidateRoleReferences
+=== RUN   TestValidateRoleReferences/both_empty_is_unset-ok
+=== RUN   TestValidateRoleReferences/provider_without_model
+=== RUN   TestValidateRoleReferences/model_without_provider
+=== RUN   TestValidateRoleReferences/unknown_provider_named
+=== RUN   TestValidateRoleReferences/unknown_model_named
+=== RUN   TestValidateRoleReferences/valid_pair
+--- PASS: TestValidateRoleReferences (0.00s)
+    --- PASS: TestValidateRoleReferences/both_empty_is_unset-ok (0.00s)
+    --- PASS: TestValidateRoleReferences/provider_without_model (0.00s)
+    --- PASS: TestValidateRoleReferences/model_without_provider (0.00s)
+    --- PASS: TestValidateRoleReferences/unknown_provider_named (0.00s)
+    --- PASS: TestValidateRoleReferences/unknown_model_named (0.00s)
+    --- PASS: TestValidateRoleReferences/valid_pair (0.00s)
+=== RUN   TestValidateRealtimeReferences
+=== RUN   TestValidateRealtimeReferences/disabled_with_dangling_pair_tolerated
+=== RUN   TestValidateRealtimeReferences/enabled_requires_existing_pair
+=== RUN   TestValidateRealtimeReferences/enabled_without_pair_rejected
+=== RUN   TestValidateRealtimeReferences/enabled_valid_pair
+--- PASS: TestValidateRealtimeReferences (0.00s)
+    --- PASS: TestValidateRealtimeReferences/disabled_with_dangling_pair_tolerated (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_requires_existing_pair (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_without_pair_rejected (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_valid_pair (0.00s)
+=== RUN   TestSplitChainElement
+--- PASS: TestSplitChainElement (0.00s)
+=== RUN   TestTicket261P1MissingEnabledKeyDecodesFalse
+--- PASS: TestTicket261P1MissingEnabledKeyDecodesFalse (0.00s)
+=== RUN   TestTicket261P1SettingsWriteMaterializesFalse
+time=2026-10-18T22:27:16.632+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket261P1SettingsWriteMaterializesFalse1997514761\001\.wisp-config-592859765.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:16.632+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.mock261.models.t261-nokey.context_window wrote=[llm.providers.mock261.models.t261-nokey.context_window]
+--- PASS: TestTicket261P1SettingsWriteMaterializesFalse (0.01s)
+=== RUN   TestLoadFileMergesDefaultsAndOverrides
+--- PASS: TestLoadFileMergesDefaultsAndOverrides (0.00s)
+=== RUN   TestLoadFileUnknownKeyErrorNamesLine
+--- PASS: TestLoadFileUnknownKeyErrorNamesLine (0.00s)
+=== RUN   TestLoadFileUnknownKeyLineNumbersAreOneBased
+--- PASS: TestLoadFileUnknownKeyLineNumbersAreOneBased (0.00s)
+=== RUN   TestLoadFileWrongTypeErrorHasPosition
+--- PASS: TestLoadFileWrongTypeErrorHasPosition (0.00s)
+=== RUN   TestLoadFileRejectsInvalidValues
+--- PASS: TestLoadFileRejectsInvalidValues (0.00s)
+=== RUN   TestLoadFilePresetInheritance
+    loader_test.go:167: preset base_url = "", want deepseek endpoint
+--- FAIL: TestLoadFilePresetInheritance (0.00s)
+=== RUN   TestLoadFileUnknownProviderNeedsProtocol
+--- PASS: TestLoadFileUnknownProviderNeedsProtocol (0.00s)
+=== RUN   TestLoadFileResolvesSecrets
+--- PASS: TestLoadFileResolvesSecrets (0.00s)
+=== RUN   TestLoadFileResolveFailureIsError
+--- PASS: TestLoadFileResolveFailureIsError (0.00s)
+=== RUN   TestLoadFileNilResolverSkipsResolution
+--- PASS: TestLoadFileNilResolverSkipsResolution (0.00s)
+=== RUN   TestLoadFileNewerSchemaVersionRejected
+--- PASS: TestLoadFileNewerSchemaVersionRejected (0.00s)
+=== RUN   TestSaveFileRoundTripsThroughLoad
+time=2026-10-18T22:27:16.668+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestSaveFileRoundTripsThroughLoad2213634802\001\.wisp-config-2418927947.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSaveFileRoundTripsThroughLoad (0.01s)
+=== RUN   TestConfirmLockedRunsOutsideTheManagerLock
+time=2026-10-18T22:27:16.682+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestConfirmLockedRunsOutsideTheManagerLock (0.01s)
+=== RUN   TestCheckAndReloadAsksOncePerFileChange
+time=2026-10-18T22:27:16.695+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestCheckAndReloadAsksOncePerFileChange (0.01s)
+=== RUN   TestManagerHotTierAppliesImmediately
+--- PASS: TestManagerHotTierAppliesImmediately (0.02s)
+=== RUN   TestManagerRestartTierKeepsOldValues
+--- PASS: TestManagerRestartTierKeepsOldValues (0.01s)
+=== RUN   TestManagerThemeIsHotInsideApp
+--- PASS: TestManagerThemeIsHotInsideApp (0.01s)
+=== RUN   TestManagerReloadTierEmitsEvent
+--- PASS: TestManagerReloadTierEmitsEvent (0.01s)
+=== RUN   TestManagerVoiceHotKeysDoNotEmitReload
+--- PASS: TestManagerVoiceHotKeysDoNotEmitReload (0.01s)
+=== RUN   TestManagerLockedLooseningRejectedKeepsOld
+time=2026-10-18T22:27:16.777+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedLooseningRejectedKeepsOld (0.02s)
+=== RUN   TestManagerLockedLooseningApprovedApplies
+time=2026-10-18T22:27:16.790+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedLooseningApprovedApplies (0.01s)
+=== RUN   TestManagerLockedTighteningHotAppliesWithoutHook
+time=2026-10-18T22:27:16.803+08:00 level=INFO msg="config: locked section tightened, hot-applied" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedTighteningHotAppliesWithoutHook (0.01s)
+=== RUN   TestManagerLockedNilConfirmHookDenies
+time=2026-10-18T22:27:16.817+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedNilConfirmHookDenies (0.01s)
+=== RUN   TestManagerLockedBothDirectionsLogged
+--- PASS: TestManagerLockedBothDirectionsLogged (0.03s)
+=== RUN   TestManagerLoadErrorKeepsCurrentConfig
+--- PASS: TestManagerLoadErrorKeepsCurrentConfig (0.02s)
+=== RUN   TestManagerMissingFileKeepsCurrentAndErrors
+--- PASS: TestManagerMissingFileKeepsCurrentAndErrors (0.00s)
+=== RUN   TestMigrateV1Fixture
+time=2026-10-18T22:27:16.875+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestMigrateV1Fixture2835995613\001\config.toml.bak-1 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:16.879+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestMigrateV1Fixture2835995613\001\.wisp-config-2627988524.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestMigrateV1Fixture (0.01s)
+=== RUN   TestMigrateNoVersionKeyAssumedV1
+time=2026-10-18T22:27:16.884+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestMigrateNoVersionKeyAssumedV1337626002\001\config.toml.bak-1 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:16.886+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestMigrateNoVersionKeyAssumedV1337626002\001\.wisp-config-849897255.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestMigrateNoVersionKeyAssumedV1 (0.01s)
+=== RUN   TestMigrateCorruptFileUntouched
+--- PASS: TestMigrateCorruptFileUntouched (0.00s)
+=== RUN   TestMigrateUnsupportedVersionUntouched
+--- PASS: TestMigrateUnsupportedVersionUntouched (0.00s)
+=== RUN   TestMigrateHigherIntermediateVersionRejected
+--- PASS: TestMigrateHigherIntermediateVersionRejected (0.00s)
+=== RUN   TestAC2BaselineModeIsDecorative
+    private_acl_windows_test.go:56: seeded wide parent D:\tmp\wisp\20261018\341r1\gotmp\TestAC2BaselineModeIsDecorative1152469064\001\data
+        D:\tmp\wisp\20261018\341r1\gotmp\TestAC2BaselineModeIsDecorative1152469064\001\data BUILTIN\Users:(OI)(CI)(RX)
+                                                                                            BUILTIN\Administrators:(I)(F)
+                                                                                            BUILTIN\Administrators:(I)(OI)(CI)(IO)(F)
+                                                                                            NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                            NT AUTHORITY\SYSTEM:(I)(OI)(CI)(IO)(F)
+                                                                                            NT AUTHORITY\Authenticated Users:(I)(M)
+                                                                                            NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+                                                                                            BUILTIN\Users:(I)(RX)
+                                                                                            BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    private_acl_windows_test.go:63: BASELINE (pre-wiring shape) icacls D:\tmp\wisp\20261018\341r1\gotmp\TestAC2BaselineModeIsDecorative1152469064\001\data\config.toml.bak-1
+        D:\tmp\wisp\20261018\341r1\gotmp\TestAC2BaselineModeIsDecorative1152469064\001\data\config.toml.bak-1 BUILTIN\Users:(I)(RX)
+                                                                                                              BUILTIN\Administrators:(I)(F)
+                                                                                                              NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                              NT AUTHORITY\Authenticated Users:(I)(M)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC2BaselineModeIsDecorative (0.17s)
+=== RUN   TestAC2MigrationBackupLandsPrivate
+    private_acl_windows_test.go:77: seeded wide parent D:\tmp\wisp\20261018\341r1\gotmp\TestAC2MigrationBackupLandsPrivate2079185284\001\data
+        D:\tmp\wisp\20261018\341r1\gotmp\TestAC2MigrationBackupLandsPrivate2079185284\001\data BUILTIN\Users:(OI)(CI)(RX)
+                                                                                               BUILTIN\Administrators:(I)(F)
+                                                                                               BUILTIN\Administrators:(I)(OI)(CI)(IO)(F)
+                                                                                               NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                               NT AUTHORITY\SYSTEM:(I)(OI)(CI)(IO)(F)
+                                                                                               NT AUTHORITY\Authenticated Users:(I)(M)
+                                                                                               NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+                                                                                               BUILTIN\Users:(I)(RX)
+                                                                                               BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+        
+        Successfully processed 1 files; Failed processing 0 files
+time=2026-10-18T22:27:17.149+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC2MigrationBackupLandsPrivate2079185284\001\data\config.toml.bak-1 kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.150+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC2MigrationBackupLandsPrivate2079185284\001\data\.wisp-config-908609934.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    private_acl_windows_test.go:89: icacls D:\tmp\wisp\20261018\341r1\gotmp\TestAC2MigrationBackupLandsPrivate2079185284\001\data\config.toml.bak-1
+        D:\tmp\wisp\20261018\341r1\gotmp\TestAC2MigrationBackupLandsPrivate2079185284\001\data\config.toml.bak-1 NT AUTHORITY\SYSTEM:(F)
+                                                                                                                 BUILTIN\Administrators:(F)
+                                                                                                                 DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    private_acl_windows_test.go:90: icacls D:\tmp\wisp\20261018\341r1\gotmp\TestAC2MigrationBackupLandsPrivate2079185284\001\data\config.toml
+        D:\tmp\wisp\20261018\341r1\gotmp\TestAC2MigrationBackupLandsPrivate2079185284\001\data\config.toml NT AUTHORITY\SYSTEM:(F)
+                                                                                                           BUILTIN\Administrators:(F)
+                                                                                                           DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC2MigrationBackupLandsPrivate (0.16s)
+=== RUN   TestAC2SaveFileLandsPrivate
+    private_acl_windows_test.go:108: seeded wide parent D:\tmp\wisp\20261018\341r1\gotmp\TestAC2SaveFileLandsPrivate352254742\001\data
+        D:\tmp\wisp\20261018\341r1\gotmp\TestAC2SaveFileLandsPrivate352254742\001\data BUILTIN\Users:(OI)(CI)(RX)
+                                                                                       BUILTIN\Administrators:(I)(F)
+                                                                                       BUILTIN\Administrators:(I)(OI)(CI)(IO)(F)
+                                                                                       NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                       NT AUTHORITY\SYSTEM:(I)(OI)(CI)(IO)(F)
+                                                                                       NT AUTHORITY\Authenticated Users:(I)(M)
+                                                                                       NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+                                                                                       BUILTIN\Users:(I)(RX)
+                                                                                       BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    private_acl_windows_test.go:122: BASELINE (pre-wiring shape) icacls D:\tmp\wisp\20261018\341r1\gotmp\TestAC2SaveFileLandsPrivate352254742\001\data\config.toml
+        D:\tmp\wisp\20261018\341r1\gotmp\TestAC2SaveFileLandsPrivate352254742\001\data\config.toml BUILTIN\Users:(I)(RX)
+                                                                                                   BUILTIN\Administrators:(I)(F)
+                                                                                                   NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                   NT AUTHORITY\Authenticated Users:(I)(M)
+        
+        Successfully processed 1 files; Failed processing 0 files
+time=2026-10-18T22:27:17.329+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC2SaveFileLandsPrivate352254742\001\data\.wisp-config-1099293278.tmp kind=inherited cleared="" cleared_inherited=S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-11(A;ID;0x1301bf;;;AU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    private_acl_windows_test.go:130: icacls D:\tmp\wisp\20261018\341r1\gotmp\TestAC2SaveFileLandsPrivate352254742\001\data\config.toml
+        D:\tmp\wisp\20261018\341r1\gotmp\TestAC2SaveFileLandsPrivate352254742\001\data\config.toml NT AUTHORITY\SYSTEM:(F)
+                                                                                                   BUILTIN\Administrators:(F)
+                                                                                                   DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC2SaveFileLandsPrivate (0.14s)
+=== RUN   TestAC11SettingWriteReportsTheKeyPathItChanged
+time=2026-10-18T22:27:17.365+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC11SettingWriteReportsTheKeyPathItChanged288408680\001\.wisp-config-178282901.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.367+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+--- PASS: TestAC11SettingWriteReportsTheKeyPathItChanged (0.01s)
+=== RUN   TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure
+time=2026-10-18T22:27:17.373+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure865993104\001\.wisp-config-722781380.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.374+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-chat.context_window wrote=[llm.providers.deepseek.models.deepseek-chat.context_window]
+--- PASS: TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure (0.01s)
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/negative_context_window
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/negative_price
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/a_provider_the_config_does_not_declare
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/a_model_the_provider's_catalog_does_not_list
+--- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical (0.02s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_context_window (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_price (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_provider_the_config_does_not_declare (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_model_the_provider's_catalog_does_not_list (0.00s)
+=== RUN   TestAC11SettingWriteKeepsAForeignHandEditedKey
+time=2026-10-18T22:27:17.409+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC11SettingWriteKeepsAForeignHandEditedKey2755710635\001\.wisp-config-839077292.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.410+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC11SettingWriteKeepsAForeignHandEditedKey (0.02s)
+=== RUN   TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit
+time=2026-10-18T22:27:17.427+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit3819034556\001\.wisp-config-2332481395.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.428+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url] kept_in_file_not_in_memory=[ball.size]
+time=2026-10-18T22:27:17.431+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit3819034556\001\.wisp-config-2486681084.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit (0.02s)
+=== RUN   TestAC3SettingWriteStoresARefNeverAValue
+time=2026-10-18T22:27:17.435+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC3SettingWriteStoresARefNeverAValue4076423523\001\.wisp-config-3066259693.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.436+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+--- PASS: TestAC3SettingWriteStoresARefNeverAValue (0.01s)
+=== RUN   TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes
+time=2026-10-18T22:27:17.443+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes1266068083\001\.wisp-config-3129294989.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.444+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+time=2026-10-18T22:27:17.446+08:00 level=INFO msg="config: config.toml already carries this key; this write added nothing (the file's bytes and mtime stayed put only because its schema_version was already current; a file behind on schema_version had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.base_url
+--- PASS: TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes (0.01s)
+=== RUN   TestTicket257R1AC1CleanMachineRefusesAllSevenFields
+time=2026-10-18T22:27:17.452+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket257R1AC1CleanMachineRefusesAllSevenFields3443925501\001\.wisp-config-3555373780.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    settings_257_test.go:183: clean machine, seven refusals by reason: map[第 2 种拒因：行不存在:7] (fields: 7)
+--- PASS: TestTicket257R1AC1CleanMachineRefusesAllSevenFields (0.01s)
+=== RUN   TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields
+time=2026-10-18T22:27:17.461+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields795893559\001\.wisp-config-3893019444.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.464+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields795893559\001\.wisp-config-1137537041.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.465+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+time=2026-10-18T22:27:17.469+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields795893559\001\.wisp-config-1000532213.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.469+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+time=2026-10-18T22:27:17.474+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields795893559\001\.wisp-config-3149620989.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.475+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-chat.context_window wrote=[llm.providers.deepseek.models.deepseek-chat.context_window]
+time=2026-10-18T22:27:17.478+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields795893559\001\.wisp-config-2234857134.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.480+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-chat.price.in wrote=[llm.providers.deepseek.models.deepseek-chat.price.in]
+time=2026-10-18T22:27:17.482+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields795893559\001\.wisp-config-2726142866.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.484+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-chat.price.out wrote=[llm.providers.deepseek.models.deepseek-chat.price.out]
+time=2026-10-18T22:27:17.488+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields795893559\001\.wisp-config-3773673083.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.488+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.roles.chat.model wrote=[llm.roles.chat.model]
+time=2026-10-18T22:27:17.492+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields795893559\001\.wisp-config-3439165820.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.492+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+--- PASS: TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields (0.04s)
+=== RUN   TestTicket257R1AC2MissingFileIsItsOwnSentence
+--- PASS: TestTicket257R1AC2MissingFileIsItsOwnSentence (0.00s)
+=== RUN   TestTicket257R1AC2MissingRowIsItsOwnSentence
+time=2026-10-18T22:27:17.497+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestTicket257R1AC2MissingRowIsItsOwnSentence1665975555\001\.wisp-config-1928127625.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestTicket257R1AC2MissingRowIsItsOwnSentence (0.01s)
+=== RUN   TestTicket257R1AC2InvalidValueIsItsOwnSentence
+--- PASS: TestTicket257R1AC2InvalidValueIsItsOwnSentence (0.00s)
+=== RUN   Test313CreateProviderRowCreatesAPresetRowAndItsModel
+time=2026-10-18T22:27:17.507+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test313CreateProviderRowCreatesAPresetRowAndItsModel603942798\001\.wisp-config-3004187702.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.507+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.stepfun wrote=[llm.providers.stepfun]
+--- PASS: Test313CreateProviderRowCreatesAPresetRowAndItsModel (0.01s)
+=== RUN   Test313CreateProviderRowRefusesNonPresetAndExistingRow
+=== RUN   Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_non-preset_provider_name
+=== RUN   Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_row_the_config_already_declares
+time=2026-10-18T22:27:17.517+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test313CreateProviderRowRefusesNonPresetAndExistingRow1634809268\001\.wisp-config-3753053022.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.517+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.stepfun wrote=[llm.providers.stepfun]
+--- PASS: Test313CreateProviderRowRefusesNonPresetAndExistingRow (0.01s)
+    --- PASS: Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_non-preset_provider_name (0.00s)
+    --- PASS: Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_row_the_config_already_declares (0.00s)
+=== RUN   Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa
+time=2026-10-18T22:27:17.524+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa3541550875\001\.wisp-config-3810564456.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.525+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.stepfun wrote=[llm.providers.stepfun]
+time=2026-10-18T22:27:17.529+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa3541550875\001\.wisp-config-968201603.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.529+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=voice.cloud_asr_chain wrote=[voice.cloud_asr_chain] kept_in_file_not_in_memory=[llm.providers.stepfun.protocol]
+time=2026-10-18T22:27:17.534+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa3541550875\001\.wisp-config-2358923347.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.535+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=voice.cloud_tts_chain wrote=[voice.cloud_tts_chain] kept_in_file_not_in_memory=[llm.providers.stepfun.protocol]
+--- PASS: Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa (0.02s)
+=== RUN   Test313RoleChatPairWritesBothKeysOrNeither
+time=2026-10-18T22:27:17.539+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test313RoleChatPairWritesBothKeysOrNeither127333697\001\.wisp-config-107678235.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.540+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.roles.chat wrote="[llm.roles.chat.model llm.roles.chat.provider]"
+--- PASS: Test313RoleChatPairWritesBothKeysOrNeither (0.01s)
+=== RUN   Test313RealtimeHalfPairFollowsTheEnabledRule
+time=2026-10-18T22:27:17.544+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test313RealtimeHalfPairFollowsTheEnabledRule929872674\001\.wisp-config-2039532490.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.546+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=voice.realtime.provider wrote=[voice.realtime.provider]
+time=2026-10-18T22:27:17.552+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test313RealtimeHalfPairFollowsTheEnabledRule929872674\001\.wisp-config-1622285685.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.553+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=voice.realtime.model wrote=[voice.realtime.model]
+time=2026-10-18T22:27:17.557+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test313RealtimeHalfPairFollowsTheEnabledRule929872674\002\.wisp-config-4211878551.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.558+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=voice.realtime.model wrote=[voice.realtime.model]
+--- PASS: Test313RealtimeHalfPairFollowsTheEnabledRule (0.02s)
+=== RUN   Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers
+time=2026-10-18T22:27:17.565+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers3187709689\001\.wisp-config-4137168543.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.566+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.billing wrote=[llm.providers.deepseek.billing]
+time=2026-10-18T22:27:17.569+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers3187709689\001\.wisp-config-3239164227.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.570+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.billing wrote=[llm.providers.deepseek.billing]
+time=2026-10-18T22:27:17.574+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers3187709689\001\.wisp-config-446538830.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.574+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.billing wrote=[llm.providers.deepseek.billing]
+--- PASS: Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers (0.02s)
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName
+time=2026-10-18T22:27:17.580+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test320CreateCustomProviderRowLandsAndRefusesByName1550045061\001\.wisp-config-616132148.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.581+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.local-gw wrote=[llm.providers.local-gw]
+time=2026-10-18T22:27:17.585+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test320CreateCustomProviderRowLandsAndRefusesByName1550045061\001\.wisp-config-3988039579.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.585+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.local-gw-bare wrote=[llm.providers.local-gw-bare]
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/a_preset_name_belongs_to_provider_row_create
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/an_empty_base_url
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/a_protocol_outside_the_enum
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/a_row_the_config_already_declares
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/no_name_at_all
+time=2026-10-18T22:27:17.591+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test320CreateCustomProviderRowLandsAndRefusesByName1550045061\001\.wisp-config-1506616368.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.591+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.local-gw-four wrote=[llm.providers.local-gw-four]
+--- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName (0.02s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/a_preset_name_belongs_to_provider_row_create (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/an_empty_base_url (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/a_protocol_outside_the_enum (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/a_row_the_config_already_declares (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/no_name_at_all (0.00s)
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice
+time=2026-10-18T22:27:17.598+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice945829272\001\.wisp-config-4072666008.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.598+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-new-under-test-320 wrote=[llm.providers.deepseek.models.deepseek-new-under-test-320]
+time=2026-10-18T22:27:17.603+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice945829272\001\.wisp-config-3883159710.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.603+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-new-under-test-320.context_window wrote=[llm.providers.deepseek.models.deepseek-new-under-test-320.context_window]
+time=2026-10-18T22:27:17.606+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice945829272\001\.wisp-config-1329206316.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.607+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-new-under-test-320.price.in wrote=[llm.providers.deepseek.models.deepseek-new-under-test-320.price.in]
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_undeclared_provider
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_entry_that_already_exists
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/no_model_id_at_all
+time=2026-10-18T22:27:17.613+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice945829272\001\.wisp-config-4062386148.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.614+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-second-under-test-320 wrote=[llm.providers.deepseek.models.deepseek-second-under-test-320]
+--- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice (0.02s)
+    --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_undeclared_provider (0.00s)
+    --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_entry_that_already_exists (0.00s)
+    --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/no_model_id_at_all (0.00s)
+=== RUN   TestEverySectionHasATierInRegistry
+--- PASS: TestEverySectionHasATierInRegistry (0.00s)
+=== RUN   TestRegistryCoversSchemaSectionsGreen
+--- PASS: TestRegistryCoversSchemaSectionsGreen (0.00s)
+=== RUN   TestPerKeySectionsAreRegisteredPerKey
+--- PASS: TestPerKeySectionsAreRegisteredPerKey (0.00s)
+=== RUN   TestVoicePerKeyRowsMirrorPlanVoiceWalks
+--- PASS: TestVoicePerKeyRowsMirrorPlanVoiceWalks (0.00s)
+=== RUN   TestEveryAppKeyIsRegisteredInTierRegistry
+--- PASS: TestEveryAppKeyIsRegisteredInTierRegistry (0.00s)
+=== RUN   TestAppKeyWalkSeesTheRosterItClaims
+--- PASS: TestAppKeyWalkSeesTheRosterItClaims (0.00s)
+=== RUN   TestUnwiredSecurityKeysFailLoudly
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides
+=== RUN   TestUnwiredSecurityKeysFailLoudly/net.allowlist
+=== RUN   TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges
+--- PASS: TestUnwiredSecurityKeysFailLoudly (0.02s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist (0.01s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/net.allowlist (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges (0.00s)
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/empty_file
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads
+time=2026-10-18T22:27:17.642+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestUnwiredGuardLeavesHonestConfigsAloneSaveFile_output_reloads1949028267\001\.wisp-config-4208390318.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected
+--- PASS: TestUnwiredGuardLeavesHonestConfigsAlone (0.01s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/empty_file (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected (0.00s)
+=== RUN   TestUnwiredGuardFiresBeforeAnyFileWrite
+--- PASS: TestUnwiredGuardFiresBeforeAnyFileWrite (0.00s)
+=== RUN   TestUnwiredGuardIsScopedNotABigStick
+--- PASS: TestUnwiredGuardIsScopedNotABigStick (0.00s)
+=== RUN   TestUnwiredKeysStillRoundTripAtTheByteLevel
+--- PASS: TestUnwiredKeysStillRoundTripAtTheByteLevel (0.00s)
+=== RUN   TestEveryLockedSectionKeyIsAccountedFor
+--- PASS: TestEveryLockedSectionKeyIsAccountedFor (0.00s)
+=== RUN   TestValidateDefaultsPass
+--- PASS: TestValidateDefaultsPass (0.00s)
+=== RUN   TestValidateEnumErrors
+=== RUN   TestValidateEnumErrors/theme
+=== RUN   TestValidateEnumErrors/observe.level
+=== RUN   TestValidateEnumErrors/proxy.mode
+=== RUN   TestValidateEnumErrors/over_budget
+=== RUN   TestValidateEnumErrors/protocol
+=== RUN   TestValidateEnumErrors/provider_billing
+=== RUN   TestValidateEnumErrors/model_billing
+=== RUN   TestValidateEnumErrors/thinking_intensity
+=== RUN   TestValidateEnumErrors/thinking_levels_element
+--- PASS: TestValidateEnumErrors (0.00s)
+    --- PASS: TestValidateEnumErrors/theme (0.00s)
+    --- PASS: TestValidateEnumErrors/observe.level (0.00s)
+    --- PASS: TestValidateEnumErrors/proxy.mode (0.00s)
+    --- PASS: TestValidateEnumErrors/over_budget (0.00s)
+    --- PASS: TestValidateEnumErrors/protocol (0.00s)
+    --- PASS: TestValidateEnumErrors/provider_billing (0.00s)
+    --- PASS: TestValidateEnumErrors/model_billing (0.00s)
+    --- PASS: TestValidateEnumErrors/thinking_intensity (0.00s)
+    --- PASS: TestValidateEnumErrors/thinking_levels_element (0.00s)
+=== RUN   TestValidateEnumAcceptsEveryListedValue
+--- PASS: TestValidateEnumAcceptsEveryListedValue (0.00s)
+=== RUN   TestValidateHardcodedReadOnly
+=== RUN   TestValidateHardcodedReadOnly/audio.half_duplex=false
+=== RUN   TestValidateHardcodedReadOnly/privacy.keep_transcript=true
+=== RUN   TestValidateHardcodedReadOnly/privacy.keep_audio=true
+=== RUN   TestValidateHardcodedReadOnly/models.verify_signature=false
+--- PASS: TestValidateHardcodedReadOnly (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/audio.half_duplex=false (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/privacy.keep_transcript=true (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/privacy.keep_audio=true (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/models.verify_signature=false (0.00s)
+=== RUN   TestValidateBallSizeRange
+--- PASS: TestValidateBallSizeRange (0.00s)
+=== RUN   TestValidateRiskConfirmTimeoutRange
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_30
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_10
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_3601
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_99999
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_0
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_-1
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_31
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_300
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_3600
+--- PASS: TestValidateRiskConfirmTimeoutRange (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_30 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_10 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_3601 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_99999 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_0 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_-1 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_31 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_300 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_3600 (0.00s)
+=== RUN   TestValidateRiskConfirmTimeoutBandRejectsWarningLeadPlusOne
+--- PASS: TestValidateRiskConfirmTimeoutBandRejectsWarningLeadPlusOne (0.00s)
+=== RUN   TestValidateAPIKeyRefFormat
+=== RUN   TestValidateAPIKeyRefFormat/empty_is_keyless
+=== RUN   TestValidateAPIKeyRefFormat/dpapi_ref
+=== RUN   TestValidateAPIKeyRefFormat/env_ref
+=== RUN   TestValidateAPIKeyRefFormat/plaintext_key
+=== RUN   TestValidateAPIKeyRefFormat/bare_blob_id
+=== RUN   TestValidateAPIKeyRefFormat/traversal_blob_id
+=== RUN   TestValidateAPIKeyRefFormat/empty_env_name
+=== RUN   TestValidateAPIKeyRefFormat/unknown_scheme
+--- PASS: TestValidateAPIKeyRefFormat (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/empty_is_keyless (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/dpapi_ref (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/env_ref (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/plaintext_key (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/bare_blob_id (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/traversal_blob_id (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/empty_env_name (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/unknown_scheme (0.00s)
+=== RUN   TestValidateRealtimeAPIKeyRefFormat
+--- PASS: TestValidateRealtimeAPIKeyRefFormat (0.00s)
+=== RUN   TestAC1AllowedDirsWriteKeepsAHandEditedKey
+time=2026-10-18T22:27:17.669+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC1AllowedDirsWriteKeepsAHandEditedKey3241730503\001\.wisp-config-3891106006.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.670+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC1AllowedDirsWriteKeepsAHandEditedKey (0.01s)
+=== RUN   TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit
+time=2026-10-18T22:27:17.683+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit456285157\001\.wisp-config-54620303.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit (0.02s)
+=== RUN   TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept
+--- PASS: TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept (0.01s)
+=== RUN   TestAC2CleanWriteReportsOneKeyAtInfoLevel
+--- PASS: TestAC2CleanWriteReportsOneKeyAtInfoLevel (0.00s)
+=== RUN   TestAC2UnreadableFileIsRefusedAndNothingIsWritten
+--- PASS: TestAC2UnreadableFileIsRefusedAndNothingIsWritten (0.01s)
+=== RUN   TestAC3AdoptionClaimsOnlyWhatThisWriteProduced
+time=2026-10-18T22:27:17.722+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC3AdoptionClaimsOnlyWhatThisWriteProduced2638365854\001\.wisp-config-1305429703.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.722+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-10-18T22:27:17.748+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC3AdoptionClaimsOnlyWhatThisWriteProduced2638365854\002\.wisp-config-4198556297.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.749+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC3AdoptionClaimsOnlyWhatThisWriteProduced (0.03s)
+=== RUN   TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory
+time=2026-10-18T22:27:17.766+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory2826852172\001\.wisp-config-902306885.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.768+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[fs.allowed_dirs]
+time=2026-10-18T22:27:17.768+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory (0.02s)
+=== RUN   TestAC4PermissionModeWriteKeepsAHandEditedKey
+time=2026-10-18T22:27:17.784+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC4PermissionModeWriteKeepsAHandEditedKey991432704\001\.wisp-config-4177110992.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.784+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=risk.permission_mode wrote=[risk.permission_mode] kept_in_file_not_in_memory=[ball.size]
+time=2026-10-18T22:27:17.787+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC4PermissionModeWriteKeepsAHandEditedKey991432704\002\.wisp-config-145014830.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.789+08:00 level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=risk.permission_mode wrote=[risk.permission_mode]
+--- PASS: TestAC4PermissionModeWriteKeepsAHandEditedKey (0.02s)
+=== RUN   TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber
+time=2026-10-18T22:27:17.803+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber1188356840\001\.wisp-config-2648028605.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.804+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber (0.01s)
+=== RUN   TestAddAllowedDirStillRefusesARelativeHop
+--- PASS: TestAddAllowedDirStillRefusesARelativeHop (0.02s)
+=== RUN   TestGuardedWriteFailureRollsBackMemory
+--- PASS: TestGuardedWriteFailureRollsBackMemory (0.00s)
+=== RUN   TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt
+time=2026-10-18T22:27:17.835+08:00 level=INFO msg="config: config.toml already carries this key; this write added nothing (the file's bytes and mtime stayed put only because its schema_version was already current; a file behind on schema_version had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs
+--- PASS: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt (0.01s)
+=== RUN   TestDiffKeyPathsNamesRealKeyPaths
+--- PASS: TestDiffKeyPathsNamesRealKeyPaths (0.00s)
+=== RUN   TestHandDeletedScalarLineComesBackAtSchemaDefault
+--- PASS: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.02s)
+=== RUN   TestHandDeletedMapEntryIsNotRestored
+time=2026-10-18T22:27:17.868+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\341r1\gotmp\TestHandDeletedMapEntryIsNotRestored2138466906\001\.wisp-config-481493916.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T22:27:17.869+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[llm.providers.deepseek]
+--- PASS: TestHandDeletedMapEntryIsNotRestored (0.02s)
+=== RUN   TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+--- PASS: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+=== RUN   TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent
+time=2026-10-18T22:27:17.904+08:00 level=INFO msg="config: config.toml already carries this key; this write added nothing (the file's bytes and mtime stayed put only because its schema_version was already current; a file behind on schema_version had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs
+--- PASS: TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent (0.01s)
+=== RUN   TestDeletedLineRestorationIsNotClaimedAsAWrittenKey
+--- PASS: TestDeletedLineRestorationIsNotClaimedAsAWrittenKey (0.01s)
+=== RUN   TestHandDeletedDefaultValuedLineIsRestoredInvisibly
+--- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.01s)
+=== RUN   TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory
+--- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+=== RUN   TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+--- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+=== RUN   TestHandDeletedProviderBaseUrlComesBackAsThePresetValue
+    writeguard_unnailed_341_test.go:320: the deleted base_url line came back as something other than the built-in preset:
+        schema_version = 2
+        
+        [app]
+        language = 'zh-CN'
+        theme = 'dark'
+        autostart = false
+        single_instance = true
+        
+        [ball]
+        size = 56
+        opacity_idle = 0.35
+        click_through = true
+        hide_on_fullscreen = true
+        
+        [ball.position]
+        x = 0
+        y = 0
+        monitor = ''
+        
+        [hotkey]
+        summon = ''
+        mute = ''
+        cancel = 'Esc'
+        panel = ''
+        
+        [session]
+        warm_timeout_sec = 90
+        settling_sec = 3
+        conversation_idle_sec = 30
+        
+        [voice]
+        enabled = true
+        punctuation = true
+        conversation_mode = false
+        cloud_asr_chain = []
+        cloud_tts_chain = []
+        
+        [voice.wake_word]
+        enabled = false
+        keywords = []
+        thresholds = []
+        veto_words = ['取消', '停下', '别']
+        
+        [voice.asr]
+        provider = 'local-sherpa'
+        model = 'parakeet-zh'
+        
+        [voice.tts]
+        provider = 'local-sherpa'
+        voice = ''
+        speed = 1.0
+        
+        [voice.aec]
+        enabled = true
+        echo_ref = 'self-render'
+        
+        [voice.realtime]
+        enabled = false
+        provider = ''
+        model = ''
+        api_key_ref = ''
+        base_url = ''
+        
+        [audio]
+        input_device = 'default'
+        sample_rate = 16000
+        half_duplex = true
+        mic_muted_default = true
+        
+        [llm]
+        text_chain = []
+        timeout_ms = 60000
+        
+        [llm.roles]
+        [llm.roles.chat]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.memory_extract]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.handoff]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.summarize]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.retry]
+        max = 3
+        backoff_ms = 1000
+        
+        [llm.providers]
+        [llm.providers.deepseek]
+        protocol = 'openai-chat'
+        base_url = ''
+        api_key_ref = ''
+        billing = ''
+        plan_credit_total_micro = 0
+        rpm = 0
+        tpm = 0
+        
+        [llm.providers.deepseek.compat]
+        loose = false
+        allow_missing_usage = false
+        
+        [agent]
+        max_rounds = 50
+        token_budget = 200000
+        per_tool_timeout_ms = 0
+        steering_enabled = true
+        project_instructions_enabled = true
+        
+        [agent.loop_guard]
+        repeat_thresholds = [3, 5, 8]
+        
+        [risk]
+        confirm_timeout_sec = 300
+        l1_window_sec = 2
+        shell_enabled = false
+        allow_shell_string = false
+        shell_allowlist = []
+        blacklist_overrides = []
+        permission_mode = 'ask_every_step'
+        
+        [fs]
+        allowed_dirs = ['D:\data']
+        reparse_point_exceptions = []
+        delete_enabled = false
+        
+        [net]
+        allowlist = []
+        block_private_ranges = true
+        
+        [net.proxy]
+        mode = 'system'
+        url = ''
+        
+        [privacy]
+        redact_paths = false
+        diagnostics_opt_in = false
+        retention_days = 30
+        keep_transcript = false
+        keep_audio = false
+        
+        [memory]
+        l1_enabled = true
+        l1_max = 20
+        l3_retention_days = 30
+        extract_model = ''
+        
+        [panel]
+        enabled = true
+        width = 640
+        height = 0
+        keep_alive_in_session = true
+        scale = 0.0
+        
+        [cost]
+        daily_budget = 0
+        monthly_budget = 0
+        alert_threshold = 0.8
+        over_budget = 'pause'
+        
+        [models]
+        dir = ''
+        mirror = []
+        verify_signature = true
+        
+        [observe]
+        level = 'info'
+        slo_sample_interval_sec = 5
+        
+        [observe.roll]
+        size_mb = 10
+        days = 7
+        [plugins]
+        tier2_enabled = false
+    writeguard_unnailed_341_test.go:330: a reload reads "", want the preset endpoint the file now carries
+--- FAIL: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+=== RUN   TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile
+--- PASS: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.01s)
+=== RUN   TestConfirmTimeoutFloorSitsAboveApprovalWarningLead
+--- PASS: TestConfirmTimeoutFloorSitsAboveApprovalWarningLead (0.00s)
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_30
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_10
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_1
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_2
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_20
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_3601
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_99999
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_0
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_-1
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_31
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_300
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_3600
+--- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath (0.02s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_30 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_10 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_1 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_2 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_20 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_3601 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_99999 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_0 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_-1 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_31 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_300 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_3600 (0.00s)
+=== RUN   TestMinimumLegalConfirmTimeoutKeepsC18Warning
+    validate_267_test.go:136: smallest legal timeout 31s, warning lead 30s, arming lead 1s > 0
+--- PASS: TestMinimumLegalConfirmTimeoutKeepsC18Warning (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	1.481s
+FAIL

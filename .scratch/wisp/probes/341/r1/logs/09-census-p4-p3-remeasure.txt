@@ -1,0 +1,28 @@
+[why a re-run] 01-start-gauges.txt gauge 3 used the anchor '"\[llm\.providers\.deepseek\]' for P4 and hit 0.
+  That is a RULER defect (my escaping), ⛔ a reading: 227-v1 measured the same格 with a different anchor and got
+  18 mentions / 1 real assertion. Per the dispatch (报 0 命中前先跑正控), re-measured below with the
+  assertion-shape anchor, and P3 got the same treatment so its 0 is not my escaping either.
+
+[P4 carrier = the test that asserts a deleted provider table is NOT restored]
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_handedit_227_test.go:92:	if _, ok := got.LLM.Providers["deepseek"]; ok {
+  (that one line is the assertion; writeguard_handedit_227_test.go:92 inside the case starting :70)
+
+[P4 total mentions of the provider table in *_test.go under internal/config + cmd/wisp]
+  hits=43
+  of which delete-shape carriers = 1 (above)
+
+[P3 re-measure: does ANY *_test.go delete the [ball] HEADER (not merely mention it)?]
+  anchor 1: a Replace whose target string starts with the header   hits=0
+  anchor 2: any deletion of a multi-line block containing [ball]   hits=1
+  positive control for the SAME ruler style (P1, known to exist):   hits=1
+  => P3's 0 is a reading, because the identical ruler form returns 1 for P1.
+
+[P6 re-measure with the same discipline]
+  anchor: deletion of a base_url line                  hits=0
+  positive control (same form, P5'):                   hits=1
+
+[P5 write-branch re-measure] a test that deletes schema_version AND still writes (owned key differs):
+  candidates = both places deleting that line:
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_handedit_227_test.go:110:	noVersion := strings.Replace(hand, "schema_version = 2\n", "", 1)
+  :110 = writeguard_handedit_227_test.go's nothing-written case (its AddAllowedDir is a no-op, log proves it)
+  => the write branch (b2 P5) had no carrier before this leg.

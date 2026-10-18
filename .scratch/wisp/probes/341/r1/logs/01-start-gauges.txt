@@ -1,0 +1,106 @@
+[gauge 1] anchors, own readings (NOT the dispatch numbers)
+start HEAD (my first action) = 98dbf20a35027a9290f52649d8ab2634646cb14e
+git log -1 at start = 98dbf20a35027a9290f52649d8ab2634646cb14e <subject: dispatch write档, see 00-start.txt line2 region>
+git log -1 now      =
+64e71606c9b46c3601f156d4ca362c6a81f87731 停车点 4.0es＝第三波 4 枚腿放出＋CI 逐名归因（12 枚唯一红＝10 枚对回在册票＋2 枚 blob 一字未动却翻脸⇒立票 346）｜★通道＝subagent 因队友帽 8 已满⇒收件尺按主题前缀＋写面根认、⛔ 按注册名认｜★票 339 那两枚 Linux 红已在 CI 档坐实转绿（第三把尺＝blob 同一性）｜写腿 1＜3 按交接书 13.1 节例外、理由具名｜本笔⛔ 含 .go 字节；未推 3、⛔ 推＝在飞含一枚写腿（推送自起的本地 runner 抢它 CPU）
+git status --porcelain -- internal/config cmd/wisp  at start  = <empty, zero lines>
+git status --porcelain -- internal/config cmd/wisp  now       =
+[end status: zero lines above means nobody is writing my face]
+
+  drift 98dbf20a..HEAD = 3 commits
+    64e71606 停车点 4.0es＝第三波 4 枚腿放出＋CI 逐名归因（12 枚唯一红＝10 枚对回在册票＋2 枚 blob 一字未动却翻脸⇒立票 346）｜★通道＝subagent 因队友帽 8 已满⇒收件尺按主题前缀＋写面根认、⛔ 按注册名认｜★票 339 那两枚 Linux 红已在 CI 档坐实转绿（第三把尺＝blob 同一性）｜写腿 1＜3 按交接书 13.1 节例外、理由具名｜本笔⛔ 含 .go 字节；未推 3、⛔ 推＝在飞含一枚写腿（推送自起的本地 runner 抢它 CPU）
+    05d37577 A1041＋立票 346｜★推送后取 CI 逐名册＝两枚"blob 一字未动却 PASS⇄FAIL 翻脸"的弃权形仪器，12 枚唯一红里 10 枚逐名对回在册票、2 枚归不出来⇒立票 346（六格、第一趟只许普查、⛔ 改成 SKIP 或恒绿＝摘牙）｜★第三波 4 枚腿已放（写腿 1＜3 按交接书 13.1 节例外、理由具名；通道＝subagent 因队友帽 8 已满⇒定式补"收件尺按主题前缀＋写面根认、⛔ 按注册名认"）｜记我一枚：把"⛔ 分节符那枚字符"这条禁令写成了那枚字符本身＝描述它的字占一枚（同族第三次还是我）⇒定式＝凡禁令要禁一枚字面字符，⛔ 在正文写那枚字符、写码位
+    c596df55 第三波放出＝4 枚腿（真实启动动作：4 次 spawn 调用，全部返回 id）
+  paths touched by drift inside my face + cmd/wisp (want: none):
+[end drift paths]
+
+  blob equality anchor-vs-HEAD, ruler = git rev-parse <ref>:<path>
+    internal/config/writeguard.go same=YES  0ebc415b0565
+    internal/config/loader.go same=YES  9100ba92e220
+    internal/config/migrate.go same=YES  78d85e22e951
+    internal/config/manager_test.go same=YES  9f7a476acea9
+    internal/config/writeguard_226_test.go same=YES  29dbd968f3f6
+    internal/config/writeguard_handedit_227_test.go same=YES  f60b308b6b2e
+    internal/config/defaults.go same=YES  d2409fc1120a
+    internal/config/parse.go same=YES  248f80bf9f5e
+
+[gauge 2] ticket row1 re-run on the named commit tree (not the in-flight worktree)
+  ruler: git show $A:internal/config/writeguard_handedit_227_test.go | grep -n '^func Test'
+23:func TestHandDeletedScalarLineComesBackAtSchemaDefault(t *testing.T) {
+70:func TestHandDeletedMapEntryIsNotRestored(t *testing.T) {
+106:func TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent(t *testing.T) {
+150:func TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent(t *testing.T) {
+181:func TestDeletedLineRestorationIsNotClaimedAsAWrittenKey(t *testing.T) {
+  lines=195
+  CR bytes = 0
+  => carrier :23 (P1) / :70 (P4) / :106 (P5') present; ticket row1 says 195 lines/5 funcs/CR 0
+
+[gauge 2b] row3: the overclaim ruler, with THIS anchor's line numbers
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard.go:154:				"a file behind on schema_version had already been re-laid in canonical form by the "+
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard.go:187:		"Only the keys listed under wrote changed value; the file is re-laid in canonical form, "+
+
+[gauge 2c] row4: de-gum recipe = manager_test.go:38 const matrixBase
+
+const matrixBase = `
+schema_version = 2
+
+[ball]
+size = 56
+
+
+[gauge 3] AC#0 self-added ruler: for each shape P1..P6, does ANY *_test.go assert it?
+  scope: git grep -nE over tree 98dbf20a35027a9290f52649d8ab2634646cb14e, only *_test.go under internal/config + cmd/wisp
+-- P0 changed value (size 56 -> 60)
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/manager_test.go:60:	mutate(strings.Replace(matrixBase, "size = 56", "size = 60", 1))
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/manager_test.go:270:	_ = os.WriteFile(path, []byte(strings.Replace(matrixBase, "size = 56", "size = 64", 1)), 0o600)
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_226_test.go:37:var handEdited = strings.Replace(matrixBase, "size = 56", "size = 60", 1)
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_handedit_227_test.go:25:	start := strings.Replace(matrixBase, "size = 56", "size = 60  # my size", 1)
+-- P1 delete a NON-default scalar line
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_handedit_227_test.go:31:	deleted := strings.Replace(start, "size = 60  # my size\n", "", 1)
+-- P2 delete a line whose value WAS the default
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_handedit_227_test.go:184:	mutate(strings.Replace(matrixBase, "size = 56\n", "", 1))
+-- P3 delete a whole section (anything removing the [ball] header)
+98dbf20a35027a9290f52649d8ab2634646cb14e:.scratch/wisp/probes/223/v2/overlay/zz_v2probe_cmdwisp_test.go:60:	v2ProbeSentence(t, "f_未来版_合法键全对_对照", "schema_version = 99\n\n[ball]\nsize = 64\n")
+98dbf20a35027a9290f52649d8ab2634646cb14e:.scratch/wisp/probes/231/r1/zz_231r1_ac1_probe_test.go:23:	const body = "schema_version = 99\n\n[ball]\nsize = 64\n"
+98dbf20a35027a9290f52649d8ab2634646cb14e:.scratch/wisp/probes/231/v1/zz_231v1_ac1_probe_test.go:26:	const body = "schema_version = 99\n\n[ball]\nsize = 64\n"
+98dbf20a35027a9290f52649d8ab2634646cb14e:cmd/wisp/config_receipt_255_test.go:748:		if strings.Contains(line, "[panel]") || strings.Contains(line, "[ball]") {
+98dbf20a35027a9290f52649d8ab2634646cb14e:cmd/wisp/config_receipt_255_test.go:805:		for _, forbidden := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[agent]", "[models]", "[hotkey]"} {
+98dbf20a35027a9290f52649d8ab2634646cb14e:cmd/wisp/config_receipt_255_test.go:811:		for _, want := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[agent]", "[models]", "[hotkey]"} {
+98dbf20a35027a9290f52649d8ab2634646cb14e:cmd/wisp/config_reload_223_test.go:334:	// 64 is inside [ball]'s validated range (validate.go: 44-72) and different
+98dbf20a35027a9290f52649d8ab2634646cb14e:cmd/wisp/config_reload_223_test.go:353:		r.plant(t, "[fs]", fmt.Sprintf("[ball]\nsize = %d\n\n[fs]", plantedSize))
+98dbf20a35027a9290f52649d8ab2634646cb14e:cmd/wisp/config_reload_223_test.go:355:		if !strings.Contains(applied, "hot=[ball]") {
+98dbf20a35027a9290f52649d8ab2634646cb14e:cmd/wisp/config_reload_223_test.go:366:		// 「这些段已立即生效」 for a [ball] edit - and [ball] has no production
+98dbf20a35027a9290f52649d8ab2634646cb14e:cmd/wisp/config_reload_223_test.go:372:		if !strings.Contains(out, "[ball]") {
+98dbf20a35027a9290f52649d8ab2634646cb14e:cmd/wisp/config_sentences_223r2_test.go:98:			"声明未来版_正文解析得开_归更高版本自己那句", "schema_version = 99\n\n[ball]\nsize = 64\n",
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/loader_test.go:88:[ball]
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/manager_test.go:40:[ball]
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/manager_test.go:66:		t.Fatalf("report.Hot = %+v, want [ball]", rep)
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/migrate_test.go:23:[ball]
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/settings_248_test.go:25:[ball]
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/settings_248_test.go:179:		t.Errorf("the settings write reverted the operator's [ball] size:\n%s", after)
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/settings_313_test.go:22:[ball]
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/unwired_test.go:168:[ball]
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_226_test.go:36:// ran - a [ball] size, which has nothing whatever to do with [fs].
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_226_test.go:74:		t.Errorf("the operator's [ball] size edit was reverted by the allowed_dirs write: got %d, want 60",
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_226_test.go:228:		t.Errorf("a [ball] edit is hot-tier; a locked verdict was reported: %+v", rep2.Locked)
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_226_test.go:278:		t.Errorf("the mode switch reverted the operator's [ball] size edit: got %d, want 60", got.Ball.Size)
+-- P4 delete a map entry (provider sub-table)
+-- P5 / P5' delete schema_version line
+98dbf20a35027a9290f52649d8ab2634646cb14e:internal/config/writeguard_handedit_227_test.go:110:	noVersion := strings.Replace(hand, "schema_version = 2\n", "", 1)
+-- P6 delete provider base_url line
+-- P6 wider (any Replace touching base_url)
+[end gauge 3: zero-match sections above ARE readings because the positive controls P0/P1/P5 hit]
+
+[gauge 4] ticket box ruler, scoped to criteria region
+  unchecked=7
+  checked  =0
+  ticket lines=43
+
+[gauge 5] leg identity triple key: my subject prefix already on disk?
+  ruler: git log --all --grep=<prefix> ; prefix = 341-r1
+    c596df55 10-18 21:38 第三波放出＝4 枚腿（真实启动动作：4 次 spawn 调用，全部返回 id）
+    98dbf20a 10-18 21:36 第三波派单写档＝4 枚腿（先存档再发）｜放出前逐面现量（21:1x）＝internal/config⇄internal/risk⇄internal/tools⇄cmd/wisp⇄internal/winsec 40 分钟内零枚文件被动、在飞腿 0、共享树跟踪件脏 0 行；★腿身份三键（注册名＋主题前缀＋写面根）逐枚现跑＝票 341 落地腿 341-r1／票 339 终裁腿 339-v1／票 338 终裁腿 338-v1／票 342 普查腿 342-a1 各 0 笔＋probes 目录各不存在
+  count=2  (want 0 before my first commit)
+
+[gauge 6] write-face contention: find internal/config -name '*.go' -newermt '-40 minutes'
+[end gauge 6: empty = nobody landing on my face]

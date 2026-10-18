@@ -1,0 +1,12 @@
+SURFACE=A default C-volume temp (GOTMPDIR unset; TMP=/tmp TEMP=/tmp as inherited)
+TREE=deliv goliles=766
+rc=0 RUN=195 PASS_TOP=114 FAIL_TOP=0 SKIP=0
+---- FAIL roster ----
+(none)
+---- my six cases, named ----
+--- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+--- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+--- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+--- PASS: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.03s)
+--- PASS: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.04s)
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/341/r1/logs/05-color-Adflt-deliv.txt

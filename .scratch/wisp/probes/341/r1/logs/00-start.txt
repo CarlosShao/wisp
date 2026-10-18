@@ -1,0 +1,35 @@
+[gauge 1] anchors, own readings (⛔ the dispatch's numbers)
+start HEAD (first action) = 98dbf20a35027a9290f52649d8ab2634646cb14e
+git log -1 now            = 64e71606c9b46c3601f156d4ca362c6a81f87731 停车点 4.0es＝第三波 4 枚腿放出＋CI �
+git status --porcelain -- internal/config cmd/wisp (first action) = <empty, zero lines>
+git status --porcelain -- internal/config cmd/wisp (now)          =
+[end status]
+
+  HEAD drift 98dbf20a..HEAD = 3 commits, subjects:
+    64e71606 停车点 4.0es＝第三波 4 枚腿放出＋CI 逐名归因（12 枚唯一红＝10 枚对回在册票＋2 
+    05d37577 A1041＋立票 346｜★推送后取 CI 逐名册＝两枚"blob 一字未动却 PASS⇄FAIL 翻脸"的弃�
+    c596df55 第三波放出＝4 枚腿（真实启动动作：4 次 spawn 调用，全部返回 id）
+  do the drifted commits touch my write face? (want: no lines)
+[end drift-paths]
+
+  blob equality check for the three forbidden-to-touch prod files + the shared fixtures,
+  my start anchor vs current HEAD (ruler: git rev-parse <ref>:<path> = blob id)
+    internal/config/writeguard.go  98dbf20a35027a9290f52649d8ab2634646cb14e=0ebc415b0565  HEAD=0ebc415b0565  same=YES
+    internal/config/loader.go  98dbf20a35027a9290f52649d8ab2634646cb14e=9100ba92e220  HEAD=9100ba92e220  same=YES
+    internal/config/migrate.go  98dbf20a35027a9290f52649d8ab2634646cb14e=78d85e22e951  HEAD=78d85e22e951  same=YES
+    internal/config/manager_test.go  98dbf20a35027a9290f52649d8ab2634646cb14e=9f7a476acea9  HEAD=9f7a476acea9  same=YES
+    internal/config/writeguard_226_test.go  98dbf20a35027a9290f52649d8ab2634646cb14e=29dbd968f3f6  HEAD=29dbd968f3f6  same=YES
+    internal/config/writeguard_handedit_227_test.go  98dbf20a35027a9290f52649d8ab2634646cb14e=f60b308b6b2e  HEAD=f60b308b6b2e  same=YES
+    internal/config/defaults.go  98dbf20a35027a9290f52649d8ab2634646cb14e=d2409fc1120a  HEAD=d2409fc1120a  same=YES
+    internal/config/parse.go  98dbf20a35027a9290f52649d8ab2634646cb14e=248f80bf9f5e  HEAD=248f80bf9f5e  same=YES
+
+[gauge 2] ticket 现量 four rows, re-run against the NAMED commit tree (98dbf20a35027a9290f52649d8ab2634646cb14e), ⛔ in-flight worktree
+  row1: ticket 227 pinned = P1/P4/P5' three cases in writeguard_handedit_227_test.go
+    carrier lines: :23 / :70 / :106  (尺 = git show 98dbf20a35027a9290f52649d8ab2634646cb14e:<file> | grep -n '^func Test')
+23:func TestHandDeletedScalarLineComesBackAtSchemaDefault(t *testing.T) {
+70:func TestHandDeletedMapEntryIsNotRestored(t *testing.T) {
+106:func TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent(t *testing.T) {
+150:func TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent(t *testing.T) {
+181:func TestDeletedLineRestorationIsNotClaimedAsAWrittenKey(t *testing.T) {
+.scratch/wisp/probes/341/r1/scripts/run0-start.sh: line 36: unexpected EOF while looking for matching `)'
+written 2854 bytes

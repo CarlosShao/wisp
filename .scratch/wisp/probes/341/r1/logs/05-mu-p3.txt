@@ -1,0 +1,38 @@
+=== SHOT p3  internal/config/writeguard.go ===
+tree=D:/tmp/wisp/20261018/341r1/mu_p3 (exported, outside the repo; tracked files untouched)
+tree copy hash  = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+delivery hash   = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd    tree==delivery ? YES
+killed anchor   [base = deepCopyConfig(disk)]  BEFORE=1  want=1
+survivor anchor [if disk != nil {]  BEFORE=2  want=2  (proves the shot does not eat the other branch)
+after shot: killed anchor=0 (want 0)  new anchor [base = deepCopyConfig(m.cur)]=1 (want >=1)  survivor=2 (want 2)
+landed hash = b481aa484229804bbb75de2d1d12b28b562e89844ecfc568735e0220f68d46e7 bytes=14931
+go test rc=1
+RUN=195 PASS_TOP=102 FAIL_TOP=12 SKIP=0
+---- full red roster (⛔ mine only; other legs' cases reddening is a legitimate reading of a dead guard) ----
+--- FAIL: TestAC11SettingWriteKeepsAForeignHandEditedKey (0.02s)
+--- FAIL: TestAC1AllowedDirsWriteKeepsAHandEditedKey (0.02s)
+--- FAIL: TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept (0.02s)
+--- FAIL: TestAC3AdoptionClaimsOnlyWhatThisWriteProduced (0.03s)
+--- FAIL: TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory (0.01s)
+--- FAIL: TestAC4PermissionModeWriteKeepsAHandEditedKey (0.02s)
+--- FAIL: TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber (0.02s)
+--- FAIL: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.02s)
+--- FAIL: TestHandDeletedMapEntryIsNotRestored (0.02s)
+--- FAIL: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+--- FAIL: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+--- FAIL: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)
+---- the ticket-341 case this shot targets, named ----
+--- FAIL: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+---- verbatim red sentences in writeguard_unnailed_341_test.go ----
+    writeguard_unnailed_341_test.go:162: the resurrected section carried memory's value instead of the schema default:
+    writeguard_unnailed_341_test.go:174: the size divergence was not reported; log:
+    writeguard_unnailed_341_test.go:180: a reload reads size=60 click_through=true, want 56 and true
+    writeguard_unnailed_341_test.go:320: the deleted base_url line came back as something other than the built-in preset:
+    writeguard_unnailed_341_test.go:323: the operator's URL or comment survived the re-lay
+    writeguard_unnailed_341_test.go:330: a reload reads "https://my-gateway.example.invalid/v1", want the preset endpoint the file now carries
+    writeguard_unnailed_341_test.go:335: the preset substitution was not reported as file-holds-what-memory-does-not; log:
+    writeguard_unnailed_341_test.go:377: an unpresetted provider kept the operator's URL; the file is re-laid, not patched
+    writeguard_unnailed_341_test.go:383: a reload reads "https://my-gateway.example.invalid/v1", want the empty string nothing refills
+    writeguard_unnailed_341_test.go:387: the empty substitution was not reported; log:
+RESTORED hash = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd   restored==pristine ? YES
+re-check killed anchor after restore = 1 (want 1)

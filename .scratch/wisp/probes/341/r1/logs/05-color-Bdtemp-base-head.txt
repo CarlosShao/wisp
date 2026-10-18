@@ -1,0 +1,8 @@
+SURFACE=B D-precreated (GOTMPDIR=D:/tmp/wisp/20261018/341r1/gotmp TMP=D:/tmp/wisp/20261018/341r1/tmpB)
+TREE=base goliles=765
+rc=0 RUN=190 PASS_TOP=109 FAIL_TOP=0 SKIP=0
+---- FAIL roster ----
+(none)
+---- my six cases, named ----
+(my case names not found in the run output)
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/341/r1/logs/05-color-Bdtemp-base.txt

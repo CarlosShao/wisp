@@ -1,0 +1,36 @@
+[gate 1] gofumpt -l <my file>  (empty + rc=0 = clean)
+rc=0
+
+[gate 1b] the pre-existing CRLF inventory, named only, ⛔ touched by this leg
+rc=0
+
+[gate 2] go vet ./internal/config/
+rc=0
+
+[gate 3] sh scripts/d22scan.sh
+d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 283 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 241 production Go files
+d22scan: scope bans #1-5 cmd/           examined  42 production Go files
+d22scan: scope ban #6 frontend/         examined 116 text files
+d22scan: scope ban #7 internal/tools/   examined  25 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 116 text files
+d22scan: scope ban #8 internal/         examined 592 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=592, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 592 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+rc=0
+
+[gate 4] sh scripts/check-path-length-budget.sh
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=bytes (probe: length of the 5-byte sample "a U+25FF b" = 5; LANG=unset LC_ALL=unset)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 16056 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=16056  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+rc=0

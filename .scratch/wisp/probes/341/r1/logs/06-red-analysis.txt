@@ -1,0 +1,65 @@
+[which cases are red]
+--- FAIL: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+--- FAIL: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)
+
+[my five case names, with their verdict]
+    --- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+    --- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+    --- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+    --- FAIL: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+    --- FAIL: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)
+
+[verbatim failure bodies for the red ones]
+HEADER: --- FAIL: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/341/r1/logs/05-color-Adflt-deliv.txt:662:     writeguard_unnailed_341_test.go:368: the deleted line of an unpresetted provider did not come back as an explicit empty string:
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/341/r1/logs/05-color-Adflt-deliv.txt:855:     writeguard_unnailed_341_test.go:374: the untouched key of the same table did not survive the re-lay:
+HEADER: --- FAIL: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)
+
+[context: the 20 lines after each FAIL header]
+--- FAIL: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+=== RUN   TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile
+    writeguard_unnailed_341_test.go:368: the deleted line of an unpresetted provider did not come back as an explicit empty string:
+        schema_version = 2
+        
+        [app]
+        language = 'zh-CN'
+        theme = 'dark'
+        autostart = false
+        single_instance = true
+        
+        [ball]
+        size = 56
+        opacity_idle = 0.35
+        click_through = true
+        hide_on_fullscreen = true
+        
+        [ball.position]
+        x = 0
+        y = 0
+        monitor = ''
+        
+        [hotkey]
+--
+--- FAIL: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)
+=== RUN   TestConfirmTimeoutFloorSitsAboveApprovalWarningLead
+--- PASS: TestConfirmTimeoutFloorSitsAboveApprovalWarningLead (0.00s)
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_30
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_10
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_1
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_2
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_20
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_3601
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_99999
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_0
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_-1
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_31
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_300
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_3600
+--- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath (0.03s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_30 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_10 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_1 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_2 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_20 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_3601 (0.00s)

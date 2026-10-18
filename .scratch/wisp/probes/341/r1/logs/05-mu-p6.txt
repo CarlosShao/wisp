@@ -1,0 +1,20 @@
+=== SHOT p6  internal/config/loader.go ===
+tree=D:/tmp/wisp/20261018/341r1/mu_p6 (exported, outside the repo; tracked files untouched)
+tree copy hash  = 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
+delivery hash   = 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb    tree==delivery ? YES
+killed anchor   [p.BaseURL = pre.BaseURL]  BEFORE=1  want=1
+survivor anchor [p.Protocol = pre.Protocol]  BEFORE=1  want=1  (proves the shot does not eat the other branch)
+after shot: killed anchor=0 (want 0)  new anchor [p.BaseURL = ""]=1 (want >=1)  survivor=1 (want 1)
+landed hash = 0724936dec8a938067ed94bb097800377c39be2889f3c6d1670f31a0dff740bc bytes=10685
+go test rc=1
+RUN=195 PASS_TOP=112 FAIL_TOP=2 SKIP=0
+---- full red roster (⛔ mine only; other legs' cases reddening is a legitimate reading of a dead guard) ----
+--- FAIL: TestLoadFilePresetInheritance (0.00s)
+--- FAIL: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+---- the ticket-341 case this shot targets, named ----
+--- FAIL: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+---- verbatim red sentences in writeguard_unnailed_341_test.go ----
+    writeguard_unnailed_341_test.go:320: the deleted base_url line came back as something other than the built-in preset:
+    writeguard_unnailed_341_test.go:330: a reload reads "", want the preset endpoint the file now carries
+RESTORED hash = 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb   restored==pristine ? YES
+re-check killed anchor after restore = 1 (want 1)

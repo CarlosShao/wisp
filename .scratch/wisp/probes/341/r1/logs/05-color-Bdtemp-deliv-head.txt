@@ -1,0 +1,12 @@
+SURFACE=B D-precreated (GOTMPDIR=D:/tmp/wisp/20261018/341r1/gotmp TMP=D:/tmp/wisp/20261018/341r1/tmpB)
+TREE=deliv goliles=766
+rc=0 RUN=195 PASS_TOP=114 FAIL_TOP=0 SKIP=0
+---- FAIL roster ----
+(none)
+---- my six cases, named ----
+--- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+--- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+--- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+--- PASS: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+--- PASS: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)
+/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/341/r1/logs/05-color-Bdtemp-deliv.txt

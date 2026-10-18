@@ -1,0 +1,74 @@
+HEAD at measurement = 7deafbd503ae6b8a91a66615903e680f171629ad   (行号会漂 ⇒ 每次引用都带取数时刻的短号; 本件用 7deafbd5)
+
+[which verdict files exist]
+docs/evidence/s1/226-config-write-no-clobber-r1.md
+docs/evidence/s1/226-config-write-no-clobber-v2.md
+226-config-write-no-clobber-r1.md
+226-config-write-no-clobber-v2.md
+
+[the sentences: anything claiming comments / key order / bytes are KEPT, in the 226 verdict piece]
+---- docs/evidence/s1/226-config-write-no-clobber-r1.md ----
+18:1. **乙省不了那枚差异器。** 票面 AC#2 给乙的那半句是"拒绝并**说清哪几枚键冲突**"，而本包今天没有任何能把两枚 `*Config` 比出键路径的东西（现跑 `grep -rn "diffKeyPa
+22:**甲的代价，照票面要求写成明文案**（不静默）：`MarshalCanonical` 是结构体序列化，注释与手排键序本来就不保留 ⇒ 一次受守卫的写会把文件重排成 canonical 形，**�
+36:| `internal/config/allowdirs.go` | `:62` `:109` `:139` `:142` `:157` | `writeAllowedDirs` 交 `mergeWrite`；`AddAllowedDir` 的追加改成"接在**文件**现有名单后面"（手加的那行既不重复也不丢�
+71:`internal/perm/ticket90_persist_test.go` 我一字未动，`-v` 册里它的**十二枚**用例在改后仍全 PASS，其中包含派单点名的那三处 `ConfirmLocked`（`:342`／`:386` 在 `TestTicket90HandEditLoo
+111:| **AC#5 "可撤销"要有真路径** | **半格：落库那半已闭，答复语法那半未闭（见 §8）** | `TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber:308`；`TestGuardedWriteDoesNotRewriteAFileTh
+116:- 写失败回滚内存：`internal/config/allowdirs.go:139-147` 与 `internal/config/permmode.go:77-85` 的 `old` 还原与错误文案原样保留；`TestGuardedWriteFailureRollsBackMemory:360` 用真写入失败�
+157:4. **一处甲的固有残缺，明写在此**：受守卫的写仍会把文件重排成 canonical 形，**注释与手排键序不保留**（`MarshalCanonical` 是结构体序列化，票面甲那一格自己就点�
+---- docs/evidence/s1/226-config-write-no-clobber-v2.md ----
+53:| `b-probe-deleted-lines.txt` | 实验：手删一枚标量行（B1）／删整节（B2）后跑受守卫写 | B1/B2 皆 `RESULT ... size line re-added to the file : true`、`ball.size on disk now : 56`、`memory ball
+56:| `b4-probe-migration-inside-read.txt` | 实验：`readConfigFile` 内部迁移是否越权改写 | Y1（已带该键＋schema 在场）→ `nothing written`、字节不变、mtime 不变、comment 存活；**Y2（手
+58:| `b6-probe-nothing-written-branch.txt` | 实验："什么都不写"承诺在迁移情形下是否兑现 | W1（当前 schema、已带键）→ 字节同、mtime 同、comment 保留（真·什么都不写）；W2（�
+65:| `d-probe-d36-adopt-bypass.txt` | 问：不认领收窄后会不会绕过 D36 判级 | S1（手松 `risk.permission_mode`＝本写自己的键）→认领、无残留外键；S2（`net.block_private_ranges` 未知键
+116:  依据：`a1-config-mutated.txt` 拿掉合并后 AC#2 三枚用例同时红（:127 未报实际写的键、:154 干净写未在 INFO 报键、:170 竟接受了不可读文件并覆盖）；`writeguard.go:168-185` �
+117:  ⚠ 注：合并报告里"什么都不写就不动文件"的承诺，只在 **schema 已是当前版** 时成立——`b4-probe-migration-inside-read.txt` Y2、`b6-probe-nothing-written-branch.txt` W2/W3 显示：�
+120:  依据：本腿 §③① 亲跑的"无条件认领"突变，稳定红 **2 枚**（`writeguard_226_test.go:224` "adopted a stat for content this process never read; the hand edit is now invisible forever"、:259 "th
+145:**边界（不会被补回的那一支）**：`b2` P4 删一个 **map 条目**（provider 子表）→ `[llm.providers.deepseek]` header `write put it back: false`、`loaded-after: providers=0` ⇒ map 项的"缺席"
+152:3. 迁移-on-读在 `nothing written` 支仍重排文件（Y2/W2/W3）这一条**也建议立一枚常驻用例**钉住"schema 落后时受守卫写会重排并丢注释"，把它从"隐性副作用"变成"被断言�
+162:3. **"`readConfigFile` 拆出止于 `validate`"（`§2` 行 35）对 `mergeWrite` 重读那一支没讲全**：重读走 `readConfigFile`，而它**内部仍会跑迁移并写备份**。`b4-probe-migration-inside-rea
+164:5. **`§1` "乙省不了那枚差异器"的 grep 证据写法对不上实现**：w1 记 `grep … 只命中 internal/config/schema.go:570 的过期注释、零实现`，而 `diffKeyPaths` 是本票在 `writeguard.go:
+
+[section headers of that piece, to name section 1 and section 5 precisely]
+---- docs/evidence/s1/226-config-write-no-clobber-r1.md ----
+1:# 票 226 — 交付证据件 r1（写腿 `226-w1`）：`always` 不再把整份内存快照写回 `config.toml`
+10:## 0. 一句话结论
+14:## 1. 选了哪一支，为什么（票面把这一支交给自己定并写明理由）
+28:## 2. 改了哪几枚文件（包级路径＋现跑 `grep -n` 行号，锚点＝提交 `78988901`）
+44:## 3. 门与读数（全部本人现跑，原始输出在 `.scratch/wisp/probes/226/r1/`）
+60:### 3.1 派单里预检的那四枚用例名（今天真绿，逐名从 `config-perm-named-green.txt` 抄）
+69:### 3.2 ⛔ 冻结件没有被打红（这是停手格，所以单列）
+84:## 4. 修复前红／修复后绿（票面 AC#1 要求的正控方向）
+97:## 4. 逐格判据
+103:## 5. 逐格判据（票面 AC#1..AC#6；每格给"用例名＋它到底断言了什么"，不是"字段在场"）
+124:## 6. Git 纪律（照字面做的，附可核证据）
+131:## 7. AC#6 整包终态（票面口径：`go test ./cmd/wisp ./internal/... -count=1`）
+152:## 8. 没做完的格、卡在哪、以及要新增却没敢造的名字
+159:## 9. `git diff --cached --name-only` 的实际输出
+184:## 10. 第二枚 commit 实测
+193:## 11. commit 台账（本腿的全部提交，逐枚 `git log`／`git show --stat` 可核）
+---- docs/evidence/s1/226-config-write-no-clobber-v2.md ----
+1:# 226 对抗验收 v2 —— 「always 答复整份覆盖 config.toml」缺陷（裁决表）
+13:## ① 锚点与四枚被验收 commit 复核
+37:## ② v1 34 发逐枚对应表（发＝改了什么／原始读数／红绿第几例）
+74:## ③ 本腿自跑的两发原始输出
+78:### ③① AC#3 无条件认领突变（装饰判据检测）
+101:### ③② "删行会不会被补回"那一发
+107:## ④ 逐格裁决 AC#1..AC#6
+134:## ⑤ 「删行会不会被补回」结论
+156:## ⑥ 推翻清单
+174:## ⑦ 本腿没做完／读不动的
+189:## 入库清单
+
+[what the production code says TODAY, verbatim, with this anchor's line numbers]
+HEAD:internal/config/writeguard.go:154:				"a file behind on schema_version had already been re-laid in canonical form by the "+
+HEAD:internal/config/writeguard.go:187:		"Only the keys listed under wrote changed value; the file is re-laid in canonical form, "+
+
+[and what ticket 227 AC#1③ added: the delete-shape clause, verbatim]
+174:			"in canonical form, so comments and hand-chosen key order are not preserved; a key line the "+
+188:		"so comments and hand-chosen key order are not preserved; a key line the operator deleted by "+
+
+[measured in THIS leg's runs: do comments survive a guarded write?]
+  P1 case asserts the comment is GONE and is green at baseline: writeguard_handedit_227_test.go:60-62
+  P2 case (this leg) asserts the same for the INFO branch:      writeguard_unnailed_341_test.go (default-to-me check)
+  P5 case (this leg) asserts the comment dies on the write branch too (hand note check)
+  hand key order: b2 line 8/16/25/34/42/50 all say "[ball] before [app] in the file: false"
