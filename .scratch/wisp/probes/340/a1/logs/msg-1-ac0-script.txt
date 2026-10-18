@@ -1,0 +1,14 @@
+票 340 普查腿 340-a1·AC#0·台件＝起手现量尺（只读普查，⛔ 动任何 .go／⛔ 跑 go test／go build）
+
+尺形＝一律取具名提交树：本腿入场锚 feac8f77（11:3x `git log -1` 现认）⇄ 票面记锚 f705b082 ⇄ 裁腿锚 5db0b538，三锚同钉，⛔ 读工作树在飞字节（336-r1 internal/risk ∥ 227-r1 internal/config 在飞）。
+
+内容（可逐字重跑＝sh .scratch/wisp/probes/340/a1/scripts/ac0.sh）：
+- a-1 票面窄尺（真产叠改形枚数，射程 internal/agent/approval）＝三锚各 0 行；
+- a-1b 响应性正控＝同一枚字节序列只换射程 internal/panel＝13 行、全仓 19 行（⛔ 交一把两形都放行的尺；并把 #[A-Z] 那一形标为⛔ 当正控——approval 射程内真 0 命中）；
+- a-3 自加宽尺（两枚 # 的字面串）产码档＝0 命中，同尺不过滤＝3 行且逐枚全是 *_test.go 夹具/注释；
+- a-4 两枚铸造点各自的生产调用者枚数（push＝1 枚产码 gate.go:507；callCorr＝1 枚产码 loop.go:676）＋panel/agent 侧零测试 import approval（正控＝cmd/wisp 16 枚）；
+- b 第三臂侧叠改形那枚子用例具名落点 internal/panel/subagent_corr_task_prefix_328_test.go:41（⛔ 本腿跑，只点名）；
+- c 数字臂 ⇄ 第三臂两枚臂的本体逐字（roster:312 / :308+:333-344）＋全仓带两枚 # 的表项逐枚点名＋cmd/wisp 那把界复跑（2 命中＝注释里的 "AC#0"/"AC#3"，卡片 corr 带 # ＝0）；
+- d callCorr def loop.go:603 ⇄ Queue.push def queue.go:156 的非导出性逐字＋两枚 %s#%d（queue.go:168 ⇄ :616）逐字＋queue.go 整枚 blob 66fec7ae 三锚对撞同一串。
+
+纪律：零新导出名／零 .go 字节／⛔ 翻框／⛔ push；正文与件内⛔ §（自家尺现量 0）；LF 现量 CR＝0。颜色一律标"读码推的"：那一发 PASS 的凭据＝裁腿判语件第一节 1 条（docs/evidence/s1/328-v1-verdict.md:11），本腿零 go。
