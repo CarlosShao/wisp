@@ -1,0 +1,70 @@
+166-r1 · 起手件（2026-10-18 第一波·写代理·AC#2 四件最小出口）
+================================================================
+
+★台面新铁律（机主 2026-10-18 10:1x 亲口下达，lead 10:1x 转发，覆盖派单 §台面配方）
+  盘符根目录零污染：⛔ 任何导出树／GOTMPDIR／TMP/TEMP 落点／探针工作目录／缓存
+  建在 D:\、C:\、E:\ 等盘符根目录下（D:\W334R1TreeAfter、D:\wisp228r3b 那种形状＝违规）。
+  ✅ 本腿唯一允许落点＝ D:\tmp\wisp\20261018\166r1\...
+    - 基线导出树  ＝ D:\tmp\wisp\20261018\166r1\tree-base
+    - 交件导出树  ＝ D:\tmp\wisp\20261018\166r1\tree-head
+    - GOTMPDIR    ＝ D:\tmp\wisp\20261018\166r1\gotmp（先 mkdir -p）
+    - TMP/TEMP    ＝ D:\tmp\wisp\20261018\166r1\tmp（先 mkdir -p）
+  ⛔ 顺手清理 D 根存量旧树（40+ 枚＝机主自己的决定，任何腿⛔ 删任何东西）。
+  目录名保持短（8.3 短名别名副要求：fsutil 8dot3name query D: 在本沙箱
+  报 Error 5 Access denied＝量不到，按配方继续用短名；若后续某判据非根目录
+  短名不可⇒停手上报，⛔ 自行退回根目录）。
+
+起手锚（现认）
+  git log -1 = c11163c896b09e7b6863d347dadbcb65702585cc
+  2026-10-18 10:02:56 +0800 「接手自检：§1 八条全跑＋差异登记…第一波 6 腿（3 写）
+  派单已存档＝待派｜推送仍按住」＝与编排者 10-18 10:0x 所见一致。
+  未修码基线锚＝同一枚 c11163c8（本腿交件前 internal/session 生产接线零变化）。
+
+起手三把尺（现跑，逐字）
+  尺一（生产构造者）：git grep -n "session\.NewManager" -- "*.go"
+    ⇒ stdout 0 行、rc=1、stderr 0 字节 ＝ 预期 rc=1 对上。
+    同条尺正控：git grep -n "func NewManager" -- "*.go" ⇒ rc=0，命中 3 枚，其中
+    internal/session/manage.go:68:func NewManager(o ManagerOptions) (*Manager, error) {
+    ＝本票那枚构造函数在盘上存在。
+    第二正控：git grep -n "session\.NewLedger" -- "*.go" ⇒ rc=0，命中的产码行＝
+    cmd/wisp/run.go:491（＋resident_approval_windows.go:260 注释、.scratch 备份件、
+    cmd/wisp/resident_grant_writer_265_windows_test.go:555 测试）＝同域装配对照成立。
+  尺二（CLI 出口）：grep -cE '"sessions"|"history"' cmd/wisp/main.go ⇒ 0 ＝ 预期对上。
+    现量名册（main.go:89-124 case 十枚）：run / providers / doctor / secret / models /
+    slo / panel-assets / panel-inbound / version / help ⇒ ⛔ sessions、⛔ history。
+  尺三（票 166 框数）：未勾 1 枚＝AC#2（`:25`），已勾 5 枚＝预期对上。
+
+已读件（派单 1) 要求全读）
+  - 派单 `.scratch/wisp/probes/orch/20261018/txt/166r1-dispatch.txt`（54 行）
+  - 票面 `.scratch/wisp/issues/166-…-go-side.md`（46 行；票尾三条历史 bullet＝
+    166-r1 2026-10-13／166-r2 编排者代提 2026-10-16／166-v1 2026-10-16＋编排者翻框 2026-10-16）
+  - 判语件 `docs/evidence/s1/166-session-verdict.md`（98 行）：AC#2＝不成立＝接线缺口，
+    生产调用者 0/0/0/0/0；★本腿要装的就是那一格。
+
+工作树现状（⛔ 我动）
+  `git status --porcelain` 大量 ?? 项＝别腿/历史未入库临时件（.scratch/commit-msg-*.txt 一族等）；
+  共享工作树⛔ 是我的判据面，一切 go test 走仓外导出树。
+  门禁存量脏（gofumpt -l 现量，⛔ 我动、只具名登记）：
+    cmd/wisp/models.go、cmd/wisp/panel_transport_35r2_test.go、
+    internal/agent/approval/pending_read.go、internal/agent/tools.go、
+    internal/risk/provenance.go、internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+    ＝ 6 枚，与 HANDOVER「本机 6 枚 CRLF 假脏」同数。
+    internal/session/ 与 internal/memory/ 两包 gofumpt -l ＝ 0 枚（干净）。
+  我碰的两枚既有产码/测试文件 EOL 现量＝纯 LF（manage.go/manage_test.go/dao_session.go CRLF 枚数 0）。
+
+台面配方（派单 §台面配方＋新铁律落点）
+  git archive c11163c8 go.mod go.sum internal cmd tools scripts frontend models ＋仓根 docs/
+  ＋手工补 build/*.dll、third_party/sherpa-onnx/*.dll、frontend/dist（三件⛔ 跟踪）。
+  取出后先数 .go 证非空。⛔ 在共享工作树跑 go test/go build。
+
+本腿计划（判据最硬先行）
+  1) 基线侧成对读数：接线尺逐字（c11163c8 上 session.NewManager 生产命中、四件调用点）
+     ＋ go test ./internal/session/ ./internal/memory/ 两临时根台面（默认 ⇄ D: 预建 GOTMPDIR）。
+  2) 在 internal/session 内装「可被宿主装配的接线点」那一半：装配守卫（编译期
+     断言 *memory.Store 满足 ManageStore）＋四件各 ≥1 枚「装配可达且返回正确」用例；
+     ⛔ 新导出名（判据尺复用 git grep session.NewManager）。
+  3) 逐件答「这一发在未修码上响不响」＝基线⇄交件成对逐件读数＋两发突变（串行、
+     当场还原、报还原哈希）。
+  4) 具名缺口：cmd/wisp 消费行（main.go 分发器＋run.go 装配位，file:line 给出）
+     与 internal/panel 读者位（pump.go:138/composer.go:57）＝那一半⛔ 写、上报。
+================================================================
