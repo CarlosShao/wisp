@@ -1,0 +1,26 @@
+### line-kind census of the shape-B pristine leg (40-ac3-b-pristine.log)
+  V1SHAPE chain:             9
+  V1SHAPE chain-clean:       9
+  V1SHAPE offchain:          9
+  V1SHAPE real-temp          4
+  V1SHAPE real-appdata       1
+  V1OVERRIDE chain:          9
+  V1OVERRIDE real-appdata    1
+  V1PREFIX anchor_root       7
+  V1LSTAT                    4
+  V1SHAPE_total=32 V1OVERRIDE_total=10
+  chain-family lines (chain + chain-clean + offchain) = 27
+### does any under-row world make the aEq half a PROVEN match (i.e. the row is not a branch-alone tooth)? measured by the teeth log itself:
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+### the leg report at e5021339:
+  lines=125
+  retracted_claim_still_there=1 (want 0)
+  honest_line_present=1
+support_rc=0

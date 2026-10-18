@@ -1,0 +1,104 @@
+time=2026-10-18T12:50:29.340+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe334V1RealMachine
+    zz_probe_334v1_test.go:106: V1LSTAT i=0 err_is_FS_ErrNotExist=false err=<CreateFile D:\tmp\wisp\20261018\336v1\gotmp\ac3-b-MU1h.log\TestProbe334V1RealMachine3804299376\001\id_ed25519已允许\u001b\u202e: The filename, directory name, or volume label syntax is incorrect.>
+    zz_probe_334v1_test.go:108: V1SHAPE real-temp-i0 class=B allow=false needL2=true rule=B-tier
+    zz_probe_334v1_test.go:106: V1LSTAT i=1 err_is_FS_ErrNotExist=false err=<CreateFile D:\tmp\wisp\20261018\336v1\gotmp\ac3-b-MU1h.log\TestProbe334V1RealMachine3804299376\001\notes*a1已允许\u001b\u202e: The filename, directory name, or volume label syntax is incorrect.>
+    zz_probe_334v1_test.go:108: V1SHAPE real-temp-i1 class=none allow=true needL2=false rule=empty
+    zz_probe_334v1_test.go:106: V1LSTAT i=2 err_is_FS_ErrNotExist=false err=<CreateFile D:\tmp\wisp\20261018\336v1\gotmp\ac3-b-MU1h.log\TestProbe334V1RealMachine3804299376\001\score?b1已允许\u001b\u202e: The filename, directory name, or volume label syntax is incorrect.>
+    zz_probe_334v1_test.go:108: V1SHAPE real-temp-i2 class=none allow=true needL2=false rule=empty
+    zz_probe_334v1_test.go:106: V1LSTAT i=3 err_is_FS_ErrNotExist=true err=<GetFileAttributesEx D:\tmp\wisp\20261018\336v1\gotmp\ac3-b-MU1h.log\TestProbe334V1RealMachine3804299376\001\plain-note.txt: The system cannot find the file specified.>
+    zz_probe_334v1_test.go:108: V1SHAPE real-temp-i3 class=none allow=true needL2=false rule=empty
+    zz_probe_334v1_test.go:112: V1ENV wisp_logs_exists=true
+    zz_probe_334v1_test.go:114: V1SHAPE real-appdata-wisp-logs class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+    zz_probe_334v1_test.go:115: V1OVERRIDE real-appdata-wisp-logs class=A allow=false needL2=false
+--- PASS: TestProbe334V1RealMachine (0.01s)
+=== RUN   TestProbe334V1PerAnchorChain
+=== RUN   TestProbe334V1PerAnchorChain/case1-gitcreds
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case1-gitcreds class=A allow=false needL2=false rule=A:~-.git-credentials
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case1-gitcreds class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case1-gitcreds class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case3-wisp-config
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case3-wisp-config class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case3-wisp-config class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case3-wisp-config class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case4-ssh
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case4-ssh class=A allow=false needL2=false rule=A:~-.ssh-**
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case4-ssh class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case4-ssh class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case5-aws
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case5-aws class=A allow=false needL2=false rule=A:~-.aws-credentials
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case5-aws class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case5-aws class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case6-kube
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case6-kube class=A allow=false needL2=false rule=A:~-.kube-config
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case6-kube class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case6-kube class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case8-dpapi
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case8-dpapi class=A allow=false needL2=false rule=A:%APPDATA%-wisp-config.toml
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case8-dpapi class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case8-dpapi class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case9-local-creds
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case9-local-creds class=B allow=true needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case9-local-creds class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case4b-ssh-solo
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case4b-ssh-solo class=A allow=false needL2=false rule=A:~-.ssh-**
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case4b-ssh-solo class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case4b-ssh-solo class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/case8b-dpapi-solo
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case8b-dpapi-solo class=A allow=false needL2=false rule=A:Microsoft-Protect
+    zz_probe_334v1_test.go:153: V1OVERRIDE chain:case8b-dpapi-solo class=A allow=false needL2=false
+    zz_probe_334v1_test.go:155: V1SHAPE chain-clean:case8b-dpapi-solo class=none allow=true needL2=false rule=empty
+=== RUN   TestProbe334V1PerAnchorChain/off/case1-gitcreds
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case1-gitcreds class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case3-wisp-config
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case3-wisp-config class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case4-ssh
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case4-ssh class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case5-aws
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case5-aws class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case6-kube
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case6-kube class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case8-dpapi
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case8-dpapi class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case9-local-creds
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case4b-ssh-solo
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case4b-ssh-solo class=B allow=false needL2=true rule=B-tier
+=== RUN   TestProbe334V1PerAnchorChain/off/case8b-dpapi-solo
+    zz_probe_334v1_test.go:170: V1SHAPE offchain:case8b-dpapi-solo class=B allow=false needL2=true rule=B-tier
+--- PASS: TestProbe334V1PerAnchorChain (0.19s)
+    --- PASS: TestProbe334V1PerAnchorChain/case1-gitcreds (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case3-wisp-config (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case4-ssh (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case5-aws (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case6-kube (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case8-dpapi (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case9-local-creds (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case4b-ssh-solo (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/case8b-dpapi-solo (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case1-gitcreds (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case3-wisp-config (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case4-ssh (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case5-aws (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case6-kube (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case8-dpapi (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case9-local-creds (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case4b-ssh-solo (0.01s)
+    --- PASS: TestProbe334V1PerAnchorChain/off/case8b-dpapi-solo (0.01s)
+=== RUN   TestProbe334V1SinkReach
+    zz_probe_334v1_test.go:185: V1SINK returned_reason_bytes=792 sink_lines=1 sink_has_long_sentence=true sink_names_candidate=true sink_names_anchor=true
+    zz_probe_334v1_test.go:190: V1SINKLINE risk: A-list DENY path=d:\tmp\wisp\20261018\336v1\gotmp\ac3-b-mu1h.log\testprobe334v1sinkreach3598354496\001\profile\work\id_ed25519已允许\u001b\u202e rule=~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1sinkreach3598354496\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1sinkreach3598354496\\001\\profile\\work") and the anchor "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1sinkreach3598354496\\001\\profile\\.aws\\credentials" is not installed here (its expansion stopped at "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1sinkreach3598354496\\001\\profile"), so R17 protects the ancestry chain the two share instead of proving a miss (non-overridable)
+--- PASS: TestProbe334V1SinkReach (0.01s)
+=== RUN   TestProbe334V1FixturePrefix
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1fixtureprefix3068982603\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1fixtureprefix3068982603\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1fixtureprefix3068982603\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1fixtureprefix3068982603\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1fixtureprefix3068982603\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1fixtureprefix3068982603\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:243: V1PREFIX anchor_root="d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1fixtureprefix3068982603\\001\\profile" shared_segments=9 anchor_certain=true cand_certain=false clause=false
+    zz_probe_334v1_test.go:247: V1PREFIX cand_root="d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac3-b-mu1h.log\\testprobe334v1fixtureprefix3068982603\\001\\work"
+--- PASS: TestProbe334V1FixturePrefix (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.264s

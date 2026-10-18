@@ -1,0 +1,50 @@
+### AC#3 shape B decisive shot: anchor=e5021339 pristine=c1799cd24afce19e6accef23db23a7d7ee746dec tree=/d/tmp/wisp/20261018/336v1/tree-yi
+### probe blob (source artefact) = 69a70fa454886029aea9f8f716cb372908467339
+  probe_on_disk_blob=69a70fa454886029aea9f8f716cb372908467339
+  probe_lines=248
+### assertion census of the probe (own ruler, counts inside the file just placed):
+  t_Log=13  t_Fatalf=7  t_Errorf_or_Error=0  t_Skip=0
+  build_tags=0  (0 => compiles on both platforms)
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [start]
+### leg 1: UNMUTATED bytes, roster=TestProbe334V1
+  rc=0 wall=3.89s RUN=22 PASS_TOP=4 FAIL_TOP=0 SKIP=0  [pristine-shapeB]
+  chain lines (the ones a real assertion would need): V1SHAPE=32 V1OVERRIDE=10
+        zz_probe_334v1_test.go:152: V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
+        zz_probe_334v1_test.go:153: V1OVERRIDE chain:case9-local-creds class=A allow=false needL2=false
+        zz_probe_334v1_test.go:152: V1SHAPE chain:case4b-ssh-solo class=A allow=false needL2=false rule=A:~-.ssh-**
+        zz_probe_334v1_test.go:153: V1OVERRIDE chain:case4b-ssh-solo class=A allow=false needL2=false
+        zz_probe_334v1_test.go:170: V1SHAPE offchain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+        zz_probe_334v1_test.go:170: V1SHAPE offchain:case4b-ssh-solo class=B allow=false needL2=true rule=B-tier
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-leg1]
+### leg 2: MU-1h only (same content needle the AC#2 sweep used)
+  落点命中枚数 before=1
+  落点命中枚数 after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1)
+    237c237
+    < 	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
+    ---
+    > 	case localAppDataS != "" && anchorMatches(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`)), isUnder):
+  mutated_hash=5f8789548f624e12ba2527c016f0f9b040c36e3a
+  rc=0 wall=2.55s RUN=22 PASS_TOP=4 FAIL_TOP=0 SKIP=0  [MU1h-shapeB]
+  --- shapeB under the tooth-removal (does the CLASS change show up as red?):
+        zz_probe_334v1_test.go:152: V1SHAPE chain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+        zz_probe_334v1_test.go:153: V1OVERRIDE chain:case9-local-creds class=B allow=true needL2=false
+        zz_probe_334v1_test.go:170: V1SHAPE offchain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+  rc=1 wall=1.57s RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0  [MU1h-shapeA]
+  --- shapeA (the shipped teeth) under the SAME single mutation:
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336 (0.22s)
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials (0.01s)
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-leg2]
+### leg 3: shape A pristine timing on the same tree for the cost pair
+  rc=0 wall=1.24s RUN=17 PASS_TOP=1 FAIL_TOP=0 SKIP=0  [pristine-shapeA]
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-leg3]
+### shape files, pristine vs MU-1h (the readable diff the probe produces, if any)
+  shape_diff_lines=2
+    1c1
+    <     zz_probe_334v1_test.go:152: V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
+    ---
+    >     zz_probe_334v1_test.go:152: V1SHAPE chain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+  probe_stays_in_exported_tree=YES (临时件只建不删；它只在仓外树里，⛔ 进仓、⛔ 进跟踪面)
+  repo_side_probe_hits=0 (want 0)
+  shared_worktree_dirty_internal_cmd=0
+ac3_runner_rc=0

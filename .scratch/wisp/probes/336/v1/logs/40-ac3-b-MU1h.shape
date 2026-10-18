@@ -1,0 +1,2 @@
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+    zz_probe_334v1_test.go:152: V1SHAPE chain:case4b-ssh-solo class=A allow=false needL2=false rule=A:~-.ssh-**
