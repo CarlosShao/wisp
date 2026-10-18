@@ -1,0 +1,57 @@
+227-v1 AC#2 决定性那一发（我自己重打，⛔ 抄腿⛔ 抄编排者）
+
+射程＝internal/config/manager_test.go:38 那枚 const matrixBase 里的 `schema_version = 2`
+      （★⛔ 打在 writeguard_226_test.go 上＝空操作；编排者踩过＝A1033 第②节）
+台树＝D:\tmp\wisp\20261018\227v1\v1\B（锚 bcf90e06 的仓外导出树）
+
+[突变锚＝内容锚，⛔ 绝对行号]
+  grep -n -A1 "^const matrixBase"  ⇒  37:const matrixBase = `   38:schema_version = 2
+  sed -i '/^const matrixBase = `/{n;d}'  ⇒ 只删紧跟的那一行
+  突变后 36-40 行＝空行 / const matrixBase = ` / 空行 / [ball] / size = 56
+  matrixBase 体内 schema_version 残留数＝0（尺活）
+
+[发前 pristine] manager_test.go sha256 = 201dc786570dbb2ffeaf8cc09a6c7bc48cb1ee6047b9f2f28a02e18163aa56a1
+[正控（同树未突变那一发，见 01 台件）] --- PASS: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt  ⇒ ⛔ 恒红
+[突变态 sha256] 65c53e5514ef68003eacaac69fbedc3fe91cb01deb4fa8b045cd7343199dc8d6
+
+[决定性红句逐字（file:line，我这枚树）]
+    writeguard_226_test.go:404: the file already carried the entry and was rewritten anyway:
+        schema_version = 2
+
+        [app]
+        language = 'zh-CN'
+        theme = 'dark'
+
+        [ball]
+        size = 56
+
+        [fs]
+        allowed_dirs = ['D:\data']
+
+        [voice]
+        enabled = true
+
+        [voice.asr]
+        model = 'parakeet-zh'
+        provider = 'local-sherpa'
+    writeguard_226_test.go:407: the file's mtime moved on a write that wrote nothing
+  --- FAIL: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt (0.04s)
+  RED_RC=1
+  ⇒ 上面那段打印出来的正文本身就是证据：fixture 是 [ball] 在 [app] 前、双引号、`size = 60  # my size` 那种手排形，
+    红出来的却是 [app] 在前、单引号、canonical 形 ⇒ 文件真被迁移-on-读重排过，⛔ 只读改内存。
+
+[突变态整包四数] RUN=190 PASS_TOP=105 FAIL_TOP=4 SKIP=0  mutfull_rc=1
+  --- FAIL: TestCheckAndReloadAsksOncePerFileChange
+  --- FAIL: TestManagerHotTierAppliesImmediately
+  --- FAIL: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt
+  --- FAIL: TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent
+  ⇒ 四枚逐名与我这发突变同源（都因 matrixBase 丢了 schema_version）；★腿报也是 4 枚、同一批名。
+  ⇒ ★顺手复现"那枚收窄句真有牙"：TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent（正控）在这一发里红＝
+    证它⛔ 摆设：schema 一落后，"什么都不写就真不动文件"那一句立刻兑现不了。
+
+[还原] git show bcf90e06:internal/config/manager_test.go > 同路径
+  restored sha256 = 201dc786570dbb2ffeaf8cc09a6c7bc48cb1ee6047b9f2f28a02e18163aa56a1  ＝发前逐字同串
+[还原后复跑] --- PASS: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt  RESTORED_RC=0
+[终态复验整包] RUN=190 PASS_TOP=109 FAIL_TOP=0 SKIP=0（＝回到交件原样，见 01）
+
+[★⛔ 把断言改成"接受新字节"] 本腿没动任何 *_test.go 的断言：只在仓外树的 fixture 常量上删了一行，且当场还原。
