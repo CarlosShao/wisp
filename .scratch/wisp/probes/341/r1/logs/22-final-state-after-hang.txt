@@ -1,0 +1,47 @@
+[1] roster: strict subject-prefix ruler (⛔ substring - that one ate the orchestrator's dispatch commit)
+46c920c8 23:12 票 341 落地腿 341-r1·交件自证（三把尺）＋本腿三处尺缺陷具�
+920537ee 23:00 票 341 落地腿 341-r1·票尾一条 bullet＋本腿纪律违规登记（事故
+f710d104 22:52 票 341 落地腿 341-r1·report＋必答分件＋EOL/禁字两把尺＋21 枚台
+fd82f786 22:42 票 341 落地腿 341-r1·起手三把尺＋台面/门禁/普查/突变台件与�
+6948eb08 22:23 票 341 落地腿 341-r1·AC#1 四格常驻用例＝P2／P3／P5／P6 逐格补�
+count=5
+
+[2] duplicate-commit check (the hung attempt might have committed once silently):
+  commits touching .scratch/wisp/probes/341/r1/logs/20-selfproof-final.txt = 1  (want 1)
+  subjects: 46c920c8 票 341 落地腿 341-r1·交件自证（三把尺�|
+
+[3] is anything of mine still staged in the shared index? (want: nothing)
+[end staged list]
+
+[4] per-commit out-of-scope count and production-go count, all five commits
+    46c920c8  out-of-scope=0  prod-go=0  files=7
+    920537ee  out-of-scope=0  prod-go=0  files=9
+    f710d104  out-of-scope=0  prod-go=0  files=29
+    fd82f786  out-of-scope=0  prod-go=0  files=33
+    6948eb08  out-of-scope=0  prod-go=0  files=1
+
+[5] the three forbidden production blobs: anchor 98dbf20a vs HEAD
+    internal/config/writeguard.go  0ebc415b0565 vs 0ebc415b0565
+    internal/config/loader.go  9100ba92e220 vs 9100ba92e220
+    internal/config/migrate.go  78d85e22e951 vs 78d85e22e951
+
+[6] ticket discipline: 44 lines / one bullet / 7 unchecked 0 checked / zero deleted lines
+    lines=44 bullet=1 unchecked=7 checked=0
+    deletions in the ticket across my range = 0
+
+[7] my new test file, final: blob/lines/CR/funcs + gate
+    blob=c577f1ccd458 lines=389 CR=0 funcs=5
+    gofumpt rc=0
+    vet rc=0
+
+[8] push discipline: this leg ran git push 0 times; branch backlog ahead of origin/dev = 32 (⛔ mine; owner is holding pushes)
+[9] bench trees under D:/tmp/wisp/20261018/341r1 (built, never deleted):
+    base
+    co_v1
+    deliv
+    gotmp
+    mu_p2
+    mu_p3
+    mu_p5
+    mu_p6
+    tmpB
