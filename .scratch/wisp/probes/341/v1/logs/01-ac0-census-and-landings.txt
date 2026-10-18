@@ -1,0 +1,125 @@
+######## AC#0 independent census: which shapes has ANY *_test.go ever asserted? ########
+ruler = grep over the tree's *_test.go for the shape's own planted-delete content anchor
+        (a shape counts as NAILED only when the test both PLANTS the delete and ASSERTS a result);
+        hits printed as file:line. Run twice: base tree (pre-341) and delivery tree.
+===== BASE tree (anchor 6948eb08^, pre-341) (/d/tmp/wisp/20261018/341v1/treeB) =====
+-- dir scope: internal/config --
+P1 plant-delete a NON-default scalar line (removes the 'size = 60' line):
+   internal/config/writeguard_handedit_227_test.go:31:	deleted := strings.Replace(start, "size = 60  # my size\n", "", 1)
+P2 plant-delete a DEFAULT-valued scalar line (removes the 'size = 56' line):
+   internal/config/writeguard_handedit_227_test.go:184:	mutate(strings.Replace(matrixBase, "size = 56\n", "", 1))
+P3 plant-delete a WHOLE SECTION (header [ball] plus its body in one removal):
+P4 plant-delete a MAP ENTRY (provider sub-table removed):
+   internal/config/writeguard_handedit_227_test.go:82:		"\n[llm]\n[llm.providers.deepseek]\nbase_url = \"https://api.deepseek.com/v1\"\n", "\n", 1)
+P5/P5-prime plant-delete the schema_version line:
+   internal/config/writeguard_handedit_227_test.go:110:	noVersion := strings.Replace(hand, "schema_version = 2\n", "", 1)
+P6 plant-delete a provider base_url LINE inside a surviving table:
+-- dir scope: cmd/wisp --
+P1 plant-delete a NON-default scalar line (removes the 'size = 60' line):
+P2 plant-delete a DEFAULT-valued scalar line (removes the 'size = 56' line):
+P3 plant-delete a WHOLE SECTION (header [ball] plus its body in one removal):
+P4 plant-delete a MAP ENTRY (provider sub-table removed):
+P5/P5-prime plant-delete the schema_version line:
+P6 plant-delete a provider base_url LINE inside a surviving table:
+===== DELIVERY tree (anchor HEAD) (/d/tmp/wisp/20261018/341v1/treeD) =====
+-- dir scope: internal/config --
+P1 plant-delete a NON-default scalar line (removes the 'size = 60' line):
+   internal/config/writeguard_handedit_227_test.go:31:	deleted := strings.Replace(start, "size = 60  # my size\n", "", 1)
+   internal/config/writeguard_unnailed_341_test.go:146:	deleted := strings.Replace(start, "[ball]\nsize = 60  # my size\n\n", "", 1)
+P2 plant-delete a DEFAULT-valued scalar line (removes the 'size = 56' line):
+   internal/config/writeguard_handedit_227_test.go:184:	mutate(strings.Replace(matrixBase, "size = 56\n", "", 1))
+   internal/config/writeguard_unnailed_341_test.go:72:	deleted := strings.Replace(start, "size = 56  # default to me\n", "", 1)
+P3 plant-delete a WHOLE SECTION (header [ball] plus its body in one removal):
+   internal/config/writeguard_unnailed_341_test.go:146:	deleted := strings.Replace(start, "[ball]\nsize = 60  # my size\n\n", "", 1)
+P4 plant-delete a MAP ENTRY (provider sub-table removed):
+   internal/config/writeguard_handedit_227_test.go:82:		"\n[llm]\n[llm.providers.deepseek]\nbase_url = \"https://api.deepseek.com/v1\"\n", "\n", 1)
+P5/P5-prime plant-delete the schema_version line:
+   internal/config/writeguard_handedit_227_test.go:110:	noVersion := strings.Replace(hand, "schema_version = 2\n", "", 1)
+   internal/config/writeguard_unnailed_341_test.go:213:	noVersion := strings.Replace(hand, "schema_version = 2\n", "", 1)
+P6 plant-delete a provider base_url LINE inside a surviving table:
+   internal/config/writeguard_unnailed_341_test.go:303:	deleted := strings.Replace(start, "base_url = \"https://my-gateway.example.invalid/v1\"  # mine\n", "", 1)
+   internal/config/writeguard_unnailed_341_test.go:363:	deleted := strings.Replace(start, "base_url = \"https://my-gateway.example.invalid/v1\"\n", "", 1)
+-- dir scope: cmd/wisp --
+P1 plant-delete a NON-default scalar line (removes the 'size = 60' line):
+P2 plant-delete a DEFAULT-valued scalar line (removes the 'size = 56' line):
+P3 plant-delete a WHOLE SECTION (header [ball] plus its body in one removal):
+P4 plant-delete a MAP ENTRY (provider sub-table removed):
+P5/P5-prime plant-delete the schema_version line:
+P6 plant-delete a provider base_url LINE inside a surviving table:
+
+######## AC#1: the four de-gum landings, pairwise distinct lines (现验) ########
+--- 175|p2 INFO-branch delete-shape clause :: internal/config/writeguard.go lines 174-175 ---
+   174: 			"in canonical form, so comments and hand-chosen key order are not preserved; a key line the "+
+   175: 			"operator deleted by hand comes back at its schema default value)",
+--- 141|p3 base = deepCopyConfig(disk) :: internal/config/writeguard.go lines 141-141 ---
+   141: 		base = deepCopyConfig(disk)
+--- 257|p5 cp.SchemaVersion = SchemaVersionCurrent :: internal/config/loader.go lines 257-257 ---
+   257: 	cp.SchemaVersion = SchemaVersionCurrent
+--- 213|p6 p.BaseURL = pre.BaseURL :: internal/config/loader.go lines 213-213 ---
+   213: 				p.BaseURL = pre.BaseURL
+-- distinctness check (byte offsets of each anchor in its file, all four different) --
+p2 offset=8908
+p3 offset=7384
+p5 offset=10552
+p6 offset=9228
+-- line numbers (from grep -n) --
+141:		base = deepCopyConfig(disk)
+175:			"operator deleted by hand comes back at its schema default value)",
+257:	cp.SchemaVersion = SchemaVersionCurrent
+213:				p.BaseURL = pre.BaseURL
+
+######## AC#2: red rosters of the four shots, named, and the P2 <-> P3 intersection ########
+--- p2 roster ---
+TestHandDeletedDefaultValuedLineIsRestoredInvisibly
+--- p3 roster ---
+TestAC11SettingWriteKeepsAForeignHandEditedKey
+TestAC1AllowedDirsWriteKeepsAHandEditedKey
+TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept
+TestAC3AdoptionClaimsOnlyWhatThisWriteProduced
+TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory
+TestAC4PermissionModeWriteKeepsAHandEditedKey
+TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber
+TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile
+TestHandDeletedMapEntryIsNotRestored
+TestHandDeletedProviderBaseUrlComesBackAsThePresetValue
+TestHandDeletedScalarLineComesBackAtSchemaDefault
+TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory
+--- p5 roster ---
+TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+TestTicket257R1AC1CleanMachineRefusesAllSevenFields
+--- p6 roster ---
+TestHandDeletedProviderBaseUrlComesBackAsThePresetValue
+TestLoadFilePresetInheritance
+-- intersection P2 ∩ P3 (want: does P2 appear in P3's roster? want NO) --
+0
+-- intersection as a set difference --
+-- P2 shot roster vs P3 shot roster (symdiff) --
+   	TestAC11SettingWriteKeepsAForeignHandEditedKey
+   	TestAC1AllowedDirsWriteKeepsAHandEditedKey
+   	TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept
+   	TestAC3AdoptionClaimsOnlyWhatThisWriteProduced
+   	TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory
+   	TestAC4PermissionModeWriteKeepsAHandEditedKey
+   	TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber
+   	TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile
+   TestHandDeletedDefaultValuedLineIsRestoredInvisibly
+   	TestHandDeletedMapEntryIsNotRestored
+   	TestHandDeletedProviderBaseUrlComesBackAsThePresetValue
+   	TestHandDeletedScalarLineComesBackAtSchemaDefault
+   	TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory
+
+######## AC#4: base<->delivery red roster difference (want zero new red) ########
+base FAIL_TOP=0 delivery FAIL_TOP=0
+-- new red in delivery (want empty) --
+-- five new case names present in delivery RUN list --
+TestHandDeletedDefaultValuedLineIsRestoredInvisibly = 1
+TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = 1
+TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed = 1
+TestHandDeletedProviderBaseUrlComesBackAsThePresetValue = 1
+TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile = 1
+-- PASS lines for the five on the unmutated delivery tree --
+TestHandDeletedDefaultValuedLineIsRestoredInvisibly = --- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = --- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed = --- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+TestHandDeletedProviderBaseUrlComesBackAsThePresetValue = --- PASS: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile = --- PASS: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)

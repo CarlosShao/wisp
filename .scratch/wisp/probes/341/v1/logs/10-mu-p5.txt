@@ -1,0 +1,41 @@
+############ SHOT p5 :: internal/config/loader.go (anchor 6c625a8c23d46c347057c8f5050e8f8a10e33fa3) ############
+anchor_old(cut)   =cp\.SchemaVersion = SchemaVersionCurrent      want before=1 after=0
+anchor_new        =cp\.SchemaVersion = 1    want before=0 after=1
+anchor_discrim    =func SaveFile   want before=1 after=1
+-- hash at entry (want == pristine-from-blob) --
+40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
+-- BEFORE: old=1 new=0 disc=1 --
+PERL_CUT_OK (1 substitution)
+-- AFTER: old=0 new=1 disc=1 --
+-- mutated region --
+255-	}
+256-	cp := deepCopyConfig(c)
+257:	cp.SchemaVersion = 1
+258-	data, err := MarshalCanonical(cp)
+259-	if err != nil {
+-- hash after cut (want != pristine) --
+95fddf8f032623738d1c11a31f5cff57f482402f3d9fce4a381bf92259df870d
+-- full package run (mutated) --
+GO_RC=1
+RUN=195
+PASS_TOP=112
+FAIL_TOP=2
+SKIP=0
+-- red roster (top-level, named) --
+TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+TestTicket257R1AC1CleanMachineRefusesAllSevenFields
+-- per-case verdict for the five 341 cases --
+TestHandDeletedDefaultValuedLineIsRestoredInvisibly = PASS:
+TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = PASS:
+TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed = FAIL:
+TestHandDeletedProviderBaseUrlComesBackAsThePresetValue = PASS:
+TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile = PASS:
+-- verbatim red lines in the 341 carrier --
+writeguard_unnailed_341_test.go:231: the write branch did not re-stamp the deleted schema_version line at the current version:
+-- failing 341 case :: its first red line --
+TestTicket257R1AC1CleanMachineRefusesAllSevenFields ::     writeguard_unnailed_341_test.go:231: the write branch did not re-stamp the deleted schema_version line at the current version:
+-- restore --
+-- restored hash (want == pristine) --
+40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
+-- old anchor hits after restore (want 1) --
+1

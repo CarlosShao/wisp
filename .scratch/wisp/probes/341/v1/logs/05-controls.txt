@@ -1,0 +1,107 @@
+######## AC#1 controls: per-name verdicts in each shot (exact grep ruler) ########
+Ruler: grep -E '^ *--- (PASS|FAIL): <name>( |\()' on the -v log; scope = ./internal/config/
+on the export tree, mutated, -count=1 -timeout 30m.
+
+★NAMED RULER DEFECT of my own (registered, not used as a reading): the awk pairing
+'failing case :: first red line' inside 10-mu-*.txt mis-associates names, because
+go test -v prints a case's failure bodies BEFORE its '^--- FAIL:' line. The authoritative
+per-case mapping is the block below plus the named red roster in each 10-mu-*.txt.
+
+===== SHOT p2 =====
+RUN=195 PASS_TOP=113 FAIL_TOP=1 SKIP=0
+  TestHandDeletedDefaultValuedLineIsRestoredInvisibly              FAIL:
+  TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory        PASS:
+  TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed PASS:
+  TestHandDeletedProviderBaseUrlComesBackAsThePresetValue          PASS:
+  TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile     PASS:
+  TestHandDeletedScalarLineComesBackAtSchemaDefault                PASS:
+  TestHandDeletedMapEntryIsNotRestored                             PASS:
+  TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent            PASS:
+  TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent         PASS:
+  TestDeletedLineRestorationIsNotClaimedAsAWrittenKey              PASS:
+  TestLoadFilePresetInheritance                                    PASS:
+  TestTicket257R1AC1CleanMachineRefusesAllSevenFields              PASS:
+  -- red roster (top-level, named) --
+     TestHandDeletedDefaultValuedLineIsRestoredInvisibly
+
+===== SHOT p3 =====
+RUN=195 PASS_TOP=102 FAIL_TOP=12 SKIP=0
+  TestHandDeletedDefaultValuedLineIsRestoredInvisibly              PASS:
+  TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory        FAIL:
+  TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed PASS:
+  TestHandDeletedProviderBaseUrlComesBackAsThePresetValue          FAIL:
+  TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile     FAIL:
+  TestHandDeletedScalarLineComesBackAtSchemaDefault                FAIL:
+  TestHandDeletedMapEntryIsNotRestored                             FAIL:
+  TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent            PASS:
+  TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent         PASS:
+  TestDeletedLineRestorationIsNotClaimedAsAWrittenKey              PASS:
+  TestLoadFilePresetInheritance                                    PASS:
+  TestTicket257R1AC1CleanMachineRefusesAllSevenFields              PASS:
+  -- red roster (top-level, named) --
+     TestAC11SettingWriteKeepsAForeignHandEditedKey
+     TestAC1AllowedDirsWriteKeepsAHandEditedKey
+     TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept
+     TestAC3AdoptionClaimsOnlyWhatThisWriteProduced
+     TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory
+     TestAC4PermissionModeWriteKeepsAHandEditedKey
+     TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber
+     TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile
+     TestHandDeletedMapEntryIsNotRestored
+     TestHandDeletedProviderBaseUrlComesBackAsThePresetValue
+     TestHandDeletedScalarLineComesBackAtSchemaDefault
+     TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory
+
+===== SHOT p5 =====
+RUN=195 PASS_TOP=112 FAIL_TOP=2 SKIP=0
+  TestHandDeletedDefaultValuedLineIsRestoredInvisibly              PASS:
+  TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory        PASS:
+  TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed FAIL:
+  TestHandDeletedProviderBaseUrlComesBackAsThePresetValue          PASS:
+  TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile     PASS:
+  TestHandDeletedScalarLineComesBackAtSchemaDefault                PASS:
+  TestHandDeletedMapEntryIsNotRestored                             PASS:
+  TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent            PASS:
+  TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent         PASS:
+  TestDeletedLineRestorationIsNotClaimedAsAWrittenKey              PASS:
+  TestLoadFilePresetInheritance                                    PASS:
+  TestTicket257R1AC1CleanMachineRefusesAllSevenFields              FAIL:
+  -- red roster (top-level, named) --
+     TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+     TestTicket257R1AC1CleanMachineRefusesAllSevenFields
+
+===== SHOT p6 =====
+RUN=195 PASS_TOP=112 FAIL_TOP=2 SKIP=0
+  TestHandDeletedDefaultValuedLineIsRestoredInvisibly              PASS:
+  TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory        PASS:
+  TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed PASS:
+  TestHandDeletedProviderBaseUrlComesBackAsThePresetValue          FAIL:
+  TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile     PASS:
+  TestHandDeletedScalarLineComesBackAtSchemaDefault                PASS:
+  TestHandDeletedMapEntryIsNotRestored                             PASS:
+  TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent            PASS:
+  TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent         PASS:
+  TestDeletedLineRestorationIsNotClaimedAsAWrittenKey              PASS:
+  TestLoadFilePresetInheritance                                    FAIL:
+  TestTicket257R1AC1CleanMachineRefusesAllSevenFields              PASS:
+  -- red roster (top-level, named) --
+     TestHandDeletedProviderBaseUrlComesBackAsThePresetValue
+     TestLoadFilePresetInheritance
+
+-- unmutated delivery tree: PASS lines for the five new cases (positive controls, surface A) --
+  --- PASS: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.02s)
+  --- PASS: TestHandDeletedMapEntryIsNotRestored (0.02s)
+  --- PASS: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+  --- PASS: TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent (0.02s)
+  --- PASS: TestDeletedLineRestorationIsNotClaimedAsAWrittenKey (0.02s)
+  --- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.02s)
+  --- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.02s)
+  --- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+  --- PASS: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.02s)
+  --- PASS: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)
+-- baseline surface: the five must be ABSENT there (that is the AC#0 reading) --
+  TestHandDeletedDefaultValuedLineIsRestoredInvisibly              hits=0
+  TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory        hits=0
+  TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed hits=0
+  TestHandDeletedProviderBaseUrlComesBackAsThePresetValue          hits=0
+  TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile     hits=0

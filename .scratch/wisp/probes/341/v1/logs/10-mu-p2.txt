@@ -1,0 +1,46 @@
+############ SHOT p2 :: internal/config/writeguard.go (anchor 6c625a8c23d46c347057c8f5050e8f8a10e33fa3) ############
+anchor_old(cut)   =are not preserved; a key line the\s*"\+\s*"operator deleted by hand comes back at its schema default value      want before=1 after=0
+anchor_new        =hand-chosen key order are not preserved\)"    want before=1 after=2
+anchor_discrim    =a key line the   want before=2 after=1
+-- hash at entry (want == pristine-from-blob) --
+efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+-- BEFORE: old=1 new=1 disc=2 --
+PERL_CUT_OK (1 substitution)
+-- AFTER: old=0 new=2 disc=1 --
+-- mutated region --
+153-				"file's bytes and mtime stayed put only because its schema_version was already current; "+
+154-				"a file behind on schema_version had already been re-laid in canonical form by the "+
+155:				"re-read, so comments and hand-chosen key order are not preserved)",
+156-				"key", ownedKey)
+157-			return nil
+--
+172-		slog.Info("config: wrote merged change into config.toml (ticket 226: only the keys listed "+
+173-			"changed value, every other key keeps the value the file already held; the file is re-laid "+
+174:			"in canonical form, so comments and hand-chosen key order are not preserved)",
+175-			"key", ownedKey, "wrote", truncateKeys(written))
+176-		// AC#3: the bytes on disk are exactly the bytes this process holds, so
+-- hash after cut (want != pristine) --
+ba4adc5ff4c9ca3e7b00c74a91aff84e0fef2ed586ae1d59d3e84855a5b05b88
+-- full package run (mutated) --
+GO_RC=1
+RUN=195
+PASS_TOP=113
+FAIL_TOP=1
+SKIP=0
+-- red roster (top-level, named) --
+TestHandDeletedDefaultValuedLineIsRestoredInvisibly
+-- per-case verdict for the five 341 cases --
+TestHandDeletedDefaultValuedLineIsRestoredInvisibly = FAIL:
+TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = PASS:
+TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed = PASS:
+TestHandDeletedProviderBaseUrlComesBackAsThePresetValue = PASS:
+TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile = PASS:
+-- verbatim red lines in the 341 carrier --
+writeguard_unnailed_341_test.go:111: the INFO branch must state the delete-shape even when the values hide it; log:
+-- failing 341 case :: its first red line --
+ ::     writeguard_unnailed_341_test.go:111: the INFO branch must state the delete-shape even when the values hide it; log:
+-- restore --
+-- restored hash (want == pristine) --
+efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+-- old anchor hits after restore (want 1) --
+1

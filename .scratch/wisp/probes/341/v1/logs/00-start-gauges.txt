@@ -1,0 +1,35 @@
+[341-v1 start gauges, my own first-run readings]
+git log -1 = cb006a376e9757551a4f991b1ea668d03badf89f 停车点 4.0eu＝收 341-r1(写腿·�
+branch = dev
+git status --porcelain -- internal/config cmd/wisp = [] (empty = clean)
+roster strict prefix count = 6
+cef2a6c9 票 341 落地腿 341-r1·挂起那发的善后现量（logs/
+46c920c8 票 341 落地腿 341-r1·交件自证（三把尺）＋本�
+920537ee 票 341 落地腿 341-r1·票尾一条 bullet＋本腿纪律�
+f710d104 票 341 落地腿 341-r1·report＋必答分件＋EOL/禁字�
+fd82f786 票 341 落地腿 341-r1·起手三把尺＋台面/门禁/普
+6948eb08 票 341 落地腿 341-r1·AC#1 四格常驻用例＝P2／P3�
+substring form count (the bad ruler, for contrast) = 17
+my own identity commits on disk (strict) = 1 [the 1 = orchestrator dispatch write, not mine]
+blob anchors HEAD:
+  internal/config/writeguard.go = 0ebc415b05651104fa13d6e71c76e61ba8fdd93c
+  internal/config/loader.go = 9100ba92e220e6a839142893b54429cb435fa80e
+  internal/config/migrate.go = 78d85e22e9518aeec84362ec68a784c01dc06afe
+log 6948eb08^..HEAD -- internal/config (name-status):
+COMMIT 6948eb08
+A	internal/config/writeguard_unnailed_341_test.go
+new test file gauges: lines=389 bytes=20241 funcs=5 CR=0
+58:func TestHandDeletedDefaultValuedLineIsRestoredInvisibly(t *testing.T) {
+138:func TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory(t *testing.T) {
+209:func TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed(t *testing.T) {
+289:func TestHandDeletedProviderBaseUrlComesBackAsThePresetValue(t *testing.T) {
+349:func TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile(t *testing.T) {
+227 recipe file: lines=195 funcs=5
+23:func TestHandDeletedScalarLineComesBackAtSchemaDefault(t *testing.T) {
+70:func TestHandDeletedMapEntryIsNotRestored(t *testing.T) {
+106:func TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent(t *testing.T) {
+150:func TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent(t *testing.T) {
+181:func TestDeletedLineRestorationIsNotClaimedAsAWrittenKey(t *testing.T) {
+ticket boxes: unchecked=0 checked=0
+ticket tail bullet numstat:
+1	0	.scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md
