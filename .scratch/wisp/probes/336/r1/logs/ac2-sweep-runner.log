@@ -1,0 +1,128 @@
+### AC#2 扫描 anchor=ed8ff551 pristine=c1799cd24afce19e6accef23db23a7d7ee746dec tree=/d/tmp/wisp/20261018/336r1/tree-mut
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [start]
+### 基线（未突变＝成对正控）
+  TEETH:
+  rc=0 RUN=17 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+### MU-1a git-credentials aEq
+  落点逐字（⇄ 具名提交 blob）:
+    220c220
+    < 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.git-credentials`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.git-credentials`)), eqPath):
+  落点命中枚数=1（本发＝摘一枚，期望 1；摘两枚时期望 2）
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/git-credentials 
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1a]
+### MU-1b wisp-config-under aUnder
+  落点逐字（⇄ 具名提交 blob）:
+    224c224
+    < 	case aUnder(cand, anchorForms(anchorPath(appDataS, `wisp`))) &&
+    ---
+    > 	case anchorMatches(cand, anchorForms(anchorPath(appDataS, `wisp`)), isUnder) &&
+  落点命中枚数=1（本发＝摘一枚，期望 1；摘两枚时期望 2）
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under 
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1b]
+### MU-1c wisp-config-eq aEq
+  落点逐字（⇄ 具名提交 blob）:
+    225c225
+    < 		aEq(cand, anchorForms(anchorPath(appDataS, `wisp`, `config.toml`))):
+    ---
+    > 		anchorMatches(cand, anchorForms(anchorPath(appDataS, `wisp`, `config.toml`)), eqPath):
+  落点命中枚数=1（本发＝摘一枚，期望 1；摘两枚时期望 2）
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq 
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1c]
+### MU-1d ssh aUnder
+  落点逐字（⇄ 具名提交 blob）:
+    227c227
+    < 	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.ssh`)), isUnder):
+  落点命中枚数=1（本发＝摘一枚，期望 1；摘两枚时期望 2）
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/ssh 
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1d]
+### MU-1e aws aEq
+  落点逐字（⇄ 具名提交 blob）:
+    229c229
+    < 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.aws`, `credentials`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.aws`, `credentials`)), eqPath):
+  落点命中枚数=1（本发＝摘一枚，期望 1；摘两枚时期望 2）
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/aws 
+  LEG:
+  rc=1 RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+    RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1e]
+### MU-1f kube aEq
+  落点逐字（⇄ 具名提交 blob）:
+    231c231
+    < 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.kube`, `config`)), eqPath):
+  落点命中枚数=1（本发＝摘一枚，期望 1；摘两枚时期望 2）
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/kube 
+  LEG:
+  rc=1 RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+    RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1f]
+### MU-1g dpapi-protect aUnder
+  落点逐字（⇄ 具名提交 blob）:
+    235c235
+    < 	case appDataS != "" && aUnder(cand, anchorForms(anchorPath(appDataS, `microsoft`, `protect`))):
+    ---
+    > 	case appDataS != "" && anchorMatches(cand, anchorForms(anchorPath(appDataS, `microsoft`, `protect`)), isUnder):
+  落点命中枚数=1（本发＝摘一枚，期望 1；摘两枚时期望 2）
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/dpapi-protect 
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1g]
+### MU-1h local-credentials aUnder
+  落点逐字（⇄ 具名提交 blob）:
+    237c237
+    < 	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
+    ---
+    > 	case localAppDataS != "" && anchorMatches(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`)), isUnder):
+  落点命中枚数=1（本发＝摘一枚，期望 1；摘两枚时期望 2）
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials 
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1h]
+### 末态
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [final]
+  shared_worktree_internal_cmd_dirty=0（期望 0）
+ac2_sweep_rc=0
