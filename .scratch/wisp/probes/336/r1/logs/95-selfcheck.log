@@ -1,0 +1,52 @@
+### 336-r1 交件侧三把尺（2026-10-18 12:08:39 +0800）
+head_now=0b1d1f0b74084ad5cf92bc56205759345d56dcab 2026-10-18T12:06:57+08:00
+## 尺①提交真在（严格前缀名册＋逐笔 name-only 枚数）
+  ae8040a1 files=1
+  28da3a7e files=7
+  90dafe77 files=20
+  c87df16d files=2
+  8c36c23c files=21
+  feac8f77 files=3
+  c55e32b1 files=1
+  f67048d9 files=8
+  ff56a9e0 files=1
+  count=9
+## 尺②件真在：写面越界普查（逐笔 ⊆ internal/risk/*_test.go ∪ probes/336/r1 ∪ 票 336）
+  ae8040a1 out_of_scope=0
+  28da3a7e out_of_scope=0
+  90dafe77 out_of_scope=0
+  c87df16d out_of_scope=0
+  8c36c23c out_of_scope=0
+  feac8f77 out_of_scope=0
+  c55e32b1 out_of_scope=0
+  f67048d9 out_of_scope=0
+  ff56a9e0 out_of_scope=0
+  .go 非测试命中总数=0
+## 尺③自己复跑：blacklist.go 逐枚提交 blob（期望全＝c1799cd2…＝起手同串）
+  ae8040a1 c1799cd24afce19e6accef23db23a7d7ee746dec
+  28da3a7e c1799cd24afce19e6accef23db23a7d7ee746dec
+  90dafe77 c1799cd24afce19e6accef23db23a7d7ee746dec
+  c87df16d c1799cd24afce19e6accef23db23a7d7ee746dec
+  8c36c23c c1799cd24afce19e6accef23db23a7d7ee746dec
+  feac8f77 c1799cd24afce19e6accef23db23a7d7ee746dec
+  c55e32b1 c1799cd24afce19e6accef23db23a7d7ee746dec
+  f67048d9 c1799cd24afce19e6accef23db23a7d7ee746dec
+  ff56a9e0 c1799cd24afce19e6accef23db23a7d7ee746dec
+  工作树 internal/cmd 脏行=1（期望 0）
+  禁区件逐笔命中=0
+## 票面七格（交件侧现跑；⛔ 翻框）
+  未勾=7 已勾=0
+  Status 行=- Status: **已立，未派**（2026-10-17 15:5x 编排者立；来源＝非实现者终裁腿 `334-v1` 判语件 `docs/evidence/s1/334-v1-verdict.md:38-47`＋编排者收件登记 `A1021`；账＝本条）
+## 我⛔ 入库的 0 字节尺坏 artefact（临时件只建不删⇒留盘上未跟踪、⛔ 当凭据）
+  ac4-full-before-dshape-a.rednames bytes=0
+  ac4-full-before-dshape-b.rednames bytes=0
+  ac4-full-after-dshape-a.rednames bytes=0
+  ac4-full-after-dshape-b.rednames bytes=0
+  teeth-01….log.redlist bytes=0
+  成因具名＝引号内 glob 不展开＝尺坏；真红名册＝*.log.rednames 逐枚非 0
+## 证据件尺寸（绝对路径＋wc -c＋行数）
+  /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/336/r1/report.md bytes=13313 lines=113
+  /d/work/workspace/projects plans/Wisp/internal/risk/anchor_fallback_teeth_336_windows_test.go bytes=7839 lines=160
+  /d/work/workspace/projects plans/Wisp/internal/risk/anchor_fallback_teeth_336_other_test.go bytes=4108 lines=92
+  logs 枚数=69 非 0 字节枚数=64
+selfcheck_rc=0
