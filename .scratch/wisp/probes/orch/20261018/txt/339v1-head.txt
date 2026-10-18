@@ -1,0 +1,28 @@
+派单＝票 339 终裁腿 339-v1（非实现者裁决腿·只读）｜编排者＝新任 harness｜发出 2026-10-18 21:2x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 你是谁
+你是票 **339** 的**终裁腿**（裁决者≠实现者）。实现腿＝`339-r1`（已交件、10 笔、落码甲形拆分）。
+⛔ 你是第二枚 `339-v*`（票 339 此前无任何裁决腿；盘上尺＝`git log --all --grep='票 339 终裁腿'`＝0 笔，编排者 21:1x 现跑）。
+★你的写面**只有两处**：`docs/evidence/s1/339-v1-verdict.md` ＋ `.scratch/wisp/probes/339/v1/**` ＋票 339 末尾**一条**只追加 bullet。⛔ 任何 `.go` 字节、⛔ 翻框、⛔ 改票名／`Status:`／加 `-done`。
+
+## 要裁什么
+票面＝`.scratch/wisp/issues/339-ticket334-anchor-miss-instrument-runs-on-linux-but-its-fake-home-is-windows-only.md`（39 行，判据区七格**一枚没翻**：`^- [ ] **AC#`＝7、`^- [x]`＝0）。
+⚠★**票面有两处已被推翻的历史文字，你必须先读再裁**（⛔ 拿过期判据当合同）：
+- 第 37 行＝实现腿 `339-r1` 的票尾交件（含它自己的机制更正与具名停手上报）。
+- 第 39 行＝**编排者追加的机制更正**：票面「这是什么」那句"`USERPROFILE` 在 Linux 不生效"＝**我写错了**。真机制＝`internal/risk/pathresolver_other.go:10` 的 `resolveHandle` 恒返回 `("",false)` ⇒ `formsOf` 的 `pathForms.root` 在 POSIX 恒空 ⇒ `blacklist.go:359-361` 的 `uncertainAnchorMiss` 首行即 `return false` ⇒ A 档（R17 fail-closed 支）在 POSIX **结构上不可达**。
+⇒ 由此，`AC#1` 的"乙形（假主目录按 `HOME`⇄`USERPROFILE` 分别设）"**按字面做不出**（`:85-88` 早就是同发设四枚环境变量），真乙＝动产码解析器＝越本票禁区；`AC#2` 的"两平台都点名红"那一维＝**本票写面内不可达**。这两处是你要下判的核心，别照票面原句读成"腿偷懒"。
+
+## 起手（第一笔就做，⛔ 跳过）
+1. `git log -1 --format='%H %s'`、`git status --porcelain -- internal/risk`（应为空）、`git log --all --oneline --grep='票 339 落地腿 339-r1' | measure`（名册笔数，⛔ 用子串尺＝公共块 `A1030`/`A1040` 定式：**逐枚 hash 取名册**，子串前缀会把别腿笔吃进来）。
+2. 逐枚读实现腿的交件：`.scratch/wisp/probes/339/r1/report.md`（终稿 108 行／13032 字节）＋`logs/**`（尤其 `linux-final-fullpkg.log`／`win-final-fullpkg-psnative.log`／`roster-diff.log`／`01-blocked-bing-not-reachable.log`／`bing-staleness-pair.log`／`tripwire-sensitivity.log`／`99-final-gates.log`）。
+3. 编排者已独立复跑过的读数（⛔ 直接采信，⛔ 当自己的凭据——**你要自己重打**）：改前 Linux 整包 `199/114/3/1` vet rc=0 ⇄ 改后 `195/115/1/1` vet rc=0；Windows 原生名册 base⇄final 逐字 IDENTICAL。
+
+## 必读料
+- 票 339 全文（七格逐格读正文）＋票 334（已 `-done`，`.scratch/wisp/issues/334-...-done.md`）尤其它 `AC#3` 那句"让仪器在 CI 那把台面下绿"的原文——★本票 `AC#3` 要求你判：**甲形拆分之后，票 334 `AC#3` 那句判语的射程要不要收窄、收窄成什么形**（腿已顺手把文件头那句 "decidable on every machine" 改成 "every WINDOWS machine"，编排者判＝⛔ 算偷改别票、算说实话；你要独立裁这一形够不够、还是要票尾追加一条）。
+- 落码两件＝`internal/risk/anchor_miss_reason_334_test.go`（+23/−1，一枚 build tag＋注释）＋`internal/risk/anchor_miss_reason_339_other_test.go`（新增，夹具复制＋POSIX 具名绊线）。
+- 被引用关系（票面第 39 行②）＝夹具 `candidateOffAnchorChain334` 在 `:96`，被 `anchor_fallback_teeth_336_other_test.go:73`（`!windows`）与 `name_claim_two_arm_216_test.go:89`（无档）逐名引用 ⇒ 你要**自己复现"naive 整档加 tag 会打坏 Linux 编译"**这一枚（腿的读数＝`jia-naive-buildbreak.log`，⛔ 抄）。
+- CI 侧真凭据（⛔ 别只用它代替本地复跑）：编排者已推送并取到 `run 39124122121`（HEAD `a5080612`）＝`test-core` 里 `TestAnchorMissReasonNamesCandidateAndMissingAnchor`／`TestAnchorMissKeepsNonOverridableClassAndNeedL2` **已不在红名册**；原始失败日志镜像在 `D:\tmp\wisp\20261018\ci39124122121.log`，⛔ 不在仓内、⛔ 你的判语件不许引它当凭据（可引 `gh run view 39124122121` 你自己现取的读数）。
+
+## 写面与车道
+`internal/risk/**` 此刻是**空车道**（编排者 21:1x 现量：40 分钟内零枚文件被动、在飞零枚腿）。★同包在册争用件＝`TestResolvePerCallBudget`（争用型假红、安静复量为准，`A426`/`A432`）⇒ 你跑整包时若它红 ⇒ **安静定向复量 3 发/树**再判，⛔ 计入新增红。
+本波同刻另有三枚腿在飞（`341-r1` internal/config、`338-v1` internal/tools+cmd/wisp 定向、`342-a1` winsec 只读）。⇒ ★⛔ `./cmd/wisp` 整包（那是 `338-v1` 的车道）、⛔ `go test ./...`、⛔ 与别腿同刻跑同一包。

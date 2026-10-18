@@ -1,0 +1,28 @@
+派单＝票 338 终裁腿 338-v1（非实现者裁决腿）｜编排者＝新任 harness｜发出 2026-10-18 21:2x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 你是谁
+你是票 **338** 的**终裁腿**（裁决者≠实现者）。实现腿＝`338-r1`（写腿，已交件、名册 23 枚命中＝⛔ 用子串尺，见下）。
+★你是本仓第一枚 `338-v*`（盘上尺＝`git log --all --grep='338-v1'` 只命中**编排者台账里提到你的名字**那一笔 `274da78a`，⛔ 那不是你交过的腿活；你自己第一笔先具名核这一形）。
+你的写面**只有三处**：`docs/evidence/s1/338-v1-verdict.md` ＋ `.scratch/wisp/probes/338/v1/**` ＋票 338 末尾**一条**只追加 bullet。⛔ 任何 `.go` 字节、⛔ 翻框、⛔ 改票名／`Status:`／加 `-done`。
+
+## 要裁什么
+票面＝`.scratch/wisp/issues/338-two-tracked-files-are-gofumpt-dirty-in-blob-form-so-cis-format-step-goes-red-on-stock.md`（47 行，判据区 5 枚框：`^- [ ] **AC#`＝5、`^- [x]`＝0）。
+⚠ 票面 `AC#4` 正文写"本票四格"而盘上有 5 枚框 ⇒ 两种读法（"四格"＝AC#1..AC#4、AC#0 属起手尺格）你**具名裁一句**该按哪个数结案，别默认。
+靶子＝两枚**blob 态真脏**的跟踪件已归位：`internal/tools/task_output_pointer_notice_errtext_174r7_test.go` ⇄ `cmd/wisp/panel_transport_35r2_test.go`；同册另有 4 枚 CRLF **假脏**（`internal/agent/approval/pending_read.go`／`internal/agent/tools.go`／`internal/risk/provenance.go`／`cmd/wisp/models.go`），票面禁区明文⛔ 顺手修。
+
+## 起手（第一笔就做，⛔ 跳过）
+1. `git log -1 --format='%H %s'`；`git status --porcelain -- internal/tools cmd/wisp internal`（应为空）；`git diff --numstat <338-r1 起手锚>..HEAD -- <那两枚>`。
+2. ★名册尺＝**逐枚 hash 取名册**：先 `git log --all --format='%H' --grep='338-r1'` 取号，再逐枚 `git show --name-only --format=` 建并集。⛔ 子串前缀尺（`A1030`/`A1040` 定式＝今天已把两条腿混成一册、23 笔那种）。正控＝同一把尺打别腿前缀必须非零。
+3. 逐枚读实现腿交件：`.scratch/wisp/probes/338/r1/**`（它 14 枚文件，`git ls-tree` 数一下，⛔ 当笔数）。
+4. ★**本格最要紧的一件事**（编排者欠账、票面 `AC#3` 与台账 `A1035` 在册）：338-r1 报 `cmd/wisp` 整包成对＝`207/150/2/0` ⇄ `203/146/2/0`，四数里 `RUN`/`PASS_TOP` 差 4，它判＝**真窗区整进程死亡位置不同造成的截断差**（⛔ 读成"我的字节让 4 枚测试消失"）。**这一判我认但⛔ 盖章 ⇒ 交你复跑点名**：⛔ 抄它的数，你自己把两侧**判定名册逐名**作差（`^--- PASS`/`^--- FAIL` 名集 ⇄ `^=== RUN` 名集），证明那 4 枚是"根本没开始跑"而不是"消失了"，并逐名对回票面 `AC#3` 那句"已知真窗区整进程死亡＝具名归位"。
+
+## 必读料
+- 票 338 全文（五格逐格读正文）。
+- 编排者收件那两节＝台账 `A1034`＋`A1035`（`docs/reports/pending-and-issues.md`，⛔ 整枚 5.2MB 镜像进你的件，只抽你引用的那一节）。
+- 338-r1 的读数件：尤其 `ac3-full2.txt`（跨漂移成对）与它的 gates 件。
+- ★CI 侧新事实（我 20:3x 现取、⛔ 你直接采信）：HEAD 已推送，`run 39124122121` 的 `lint` 作业仍 `failure`，但**它点名的 20 枚文件全在 `.scratch/wisp/probes/**`**（＝票 275/276 那族"故意种坏的样本／探针件"存量），与 `internal/cmd` 两枚已归位的件无关。⇒ `AC#2` 那句"门变绿"的**射程要按这个收窄**：本机门 ⇄ CI 那道门（`ci.yml:172`/`:189`）分母不同＝CI 那道今天**照旧红**。你可以自己 `gh run view 39124122121 --log-failed` 现取，⛔ 引我的散文当凭据。
+
+## 写面与车道（★本波的车道分配，照做）
+- ★**`go test ./cmd/wisp` 这一时刻只许你一枚在跑**（共享编译面；本波另三枚腿＝`341-r1` internal/config、`339-v1` internal/risk、`342-a1` winsec 只读，都⛔ 碰 `cmd/wisp`）。你跑整包前：`Get-CimInstance Win32_Process` 现验没有别的 go test 进程，并把这一枚"车道确认"读数入你的件。
+- ⛔ `go test ./...`；`internal/risk` 的 `TestResolvePerCallBudget` 争用假红定式（安静复量 3 发）也适用于你两包成对里任何一枚争用形。
+- 门禁四数只在共享工作树、★先 `unset GOTMPDIR TMPDIR`（票 311 AC#1 shape B GUARD＝rc=2 射程拒绝⛔ 读成红）。

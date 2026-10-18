@@ -1,0 +1,41 @@
+派单＝票 342 只读普查腿 342-a1（零写面·⛔ 产码）｜编排者＝新任 harness｜发出 2026-10-18 21:2x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 你是谁
+你是票 **342** 的**只读普查腿**。★你不是落地腿：票面 `AC#0` 就是"三形代价表"，而票面明文「⛔ 未出表任何一形都不许开工」⇒ 你这趟**只出表、⛔ 落任何一形**。
+本票此前无任何腿（盘上尺＝`git log --all --grep='342-a1'`＝0、`.scratch/wisp/probes/342` 不存在，编排者 21:1x 现跑）。
+★你的写面**只有两处**：`.scratch/wisp/probes/342/a1/**`（短名、⛔ 分节符 `U+00A7`、逐枚非 0 字节）＋票 342 末尾**一条**只追加 bullet。⛔ 任何 `.go` 字节、⛔ 翻框、⛔ 改票名／`Status:`／`-done`。
+
+## 议题（一句话）
+`winsec.PrivateFile` 那次 open 的**祖先那一支**今天两平台都开着（POSIX 的 `O_NOFOLLOW` 只护最后一枚组件；Windows 连 `O_NOFOLLOW` 都不存在）。票 322 按边界只关了**叶子**那一支并已 `-done`；祖先那一支在本仓⛔ 主人 ⇒ 票 342 接它。
+权威现读凭据＝`internal/winsec/winsec.go:118-138` 那段**产码注释自陈**（逐字 `the ANCESTOR leg is still open on POSIX.`／`on Windows O_NOFOLLOW does not exist (oNoFollowPlatform is 0)`／`This window is not claimed closed anywhere.`）＋`winsec.go:149` 那次 `os.OpenFile(resolved, flags|oNoFollowPlatform, perm)`。**起手先自己逐字读回来**（行号会漂；⛔ 抄票面行号）。
+
+## 起手（第一笔就做）
+1. `git log -1 --format='%H %s'`、`git status --porcelain -- internal/winsec cmd/wisp internal`（应为空）、`git log --all --oneline --grep='342-a1'`（应为 0＝自证你是第一枚）。
+2. 逐枚重跑票面「现量」那六行（一律取**具名提交树** `git show HEAD:<path>`，⛔ 读在飞工作树）。与表不符 ⇒ **当场具名更正**（票面明文要的就是这个）。
+3. ★票面那条"生产调用者枚数"要**自己现跑**：`winsec.PrivateFile(` 生产 5 枚 ⇄ `PrivateFileExclusive(` 生产 2 枚 ⇒ 逐枚 `file:line` 点名，并给每枚答案**"它依赖覆盖写吗"**（＝AC#2 的前置料）。
+
+## 要出的三形代价表（AC#0，只量、⛔ 选形、⛔ 写"建议选 X"）
+- **甲**＝POSIX 侧逐组件 `openat(O_NOFOLLOW)` 下探到父目录、再在钉住的 fd 上开叶子（产码注释点名的第一形）。
+- **乙**＝复用本包**为密封已经做过的那套 handle pinning**（`sealHandle`／`applyDescriptorPOSIX` 同一族）把父目录钉住 ⇒ 祖先换手后 fd 与 name 不是同一对象即被复验抓住。
+- **丙**＝**只诚实报告**（`f.Stat()` ⇄ 逐组件 `Lstat` 复验，截断已发生后报错）＝⛔ 防住形；若选它则票面与注释一律⛔ 出现"窗口已关"。
+
+每形都要**现量**给出（⛔ 散文推断当读数）：
+① 改动面（文件:行，逐枚）；② POSIX **与 Windows 各自**的实测读数（★⛔ 用 POSIX 绿冒充 Windows 绿＝票 322 `AC#3` 那味；Windows 那一侧的落点必然要逐组件下探，票面 `322-a1` 已量到 `FILE_FLAG_OPEN_REPARSE_POINT` 只对叶子有效——你**复跑那把尺**再引它）；③ **会顶红谁现有的钉**：逐名读断言并给名册
+`internal/winsec/placement_symlink_113_other_test.go`／`ancestor_separator_108_other_test.go`／`dataroot_symlink_119_other_test.go`／`seam_probe_root_125_other_test.go`／`posix_seal_window_120_other_test.go`／票 322 的 `openleaf_*_322_*_test.go`（六枚路径我已逐枚 `git cat-file -e HEAD:<path>` 现验存在，rc=0）。
+★名册判据＝**逐枚列"哪一条断言会被甲／乙／丙各自打红、红句会长成什么样"**，0 命中也要带正控（同一把尺打一个已知在场的锚必须非零）。
+
+## 台面与颜色尺
+- 你要跑真读数才能填 ② ⇒ 台面＝`git archive <具名锚>` **仓外导出树**（配方见公共块八件套＋`docs/`＋手工三件）；★树与临时件一律落 `D:\tmp\wisp\20261018\342a1\<台名>`（⛔ 任何盘符根，机主 10-18 新铁律）。
+- POSIX 档＝容器 `golang:1.27`＋`CGO_ENABLED=0`＋`GOPROXY=off`＋挂宿主 module 缓存＋`MSYS_NO_PATHCONV=1`（防 `/src` 被 Git Bash 改写＝今天真咬过一次，故障件具名入库、⛔ 计入判据）。
+- ★⛔ 与别腿同刻跑同一包：本波另三枚在飞＝`341-r1`（internal/config）、`339-v1`（internal/risk）、`338-v1`（internal/tools＋**cmd/wisp 整包独占**）。⇒ 你**⛔ `go test ./cmd/wisp`**、⛔ `go test ./...`；你的色只取 `./internal/winsec/` 定向与容器档。
+- ★**在册摆动枚具名**：`TestPOSIX120SealWindowLeafSwapIsClosed` 与 `TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1` 是**争用／时序敏感**仪器（编排者 20:4x 现量：blob 在两枚 CI 锚之间**逐字同串**，上一发 CI `PASS`、这一发 `FAIL`，红句自陈「RED instrument is dead … a zero window reading here proves nothing」）。⇒ 你在任何台面读到它们红 ⇒ **先安静复量 3 发再归因**，⛔ 记成"祖先那一支新造的红"，也⛔ 拿它们的绿当"叶子那一支已钉住"的凭据。
+
+## 票面其余格（本趟⛔ 做，只登记"缺什么"）
+`AC#1`（成对读数要有 liveness）／`AC#2`（覆盖写语义不许被悄悄改掉，要么补那枚钉要么具名说明为何不补）／`AC#3`（去牙反控两发）／`AC#4`（门禁＋消费者不推红）／`AC#5`（`winsec.go:118-138` 那段自陈随终态更新，⛔ 出现"窗口已关"除非两平台都量到）／`AC#6`（纪律格）＝**都要等落地腿**。你只在表末具名写：**哪一格在选形落地前根本无法判**、以及**落地腿需要的人工批准**（甲／乙都动 `internal/winsec` 产码＝不是仪器活）。
+
+## 禁区
+`docs/PLAN.md`／`docs/specs/**`／`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／`.github/**`／`frontend/**`／`design/**`；三枚冻结件（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）一字不动；⛔ 为变绿放宽票 113／116／119／120／**322** 的既有钉；⛔ 顺手改票 120 的"r 权限类"口径（`A990` 裁②已定）；⛔ 回头改票 322 判据文字（已 `-done`，要更正只追加）；⛔ 把叶子那一支当没做。
+
+## 交件
+`.scratch/wisp/probes/342/a1/census.md`（三形表本体，≤160 行；写不下 ⇒ 拆具名分件，⛔ 压正文）＋`scripts/`（逐形可重跑尺）＋`logs/`（逐字读数）。⛔ 落 `docs/evidence/s1/`（那是判语件的落点，你不裁）。
+三把尺自证照公共块。⛔ push、⛔ 翻框、⛔ 立票（立票权归编排者；你要新形状就具名上报）。

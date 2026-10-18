@@ -1,0 +1,25 @@
+派单＝票 341 落地腿 341-r1（写腿）｜编排者＝新任 harness｜发出时刻 2026-10-18 21:2x +08｜起手锚＝编排者派单时现跑的 HEAD
+
+## 你是谁、要干什么
+你是票 **341** 的落地腿（实现者）。票面＝`.scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md`（43 行，七格全未勾）。
+靶子＝票 227 交件矩阵表里**如实报"仍未覆盖"的四格**：P2（删值本就等于 schema 默认的标量行）／P3（删整节，连 `[ball]` 表头）／P5（删 `schema_version` 走**写支**）／P6（删 `provider` 的 `base_url`）。
+你要给这四格**逐格补常驻用例**，每格自带去牙反形。
+
+## 起手（第一笔必须做这个，⛔ 跳过）
+1. `git log -1 --format='%H %s'` ＋ `git status --porcelain -- internal/config cmd/wisp` → 把两个读数原样写进你的 report 头（你的基线＝**你起手的 HEAD**，⛔ 用我这封里写的号）。
+2. 逐枚重跑票面「现量」那四行（一律取**具名提交树**，⛔ 读在飞工作树）。与表不符 ⇒ **当场具名更正写进 report**（票面明文要的就是这个）。
+3. ★票面 `AC#0` 那句自加尺：**对 P1–P6 逐格问"有没有任何 `*_test.go` 真断这一形的结果"**，命中枚数＋载体 `file:line` 逐格列。⛔ 抄 227-v1 的八行表当结论（那是别人的判语，你只借它定位，判"覆盖没覆盖"要你自己现量）。
+
+## 必读料（具名件，⛔ 到处翻）
+- 票 341 全文（判据七格＝你的合同，逐格读正文，⛔ 只读标题）。
+- 票 227 那张矩阵表出处＝`.scratch/wisp/probes/227/r1/report.md`（151 行）＋ 227-v1 的独立普查 `.scratch/wisp/probes/227/v1/logs/06-ac3-independent-census.txt`（★这枚最值：它是非实现者对 P0–P6 逐格现量的名册，含"哪格只有台件、哪格什么都没有"的载体行号）。
+- 现成配方（★照这个形状做，别自创）＝`internal/config/writeguard_handedit_227_test.go`（195 行／5 枚 `^func Test`／CR 0）——票 227 已钉的 P1／P4／P5′ 三枚就在这文件里；你的四格**另起新件**（建议 `writeguard_unnailed_341_test.go`），⛔ 改这枚已有件的既有用例。
+- 去牙配方＝编排者台账 `A1033` 第④节点名的、以及票面现量表第 5 行那把尺：`manager_test.go:38` 的 `const matrixBase` 删 `schema_version = 2` ⇒ 既有用例点名红。**你要给每一格造出等价的"摘守卫 ⇒ 该枚必红"落点**，两发落点⛔ 相同。
+
+## 写面（越界＝我直接退你那一笔）
+`internal/config/**` 的**测试面**（新增 `*_test.go`；★⛔ 动任何产码 `.go` 的非注释字节，见下禁区）＋ `.scratch/wisp/probes/341/r1/**`（短名、⛔ 分节符 `U+00A7`、逐枚非 0 字节）＋ 票 341 末尾**一条**只追加 bullet。
+`internal/config/**` 此刻是**空车道**（编排者 2026-10-18 21:1x 现量：40 分钟内零枚文件被动、在飞零枚腿、`git diff` 对 `internal/cmd` 零行）。你是本波该面唯一写腿。
+
+## 禁区（⛔ 不是建议）
+`writeguard.go`／`loader.go`／`migrate.go` 的**任何非注释字节**（★"迁移-on-读真写盘"那一形＝乙形，属行为变更，已另立票 345，⛔ 在本票顺手做）；`docs/evidence/s1/226-*.md` 一字（那是别人的判语件，你只**具名指认**，更正由编排者落笔）；`internal/observe/thresholds.go`／golden／`tools/d22scan/allowlist.txt`／三枚冻结件（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）；`docs/PLAN.md`／`docs/specs/**`／`.github/**`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／D1–D47／C1–C32／R1–R9／D43 转移表；⛔ 新导出名／新 JSON 键；⛔ `frontend/**`／`design/**`；⛔ `cmd/wisp/**`／`internal/panel/**`（本波共享编译面零写腿）。
+★上面每条路径我已逐枚 `git cat-file -e HEAD:<path>` 现验存在（rc=0），⛔ 你再拿不存在的名字当"我查过了"的凭据。
