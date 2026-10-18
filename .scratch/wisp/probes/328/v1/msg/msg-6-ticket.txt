@@ -1,0 +1,8 @@
+票 328 终裁腿 328-v1·票尾一条只追加（含"五枚框一枚没翻"）＋收尾自证尺入库
+
+尺（追加前再验＝该文件对 HEAD 差 0 行＝没人在这枚文件上飞）：git diff HEAD -- <票面> | wc -l = 0
+追加后尺（量的）＝git diff -- <票面> | wc -l = 10；新增非空行 1／删除 0；票面 59 行→61 行（一空行＋我那一枚）
+未勾框仍 3／带勾框仍 2（尺＝grep -c '^[[:space:]]*- \[ \]' ⇄ '- \[x\]'）⇒ ⛔ 翻任何框成立
+该形总行 8＝五枚 AC 框＋三枚 dated bullet（我那一枚；:50 :59 那两枚是编排者与落地腿的）⇒ 派单那把尺的 boxes_total=7→8 全因 dated bullet 同形，AC 枚数仍 5（具名分清，见 logs/start-rulers-v2.txt §2＋attribution-round2.log §6）
+那一枚内容＝五格裁语＋两条具名界＋红名册逐名作差＝0＋一枚红名抖动归位＋必答二题裁定＋两处对编排者具名上报；⛔ 改票名／⛔ Status:／⛔ -done／⛔ push。
+本笔同时入库第二程新落的读数件：logs/ac3-attribution-and-zero-read.log 已随 8ba2ae09 入库，本笔补 logs/start-rulers-v2.txt 的 legacy 追加已由该笔带上 ⇒ 本笔只剩票面一枚＋msg/msg-6-ticket.txt；零新导出名⇄零新 JSON 键那把尺的逐字在 logs/attribution-round2.log §3（⛔ 引用不存在的件名）。
