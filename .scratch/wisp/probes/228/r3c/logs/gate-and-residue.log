@@ -1,0 +1,27 @@
+### 228-r3c 门禁（共享工作树＝/d/work/workspace/projects plans/Wisp；本腿零 .go 跟踪件） date=2026-10-18 10:32:59 +0800
+### [1] sh scripts/d22scan.sh
+d22scan-rc=0
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=586, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 586 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+### [2] sh scripts/check-path-length-budget.sh
+pathlength-rc=0
+check-path-length-budget.sh: denominator read: 15255 tracked paths
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+### [3] gofumpt -l 本腿文件（零 .go 跟踪件⇒空列表具名，⛔ 当过了）
+gofumpt-on-.md-and-.sh-rc=0（同把尺指非 .go 会 rc=2 illegal character，本腿只指回 .go 集＝空）
+gofumpt-tracked-go-count=0
+### [4] go vet ./cmd/wisp/ —— 共享工作树＝⛔ 跑（本波唯一持跑者是我，但派单⛔ 在共享树跑 go test/build）；改在导出树跑并具名
+govet-exporttree-rc=0
+vet-output-bytes=0
+### [5] 残留尺正控（报 0 命中前先跑一把已知存在的正控）
+POSCTRL-hits(stopSignal :=)=1
+POSCTRL-hits(MUTATION-token-in-my-own-scripts)=5
+RESIDUE-hits(MUTATION-228r3c in export tree)=0 (expect 0，正控在上一行证明这把尺会响)
+### [6] 最终对撞：anchor blob ⇄ 导出树物理字节
+fatal: not a git repository (or any of the parent directories): .git
+cmp: EOF on '/d/tmp/wisp/20261018/228r3c/anchor-blob.go' which is empty
+cmp-rc=1 (0=IDENTICAL)
+tree-sha256=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7
+tree-blob1=531060a55c080ebd535b426b8c60dcd9011785fc
+### [7] 跟踪面自证（.go 命中必须 0）
+ M internal/session/manage.go
+### (上面那枚 M internal/winsec/..._test.go＝322-r2 写腿的在飞字节，⛔ 我写的；本腿笔的 --name-only 逐枚不含任何 .go)

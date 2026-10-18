@@ -1,0 +1,27 @@
+### 228-r3c 门禁②＋残留尺＋最终对撞（具名重跑：上一件 [6] 段因 cd 到导出树后未 cd 回仓 ⇒ git cat-file 撞 "not a git repository"＝我那把尺写坏，⛔ 读成没还原） date=2026-10-18 10:34:23 +0800
+### [A] 最终对撞 anchor blob ⇄ 导出树物理字节
+anchor-blob-bytes=12916  tree-bytes=12916
+cmp-rc=0 (0=逐字节 IDENTICAL)
+tree-sha256=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7
+tree-blob1=531060a55c080ebd535b426b8c60dcd9011785fc
+### [B] 残留尺（先正控再报 0）
+POSCTRL-token-present(stopSignal := rt.StopSignal)=1 (expect 1，尺会响)
+POSCTRL-MUTATION-label-hits(my-scripts)=5-shape-check:3
+RESIDUE-MUTATION-in-export-tree=0 (expect 0)
+### [C] 跟踪面自证（⛔ 我写任何跟踪字节）
+status:  M internal/session/manage.go
+### [D] 本腿已入库笔的 .go 命中尺（严格前缀＋--all）
+commit: 52f24441 票 228 突变复跑腿 228-r3c·M1 断环路 stop 检查 ⇒ ⓑ-1 点名红（单发独立）
+commit: c544bb3d 票 228 突变复跑腿 228-r3c·pristine 正控 定向四枚两台面成对 4/4/0/0
+commit: 953f8966 票 228 突变复跑腿 228-r3c·起手 落点更正＋起手三把尺＋pristine 基准
+path: .scratch/wisp/probes/228/r3c/hash.sh
+path: .scratch/wisp/probes/228/r3c/logs/estate-pristine-c.log
+path: .scratch/wisp/probes/228/r3c/logs/estate-pristine-d.log
+path: .scratch/wisp/probes/228/r3c/logs/hashes-pristine.txt
+path: .scratch/wisp/probes/228/r3c/logs/mutation-M1-b1.log
+path: .scratch/wisp/probes/228/r3c/logs/setup-tree.log
+path: .scratch/wisp/probes/228/r3c/mutate-shot.sh
+path: .scratch/wisp/probes/228/r3c/run-targeted.sh
+path: .scratch/wisp/probes/228/r3c/setup-tree.sh
+path: .scratch/wisp/probes/228/r3c/start.md
+GO-HITS-IN-MY-COMMITS=0 (expect 0)

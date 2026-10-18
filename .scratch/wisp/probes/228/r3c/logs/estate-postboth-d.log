@@ -1,0 +1,62 @@
+### leg=228-r3c surface=d pwd=/d/tmp/wisp/20261018/228r3c/tree GOTMPDIR=/d/tmp/wisp/20261018/228r3c/gotmp TMP=/d/tmp/wisp/20261018/228r3c/tdst
+### run-pattern=TestAC11StopBitIsBuiltAtBoot$|TestAC11StopRequestDuringTheBootWindowIsNotSwallowed$|TestAC11TrayExitExecutorIsMountedAtTheBallHost$|TestAC11TrayExitTriggerWalksTheTenSteps$ date=2026-10-18 10:27:32 +0800
+### shortname-ruler(cygpath -d tree)=D:\tmp\wisp\20261018\228r3c\tree
+### hash-of-mutated-file-BEFORE-this-run
+file=/d/tmp/wisp/20261018/228r3c/tree/internal/proc/boot_windows.go
+sha256bytes=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7
+blobsha1=531060a55c080ebd535b426b8c60dcd9011785fc
+bytes=12916
+lines=313
+time=2026-10-18T10:27:46.040+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC11StopBitIsBuiltAtBoot
+--- PASS: TestAC11StopBitIsBuiltAtBoot (0.00s)
+=== RUN   TestAC11TrayExitExecutorIsMountedAtTheBallHost
+time=2026-10-18T10:27:46.084+08:00 level=INFO msg="tray exit requested" outcome="recorded; the event loop ends this process through the D38(e) order" why="tray Exit item selected in this process"
+wisp: tray exit requested: recorded; the event loop ends this process through the D38(e) order
+time=2026-10-18T10:27:46.089+08:00 level=WARN msg="tray exit requested" outcome=ignored why="the assembly root handed this ball host no stop executor, so the request is recorded and nothing else happens; this process leaves when its event loop returns, and here only a console signal (Ctrl+C) can ask for that"
+wisp: tray exit requested: the assembly root handed this ball host no stop executor, so the request is recorded and nothing else happens; this process leaves when its event loop returns, and here only a console signal (Ctrl+C) can ask for that
+time=2026-10-18T10:27:46.089+08:00 level=INFO msg="tray exit requested" outcome="recorded; the event loop ends this process through the D38(e) order" why="tray Exit item selected in this process"
+wisp: tray exit requested: recorded; the event loop ends this process through the D38(e) order
+--- PASS: TestAC11TrayExitExecutorIsMountedAtTheBallHost (0.01s)
+=== RUN   TestAC11TrayExitTriggerWalksTheTenSteps
+time=2026-10-18T10:27:46.092+08:00 level=INFO msg="tray exit requested" outcome="recorded; the event loop ends this process through the D38(e) order" why="tray Exit item selected in this process"
+wisp: tray exit requested: recorded; the event loop ends this process through the D38(e) order
+time=2026-10-18T10:27:46.092+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-18T10:27:46.092+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-18T10:27:46.092+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-18T10:27:46.092+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+    resident_tray_stop_228_windows_test.go:340: AC#11 READING (ⓑ-1): reason="stop request (tray Exit item selected in this process)"; trail=scheduler-close > stop-hotkey-kws > cancel-task-roots > stop-audio > release-speech-sessions > destroy-panel-webview > flush-logs-close-db > free-os-memory > close-job-object > exit
+--- PASS: TestAC11TrayExitTriggerWalksTheTenSteps (0.01s)
+=== RUN   TestAC11StopRequestDuringTheBootWindowIsNotSwallowed
+time=2026-10-18T10:27:46.099+08:00 level=INFO msg="tray exit requested" outcome="recorded; the event loop ends this process through the D38(e) order" why="tray Exit item selected in this process"
+wisp: tray exit requested: recorded; the event loop ends this process through the D38(e) order
+    resident_tray_stop_228_windows_test.go:392: AC#11 READING (ⓐ gap): "stop request (tray Exit item selected in this process) arrived during boot; the event loop was never entered"
+--- PASS: TestAC11StopRequestDuringTheBootWindowIsNotSwallowed (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.204s
+### go-test-rc=0 surface=d 2026-10-18 10:27:46 +0800
+### hash-of-mutated-file-AFTER-this-run
+file=/d/tmp/wisp/20261018/228r3c/tree/internal/proc/boot_windows.go
+sha256bytes=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7
+blobsha1=531060a55c080ebd535b426b8c60dcd9011785fc
+bytes=12916
+lines=313
+### four-counts (尺=grep -c on this log；RUN=^=== RUN 含子测试 / PASS_TOP=^--- PASS 只顶层 / FAIL_TOP=^--- FAIL / SKIP=^--- SKIP；四数不混用不相减)
+RUN=4
+PASS_TOP=4
+FAIL_TOP=0
+SKIP=0
+### per-test-colour
+--- PASS: TestAC11StopBitIsBuiltAtBoot (0.00s)
+--- PASS: TestAC11TrayExitExecutorIsMountedAtTheBallHost (0.01s)
+--- PASS: TestAC11TrayExitTriggerWalksTheTenSteps (0.01s)
+--- PASS: TestAC11StopRequestDuringTheBootWindowIsNotSwallowed (0.00s)
+### per-test-names
+=== RUN   TestAC11StopBitIsBuiltAtBoot
+--- PASS: TestAC11StopBitIsBuiltAtBoot (0.00s)
+=== RUN   TestAC11TrayExitExecutorIsMountedAtTheBallHost
+--- PASS: TestAC11TrayExitExecutorIsMountedAtTheBallHost (0.01s)
+=== RUN   TestAC11TrayExitTriggerWalksTheTenSteps
+--- PASS: TestAC11TrayExitTriggerWalksTheTenSteps (0.01s)
+=== RUN   TestAC11StopRequestDuringTheBootWindowIsNotSwallowed
+--- PASS: TestAC11StopRequestDuringTheBootWindowIsNotSwallowed (0.00s)
