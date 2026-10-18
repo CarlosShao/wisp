@@ -1,0 +1,43 @@
+
+### 322-r2 host winsec started 2026-10-18 10:13:37 +08:00 HEAD=5db0b538dad3bf2841adec834a130e4a6b28d8df
+TREE=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+GOTMP-D=D:\tmp\wisp\20261018\322r2\gtD  (D: 卷·预建·8.3 别名)
+PATH-HEAD=D:\tmp\wisp\20261018\322r2\head.RJNBgS\third_party\sherpa-onnx;D:\tmp\wisp\20261018\322r2\head.RJNBgS\build;C:\Program Files\PowerShell\7;C:\Windows\system32;C:\Windows;C
+=== wh-D rc=1 GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD filter=''
+RUN=110 PASS_TOP=59 FAIL_TOP=2 SKIP=0
+walk=9 buildfailed=0 noteststorun=0 setupfailed=0 0xc0000135=0
+--- top FAIL names:
+  --- FAIL: TestGateJudgesThePrivateSetByResolvedSID (4.94s)
+  --- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (2.10s)
+--- top SKIP names: (none)
+--- witnessTruncated rows:
+      openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=325 guardRefusals=25 otherRefusals=283 returnedNil=92 witnessTruncated=true witnessSize=35 witnessMode=-rw-rw-rw- firstGuardVerbatim="winsec: path is not provably resolved, refusing to seal: D:\\tmp\\wisp\\20261018\\322r2\\gtD\\TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r11765030363\\001\\caller-name-322r1.bin: refusing to open for a private write: the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets (winsec: cannot apply a private security descriptor)"
+=== wh-C rc=0 GOTMPDIR=unset (默认 TMP=C:\Users\swq\AppData\Local\Temp = C 卷) filter=''
+RUN=110 PASS_TOP=61 FAIL_TOP=0 SKIP=0
+walk=7 buildfailed=0 noteststorun=0 setupfailed=0 0xc0000135=0
+--- top FAIL names: (none)
+--- top SKIP names: (none)
+--- witnessTruncated rows:
+      openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=236 guardRefusals=8 otherRefusals=253 returnedNil=139 witnessTruncated=true witnessSize=35 witnessMode=-rw-rw-rw- firstGuardVerbatim="winsec: path is not provably resolved, refusing to seal: C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r12849886961\\001\\caller-name-322r1.bin: refusing to open for a private write: the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets (winsec: cannot apply a private security descriptor)"
+=== wd-D rc=1 GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD filter='TestGateJudgesThePrivateSetByResolvedSID|TestSealNarrowsAndNamesThePrincipalItRemovedBySID'
+RUN=5 PASS_TOP=0 FAIL_TOP=2 SKIP=0
+walk=0 buildfailed=0 noteststorun=0 setupfailed=0 0xc0000135=0
+--- top FAIL names:
+  --- FAIL: TestGateJudgesThePrivateSetByResolvedSID (5.15s)
+  --- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (1.82s)
+--- top SKIP names: (none)
+--- witnessTruncated rows: (none)
+=== wd-C rc=0 GOTMPDIR=unset (默认 TMP=C:\Users\swq\AppData\Local\Temp = C 卷) filter='TestGateJudgesThePrivateSetByResolvedSID|TestSealNarrowsAndNamesThePrincipalItRemovedBySID'
+RUN=5 PASS_TOP=2 FAIL_TOP=0 SKIP=0
+walk=0 buildfailed=0 noteststorun=0 setupfailed=0 0xc0000135=0
+--- top FAIL names: (none)
+--- top SKIP names: (none)
+--- witnessTruncated rows: (none)
+=== wt-D rc=0 GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD filter='TestAC3Windows'
+RUN=2 PASS_TOP=2 FAIL_TOP=0 SKIP=0
+walk=0 buildfailed=0 noteststorun=0 setupfailed=0 0xc0000135=0
+--- top FAIL names: (none)
+--- top SKIP names: (none)
+--- witnessTruncated rows:
+      openleaf_guard_322_windows_test.go:251: AC#3 local paired reading (winsec_windows.go leaf guard): attempts=400 flips=343 guardRefusals=23 otherRefusals=289 returnedNil=88 witnessTruncated=true witnessSize=35 witnessMode=-rw-rw-rw- firstGuardVerbatim="winsec: path is not provably resolved, refusing to seal: D:\\tmp\\wisp\\20261018\\322r2\\gtD\\TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r13702365549\\001\\caller-name-322r1.bin: refusing to open for a private write: the name carries a reparse point, so the open that follows would go through that link and truncate whatever it targets (winsec: cannot apply a private security descriptor)"
+### done 2026-10-18 10:14:32 +08:00

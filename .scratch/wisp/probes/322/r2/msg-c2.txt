@@ -1,0 +1,30 @@
+票 322 收尾腿 322-r2·残余①过期注释更正（＋授权范围内一枚出向字符串）
+
+改动面＝internal/winsec/sealhandle_privateroute_120_other_test.go 一枚件、7 行注释 + 2 行
+t.Logf 字符串（净行数 0：文件仍 260 行、0 枚 CR 字节＝LF）。⛔ 动任何断言／判据文字／
+case 结构／%q 与实参／t.Logf 的存在性（尺＝git diff -U0 里 Errorf|Fatalf|switch|case|want 命中 0 行）。
+
+为什么改：`322-v1` 判语 §7 具名上报这两句已被票 322 终态越过——
+  :232 "stated as unfixed at this anchor in winsec_other.go:78-82"
+  :237 "(ticket 322, unfixed at this anchor; winsec_other.go:78-82)"
+票 322 已落地（`8baec646`＋`322-r1b`）＝POSIX **叶子**那一支由 oNoFollowPlatform 关上、
+**祖先**那一支仍开；且被引的 winsec_other.go 那句今天住在 :103-113，不在 :78-82。
+
+新句＝带条件的事实句（⛔ 许诺"窗口已关"）：注释那半写明"leaf leg 已由票 322 的叶子标志关上、
+祖先那一支仍开、谁都⛔ 把任何一句读成窗口已关"；字符串那半照编排者授权（派单公共块 §边界 (a)–(d)）
+只改词＝"closed only the POSIX leaf leg; the ancestor leg stays open"。
+
+授权链＝编排者 2026-10-18 10:0x 回复②亲笔放行（字符串属派单未覆盖形状，四条硬边界逐条走）：
+(a) 读者尺已现跑入库：git grep -l 'R-322 SHAPE OBSERVED' 全仓命中 **11 枚文件**＝8 份归档
+    `go test` 读数件（.log）+ 2 份判语/派语文本（.md/.txt）+ 本件自身，
+    **零枚仪器/脚本（.sh/.ps1/.py/.js/.pl）按这句计数** ⇒ 未触发停手条款；
+    另 git grep -n 'unfixed at this anchor' -- '*.go' 恰 2 枚＝就是本件这两句。
+(b) 码位纪律：新字符串⛔ 任何 ban#8 射程码位（U+1F000–1FAFF / U+2200–U+22FF / U+2600–U+27BF /
+    U+2B00–U+2BFF / U+FE0F）；全文件非 ASCII 字节数现量＝0 ⇒ 我的新行纯 ASCII。
+(c) 只改词，⛔ 动结构与判据。
+(d) winsec_other.go 本体一字未动（sha256 复量仍 19f3c211…＝r1b 记录的 pristine 同串）。
+
+本机颜色⛔ 覆盖这一处：该件 `//go:build !windows`，Windows 档不编译它 ⇒ 证色归容器成对两发
+（cw2-head pristine ⇄ cw2-mine 我的字节），读数落 .scratch/wisp/probes/322/r2/logs/。
+
+⛔ 翻框（AC#4 仍 1 未勾／5 勾，交件复量见 report）、⛔ 动 cmd/wisp、⛔ 动 privateFile 产码、⛔ push。

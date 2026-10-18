@@ -1,0 +1,14 @@
+time=2026-10-18T10:14:27.625+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/runner_descriptor_is_judged_by_what_it_resolves_to
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/the_set_holds_no_name_in_the_form_it_is_compared_with
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/a_name_spelling_cannot_change_the_verdict
+--- PASS: TestGateJudgesThePrivateSetByResolvedSID (0.02s)
+    --- PASS: TestGateJudgesThePrivateSetByResolvedSID/runner_descriptor_is_judged_by_what_it_resolves_to (0.00s)
+    --- PASS: TestGateJudgesThePrivateSetByResolvedSID/the_set_holds_no_name_in_the_form_it_is_compared_with (0.00s)
+    --- PASS: TestGateJudgesThePrivateSetByResolvedSID/a_name_spelling_cannot_change_the_verdict (0.00s)
+=== RUN   TestSealNarrowsAndNamesThePrincipalItRemovedBySID
+    private_set_sid_windows_test.go:314: planted as strangers: [S-1-1-0 S-1-5-32-546 S-1-5-21-1228170099-895614386-1166154857-500]; planted as a private-set member: S-1-5-32-544 (LA=S-1-5-21-1228170099-895614386-1166154857-500, in set: false, set=[S-1-5-18 S-1-5-32-544 S-1-5-21-1228170099-895614386-1166154857-1001])
+--- PASS: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (0.14s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.303s

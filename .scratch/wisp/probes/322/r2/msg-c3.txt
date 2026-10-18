@@ -1,0 +1,32 @@
+票 322 收尾腿 322-r2·门禁四数＋容器成对复跑（我的字节颜色中性）
+
+入库＝gates.ps1／container-mine.ps1／host-consumers.ps1（台件）＋logs/ 下
+gates-summary.txt、gate-*.txt（16 枚逐把尺正文）、container-summary.txt、
+cw-winsec.body.log、cc-consumers.body.log、container-mine-summary.txt、
+cw2-head.body.log、cw2-mine.body.log。
+
+## 门禁（只在共享工作树的那三把＋导出台 build/vet，逐枚 rc=）
+- gofumpt 真身 `/d/work/base/gopath/bin/gofumpt.exe -l`（对我的件）**rc=0 列出 0 枚**
+- gofmt -l（同件）rc=0 列出 0 枚
+- sh scripts/d22scan.sh **rc=0** clean；ban #8 射程 design/=39 frontend/=116 internal/=586 cmd/=143
+- sh scripts/check-path-length-budget.sh --with-self-test **rc=0** VERDICT GREEN（over=60/roster=60）
+- go build ./... 导出台两枚台（head pristine ⇄ mine＝head＋我的字节）**各 rc=0**
+- go vet ./internal/winsec/ ＋ ./cmd/wisp/ 两枚台 × 本机/linux/darwin/windows **八发全 rc=0**
+  ★cmd/wisp 这一发是 **go vet**（⛔ go test），不占 cmd/wisp 的 test 车道。
+
+## 容器成对两发（★我的那一枚 .go 是 //go:build !windows ⇒ 本机 Windows 档根本不编译它，
+##   所以它的证色只能出在容器这一侧；本机那些发全是 pristine 字节下的读数，具名登记）
+- cw2-head（pristine fb6c54ed…）rc=0  RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0
+  分支尺 holds-its-own=2 / R-322-SHAPE=0 / payload-IN=0
+- cw2-mine （我的字节 f87035bd…）rc=0  RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0
+  分支尺 holds-its-own=2 / R-322-SHAPE=0 / payload-IN=0
+⇒ 四数与分支色一字不变＝我那 7 行注释＋2 行字符串对判据零影响（同镜像 golang:1.27、同
+   -count=2 -timeout 30m -v、同 GOTMPDIR=/tmp/gt-cw2-*、同 GOMODCACHE 挂宿主 pkg/mod 只读）。
+
+## 我自己一笔台面故障（自抓，⛔ 计入判据）
+gates.ps1 第一／二版用 `if ($Mine -match '^/')` 归一路径，把 MSYS 形换成 D:\d\tmp\... 这种
+不存在的路径 ⇒ 那一版 6 枚 *-mine 发 Push-Location 当场报错、`rc=0` 是**无效读数**。
+具名作废，第三版加 Test-Path 硬闸（不在即 exit 91）后重跑＝上面那批数。
+同一条 MSYS/原生路径坑第一枚已记在 00-anchor.md §3（host-winsec.sh rc=128 那发）。
+
+⛔ 翻框、⛔ 动 cmd/wisp 任何字节、⛔ go test ./cmd/wisp（等编排者放行）、⛔ push。

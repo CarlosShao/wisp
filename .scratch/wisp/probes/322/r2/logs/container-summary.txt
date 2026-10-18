@@ -1,0 +1,280 @@
+
+### 322-r2 container started 2026-10-18 10:15:17 +08:00 HEAD=5db0b538dad3bf2841adec834a130e4a6b28d8df
+TREE=D:/tmp/wisp/20261018/322r2/head.RJNBgS  MODCACHE=D:/work/base/gopath/pkg/mod
+GO-VERSION-IMAGE: go version go1.27.1 linux/amd64
+=== cw-winsec pkgs='./internal/winsec/' runfilter='' host-rc=0
+RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0
+--- package result lines:
+  ok  	github.com/CarlosShao/wisp/internal/winsec	9.368s
+--- top FAIL names:
+  (none)
+--- RED lines verbatim:
+      openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1786 flipErrs=0 damagedWitnesses=0 leafLegRefusals=59 foreignsNarrowed=0 foreignsHoldingPayload=0
+      openleaf_322_other_test.go:196: AC#1' leg that answered = placement floor before the act (platformVerifyPlacement) : 2475 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = pinPlacement sameObjectPinned link face (winsec_other.go:188) : 364 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = sealHandle inline link face (winsec_other.go:269) : 22 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = sealHandle inline SameFile face (winsec_other.go:272) : 36 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = link-chain ELOOP from a deeper openat (winsec_other.go pinPlacement), NOT this leg : 2 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = some other failure : 12 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = none: the call returned nil : 30 attempts
+      sealhandle_identity_120_other_test.go:124: AC#1' pre-planted-link-is-answered-by-the-walk: leg that spoke = pinPlacement sameObjectPinned link face (winsec_other.go:188)
+      sealhandle_privateroute_120_other_test.go:203: AC#1' natural-window reading, denominator=2000, attempts classified by the leg that answered:
+  === RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp
+      --- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp (0.00s)
+      seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=pass_through refused=true reason="it answered the hostile shape \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125/../wisp-103-conformance-probe\" by passing it through unchanged, which is the bypass this seam exists to close"
+      seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=constant refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125\" and \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with the same single spelling \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/002/constant-leaf\", i.e. it does not resolve the tree the caller named at all"
+      seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=tree_moving refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with \"/wisp125-foreign-tree/wisp-108-tree-ownership-probe\", which is neither inside the tree \"/wisp125-foreign-tree/tmproot125\" it answered for that path's own parent \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125\" nor inside the tree that answer names once the candidate is asked about it directly (\"/wisp125-foreign-tree/wisp125-foreign-tree\" for \"/wisp125-foreign-tree\"): the seam may not be used to move a seal into another tree"
+      seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=answer_through_the_link refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125/../wisp-103-conformance-probe\" with \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/varlink125/tmproot125/../wisp-103-conformance-probe\", a spelling the built-in floor itself refuses: winsec: path is not provably resolved, refusing to seal: /tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/varlink125/tmproot125/../wisp-103-conformance-probe traverses \"..\""
+  === RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/measured_symlink_spelled_temp
+      seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=pass_through refused=true reason="it answered the hostile shape \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125/../wisp-103-conformance-probe\" by passing it through unchanged, which is the bypass this seam exists to close"
+      seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=constant refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125\" and \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with the same single spelling \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/002/constant-leaf\", i.e. it does not resolve the tree the caller named at all"
+      seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=tree_moving refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with \"/wisp125-foreign-tree/wisp-108-tree-ownership-probe\", which is neither inside the tree \"/wisp125-foreign-tree/tmproot125\" it answered for that path's own parent \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125\" nor inside the tree that answer names once the candidate is asked about it directly (\"/wisp125-foreign-tree/wisp125-foreign-tree\" for \"/wisp125-foreign-tree\"): the seam may not be used to move a seal into another tree"
+      seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=no_account refused=true reason="it cannot answer the tree-ownership question at all: without ResolveAccounted this package would have to seal whatever tree its answers name, which is ticket 103's R-103-1"
+      seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=answer_through_the_link refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/real125/tmproot125/../wisp-103-conformance-probe\" with \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/varlink125/tmproot125/../wisp-103-conformance-probe\", a spelling the built-in floor itself refuses: winsec: path is not provably resolved, refusing to seal: /tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1251019555408/001/varlink125/tmproot125/../wisp-103-conformance-probe traverses \"..\""
+      --- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/measured_symlink_spelled_temp (0.00s)
+  === RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp
+      --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp (0.00s)
+  === RUN   TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+      dataroot_symlink_119_other_test.go:358: AC#2 PrivateDirAll("/tmp/gt-cw-winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1191365270702/001/injlink119/harness/picked") -> winsec: refusing to seal /tmp/gt-cw-winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1191365270702/001/injlink119/harness/picked: winsec: path is not provably resolved, refusing to seal: /tmp/gt-cw-winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1191365270702/001/injlink119/harness/picked reaches it through the link at /tmp/gt-cw-winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1191365270702/001/injlink119, which is not the tree this call names
+  --- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.01s)
+      openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1808 flipErrs=0 damagedWitnesses=0 leafLegRefusals=53 foreignsNarrowed=0 foreignsHoldingPayload=0
+      openleaf_322_other_test.go:196: AC#1' leg that answered = placement floor before the act (platformVerifyPlacement) : 2469 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = pinPlacement sameObjectPinned link face (winsec_other.go:188) : 363 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = sealHandle inline link face (winsec_other.go:269) : 19 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = sealHandle inline SameFile face (winsec_other.go:272) : 32 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = link-chain ELOOP from a deeper openat (winsec_other.go pinPlacement), NOT this leg : 1 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = some other failure : 13 attempts
+      openleaf_322_other_test.go:196: AC#1' leg that answered = none: the call returned nil : 50 attempts
+      sealhandle_identity_120_other_test.go:124: AC#1' pre-planted-link-is-answered-by-the-walk: leg that spoke = pinPlacement sameObjectPinned link face (winsec_other.go:188)
+      sealhandle_privateroute_120_other_test.go:203: AC#1' natural-window reading, denominator=2000, attempts classified by the leg that answered:
+  === RUN   TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp
+      --- PASS: TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp (0.00s)
+      seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=pass_through refused=true reason="it answered the hostile shape \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125/../wisp-103-conformance-probe\" by passing it through unchanged, which is the bypass this seam exists to close"
+      seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=constant refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125\" and \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with the same single spelling \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/002/constant-leaf\", i.e. it does not resolve the tree the caller named at all"
+      seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=tree_moving refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with \"/wisp125-foreign-tree/wisp-108-tree-ownership-probe\", which is neither inside the tree \"/wisp125-foreign-tree/tmproot125\" it answered for that path's own parent \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125\" nor inside the tree that answer names once the candidate is asked about it directly (\"/wisp125-foreign-tree/wisp125-foreign-tree\" for \"/wisp125-foreign-tree\"): the seam may not be used to move a seal into another tree"
+      seam_probe_root_125_other_test.go:251: reading: shape=control_plain_temp candidate=answer_through_the_link refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125/../wisp-103-conformance-probe\" with \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/varlink125/tmproot125/../wisp-103-conformance-probe\", a spelling the built-in floor itself refuses: winsec: path is not provably resolved, refusing to seal: /tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/varlink125/tmproot125/../wisp-103-conformance-probe traverses \"..\""
+  === RUN   TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/measured_symlink_spelled_temp
+      seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=pass_through refused=true reason="it answered the hostile shape \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125/../wisp-103-conformance-probe\" by passing it through unchanged, which is the bypass this seam exists to close"
+      seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=constant refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125\" and \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with the same single spelling \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/002/constant-leaf\", i.e. it does not resolve the tree the caller named at all"
+      seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=tree_moving refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125/wisp-108-tree-ownership-probe\" with \"/wisp125-foreign-tree/wisp-108-tree-ownership-probe\", which is neither inside the tree \"/wisp125-foreign-tree/tmproot125\" it answered for that path's own parent \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125\" nor inside the tree that answer names once the candidate is asked about it directly (\"/wisp125-foreign-tree/wisp125-foreign-tree\" for \"/wisp125-foreign-tree\"): the seam may not be used to move a seal into another tree"
+      seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=no_account refused=true reason="it cannot answer the tree-ownership question at all: without ResolveAccounted this package would have to seal whatever tree its answers name, which is ticket 103's R-103-1"
+      seam_probe_root_125_other_test.go:251: reading: shape=measured_symlink_spelled_temp candidate=answer_through_the_link refused=true reason="it answered \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/real125/tmproot125/../wisp-103-conformance-probe\" with \"/tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/varlink125/tmproot125/../wisp-103-conformance-probe\", a spelling the built-in floor itself refuses: winsec: path is not provably resolved, refusing to seal: /tmp/gt-cw-winsec/TestAC2POSIXSeamGuardStillRefusesEveryHostileShape1253772597676/001/varlink125/tmproot125/../wisp-103-conformance-probe traverses \"..\""
+      --- PASS: TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/measured_symlink_spelled_temp (0.00s)
+  === RUN   TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp
+      --- PASS: TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp (0.00s)
+  === RUN   TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+      dataroot_symlink_119_other_test.go:358: AC#2 PrivateDirAll("/tmp/gt-cw-winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1193567761226/001/injlink119/harness/picked") -> winsec: refusing to seal /tmp/gt-cw-winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1193567761226/001/injlink119/harness/picked: winsec: path is not provably resolved, refusing to seal: /tmp/gt-cw-winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1193567761226/001/injlink119/harness/picked reaches it through the link at /tmp/gt-cw-winsec/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1193567761226/001/injlink119, which is not the tree this call names
+  --- PASS: TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 (0.01s)
+tooling-words: walk=2 buildfailed=0 noteststorun=0 setupfailed=0
+=== cc-consumers pkgs='./internal/risk/ ./internal/secret/ ./internal/config/ ./internal/agent/ ./internal/memory/' runfilter='' host-rc=1
+RUN=1160 PASS_TOP=702 FAIL_TOP=6 SKIP=6
+--- package result lines:
+  FAIL	github.com/CarlosShao/wisp/internal/risk	18.578s
+  ok  	github.com/CarlosShao/wisp/internal/secret	0.084s
+  ok  	github.com/CarlosShao/wisp/internal/config	2.969s
+  ok  	github.com/CarlosShao/wisp/internal/agent	16.764s
+  ok  	github.com/CarlosShao/wisp/internal/memory	33.969s
+--- top FAIL names:
+  --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.06s)
+  --- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.02s)
+  --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (6.45s)
+  --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.04s)
+  --- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.01s)
+  --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (5.67s)
+--- RED lines verbatim:
+  === RUN   TestR9PanicInWiredDependencyFailsClosed
+  --- PASS: TestR9PanicInWiredDependencyFailsClosed (0.00s)
+      pathresolver_expansion_test.go:80: risk.c26Pipeline.Resolve (seam installed into winsec): refused as required: risk: expansion moved this path onto a tree the caller did not name: /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp307190913/001/a%WISP102PROBE_TARGET%b/artifacts expands to /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp307190913/001/aelsewhereb/artifacts (env); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:83: winsec.ResolvePath (sealing caller's view): refused as required: winsec: refusing to seal /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp307190913/001/a%WISP102PROBE_TARGET%b/artifacts: risk: expansion moved this path onto a tree the caller did not name: /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp307190913/001/a%WISP102PROBE_TARGET%b/artifacts expands to /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp307190913/001/aelsewhereb/artifacts (env); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:86: risk.syncSet.resolveTarget (fs.write sync judgement): refused as required: risk: expansion moved this path onto a tree the caller did not name: /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp307190913/001/a%WISP102PROBE_TARGET%b/artifacts expands to /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp307190913/001/aelsewhereb/artifacts (env); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:95: risk.c26Pipeline.Resolve ~ ~\wisp102-tilde-probe\artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to /root\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:98: winsec.ResolvePath ~ ~\wisp102-tilde-probe\artifacts: refused as required: winsec: refusing to seal ~\wisp102-tilde-probe\artifacts: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to /root\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:101: risk.syncSet.resolveTarget ~ ~\wisp102-tilde-probe\artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to /root\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:95: risk.c26Pipeline.Resolve ~ ~/wisp102-tilde-probe/artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to /root/wisp102-tilde-probe/artifacts (home); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:98: winsec.ResolvePath ~ ~/wisp102-tilde-probe/artifacts: refused as required: winsec: refusing to seal ~/wisp102-tilde-probe/artifacts: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to /root/wisp102-tilde-probe/artifacts (home); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:101: risk.syncSet.resolveTarget ~ ~/wisp102-tilde-probe/artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to /root/wisp102-tilde-probe/artifacts (home); act on the expanded tree only if you asked for it by name
+  === RUN   TestTierAAnchorsMatchNativeSpelling/~/.git-credentials
+  === RUN   TestTierAAnchorsMatchNativeSpelling/~/.aws/credentials
+  === RUN   TestTierAAnchorsMatchNativeSpelling/%LOCALAPPDATA%\Microsoft\Credentials\**
+  === RUN   TestTierAAnchorsMatchNativeSpelling/browser_credential_store
+      --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.git-credentials (0.00s)
+      --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.aws/credentials (0.00s)
+      --- PASS: TestTierAAnchorsMatchNativeSpelling/%LOCALAPPDATA%\Microsoft\Credentials\** (0.00s)
+      --- PASS: TestTierAAnchorsMatchNativeSpelling/browser_credential_store (0.00s)
+  === RUN   TestPointer183DeclaredPathAbsentFromBodyStillHits
+  --- PASS: TestPointer183DeclaredPathAbsentFromBodyStillHits (0.03s)
+  === RUN   TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt
+  --- PASS: TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt (0.03s)
+  === RUN   TestRuleDeclaredR1
+  --- PASS: TestRuleDeclaredR1 (0.00s)
+  === RUN   TestShapeAHostReReadOfDeclaredPathIsClean
+  --- PASS: TestShapeAHostReReadOfDeclaredPathIsClean (0.02s)
+          verdict: Sync=true Root={Provider:sync-suspect Path: Source:suspect-fallback} Why="write target spelling could not be anchored on a C26-verifiable ancestor (8.3/\\\\?\\/missing chain); fail-closed as sync-suspect: risk: expansion moved this path onto a tree the caller did not name: /tmp/gt-cc-consumers/TestSyncAncestorActableLegFailsClosedOnMovedAncestor116680305704/001/%WISP116ANC/B% expands to /tmp/gt-cc-consumers/TestSyncAncestorActableLegFailsClosedOnMovedAncestor116680305704/wisp116-escape (env); act on the expanded tree only if you asked for it by name"
+  === RUN   TestSyncEnvConfiguredRoots
+  --- PASS: TestSyncEnvConfiguredRoots (0.01s)
+  === RUN   TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored
+      --- PASS: TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored (0.00s)
+  === RUN   TestR9PanicInWiredDependencyFailsClosed
+  --- PASS: TestR9PanicInWiredDependencyFailsClosed (0.00s)
+      pathresolver_expansion_test.go:80: risk.c26Pipeline.Resolve (seam installed into winsec): refused as required: risk: expansion moved this path onto a tree the caller did not name: /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp2499289157/001/a%WISP102PROBE_TARGET%b/artifacts expands to /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp2499289157/001/aelsewhereb/artifacts (env); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:83: winsec.ResolvePath (sealing caller's view): refused as required: winsec: refusing to seal /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp2499289157/001/a%WISP102PROBE_TARGET%b/artifacts: risk: expansion moved this path onto a tree the caller did not name: /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp2499289157/001/a%WISP102PROBE_TARGET%b/artifacts expands to /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp2499289157/001/aelsewhereb/artifacts (env); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:86: risk.syncSet.resolveTarget (fs.write sync judgement): refused as required: risk: expansion moved this path onto a tree the caller did not name: /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp2499289157/001/a%WISP102PROBE_TARGET%b/artifacts expands to /tmp/gt-cc-consumers/TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp2499289157/001/aelsewhereb/artifacts (env); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:95: risk.c26Pipeline.Resolve ~ ~\wisp102-tilde-probe\artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to /root\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:98: winsec.ResolvePath ~ ~\wisp102-tilde-probe\artifacts: refused as required: winsec: refusing to seal ~\wisp102-tilde-probe\artifacts: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to /root\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:101: risk.syncSet.resolveTarget ~ ~\wisp102-tilde-probe\artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to /root\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:95: risk.c26Pipeline.Resolve ~ ~/wisp102-tilde-probe/artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to /root/wisp102-tilde-probe/artifacts (home); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:98: winsec.ResolvePath ~ ~/wisp102-tilde-probe/artifacts: refused as required: winsec: refusing to seal ~/wisp102-tilde-probe/artifacts: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to /root/wisp102-tilde-probe/artifacts (home); act on the expanded tree only if you asked for it by name
+      pathresolver_expansion_test.go:101: risk.syncSet.resolveTarget ~ ~/wisp102-tilde-probe/artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to /root/wisp102-tilde-probe/artifacts (home); act on the expanded tree only if you asked for it by name
+  === RUN   TestTierAAnchorsMatchNativeSpelling/~/.git-credentials
+  === RUN   TestTierAAnchorsMatchNativeSpelling/~/.aws/credentials
+  === RUN   TestTierAAnchorsMatchNativeSpelling/%LOCALAPPDATA%\Microsoft\Credentials\**
+  === RUN   TestTierAAnchorsMatchNativeSpelling/browser_credential_store
+      --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.git-credentials (0.00s)
+      --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.aws/credentials (0.00s)
+      --- PASS: TestTierAAnchorsMatchNativeSpelling/%LOCALAPPDATA%\Microsoft\Credentials\** (0.00s)
+      --- PASS: TestTierAAnchorsMatchNativeSpelling/browser_credential_store (0.00s)
+  === RUN   TestPointer183DeclaredPathAbsentFromBodyStillHits
+  --- PASS: TestPointer183DeclaredPathAbsentFromBodyStillHits (0.01s)
+  === RUN   TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt
+  --- PASS: TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt (0.01s)
+  === RUN   TestRuleDeclaredR1
+  --- PASS: TestRuleDeclaredR1 (0.00s)
+  === RUN   TestShapeAHostReReadOfDeclaredPathIsClean
+  --- PASS: TestShapeAHostReReadOfDeclaredPathIsClean (0.02s)
+          verdict: Sync=true Root={Provider:sync-suspect Path: Source:suspect-fallback} Why="write target spelling could not be anchored on a C26-verifiable ancestor (8.3/\\\\?\\/missing chain); fail-closed as sync-suspect: risk: expansion moved this path onto a tree the caller did not name: /tmp/gt-cc-consumers/TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163420271864/001/%WISP116ANC/B% expands to /tmp/gt-cc-consumers/TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163420271864/wisp116-escape (env); act on the expanded tree only if you asked for it by name"
+  === RUN   TestSyncEnvConfiguredRoots
+  --- PASS: TestSyncEnvConfiguredRoots (0.02s)
+  === RUN   TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored
+      --- PASS: TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored (0.00s)
+      c26_seam_posix_125_test.go:75: reading: installed risk.c26Pipeline answered "/tmp/gt-cc-consumers/TestAC1POSIXSeamHoldsC26Pipeline125406723094/001/../wisp-125-probe" with "/tmp/gt-cc-consumers/TestAC1POSIXSeamHoldsC26Pipeline125406723094/wisp-125-probe"
+  === RUN   TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125/measured_symlink_spelled_temp
+      --- PASS: TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125/measured_symlink_spelled_temp (0.02s)
+  === RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field
+      --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field (0.00s)
+  === RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_undeclared_provider
+      --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_undeclared_provider (0.00s)
+  === RUN   TestPerKeySectionsAreRegisteredPerKey
+  --- PASS: TestPerKeySectionsAreRegisteredPerKey (0.00s)
+  === RUN   TestEveryAppKeyIsRegisteredInTierRegistry
+  --- PASS: TestEveryAppKeyIsRegisteredInTierRegistry (0.00s)
+  === RUN   TestUnwiredSecurityKeysFailLoudly
+  === RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled
+  === RUN   TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string
+  === RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist
+  === RUN   TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides
+  === RUN   TestUnwiredSecurityKeysFailLoudly/net.allowlist
+  === RUN   TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges
+  --- PASS: TestUnwiredSecurityKeysFailLoudly (0.05s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled (0.00s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string (0.00s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist (0.01s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides (0.00s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/net.allowlist (0.01s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges (0.02s)
+  === RUN   TestUnwiredGuardLeavesHonestConfigsAlone
+  === RUN   TestUnwiredGuardLeavesHonestConfigsAlone/empty_file
+  === RUN   TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults
+  === RUN   TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads
+  === RUN   TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected
+  --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone (0.02s)
+      --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/empty_file (0.00s)
+      --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults (0.00s)
+      --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads (0.00s)
+      --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected (0.00s)
+  === RUN   TestUnwiredGuardFiresBeforeAnyFileWrite
+  --- PASS: TestUnwiredGuardFiresBeforeAnyFileWrite (0.00s)
+  === RUN   TestUnwiredGuardIsScopedNotABigStick
+  --- PASS: TestUnwiredGuardIsScopedNotABigStick (0.01s)
+  === RUN   TestUnwiredKeysStillRoundTripAtTheByteLevel
+  --- PASS: TestUnwiredKeysStillRoundTripAtTheByteLevel (0.01s)
+      c26_seam_posix_125_test.go:75: reading: installed risk.c26Pipeline answered "/tmp/gt-cc-consumers/TestAC1POSIXSeamHoldsC26Pipeline1251949816919/001/../wisp-125-probe" with "/tmp/gt-cc-consumers/TestAC1POSIXSeamHoldsC26Pipeline1251949816919/wisp-125-probe"
+  === RUN   TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125/measured_symlink_spelled_temp
+      --- PASS: TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125/measured_symlink_spelled_temp (0.02s)
+  === RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field
+      --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field (0.01s)
+  === RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_undeclared_provider
+      --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_undeclared_provider (0.00s)
+  === RUN   TestPerKeySectionsAreRegisteredPerKey
+  --- PASS: TestPerKeySectionsAreRegisteredPerKey (0.00s)
+  === RUN   TestEveryAppKeyIsRegisteredInTierRegistry
+  --- PASS: TestEveryAppKeyIsRegisteredInTierRegistry (0.00s)
+  === RUN   TestUnwiredSecurityKeysFailLoudly
+  === RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled
+  === RUN   TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string
+  === RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist
+  === RUN   TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides
+  === RUN   TestUnwiredSecurityKeysFailLoudly/net.allowlist
+  === RUN   TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges
+  --- PASS: TestUnwiredSecurityKeysFailLoudly (0.03s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled (0.00s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string (0.00s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist (0.00s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides (0.01s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/net.allowlist (0.00s)
+      --- PASS: TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges (0.00s)
+  === RUN   TestUnwiredGuardLeavesHonestConfigsAlone
+  === RUN   TestUnwiredGuardLeavesHonestConfigsAlone/empty_file
+  === RUN   TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults
+  === RUN   TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads
+  === RUN   TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected
+  --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone (0.02s)
+      --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/empty_file (0.00s)
+      --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults (0.01s)
+      --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads (0.01s)
+      --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected (0.00s)
+  === RUN   TestUnwiredGuardFiresBeforeAnyFileWrite
+  --- PASS: TestUnwiredGuardFiresBeforeAnyFileWrite (0.01s)
+  === RUN   TestUnwiredGuardIsScopedNotABigStick
+  --- PASS: TestUnwiredGuardIsScopedNotABigStick (0.01s)
+  === RUN   TestUnwiredKeysStillRoundTripAtTheByteLevel
+  --- PASS: TestUnwiredKeysStillRoundTripAtTheByteLevel (0.00s)
+  === RUN   TestDeclaredL0RunsWhenPassThroughIsOff179
+  --- PASS: TestDeclaredL0RunsWhenPassThroughIsOff179 (0.50s)
+  === RUN   TestDeclaredL1L2RoutingUnchanged179
+  === RUN   TestDeclaredL1L2RoutingUnchanged179/L1/no-approval-layer
+  === RUN   TestDeclaredL1L2RoutingUnchanged179/L1/with-approval-layer
+  === RUN   TestDeclaredL1L2RoutingUnchanged179/L2/no-approval-layer
+  === RUN   TestDeclaredL1L2RoutingUnchanged179/L2/with-approval-layer
+  --- PASS: TestDeclaredL1L2RoutingUnchanged179 (0.45s)
+      --- PASS: TestDeclaredL1L2RoutingUnchanged179/L1/no-approval-layer (0.03s)
+      --- PASS: TestDeclaredL1L2RoutingUnchanged179/L1/with-approval-layer (0.01s)
+      --- PASS: TestDeclaredL1L2RoutingUnchanged179/L2/no-approval-layer (0.00s)
+      --- PASS: TestDeclaredL1L2RoutingUnchanged179/L2/with-approval-layer (0.00s)
+  === RUN   TestSpillPointerUnwiredJudgeFailsClosed174
+  --- PASS: TestSpillPointerUnwiredJudgeFailsClosed174 (0.00s)
+  === RUN   TestSpillPointerNoticeAddsNoSecondPath174/unwired
+      --- PASS: TestSpillPointerNoticeAddsNoSecondPath174/unwired (0.01s)
+  === RUN   TestLoopSpillNoticeReachesHistoryUnwired174
+  --- PASS: TestLoopSpillNoticeReachesHistoryUnwired174 (0.21s)
+  === RUN   TestDeclaredL0RunsWhenPassThroughIsOff179
+  --- PASS: TestDeclaredL0RunsWhenPassThroughIsOff179 (0.93s)
+  === RUN   TestDeclaredL1L2RoutingUnchanged179
+  === RUN   TestDeclaredL1L2RoutingUnchanged179/L1/no-approval-layer
+  === RUN   TestDeclaredL1L2RoutingUnchanged179/L1/with-approval-layer
+  === RUN   TestDeclaredL1L2RoutingUnchanged179/L2/no-approval-layer
+  === RUN   TestDeclaredL1L2RoutingUnchanged179/L2/with-approval-layer
+  --- PASS: TestDeclaredL1L2RoutingUnchanged179 (0.23s)
+      --- PASS: TestDeclaredL1L2RoutingUnchanged179/L1/no-approval-layer (0.01s)
+      --- PASS: TestDeclaredL1L2RoutingUnchanged179/L1/with-approval-layer (0.00s)
+      --- PASS: TestDeclaredL1L2RoutingUnchanged179/L2/no-approval-layer (0.00s)
+      --- PASS: TestDeclaredL1L2RoutingUnchanged179/L2/with-approval-layer (0.00s)
+  === RUN   TestSpillPointerUnwiredJudgeFailsClosed174
+  --- PASS: TestSpillPointerUnwiredJudgeFailsClosed174 (0.01s)
+  === RUN   TestSpillPointerNoticeAddsNoSecondPath174/unwired
+      --- PASS: TestSpillPointerNoticeAddsNoSecondPath174/unwired (0.01s)
+  === RUN   TestLoopSpillNoticeReachesHistoryUnwired174
+  --- PASS: TestLoopSpillNoticeReachesHistoryUnwired174 (0.02s)
+      concurrent_test.go:312: crash recovery: 29 committed rows recovered, integrity ok, wal=0 bytes
+  === RUN   TestAppendSessionTurnRefreshUsesStoredClockFamily
+  time=2026-10-18T02:19:06.550Z level=INFO msg="pre-migration backup written" component=memory backup=/tmp/gt-cc-consumers/TestAppendSessionTurnRefreshUsesStoredClockFamily2854044592/001/data/backup/wisp.db.bak-0-1 from=0 to=1
+  time=2026-10-18T02:19:06.576Z level=INFO msg="pre-migration backup written" component=memory backup=/tmp/gt-cc-consumers/TestAppendSessionTurnRefreshUsesStoredClockFamily2854044592/001/data/backup/wisp.db.bak-1-2 from=1 to=2
+  time=2026-10-18T02:19:06.611Z level=INFO msg="pre-migration backup written" component=memory backup=/tmp/gt-cc-consumers/TestAppendSessionTurnRefreshUsesStoredClockFamily2854044592/001/data/backup/wisp.db.bak-2-3 from=2 to=3
+  --- PASS: TestAppendSessionTurnRefreshUsesStoredClockFamily (0.16s)
+      concurrent_test.go:312: crash recovery: 29 committed rows recovered, integrity ok, wal=0 bytes
+  === RUN   TestAppendSessionTurnRefreshUsesStoredClockFamily
+  time=2026-10-18T02:19:21.733Z level=INFO msg="pre-migration backup written" component=memory backup=/tmp/gt-cc-consumers/TestAppendSessionTurnRefreshUsesStoredClockFamily227876212/001/data/backup/wisp.db.bak-0-1 from=0 to=1
+  time=2026-10-18T02:19:21.748Z level=INFO msg="pre-migration backup written" component=memory backup=/tmp/gt-cc-consumers/TestAppendSessionTurnRefreshUsesStoredClockFamily227876212/001/data/backup/wisp.db.bak-1-2 from=1 to=2
+  time=2026-10-18T02:19:21.759Z level=INFO msg="pre-migration backup written" component=memory backup=/tmp/gt-cc-consumers/TestAppendSessionTurnRefreshUsesStoredClockFamily227876212/001/data/backup/wisp.db.bak-2-3 from=2 to=3
+  --- PASS: TestAppendSessionTurnRefreshUsesStoredClockFamily (0.07s)
+tooling-words: walk=12 buildfailed=0 noteststorun=0 setupfailed=0
+### done 2026-10-18 10:19:25 +08:00

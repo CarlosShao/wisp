@@ -1,0 +1,20 @@
+time=2026-10-18T10:14:19.256+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/runner_descriptor_is_judged_by_what_it_resolves_to
+    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:\tmp\wisp\20261018\322r2\gtD\TestGateJudgesThePrivateSetByResolvedSIDrunner_descriptor_is_ju1028164374\001\runner: Access is denied.
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/the_set_holds_no_name_in_the_form_it_is_compared_with
+=== RUN   TestGateJudgesThePrivateSetByResolvedSID/a_name_spelling_cannot_change_the_verdict
+    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:\tmp\wisp\20261018\322r2\gtD\TestGateJudgesThePrivateSetByResolvedSIDa_name_spelling_cannot_3036497647\001\named: Access is denied.
+=== NAME  TestGateJudgesThePrivateSetByResolvedSID
+    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:\tmp\wisp\20261018\322r2\gtD\TestGateJudgesThePrivateSetByResolvedSID1498817373\001\la: Access is denied.
+--- FAIL: TestGateJudgesThePrivateSetByResolvedSID (5.15s)
+    --- FAIL: TestGateJudgesThePrivateSetByResolvedSID/runner_descriptor_is_judged_by_what_it_resolves_to (1.44s)
+    --- PASS: TestGateJudgesThePrivateSetByResolvedSID/the_set_holds_no_name_in_the_form_it_is_compared_with (0.00s)
+    --- FAIL: TestGateJudgesThePrivateSetByResolvedSID/a_name_spelling_cannot_change_the_verdict (1.87s)
+=== RUN   TestSealNarrowsAndNamesThePrincipalItRemovedBySID
+    private_set_sid_windows_test.go:314: planted as strangers: [S-1-1-0 S-1-5-32-546 S-1-5-21-1228170099-895614386-1166154857-500]; planted as a private-set member: S-1-5-32-544 (LA=S-1-5-21-1228170099-895614386-1166154857-500, in set: false, set=[S-1-5-18 S-1-5-32-544 S-1-5-21-1228170099-895614386-1166154857-1001])
+    testing.go:1617: TempDir RemoveAll cleanup: openfdat D:\tmp\wisp\20261018\322r2\gtD\TestSealNarrowsAndNamesThePrincipalItRemovedBySID4279009067\002\la: Access is denied.
+--- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (1.82s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	7.016s
+FAIL
