@@ -31,18 +31,19 @@ function ToolWords([string]$b) {
   ' setupfailed=' + (Select-String -Path $b -Pattern 'setup failed' -AllMatches).Count +
   ' fatal-error=' + (Select-String -Path $b -Pattern '^fatal:|signal: killed|exit status' -AllMatches).Count
 }
-function Go([string]$label, [string]$filter) {
+function Go([string]$label, [string]$filter, [string]$tmp) {
   $body = Join-Path $Logs "$label.log"
   Push-Location $Tree
-  $env:GOTMPDIR = $Gt
-  # ★两串 dll 前置；用短名形（8.3）以躲长路径/短名族那一格
+  if ($tmp -ne 'NONE') { $env:GOTMPDIR = $tmp; New-Item -ItemType Directory -Force -Path $tmp | Out-Null }
+  else { Remove-Item Env:\GOTMPDIR -ErrorAction SilentlyContinue }
+  # ★两串 dll 前置（⛔ 漏＝0xc0000135＋零枚 --- FAIL＝那包根本没跑＝台面故障）
   $env:PATH = "$Tree\third_party\sherpa-onnx;$Tree\build;$env:PATH"
   $a = @('test', './cmd/wisp/', '-count=1', '-timeout', '30m', '-v')
   if ($filter -ne '') { $a += @('-run', $filter) }
   & go @a > $body 2>&1
   $rc = $LASTEXITCODE
   Pop-Location
-  say "=== $label rc=$rc filter='$filter' tree=$Tree GOTMPDIR=$Gt"
+  say "=== $label rc=$rc filter='$filter' GOTMPDIR=$(if($tmp -eq 'NONE'){'unset (默认 TMP=' + $env:TMP + ' = C 卷)'}else{$tmp}) tree=$Tree"
   say (Count4 $body)
   say (ToolWords $body)
   $pk = (Select-String -Path $body -Pattern '^(ok|FAIL|\?)\s' | ForEach-Object { $_.Line }) -join ' ;; '
@@ -62,19 +63,25 @@ $mode = if ($args.Count -gt 0) { $args[0] } else { 'both' }
 #    TestPanelThreadIsSTAAndExitsCleanly -> 1（228-r3b 具名 c 面死亡点）
 #    TestAC13BringUpSurvivesAReusedThreadQuit -> 1（228-r3b 具名 d 面死亡点）
 # 尺＝git grep -h '^func Test' -- cmd/wisp | Where-Object { $_ -match <pat> } | Measure-Object
+# ★成对两枚临时根台面（派单颜色尺："两把临时根台面成对（默认 C 卷 ⇄ D: 预建 GOTMPDIR）"）——
+#   228-r3b 具名的整进程死亡在两台落在**不同枚**＝非确定性 ⇒ 整包那一发两台各跑一发，
+#   死亡枚归位才有对照；⛔ 拿单台整包 rc=1 当"322 把包打红"、⛔ 当全绿。
 switch ($mode) {
-  'full'  { Go 'cwisp-full' '' | Out-Null }
+  'full' {
+    Go 'cwisp-full-D' '' $Gt
+    Go 'cwisp-full-C' '' 'NONE'
+  }
   'estate' {
-    # estate 色取自定向：resident_* 一族在整包里从不执行（228-r3b 具名的真窗区整进程死亡）
-    Go 'cwisp-estate-resident' 'Resident' | Out-Null
-    Go 'cwisp-estate-live' 'TestLive' | Out-Null
-    Go 'cwisp-estate-deathpoints' 'TestPanelThreadIsSTAAndExitsCleanly|TestAC13BringUpSurvivesAReusedThreadQuit' | Out-Null
+    Go 'cwisp-estate-resident' 'Resident' $Gt
+    Go 'cwisp-estate-live' 'TestLive' $Gt
+    Go 'cwisp-estate-deathpoints' 'TestPanelThreadIsSTAAndExitsCleanly|TestAC13BringUpSurvivesAReusedThreadQuit' $Gt
   }
   default {
-    Go 'cwisp-full' '' | Out-Null
-    Go 'cwisp-estate-resident' 'Resident' | Out-Null
-    Go 'cwisp-estate-live' 'TestLive' | Out-Null
-    Go 'cwisp-estate-deathpoints' 'TestPanelThreadIsSTAAndExitsCleanly|TestAC13BringUpSurvivesAReusedThreadQuit' | Out-Null
+    Go 'cwisp-full-D' '' $Gt
+    Go 'cwisp-full-C' '' 'NONE'
+    Go 'cwisp-estate-resident' 'Resident' $Gt
+    Go 'cwisp-estate-live' 'TestLive' $Gt
+    Go 'cwisp-estate-deathpoints' 'TestPanelThreadIsSTAAndExitsCleanly|TestAC13BringUpSurvivesAReusedThreadQuit' $Gt
   }
 }
 say "### done $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
