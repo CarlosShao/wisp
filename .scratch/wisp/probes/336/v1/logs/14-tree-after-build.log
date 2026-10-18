@@ -1,0 +1,8 @@
+date=2026-10-18 12:51:09 +0800 anchor=8c36c23c root=/d/tmp/wisp/20261018/336v1/tree-after
+go_files=750
+go_files_risk=47
+teeth_present=YES
+docs_plan=present
+dlls_build=3 dlls_sherpa=3 dist=present
+blob_blacklist_disk=c1799cd24afce19e6accef23db23a7d7ee746dec
+build_tree_rc=0

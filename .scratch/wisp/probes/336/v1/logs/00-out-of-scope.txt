@@ -1,0 +1,4 @@
+ruler: unique paths touched by the 18 commits matching strict prefix ^票 336 落地腿 336-r1, filtered OUT of the three allowed write faces (internal/risk/**, .scratch/wisp/probes/336/r1/**, ticket 336 file)
+positive control (same filter, deliberately widened to only internal/risk/ => must be non-zero):
+2
+hits_out_of_scope=0 (this file was 0 bytes when produced by tee with no match; that is a NEGATIVE reading, so it is annotated here rather than shipped empty — see the AC#6 judgement)

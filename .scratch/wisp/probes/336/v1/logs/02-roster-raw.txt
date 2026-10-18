@@ -1,0 +1,12 @@
+bcf90e06:internal/risk/blacklist.go:193:// provably expanded fails CLOSED (aEquiv / aUnder report such a miss as a
+bcf90e06:internal/risk/blacklist.go:220:	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.git-credentials`))):
+bcf90e06:internal/risk/blacklist.go:224:	case aUnder(cand, anchorForms(anchorPath(appDataS, `wisp`))) &&
+bcf90e06:internal/risk/blacklist.go:225:		aEq(cand, anchorForms(anchorPath(appDataS, `wisp`, `config.toml`))):
+bcf90e06:internal/risk/blacklist.go:227:	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
+bcf90e06:internal/risk/blacklist.go:229:	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.aws`, `credentials`))):
+bcf90e06:internal/risk/blacklist.go:231:	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`))):
+bcf90e06:internal/risk/blacklist.go:235:	case appDataS != "" && aUnder(cand, anchorForms(anchorPath(appDataS, `microsoft`, `protect`))):
+bcf90e06:internal/risk/blacklist.go:237:	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
+bcf90e06:internal/risk/blacklist.go:265:// aEq and aUnder are the two A-anchor relations. They are spelled separately
+bcf90e06:internal/risk/blacklist.go:268:func aEq(cand, anchor pathForms) bool { return aRelates(cand, anchor, eqPath) }
+bcf90e06:internal/risk/blacklist.go:270:func aUnder(cand, anchor pathForms) bool { return aRelates(cand, anchor, isUnder) }
