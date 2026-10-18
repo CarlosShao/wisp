@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 336-r1 门禁四数：只在【共享工作树】跑（派单：那是它们要求的台面），逐枚落 rc=。
 # ★lead 10-18 提醒＝先 unset GOTMPDIR TMPDIR，否则触发票 311 AC#1 shape B GUARD＝rc=2 射程拒绝（⛔ 读成红）。
-# ⛔ 顺手重排别腿文件；gofumpt 存量脏 6 枚（A1024／停车点 §4.0ei）只具名登记，⛔ 动它们一字。
+# ⛔ 顺手重排别腿文件；gofumpt 存量脏 6 枚（A1024／停车点 4.0ei 那一节）只具名登记，⛔ 动它们一字。
 set -u
 REPO="D:/work/workspace/projects plans/Wisp"
 cd "$REPO" || exit 1

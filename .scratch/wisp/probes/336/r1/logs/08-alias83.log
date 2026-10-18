@@ -1,0 +1,43 @@
+### 336-r1 8.3 短名别名现量（机主 10-18 新铁律落点＝D:\tmp\wisp\20261018\336r1，⛔ 盘符根）
+date=2026-10-18 12:03:14 +0800
+尺＝/c/Windows/System32/cmd.exe //c dir /X，射程＝本腿每一枚落点的父目录
+
+== dir /X of D:\tmp\wisp\20261018 ==
+ Directory of D:\tmp\wisp\20261018
+2026/10/18  11:56    <DIR>                       .
+2026/10/18  10:25    <DIR>                       ..
+2026/10/18  10:45    <DIR>                       166r1
+2026/10/18  12:01    <DIR>                       227r1
+2026/10/18  10:32    <DIR>                       228r3c
+2026/10/18  11:07    <DIR>                       322r2
+2026/10/18  10:55    <DIR>                       328v1
+2026/10/18  11:56    <DIR>                       336r1
+2026/10/18  12:02    <DIR>                       338r1
+2026/10/18  11:56    <DIR>                       orch
+
+== dir /X of D:\tmp\wisp\20261018\336r1（本腿四枚落点）==
+2026/10/18  11:56    <DIR>                       .
+2026/10/18  11:56    <DIR>                       ..
+2026/10/18  11:57    <DIR>                       gotmp
+2026/10/18  11:57    <DIR>                       msg
+2026/10/18  11:39    <DIR>          TREE-A~1     tree-after
+2026/10/18  10:29    <DIR>          TREE-B~1     tree-before
+2026/10/18  11:49    <DIR>          TREE-C~1     tree-comm
+2026/10/18  10:40    <DIR>                       tree-mut
+
+== cygpath -d（短名路径尺）==
+  tree-before -> D:\tmp\wisp\20261018\336r1\TREE-B~1
+  tree-mut -> D:\tmp\wisp\20261018\336r1\tree-mut
+  tree-comm -> D:\tmp\wisp\20261018\336r1\TREE-C~1
+  gotmp -> D:\tmp\wisp\20261018\336r1\gotmp
+  msg -> D:\tmp\wisp\20261018\336r1\msg
+
+== 判据是否依赖『树在盘符根才有短名』==
+  现量：tree-before(11)→TREE-B~1、tree-after(11)→TREE-A~1、tree-comm(10)→TREE-C~1 三枚有别名；tree-mut(8)／gotmp(5)／msg(3) 名字已 ≤8 字符⇒短名＝长名（README：谁也不许再拿『短名需要根目录』往根目录建物）
+  本腿所有判据（AC#0 四发／AC#2 八发／AC#3／AC#4 成对台面）全在上述落点上跑出 rc 与四数（见 ac0-runner.log／ac2-sweep-runner.log／ac3y-runner.log／ac4-runner.log）⇒ 无一枚需要盘符根
+  ★具名自纠：本行首版把 AC#3 那件写成 `acy-runner.log`＝幻影名（真件＝ac3y-runner.log，现量在位）；未入库前改正在此登记，⛔ 让一句引用不存在的件当凭据。
+
+== 补记（本件首版漏列一枚落点）==
+  tree-after -> D:\tmp\wisp\20261018\336r1\TREE-A~1
+  本腿落点共五枚导出树＋gotmp＋msg＝tree-before／tree-mut／tree-comm／tree-after（★首版只列了三枚有别名的，tree-after 同为 11 字符⇒TREE-A~1，上表 :23 已在 dir /X 里现量到）
+  ★更正首版一句：『⛔ 停手上报必要』那句写反了，本意＝『无一枚判据需要盘符根⇒无须停手上报』；若将来某判据真依赖根目录短名，那时才停手上报 lead（机主 10-18 铁律原文）。
