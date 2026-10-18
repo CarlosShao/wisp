@@ -1,0 +1,19 @@
+### 228-r3c pristine 基准（现跑，anchor=c11163c896b09e7b6863d347dadbcb65702585cc）
+### date=2026-10-18 10:15:24 +0800
+--- git log -1 ---
+5db0b538dad3bf2841adec834a130e4a6b28d8df Sun Oct 18 10:13:17 2026 +0800 票 337 普查腿 337-a1·AC#0 起手＋逐跳 a–f
+--- git rev-parse anchor:file (blob sha1) ---
+531060a55c080ebd535b426b8c60dcd9011785fc
+--- sha256 of blob content (LF form, via git cat-file) ---
+3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7 *-
+--- export tree physical bytes ---
+file=/d/tmp/wisp/20261018/228r3c/tree/internal/proc/boot_windows.go
+sha256bytes=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7
+blobsha1=531060a55c080ebd535b426b8c60dcd9011785fc
+bytes=12916
+lines=313
+--- last touch of that file ---
+f4d4fda9 Sat Oct 17 11:09:42 2026 +0800 票 228 AC#11 产码①（internal/proc，修法乙-1）：常驻 runtime 终于有了停机请求位
+--- token anchors (content anchors, grep) ---
+185:	stopSignal := rt.StopSignal()
+111:	rt.stopReq = newStopRequest()

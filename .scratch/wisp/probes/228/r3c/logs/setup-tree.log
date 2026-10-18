@@ -1,0 +1,20 @@
+anchor=c11163c896b09e7b6863d347dadbcb65702585cc
+repo=ed8ff551b32f7e6e353c2f1180e004dc64299c59
+mkdir tree/gotmp/tdst rc=0
+git-archive|tar rc=0
+cp build/*.dll rc=0
+cp sherpa dll rc=0
+cp frontend/dist rc=0
+--- build dlls in tree ---
+3
+--- sherpa dlls in tree ---
+3
+--- frontend/dist present ---
+assets
+index.html
+--- .go count in tree ---
+760
+--- docs/PLAN.md present ---
+docs/PLAN.md YES
+docs/PLAN.md YES
+DONE setup
