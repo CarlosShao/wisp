@@ -1,0 +1,13 @@
+### 322-v2 estate 包含尺 2026-10-18 13:23:49 +0800
+-- estate-resident 判定名枚数=22 not-in-fullD=0 not-in-fullC=0
+-- deathpoints 两枚逐名在两台的存在尺：
+TestPanelThreadIsSTAAndExitsCleanly                D=1 C=1
+TestAC13BringUpSurvivesAReusedThreadQuit           D=1 C=1
+-- resident 族顶格 RUN/判定/FAIL 尺（『从不执行』旧口径的收窄凭据）：
+orch-322v1-ac4-cmdwisp-full.txt    topRUNres=22 topVERDres=22 resFAIL=0
+cwisp-full-D.log                   topRUNres=22 topVERDres=22 resFAIL=0
+cwisp-full-C.log                   topRUNres=22 topVERDres=22 resFAIL=0
+-- 228/r3b 两台（旧口径出处的死亡台面）同尺：
+surface-c.log    topRUNres=0 topVERDres=0 lastRUN=estPanelThreadIsSTAAndExitsCleanly
+surface-d.log    topRUNres=0 topVERDres=0 lastRUN=estAC13BringUpSurvivesAReusedThreadQuit
+### done 2026-10-18 13:23:51 +0800
