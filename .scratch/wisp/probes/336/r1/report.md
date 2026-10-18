@@ -1,10 +1,12 @@
 # 票 336 落地腿 336-r1 · 交件报告（仪器补牙，2026-10-18 第一波）
 
 写面＝三处：`internal/risk/*_336*_test.go`（2 枚，全测试面）＋`.scratch/wisp/probes/336/r1/**`＋票 336 尾一条 bullet。
-⛔ 动 `blacklist.go` 任何非注释字节（尺：逐笔 `git show --name-only` 全集⊆三处、`.go` 非测试命中 0，见 §7）。
+⛔ 动 `blacklist.go` 任何非注释字节（尺：逐笔 `git show --name-only` 全集⊆三处、`.go` 非测试命中 0，见 第 7 节）。
 起手锚现认＝`c11163c8`（10-18 10:02:56）；台面锚具名＝`ed8ff551`（放出笔），`internal/risk` 在两号下 `git diff --stat`＝空 rc=0、
-`blacklist.go` blob 两号同为 `c1799cd24afce19e6accef23db23a7d7ee746dec`（＝334-v1 交件 blob）。交件侧 HEAD 见 §7。
-★新铁律已生效于本腿：落点＝`D:\tmp\wisp\20261018\336r1\{tree-before,tree-comm,tree-mut,gotmp}`（⛔ 盘符根，逐枚 8.3 别名见 `logs/00-intake.log`＋建树件 `alias83=`）。
+`blacklist.go` blob 两号同为 `c1799cd24afce19e6accef23db23a7d7ee746dec`（＝334-v1 交件 blob）。交件侧 HEAD 见 第 7 节。
+★新铁律已生效于本腿：落点＝`D:\tmp\wisp\20261018\336r1\{tree-before,tree-mut,tree-comm,tree-after,gotmp,msg}`（⛔ 盘符根）；
+8.3 别名现量＋"无一枚判据需要根目录"的读数＝`logs/08-alias83.log`（`dir /X`＋`cygpath -d` 逐枚：`TREE-B~1`/`TREE-A~1`/`TREE-C~1` 三枚有别名字，
+`tree-mut`(8)/`gotmp`(5)/`msg`(3) 名已 ≤8 字符⇒短名＝长名；本腿⛔ 因此停手上报）。
 
 ## 1 AC#0 起手现量＝票面四发串行重放，逐字复认（`logs/ac0-runner.log`＋`ac0-0[0-4]-*.log`）
 
@@ -31,7 +33,7 @@
 今天有谁钉（⛔ 抄票面"七枚"那句）：只有 `.aws`（`TestAnchorMiss*` 两枚）与 `.kube`（ⓑ 那枚子用例）活在回落支上；
 其余五枚锚在册用例里只被**叶子真装上了**那一形读到（`TestAListDenyAndUnoverridable`／`TestTierAAnchorsMatchNativeSpelling`／
 `TestClassifyAnchorSpellingIsNotVerdict`／`TestReparseExceptionExplicitPathOnly`，home 全是假主目录）＝`anchorMatches` 命中支，⛔ 回落支。
-⇒ 票面标题那句"只有 `.aws`＋`.kube` 会红"在**突变现量**这一维复认（§1／§3 的 LEG 尺逐名），本腿把射程从 2 枚扩到 8 枚操作数。
+⇒ 票面标题那句"只有 `.aws`＋`.kube` 会红"在**突变现量**这一维复认（第 1 节／第 3 节 的 LEG 尺逐名），本腿把射程从 2 枚扩到 8 枚操作数。
 
 ## 3 AC#2 牙＝`internal/risk/anchor_fallback_teeth_336_windows_test.go`（`c55e32b1`）＋逐操作数突变扫描（`8c36c23c`）
 
@@ -47,8 +49,8 @@
 | 发／落点 | 我的牙（TEETH） | 在册三枚（LEG） |
 |---|---|---|
 | MU-1a `:220` | `rc=1 17/0/1/0` 红＝`git-credentials` | `10/3/0/0 rc=0` |
-| MU-1b `:224` | `rc=1` 红＝`wisp-config-under` | rc=0 |
-| MU-1c `:225` | `rc=1` 红＝`wisp-config-under`＋`wisp-config-eq` | rc=0 |
+| MU-1b `:224` | `rc=1` 红＝`wisp-config-under`，★只咬 `:138` 那一句（reason 点名本锚）——`class` 仍 A，由**更后面**的 `dpapi-protect` 经自己的回落支接住 | rc=0 |
+| MU-1c `:225` | `rc=1` 红＝`wisp-config-under`（:138）＋`wisp-config-eq`（:129/:132/:135/:138/:141 五句） | rc=0 |
 | MU-1d `:227` | `rc=1` 红＝`ssh` | rc=0 |
 | MU-1e `:229` | `rc=1` 红＝`aws` | `10/2/1/0 rc=1`＝`absent-aws-leaf…` |
 | MU-1f `:231` | `rc=1` 红＝`kube` | `10/2/1/0 rc=1`＝`installing-aws-moves…` |
@@ -59,7 +61,7 @@
 
 ## 4 AC#3 两形代价（现量，⛔ 定案；选不选＝裁腿＋编排者）
 
-甲＝本腿已落（§3）。乙＝把 334-v1 那把 42 行三值对撞尺搬成仓内断言，代价现量（`logs/ac3y-runner.log`，尺原件 blob `69a70fa4…` 逐字同串）：
+甲＝本腿已落（第 3 节）。乙＝把 334-v1 那把 42 行三值对撞尺搬成仓内断言，代价现量（`logs/ac3y-runner.log`，尺原件 blob `69a70fa4…` 逐字同串）：
 未突变 `rc=0 RUN=22 PASS_TOP=4 FAIL_TOP=0 SKIP=0`，首发 wall 20.48s（含编译）⇄ 复用缓存 4.26s；
 ★摘 MU-1h 那一枚后这把尺 **`rc` 仍＝0**（它 13 发 `t.Log`＋7 发 setup `Fatalf`＝⛔ 断言），只在 shape 文件显形
 `chain:case9-local-creds class=A→B／rule=A:Microsoft-Credentials→B-tier` ⇒ 搬进仓内必须逐枚补 want＝**18 行 chain ＋ 9 行 offchain＝27 枚具名期望**，
@@ -83,23 +85,27 @@ dshape（`gotmp/`，先 `mkdir -p`＝`mkdir_gotmp_rc=0`）前 `10/3/0/0 rc=0`（
 
 (i) 现量枚数＝**8 枚回落支操作数／7 枚锚**；票面与 334-v1 那句"七枚 aEq/aUnder 锚"＝**按锚计数**，差在我这把尺把
 `%APPDATA%\wisp` 那一枚 case 的 **AND 两枚操作数**分开算（`blacklist.go:224` 与 `:225`）——尺＝`git grep -n`（12 行原始命中，2 注释＋2 定义＋8 用法）。
-(ii) 见 §5：定向名册两形台面各自前后（0.727→0.541／0.168→0.351，pkg 级）；我的牙自身 0.21s 顶层＋16 发 0.01–0.02s；整包 RUN＋17 枚逐名对上，包级秒数＝噪声、⛔ 当差值。
+(ii) 见 第 5 节：定向名册两形台面各自前后（0.727→0.541／0.168→0.351，pkg 级）；我的牙自身 0.21s 顶层＋16 发 0.01–0.02s；整包 RUN＋17 枚逐名对上，包级秒数＝噪声、⛔ 当差值。
 (iii) **缺世界具名＝整个 POSIX 平台**：`pathresolver_other.go` 的 `resolveHandle` 是 `("", false)` 桩 ⇒ 候选与每一枚锚 `root=""`，`uncertainAnchorMiss` 恒 false，
 "摘这一枚⇒必红"在 POSIX 造不出来。容器实测（`golang:1.27`，`logs/ac4-08-linux-tripwire.log`）逐枚 `cand_root=EMPTY`、我的绊线 `--- PASS`。
 ⇒ ⛔ 假绿、⛔ 恒红：新落 `anchor_fallback_teeth_336_other_test.go`（`c87df16d`，`//go:build !windows`）把这件事量成**绊线**（POSIX 解析器一落地 root 非空即当场红并点名"把牙搬过来"），
 并具名交 CI 射程账＝**票 339 债⛔ 由本票新增**（本腿两平台各自绿；Linux 档现存两枚红＝票 334 字节 `anchor_miss_reason_334_test.go:131/:156/:193/:197/:201`，早于本腿锚，⛔ 本腿引入、⛔ 本腿动它一字）。
-另具名一枚非平台缺口：`MU-1c`（`:225`）的红名册含 `wisp-config-under`＋`wisp-config-eq` **两枚**＝同一枚 case 的 AND 两侧在同一发世界重叠（落点仍各自唯一，见 (iv)），
-"一发只摘一枚"在两操作数 case 上做不到红名册单枚——若裁腿要逐枚独立，需给那枚 case 造两个不同候选世界，属加件、本腿⛔ 自行扩面。
-(iv) 成对两发落点不同自查（逐名列）：`:220`／`:224`／`:225`／`:227`／`:229`／`:231`／`:235`／`:237`＝8 发 8 枚不同物理行，`落点命中枚数=1` 逐发；
-红句落点（`file:line`）＝`anchor_fallback_teeth_336_windows_test.go:129`/`:132`/`:135`/`:138`/`:141`/`:148` 六处，各发命中的是**被测锚自己的行差＋自己的子用例名**；
-唯一交叉＝(iii) 末具名的 `MU-1c` 双子用例，⛔ 有两发落在同一枚物理行。
+另具名一枚非平台缺口＝**枚数对不上＝8 发 8 枚不同落点，但红名册只有 7 枚唯一名**：`MU-1b`（`:224`）与 `MU-1c`（`:225`）都咬 `wisp-config-under`
+＝同一枚 case 的 AND 两枚操作数在同一批世界（`:224` 与 `:225` 的 `omit` 都是 `wispCfgLeaf334`）上重叠，"一发只摘一枚"在这一枚 case 上做不到红名册单枚。
+★且 MU-1b 只咬 `:138`（reason 点名本锚）这一句＝`class` 没降：那枚候选改由**更后面的** `dpapi-protect` 经自己的回落支接住——
+这正是本票 第 3 节 那句"只看 class 是盲的"的实测形状。⇒ 若裁腿要逐枚独立，需给那枚 case 再造第三个世界（装回 `config.toml` 叶子、只缺 `wisp` 目录那一形），属**加件**、本腿⛔ 自行扩面。
+(iv) 成对两发落点不同自查（逐名列，尺＝逐发 `落点命中枚数=1`＋`diff` 行差逐字在 `ac2-sweep-runner.log`）：
+发⇄物理行＝MU-1a `:220`／MU-1b `:224`／MU-1c `:225`／MU-1d `:227`／MU-1e `:229`／MU-1f `:231`／MU-1g `:235`／MU-1h `:237`
+＝**8 发 8 枚不同物理行，⛔ 任何两发落在同一枚行**；每发红句咬的是被测锚自己的子用例名（＋自己的字面串）。
+★唯一一处名册交叉具名＝MU-1b ⇄ MU-1c 都含 `wisp-config-under`（同一枚 case 的两枚 AND 操作数，见 (iii) 末段），属**枚数**问题、⛔ 落点重合。
+红句 `file:line` 逐发＝除 MU-1b 只 `:138` 一句外，其余七发各咬 `:129`/`:132`/`:135`/`:138`/`:141` 五句（＋`:148` 读数行）＝六处尺面，逐名取自 `ac2-MU-*-teeth.log`。
 
 ## 7 纪律格与交件自证
 
 逐笔（严格前缀尺 `git log --all --grep='^票 336 落地腿 336-r1'`＝**8 笔**，越界 0）：
 `ff56a9e0` 台件 1 枚／`f67048d9` AC#0 8 枚／`c55e32b1` AC#2 牙 1 枚（`.go` 测试面）／`feac8f77` AC#2 正控 3 枚／
 `8c36c23c` AC#2 突变名册 21 枚／`c87df16d` POSIX 半格 2 枚／`90dafe77` AC#4 20 枚／`28da3a7e` AC#3 7 枚。
-写面尺＝逐笔 `git show --name-only` ⊆ `^internal/risk/[^/]+_test.go` ∪ `^\.scratch/wisp/probes/336/r1/` ∪ 票 336 ⇒ `out_of_scope=0` 逐笔（§2 命令可重跑）；
+写面尺＝逐笔 `git show --name-only` ⊆ `^internal/risk/[^/]+_test.go` ∪ `^\.scratch/wisp/probes/336/r1/` ∪ 票 336 ⇒ `out_of_scope=0` 逐笔（第 2 节 命令可重跑）；
 `.go` 非测试命中 **0**；`blacklist.go` blob 交件侧仍 `c1799cd2…`（＝起手同串）；票面七格现跑**未勾 7／已勾 0**、票名与 `Status:` ⛔ 动。
 形状尺：`anchor_fallback_teeth_336_windows_test.go` 160 行／`..._other_test.go` 92 行，均 CRLF 0、非 ASCII 0、`exported_non_test=0`、`t.Skip=0`。
 具名遗留＝`logs/ac4-full-before-dshape-a.rednames` 等 **4 枚 0 字节**＋`teeth-01-pristine-dshape.log.redlist` 0 字节＝
