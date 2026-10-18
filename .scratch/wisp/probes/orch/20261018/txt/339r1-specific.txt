@@ -1,0 +1,18 @@
+派单 339r1-specific — 本腿判据（逐格可机读；⛔ 抄票面／本块任何数，一律现跑）
+
+AC#0 起手现跑：① 上面五行逐枚重跑（Linux 容器台件**由你自己建**、⛔ 复用编排者那棵 `D:\tmp\wisp\20261018\orch\linuxred334`）；取树一律具名提交树；② ★再加一枚：`go test ./internal/risk/ -count=1 -timeout 30m -v` **整包在 Linux 档**的完整红名册（逐名点名——同族 `USERPROFILE`／`%LOCALAPPDATA%` 形状的仪器可能不止这两枚，一次数清）；③ 与票面表不符 ⇒ 当场具名更正并把差异写进件。
+★容器台件配方（⛔ 少一味就是假红）：`docker run` 挂①仓外导出树②宿主 module 缓存（`go env GOMODCACHE`＝`D:\work\base\gopath\pkg\mod`，只读挂）；env＝`GOFLAGS=-mod=mod GOPROXY=off CGO_ENABLED=0 HOME=/src GOMODCACHE=/go/pkg/mod`；`TMPDIR`/`GOTMPDIR` 指容器内**先 mkdir -p**；★Windows 宿主路径进 `-v` 要用 `MSYS_NO_PATHCONV=1`（否则 `/src` 被 MSYS 改写成 `D:/src`＝容器起不来）；镜像 `golang:1.27`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`creating work dir` ⇒ 判台面故障、⛔ 计入判据、具名重打。
+
+AC#1 三形代价表（先量再选，⛔ 未出表不许开工、⛔ 推荐、⛔ 定案）：
+- **甲**＝给该文件加平台档（`//go:build windows` 或改 `_windows_test.go` 后缀）＋补一枚 POSIX 侧"我不覆盖这一维"的**具名读数**。★现量：Linux 档少跑几枚（分母变化，逐名点）；票 334 `AC#3` 那句判语"CI 那把台面下绿"的射程要不要收窄（＝AC#3 那一格，归编排者裁，你只交料）。
+- **乙**＝**造得出两平台都成立的世界**＝假主目录按 `HOME`⇄`USERPROFILE` 分别设（或显式把锚根指过去），让同一枚断言在 Linux 也真跑到 A。★现量：要动几行、会不会把票 334 已勾的判据文字变成假话、两平台各自四数。
+- **丙**＝进 `scripts/portable-tests.sh` 的 redlist 名册（现成形状＝`:677-679` 那三行，带 platform／fixture／理由／next 四字段）。★现量：⚠ redlist 是"承认不跑"不是"修好"；且 `portable-tests.sh:7-8` 逐字记着"Go 把 SKIP 记成 `ok`"那口旧坑 ⇒ 这一格会从"红"变成"没人看"；★⛔ 动射程名册去"让 CI 别看这个包"（那是藏红不是修）——选丙只许**加一行具名 redlist**、⛔ 删既有那三行。
+
+AC#2 ★不许用放宽断言换绿：⛔ 把 `want A` 改成"红也算对"、⛔ 删用例、⛔ `t.Skip`（无具名登记面的裸 Skip＝本仓禁手）、⛔ 摘掉那三句承重断言里的任何一句。★判据自带**去牙反控**＝把回落支整支摘掉（同 `334-v1` 的 M-V1 那一形）⇒ 修好后的仪器**必须在两平台都点名红**（这才是"补世界"而不是"藏红"）；★成对正控＝未突变树上必须绿（⛔ 恒红）。两发落点必须不同、串行、每发前后各验一次 pristine 哈希。
+AC#3 票 334 的账⛔ 被偷偷改写：只交"若选甲/丙则那句判语射程要收成什么形"的**文字料**，⛔ 你动票 334、⛔ 撤它的框（裁与翻框归编排者）。
+AC#4 颜色与门禁：`./internal/risk/` **两平台成对**（Linux 容器 ⇄ 本机 Windows 档；同一 `-run` 名册、四数逐枚点名⛔ 混用⛔ 相减、改前⇄改后同台面）；红名册**逐名**作差归位（★本包在册争用假红件 `TestResolvePerCallBudget` 要求安静复量为准＝票 228 `AC#6` 逐字在册，⛔ 与别腿并发跑）。门禁四数只在共享工作树（`/d/work/base/gopath/bin/gofumpt.exe` 真身／`d22scan`／长度门／`go vet ./internal/risk/`）逐枚落 `rc=`；★**跑前先 `unset GOTMPDIR TMPDIR`**（票 311 AC#1 shape B GUARD，带 env 时 rc=2 射程拒绝＝我 10-18 坐实，⛔ 读成红）。⛔ `./cmd/wisp` 整包、⛔ `go test ./...`。
+AC#5／AC#6：见 head 禁区，逐条自证（逐笔 `git show --name-only` 全集⊆三处写面、`.go` 只可能出现在 `internal/risk/**` 测试面）。
+
+必答（⛔ 盖章不算）：(i) 那两枚红在 Linux 档的**完整逐字红句**（你自己那发，带 `file:line`＋`rc=`）；(ii) 整包 Linux 档红名册逐名（有没有第三枚同族）；(iii) 三形各自的"会不会把票 334 已勾判语变成假话"逐形真／假＋凭据；(iv) 你选哪形**不裁**、但要把"甲/乙/丙三形里哪一形在两平台都能给出有牙读数"这一维量死（⛔ 推理代替读数）。
+
+交件＝`.scratch/wisp/probes/339/r1/report.md`（≤160 行，含 AC#1 那张三形表）＋`logs/**` 逐枚入库＋票 339 尾**一条**只追加 bullet（写锚、写"七格一枚没翻"）。每落一枚文件就 commit；`add` 与 `commit` **两处 pathspec 都逐枚手写字面路径**（⛔ `$(git diff --cached --name-only)` 从共享 index 反推＝今天已咬两枚腿；★今天另有一枚腿撞编排者的 `index.lock`，处置＝没删锁、等自散、重试同一笔、事后自证没卷走别腿件＝照它做）；中文正文⛔ 走 PowerShell（`A1030` 那枚被打坏成逐字 `?` 的主题）、一律 Write 成文件再 `git commit -F`；主题前缀 `票 339 落地腿 339-r1·<格>`。⛔ push／翻框／改票名。
