@@ -1,0 +1,17 @@
+票 322 收尾腿 322-r2·票尾一条只追加 bullet（1/0，AC 框一枚没翻）
+
+`.scratch/wisp/issues/322-…md` numstat＝**1 insertion / 0 deletions**（现量尺＝`git diff --numstat`），
+追加前后 AC 框复量都是 **1 未勾（AC#4）／5 勾**＝⛔ 翻框、⛔ 改票名／`Status:`／`-done`。
+文件仍 0 枚 CR 字节＝LF（票面 `.md` 按 `.gitattributes` 是 `text eol=lf`）。
+
+正文＝本腿全部现量读数的票面摘要（锚 `c11163c8`／容器成对两台 142-86-0-0 一字不变证我那枚 `.go`
+颜色中性／门禁逐枚 rc=／本机 winsec 成对台面＋estate 定向色随卷换色／残余② `witnessTruncated=true
+witnessSize=35` 4/4 复认／AC#4 消费者面 Linux⇄本机成对＋`internal/risk` 三枚红两台逐字相同／
+必答 (ii) 里 `120-v2-verdict:210` 与票 120 `:145` 那处点名失效／头号活〔待编排者放行〕／
+本腿四笔台面故障与一笔越界形状违规具名自纠）。
+
+★同批入库 `bullet-322-r2.txt`＝那一行的正文留底（可审计，⛔ 只挂在盘上）。
+pathspec 两处（`git add`／`git commit`）都字面逐枚写死，⛔ 用任何"从共享 index 反推"的形状
+（＝`7f805583` 那笔越界的根因，编排者裁定①）。
+
+⛔ push、⛔ 动 `cmd/wisp`／`privateFile` 产码／`winsec_other.go`／`internal/risk/**` 一字。
