@@ -1,0 +1,27 @@
+time=2026-10-18T12:13:54.360+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt
+time=2026-10-18T12:13:54.391+08:00 level=INFO msg="config: config.toml already carries this key; this write added nothing (the file's bytes and mtime stayed put only because its schema_version was already current; a file behind on schema_version had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs
+    writeguard_226_test.go:405: the file already carried the entry and was rewritten anyway:
+        schema_version = 2
+        
+        [app]
+        language = 'zh-CN'
+        theme = 'dark'
+        
+        [ball]
+        size = 56
+        
+        [fs]
+        allowed_dirs = ['D:\data']
+        
+        [voice]
+        enabled = true
+        
+        [voice.asr]
+        model = 'parakeet-zh'
+        provider = 'local-sherpa'
+    writeguard_226_test.go:408: the file's mtime moved on a write that wrote nothing
+--- FAIL: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.090s
+FAIL

@@ -1,0 +1,36 @@
+gauge = git grep -n <pat> HEAD -- internal/config cmd/wisp  (committed tree ONLY; counted, not measured); question per P row = does ANY *_test.go assert this hand-edit shape's result
+=== P0 change-a-value: tests asserting hand-edited key kept ===
+HEAD:internal/config/settings_248_test.go:186:// TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit is the positive control for
+HEAD:internal/config/settings_248_test.go:192:func TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit(t *testing.T) {
+HEAD:internal/config/writeguard_226_test.go:63:func TestAC1AllowedDirsWriteKeepsAHandEditedKey(t *testing.T) {
+HEAD:internal/config/writeguard_226_test.go:102:func TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit(t *testing.T) {
+HEAD:internal/config/writeguard_226_test.go:234:func TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory(t *testing.T) {
+HEAD:internal/config/writeguard_226_test.go:269:func TestAC4PermissionModeWriteKeepsAHandEditedKey(t *testing.T) {
+=== P1 delete non-default scalar line ===
+HEAD:internal/config/writeguard_handedit_227_test.go:23:func TestHandDeletedScalarLineComesBackAtSchemaDefault(t *testing.T) {
+HEAD:internal/config/writeguard_handedit_227_test.go:63:	if !strings.Contains(text, "a key line the operator deleted by hand comes back at its schema default value") {
+=== P2 delete scalar line already at default ===
+HEAD:internal/config/writeguard_226_test.go:37:var handEdited = strings.Replace(matrixBase, "size = 56", "size = 60", 1)
+HEAD:internal/config/writeguard_226_test.go:202:	mutate(strings.Replace(time1, "size = 56", "size = 60", 1))
+HEAD:internal/config/writeguard_handedit_227_test.go:6:// changed VALUE ("size = 56" -> "size = 60") on a fixture whose schema_version was
+HEAD:internal/config/writeguard_handedit_227_test.go:25:	start := strings.Replace(matrixBase, "size = 56", "size = 60  # my size", 1)
+HEAD:internal/config/writeguard_handedit_227_test.go:46:	if !strings.Contains(readText(t, path), "size = 56") {
+HEAD:internal/config/writeguard_handedit_227_test.go:184:	mutate(strings.Replace(matrixBase, "size = 56\n", "", 1))
+=== P3 delete whole section ===
+HEAD:internal/config/tiers_app_255r2_test.go:49:			t.Errorf("app key %q (AppSection.%s) has no tier row in TierRegistry: ticket 255 AC#3's residual - a NEW [app] key is invisible to the fixed-name list, so it must be caught by the walk (register it in tiers.go, or delete the key)",
+=== P4 delete map entry ===
+HEAD:internal/config/writeguard_handedit_227_test.go:70:func TestHandDeletedMapEntryIsNotRestored(t *testing.T) {
+=== P5 delete schema_version going through WRITE branch ===
+HEAD:internal/config/writeguard_226_test.go:432:	// schema_version is forced by SaveFile and is not an operator's key.
+HEAD:internal/config/writeguard_226_test.go:436:		t.Errorf("schema_version was reported as a changed key: %v", got)
+HEAD:internal/config/writeguard_handedit_227_test.go:6:// changed VALUE ("size = 56" -> "size = 60") on a fixture whose schema_version was
+HEAD:internal/config/writeguard_handedit_227_test.go:101:// schema_version is already current. Strip it and the migration inside
+HEAD:internal/config/writeguard_handedit_227_test.go:110:	noVersion := strings.Replace(hand, "schema_version = 2\n", "", 1)
+HEAD:internal/config/writeguard_handedit_227_test.go:111:	if strings.Contains(noVersion, "schema_version") {
+HEAD:internal/config/writeguard_handedit_227_test.go:112:		t.Fatal("setup: the schema_version line was not removed")
+HEAD:internal/config/writeguard_handedit_227_test.go:128:	if !strings.Contains(text, "only because its schema_version was already current") {
+HEAD:internal/config/writeguard_handedit_227_test.go:139:	if !strings.Contains(readText(t, path), "schema_version = 2") {
+=== P6 delete provider base_url (preset fill) ===
+=== func Test counts in the two writeguard files ===
+handedit227=HEAD:internal/config/writeguard_handedit_227_test.go:5
+wc226=HEAD:internal/config/writeguard_226_test.go:13
