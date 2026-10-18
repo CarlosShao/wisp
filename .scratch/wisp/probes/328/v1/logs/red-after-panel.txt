@@ -1,0 +1,8 @@
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestC21DesignTokensFourWayAgree
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestComposerRenderFixtureTellsTheTruth
+--- FAIL: TestFloodRulerFiresOnAnUnboundedSink35r8
+--- FAIL: TestReadGitOnThisRepositoryIsSelfConsistent
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8

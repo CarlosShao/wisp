@@ -1,0 +1,5 @@
+internal/agent 整包红名册＝0 枚（改前⇄改后两侧同）。
+改前侧尺＝grep -c "^--- FAIL" logs/before-agent-full.log = 0；rc=0
+改后侧尺＝grep -c "^--- FAIL" logs/after-agent-full.log = 0；rc=0
+⇒ 这枚件不是空文件：它记的是"那把尺回 0"这件事本身＋正控在 agent 两包里可读的行数：
+before-agent-full 总行数=318／after-agent-full 总行数=322

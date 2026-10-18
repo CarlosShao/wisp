@@ -1,0 +1,84 @@
+date=2026-10-18 10:22:15 +0800 adjudication_anchor=5db0b538dad3bf2841adec834a130e4a6b28d8df
+tree_roster_blob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb anchor_blob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb
+legEnd_f705b082_blob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb
+
+## A. 那枚多出来的红名：文件归属尺（它是不是 328 射程）
+  diff_lines internal/panel/backpressure_bound_35r8_test.go 648eda04..5db0b538dad3bf2841adec834a130e4a6b28d8df = 0
+  blob before=3e5c0e81d03511e76b3e2d0e00d10d49c94c920f after=5db0b538dad3bf2841adec834a130e4a6b28d8df=3e5c0e81d03511e76b3e2d0e00d10d49c94c920f
+  328 落笔四枚文件名册（尺＝git show --name-only 逐枚）：
+    b2d55342 => internal/panel/subagent_roster_197.go 
+    1696d01b => internal/panel/subagent_blocked_220_test.go 
+    ffebb6d1 => internal/panel/subagent_corr_task_prefix_328_test.go 
+    f705b082 => internal/agent/corr_roster_join_328_test.go 
+
+## B. 归位实验一：改前侧整包再跑第二发（同树同配方；那枚红名是否本来就会自己冒出来）
+before-panel-full-rerun2: RUN=257 PASS_TOP=160 FAIL_TOP=7 SKIP=0 rc=1
+  改前第二发红名册（⇄ 改前第一发）：
+  SAME_AS_FIRST_BEFORE
+  改前第二发 ⇄ 改后第一发 逐名作差：
+4a5
+> --- FAIL: TestFloodRulerFiresOnAnUnboundedSink35r8
+
+## C. 归位实验二：那枚红名单跑（两侧各两发；堆量尺在整包里受同场分配影响）
+floodruler-before-1: RUN=1 PASS_TOP=1 FAIL_TOP=0 SKIP=0 rc=0
+    backpressure_bound_35r8_test.go:360: 35r8 positive control fired as required: rows 100 > the hard ceiling 64; pinned text 800000 runes > the cap 36864 (heap +826024 bytes)
+floodruler-before-2: RUN=1 PASS_TOP=1 FAIL_TOP=0 SKIP=0 rc=0
+    backpressure_bound_35r8_test.go:360: 35r8 positive control fired as required: rows 100 > the hard ceiling 64; pinned text 800000 runes > the cap 36864 (heap +815736 bytes)
+floodruler-after-1: RUN=1 PASS_TOP=1 FAIL_TOP=0 SKIP=0 rc=0
+    backpressure_bound_35r8_test.go:360: 35r8 positive control fired as required: rows 100 > the hard ceiling 64; pinned text 800000 runes > the cap 36864 (heap +821344 bytes)
+floodruler-after-2: RUN=1 PASS_TOP=1 FAIL_TOP=0 SKIP=0 rc=0
+    backpressure_bound_35r8_test.go:360: 35r8 positive control fired as required: rows 100 > the hard ceiling 64; pinned text 800000 runes > the cap 36864 (heap +815624 bytes)
+
+## D. 精确定点：四形实测（改后侧，逐名 RUN/结果）
+after-panel-fourshapes-precise: RUN=19 PASS_TOP=5 FAIL_TOP=0 SKIP=0 rc=0
+--- PASS: TestASecondCardForTheSameTaskStillLightsItsRow
+--- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_tail_on_a_filed_task_id_lights_(328)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row
+--- PASS: TestProductionCorrelationShapesLightTheirRows
+    --- PASS: TestProductionCorrelationShapesLightTheirRows/arm_A_provider_call_id_lights_its_task
+    --- PASS: TestProductionCorrelationShapesLightTheirRows/arm_B_id-less_call_lights_its_task
+    --- PASS: TestProductionCorrelationShapesLightTheirRows/arm_B_with_the_queue_clash_rewrite_stacked_lights_its_task
+    --- PASS: TestProductionCorrelationShapesLightTheirRows/the_queue_rewrite_of_a_bare_task_id_lights_its_task
+    --- PASS: TestProductionCorrelationShapesLightTheirRows/arm_A_rewrite_of_a_bare_task_id_lights_its_task
+    --- PASS: TestProductionCorrelationShapesLightTheirRows/the_empty-corr_fallback_names_no_row
+    --- PASS: TestProductionCorrelationShapesLightTheirRows/a_host-initiated_correlation_names_no_row
+    --- PASS: TestProductionCorrelationShapesLightTheirRows/a_correlation_built_on_a_task_nobody_filed_names_no_row
+--- PASS: TestEachCorrelationLightsOnlyTheRowItIsBuiltOn
+--- PASS: TestAnL1WindowCorrelationIsMatchedByTheSameArm
+  --- 红句逐字（若有）---
+
+## E. 改前侧同一条 -run（ⓑ 那枚断言的起手形状：child-1#retry 当时钉 false）
+before-panel-220table-precise: RUN=8 PASS_TOP=2 FAIL_TOP=0 SKIP=0 rc=0
+--- PASS: TestASecondCardForTheSameTaskStillLightsItsRow
+--- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_suffix_is_not_the_queue's_form
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row
+
+## F. 门禁四数（只在共享工作树；我零 .go，尺打的是腿那四枚文件＋两包）
+gofumpt_rc=0
+d22scan.sh: positive control - runtests.sh -C tools/d22scan ./...
+runtests.sh: ticket 311 AC#1 shape B: GUARD - the test temp root names ANOTHER VOLUME than %LOCALAPPDATA%: reference volume C (path C:/Users/swq/AppData/Local), offender: GOTMPDIR=D:/tmp/wisp/20261018/328v1/gotmp(volume D)
+runtests.sh: ticket 311 AC#1 shape B: this gate's COLOUR is a function of that volume - the same unchanged internal/winsec code reads PASS=58 FAIL=0 on a volume-C root and PASS=56 FAIL=2 with Go's own TempDir cleanup failing on a D:/tmp root (ticket 311). Refusing to run is the fix; reporting a re-coloured gate as a verdict is not.
+runtests.sh: ticket 311 AC#1 shape B: point WISP_TEST_GOTMP_ROOT (or GOTMPDIR) at a directory on volume C, or unset both, then run this step again. Do NOT relax an assertion, threshold, golden or SLO to make it green.
+d22scan_rc=2
+check-path-length-budget.sh: denominator read: 15217 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=15217  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+length_rc=0
+vet_rc=0
+--- 共享树那两包字节与裁决锚一致性（跑门禁前现量，别腿若已落笔要具名）---
+status_rc=0
+shared_tree_vs_anchor_internal_panel_agent_diff_files=0
+done_rc=0

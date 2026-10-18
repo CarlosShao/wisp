@@ -1,0 +1,75 @@
+===== 1. 成对整包（改前侧＝648eda04 树）=====
+before-panel-full: RUN=257 PASS_TOP=160 FAIL_TOP=7 SKIP=0 rc=1
+red_names=7 out=D:/tmp/wisp/20261018/328v1/logs/red-before-panel.txt
+before-agent-full: RUN=112 PASS_TOP=88 FAIL_TOP=0 SKIP=0 rc=0
+red_names=0 out=D:/tmp/wisp/20261018/328v1/logs/red-before-agent.txt
+===== 2. 成对整包（改后侧＝我的锚现认树）=====
+after-panel-full: RUN=268 PASS_TOP=162 FAIL_TOP=8 SKIP=0 rc=1
+red_names=8 out=D:/tmp/wisp/20261018/328v1/logs/red-after-panel.txt
+after-agent-full: RUN=114 PASS_TOP=90 FAIL_TOP=0 SKIP=0 rc=0
+red_names=0 out=D:/tmp/wisp/20261018/328v1/logs/red-after-agent.txt
+===== 3. 红名册逐名作差（尺＝sort 后 comm；⛔ 只看枚数）=====
+--- panel 改前⇄改后 ---
+4a5
+> --- FAIL: TestFloodRulerFiresOnAnUnboundedSink35r8
+panel_redroster_diff_rc=NONZERO（名字换了，逐名看）
+--- agent 改前⇄改后 ---
+agent_redroster_diff_rc=0
+===== 4. 定点：票 220 那族形表（改前侧应钉 child-1#retry=false 且绿；改后侧=true）=====
+before-panel-220table: RUN=7 PASS_TOP=1 FAIL_TOP=0 SKIP=0 rc=0
+after-panel-220table: RUN=8 PASS_TOP=2 FAIL_TOP=0 SKIP=0 rc=0
+===== 5. 定点：四形实测（改后侧）=====
+after-panel-fourshapes: RUN=59 PASS_TOP=36 FAIL_TOP=1 SKIP=0 rc=1
+===== 6. 定点：AC#2 正控（agent 包，经真铸造点那两发）=====
+after-agent-positive: RUN=2 PASS_TOP=2 FAIL_TOP=0 SKIP=0 rc=0
+=== RUN   TestACorrelationTheLoopActuallyMintedLightsItsRosterRow
+--- PASS: TestACorrelationTheLoopActuallyMintedLightsItsRosterRow (0.02s)
+=== RUN   TestTheLoopMintsTheShapesTheRosterAccepts
+--- PASS: TestTheLoopMintsTheShapesTheRosterAccepts (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.124s
+===== 7. ★去牙一发（派单 AC#2③ 那一发＝抹掉边界⇒:142 child-1x 必须红）=====
+pristine_before: sha256=450e1d1c47ee715fb74b56116a827988b0d9bfbc261fc06748c4704b4bd87028 gitblob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb (对锚串应＝2da6c596369c1ee38672ae2656a7d5a3ecbaabfb)
+312:		if strings.HasPrefix(key, task) {
+mut-V1-boundary: RUN=7 PASS_TOP=0 FAIL_TOP=1 SKIP=0 rc=1
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row
+--- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_tail_on_a_filed_task_id_lights_(328) (0.00s)
+    --- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.085s
+FAIL
+mutated_sha256=31b8dcdc4cfca4ef86f5cf4cf8d8c9933b613b622013f73cf9f93add7c64c70a
+restored: sha256=450e1d1c47ee715fb74b56116a827988b0d9bfbc261fc06748c4704b4bd87028 gitblob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb
+restored_same_as_pristine=YES
+pristine_equals_anchor_blob=YES
+===== 8. ★去牙二发（第三臂登记抹掉＝改回今天的形状⇒agent 正控必须红，落点与一发不同枚）=====
+313:			_ = task
+312:		if strings.HasPrefix(key, task+"#") {
+313-			_ = task
+314-		}
+mut-V2-droparm-agent: RUN=2 PASS_TOP=0 FAIL_TOP=2 SKIP=0 rc=1
+    corr_roster_join_328_test.go:124: the row for task "c69a9451-042f-4209-bd5d-bf9f70f4e1c7" reads not-blocked although a card of its own call ("c69a9451-042f-4209-bd5d-bf9f70f4e1c7#call_e1") is pending: this is ticket 328's defect, measured on a correlation the loop minted
+--- FAIL: TestACorrelationTheLoopActuallyMintedLightsItsRosterRow (0.01s)
+    corr_roster_join_328_test.go:165: a correlation the loop mints ("5cbb2a16-39e9-4cdf-8d7d-381f3e9e76f6#call_e1") does not light its own row
+    corr_roster_join_328_test.go:165: a correlation the loop mints ("5cbb2a16-39e9-4cdf-8d7d-381f3e9e76f6#call-0") does not light its own row
+--- FAIL: TestTheLoopMintsTheShapesTheRosterAccepts (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.078s
+FAIL
+mut-V2-droparm-panel: RUN=7 PASS_TOP=0 FAIL_TOP=1 SKIP=0 rc=1
+--- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light
+    --- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_tail_on_a_filed_task_id_lights_(328)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row
+restored2: sha256=450e1d1c47ee715fb74b56116a827988b0d9bfbc261fc06748c4704b4bd87028 gitblob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb pristine_equals_anchor_blob=YES
+===== 9. 还原后复绿一发（证树没坏）=====
+after-panel-220table-restored: RUN=7 PASS_TOP=1 FAIL_TOP=0 SKIP=0 rc=0
+color_pair_mutations_rc=0

@@ -1,0 +1,6 @@
+time=2026-10-18T10:22:42.483+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFloodRulerFiresOnAnUnboundedSink35r8
+    backpressure_bound_35r8_test.go:360: 35r8 positive control fired as required: rows 100 > the hard ceiling 64; pinned text 800000 runes > the cap 36864 (heap +815624 bytes)
+--- PASS: TestFloodRulerFiresOnAnUnboundedSink35r8 (0.72s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.796s
