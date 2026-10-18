@@ -1,0 +1,74 @@
+HEAD=5936cee3
+===== [0] 起手：该枚相对 HEAD 无本地脏 =====
+status_rows=0
+before_sha=df5f4a9fe179fd5b6a98616db149a128c2a5d8fcb424c237de275916c5221eec bytes=73470
+before_gofumpt_l_rows=1
+===== [1] 逐发 gofumpt -w 直到 -l 空输出（条件①＋②） =====
+round1 rc_w=0 gofumpt_l_rows=1 sha=726b761f75c1a8f5 bytes=73494
+round2 rc_w=0 gofumpt_l_rows=0 sha=17d4f3a36ba3451d bytes=73497
+===== [2] 条件⑤：交件侧 gofmt -d 必须 0 字节 ＋ gofmt -l 0 行 =====
+gofmt_d_bytes=0
+gofmt_l_rows=0
+===== [3] 非空白尺（甲形下预期不空＝记录逐字，票面已让路） =====
+RULER_RC=1 rows=47
+nonblank_bytes before=62106 after=62107
+===== [4] 改动形状自查：除 gofumpt -w 产物外无别的字节（diff 全文逐字入库） =====
+34	20	cmd/wisp/panel_transport_35r2_test.go
+diff_bytes=2283
+--- 新增行的 token 类别清点（只应见 type ( ) 逗号 空行） ---
+      6 +
+      4 +}
+      3 +type(
+      3 +)
+      1 +varjsPuncts=[]string{
+      1 +params[]string
+      1 +objjsNode
+      1 +namestring
+      1 +jsPostIncstruct{targetjsNode}
+      1 +jsMemberstruct{
+      1 +jsLitstruct{vjsValue}
+      1 +jsIndexstruct{obj,indexjsNode}
+      1 +jsIdentstruct{namestring}
+      1 +jsFuncExprstruct{
+      1 +jsCallNodestruct{
+      1 +jsAssignNodestruct{target,valuejsNode}
+      1 +isNewbool
+      1 +calleejsNode
+      1 +body[]jsStmt
+      1 +args[]jsNode
+      1 +"===","!==","=>","==","!=","&&","||","++",
+      1 +"(",")","{","}","[","]",";",",",".","=","!","+","-",":",
+--- 删除行清点 ---
+      3 -}
+      1 -varjsPuncts=[]string{"===","!==","=>","==","!=","&&","||","++",
+      1 -typejsPostIncstruct{targetjsNode}
+      1 -typejsMemberstruct{
+      1 -typejsLitstruct{vjsValue}
+      1 -typejsIndexstruct{obj,indexjsNode}
+      1 -typejsIdentstruct{namestring}
+      1 -typejsFuncExprstruct{
+      1 -typejsCallNodestruct{
+      1 -typejsAssignNodestruct{target,valuejsNode}
+      1 -params[]string
+      1 -objjsNode
+      1 -namestring
+      1 -isNewbool
+      1 -calleejsNode
+      1 -body[]jsStmt
+      1 -args[]jsNode
+      1 -"(",")","{","}","[","]",";",",",".","=","!","+","-",":"}
+===== [5] eol 自证：新字节无 CR、交件侧 i/lf =====
+CR_lines=0
+i/lf    w/lf    attr/text eol=lf      	cmd/wisp/panel_transport_35r2_test.go
+===== [6] 名册复量（交件侧，逐名） =====
+cmd/wisp/models.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+rc_list=0
+===== [7] 四枚 CRLF ＋ tools 枚：本笔写操作前后一字未动 =====
+internal/agent/approval/pending_read.go | wt_sha=ff26e84cbaf1663e2d5440a62b187e4f1e485cee1a4000f199f0fea7dd9d946f
+internal/agent/tools.go | wt_sha=14b2c067a21f713a54bad84857883a1520c7dccc3e3d0d9cde163e926405b0d9
+internal/risk/provenance.go | wt_sha=958364fa9775ab7a84256c4d56cec143b1d078f0c25a1ddfec858574552f6c53
+cmd/wisp/models.go | wt_sha=ad839c103367554e081b72be859112ae0396e9451810279942e52cce8ad42f99
+internal/tools/task_output_pointer_notice_errtext_174r7_test.go | wt_sha=005ec7d47ca197a464c4848ba900ce0cc926d16cd69f4b075176c0d07a1d12b1
