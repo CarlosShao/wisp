@@ -1,0 +1,20 @@
+=== LINUX 起手(ac0)⇄交件(final) 逐名作差 ===
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so
+    --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube
+    --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal
+--- FAIL: TestAnchorMissKeepsNonOverridableClassAndNeedL2
+--- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor
+--- 交件新增 ---
+--- PASS: TestAnchorMissHasNoWorldOnThisPlatform339
+=== WINDOWS 起手⇄交件（期望＝空＝名册逐字相同）===
+IDENTICAL
+=== 关键两枚＋绊线＋C26 的逐名色（final 两平台）===
+TestAnchorMissReasonNamesCandidateAndMissingAnchor           win-final-fullpkg-psnative PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor
+TestAnchorMissKeepsNonOverridableClassAndNeedL2              win-final-fullpkg-psnative PASS: TestAnchorMissKeepsNonOverridableClassAndNeedL2
+TestAnchorMissHasNoWorldOnThisPlatform339                    linux-final-fullpkg        PASS: TestAnchorMissHasNoWorldOnThisPlatform339
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg            linux-final-fullpkg        FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg            win-final-fullpkg-psnative FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+TestFileBaseNameClaimChangesNoClassOrReason                  linux-final-fullpkg        PASS: TestFileBaseNameClaimChangesNoClassOrReason
+TestFileBaseNameClaimChangesNoClassOrReason                  win-final-fullpkg-psnative PASS: TestFileBaseNameClaimChangesNoClassOrReason
+TestAnchorFallbackTeethPerAnchor336                          win-final-fullpkg-psnative PASS: TestAnchorFallbackTeethPerAnchor336
+TestFallbackBranchHasNoWorldOnThisPlatform336                linux-final-fullpkg        PASS: TestFallbackBranchHasNoWorldOnThisPlatform336

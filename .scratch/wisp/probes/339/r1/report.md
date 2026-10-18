@@ -4,6 +4,10 @@
 `d8c52982`，尺＝`git diff --name-only e6fd0f50 d8c52982 -- internal/risk/`＝**空**（仪器面逐字未动，读数同源）。
 写面只三处＝`internal/risk/anchor_miss_reason_334_test.go`＋同目录新增 `anchor_miss_reason_339_other_test.go`
 ＋`.scratch/wisp/probes/339/r1/**`＋票尾一条 bullet。⛔ 翻框（票 339 判据区七格一枚未动，尺见下）。
+★本腿七笔（每落一枚文件就 commit，⛔ 合笔）＝`7c279453` AC#0 基线／`7437ef88` 甲形落码（唯一 .go 笔）／
+`149b265a` 证据 bundle／`2bf64afa` 票尾 bullet／`5d1ae702` 末态门禁／`3a8f3852` 三把尺自证／`72c186c3` 更正 rm 自纠。
+尺①逐枚 `git show --name-only`⊆三处写面＝PASS（48 枚唯一路径、越界 0、`.go` 只 2 枚都在 `internal/risk/**` 测试面、
+正控打别腿 `7d9cf71a` 开火＝1；坏尺第一稿具名作废见 `logs/selfcheck-ruler1.log` 头两行）。
 
 ## AC#0 起手现跑（全部我自己建台件，⛔ 复用编排者那棵树）
 

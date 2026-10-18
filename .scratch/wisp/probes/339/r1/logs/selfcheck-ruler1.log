@@ -47,6 +47,20 @@ internal/risk/anchor_miss_reason_339_other_test.go
 == 5d1ae702ef 票 339 落地腿 339-r1·交件末态门禁四数原件尺� ==
 .scratch/wisp/probes/339/r1/logs/99-final-gates.log
   -> out-of-face=0  bad-go=0
+== 3a8f3852fe 票 339 落地腿 339-r1·三把尺自证件入库（尺①� ==
+.scratch/wisp/probes/339/r1/logs/.ph-pos-control
+.scratch/wisp/probes/339/r1/logs/selfcheck-ruler1.log
+.scratch/wisp/probes/339/r1/logs/selfcheck-ruler2-3.log
+.scratch/wisp/probes/339/r1/msg-gates.txt
+.scratch/wisp/probes/339/r1/msg-ticket.txt
+.scratch/wisp/probes/339/r1/scripts/selfcheck-ruler1.sh
+.scratch/wisp/probes/339/r1/scripts/selfcheck-ruler23.sh
+  -> out-of-face=0  bad-go=0
+== 72c186c343 票 339 落地腿 339-r1·更正 report 里那句 rm 自纠� ==
+.scratch/wisp/probes/339/r1/msg-reportfix.txt
+.scratch/wisp/probes/339/r1/msg-selfcheck.txt
+.scratch/wisp/probes/339/r1/report.md
+  -> out-of-face=0  bad-go=0
 ALL-5-COMMITS-FACES=PASS
-UNIQUE-PATHS-ACROSS-5-COMMITS=39
+UNIQUE-PATHS-ACROSS-5-COMMITS=48
 POSITIVE-CONTROL other-leg out-of-face=1 (must be > 0)

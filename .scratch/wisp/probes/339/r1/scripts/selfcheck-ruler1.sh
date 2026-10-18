@@ -10,7 +10,7 @@ PAT='^(internal/risk/anchor_miss_reason_(334|339)[a-z0-9_]*_test\.go|\.scratch/w
 # 判成越界（334 后面没有 "_.*_" 那一段）＝尺坏、⛔ 读成红；改正形后重打，正控仍会开火。
 : > "$OUT"
 ok=1
-for c in 7c279453 7437ef88 149b265a 2bf64afa 5d1ae702; do
+for c in 7c279453 7437ef88 149b265a 2bf64afa 5d1ae702 3a8f3852 72c186c3; do
   full=$(git rev-parse --short=10 "$c")
   echo "== $full $(git log -1 --format=%s $c | cut -c1-60) ==" >> "$OUT"
   git show --name-only --format="" "$c" | sed '/^$/d' >> "$OUT"
@@ -20,7 +20,7 @@ for c in 7c279453 7437ef88 149b265a 2bf64afa 5d1ae702; do
   { [ "$bad" -eq 0 ] && [ "$gonon" -eq 0 ]; } || ok=0
 done
 echo "ALL-5-COMMITS-FACES=$([ $ok -eq 1 ] && echo PASS || echo FAIL)" >> "$OUT"
-allpaths=$( { for c in 7c279453 7437ef88 149b265a 2bf64afa 5d1ae702; do git show --name-only --format="" "$c" | sed '/^$/d'; done; } | sort -u | wc -l)
+allpaths=$( { for c in 7c279453 7437ef88 149b265a 2bf64afa 5d1ae702 3a8f3852 72c186c3; do git show --name-only --format="" "$c" | sed '/^$/d'; done; } | sort -u | wc -l)
 echo "UNIQUE-PATHS-ACROSS-5-COMMITS=$allpaths" >> "$OUT"
 echo "=== 正控（尺必须会开火）＝同尺打 227-v1 的提交 7d9cf71a ==="
 probe=$(git show --name-only --format="" 7d9cf71a | sed '/^$/d' | grep -vcE "$PAT" || true)

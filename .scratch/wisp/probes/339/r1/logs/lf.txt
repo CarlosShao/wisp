@@ -1,0 +1,195 @@
+    --- PASS: TestAllowSideFunctionsCarryNoSubstringOperator/hostAllowlisted
+    --- PASS: TestAllowSideFunctionsCarryNoSubstringOperator/overrideApplies
+    --- PASS: TestAllowSideFunctionsCarryNoSubstringOperator/shellAllowlisted
+    --- PASS: TestArgvZeroClaimChangesNoShellVerdict/allowlisted-program-with-claim-in-its-directory
+    --- PASS: TestArgvZeroClaimChangesNoShellVerdict/claim-glued-onto-an-allowlisted-program-buys-nothing
+    --- PASS: TestArgvZeroClaimChangesNoShellVerdict/two-unlisted-programs-one-claiming
+    --- PASS: TestC26ExpansionMustNotRewriteOntoAnotherTree/leading_tilde_spelling
+    --- PASS: TestC26ExpansionMustNotRewriteOntoAnotherTree/percent_env_var_spelling
+    --- PASS: TestC26RewriteAccountIsRecorded/clean_absolute_is_not_marked
+    --- PASS: TestC26RewriteAccountIsRecorded/dollar_env_var
+    --- PASS: TestC26RewriteAccountIsRecorded/leading_home_tilde
+    --- PASS: TestC26RewriteAccountIsRecorded/percent_env_var
+    --- PASS: TestC26RewriteAccountIsRecorded/unexpandable_construct_is_not_marked
+    --- PASS: TestExfilSyncWritePosixSpellingInvariant/backslash_inside_a_POSIX_file_name
+    --- PASS: TestExfilSyncWritePosixSpellingInvariant/sync_root_through_missing_intermediate_ancestors
+    --- PASS: TestExfilSyncWritePosixSpellingInvariant/write_into_sync_root
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env*
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_*
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.*
+    --- PASS: TestFourChannelExfilSuite/clipboard.write
+    --- PASS: TestFourChannelExfilSuite/fs.write_into_sync_dir
+    --- PASS: TestFourChannelExfilSuite/notify_text
+    --- PASS: TestFourChannelExfilSuite/notify_url
+    --- PASS: TestFourChannelExfilSuite/web.search_query
+    --- PASS: TestHostClaimChangesNoNetworkVerdict/allowlisted-subdomain-with-claim-inside-a-label
+    --- PASS: TestHostClaimChangesNoNetworkVerdict/claim-glued-onto-an-allowlisted-domain-buys-nothing
+    --- PASS: TestNamedChannelParamEscape/[]string_payload
+    --- PASS: TestNamedChannelParamEscape/abbreviated_key
+    --- PASS: TestNamedChannelParamEscape/array_payload
+    --- PASS: TestNamedChannelParamEscape/byte_payload
+    --- PASS: TestNamedChannelParamEscape/deep_map_under_an_unknown_key
+    --- PASS: TestNamedChannelParamEscape/harmless_table_key,_tainted_extra_key
+    --- PASS: TestNamedChannelParamEscape/nested_object_payload
+    --- PASS: TestNamedChannelParamEscape/payload_under_another_name
+    --- PASS: TestNamedChannelParamEscape/renamed_query_key
+    --- PASS: TestNamedChannelParamEscape/table_key_still_gets_its_contract_label
+    --- PASS: TestNormalizationEndToEnd/bom/word-joiner
+    --- PASS: TestNormalizationEndToEnd/combining_mark
+    --- PASS: TestNormalizationEndToEnd/full-width
+    --- PASS: TestNormalizationEndToEnd/lowercase
+    --- PASS: TestNormalizationEndToEnd/soft-hyphen
+    --- PASS: TestNormalizationEndToEnd/whitespace_split
+    --- PASS: TestNormalizationEndToEnd/zero-width_split
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/bom
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/combining_marks
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/full-width_+_ignorable_mix
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/soft_hyphen
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/word_joiner
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/zwnj+zwj
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/zwsp
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/Contains
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/ContainsAny
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/ContainsRune
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/Index
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/IndexAny
+    --- PASS: TestSubstringOperatorCounter216IsNotBlind/lookalikes-are-not-operators
+    --- PASS: TestSyncRegistryProbeTable/dropbox_installer_path
+    --- PASS: TestSyncRegistryProbeTable/duplicate_accounts_dedupe
+    --- PASS: TestSyncRegistryProbeTable/empty_hive_yields_nothing
+    --- PASS: TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/%APPDATA%\Microsoft\Protect\**
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/%APPDATA%\wisp\config.toml
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/%LOCALAPPDATA%\Microsoft\Credentials\**
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/.git/config
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/browser_credential_store
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.aws/credentials
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.git-credentials
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.kube/config
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.ssh/**
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.ssh/_dir_itself
+    --- PASS: TestWriteGateEveryPathTargetJudged/casing_decoy:_Path_hides_the_sync_target_from_an_exact-match_scan
+    --- PASS: TestWriteGateEveryPathTargetJudged/decoy_path_+_real_dest
+    --- PASS: TestWriteGateEveryPathTargetJudged/file+destination,_no_tool_name
+    --- PASS: TestWriteGateEveryPathTargetJudged/path-shaped_key_with_no_checkable_value
+    --- PASS: TestWriteGateEveryPathTargetJudged/reversed_order
+    --- PASS: TestWriteGateEveryPathTargetJudged/single_sync_dest_only
+    --- PASS: TestWriteGateEveryPathTargetJudged/three-way:_path+dest_non-sync,_file_in_sync_root
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+--- PASS: TestAllowSideFunctionsCarryNoSubstringOperator
+--- PASS: TestAnchorMissHasNoWorldOnThisPlatform339
+--- PASS: TestArgvZeroClaimChangesNoShellVerdict
+--- PASS: TestC26ExpansionMustNotRewriteOntoAnotherTree
+--- PASS: TestC26RewriteAccountIsRecorded
+--- PASS: TestConcurrentMarkInspect
+--- PASS: TestDecisionGoldenSnapshots
+--- PASS: TestDeepNestingFailsClosedNotSilent
+--- PASS: TestDetectorUnknownToolScansEverything
+--- PASS: TestDisposalScopeClearsTaints
+--- PASS: TestDoubleSlashSpellingIsNotUNC
+--- PASS: TestExfilSyncWritePosixSpellingInvariant
+--- PASS: TestFallbackBranchHasNoWorldOnThisPlatform336
+--- PASS: TestFileBaseNameClaimChangesNoClassOrReason
+--- PASS: TestFourChannelExfilSuite
+--- PASS: TestFragmentHashCollisionCannotFakeHit
+--- PASS: TestFragmentIndexShortSourceNeverMatches
+--- PASS: TestFragmentMatchAcrossTransforms
+--- PASS: TestFragmentMatchCJK
+--- PASS: TestFragmentMatchExactBoundary
+--- PASS: TestFragmentThresholdClampedToContractFloor
+--- PASS: TestFragmentThresholdStricterAllowed
+--- PASS: TestFusionR4BlocksSessionOverride
+--- PASS: TestFusionSingleDenyBeatsAnyConfirm
+--- PASS: TestFusionTakesMaxSeverity
+--- PASS: TestHostClaimChangesNoNetworkVerdict
+--- PASS: TestInspectUnknownScopeIsEmptyStore
+--- PASS: TestLLMParaphraseResidual
+--- PASS: TestMarkEmptyAfterNormalization
+--- PASS: TestMarkInspectSourceAttribution
+--- PASS: TestMarkNegativeNoTaintNoHit
+--- PASS: TestMarkUnknownSourceToolFailClosed
+--- PASS: TestNamedChannelParamEscape
+--- PASS: TestNormalizationEndToEnd
+--- PASS: TestNormalizeTaintContractForm
+--- PASS: TestNormalizeTaintDropsIgnorableChars
+--- PASS: TestOverrideKeyKeepsPosixBackslashesDistinct
+--- PASS: TestOverrideKeySpelledWithClaimDoesNotUnlock
+--- PASS: TestPointer183AlmostPathInSameHostMarkStillHits
+--- PASS: TestPointer183BodySecretOutsideSpanStillHits
+--- PASS: TestPointer183DeclaredPathAbsentFromBodyStillHits
+--- PASS: TestPointer183ForeignMarkCarryingSamePathStillHits
+--- PASS: TestPointer183PathAppearingTwiceInBodyStaysExempted
+--- PASS: TestPointer183RefereeControlBodyWithoutTwinIsClean
+--- PASS: TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted
+--- PASS: TestPointer183WorstCaseOfTheLandedExemptionIsPinned
+--- PASS: TestPointer185AModelNominatedFileIsNotOnTheRoster
+--- PASS: TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan
+--- PASS: TestPointer185ForeignContentCarryingTheHostPathStillHits
+--- PASS: TestPointer185OneRuneDifferentPathStillHits
+--- PASS: TestPointer185RosterDiesWithTheMarksItWasDerivedFrom
+--- PASS: TestPointer185RosterDoesNotCrossScopeIDs
+--- PASS: TestPointer185SameBasenameOtherDirectoryStillHits
+--- PASS: TestPointer185SecondRereadOfAHostArtifactIsClean
+--- PASS: TestPointer185SiblingArtifactInSameDirectoryStillHits
+--- PASS: TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt
+--- PASS: TestR4EndToEndViaAssessor
+--- PASS: TestR9PanicInSubAssessorFailsClosed
+--- PASS: TestR9PanicInWiredDependencyFailsClosed
+--- PASS: TestResidualLimitsAreLoggedNotSilent
+--- PASS: TestResolveCanonicalIsPlatformShaped
+--- PASS: TestResolveKeepsSeparatorsOutOfPosixNames
+--- PASS: TestResolvePerCallBudget
+--- PASS: TestRuleBatchScaleR7
+--- PASS: TestRuleDeclaredR1
+--- PASS: TestRuleIrreversibleR8
+--- PASS: TestRuleNetworkR5
+--- PASS: TestRulePathAllowlistR2
+--- PASS: TestRuleSensitivePathR3
+--- PASS: TestRuleShellR6
+--- PASS: TestRuleTaintR4
+--- PASS: TestScopeCloseIsIdempotent
+--- PASS: TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible
+--- PASS: TestScopeCloseRefusesAnotherOwnersRegistration
+--- PASS: TestScopeIDGrantsNoPower
+--- PASS: TestScopesNeverInherit
+--- PASS: TestSensitiveSourceSetComplete
+--- PASS: TestShapeAFExclusionDiesWithScopeClose
+--- PASS: TestShapeAHostReReadOfDeclaredPathIsClean
+--- PASS: TestShapeAOrderOneSpanLocatedAfterNormalization
+--- PASS: TestShapeAW1RestOfHostMarkStillIndexed
+--- PASS: TestShapeAW2ForeignMarkCarryingSamePathStillHits
+--- PASS: TestShapeAW3NeverMintedSiblingUnderSameDirStillHits
+--- PASS: TestShapeAW4PositionalExclusionNeverLeavesHostMark
+--- PASS: TestShapeAW5EmptyCheckPrecedesExclusion
+--- PASS: TestSubstringOperatorCounter216IsNotBlind
+--- PASS: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+--- PASS: TestSyncAncestorLegStillMatchesPlainSameTreeWrite116
+--- PASS: TestSyncAncestorWalkVerifiesNativeChain
+--- PASS: TestSyncDefaultLocationProbe
+--- PASS: TestSyncDetectionOnThisMachine
+--- PASS: TestSyncDotDotTailFailsClosed
+--- PASS: TestSyncDropboxHostDBConfig
+--- PASS: TestSyncEnvConfiguredRoots
+--- PASS: TestSyncFallbackNotDisarmableByWeakRoot
+--- PASS: TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+--- PASS: TestSyncFixtureFallbackAndMatch
+--- PASS: TestSyncMembershipDecidesOffProfilePosix
+--- PASS: TestSyncNoGradeIsConfirmedOnPosix
+--- PASS: TestSyncNormalNewFileWriteNotFlagged
+--- PASS: TestSyncRegistryProbeIsAStubHere
+--- PASS: TestSyncRegistryProbeTable
+--- PASS: TestSyncRootsIntrospection
+--- PASS: TestSyncSuspectFallbackIsComponentBounded
+--- PASS: TestSyncSuspectFallbackWhenUndetectable
+--- PASS: TestSyncUnresolvablePathFailClosed
+--- PASS: TestSyncUnverifiedRootKeepsFallback
+--- PASS: TestSyncWriteNegative
+--- PASS: TestTierAAnchorsMatchNativeSpelling
+--- PASS: TestVolumeInvariantSpellingsVolumeLess308
+--- PASS: TestWriteGateAllPathsNonSyncStaysExempt
+--- PASS: TestWriteGateEveryPathTargetJudged
+--- PASS: TestWriteGateNotSelectedByPayloadKey
+--- PASS: TestWriteGatePlainLocalWriteNotFlagged
+--- SKIP: TestC26RewrittenSyncRootDoesNotDisarmSuspectNet

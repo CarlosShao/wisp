@@ -1,0 +1,1 @@
+票 339 落地腿 339-r1·report 头补七笔名册＋名册逐名作差尺钉成形入库（roster-diff.sh＋.log＝LINUX 少 2 顶层＋3 子用例、多 1 枚绊线；WINDOWS 起手⇄交件逐字 IDENTICAL；关键六枚两平台逐名色点名＝两枚 334 Windows PASS/Linux 无档、绊线 Linux PASS、C26 两平台同 FAIL 存量、216 与 336 牙/绊线两平台全 PASS＝⛔ 被本腿动）＋作差中转四枚（lb/lf/wb/wf.txt，⛔ 删、入库）＋尺①改正形重打件。
