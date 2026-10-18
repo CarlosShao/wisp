@@ -1,0 +1,96 @@
+166-r1 · 06 · 停手上报＋必答 (i)(ii)(iii)（★"最小出口"的另一半必然落 cmd/wisp／internal/panel＝本波零写腿面 ⇒ 按派单 §射程边界停手，⛔ 自行扩面）
+================================================================
+本腿状态＝装配半边已装好并入库，消费那一跳＝具名缺口上交编排者排第二波。
+AC#2 判语在本腿交件后仍＝**不成立**（生产调用者枚数交件侧现量仍 0：
+git grep -n "session\.NewManager" -- "*.go" ⇒ 0 命中、rc=1，见 03 件第二层尺）。
+★话要说准（lead 收件点名、本腿自认）：manage.go:60 那枚
+  var _ ManageStore = (*memory.Store)(nil)
+是【编译期守卫】＝买到的只是"接口对得上、装配那一行随时可写、漂移会先在这里炸构建"；
+它⛔ 是"有人调用它"。Go 不为未使用的方法/构造报错（本仓入账多次），所以本件通篇
+⛔ 出现"已接线"三字，只用"可装配／已装半边／待消费"。
+
+──────────────────────────────────────────────
+必答 (i) 装配点形状＝什么、下一波谁消费（具名 file:line）
+──────────────────────────────────────────────
+形状＝三段，都在 internal/session 内（＝本腿写面），合起来叫"宿主一行即装"：
+  1) 编译期守卫（产码面）：internal/session/manage.go:60
+       var _ ManageStore = (*memory.Store)(nil)
+     语义＝宿主从 memory.Open 拿到的那枚【具体类型】无需适配器即满足 ManageStore。
+  2) 构造入口（既有、未改一字）：internal/session/manage.go:81（NewManager(ManagerOptions)；基线
+     c11163c8 上同一函数在 :68＝本腿守卫插了 13 行所致，两枚号都在这）
+     ＋ ManagerOptions{Store, Mint, Now}（:73-77 区段）——宿主只喂 Store 即可（Mint/Now 有安全默认）。
+  3) 运行期"装配可达"用例四枚（经接口构造＝宿主调用会撞的同一编译边）：
+     internal/session/ticket166r1_assembly_test.go
+       :54  var ms ManageStore = store      ← ★宿主调用点那一次隐式转换，这里显式写出来
+       :73  TestAC2OutletListAssembled      （列：时间序＋workspace 过滤＋archived 掩码）
+       :107 TestAC2OutletSearchAssembled    （搜：标题＋正文，断言只比命中枚数＝166-v1 必答 1 口径）
+       :145 TestAC2OutletRenameAssembled    （改名：只动 title 列，created_at/正文零扰＋改后可搜）
+       :178 TestAC2OutletArchiveUndoAssembled（归档带撤销：archived_at 打标→清除、正文零删）
+下一波消费它的人（＝写 cmd/wisp 的那条腿，具名落点）：
+  cmd/wisp/run.go:463  mem, err := memory.Open(s.dataDir)   ← 宿主手里那枚 *memory.Store 今天就在
+  cmd/wisp/run.go:468  rt.store = mem
+  cmd/wisp/run.go:491  ledger, lerr := session.NewLedger(session.LedgerOptions{ … Store: mem … })
+      ↑ 同域正控：装配根构造 session 包对象再存进 runtime 形状【本仓已有先例、尺看得见】（02 件 B3）。
+  消费行＝在 run.go:491 同段之后加一行（形状，⛔ 本腿写）：
+      sessMgr, err := session.NewManager(session.ManagerOptions{Store: mem})
+  runtime 形状字段位＝cmd/wisp/run.go:276-282（store/session 两枚字段所在的 struct 区段）。
+
+──────────────────────────────────────────────
+必答 (ii) "必须 cmd/wisp／internal/panel"那一半＝具体最小缺口
+──────────────────────────────────────────────
+判语：AC#2 的"**出口**"两字（166-v1 §必答 2 的分量所在）在 Go 生产面上只有两种读者，
+      两种都落在本波 ⛔ 写面 ⇒ 这就是停手上报的那一格。
+甲｜CLI 出口（票面 AC#1 命令档用的就是这一形：wisp sessions / wisp history）
+  最小缺口＝三处、合计约 15-25 行＋一枚 handler 文件 40-80 行：
+   ① cmd/wisp/main.go:89-124 分发器加一枚 case（今天十枚名册⛔ sessions，起手件尺二现量 0 命中）
+        case "sessions":  return s.runSessions(args[1:])
+   ② cmd/wisp/run.go 装配位加消费行（必答 (i) 那一行）＋runtime 字段一枚：约 5-8 行。
+   ③ 新 handler（cmd/wisp/sessions.go 一族）：解析 --workspace/--rename/--archive/--undo，
+      调 sessMgr.List/Search/Rename/Archive/Unarchive，打 stdout：约 40-80 行。
+  为什么绕不开（⛔ 本腿扩面的理由，逐条）：
+   - Manager 的构造必须喂一枚 ManageStore，而全仓唯一的 *memory.Store 装配根＝cmd/wisp/run.go:463
+     （＋cmd/wisp/providers.go:180 的只读装配）。internal/session 包内自己 memory.Open 第二枚＝
+     派单 §禁区"⛔ 新造存储"（D35 那张表定过）＋两枚写手同一 sqlite 文件的并发债。
+   - 包内 init()/全局变量自装配＝仍然没有任何宿主入口，判据尺（生产调用者枚数）照旧 0 命中，
+     且属"为绕开停手上报而自造形状"。
+   - 在 internal/session 里加一枚"假装是 cmd 的"导出名/JSON 键＝派单 §判据形状 ⛔ 明令。
+乙｜面板出口（票面 §关联＝"本票是票 145 的上游"）
+  缺口＝internal/panel/pump.go:138 type PumpSources ＋ internal/panel/composer.go:57 type Snapshot
+        加会话读者字段（＋快照 JSON 键）。★派单 §射程边界逐字点名：⛔ 新导出 panel.*、
+        ⛔ 新 JSON 键 ⇒ 本腿零尝试；且 internal/panel/** 本波零写腿。
+丙｜DAO 级分叉用例（166-v1 §上交料 5 顺手量到的单层把守）＝本可落在 internal/memory/dao_session.go，
+     但派单 §禁区逐字"要动它＝上报"，本腿⛔ 动一字，只在此具名转交：
+     建议第二波补一枚 DAO 级"fork ⛔ 吞原件"用例（manage_test.go:241 的形状下沉一层）。
+丁｜★与派单前提不符的一处，具名交回（⛔ 我抹平）：派单 §写面 4) 说
+     "AppendSessionTurn 不刷新 session.updated_at 属编排者另立的票 ⇒ ⛔ 顺手做"。
+     盘上现量：这一格【已经做了】＝internal/memory/dao_session.go:300
+       `UPDATE session SET updated_at=? WHERE id=?`（同事务，票 326 AC#1 装）
+     ＋用例 internal/session/manage_test.go:185 TestSessionAppendTurnMovesItBackToTheFront。
+     本腿照派单⛔ 动一字，只把"另立的票在盘上已结"这一读数上交，避免第二波重复装它或误判次序缺陷仍在。
+
+──────────────────────────────────────────────
+必答 (iii) 四件"未修码响不响"＝逐字成对读数（详件＝02 ⇄ 03，同台面 GOTMPDIR=D:\tmp\wisp\20261018\166r1\gotmp）
+──────────────────────────────────────────────
+一把尺两个方向（★两层都要报，⛔ 只报绿）：
+  层一（用例存在性尺：go test -run "^<名>$" -count=1 -timeout 30m -v，四数逐枚点名）
+    列 List        基线 c11163c8＝rc=0 RUN=0 PASS=0 FAIL=0 SKIP=0 no-tests-to-run=2 ⇒ ★响
+                    交件 7404c42f＝rc=0 RUN=1 PASS=1 FAIL=0 SKIP=0 ⇒ --- PASS: TestAC2OutletListAssembled (0.06s)
+    搜 Search       基线＝rc=0 RUN=0 PASS=0 FAIL=0 SKIP=0 no-tests-to-run=2 ⇒ ★响
+                    交件＝rc=0 RUN=1 PASS=1 FAIL=0 SKIP=0 ⇒ --- PASS: TestAC2OutletSearchAssembled (0.05s)
+    改名 Rename     基线＝rc=0 RUN=0 PASS=0 FAIL=0 SKIP=0 no-tests-to-run=2 ⇒ ★响
+                    交件＝rc=0 RUN=1 PASS=1 FAIL=0 SKIP=0 ⇒ --- PASS: TestAC2OutletRenameAssembled (0.06s)
+    归档带撤销      基线＝rc=0 RUN=0 PASS=0 FAIL=0 SKIP=0 no-tests-to-run=2 ⇒ ★响
+                    交件＝rc=0 RUN=1 PASS=1 FAIL=0 SKIP=0 ⇒ --- PASS: TestAC2OutletArchiveUndoAssembled (0.06s)
+    基线正控（既有用例 TestSessionListByWorkspace，同尺）＝RUN=1 PASS=1 FAIL=0 ⇒ 尺灵，
+      上面四枚 RUN=0 是"用例真不在"，⛔ 尺坏（台面故障那形已排）。
+  层二（生产可达尺＝AC#2 判语那格：git grep -n "session\.NewManager" -- "*.go"）
+    基线 c11163c8＝命中 0 行、rc=1、stderr 0 字节 ⇒ ★响（正控 func NewManager 基线命中 manage.go:68＝交件后同函数在 :81）
+    交件 7404c42f＝命中 0 行、rc=1 ⇒ ★仍响＝接线缺口未闭（缺口＝必答 (ii) 的甲／乙两处，在别的写面）
+  成对整包色（go test ./internal/session/ ./internal/memory/ -count=1 -timeout 30m -v，两临时根台面）
+    基线＝两台面均 RUN=117 PASS_TOP=63 FAIL_TOP=0 SKIP=2
+    交件＝两台面均 RUN=121 PASS_TOP=67 FAIL_TOP=0 SKIP=2 ＝ 恰多 4 RUN／4 顶层 PASS＝我四件，⛔ 弄红任何东西
+  牙（04 件）：T1 Unarchive 空装 ⇒ archive-undo 用例红（assembly_test.go:209/:212 逐字）；
+    T2 List 空返回 ⇒ list 用例红（:87/:90/:98/:101 逐字）；两发落点不同、串行、当场还原，
+    还原 SHA 各＝pristine 0577B500C1FC705EE0246AB6B87D74782DFBB37831930550774CBD645ABC7E6D。
+    ⇒ 四枚用例对"出口装死"有牙；⛔ 拿这层绿当"已接线"凭据（那只在层二读）。
+================================================================
