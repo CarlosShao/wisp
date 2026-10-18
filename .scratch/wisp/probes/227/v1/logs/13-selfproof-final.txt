@@ -1,0 +1,37 @@
+227-v1 交件自证终尺（本腿逐枚现跑，16:3x；★两枚尺坏具名作废＋改正形）
+
+[尺①] 本腿 14 枚提交逐枚 `git show --name-only`＝每枚 paths=1、三处写面之外=0、.go=0；
+  合计 枚数14／路径14／越界0／.go 0。
+  正控（尺活）＝同一把 .go 尺打 227-r1 前三笔并集 ⇒ 读 **3**；
+  负控（尺活）＝越界尺故意只放 `probes/227/v1/logs/0` 当前缀打本腿 `05b0b61b` ⇒ 读 **1**（尺会红）。
+  名册＝d1da6386 daec56ac 73dac93c 69ce6600 57eb72cf 9ac4adef db6c6156 b578fa71 b7eee814 1d1be1d4 3fae924f 171bc0d0 05b0b61b 8ce85b4f
+  ★⛔ 主题前缀当本腿名册尺（同前缀吃进同名外腿笔＝14 枚现量：本腿 8＋外腿 6，起手侧尺）⇒ 改逐枚路径尺。
+
+[尺② 第一发＝坏尺，具名作废] 那两枚"正控"（README.md／HANDOVER.md）实测都读 0 ⇒ ⛔ 证这把尺活；
+  ⛔ 用 0 当"尺坏"的证据，也⛔ 用 0 当"尺活"的证据（同一枚道理＝"报 0 命中前先跑一枚已知存在的正控"）。
+  ★改正形＝仓外造一枚必含占位的正控件（`TODO`/`FIXME`/`占位` 三行）⇒ 同尺读 **3**＝尺活；
+  再打两枚判语件＝`docs/evidence/s1/227-v1-verdict.md`(外腿的) 命中 0 ⇄ 本腿 `12-final-verdict-myleg.md` 命中 0；
+  负控 `[Z][Z][Z]absent-token-9x7`＝0。件⛔ 入库⛔ 删（只建不删）。
+  0 字节尺＝本腿写面全量 **0 枚**；★分节符 U+00A7 第一发读"3 枚"＝**误归因**（同目录共存着同名外腿的件，
+  那把尺扫了全目录）⇒ 改正＝逐枚只扫本腿 13 枚（12 枚 logs＋1 枚判语）＝**§ 命中 0、每枚字节非 0**（逐枚清单见本件末）；
+  同目录非本腿件里有 § 的具名⛔ 算本腿账（12-ac5…/14-a1033-extract/16-ac5-internal-base-full/r0-leg-report-copy-read/tree-341/tree-always_write…/tree-config_reload… ＝外腿件，本腿⛔ 动）。
+  绝对路径＝本腿判语全文 D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\227\v1\12-final-verdict-myleg.md（18,975 字节／71 行）
+  派单指定那枚 docs/evidence\s1\227-v1-verdict.md＝18,481 字节／36 行＝**外腿字节**，本腿 14 枚里命中 `docs/evidence` 的枚数＝**0**（＝⛔ 动过，自证）。
+
+[尺③ 决定性那把尺逐字]
+  起手侧（基线锚 feac8f77 仓外树原样）＝writeguard.go sha256 bf82226988b83fdc… ；整包四数 RUN=185 PASS_TOP=104 FAIL_TOP=0 SKIP=0
+  交件侧（锚 bcf90e06 仓外树原样）＝四枚 sha256 逐字＝
+     writeguard.go efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+     writeguard_226_test.go 49960da670dbe1350478a7f710900b52a5127dcfc24735250be1e4104cbef9b8
+     manager_test.go 201dc786570dbb2ffeaf8cc09a6c7bc48cb1ee6047b9f2f28a02e18163aa56a1
+     writeguard_handedit_227_test.go 9b430e3b68ad3be3d5692972faa10364f71c248a80f66dc452dda4836ac87edb
+  六枚定向（五枚 227 新用例＋那枚 :393 既有用例）逐名 --- PASS，SIX_RC=0；整包四数 RUN=190 PASS_TOP=109 FAIL_TOP=0 SKIP=0
+  决定性突变那一发的 file:line 逐字（本腿的树）＝`internal/config/writeguard_226_test.go:404`＋`:407`，`RED_RC=1`，
+    突变态整包 `190/105/4/0`；还原 sha256＝201dc786…56a1 逐字回原 ⇒ 复跑 --- PASS（`RESTORED_RC=0`）。
+  票面尺（交件侧终量）＝判据区未勾 **6**／已勾 **0**／行数 54＝与起手逐字同 ⇒ **六格一枚没翻**、`Status:` 行逐字未动。
+  共享工作树零 .go 自证＝本腿 14 枚 .go 命中 0；`git diff --quiet HEAD -- writeguard.go ⇄ handedit_227_test.go`＝YES/YES（同串＝本腿⛔ 动）；
+    工作树里列出的 `M internal/risk/anchor_miss_reason_334_test.go`⇄一批 `??` 探针件＝**别腿（339-r1）/存量在飞字节**，本腿⛔ 碰、⛔ 代提、⛔ 记进自己名册。
+
+[本腿 13 枚件逐枚 §／字节（改正尺现量）]
+  00 2533／01 2369／02 3142／03 3775／04 5077／05 1921／06 4050／07 7448／08 5589／09 6590／10 1853／11 4106 各 §=0；
+  12-final-verdict-myleg.md 18975 §=0。
