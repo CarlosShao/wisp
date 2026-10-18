@@ -1,0 +1,30 @@
+227-v1 起手三把尺（终裁腿自己现跑，2026-10-18 15:0x，全部＝量的）
+
+[尺1] 锚＝`git log -1 --format=%H`
+  e6fd0f5051812a23c72db444d12d76b4d27285a7  (Sun Oct 18 14:55:40 2026 +0800)
+  分支＝dev；本腿取件一律用具名提交树（git show <rev>:<path>／git grep <pat> <rev>／git archive）。
+
+[尺2] AC 框数＝`grep -c '^- \[ \] \*\*AC#' <票面>`（判据区射程，⛔ 全档计数）
+  未勾＝6  已勾（`- \[x\] \*\*AC#`）＝0
+  六格逐名所在行＝26/27/28/29/30/31（`grep -n '^- \[.\] \*\*AC#'` 全量输出见 00b 段）
+  污染对照＝`grep -c '^[[:space:]]*- \[ \]'` 全档＝6（本票票尾那条 bullet 里没有 checkbox 行，两把尺同数＝这枚票面暂无污染）
+
+[尺3] 227-r1 枚数＝8 笔（派单存档里 head 写的 14 笔＝编排者已具名更正，真数 8）
+  b72d7391 12:02 AC#1③＋AC#2甲·三句日志字面串说实话        -> internal/config/writeguard.go (1 path, .go 1)
+  3b8c114e 12:04 AC#1＋AC#2·常驻用例                        -> internal/config/writeguard_handedit_227_test.go (227/0)
+  dd0e489d 12:21 定稿用例件                                  -> 同上 (52/84)
+  6da21d4a 12:25 report＋七枚 logs 入库                      -> .scratch/wisp/probes/227/r1/** (9 paths)
+  32a70e2f 12:25 票尾一条 bullet                             -> .scratch/wisp/issues/227-*.md (1 path)
+  9f5b0022 12:30 名册尺更正＋交件侧终量门禁＋report 收口      -> 本件＋logs/c8…c11 (5 paths)
+  3cda0aef 12:32 AC#4 终尺 c12 入库                          -> 本件＋logs/c12 (2 paths)
+  bcf90e06 12:38 必答(iv)＋AC#4 report 终收口                 -> .scratch/wisp/probes/227/r1/report.md (1 path)
+  合计 21 枚路径，其中 .go＝3 枚（writeguard.go ×1 ＋ handedit_227_test.go ×2）
+
+[尺3b] 越界尺（改正形，⛔ `grep -c "^\."`）＝
+  for c in <8笔>; do git show --name-only --format= $c | grep -vcE "^(internal/config/|\.scratch/wisp/probes/227/r1/|\.scratch/wisp/issues/227-)"; done
+  逐笔之外字节＝0 0 0 0 0 0 0 0，合计 0
+  正控一＝同一把尺的允许前缀里不放 .go，b72d7391 读到 1（尺能开火）
+  正控二＝同一把尺读 6da21d4a 允许前缀只留 probes/227/r1 ⇒ 之外＝0（report 与 logs 都在册）
+
+[尺4] 归属核正：⛔ 本腿不是 227-r1（产码＋仪器）、⛔ 不是 226-v1／226-v2（票 226 判语）。
+  本腿写面只三处：docs/evidence/s1/227-v1-verdict.md ＋ .scratch/wisp/probes/227/v1/** ＋ 票 227 尾一条 bullet。
