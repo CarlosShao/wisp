@@ -1,0 +1,198 @@
+
+### 322-r2 cmd/wisp started 2026-10-18 11:08:05 +08:00 HEAD=6ef91d756a06139ce127cbff13ee75195ba9f648
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+    0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+      package-line: 
+      --- top FAIL names (unique):
+        (none)
+      --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=2 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+        0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+          package-line: 
+          --- top FAIL names (unique):
+            (none)
+          --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    0
+=== cwisp-full-D rc=0 filter='' GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=2 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+              package-line: 
+              --- top FAIL names (unique):
+                (none)
+              --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+        0
+    0
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+    0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+      package-line: 
+      --- top FAIL names (unique):
+        (none)
+      --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=2 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+        0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+          package-line: 
+          --- top FAIL names (unique):
+            (none)
+          --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    0
+=== cwisp-full-C rc=0 filter='' GOTMPDIR=unset (默认 TMP=C:\Users\swq\AppData\Local\Temp = C 卷) tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=2 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+              package-line: 
+              --- top FAIL names (unique):
+                (none)
+              --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+        0
+    0
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+    0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+      package-line: 
+      --- top FAIL names (unique):
+        (none)
+      --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=2 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+        0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+          package-line: 
+          --- top FAIL names (unique):
+            (none)
+          --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    0
+=== cwisp-estate-resident rc=0 filter='Resident' GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=2 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+              package-line: 
+              --- top FAIL names (unique):
+                (none)
+              --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+        0
+    0
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+    0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+      package-line: 
+      --- top FAIL names (unique):
+        (none)
+      --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=2 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+        0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+          package-line: 
+          --- top FAIL names (unique):
+            (none)
+          --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    0
+=== cwisp-estate-live rc=0 filter='TestLive' GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=2 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+              package-line: 
+              --- top FAIL names (unique):
+                (none)
+              --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+        0
+    0
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+    0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+      package-line: 
+      --- top FAIL names (unique):
+        (none)
+      --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=2 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+        0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+          package-line: 
+          --- top FAIL names (unique):
+            (none)
+          --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    0
+=== cwisp-estate-deathpoints rc=0 filter='TestPanelThreadIsSTAAndExitsCleanly|TestAC13BringUpSurvivesAReusedThreadQuit' GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=2 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+              package-line: 
+              --- top FAIL names (unique):
+                (none)
+              --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+        0
+    0
+### done 2026-10-18 11:08:07 +08:00

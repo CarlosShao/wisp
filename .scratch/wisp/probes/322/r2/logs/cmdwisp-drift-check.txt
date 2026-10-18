@@ -1,0 +1,7 @@
+cmd/wisp drift ruler, re-run at 11:0x per orchestrator note (1) BEFORE the gated shots
+HEAD at run time  : 6ef91d756a06139ce127cbff13ee75195ba9f648 (10:56, my own report commit)
+cmd/wisp tree c11163c8 : 54efbbbf2017a37014c219c15587f878a9b29bcc
+cmd/wisp tree HEAD     : 54efbbbf2017a37014c219c15587f878a9b29bcc  (SAME -> old tree still valid)
+export tree vs HEAD cmd/wisp : 139 files each, Compare-Object diff = 0 lines
+ruler = git ls-tree -r --format=%(objectname) %(path) HEAD -- cmd/wisp
+        vs git hash-object per file in D:\tmp\wisp\20261018\322r2\head.RJNBgS\cmd\wisp

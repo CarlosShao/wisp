@@ -1,0 +1,64 @@
+票 322 收尾腿 322-r2·★头号活补上＝`cmd/wisp` 那一发（编排者 11:0x 放行后起跑）
+
+入库＝`cmdwisp-readings.md`（117 行、0 枚 CR＝LF）＋`cmd-wisp.ps1` 第三版＋`logs/` 那一发全部正文
+（成对两枚临时根台面整包 ⇄ 三档定向 ⇄ 补正那发 `-tags winlive`）＋故障留底六枚＋`cmdwisp-drift-check.txt`。
+
+**起跑前置（裁定①的注意①）**：漂移尺复跑＝`cmd/wisp` 树对象 `c11163c8`＝现 `HEAD`＝`54efbbbf` 同一枚，
+导出树与现 HEAD 逐枚比＝139 枚文件、差 0 行 ⇒ 旧树仍等于现锚字节，读数有效（⛔ 重新认锚）。
+
+**整包那一发（默认档，两台成对；裁定②⒜＝只作台面终态记录）**：
+`cwisp-full-D` rc=1 `RUN=448 PASS_TOP=322 FAIL_TOP=8 SKIP=3` 483.7s（GOTMPDIR=gtD·D 卷）
+`cwisp-full-C` rc=1 `RUN=448 PASS_TOP=323 FAIL_TOP=7 SKIP=3` 445.6s（默认 TMP=C 卷）
+台面故障尺（`0xc0000135`／`build failed`／`no tests to run`／`setup failed`）两台全 0。
+这一回两台都跑到终点、**没有整进程死亡**。相抵尺（两台同一形）＝`=== RUN` 行 448 ＝ 顶格 333 ＋
+子测试（名字含 `/`）115；判定行 448 ＝ 顶格 333 ＋ 缩进 115；顶格 RUN 名去重 333 ⇄ 顶格判定名去重 333
+＝未判定 **0 枚**。顶格内部另一枚相抵＝D 台 `PASS_TOP 322 + FAIL_TOP 8 + SKIP 3 = 333`、
+C 台 `323 + 7 + 3 = 333`，两台同值（⛔ 拿 `RUN=448 − PASS_TOP=322` 那种跨尺相减当"失踪 126 枚"）。
+两台红名册差集只一枚＝`TestAC2SealNoticeLandsInTheRunLegLogFile`（D 红 C 绿，红句
+`logsink_windows_test.go:175: records naming "winsec: seal cleared principals…" = 2, want 1`）；
+SKIP 名册两台逐字相同 3 枚。
+
+**estate（裁定②⒜＝AC#4 以此为准）**：
+`cwisp-estate-resident` rc=0 `31/22/0/0`（顶格 22＋子测试 9，未判定 0）；
+`cwisp-estate-deathpoints` rc=0 `2/2/0/0`＝228-r3b 具名那两枚死亡点定向复跑都绿；
+`cwisp-estate-live` 第一发 `0/0/0/0`＋`[no tests to run]`＝台面故障、⛔ 计入判据
+（根因现读＝`TestLive*` 六件首行全是 `//go:build windows && winlive`，我台件⛔ 带 `-tags`）；
+补正那发 `cwisp-estate-live-winelive` rc=1 `RUN=12 PASS_TOP=6 FAIL_TOP=6 SKIP=0` 93.4s，
+六枚红句逐字含 `idle live hot key set = 0 ([{Name:summon … Status:occupied by another app
+Err:Hot key is already registered.])`＝本机有常驻实例占着热键（尺＝`Get-Process wisp` 现量 PID 21892、
+`StartTime 2026-10-15 19:03:14`，起于本腿这一发之前）；`228-resident-ball-v1.md:151-153` 把
+"hotkeys live 0/4" 写成一枚会红的判据，台账 `:17005`／`:18192` 已具名这一族＝本机真窗／真麦／驻留族
+⛔ 由本票归因。本腿⛔ 判生死、⛔ 为它动任何字节。
+
+**八枚整包红逐名归位**：六枚（`Test258BridgeMutationNoSrcKeepsOldBinding`／
+`Test258OccupiedCombinationNamesTheNewValue`／`Test258V1ProbeSummonEditRebindsLiveBall`／
+`TestAC14GoSideEvalPushReachesThePage`／`TestAC246DevLegIgnoresTheTestTaskInjection`／
+`TestAC4FocusReturnToPriorWindowGap33r5`）⊂ 编排者自己 10-16 那发的名册
+（`probes/orch/20261016/logs/orch-322v1-ac4-cmdwisp-full.txt`＝`430/305/6/3`，差集 in-orch-not-D＝空）
+＝别票存量；`TestCleanCheckoutBuilds_AC11`＝台面/装置红（红句 `panel_host_gate_test.go:404:
+git rev-parse --show-toplevel: exit status 128`＝导出树没有 `.git`；台账 `:15164` 已定式化
+"4 枚真窗族＋1 枚装置红"＝`A802` 第二面）；`TestAC2SealNotice…`＝随台面摆动（两台差集唯一一枚
+＋`228/r1/baseline-test.txt` 与 10-04 CI 失败件都红过）。⇒ 本票新增红＝零枚（料级，⛔ 判语、⛔ 翻框）。
+
+**因果尺（机制级，⛔ 靠推理）**：本腿那一枚 `.go` 首行 `//go:build !windows`；`go list -e` 在
+GOOS=windows 下该件进 `IgnoredGoFiles`（命中 1）、不进 `TestGoFiles`（命中 0），GOOS=linux 反之；
+且 `_test.go` 只编进自己包的测试二进制＝`go list -e -f '{{range .TestGoFiles}}' ./cmd/wisp/` 89 枚里
+来自 `internal/winsec` 的 0 枚 ⇒ 我这枚字节机制上无法改 `cmd/wisp` 的颜色（＋`cmd/wisp` 生产字节
+两台同一枚 `54efbbbf`）。
+
+★两笔具名交编排者：① 派单／判语那句 "resident_* 在整包从不执行"在本机今天这一发不成立
+（整包 D 台顶格 `=== RUN …Resident` 32 行、判定 22 行、FAIL 0）；差额 28−22＝6 枚全在 winlive 档
+（28＝22 默认＋6 winlive，与那发 `RUN=12` 对得上；两集合交集只 2 枚，⛔ 当同一处数读）。
+② `estate-live` 那一档要不要进 AC#4 的数（`-tags winlive` 在 CI 侧按 228-v1 §F-6 仍零读数）。
+
+**自抓第三笔台面故障**＝前两版 `cmd-wisp.ps1` 把函数取名叫 `Go`，撞上外部命令 `go`
+（PowerShell 函数名大小写不敏感）⇒ 函数体那行递归调自己、五发两秒"跑完"、`RUN=0`；
+`0xc0000135=2` 是嵌套 summary 被自己数到的自指产物（两串 dll 现量都在树里＝台面配方没问题）。
+对照凭据＝同目录 `host-winsec.ps1` 用不撞名的 `HostRun`，那一族五发都出了真数（`RUN=110` 等）。
+本版改名 `Run-Shot`＋外部命令显式 `& 'go'`＋`ParseFile` 语法自检零错；前两版正文按
+`cwisp-*.FAULT-recursion.log`／`cmdwisp-summary.FAULT-recursion.txt`／`test.FAULT-recursion.log`
+全部只建不删留底。另自抓一笔：我用 `Set-Content -Encoding ascii` 改那枚台件时把它自己的
+CJK 注释打成了 `?`（本版已用 UTF-8 重写）。
+
+pathspec 两处仍字面逐枚写死（⛔ 从共享 index 反推的形状）；⛔ 翻框（交件侧 AC 框复量仍 1 未勾／5 勾）、
+⛔ 动 `cmd/wisp` 与 `internal/risk/**` 一字、⛔ push。

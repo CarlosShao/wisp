@@ -1,0 +1,21 @@
+Out-File: D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\322\r2\cmd-wisp.ps1:43
+Line |
+  43 |    & go @a > $body 2>&1
+     |    ~~~~~~~~~~~~~~~~~~~~
+     | The process cannot access the file 'D:\work\workspace\projects
+     | plans\Wisp\.scratch\wisp\probes\322\r2\logs\test.log' because it is being used by another process.
+
+=== test rc=0 filter='./cmd/wisp/' GOTMPDIR=-count=1 tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+  package-line: 
+  --- top FAIL names (unique):
+    (none)
+  --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+    RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+    0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 fatal-error=0
+      package-line: 
+      --- top FAIL names (unique):
+        (none)
+      --- last 6 lines verbatim (进程死亡时这里是唯一现场):
+0

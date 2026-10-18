@@ -1,0 +1,101 @@
+
+### 322-r2 cmd/wisp started 2026-10-18 11:10:24 +08:00 HEAD=1b9f602c2b06c9b9da5bd7503816149d9a3f0059
+=== cwisp-full-D rc=1 filter='' GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=448 PASS_TOP=322 FAIL_TOP=8 SKIP=3
+0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 dead=2
+  package-line: FAIL	github.com/CarlosShao/wisp/cmd/wisp	483.689s
+  --- top FAIL names (unique):
+    --- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding
+    --- FAIL: Test258OccupiedCombinationNamesTheNewValue
+    --- FAIL: Test258V1ProbeSummonEditRebindsLiveBall
+    --- FAIL: TestAC14GoSideEvalPushReachesThePage
+    --- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection
+    --- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile
+    --- FAIL: TestAC4FocusReturnToPriorWindowGap33r5
+    --- FAIL: TestCleanCheckoutBuilds_AC11
+  --- top SKIP names (unique):
+    --- SKIP: Test296BridgeKeepsThreeLiveKeysWhenConfigUnreadable
+    --- SKIP: Test296BridgeKeepsThreeLiveKeysWithOwnerEmptySlots
+    --- SKIP: TestAC247LiveMicrophoneLevelsReachTheBallSeam
+  --- last 8 lines verbatim (整进程死亡时这里是唯一现场):
+            [audit] tools: C25 scope closed task=ea81b6a1-4d26-4a10-8ffa-2abd1b970576 was_open=true dropped=1 open_scopes=0 close_err=<nil>
+            [audit] config: HOT-RELOAD state=stopped reason=run-root-cancelled detail="轮询协程已退出（本次进程正在收口）；此后对 config.toml 的改动要下一次启动才会被读到"
+    time=2026-10-18T11:18:36.725+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+        zz315a1probe_test.go:693: case C root read row: {ID:1 TaskID:ea81b6a1-4d26-4a10-8ffa-2abd1b970576 Seq:1 Tool:fs.read ArgsJSON:{"path":"D:/tmp/wisp/20261018/322r2/gtD/TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask621195818/001/zz315a1-note.txt"} RiskLevel:L0 Decision:allow DecidedAt:<nil> StartedAt:<nil> EndedAt:<nil> Outcome:success ErrorClass: CorrelationID:ea81b6a1-4d26-4a10-8ffa-2abd1b970576#call_zz315_a1c_root_read GrantID:<nil>}
+    --- PASS: TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask (0.10s)
+    FAIL
+    FAIL	github.com/CarlosShao/wisp/cmd/wisp	483.689s
+    FAIL
+=== cwisp-full-C rc=1 filter='' GOTMPDIR=unset (default TMP=C:\Users\swq\AppData\Local\Temp = C drive) tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=448 PASS_TOP=323 FAIL_TOP=7 SKIP=3
+0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 dead=2
+  package-line: FAIL	github.com/CarlosShao/wisp/cmd/wisp	445.592s
+  --- top FAIL names (unique):
+    --- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding
+    --- FAIL: Test258OccupiedCombinationNamesTheNewValue
+    --- FAIL: Test258V1ProbeSummonEditRebindsLiveBall
+    --- FAIL: TestAC14GoSideEvalPushReachesThePage
+    --- FAIL: TestAC246DevLegIgnoresTheTestTaskInjection
+    --- FAIL: TestAC4FocusReturnToPriorWindowGap33r5
+    --- FAIL: TestCleanCheckoutBuilds_AC11
+  --- top SKIP names (unique):
+    --- SKIP: Test296BridgeKeepsThreeLiveKeysWhenConfigUnreadable
+    --- SKIP: Test296BridgeKeepsThreeLiveKeysWithOwnerEmptySlots
+    --- SKIP: TestAC247LiveMicrophoneLevelsReachTheBallSeam
+  --- last 8 lines verbatim (整进程死亡时这里是唯一现场):
+            [audit] tools: C25 scope closed task=672ea3f2-decc-41b9-a607-19ae0e87c175 was_open=true dropped=1 open_scopes=0 close_err=<nil>
+            [audit] config: HOT-RELOAD state=stopped reason=run-root-cancelled detail="轮询协程已退出（本次进程正在收口）；此后对 config.toml 的改动要下一次启动才会被读到"
+    time=2026-10-18T11:26:06.776+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+        zz315a1probe_test.go:693: case C root read row: {ID:1 TaskID:672ea3f2-decc-41b9-a607-19ae0e87c175 Seq:1 Tool:fs.read ArgsJSON:{"path":"C:/Users/swq/AppData/Local/Temp/TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask3665333355/001/zz315a1-note.txt"} RiskLevel:L0 Decision:allow DecidedAt:<nil> StartedAt:<nil> EndedAt:<nil> Outcome:success ErrorClass: CorrelationID:672ea3f2-decc-41b9-a607-19ae0e87c175#call_zz315_a1c_root_read GrantID:<nil>}
+    --- PASS: TestZZ315A1ProjectInstructionsSeedCannotStrandTheFirstTask (0.17s)
+    FAIL
+    FAIL	github.com/CarlosShao/wisp/cmd/wisp	445.592s
+    FAIL
+=== cwisp-estate-resident rc=0 filter='Resident' GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=31 PASS_TOP=22 FAIL_TOP=0 SKIP=0
+0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 dead=0
+  package-line: ok  	github.com/CarlosShao/wisp/cmd/wisp	36.692s
+  --- top FAIL names (unique):
+    (none)
+  --- top SKIP names (unique):
+    (none)
+  --- last 8 lines verbatim (整进程死亡时这里是唯一现场):
+    === RUN   TestAC246ShippedResidentLegWithoutConsoleRefusesItsTaskEntry
+        resident_task_source_246_windows_test.go:340: resident sink D:\tmp\wisp\20261018\322r2\gtD\TestAC246ShippedResidentLegWithoutConsoleRefusesItsTaskEntry3013909386\002\logs: 1 file(s), 28 record(s)
+    --- PASS: TestAC246ShippedResidentLegWithoutConsoleRefusesItsTaskEntry (5.01s)
+    === RUN   TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeline
+        resident_task_source_246_windows_test.go:401: resident sink D:\tmp\wisp\20261018\322r2\gtD\TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeli1247412396\002\logs: 1 file(s), 30 record(s)
+    --- PASS: TestAC246ShippedResidentLegTakesTheInjectionAndAttemptsThePipeline (4.39s)
+    PASS
+    ok  	github.com/CarlosShao/wisp/cmd/wisp	36.692s
+=== cwisp-estate-live rc=0 filter='TestLive' GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+0xc0000135=0 buildfailed=0 noteststorun=2 setupfailed=0 dead=0
+  package-line: ok  	github.com/CarlosShao/wisp/cmd/wisp	0.093s [no tests to run]
+  --- top FAIL names (unique):
+    (none)
+  --- top SKIP names (unique):
+    (none)
+  --- last 8 lines verbatim (整进程死亡时这里是唯一现场):
+    time=2026-10-18T11:26:51.892+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+    testing: warning: no tests to run
+    PASS
+    ok  	github.com/CarlosShao/wisp/cmd/wisp	0.093s [no tests to run]
+=== cwisp-estate-deathpoints rc=0 filter='TestPanelThreadIsSTAAndExitsCleanly|TestAC13BringUpSurvivesAReusedThreadQuit' GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD tree=D:\tmp\wisp\20261018\322r2\head.RJNBgS
+RUN=2 PASS_TOP=2 FAIL_TOP=0 SKIP=0
+0xc0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 dead=0
+  package-line: ok  	github.com/CarlosShao/wisp/cmd/wisp	2.338s
+  --- top FAIL names (unique):
+    (none)
+  --- top SKIP names (unique):
+    (none)
+  --- last 8 lines verbatim (整进程死亡时这里是唯一现场):
+    wisp: panel window is up (test-harness, cold 964.6 ms, hot path 0.0 ms)
+    time=2026-10-18T11:26:58.668+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+    time=2026-10-18T11:26:58.669+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+        panel_resident_windows_test.go:987: panel thread up and down: hwnd 0x11b11314, exits observed, shows=1
+    time=2026-10-18T11:26:58.669+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+    --- PASS: TestPanelThreadIsSTAAndExitsCleanly (0.97s)
+    PASS
+    ok  	github.com/CarlosShao/wisp/cmd/wisp	2.338s
+### done 2026-10-18 11:26:59 +08:00
