@@ -1,0 +1,117 @@
+### 1. 既存跨包装配先例（甲／乙"要不要新导出名"的对照面）
+-- internal/tools 的测试包名册（⛔ 只有 in-package 才碰得到非导出件）
+      1 // nilbase_270_test.go is
+     11 //go:build windows 
+     53 package tools 
+      3 package tools_test 
+-- 同时 import agent＋approval＋tools 的测试文件（一枚具名先例）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/loop_approval_test.go  imports=8
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/wiring_test.go  imports=4
+-- 该先例的装配入口是否全为导出名（agent.New／approval.New／tools.New）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/loop_approval_test.go:94:	gate := approval.New(approval.Options{UI: ui, Channels: approval.NewChannels()})
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/loop_approval_test.go:103:	b := tools.New(tools.Options{
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/loop_approval_test.go:142:	loop, err := agent.New(opt)
+
+### 2. 这条链上 CorrelationID 的搬运工（逐枚具名 file:line，判"真 corr 进真队列"要走几跳）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/bridge.go:383:		Capabilities: dedupe(entry.Decl.Needs), CorrelationID: req.CorrelationID,
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/loop.go:676:			TaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i),
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/gate.go:507:	it, err := g.q.push(d)
+-- PendingApproval（L2，走 push）与 PendingWindow（L1，不走 push）的边界
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/gate.go:252:func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answer, string) {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/gate.go:502:func (g *Gate) PendingApproval(ctx context.Context, d tools.Decision) (tools.Answer, string) {
+-- 桥侧把请求送进 Gate 的调用（L1／L2 各一枚）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/bridge.go:451:		a, why := b.gate.PendingWindow(ctx, *dec)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/bridge.go:466:		a, why := b.gate.PendingApproval(ctx, *dec)
+
+### 3. 叠改那一形的触发条件（同一枚 corr 二次入队，生产侧有几条路）
+-- Gate.Replay（导出）⇄ Queue.Replay 的撞名支逐字
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/gate.go:755:func (g *Gate) Replay(ctx context.Context, corr, taskID string) (tools.Decision, string, error) {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:598:func (q *Queue) replay(corr string) (tools.Decision, string, error) {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:614:		d.CorrelationID = corr + "#replay"
+-- push 的撞名判定逐字
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:167:	if _, clash := q.byID[corr]; clash {
+-- d.CorrelationID 进 push 的上一跳（Decision 的 corr 来自 req.CorrelationID，⛔ 队列自己造）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/bridge.go:383:		Capabilities: dedupe(entry.Decl.Needs), CorrelationID: req.CorrelationID,
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/bridge.go:1206:		CorrelationID: orDefault(req.CorrelationID, req.TaskID),
+
+### 4. 丙形那枚钉的形状先例（包内测试读自己的源文件）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/task_cancel_221_legs_test.go:224:	src, err := os.ReadFile("task.go")
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/tasklist_deferred_236r3_teeth_test.go:19:// os.ReadFile("task.go") (:224) and counts lines containing "DEFERRED",
+-- 该先例的用意（读码推的：内容锚，⛔ 绝对行号）＝包内测试读自己的源文件
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/task_cancel_221_legs_test.go:224:	src, err := os.ReadFile("task.go")
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/tasklist_deferred_236r3_teeth_test.go:19:// os.ReadFile("task.go") (:224) and counts lines containing "DEFERRED",
+   本腿⛔ 打印整段别人件源文（那字节不归我入库）：只点名落点＋形状。
+
+### 5. 禁名词表那族仪器的射程（会不会咬本票三形）
+-- 扫描目录（具名点）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go:1231:	dir := filepath.Join(root, "internal", "panel")
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go:1574:	findings := scanGrantBoundary(t, filepath.Join(root, "internal", "panel"))
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go:1848:	dir := filepath.Join(root, "internal", "panel")
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go:2170:	src := filepath.Join(root, "internal", "panel")
+-- 是否排除 _test.go（逐字尺命中）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go:369:		if !strings.HasSuffix(p, ".go") || strings.HasSuffix(p, "_test.go") {
+-- routeShapedName 的定义（"route 形状"到底是什么）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go:1050:func routeShapedName(s string) bool {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1051-	segments := strings.Split(s, ".")
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1052-	if len(segments) < 2 {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1053-		return false
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1054-	}
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1055-	for _, seg := range segments {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1056-		if seg == "" {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1057-			return false
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1058-		}
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1059-		for i, r := range seg {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1060-			switch {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1061-			case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', r == '_':
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1062-			case r == '-' && i > 0:
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1063-			default:
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/l2_grant_boundary_test.go-1064-				return false
+-- 词表本体逐字（两枚）
+var grantFieldWords = []string{
+	"approve", "approval", "autoapprove", "grant", "granted",
+	"allow", "allowed", "allowonce", "permit", "permitted",
+	"ratify", "authorize", "authorised", "decision", "decide",
+	"verdict", "outcome", "bypass", "override",
+}
+
+// grantRouteWords is the same idea for a ROUTE name: a method whose own name
+// states an approval decision is a panel-side allow door.
+var grantRouteWords = []string{
+	"approve", "approval", "grant", "allow", "permit",
+	"ratify", "authorize", "authorised", "decide", "decision", "verdict",
+}
+-- 三形候选名逐个撞词表（算的：⛔ 任何一枚含下表词根）
+tr: range-endpoints of '_- ' are in reverse collating sequence order
+PushForTest -> 词根命中: 无
+tr: range-endpoints of '_- ' are in reverse collating sequence order
+ExportPushForTest -> 词根命中: 无
+tr: range-endpoints of '_- ' are in reverse collating sequence order
+QueuePushForTest -> 词根命中: 无
+tr: range-endpoints of '_- ' are in reverse collating sequence order
+CallCorrForTest -> 词根命中: 无
+tr: range-endpoints of '_- ' are in reverse collating sequence order
+RewriteFormatAnchor -> 词根命中: 无
+tr: range-endpoints of '_- ' are in reverse collating sequence order
+PinsTheClashFormat -> 词根命中: 无
+
+### 6. 丙形的两枚去牙落点候选（⛔ 同一枚断言行两处落点）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:168:		corr = fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:616:			d.CorrelationID = fmt.Sprintf("%s#%d", corr, q.seq+uint64(i)+1)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:168:		corr = fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:616:			d.CorrelationID = fmt.Sprintf("%s#%d", corr, q.seq+uint64(i)+1)
+-- 名册侧两枚臂（叠改的另一半）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_roster_197.go:312:		if strings.HasPrefix(key, task+"#") {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_roster_197.go:308:	if base, ok := splitClashSuffix(key); ok && base != "" {
+
+### 7. AC#5 前置料：本票落地后落到哪几包（点名，⛔ 跑）
+24
+22
+29
+-- 三包各自的顶层非测试文件枚数（成对台面的分母）
+internal/agent  nontest_go=13
+internal/agent/approval  nontest_go=10
+internal/panel  nontest_go=17
+
+### 8. 本腿写面自检（⛔ 越格／⛔ 动 .go）
+-- .go 命中枚数（逐笔名册并集，尺＝git show --name-only 全集）
+0

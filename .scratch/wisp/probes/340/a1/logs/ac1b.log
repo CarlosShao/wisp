@@ -1,0 +1,211 @@
+### 1. 交集硬尺：同一枚测试文件里既有真 callCorr 侧调用形又有真队列侧调用形
+-- 支 L（真铸造侧的调用形，⛔ 注释词）
+cmd/wisp/always_write_no_clobber_226_test.go
+cmd/wisp/approval_always_201_test.go
+cmd/wisp/approval_reply_201_test.go
+cmd/wisp/approval_seam_201_test.go
+cmd/wisp/config_reload_223_test.go
+cmd/wisp/plan_assembled_165r2_test.go
+cmd/wisp/ticket224_assembly_test.go
+internal/agent/compress_trace_test.go
+internal/agent/control_test.go
+internal/agent/corr_percall_242_test.go
+internal/agent/corr_roster_join_328_test.go
+internal/agent/declared_l0_risk_179_test.go
+internal/agent/forensics_test.go
+internal/agent/guard_test.go
+internal/agent/harness_test.go
+internal/agent/instructions_test.go
+internal/agent/loop_golden_test.go
+internal/agent/plan_present_crowded_world_330r2_test.go
+internal/agent/plan_present_doorbell_165r3_test.go
+internal/agent/spill_pointer_honesty_174_test.go
+internal/agent/ticket285_corr_distinct_rulers_test.go
+internal/agent/truncation_test.go
+internal/tools/loop_approval_test.go
+internal/tools/subagent_depth_fixture_287_test.go
+internal/tools/taskid_source_236r4_teeth_test.go
+internal/tools/ticket283_corr_identity_rulers_test.go
+internal/tools/ticket285_corr_rows_rulers_test.go
+-- 支 P（真队列侧的调用形，⛔ 注释词）
+cmd/wisp/resident_grant_writer_265_windows_test.go
+cmd/wisp/subagent_blocked_197_test.go
+internal/agent/approval/fakes_test.go
+internal/agent/approval/pending_read_test.go
+internal/agent/approval/queue_test.go
+internal/agent/approval/ticket242_binding_test.go
+internal/agent/approval/ticket259_denial_rulers_test.go
+internal/agent/approval/ticket84_no_owner_test.go
+-- 两支同文件交集（尺＝comm，⛔ 空交集当"尺没响"）
+internal/tools/loop_approval_test.go
+   => 交集枚数即"真 loop 与真队列同在一枚用例里"的文件枚数（本腿据此判端到端通路是否已在盘上）
+-- 正控（这把尺会响）：队列侧命中文件名册逐枚
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:cmd/wisp/resident_grant_writer_265_windows_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:cmd/wisp/subagent_blocked_197_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/fakes_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/pending_read_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/ticket220_l1_window_read_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/ticket224_reply_grant_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/ticket242_binding_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/ticket259_denial_rulers_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/ticket84_no_owner_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/loop_approval_test.go
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/wiring_test.go
+
+### 2. 决定性那一跳：approval 包内既有测试直呼非导出 push 的枚数（甲形的盘上现状）
+-- 包名册（package approval ⇄ package approval_test）
+batch_test.go  package approval_test
+cancel_key_label_260r4_test.go  package approval_test
+cancel_key_wording_260r3_test.go  package approval_test
+fakes_test.go  package approval_test
+pending_read_test.go  package approval
+queue_test.go  package approval_test
+replies_201_test.go  package approval
+tempdir_resolved_124_test.go  package approval_test
+ticket146_liveapprovals_backing_test.go  package approval
+ticket220_l1_window_read_test.go  package approval
+ticket224_reply_grant_test.go  package approval_test
+ticket242_binding_test.go  package approval
+ticket242_panelface_test.go  package approval
+ticket259_denial_rulers_test.go  package approval
+ticket259_panel_capability_rulers_test.go  package approval
+ticket285_route_denial_name_rulers_test.go  package approval
+ticket318_widening_marker_rulers_test.go  package approval
+ticket84_no_owner_test.go  package approval_test
+ticket87_veto_l2_test.go  package approval_test
+ticket97_alias_direction_test.go  package approval_test
+window_test.go  package approval_test
+zz_201_a1_junction_marker_windows_test.go  //go:build windows
+-- 直呼 q.push( 的文件及其包名（逐枚）
+internal/agent/approval/gate.go  package approval
+internal/agent/approval/pending_read_test.go  package approval
+internal/agent/approval/ticket242_binding_test.go  package approval
+internal/agent/approval/ticket259_denial_rulers_test.go  package approval
+-- internal/agent 侧：23 枚测试全 in-package ⇒ callCorr 今天是否已被测试直呼
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/corr_roster_join_328_test.go:11://	                               -> loop.go:676 CorrelationID: callCorr(taskID,
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/corr_roster_join_328_test.go:116:	if got := callCorr(req.TaskID, req.CallID, 0); got != corr {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/corr_roster_join_328_test.go:117:		t.Fatalf("callCorr(%q,%q,0) = %q but the dispatched corr was %q", req.TaskID, req.CallID, got, corr)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/corr_roster_join_328_test.go:152:	armB := callCorr(res.TaskID, "", 0)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/corr_roster_join_328_test.go:157:	armA := callCorr(res.TaskID, "call_e1", 0)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/ticket285_corr_distinct_rulers_test.go:51:		{"first call", callCorr(task, "call-285-a", 0)},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/ticket285_corr_distinct_rulers_test.go:52:		{"second call", callCorr(task, "call-285-b", 1)},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/ticket285_corr_distinct_rulers_test.go:58:		{"first id-less call", callCorr(task, "", 0)},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/ticket285_corr_distinct_rulers_test.go:59:		{"second id-less call", callCorr(task, "", 1)},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/ticket285_corr_distinct_rulers_test.go:60:		{"third id-less call", callCorr(task, "", 2)},
+
+### 3. 全导出名的端到端通路（乙形前提"要跨包入口"是否只有一条形）
+-- push 的两枚导出入口（Gate 侧）逐字
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/gate.go:169:func (g *Gate) Queue() *Queue { return g.q }
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/gate.go:502:func (g *Gate) PendingApproval(ctx context.Context, d tools.Decision) (tools.Answer, string) {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/gate.go:755:func (g *Gate) Replay(ctx context.Context, corr, taskID string) (tools.Decision, string, error) {
+-- 改写输出的导出读出口（测试拿叠改后的 corr 走这扇）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/pending_read.go:113:func (q *Queue) LiveApprovals() []LiveApproval {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/pending_read.go:125:			CorrelationID: it.Corr,
+-- Decision.corr 的生产搬运工（req→dec→push 全导出字段）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/bridge.go:383:		Capabilities: dedupe(entry.Decl.Needs), CorrelationID: req.CorrelationID,
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/tools/bridge.go:1206:		CorrelationID: orDefault(req.CorrelationID, req.TaskID),
+-- D47 前置（PendingApproval 第一跳的 admitCheck ⇄ 导出登记口）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/gate.go:194:func (g *Gate) AdmitTextTask(taskID string) (revoke func()) {
+-- 名册侧导出入口
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_roster_197.go:196:func TaskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView) *TaskRosterSection {
+
+### 4. push 撞名支的完整字节（含两枚操作数与空 corr 回退，丙形看不见的语义在这一段）
+   154	// push admits one decision into the queue and assigns the correlation id the
+   155	// reply is routed by (C18). Overflow fails closed.
+   156	func (q *Queue) push(d tools.Decision) (*qitem, error) {
+   157		q.mu.Lock()
+   158		defer q.mu.Unlock()
+   159		if len(q.pending) >= q.maxPend {
+   160			return nil, fmt.Errorf("审批队列已满（%d 项待决），无法登记新的 L2 请求，已 fail-closed 拒绝", q.maxPend)
+   161		}
+   162		q.seq++
+   163		corr := d.CorrelationID
+   164		if corr == "" {
+   165			corr = "approval-" + strconv.FormatUint(q.seq, 10)
+   166		}
+   167		if _, clash := q.byID[corr]; clash {
+   168			corr = fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)
+   169		}
+   170		it := &qitem{
+   171			Dec: d, Corr: corr, Seq: q.seq,
+   172			names:  otherNames(d, corr),
+   173			grants: newGrantStore(),
+   174			state:  statePending,
+   175			answer: make(chan answer, 1),
+   176		}
+   177		it.bind = bindDigest(corr, d.TaskID, d.Tool, d.LevelString(), q.seq, d.Args)
+   178		q.pending = append(q.pending, it)
+   179		q.byID[corr] = it
+   180		q.indexLocked(it)
+   181		q.logf("approval: queued corr=%s task=%s tool=%s depth=%d",
+   182			corr, d.TaskID, d.Tool, len(q.pending))
+   183		return it, nil
+   184	}
+-- callCorr 两臂格式串逐字（铸造侧的另一枚 #）
+   603	func callCorr(taskID, callID string, index int) string {
+   604		if callID == "" {
+   605			return fmt.Sprintf("%s#call-%d", taskID, index)
+   606		}
+   607		return taskID + "#" + callID
+   608	}
+
+### 5. 臂承重名册的原料（⛔ 本腿跑，只逐枚点名表项与两枚臂的字节判据）
+-- 数字臂的判据逐字（LastIndexByte + 尾段全数字）
+   333	func splitClashSuffix(id string) (base string, ok bool) {
+   334		i := strings.LastIndexByte(id, '#')
+   335		if i <= 0 || i == len(id)-1 {
+   336			return "", false
+   337		}
+   338		for _, r := range id[i+1:] {
+   339			if r < '0' || r > '9' {
+   340				return "", false
+   341			}
+   342		}
+   343		return id[:i], true
+   344	}
+-- 两枚名册里全部带 # 的表项（逐枚，file:line＋字面串＋want）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:138:		{"the queue's own rewrite lights", "child-1#9", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:139:		{"a multi-digit seq lights", "child-1#147", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:140:		{"another task's rewrite does not light", "other-1#9", false},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:141:		{"a non-numeric tail on a filed task id lights (328)", "child-1#retry", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:142:		{"a task id that merely prefixes does not light", "child-1x", false},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:143:		{"an empty correlation id names no row", "", false},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:39:		{"arm A provider call id lights its task", "child-1#call_e1", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:40:		{"arm B id-less call lights its task", "child-1#call-0", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:41:		{"arm B with the queue clash rewrite stacked lights its task", "child-1#call-0#7", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:42:		{"the queue rewrite of a bare task id lights its task", "child-1#9", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:43:		{"arm A rewrite of a bare task id lights its task", "child-1#call_e1#7", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:44:		{"the empty-corr fallback names no row", "approval-7", false},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:45:		{"a host-initiated correlation names no row", "host:mode-switch", false},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:46:		{"a correlation built on a task nobody filed names no row", "ghost-9#call-0", false},
+-- 表项之外的 card197/L1WindowWait 直投形（逐枚）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:108:	data := blockedPacket(t, []NativeVerdict{card197("child-1#9")}, nil)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:112:	data = blockedPacket(t, []NativeVerdict{card197("child-1"), card197("child-1#9")}, nil)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:159:	data := blockedPacket(t, nil, []L1WindowWait{{CorrelationID: "corr-host-9", TaskID: "child-1"}})
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:165:	data = blockedPacket(t, nil, []L1WindowWait{{CorrelationID: "child-1", TaskID: ""}})
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:194:	data := blockedPacket(t, []NativeVerdict{card197("child-1#9")},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:195:		[]L1WindowWait{{CorrelationID: "corr-root", TaskID: "root-1"}})
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:65:		card197("root-1#call-0"),
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:66:		card197("child-1#call_e1"),
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:73:	data = blockedPacket(t, []NativeVerdict{card197("root-1#call-0")}, nil)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:83:	data := blockedPacket(t, nil, []L1WindowWait{{CorrelationID: "child-1#call-0", TaskID: ""}})
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:87:	data = blockedPacket(t, nil, []L1WindowWait{{CorrelationID: "child-1x", TaskID: ""}})
+
+### 6. 丙形的"有没有牙"原料（谁读改写输出）
+-- approval 测试里带 # 的 corr 字面串断言（预期 0＝格式变了没有既存用例红）
+  => 0 命中 rc=1
+-- 正控：同尺族打到 internal/panel（该响）
+20
+-- approval 测试读 it.Corr 的符号化断言枚数（读变量、不比字面串）
+39
+-- 既存 replay 那一发怎么断言新 corr（符号化 ⇄ 字面串）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue_test.go:283:	fresh, corr, err := g.Replay(context.Background(), p.CorrelationID, testTask)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue_test.go:290:	if corr == p.CorrelationID {
+
+### 7. AC#4 去牙落点候选（具名，⛔ 同一枚断言行两处落点）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:168:		corr = fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:614:		d.CorrelationID = corr + "#replay"
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:616:			d.CorrelationID = fmt.Sprintf("%s#%d", corr, q.seq+uint64(i)+1)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_roster_197.go:312:		if strings.HasPrefix(key, task+"#") {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:167:	if _, clash := q.byID[corr]; clash {

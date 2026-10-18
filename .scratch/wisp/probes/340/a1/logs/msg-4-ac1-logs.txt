@@ -1,0 +1,15 @@
+票 340 普查腿 340-a1·AC#1·读数入库＝logs/ac1.log＋logs/ac1b.log（上一笔那两把尺的逐字输出，⛔ 摘要）
+
+★决定性价表原料（交集尺响 1 枚）：internal/tools/loop_approval_test.go 同一枚测试文件里已同时装配真 loop（agent.New:142）＋真 Gate（approval.New:94）＋真桥（tools.New:103）＝端到端那条链的四门今天全是导出名。⇒ 本腿据此把"甲／乙两形要不要新导出名"逐形量成读码推的结论写进 census（⛔ 选形、⛔ 建议）。
+
+其余关键读数（具名树 feac8f77）：
+- 甲形的队列半侧今天已被 in-package 测试直呼非导出 push（pending_read_test／ticket242_binding／ticket259，包名册 21 枚＝12 approval ⇄ 9 approval_test）；agent 半侧 callCorr 已被 23 枚全 in-package 测试直呼（corr_roster_join_328:116/:152/:157）；
+- L1⇄L2 边界＝gate.go:252 PendingWindow 不经 push ⇄ :502 PendingApproval 经 push；那枚既存先例今天零 risk.L2 命中（尺 0 命中 rc=1）＝它今天走 L1、没踩到改写支；
+- 改写输出的导出读出口＝pending_read.go:113 LiveApprovals（:125 CorrelationID: it.Corr）＝叠改后的 corr 有现成导出取法；
+- 禁名词表那族（l2_grant_boundary_test.go）射程＝只 filepath.Join(root,"internal","panel")＋goSourceFiles 排除 _test.go ⇒ 本票三形的新增字节在 approval／agent 包、或在任何 _test.go 里＝射程外（量的）；七枚候选名撞两枚词表词根＝0（算的）；
+- ★丙形"今天没牙"的字节凭据＝approval 测试里带 # 的 corr 字面串断言＝0 命中（正控＝同尺族 internal/panel 测试档 20 行）；改 39 枚符号化读 it.Corr 的断言（queue_test:283/:290 那形比"不等"、不比字面串）⇒ 格式串换成任何别的形状，approval 侧既存用例无一枚红；
+- 臂承重名册原料逐枚：220 六枚表项＋328 八枚表项＋11 枚直投形（带行号）＋数字臂判据字节 roster:333-344＋唯一读点 roster:252 waiting[row.TaskID]；
+- AC#4 去牙落点候选具名＝queue.go:167 判定 / :168 push 格式串 / :614 #replay / :616 replay 格式串 ⇄ roster:312 第三臂（⛔ 同一枚断言行两处落点，两发落点必须不同）；
+- AC#5 前置料＝三包枚数分母（agent 24 测 13 产／approval 22 测 10 产／panel 29 测 17 产，⛔ 跑）。
+
+纪律：零 .go 字节／零新导出名／⛔ go test／go build（颜色一律"读码推的"）／⛔ 翻框／⛔ push；件内零分节符、CR＝0。
