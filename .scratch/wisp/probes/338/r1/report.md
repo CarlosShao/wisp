@@ -4,7 +4,10 @@
   落 AC#0 时 HEAD 已漂到 `90dafe77`→`631a04ba`（工作树在飞，⛔ 拿编排者号当锚）。
 - 我的落笔序列：`0b1d1f0b`（AC#0 尺＋logs）→ `87521cb4`（AC#1 tools 枚归位）→
   `3d26240c`（AC#2 改前四道门）→ `93d0f39c`（AC#1b panel 枚归位）→
-  `ee75c23f`（AC#2 交件侧门＋lead 条件④）→ AC#3 logs → 本 report → 票尾一条 bullet。
+  `ee75c23f`（AC#2 交件侧门＋lead 条件④）→ AC#3 logs（`fa5f008f`／`b84dedd0`）→
+  report（`787dbfb9`）→ 票尾一条 bullet（`b4844295`）→ 交件前三把尺复量（`91d08c3d`）。
+  ★具名更正一枚＝`b84dedd0` 那笔主题写了"report 入库"但该枚未含 `report.md`（主题不实），
+  真正入库那一笔＝`787dbfb9`，两笔正文都留痕、⛔ amend（不改已入库历史）。
 - 尺＝`/d/work/base/gopath/bin/gofumpt.exe v0.12.0 (go1.27.1)` ⇄ 同版 `gofmt`；
   go＝`go1.27.1 windows/amd64`。落点一律 `D:\tmp\wisp\20261018\338r1\**`（先 `mkdir -p`，
   ⛔ 盘符根、⛔ 删任何旧树）。
