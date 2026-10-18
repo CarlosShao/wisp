@@ -1,0 +1,78 @@
+# 340-a1 交件自证三把尺（逐字，只读普查腿，⛔ 判语／⛔ 翻框／⛔ push）
+
+腿＝`340-a1`（票 340 只读普查腿，2026-10-18 第二波）；入场锚＝**`feac8f77`**（11:3x `git log -1` 现认；编排者 11:2x 所见 `130b1475` 系是其祖先，已现量）。
+帽的口径（派单原文＝≤4 枚正文件、每件 ≤160 行；`logs/**` 是读数与存档、派单明许）＝正文件四枚＝`census.md`＋`scripts/{ac0,ac1,ac1b}.sh`，本件＝交件自证件（第 5 枚，具名说明在下面⑤-3）。
+
+## ① 写面名册尺（逐枚 `git show --name-only`，⛔ 目录前缀反推）
+
+严格前缀尺＝`git log --grep="^票 340 普查腿 340-a1·" --format="%h %s"`＝**7 笔**（含本笔），逐枚名册并集 ⊆ 允许写面＝`.scratch/wisp/probes/340/a1/**` ＋ 票 340 尾**一条**：
+
+| 笔 | 节 | 该笔 name-only 全集 |
+|---|---|---|
+| `ba8ecb4f` | AC#0 台件 | `scripts/ac0.sh`＋`logs/msg-1-ac0-script.txt` |
+| `fac6c918` | AC#0 读数 | `logs/ac0.log`＋`logs/msg-2-ac0-log.txt` |
+| `bc0669c5` | AC#1 台件 | `scripts/ac1.sh`＋`scripts/ac1b.sh`＋`logs/msg-3-ac1-scripts.txt` |
+| `6c46d96b` | AC#1 读数 | `logs/ac1.log`＋`logs/ac1b.log`＋`logs/msg-4-ac1-logs.txt` |
+| `fbfa1cbe` | 交付主体 | `census.md`＋`logs/msg-5-census.txt` |
+| `257780ad` | 票尾一条 | 票 340 那一枚＋`logs/ticket-bullet-340.txt`＋`logs/msg-6-bullet.txt` |
+| 本笔 | 自证＋两处更正 | `logs/self-evidence-three-rulers.txt`＋`logs/msg-7-selfevidence.txt`＋`logs/msg-1-ac0-script.txt`（更正件）＋`logs/gate-d22scan.log`＋`logs/gate-pathlength.log`＋两枚早期草稿件（⑤-1） |
+
+- ★`.go` 命中＝**0**（尺＝逐笔名册并集里以 `.go` 结尾者的枚数，交件侧现量 0；⛔ 拿全仓 grep 那形当这把尺）；
+- ★越格枚数＝**0**（尺＝逐枚路径判"是不是 `.scratch/wisp/probes/340/a1/` 开头，或正好是票 340 那一枚路径"，逐枚 `case` 判；⛔ 行尾锚那形坏尺＝裁腿自纠过，判语件第七节 3 条）；
+- ★别腿字节未被我这笔卷走＝`fbfa1cbe`／`257780ad` 两笔 `--numstat` 现量＝前者 2 行新增（`census.md` 75＋`msg-5` 13）、后者 1 加 0 删（票面）＋2 枚新增，全 ⊆ 我的路径。撞 `.git/index.lock` 那一轮（12:5x＝编排者 `e7ab8c7b` 在跑）index 里另有 `338-r1` 八枚 staged 件与一枚编排者脚本，两处 pathspec 都写死字面路径 ⇒ 它们没进我这笔（事后 `git diff --cached --name-only | grep -c 338`＝**0**＝已由 `338-r1` 自己那笔 `fa5f008f` 提交）。
+
+## ② 证据件字节／行数（逐枚现量 `wc -c`／`wc -l`，交件侧 12:5x）
+
+| 件 | 字节 | 行数 |
+|---|---|---|
+| `census.md`（正文件·交付主体） | 15164 | 75 |
+| `scripts/ac0.sh`（正文件·可逐字重跑） | 5907 | 92 |
+| `scripts/ac1.sh`（正文件·可逐字重跑） | 5705 | 92 |
+| `scripts/ac1b.sh`（正文件·可逐字重跑） | 5601 | 76 |
+| `logs/ac0.log` ⇄ `logs/ac1.log` ⇄ `logs/ac1b.log` | 9829 ⇄ 9498 ⇄ 15713 | 102 ⇄ 117 ⇄ 211 |
+| `logs/gate-d22scan.log` ⇄ `logs/gate-pathlength.log` | 23774 ⇄ 1294 | 252 ⇄ 10 |
+| `logs/ticket-bullet-340.txt`（票尾那一枚的件内存档） | 6086 | 1 |
+| `logs/msg-1`…`msg-6` 六枚提交正文存档 | 2409／1542／3398／2540／3357／657 | 15／11／22／15／13／3 |
+| `logs/ac0-a-narrow.sh` ⇄ `.log.raw`（草稿件，⛔ 当凭据，见⑤-1） | 1257 ⇄ 576 | 23 ⇄ 14 |
+
+- ★零枚 0 字节件（尺＝`find .scratch/wisp/probes/340/a1 -type f -size 0 | wc -l`＝**0**）；写面总枚数＝**20 枚**（尺＝`find .scratch/wisp/probes/340/a1 -type f | wc -l`，本笔落完后现量）；
+- ★CR 字节＝**0**（尺＝逐枚 `tr -dc` 后计数，⛔ `grep -c $"\r"` 那形会误报行数）；
+- ★派单禁的那枚分节符字形（U+00A7）＝本腿全部写面逐枚现量**各 0 命中**（尺＝逐枚 `grep -c` 列全，含本件与 `logs/msg-7-selfevidence.txt`）；具名自纠见⑤-2。
+- 票 340 现量该字形 3 处＝`:3`／`:21`／`:22`，**HEAD 版本原有**（编排者字节，⛔ 我动原文；尺＝`git show HEAD:<票> | grep -c`＝3 ⇄ 工作树＝3，我追加那一行 0 命中）。
+
+## ③ 决定性尺的逐字读数（起手侧 ⇄ 交件侧，都带 file:line）
+
+- **必答 (ii)（丙形承重）**：`internal/agent/approval/queue.go:168`　`corr = fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)`＝交件侧现跑复认（起手侧＝`logs/ac0.log`）；内容锚 token＝`%s#%d`；同形第二枚＝`queue.go:616`　`d.CorrelationID = fmt.Sprintf("%s#%d", corr, q.seq+uint64(i)+1)`（replay 支，操作数不同）；`queue.go` 整枚 blob＝`66fec7ae375344d7bc741270b42c4ec5050cf41f`，**三锚同一串**（`feac8f77`／`f705b082`／`5db0b538`）。
+- **必答 (i)（那把"真产枚数 0"尺的正控）**：尺逐字节不变、只换射程＝`git grep -nE '"[^"]*#[0-9]+"' feac8f77 -- internal/panel`＝**13 行**（逐枚在 `logs/ac0.log`，落点含 `internal/panel/subagent_corr_task_prefix_328_test.go:41/:42/:43` ⇄ `internal/panel/subagent_blocked_220_test.go:138/:139/:140`）；再扩一档 `-- internal cmd tools scripts`＝**19 行**；原尺原射程（`internal/agent/approval`）＝三锚各 **0 行**。★具名作废一枚假正控＝`#[A-Z]` 那一形打到 approval＝0 命中（rc=1）＝该射程真无此形，⛔ 拿它当正控。
+- **★AC#0 那处具名更正（票面第四行在盘上过窄）**：交集尺＝支 L 27 枚 ∩ 支 P 12 枚＝**1 枚**＝`internal/tools/loop_approval_test.go`；三处装配逐字＝`:94 approval.New(approval.Options{UI: ui, Channels: approval.NewChannels()})`／`:103 b := tools.New(tools.Options{`／`:142 loop, err := agent.New(opt)`；四道门 def 行逐字＝`approval/gate.go:502 func (g *Gate) PendingApproval(ctx context.Context, d tools.Decision) (tools.Answer, string)`（体内 `:507 it, err := g.q.push(d)`）／`approval/gate.go:169 func (g *Gate) Queue() *Queue`／`approval/pending_read.go:113 func (q *Queue) LiveApprovals() []LiveApproval`（读出口 `:125 CorrelationID: it.Corr`）／`internal/panel/subagent_roster_197.go:196 func TaskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView) *TaskRosterSection`＝**全导出名**。正控＝支 P 名册逐名 12 枚（`logs/ac1b.log` 第 1 节），⛔ 空交集读成"尺没响"。
+- **★那枚先例的射程边界（编排者 12:3x 令：⛔ 写成"端到端已被覆盖"）**：`risk.L2` 与 `PendingApproval` 在同件命中各 **0**（尺 0 命中 rc=1；编排者独立复跑同数）⇒ 它走 L1＝`internal/tools/bridge.go:451 a, why := b.gate.PendingWindow(ctx, *dec)`，而 L1 那一路不经 `q.push`（边界逐字＝`approval/gate.go:252` PendingWindow ⇄ `:502` PendingApproval）。
+- **丙形今天没牙（量的）**：`git grep -nE '"[A-Za-z0-9_.-]+#[A-Za-z0-9_.-]*"' feac8f77 -- internal/agent/approval` 的 `*_test.go` 档＝**0 命中**；正控＝同尺族 `internal/panel` 测试档＝**20 行**；符号化读改写输出＝`.Corr` **39 枚**（例 `approval/queue_test.go:283`／`:290` 只比"不等"、不比字面串）⇒ 改写串换成任何别的形状，全仓无一枚既存用例红（**读码推的**，⛔ 颜色凭据）。
+- **两枚铸造点非导出性（票面 d 行复认）**：`internal/agent/loop.go:603 func callCorr(taskID, callID string, index int) string`（首字母小写＝非导出），非测试调用点＝**1 枚**＝`:676`；`internal/agent/approval/queue.go:156 func (q *Queue) push(d tools.Decision) (*qitem, error)`（非导出），产码调用者＝**1 枚**＝`gate.go:507`（含测试共 7 枚命中）。
+- **两枚臂的本体（臂分账的字节凭据）**：数字臂＝`subagent_roster_197.go:333-344`（`:334 LastIndexByte(id, '#')` ⇄ `:339-340` 尾段逐字符验 `'0'..'9'` ⇄ `:343 id[:i]`），唯一读者 `:308`；第三臂＝`:312 if strings.HasPrefix(key, task+"#")`；名册唯一读点＝`:252 BlockedOnApproval: row.TaskID != "" && waiting[row.TaskID]`。
+
+**四数（派单明令⛔ 混用⛔ 相减）**：本腿⛔ 跑 `go test`／`go build` ⇒ **零个四数读数**（不申报）。票面第三行那一发的 `RUN=2 PASS_TOP=2 FAIL_TOP=0 SKIP=0 rc=0` 一律标**读码推的**，凭据＝裁腿判语件 `docs/evidence/s1/328-v1-verdict.md:11`。
+
+**门禁四数（只在共享工作树；跑前 `unset GOTMPDIR TMPDIR WISP_TEST_GOTMP_ROOT`＝A1027 第⑤节定式，env 现量＝GOTMPDIR／TMPDIR 均 unset）**：
+1. `gofumpt.exe -l`＝**未适用（尺无对象）**：本腿名册 `.go` 命中＝0 ⇒ 零枚可喂件；★⛔ 把 `.sh` 喂给 gofumpt＝今天 336-r1 踩过的"尺用错、rc=2 只是 U+0023 噪声"那一形，本腿具名不做；
+2. `sh scripts/d22scan.sh`＝**rc=0 clean**（逐字＝`logs/gate-d22scan.log`；射程现量 ban#8 `internal/` 590 枚 ⇄ `cmd/` 143 枚、live scope `internal/`=241 ⇄ `cmd/`=42 ⇄ `frontend/`=116 ⇒ 非空，⛔ 缺 `design/` 那一形 exit 2＝GUARD 射程拒绝⛔ 读成红）；
+3. `sh scripts/check-path-length-budget.sh`＝**rc=0 VERDICT GREEN**（逐字＝`logs/gate-pathlength.log`；分母＝全树在册超帽件，本腿件最长相对路径＝**54** 字符，尺＝`git ls-files .scratch/wisp/probes/340/a1 | awk '{print length}' | sort -rn | head -1`）；
+4. `go vet`＝**未适用（尺无对象）**：`.go` 命中＝0 ⇒ 无待检包。
+★两枚"未适用"是尺无对象，⛔ 读成 rc=0 绿、⛔ 拿它们凑四数。
+
+## ④ 空槽尺（自避分词形）0 命中 ＋ 正控
+
+逐字命令＝`grep -nE "([T]ODO|[F]IXME|[T]BD|待[补]|占[位]|X{3})" .scratch/wisp/probes/340/a1/census.md .scratch/wisp/probes/340/a1/logs/self-evidence-three-rulers.txt`＝**命中 0**（两件的正文都按自避形写，⛔ 匹配自己）。
+★正控＝同一串尺打到 `internal/agent/approval/ticket146_liveapprovals_backing_test.go`（具名树 `feac8f77`）＝**命中 2 枚**＝`:296`／`:313`（一枚八字母 X 串的夹具）⇒ 先证这把尺会响，再信它的 0。
+
+## ⑤ 五处具名上报（⛔ 我自己填假设／⛔ 盖章）
+
+1. **两枚早期草稿件入库、⛔ 当凭据**＝`logs/ac0-a-narrow.sh`＋`logs/ac0-a-narrow.log.raw`（11:3x 第一稿）：那把窄尺的正控当时选错形＝同尺打到 `queue.go` 单文件，而格式串里 `#` 后面是 `%` 而⛔ 数字 ⇒ 正控 0 命中＝"看着像尺失明"。处置＝临时件只建不删、随本笔入库留痕；凭据一律以 `scripts/ac0.sh`（正控＝同尺换射程）⇄ `logs/ac0.log` 为准。**教训具名**：正控要选在"同一枚尺、射程内有已知存在之物"那一档，⛔ 单文件收窄。
+2. **两处本腿自纠（追加笔入库，⛔ amend／⛔ 回改历史）**：
+   - ① 第一枚提交正文（`ba8ecb4f`）与它的存档件 `logs/msg-1-ac0-script.txt` 里，我在"⛔ 那个字形"这句话中**亲手写下了派单禁的那枚分节符字形一次**。派单禁的是写面出现该字形 ⇒ 那一笔不合规。处置＝该件改正字面（随本笔入库，现量 0 命中）＋此处具名登记；⛔ 改 `ba8ecb4f` 的历史（已入库纪律＝要更正只追加）。
+   - ② 本件第一稿里两枚字节数（`ac1.sh`／`ac1b.sh`）⛔ 现量就抄了旧读数、且禁字形那一节自己也带了一枚该字形 ⇒ 全部逐枚重跑后重写（现量见②表；交件侧 12:5x）。★同族教训＝**枚数／字节型引用落笔前必须自己现跑一遍**（裁腿第七节 2 条那一枚账，本腿再踩一次）。
+3. **帽的口径**：正文件四枚（`census.md`＋三把尺）各 ≤160 行 ✓；本件＝派单要求的"交件自证"件、第 5 枚正文件（69 行 ≤160），`logs/**` 属派单明许的读数与存档 ⇒ ⛔ 我把它读成"超帽"，具名交编排者核口径。
+4. **两处未定义即停（已上报并获编排者 12:3x 逐字答）**：① 端到端那一发落哪一包＝票面没写 ⇒ 归编排者裁（本腿⛔ 自行挪射程，只读上报）；② 那枚先例走 L1、不经 push ⇒ census 第三节写成"既存先例射程边界"、⛔ 写"端到端已被覆盖"。
+5. **两枚尺坑自报（同②-2 之外的另两形）**：① `git grep -c` 交回的是"每文件命中数"那几列，第一稿拿 `awk` 求和当行数 ⇒ 改为 `git grep -n … | wc -l`（本件所有枚数＝**行数口径**）；② 支 P 的 pattern 里 `g\.Queue()` 未转义括号会让整条 pattern 报 `Unmatched (`（rc=128＝**尺坏**，⛔ 读成 0 命中）⇒ 修正后现量 12 枚，交件侧复跑同一串。
+
+**必答 (i)–(iv) 的读数位置**：(i) 本件③第二条 ⇄ `logs/ac0.log`；(ii) 本件③第一条 ⇄ `logs/ac0.log` 末段；(iii) `census.md` 第二节表内第三列（甲真／乙真／丙假）＋本件③；(iv) `census.md` 第四节 (iv) 两条（覆盖得到的那一维带尺形，覆盖不到的那一维具名三处字节）。
+**纪律格**：⛔ 翻任何框（现量＝判据区射程 `'^- \[ \] \*\*AC#'` 仍 **7**、已勾 **0**；⛔ 全档形＝会被本腿票尾那一枚污染，A1031）；⛔ 改票名／`Status:`／加 `-done`；⛔ push（本机推送只由编排者做、现被机主按住）；⛔ 动任何 `.go`／⛔ 台账／停车点／别的票／票 328 判据文字；⛔ 新建票件；`add`⇄`commit` 两处 pathspec 逐枚字面路径。

@@ -11,4 +11,5 @@
 - c 数字臂 ⇄ 第三臂两枚臂的本体逐字（roster:312 / :308+:333-344）＋全仓带两枚 # 的表项逐枚点名＋cmd/wisp 那把界复跑（2 命中＝注释里的 "AC#0"/"AC#3"，卡片 corr 带 # ＝0）；
 - d callCorr def loop.go:603 ⇄ Queue.push def queue.go:156 的非导出性逐字＋两枚 %s#%d（queue.go:168 ⇄ :616）逐字＋queue.go 整枚 blob 66fec7ae 三锚对撞同一串。
 
-纪律：零新导出名／零 .go 字节／⛔ 翻框／⛔ push；正文与件内⛔ §（自家尺现量 0）；LF 现量 CR＝0。颜色一律标"读码推的"：那一发 PASS 的凭据＝裁腿判语件第一节 1 条（docs/evidence/s1/328-v1-verdict.md:11），本腿零 go。
+纪律：零新导出名／零 .go 字节／⛔ 翻框／⛔ push；正文与件内⛔ 那枚分节符字形（自家尺现量 0）；LF 现量 CR＝0。颜色一律标"读码推的"：那一发 PASS 的凭据＝裁腿判语件第一节 1 条（docs/evidence/s1/328-v1-verdict.md:11），本腿零 go。
+（★本件自纠一笔，追加⛔ amend：`ba8ecb4f` 那笔的提交正文里我自己写下了那枚被禁的分节符字形一次——写的是"⛔ 该字形"这句话本身。派单禁的是件内出现该字形，故该笔正文按规不合规＝不合规；⛔ 回改历史（已推送纪律＋禁 amend），处置＝本件改正字面＋此笔具名登记，交件笔＝见 logs/self-evidence-three-rulers.txt 第④节。）
