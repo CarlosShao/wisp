@@ -58,5 +58,5 @@
 2. **证据件字节／行数**：`wc -c`＋`wc -l` 逐枚现量入库（`logs/deliverable-sizes.txt`），本件 ≤130 行。
 3. **空槽尺（自避分词形）0 命中**：逐字命令＝`grep -nE '([T]ODO|[F]IXME|[T]BD|待[补]|占[位]|X{3})' docs/evidence/s1/328-v1-verdict.md`（射程＝判语件一枚；写成本文件正文里这个形状、⛔ 匹配自己）＝**命中 0**；★正控＝同一串尺打到 `internal/agent/approval/ticket146_liveapprovals_backing_test.go` 命中 `:296`（一枚八字母 X 串的夹具）⇒ 先证这把尺会响，再信它的 0。逐字读数＝`logs/deliverable-sizes.txt` 末段。
 
-本腿提交（严格前缀尺＝`git log --grep='^票 328 终裁腿 328-v1·' --oneline`）＝起手 `ce16d7bf`／AC#2 `c8e741a8`／AC#3 `8ba2ae09`／AC#4 `45b474ec`／本件＋票尾另两枚。⛔ push／⛔ 翻框／⛔ 改票名／⛔ `add -A`／⛔ `commit -- .`／⛔ amend·reset·rebase·stash·checkout .·clean／⛔ 仓内 worktree；临时件只建不删。
+本腿提交（严格前缀尺＝`git log --grep='^票 328 终裁腿 328-v1·' --oneline`）＝起手 `ce16d7bf`／AC#2 `c8e741a8`／AC#3 `8ba2ae09`／AC#4 `45b474ec`／判语件 `5615f14e`／票尾一条 `f255d53c`＋正文件 `5c6cbe75`／自证与自纠 `363ab1bc`＋本笔更正＝**第二程 9 枚**（★超派单"4–7 笔"帽，逐枚具名上报在 `msg/msg-7-selfevidence.txt`：派单同段那条"每落一枚文件就 commit ⛔ 攒着"与枚数帽相冲，本腿按前者逐批落笔、⛔ amend/reset 合笔）。另：★行数自纠——本笔之前 62 行，票尾那一枚 bullet 里写的"61 行"以本件现量为准（⛔ 回改票面：票尾只许一条，合规做法是追加笔＋此处具名）。⛔ push／⛔ 翻框／⛔ 改票名／⛔ `add -A`／⛔ `commit -- .`／⛔ amend·reset·rebase·stash·checkout .·clean／⛔ 仓内 worktree；临时件只建不删；旧树迁 `D:\tmp\wisp\legacy\` 后我一枚没复用、一枚没删。
 **判语汇总**：`AC#2` 过（具名界①corr 半边生产／在册半边夹具，界②cmd/wisp 无颜色）·`AC#3` 过·`AC#4` 过·必答①＝不算本票欠修＋建议新票·必答②＝买到 Go 侧接线⛔ 用户可见真相。**五枚框一枚没翻**（翻框归编排者）。
