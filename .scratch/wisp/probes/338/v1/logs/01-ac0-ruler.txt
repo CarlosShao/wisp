@@ -1,0 +1,45 @@
+# 338-v1 · AC#0 起手现跑读数（我自己重打，⛔ 采信腿入库的读数）
+
+尺具名：gofumpt v0.12.0 (go1.27.1) ⇄ 同版 gofmt；`diff <(tr -d ' \t' <before>) <(tr -d ' \t' <after>)`。
+射程目录＝`git show <锚>:<f>` 抽到仓外 LF 镜像 `D:\tmp\wisp\20261018\338v1\blobs\`（量的＝blob 字节，⛔ 工作树 CRLF 形）。
+起手锚（我自己 `git log -1` 现认）＝`c596df55`；我读到的 338-r1 起手锚＝`d19288a8`（11:53，它 report `:3` 自认同串）。
+
+## [0] 锚与车道前置
+- `git rev-parse --abbrev-ref HEAD`＝`dev`；`git status --porcelain -- internal cmd`＝0 行（干净）。
+- 腿身份尺（派单 `:5` 要我具名核这一形）＝`git log --all --grep='338-v1'` 现量 **3 笔**，逐枚都是编排者的账（`c596df55`／`98dbf20a`／`274da78a`）⇒ 编排者写的票面／台账里提到我的名字，⛔ 我交过腿活。我这一笔＝盘上第一枚 `338-v1` 腿活。
+
+## [1] 票面行1（全量脏名册）
+- 工作树侧 `gofumpt -l internal cmd`＝**4 行**：`internal\agent\approval\pending_read.go`／`internal\agent\tools.go`／`internal\risk\provenance.go`／`cmd\wisp\models.go`（＝票面那 4 枚 CRLF 假脏，⛔ 本票射程）。
+- ⚠ 与票面记的「6 枚」不同＝**归位已发生**（本票的目的），交件侧只剩 4 枚＝台账 `A1035` 尺③第④项同读数（我自己复跑到同串）。
+
+## [2] 票面行3（blob 态真脏＝本票靶子）
+两棵镜像（`internal`＋`cmd` 跟踪 `.go` 各 735 枚，先数非空）同一把尺：
+- before 锚 `d19288a8`＝**2 枚**：`internal/tools/task_output_pointer_notice_errtext_174r7_test.go`、`cmd/wisp/panel_transport_35r2_test.go`。
+- HEAD＝**0 枚**。
+- 逐名作差 `only_before`＝恰好这两枚；`only_after`＝空。
+- ⚠ 具名两处尺的边角（都⛔ 影响判据，如实登记）：① 镜像里 `before` 侧另有 2 行是 gofumpt 的**解析报错**（`internal/config/writeguard_handedit_227_test.go:1:1: expected 'package', found 'EOF'`、`internal/risk/anchor_miss_reason_339_other_test.go`）＝这两枚在 `d19288a8` 尚未存在、我 `git show` 取到空文件⇒报错非「脏」，名册尺要把「报错行」摘掉才是票面那 2 枚真脏；② `comm` 需 `LC_ALL=C` 排序，否则告警（第二发已修）。
+
+## [3] 票面行2（4 枚 CRLF 假脏＝blob 侧干净）
+逐枚 `gofumpt -l <仓外 LF blob>`＝**0 行**（4/4）⇒ 「假脏」成立：脏只在 `w/crlf` 的工作树形。
+工作树 `git ls-files --eol`＝`i/lf w/crlf attr/text eol=lf` ×4（路径逐名：`cmd/wisp/models.go`／`internal/agent/approval/pending_read.go`／`internal/agent/tools.go`／`internal/risk/provenance.go`）。
+
+## [4] ★AC#0 最硬那枚：非空白尺（我自己造的 before/after）
+| 枚 | before_bytes | after_bytes | 非空白 before⇄after | TR_RC | tr_diff 行 |
+|---|---|---|---|---|---|
+| tools `174r7` | 5914 | 5838 | 4966 ⇄ 4966 | **0** | **0 行（空输出）** |
+| panel `35r2` | 73470 | 73497 | 62106 ⇄ 62107 | **1** | 47 行 |
+- tools 枚＝票面 AC#0 那把尺**成立**（空输出＝非空白字节零变化）。
+- panel 枚＝尺**不成立**＝甲形让路的那一枚（票面 `:39-40` 编排者已裁；台账 `A1031`）。
+- ★**我这把比腿更硬的自证**：把 before blob 拷到仓外、只跑 `gofumpt -w`（⛔ 碰跟踪件），逐发 `gofumpt -l` 到 0，所得哈希 **逐枚等于 HEAD blob**：
+  - tools：round1 `rc_w=0`/l=0 → `13fea5ea73619bf30b474317abbe7ab3a374abaa` ⇄ `HEAD:<f>` 同串；BEFORE=`cb40ecde…`。
+  - panel：round1 `rc_w=0`/l=**1**（一发不收敛）→ round2 l=0 → `bd13149858d314e3de5deab5f0c40205c211f21a` ⇄ `HEAD:<f>` 同串；BEFORE=`52d3c1b2…`。
+  - 两枚再 -w 一发＝哈希不变（幂等 YES）。⇒ **交件字节 ≡ 纯 `gofumpt -w` 的不动点输出**，比「看起来只有空格」强一整档（甲形条件①「改动只许来自 `-w` 本身」被我这一发直接钉住）。
+- `gofmt -d` 交件侧两枚＝**0 字节**（甲形条件⑤复认）。
+
+## [5] panel 枚那 47 行非空白差异逐字归类（甲形放行的三形，具名）
+`type ( … )` 分组新增括号 token ×3 组 ／ `jsPuncts` 切片拆行＋尾逗号 ／ 函数间补空行。逐字见 `tr-T2.diff`。
+
+## [6] ★正控（同一把尺对语义变化不许失明）
+- 只加空白（`package ` → `package  `）：`RC=0`／0 行 ⇒ 尺**对空白失明＝设计如此**。
+- 追加一枚 token（`var zzV1TokenProbe = 1`）：`RC=1`／3 行，逐字 `114a115,116 >  > varzzV1TokenProbe=1`。
+- 改一枚数字：⚠ 我第一发用 GNU sed 不支持的 `\b` ⇒ 命中 0＝空操作伪装成读数（同 `A1033` 第②节那一形）；复做＝先量锚（行号定址）后落刀、落刀后验「旧锚归零＋新锚命中」，`RC=1`／56 行逐字含 `174r7 → 774r7` ⇒ 尺对语义变化**敏感**。
