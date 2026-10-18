@@ -1,0 +1,63 @@
+### hop c-1) BlacklistNote 与它的 Reason 字段：全部落点 rev=c11163c8（★剔 .scratch/** 影子件）
+尺一＝git grep -n BlacklistNote c11163c8 -- "*.go" | grep -v .scratch（射程＝全仓 Go）
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:82:		Blacklist: tools.BlacklistNote{
+c11163c8:internal/tools/gate.go:53:	// BlacklistNote in mode.go: it is evidence for the card, never authority.
+c11163c8:internal/tools/gate.go:54:	Blacklist BlacklistNote
+c11163c8:internal/tools/mode.go:49:// BlacklistNote is risk.Gate's own reading of one call's paths, kept beside the
+c11163c8:internal/tools/mode.go:66:type BlacklistNote struct {
+c11163c8:internal/tools/mode.go:86:func (b *Bridge) readBlacklist(raw []string) BlacklistNote {
+c11163c8:internal/tools/mode.go:87:	var n BlacklistNote
+c11163c8:internal/tools/mode.go:120:func (n BlacklistNote) blacklistedSensitive() bool {
+c11163c8:internal/tools/ticket90_test.go:492:// fills BlacklistNote and leaves risk's own security log line behind, because
+c11163c8:internal/tools/ticket90_test.go:514:	run := func(overrides map[string]bool) (BlacklistNote, int, int) {
+尺二（★决定性：Reason 字段的读形 note.Reason / n.Reason / Blacklist.Reason，同尺同剔）＝
+c11163c8:cmd/wisp/instructions_200r2_test.go:233:			panel.InstructionsStatusLoaded, secOn.Reason)
+c11163c8:cmd/wisp/panel_pump.go:75:			Reason:                 it.Decision.Reason,
+c11163c8:internal/llm/adaptertest/harness.go:652:		if turn.Reasoning == "" {
+c11163c8:internal/llm/adaptertest/harness.go:653:			t.Errorf("no ReasoningDelta assembled (reasoning=%q events below)", turn.Reasoning)
+c11163c8:internal/llm/adaptertest/harness.go:655:		if turn.Reasoning != c.WantReasoning {
+c11163c8:internal/llm/adaptertest/harness.go:656:			t.Errorf("reasoning = %q, want %q", turn.Reasoning, c.WantReasoning)
+c11163c8:internal/panel/approval.go:47:	// Reason is Decision.Reason verbatim.
+c11163c8:internal/panel/approval.go:83:		Reason:                 decision.Reason,
+c11163c8:internal/panel/approval.go:84:		ReasonKnown:            strings.TrimSpace(decision.Reason) != "",
+c11163c8:internal/panel/display_scrub_216_test.go:221:		benign.Deduplicated != hostile.Deduplicated || benign.Reason != hostile.Reason {
+c11163c8:internal/risk/assessor.go:13:// renders Decision.RulesHit and Decision.Reason verbatim.
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:48:	if plain.Level != hostile.Level || plain.Reason != hostile.Reason ||
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:170:		if want := `R6: 程序不在 shell 白名单: helper`; plain.Reason != want {
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:171:			t.Errorf("plain reason = %q, want %q", plain.Reason, want)
+c11163c8:internal/tools/mode.go:111:			n.Reason = d.Reason
+命中行数＝15；逐字判堆：mode.go:111 是 n.Reason = d.Reason＝写侧（生产者），非读者 ⇒ 判定型/搬运型/打印型读者＝0 枚
+尺三（★正控：同一把尺的形状换成今天确实有人读的 Decision.Reason 读形）＝
+c11163c8:cmd/wisp/panel_pump.go:75:			Reason:                 it.Decision.Reason,
+c11163c8:internal/tools/bridge.go:301:	dec.Reason = verdict.Reason
+c11163c8:internal/tools/bridge.go:439:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:internal/tools/bridge.go:1093:	if dec.Reason == "" {
+c11163c8:internal/tools/bridge.go:1094:		dec.Reason = why
+c11163c8:internal/tools/bridge.go:1165:		dec.RulesHit, b.scopeVerdictOf(dec).token(), grantID, dec.Refusal.refusalToken(), dec.Reason)
+正控非测试命中行数＝6（含 bridge.go:301/439/1093/1094/1165、panel_pump.go:75、approval/gate.go:267/606、panel/approval.go:83/84）⇒ 尺在同形状下认得读者，本跳的 0 是真 0
+
+### 尺二自撞具名＋收紧尺（本腿自己抓到的坑，落账）
+★尺二里 n\.Reason 会子串命中 turn.Reasoning（tur[n.Reason]ing），那是 llm/adaptertest 的字段，与 BlacklistNote 无关 ⇒ 尺二的 15 行含子串假命中。
+收紧尺＝git grep -nE "(note|n|Blacklist)\.Reason[^a-zA-Z]" c11163c8 -- "*.go" | grep -v .scratch（词边界，排除 Reasoning/ReasonKnown）：
+c11163c8:cmd/wisp/instructions_200r2_test.go:233:			panel.InstructionsStatusLoaded, secOn.Reason)
+c11163c8:cmd/wisp/panel_pump.go:75:			Reason:                 it.Decision.Reason,
+c11163c8:internal/panel/approval.go:47:	// Reason is Decision.Reason verbatim.
+c11163c8:internal/panel/approval.go:83:		Reason:                 decision.Reason,
+c11163c8:internal/panel/approval.go:84:		ReasonKnown:            strings.TrimSpace(decision.Reason) != "",
+c11163c8:internal/panel/display_scrub_216_test.go:221:		benign.Deduplicated != hostile.Deduplicated || benign.Reason != hostile.Reason {
+c11163c8:internal/risk/assessor.go:13:// renders Decision.RulesHit and Decision.Reason verbatim.
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:48:	if plain.Level != hostile.Level || plain.Reason != hostile.Reason ||
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:170:		if want := `R6: 程序不在 shell 白名单: helper`; plain.Reason != want {
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:171:			t.Errorf("plain reason = %q, want %q", plain.Reason, want)
+c11163c8:internal/tools/mode.go:111:			n.Reason = d.Reason
+收紧后命中行数＝11
+唯一那一枚＝internal/tools/mode.go:111 n.Reason = d.Reason ⇒ 赋值左值＝写侧（生产者），右侧 d.Reason 是 PathDecision.Reason 的读（仍在这同一枚函数内）⇒ BlacklistNote.Reason 的包外/包内读者＝0 枚
+正控（同一把收紧尺的形状，换成 Decision.Reason 读形，非测试）＝
+c11163c8:cmd/wisp/panel_pump.go:75:			Reason:                 it.Decision.Reason,
+c11163c8:internal/panel/approval.go:83:		Reason:                 decision.Reason,
+c11163c8:internal/panel/approval.go:84:		ReasonKnown:            strings.TrimSpace(decision.Reason) != "",
+c11163c8:internal/tools/bridge.go:301:	dec.Reason = verdict.Reason
+c11163c8:internal/tools/bridge.go:1093:	if dec.Reason == "" {
+c11163c8:internal/tools/bridge.go:1094:		dec.Reason = why
+c11163c8:internal/tools/bridge.go:1165:		dec.RulesHit, b.scopeVerdictOf(dec).token(), grantID, dec.Refusal.refusalToken(), dec.Reason)
+正控命中行数＝7 ⇒ ≥1 成立，尺在同形状下认得真读者

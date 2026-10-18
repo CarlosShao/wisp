@@ -1,0 +1,22 @@
+### hop a) blacklist.go 那句 reason 的生产者点位（aRuleReason 一族）rev=c11163c8
+尺＝git grep -n aRuleReason c11163c8 -- internal/risk/blacklist.go 〔量出来的命中行，射程＝单文件〕
+c11163c8:internal/risk/blacklist.go:214:	// Ticket 334 AC#1: every case below returns through aRuleReason, so the
+c11163c8:internal/risk/blacklist.go:221:		return ClassA, aRuleReason("~/.git-credentials", anchorPath(homeS, `.git-credentials`), cand, eqPath)
+c11163c8:internal/risk/blacklist.go:226:		return ClassA, aRuleReason("%APPDATA%\\wisp\\config.toml", anchorPath(appDataS, `wisp`, `config.toml`), cand, eqPath)
+c11163c8:internal/risk/blacklist.go:228:		return ClassA, aRuleReason("~/.ssh/**", anchorPath(homeS, `.ssh`), cand, isUnder)
+c11163c8:internal/risk/blacklist.go:230:		return ClassA, aRuleReason("~/.aws/credentials", anchorPath(homeS, `.aws`, `credentials`), cand, eqPath)
+c11163c8:internal/risk/blacklist.go:232:		return ClassA, aRuleReason("~/.kube/config", anchorPath(homeS, `.kube`, `config`), cand, eqPath)
+c11163c8:internal/risk/blacklist.go:236:		return ClassA, aRuleReason("%APPDATA%\\Microsoft\\Protect\\** (DPAPI master keys)", anchorPath(appDataS, `microsoft`, `protect`), cand, isUnder)
+c11163c8:internal/risk/blacklist.go:238:		return ClassA, aRuleReason("%LOCALAPPDATA%\\Microsoft\\Credentials\\**", anchorPath(localAppDataS, `microsoft`, `credentials`), cand, isUnder)
+c11163c8:internal/risk/blacklist.go:286:// they say different things about the candidate (see aRuleReason); splitting
+c11163c8:internal/risk/blacklist.go:306:// aRuleReason is the ONE place an A-tier reason string is assembled (ticket 334
+c11163c8:internal/risk/blacklist.go:324:func aRuleReason(literal, anchorSpelling string, cand pathForms, rel func(p, dir string) bool) string {
+命中行数＝11；其中 return 调用形＝7 枚
+非 aRuleReason 的 A 档短串（同 switch 里另三支）＝
+c11163c8:internal/risk/blacklist.go:223:		return ClassA, ".git/config"
+c11163c8:internal/risk/blacklist.go:234:		return ClassA, "browser credential store"
+正控（同尺换一枚确定存在的函数名 classifyForms）命中＝
+c11163c8:internal/risk/blacklist.go:80:	class, rule := classifyForms(cand)
+c11163c8:internal/risk/blacklist.go:184:	return classifyForms(formsOf(canonical))
+c11163c8:internal/risk/blacklist.go:187:// classifyForms does the actual matching, on the comparison forms of one path
+c11163c8:internal/risk/blacklist.go:195:func classifyForms(cand pathForms) (Class, string) {

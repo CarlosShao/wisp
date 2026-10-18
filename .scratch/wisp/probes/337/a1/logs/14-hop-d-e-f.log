@@ -1,0 +1,35 @@
+### hop d/e/f rev=c11163c8（★所有尺射程＝全仓 *.go 剔 .scratch/**）
+尺一（hop d：Blacklist 被读的三枚路径切片）＝git grep -n cloneBacking c11163c8 -- internal/agent/approval/pending_read.go
+c11163c8:internal/agent/approval/pending_read.go:69:	out.Args = cloneBacking(d.Args)
+c11163c8:internal/agent/approval/pending_read.go:70:	out.RulesHit = cloneBacking(d.RulesHit)
+c11163c8:internal/agent/approval/pending_read.go:71:	out.Paths = cloneBacking(d.Paths)
+c11163c8:internal/agent/approval/pending_read.go:72:	out.Capabilities = cloneBacking(d.Capabilities)
+c11163c8:internal/agent/approval/pending_read.go:73:	out.Blacklist.Absolute = cloneBacking(d.Blacklist.Absolute)
+c11163c8:internal/agent/approval/pending_read.go:74:	out.Blacklist.Unlockable = cloneBacking(d.Blacklist.Unlockable)
+c11163c8:internal/agent/approval/pending_read.go:75:	out.Blacklist.AlreadyUnlocked = cloneBacking(d.Blacklist.AlreadyUnlocked)
+c11163c8:internal/agent/approval/pending_read.go:79:// cloneBacking copies one slice's elements into fresh memory.
+c11163c8:internal/agent/approval/pending_read.go:80:func cloneBacking[S ~[]E, E any](in S) S {
+hop d 读数＝三枚切片行 :73/:74/:75（Absolute/Unlockable/AlreadyUnlocked），无 Reason 行
+
+尺二（hop e：blacklistedSensitive 全仓命中）＝
+c11163c8:internal/tools/mode.go:117:// blacklistedSensitive reports whether the note found anything worth putting on
+c11163c8:internal/tools/mode.go:120:func (n BlacklistNote) blacklistedSensitive() bool {
+hop_e_hits＝2（两枚都在 mode.go：注释:117＋定义:120 ⇒ 调用点 0 枚）
+尺三（★hop e 正控：同尺形状换一枚确实有调用点的同文件方法 permissionMode）＝
+c11163c8:internal/tools/bridge.go:310:	mode := b.permissionMode()
+positive_control_hits＝1
+
+尺四（hop f：分类器那一跳＝只取 tier、把串丢掉）＝git grep -n Classify 于 tools/paths.go + risk/rules_gateway.go + risk/blacklist.go
+c11163c8:internal/risk/blacklist.go:59:// Classify classifies an already-resolved canonical path. Callers MUST pass
+c11163c8:internal/risk/blacklist.go:70:func Classify(canonical string) Class {
+c11163c8:internal/risk/rules_gateway.go:77:		switch ctx.classifier.Classify(canonical) {
+c11163c8:internal/tools/paths.go:24:// risk.Resolve and risk.Classify were both landed and tested, but the assessor
+c11163c8:internal/tools/paths.go:371:// A/B blacklist (risk.Classify).
+c11163c8:internal/tools/paths.go:377:// Classify implements risk.SensitiveClassifier. The tier mapping is direct:
+c11163c8:internal/tools/paths.go:380:func (sensitiveClassifier) Classify(canonical string) risk.Tier {
+c11163c8:internal/tools/paths.go:381:	switch risk.Classify(canonical) {
+读数＝internal/tools/paths.go:380 func (sensitiveClassifier) Classify(canonical string) risk.Tier ⇒ 返回类型只有 Tier；内部 switch risk.Classify(canonical) 只映射档位，Gate/aRuleReason 那枚字符串在这跳不存在（Classify 只回 Class，不回 reason）
+尺五（hop f 旁证：SensitiveClassifier 接口自陈）＝
+c11163c8:internal/risk/assessor.go:160:type SensitiveClassifier interface {
+c11163c8:internal/risk/assessor.go:161:	Classify(canonical string) Tier
+c11163c8:internal/risk/rules_test.go:33:func (s *stubClassifier) Classify(canonical string) Tier { return s.tiers[canonical] }

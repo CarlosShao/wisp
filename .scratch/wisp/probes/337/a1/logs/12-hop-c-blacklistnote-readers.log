@@ -1,0 +1,160 @@
+## 【对照件·全量原始命中，射程含 .scratch/** 影子件，未剔 ⇒ 本腿决定性读数以 12-hop-c-blacklistnote-landing.log 为准】
+### hop c) BlacklistNote.Reason 消费者普查 rev=c11163c8
+尺一（找 BlacklistNote 全部落点）＝git grep -n "BlacklistNote" c11163c8 -- "*.go":
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:82:		Blacklist: tools.BlacklistNote{
+c11163c8:internal/tools/gate.go:53:	// BlacklistNote in mode.go: it is evidence for the card, never authority.
+c11163c8:internal/tools/gate.go:54:	Blacklist BlacklistNote
+c11163c8:internal/tools/mode.go:49:// BlacklistNote is risk.Gate's own reading of one call's paths, kept beside the
+c11163c8:internal/tools/mode.go:66:type BlacklistNote struct {
+c11163c8:internal/tools/mode.go:86:func (b *Bridge) readBlacklist(raw []string) BlacklistNote {
+c11163c8:internal/tools/mode.go:87:	var n BlacklistNote
+c11163c8:internal/tools/mode.go:120:func (n BlacklistNote) blacklistedSensitive() bool {
+c11163c8:internal/tools/ticket90_test.go:492:// fills BlacklistNote and leaves risk's own security log line behind, because
+c11163c8:internal/tools/ticket90_test.go:514:	run := func(overrides map[string]bool) (BlacklistNote, int, int) {
+尺二（Blacklist 字段访问全形）＝git grep -n "Blacklist\." c11163c8 -- "*.go":
+c11163c8:internal/agent/approval/pending_read.go:73:	out.Blacklist.Absolute = cloneBacking(d.Blacklist.Absolute)
+c11163c8:internal/agent/approval/pending_read.go:74:	out.Blacklist.Unlockable = cloneBacking(d.Blacklist.Unlockable)
+c11163c8:internal/agent/approval/pending_read.go:75:	out.Blacklist.AlreadyUnlocked = cloneBacking(d.Blacklist.AlreadyUnlocked)
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:61:// tools.Decision filled, including the three that live inside Blacklist. The
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:96:// Blacklist.Absolute is reached, and how a reference hiding behind a struct or
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:192:	"Blacklist.Absolute",
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:193:	"Blacklist.AlreadyUnlocked",
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:194:	"Blacklist.Unlockable",
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:300:	row.Decision.Blacklist.Absolute[0] = "C:/clobbered"
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:301:	row.Decision.Blacklist.Unlockable[0] = "C:/clobbered"
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:302:	row.Decision.Blacklist.AlreadyUnlocked[0] = "C:/clobbered"
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:328:		"Blacklist.Absolute":        have.Blacklist.Absolute[0],
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:329:		"Blacklist.Unlockable":      have.Blacklist.Unlockable[0],
+c11163c8:internal/agent/approval/ticket146_liveapprovals_backing_test.go:330:		"Blacklist.AlreadyUnlocked": have.Blacklist.AlreadyUnlocked[0],
+c11163c8:internal/tools/ticket90_test.go:535:		t.Fatalf("Blacklist.Class = %v, want B (risk.Gate was not consulted at all)", note.Class)
+尺三（★正控：同尺换一句今天确实有人读的 reason 串＝assessor Decision.Reason 的读侧）＝git grep -n "dec\.Reason\|Decision\.Reason\|verdict\.Reason" c11163c8 -- "*.go":
+c11163c8:.scratch/wisp/probes/151-accept/bridge.shipped.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/151-accept/bridge.shipped.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/151-accept/bridge.shipped.go:763:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/151-accept/bridge.shipped.go:764:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/151-accept/bridge.shipped.go:820:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/151/bridge.head.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/151/bridge.head.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/151/bridge.head.go:750:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/151/bridge.head.go:751:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/151/bridge.head.go:807:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:792:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:793:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:849:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:792:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:793:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:849:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:791:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:792:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:848:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:791:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:792:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:848:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:792:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:793:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:849:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:792:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:793:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:849:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:792:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:793:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:849:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/mut/bridge.canary.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/mut/bridge.canary.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/mut/bridge.canary.go:788:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/mut/bridge.canary.go:789:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/mut/bridge.canary.go:845:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/mut/bridge.noopentask.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/mut/bridge.noopentask.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/mut/bridge.noopentask.go:787:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/mut/bridge.noopentask.go:788:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/mut/bridge.noopentask.go:844:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:792:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:793:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:849:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:791:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:792:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:848:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:834:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:835:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:891:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:803:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:804:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:860:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/175/r2/bak1-bridge.go:276:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/175/r2/bak1-bridge.go:377:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/175/r2/bak1-bridge.go:861:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/175/r2/bak1-bridge.go:862:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/175/r2/bak1-bridge.go:918:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/197/r3b/pre/panel_pump.go:71:			Reason:                 it.Decision.Reason,
+c11163c8:.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:278:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:379:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:939:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:940:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/222/v1/mutations/asis/bridge.go:996:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:278:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:379:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:937:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:938:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m2-drop-sync-once/bridge.go:994:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:278:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:379:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:939:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:940:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m5-ceiling-to-8/bridge.go:996:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:278:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:379:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:932:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:933:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m8-double-drain-for-real/bridge.go:989:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:278:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:379:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:938:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:939:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/222/v1/mutations/m9-drop-nil-guard/bridge.go:995:		dec.RulesHit, b.inScope(dec), dec.Reason)
+c11163c8:.scratch/wisp/probes/309/a1/logs/assessor.go:13:// renders Decision.RulesHit and Decision.Reason verbatim.
+c11163c8:.scratch/wisp/probes/309/a1/logs/bridge.go:301:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/309/a1/logs/bridge.go:431:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/309/a1/logs/bridge.go:1011:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/309/a1/logs/bridge.go:1012:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/309/a1/logs/bridge.go:1083:		dec.RulesHit, b.inScope(dec), grantID, dec.Reason)
+c11163c8:.scratch/wisp/probes/orch/20261011/writeface-1/logs/head-bridge.go:301:	dec.Reason = verdict.Reason
+c11163c8:.scratch/wisp/probes/orch/20261011/writeface-1/logs/head-bridge.go:431:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:.scratch/wisp/probes/orch/20261011/writeface-1/logs/head-bridge.go:1011:	if dec.Reason == "" {
+c11163c8:.scratch/wisp/probes/orch/20261011/writeface-1/logs/head-bridge.go:1012:		dec.Reason = why
+c11163c8:.scratch/wisp/probes/orch/20261011/writeface-1/logs/head-bridge.go:1083:		dec.RulesHit, b.inScope(dec), grantID, dec.Reason)
+c11163c8:cmd/wisp/panel_pump.go:75:			Reason:                 it.Decision.Reason,
+c11163c8:internal/panel/approval.go:47:	// Reason is Decision.Reason verbatim.
+c11163c8:internal/risk/assessor.go:13:// renders Decision.RulesHit and Decision.Reason verbatim.
+c11163c8:internal/tools/bridge.go:301:	dec.Reason = verdict.Reason
+c11163c8:internal/tools/bridge.go:439:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:internal/tools/bridge.go:1093:	if dec.Reason == "" {
+c11163c8:internal/tools/bridge.go:1094:		dec.Reason = why
+c11163c8:internal/tools/bridge.go:1165:		dec.RulesHit, b.scopeVerdictOf(dec).token(), grantID, dec.Refusal.refusalToken(), dec.Reason)
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:142:			"fs.write", dec.Level, dec.RulesHit, dec.Reason,
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:170:			"fs.edit", dec.Level, dec.RulesHit, dec.Reason,
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:332:	if !strings.Contains(dec.Reason, "授权目录之外") {
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:333:		t.Errorf("the reason shown to the human must name the allowlist verdict, got %q", dec.Reason)
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:343:	t.Logf("读数：越界 fs.edit 经 R2 判 L2、卡片 reason=%q，人批准后落盘", dec.Reason)

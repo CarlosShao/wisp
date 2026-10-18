@@ -1,0 +1,116 @@
+## 【对照件·全量原始命中，射程含 .scratch/** 影子件，未剔；尺四/五/六逐字堆在此】
+### hop c 追加：BlacklistNote.Reason 字段级读者 + Decision.Reason 正控同尺 rev=c11163c8
+尺四（BlacklistNote.Reason 的读形：note.Reason / n.Reason / Blacklist.Reason）＝git grep -n "note\.Reason|n\.Reason|Blacklist\.Reason" c11163c8 -- "*.go":
+c11163c8:.scratch/wisp/probes/197/r3b/pre/panel_pump.go:71:			Reason:                 it.Decision.Reason,
+c11163c8:.scratch/wisp/probes/309/a1/logs/assessor.go:13:// renders Decision.RulesHit and Decision.Reason verbatim.
+c11163c8:cmd/wisp/instructions_200r2_test.go:233:			panel.InstructionsStatusLoaded, secOn.Reason)
+c11163c8:cmd/wisp/panel_pump.go:75:			Reason:                 it.Decision.Reason,
+c11163c8:internal/llm/adaptertest/harness.go:652:		if turn.Reasoning == "" {
+c11163c8:internal/llm/adaptertest/harness.go:653:			t.Errorf("no ReasoningDelta assembled (reasoning=%q events below)", turn.Reasoning)
+c11163c8:internal/llm/adaptertest/harness.go:655:		if turn.Reasoning != c.WantReasoning {
+c11163c8:internal/llm/adaptertest/harness.go:656:			t.Errorf("reasoning = %q, want %q", turn.Reasoning, c.WantReasoning)
+c11163c8:internal/panel/approval.go:47:	// Reason is Decision.Reason verbatim.
+c11163c8:internal/panel/approval.go:83:		Reason:                 decision.Reason,
+c11163c8:internal/panel/approval.go:84:		ReasonKnown:            strings.TrimSpace(decision.Reason) != "",
+c11163c8:internal/panel/display_scrub_216_test.go:221:		benign.Deduplicated != hostile.Deduplicated || benign.Reason != hostile.Reason {
+c11163c8:internal/risk/assessor.go:13:// renders Decision.RulesHit and Decision.Reason verbatim.
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:48:	if plain.Level != hostile.Level || plain.Reason != hostile.Reason ||
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:170:		if want := `R6: 程序不在 shell 白名单: helper`; plain.Reason != want {
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:171:			t.Errorf("plain reason = %q, want %q", plain.Reason, want)
+c11163c8:internal/tools/mode.go:111:			n.Reason = d.Reason
+尺五（★正控：同尺换形＝assessor 的 Decision.Reason 读形）命中行数＋逐字（剔 .scratch/**）：
+c11163c8:cmd/wisp/panel_assets_143_test.go:140:	if !strings.Contains(card.Reason, taintOrigin143) {
+c11163c8:cmd/wisp/panel_assets_143_test.go:142:			"The source string reaches the card through C25's provenance record and nowhere else: if this fails while R4 is present, something started writing its own explanation.", card.Reason, taintOrigin143)
+c11163c8:cmd/wisp/panel_assets_143_test.go:144:	if !strings.HasPrefix(card.Reason, "R1: ") || !strings.Contains(card.Reason, "R4") {
+c11163c8:cmd/wisp/panel_assets_143_test.go:145:		t.Errorf("reason = %q, want both judged clauses (fusion names every rule that fired)", card.Reason)
+c11163c8:cmd/wisp/panel_assets_143_test.go:147:	if !card.ReasonKnown {
+c11163c8:cmd/wisp/panel_pump.go:75:			Reason:                 it.Decision.Reason,
+c11163c8:cmd/wisp/panel_pump_test.go:242:	if got, want := strings.TrimSpace(m[3]), card.Reason; got != want {
+c11163c8:cmd/wisp/panel_pump_test.go:245:	if !card.ReasonKnown {
+c11163c8:cmd/wisp/run.go:785:				d.Tool, d.LevelString(), d.RulesHit, d.Reason)
+c11163c8:internal/agent/approval/fakes_test.go:307:	d.Reason = "目标越出 [fs] 授权目录（R2），需 L2 强确认"
+c11163c8:internal/agent/approval/gate.go:267:			d.Reason = orDefaultText(d.Reason,
+c11163c8:internal/agent/approval/gate.go:606:		Reason:        d.Reason,
+c11163c8:internal/agent/approval/pending_read_test.go:89:	if d.Reason != want.Reason {
+c11163c8:internal/agent/approval/pending_read_test.go:90:		t.Errorf("%s 的 Reason=%q，期望原样 %q", want.CorrelationID, d.Reason, want.Reason)
+c11163c8:internal/llm/openaichat/wire.go:42:	if d.ReasoningContent != "" {
+c11163c8:internal/llm/openaichat/wire.go:43:		return d.ReasoningContent
+c11163c8:internal/llm/openaichat/wire.go:45:	return d.Reasoning
+c11163c8:internal/panel/pump_test.go:80:	if card.Reason != "命令串按 SPEC-06 §10 恒为 L2" || !card.ReasonKnown {
+c11163c8:internal/panel/pump_test.go:81:		t.Errorf("reason = %q known=%v, want the native reason carried as-is", card.Reason, card.ReasonKnown)
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:133:		if d.Reason == "A-list sensitive path (non-overridable): ~/.aws/credentials" {
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:134:			t.Errorf("the reason is back to naming only the anchor, which is the false accusation ticket 334 is about: %q", d.Reason)
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:136:		containFolded334(t, d.Reason, normPath(cand), "the REAL candidate being rejected")
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:137:		containFolded334(t, d.Reason, filepath.Join(w.profile, ".aws", "credentials"), "the REAL absent anchor")
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:138:		containFolded334(t, d.Reason, filepath.Join(w.profile, "work"), "where the candidate's own walk stopped")
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:141:		containFolded334(t, d.Reason, w.profile, "the home the un-installed anchor collapsed to")
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:143:			if !strings.Contains(d.Reason, want) {
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:144:				t.Errorf("reason must carry the word %q so a reader cannot take it for a match, got:\n\t%s", want, d.Reason)
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:147:		t.Logf("honest reject: %s", d.Reason)
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:158:		containFolded334(t, d.Reason, filepath.Join(w.profile, ".kube", "config"), "the now-missing kube anchor")
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:159:		containFolded334(t, d.Reason, normPath(cand), "the REAL candidate")
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:160:		if strings.Contains(strings.ToLower(d.Reason), quotedFold334(filepath.Join(w.profile, ".aws", "credentials"))) {
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:161:			t.Errorf("the aws anchor is installed here, it must not be the one the reason names: %s", d.Reason)
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:177:		if want := "A-list sensitive path (non-overridable): ~/.aws/credentials"; d.Reason != want {
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:178:			t.Errorf("an honest match must keep the bare rule literal verbatim\n\tgot  %q\n\twant %q", d.Reason, want)
+c11163c8:internal/risk/assessor.go:306:		reason:           d.Reason,
+c11163c8:internal/risk/assessor_test.go:22:	if !strings.Contains(d.Reason, "panic") {
+c11163c8:internal/risk/assessor_test.go:23:		t.Fatalf("reason must name the panic, got %q", d.Reason)
+c11163c8:internal/risk/assessor_test.go:32:		t.Fatalf("panicking dependency: want L2/[R9], got %v/%v (%s)", d.Level, d.RulesHit, d.Reason)
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:38:	return fmt.Sprintf("level=%s rules=%v reason=%q", d.Level, d.RulesHit, d.Reason)
+c11163c8:internal/risk/name_claim_two_arm_216_test.go:42:	return fmt.Sprintf("class=%s allow=%v needL2=%v reason=%q", d.Class, d.Allow, d.NeedL2, d.Reason)
+c11163c8:internal/risk/provenance_test.go:245:	if !strings.Contains(d.Reason, "包含来自") || !strings.Contains(d.Reason, "doc.read") {
+c11163c8:internal/risk/provenance_test.go:246:		t.Fatalf("reason must name the source in the contract wording, got %q", d.Reason)
+c11163c8:internal/risk/rules_test.go:172:				t.Fatalf("%s: want %v/[R5], got %v/%v (%s)", tc.name, tc.wantLevel, d.Level, d.RulesHit, d.Reason)
+c11163c8:internal/risk/rules_test.go:177:			t.Fatalf("%s: want clean L0, got %v/%v (%s)", tc.name, d.Level, d.RulesHit, d.Reason)
+c11163c8:internal/risk/rules_test.go:205:			t.Fatalf("%s: want %v/[R6], got %v/%v (%s)", tc.name, tc.wantLevel, d.Level, d.RulesHit, d.Reason)
+c11163c8:internal/risk/rules_test.go:258:			t.Fatalf("%s: want %v, got %v/%v (%s)", tc.name, tc.wantLevel, d.Level, d.RulesHit, d.Reason)
+c11163c8:internal/tools/bridge.go:301:	dec.Reason = verdict.Reason
+c11163c8:internal/tools/bridge.go:439:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:internal/tools/bridge.go:1093:	if dec.Reason == "" {
+c11163c8:internal/tools/bridge.go:1094:		dec.Reason = why
+c11163c8:internal/tools/bridge.go:1165:		dec.RulesHit, b.scopeVerdictOf(dec).token(), grantID, dec.Refusal.refusalToken(), dec.Reason)
+c11163c8:internal/tools/bridge_junction_windows_test.go:306:	if !strings.Contains(d.Reason, "无法规范化") {
+c11163c8:internal/tools/bridge_junction_windows_test.go:307:		t.Fatalf("junction 拒绝的 reason 必须说明是解析失败: %q", d.Reason)
+c11163c8:internal/tools/bridge_junction_windows_test.go:309:	if strings.Contains(d.Reason, "目标路径在授权目录之外") {
+c11163c8:internal/tools/bridge_junction_windows_test.go:310:		t.Fatalf("红队拒绝不得与'不在授权目录内'共用措辞（否则未来的询问流会被注入文档驱动）: %q", d.Reason)
+c11163c8:internal/tools/bridge_junction_windows_test.go:462:	if strings.Contains(d.Reason, "A 档") {
+c11163c8:internal/tools/bridge_junction_windows_test.go:463:		t.Errorf("reason = %q：解析器一拒，A 档匹配根本没发生（这正是上面那段登记的成因）", d.Reason)
+c11163c8:internal/tools/bridge_junction_windows_test.go:558:		if !strings.Contains(d.Reason, "目标路径在授权目录之外") {
+c11163c8:internal/tools/bridge_junction_windows_test.go:559:			t.Errorf("拼法 %q 的 reason = %q, want 越界措辞（8.3 不是红队门）", spelling, d.Reason)
+c11163c8:internal/tools/bridge_test.go:517:		if d.Reason == "" || !strings.Contains(d.Reason, "R1") {
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:142:			"fs.write", dec.Level, dec.RulesHit, dec.Reason,
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:170:			"fs.edit", dec.Level, dec.RulesHit, dec.Reason,
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:332:	if !strings.Contains(dec.Reason, "授权目录之外") {
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:333:		t.Errorf("the reason shown to the human must name the allowlist verdict, got %q", dec.Reason)
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:343:	t.Logf("读数：越界 fs.edit 经 R2 判 L2、卡片 reason=%q，人批准后落盘", dec.Reason)
+c11163c8:internal/tools/fs_test.go:88:	if !strings.Contains(d.Reason, "fs.read") {
+c11163c8:internal/tools/fs_test.go:89:		t.Errorf("the card reason must NAME the leak source, got %q", d.Reason)
+c11163c8:internal/tools/mode.go:111:			n.Reason = d.Reason
+c11163c8:internal/tools/refusal_20r2_test.go:130:	if !strings.Contains(d.Reason, "R2") {
+c11163c8:internal/tools/refusal_20r2_test.go:131:		t.Fatalf("reason = %q, want the R2 verdict wording (unchanged by this ticket)", d.Reason)
+c11163c8:internal/tools/ticket175r2_stamp_live_test.go:256:	if strings.Contains(d.Reason, "task.output") {
+c11163c8:internal/tools/ticket175r2_stamp_live_test.go:257:		t.Errorf("确认卡把这次命中记成了宿主自己写下的那一枚来源（%q）：豁免越界把它扩到了外来 mark 上", d.Reason)
+正控命中行数（生产 internal/cmd，剔 .scratch）=72
+尺六（判定型读形：Contains/== 比 reason 串）＝git grep -n -e "Contains(dec\.Reason" -e "Reason ==" c11163c8 -- "*.go" 剔 .scratch：
+c11163c8:cmd/wisp/panel_pump_test.go:278:	if live.Composer.Workspace.Reason == "" {
+c11163c8:cmd/wisp/panel_pump_test.go:395:	if live.Composer.Workspace.Reason == "" {
+c11163c8:cmd/wisp/resident_approval_windows.go:643:	if c.TaskID == "" || c.Reason == "" {
+c11163c8:cmd/wisp/subagent_carrier_197_test.go:323:	if root.StatusKnown || root.Status != "" || root.StatusReason == "" {
+c11163c8:internal/agent/approval/queue_test.go:62:	if p.Reason == "" {
+c11163c8:internal/panel/display_scrub_216_test.go:288:	if unread.Composer.Workspace.Reason == readButNone.Composer.Workspace.Reason {
+c11163c8:internal/panel/git_test.go:153:	if view.Reason == "" || !strings.Contains(view.Reason, sha) {
+c11163c8:internal/panel/git_test.go:310:	if view.Reason == "" {
+c11163c8:internal/panel/git_test.go:577:	if wire.Composer.Git.Reason == "" || wire.Composer.Git.Blocked == "" {
+c11163c8:internal/panel/git_test.go:586:	if snap.Composer.Git.Kind != GitKindUnreadable || snap.Composer.Git.Reason == "" {
+c11163c8:internal/panel/pump_test.go:137:	if snap.Composer.Workspace.Set || snap.Composer.Workspace.Reason == "" {
+c11163c8:internal/panel/subagent_roster_197.go:263:			if view.StatusReason == "" {
+c11163c8:internal/panel/subagent_roster_197_test.go:321:	if blankRow.StatusReason == "" {
+c11163c8:internal/panel/workspace_account_181r3_test.go:119:		if v.Set || v.Reason == "" || v.Rewritten || v.Reparse {
+c11163c8:internal/panel/workspace_test.go:156:	if v := WorkspaceViewFromRoot(risk.Result{}); v.Set || v.Reason == "" {
+c11163c8:internal/panel/workspace_test.go:159:	if v := WorkspaceViewFromRoot(risk.Result{Canonical: "   "}); v.Set || v.Reason == "" {
+c11163c8:internal/risk/anchor_miss_reason_334_test.go:133:		if d.Reason == "A-list sensitive path (non-overridable): ~/.aws/credentials" {
+c11163c8:internal/tools/bridge.go:1093:	if dec.Reason == "" {
+c11163c8:internal/tools/bridge_test.go:517:		if d.Reason == "" || !strings.Contains(d.Reason, "R1") {
+c11163c8:internal/tools/fs_edit_ac5_gate_r4_test.go:332:	if !strings.Contains(dec.Reason, "授权目录之外") {
+判定型命中行数=20

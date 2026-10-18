@@ -1,0 +1,11 @@
+### hop b) risk.Gate 全仓生产调用点 rev=c11163c8
+尺一（射程＝全仓 *.go，★剔 .scratch/** 影子件）＝git grep -n "risk\.Gate(" c11163c8 -- "*.go" | grep -v .scratch
+c11163c8:internal/tools/mode.go:98:		d := risk.Gate(c, overrides)
+命中行数＝1
+尺二（同尺只数非测试文件）＝
+c11163c8:internal/tools/mode.go:98:		d := risk.Gate(c, overrides)
+非测试命中行数＝1
+尺三（★正控：同尺形状换一枚今天确有 ≥2 枚调用点的 risk.Resolve(）＝
+c11163c8:internal/tools/paths.go:116:	res, err := risk.Resolve(raw, p.exceptions)
+正控非测试命中行数＝1
+⇒ 尺子没坏（正控命中≥1），本跳读数＝生产调用点恰 1 枚＝internal/tools/mode.go:98
