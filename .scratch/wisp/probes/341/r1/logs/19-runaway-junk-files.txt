@@ -1,0 +1,96 @@
+[how they happened] my inline printf used a bash DOUBLE-QUOTED format string containing BACKTICKS.
+  Backticks there = command substitution; the substituted text (git status / git diff output lines, and
+  CJK prose fragments) was then EXECUTED by bash repeatedly. Lines containing '>' became shell
+  redirections, which created files in the CURRENT directory = the repo root. Rule violated:
+  dispatch shell block, quoted verbatim in spirit: double-quoted strings must not contain backticks or $.
+
+[1] every untracked entry in the repo ROOT that is not a directory, with size and mtime
+    UNTRACKED ./****（）。 bytes=0 mtime=2026-10-03 10:20:55
+    UNTRACKED ./- bytes=0 mtime=2026-10-03 10:20:56
+    UNTRACKED ./10-roster.md bytes=180 mtime=2026-10-12 10:38:27
+    UNTRACKED ./2026-09-24 bytes=0 mtime=2026-10-03 10:21:07
+    UNTRACKED ./2379 bytes=11859 mtime=2026-10-02 09:15:21
+    UNTRACKED ./397 bytes=54 mtime=2026-10-06 16:57:57
+    UNTRACKED ./4 bytes=216 mtime=2026-10-06 16:57:57
+    UNTRACKED ./; bytes=0 mtime=2026-10-18 16:10:56
+    TRACKED, not mine to judge: ./AGENTS.md
+    TRACKED, not mine to judge: ./README.md
+    UNTRACKED ./balldebug.exe bytes=7069696 mtime=2026-09-21 08:40:42
+    UNTRACKED ./core-after.A-evaluated.txt bytes=0 mtime=2026-10-10 14:44:24
+    UNTRACKED ./core-after.A-fail.txt bytes=0 mtime=2026-10-10 14:44:24
+    UNTRACKED ./core-after.A-pass.txt bytes=0 mtime=2026-10-10 14:44:24
+    UNTRACKED ./core-after.A-skip.txt bytes=0 mtime=2026-10-10 14:44:24
+    UNTRACKED ./core-after.B-evaluated.txt bytes=0 mtime=2026-10-10 14:44:24
+    TRACKED, not mine to judge: ./deps.toml
+    UNTRACKED ./g-f-83fixtures.txt bytes=3651 mtime=2026-10-11 09:46:46
+    TRACKED, not mine to judge: ./go.mod
+    TRACKED, not mine to judge: ./go.sum
+    UNTRACKED ./part1-state1-fixed.txt bytes=20288 mtime=2026-09-27 17:39:38
+    UNTRACKED ./part1-state1-pristine.txt bytes=20288 mtime=2026-09-27 17:39:26
+    UNTRACKED ./part1-state2-fixed.txt bytes=20582 mtime=2026-09-27 17:40:04
+    UNTRACKED ./part1-state2-pristine.txt bytes=20582 mtime=2026-09-27 17:39:52
+    UNTRACKED ./part2-nog6-fixed.txt bytes=86013 mtime=2026-09-27 17:40:49
+    UNTRACKED ./part2-nog6-pristine.txt bytes=86013 mtime=2026-09-27 17:40:26
+    UNTRACKED ./part3-stale-fixed.txt bytes=87537 mtime=2026-09-27 17:41:36
+    UNTRACKED ./part3-stale-pristine.txt bytes=87537 mtime=2026-09-27 17:41:14
+    UNTRACKED ./signmodels.exe bytes=7838720 mtime=2026-09-25 23:16:17
+    UNTRACKED ./wisp.exe bytes=31688925 mtime=2026-10-17 09:39:53
+    UNTRACKED ./⚠⚠ bytes=0 mtime=2026-10-03 10:20:44
+    UNTRACKED ./⛔ bytes=0 mtime=2026-10-18 22:55:26
+    UNTRACKED ./「干净 bytes=0 mtime=2026-10-03 10:21:37
+    UNTRACKED ./与 bytes=0 mtime=2026-10-03 10:21:18
+    UNTRACKED ./且按 bytes=0 mtime=2026-10-03 10:21:06
+    UNTRACKED ./主料＝（26 bytes=0 mtime=2026-10-18 22:55:26
+    UNTRACKED ./任何结论与 bytes=0 mtime=2026-10-03 10:21:06
+    UNTRACKED ./作者：编排会话（owner bytes=0 mtime=2026-10-03 10:21:07
+    UNTRACKED ./全部**只读**、全部取 bytes=0 mtime=2026-10-03 10:21:08
+    UNTRACKED ./前一腿 bytes=0 mtime=2026-10-18 22:55:26
+    UNTRACKED ./取证方：6 bytes=0 mtime=2026-10-03 10:21:07
+    UNTRACKED ./开票动作按 bytes=0 mtime=2026-10-03 10:21:18
+    UNTRACKED ./性质：**这不是契约文件，也不是冻结面**。它是**补票的输入**，不是判据本身。 bytes=0 mtime=2026-10-03 10:20:56
+    UNTRACKED ./性质：**这是审核裁决，不是判据本身，也不是开票授权。** bytes=0 mtime=2026-10-03 10:21:08
+    UNTRACKED ./本件＝票 bytes=0 mtime=2026-10-18 22:55:25
+    UNTRACKED ./本文经 bytes=0 mtime=2026-10-03 10:20:44
+    UNTRACKED ./状态：**FROZEN（S0 bytes=0 mtime=2026-10-03 10:21:36
+    UNTRACKED ./空 bytes=5 mtime=2026-10-06 16:57:57
+    UNTRACKED ./追溯：PLAN.md bytes=0 mtime=2026-10-03 10:21:09
+    UNTRACKED ./（要动 bytes=0 mtime=2026-10-03 10:20:55
+
+[2] git status --porcelain for the root level only (want: exactly these four, nothing of mine tracked)
+ M .scratch/wisp/issues/334-anchor-missing-leaf-reason-names-another-path-and-ci-surface-reds-216-instrument-done.md
+ M .scratch/wisp/issues/339-ticket334-anchor-miss-instrument-runs-on-linux-but-its-fake-home-is-windows-only.md
+ M .scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md
+A  .scratch/wisp/issues/347-posix-resolver-stub-leaves-the-fail-closed-a-clause-unreachable-on-a-supported-platform.md
+?? -
+?? .scratch/bullet-216-flip.txt
+?? .scratch/ci-logs/run-37158259050.err
+?? .scratch/ci-logs/run-37158259050.log
+?? .scratch/ci-logs/run-37166458550-failed.err
+?? .scratch/commit-msg-120r2.txt
+?? .scratch/commit-msg-136s-ac2-ev.txt
+?? .scratch/commit-msg-136s-ac2.txt
+?? .scratch/commit-msg-136s-ac2b.txt
+?? .scratch/commit-msg-136s-ac3.txt
+?? .scratch/commit-msg-136s-ac4.txt
+?? .scratch/commit-msg-136s-ev-ac34.txt
+?? .scratch/commit-msg-136s-ev-add.txt
+?? .scratch/commit-msg-136s-ev-final.txt
+?? .scratch/commit-msg-166r1-fix-comment.txt
+?? .scratch/commit-msg-166r1-guard.txt
+
+[3] content head of each (they are shell-output fragments, not data; recorded so the orchestrator can
+    confirm they contain nothing that looks like an instruction being followed)
+    ---- ./⛔ (0 bytes) ----
+
+    ---- ./主料＝（26 (0 bytes) ----
+
+    ---- ./前一腿 (0 bytes) ----
+
+    ---- ./本件＝票 (0 bytes) ----
+
+[4] my commits do NOT contain them (strict roster, per-commit name-only)
+    f710d104: .scratch/wisp/probes/341/r1/logs/10-ac3-overclaim-run1-rulerdefect.txt .scratch/wisp/probes/341/r1/logs/10-ac3-overclaim.txt .scratch/wi
+    fd82f786: .scratch/wisp/probes/341/r1/logs/00-start.txt .scratch/wisp/probes/341/r1/logs/01-start-gauges.txt .scratch/wisp/probes/341/r1/logs/02-n
+    6948eb08: internal/config/writeguard_unnailed_341_test.go 
+    (any path in those lines outside internal/config/**_test.go, .scratch/wisp/probes/341/r1/,
+     .scratch/wisp/issues/341-* = 越界; the junk files must NOT appear)

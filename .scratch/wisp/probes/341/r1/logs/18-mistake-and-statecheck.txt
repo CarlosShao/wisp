@@ -1,0 +1,72 @@
+[what happened] leg's own shell-discipline violation (dispatch shell rule: backticks inside double quotes).
+  job pwsh-f0ad4753d8984224 killed on request. Consequence checked below, ⛔ assumed.
+
+[1] HEAD and my roster (strict subject-prefix ruler)
+f710d1049d9b211f1b7b5890208c0ca8febbb278 票 341 落地腿 341-r1·report＋必答分件＋EOL/禁字两把尺＋21 枚台件脚本入库（并具名更正三处）
+  my commits:
+    f710d104 票 341 落地腿 341-r1·report＋必答分件＋EOL/禁字两把尺＋21 枚台件脚…
+    fd82f786 票 341 落地腿 341-r1·起手三把尺＋台面/门禁/普查/突变台件与证据�…
+    6948eb08 票 341 落地腿 341-r1·AC#1 四格常驻用例＝P2／P3／P5／P6 逐格补牙（�…
+  count=3
+
+[2] did the runaway commit anything? (expect: NO msg-4 commit; the bullet file may be staged)
+ M .scratch/wisp/issues/334-anchor-missing-leaf-reason-names-another-path-and-ci-surface-reds-216-instrument-done.md
+R  .scratch/wisp/issues/338-two-tracked-files-are-gofumpt-dirty-in-blob-form-so-cis-format-step-goes-red-on-stock.md -> .scratch/wisp/issues/338-two-tracked-files-are-gofumpt-dirty-in-blob-form-so-cis-format-step-goes-red-on-stock-done.md
+ M .scratch/wisp/issues/339-ticket334-anchor-miss-instrument-runs-on-linux-but-its-fake-home-is-windows-only.md
+ M .scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md
+A  .scratch/wisp/issues/347-posix-resolver-stub-leaves-the-fail-closed-a-clause-unreachable-on-a-supported-platform.md
+[end tracked-dirty list: only my own intended paths may appear]
+
+[3] the ticket file: appended bullet present once? line count? box ruler?
+  lines=44 (was 43 at start, 44 after my append)
+  my bullet occurrences=1
+  unchecked=7 checked=0
+  numstat vs HEAD:
+1	0	.scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md
+
+[4] production files untouched all along (blob identity vs my start anchor)
+    internal/config/writeguard.go anchor=0ebc415b0565 index=0ebc415b0565 worktree=0ebc415b0565
+    internal/config/loader.go anchor=9100ba92e220 index=9100ba92e220 worktree=9100ba92e220
+    internal/config/migrate.go anchor=78d85e22e951 index=78d85e22e951 worktree=78d85e22e951
+
+[5] my test file: worktree vs committed blob
+    added in 6948eb08  blob=c577f1ccd458  worktree=c577f1ccd458
+    lines=389 CR=0
+
+[6] anything the runaway may have created by accident? list newest files in repo root and my face]
+    .
+    ./.git
+    ./⛔
+    ./主料＝（26
+    ./前一腿
+    ./本件＝票
+    .scratch/wisp/probes/341/r1
+    .scratch/wisp/probes/341/r1/logs
+    .scratch/wisp/probes/341/r1/logs/10-ac3-overclaim-run1-rulerdefect.txt
+    .scratch/wisp/probes/341/r1/logs/10-ac3-overclaim.txt
+    .scratch/wisp/probes/341/r1/logs/13-precision.txt
+    .scratch/wisp/probes/341/r1/logs/16-eol-proof.txt
+    .scratch/wisp/probes/341/r1/logs/17-banned-char-ruler.txt
+    .scratch/wisp/probes/341/r1/logs/18-mistake-and-statecheck.txt
+    .scratch/wisp/probes/341/r1/report-answers.md
+    .scratch/wisp/probes/341/r1/report.md
+    .scratch/wisp/probes/341/r1/scripts
+    .scratch/wisp/probes/341/r1/scripts/bullet-341-append.txt
+    .scratch/wisp/probes/341/r1/scripts/msg-2-start.txt
+    .scratch/wisp/probes/341/r1/scripts/msg-3-report.txt
+    .scratch/wisp/probes/341/r1/scripts/msg-4-bullet.txt
+    .scratch/wisp/probes/341/r1/scripts/run14-precision.sh
+    .scratch/wisp/probes/341/r1/scripts/run17-eol.sh
+    .scratch/wisp/probes/341/r1/scripts/run18-bannedchar.sh
+    .scratch/wisp/probes/341/r1/scripts/run19-mistakecheck.sh
+
+[7] gates re-run clean after the incident (shared worktree, GOTMPDIR/TMPDIR unset first)
+    gofumpt rc=0
+    vet rc=0
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=592, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 592 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+    d22scan rc=0
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+    pathlen rc=0
+
+[8] bench tree colours are unaffected (they were measured earlier); the shared worktree never ran go test
+    (dispatch: ⛔ 在共享工作树跑 go test／go build - this leg honoured it; the runaway ran git/status only)
