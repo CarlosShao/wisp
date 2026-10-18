@@ -1,0 +1,52 @@
+### AC#1 pinners for the two DPAPI-family anchors (my own rulers, named commit ed8ff551 = before the teeth existed)
+-- who mentions Microsoft/Protect (any spelling) in risk test files at ed8ff551:
+    anchor_miss_reason_334_test.go:21:// roots with one unproven side and says "treat it as protected" - a DENY, in the
+    pathresolver_junction_windows_test.go:282:		filepath.Join(ad, "Microsoft", "Protect", "S-1-5-21", "df9d23cd"),
+    pathshape_portable_test.go:138:		{"%APPDATA%\\Microsoft\\Protect\\**", filepath.Join(appdata, "Microsoft", "Protect", "S-1-5", "masterkey")},
+-- who mentions Microsoft/Credentials (any spelling) at ed8ff551:
+    anchor_miss_reason_334_test.go:120:		// .git-credentials and .ssh ARE installed, so those two rules miss
+    anchor_miss_reason_334_test.go:123:		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
+    anchor_miss_reason_334_test.go:190:	w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
+    assessor_test.go:65:		WithCanonicalizer(&stubCanon{allow: map[string]bool{"~/.git-credentials": true}}).
+    assessor_test.go:66:		WithSensitiveClassifier(&stubClassifier{tiers: map[string]Tier{"~/.git-credentials": TierA}})
+    assessor_test.go:70:		Paths:      []string{"~/.git-credentials"},
+    pathresolver_anchor_spelling_windows_test.go:64:		".git-credentials",                  // exact rule
+    pathresolver_anchor_spelling_windows_test.go:176:// .git-credentials still A, everything here still None), and it is that
+    pathresolver_anchor_spelling_windows_test.go:191:		{filepath.Join(home, ".git-credentials"), ClassA},
+    pathresolver_anchor_spelling_windows_test.go:286:		filepath.Join(home, ".ssh", "prod-credentials.json"), // ~/.ssh/**  +  *credentials*.json
+    pathresolver_junction_windows_test.go:29:	mustWrite(t, filepath.Join(home, ".git-credentials"), "secret")
+    pathresolver_junction_windows_test.go:125:	long := filepath.Join(home, ".git-credentials")
+    pathresolver_junction_windows_test.go:150:	long := filepath.Join(home, ".git-credentials")
+    pathresolver_junction_windows_test.go:196:	long := filepath.Join(home, ".git-credentials")
+-- pathshape_portable_test.go A-table rows (which anchors that table exercises, and what it compares):
+    func TestTierAAnchorsMatchNativeSpelling(t *testing.T) {
+    	home, lapp, appdata := sandbox(t)
+    	t.Setenv("HOME", home)        // POSIX home
+    	t.Setenv("USERPROFILE", home) // Windows home
+    	t.Setenv("APPDATA", appdata)
+    	t.Setenv("LOCALAPPDATA", lapp)
+    
+    	for _, tc := range []struct {
+    		name string
+    		path string
+    	}{
+    		{"~/.ssh/**", filepath.Join(home, ".ssh", "id_platformkey")},
+    		{"~/.ssh/ dir itself", filepath.Join(home, ".ssh")},
+    		{"~/.git-credentials", filepath.Join(home, ".git-credentials")},
+    		{"~/.aws/credentials", filepath.Join(home, ".aws", "credentials")},
+    		{"~/.kube/config", filepath.Join(home, ".kube", "config")},
+    		{".git/config", filepath.Join(home, "repo", ".git", "config")},
+    		{"%APPDATA%\\wisp\\config.toml", filepath.Join(appdata, "wisp", "config.toml")},
+    		{"%APPDATA%\\Microsoft\\Protect\\**", filepath.Join(appdata, "Microsoft", "Protect", "S-1-5", "masterkey")},
+    		{"%LOCALAPPDATA%\\Microsoft\\Credentials\\**", filepath.Join(lapp, "Microsoft", "Credentials", "cred")},
+    		{"browser credential store", filepath.Join(home, "AppData", "Login Data")},
+    	} {
+    		t.Run(tc.name, func(t *testing.T) {
+    			if err := os.MkdirAll(filepath.Dir(tc.path), 0o755); err != nil {
+    				t.Fatal(err)
+    			}
+    			res, err := Resolve(tc.path, nil)
+    			if err != nil {
+    				t.Fatalf("Resolve(%s): %v", tc.path, err)
+    			}
+    			if got := Classify(res.Canonical); got != ClassA {

@@ -1,0 +1,98 @@
+### AC#0 replay start: anchor=e5021339 pristine=c1799cd24afce19e6accef23db23a7d7ee746dec tree=/d/tmp/wisp/20261018/336v1/tree-final
+### start_head=0fd15c6f7555e8d318eebc133322ec950d774d43 1792298407
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [restored-from-commit]
+  go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  GREEN --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal 
+  GREEN --- PASS: TestAnchorMissKeepsNonOverridableClassAndNeedL2 
+  GREEN --- PASS: TestFileBaseNameClaimChangesNoClassOrReason 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* 
+### M-V2a: drop ONLY the fallback branch of the LOCALAPPDATA Microsoft Credentials case
+  落点命中枚数 before=1 after=0  (want 1 -> 0)
+  changed_lines=2
+  diff vs named commit blob:
+    237c237
+    < 	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
+    ---
+    > 	case localAppDataS != "" && anchorMatches(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`)), isUnder):
+  go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  GREEN --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal 
+  GREEN --- PASS: TestAnchorMissKeepsNonOverridableClassAndNeedL2 
+  GREEN --- PASS: TestFileBaseNameClaimChangesNoClassOrReason 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* 
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V2a]
+### M-V2b: drop ONLY the fallback branch of the ~/.ssh/** case
+  落点命中枚数 before=1 after=0  (want 1 -> 0)
+  changed_lines=2
+  diff vs named commit blob:
+    227c227
+    < 	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.ssh`)), isUnder):
+  go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  GREEN --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal 
+  GREEN --- PASS: TestAnchorMissKeepsNonOverridableClassAndNeedL2 
+  GREEN --- PASS: TestFileBaseNameClaimChangesNoClassOrReason 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* 
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V2b]
+### M-V2c: drop ONLY the fallback branch of the ~/.kube/config case
+  落点命中枚数 before=1 after=0  (want 1 -> 0)
+  changed_lines=2
+  diff vs named commit blob:
+    231c231
+    < 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.kube`, `config`)), eqPath):
+  go_test_rc=1 RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal 
+  GREEN --- PASS: TestAnchorMissKeepsNonOverridableClassAndNeedL2 
+  GREEN --- PASS: TestFileBaseNameClaimChangesNoClassOrReason 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* 
+  GREEN     --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* 
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V2c]
+### M-V3: opposite shape (STRICTER) - remove the ancestry bound of uncertainAnchorMiss
+  落点命中枚数 before=1 after=0  (want 1 -> 0)
+  changed_lines=2
+  diff vs named commit blob:
+    366c366
+    < 	return isUnder(cand.root, anchor.root) || isUnder(anchor.root, cand.root)
+    ---
+    > 	return true
+  go_test_rc=1 RUN=10 PASS_TOP=1 FAIL_TOP=2 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  RED --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* 
+  GREEN     --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal 
+  GREEN --- PASS: TestAnchorMissKeepsNonOverridableClassAndNeedL2 
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V3]
+### final state
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [final-blacklist]
+  shared_worktree_dirty_internal_cmd=0
+ac0_runner_rc=0

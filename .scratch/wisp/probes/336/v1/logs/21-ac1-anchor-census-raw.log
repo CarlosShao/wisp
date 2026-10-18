@@ -1,0 +1,85 @@
+### AC#1 census: who pins each anchor today (measured by the judge, read-only on named commit e5021339)
+### ruler: git grep -n <literal> e5021339 -- internal/risk/ ; classification = does the hitting file exercise the BRANCH (uncertainAnchorMiss) or the proven-match arm
+--- literal: git-credentials
+anchor_fallback_teeth_336_other_test.go:30:		anchorPath(homeS, ".git-credentials"),
+anchor_fallback_teeth_336_windows_test.go:51:		{"git-credentials", "home:.git-credentials", "eq", "~/.git-credentials", ".git-credentials", "work"},
+anchor_fallback_teeth_336_windows_test.go:64:	".git-credentials", wispCfgLeaf334, ".ssh/id_installed", ".aws/credentials",
+anchor_miss_reason_334_test.go:120:		// .git-credentials and .ssh ARE installed, so those two rules miss
+anchor_miss_reason_334_test.go:123:		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
+anchor_miss_reason_334_test.go:152:		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", ".aws/not_credentials", wispCfgLeaf334)
+anchor_miss_reason_334_test.go:168:		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", ".aws/credentials", wispCfgLeaf334)
+anchor_miss_reason_334_test.go:190:	w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
+assessor_test.go:65:		WithCanonicalizer(&stubCanon{allow: map[string]bool{"~/.git-credentials": true}}).
+assessor_test.go:66:		WithSensitiveClassifier(&stubClassifier{tiers: map[string]Tier{"~/.git-credentials": TierA}})
+assessor_test.go:70:		Paths:      []string{"~/.git-credentials"},
+pathresolver_anchor_spelling_windows_test.go:46:// (id_*), ~/.git-credentials, ~/.aws/credentials and ~/.kube/config to
+pathresolver_anchor_spelling_windows_test.go:64:		".git-credentials",                  // exact rule
+pathresolver_anchor_spelling_windows_test.go:176:// .git-credentials still A, everything here still None), and it is that
+pathresolver_anchor_spelling_windows_test.go:191:		{filepath.Join(home, ".git-credentials"), ClassA},
+pathresolver_junction_windows_test.go:29:	mustWrite(t, filepath.Join(home, ".git-credentials"), "secret")
+pathresolver_junction_windows_test.go:125:	long := filepath.Join(home, ".git-credentials")
+pathresolver_junction_windows_test.go:150:	long := filepath.Join(home, ".git-credentials")
+pathresolver_junction_windows_test.go:196:	long := filepath.Join(home, ".git-credentials")
+pathresolver_junction_windows_test.go:219:	base := filepath.Join(home, ".git-credentials")
+--- literal: wisp.*config.toml
+anchor_fallback_teeth_336_other_test.go:32:		anchorPath(appDataS, "wisp", "config.toml"),
+anchor_fallback_teeth_336_windows_test.go:52:		{"wisp-config-under", "appdata:wisp", "under", "%APPDATA%\\wisp\\config.toml", wispCfgLeaf334, `AppData/Roaming`},
+anchor_fallback_teeth_336_windows_test.go:53:		{"wisp-config-eq", "appdata:wisp:config.toml", "eq", "%APPDATA%\\wisp\\config.toml", wispCfgLeaf334, `AppData/Roaming/wisp/logs`},
+anchor_miss_reason_334_test.go:44:	wispCfgLeaf334 = `AppData/Roaming/wisp/config.toml`
+pathresolver_junction_windows_test.go:275:		filepath.Join(ad, "wisp", "config.toml"),
+pathshape_portable_test.go:137:		{"%APPDATA%\\wisp\\config.toml", filepath.Join(appdata, "wisp", "config.toml")},
+--- literal: .ssh
+anchor_fallback_teeth_336_other_test.go:33:		anchorPath(homeS, ".ssh"),
+anchor_fallback_teeth_336_windows_test.go:54:		{"ssh", "home:.ssh", "under", "~/.ssh/**", ".ssh/id_installed", "work"},
+anchor_fallback_teeth_336_windows_test.go:64:	".git-credentials", wispCfgLeaf334, ".ssh/id_installed", ".aws/credentials",
+anchor_miss_reason_334_test.go:120:		// .git-credentials and .ssh ARE installed, so those two rules miss
+anchor_miss_reason_334_test.go:123:		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
+anchor_miss_reason_334_test.go:152:		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", ".aws/not_credentials", wispCfgLeaf334)
+anchor_miss_reason_334_test.go:168:		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", ".aws/credentials", wispCfgLeaf334)
+anchor_miss_reason_334_test.go:190:	w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
+pathresolver_anchor_spelling_windows_test.go:45:// rule must still win. Pre-fix, all four of these degrade: ~/.ssh/** to B
+pathresolver_anchor_spelling_windows_test.go:63:		filepath.Join(".ssh", "id_testkey"), // ~/.ssh/** (prefix rule) AND id_*
+pathresolver_anchor_spelling_windows_test.go:116:	long := filepath.Join(home, ".ssh", "id_testkey")
+pathresolver_anchor_spelling_windows_test.go:138:	if s := getShortPath(t, filepath.Join(home, ".ssh", "id_testkey")); s != "" {
+pathresolver_anchor_spelling_windows_test.go:175:// caller the verdict is the pre-ticket-72 verdict (.ssh/** and
+pathresolver_anchor_spelling_windows_test.go:190:		{filepath.Join(home, ".ssh", "id_testkey"), ClassA},
+pathresolver_anchor_spelling_windows_test.go:285:		filepath.Join(home, ".ssh", "id_bothkey"),            // ~/.ssh/**  +  id_*
+pathresolver_anchor_spelling_windows_test.go:286:		filepath.Join(home, ".ssh", "prod-credentials.json"), // ~/.ssh/**  +  *credentials*.json
+pathresolver_anchor_spelling_windows_test.go:287:		filepath.Join(home, ".ssh", "deep", "server.pem"),    // ~/.ssh/**  +  *.pem
+pathresolver_anchor_spelling_windows_test.go:382:		{filepath.Join(home, ".ssh", "id_testkey"), ClassA},
+pathresolver_junction_windows_test.go:30:	mustWrite(t, filepath.Join(home, ".ssh", "id_testkey"), "secret")
+pathresolver_junction_windows_test.go:91:	mkJunction(t, link, filepath.Join(home, ".ssh"))
+--- literal: aws
+anchor_fallback_teeth_336_other_test.go:34:		anchorPath(homeS, ".aws", "credentials"),
+anchor_fallback_teeth_336_windows_test.go:55:		{"aws", "home:.aws:credentials", "eq", "~/.aws/credentials", ".aws/credentials", "work"},
+anchor_fallback_teeth_336_windows_test.go:64:	".git-credentials", wispCfgLeaf334, ".ssh/id_installed", ".aws/credentials",
+anchor_miss_reason_334_test.go:17://   - an A-anchor leaf that is not installed on this machine (say ~/.aws) stops
+anchor_miss_reason_334_test.go:40:	// about the ~/.aws/credentials sentence, so the wisp config leaf (the
+anchor_miss_reason_334_test.go:119:	t.Run("absent-aws-leaf-accuses-aws-and-says-so", func(t *testing.T) {
+anchor_miss_reason_334_test.go:121:		// honestly and the first fail-closed hit is the ~/.aws one - the exact
+anchor_miss_reason_334_test.go:133:		if d.Reason == "A-list sensitive path (non-overridable): ~/.aws/credentials" {
+anchor_miss_reason_334_test.go:137:		containFolded334(t, d.Reason, filepath.Join(w.profile, ".aws", "credentials"), "the REAL absent anchor")
+anchor_miss_reason_334_test.go:149:	t.Run("installing-aws-moves-the-named-anchor-to-kube", func(t *testing.T) {
+anchor_miss_reason_334_test.go:152:		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", ".aws/not_credentials", wispCfgLeaf334)
+anchor_miss_reason_334_test.go:160:		if strings.Contains(strings.ToLower(d.Reason), quotedFold334(filepath.Join(w.profile, ".aws", "credentials"))) {
+anchor_miss_reason_334_test.go:161:			t.Errorf("the aws anchor is installed here, it must not be the one the reason names: %s", d.Reason)
+anchor_miss_reason_334_test.go:168:		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", ".aws/credentials", wispCfgLeaf334)
+anchor_miss_reason_334_test.go:169:		cand := filepath.Join(w.profile, ".aws", "credentials")
+anchor_miss_reason_334_test.go:177:		if want := "A-list sensitive path (non-overridable): ~/.aws/credentials"; d.Reason != want {
+name_claim_two_arm_216_test.go:78:	// leaf is not installed here (say ~/.aws) has its own expansion stopped at
+pathresolver_anchor_spelling_windows_test.go:46:// (id_*), ~/.git-credentials, ~/.aws/credentials and ~/.kube/config to
+pathresolver_anchor_spelling_windows_test.go:65:		filepath.Join(".aws", "credentials"),
+pathresolver_junction_windows_test.go:31:	mustWrite(t, filepath.Join(home, ".aws", "credentials"), "secret")
+--- literal: kube
+anchor_fallback_teeth_336_other_test.go:35:		anchorPath(homeS, ".kube", "config"),
+anchor_fallback_teeth_336_windows_test.go:56:		{"kube", "home:.kube:config", "eq", "~/.kube/config", ".kube/config", "work"},
+anchor_fallback_teeth_336_windows_test.go:65:	".kube/config", `AppData/Roaming/Microsoft/Protect/marker.txt`,
+anchor_miss_reason_334_test.go:149:	t.Run("installing-aws-moves-the-named-anchor-to-kube", func(t *testing.T) {
+anchor_miss_reason_334_test.go:158:		containFolded334(t, d.Reason, filepath.Join(w.profile, ".kube", "config"), "the now-missing kube anchor")
+pathresolver_anchor_spelling_windows_test.go:46:// (id_*), ~/.git-credentials, ~/.aws/credentials and ~/.kube/config to
+pathresolver_anchor_spelling_windows_test.go:66:		filepath.Join(".kube", "config"),
+pathresolver_junction_windows_test.go:32:	mustWrite(t, filepath.Join(home, ".kube", "config"), "secret")
+pathresolver_junction_windows_test.go:279:		filepath.Join(home, ".kube", "config"),
+pathshape_portable_test.go:135:		{"~/.kube/config", filepath.Join(home, ".kube", "config")},
+--- literal: Microsoft...Protect\|microsoft`, `protect
+--- literal: microsoft`, `credentials
