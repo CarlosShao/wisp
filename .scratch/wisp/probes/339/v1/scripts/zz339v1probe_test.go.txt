@@ -1,0 +1,85 @@
+//go:build !windows
+
+package risk
+
+import (
+	"os"
+	"path/filepath"
+	"runtime"
+	"testing"
+)
+
+// 339-v1 adjudication probe (reading only, zero assertions): the verdict leg
+// re-measures the orchestrator's mechanism correction on ticket 339 line 39 by
+// itself, instead of reading his prose. It prints what formsOf /
+// uncertainAnchorMiss / Classify / Gate actually return on THIS platform for a
+// world built the same way ticket 334's instrument builds it (fake home
+// relocated through USERPROFILE/HOME/APPDATA/LOCALAPPDATA, anchor leaves
+// installed by name), so "the A fail-closed shape is structurally unreachable
+// on POSIX because resolveHandle is a stub" is a fresh reading with file:line.
+func TestZZ339V1ProbeMechanism(t *testing.T) {
+	base := t.TempDir()
+	profile := filepath.Join(base, "profile")
+	work := filepath.Join(profile, "work")
+	for _, d := range []string{profile, work} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatalf("setup mkdir %s: %v", d, err)
+		}
+	}
+	for _, leaf := range []string{".git-credentials", ".ssh/id_installed", `AppData/Roaming/wisp/config.toml`} {
+		full := filepath.Join(profile, filepath.FromSlash(leaf))
+		if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+			t.Fatalf("setup mkdir %s: %v", full, err)
+		}
+		if err := os.WriteFile(full, []byte("x\n"), 0o600); err != nil {
+			t.Fatalf("setup write %s: %v", full, err)
+		}
+	}
+	t.Setenv("USERPROFILE", profile)
+	t.Setenv("HOME", profile)
+	t.Setenv("APPDATA", filepath.Join(profile, "AppData", "Roaming"))
+	t.Setenv("LOCALAPPDATA", filepath.Join(profile, "AppData", "Local"))
+
+	// (a) does the fake home actually take effect on this platform? (the
+	// ticket's original USERPROFILE diagnosis, measured rather than argued)
+	homeSaw := userHomeDir()
+	t.Logf("V1PROBE goos=%s runtime.GOOS=%s homeSaw=%q profile=%q fakeHomeEffective=%v",
+		os.Getenv("HOME"), runtime.GOOS, homeSaw, profile, normDir(homeSaw) == normPath(profile))
+
+	cand := filepath.Join(work, "id_ed25519\x1b\xe2\x80\xae")
+	if _, err := os.Lstat(cand); err == nil {
+		t.Fatalf("setup: hostile candidate must not exist")
+	}
+	fc := formsOf(cand)
+	t.Logf("V1PROBE cand raw=%q real=%q root=%q partial=%v certain=%v", fc.raw, fc.real, fc.root, fc.partial, fc.certain())
+
+	aws := anchorForms(anchorPath(homeSaw, ".aws", "credentials"))
+	t.Logf("V1PROBE anchor-aws(absent leaf) raw=%q real=%q root=%q certain=%v", aws.raw, aws.real, aws.root, aws.certain())
+
+	gitc := anchorForms(anchorPath(homeSaw, ".git-credentials"))
+	t.Logf("V1PROBE anchor-gitcred(installed) real=%q root=%q certain=%v", gitc.real, gitc.root, gitc.certain())
+
+	t.Logf("V1PROBE uncertainAnchorMiss(cand,aws)=%v", uncertainAnchorMiss(fc, aws))
+	t.Logf("V1PROBE Classify(cand)=%s", Classify(cand))
+	d := Gate(cand, nil)
+	t.Logf("V1PROBE Gate class=%s allow=%v needL2=%v reason=%q", d.Class, d.Allow, d.NeedL2, d.Reason)
+
+	// (b) the resolver claim itself, measured on paths that exist on disk.
+	r1, ok1 := resolveHandle(profile)
+	r2, ok2 := resolveHandle(work)
+	t.Logf("V1PROBE resolveHandle(existing profile)=(%q,%v) resolveHandle(existing work)=(%q,%v)", r1, ok1, r2, ok2)
+	fDir := formsOf(profile)
+	t.Logf("V1PROBE formsOf(real existing dir) real=%q root=%q", fDir.real, fDir.root)
+	fLeaf := formsOf(filepath.Join(profile, ".git-credentials"))
+	t.Logf("V1PROBE formsOf(installed anchor leaf) real=%q root=%q", fLeaf.real, fLeaf.root)
+
+	// (c) is the first-line guard of uncertainAnchorMiss the thing that returns
+	// false, or the certainty/ancestry lines below it? probe both by hand.
+	t.Logf("V1PROBE guard-expr cand.root==\"\"||anchor.root==\"\" = %v", fc.root == "" || aws.root == "")
+	t.Logf("V1PROBE cand.certain()=%v anchor.certain()=%v isUnder(cand,anchor)=%v isUnder(anchor,cand)=%v",
+		fc.certain(), aws.certain(), isUnder(fc.root, aws.root), isUnder(aws.root, fc.root))
+
+	// (d) positive control for the reading above: on a spelling whose every
+	// component exists, a working resolver WOULD give a root; here it must not.
+	t.Logf("V1PROBE formsOf(tempdir root) real=%q root=%q", formsOf(base).real, formsOf(base).root)
+}

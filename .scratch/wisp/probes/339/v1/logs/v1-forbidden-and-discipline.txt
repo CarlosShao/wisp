@@ -1,0 +1,83 @@
+== 尺①禁区件在 e6fd0f50..HEAD 的被动次数（应全 0）==
+  touched=0  internal/risk/blacklist.go
+  touched=0  internal/risk/pathresolver.go
+  touched=0  internal/risk/pathresolver_other.go
+  touched=0  internal/risk/pathresolver_windows.go
+  touched=0  internal/risk/anchor_fallback_teeth_336_windows_test.go
+  touched=0  internal/risk/anchor_fallback_teeth_336_other_test.go
+  touched=0  internal/risk/name_claim_two_arm_216_test.go
+  touched=0  internal/observe/thresholds.go
+  touched=0  scripts/portable-tests.sh
+  touched=0  .github/workflows/ci.yml
+  touched=0  go.mod
+  touched=0  go.sum
+  touched=0  .gitignore
+  touched=0  internal/panel/tokens_fourway_test.go
+  touched=0  internal/panel/l2_grant_boundary_test.go
+  touched=0  internal/perm/ticket90_persist_test.go
+  touched=0  docs/PLAN.md
+  touched=0  frontend
+  touched=0  design
+  touched=0  cmd/wisp
+  touched=0  internal/panel
+
+== 尺②三枚生产码件 blob 同串（⛔ 非注释字节＝整件未动）==
+  internal/risk/blacklist.go pre=c1799cd24afce19e6accef23db23a7d7ee746dec head=c1799cd24afce19e6accef23db23a7d7ee746dec same=YES
+  internal/risk/pathresolver.go pre=15349e28baf70da3bd7aa1d101ebf61cee20fe35 head=15349e28baf70da3bd7aa1d101ebf61cee20fe35 same=YES
+  internal/risk/pathresolver_other.go pre=37c42e9471101c8eedacfad6b7c539a5d4bc4c46 head=37c42e9471101c8eedacfad6b7c539a5d4bc4c46 same=YES
+
+== 尺③票 339 票面＝纯追加？numstat ＋ Status 行 ＋ 票名 rename ==
+  numstat e6fd0f5051812a23c72db444d12d76b4d27285a7..HEAD:
+    14	4	.scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md
+    4	0	.scratch/wisp/issues/339-ticket334-anchor-miss-instrument-runs-on-linux-but-its-fake-home-is-windows-only.md
+    35	0	.scratch/wisp/issues/344-c21-table-still-names-the-abandoned-v2-glass-file-as-authority-three-dead-colors.md
+    50	0	.scratch/wisp/issues/345-migration-on-read-is-the-root-of-lost-comments-and-no-ticket-owns-it.md
+    49	0	.scratch/wisp/issues/346-two-race-window-instruments-red-on-abstention-under-ci-contention-blob-identical-flip.md
+  票 339 文件 rename 检测:
+      commit=a5080612
+    
+    M	.scratch/wisp/issues/339-ticket334-anchor-miss-instrument-runs-on-linux-but-its-fake-home-is-windows-only.md
+      commit=2bf64afa
+    
+    M	.scratch/wisp/issues/339-ticket334-anchor-miss-instrument-runs-on-linux-but-its-fake-home-is-windows-only.md
+  Status 行现读（第 3 行前 90 字）:
+    - Status: **已立，未派**（2026-10-18 10:4x 编排者立；来源＝收尾腿 `322-r2
+
+== 尺④票 334 票面文件在 339-r1 期间被动枚数（应 0＝它没改别票）==
+  (空＝零被动)
+
+== 尺⑤甲形落码那笔的 .go 面（恰 2 枚、⛔ 别家件）==
+      7437ef88
+    
+    internal/risk/anchor_miss_reason_334_test.go
+    internal/risk/anchor_miss_reason_339_other_test.go
+
+== 尺⑥断言未放宽：want A／ClassA 那三句在 HEAD 逐字在场 ==
+    22:// non-overridable A that AC#1/AC#2 pin has no world on that platform. Un-tagged,
+    42:// non-overridable tier. That verdict stays exactly as it is (AC#2). What ticket
+    152:		if d.Class != ClassA {
+    155:		if d.Reason == "A-list sensitive path (non-overridable): ~/.aws/credentials" {
+    177:		if d.Class != ClassA {
+    178:			t.Fatalf("fixture guard: want A from the fail-closed clause, got %s", gateShape216(d))
+    196:		if d.Class != ClassA {
+    199:		if want := "A-list sensitive path (non-overridable): ~/.aws/credentials"; d.Reason != want {
+    205:// TestAnchorMissKeepsNonOverridableClassAndNeedL2 is ticket 334 AC#2's gate.
+    211:func TestAnchorMissKeepsNonOverridableClassAndNeedL2(t *testing.T) {
+    214:	if got := Classify(cand); got != ClassA {
+    215:		t.Errorf("class: got %s, want A (the fail-closed tier is unchanged by AC#1)", got)
+    218:	if d.Class != ClassA || d.NeedL2 || d.Allow {
+    219:		t.Errorf("Gate: got %s, want class=A needL2=false allow=false (non-overridable)", gateShape216(d))
+    222:	if u := Gate(cand, map[string]bool{normPath(cand): true}); u.Allow || u.Class != ClassA {
+  t.Skip 命中（两枚仪器件，应 0）:
+    internal/risk/anchor_miss_reason_334_test.go:0
+    internal/risk/anchor_miss_reason_339_other_test.go:0
+
+== 尺⑦新导出名尺（⛔ 新导出名＝两枚件里以大写字母开头的顶层 func/const/type 新增）==
+    +func TestAnchorMissHasNoWorldOnThisPlatform339(t *testing.T) {
+  (只许出现测试函数名 Test*，测试名不算生产导出 API＝同包内 336/334 先例同形)
+
+== 尺⑧绊线件是否真引用了它点名的那三枚锚（⛔ 注释里指名不存在的件）==
+    ref pathresolver_other.go in 339_other=3
+    ref blacklist.go in 339_other=2
+    ref name_claim_two_arm_216_test.go in 339_other=1
+    ref anchor_fallback_teeth_336_other_test.go in 339_other=1
