@@ -102,12 +102,24 @@ dshape（`gotmp/`，先 `mkdir -p`＝`mkdir_gotmp_rc=0`）前 `10/3/0/0 rc=0`（
 
 ## 7 纪律格与交件自证
 
-逐笔（严格前缀尺 `git log --all --grep='^票 336 落地腿 336-r1'`＝**8 笔**，越界 0）：
-`ff56a9e0` 台件 1 枚／`f67048d9` AC#0 8 枚／`c55e32b1` AC#2 牙 1 枚（`.go` 测试面）／`feac8f77` AC#2 正控 3 枚／
-`8c36c23c` AC#2 突变名册 21 枚／`c87df16d` POSIX 半格 2 枚／`90dafe77` AC#4 20 枚／`28da3a7e` AC#3 7 枚。
+逐笔（严格前缀尺 `git log --all --grep='^票 336 落地腿 336-r1'`，现量枚数＝`logs/95-selfcheck.log` 的 `count=` 那行；⛔ 在本件写死一枚会腐烂的号，
+本腿每多落一笔该数就变，唯一真相＝那把尺现跑）：起手九枚＝`ff56a9e0` 台件／`f67048d9` AC#0／`c55e32b1` AC#2 牙本体／`feac8f77` AC#2 成对正控／
+`8c36c23c` AC#2 逐操作数名册／`c87df16d` POSIX 半格／`90dafe77` AC#4／`28da3a7e` AC#3／`ae8040a1` report.md；
+其后四枚＝`14121a91`（8.3 读数＋去 `§`）／`3c535952`（本件三处读数改正）／`985929d0`（三把尺自证件）／`bb247168`（票尾 bullet）／
+`638e7af3`（★交件锚确认发，见下）。
+★票尾那条 bullet 里"logs 69 枚／非 0 字节 64 枚"与"提交九枚"＝本腿写作时刻的读数，其后入库的件使该数已过期（现量＝该 bullet 之后仍在我写面内追加，
+⛔ amend、⛔ 第二条 bullet⇒以本件与 `95-selfcheck.log` 为准，此处具名不糊）。
+**交件锚（`bb247168`＝含我全部字节那枚）确认发**（`logs/96-confirm-anchor.log`，同一台树 `tree-final`、同一条名册、三发串行）＝
+① pristine 哈希 `c1799cd2…` match=YES ⇒ `rc=0 RUN=27 PASS_TOP=4 FAIL_TOP=0 SKIP=0`，且 `teeth_on_tree=a429cdae…`＝跟踪件 blob 逐字同串；
+② 只摘 `:237` 一枚（`落点命中枚数=1`、突变哈希 `5f878954…`）⇒ `rc=1 27/3/1/0`，红名册逐名＝`TestAnchorFallbackTeethPerAnchor336/local-credentials`；
+③ 还原哈希＝`c1799cd2…` match=YES ⇒ 复跑 `rc=0 27/4/0/0` 回绿，末态哈希＝pristine。
+★同批具名作废＝`ac4-10-*.log`／`ac4-11-*.log` 两枚〔故障件〕＝我第一发把 perl 表达式写进 `bash -c` 的双引号里⇒反引号被当命令替换吃掉
+（stderr 逐字 `microsoft: command not found`）⇒`落点命中=0`＝那两发的 `rc=0` 是**假读数**、文件名里的 `MU1h` 也名不副实（实际打在未突变字节上）＝
+⛔ 当凭据、⛔ 删（临时件只建不删）；改正版＝`run-confirm-anchor.sh`（表达式落文件内单引号，⛔ 依赖 echo）。
 写面尺＝逐笔 `git show --name-only` ⊆ `^internal/risk/[^/]+_test.go` ∪ `^\.scratch/wisp/probes/336/r1/` ∪ 票 336 ⇒ `out_of_scope=0` 逐笔（第 2 节 命令可重跑）；
 `.go` 非测试命中 **0**；`blacklist.go` blob 交件侧仍 `c1799cd2…`（＝起手同串）；票面七格现跑**未勾 7／已勾 0**、票名与 `Status:` ⛔ 动。
 形状尺：`anchor_fallback_teeth_336_windows_test.go` 160 行／`..._other_test.go` 92 行，均 CRLF 0、非 ASCII 0、`exported_non_test=0`、`t.Skip=0`。
-具名遗留＝`logs/ac4-full-before-dshape-a.rednames` 等 **4 枚 0 字节**＋`teeth-01-pristine-dshape.log.redlist` 0 字节＝
-★尺坏 artefact（我在双引号里写 glob＝失效，`redlist=0` 是假读数，真名册＝`*.log.rednames` 逐枚非 0）；按"临时件只建不删"⛔ 删、⛔ 当凭据。
+具名遗留＝0 字节件 6 枚（`ac4-full-*.rednames` 四枚＋`teeth-01-….log.redlist`＋`ac4-09-….log.redlist`）＝
+★尺坏 artefact（我在双引号里写 glob＝失效，`redlist=0` 是假读数，真名册＝`*.log.rednames` 逐枚非 0）；按"临时件只建不删"⛔ 删、⛔ 入库当凭据（现量 6 枚全未跟踪）。
+交件锚门禁复量（`logs/gates-final.log`）＝`gofumpt -l` 对我新增件列出 0 枚 rc=0／`d22scan` rc=0 clean（ban#8 `internal/=590`）／长度门 rc=0 GREEN（分母 15520）／`go vet` rc=0。
 ⛔ push、⛔ 翻框、⛔ 改票名；`go test ./cmd/wisp` ⛔ 跑（唯一持跑者＝`228-r3c`／`322-r2`）；本腿⛔ 碰 `internal/panel/**`、`cmd/wisp/**`、`frontend/**`、`design/**`。
