@@ -1,0 +1,18 @@
+NEST=/d/tmp/wisp/20261018/338r1/trees-at-121746
+tree-before go=764 dll=6
+tree-after go=764 dll=6
+===== 别名核验：NEST 与 tree-* 两枚都该有短名 =====
+2026/10/18  12:05    <DIR>          BLOBCH~1     blobcheck
+2026/10/18  12:13    <DIR>          TREE-A~1     tree-after-121315-after
+2026/10/18  12:13    <DIR>          TREE-B~1     tree-before-121311-before
+2026/10/18  12:13               117 TREE-P~1.TXT tree-paths.txt
+2026/10/18  12:17    <DIR>          TREES-~1     trees-at-121746
+2026/10/18  11:59    <DIR>                       wtest
+2026/10/18  12:03    <DIR>                       wtest2
+
+2026/10/18  12:17    <DIR>                       .
+2026/10/18  12:17    <DIR>                       ..
+2026/10/18  12:17    <DIR>          TREE-A~1     tree-after
+2026/10/18  12:17    <DIR>          TREE-B~1     tree-before
+               0 File(s)              0 bytes
+               4 Dir(s)  210,673,774,592 bytes free

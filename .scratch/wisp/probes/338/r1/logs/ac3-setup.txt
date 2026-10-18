@@ -1,0 +1,35 @@
+===== tree-before  rev=0b1d1f0b =====
+cp_build_rc=0
+cp_sherpa_rc=0
+cp_dist_rc=0
+go_files=764
+dll_count=6
+===== tree-after  rev=87521cb4 =====
+cp_build_rc=0
+cp_sherpa_rc=0
+cp_dist_rc=0
+go_files=764
+dll_count=6
+===== 两枚树的差异（应只有 tools 那枚） =====
+Files /d/tmp/wisp/20261018/338r1/tree-before-121311-before/internal/tools/task_output_pointer_notice_errtext_174r7_test.go and /d/tmp/wisp/20261018/338r1/tree-after-121315-after/internal/tools/task_output_pointer_notice_errtext_174r7_test.go differ
+===== 短名别名核验（D 卷 8.3） =====
+ Volume in drive D is SWQ
+ Volume Serial Number is 682D-FE5E
+
+ Directory of D:\tmp\wisp\20261018\338r1
+
+2026/10/18  12:13    <DIR>                       .
+2026/10/18  11:56    <DIR>                       ..
+2026/10/18  12:09    <DIR>                       ac1
+2026/10/18  12:11            23,774 AC2-D2~1.TXT ac2-d22scan.txt
+2026/10/18  12:11             1,294              ac2-len.txt
+2026/10/18  12:11                 0 AC2-VE~1.TXT ac2-vet-tools.txt
+2026/10/18  12:11                 0 AC2-VE~2.TXT ac2-vet-wisp.txt
+2026/10/18  12:05    <DIR>          BLOBCH~1     blobcheck
+2026/10/18  11:56    <DIR>                       logs
+2026/10/18  12:12    <DIR>                       msgs
+2026/10/18  11:56    <DIR>          RULERC~1     rulercheck
+2026/10/18  12:13    <DIR>          TREE-A~1     tree-after-121315-after
+2026/10/18  12:13    <DIR>          TREE-B~1     tree-before-121311-before
+2026/10/18  12:13               117 TREE-P~1.TXT tree-paths.txt
+2026/10/18  11:59    <DIR>                       wtest

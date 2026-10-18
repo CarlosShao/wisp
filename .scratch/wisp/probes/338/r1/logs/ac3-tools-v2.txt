@@ -1,0 +1,41 @@
+NEST=/d/tmp/wisp/20261018/338r1/trees-at-121746  GOTMPDIR=/d/tmp/wisp/20261018/338r1/trees-at-121746/gotmp
+别名尺: 1
+===== before internal/tools =====
+rc=1
+RUN=323
+PASS_TOP=235
+FAIL_TOP=7
+SKIP=0
+--- FAIL 逐名 ---
+--- FAIL: TestBridgeRefusesARealJunctionOnTheReadRoute (0.06s)
+--- FAIL: TestBridgeWritesNothingThroughARealJunction (0.41s)
+--- FAIL: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing (0.06s)
+--- FAIL: TestSweepNeverDeletesThroughARealJunction (0.11s)
+--- FAIL: TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop (0.01s)
+--- FAIL: TestDirOfBaseOfCutOnThePlatformSeparator (0.00s)
+--- FAIL: Test20r2JunctionRefusalIsNeverAskable (0.04s)
+--- SKIP 逐名 ---
+--- 台面故障尺 ---
+none
+bytes=178806
+===== after internal/tools =====
+rc=1
+RUN=323
+PASS_TOP=235
+FAIL_TOP=7
+SKIP=0
+--- FAIL 逐名 ---
+--- FAIL: TestBridgeRefusesARealJunctionOnTheReadRoute (0.06s)
+--- FAIL: TestBridgeWritesNothingThroughARealJunction (0.30s)
+--- FAIL: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing (0.05s)
+--- FAIL: TestSweepNeverDeletesThroughARealJunction (0.07s)
+--- FAIL: TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop (0.01s)
+--- FAIL: TestDirOfBaseOfCutOnThePlatformSeparator (0.00s)
+--- FAIL: Test20r2JunctionRefusalIsNeverAskable (0.05s)
+--- SKIP 逐名 ---
+--- 台面故障尺 ---
+none
+bytes=178653
+===== 两侧 FAIL 名册作差 =====
+only_before=0
+only_after=0

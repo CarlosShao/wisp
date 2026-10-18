@@ -1,0 +1,38 @@
+===== before internal/tools =====
+rc=1
+RUN=316
+PASS_TOP=234
+FAIL_TOP=8
+SKIP=0
+--- FAIL 逐名 ---
+--- FAIL: TestBridgeRefusesARealJunctionOnTheReadRoute (0.07s)
+--- FAIL: TestBridgeWritesNothingThroughARealJunction (0.39s)
+--- FAIL: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing (0.05s)
+--- FAIL: TestSweepNeverDeletesThroughARealJunction (0.08s)
+--- FAIL: TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop (0.01s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+--- FAIL: TestDirOfBaseOfCutOnThePlatformSeparator (0.00s)
+--- FAIL: Test20r2JunctionRefusalIsNeverAskable (0.04s)
+--- SKIP 逐名 ---
+--- 台面故障尺（walk|build failed|no test files|setup failed|0xc0000135） ---
+none
+bytes=167073
+===== after internal/tools =====
+rc=1
+RUN=316
+PASS_TOP=234
+FAIL_TOP=8
+SKIP=0
+--- FAIL 逐名 ---
+--- FAIL: TestBridgeRefusesARealJunctionOnTheReadRoute (0.05s)
+--- FAIL: TestBridgeWritesNothingThroughARealJunction (0.34s)
+--- FAIL: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing (0.04s)
+--- FAIL: TestSweepNeverDeletesThroughARealJunction (0.07s)
+--- FAIL: TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop (0.01s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+--- FAIL: TestDirOfBaseOfCutOnThePlatformSeparator (0.00s)
+--- FAIL: Test20r2JunctionRefusalIsNeverAskable (0.05s)
+--- SKIP 逐名 ---
+--- 台面故障尺（walk|build failed|no test files|setup failed|0xc0000135） ---
+none
+bytes=166704
