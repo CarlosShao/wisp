@@ -1,0 +1,120 @@
+===== [1] 逐枚提交号＋git show --name-only（我这一串 9 笔） =====
+----- 0b1d1f0b
+0b1d1f0b 票 338 落地腿 338-r1·AC#0 起手现跑（两枚尺＋logs）
+      .scratch/wisp/probes/338/r1/logs/ac0-extra.txt
+      .scratch/wisp/probes/338/r1/logs/ac0-start.txt
+      .scratch/wisp/probes/338/r1/logs/run-ac0-extra.sh
+      .scratch/wisp/probes/338/r1/logs/run-ac0.sh
+      OVERREACH=0
+----- 87521cb4
+87521cb4 票 338 落地腿 338-r1·AC#1 归位一枚（tools 枚＝纯空白）＋AC#2 名册成对
+      .scratch/wisp/probes/338/r1/logs/ac1-ac2.txt
+      .scratch/wisp/probes/338/r1/logs/run-ac1-ac2.sh
+      internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+      OVERREACH=0
+----- 3d26240c
+3d26240c 票 338 落地腿 338-r1·AC#2 四道门（共享工作树·逐枚 rc）
+      .scratch/wisp/probes/338/r1/logs/ac2-gates.txt
+      .scratch/wisp/probes/338/r1/logs/run-gates.sh
+      OVERREACH=0
+----- 93d0f39c
+93d0f39c 票 338 落地腿 338-r1·AC#1b 归位第二枚（panel 枚＝lead 票面裁语甲形放行
+      .scratch/wisp/probes/338/r1/logs/ac1b.txt
+      .scratch/wisp/probes/338/r1/logs/run-ac1b.sh
+      cmd/wisp/panel_transport_35r2_test.go
+      OVERREACH=0
+----- ee75c23f
+ee75c23f 票 338 落地腿 338-r1·AC#2 交件侧四道门＋lead 甲形条件④（含存量归位�
+      .scratch/wisp/probes/338/r1/logs/ac2b-gates-post.txt
+      .scratch/wisp/probes/338/r1/logs/ac2c-ctrl-linuxvet.txt
+      .scratch/wisp/probes/338/r1/logs/run-ctrl-linuxvet.sh
+      .scratch/wisp/probes/338/r1/logs/run-gates-post.sh
+      OVERREACH=0
+----- fa5f008f
+fa5f008f 票 338 落地腿 338-r1·AC#3 颜色（internal/tools 成对＋cmd/wisp 定向成对＋红
+      .scratch/wisp/probes/338/r1/logs/ac3-setup-v2.txt
+      .scratch/wisp/probes/338/r1/logs/ac3-setup.txt
+      .scratch/wisp/probes/338/r1/logs/ac3-tools-v2.txt
+      .scratch/wisp/probes/338/r1/logs/ac3-tools.txt
+      .scratch/wisp/probes/338/r1/logs/run-ac3-setup-v2.sh
+      .scratch/wisp/probes/338/r1/logs/run-ac3-setup.sh
+      .scratch/wisp/probes/338/r1/logs/run-ac3-tools-v2.sh
+      .scratch/wisp/probes/338/r1/logs/run-ac3-tools.sh
+      OVERREACH=0
+----- b84dedd0
+b84dedd0 票 338 落地腿 338-r1·AC#3 颜色续（cmd/wisp 整包＋定向成对＋归位尺）＋
+      .scratch/wisp/probes/338/r1/logs/ac3-attr.txt
+      .scratch/wisp/probes/338/r1/logs/ac3-full2.txt
+      .scratch/wisp/probes/338/r1/logs/ac3-tgt.txt
+      .scratch/wisp/probes/338/r1/logs/ac3-tgt2.txt
+      .scratch/wisp/probes/338/r1/logs/ac3-wisp.txt
+      .scratch/wisp/probes/338/r1/logs/run-ac3-attr.sh
+      .scratch/wisp/probes/338/r1/logs/run-ac3-full2.sh
+      .scratch/wisp/probes/338/r1/logs/run-ac3-tgt.sh
+      .scratch/wisp/probes/338/r1/logs/run-ac3-tgt2.sh
+      .scratch/wisp/probes/338/r1/logs/run-ac3-wisp.sh
+      OVERREACH=0
+----- 787dbfb9
+787dbfb9 票 338 落地腿 338-r1·交件 report 入库（具名更正：上一笔 b84dedd0 主题�
+      .scratch/wisp/probes/338/r1/report.md
+      OVERREACH=0
+----- b4844295
+b4844295 票 338 落地腿 338-r1·票尾一条只追加 bullet（交件＋四格一枚没翻的盘�
+      .scratch/wisp/issues/338-two-tracked-files-are-gofumpt-dirty-in-blob-form-so-cis-format-step-goes-red-on-stock.md
+      OVERREACH=0
+===== [2] 必答①：两枚的非空白尺逐字（用 logs 里留档的改前⇄改后重跑） =====
+TOOLS_RULER_RC=0 (期望 0＝空输出)
+tools nonblank before=4966 after=4966
+PANEL_RULER_RC=1 (甲形＝预期 1＝非空白有变，票面已让路)
+panel nonblank before=62106 after=62107
+===== [3] 必答②：名册交件侧现量＋与改前名册作差 =====
+cmd/wisp/models.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+rows_now=4
+--- 改前(6) 逐名 ---
+cmd/wisp/models.go
+cmd/wisp/panel_transport_35r2_test.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+--- 作差：改前有、现无 ---
+cmd/wisp/panel_transport_35r2_test.go
+internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+--- 作差：现有、改前无（必须空） ---
+--- 逐枚复量＝0 枚 ---
+tools_l=0 panel_l=0
+===== [4] 必答③：另四枚 CRLF 件一字未动的尺 =====
+internal/agent/approval/pending_read.go | wt_sha256=ff26e84cbaf1663e | git_status=0 | eol=i/lf w/crlf
+internal/agent/tools.go | wt_sha256=14b2c067a21f713a | git_status=0 | eol=i/lf w/crlf
+internal/risk/provenance.go | wt_sha256=958364fa9775ab7a | git_status=0 | eol=i/lf w/crlf
+cmd/wisp/models.go | wt_sha256=ad839c103367554e | git_status=0 | eol=i/lf w/crlf
+--- blob 侧仍 CLEAN（＝假脏、票面禁区，未动） ---
+internal/agent/approval/pending_read.go blob_gofumpt_l_rows=0
+internal/agent/tools.go blob_gofumpt_l_rows=0
+internal/risk/provenance.go blob_gofumpt_l_rows=0
+cmd/wisp/models.go blob_gofumpt_l_rows=0
+===== [5] 交件侧 eol＋numstat＋CR（两枚） =====
+i/lf    w/lf    attr/text eol=lf      	cmd/wisp/panel_transport_35r2_test.go
+i/lf    w/lf    attr/text eol=lf      	internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+5	5	internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+34	20	cmd/wisp/panel_transport_35r2_test.go
+tools_CR=0 panel_CR=0
+===== [6] report＋logs 尺 =====
+ 115 9871 .scratch/wisp/probes/338/r1/report.md
+logs_count=34
+report_section_char=0
+logs_section_char_total=0
+this_script_own_literal_count=0 (修后期望 0＝连本脚本也不留字面)
+any_zero_byte=0
+max_log_lines=111 (帽 160)
+===== [7] 票 338＝四格一枚没翻＋只追加 =====
+boxes_unchecked=5 boxes_checked=0
+b4844295 票 338 落地腿 338-r1·票尾一条只追加 bullet（交件＋四格一枚没翻的盘上尺）
+1f16831d 两笔账入库（A1030＋A1031）｜A1030＝322-r2 收工确认（10 笔）＋★抓出收件尺盲区：严格前缀尺对「主题被编码打坏成逐字 ?」那笔失明（82c4a1d4，正文同坏、ASCII 完好＝PowerShell 侧编码落空）⇒ 我数 9、盘上真 10；复点尺＝逐枚哈希点名（recount-322r2.sh）；全仓扫今日仅此一枚；定式＝腿报枚数与我的尺不符时，除「先怀疑我的尺」外必须再跑一把逐枚哈希点名尺，前缀尺只做收集、不做分母｜A1031＝★批准「撤 338 甲形」那一笔（对我自己派单硬尺的一次具名让路，五字段齐全，凭据＝票 280 已 -done 的原裁「下一枚真正动该文件的票」＋五条补偿边界）＋票 338 面追加更正我起草的票面前提不实（panel 那枚 gofmt 干净、脏只属 gofumpt 档、非空白 62106→62104、一发 -w 不收敛）＋框数四格→五格（记我，同 A1021 那族）＋★抓出一枚通道限制：subagent 起的腿不被 send_message 中途转达（target not found，试全 id 与前 8 位皆失败）⇒ 裁定落盘、交件后另派接续腿做 panel 那一枚；定式＝名册满时先 release 收工腿腾位、优先 spawn_teammate，subagent 只作兜底＋派单预写「遇未定义即停则落盘后继续做不依赖它的部分」｜另记我一枚：数 AC 框用全档 grep 把自己刚追加的 bullet 数进去了（328-v1 同形）⇒ 数框只许判据区射程或 AC# 形｜★本笔再记我一枚：我差点用 printf 双引号串内嵌 ASCII 双引号写提交正文＝A1030 里刚入账的同形错，改用 Write 落文件再 commit -F｜在飞 4、写腿 3≥3、cmd/wisp 车道已放行 338-r1｜推送已授权仍未执行（未推 428）
+8036586e 机主回话两句：推吧（72b65c61 照推，只推 origin/dev）＋乙（旧树全搬 legacy）｜乙已执行＝D 根 36 枚＋workspace 10 枚搬进 D:\tmp\wisp\legacy（46 枚 3.76GB，⛔ 零删除，worktree 三枚未动）｜★推送已授权但按 CPU 门槛延后（写腿在跑，推会自启 slo-full 洗脏读数）｜立票 338（gofumpt blob 真脏 2 枚＝CI 存量红；4 枚 CRLF 假脏⛔ 顺手修）｜账 A1026＋停车点 4.0ek
+5	0	.scratch/wisp/issues/338-two-tracked-files-are-gofumpt-dirty-in-blob-form-so-cis-format-step-goes-red-on-stock.md
+===== [8] 我没在 docs/evidence/s1/ 落任何件 =====
+rows=0
