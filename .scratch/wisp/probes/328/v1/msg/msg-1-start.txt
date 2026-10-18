@@ -1,0 +1,10 @@
+票 328 终裁腿 328-v1·起手尺 v2 入库＋★落点改判（机主 10-18 10:1x 新铁律＝盘符根目录零污染，覆盖派单台面配方两行）
+
+锚现认＝5db0b538（入场时 10:0x 见 c11163c8，10:13 前已进两笔；★裁决锚固定＝5db0b538，本腿所有只读尺与那棵 after 树取同一份字节，尺＝tree_roster_blob=anchor_blob=2da6c596…）
+框数尺现跑＝总 7 行 - [ 形状／五枚 AC 框（AC#0/AC#1 已勾，AC#2/#3/#4 未勾 3）／:50 :59 两条是 bullet 不是框 ⇒ 腿那句"七格"与 A1020 那句"七格"按尺作废（本腿全程⛔ 翻框）
+f705b082..HEAD 对 internal cmd diff=0 行（入场重验，与编排者那句现跑同读数）⇒ 我要裁的字节＝腿交件侧字节
+internal/panel cmd/wisp status＝空（本波两枚零写腿在我这侧成立）
+★两处具名上报（⛔ 我自己填假设）：
+① 复认 c59d0354 那处派单前提与盘上不符：派单 AC#2③ 要我补的"去边界反形"＝腿 logs/mutate.sh:31 的 M1 替换串逐字节同形（同一枚函数体内 token strings.HasPrefix(key, task+"#")→(key, task)）。我仍自己现跑，判语按我的读数写；⛔ 据此退腿那一发。
+② 落点改判：新建两棵仓外树只落 D:\tmp\wisp\20261018\328v1\{before,after}，GOTMPDIR 同根下 gotmp；上一程旧树（wisp-328r1-*-tree）与第一程那两棵（w328v1a/b）一律不复用不删除。短名实测＝before/after 各自即 8.3 形式（段名 ≤8 ASCII 无空格），cmd for %~sI 现量逐字入库，未触发"非要根目录"那格 ⇒ 不停手。
+本笔含第一程（死于日限额）已建未入库的 8 枚写面件（snap×5／build-trees.log／scripts/build-trees.sh）＝同腿同写面，逐枚显式 pathspec。

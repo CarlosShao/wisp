@@ -1,0 +1,14 @@
+票 328 终裁腿 328-v1·AC#3 三面尺＋归因第二发＋★旧树迁 legacy 登记（起手件追加）
+
+编排者 10:3x 转达机主决定「乙」＝D 根 36 枚＋D:\work\workspace 10 枚旧导出树全部迁 D:\tmp\wisp\legacy\（零删除）⇒ 本腿落点不变＝D:\tmp\wisp\20261018\328v1（10:14 新建的那两棵现量：before go=758 blob=35ce6ffb… ⇄ after go=760 blob=2da6c596…，迁移未波及）；⛔ 复用旧树当凭据、⛔ 删 legacy 任何东西。起手件里那四行 untouched_old_tree 按新位置重读，已在件内具名作废。
+
+AC#3① 那 4 枚 .go 逐枚现量动了什么（尺＝git diff -U0 --numstat 648eda04..5db0b538，射程＝具名提交树）：
+  subagent_roster_197.go +66/-10 ＝ 新增非导出 rosteredTaskIDs(:276) ＋ indexWaitingKey 加一枚 known 入参(:303) ＋ 第三臂三行(:311-314) ＋ 两处散文（⓭ 说实话）；★函数体那半把尺＝splitClashSuffix body sha16 两侧同串 7fec699e1a0f00a7 ⇒ 数字臂一字未动（量的，⛔ 抄腿那句）
+  subagent_blocked_220_test.go +12/-4 ＝ 表头散文＋ⓑ 那枚 :141 翻向（false→true）＋:142/:143 原地
+  两枚 *_328_test.go ＝新增（改前侧 cat-file -t＝NOFILE）＋89／＋171
+AC#3② 门控档位与 L2 许可面零字节（我自己打，⛔ 借本票动判定）：internal/risk/mode.go＝c21beeea／internal/risk/provenance.go＝d634aae0／internal/agent/approval/gate.go＝78e2d28a／…/queue.go＝66fec7ae，三锚（648eda04 ⇄ 46d815d9 ⇄ 5db0b538）逐枚同一串＝ZEROBYTE；整面 diff -U0 行数＝internal/risk 0 ⇄ internal/agent/approval 0 ⇄ internal/statemachine 0（D43 转移表那面）
+AC#3③ 零命中带正控：三枚冻结件 diff 各 0 行（正控＝同锚取出的字节 19175/109415/15659、行 550/2549/430 非空）；internal/**/thresholds.go 0 ⇄ testdata/** 0 ⇄ go.mod 0 ⇄ go.sum 0 ⇄ .github/workflows/ci.yml 0（正控＝ci.yml 64794 字节、golden 名册 66 枚、observe/thresholds.go 在树里）
+零新导出名／零新 JSON 键（我自己那把尺，⛔ 抄腿）：panel 那枚文件导出 func 名册两侧作差＝0（同集）；四枚 + 行里唯一的顶层导出标识符＝五枚 Test* 用例名；json: 标签名册作差＝0；ApprovalCardView 里 TaskID 命中仍 0（卡片仍 10 枚带 json: 字段）⇒ 没撞语言层、没开契约面
+splitClashSuffix 仪器现状复认：测试直呼＝0 枚（def :333／doc :318／唯一读者 :308 三命中），正控＝同尺族 indexWaitingKey 8 行 ⇒ 腿件①第五节那句对本腿成立
+⓭ 那句自陈现取逐字：TaskRosterSectionFrom 头补了 328 那一族；splitClashSuffix 文档段已改写为"stopped being true the day loop.go:603 started minting them"＋点名由 indexWaitingKey 的 rostered-task arm 承担 ⇒ 那句话改到说实话（量的）
+必答①那格零读数复跑（我的锚）：git grep -nE '"[^"]*#[0-9]+"' 5db0b538 -- internal/agent/approval＝0；正控＝同族放宽 internal cmd 11 行（真值 7 枚全在 *_test.go 夹具，另 4 枚注释）；真产 <corr>#<seq> 的是 queue.go:168 ⇄ :616 fmt.Sprintf("%s#%d", …, q.seq)，两枚铸造点 callCorr(loop.go:603 非导出) ⇄ Queue.push(queue.go:156 非导出) 跨包 ⇒ 链起来要新导出名（腿如实具名交回，裁语见判语件）

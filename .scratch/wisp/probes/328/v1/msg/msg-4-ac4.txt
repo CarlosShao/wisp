@@ -1,0 +1,19 @@
+票 328 终裁腿 328-v1·AC#4 成对颜色复跑＋红名册逐名作差＋门禁四数（含一处对编排者的具名台面发现）
+
+成对复跑（仓外两棵临时根台面，同一条配方、同一台机、显式 -count=1 -timeout 30m；四数尺逐枚点名＝^=== RUN 含子测试 ⇄ ^--- PASS 只顶层 ⇄ ^--- FAIL ⇄ ^--- SKIP，⛔ 混用⛔ 相减）：
+  ./internal/panel 改前（锚 648eda04 树）＝RUN=257 PASS_TOP=160 FAIL_TOP=7 SKIP=0 rc=1（第一发与复跑两发同名册＝before_stable）
+  ./internal/panel 改后（锚 5db0b538 树，与腿交件侧同 blob 2da6c596）＝RUN=268 PASS_TOP=163 FAIL_TOP=7 SKIP=0 rc=1
+  ./internal/agent 改前＝112/88/0/0 rc=0；改后＝114/90/0/0 rc=0
+  ⇒ 与我那两把代表尺一致（f705b082..HEAD 对 internal cmd＝0 行、after 树 roster blob＝腿交件 blob）⇒ 腿报的 panel 257/160⇄268/163、agent 112/88⇄114/90 我逐枚复现成立（＋11 RUN/+3 PASS_TOP＝它新加的用例数，⛔ 当判据）
+★终态红名册 ⇄ 起手**逐名**作差（派单点名要逐名，不是枚数）：尺＝grep '^--- FAIL' | sed 去时长 | sort -u | diff
+  改前 ⇄ 改后（复跑两发）＝REDROSTER_DIFF_RC=0 逐名同集，两侧各 7 枚同名（logs/red-before-panel-rerun2.txt ⇄ red-after-panel-rerun2.txt）
+  七枚逐名＝TestApprovalCardViewJSONKeysMatchFrontendTypes(approval_test.go:129)／TestComposerContractTypesMatchFrontend(composer_test.go:78)／TestStreamLogFloodBelowKeyBoundIsNotBounded35r8／TestStreamLogDroppedNamingLedgerIsNotBounded35r8／TestComposerRenderFixtureTellsTheTruth(composer_test.go:873)／TestReadGitOnThisRepositoryIsSelfConsistent(git_test.go:600)／TestC21DesignTokensFourWayAgree(tokens_fourway_test.go:441)
+  两枚前端契约键族（:129⇄:78）＝起手即红、与卡片无关，本票⛔ 加键 ⇒ 没多出第二句（复认）；两枚台面局限（git_test 缺 .git／tokens_fourway 缺 design/，那是机主外部 agent 写面，派单手工三件不含它）＝改前改后同红、作差互相抵掉（复认）。★枚数相同而名字换了那一格我专门看了：见下条。
+★本腿抓到的一枚红名抖动（具名，⛔ 计入 328 判据）：改后侧**第一发** FAIL_TOP=8（比改前多一枚 TestFloodRulerFiresOnAnUnboundedSink35r8，背压堆量尺 :369 "over cap through the production log (live heap +1429296 > cap 1196032)"）。归位四把尺：① 那枚文件 blob 两侧同一串 3e5c0e81（diff_lines=0，⛔ 328 射程）② 单跑两侧各两发＝全绿 rc=0（logs/floodruler-{before,after}-{1,2}.log）③ 改后整包复跑＝PASS(:94 行) ④ 复跑红名册与起手侧逐名作差=0 ⇒ 判**同场堆量分配的台面抖动**，⛔ 读成"我的字节/328 的字节把包打红"，也⛔ 据此退腿。腿那句"改后仍 7 枚"在我复跑侧成立（第一发的抖动具名登记在此）。
+门禁四数（只在共享工作树；逐枚落 rc=）：
+  gofumpt 真身 /d/work/base/gopath/bin/gofumpt.exe -l 腿那四枚文件 → 无输出 rc=0
+  sh scripts/d22scan.sh → **第一发 rc=2＝GUARD 射程拒绝**（offender＝我那条 GOTMPDIR=D:/tmp/wisp/20261018/328v1/gotmp 与 %LOCALAPPDATA% 不同卷＝票 311 AC#1 shape B 那道闸；⛔ 读成红）⇒ 按它给的修法 unset GOTMPDIR/WISP_TEST_GOTMP_ROOT 重打＝d22scan: clean rc=0（射程现量 ban#8 internal 586／cmd 143／design 39 text files＝非空射程）★具名上报：这条新铁律（临时根只许 D:）与 d22scan 的这道闸在共享树门禁上有冲突，属编排者/机主那一层，不属本票
+  sh scripts/check-path-length-budget.sh → VERDICT GREEN rc=0（分母 tracked paths=15217、over-budget=60 全在册、roster 等于树；腿报的 15035 随仓在长，两数都带尺）
+  go vet ./internal/panel/ ./internal/agent/ → rc=0
+  跑门禁前现量：git diff --name-only 5db0b538 -- internal/panel internal/agent＝0 文件、status 三包＝空 ⇒ 共享树那两包字节与我的裁决锚一致（别腿没在这面上落笔，读的是同一份字节）
+定点（同一对树）：改后侧四形＋票 220 那族精确定点 RUN=19 PASS_TOP=5 FAIL_TOP=0 SKIP=0 rc=0（四形逐名 PASS：arm A／arm B／arm B 叠改／裸任务号撞名改写／arm A 叠改＋不亮那三枚）；改前侧同一条 -run RUN=8 PASS_TOP=2 rc=0 ⇒ 起手侧那枚子用例名＝a_non-numeric_suffix_is_not_the_queue's_form（钉 false 且绿）＝ⓑ 翻向的起手证据。

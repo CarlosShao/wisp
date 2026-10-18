@@ -1,0 +1,17 @@
+票 328 终裁腿 328-v1·AC#2 读数入库（正控独立复跑＋去牙两发现跑＋逐跳 file:line＋在册那半边归属）
+
+★决定性那把尺逐字（去牙一发＝派单 AC#2③ 点名要我补的那一发，打在我自己新建的仓外树字节上）：
+  pristine 前置断言 sha256=450e1d1c47ee715fb74b56116a827988b0d9bfbc261fc06748c4704b4bd87028 gitblob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb（＝裁决锚那枚 ⇒ pristine_equals_anchor_blob=YES）
+  sed 后现量行 312: if strings.HasPrefix(key, task) {（内容锚＝函数体内那枚 token，⛔ 绝对行号）
+  读数 mut-V1-boundary: RUN=7 PASS_TOP=0 FAIL_TOP=1 SKIP=0 rc=1
+  红的那一枚＝TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light（＝:142 child-1x 那枚，按裁形必须红 ⇒ 红）
+  红句逐字（logs/mut-V1-redlines.txt）＝subagent_blocked_220_test.go:147: row "child-1" blockedOnApproval=true，期望 false； packets={"pending":[{"correlationId":"child-1x",…
+  ★同场其余五枚全 PASS ⇒ 这一发只对"边界（那枚 #）"敏感＝"带边界"这个限定词的单独敏感性被我量到了：仪器钉住了丙-带边界，不是只钉住"有第三臂"
+  当场还原＋后置断言 sha256=450e1d1c… gitblob=2da6c596…（restored_same_as_pristine=YES，同一 shell，⛔ 跨 shell finally）
+去牙二发（成对另一发，落点不同枚＝第三臂登记那行 set[task] = true → _ = task）：
+  agent 侧 RUN=2 PASS_TOP=0 FAIL_TOP=2 rc=1 ⇒ 红句带真 UUID：corr_roster_join_328_test.go:124 正控那行 ⇄ :165 两支各一句
+  panel 侧 RUN=7 PASS_TOP=0 FAIL_TOP=1 rc=1 ⇒ 红的正是 a_non-numeric_tail_on_a_filed_task_id_lights_(328)（＝ⓑ 翻向那枚承重），而 child-1#9／#147／other-1#9／child-1x／空 corr 全绿 ⇒ 数字臂没被碰
+  还原后复绿 after-panel-220table-restored: RUN=7 PASS_TOP=1 FAIL_TOP=0 SKIP=0 rc=0；还原哈希同串＝pristine_equals_anchor_blob=YES
+正控独立复跑（AC#2①，⛔ 抄腿）：after-agent-positive RUN=2 PASS_TOP=2 FAIL_TOP=0 SKIP=0 rc=0（TestACorrelationTheLoopActuallyMintedLightsItsRosterRow ⇄ TestTheLoopMintsTheShapesTheRosterAccepts 逐名 PASS）
+逐跳 file:line 现量（AC#2①，射程＝具名提交树 5db0b538，⛔ 读工作树在飞字节）：callCorr def loop.go:603 ⇄ 唯一生产调用 :676；ToolRequest{ 构造 :675（非测试全仓唯一）；executeCalls 调用点 :504 ⇐ run :346；卡片搬运 pump.go:98 → approval.go:72；名册渲染 TaskRosterSectionFrom :196 → taskRosterSectionFrom :207；第三臂 subagent_roster_197.go:312；rosteredTaskIDs :276
+★AC#2②（派单问腿没答那一层）现量：TaskRosterState{ 非测试构造点＝0 枚（尺＝git grep -n 含 stderr 0 字节；正控＝全仓 10 命中逐枚点名全是 *_test.go）；生产那半边的真装配者＝cmd/wisp/panel_pump.go:191 taskRosterState()（:233 rt.tasks.Look ⇄ :240 Descendants 塞行）⇒ 正控的 corr 半边＝生产铸造，任务号（在册）半边＝夹具 rosterWithTwoRows 代劳（⛔ 写成"整条链是生产真形"；判语在件）
