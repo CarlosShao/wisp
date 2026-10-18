@@ -1,0 +1,8 @@
+tree-ctrl-linux go=764
+===== 改前锚（0b1d1f0b）GOOS=linux go vet ./cmd/wisp/ =====
+rc_ctrl_linux_vet=1
+package github.com/CarlosShao/wisp/cmd/wisp
+	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+	imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8
+===== 同树本机档正控 go vet ./cmd/wisp/ =====
+rc_ctrl_native_vet=0

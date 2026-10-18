@@ -1,0 +1,36 @@
+GOTMPDIR=[unset] TMPDIR=[unset]
+HEAD=531081b4
+===== [1] gofumpt -l internal cmd（交件侧名册，逐名） =====
+cmd/wisp/models.go
+internal/agent/approval/pending_read.go
+internal/agent/tools.go
+internal/risk/provenance.go
+rc_gofumpt=0
+===== [2] sh scripts/d22scan.sh =====
+rc_d22scan=0
+d22scan: scope ban #7 internal/tools/   examined  25 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 116 text files
+d22scan: scope ban #8 internal/         examined 590 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=590, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 590 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+===== [3] sh scripts/check-path-length-budget.sh =====
+rc_len=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+===== [4] go vet ./internal/tools/ =====
+rc_vet_tools=0
+===== [5] go vet ./cmd/wisp/（本机档） =====
+rc_vet_wisp=0
+===== [6] GOOS=linux go vet ./cmd/wisp/（lead 甲形条件④第二档） =====
+rc_vet_wisp_linux=1
+package github.com/CarlosShao/wisp/cmd/wisp
+	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+	imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8
+===== [7] go build ./...（lead 甲形条件④第三档；★派单禁在共享工作树跑 go build ⇒ 落仓外导出树） =====
+tree-build go=764
+rc_build=0
+===== [8] 六枚在册件＋CRLF 四枚：写面自证 =====
+status_rows=0
