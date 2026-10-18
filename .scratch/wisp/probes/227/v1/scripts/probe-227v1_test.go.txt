@@ -1,0 +1,69 @@
+package config
+
+// 227-v1 verdict probe (off-repo tree only, never committed): does each of the three
+// re-worded log literals tell the truth in the branch that prints it?
+// Q1: the Info "wrote merged change" branch (writeguard.go:172-176) with a hand-deleted
+//     scalar line whose value already equals the default (b2 P2) - does the line come back?
+// Q2: same sentence when what the operator deleted was a MAP ENTRY (P4) - the leg's own
+//     P4 case pins the opposite result (not restored). Which branch prints, and does the
+//     clause "a key line the operator deleted by hand comes back at its schema default
+//     value" overclaim there?
+
+import (
+	"strings"
+	"testing"
+)
+
+func TestProbe227v1InfoBranchLineAtDefaultComesBack(t *testing.T) {
+	logs := captureSlog(t)
+	// memory holds the default 56; delete the size line by hand (P2 shape)
+	start := matrixBase
+	m, path, mutate := newTestManager(t, start)
+	noSize := strings.Replace(matrixBase, "size = 56\n", "", 1)
+	if strings.Contains(noSize, "size = 56") {
+		t.Fatal("setup: size line not deleted")
+	}
+	mutate(noSize)
+	if err := m.AddAllowedDir(testDir); err != nil {
+		t.Fatalf("AddAllowedDir: %v", err)
+	}
+	text := logs.String()
+	file := readText(t, path)
+	t.Logf("PROBE-Q1 branch-Info=%v branch-Warn=%v kept-in-log=%v",
+		strings.Contains(text, "wrote merged change into config.toml (ticket 226"),
+		strings.Contains(text, "kept hand edits this process"),
+		strings.Contains(text, "kept_in_file_not_in_memory"))
+	t.Logf("PROBE-Q1 clause-present=%v line-came-back=%v memory-size=%d",
+		strings.Contains(text, "a key line the operator deleted by hand comes back at its schema default value"),
+		strings.Contains(file, "size = 56"), m.Config().Ball.Size)
+}
+
+func TestProbe227v1WarnBranchMapEntryClause(t *testing.T) {
+	logs := captureSlog(t)
+	start := matrixBase + `
+[llm]
+[llm.providers.deepseek]
+base_url = "https://api.deepseek.com/v1"
+`
+	m, path, mutate := newTestManager(t, start)
+	noTable := strings.Replace(start,
+		"\n[llm]\n[llm.providers.deepseek]\nbase_url = \"https://api.deepseek.com/v1\"\n", "\n", 1)
+	if strings.Contains(noTable, "llm.providers.deepseek") {
+		t.Fatal("setup: provider table not deleted")
+	}
+	mutate(noTable)
+	if err := m.AddAllowedDir(testDir); err != nil {
+		t.Fatalf("AddAllowedDir: %v", err)
+	}
+	text := logs.String()
+	file := readText(t, path)
+	restored := strings.Contains(file, "llm.providers.deepseek")
+	t.Logf("PROBE-Q2 clause-present=%v map-entry-restored=%v branch-Warn=%v kept=%s",
+		strings.Contains(text, "a key line the operator deleted by hand comes back at its schema default value"),
+		restored,
+		strings.Contains(text, "kept_in_file_not_in_memory"),
+		func() string { i := strings.Index(text, "kept_in_file_not_in_memory"); if i < 0 { return "n/a" }; j := strings.Index(text[i:], "\n"); if j < 0 { return text[i:] }; return text[i : i+j] }())
+	if restored {
+		t.Log("PROBE-Q2: map entry came back (unexpected vs leg P4 case)")
+	}
+}

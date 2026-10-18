@@ -1,0 +1,28 @@
+probe = 227-v1 read-only probe tests (off-repo tree, never committed; not part of any AC roster)
+gofiles=765
+writeguard.go sha (want efe12661...) = efe12661e71b940f
+handedit test sha (want 9b430e3b...) = 9b430e3b68ad3be3
+time=2026-10-18T14:52:46.008+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe227v1InfoBranchLineAtDefaultComesBack
+    zz_probe_227v1_test.go:32: PROBE-Q1 branch-Info=true branch-Warn=false kept-in-log=false
+    zz_probe_227v1_test.go:36: PROBE-Q1 clause-present=true line-came-back=true memory-size=56
+--- PASS: TestProbe227v1InfoBranchLineAtDefaultComesBack (0.02s)
+=== RUN   TestProbe227v1WarnBranchMapEntryClause
+    zz_probe_227v1_test.go:61: PROBE-Q2 clause-present=true map-entry-restored=false branch-Warn=true kept=kept_in_file_not_in_memory=[llm.providers.deepseek]
+--- PASS: TestProbe227v1WarnBranchMapEntryClause (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/config	0.075s
+probe rc=0
+---- leg named cases alongside (for branch comparison) ----
+time=2026-10-18T14:52:47.528+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestHandDeletedScalarLineComesBackAtSchemaDefault
+--- PASS: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.02s)
+=== RUN   TestHandDeletedMapEntryIsNotRestored
+time=2026-10-18T14:52:47.570+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\227v1\gotmp\TestHandDeletedMapEntryIsNotRestored3586000695\001\.wisp-config-1639816111.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T14:52:47.570+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[llm.providers.deepseek]
+--- PASS: TestHandDeletedMapEntryIsNotRestored (0.01s)
+=== RUN   TestDeletedLineRestorationIsNotClaimedAsAWrittenKey
+--- PASS: TestDeletedLineRestorationIsNotClaimedAsAWrittenKey (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/config	0.098s
+named rc=0

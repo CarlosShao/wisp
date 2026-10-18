@@ -1,0 +1,68 @@
+pkgcount=30
+tree=deliv(HEAD) scope=./internal/... (NOT ./...; cmd/wisp half deliberately NOT run = 车道归编排者)
+AC#5 rc=1 RUN=2077 PASS_TOP=1365 FAIL_TOP=32 SKIP=8
+---- named FAIL roster ----
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+--- FAIL: TestAC4InstallDirWidthIsDeliberateAndHasABreakLine (0.63s)
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 (2.69s)
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8 (0.80s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.01s)
+--- FAIL: TestComposerRenderFixtureTellsTheTruth (0.00s)
+--- FAIL: TestReadGitOnThisRepositoryIsSelfConsistent (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+--- FAIL: TestResolvePerCallBudget (2.04s)
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.18s)
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.12s)
+--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed (0.15s)
+--- FAIL: TestBridgeRefusesARealJunctionOnTheReadRoute (0.11s)
+--- FAIL: TestBridgeWritesNothingThroughARealJunction (0.70s)
+--- FAIL: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing (0.10s)
+--- FAIL: TestSweepNeverDeletesThroughARealJunction (0.18s)
+--- FAIL: TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop (0.03s)
+--- FAIL: TestTicket252P1AllowlistLegs (0.00s)
+--- FAIL: TestTicket252P1OwnerMachineReachability (0.00s)
+--- FAIL: TestTicket252P1EnvSpellingCensus (0.00s)
+--- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized (0.00s)
+--- FAIL: TestTicket252R1BothSpellingsAnswerTheSame (0.00s)
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization (0.00s)
+--- FAIL: TestTicket252R1CanonicalStillNamesOneTree (0.00s)
+--- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses (0.00s)
+--- FAIL: TestDirOfBaseOfCutOnThePlatformSeparator (0.00s)
+--- FAIL: Test20r2JunctionRefusalIsNeverAskable (0.25s)
+--- FAIL: TestGateJudgesThePrivateSetByResolvedSID (4.74s)
+--- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (2.02s)
+---- package lines ----
+      1 FAIL	github.com/CarlosShao/wisp/internal/ball	
+      1 FAIL	github.com/CarlosShao/wisp/internal/models	
+      1 FAIL	github.com/CarlosShao/wisp/internal/panel	
+      1 FAIL	github.com/CarlosShao/wisp/internal/risk	
+      1 FAIL	github.com/CarlosShao/wisp/internal/tools	
+      1 FAIL	github.com/CarlosShao/wisp/internal/winsec	
+      1 ok  	github.com/CarlosShao/wisp/internal/agent	
+      1 ok  	github.com/CarlosShao/wisp/internal/agent/approval	
+      1 ok  	github.com/CarlosShao/wisp/internal/audio	
+      1 ok  	github.com/CarlosShao/wisp/internal/buildinfo	
+      1 ok  	github.com/CarlosShao/wisp/internal/config	
+      1 ok  	github.com/CarlosShao/wisp/internal/llm	
+      1 ok  	github.com/CarlosShao/wisp/internal/llm/adaptertest	
+      1 ok  	github.com/CarlosShao/wisp/internal/llm/anthropic	
+      1 ok  	github.com/CarlosShao/wisp/internal/llm/golden	
+      1 ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	
+      1 ok  	github.com/CarlosShao/wisp/internal/llm/openairesponses	
+      1 ok  	github.com/CarlosShao/wisp/internal/memory	
+      1 ok  	github.com/CarlosShao/wisp/internal/observe	
+      1 ok  	github.com/CarlosShao/wisp/internal/perm	
+      1 ok  	github.com/CarlosShao/wisp/internal/plugin	
+      1 ok  	github.com/CarlosShao/wisp/internal/proc	
+      1 ok  	github.com/CarlosShao/wisp/internal/projctx	
+      1 ok  	github.com/CarlosShao/wisp/internal/secret	
+      1 ok  	github.com/CarlosShao/wisp/internal/session	
+      1 ok  	github.com/CarlosShao/wisp/internal/statemachine	
+---- build/setup failure sniff (台面故障 must not count) ----
+552:?   	github.com/CarlosShao/wisp/internal/agent/scheduler	[no test files]
+4786:?   	github.com/CarlosShao/wisp/internal/speech	[no test files]
+5677:?   	github.com/CarlosShao/wisp/internal/streamkey	[no test files]
+6687:?   	github.com/CarlosShao/wisp/internal/watchdog	[no test files]

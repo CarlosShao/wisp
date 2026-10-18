@@ -1,0 +1,41 @@
+tree gauge = HEAD=274da78a (2038c45d..HEAD touched 0 files under internal/config cmd/wisp)
+
+== FIX: my earlier tr-s gauge was mismeasured by me: tr -s ' \t' does not join the newline,
+   so the sentence split over :43/:44 can never match on ONE line. Correct gauges below,
+   both content-anchored, each with a negative control that must return 0 (rc=1). ==
+A) two-line window join (sed):
+1
+A-negctrl (must be 0): hits=0 (grep rc=1 when 0)
+B) whole file joined on space:
+1
+B-negctrl (must be 0): hits=0
+C) per-part hits with line numbers (the 09-29 leg reading this was 'nothing' twice):
+HEAD:cmd/wisp/always_write_no_clobber_226_test.go:43:	// The edit lands after assembly, while the process is running and
+
+=== 必答(iv): do the three log literals tell the truth today? gauges: ===
+[iv-a] the narrowed nothing-written sentence: does the CONDITIONAL half hold in production code?
+  the branch returns nil WITHOUT SaveFile when written==0:
+	if disk != nil {
+		written = diffKeyPaths(disk, base)
+		if len(written) == 0 {
+			slog.Info("config: config.toml already carries this key; this write added nothing (the "+
+				"file's bytes and mtime stayed put only because its schema_version was already current; "+
+				"a file behind on schema_version had already been re-laid in canonical form by the "+
+				"re-read, so comments and hand-chosen key order are not preserved)",
+				"key", ownedKey)
+			return nil
+		}
+	}
+[iv-b] does the schema-migration really re-lay inside readConfigFile before that sentence logs?
+  mergeWrite step (1) readConfigFile at writeguard.go:118 -> loader.go applyMigrations -> migrate.go PrivateFile+atomicWrite:
+HEAD:internal/config/writeguard.go:118:		loaded, err := readConfigFile(m.path)
+HEAD:internal/config/loader.go:126:		raw, err = applyMigrations(path, raw, ver)
+HEAD:internal/config/migrate.go:93:	if err := winsec.PrivateFile(backup, raw, 0o600); err != nil {
+HEAD:internal/config/migrate.go:96:	if err := atomicWrite(path, data); err != nil {
+[iv-c] the delete-shape sentence (两句): does a deleted scalar line really come back at the SCHEMA DEFAULT,
+  not at memory's value? readout = my MU-1 run + the leg's own c1 + MY named PASS list above
+  (01-deliv: TestHandDeletedScalarLineComesBackAtSchemaDefault PASS; under MU-2b that case reds ONLY on the 文案 line :64
+   => the restoration half is true without my sentence, the sentence names a fact production already has).
+[iv-d] residue check: does the Info branch still EVER fire with a schema-stale file that DID move bytes?
+  (yes: matrixBase hand case with no schema_version -> leg P5' + my MU-1 red 404/407 prove bytes+mtime moved while
+   the file 'already carried the key'. The narrowed sentence is the honest one.)

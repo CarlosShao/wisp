@@ -1,0 +1,18 @@
+time=2026-10-18T15:42:44.380+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.07s)
+    pathresolver_rewrite_account_test.go:200: ..\..\internal\panel\composer.go:127 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer
+    pathresolver_rewrite_account_test.go:200: ..\..\internal\panel\display_scrub_216.go:26 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer
+    pathresolver_rewrite_account_test.go:200: ..\..\internal\panel\display_scrub_216.go:37 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer
+    pathresolver_rewrite_account_test.go:200: ..\..\internal\panel\display_scrub_216.go:218 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer
+time=2026-10-18T15:42:48.292+08:00 level=INFO msg="scope disposed" scope=session-1 completed=1 failed=0 disposal_incomplete=false timed_out=false
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+    syncdirs_ancestor_actable_leg_116_test.go:182: precondition: deepestExistingAncestor("D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163202312212\\001\\%WISP116ANC\\B%\\new.md") = "D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163202312212\\001\\%WISP116ANC\\B%", want "D:/tmp/wisp/20261018/227v1/gotmp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163202312212\\001\\%WISP116ANC\\B%"
+--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+    syncdirs_ancestor_actable_leg_116_test.go:286: precondition: the ~ spelling must resolve under the relocated home "D:/tmp/wisp/20261018/227v1/gotmp\\TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict1163309669914\\002", got "D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict1163309669914\\002\\wisp116-tilde-probe\\new.md"
+--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.07s)
+    syncdirs_ancestor_reparse_ticket105_windows_test.go:59: mklink /J D:\tmp\wisp\20261018\227v1\gotmp\TestSyncAncestorLegReResolvesThroughJunctionToRealTree1278051594\002\proj D:/tmp/wisp/20261018/227v1/gotmp\TestSyncAncestorLegReResolvesThroughJunctionToRealTree1278051594\001 failed: exit status 1: Invalid switch - "tmp".
+--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed (0.07s)
+    syncdirs_ancestor_reparse_ticket105_windows_test.go:116: mklink /J D:\tmp\wisp\20261018\227v1\gotmp\TestSyncAncestorLegNotExemptedStaysFailClosed3135895012\002\proj D:/tmp/wisp/20261018/227v1/gotmp\TestSyncAncestorLegNotExemptedStaysFailClosed3135895012\001 failed: exit status 1: Invalid switch - "tmp".
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	6.107s
+FAIL

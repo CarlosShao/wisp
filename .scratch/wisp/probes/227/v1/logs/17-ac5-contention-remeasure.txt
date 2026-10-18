@@ -1,0 +1,11 @@
+quiet re-measure = targeted -run on the one differing name, serial, 3 rounds per tree
+CPU now: 82
+deliv round1 rc=0  --- PASS: TestResolvePerCallBudget (1.49s)
+deliv round2 rc=0  --- PASS: TestResolvePerCallBudget (1.99s)
+deliv round3 rc=0  --- PASS: TestResolvePerCallBudget (1.20s)
+base round1 rc=0  --- PASS: TestResolvePerCallBudget (1.31s)
+base round2 rc=0  --- PASS: TestResolvePerCallBudget (3.53s)
+base round3 rc=0  --- PASS: TestResolvePerCallBudget (2.08s)
+== and the full-package context for the two trees (risk only, -run empty = whole pkg) ==
+deliv whole-internal/risk rc=1 -> FAIL
+base whole-internal/risk rc=1 -> FAIL

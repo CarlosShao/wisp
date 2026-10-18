@@ -1,0 +1,149 @@
+scope = deliv(HEAD export tree) ./internal/... -count=1 -timeout 30m ; four numbers 2077/1365/32/8 (rc=1)
+per red: name <- owning test file (last .go: token printed above the FAIL line) <- first 判定 sentence
+classification key: [台面]=export-tree gap (design//.git//.scratch absent, mklink/J blocked by long GOTMPDIR, SID/ACL seeded shapes) ; [争用]=ticket-named contention family
+grep: Invalid back reference
+grep: Invalid back reference
+[1] TestC21TableColourRowsMatchTokensCSS <-     tokens_table_test.go:1468: read design/assets/tokens.css: open D:\tmp\wisp\20261018\227v1\deliv\design\assets\tokens.css: The system cannot find the path specified. - the CSS leg of this check must never skip
+[2] TestAC4InstallDirWidthIsDeliberateAndHasABreakLine <-     handoff_window_109_windows_test.go:172: removing the parent's grant left an explicit foreign ACE on the install dir - out-of-band by ticket 89's definition: [BUILTIN\Users (I)(RX) BUILTIN\Users (I)(OI)(CI)(IO)(GR,GE)]
+[3] TestApprovalCardViewJSONKeysMatchFrontendTypes <-     approval_test.go:134: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+[4] TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 <-     backpressure_bound_35r8_test.go:309: flood under a blocked consumer with no fan-out (3 streams, so the key bound never engages): 1x pinned 1200000 text runes over 3 rows (live heap +1217368 bytes), 4x pinned 4800000 runes over 3 rows (live heap +4818208 bytes), against the cap this package can state (36864 runes over 64 rows). Retention grew 4.0x for a 4x flood and equals the flood exactly, so ticket 35 :49's "no unbounded memory (heap cap asserted)" has no counterpart in internal/panel below the key bound. pinned text 4800000 runes > the cap 36864; live heap + 4818208 bytes > the cap 1196032
+[5] TestStreamLogDroppedNamingLedgerIsNotBounded35r8 <-     backpressure_bound_35r8_test.go:336: blocked consumer, fan-out past the ceiling: 1x opened 4000 streams and pins 3936 names (50058 runes, live heap +154128 bytes), 4x opened 16000 and pins 15936 names (211994 runes, live heap +563712 bytes) - rows stayed at the ceiling 64 in both, so the memory the flood bought is the naming ledger itself. Its cap is the event count, not the bound. pinned dropped-name runes 211994 > the cap 36864
+[6] TestComposerContractTypesMatchFrontend <-     composer_test.go:83: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+[7] TestComposerRenderFixtureTellsTheTruth <-     composer_test.go:902: render fixture verified across 0 painted states
+[8] TestReadGitOnThisRepositoryIsSelfConsistent <-     git_test.go:600: kind = "not_a_repo" reason = "这棵工作区目录及其以上都没有 .git，所以没有分支可显示": this repository has a .git directory
+grep: Invalid back reference
+grep: Invalid back reference
+[9] TestC21DesignTokensFourWayAgree <-     tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\tmp\wisp\20261018\227v1\deliv\design\assets\tokens.css: The system cannot find the path specified.
+[10] TestResolvePerCallBudget <-     pathresolver_budget_norace_test.go:37: C26 budget breach: Resolve averages 1.445844ms per call, budget 1ms
+[11] TestC26RewriteAccountIsConsumedAtEverySecurityLeg <-     pathresolver_rewrite_account_test.go:200: ..\..\internal\panel\display_scrub_216.go:218 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer
+[12] TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 <-     syncdirs_ancestor_actable_leg_116_test.go:182: precondition: deepestExistingAncestor("D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163081699566\\001\\%WISP116ANC\\B%\\new.md") = "D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163081699566\\001\\%WISP116ANC\\B%", want "D:/tmp/wisp/20261018/227v1/gotmp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1163081699566\\001\\%WISP116ANC\\B%"
+[13] TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 <-     syncdirs_ancestor_actable_leg_116_test.go:286: precondition: the ~ spelling must resolve under the relocated home "D:/tmp/wisp/20261018/227v1/gotmp\\TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict1162432892287\\002", got "D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict1162432892287\\002\\wisp116-tilde-probe\\new.md"
+grep: Invalid back reference
+grep: Invalid back reference
+[14] TestSyncAncestorLegReResolvesThroughJunctionToRealTree <-     syncdirs_ancestor_reparse_ticket105_windows_test.go:59: mklink /J D:\tmp\wisp\20261018\227v1\gotmp\TestSyncAncestorLegReResolvesThroughJunctionToRealTree3845462406\002\proj D:/tmp/wisp/20261018/227v1/gotmp\TestSyncAncestorLegReResolvesThroughJunctionToRealTree3845462406\001 failed: exit status 1: Invalid switch - "tmp".
+grep: Invalid back reference
+grep: Invalid back reference
+[15] TestSyncAncestorLegNotExemptedStaysFailClosed <-     syncdirs_ancestor_reparse_ticket105_windows_test.go:116: mklink /J D:\tmp\wisp\20261018\227v1\gotmp\TestSyncAncestorLegNotExemptedStaysFailClosed1603524996\002\proj D:/tmp/wisp/20261018/227v1/gotmp\TestSyncAncestorLegNotExemptedStaysFailClosed1603524996\001 failed: exit status 1: Invalid switch - "tmp".
+grep: Invalid back reference
+grep: Invalid back reference
+[16] TestBridgeRefusesARealJunctionOnTheReadRoute <-     bridge_junction_windows_test.go:268: 前置条件缺失：造不出真 NTFS junction（mklink /J D:\tmp\wisp\20261018\227v1\gotmp\TestBridgeRefusesARealJunctionOnTheReadRoute1765714766\001\jn D:/tmp/wisp/20261018/227v1/gotmp\TestBridgeRefusesARealJunctionOnTheReadRoute1765714766\002: exit status 1: Invalid switch - "tmp".
+grep: Invalid back reference
+grep: Invalid back reference
+[17] TestBridgeWritesNothingThroughARealJunction <-     bridge_junction_windows_test.go:394: 前置条件缺失：造不出真 NTFS junction（mklink /J D:\tmp\wisp\20261018\227v1\gotmp\TestBridgeWritesNothingThroughARealJunctionfs.delete_through_th1346668258\001\jn D:/tmp/wisp/20261018/227v1/gotmp\TestBridgeWritesNothingThroughARealJunctionfs.delete_through_th1346668258\002: exit status 1: Invalid switch - "tmp".
+grep: Invalid back reference
+grep: Invalid back reference
+[18] TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing <-     bridge_junction_windows_test.go:592: 前置条件缺失：造不出真 NTFS junction（mklink /J D:\tmp\wisp\20261018\227v1\gotmp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing3836009259\001\jn D:/tmp/wisp/20261018/227v1/gotmp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing3836009259\002: exit status 1: Invalid switch - "tmp".
+grep: Invalid back reference
+grep: Invalid back reference
+[19] TestSweepNeverDeletesThroughARealJunction <-     fs_staging_windows_test.go:229: 前置条件缺失：造不出真 NTFS junction（mklink /J D:\tmp\wisp\20261018\227v1\gotmp\TestSweepNeverDeletesThroughARealJunction4198491672\001\.wisp-tmp-92029d2e-25336-777 D:/tmp/wisp/20261018/227v1/gotmp\TestSweepNeverDeletesThroughARealJunction4198491672\002: exit status 1: Invalid switch - "tmp".
+[20] TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop <-     fs_write_test.go:712: the bridge must attach the D31 report: "创建目标临时文件失败：open C:\\.wisp-tmp-92029d2e-37772-2085081930: Access is denied.（源未被改动）"
+grep: Invalid back reference
+grep: Invalid back reference
+[21] TestTicket252P1AllowlistLegs <-     paths_shortname_252_probe_test.go:230: 前置条件缺失：D:\tmp\wisp\20261018\227v1\deliv 的短名回显 D:\tmp\wisp\20261018\227v1\deliv 与长名同串（该名本身已合 8.3 或卷未生成别名），两形对比无从谈起。本探针不许 skip。
+grep: Invalid back reference
+grep: Invalid back reference
+[22] TestTicket252P1OwnerMachineReachability <-     paths_shortname_252_probe_test.go:269: 前置条件缺失：D:\tmp\wisp\20261018\227v1\deliv\docs 的短名回显 D:\tmp\wisp\20261018\227v1\deliv\docs 与长名同串（该名本身已合 8.3 或卷未生成别名），两形对比无从谈起。本探针不许 skip。
+grep: Invalid back reference
+grep: Invalid back reference
+[23] TestTicket252P1EnvSpellingCensus <-     paths_shortname_252_probe_test.go:310: 前置条件缺失：D:\tmp\wisp\20261018\227v1\deliv 的短名回显 D:\tmp\wisp\20261018\227v1\deliv 与长名同串（该名本身已合 8.3 或卷未生成别名），两形对比无从谈起。本探针不许 skip。
+grep: Invalid back reference
+grep: Invalid back reference
+[24] TestTicket252R1ShortSpellingOfNewFileIsAuthorized <-     paths_shortname_252_r1_test.go:77: 前置条件缺失：D:\tmp\wisp\20261018\227v1\deliv 的短名回显 D:\tmp\wisp\20261018\227v1\deliv 与长名同串（该名本身已合 8.3 或卷未生成别名），两形对比无从谈起。本探针不许 skip。
+grep: Invalid back reference
+grep: Invalid back reference
+[25] TestTicket252R1BothSpellingsAnswerTheSame <-     paths_shortname_252_r1_test.go:108: 前置条件缺失：D:\tmp\wisp\20261018\227v1\deliv 的短名回显 D:\tmp\wisp\20261018\227v1\deliv 与长名同串（该名本身已合 8.3 或卷未生成别名），两形对比无从谈起。本探针不许 skip。
+grep: Invalid back reference
+grep: Invalid back reference
+[26] TestTicket252R1AlignmentAddsNoAuthorization <-     paths_shortname_252_r1_test.go:164: 前置条件缺失：D:\tmp\wisp\20261018\227v1\deliv 的短名回显 D:\tmp\wisp\20261018\227v1\deliv 与长名同串（该名本身已合 8.3 或卷未生成别名），两形对比无从谈起。本探针不许 skip。
+grep: Invalid back reference
+grep: Invalid back reference
+[27] TestTicket252R1CanonicalStillNamesOneTree <-     paths_shortname_252_r1_test.go:263: 前置条件缺失：D:\tmp\wisp\20261018\227v1\deliv 的短名回显 D:\tmp\wisp\20261018\227v1\deliv 与长名同串（该名本身已合 8.3 或卷未生成别名），两形对比无从谈起。本探针不许 skip。
+grep: Invalid back reference
+grep: Invalid back reference
+[28] TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses <-     paths_twocontainments_252_r2_windows_test.go:45: 前置条件缺失：D:\tmp\wisp\20261018\227v1\deliv 的短名回显 D:\tmp\wisp\20261018\227v1\deliv 与长名同串（该名本身已合 8.3 或卷未生成别名），两形对比无从谈起。本探针不许 skip。
+[29] TestDirOfBaseOfCutOnThePlatformSeparator <-     pathshape_portable_test.go:99: dirOf("D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestDirOfBaseOfCutOnThePlatformSeparator164610680\\001\\notes.txt") = "D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestDirOfBaseOfCutOnThePlatformSeparator164610680\\001", want "D:/tmp/wisp/20261018/227v1/gotmp\\TestDirOfBaseOfCutOnThePlatformSeparator164610680\\001"
+grep: Invalid back reference
+grep: Invalid back reference
+[30] Test20r2JunctionRefusalIsNeverAskable <-     refusal_20r2_windows_test.go:34: 前置条件缺失：造不出真 NTFS junction（mklink /J D:\tmp\wisp\20261018\227v1\gotmp\Test20r2JunctionRefusalIsNeverAskable740173945\001\jn D:/tmp/wisp/20261018/227v1/gotmp\Test20r2JunctionRefusalIsNeverAskable740173945\002: exit status 1: Invalid switch - "tmp".
+[31] TestGateJudgesThePrivateSetByResolvedSID <-     testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp/20261018/227v1/gotmp\TestGateJudgesThePrivateSetByResolvedSID3175326411\001\la: Access is denied.
+[32] TestSealNarrowsAndNamesThePrincipalItRemovedBySID <-     testing.go:1617: TempDir RemoveAll cleanup: openfdat D:/tmp/wisp/20261018/227v1/gotmp\TestSealNarrowsAndNamesThePrincipalItRemovedBySID2491115659\002\la: Access is denied.
+
+== first red sentence per case (verbatim, truncated to 220 cols) ==
+    spill_acl_windows_test.go:29: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:30: icacls artifacts -> [NT AUTHORITY\SYSTEM NT AUTHORITY\SYSTEM BUILTIN\Administrators BUILTIN\Administrators DESKTOP-LVS7839\swq DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:37: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-pq.txt:pq]
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%5Cq.txt:p\q tool-output-pq.txt:pq]
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-p%5Cq.txt:p\q]
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-p%5Cq.txt:p\q tool-output-pq.txt:pq]
+    spill_name_injectivity_test.go:90: names: map[tool-output-%2E%2E.txt:.. tool-output-%2E.txt:. tool-output-seq.1.txt:]
+    spill_name_injectivity_test.go:90: names: map[tool-output-%5C%5Ca%5Cb.txt:\\a\b tool-output-a%3Ab.txt:a:b]
+    spill_name_injectivity_test.go:90: names: map[tool-output-a%25b.txt:a%b tool-output-a-b.txt:a-b tool-output-a_b.txt:a_b]
+    spill_name_injectivity_test.go:90: names: map[tool-output-%50%51.txt:PQ tool-output-pq.txt:pq]
+    spill_name_injectivity_test.go:90: names: map[tool-output-0o.txt:0o tool-output-o0.txt:o0]
+    spill_path_invariant_test.go:284: control: escape id "..\\..\\..\\..\\CONTROL-escape" resolves to "D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSpillContainmentByDirectoryListing181714370\\001\\CONTROL-escape.txt" (root is "D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSpillContainmentByDirectoryListing181714370\\001")
+    spill_path_invariant_test.go:307: literal-backslash control: id "..\\..\\..\\..\\CONTROL-literal" resolves to "D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSpillContainmentByDirectoryListing181714370\\001\\CONTROL-literal.txt"
+    spill_path_invariant_test.go:545: audited 3 filesystem-mutating call(s) in spill.go
+    spill_pointer_authority_ac3_174r4_test.go:87: arm 1 verbatim: Text="[…输出已落文件：省略 65221 字符，总长 68021 字节 / 约 17005 token，全文见 D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r4336335086\\001\\tool-output-call_honesty.txt…]"
+    spill_pointer_authority_ac3_174r4_test.go:110: arm 2 verbatim: Text="[…输出已落文件：省略 65221 字符，总长 68021 字节 / 约 17005 token；注意：这条路径现在读不到，它不在你被授权的目录范围内：fs.read 会要一张 L2 卡，没人批就是直接拒；回来的路有两条——要么用户把所属目录加进 [fs] allowed_dirs，要么批下那一张卡，全文见 D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestSpillPointerAuthorityAsksWithTheCanonicalAnswer174r4336335086\\002\\tool-output-call_honesty.txt…]"
+    cancel_key_label_260r4_test.go:142: r4 L2 veto: returned after 0s (start=14:59:40, end=14:59:40)
+    ticket84_no_owner_test.go:76: unanswered L2 (250ms deadline): returned after 262.6237ms (start=14:59:40, end=14:59:40)
+    ticket84_no_owner_test.go:168: Native.Allow: approval: correlation_id 无对应待审批项 in 0s
+    ticket84_no_owner_test.go:168: Native.Reject: approval: correlation_id 无对应待审批项 in 0s
+    ticket84_no_owner_test.go:168: Panel.Reject: approval: correlation_id 无对应待审批项 in 0s
+    ticket84_no_owner_test.go:168: DecideFromNative.reject: approval: correlation_id 无对应待审批项 in 0s
+    ticket84_no_owner_test.go:168: DecideFromNative.allow: approval: correlation_id 无对应待审批项 in 0s
+    ticket84_no_owner_test.go:168: DecideFromPanel.reject: approval: correlation_id 无对应待审批项 in 0s
+    ticket84_no_owner_test.go:168: Veto.unknown: approval: correlation_id 无对应待审批项 in 0s
+    ticket84_no_owner_test.go:168: Veto.empty: approval: correlation_id 无对应待审批项 in 0s
+    ticket84_no_owner_test.go:189: prompt surface unreachable: returned after 0s (start=14:59:40, end=14:59:40)
+    ticket84_no_owner_test.go:224: 有意慢：300s 墙钟计量，只在 WISP_84_MEASURE=1 时跑（票 84 AC#1；见 docs/evidence/s1/84-ac1-bounded-wait.md）
+    ticket87_veto_l2_test.go:91: veto against an on-screen L2 card: returned after 0s (start=14:59:40, end=14:59:40)
+    ticket87_veto_l2_test.go:147: veto addressed by the task id: returned after 0s (start=14:59:40, end=14:59:40)
+    ticket97_alias_direction_test.go:134: 别名驱动的拒绝: returned after 0s (start=14:59:40, end=14:59:40)
+    ticket97_alias_direction_test.go:212: 路线 veto 的别名拒绝: returned after 0s (start=14:59:40, end=14:59:40)
+    ticket97_alias_direction_test.go:212: 路线 native_reject 的别名拒绝: returned after 0s (start=14:59:40, end=14:59:40)
+    ticket97_alias_direction_test.go:212: 路线 panel_reject 的别名拒绝: returned after 0s (start=14:59:40, end=14:59:40)
+    ticket97_alias_direction_test.go:212: 路线 decide_from_native 的别名拒绝: returned after 0s (start=14:59:40, end=14:59:40)
+    ticket97_alias_direction_test.go:212: 路线 decide_from_panel 的别名拒绝: returned after 0s (start=14:59:40, end=14:59:40)
+    zz_201_a1_junction_marker_windows_test.go:163: READING-1 bridge 路由的 Decision: level=L2 rules=[R2 R3] refusal=""
+    zz_201_a1_junction_marker_windows_test.go:168: READING-2 卡面逐字 Paths[0] = "D:/tmp/wisp/20261018/227v1/gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening3743445438/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"
+    zz_201_a1_junction_marker_windows_test.go:189: READING-2b 反斜杠拼法: 卡面=["D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestZZ201A1JunctionMarkerCardIsRefusedForWidening3743445438\\001\\allowed\\jn\\victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"] dir="" ok=false
+    zz_201_a1_junction_marker_windows_test.go:219: READING-3 ledger 卡: level=L2 tool=fs.read paths=["D:/tmp/wisp/20261018/227v1/gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening3743445438/001/allowed/jn/victim.txt (无法规范化: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions)"]
+    zz_201_a1_junction_marker_windows_test.go:232: READING-4 WideningRule: ok=false
+    zz_201_a1_junction_marker_windows_test.go:233: READING-5 dir  = ""
+    zz_201_a1_junction_marker_windows_test.go:234: READING-6 rule = ""
+    zz_201_a1_junction_marker_windows_test.go:242: READING-7 真父目录 = "D:/tmp/wisp/20261018/227v1/gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening3743445438/001/allowed/jn"（修后不再被产出到任何卡/规则文本）
+    zz_201_a1_junction_marker_windows_test.go:265: READING-11 对照（无标记的越界读）: paths=["D:\\tmp\\wisp\\20261018\\227v1\\gotmp\\TestZZ201A1JunctionMarkerCardIsRefusedForWidening3743445438\\001\\outside\\victim.txt"] dir="D:/tmp/wisp/20261018/227v1/gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening3743445438/001/outside" rule="[fs] allowed_dirs += \"D:/tmp/wisp/20261018/227v1/gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening3743445438/001/outside\"" ok=true
+    zz_201_a1_junction_marker_windows_test.go:275: READING-12 结论：带标记卡面在入口整卡拒（两种拼法 + 空路径标记同拒），干净卡面仍推真父目录 "D:/tmp/wisp/20261018/227v1/gotmp/TestZZ201A1JunctionMarkerCardIsRefusedForWidening3743445438/001/outside"
+    hotplug_test.go:527: live WASAPI smoke requires WISP_LIVE_MIC=1 and a real microphone (真机冒烟待票 16)
+    wave_format_float_300_windows_test.go:205: waveFormatFloat observed 0x0003 against test-carried 0x0003; waveFormatFloat is the constant wasapi_windows.go uses for floating := s.format.tag == waveFormatFloat, so its value decides whether 32-bit float frames are sliced as float32 or as int16; at 1 it would fire for PCM mix formats and never for float ones, at 0 for nothing at all
+    wave_format_float_300_windows_test.go:205: waveFormatExt observed 0xfffe against test-carried 0xfffe; waveFormatExt is the tag parseWaveFormat tests before it expands SubFormat; off 0xFFFE every extensible mix format keeps 0xFFFE as its tag and never resolves to a subtype at all
+    wave_format_float_300_windows_test.go:205: waveFormatPCM observed 0x0001 against test-carried 0x0001; waveFormatPCM is declared and unused in this package (300-a2 F2, zero uses), so before this case no ruler of any kind read it; this cell pins its value and does NOT delete it -- deleting an unused declaration is a different cell under a different authorization
+    hotkey_borrow_refused_260r5_test.go:293: 260-r5 rig: IsWindow(0x1D0A5C)=0 uiRun-inline=true closure-entered=true sta.hwnd=0x0 door="260-r5 rig: this door creates no window and runs no pump" refusal="Invalid window handle."
+    hotkey_borrow_refused_260r5_test.go:386: 260-r5 refused borrow: line={Name:cancel ID:3 Binding:Ctrl+Alt+F9 Status:registration failed Acc:{Mods:16387 VK:120} Err:Invalid window handle. Note:} problems=["hotkey cancel = \"Ctrl+Alt+F9\" was not registered: Invalid window handle."] logged="time=2026-10-18T14:59:40.418+08:00 level=ERROR msg=\"cancel takeover refused by Win32; Confirming will have no cancel key\" hotkey=cancel binding=Ctrl+Alt+F9 err=\"Invalid window handle.\"\n"
+    hotkey_cancel_borrow_260_test.go:347: named conflict for the orchestrator: hotkey_live_test.go:107 reads rep.Live()[hkCancel].VK == vkEscape for a ball booted with liveHotkeys().Cancel = "Ctrl+Alt+V"; under 形ⓐ that slot holds VK 0x56, so the helper's bare-Esc premise is now config-dependent (winlive tier not run this round)
+    sta_release_windows_test.go:268: 33-r8 create-error door: tid=12048 planted hwnd=0xC390ABA | after plant: ball windows=1 all windows=2 classes=[WispBallWindow IME] queue head=empty
+    sta_release_windows_test.go:270: 33-r8 create-error door: after the plants (window-addressed PostMessageW rc=1, thread-addressed PostThreadMessageW rc=1): ball windows=1 all=2 classes=[WispBallWindow IME] queue head=msg 0x82F8 on hwnd 0xC390ABA
+    sta_release_windows_test.go:272: 33-r8 create-error door: the instant start() returned: ball windows=0 all windows=0 classes=[] queue head=empty (start err=plant: renderer init failed plant err=<nil>)
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=quit-only: tid=12048 hwnd=0xC3A0ABA createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=1 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+    sta_release_windows_test.go:448: 33-r8 pump-exit door=real-Close: tid=12048 hwnd=0xC3B0ABA createErr=<nil> | after create: ball windows=1 all=2 classes=[WispBallWindow IME] head=empty | AT RELEASE: ball windows=0 all=0 classes=[] head=empty staThread.hwnd=0x0 | plant PostMessage rc=0 | this file's own pump moved 0 | after own teardown: ball windows=0 head=empty | what the release unwind logged=""
+    sta_release_windows_test.go:602: 33-r8b cap leg (planted 4160, want pump to stop at the cap): tid=12048 posted=4160 postErr=<nil> pumped=4096 head-after="msg 0x82F9 on hwnd 0x0" windows(ball/all)=0/0 classes=[] | own drain moved 64, head-final="empty" | logged="time=2026-10-18T14:59:40.764+08:00 level=WARN msg=\"ball: the ui-sta release pump hit its cap before the thread's queue was empty; the thread goes back to the Go pool non-empty\" cap=4096 pumped=4096\n"
+    sta_release_windows_test.go:605: 33-r8b control leg (planted 8, under the cap): tid=12048 posted=8 postErr=<nil> pumped=8 head-after="empty" windows(ball/all)=0/0 classes=[] | own drain moved 0, head-final="empty" | logged=""
+    tokens_table_test.go:780: light table reuses the :root value by cascade for 2 field(s): BallHalo, OnSolid (the table states this in prose above its light rows)
+    tokens_table_test.go:805: verified 114/114 colour rows against tokens.go (40 palette fields checked in code -> table, 36 look colours, 4 looks)
+    tokens_table_test.go:955: docs/evidence/s1/c21-native-tokens.md:169: this row states a rule (缓动) without naming a Go constant, so there is no value to compare
+    tokens_table_test.go:1059: MATCHED WITHOUT THE PROMISED UNIT (4): BallSizeMaxPx=72 @ docs/evidence/s1/c21-native-tokens.md:141, BallSizeMinPx=44 @ docs/evidence/s1/c21-native-tokens.md:141, FontSizeMicroPx=11 @ docs/evidence/s1/c21-native-tokens.md:159, FontSizeMonoPx=12.5 @ docs/evidence/s1/c21-native-tokens.md:159
+    tokens_table_test.go:1063: NUMBERS NO NAMED CONSTANT CLAIMS (52): 0.35 @ docs/evidence/s1/c21-native-tokens.md:155, 0.55 @ docs/evidence/s1/c21-native-tokens.md:162, 0.8s @ docs/evidence/s1/c21-native-tokens.md:151, 1 @ docs/evidence/s1/c21-native-tokens.md:154, 1 @ docs/evidence/s1/c21-native-tokens.md:155, 1 @ docs/evidence/s1/c21-native-tokens.md:162, 1 @ docs/evidence/s1/c21-native-tokens.md:163, 1000 @ docs/evidence/s1/c21-native-tokens.md:165, 10fps @ docs/evidence/s1/c21-native-tokens.md:149, 160ms @ docs/evidence/s1/c21-native-tokens.md:157, 16px @ docs/evidence/s1/c21-native-tokens.md:166, 180ms @ docs/evidence/s1/c21-native-tokens.md:167, 2 @ docs/evidence/s1/c21-native-tokens.md:167, 2.1 @ docs/evidence/s1/c21-native-tokens.md:157, 21.75 @ docs/evidence/s1/c21-native-tokens.md:166, 22 @ docs/evidence/s1/c21-native-tokens.md:166, 22 @ docs/evidence/s1/c21-native-tokens.md:166, 220ms @ docs/evidence/s1/c21-native-tokens.md:167, 22px @ docs/evidence/s1/c21-native-tokens.md:168, 24 @ docs/evidence/s1/c21-native-tokens.md:168, 260ms @ docs/evidence/s1/c21-native-tokens.md:148, 2px @ docs/evidence/s1/c21-native-tokens.md:152, 3 @ docs/evidence/s1/c21-native-tokens.md:151, 30 @ docs/evidence/s1/c21-native-tokens.md:166, 30 @ docs/evidence/s1/c21-native-tokens.md:168, 300ms @ docs/evidence/s1/c21-native-tokens.md:167, 32 @ docs/evidence/s1/c21-native-tokens.md:168, 33 @ docs/evidence/s1/c21-native-tokens.md:163, 33ms @ docs/evidence/s1/c21-native-tokens.md:165, 34.72px @ docs/evidence/s1/c21-native-tokens.md:145, 4.2 @ docs/evidence/s1/c21-native-tokens.md:163, 44 @ docs/evidence/s1/c21-native-tokens.md:166, 56 @ docs/evidence/s1/c21-native-tokens.md:145, 5px @ docs/evidence/s1/c21-native-tokens.md:166, 62 @ docs/evidence/s1/c21-native-tokens.md:145, 62 @ docs/evidence/s1/c21-native-tokens.md:166, 72 @ docs/evidence/s1/c21-native-tokens.md:166, 74 @ docs/evidence/s1/c21-native-tokens.md:157, 74 @ docs/evidence/s1/c21-native-tokens.md:162, 74 @ docs/evidence/s1/c21-native-tokens.md:163, 8 @ docs/evidence/s1/c21-native-tokens.md:145, 8 @ docs/evidence/s1/c21-native-tokens.md:157, 8 @ docs/evidence/s1/c21-native-tokens.md:166, 8 @ docs/evidence/s1/c21-native-tokens.md:167, 838 @ docs/evidence/s1/c21-native-tokens.md:145, 8px @ docs/evidence/s1/c21-native-tokens.md:166, 9 @ docs/evidence/s1/c21-native-tokens.md:166, 9 @ docs/evidence/s1/c21-native-tokens.md:168, 900ms @ docs/evidence/s1/c21-native-tokens.md:167, 96dpi @ docs/evidence/s1/c21-native-tokens.md:161, 96dpi @ docs/evidence/s1/c21-native-tokens.md:166, 96dpi @ docs/evidence/s1/c21-native-tokens.md:168
+    tokens_table_test.go:1065: checked 67 constant declarations across 29 geometry rows against 56 exported tokens.go constants + 11 tabled from hit.go/liquid.go
+    tokens_table_test.go:1149: ZERO-CONSUMER TOKENS (27 of 116 checked; 89 are referenced by 18 non-test files):
+    tokens_table_test.go:1156:   UNCONSUMED BallSizeLargePx (declared at docs/evidence/s1/c21-native-tokens.md:143)
+    tokens_table_test.go:1156:   UNCONSUMED BallSizeSmallPx (declared at docs/evidence/s1/c21-native-tokens.md:142)
+
+== package-level FAIL lines ==
+FAIL	github.com/CarlosShao/wisp/internal/ball	1.198s
+FAIL	github.com/CarlosShao/wisp/internal/models	16.497s
+FAIL	github.com/CarlosShao/wisp/internal/panel	20.960s
+FAIL	github.com/CarlosShao/wisp/internal/risk	9.768s
+FAIL	github.com/CarlosShao/wisp/internal/tools	24.658s
+FAIL	github.com/CarlosShao/wisp/internal/winsec	29.204s

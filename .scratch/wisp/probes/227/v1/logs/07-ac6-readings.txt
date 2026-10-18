@@ -1,0 +1,54 @@
+gauge = git show HEAD:<path> + grep (算的: 命中枚数; 读的: 逐字句). tree = HEAD (274da78a)
+
+[1] the sentence under AC#6: always_write_no_clobber_226_test.go:43-44 verbatim
+	// The edit lands after assembly, while the process is running and nothing
+	// polls: [app] theme, a key with nothing whatever to do with [fs].
+hits of 'nothing polls' across the line break (content anchor, not line number):
+0
+negative control (same gauge, phrase that must NOT exist): 0 (rc=1 => zero)
+
+[2] is the claim 'nothing polls' true in production bytes at HEAD?
+HEAD:cmd/wisp/config_reload.go:92:	configReloadPollInterval = time.Second
+HEAD:cmd/wisp/config_reload.go:136:	t := time.NewTicker(configReloadPollInterval)
+HEAD:cmd/wisp/config_readers_255.go:195:	//     "hot", and startConfigReload's only non-test caller is cmd/wisp/run.go -
+HEAD:cmd/wisp/config_reload.go:20://     startConfigReload assigns it below, before the tick is spawned.
+HEAD:cmd/wisp/config_reload.go:24://     (不许用「静默不生效」充当这一档). startConfigReload assigns it below,
+HEAD:cmd/wisp/config_reload.go:105:// startConfigReload wires this run to D36's three tiers and starts its tick.
+HEAD:cmd/wisp/config_reload.go:109:func (rt *agentRuntime) startConfigReload() {
+HEAD:cmd/wisp/config_reload_223_test.go:12:// this terminal travels. Deleting rt.startConfigReload() reddens every case in
+HEAD:cmd/wisp/config_reload_223_test.go:580:		// synchronously by startConfigReload (run.go:813) into a syncWriter
+HEAD:cmd/wisp/panel_host_windows.go:685:// startConfigReload's only non-test caller is cmd/wisp/run.go - the resident leg
+
+[3] which commit wired it (票面 says 248095d1) - is 248095d1 an ancestor of HEAD?
+ANCESTOR=yes
+248095d1 09-29 15:33 代落 223-r1 的死腿现场（五枚文件未提交改动·我一字未改·门我自己跑过）
+
+[4] AC#6's other half: does ANY resident *_test.go in cmd/wisp pin 'hand edit still visible under the real 1s tick'?
+  (question: a permanent case that lets the production ticker run and asserts a hand-edited key is seen)
+HEAD:cmd/wisp/config_reload_223_test.go:660:		// CheckAndReload has returned (config_reload.go:179) while the
+HEAD:cmd/wisp/config_sentences_223r2_test.go:22:// CheckAndReload feeds describeReloadFailure exactly what reloadOnce does
+HEAD:cmd/wisp/config_sentences_223r2_test.go:118:			_, err = mgr.CheckAndReload()
+HEAD:cmd/wisp/restart_tier_keys_255r2_test.go:18:// the real config.Manager (SaveFile -> NewManager -> CheckAndReload), and must land
+HEAD:cmd/wisp/restart_tier_keys_255r2_test.go:91:// the Report the production CheckAndReload answers with. Nothing here mocks the
+HEAD:cmd/wisp/restart_tier_keys_255r2_test.go:119:	rep, err := mgr.CheckAndReload()
+HEAD:cmd/wisp/restart_tier_keys_255r2_test.go:121:		t.Fatalf("CheckAndReload after planting %s: %v", key, err)
+HEAD:cmd/wisp/restart_tier_keys_255r2_test.go:124:		t.Fatalf("CheckAndReload answered nil for a planted %s change - the poll never saw it", key)
+  ---- how those call it: manual in-test calls vs the wired ticker ----
+HEAD:cmd/wisp/config_reload_223_test.go:12:// this terminal travels. Deleting rt.startConfigReload() reddens every case in
+HEAD:cmd/wisp/config_reload_223_test.go:580:		// synchronously by startConfigReload (run.go:813) into a syncWriter
+HEAD:cmd/wisp/panel_reshow_255r1_windows_test.go:47:// as "hot", so manager.go's OnReload never fires for it, and startConfigReload's only
+
+[5] the :102 assertion direction (票面 AC#6 第二条要求) verbatim
+	// The merge reads the file to write it; it does not read the file into memory.
+	rt := w.runtime()
+	if rt == nil {
+		t.Fatal("no runtime was captured")
+	}
+	if got := rt.mgr.Config().App.Theme; got != "dark" {
+		t.Errorf("the guarded write applied the hand-edited theme to the running process "+
+			"(got %q, want the dark this run loaded): reading a hand edit back is ticket 223", got)
+	}
+
+[6] the 09-29 correction the ticket carries: 4.82s/1.31s readings are NOT mine (cited as 票面 text) - gauge on ticket bytes:
+1
+32:  - ⚠ **09-29 17:3x 编排者更正本格的措辞（原句不抹，台账 

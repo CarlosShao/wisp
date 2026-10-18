@@ -1,0 +1,39 @@
+tree=base(feac8f77) scope=./internal/... (cmd/wisp half NOT run = lane)
+rc=1 RUN=2072 PASS_TOP=1361 FAIL_TOP=31 SKIP=8
+---- named FAIL roster (base) ----
+--- FAIL: Test20r2JunctionRefusalIsNeverAskable
+--- FAIL: TestAC4InstallDirWidthIsDeliberateAndHasABreakLine
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes
+--- FAIL: TestBridgeRefusesARealJunctionOnTheReadRoute
+--- FAIL: TestBridgeWritesNothingThroughARealJunction
+--- FAIL: TestC21DesignTokensFourWayAgree
+--- FAIL: TestC21TableColourRowsMatchTokensCSS
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+--- FAIL: TestComposerContractTypesMatchFrontend
+--- FAIL: TestComposerRenderFixtureTellsTheTruth
+--- FAIL: TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop
+--- FAIL: TestDirOfBaseOfCutOnThePlatformSeparator
+--- FAIL: TestGateJudgesThePrivateSetByResolvedSID
+--- FAIL: TestReadGitOnThisRepositoryIsSelfConsistent
+--- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID
+--- FAIL: TestStreamLogDroppedNamingLedgerIsNotBounded35r8
+--- FAIL: TestStreamLogFloodBelowKeyBoundIsNotBounded35r8
+--- FAIL: TestSweepNeverDeletesThroughARealJunction
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed
+--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+--- FAIL: TestTicket252P1AllowlistLegs
+--- FAIL: TestTicket252P1EnvSpellingCensus
+--- FAIL: TestTicket252P1OwnerMachineReachability
+--- FAIL: TestTicket252R1AlignmentAddsNoAuthorization
+--- FAIL: TestTicket252R1BothSpellingsAnswerTheSame
+--- FAIL: TestTicket252R1CanonicalStillNamesOneTree
+--- FAIL: TestTicket252R1ShortSpellingOfNewFileIsAuthorized
+--- FAIL: TestTicket252R2LexicalLegRefusesWhatOnlyItRefuses
+--- FAIL: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing
+== 逐名差集 (deliv minus base) = 本票字节带进来的新红? want EMPTY ==
+--- FAIL: TestResolvePerCallBudget
+== 差集枚数 = 1 (want 0)
+== 反向差集 (base minus deliv) = 交付件治掉的既有红 (info only) ==
+== 两枚名册枚数: base=31 deliv=32 ==
