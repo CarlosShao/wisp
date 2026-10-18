@@ -1,0 +1,5 @@
+=== RUN   TestFallbackBranchHasNoWorldOnThisPlatform336
+--- PASS: TestFallbackBranchHasNoWorldOnThisPlatform336 (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/risk	0.014s
+---- my tripwire only ----
+ok  	github.com/CarlosShao/wisp/internal/risk	0.016s
