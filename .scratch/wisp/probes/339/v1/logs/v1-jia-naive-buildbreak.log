@@ -1,0 +1,19 @@
+# naive 形＝只给 anchor_miss_reason_334_test.go 加 //go:build windows，夹具不搬（⛔ 339 件在场）
+tree=/d/tmp/wisp/20261018/339v1/naive/tree blob_expect=8f683b04d19c2bbe6956620f1d96338915b48cdd
+P0=8f683b04d19c2bbe6956620f1d96338915b48cdd
+build_tag_lines_before=0 (must be 0)
+build_tag_lines_after=1 (must be 1)
+first_line=//go:build windows
+== Linux 档 go vet ==
+# github.com/CarlosShao/wisp/internal/risk
+# [github.com/CarlosShao/wisp/internal/risk]
+vet: internal/risk/anchor_fallback_teeth_336_other_test.go:73:30: undefined: hostile334
+VET_RC=1
+# github.com/CarlosShao/wisp/internal/risk [github.com/CarlosShao/wisp/internal/risk.test]
+internal/risk/anchor_fallback_teeth_336_other_test.go:73:30: undefined: hostile334
+internal/risk/name_claim_two_arm_216_test.go:89:9: undefined: candidateOffAnchorChain334
+FAIL	github.com/CarlosShao/wisp/internal/risk [build failed]
+FAIL
+TESTBUILD_RC=0
+== 还原 naive 树＝重取 blob（这棵树专用、不作正控）==
+R=8f683b04d19c2bbe6956620f1d96338915b48cdd match=YES

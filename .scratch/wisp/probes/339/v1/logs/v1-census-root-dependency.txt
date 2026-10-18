@@ -1,0 +1,22 @@
+== 尺甲＝internal/risk/** 里引用 formsOf|anchorForms|uncertainAnchorMiss 的 _test 件，逐枚验档 ==
+FILE=internal/risk/anchor_fallback_teeth_336_other_test.go tag_lines=1 tag="//go:build !windows" name=suffixed ref_lines=16,19,74,80,85,86
+FILE=internal/risk/anchor_fallback_teeth_336_windows_test.go tag_lines=1 tag="//go:build windows" name=suffixed ref_lines=13,24,28,143,144,147,150
+FILE=internal/risk/anchor_miss_reason_334_test.go tag_lines=1 tag="//go:build windows" name=no-suffix ref_lines=15,19,20,40,116
+FILE=internal/risk/anchor_miss_reason_339_other_test.go tag_lines=1 tag="//go:build !windows" name=suffixed ref_lines=18,20,109,118,137,138,145,146
+FILE=internal/risk/name_claim_two_arm_216_test.go tag_lines=0 tag="" name=no-suffix ref_lines=79
+FILE=internal/risk/pathresolver_anchor_spelling_windows_test.go tag_lines=1 tag="//go:build windows" name=suffixed ref_lines=28,38,166,183,200
+
+== 尺乙＝上述件里既无 //go:build 行、文件名也无后缀的（＝真同族未档件）==
+UNTAGGED-DEPENDENT file=internal/risk/name_claim_two_arm_216_test.go lines=79
+
+== 尺丙＝正控：同一把尺打在票 339 落码前的旧锚 e6fd0f50（那时 334 件无档＝必须开火）==
+  OLD-UNTAGGED file=internal/risk/anchor_miss_reason_334_test.go (tag_lines=0)
+  OLD-UNTAGGED file=internal/risk/name_claim_two_arm_216_test.go (tag_lines=0)
+
+== 尺丁＝internal/risk 之外有没有同族依赖（必答 v）==
+  OUTSIDE file=.scratch/wisp/probes/307/v1/logs/pristine-v1-syncdirs.go
+outside_count=1
+
+== 尺戊＝跨包消费者尺：哪些包直接读 pathForms/.root 形状（只读数）==
+  (pathForms 是包内类型，导出面只有 Classify/Gate/Resolve ⇒ 外包零依赖是结构必然)
+2

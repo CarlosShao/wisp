@@ -1,0 +1,48 @@
+# 尺＝git grep -lE 'Setenv\("(USERPROFILE|APPDATA|LOCALAPPDATA)"'（量的、HEAD 具名提交树；工作树与 HEAD 同串已现跑）
+
+== 正控 A（证尺灵）：三枚 Windows-only env 名在全仓 .go 的在场文件数 ==
+files_with_USERPROFILE=23
+files_with_LOCALAPPDATA=14
+files_with_APPDATA=23
+
+== 正控 B：本尺在 internal/risk 的在场命中（应含 334/339 两枚仪器）==
+FILE=internal/risk/anchor_fallback_teeth_336_other_test.go build_tag_lines=1 name_suffix=other-suffix setenv_lines=57,58,59
+FILE=internal/risk/anchor_miss_reason_334_test.go build_tag_lines=1 name_suffix=NO-SUFFIX setenv_lines=107,109,110
+FILE=internal/risk/anchor_miss_reason_339_other_test.go build_tag_lines=1 name_suffix=other-suffix setenv_lines=100,102,103
+FILE=internal/risk/pathresolver_anchor_spelling_windows_test.go build_tag_lines=1 name_suffix=windows-suffix setenv_lines=57,59,60
+FILE=internal/risk/pathresolver_junction_windows_test.go build_tag_lines=1 name_suffix=windows-suffix setenv_lines=25,27,28,266,268,269
+FILE=internal/risk/pathshape_portable_test.go build_tag_lines=0 name_suffix=NO-SUFFIX setenv_lines=123,124,125
+FILE=internal/risk/syncdirs_ancestor_actable_leg_116_test.go build_tag_lines=0 name_suffix=NO-SUFFIX setenv_lines=275
+
+== 尺甲 internal/risk/**：上面那份即全量；逐枚点名无档件 ==
+risk_no_tag=2
+
+== 尺乙（必答 v）internal/risk 之外全仓其余包 ==
+FILE=internal/tools/bridge_junction_windows_test.go build_tag_lines=1 name_suffix=windows-suffix setenv_lines=414,477
+FILE=internal/tools/fs_test.go build_tag_lines=0 name_suffix=NO-SUFFIX setenv_lines=159
+FILE=internal/tools/grant_test.go build_tag_lines=0 name_suffix=NO-SUFFIX setenv_lines=351
+FILE=internal/tools/refusal_20r2_test.go build_tag_lines=0 name_suffix=NO-SUFFIX setenv_lines=143
+FILE=internal/tools/refusal_20r2_windows_test.go build_tag_lines=1 name_suffix=windows-suffix setenv_lines=67
+FILE=internal/tools/ticket90_test.go build_tag_lines=0 name_suffix=NO-SUFFIX setenv_lines=388
+
+== 尺丙 生产码（非 _test）读 Windows-only env 的落点（只读数、⛔ 本票射程）==
+
+== 尺丁 全仓 _test 件里 t.Setenv 的环境变量名总表（防判据写窄）==
+     19 Setenv("HOME"
+     15 Setenv("USERPROFILE"
+      7 Setenv("WISP_ENV"
+      7 Setenv("LOCALAPPDATA"
+      7 Setenv("APPDATA"
+      6 Setenv("TMPDIR"
+      4 Setenv("XDG_CONFIG_HOME"
+      3 Setenv("WISP_TEST_DATA_DIR"
+      2 Setenv("WISP_MODELS_MANIFEST"
+      2 Setenv("WISP_LLM_KEY"
+      2 Setenv("DEEPSEEK_KEY"
+      1 Setenv("WISP_TEST_LLM_KEY"
+      1 Setenv("WISP_TEST_HOME"
+      1 Setenv("WISP_SECRETSTORE_EMPTY"
+      1 Setenv("WISP186R1"
+      1 Setenv("NO_PROXY"
+      1 Setenv("HTTP_PROXY"
+      1 Setenv("HTTPS_PROXY"

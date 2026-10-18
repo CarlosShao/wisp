@@ -1,0 +1,24 @@
+== 尺＝逐枚验四条件（量的、HEAD 具名树）==
+正控＝票 339 落码前的 anchor_miss_reason_334_test.go（在 e6fd0f50 上＝四条件全中的原形）
+
+--- 正控（旧锚 e6fd0f50 的 334 件）：设 env 逐行 / 有 HOME 吗 / 有档吗 / 有 GOOS 守卫吗
+  setenv_lines=85,86,87,88
+  sets_HOME=1 (正控＝1 ⇒ 旧锚那件本来就在设 HOME ⇒ 票面那句 USERPROFILE 诊断作废)
+  build_tag_lines=0 (正控＝0 ⇒ 四条件全中 ⇒ 票 339 那两枚红就是这么来的)
+
+--- 全仓 .go 逐枚筛（HEAD）：设 Windows-only env 且件内不设 HOME、无档、无 GOOS 守卫
+no  file=internal/risk/anchor_fallback_teeth_336_other_test.go winenv=3 setsHOME=1 tag=1 suffix=1 goos=0
+no  file=internal/risk/anchor_miss_reason_334_test.go winenv=3 setsHOME=1 tag=1 suffix=0 goos=0
+no  file=internal/risk/anchor_miss_reason_339_other_test.go winenv=3 setsHOME=1 tag=1 suffix=1 goos=0
+no  file=internal/risk/pathresolver_anchor_spelling_windows_test.go winenv=3 setsHOME=1 tag=1 suffix=1 goos=0
+no  file=internal/risk/pathresolver_junction_windows_test.go winenv=6 setsHOME=2 tag=1 suffix=1 goos=0
+no  file=internal/risk/pathshape_portable_test.go winenv=3 setsHOME=1 tag=0 suffix=0 goos=0
+no  file=internal/risk/syncdirs_ancestor_actable_leg_116_test.go winenv=1 setsHOME=1 tag=0 suffix=0 goos=0
+no  file=internal/tools/bridge_junction_windows_test.go winenv=2 setsHOME=2 tag=1 suffix=1 goos=0
+no  file=internal/tools/fs_test.go winenv=1 setsHOME=1 tag=0 suffix=0 goos=0
+no  file=internal/tools/grant_test.go winenv=1 setsHOME=1 tag=0 suffix=0 goos=0
+no  file=internal/tools/refusal_20r2_test.go winenv=1 setsHOME=1 tag=0 suffix=0 goos=0
+no  file=internal/tools/refusal_20r2_windows_test.go winenv=1 setsHOME=1 tag=1 suffix=1 goos=0
+no  file=internal/tools/ticket90_test.go winenv=1 setsHOME=1 tag=0 suffix=0 goos=0
+
+--- 同族另一形（只读参考）：设 HOME 不设 Windows-only env 的无档件（POSIX-only 世界）
