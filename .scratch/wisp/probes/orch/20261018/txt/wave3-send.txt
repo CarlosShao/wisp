@@ -1,0 +1,19 @@
+第三波放出＝4 枚腿（真实启动动作：4 次 spawn 调用，全部返回 id）
+
+通道＝subagent（★队友帽 8 已满＝spawn_teammate 返回 "Team member limit 8 reached"，与 10-18 17:1x 第二波同形＝那波也走 subagent 通道；本波 4 枚腿⛔ 出现在 list_agents 里 ⇒ 收件尺一律按主题前缀＋写面根认，⛔ 按注册名认）
+
+在飞（4）＝
+- 341-r1 写·internal/config 测试面＝subagent 2e2d5c3d-31ff-4449-a412-14eaa8692ae0（票 341 四格 P2/P3/P5/P6 补常驻用例＋去牙）
+- 339-v1 裁·internal/risk 只读＝subagent c62fe720-0016-489e-8b0a-cd96461395a5（票 339 七格；必答(vi)＝现跑推翻⇄坐实我的机制更正）
+- 338-v1 裁·internal/tools⇄cmd/wisp＝subagent f4de7da5-89dd-4995-a392-168c664371d7（票 338 五格；★cmd/wisp 整包本波唯一持跑者＝它，裁 only_before=4 截断差＝A1035 我的欠账）
+- 342-a1 普查·internal/winsec 只读＝subagent 7246a829-5d33-460b-b293-dbdc26e9c266（票 342 AC#0 三形代价表，⛔ 落任何一形）
+
+释放前置现跑（21:3x）＝CPU 44%、go test 进程 0（那两枚 cargo 是别的程序、⛔ 我方编队）、共享树跟踪件脏 0 行、HEAD＝98dbf20a（派单存档笔）
+腿身份三键放出前逐枚现跑＝4 枚前缀各 0 笔＋probes 目录各不存在
+写面互斥逐面现跑＝40 分钟内 internal/config⇄internal/risk⇄internal/tools⇄cmd/wisp⇄internal/winsec 零枚文件被动
+
+派单存档＝98dbf20a（16 枚文件、809 行、逐枚非 0 字节；先存档再发＝本笔在它之后）
+★放腿前我自己抓到并改掉的一处（已随 98dbf20a 入库、⛔ 事后更正）：公共块与三枚 head/specific 里我把禁令"⛔ 分节符那枚字符"写成了**那枚字符本身**＝描述它的字自己占一枚（同形先例＝336-v1 的 55f0ac49／322-v2 的 96-selfcheck 那枚"分节号 needle 写进尺文件"）。改法＝perl 把 6 枚件里的 U+00A7 全换成字面串 "U+00A7"、重拼 dispatch、逐枚 grep 复验命中 0 ⇒ 98dbf20a 落库时已⛔ 含该字符（本件是放行动记录、不是更正件）。
+
+形状与例外（具名）＝总腿 4≤8；写腿 1＜3＝交接书 13.1 节例外，理由已写进公共块与 98dbf20a（其余可派写票全卡人工批准门或裁腿前置）
+推送＝未推 0（本波在飞含 1 枚写腿 ⇒ ⛔ 推；下一窗口＝写腿交件后）
