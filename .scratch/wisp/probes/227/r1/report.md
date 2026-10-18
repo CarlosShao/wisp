@@ -14,13 +14,16 @@
 | `dd0e489d` | 定稿用例件（编排者收回 ≤160 帽对 `*_test.go` 的适用） | 同上（`52/84`） |
 | `6da21d4a` | report（本件）＋八枚 logs 入库 | `.scratch/wisp/probes/227/r1/**`（9 files＝本件＋c0…c7） |
 | `32a70e2f` | 票尾一条 bullet | `.scratch/wisp/issues/227-*.md`（`2/0`＝只追加） |
+| `9f5b0022` | 名册尺更正＋交件侧终量门禁 | 本件＋`logs/c8…c11`（5 files） |
+| `3cda0aef` | AC#4 终尺 c12 入库（＝c8 过期，具名更正） | 本件＋`logs/c12`（2 files） |
 
-★末笔＝**本行所在的这一笔**（report 终量笔：补上 `6da21d4a`/`32a70e2f` 两枚交件号＋名册尺终量）。它的提交号
-⛔ 在这里预先写死＝**尚未存在的号不能当凭据**；收件时请现读 `git log -1` 与本件同看。
-名册尺终量＝`logs/c8-roster-five-commits.txt`：逐笔 `internal/config/**`＋`.scratch/wisp/probes/227/r1/**`＋票 227
-之外＝**零字节**。
-
-`internal/config/**` 与 `.scratch/wisp/probes/227/r1/**` 与票 227 之外＝**零字节**（尺见 logs/`c7-roster-per-commit.txt`）。
+★**还有一枚＝本行所在这一笔，号⛔ 在这里预先写死**（写这行时它还不存在＝尚未存在的号⛔ 当凭据）；
+收件侧现跑尺＝`git log --format="%h %s" feac8f77..HEAD` 只留 subject 以「票 227 落地腿 227-r1·」开头的枚。
+名册尺终量＝`logs/c12-roster-six-commits.txt`（它自身也⛔ 覆盖把自己写进去的那一笔＝同一枚自指道理，件头写明）：
+逐笔 `internal/config/**` ∪ `.scratch/wisp/probes/227/r1/**` ∪ 票 227 **之外＝零字节**，合计 0，两枚正控在件内。
+- ⚠ **票尾那条 bullet 里的"四枚提交"已过期**＝它写于本腿第 4 枚（`6da21d4a`）落盘之后，同一枚自指道理
+  （一条 bullet 装不下后续笔）。派单只许票尾**一条**追加 bullet ⇒ 本腿⛔ 为补枚数去追加第二条（那＝扩写面）。
+  **终名册以本件这张表＋`logs/c12`＋收件侧现跑那把 subject 尺为准**；票尾那条只当"本腿来过的路标"，不当名册。
 
 ## AC#3 交付主体：四种手改形状矩阵（分母＝`226-v1` 的 `b2` P1–P6，⛔ 重造）
 
@@ -103,6 +106,18 @@ P2／P3／P5／P6 四行**如实报未覆盖**（AC#4 不许顺手扩大射程�
 
 - 红名册作差：基线⇄交件＝**零枚新增红**（交件恰＝基线＋本腿 5 枚全绿）；未改产码那一发只红本腿两枚**文案**断言
   （`writeguard_handedit_227_test.go:64`／`:129`）＝证"用例盯的是文案、⛔ 恒红"。
+- ★**"未修码响不响"逐件成对**（＝派单必答 (iv)，尺＝未改产码⇄只换我的用例，件 `logs/c2-final-unmodcode.txt`）：
+  | 本腿用例 | 钉的事实 | 未修码响不响 | 成对读数出处 |
+  |---|---|---|---|
+  | `TestHandDeletedScalarLineComesBackAtSchemaDefault:23` | ①补回＝默认 56／②`kept_…=[ball.size]`／③注释丢＋日志说实话 | ①②③-注释＝**不响**（既有码本就如此，属被钉的既有代价）；③-日志＝**响**（红句 `:64`） | c2 ⇄ c1 |
+  | `TestHandDeletedMapEntryIsNotRestored:70` | P4 删 map 条目不补回 | **不响**（既有行为，本枚把它从台件升级成常驻） | c2 ⇄ c1 |
+  | `TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent:106` | 边界＋收窄句 | 边界半边**不响**（迁移确实重排＝既有码）；收窄句**响**（红句 `:129`） | c2 ⇄ c1 |
+  | `TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent:150` | 正控（schema 当前版真不动文件） | **不响**（＝成对正控，证上两枚⛔ 恒红） | c2 ⇄ c1 |
+  | `TestDeletedLineRestorationIsNotClaimedAsAWrittenKey:181` | AC#4 删行形不认领别键 | **不响**（既有形状） | c2 ⇄ c1 |
+  ⇒ 未修码合计只红 **2** 枚，且两枚红句逐字都指向**文案**（⛔ 指向字节或行为）＝AC#2 走甲
+  "只补仪器＋让文案说实话、⛔ 改行为"那句的机读证据。★AC#2 的"改码才响"那一维另有一发＝
+  `logs/c6-mu3-393-schema-red.txt`：未改产码⇄**把 `:393` 那枚的 fixture 塞进 schema 落后形** ⇒
+  既有码红（`:405`＋`:408`）＝证那枚用例今天对这一形**失明**，不是它测不了。
 - 成对突变落点不同（报告侧⇄写侧）⇄ 还原 sha256＝pristine `EFE12661…D47BD`（跑前后各验一次）。
 - 门禁四数（只在共享工作树，★跑前 `unset GOTMPDIR TMPDIR`，逐枚 `rc=`）：`gofumpt -l <本腿两枚>`＝空输出 rc=0
   ／`sh scripts/d22scan.sh` rc=0 clean／`sh scripts/check-path-length-budget.sh` rc=0 VERDICT GREEN／
