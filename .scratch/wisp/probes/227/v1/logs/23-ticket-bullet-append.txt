@@ -1,0 +1,16 @@
+== before ==
+lines=50
+AC-unchecked=6 AC-checked=0
+bullet-count-227-r1=1
+bullet-count-227-v1=0 (want 0 before)
+== after the append ==
+lines=52
+AC-unchecked=6 AC-checked=0
+bullet-count-227-r1=1
+bullet-count-227-v1=1 (want 1)
+== diff numstat (want 2 0 => pure addition of one bullet line + its blank line, zero deletions) ==
+warning: in the working copy of '.scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md', CRLF will be replaced by LF the next time Git touches it
+2	0	.scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md
+== git diff word-diff sanity: no removed content ==
+warning: in the working copy of '.scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md', CRLF will be replaced by LF the next time Git touches it
+0
