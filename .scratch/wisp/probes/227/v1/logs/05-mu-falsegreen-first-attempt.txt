@@ -1,0 +1,26 @@
+227-v1 故障件（本腿自己踩的空操作一发，⛔ 当凭据、⛔ 删＝临时件只建不删）
+
+时间＝2026-10-18 15:0x 台树＝D:\tmp\wisp\20261018\227v1\v1\B（bcf90e06 仓外导出）
+目的＝AC#1③ 那句"删一行＝回落默认"的去牙（文案侧）
+
+[这一发用了什么锚]
+  sed -i "s/a key line the operator deleted by hand comes back at its schema default value/PLACEHOLDER-227v1-tooth/g"
+[这一发的实际命中]
+  grep -c "a key line the operator deleted by hand" internal/config/writeguard.go  ⇒ 0（替换前后同数＝改 0 字节）
+  原因＝产码里那句被拆成两枚字面续行：
+    :174  "in canonical form, so comments and hand-chosen key order are not preserved; a key line the "+
+    :175  "operator deleted by hand comes back at its schema default value)",
+  单行 sed 跨不过 `"+` 这个换行 ⇒ 锚＝0 命中。
+[这一发被记成了什么（＝假读数）]
+  SHOT1_RC=0
+  --- PASS: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.02s)
+  ok  github.com/CarlosShao/wisp/internal/config
+  ⇒ 这枚 rc=0 与 PASS 打的是**未突变**的字节，⛔ 证明任何东西。
+[为什么现场就抓到了]
+  发后我 grep 那句的命中数＝0（＝"after sed" 那行），与发前 2 枚不一致 ⇒ 当场判"锚没落上＝空操作"，
+  没有把这枚 PASS 写进任何判语；改正版＝04-ac1-teeth.txt 尺 C（换单行内可落的锚
+  "hand comes back at its schema default value"，ANCHOR_HITS=2 非 0 才开火）⇒ 真红 rc=1、红句 :64。
+[定式（交编排者，可进公共块）]
+  去牙/突变的每一条 sed 锚，落刀前先 `grep -c` 记下命中数、落刀后要求
+  「剩余命中＝0 且 占位命中＝预期枚数」两个数都对得上；对不上＝那发作废重打，⛔ 用它的 rc 当凭据。
+  同一枚字符串在 Go 里可能跨字面续行（`"…"+ / "…"`），⛔ 假设它在一行内。
