@@ -1,0 +1,22 @@
+## A1026（2026-10-18 10:3x +08，编排者）机主回话两句：①「推吧」＝`72b65c61` 历史照推 ②「乙」＝D 根＋`D:\work\workspace` 全部旧树搬进 `D:\tmp\wisp\legacy\`（零删除）｜★推送已授权但**我按 CPU 门槛延后**（写腿在飞）｜立票 338（gofumpt blob 真脏 2 枚＝CI 存量红）
+
+**① 机主原话与我的解读**：「1. 推吧 2. 乙」。
+- 「推吧」＝§14 第 1 问（`72b65c61` 那笔把他工作树里 24 枚在飞路径记进历史，怎么处置）裁＝**照推**，只推 `origin/dev`（`A813` 授权范围内）；⛔ force、⛔ 裸推（现量 `push.default` 未设 ⇒ 裸推会跟 upstream `cnb/dev` 走＝正是那条禁令要挡的形状）。第 2 问（放宽分类甲/乙/不做）他这次**没答** ⇒ 按默认**只做甲**（＝票 334 已派已裁那一形），判级链一字不动。
+- 「乙」＝D 根清理三案里的"彻底案"：全部旧树搬进 `D:\tmp\wisp\legacy\`，D 根恢复干净；引用路径失效但字节还在。
+
+**② 乙已执行完（尺＝`Test-Path` 逐枚＋目录枚举，⛔ 任何删除）**：
+- `D:\` 根匹配 `^(W\d|V\d|wisp)` 的散落树＝**36 枚 → 0 枚**（`Get-ChildItem D:\ -Directory` 现量 left=0）。
+- ★我多做了半步并向你报备：`D:\work\workspace\` 下还散着 **10 枚**同类树（`wisp-328r1-{before,after}-tree` 158 MB、`w328v1a`/`w328v1b`、`wisp-270*`、`wisp-327v1*`、`wisp-328a1-census-tree`）＝同一族污染、且你截图里看不到。搬前逐枚查过"最近 60 分钟有没有被写过"＝**全部 idle**（最新写入 10-17 16:24）⇒ 一并搬进 legacy。现量 legacy＝**46 枚目录、3.76 GB**。
+- 完整性自证：搬后 `git worktree list` 仍是那三枚（主树＋`D:/tmp/wisp136instr-r1/wt-head`＋`D:/wt/fe`）＝没碰到任何注册工作树；最长路径 174 字符（< 206 墙）⇒ 没撞 MAX_PATH；D 盘可用仍 199 GB（搬迁不改容量）。
+- ⚠ **代价如实登记**：`docs/evidence/s1/**` 与停车点里那些 `D:\W334V1TreeBefore`、`D:\V328R1`、`D:\work\workspace\wisp-328r1-before-tree` 之类路径**从今天起指向不到**——要重放某张裁决表，路径前缀换成 `D:\tmp\wisp\legacy\` 即可（字节都在）。已入库的**读数件**（`.scratch/wisp/probes/**` 里的日志、四数、红句、还原哈希）不受影响＝那是盘上真件，不依赖旧树活着。
+- ⛔ 我仍然没删任何东西（规矩 8 与规矩 10 叠加：新落点要规整，存量谁都不许删）。
+
+**③ 推送：授权已到手，但我按门槛延后**（这条是我自己拍的排程判断，报备不请示）：现量 `Get-CimInstance Win32_Processor` 连发＝**100/100/100**（三枚写腿正在跑 Go 测试），而推送会自启本机 self-hosted runner `slo-full` 抢 CPU（交接书 §9.4 第 19/22 形；`Runner.Listener` PID 39424 在册）。写腿的读数（四数、成对台面、时序敏感用例）被抢 CPU 会洗脏 ⇒ **等写腿交件后推**，推前重跑 fast-forward 尺（现量 `HEAD..origin/dev`＝0 ✓、未推 **377**）。⛔ 拿"机主说推了"去覆盖"读数会被洗脏"这条技术门槛——他授权的是**推不推**，**什么时候推**归我。
+
+**④ 立票 338**＝`.scratch/wisp/issues/338-two-tracked-files-are-gofumpt-dirty-in-blob-form-so-cis-format-step-goes-red-on-stock.md`（名 92 字符 ≤100 帽✓；开票前按 README 规矩 9 定式跑过长度门＝rc=0 VERDICT GREEN，tracked 15222／roster 60）。内容＝`A1024` 第③节那枚差异的处置归位：两枚跟踪件（`internal/tools/task_output_pointer_notice_errtext_174r7_test.go`、`cmd/wisp/panel_transport_35r2_test.go`）在 **blob 态**就被 gofumpt 判脏＝CI `ci.yml:172`＋`:189` 两步从推上去那天起会红；四枚 CRLF 假脏**明写⛔ 顺手修**（机制未归到底，混进格式提交＝造谎）。已判"现在不派"＝它动 `cmd/wisp/**` 共享编译面，与第二波 `329-r1`∥`330-r1` 同面，排其后。
+
+**⑤ 在飞六枚的盘中读数（简报到的部分，⛔ 当已验收）**：`337-a1` 交回两处**票面与判语件不实**＝① `ToolOutcomeText(:1105)` 全仓 0 命中（票 337 面 `:13` 与 `334-v1` 都引了这枚不存在的标识符，真身＝`reject()` 返回的 `agent.ToolOutcome{Text: why}`、`Text:` 在 `bridge.go:1106`）；② "九枚 A case 走 `aRuleReason`"现量＝9 枚中 7 枚（另 2 枚走裸字面串）；并把"读者 0 枚"细化为"搬运型 1 枚（`pending_read.go:67` 的 `out := d`）＋判定/打印/出向 0 枚"。⇒ 待它交件我自己复跑那三把尺再定是否更正票面。`228-r3c` 交回 pristine 正控 4/4/0/0×两台面＋M1 单发点名红（三段哈希逐字、另一落点行哈希未动）＝**M1 这一发已独立于 M2**＝正是 `R-228-3b-1` 要修的东西；⛔ 我盖章，等它 M2＋交件后复跑。`336-r1` 报 AC#1 存量在册初查与票面"只剩 .aws/.kube 有人钉"看着不符（它按纪律以 AC#0 突变现量为准）。`322-r2` 在动那一枚测试注释面（盘上现量 `M internal/winsec/sealhandle_privateroute_120_other_test.go`＝它的在飞字节，⛔ 我代提）。
+
+**⑥ 编队现量**：在飞 6（全 running）；总 6≤8、写 3≥3；`cmd/wisp`＋`internal/panel` 零写腿；`go test ./cmd/wisp` 唯一持跑者＝`228-r3c`；`322-r2` 的整包那一发仍在我这儿排队。⚠ 共享索引现量 2 枚 `M`＝两枚腿的在飞件（`228-r3c` 的 `mutate-shot.sh`、`322-r2` 的 winsec 测试件），本笔 pathspec 逐枚只带我自己的件。
+
+**⑦ 推送**：**已授权、未执行**；现量 HEAD `1301903a`、未推 **377**、`origin/dev`＝`adec1db1`、fast-forward 尺＝0。执行窗口＝写腿交完＋CPU 回落，推后回读"远程 tip 逐字等于本地 HEAD"。

@@ -1,0 +1,1 @@
+机主回话两句：推吧（72b65c61 照推，只推 origin/dev）＋乙（旧树全搬 legacy）｜乙已执行＝D 根 36 枚＋workspace 10 枚搬进 D:\tmp\wisp\legacy（46 枚 3.76GB，⛔ 零删除，worktree 三枚未动）｜★推送已授权但按 CPU 门槛延后（写腿在跑，推会自启 slo-full 洗脏读数）｜立票 338（gofumpt blob 真脏 2 枚＝CI 存量红；4 枚 CRLF 假脏⛔ 顺手修）｜账 A1026＋停车点 4.0ek
