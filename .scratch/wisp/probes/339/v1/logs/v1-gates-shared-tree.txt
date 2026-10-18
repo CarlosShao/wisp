@@ -13,8 +13,8 @@ d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _tes
 d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=592, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 592 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
 --- 门③ 长度门（要 .git）---
 len_rc=0
-check-path-length-budget.sh: denominator read: 16084 tracked paths
-check-path-length-budget.sh: denominator: tracked paths=16084  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: denominator read: 16112 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=16112  over-budget=60  covered by roster=60  not in roster=0
 check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
 check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
 --- 门④ go vet ./internal/risk/ ---

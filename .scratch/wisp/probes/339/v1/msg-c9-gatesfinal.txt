@@ -1,0 +1,1 @@
+票 339 终裁腿 339-v1·门禁四数对交件末态重打（同一把 gates.sh、共享工作树、跑前 unset GOTMPDIR TMPDIR TEMP TMP）＝rc 0/0/0/0 一字不变；★长度门分母 16084→16112＝本腿其后两笔（df043212 票尾 bullet＋7deafbd5 自证尺件）自己入库的时间差＝按现行口径具名刷新、⛔ 抄过期数（910ed7c3 里那句 16084 同形作废、原件一字不改，本笔为载体）；gofumpt 射程＝本腿写面 .go 枚数 0＝正控空集输出空、d22scan clean、go vet ./internal/risk/ 空。⛔ 翻框（票 339 现跑未勾 7／已勾 0）⛔ push。
