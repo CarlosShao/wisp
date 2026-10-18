@@ -1,0 +1,19 @@
+票 322 收尾腿 322-r2·★自抓：同一笔形状违规第二次再犯（9c372800 越界 2 枚）
+
+`9c372800` 把编排者已 `git add` 未 commit 的两枚新件卷进我这一笔＝
+`.scratch/wisp/probes/orch/20261018/txt/commit-40em.sh`＋`commit-corrections.sh`（越界 2／20 枚）。
+机制与 `7f805583` **完全同一形**：`git add` 我逐枚字面 pathspec 合规（18 枚全在我写面内），
+`git commit` 却写成 `-- $s`，那个 `$s` ＝ `git diff --cached --name-only` ＝**共享 index 的全集**。
+⚠ 我那笔正文里刚写着"pathspec 两处仍字面逐枚写死"——那句话当场就是假的＝
+不是知识缺口，是我没把尺用在最后一步（第二次）。
+
+盘上三把尺（内容无损）：两枚件在 `9c372800^` **不存在**（`git log --diff-filter=A` 显示由我这一笔首现）；
+我笔 blob＝工作树 `git hash-object` 现量逐字相同（`b29ca514…`／`1d096171…`）；我笔之后共享 index 剩 **0 枚**
+⇒ 字节没丢、没改坏，只是**代提在 `322-r2` 名下**。请编排者照 `7f805583` 那次处理记账。
+
+定式升级（⛔ 再靠"我记得"）：**`git commit` 的 pathspec 逐枚手打，与 `git add` 那一串同形；
+两处的字面路径都⛔ 来自任何 `git diff --cached`／`git status` 输出**。本笔即照此执行＝
+`add` 与 `commit` 两处各自字面写 `cmdwisp-readings.md`＋本 `msg-c8.txt` 两枚，⛔ 任何反推形状。
+
+同时把这段登记进 `cmdwisp-readings.md` 新 §6（原 §6 故障件节顺延为 §7）；现量 **138** 行、12191 字节、
+0 枚 CR＝LF、占位符尺 0 命中。⛔ 翻框（AC 框复量仍 1 未勾／5 勾）、⛔ push、⛔ 回改历史、⛔ amend/reset。

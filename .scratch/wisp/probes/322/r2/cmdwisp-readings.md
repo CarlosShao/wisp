@@ -112,7 +112,24 @@ cwisp-estate-live-winelive  rc=1  RUN=12 PASS_TOP=6 FAIL_TOP=6 SKIP=0  93.399s
 `slo_exit_os_156_windows_test.go:206 Wait on a killed child reports the kill as an error (exit status 1);
 that is the fixture, not a failure`），⛔ 读成整进程死亡。
 
-## 6. 前两版台件的故障（⛔ 计入判据，件与正文只建不删）
+## 6. 本腿★同一笔形状违规第二次再犯（`9c372800`，具名自抓，⛔ 回改历史）
+
+`9c372800` 越界 **2 枚**＝`.scratch/wisp/probes/orch/20261018/txt/{commit-40em.sh,commit-corrections.sh}`
+（编排者已 `git add` 未 commit 的两枚新件）。
+机制与 `7f805583` **完全同一形**：我的 `git add` 逐枚字面 pathspec 合规（18 枚全在我写面内），
+但 `git commit` 我写成 `-- $s`，那个 `$s` ＝ `git diff --cached --name-only` ＝**共享 index 的全集**
+⇒ 把别人 staged 的东西一起提走。**我在同一笔的正文里刚写着"pathspec 两处仍字面逐枚写死"，
+那一句话当场就是假的**＝不是知识缺口，是我没把尺用在最后一步上。
+
+盘上事实（三把尺）：两枚件在 `9c372800^` **不存在**（`git log --diff-filter=A` 显示由我这一笔首现）；
+我笔 blob ＝ 工作树 `git hash-object` 现量逐字相同（`b29ca514…`／`1d096171…`）
+⇒ **内容没丢、没改坏，只是代提在 `322-r2` 名下**；我笔之后共享 index 剩 0 枚。
+定式（升级，⛔ 再靠"我记得"）：**`git commit` 的 pathspec 必须逐枚手打完，与 `git add` 那一串同形，
+两处的字面路径都不许来自任何 `git diff --cached`／`git status` 输出**——`$s` 那形一次都不许用。
+上报编排者：这两枚请照 `7f805583` 那次的处理＝记账"由 `9c372800` 代提、字节同原稿"，
+编排者下一笔⛔ 重复 `add`、⛔ 判"丢了件"。
+
+## 7. 前两版台件的故障（⛔ 计入判据，件与正文只建不删）
 
 `cwisp-*.{FAULT-recursion.log}` ＋ `cmdwisp-summary.FAULT-recursion.txt`：五发 `RUN=0`、2 秒"跑完"。
 根因＝函数名 `Go` 撞上外部命令 `go`（PowerShell 函数名大小写不敏感）⇒ 函数体那行递归调自己、
