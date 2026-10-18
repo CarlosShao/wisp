@@ -1,0 +1,38 @@
+227-v1 blocked（ⓐ 那枚 1 行号差＝本腿问句＋本腿查到的全部盘上事实；结论＝未归到底，具名交回编排者）
+
+[问 227-r1 的那一句（派单 head ⓐ 指定）]
+  你那一发（logs/c6-mu3-393-schema-red.txt，12:13:54）跑的那棵树里，internal/config/writeguard_226_test.go
+  是不是多了一行？如果不是，你那两枚红句行号（:405／:408）是从哪棵树的字节上读出来的？
+  ── 腿的状态＝已收工（第 8 笔 bcf90e06 12:38，此后无笔），本腿⛔ 通道转达、也拿不到它的回答
+     ⇒ 按派单走第二形：具名标"未归到底"交回编排者。
+
+[本腿现量（全部＝量的，射程逐条写明）]
+1) 我这枚树（bcf90e06 仓外导出，sha256 49960da6…ef9b8＝456 行）同一发的红句逐字＝
+     writeguard_226_test.go:404  the file already carried the entry and was rewritten anyway:
+     writeguard_226_test.go:407  the file's mtime moved on a write that wrote nothing
+   ＝与编排者复跑逐字同；与腿报差 1 行。
+2) 全历史 blob 尺：`git rev-list --all -- internal/config/writeguard_226_test.go` 逐枚取 blob ⇒
+   去重后**只有 1 枚**＝29dbd968f3f6f75f55e9d3e50f33182c4f5c55ed，456 行，那句 "rewritten anyway" 在**第 404 行**。
+   ⇒ 不存在任何一枚"该件 457 行／断言在 405"的已提交字节。
+3) dangling blob 尺：`git fsck --no-reflogs` 全部 52 枚 dangling 逐枚 cat-file ＋ grep 那句 ⇒
+   命中 **0** 枚（正控＝同尺读跟踪那枚 blob 得 404，尺活）。
+   ⇒ 那 1 行差**不在**仓内任何未引用对象里。
+4) 腿自己留下的五棵台树（D:\tmp\wisp\20261018\227r1\tree-*，11:51–12:32 的 mtime）逐枚量：
+   manager_test.go 全＝296 行、matrixBase 里 schema_version 全在（has_schema=1）、
+   writeguard_226_test.go 全＝456 行、sha256 全＝49960da6…、那句全在第 404 行。
+   ⇒ 腿的树**当场还原过**，盘上没有"跑那一发时多一行"的残留证据（也没有少一行的残留）。
+5) 我另数了一件事：全 D:\tmp\wisp 下 93 枚 writeguard_226_test.go 的实体副本（含别腿全部台树、编排者全部 verify 树、
+   legacy 归档）**枚枚＝456 行、sha 同串、断言行＝404**。没有任何一枚副本读到过 405。
+
+[本腿能坐实的与不能坐实的]
+  坐实＝红是真红：两枚读数（腿⇄我⇄编排者）红的是**同一枚用例**（TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt）、
+  　　　**同一对逐字红句**（rewritten anyway ＋ mtime moved on a write that wrote nothing）、**同一枚 rc=1**，
+  　　　且突变态整包红枚数＝4、名册同源（我 190/105/4/0 与腿报 190/105/4/0 逐字同）。
+  坐实＝⛔ 任何"实现者把断言改成接受新字节"的怀疑：该件 blob 在五枚锚上同串，本腿自己复跑还原哈希逐字回原。
+  ⛔ 坐实＝那 1 行从哪来。三条候选本腿⛔ 采信任何一条（都＝替它编原因）：
+  　(a) 腿那一发的树里该件真多一行（盘上/仓内零残留＝查无实据）；
+  　(b) 腿报的 :405/:408 是从红句**上下文行号**或带表头的输出里抄的（本腿无从证）；
+  　(c) 腿台件 c6 落盘前被别的加工动过行号（⛔ 本腿⛔ 读别腿字节，未查＝⛔ 指控）。
+  ⇒ **裁决＝机制未归到底**；按派单⛔ 据一位差退腿：AC#2 那一发**成立**（成立性⛔ 依赖行号，依赖的是红/还原/逐字红句，
+  　　　三件本腿全部独立复现）。交回编排者＝若要归到底，唯一形＝让 227-r1 复述它那一发的 `sed -n '36,40p'` 与
+  　　　`wc -l` 现场读数，或重跑一发；⛔ 本腿⛔ 替它做，⛔ 把这一格降成"不成立"。
