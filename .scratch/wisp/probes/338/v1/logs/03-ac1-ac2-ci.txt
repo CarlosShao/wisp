@@ -1,0 +1,64 @@
+# 338-v1 · AC#1 归位两枚＋AC#2 门（成对逐名）＋门禁四数读数
+
+## AC#1 三条判据（逐条现跑，⛔ 采腿读数）
+### ① ⛔ 动其它 4 枚 CRLF 件 ⇒ 逐枚 blob 对撞
+尺＝`git rev-parse d19288a8:<f>` ⇄ `git rev-parse HEAD:<f>`（同串＝一字未动）
+| 件 | before | HEAD | 判 |
+|---|---|---|---|
+| `internal/agent/approval/pending_read.go` | `a7db9b10…` | 同 | SAME |
+| `internal/agent/tools.go` | `ecce49dc…` | 同 | SAME |
+| `internal/risk/provenance.go` | `d634aae0…` | 同 | SAME |
+| `cmd/wisp/models.go` | `4259a20f…` | 同 | SAME |
+★正控（同一把尺不许失明）＝本票两枚在此尺上必须 DIFF ⇒ 实测两枚都 DIFF。
+另加我对**自己起手锚**那一维（⛔ 只量腿）＝`ci.yml`／4 枚 CRLF 件／`go.mod`／`go.sum`／`.gitignore` 自我锚 `c596df55` 起逐枚 SAME。
+
+### ② ⛔ 动任何断言／用例名／字符串字面量／注释文字内容
+票面 AC#1 那句逻辑（"空白外零变化 ⇒ 这四样自动不可能变"）**只对 tools 枚成立**（非空白尺 `RC=0`／0 行，见 `01-ac0-ruler.txt` [4]）。
+panel 枚走甲形 ⇒ 非空白尺 `RC=1`／47 行 ⇒ 这一判据我改用**内容四把尺**逐枚现量（两枚都跑）：
+| 尺 | tools 枚 | panel 枚 |
+|---|---|---|
+| 顶层用例名 `^func Test…`（before⇄after 多重集对称差） | 1⇄1，**symdiff=0** | **46⇄46，symdiff=0** |
+| 字符串字面量（`"…"` 全抽＋排序＋sha256） | 24⇄24，sha `127538dfa31c` 同串，**symdiff=0** | **372⇄372，sha `5399fdc85aeb` 同串，symdiff=0** |
+| 整行注释文字（剥前导空白） | 50⇄50，**symdiff=0** | **311⇄311，symdiff=0** |
+| 行尾注释文字（`//…` 全抽） | **symdiff=0** | **symdiff=0** |
+⇒ 断言／用例名／字符串字面量／注释文字**四样在两枚上都零变化**。
+★这一发是比"看起来只有空格"硬得多的东西：**372 枚字符串字面量的排序 sha256 两侧同串**＝注释文字内容与任何字面量都不可能变（中文串也在内）。
+panel 那 47 行非空白差异我逐枚归了类（`tr-T2.diff` 逐字入库）＝只有三形：`type ( … )` 分组新增括号 token ×3 组、`jsPuncts` 切片拆行＋补尾逗号、函数间补空行 ⇒ 全是**声明形状**，⛔ 任何 token 的进出（除 `type` 与括号／逗号）。
+
+### ③ 新字节必须 LF
+`git ls-files --eol` 交件侧＝`i/lf w/lf attr/text eol=lf`（两枚都是），⛔ 一枚被 `core.autocrlf` 改成 `w/crlf`。
+⚠ 具名一条我这发的观察：`git commit` 时对**我的 `.txt` 证据件**打 `LF will be replaced by CRLF` 告警＝本机 `core.autocrlf=true`；
+`.gitattributes:1` 是 `* text=auto`、`:4` 是 `*.go text eol=lf` ⇒ 跟踪件入库字节由属性钉死＝`i/lf`，两枚靶子实测同串，判据③成立。
+
+## AC#2 门变绿要成对（名册逐名作差，⛔ 只报枚数）
+台面＝同一把尺 `gofumpt -l internal cmd`（v0.12.0 (go1.27.1)）打在**两棵 `git archive` 导出树**（＝blob 字节，⛔ 工作树 CRLF 形）：
+- before 树（锚 `d19288a8`，733 枚 `.go`）＝**2 行**：`cmd/wisp/panel_transport_35r2_test.go`、`internal/tools/…174r7_test.go`
+- head 树（锚 `HEAD`，735 枚 `.go`）＝**0 行**
+- 逐名作差＝`only_before=2`（恰这两枚）／`only_after=0`（⛔ 多动）。
+★正控＝同一把尺打在枚故意做坏的拷贝上 → 命中 1（`posctl_rows=1`）＝尺没失明。
+★归位那一维的更硬读数（我自己造的 before/after＝`01-ac0-ruler.txt` [4]）＝两枚 `gofumpt -w` 的不动点哈希 **逐枚等于 HEAD blob**（`13fea5ea…`／`bd131498…`）⇒ 交件字节 ≡ 纯 `-w` 输出。
+
+## 门禁四数（★只在共享工作树，跑前 `unset GOTMPDIR TMPDIR`＋echo 坐实＝`GOTMPDIR=[UNSET] TMPDIR=[UNSET]`）
+| 门 | rc | 逐字尾读 |
+|---|---|---|
+| `gofumpt -l internal cmd` | 0 | 4 行＝只剩那 4 枚 CRLF 假脏（`internal\agent\approval\pending_read.go`／`internal\agent\tools.go`／`internal\risk\provenance.go`／`cmd\wisp\models.go`）＝票面禁区，⛔ 本票射程 |
+| `sh scripts/d22scan.sh` | **0** | `clean - no D22 ban violations`（ban #8 射程逐枚点名：`internal/`=592、`cmd/`=143、`internal/tools/`=25、`design/`=39、`frontend/`=116）；`design/` 存在=YES（缺则 GUARD exit 2＝射程拒绝⛔ 读成红） |
+| `sh scripts/check-path-length-budget.sh` | **0** | `VERDICT GREEN`＝分母 16055 跟踪、over-budget 60、roster 60、not-in-roster 0（`.git` 在） |
+| `go vet ./internal/tools/` | **0** | 空输出 |
+| `go vet ./cmd/wisp/` | **0** | 空输出 |
+
+## ★CI 那道门我自己现取的名册（⛔ 采编排者散文；尺＝`gh run view --job 117665567250 --log-failed`）
+- run `39124122121`：`headSha=a5080612`＝**当前 `origin/dev` tip**（我 `git rev-parse origin/dev` 现量同串）；`lint` 作业 `failure`。
+- 两步都点名 **20 枚**，两步名册**逐名同串**（`ci-roster-step1.txt` ⇄ `ci-roster-step2.txt` 各 20 行、`sort -u` 同集合）。
+- ★前缀尺逐枚数（我自己数，⛔ 看编排者一句"全在 .scratch"）：`internal/`=**0**、`cmd/`=**0**、`tools/`=**0**、`scripts/`=0、`docs/`=0、`frontend/`=0、`models/`=**0**、`.scratch/`=**20**（20/20）。
+- ★两枚靶子在 CI 名册里的枚数＝`panel=0`／`tools=0`（正控：确在名册里的 `241/v1/posctl/badly_formatted.go` 同尺命中 1＝尺没失明）。
+- ★分母差在哪（逐字取自 log）＝CI 第一步命令是 `OUT="$(gofumpt -l . tools/d22scan tools/mockllm)"` ⇒ 分母＝**整仓含 `.scratch/**`**；本机那把尺分母＝`internal cmd`。第二步 `attrib.sh (A) tracked-tree lines=20 files=20 rule: MUST be empty`＋`RED (tracked-only) - tracked-dirty=20`。
+- ⇒ **本票两枚已从 CI 名册消失**（`blob 名册 0 枚`＋`CI 名册 0 枚`双向对上）；CI 那 20 枚＝票 275/276 那族故意种坏的探针/样本件，⛔ 本票射程。
+- ★两步名册我逐名比过＝**同集合**（各 20 行、`comm -3`＝0、sha256 同为 `89fbdf333963f36e`）⇒ 第二步那句 `rule: MUST be empty` 与第一步同源同分母，⛔ 两枚靶子。
+- ★⛔ 只看编排者散文，我自己读了 `ci.yml` 那两步（**逐步号现量**：第一步名 `:172`、命令 `:176`；第二步名 `:189`、那句注释 `:191` 与 `:197-198`）：第一步命令逐字 `OUT="$(gofumpt -l . tools/d22scan tools/mockllm)"`、`if [ -n "$OUT" ]; then … exit 1; fi`；
+  第二步注释（`ci.yml` 原文，票 161 AC#7 form A）逐字记着这一句＝
+  「`gofumpt -l . tools/... must be EMPTY` was found to be **structurally unsatisfiable** on a bench tree (**gofumpt walks `.scratch/**`, which by definition holds deliberately-broken samples**)」
+  ＋「it adds NO REACH TODAY … the step above and this one read the same bytes and must agree」。
+  ⇒ **CI 那道门今天红不是本票新造、也不是任何一条腿新造，是它自己在 `ci.yml` 里登记过的结构性事实**（分母含 `.scratch/**`），
+  射程归票 275/276（＋`241/v1/posctl`／`259/r1/gofumpt-negctl` 这两枚⛔ 许格式化的正控负控）。
+- ⚠ 另具名一枚新事实：`a5080612`＝origin/dev tip 已**含**两枚归位后的 blob（`git rev-parse a5080612:<f>` ⇄ `HEAD:<f>` 同串；`git merge-base --is-ancestor 87521cb4 a5080612`＝YES），而我现量的 blob 名册对它也是 0 枚 ⇒ **那两道 CI 步今天红的 20 枚里没有一枚是本票的账**（不是"归位没推上去"）。
