@@ -1,0 +1,33 @@
+### 322-v2 交件侧三把尺 v2（改正版；首版 95-selfcheck.txt 两枚缺陷具名作废＝(a) 拼尺行 g hits= 笔误七枚 "g: command not found"＝零读数故障；(b) 把该分节号的字面字符写进尺文件＝描述它的字＝自己占了一枚（同 336-r1 55f0ac49 那枚坑，本腿再犯一次当场改）；needle 改为字节构造 C2 A7，⛔ 字面形） 2026-10-18 13:45:24 +0800 HEAD=5af8ee8b
+-- 尺1 逐枚提交号＋name-only 越界＋.go 命中:
+  aa56fc04 paths=9   out_of_scope=0 .go=0 :: 票 322 终裁腿 322-v2·AC#4·起�
+  f1bb43cf paths=3   out_of_scope=0 .go=0 :: 票 322 终裁腿 322-v2·AC#4·因�
+  0afff34e paths=18  out_of_scope=0 .go=0 :: 票 322 终裁腿 322-v2·AC#4·容�
+  a1122b0d paths=7   out_of_scope=0 .go=0 :: 票 322 终裁腿 322-v2·AC#4·esta
+  a4b4801d paths=3   out_of_scope=0 .go=0 :: 票 322 终裁腿 322-v2·AC#4·必�
+  014d71ac paths=1   out_of_scope=0 .go=0 :: 票 322 终裁腿 322-v2·AC#4·判�
+  5af8ee8b paths=8   out_of_scope=0 .go=0 :: 票 322 终裁腿 322-v2·票尾一�
+  笔数=7
+-- 尺2 判语件字节/行数（改正版现量）:
+  docs/evidence/s1/322-v2-verdict.md = 9311 bytes / 92 rows / CR=0
+-- 尺2b 分节号逐枚尺（字节 needle，⛔ 字面）：写面命中＝
+  docs/evidence/s1/322-v2-verdict.md                         0
+  .scratch/wisp/probes/322/v2/mandatory.md                   0
+  .scratch/wisp/probes/322/v2/ticket-before.txt              8
+  探针面残留枚数（除本两尺文件）=1（唯一一枚＝ticket-before.txt＝票面追加前快照＝原字节遗产、⛔ 我的新字节）
+-- 尺3 空槽分词形尺 0 命中带正控:
+  正控（尺灵）：grep -cE 〔待|待填|待补 在 r2 report-sec9.md＝1（命中行＝:3 〔待编排者放行〕）
+  docs/evidence/s1/322-v2-verdict.md                         0
+  .scratch/wisp/probes/322/v2/mandatory.md                   0
+  .scratch/wisp/probes/322/v2/logs/recount.txt               0
+  .scratch/wisp/probes/322/v2/logs/00-start-rulers.txt       0
+  .scratch/wisp/probes/322/v2/msg/m1.txt                     0
+-- 尺4 票框⇄append-only:
+  未勾=1 已勾=5（＝六枚框一枚没翻，同起手段 00-start-rulers.txt:4）
+  前 49 行 ⇄ 追加前快照 cmp＝IDENTICAL
+-- 尺5 决定性那把尺逐字（判语侧⇄交件侧 blob 对撞）:
+full-D                 RUN=448   PASS_TOP=322   FAIL_TOP=8    SKIP=3    | c0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 | sha=adfcd0d35f80
+full-C                 RUN=448   PASS_TOP=323   FAIL_TOP=7    SKIP=3    | c0000135=0 buildfailed=0 noteststorun=0 setupfailed=0 | sha=80a210ccd077
+  BLOB-MATCH cwisp-full-D adfcd0d35f8098a8d9fdd6972c4e709e25486c2c
+  BLOB-MATCH cwisp-full-C 80a210ccd07788636617fb0dcb6c5461e2cc957d
+### done 2026-10-18 13:45:35 +0800
