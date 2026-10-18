@@ -1,0 +1,56 @@
+### ===== 228-r3c mutation shot M1 =====  2026-10-18 10:23:18 +0800
+### M1 = 断环路 stop 检查（nil 通道永不 ready ⇒ 记录下的请求转不成 return）
+### anchor=c11163c896b09e7b6863d347dadbcb65702585cc
+### surface=c（默认 C 卷临时根）GOTMPDIR=/d/tmp/wisp/20261018/228r3c/gotmp pwd=/d/tmp/wisp/20261018/228r3c/tree
+### target=internal/proc/boot_windows.go（仓外导出树物理字节；⛔ 动跟踪件、⛔ -overlay）
+### content-anchor-line=[	stopSignal := rt.StopSignal()]（整行等值替换，⛔ 绝对行号）
+### other-landing-token=[rt.stopReq = newStopRequest()] 本发⛔ 碰
+### run-pattern=TestAC11TrayExitTriggerWalksTheTenSteps$
+### --- [1] 本发突变前哈希 ---
+HASH-BEFORE-MUTATION sha256=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7 blob1=531060a55c080ebd535b426b8c60dcd9011785fc bytes=12916 lines=313
+### --- [2] 突变落笔 rc=0（hit 必须恰 1 次，否则 awk exit 6）---
+HASH-AFTER-MUTATION sha256=3856c24aa1c1ee25b1a351d99fb91ec8ba7bb475cabeea793796944cfcd57fb3 blob1=54e0b8801d025be8d35659eeeb56f9e8c980f832 bytes=12969 lines=313
+### mutated-line-readback:
+185:	stopSignal := (<-chan struct{})(nil) // MUTATION-228r3c-M1 severed-loop-stop-check
+### 另一枚落点未被改的尺（行哈希前后 ⇄ 整文件哈希见上两行）:
+OTHER-ANCHOR-LINE-SHA256-PRE  6268b19405ba7584d966c2a21c226185c50ef7a0a902be0b7a4f98f418e3afb8
+OTHER-ANCHOR-LINE-SHA256-POST 6268b19405ba7584d966c2a21c226185c50ef7a0a902be0b7a4f98f418e3afb8
+OTHER-ANCHOR-HITS 1 (expect 1)
+time=2026-10-18T10:23:42.310+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC11TrayExitTriggerWalksTheTenSteps
+time=2026-10-18T10:23:42.322+08:00 level=INFO msg="tray exit requested" outcome="recorded; the event loop ends this process through the D38(e) order" why="tray Exit item selected in this process"
+wisp: tray exit requested: recorded; the event loop ends this process through the D38(e) order
+    resident_tray_stop_228_windows_test.go:310: AC#11 RED: RunEventLoop never returned, although a stop request is recorded on this runtime (waited 5s). internal/proc's loop select is the only thing in this package that turns a recorded request into a return, so this is the clause that reads that check.
+--- FAIL: TestAC11TrayExitTriggerWalksTheTenSteps (5.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	5.335s
+FAIL
+### --- [3] 点名红读数  go-test-rc=1（期望 1） 2026-10-18 10:23:48 +0800 ---
+### named-red-lines:
+    resident_tray_stop_228_windows_test.go:310: AC#11 RED: RunEventLoop never returned, although a stop request is recorded on this runtime (waited 5s). internal/proc's loop select is the only thing in this package that turns a recorded request into a return, so this is the clause that reads that check.
+--- FAIL: TestAC11TrayExitTriggerWalksTheTenSteps (5.01s)
+### NAMED-FAIL-TOP-COUNT=1
+### --- [4] 还原＝按具名 blob 重新 git archive 覆盖（⛔ 信 echo）---
+### restore-command-rc=0
+### --- [5] 还原后哈希（只认这把对撞；三段齐＝本发/前/后）---
+HASH-AFTER-RESTORE sha256=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7 blob1=531060a55c080ebd535b426b8c60dcd9011785fc bytes=12916 lines=313
+time=2026-10-18T10:23:59.525+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC11TrayExitTriggerWalksTheTenSteps
+time=2026-10-18T10:23:59.533+08:00 level=INFO msg="tray exit requested" outcome="recorded; the event loop ends this process through the D38(e) order" why="tray Exit item selected in this process"
+wisp: tray exit requested: recorded; the event loop ends this process through the D38(e) order
+time=2026-10-18T10:23:59.533+08:00 level=INFO msg="shutdown step skipped (module not present)" step=4 name=stop-audio
+time=2026-10-18T10:23:59.533+08:00 level=INFO msg="shutdown step skipped (module not present)" step=5 name=release-speech-sessions
+time=2026-10-18T10:23:59.533+08:00 level=INFO msg="shutdown step skipped (module not present)" step=6 name=destroy-panel-webview
+time=2026-10-18T10:23:59.533+08:00 level=INFO msg="shutdown step skipped (module not present)" step=7 name=flush-logs-close-db
+    resident_tray_stop_228_windows_test.go:340: AC#11 READING (ⓑ-1): reason="stop request (tray Exit item selected in this process)"; trail=scheduler-close > stop-hotkey-kws > cancel-task-roots > stop-audio > release-speech-sessions > destroy-panel-webview > flush-logs-close-db > free-os-memory > close-job-object > exit
+--- PASS: TestAC11TrayExitTriggerWalksTheTenSteps (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.141s
+### --- [6] 还原后复跑同一用例（期望 rc=0 绿）  go-test-rc=0  2026-10-18 10:23:59 +0800 ---
+--- FAIL: TestAC11TrayExitTriggerWalksTheTenSteps (5.01s)
+--- FAIL: TestAC11TrayExitTriggerWalksTheTenSteps (5.01s)
+--- PASS: TestAC11TrayExitTriggerWalksTheTenSteps (0.01s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.141s
+HASH-FINAL sha256=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7 blob1=531060a55c080ebd535b426b8c60dcd9011785fc bytes=12916 lines=313
+OTHER-ANCHOR-LINE-SHA256-FINAL 6268b19405ba7584d966c2a21c226185c50ef7a0a902be0b7a4f98f418e3afb8 (expect == PRE)
+### ===== DONE shot=M1 rc_test=1 rc_rerun=0 =====
