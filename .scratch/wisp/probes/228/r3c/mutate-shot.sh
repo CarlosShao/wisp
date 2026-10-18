@@ -109,11 +109,19 @@ case "$POST" in
   *) echo "### RESULT: NOT RESTORED ⇒ 停，下一发⛔ 开跑" >>"$LOG"; exit 7 ;;
 esac
 
+# 复跑段单独可分：记下当前行数，只 tail 这一段——否则上一发（突变态）的
+# --- FAIL 会被 tail 一起带进来＝读数歧义（M1 那发的尺局限已在提交里具名）。
+RERUN_FROM=$(( $(wc -l <"$LOG") + 1 ))
 go test ./cmd/wisp/ -count=1 -timeout 30m -v -run "$RUN" >>"$LOG" 2>&1
 RC_RERUN=$?
+RERUN_COLOUR=$(sed -n "${RERUN_FROM},\$p" "$LOG" | grep -E '^(--- (PASS|FAIL):|=== RUN|ok  |FAIL\t)' || true)
+RERUN_FAIL=$(sed -n "${RERUN_FROM},\$p" "$LOG" | grep -c '^--- FAIL' || true)
+RERUN_PASS=$(sed -n "${RERUN_FROM},\$p" "$LOG" | grep -c '^--- PASS' || true)
 {
   echo "### --- [6] 还原后复跑同一用例（期望 rc=0 绿）  go-test-rc=$RC_RERUN  $(date '+%F %T %z') ---"
-  grep -E '^(--- (PASS|FAIL):|ok  |FAIL\t)' "$LOG" | tail -8
+  echo "### rerun-only-segment (lines ${RERUN_FROM}-end of this file):"
+  printf '%s\n' "$RERUN_COLOUR"
+  printf '### rerun-own-counts: PASS_TOP=%s FAIL_TOP=%s (expect FAIL_TOP=0)\n' "$RERUN_PASS" "$RERUN_FAIL"
   printf 'HASH-FINAL '; read_sha "$TARGET"
   printf 'OTHER-ANCHOR-LINE-SHA256-FINAL %s (expect == PRE)\n' "$(line_sha "$OTHER_TOKEN" "$TARGET")"
   echo "### ===== DONE shot=$SHOT rc_test=$RC_TEST rc_rerun=$RC_RERUN ====="

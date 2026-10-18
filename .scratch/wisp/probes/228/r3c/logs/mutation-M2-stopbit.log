@@ -1,0 +1,48 @@
+### ===== 228-r3c mutation shot M2 =====  2026-10-18 10:25:49 +0800
+### M2 = 令 Boot 不建停机位（StopSignal() 答 nil）
+### anchor=c11163c896b09e7b6863d347dadbcb65702585cc
+### surface=c（默认 C 卷临时根）GOTMPDIR=/d/tmp/wisp/20261018/228r3c/gotmp pwd=/d/tmp/wisp/20261018/228r3c/tree
+### target=internal/proc/boot_windows.go（仓外导出树物理字节；⛔ 动跟踪件、⛔ -overlay）
+### content-anchor-line=[	rt.stopReq = newStopRequest()]（整行等值替换，⛔ 绝对行号）
+### other-landing-token=[stopSignal := rt.StopSignal()] 本发⛔ 碰
+### run-pattern=TestAC11StopBitIsBuiltAtBoot$
+### --- [1] 本发突变前哈希 ---
+HASH-BEFORE-MUTATION sha256=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7 blob1=531060a55c080ebd535b426b8c60dcd9011785fc bytes=12916 lines=313
+### --- [2] 突变落笔 rc=0（hit 必须恰 1 次，否则 awk exit 6）---
+HASH-AFTER-MUTATION sha256=2708ff75b40a3219344c6e06b4740bf9f5526d3bd568195375b6b2c0f2c2225c blob1=e62b05be126939e267a18a010e448a8ce239796e bytes=12963 lines=313
+### mutated-line-readback:
+111:	// MUTATION-228r3c-M2 boot-builds-no-stop-bit  rt.stopReq = newStopRequest()
+### 另一枚落点未被改的尺（行哈希前后 ⇄ 整文件哈希见上两行）:
+OTHER-ANCHOR-LINE-SHA256-PRE  d0a029bc8ab8b2c274776c6914400182681a8c4717e231b91c29d4a185859950
+OTHER-ANCHOR-LINE-SHA256-POST d0a029bc8ab8b2c274776c6914400182681a8c4717e231b91c29d4a185859950
+OTHER-ANCHOR-HITS 1 (expect 1)
+time=2026-10-18T10:26:16.097+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC11StopBitIsBuiltAtBoot
+    resident_tray_stop_228_windows_test.go:137: AC#11 RED: a runtime built through proc.Boot has no stop-request bit (StopSignal() answers nil), so the tray's Exit item has nothing to record into before the event loop exists
+--- FAIL: TestAC11StopBitIsBuiltAtBoot (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.319s
+FAIL
+### --- [3] 点名红读数  go-test-rc=1（期望 1） 2026-10-18 10:26:17 +0800 ---
+### named-red-lines:
+    resident_tray_stop_228_windows_test.go:137: AC#11 RED: a runtime built through proc.Boot has no stop-request bit (StopSignal() answers nil), so the tray's Exit item has nothing to record into before the event loop exists
+--- FAIL: TestAC11StopBitIsBuiltAtBoot (0.00s)
+### NAMED-FAIL-TOP-COUNT=1
+### --- [4] 还原＝按具名 blob 重新 git archive 覆盖（⛔ 信 echo）---
+### restore-command-rc=0
+### --- [5] 还原后哈希（只认这把对撞；三段齐＝本发/前/后）---
+HASH-AFTER-RESTORE sha256=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7 blob1=531060a55c080ebd535b426b8c60dcd9011785fc bytes=12916 lines=313
+time=2026-10-18T10:26:31.359+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC11StopBitIsBuiltAtBoot
+--- PASS: TestAC11StopBitIsBuiltAtBoot (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.177s
+### --- [6] 还原后复跑同一用例（期望 rc=0 绿）  go-test-rc=0  2026-10-18 10:26:32 +0800 ---
+### rerun-only-segment (lines 35-end of this file):
+=== RUN   TestAC11StopBitIsBuiltAtBoot
+--- PASS: TestAC11StopBitIsBuiltAtBoot (0.00s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.177s
+### rerun-own-counts: PASS_TOP=1 FAIL_TOP=0 (expect FAIL_TOP=0)
+HASH-FINAL sha256=3e2e83fab184ce91640ad7dbc06f8dd116baffe325bd47aa46af2527aad73fe7 blob1=531060a55c080ebd535b426b8c60dcd9011785fc bytes=12916 lines=313
+OTHER-ANCHOR-LINE-SHA256-FINAL d0a029bc8ab8b2c274776c6914400182681a8c4717e231b91c29d4a185859950 (expect == PRE)
+### ===== DONE shot=M2 rc_test=1 rc_rerun=0 =====
