@@ -1,0 +1,23 @@
+### 322-v2 shared-worktree gates started 2026-10-18 13:03:53 +0800 HEAD=6cfbd5db7866d068991324b7fca2ff7948bc0bed
+★先 unset GOTMPDIR TMPDIR（票 311 AC#1 shape B GUARD 定式）
+GOTMPDIR=[] TMPDIR=[]
+--- gate1 gofumpt -l internal/winsec/ ---
+gofumpt-winsec rc=0
+--- gate1b gofumpt -l internal cmd (stock roster) ---
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+cmd\wisp\models.go
+gofumpt-internal-cmd rc=0 (stock CRLF fakes=4, named: pending_read/tools.go/provenance/models.go = ticket 338 stock)
+--- gate2 d22scan ---
+d22scan rc=0
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=590, ban #8 cmd/=143; ban #8 emoji coverage: design/
+--- gate3 lengthgate ---
+lengthgate rc=0
+VERDICT GREEN
+--- gate4 go vet (shared tree: vet is not test, no cmd/wisp test lane touch) ---
+vet-winsec rc=0
+vet-darwin-winsec rc=0
+vet-linux-winsec rc=0
+vet-cmdwisp rc=0
+### done 2026-10-18 13:04:38 +0800

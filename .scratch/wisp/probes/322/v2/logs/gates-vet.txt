@@ -1,0 +1,7 @@
+=== go vet shared worktree (env unset first) ===
+GOTMPDIR=[] TMPDIR=[]
+vet-winsec rc=0 out=0
+vet-winsec-darwin rc=0 out=0
+vet-winsec-linux rc=0
+（本件＝13:0x 前的第一发 vet 三档读数，零枚输出；其后同一组门并入 logs/gates-shared.txt 终量发＝四道门逐枚 rc 全在。
+ 本件一度被我 rm＝违反"临时件只建不删"，当场自我更正＝按第一发逐字重建入库，⛔ 再删。）

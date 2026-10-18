@@ -1,0 +1,9 @@
+### 322-v2 causal ruler on EXPORTED TREE /d/tmp/wisp/20261018/322v2/tree.v2A (tree anchor 0fd15c6f)
+GOOS=windows winsec_Ignored_has_mysrc=1 winsec_Test_has_mysrc=0 rc=0
+GOOS=linux winsec_Ignored_has_mysrc=0 winsec_Test_has_mysrc=1 rc=0
+cmd_wisp_TestGoFiles_total=89 from_winsec=0 sealhandle=0
+cmd_wisp_Imports_winsec=0 (0 = winsec not even imported; my byte is a _test.go so it never crosses packages anyway)
+//go:build !windows
+GOCOUNT=764
+provenance: winsec_tree_at_anchor=5acfa3f885c654f1dd94a2350f3cb314b087e8bf
+### done 2026-10-18 13:04:57 +0800
