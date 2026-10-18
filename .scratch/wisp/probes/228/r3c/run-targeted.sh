@@ -38,12 +38,21 @@ RC=$?
   echo "### go-test-rc=$RC surface=$SURFACE $(date '+%F %T %z')"
   echo "### hash-of-mutated-file-AFTER-this-run"
   sh "$HASHSH" "$EXPORT/internal/proc/boot_windows.go"
-  echo "### four-counts (尺=grep on this log; RUN=^=== RUN / PASS_TOP=^--- PASS / FAIL_TOP=^--- FAIL / SKIP=^--- SKIP)"
-  printf 'RUN=';     grep -c '^=== RUN' "$LOG" || true
-  printf 'PASS_TOP='; grep -c '^--- PASS' "$LOG" || true
-  printf 'FAIL_TOP='; grep -c '^--- FAIL' "$LOG" || true
-  printf 'SKIP=';    grep -c '^--- SKIP' "$LOG" || true
+} >>"$LOG" 2>&1
+# 四数尺：先读进变量再落笔——直接 `grep "$LOG" >>"$LOG"` 会撞上
+# "input file is also the output"（GNU grep 拒）＝台面故障，⛔ 计入判据。
+RUN=$(grep -c '^=== RUN' "$LOG" || true)
+PASSTOP=$(grep -c '^--- PASS' "$LOG" || true)
+FAILTOP=$(grep -c '^--- FAIL' "$LOG" || true)
+SKIP=$(grep -c '^--- SKIP' "$LOG" || true)
+COLOUR=$(grep -E '^--- (PASS|FAIL|SKIP)' "$LOG" || true)
+NAMES=$(grep -E '^(=== RUN|--- (PASS|FAIL|SKIP))' "$LOG" || true)
+{
+  echo "### four-counts (尺=grep -c on this log；RUN=^=== RUN 含子测试 / PASS_TOP=^--- PASS 只顶层 / FAIL_TOP=^--- FAIL / SKIP=^--- SKIP；四数不混用不相减)"
+  printf 'RUN=%s\nPASS_TOP=%s\nFAIL_TOP=%s\nSKIP=%s\n' "$RUN" "$PASSTOP" "$FAILTOP" "$SKIP"
   echo "### per-test-colour"
-  grep -E '^--- (PASS|FAIL|SKIP)' "$LOG" || echo "(none)"
+  printf '%s\n' "$COLOUR"
+  echo "### per-test-names"
+  printf '%s\n' "$NAMES"
 } >>"$LOG" 2>&1
 echo "DONE rc=$RC surface=$SURFACE log=$LOG"
