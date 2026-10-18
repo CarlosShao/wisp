@@ -1,0 +1,5 @@
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 

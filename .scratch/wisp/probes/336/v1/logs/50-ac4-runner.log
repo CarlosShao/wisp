@@ -1,0 +1,52 @@
+### AC#4 paired temp-root surfaces, same roster, before <=> after (judge-run)
+### roster=TestAnchorMissReasonNamesCandidateAndMissingAnchor|TestAnchorMissKeepsNonOverridableClassAndNeedL2|TestFileBaseNameClaimChangesNoClassOrReason|TestAnchorFallbackTeethPerAnchor336
+### tree-before=/d/tmp/wisp/20261018/336v1/tree-before tree-after=/d/tmp/wisp/20261018/336v1/tree-after
+### blacklist_before=c1799cd24afce19e6accef23db23a7d7ee746dec blacklist_after=c1799cd24afce19e6accef23db23a7d7ee746dec
+### teeth_before=ABSENT teeth_after=PRESENT
+#### directed roster, D-volume surface (dshape)
+-- before:
+  rc=0 mkdir_gotmp_rc=0 GOTMPDIR=/d/tmp/wisp/20261018/336v1/gotmp/ac4-d-before.log
+  FOURCOUNT RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0 rc=0
+  rednames=0
+-- after:
+  rc=0 mkdir_gotmp_rc=0 GOTMPDIR=/d/tmp/wisp/20261018/336v1/gotmp/ac4-d-after.log
+  FOURCOUNT RUN=27 PASS_TOP=4 FAIL_TOP=0 SKIP=0 rc=0
+  rednames=0
+#### directed roster, %LOCALAPPDATA% surface (ci-shape)
+-- before:
+  rc=0 mkdir_gotmp_rc=0 GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-336v1-ac4-ci-before.log
+  FOURCOUNT RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0 rc=0
+  rednames=0
+-- after:
+  rc=0 mkdir_gotmp_rc=0 GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-336v1-ac4-ci-after.log
+  FOURCOUNT RUN=27 PASS_TOP=4 FAIL_TOP=0 SKIP=0 rc=0
+  rednames=0
+#### whole package -run . (two legs per tree, same shape = dshape)
+-- before:
+  rc=1 mkdir_gotmp_rc=0 GOTMPDIR=/d/tmp/wisp/20261018/336v1/gotmp/ac4-full-before.log
+  FOURCOUNT RUN=230 PASS_TOP=135 FAIL_TOP=5 SKIP=1 rc=1
+  rednames=5
+    --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+    --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+    --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+    --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+    SKIPPED --- SKIP: TestSyncRegistryProbeLive 
+-- after:
+  rc=1 mkdir_gotmp_rc=0 GOTMPDIR=/d/tmp/wisp/20261018/336v1/gotmp/ac4-full-after.log
+  FOURCOUNT RUN=247 PASS_TOP=136 FAIL_TOP=5 SKIP=1 rc=1
+  rednames=5
+    --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+    --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+    --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+    --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+    SKIPPED --- SKIP: TestSyncRegistryProbeLive 
+#### red roster diff, by name (before <=> after)
+  diff_rc=0 diff_lines=0
+#### SKIP lines, both full legs
+    --- SKIP: TestSyncRegistryProbeLive (0.00s)
+    --- SKIP: TestSyncRegistryProbeLive (0.00s)
+#### dshape-only reds of the full AFTER leg vs the ci-shape comparison (surface sensitivity)
+  (this leg only measures surface; the roster difference before/after is the diff above)
+ac4_runner_rc=0

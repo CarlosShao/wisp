@@ -1,0 +1,1 @@
+REDNAME_COUNT=0 (grep -cE ^\s*---\ FAIL: = 0 on the paired .log; positive control: the same ruler on 50-ac4-full-after.log.rednames returns 5 lines)

@@ -1,0 +1,9 @@
+2c2,6
+< REDNAME_COUNT=1 (ruler=grep -E "^\s*--- FAIL: "; empty means zero reds)
+---
+> --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+> --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+> --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+> --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+> REDNAME_COUNT=5 (ruler=grep -E "^\s*--- FAIL: "; empty means zero reds)
+surface_diff_rc=1 surface_diff_lines=8 (ruler=diff of the two red-name rosters)

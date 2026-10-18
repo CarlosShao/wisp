@@ -1,0 +1,15 @@
+### corrected ruler: FAIL lines only (top-level and subtest forms both start with --- FAIL:)
+ac4full-ci-after fail_lines_naming_teeth=0 fail_lines_total=1 (positive control: fail lines naming TestC26 = 1)
+ac4full-d-after fail_lines_naming_teeth=0 fail_lines_total=5 (positive control: fail lines naming TestC26 = 1)
+ac4full-ci-before fail_lines_naming_teeth=0 fail_lines_total=1 (positive control: fail lines naming TestC26 = 1)
+### what the 8 wrong-scope hits actually were (line kinds, first 12):
+  29:    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+  32:    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+  35:    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+  38:    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+  41:    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+  44:    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+  47:    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+  50:    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+### named surface blemish in run-ac4-surface.sh: the ci-shape GOTMPDIR line has a misplaced quote so the dir name ends with '}' (visible in ac4-surface-runner.log). Same volume, same shape, same TMP/TEMP handling => the four-count and roster readings stand; the script is kept as-run (no deletes) and corrected here.
+correction_rc=0

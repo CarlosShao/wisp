@@ -1,0 +1,37 @@
+### AC#4 surface sensitivity: whole package, ci-shape <=> d-shape, same tree
+-- AFTER tree, ci-shape (%LOCALAPPDATA% temp root):
+  rc=1 mkdir_gotmp_rc=0 GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-336v1-ac4full-ci-after.log}
+  FOURCOUNT RUN=247 PASS_TOP=140 FAIL_TOP=1 SKIP=1 rc=1
+    --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    REDNAME_COUNT=1 (ruler=grep -E "^\s*--- FAIL: "; empty means zero reds)
+-- AFTER tree, d-shape (D: temp root):
+  rc=1 mkdir_gotmp_rc=0 GOTMPDIR=/d/tmp/wisp/20261018/336v1/gotmp/ac4full-d-after.log
+  FOURCOUNT RUN=247 PASS_TOP=136 FAIL_TOP=5 SKIP=1 rc=1
+    --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+    --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+    --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+    --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+    REDNAME_COUNT=5 (ruler=grep -E "^\s*--- FAIL: "; empty means zero reds)
+-- BEFORE tree, ci-shape:
+  rc=1 mkdir_gotmp_rc=0 GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-336v1-ac4full-ci-before.log}
+  FOURCOUNT RUN=230 PASS_TOP=139 FAIL_TOP=1 SKIP=1 rc=1
+    --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    REDNAME_COUNT=1 (ruler=grep -E "^\s*--- FAIL: "; empty means zero reds)
+### red roster: AFTER ci-shape <=> AFTER d-shape (by name)
+    2c2,6
+    < REDNAME_COUNT=1 (ruler=grep -E "^\s*--- FAIL: "; empty means zero reds)
+    ---
+    > --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+    > --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+    > --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+    > --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+    > REDNAME_COUNT=5 (ruler=grep -E "^\s*--- FAIL: "; empty means zero reds)
+    surface_diff_rc=1 surface_diff_lines=8 (ruler=diff of the two red-name rosters)
+### do the ticket-336 teeth files appear in ANY red line of either surface? (want 0)
+ac4full-ci-after teeth_red_hits=8 positive_control_anchor_miss_334_red_hits=0
+ac4full-d-after teeth_red_hits=8 positive_control_anchor_miss_334_red_hits=0
+### blacklists unchanged across all four trees/surfaces
+  blacklist_hashes before=c1799cd24afce19e6accef23db23a7d7ee746dec after=c1799cd24afce19e6accef23db23a7d7ee746dec
+### shared worktree internal/cmd dirty (want 0 = I never ran anything there): 0
+ac4_surface_rc=0

@@ -1,0 +1,34 @@
+### intake-anchor confirmation triple: anchor=e5021339 pristine=c1799cd24afce19e6accef23db23a7d7ee746dec tree=/d/tmp/wisp/20261018/336v1/tree-ac2 roster=4 instruments
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [start]
+### leg 1 pristine:
+  rc=0 RUN=27 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+    GREEN_TOP=27 RED_TOP=0 (positive control: the same two greps on the paired pristine log)
+### leg 2 MU-1h only:
+  needle_before=1
+  needle_after=0 branch_removals=1 (want 0 / 1)
+  mutated_hash=5f8789548f624e12ba2527c016f0f9b040c36e3a
+  rc=1 RUN=27 PASS_TOP=3 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials 
+    GREEN_TOP=25 RED_TOP=2 (positive control: the same two greps on the paired pristine log)
+  verbatim red sentence:
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain (0.01s)
+    === RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor
+    === RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so
+        anchor_miss_reason_334_test.go:147: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\acx-2-mu1h.log\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2191729733\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\acx-2-mu1h.log\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2191729733\\001\\profile\\work") and the anchor "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\acx-2-mu1h.log\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2191729733\\001\\profile\\.aws\\credentials" is not installed here (its expansion stopped at "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\acx-2-mu1h.log\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2191729733\\001\\profile"), so R17 protects the ancestry chain the two share instead of proving a miss
+    === RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube
+    === RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal
+    --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.02s)
+        --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so (0.01s)
+        --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube (0.01s)
+        --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal (0.01s)
+    === RUN   TestAnchorMissKeepsNonOverridableClassAndNeedL2
+        anchor_miss_reason_334_test.go:208: SHAPE-READING334 inside-profile=class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate \"d:\\\\tmp\\\\wisp\\\\20261018\\\\336v1\\\\gotmp\\\\acx-2-mu1h.log\\\\testanchormisskeepsnonoverridableclassandneedl232460439\\\\001\\\\profile\\\\work\\\\id_ed25519已允许\\x1b\\u202e\" is not proven handle-expanded (its own walk stopped at \"d:\\\\tmp\\\\wisp\\\\20261018\\\\336v1\\\\gotmp\\\\acx-2-mu1h.log\\\\testanchormisskeepsnonoverridableclassandneedl232460439\\\\001\\\\profile\\\\work\") and the anchor \"d:\\\\tmp\\\\wisp\\\\20261018\\\\336v1\\\\gotmp\\\\acx-2-mu1h.log\\\\testanchormisskeepsnonoverridableclassandneedl232460439\\\\001\\\\profile\\\\.aws\\\\credentials\" is not installed here (its expansion stopped at \"d:\\\\tmp\\\\wisp\\\\20261018\\\\336v1\\\\gotmp\\\\acx-2-mu1h.log\\\\testanchormisskeepsnonoverridableclassandneedl232460439\\\\001\\\\profile\"), so R17 protects the ancestry chain the two share instead of proving a miss" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+### leg 3 restore + rerun:
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU1h]
+  rc=0 RUN=27 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+    GREEN_TOP=27 RED_TOP=0 (positive control: the same two greps on the paired pristine log)
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [final]
+  shared_worktree_dirty_internal_cmd=0
+acX_rc=0

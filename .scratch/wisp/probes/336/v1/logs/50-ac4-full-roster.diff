@@ -1,0 +1,1 @@
+RED_NAME_DIFF_EMPTY=0 lines, rc=0 (ruler: diff of ac4-full-before.log.rednames vs ac4-full-after.log.rednames, both 5 lines / same 5 names; empty diff file = identical rosters. Positive control: the same diff ruler on the ci-shape vs d-shape rosters, 51-ac4full-surface.diff, is non-empty)

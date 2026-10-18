@@ -1,0 +1,1 @@
+GO_VET_EMPTY=0 bytes, rc=0 (go vet prints nothing when it finds nothing; the rc=0 line is in gates-runner.log gate 4. Positive control: the same capture slot is non-empty when a vet error exists — see the d22scan capture in 28-d22scan.log which does print)

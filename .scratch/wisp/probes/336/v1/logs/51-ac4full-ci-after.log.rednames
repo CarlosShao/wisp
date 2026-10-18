@@ -1,0 +1,2 @@
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+REDNAME_COUNT=1 (ruler=grep -E "^\s*--- FAIL: "; empty means zero reds)

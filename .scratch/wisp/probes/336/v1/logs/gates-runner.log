@@ -1,0 +1,40 @@
+### AC#4 gates (judge-run, SHARED WORKING TREE only, GOTMPDIR/TMPDIR unset first per A1027 #5)
+  unset_check GOTMPDIR=<> TMPDIR=<>
+### gate 1: gofumpt -l on the two ticket-336 test files + whole risk package
+  rc=0 listed_new_files=0
+  package-level (existing CRLF dirt, not mine):
+  rc=0 listed=1
+    internal\risk\provenance.go
+### gate 2: sh scripts/d22scan.sh
+  rc=0
+    d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+    d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+    d22scan: examined 283 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+    d22scan: scope bans #1-5 internal/      examined 241 production Go files
+    d22scan: scope bans #1-5 cmd/           examined  42 production Go files
+    d22scan: scope ban #6 frontend/         examined 116 text files
+    d22scan: scope ban #7 internal/tools/   examined  25 production Go files
+    d22scan: scope ban #8 design/           examined  39 text files
+    d22scan: scope ban #8 frontend/         examined 116 text files
+    d22scan: scope ban #8 internal/         examined 590 Go files, comments and _test.go included
+    d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+    d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=590, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 590 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+    d22scan: scope ban #8 frontend/         examined 116 text files
+    d22scan: scope ban #8 internal/         examined 590 Go files, comments and _test.go included
+    d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+    d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=590, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 590 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+### gate 3: sh scripts/check-path-length-budget.sh
+  rc=0
+    check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+    check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+    check-path-length-budget.sh: denominator read: 15615 tracked paths
+    check-path-length-budget.sh: denominator: tracked paths=15615  over-budget=60  covered by roster=60  not in roster=0
+    check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+    check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+    check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+    check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+### gate 4: go vet ./internal/risk/
+  rc=0
+### my own write face in the path-length denominator (longest path)
+81
+gates_rc=0

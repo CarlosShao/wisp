@@ -1,0 +1,1 @@
+GOFUMPT_LIST_EMPTY=0 files (ruler: gofumpt.exe -l on the two ticket-336 test files; empty = clean. Positive control: the package-level run in 28-gofumpt-pkg.txt lists 1 file, internalisk\provenance.go = the known CRLF existing dirt, not mine)
