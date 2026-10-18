@@ -1,0 +1,39 @@
+166-r1 · 03 · 交件侧读数（成对⇄02；台面＝D:\tmp\wisp\20261018\166r1\tree-head，锚 7404c42f）
+================================================================
+交件字节＝b836af08（起手件）＋2f936413（manage.go 守卫）＋67fe813a（四用例）＋7404c42f（注释自更正）＋cbc3fe21（02 基线读数入库）。
+7404c42f 重树：GO_FILES=761（基线 760＋我 1 枚新文件＝自洽）；guard 行现位＝manage.go:60。
+（★自更正一笔具名：67fe813a 那版我两枚文件注释含逐字 session.NewManager( 限定串，会让判据尺
+  假变 rc=0＝拿注释冒充接线，正是 166-v1 点名的陷阱；7404c42f 改 host 限定形态后尺回到真值。
+  因交付字节变更，成对色与突变两发在 7404c42f 字节上全部重打＝下方读数与 04 件皆出自重打轮；
+  67fe813a 上那轮数值（head-pair-*／mut-T*）与重打轮逐项同色，原始日志留档 D:\tmp\wisp\20261018\166r1\。）
+★话要说准（lead 10-18 收件点名，本腿自认）：manage.go:60 那枚 var _ ManageStore = (*memory.Store)(nil)
+  是【编译期守卫】＝买到"接口对得上、装配那一行随时可写"；它⛔ 是"有人调用 NewManager"。
+  HEAD 尺仍 rc=1（上方第二层读数）＝生产调用者枚数交件侧仍 0/0/0/0/0，⛔ 写成"已接线"。
+
+■ 成对颜色（go test ./internal/session/ ./internal/memory/ -count=1 -timeout 30m -v）
+  台面 A（默认临时根＝C 卷）：final-head-pair-default.log
+    rc=0  RUN=121  PASS_TOP=67  FAIL_TOP=0  SKIP=2
+    ok github.com/CarlosShao/wisp/internal/session 4.550s ／ ok …/internal/memory 17.835s
+  台面 B（GOTMPDIR=D:\tmp\wisp\20261018\166r1\gotmp）：final-head-pair-gotmpD.log
+    rc=0  RUN=121  PASS_TOP=67  FAIL_TOP=0  SKIP=2
+    ok …/internal/session 1.695s ／ ok …/internal/memory 13.973s
+  ⇄ 基线（02 件）两台面均 RUN=117 PASS_TOP=63 FAIL_TOP=0 SKIP=2 ＝ 恰多 4 RUN／4 顶层 PASS＝我四件，⛔ 没弄红任何东西。
+
+■ 逐件「这一发在未修码上响不响」成对（-run 定向、两发同台面 GOTMPDIR=D:\tmp\wisp\20261018\166r1\gotmp）
+  件｜基线（c11163c8＝未修码）｜交件（7404c42f）
+  List        ｜ base-run-…List.log        rc=0 RUN=0 PASS=0 FAIL=0 no-tests-to-run=2 ⇒ ★响（用例在基线上压根不存在＝接线缺口的直接读数） ｜ rc=0 RUN=1 PASS=1 FAIL=0
+  Search      ｜ base-run-…Search.log      rc=0 RUN=0 PASS=0 FAIL=0 no-tests-to-run=2 ⇒ ★响 ｜ rc=0 RUN=1 PASS=1 FAIL=0
+  Rename      ｜ base-run-…Rename.log      rc=0 RUN=0 PASS=0 FAIL=0 no-tests-to-run=2 ⇒ ★响 ｜ rc=0 RUN=1 PASS=1 FAIL=0
+  Archive+撤销｜ base-run-…ArchiveUndo.log rc=0 RUN=0 PASS=0 FAIL=0 no-tests-to-run=2 ⇒ ★响 ｜ rc=0 RUN=1 PASS=1 FAIL=0
+  正控（基线上同尺跑既有用例 TestSessionListByWorkspace）：RUN=1 PASS=1 FAIL=0 ＝ 这把 -run 尺在基线上
+    量得到存在的用例 ⇒ 上面 4 枚 RUN=0 不是尺坏，是用例真不在。
+  ★ 第二层「生产可达」尺（这才是 AC#2 判语那格）：
+    基线＝git grep session\.NewManager rc=1（0 命中）＋正控 func NewManager 命中 manage.go:68。
+    交件＝git grep -n "session\.NewManager" -- "*.go" 命中 0、rc=1（HEAD 上生产装配仍真零）。
+    ⇒ 诚实读数：本腿装好的是 internal/session 内的装配半边（守卫＋四件接口可达用例）；
+      消费行那一跳落 cmd/wisp／internal/panel＝⛔ 本波写面，见 06 缺口件。⛔ 拿守卫或绿当接线。
+
+■ 守卫与用例落点（file:line，HEAD 现量）
+  internal/session/manage.go:60           var _ ManageStore = (*memory.Store)(nil)   ＝编译期装配证明（产码面，每次构建都量）
+  internal/session/ticket166r1_assembly_test.go:73/:107/:145/:178 ＝四件装配可达用例（经 ManageStore 接口＝宿主调用同一编译边）
+================================================================
