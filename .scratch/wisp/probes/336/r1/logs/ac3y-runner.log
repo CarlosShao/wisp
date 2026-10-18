@@ -1,0 +1,23 @@
+### 装尺 probe=D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/334/v1/logs/probe-334v1_test.go.txt
+  probe_blob=69a70fa454886029aea9f8f716cb372908467339 334-v1 原件哈希=69a70fa454886029aea9f8f716cb372908467339
+  probe_lines=248  打印行数（无断言＝t.Log）=13  断言行数=7
+### 乙-1 未突变（成对正控＝这一尺今天必绿，因为它⛔ 断言）
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec
+  rc=0 wall=20.48s RUN=22 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+  shape_lines=18
+### 乙-2 只摘 local-credentials 一枚的回落支（＝AC#2 的 MU-1h 同一落点）
+  落点命中=1
+  rc=0 wall=4.26s RUN=22 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+  尺看到的行差（pristine ⇄ MU-1h，逐字）:
+    7c7
+    < V1SHAPE chain:case9-local-creds class=A allow=false needL2=false rule=A:Microsoft-Credentials
+    ---
+    > V1SHAPE chain:case9-local-creds class=B allow=false needL2=true rule=B-tier
+  ★注意＝这一尺⛔ 断言，所以 rc 仍 0：搬成仓内断言必须逐枚补 want（维护面见 report）
+### 乙-3 甲齿对照（同一发突变下我的牙的 rc／四数）
+  rc=1 wall=1.85s RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials 
+  final_hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec
+  两尺件数与行数＝甲：1 枚 windows 件 160 行＋1 枚 other 件 92 行；乙：1 枚 248 行（无断言）
+ac3y_rc=0
