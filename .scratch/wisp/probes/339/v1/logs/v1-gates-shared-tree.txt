@@ -1,0 +1,25 @@
+unset 后 GOTMPDIR=[UNSET] TMPDIR=[UNSET]（★跑前清 env＝票 311 AC#1 shape B GUARD 定式）
+--- 门① gofumpt -l（真身 /d/work/base/gopath/bin/gofumpt.exe，射程＝本腿写面的 .go 件；本腿零 .go ⇒ 尺打目录＝空输出）---
+（★具名一枚坏尺：第一发把这把尺打到了 .md 判语件上 ⇒ rc=2 illegal character U+0023＝尺用错对象、⛔ 读成红、⛔ 计入判据；gofumpt 只吃 Go 源）
+my_go_files=0 (本腿写面 .go 枚数＝0＝正控：尺对空集的正确输出＝空)
+gofumpt_rc=0 output_lines=0
+
+--- 门①b 全仓 gofumpt -l（存量对照，逐枚点名⛔ 我写面的件；⛔ 顺手重排别人件）---
+repo_dirty_listed_not_mine=50
+--- 门② d22scan ---
+d22_rc=0
+d22scan: scope ban #8 internal/         examined 592 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=592, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 592 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+--- 门③ 长度门（要 .git）---
+len_rc=0
+check-path-length-budget.sh: denominator read: 16084 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=16084  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+--- 门④ go vet ./internal/risk/ ---
+vet_rc=0
+
+--- 门④b 两平台 vet 交叉（容器侧，交件树）---
+（另见 logs/v1-*-fullpkg：包内编译已证；容器 vet 读数＝实现腿 linux-final-vet.log、本腿⛔ 抄：见 v1-jia-naive 那份 vet 尺同源）
+RC_TABLE rc1=0 rc2=0 rc3=0 rc4=0
