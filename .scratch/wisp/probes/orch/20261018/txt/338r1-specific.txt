@@ -1,0 +1,9 @@
+派单 338r1-specific — 本腿判据（逐格可机读；⛔ 抄票面任何数，一律现跑）
+
+AC#0 起手现跑：① `gofumpt -l internal cmd` 枚名册（票面记 6 枚）；② 逐枚分"假脏／真脏"＝`git show HEAD:<f>` 取到**仓外 LF 文件**再跑同一把尺（假脏＝blob CLEAN、真脏＝blob DIRTY）；③ `gofmt -d` 那两枚的逐字 diff 进件；④ ★**非空白零变化尺**先在你自己的改法上试一发（拿已知纯空白的改动验它会 PASS、拿一处改字的验它会 FAIL）＝⛔ 交一把两种形状都放行的尺。与票面不符⇒当场具名更正。
+AC#1 归位：只跑 `/d/work/base/gopath/bin/gofumpt.exe -w <那两枚>`（或等价手工对齐）。交件必带＝① 两枚的 `git diff --numstat`；② 上面那把非空白尺的**逐字空输出**＋`rc=`；③ `git ls-files --eol` 两枚交件侧（必须 `i/lf`）；④ 逐枚 `gofumpt -l` 复量＝0 枚。★⛔ 动另四枚 CRLF 件（具名登记"仍脏、⛔ 本腿射程"）。
+AC#2 门变绿要成对：改前⇄改后各跑一发 `gofumpt -l internal cmd`（同一台面），名册**逐名作差**＝必须恰好少这两枚、⛔ 只报枚数；`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./internal/tools/`／`go vet ./cmd/wisp/` 逐枚 `rc=`。★**跑共享树四道门前先 `unset GOTMPDIR TMPDIR`**（票 311 AC#1 shape B 那道卷闸，带 env 时 rc=2 射程拒绝＝我 10-18 坐实，⛔ 读成红）。
+AC#3 颜色：`./internal/tools/` 与 `./cmd/wisp/` 两包**仓外导出树**成对（改前⇄改后、同一台面、两把临时根台面默认 C 卷 ⇄ `D:` 预建、`-count=1 -timeout 30m`、四数逐枚点名⛔ 混用⛔ 相减）；红名册**逐名**作差归位。★`cmd/wisp` 整包已知：真窗／热键／驻留族红属别票存量（本机常驻实例 `wisp.exe` PID **21892** 握全局热键＋单实例锁）⇒ 逐名归位、⛔ 当本票新增、⛔ 杀那枚 PID。⛔ `go test ./...`。
+AC#4 纪律格自证：逐笔 `git show --name-only` 全集 ⊆ 三处写面；`add` 与 `commit` **两处 pathspec 都逐枚手打写字面路径**——★⛔ `git commit -F 正文 -- $(git diff --cached --name-only)`／⛔ 任何"从 index 或 `git status` 输出反推"的形（今天同一形状已咬两枚腿，台账 `A1027`／`A1029`）；★**每笔提交后立刻自证一把**＝`git show --name-only HEAD | grep -v -E '^(你的三处写面)'` 非空 ⇒ 当场 send_message 具名上报（⛔ 攒到收件）。
+交件＝`.scratch/wisp/probes/338/r1/report.md`（≤120 行）＋`logs/**` 逐枚入库＋票 338 尾一条 bullet（写锚、写"四格一枚没翻"）。每落一枚文件就 commit；主题前缀 `票 338 落地腿 338-r1·<格>`。⛔ push／ add -A／ amend／reset／rebase／stash／checkout .／clean。
+必答：(i) 两枚的"非空白零变化"尺逐字读数；(ii) 改前⇄改后 `gofumpt -l` 名册逐名作差（少了哪两枚、有没有多动的）；(iii) 另四枚 CRLF 件你确认一字未动的尺；(iv) 两包成对四数＋红名册逐名归位（哪些＝别票存量）。

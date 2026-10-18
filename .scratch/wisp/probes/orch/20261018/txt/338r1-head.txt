@@ -1,0 +1,8 @@
+派单 338r1-head — 票 338 落地腿（写·两枚跟踪件格式归位）2026-10-18 第三波
+- 起手锚＝你自己 `git log -1` 现认（编排者 11:4x 见 `7e106b89` 系，⛔ 拿我的号当锚）。
+- 目标＝票 338 四格（`.scratch/wisp/issues/338-two-tracked-files-are-gofumpt-dirty-in-blob-form-so-cis-format-step-goes-red-on-stock.md` 全文照读）：把两枚 **blob 态就被 `gofumpt` 判真脏**的跟踪件归位（注释对齐空白），让 CI 那两道 gofumpt 步骤（`ci.yml:172` 与 `:189`）不再因**存量**红。两枚＝`internal/tools/task_output_pointer_notice_errtext_174r7_test.go`（末笔 `67a7ab41`）＋`cmd/wisp/panel_transport_35r2_test.go`（末笔 `18d438e`）。
+- ★**这活只有空白**：判据形状＝`diff <(tr -d ' \t' <改前>) <(tr -d ' \t' <改后>)` **必须空输出**＝非空白字节零变化。⛔ 任何 token／断言／字符串字面量／注释文字内容变化；⛔ 换行符改写（`git ls-files --eol` 交件侧必须仍 `i/lf`，新字节 LF）。
+- ★**只这两枚，⛔ 顺手修别的**：另四枚 CRLF 假脏（`internal/agent/approval/pending_read.go`／`internal/agent/tools.go`／`internal/risk/provenance.go`／`cmd/wisp/models.go`）＝工作树形状、blob 干净、CI 不咬，"谁写脏的"未归到底 ⇒ ⛔ 动它们一字（把它们混进一笔格式提交＝造谎，票面禁区逐字写着）。
+- 写面（逐路径，只三处）：那两枚跟踪件 ＋ `.scratch/wisp/probes/338/r1/**`（report＋logs，短名、⛔ `§`、⛔ 落 `docs/evidence/s1/`）＋票 338 末尾**一条**只追加 bullet。
+- ★车道说明：`cmd/wisp/**` 本波**你是唯一写腿**（改的是那包里一枚 `_test.go`）；`go test ./cmd/wisp` 同一时刻只跑一个 ⇒ 你跑之前先 `list_agents` 式自查／拿不准就 send_message 问我要放行。`internal/panel/**` 零写腿；`internal/risk/**`＝`336-r1` 在写⛔ 碰；`internal/config/**`＝`227-r1` 在写⛔ 碰。
+- 禁区：⛔ 动 `ci.yml`（那是"为让门绿去改门"）／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件／`go.mod`／`go.sum`／`.gitignore`／D1–D47／C1–C32／R1–R9／D43；⛔ 为变绿放宽任何断言／删用例／`t.Skip`；⛔ `frontend/**`／`design/**`；⛔ 翻框（四格由非实现者裁）／改票名／`-done`／push。
