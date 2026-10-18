@@ -1,6 +1,6 @@
 ### 尺② report 绝对路径＋wc -c＋行数＋空槽尺 0 命中带正控 ###
 abs=D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/339/r1/report.md
-report bytes=12232 lines=102 (帽=160)
+report bytes=13179 lines=108 (帽=160)
 positive-control(空槽词，必=1)=1
 report+logs 空槽命中=0? YES
 logs 0 字节枚数=0 (must be 0)
