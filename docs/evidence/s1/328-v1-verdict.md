@@ -24,7 +24,7 @@
 
 ## 三、AC#4 判语：**过**（成对复跑＋逐名作差＋门禁四数）
 
-- 四数逐枚点名（⛔ 混用⛔ 相减），两把临时根台面同配方同机 `-count=1 -timeout 30m`：`./internal/panel` 改前 **257/160/7/0 rc=1** ⇄ 改后 **268/163/7/0 rc=1**；`./internal/agent` 改前 **112/88/0/0 rc=0** ⇄ 改后 **114/90/0/0 rc=0**。⇒ **腿那四个数我逐枚复现成立**（＋11 RUN／＋3 PASS_TOP＝它新加的用例数，⛔ 当判据）。
+- 四数逐枚点名（⛔ 混用⛔ 相减），两把临时根台面同配方同机 `-count=1 -timeout 30m`：`./internal/panel` 改前 **257/160/7/0 rc=1**（两发同名册）⇄ 改后第一发 **268/162/8/0 rc=1**、复发 **268/163/7/0 rc=1**；`./internal/agent` 改前 **112/88/0/0 rc=0** ⇄ 改后 **114/90/0/0 rc=0**。⇒ **腿报的那四个数我逐枚复现成立**（panel 复发与 agent 两侧同名同数；＋11 RUN／＋3 PASS_TOP＝它新加的用例枚数，⛔ 当判据）。
 - ★红名册**逐名**作差（派单点名看名字不看枚数）：`grep '^--- FAIL' | sed 去时长 | sort -u | diff` ⇒ **REDROSTER_DIFF_RC=0，两侧各 7 枚同名**（`logs/red-{before,after}-panel-rerun2.txt`）。七枚逐名＝`approval_test.go:129` 键族／`composer_test.go:78` 键族（两枚起手即红、与卡片无关，本票⛔ 加键 ⇒ 没多出第二句，复认）／两枚 35r8 堆量尺／`composer_test.go:873`／`git_test.go:600`（缺 `.git`）＋`tokens_fourway_test.go:441`（缺 `design/`＝机主外部 agent 写面）＝两枚台面局限，改前改后同红、作差互抵（四枚逐枚复认）。
 - ★本腿抓到并归位一枚红名抖动：改后侧**第一发** `FAIL_TOP=8`，多出 `TestFloodRulerFiresOnAnUnboundedSink35r8`（`:369` 堆量句）。归位四把尺＝① 那文件两侧 blob 同串 `3e5c0e81`（`diff_lines=0`，⛔ 328 射程）② 单跑两侧各两发全绿 rc=0 ③ 改后整包**复跑**该枚 `--- PASS` ④ 复跑两侧名册逐名作差＝0 ⇒ 判**同场堆量分配的台面抖动**，⛔ 计入 328 判据、⛔ 据此退腿。
 - 门禁四数（只在共享工作树，逐枚 `rc=`）：`gofumpt.exe -l <腿那四枚>`＝**rc=0**（无输出）；`sh scripts/d22scan.sh`＝**第一发 rc=2＝GUARD 射程拒绝**（offender＝我的 `GOTMPDIR=D:/tmp/…` 与 `%LOCALAPPDATA%` 不同卷＝票 311 AC#1 shape B 那道闸；⛔ 读成红）⇒ 按其自陈 unset `GOTMPDIR`/`WISP_TEST_GOTMP_ROOT` 重打＝**clean rc=0**（射程现量 ban#8 internal 586／cmd 143／design 39＝非空）；`check-path-length-budget.sh`＝**VERDICT GREEN rc=0**（分母 15217 tracked paths，腿报 15035 随仓在长，两数都带尺）；`go vet ./internal/panel/ ./internal/agent/`＝**rc=0**。跑门禁前现量：共享树两包与我的锚**差 0 文件**、`status -- internal/panel internal/agent cmd/wisp`＝空。
@@ -50,6 +50,7 @@
 
 1. **复认第一程 `c59d0354` 那处派单前提与盘上不符**（我自己现跑，⛔ 抄它）：派单 `AC#2③` 说"把第三臂换成 `strings.HasPrefix(key, task)` 这一发＝腿没发的反形"，而腿 `logs/mutate.sh:31` 的 **M1 替换串与那一发逐字节同形**（`sed 's/strings.HasPrefix(key, task+"#")/strings.HasPrefix(key, task)/'`）。我仍自己现跑（§一 2）＝判据按我的读数成立；⛔ 据此退腿那一发。⇒ **建议派单模板改一句**：这类"补反形"先对 `git show <腿末笔>:…/mutate.sh` 现量再写。
 2. **新落点铁律与共享树门禁相冲**：`GOTMPDIR` 只许在 `D:` ⇒ 共享工作树里的 `scripts/d22scan.sh` 触发票 311 AC#1 shape B 的 GUARD（`rc=2`，射程拒绝，⛔ 读成红）。本腿用"跑门禁前 unset 两枚 env"绕开（逐字 `logs/gates-recheck-nogotmp.log`），但那是**每台机每次都要记的一手**，属编排者/机主那一层的定案（⛔ 属本票）。
+3. ★**本腿自纠两把尺（⛔ 判语改动，只改我的尺，具名在 `logs/self-evidence-three-rulers.txt` 自纠①②）**：① 越格自查第一稿写成 `grep -vE '^(目录前缀|B|C)$'`，行尾锚把目录那一支钉死 ⇒ 58 枚里 56 枚被**我的错尺**误报越格；改逐枚 `case` 判后＝越格 **0**、`.go` 命中 **0**（正控＝同册 `*.go.snap` 命中 4 枚且逐枚 blob 与锚对撞 same=YES）。② 空槽尺第一稿用不断形的那串（末一支写作三枚连续大写 X 的字面形），把我自己那行命令匹配进去（命中 1）且正控射程当时真 0 命中 ⇒ 改自避分词形（末一支换成 `X{3}` 量词形）＋到 `internal/` 拿到正控 `:296/:313`。另：AC 枚数那把尺**全档**命中 6 枚＝被我自己的票尾 bullet 污染 ⇒ ⛔ 用全档数 AC，以判据区射程（`sed -n '29,36p'`）＝5 为准。
 
 ## 八、交件自证三把尺（逐字，入库笔见下）
 

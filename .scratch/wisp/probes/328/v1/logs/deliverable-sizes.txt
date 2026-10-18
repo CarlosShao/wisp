@@ -1,6 +1,6 @@
-date=2026-10-18 10:41:19 +0800  leg=328-v1  尺＝wc -c / wc -l 逐枚现量（射程＝本腿写面全集＋判语件）
+date=2026-10-18 10:50:42 +0800  leg=328-v1  尺＝wc -c / wc -l 逐枚现量（射程＝本腿写面全集＋判语件）
 --- 判语件 ---
-   14611    61 docs/evidence/s1/328-v1-verdict.md
+   15616    62 docs/evidence/s1/328-v1-verdict.md
 --- probes/328/v1 逐枚（bytes lines path）---
    17140   526 .scratch/wisp/probes/328/v1/logs/ac3-attribution-and-zero-read.log
    40811   322 .scratch/wisp/probes/328/v1/logs/after-agent-full.log
@@ -38,6 +38,7 @@ date=2026-10-18 10:41:19 +0800  leg=328-v1  尺＝wc -c / wc -l 逐枚现量（�
      419     8 .scratch/wisp/probes/328/v1/logs/red-after-panel.txt
      368     7 .scratch/wisp/probes/328/v1/logs/red-before-panel-rerun2.txt
      368     7 .scratch/wisp/probes/328/v1/logs/red-before-panel.txt
+   10855   147 .scratch/wisp/probes/328/v1/logs/self-evidence-three-rulers.txt
     7105    90 .scratch/wisp/probes/328/v1/logs/start-rulers-v2.txt
     3222    47 .scratch/wisp/probes/328/v1/logs/start-rulers.txt
    10637   224 .scratch/wisp/probes/328/v1/logs/subagent_blocked_220_test.go.snap
@@ -47,6 +48,10 @@ date=2026-10-18 10:41:19 +0800  leg=328-v1  尺＝wc -c / wc -l 逐枚现量（�
     3148    17 .scratch/wisp/probes/328/v1/msg/msg-2-ac2.txt
     3328    14 .scratch/wisp/probes/328/v1/msg/msg-3-ac3.txt
     4474    19 .scratch/wisp/probes/328/v1/msg/msg-4-ac4.txt
+    2523     9 .scratch/wisp/probes/328/v1/msg/msg-5-verdict.txt
+    1350     8 .scratch/wisp/probes/328/v1/msg/msg-6-ticket.txt
+    2584     9 .scratch/wisp/probes/328/v1/msg/msg-7-selfevidence.txt
+    4953     1 .scratch/wisp/probes/328/v1/msg/msg-ticket-bullet.txt
     8511   118 .scratch/wisp/probes/328/v1/scripts/ac3-and-attribution.sh
     5292    71 .scratch/wisp/probes/328/v1/scripts/attribute-extra-red-and-gates.sh
     5167    65 .scratch/wisp/probes/328/v1/scripts/attribution-round2-readonly.sh
@@ -54,6 +59,7 @@ date=2026-10-18 10:41:19 +0800  leg=328-v1  尺＝wc -c / wc -l 逐枚现量（�
     2105    35 .scratch/wisp/probes/328/v1/scripts/build-trees.sh
     7870   116 .scratch/wisp/probes/328/v1/scripts/color-pair-and-mutations.sh
     2092    33 .scratch/wisp/probes/328/v1/scripts/deliverable-sizes.sh
+    7423   101 .scratch/wisp/probes/328/v1/scripts/self-evidence-three-rulers.sh
     5868    77 .scratch/wisp/probes/328/v1/scripts/start-rulers-v2.sh
 --- 0 字节枚数（尺＝find -size 0，射程＝写面全集＋判语件）---
 0
@@ -64,6 +70,6 @@ $ grep -nE '([T]ODO|[F]IXME|[T]BD|待[补]|占[位]|X{3})' internal/agent/approv
   正控命中行号＝296 313 （⛔ 把夹具串原样打进本件，免自匹配）
   正控命中行数=2
 --- 行数帽尺（派单：判语件 ≤130 行）---
-  verdict_lines=61  cap=130  over=NO
+  verdict_lines=62  cap=130  over=NO
 --- 件数帽尺（输出预算 ≤4 枚件：判语件＋logs 属读数件，正件＝判语件一枚＋票尾一条）---
   非读数正件枚数＝2（docs/evidence/s1/328-v1-verdict.md ＋ 票 328 尾一条 bullet）；probes 面＝脚本＋logs

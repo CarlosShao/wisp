@@ -1,0 +1,147 @@
+date=2026-10-18 10:48:20 +0800 leg=328-v1 裁决锚=5db0b538dad3bf2841adec834a130e4a6b28d8df 第二稿（两把尺写法自纠，逐字在下）
+
+## 尺① 逐枚提交号＋逐枚 git show --name-only（严格前缀＝编排者收件的尺）
+--- 5c6cbe75 | 票 328 终裁腿 328-v1·正文件入�…
+      .scratch/wisp/probes/328/v1/msg/msg-6-ticket.txt
+      枚数=1
+--- f255d53c | 票 328 终裁腿 328-v1·票尾一条�…
+      .scratch/wisp/issues/328-l2-card-corr-shape-never-matches-the-roster-join-key.md
+      枚数=1
+--- 5615f14e | 票 328 终裁腿 328-v1·判语件入�…
+      .scratch/wisp/probes/328/v1/logs/deliverable-sizes.txt
+      .scratch/wisp/probes/328/v1/msg/msg-1-start.txt
+      .scratch/wisp/probes/328/v1/msg/msg-2-ac2.txt
+      .scratch/wisp/probes/328/v1/msg/msg-3-ac3.txt
+      .scratch/wisp/probes/328/v1/msg/msg-4-ac4.txt
+      .scratch/wisp/probes/328/v1/msg/msg-5-verdict.txt
+      .scratch/wisp/probes/328/v1/msg/msg-ticket-bullet.txt
+      .scratch/wisp/probes/328/v1/scripts/deliverable-sizes.sh
+      docs/evidence/s1/328-v1-verdict.md
+      枚数=9
+--- 45b474ec | 票 328 终裁腿 328-v1·AC#4 成对颜…
+      .scratch/wisp/probes/328/v1/logs/after-panel-full-rerun2.log
+      .scratch/wisp/probes/328/v1/logs/after-panel-full.log
+      .scratch/wisp/probes/328/v1/logs/agent-red-roster-both-sides.txt
+      .scratch/wisp/probes/328/v1/logs/attribute-driver-raw.log
+      .scratch/wisp/probes/328/v1/logs/before-panel-full-rerun2.log
+      .scratch/wisp/probes/328/v1/logs/before-panel-full.log
+      .scratch/wisp/probes/328/v1/logs/color-driver-raw.log
+      .scratch/wisp/probes/328/v1/logs/floodruler-after-1.log
+      .scratch/wisp/probes/328/v1/logs/floodruler-after-2.log
+      .scratch/wisp/probes/328/v1/logs/floodruler-attribution-note.txt
+      .scratch/wisp/probes/328/v1/logs/floodruler-before-1.log
+      .scratch/wisp/probes/328/v1/logs/floodruler-before-2.log
+      .scratch/wisp/probes/328/v1/logs/gates-recheck-nogotmp.log
+      .scratch/wisp/probes/328/v1/logs/red-after-panel-rerun2.txt
+      .scratch/wisp/probes/328/v1/logs/red-after-panel.txt
+      .scratch/wisp/probes/328/v1/logs/red-before-panel-rerun2.txt
+      .scratch/wisp/probes/328/v1/logs/red-before-panel.txt
+      .scratch/wisp/probes/328/v1/scripts/attribute-extra-red-and-gates.sh
+      枚数=18
+--- 8ba2ae09 | 票 328 终裁腿 328-v1·AC#3 三面尺…
+      .scratch/wisp/probes/328/v1/logs/ac3-attribution-and-zero-read.log
+      .scratch/wisp/probes/328/v1/logs/attribution-round2.log
+      .scratch/wisp/probes/328/v1/scripts/ac3-and-attribution.sh
+      .scratch/wisp/probes/328/v1/scripts/attribution-round2-readonly.sh
+      枚数=4
+--- c8e741a8 | 票 328 终裁腿 328-v1·AC#2 读数入…
+      .scratch/wisp/probes/328/v1/logs/after-agent-full.log
+      .scratch/wisp/probes/328/v1/logs/after-panel-220table-restored.log
+      .scratch/wisp/probes/328/v1/logs/after-panel-fourshapes-precise.log
+      .scratch/wisp/probes/328/v1/logs/before-agent-full.log
+      .scratch/wisp/probes/328/v1/logs/before-panel-220table-precise.log
+      .scratch/wisp/probes/328/v1/logs/mut-V1-boundary.log
+      .scratch/wisp/probes/328/v1/logs/mut-V1-redlines.txt
+      .scratch/wisp/probes/328/v1/logs/mut-V2-droparm-agent.log
+      .scratch/wisp/probes/328/v1/logs/mut-V2-droparm-panel.log
+      .scratch/wisp/probes/328/v1/logs/mut-V2-redlines.txt
+      .scratch/wisp/probes/328/v1/scripts/color-pair-and-mutations.sh
+      枚数=11
+--- ce16d7bf | 票 328 终裁腿 328-v1·起手尺 v2 �…
+      .scratch/wisp/probes/328/v1/logs/build-trees-v2.log
+      .scratch/wisp/probes/328/v1/logs/build-trees.log
+      .scratch/wisp/probes/328/v1/logs/corr_roster_join_328_test.go.snap
+      .scratch/wisp/probes/328/v1/logs/r1-mut-M1.log.snap
+      .scratch/wisp/probes/328/v1/logs/r1-mutate.sh.snap
+      .scratch/wisp/probes/328/v1/logs/r1join.snap
+      .scratch/wisp/probes/328/v1/logs/start-rulers-v2.txt
+      .scratch/wisp/probes/328/v1/logs/subagent_blocked_220_test.go.snap
+      .scratch/wisp/probes/328/v1/logs/subagent_corr_task_prefix_328_test.go.snap
+      .scratch/wisp/probes/328/v1/logs/subagent_roster_197.go.snap
+      .scratch/wisp/probes/328/v1/scripts/build-trees-v2.sh
+      .scratch/wisp/probes/328/v1/scripts/build-trees.sh
+      .scratch/wisp/probes/328/v1/scripts/start-rulers-v2.sh
+      枚数=13
+--- c59d0354 | 票 328 终裁腿 328-v1·起手三把�…
+      .scratch/wisp/probes/328/v1/logs/start-rulers.txt
+      枚数=1
+
+## 尺①补 全集越格自查（⊄ 三处写面者枚数，应 0）
+  ★自纠①具名：第一稿这把尺写成 grep -vE "^(目录前缀|B|C)$" ⇒ 行尾锚把"目录前缀"那一支钉死，
+    58 枚里 56 枚被我自己的错尺误报成越格＝尺的缺陷，⛔ 写面缺陷。改用逐枚 case 判：
+  去重总枚数=58
+  落在三处写面内=58（越格 0 时＝总数−越格）
+  越格枚数=0
+  ★.go 命中（尺＝名册里以 .go 结尾者）=0
+    正控＝这把尺认得 .go 这个词尾：同一名册里 *.go.snap 命中 4 枚（第一程存的只读快照，在 probes/** 允许面内、⛔ 产码路径）
+    逐枚对撞尺（快照字节 ⇄ 具名锚的真实 blob，证它们＝只读镜像、非产码）：
+      corr_roster_join_328_test.go hash=53f0494f2271d90dbd324d5a70de2936623ea46f  internal/agent/corr_roster_join_328_test.go@锚=53f0494f2271d90dbd324d5a70de2936623ea46f same=YES
+      subagent_blocked_220_test.go hash=a37cbd1f0b64aee76bdac6d3e1a9d7c47f22e30d  internal/panel/subagent_blocked_220_test.go@锚=a37cbd1f0b64aee76bdac6d3e1a9d7c47f22e30d same=YES
+      subagent_corr_task_prefix_328_test.go hash=99d203db2b4f15006e6bafeb74892631b54e5fb4  internal/panel/subagent_corr_task_prefix_328_test.go@锚=99d203db2b4f15006e6bafeb74892631b54e5fb4 same=YES
+      subagent_roster_197.go hash=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb  internal/panel/subagent_roster_197.go@锚=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb same=YES
+
+## 尺② 证据件绝对路径＋wc -c＋行数＋空槽尺（逐字命令＋正控）
+  绝对路径＝/d/work/workspace/projects plans/Wisp/docs/evidence/s1/328-v1-verdict.md
+  docs/evidence/s1/328-v1-verdict.md bytes=14611 lines=61 帽=130 over=NO
+$ grep -nE '([T]ODO|[F]IXME|[T]BD|待[补]|占[位]|X{3})' docs/evidence/s1/328-v1-verdict.md
+  命中=0（0＝空槽尺；正控在下面一枚）
+$ grep -nE '([T]ODO|[F]IXME|[T]BD|待[补]|占[位]|X{3})' internal/agent/approval/ticket146_liveapprovals_backing_test.go   ← 正控：同一串尺打到已知存在的夹具件，先证这把尺会响
+  正控命中行号=296 313 行数=2
+  写面 0 字节枚数（尺＝find -size 0，射程＝probes/328/v1/** ＋判语件）=0
+  ★自纠②具名：第一稿这把空槽尺写成不断形的 (TODO|FIXME|…|XXX)，把我自己那一行命令匹配进去（命中 1），
+    且正控射程（我自己的 logs）当时真 0 命中⇒拿不到"尺会响"的证据。改成自避分词形＋到 internal/ 找到真正控。
+  逐枚 wc 名册＝logs/deliverable-sizes.txt（入库笔 5615f14e）
+
+## 尺③ 票面（⛔ 翻框＋只追加一枚）
+  未勾框=3 带勾框=2 票面总行=61
+  ★AC 标题行尺：全档命中=6；判据区射程（sed -n '29,36p'）命中=5
+    ⇒ 那把全档尺被我自己的票尾 bullet 污染（正文里引用了"AC#2"字样）＝⛔ 用它数 AC 枚数；AC 枚数以判据区射程＝5 为准
+    （起手指 §2 那把 - [ 形状尺另具名：五枚 AC 框＋两枚 dated bullet＝7，我那枚追加后＝8，dated bullet 同形所致）
+  我那枚提交（f255d53c）numstat（追加行＝1，删除＝0）：
+      2	0	.scratch/wisp/issues/328-l2-card-corr-shape-never-matches-the-roster-join-key.md
+
+## 尺③补 ★编排者代提那枚（7f805583）：字节同原稿三串对撞，⛔ 判"件丢了"、⛔ 补第二枚同内容件
+  git rev-parse 7f805583^:.scratch/wisp/probes/328/v1/logs/start-rulers-v2.txt = b6cae95c2a898341507785e4322c6bb6b43f955d
+  git rev-parse 7f805583:.scratch/wisp/probes/328/v1/logs/start-rulers-v2.txt  = 9d1ac93e888be9c33c7755448d94b7f580bd72ae
+  git rev-parse HEAD:.scratch/wisp/probes/328/v1/logs/start-rulers-v2.txt      = 9d1ac93e888be9c33c7755448d94b7f580bd72ae
+  git hash-object <工作树>    = 9d1ac93e888be9c33c7755448d94b7f580bd72ae
+  numstat（7f805583 对该件）＝8	0	.scratch/wisp/probes/328/v1/logs/start-rulers-v2.txt
+
+## 尺④ 决定性那把尺逐字（起手侧 ⇄ 交件侧，带 file:line＋rc=）
+--- 去牙一发（派单 AC#2③ 那一发）红句逐字（截 packets 前）---
+          subagent_blocked_220_test.go:147: row "child-1" blockedOnApproval=true，期望 false； packets={"pending":[{"correlationId":"child-1x","tool":"fs.write","
+--- 改前改后四数＋还原哈希 ---
+      pristine_before: sha256=450e1d1c47ee715fb74b56116a827988b0d9bfbc261fc06748c4704b4bd87028 gitblob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb (对锚串�
+      mut-V1-boundary: RUN=7 PASS_TOP=0 FAIL_TOP=1 SKIP=0 rc=1
+      restored: sha256=450e1d1c47ee715fb74b56116a827988b0d9bfbc261fc06748c4704b4bd87028 gitblob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb
+      restored_same_as_pristine=YES
+      pristine_equals_anchor_blob=YES
+      restored2: sha256=450e1d1c47ee715fb74b56116a827988b0d9bfbc261fc06748c4704b4bd87028 gitblob=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb pristine_equals_an
+      after-panel-220table-restored: RUN=7 PASS_TOP=1 FAIL_TOP=0 SKIP=0 rc=0
+--- 成对第二发红句逐字（落点不同枚）---
+          corr_roster_join_328_test.go:124: the row for task "c69a9451-042f-4209-bd5d-bf9f70f4e1c7" reads not-blocked although a card of its own call ("c69a9451-042f-
+          corr_roster_join_328_test.go:165: a correlation the loop mints ("5cbb2a16-39e9-4cdf-8d7d-381f3e9e76f6#call_e1") does not light its own row
+          corr_roster_join_328_test.go:165: a correlation the loop mints ("5cbb2a16-39e9-4cdf-8d7d-381f3e9e76f6#call-0") does not light its own row
+--- 门禁四数 rc（重打那发，GOTMPDIR unset）---
+      d22scan_rc=0
+      gofumpt_rc=0
+      length_rc=0
+      vet_rc=0
+--- 红名册逐名作差（复跑两侧）---
+      REDROSTER_DIFF_RC=0 逐名同集（各 7 枚）
+--- 成对整包四数逐枚点名 ---
+      .scratch/wisp/probes/328/v1/logs/color-driver-raw.log:before-panel-full: RUN=257 PASS_TOP=160 FAIL_TOP=7 SKIP=0 rc=1
+      .scratch/wisp/probes/328/v1/logs/color-driver-raw.log:before-agent-full: RUN=112 PASS_TOP=88 FAIL_TOP=0 SKIP=0 rc=0
+      .scratch/wisp/probes/328/v1/logs/color-driver-raw.log:after-panel-full: RUN=268 PASS_TOP=162 FAIL_TOP=8 SKIP=0 rc=1
+      .scratch/wisp/probes/328/v1/logs/color-driver-raw.log:after-agent-full: RUN=114 PASS_TOP=90 FAIL_TOP=0 SKIP=0 rc=0
+      .scratch/wisp/probes/328/v1/logs/attribute-driver-raw.log:before-panel-full-rerun2: RUN=257 PASS_TOP=160 FAIL_TOP=7 SKIP=0 rc=1
