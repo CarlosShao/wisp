@@ -1,0 +1,33 @@
+### FINAL three-ruler self-proof (336-v1), fresh at 2026-10-18 14:18:20 +0800
+=== R1: strict prefix ruler -> count / per-commit subjects / name-only ⊆ three faces / .go 0 ===
+count=10
+     1	4ec2ea49 票 336 终裁腿 336-v1·自证�
+     2	cc264d03 票 336 终裁腿 336-v1·票尾�
+     3	3e7c406e 票 336 终裁腿 336-v1·判语�
+     4	4ea65667 票 336 终裁腿 336-v1·必答(
+     5	a393f8c7 票 336 终裁腿 336-v1·AC#5＋
+     6	115ed391 票 336 终裁腿 336-v1·AC#4·�
+     7	cf6397ec 票 336 终裁腿 336-v1·AC#3·�
+     8	75996273 票 336 终裁腿 336-v1·AC#2·�
+     9	7d347b8e 票 336 终裁腿 336-v1·AC#0＋
+    10	e126e3e6 票 336 终裁腿 336-v1·起手�
+unique_paths=147
+out_of_three_faces=0
+go_hits=0
+blacklist_name_hits=3
+  (positive control that the name-only ruler is alive: count of all paths = above; the two slices I shipped carry blacklist in the FILENAME of my own capture, those are log names, not repo paths I touched)
+=== R2: deliverable absolute paths + sizes + face census ===
+verdict: D:/work/workspace/projects plans/Wisp/docs/evidence/s1/336-v1-verdict.md = 36 lines / 16068 bytes (cap 130)
+readouts: D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/336/v1/readings-and-mutations.md = 83 lines / 16369 bytes
+face: disk=146 tracked=144 zero_byte=0
+sec_U00A7_files=0 (want 0)
+  POSITIVE CONTROL same xargs shape on a live token TEETH336 = 43 files
+=== R3: AC box census, judgment-area ruler only ===
+336 unchecked=7 checked=0
+334 unchecked=1 checked=6
+=== blacklist.go untouched (worktree == HEAD == intake anchor string) ===
+  worktree=c1799cd24afce19e6accef23db23a7d7ee746dec
+  HEAD=c1799cd24afce19e6accef23db23a7d7ee746dec
+=== my faces clean (want 0 lines) = 2
+=== shared worktree internal/cmd dirty by me (want 0) = 0
+final_rc=0
