@@ -1,0 +1,51 @@
+=== AC#4 roster gauge - FINAL (strict subject-prefix form, covers every commit of this leg) ===
+gauge = git log --format="%H<TAB>%s" feac8f77..HEAD, keep only subjects starting with the literal prefix "票 227 落地腿 227-r1·"
+allowed write set = internal/config/** UNION .scratch/wisp/probes/227/r1/** UNION .scratch/wisp/issues/227-*.md
+CAVEAT: this file cannot cover the commit that adds it (self-reference). Delivery side: re-run the gauge above.
+
+this-leg commit count = 6  (c8 measured 5; two more landed since)
+---- 9f5b0022  票 227 落地腿 227-r1·AC#4＋交件自证·名册尺更正入库＋交件侧终量门禁＋report 收口 ----
+  .scratch/wisp/probes/227/r1/logs/c10-pathlen-final.txt
+  .scratch/wisp/probes/227/r1/logs/c11-vet-final.txt
+  .scratch/wisp/probes/227/r1/logs/c8-roster-five-commits.txt
+  .scratch/wisp/probes/227/r1/logs/c9-gates-final.txt
+  .scratch/wisp/probes/227/r1/report.md
+OUTSIDE-ALLOWED-WRITES-SET = 0 []
+
+---- 32a70e2f  票 227 落地腿 227-r1·票尾一条 bullet（只追加、⛔ 翻框、⛔ 改票名/Status/-done） ----
+  .scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md
+OUTSIDE-ALLOWED-WRITES-SET = 0 []
+
+---- 6da21d4a  票 227 落地腿 227-r1·AC#3＋AC#4＋交件自证·report（四形状矩阵表＝本票交付主体）＋七枚 logs 逐枚入库 ----
+  .scratch/wisp/probes/227/r1/logs/c0-baseline-feac8f77.txt
+  .scratch/wisp/probes/227/r1/logs/c1-final-delivery.txt
+  .scratch/wisp/probes/227/r1/logs/c2-final-unmodcode.txt
+  .scratch/wisp/probes/227/r1/logs/c3-final-mu1-diverged.txt
+  .scratch/wisp/probes/227/r1/logs/c4-final-mu2-base-memory.txt
+  .scratch/wisp/probes/227/r1/logs/c5-gates-four.txt
+  .scratch/wisp/probes/227/r1/logs/c6-mu3-393-schema-red.txt
+  .scratch/wisp/probes/227/r1/logs/c7-roster-per-commit.txt
+  .scratch/wisp/probes/227/r1/report.md
+OUTSIDE-ALLOWED-WRITES-SET = 0 []
+
+---- dd0e489d  票 227 落地腿 227-r1·AC#1＋AC#2＋AC#4·定稿用例件（编排者收回 ≤160 行帽对 *_test.go 的适用，注释复原＋补一枚 AC#4 守卫） ----
+  internal/config/writeguard_handedit_227_test.go
+OUTSIDE-ALLOWED-WRITES-SET = 0 []
+
+---- 3b8c114e  票 227 落地腿 227-r1·AC#1＋AC#2·删行形状与"什么都不写"射程边界的常驻用例（internal/config 测试面） ----
+  internal/config/writeguard_handedit_227_test.go
+OUTSIDE-ALLOWED-WRITES-SET = 0 []
+
+---- b72d7391  票 227 落地腿 227-r1·AC#1③＋AC#2甲·三句日志字面串说实话（⛔ 任何逻辑分支/条件/签名/diverged 算法） ----
+  internal/config/writeguard.go
+OUTSIDE-ALLOWED-WRITES-SET = 0 []
+
+SUM of outside-allowed bytes across this leg's commits = 0  (want 0)
+
+--- positive control 1 (the subject gauge is not vacuous) ---
+same gauge aimed at ticket-336 landing commits = 14 (non-zero => the gauge really separates legs)
+--- positive control 2 (the path-set difference can fire) ---
+6da21d4a measured against internal/config/** only = 9 paths outside (non-zero => the roster gauge has teeth)
+
+--- ticket 227 box gauge (delivery side) ---
+unchecked=6  checked=0   (start-of-leg reading was 6/0 => this leg flipped nothing)
