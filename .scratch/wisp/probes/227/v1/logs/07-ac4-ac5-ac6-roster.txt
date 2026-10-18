@@ -1,0 +1,71 @@
+227-v1 AC#4 越界尺＋甲/乙那一支（本腿现量）
+
+[尺 1 逐笔名册（改正形，⛔ grep -c "^\."）]
+  for c in b72d7391 3b8c114e dd0e489d 6da21d4a 32a70e2f 9f5b0022 3cda0aef bcf90e06:
+    git show --name-only --format= $c | grep -vcE "^(internal/config/|\.scratch/wisp/probes/227/r1/|\.scratch/wisp/issues/227-)"
+  ⇒ 0 0 0 0 0 0 0 0，合计 **0**（21 枚路径全在三处写面内；.go 3 枚全＝internal/config/**）
+[尺 2 包内越界] git diff --name-only feac8f77 bcf90e06 -- internal/config
+  ⇒ 只有 writeguard.go ＋ writeguard_handedit_227_test.go 两枚 ⇒ cmd/wisp/**、internal/panel/**、winsec、
+    loader.go、migrate.go、manager.go、thresholds、golden、三枚冻结件、go.mod/go.sum 逐枚 0 字节（blob 同串，见 01）
+[尺 3 产码只动字面] 把新旧两版 writeguard.go 的**所有字符串字面抹成 <L>** 再 diff 代码骨架：
+  skeleton_old 336 行 ⇄ skeleton_new 341 行；diff 只有三处，且全在字面参数列表内：
+    152c152,155  slog.Info(<L>, → slog.Info(<L>+ <L>+ <L>+ <L>,
+    170a174      + <L>+        180a185 + <L>+
+  ⇒ 函数签名／分支条件／statOwnWrite 调用位置／diverged 算法／allowed_dirs 语义／readConfigFile 迁移行为
+    逐枚 0 处进 diff；Info⇄Warn 等级未动（:152 Info／:172 Info／:184 Warn）；"key", ownedKey 实参三处俱在（:156/:176/:190）；
+    属性名 kept_in_file_not_in_memory 新旧各 1 枚＝一字未碰。
+  新增顶层 func/var/type/const＝diff 空（rc=0）；新用例件里除 ^func Test 外无其它顶层声明＝新导出名 0。
+
+[尺 4 乙形那支确实没被塞进来（票面 AC#4 逐字"不把任何补回改成不补回以外的新行为"）]
+  loader.go:126 raw, err = applyMigrations(path, raw, ver) 在位（nl -ba 现量＝第 126 行）
+  migrate.go:93 winsec.PrivateFile(backup, raw, 0o600) ＋ :96 atomicWrite(path, data) 俱在位
+  ⇒ 迁移-on-读**仍**在重读管线内＝乙形零字节；腿把它具名交回＝对。
+  编排者那一裁（"乙＝行为变更、另立一票、⛔ 塞进票 227"）复核：
+    票面 AC#4 原文三件事＝不改判级／不动 allowed_dirs 语义／不把任何"补回"改成"不补回以外的新行为"，
+    并明写"要改成文本级 patch 式改写以保住注释＝丙的量级，另立一票"；
+    票面 AC#2 自己给了甲／乙二选一（乙＝"把迁移从这条读路径里挪出去"＝管线顺序变更）；
+    落点候选乙那段逐字承认"要连票 226 那条『管线顺序与错误文案一字未动』的承诺一起重议"。
+  ⇒ 本腿裁：编排者那一裁**没读歪**——AC#4 禁的是"顺手扩大射程"，而乙要动 loader.go 管线并重议票 226 的承诺＝
+    超出本票"加用例＋让文案说实话"的量级；票面在 AC#4 里只对**丙**明写"另立一票"，对乙**没有**明写，
+    但乙的行为面（改管线）与 AC#4 第三句直接冲突 ⇒ 另立一票＝对票面的正确读法，⛔ 把"没明写"读成"被允许"。
+    乙现在有没有家＝票 341 AC#5 逐字"⛔ 动 writeguard.go／loader.go／migrate.go 任何非注释字节…乙形属行为变更、另立一票"
+    ＝**票 341 明写它⛔ 做乙** ⇒ 乙形缺口今天在册但**无主**（具名交回编排者拍板另立一票）。
+
+[AC#5 半区读数（我自己现跑；★⛔ 整包＝cmd/wisp 那半＝待车道）]
+  台树＝treeA（交件 bcf90e06，.go 764）  尺＝go test ./internal/... -count=1 -timeout 30m -v
+  ⇒ INTERNAL_RC=1  RUN=2077 PASS_TOP=1365 FAIL_TOP=32 SKIP=8
+     github.com/CarlosShao/wisp/internal/config ＝ ok（绿，5.755s）
+  基线树＝base2（feac8f77，.go 762）同尺 ⇒ RUN=2072 PASS_TOP=1360 FAIL_TOP=32 SKIP=8 rc=1
+  ★逐名红册作差＝**diff 空**（32 枚⇄32 枚同名）⇒ 交件在 internal/** 全区**零枚新增红**（本腿自己量的，⛔ 抄腿）
+  红名归属包（按 go test 分节顺序现量）＝tools 15／panel 7／risk 6／winsec 2／models 1／ball 1
+  ⇒ 与票面 AC#5 那句"历史在册 internal/ball 1 例＋internal/panel 4 例"对不上号的地方**具名**：
+     我这发 panel 读到 7 枚、ball 读到 1 枚、risk 6 枚（含 TestResolvePerCallBudget＝票面点名的争用型假红），
+     多出的是 tools 15 枚（Ticket252* 一族 8 枚＋junction/sync 一族）与 models/winsec；
+     这些名⛔ 一枚指 internal/config ⇒ 都属别票地界；本腿⛔ 顺手修、也⛔ 判它算谁的账。
+  ★票面 AC#5 要的是 `go test ./cmd/wisp ./internal/...` 整包终态：cmd/wisp 那半本腿**零跑**
+     ＝派单明令⛔ 跑 ./cmd/wisp 整包、车道归编排者排程 ⇒ 具名标"待车道"交回编排者，⛔ 算腿的欠账、⛔ 算本腿的红。
+
+[AC#6 静态现读（本腿自己跑的尺）]
+  cmd/wisp/always_write_no_clobber_226_test.go:43-44 在 HEAD 仍逐字＝
+     "// The edit lands after assembly, while the process is running and nothing" / "// polls: [app] theme, …"
+  该件 blob feac8f77＝bcf90e06＝HEAD 三枚同串 5fde7930… ⇒ 自 227-r1 交件后没人改过这句。
+  248095d1 是 HEAD 祖先（git merge-base --is-ancestor ⇒ YES）；config_reload.go:92 configReloadPollInterval = time.Second、
+     :136 time.NewTicker(configReloadPollInterval)、:148 rt.reloadOnce() ⇒ 生产 tick 已接线。
+  ⇒ **:43-44 那句"nothing polls"是假的＝成立（本腿独立复现票面 AC#6 要求①）。
+  :102 那条断言（rt.mgr.Config().App.Theme != "dark" ⇒ Errorf "reading a hand edit back is ticket 223"）现读在位。
+  ★本腿新量到的一件（腿与编排者都没报）：internal/config/tiers.go:47 逐字 "app.theme": "hot"
+     ⇒ 这把尺**顶票面**：热档的语义＝换进内存，而 :102 断**不**换 ⇒ 票面"它 :102 断的方向与 D36 热档相反"
+       本腿独立复现＝成立（不是相反方向读错，是 tiers.go 那行逐字支持票面）。
+     ⇒ 票面那条 09-29 更正的第二半也复现：今天它绿的真实原因＝**没人钉**（⛔ 拿时序当依据）——
+       本腿尺：git grep reloadOnce ⇒ 非测试文件只有 config_reload.go:148 与 :156 两处，
+       always_write_no_clobber_226_test.go 里⛔ 驱动真 tick 的东西（它走的是包内裸 Manager＋rtHook），
+       所以那一发根本⛔ 经过轮询路径 ⇒ 它绿＝它测的不是自己，⛔ 证"手改在真轮询下仍看得见"。
+  ★而"真轮询之下手改仍看得见"那一跳，本腿量到**已有**一枚常驻用例钉住（热档另一枚键）＝
+     cmd/wisp/config_reload_223_test.go:333 TestTicket223RunArmsTheReloadTick：
+     awaitAudit "config: HOT-RELOAD state=armed"（含 goroutine=watchdog）⇒ :353 种 [ball] size=64
+     ⇒ awaitAudit "state=applied" ＋ :358 断 mgr.Config().Ball.Size == 64＝真 tick 下热档手改被看见。
+     ⚠ 本腿⛔ 跑 cmd/wisp 那包 ⇒ 这一枚只算**静态存在性**读数（名册尺：^func Test 起始行＝:333 现量），
+     它的颜色归 cmd/wisp 车道（待编排者）。
+  ⇒ 本腿裁 AC#6＝**部分成立**：要求①（把 :43-44 那句 nothing polls 改准）＝**未做**（HEAD 仍逐字假话）；
+     要求②（补常驻用例）＝热档那一跳已有票 223 那枚钉住（另一枚键），
+     ⛔ 拿它当"颜色已过"的凭据——缺的那一发＝cmd/wisp 整包终态读数＝**待车道**，交回编排者。
