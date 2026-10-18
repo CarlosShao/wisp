@@ -1,0 +1,31 @@
+派单＝票 341 终裁腿 341-v1（非实现者裁决腿·只读产码）｜编排者＝新任 harness｜发出 2026-10-18 23:2x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 你是谁
+你是票 **341** 的**终裁腿**（裁决者≠实现者）。实现腿＝`341-r1`（写腿，已交件、名册 6 笔、新测试件 `internal/config/writeguard_unnailed_341_test.go` 389 行／5 枚 `^func Test`）。
+★你是盘上第一枚 `341-v*`（编排者 23:1x 现跑尺＝`git log --all --grep='票 341 终裁腿 341-v1'`＝0 笔、`.scratch/wisp/probes/341/v1` 不存在）。
+你的写面**只有三处**：`docs/evidence/s1/341-v1-verdict.md` ＋ `.scratch/wisp/probes/341/v1/**`（短名、⛔ U+00A7 那枚字符、逐枚非 0 字节、⛔ `.out` 扩展名）＋票 341 末尾**一条**只追加 bullet。⛔ 任何 `.go` 字节、⛔ 翻框、⛔ 改票名／`Status:`／加 `-done`。
+
+## 要裁什么
+票面＝`.scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md`（43 行，判据区七格一枚未翻：`^- [ ] **AC#`＝7、`^- [x]`＝0）。
+靶子＝实现腿给票 227 如实报"仍未覆盖"的四格（**P2／P3／P5／P6**）各补了一枚常驻用例、每格自带去牙反形。★你要**独立复核这张四格表是不是真的**——不是信腿的表，是你自己逐格重跑去牙那一发、看目标用例红不红、正控绿不绿。
+
+## 编排者已做的（⛔ 当你的凭据，你要自己复跑）
+我为收件跑了三把尺、其中 P6 那一发**我从零重打过**（仓外导出树、⛔ 复用腿的树）：未突变 `195/114/0/0 rc=0`；落刀 P6（`loader.go:213 p.BaseURL = pre.BaseURL`→`""`）⇒ 目标 `TestHandDeletedProviderBaseUrlComesBackAsThePresetValue` **红**、★P6 正控 `TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile` **仍绿**、红名册恰 2 枚（目标＋既有 `TestLoadFilePresetInheritance`）、还原哈希 `9100ba92…` match=YES。⇒ **这只证了我复跑的那一发**。P2／P3／P5 三格的去牙**你必须自己逐格重打**（⛔ 抄我、⛔ 抄腿）；★尤其 `AC#1` 明写"每格自带去牙反形、成对两发落点必须不同"＝四格四落点逐一验落点互不相同。
+
+## 起手（第一笔，⛔ 跳过）
+1. `git log -1 --format='%H %s'`＋`git status --porcelain -- internal/config cmd/wisp`（internal/config 自 `341-r1` 交件应空；现验并把读数入库）。
+2. ★名册尺＝**逐枚 hash** 取前缀 `票 341 落地腿 341-r1·`（⛔ 子串形＝今天第九次混册、连编排者自己的存档笔都吃进去过＝`A1030`/`A1040`/`A1042` 定式）。腿报 6 笔：`6948eb08`（测试件）／`fd82f786`／`f710d104`／`920537ee`（票尾 bullet）／`46c920c8`／`cef2a6c9`。逐枚 `git show --name-only` 对回写面。
+3. 逐枚重跑票面「现量」四行＋腿的 `AC#0` 那张"今天到底哪几格有用例"尺（⛔ 抄腿的表；P1／P4／P5′ 三枚是票 227 已有、P2／P3／P5／P6 是本票新补、要逐格现量"有没有任何 `*_test.go` 真断这一形"）。
+4. ★**先读 `341-r1` 的 report 第 9 节（事故）**＋票尾那条 bullet：它自报两处（① 交票尾那笔用了内联命令、bash 双引号里含反引号＝命令替换、把 git 输出行当命令跑、副作用＝仓库根 4 枚 0 字节乱码件 mtime 22:55；② 一次 `git commit -F` 挂 240s 被杀、期间 7 枚文件暂存在共享 index＝A1027 反向风险真出现过、后改 `GIT_EDITOR=true`＋逐枚字面 pathspec 重试）。★编排者已独立复跑坐实这两件（那 4 枚乱码件在盘、三枚禁区产码 blob 锚 `0ebc415b`/`9100ba92`/`78d85e22` 逐枚 True＝产码一字未动、票尾 numstat 1/0 纯追加、它那 7 枚暂存件现已全部提交不在 index）。你的活＝**裁这些是否影响任何一格判据的成立**（我的预判＝都不影响判据、属纪律面、登记⛔ 退件），⛔ 拿它当"这腿不可信"、也⛔ 无视。
+
+## 必读料（具名件）
+- 票 341 全文（七格逐格读正文＝你的合同）。
+- 实现腿交件＝`.scratch/wisp/probes/341/r1/report.md`（起手读数／名册尺／AC#0 现量表／四格逐格表／颜色门禁／第 9 节事故）＋`report-answers.md`（必答五条）＋`logs/**`（尤其 `05-mu-*` 四格去牙逐发、`06`/`07` 改前红句、`15` 末段 P3⇄P2 交集 0 计数、`19` 乱码件名册、`20`/`21` 三把尺自证＋逐条更正、`22` 挂起善后）。
+- 新用例本体＝`internal/config/writeguard_unnailed_341_test.go`（读五枚用例的断言方向、⛔ 只看腿的表）。
+- 参照配方＝`internal/config/writeguard_handedit_227_test.go`（票 227 已钉的 P1／P4／P5′，★尤其 `:92` 附近——腿报 P4 命中 0 是它自己一把锚转义坏的尺、真载体在这）。
+
+## 写面与车道（⛔ 抢）
+- 你只读产码＋可跑 `./internal/config/` 的色。★本波 `cmd/wisp` 整包⛔ 跑（那面无人持有但你⛔ 动它＝票 341 `AC#4` 明写"⛔ `./cmd/wisp` 整包、车道按波次排"）。
+- 在飞另有 `343-r1`（写·`internal/risk/blacklist.go` 注释面）＝⛔ 你动 `internal/risk`、⛔ 与它同刻读同一包。你的色只取 `./internal/config/`。⛔ `go test ./...`。
+- 台面＝`git archive <具名锚>` 仓外导出树（八件套＋`docs/`＋手工三件；`.go` 先数非空）；树落 `D:\tmp\wisp\20261018\341v1\<台名>`（⛔ 任何盘符根、⛔ 删任何东西＝临时件只建不删）。★仓外树跑 Windows `.exe` 取 DLL 时 `PATH` 必须 `cygpath -w`＋`;`（⛔ POSIX 形＝会造"零枚 `--- FAIL` 的整包死"＝台损非判据，`A1042` 定式）。
+- 突变只打在**仓外导出树物理字节**、⛔ 跟踪件、⛔ `-overlay`；内容锚⛔ 行号；每发落刀前验旧锚命中＝期望、落刀后旧锚＝0 且新锚≥1、跑前跑后各验一次 pristine 哈希、报还原哈希。⛔ 信跨 shell 的 echo、两发串行。
