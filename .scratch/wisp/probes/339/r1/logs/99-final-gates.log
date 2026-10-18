@@ -1,0 +1,28 @@
+# 339-r1 交件末态门禁四数（共享工作树，跑前 unset GOTMPDIR TMPDIR TEMP TMP＝票 311 AC#1 shape B GUARD 定式）
+# 打在【我全部落码后的盘上字节】＝report 里那句 rc=0/0/0/0 的原件尺。
+
+## gofumpt -l internal/risk/anchor_miss_reason_334_test.go internal/risk/anchor_miss_reason_339_other_test.go
+（输出＝空＝两枚都 clean）
+gofumpt_rc=0
+
+## sh scripts/d22scan.sh（尾三行）
+d22scan: scope ban #8 internal/         examined 591 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=591, ban #8 cmd/=143
+d22_rc=0
+（我的两枚在 internal/ 的 591 枚分母内、⛔ offender）
+
+## sh scripts/check-path-length-budget.sh（尾两行）
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+len_rc=0
+
+## go vet ./internal/risk/
+（空输出＝clean）
+vet_rc=0
+
+## EOL 尺（交件侧＝i/lf）
+i/lf w/lf attr/text eol=lf  internal/risk/anchor_miss_reason_334_test.go
+i/lf w/lf attr/text eol=lf  internal/risk/anchor_miss_reason_339_other_test.go
+i/lf w/lf attr/text eol=lf  .scratch/wisp/issues/339-...md
+（★更正本件第一稿那句：交件时刻盘上 **没有** CR-only 假脏枚＝尺 git diff --name-only ⇄ git diff --ignore-cr-at-eol --name-only 作差现跑＝**0 枚**、git status M 行＝0。派单预登记的"本机 4 枚 CRLF 存量假脏"今天没咬到我这腿＝编排者 14:5x 那笔把 finish-close.sh 自己补入库了（bd1baff2）。⛔ 动别人件，此句以现跑为准。）
