@@ -12,8 +12,13 @@
 | `b72d7391` | AC#1③＋AC#2甲·三句日志字面串说实话 | `internal/config/writeguard.go`（`8/3`） |
 | `3b8c114e` | AC#1＋AC#2·常驻用例 | `internal/config/writeguard_handedit_227_test.go`（`227/0`） |
 | `dd0e489d` | 定稿用例件（编排者收回 ≤160 帽对 `*_test.go` 的适用） | 同上（`52/84`） |
-| 本笔 | report＋logs 入库 | `.scratch/wisp/probes/227/r1/**` |
-| 末笔 | 票尾一条 bullet | `.scratch/wisp/issues/227-*.md` |
+| `6da21d4a` | report（本件）＋八枚 logs 入库 | `.scratch/wisp/probes/227/r1/**`（9 files＝本件＋c0…c7） |
+| `32a70e2f` | 票尾一条 bullet | `.scratch/wisp/issues/227-*.md`（`2/0`＝只追加） |
+
+★末笔＝**本行所在的这一笔**（report 终量笔：补上 `6da21d4a`/`32a70e2f` 两枚交件号＋名册尺终量）。它的提交号
+⛔ 在这里预先写死＝**尚未存在的号不能当凭据**；收件时请现读 `git log -1` 与本件同看。
+名册尺终量＝`logs/c8-roster-five-commits.txt`：逐笔 `internal/config/**`＋`.scratch/wisp/probes/227/r1/**`＋票 227
+之外＝**零字节**。
 
 `internal/config/**` 与 `.scratch/wisp/probes/227/r1/**` 与票 227 之外＝**零字节**（尺见 logs/`c7-roster-per-commit.txt`）。
 
@@ -103,6 +108,16 @@ P2／P3／P5／P6 四行**如实报未覆盖**（AC#4 不许顺手扩大射程�
   ／`sh scripts/d22scan.sh` rc=0 clean／`sh scripts/check-path-length-budget.sh` rc=0 VERDICT GREEN／
   `go vet ./internal/config/` rc=0。★本机 6 枚 CRLF 存量脏＝**别腿件，本腿一枚没重排**（具名登记，⛔ 动）。
 - ⛔ 突变那两发未碰任何跟踪文件；`c6` 那发在仓外树上改 fixture 后**当场还原**。
+- 交件侧**终量**门禁（本腿最后一枚件定稿后复跑）＝`logs/c9-gates-final.txt`（d22scan rc=0 clean＋gofumpt 空输出 rc=0）
+  ／`logs/c10-pathlen-final.txt`（分母 15570 tracked、over-budget 60 全在册、not in roster 0、rc=0）
+  ／`logs/c11-vet-final.txt`（rc=0）。⚠ 读 `c9` 别把里面的 `1 finding(s)` 当红：那六行 rc=1／rc=2 全部来自
+  **d22scan 自带的 self-test**（故意 seeded violation，件内正读＝`--- PASS: TestBuiltBinaryGoesRedEndToEnd`），
+  真判据是末行逐字 `d22scan: clean - no D22 ban violations`＋`d22scan rc=0`。
+- ★名册尺更正：`logs/c8-roster-five-commits.txt` 头四行写明——第一发用 `git log --grep='227-r1'` 量到的名册
+  **不干净**（把别腿正文里提到本腿名的笔也吃进来＝336-r1／编排者收工笔），那把尺**作废**（⛔ 删，只建不删），
+  改用严格 subject-prefix 尺 ⇒ 本腿 5 枚、逐枚「允许写面之外字节」合计＝**0**，且带两枚正控证明这把尺⛔ 空转
+  （同尺打 `票 336 落地腿 336-r1·`＝14 枚非零；把 `6da21d4a` 只按 `internal/config/**` 量＝9 枚非零⇒尺能开火）。
+- 票面框尺（交件侧，`c8` 末行）＝未勾 **6**／已勾 **0**＝与起手读数逐字相同 ⇒ **本腿一枚没翻**。
 
 ## 欠账（具名交回编排者，本腿⛔ 自行扩面）
 
