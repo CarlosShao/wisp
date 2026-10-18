@@ -1,0 +1,5 @@
+--- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under 
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.355s
+FAIL

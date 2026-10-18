@@ -1,0 +1,52 @@
+time=2026-10-18T11:19:41.089+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAnchorFallbackTeethPerAnchor336
+=== RUN   TestAnchorFallbackTeethPerAnchor336/git-credentials
+    anchor_fallback_teeth_336_windows_test.go:153: TEETH336 operand=git-credentials class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-under
+    anchor_fallback_teeth_336_windows_test.go:134: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of %APPDATA%\wisp\config.toml carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:137: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:140: an A deny carried by %APPDATA%\wisp\config.toml was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:143: the reason must name THIS anchor "%APPDATA%\\wisp\\config.toml" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:146: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:153: TEETH336 operand=wisp-config-under class=B matched=false clause=false
+    anchor_fallback_teeth_336_windows_test.go:158: the branch is NOT what fires %APPDATA%\wisp\config.toml here (uncertainAnchorMiss=false): removing it could not turn this tooth red
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-eq
+    anchor_fallback_teeth_336_windows_test.go:153: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/ssh
+    anchor_fallback_teeth_336_windows_test.go:153: TEETH336 operand=ssh class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/ssh/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/aws
+    anchor_fallback_teeth_336_windows_test.go:153: TEETH336 operand=aws class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/aws/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/kube
+    anchor_fallback_teeth_336_windows_test.go:153: TEETH336 operand=kube class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/kube/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/dpapi-protect
+    anchor_fallback_teeth_336_windows_test.go:153: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/local-credentials
+    anchor_fallback_teeth_336_windows_test.go:153: TEETH336 operand=local-credentials class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain
+--- FAIL: TestAnchorFallbackTeethPerAnchor336 (0.19s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/kube (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/kube/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.355s
+FAIL
