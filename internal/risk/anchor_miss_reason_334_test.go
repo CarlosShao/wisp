@@ -1,3 +1,5 @@
+//go:build windows
+
 package risk
 
 import (
@@ -8,6 +10,24 @@ import (
 	"testing"
 )
 
+// Ticket 339 shape A: this instrument is windows-tagged because its world is
+// un-buildable on POSIX for a reason in the resolver, not in the environment.
+// formsOf (pathresolver.go:345) can only fill pathForms.root through
+// resolveHandle, and on the other platform that is the documented stub
+// pathresolver_other.go:10 returning ("", false) for every spelling - measured
+// (readings named PROBE339, .scratch/wisp/probes/339/r1/logs/probe339-posix-root
+// .log): walking a real existing directory through formsOf on linux gives
+// root == "". uncertainAnchorMiss (blacklist.go:359) needs a NON-EMPTY root on
+// both sides, so R17's fail-closed clause cannot fire there and the
+// non-overridable A that AC#1/AC#2 pin has no world on that platform. Un-tagged,
+// the two fail-closed cases are permanently red (ticket 334's Linux CI leg going
+// red = the ticket 339 report). The environment is NOT the cause: this file's
+// world builder sets HOME as well as USERPROFILE, os.UserHomeDir reads HOME on
+// POSIX, and the ticket's original "USERPROFILE is Windows-only, so the fake
+// home is never read" diagnosis was re-measured false (AC#0). The named POSIX
+// half (the mechanism + a tripwire that goes red the moment a POSIX resolver
+// lands) is anchor_miss_reason_339_other_test.go.
+//
 // Ticket 334. Two things multiply into one dishonest rejection:
 //
 //   - pathExists (pathresolver.go) is deliberately fail-toward-exists: only a
@@ -25,7 +45,9 @@ import (
 //
 // The worlds below are built, not inherited from the host: every A-anchor leaf
 // is either installed by name or deliberately absent, so both the over-strict
-// shape and the honest-match shape are decidable on every machine.
+// shape and the honest-match shape are decidable on every WINDOWS machine (the
+// over-strict shape needs a resolved root, which POSIX does not supply - see
+// the ticket 339 note above).
 
 const (
 	// U+001B then U+202E (written as its UTF-8 bytes so this file stays
