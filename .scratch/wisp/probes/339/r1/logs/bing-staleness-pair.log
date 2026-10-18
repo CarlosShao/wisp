@@ -1,0 +1,11 @@
+# 丙形 staleness 成对尺：go test -list 点名，甲前（基线树，两枚必须在＝正控）⇄ 甲后（final 树，两枚随档下线）。
+## label=before-jia tree=/d/tmp/wisp/20261018/339r1/linux/tree
+  name=TestAnchorMissReasonNamesCandidateAndMissingAnchor in_linux_test_binary=1
+  name=TestAnchorMissKeepsNonOverridableClassAndNeedL2 in_linux_test_binary=1
+  name=TestAnchorMissHasNoWorldOnThisPlatform339 in_linux_test_binary=0
+== before-jia done rc=0
+## label=after-jia tree=/d/tmp/wisp/20261018/339r1/linux/final
+  name=TestAnchorMissReasonNamesCandidateAndMissingAnchor in_linux_test_binary=0
+  name=TestAnchorMissKeepsNonOverridableClassAndNeedL2 in_linux_test_binary=0
+  name=TestAnchorMissHasNoWorldOnThisPlatform339 in_linux_test_binary=1
+== after-jia done rc=0

@@ -1,0 +1,12 @@
+# 甲-naive 形＝整枚 334 文件直接加 //go:build windows、夹具不搬。Linux 档 go vet 现跑（容器 golang:1.27，配方同 linux.sh）。
+# 用途＝AC#1 甲形代价读数：证明夹具（hostile334/candidateOffAnchorChain334/world334/newWorld334/wispCfgLeaf334）被 POSIX 侧的 anchor_fallback_teeth_336_other_test.go 与 name_claim_two_arm_216_test.go 依赖，整档一关＝Linux 编译坏。
+# github.com/CarlosShao/wisp/internal/risk
+# [github.com/CarlosShao/wisp/internal/risk]
+vet: internal/risk/anchor_fallback_teeth_336_other_test.go:73:30: undefined: hostile334
+VET_RC=1
+# github.com/CarlosShao/wisp/internal/risk [github.com/CarlosShao/wisp/internal/risk.test]
+internal/risk/anchor_fallback_teeth_336_other_test.go:73:30: undefined: hostile334
+internal/risk/name_claim_two_arm_216_test.go:89:9: undefined: candidateOffAnchorChain334
+FAIL	github.com/CarlosShao/wisp/internal/risk [build failed]
+FAIL
+TESTBUILD_RC=0

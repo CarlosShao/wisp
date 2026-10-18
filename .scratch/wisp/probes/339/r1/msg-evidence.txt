@@ -1,0 +1,5 @@
+票 339 落地腿 339-r1·证据入库（report 三形表＋两平台成对 logs＋台件脚本＋具名停手件）
+
+report.md＝102 行：AC#0 起手现跑（两枚红逐字复现＋★第三枚红 TestC26RewriteAccount…＝平台中性存量⛔ 本票射程）；AC#1 三形代价表（甲＝拆分形＋Linux 分母逐名 199⇄195；乙＝现量做不到＝PROBE339 root 恒空、硬做即动产码＝head line 5 停手；丙＝staleness 成对尺实测与甲互斥＝甲后 ledger 行当场 stale）；AC#2 去牙三发串行（Windows 22/3/0/0 rc=0 ⇄ 摘 aRelates 尾行 22/0/3/0 rc=1 逐名红 ⇄ 还原 22/3/0/0，blacklist.go 还原哈希 c1799cd2 match×3；Linux 去牙 RC=0 PASS=1＝绊线不假红；绊线敏感度另尺＝resolveHandle 换可解析⇒:140/:143 点名红、还原 37c42e94 match=YES）；AC#4 两平台成对四数＋名册逐名作差（Windows base⇄final 逐字相同）；门禁 rc=0×4；必答 (i)-(iv)；★自纠记我一枚＝rm -f 删过自己未入库的中转件（两批、具名⛔ 掩盖）。
+
+logs/**＝17 枚逐枚非 0 字节⛔ 分节符（带正控尺 0 命中）；01-blocked-bing-not-reachable.log＝具名停手件（最小缺口逐枚 file:line）。

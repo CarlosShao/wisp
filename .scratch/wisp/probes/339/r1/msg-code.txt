@@ -1,0 +1,5 @@
+票 339 落地腿 339-r1·AC#1 甲形落码＝334 仪器加 windows 档＋POSIX 侧具名绊线
+
+现量（⛔ 抄票面）：票面机制句"t.Setenv("USERPROFILE") 在 Linux 不生效"在 e6fd0f50 上已过期＝该件 :86（我改后 :107）同发已设 HOME，假主目录在 POSIX 照常生效（绊线件里 homeS==profile 自证）。真机制＝pathresolver_other.go:10 resolveHandle 恒 ("",false)⇒formsOf 两侧 root 恒空⇒uncertainAnchorMiss（blacklist.go:360 要两侧 root 非空）结构不可达⇒判不出 A（Linux 容器整包＝FAIL 3 枚：票面两枚逐字复现＋TestC26RewriteAccount…＝A380 在册存量、两平台同红、⛔ 同族、⛔ 本票射程）。只读探针 PROBE339 读数＝logs/probe339-posix-root.log。
+
+甲形：整枚加档⛔ 可用＝夹具名册（hostile334/world334/newWorld334/candidateOffAnchorChain334/wispCfgLeaf334）被 POSIX 侧 anchor_fallback_teeth_336_other_test.go:73 与 name_claim_two_arm_216_test.go:89 逐名依赖，go vet 现跑 undefined 两枚＝logs/jia-naive-buildbreak.log。⇒ 拆形＝334 断言区留本件加 //go:build windows；夹具块在无档新件 anchor_miss_reason_339_other_test.go 逐字节复制（⛔ 动 336/216 一字），并带具名 POSIX 读数＋绊线 TestAnchorMissHasNoWorldOnThisPlatform339：root 一出非空即红＝真解析器落地时必须把牙齿搬过来的时刻（同 336 other 半格定式）。⛔ 动产码／判级／门控语义／豁免键；⛔ 放宽断言＝那两枚 A 断言与三句承重原样进 windows 档，POSIX 侧新增的是"这里没有世界"的点名读数，不是把 want A 改口。

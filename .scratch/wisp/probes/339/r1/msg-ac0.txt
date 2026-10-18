@@ -1,0 +1,9 @@
+票 339 落地腿 339-r1·AC#0 起手现跑入库（两平台成对基线＋台件）
+
+起手锚＝git log -1 现认 e6fd0f50（HEAD 已漂到 d8c52982，但 internal/risk 与票 339 逐字未动＝尺 git diff e6fd0f50 HEAD -- internal/risk/ 空）。
+
+Linux 容器（golang:1.27，我自己建的仓外导出树 tree.sh，⛔ 复用编排者那棵；module 缓存只读挂；MSYS_NO_PATHCONV=1）：go test ./internal/risk/ 整包 -count=1 -v ⇒ rc=1，RUN=199 PASS_TOP=114 FAIL_TOP=3 SKIP=1。三枚红＝TestAnchorMissReasonNamesCandidateAndMissingAnchor（:131/:156 两枚子用例）＋TestAnchorMissKeepsNonOverridableClassAndNeedL2（:193/:197/:201 三句）＋★第三枚 TestC26RewriteAccountIsConsumedAtEverySecurityLeg（两平台都红、读 internal/panel 源码＝平台中性、⛔ 同族 USERPROFILE、⛔ 本票射程）。台面故障名册（walk/build failed/no test files/setup failed/creating work dir）＝无。
+
+Windows 本机（PowerShell 原生 win.ps1，仓外导出树同锚）：⛔ 首用 Git Bash⇒MSYS 把 TMPDIR 改成 D:/tmp 混分隔符＋mklink 坏开关＝台面故障，作废（win-ac0-fullpkg.log 留存具名）。原生重跑⇒rc=1，RUN=247 PASS_TOP=140 FAIL_TOP=1 SKIP=1；两枚 334 仪器在 Windows 全绿。
+
+★票面机制更正（现量）：HEAD blob :86 已 t.Setenv("HOME", profile)，票面"USERPROFILE 在 POSIX 不生效⇒世界造不出来"过期。真机制＝pathresolver_other.go:10 resolveHandle 恒返回 ("",false)⇒任何拼写在 POSIX 都拿不到 root（PROBE339 具名读数）⇒uncertainAnchorMiss 需两侧 root 非空⇒回落支在本平台结构上不可达⇒判级落 B。这不是假主目录的问题，是解析器的问题（⛔ 本票动）。

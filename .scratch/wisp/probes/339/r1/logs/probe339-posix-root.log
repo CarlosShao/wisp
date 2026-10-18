@@ -1,0 +1,18 @@
+# 乙形可行性只读探针（ZZ339probe，⛔ 断言、只打印）：Linux 容器 golang:1.27，基线树 e6fd0f50＋探针件。
+# 读数＝在 POSIX 上 formsOf 走真存在的目录／假主目录／缺位锚叶子都拿不到 root；uncertainAnchorMiss 恒 false；Classify 恒落 B。
+# 用途＝AC#1 乙形代价：造不出两平台都成立的世界，除非 pathresolver_other.go:10 的 resolveHandle 不再是 stub（＝动产码，⛔ 本票禁区）。
+time=2026-10-18T08:39:31.162Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+=== RUN   TestZZ339ProbeRootsOnThisPlatform
+    zz339probe_test.go:22: PROBE339 goos=linux profile=/tmp/gt/TestZZ339ProbeRootsOnThisPlatform3623298308/001/profile
+    zz339probe_test.go:23: PROBE339 cand raw="/tmp/gt/testzz339proberootsonthisplatform3623298308/001/profile/work/id_ed25519已允许\x1b\u202e" real="" root="" partial=false certain=false
+    zz339probe_test.go:24: PROBE339 anchor(aws, absent leaf) real="" root="" certain=false
+    zz339probe_test.go:25: PROBE339 anchor(git-credentials, installed) real="" root="" certain=false
+    zz339probe_test.go:26: PROBE339 uncertainAnchorMiss(cand,aws)=false
+    zz339probe_test.go:27: PROBE339 Classify(cand)=B
+    zz339probe_test.go:29: PROBE339 Gate class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    zz339probe_test.go:32: PROBE339 formsOf(existing dir) real="" root=""
+    zz339probe_test.go:34: PROBE339 formsOf(profile) real="" root=""
+--- PASS: TestZZ339ProbeRootsOnThisPlatform (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.020s
+PROBE_RC=0

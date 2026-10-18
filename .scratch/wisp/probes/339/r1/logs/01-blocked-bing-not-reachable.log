@@ -1,0 +1,19 @@
+339-r1·具名停手上报（未定义即停格＝head line 5：判明"要让两平台都成立必须动产码解析器"⇒停手上报、不自行扩面）
+
+问题＝票 339 AC#2 那句"修好后的仪器必须在两平台都点名红（去牙反控）"在本票写面内不可达。
+最小缺口（file:line，全部现跑）：
+- internal/risk/pathresolver_other.go:10 —— resolveHandle(p) 在 POSIX 恒返回 ("", false)。
+  ⇒ pathresolver.go:345 formsOf 的 f.root/f.real 在 POSIX 对任何拼写都留空（只读探针逐字读数
+  ＝logs/probe339-posix-root.log：真存在的目录、假主目录、装上的锚叶子，real/root 全＝""）。
+- internal/risk/blacklist.go:359-361 —— uncertainAnchorMiss 先判 cand.root==""||anchor.root==""
+  即 return false。⇒ R17 回落支在 POSIX 对任何输入结构不可达＝A 形（非豁免拒绝）在 Linux
+  没有任何"造得出的世界"；t.Setenv 管不到这一维（HOME 已设＝假主目录在 Linux 已生效，AC#0 复量）。
+⇒ 后果：(a) 票 334 断言在 Linux 只能"存在世界才跑得动"＝要么产码落 POSIX 解析器（本票禁区，
+属改判级地基＝契约邻接、须人工批准另立票），要么仪器只在世界存在的那一平台带牙＝本腿交的甲形。
+(b) AC#2"两平台都点名红"只对乙形（产码）可达：本腿实测甲形落码后去牙一发在 Linux 咬不红
+任何仪器（logs/linux-ac2-deteeth.log：RC=0、PASS=1、FAIL=0＝绊线不假红、也不真红），
+在 Windows 三枚点名红（logs/win-ac2-deteeth-fallback.log）。绊线自身敏感度另立一尺已证
+（logs/tripwire-sensitivity.log：把 resolveHandle stub 换成可解析⇒绊线 :140/:143 当场点名红、
+还原哈希 match=YES）＝"搬牙时刻"会被绊线点名抓住，不是装饰。
+处置＝不扩面、按 head line 5 具名上报；继续做不依赖它的格（AC#0/#1/#3/#4/#5/#6 全部照常交）。
+裁与不裁归编排者；若裁乙，落点＝POSIX resolveHandle 真实现（另票），本腿字节可被后笔覆盖、⛔ 改写历史。
