@@ -1,0 +1,28 @@
+anchor (git log -1, own reading) = a1c6eeda 16:27 票 227 终裁腿 227-v1·交件自证终尺（名册尺一枚本腿自己�
+
+== roster cross-check (listed vs derived) ==
+  listed=7  derived=7
+  two-way difference = 0 (want 0)
+
+== per-commit out-of-scope ruler (corrected form) ==
+  173796c4  paths=1   outside=0 .go=0
+  a13c87fa  paths=16  outside=0 .go=0
+  88338d6a  paths=22  outside=0 .go=0
+  bc4a3fbb  paths=29  outside=0 .go=0
+  65558bb1  paths=7   outside=0 .go=0
+  761681de  paths=16  outside=0 .go=0
+  a1c6eeda  paths=7   outside=0 .go=0
+  union paths=96  .go=0  outside=0
+
+== subject-prefix ruler (polluted; reported for the orchestrator, ⛔ this leg's key) ==
+  total=15  mine=7  foreign=8
+
+== ticket + verdict gauges ==
+  AC-unchecked=6 AC-checked=0 my-v1-bullets=1
+  verdict lines=36 (cap 130) bytes=18358
+  slot ruler verdict=0 (want 0) | posctrl=5 (want >0)
+  zero-byte over my 7 commits' files = 0 (want 0)
+
+== absolute paths of deliverables ==
+  D:\work\workspace\projects plans\Wisp\docs\evidence\s1\227-v1-verdict.md
+  D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\227\v1  (logs\ + scripts\)

@@ -1,0 +1,12 @@
+227-v1·外腿在飞件增量续记第二枚（接 `25-foreign-inflight-increment.log`，同一族，逐枚 mtime 现跑）
+时间＝2026-10-18 16:2x
+
+`git status --porcelain -uall -- <本腿三处写面>` 现跑，本腿⛔ 写、⛔ 提交、⛔ 引为凭据的外来件名册（按 mtime 排）：
+- `logs/08-answer-iv-sentences.txt`（＝外腿必答 (iv) 的回答件；本腿同题那枚叫 `08-ac6-fix-and-iv-gauges.txt`＝⛔ 同名同内容）
+- `logs/09-probe-dump-source.txt`  6,590 字节  mtime 16:18:42
+- `logs/10-gates-four.txt`          1,853 字节  mtime 16:18:21
+（编号与外腿已入库那 8 枚 `00-*`…`07-*` **逐枚连续**＝同一位写者的序列在长；本腿的序列⛔ 这形＝`00-start-gauges`/`01-base-*`/`01-deliv-*`/`03-mu1`/`04-mu2`/`05-mu2b`/`06-ac3-shape-census`/`07-ac6-readings`/`08-ac6-fix-*`/`09-mua`/`09-mub`/`10-gates-final`/`11-*`…`29-*`，两边⛔ 一枚撞名，见 `logs/29-collision-check.txt` 的"交集＝0 枚"。）
+
+本腿处置（与前四枚同规，⛔ 自行扩面）：⛔ 删 ⛔ 改 ⛔ 挪 ⛔ 提交 ⛔ 读它当凭据；名册会长＝本腿⛔ 追着登记每一枚新到达（＝⛔ 终点），故本腿在判语件里把那句**改成指向本件**（⛔ 硬枚数），并具名交编排者一把可重跑的尺：
+`git status --porcelain -uall -- .scratch/wisp/probes/227/v1 | awk '{print $2}' | grep -vE '(00-start-gauges|01-(base|deliv)-config|0[3-9]-(mu|mua|mub|ac3|ac6|one)|1[0-9]-|2[0-9]-|probe-227v1|msg-m|run[0-9]+-)'`
+⇒ 剩下那些＝外腿在本腿写面里的字节，处置权⛔ 本腿（⛔ 代它提交＝今天两枚越界代提的根因）。

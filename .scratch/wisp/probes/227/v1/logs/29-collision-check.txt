@@ -1,0 +1,32 @@
+== the duplicate leg's 8 commits, and the paths each added ==
+  d1da6386  16:07 票 227 终裁腿 227-v1·起手·三把尺入库（锚现认／
+      .scratch/wisp/probes/227/v1/logs/00-start-anchors.txt
+  daec56ac  16:07 票 227 终裁腿 227-v1·台面·两棵仓外导出树＋pristi
+      .scratch/wisp/probes/227/v1/logs/01-table-and-pristine.txt
+  73dac93c  16:10 票 227 终裁腿 227-v1·AC#2·决定性那一发我自己重�
+      .scratch/wisp/probes/227/v1/logs/02-ac2-decisive-shot.txt
+  69ce6600  16:10 票 227 终裁腿 227-v1·AC#2·ⓐ那枚 1 行号差＝落盘�
+      .scratch/wisp/probes/227/v1/logs/03-blocked-linegap.txt
+  57eb72cf  16:10 票 227 终裁腿 227-v1·AC#1·五枚在未突变交件树逐�
+      .scratch/wisp/probes/227/v1/logs/04-ac1-teeth.txt
+  9ac4adef  16:10 票 227 终裁腿 227-v1·AC#1·故障件一枚具名入账（�
+      .scratch/wisp/probes/227/v1/logs/05-mu-falsegreen-first-attempt.txt
+  db6c6156  16:11 票 227 终裁腿 227-v1·AC#3·独立名册尺入库（⛔ 抄�
+      .scratch/wisp/probes/227/v1/logs/06-ac3-independent-census.txt
+  b578fa71  16:11 票 227 终裁腿 227-v1·AC#4＋AC#5半区＋AC6静态·入库�
+      .scratch/wisp/probes/227/v1/logs/07-ac4-ac5-ac6-roster.txt
+
+== intersection of THEIR path set with MY path set (want EMPTY) ==
+  their paths = 8 ; my paths = 96
+  INTERSECTION = 0 枚 (want 0)
+
+== same check by authorship per path (git log -1 --format=%h for each of my paths) ==
+  paths whose last committer is ⛔ one of my seven = 0 (want 0)
+
+== and the two shared-surface risks named in the dispatch ==
+  the ticket file: my append = one line-pair only; numstat vs its parent commit:
+2	0	.scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md
+  verdict file commits touching it (want only mine):
+    a1c6eeda 票 227 终裁腿 227-v1·交件自证终尺（名册尺�
+    65558bb1 票 227 终裁腿 227-v1·判语定稿＋票尾一条 bul
+    173796c4 票 227 终裁腿 227-v1·起手三把尺与读料入库�

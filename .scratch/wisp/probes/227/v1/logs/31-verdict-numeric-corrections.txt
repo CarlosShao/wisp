@@ -1,0 +1,19 @@
+== before (hits of each stale token) ==
+  同前缀终量 **14 笔**＝本腿 6＋外腿 8
+  本腿 6 笔并集 **90 枚路径**
+  终量＝**14 笔＝本腿 6＋外腿 8**
+  八枚入库＋一枚在飞 `08-answer-iv-sentences.txt`
+
+== after (each new token must hit exactly once; stale tokens must be 0) ==
+  [同前缀终量 \*\*15 笔\*\*＝本腿 7＋外腿 8] hits=1
+  [本腿 7 笔并集 \*\*96 枚路径\*\*] hits=1
+  [终量＝\*\*15 笔＝本腿 7＋外腿 8\*\*] hits=1
+  [八枚已自行入库＋三枚在飞未提交] hits=1
+  [交集＝0] hits=1
+  stale [14 笔] hits=1 (want 0)
+  stale [90 枚路径] hits=0 (want 0)
+  stale [一枚在飞] hits=0 (want 0)
+
+== size after edits: lines=36 (cap 130) bytes=18481 ==
+== slot ruler re-run: 0 (want 0) | posctrl 5 (want >0)
+== CR delta introduced by sed (want 0): 0 CR bytes total (pristine file had 0) ==
