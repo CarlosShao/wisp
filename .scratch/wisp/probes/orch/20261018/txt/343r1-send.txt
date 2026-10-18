@@ -1,0 +1,17 @@
+第三波 b 放出＝补放 `343-r1`（真实启动动作＝subagent 491c0374-332e-4e08-8d2f-0d3bfafe141a 已返回 id）
+
+通道＝subagent（队友帽 8 已满，同第三波那四枚）⇒ 收件尺按主题前缀「票 343 落地腿 343-r1」＋写面根 `internal/risk/blacklist.go` 认，⛔ 按注册名认（公共块双唯一键定式）。
+
+在飞现量（23:1x）＝**3**：`341-r1`（写 `internal/config`，subagent 2e2d5c3d，名册 5 笔活着）∥`342-a1`（普查 `internal/winsec` 只读，subagent 7246a829，台面已建尚未落第一笔）∥`343-r1`（写 `internal/risk/blacklist.go` 注释面，491c0374，刚放）。
+
+★放 343-r1 的前置（都是放出前 23:0x 现跑，⛔ 凭印象派腿）：
+- 三键尺＝`票 343 落地腿 343-r1` 前缀盘上 **0 笔**＋`.scratch/wisp/probes/343/r1` 目录不存在 ⇒ 我是第一枚、无同名在飞。
+- 写面根静默＝`internal/risk/**` 40 分钟内零枚文件被动＋`blacklist.go` blob＝`c1799cd2…` 逐串未动。
+- ★排他前提合上＝票 343 票面「为什么现在不派」明写"排在票 339 之后（同一枚 `blacklist.go`、⛔ 两腿同波动）"⇒ `339-v1` 已交件、我已收件（`d298474c`／账 `A1042`）⇒ 车道空。
+- CPU 闸＝连采 6 次 54/60/62/65/65/54（**0/6 超 70%**）；瞬时那次 79–87 是机主桌面 `msedgewebview2`／DeepSeek Harness／Weixin 抬的，⛔ 我编队的 `go test`（那刻零枚在算）⇒ 按机主"CPU≤70% 就补位"放行。
+
+写面互斥复核＝`internal/risk`（343-r1 独占）⇄`internal/config`（341-r1）⇄`internal/winsec`（342-a1 只读）三面两两不交；`cmd/wisp`／`internal/panel` 本波零写腿；无两腿读同一包。
+
+先存档（`29d258f9`＝5 枚 archive 件、逐枚 pathspec 只含我这一路、⛔ 卷走 341-r1 那 7 枚在飞件）再发（本件＝放行动、在 `29d258f9` 之后）。⛔ push（在飞含两枚写腿、车道未空）。
+
+★本波公共块 `common-20261018c` 已折进 `338-v1` 交回来的两条定式＋我自己今天栽的两条：ⓓ `cygpath -w`（仓外树跑 Windows .exe 取 DLL、POSIX 形 PATH⇒零枚 FAIL 的整包死＝台损非判据）；ⓔ 甲形（token 级放行）⛔ 一把 `tr` 尺通吃、须换四把内容尺＋不动点哈希==HEAD；＋here-doc 定式（乱码散件真身）＋`commit -F` 路径必须 Windows 形＋凡禁令禁一枚字面字符就写码位。
