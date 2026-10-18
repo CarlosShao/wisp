@@ -1,0 +1,28 @@
+票 322 收尾腿 322-r2·report.md（160 行帽）＋必答件＋cmd/wisp 台件＋消费者读数入库
+
+★pathspec 定式已改：这一笔 `git add` 与 `git commit` **两处都字面逐枚写死**，
+⛔ 再用 `$(git diff --cached --name-only)` 那种"从共享 index 反推"的形状
+（＝上一笔 7f805583 越界卷入 328-v1 一枚件的根因，编排者 10:4x 裁定①收单、不追责、⛔ 回改历史）。
+
+入库 15 枚，全部在 `.scratch/wisp/probes/322/r2/**`（暂存集越界尺现量＝0 枚）：
+- report.md（160 行＝输出预算帽、0 枚 CR＝LF、占位符 TODO/TBD/FIXME/XXX 尺 0 命中）
+  §0 锚＋落点合规＋台面自证｜§1 头号活具名待补｜§2 残余①更正在案（四条硬边界逐条）
+  ＋容器成对两发证我的字节颜色中性（142/86/0/0 两台一字不变）｜§3 本机 winsec 成对台面
+  ＋estate 定向色｜§4 残余② witnessTruncated=true witnessSize=35 复认（4/4，⛔ 动字节）
+  ｜§5 AC#4 消费者面 Linux⇄本机成对｜§6 门禁逐枚 rc=｜§7 本腿五笔自抓偏差｜§8 落点索引。
+- report-sec9.md（41 行）＝派单 specific 第 54 行必答 (i)(ii)(iii)。
+- cmd-wisp.ps1＝头号活台件（full ⇄ estate 两档，PATH 带两串 dll、四数逐枚点名、
+  0xc0000135／build failed／no tests to run／setup failed 单独一把尺）。
+  ★定向 -run 串逐枚对过实名册⛔ 指不存在的名字：Resident=28 枚顶层／TestLive=12／
+  TestPanelThreadIsSTAAndExitsCleanly=1（panel_resident_windows_test.go:958）／
+  TestAC13BringUpSurvivesAReusedThreadQuit=1（同件 :523）。
+- msg-c1.txt＝起手笔正文入库（可审计）。
+- logs/＝cc-mine、cc2-head、cc2-mine（容器消费者成对，两台 RUN=1160 PASS_TOP=702 FAIL_TOP=6 SKIP=6
+  逐字相同、红名册同三枚全在 internal/risk＝编排者已复跑并立票 339）；
+  hc-risk/secret/config/agent/memory＋host-consumers-summary（本机五包）；
+  container-mine-summary＋cw2-mine 复跑增补。
+
+★头号活仍〔待编排者放行＝228-r3c 交件并核验后〕：本腿⛔ 起 cmd/wisp 任何一发（含定向 -run）；
+  `cmd/wisp` 树在起树锚与现 HEAD 同一枚 54efbbbf（漂移尺复跑）＝别腿没动它，等放行期间读数仍有效。
+
+⛔ 翻框（交件侧复量仍 1 未勾／5 勾＝AC#4）、⛔ 动 cmd/wisp 与 internal/risk 一字、⛔ push。

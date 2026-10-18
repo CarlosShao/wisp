@@ -1,23 +1,13 @@
 
-### 322-r2 container paired started 2026-10-18 10:28:57 +08:00
-=== cw2-head tree=D:/tmp/wisp/20261018/322r2/head.RJNBgS rc=0
-RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0
---- package result lines:
-  ok  	github.com/CarlosShao/wisp/internal/winsec	12.962s
---- top FAIL names:
-  (none)
---- AC#1 paired readings (openleaf 322 race rows):
-  openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1756 flipErrs=0 damagedWitnesses=0 leafLegRefusals=43 foreignsNarrowed=0 foreignsHoldingPayload=0
-  openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1932 flipErrs=0 damagedWitnesses=0 leafLegRefusals=50 foreignsNarrowed=0 foreignsHoldingPayload=0
---- branch尺: holds-its-own=2 R-322-SHAPE=0 payload-IN=0
+### 322-r2 container paired started 2026-10-18 10:36:04 +08:00
 === cw2-mine tree=D:/tmp/wisp/20261018/322r2/mine.NkOEKC rc=0
 RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0
 --- package result lines:
-  ok  	github.com/CarlosShao/wisp/internal/winsec	13.917s
+  ok  	github.com/CarlosShao/wisp/internal/winsec	6.223s
 --- top FAIL names:
   (none)
 --- AC#1 paired readings (openleaf 322 race rows):
-  openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1432 flipErrs=0 damagedWitnesses=0 leafLegRefusals=25 foreignsNarrowed=0 foreignsHoldingPayload=0
-  openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1998 flipErrs=0 damagedWitnesses=0 leafLegRefusals=60 foreignsNarrowed=0 foreignsHoldingPayload=0
+  openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=1928 flipErrs=0 damagedWitnesses=0 leafLegRefusals=48 foreignsNarrowed=0 foreignsHoldingPayload=0
+  openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=2012 flipErrs=0 damagedWitnesses=0 leafLegRefusals=53 foreignsNarrowed=0 foreignsHoldingPayload=0
 --- branch尺: holds-its-own=2 R-322-SHAPE=0 payload-IN=0
-### done 2026-10-18 10:29:46 +08:00
+### done 2026-10-18 10:36:12 +08:00

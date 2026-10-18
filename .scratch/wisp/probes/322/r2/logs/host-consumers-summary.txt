@@ -1,0 +1,16 @@
+
+### 322-r2 host consumers started 2026-10-18 10:33:37 +08:00
+TREE=D:\tmp\wisp\20261018\322r2\head.RJNBgS (pristine 字节，本腿那一枚 .go 改前) GOTMPDIR=D:\tmp\wisp\20261018\322r2\gtD
+PKG ./internal/risk/ rc=1 RUN=230 PASS_TOP=139 FAIL_TOP=1 SKIP=1 :: FAIL	github.com/CarlosShao/wisp/internal/risk	4.788s
+  FAIL names:
+    --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.08s)
+  tooling-words: walk=4 buildfailed=0 noteststorun=0 setupfailed=0 0xc0000135=0
+PKG ./internal/secret/ rc=0 RUN=29 PASS_TOP=21 FAIL_TOP=0 SKIP=0 :: ok  	github.com/CarlosShao/wisp/internal/secret	0.315s
+  tooling-words: walk=0 buildfailed=0 noteststorun=0 setupfailed=0 0xc0000135=0
+PKG ./internal/config/ rc=0 RUN=185 PASS_TOP=104 FAIL_TOP=0 SKIP=0 :: ok  	github.com/CarlosShao/wisp/internal/config	1.653s
+  tooling-words: walk=4 buildfailed=0 noteststorun=0 setupfailed=0 0xc0000135=0
+PKG ./internal/agent/ rc=0 RUN=114 PASS_TOP=90 FAIL_TOP=0 SKIP=0 :: ok  	github.com/CarlosShao/wisp/internal/agent	2.578s
+  tooling-words: walk=0 buildfailed=0 noteststorun=0 setupfailed=0 0xc0000135=0
+PKG ./internal/memory/ rc=0 RUN=80 PASS_TOP=43 FAIL_TOP=0 SKIP=2 :: ok  	github.com/CarlosShao/wisp/internal/memory	15.416s
+  tooling-words: walk=8 buildfailed=0 noteststorun=0 setupfailed=0 0xc0000135=0
+### done 2026-10-18 10:34:22 +08:00
