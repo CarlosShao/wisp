@@ -1,0 +1,526 @@
+date=2026-10-18 10:30:33 +0800 my_anchor=5db0b538dad3bf2841adec834a130e4a6b28d8df
+
+## AC#3① 那 4 枚 .go 到底动了什么（尺＝git diff -U0 --numstat ⇄ 逐枚函数体具名）
+  internal/panel/subagent_roster_197.go +66 -10
++ -
++diff ---git
++index -35ce6ffb..2da6c596
++--- -a/internal/panel/subagent_roster_197.go
+++++ -b/internal/panel/subagent_roster_197.go
++@@ --186,0
+++// -
+++// -Ticket
+++// -actually
+++// -which
+++// -for
+++// -id
+++// -of
+++// -"child-1".
+++// -is
++@@ --211,0
+++ -//
+++ -//
+++ -//
+++ -//
+++ -//
+++ -//
+++ -known
++@@ --214
++- -indexWaitingKey(waiting,
+++ -indexWaitingKey(waiting,
++@@ --219,2
++- -indexWaitingKey(waiting,
++- -indexWaitingKey(waiting,
+++ -indexWaitingKey(waiting,
+++ -indexWaitingKey(waiting,
++@@ --256,0
+++// -rosteredTaskIDs
+++// -An
+++// -correlation,
+++func -rosteredTaskIDs(state
+++ -known
+++ -for
+++ -if
+++ -continue
+++ -}
+++ -known[row.TaskID]
+++ -}
+++ -return
+++} -
+++ -
++@@ --259,4
++-// -the
++-// -An
++-// -the
++-func -indexWaitingKey(set
+++// -the
+++// -plus
+++// -("<taskID>#<tail>",
+++// -and
+++// -that
+++// -
+++// -The
+++// -the
+++// -correlation
+++// -one
+++// -tasks
+++// -TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt.
+++// -requirement
+++// -pass
+++func -indexWaitingKey(set
++@@ --269,0
+++ -for
+++ -if
+++ -set[task]
+++ -}
+++ -}
++@@ --272,2
++-// -splitClashSuffix
++-// -whose
+++// -splitClashSuffix
+++// -'#'
++@@ --276
++-// -rewritten
+++// -rewritten
+++// -numbering
+++// -
+++// -What
+++// -actually
+++// -rewrite
+++// -doc
+++// -this
+++// -them.
+++// -names
+++// -would
+  internal/panel/subagent_blocked_220_test.go +12 -4
++ -
++diff ---git
++index -dbdce69d..a37cbd1f
++--- -a/internal/panel/subagent_blocked_220_test.go
+++++ -b/internal/panel/subagent_blocked_220_test.go
++@@ --121,3
++-// -queue.go:152-154),
++-// -test
++-// -passes.
+++// -queue.go:152-154)
+++// -("<taskID>#<tail>",
+++// -starts
+++// -other-task
+++// -and
+++// -
+++// -★
+++// -green
+++// -a
+++// -was
+++// -guard
++@@ --133
++- -{"a
+++ -{"a
+  internal/panel/subagent_corr_task_prefix_328_test.go +89 -0
++ -
++diff ---git
++new -file
++index -00000000..99d203db
++--- -/dev/null
+++++ -b/internal/panel/subagent_corr_task_prefix_328_test.go
++@@ --0,0
+++package -panel
+++ -
+++// -Ticket
+++// -production
+++// -on,
+++// -
+++// -WHY
+++// -file:
+++// -(run
+++// -the
+++// -this
+++// -so
+++// -is
+++// -names
+++// -
+++// -"child-1#call_e1"
+++// -"child-1#call-0"
+++// -"child-1#call-0#7"
+++// -rewrote
+++// -"child-1#9"
+++// -"approval-7"
+++// -"host:mode-switch"
+++// -
+++// -The
+++// -rostered
+++// -case
+++ -
+++import -"testing"
+++ -
+++// -TestProductionCorrelationShapesLightTheirRows
+++// -the
+++// -measured
+++func -TestProductionCorrelationShapesLightTheirRows(t
+++ -cases
+++ -name
+++ -corr
+++ -want
+++ -}{
+++ -{"arm
+++ -{"arm
+++ -{"arm
+++ -{"the
+++ -{"arm
+++ -{"the
+++ -{"a
+++ -{"a
+++ -}
+++ -for
+++ -t.Run(c.name,
+++ -data
+++ -assertBlocked(t,
+++ -//
+++ -//
+++ -assertBlocked(t,
+++ -})
+++ -}
+++} -
+++ -
+++// -TestEachCorrelationLightsOnlyTheRowItIsBuiltOn
+++// -the
+++// -not
+++// -to
+++func -TestEachCorrelationLightsOnlyTheRowItIsBuiltOn(t
+++ -data
+++ -card197("root-1#call-0"),
+++ -card197("child-1#call_e1"),
+++ -},
+++ -assertBlocked(t,
+++ -assertBlocked(t,
+++ -
+++ -//
+++ -//
+++ -data
+++ -assertBlocked(t,
+++ -assertBlocked(t,
+++} -
+++ -
+++// -TestAnL1WindowCorrelationIsMatchedByTheSameArm
+++// -not
+++// -indexWaitingKey,
+++// -row
+++func -TestAnL1WindowCorrelationIsMatchedByTheSameArm(t
+++ -data
+++ -assertBlocked(t,
+++ -assertBlocked(t,
+++ -
+++ -data
+++ -assertBlocked(t,
+++} -
+  internal/agent/corr_roster_join_328_test.go +171 -0
++ -
++diff ---git
++new -file
++index -00000000..53f0494f
++--- -/dev/null
+++++ -b/internal/agent/corr_roster_join_328_test.go
++@@ --0,0
+++package -agent
+++ -
+++// -Ticket
+++// -off
+++// -
+++// -The
+++// -
+++// -newHarness("tool-then-text")
+++// -openai-chat
+++// -h.run(...)
+++// -->
+++// -p.call.ID,
+++// -the
+++// -h.echo().Calls()[0].Req
+++// -panel.NativeVerdict{...}.CardView()
+++// -->
+++// -half
+++// -here
+++// -panel.TaskRosterSectionFrom
+++// -render
+++// -with
+++// -names
+++// -
+++// -Before
+++// -carried
+++// -row
+++// -call,
+++// -TestTheLoopMintsTheShapesTheRosterAccepts
+++// -internal/panel/subagent_corr_task_prefix_328_test.go.
+++ -
+++import -(
+++ -"strings"
+++ -"testing"
+++ -
+++ -"github.com/CarlosShao/wisp/internal/panel"
+++ -"github.com/CarlosShao/wisp/internal/risk"
+++) -
+++ -
+++// -rosterWithTwoRows
+++// -row
+++// -word
+++// -not
+++func -rosterWithTwoRows(taskID,
+++ -return
+++ -Rows:
+++ -{
+++ -TaskID:
+++ -Status:
+++ -},
+++ -{
+++ -TaskID:
+++ -Kind:
+++ -StreamKey:
+++ -},
+++ -},
+++ -InFlightSlots:
+++ -}
+++} -
+++ -
+++// -cardForCorr
+++// -carry
+++// -the
+++func -cardForCorr(corr
+++ -return
+++ -CorrelationID:
+++ -Level:
+++ -}.CardView()
+++} -
+++ -
+++func -rowOf(t
+++ -t.Helper()
+++ -for
+++ -if
+++ -return
+++ -}
+++ -}
+++ -t.Fatalf("the
+++ -return
+++} -
+++ -
+++// -TestACorrelationTheLoopActuallyMintedLightsItsRosterRow
+++// -assertion
+++func -TestACorrelationTheLoopActuallyMintedLightsItsRosterRow(t
+++ -h
+++ -res
+++ -if
+++ -t.Fatalf("fixture
+++ -}
+++ -calls
+++ -if
+++ -t.Fatalf("tool
+++ -}
+++ -req
+++ -if
+++ -t.Fatalf("the
+++ -}
+++ -//
+++ -//
+++ -//
+++ -corr
+++ -if
+++ -t.Fatal("the
+++ -}
+++ -if
+++ -t.Fatalf("corr
+++ -"the
+++ -}
+++ -if
+++ -strings.TrimPrefix(corr,
+++ -t.Fatalf("corr
+++ -}
+++ -//
+++ -//
+++ -//
+++ -//
+++ -if
+++ -t.Fatalf("callCorr(%q,%q,0)
+++ -}
+++ -
+++ -sect
+++ -[]panel.ApprovalCardView{cardForCorr(corr)})
+++ -row
+++ -if
+++ -t.Errorf("the
+++ -"pending:
+++ -}
+++ -other
+++ -if
+++ -t.Errorf("the
+++ -other.TaskID,
+++ -}
+++ -if
+++ -t.Errorf("blockedOnApproval
+++ -"host's
+++ -row.Status,
+++ -}
+++} -
+++ -
+++// -TestTheLoopMintsTheShapesTheRosterAccepts
+++// -byte
+++// -join,
+++// -with
+++// -call_unnamed_<n>
+++// -so
+++// -minter
+++func -TestTheLoopMintsTheShapesTheRosterAccepts(t
+++ -h
+++ -res
+++ -if
+++ -t.Fatal("the
+++ -}
+++ -armB
+++ -if
+++ -t.Fatalf("callCorr
+++ -"no
+++ -}
+++ -armA
+++ -if
+++ -t.Fatalf("callCorr
+++ -}
+++ -for
+++ -sect
+++ -[]panel.ApprovalCardView{cardForCorr(corr)})
+++ -if
+++ -t.Errorf("a
+++ -}
+++ -if
+++ -t.Errorf("correlation
+++ -}
+++ -}
+++} -
+--- 名册那枚：新增/改动的标识符逐枚点名（尺＝diff -U0 只取 + 行的 func/for/if） ---
+24:+func rosteredTaskIDs(state TaskRosterState) map[string]bool {
+49:+func indexWaitingKey(set map[string]bool, known map[string]bool, key string) {
+50:+	for task := range known {
+51:+		if strings.HasPrefix(key, task+"#") {
+52:+			set[task] = true
+55:+// splitClashSuffix recognises the queue's own rewrite and nothing else: a final
+--- 数字臂（splitClashSuffix 函数体）对锚零改动那把尺（尺＝取函数体行段 hash 对撞）---
+  splitClashSuffix_body_sha16 anchor=648eda04 7fec699e1a0f00a7
+  splitClashSuffix_body_sha16 anchor=5db0b538dad3bf2841adec834a130e4a6b28d8df 7fec699e1a0f00a7
+--- 两枚新仪器文件＝改前侧不存在（尺＝cat-file -t）---
+  648eda04 internal/panel/subagent_corr_task_prefix_328_test.go exists=NO(新增)
+  648eda04 internal/agent/corr_roster_join_328_test.go exists=NO(新增)
+
+## AC#3② 门控档位与 L2 许可面零字节（blob 对撞，起手锚 ⇄ 腿末笔 ⇄ 我的锚）
+  internal/risk/mode.go before=c21beeea5c88541a0ce088671074f4a79c52ca6f legEnd=c21beeea5c88541a0ce088671074f4a79c52ca6f myAnchor=c21beeea5c88541a0ce088671074f4a79c52ca6f => ZEROBYTE
+  internal/risk/provenance.go before=d634aae0f1e31a33a6f155ee13912a05006273dd legEnd=d634aae0f1e31a33a6f155ee13912a05006273dd myAnchor=d634aae0f1e31a33a6f155ee13912a05006273dd => ZEROBYTE
+  internal/agent/approval/gate.go before=78e2d28a8b676754514bd80898ace8c5a974d3ce legEnd=78e2d28a8b676754514bd80898ace8c5a974d3ce myAnchor=78e2d28a8b676754514bd80898ace8c5a974d3ce => ZEROBYTE
+  internal/agent/approval/queue.go before=66fec7ae375344d7bc741270b42c4ec5050cf41f legEnd=66fec7ae375344d7bc741270b42c4ec5050cf41f myAnchor=66fec7ae375344d7bc741270b42c4ec5050cf41f => ZEROBYTE
+--- internal/risk/** 整面行数尺 ---
+  git diff -U0 648eda04..5db0b538dad3bf2841adec834a130e4a6b28d8df -- internal/risk | wc -l = 0
+  git diff -U0 648eda04..5db0b538dad3bf2841adec834a130e4a6b28d8df -- internal/agent/approval | wc -l = 0
+  git diff -U0 648eda04..5db0b538dad3bf2841adec834a130e4a6b28d8df -- internal/statemachine | wc -l = 0
+
+## AC#3③ 冻结件／thresholds／golden／go.mod／go.sum／ci.yml 命中 0（带正控）
+  diff_lines internal/panel/tokens_fourway_test.go = 0
+  diff_lines internal/panel/l2_grant_boundary_test.go = 0
+  diff_lines internal/perm/ticket90_persist_test.go = 0
+--- 正控（先证我取出的东西非空再信 0）：三枚冻结件在我的锚里真存在且非空 ---
+  internal/panel/tokens_fourway_test.go bytes=19175 lines=550
+  internal/panel/l2_grant_boundary_test.go bytes=109415 lines=2549
+  internal/perm/ticket90_persist_test.go bytes=15659 lines=430
+--- 面值尺（thresholds.go／golden／go.mod／go.sum／ci.yml）---
+  diff_lines(internal/**/thresholds.go)=0
+  diff_lines(testdata/**)=0
+  diff_lines(go.mod)=0
+  diff_lines(go.sum)=0
+  diff_lines(.github/workflows/ci.yml)=0
+--- 正控：thresholds.go 与 golden 名册在我的锚非空（尺＝ls-tree）---
+internal/observe/thresholds.go
+  golden_files_count=66
+  ci_yml_bytes=64794
+
+## AC#2① 正控逐跳 file:line（现跑，行号只当读数；射程＝我的锚具名提交树）
+--- 跳1 铸造点 def＋唯一非测试调用 ---
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/loop.go:603:func callCorr(taskID, callID string, index int) string {
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/loop.go:603:func callCorr(taskID, callID string, index int) string {
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/loop.go:676:			TaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i),
+--- 跳2 ToolRequest 生产构造点（唯一一枚非注释）---
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/loop.go:675:		req := ToolRequest{
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/tools/bridge.go:890:// 'ToolRequest{' internal cmd --include=*.go, drop the roster lines whose FILENAME ends in
+--- 跳3 executeCalls ← run 的父链 ---
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/loop.go:504:		l.executeCalls(ctx, root, j, taskID, guard, turn, &res)
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/loop.go:615:func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJournal,
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/loop.go:346:func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/loop.go:517:func (l *Loop) runControl(taskID string, verb ControlVerb, utterance string) Result {
+--- 跳4 卡片搬运 NativeVerdict.CardView → approval.go ---
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/approval.go:66:	return CardViewFromDecision(subject, decision)
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/approval.go:69:// CardViewFromDecision is the pure half of NewApprovalCardView, split out so a
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/approval.go:72:func CardViewFromDecision(subject ApprovalSubject, decision risk.Decision) ApprovalCardView {
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/approval_test.go:92:	view := CardViewFromDecision(ApprovalSubject{CorrelationID: "c", Tool: "shell.run"}, risk.Decision{
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/pump.go:98:func (v NativeVerdict) CardView() ApprovalCardView {
+--- 跳5 名册渲染入口 TaskRosterSectionFrom def ⇄ 宿主真调用点 ---
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_roster_197.go:196:func TaskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView) *TaskRosterSection {
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_roster_197.go:207:func taskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView, l1Windows []L1WindowWait) *TaskRosterSection {
+--- 跳6 第三臂本体＋判据行 ---
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_roster_197.go:312:		if strings.HasPrefix(key, task+"#") {
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_roster_197.go:276:func rosteredTaskIDs(state TaskRosterState) map[string]bool {
+
+## AC#2② 任务号半边（T）是谁给的——三问逐问现跑
+--- 问A：正控里喂给名册的 TaskID 取值来自哪里（夹具文件逐字节，射程＝该文件）---
+39:// rosterWithTwoRows files the loop's own task and one sibling row, so "exactly one
+43:func rosterWithTwoRows(taskID, otherID string) panel.TaskRosterState {
+47:				TaskID: taskID, Label: "本轮任务", Kind: "root",
+51:				TaskID: otherID, ParentTaskID: taskID, Label: "另一枚任务",
+94:	if req.TaskID != res.TaskID {
+95:		t.Fatalf("the dispatched request carries task %q, the loop reported %q", req.TaskID, res.TaskID)
+120:	sect := panel.TaskRosterSectionFrom(rosterWithTwoRows(res.TaskID, "sibling-of-"+res.TaskID),
+122:	row := rowOf(t, sect, res.TaskID)
+125:			"pending: this is ticket 328's defect, measured on a correlation the loop minted", res.TaskID, corr)
+127:	other := rowOf(t, sect, "sibling-of-"+res.TaskID)
+149:	if res.TaskID == "" {
+152:	armB := callCorr(res.TaskID, "", 0)
+--- 问B：真产 TaskID 的那枚函数（newTaskID）---
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/loop.go:1157:func newTaskID() string {
+--- 问C：生产侧那枚名册装配者（真把行塞进 TaskRosterState 的代码在哪家）---
+--- 问C补：TaskRosterState 的字段握法＋在册那把尺的入参来源 ---
+fatal: unable to resolve revision: -A6
+    func rosteredTaskIDs(state TaskRosterState) map[string]bool {
+    	known := make(map[string]bool, len(state.Rows))
+    	for _, row := range state.Rows {
+    		if row.TaskID == "" {
+    			continue
+    		}
+    		known[row.TaskID] = true
+    	}
+    	return known
+    }
+
+## 必答①那格的零读数尺（叠改形真产过没有）＋正控
+  尺A git grep -nE '"[^"]*#[0-9]+"' 5db0b538dad3bf2841adec834a130e4a6b28d8df -- internal/agent/approval | wc -l = 0
+  正控 尺B 同族放宽到 internal cmd：11 行
+5db0b538dad3bf2841adec834a130e4a6b28d8df:cmd/wisp/resident_audio_windows.go:15:// Shape, all of it r…
+5db0b538dad3bf2841adec834a130e4a6b28d8df:cmd/wisp/slo_report_144_windows_test.go:873:// by grepping …
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_blocked_220_test.go:15://     and a…
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_blocked_220_test.go:108:	data := bl…
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_blocked_220_test.go:112:	data = blo…
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_blocked_220_test.go:138:		{"the que…
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_blocked_220_test.go:139:		{"a multi…
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_blocked_220_test.go:140:		{"another…
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_blocked_220_test.go:194:	data := bl…
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_corr_task_prefix_328_test.go:20:// …
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/panel/subagent_corr_task_prefix_328_test.go:42:		{…
+--- 队列改写那半边（真产 <corr>#<seq> 的代码）逐枚点名 ---
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/approval/queue.go:168:		corr = fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/approval/queue.go:616:			d.CorrelationID = fmt.Sprintf("%s#%d", corr, q.seq+uint64(i)+1)
+--- 两枚铸造点的可导性（要不要新导出名才链得起来）---
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/approval/queue.go:156:func (q *Queue) push(d tools.Decision) (*qitem, error) {
+5db0b538dad3bf2841adec834a130e4a6b28d8df:internal/agent/loop.go:603:func callCorr(taskID, callID string, index int) string {
+
+## 必答② 用户可见那一跳：frontend 命中枚数（带尺＋射程＋正控）
+  git grep -l 'blockedOnApproval' 5db0b538dad3bf2841adec834a130e4a6b28d8df -- frontend | wc -l = 0
+  git grep -il 'blockedonapproval' 5db0b538dad3bf2841adec834a130e4a6b28d8df -- frontend | wc -l = 0
+  git grep -l 'blockedOnApproval' 5db0b538dad3bf2841adec834a130e4a6b28d8df -- frontend/src | wc -l = 0
+  git grep -il 'blockedonapproval' 5db0b538dad3bf2841adec834a130e4a6b28d8df -- frontend/src | wc -l = 0
+--- 正控（同尺族 correlationId；量的是文件枚数）---
+  correlationId -- frontend = 11 枚文件
+  correlationId -- frontend/src = 7 枚文件 / 24 处出现
+--- 接收器自陈（现量行号）---
+5db0b538dad3bf2841adec834a130e4a6b28d8df:cmd/wisp/panel_snapshot_deliver_329.go:28:// window.wispOnPanelSnapshot does not exist yet (frontend/src/main.tsx renders
+5db0b538dad3bf2841adec834a130e4a6b28d8df:cmd/wisp/panel_snapshot_deliver_329.go:57:const panelSnapshotGlobal = "window.wispOnPanelSnapshot"
+5db0b538dad3bf2841adec834a130e4a6b28d8df:cmd/wisp/subagent_carrier_197_test.go:598://  1. blockedOnApproval is never asserted on a production packet. The join has two

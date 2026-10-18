@@ -1,0 +1,110 @@
+date=2026-10-18 10:31:05 +0800 adjudication_anchor=5db0b538dad3bf2841adec834a130e4a6b28d8df before=648eda04
+
+## 1. 追因：上一发问C 那把尺回空——先看 stderr 再判（规矩块读数纪律）
+$ git grep -n "TaskRosterState{" <锚> -- internal cmd   （全含测试）
+  rc=0 hits=10 stderr_bytes=0
+internal/agent/corr_roster_join_328_test.go:44:	return panel.TaskRosterState{
+internal/panel/subagent_blocked_220_test.go:79:			return TaskRosterState{Rows: rows197(), InFlightSlots: 1, PoolCap: poolCapGiven197}
+internal/panel/subagent_blocked_220_test.go:177:			return TaskRosterState{Rows: rows197(), InFlightSlots: 1, PoolCap: poolCapGiven197}
+internal/panel/subagent_roster_197_test.go:115:			return TaskRosterState{
+internal/panel/subagent_roster_197_test.go:223:		Tasks: func() TaskRosterState { return TaskRosterState{} },
+internal/panel/subagent_roster_197_test.go:268:		return TaskRosterState{Rows: all}
+internal/panel/subagent_roster_197_test.go:287:		return TaskRosterState{Rows: []TaskRow{{
+internal/panel/subagent_roster_197_test.go:310:		return TaskRosterState{Rows: []TaskRow{{TaskID: "x-2", Kind: "root"}}}
+internal/panel/subagent_roster_197_test.go:370:			return TaskRosterState{
+internal/panel/subagent_roster_197_test.go:432:		return TaskRosterState{
+  ⇒ 上一发我把 grep -v _test.go 直接接在同一根管子上并只打非测试 ⇒ 需逐枚点名：
+$ 非测试构造点（量的）：
+  非测试命中枚数=0
+$ 那么名册那批行在生产是谁塞进去的（TaskRosterState 作参数/字段的所有者，非测试）
+191:func (rt *agentRuntime) taskRosterState() panel.TaskRosterState {
+192:	var state panel.TaskRosterState
+192:	Tasks func() TaskRosterState
+86:// TaskRosterState is the pump's reader value: the rows plus the two facts about
+94:type TaskRosterState struct {
+156:	// TaskRosterState for the window where the two differ.
+196:func TaskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView) *TaskRosterSection {
+207:func taskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView, l1Windows []L1WindowWait) *TaskRosterSection {
+276:func rosteredTaskIDs(state TaskRosterState) map[string]bool {
+
+## 2. ★在册那半边（任务号）的产码链：cmd/wisp 侧真装配者（现量行号）
+$ git grep -n "TaskRosterSectionFrom(" 非测试
+196:func TaskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView) *TaskRosterSection {
+$ roster 行的 TaskID 在宿主侧从哪来（TaskRosterState 装配那枚函数）
+233:		if out, ok := rt.tasks.Look(id); ok {
+
+## 3. 零新导出名／零新 JSON 键（尺＝对撞两枚锚的标识符名册）
+  blob internal/panel/subagent_roster_197.go before=35ce6ffb8603172e3c1143c56a0cb165cac12e32 after=2da6c596369c1ee38672ae2656a7d5a3ecbaabfb
+  blob internal/panel/subagent_blocked_220_test.go before=dbdce69def73fa59fdd3d96c9708e69db5d7cb96 after=a37cbd1f0b64aee76bdac6d3e1a9d7c47f22e30d
+  blob internal/panel/subagent_corr_task_prefix_328_test.go before=648eda04:internal/panel/subagent_corr_task_prefix_328_test.go
+NOFILE after=99d203db2b4f15006e6bafeb74892631b54e5fb4
+  blob internal/agent/corr_roster_join_328_test.go before=648eda04:internal/agent/corr_roster_join_328_test.go
+NOFILE after=53f0494f2271d90dbd324d5a70de2936623ea46f
+--- 导出函数名册作差（panel 那枚产码文件）---
+  exported_func_diff=0（同集）
+--- 全仓新增导出标识符尺（四枚文件 + 行）：diff 的 + 行里抓 func/type/const 顶层导出名 ---
+    +func TestACorrelationTheLoopActuallyMintedLightsItsRosterRow(t *testing.T) {
+    +func TestTheLoopMintsTheShapesTheRosterAccepts(t *testing.T) {
+    +func TestProductionCorrelationShapesLightTheirRows(t *testing.T) {
+    +func TestEachCorrelationLightsOnlyTheRowItIsBuiltOn(t *testing.T) {
+    +func TestAnL1WindowCorrelationIsMatchedByTheSameArm(t *testing.T) {
+--- JSON 键名册作差（四枚文件里所有 json: 标签）---
+  json_keys_diff=0（同集）
+--- approval.go 卡片字段名册（腿那句 grep -c TaskID=0 的复认）---
+  ApprovalCardView 里 TaskID 命中=0（尺＝同一枚文件逐枚数）
+10
+
+## 4. ⓭ 那句自陈是否改到说实话（尺＝现取那两行段逐字）
+// was on the queue. A host that pairs cards with a correlation of its own, with no
+// task id in it, still shows those rows as not blocked; that remains a statement
+// about the pairing, not a guess to paper over.
+//
+// Ticket 328 closed the family this render used to miss: the correlation the loop
+// actually mints is "<taskID>#<callID>" (loop.go:603, its only call site :676),
+// which carries a task id but is never equal to one, so no row lit while a card
+// for that very task was pending. indexWaitingKey now also files the rostered task
+// id a correlation is built on, and only that one - the '#' after the id is part
+// of the match, so "child-1x" stays a different task rather than a rewrite of
+// "child-1". Nothing about the verdict, the level, or who may answer changed: this
+// is the pairing hop, and it stays a read.
+func TaskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView) *TaskRosterSection {
+	return taskRosterSectionFrom(state, pending, nil)
+}
+
+// taskRosterSectionFrom is the whole render with one extra source: l1Windows, the
+  --- splitClashSuffix 文档段 ---
+}
+
+// splitClashSuffix recognises the queue's own rewrite and nothing else: a final
+// '#' whose remainder is at least one ASCII digit. Cutting at the FIRST '#' would
+// eat a correlation id that legitimately contains one, and accepting a non-numeric
+// tail would treat a host's own "<task>-suffix" naming as if the queue had
+// rewritten it - so this function still answers only the one question the queue's
+// numbering answers, whoever else asks.
+//
+// What ticket 328 changed is NOT this digit test. The correlations production
+// actually mints carry non-numeric tails ("<taskID>#<callID>", and the queue's
+// rewrite stacked on one of those: "<taskID>#<callID>#<seq>"), and the claim this
+// doc used to finish with - that such a tail is a wider match than any code in
+// this tree produces - stopped being true the day loop.go:603 started minting
+// them. Those shapes are now matched by indexWaitingKey's rostered-task arm, which
+// names the ids it accepts instead of guessing a cut, and loosening this function
+// would only make "who rewrote this id" unreadable again.
+
+## 5. 腿件①里那句"唯一读者 :308"⇄现量（splitClashSuffix 直呼尺）
+308:	if base, ok := splitClashSuffix(key); ok && base != "" {
+318:// splitClashSuffix recognises the queue's own rewrite and nothing else: a final
+333:func splitClashSuffix(id string) (base string, ok bool) {
+  测试直呼枚数=0
+  正控＝同尺族 indexWaitingKey 命中 8 行
+
+## 6. 票面 AC 框数⇄leg 那句"七格"复认（同一把尺，量的）
+31:- [x] **AC#0 现量普查（⛔ 没�…
+32:- [x] **AC#1 选一形并写清代价…
+33:- [ ] **AC#2 ★正控必须有**：�…
+34:- [ ] **AC#3 判定与批准语义不…
+35:- [ ] **AC#4 门禁四数＋颜色**�…
+50:- [2026-10-17 11:5x +08] **编排者�…
+59:- [2026-10-17 15:1x +08] **`328-r1` �…
+  五枚 AC 框＝AC#0 AC#1 AC#2 AC#3 AC#4；:50/:59 那两条是 bullet 不是框（grep 形状同族被计入＝boxes_total=7 的来源，具名分清）
+  AC 标题行数（尺＝grep -c 'AC#[0-4] 现量普查\|AC#1 选一形\|AC#2 ★正控\|AC#3 判定与批准\|AC#4 门禁四数'）=5
