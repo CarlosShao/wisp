@@ -1,0 +1,56 @@
+派单 228r3c-head — 票 228 探针/突变复跑腿（228/r3c/**，只仓外导出树）2026-10-18 第一波
+- 起手锚＝你自己 `git log -1` 现认（编排者 09:3x 见 `f60d50d6`）。
+- 目标（唯一）＝把 `R-228-3b-1`（台账 `A1019` 第③节）那两发突变**串行**复跑：`228-r3b` 如实自报两发突变的 `finally`/trap 各 echo 过"还原成功"，但事后发现导出台**一度同时残留 M1＋M2**（跨 shell trap 竞态）⇒ 那两发红句（`mutation-M1-b1.log`／`mutation-M2-stopbit.log`）取于残留窗口＝**彼此不独立，⛔ 当"成对两发（落点不同）"凭据**。本腿把它重做成**独立**的两发。
+- 料出处（照读，⛔ 重造）：`.scratch/wisp/probes/228/r3b/report.md`（59 行，含两发落点与用例名）＋票 228 `AC#11` ⓐ/ⓑ-1 判据原文（票面 `:91-102`＋`:97-100` 拆钉）＋`A1019`。
+- 两发内容（照 `228-r3b` §4，逐发串行）：M1＝断 `internal/proc/boot_windows.go` 环路 stop 检查（`stopSignal := rt.StopSignal()` 置 nil 通道）⇒ `TestAC11TrayExitTriggerWalksTheTenSteps`（ⓑ-1）必须点名红；M2＝令 Boot 不建停机位（`rt.stopReq = newStopRequest()` 注释掉）⇒ `TestAC11StopBitIsBuiltAtBoot`（ⓐ-first）必须点名红。每发 pristine 基准＝`internal/proc/boot_windows.go` 在你起手锚上的 blob 哈希（现跑算，⛔ 抄 `3e2e83fa…`）。
+- ★串行硬规矩：两发之间⛔ 并发 shell；**每发前**验一次 pristine 哈希、**每发后**再验一次并落盘；还原＝重新 `git archive` 覆盖或按具名 blob 还原，然后**复跑 estate 四枚确认 4/4/0/0**；凡 echo 的"已还原"不当证据，只认事后哈希对撞。
+- 写面（只两处）：`.scratch/wisp/probes/228/r3c/**`（脚本＋logs＋report，短名、⛔ `§`、逐枚 `wc -c`>0、⛔ 0 字节件＝没交）＋票 228 末尾一条只追加 bullet。⛔ 动任何跟踪码/测试字节（`.go` 命中必须 0；突变只打仓外导出树物理字节）。⛔ 落 `docs/evidence/s1/`（那是裁决者的面）。
+- 独占：本波 `go test ./cmd/wisp` **唯一持跑者＝你**（`cmd/wisp/**` 与 `internal/panel/**` 本波零写腿）；`322-r2` 的 `cmd/wisp` 那一发排在你的交件之后。
+派单公共块（2026-10-18 第一波，编排者＝新任 harness；逐条都是现行铁律，缺一条我就退回你那笔交件）
+
+## 编队规则（本波）
+本波总代理 6 条（≤8）；写代理 3 条（336-r1／166-r1／322-r2）。写面互斥：`cmd/wisp/**` 与 `internal/panel/**` 本波零写腿、任何腿⛔ 写这两面；`go test ./cmd/wisp` 同一时刻只跑一个（本波唯一持跑者＝228-r3c）；`internal/risk/**` 本波唯一写腿＝336-r1；`internal/session/**`＝166-r1；`internal/winsec/**`＝322-r2；`frontend/**`、`design/**` 本编队零写面（归机主外部 agent）。
+
+## git
+⛔ **push**（推送只由编排者做，且现在被机主按住）。`git add` 与 `git commit` 两处都要**逐枚显式 pathspec**——⛔ `add -A`／`add .`／目录形、★⛔ `git commit -F <正文> -- .`（那个 `.` 曾把机主在飞的 24 枚工作树字节记进历史，台账 `A1011` 第⑧节）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree 或 checkout。临时件**只建不删**。撞 `.git/index.lock`：⛔ 删锁，等它自己散再重试同一笔。
+
+## 票面
+⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`（裁决者≠实现者；翻框只由编排者凭非实现者判语做）。只许在你被指定的票尾**追加一条** bullet。
+
+## 台面配方（仓外导出树，缺一味就假红）
+`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models`（**八件套**）＋★仓根 `docs/`（有些测试读 `docs/PLAN.md`；`internal/panel/git_test.go` 一族要它）＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`——都⛔ 跟踪）。树放 **`D:` 卷且目录名要产生 8.3 短名别名**（放 C 卷 Temp ⇒ 短名族打红＝台面故障）；`GOTMPDIR` 指到 `D:` 上**先 `mkdir -p`**（没建＝`creating work dir` 红，长得像判据响）。取出后**先数 `.go` 证非空**（"0"⛔ 是读数）。⛔ 在共享工作树跑 `go test`／`go build`。
+
+## 颜色尺
+`RUN=`＝`grep -c '^=== RUN'`（含子测试）⇄ `PASS_TOP=`＝`grep -c '^--- PASS'`（只顶层）⇄ `FAIL_TOP=`＝`^--- FAIL` ⇄ `SKIP=`。**四数不许混用、不许相减**。一律 `-count=1 -timeout 30m` 或更长；⛔ `go test ./...`。★跑 `cmd/wisp` 必须带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，否则 `0xc0000135`＋零枚 `--- FAIL`＝那包根本没跑（台面故障，⛔ 计入判据）。已知本机一格：`cmd/wisp` 整包有真窗区整进程死亡（`resident_*` 在整包从不执行）⇒ estate 颜色取自定向 `-run`，⛔ 拿整包当"全绿"或"我的字节把包打红"。
+
+## 门禁四数（只在共享工作树）
+`/d/work/base/gopath/bin/gofumpt.exe -l <你的文件>`（⚠ 本机工作树 6 枚既有件因 CRLF 被标脏＝存量，**你的新字节必须 LF**，⛔ 顺手重排别腿文件；具名登记即可）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./<你的包>/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 exit 2＝GUARD 射程拒绝⛔ 读成红；长度门要 `.git`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+
+## 突变（牙）
+只打在**仓外导出树**的物理字节上——⛔ 改跟踪文件、⛔ `-overlay`（那形对读盘的尺失明）；**内容锚**（函数体内那枚 token），⛔ 绝对行号；逐发**当场还原并报还原哈希**，跑前跑后各验一次 pristine 哈希；跨 shell 的 `trap`/`finally` 有竞态 ⇒ **两发串行**，⛔ 信 echo。成对两发落点必须不同，少任一发＝那把尺不敏感，⛔ 用它的绿当凭据。
+
+## 判据形状
+⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ `t.Skip`、⛔ 在注释里指名一枚不存在的测试或件当凭据、⛔ 许诺未实现的能力、⛔ 动 SLO 阈值／golden／`thresholds.go`／`allowlist.txt`／三枚冻结件（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`ticket90_persist_test.go`）／D1–D47／C1–C32／R1–R9／D43 转移表／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`。⛔ 新导出名、⛔ 新 `panel.*` 方法名、⛔ 新 JSON 键。碰到未定义的事**停手上报**（写进交件具名），⛔ 自行假设。
+
+## 输出预算
+≤4 枚正文件、每件 ≤160 行；⛔ 0 字节文件（落笔前后 `wc -c`）；**每落一枚文件就 commit**（⛔ 攒着）。轮次帽：先做判据最硬的那格，把 `logs/` 逐枚提前入库；到帽前把最新状态 commit＋票尾 bullet 落盘。
+
+## shell
+进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`。中文 commit 正文先 Write 成文件再 `git commit -F`。PowerShell 内联⛔ `$_`／裸 `$b`。
+
+## 读数纪律
+引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先跑一枚已知存在的正控并看 `stderr`；`grep -c` 命中 0 会回 rc=1 ⇒ 在 `$( )` 里 `|| true`。两把尺矛盾时先假定新那把坏。**完成通知一律当未验证**——编排者收件只认盘上三把尺（提交真在／件真在／自己复跑）。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含你被允许的写面）；② 证据件**绝对路径**＋`wc -c`＋行数＋占位符尺 0 命中；③ 决定性那把尺的逐字输出（起手侧⇄交件侧都带 `file:line`）＋成对红句逐字＋还原哈希＋四数＋门禁 `rc=`。另加派单里的**必答题**（⛔ 你自己盖章不算）。
+派单 228r3c-specific — 本腿判据（逐条可机读；⛔ 抄 `228-r3b` 任何数，一律现跑）
+
+1) 台面：仓外导出树（`git archive <起手锚> 八件套`＋仓根 `docs/`＋手工三件 `build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`），放 `D:` 卷、目录名产生 8.3 短名；`GOTMPDIR` 先 `mkdir -p`；取出后**先数 `.go` 证非空**并入库。全程 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`。
+2) pristine 正控一发（未突变）：estate 定向四枚（`TestAC11StopBitIsBuiltAtBoot`／`TestAC11StopRequestDuringTheBootWindowIsNotSwallowed`／`TestAC11TrayExitExecutorIsMountedAtTheBallHost`／`TestAC11TrayExitTriggerWalksTheTenSteps`）＋派单额外那枚挂载钉，两把临时根台面成对（默认 C 卷 ⇄ `D:` 预建），四数逐枚点名（预期 4/4/0/0，不符⇒具名更正）。⛔ 恒红当牙。
+3) M1 单发：落点＝`boot_windows.go` 环路 stop 检查那一行（**内容锚**：函数体内那枚 token；⛔ 抄行号——现读并在件里写出你锚的那个 token）。跑 ⓑ-1 用例 ⇒ 必须点名红（红句逐字＋`file:line`＋`rc=`）。当场还原＋复验 pristine 哈希＋复跑该用例绿。
+4) M2 单发（M1 确认已还原之后才开）：落点＝Boot 建停机位那一行。跑 ⓐ-first ⇒ 必须点名红。还原＋复验＋复跑绿。
+5) 两发互不污染自证：每发的 logs 里带"本发突变前哈希／本发后哈希／还原后哈希"三段逐字，并跑一把尺证**另一枚落点在这一发期间未被改**（对整文件哈希，⛔ 只 diff 一行）。
+6) ⛔ 用 `-overlay`；⛔ 改共享工作树跟踪文件；⛔ 杀 `wisp.exe` PID **21892**；⛔ 跑 `cmd/wisp` **整包**（本腿只要定向 `-run`；整包由 322-r2 在你交件后取）。
+7) 门禁只在共享工作树：`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet` 不适用则具名跳过并写明；`gofumpt`＝本腿零 `.go` 跟踪件⇒空列表⛔ 当"过了"（照 `228-r3b` 口径写明）。
+8) 交件＝`.scratch/wisp/probes/228/r3c/report.md`（≤120 行）＋`logs/**` 逐枚入库＋票 228 尾一条 bullet（写锚、写"11 格一枚没翻"）。主题前缀 `票 228 突变复跑腿 228-r3c·<发>`。每落一枚文件就 commit。
+9) 必答：(i) `R-228-3b-1` 是否已被本腿重做成两发**独立**读数（成立／不成立，逐字凭据）；(ii) 两发是否都"有牙"（各自点名红、且 pristine 绿）；(iii) `228-r3b` §4 那句"两枚未做反形⇒不盖章"的用例（挂载钉、空窗那枚）本腿是否补了——没补就明写没补，⛔ 顺手盖章；(iv) 有没有任何一发落在残留窗口里取的读数（有⇒作废重跑，⛔ 交）。

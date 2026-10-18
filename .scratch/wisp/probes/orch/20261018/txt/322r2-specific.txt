@@ -1,0 +1,7 @@
+派单 322r2-specific — 本腿判据（逐条可机读；⛔ 抄数，现跑）
+
+AC#4 补 `cmd/wisp` 那一发（头号）：在仓外导出树跑 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -timeout 30m -v`（⛔ 共享工作树跑 test；⛔ `go test ./...`）。四数逐枚点名（RUN/PASS_TOP/FAIL_TOP/SKIP）；已知本机整包"真窗区整进程死亡"那一格（`228-r3b` 具名：c 面死在 `TestPanelThreadIsSTAAndExitsCleanly`、d 面死在 `TestAC13BringUpSurvivesAReusedThreadQuit`，两台面不同枚＝非确定性）⇒ 死亡与红名册**逐名归位**（哪些＝别票存量、哪些＝台面、有没有本票新增），⛔ 拿整包 rc=1 当"322 把包打红"也⛔ 当全绿。两把临时根台面成对（默认 C 卷 ⇄ `D:` 预建 GOTMPDIR）。消费者面复认：`internal/risk`／`internal/secret`／`internal/config`／`internal/agent`／`internal/memory` 在 Linux 档与本机全 ok 的成对读数（照 `322-v1` 那六道补齐）。门禁四数只在共享工作树：`gofumpt.exe` 真身对你动的件（⛔ 本机存量 6 枚假脏）／`d22scan`／长度门／`go vet ./internal/winsec/ ./cmd/wisp/`（导出台），逐枚 `rc=`。
+残余①注释更正：`sealhandle_privateroute_120_other_test.go` 约 `:232/:237`（行号只当读数，落笔前现读）那句"ticket 322 … stated as unfixed at this anchor in winsec_other.go:78-82"——票 322 已落地的现状＝**叶子那一支已关、祖先那一支仍开**。判据形状＝改成带条件的事实句（说清"O_TRUNC 经被换叶子的 open 这一支由票 322 的守卫拦、祖先仍开"），⛔ 许诺"窗口已关"；⛔ 动该用例任何断言；⛔ 动 `winsec_other.go` 一字（它的注释面 `322-v1` 判 AC#5 已成立）。
+残余②Windows 半格：把 `witnessTruncated=true`（`witnessSize=0/35`）那两枚本机读数在只读复跑里具名复认或更正（`322-v1` 判语 §AC#3 第二形＝〔仅本机可量〕＋CI 覆盖不到已登记）；⛔ 为它动任何字节。
+票面 AC 框一枚不翻（`AC#4` 的翻框要凭**非实现者**判语＋编排者复跑；你交的是料＋注释更正那一笔）。交件＝逐笔 `git show --name-only` 全集⊆三处写面、`.go` 只可能出现在那一枚测试注释面（若你按停手规则没动字节，则 `.go` 命中 0）；证据落 `.scratch/wisp/probes/322/r2/report.md`（≤160 行）＋logs。主题前缀 `票 322 收尾腿 322-r2·<格>`。每落一枚文件就 commit。
+必答：(i) `cmd/wisp` 那一发的逐名红册＋死亡枚归位；(ii) 三处消费过"unfixed"旧口径的位置你更正了哪几处、为什么其余不动（具名）；(iii) AC#4 判"成立／仍缺什么"的料级结论（不下判语，只交数＋缺项）。

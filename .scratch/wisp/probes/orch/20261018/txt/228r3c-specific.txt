@@ -1,0 +1,11 @@
+派单 228r3c-specific — 本腿判据（逐条可机读；⛔ 抄 `228-r3b` 任何数，一律现跑）
+
+1) 台面：仓外导出树（`git archive <起手锚> 八件套`＋仓根 `docs/`＋手工三件 `build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`），放 `D:` 卷、目录名产生 8.3 短名；`GOTMPDIR` 先 `mkdir -p`；取出后**先数 `.go` 证非空**并入库。全程 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`。
+2) pristine 正控一发（未突变）：estate 定向四枚（`TestAC11StopBitIsBuiltAtBoot`／`TestAC11StopRequestDuringTheBootWindowIsNotSwallowed`／`TestAC11TrayExitExecutorIsMountedAtTheBallHost`／`TestAC11TrayExitTriggerWalksTheTenSteps`）＋派单额外那枚挂载钉，两把临时根台面成对（默认 C 卷 ⇄ `D:` 预建），四数逐枚点名（预期 4/4/0/0，不符⇒具名更正）。⛔ 恒红当牙。
+3) M1 单发：落点＝`boot_windows.go` 环路 stop 检查那一行（**内容锚**：函数体内那枚 token；⛔ 抄行号——现读并在件里写出你锚的那个 token）。跑 ⓑ-1 用例 ⇒ 必须点名红（红句逐字＋`file:line`＋`rc=`）。当场还原＋复验 pristine 哈希＋复跑该用例绿。
+4) M2 单发（M1 确认已还原之后才开）：落点＝Boot 建停机位那一行。跑 ⓐ-first ⇒ 必须点名红。还原＋复验＋复跑绿。
+5) 两发互不污染自证：每发的 logs 里带"本发突变前哈希／本发后哈希／还原后哈希"三段逐字，并跑一把尺证**另一枚落点在这一发期间未被改**（对整文件哈希，⛔ 只 diff 一行）。
+6) ⛔ 用 `-overlay`；⛔ 改共享工作树跟踪文件；⛔ 杀 `wisp.exe` PID **21892**；⛔ 跑 `cmd/wisp` **整包**（本腿只要定向 `-run`；整包由 322-r2 在你交件后取）。
+7) 门禁只在共享工作树：`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet` 不适用则具名跳过并写明；`gofumpt`＝本腿零 `.go` 跟踪件⇒空列表⛔ 当"过了"（照 `228-r3b` 口径写明）。
+8) 交件＝`.scratch/wisp/probes/228/r3c/report.md`（≤120 行）＋`logs/**` 逐枚入库＋票 228 尾一条 bullet（写锚、写"11 格一枚没翻"）。主题前缀 `票 228 突变复跑腿 228-r3c·<发>`。每落一枚文件就 commit。
+9) 必答：(i) `R-228-3b-1` 是否已被本腿重做成两发**独立**读数（成立／不成立，逐字凭据）；(ii) 两发是否都"有牙"（各自点名红、且 pristine 绿）；(iii) `228-r3b` §4 那句"两枚未做反形⇒不盖章"的用例（挂载钉、空窗那枚）本腿是否补了——没补就明写没补，⛔ 顺手盖章；(iv) 有没有任何一发落在残留窗口里取的读数（有⇒作废重跑，⛔ 交）。

@@ -1,0 +1,64 @@
+派单 336r1-head — 票 336 落地腿（写·仪器补牙）2026-10-18 第一波
+- 编排者＝新任 harness（零记忆接手，自检已跑）；发出前 CPU 连发五现量 48/49/48/59/48（≤70%）。
+- 起手锚＝你自己 `git log -1` 现认（编排者 09:3x 见 `f60d50d6`；⛔ 拿我的号当锚）。
+- 目标：给 `internal/risk/blacklist.go` A 档回落支的**每一枚锚**装上"摘掉它这一枚的回落支⇒必红"的仪器牙。票 336 七格（AC#0…AC#6）全未勾，一枚都不翻；七枚由非实现者裁。
+- 来历（读票面即可，不重抄）：票 334 `AC#2` 半成立——`334-v1` 实测 M-V2a（只摘 `%LOCALAPPDATA%\Microsoft\Credentials` 回落支）与 M-V2b（只摘 `~/.ssh/**`）两发都让同一形从不可豁免 A 掉到可单文件豁免 B，而三枚仪器全绿 `10/3/0/0 rc=0`；真被钉住的只有 `.aws`（闸门格＋ⓐ）与 `.kube`（ⓑ，M-V2c 摘它当场红＝反证）；M-V3（变严）闸门格恒不红＝偶然接住、非本格敏感方向。票面 `.scratch/wisp/issues/336-*.md` 全文照读。
+- 写面（只三处，逐路径）：
+  1) `internal/risk/**` 的**测试面**＝只许新建/修改 `*_test.go`（建议名 `anchor_fallback_teeth_336_test.go` 一族，短名）；
+  2) `.scratch/wisp/probes/336/r1/**`（report.md＋logs/，短名、⛔ `§`、⛔ 落 `docs/evidence/s1/`——那是裁决者的面）；
+  3) 票 336 末尾**一条**只追加 bullet。
+- 禁区：⛔ 动 `blacklist.go` 任何非注释字节（本票是仪器活；产码要改另立票）；⛔ 动 `internal/risk/**` 非测试 `.go` 一字；⛔ `internal/panel/**`、⛔ `cmd/wisp/**`、⛔ `frontend/**`、⛔ `design/**`；⛔ 判级档位／门控语义／三枚冻结件／`thresholds.go`／golden／`allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／D1–D47／C1–C32／R1–R9／D43 转移表；⛔ 为变绿放宽断言／删用例／`t.Skip`／新导出名；⛔ 翻框／改票名／`-done`／push。
+- 并发说明：本波另五枚腿在飞——`337-a1` 只读同包（它按纪律读具名提交树、⛔ 读你的在飞字节，你别管它）；`cmd/wisp/**` 与 `internal/panel/**` 本波零写腿；`go test ./cmd/wisp` 唯一持跑者＝`228-r3c`，你⛔ 跑它。放腿前 CPU ≤70% 已由编排者现量。
+派单公共块（2026-10-18 第一波，编排者＝新任 harness；逐条都是现行铁律，缺一条我就退回你那笔交件）
+
+## 编队规则（本波）
+本波总代理 6 条（≤8）；写代理 3 条（336-r1／166-r1／322-r2）。写面互斥：`cmd/wisp/**` 与 `internal/panel/**` 本波零写腿、任何腿⛔ 写这两面；`go test ./cmd/wisp` 同一时刻只跑一个（本波唯一持跑者＝228-r3c）；`internal/risk/**` 本波唯一写腿＝336-r1；`internal/session/**`＝166-r1；`internal/winsec/**`＝322-r2；`frontend/**`、`design/**` 本编队零写面（归机主外部 agent）。
+
+## git
+⛔ **push**（推送只由编排者做，且现在被机主按住）。`git add` 与 `git commit` 两处都要**逐枚显式 pathspec**——⛔ `add -A`／`add .`／目录形、★⛔ `git commit -F <正文> -- .`（那个 `.` 曾把机主在飞的 24 枚工作树字节记进历史，台账 `A1011` 第⑧节）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree 或 checkout。临时件**只建不删**。撞 `.git/index.lock`：⛔ 删锁，等它自己散再重试同一笔。
+
+## 票面
+⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`（裁决者≠实现者；翻框只由编排者凭非实现者判语做）。只许在你被指定的票尾**追加一条** bullet。
+
+## 台面配方（仓外导出树，缺一味就假红）
+`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models`（**八件套**）＋★仓根 `docs/`（有些测试读 `docs/PLAN.md`；`internal/panel/git_test.go` 一族要它）＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`——都⛔ 跟踪）。树放 **`D:` 卷且目录名要产生 8.3 短名别名**（放 C 卷 Temp ⇒ 短名族打红＝台面故障）；`GOTMPDIR` 指到 `D:` 上**先 `mkdir -p`**（没建＝`creating work dir` 红，长得像判据响）。取出后**先数 `.go` 证非空**（"0"⛔ 是读数）。⛔ 在共享工作树跑 `go test`／`go build`。
+
+## 颜色尺
+`RUN=`＝`grep -c '^=== RUN'`（含子测试）⇄ `PASS_TOP=`＝`grep -c '^--- PASS'`（只顶层）⇄ `FAIL_TOP=`＝`^--- FAIL` ⇄ `SKIP=`。**四数不许混用、不许相减**。一律 `-count=1 -timeout 30m` 或更长；⛔ `go test ./...`。★跑 `cmd/wisp` 必须带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，否则 `0xc0000135`＋零枚 `--- FAIL`＝那包根本没跑（台面故障，⛔ 计入判据）。已知本机一格：`cmd/wisp` 整包有真窗区整进程死亡（`resident_*` 在整包从不执行）⇒ estate 颜色取自定向 `-run`，⛔ 拿整包当"全绿"或"我的字节把包打红"。
+
+## 门禁四数（只在共享工作树）
+`/d/work/base/gopath/bin/gofumpt.exe -l <你的文件>`（⚠ 本机工作树 6 枚既有件因 CRLF 被标脏＝存量，**你的新字节必须 LF**，⛔ 顺手重排别腿文件；具名登记即可）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./<你的包>/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 exit 2＝GUARD 射程拒绝⛔ 读成红；长度门要 `.git`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+
+## 突变（牙）
+只打在**仓外导出树**的物理字节上——⛔ 改跟踪文件、⛔ `-overlay`（那形对读盘的尺失明）；**内容锚**（函数体内那枚 token），⛔ 绝对行号；逐发**当场还原并报还原哈希**，跑前跑后各验一次 pristine 哈希；跨 shell 的 `trap`/`finally` 有竞态 ⇒ **两发串行**，⛔ 信 echo。成对两发落点必须不同，少任一发＝那把尺不敏感，⛔ 用它的绿当凭据。
+
+## 判据形状
+⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ `t.Skip`、⛔ 在注释里指名一枚不存在的测试或件当凭据、⛔ 许诺未实现的能力、⛔ 动 SLO 阈值／golden／`thresholds.go`／`allowlist.txt`／三枚冻结件（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`ticket90_persist_test.go`）／D1–D47／C1–C32／R1–R9／D43 转移表／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`。⛔ 新导出名、⛔ 新 `panel.*` 方法名、⛔ 新 JSON 键。碰到未定义的事**停手上报**（写进交件具名），⛔ 自行假设。
+
+## 输出预算
+≤4 枚正文件、每件 ≤160 行；⛔ 0 字节文件（落笔前后 `wc -c`）；**每落一枚文件就 commit**（⛔ 攒着）。轮次帽：先做判据最硬的那格，把 `logs/` 逐枚提前入库；到帽前把最新状态 commit＋票尾 bullet 落盘。
+
+## shell
+进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`。中文 commit 正文先 Write 成文件再 `git commit -F`。PowerShell 内联⛔ `$_`／裸 `$b`。
+
+## 读数纪律
+引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先跑一枚已知存在的正控并看 `stderr`；`grep -c` 命中 0 会回 rc=1 ⇒ 在 `$( )` 里 `|| true`。两把尺矛盾时先假定新那把坏。**完成通知一律当未验证**——编排者收件只认盘上三把尺（提交真在／件真在／自己复跑）。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含你被允许的写面）；② 证据件**绝对路径**＋`wc -c`＋行数＋占位符尺 0 命中；③ 决定性那把尺的逐字输出（起手侧⇄交件侧都带 `file:line`）＋成对红句逐字＋还原哈希＋四数＋门禁 `rc=`。另加派单里的**必答题**（⛔ 你自己盖章不算）。
+派单 336r1-specific — 本腿判据（照票面逐格，逐条可机读；⛔ 抄本块里的任何数，一律现跑）
+
+AC#0 起手现量：把票面「现量」四发（M-V2a／M-V2b／M-V2c／M-V3）**串行**重放——只打仓外导出树的物理字节（⛔ 改跟踪文件、⛔ `-overlay`），每发带 `rc=`＋每发前后各断言一次 pristine 哈希＋还原哈希；与票面上表读数不同 ⇒ 当场具名更正。参照料：`334-v1` 的原读数在 `.scratch/wisp/probes/334/v1/**`（91 枚 logs 已入库 40＋我代提 46，具名 0 字节 6 枚⛔ 入库）。
+AC#1 名册要全：现量尺＝`grep -n 'aEq\|aUnder' internal/risk/blacklist.go`（取具名提交树），逐枚列 A 档锚名册＋每枚标"今天有哪枚用例钉它"；⛔ 抄票面「七枚」那句（编排者 10-18 现跑 grep 原始命中 12 行＝含定义与用法，枚数以你按 case 归并的现量为准并附尺）。没人钉的那几枚具名列出。
+AC#2 ★每枚锚各发一两枚用例、落点必须不同：对名册里每一枚锚，测试要能回答"摘掉它这一枚的回落支⇒必红"；★成对正控＝同一枚用例在未突变树上必须绿（⛔ 恒红）。红名册逐名对撞，⛔ 只看枚数。
+AC#3 形状：甲＝逐锚用例（落 `internal/risk` 测试面）；乙＝把 `334-v1` 那把 42 行三值对撞尺搬成仓内断言（世界现成＝`.scratch/wisp/probes/334/v1/logs/probe-334v1_test.go.txt`）。**本腿先落甲**（写面所限），乙形的代价你现量后交材料（能否搬、搬进来要几枚文件、跑时长），选不选由裁腿与编排者裁——⛔ 自己定案。两形代价都要现量（跑时长、维护面、能否在 CI 跑到），⛔ 推理代替读数。
+AC#4 颜色与门禁：`./internal/risk` 成对两把临时根台面（默认 C 卷 ⇄ `D:` 上先 `mkdir -p` 那一发）、同一条 `-run` 名册、四数逐枚点名（RUN⇄PASS_TOP⇄FAIL_TOP⇄SKIP，⛔ 混用⛔ 相减）、改前⇄改后同一台面；红名册作差逐名列出。门禁四数只在共享工作树（`/d/work/base/gopath/bin/gofumpt.exe` 真身／`d22scan`／长度门／`go vet ./internal/risk/`）逐枚落 `rc=`。⚠ gofumpt 本机存量脏 6 枚（编排者 10-18 登记，见停车点 §4.0ei）：其中 `internal/risk/provenance.go` 是 CRLF 台面假脏——⛔ 动它一字，你只需证**你自己新增件**列出 0 枚。⛔ 跑 `./cmd/wisp` 整包、⛔ `go test ./...`。
+AC#5／AC#6：见 head 禁区，逐条自证（逐笔 `git show --name-only` 全集⊆三处写面、`.go` 非测试命中 0）。
+
+必答题（⛔ 盖章不算）：
+(i) 名册现量枚数 ⇄ 票面「七枚」那句的差异具名（谁的尺、差在哪）。
+(ii) 每枚新用例给存量整包带来的跑时长差（成对读数，同一台面）。
+(iii) 若某枚锚在仓内测试里造不出"摘它必红"的世界（缺世界），具名写出缺哪一味——⛔ 用假绿糊。
+(iv) 本腿有没有任何一发的红句落点与另一发相同（成对两发落点不同自查，逐名列）。
+
+交件落点：`internal/risk/*_336*_test.go` 新件（逐笔 commit）＋`.scratch/wisp/probes/336/r1/report.md`（≤160 行）＋`logs/` 逐枚入库＋票 336 尾一条 bullet（写锚、写"七枚框一枚没翻"）。每落一枚文件就 commit；主题前缀一律 `票 336 落地腿 336-r1·<格>`（编排者收件尺用严格前缀，先采样板上真实形状）。

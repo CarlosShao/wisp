@@ -1,0 +1,54 @@
+派单 166r1-head — 票 166 落地腿（写·AC#2 四件最小出口）2026-10-18 第一波
+- 起手锚＝你自己 `git log -1` 现认（编排者 09:3x 见 `f60d50d6`）。
+- 目标：票 166 `AC#2`＝"四件最小出口：列（按时间/按工作区）、搜（标题与正文）、改名、归档带撤销。每件都要答『这一发在未修码上响不响』"。`166-v1` 判语＝AC#2 **不成立＝接线缺口**：`internal/session/manage.go` 的四件（`List/Search/Rename/Archive+Unarchive`→`internal/memory/dao_session.go`）函数与用例齐全，但**生产调用者枚数＝0/0/0/0/0**（尺＝`git grep -n "session\.NewManager" -- '*.go'` rc=1；正控 `session.NewLedger`＝3 命中）。件＝`docs/evidence/s1/166-session-verdict.md`（98 行／13583 字节）照读。
+- ★本腿射程边界（编排者裁，写进判据）：写面＝**`internal/session/**`**（产码＋测试）＋`.scratch/wisp/probes/166/r1/logs/**`＋票尾一条。`cmd/wisp/**` 与 `internal/panel/**`＝共享编译面、**本波零写腿**，你⛔ 碰；若你判明"最小出口"必然要 `cmd/wisp`（CLI 子命令）或面板泵字段才成立 ⇒ **停手上报**（未定义即停）：交回你已在 `internal/session` 内装好的那一半＋具名缺口，由编排者排下一波。⛔ 不许为绕开这一步去造新导出 `panel.*`、新 JSON 键、C17 新方法名。
+- 写面（逐路径）：`internal/session/**`（含该目录新文件；若必须动 `internal/memory/dao_session.go` 才走得通 ⇒ 那是另一面，**先停手上报**，本腿不自行扩面）＋`.scratch/wisp/probes/166/r1/logs/**`＋票 166 末尾一条只追加 bullet。
+- 禁区：⛔ `cmd/wisp/**`／`internal/panel/**`／`internal/risk/**`（336-r1 在写）／`internal/winsec/**`（322-r2 在写）／`frontend/**`／`design/**`；⛔ 动 `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／D1–D47／C1–C32／R1–R9／D43；⛔ 新造存储（D35 定过；加列走可重放迁移）；⛔ 静默删历史（分叉/改名不许吞原件）；⛔ 翻框／改票名／`-done`／push。票 166 现量 1 未勾（`AC#2`）／5 已勾；`AC#2` 的翻框归非实现者裁腿。
+- 并发：本波 6 腿（3 写：336-r1／166-r1／322-r2）；CPU 现量 ≤70% 才放；`go test ./cmd/wisp` 唯一持跑者＝228-r3c，你⛔ 跑。
+派单公共块（2026-10-18 第一波，编排者＝新任 harness；逐条都是现行铁律，缺一条我就退回你那笔交件）
+
+## 编队规则（本波）
+本波总代理 6 条（≤8）；写代理 3 条（336-r1／166-r1／322-r2）。写面互斥：`cmd/wisp/**` 与 `internal/panel/**` 本波零写腿、任何腿⛔ 写这两面；`go test ./cmd/wisp` 同一时刻只跑一个（本波唯一持跑者＝228-r3c）；`internal/risk/**` 本波唯一写腿＝336-r1；`internal/session/**`＝166-r1；`internal/winsec/**`＝322-r2；`frontend/**`、`design/**` 本编队零写面（归机主外部 agent）。
+
+## git
+⛔ **push**（推送只由编排者做，且现在被机主按住）。`git add` 与 `git commit` 两处都要**逐枚显式 pathspec**——⛔ `add -A`／`add .`／目录形、★⛔ `git commit -F <正文> -- .`（那个 `.` 曾把机主在飞的 24 枚工作树字节记进历史，台账 `A1011` 第⑧节）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree 或 checkout。临时件**只建不删**。撞 `.git/index.lock`：⛔ 删锁，等它自己散再重试同一笔。
+
+## 票面
+⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`（裁决者≠实现者；翻框只由编排者凭非实现者判语做）。只许在你被指定的票尾**追加一条** bullet。
+
+## 台面配方（仓外导出树，缺一味就假红）
+`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models`（**八件套**）＋★仓根 `docs/`（有些测试读 `docs/PLAN.md`；`internal/panel/git_test.go` 一族要它）＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`——都⛔ 跟踪）。树放 **`D:` 卷且目录名要产生 8.3 短名别名**（放 C 卷 Temp ⇒ 短名族打红＝台面故障）；`GOTMPDIR` 指到 `D:` 上**先 `mkdir -p`**（没建＝`creating work dir` 红，长得像判据响）。取出后**先数 `.go` 证非空**（"0"⛔ 是读数）。⛔ 在共享工作树跑 `go test`／`go build`。
+
+## 颜色尺
+`RUN=`＝`grep -c '^=== RUN'`（含子测试）⇄ `PASS_TOP=`＝`grep -c '^--- PASS'`（只顶层）⇄ `FAIL_TOP=`＝`^--- FAIL` ⇄ `SKIP=`。**四数不许混用、不许相减**。一律 `-count=1 -timeout 30m` 或更长；⛔ `go test ./...`。★跑 `cmd/wisp` 必须带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，否则 `0xc0000135`＋零枚 `--- FAIL`＝那包根本没跑（台面故障，⛔ 计入判据）。已知本机一格：`cmd/wisp` 整包有真窗区整进程死亡（`resident_*` 在整包从不执行）⇒ estate 颜色取自定向 `-run`，⛔ 拿整包当"全绿"或"我的字节把包打红"。
+
+## 门禁四数（只在共享工作树）
+`/d/work/base/gopath/bin/gofumpt.exe -l <你的文件>`（⚠ 本机工作树 6 枚既有件因 CRLF 被标脏＝存量，**你的新字节必须 LF**，⛔ 顺手重排别腿文件；具名登记即可）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./<你的包>/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 exit 2＝GUARD 射程拒绝⛔ 读成红；长度门要 `.git`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+
+## 突变（牙）
+只打在**仓外导出树**的物理字节上——⛔ 改跟踪文件、⛔ `-overlay`（那形对读盘的尺失明）；**内容锚**（函数体内那枚 token），⛔ 绝对行号；逐发**当场还原并报还原哈希**，跑前跑后各验一次 pristine 哈希；跨 shell 的 `trap`/`finally` 有竞态 ⇒ **两发串行**，⛔ 信 echo。成对两发落点必须不同，少任一发＝那把尺不敏感，⛔ 用它的绿当凭据。
+
+## 判据形状
+⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ `t.Skip`、⛔ 在注释里指名一枚不存在的测试或件当凭据、⛔ 许诺未实现的能力、⛔ 动 SLO 阈值／golden／`thresholds.go`／`allowlist.txt`／三枚冻结件（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`ticket90_persist_test.go`）／D1–D47／C1–C32／R1–R9／D43 转移表／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`。⛔ 新导出名、⛔ 新 `panel.*` 方法名、⛔ 新 JSON 键。碰到未定义的事**停手上报**（写进交件具名），⛔ 自行假设。
+
+## 输出预算
+≤4 枚正文件、每件 ≤160 行；⛔ 0 字节文件（落笔前后 `wc -c`）；**每落一枚文件就 commit**（⛔ 攒着）。轮次帽：先做判据最硬的那格，把 `logs/` 逐枚提前入库；到帽前把最新状态 commit＋票尾 bullet 落盘。
+
+## shell
+进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`。中文 commit 正文先 Write 成文件再 `git commit -F`。PowerShell 内联⛔ `$_`／裸 `$b`。
+
+## 读数纪律
+引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先跑一枚已知存在的正控并看 `stderr`；`grep -c` 命中 0 会回 rc=1 ⇒ 在 `$( )` 里 `|| true`。两把尺矛盾时先假定新那把坏。**完成通知一律当未验证**——编排者收件只认盘上三把尺（提交真在／件真在／自己复跑）。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含你被允许的写面）；② 证据件**绝对路径**＋`wc -c`＋行数＋占位符尺 0 命中；③ 决定性那把尺的逐字输出（起手侧⇄交件侧都带 `file:line`）＋成对红句逐字＋还原哈希＋四数＋门禁 `rc=`。另加派单里的**必答题**（⛔ 你自己盖章不算）。
+派单 166r1-specific — 本腿判据（逐格可机读；⛔ 抄本块任何数，一律现跑）
+
+1) 起手：票面＋`166-v1` 判语件＋票尾三条（166-r1／166-r2／166-v1／编排者翻框）全读；起手锚现认；尺三枚现跑入库——`session.NewManager` 生产命中数（预期 rc=1，正控 `func NewManager` 命中 1）／CLI 出口尺 `grep -cE '"sessions"|"history"' cmd/wisp/main.go`（预期 0）／票 166 框数（预期 1 未勾＝AC#2）。与预期不符⇒具名更正。
+2) 装最小出口（在 internal/session 内）：给 `Manager` 一枚**可被宿主装配的构造/接线点**——判据形状＝"生产装配者真调用它"，⛔ 拿 `go build`/`go vet` rc=0 冒充接线（Go 不为未使用方法报错，本仓入账多次）。若装配点必然落在 `cmd/wisp`（CLI `sessions` 子命令）或面板泵（`internal/panel` 快照字段）⇒ **那一半不写**，具名上报＋把已装好的半边与残余各落成用例/读数。
+3) "每件都要答『这一发在未修码上响不响』"＝逐件成对读数：未修码基线（`git archive <起手锚>` 仓外导出树）上跑该件判据 ⇒ 记录它今天响不响（预期：List/Search/Rename/Archive 四件"生产可达"那一发在基线上**必响/必零命中**，因为接线不存在）；交件侧同一把尺复跑。两发同台面、四数逐枚点名、红句带 `file:line`。
+4) AC#2 那四件语义钉：列（按时间/按工作区）、搜（标题＋正文）、改名、归档**带撤销**——每件在 internal/session 测试面各 ≥1 枚用例断"出口被装配后调用可达且返回正确"；⛔ 放宽、⛔ Skip、⛔ 删。`updated_at` 同秒硬币那格（AC#6 已勾）⛔ 重开；`AppendSessionTurn` 不刷新 `session.updated_at` 属编排者另立的票 ⇒ ⛔ 顺手做。
+5) 颜色与门禁：`go test ./internal/session/ ./internal/memory/` 成对（基线⇄交件、同一台面）、两把临时根台面成对（默认 C 卷 ⇄ `D:` 预建 `GOTMPDIR`）、四数逐枚点名；`-count=1 -timeout 30m`；⛔ `./...`、⛔ `./cmd/wisp`。门禁四数只在共享工作树：`/d/work/base/gopath/bin/gofumpt.exe -l <你的新/改文件>`（你的字节必须 LF；本机存量 6 枚 CRLF 假脏与 `internal/tools` 1 枚真脏属存量⛔ 动，具名登记）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./internal/session/`，逐枚 `rc=`。
+6) 契约轴自查（票 166 AC#5 形状）：`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`internal/panel/**`、`internal/agent/approval/**`、`thresholds.go`、golden、`allowlist.txt`、`frontend/**`、`design/**` 对**你的每一笔提交**零字节；名册按 commit 号集合算（`--no-walk`），逐笔 `git show --name-only` 进 logs。
+7) 交件落点：`.scratch/wisp/probes/166/r1/logs/**` 逐枚入库＋（若正解只在此面）`internal/session/**`＋票尾一条 bullet（写锚、写"框一枚没翻"）。主题前缀 `票 166 落地腿 166-r1·<格>`。每落一枚文件就 commit；轮次帽前先交最硬判据。
+8) 必答：(i) 你的装配点形状是什么、谁会在下一波消费它（具名 `file:line`）；(ii) 若判明必须 cmd/wisp／internal panel ⇒ 停手上报的具体最小缺口（几行、哪枚函数、为什么绕不开）；(iii) 四件各自"未修码响不响"的逐字读数。

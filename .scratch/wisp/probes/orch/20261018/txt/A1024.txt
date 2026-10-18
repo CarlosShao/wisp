@@ -1,0 +1,23 @@
+## A1024（2026-10-18 09:3x–09:5x +08，编排者＝新任 harness 接手自检）8 条自检全跑｜★与交接书 §5 的唯一差异＝gofumpt（现量 6 枚脏＝4 枚 CRLF 假脏＋2 枚 blob 真脏）｜盘上清理增量按机主授权记账｜第一波 6 腿派单已存档＝待派
+
+**① 接手（只读先行）**：按机主指令顺序读盘——交接书 `docs/reports/orchestrator-handoff-20261017.md` 全文 600 行／`AGENTS.md`「当前时代」段（注：该段仍指 `4.0de` 与 10-13 交接书＝过期索引，现势以交接书 §1 必读顺序为准）／`HANDOVER.md` §4.0eh（`f60d50d6` 入库）／台账最新 `A1023`／五枚要碰的票（328／334／228／336／337）全文＋票 322／166 与 328v1 派单存档 62 行。⛔ 动手改任何字节之前先跑完 §1 的 8 条。
+
+**② 8 条自检（09:3x–09:4x 现跑，逐条带尺）**：
+1) 基准提交＝`f60d50d6`（2026-10-17 18:41:46 +0800，交接书更正笔）✓ 与机主指令一致。
+2) 未推数＝`git rev-list --count origin/dev..HEAD`＝**366**（`A1023` 那句"本笔后 366"对上；⛔ 抄交接书 §5 的 364＝10-17 16:5x 旧读数）。`git rev-list --count HEAD..origin/dev`＝0（fast-forward 条件成立，但⛔ 推——见 ⑥）。
+3) 跟踪面＝`git status --porcelain` 剥 `??` 后 **0 枚**（未跟踪历史临时件按"只建不删"留着）。
+4) 票池分母＝票件 **324**／未结 **181**／未勾格 **768**——三把尺逐字与交接书 §5 一致（尺＝`ls *.md` 去 README＋`-done` 名尺＋`^[[:space:]]*- \[ \]` 全池 grep）。
+5) 格数＝334 未勾 1／勾 6 ✓；328 未勾 3／勾 2 ✓；228 未勾 11／勾 5 ✓；336＝7/0、337＝7/0、335 已 `-done` 0/7、327 未改名 0/6、329 2/7、330 5/3、322 1/5、216 1/5、220 1/4、166 1/5——与交接书 §5 逐枚对上。
+6) CPU＝头一把连发 67/80/57（**80 那一读发生在我自己扫盘期间＝我的读数的自负载**，具名不藏）；09:5x 再连发五把＝48/49/48/59/48 ⇒ 放腿门槛 ≤70% 在派单时刻成立。
+7) 门禁：`sh scripts/d22scan.sh` rc=**0** clean（ban#8 internal/=586＋cmd/=143、design/=39、frontend/=116，与 `A1021` 逐枚同）；`sh scripts/check-path-length-budget.sh` rc=**0** VERDICT GREEN（tracked 15168、over-budget=60、roster=60、worst 229＝分母比 `A1021` 涨 133 枚＝别腿入库时间差，roster 同集）；★**`/d/work/base/gopath/bin/gofumpt.exe -l internal cmd`＝现量 6 枚**（`internal/agent/approval/pending_read.go`／`internal/agent/tools.go`／`internal/risk/provenance.go`／`internal/tools/task_output_pointer_notice_errtext_174r7_test.go`／`cmd/wisp/models.go`／`cmd/wisp/panel_transport_35r2_test.go`）。
+8) 最近三笔＝`f60d50d6`／`6bf5af5c`／`d473b7d5` ✓ 没接在别人未收的腿上；`c59d0354`（`328-v1` 起手三把尺）是 HEAD 祖先、`git diff 78d3b46a..HEAD -- internal cmd`＝**0 行**（那包字节自死腿锚以来未动）；`origin/dev` ref＝`adec1db1`。
+
+**③ ★唯一对不上的读数＝gofumpt（交接书 §5 说 0 枚，我现量 6 枚）——机制归到底再登记**：把 6 枚逐一取证：① `git ls-files --eol`＝四枚 `i/lf w/crlf`（`pending_read.go`/`tools.go`/`provenance.go`/`models.go`），HEAD blob 抽到 LF 态复跑 gofumpt＝**CLEAN** ⇒ 这四枚＝**工作树 CRLF 假脏**（`core.autocrlf=true`＋`.gitattributes eol=lf`，盘上字节被哪个进程写成 CRLF 未归到底；CI 的 checkout 是 LF＝CI 不会因它们红）；② 另两枚 `internal/tools/task_output_pointer_notice_errtext_174r7_test.go`（末笔 `67a7ab41` 10-14）与 `cmd/wisp/panel_transport_35r2_test.go`（末笔 `18d43f8e` 10-10）**blob 态也脏**＝注释对齐形真脏（`gofmt -d` 现读），CI 那两道 gofumpt 步骤（`ci.yml:172` 与 `:189`，分母＝跟踪集）推上去**会红**。⇒ 登记为存量差异：⛔ 归任何在飞腿顺手修（那是别票写面＋为变绿动字节的形状）；处置归我——要不要立一枚「两枚跟踪件格式归位」小票，我在 §4.0ei 拍了再说。★交接书 §5「gofumpt 0 枚」判过期，以本笔现量为准。
+
+**④ 接手增量（机主 2026-10-18 亲口授权，此前台账无账——按规矩补记，非我做的）**：`D:\tmp` 10-12 之前旧 Wisp 测试/探针树 1,070 个＋`D:\work` 22 项旧残留（bisect 686MB、旧编译缓存、散落 txt）＋若干空目录已删，逐项复查 0 残留；D 盘可用 170GB→199GB（df 与 PowerShell 两把尺一致）。未动＝仓库（HEAD `f60d50d6`）／三棵注册工作树（`git worktree list` 现量＝主树＋`D:/tmp/wisp136instr-r1/wt-head`＋`D:/wt/fe`，枚数吻合）／`D:\tmp` 10-12 之后的测试树／`D:\work` 近期树／`D:` 根 `W334R1*`/`W334V1*`（现量 11 枚目录仍在，等票 334-v1 收件）。⇒ 清理任务已结束；**⛔ 未经机主另行授权不许再删任何东西，⛔ 清理 `.scratch/**` 临时件**（本笔起生效于我）。
+
+**⑤ 断点复认（盘上尺）**：最后一笔编排者提交＝`f60d50d6`；最后一笔腿提交＝`c59d0354`（`328-v1` 起手三把尺，死于 Qoder 日限额，无未提交跟踪面）；在飞 **0**（`list_agents`＝只有我）；`328v1-dispatch.txt` 62 行／13803 字节已复本到 `orch/20261018/txt/`，**按原样重放**（⛔ 重写判据；唯一更正＝票面 `:56` 那句"correlationId 命中 4 枚"已作废，现量 11/7/24，派单原文第 49 行本就自带这条更正）。
+
+**⑥ 推送**：仍 **⛔ 执行**——机主两句话未回（`72b65c61` 历史处置＝「推吧」或「design 那批先别推」；放宽分类＝甲／乙／不做，默认只做甲）。第 3 句（仓根 0 字节 `-` 件删不删）也未回；⛔ 催第二次。本笔现量＝HEAD `f60d50d6`、未推 **366**。
+
+**⑦ 排程（本笔动作）**：第一波 6 腿派单已逐枚存档（`orch/20261018/txt/{328v1,336r1,166r1,322r2,337a1,228r3c}-{head,common,specific,dispatch}.txt`，common 本波共用＝`common-20261018.txt`）：`328-v1` 裁决重放∥`336-r1` 写（`internal/risk/**` 测试面）∥`166-r1` 写（`internal/session/**`）∥`322-r2` 写/收尾（`internal/winsec/**` 注释面＋`cmd/wisp` 读数取证，⚠ 它的 `cmd/wisp` 一发排在 `228-r3c` 交件后）∥`337-a1` 只读普查∥`228-r3c` 突变串行复跑（本波唯一 `go test ./cmd/wisp` 持跑者）。形状＝6 总≤8、3 写≥3、`cmd/wisp`/`internal/panel` 零写腿、CPU≤70%。第二波预留＝`228-v1`（裁决）＋`329-r1`∥`330-r1`（`cmd/wisp` 单车道串行）。

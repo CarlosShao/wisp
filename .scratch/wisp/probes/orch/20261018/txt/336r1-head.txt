@@ -1,0 +1,11 @@
+派单 336r1-head — 票 336 落地腿（写·仪器补牙）2026-10-18 第一波
+- 编排者＝新任 harness（零记忆接手，自检已跑）；发出前 CPU 连发五现量 48/49/48/59/48（≤70%）。
+- 起手锚＝你自己 `git log -1` 现认（编排者 09:3x 见 `f60d50d6`；⛔ 拿我的号当锚）。
+- 目标：给 `internal/risk/blacklist.go` A 档回落支的**每一枚锚**装上"摘掉它这一枚的回落支⇒必红"的仪器牙。票 336 七格（AC#0…AC#6）全未勾，一枚都不翻；七枚由非实现者裁。
+- 来历（读票面即可，不重抄）：票 334 `AC#2` 半成立——`334-v1` 实测 M-V2a（只摘 `%LOCALAPPDATA%\Microsoft\Credentials` 回落支）与 M-V2b（只摘 `~/.ssh/**`）两发都让同一形从不可豁免 A 掉到可单文件豁免 B，而三枚仪器全绿 `10/3/0/0 rc=0`；真被钉住的只有 `.aws`（闸门格＋ⓐ）与 `.kube`（ⓑ，M-V2c 摘它当场红＝反证）；M-V3（变严）闸门格恒不红＝偶然接住、非本格敏感方向。票面 `.scratch/wisp/issues/336-*.md` 全文照读。
+- 写面（只三处，逐路径）：
+  1) `internal/risk/**` 的**测试面**＝只许新建/修改 `*_test.go`（建议名 `anchor_fallback_teeth_336_test.go` 一族，短名）；
+  2) `.scratch/wisp/probes/336/r1/**`（report.md＋logs/，短名、⛔ `§`、⛔ 落 `docs/evidence/s1/`——那是裁决者的面）；
+  3) 票 336 末尾**一条**只追加 bullet。
+- 禁区：⛔ 动 `blacklist.go` 任何非注释字节（本票是仪器活；产码要改另立票）；⛔ 动 `internal/risk/**` 非测试 `.go` 一字；⛔ `internal/panel/**`、⛔ `cmd/wisp/**`、⛔ `frontend/**`、⛔ `design/**`；⛔ 判级档位／门控语义／三枚冻结件／`thresholds.go`／golden／`allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／D1–D47／C1–C32／R1–R9／D43 转移表；⛔ 为变绿放宽断言／删用例／`t.Skip`／新导出名；⛔ 翻框／改票名／`-done`／push。
+- 并发说明：本波另五枚腿在飞——`337-a1` 只读同包（它按纪律读具名提交树、⛔ 读你的在飞字节，你别管它）；`cmd/wisp/**` 与 `internal/panel/**` 本波零写腿；`go test ./cmd/wisp` 唯一持跑者＝`228-r3c`，你⛔ 跑它。放腿前 CPU ≤70% 已由编排者现量。

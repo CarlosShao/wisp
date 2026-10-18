@@ -1,0 +1,10 @@
+派单 322r2-head — 票 322 收尾腿（写/取证，AC#4＋残余）2026-10-18 第一波
+- 起手锚＝你自己 `git log -1` 现认（编排者 09:3x 见 `f60d50d6`）。
+- 目标：票 322 只剩一格未勾＝`AC#4 门禁＋消费者不推红`。`322-v1`（非实现者）判 AC#4 **部分成立**：build／三档 vet／d22scan／长度门／容器四数／消费者五包全 rc=0，**唯缺 `cmd/wisp` 那一发读数**（当时 `220-r2` 占唯一写腿＋票 314 整包死亡区，本腿⛔ 跑）。`322-r1b` 交件时同样具名交回"AC#4 的 `cmd/wisp` 那一维零读数"。⇒ **本腿头号判据＝补上 `cmd/wisp` 那一发**（只读取证，⛔ 动 cmd/wisp 一字），并裁两枚残余：① `322-v1` §7 具名的 `sealhandle_privateroute_120_other_test.go:232/:237` 那句旧注释被本票终态越过（"unfixed at this anchor"已过期，票 322 叶子那一支已修）；② Windows `witnessTruncated=true` 那半格按 `322-v1` 归票 120 的 Windows 半格外射程。
+- ★写面（逐路径）：
+  1) `internal/winsec/**`——**只允许测试注释面**：即 `internal/winsec/sealhandle_privateroute_120_other_test.go` 那一处过期注释的更正（整行注释、⛔ 动任何可执行字节、⛔ 动判据文字与断言）；若 `322-r1b` 的 `winsec_other.go` 注释面另有被越过的句子一并具名上报、⛔ 自行扩大；
+  2) `cmd/wisp` 那一发的**读数**落 `.scratch/wisp/probes/322/r2/logs/**`（⛔ `cmd/wisp/**` 写面；你是**读它跑它**，不是改它）；
+  3) `.scratch/wisp/probes/322/r2/**`（report＋logs）＋票 322 末尾一条只追加 bullet。
+- ★若你判明 AC#4 其实"只缺读数、不缺任何字节"⇒ 照只做读数那一半交件，注释那一格具名留给编排者；编排者会按停车点规则记账并（若本波写腿因此不足 3 枚）另补一条写腿——本波另两枚写腿＝336-r1／166-r1，你减格不影响 ≥3。
+- 跑 `cmd/wisp` 的独占纪律：本波 `go test ./cmd/wisp` **唯一持跑者＝228-r3c**；你的 `cmd/wisp` 那一发**排在它交件之后**，或与其错开——拿不准就先把 internal/winsec 的取证做完，`cmd/wisp` 那一发交回编排者排程（具名写明"待 228-r3c 交件"），⛔ 同时跑两发 `cmd/wisp`。
+- 禁区：⛔ 动 `privateFile`/`privateFileExclusive` 产码、⛔ 判级/门控、⛔ `docs/PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／`.github/**`／`frontend/**`／`design/**`／三枚冻结件／`go.mod`／`go.sum`／`.gitignore`；⛔ 放宽票 113/120 既有钉；⛔ 顺手改票 120 的"r 权限类"口径（`A990` 裁②已定）；⛔ 把祖先那一支（票面具名"仍开"）当已修；⛔ 翻框／改票名／`-done`／push（票 322＝1 未勾 AC#4／5 勾）。

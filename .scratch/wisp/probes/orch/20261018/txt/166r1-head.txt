@@ -1,0 +1,7 @@
+派单 166r1-head — 票 166 落地腿（写·AC#2 四件最小出口）2026-10-18 第一波
+- 起手锚＝你自己 `git log -1` 现认（编排者 09:3x 见 `f60d50d6`）。
+- 目标：票 166 `AC#2`＝"四件最小出口：列（按时间/按工作区）、搜（标题与正文）、改名、归档带撤销。每件都要答『这一发在未修码上响不响』"。`166-v1` 判语＝AC#2 **不成立＝接线缺口**：`internal/session/manage.go` 的四件（`List/Search/Rename/Archive+Unarchive`→`internal/memory/dao_session.go`）函数与用例齐全，但**生产调用者枚数＝0/0/0/0/0**（尺＝`git grep -n "session\.NewManager" -- '*.go'` rc=1；正控 `session.NewLedger`＝3 命中）。件＝`docs/evidence/s1/166-session-verdict.md`（98 行／13583 字节）照读。
+- ★本腿射程边界（编排者裁，写进判据）：写面＝**`internal/session/**`**（产码＋测试）＋`.scratch/wisp/probes/166/r1/logs/**`＋票尾一条。`cmd/wisp/**` 与 `internal/panel/**`＝共享编译面、**本波零写腿**，你⛔ 碰；若你判明"最小出口"必然要 `cmd/wisp`（CLI 子命令）或面板泵字段才成立 ⇒ **停手上报**（未定义即停）：交回你已在 `internal/session` 内装好的那一半＋具名缺口，由编排者排下一波。⛔ 不许为绕开这一步去造新导出 `panel.*`、新 JSON 键、C17 新方法名。
+- 写面（逐路径）：`internal/session/**`（含该目录新文件；若必须动 `internal/memory/dao_session.go` 才走得通 ⇒ 那是另一面，**先停手上报**，本腿不自行扩面）＋`.scratch/wisp/probes/166/r1/logs/**`＋票 166 末尾一条只追加 bullet。
+- 禁区：⛔ `cmd/wisp/**`／`internal/panel/**`／`internal/risk/**`（336-r1 在写）／`internal/winsec/**`（322-r2 在写）／`frontend/**`／`design/**`；⛔ 动 `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`／D1–D47／C1–C32／R1–R9／D43；⛔ 新造存储（D35 定过；加列走可重放迁移）；⛔ 静默删历史（分叉/改名不许吞原件）；⛔ 翻框／改票名／`-done`／push。票 166 现量 1 未勾（`AC#2`）／5 已勾；`AC#2` 的翻框归非实现者裁腿。
+- 并发：本波 6 腿（3 写：336-r1／166-r1／322-r2）；CPU 现量 ≤70% 才放；`go test ./cmd/wisp` 唯一持跑者＝228-r3c，你⛔ 跑。

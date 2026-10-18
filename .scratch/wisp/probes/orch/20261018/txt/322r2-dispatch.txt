@@ -1,0 +1,54 @@
+派单 322r2-head — 票 322 收尾腿（写/取证，AC#4＋残余）2026-10-18 第一波
+- 起手锚＝你自己 `git log -1` 现认（编排者 09:3x 见 `f60d50d6`）。
+- 目标：票 322 只剩一格未勾＝`AC#4 门禁＋消费者不推红`。`322-v1`（非实现者）判 AC#4 **部分成立**：build／三档 vet／d22scan／长度门／容器四数／消费者五包全 rc=0，**唯缺 `cmd/wisp` 那一发读数**（当时 `220-r2` 占唯一写腿＋票 314 整包死亡区，本腿⛔ 跑）。`322-r1b` 交件时同样具名交回"AC#4 的 `cmd/wisp` 那一维零读数"。⇒ **本腿头号判据＝补上 `cmd/wisp` 那一发**（只读取证，⛔ 动 cmd/wisp 一字），并裁两枚残余：① `322-v1` §7 具名的 `sealhandle_privateroute_120_other_test.go:232/:237` 那句旧注释被本票终态越过（"unfixed at this anchor"已过期，票 322 叶子那一支已修）；② Windows `witnessTruncated=true` 那半格按 `322-v1` 归票 120 的 Windows 半格外射程。
+- ★写面（逐路径）：
+  1) `internal/winsec/**`——**只允许测试注释面**：即 `internal/winsec/sealhandle_privateroute_120_other_test.go` 那一处过期注释的更正（整行注释、⛔ 动任何可执行字节、⛔ 动判据文字与断言）；若 `322-r1b` 的 `winsec_other.go` 注释面另有被越过的句子一并具名上报、⛔ 自行扩大；
+  2) `cmd/wisp` 那一发的**读数**落 `.scratch/wisp/probes/322/r2/logs/**`（⛔ `cmd/wisp/**` 写面；你是**读它跑它**，不是改它）；
+  3) `.scratch/wisp/probes/322/r2/**`（report＋logs）＋票 322 末尾一条只追加 bullet。
+- ★若你判明 AC#4 其实"只缺读数、不缺任何字节"⇒ 照只做读数那一半交件，注释那一格具名留给编排者；编排者会按停车点规则记账并（若本波写腿因此不足 3 枚）另补一条写腿——本波另两枚写腿＝336-r1／166-r1，你减格不影响 ≥3。
+- 跑 `cmd/wisp` 的独占纪律：本波 `go test ./cmd/wisp` **唯一持跑者＝228-r3c**；你的 `cmd/wisp` 那一发**排在它交件之后**，或与其错开——拿不准就先把 internal/winsec 的取证做完，`cmd/wisp` 那一发交回编排者排程（具名写明"待 228-r3c 交件"），⛔ 同时跑两发 `cmd/wisp`。
+- 禁区：⛔ 动 `privateFile`/`privateFileExclusive` 产码、⛔ 判级/门控、⛔ `docs/PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／`.github/**`／`frontend/**`／`design/**`／三枚冻结件／`go.mod`／`go.sum`／`.gitignore`；⛔ 放宽票 113/120 既有钉；⛔ 顺手改票 120 的"r 权限类"口径（`A990` 裁②已定）；⛔ 把祖先那一支（票面具名"仍开"）当已修；⛔ 翻框／改票名／`-done`／push（票 322＝1 未勾 AC#4／5 勾）。
+派单公共块（2026-10-18 第一波，编排者＝新任 harness；逐条都是现行铁律，缺一条我就退回你那笔交件）
+
+## 编队规则（本波）
+本波总代理 6 条（≤8）；写代理 3 条（336-r1／166-r1／322-r2）。写面互斥：`cmd/wisp/**` 与 `internal/panel/**` 本波零写腿、任何腿⛔ 写这两面；`go test ./cmd/wisp` 同一时刻只跑一个（本波唯一持跑者＝228-r3c）；`internal/risk/**` 本波唯一写腿＝336-r1；`internal/session/**`＝166-r1；`internal/winsec/**`＝322-r2；`frontend/**`、`design/**` 本编队零写面（归机主外部 agent）。
+
+## git
+⛔ **push**（推送只由编排者做，且现在被机主按住）。`git add` 与 `git commit` 两处都要**逐枚显式 pathspec**——⛔ `add -A`／`add .`／目录形、★⛔ `git commit -F <正文> -- .`（那个 `.` 曾把机主在飞的 24 枚工作树字节记进历史，台账 `A1011` 第⑧节）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree 或 checkout。临时件**只建不删**。撞 `.git/index.lock`：⛔ 删锁，等它自己散再重试同一笔。
+
+## 票面
+⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`（裁决者≠实现者；翻框只由编排者凭非实现者判语做）。只许在你被指定的票尾**追加一条** bullet。
+
+## 台面配方（仓外导出树，缺一味就假红）
+`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models`（**八件套**）＋★仓根 `docs/`（有些测试读 `docs/PLAN.md`；`internal/panel/git_test.go` 一族要它）＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`——都⛔ 跟踪）。树放 **`D:` 卷且目录名要产生 8.3 短名别名**（放 C 卷 Temp ⇒ 短名族打红＝台面故障）；`GOTMPDIR` 指到 `D:` 上**先 `mkdir -p`**（没建＝`creating work dir` 红，长得像判据响）。取出后**先数 `.go` 证非空**（"0"⛔ 是读数）。⛔ 在共享工作树跑 `go test`／`go build`。
+
+## 颜色尺
+`RUN=`＝`grep -c '^=== RUN'`（含子测试）⇄ `PASS_TOP=`＝`grep -c '^--- PASS'`（只顶层）⇄ `FAIL_TOP=`＝`^--- FAIL` ⇄ `SKIP=`。**四数不许混用、不许相减**。一律 `-count=1 -timeout 30m` 或更长；⛔ `go test ./...`。★跑 `cmd/wisp` 必须带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，否则 `0xc0000135`＋零枚 `--- FAIL`＝那包根本没跑（台面故障，⛔ 计入判据）。已知本机一格：`cmd/wisp` 整包有真窗区整进程死亡（`resident_*` 在整包从不执行）⇒ estate 颜色取自定向 `-run`，⛔ 拿整包当"全绿"或"我的字节把包打红"。
+
+## 门禁四数（只在共享工作树）
+`/d/work/base/gopath/bin/gofumpt.exe -l <你的文件>`（⚠ 本机工作树 6 枚既有件因 CRLF 被标脏＝存量，**你的新字节必须 LF**，⛔ 顺手重排别腿文件；具名登记即可）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./<你的包>/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 exit 2＝GUARD 射程拒绝⛔ 读成红；长度门要 `.git`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+
+## 突变（牙）
+只打在**仓外导出树**的物理字节上——⛔ 改跟踪文件、⛔ `-overlay`（那形对读盘的尺失明）；**内容锚**（函数体内那枚 token），⛔ 绝对行号；逐发**当场还原并报还原哈希**，跑前跑后各验一次 pristine 哈希；跨 shell 的 `trap`/`finally` 有竞态 ⇒ **两发串行**，⛔ 信 echo。成对两发落点必须不同，少任一发＝那把尺不敏感，⛔ 用它的绿当凭据。
+
+## 判据形状
+⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ `t.Skip`、⛔ 在注释里指名一枚不存在的测试或件当凭据、⛔ 许诺未实现的能力、⛔ 动 SLO 阈值／golden／`thresholds.go`／`allowlist.txt`／三枚冻结件（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`ticket90_persist_test.go`）／D1–D47／C1–C32／R1–R9／D43 转移表／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`。⛔ 新导出名、⛔ 新 `panel.*` 方法名、⛔ 新 JSON 键。碰到未定义的事**停手上报**（写进交件具名），⛔ 自行假设。
+
+## 输出预算
+≤4 枚正文件、每件 ≤160 行；⛔ 0 字节文件（落笔前后 `wc -c`）；**每落一枚文件就 commit**（⛔ 攒着）。轮次帽：先做判据最硬的那格，把 `logs/` 逐枚提前入库；到帽前把最新状态 commit＋票尾 bullet 落盘。
+
+## shell
+进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`。中文 commit 正文先 Write 成文件再 `git commit -F`。PowerShell 内联⛔ `$_`／裸 `$b`。
+
+## 读数纪律
+引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先跑一枚已知存在的正控并看 `stderr`；`grep -c` 命中 0 会回 rc=1 ⇒ 在 `$( )` 里 `|| true`。两把尺矛盾时先假定新那把坏。**完成通知一律当未验证**——编排者收件只认盘上三把尺（提交真在／件真在／自己复跑）。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含你被允许的写面）；② 证据件**绝对路径**＋`wc -c`＋行数＋占位符尺 0 命中；③ 决定性那把尺的逐字输出（起手侧⇄交件侧都带 `file:line`）＋成对红句逐字＋还原哈希＋四数＋门禁 `rc=`。另加派单里的**必答题**（⛔ 你自己盖章不算）。
+派单 322r2-specific — 本腿判据（逐条可机读；⛔ 抄数，现跑）
+
+AC#4 补 `cmd/wisp` 那一发（头号）：在仓外导出树跑 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp/ -count=1 -timeout 30m -v`（⛔ 共享工作树跑 test；⛔ `go test ./...`）。四数逐枚点名（RUN/PASS_TOP/FAIL_TOP/SKIP）；已知本机整包"真窗区整进程死亡"那一格（`228-r3b` 具名：c 面死在 `TestPanelThreadIsSTAAndExitsCleanly`、d 面死在 `TestAC13BringUpSurvivesAReusedThreadQuit`，两台面不同枚＝非确定性）⇒ 死亡与红名册**逐名归位**（哪些＝别票存量、哪些＝台面、有没有本票新增），⛔ 拿整包 rc=1 当"322 把包打红"也⛔ 当全绿。两把临时根台面成对（默认 C 卷 ⇄ `D:` 预建 GOTMPDIR）。消费者面复认：`internal/risk`／`internal/secret`／`internal/config`／`internal/agent`／`internal/memory` 在 Linux 档与本机全 ok 的成对读数（照 `322-v1` 那六道补齐）。门禁四数只在共享工作树：`gofumpt.exe` 真身对你动的件（⛔ 本机存量 6 枚假脏）／`d22scan`／长度门／`go vet ./internal/winsec/ ./cmd/wisp/`（导出台），逐枚 `rc=`。
+残余①注释更正：`sealhandle_privateroute_120_other_test.go` 约 `:232/:237`（行号只当读数，落笔前现读）那句"ticket 322 … stated as unfixed at this anchor in winsec_other.go:78-82"——票 322 已落地的现状＝**叶子那一支已关、祖先那一支仍开**。判据形状＝改成带条件的事实句（说清"O_TRUNC 经被换叶子的 open 这一支由票 322 的守卫拦、祖先仍开"），⛔ 许诺"窗口已关"；⛔ 动该用例任何断言；⛔ 动 `winsec_other.go` 一字（它的注释面 `322-v1` 判 AC#5 已成立）。
+残余②Windows 半格：把 `witnessTruncated=true`（`witnessSize=0/35`）那两枚本机读数在只读复跑里具名复认或更正（`322-v1` 判语 §AC#3 第二形＝〔仅本机可量〕＋CI 覆盖不到已登记）；⛔ 为它动任何字节。
+票面 AC 框一枚不翻（`AC#4` 的翻框要凭**非实现者**判语＋编排者复跑；你交的是料＋注释更正那一笔）。交件＝逐笔 `git show --name-only` 全集⊆三处写面、`.go` 只可能出现在那一枚测试注释面（若你按停手规则没动字节，则 `.go` 命中 0）；证据落 `.scratch/wisp/probes/322/r2/report.md`（≤160 行）＋logs。主题前缀 `票 322 收尾腿 322-r2·<格>`。每落一枚文件就 commit。
+必答：(i) `cmd/wisp` 那一发的逐名红册＋死亡枚归位；(ii) 三处消费过"unfixed"旧口径的位置你更正了哪几处、为什么其余不动（具名）；(iii) AC#4 判"成立／仍缺什么"的料级结论（不下判语，只交数＋缺项）。
