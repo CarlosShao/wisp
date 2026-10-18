@@ -50,10 +50,8 @@ type ManageStore interface {
 // the value a production root gets from memory.Open is a concrete *memory.Store
 // (cmd/wisp/run.go:463 today), and this line asserts it satisfies ManageStore
 // with NO adapter — so the one production line ticket 166 AC#2 still waits for,
-//
-//	session.NewManager(session.ManagerOptions{Store: mem})
-//
-// compiles the moment the shared compile surface (cmd/wisp) gets its own wave.
+// the host-qualified NewManager(ManagerOptions{Store: mem}) call from cmd/wisp,
+// compiles the moment the shared compile surface gets its own wave.
 // It lives in production code, not a test, because 166-v1's ruling is that
 // "tests green + functions complete" is NOT wiring (生产调用者 0/0/0/0/0): only
 // a byte that the compiler enforces on every build belongs on the assembly

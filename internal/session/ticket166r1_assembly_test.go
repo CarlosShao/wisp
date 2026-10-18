@@ -8,9 +8,9 @@ package session
 // (*memory.Store)(nil)) pins compile-time that the concrete store a production
 // root holds satisfies the slice with no adapter; the cases below pin the
 // runtime half with the same shape: a Manager assembled from a concrete
-// *memory.Store (declared as the interface, exactly what
-// session.NewManager(session.ManagerOptions{Store: mem}) would receive at
-// cmd/wisp/run.go's assembly root — mem := memory.Open(...) is already held
+// *memory.Store (declared as the interface, exactly what the host-qualified
+// NewManager(ManagerOptions{Store: mem}) call would receive at cmd/wisp/run.go's
+// assembly root — mem := memory.Open(...) is already held
 // there as *memory.Store at run.go:468) answers each of the four outlets
 // correctly through the interface, over a real wisp.db.
 //
