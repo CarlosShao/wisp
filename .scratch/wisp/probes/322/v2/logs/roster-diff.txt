@@ -1,0 +1,22 @@
+### 322-v2 作差尺 2026-10-18 13:22:44 +0800
+O(10-16 名册)=.scratch/wisp/probes/orch/20261016/logs/orch-322v1-ac4-cmdwisp-full.txt  sha=a72f946ee873
+--- 名册枚数: O=6 D=8 C=7 UNION(D,C)=8
+--- O 全集（10-16 六枚）
+Test258BridgeMutationNoSrcKeepsOldBinding
+Test258OccupiedCombinationNamesTheNewValue
+Test258V1ProbeSummonEditRebindsLiveBall
+TestAC14GoSideEvalPushReachesThePage
+TestAC246DevLegIgnoresTheTestTaskInjection
+TestAC4FocusReturnToPriorWindowGap33r5
+--- in-O-not-in-D（被今天盖住／消失的旧红候选）
+枚数=0
+--- UNION(D,C) minus O（今天多出的枚，逐名）
+TestAC2SealNoticeLandsInTheRunLegLogFile
+TestCleanCheckoutBuilds_AC11
+--- D minus C（随台面摆动的枚）
+TestAC2SealNoticeLandsInTheRunLegLogFile
+--- C minus D
+--- SKIP 名册三台对撞（顶格 ^--- SKIP）
+SKIP D⇄C 逐字相同（枚数=3）
+SKIP O⇄D 逐字相同
+### done 2026-10-18 13:22:45 +0800

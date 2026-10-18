@@ -1,0 +1,20 @@
+### 322-v2 起手锚＋票框尺（现跑 2026-10-18 13:24:31 +0800）
+git log -1 = fd009fa1 2026-10-18 13:15:45 +0800 票 339 落地腿派单写档＝待派（⛔ 未启动、不�
+★上一版此件的 4 枚 DIFF＝本腿自己拼错名（漏 .body）＝零读数故障，当场改正重跑；旧件不删（只建不删）
+票框尺: 未勾 - [ ] = 1 已勾 - [x] = 5
+本腿写面尺 git status --porcelain internal cmd = 0 行
+起手 blob 对撞（r2 入库 log ⇄ HEAD，逐枚指名 .body 全名）:
+MATCH cw2-head.body
+MATCH cw2-mine.body
+MATCH cc2-head.body
+MATCH cc2-mine.body
+MATCH cwisp-full-D
+MATCH cwisp-full-C
+MATCH cwisp-estate-resident
+MATCH cwisp-estate-deathpoints
+MATCH cwisp-estate-live-winelive
+MATCH cwisp-estate-live
+MATCH wh-D
+MATCH wh-C
+MATCH wt-D
+MATCH hc-risk
