@@ -1,0 +1,17 @@
+票 337 普查腿 337-a1·AC#1/AC#3/AC#4 现量四枚入库（logs/20-23＋尺脚本 11-14）
+
+现量三形出向面（★只量现状，⛔ 选形⛔ 推荐）：
+- 两枚 sink 分工：risk.Logf（包级 var，生产注入 0）与 tools.Options.Logf（字段，cmd/wisp 里生产注入 6 枚：
+  panel_inbound.go:255、resident_approval_windows.go:375、run.go:494/630/670/787）；两者之间今天接线 0 枚。
+  桥自己的 b.logf 只有 :1313 一处包装，不打印 Gate 的 PathDecision.Reason ⇒ Gate 那句连"有注入的那枚 sink"都没接。
+- 乙形承载体只有三处（panel/approval.go:48 json:"reason"、:83、panel_pump.go:75）；
+  internal/panel 非测试对 Blacklist 命中 0 枚 ⇒ 面板字节面今天完全不带 BlacklistNote。
+  ★真缺口：display_scrub_216.go:58 自陈不洗 ApprovalCardView.Reason，scrubForDisplay 生产调用点仅 composer.go:145 一处。
+- 丙形那一跳今天已有出向句且已含 canonical 绝对路径（rules_gateway.go:82 的 %s → bridge.go:439）；
+  模型侧无拦网（sanitizeArgs 只作用 ArgsJSON/forensics 列 :1201，不作用进模型的 Text）。
+  先例逐枚点名（跟踪件真名）：票 264（绝对路径进 model-visible text）／票 216（控制字符显示底座，自陈不覆盖卡片 Reason）／票 174（指针诚实性）。
+- AC#3 现状：门拦下文与权限判定文（rules_gateway.go:49 R2）今天不同形；既有钉子＝bridge_junction_windows_test.go:309-310＋:462；
+  242/244 族真名＝ticket242_binding_test.go／ticket242_panelface_test.go／corr_percall_242_test.go／docs/evidence/s1/244-black-console-r1.md。
+- AC#4 只点名列⛔ 跑。三形共同约束：cmd/wisp 与 internal/panel 本波零写腿、internal/risk 唯一写腿＝336-r1、
+  cmd/wisp 唯一持跑者＝228-r3c；台面落点按机主新铁律只许 D:\tmp\wisp\20261018\<腿名>\，⛔ 盘符根目录。
+尺脚本 11-14 一并入库（可逐字重跑）。零 .go／零 go test／零 go build／零 push／零翻框。

@@ -1,0 +1,84 @@
+### AC#1 现量：三形各自的出向面今天长什么样 rev=c11163c8（★所有尺剔 .scratch/**）
+
+== 甲（本机日志）==
+甲1 sink 定义与今天为 nil 的形状：internal/risk/blacklist.go:51 var Logf func(...)（见 17-hop-g log 尺一）
+甲2 注入位候选（host 侧现成设施，只点名）：
+  cmd/wisp/logsink.go:153 slog.SetDefault / :122 logSink.logger()
+  先例＝别的包把自己的注入点接上去：cmd/wisp/models.go:288-290 sinkLogger := sink.logger()
+甲3 现有 A/B 日志行枚数（＝今天已经在 logf 里走的内容形状）：
+19
+甲4 host 是否已在别处把 risk 的串往出向面写（尺＝git grep -n risk.Logf 剔测试）＝0（见 17 尺三）
+
+== 乙（面板）：C17 现有方法面 + 确认卡今天的字段面 ==
+乙1 C17 PanelBridge 接口方法名册（★不许新名，先点名）：
+  接口文件＝
+乙2 确认卡今天携带的 reason 字段（panel 侧）：
+c11163c8:internal/panel/approval.go:47:	// Reason is Decision.Reason verbatim.
+c11163c8:internal/panel/approval.go:48:	Reason string `json:"reason"`
+c11163c8:internal/panel/approval.go:49:	// ReasonKnown is false when the assessor produced no reason text. The card
+c11163c8:internal/panel/approval.go:52:	ReasonKnown bool `json:"reasonKnown"`
+c11163c8:internal/panel/approval.go:83:		Reason:                 decision.Reason,
+c11163c8:internal/panel/approval.go:84:		ReasonKnown:            strings.TrimSpace(decision.Reason) != "",
+乙3 panel 侧 Blacklist 三枚切片是否已进快照（尺＝git grep -n Blacklist 于 internal/panel）：
+  internal/panel 非测试命中行数=0
+乙4 前端是否已在渲染 approval 的 reason（★是否触碰 frontend/**）：
+  frontend 命中 reason 的行数（含 dist 等）=84
+c11163c8:frontend/src/App.tsx:62:    reason: "尚未收到原生侧的状态快照",
+c11163c8:frontend/src/App.tsx:94:  // ONE state object. The gate pins the count, and the reason is in the
+c11163c8:frontend/src/components/ai-native/insight-cards.tsx:14:                    Beyond the mechanical pass: three hex literals -> the accent/red/orange tokens. Two things worth knowing before mounting it: it needs the liveline package, which is now a real dependency (that was the reason this piece was called unmovable), and it hands liveline a theme string of its own ('dark'/'light'), so the charts inside draw liveline's palette, not ours. The numbers around them are ours; the marks are not.
+c11163c8:frontend/src/components/composer.tsx:150:          title={state.workspace.set ? state.workspace.canonical : state.workspace.reason}
+c11163c8:frontend/src/components/composer.tsx:152:          {state.workspace.set ? state.workspace.canonical : state.workspace.reason}
+c11163c8:frontend/src/components/composer.tsx:291:    refusal renders with its full reason: a truncated refusal reads as if the
+c11163c8:frontend/src/components/composer.tsx:302:        <span className="text-[10.5px] leading-[1.6] text-red">未发送：{a.reason}</span>
+c11163c8:frontend/src/components/config-screen.tsx:121:  /** The sentence under the heading. Same reason: the page has its own lede. */
+c11163c8:frontend/src/components/harness/main.tsx:600:          <span className="min-w-0 flex-1 truncate text-[12px] text-ink-2">{msg.openTab.reason}</span>
+c11163c8:frontend/src/components/harness/settings-page.tsx:30:    sentence is the reason this table exists rather than a bare label list. */
+c11163c8:frontend/src/components/l2-approval-card.tsx:20:       production shows params, reason and call chain at once;
+c11163c8:frontend/src/components/l2-approval-card.tsx:29:     - verbatim params, the reason, the C19 rule ids, the call chain;
+乙5 出向 JSON 键今天的形状（approval 卡片序列化处）：
+c11163c8:internal/panel/approval.go:48:	Reason string `json:"reason"`
+c11163c8:internal/panel/approval.go:52:	ReasonKnown bool `json:"reasonKnown"`
+c11163c8:internal/panel/attachments.go:103:	Reason string `json:"reason"`
+c11163c8:internal/panel/composer.go:239:	Reason string `json:"reason"`
+c11163c8:internal/panel/git.go:132:	Reason string `json:"reason"`
+c11163c8:internal/panel/git_test.go:564:				Reason  string `json:"reason"`
+c11163c8:internal/panel/instructions_200.go:77:	Reason string `json:"reason,omitempty"`
+c11163c8:internal/panel/l2_grant_boundary_test.go:1608:		Reason string `json:"reason"`
+c11163c8:internal/panel/workspace_account_181r3_test.go:193:					Reason    string `json:"reason"`
+
+== 丙（模型正文）==
+丙1 今天到模型的拒绝串是哪一句＋在哪一跳拼的（见 18-hop-h：bridge.go:439 → reject → Text）
+丙2 该句里今天含不含绝对路径（R3 那句带 %s canonical）：
+c11163c8:internal/risk/rules_gateway.go:82:				reason: fmt.Sprintf("R3: 命中 A 档敏感路径，拒绝（不可豁免）: %s", canonical),
+丙3 真 reason（aRuleReason）里带的字节形状＝cand.raw / cand.root / anchorSpelling / anchor.root（%q 四枚）
+丙4 ★先例尺：模型上下文里的绝对路径／控制字符，本仓今天有哪几处治理：
+c11163c8:internal/panel/display_scrub_216.go:21:// visible escapes - and neither covers the menu. A third "each producer scrubs its
+c11163c8:internal/panel/display_scrub_216.go:71:// scrubForDisplay turns the characters a human cannot see into characters a human
+c11163c8:internal/panel/display_scrub_216.go:107:func scrubForDisplay(s string) string {
+c11163c8:internal/panel/display_scrub_216.go:149:// relation nail in display_scrub_327r2_test.go compares this predicate against the
+c11163c8:internal/panel/display_scrub_216.go:191:// needsDisplayWash reports whether scrubForDisplay would change s. It is the same
+c11163c8:internal/panel/display_scrub_216.go:212:// scrubComposerForDisplay is the display boundary's whole roster, in one call. It
+c11163c8:internal/panel/display_scrub_216.go:217:func scrubComposerForDisplay(c ComposerState) ComposerState {
+c11163c8:internal/panel/display_scrub_216.go:218:	c.Workspace.Canonical = scrubForDisplay(c.Workspace.Canonical)
+c11163c8:internal/panel/display_scrub_216.go:224:		a.Name = scrubForDisplay(a.Name)
+  174/264/216 三族件点名（只列在树里真实存在的）：
+".scratch/wisp/probes/171/r1/logs/roster-G5-\346\255\243\346\216\247-post.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G5-\346\255\243\346\216\247-pre.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G5-\350\264\237\344\270\200\350\264\237-post.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G5-\350\264\237\344\270\200\350\264\237-pre.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G5_\346\255\243\346\216\247-post.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G5_\346\255\243\346\216\247-pre.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G5_\350\264\237\344\270\200\350\264\237-post.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G5_\350\264\237\344\270\200\350\264\237-pre.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G6-\346\255\243\346\216\247-post.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G6-\346\255\243\346\216\247-pre.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G6-\350\264\237\344\270\200\350\264\237-post.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G6-\350\264\237\344\270\200\350\264\237-pre.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G6_\346\255\243\346\216\247-post.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G6_\346\255\243\346\216\247-pre.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G6_\350\264\237\344\270\200\350\264\237-post.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G6_\350\264\237\344\270\200\350\264\237-pre.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G7-\346\255\243\346\216\247-post.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G7-\346\255\243\346\216\247-pre.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G7-\350\264\237\344\270\200\350\264\237-post.txt"
+".scratch/wisp/probes/171/r1/logs/roster-G7-\350\264\237\344\270\200\350\264\237-pre.txt"

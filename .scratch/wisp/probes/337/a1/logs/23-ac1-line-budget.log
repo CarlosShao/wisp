@@ -1,0 +1,19 @@
+### AC#1 三形落点的现长度尺 rev=c11163c8（★量＝每行字节数；⛔ 估改动量：本腿零写码，不报“要动几字节”）
+尺＝git show $R:<path> | sed -n '<N>p' | wc -c（逐枚量）
+-- 甲（本机日志）候选点位现长度 --
+risk/blacklist.go:51 (var Logf sink 定义)                42 bytes
+tools/bridge.go:73 (Options.Logf 字段)                   39 bytes
+cmd/wisp/run.go:787 (Logf: rt.auditf 既有注入形)      19 bytes
+甲-既有注入枚数＝cmd/wisp 里 Logf: 生产注入 6 枚（尺见 22）
+-- 乙（面板）候选点位现长度 --
+panel/approval.go:48 (json:"reason" 键)                   31 bytes
+panel/approval.go:83 (Reason: decision.Reason)             43 bytes
+cmd/wisp/panel_pump.go:75 (Reason: it.Decision.Reason)     47 bytes
+tools/mode.go:111 (n.Reason = d.Reason 写入)             23 bytes
+-- 丙（模型正文）候选点位现长度 --
+risk/rules_gateway.go:82 (R3 那句)                       99 bytes
+tools/bridge.go:439 (Deny 支拼句)                       109 bytes
+tools/bridge.go:1106 (Text: why)                           19 bytes
+agent/loop.go:745 (进对话正文)                        77 bytes
+-- 那句实话自身的长度（拼装后的样本，从测试自陈里取形状）--
+352

@@ -1,0 +1,14 @@
+### hop a 分母核对 rev=c11163c8（尺＝git grep -nE 'return ClassA, ' 单文件射程）
+全部 return ClassA 行＝9
+c11163c8:internal/risk/blacklist.go:221:		return ClassA, aRuleReason("~/.git-credentials", anchorPath(homeS, `.git-credentials`), cand, eqPath)
+c11163c8:internal/risk/blacklist.go:223:		return ClassA, ".git/config"
+c11163c8:internal/risk/blacklist.go:226:		return ClassA, aRuleReason("%APPDATA%\\wisp\\config.toml", anchorPath(appDataS, `wisp`, `config.toml`), cand, eqPath)
+c11163c8:internal/risk/blacklist.go:228:		return ClassA, aRuleReason("~/.ssh/**", anchorPath(homeS, `.ssh`), cand, isUnder)
+c11163c8:internal/risk/blacklist.go:230:		return ClassA, aRuleReason("~/.aws/credentials", anchorPath(homeS, `.aws`, `credentials`), cand, eqPath)
+c11163c8:internal/risk/blacklist.go:232:		return ClassA, aRuleReason("~/.kube/config", anchorPath(homeS, `.kube`, `config`), cand, eqPath)
+c11163c8:internal/risk/blacklist.go:234:		return ClassA, "browser credential store"
+c11163c8:internal/risk/blacklist.go:236:		return ClassA, aRuleReason("%APPDATA%\\Microsoft\\Protect\\** (DPAPI master keys)", anchorPath(appDataS, `microsoft`, `protect`), cand, isUnder)
+c11163c8:internal/risk/blacklist.go:238:		return ClassA, aRuleReason("%LOCALAPPDATA%\\Microsoft\\Credentials\\**", anchorPath(localAppDataS, `microsoft`, `credentials`), cand, isUnder)
+走 aRuleReason＝7
+走裸字面串＝2
+★差异具名：判语件 logs/80-chain-reach.log 第 2 行写「九枚 A case 走 aRuleReason」；现跑＝9 枚 A 档 case 里 7 枚走 aRuleReason、2 枚走裸字面串（blacklist.go:223 .git/config、:234 browser credential store）。该九枚是真分母，走那把拼装尺的是七枚。

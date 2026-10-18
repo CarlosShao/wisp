@@ -1,0 +1,40 @@
+### 门禁（本腿零 .go：四数里两枚对 md/log 件不适用，具名说明；只在共享工作树跑）
+d22scan.sh（★它内部 go run 的是 tools/d22scan 自己的扫描模块＝guard 本身，派单明文要求跑；⛔ 不碰根模块） rc=0
+check-path-length-budget.sh rc=0
+go vet ./<本腿的包>/ rc=不适用（具名：本腿零 .go 字节、零自己的包；跑 go vet 会在共享工作树真编译 internal/risk＝只读腿禁区，且本波该面写腿＝336-r1）
+gofumpt -l 对 md/log/sh：本腿非 .go 件不受 gofumpt 射程；★派单那条「你的新字节必须 LF」＋⛔ 顺手重排别腿文件，尺＝下面的 CR 计数
+★新字节 LF 尺（工作树侧 CR 计数，逐枚）：
+.scratch/wisp/probes/337/a1/logs/00-anchor.log                         CR=0
+.scratch/wisp/probes/337/a1/logs/10-hop-a-producers.log                CR=0
+.scratch/wisp/probes/337/a1/logs/11-hop-b-gate-callsites.log           CR=0
+.scratch/wisp/probes/337/a1/logs/12-hop-c-blacklistnote-landing.log    CR=0
+.scratch/wisp/probes/337/a1/logs/12-hop-c-blacklistnote-readers.log    CR=0
+.scratch/wisp/probes/337/a1/logs/13-hop-c2-reason-readers.log          CR=0
+.scratch/wisp/probes/337/a1/logs/14-hop-d-e-f.log                      CR=0
+.scratch/wisp/probes/337/a1/logs/15-hop-g-logf-injection.log           CR=0
+.scratch/wisp/probes/337/a1/logs/16-hop-a-denominator.log              CR=0
+.scratch/wisp/probes/337/a1/logs/17-hop-g-logf-injection.log           CR=0
+.scratch/wisp/probes/337/a1/logs/18-hop-h-to-model-chain.log           CR=0
+.scratch/wisp/probes/337/a1/logs/20-ac1-three-shapes.log               CR=0
+.scratch/wisp/probes/337/a1/logs/21-ac1-panel-and-farthest-byte.log    CR=0
+.scratch/wisp/probes/337/a1/logs/22-ac1-ac3-ac4-measure.log            CR=0
+.scratch/wisp/probes/337/a1/logs/23-ac1-line-budget.log                CR=0
+.scratch/wisp/probes/337/a1/logs/90-gates-and-lf.log                   CR=0
+.scratch/wisp/probes/337/a1/scripts/10-logs-gh.sh                      CR=0
+.scratch/wisp/probes/337/a1/scripts/11-ac1-shapes.sh                   CR=0
+.scratch/wisp/probes/337/a1/scripts/12-ac1-supplement.sh               CR=0
+.scratch/wisp/probes/337/a1/scripts/13-ac1-ac3-ac4.sh                  CR=0
+.scratch/wisp/probes/337/a1/scripts/14-denominator-budget-gates.sh     CR=0
+★blob 侧（入库归一）CR 计数（core.autocrlf=true ⇒ blob 应恒 0）：
+.scratch/wisp/probes/337/a1/logs/00-anchor.log                         blob_CR=0
+.scratch/wisp/probes/337/a1/logs/10-hop-a-producers.log                blob_CR=0
+.scratch/wisp/probes/337/a1/logs/11-hop-b-gate-callsites.log           blob_CR=0
+.scratch/wisp/probes/337/a1/logs/12-hop-c-blacklistnote-landing.log    blob_CR=0
+.scratch/wisp/probes/337/a1/logs/12-hop-c-blacklistnote-readers.log    blob_CR=0
+.scratch/wisp/probes/337/a1/logs/13-hop-c2-reason-readers.log          blob_CR=0
+.scratch/wisp/probes/337/a1/logs/14-hop-d-e-f.log                      blob_CR=0
+.scratch/wisp/probes/337/a1/logs/15-hop-g-logf-injection.log           blob_CR=0
+.scratch/wisp/probes/337/a1/logs/17-hop-g-logf-injection.log           blob_CR=0
+.scratch/wisp/probes/337/a1/logs/18-hop-h-to-model-chain.log           blob_CR=0
+.scratch/wisp/probes/337/a1/msg/02-logs-gh.txt                         blob_CR=0
+.scratch/wisp/probes/337/a1/scripts/10-logs-gh.sh                      blob_CR=0
