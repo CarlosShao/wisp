@@ -65,9 +65,10 @@
 
 ## 6. 写面与纪律自证
 
-笔次＝读数笔 5 枚已入库（严格前缀尺 `git log --all --grep='^票 228 突变复跑腿 228-r3c'`，逐枚＝`953f8966` 起手／`c544bb3d` pristine 正控／
-`52f24441` M1／`266c6463` M2／`f250b532` post-both 复验）＋本笔（report，＝第 6 枚）＋末笔（票 228 尾一条 bullet，＝第 7 枚）。
-枚数尺按构造数不到"写它的那一笔"，故这里报"已入库 5 ＋ 本笔 ＋ 末笔"，⛔ 自吹成 7。
+笔次＝读数笔 5 枚（严格前缀尺 `git log --all --grep='^票 228 突变复跑腿 228-r3c'`）＝`953f8966` 起手／`c544bb3d` pristine 正控／
+`52f24441` M1／`266c6463` M2／`f250b532` post-both 复验；再加 `8adac478`(report)／`7b1b22d8`(票尾一条)／`28f61c33`(收笔＝本节＋`logs/closing-final.txt`)＝**交件共 8 笔**、
+去重路径 **18 枚**、越出写面 **0 枚**、**`.go` 命中＝0**（`logs/gate2-residue.log` [D] 段逐枚 `--name-only` 尺；尺伤改正见 §7）。
+⚠ 那"8 笔＋18 枚"＝**本段落笔前**的读数；本段的更正由**第 9 笔**（＝名册自计更正笔，只动本节这一枚件）承载 ⇒ 枚数尺按构造数不到写它的那一笔，同 §7 那一形。
 路径全在 `.scratch/wisp/probes/228/r3c/**` ＋票 228 尾一条；**`.go` 命中＝0**（`logs/gate2-residue.log` [D] 段逐枚 `--name-only` 尺）；
 ⛔ 落 `docs/evidence/s1/`（那是裁决者的面）；⛔ 翻框／改票名／`Status:`／`-done`／push ⇒ **票 228 未勾仍 11 枚、`AC#11` 十一格里一枚没翻**（尺＝`grep -c '^[[:space:]]*- \[ \]'`＝11，现跑）。
 `cmd/wisp/**`／`internal/panel/**` 零写腿自证：`git status --porcelain -- cmd internal tools scripts go.mod go.sum frontend docs` 现量只吐别腿在飞字节（`internal/winsec/…`、`internal/session/manage.go`＝`322-r2`／`166-r1` 写腿），⛔ 我一枚。
