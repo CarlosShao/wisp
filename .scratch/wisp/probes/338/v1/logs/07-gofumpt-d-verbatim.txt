@@ -1,0 +1,122 @@
+# 338-v1 · AC#0 后半那把尺的逐字本体＝gofumpt -d 两枚各一份（票面 AC#0 明文要求「逐字 diff 进件」）
+# 尺＝/d/work/base/gopath/bin/gofumpt.exe -d <仓外 LF blob 拷贝>；版本 v0.12.0 (go1.27.1)
+# before＝git show d19288a8:<f>（338-r1 起手锚）抽到仓外 LF；⛔ 在工作树量 CRLF 形
+# 「只动空白」的证法＝04-content-rulers.txt 第 1 节（tools 非空白尺 RC=0／0 行）＋第 5 节（panel 那 47 行逐字归类）
+
+## [1] tools 枚＝internal/tools/task_output_pointer_notice_errtext_174r7_test.go（非空白尺 RC=0＝纯空白）
+diff D:/tmp/wisp/20261018/338v1/blobs/T1.before.orig D:/tmp/wisp/20261018/338v1/blobs/T1.before
+--- D:/tmp/wisp/20261018/338v1/blobs/T1.before.orig
++++ D:/tmp/wisp/20261018/338v1/blobs/T1.before
+@@ -100,12 +100,12 @@
+ 	// wrapper (risk.PathResolver, an fs wrapper) is caught by class, not by one
+ 	// copy of today's string.
+ 	for _, banned := range []string{
+-		canonicalizeFailsHere,                          // the filed literal, as filed
+-		fmt.Sprintf("%q", canonicalizeFailsHere),       // ...or in its quoted spelling
+-		rootA, rootB,                                   // the authorized root list, entry by entry
++		canonicalizeFailsHere,                    // the filed literal, as filed
++		fmt.Sprintf("%q", canonicalizeFailsHere), // ...or in its quoted spelling
++		rootA, rootB,                             // the authorized root list, entry by entry
+ 		strings.ToLower(rootA), strings.ToLower(rootB), // ...as the comparison fold spells it
+-		upstream,                                       // C26's own error text, verbatim
+-		"tools:", "risk:",                              // ...and the packages' error prefixes
++		upstream,          // C26's own error text, verbatim
++		"tools:", "risk:", // ...and the packages' error prefixes
+ 	} {
+ 		if strings.Contains(notice, banned) {
+ 			t.Errorf("the canonicalize-error notice must not relay %q: notice %q", banned, notice)
+
+## [2] panel 枚＝cmd/wisp/panel_transport_35r2_test.go（甲形＝token 级三形，非空白尺 RC=1／47 行）
+diff D:/tmp/wisp/20261018/338v1/blobs/T2.before.orig D:/tmp/wisp/20261018/338v1/blobs/T2.before
+--- D:/tmp/wisp/20261018/338v1/blobs/T2.before.orig
++++ D:/tmp/wisp/20261018/338v1/blobs/T2.before
+@@ -400,18 +400,22 @@
+ // nodes
+ type jsNode = any
+ 
+-type jsIdent struct{ name string }
+-type jsLit struct{ v jsValue }
+-type jsMember struct {
+-	obj  jsNode
+-	name string
+-}
+-type jsIndex struct{ obj, index jsNode }
+-type jsCallNode struct {
+-	callee jsNode
+-	args   []jsNode
+-	isNew  bool
+-}
++type (
++	jsIdent  struct{ name string }
++	jsLit    struct{ v jsValue }
++	jsMember struct {
++		obj  jsNode
++		name string
++	}
++)
++type (
++	jsIndex    struct{ obj, index jsNode }
++	jsCallNode struct {
++		callee jsNode
++		args   []jsNode
++		isNew  bool
++	}
++)
+ type jsUnary struct {
+ 	op string
+ 	x  jsNode
+@@ -421,12 +425,14 @@
+ 	x  jsNode
+ 	y  jsNode
+ }
+-type jsAssignNode struct{ target, value jsNode }
+-type jsPostInc struct{ target jsNode }
+-type jsFuncExpr struct {
+-	params []string
+-	body   []jsStmt
+-}
++type (
++	jsAssignNode struct{ target, value jsNode }
++	jsPostInc    struct{ target jsNode }
++	jsFuncExpr   struct {
++		params []string
++		body   []jsStmt
++	}
++)
+ type jsObjLit struct {
+ 	keys []string
+ 	vals []jsNode
+@@ -698,8 +704,10 @@
+ 	num  float64
+ }
+ 
+-var jsPuncts = []string{"===", "!==", "=>", "==", "!=", "&&", "||", "++",
+-	"(", ")", "{", "}", "[", "]", ";", ",", ".", "=", "!", "+", "-", ":"}
++var jsPuncts = []string{
++	"===", "!==", "=>", "==", "!=", "&&", "||", "++",
++	"(", ")", "{", "}", "[", "]", ";", ",", ".", "=", "!", "+", "-", ":",
++}
+ 
+ func jsLex(src string) []jsTok {
+ 	var out []jsTok
+@@ -810,10 +818,12 @@
+ 	t := p.peek()
+ 	return t.kind == "punct" && t.text == s
+ }
++
+ func (p *jsParser) atID(s string) bool {
+ 	t := p.peek()
+ 	return t.kind == "id" && t.text == s
+ }
++
+ func (p *jsParser) eatPunct(s string) bool {
+ 	if p.atPunct(s) {
+ 		p.i++
+@@ -821,6 +831,7 @@
+ 	}
+ 	return false
+ }
++
+ func (p *jsParser) expectPunct(s string) {
+ 	if !p.eatPunct(s) {
+ 		panic(&jsPanic{"SyntaxError: expected " + s + ", saw " + p.peek().text})
