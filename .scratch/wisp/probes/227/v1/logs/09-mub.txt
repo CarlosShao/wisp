@@ -1,0 +1,20 @@
+PRISTINE writeguard.go sha256=efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd (verified before landing: efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd)
+mutation: base = deepCopyConfig(disk)  ==>  base = deepCopyConfig(m.cur)  (merge base back to memory snapshot)
+landed sha256=b481aa484229804bbb75de2d1d12b28b562e89844ecfc568735e0220f68d46e7 bytes=14931
+mub rc=1 RUN=190 PASS_TOP=100 FAIL_TOP=9 SKIP=0
+---- named FAIL roster ----
+--- FAIL: TestAC11SettingWriteKeepsAForeignHandEditedKey (0.02s)
+--- FAIL: TestAC1AllowedDirsWriteKeepsAHandEditedKey (0.02s)
+--- FAIL: TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept (0.02s)
+--- FAIL: TestAC3AdoptionClaimsOnlyWhatThisWriteProduced (0.03s)
+--- FAIL: TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory (0.02s)
+--- FAIL: TestAC4PermissionModeWriteKeepsAHandEditedKey (0.02s)
+--- FAIL: TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber (0.02s)
+--- FAIL: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.02s)
+--- FAIL: TestHandDeletedMapEntryIsNotRestored (0.02s)
+RESTORED sha256=efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd  match_pristine=YES
+---- decisive red lines for the AC#1 case (MUB wants ① at :43 red) ----
+929:    writeguard_handedit_227_test.go:43: the hand-deleted size line came back as 60, want the schema default 56: a deleted line falls back to the default, NOT to the value held in memory (ticket 227)
+930:    writeguard_handedit_227_test.go:47: the deleted size line was not restored to the file:
+1109:    writeguard_handedit_227_test.go:56: the fallback-to-default divergence was not reported; log:
+1116:    writeguard_handedit_227_test.go:93: a hand-deleted map entry came BACK; this shape is pinned as NOT restored (b2 P4)

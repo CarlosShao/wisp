@@ -1,0 +1,9 @@
+TREE=deliv anchor=HEAD gofiles=764
+tree=deliv rc=0 RUN=190 PASS_TOP=109 FAIL_TOP=0 SKIP=0
+---- named five (227 cases) + the 226 :393 case ----
+--- PASS: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt (0.01s)
+--- PASS: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.02s)
+--- PASS: TestHandDeletedMapEntryIsNotRestored (0.01s)
+--- PASS: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+--- PASS: TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent (0.01s)
+--- PASS: TestDeletedLineRestorationIsNotClaimedAsAWrittenKey (0.02s)

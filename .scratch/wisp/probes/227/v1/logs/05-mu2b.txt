@@ -1,0 +1,14 @@
+PRISTINE sha256 writeguard.go = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+BEFORE(landed) sha256 = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd bytes=14930
+AFTER(landed) sha256 = bf82226988b83fdce151478bd51a550beec8d66caef39e5cc4096f6f55150f16 bytes=14484
+residue delete-shape token hits = 0
+residue schema-cond token hits = 0
+old short sentence present = 1
+MU2b rc=1 RUN=190 PASS_TOP=107 FAIL_TOP=2 SKIP=0
+---- named FAIL roster ----
+--- FAIL: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.01s)
+--- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+---- red file:line verbatim ----
+518:    writeguard_handedit_227_test.go:64: the log must state the delete-shape plainly; log:
+527:    writeguard_handedit_227_test.go:129: the nothing-written sentence must state the schema-current condition; log:
+RESTORED sha256 = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd bytes=14930

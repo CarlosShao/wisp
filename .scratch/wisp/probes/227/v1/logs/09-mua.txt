@@ -1,0 +1,12 @@
+PRISTINE writeguard.go sha256=efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd (verified before landing: efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd)
+mutation: diverged := diffKeyPaths(m.cur, base)  ==>  diverged := []string{}
+landed sha256=ea3aa61a76580530f529580240056ae5ed29733277eddb6b7f534c6291b4180e bytes=14915
+mua rc=1 RUN=190 PASS_TOP=105 FAIL_TOP=4 SKIP=0
+---- named FAIL roster ----
+--- FAIL: TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept (0.02s)
+--- FAIL: TestAC3AdoptionClaimsOnlyWhatThisWriteProduced (0.03s)
+--- FAIL: TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory (0.02s)
+--- FAIL: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.02s)
+RESTORED sha256=efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd  match_pristine=YES
+---- decisive red lines for the AC#1 case (MUB wants ① at :43 red) ----
+522:    writeguard_handedit_227_test.go:56: the fallback-to-default divergence was not reported; log:

@@ -1,0 +1,46 @@
+PRISTINE manager_test.go sha (want 201dc786...) = 201dc786570dbb2f
+PRISTINE writeguard_226 sha (want 49960da6...) = 49960da670dbe135
+pristine red-sentence call-site lines (content anchor, git-tree bytes):
+404:		t.Errorf("the file already carried the entry and was rewritten anyway:\n%s", got)
+407:		t.Error("the file's mtime moved on a write that wrote nothing")
+after AC#2 mutation: manager_test bytes=9658 (pristine 9677)
+writeguard_226 lines now=458 pristine=456
+probe-line landed at:
+393:	// probe line for the one-row gap question (227-v1, off-repo only)
+395:	// probe line for the one-row gap question (227-v1, off-repo only)
+red-sentence call-site lines AFTER insert:
+406:		t.Errorf("the file already carried the entry and was rewritten anyway:\n%s", got)
+409:		t.Error("the file's mtime moved on a write that wrote nothing")
+time=2026-10-18T15:21:26.126+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt
+time=2026-10-18T15:21:26.140+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\227v1\gotmp\TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt2333578725\001\config.toml.bak-1 kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T15:21:26.142+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\227v1\gotmp\TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt2333578725\001\.wisp-config-3956093186.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T15:21:26.157+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=D:\tmp\wisp\20261018\227v1\gotmp\TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt2333578725\001\.wisp-config-1457365669.tmp kind=inherited cleared="" cleared_inherited=S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+time=2026-10-18T15:21:26.158+08:00 level=INFO msg="config: config.toml already carries this key; this write added nothing (the file's bytes and mtime stayed put only because its schema_version was already current; a file behind on schema_version had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs
+    writeguard_226_test.go:406: the file already carried the entry and was rewritten anyway:
+        schema_version = 2
+        
+        [app]
+        language = 'zh-CN'
+        theme = 'dark'
+        
+        [ball]
+        size = 56
+        
+        [fs]
+        allowed_dirs = ['D:\data']
+        
+        [voice]
+        enabled = true
+        
+        [voice.asr]
+        model = 'parakeet-zh'
+        provider = 'local-sherpa'
+    writeguard_226_test.go:409: the file's mtime moved on a write that wrote nothing
+--- FAIL: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.097s
+FAIL
+targeted rc=1
+RESTORED manager_test.go sha = 201dc786570dbb2f bytes=9677
+RESTORED writeguard_226 sha = 49960da670dbe135 bytes=18210

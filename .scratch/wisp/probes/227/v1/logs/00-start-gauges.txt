@@ -1,0 +1,52 @@
+[gauge 1] anchor = git log -1 (own reading, HEAD drifts between legs)
+d114a29228f9ea93eb3cef80cf49d70efe6bccc2 2026-10-18T15:07:51+08:00 两枚腿放出＝subagent 通道（名册 8 枚帽�
+
+[gauge 2] AC box count, criteria-region scoped form ONLY (dispatch: 全档计数会被票尾 bullet 污染)
+  ruler: grep -c '^[[:space:]]*- \[ \] \*\*AC#'  -> .scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md
+unchecked=0
+checked=0
+  line numbers of the six boxes:
+26:- [ ] **AC#1 删行形状要有常驻用例＋一句人�
+27:- [ ] **AC#2 把那枚"什么都不写"用例的射程边
+28:- [ ] **AC#3 四种手改形状要一张矩阵表，逐�
+29:- [ ] **AC#4 不许顺手扩大射程**：本票**不改�
+30:- [ ] **AC#5 整包终态**：`PATH="$PWD/third_party/she
+31:- [ ] **AC#6 时间炸弹那一格（09-29 由非实现�
+  ticket file lines=50  (票面 48 行＋腿的票尾 bullet)
+
+[gauge 3] 227-r1 roster: STRICT subject-prefix ruler (the leg's first sub-string ruler was self-invalidated)
+  ruler: git log --grep='票 227 落地腿 227-r1' (prefix of the subject)
+bcf90e06 12:38 票 227 落地腿 227-r1·必答(iv)＋AC#4·report 终收口＝"未修码响不响"�
+3cda0aef 12:32 票 227 落地腿 227-r1·AC#4·终尺入库（c12＝六枚全量）＝我上一枚�
+9f5b0022 12:30 票 227 落地腿 227-r1·AC#4＋交件自证·名册尺更正入库＋交件侧终�
+32a70e2f 12:25 票 227 落地腿 227-r1·票尾一条 bullet（只追加、⛔ 翻框、⛔ 改票�
+6da21d4a 12:25 票 227 落地腿 227-r1·AC#3＋AC#4＋交件自证·report（四形状矩阵表＝�
+dd0e489d 12:21 票 227 落地腿 227-r1·AC#1＋AC#2＋AC#4·定稿用例件（编排者收回 ≤16
+3b8c114e 12:04 票 227 落地腿 227-r1·AC#1＋AC#2·删行形状与"什么都不写"射程边界�
+b72d7391 12:02 票 227 落地腿 227-r1·AC#1③＋AC#2甲·三句日志字面串说实话（⛔ 任
+count=8
+  SAME ruler in the leg's own range feac8f77..HEAD = 8
+  the loose sub-string ruler (--grep='227-r1') over the same range = 18  <- swallows OTHER legs' commits (必答 v)
+
+  per-commit name-only union + out-of-scope ruler (corrected form, 越界尺):
+.scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md
+.scratch/wisp/probes/227/r1/logs/c0-baseline-feac8f77.txt
+.scratch/wisp/probes/227/r1/logs/c1-final-delivery.txt
+.scratch/wisp/probes/227/r1/logs/c10-pathlen-final.txt
+.scratch/wisp/probes/227/r1/logs/c11-vet-final.txt
+.scratch/wisp/probes/227/r1/logs/c12-roster-six-commits.txt
+.scratch/wisp/probes/227/r1/logs/c2-final-unmodcode.txt
+.scratch/wisp/probes/227/r1/logs/c3-final-mu1-diverged.txt
+.scratch/wisp/probes/227/r1/logs/c4-final-mu2-base-memory.txt
+.scratch/wisp/probes/227/r1/logs/c5-gates-four.txt
+.scratch/wisp/probes/227/r1/logs/c6-mu3-393-schema-red.txt
+.scratch/wisp/probes/227/r1/logs/c7-roster-per-commit.txt
+.scratch/wisp/probes/227/r1/logs/c8-roster-five-commits.txt
+.scratch/wisp/probes/227/r1/logs/c9-gates-final.txt
+.scratch/wisp/probes/227/r1/report.md
+internal/config/writeguard.go
+internal/config/writeguard_handedit_227_test.go
+union paths=17  .go=0
+OUTSIDE the three allowed write surfaces (for the leg's own面) = 0 (want 0)
+
+  dispatch/head claim '14 笔' does NOT reproduce: strict ruler = 8; 14 = file count under probes/227/r1 = 14

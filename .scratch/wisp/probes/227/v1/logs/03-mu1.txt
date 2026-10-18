@@ -1,0 +1,20 @@
+PRISTINE sha256 manager_test.go = 201dc786570dbb2ffeaf8cc09a6c7bc48cb1ee6047b9f2f28a02e18163aa56a1
+MUTATED  sha256 manager_test.go = 65c53e5514ef68003eacaac69fbedc3fe91cb01deb4fa8b045cd7343199dc8d6  bytes=9658
+ANCHOR (content, not line number): the deleted line is the one inside const matrixBase; grep of the surviving line in deliv:
+38:schema_version = 2
+37:const matrixBase = `
+MUTATED tree=D:/tmp/wisp/20261018/227v1/mu rc=1 RUN=190 PASS_TOP=105 FAIL_TOP=4 SKIP=0
+---- named FAIL roster ----
+--- FAIL: TestCheckAndReloadAsksOncePerFileChange (0.02s)
+--- FAIL: TestManagerHotTierAppliesImmediately (0.02s)
+--- FAIL: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt (0.02s)
+--- FAIL: TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent (0.02s)
+---- the :393 case red sentences, verbatim with file:line ----
+102:    manager_test.go:73: unchanged file must be a no-op, got rep=&{[] [] [] []} err=<nil>
+585:    writeguard_226_test.go:404: the file already carried the entry and was rewritten anyway:
+604:    writeguard_226_test.go:407: the file's mtime moved on a write that wrote nothing
+624:    writeguard_handedit_227_test.go:165: a current-schema file that already carried the key was rewritten:
+643:    writeguard_handedit_227_test.go:168: mtime moved on a true nothing-written write - the control lost its teeth
+644:    writeguard_handedit_227_test.go:171: a current-schema nothing-written write destroyed the operator's comment
+MUT sha now:
+65c53e5514ef68003eacaac69fbedc3fe91cb01deb4fa8b045cd7343199dc8d6 *internal/config/manager_test.go

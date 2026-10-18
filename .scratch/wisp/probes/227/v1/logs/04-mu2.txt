@@ -1,0 +1,10 @@
+PRISTINE sha256 writeguard.go = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+BEFORE(landed) sha256 = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd bytes=14930
+AFTER(landed) sha256 = b81982ff3c1e289cdf04f01a13168907268b78e9b90b4fb167c0fdd283fd2789 bytes=14757
+residue hits of the sentence token in landed file (want 0): 0
+MU2 rc=1 RUN=190 PASS_TOP=108 FAIL_TOP=1 SKIP=0
+---- named FAIL roster ----
+--- FAIL: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.01s)
+---- red sentences verbatim (numbered lines of the full log) ----
+518:    writeguard_handedit_227_test.go:64: the log must state the delete-shape plainly; log:
+RESTORED sha256 = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd bytes=14930
