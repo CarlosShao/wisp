@@ -1,17 +1,14 @@
 # 票 338 落地腿 338-r1 · 交件 report（写代理·格式归位）
 
-- 起手锚＝我自己 `git log -1` 现认：`d19288a8`（2026-10-18 11:53，dev）。
-  落 AC#0 时 HEAD 已漂到 `90dafe77`→`631a04ba`（工作树在飞，⛔ 拿编排者号当锚）。
+- 起手锚＝我自己 `git log -1` 现认 `d19288a8`（2026-10-18 11:53，dev）；落 AC#0 时已漂到 `90dafe77`→`631a04ba`（工作树在飞，⛔ 拿编排者号当锚）。
 - 我的落笔序列：`0b1d1f0b`（AC#0 尺＋logs）→ `87521cb4`（AC#1 tools 枚归位）→
   `3d26240c`（AC#2 改前四道门）→ `93d0f39c`（AC#1b panel 枚归位）→
   `ee75c23f`（AC#2 交件侧门＋lead 条件④）→ AC#3 logs（`fa5f008f`／`b84dedd0`）→
-  report（`787dbfb9`）→ 票尾一条 bullet（`b4844295`）→ 交件前三把尺复量（`91d08c3d`）。
-  ★具名更正一枚＝`b84dedd0` 那笔主题写了"report 入库"但该枚未含 `report.md`（主题不实），
-  真正入库那一笔＝`787dbfb9`，两笔正文都留痕、⛔ amend（不改已入库历史）。
+  report（`787dbfb9`）→ 票尾一条 bullet（`b4844295`）→ 交件前三把尺复量（`91d08c3d`）。★具名更正一枚＝`b84dedd0` 主题写了"report 入库"但该枚未含 `report.md`（主题不实），真正入库那笔＝`787dbfb9`，两笔正文都留痕、⛔ amend（不改已入库历史）。
 - 尺＝`/d/work/base/gopath/bin/gofumpt.exe v0.12.0 (go1.27.1)` ⇄ 同版 `gofmt`；
   go＝`go1.27.1 windows/amd64`。落点一律 `D:\tmp\wisp\20261018\338r1\**`（先 `mkdir -p`，
   ⛔ 盘符根、⛔ 删任何旧树）。
-- **四格一枚没翻**（AC#0–AC#4 全部仍是 `[ ]`，框由非实现者裁）；票名／`Status:` 未动；⛔ push。
+- **四格一枚没翻**（本票判据区现量＝5 枚框 `^- \[ \]`、`^- \[x\]` 0 枚，全未勾、我一枚未动；框由非实现者裁）；票名／`Status:` 未动；⛔ push。
 
 ## AC#0 起手现跑（票面四行逐枚重跑＋非空白尺自证）
 
@@ -97,7 +94,11 @@ lead 条件④另两档：`go build ./...` rc=0（★派单禁共享树 build �
 ## AC#4 纪律格（自证）
 
 - 写面＝三处，逐笔越界尺 0 行：
-  `git show --name-only --format= <每笔> | grep -v -E '^(三处写面)'` ⇒ OVERREACH_ROWS=0（逐笔见下）。
+  `git show --name-only --format= <每笔> | grep -v -E '^(三处写面)' | grep -c .`
+  ⇒ 该尺射程＝`0b1d1f0b…a3994e28` 那 11 笔全 0（其后各笔交件正文逐笔带同形复量）；
+  ★具名形状更正＝我前几笔正文里用的分母是 `grep -c "^\."`（只数点开头的路径）⇒ 若真越界落在
+  `cmd/**`／`internal/**`（不以点开头）会漏数＝假 0。改尺后复量＝`logs/overreach-fixed.txt`
+  （11 笔 OVERREACH_corrected 全 0；全集去重 38 枚路径 ⊆ 三处写面、越界 0）。
 - `git add` 与 `git commit` **两处都逐枚手写字面路径**；⛔ `add -A`／`commit -- .`／
   `$(git diff --cached --name-only)`／从 `git status` 反推／通配／`xargs`。
   ⛔ amend／reset／rebase／stash／checkout .／clean／在仓内建 worktree／push。

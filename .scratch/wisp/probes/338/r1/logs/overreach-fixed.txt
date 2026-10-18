@@ -1,0 +1,17 @@
+0b1d1f0b files=4 OVERREACH_corrected=0
+87521cb4 files=3 OVERREACH_corrected=0
+3d26240c files=2 OVERREACH_corrected=0
+93d0f39c files=3 OVERREACH_corrected=0
+ee75c23f files=4 OVERREACH_corrected=0
+fa5f008f files=8 OVERREACH_corrected=0
+b84dedd0 files=10 OVERREACH_corrected=0
+787dbfb9 files=1 OVERREACH_corrected=0
+b4844295 files=1 OVERREACH_corrected=0
+91d08c3d files=2 OVERREACH_corrected=0
+a3994e28 files=1 OVERREACH_corrected=0
+===== 全集自证：11 笔的全部路径去重 ⊆ 三处写面 =====
+total_unique_paths=38
+overreach_unique=0
+===== 票 338 框（读-only，⛔ 翻） =====
+unchecked=5
+checked=0
