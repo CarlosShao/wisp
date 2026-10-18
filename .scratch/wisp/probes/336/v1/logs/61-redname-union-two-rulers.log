@@ -1,0 +1,28 @@
+### leg artefact check: red names in the leg own ac2 MU-1c / MU-1b teeth logs at e5021339
+-- MU-1b (tracked r1 log):
+      --- FAIL: TestAnchorFallbackTeethPerAnchor336 (0.24s)
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.01s)
+-- MU-1c (tracked r1 log):
+      --- FAIL: TestAnchorFallbackTeethPerAnchor336 (0.21s)
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.01s)
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq (0.01s)
+### union of red names in the leg own 8 teeth logs:
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/aws 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/dpapi-protect 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/git-credentials 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/kube 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/ssh 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under 
+  leg_union_count=8
+### same ruler applied to MY logs (for the apples-to-apples pair):
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/aws 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/dpapi-protect 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/git-credentials 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/kube 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/ssh 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq 
+          --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under 
+  my_union_count=8

@@ -1,0 +1,56 @@
+### verbatim red text of MU-1b (the :224 operand) on the teeth roster:
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh/offchain (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/aws (0.01s)
+### verbatim red text of MU-1c (the :225 operand):
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq (0.02s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh/offchain (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/aws (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/aws/offchain (0.01s)
+        --- PASS: TestAnchorFallbackTeethPerAnchor336/kube (0.01s)
+### unique FAIL subtest names across the 8 teeth legs:
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/aws 
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/dpapi-protect 
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/git-credentials 
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/kube 
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials 
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/ssh 
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq 
+        --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under 
+### landing line per leg (from the diff each leg printed):
+MU-1a p
+p
+p
+p
+p
+p
+p
+p
+MU-1b 
+MU-1c p
+p
+p
+p
+p
+p
+p
+p
+MU-1d 
+MU-1e 
+MU-1f 
+MU-1g 
+MU-1h 
+    line 21:    220c220
+    line 44:    224c224
+    line 67:    225c225
+    line 91:    227c227
+    line 114:    229c229
+    line 139:    231c231
+    line 164:    235c235
+    line 187:    237c237

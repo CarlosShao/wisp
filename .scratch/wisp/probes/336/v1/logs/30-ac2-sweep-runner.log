@@ -1,0 +1,218 @@
+### AC#2 sweep: anchor=e5021339 pristine=c1799cd24afce19e6accef23db23a7d7ee746dec tree=/d/tmp/wisp/20261018/336v1/tree-ac2
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [start]
+### paired positive control (UNMUTATED bytes)
+  TEETH:
+  rc=0 RUN=17 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-pristine]
+### MU-1a
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+    220c220
+    < 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.git-credentials`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.git-credentials`)), eqPath):
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/git-credentials 
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=B matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1a]
+### MU-1b
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+    224c224
+    < 	case aUnder(cand, anchorForms(anchorPath(appDataS, `wisp`))) &&
+    ---
+    > 	case anchorMatches(cand, anchorForms(anchorPath(appDataS, `wisp`)), isUnder) &&
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under 
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1b]
+### MU-1c
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+    225c225
+    < 		aEq(cand, anchorForms(anchorPath(appDataS, `wisp`, `config.toml`))):
+    ---
+    > 		anchorMatches(cand, anchorForms(anchorPath(appDataS, `wisp`, `config.toml`)), eqPath):
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq 
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=B matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1c]
+### MU-1d
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+    227c227
+    < 	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.ssh`)), isUnder):
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/ssh 
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=B matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1d]
+### MU-1e
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+    229c229
+    < 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.aws`, `credentials`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.aws`, `credentials`)), eqPath):
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/aws 
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=B matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+  LEG:
+  rc=1 RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+    RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1e]
+### MU-1f
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+    231c231
+    < 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.kube`, `config`)), eqPath):
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/kube 
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=B matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+  LEG:
+  rc=1 RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+    RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1f]
+### MU-1g
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+    235c235
+    < 	case appDataS != "" && aUnder(cand, anchorForms(anchorPath(appDataS, `microsoft`, `protect`))):
+    ---
+    > 	case appDataS != "" && anchorMatches(cand, anchorForms(anchorPath(appDataS, `microsoft`, `protect`)), isUnder):
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/dpapi-protect 
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=B matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1g]
+### MU-1h
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+    237c237
+    < 	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
+    ---
+    > 	case localAppDataS != "" && anchorMatches(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`)), isUnder):
+  TEETH:
+  rc=1 RUN=17 PASS_TOP=0 FAIL_TOP=1 SKIP=0
+    RED --- FAIL: TestAnchorFallbackTeethPerAnchor336 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials 
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=B matched=false clause=true
+  LEG:
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-MU-1h]
+### final state
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [final]
+  shared_worktree_dirty_internal_cmd=0
+### red roster, teeth legs, per mutation (names only)
+MU-1a teeth_red=2 leg_red=0
+MU-1b teeth_red=2 leg_red=0
+MU-1c teeth_red=3 leg_red=0
+MU-1d teeth_red=2 leg_red=0
+MU-1e teeth_red=2 leg_red=2
+MU-1f teeth_red=2 leg_red=2
+MU-1g teeth_red=2 leg_red=0
+MU-1h teeth_red=2 leg_red=0
+ac2_sweep_rc=0

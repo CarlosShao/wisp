@@ -1,0 +1,25 @@
+time=2026-10-18T12:47:59.309+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so
+    anchor_miss_reason_334_test.go:147: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac2-mu-1b-leg.log\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2522466234\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac2-mu-1b-leg.log\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2522466234\\001\\profile\\work") and the anchor "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac2-mu-1b-leg.log\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2522466234\\001\\profile\\.aws\\credentials" is not installed here (its expansion stopped at "d:\\tmp\\wisp\\20261018\\336v1\\gotmp\\ac2-mu-1b-leg.log\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2522466234\\001\\profile"), so R17 protects the ancestry chain the two share instead of proving a miss
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal
+--- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor (0.03s)
+    --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so (0.01s)
+    --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube (0.01s)
+    --- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchor/proven-match-keeps-the-bare-literal (0.01s)
+=== RUN   TestAnchorMissKeepsNonOverridableClassAndNeedL2
+    anchor_miss_reason_334_test.go:208: SHAPE-READING334 inside-profile=class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate \"d:\\\\tmp\\\\wisp\\\\20261018\\\\336v1\\\\gotmp\\\\ac2-mu-1b-leg.log\\\\testanchormisskeepsnonoverridableclassandneedl2399419710\\\\001\\\\profile\\\\work\\\\id_ed25519已允许\\x1b\\u202e\" is not proven handle-expanded (its own walk stopped at \"d:\\\\tmp\\\\wisp\\\\20261018\\\\336v1\\\\gotmp\\\\ac2-mu-1b-leg.log\\\\testanchormisskeepsnonoverridableclassandneedl2399419710\\\\001\\\\profile\\\\work\") and the anchor \"d:\\\\tmp\\\\wisp\\\\20261018\\\\336v1\\\\gotmp\\\\ac2-mu-1b-leg.log\\\\testanchormisskeepsnonoverridableclassandneedl2399419710\\\\001\\\\profile\\\\.aws\\\\credentials\" is not installed here (its expansion stopped at \"d:\\\\tmp\\\\wisp\\\\20261018\\\\336v1\\\\gotmp\\\\ac2-mu-1b-leg.log\\\\testanchormisskeepsnonoverridableclassandneedl2399419710\\\\001\\\\profile\"), so R17 protects the ancestry chain the two share instead of proving a miss" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+--- PASS: TestAnchorMissKeepsNonOverridableClassAndNeedL2 (0.01s)
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env*
+=== RUN   TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.*
+--- PASS: TestFileBaseNameClaimChangesNoClassOrReason (0.01s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* (0.00s)
+    --- PASS: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.119s
