@@ -14,18 +14,22 @@
   `cmd/wisp` 树在锚与 HEAD 也**同一枚** `54efbbbf`；`.go=760` 数过才信。盘符根零污染自检与起手台件作废见 [00-anchor.md](00-anchor.md) §1。
 - 起手 `git status --porcelain -- internal cmd` = **0 行**（⛔ 本腿写这两面）。
 
-## 1. ★头号活：`cmd/wisp` 整包那一发＝〔待编排者放行＝228-r3c 交件并核验后〕
+## 1. ★头号活：`cmd/wisp` 那一发＝**已跑完**（编排者 11:0x 放行后起跑）
 
-派单 §9＋编排者 10:0x 回复①＝本波 `go test ./cmd/wisp` 唯一持跑者＝`228-r3c`，放行只由编排者主动发消息。
-10:5x 现量：`228-r3c` 已交 `28f61c33`／`427b1f03` 且 `list_agents` 转 `inactive`，但我**尚未收到放行消息**
-⇒ 本腿⛔ 起跑（含定向 `-run`），已把该观察上报等你一字。编排者 10:4x 裁定⑤＝缺的这一发按 `A1021` 那形记账、
-**归编排者排程、⛔ 算本腿欠账**。台件＝`cmd-wisp.ps1`（`full` 整包成对两枚临时根台面 `cwisp-full-D`⇄`cwisp-full-C`
-＋`estate` 三档定向；PATH 带 `third_party/sherpa-onnx`＋`build` 两串 dll、`-count=1 -timeout 30m -v`、四数逐枚点名、
-`0xc0000135`／`build failed`／`no tests to run`／`setup failed` 另有单独一把尺＝命中即判台面故障、⛔ 计入判据）。
-★定向 `-run` 串逐枚对过实名册（⛔ 指不存在的名字当凭据）：`Resident`＝**28 枚顶层**、`TestLive`＝**12 枚**、
-`TestPanelThreadIsSTAAndExitsCleanly`＝1（`panel_resident_windows_test.go:958`）、`TestAC13BringUpSurvivesAReusedThreadQuit`＝1
-（同件 `:523`）；尺＝`git grep -h '^func Test' -- cmd/wisp | Where-Object { $_ -match <pat> } | Measure-Object`。
-本腿对 `cmd/wisp` 已交的只有一维＝`go build ./...`（两台各 rc=0）＋`go vet ./cmd/wisp/`（两台各 rc=0）＝vet⛔ test，不占车道。
+**四数逐枚表、逐名归位、死亡尺、build-tag 因果尺全在 [cmdwisp-readings.md](cmdwisp-readings.md)（138 行）；正文＝`logs/cmdwisp-*`。**
+本节只留最硬的几行（裁定②⒜已拍＝**AC#4 以定向 `-run` 的 estate 色为准，整包色只作台面终态记录**）：
+
+- 起跑前照裁定①注意①复跑漂移尺＝`cmd/wisp` 树 `c11163c8`＝现 `HEAD`＝**`54efbbbf`** 同一枚、导出树⇄现 HEAD
+  **139 枚文件差 0 行** ⇒ 旧树仍等于现锚字节（⛔ 拿旧树冒充现锚）。
+- 整包成对两台：`cwisp-full-D` rc=1 `448/322/8/3`（D 卷 GOTMPDIR，483.7s）⇄ `cwisp-full-C` rc=1 `448/323/7/3`
+  （默认 TMP＝C 卷，445.6s）；差集只一枚 `TestAC2SealNoticeLandsInTheRunLegLogFile`（D 红 C 绿）、SKIP 逐字相同。
+- estate：`estate-resident` rc=0 `31/22/0/0`；`estate-deathpoints` rc=0 `2/2/0/0`＝228-r3b 具名那两枚死亡点
+  定向**都绿**；`estate-live` 第一发 `0/0/0/0`＋`[no tests to run]`＝**台面故障⛔ 计入判据**（根因＝`TestLive*`
+  六件首行全 `//go:build windows && winlive`，我台件⛔ 带 `-tags`）⇒ 补正 `estate-live-winelive` rc=1 `12/6/6/0`。
+- **八枚整包红逐名归位＝本票新增红零枚**；**这一回没有整进程死亡**（`=== RUN` 448＝顶格 333＋子测试 115＝判定行
+  448＝顶格 333＋缩进 115，未判定 0 枚）。★机制级因果尺＝我那枚 `.go` 是 `//go:build !windows` 件（GOOS=windows
+  进 `IgnoredGoFiles` 1 枚、`TestGoFiles` 0），且 `_test.go` 只编进自己包（`cmd/wisp` 89 枚测试件里来自
+  `internal/winsec` 的 **0 枚**）⇒ 本腿那枚字节**机制上无法**改 `cmd/wisp` 的颜色。
 
 ## 2. 残余①：过期注释更正（＝唯一那一枚 `.go`）
 
@@ -44,16 +48,11 @@
 - (d) `winsec_other.go` 本体未动（复量 `19f3c211055011cc…` ＝ r1b 记录的 pristine 同串）；只把过期指针 `:78-82` 改 `:103-113`。
 - 全称声明尺：新句里 `window is closed` 肯定式命中 **0**。
 
-**证色（决定性）＝容器成对两发**，因为该件 `//go:build !windows` ⇒ 本机 Windows 档**根本不编译它**：
-
-```
-cw2-head（pristine fb6c54ed…）rc=0  RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0
-cw2-mine （我的字节 f87035bd…）rc=0  RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0
-分支尺（同发同行）：两台都 holds-its-own=2 / R-322-SHAPE=0 / payload-IN=0
-AC#1 成对两样本（两台各自）：damagedWitnesses=0 且 leafLegRefusals=43/50（head）、25/60（mine）
-```
-
-⇒ 四数与分支色一字不变＝我那一枚 `.go` 对判据**零影响、且没把任何判据放宽**。
+**证色（决定性）＝容器成对两发**（该件 `//go:build !windows` ⇒ 本机 Windows 档根本不编译它）：
+`cw2-head`（pristine `fb6c54ed…`）⇄ `cw2-mine`（我的字节 `f87035bd…`）各 **`RUN=142 PASS_TOP=86 FAIL_TOP=0 SKIP=0` rc=0
+一字不变**；分支尺两台都 `holds-its-own=2 / R-322-SHAPE=0 / payload-IN=0`；AC#1 成对两样本各自
+`damagedWitnesses=0` 且 `leafLegRefusals=43/50`（head）、`25/60`（mine）
+⇒ 我那一枚 `.go` 对判据**零影响、且没把任何判据放宽**。
 ⚠ 那一枚 `R-322 SHAPE OBSERVED` 分支**在已修 POSIX 码上今天不再走**（`cw-winsec` 两样本 2/2 走 `:225`
 `witness holds its own bytes`）＝与 `120-v2-verdict` §交付缺陷 2 那句"本腿两发盲跑里那一形都没出现"相符。
 
@@ -109,14 +108,13 @@ follows would go through that link and truncate whatever it targets …"
 `TestAnchorMissKeepsNonOverridableClassAndNeedL2`（＝票 334 `anchor_miss_reason_334_test.go`，10-17 11:47 落在我锚**之前**），
 `TestC26RewriteAccountIsConsumedAtEverySecurityLeg`（红句逐字 `internal/panel/composer.go:127 … display_scrub_216.go:26/:37/:218
 reads Result.Canonical without reading the rewrite account … ticket 102's hole re-opened by a new consumer`＝**台账 A380／200 已在册**）。
-⇒ ⚠ **具名上报一处与既有判语不符**：`322-r1b` §6 写"Linux 档五包全 ok"，本腿现量 `internal/risk` 在 Linux 档 **rc=1**。
-本票⛔ 一字节未动 `internal/risk`／`internal/panel` ⇒ 那一支变色非本票引入（红名册两台一字不变背书）；归编排者。
-★编排者 10:4x 裁定③收单：他**自己建容器台件复跑**那两枚（⛔ 抄本腿的数）＝红句逐字 `anchor_miss_reason_334_test.go:131/:156`
+⇒ ⚠ **具名上报一处与既有判语不符**：`322-r1b` §6 写"Linux 档五包全 ok"，本腿现量 `internal/risk` 在 Linux 档 **rc=1**；
+本票⛔ 一字节未动 `internal/risk`／`internal/panel` ⇒ 变色非本票引入（红名册两台一字不变背书）。
+★编排者 10:4x 裁定③收单＝他自己建容器台件复跑那两枚（⛔ 抄本腿的数）＝红句 `anchor_miss_reason_334_test.go:131/:156`
 `fixture guard: the fail-closed shape must still be A here, got class=B …`＋`:193/:197/:201` 三句、rc=1 ⇒ 判"成立、
-**且不是 322 造成的**＝票 334 自己的新仪器在 Linux 档红"，已立**票 339**
-（`.scratch/wisp/issues/339-ticket334-anchor-miss-instrument-runs-on-linux-but-its-fake-home-is-windows-only.md`），
-⛔ 记在 322 头上；本腿⛔ 动 `internal/risk/**`（那是 336-r1 写面）。
-中途一枚多出的 `Test285LoopDispatchesOneCorrPerCall`（328 的件）按单臂 `-count=3` 两台复跑**都 ok rc=0**＝一发摆动、⛔ 计入判据。
+**且不是 322 造成的**＝票 334 自己的新仪器在 Linux 档红"，已立**票 339**（`issues/339-ticket334-anchor-miss-instrument-runs-on-linux-but-its-fake-home-is-windows-only.md`），
+⛔ 记在 322 头上；本腿⛔ 动 `internal/risk/**`（＝336-r1 写面）。中途多出的 `Test285LoopDispatchesOneCorrPerCall`
+（328 的件）按单臂 `-count=3` 两台复跑**都 ok rc=0**＝一发摆动、⛔ 计入判据。
 
 ## 6. 门禁（逐枚 rc=；格式化/d22scan/长度门＝共享工作树，build/vet＝仓外导出台）
 
@@ -130,31 +128,33 @@ reads Result.Canonical without reading the rewrite account … ticket 102's hole
 `internal/tools/task_output_pointer_notice_errtext_174r7_test.go`、`cmd/wisp/models.go`、`cmd/wisp/panel_transport_35r2_test.go`
 （台账 A1024 那笔＝6 枚现量；票 338 已立＝真脏 2 枚＋CRLF 假脏 4 枚）。
 
-## 7. 本腿自己的偏差与台面故障（自抓，⛔ 计入判据）
+## 7. 本腿自己的偏差与台面故障（自抓，⛔ 计入判据；明细＝`cmdwisp-readings.md` §6/§7、`00-anchor.md` §3）
 
-1. **★一笔形状违规（越界 1 枚路径）＝编排者已收单、不追责、⛔ 回改历史**：`7f805583` 里
-   `git commit -F msg -- $(git diff --cached --name-only)`，那个 `$(…)` 取自**共享 index**，把 `leg-328-v1`
-   已 `git add` 未 commit 的 `.scratch/wisp/probes/328/v1/logs/start-rulers-v2.txt` 卷进我这一笔（`--numstat 8/0` 只追加）。
-   尺：blob 演进 `ce16d7bf`=`b6cae95c` → `7f805583^`=`b6cae95c` → `7f805583`=`9d1ac93e`＝工作树现量
-   （`git hash-object`）⇒ **那 8 行逐字是 328-v1 自己写的，零枚我的字节；内容没丢、没改坏，只是代提在我名下**。
-   定式（编排者入台账）＝`git add` 逐枚但 `commit` 从 index 取名＝**只守了一半**；本腿其后每一笔 pathspec
-   **字面逐枚写死**，⛔ 再用任何"从 index 反推"的形状；⛔ amend/reset/rebase/回改历史（＝`A1011` 第⑧节同族）。
-2. `host-winsec.sh` 首版把仓路径写成 MSYS 形 ⇒ `git -C` 当场 rc=128 零读数＝台面故障，件标〔故障件〕只建不删；
-   有效版＝`host-winsec.ps1`。同坑亦见 `container.ps1` 用 `D:/` 形挂载路径。
-3. `gates.ps1` 前两版把 `mine` 树路径归一坏成 `D:\d\tmp\…`（不存在）⇒ 那一版 **6 枚 `*-mine` 发 Push-Location
-   报错、`rc=0` 是无效读数**；已具名作废，第三版加 `Test-Path` 硬闸（不在即 `exit 91`）后重跑＝§6 那批数。
-4. `host-consumers.ps1` 首版 `$p.Trim('/')` 被开头的 `.` 挡住 ⇒ tag=`./risk.`、正文写进不存在的 `hc-\risk.log`、
-   五包**零读数**＝台面故障、⛔ 计入判据（作废 summary 只建不删）；本版显式配对 pkg/tag。
-5. 起手台件曾建在 `D:\tmp\probe322r2\`（`D:\tmp` 下、不在盘符根），新铁律到达后全部作废、改用具名落点；⛔ 删。
-6. `e73b8c35`（`cmd-wisp.ps1` 改整包成对两台）我**误复用了 `msg-c5.txt`** ⇒ 那一笔正文写着"票尾一条 bullet"、
-   与内容不符＝描述面缺陷（name-only 尺仍合格＝1 枚、在我的写面内）；⛔ `--amend`，真实内容以本节＋文件头为准。
+1. **★同一笔形状违规犯了两次**＝`git add` 逐枚字面 pathspec 合规，但 `git commit` 的 pathspec 写成从**共享 index**
+   反推的形状。`7f805583` 越界 1 枚（`328-v1` 的 `start-rulers-v2.txt`，8/0 只追加、blob `b6cae95c`→`9d1ac93e`
+   ＝工作树现量）＝编排者裁定①收单；`9c372800` 越界 2 枚（编排者自己的 `probes/orch/20261018/txt/{commit-40em.sh,
+   commit-corrections.sh}`，两枚在父笔不存在、我笔 blob＝工作树逐字相同）＝⚠ 我那笔正文刚写着"两处都字面写死"，
+   那句话当场是假的。**定式升级＝`commit` 的 pathspec 逐枚手打完，两处都⛔ 来自任何 `git diff --cached`／
+   `git status` 输出**；`17e67cca` 起照此执行（复尺 out=0）。⛔ amend/reset/rebase/回改历史（＝`A1011` 第⑧节同族）。
+2. 四枚台面故障（全部零读数、⛔ 计入判据、件与正文只建不删留底）＝`host-winsec.sh` 用 MSYS 路径形 ⇒ `git -C` rc=128；
+   `gates.ps1` 前两版把 `mine` 树归一坏成 `D:\d\tmp\…` ⇒ 6 枚 `*-mine` 的 `rc=0` **作废**（第三版加 `Test-Path`
+   硬闸 `exit 91` 后重跑＝§6 那批数）；`host-consumers.ps1` 首版 `Trim('/')` 被开头的 `.` 挡住 ⇒ 五包零读数；
+   `cmd-wisp.ps1` 前两版函数取名 `Go` 撞上外部命令 ⇒ 递归调自己、五发零读数（`0xc0000135=2` 是自指产物，两串 dll
+   现量都在树里），第三版改名 `Run-Shot`＋`& 'go'`＋`ParseFile` 自检。另：我用 `Set-Content -Encoding ascii` 改那枚
+   台件时把它自己的 CJK 注释打成 `?`（已 UTF-8 重写）。
+3. `e73b8c35` **误复用了 `msg-c5.txt`** ⇒ 那一笔正文写着"票尾一条 bullet"、与内容（台件改进）不符＝描述面缺陷
+   （name-only 尺合格＝1 枚在我写面内）；真实内容以本节＋`cmd-wisp.ps1` 文件头为准。
+4. 起手台件曾建在 `D:\tmp\probe322r2\`（在 `D:\tmp` 下、⛔ 盘符根），新铁律到达后全部作废、改用具名落点；⛔ 删。
+5. `report.md` 多次越过 160 行帽（逐次现量最高读到 **172**）⇒ 每一轮都当场压回（本件终态＝**160 行＝正好顶帽**）；
+   压缩只动叙述与重复段（明细改指 `cmdwisp-readings.md`），⛔ 改任何读数——复尺＝`448/322/8/3`、`448/323/7/3`、
+   `31/22/0/0`、`2/2/0/0`、`12/6/6/0`、`142/86/0/0` 六枚逐名仍在位。★另一次公共块 §shell 我自己犯了：量行数的
+   命令把反引号写进双引号串 ⇒ PowerShell ParserError、那一发零输出＝自己的台面故障（原文＝⛔ 双引号串里出现反引号或 `$`）。
 
 ## 8. 落点索引
 
-- 本件＝`report.md`；起手件＝`00-anchor.md`；必答＝[report-sec9.md](report-sec9.md)（41 行）；
-  台件＝`mk-tree.sh`（＋标〔故障件〕那枚 `.sh`）、`host-winsec.ps1`、`container.ps1`、`container-mine.ps1`、
-  `gates.ps1`、`host-consumers.ps1`、`cmd-wisp.ps1`。
-- `logs/`＝逐枚原始正文＋六枚 summary（`host-winsec-`／`gates-`＋`gate-*.txt`／`container-`／`container-mine-`／
-  `host-consumers-`），正文件＝`wh-*`／`wd-*`／`wt-*`、`cw-winsec`、`cc-*`、`cc2-*`、`cw2-*`、`cmdwisp-*`。
-- 只建不删的树＝`D:\tmp\wisp\20261018\322r2\{head.RJNBgS,mine.NkOEKC,gtD}`＋作废的 `D:\tmp\probe322r2\*`。
-- 产码面＝那一枚 `.go` 的 7 行注释＋2 行字符串（`ab49e9f9`）；票面＝尾一条追加 bullet；⛔ push。
+- 正文件四枚＝`00-anchor.md`(45)／`report.md`(本件 160)／[report-sec9.md](report-sec9.md)(41，必答)／
+  [cmdwisp-readings.md](cmdwisp-readings.md)(138，头号活明细)；台件七枚＝`mk-tree.sh`、`host-winsec.ps1`、
+  `container.ps1`、`container-mine.ps1`、`gates.ps1`、`host-consumers.ps1`、`cmd-wisp.ps1`（＋〔故障件〕那枚 `.sh`）。
+- `logs/`＝逐枚原始正文＋summary（`host-winsec-`／`gates-`＋`gate-*.txt`／`container-`／`container-mine-`／
+  `host-consumers-`／`cmdwisp-`／`hc-*`），故障留底＝`cwisp-*.FAULT-recursion.log`／`cmdwisp-summary.FAULT-recursion.txt`／`test.FAULT-recursion.log`。
+- 只建不删的树＝`D:\tmp\wisp\20261018\322r2\{head.RJNBgS,mine.NkOEKC,gtD}`＋作废的 `D:\tmp\probe322r2\*`；产码面＝那一枚 `.go` 的 7 行注释＋2 行字符串（`ab49e9f9`）；票面＝尾一条追加 bullet；⛔ push。

@@ -1,0 +1,26 @@
+票 322 收尾腿 322-r2·report.md 终态＝§1 收成指针（头号活已跑完）＋§7 补第二笔越界与三次帽超
+
+三处改动（本笔两枚路径＝这一枚正文留底＋`report.md`，⛔ 任何从共享 index 反推的 pathspec 形状）：
+
+1. §1 从〔待放行〕改写＝**头号活已跑完**（编排者 11:0x 放行；四数逐枚表与逐名归位改指
+   `cmdwisp-readings.md` 138 行那枚，本件只留最硬六行）。复尺＝`448/322/8/3` ⇄ `448/323/7/3`（成对两台
+   临时根台面）、`31/22/0/0`、`2/2/0/0`、`12/6/6/0`、`142/86/0/0` 六枚逐名仍在位。
+2. §7 补两笔自抓＝① **同一笔形状违规第二次再犯**（`9c372800` 越界 2 枚，机制＝`commit` 的 pathspec 从共享
+   index 反推；定式升级＝两处都⛔ 来自 `git diff --cached`／`git status` 输出，`17e67cca` 起照此执行）；
+   ② `report.md` 多次越过 160 行帽（逐次现量最高读到 172）都当场压回＝本件终态 160 行正好顶帽，压缩只动叙述
+   与重复段、⛔ 改任何读数；另自抓一笔公共块 §shell 违规＝量行数的命令把反引号写进双引号串 ⇒ ParserError 零输出。
+3. §4/§7 里 `cmd-wisp.ps1` 那笔递归故障（函数名 `Go` 撞外部命令）与 `Set-Content -Encoding ascii` 把台件
+   自己 CJK 注释打成 `?` 那笔，一并登记（明细在 `cmdwisp-readings.md` §7）。
+
+终量：`report.md` **160 行**＝正好顶到输出预算帽（⛔ 超）、14662 字节、0 枚 CR；
+`cmdwisp-readings.md` 138、`00-anchor.md` 45、`report-sec9.md` 41；
+`TODO|TBD|FIXME|XXX` 尺 0 命中；全部新字节入库侧 `i/lf`（`git ls-files --eol` 复量＝⛔ 一枚 `i/crlf`，
+工作树侧 `w/crlf` 是 `core.autocrlf=true` 的 checkout 形状、⛔ 存进去的字节）。
+票 322 的 `.go` 那枚字节仍＝`ab49e9f9` 的 7/7、净 0 行、260 行、0 枚 CR。
+
+★本腿又一笔自抓（公共块 §shell 那条我当场犯了）：上一条量行数的命令我把 `` `n `` 写进了双引号串里
+⇒ PowerShell 直接 ParserError（那一发零输出＝自己的台面故障，重跑用无引号 hazards 的写法才对）。
+＝派单原文"进 shell 的正文一律单引号或加引号 heredoc；⛔ 双引号串里出现反引号或 `$`"。登记在此，⛔ 再犯。
+
+⛔ 翻框（AC 框终量仍 1 未勾／5 勾＝AC#4）、⛔ push、⛔ 动 `cmd/wisp`／`internal/risk/**`／`privateFile` 产码／
+`winsec_other.go` 一字、⛔ amend/reset/rebase（两笔越界都按"要更正就追加"处理）。
