@@ -1,0 +1,87 @@
+### 336-r1 末读数 2026-10-18 12:25:23 +0800  head=6da21d4acb0418ea602faa988749fd9eccab5a1b
+  SEC_bytes=2（现量＝2 字节：U+00A7 的 UTF-8 形是 C2 A7；★上一版我在此写死一枚＝3 的期望＝假读数，本版以现量为准，同时证明 needle 真构造出来了、本件⛔ 出现那枚字面字符）
+## 1 分节号逐枚位置（尺＝grep -n，⛔ 只看总数）
+  票面 hits=1（逐枚行号见下：区分编排者 AC#6 判据原文 ⇄ 我的 bullet）
+      26:- [ ] **AC#6 纪律格**：⛔ 翻任
+  我的 bullet（第 27 行）hits=0
+## 2 占位符尺（正控先行）
+  正控＝同尺指真含词件：HEAD:.scratch/wisp/probes/334/v1/logs/83-incident-flipcount.log:2 HEAD:.scratch/wisp/probes/334/v1/logs/95-final-selfcheck.log:4 
+  我的件：report.md=0 牙=0 绊线=0
+## 3 提交名册（严格前缀尺；本件那一笔不计入＝自指滞后）
+  count=17
+  aaaedbb4 12:22 票 336 落地腿 336-r1·AC#5·具名更正上一笔的假读数＋去掉分节�
+  55f0ac49 12:21 票 336 落地腿 336-r1·AC#5·report 提交名册枚数自洽改正＝原句"�
+  5936cee3 12:20 票 336 落地腿 336-r1·AC#5＋AC#6·report.md 第 7 节改正入库＝① 枚�
+  638e7af3 12:18 票 336 落地腿 336-r1·AC#2＋AC#4·交件锚（bb247168＝含我全部字节�
+  bb247168 12:14 票 336 落地腿 336-r1·AC#6·票尾一条只追加 bullet＝尺复量 numstat 
+  985929d0 12:12 票 336 落地腿 336-r1·AC#5＋AC#6·交件侧三把尺入库＝run-selfcheck.s
+  3c535952 12:11 票 336 落地腿 336-r1·AC#2＋必答·report.md 增补入库＝三处具名读
+  14121a91 12:11 票 336 落地腿 336-r1·AC#0·8.3 短名读数入库＝logs/08-alias83.log（di
+  ae8040a1 12:01 票 336 落地腿 336-r1·AC#0–AC#6·report.md 入库＝107 行（≤160 帽）
+  28da3a7e 11:58 票 336 落地腿 336-r1·AC#3·两形代价现量入库（⛔ 定案，选不选
+  90dafe77 11:56 票 336 落地腿 336-r1·AC#4·颜色与门禁入库＝成对两把临时根台�
+  c87df16d 11:51 票 336 落地腿 336-r1·AC#2·POSIX 半格入库＝新件 anchor_fallback_teeth
+  8c36c23c 11:37 票 336 落地腿 336-r1·AC#2·逐锚突变名册入库＝八枚操作数各摘�
+  feac8f77 11:30 票 336 落地腿 336-r1·AC#2·成对正控入库＝未突变树首发 teeth-00 
+  c55e32b1 11:26 票 336 落地腿 336-r1·AC#2·牙本体＝每枚 A 档回落支操作数各一�
+  f67048d9 11:14 票 336 落地腿 336-r1·AC#0·起手现量＝票面四发串行重放全复认�
+  ff56a9e0 11:13 票 336 落地腿 336-r1·AC#0·台件＝八件套＋docs＋手工三件导出树
+## 4 写面越界（逐笔 name-only ⊆ 三处）
+  aaaedbb4 out_of_scope=0
+  55f0ac49 out_of_scope=0
+  5936cee3 out_of_scope=0
+  638e7af3 out_of_scope=0
+  bb247168 out_of_scope=0
+  985929d0 out_of_scope=0
+  3c535952 out_of_scope=0
+  14121a91 out_of_scope=0
+  ae8040a1 out_of_scope=0
+  28da3a7e out_of_scope=0
+  90dafe77 out_of_scope=0
+  c87df16d out_of_scope=0
+  8c36c23c out_of_scope=0
+  feac8f77 out_of_scope=0
+  c55e32b1 out_of_scope=0
+  f67048d9 out_of_scope=0
+  ff56a9e0 out_of_scope=0
+  .go 非测试命中总数=0
+  禁区件命中=0
+## 5 blacklist.go 逐枚提交 blob（期望全＝c1799cd2…）
+  aaaedbb4 c1799cd24afce19e6accef23db23a7d7ee746dec
+  55f0ac49 c1799cd24afce19e6accef23db23a7d7ee746dec
+  5936cee3 c1799cd24afce19e6accef23db23a7d7ee746dec
+  638e7af3 c1799cd24afce19e6accef23db23a7d7ee746dec
+  bb247168 c1799cd24afce19e6accef23db23a7d7ee746dec
+  985929d0 c1799cd24afce19e6accef23db23a7d7ee746dec
+  3c535952 c1799cd24afce19e6accef23db23a7d7ee746dec
+  14121a91 c1799cd24afce19e6accef23db23a7d7ee746dec
+  ae8040a1 c1799cd24afce19e6accef23db23a7d7ee746dec
+  28da3a7e c1799cd24afce19e6accef23db23a7d7ee746dec
+  90dafe77 c1799cd24afce19e6accef23db23a7d7ee746dec
+  c87df16d c1799cd24afce19e6accef23db23a7d7ee746dec
+  8c36c23c c1799cd24afce19e6accef23db23a7d7ee746dec
+  feac8f77 c1799cd24afce19e6accef23db23a7d7ee746dec
+  c55e32b1 c1799cd24afce19e6accef23db23a7d7ee746dec
+  f67048d9 c1799cd24afce19e6accef23db23a7d7ee746dec
+  ff56a9e0 c1799cd24afce19e6accef23db23a7d7ee746dec
+  工作树＝c1799cd24afce19e6accef23db23a7d7ee746dec
+## 6 票面（⛔ 翻框）
+  未勾=7 已勾=0 我的 bullet 枚数=1 总行数=27
+  append-only 尺（我这一条 ⇄ HEAD 前那 26 行逐字）＝IDENTICAL rc=0
+## 7 形状尺（两枚 .go）
+  internal/risk/anchor_fallback_teeth_336_windows_test.go lines=160 bytes=7839 cr=0 nonascii=0 exported_non_test=0 t_Skip=0 tag=//go:build windows
+  internal/risk/anchor_fallback_teeth_336_other_test.go lines=92 bytes=4108 cr=0 nonascii=0 exported_non_test=0 t_Skip=0 tag=//go:build !windows
+  report.md lines=125 bytes=15523 cr=0
+  logs 枚数=82 非 0 字节=76 0 字节=6
+  0 字节件逐枚（⛔ 入库＝尺坏 artefact，临时件只建不删）:
+      .scratch/wisp/probes/336/r1/logs/ac4-09-final-anchor-dshape.log.redlist
+      .scratch/wisp/probes/336/r1/logs/ac4-full-after-dshape-a.rednames
+      .scratch/wisp/probes/336/r1/logs/ac4-full-after-dshape-b.rednames
+      .scratch/wisp/probes/336/r1/logs/ac4-full-before-dshape-a.rednames
+      .scratch/wisp/probes/336/r1/logs/ac4-full-before-dshape-b.rednames
+      .scratch/wisp/probes/336/r1/logs/teeth-01-pristine-dshape.log.redlist
+## 8 台面字节对账（交件锚那棵 ⇄ 跟踪件）
+  teeth_in_tree_final=a429cdae29723adfa99de95f0f98cc52ac0fdf08
+  teeth_tracked=a429cdae29723adfa99de95f0f98cc52ac0fdf08
+  blacklist_tree=c1799cd24afce19e6accef23db23a7d7ee746dec
+final_readings_rc=0
