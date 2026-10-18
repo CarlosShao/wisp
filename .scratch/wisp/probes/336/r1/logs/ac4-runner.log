@@ -1,0 +1,115 @@
+### AC#4-1 成对两把临时根台面（同一条名册，改前⇄改后）
+### ac4-01-before-cishape.log shape=--ci-shape mkdir_gotmp_rc=0 GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-336r1-20261018-113958-555876
+  tree=D:/tmp/wisp/20261018/336r1/tree-before blob_blacklist=c1799cd24afce19e6accef23db23a7d7ee746dec
+  teeth_on_tree=ABSENT
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  PKGTIME ok  	github.com/CarlosShao/wisp/internal/risk	0.727s
+### ac4-02-after-cishape.log shape=--ci-shape mkdir_gotmp_rc=0 GOTMPDIR=C:\Users\swq\AppData\Local\wisp-test-gotmp\portable-336r1-20261018-114008-555876
+  tree=D:/tmp/wisp/20261018/336r1/tree-after blob_blacklist=c1799cd24afce19e6accef23db23a7d7ee746dec
+  teeth_on_tree=present
+  rc=0 RUN=27 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+  PKGTIME ok  	github.com/CarlosShao/wisp/internal/risk	0.541s
+  TEETH336 operand=git-credentials class=A matched=false clause=true
+  TEETH336 operand=wisp-config-under class=A matched=false clause=true
+  TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+  TEETH336 operand=ssh class=A matched=false clause=true
+  TEETH336 operand=aws class=A matched=false clause=true
+  TEETH336 operand=kube class=A matched=false clause=true
+  TEETH336 operand=dpapi-protect class=A matched=false clause=true
+  TEETH336 operand=local-credentials class=A matched=false clause=true
+### ac4-03-before-dshape.log shape=--dshape mkdir_gotmp_rc=0 GOTMPDIR=D:/tmp/wisp/20261018/336r1/gotmp/ac4-03-before-dshape.log
+  tree=D:/tmp/wisp/20261018/336r1/tree-before blob_blacklist=c1799cd24afce19e6accef23db23a7d7ee746dec
+  teeth_on_tree=ABSENT
+  rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  PKGTIME ok  	github.com/CarlosShao/wisp/internal/risk	0.168s
+### ac4-04-after-dshape.log shape=--dshape mkdir_gotmp_rc=0 GOTMPDIR=D:/tmp/wisp/20261018/336r1/gotmp/ac4-04-after-dshape.log
+  tree=D:/tmp/wisp/20261018/336r1/tree-after blob_blacklist=c1799cd24afce19e6accef23db23a7d7ee746dec
+  teeth_on_tree=present
+  rc=0 RUN=27 PASS_TOP=4 FAIL_TOP=0 SKIP=0
+  PKGTIME ok  	github.com/CarlosShao/wisp/internal/risk	0.351s
+  TEETH336 operand=git-credentials class=A matched=false clause=true
+  TEETH336 operand=wisp-config-under class=A matched=false clause=true
+  TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+  TEETH336 operand=ssh class=A matched=false clause=true
+  TEETH336 operand=aws class=A matched=false clause=true
+  TEETH336 operand=kube class=A matched=false clause=true
+  TEETH336 operand=dpapi-protect class=A matched=false clause=true
+  TEETH336 operand=local-credentials class=A matched=false clause=true
+### AC#4-2 必答(ii) 跑时长差＝整包 ./internal/risk（-run . ，同台面 --dshape，各两发）
+### ac4-05-full-before-dshape-a.log shape=--dshape mkdir_gotmp_rc=0 GOTMPDIR=D:/tmp/wisp/20261018/336r1/gotmp/ac4-05-full-before-dshape-a.log
+  tree=D:/tmp/wisp/20261018/336r1/tree-before blob_blacklist=c1799cd24afce19e6accef23db23a7d7ee746dec
+  teeth_on_tree=ABSENT
+  rc=1 RUN=230 PASS_TOP=135 FAIL_TOP=5 SKIP=1
+    RED --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    RED --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+    RED --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+    RED --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+    RED --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+  PKGTIME FAIL
+  PKGTIME FAIL	github.com/CarlosShao/wisp/internal/risk	12.593s
+  PKGTIME FAIL
+### ac4-05-full-before-dshape-b.log shape=--dshape mkdir_gotmp_rc=0 GOTMPDIR=D:/tmp/wisp/20261018/336r1/gotmp/ac4-05-full-before-dshape-b.log
+  tree=D:/tmp/wisp/20261018/336r1/tree-before blob_blacklist=c1799cd24afce19e6accef23db23a7d7ee746dec
+  teeth_on_tree=ABSENT
+  rc=1 RUN=230 PASS_TOP=135 FAIL_TOP=5 SKIP=1
+    RED --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    RED --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+    RED --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+    RED --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+    RED --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+  PKGTIME FAIL
+  PKGTIME FAIL	github.com/CarlosShao/wisp/internal/risk	4.258s
+  PKGTIME FAIL
+### ac4-06-full-after-dshape-a.log shape=--dshape mkdir_gotmp_rc=0 GOTMPDIR=D:/tmp/wisp/20261018/336r1/gotmp/ac4-06-full-after-dshape-a.log
+  tree=D:/tmp/wisp/20261018/336r1/tree-after blob_blacklist=c1799cd24afce19e6accef23db23a7d7ee746dec
+  teeth_on_tree=present
+  rc=1 RUN=247 PASS_TOP=136 FAIL_TOP=5 SKIP=1
+    RED --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    RED --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+    RED --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+    RED --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+    RED --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+  PKGTIME FAIL
+  PKGTIME FAIL	github.com/CarlosShao/wisp/internal/risk	3.477s
+  PKGTIME FAIL
+  TEETH336 operand=git-credentials class=A matched=false clause=true
+  TEETH336 operand=wisp-config-under class=A matched=false clause=true
+  TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+  TEETH336 operand=ssh class=A matched=false clause=true
+  TEETH336 operand=aws class=A matched=false clause=true
+  TEETH336 operand=kube class=A matched=false clause=true
+  TEETH336 operand=dpapi-protect class=A matched=false clause=true
+  TEETH336 operand=local-credentials class=A matched=false clause=true
+### ac4-06-full-after-dshape-b.log shape=--dshape mkdir_gotmp_rc=0 GOTMPDIR=D:/tmp/wisp/20261018/336r1/gotmp/ac4-06-full-after-dshape-b.log
+  tree=D:/tmp/wisp/20261018/336r1/tree-after blob_blacklist=c1799cd24afce19e6accef23db23a7d7ee746dec
+  teeth_on_tree=present
+  rc=1 RUN=247 PASS_TOP=136 FAIL_TOP=5 SKIP=1
+    RED --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    RED --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+    RED --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+    RED --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+    RED --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+  PKGTIME FAIL
+  PKGTIME FAIL	github.com/CarlosShao/wisp/internal/risk	3.100s
+  PKGTIME FAIL
+  TEETH336 operand=git-credentials class=A matched=false clause=true
+  TEETH336 operand=wisp-config-under class=A matched=false clause=true
+  TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+  TEETH336 operand=ssh class=A matched=false clause=true
+  TEETH336 operand=aws class=A matched=false clause=true
+  TEETH336 operand=kube class=A matched=false clause=true
+  TEETH336 operand=dpapi-protect class=A matched=false clause=true
+  TEETH336 operand=local-credentials class=A matched=false clause=true
+### AC#4-3 红名册逐名作差（before ⇄ after，整包）
+  before-dshape-a rednames=0
+  before-dshape-b rednames=0
+  after-dshape-a rednames=0
+  after-dshape-b rednames=0
+  diff before-a ⇄ after-a:
+  diff before-b ⇄ after-b:
+  SKIP 逐名（两棵树各一发）:
+    ac4-05-full-before-dshape-a.log:
+      --- SKIP: TestSyncRegistryProbeLive (0.00s)
+    ac4-06-full-after-dshape-a.log:
+      --- SKIP: TestSyncRegistryProbeLive (0.00s)
+ac4_rc=0
