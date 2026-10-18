@@ -61,6 +61,18 @@ internal/risk/anchor_miss_reason_339_other_test.go
 .scratch/wisp/probes/339/r1/msg-selfcheck.txt
 .scratch/wisp/probes/339/r1/report.md
   -> out-of-face=0  bad-go=0
-ALL-5-COMMITS-FACES=PASS
-UNIQUE-PATHS-ACROSS-5-COMMITS=48
+== b2fc7e9a74 票 339 落地腿 339-r1·report 头补七笔名册＋名册 ==
+.scratch/wisp/probes/339/r1/logs/lb.txt
+.scratch/wisp/probes/339/r1/logs/lf.txt
+.scratch/wisp/probes/339/r1/logs/roster-diff.log
+.scratch/wisp/probes/339/r1/logs/selfcheck-ruler1.log
+.scratch/wisp/probes/339/r1/logs/wb.txt
+.scratch/wisp/probes/339/r1/logs/wf.txt
+.scratch/wisp/probes/339/r1/msg-roster.txt
+.scratch/wisp/probes/339/r1/report.md
+.scratch/wisp/probes/339/r1/scripts/roster-diff.sh
+.scratch/wisp/probes/339/r1/scripts/selfcheck-ruler1.sh
+  -> out-of-face=0  bad-go=0
+ROSTER-FACES=PASS（名册＝声明、尺＝判）
+UNIQUE-PATHS-ACROSS-ROSTER=55
 POSITIVE-CONTROL other-leg out-of-face=1 (must be > 0)

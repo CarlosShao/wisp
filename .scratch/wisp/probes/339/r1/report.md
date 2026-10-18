@@ -4,10 +4,12 @@
 `d8c52982`，尺＝`git diff --name-only e6fd0f50 d8c52982 -- internal/risk/`＝**空**（仪器面逐字未动，读数同源）。
 写面只三处＝`internal/risk/anchor_miss_reason_334_test.go`＋同目录新增 `anchor_miss_reason_339_other_test.go`
 ＋`.scratch/wisp/probes/339/r1/**`＋票尾一条 bullet。⛔ 翻框（票 339 判据区七格一枚未动，尺见下）。
-★本腿七笔（每落一枚文件就 commit，⛔ 合笔）＝`7c279453` AC#0 基线／`7437ef88` 甲形落码（唯一 .go 笔）／
-`149b265a` 证据 bundle／`2bf64afa` 票尾 bullet／`5d1ae702` 末态门禁／`3a8f3852` 三把尺自证／`72c186c3` 更正 rm 自纠。
-尺①逐枚 `git show --name-only`⊆三处写面＝PASS（48 枚唯一路径、越界 0、`.go` 只 2 枚都在 `internal/risk/**` 测试面、
-正控打别腿 `7d9cf71a` 开火＝1；坏尺第一稿具名作废见 `logs/selfcheck-ruler1.log` 头两行）。
+★本腿逐笔（每落一枚文件就 commit，⛔ 合笔；⛔ 枚数当判据＝参考值）＝`7c279453` AC#0 基线／`7437ef88` 甲形落码（唯一 .go 笔）／
+`149b265a` 证据 bundle／`2bf64afa` 票尾 bullet／`5d1ae702` 末态门禁／`3a8f3852` 三把尺自证／`72c186c3` 更正 rm 自纠／
+`b2fc7e9a` 名册补笔＋roster-diff 尺／**本笔**＝尺①定形笔（名册＝声明、尺＝判；枚数⛔ 写死进判语＝本枚含自身哈希不可预写，现跑尺＝`git log --oneline e6fd0f50..HEAD` 数我这几笔）。
+尺①逐枚 `git show --name-only`⊆三处写面＝PASS（尺件现跑读 `logs/selfcheck-ruler1.log`：ROSTER-FACES=PASS、
+唯一路径数与枚数以尺为准；正控打别腿 `7d9cf71a` 开火＝1；坏尺两稿具名作废＝`(334|339)_.*_test` 误判真身越界
+＋硬编枚数的自动筛形＝循环尺藏红，均改正重打，⛔ 读成红）。
 
 ## AC#0 起手现跑（全部我自己建台件，⛔ 复用编排者那棵树）
 
