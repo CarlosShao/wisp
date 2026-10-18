@@ -1,0 +1,105 @@
+### 337-a1 交件自证 rev 起手锚＝c11163c896b09e7b6863d347dadbcb65702585cc；落笔侧 HEAD＝afb840d15a8dd554d8aff6955a258441b47973f3 2026-10-18 10:37:25 +0800
+date=Sun Oct 18 10:38:08 +0800
+
+== 尺一（本腿全部提交＋逐枚 name-only＋.go 命中枚数）==
+--- afb840d15a8dd554d8aff6955a258441b47973f3  票 337 普查腿 337-a1·票尾一条只追加 bullet（写锚 c11163c8＋七枚框一枚没翻）
+.scratch/wisp/issues/337-fail-closed-reason-has-no-reader-wiring-census.md
+.scratch/wisp/probes/337/a1/msg/01-logs-anchor-hops.md
+.scratch/wisp/probes/337/a1/msg/05-ticket-bullet.md
+.scratch/wisp/probes/337/a1/msg/07-ticket-tail-commit.txt
+    go_hits=0  files=4
+--- a24a8684e7b41c9308f42417ecc08eadd0e64698  票 337 普查腿 337-a1·census.md 正文件（74 行）＋本腿两处自报更正追加
+.scratch/wisp/probes/337/a1/census.md
+.scratch/wisp/probes/337/a1/logs/10-hop-a-producers.log
+.scratch/wisp/probes/337/a1/logs/11-hop-b-gate-callsites.log
+.scratch/wisp/probes/337/a1/msg/03-census.txt
+.scratch/wisp/probes/337/a1/msg/06-census.txt
+    go_hits=0  files=5
+--- 6559fb4f9c6b459da5b37da91f0301330812c76d  票 337 普查腿 337-a1·AC#1/AC#3/AC#4 现量四枚入库（logs/20-23＋尺脚本 11-14）
+.scratch/wisp/probes/337/a1/logs/16-hop-a-denominator.log
+.scratch/wisp/probes/337/a1/logs/20-ac1-three-shapes.log
+.scratch/wisp/probes/337/a1/logs/21-ac1-panel-and-farthest-byte.log
+.scratch/wisp/probes/337/a1/logs/22-ac1-ac3-ac4-measure.log
+.scratch/wisp/probes/337/a1/logs/23-ac1-line-budget.log
+.scratch/wisp/probes/337/a1/logs/90-gates-and-lf.log
+.scratch/wisp/probes/337/a1/msg/04-measure.txt
+.scratch/wisp/probes/337/a1/scripts/11-ac1-shapes.sh
+.scratch/wisp/probes/337/a1/scripts/12-ac1-supplement.sh
+.scratch/wisp/probes/337/a1/scripts/13-ac1-ac3-ac4.sh
+.scratch/wisp/probes/337/a1/scripts/14-denominator-budget-gates.sh
+    go_hits=0  files=11
+--- 1301903ade6bfc3ed86644b39443369d6e84051e  票 337 普查腿 337-a1·AC#0 逐跳 g＋h（含正控与两枚具名差异）
+.scratch/wisp/probes/337/a1/logs/15-hop-g-logf-injection.log
+.scratch/wisp/probes/337/a1/logs/17-hop-g-logf-injection.log
+.scratch/wisp/probes/337/a1/logs/18-hop-h-to-model-chain.log
+.scratch/wisp/probes/337/a1/msg/02-logs-gh.txt
+.scratch/wisp/probes/337/a1/scripts/10-logs-gh.sh
+    go_hits=0  files=5
+--- 5db0b538dad3bf2841adec834a130e4a6b28d8df  票 337 普查腿 337-a1·AC#0 起手＋逐跳 a–f
+.scratch/wisp/probes/337/a1/logs/00-anchor.log
+.scratch/wisp/probes/337/a1/logs/10-hop-a-producers.log
+.scratch/wisp/probes/337/a1/logs/11-hop-b-gate-callsites.log
+.scratch/wisp/probes/337/a1/logs/12-hop-c-blacklistnote-landing.log
+.scratch/wisp/probes/337/a1/logs/12-hop-c-blacklistnote-readers.log
+.scratch/wisp/probes/337/a1/logs/13-hop-c2-reason-readers.log
+.scratch/wisp/probes/337/a1/logs/14-hop-d-e-f.log
+    go_hits=0  files=7
+★提交主题前缀尺＝git log --grep '^票 337 普查腿 337-a1'（采样真实形状后用的严格前缀）命中枚数＝5
+★越面尺＝本腿全部 name-only 去重后，不在两处允许写面（probes/337/a1/** ＋ 票 337 那枚件）的枚数：
+0
+
+== 尺二（证据件绝对路径＋wc -c＋行数＋占位符尺 0 命中）==
+根＝D:/work/workspace/projects plans/Wisp
+.scratch/wisp/probes/337/a1/census.md                                          bytes=13357   lines=74    placeholder=0
+.scratch/wisp/probes/337/a1/logs/00-anchor.log                                 bytes=1091    lines=7     placeholder=0
+.scratch/wisp/probes/337/a1/logs/10-hop-a-producers.log                        bytes=2820    lines=24    placeholder=0
+.scratch/wisp/probes/337/a1/logs/11-hop-b-gate-callsites.log                   bytes=1270    lines=16    placeholder=0
+.scratch/wisp/probes/337/a1/logs/12-hop-c-blacklistnote-landing.log            bytes=6375    lines=63    placeholder=0
+.scratch/wisp/probes/337/a1/logs/12-hop-c-blacklistnote-readers.log            bytes=18076   lines=160   placeholder=0
+.scratch/wisp/probes/337/a1/logs/13-hop-c2-reason-readers.log                  bytes=13551   lines=116   placeholder=0
+.scratch/wisp/probes/337/a1/logs/14-hop-d-e-f.log                              bytes=3336    lines=35    placeholder=0
+.scratch/wisp/probes/337/a1/logs/15-hop-g-logf-injection.log                   bytes=5523    lines=51    placeholder=0
+.scratch/wisp/probes/337/a1/logs/16-hop-a-denominator.log                      bytes=1706    lines=14    placeholder=0
+.scratch/wisp/probes/337/a1/logs/17-hop-g-logf-injection.log                   bytes=3954    lines=48    placeholder=0
+.scratch/wisp/probes/337/a1/logs/18-hop-h-to-model-chain.log                   bytes=4807    lines=110   placeholder=0
+.scratch/wisp/probes/337/a1/logs/20-ac1-three-shapes.log                       bytes=7874    lines=84    placeholder=0
+.scratch/wisp/probes/337/a1/logs/21-ac1-panel-and-farthest-byte.log            bytes=4448    lines=56    placeholder=0
+.scratch/wisp/probes/337/a1/logs/22-ac1-ac3-ac4-measure.log                    bytes=5608    lines=63    placeholder=0
+.scratch/wisp/probes/337/a1/logs/23-ac1-line-budget.log                        bytes=1270    lines=19    placeholder=0
+.scratch/wisp/probes/337/a1/logs/90-gates-and-lf.log                           bytes=3376    lines=40    placeholder=0
+.scratch/wisp/probes/337/a1/logs/95-final-selfcheck.log                        bytes=5258    lines=69    placeholder=18
+.scratch/wisp/probes/337/a1/msg/01-logs-anchor-hops.md                         bytes=1235    lines=16    placeholder=0
+.scratch/wisp/probes/337/a1/msg/02-logs-gh.txt                                 bytes=1461    lines=15    placeholder=0
+.scratch/wisp/probes/337/a1/msg/03-census.txt                                  bytes=802     lines=8     placeholder=2
+.scratch/wisp/probes/337/a1/msg/04-measure.txt                                 bytes=2032    lines=17    placeholder=0
+.scratch/wisp/probes/337/a1/msg/05-ticket-bullet.md                            bytes=7296    lines=1     placeholder=1
+.scratch/wisp/probes/337/a1/msg/06-census.txt                                  bytes=1136    lines=10    placeholder=1
+.scratch/wisp/probes/337/a1/msg/07-ticket-tail-commit.txt                      bytes=1216    lines=12    placeholder=0
+.scratch/wisp/probes/337/a1/scripts/10-logs-gh.sh                              bytes=4938    lines=67    placeholder=0
+.scratch/wisp/probes/337/a1/scripts/11-ac1-shapes.sh                           bytes=3495    lines=50    placeholder=0
+.scratch/wisp/probes/337/a1/scripts/12-ac1-supplement.sh                       bytes=3999    lines=38    placeholder=0
+.scratch/wisp/probes/337/a1/scripts/13-ac1-ac3-ac4.sh                          bytes=5232    lines=57    placeholder=0
+.scratch/wisp/probes/337/a1/scripts/14-denominator-budget-gates.sh             bytes=4202    lines=56    placeholder=0
+.scratch/wisp/probes/337/a1/scripts/15-selfcheck.sh                            bytes=4019    lines=45    placeholder=4
+★零字节件枚数（应 0）＝0
+正控（同一把占位符尺在别处应≥1）＝docs/evidence/s1/334-v1-verdict.md 命中 1 枚
+
+== 尺三（决定性尺逐字：票面七格＋写面＋票尾一条）==
+票面框数现跑＝未勾 7／已勾 0（尺＝grep -c -- '^- [ ]' 于票面）
+票尾本腿那条＝1 行；票面相对 c11163c8 的差＝1	0	.scratch/wisp/issues/337-fail-closed-reason-has-no-reader-wiring-census.md
+★本腿交件时对 internal/**／cmd/**／frontend/** 的字节改动＝
+3
+
+== 必答逐字读数汇总（尺见各 logs）==
+(i)  c 跳正控 Decision.Reason 非测试枚数＝7（那一发用的是含 [^A-Za-z] 的变体形状；终版尺＝行尾 inclusive ($|[^A-Za-z]) ＝8 枚，见 96 件）
+(i)  c 跳被测尺（BlacklistNote.Reason 读形）命中枚数＝11（唯一那枚＝mode.go:111 写侧）
+(iv) 最远字节所在行逐字＝	out := d
+(iv) 写侧行逐字＝			n.Reason = d.Reason
+gate 调用点逐字＝		d := risk.Gate(c, overrides)
+risk.Logf 生产注入枚数＝0
+ToolOutcomeText 全仓命中枚数（票面引用名）＝0
+
+### ★本件两枚读数请按 96-ruler-final-reconciliation.log 的终版引用（不改本件原句，只追加指针）：
+  (1) 上面尺三那发（两条 -e）＝正控 6 枚 ⇒ 终版（行尾 inclusive ＋ decision 别名）＝8 枚；
+  (2) 上面“本腿交件时对 internal/cmd/frontend 的字节改动＝3”那枚用错了分母（用的是 c11163c8..HEAD 全部提交的并集，含别腿字节）
+      ⇒ 对本腿逐笔 name-only 过滤后的真读数＝0 枚（越面 0）。详见 96 件缺陷③节。

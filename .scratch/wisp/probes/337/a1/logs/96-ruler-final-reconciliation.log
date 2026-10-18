@@ -1,0 +1,54 @@
+### 尺终版对账 rev=c11163c8（本腿自报三枚尺面缺陷并给终值；早期那几发原样留在 logs/12・13・95 作对照件，⛔ 删）
+
+== 缺陷①：收紧形 [^A-Za-z] 会漏行尾那一枚 ==
+尺＝git grep -nE 'dec\.Reason$' $R -- internal/tools/bridge.go
+c11163c8:internal/tools/bridge.go:439:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+
+== 缺陷②：(note|n|Blacklist)\.Reason 里的 n 会子串命中 decision.Reason（decision 以 n 结尾）
+  ⇒ 与 turn.Reasoning 同族坑。类型级正尺＝显式 Blacklist\.Reason／note\.Reason／唯一 BlacklistNote 变量 n 的落点：
+-- 显式 Blacklist.Reason（剔 .scratch，含测试）命中＝
+Blacklist_Reason_hits=0
+-- note.Reason（剔 .scratch）命中＝
+note_Reason_hits=0
+-- 唯一 BlacklistNote 变量 n 的声明（mode.go:86-87）与它唯一一次 .Reason 落点（:111＝写侧）--
+func (b *Bridge) readBlacklist(raw []string) BlacklistNote {
+	var n BlacklistNote
+		if d.Class > n.Class {
+			n.Class = d.Class
+			n.Reason = d.Reason
+		}
+-- promptFor 那枚 Reason: d.Reason 的 d 类型（tools.Decision，非 Note）＝下面签名逐字 ⇒ 属正控那一族 --
+c11163c8:internal/agent/approval/gate.go:597:func (g *Gate) promptFor(d tools.Decision, corr string, win, deadline time.Duration, bv *BatchView, grant string) Prompt {
+
+== 终版尺（行尾 inclusive：($|[^A-Za-z])；剔 .scratch、剔 _test）==
+-- 被测尺逐枚（含假命中，供判堆）--
+c11163c8:cmd/wisp/panel_pump.go:75:			Reason:                 it.Decision.Reason,
+c11163c8:internal/panel/approval.go:47:	// Reason is Decision.Reason verbatim.
+c11163c8:internal/panel/approval.go:83:		Reason:                 decision.Reason,
+c11163c8:internal/panel/approval.go:84:		ReasonKnown:            strings.TrimSpace(decision.Reason) != "",
+c11163c8:internal/risk/assessor.go:13:// renders Decision.RulesHit and Decision.Reason verbatim.
+c11163c8:internal/tools/mode.go:111:			n.Reason = d.Reason
+被测尺命中枚数（收紧前）＝6
+  ⇒ 逐枚判堆：mode.go:111＝写侧（唯一真指名 Note.Reason）；panel_pump.go:75／panel/approval.go:47,83,84／assessor.go:13＝子串假命中或注释，读的是 Decision.Reason
+-- 正控尺逐枚 --
+c11163c8:cmd/wisp/panel_pump.go:75:			Reason:                 it.Decision.Reason,
+c11163c8:internal/panel/approval.go:83:		Reason:                 decision.Reason,
+c11163c8:internal/panel/approval.go:84:		ReasonKnown:            strings.TrimSpace(decision.Reason) != "",
+c11163c8:internal/tools/bridge.go:301:	dec.Reason = verdict.Reason
+c11163c8:internal/tools/bridge.go:439:		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+c11163c8:internal/tools/bridge.go:1093:	if dec.Reason == "" {
+c11163c8:internal/tools/bridge.go:1094:		dec.Reason = why
+c11163c8:internal/tools/bridge.go:1165:		dec.RulesHit, b.scopeVerdictOf(dec).token(), grantID, dec.Refusal.refusalToken(), dec.Reason)
+正控命中枚数（终值）＝8
+与 logs/12 尺三那发（两条 -e＝6 枚）的差异具名：终版多 panel/approval.go:83/:84 这两枚 decision.Reason（前发未带该别名）；前发里 bridge.go:439 本就在（该行后还有引号，不属行尾）。⇒ 终值 8 枚；两发都 ≥1 ⇒ 正控成立，被测尺那些 0 不受影响。
+
+== 缺陷③：越面尺用错分母（logs/95 那枚 3）==
+错形＝git diff --name-only c11163c8 HEAD（＝两号之间全部提交的并集，含别腿字节）＝3
+对形＝只对本腿逐笔 name-only 后过滤 ^(internal|cmd|frontend|design|tools|scripts)/ ＝
+0
+⇒ 真读数＝0 枚（越面 0）。那 3 枚属别腿，尺＝git log --format='%h %s' c11163c8..HEAD -- internal cmd frontend 主题逐枚可见（166-r1 两笔＋322-r2 一笔）
+
+== 终值一览 ==
+被测：BlacklistNote.Reason 判定型／打印型／出向读者＝0 枚；搬运型＝1 枚（pending_read.go:67 out := d）；写侧＝1 枚（mode.go:111）
+正控：Decision.Reason 非测试读形＝8 枚
+其余不变：risk.Gate 生产调用点 1／blacklistedSensitive 调用点 0（正控 1）／risk.Logf 生产注入 0（正控 24）／risk.Resolve 非测试 1（含测试 7）

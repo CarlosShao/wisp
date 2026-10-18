@@ -11,7 +11,7 @@
 |---|---|---|
 | a 生产者 | A 档 case **9** 枚；走 `aRuleReason` **7** 枚（`blacklist.go:221/226/228/230/232/236/238`），走裸字面串 **2** 枚（`:223 .git/config`、`:234 browser credential store`）；拼装点唯一 `:329` | **差异①**：判语件 `80-chain-reach.log:2` 写「九枚 A case 走 aRuleReason」→ 现跑 9 枚中 7 枚（logs/16）。★成因也具名：`blacklist.go:214` 那行注释自陈「every case below returns through aRuleReason」，而同一个 switch 里 `:223`／`:234` 两支返回裸字面串 ⇒ **注释过期**（非判级差异，档位一字未变）；本波 `internal/risk/**` 写腿＝336-r1，⛔ 本腿动它，只上报 |
 | b Gate 调用点 | `risk.Gate(` 生产调用点**恰 1 枚**＝`internal/tools/mode.go:98`；`internal/**` 测试对该串 0 枚 | 一致（行号未漂） |
-| c `Reason` 读者 | 判定型 **0**／搬运型 **1**／打印型 **0**（尺＝收紧形 `(note\|n\|Blacklist)\.Reason[^A-Za-z]`，唯一命中 `mode.go:111`＝写侧赋值） | 一致（细节见必答④） |
+| c `Reason` 读者 | 判定型 **0**／打印型 **0**／出向 **0**／搬运型 **1**。★终版尺（§8）：显式 `Blacklist\.Reason` 与 `note\.Reason` 剔 `.scratch` 后各 **0** 枚；唯一真指名该字段的字节＝`mode.go:111` `n.Reason = d.Reason`（`n` 在 `:87` 声明为 `BlacklistNote`）＝**写侧** | 一致（细化见必答④） |
 | d 切片被读 | `pending_read.go:73/74/75` 三枚（Absolute／Unlockable／AlreadyUnlocked） | 一致 |
 | e `blacklistedSensitive()` | 命中 **2** 行＝注释 `:117`＋定义 `:120` ⇒ 调用点 **0** | 一致 |
 | f 分类器那一跳 | `internal/tools/paths.go:380` 返回 `risk.Tier`（无字符串）；`rules_gateway.go:77` 只 switch tier | 一致 |
@@ -19,11 +19,11 @@
 | h 到模型那句 | `rules_gateway.go:82` → 融合 `assessor.go:316-352`（`:345 join`）→ `bridge.go:301` → `:439` Deny 支 → `reject(:1090)` 返回 `ToolOutcome{Text: why}`（`Text:` 在 `:1106`）→ `loop.go:745` | **差异②**：票面/判语件引的 `ToolOutcomeText(:1105)` 全仓 **0 命中**＝不存在的标识符（尺＝`git grep -n ToolOutcomeText <rev>` 剔 .scratch） |
 
 ★正控（派单 AC#0 明文要的自带正控，⛔ 交两种形状都放行的尺）：
-- c 跳同一把尺换 `Decision.Reason` 读形＝非测试 **6 枚**（`bridge.go:301/439/1093/1094/1165`、`panel_pump.go:75`）；再放宽一把（含测试）＝**72 枚**（logs/13）。
+- c 跳同一把尺换 `Decision.Reason` 读形＝非测试 **6 枚**（`bridge.go:301/439/1093/1094/1165`、`panel_pump.go:75`）；再放宽一把（含测试）＝**72 枚**（logs/13）。★终值 **8 枚**（见 §8 尺终版）。
 - e 跳同一把尺换同文件确有调用点的 `b.permissionMode()` ＝ **1 枚**。
 - g 跳同一把尺换 `opt.Sink`／`opt.Logger` 族＝非测试 **24 枚**。⚠ 我第一发正控（`risk.NowFunc` 形）落空＝那把尺不可信，旧发原样留 `logs/15`，决定性读数以 `logs/17` 为准。
 - b 跳同一把尺换 `risk.Resolve(`＝非测试 **1** 枚（`paths.go:116`）、含测试 7 枚。⚠★本腿先把预期写成「确有 ≥2 枚」＝错，已当场具名更正（logs/11 末节）。**四跳的 0 都不是尺坏。**
-★本腿自抓两枚尺坑并具名：① `n\.Reason` 子串命中 `turn.Reasoning`（llm 的字段，与 Note 无关）⇒ 收紧 `[^A-Za-z]`；② `ls-tree` 未关 `core.quotePath` 时中文名以八进制转义呈现，`grep 264` 会假命中 ⇒ 重跑用 `-c core.quotePath=false`（logs/21）。
+★本腿自抓三枚尺坑并具名（尺面缺陷，不影响任何一跳的 0／1 结论）：① `n\.Reason` 子串命中 `turn.Reasoning`（llm 字段，与 Note 无关）⇒ 收紧 `[^A-Za-z]`；② `ls-tree` 未关 `core.quotePath` 时中文名以八进制转义呈现，`grep 264` 会假命中 ⇒ 重跑用 `-c core.quotePath=false`（logs/21）；③ 收紧形 `[^A-Za-z]` 会**漏行尾**那一枚（`bridge.go:439` 以 `dec.Reason` 结尾），且 `(note|n|Blacklist)` 里的 `n` 又子串命中 `decision.Reason`（decision 以 n 结尾）⇒ 终版尺见 §8（logs/96）。
 
 ## 2. AC#1 三形代价表（先量再选；★本腿⛔ 选形、⛔ 推荐、⛔ 替机主决定）
 
@@ -62,7 +62,7 @@
 
 ## 6. 必答（派单末四问）
 
-**(i) "消费者 0 枚"那把尺的正控逐字读数**：同一把尺（`git grep -nE '(dec|it\.Decision|decision)\.Reason[^A-Za-z]' c11163c8 -- "*.go"` 剔 `.scratch`、剔 `_test.go`）命中 **6** 枚——`bridge.go:301/439/1093/1094/1165`、`panel_pump.go:75`；放宽一把（含测试）**72** 枚。逐字见 `logs/12-hop-c-blacklistnote-landing.log` 尺三。
+**(i) "消费者 0 枚"那把尺的正控逐字读数（终版尺见 §8）**：同一把尺（`git grep -nE '(dec|decision|it\.Decision)\.Reason($|[^A-Za-z])' c11163c8 -- "*.go"` 剔 `.scratch`、剔 `_test.go`）命中 **8** 枚——`panel_pump.go:75`、`panel/approval.go:83/84`、`bridge.go:301/439/1093/1094/1165`；放宽一把（含测试）**72** 枚。逐字见 `logs/12-hop-c-blacklistnote-landing.log` 尺三＋`logs/96-ruler-final-reconciliation.log`。
 **(ii) 逐跳读数与票面差异清单**：**2 枚**＝① hop a 分母：票面正文未写分母，参照件 `80-chain-reach.log:2`（＝派单指定逐跳对照的判语件）写「九枚 A case 走 aRuleReason」→ 现跑 9 枚中 7 枚（logs/16）；② hop h 的 `ToolOutcomeText` 全仓 0 命中＝不存在的标识符（票面第 13 行与判语件都引它；真身 `ToolOutcome.Text`，`bridge.go:1106`）。其余 a—h 六跳**零差异**（尺见 §1 表与 logs/10–23）。★另具名一枚非链读数的发现：`blacklist.go:214` 注释自陈过期（见 §1 差异①成因行），属产码注释、⛔ 本腿动。
 **(iii) "会动 `frontend/**`"逐形点名**：甲＝**假**；乙＝**假**（就出向字节而言：前端 `l2-approval-card.tsx:207/:216` 已渲染 `view.reason`；⚠ 但 `frontend/**` 是机主外部 agent 的写面，任何显示侧改动需另排）；丙＝**假**。
 **(iv) 这句实话今天最远流到哪一枚字节就停了**：最远＝`internal/agent/approval/pending_read.go:67` 的 `out := d`（`cloneDecision` 整枚 struct 值拷贝，把 `BlacklistNote` 连 `Reason` 一起搬进 `LiveApproval.Decision`）＝**搬运型接触，不指名读该字段**；再往前一步是写侧 `internal/tools/mode.go:111`。之后判定型／打印型／面板出向／模型正文**全部 0 位读者**（`internal/panel` 对 `Blacklist` 非测试 0 命中）。⇒ 这是对票面"读者 0 枚"的一处**细化**（搬运型 1 枚），不推翻它。
@@ -72,3 +72,10 @@
 1. 票面第 13 行把 `ToolOutcomeText(:1105)` 当既有标识符引用——请编排者裁定是否只追加更正注记（⛔ 本腿动票面原文）。
 2. 必答④那枚"搬运型 1 枚"要不要计入票面"读者 0 枚"的定义——归裁决者，⛔ 本腿盖章。
 3. `internal/panel/display_scrub_216.go:58` 那句自陈（卡片 Reason 不进 216 清洗名册）对乙形是**既有事实**还是**待立缺口**——属票 216／乙形裁量，本腿只报盘上字节。
+
+## 8. 尺终版对账（本腿自报三枚尺面缺陷＋终值；logs/96 逐字）
+
+- ★`[^A-Za-z]` 这个收尾**会漏行尾**：`bridge.go:439` 那行以 `dec.Reason` 结尾 ⇒ 被吞。终版尺＝`($|[^A-Za-z])`。
+- ★`(note|n|Blacklist)\.Reason` 里的 `n` **子串命中 `decision.Reason`**（decision 以 n 结尾）＝与 `turn.Reasoning` 同族坑 ⇒ 收紧那一发给出的"6 枚"里有 5 枚是假命中（读的是 `Decision.Reason`／注释，不是 Note）。类型级正尺＝显式 `Blacklist\.Reason`（剔 `.scratch` **0** 枚）＋`note\.Reason`（**0** 枚）＋唯一 `BlacklistNote` 变量 `n`（`mode.go:87` 声明）只出现在 `:111`＝写侧。
+- ★`logs/95` 那枚"越面＝3"用错分母（`git diff --name-only c11163c8 HEAD`＝两号之间**全部**提交的并集，含 166-r1／322-r2 别腿字节）。正确尺＝只对本腿逐笔 `name-only` 后过滤 `^(internal|cmd|frontend|design|tools|scripts)/`＝**0** 枚。
+- **终值**：被测（`BlacklistNote.Reason` 读者）＝判定／打印／出向 **0** 枚＋搬运 **1** 枚；正控（`Decision.Reason` 非测试读形）＝**8** 枚 ⇒ 尺认得真读者，那些 0 是真 0。**census 的 §1/§6 已按终版改写；早期那两发原样留在 `logs/12`／`logs/13`／`logs/95` 作对照件，⛔ 删。**

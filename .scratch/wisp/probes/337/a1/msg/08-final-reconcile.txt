@@ -1,0 +1,13 @@
+票 337 普查腿 337-a1·尺终版对账（本腿三枚尺面缺陷＋终值）
+
+★交付前自查抓到三枚我自己的尺坑，全部具名并把终值写进 census §8＋logs/96，早期那几发原样留作对照件（⛔ 删）：
+- ① 收紧形 [^A-Za-z] 会漏行尾那一枚（bridge.go:439 以 dec.Reason 结尾被吞）⇒ 终版尺 ($|[^A-Za-z])。
+- ② (note|n|Blacklist)\.Reason 里的 n 子串命中 decision.Reason（decision 以 n 结尾）＝与 turn.Reasoning 同族坑
+  ⇒ 收紧那一发的"6 枚"里 5 枚是假命中（读的是 Decision.Reason／注释）。类型级正尺＝显式 Blacklist.Reason 0 枚、
+  note.Reason 0 枚、唯一 BlacklistNote 变量 n（mode.go:87 声明）只落 :111＝写侧 ⇒ 读者读数仍＝0 枚（票面成立）。
+- ③ logs/95 那枚"越面＝3"用错分母（git diff --name-only c11163c8 HEAD ＝两号之间全部提交并集，含 166-r1／322-r2
+  别腿字节）⇒ 正确尺＝只对本腿逐笔 name-only 过滤 ^(internal|cmd|frontend|design|tools|scripts)/ ＝0 枚（越面 0）。
+终值：正控 Decision.Reason 非测试 8 枚（先前两发 6/7 枚，差异具名）；被测 0 枚＋搬运型 1 枚；
+其余读数不变（Gate 调用点 1、blacklistedSensitive 0/正控 1、risk.Logf 注入 0/正控 24、risk.Resolve 非测试 1/含测试 7）。
+census.md 现量 81 行（帽 ≤160），§1 表 c 行＋§1 正控那一 bullet＋§6 必答(i) 已按终版改写，新增 §8 尺终版对账一节。
+本腿零 .go／零 go test／零 go build／零 push／零翻框（票面现跑仍 未勾 7／已勾 0）。
