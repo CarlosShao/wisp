@@ -1,0 +1,24 @@
+227-v1 门禁四数（只在共享工作树，★跑前 unset GOTMPDIR TMPDIR，本腿现量）
+
+起手先自证 env 已空：GOTMPDIR=[] TMPDIR=[]（件内逐字打印过）
+时间＝2026-10-18 15:2x 工作树＝共享 dev 工作树（HEAD 起于 e6fd0f50，本腿跑门时工作树未被本腿动过任何 .go）
+
+[1] gofumpt：本腿写面 .go 枚数＝0 ⇒ 这扇门对本腿**新增字节**＝N/A（具名）。
+    实跑＝对**交件那两枚 .go** 复认（⛔ 顺手重排别腿文件）：
+      /d/work/base/gopath/bin/gofumpt.exe -l internal/config/writeguard.go internal/config/writeguard_handedit_227_test.go
+    ⇒ 空输出  gofumpt rc=0
+[2] sh scripts/d22scan.sh
+    ⇒ 末行逐字 d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42,
+      ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116,
+      ban #8 internal/=590, ban #8 cmd/=143 …   d22scan rc=0
+    ★带 env 时那一发（票 311 AC#1 shape B GUARD 射程拒绝 rc=2）本腿**没踩**＝先 unset 再跑，rc=0 clean
+[3] sh scripts/check-path-length-budget.sh
+    ⇒ denominator: tracked paths=15851  over-budget=60  covered by roster=60  not in roster=0
+      longest=185 chars relative（252 那枚名）  worst full path on self-hosted runner=229
+      VERDICT GREEN - every over-budget tracked path is rostered by name …  pathlen rc=0
+    ⚠ 分母 15851 ⇄ 腿报 15570＝本腿之后又有别笔入库（HEAD 在漂），⛔ 据此判任何件
+[4] /d/work/base/go/bin/go.exe vet ./internal/config/
+    ⇒ 空输出  vet rc=0
+
+[★门⛔ 在仓外树跑] 四道门只在共享工作树（长度门要 .go.mod… 要 .git；d22scan 的射程要 design/ 在场）；
+   go test/go build 只在仓外导出树＝本次全部读数出处（treeA/treeB/base2，见 01）。
