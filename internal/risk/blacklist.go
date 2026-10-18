@@ -190,8 +190,11 @@ func classifyWith(canonical string) (Class, string) {
 // Ticket 72 invariant, in one line: **the verdict must not depend on the
 // spelling a path arrived in.** Both sides of every A-anchor comparison below
 // are therefore handle-expanded, and a comparison whose provenance is not
-// provably expanded fails CLOSED (aEquiv / aUnder report such a miss as a
-// hit) instead of quietly dropping a path from A into B.
+// provably expanded fails CLOSED: aEq / aUnder delegate to aRelates, which
+// reports such a miss as a hit when anchorMatches found nothing AND
+// uncertainAnchorMiss held, instead of quietly dropping a path from A into B.
+// anchorMatches on its own does not do that - ticket 334 needs the two apart
+// because aRuleReason has to say which of them produced the verdict.
 func classifyForms(cand pathForms) (Class, string) {
 	p := cand.raw
 	if p == "" {
