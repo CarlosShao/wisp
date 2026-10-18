@@ -1,0 +1,62 @@
+===== targeted before ./cmd/wisp/ =====
+rc=1
+RUN=154
+PASS_TOP=150
+FAIL_TOP=3
+SKIP=0
+--- PASS: TestAC1AlwaysBranchDoesNotRevertAHandEditedKey (1.01s)
+--- PASS: TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card (0.93s)
+--- PASS: TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused (0.94s)
+--- PASS: TestReplyListenerAllowsAnL2CardFromTheNativeSide (1.05s)
+--- PASS: TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel (1.03s)
+--- PASS: TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject (1.05s)
+--- PASS: TestUnansweredL2CardTimesOutIntoRejectNeverExecution (32.19s)
+--- PASS: TestL1VetoNeedsAChannelTheHostReallyWired (0.00s)
+--- PASS: TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole (1.00s)
+--- PASS: TestNativeHostSeamRefusesAPanelSourcedAllow (0.92s)
+--- PASS: TestTicket255SplitOnlyClaimsSectionsWithALiveReader (0.00s)
+--- PASS: TestTicket255HotRowRosterCoversTheRegistry (0.00s)
+--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+--- PASS: TestTicket255RosterStillMatchesTheActualReadSites (0.75s)
+--- PASS: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+--- PASS: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+--- PASS: TestTicket255ReceiptOmitsPanelFromTheImmediateSentence (2.02s)
+--- PASS: TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere (2.01s)
+--- PASS: TestTicket255ReceiptStillNamesTheLiveReadSection (2.03s)
+--- PASS: TestTicket255ReceiptSentenceAssemblyIsFiltered (0.94s)
+--- PASS: TestTicket223RunArmsTheReloadTick (2.12s)
+--- PASS: TestTicket223HandEditedFsLooseningCostsAnL2Card (1.98s)
+--- PASS: TestTicket223RefusedLooseningKeepsOldValues (5.08s)
+--- PASS: TestTicket223TighteningRaisesNoCard (1.98s)
+bytes=285392
+===== targeted after ./cmd/wisp/ =====
+rc=1
+RUN=153
+PASS_TOP=150
+FAIL_TOP=2
+SKIP=0
+--- PASS: TestAC1AlwaysBranchDoesNotRevertAHandEditedKey (1.07s)
+--- PASS: TestAlwaysBranchStoresItsRuleOnlyAfterASecondL2Card (0.92s)
+--- PASS: TestAlwaysBranchStoresNothingWhenTheSecondCardIsRefused (0.93s)
+--- PASS: TestReplyListenerAllowsAnL2CardFromTheNativeSide (0.95s)
+--- PASS: TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel (0.97s)
+--- PASS: TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject (0.98s)
+--- PASS: TestUnansweredL2CardTimesOutIntoRejectNeverExecution (32.03s)
+--- PASS: TestL1VetoNeedsAChannelTheHostReallyWired (0.00s)
+--- PASS: TestNativeHostSeamAnswersAnL2CardWithoutAnyConsole (1.26s)
+--- PASS: TestNativeHostSeamRefusesAPanelSourcedAllow (1.34s)
+--- PASS: TestTicket255SplitOnlyClaimsSectionsWithALiveReader (0.00s)
+--- PASS: TestTicket255HotRowRosterCoversTheRegistry (0.00s)
+--- PASS: TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim (0.00s)
+--- PASS: TestTicket255RosterStillMatchesTheActualReadSites (0.99s)
+--- PASS: TestTicket324RosterScanRefusesSameNamedNonConfigFieldSite (0.01s)
+--- PASS: TestTicket324SectionMembersAreReadOffTheSchema (0.00s)
+--- PASS: TestTicket255ReceiptOmitsPanelFromTheImmediateSentence (2.31s)
+--- PASS: TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere (2.39s)
+--- PASS: TestTicket255ReceiptStillNamesTheLiveReadSection (2.16s)
+--- PASS: TestTicket255ReceiptSentenceAssemblyIsFiltered (1.23s)
+--- PASS: TestTicket223RunArmsTheReloadTick (2.16s)
+--- PASS: TestTicket223HandEditedFsLooseningCostsAnL2Card (2.36s)
+--- PASS: TestTicket223RefusedLooseningKeepsOldValues (5.21s)
+--- PASS: TestTicket223TighteningRaisesNoCard (2.36s)
+bytes=280189

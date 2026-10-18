@@ -1,0 +1,24 @@
+===== attr ctrl-before =====
+rc=1
+RUN=3 PASS_TOP=0 FAIL_TOP=3 SKIP=0
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.09s)
+--- FAIL: TestCleanCheckoutBuilds_AC11 (0.07s)
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (1.02s)
+--- 红因首行逐名 ---
+    logsink_windows_test.go:167: sink dir D:\tmp\wisp\20261018\338r1\trees-at-121746\gotmp-attr\TestAC2SealNoticeLandsInTheRunLegLogFile1794365966\001\logs: 1 file(s), 1515 bytes, 4 record(s)
+    logsink_windows_test.go:175: records naming "winsec: seal cleared principals that stood on this object" = 2, want 1; all records: [{Time:2026-10-18T12:42:48.2321629+08:00 Level:INFO Msg:winsec: sealing path resolver installed Path: Kind: Cleared: ClearedInherited: Policy:} {Time:2026-10-18T12:42:48.3096056+08:00 Level:INFO Msg:wisp: persistent log sink installed Path: Kind: Cleared: ClearedInherited: Policy:} {Time:2026-10-18T12:42:48.3181764+08:00 Level:WARN Msg:winsec: seal cleared principals that stood on this object Path:D:\tmp\wisp\20261018\338r1\trees-at-121746\gotmp-attr\TestAC2SealNoticeLandsInTheRunLegLogFile1794365966\001\secrets Kind:explicit+inherited Cleared:S-1-1-0(A;OICI;0x1200a9;;;WD) ClearedInherited:S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) Policy:winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal} {Time:2026-10-18T12:42:48.322174+08:00 Level:WARN Msg:winsec: seal cleared principals that stood on this object Path:D:\tmp\wisp\20261018\338r1\trees-at-121746\gotmp-attr\TestAC2SealNoticeLandsInTheRunLegLogFile1794365966\001\.wisp-config-3696598551.tmp Kind:inherited Cleared: ClearedInherited:S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) Policy:winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal}]
+    panel_host_gate_test.go:404: git rev-parse --show-toplevel: exit status 128
+    panel_resident_windows_test.go:944: AC#14 nail 2 (Eval push hop), page's own words: title=""
+    panel_resident_windows_test.go:946: Go's Eval push did not reach the document: the page reports its title as "", want "PUSHED-33R5-OK". This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other
+===== attr ctrl-after =====
+rc=1
+RUN=3 PASS_TOP=0 FAIL_TOP=3 SKIP=0
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.08s)
+--- FAIL: TestCleanCheckoutBuilds_AC11 (0.05s)
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (0.87s)
+--- 红因首行逐名 ---
+    logsink_windows_test.go:167: sink dir D:\tmp\wisp\20261018\338r1\trees-at-121746\gotmp-attr\TestAC2SealNoticeLandsInTheRunLegLogFile1278110444\001\logs: 1 file(s), 1516 bytes, 4 record(s)
+    logsink_windows_test.go:175: records naming "winsec: seal cleared principals that stood on this object" = 2, want 1; all records: [{Time:2026-10-18T12:42:53.7236815+08:00 Level:INFO Msg:winsec: sealing path resolver installed Path: Kind: Cleared: ClearedInherited: Policy:} {Time:2026-10-18T12:42:53.7899675+08:00 Level:INFO Msg:wisp: persistent log sink installed Path: Kind: Cleared: ClearedInherited: Policy:} {Time:2026-10-18T12:42:53.7955164+08:00 Level:WARN Msg:winsec: seal cleared principals that stood on this object Path:D:\tmp\wisp\20261018\338r1\trees-at-121746\gotmp-attr\TestAC2SealNoticeLandsInTheRunLegLogFile1278110444\001\secrets Kind:explicit+inherited Cleared:S-1-1-0(A;OICI;0x1200a9;;;WD) ClearedInherited:S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-11(A;OICIIOID;SDGXGWGR;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU),S-1-5-32-545(A;OICIIOID;GXGR;;;BU) Policy:winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal} {Time:2026-10-18T12:42:53.7973995+08:00 Level:WARN Msg:winsec: seal cleared principals that stood on this object Path:D:\tmp\wisp\20261018\338r1\trees-at-121746\gotmp-attr\TestAC2SealNoticeLandsInTheRunLegLogFile1278110444\001\.wisp-config-1835188462.tmp Kind:inherited Cleared: ClearedInherited:S-1-5-11(A;ID;0x1301bf;;;AU),S-1-5-32-545(A;ID;0x1200a9;;;BU) Policy:winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal}]
+    panel_host_gate_test.go:404: git rev-parse --show-toplevel: exit status 128
+    panel_resident_windows_test.go:944: AC#14 nail 2 (Eval push hop), page's own words: title=""
+    panel_resident_windows_test.go:946: Go's Eval push did not reach the document: the page reports its title as "", want "PUSHED-33R5-OK". This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other

@@ -1,0 +1,47 @@
+ctrl-before go=764
+ctrl-after go=764
+===== 单差异核验（应只有 panel 一枚，且 gotmp 除外） =====
+Files /d/tmp/wisp/20261018/338r1/trees-at-121746/tree-ctrl-before/cmd/wisp/panel_transport_35r2_test.go and /d/tmp/wisp/20261018/338r1/trees-at-121746/tree-ctrl-after/cmd/wisp/panel_transport_35r2_test.go differ
+before_panel_sha=df5f4a9fe179fd5b
+after_panel_sha=17d4f3a36ba3451d
+===== targeted2 ctrl-before ./cmd/wisp/ =====
+rc=0
+RUN=9
+PASS_TOP=9
+FAIL_TOP=0
+SKIP=0
+--- 逐名 ---
+--- PASS: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3 (0.00s)
+--- PASS: TestShapeA3SecondPagePostStillDelivers (0.00s)
+--- PASS: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+--- PASS: TestLegacySubShapeOneHookDiesInAReentryLoop (0.00s)
+--- PASS: TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot (0.00s)
+--- PASS: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+--- PASS: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+--- 台面故障尺 ---
+none
+bytes=2949
+===== targeted2 ctrl-after ./cmd/wisp/ =====
+rc=0
+RUN=9
+PASS_TOP=9
+FAIL_TOP=0
+SKIP=0
+--- 逐名 ---
+--- PASS: TestPagePostMessageEnvelopeReachesNativeExitViaShapeA3 (0.01s)
+--- PASS: TestShapeA3SecondPagePostStillDelivers (0.00s)
+--- PASS: TestShapeA3ForwardingHookIsIdempotentInOneDocument (0.00s)
+--- PASS: TestLegacySubShapeOneHookDiesInAReentryLoop (0.00s)
+--- PASS: TestUnforwardedPageEnvelopeDiesAtTheUnboundSlot (0.00s)
+--- PASS: TestForwardingHookMustNotLoseTheNativeExitReceiver (0.00s)
+--- PASS: TestForwardingHookIsSilentlyUnarmedByANonWritableNativeExit (0.00s)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsAbsent (0.00s)
+--- PASS: TestForwardingHookFallsBackToTheNativeExitWhenTheDoorIsNotCallable (0.00s)
+--- 台面故障尺 ---
+none
+bytes=2949
+===== 定向两侧名册作差 =====
+only_before=0
+only_after=0

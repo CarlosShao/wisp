@@ -1,0 +1,42 @@
+===== whole-package ctrl-before ./cmd/wisp/ =====
+rc=1
+RUN=207
+PASS_TOP=150
+FAIL_TOP=2
+SKIP=0
+--- FAIL 逐名 ---
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.08s)
+--- FAIL: TestCleanCheckoutBuilds_AC11 (0.06s)
+--- SKIP 逐名 ---
+--- 台面故障尺 ---
+none
+--- 最后一枚顶层结果＋尾部 ---
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (0.54s)
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	160.046s
+FAIL
+bytes=325560
+===== whole-package ctrl-after ./cmd/wisp/ =====
+rc=1
+RUN=203
+PASS_TOP=146
+FAIL_TOP=2
+SKIP=0
+--- FAIL 逐名 ---
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.07s)
+--- FAIL: TestCleanCheckoutBuilds_AC11 (0.06s)
+--- SKIP 逐名 ---
+--- 台面故障尺 ---
+none
+--- 最后一枚顶层结果＋尾部 ---
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.06s)
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	164.314s
+FAIL
+bytes=304883
+===== 名册逐名作差 =====
+only_before=4
+only_after=0
+--- 逐名 ---
+--- PASS: TestAC13BringUpRefusesAThreadWithAQueuedClose
+--- PASS: TestAC13BringUpSurvivesAReusedThreadQuit
+--- PASS: TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage

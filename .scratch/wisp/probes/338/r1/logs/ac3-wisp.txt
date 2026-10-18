@@ -1,0 +1,41 @@
+tree-wisp-before rev=87521cb4 go=764 dll=6
+tree-wisp-after rev=93d0f39c go=764 dll=6
+===== 两枚树应只差 panel 一枚 =====
+Files /d/tmp/wisp/20261018/338r1/trees-at-121746/tree-wisp-before/cmd/wisp/panel_transport_35r2_test.go and /d/tmp/wisp/20261018/338r1/trees-at-121746/tree-wisp-after/cmd/wisp/panel_transport_35r2_test.go differ
+Files /d/tmp/wisp/20261018/338r1/trees-at-121746/tree-wisp-before/docs/reports/pending-and-issues.md and /d/tmp/wisp/20261018/338r1/trees-at-121746/tree-wisp-after/docs/reports/pending-and-issues.md differ
+Files /d/tmp/wisp/20261018/338r1/trees-at-121746/tree-wisp-before/internal/config/writeguard_handedit_227_test.go and /d/tmp/wisp/20261018/338r1/trees-at-121746/tree-wisp-after/internal/config/writeguard_handedit_227_test.go differ
+===== before ./cmd/wisp/ (whole package, -v) =====
+rc=1
+RUN=208
+PASS_TOP=150
+FAIL_TOP=3
+SKIP=0
+testbinary_exit_lines=1
+--- 台面故障尺 ---
+none
+--- FAIL 逐名 ---
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.08s)
+--- FAIL: TestCleanCheckoutBuilds_AC11 (0.08s)
+--- FAIL: TestAC14GoSideEvalPushReachesThePage (0.51s)
+--- SKIP 逐名 ---
+bytes=328259
+===== after ./cmd/wisp/ (whole package, -v) =====
+rc=1
+RUN=203
+PASS_TOP=146
+FAIL_TOP=2
+SKIP=0
+testbinary_exit_lines=1
+--- 台面故障尺 ---
+none
+--- FAIL 逐名 ---
+--- FAIL: TestAC2SealNoticeLandsInTheRunLegLogFile (0.07s)
+--- FAIL: TestCleanCheckoutBuilds_AC11 (0.07s)
+--- SKIP 逐名 ---
+bytes=306259
+===== FAIL 名册逐名作差（必须 0 枚新增＝lead 条件③） =====
+only_before=1
+only_after=0
+--- 作差逐名 ---
+--- FAIL: TestAC14GoSideEvalPushReachesThePage
+--- SKIP 名册作差 ---
