@@ -1,0 +1,44 @@
+166-r1 · 04 · 突变两发（牙）＝打在交件字节 7404c42f 的仓外导出树物理字节上
+================================================================
+台面＝D:\tmp\wisp\20261018\166r1\tree-head（git archive 7404c42f 重树，GO_FILES=761）
+GOTMPDIR＝D:\tmp\wisp\20261018\166r1\gotmp（两发同台面）；⛔ 改跟踪文件、⛔ -overlay。
+目标文件＝internal/session/manage.go，内容锚＝函数体内那枚 token 串（⛔ 绝对行号）。
+两发串行（跨 shell trap 有竞态）；每发跑前验 pristine、打完当场还原、还原后再验 pristine。
+pristine（7404c42f 交付字节）SHA256＝0577B500C1FC705EE0246AB6B87D74782DFBB37831930550774CBD645ABC7E6D
+（首轮跑前验＝02 件；两发还原后各验＝下方两行 RESTORE 读数，皆 OK=True；
+ 67fe813a→7404c42f 之间因注释自更正字节变过一次，旧轮在旧字节上的 T1/T2 数值同形，留档不引为准。）
+
+■ T1（归档撤销＝Unarchive 空装）
+  锚＝`return m.store.SetSessionArchived(ctx, id, false)`（ANCHOR-HITS=1 现量后落笔）
+  替换＝`return nil`（撤销变成 no-op＝"归档带撤销"那一发被吞的形状）
+  突变 SHA＝E332AE5A0355A417B2037088A621741F2A71DC2CE180B4D99C59996D42D38FEF
+  跑＝go test ./internal/session/ -run "^TestAC2OutletArchiveUndoAssembled$" -count=1 -timeout 30m -v
+  rc=1，红句逐字（final-mut-T1.log）：
+    ticket166r1_assembly_test.go:209: undo did not clear archived_at: 0xdefbe3e74c8
+    ticket166r1_assembly_test.go:212: undo did not restore listing: [] (<nil>)
+    --- FAIL: TestAC2OutletArchiveUndoAssembled (0.07s)
+    FAIL    github.com/CarlosShao/wisp/internal/session   0.106s
+  还原 SHA＝0577B500C1FC705EE0246AB6B87D74782DFBB37831930550774CBD645ABC7E6D ＝ pristine（OK=True）
+
+■ T2（列＝List 空返回）
+  锚＝`return m.store.ListSessions(ctx, opts)`（ANCHOR-HITS=1）
+  替换＝`return nil, nil`（列出口装死＝"列不出来"在产品面上复活）
+  突变 SHA＝054D88560CE0726BD68FDB4EB867BAAF4AB2B02AE23C2CD893DECE9831D44271
+  跑＝go test ./internal/session/ -run "^TestAC2OutletListAssembled$" -count=1 -timeout 30m -v
+  rc=1，红句逐字（final-mut-T2.log）：
+    ticket166r1_assembly_test.go:87: workspace list = [], want [sess_c4bd69afc990e6b07233495fcec7756d sess_62f62a4455e4b099b15169d6a2549f36]
+    ticket166r1_assembly_test.go:90: full list = [] (<nil>), want 3 rows
+    ticket166r1_assembly_test.go:98: active list after archive = [] (<nil>), want 2 rows
+    ticket166r1_assembly_test.go:101: IncludeArchived = [] (<nil>), want 3 rows
+    --- FAIL: TestAC2OutletListAssembled (0.06s)
+    FAIL    github.com/CarlosShao/wisp/internal/session   0.093s
+  还原 SHA＝0577B500C1FC705EE0246AB6B87D74782DFBB37831930550774CBD645ABC7E6D ＝ pristine（OK=True）
+
+■ 还原后复跑（final-mut-restored-green.log）
+  go test ./internal/session/ -run "^TestAC2Outlet" -count=1 -timeout 30m -v
+  rc=0  RUN=4 PASS_TOP=4 FAIL_TOP=0 SKIP=0（四枚装配用例全绿＝台面与字节复原自证）
+
+■ 两发落点不同（List 的 store 调用 ⇄ Unarchive 的 store 调用），⛔ 同发双牙；
+  每发都能单独把那枚用例打红＝这把尺对"出口装死"敏感。⛔ 用它的绿当接线凭据——
+  接线那格仍按 03 件第二层尺读（rc=1＝生产调用者 0，缺口见 06 件）。
+================================================================
