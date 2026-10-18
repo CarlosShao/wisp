@@ -1,0 +1,101 @@
+# 338-v1 · 内容尺逐字落盘（AC#1 判据②那四把尺的输出本体）
+
+尺本体都在 `D:\tmp\wisp\20261018\338v1\`（`scripts\`＝配方、`logs\`＝输出）。本件只放**逐字输出**，⛔ 散文。
+射程＝blob 态 LF 拷贝（`blobs\<T1|T2>.before`＝`git show d19288a8:<f>`、`.after`＝`git show HEAD:<f>`）。
+
+## 1. 非空白尺（票面 AC#0 那一枚）`diff <(tr -d ' \t' <before>) <(tr -d ' \t' <after>)`
+```
+##### [T1] internal/tools/task_output_pointer_notice_errtext_174r7_test.go
+  before_bytes=5914  after_bytes=5838
+  TR_RULER_RC=0  tr_diff_lines=0  nonblank_before=4966  nonblank_after=4966
+##### [T2] cmd/wisp/panel_transport_35r2_test.go
+  before_bytes=73470 after_bytes=73497
+  TR_RULER_RC=1  tr_diff_lines=47  nonblank_before=62106 nonblank_after=62107
+```
+## 2. `gofumpt -w` 不动点 ⇄ HEAD blob 同串（★比 tr 尺硬的一发）
+```
+T1: round1 rc_w=0 gofumpt_l_rows=0 hash=13fea5ea73619bf30b474317abbe7ab3a374abaa
+    HEAD_blob_hash=13fea5ea73619bf30b474317abbe7ab3a374abaa   BEFORE_blob_hash=cb40ecde4562bc23a721ba23d088b41f70129204
+    idempotent=YES
+T2: round1 rc_w=0 gofumpt_l_rows=1 hash=a15a2970f8c39e83b522dd8fc9fd58229d15d9e8   <-- 一发不收敛
+    round2 rc_w=0 gofumpt_l_rows=0 hash=bd13149858d314e3de5deab5f0c40205c211f21a
+    HEAD_blob_hash=bd13149858d314e3de5deab5f0c40205c211f21a   BEFORE_blob_hash=52d3c1b2d78164835b7fd858e2f5e511c62fc445
+    idempotent=YES
+gofmt -d 交件侧：T1 rc=0 bytes=0 ／ T2 rc=0 bytes=0
+```
+## 3. 正控三形（同一把 tr 尺不许对语义变化失明）
+```
+posctl_blank_only  RC=0 LINES=0     <-- 只加空白＝尺看不见＝设计如此
+posctl_one_token   RC=1 LINES=3     <-- 追加一枚 var zzV1TokenProbe = 1 ⇒ 114a115,116 > varzzV1TokenProbe=1
+posctl_digit2      RC=1 LINES=56    <-- 行号定址把一枚 1 改成 7 ⇒ 逐字含 174r7→774r7 那族行
+```
+★自纠具名＝第一发改数字的正控用了 GNU sed 不支持的 `\b` ⇒ 命中 0＝**空操作伪装成一次成功复跑**（台账 `A1033` 第②节那一形，我也踩了）。
+复做＝落刀前量锚（打印锚行）＋落刀后验旧锚归零/新锚命中，两把都对上才认 `rc`。
+另一枚同形自纠＝我把 `diff` 的 rc 丢给管道尾的 `sed`（`$?`＝sed 的 rc）⇒ 读出假 `TR_RC=0`；重打（diff 直接落文件）得真值 `RC=1／18 行`（探针件那一发）。
+
+## 4. 内容四把尺逐字（AC#1 判据②）
+```
+##### T1
+  func_names before=1 after=1 symdiff=0
+  string_literals before=24 after=24 symdiff=0 shaB=127538dfa31c shaA=127538dfa31c
+  comment_lines before=50 after=50 symdiff=0
+  trailing_comment_texts symdiff=0
+##### T2
+  func_names before=46 after=46 symdiff=0
+  string_literals before=372 after=372 symdiff=0 shaB=5399fdc85aeb shaA=5399fdc85aeb
+  comment_lines before=311 after=311 symdiff=0
+  trailing_comment_texts symdiff=0
+```
+
+## 5. T2 那 47 行非空白差异逐字（＝甲形放行前三形的本体）
+```
+403,405c403,406
+< typejsIdentstruct{namestring}
+< typejsLitstruct{vjsValue}
+< typejsMemberstruct{
+---
+> type(
+> jsIdentstruct{namestring}
+> jsLitstruct{vjsValue}
+> jsMemberstruct{
+409,410c410,414
+< typejsIndexstruct{obj,indexjsNode}
+< typejsCallNodestruct{
+---
+> )
+>
+> type(
+> jsIndexstruct{obj,indexjsNode}
+> jsCallNodestruct{
+414a419,420
+> )
+>
+424,426c430,433
+< typejsAssignNodestruct{target,valuejsNode}
+< typejsPostIncstruct{targetjsNode}
+< typejsFuncExprstruct{
+---
+> type(
+> jsAssignNodestruct{target,valuejsNode}
+> jsPostIncstruct{targetjsNode}
+> jsFuncExprstruct{
+429a437,438
+> )
+>
+701,702c710,713
+< varjsPuncts=[]string{"===","!==","=>","==","!=","&&","||","++",
+< "(",")","{","}","[","]",";",",",".","=","!","+","-",":"}
+---
+> varjsPuncts=[]string{
+> "===","!==","=>","==","!=","&&","||","++",
+> "(",")","{","}","[","]",";",",",".","=","!","+","-",":",
+> }
+812a824
+>
+816a829
+>
+823a837
+>
+```
+⇒ 逐枚读这四十七行只见到三形＝`type ( )` 分组（吃掉行首 `type` 词＋进出括号 token）／`jsPuncts` 切片拆行补尾逗号／三处函数间补空行。
+★注意第 701-702 那一对：切片里那 19 个字符串字面量**一枚没变**（只是换行＋补尾逗号）＝与第 4 节 `string_literals symdiff=0` 互证。
