@@ -1,0 +1,5 @@
+=== send 记录 2026-10-18 10:0x +08（编排者）===
+腿＝166-r1（票 166 落地腿·写）
+启动动作＝`spawn_teammate(name="leg-166-r1")` ⇒ target `leg-166-r1`，回执 **running**（真启动）。
+正文＝`orch/20261018/txt/166r1-dispatch.txt`（54 行／11550 字节）逐字＋票面/判语件指引。
+写面＝`internal/session/**`＋`.scratch/wisp/probes/166/r1/logs/**`＋票 166 尾一条；若必然要 `cmd/wisp`／`internal/panel` ⇒ 停手上报（编排者裁下一波）。CPU 发出前 52/48/57。⛔ push。

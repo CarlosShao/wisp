@@ -1,0 +1,10 @@
+=== send 记录 2026-10-18 10:0x +08（编排者＝新任 harness）===
+328-v1＝**第二次发出**（第一次＝2026-10-17 15:56 由 Qoder 编排者放出，agentId 见 `orch/20261017/txt/328v1-send.txt`，那程死于日限额、只落第一笔 `c59d0354`）。
+本次启动动作＝`spawn_teammate(name="leg-328-v1", description="票 328 非实现者终裁腿（重放）", context="fresh")` ⇒ target＝`leg-328-v1`，status 回执＝**running**（＝真启动，不是"写了派单当放了腿"）。
+正文＝`orch/20261018/txt/328v1-dispatch.txt`（62 行／13803 字节＝`0b102fc2` 存档原样复本）逐字重放，⛔ 重写判据；只补三条编排者更正（起手锚现认 `c11163c8`／`78d3b46a..HEAD` 对 internal cmd diff=0 行入场重验／本波写面互斥与 `cmd/wisp` 持跑者＝228-r3c）。
+发出前 CPU 现量 52/48/57（≤70）；未推数 366（本笔提交后 367）。
+
+=== 同波其余五枚的启动动作（同一时刻批放）===
+`leg-336-r1` running｜`leg-166-r1` running｜`leg-322-r2` running｜`leg-337-a1` running｜`leg-228-r3c` running。
+派单正文＝`orch/20261018/txt/{336r1,166r1,322r2,337a1,228r3c}-dispatch.txt`（逐枚 54–66 行，＝head＋common-20261018＋specific 拼装，拼装尺＝`assemble-dispatches.sh`）。
+形状自查：总代理 6≤8、写代理 3≥3（336-r1／166-r1／322-r2）、`cmd/wisp/**`＋`internal/panel/**` 零写腿、`go test ./cmd/wisp` 唯一持跑者＝228-r3c、CPU ≤70%、写面逐路径互斥。
