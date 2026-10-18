@@ -1,0 +1,11 @@
+time=2026-10-18T10:19:26.241+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestACorrelationTheLoopActuallyMintedLightsItsRosterRow
+    corr_roster_join_328_test.go:124: the row for task "c69a9451-042f-4209-bd5d-bf9f70f4e1c7" reads not-blocked although a card of its own call ("c69a9451-042f-4209-bd5d-bf9f70f4e1c7#call_e1") is pending: this is ticket 328's defect, measured on a correlation the loop minted
+--- FAIL: TestACorrelationTheLoopActuallyMintedLightsItsRosterRow (0.01s)
+=== RUN   TestTheLoopMintsTheShapesTheRosterAccepts
+    corr_roster_join_328_test.go:165: a correlation the loop mints ("5cbb2a16-39e9-4cdf-8d7d-381f3e9e76f6#call_e1") does not light its own row
+    corr_roster_join_328_test.go:165: a correlation the loop mints ("5cbb2a16-39e9-4cdf-8d7d-381f3e9e76f6#call-0") does not light its own row
+--- FAIL: TestTheLoopMintsTheShapesTheRosterAccepts (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.078s
+FAIL

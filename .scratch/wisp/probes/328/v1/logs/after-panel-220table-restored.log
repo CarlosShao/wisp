@@ -1,0 +1,17 @@
+time=2026-10-18T10:19:34.414+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_tail_on_a_filed_task_id_lights_(328)
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row
+--- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_tail_on_a_filed_task_id_lights_(328) (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/panel	0.170s

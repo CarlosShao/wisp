@@ -1,0 +1,19 @@
+time=2026-10-18T10:19:30.405+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_tail_on_a_filed_task_id_lights_(328)
+    subagent_blocked_220_test.go:147: row "child-1" blockedOnApproval=false，期望 true； packets={"pending":[{"correlationId":"child-1#retry","tool":"fs.write","args":[],"level":"L2","rulesHit":["R2"],"reason":"写在工作区之外","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"native"}],"results":[],"composer":{"mode":{"current":"ask_high_risk","names":["ask_every_step","ask_high_risk","auto_approve"],"l2ConfirmNames":["auto_approve"]},"workspace":{"set":false,"spelling":"","canonical":"","reparse":false,"rewritten":false,"reason":"工作区这一维没有读数：本机的快照泵没有被接入工作区读数腿（PumpSources.Workspace=nil），所以「未选择工作区」这句话我没有资格说——这里是没有读数，不是没有工作区（票 216 AC#4；票 200 的 not_run 是同一纪律）"},"attachments":[],"acceptedAttachmentMimes":["image/png","image/jpeg","image/gif","image/webp","video/mp4","video/quicktime"],"maxAttachmentBytes":67108864,"attachmentError":"","git":{"kind":"unreadable","reason":"本轮未选择工作区，git 这一维没有可探测的目录","branch":"","detachedSha":"","isDetached":false,"repoRoot":"","currentWorktree":"","worktrees":[],"branches":[],"switchBlocked":"本进程不持有面板宿主，无法执行工作区切换：切换由持有面板的常驻腿按其 panel.workspace.request 收窄它自己的范围；本快照的 git 这一维在本进程里只读"},"currentModel":"","modelKnown":false,"credentialState":"unknown","credentialKnown":false},"generatedAt":"2026-10-03T09:00:00Z","tasks":{"rows":[{"taskId":"child-1","label":"读三份文件","kind":"subagent","parentTaskId":"root-1","status":"Thinking","statusKnown":true,"streamKey":"subagent:child-1","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"root-1","label":"总结这份笔记","kind":"root","parentTaskId":"","status":"Thinking","statusKnown":true,"streamKey":"root-1","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":1,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}}
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light
+=== RUN   TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row
+--- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/the_queue's_own_rewrite_lights (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_multi-digit_seq_lights (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/another_task's_rewrite_does_not_light (0.00s)
+    --- FAIL: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_non-numeric_tail_on_a_filed_task_id_lights_(328) (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/a_task_id_that_merely_prefixes_does_not_light (0.00s)
+    --- PASS: TestTheClashFormIsRecognisedOnlyAsTheQueueWritesIt/an_empty_correlation_id_names_no_row (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.062s
+FAIL
