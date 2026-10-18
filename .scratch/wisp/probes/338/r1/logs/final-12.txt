@@ -1,0 +1,20 @@
+HEAD=5e18e1e2
+0b1d1f0b files=4 OVERREACH=0
+87521cb4 files=3 OVERREACH=0
+3d26240c files=2 OVERREACH=0
+93d0f39c files=3 OVERREACH=0
+ee75c23f files=4 OVERREACH=0
+fa5f008f files=8 OVERREACH=0
+b84dedd0 files=10 OVERREACH=0
+787dbfb9 files=1 OVERREACH=0
+b4844295 files=1 OVERREACH=0
+91d08c3d files=2 OVERREACH=0
+a3994e28 files=1 OVERREACH=0
+5e18e1e2 files=3 OVERREACH=0
+--- 全集（12 笔）去重 ⊆ 三处写面 ---
+unique=40 overreach=0
+--- 写面残留／票框 ---
+my_uncommitted_rows=2
+boxes_unchecked=5 boxes_checked=0
+report_lines=119 logs=38
+gofumpt_l_now=4
