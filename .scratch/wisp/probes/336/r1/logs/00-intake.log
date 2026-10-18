@@ -1,0 +1,63 @@
+### 336-r1 起手件（2026-10-18 第一波·写代理·仪器补牙）
+
+★新铁律已生效于本腿（lead 转达，机主 2026-10-18 10:1x 亲口下达，覆盖派单「台面配方」那节的落点）：
+  盘符根目录零污染 —— ⛔ 任何导出树／GOTMPDIR／TMP/TEMP 落点／探针工作目录／缓存建在 D:\ C:\ E:\ 等盘符根目录下。
+  本腿唯一允许落点＝D:\tmp\wisp\20261018\336r1\...，现量（逐枚 Test-Path 真建）：
+    D:\tmp\wisp\20261018\336r1\tree-before
+    D:\tmp\wisp\20261018\336r1\tree-mut
+    D:\tmp\wisp\20261018\336r1\gotmp
+  ⛔ 复用旧树当凭据、⛔ 删 legacy 任何东西（lead 10-18 追加：旧树已由机主拍板搬进 D:\tmp\wisp\legacy\，零删除）。
+  短名那一维：本腿现跑见 logs/08-alias83.log（若某判据需要「树本身在根目录才有短名」⇒ 停手上报 lead，⛔ 自行退回根目录）。
+
+### 起手锚（⛔ 用编排者给我的号，自己现认）
+
+尺＝git log -1 --date=iso-strict --pretty='%H|%ad|%s'，射程＝共享工作树
+  10:04:44 现认＝c11163c896b09e7b6863d347dadbcb65702585cc | 2026-10-18T10:02:56+08:00 | 接手自检那笔（＝编排者 10-18 10:0x 见的那枚）
+  10:0x 建目录那一刻 HEAD 已＝ed8ff551b32f7e6e353c2f1180e004dc64299c59 | 2026-10-18T10:05:35+08:00 | 第一波放出笔
+  ⇒ 本腿台面锚具名取 ed8ff551（导出时再现跑一次 HEAD 并具名）。
+
+尺＝git diff --stat c11163c8 ed8ff551 -- internal/risk/，射程＝internal/risk/**
+  ＝空输出 rc=0 ⇒ 两枚号下本腿射程字节全等。
+尺＝git rev-parse <号>:internal/risk/blacklist.go
+  c11163c8 ＝ c1799cd24afce19e6accef23db23a7d7ee746dec
+  ed8ff551 ＝ c1799cd24afce19e6accef23db23a7d7ee746dec（同串，且＝票 334 裁腿 334-v1 的交件 blob，逐字同串）
+
+### 跟踪件面起手脏（⛔ 本腿字节）
+
+尺＝git status --porcelain --untracked-files=no，射程＝全仓跟踪件
+  10:04:44 起手＝零行（干净）。
+  10:0x 现跑＝7 枚 A（staged 新增）：.scratch/wisp/probes/337/a1/logs/00-anchor.log、10-hop-a-producers.log、
+  11-hop-b-gate-callsites.log、12-hop-c-blacklistnote-landing.log、12-hop-c-blacklistnote-readers.log、
+  13-hop-c2-reason-readers.log、14-hop-d-e-f.log ＝ 337-a1（只读同包那枚腿）在飞字节。
+  ⇒ 本腿⛔ 碰、⛔ 代提、⛔ 删；本腿每笔 add/commit 都带逐枚显式 pathspec，只点自己那几枚件。
+
+### AC#1 名册初查（起手侧；定论以本腿 AC#0 突变现量为准）
+
+尺＝git grep -n -e 'aEq' -e 'aUnder' ed8ff551 -- internal/risk/blacklist.go（＝具名提交树，非工作树）
+原始命中 12 行，按 case 归并＝7 枚走回落支的 A 档锚（其余 2 行注释 :193/:265 ＋ 2 行定义 :268/:270）：
+  :220  case1  ~/.git-credentials                          aEq
+  :224  case2  %APPDATA%\wisp\config.toml                  aUnder(:224) && aEq(:225)   ← 同一枚 case 两枚操作数
+  :227  case3  ~/.ssh/**                                    aUnder
+  :229  case4  ~/.aws/credentials                           aEq
+  :231  case5  ~/.kube/config                               aEq
+  :235  case6  %APPDATA%\Microsoft\Protect\** (DPAPI)       aUnder
+  :237  case7  %LOCALAPPDATA%\Microsoft\Credentials\**      aUnder
+不落 aEq/aUnder 的 A 档 case（无回落支＝本票射程外）＝:222 .git/config（aAnyForm）、:233 browser credential store（aAnyForm）。
+⇒ 枚数现量＝7 枚锚（case2 的两枚操作数在「摘它这一枚的回落支」这一问下是**两个不同落点**：
+   aUnder(:224) 摘了不改变判据＝候选真在 wisp 目录下时该侧本就 anchorMatches 命中；aEq(:225) 摘了才动判据。
+   本腿逐枚现量，具名见 AC#0／AC#2 那节的 sweep 日志）。
+
+存量在册用例的初查（尺＝git grep -n 逐枚锚字面串，射程＝ed8ff551 跟踪件 'internal/risk/*_test.go'）：
+  「叶子真装上了」那一形（＝anchorMatches 命中支，⛔ 回落支）有人读——注意这几枚的 home 都是**假主目录**（tmpHome/sandbox/t.TempDir），⛔ 机主真 profile：
+    pathresolver_junction_windows_test.go:264 TestAListDenyAndUnoverridable 的 cases 逐枚含
+      .git-credentials／wisp\config.toml／.ssh\known_hosts／.aws\credentials／.kube\config／
+      Microsoft\Protect\S-1-5-21\df9d23cd（:282）／Microsoft\Credentials\AB12CD34（:283）＝11 枚，断言 Classify==ClassA 且豁免键买不到放行；
+    pathshape_portable_test.go:120 TestTierAAnchorsMatchNativeSpelling 的表逐枚含同 7 枚锚＋.git/config＋browser store＝10 枚，比 Classify==ClassA；
+    pathresolver_anchor_spelling_windows_test.go:48 TestClassifyAnchorSpellingIsNotVerdict 含 .ssh／.git-credentials／.aws／.kube；
+    TestReparseExceptionExplicitPathOnly（junction :240）含 .git-credentials 的多拼法。
+  活在回落支（「叶子缺位×候选拼法证明不了」）那一形的在册用例只有：
+    anchor_miss_reason_334_test.go  TestAnchorMissReasonNamesCandidateAndMissingAnchor（点 ~/.aws／~/.kube）
+    ＋ TestAnchorMissKeepsNonOverridableClassAndNeedL2（点 ~/.aws）
+  ⇒ 与票面「只有 .aws＋.kube 会红」这一维**初查看着更宽**（真机 A 读数那几枚也在钉 class），
+    但那是命中支、不是回落支；本腿 AC#0 与 AC#2 的逐枚突变会把「摘这一枚的回落支⇒谁红」逐名钉死，
+    与票面／判语件不符之处在 report.md 具名更正（⛔ 改判据原文）。

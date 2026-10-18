@@ -1,0 +1,49 @@
+### AC#0 起手：anchor=ed8ff551 pristine=c1799cd24afce19e6accef23db23a7d7ee746dec tree=/d/tmp/wisp/20261018/336r1/tree-mut
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [restored-from-commit]
+  go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+### M-V2a 只摘 %LOCALAPPDATA%\Microsoft\Credentials 那一枚 case 的回落支
+  落点逐字（⇄ 具名提交 blob 的行差）:
+    237c237
+    < 	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
+    ---
+    > 	case localAppDataS != "" && anchorMatches(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`)), isUnder):
+  go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V2a]
+### M-V2b 只摘 ~/.ssh/** 那一枚 case 的回落支
+  落点逐字（⇄ 具名提交 blob 的行差）:
+    227c227
+    < 	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.ssh`)), isUnder):
+  go_test_rc=0 RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V2b]
+### M-V2c 只摘 ~/.kube/config 那一枚 case 的回落支
+  落点逐字（⇄ 具名提交 blob 的行差）:
+    231c231
+    < 	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`))):
+    ---
+    > 	case homeS != "" && anchorMatches(cand, anchorForms(anchorPath(homeS, `.kube`, `config`)), eqPath):
+  go_test_rc=1 RUN=10 PASS_TOP=2 FAIL_TOP=1 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V2c]
+### M-V3 反形（变严）：回落支去掉祖先关系界＝任何候选都算命中
+  落点逐字（⇄ 具名提交 blob 的行差）:
+    366c366
+    < 	return isUnder(cand.root, anchor.root) || isUnder(anchor.root, cand.root)
+    ---
+    > 	return true
+  go_test_rc=1 RUN=10 PASS_TOP=1 FAIL_TOP=2 SKIP=0
+  RED --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so 
+  RED     --- FAIL: TestAnchorMissReasonNamesCandidateAndMissingAnchor/installing-aws-moves-the-named-anchor-to-kube 
+  RED --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/A_tier_.git/config 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_id_* 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_.env* 
+  RED     --- FAIL: TestFileBaseNameClaimChangesNoClassOrReason/B_tier_secrets.* 
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [after-M-V3]
+### 末态
+  hash=c1799cd24afce19e6accef23db23a7d7ee746dec expected=c1799cd24afce19e6accef23db23a7d7ee746dec match=YES  [final-blacklist]
+  shared_worktree_untouched=0 行（必须 0）
+ac0_runner_rc=0
