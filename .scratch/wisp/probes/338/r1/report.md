@@ -95,10 +95,11 @@ lead 条件④另两档：`go build ./...` rc=0（★派单禁共享树 build �
 
 - 写面＝三处，逐笔越界尺 0 行：
   `git show --name-only --format= <每笔> | grep -v -E '^(三处写面)' | grep -c .`
-  ⇒ 该尺射程＝`0b1d1f0b…a3994e28` 那 11 笔全 0（其后各笔交件正文逐笔带同形复量）；
+  ⇒ 该尺射程＝13 笔（`0b1d1f0b`…`6cfbd5db`）逐笔全 0；
   ★具名形状更正＝我前几笔正文里用的分母是 `grep -c "^\."`（只数点开头的路径）⇒ 若真越界落在
-  `cmd/**`／`internal/**`（不以点开头）会漏数＝假 0。改尺后复量＝`logs/overreach-fixed.txt`
-  （11 笔 OVERREACH_corrected 全 0；全集去重 38 枚路径 ⊆ 三处写面、越界 0）。
+  `cmd/**`／`internal/**`（不以点开头）会漏数＝假 0。改尺后复量＝`logs/overreach-fixed.txt`（11 笔 0）
+  ＋`logs/fix-count-13.txt`（13 笔全集去重＝**42 枚**路径 ⊆ 三处写面、越界 0；先前正文里的 38／40
+  ＝各自测量时刻的射程，已过时、具名作废，分母以这把 13 笔尺为准）。
 - `git add` 与 `git commit` **两处都逐枚手写字面路径**；⛔ `add -A`／`commit -- .`／
   `$(git diff --cached --name-only)`／从 `git status` 反推／通配／`xargs`。
   ⛔ amend／reset／rebase／stash／checkout .／clean／在仓内建 worktree／push。

@@ -1,0 +1,7 @@
+commits_counted=13
+unique_paths_13=42
+overreach_13=0
+unique_paths_12=40
+--- 6cfbd5db 带入的两枚（＝40→42 的那两枚） ---
+.scratch/wisp/probes/338/r1/logs/final-12.txt
+.scratch/wisp/probes/338/r1/logs/run-final-12.sh
