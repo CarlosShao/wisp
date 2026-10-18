@@ -1,0 +1,8 @@
+票 227 终裁腿 227-v1·AC#1/AC#2 色尺与决定性那一发（自己重打）入库
+
+① 色尺（量的，仓外导出树，`-count=1 -timeout 30m`，四数⛔ 混用⛔ 相减）：base(`feac8f77`)＝RUN 185／PASS_TOP 104／FAIL_TOP 0／SKIP 0 rc=0 ⇄ deliv(HEAD)＝190／109／0／0 rc=0＝与腿报两行逐字相同，本腿⛔ 抄、自己跑出来的；五枚 227 用例＋`:393` 那枚既有用例在未改动 deliv 树上逐名 `--- PASS`（＝AC#1 的成对正控：⛔ 恒红）。
+② AC#2 决定性那一发＝本腿自己重打：落点＝`manager_test.go` 里 `const matrixBase` 内那行 `schema_version = 2`（★派单点名的射程；⛔ 打在 `writeguard_226_test.go` 上＝编排者踩过那枚空操作 `A1033`②，本腿先数了行数变化 9677→9658＝真删了一行才跑）。⇒ rc=1、整包 190／105／4／0，四枚红逐名＝既有用例＋`TestCheckAndReloadAsksOncePerFileChange`＋`TestManagerHotTierAppliesImmediately`＋腿自己那枚 `TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent`（＝收窄句真有牙）；红句逐字＝`writeguard_226_test.go:404 the file already carried the entry and was rewritten anyway` ⇄ `:407 the file's mtime moved on a write that wrote nothing`。pristine sha256 跑前跑后各验一次＝`201dc786570dbb2f…`，当场还原后定向复跑同一枚用例＝`--- PASS`（回绿）。⛔ 把断言改成"接受新字节"。
+③ 成对两发（落点⛔ 相同）：MU-2＝只摘产码里那两句删行人话（物理字节，测试件不动）⇒ 190／108／1／0，红在 `writeguard_handedit_227_test.go:64`；MU-2b＝三句字面串全回旧句（＝"未改产码⇄只换它的用例"）⇒ 190／107／2／0，两枚红逐字 `:64`/`:129`＝与腿报 c2 那行对上；两发还原 sha256＝`efe12661…d47bd`＝pristine。
+④ 本腿另补两发生产侧突变（落点与腿报两发不同）：MUA（`diverged := diffKeyPaths(m.cur, base)`→`[]string{}`）＝4 枚红；MUB（合并基准从盘的深拷贝改回内存快照）＝9 枚红，且 MUB 让 AC#1 用例的①那半当场红（`:43 came back as 60, want the schema default 56`）＝AC#1 那把尺⛔ 恒绿、有牙；两发还原哈希均＝pristine。
+⑤ 13-one-line-gap.txt＝必答 (i) 的足量性台（见判语件）：在 `:393` 用例体内插一行 ⇒ 同一对红句移到 `:406`/`:409`、红的还是那两枚断言 ⇒ "多一行"那形确实精确复现派单点出的那位差；本腿⛔ 由此反推腿真插过＝只把"能解释差值的最小形状"摆上桌。
+本笔 20 枚＝台件读数（`00`/`01`/`03`/`04`/`05`/`09`/`13` 系）＋两枚 `-full.txt` 原始 `-v` 输出。`.go` 命中 0；两处 pathspec 逐枚手写字面路径。⛔ 翻框 ⛔ push。

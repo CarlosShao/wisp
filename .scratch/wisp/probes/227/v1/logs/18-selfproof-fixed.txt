@@ -1,0 +1,29 @@
+== [slot ruler] on my verdict file (bracket form => this script's own bytes cannot self-match the pattern meaningfully)
+  hits = 0  (want 0)
+== [positive control 1] same ruler over docs/reports/HANDOVER.md (want >0 => 尺活) = 6
+== [positive control 2] same ruler over .scratch/wisp/issues/README.md (want >0) = 1
+== [negative control] known-absent token over verdict (want 0) = 1
+
+== [AC-box gauge] ticket 227, criteria-region scoped form (翻框归编排者; 六格必须仍未勾)
+  unchecked('- [ ] **AC#') = 6
+  checked('- [x] **AC#')   = 0
+  line numbers of all box lines:
+26:- [ ] **AC#1 删行�
+27:- [ ] **AC#2 把那�
+28:- [ ] **AC#3 四种�
+29:- [ ] **AC#4 不许�
+30:- [ ] **AC#5 整包�
+31:- [ ] **AC#6 时间�
+
+== [my own roster] commits with subject prefix 票 227 终裁腿 227-v1· (want 4-8)
+  count = 0
+  union paths:
+
+  .go hits (want 0) = 0
+  outside my three write surfaces (want 0) = 1
+  [positive control] same .go ruler on the leg's b72d7391 = 1  (want 2 => 尺⛔ 空转)
+
+== [zero-byte census] my write surface
+  probes/227/v1 files = 72; zero-byte = 0 (want 0)
+  NOTE kept OUT of commits (too large, and it mirrors another party's file): logs/tree-ledger.txt = 5233854 bytes; the section I cite is excerpted to logs/14-a1033-extract.txt = 9400 bytes, taken from HEAD bytes.
+== [verdict size] lines=36 bytes=14822 (cap 130)
