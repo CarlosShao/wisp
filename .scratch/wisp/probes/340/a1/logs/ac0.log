@@ -1,0 +1,102 @@
+### 0. 锚自证（⛔ 打印 HEAD 标题＝那字节属在飞别腿，不进本腿件）
+本腿入场锚（11:3x 现认，全尺钉在这一枚提交树上）=feac8f77c2fbb15addbc36fb1bbaf13ed56588be
+跑动时刻的 HEAD（仅供对照，⛔ 本腿读数来源）:
+631a04ba9fac31daae3a050203b36d8d6830fe5f
+
+### AC#0 a-1 票面窄尺：真产叠改形枚数，射程＝internal/agent/approval
+rev=feac8f77c2fbb15addbc36fb1bbaf13ed56588be  命中行数=0
+rev=f705b082f452754af477dff096e7000e590c5d82  命中行数=0
+rev=5db0b538dad3bf2841adec834a130e4a6b28d8df  命中行数=0
+-- 逐字（入场锚，预期无输出）
+  => 0 命中 rc=1
+
+### AC#0 a-1b 这把窄尺的响应性（正控＝同一枚字节序列、只换射程）
+-- 正控 1：尺逐字节不变，只换射程＝internal/panel ⇒ 该响（入场锚行数）
+panel@ticket rows=13
+panel@anchor rows=13
+-- 正控 1 逐字（入场锚，internal/panel）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/composer_test.go:123:		{"approval.decide planted in composer trips ban #6", plantDecision, panelDecisionIdentifierRe},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:15://     and a lookup by "task-7" cannot find "task-7#9". The busier a task is, the
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:108:	data := blockedPacket(t, []NativeVerdict{card197("child-1#9")}, nil)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:112:	data = blockedPacket(t, []NativeVerdict{card197("child-1"), card197("child-1#9")}, nil)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:138:		{"the queue's own rewrite lights", "child-1#9", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:139:		{"a multi-digit seq lights", "child-1#147", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:140:		{"another task's rewrite does not light", "other-1#9", false},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_blocked_220_test.go:194:	data := blockedPacket(t, []NativeVerdict{card197("child-1#9")},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:18://   "child-1#call-0#7"   queue.go:168 pushed arm B's corr a second time and
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:20://   "child-1#9"          queue.go:168 rewriting a corr that was the bare task id
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:41:		{"arm B with the queue clash rewrite stacked lights its task", "child-1#call-0#7", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:42:		{"the queue rewrite of a bare task id lights its task", "child-1#9", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:43:		{"arm A rewrite of a bare task id lights its task", "child-1#call_e1#7", true},
+-- 正控 2：尺逐字不变，射程＝全仓枚数（证明这把尺在别处看得见东西）
+19
+-- 反形（⛔ 一把两形都放行的尺）：只改字符类 [0-9] 到 [A-Z]，approval 射程
+  => 0 命中 rc=1（说明 approval 射程内没有任何 "#字母" 字面串，⛔ 拿这形当正控）
+
+### AC#0 a-3 自加的宽尺：叠改形字面串（两枚 #）产码档，⛔ 测试档／⛔ .scratch 档
+-- 档 A 产码（排除 *_test.go）＝票面那一格的真产读数
+  => 0 命中 rc=1
+-- 档 B 同一枚尺不过滤（正控，必须响；逐枚点名它们全是测试/注释）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:18://   "child-1#call-0#7"   queue.go:168 pushed arm B's corr a second time and
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:41:		{"arm B with the queue clash rewrite stacked lights its task", "child-1#call-0#7", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:43:		{"arm A rewrite of a bare task id lights its task", "child-1#call_e1#7", true},
+
+### AC#0 a-4 真产链的构成条件现读（两枚铸造点各自的生产调用者枚数）
+-- Queue.push 调用点：产码档逐字
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/gate.go:507:	it, err := g.q.push(d)
+-- Queue.push 调用点：含测试总枚数
+7
+-- callCorr：产码档逐字（def ⇄ 唯一调用点）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/loop.go:367:	// id per tool call at the dispatch hop (callCorr), so the request-side corr
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/loop.go:594:// callCorr mints the correlation id of ONE tool call (ticket 242). C18 defines
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/loop.go:603:func callCorr(taskID, callID string, index int) string {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/loop.go:676:			TaskID: taskID, CorrelationID: callCorr(taskID, p.call.ID, i),
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_roster_197.go:58:	// bd124b2a loop.go's callCorr mints one per call (<taskID>#<callID>, :603/:676).
+-- panel／cmd 的测试有没有 import 过 approval（跨包真队列的现量门槛）
+0
+  => 0 命中 rc=1（internal/agent 侧零测试 import approval）
+-- 正控（同尺族证明这把 import 尺会响）：cmd/wisp import approval 枚数
+16
+
+### AC#0 b 第三臂侧叠改形那枚子用例的具名落点（⛔ 本腿跑它，只点名）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:41:		{"arm B with the queue clash rewrite stacked lights its task", "child-1#call-0#7", true},
+
+### AC#0 c 数字臂 ⇄ 第三臂：两枚臂的本体与全部消费点
+-- 第三臂本体（rostered-task arm）逐字
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_roster_197.go:312:		if strings.HasPrefix(key, task+"#") {
+-- 数字臂本体 splitClashSuffix：def ⇄ doc ⇄ 唯一读者
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_roster_197.go:308:	if base, ok := splitClashSuffix(key); ok && base != "" {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_roster_197.go:318:// splitClashSuffix recognises the queue's own rewrite and nothing else: a final
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_roster_197.go:333:func splitClashSuffix(id string) (base string, ok bool) {
+-- 数字臂的字符判据逐字（LastIndexByte 那枚尺）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_roster_197.go:334:	i := strings.LastIndexByte(id, '#')
+-- 全仓测试名册里带两枚 # 的字面串（叠改形夹具，逐枚点名）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:18://   "child-1#call-0#7"   queue.go:168 pushed arm B's corr a second time and
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:41:		{"arm B with the queue clash rewrite stacked lights its task", "child-1#call-0#7", true},
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/panel/subagent_corr_task_prefix_328_test.go:43:		{"arm A rewrite of a bare task id lights its task", "child-1#call_e1#7", true},
+-- cmd/wisp 卡片 corr 带 # 的字面串枚数（裁决件那把界，本腿复跑）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:cmd/wisp/resident_audio_windows.go:15:// Shape, all of it ruled by the orchestrator in the ticket's "AC#0" section and
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:cmd/wisp/slo_report_144_windows_test.go:873:// by grepping this file for "AC#3" to find its ruling. The sentence "// Case 13 -
+-- 正控：同尺族打到 internal/panel 的行数
+9
+
+### AC#0 d 两枚铸造点的非导出性 + 那枚改写格式串逐字（丙形承重）
+-- callCorr def（非导出＝首字母小写，逐字）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/loop.go:603:func callCorr(taskID, callID string, index int) string {
+-- Queue.push def（非导出，逐字）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:156:func (q *Queue) push(d tools.Decision) (*qitem, error) {
+-- 两枚格式串逐字（带行号）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:168:		corr = fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:616:			d.CorrelationID = fmt.Sprintf("%s#%d", corr, q.seq+uint64(i)+1)
+-- queue.go 整枚 blob 哈希跨锚对撞（同串＝三锚的这枚字节未变）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be  66fec7ae375344d7bc741270b42c4ec5050cf41f
+f705b082f452754af477dff096e7000e590c5d82  66fec7ae375344d7bc741270b42c4ec5050cf41f
+5db0b538dad3bf2841adec834a130e4a6b28d8df  66fec7ae375344d7bc741270b42c4ec5050cf41f
+-- approval 包导出 func 名册里有 push 吗（乙/甲越界的现量凭据）
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/pending_read.go:113:func (q *Queue) LiveApprovals() []LiveApproval {
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:141:func (q *Queue) Timeout() time.Duration { return q.timeout }
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:144:func (q *Queue) WarningLead() time.Duration { return q.warn }
+feac8f77c2fbb15addbc36fb1bbaf13ed56588be:internal/agent/approval/queue.go:148:func (q *Queue) Depth() int {
+
+### AC#0 e 票面那行第三臂 PASS 凭据：⛔ 本腿零 go（只读普查）
+本腿⛔ 跑 go test／go build ⇒ 那一行的颜色＝读码推的，凭据＝裁腿判语件第一节 1 条逐字（docs/evidence/s1/328-v1-verdict.md:11）

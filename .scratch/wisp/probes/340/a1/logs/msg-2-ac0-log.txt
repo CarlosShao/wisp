@@ -1,0 +1,11 @@
+票 340 普查腿 340-a1·AC#0·读数入库＝logs/ac0.log（上一笔那把尺的逐字输出，⛔ 摘要）
+
+关键读数（具名锚 feac8f77，全取提交树）：
+- 窄尺三锚各 0 行（feac8f77／f705b082／5db0b538 三枚同一读数）；正控＝尺逐字节不变换射程 internal/panel＝13 行、全仓＝19 行 ⇒ 这把尺看得见东西，它的 0 才可用；
+- ★必答(i) 的正控逐字＝`git grep -nE "\"[^\"]*#[0-9]+\"" feac8f77 -- internal/panel`＝13 行（逐枚在件内），同尺原射程 approval＝0 行；
+- 宽尺产码档（两枚 # 的字面串）＝0 命中，未过滤＝3 行且全是 *_test.go 的夹具/注释（internal/panel/subagent_corr_task_prefix_328_test.go:18/:41/:43）；
+- push 产码调用者＝1 枚（gate.go:507，非导出方法）；callCorr 产码调用者＝1 枚（loop.go:676）；
+- ★必答(ii) 格式串今天逐字＝queue.go:168 `corr = fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)`；内容锚 token＝`%s#%d`；同形第二枚＝queue.go:616（replay 支）；queue.go 整枚 blob＝66fec7ae，三锚对撞同一串；
+- c 节两枚臂本体逐字（roster:312 HasPrefix(key, task+"#") ⇄ :308/:333-344 splitClashSuffix）；cmd/wisp 界复跑＝尺 2 命中全是注释里的 "AC#0"/"AC#3"，卡片 corr 带 # ＝0（＝推算的界，不是颜色）。
+
+⛔ 跑 go test／go build ⇒ 那一发 PASS 的颜色＝读码推的，凭据＝裁腿判语件第一节 1 条（docs/evidence/s1/328-v1-verdict.md:11）。件内零分节符（派单禁形）、CR＝0。
