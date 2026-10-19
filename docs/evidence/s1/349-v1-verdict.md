@@ -10,11 +10,13 @@
 
 **AC#1 逐枚改准＝成立**。①交件侧四枚死名**精确形**（词边界／调用形）各自 0 命中，正控非零：`SyncDetectionComplete` 26 行／`scopeID` 34 行／`DisposalScope` 全仓 50 行；★坏尺复现＝裸子串 `Complete` 两侧都 27 命中。②`git diff -U0` base⇄del 全 8 枚 `^[+-]` 行都以 `//` 开头＝**非注释行 0**（numstat `1/1`·`2/2`·`1/1`）。③改准后的名字**都指向盘上真身**（我逐枚现验）：`aEq:271`/`aUnder:273`→`aRelates`、`SyncDetectionComplete:472`、`Detector(scopeID)` `provenance.go:858`、`internal/plugin.DisposalScope:129`＋`Defer:186`。
 
-**AC#2 ⛔ 动可执行字节＝成立**。命门＝**剥注释结构尺我自己另起两形**（⛔ 抄编排者两串、⛔ 抄 GS1/GS2/GB），★两侧一律 `git cat-file blob`：
-- GS-B（整文件状态机：字符串/字符/原始字面量保留、注释剔除→删空白→sha256）＝`9de81d0d…39d07e`／`d3c64f86…8b2655`／`c6bdd86a…de3c5a1`，base⇄del⇄HEAD⇄`7b633fa9` **四锚同串**；
-- GS-D（只删整行注释、其余字节一字不动，cmp 级）＝三枚 `cmp` IDENTICAL，sha `97796acc…`／`851972c9…`／`68f2d7cc…`＝我从零算出的值（与票 343/本腿先例同值＝独立复现，⛔ 抄）；
-- 非注释非空行数两侧同＝**232／621／435**；尺灵敏正控＝注一枚 `package XX` ⇒ 哈希变（`045df79f…`）、注一枚纯注释改动 ⇒ 哈希不变。
-- ★CRLF 坑复验：`provenance.go` **blob CR=0／LF=1115**，磁盘副本 **CR=1115** ⇒ 拿磁盘比必假红（本腿全程 blob）。
+**AC#2 ⛔ 动可执行字节＝成立**。命门＝**剥注释结构尺我自己另起三形**（⛔ 抄编排者两串、⛔ 抄它的 GS1/GS2/GB），★两侧一律 `git cat-file blob`：
+- GS-B（整文件 perl 状态机：字符串/字符/原始字面量保留、注释剔除→删全部空白→sha256）＝`9de81d0d…39d07e`／`d3c64f86…8b2655`／`c6bdd86a…de3c5a1`，**base⇄del⇄现 HEAD⇄派单锚 `7b633fa9` 四锚同串**；
+- GS-E（第五形＝`go/parser`＋`go/printer`：剥 `File.Comments` 与全部 `Doc/Comment` 字段后重新打印、去空白→sha256，与任何文本剥法结构性不同）＝与 GS-B **逐枚同值**（三枚、四锚全同）⇒ 一把要文件先能被语法解析、一把只当字节流，两把独立尺同串；
+- GS-D（只删整行注释、其余字节一字不动，cmp 级最严形，⛔ `tr`）＝三枚 `cmp` IDENTICAL，sha `97796acc…`／`851972c9…`／`68f2d7cc…`＝我从零算出的值（与票 343／`349-r1` 先例同值＝独立复现，⛔ 抄）；
+- 非注释非空行数两侧同＝**232／621／435**；★尺灵敏正控＝注一枚 `package riskX` ⇒ 哈希变（`bcdab391…`／codelen 6165）、注一枚纯注释改动 ⇒ 哈希**不变**（仍 `9de81d0d…`）；
+- ★两把文本形在此面等价的形状凭据（⛔ 巧合）＝三枚文件的整行注释 142／439／190、含 `//` 的非整行行 5／25／16、原始字面量内整行注释 0／0／0、`/*` 行 1／0／0 ⇒ 差异面恰被 GS-E 那把 AST 形补住。
+- ★CRLF 坑复验：`provenance.go` **blob CR=0／LF=1115**，磁盘副本 **CR=1115** ⇒ 拿磁盘比必假红（本腿全程 blob，含 `git grep` 都打具名提交树）。
 - 仪器面 base⇄del：`anchor_fallback_teeth_336_{windows,other}_test.go`／`anchor_miss_reason_339_other_test.go`／`anchor_miss_reason_334_test.go` 四枚 blob **UNCHANGED**；三枚冻结件／`internal/observe/thresholds.go`／`go.mod`／`go.sum`／`.gitignore` 全 UNCHANGED；四枚死名"定义形"两侧 0＝⛔ 为凑话造符号。
 
 **AC#3 ⛔ 上通用仪器＝复核成立（我独立跑一把）**。我的 precision（我这把更宽的尺）：射程三文件 **4/22＝18%**、全包 prodOnly **4/63＝6.3%**、未过筛超集 **4/452≈0.9%**；方向与它一致且更硬（尺越宽越差）。最硬否证复现＝★SC 声明形：射程文件侧 **4 命中／GREEN-pkg 0**，含 `_test.go` 全 package **13 命中／GREEN-pkg 2**（两枚真绿是测试件里的 `func Test…` 前缀切词，⛔ 一枚真残留）＝放宽切词只给一把 0 真阳的尺加噪声，与 `343-v1`"放宽即 142 枚红"同向。有界词表形 `^a[A-Z]…` 我只复量⛔ 造门：三枚产码文件注释名册 **5 枚**（`aAnyForm aEq aRelates aRuleReason aUnder`）两侧全有定义＝红 0；★这形⛔ 抓 `fires()` ⇒ 要不要上属契约邻接＝人工批准，载体＝票 350（不阻结案）。
