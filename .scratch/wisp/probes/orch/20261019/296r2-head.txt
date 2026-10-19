@@ -1,0 +1,33 @@
+派单＝票 296 `AC#5` 注释面落地腿 296-r2（★写腿·纯注释面·`cmd/wisp/resident_windows.go` 一枚文件）｜编排者＝新任 harness｜发出 2026-10-19 22:3x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 你是谁
+你是票 **296** 的落地腿，★这一趟**只做 `AC#5` 那一格**（票面 `.scratch/wisp/issues/296-*.md`，现量 4 勾／2 未勾＝未勾的两格＝`AC#2`（部分成立、归后续）与 `AC#5`（＝你这趟））。
+★这趟已被裁完、⛔ 再等人拍：三处过头话由非实现者验收腿 `296-v1` 坐实、编排者裁在台账 `A795`，落笔判据逐字写在票面 `AC#5` 那一格里＝**你照那一格做，⛔ 自己扩射程**。
+你的写面＝**只有 `cmd/wisp/resident_windows.go` 的注释行**＋`.scratch/wisp/probes/296/r2/**`＋票 296 尾一条只追加 bullet＋Progress log 一行。★**⛔ 一枚可执行字节都不许多变**（票面 `AC#5` 逐字：若你认为需要动行为 ⇒ 停手上报，⛔ 顺手改）。
+
+## 三处锚（★内容锚、⛔ 绝对行号；我落笔前用 `sed -n '36,44p' cmd/wisp/resident_windows.go` 现量逐字在场，落刀前你自己再验一次在场）
+① `// an empty answer: Check()'s only skip is the DeepEqual diff against what is` ⇄ `applied` ⇒ **不成立**：`internal/ball/hotkey_reload.go` 的 `Check()` 有**两条**不重绑出口（`if r.src == nil {` 那一条**恰恰就是"保持当前绑定"**、与 `reflect.DeepEqual(r.applied, cfg)` 那一条并列）⇒ 现注释用另一种形状把已被删掉的旧承诺又许了一遍。
+② `// here would re-register the set and leave summon, mute and panel dead until` ⇄ `the next read` ⇒ **把恢复条件说轻了**：要"下一次读到**不同**的集合"才重绑；连续读到同一组空串会被 `DeepEqual` 跳过。
+③ 末句括注 `(an empty [hotkey] slot means "unset", not "turned off")` ⇒ 以行为语义口吻**触到 `Q-82` 的待定案线**（"用户到底能不能主动关掉一枚键"**仍未拍、默认动作＝不做**）⇒ 改成只描述"今天这一支怎么处理空串"，⛔ 写成契约裁决。
+
+## ★硬禁区（除票面 `AC#5` 那格的判据之外，一律⛔）
+⛔ 动 `internal/ball/**`（`Check()` 两条出口是**事实**、⛔ 去改它）；⛔ 动 `internal/config/schema.go` 里 `[hotkey]` 四枚默认值；⛔ 读或改机主那份 `config.toml`（`C:/Users/swq/AppData/Roaming/wisp-dev/config.toml`＝**他的**，本票一票到底⛔ 碰）；⛔ 引入任何 `none`/`off` 的 normalize（`Q-82` 未拍＝**不做**）；⛔ 放宽票 258 既有断言（含"源可以返回全空"那句＝它是对的）；⛔ 把 `hotCfg258` 与 `hotReload258` 两枚闭包合并（会改掉那条 Warn 的出现时机）；⛔ 翻任何框（`AC#5` 归非实现者裁、⛔ 你给自己盖章）；⛔ `frontend/**`／`design/**`／三枚冻结件／golden／`thresholds.go`／D43 表零字节；⛔ push。
+
+## ★跨腿耦合（放你前我现读出来的，务必照做）
+另有一枚写腿 **`342-r2`** 正在编辑 `internal/winsec/**`（Windows 续体仪器）。★`cmd/wisp` 的**导入图里有 `internal/winsec`**（我现量：`internal/secret`⇄`config`⇄`agent`⇄`memory`⇄`risk` 各 1–3 枚文件导它）⇒ 你取 `./cmd/wisp/` 颜色时：
+- ★两枚仪器件（`*_test.go`）⛔ 进导入图＝它编不动你的包；**但若它改 `winsec` 的产码字节且当时处于半保存态**，你的编译可能撞到⛔ 指向你写面的错。⇒ 红句若点名 `internal/winsec/**` ⇒ **具名上报、⛔ 你去动它一个字节、⛔ 据此判自己失败**。
+- ★可比性凭据：你改前那两发起手时现跑一次 `git rev-parse HEAD:internal/winsec/winsec.go` 记进件里（＝当时那颗 seed 是什么、你的两发是否同串）。
+- ★你⛔ 跑 `go test ./internal/winsec/`⇄`./cmd/wisp` **整包并发**（它吃 CPU）；两发改前读数串行、安静复量。
+
+## 台面与读数（公共块 j 全部照做；★这三条本轮新定式必用）
+- ★**临时根形＝反斜杠**：`GOTMPDIR`⇄`TMPDIR` 一律 `cygpath -w` 出来（`C:\…`），⛔ 原样 export `/d/…` 或 `C:/…` ⇒ 正斜杠形会让 `mklink /J <link> <target>` 的 target 被 cmd 吃掉＝`Invalid switch`＝造出一片假红（本轮两枚腿独立复现）。
+- ★**整条 `PATH` 一起转**：`PATH="$(cygpath -wp "$PWD/third_party/sherpa-onnx:$PWD/build:$PATH")"`＝⛔ 半 POSIX 冒号接半 Windows 分号（＝"零枚 `--- FAIL` 的整包死"）。
+- ★**判据只认到达数**（`live=3`／`refused-at-act>0`／`flips>0` 这类分子），⛔ 拿"总 refused 很大"当"到达"（本轮实测红发的总数比绿发更大＝方向与直觉相反）。
+- 取退码＝重定向文件＋`echo RC=$?` 紧跟裸命令（⛔ 管进 `tail`）；`go test` 正文印在 `--- FAIL` **之前**（⛔ 事后 grep 配错行）；★取 blob 一律落**仓外**（`D:\tmp\wisp\20261019\296r2\`，⛔ 仓内解副本＝会被 `go build ./...` 当成包扫＝前人现场栽过）；★探针里的 blob 副本从一开始⛔ 叫 `.go`（用 `.go.txt`）。
+- 门禁按票面 `AC#4` 那套并排两把尺的口径交回（工作树⇄`git archive`→仓外同把尺）：`GOFLAGS= go build ./...` rc、`sh scripts/d22scan.sh` rc、`gofmt -l cmd/wisp`⇄`gofumpt -l cmd/wisp` 两把并排（⛔ 顺手洗别人的脏件、⛔ 裸 `gofumpt` 当 rc=127 为"跳过"）、`go test ./cmd/wisp/ -count=1 -run 'Test296|Test258'` rc=0（票面 `AC#5` 指定这一发）。
+- ★**你只改注释行 ⇒ 判据自带一把尺**：`git diff -U0` 逐行看＝每枚变动行都以 `//` 开头或为空注释行、⛔ 一行可执行代码变动（把这条量出来写进件，是你能给我的最硬凭据）。
+
+## Git 纪律
+新建文件**先 `git add`**；`add`⇄`commit` 逐枚字面 pathspec、⛔ `add -A`／`commit -- .`／`--amend`／`reset`／`rebase`／`stash`／`clean`／`checkout`；中文正文 Write 成文件再 `git commit -F`（`-F` 路径 Windows 形 `D:\tmp\…`）；⛔ 并行跑改文件的脚本；here-doc 用 `<<'EOF'`；⛔ 写出被禁字面字符（码位 U+00A7，写码位名；⚠ 别与间隔号 U+00B7 混）；★还原文件一律 `git cat-file blob HEAD:<path> > <path>`；名册尺锚定行首、⛔ 假设分隔符（`A1045`）；★枚数必带尺名（"几枚⇄哪把尺⇄射程含不含 `_test.go` 与注释行"＝本票 `AC#0` 那一格栽过第 5 次的口径病）；★凡报"几格"先跑框尺（本票 `AC#` 实际 **6 格**＝`AC#0`..`AC#5`，⛔ 沿用票面散文里"六格／五格"那句按记忆数的旧话）；★提交后现跑 `git log -1`＋`git show --name-only` 对回"声称⇄实际"再报"已提交"（完成通知一律当未验证）。
+
+做完或卡住 send_message 报 lead：逐枚提交号＋`git show --name-only` 越界尺结果＋★`git diff -U0` 的"⛔ 可执行字节变动"量证（含行数与逐行首字符统计）＋三处改后注释原文（逐字，供我裁说实话）＋`Check()` 两条出口你自己现读的 `file:line` 凭据＋门禁四把 rc 与并排两把格式尺的逐名＋`-run 'Test296|Test258'` 两发改前改后读数＋`winsec.go` 那颗 seed 串＋票 296 框终量尺（须 4 勾／2 未勾＝你一枚没翻）＋票尾与 Progress log 的 numstat（须纯追加）。
