@@ -5,7 +5,7 @@
 
 ## AC#5 整包终态＝**成立**（本腿那发四数＝`RUN=2552 / PASS_TOP=1714 / FAIL_TOP=19 / SKIP=13 rc=1`）
 
-尺＋射程＝票面逐字命令的两半（`./cmd/wisp ./internal/...`，`-count=1 -timeout 30m -v`，仓外导出树，逐名读数件 `.scratch/wisp/probes/227/v2/logs/01-*.md`）。票面要的"到终态＋逐名比红名册"两半都齐：★终态＝本腿这发把 `cmd/wisp` 跑到包尾（块内 `=== RUN=448`、源码定义 356 枚顶层用例实跑 **333** 枚，余 23 枚＝19 枚 `windows && winlive` tag＋3 枚 `!windows`＋1 枚⛔ 真用例＝反引号字面量里的票 133 夹具；⚠ 分母那把尺（`grep '^func Test'`）⛔ 感知 Go 词法、差 1 枚，具名登记＝形状全部可解释、⛔ 缺口）。
+尺＋射程＝票面逐字命令的两半（`./cmd/wisp ./internal/...`，`-count=1 -timeout 30m -v`，仓外导出树，逐名读数件 `.scratch/wisp/probes/227/v2/logs/01-*.md`）。票面要的"到终态＋逐名比红名册"两半都齐：★终态＝本腿这发把 `cmd/wisp` 跑到包尾（块内 `=== RUN=448`、源码定义 356 枚顶层用例实跑 **333** 枚，余 23 枚＝19 枚 `windows && winlive` tag＋3 枚 `!windows`＋1 枚⛔ 真用例＝反引号字面量里的票 133 夹具；⚠ 分母那把尺（`grep '^func Test'`）⛔ 感知 Go 词法、差 1 枚，具名登记＝形状全部可解释、⛔ 缺口）。★终态那半另有一把更硬的尺＝`go test ./cmd/wisp -list '.*'`（编译后的包名册）＝**333** 枚 ⇄ 本腿 full-B 逐名比对**未跑到 0 枚**＝真跑到包尾；同一把尺打编排者那一发＝未跑到 **179/333**。⚠ 作差的两把射程尺与收窄见 `logs/04-*.md`（＝`cmd/wisp` 那包在编排者那发中途整进程死亡、块尾一枚⛔ 结果行；★"只在编排者侧红"那 15 枚⛔ 受此影响＝逐枚包归属尺现量两发每枚都有结果行、包归属逐枚相同＝`internal/tools` 7＋`internal/risk` 4＋`internal/winsec` 2＋`internal/models` 1＋`cmd/wisp` 1；反向那 5 枚里有 4 枚在 `cmd/wisp`＝在它那一发是"没跑到"、⛔ 是"跑到了且绿"⇒ 那 5 枚的定性只依赖本腿自己三发定向复量）。
 
 **逐名作差（⇄编排者 `A1053` 那发 29 枚，两把尺各自闭合：15＋14＝29、14＋5＝19）**
 - **只在编排者侧红＝15 枚**＝junction 族 9（含派单点名的 `Test20r2JunctionRefusalIsNeverAskable`）＋SID 卷形 2＋跨卷 1＋`TestAC4InstallDirWidth…` 1＋`TestAC2SealNotice…` 1＋`TestDirOfBaseOfCut…` 1 ⇒ **本腿逐名 `--- PASS`**（逐字行在 `07-attribute.sh` 输出）。与 `A1053`② 归的台损**逐名相符**。
