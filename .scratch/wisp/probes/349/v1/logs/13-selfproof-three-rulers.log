@@ -1,0 +1,97 @@
+### 349-v1 三把尺自证（快形＝单次 %H%x09%s 导出＋内存 index==1）
+########## 349-v1 三把尺自证（快形＝单次 %H%x09%s 导出＋内存 index==1，⛔ 逐枚 git log）##########
+MY_COMMITS=3
+  d969180f 14:13 票 349 终裁腿 349-v1·第 3 笔＝判语件补第五形（GS-E AST 尺）＋票尾唯一一条只追加 bullet
+  ef3ae694 14:12 票 349 终裁腿 349-v1·第 2 笔＝必答 (ii)(iv)＋门禁＋纪律面读数件与全部台件入库
+  90ba3898 14:05 票 349 终裁腿 349-v1·第 1 笔＝判据最硬两格（必答 (i)(iii)）读数件入库
+### 尺① 逐枚 name-only ⊆ 三处写面；.go 命中 0
+--- d969180f name-only ---
+  INSCOPE-bulletfile .scratch/wisp/issues/349-blacklist-provenance-comments-name-undefined-symbols-fires-taskscope-cleanup.md
+  INSCOPE docs/evidence/s1/349-v1-verdict.md
+  go_hits=0
+--- ef3ae694 name-only ---
+  INSCOPE .scratch/wisp/probes/349/v1/logs/06-ac3-independent-ruler.log
+  INSCOPE .scratch/wisp/probes/349/v1/logs/07-fp-and-candidates.log
+  INSCOPE .scratch/wisp/probes/349/v1/logs/08-gates.log
+  INSCOPE .scratch/wisp/probes/349/v1/logs/09-discipline-roster.log
+  INSCOPE .scratch/wisp/probes/349/v1/logs/10-redsets.log
+  INSCOPE .scratch/wisp/probes/349/v1/logs/11-tree-and-hygiene.log
+  INSCOPE .scratch/wisp/probes/349/v1/logs/12-candidates-raw.log
+  INSCOPE .scratch/wisp/probes/349/v1/sh/build-tree.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/census-v1.go.txt
+  INSCOPE .scratch/wisp/probes/349/v1/sh/gse-ast.go.txt
+  INSCOPE .scratch/wisp/probes/349/v1/sh/q1-quadrant.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/q5-gates.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/q6-teeth.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/q8-linuxpair.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/r1-roster.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/r2-blobs.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/r3-anchors.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/r4-diff.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/r5-gs.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/r6-deadnames.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/strip-b.pl
+  go_hits=0
+--- 90ba3898 name-only ---
+  INSCOPE .scratch/wisp/probes/349/v1/logs/01-structural-rulers.log
+  INSCOPE .scratch/wisp/probes/349/v1/logs/02-deadnames-precise.log
+  INSCOPE .scratch/wisp/probes/349/v1/logs/03-quadrant.log
+  INSCOPE .scratch/wisp/probes/349/v1/logs/04-linux-pair.log
+  INSCOPE .scratch/wisp/probes/349/v1/logs/05-teeth-336.log
+  INSCOPE docs/evidence/s1/349-v1-verdict.md
+  go_hits=0
+### 正控（尺灵）＝同一把尺打 349-r1 两把锚并集 7 笔 ⇒ .go 恰 3
+  union=7
+  GO internal/risk/blacklist.go
+  GO internal/risk/provenance.go
+  GO internal/risk/syncdirs.go
+  POSITIVE_CONTROL_go_unique=3 (want 3)
+### 尺② 件：逐枚 bytes/lines/U+00A7，非 0 字节，⛔ .out
+verdict bytes=11746 lines=47 U00A7=0 U00B7=2
+  logs/01-structural-rulers.log      bytes=10568  lines=161  U00A7=0
+  logs/02-deadnames-precise.log      bytes=5304   lines=65   U00A7=0
+  logs/03-quadrant.log               bytes=12958  lines=97   U00A7=0
+  logs/04-linux-pair.log             bytes=852    lines=28   U00A7=0
+  logs/05-teeth-336.log              bytes=3051   lines=49   U00A7=0
+  logs/06-ac3-independent-ruler.log  bytes=5514   lines=90   U00A7=0
+  logs/07-fp-and-candidates.log      bytes=6280   lines=38   U00A7=0
+  logs/08-gates.log                  bytes=2025   lines=25   U00A7=0
+  logs/09-discipline-roster.log      bytes=4082   lines=59   U00A7=0
+  logs/10-redsets.log                bytes=2787   lines=59   U00A7=0
+  logs/11-tree-and-hygiene.log       bytes=2524   lines=49   U00A7=0
+  logs/12-candidates-raw.log         bytes=9245   lines=170  U00A7=0
+  sh/build-tree.sh                   bytes=1687   lines=30   U00A7=0
+  sh/census-v1.go.txt                bytes=7572   lines=254  U00A7=0
+  sh/gse-ast.go.txt                  bytes=2989   lines=127  U00A7=0
+  sh/q1-quadrant.sh                  bytes=3034   lines=66   U00A7=0
+  sh/q5-gates.sh                     bytes=1546   lines=34   U00A7=0
+  sh/q6-teeth.sh                     bytes=1757   lines=28   U00A7=0
+  sh/q8-linuxpair.sh                 bytes=2232   lines=41   U00A7=0
+  sh/r1-roster.sh                    bytes=1670   lines=23   U00A7=0
+  sh/r2-blobs.sh                     bytes=1342   lines=23   U00A7=0
+  sh/r3-anchors.sh                   bytes=1536   lines=26   U00A7=0
+  sh/r4-diff.sh                      bytes=967    lines=16   U00A7=0
+  sh/r5-gs.sh                        bytes=2330   lines=35   U00A7=0
+  sh/r6-deadnames.sh                 bytes=2390   lines=34   U00A7=0
+  sh/strip-b.pl                      bytes=1292   lines=25   U00A7=0
+zero_byte=0 out=0
+  占位符尺（本腿件 want 0）=0
+  占位符尺正控（同尺打 tools/d22scan 与 HANDOVER，want 非 0）=0
+  HANDOVER_U00A7_POSITIVE_CONTROL=304
+### 尺③ 票框终量尺＋本腿对票面纯追加＋票名／Status 未动
+boxes_unchecked=7 boxes_checked=0
+  ticket-numstat d969180f [3 0 .scratch/wisp/issues/349-blacklist-provenance-comments-name-undefined-symbols-fires-taskscope-cleanup.md]
+  headline_or_status_lines_changed_in_my_commits=0
+### 尺④ 三枚产码 .go：交件锚 ⇄ 现 HEAD blob 同一（本腿⛔ 动 .go 字节）
+  blacklist.go                     ed8db1ea=964ee75a4befc7a51424f409a95745296e369da3 HEAD=964ee75a4befc7a51424f409a95745296e369da3 UNCHANGED
+  provenance.go                    ed8db1ea=eff984f8c194116a5e99471fbaecf7a4ab691574 HEAD=eff984f8c194116a5e99471fbaecf7a4ab691574 UNCHANGED
+  syncdirs.go                      ed8db1ea=8dfe18602fa749ea1740ecfbbbcfcc30b38ea27f HEAD=8dfe18602fa749ea1740ecfbbbcfcc30b38ea27f UNCHANGED
+### 尺⑤ winsec 车道（我只读具名快照、⛔ 读在飞工作树、⛔ 跑该包）
+  winsec.go ed8db1ea=67783ae062dcbdefbe74a72ddf4307b3ac9cedf7 HEAD=67783ae062dcbdefbe74a72ddf4307b3ac9cedf7
+RC=0
+### 占位符尺的正控（尺灵）：同一条尺打盘上有占位形状的射程（非 0＝尺没坏）
+  POSITIVE_placeholder_hits_scope_internal_tools_scripts_docs_reports=92
+  正控逐枚样本（前 3 行）:
+    internal/agent/compress.go:140:// the compressor never fills in "" or "unknown", because a placeholder reads as
+    internal/agent/compress_trace_test.go:476:// handed a placeholder that would read as a real owner.
+    internal/agent/compress_trace_test.go:583:	// And no placeholder value ever reaches a record, on any attribute: that is
