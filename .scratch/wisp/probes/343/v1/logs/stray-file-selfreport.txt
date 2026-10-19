@@ -1,0 +1,30 @@
+343-v1 SELF-REPORT OF A STRAY FILE I CREATED (登记⛔ 删、⛔ 藏)
+
+What happened: while copying my final readings into my probes surface I ran one malformed
+PowerShell->bash hybrid command. The variable $T did not survive into bash, so the redirect
+target collapsed to a bare filename and its parent resolved to the bash process's startup
+directory. Verified on disk just now (read-only probes):
+
+  path (POSIX form seen by bash): /final-report.log
+  path (Windows form)           : D:\work\soft\Git\/final-report.log
+  size 1394 bytes, mtime 2026-10-19 11:14
+  ROOT=$(cygpath -w /) proves that "/" in this bash == the Git install dir, NOT a drive root.
+
+Facts that matter for the ledger:
+- ★⛔ 盘符根：it is NOT at D:\ or C:\ (my own landing rule was D:\tmp\wisp\20261019\343v1\**,
+  and the dispatch's "⛔ 任何盘符根" is respected); it landed inside the Git installation dir
+  because that is where this particular bash process starts.
+- ★⛔ 它⛔ 在仓库里：not under "D:\work\workspace\projects plans\Wisp", so nothing was added,
+  staged or committed by it. My own gauges confirm the repo is clean:
+  `git status --porcelain --untracked-files=no` = 0 lines, untracked files inside
+  .scratch/wisp/probes/343/v1 = 0, and every commit of mine carries only my three allowed
+  write surfaces.
+- ★临时件只建不删 ⇒ I am NOT deleting it (dispatch rule 8 / 公共块). It is the same content as
+  .scratch/wisp/probes/343/v1/logs/final-report.log (the v1 copy, the one whose `cut -c` left an
+  invalid UTF-8 line) which I did keep, commit and supersede with final-report-v2.log.
+- Root cause = shell discipline slip on MY side: I mixed pwsh `$var` interpolation into a
+  `bash -c` string instead of putting the work in a .sh file (the pattern I used everywhere
+  else this run). Registered here rather than quietly re-run.
+
+Action left to the orchestrator: whether to delete that file from the Git install dir is yours /
+the machine owner's call (it is outside my lanes and outside the repo; I neither touch nor delete it).
