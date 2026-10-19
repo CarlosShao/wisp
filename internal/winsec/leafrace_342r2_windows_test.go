@@ -251,10 +251,15 @@ func (w *winLeafWorld342r2) stopRacer() {
 	w.settle()
 }
 
-func (w *winLeafWorld342r2) run(call func() error) (map[string]int, int, string) {
+// run drives the production entry point over the flipping name and samples the sibling witness AFTER
+// EVERY attempt, before the racer's next restock can hide a damage row. Sampling races the restock, so
+// the count may UNDER-count (a truncation can be restocked before the read); it cannot over-count,
+// because a body that differs from the witness's own is a fact that happened. This is the DAMAGE column
+// of dispatch ②; the leg map is the REFUSAL column; one number never feeds the other's gate.
+func (w *winLeafWorld342r2) run(call func() error) (legs map[string]int, flipped int, firstOther string, damage winLeafDamage342r2) {
 	w.startRacer()
-	legs := map[string]int{}
-	var firstOther string
+	legs = map[string]int{}
+	damage = winLeafDamage342r2{}
 	for i := 0; i < winLeafAttempts342r2; i++ {
 		err := call()
 		leg := spokeWinLeaf342r2(err)
@@ -262,9 +267,46 @@ func (w *winLeafWorld342r2) run(call func() error) (map[string]int, int, string)
 		if leg == winLeafOther342r2 && firstOther == "" {
 			firstOther = err.Error()
 		}
+		info, lErr := os.Lstat(w.witness)
+		switch {
+		case lErr != nil:
+			damage.gone++
+			if damage.firstGone == "" {
+				damage.firstGone = fmt.Sprintf("attempt %d: %v", i, lErr)
+			}
+		default:
+			_ = info // Mode() is decorative on this platform (ticket 89's premise), so no mode row here.
+			body, rErr := os.ReadFile(w.witness)
+			if rErr != nil {
+				damage.unreadable++
+			} else if string(body) != winLeafWitBody342r2 {
+				damage.truncated++
+				if damage.firstTrunc == "" {
+					damage.firstTrunc = fmt.Sprintf("attempt %d: size %d body [%s]", i, len(body), body)
+				}
+				// Re-stock the witness here, from the main loop, so each attempt gets a fresh reading.
+				// The racer's own settle also writes it back, so the sample races two restocks and can
+				// UNDER-count damage; it cannot over-count, because a body that differs from the
+				// witness's own is a fact that happened.
+				if wErr := os.WriteFile(w.witness, []byte(winLeafWitBody342r2), 0o600); wErr != nil {
+					w.t.Fatalf("restock the witness: %v", wErr)
+				}
+			}
+		}
 	}
 	w.stopRacer()
-	return legs, int(atomic.LoadInt32(&w.flipped)), firstOther
+	return legs, int(atomic.LoadInt32(&w.flipped)), firstOther, damage
+}
+
+// winLeafDamage342r2 is the DAMAGE column: facts about the sibling object, counted per attempt. It never
+// feeds, and is never fed by, the leg map - ticket 348 AC#3's rule that one numerator may not reuse
+// another's green.
+type winLeafDamage342r2 struct {
+	truncated  int // the witness held something other than its own body
+	gone       int // the witness was absent
+	unreadable int
+	firstTrunc string
+	firstGone  string
 }
 
 // TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2 gates exactly one claim: on the dispatch's
@@ -275,13 +317,18 @@ func (w *winLeafWorld342r2) run(call func() error) (map[string]int, int, string)
 // keeps that residual named); the two tickets' numerators stay in separate files by separate gates.
 func TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2(t *testing.T) {
 	w := newWinLeafWorld342r2(t)
-	legs, flipped, firstOther := w.run(func() error {
+	legs, flipped, firstOther, damage := w.run(func() error {
 		return PrivateFile(w.name, []byte(winLeafPayload342r2), 0o600)
 	})
 	recheck := legs[winLeafLegs342r2[0].name] + legs[winLeafLegs342r2[1].name]
 	guard := legs[winLeafLegs342r2[2].name] + legs[winLeafLegs342r2[3].name]
 	t.Logf("AC#1-leaf attempts=%d flippedCycles=%d flipErrs=%d firstFlipErr=%q",
 		winLeafAttempts342r2, flipped, atomic.LoadInt32(&w.flipErrs), w.firstFlip)
+	// The DAMAGE column, its own rows, its own numbers.
+	t.Logf("AC#1-leaf DAMAGE : witness truncated=%d gone=%d unreadable=%d | first truncation=%q | first "+
+		"absence=%q (sampled after every attempt from the main goroutine; sampling races the racer's own "+
+		"restock so it can UNDER-count and cannot over-count)",
+		damage.truncated, damage.gone, damage.unreadable, damage.firstTrunc, damage.firstGone)
 	for _, leg := range winLeafLegs342r2 {
 		if n := legs[leg.name]; n > 0 {
 			t.Logf("AC#1-leaf': leg that answered = %s : %d attempts", leg.name, n)
