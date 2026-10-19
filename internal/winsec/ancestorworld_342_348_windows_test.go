@@ -88,6 +88,7 @@ var winAncLegs342r1 = []struct{ why, name string }{
 	{"the reparse-point probe could not read the name", "preOpenLeafGuard's unreadable-name refusal (ticket 322's Windows leaf leg)"},
 	{"the name carries a reparse point", "preOpenLeafGuard's leaf refusal (ticket 322's Windows leaf leg)"},
 	{"reaches it through the link at", "placement floor before the act (platformVerifyPlacement)"},
+	{"path traverses a reparse point", "the installed C26 resolver's own refusal (resolveString -> risk), i.e. steady state BEFORE any act"},
 	{"cannot apply a private security descriptor", "a seal refusal on this route"},
 	{"not provably resolved", "C26 resolveString refused the spelling"},
 }

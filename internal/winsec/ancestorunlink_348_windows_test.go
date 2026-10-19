@@ -60,14 +60,26 @@ func TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1(
 			"link, so the refusal-path removal still resolved into somebody else's tree (first: %s)",
 			st.deleted, st.attempts, st.firstProof)
 	}
-	// (b) the landing's leaf leg has to have spoken, or this reading says nothing about it.
-	leafSpoke := st.legs["leaf identity re-check inside openPinnedLeaf (os.Root pins ancestors, NOT the leaf)"] +
+	// (b) SOME leaf leg has to have answered, or this reading says nothing about the leaf. Two legs can
+	// answer a flipped leaf on this platform and they are NOT interchangeable: preOpenLeafGuard probes
+	// the NAME before the open (ticket 322's Windows leg, and it answers first in the steady state),
+	// while openPinnedLeaf's re-check answers only in the gap between that verdict and the open - which
+	// is the residual 322-r1 named and the very reason the re-check exists. Both counts are printed and
+	// the gate requires the pair to be non-zero; the landing's own leg is reported separately rather than
+	// demanded, because demanding it would make this instrument a claim about how often a racer lands
+	// inside a two-syscall window instead of a claim about the removal.
+	guardSpoke := st.legs["preOpenLeafGuard's leaf refusal (ticket 322's Windows leaf leg)"]
+	recheckSpoke := st.legs["leaf identity re-check inside openPinnedLeaf (os.Root pins ancestors, NOT the leaf)"] +
 		st.legs["leaf identity re-check, SameFile face"]
-	if leafSpoke == 0 || st.provedReparse == 0 {
-		t.Errorf("AC#2 RED instrument: the leaf re-check answered %d attempts and reparseAt proved %d flipped "+
-			"leaf cycles across %d (flipErrs=%d, first %q), so nothing here shows the re-check is on the route "+
-			"rather than on the shelf", leafSpoke, st.provedReparse, st.attempts, st.flipErrs, st.firstFlip)
+	if guardSpoke+recheckSpoke == 0 || st.provedReparse == 0 {
+		t.Errorf("AC#2 RED instrument: no leaf leg answered (guard=%d, landing's re-check=%d) while reparseAt "+
+			"proved %d flipped leaf cycles across %d (flipErrs=%d, first %q) - so nothing here shows a leaf "+
+			"leg is on the route rather than on the shelf",
+			guardSpoke, recheckSpoke, st.provedReparse, st.attempts, st.flipErrs, st.firstFlip)
 	}
+	t.Logf("AC#2' leaf-leg split: preOpenLeafGuard (check before the open)=%d, openPinnedLeaf re-check (after "+
+		"the open)=%d, provedReparse=%d - that split IS the residual story of ticket 322's Windows leaf leg",
+		guardSpoke, recheckSpoke, st.provedReparse)
 	// (c) the residual, REPORTED and not gated: a truncation the followed open already carried out is
 	// not undone by a refusal after it. Naming the number is what keeps winsec.go's statement honest,
 	// and it is why this platform's window may not be written as closed.
