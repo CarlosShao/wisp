@@ -57,6 +57,13 @@
 - **`342-a1` 越界那处（跑了 `./internal/risk/`⇄`./internal/config/`⇄`./internal/agent/` 色彩）＝处置够、⛔ 判谎报成立**。理由：①载体只有 `logs/29-*`／`32-*`／`33-*`，射程全在**消费者维**＝票面 `AC#4`，而 `AC#4` 今天本来就⛔ 可判 ⇒ **退这一维＝退掉的东西今天没有承重**；②它自己具名"⛔ 当判据"＋基线树 3/3 红＝与落点无关，本腿核其"⛔ 谎报"成立（自抓＝本仓要的形状）。★**污染别的格＝没有**：本腿把它三张承重脸全部重打且**逐字同号**（容器 `71/43/0/0`、本机 `110/61/0/0`、`yinofb` `71/39/4/0`＋同名四枚）⇒ 它的 `AC#0` 读数⛔ 受那三枚色彩影响。★**唯一不许延伸的一格**＝"摆动枚安静复量 3 发全绿"：那两枚名（票 346）本腿在 `GOTMPDIR` bind 档读到**真红**（第 7 条）＝它们对台面配置敏感 ⇒ ⛔ 拿它们的绿当"叶子已钉住"的凭据，⛔ 拿本腿 B 档的绿当"祖先那一支已钉住"的凭据（两枚都量不到祖先那一支：`posix_seal_window_120_other_test.go:479` 驱动的是 `SealFile`，本腿尺 `PrivateFile` 命中 0）。
 - **票 348＝⛔ 并进 342 成立、同批同腿成立**；★**新报两味**：同一枚路由第二处 `os.Remove` 在 `winsec.go:165`（写失败支，同样沿祖先链接删）＝票 348 票面只点 `:160`；且甲形的 `unlinkat` 与 342 选形有**依赖耦合**（见上）。⛔ 本腿立新票，具名报编排者。
 
+## 本腿自抓（⛔ 藏，公共块口径）
+
+- ★台损一枚：容器 `GOTMPDIR` 绑 D 卷 ⇒ `os.SameFile` 失真（见 AC#0 第 7 条，A/B 逐字在 `logs/18-yinofb-and-config-attribution.txt`＋`logs/13-color-treeC.log`＋正控 `logs/positive-control-samefile.go.txt`）。
+- ★门禁误用一枚：`gofumpt -l` 指到 `.md` ⇒ `rc=2`（见门禁段）。
+- ★探针形状缺陷一枚：`TestV342v1WindowsLeafSwapAfterGuardIsTheResidualLeafLeg` **⛔ 建立结论**——那枚叶子链接本腿用了"junction 指向目录"，于是 `os.OpenFile(...O_WRONLY|O_TRUNC)` 回的是 `is a directory`＝拒绝来自"目标是目录"、⛔ 来自守卫，那一发问不出"守卫答复过期后叶子能否被换"。要量那一支需要**目标是 FILE** 的叶子链接（junction 只能指目录 ⇒ 得用 `os.Symlink` 指文件，本机有开发者模式＝票 89 已量）。⇒ 本腿对"甲在 Windows＝check-then-act"的裁语⛔ 依赖那一发，依据＝产码自陈（`winsec_windows.go:361-369`）＋`WJIA damage=3/5/5` 的直接读数。⛔ 据此退任何一形，交落地腿补那一枚形状。
+- ★帽与笔数：本腿在 150 轮帽内交完六笔（探针／POSIX 读数／散件＋判语／判语补正／票尾 bullet），logs 逐枚提前入库；枚数帽 4–8＝按公共块 14:3x 口径为参考值（"每落一枚就 commit"优先），已具名。
+
 ## 门禁四数（只在共享工作树，跑前 `unset GOTMPDIR TMPDIR TEMP TMP`，逐枚 rc）
 
 `gofumpt.exe -l .scratch/wisp/probes/342/v1` **rc=0**（输出空＝本腿写面⛔ `.go` 件；正控 `-l internal/winsec/winsec.go` 同 rc=0＝尺在跑）／`sh scripts/d22scan.sh` **rc=0**（`clean - no D22 ban violations`）／`sh scripts/check-path-length-budget.sh` **rc=0**（`VERDICT GREEN`，worst 229 chars、roster 60＝存量）／`go vet ./internal/winsec/` **rc=0**（无输出）。★**本腿自抓一枚门禁误用（入账、⛔ 读成红）**：本腿一度把 `gofumpt -l` 指到 `docs/evidence/s1/342-v1-verdict.md`，得 `rc=2`＋`illegal character U+0023 '#'`＝**该工具射程只含 Go 件**、拿它量 `.md`＝误用（与票 311 的 rc=2 射程拒绝同族、⛔ 计入判据）；正确档＝只量 Go 落面的 `rc=0`（`logs/f-1-gofumpt-face.txt`，误用原件也留盘 `logs/f-1-gofumpt.txt` 可复跑）。★票框终量尺：`grep -c '^- [ ] \*\*AC#'`=7、`grep -c '^- [x]'`=0 ＝**七格一枚没翻**（本腿⛔ 翻框）。两平台四数（⛔ 混用⛔ 相减）：容器 B 档 `71/43/0/0`、本机 `110/61/0/0`，落点脸各自逐字同号。
