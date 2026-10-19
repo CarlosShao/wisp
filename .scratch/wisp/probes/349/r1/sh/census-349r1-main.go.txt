@@ -1,0 +1,328 @@
+package main
+
+// 349-r1 AC#0 same-family census gauge (my own instrument; read-only, prints to stdout).
+//
+// Question the ticket asks: does a COMMENT inside internal/risk name a symbol that the
+// package does not have? Three shapes over comment text only:
+//
+//	SA  lowerCamel identifier            \b[a-z][a-z0-9_]*[A-Z][A-Za-z0-9_]*\b
+//	SB  call shape  "foo(" / "foo()"     \b([A-Za-z_][A-Za-z0-9_]*)\(   (asserts callability)
+//	SC  declaration shape in prose       (func|type|var|const) <name>   (asserts a definition exists)
+//
+// Every candidate is graded against two rosters built from the SAME package plus a
+// repo-wide scan:
+//
+//	GREEN-pkg     defined at package level inside internal/risk (func/method/type/const/var)
+//	GREEN-bound   appears only as a param / field / local / range-var inside the package
+//	RED-elsewhere not in the package at all, but defined somewhere under -roots
+//	RED-nowhere   no definition anywhere under -roots
+//
+// BEXCL = SB hits that are Go builtins / keywords / predeclared types (noise class, reported
+// separately so a reader can audit the misfire surface instead of trusting a filter).
+//
+// A RED row is NOT automatically a family member: prose words ("macOS"), stdlib method names
+// ("TempDir("), the DEFERRED(...) marker convention and deliberately-deleted historical names
+// (票 160 删掉的 CloseScope) all land here. This gauge enumerates; the human read decides.
+import (
+	"flag"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strings"
+)
+
+var camelRe = regexp.MustCompile(`\b[a-z][a-z0-9_]*[A-Z][A-Za-z0-9_]*\b`)
+var callRe = regexp.MustCompile(`\b([A-Za-z_][A-Za-z0-9_]*)\(`)
+var declRe = regexp.MustCompile(`\b(?:func|type|var|const)\s+([A-Za-z_][A-Za-z0-9_]*)`)
+
+var builtins = words("append cap close complex copy delete imag len make new panic print println real recover min max clear")
+var keywords = words("break case chan const continue default defer else fallthrough for func go goto if import interface map package range return select struct switch type var true false nil iota")
+var predecl = words("string error bool int int8 int16 int32 int64 uint uint8 uint16 uint32 uint64 uintptr byte rune any comparable")
+
+func words(s string) map[string]bool {
+	m := map[string]bool{}
+	for _, w := range strings.Fields(s) {
+		m[w] = true
+	}
+	return m
+}
+
+type def struct{ kind, where string }
+
+type cand struct {
+	shape, name, verdict, kind, where, file string
+	line                                    int
+}
+
+func goFiles(dir string) []string {
+	var out []string
+	_ = filepath.Walk(dir, func(p string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return nil
+		}
+		if strings.HasSuffix(p, ".go") {
+			out = append(out, p)
+		}
+		return nil
+	})
+	sort.Strings(out)
+	return out
+}
+
+// roster fills pkg (package level) and bound (param/field/local/range) maps for one file set.
+func roster(fset *token.FileSet, files []string, pkg, bound map[string]def) int {
+	n := 0
+	for _, f := range files {
+		file, err := parser.ParseFile(fset, f, nil, parser.ParseComments)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "PARSE_FAIL %s: %v\n", f, err)
+			continue
+		}
+		n++
+		sl := filepath.ToSlash(f)
+		put := func(m map[string]def, name, kind string) {
+			if name == "" || name == "_" {
+				return
+			}
+			if _, ok := m[name]; !ok {
+				m[name] = def{kind: kind, where: sl}
+			}
+		}
+		for _, d := range file.Decls {
+			switch x := d.(type) {
+			case *ast.FuncDecl:
+				if x.Recv != nil && len(x.Recv.List) > 0 {
+					put(pkg, x.Name.Name, "method")
+				} else {
+					put(pkg, x.Name.Name, "func")
+				}
+				if x.Type.Params != nil {
+					for _, p := range x.Type.Params.List {
+						for _, id := range p.Names {
+							put(bound, id.Name, "param")
+						}
+					}
+				}
+				if x.Type.Results != nil {
+					for _, p := range x.Type.Results.List {
+						for _, id := range p.Names {
+							put(bound, id.Name, "result")
+						}
+					}
+				}
+			case *ast.GenDecl:
+				for _, sp := range x.Specs {
+					switch s := sp.(type) {
+					case *ast.TypeSpec:
+						put(pkg, s.Name.Name, "type")
+						if st, ok := s.Type.(*ast.StructType); ok {
+							for _, fl := range st.Fields.List {
+								for _, id := range fl.Names {
+									put(bound, id.Name, "field")
+								}
+							}
+						}
+						if it, ok := s.Type.(*ast.InterfaceType); ok {
+							for _, fl := range it.Methods.List {
+								for _, id := range fl.Names {
+									put(bound, id.Name, "iface-method")
+								}
+							}
+						}
+					case *ast.ValueSpec:
+						for _, id := range s.Names {
+							put(pkg, id.Name, strings.ToLower(x.Tok.String()))
+						}
+					}
+				}
+			}
+		}
+		ast.Inspect(file, func(node ast.Node) bool {
+			switch x := node.(type) {
+			case *ast.AssignStmt:
+				if x.Tok == token.DEFINE {
+					for _, l := range x.Lhs {
+						if id, ok := l.(*ast.Ident); ok {
+							put(bound, id.Name, "local")
+						}
+					}
+				}
+			case *ast.RangeStmt:
+				if x.Tok == token.DEFINE {
+					for _, e := range []ast.Expr{x.Key, x.Value} {
+						if id, ok := e.(*ast.Ident); ok {
+							put(bound, id.Name, "rangevar")
+						}
+					}
+				}
+			case *ast.DeclStmt:
+				if gd, ok := x.Decl.(*ast.GenDecl); ok {
+					for _, sp := range gd.Specs {
+						if vs, ok2 := sp.(*ast.ValueSpec); ok2 {
+							for _, id := range vs.Names {
+								put(bound, id.Name, "local-"+strings.ToLower(gd.Tok.String()))
+							}
+						}
+					}
+				}
+			case *ast.FuncLit:
+				if x.Type != nil && x.Type.Params != nil {
+					for _, p := range x.Type.Params.List {
+						for _, id := range p.Names {
+							put(bound, id.Name, "param")
+						}
+					}
+				}
+			}
+			return true
+		})
+	}
+	return n
+}
+
+// parsePkg returns the parsed files of the scanned package (comment scan needs the AST).
+func parsePkg(fset *token.FileSet, files []string, only string) []*ast.File {
+	var out []*ast.File
+	for _, f := range files {
+		if only != "" && filepath.Base(f) != only {
+			continue
+		}
+		file, err := parser.ParseFile(fset, f, nil, parser.ParseComments)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "PARSE_FAIL %s: %v\n", f, err)
+			continue
+		}
+		out = append(out, file)
+	}
+	return out
+}
+
+func main() {
+	pkgDir := flag.String("pkg", "internal/risk", "package dir whose COMMENT text is scanned")
+	rootsCSV := flag.String("roots", "internal,cmd,tools", "repo-wide definition roots")
+	only := flag.String("file", "", "restrict comment scan to this basename")
+	// Run this gauge INSIDE an exported tree (see build-tree.sh): the repo-wide roster is then
+	// pinned to one commit, and a stale or untracked copy of some other package on the shared
+	// working tree cannot quietly change the verdict of a name.
+	flag.Parse()
+
+	fset := token.NewFileSet()
+	pkgFiles := goFiles(*pkgDir)
+	var repoFiles []string
+	for _, r := range strings.Split(*rootsCSV, ",") {
+		repoFiles = append(repoFiles, goFiles(r)...)
+	}
+	pkgP, pkgB := map[string]def{}, map[string]def{}
+	repoP, repoB := map[string]def{}, map[string]def{}
+	pf := roster(fset, pkgFiles, pkgP, pkgB)
+	rf := roster(fset, repoFiles, repoP, repoB)
+
+	grade := func(name string) (verdict, kind, where string) {
+		if d, ok := pkgP[name]; ok {
+			return "GREEN-pkg", d.kind, d.where
+		}
+		if d, ok := pkgB[name]; ok {
+			return "GREEN-bound", d.kind, d.where
+		}
+		if d, ok := repoP[name]; ok {
+			return "RED-elsewhere", d.kind, d.where
+		}
+		if d, ok := repoB[name]; ok {
+			return "RED-elsewhere-bound", d.kind, d.where
+		}
+		return "RED-nowhere", "", ""
+	}
+
+	var out []cand
+	seen := map[string]bool{}
+	add := func(shape, name string, file string, line int) {
+		key := shape + "|" + name + "|" + file + "|" + fmt.Sprint(line)
+		if seen[key] {
+			return
+		}
+		seen[key] = true
+		v, k, w := grade(name)
+		out = append(out, cand{shape: shape, name: name, verdict: v, kind: k, where: w,
+			file: filepath.Base(file), line: line})
+	}
+
+	for _, file := range parsePkg(fset, pkgFiles, *only) {
+		for _, cg := range file.Comments {
+			for _, c := range cg.List {
+				line := fset.Position(c.Pos()).Line
+				path := fset.Position(c.Pos()).Filename
+				for _, m := range camelRe.FindAllString(c.Text, -1) {
+					add("SA", m, path, line)
+				}
+				for _, mm := range callRe.FindAllStringSubmatch(c.Text, -1) {
+					nm := mm[1]
+					if builtins[nm] || keywords[nm] || predecl[nm] {
+						k := "BEXCL|" + nm + "|" + path + "|" + fmt.Sprint(line)
+						if !seen[k] {
+							seen[k] = true
+							out = append(out, cand{shape: "BEXCL", name: nm, verdict: "builtin/keyword/predecl", file: filepath.Base(path), line: line})
+						}
+						continue
+					}
+					add("SB", nm, path, line)
+				}
+				for _, mm := range declRe.FindAllStringSubmatch(c.Text, -1) {
+					add("SC", mm[1], path, line)
+				}
+			}
+		}
+	}
+
+	sort.SliceStable(out, func(i, j int) bool {
+		a, b := out[i], out[j]
+		if a.verdict != b.verdict {
+			return a.verdict < b.verdict
+		}
+		if a.shape != b.shape {
+			return a.shape < b.shape
+		}
+		if a.file != b.file {
+			return a.file < b.file
+		}
+		if a.line != b.line {
+			return a.line < b.line
+		}
+		return a.name < b.name
+	})
+	fmt.Printf("# pkg=%s pkgfiles=%d(reparsed=%d) repofiles=%d pkgRoster=%d boundRoster=%d repoRoster=%d only=%q\n",
+		*pkgDir, len(pkgFiles), pf, len(repoFiles), len(pkgP), len(pkgB), len(repoP), *only)
+	for _, c := range out {
+		if c.verdict == "GREEN-pkg" || c.verdict == "GREEN-bound" {
+			continue
+		}
+		fmt.Printf("%-5s %-26s %-22s %-14s %-52s %s:%d\n",
+			c.verdict, c.shape, c.name, c.kind, c.where, c.file, c.line)
+	}
+	fmt.Println("# --- counters (rows above are all non-GREEN) ---")
+	for _, shape := range []string{"SA", "SB", "SC", "BEXCL"} {
+		tot, gp, gb, re, rn := 0, 0, 0, 0, 0
+		for _, c := range out {
+			if c.shape != shape {
+				continue
+			}
+			tot++
+			switch c.verdict {
+			case "GREEN-pkg":
+				gp++
+			case "GREEN-bound":
+				gb++
+			case "RED-elsewhere", "RED-elsewhere-bound":
+				re++
+			case "RED-nowhere":
+				rn++
+			}
+		}
+		fmt.Printf("shape=%-5s TOTAL=%-4d GREEN-pkg=%-4d GREEN-bound=%-4d RED-elsewhere=%-4d RED-nowhere=%d\n",
+			shape, tot, gp, gb, re, rn)
+	}
+}

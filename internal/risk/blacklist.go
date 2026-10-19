@@ -307,7 +307,7 @@ func anchorMatches(cand, anchor pathForms, rel func(p, dir string) bool) bool {
 }
 
 // aRuleReason is the ONE place an A-tier reason string is assembled (ticket 334
-// AC#1), and it reads nothing but the reason: fires()/aRelates above decided
+// AC#1), and it reads nothing but the reason: aEq/aUnder (via aRelates) above decided
 // the class, the tier and the overridability before this function is ever
 // called, and nothing here can move them (AC#2 pins that with a positive
 // control that goes red the moment someone relaxes the level).

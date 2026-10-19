@@ -1,0 +1,17 @@
+票 349 落地腿 349-r1·AC#1 第①枚＝blacklist.go:310 注释改准（只动注释行、可执行字节 0）
+
+现读该句断言的是"上面那两枚关系尺决定了 class／tier／overridability"。包内真身＝aEq／aUnder
+（两枚都 delegate 到 aRelates，见 blacklist.go:271／:273／:280），`fires()`＝包内⛔ 此符号
+（`git grep 'func .*fires' HEAD -- internal/risk`＝0 命中；`fires` 作标识符的真身在别包
+internal/config/unwired.go:54 那枚 struct 字段＝本包⛔ 引用它）。⇒ 旧裸名换成盘上真名
+`aEq/aUnder (via aRelates)`，⛔ 新增任何符号去让注释变真。
+
+尺（逐枚现跑，读数进 logs/01）：
+- 内容锚 before=1 → after=0；新锚 after=1（⛔ 用绝对行号落刀）
+- `git diff -U0` 本枚 `^[+-]` 行＝1 换 1，逐枚以 `//` 开头；非注释变化行＝0
+- 剥注释三把尺（GS1＝票 343 交付形／GS2＝第二独立形／GB＝本腿最严形＝只整行删注释行）
+  起手 blob 62f2dddb ⇄ 交件 blob 两侧同串＝注释改动结构上碰⛔ 到可执行字节
+- 文件行尾＝LF（CR 计数 0⇄0；本枚改后新行 86 字符 ≤ 本包注释面 100 形）
+
+写面＝internal/risk/blacklist.go 注释面＋.scratch/wisp/probes/349/r1/**（本笔）。
+⛔ push、⛔ 翻任何 AC 框、⛔ 改票名／Status／加 -done；⛔ internal/winsec（342-r1 独占写面）。
