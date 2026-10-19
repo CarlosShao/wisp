@@ -1,0 +1,19 @@
+### 尺一＝本腿名册（主题起头锚定行首＝票 342＋票 348 终裁腿 342-v2）
+MY_COMMITS=5
+-- 85be14c4 files=6 go_bytes=0
+-- bb35fe0f files=11 go_bytes=0
+-- 8e53f368 files=30 go_bytes=0
+-- 44c65a69 files=41 go_bytes=0
+-- 6e37a005 files=39 go_bytes=0
+### 尺二＝两枚判语件绝对路径＋字节＋行数
+/d/work/workspace/projects plans/Wisp/docs/evidence/s1/342-v2-verdict.md  bytes=11838 lines=38 CTA7=0
+/d/work/workspace/projects plans/Wisp/docs/evidence/s1/348-v1-verdict.md  bytes=10439 lines=20 CTA7=0
+### 写面件数／0 字节／.out
+FILES_342_v2=90 FILES_348_v1=34
+ZERO_BYTE=0 DOT_OUT=0
+### 尺三＝两票框终量（须＝起手：342 x=1 open=6 ⇄ 348 x=0 open=7）
+342-pr x=1 open=6 ls_tree_count=0
+348-re x=0 open=7 ls_tree_count=0
+### 跟踪件是否仍有未提交改动（须空）
+### HEAD
+85be14c4 票 342＋票 348 终裁腿 342-v2 第 5 笔＝三枚剥注�
