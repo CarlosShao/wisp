@@ -1,0 +1,13 @@
+=== 296-r2 跨腿可比性复量（当发真跑，23:1x）===
+起因＝另一枚写腿 342-r2 在我的读数之后落了 4f4f8419 ⇒ 我必须在最终 HEAD 上再验一次"我的读数是否仍可比"。
+1) 那笔越界尺 = git show --name-only 4f4f8419 → 只含 internal/winsec/ancestorwindow_342r2_windows_test.go
+   （一枚 *_test.go 仪器件；按公共块口径＝仪器件不进 cmd/wisp 导入图，编不动我的包）
+2) 产码 seed：git rev-parse HEAD:internal/winsec/winsec.go = 07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+   = 与本腿全部四发改前/改后 + 交件④那一发现跑的**同串** ⇒ internal/winsec 的产码字节在我整趟里没变过，
+     我的五发读数在同一颗 seed 上、彼此可比（本腿对 internal/winsec/** 零字节，也没撞见过点名它的红）
+3) 最终 HEAD（含 4f4f8419 ⇄ 我四笔）上复跑两把：
+   GOFLAGS= go build ./...                       rc=0  输出字节=0
+   -run 'Test296|Test258'（POSIX 前缀 PATH 形）  rc=1  RUN=13 PASS_TOP=8 FAIL_TOP=3 SKIP=2
+   = 与交件④的尺 G 逐字相同（同一枚台面：机主那枚活着的 build\wisp.exe 占着三枚默认组合键）
+结论＝本腿那枚注释（1d6b0cf9）在三笔之后的 HEAD 上仍然既没打红也没打绿；越界名册仍以 cmd/wisp/resident_windows.go
+⇄ .scratch/wisp/probes/296/r2/** ⇄ .scratch/wisp/issues/296-*.md 三处为限。⛔ push。
