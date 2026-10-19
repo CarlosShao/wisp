@@ -1,0 +1,7 @@
+final gate 4 — go vet ./internal/winsec/ on the SHARED working tree, run before the last commit of this batch.
+command (git-bash): unset GOTMPDIR TMPDIR TEMP TMP ; go vet ./internal/winsec/ > logs/f-4-vet.txt 2>&1 ; echo RC=$?
+RC=0. A clean `go vet` emits zero bytes by construction, so this file carries the reading as text rather
+than shipping a 0-byte artefact (dispatch: ⛔ 0 字节文件). Raw empty output stays on disk for rerun at
+D:\tmp\wisp\20261018\342v1\logs\f-4-vet.txt. Companion final gates in the same run: sh scripts/d22scan.sh
+rc=0 (f-2-d22scan.txt, "clean - no D22 ban violations") and sh scripts/check-path-length-budget.sh rc=0
+(f-3-length.txt, "VERDICT GREEN"). gate 1 is documented separately in f-1-gofumpt-face.txt.

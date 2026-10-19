@@ -1,0 +1,12 @@
+final gate 1 — gofumpt -l over the Go-object-bearing face only (shared working tree).
+command (git-bash): unset GOTMPDIR TMPDIR TEMP TMP ; PATH="/d/work/base/gopath/bin:$PATH" ;
+  gofumpt.exe -l .scratch/wisp/probes/342/v1 > logs/f-1-gofumpt-face.txt 2>&1 ; echo RC=$?
+RC=0. The tool printed NOTHING on a clean run, which is exactly zero bytes; this file carries the
+reading as text so the write face holds no 0-byte artefact (dispatch: ⛔ 0 字节文件). Raw empty output
+stays on disk for rerun at D:\tmp\wisp\20261018\342v1\logs\f-1-gofumpt-face.txt.
+Positive controls from the same invocation:
+  - gofumpt -l internal/winsec/winsec.go            => rc=0, empty output  (the ruler ran against a real Go file)
+  - gofumpt -l docs/evidence/s1/342-v1-verdict.md   => rc=2, "illegal character U+0023 '#'"
+    = TOOL MISAPPLICATION, not a red: gofumpt's scope is Go sources and a .md is not one. Booked in
+    docs/evidence/s1/342-v1-verdict.md as this leg's own gate misuse (same family as ticket 311's rc=2
+    range refusal) and ⛔ counted as a judgement reading. Raw bytes of that misuse: f-1-gofumpt-misuse-on-md.txt.
