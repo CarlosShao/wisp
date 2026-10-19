@@ -1,0 +1,9 @@
+第七枚放行动记档＝第八波放裁腿 227-v2（真实启动动作＝subagent d87c2441-38a1-4c13-99a9-127d951d1c04 已返 id）
+
+通道＝subagent（队友帽满）⇒ 收件尺＝两把锚并集（`票 227 二审裁腿 227-v2` ＋ `227-v2` 起头形，防它中途换形＝`A1045` 定式）；写面根＝`docs/evidence/s1/227-v2-verdict.md`＋`.scratch/wisp/probes/227/v2/**`＋票 227 尾一条 bullet。
+
+放腿前置（19:3x 现量，全在派单存档那把尺里）＝三键尺全清（两把锚各 0 笔、`probes/227/v2` 不存在、verdict 不存在；★正控＝同尺吃 `342-v2` 恰 8 笔＝尺灵）；车道＝在飞 0、脏跟踪 0、`go.exe` 0、CPU 19:2x 现采过；票 227 框＝4 勾／2 未勾（现量）。
+
+★这枚腿要结的东西＝票 227 唯一两格缺口（一审 227-v1 判"部分成立＝缺 `cmd/wisp` 整包那一发"）＋我具名交回的两枚未定性名字（`TestDirOfBaseOfCutOnThePlatformSeparator` ⇄ `cmd/wisp` 侧 `Test20r2JunctionRefusalIsNeverAskable`）。★我在派单里明写"编排者 `A1053` 那份读数⛔ 当你的凭据、自己重打，且红名册须与我的归类逐名作差"＋"我那发用的长 D 卷 `GOTMPDIR` 造出 17 枚台损＝短 `%LOCALAPPDATA%` 同卷形是硬要求"＝⛔ 让它把我的错读当基线，也⛔ 让它把我的台损当真红。
+
+★推送决定＝本窗⛔ 推（未推＝存档 1 枚＋本枚）：这枚腿正重打整包、含 `TestResolvePerCallBudget` 一类争用敏感枚，推送自起的本地 runner 会抢它 CPU＝我自己刚记过的"并发洗脏读数"那形，⛔ 再犯一次。它交件后推。
