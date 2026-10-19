@@ -1,0 +1,161 @@
+### 349-v1 剥注释结构尺（三把我自己的独立形，⛔ 抄编排者两串）
+### 生成 2026-10-19T14:04:49+08:00｜两侧一律 git cat-file blob（⛔ 读工作树副本）
+### 锚：7b633fa9（派单起手锚）／070de7fa（＝本腿第一枚改码笔 bf7f13bc 的父，我算的 base）／ed8db1ea（del）／HEAD
+HDR=9f4e4f693c25ac92331a822469cc3cac7d90bdb7
+### 7b633fa9 三枚 blob ⇄ 070de7fa 三枚 blob 是否同一（我的 base 锚 ⇄ 派单锚）
+blacklist  7b633fa9=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b  070de7fa=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+provenance  7b633fa9=d634aae0f1e31a33a6f155ee13912a05006273dd  070de7fa=d634aae0f1e31a33a6f155ee13912a05006273dd
+syncdirs  7b633fa9=7125b08a84211e51ed6ddbb68f1a2b625d03b8c3  070de7fa=7125b08a84211e51ed6ddbb68f1a2b625d03b8c3
+### 形GS-B（整文件状态机→删空白） 与 形GS-C（先删整行^//→再状态机→删空白）
+blacklist
+  GS-B  7b633fa9=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e
+  GS-B  HEAD    =9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e  IDENTICAL
+  GS-C  7b633fa9=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e
+  GS-C  HEAD    =9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e  IDENTICAL
+  noncomment_nonblank_lines 232 / 232
+provenance
+  GS-B  7b633fa9=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655
+  GS-B  HEAD    =d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655  IDENTICAL
+  GS-C  7b633fa9=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655
+  GS-C  HEAD    =d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655  IDENTICAL
+  noncomment_nonblank_lines 621 / 621
+syncdirs
+  GS-B  7b633fa9=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1
+  GS-B  HEAD    =c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1  IDENTICAL
+  GS-C  7b633fa9=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1
+  GS-C  HEAD    =c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1  IDENTICAL
+  noncomment_nonblank_lines 435 / 435
+### 第三形 GS-D＝只删整行注释、其余字节一字不动（cmp 级最严形）
+blacklist GS-D IDENTICAL sha=97796acc2690b59e6d9bf5857768377d6948ba560e992b884a93d4500b379bd3
+provenance GS-D IDENTICAL sha=851972c953d75415927d98fd29111f43006e5fab5bcbc6547362fc739ea82f41
+syncdirs GS-D IDENTICAL sha=68f2d7ccc6f9c805da94fd6ade8db81bd6f5ed080c1783ca5f80fdf615b9127d
+RC=0
+
+=== 同尺 GS-B／GS-C 跑 base⇄del（logs2/gs.txt）＋尺灵敏正控 ===
+FILE=blacklist.go
+  GS-B base=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e
+  GS-B del=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e
+  GS-B HEADnow=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e
+  GS-B base==del : IDENTICAL
+  GS-B del==HEAD : IDENTICAL
+  GS-C base=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e
+  GS-C del=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e
+  GS-C HEADnow=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e
+  GS-C base==del : IDENTICAL
+  GS-C del==HEAD : IDENTICAL
+  noncomment-nonblank-lines base=232 del=232 SAME
+FILE=provenance.go
+  GS-B base=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655
+  GS-B del=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655
+  GS-B HEADnow=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655
+  GS-B base==del : IDENTICAL
+  GS-B del==HEAD : IDENTICAL
+  GS-C base=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655
+  GS-C del=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655
+  GS-C HEADnow=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655
+  GS-C base==del : IDENTICAL
+  GS-C del==HEAD : IDENTICAL
+  noncomment-nonblank-lines base=621 del=621 SAME
+FILE=syncdirs.go
+  GS-B base=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1
+  GS-B del=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1
+  GS-B HEADnow=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1
+  GS-B base==del : IDENTICAL
+  GS-B del==HEAD : IDENTICAL
+  GS-C base=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1
+  GS-C del=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1
+  GS-C HEADnow=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1
+  GS-C base==del : IDENTICAL
+  GS-C del==HEAD : IDENTICAL
+  noncomment-nonblank-lines base=435 del=435 SAME
+--- positive control: GS-B must DIFFER if I inject a code change (sanity of the ruler) ---
+045df79f457fd005
+--- and must NOT differ if I only change a comment (proof ruler is comment-blind) ---
+9de81d0d20c9420a
+RC=0
+
+=== GS-E＝第五形（go/parser＋go/printer AST 尺，剥 File.Comments 与全部 Doc/Comment 后重新打印）===
+BUILD_RC=0
+--- anchor 7b633fa9 ---
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/7b633fa9/blacklist.go sha256=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e codelen=6164 comments_dropped=29
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/7b633fa9/provenance.go sha256=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655 codelen=12815 comments_dropped=103
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/7b633fa9/syncdirs.go sha256=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1 codelen=9586 comments_dropped=58
+--- anchor 070de7fa ---
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/070de7fa/blacklist.go sha256=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e codelen=6164 comments_dropped=29
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/070de7fa/provenance.go sha256=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655 codelen=12815 comments_dropped=103
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/070de7fa/syncdirs.go sha256=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1 codelen=9586 comments_dropped=58
+--- anchor ed8db1ea ---
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/ed8db1ea/blacklist.go sha256=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e codelen=6164 comments_dropped=29
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/ed8db1ea/provenance.go sha256=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655 codelen=12815 comments_dropped=103
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/ed8db1ea/syncdirs.go sha256=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1 codelen=9586 comments_dropped=58
+--- anchor HEAD ---
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/HEAD/blacklist.go sha256=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e codelen=6164 comments_dropped=29
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/HEAD/provenance.go sha256=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655 codelen=12815 comments_dropped=103
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/HEAD/syncdirs.go sha256=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1 codelen=9586 comments_dropped=58
+### GS-E 作差：7b633fa9 ⇄ HEAD（blob 取数、AST 尺）
+blacklist sha256=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e sha256=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e IDENTICAL
+provenance sha256=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655 sha256=d3c64f86a840a4663855237350eeed05451df53405f893b2716cc785878b2655 IDENTICAL
+syncdirs sha256=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1 sha256=c6bdd86a808a1ed6d97c4bf6a0e72d49f9f352b2c171716a6f849f38bde3c5a1 IDENTICAL
+### 尺灵敏正控：注一枚可执行改动（package 名）后 GS-E 必变；注一枚注释改动后 GS-E 必不变
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/CTRL-code.go sha256=bcdab3913207533af6e934d2a65b48d506e4297520c978404c0abe13625f9bbb codelen=6165 comments_dropped=29
+GS_E file=D:/tmp/wisp/20261019/349v1/gse/CTRL-comment.go sha256=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e codelen=6164 comments_dropped=29
+RC=0
+
+=== 两把文本形在此面等价的形状凭据（整行注释⇄行尾注释⇄原始字面量⇄块注释计数）===
+### 行尾注释（代码后跟 //）枚数（非整行注释面）
+blacklist wholeline=142 nonwholeline_with_dslashslash=5
+provenance wholeline=439 nonwholeline_with_dslashslash=25
+syncdirs wholeline=190 nonwholeline_with_dslashslash=16
+### 原始字面量内部有没有整行 //（＝两形会分叉的地方）
+blacklist rawstring_line_comment=0
+provenance rawstring_line_comment=0
+syncdirs rawstring_line_comment=0
+### 三枚文件里 ` 出现行数（奇偶＝是否闭合）
+blacklist backtick_lines=16
+provenance backtick_lines=11
+syncdirs backtick_lines=27
+RC=0
+
+=== CRLF⇄LF（本腿全程 blob 的理由）===
+--- CR count check: disk vs blob for provenance.go ---
+BLOB_CR=0
+BLOB_LF=1115
+DISK_CR=1115
+DISK_LF=1115
+RC=0
+
+=== git diff -U0 base⇄del 逐字（四枚改动＋非注释行判定）===
+=== git diff -U0 BASE..LEG for internal/risk (verbatim) ===
+diff --git a/internal/risk/blacklist.go b/internal/risk/blacklist.go
+index 62f2dddb..964ee75a 100644
+--- a/internal/risk/blacklist.go
++++ b/internal/risk/blacklist.go
+@@ -310 +310 @@ func anchorMatches(cand, anchor pathForms, rel func(p, dir string) bool) bool {
+-// AC#1), and it reads nothing but the reason: fires()/aRelates above decided
++// AC#1), and it reads nothing but the reason: aEq/aUnder (via aRelates) above decided
+diff --git a/internal/risk/provenance.go b/internal/risk/provenance.go
+index d634aae0..eff984f8 100644
+--- a/internal/risk/provenance.go
++++ b/internal/risk/provenance.go
+@@ -54 +54 @@ import (
+-// assessor.WithTaintDetector(prov.Detector(taskScopeID)) yields the
++// assessor.WithTaintDetector(prov.Detector(scopeID)) yields the
+@@ -427 +427 @@ func (s *Scope) ID() string {
+-// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
++// the task's internal/plugin.DisposalScope deferring this closure — the handle, not the id,
+diff --git a/internal/risk/syncdirs.go b/internal/risk/syncdirs.go
+index 7125b08a..8dfe1860 100644
+--- a/internal/risk/syncdirs.go
++++ b/internal/risk/syncdirs.go
+@@ -453 +453 @@ func (s *syncSet) match(rawPath string) SyncStatus {
+-// is reported via Complete()==false, not as a root.
++// is reported via SyncDetectionComplete()==false, not as a root.
+=== numstat ===
+1	1	internal/risk/blacklist.go
+2	2	internal/risk/provenance.go
+1	1	internal/risk/syncdirs.go
+=== every ^[+-] line classified: starts-with-// after leading +/- ? ===
+DIFFLINE_TOTAL=8 NONCOMMENTLINE=0
+--- the non-comment ones (should be none) ---
+NONE
+RC=0

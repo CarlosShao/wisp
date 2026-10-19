@@ -1,0 +1,97 @@
+### 349-v1 WINDOWS QUADRANT start 2026-10-19T13:21:45+08:00
+### anchors: base=070de7fa(349-r1 起手前最后一笔) del=ed8db1ea(349-r1 第 7 笔交件)
+### tag=dmg-base tree=/d/tmp/wisp/20261019/349v1/treeBase GOTMPDIR=/d/tmp/wisp/20261019/349v1/gtDmg/base
+rc=1
+RUN=247
+PASS_TOP=136
+FAIL_TOP=5
+SKIP=1
+-- 台损关键词具名 --
+71:    anchor_miss_reason_334_test.go:169: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "d:\\tmp\\wisp\\20261019\\349v1\\gtdmg\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le3792493260\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "d:\\tmp\\wisp\\20261019\\349v1\\gtdmg\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le3792493260\\001\\profile\\work") and the anchor "d:\\tmp\\wisp\\20261019\\349v1\\gtdmg\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le3792493260\\001\\profile\\.aws\\credentials" is not installed here (its expansion stopped at "d:\\tmp\\wisp\\20261019\\349v1\\gtdmg\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le3792493260\\001\\profile"), so R17 protects the ancestry chain the two share instead of proving a miss
+79:    anchor_miss_reason_334_test.go:230: SHAPE-READING334 inside-profile=class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtdmg\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl2702033400\\\\001\\\\profile\\\\work\\\\id_ed25519已允许\\x1b\\u202e\" is not proven handle-expanded (its own walk stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtdmg\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl2702033400\\\\001\\\\profile\\\\work\") and the anchor \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtdmg\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl2702033400\\\\001\\\\profile\\\\.aws\\\\credentials\" is not installed here (its expansion stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtdmg\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl2702033400\\\\001\\\\profile\"), so R17 protects the ancestry chain the two share instead of proving a miss" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+438:    syncdirs_ancestor_reparse_ticket105_windows_test.go:59: mklink /J D:\tmp\wisp\20261019\349v1\gtDmg\base\TestSyncAncestorLegReResolvesThroughJunctionToRealTree2656521160\002\proj D:/tmp/wisp/20261019/349v1/gtDmg/base\TestSyncAncestorLegReResolvesThroughJunctionToRealTree2656521160\001 failed: exit status 1: Invalid switch - "tmp".
+441:    syncdirs_ancestor_reparse_ticket105_windows_test.go:116: mklink /J D:\tmp\wisp\20261019\349v1\gtDmg\base\TestSyncAncestorLegNotExemptedStaysFailClosed3456484629\002\proj D:/tmp/wisp/20261019/349v1/gtDmg/base\TestSyncAncestorLegNotExemptedStaysFailClosed3456484629\001 failed: exit status 1: Invalid switch - "tmp".
+-- 红名册逐名 --
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+TestSyncAncestorLegNotExemptedStaysFailClosed
+TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+-- TestResolvePerCallBudget 行 --
+--- PASS: TestResolvePerCallBudget (1.24s)
+-- bytes --
+42600 /d/tmp/wisp/20261019/349v1/logsQ/dmg-base.log
+
+### tag=dmg-del tree=/d/tmp/wisp/20261019/349v1/treeDel GOTMPDIR=/d/tmp/wisp/20261019/349v1/gtDmg/del
+rc=1
+RUN=247
+PASS_TOP=136
+FAIL_TOP=5
+SKIP=1
+-- 台损关键词具名 --
+71:    anchor_miss_reason_334_test.go:169: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "d:\\tmp\\wisp\\20261019\\349v1\\gtdmg\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le1206424001\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "d:\\tmp\\wisp\\20261019\\349v1\\gtdmg\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le1206424001\\001\\profile\\work") and the anchor "d:\\tmp\\wisp\\20261019\\349v1\\gtdmg\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le1206424001\\001\\profile\\.aws\\credentials" is not installed here (its expansion stopped at "d:\\tmp\\wisp\\20261019\\349v1\\gtdmg\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le1206424001\\001\\profile"), so R17 protects the ancestry chain the two share instead of proving a miss
+79:    anchor_miss_reason_334_test.go:230: SHAPE-READING334 inside-profile=class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtdmg\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl2989961001\\\\001\\\\profile\\\\work\\\\id_ed25519已允许\\x1b\\u202e\" is not proven handle-expanded (its own walk stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtdmg\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl2989961001\\\\001\\\\profile\\\\work\") and the anchor \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtdmg\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl2989961001\\\\001\\\\profile\\\\.aws\\\\credentials\" is not installed here (its expansion stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtdmg\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl2989961001\\\\001\\\\profile\"), so R17 protects the ancestry chain the two share instead of proving a miss" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+438:    syncdirs_ancestor_reparse_ticket105_windows_test.go:59: mklink /J D:\tmp\wisp\20261019\349v1\gtDmg\del\TestSyncAncestorLegReResolvesThroughJunctionToRealTree2058620061\002\proj D:/tmp/wisp/20261019/349v1/gtDmg/del\TestSyncAncestorLegReResolvesThroughJunctionToRealTree2058620061\001 failed: exit status 1: Invalid switch - "tmp".
+441:    syncdirs_ancestor_reparse_ticket105_windows_test.go:116: mklink /J D:\tmp\wisp\20261019\349v1\gtDmg\del\TestSyncAncestorLegNotExemptedStaysFailClosed1544820477\002\proj D:/tmp/wisp/20261019/349v1/gtDmg/del\TestSyncAncestorLegNotExemptedStaysFailClosed1544820477\001 failed: exit status 1: Invalid switch - "tmp".
+-- 红名册逐名 --
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+TestSyncAncestorLegNotExemptedStaysFailClosed
+TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+-- TestResolvePerCallBudget 行 --
+--- PASS: TestResolvePerCallBudget (1.22s)
+-- bytes --
+42570 /d/tmp/wisp/20261019/349v1/logsQ/dmg-del.log
+
+### tag=clean-base tree=/d/tmp/wisp/20261019/349v1/treeBase GOTMPDIR=D:\tmp\wisp\20261019\349v1\gtClean\base
+rc=1
+RUN=247
+PASS_TOP=140
+FAIL_TOP=1
+SKIP=1
+-- 台损关键词具名 --
+71:    anchor_miss_reason_334_test.go:169: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "d:\\tmp\\wisp\\20261019\\349v1\\gtclean\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2469052978\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "d:\\tmp\\wisp\\20261019\\349v1\\gtclean\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2469052978\\001\\profile\\work") and the anchor "d:\\tmp\\wisp\\20261019\\349v1\\gtclean\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2469052978\\001\\profile\\.aws\\credentials" is not installed here (its expansion stopped at "d:\\tmp\\wisp\\20261019\\349v1\\gtclean\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2469052978\\001\\profile"), so R17 protects the ancestry chain the two share instead of proving a miss
+79:    anchor_miss_reason_334_test.go:230: SHAPE-READING334 inside-profile=class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtclean\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl22430369793\\\\001\\\\profile\\\\work\\\\id_ed25519已允许\\x1b\\u202e\" is not proven handle-expanded (its own walk stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtclean\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl22430369793\\\\001\\\\profile\\\\work\") and the anchor \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtclean\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl22430369793\\\\001\\\\profile\\\\.aws\\\\credentials\" is not installed here (its expansion stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtclean\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl22430369793\\\\001\\\\profile\"), so R17 protects the ancestry chain the two share instead of proving a miss" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+-- 红名册逐名 --
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+-- TestResolvePerCallBudget 行 --
+--- PASS: TestResolvePerCallBudget (1.27s)
+-- bytes --
+42216 /d/tmp/wisp/20261019/349v1/logsQ/clean-base.log
+
+### tag=clean-del tree=/d/tmp/wisp/20261019/349v1/treeDel GOTMPDIR=D:\tmp\wisp\20261019\349v1\gtClean\del
+rc=1
+RUN=247
+PASS_TOP=140
+FAIL_TOP=1
+SKIP=1
+-- 台损关键词具名 --
+71:    anchor_miss_reason_334_test.go:169: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "d:\\tmp\\wisp\\20261019\\349v1\\gtclean\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le996265264\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "d:\\tmp\\wisp\\20261019\\349v1\\gtclean\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le996265264\\001\\profile\\work") and the anchor "d:\\tmp\\wisp\\20261019\\349v1\\gtclean\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le996265264\\001\\profile\\.aws\\credentials" is not installed here (its expansion stopped at "d:\\tmp\\wisp\\20261019\\349v1\\gtclean\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le996265264\\001\\profile"), so R17 protects the ancestry chain the two share instead of proving a miss
+79:    anchor_miss_reason_334_test.go:230: SHAPE-READING334 inside-profile=class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtclean\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl24063753443\\\\001\\\\profile\\\\work\\\\id_ed25519已允许\\x1b\\u202e\" is not proven handle-expanded (its own walk stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtclean\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl24063753443\\\\001\\\\profile\\\\work\") and the anchor \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtclean\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl24063753443\\\\001\\\\profile\\\\.aws\\\\credentials\" is not installed here (its expansion stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349v1\\\\gtclean\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl24063753443\\\\001\\\\profile\"), so R17 protects the ancestry chain the two share instead of proving a miss" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+-- 红名册逐名 --
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+-- TestResolvePerCallBudget 行 --
+--- PASS: TestResolvePerCallBudget (1.20s)
+-- bytes --
+42191 /d/tmp/wisp/20261019/349v1/logsQ/clean-del.log
+
+### === QUADRANT REDSET DIFFS ===
+-- symdiff dmg-base ⇄ dmg-del --
+-- symdiff clean-base ⇄ clean-del --
+-- symdiff dmg-base ⇄ clean-base --
+TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+TestSyncAncestorLegNotExemptedStaysFailClosed
+TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+-- symdiff dmg-del ⇄ clean-del --
+TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+TestSyncAncestorLegNotExemptedStaysFailClosed
+TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+### counts matrix
+dmg-base RUN=247 PASS=136 FAIL=5 SKIP=1
+dmg-del RUN=247 PASS=136 FAIL=5 SKIP=1
+clean-base RUN=247 PASS=140 FAIL=1 SKIP=1
+clean-del RUN=247 PASS=140 FAIL=1 SKIP=1
+### QUADRANT_DONE 2026-10-19T13:22:05+08:00

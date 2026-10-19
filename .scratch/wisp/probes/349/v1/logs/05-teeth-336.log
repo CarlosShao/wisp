@@ -1,0 +1,49 @@
+### 349-v1 复打票 336 那 8 枚牙（台件一字⛔ 动＝blob 454da3ee 与 336-v1 交付锚 c315fa4c 同值；env 指我自己的 treeDel＝交件锚 ed8db1ea）
+== step 0: 台件存在性＋未动凭据 ==
+台件 blob at HEAD      = 454da3ee5feabf39cb63ef1bea95178e8ea2c432
+台件 blob at c315fa4c  = 454da3ee5feabf39cb63ef1bea95178e8ea2c432
+== step 1: 锚⇄树 blob 对撞 ==
+ANCHOR(ed8db1ea) blacklist.go blob=964ee75a4befc7a51424f409a95745296e369da3
+treeDel blacklist.go hash-object=964ee75a4befc7a51424f409a95745296e369da3
+== step 2: 跑台件（POSIX 形 GOTMP） ==
+### AC#2 sweep: anchor=ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc pristine=964ee75a4befc7a51424f409a95745296e369da3 tree=D:/tmp/wisp/20261019/349v1/treeDel
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [start]
+### paired positive control (UNMUTATED bytes)
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [after-pristine]
+### MU-1a
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [after-MU-1a]
+### MU-1b
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [after-MU-1b]
+### MU-1c
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [after-MU-1c]
+### MU-1d
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [after-MU-1d]
+### MU-1e
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [after-MU-1e]
+### MU-1f
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [after-MU-1f]
+### MU-1g
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [after-MU-1g]
+### MU-1h
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [after-MU-1h]
+### final state
+  hash=964ee75a4befc7a51424f409a95745296e369da3 expected=964ee75a4befc7a51424f409a95745296e369da3 match=YES  [final]
+### red roster, teeth legs, per mutation (names only)
+MU-1a teeth_red=2 leg_red=0
+MU-1b teeth_red=2 leg_red=0
+MU-1c teeth_red=3 leg_red=0
+MU-1d teeth_red=2 leg_red=0
+MU-1e teeth_red=2 leg_red=2
+MU-1f teeth_red=2 leg_red=2
+MU-1g teeth_red=2 leg_red=0
+MU-1h teeth_red=2 leg_red=0
+ac2_sweep_rc=0
+SWEEP_RC=0

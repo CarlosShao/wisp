@@ -1,0 +1,28 @@
+### 349-v1 Linux pair (串行: base 先、del 后) 2026-10-19T13:36:35+08:00
+tree=/d/tmp/wisp/20261019/349v1/treeBase label=base modcache=D:\work\base\gopath\pkg\mod
+== label=base bytes=32306 ==
+RUN=195
+PASS_TOP=115
+FAIL_TOP=1
+SKIP=1
+-- 红名册 --
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (2.28s)
+-- 台面故障名册 --
+none
+tree=/d/tmp/wisp/20261019/349v1/treeDel label=del modcache=D:\work\base\gopath\pkg\mod
+== label=del bytes=32304 ==
+RUN=195
+PASS_TOP=115
+FAIL_TOP=1
+SKIP=1
+-- 红名册 --
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (2.72s)
+-- 台面故障名册 --
+none
+### 红名册逐名作差
+  1 /d/tmp/wisp/20261019/349v1/logsLin/lin-red-base.txt
+  1 /d/tmp/wisp/20261019/349v1/logsLin/lin-red-del.txt
+  2 total
+-- only in base --
+-- only in del (want empty) --
+### LIN_DONE 2026-10-19T13:37:38+08:00

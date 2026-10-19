@@ -1,0 +1,65 @@
+### 349-v1 交件侧四枚死名＝精确形（词边界／调用形），⛔ 裸子串；每枚带正控
+######## PRECISION SHAPES ON DELIVERED SIDE (blob tree, git grep -E word-boundary) ########
+--- 1) bare Complete() call shape: exact token with word boundaries ---
+REV=070de7fa1b38b5c5d52445564c7ae19d1a73d6bd CompleteCallExact=1
+REV=ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc CompleteCallExact=0
+--- 1b) positive control: SyncDetectionComplete present (should be >0) ---
+SYNCDETECTIONCOMPLETE_del=11
+SYNCDETECTIONCOMPLETE_lines_del=26
+--- 1c) the BAD ruler (bare substring Complete) for contrast: how many hits ---
+BARESUBSTR_base=27 del=27
+--- 2) fires() exact call shape ---
+REV=070de7fa1b38b5c5d52445564c7ae19d1a73d6bd firesCallExact=1
+REV=ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc firesCallExact=0
+--- 2b) positive control: bare substring fires (nonzero) ---
+FIRES_BARESUBSTR_del=3
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/anchor_fallback_teeth_336_windows_test.go:47:// it, so the case never fires - that half reads from <APPDATA>\Roaming; the aEq half
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/provenance_test.go:919:	// ...and the gate still fires on the victim's own next call.
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:191:	// 3. Re-resolving THAT ancestor is where the account fires. Nothing above
+--- 3) taskScopeID exact word ---
+REV=070de7fa1b38b5c5d52445564c7ae19d1a73d6bd taskScopeID=1
+REV=ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc taskScopeID=0
+--- 3b) positive control scopeID present ---
+SCOPEID_del_lines=34
+--- 4) disposalScope exact word ---
+REV=070de7fa1b38b5c5d52445564c7ae19d1a73d6bd disposalScope=1
+REV=ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc disposalScope=0
+--- 4b) positive control DisposalScope (real type, other pkg) whole-repo ---
+DISPOSALSCOPE_repo_lines=50
+RC=0
+--- 定义形缺席（AC#2＝⛔ 新增符号去让注释变真）---
+### 1. AC#2：⛔ 新增符号去让注释变真 —— 交件侧三枚死名的"定义形"计数（应 0）
+defshape func .*fires     base=0 del=0
+defshape taskScopeID      base=1 del=0
+defshape disposalScope    base=1 del=0
+funcDefinitionOfTheFour base=0 del=0
+### 2. SYM 按 file:line+NAME 作差（base-only 应＝四枚真残留相关行、del-only 应 0）
+--- 改准后的名字逐枚现验＝都指向盘上真身（blob 取数）---
+### where does package-level "Complete" exist module-wide? (explains the one MODHIT)
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/agent/approval/gate.go:389:func (g *Gate) Complete(corr string) {
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/agent/approval/report.go:91:func (b bus) Complete(corr string) { b.g.Complete(corr) }
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/agent/approval/report.go:193:func (b toolsBus) Complete(corr string) { b.g.Bus().Complete(corr) }
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/tools/fs_write_test.go:755:func (f *fakeBus) Complete(corr string) {
+### and in the whole tree incl vendor-ish dirs:
+### SyncDetectionComplete declaration (the true name) at LEG:
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/syncdirs.go:453:// is reported via SyncDetectionComplete()==false, not as a root.
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/syncdirs.go:467:// SyncDetectionComplete reports whether a CONFIRMED sync location (env var,
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/syncdirs.go:472:func (p *Provenance) SyncDetectionComplete() bool {
+### the exact delivered comment lines at LEG (4 items):
+// AC#1), and it reads nothing but the reason: aEq/aUnder (via aRelates) above decided
+// is reported via SyncDetectionComplete()==false, not as a root.
+// assessor.WithTaintDetector(prov.Detector(scopeID)) yields the
+// the task's internal/plugin.DisposalScope deferring this closure — the handle, not the id,
+### do the new names in those comments actually exist? (truth check of AC#1)
+-- aEq / aUnder / aRelates in blacklist.go --
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/blacklist.go:193:// provably expanded fails CLOSED: aEq / aUnder delegate to aRelates, which
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/blacklist.go:223:	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.git-credentials
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/blacklist.go:227:	case aUnder(cand, anchorForms(anchorPath(appDataS, `wisp`))) &&
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/blacklist.go:228:		aEq(cand, anchorForms(anchorPath(appDataS, `wisp`, `config.toml`))):
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/blacklist.go:230:	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/blacklist.go:232:	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.aws`, `credenti
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/risk/blacklist.go:234:	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`
+-- internal/plugin DisposalScope + Defer --
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/plugin/disposal.go:129:type DisposalScope struct {
+ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc:internal/plugin/disposal.go:186:func (s *DisposalScope) Defer(fn func()) bool {
+RC=0
