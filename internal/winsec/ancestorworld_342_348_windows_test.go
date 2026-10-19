@@ -166,8 +166,17 @@ func newWinAncWorld342r1(t *testing.T, form string) *winAncWorld342r1 {
 	w.name = filepath.Join(w.sub, winAncLeaf342r1)
 	w.foreign = filepath.Join(w.base, winAncOutside342r1)
 	w.witness = filepath.Join(w.foreign, winAncLeaf342r1)
-	w.parkReal = filepath.Join(w.base, "parked-real-sub")
-	w.staged = filepath.Join(w.base, "staged-flip")
+	w.parkReal = filepath.Join(w.data, "parked-real-sub")
+	// The staged name lives IN THE DIRECTORY THE FLIP LANDS IN, because a relative reparse target is
+	// resolved against the directory that CONTAINS the link: staged at `<base>` and renamed into `data`
+	// would leave the target pointing at something the link's own directory cannot reach. (The junction
+	// form carries an ABSOLUTE substitute name, so it does not care - which is precisely why containment
+	// refuses that one and not this one.)
+	if w.form == winAncFormLeafSym {
+		w.staged = filepath.Join(w.sub, "staged-leaf-flip")
+	} else {
+		w.staged = filepath.Join(w.data, "staged-anc-flip")
+	}
 	for _, d := range []string{w.data, w.sub, w.foreign} {
 		if err := os.MkdirAll(d, 0o700); err != nil {
 			t.Fatalf("stage %s: %v", d, err)
@@ -239,10 +248,16 @@ func (w *winAncWorld342r1) stageFlip() error {
 		if err != nil {
 			return fmt.Errorf("mklink /J: %v (%s)", err, strings.TrimSpace(out))
 		}
-	case winAncFormSymDir, winAncFormLeafSym:
-		// A RELATIVE target: the whole point of these two forms is that containment does not refuse
-		// them, so the answer has to come from the identity gate or the leaf re-check (see the header).
+	case winAncFormSymDir:
+		// A RELATIVE target, resolved against the directory the link ends up in (`data`), so it lands on
+		// the foreign tree INSIDE the volume root the chain descends from: containment does not refuse
+		// it, so the answer has to come from the identity gate.
 		if err := os.Symlink(filepath.Join("..", winAncOutside342r1), w.staged); err != nil {
+			return err
+		}
+	case winAncFormLeafSym:
+		// Same rule, one level deeper: this link ends up inside `sub`, so the target is two steps up.
+		if err := os.Symlink(filepath.Join("..", "..", winAncOutside342r1), w.staged); err != nil {
 			return err
 		}
 	}
@@ -252,13 +267,26 @@ func (w *winAncWorld342r1) stageFlip() error {
 	return nil
 }
 
+// toReal lands the ordinary state for THIS form. It is form-aware on purpose: the ancestor forms flip
+// `sub` itself, while the leaf form keeps `sub` real and flips only the leaf name - so asking the leaf
+// form to remove `sub` would fail ENOTEMPTY (a directory holding a link) and the first settle would
+// end the run with a bench fault instead of a reading.
 func (w *winAncWorld342r1) toReal() error {
+	if w.form == winAncFormLeafSym {
+		if err := removeWinAnc(w.name); err != nil {
+			return err
+		}
+		if err := os.MkdirAll(w.sub, 0o700); err != nil {
+			return err
+		}
+		return os.WriteFile(w.name, []byte(winAncOwnBody342r1), 0o600)
+	}
 	if err := removeWinAnc(w.sub); err != nil {
 		return err
 	}
 	if _, err := os.Lstat(w.parkReal); err != nil {
-		// The parked directory is the caller's own object; if a previous settle already put it back,
-		// re-create the real state rather than rename a ghost.
+		// Nothing parked (a first settle, or a previous settle that already rebuilt the real state):
+		// re-create it rather than rename a ghost.
 		if err := os.MkdirAll(w.sub, 0o700); err != nil {
 			return err
 		}
