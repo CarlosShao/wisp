@@ -1,0 +1,28 @@
+票 349 落地腿专属（四枚逐枚＋必答＋帽）
+
+## 四枚逐枚改准（AC#1＝主格；每枚＝改注释一行、⛔ 动可执行字节）
+- `fires()`（`blacklist.go:310`）：现读该句在断言什么 ⇒ 改成**带条件事实句**（他包真身＝`internal/config/unwired.go:54` 字段 ⇒ 若要指它，全包路径点名；若那句其实指"某个会触发的东西"、⛔ 一枚叫 `fires` 的包内符号 ⇒ 改成不点名不存在符号的形）。
+- `Complete`（`syncdirs.go:453` 写 `Complete()==false`）：真名＝`SyncDetectionComplete:472` ⇒ 改成真名（或"该方法"）。★这枚纯小写、只有调用形尺抓得到＝票面 `AC#0` 三形尺的现场样本。
+- `taskScopeID`（`provenance.go:54`）／`disposalScope`（`provenance.go:427`）：现读上下文＋`git log -S` 追是否历史改名/删；多半改成"当时那个东西／历史名"的形，⛔ 保留指向不存在符号的裸名。
+★每枚完成判据＝交件侧那枚名字在 `internal/risk` 里命中要么 0、要么只剩"已说明它不是包内符号"的注释；＋`git diff -U0` 该枚改动行逐枚 `//` 开头。
+
+## 必答（⛔ 你盖章不算，我逐条复跑）
+(i) 四枚各自：起手 blob ⇄ 交件 blob **剥注释后 sha256 逐枚相同**（贴你算的两两串＋行数）。
+(ii) `AC#0` 那把"同族还有几枚"三形尺的**全 `internal/risk` 终数**（⛔ 只交票面那四枚＝抓到一枚⛔ 同族只有这一枚＝票 334/343 教训）；命中逐枚 `file:line`，0 命中带正控。
+(iii) `AC#3`：通用仪器该不该上＝你独立跑一把给结论（`343-v1` 已量 50%／67%／放宽即 142 枚红）；⛔ 造门。
+(iv) `git diff --numstat` 逐枚＝对三枚产码文件的可执行行变化**必须 0**；只 `blacklist.go`/`provenance.go`/`syncdirs.go` 三枚被动、⛔ 第四枚文件。
+
+## 颜色（AC#4）
+`./internal/risk/` 成对（起手锚仓外导出树 ⇄ 交件、同一台面、`-count=1 -timeout 30m`、四数⛔ 混用⛔ 相减、红名册逐名作差）；★唯一合法红＝`TestC26Rewrite…` 存量（`A380`／票 200／216）；`TestResolvePerCallBudget` 争用假红安静复量 3 发。★同波 `342-r1` 在算 `internal/winsec`＝CPU 争用比平时真 ⇒ 读数被漂就复量、⛔ 记成你的错。门禁四数只在共享树、跑前 `unset GOTMPDIR TMPDIR TEMP TMP`（票 311 shape B GUARD＝rc=2 射程拒绝⛔ 读成红）。⛔ `./cmd/wisp` 整包、⛔ `go test ./...`。
+
+## 帽／节奏
+每落一枚就 commit（枚数帽 4–8＝参考值⛔ 判据）；150 轮帽＝真的：先做 AC#1 四枚改准＋命门那把结构尺（判据最硬），logs 逐枚提前入库；到帽前把最新状态 commit＋票尾一条 bullet 落盘。正文件 ≤4 枚、每件 ≤160 行（★该帽⛔ 外推到产码/测试件、更⛔ 为凑帽压注释）。★⛔ 用 `.out`（`.gitignore` 有全仓 `*.out`＝静默跳过、件根本没进 commit＝票 275 那枚腿自抓）。
+
+## Git／shell（★全是你这条腿容易栽的，公共块有全文）
+- `add`／`commit` 两处 pathspec 逐枚手写字面路径；★**新文件必须先 `git add` 才能进 commit pathspec**（未跟踪件写进 pathspec＝"did not match any file"、整笔 rc=128 中止、⛔ 副作用＝编排者今天栽过两次＝`A1042`／`A1046`）；⛔ `add -A`／`commit -- .`／从共享 index 反推；⛔ `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`。
+- 中文正文 Write 成文件再 `git commit -F`、★`-F` 路径**必须 Windows 形 `D:\tmp\...`**（⛔ bash 形 `/d/...`＝pwsh 里 git 读不到）。here-doc 若用＝`<<'EOF'` 单引号＋终止符独占一行、⛔ 用 `>` 重定向中文（乱码散件就这么造的）。★改文件的脚本⛔ 并行跑（幂等守门也⛔  substitute 串行复尺）。
+- 取脚本退码＝重定向到文件＋`echo RC=$?` 紧跟裸命令（⛔ 管进 `tail`、⛔ 在 pwsh 内联写 `$?`）。
+- 提交后现跑 `git log -1`＋`git status` 对回再报"已提交"；⛔ 拿"命令没报错"当已落库。
+
+## 交件自证（三把尺）
+① 逐枚提交号＋逐枚 `git show --name-only` ⇒ ⊆ 写面、`.go` 命中恰 3（那三枚注释面件）、越界 0；② 证据件绝对路径＋`wc -c`＋行数＋占位符尺 0 命中（正控非零）＋逐枚非 0 字节＋U+00A7 命中 0（正控 `HANDOVER.md` 非零）；③ 决定性逐字（起手⇄交件、带 `file:line`）＝四枚剥注释两侧同串＋成对四数两平台＋8 枚牙逐名红册＋还原哈希＋门禁 `rc=`＋票框终量尺（七格一枚没翻）。⛔ push、⛔ 翻框、⛔ 改票名／`Status:`／加 `-done`。

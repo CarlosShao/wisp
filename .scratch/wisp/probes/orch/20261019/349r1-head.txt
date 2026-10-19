@@ -1,0 +1,26 @@
+派单＝票 349 落地腿 349-r1（写腿·注释面）｜编排者＝新任 harness｜发出 2026-10-19 11:3x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 你是谁
+你是票 **349** 的落地腿（实现者·注释面）。票面＝`.scratch/wisp/issues/349-blacklist-provenance-comments-name-undefined-symbols-fires-taskscope-cleanup.md`（七格 AC#0…AC#6，全未翻）。
+靶子＝`internal/risk/**` 的注释里点名了**包里不存在的符号**，共**四枚**（编排者现读＋`343-v1` 三形尺对撞坐实）：`fires()`（`blacklist.go:310`）／`taskScopeID`（`provenance.go:54`）／`disposalScope`（`provenance.go:427`）／`Complete`（`syncdirs.go:453`、真名 `SyncDetectionComplete:472`）。
+★这是票 343 那一族（`aEquiv` 已结）的**清扫延续**，形一模一样：⛔ 动可执行字节、⛔ 为让注释变真去新增符号。
+
+## 起手（第一笔，⛔ 跳过）
+1. `git log -1 --format='%H %s'`＋`git status --porcelain -- internal/risk`（应为空＝本面此刻无人写）＋名册尺**锚定行首**（`git log --all --grep='^票 349 落地腿'`＝应为 **0**＝自证第一枚；⛔ 非锚定 `--grep`＝那族第十二次：它吃整条 message〔主题⇄正文〕会把别腿引用你腿名的笔吃进来）。
+2. 逐枚重跑票面「现量」四行＋★`AC#0` 那句自加尺＝**对 `internal/risk/**` 逐枚点名注释里出现的每个包内标识符**问"有定义吗"（三形对撞：驼峰形＋纯小写调用形 `foo(`/`foo()`＋声明形；★`aEquiv` 之外的同族一枚都别漏，命中逐枚 `file:line`，0 命中带正控）。
+3. 每枚先**读准上下文**（⛔ 猜它"原本想指什么"）：`fires()` 那处他包真身＝`internal/config/unwired.go:54`（字段）；`Complete` 真名＝`SyncDetectionComplete:472`；`taskScopeID`/`disposalScope`＝全仓 0 定义（多半是**已删／改名**的历史名 ⇒ 改成"历史名／当时那个东西"的形）。
+
+## 写面（越界＝我直接退你那一笔）
+`internal/risk/blacklist.go`＋`provenance.go`＋`syncdirs.go` 的**注释面**（★只动注释行，判据＝`git diff -U0` 里 `^[+-]` 行逐枚以 `//` 开头、非注释行 0）＋`.scratch/wisp/probes/349/r1/**`（短名、⛔ 写出被禁字面字符〔码位 U+00A7；⚠ 别与腿主题常用的间隔号 U+00B7 混〕、逐枚非 0 字节、⛔ `.out` 扩展名）＋票 349 末尾**一条**只追加 bullet。
+★`internal/winsec/**`＝另一枚写腿（`342-r1`＝乙形落地腿、编排者随后单独放、放你这封时可能还没起）的独占写面、⛔ 动/读它的工作树字节；★`cmd/wisp/**` 与 `internal/panel/**`＝本波零写腿、⛔ 写；⛔ `go test ./cmd/wisp` 整包。
+
+## ★命门三条（照票 343 那把结构尺做）
+1. **⛔ 新增 `fires`/`Complete` 等任何符号去"让注释变真"**（为凑一句话造符号＝本仓禁手，且会顶红票 336 那 8 枚牙）；⛔ 动 `blacklist.go`/`provenance.go`/`syncdirs.go` 任何非注释字节、⛔ 动判级档位／回落支／豁免键语义。
+2. ★**自证用那把比"看着只有空格"硬的尺**＝对每枚被动的文件，取起手 blob ⇄ 交件 blob、**剥注释（`sed 's://.*::'` 或先删整行 `//`）＋去空白去空行后两侧可执行字节 sha256 逐枚相同**（＝票 343 交付、裁腿＋编排者都复现过的形）。★⛔ 只交"diff 看起来都是注释"这句话。
+3. ★**票 336 那 8 枚牙仍 8/8 全红**（复跑一次是便宜的保险）＝台件现成 `.scratch/wisp/probes/336/v1/sh/run-ac2-sweep.sh`（★路径我已 `cat-file -e HEAD:<path>` 现验＝rc=0；⛔ 写成 `scripts/probes/…`＝那形不存在、票 349 曾犯已被改正）一字⛔ 动、env 指**你自己仓外重导的树**（⛔ 复用别人的树、⛔ `-overlay`、每发前后各验 pristine 哈希＋报还原哈希）。`TestResolvePerCallBudget` 若红＝争用假红、安静复量 3 发、⛔ 计入新增红（★同波 `342-r1` 吃 CPU、读数被漂就复量、⛔ 记成你的错）。
+
+## 禁区（⛔ 不是建议；下列我已逐枚 `cat-file -e HEAD:<path>` 现验存在）
+`internal/risk/rules_gateway.go`／`internal/observe/thresholds.go`／三枚冻结件（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）／golden／`tools/d22scan/allowlist.txt`／`go.mod`／`go.sum`／`.gitignore`／`.github/**`／`ci.yml`／D1–D47／C1–C32／R1–R9／D43 转移表；⛔ `frontend/**`／`design/**`；★⛔ 回头改票 336／334／343／339 判据文字（都 `-done`，要更正只追加）；⛔ `internal/winsec/**`（`342-r1` 在写）。
+
+## `AC#3`（⛔ 造门）
+票面 `AC#3` 只给"这一维要不要上通用仪器"的**结论**、⛔ 你新造门（造门＝契约邻接＝人工批准、已另有票 350 承接）。`343-v1` 已量死通用形误伤面（驼峰 50%、调用形 67%、切词放宽即 142 枚红＝尺自身不稳）⇒ 你复核⛔ 抄，给一句结论＋误伤样本。若"该上"⇒⛔ 你上、具名交我（票 350 已在那儿）。
