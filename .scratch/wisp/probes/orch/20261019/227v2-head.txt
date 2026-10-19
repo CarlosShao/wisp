@@ -1,0 +1,17 @@
+派单＝票 227 二审裁腿 227-v2（非实现者裁决腿·只读产码）｜编排者＝新任 harness｜发出 2026-10-19 19:3x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 你是谁
+你是票 **227** 的**二审裁腿**（裁决者≠实现者）。实现腿＝`227-r1`；一审＝`227-v1`（2026-10-18，⚠ 我当天重复放了两枚同名腿＝我的失误、账 `A1040`，（两枚判语我都读了））。票面＝`.scratch/wisp/issues/227-*.md`（现量：4 勾／2 未勾＝`AC#5`/`AC#6`）。
+★你只裁这两格＋交回新缺口：`AC#1..AC#4` 已有判语（`docs/evidence/s1/227-v1-verdict.md`）＝⛔ 重开、⛔ 推翻，除非你复跑撞到与它矛盾的事实（那就具名上报、⛔ 自行改判）。
+你的写面只有三处＝`docs/evidence/s1/227-v2-verdict.md`＋`.scratch/wisp/probes/227/v2/**`（短名、⛔ 写出被禁字面字符〔码位 U+00A7；⚠ 别与腿主题常用的间隔号 U+00B7 混〕、逐枚非 0 字节、⛔ `.out`）＋票 227 尾**一条**只追加 bullet。⛔ 任何 `.go` 字节、⛔ 翻框（翻勾归我凭你判语）、⛔ 改票名／`Status:`／`-done`、⛔ push。
+
+## ★为什么现在派你（缺的读数刚被我结掉）
+一审对两格的判语都是"⛔ 可判＝缺 `cmd/wisp` 整包那一发"（`A1035`/`A1040` 记的是我的调度欠账）。2026-10-19 19:2x 我亲手跑了那发（台账 `A1053`）＝台面＝我自己 `git archive HEAD(7c44446a)` 导出树、DLL 三件齐、`-v -count=1 -timeout 30m`、四数 `RUN=2317／PASS_TOP=1529／FAIL_TOP=29／SKIP=8 rc=1`、29 枚红**逐名归因**（CI 存量 8＋落地续体 2＋台损 17＋★未定性 2）。★**编排者的读数⛔ 当凭据**（完成通知一律当未验证——对我自己也一样）：你要①自己重打决定性读数、②只认"短 GOTMPDIR（`%LOCALAPPDATA%` 同卷＝票 311 认可形）下仍红"的红＝我那次整包用的是**长 D 卷 GOTMPDIR＝造出 17 枚台损**（junction 前置 `mklink` 建不出＋SID 卷形＋缺 `.git`＋跨卷那枚…逐名清单在 `A1053` 与本件 `window-facts`）。
+
+## 逐格要什么
+**AC#5 整包终态**＝票面逐字：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/... -count=1` 到终态＋逐名比红名册（★在册存量＝`internal/ball` 1＋`internal/panel` 4 属别人地界、不算新增、⛔ 顺手修；`TestResolvePerCallBudget`＝争用型假红安静复量、见台账 `A426`/`A432`）。你重打时：短 GOTMPDIR＋整条 `PATH` 用 `cygpath -w`＋分号（⛔ POSIX 冒号形混进去＝会造"零枚 `--- FAIL` 的整包死"＝`A1042` 定式）；红名册逐名对我 `A1053` 那份归类作差＝【你的红 ⊖ 我归的台损/存量】必须逐名解释，⛔ 笼统。
+**AC#6 时间炸弹那一格**＝票面逐字（`always_write_no_clobber_226_test.go:43-44` 那句"nothing polls"从 `248095d1` 起为假＋`:102` 断言方向与 D36 热档相反、只靠 1 秒内跑完侥幸绿）。一审判"部分成立"＝要求①那句可判且判未做、要求②那枚常驻用例真在场（`config_reload_223_test.go:333`）。你要现验两件事：①那句注释今天逐字还在不在、还是不是假话（⛔ 你改它＝`docs/evidence` 与产码注释都⛔ 你写面、具名交我处理）；②"真轮询下手改仍看得见"那枚常驻用例**是否真有牙**＝去牙一发（把 1s tick 或 `CheckAndReload` 的接缝摘掉⇒该用例必须红；只打仓外导出树、⛔ `-overlay`、前后验 pristine/还原哈希）。
+**★顺手结我两枚未定性（我具名交回、⛔ 你圆场）**：①`TestDirOfBaseOfCutOnThePlatformSeparator`（`internal/tools/pathshape_portable_test.go:99`，短路径下仍红、我未读全红句）；②`cmd/wisp` 侧 `Test20r2JunctionRefusalIsNeverAskable`（短路径仍红、★panel 同名那枚已绿＝两枚同名不同包）。各给定性〔真缺陷→立票形状交我／台损→具名凭据／存量→出处〕。
+
+## 车道（★本波只有你一枚腿）
+在飞 0＝你独占：`go test ./cmd/wisp` 整包本波唯一持跑者＝你；`internal/winsec` 此刻无人读（落地腿已交件、`winsec.go` HEAD blob＝`07300bff`）。⛔ 动 `internal/winsec/**`⇄`internal/risk/**` 任何字节（只读允许、跑色限 `./cmd/wisp`＋`./internal/...`）；⛔ `go test ./...`（票面明令）。台面落 `D:\tmp\wisp\20261019\227v2\`（⛔ 盘符根、⛔ 删任何东西＝只建不删）；★取脚本退码＝重定向文件＋`echo RC=$?` 紧跟裸命令（⛔ 管进 `tail`）；⛔ 并行跑改文件的脚本；中文正文 Write 成文件再 `git commit -F`（Windows 形路径）；`add`／`commit` 逐枚字面 pathspec、★新文件先 `git add`；提交后现跑 `git log -1`＋`git show --name-only` 对回再报"已提交"；还原文件一律 `git cat-file blob HEAD:<path> > <path>`、⛔ `checkout`；名册尺锚定行首⛔ 假设分隔符（`A1045`）；⛔ `--amend`/`reset`/`rebase`/`stash`/`clean`。150 轮帽＝先做 AC#5 整包重打（最吃时间），每落一枚就 commit（枚数帽参考值）。做完或卡住 send_message 报 lead：逐枚提交号＋判语件绝对路径＋字节／行＋你的整包四数与逐名红册⇄我的归类作差＋AC#6 两验（注释在场性＋去牙红句与还原哈希）＋两枚未定性结论＋门禁 rc＋票框终量尺（4 勾／2 未勾＝你一枚没翻）。
