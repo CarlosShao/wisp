@@ -81,3 +81,5 @@
 **4. 追加到实现腿证据件的那一句（原句不抹）**：`docs/evidence/s1/226-config-write-no-clobber-r1.md:97` 那节空壳由编排者加一行指针指向同文件 `:101` 起的 `## 5.`，并具名记"两枚 `## 4.` 标题属交付缺陷、由本仓台账追认"——**见本次提交**。
 
 **5. 悬空账（`deferred-work-must-be-registered` 那一规，责任在我）**：事项＝**"一条长期规则的撤销入口（答复语法）"**；已交付＝`Manager.SetAllowedDirs` 有真写路径＋两枚用例（此前全仓零调用者零用例）；未交付＝触发它的那枚答复动词；落点＝**票 219 的答复语法面**（撤销）＋**票 224**（会话档）；阻塞原因＝同一格三方重叠、新增答复动词属别票判据表；**未挂 `DEFERRED` 代码标记**（`internal/config` 里今天只有 `doc.go:14` 那枚属票 05 的标记，`226-v2` §⑥ 条 6 现跑复认）⇒ 因 `SPEC-12 §5` 的 1:1 要求要动 `docs/specs/**`（禁动），这半截**归口票 225（DEFERRED 与登记表双向对账）**，不在本票也不在票 227。
+
+订正（2026-10-19，由票 341 终裁腿 341-v1 现量、编排者落笔）：本件 `:111`（sec 5 AC#5 格）那句"文件里已经有这枚键要的值时**一个字节都不写**（不白重排、不白丢注释、不动 mtime）"**只在 `config.toml` 的 `schema_version` 已是当前版时成立**；手删 `schema_version` 行或塞入旧版件时，`readConfigFile` 内部的迁移-on-读会先把文件重排成 canonical（bytes 变、mtime 变、操作者注释与手排键序丢、落 `config.toml.bak-1`），即便 `mergeWrite` 走 `nothing written` 早返回支也一样（产码 `internal/config/writeguard.go:152-156` 自陈；钉住它的常驻用例＝`internal/config/writeguard_handedit_227_test.go:106` ⇄ 正控 `:150`，写支同形＝`internal/config/writeguard_unnailed_341_test.go:209`）。原句不抹。
