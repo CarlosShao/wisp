@@ -1,0 +1,127 @@
+time=2026-10-19T23:13:15.696+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test258AssemblyRootWiresTheChainAndTheBridge
+--- PASS: Test258AssemblyRootWiresTheChainAndTheBridge (0.00s)
+=== RUN   Test258SinkRebindRulerReadsBothSpellings
+--- PASS: Test258SinkRebindRulerReadsBothSpellings (0.00s)
+=== RUN   Test258ConstructionChainTakesConfigValues
+--- PASS: Test258ConstructionChainTakesConfigValues (0.02s)
+=== RUN   Test258ConstructionChainMissingFileFallsBackAndSaysIt
+--- PASS: Test258ConstructionChainMissingFileFallsBackAndSaysIt (0.01s)
+=== RUN   Test258SectionMissingTierWordIsDefaults
+--- PASS: Test258SectionMissingTierWordIsDefaults (0.01s)
+=== RUN   Test258ProvenanceWordsAreThePrintedOnes
+--- PASS: Test258ProvenanceWordsAreThePrintedOnes (0.00s)
+=== RUN   Test258BridgeRebindsLiveKeysFromConfigEdit
+time=2026-10-19T23:13:16.138+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T23:13:16.138+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-19T23:13:16.138+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-19T23:13:16.156+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
+wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-19T23:13:16.156+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey mute = "Ctrl+Alt+M" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.156+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey panel = "Ctrl+Alt+P" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.156+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=1 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246), the panel gestures (ticket 33) and the tray's Exit item, whose request goes to the stop bit this boot built (ticket 228 AC#11); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+time=2026-10-19T23:13:16.164+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T23:13:16.164+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-19T23:13:16.164+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-19T23:13:16.164+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-19T23:13:16.164+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-19T23:13:16.164+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=1
+time=2026-10-19T23:13:16.171+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- PASS: Test258BridgeRebindsLiveKeysFromConfigEdit (0.44s)
+=== RUN   Test258BridgeMutationNoSrcKeepsOldBinding
+time=2026-10-19T23:13:16.220+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=summon binding=Ctrl+Alt+Q err="Hot key is already registered."
+time=2026-10-19T23:13:16.220+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T23:13:16.220+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-19T23:13:16.220+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-19T23:13:16.224+08:00 level=ERROR msg="ball: hotkey summon = \"Ctrl+Alt+Q\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey summon = "Ctrl+Alt+Q" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.224+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey mute = "Ctrl+Alt+M" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.224+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey panel = "Ctrl+Alt+P" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.224+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=defaults hotkeys_live=0 hotkeys="summon=Ctrl+Alt+Q occupied by another app, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246), the panel gestures (ticket 33) and the tray's Exit item, whose request goes to the stop bit this boot built (ticket 228 AC#11); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+    resident_hotkey_258_windows_test.go:361: the old binding did not survive a no-rebind host (VK=0x0): the premise moved
+time=2026-10-19T23:13:16.637+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding (0.47s)
+=== RUN   Test258OccupiedCombinationNamesTheNewValue
+time=2026-10-19T23:13:16.685+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T23:13:16.685+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-19T23:13:16.685+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-19T23:13:16.693+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
+wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-19T23:13:16.693+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey mute = "Ctrl+Alt+M" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.693+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey panel = "Ctrl+Alt+P" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.693+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=1 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246), the panel gestures (ticket 33) and the tray's Exit item, whose request goes to the stop bit this boot built (ticket 228 AC#11); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+time=2026-10-19T23:13:16.709+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T23:13:16.709+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-19T23:13:16.709+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+V err="Hot key is already registered."
+time=2026-10-19T23:13:16.710+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-19T23:13:16.710+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey panel = \"Ctrl+Alt+V\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-19T23:13:16.710+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Z mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+V live=1
+    resident_hotkey_258_windows_test.go:448: the boot verdict lost the live-count shape: "the floating ball window is up in this process (tray icon added, hotkeys from config, hotkeys live 1/4: summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app)"
+    resident_hotkey_258_windows_test.go:453: live slots after the rebind = 1, want 2 (summon+mute; cancel is standby, panel is taken)
+time=2026-10-19T23:13:16.718+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- FAIL: Test258OccupiedCombinationNamesTheNewValue (0.08s)
+=== RUN   Test296BridgeKeepsThreeLiveKeysWithOwnerEmptySlots
+time=2026-10-19T23:13:16.784+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=summon binding=Ctrl+Alt+Q err="Hot key is already registered."
+time=2026-10-19T23:13:16.784+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T23:13:16.784+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-19T23:13:16.785+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-19T23:13:16.789+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=defaults
+wisp: ball hotkey reload bridge armed (provenance=defaults); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-19T23:13:16.789+08:00 level=ERROR msg="ball: hotkey summon = \"Ctrl+Alt+Q\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey summon = "Ctrl+Alt+Q" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.789+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey mute = "Ctrl+Alt+M" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.789+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey panel = "Ctrl+Alt+P" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.790+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=defaults hotkeys_live=0 hotkeys="summon=Ctrl+Alt+Q occupied by another app, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246), the panel gestures (ticket 33) and the tray's Exit item, whose request goes to the stop bit this boot built (ticket 228 AC#11); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+    resident_hotkey_296_windows_test.go:172: SKIP-LOUD: boot could not register the three default combinations on this host (summon=occupied by another app="Ctrl+Alt+Q" mute=occupied by another app="Ctrl+Alt+M" cancel=not bound while idle (cancel is borrowed only during Confirming)="Esc" panel=occupied by another app="Ctrl+Alt+P"), so the live count cannot be read here
+time=2026-10-19T23:13:16.804+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- SKIP: Test296BridgeKeepsThreeLiveKeysWithOwnerEmptySlots (0.08s)
+=== RUN   Test296BridgeKeepsThreeLiveKeysWhenConfigUnreadable
+time=2026-10-19T23:13:16.854+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=summon binding=Ctrl+Alt+Q err="Hot key is already registered."
+time=2026-10-19T23:13:16.854+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T23:13:16.854+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-19T23:13:16.854+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-19T23:13:16.857+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=defaults
+wisp: ball hotkey reload bridge armed (provenance=defaults); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-19T23:13:16.857+08:00 level=ERROR msg="ball: hotkey summon = \"Ctrl+Alt+Q\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey summon = "Ctrl+Alt+Q" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.857+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey mute = "Ctrl+Alt+M" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.857+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey panel = "Ctrl+Alt+P" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.858+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=defaults hotkeys_live=0 hotkeys="summon=Ctrl+Alt+Q occupied by another app, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246), the panel gestures (ticket 33) and the tray's Exit item, whose request goes to the stop bit this boot built (ticket 228 AC#11); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+    resident_hotkey_296_windows_test.go:213: SKIP-LOUD: boot could not register the three default combinations on this host (summon=occupied by another app="Ctrl+Alt+Q" mute=occupied by another app="Ctrl+Alt+M" cancel=not bound while idle (cancel is borrowed only during Confirming)="Esc" panel=occupied by another app="Ctrl+Alt+P"), so the live count cannot be read here
+time=2026-10-19T23:13:16.867+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- SKIP: Test296BridgeKeepsThreeLiveKeysWhenConfigUnreadable (0.06s)
+=== RUN   Test258V1ProbeSummonEditRebindsLiveBall
+time=2026-10-19T23:13:16.921+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T23:13:16.921+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-19T23:13:16.922+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-19T23:13:16.926+08:00 level=INFO msg="ball: hotkey reload bridge armed (polls config, rebinds on change)" poll=1s provenance=config
+wisp: ball hotkey reload bridge armed (provenance=config); a hand edit of [hotkey] rebinds the live keys without a restart
+time=2026-10-19T23:13:16.926+08:00 level=ERROR msg="ball: hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey mute = "Ctrl+Alt+M" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.926+08:00 level=ERROR msg="ball: hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+wisp: hotkey panel = "Ctrl+Alt+P" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]
+time=2026-10-19T23:13:16.926+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=1 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app" gestures="recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246), the panel gestures (ticket 33) and the tray's Exit item, whose request goes to the stop bit this boot built (ticket 228 AC#11); the two mute gestures turn this process's capture gate once that leg is assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four veto channels stay reduced here to the one the assembly root injected"
+time=2026-10-19T23:13:16.935+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T23:13:16.936+08:00 level=INFO msg="cancel hotkey left unbound while idle: the configured key is borrowed only during Confirming and handed back at session end (ticket 245)" hotkey=cancel binding=Esc
+time=2026-10-19T23:13:16.936+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-19T23:13:16.936+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey mute = \"Ctrl+Alt+M\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-19T23:13:16.936+08:00 level=ERROR msg="ball: hotkey reload" binding="hotkey panel = \"Ctrl+Alt+P\" is occupied by another program and was NOT registered; pressing it will do nothing until you pick a free combination in [hotkey]"
+time=2026-10-19T23:13:16.936+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+7 mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=1
+    resident_hotkey_v1probe_test.go:108: 258-v1 PROBE: boot verdict lost the live-count shape: "the floating ball window is up in this process (tray icon added, hotkeys from config, hotkeys live 1/4: summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app)"
+time=2026-10-19T23:13:16.944+08:00 level=INFO msg="ball: resident leg destroyed the ball window, its tray icon and its hotkeys"
+--- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (0.08s)
+=== RUN   Test258V1ProbeConstructionMissingFileNamesTheFallback
+--- PASS: Test258V1ProbeConstructionMissingFileNamesTheFallback (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.399s
+FAIL

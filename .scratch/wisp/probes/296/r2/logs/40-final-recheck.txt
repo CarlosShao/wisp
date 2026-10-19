@@ -1,0 +1,67 @@
+=== 最终 HEAD＝12e7176597305e42104ca127e9d02e169ec17d49（2026-10-19 23:11:30 +0800）===
+winsec_seed=07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+CGO_ENABLED=1  （⛔ 整条 PATH 过 cygpath -wp 那形：会把它打到 0）
+--- 尺 A：零可执行字节（对提交本身复跑，⛔ 对工作树）---
+numstat=11 5 cmd/wisp/resident_windows.go
+changed_lines=18  （含 +++/--- 两枚文件头）
+first3 histogram:
+     11 +//
+      5 -//
+non_comment_changed_lines=0
+--- 尺 B：GOFLAGS= go build ./... ---
+rc=0  输出字节=0
+--- 尺 C：sh scripts/d22scan.sh ---
+rc=0
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=244, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 in
+--- 尺 D：并排两把格式尺（工作树侧⇄判据尺＝仓外导出树）---
+gofmt_mine_rc=0 命中=0
+gofmt_pkg_rc=0 命中=1
+cmd\wisp\models.go
+gofumpt_pkg_rc=0 命中=1
+cmd\wisp\models.go
+exported_go_count=139
+ruler_on_exported_head_pkg_gofmt_rc=0 命中=0
+ruler_on_exported_head_pkg_gofumpt_rc=0 命中=0
+--- 尺 E：go vet ./cmd/wisp/ ---
+rc=0  输出字节=0
+--- 尺 F：票 296 框尺（盘上 HEAD 那枚票面）---
+AC_total=6  AC_checked=4  AC_unchecked=2
+--- 尺 G：-run Test296|Test258 最终一发（同一台面上）---
+rc=1
+RUN=13  PASS_TOP=8  FAIL_TOP=3  SKIP=2
+--- PASS: Test258AssemblyRootWiresTheChainAndTheBridge (0.00s)
+--- PASS: Test258SinkRebindRulerReadsBothSpellings (0.00s)
+--- PASS: Test258ConstructionChainTakesConfigValues (0.02s)
+--- PASS: Test258ConstructionChainMissingFileFallsBackAndSaysIt (0.01s)
+--- PASS: Test258SectionMissingTierWordIsDefaults (0.01s)
+--- PASS: Test258ProvenanceWordsAreThePrintedOnes (0.00s)
+--- PASS: Test258BridgeRebindsLiveKeysFromConfigEdit (0.44s)
+--- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding (0.47s)
+--- FAIL: Test258OccupiedCombinationNamesTheNewValue (0.08s)
+--- SKIP: Test296BridgeKeepsThreeLiveKeysWithOwnerEmptySlots (0.08s)
+--- SKIP: Test296BridgeKeepsThreeLiveKeysWhenConfigUnreadable (0.06s)
+--- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (0.08s)
+--- PASS: Test258V1ProbeConstructionMissingFileNamesTheFallback (0.01s)
+--- 尺 H：本腿三笔的越界名册 ---
+[1d6b0cf9]
+cmd/wisp/resident_windows.go
+[7ae0af22]
+.scratch/wisp/probes/296/r2/00-comment-only-report.md
+.scratch/wisp/probes/296/r2/logs/00-diff-comment-only.txt
+.scratch/wisp/probes/296/r2/logs/20-pre-1.txt
+.scratch/wisp/probes/296/r2/logs/21-pre-2.txt
+.scratch/wisp/probes/296/r2/logs/22-post-1.txt
+.scratch/wisp/probes/296/r2/logs/22-pre-2.txt
+.scratch/wisp/probes/296/r2/logs/23-post-1.txt
+.scratch/wisp/probes/296/r2/logs/23-post-2.txt
+.scratch/wisp/probes/296/r2/logs/24-post-2.txt
+.scratch/wisp/probes/296/r2/logs/30-build.txt
+.scratch/wisp/probes/296/r2/logs/31-d22scan.txt
+.scratch/wisp/probes/296/r2/logs/31-format-rulers.txt
+.scratch/wisp/probes/296/r2/logs/32-d22scan.txt
+.scratch/wisp/probes/296/r2/logs/32-vet.txt
+.scratch/wisp/probes/296/r2/logs/33-pathlen.txt
+.scratch/wisp/probes/296/r2/logs/33-vet-and-pathlen.txt
+.scratch/wisp/probes/296/r2/logs/34-rc-method.txt
+[12e71765]
+.scratch/wisp/issues/296-hotkey-reload-source-skips-applyhotkeydefaults-keys-die-1s-after-boot.md
