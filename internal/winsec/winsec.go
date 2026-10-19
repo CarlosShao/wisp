@@ -146,7 +146,24 @@ func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
 	if err := preOpenLeafGuard(resolved); err != nil {
 		return err
 	}
-	f, err := os.OpenFile(resolved, flags|oNoFollowPlatform, perm)
+	// Tickets 342 and 348, form 乙: the ANCESTOR leg. The parent directory of the
+	// spelling is pinned before anything is opened inside it, and that pin lives to
+	// the last statement of this route on purpose - the two unlinks below are
+	// relative to it, so the handle must outlive the open it was used for. Releasing
+	// it as soon as the leaf is open is the exact shape that coupling exists to
+	// prevent. resolveString and platformVerifyPlacement answered about a SPELLING;
+	// every act after them used to re-resolve that spelling through the kernel, so
+	// whoever could rename an ancestor in the gap chose which object this open
+	// truncated and which object the refusal-path unlink removed.
+	parent, err := pinnedParent(resolved)
+	if err != nil {
+		// Verbatim too, and NOT through sealError: this is the pin refusing, which is a
+		// placement answer about a spelling this route may not act on. pinPlacement carries
+		// both sentinels itself, so nothing here may strip them on the way out.
+		return err
+	}
+	defer func() { _ = parent.close() }()
+	f, err := openPinnedLeaf(parent, filepath.Base(resolved), flags|oNoFollowPlatform, perm)
 	if err != nil {
 		// Returned verbatim, and deliberately NOT run through sealError: this is
 		// the open refusing, not a seal, and the entry that made it refuse is
@@ -157,12 +174,12 @@ func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
 	}
 	if err := sealHandle(f); err != nil {
 		_ = f.Close()
-		_ = os.Remove(resolved)
+		unlinkPinnedLeaf(parent, filepath.Base(resolved))
 		return sealError(resolved, err)
 	}
 	if _, err := f.Write(data); err != nil {
 		_ = f.Close()
-		_ = os.Remove(resolved)
+		unlinkPinnedLeaf(parent, filepath.Base(resolved))
 		return err
 	}
 	if err := f.Close(); err != nil {
