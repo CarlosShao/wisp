@@ -35,12 +35,17 @@
 // untouched). No containment rule can answer this world by construction - there is no spelling that
 // escapes anything - so a refusal here cannot be borrowed from another leg, which was r1's whole problem.
 //
-// Bench facts this shape leans on (342-r2 probes, outside the repository): a relative symlink's substitute
-// name is stored relative, so Root.OpenFile's restart resolves it inside the root and the open FOLLOWS it
-// (Go's W-ROOTSYM row, measured three runs by 342-a1, and reproduced by this leg's own probe 7 before the
-// instrument was written); and the platform lets the link's entry be removed while other handles stand in
-// the directory (deleteLink's own promise), so clear-then-rename is the flip and the gap between the two
-// is ENOENT - counted as gaps, never hidden, never claimed as liveness.
+// Bench facts this shape leans on, with each one tied to the reading that carries it (本腿仓外 probe7
+// 编译失败＝⛔ 凭据、已在散件里作废登记，这里⛔ 引用它): "the followed open really truncates" is proven
+// INSIDE this instrument - the landing's damage rows read `size 0 body []` (an O_TRUNC that landed through
+// the flipped name and wrote nothing, which no restock can produce) on runs where the same reading counts
+// 46~49 re-check refusals; the per-attempt pairing of one truncation to one refusal is NOT claimed (the
+// sample races the racer), and ticket 342's numerator stays REPORTED rather than gated here. The property
+// itself is in-repo evidence already (342-a1's W-ROOTSYM row: Root.OpenFile follows an in-root relative
+// link, measured three runs). That the link's entry can be removed while other handles stand in the
+// directory is probe6's own row (`os.Remove` on the name while the landing's handle is open = ok), and it
+// is also what this package's deleteLink documents; the clear-then-rename gap is therefore ENOENT for one
+// instruction, counted as a gap, never hidden, never claimed as liveness.
 //
 // NO NEW SEAM, NO PRODUCTION CHANGE: this file consumes only the exported entry point and the package's
 // existing test helpers (reparseAt, SealableTempDirForTest124), plus its own helpers named with the 342r2

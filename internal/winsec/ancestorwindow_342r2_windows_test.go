@@ -10,7 +10,9 @@
 // removal.
 //
 // THIS LEG DID NOT INVENT A SEAM TO GET THE WORLD IT WANTED. It measured first, outside the repository
-// (bench probes 342r2 probe1..probe8, verbatim rows archived under .scratch/wisp/probes/342/r2/logs/),
+// (bench probes 342r2 probe1..probe6 plus probe8; verbatim rows archived under
+// .scratch/wisp/probes/342/r2/logs/bench-probes-verbatim.txt - probe7 never compiled and is
+// void-registered in that same file, and nothing in these instruments leans on it),
 // which name an attacker can move at each instant the route owns, and it then drives only the worlds the
 // platform actually offers, through the seam this package ALREADY declares:
 //
