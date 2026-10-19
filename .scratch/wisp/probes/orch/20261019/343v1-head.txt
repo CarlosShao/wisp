@@ -1,0 +1,31 @@
+派单＝票 343 终裁腿 343-v1（非实现者裁决腿·只读产码）｜编排者＝新任 harness｜发出 2026-10-19 10:0x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 你是谁
+你是票 **343** 的**终裁腿**（裁决者≠实现者）。实现腿＝`343-r1`（写·注释面，名册 6 笔：`31d4a476` 唯一一枚 `.go`＝`blacklist.go`／`2b6f8a9a` sh 台件／`360a6af6` logs 18 枚／`bf5977f4` 票尾一条／`70caae94` report／`137044b6` report 改正）。
+★你是盘上第一枚 `343-v*`（编排者现跑＝锚定前缀 `^票 343 终裁腿 343-v1`＝0 笔、`probes/343/v1` 不存在）。
+你的写面**只有三处**：`docs/evidence/s1/343-v1-verdict.md` ＋ `.scratch/wisp/probes/343/v1/**`（短名、⛔ 写出被禁的那枚字面字符〔码位 U+00A7〕、逐枚非 0 字节、⛔ `.out` 扩展名）＋票 343 末尾**一条**只追加 bullet。⛔ 任何 `.go` 字节、⛔ 翻框、⛔ 改票名／`Status:`／加 `-done`。
+
+## 要裁什么
+票面＝`.scratch/wisp/issues/343-blacklist-comment-names-aEquiv-a-symbol-that-does-not-exist-in-the-package.md`（30 行，判据区六格一枚未翻：`^- [ ] **AC#`＝6、`^- [x]`＝0）。
+靶子＝`blacklist.go:193` 那句注释点名了包里根本不存在的符号 `aEquiv`；实现腿把它改成带条件的事实句（只用盘上真名），★⛔ 新增 `aEquiv` 去"让注释变真"。
+
+## ★起手第一笔（第一动作，⛔ 跳过）
+1. `git log -1 --format='%H %s'`＋`git status --porcelain -- internal/risk`（应为空＝`343-r1` 已交件、写面静默）＋名册尺**锚定行首**（★⛔ 非锚定 `--grep`＝那族第十二次今天由裁腿 `341-v1` 自己抓到：`git log --grep` 吃整条 message〔主题＋正文〕⇒ 非锚定形会把"正文引用了别腿前缀"的笔吃进名册＝现量非锚定 9⇄锚定 6）⇒ 用 `--grep='^票 343 落地腿 343-r1'` 或"单次 `%H%x09%s` 导出＋内存内 `index($2,P)==1`"，⛔ 假设其后分隔符。
+2. 逐枚重跑票面「现量」三行＋`AC#0` 那句自加尺＝**逐枚点名 `blacklist.go` 注释里出现的每个包内标识符**问"它在包里有定义吗"（⛔ 只交 `aEquiv` 那一枚＝腿抓到第二枚 `fires()`＝教训在案）。
+3. ★读实现腿的 report（`probes/343/r1/report.md` 123 行／`report-sec-b.md`／`report-sec-c.md`＋`logs/01`–`04`＋`logs/teeth-sweep/` 14 枚原始 stdout）再裁。
+
+## ★你要独立裁的四件事（每件自己现跑、⛔ 抄腿⛔ 抄编排者）
+① **`AC#1` 完成判据**＝交件侧 `git grep -n aEquiv HEAD -- internal/risk`＝**0 命中**（你自己跑）＋`git diff --numstat` 注释行⇄可执行行＝★`git diff -U0` 里 `^[+-]` 行逐枚以 `//` 开头、非注释行 0。
+② ★**比"看着只有空格"硬的那把尺**（腿交付、编排者复现过＝你要自己再跑一遍）＝`blacklist.go` 起手 blob `c1799cd2`⇄交件 `62f2dddb`，但**剥掉注释后两侧可执行字节 sha256 完全相同**（编排者现量 `b1610acf…`、各 232 行、`cmp` 同）＝结构上证"这枚注释改动⛔ 可能影响任何判级／那 8 枚牙"。你的复现形＝`sed 's://.*::' | tr -d ' \t' | 去空行` 两侧对撞，⛔ 抄我这串哈希。
+③ ★**票 336 那 8 枚牙仍 8/8 全红**（改注释⛔ 动它们、但这是本票唯一"改了这一包"的活⇒复跑是便宜保险）＝台件现成 `.scratch/wisp/probes/336/v1/sh/run-ac2-sweep.sh` 一字⛔ 动、env 指**你自己仓外重导的树**（⛔ 复用腿那棵、⛔ `-overlay`、逐发前后验 pristine 哈希、报还原哈希）。`TestResolvePerCallBudget`（本包在册争用件）若红⇒安静复量 3 发再归因、⛔ 计入新增红。
+④ ★**`AC#3` 那条结论你复核⛔ 抄**＝腿判"该上通用仪器＝否"并量了误伤面（驼峰形 6 红/3 假阳＝50%、调用形 11 红/9 假阳＝82%；假阳含 `CloseScope`＝票 160 故意删的历史名、词面与假话不可分；根因＝"注释对名字做了什么断言无法从名字恢复"⇒任何规则退化成手工 allowlist）。你要么独立复现误伤面、要么给出能收窄的**有界词表**形（腿的候选＝只对 `^a[A-Z]…` 那枚词表作硬检查）。⛔ 在本票造门（属契约邻接＝人工批准）。
+
+## ★两件随件要你裁的"归谁"（我已处理，你复核）
+- 腿必答 (ii) 抓到同族第二枚 `fires()`（`:310`，票 334 落码腿 `e052b11a` 引入、`func fires` 全仓 0 定义、真身在别包 `internal/config/unwired.go:54`），**⛔ 扩自己射程、具名把立票权交回**＝做对了 ⇒ 我据此立了 `.scratch/wisp/issues/349-blacklist-provenance-comments-name-undefined-symbols-fires-taskscope-cleanup.md`（六格、含 `taskScopeID`/`disposalScope` 两枚；我现读三锚均在注释行）。★你裁：这处"分票、⛔ 并进 343"对不对＋票 349 判据形状够不够（⛔ 你落票 349 一字、⛔ 动 `blacklist.go:310`／`provenance.go`＝那是票 349 写腿的活）。
+- 腿三处自抓（正文件超帽走"拆具名分件"口径／笔数抄死被自己改正尺读到 5⇄改 6 已改成"只留尺"／ASCII 编码造 `??` 乱码已重落 UTF-8）＝登记⛔ 退件，你复核"有没有污染任何一格读数"（我的复跑＝写面 U+00A7 命中 0⇄正控 HANDOVER 199、乱码件逐枚 0 字节⛔ tracked）。
+
+## 车道（★本波两枚腿同时在跑）
+- 在飞另有 `342-v1`（裁·`internal/winsec` 只读＋容器竞态重打，正读对争用最敏感的那两枚翻脸仪器＝票 346）。⇒ ★你的包＝`internal/risk`、它的包＝`internal/winsec`＝**不同包、不同突变目标**（你在仓外导出树改 `blacklist.go`、它改 winsec、⛔ 共享源），但★你俩会同时吃 CPU ⇒ 你那两包成对四数与 8 枚牙若撞红，一律"安静复量 3 发为准"（本包在册 `TestResolvePerCallBudget` 定式），⛔ 记成腿的新造红、⛔ 记成争用以外的东西。
+- ★⛔ 动 `internal/winsec/**`（`342-v1` 在读）；⛔ `./cmd/wisp` 整包（票 343 `AC#4` 明写⛔ 它、车道按波次排）、⛔ `go test ./...`。
+- 台面＝`git archive <具名锚>` 仓外导出树（八件套＋`docs/`＋手工三件），落 `D:\tmp\wisp\20261019\343v1\<台名>`（⛔ 任何盘符根、⛔ 删任何东西）；仓外树跑 Windows `.exe` 取 DLL 时 `PATH` 必须 `cygpath -w`＋`;`（⛔ POSIX 形＝造"零枚 `--- FAIL` 的整包死"＝台损⛔ 计入判据）；取脚本退码＝重定向到文件＋`echo RC=$?` 紧跟裸命令（⛔ 管进 `tail`、⛔ 在 pwsh 内联写 `$?`）。
+- 门禁四数只在共享工作树、跑前 `unset GOTMPDIR TMPDIR TEMP TMP`（票 311 shape B GUARD＝rc=2 射程拒绝⛔ 读成红）。
