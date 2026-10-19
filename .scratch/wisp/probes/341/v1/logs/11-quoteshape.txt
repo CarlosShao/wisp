@@ -1,0 +1,20 @@
+=== canonical single-quoted string lines dumped in MY runs ===
+-- /d/tmp/wisp/20261018/341v1/log-p6/test.log --
+   single-quote-shape hits  = 40
+   double-quote-shape hits  = 1
+     472:        language = 'zh-CN'
+     473:        theme = 'dark'
+-- /d/tmp/wisp/20261018/341v1/run-deliv-A/test.log --
+   single-quote-shape hits  = 0
+   double-quote-shape hits  = 0
+-- /d/tmp/wisp/20261018/341v1/log-p3/test.log --
+   single-quote-shape hits  = 190
+   double-quote-shape hits  = 0
+     211:        language = 'zh-CN'
+     212:        theme = 'dark'
+
+=== exact lines cited in the verdict (base_url / protocol) ===
+   514:        model = 'parakeet-zh'
+   528:        model = ''
+   530:        base_url = ''
+   545:        model = ''

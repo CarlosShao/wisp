@@ -1,0 +1,66 @@
+########## FINAL STATE (341-v1) ##########
+-- HEAD now (drift is expected: other legs commit on dev) --
+0b5bd8c686ec34cd5b5282ecfd5486a9d1857044 票 342 终裁腿 342-v1 交件
+-- my own roster, strict per-hash prefix 「票 341 终裁腿 341-v1·」 --
+95b1015dcccf04ac0b8c1b1ac161ae09ae24d9e6 票 341 终裁腿 341-v1·AC#1 四格去牙逐格
+-- my commit 95b1015d is an ancestor of HEAD? --
+   YES
+-- leg's test-file blob: HEAD vs the leg's self-reported c577f1cc --
+   HEAD blob   = c577f1ccd4587cd48c2168f7eb1eb767b720450f
+   leg reported= c577f1ccd4587cd48c2168f7eb1eb767b720450f
+-- the two production files I mutated: tree bytes vs pristine blob (want match) --
+   writeguard.go  treeD_sha256=efe12661e71b blob_sha256=efe12661e71b
+   loader.go      treeD_sha256=40cb3e12b9bb blob_sha256=40cb3e12b9bb
+   migrate.go     treeD_sha256=43857a141bc9 blob_sha256=43857a141bc9
+-- the leg's start anchor .. HEAD: only non-test .go in internal/config (want 1 = new test file) --
+   internal/config/writeguard_unnailed_341_test.go
+-- worktree clean in my lanes? (want empty) --
+-- shared index now (want 0) --
+0
+
+########## 票框终量尺 (want 7 unchecked / 0 checked, title+Status untouched) ##########
+unchecked=7 checked=0 lines=44
+title    = # 341 — 票 227 交件里**如实报�...
+Status   = - Status: **已立，未派**（2026-10-...
+
+########## 341-r1 两处纪律事故：我这一趟的独立复跑 ##########
+-- (1) repo-root junk files: tracked? size? in any gate's walk scope? --
+   name=⛔ bytes=0 tracked=0
+   name=主料＝（26 bytes=0 tracked=0
+   name=前一腿 bytes=0 tracked=0
+   name=本件＝票 bytes=0 tracked=0
+   d22scan walk scopes (from tools/d22scan/main.go) = internal/ cmd/ frontend/ internal/tools/ design/ ; 仓库根散件⛔ 在射程内
+   260:	if err := s.loadAllowlist(filepath.Join(root, "tools", "d22scan", "allowlist.txt")); err != nil {
+   264:	if err := s.walkGo(filepath.Join(root, "internal")); err != nil {
+   267:	if err := s.walkGo(filepath.Join(root, "cmd")); err != nil {
+   271:	if err := s.walkText(filepath.Join(root, "frontend"), "panel-approval", s.panelCheck, false); err != nil {
+   274:	if err := s.walkText(filepath.Join(root, "internal", "tools"), "internal-artifact-tool", s.artifactCheck, true); err != nil {
+   406:	internalGo, cmdGo := goScopeKey(filepath.Join(root, "internal")), goScopeKey(filepath.Join(root, "cmd"))
+   409:			label: "bans #1-5 internal/", dir: filepath.Join(root, "internal"),
+   413:			label: "bans #1-5 cmd/", dir: filepath.Join(root, "cmd"),
+-- (2) the hang episode: those 7 files are all committed now (index empty above); --
+   决定性读数全部在事故之后由我现跑（blob 同一性 ⇄ 腿自报锚逐枚对撞，见上）。
+
+########## 341-v1 self-discipline: my own U+00A7 hit and fix (named, ⛔ 掩盖) ##########
+logs/06 抓 226 判语件原句时把两处 U+00A7 抄进了我的证据面＝派单明令⛔ 出现在我写面。
+处置＝perl -CSD 逐枚替换为字面 [U+00A7]（原文⛔ 改、只在我这枚镜像件里遮字符），改后尺＝
+   U+00A7 hits in .scratch/wisp/probes/341/v1 = 0
+   positive control, same ruler on docs/reports/HANDOVER.md = 1 file(s)
+   mask markers now in logs/06 = 6
+   被遮原句仍在盘上原件＝docs/evidence/s1/226-config-write-no-clobber-r1.md:111 与 v2.md:162（我一字未动）
+
+########## 台面与突变卫生 ##########
+-- export trees (仓外, D: 卷, ⛔ 盘符根直下, 只建⛔ 删) --
+   /d/tmp/wisp/20261018/341v1/pristine
+   /d/tmp/wisp/20261018/341v1/treeB
+   /d/tmp/wisp/20261018/341v1/treeD
+-- GOTMPDIR / GOCACHE used by runs (all under D:\tmp\wisp\20261018\341v1) --
+   /d/tmp/wisp/20261018/341v1/log-p2
+   /d/tmp/wisp/20261018/341v1/log-p3
+   /d/tmp/wisp/20261018/341v1/log-p5
+   /d/tmp/wisp/20261018/341v1/log-p6
+   /d/tmp/wisp/20261018/341v1/run-base-A
+   /d/tmp/wisp/20261018/341v1/run-base-B
+   /d/tmp/wisp/20261018/341v1/run-deliv-A
+   /d/tmp/wisp/20261018/341v1/run-deliv-B
+-- PATH passed to go test in bash form was cygpath -w'ed (公共块 A1042 定式)：见 scripts/run2-color.sh / run3-mu.sh --

@@ -1,0 +1,137 @@
+########## positive control for the single-quote canonical shape (another resident test) ##########
+270:	if !strings.Contains(readSettingsFile(t, path2), "model = 'deepseek-reasoner'") {
+hits of the double-quote shape in resident assertions about re-laid text:
+0
+   internal/config/writeguard_handedit_227_test.go:82:		"\n[llm]\n[llm.providers.deepseek]\nbase_url = \"https://api.deepseek.com/v1\"\n", "\n", 1)
+   internal/config/writeguard_unnailed_341_test.go:303:	deleted := strings.Replace(start, "base_url = \"https://my-gateway.example.invalid/v1\"  # mine\n", "", 1)
+   internal/config/writeguard_unnailed_341_test.go:363:	deleted := strings.Replace(start, "base_url = \"https://my-gateway.example.invalid/v1\"\n", "", 1)
+
+########## assertion-count arithmetic: pre-fix red messages vs today's file ##########
+-- pre-fix (r1 logs/06 + logs/07): distinct messages, with their file:line --
+   writeguard_unnailed_341_test.go:314: the deleted base_url line came back as something other than the built-in preset:
+   writeguard_unnailed_341_test.go:368: the deleted line of an unpresetted provider did not come back as an explicit empty string:
+   writeguard_unnailed_341_test.go:374: the untouched key of the same table did not survive the re-lay:
+-- today's file: same three messages with line numbers --
+320:		t.Errorf("the deleted base_url line came back as something other than the built-in preset:\n%s", text)
+374:		t.Errorf("the deleted line of an unpresetted provider did not come back as an explicit empty string:\n%s", text)
+380:		t.Errorf("the untouched key of the same table did not survive the re-lay:\n%s", text)
+-- delta in lines (want 6 = the inserted comment block) --
+314 -> 320 = +6 ; 368 -> 374 = +6 ; 374 -> 380 = +6
+-- the inserted block, verbatim (lines 313-318) --
+	// MarshalCanonical emits TOML literal strings, so every quoted value in the
+	// re-laid file lands between single quotes - measured here, and the house
+	// convention (b2's own dump says base_url = ''; settings_313_test.go:270
+	// asserts model = 'deepseek-reasoner'). An earlier draft of this case matched
+	// double quotes and was red on that alone: a ruler defect, fixed here, ⛔ a
+	// finding about the behaviour.
+-- t.Errorf/t.Fatal counts per case (today) --
+   TestHandDeletedDefaultValuedLineIsRestoredInvisibly(t                  assertion-sites=11
+   TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory(t            assertion-sites=11
+   TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed(t assertion-sites=13
+   TestHandDeletedProviderBaseUrlComesBackAsThePresetValue(t              assertion-sites=9
+   TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile(t         assertion-sites=8
+
+########## AC#2(iii): P2 case body -- does it pin P2's OWN judgement? ##########
+-- P2's unique assertion (:100-:112) verbatim --
+	logText := logs.String()
+	if !strings.Contains(logText, "wrote merged change into config.toml") {
+		t.Errorf("expected a real write (the file held no allowed_dirs entry); log:\n%s", logText)
+	}
+	if strings.Contains(logText, "kept hand edits this process does not hold") ||
+		strings.Contains(logText, "kept_in_file_not_in_memory") {
+		t.Errorf("a deleted default-valued line is invisible to the divergence report - that is P2's whole point; log:\n%s", logText)
+	}
+	if strings.Contains(logText, "wrote=[ball.size") {
+		t.Errorf("the write claimed a key it does not own; log:\n%s", logText)
+	}
+
+	// (4) and still the INFO sentence names the delete-shape out loud, because the
+	// numbers alone hide the event: this is the assertion its de-gum shot kills.
+	if !strings.Contains(logText, "a key line the operator deleted by hand comes back at its schema default value") {
+		t.Errorf("the INFO branch must state the delete-shape even when the values hide it; log:\n%s", logText)
+	}
+	// (5) file and memory end up equal: indistinguishable from a write that
+	// restored nothing.
+	if got := readLoaded(t, path); got.Ball.Size != p2Default || m.Config().Ball.Size != p2Default {
+		t.Errorf("file says %d and memory says %d, want %d and %d", got.Ball.Size, m.Config().Ball.Size, p2Default, p2Default)
+	}
+-- P1's counterpart (227 file :55-:65) verbatim --
+	// (2) the divergence is reported, not swallowed.
+	text := logs.String()
+	if !strings.Contains(text, "kept_in_file_not_in_memory=[ball.size]") {
+		t.Errorf("the fallback-to-default divergence was not reported; log:\n%s", text)
+	}
+
+	// (3) the comment is gone AND the log names the delete-shape.
+	if strings.Contains(readText(t, path), "my size") {
+		t.Error("the operator's comment survived a canonical re-lay; it must be reported gone, not kept silently")
+	}
+	if !strings.Contains(text, "a key line the operator deleted by hand comes back at its schema default value") {
+		t.Errorf("the log must state the delete-shape plainly; log:\n%s", text)
+	}
+
+########## AC#5: P5 case = 观测今天这形 or 夹带行为改动（乙形）? ##########
+-- P5 body lines 209-270 --
+func TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed(t *testing.T) {
+	logs := captureSlog(t)
+	m, path, mutate := newTestManager(t, matrixBase)
+	hand := strings.Replace(matrixBase, "size = 56", "size = 56  # hand note", 1)
+	noVersion := strings.Replace(hand, "schema_version = 2\n", "", 1)
+	if strings.Contains(noVersion, "schema_version") {
+		t.Fatal("setup: the schema_version line was not removed")
+	}
+	mutate(noVersion)
+	before := readText(t, path)
+	mtimeBefore := statMod(t, path)
+	if strings.Contains(before, "schema_version") {
+		t.Fatal("setup: the file on disk still declares a version")
+	}
+
+	if err := m.AddAllowedDir(testDir); err != nil {
+		t.Fatalf("AddAllowedDir: %v", err)
+	}
+
+	// (1) the version line is back at the CURRENT number: forced, not merged.
+	text := readText(t, path)
+	if !strings.Contains(text, "schema_version = 2") {
+		t.Fatalf("the write branch did not re-stamp the deleted schema_version line at the current version:\n%s", text)
+	}
+-- any write-behaviour call introduced? (SaveFile/applyMigrations callers in the test file) --
+   195:// before that write (readConfigFile sees version 0, treats it as v1,
+   196:// applyMigrations replaces the bytes and drops config.toml.bak-1).
+   202:// (writeguard.go:225-229) precisely because SaveFile stamps it, so a claim naming
+   205:// Guard pinned: SaveFile stamps the current schema version (loader.go:257). De-gum
+-- production diff for migrate.go / loader.go since the leg's anchor: (want zero) --
+   internal/config/writeguard_unnailed_341_test.go
+
+########## AC#6: discipline gauges ##########
+-- index clean now? (git diff --cached --name-only) --
+   count=0
+-- the 4 junk files at repo root (the leg's own incident) --
+   EXISTS ⛔ bytes=0 mtime=2026-10-18 22:55:26
+   EXISTS 主料＝（26 bytes=0 mtime=2026-10-18 22:55:26
+   EXISTS 前一腿 bytes=0 mtime=2026-10-18 22:55:26
+   EXISTS 本件＝票 bytes=0 mtime=2026-10-18 22:55:25
+-- are they tracked? (want no) --
+0
+-- do they fall in any gate's scope? d22scan scope dirs --
+264:	if err := s.walkGo(filepath.Join(root, "internal")); err != nil {
+267:	if err := s.walkGo(filepath.Join(root, "cmd")); err != nil {
+271:	if err := s.walkText(filepath.Join(root, "frontend"), "panel-approval", s.panelCheck, false); err != nil {
+274:	if err := s.walkText(filepath.Join(root, "internal", "tools"), "internal-artifact-tool", s.artifactCheck, true); err != nil {
+406:	internalGo, cmdGo := goScopeKey(filepath.Join(root, "internal")), goScopeKey(filepath.Join(root, "cmd"))
+409:			label: "bans #1-5 internal/", dir: filepath.Join(root, "internal"),
+413:			label: "bans #1-5 cmd/", dir: filepath.Join(root, "cmd"),
+417:			label: "ban #6 frontend/", dir: filepath.Join(root, "frontend"),
+433:			label: "ban #7 internal/tools/", dir: filepath.Join(root, "internal", "tools"),
+581:		{dir: filepath.Join(root, "design"), label: "design/"},
+582:		{dir: filepath.Join(root, "frontend"), label: "frontend/", everyFile: true},
+583:		{dir: filepath.Join(root, "internal"), label: "internal/", goOnly: true},
+-- length gate denominator = tracked paths (junk is untracked) --
+   tracked=16299
+-- leg's 6 commits: any file outside its allowed面? --
+-- count of outside files --
+0
+-- ticket tail bullet: numstat and append-only check --
+1	0	.scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md
+0

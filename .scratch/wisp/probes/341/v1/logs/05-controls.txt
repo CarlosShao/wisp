@@ -105,3 +105,8 @@ RUN=195 PASS_TOP=112 FAIL_TOP=2 SKIP=0
   TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed hits=0
   TestHandDeletedProviderBaseUrlComesBackAsThePresetValue          hits=0
   TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile     hits=0
+
+-- addendum: P5 shot control detail (227 P5-prime cases stayed GREEN) --
+   --- PASS: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+   --- PASS: TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent (0.02s)
+-- P2 shot control detail: the other four 341 cases stayed GREEN (from 10-mu-p2 per-case block) --

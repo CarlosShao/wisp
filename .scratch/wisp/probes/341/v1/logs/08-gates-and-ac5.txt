@@ -1,0 +1,54 @@
+=== env after unset: GOTMPDIR=[] TMPDIR=[] TEMP=[] TMP=[] ===
+=== HEAD at gate time ===
+95b1015dcccf04ac0b8c1b1ac161ae09ae24d9e6
+=== internal/config worktree status (want clean) ===
+[empty above = clean]
+
+=== [1] gofumpt -l on the leg's new file (want empty, rc=0) ===
+GOFUMPPT_RC=0
+--- package-wide -l (informational: existing CRLF stock) ---
+GOFUMPPT_PKG_RC=0
+
+=== [2] go vet ./internal/config/ (want rc=0) ===
+VET_RC=0
+
+=== [3] d22scan (want clean rc=0; scope needs design/ present) ===
+d22scan: scope ban #7 internal/tools/   examined  25 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 116 text files
+d22scan: scope ban #8 internal/         examined 592 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=592, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 592 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+D22_RC=0
+
+=== [4] path-length budget (want rc=0 GREEN; needs .git) ===
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 16281 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=16281  over-budget=60  covered by roster=60  not in roster=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 60 paths on this tree, recomputed just now in both units
+PATHLEN_RC=0
+
+=== AC#5 forbidden-zone blob identity, my own re-run ===
+internal/config/writeguard.go HEAD=0ebc415b05651104fa13d6e71c76e61ba8fdd93c
+internal/config/loader.go HEAD=9100ba92e220e6a839142893b54429cb435fa80e
+internal/config/migrate.go HEAD=78d85e22e9518aeec84362ec68a784c01dc06afe
+--- start-anchor(98dbf20a, the leg's own) vs HEAD for the three ---
+internal/config/writeguard.go leg_anchor=0ebc415b0565 head=0ebc415b0565 same=YES
+internal/config/loader.go leg_anchor=9100ba92e220 head=9100ba92e220 same=YES
+internal/config/migrate.go leg_anchor=78d85e22e951 head=78d85e22e951 same=YES
+--- internal/config non-test .go changes in 6948eb08^..HEAD ---
+COMMIT 6948eb08
+A	internal/config/writeguard_unnailed_341_test.go
+--- .go files touched by the leg roster (union of 6 commits) ---
+   internal/config/writeguard_unnailed_341_test.go
+--- t.Skip / Skip( in the leg's test file (want 0) ---
+0
+0
+--- AC box gauge (ticket tail) ---
+unchecked=7 checked=0 lines=44
+Status line unchanged: 1
+title: # 341 — 票 227 交件里**如实报�
