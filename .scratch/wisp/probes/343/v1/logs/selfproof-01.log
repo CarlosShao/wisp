@@ -1,0 +1,59 @@
+############ 343-v1 delivery self-proof (three gauges: commits real / files real / own reruns) ############
+== gauge A: my own roster, anchored (two independent shapes) ==
+A1_gitlog_anchored=5
+   c315fa4c4b34bc4db8a62d0067c7f3bbe23bebfd 票 343 终裁腿 343-v1 交件（第 5 笔）＝本腿自己那批台件/尺件入库（17 枚＝15 枚 sh＋2 枚普查尺源码）。
+   1a51b26b5487838970c9ccef0ae93116288d819d 票 343 终裁腿 343-v1 交件（第 4 笔）＝票尾**一条**只追加 bullet（判语摘要，⛔ 翻框、⛔ 改票名/Status）。
+   f46f69df46351deedb7bdd07c96068e721e10567 票 343 终裁腿 343-v1 交件（第 3 笔）＝判语件 docs/evidence/s1/343-v1-verdict.md（66 行、12991 字节、逐格 ≤8 行、LF）。
+   ed597a1213033d564759e1fd9f98602222f1efbe 票 343 终裁腿 343-v1 交件（第 2 笔）＝AC#1／AC#4／AC#5／AC#0-AC#3 读数件入库（40 枚）。
+   528bc90e4cc45fc7f83fed6d313c1584b780d432 票 343 终裁腿 343-v1 交件（第 1 笔）＝起手三尺＋AC#2 结构尺（独立再算）＋我自己重导树上的 8 枚牙。
+A2_index0_COUNT=5
+
+== gauge B: per-commit path lists, ⊆ write surface, .go / .out / 0-byte counts ==
+----- 528bc90e4cc45fc7f83fed6d313c1584b780d432
+   票 343 终裁腿 343-v1 交件（第 1 笔）＝起手三尺＋AC#2 结构尺（独立再算）＋我自己重导树上的 8 枚牙。
+   paths=36
+   outside_allowed_surface=0
+   .go=0 .out=0
+----- ed597a1213033d564759e1fd9f98602222f1efbe
+   票 343 终裁腿 343-v1 交件（第 2 笔）＝AC#1／AC#4／AC#5／AC#0-AC#3 读数件入库（40 枚）。
+   paths=40
+   outside_allowed_surface=0
+   .go=0 .out=0
+----- f46f69df46351deedb7bdd07c96068e721e10567
+   票 343 终裁腿 343-v1 交件（第 3 笔）＝判语件 docs/evidence/s1/343-v1-verdict.md（66 行、12991 字节、逐格 ≤8 行、LF）。
+   paths=1
+   outside_allowed_surface=0
+   .go=0 .out=0
+----- 1a51b26b5487838970c9ccef0ae93116288d819d
+   票 343 终裁腿 343-v1 交件（第 4 笔）＝票尾**一条**只追加 bullet（判语摘要，⛔ 翻框、⛔ 改票名/Status）。
+   paths=1
+   outside_allowed_surface=0
+   .go=0 .out=0
+----- c315fa4c4b34bc4db8a62d0067c7f3bbe23bebfd
+   票 343 终裁腿 343-v1 交件（第 5 笔）＝本腿自己那批台件/尺件入库（17 枚＝15 枚 sh＋2 枚普查尺源码）。
+   paths=17
+   outside_allowed_surface=0
+   .go=0 .out=0
+
+== gauge C: files real on disk (tracked tree of HEAD), byte sizes, 0-byte scan ==
+tracked_files_in_my_surface=94
+zero_byte_tracked=0
+total_bytes=924148
+-- banned literal char (U+00A7) across my tracked surface (want 0 files) --
+banned_files=0  positive_control_HANDOVER=199
+-- UTF-8 validity of every tracked file in my surface (iconv round trip) --
+nonutf8_flag=0
+
+== gauge D: ticket state (boxes untouched, name/Status untouched, my bullet = last) ==
+unchecked_AC=6 checked=0
+name+Status BYTE-IDENTICAL=YES
+ticket_line_count=45
+-- my bullet is the tail: first line of the last appended block (WHOLE line; no cut -c, that works on BYTES and would leave invalid UTF-8 = my own v1 trap) --
+- 343-v1 终裁腿判语（2026-10-19 11:0x +08；★⛔ 翻框＝本票六格终量仍 6 未勾／0 已勾、⛔ 改票名／`Status:`；本条只追加在票尾）＝**六格全部成立**，判语件＝`docs/evidence/s1/343-v1-verdict.md`（66 行、逐格 ≤8 行），逐字读数＝`.scratch/wisp/probes/343/v1/logs/**`（提交 `528bc90e`／`ed597a12`／`f46f69df`，我按"每落一枚就 commit"落到第 4 笔＝枚数帽按公共块口径为参考值）。
+
+== gauge E: lane integrity (I touched NO tracked code byte) ==
+tracked_changes_in_working_tree=0 (want 0)
+internal_risk_dirty=0 internal_winsec_dirty=0
+blacklist.go_blob_at_HEAD=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b (leg delivery 62f2dddb…, unchanged by me)
+push_count_by_this_leg=0 (I never ran git push)
+SELFPROOF_DONE
