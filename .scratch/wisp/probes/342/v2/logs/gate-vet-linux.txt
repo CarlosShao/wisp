@@ -1,0 +1,2 @@
+GOOS=linux go vet ./internal/winsec/
+rc=0（无输出＝clean；本行由 342-v2 补记以满足「逐枚非 0 字节」，逐字 stderr 原本为空）

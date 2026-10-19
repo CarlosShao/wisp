@@ -1,0 +1,546 @@
+### 尺＝git grep -n "errors.Is(.*fs.ErrNotExist\|os.IsNotExist" -- 产码（⛔ _test、⛔ .scratch）
+DECISION_POINTS=38
+cmd/wisp/config_reload.go:360:	case errors.Is(err, fs.ErrNotExist):
+cmd/wisp/firstrun.go:55:// The absence test is os.Stat + errors.Is(err, fs.ErrNotExist) - the exported
+cmd/wisp/firstrun.go:76:	if _, err := os.Stat(cfgPath); !errors.Is(err, fs.ErrNotExist) {
+cmd/wisp/resident_approval_windows.go:477:		if errors.Is(err, fs.ErrNotExist) {
+internal/ball/position.go:41:		if os.IsNotExist(err) {
+internal/config/parse.go:234:	return errors.Is(err, fs.ErrNotExist)
+internal/memory/artifacts.go:115:		if errors.Is(err, fs.ErrNotExist) {
+internal/memory/artifacts.go:125:			if errors.Is(err, fs.ErrNotExist) {
+internal/memory/artifacts.go:152:					if errors.Is(iErr, fs.ErrNotExist) {
+internal/memory/artifacts.go:204:			if rErr := winsec.RemoveUnlinked(full); rErr != nil && !errors.Is(rErr, fs.ErrNotExist) {
+internal/memory/artifacts.go:214:		if err := winsec.RemoveUnlinked(full); err != nil && !errors.Is(err, fs.ErrNotExist) {
+internal/memory/artifacts.go:264:			!errors.Is(rmErr, fs.ErrNotExist) {
+internal/memory/artifacts.go:286:		if errors.Is(err, fs.ErrNotExist) {
+internal/memory/artifacts.go:307:		if err := os.Remove(filepath.Join(s.artifactsDir, a.Name)); err != nil && !errors.Is(err, fs.ErrNotExist) {
+internal/observe/logging.go:341:			if rmErr := os.Remove(filepath.Join(w.dir, name)); rmErr != nil && !os.IsNotExist(rmErr) {
+internal/panel/assets.go:87:	if errors.Is(err, fs.ErrNotExist) {
+internal/panel/git.go:318:		case errors.Is(err, fs.ErrNotExist):
+internal/panel/git.go:421:	case errors.Is(err, fs.ErrNotExist):
+internal/proc/envfork.go:171:		if !errors.Is(err, fs.ErrNotExist) {
+internal/proc/envfork.go:221:		if !errors.Is(err, fs.ErrNotExist) {
+internal/secret/configrefs.go:25:	if errors.Is(err, fs.ErrNotExist) {
+internal/secret/list.go:38:		if errors.Is(err, fs.ErrNotExist) {
+internal/secret/list.go:50:			if errors.Is(err, fs.ErrNotExist) {
+internal/secret/migrate.go:88:	if errors.Is(err, fs.ErrNotExist) {
+internal/secret/migrate.go:168:	if _, statErr := os.Stat(backupPath); errors.Is(statErr, fs.ErrNotExist) {
+internal/secret/store.go:106:		if errors.Is(err, fs.ErrNotExist) {
+internal/secret/store.go:140:	case errors.Is(err, fs.ErrNotExist):
+internal/secret/store.go:162:		if errors.Is(err, fs.ErrNotExist) {
+internal/winsec/resolve.go:264:		if !errors.Is(err, fs.ErrNotExist) {
+internal/winsec/winsec.go:251:		if !errors.Is(err, fs.ErrNotExist) {
+internal/winsec/winsec_other.go:438:	if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
+internal/winsec/winsec_windows.go:683:		if errors.Is(err, fs.ErrNotExist) {
+internal/winsec/winsec_windows.go:732:	if errors.Is(err, fs.ErrNotExist) {
+internal/winsec/winsec_windows.go:748:	if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
+tools/d22scan/main.go:619:		if os.IsNotExist(err) {
+tools/d22scan/main.go:673:	if _, err := os.Stat(dir); os.IsNotExist(err) {
+tools/d22scan/main.go:1023:	if _, err := os.Stat(dir); os.IsNotExist(err) {
+tools/d22scan/main.go:1098:	if _, err := os.Stat(sc.dir); os.IsNotExist(err) {
+
+### 逐枚窗口（±6 行）＝看 err 从哪来
+===== POINT cmd/wisp/config_reload.go:360 =====
+354	//
+355	// Order carries weight: the io/fs sentinels are checked first, because a failed
+356	// read also arrives wrapped in a config-class error, and "the file is gone" must
+357	// not be reported as "the file is invalid".
+358	func describeReloadFailure(err error) string {
+359		switch {
+360		case errors.Is(err, fs.ErrNotExist):
+361			return "cause=missing detail=\"" +
+362				"config.toml 读不到：文件不存在（这一条只说缺失，不说语法、不说权限）。本次运行继续用内存里的旧配置；" +
+363				"文件回来之后要它的 mtime 或大小变过才会被下一 tick 重读\""
+364		case errors.Is(err, fs.ErrPermission):
+===== POINT cmd/wisp/firstrun.go:55 =====
+49		"github.com/CarlosShao/wisp/internal/secret"
+50	)
+51	
+52	// ensureFirstRunConfig creates <dataDir>\config.toml from the exported
+53	// defaults and returns true, but ONLY when the file is really absent.
+54	//
+55	// The absence test is os.Stat + errors.Is(err, fs.ErrNotExist) - the exported
+56	// equivalent of internal/config's unexported fileMissing (parse.go:232-235):
+57	//   - a DIRECTORY standing under the config name (ticket 101's 权限读不到
+58	//     stand-in, run_mode101_test.go:621-633) stats clean, so it is not missing
+59	//     and this function never touches it. A "stat failed -> create" test would
+===== POINT cmd/wisp/firstrun.go:76 =====
+70	// configFileName constant (the same join run.go:391 already performs inside
+71	// assembleRuntime; the
+72	// d22scan prohibition is on filepath.Clean/Abs decisions outside
+73	// risk.PathResolver, PLAN.md:1288, not on Join over a resolved root).
+74	func ensureFirstRunConfig(dataDir string, stderr io.Writer) (bool, error) {
+75		cfgPath := filepath.Join(dataDir, configFileName)
+76		if _, err := os.Stat(cfgPath); !errors.Is(err, fs.ErrNotExist) {
+77			// Exists (file or directory), or the stat answered something that is
+78			// not absence: not ours to create, not ours to report.
+79			return false, nil
+80		}
+===== POINT cmd/wisp/resident_approval_windows.go:477 =====
+471		if dataDir == "" {
+472			return 0, 0, riskProvenanceNoView
+473		}
+474		cfgPath := filepath.Join(dataDir, configFileName)
+475		c, _, err := config.LoadFile(cfgPath, nil)
+476		if err != nil || c == nil {
+477			if errors.Is(err, fs.ErrNotExist) {
+478				slog.Warn("resident gate: [risk] source unreadable at construction; the gate falls back to the compiled approval constants",
+479					"path", cfgPath, "err", err,
+480					"fallback", "DefaultApprovalTimeout=300s / DefaultL1Window=3s")
+481				return 0, 0, riskProvenanceUnreadable
+===== POINT internal/ball/position.go:41 =====
+35	
+36	// OpenPositionStore loads (or initializes) the store at path.
+37	func OpenPositionStore(path string) (*PositionStore, error) {
+38		s := &PositionStore{path: path, data: posFile{Version: 1, Positions: map[string]PosEntry{}}}
+39		b, err := os.ReadFile(path)
+40		if err != nil {
+41			if os.IsNotExist(err) {
+42				return s, nil
+43			}
+44			return nil, err
+45		}
+===== POINT internal/config/parse.go:234 =====
+228		}
+229		return nil
+230	}
+231	
+232	// fileMissing reports whether err is a not-exist condition.
+233	func fileMissing(err error) bool {
+234		return errors.Is(err, fs.ErrNotExist)
+235	}
+===== POINT internal/memory/artifacts.go:115 =====
+109	// non-conforming entries, the latter measured recursively. Every caller in this
+110	// package feeds it s.artifactsDir and nothing else (ticket 76's audit enforces
+111	// that), so no walk here starts anywhere a caller pointed at.
+112	func listArtifactsDir(dir string) ([]Artifact, []strayEntry, error) {
+113		entries, err := os.ReadDir(dir)
+114		if err != nil {
+115			if errors.Is(err, fs.ErrNotExist) {
+116				return nil, nil, nil
+117			}
+118			return nil, nil, fmt.Errorf("memory: read artifacts dir: %w", err)
+119		}
+===== POINT internal/memory/artifacts.go:125 =====
+119		}
+120		out := make([]Artifact, 0, len(entries))
+121		var strays []strayEntry
+122		for _, e := range entries {
+123			info, err := e.Info()
+124			if err != nil {
+125				if errors.Is(err, fs.ErrNotExist) {
+126					continue // raced with a concurrent delete
+127				}
+128				return nil, nil, fmt.Errorf("memory: artifact info %s: %w", e.Name(), err)
+129			}
+===== POINT internal/memory/artifacts.go:152 =====
+146					}
+147					if d.IsDir() {
+148						return nil
+149					}
+150					fi, iErr := d.Info()
+151					if iErr != nil {
+152						if errors.Is(iErr, fs.ErrNotExist) {
+153							return nil // raced with a concurrent delete
+154						}
+155						return fmt.Errorf("memory: artifact info %s: %w", d.Name(), iErr)
+156					}
+===== POINT internal/memory/artifacts.go:204 =====
+198					if rel != "." {
+199						dirs = append(dirs, rel)
+200					}
+201					return nil
+202				}
+203				full := filepath.Join(s.artifactsDir, rel)
+204				if rErr := winsec.RemoveUnlinked(full); rErr != nil && !errors.Is(rErr, fs.ErrNotExist) {
+205					return fmt.Errorf("memory: remove artifacts stray file %q: %w", rel, rErr)
+206				}
+207				return nil
+208			})
+===== POINT internal/memory/artifacts.go:214 =====
+208			})
+209		if err != nil {
+210			return fmt.Errorf("memory: reclaim artifacts stray %q: %w", name, err)
+211		}
+212		for i := len(dirs) - 1; i >= 0; i-- {
+213			full := filepath.Join(s.artifactsDir, dirs[i])
+214			if err := winsec.RemoveUnlinked(full); err != nil && !errors.Is(err, fs.ErrNotExist) {
+215				return fmt.Errorf("memory: reclaim artifacts stray dir %q: %w", dirs[i], err)
+216			}
+217		}
+218		return nil
+===== POINT internal/memory/artifacts.go:264 =====
+258			}
+259			if it.subtree {
+260				if rmErr := s.removeStray(it.name); rmErr != nil {
+261					return files, freed, rmErr
+262				}
+263			} else if rmErr := os.Remove(filepath.Join(s.artifactsDir, it.name)); rmErr != nil &&
+264				!errors.Is(rmErr, fs.ErrNotExist) {
+265				return files, freed, fmt.Errorf("memory: LRU remove %s: %w", it.name, rmErr)
+266			}
+267			files++
+268			freed += it.bytes
+===== POINT internal/memory/artifacts.go:286 =====
+280	func (s *Store) DeleteArtifact(ctx context.Context, name string) error {
+281		if err := validArtifactName(name); err != nil {
+282			return err
+283		}
+284		full := filepath.Join(s.artifactsDir, name)
+285		if err := os.Remove(full); err != nil {
+286			if errors.Is(err, fs.ErrNotExist) {
+287				return fmt.Errorf("artifact %q: %w", name, ErrNotFound)
+288			}
+289			return fmt.Errorf("memory: delete artifact %q: %w", name, err)
+290		}
+===== POINT internal/memory/artifacts.go:307 =====
+301		arts, strays, err := listArtifactsDir(s.artifactsDir)
+302		if err != nil {
+303			return 0, err
+304		}
+305		removed := 0
+306		for _, a := range arts {
+307			if err := os.Remove(filepath.Join(s.artifactsDir, a.Name)); err != nil && !errors.Is(err, fs.ErrNotExist) {
+308				return removed, fmt.Errorf("memory: purge artifact %q: %w", a.Name, err)
+309			}
+310			removed++
+311		}
+===== POINT internal/observe/logging.go:341 =====
+335				if ierr != nil {
+336					continue
+337				}
+338				t = info.ModTime().UTC()
+339			}
+340			if t.Before(cutoff) {
+341				if rmErr := os.Remove(filepath.Join(w.dir, name)); rmErr != nil && !os.IsNotExist(rmErr) {
+342					return rmErr
+343				}
+344			}
+345		}
+===== POINT internal/panel/assets.go:87 =====
+81			name = EntryFile
+82		}
+83		if strings.Contains(name, "..") || strings.Contains(name, "\\") || strings.Contains(name, ":") {
+84			return nil, "", fmt.Errorf("panel: refused request path %q", requestPath)
+85		}
+86		data, err := fs.ReadFile(a.tree, name)
+87		if errors.Is(err, fs.ErrNotExist) {
+88			return nil, "", fmt.Errorf("panel: %q is not in the embedded bundle: %w", name, err)
+89		}
+90		if err != nil {
+91			return nil, "", fmt.Errorf("panel: read %q: %w", name, err)
+===== POINT internal/panel/git.go:318 =====
+312				// git dir and the shared one.
+313				return gitDirs{worktreeGitDir: dot, commonGitDir: dot, repoRoot: dir},
+314					GitKindRepo, ""
+315			case err == nil:
+316				// Linked tree: .git is a pointer file.
+317				return resolvePointerFile(dot, dir)
+318			case errors.Is(err, fs.ErrNotExist):
+319				parent := filepath.Dir(dir)
+320				if parent == dir {
+321					return gitDirs{}, GitKindNotARepo,
+322						"这棵工作区目录及其以上都没有 .git，所以没有分支可显示"
+===== POINT internal/panel/git.go:421 =====
+415	
+416	// readHead classifies a HEAD file: symref, detached sha, or a failure with its
+417	// own kind. kind is GitKindRepo when a usable answer came back.
+418	func readHead(gitDir string) (branch, sha string, detached bool, kind, reason string) {
+419		raw, err := os.ReadFile(filepath.Join(gitDir, "HEAD"))
+420		switch {
+421		case errors.Is(err, fs.ErrNotExist):
+422			return "", "", false, GitKindUnreadable, "git 目录里没有 HEAD：" + gitDir
+423		case errors.Is(err, fs.ErrPermission):
+424			return "", "", false, GitKindPermissionDenied, ioReason(err)
+425		case err != nil:
+===== POINT internal/proc/envfork.go:171 =====
+165		cur := path
+166		for {
+167			_, err := os.Lstat(cur)
+168			if err == nil {
+169				break
+170			}
+171			if !errors.Is(err, fs.ErrNotExist) {
+172				return path // unreadable, not absent: not ours to reinterpret
+173			}
+174			parent := filepath.Dir(cur)
+175			if parent == cur {
+===== POINT internal/proc/envfork.go:221 =====
+215		name, err := PortableDataDirName(env)
+216		if err != nil {
+217			return l, false, err
+218		}
+219		marker := filepath.Join(exeDir, PortableMarker)
+220		if _, err := os.Stat(marker); err != nil {
+221			if !errors.Is(err, fs.ErrNotExist) {
+222				return l, false, fmt.Errorf("proc: portable marker %s: %w", marker, err)
+223			}
+224			return l, false, nil
+225		}
+===== POINT internal/secret/configrefs.go:25 =====
+19	// deleting a blob a live config still points at (ticket 63). The values are
+20	// references, never secret material, so they are safe in diagnostics. A
+21	// missing config file yields an empty map and no error: no config means no
+22	// references.
+23	func ConfigRefs(configPath string) (map[string]string, error) {
+24		raw, err := os.ReadFile(configPath)
+25		if errors.Is(err, fs.ErrNotExist) {
+26			return map[string]string{}, nil
+27		}
+28		if err != nil {
+29			return nil, fmt.Errorf("secret: config refs: read %s: %w", configPath, err)
+===== POINT internal/secret/list.go:38 =====
+32	// the files are not. Entries whose name is not a valid blob id are skipped
+33	// (they are not refs; e.g. a stray file left by a tool), and the result is
+34	// sorted by id so listings are stable.
+35	func (s *Store) Blobs() ([]BlobInfo, error) {
+36		entries, err := os.ReadDir(s.dir)
+37		if err != nil {
+38			if errors.Is(err, fs.ErrNotExist) {
+39				return nil, nil // no secrets directory yet = no blobs
+40			}
+41			return nil, fmt.Errorf("secret: list %s: %w", s.dir, err)
+42		}
+===== POINT internal/secret/list.go:50 =====
+44		for _, e := range entries {
+45			if e.IsDir() || !ValidBlobID(e.Name()) {
+46				continue
+47			}
+48			fi, err := e.Info()
+49			if err != nil {
+50				if errors.Is(err, fs.ErrNotExist) {
+51					continue // raced with a delete
+52				}
+53				return nil, fmt.Errorf("secret: list %s: stat %s: %w", s.dir, e.Name(), err)
+54			}
+===== POINT internal/secret/migrate.go:88 =====
+82	// backup, no rewrite, no notice). Empty-string api_key values are not
+83	// secrets and are left alone. If storing any blob fails, the file is left
+84	// untouched. The rewrite re-serializes the TOML tree (comments/formatting are
+85	// preserved only in the backup).
+86	func MigratePlaintext(configPath string) (*MigrationReport, error) {
+87		raw, err := os.ReadFile(configPath)
+88		if errors.Is(err, fs.ErrNotExist) {
+89			// First run without a config yet: nothing to migrate, not an error.
+90			return &MigrationReport{ConfigPath: configPath, Refs: map[string]string{}}, nil
+91		}
+92		if err != nil {
+===== POINT internal/secret/migrate.go:168 =====
+162		// accounts). Sealing only the rewritten config while leaving the plaintext
+163		// copy wide hands the whole migration back to the hole it was meant to close.
+164		// The existing-backup branch is the repair path for exactly that tree: a
+165		// backup written before this call sealed anything stays on disk forever,
+166		// because the branch above refuses to overwrite it.
+167		backupPath := configPath + BackupSuffix
+168		if _, statErr := os.Stat(backupPath); errors.Is(statErr, fs.ErrNotExist) {
+169			if werr := winsec.PrivateFile(backupPath, raw, 0o600); werr != nil {
+170				return nil, fmt.Errorf("secret: migrate: write backup %s: %w", backupPath, werr)
+171			}
+172		} else if statErr != nil {
+===== POINT internal/secret/store.go:106 =====
+100			if v == "" {
+101				return "", fmt.Errorf("secret: resolve %q: environment variable %s is empty", ref, value)
+102			}
+103			return v, nil
+104		case RefKindDPAPI:
+105			blob, err := os.ReadFile(s.blobPath(value))
+106			if errors.Is(err, fs.ErrNotExist) {
+107				return "", fmt.Errorf("secret: resolve %q: no blob file under %s", ref, s.dir)
+108			}
+109			if err != nil {
+110				return "", fmt.Errorf("secret: resolve %q: read blob: %w", ref, err)
+===== POINT internal/secret/store.go:140 =====
+134		if kind != RefKindDPAPI {
+135			return false, fmt.Errorf("secret: exists: %q: env refs live in the process environment; only dpapi: refs have blob files", ref)
+136		}
+137		switch _, err := os.Stat(s.blobPath(id)); {
+138		case err == nil:
+139			return true, nil
+140		case errors.Is(err, fs.ErrNotExist):
+141			return false, nil
+142		default:
+143			return false, fmt.Errorf("secret: exists %q: %w", ref, err)
+144		}
+===== POINT internal/secret/store.go:162 =====
+156			return err
+157		}
+158		if kind != RefKindDPAPI {
+159			return fmt.Errorf("secret: delete: %q: env refs live in the process environment; there is no blob to delete", ref)
+160		}
+161		if err := os.Remove(s.blobPath(id)); err != nil {
+162			if errors.Is(err, fs.ErrNotExist) {
+163				return fmt.Errorf("secret: delete %q: no blob file under %s: %w", ref, s.dir, err)
+164			}
+165			return fmt.Errorf("secret: delete %q: %w", ref, err)
+166		}
+===== POINT internal/winsec/resolve.go:264 =====
+258		cur := path
+259		for {
+260			_, err := os.Lstat(cur)
+261			if err == nil {
+262				break
+263			}
+264			if !errors.Is(err, fs.ErrNotExist) {
+265				return path // unreadable, not absent: not this guard's to reinterpret
+266			}
+267			parent := filepath.Dir(cur)
+268			if parent == cur {
+===== POINT internal/winsec/winsec.go:251 =====
+245					return fmt.Errorf("winsec: %s is not a directory", cur)
+246				}
+247				// Existing level: stop climbing. Its parents are not ours to seal,
+248				// and if cur is the requested path the SealDir below repairs it.
+249				break
+250			}
+251			if !errors.Is(err, fs.ErrNotExist) {
+252				return err
+253			}
+254			parent := filepath.Dir(cur)
+255			if parent == cur {
+===== POINT internal/winsec/winsec_other.go:438 =====
+432	func sealDir(path string) error { return applyDescriptor(path, true) }
+433	
+434	// removeUnlinked needs no special care on POSIX: unlink operates on the link
+435	// itself and never follows it, so os.Remove already has the non-recursive,
+436	// non-following behavior the Windows implementation has to work for.
+437	func removeUnlinked(path string) error {
+438		if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
+439			return err
+440		}
+441		return nil
+442	}
+===== POINT internal/winsec/winsec_windows.go:683 =====
+677		return propagatePrivate(path)
+678	}
+679	
+680	func propagatePrivate(dir string) error {
+681		entries, err := os.ReadDir(dir)
+682		if err != nil {
+683			if errors.Is(err, fs.ErrNotExist) {
+684				return nil // the subtree vanished under us; there is nothing left to narrow
+685			}
+686			// Not-a-permission-error-skip: an entry we cannot enumerate is an entry
+687			// we cannot prove private, and "could not check, so assume fine" is the
+===== POINT internal/winsec/winsec_windows.go:732 =====
+726	// caller is left with a stray subtree it cannot reclaim - and the tempting
+727	// "fix", os.RemoveAll, would instead delete that target tree. Opening the link
+728	// with FILE_FLAG_OPEN_REPARSE_POINT and asking the handle to mark itself
+729	// delete-pending is the form that removes the link and leaves the tree behind.
+730	func removeUnlinked(path string) error {
+731		info, err := os.Lstat(path)
+732		if errors.Is(err, fs.ErrNotExist) {
+733			return nil
+734		}
+735		if err != nil {
+736			return err
+===== POINT internal/winsec/winsec_windows.go:748 =====
+742				// human has to be able to grep it.
+743				return fmt.Errorf("%w %s: %v: refusing to recurse into whatever it points at",
+744					ErrIsReparsePoint, path, err)
+745			}
+746			return nil
+747		}
+748		if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
+749			return err
+750		}
+751		return nil
+752	}
+===== POINT tools/d22scan/main.go:619 =====
+613		return ""
+614	}
+615	
+616	func (s *scanner) loadAllowlist(path string) error {
+617		data, err := os.ReadFile(path)
+618		if err != nil {
+619			if os.IsNotExist(err) {
+620				return nil
+621			}
+622			return err
+623		}
+===== POINT tools/d22scan/main.go:673 =====
+667	
+668	// walkGo runs the Go-level bans over production files of dir. Every file it
+669	// hands to scanGoFile is counted into the ledger under the repo-relative dir,
+670	// which is what makes bans #1-5 report per-directory work instead of one
+671	// aggregate that hides an empty directory (ticket 71 AC#4).
+672	func (s *scanner) walkGo(dir string) error {
+673		if _, err := os.Stat(dir); os.IsNotExist(err) {
+674			return nil
+675		}
+676		key := goScopeKey(dir)
+677		return filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+===== POINT tools/d22scan/main.go:1023 =====
+1017	// walkText runs a line-based check over all files of dir (all extensions).
+1018	// The per-ban counter is what ticket 71 AC#4's ledger reads: ban #6 and ban #7
+1019	// each walk exactly one directory, so "files examined for this ban" is a
+1020	// well-defined number, and an always-0 one is now visible in the self-report
+1021	// instead of being inferred from the absence of findings.
+1022	func (s *scanner) walkText(dir, ban string, check func(string) (string, bool), goOnly bool) error {
+1023		if _, err := os.Stat(dir); os.IsNotExist(err) {
+1024			return nil
+1025		}
+1026		return filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+1027			if err != nil {
+===== POINT tools/d22scan/main.go:1098 =====
+1092	// as internal/tools/tmp/, i.e. not source - and testdata is skipped
+1093	// below exactly as walkGo/walkText skip it for every other ban, so ban #8 gains
+1094	// no file class the other bans lack and drops none either. design/ stays
+1095	// all-text (isTextFile) because its HTML/CSS/JS mockups ARE the surface D23
+1096	// governs.
+1097	func (s *scanner) walkEmoji(sc emojiScope) error {
+1098		if _, err := os.Stat(sc.dir); os.IsNotExist(err) {
+1099			// Absent tree: the count stays 0 and emptyEmojiScope in main makes
+1100			// that fatal. Not an error here, so Scan stays usable from fixtures
+1101			// that seed only part of the repo.
+1102			return nil
+
+### 谁把 winsec 入口的返回错误**存下来**再判（尺＝winsec 调用赋值行 ±12 行窗口内有无 NotExist 判定）
+## FILE cmd/wisp/secret_dataroot_119b_test.go
+256:	if _, statErr := os.Lstat(filepath.Join(foreign, "artifact.txt")); !errors.Is(statErr, fs.ErrNotExist) {
+## FILE internal/agent/spill.go
+   (no NotExist decision in this file)
+## FILE internal/config/migrate.go
+   (no NotExist decision in this file)
+## FILE internal/config/parse.go
+234:	return errors.Is(err, fs.ErrNotExist)
+## FILE internal/memory/artifacts.go
+115:		if errors.Is(err, fs.ErrNotExist) {
+125:			if errors.Is(err, fs.ErrNotExist) {
+152:					if errors.Is(iErr, fs.ErrNotExist) {
+204:			if rErr := winsec.RemoveUnlinked(full); rErr != nil && !errors.Is(rErr, fs.ErrNotExist) {
+214:		if err := winsec.RemoveUnlinked(full); err != nil && !errors.Is(err, fs.ErrNotExist) {
+264:			!errors.Is(rmErr, fs.ErrNotExist) {
+286:		if errors.Is(err, fs.ErrNotExist) {
+307:		if err := os.Remove(filepath.Join(s.artifactsDir, a.Name)); err != nil && !errors.Is(err, fs.ErrNotExist) {
+## FILE internal/secret/migrate.go
+88:	if errors.Is(err, fs.ErrNotExist) {
+168:	if _, statErr := os.Stat(backupPath); errors.Is(statErr, fs.ErrNotExist) {
+## FILE internal/secret/store.go
+106:		if errors.Is(err, fs.ErrNotExist) {
+140:	case errors.Is(err, fs.ErrNotExist):
+149:// absent blob reports fs.ErrNotExist wrapped, so callers can distinguish
+162:		if errors.Is(err, fs.ErrNotExist) {
+## FILE internal/winsec/absoluteness_seam_landing_129_windows_test.go
+138:				if _, lErr := os.Lstat(target); !os.IsNotExist(lErr) {
+225:			if _, lErr := os.Lstat(target); !os.IsNotExist(lErr) {
+## FILE internal/winsec/acl_windows_test.go
+   (no NotExist decision in this file)
+## FILE internal/winsec/dataroot_symlink_119_other_test.go
+246:	if _, statErr := os.Lstat(shape.inRealTree("data")); !errors.Is(statErr, fs.ErrNotExist) {
+249:	if _, statErr := os.Lstat(foreign.inRealTree("data")); !errors.Is(statErr, fs.ErrNotExist) {
+366:	if _, statErr := os.Lstat(asTheKernelSpellsIt); !errors.Is(statErr, fs.ErrNotExist) {
+## FILE internal/winsec/placement_leaf_118_other_test.go
+   (no NotExist decision in this file)
+## FILE internal/winsec/placement_symlink_113_other_test.go
+289:	if _, err := os.Lstat(filepath.Join(f.dir, "secret.txt")); !errors.Is(err, fs.ErrNotExist) {
+292:	if _, err := os.Lstat(spelled); !errors.Is(err, fs.ErrNotExist) {
+## FILE internal/winsec/posix_seal_window_120_other_test.go
+437:			if !errors.Is(err, fs.ErrNotExist) {
+446:		if err := os.Remove(blob); err != nil && !errors.Is(err, fs.ErrNotExist) {
+## FILE internal/winsec/seam_bypass_108_windows_test.go
+364:			if _, lErr := os.Lstat(link); lErr != nil && !errors.Is(lErr, fs.ErrNotExist) {
+385:	if _, err := os.Stat(f); !errors.Is(err, fs.ErrNotExist) {
+393:	if _, err := os.Lstat(link); !errors.Is(err, fs.ErrNotExist) {
+## FILE internal/winsec/seam_guard_windows_test.go
+195:	if _, err := os.Lstat(filepath.Join(victim, "artifacts")); !errors.Is(err, fs.ErrNotExist) {
+366:	if _, err := os.Lstat(link); !errors.Is(err, fs.ErrNotExist) {

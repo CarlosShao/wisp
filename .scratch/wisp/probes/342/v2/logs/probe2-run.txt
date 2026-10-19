@@ -1,0 +1,7 @@
+PROBE_ROOT=C:\Users\swq\AppData\Local\Temp\wisp342v2probe2-728082130 VOLUME_ROOT=C:\
+=== CASE A: ancestor = RELATIVE directory SYMLINK (the instrument's symlink-dir form) ===
+P0 handle at the link's own directory OK
+P1 OpenRoot("sub" through the link) err=openat sub: path escapes from parent <== 落地链在这一跳的答案
+=== CASE B: ancestor = JUNCTION, absolute substitute name (control) ===
+P0 handle at the link's own directory OK
+P1 OpenRoot("sub2" through the link) err=openat sub2: path escapes from parent <== 落地链在这一跳的答案

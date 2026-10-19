@@ -1,0 +1,18 @@
+iv02-treeB-winfullpkg-1 RC=1 RUN=115 PASS_TOP=61 FAIL_TOP=3 SKIP=0
+  RED_NAMES=3
+TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 (1.04s)
+TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1 (0.57s)
+TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 (0.57s)
+iv02-treeB-winfullpkg-2 RC=1 RUN=115 PASS_TOP=61 FAIL_TOP=3 SKIP=0
+  RED_NAMES=3
+TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 (1.49s)
+TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1 (0.54s)
+TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 (0.61s)
+iv02-treeL-winfullpkg-1 RC=1 RUN=115 PASS_TOP=62 FAIL_TOP=2 SKIP=0
+  RED_NAMES=2
+TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 (1.45s)
+TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1 (2.01s)
+iv02-treeL-winfullpkg-2 RC=1 RUN=115 PASS_TOP=62 FAIL_TOP=2 SKIP=0
+  RED_NAMES=2
+TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 (1.41s)
+TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1 (1.62s)

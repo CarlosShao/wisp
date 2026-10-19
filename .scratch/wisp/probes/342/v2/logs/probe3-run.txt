@@ -1,0 +1,4 @@
+PROBE_ROOT=C:\Users\swq\AppData\Local\Temp\wisp342v2probe3-1280430357 VOLUME_ROOT=C:\
+=== leaf is now a RELATIVE symlink to the foreign file, inside the pinned parent ===
+Q0 parent.Lstat(leaf): reparse=true modeSymlink=true attrs=0x420
+Q1 Root.OpenFile(leaf, O_TRUNC) err=openat leaf-342r1w.bin: path escapes from parent <== 跟随＝落地形拿到的是外来对象

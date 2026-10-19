@@ -1,0 +1,14 @@
+time=2026-10-19T18:04:21.904+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+=== RUN   TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1/junction
+    ancestoropen_342_windows_test.go:48: AC#1 (ticket 342, Windows ancestor form junction: the act-time face: an absolute reparse target refused inside the descent): form=junction attempts=400 cycles=8 provedReparse=9 formBLegRefusals=0 truncated=0 deleted=0 returnedNil=400 flipErrs=0
+    ancestoropen_342_windows_test.go:48: AC#1 (ticket 342, Windows ancestor form junction: the act-time face: an absolute reparse target refused inside the descent)': leg that answered = none: the call returned nil : 400 attempts
+    ancestoropen_342_windows_test.go:56: AC#1 RED instrument: reparseAt proved 9 flipped cycles and the landing's own legs answered 0 attempts across 400 (flipErrs=0, first "") - so the zeroes above are not evidence about a window that was ever reached
+=== RUN   TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1/symlink-dir
+    ancestorworld_342_348_windows_test.go:386: settle the world back to the real state: remove C:\Users\swq\AppData\Local\Temp\TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAF2781393429\001\data\sub: The directory is not empty.
+--- FAIL: TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 (0.69s)
+    --- FAIL: TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1/junction (0.40s)
+    --- FAIL: TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1/symlink-dir (0.28s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.727s
+FAIL

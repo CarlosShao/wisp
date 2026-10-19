@@ -1,0 +1,9 @@
+PROBE_ROOT=C:\Users\swq\AppData\Local\Temp\wisp342v2probe4-4242792406
+=== A: leaf symlink whose target contains '..' (the instrument's leaf-symlink form) ===
+A1 OpenFile err=openat leaf-342r1w.bin: path escapes from parent
+A3 FOREIGN witness now="FOREIGN-WITNESS-BODY" err=<nil>
+=== B: leaf symlink with a BARE in-parent target (containment cannot refuse) ===
+B1 OpenFile err=<nil> <== nil＝跟随（Root 只看是否出根，出根与否由目标决定）
+B2 Write err=<nil>
+B3 IN-ROOT sibling now="PROBE-BYTES-B" err=<nil> <== 被改写＝落地那道复验是这一形上⛔ 得拦住的那一支
+B4 FOREIGN witness still="FOREIGN-WITNESS-BODY" err=<nil>

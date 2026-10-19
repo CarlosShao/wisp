@@ -1,0 +1,81 @@
+//go:build unix
+
+// 342-v2 仓外探针件（★只存在于 D:\tmp 的拷贝树，⛔ 入库、⛔ 任何跟踪字节）：
+// 必答(v) 的实测面＝"父目录不存在"那一跳在基线产码⇄落地产码上的**分类差**，逐枚 sentinel 现打：
+//   errors.Is(err, fs.ErrNotExist) ⇄ errors.Is(err, ErrNotSealable) ⇄ errors.Is(err, ErrUnresolvedPath)
+// 外加 *os.PathError 的 Op 与 errno 逐字。⛔ 断言、只 Logf＝这是一把尺、不是一枚钉。
+package winsec
+
+import (
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"syscall"
+	"testing"
+)
+
+func p342v2Classify(t *testing.T, tag string, err error) {
+	t.Helper()
+	if err == nil {
+		t.Logf("%s: err=nil", tag)
+		return
+	}
+	var pe *os.PathError
+	asPath := errors.As(err, &pe)
+	op, eno := "<no *os.PathError>", "<n/a>"
+	if asPath {
+		op = pe.Op
+		if e, ok := pe.Err.(syscall.Errno); ok {
+			eno = e.Error()
+		} else {
+			eno = fmt.Sprintf("%T:%v", pe.Err, pe.Err)
+		}
+	}
+	t.Logf("%s: isErrNotExist=%v isNotSealable=%v isErrExist=%v isUnresolved=%v isReparse=%v PathError{Op:%s errno:%s} verbatim=%q",
+		tag,
+		errors.Is(err, fs.ErrNotExist),
+		errors.Is(err, ErrNotSealable),
+		errors.Is(err, fs.ErrExist),
+		errors.Is(err, ErrUnresolvedPath),
+		errors.Is(err, ErrIsReparsePoint),
+		op, eno, err.Error())
+}
+
+func TestP342V2ErrClassifyPOSIX(t *testing.T) {
+	base := SealableTempDirForTest124(t)
+	// 1) 父目录不存在（＝派单点名的那一跳）
+	missing := filepath.Join(base, "no-such-dir", "leaf.bin")
+	p342v2Classify(t, "C1 parent-missing PrivateFile", PrivateFile(missing, []byte("x"), 0o600))
+	p342v2Classify(t, "C1b parent-missing PrivateFileExclusive", PrivateFileExclusive(missing, []byte("x")))
+	// 2) 叶子名已存在（覆盖写那一支，⛔ 该拒）
+	existing := filepath.Join(base, "exists.bin")
+	if err := os.WriteFile(existing, []byte("old"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	p342v2Classify(t, "C2 existing-name PrivateFile", PrivateFile(existing, []byte("new"), 0o600))
+	// 3) 独占撞已存在名（fs.ErrExist 承诺）
+	p342v2Classify(t, "C3 exclusive-on-existing", PrivateFileExclusive(existing, []byte("new")))
+	// 4) 叶子＝符号链接（票 322 那一支：ELOOP 可穿）
+	link := filepath.Join(base, "link.bin")
+	if err := os.Symlink(filepath.Join(base, "target.bin"), link); err != nil {
+		t.Fatal(err)
+	}
+	p342v2Classify(t, "C4 leaf-is-symlink PrivateFile", PrivateFile(link, []byte("x"), 0o600))
+	// 5) 祖先＝符号链接（稳态，⛔ 竞态）
+	anc := filepath.Join(base, "anc-link")
+	realDir := filepath.Join(base, "real-dir")
+	if err := os.MkdirAll(realDir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(realDir, anc); err != nil {
+		t.Fatal(err)
+	}
+	p342v2Classify(t, "C5 ancestor-is-symlink steady", PrivateFile(filepath.Join(anc, "l.bin"), []byte("x"), 0o600))
+	// 6) 空串／相对拼写（C26 面）
+	p342v2Classify(t, "C6 empty", PrivateFile("", []byte("x"), 0o600))
+	p342v2Classify(t, "C7 relative", PrivateFile("relative/leaf.bin", []byte("x"), 0o600))
+	// 7) SealFile 撞不存在的名字
+	p342v2Classify(t, "C8 SealFile-missing", SealFile(missing))
+}

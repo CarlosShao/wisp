@@ -1,0 +1,4 @@
+iv02-treeB-winfullpkg-1 RC=1 RUN=115 PASS_TOP=61 FAIL_TOP=3 SKIP=0
+iv02-treeB-winfullpkg-2 RC=1 RUN=115 PASS_TOP=61 FAIL_TOP=3 SKIP=0
+iv02-treeL-winfullpkg-1 RC=1 RUN=115 PASS_TOP=62 FAIL_TOP=2 SKIP=0
+iv02-treeL-winfullpkg-2 RC=1 RUN=115 PASS_TOP=62 FAIL_TOP=2 SKIP=0
