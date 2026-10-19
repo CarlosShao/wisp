@@ -1,0 +1,71 @@
+== header line (anchor/pristine/tree = MINE) ==
+### AC#2 sweep: anchor=31d4a47626ec7997666b6e0b190a760cdc535da0 pristine=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b tree=D:/tmp/wisp/20261019/343v1/treeDel
+== every pristine/restore hash check in order (11 shots + final) ==
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [start]
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-pristine]
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1a]
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1b]
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1c]
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1d]
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1e]
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1f]
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1g]
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1h]
+  hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [final]
+== 落刀前后命中数 (per mutation) ==
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+  落点命中枚数 needle_before=1 needle_after=0 (want 1 -> 0)
+  branch_removals_on_disk=1 (want 1: exactly one operand lost its branch)
+  changed_lines=2
+== red subtest names per mutation (the 8 teeth) ==
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/git-credentials 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/ssh 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/aws 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/kube 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/dpapi-protect 
+    RED     --- FAIL: TestAnchorFallbackTeethPerAnchor336/local-credentials 
+== final per-mutation counts ==
+MU-1a teeth_red=2 leg_red=0
+MU-1b teeth_red=2 leg_red=0
+MU-1c teeth_red=3 leg_red=0
+MU-1d teeth_red=2 leg_red=0
+MU-1e teeth_red=2 leg_red=2
+MU-1f teeth_red=2 leg_red=2
+MU-1g teeth_red=2 leg_red=0
+MU-1h teeth_red=2 leg_red=0
+== TEETH336 operand roster in the UNMUTATED positive control ==
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+        anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+== runner rc + worktree dirtiness ==
+  shared_worktree_dirty_internal_cmd=0
+ac2_sweep_rc=0
+DONE

@@ -1,0 +1,20 @@
+== my roster, anchored, two independent gauges ==
+A1_gitlog_anchored=6
+A2_index0_COUNT=6
+== per commit: hash, subject, path count, .go count, and the key file byte sizes ==
+528bc90e | 票 343 终裁腿 343-v1 交件（第 1 笔）＝起手三� | paths=36 | .go=0
+ed597a12 | 票 343 终裁腿 343-v1 交件（第 2 笔）＝AC#1／AC#4 | paths=40 | .go=0
+f46f69df | 票 343 终裁腿 343-v1 交件（第 3 笔）＝判语件 d | paths=1 | .go=0
+1a51b26b | 票 343 终裁腿 343-v1 交件（第 4 笔）＝票尾**一 | paths=1 | .go=0
+c315fa4c | 票 343 终裁腿 343-v1 交件（第 5 笔）＝本腿自� | paths=17 | .go=0
+bff8264c | 票 343 终裁腿 343-v1 交件（第 6 笔）＝判语件� | paths=7 | .go=0
+== deliverable absolute paths + bytes + lines ==
+verdict: /d/work/workspace/projects plans/Wisp/docs/evidence/s1/343-v1-verdict.md bytes=14744 lines=67
+probes root: /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/343/v1 files=99 bytes=926830
+== the two AC#2 hashes, recomputed one last time from the object store ==
+start-side b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 *-
+head-side  b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 *-
+== ticket final gauges ==
+unchecked=6 checked=0 lines=45 banned=0
+working_tree_tracked_changes=0
+HEAD=bff8264c895bf1cfd3ee8bf0125ae9f4557d8b5d 票 343 终裁腿 343-v1 交件（第 6 笔）＝
