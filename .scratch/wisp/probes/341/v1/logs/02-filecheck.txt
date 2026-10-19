@@ -1,0 +1,49 @@
+[note] the inner ls below lists 02-filecheck.txt at 14 bytes = its size at the instant that ls ran (the redirect had just created it). The committed size of this file is the number in the commit message of this batch, not that 14.
+=== files ===
+.scratch/wisp/probes/341/v1/logs:
+total 109
+-rw-r--r-- 1 swq 197609  2241 Oct 18 23:52 00-start-gauges.txt
+-rw-r--r-- 1 swq 197609  8426 Oct 18 23:54 01-ac0-census-and-landings.txt
+-rw-r--r-- 1 swq 197609    14 Oct 19 09:30 02-filecheck.txt
+-rw-r--r-- 1 swq 197609  1800 Oct 18 23:36 03-color-base.txt
+-rw-r--r-- 1 swq 197609  1802 Oct 18 23:38 04-color-deliv.txt
+-rw-r--r-- 1 swq 197609  7061 Oct 19 09:16 05-controls.txt
+-rw-r--r-- 1 swq 197609 11284 Oct 19 09:12 06-ac2-quote-shape-and-ac3.txt
+-rw-r--r-- 1 swq 197609  8349 Oct 19 09:11 07-ac2356-residual.txt
+-rw-r--r-- 1 swq 197609  3510 Oct 19 09:11 08-gates-and-ac5.txt
+-rw-r--r-- 1 swq 197609  4093 Oct 19 09:14 09-final-state.txt
+-rw-r--r-- 1 swq 197609  2529 Oct 18 23:51 10-mu-p2.txt
+-rw-r--r-- 1 swq 197609  3723 Oct 18 23:51 10-mu-p3.txt
+-rw-r--r-- 1 swq 197609  1965 Oct 18 23:51 10-mu-p5.txt
+-rw-r--r-- 1 swq 197609  1951 Oct 18 23:52 10-mu-p6.txt
+-rw-r--r-- 1 swq 197609   728 Oct 19 09:16 11-quoteshape.txt
+-rw-r--r-- 1 swq 197609   706 Oct 19 09:21 12-append-bullet.txt
+-rw-r--r-- 1 swq 197609  1188 Oct 19 09:22 13-my-discipline-slip-reset.txt
+-rw-r--r-- 1 swq 197609 12820 Oct 19 09:30 14-selfproof.txt
+
+.scratch/wisp/probes/341/v1/scripts:
+total 80
+-rwxr-xr-x 1 swq 197609 1918 Oct 19 09:30 commit1.sh
+-rwxr-xr-x 1 swq 197609 1718 Oct 18 23:52 run1-trees.sh
+-rwxr-xr-x 1 swq 197609 4262 Oct 19 09:14 run10-final.sh
+-rwxr-xr-x 1 swq 197609  645 Oct 19 09:16 run11-quoteshape.sh
+-rwxr-xr-x 1 swq 197609 1458 Oct 19 09:21 run12-append-bullet.sh
+-rwxr-xr-x 1 swq 197609 5125 Oct 19 09:28 run13-selfproof.sh
+-rwxr-xr-x 1 swq 197609 1585 Oct 18 23:52 run2-color.sh
+-rwxr-xr-x 1 swq 197609 6722 Oct 18 23:52 run3-mu.sh
+-rwxr-xr-x 1 swq 197609 6011 Oct 19 09:30 run4-census.sh
+-rwxr-xr-x 1 swq 197609 2867 Oct 18 23:56 run5-controls.sh
+-rwxr-xr-x 1 swq 197609  744 Oct 19 09:30 run6-filecheck.sh
+-rwxr-xr-x 1 swq 197609 2995 Oct 19 09:11 run7-gates.sh
+-rwxr-xr-x 1 swq 197609 4282 Oct 19 09:11 run8-ac23.sh
+-rwxr-xr-x 1 swq 197609 4475 Oct 19 09:11 run9-residual.sh
+=== zero-byte count ===
+0
+=== total files ===
+32
+=== banned char U+00A7 hits in my write面 (ruler self-exclusion noted) ===
+0
+positive control for that ruler (same ruler on docs/reports/HANDOVER.md):
+1
+=== .out extension count (want 0) ===
+0

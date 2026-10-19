@@ -217,3 +217,45 @@ CR in verdict = 0
    restored= 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
    pristine(ref) = 
 -- head-of-run pristine declarations (each shot file carries the entry hash) --
+########## 尺二补：写面件目录逐枚现量（run1..run13 全在盘＋commit1.sh 台件）##########
+   script: commit1.sh
+   script: run1-trees.sh
+   script: run10-final.sh
+   script: run11-quoteshape.sh
+   script: run12-append-bullet.sh
+   script: run13-selfproof.sh
+   script: run2-color.sh
+   script: run3-mu.sh
+   script: run4-census.sh
+   script: run5-controls.sh
+   script: run6-filecheck.sh
+   script: run7-gates.sh
+   script: run8-ac23.sh
+   script: run9-residual.sh
+   script count = 14
+   log: 00-start-gauges.txt
+   log: 01-ac0-census-and-landings.txt
+   log: 03-color-base.txt
+   log: 04-color-deliv.txt
+   log: 05-controls.txt
+   log: 06-ac2-quote-shape-and-ac3.txt
+   log: 07-ac2356-residual.txt
+   log: 08-gates-and-ac5.txt
+   log: 09-final-state.txt
+   log: 10-mu-p2.txt
+   log: 10-mu-p3.txt
+   log: 10-mu-p5.txt
+   log: 10-mu-p6.txt
+   log: 11-quoteshape.txt
+   log: 12-append-bullet.txt
+   log: 13-my-discipline-slip-reset.txt
+   log: 14-selfproof.txt
+   log count = 17
+   zero-byte files (want 0) = 0
+########## 尺二补二：本笔新增三枚台件＝纯补目（⛔ 改任何已交读数） ##########
+  scripts/run4-census.sh (6011B, AC#0 census＋落点两两不同那把尺的真身)
+  scripts/run6-filecheck.sh (744B, 件形尺: 零字节/那枚禁字/.out)
+  scripts/commit1.sh (1918B, 我第一笔提交的逐枚字面 pathspec 台件)
+  logs/02-filecheck.txt (2500B级, 件形尺逐字输出; 内含对自身大小的快照说明)
+  logs/14-selfproof.txt (追加 32 行: 写面件目录逐枚现量 = 14 枚 script + 17 枚 log, 零字节 0)
+  verdict.md 引用号改准 = logs/00..14 + run1..run13 (上一笔已含)
