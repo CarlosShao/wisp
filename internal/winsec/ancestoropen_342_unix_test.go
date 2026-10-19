@@ -46,9 +46,12 @@ func TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342
 	})
 	st.print(t, "AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)")
 	if st.truncated > 0 || st.deleted > 0 {
-		t.Errorf("AC#1 RED: %d attempts found the foreign witness's body replaced and %d found it gone, so the "+
-			"open inside privateFile followed an ancestor swapped into a link after resolveString had "+
-			"answered, and its O_TRUNC landed in somebody else's tree (first: %s)",
+		t.Errorf("AC#1 RED: %d attempts found the foreign witness's body replaced and %d found it gone, so this "+
+			"route's act reached THROUGH an ancestor swapped into a link after resolveString had answered "+
+			"(first: %s). Both numerators count here on purpose: on this route an O_TRUNC that lands is very "+
+			"often followed by the refusal-path unlink taking the name away, so a gate reading only the "+
+			"surviving body would go GREEN on a damaged tree - the shape ticket 342 AC#3 refuses. Ticket 348's "+
+			"own gate is the removal alone and does not borrow this reading.",
 			st.truncated, st.deleted, st.firstProof)
 	}
 	if st.provedLinkCycles == 0 || st.pinnedParentLeg == 0 {

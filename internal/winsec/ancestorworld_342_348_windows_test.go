@@ -257,8 +257,14 @@ func (w *winAncWorld342r1) stageFlip() error {
 			return err
 		}
 	case winAncFormLeafSym:
-		// Same rule, one level deeper: this link ends up inside `sub`, so the target is two steps up.
-		if err := os.Symlink(filepath.Join("..", "..", winAncOutside342r1), w.staged); err != nil {
+		// ★The target is the foreign FILE, not the foreign directory. The first version of this case
+		// pointed at the directory, so the flipped leaf resolved to a directory and the open answered
+		// EISDIR - the run never drove the shape its gate claims to test, and "no leg answered" was a
+		// bench fault and NOT a reading about the landing (本腿自抓，⛔ 计入判据；that case's earlier
+		// numbers must be re-measured before anyone cites them).
+		// Same resolution rule as above: the link ends up inside `sub`, so the target walks up from
+		// there to `base`, then into the foreign tree and onto the one name in it.
+		if err := os.Symlink(filepath.Join("..", "..", winAncOutside342r1, winAncLeaf342r1), w.staged); err != nil {
 			return err
 		}
 	}
