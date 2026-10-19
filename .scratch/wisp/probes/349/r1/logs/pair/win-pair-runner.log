@@ -1,0 +1,54 @@
+### PAIR start (treeBase＝起手锚 7b633fa9) then delivery (treeDel＝交件 db2f9eab)，串行
+### label=base tree=/d/tmp/wisp/20261019/349r1/treeBase rc=1
+RUN=247
+PASS_TOP=136
+FAIL_TOP=5
+SKIP=1
+-- 台面故障名册（红句含这些词⇒具名、⛔ 计入判据）--
+71:    anchor_miss_reason_334_test.go:169: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "d:\\tmp\\wisp\\20261019\\349r1\\gt\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le496226187\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "d:\\tmp\\wisp\\20261019\\349r1\\gt\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le496226187\\001\\profile\\work") and the anchor "d:\\tmp\\wisp\\20261019\\349r1\\gt\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le496226187\\001\\profile\\.aws\\credentials" is not installed here (its expansion stopped at "d:\\tmp\\wisp\\20261019\\349r1\\gt\\base\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le496226187\\001\\profile"), so R17 protects the ancestry chain the two share instead of proving a miss
+79:    anchor_miss_reason_334_test.go:230: SHAPE-READING334 inside-profile=class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349r1\\\\gt\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl24043269659\\\\001\\\\profile\\\\work\\\\id_ed25519已允许\\x1b\\u202e\" is not proven handle-expanded (its own walk stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349r1\\\\gt\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl24043269659\\\\001\\\\profile\\\\work\") and the anchor \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349r1\\\\gt\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl24043269659\\\\001\\\\profile\\\\.aws\\\\credentials\" is not installed here (its expansion stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349r1\\\\gt\\\\base\\\\testanchormisskeepsnonoverridableclassandneedl24043269659\\\\001\\\\profile\"), so R17 protects the ancestry chain the two share instead of proving a miss" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+-- 红名册逐名 --
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.06s)
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.00s)
+--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.06s)
+--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed (0.07s)
+-- bytes of log --
+42525 /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/349/r1/logs/pair/win-base.log
+### label=del tree=/d/tmp/wisp/20261019/349r1/treeDel rc=1
+RUN=247
+PASS_TOP=136
+FAIL_TOP=5
+SKIP=1
+-- 台面故障名册（红句含这些词⇒具名、⛔ 计入判据）--
+71:    anchor_miss_reason_334_test.go:169: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "d:\\tmp\\wisp\\20261019\\349r1\\gt\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2438679691\\001\\profile\\work\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "d:\\tmp\\wisp\\20261019\\349r1\\gt\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2438679691\\001\\profile\\work") and the anchor "d:\\tmp\\wisp\\20261019\\349r1\\gt\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2438679691\\001\\profile\\.aws\\credentials" is not installed here (its expansion stopped at "d:\\tmp\\wisp\\20261019\\349r1\\gt\\del\\testanchormissreasonnamescandidateandmissinganchorabsent-aws-le2438679691\\001\\profile"), so R17 protects the ancestry chain the two share instead of proving a miss
+79:    anchor_miss_reason_334_test.go:230: SHAPE-READING334 inside-profile=class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349r1\\\\gt\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl2194082121\\\\001\\\\profile\\\\work\\\\id_ed25519已允许\\x1b\\u202e\" is not proven handle-expanded (its own walk stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349r1\\\\gt\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl2194082121\\\\001\\\\profile\\\\work\") and the anchor \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349r1\\\\gt\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl2194082121\\\\001\\\\profile\\\\.aws\\\\credentials\" is not installed here (its expansion stopped at \"d:\\\\tmp\\\\wisp\\\\20261019\\\\349r1\\\\gt\\\\del\\\\testanchormisskeepsnonoverridableclassandneedl2194082121\\\\001\\\\profile\"), so R17 protects the ancestry chain the two share instead of proving a miss" || off-profile=class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+-- 红名册逐名 --
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.04s)
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.00s)
+--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.04s)
+--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed (0.04s)
+-- bytes of log --
+42489 /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/349/r1/logs/pair/win-del.log
+### 红名册逐名作差（base ⇄ del；⛔ 拿四数差当"改了 N 枚测试"＝公共块明令）
+  5 /d/tmp/wisp/20261019/349r1/logs/pair/red-base.txt
+  5 /d/tmp/wisp/20261019/349r1/logs/pair/red-del.txt
+ 10 total
+-- only in base (fixed by me / disappeared) --
+-- only in del (NEW reds = must be zero) --
+-- 名册逐名（两侧全量）--
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+TestSyncAncestorLegNotExemptedStaysFailClosed
+TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+  ~~ del ~~
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+TestSyncAncestorLegNotExemptedStaysFailClosed
+TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+### SKIP 名册（两侧）
+--- SKIP: TestSyncRegistryProbeLive 
+--- SKIP: TestSyncRegistryProbeLive 

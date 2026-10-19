@@ -1,0 +1,68 @@
+### AC#0 census label=del tree=/d/tmp/wisp/20261019/349r1/treeDel
+# pkg=internal/risk pkgfiles=49(pkgparsed=49, prodfiles=19/prodparsed=19) repofiles=754(repoparsed=754) pkgRoster=527 boundRoster=479 repoRoster=9086 only=""
+RED-elsewhere SA                         assessorFor            method         internal/tools/bridge.go                             assessor.go:30
+RED-elsewhere SA                         hostPathBox            type           internal/tools/bridge.go                             hostpath_185.go:28
+RED-elsewhere SA                         volumeID               func           internal/tools/platform_other.go                     pathresolver_volumeless_spelling_308_test.go:23
+RED-elsewhere SA                         volumeRootOf           func           internal/tools/platform_other.go                     pathresolver_volumeless_spelling_308_test.go:24
+RED-elsewhere SC                         and                    method         cmd/wisp/panel_transport_35r2_test.go                pathresolver_junction_windows_test.go:362
+RED-elsewhere-bound SC                         documents              field          cmd/wisp/panel_transport_35r2_test.go                taintmatch.go:256
+RED-nowhere SA                         macOS                                                                                      pathresolver_other.go:5
+RED-nowhere SA                         macOS                                                                                      syncdirs.go:249
+RED-nowhere SA                         macOS                                                                                      syncdirs_other.go:12
+RED-nowhere SA                         macOS                                                                                      syncdirs_other.go:17
+RED-nowhere SA                         macOS                                                                                      syncdirs_other_test.go:18
+RED-nowhere SA                         macOS                                                                                      syncdirs_other_test.go:30
+RED-nowhere SA                         macOS                                                                                      syncdirs_test.go:52
+RED-nowhere SA                         valueName                                                                                  syncdirs_test.go:298
+RED-nowhere SA                         macOS                                                                                      syncdirs_windows_test.go:20
+RED-nowhere SA                         macOS                                                                                      syncdirs_windows_test.go:31
+RED-nowhere SA                         winStrs                                                                                    taintmatch_test.go:171
+RED-nowhere SB                         TempDir                                                                                    anchor_miss_reason_334_test.go:126
+RED-nowhere SB                         DEFERRED                                                                                   doc.go:15
+RED-nowhere SB                         TempDir                                                                                    name_claim_two_arm_216_test.go:74
+RED-nowhere SB                         TempDir                                                                                    pathresolver_anchor_spelling_windows_test.go:31
+RED-nowhere SB                         EqualFold                                                                                  pathresolver_anchor_spelling_windows_test.go:76
+RED-nowhere SB                         TempDir                                                                                    pathresolver_anchor_spelling_windows_test.go:77
+RED-nowhere SB                         ToLower                                                                                    pathresolver_anchor_spelling_windows_test.go:124
+RED-nowhere SB                         TempDir                                                                                    pathresolver_junction_windows_test.go:18
+RED-nowhere SB                         TempDir                                                                                    pathresolver_junction_windows_test.go:176
+RED-nowhere SB                         DEFERRED                                                                                   pathresolver_other.go:5
+RED-nowhere SB                         ToLower                                                                                    pathresolver_volumeless_spelling_308_test.go:13
+RED-nowhere SB                         TempDir                                                                                    pathresolver_volumeless_spelling_308_test.go:70
+RED-nowhere SB                         VolumeName                                                                                 pathresolver_volumeless_spelling_308_test.go:71
+RED-nowhere SB                         DEFERRED                                                                                   provenance.go:58
+RED-nowhere SB                         CloseScope                                                                                 provenance.go:365
+RED-nowhere SB                         TempDir                                                                                    provenance_syncdirs_other_test.go:12
+RED-nowhere SB                         TempDir                                                                                    provenance_syncdirs_other_test.go:13
+RED-nowhere SB                         TempDir                                                                                    provenance_syncdirs_windows_test.go:13
+RED-nowhere SB                         TempDir                                                                                    provenance_syncdirs_windows_test.go:18
+RED-nowhere SB                         CloseScope                                                                                 provenance_test.go:312
+RED-nowhere SB                         CloseScope                                                                                 provenance_test.go:339
+RED-nowhere SB                         Nutstore                                                                                   syncdirs.go:15
+RED-nowhere SB                         TempDir                                                                                    syncdirs_ancestor_reparse_ticket105_windows_test.go:31
+RED-nowhere SB                         DEFERRED                                                                                   syncdirs_other.go:17
+RED-nowhere SB                         DEFERRED                                                                                   syncdirs_other_test.go:18
+RED-nowhere SB                         DEFERRED                                                                                   syncdirs_other_test.go:106
+RED-nowhere SB                         DEFERRED                                                                                   syncdirs_test.go:52
+RED-nowhere SB                         DEFERRED                                                                                   syncdirs_windows_test.go:20
+RED-nowhere SC                         so                                                                                         mode.go:96
+RED-nowhere SC                         Test                                                                                       pointer_183_test.go:25
+RED-nowhere SC                         Test                                                                                       pointer_185_test.go:23
+RED-nowhere SC                         Test                                                                                       provenance.go:534
+RED-nowhere SC                         escape                                                                                     provenance.go:1077
+RED-nowhere SC                         the                                                                                        syncdirs.go:59
+RED-nowhere SC                         whose                                                                                      syncdirs_ancestor_actable_leg_116_test.go:63
+RED-nowhere SC                         the                                                                                        syncdirs_ancestor_actable_leg_116_test.go:70
+RED-nowhere SC                         the                                                                                        syncdirs_ancestor_actable_leg_116_test.go:73
+RED-nowhere SC                         that                                                                                       syncdirs_ancestor_actable_leg_116_test.go:95
+builtin/keyword/predecl BEXCL                      len                                                                                        assessor.go:111
+builtin/keyword/predecl BEXCL                      len                                                                                        pathresolver_anchor_spelling_windows_test.go:126
+builtin/keyword/predecl BEXCL                      len                                                                                        pathresolver_volumeless_spelling_308_test.go:22
+builtin/keyword/predecl BEXCL                      rune                                                                                       provenance.go:495
+builtin/keyword/predecl BEXCL                      len                                                                                        rules_scale.go:11
+builtin/keyword/predecl BEXCL                      len                                                                                        syncdirs_windows_test.go:118
+# --- counters (rows above are all non-GREEN) ---
+shape=SA    TOTAL=459  GREEN-pkg=280  GREEN-bound=25   GREEN-testonly=139  RED-elsewhere=4    RED-nowhere=11
+shape=SB    TOTAL=92   GREEN-pkg=58   GREEN-bound=1    GREEN-testonly=5    RED-elsewhere=0    RED-nowhere=28
+shape=SC    TOTAL=14   GREEN-pkg=0    GREEN-bound=1    GREEN-testonly=1    RED-elsewhere=2    RED-nowhere=10
+shape=BEXCL TOTAL=6    GREEN-pkg=0    GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=0

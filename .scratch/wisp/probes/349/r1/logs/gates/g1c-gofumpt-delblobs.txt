@@ -1,0 +1,1 @@
+ZERO-LINES READING = gofumpt -l over the three DELIVERY blobs (git object form, LF) printed nothing = my new bytes clean.

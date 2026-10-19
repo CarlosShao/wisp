@@ -1,0 +1,1 @@
+ZERO-LINES READING = gofumpt -l over the three START blobs (extracted to disk as LF) printed nothing = start side already clean; the CRLF working-copy hit is a pre-existing condition, not introduced by this leg.

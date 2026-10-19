@@ -1,0 +1,78 @@
+### AC#3 misfire surface, measured by 349-r1 on its own gauge
+== raw non-GREEN rows, the three production files, both sides ==
+-- side=base --
+blacklist.go  RED-elsewhere-bound SB                         fires                  field          internal/config/unwired.go                           blacklist.go:310
+provenance.go  RED-elsewhere SB                         Defer                  method         internal/plugin/disposal.go                          provenance.go:427
+provenance.go  RED-nowhere SA                         taskScopeID                                                                                provenance.go:54
+provenance.go  RED-nowhere SA                         disposalScope                                                                              provenance.go:427
+provenance.go  RED-nowhere SB                         DEFERRED                                                                                   provenance.go:58
+provenance.go  RED-nowhere SB                         CloseScope                                                                                 provenance.go:365
+provenance.go  RED-nowhere SC                         Test                                                                                       provenance.go:534
+provenance.go  RED-nowhere SC                         escape                                                                                     provenance.go:1077
+syncdirs.go  RED-elsewhere SB                         Complete               method         internal/agent/approval/gate.go                      syncdirs.go:453
+syncdirs.go  RED-nowhere SA                         macOS                                                                                      syncdirs.go:249
+syncdirs.go  RED-nowhere SB                         Nutstore                                                                                   syncdirs.go:15
+syncdirs.go  RED-nowhere SC                         the                                                                                        syncdirs.go:59
+-- side=del --
+provenance.go  RED-nowhere SB                         DEFERRED                                                                                   provenance.go:58
+provenance.go  RED-nowhere SB                         CloseScope                                                                                 provenance.go:365
+provenance.go  RED-nowhere SC                         Test                                                                                       provenance.go:534
+provenance.go  RED-nowhere SC                         escape                                                                                     provenance.go:1077
+syncdirs.go  RED-nowhere SA                         macOS                                                                                      syncdirs.go:249
+syncdirs.go  RED-nowhere SB                         Nutstore                                                                                   syncdirs.go:15
+syncdirs.go  RED-nowhere SC                         the                                                                                        syncdirs.go:59
+
+== 手工逐枚分类（TRUE＝注释真在断言'包内有此符号'且⛔ 有；FP＝词面与假话不可分／根本不是断言）==
+side=START(base)
+  blacklist.go:310  SB fires        TRUE   票 349 名册第①枚（真身在别包 config/unwired.go:54 的字段）
+  provenance.go:54  SA taskScopeID  TRUE   名册第②枚（全仓⛔ 定义＝散文占位）
+  provenance.go:427 SA disposalScope TRUE  名册第③枚（真身＝别包类型 internal/plugin.DisposalScope）
+  provenance.go:427 SB Defer        FP     Defer 真是 internal/plugin/disposal.go:186 的方法；谎在 disposalScope 不在 Defer
+  provenance.go:58  SB DEFERRED     FP     DEFERRED(C25-loop-wiring)＝本仓标记约定（AGENTS.md 1.1 节要求它与 SPEC-12 第 5 节 1:1 对得上）
+  provenance.go:365 SB CloseScope   FP     句子自己写 "Before it, ... was TWO functions — OpenScope(id) and CloseScope(id)"＝票 160 故意删的历史名，词面与假话不可分
+  provenance.go:534 SC Test         FP     散文里嵌的一条命令 `grep -n "^func Test"`＝被声明形尺当成"func Test 的定义声明"
+  provenance.go:1077 SC escape      FP     括注 "(B-2 type escape)"＝名词短语，不是声明
+  syncdirs.go:453   SB Complete     TRUE   名册第④枚（真名 SyncDetectionComplete:472＝纯小写调用形）
+  syncdirs.go:249   SA macOS        FP     平台名
+  syncdirs.go:15    SB Nutstore     FP     厂商名（后紧跟全角左括号"坚果云"才被切成调用形）
+  syncdirs.go:59    SC the          FP     散文冠词（"env var the sync client sets"）
+side=DELIVERY(del)
+  provenance.go:58  SB DEFERRED     FP     同上
+  provenance.go:365 SB CloseScope   FP     同上
+  provenance.go:534 SC Test         FP     同上
+  provenance.go:1077 SC escape      FP     同上
+  syncdirs.go:249   SA macOS        FP     同上
+  syncdirs.go:15    SB Nutstore     FP     同上
+  syncdirs.go:59    SC the          FP     同上
+
+== precision（START：TRUE=4 / 非GREEN行=12；DELIVERY：TRUE=0 / 非GREEN行=7）==
+-- 逐枚复核这两把算术（⛔ 我手算，尺自己数一遍）--
+start_non_green_rows=12
+del_non_green_rows=7
+
+== 三形各自的命中构成（全 package 两侧，含 _test.go＝另一维读数）==
+  base shape=SA    TOTAL=458  GREEN-pkg=278  GREEN-bound=24   GREEN-testonly=139  RED-elsewhere=4    RED-nowhere=13
+  base shape=SB    TOTAL=95   GREEN-pkg=58   GREEN-bound=1    GREEN-testonly=5    RED-elsewhere=3    RED-nowhere=28
+  base shape=SC    TOTAL=14   GREEN-pkg=0    GREEN-bound=1    GREEN-testonly=1    RED-elsewhere=2    RED-nowhere=10
+  base shape=BEXCL TOTAL=7    GREEN-pkg=0    GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=0
+  del  shape=SA    TOTAL=459  GREEN-pkg=280  GREEN-bound=25   GREEN-testonly=139  RED-elsewhere=4    RED-nowhere=11
+  del  shape=SB    TOTAL=92   GREEN-pkg=58   GREEN-bound=1    GREEN-testonly=5    RED-elsewhere=0    RED-nowhere=28
+  del  shape=SC    TOTAL=14   GREEN-pkg=0    GREEN-bound=1    GREEN-testonly=1    RED-elsewhere=2    RED-nowhere=10
+  del  shape=BEXCL TOTAL=6    GREEN-pkg=0    GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=0
+
+== SC（声明形）单独摊：它是'放宽切词'的那一味，看它抓到什么 ==
+  RED-elsewhere SC                         and                    method         cmd/wisp/panel_transport_35r2_test.go                pathresolver_junction_windows_test.go:362
+  RED-elsewhere-bound SC                         documents              field          cmd/wisp/panel_transport_35r2_test.go                taintmatch.go:256
+  RED-nowhere SC                         so                                                                                         mode.go:96
+  RED-nowhere SC                         Test                                                                                       pointer_183_test.go:25
+  RED-nowhere SC                         Test                                                                                       pointer_185_test.go:23
+  RED-nowhere SC                         Test                                                                                       provenance.go:534
+  RED-nowhere SC                         escape                                                                                     provenance.go:1077
+  RED-nowhere SC                         the                                                                                        syncdirs.go:59
+  RED-nowhere SC                         whose                                                                                      syncdirs_ancestor_actable_leg_116_test.go:63
+  RED-nowhere SC                         the                                                                                        syncdirs_ancestor_actable_leg_116_test.go:70
+  RED-nowhere SC                         the                                                                                        syncdirs_ancestor_actable_leg_116_test.go:73
+  RED-nowhere SC                         that                                                                                       syncdirs_ancestor_actable_leg_116_test.go:95
+-- SC 全 package：14 枚命中里 GREEN-pkg＝0 ⇒ 这一形结构性地只会捞散文（本腿独立复现 343-v1 的放宽即不稳）--
+
+== 有界词表形（票 350 那一族 ^a[A-Z]）另开一把尺＝见 sh/run-ac3-wordlist.sh 与 logs/ac3/ac3-wordlist.log ==

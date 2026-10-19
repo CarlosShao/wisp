@@ -1,0 +1,104 @@
+# 票 349 落地腿 `349-r1` 交件报告（写腿·注释面）
+
+起手锚（我自己第一笔 `git log -1` 现认）＝`7b633fa9713b0514806c8b808ed4db91b1485cdc`
+交件锚＝见名册（本腿全部提交）。分支 `dev`。⛔ push、⛔ 翻框、⛔ 改票名／`Status:`／`-done`。
+
+## 0. 起手三键尺（原样）
+
+| 尺 | 读数 |
+|---|---|
+| `git log -1 --format='%H %s'` | `7b633fa9…` ＝第五波派单写档（＝我的起手 HEAD，⛔ 用派单里的号） |
+| `git status --porcelain -- internal/risk` | 空＝本面无人写（★起手⇄交件各复量一次都空） |
+| `git log --all --grep='^票 349 落地腿'` | **0 枚**＝自证第一枚（★锚定行首形；⛔ 非锚定＝会吃正文） |
+| `git log --all --grep='票 349 落地腿'` | 0 枚（两把同值＝本票前缀此前无人用过，非"锚吃了别腿"那一形） |
+
+工作树 `git status --porcelain` 全量＝1211 行、其中**已跟踪改动 0 枚**（全是未跟踪历史探针件），
+`internal/**` 未跟踪 0 枚 ⇒ 共享树里别腿没在我写面上留字节。
+
+## 1. AC#1 四枚逐枚（每枚＝改注释一行、可执行字节 0）
+
+| 枚 | 位置（起手侧号） | 改成什么 | 一手凭据 | 提交 |
+|---|---|---|---|---|
+| ① | `blacklist.go:310` `fires()/aRelates above decided` | `aEq/aUnder (via aRelates) above decided` | 该句断言"上面那两枚关系尺定了 class/tier/overridability"；盘上真身＝`aEq:271`／`aUnder:273`→`aRelates:280`。`git grep 'func .*fires' 锚 -- internal/risk`＝0；`fires` 作标识符真身＝别包 `internal/config/unwired.go:54` 的 struct 字段（本包⛔ 引用它） | `bf7f13bc` |
+| ② | `syncdirs.go:453` `via Complete()==false` | `via SyncDetectionComplete()==false` | 真名＝同文件 `:472`；★纯小写调用形＝票面 `AC#0` 三形尺的现场样本（驼峰形尺结构上看不到） | `07f178df` |
+| ③ | `provenance.go:54` `prov.Detector(taskScopeID)` | `prov.Detector(scopeID)` | `git log -S taskScopeID`＝引入笔 `73b60571`（票 19 落 C25）；`git grep taskScopeID 73b60571 -- internal` 只有那一枚注释行、`func taskScopeID` 全历史 **0 笔** ⇒ 从来不是符号＝散文占位；盘上真身＝`Detector(scopeID string)` `provenance.go:858` ⇒ 用那枚方法自己的形参名 | `db2f9eab` |
+| ④ | `provenance.go:427` `disposalScope.Defer(func() { _ = scope.Close() })` | `the task's internal/plugin.DisposalScope deferring this closure` | 同一来路 `73b60571`、该树 0 定义形。真身＝别包类型 `internal/plugin.DisposalScope`（`disposal.go:129`）＋方法 `Defer`（`:186`）⇒ 按票面"别包的要写全包路径"点名。写成**散文形**（`deferring this closure` 不带左括号）：`DisposalScope.Defer(...)` 那形会被调用形尺再算一枚命中＝自造同族残留 | `db2f9eab` |
+
+★四枚都⛔ 新增符号去"让注释变真"、⛔ 动判级档位／回落支／豁免键语义。
+
+## 2. 必答 (i)＝命门结构尺（起手 blob ⇄ 交件 blob，三把剥注释尺逐枚同串）
+
+两把⛔ 同形（＝票 343 交付那两把）＋一把本腿自加的最严形（GB＝只整行删 `^\s*//`，其余字节一字不动）：
+
+| 文件 | 起手 blob | 交件 blob | GS1（`s://.*::`→去空白→去空行） | GS2（先整行删 `//`→同余下两步） | GB（只整行删注释行，⛔ tr） |
+|---|---|---|---|---|---|
+| `blacklist.go` | `62f2dddb` | `964ee75a` | `b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908` / 232 行 **两侧同串** | 同串（同值） | `97796acc2690b59e6d9bf5857768377d6948ba560e992b884a93d4500b379bd3` / 265 行 **两侧同串** |
+| `provenance.go` | `d634aae0` | `eff984f8` | `1df28906d551e8b9bd1e4cdb11b44e9f5e453ec0ea84a42b7ba579fb66ece8b1` / 621 行 **两侧同串** | 同串 | `851972c953d75415927d98fd29111f43006e5fab5bcbc6547362fc739ea82f41` / 676 行 **两侧同串** |
+| `syncdirs.go` | `7125b08a` | `8dfe1860` | `00fb159ac7c38c3b93ccd4ceeca50edacd48564c8440198eaf00a6889fe753f1` / 435 行 **两侧同串** | 同串 | `68f2d7ccc6f9c805da94fd6ade8db81bd6f5ed080c1783ca5f80fdf615b9127d` / 468 行 **两侧同串** |
+
+`cmp` 逐枚＝`GS1_CMP=IDENTICAL`／`GB_CMP=IDENTICAL`（三枚各一次，读数在 `logs/01…03`）。
+旁证＝票 343 那把尺的已知串 `b1610acf…29924908`／232 行在我手上**复现**（编排者票面给的同一串，我从零算）。
+
+★两处形状坑（具名，别腿别再栽）：
+- `provenance.go` 的**工作副本是 CRLF**（`core.autocrlf=true`＋历史入库时留下的）、blob 是 LF
+  （`.gitattributes *.go text eol=lf`）⇒ 结构尺⛔ 拿磁盘副本比 GB 那把（GB 不 `tr -d '\r'`）＝必假红。
+  本尺一律跑 `git cat-file blob` 两侧，读数里带 `worktree_CR=1115 / blob_CR=0` 摊开这一处。
+- `git diff -U0` 的 `numstat`：三枚＝`1/1`、`1/1`、`2/2` ⇒ 可执行行变化 **0**（必答 (iv)）。
+
+## 3. 必答 (ii)＝AC#0 同族终数（我自己那把三形尺，⛔ 抄 343 名册）
+
+尺＝`sh/census-349r1-main.go.txt`（SA 驼峰形／SB 调用形 `foo(`/`foo()`／SC 声明形 `func|type|var|const X`，
+＋BEXCL＝builtin/关键字/预声明噪声类单列）。名册分三级：`GREEN-pkg`（包级定义）／`GREEN-bound`
+（形参·字段·局部）／`GREEN-*-TESTONLY`（只在 `_test.go` 里定义＝产码注释⛔ 可指它）。
+★跑在**我自己的仓外导出树**里（共享树有 1211 枚未跟踪历史探针件，其中一堆 `.go`，会污染"全仓定义名册"）。
+
+**三枚产码文件（票 349 射程）·起手侧 12 枚非 GREEN 行**，逐枚 `file:line` ＋ 人工读判定：
+
+| # | `file:line` | 形·名 | 判定 | 依据 |
+|---|---|---|---|---|
+| 1 | `blacklist.go:310` | SB `fires` | **TRUE**＝名册① | 他包字段，本包⛔ 有 |
+| 2 | `provenance.go:54` | SA `taskScopeID` | **TRUE**＝名册② | 全仓⛔ 定义 |
+| 3 | `provenance.go:427` | SA `disposalScope` | **TRUE**＝名册③ | 真身＝别包类型 |
+| 4 | `provenance.go:427` | SB `Defer` | FP | `Defer` 真是 `internal/plugin/disposal.go:186` 的方法；谎在 `disposalScope` 不在它 |
+| 5 | `provenance.go:58` | SB `DEFERRED` | FP | `DEFERRED(...)`＝本仓标记约定（`AGENTS.md` sec 1.1 要求它与 `SPEC-12 sec 5` 1:1） |
+| 6 | `provenance.go:365` | SB `CloseScope` | FP | 句子自己写 "Before it … was TWO functions — `OpenScope(id)` and `CloseScope(id)`"＝票 160 故意删的历史名，词面与假话不可分 |
+| 7 | `provenance.go:534` | SC `Test` | FP | 散文里嵌的命令 `grep -n "^func Test"` 被声明形尺当成声明 |
+| 8 | `provenance.go:1077` | SC `escape` | FP | 括注 "(B-2 type escape)"＝名词短语 |
+| 9 | `syncdirs.go:453` | SB `Complete` | **TRUE**＝名册④ | 真名 `SyncDetectionComplete:472` |
+| 10 | `syncdirs.go:249` | SA `macOS` | FP | 平台名 |
+| 11 | `syncdirs.go:15` | SB `Nutstore` | FP | 厂商名（后跟全角左括号"坚果云"才被切成调用形） |
+| 12 | `syncdirs.go:59` | SC `the` | FP | 散文冠词（"env var the sync client sets"） |
+
+⇒ **同族终数＝票面那 4 枚，一枚不多**（★⛔ 只交那四枚这条我照做了：抓到 4 枚 TRUE 之外还摊出 8 枚 FP
+逐枚给了为什么是 FP）。**交件侧非 GREEN 行＝7 枚、TRUE＝0**（`logs/census/ac0-del-prodonly.txt`），
+四枚名在交件侧 `git grep`＝**0 命中**（正控＝`SyncDetectionComplete` 交件侧 24 命中、`aRelates` 命中）。
+
+**全 package 49 枚 .go 的第三维**（含 `_test.go`，起手侧非 GREEN 31 枚／交件 29 枚）里另有 3 枚 TRUE 形
+候选，我逐枚读了、**判⛔ 属本票同族**、具名交回给编排者裁（⛔ 我扩自己射程）：
+- `pathresolver_junction_windows_test.go:362` SC `and`、`taintmatch.go:256` SC `documents` ⇒ 都是
+  我 SC 形（`type and`/`type documents` 被散文撞出来的）**假阳**，⛔ 新残留；
+- `syncdirs_test.go:298` SA `valueName`、`taintmatch_test.go:171` SA `winStrs` ⇒ 都在 `_test.go`，
+  且各自句子诚实（前者是字符串格式串 `"<key>|<valueName>"`，后者明写 "with the **dead** `winStrs` table removed"
+  ＝已删历史名＋"dead"限定）；本包产码注释⛔ 指它们。
+⇒ 结论：**`internal/risk` 注释面同族残留已清零**；枚数按形／按侧摊在 `logs/census/ac0-{base,del}-full.txt`。
+
+## 4. 必答 (iii)＝AC#3：通用仪器该不该上 ⇒ **不上**（我独立跑，⛔ 抄；⛔ 造门）
+
+precision（三枚产码文件，我自己的尺）＝起手侧 **4 TRUE / 12 非 GREEN＝33%**、交件侧 **0 / 7＝0%**。
+FP 八枚的构成（每类都可能撑红一道通用门）：他包真符号 2（`Defer`／`CloseScope` 历史名）、
+标记约定 1（`DEFERRED(`）、平台名 1（`macOS`）、厂商名 1（`Nutstore`）、散文被切成"声明"3（`Test`／`escape`／`the`）。
+★最硬的一条否证＝**SC（声明形）这一味在全 package 的 14 枚命中里 `GREEN-pkg`＝0** ⇒ 它结构性地只会捞散文，
+任何"再放宽切词"的形都是在给一把 0 命中的尺加噪声（＝343-v1 "切词放宽即 142 枚红"那一形，我从零复现的方向一致）。
+误伤样本可复核＝上面那张 12 行表（逐枚 `file:line`＋一句话依据）。
+**有界词表形 `^a[A-Z]…` 我另开一把尺复量**（`sh/run-ac3-wordlist.sh`）：三枚产码文件注释里名册＝5 枚
+（`aAnyForm aEq aRelates aRuleReason aUnder`）**起手⇄交件两侧全 GREEN、红 0**；全 package 生产件（19 枚去 `_test.go`）
+同一名册＝5 枚。⚠ 与我起手的锚有关（`aEquiv` 在票 343 那笔已被改准 ⇒ 编排者"HEAD=5⇄起手锚=6"两枚读数都对、
+本腿两侧都＝5 因为我两侧锚都在 343 之后）。这一形⛔ 抓 `fires()`／⛔ 泛化＝"要不要上"仍属契约邻接＝人工批准
+⇒ **归票 350，我⛔ 造门、⛔ 动 `tools/d22scan`**。
+
+## 5. 必答 (iv)＝`git diff --numstat` 与写面
+
+三枚产码文件可执行行变化 **0**（GS1/GS2/GB 三把同串＋`numstat 1/1·1/1·2/2`＋`diff -U0` 每枚 `^[+-]` 行都以 `//` 开头）。
+第四枚文件＝⛔ 有（`git show --name-only` 逐笔只含 `blacklist.go`／`syncdirs.go`／`provenance.go` ＋ `probes/349/r1/**`；
+`.go` 命中恰 3）。
+

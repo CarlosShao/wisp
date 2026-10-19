@@ -1,0 +1,144 @@
+### base=7b633fa9713b0514806c8b808ed4db91b1485cdc del=db2f9eab
+### build-tree anchor=7b633fa9713b0514806c8b808ed4db91b1485cdc full=7b633fa9713b0514806c8b808ed4db91b1485cdc dir=/d/tmp/wisp/20261019/349r1/treeBase
+go_files=766
+dll_files=6
+docs_PLAN=yes
+frontend_dist_files=4
+risk_blacklist_hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+risk_provenance_hash=d634aae0f1e31a33a6f155ee13912a05006273dd
+risk_syncdirs_hash=7125b08a84211e51ed6ddbb68f1a2b625d03b8c3
+### done
+### build-tree anchor=db2f9eab full=db2f9eab7bcffd827240763699aa0f4ad7ff3266 dir=/d/tmp/wisp/20261019/349r1/treeDel
+go_files=766
+dll_files=6
+docs_PLAN=yes
+frontend_dist_files=4
+risk_blacklist_hash=964ee75a4befc7a51424f409a95745296e369da3
+risk_provenance_hash=eff984f8c194116a5e99471fbaecf7a4ab691574
+risk_syncdirs_hash=8dfe18602fa749ea1740ecfbbbcfcc30b38ea27f
+### done
+### 8.3 short-name proof (tree root must have an ASCII 8.3 alias)
+   Volume in drive D is SWQ
+   Volume Serial Number is 682D-FE5E
+  
+   Directory of D:\tmp\wisp\20261019
+  
+  2026/10/19  11:39    <DIR>                       .
+  2026/10/19  09:33    <DIR>                       ..
+  2026/10/19  09:39            28,771              226r1.md
+  2026/10/19  09:46            17,915 341-BE~1.MD  341-before.md
+  2026/10/19  09:46            17,915              341-norm.md
+  2026/10/19  10:19            20,636 342-BE~1.MD  342-before.md
+  2026/10/19  10:19            20,636              342-norm.md
+  2026/10/19  11:25            18,617 343-BE~1.MD  343-before.md
+  2026/10/19  11:25            18,617              343-norm.md
+  2026/10/19  10:20    <DIR>                       343v1
+  2026/10/19  10:19            10,275              348-a.md
+  2026/10/19  10:19             8,858 348-BE~1.MD  348-before.md
+  2026/10/19  12:16    <DIR>                       349r1
+  2026/10/19  09:46             6,396              a.txt
+  2026/10/19  09:55             9,019              A1045.txt
+  2026/10/19  10:25             8,497              A1046.txt
+  2026/10/19  11:27             7,074              A1047.txt
+  2026/10/19  09:46               838              ac3-line.txt
+  2026/10/19  09:36         2,270,264              allraw.txt
+  2026/10/19  09:46         2,189,845              allsubj.txt
+  2026/10/19  10:07             3,677              archive-343v1.sh
+  2026/10/19  11:36             3,210              archive-349r1.sh
+  2026/10/19  11:29         2,219,334              as.txt
+  2026/10/19  10:17         2,204,763              as2.txt
+  2026/10/19  10:23         2,207,896              as3.txt
+  2026/10/19  11:18         2,214,960              as6.txt
+  2026/10/19  11:20         2,215,140              as8.txt
+  2026/10/19  10:06             1,734              asm-343v1.sh
+  2026/10/19  11:34               989              asm-349r1.sh
+  2026/10/19  09:46             6,396              b.txt
+  2026/10/19  10:23            16,819              b1.go
+  2026/10/19  10:23             6,396 B143C7~1.STR b1.strip
+  2026/10/19  10:23            17,058              b2.go
+  2026/10/19  10:23             6,396 B2838A~1.STR b2.strip
+  2026/10/19  09:46            17,058              bl-after.go
+  2026/10/19  09:46            16,819 BL-BEF~1.GO  bl-before.go
+  2026/10/19  11:22            17,058              bl.go
+  2026/10/19  09:42             4,097 BULLET~1.MD  bullet341-receipt.md
+  2026/10/19  10:19             3,613 BULLET~2.MD  bullet342-receipt.md
+  2026/10/19  11:25             3,988 BULLET~3.MD  bullet343-receipt.md
+  2026/10/19  11:26             2,468              check-race.sh
+  2026/10/19  10:22             1,917              commit-342rc-v2.sh
+  2026/10/19  10:20             4,505              commit-342rc.sh
+  2026/10/19  10:10             3,619              commit-343v1-send.sh
+  2026/10/19  11:38             2,509              commit-349r1-send.sh
+  2026/10/19  10:02             4,381 COMMIT~2.SH  commit-40ev.sh
+  2026/10/19  10:27             3,513              commit-40ew.sh
+  2026/10/19  10:00             2,895 COMMIT~1.SH  commit-a1045-v2.sh
+  2026/10/19  10:00             3,526              commit-a1045-v3.sh
+  2026/10/19  09:56             5,449              commit-a1045.sh
+  2026/10/19  10:25             5,392              commit-a1046.sh
+  2026/10/19  11:28             7,133              commit-a1047.sh
+  2026/10/19  09:46               512              d.txt
+  2026/10/19  11:24            23,773              d22-350.txt
+  2026/10/19  09:53            23,770              d22349.txt
+  2026/10/19  09:45             3,005 DO-341~1.SH  do-341-receipt.sh
+  2026/10/19  09:49             2,089              fleet.sh
+  2026/10/19  11:22             2,169              gates-350.sh
+  2026/10/19  11:23             1,372              gates2-350.sh
+  2026/10/19  09:52               719              gates349.sh
+  2026/10/19  11:18               287              h343v.txt
+  2026/10/19  10:23                41              h343v1.txt
+  2026/10/19  11:20               328              h343v8.txt
+  2026/10/19  11:22                41              ident.txt
+  2026/10/19  09:33               205              m.txt
+  2026/10/19  11:30               794              mk-block-f.sh
+  2026/10/19  09:47             2,778              msg-341-close.txt
+  2026/10/19  10:20             2,915 MSG-34~3.TXT msg-342rc.txt
+  2026/10/19  10:07             1,798 MSG-34~1.TXT msg-343v1-archive.txt
+  2026/10/19  10:10             2,406 MSG-34~2.TXT msg-343v1-send.txt
+  2026/10/19  11:36             1,860 MSG-34~4.TXT msg-349r1-archive.txt
+  2026/10/19  11:39             1,500 MSD61A~1.TXT msg-349r1-send.txt
+  2026/10/19  10:02             2,804              msg-40ev.txt
+  2026/10/19  10:28             2,200              msg-40ew.txt
+  2026/10/19  10:01             4,623 MSG-A1~1.TXT msg-a1045.txt
+  2026/10/19  10:26             3,746 MSG-A1~2.TXT msg-a1046.txt
+  2026/10/19  11:28             4,153 MSG-A1~3.TXT msg-a1047.txt
+  2026/10/19  11:22               562              pkgfiles.txt
+  2026/10/19  11:24             1,294              pl-350.txt
+  2026/10/19  09:46             1,294              pl-after.txt
+  2026/10/19  09:43             1,265              pl-precheck.sh
+  2026/10/19  09:52             1,294              pl349.txt
+  2026/10/19  09:43             1,294              plbase.txt
+  2026/10/19  10:11                61              posctl.txt
+  2026/10/19  10:28                42              posctl2.txt
+  2026/10/19  11:29                54              posctl3.txt
+  2026/10/19  10:11             1,807              prepush-scan.sh
+  2026/10/19  10:28             1,717              prepush-scan2.sh
+  2026/10/19  11:28             1,983              prepush3.sh
+  2026/10/19  10:17            20,355              psw.go
+  2026/10/19  09:46               246              r343.txt
+  2026/10/19  09:33             1,131              roster.sh
+  2026/10/19  10:17             3,008              ruler-342v1.sh
+  2026/10/19  09:46             3,214              ruler-343r1.sh
+  2026/10/19  11:18             4,194 RULER-~1.SH  ruler-343v1.sh
+  2026/10/19  09:36             1,485              ruler341v1.sh
+  2026/10/19  10:22               931              state-check.sh
+  2026/10/19  09:39             3,266 STATIC~1.SH  static-341v1.sh
+  2026/10/19  10:18             6,845              tickets-342-348.sh
+  2026/10/19  11:25             7,979              tickets-343-349.sh
+  2026/10/19  10:28         4,529,381 UNP2~1.DIF   unp2.diff
+  2026/10/19  11:29         5,439,538 UNP3~1.DIF   unp3.diff
+  2026/10/19  10:11         4,316,647 UNPUSH~1.DIF unpushed.diff
+  2026/10/19  10:17               287              v1h.txt
+  2026/10/19  09:36               328              v1hashes.txt
+  2026/10/19  09:46            16,817 VERDIC~1.MD  verdict-at-HEAD.md
+  2026/10/19  09:54             1,969              verify-a1045.sh
+  2026/10/19  11:20             2,176              verify-stray.sh
+  2026/10/19  10:10             1,042              whos-dirty.sh
+  2026/10/19  10:17            20,074              ws.go
+  2026/10/19  11:18            16,819              x1.go
+  2026/10/19  11:18             6,396              x1.s
+  2026/10/19  11:18            17,058              x2.go
+  2026/10/19  11:18             6,396              x2.s
+               110 File(s)     30,419,018 bytes
+                 4 Dir(s)  196,880,846,848 bytes free
+### go file counts (want non-zero)
+treeBase go=766
+treeDel go=766

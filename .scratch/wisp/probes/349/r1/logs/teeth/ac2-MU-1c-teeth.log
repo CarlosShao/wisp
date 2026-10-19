@@ -1,0 +1,52 @@
+time=2026-10-19T12:21:51.055+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAnchorFallbackTeethPerAnchor336
+=== RUN   TestAnchorFallbackTeethPerAnchor336/git-credentials
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-under
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "%APPDATA%\\wisp\\config.toml" (the switch is ordered: naming another anchor means this case stopped firing): A-list sensitive path (non-overridable): %APPDATA%\Microsoft\Protect\** (DPAPI master keys) [fail-closed, NOT a match on this rule]: the candidate "d:\\tmp\\wisp\\20261019\\349r1\\gt\\ac2-mu-1c-teeth.log\\testanchorfallbackteethperanchor336wisp-config-under3687162857\\001\\profile\\appdata\\roaming\\id_ed25519已允许\x1b\u202e" is not proven handle-expanded (its own walk stopped at "d:\\tmp\\wisp\\20261019\\349r1\\gt\\ac2-mu-1c-teeth.log\\testanchorfallbackteethperanchor336wisp-config-under3687162857\\001\\profile\\appdata\\roaming") and the anchor "d:\\tmp\\wisp\\20261019\\349r1\\gt\\ac2-mu-1c-teeth.log\\testanchorfallbackteethperanchor336wisp-config-under3687162857\\001\\profile\\appdata\\roaming\\microsoft\\protect" is not installed here (its expansion stopped at "d:\\tmp\\wisp\\20261019\\349r1\\gt\\ac2-mu-1c-teeth.log\\testanchorfallbackteethperanchor336wisp-config-under3687162857\\001\\profile\\appdata\\roaming\\microsoft\\protect"), so R17 protects the ancestry chain the two share instead of proving a miss
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-eq
+    anchor_fallback_teeth_336_windows_test.go:129: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of %APPDATA%\wisp\config.toml carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:132: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:135: an A deny carried by %APPDATA%\wisp\config.toml was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "%APPDATA%\\wisp\\config.toml" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:141: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=B matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/ssh
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/ssh/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/aws
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/aws/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/kube
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/kube/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/dpapi-protect
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/local-credentials
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain
+--- FAIL: TestAnchorFallbackTeethPerAnchor336 (0.15s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/kube (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/kube/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.183s
+FAIL

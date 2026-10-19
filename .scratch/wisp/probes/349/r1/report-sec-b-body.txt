@@ -1,0 +1,75 @@
+## 6. 票 336 那 8 枚牙（复跑＝便宜保险）⇒ **8/8 全红**
+
+台件 `.scratch/wisp/probes/336/v1/sh/run-ac2-sweep.sh` **一字⛔ 动**：blob `454da3ee…` ⇄ 我交件 HEAD ＝同一枚；
+env 指**我自己** `git archive` 重导的 `treeDel`（锚 `db2f9eab`，树里 `blacklist.go` blob＝`964ee75a`＝锚侧逐字）；
+⛔ `-overlay`、⛔ 复用别腿的树。逐发：`落点命中枚数 needle_before=1 needle_after=0`（8 枚全中）＋
+`branch_removals_on_disk=1`＋还原哈希 `964ee75a…` `match=YES`（含 start／after-pristine／8×after-MU／final ＝**11 次全 YES**）。
+
+| 发 | 牙（`TestAnchorFallbackTeethPerAnchor336`） | 三枚 legacy 仪器 |
+|---|---|---|
+| pristine | `rc=0` RUN=17 PASS_TOP=1 FAIL_TOP=0 SKIP=0（8 枚 operand 全 class=A） | `rc=0` RUN=10 PASS_TOP=3 FAIL_TOP=0 SKIP=0 |
+| MU-1a git-credentials | `rc=1` FAIL_TOP=1，红子名 `/git-credentials`（class=B） | `rc=0` 3/0 |
+| MU-1b wisp-config-under | `rc=1` 红 `/wisp-config-under` | `rc=0` 3/0 |
+| MU-1c wisp-config-eq | `rc=1` 红 `/wisp-config-under`＋`/wisp-config-eq`（子名 2 枚⇒计数 3 行含顶层） | `rc=0` 3/0 |
+| MU-1d ssh | `rc=1` 红 `/ssh` | `rc=0` 3/0 |
+| MU-1e aws | `rc=1` 红 `/aws` | `rc=1` 红 `TestAnchorMissReasonNamesCandidateAndMissingAnchor/absent-aws-leaf-accuses-aws-and-says-so` |
+| MU-1f kube | `rc=1` 红 `/kube` | `rc=1` 红 `…/installing-aws-moves-the-named-anchor-to-kube` |
+| MU-1g dpapi-protect | `rc=1` 红 `/dpapi-protect` | `rc=0` 3/0 |
+| MU-1h local-credentials | `rc=1` 红 `/local-credentials` | `rc=0` 3/0 |
+
+⇒ 8 枚逐名各自兑现（`teeth_red` 每发 ≥1 顶层红），⛔ 一枚被我改红的常驻测试。原始 stdout 全在 `logs/teeth/`。
+
+## 7. AC#4 成对四数（两平台，同一台面，`-count=1 -timeout 30m`，⛔ 混用⛔ 相减）
+
+| 平台 | 侧 | RUN | PASS_TOP | FAIL_TOP | SKIP |
+|---|---|---|---|---|---|
+| Windows（`treeBase`⇄`treeDel`） | base | 247 | 136 | 5 | 1 |
+| Windows | del | 247 | 136 | 5 | 1 |
+| Linux（docker `golang:1.27`，我自己的两棵树） | base | 195 | 115 | 1 | 1 |
+| Linux | del | 195 | 115 | 1 | 1 |
+
+红名册**逐名作差＝两侧同集**（Windows `REDSET_SYMDIFF=0`、Linux 同）：
+Windows 5 枚＝`TestC26RewriteAccountIsConsumedAtEverySecurityLeg`（票面唯一合法存量红，`A380`／票 200／216）＋
+`TestSyncAncestorActableLegFailsClosedOnMovedAncestor116`／`TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116`／
+`TestSyncAncestorLegReResolvesThroughJunctionToRealTree`／`TestSyncAncestorLegNotExemptedStaysFailClosed`
+⇒ 后 4 枚**不是我造的**：票 343 终裁腿 `343-v1` 同包同台面读数是同一集（`RUN=247 PASS_TOP=136 FAIL_TOP=5 SKIP=1`，
+红名册 5 枚逐字同名，见 `probes/343/v1/logs/pair/pair-summary.log`），我这把尺从零复现＝同值。
+Linux 侧红名册＝只 `TestC26RewriteAccountIsConsumedAtEverySecurityLeg` 1 枚（另 4 枚是 `//go:build windows`）。
+`TestResolvePerCallBudget`＝两侧都 **PASS**（base 1.19s／del 1.21s）⇒ 本波没撞争用、⛔ 需复量、
+⛔ 计入我的新增红（本腿**新增红＝0 枚**，两平台都是）。台面故障名册＝`none`（`walk`／`build failed`／
+`no test files`／`setup failed`／`creating work dir`／`0xc0000135` 全 0 命中）。
+
+## 8. 门禁四数（★只在共享工作树、跑前 `unset GOTMPDIR TMPDIR TEMP TMP`）
+
+| 门 | rc | 读数 |
+|---|---|---|
+| `gofumpt -l` 三枚被动文件 | **0** | 打**blob 形**（LF）时 base⇄del 两侧都 **0 行**＝我的新字节 gofumpt 干净；打**工作副本**时 `provenance.go` 被标脏＝该文件磁盘副本是 CRLF 的**存量**（起手侧同样被标、⛔ 我引入、我⛔ 顺手重排）＝公共块"6 枚既有件因 CRLF 被标脏"那一形，具名登记 |
+| `sh scripts/d22scan.sh` | **0** | `clean - no D22 ban violations`（examined 283 production Go files） |
+| `sh scripts/check-path-length-budget.sh` | **0** | `VERDICT GREEN`，tracked paths=16549／over-budget=60／rostered=60／not in roster=0 |
+| `go vet ./internal/risk/` | **0** | 空输出 |
+
+## 9. 纪律面自证
+
+- 名册尺（锚定行首）＝`git log --all --grep='^票 349 落地腿'` → 本腿全部提交（起手 0 枚＝sec 0）。
+- ⛔ 翻框：票 349 盘上 7 枚框（`AC#0…AC#6`）终量＝**7 枚未翻**（尺＝`grep -c '^- \[ \] \*\*AC#'`）。
+- ⛔ 改票名／`Status:`／`-done`：`git ls-tree HEAD --name-only -- .scratch/wisp/issues/ | grep -c 'issues/349-'`＝1、名字未变。
+- 写面＝`internal/risk/{blacklist,provenance,syncdirs}.go` 注释面 ＋ `.scratch/wisp/probes/349/r1/**` ＋ 票尾**一条** bullet。
+- ⛔ `internal/winsec/**`（`342-r1` 独占、放我这封时它尚未启动＝我起手现量 `git log --all --grep='^票 342 落地腿'`＝0）；
+  ⛔ `cmd/wisp/**`／`internal/panel/**` 写、⛔ `go test ./cmd/wisp` 整包、⛔ `go test ./...`。
+- 临时件全部落 `D:\tmp\wisp\20261019\349r1\`（⛔ 盘符根）、**只建不删**；证据件⛔ `.out` 扩展名（尺＝`find -name '*.out'`＝0 枚）。
+- 被禁字面字符 U+00A7＝写面逐枚 **0 命中**（正控 `docs/reports/HANDOVER.md`＝304 非零）；⛔ 与 U+00B7（本腿主题里合法）混。
+- `add`／`commit` 两处都逐枚字面 pathspec（⛔ 从 index／目录反推）；新件先 `git add` 才进 pathspec；
+  中文正文 Write 成文件后 `git commit -F`，`-F` 一律 Windows 形路径；提交后现跑 `git log -1`＋`git status` 对回。
+- ⛔ push（本腿全程）。
+
+## 10. 本程没测什么／未决（实话栏）
+
+1. ⛔ 跑 `go build ./...`、⛔ 跑 `cmd/wisp`／`internal/panel` 任何测试（派单禁）⇒ 我那三枚注释改动对**包外**的影响
+   只由"可执行字节 0 变化"这把结构尺承担，⛔ 跑过其它包的成对读数。
+2. Linux 侧成对＝docker `golang:1.27` 里跑我自己的两棵树，**⛔ 8 枚牙**（台件 `run-ac2-sweep.sh` 的 8 枚 operand
+   测试文件带 `//go:build windows`，Linux 侧结构上跑不到）⇒ 牙只在 Windows 侧复跑，两平台各自摊开。
+3. ⛔ 复核 `343-v1` 判语的其余格（那不是我的票）；我只复跑与"注释改动会不会碰到那 8 枚牙"相关的那一把。
+4. sec 3 那 3 枚 `_test.go`／假阳候选具名交回＝**归口请编排者裁**（我⛔ 扩射程、⛔ 动 `_test.go` 一字）。
+5. 未决坑一枚（⛔ 我拍）：`internal/risk/provenance.go` 的工作副本是 **CRLF** 而 HEAD blob 是 **LF**
+   （`.gitattributes *.go text eol=lf`＋`core.autocrlf=true`）。我这枚改动没引入它（起手侧同一状态、同一把尺同样标脏），
+   但它让"拿磁盘文件比剥注释字节"这类尺**天然假红**，`gofumpt -l` 也会长期把它报脏 ⇒ 建议编排者立案（存量、非本票射程）。

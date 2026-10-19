@@ -1,0 +1,1 @@
+ZERO-HITS READING = DELIVERY side: none of the four ticket names (fires()/taskScopeID/disposalScope/bare Complete()) appears in the census output any more. This IS the wanted reading. Positive control = logs/census/ac0-base-four-names.txt (3 lines, START side).

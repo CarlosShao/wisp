@@ -1,0 +1,37 @@
+############ AC#1 proof: file=internal/risk/blacklist.go anchor=7b633fa9713b0514806c8b808ed4db91b1485cdc after=HEAD ############
+== 0. blob hashes: before / after ==
+62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+964ee75a4befc7a51424f409a95745296e369da3
+-- working-copy vs after-blob CR counts (why GB must run on blobs) --
+worktree_CR=0 blob_CR=0
+== 1. git diff -U0 changed lines (each must start with //) ==
+-// AC#1), and it reads nothing but the reason: fires()/aRelates above decided
++// AC#1), and it reads nothing but the reason: aEq/aUnder (via aRelates) above decided
+-- count of changed lines: total / non-comment (want non-comment = 0) --
+2
+0
+== 1b. git numstat (added/deleted lines, this file) ==
+1	1	internal/risk/blacklist.go
+== 2. THREE stripped-executable gauges, BOTH sides ==
+label=before-blob file=/d/tmp/wisp/20261019/349r1/before/blacklist.go
+  RAW_sha256=8fc54f75a60fab5f4759eeea945585a20c13b2b8f46276aae50b8165911ab7ea bytes=17058 lines=407
+  GS1_sha256=b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 lines=232
+  GS2_sha256=b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 lines=232
+  GB_sha256=97796acc2690b59e6d9bf5857768377d6948ba560e992b884a93d4500b379bd3 lines=265
+label=after-blob file=/d/tmp/wisp/20261019/349r1/after/blacklist.go
+  RAW_sha256=e1a0fbeb91bb5090b8268a533d3589b8c418f483771f24078fd9b7d1587f47e6 bytes=17067 lines=407
+  GS1_sha256=b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 lines=232
+  GS2_sha256=b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 lines=232
+  GB_sha256=97796acc2690b59e6d9bf5857768377d6948ba560e992b884a93d4500b379bd3 lines=265
+GS1_CMP=IDENTICAL
+GB_CMP=IDENTICAL
+== 3. the dead name in internal/risk, at ANCHOR vs at AFTER (delivery) ==
+-- ANCHOR side (expect the old bare-name hit to exist there) --
+7b633fa9713b0514806c8b808ed4db91b1485cdc:internal/risk/blacklist.go:310:// AC#1), and it reads nothing but the reason: fires()/aRelates above decided
+-- AFTER side (want 0 hits = the bare name is gone) --
+ZERO-HITS-at-delivery (want this)
+-- POSITIVE CONTROL (a name that must hit): aRelates --
+HEAD:internal/risk/blacklist.go:8
+HEAD:internal/risk/syncdirs.go:1
+== 3b. blob hygiene for the after side ==
+after_blob_CR=0 bytes=17067 lines=407 maxlen=288

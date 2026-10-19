@@ -1,0 +1,1 @@
+ZERO-LINES READING = gofumpt -l on the DELIVERY blobs (LF, git object form) printed 0 lines = my new bytes are gofumpt-clean. Positive control: see logs/gates/gates-outer.log (gofumpt -l on the working copies prints provenance.go = pre-existing CRLF, not my byte).

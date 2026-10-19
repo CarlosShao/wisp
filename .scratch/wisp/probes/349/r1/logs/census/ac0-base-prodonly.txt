@@ -1,0 +1,36 @@
+### AC#0 census restricted to the three production files of the ticket
+-- blacklist.go --
+# pkg=internal/risk pkgfiles=49(pkgparsed=49, prodfiles=19/prodparsed=19) repofiles=754(repoparsed=754) pkgRoster=527 boundRoster=479 repoRoster=9086 only="blacklist.go"
+RED-elsewhere-bound SB                         fires                  field          internal/config/unwired.go                           blacklist.go:310
+# --- counters (rows above are all non-GREEN) ---
+shape=SA    TOTAL=43   GREEN-pkg=42   GREEN-bound=1    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=0
+shape=SB    TOTAL=1    GREEN-pkg=0    GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=1    RED-nowhere=0
+shape=SC    TOTAL=0    GREEN-pkg=0    GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=0
+shape=BEXCL TOTAL=0    GREEN-pkg=0    GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=0
+-- provenance.go --
+# pkg=internal/risk pkgfiles=49(pkgparsed=49, prodfiles=19/prodparsed=19) repofiles=754(repoparsed=754) pkgRoster=527 boundRoster=479 repoRoster=9086 only="provenance.go"
+RED-elsewhere SB                         Defer                  method         internal/plugin/disposal.go                          provenance.go:427
+RED-nowhere SA                         taskScopeID                                                                                provenance.go:54
+RED-nowhere SA                         disposalScope                                                                              provenance.go:427
+RED-nowhere SB                         DEFERRED                                                                                   provenance.go:58
+RED-nowhere SB                         CloseScope                                                                                 provenance.go:365
+RED-nowhere SC                         Test                                                                                       provenance.go:534
+RED-nowhere SC                         escape                                                                                     provenance.go:1077
+builtin/keyword/predecl BEXCL                      func                                                                                       provenance.go:427
+builtin/keyword/predecl BEXCL                      rune                                                                                       provenance.go:495
+# --- counters (rows above are all non-GREEN) ---
+shape=SA    TOTAL=42   GREEN-pkg=34   GREEN-bound=6    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=2
+shape=SB    TOTAL=18   GREEN-pkg=15   GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=1    RED-nowhere=2
+shape=SC    TOTAL=2    GREEN-pkg=0    GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=2
+shape=BEXCL TOTAL=2    GREEN-pkg=0    GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=0
+-- syncdirs.go --
+# pkg=internal/risk pkgfiles=49(pkgparsed=49, prodfiles=19/prodparsed=19) repofiles=754(repoparsed=754) pkgRoster=527 boundRoster=479 repoRoster=9086 only="syncdirs.go"
+RED-elsewhere SB                         Complete               method         internal/agent/approval/gate.go                      syncdirs.go:453
+RED-nowhere SA                         macOS                                                                                      syncdirs.go:249
+RED-nowhere SB                         Nutstore                                                                                   syncdirs.go:15
+RED-nowhere SC                         the                                                                                        syncdirs.go:59
+# --- counters (rows above are all non-GREEN) ---
+shape=SA    TOTAL=30   GREEN-pkg=28   GREEN-bound=1    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=1
+shape=SB    TOTAL=9    GREEN-pkg=6    GREEN-bound=1    GREEN-testonly=0    RED-elsewhere=1    RED-nowhere=1
+shape=SC    TOTAL=1    GREEN-pkg=0    GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=1
+shape=BEXCL TOTAL=0    GREEN-pkg=0    GREEN-bound=0    GREEN-testonly=0    RED-elsewhere=0    RED-nowhere=0

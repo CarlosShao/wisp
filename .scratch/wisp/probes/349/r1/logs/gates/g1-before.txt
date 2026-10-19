@@ -1,0 +1,1 @@
+ZERO-LINES READING = gofumpt -l on the START-side blobs (LF, git object form) printed 0 lines = my byte-side start was already gofumpt-clean. Positive control = the same gauge on provenance.go WORKING COPY (CRLF 存量) which does print it: see logs/gates/gates-outer.log.

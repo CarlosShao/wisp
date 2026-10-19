@@ -1,0 +1,1 @@
+ZERO-BYTES READING = go vet ./internal/risk/ rc=0 with NO output (go vet prints nothing when clean). rc= is recorded in logs/gates/gates-outer.log; positive control for a real vet finding is not needed here because rc=0 and empty = the passing shape.

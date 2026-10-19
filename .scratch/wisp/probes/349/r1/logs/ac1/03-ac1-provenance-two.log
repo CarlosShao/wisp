@@ -1,0 +1,43 @@
+############ AC#1 proof: file=internal/risk/provenance.go anchor=7b633fa9713b0514806c8b808ed4db91b1485cdc after=db2f9eab7bcffd827240763699aa0f4ad7ff3266 ############
+== 0. blob hashes: before / after ==
+d634aae0f1e31a33a6f155ee13912a05006273dd
+eff984f8c194116a5e99471fbaecf7a4ab691574
+-- working-copy vs after-blob CR counts (why GB must run on blobs) --
+worktree_CR=1115 blob_CR=0
+== 1. git diff -U0 changed lines (each must start with //) ==
+-// assessor.WithTaintDetector(prov.Detector(taskScopeID)) yields the
++// assessor.WithTaintDetector(prov.Detector(scopeID)) yields the
+-// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
++// the task's internal/plugin.DisposalScope deferring this closure — the handle, not the id,
+-- count of changed lines: total / non-comment (want non-comment = 0) --
+4
+0
+== 1b. git numstat (added/deleted lines, this file) ==
+2	2	internal/risk/provenance.go
+== 2. THREE stripped-executable gauges, BOTH sides ==
+label=before-blob file=/d/tmp/wisp/20261019/349r1/before/provenance.go
+  RAW_sha256=a870b5f1a46bb4c9e602f771806934d1ca734a0026ef50e0e3e782faac162612 bytes=46608 lines=1115
+  GS1_sha256=1df28906d551e8b9bd1e4cdb11b44e9f5e453ec0ea84a42b7ba579fb66ece8b1 lines=621
+  GS2_sha256=1df28906d551e8b9bd1e4cdb11b44e9f5e453ec0ea84a42b7ba579fb66ece8b1 lines=621
+  GB_sha256=851972c953d75415927d98fd29111f43006e5fab5bcbc6547362fc739ea82f41 lines=676
+label=after-blob file=/d/tmp/wisp/20261019/349r1/after/provenance.go
+  RAW_sha256=092590aae9465518c6511a2dee2e8d1e1819858e3d9f4c227f0ad97c487c6f68 bytes=46618 lines=1115
+  GS1_sha256=1df28906d551e8b9bd1e4cdb11b44e9f5e453ec0ea84a42b7ba579fb66ece8b1 lines=621
+  GS2_sha256=1df28906d551e8b9bd1e4cdb11b44e9f5e453ec0ea84a42b7ba579fb66ece8b1 lines=621
+  GB_sha256=851972c953d75415927d98fd29111f43006e5fab5bcbc6547362fc739ea82f41 lines=676
+GS1_CMP=IDENTICAL
+GB_CMP=IDENTICAL
+== 3. the dead name in internal/risk, at ANCHOR vs at AFTER (delivery) ==
+-- ANCHOR side (expect the old bare-name hit to exist there) --
+7b633fa9713b0514806c8b808ed4db91b1485cdc:internal/risk/provenance.go:54:// assessor.WithTaintDetector(prov.Detector(taskScopeID)) yields the
+-- AFTER side (want 0 hits = the bare name is gone) --
+ZERO-HITS-at-delivery (want this)
+-- POSITIVE CONTROL (a name that must hit): Detector --
+db2f9eab7bcffd827240763699aa0f4ad7ff3266:internal/risk/assessor.go:7
+db2f9eab7bcffd827240763699aa0f4ad7ff3266:internal/risk/assessor_test.go:2
+db2f9eab7bcffd827240763699aa0f4ad7ff3266:internal/risk/provenance.go:7
+db2f9eab7bcffd827240763699aa0f4ad7ff3266:internal/risk/provenance_test.go:10
+db2f9eab7bcffd827240763699aa0f4ad7ff3266:internal/risk/rules_gateway.go:1
+db2f9eab7bcffd827240763699aa0f4ad7ff3266:internal/risk/rules_test.go:1
+== 3b. blob hygiene for the after side ==
+after_blob_CR=0 bytes=46618 lines=1115 maxlen=267

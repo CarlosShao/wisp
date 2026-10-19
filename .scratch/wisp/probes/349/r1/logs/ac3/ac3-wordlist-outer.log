@@ -1,0 +1,40 @@
+wrote=.scratch/wisp/probes/349/r1/logs/ac3/ac3-wordlist.log rc=0
+############ side=base tree=/d/tmp/wisp/20261019/349r1/treeBase anchor=7b633fa9713b0514806c8b808ed4db91b1485cdc ############
+comment a[A-Z] names in the 3 production files = 5
+    aAnyForm
+    aEq
+    aRelates
+    aRuleReason
+    aUnder
+  -- 逐枚问'包里有定义吗'（三形对撞，射程＝该树 internal/risk 全 49 枚 .go）--
+  GREEN  aAnyForm       func aAnyForm(
+  GREEN  aEq            func aEq(
+  GREEN  aRelates       func aRelates(
+  GREEN  aRuleReason    func aRuleReason(
+  GREEN  aUnder         func aUnder(
+############ side=del tree=/d/tmp/wisp/20261019/349r1/treeDel anchor=db2f9eab7bcffd827240763699aa0f4ad7ff3266 ############
+comment a[A-Z] names in the 3 production files = 5
+    aAnyForm
+    aEq
+    aRelates
+    aRuleReason
+    aUnder
+  -- 逐枚问'包里有定义吗'（三形对撞，射程＝该树 internal/risk 全 49 枚 .go）--
+  GREEN  aAnyForm       func aAnyForm(
+  GREEN  aEq            func aEq(
+  GREEN  aRelates       func aRelates(
+  GREEN  aRuleReason    func aRuleReason(
+  GREEN  aUnder         func aUnder(
+############ 对照：全 package 生产件（去 _test.go）的 a[A-Z] 名册枚数（编排者现跑 HEAD=5 那把尺的口径）############
+side=base prodfiles=19 whole-package-production a[A-Z] names=5
+    aAnyForm
+    aEq
+    aRelates
+    aRuleReason
+    aUnder
+side=del prodfiles=19 whole-package-production a[A-Z] names=5
+    aAnyForm
+    aEq
+    aRelates
+    aRuleReason
+    aUnder

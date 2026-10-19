@@ -1,0 +1,26 @@
+票 349 落地腿 349-r1·第 6 笔＝交件套：报告两枚＋票尾一条 bullet＋全部读数件入库
+
+本笔内容：
+- `.scratch/wisp/probes/349/r1/report.md`（第 0 节至第 5 节，111 行）＝起手三键尺／AC#1 四枚逐枚／
+  必答 (i) 命门结构尺（起手 blob ⇄ 交件 blob 三把剥注释尺逐枚同串）／必答 (ii) AC#0 三形尺同族终数
+  （产码面起手侧 12 枚非 GREEN＝TRUE 恰＝票面那四枚、另 8 枚逐具名判 FP）／必答 (iii) AC#3 独立复量
+  判"通用仪器⛔ 上"＋误伤样本表／必答 (iv) numstat 与写面。
+- `report-sec-b.md`（第 6 节至第 10 节，105 行）＝票 336 那 8 枚牙 8/8 全红逐名＋还原哈希 11 次 YES、
+  AC#4 两平台成对四数（Windows 247/136/5/1 ⇄ 同值、Linux 195/115/1/1 ⇄ 同值、红名册逐名作差同集＝
+  本腿新增红 0）、门禁四数 rc 全 0、纪律面自证、本程没测什么与未决。
+- 票 349 尾**一条**只追加 bullet（守门＝落刀前锚 0 枚→落刀后 1 枚；numstat 2/0＝只追加⛔ 删原句；
+  AC 框终量＝未翻 7 枚、已翻 0 枚＝七格一枚没翻）。
+- `logs/`（94 枚件、逐枚非 0 字节、⛔ .out）＝ac1 四枚证明、census 两侧全量＋产码面、
+  pair 两平台原始 stdout＋红名册、teeth 18 枚逐发、gates 四道门、ac3 两把尺。
+- `sh/` 台件＝我自己那把三形普查尺源码（⛔ 交 .go 形＝落 .go.txt，不进任何 build）、strip-sha 三把尺、
+  ac1-proof、build-tree/make-trees（仓外导出树配方）、run-teeth-336（一字⛔ 动 336 台件、env 指我自己的树）、
+  run-pair-windows/linux、run-gates（跑前 unset GOTMPDIR TMPDIR TEMP TMP）、run-ac3＋run-ac3-wordlist、
+  collect-logs、hygiene/final-hygiene（U+00A7 码位形＋双重编码乱码形＋零字节/.out 三形对撞，正控非零）、
+  append-bullet、fix-mojibake（自抓自改正的具名记录）。
+
+★两处我自己踩过并当场改正的形，已在报告里具名摊出（⛔ 抹）：
+① 结构尺第一版把"交件侧"取成工作树副本＝provenance.go 磁盘副本是 CRLF 而 blob 是 LF ⇒ GB 那把必假红
+   ⇒ 改成两侧都 `git cat-file blob`；② 清被禁字面字符（码位 U+00A7）的第一把脚本用双引号 shell 串
+   吃了 `$1` ⇒ 造出双重编码乱码 ⇒ 第二把按字节形改正、三枚正文件由 Write 工具重落＝读数⛔ 变。
+
+⛔ push、⛔ 翻框、⛔ 改票名／Status／-done；写面⛔ 越界（⛔ internal/winsec、⛔ cmd/wisp、⛔ internal/panel）。

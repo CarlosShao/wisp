@@ -1,0 +1,35 @@
+### 349-r1 Linux pair (串行: base 先、del 后)
+tree=/d/tmp/wisp/20261019/349r1/treeBase label=base modcache=D:\work\base\gopath\pkg\mod
+== label=base bytes=32304 ==
+RUN=195
+PASS_TOP=115
+FAIL_TOP=1
+SKIP=1
+-- 红名册 --
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (2.55s)
+-- SKIP 名册 --
+--- SKIP: TestC26RewrittenSyncRootDoesNotDisarmSuspectNet (0.00s)
+-- GO_TEST_RC --
+GO_TEST_RC=1
+-- 台面故障名册 --
+none
+tree=/d/tmp/wisp/20261019/349r1/treeDel label=del modcache=D:\work\base\gopath\pkg\mod
+== label=del bytes=32306 ==
+RUN=195
+PASS_TOP=115
+FAIL_TOP=1
+SKIP=1
+-- 红名册 --
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (2.63s)
+-- SKIP 名册 --
+--- SKIP: TestC26RewrittenSyncRootDoesNotDisarmSuspectNet (0.00s)
+-- GO_TEST_RC --
+GO_TEST_RC=1
+-- 台面故障名册 --
+none
+### 红名册逐名作差（lin base ⇄ lin del）
+  1 /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/349/r1/logs/pair/lin-red-base.txt
+  1 /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/349/r1/logs/pair/lin-red-del.txt
+  2 total
+-- only in base --
+-- only in del (want empty) --

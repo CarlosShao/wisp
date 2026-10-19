@@ -1,0 +1,46 @@
+############ AC#1 proof: file=internal/risk/syncdirs.go anchor=7b633fa9713b0514806c8b808ed4db91b1485cdc after=HEAD ############
+== 0. blob hashes: before / after ==
+7125b08a84211e51ed6ddbb68f1a2b625d03b8c3
+8dfe18602fa749ea1740ecfbbbcfcc30b38ea27f
+-- working-copy vs after-blob CR counts (why GB must run on blobs) --
+worktree_CR=0 blob_CR=0
+== 1. git diff -U0 changed lines (each must start with //) ==
+-// is reported via Complete()==false, not as a root.
++// is reported via SyncDetectionComplete()==false, not as a root.
+-- count of changed lines: total / non-comment (want non-comment = 0) --
+2
+0
+== 1b. git numstat (added/deleted lines, this file) ==
+1	1	internal/risk/syncdirs.go
+== 2. THREE stripped-executable gauges, BOTH sides ==
+label=before-blob file=/d/tmp/wisp/20261019/349r1/before/syncdirs.go
+  RAW_sha256=aa4779bb52704f4333a286c1a8396868579daa8d0c26634022ef9a8830ff2d36 bytes=25756 lines=658
+  GS1_sha256=00fb159ac7c38c3b93ccd4ceeca50edacd48564c8440198eaf00a6889fe753f1 lines=435
+  GS2_sha256=00fb159ac7c38c3b93ccd4ceeca50edacd48564c8440198eaf00a6889fe753f1 lines=435
+  GB_sha256=68f2d7ccc6f9c805da94fd6ade8db81bd6f5ed080c1783ca5f80fdf615b9127d lines=468
+label=after-blob file=/d/tmp/wisp/20261019/349r1/after/syncdirs.go
+  RAW_sha256=58ec56819cc7c5df8ef9a52815bb6b9e30dea295e45ee6f94e26c4da3ceaabb2 bytes=25769 lines=658
+  GS1_sha256=00fb159ac7c38c3b93ccd4ceeca50edacd48564c8440198eaf00a6889fe753f1 lines=435
+  GS2_sha256=00fb159ac7c38c3b93ccd4ceeca50edacd48564c8440198eaf00a6889fe753f1 lines=435
+  GB_sha256=68f2d7ccc6f9c805da94fd6ade8db81bd6f5ed080c1783ca5f80fdf615b9127d lines=468
+GS1_CMP=IDENTICAL
+GB_CMP=IDENTICAL
+== 3. the dead name in internal/risk, at ANCHOR vs at AFTER (delivery) ==
+-- ANCHOR side (expect the old bare-name hit to exist there) --
+7b633fa9713b0514806c8b808ed4db91b1485cdc:internal/risk/syncdirs.go:453:// is reported via Complete()==false, not as a root.
+-- AFTER side (want 0 hits = the bare name is gone) --
+ZERO-HITS-at-delivery (want this)
+-- POSITIVE CONTROL (a name that must hit): SyncDetectionComplete --
+HEAD:internal/risk/provenance_syncdirs_other_test.go:1
+HEAD:internal/risk/provenance_syncdirs_windows_test.go:1
+HEAD:internal/risk/provenance_test.go:1
+HEAD:internal/risk/syncdirs.go:3
+HEAD:internal/risk/syncdirs_alias_307_windows_test.go:2
+HEAD:internal/risk/syncdirs_ancestor_actable_leg_116_test.go:1
+HEAD:internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go:1
+HEAD:internal/risk/syncdirs_other_test.go:4
+HEAD:internal/risk/syncdirs_redteam_windows_test.go:1
+HEAD:internal/risk/syncdirs_test.go:8
+HEAD:internal/risk/syncdirs_windows_test.go:3
+== 3b. blob hygiene for the after side ==
+after_blob_CR=0 bytes=25769 lines=658 maxlen=164

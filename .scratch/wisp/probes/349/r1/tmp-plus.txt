@@ -1,0 +1,4 @@
++// AC#1), and it reads nothing but the reason: aEq/aUnder (via aRelates) above decided
++// assessor.WithTaintDetector(prov.Detector(scopeID)) yields the
++// the task's internal/plugin.DisposalScope deferring this closure — the handle, not the id,
++// is reported via SyncDetectionComplete()==false, not as a root.

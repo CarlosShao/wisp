@@ -213,21 +213,38 @@ func main() {
 
 	fset := token.NewFileSet()
 	pkgFiles := goFiles(*pkgDir)
+	// Two package rosters: prod-only (non _test.go) and all-files. A name defined ONLY in a
+	// test is NOT what a production comment may point at, so it gets its own verdict class
+	// (GREEN-pkg-TESTONLY) instead of being silently counted as defined.
+	var pkgProdFiles []string
+	for _, f := range pkgFiles {
+		if !strings.HasSuffix(f, "_test.go") {
+			pkgProdFiles = append(pkgProdFiles, f)
+		}
+	}
 	var repoFiles []string
 	for _, r := range strings.Split(*rootsCSV, ",") {
 		repoFiles = append(repoFiles, goFiles(r)...)
 	}
 	pkgP, pkgB := map[string]def{}, map[string]def{}
+	pkgProdP, pkgProdB := map[string]def{}, map[string]def{}
 	repoP, repoB := map[string]def{}, map[string]def{}
 	pf := roster(fset, pkgFiles, pkgP, pkgB)
+	pfp := roster(fset, pkgProdFiles, pkgProdP, pkgProdB)
 	rf := roster(fset, repoFiles, repoP, repoB)
 
 	grade := func(name string) (verdict, kind, where string) {
-		if d, ok := pkgP[name]; ok {
+		if d, ok := pkgProdP[name]; ok {
 			return "GREEN-pkg", d.kind, d.where
 		}
-		if d, ok := pkgB[name]; ok {
+		if d, ok := pkgProdB[name]; ok {
 			return "GREEN-bound", d.kind, d.where
+		}
+		if d, ok := pkgP[name]; ok {
+			return "GREEN-pkg-TESTONLY", d.kind, d.where
+		}
+		if d, ok := pkgB[name]; ok {
+			return "GREEN-bound-TESTONLY", d.kind, d.where
 		}
 		if d, ok := repoP[name]; ok {
 			return "RED-elsewhere", d.kind, d.where
@@ -294,10 +311,11 @@ func main() {
 		}
 		return a.name < b.name
 	})
-	fmt.Printf("# pkg=%s pkgfiles=%d(reparsed=%d) repofiles=%d pkgRoster=%d boundRoster=%d repoRoster=%d only=%q\n",
-		*pkgDir, len(pkgFiles), pf, len(repoFiles), len(pkgP), len(pkgB), len(repoP), *only)
+	fmt.Printf("# pkg=%s pkgfiles=%d(pkgparsed=%d, prodfiles=%d/prodparsed=%d) repofiles=%d(repoparsed=%d) pkgRoster=%d boundRoster=%d repoRoster=%d only=%q\n",
+		*pkgDir, len(pkgFiles), pf, len(pkgProdFiles), pfp, len(repoFiles), rf,
+		len(pkgP), len(pkgB), len(repoP), *only)
 	for _, c := range out {
-		if c.verdict == "GREEN-pkg" || c.verdict == "GREEN-bound" {
+		if strings.HasPrefix(c.verdict, "GREEN") {
 			continue
 		}
 		fmt.Printf("%-5s %-26s %-22s %-14s %-52s %s:%d\n",
@@ -305,7 +323,7 @@ func main() {
 	}
 	fmt.Println("# --- counters (rows above are all non-GREEN) ---")
 	for _, shape := range []string{"SA", "SB", "SC", "BEXCL"} {
-		tot, gp, gb, re, rn := 0, 0, 0, 0, 0
+		tot, gp, gb, gt, re, rn := 0, 0, 0, 0, 0, 0
 		for _, c := range out {
 			if c.shape != shape {
 				continue
@@ -316,13 +334,15 @@ func main() {
 				gp++
 			case "GREEN-bound":
 				gb++
+			case "GREEN-pkg-TESTONLY", "GREEN-bound-TESTONLY":
+				gt++
 			case "RED-elsewhere", "RED-elsewhere-bound":
 				re++
 			case "RED-nowhere":
 				rn++
 			}
 		}
-		fmt.Printf("shape=%-5s TOTAL=%-4d GREEN-pkg=%-4d GREEN-bound=%-4d RED-elsewhere=%-4d RED-nowhere=%d\n",
-			shape, tot, gp, gb, re, rn)
+		fmt.Printf("shape=%-5s TOTAL=%-4d GREEN-pkg=%-4d GREEN-bound=%-4d GREEN-testonly=%-4d RED-elsewhere=%-4d RED-nowhere=%d\n",
+			shape, tot, gp, gb, gt, re, rn)
 	}
 }

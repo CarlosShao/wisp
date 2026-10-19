@@ -1,0 +1,3 @@
+10:RED-elsewhere-bound SB                         fires                  field          internal/config/unwired.go                           blacklist.go:310
+13:RED-nowhere SA                         taskScopeID                                                                                provenance.go:54
+14:RED-nowhere SA                         disposalScope                                                                              provenance.go:427
