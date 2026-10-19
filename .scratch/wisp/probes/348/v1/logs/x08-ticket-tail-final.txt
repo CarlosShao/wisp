@@ -1,0 +1,9 @@
+WINSEC_GO_BLOB_NOW=07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+T342_342v2_BULLET_MENTIONS=1
+T348_342v2_BULLET_MENTIONS=1
+--- my bullet head line in each ticket (must be the LAST bullet) ---
+- [2026-10-19 18:2x +08] agent=`342-v2`（票 342＋票 348 终裁腿＝非实现者裁决腿，★只读产码、⛔ 实现者、⛔ 翻任何框、�
+- [2026-10-19 18:2x +08] agent=`342-v2`（票 342＋票 348 终裁腿＝非实现者裁决腿，★只读产码、⛔ 实现者、⛔ 翻任何框、�
+--- boxes ---
+T342 x=1 open=6
+T348 x=0 open=7
