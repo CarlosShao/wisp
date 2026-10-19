@@ -5,7 +5,7 @@
 - 起手锚＝我自己现跑的 `6c625a8c…`（⛔ 抄任何人的号）；`git status --porcelain -- internal/config cmd/wisp`＝零行。
 - ★四格去牙（P2／P3／P5／P6）**全部由我从零重打**，⛔ 抄编排者那一发（他那只证了 P6）、⛔ 抄腿。
 - 台面＝我自己 `git archive` 的两棵仓外导出树 `D:\tmp\wisp\20261018\341v1\treeB|treeD`（八件套＋`docs/`＋手工三件；`.go` 592 枚非空现验）；突变只打导出树物理字节、⛔ `-overlay`、内容锚⛔ 行号。
-- 逐格尺的逐字输出＝`.scratch/wisp/probes/341/v1/logs/00..14-*.txt`；台件脚本＝同处 `scripts/run1..run13`；交件自证三把尺的逐字＝`logs/14-selfproof.txt`（★票尾那条 bullet 写的是它落笔时的 `00..13／run1..run12`，其后只**增加**了 `logs/14`＋`scripts/run13` 这枚自证件，⛔ 改动任何已交读数）。
+- 逐格尺的逐字输出＝`.scratch/wisp/probes/341/v1/logs/00..14-*.txt`（18 枚，含 `02-filecheck.txt` 件形尺逐字＋`13`/`14` 两枚本腿自报件）；台件脚本＝同处 `scripts/run1..run13`＋`commit1.sh`（14 枚）。★票尾那条 bullet 与前三笔提交里写的号段（`00..13`／`run1..run12`）＝它各自落笔时刻的形，其后两笔（`bcdddbfb`／`251f8aaf`）只**追加**了真身台件与件目录现量、⛔ 改动任何已交读数＝`logs/14` 末段"尺二补三"具名记了这枚枚数取早。交件自证三把尺逐字＝`logs/14-selfproof.txt`。
 - ⛔ 翻框（本判语只裁）、⛔ 动 226 判语件一字、⛔ 任何 `.go` 字节、⛔ `./cmd/wisp` 整包、⛔ `go test ./...`、⛔ `internal/risk`。
 
 ## AC#0 起手现量＝**成立**（与票面四行相符，与腿的表相符，另有一处我加细）
