@@ -47,3 +47,22 @@ MU-1g teeth_red=2 leg_red=0
 MU-1h teeth_red=2 leg_red=0
 ac2_sweep_rc=0
 SWEEP_RC=0
+
+### 8 枚牙逐名对回 8 个落点（本腿自己那一发的逐发读数；台件原样 log 落仓外 logsTeeth/posix/）
+# 尺＝台件自带的 TEETH336 operand=… class=… 行 ⇄ 逐枚 --- FAIL 子测试名（两种红形：class 掉 B／子测试直接 FAIL）
+MU-1a flipped_classB=[git-credentials ] failing_subtest_names=[git-credentials,]
+MU-1b flipped_classB=[none] failing_subtest_names=[wisp-config-under,]
+MU-1c flipped_classB=[wisp-config-eq ] failing_subtest_names=[wisp-config-eq,wisp-config-under,]
+MU-1d flipped_classB=[ssh ] failing_subtest_names=[ssh,]
+MU-1e flipped_classB=[aws ] failing_subtest_names=[aws,]
+MU-1f flipped_classB=[kube ] failing_subtest_names=[kube,]
+MU-1g flipped_classB=[dpapi-protect ] failing_subtest_names=[dpapi-protect,]
+MU-1h flipped_classB=[local-credentials ] failing_subtest_names=[local-credentials,]
+pristine_classB_hits=0 (want 0＝未动形 8/8 全 class=A、clause=true)
+pristine_teeth_verdict_line=--- PASS: TestAnchorFallbackTeethPerAnchor336 
+# 逐发还原哈希（台件 check_hash 摊出）＝11 发全 match=YES（start／after-pristine／8×after-MU-*／final）＝见本件上半段
+### 台面另注：本轮 GOTMPROOT 用 POSIX 形＝这八枚牙件不建 junction／mklink，台损那形打不到它们；
+###   对撞凭据＝本腿四象限同形 GOTMP 的整包发（logs/03）确实造出那 4 枚 …116/…Junction 红、牙名册⛔ 受其影响＝两形牙读数一致（8/8 全红）。
+### 票 346 那两枚摆动枚（TestPOSIX120SealWindowLeafSwapIsClosed／TestAC1POSIXOpen…322r1）：
+  occurrences_in_my_risk_package_colour_logs=0 (want 0＝那两枚住 internal/winsec、⛔ 在我射程包内；本腿⛔ 跑该包、⛔ 读在飞工作树)
+  winsec_322_files_present_in_my_exported_tree=4 (在场＝证明"⛔ 在我的包色里"是射程问题、⛔ 缺件)
