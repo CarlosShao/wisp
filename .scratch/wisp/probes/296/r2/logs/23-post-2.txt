@@ -1,0 +1,33 @@
+SHOT=23-post-2  log=/d/tmp/wisp/20261019/296r2/post-2.log
+winsec_seed=07300bfffc3e5b14c017029d6f84fb5a7ede3db8  CGO_ENABLED=1
+RUN=13  PASS_TOP=8  FAIL_TOP=3  SKIP=2
+--- per-test roster (top-level) ---
+--- PASS: Test258AssemblyRootWiresTheChainAndTheBridge (0.00s)
+--- PASS: Test258SinkRebindRulerReadsBothSpellings (0.00s)
+--- PASS: Test258ConstructionChainTakesConfigValues (0.01s)
+--- PASS: Test258ConstructionChainMissingFileFallsBackAndSaysIt (0.01s)
+--- PASS: Test258SectionMissingTierWordIsDefaults (0.01s)
+--- PASS: Test258ProvenanceWordsAreThePrintedOnes (0.00s)
+--- PASS: Test258BridgeRebindsLiveKeysFromConfigEdit (0.37s)
+--- FAIL: Test258BridgeMutationNoSrcKeepsOldBinding (0.46s)
+--- FAIL: Test258OccupiedCombinationNamesTheNewValue (0.06s)
+--- SKIP: Test296BridgeKeepsThreeLiveKeysWithOwnerEmptySlots (0.05s)
+--- SKIP: Test296BridgeKeepsThreeLiveKeysWhenConfigUnreadable (0.05s)
+--- FAIL: Test258V1ProbeSummonEditRebindsLiveBall (0.05s)
+--- PASS: Test258V1ProbeConstructionMissingFileNamesTheFallback (0.01s)
+--- red/skip sentences (file:line, verbatim) ---
+    resident_hotkey_258_windows_test.go:361: the old binding did not survive a no-rebind host (VK=0x0): the premise moved
+    resident_hotkey_258_windows_test.go:448: the boot verdict lost the live-count shape: "the floating ball window is up in this process (tray icon added, hotkeys from config, hotkeys live 1/4: summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app)"
+    resident_hotkey_258_windows_test.go:453: live slots after the rebind = 1, want 2 (summon+mute; cancel is standby, panel is taken)
+    resident_hotkey_296_windows_test.go:172: SKIP-LOUD: boot could not register the three default combinations on this host (summon=occupied by another app="Ctrl+Alt+Q" mute=occupied by another app="Ctrl+Alt+M" cancel=not bound while idle (cancel is borrowed only during Confirming)="Esc" panel=occupied by another app="Ctrl+Alt+P"), so the live count cannot be read here
+    resident_hotkey_296_windows_test.go:213: SKIP-LOUD: boot could not register the three default combinations on this host (summon=occupied by another app="Ctrl+Alt+Q" mute=occupied by another app="Ctrl+Alt+M" cancel=not bound while idle (cancel is borrowed only during Confirming)="Esc" panel=occupied by another app="Ctrl+Alt+P"), so the live count cannot be read here
+    resident_hotkey_v1probe_test.go:108: 258-v1 PROBE: boot verdict lost the live-count shape: "the floating ball window is up in this process (tray icon added, hotkeys from config, hotkeys live 1/4: summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), panel=Ctrl+Alt+P occupied by another app)"
+--- occupancy cause (verbatim, first 4) ---
+time=2026-10-19T22:58:35.384+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T22:58:35.384+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+time=2026-10-19T22:58:35.408+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-10-19T22:58:35.408+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=panel binding=Ctrl+Alt+P err="Hot key is already registered."
+--- package tail ---
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.224s
+FAIL

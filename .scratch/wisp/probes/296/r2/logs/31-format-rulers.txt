@@ -1,0 +1,29 @@
+=== 并排两把格式尺（工作树侧），逐名；当发真跑 ===
+RC_gofmt_l_cmd_wisp_worktree=0
+--- gofmt 逐名（应只含已知 CRLF 存量 models.go，⛔ 顺手洗）---
+cmd\wisp\models.go
+RC_gofumpt_l_cmd_wisp_worktree=0
+--- gofumpt 逐名 ---
+cmd\wisp\models.go
+RC_bare_gofumpt_not_in_PATH=127  （具名：⛔ 读成「跳过」）
+/d/tmp/wisp/20261019/296r2/mklogs.sh: line 51: gofumpt: command not found
+=== 判据尺：git archive HEAD cmd/wisp → 仓外 → 同两把尺 ===
+exported_tree_go_file_count=139  （正控：非 0）
+RC_gofmt_on_exported_head=0
+--- 逐名 ---
+RC_gofumpt_on_exported_head=0
+--- 逐名 ---
+=== 交件侧（工作树含我这三行注释）我那一枚文件单独过两把尺 ===
+RC_gofmt_mine=0 命中=0
+RC_gofumpt_mine=0 命中=0
+worktree_CR_bytes_in_models.go=334  HEAD_blob_CR_bytes=0  （CRLF 假枚成因）
+=== 正控：在仓外导出树里造一枚故意脏的 .go，同两把尺必须点名它 ===
+RC=0 命中=1
+D:\tmp\wisp\20261019\296r2\tree-head2\cmd\wisp\zz_296r2_positive_control.go
+gofumpt RC=0
+1
+=== 反控：摘掉正控文件后同一把尺回到 0 枚 ===
+RC=0 命中=0
+=== 同时证明导出的 cmd/wisp 包里有我的那一枚文件（尺射程含它）===
+-rw-r--r-- 1 swq 197609 43952 Oct 19 23:01 /d/tmp/wisp/20261019/296r2/tree-head2/cmd/wisp/resident_windows.go
+1

@@ -1,0 +1,6 @@
+=== d22scan 当发真跑 ===
+RC_sh_scripts_d22scan=1
+--- 逐字末两行 ---
+FAIL
+runtests.sh: go test exited 1 - packages=[./...] top-level: PASS=33 FAIL=2 SKIP=0, === RUN=77, '[no tests to run]'=0
+（跑前 unset GOTMPDIR TMPDIR＝公共块 A1027 第⑤节定式；带 env 时票 311 GUARD 会 rc=2 射程拒绝＝⛔ 读成红）

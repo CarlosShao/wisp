@@ -1,0 +1,5 @@
+=== vet ＋ 长度门 当发真跑 ===
+RC_go_vet_cmd_wisp=0  输出字节=0
+RC_sh_scripts_check_path_length_budget=0
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree

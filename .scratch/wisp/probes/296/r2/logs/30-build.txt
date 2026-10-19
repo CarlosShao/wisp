@@ -1,0 +1,5 @@
+=== 本件＝当发真跑取 rc（⛔ 转述）；跑前 unset GOTMPDIR TMPDIR ===
+RC_GOFLAGS_go_build_dot_dot_dot=0
+--- 该发 stdout/stderr（空＝成功）字节数=0 ---
+positive-control: go version=go version go1.27.1 windows/amd64
+date_when_run=2026-10-19 23:03:22 +0800
