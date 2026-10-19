@@ -1,0 +1,44 @@
+=== RUN   TestV342v1PosixAncestorRaceRows
+=== RUN   TestV342v1PosixAncestorRaceRows/VBASE
+    v342v1race_test.go:366: V342V1 VBASE: attempts=1500 flips=1074 flipErrs=108 damage=484 truncated=484 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBASE1671360151/001/root/data/sub: directory not empty
+    v342v1race_test.go:366: V342V1 VBASE leg=enoent/body : 878
+    v342v1race_test.go:366: V342V1 VBASE leg=ok/truncated : 484
+    v342v1race_test.go:366: V342V1 VBASE leg=ok/body : 138
+    v342v1race_test.go:366: V342V1 VBASE damageRow i=2 err=<nil> kind=truncated size=22
+    v342v1race_test.go:366: V342V1 VBASE damageRow i=4 err=<nil> kind=truncated size=22
+    v342v1race_test.go:366: V342V1 VBASE damageRow i=7 err=<nil> kind=truncated size=22
+=== RUN   TestV342v1PosixAncestorRaceRows/VPROD
+    v342v1race_test.go:375: V342V1 VPROD: attempts=1500 flips=1581 flipErrs=1158 damage=2 truncated=2 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVPROD2758700880/001/root/data/sub: directory not empty
+    v342v1race_test.go:375: V342V1 VPROD leg=enoent/body : 1353
+    v342v1race_test.go:375: V342V1 VPROD leg=floor/body : 145
+    v342v1race_test.go:375: V342V1 VPROD leg=enoent/truncated : 2
+    v342v1race_test.go:375: V342V1 VPROD damageRow i=17 err=winsec: cannot apply a private security descriptor: /gotmp/TestV342v1PosixAncestorRaceRowsVPROD2758700880/001/root/data/sub/blob.bin: openat sub: no such file or directory kind=truncated size=0
+    v342v1race_test.go:375: V342V1 VPROD damageRow i=89 err=winsec: cannot apply a private security descriptor: /gotmp/TestV342v1PosixAncestorRaceRowsVPROD2758700880/001/root/data/sub/blob.bin: openat sub: no such file or directory kind=truncated size=0
+=== RUN   TestV342v1PosixAncestorRaceRows/VJIA
+    v342v1race_test.go:380: V342V1 VJIA: attempts=1500 flips=1231 flipErrs=217 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVJIA981376198/001/root/data/sub: directory not empty
+    v342v1race_test.go:380: V342V1 VJIA leg=enoent/body : 1051
+    v342v1race_test.go:380: V342V1 VJIA leg=ok/body : 219
+    v342v1race_test.go:380: V342V1 VJIA leg=enotdir/body : 230
+=== RUN   TestV342v1PosixAncestorRaceRows/VYI
+    v342v1race_test.go:389: V342V1 VYI: attempts=1500 flips=1516 flipErrs=102 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVYI3848639223/001/root/data/sub: directory not empty
+    v342v1race_test.go:389: V342V1 VYI leg=enoent/body : 955
+    v342v1race_test.go:389: V342V1 VYI leg=ok/body : 102
+    v342v1race_test.go:389: V342V1 VYI leg=other:winsec: cannot apply a private security descriptor: /gotmp/T/body : 443
+=== RUN   TestV342v1PosixAncestorRaceRows/VBING
+    v342v1race_test.go:400: V342V1 VBING: attempts=1500 flips=1297 flipErrs=1038 damage=123 truncated=123 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBING1179282443/001/root/data/sub: directory not empty
+    v342v1race_test.go:400: V342V1 VBING leg=ok/body : 62
+    v342v1race_test.go:400: V342V1 VBING leg=other:winsec: cannot apply a private security descriptor: /gotmp/T/body : 1
+    v342v1race_test.go:400: V342V1 VBING leg=enoent/body : 1314
+    v342v1race_test.go:400: V342V1 VBING leg=ok/truncated : 44
+    v342v1race_test.go:400: V342V1 VBING leg=enoent/truncated : 79
+    v342v1race_test.go:400: V342V1 VBING damageRow i=4 err=<nil> kind=truncated size=22
+    v342v1race_test.go:400: V342V1 VBING damageRow i=6 err=winsec: cannot apply a private security descriptor: /gotmp/TestV342v1PosixAncestorRaceRowsVBING1179282443/001/root/data/sub: openat sub: no such file or directory kind=truncated size=0
+    v342v1race_test.go:400: V342V1 VBING damageRow i=8 err=winsec: cannot apply a private security descriptor: /gotmp/TestV342v1PosixAncestorRaceRowsVBING1179282443/001/root/data/sub: openat sub: no such file or directory kind=truncated size=0
+--- PASS: TestV342v1PosixAncestorRaceRows (172.13s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VBASE (16.21s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VPROD (30.55s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VJIA (67.20s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VYI (25.06s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VBING (33.10s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	172.174s

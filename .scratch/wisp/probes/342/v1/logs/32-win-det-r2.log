@@ -1,0 +1,13 @@
+time=2026-10-19T09:23:13.391+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV342v1WindowsLeafSwapAfterGuardIsTheResidualLeafLeg
+    v342v1win_test.go:445: mklink /J: Junction created for C:\Users\swq\TestV342v1WindowsLeafSwapAfterGuardIsTheResidualLeafLeg4260946746\001\stage-link <<===>> C:\Users\swq\TestV342v1WindowsLeafSwapAfterGuardIsTheResidualLeafLeg4260946746\002\fdir
+    v342v1win_test.go:466: V342V1 W-LEAFSWAP: open after the guard's verdict REFUSED err=open C:\Users\swq\TestV342v1WindowsLeafSwapAfterGuardIsTheResidualLeafLeg4260946746\001\root\data\sub\blob.bin: is a directory; witness kind=body
+--- PASS: TestV342v1WindowsLeafSwapAfterGuardIsTheResidualLeafLeg (0.13s)
+=== RUN   TestV342v1WindowsOsRootFollowsInRootRelativeFileLink
+    v342v1win_test.go:511: V342V1 W-ROOTSYM VERDICT: Root.OpenFile err=<nil>; victim now "X"; link-still-there=true => followed=true
+    v342v1win_test.go:513: V342V1 W-ROOTSYM CONSEQUENCE: os.Root pins ancestors but NOT the leaf on this platform, so a Windows 乙 landing keeps needing an identity re-check for the leaf that this package does not have today (winsec_windows.go:371-373 states that leg is open and belongs to ticket 120's Windows half).
+    v342v1win_test.go:541: V342V1 W-ROOTJUNC VERDICT: Root.OpenFile through an in-root JUNCTION REFUSED err=openat junc\blob.bin: path escapes from parent; foreign blob intact=true
+--- PASS: TestV342v1WindowsOsRootFollowsInRootRelativeFileLink (0.07s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.268s
+RC=0

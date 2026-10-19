@@ -1,0 +1,50 @@
+time=2026-10-19T09:22:48.403+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV342v1WindowsFormsRace
+=== RUN   TestV342v1WindowsFormsRace/WBASE
+    v342v1win_test.go:331: mklink /J: Junction created for C:\Users\swq\TestV342v1WindowsFormsRaceWBASE2786623747\001\stage-link <<===>> C:\Users\swq\TestV342v1WindowsFormsRaceWBASE2786623747\002\fdir
+    v342v1win_test.go:331: V342V1 WBASE: attempts=1500 linkStateFlips=123 flipErrs=79 damage=871 truncated=871 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWBASE2786623747\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    v342v1win_test.go:331: V342V1 WBASE leg=other:open C:\Users\swq\TestV342v1WindowsFormsRaceWBASE2786623747\/body : 4
+    v342v1win_test.go:331: V342V1 WBASE leg=ok/body : 212
+    v342v1win_test.go:331: V342V1 WBASE leg=enoent/body : 397
+    v342v1win_test.go:331: V342V1 WBASE leg=eacces/body : 16
+    v342v1win_test.go:331: V342V1 WBASE leg=ok/truncated : 871
+    v342v1win_test.go:331: V342V1 WBASE damageRow i=12 err=<nil> kind=truncated size=24
+    v342v1win_test.go:331: V342V1 WBASE damageRow i=13 err=<nil> kind=truncated size=24
+    v342v1win_test.go:331: V342V1 WBASE damageRow i=14 err=<nil> kind=truncated size=24
+=== RUN   TestV342v1WindowsFormsRace/WPROD
+    v342v1win_test.go:340: mklink /J: Junction created for C:\Users\swq\TestV342v1WindowsFormsRaceWPROD1397413131\001\stage-link <<===>> C:\Users\swq\TestV342v1WindowsFormsRaceWPROD1397413131\002\fdir
+    v342v1win_test.go:340: V342V1 WPROD: attempts=1500 linkStateFlips=65 flipErrs=107 damage=6 truncated=6 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWPROD1397413131\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    v342v1win_test.go:340: V342V1 WPROD leg=enoent/body : 61
+    v342v1win_test.go:340: V342V1 WPROD leg=ok/body : 36
+    v342v1win_test.go:340: V342V1 WPROD leg=guard-refuse/body : 1395
+    v342v1win_test.go:340: V342V1 WPROD leg=eacces/body : 2
+    v342v1win_test.go:340: V342V1 WPROD leg=ok/truncated : 6
+    v342v1win_test.go:340: V342V1 WPROD damageRow i=332 err=<nil> kind=truncated size=24
+    v342v1win_test.go:340: V342V1 WPROD damageRow i=500 err=<nil> kind=truncated size=24
+    v342v1win_test.go:340: V342V1 WPROD damageRow i=795 err=<nil> kind=truncated size=24
+=== RUN   TestV342v1WindowsFormsRace/WJIA
+    v342v1win_test.go:345: mklink /J: Junction created for C:\Users\swq\TestV342v1WindowsFormsRaceWJIA2744777471\001\stage-link <<===>> C:\Users\swq\TestV342v1WindowsFormsRaceWJIA2744777471\002\fdir
+    v342v1win_test.go:345: V342V1 WJIA: attempts=1500 linkStateFlips=56 flipErrs=16 damage=5 truncated=5 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWJIA2744777471\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    v342v1win_test.go:345: V342V1 WJIA leg=ok/body : 53
+    v342v1win_test.go:345: V342V1 WJIA leg=eacces/body : 5
+    v342v1win_test.go:345: V342V1 WJIA leg=guard-refuse/body : 1318
+    v342v1win_test.go:345: V342V1 WJIA leg=ok/truncated : 5
+    v342v1win_test.go:345: V342V1 WJIA leg=enoent/body : 119
+    v342v1win_test.go:345: V342V1 WJIA damageRow i=437 err=<nil> kind=truncated size=24
+    v342v1win_test.go:345: V342V1 WJIA damageRow i=549 err=<nil> kind=truncated size=24
+    v342v1win_test.go:345: V342V1 WJIA damageRow i=720 err=<nil> kind=truncated size=24
+=== RUN   TestV342v1WindowsFormsRace/WYI
+    v342v1win_test.go:348: mklink /J: Junction created for C:\Users\swq\TestV342v1WindowsFormsRaceWYI1764506699\001\stage-link <<===>> C:\Users\swq\TestV342v1WindowsFormsRaceWYI1764506699\002\fdir
+    v342v1win_test.go:348: V342V1 WYI: attempts=1500 linkStateFlips=65 flipErrs=3 damage=0 truncated=0 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWYI1764506699\001\root\data\sub: The directory is not empty.
+    v342v1win_test.go:348: V342V1 WYI leg=eacces/body : 14
+    v342v1win_test.go:348: V342V1 WYI leg=enoent/body : 105
+    v342v1win_test.go:348: V342V1 WYI leg=ok/body : 39
+    v342v1win_test.go:348: V342V1 WYI leg=root-refuse/body : 1342
+--- PASS: TestV342v1WindowsFormsRace (8.28s)
+    --- PASS: TestV342v1WindowsFormsRace/WBASE (2.82s)
+    --- PASS: TestV342v1WindowsFormsRace/WPROD (1.85s)
+    --- PASS: TestV342v1WindowsFormsRace/WJIA (1.92s)
+    --- PASS: TestV342v1WindowsFormsRace/WYI (1.70s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	8.349s
+RC=0

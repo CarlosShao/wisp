@@ -1,0 +1,21 @@
+//go:build linux
+
+// Ticket 342, leg 342-v1: the LANDED PRODUCTION route. privateFile's open line is cut
+// (in the exported mut-jia / mut-yi trees only) to call openPrivateAt — the simulated
+// landing — so this row drives the shipped PrivateFile end to end with the shape in
+// place. This is 342-v1's own reading of AC#1's paired requirement: repaired side must
+// read damage=0 WITH liveness (flips>0), and any residual has to decompose into
+// truncated (the O_TRUNC act) versus deleted (the refusal-path unlink, ticket 348).
+package winsec
+
+import (
+	"testing"
+)
+
+func TestV342v1PosixLandedProductionRow(t *testing.T) {
+	t.Run("VPROD-LANDED", func(t *testing.T) {
+		v342v1Run(t, "VPROD-LANDED", func(w v342v1World) error {
+			return PrivateFile(w.name, []byte(v342v1Payload), 0o600)
+		})
+	})
+}

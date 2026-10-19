@@ -1,0 +1,30 @@
+RAW=/d/tmp/wisp/20261018/342v1/logs/10-race-smoke.log RECOMPUTED: RUN=6 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+    v342v1race_test.go:358: V342V1 VBASE: attempts=200 flips=152 flipErrs=9 damage=36 truncated=36 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBASE1377820943/001/root/data/sub: directory not empty
+    v342v1race_test.go:367: V342V1 VPROD: attempts=200 flips=265 flipErrs=29 damage=2 truncated=1 deleted=1 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVPROD3524976065/001/root/data/sub: directory not empty
+    v342v1race_test.go:372: V342V1 VJIA: attempts=200 flips=172 flipErrs=28 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVJIA2886142096/001/root/data/sub: directory not empty
+    v342v1race_test.go:381: V342V1 VYI: attempts=200 flips=206 flipErrs=42 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVYI3326102961/001/root/data/sub: directory not empty
+    v342v1race_test.go:392: V342V1 VBING: attempts=200 flips=219 flipErrs=91 damage=37 truncated=37 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBING890550105/001/root/data/sub: directory not empty
+
+RAW=/d/tmp/wisp/20261018/342v1/logs/10-race-r1.log RECOMPUTED: RUN=6 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+    v342v1race_test.go:366: V342V1 VBASE: attempts=1500 flips=1074 flipErrs=108 damage=484 truncated=484 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBASE1671360151/001/root/data/sub: directory not empty
+    v342v1race_test.go:375: V342V1 VPROD: attempts=1500 flips=1581 flipErrs=1158 damage=2 truncated=2 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVPROD2758700880/001/root/data/sub: directory not empty
+    v342v1race_test.go:380: V342V1 VJIA: attempts=1500 flips=1231 flipErrs=217 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVJIA981376198/001/root/data/sub: directory not empty
+    v342v1race_test.go:389: V342V1 VYI: attempts=1500 flips=1516 flipErrs=102 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVYI3848639223/001/root/data/sub: directory not empty
+    v342v1race_test.go:400: V342V1 VBING: attempts=1500 flips=1297 flipErrs=1038 damage=123 truncated=123 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBING1179282443/001/root/data/sub: directory not empty
+
+RAW=/d/tmp/wisp/20261018/342v1/logs/10-race-r2.log RECOMPUTED: RUN=6 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+    v342v1race_test.go:366: V342V1 VBASE: attempts=1500 flips=1089 flipErrs=169 damage=458 truncated=458 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBASE1432847911/001/root/data/sub: directory not empty
+    v342v1race_test.go:375: V342V1 VPROD: attempts=1500 flips=1487 flipErrs=1381 damage=2 truncated=1 deleted=1 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVPROD3260488965/001/root/data/sub: directory not empty
+    v342v1race_test.go:380: V342V1 VJIA: attempts=1500 flips=1226 flipErrs=213 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVJIA3378284770/001/root/data/sub: directory not empty
+    v342v1race_test.go:389: V342V1 VYI: attempts=1500 flips=1514 flipErrs=109 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVYI2164556325/001/root/data/sub: directory not empty
+    v342v1race_test.go:400: V342V1 VBING: attempts=1500 flips=1521 flipErrs=1141 damage=189 truncated=189 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBING3443584696/001/root/data/sub: directory not empty
+
+RAW=/d/tmp/wisp/20261018/342v1/logs/10-race-r3.log RECOMPUTED: RUN=6 PASS_TOP=1 FAIL_TOP=0 SKIP=0
+    v342v1race_test.go:366: V342V1 VBASE: attempts=1500 flips=1066 flipErrs=110 damage=479 truncated=479 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBASE453641273/001/root/data/sub: directory not empty
+    v342v1race_test.go:375: V342V1 VPROD: attempts=1500 flips=1526 flipErrs=1289 damage=1 truncated=1 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVPROD2086647261/001/root/data/sub: directory not empty
+    v342v1race_test.go:380: V342V1 VJIA: attempts=1500 flips=1221 flipErrs=192 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVJIA71698802/001/root/data/sub: directory not empty
+    v342v1race_test.go:389: V342V1 VYI: attempts=1500 flips=1466 flipErrs=259 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVYI2562630281/001/root/data/sub: directory not empty
+    v342v1race_test.go:400: V342V1 VBING: attempts=1500 flips=1508 flipErrs=1094 damage=206 truncated=206 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBING3990060113/001/root/data/sub: directory not empty
+
+ATTEMPTS: smoke=200 r1..r3=1500; the five shapes (VBASE/VPROD/VJIA/VYI/VBING) share ONE world struct + ONE racer within each run, so rows inside a run are directly comparable; damage split into truncated (O_TRUNC act) vs deleted (refusal-path unlink, ticket 348).
+NOTE: leg-classifier row enot/<name> = the attempt found the ancestor absent mid-flip (racer consumed a stage); it is the liveness denominator, not a damage row.

@@ -1,0 +1,43 @@
+=== RUN   TestV342v1PosixAncestorRaceRows
+=== RUN   TestV342v1PosixAncestorRaceRows/VBASE
+    v342v1race_test.go:366: V342V1 VBASE: attempts=1500 flips=1066 flipErrs=110 damage=479 truncated=479 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBASE453641273/001/root/data/sub: directory not empty
+    v342v1race_test.go:366: V342V1 VBASE leg=enoent/body : 880
+    v342v1race_test.go:366: V342V1 VBASE leg=ok/truncated : 479
+    v342v1race_test.go:366: V342V1 VBASE leg=ok/body : 141
+    v342v1race_test.go:366: V342V1 VBASE damageRow i=4 err=<nil> kind=truncated size=22
+    v342v1race_test.go:366: V342V1 VBASE damageRow i=8 err=<nil> kind=truncated size=22
+    v342v1race_test.go:366: V342V1 VBASE damageRow i=10 err=<nil> kind=truncated size=22
+=== RUN   TestV342v1PosixAncestorRaceRows/VPROD
+    v342v1race_test.go:375: V342V1 VPROD: attempts=1500 flips=1526 flipErrs=1289 damage=1 truncated=1 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVPROD2086647261/001/root/data/sub: directory not empty
+    v342v1race_test.go:375: V342V1 VPROD leg=enoent/body : 1420
+    v342v1race_test.go:375: V342V1 VPROD leg=floor/body : 79
+    v342v1race_test.go:375: V342V1 VPROD leg=enoent/truncated : 1
+    v342v1race_test.go:375: V342V1 VPROD damageRow i=93 err=winsec: cannot apply a private security descriptor: /gotmp/TestV342v1PosixAncestorRaceRowsVPROD2086647261/001/root/data/sub/blob.bin: openat sub: no such file or directory kind=truncated size=0
+=== RUN   TestV342v1PosixAncestorRaceRows/VJIA
+    v342v1race_test.go:380: V342V1 VJIA: attempts=1500 flips=1221 flipErrs=192 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVJIA71698802/001/root/data/sub: directory not empty
+    v342v1race_test.go:380: V342V1 VJIA leg=ok/body : 194
+    v342v1race_test.go:380: V342V1 VJIA leg=enotdir/body : 258
+    v342v1race_test.go:380: V342V1 VJIA leg=enoent/body : 1048
+=== RUN   TestV342v1PosixAncestorRaceRows/VYI
+    v342v1race_test.go:389: V342V1 VYI: attempts=1500 flips=1466 flipErrs=259 damage=0 truncated=0 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVYI2562630281/001/root/data/sub: directory not empty
+    v342v1race_test.go:389: V342V1 VYI leg=ELOOP/body : 1
+    v342v1race_test.go:389: V342V1 VYI leg=enoent/body : 1000
+    v342v1race_test.go:389: V342V1 VYI leg=ok/body : 119
+    v342v1race_test.go:389: V342V1 VYI leg=other:winsec: cannot apply a private security descriptor: /gotmp/T/body : 380
+=== RUN   TestV342v1PosixAncestorRaceRows/VBING
+    v342v1race_test.go:400: V342V1 VBING: attempts=1500 flips=1508 flipErrs=1094 damage=206 truncated=206 deleted=0 firstFlipErr=remove /gotmp/TestV342v1PosixAncestorRaceRowsVBING3990060113/001/root/data/sub: directory not empty
+    v342v1race_test.go:400: V342V1 VBING leg=enoent/body : 1259
+    v342v1race_test.go:400: V342V1 VBING leg=ok/truncated : 64
+    v342v1race_test.go:400: V342V1 VBING leg=enoent/truncated : 142
+    v342v1race_test.go:400: V342V1 VBING leg=ok/body : 35
+    v342v1race_test.go:400: V342V1 VBING damageRow i=3 err=<nil> kind=truncated size=22
+    v342v1race_test.go:400: V342V1 VBING damageRow i=4 err=winsec: cannot apply a private security descriptor: /gotmp/TestV342v1PosixAncestorRaceRowsVBING3990060113/001/root/data/sub: openat sub: no such file or directory kind=truncated size=0
+    v342v1race_test.go:400: V342V1 VBING damageRow i=26 err=<nil> kind=truncated size=22
+--- PASS: TestV342v1PosixAncestorRaceRows (126.50s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VBASE (14.26s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VPROD (31.04s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VJIA (23.63s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VYI (32.35s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VBING (25.21s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	126.543s

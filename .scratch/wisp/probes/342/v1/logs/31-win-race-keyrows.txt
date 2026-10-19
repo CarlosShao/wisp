@@ -1,0 +1,26 @@
+RAW=/d/tmp/wisp/20261018/342v1/logs/31-win-race-r1.log RECOMPUTED: RUN=5 PASS_TOP=1 FAIL_TOP=0 SKIP=0 RC=RC=0
+    v342v1win_test.go:331: V342V1 WBASE: attempts=1500 linkStateFlips=118 flipErrs=65 damage=975 truncated=975 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWBASE1963610048\001\root\data\sub: The directory is not empty.
+    v342v1win_test.go:340: V342V1 WPROD: attempts=1500 linkStateFlips=63 flipErrs=131 damage=7 truncated=7 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWPROD1493518561\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    v342v1win_test.go:345: V342V1 WJIA: attempts=1500 linkStateFlips=59 flipErrs=13 damage=3 truncated=3 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWJIA898995902\001\root\data\sub: The directory is not empty.
+    v342v1win_test.go:348: V342V1 WYI: attempts=1500 linkStateFlips=66 flipErrs=2 damage=0 truncated=0 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWYI173519062\001\root\data\sub: The directory is not empty.
+
+RAW=/d/tmp/wisp/20261018/342v1/logs/31-win-race-r2.log RECOMPUTED: RUN=5 PASS_TOP=1 FAIL_TOP=0 SKIP=0 RC=RC=0
+    v342v1win_test.go:331: V342V1 WBASE: attempts=1500 linkStateFlips=123 flipErrs=79 damage=871 truncated=871 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWBASE2786623747\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    v342v1win_test.go:340: V342V1 WPROD: attempts=1500 linkStateFlips=65 flipErrs=107 damage=6 truncated=6 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWPROD1397413131\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    v342v1win_test.go:345: V342V1 WJIA: attempts=1500 linkStateFlips=56 flipErrs=16 damage=5 truncated=5 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWJIA2744777471\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    v342v1win_test.go:348: V342V1 WYI: attempts=1500 linkStateFlips=65 flipErrs=3 damage=0 truncated=0 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWYI1764506699\001\root\data\sub: The directory is not empty.
+
+RAW=/d/tmp/wisp/20261018/342v1/logs/31-win-race-r3.log RECOMPUTED: RUN=5 PASS_TOP=1 FAIL_TOP=0 SKIP=0 RC=RC=0
+    v342v1win_test.go:331: V342V1 WBASE: attempts=1500 linkStateFlips=131 flipErrs=83 damage=878 truncated=878 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWBASE2324590658\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    v342v1win_test.go:340: V342V1 WPROD: attempts=1500 linkStateFlips=70 flipErrs=126 damage=4 truncated=4 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWPROD1096383035\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    v342v1win_test.go:345: V342V1 WJIA: attempts=1500 linkStateFlips=63 flipErrs=21 damage=5 truncated=5 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWJIA102667225\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+    v342v1win_test.go:348: V342V1 WYI: attempts=1500 linkStateFlips=64 flipErrs=2 damage=0 truncated=0 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWYI2185804792\001\root\data\sub: The directory is not empty.
+
+== deterministic windows rows (same RAW, 3 repeats):
+    v342v1win_test.go:466: V342V1 W-LEAFSWAP: open after the guard's verdict REFUSED err=open C:\Users\swq\TestV342v1WindowsLeafSwapAfterGuardIsTheResidualLeafLeg2941493774\001\root\data\sub\blob.bin: is a directory; witness kind=body
+    v342v1win_test.go:511: V342V1 W-ROOTSYM VERDICT: Root.OpenFile err=<nil>; victim now "X"; link-still-there=true => followed=true
+    v342v1win_test.go:513: V342V1 W-ROOTSYM CONSEQUENCE: os.Root pins ancestors but NOT the leaf on this platform, so a Windows 乙 landing keeps needing an identity re-check for the leaf that this package does not have today (winsec_windows.go:371-373 states that leg is open and belongs to ticket 120's Windows half).
+    v342v1win_test.go:541: V342V1 W-ROOTJUNC VERDICT: Root.OpenFile through an in-root JUNCTION REFUSED err=openat junc\blob.bin: path escapes from parent; foreign blob intact=true
+
+NOTE host=go1.27.1 windows/amd64; linkStateFlips = flips proved reparseAt(ancestor)=true after rename (liveness).
+NOTE treeH host full-package baseline four numbers (repo bytes, no probe) RAW=/d/tmp/wisp/20261018/342v1/logs/20-host-winsec-baseline.log
