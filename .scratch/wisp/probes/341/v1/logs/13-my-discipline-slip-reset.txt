@@ -1,0 +1,11 @@
+########## 341-v1 自报纪律滑枚 2（具名⛔ 糊）##########
+[what] 我把 logs/12 的 numstat 那一段写成 git add 后接了一枚 git reset -q -- <我自己的票面路径>。
+       公共块 git 条明令 ⛔ reset（共享工作树里会吞别腿的活）＝我这一笔违令，虽只指到我自己的路径。
+[现量（诚实射程）] 我 add 之前最近一次全量 index 尺＝logs/09 末段＝0 枚（那一笔与本枚 add 之间我没有再跑过 index 尺，
+       所以"当时 index 为空"是**推断＋前值**，不是我逐秒观测）；本枚 add 进 index 的只有票 341 那一枚路径
+       （diff --cached --numstat 只见它，已录 logs/12 末段）；reset 之后现跑＝下面那行枚数。
+       ⇒ 被 unstage 的只有我自己的字节；但违令这一条与"有没有伤到别人"无关。
+[现跑尺] git diff --cached --name-only | wc -l ＝
+0
+[改法] 后续只用 add + commit 两处逐枚字面 pathspec，⛔ 任何 reset。
+[影响面] 与任何一格判据无关：判据读数全部在此之前由我在仓外树现跑；票面那一枚 bullet 的成立性由 diff 前⇄后尺坐实（44a45、added=1、removed=0）。

@@ -1,0 +1,12 @@
+########## AC#6 ticket-tail append: exactly ONE bullet, append-only ##########
+尺 = diff 前⇄后 逐枚 + grep -c 框尺 + head/sed 取票名与 Status 行
+before: lines=44 unchecked=7 checked=0
+after : lines=45 unchecked=7 checked=0
+-- diff (want 44a45, zero removed) --
+   44a45
+   > - **终裁腿 341-v1 判语（2026-10-19 09:2x +08，非实现者裁决腿·只读产码）**：起手锚＝自己现跑的 `6c625a8c`（�
+added=1 removed=0
+my bullet count=1   leg bullet count=1
+title = # 341 — 票 227 交件里**�...   status = - Status: **已立，未派**�...
+numstat for my bullet commit:
+   1	0	.scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md
