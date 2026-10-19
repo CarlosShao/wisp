@@ -1,0 +1,43 @@
+//go:build linux
+
+// v342v1 SIMULATED LANDING (甲 on POSIX) — physical bytes only inside exported trees
+// under D:\tmp\wisp\20261018\342v1\mut-jia. Never tracked; 342-v1 is a read-only
+// adjudication leg and the repository's internal/** bytes are untouched by it.
+//
+// Shape = winsec.go:128-133's own named first choice: a per-component open at the time
+// of the act (openat with O_NOFOLLOW down every component), the leaf opened ON the
+// descriptor of the pinned parent. privateFile's line 149 is cut by the driver to call
+// this instead of os.OpenFile(resolved, flags|oNoFollowPlatform, perm).
+package winsec
+
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"syscall"
+)
+
+func openPrivateAt(path string, flags int, perm fs.FileMode) (*os.File, error) {
+	comps := pathComponents(path)
+	if len(comps) == 0 {
+		return nil, fmt.Errorf("v342v1 landing jia: no components in %q", path)
+	}
+	fd, err := syscall.Open("/", syscall.O_RDONLY|syscall.O_DIRECTORY|syscall.O_NOFOLLOW, 0)
+	if err != nil {
+		return nil, fmt.Errorf("v342v1 landing jia root: %w", err)
+	}
+	for _, comp := range comps[:len(comps)-1] {
+		next, err := syscall.Openat(fd, comp, syscall.O_RDONLY|syscall.O_DIRECTORY|syscall.O_NOFOLLOW, 0)
+		_ = syscall.Close(fd)
+		if err != nil {
+			return nil, fmt.Errorf("v342v1 landing jia descend %s: %w", comp, err)
+		}
+		fd = next
+	}
+	lfd, err := syscall.Openat(fd, comps[len(comps)-1], flags|syscall.O_NOFOLLOW, uint32(perm.Perm()))
+	_ = syscall.Close(fd)
+	if err != nil {
+		return nil, &os.PathError{Op: "open", Path: path, Err: err}
+	}
+	return os.NewFile(uintptr(lfd), path), nil
+}

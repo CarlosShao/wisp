@@ -1,0 +1,32 @@
+//go:build linux
+
+// v342v1 SIMULATED LANDING (乙 on POSIX) — physical bytes only inside exported trees
+// under D:\tmp\wisp\20261018\342v1\mut-yi. Never tracked.
+//
+// Shape = reuse the package's OWN seal-side pinning walk (pinPlacement, winsec_other.go
+// :149) to pin the PARENT, then open the leaf fd-relative on that pinned descriptor.
+// No new exported names: pinPlacement/sameObjectPinned/pinBase are same-package and
+// unexported, which is the whole cost claim of 乙 versus 甲 on this platform.
+package winsec
+
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"syscall"
+)
+
+func openPrivateAt(path string, flags int, perm fs.FileMode) (*os.File, error) {
+	parent := filepath.Dir(path)
+	pinned, err := pinPlacement(parent)
+	if err != nil {
+		return nil, err
+	}
+	defer pinned.Close()
+	lfd, err := syscall.Openat(int(pinned.Fd()), filepath.Base(path), flags|syscall.O_NOFOLLOW, uint32(perm.Perm()))
+	if err != nil {
+		return nil, &os.PathError{Op: "open", Path: path, Err: fmt.Errorf("v342v1 landing yi on the pinned parent: %w", err)}
+	}
+	return os.NewFile(uintptr(lfd), path), nil
+}

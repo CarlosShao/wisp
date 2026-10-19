@@ -1,0 +1,548 @@
+//go:build windows
+
+// Ticket 342, leg 342-v1 ADJUDICATION RE-RUN PROBE (Windows shapes). Not tracked:
+// placed only into exported trees under D:\tmp\wisp\20261018\342v1\. Written from this
+// leg's own reading of winsec.go:141-174, winsec_windows.go:322-340 (oNoFollowPlatform
+// is 0 + the guard's two named residuals) and :374-395 (preOpenLeafGuard).
+//
+// Same world as the POSIX rows, this platform's spelling of the ancestor swap: the
+// ancestor name flips between a real directory and a junction (mklink /J) whose target
+// holds the foreign witness. Liveness rule: a flip counts only when reparseAt(ancestor)
+// reads true right after the rename, so flips is evidence the name ENTERED the link
+// state, not evidence that the racer ran a command.
+//
+// Rows:
+//   WBASE  by-name open with the shipped flag composition (oNoFollowPlatform == 0 here)
+//   WPROD  the shipped production route PrivateFile (guard + open + sealHandle + unlink)
+//   WJIA   甲's Windows face: per-prefix CreateFile(FILE_FLAG_OPEN_REPARSE_POINT) probe,
+//          refuse any prefix reporting reparse, THEN os.OpenFile by name (check-then-act)
+//   WYI    乙's Windows face: os.Root descent (OpenRoot volume, OpenRoot each ancestor),
+//          leaf opened ON the pinned child Root (act-time)
+package winsec
+
+import (
+	"bytes"
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"testing"
+
+	"golang.org/x/sys/windows"
+)
+
+const (
+	v342v1WBody            = "v342v1-W foreign witness bytes, not yours to truncate"
+	v342v1WOwn             = "v342v1-W the tree's own blob"
+	v342v1WPayload         = "v342v1-W private payload"
+	v342v1WDefaultAttempts = 1500
+)
+
+// v342v1WMklinkJ plants a directory junction and reports failure instead of ending the
+// racer goroutine (the package's mkJunction helper is t.Fatalf-shaped).
+func v342v1WMklinkJ(link, target string) error {
+	var out bytes.Buffer
+	cmd := exec.Command("cmd", "/c", "mklink", "/J", link, target)
+	cmd.Stdout, cmd.Stderr = &out, &out
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("mklink /J %s -> %s: %w: %s", link, target, err, strings.TrimSpace(out.String()))
+	}
+	return nil
+}
+
+type v342v1WWorld struct {
+	dir       string
+	foreign   string
+	witness   string
+	anc       string
+	name      string
+	stageReal string
+	stageLink string
+}
+
+func v342v1WStage(t *testing.T) v342v1WWorld {
+	t.Helper()
+	w := v342v1WWorld{dir: SealableTempDirForTest124(t)}
+	out := SealableTempDirForTest124(t)
+	w.foreign = filepath.Join(out, "fdir")
+	if err := os.MkdirAll(w.foreign, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.witness = filepath.Join(w.foreign, "blob.bin")
+	v342v1WRestock(t, w)
+	w.stageReal = filepath.Join(w.dir, "stage-real")
+	if err := os.MkdirAll(w.stageReal, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(w.stageReal, "blob.bin"), []byte(v342v1WOwn), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	w.stageLink = filepath.Join(w.dir, "stage-link")
+	mkJunction(t, w.stageLink, w.foreign)
+	data := filepath.Join(w.dir, "root", "data")
+	if err := os.MkdirAll(data, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.anc = filepath.Join(data, "sub")
+	w.name = filepath.Join(w.anc, "blob.bin")
+	return w
+}
+
+func v342v1WRestock(t *testing.T, w v342v1WWorld) {
+	t.Helper()
+	if err := os.WriteFile(w.witness, []byte(v342v1WBody), 0o666); err != nil {
+		t.Fatalf("restock witness: %v", err)
+	}
+}
+
+// clearAncestor unlinks a reparse entry directly (never through it) and empties+rmdir's
+// a real directory.
+func v342v1WClearAncestor(name string) error {
+	info, err := os.Lstat(name)
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if info.IsDir() && !reparseAt(name) {
+		if err := os.Remove(filepath.Join(name, "blob.bin")); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			return err
+		}
+	}
+	return os.Remove(name)
+}
+
+func (w v342v1WWorld) restockStages() error {
+	if err := os.Mkdir(w.stageReal, 0o700); err != nil && !errors.Is(err, fs.ErrExist) {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(w.stageReal, "blob.bin"), []byte(v342v1WOwn), 0o600); err != nil {
+		return err
+	}
+	_, err := os.Lstat(w.stageLink)
+	if errors.Is(err, fs.ErrNotExist) {
+		return mkJunctionE(w.stageLink, w.foreign)
+	}
+	if err != nil {
+		return err
+	}
+	if !reparseAt(w.stageLink) {
+		_ = os.RemoveAll(w.stageLink)
+		return mkJunctionE(w.stageLink, w.foreign)
+	}
+	return nil
+}
+
+func (w v342v1WWorld) toReal() error {
+	if err := v342v1WClearAncestor(w.anc); err != nil {
+		return err
+	}
+	if err := os.Rename(w.stageReal, w.anc); err != nil {
+		return err
+	}
+	return w.restockStages()
+}
+
+// toLink counts a flip only when the ancestor is PROVED to be a reparse point after the
+// rename. That is this platform's liveness rule.
+func (w v342v1WWorld) toLink() error {
+	if err := v342v1WClearAncestor(w.anc); err != nil {
+		return err
+	}
+	if err := os.Rename(w.stageLink, w.anc); err != nil {
+		return err
+	}
+	if !reparseAt(w.anc) {
+		return fmt.Errorf("ancestor %s is not a reparse point after the flip", w.anc)
+	}
+	return w.restockStages()
+}
+
+type v342v1WTally struct {
+	attempts                 int
+	flips                    int32
+	flipErrs                 int32
+	damage                   int
+	truncated                int
+	deleted                  int
+	legs                     map[string]int
+	firstRows, firstFlipRows []string
+}
+
+func v342v1WReadWitness(w v342v1WWorld) (string, int64) {
+	body, rErr := os.ReadFile(w.witness)
+	if rErr != nil {
+		if strings.Contains(rErr.Error(), "cannot find") || strings.Contains(rErr.Error(), "no such file") {
+			return "deleted", -1
+		}
+		return "unreadable:" + rErr.Error(), -1
+	}
+	info, sErr := os.Lstat(w.witness)
+	if sErr != nil {
+		return "unreadable-lstat:" + sErr.Error(), -1
+	}
+	if string(body) != v342v1WBody {
+		return "truncated", info.Size()
+	}
+	return "body", info.Size()
+}
+
+func v342v1WAttempts() int {
+	if v := os.Getenv("V342V1_ATTEMPTS"); v != "" {
+		var n int
+		if _, err := fmt.Sscanf(v, "%d", &n); err == nil && n > 0 {
+			return n
+		}
+	}
+	return v342v1WDefaultAttempts
+}
+
+func v342v1WRun(t *testing.T, shape string, call func(w v342v1WWorld) error) *v342v1WTally {
+	t.Helper()
+	w := v342v1WStage(t)
+	if err := w.toReal(); err != nil {
+		t.Fatalf("seed real: %v", err)
+	}
+	var tally v342v1WTally
+	tally.legs = map[string]int{}
+	var mu sync.Mutex
+	var firstFlip string
+	note := func(err error) {
+		if err == nil {
+			atomic.AddInt32(&tally.flips, 1)
+			return
+		}
+		atomic.AddInt32(&tally.flipErrs, 1)
+		mu.Lock()
+		if firstFlip == "" {
+			firstFlip = err.Error()
+		}
+		mu.Unlock()
+	}
+	stop, done := make(chan struct{}), make(chan struct{})
+	var once sync.Once
+	stopRacer := func() { once.Do(func() { close(stop) }); <-done }
+	go func() {
+		defer close(done)
+		defer func() {
+			if p := recover(); p != nil {
+				note(fmt.Errorf("racer panic: %v", p))
+			}
+		}()
+		wantLink := false
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+			}
+			if wantLink {
+				note(w.toLink())
+			} else {
+				note(w.toReal())
+			}
+			wantLink = !wantLink
+		}
+	}()
+	defer stopRacer()
+
+	n := v342v1WAttempts()
+	tally.attempts = n
+	for i := 0; i < n; i++ {
+		err := call(w)
+		klass := "ok"
+		if err != nil {
+			klass = v342v1WClassify(err)
+		}
+		kind, sz := v342v1WReadWitness(w)
+		tally.legs[klass+"/"+kind]++
+		if kind != "body" {
+			tally.damage++
+			switch kind {
+			case "truncated":
+				tally.truncated++
+			case "deleted":
+				tally.deleted++
+			}
+			if len(tally.firstRows) < 3 {
+				tally.firstRows = append(tally.firstRows, fmt.Sprintf("i=%d err=%v kind=%s size=%d", i, err, kind, sz))
+			}
+			v342v1WRestock(t, w)
+		}
+	}
+	stopRacer()
+	tally.flips = atomic.LoadInt32(&tally.flips)
+	tally.flipErrs = atomic.LoadInt32(&tally.flipErrs)
+	t.Logf("V342V1 %s: attempts=%d linkStateFlips=%d flipErrs=%d damage=%d truncated=%d deleted=%d firstFlipErr=%s",
+		shape, tally.attempts, tally.flips, tally.flipErrs, tally.damage, tally.truncated, tally.deleted, firstFlip)
+	for k, c := range tally.legs {
+		t.Logf("V342V1 %s leg=%s : %d", shape, k, c)
+	}
+	for _, r := range tally.firstRows {
+		t.Logf("V342V1 %s damageRow %s", shape, r)
+	}
+	if tally.flips == 0 {
+		t.Errorf("V342V1 %s DEAD INSTRUMENT: 0 link-state flips (firstErr=%q) => damage=%d proves nothing", shape, firstFlip, tally.damage)
+	}
+	return &tally
+}
+
+func v342v1WClassify(err error) string {
+	s := err.Error()
+	switch {
+	case strings.Contains(s, "reparse point"):
+		return "guard-refuse"
+	case strings.Contains(s, "escapes from parent"):
+		return "root-refuse"
+	case strings.Contains(s, "Access is denied"):
+		return "eacces"
+	case strings.Contains(s, "too many levels"):
+		return "ELOOP"
+	case strings.Contains(s, "cannot find the file"), strings.Contains(s, "cannot find the path"):
+		return "enoent"
+	case strings.Contains(s, "not a directory"):
+		return "enotdir"
+	case strings.Contains(s, "already exists"):
+		return "eexist"
+	}
+	if len(s) > 60 {
+		s = s[:60]
+	}
+	return "other:" + s
+}
+
+func v342v1WWrite(f *os.File) error {
+	if _, err := f.Write([]byte(v342v1WPayload)); err != nil {
+		_ = f.Close()
+		return err
+	}
+	return f.Close()
+}
+
+func TestV342v1WindowsFormsRace(t *testing.T) {
+	t.Run("WBASE", func(t *testing.T) {
+		v342v1WRun(t, "WBASE", func(w v342v1WWorld) error {
+			f, err := os.OpenFile(w.name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+			if err != nil {
+				return err
+			}
+			return v342v1WWrite(f)
+		})
+	})
+	t.Run("WPROD", func(t *testing.T) {
+		v342v1WRun(t, "WPROD", func(w v342v1WWorld) error {
+			return PrivateFile(w.name, []byte(v342v1WPayload), 0o600)
+		})
+	})
+	t.Run("WJIA", func(t *testing.T) {
+		v342v1WRun(t, "WJIA", v342v1WJia)
+	})
+	t.Run("WYI", func(t *testing.T) {
+		v342v1WRun(t, "WYI", v342v1WYi)
+	})
+}
+
+// v342v1WJia = 甲 on Windows: probe every ancestor prefix with the reparse flag (the
+// shipped guard's own call, widened), refuse on reparse, THEN open by name. The probe
+// cannot hold its answer: that is what this row exists to measure, not to claim.
+func v342v1WJia(w v342v1WWorld) error {
+	pieces := pathPieces(w.name)
+	if len(pieces) < 2 {
+		return fmt.Errorf("v342v1 WJIA: unexpected spelling %q", w.name)
+	}
+	for _, prefix := range pieces[:len(pieces)-1] {
+		h, err := windows.CreateFile(windows.StringToUTF16Ptr(prefix),
+			windows.FILE_READ_ATTRIBUTES,
+			windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE|windows.FILE_SHARE_DELETE,
+			nil, windows.OPEN_EXISTING,
+			windows.FILE_FLAG_OPEN_REPARSE_POINT|windows.FILE_FLAG_BACKUP_SEMANTICS, 0)
+		if err != nil {
+			if errors.Is(err, syscall.ERROR_FILE_NOT_FOUND) || errors.Is(err, syscall.ERROR_PATH_NOT_FOUND) {
+				continue
+			}
+			return fmt.Errorf("v342v1 WJIA prefix probe %s: %w", prefix, err)
+		}
+		var info windows.ByHandleFileInformation
+		gErr := windows.GetFileInformationByHandle(h, &info)
+		_ = windows.CloseHandle(h)
+		if gErr != nil {
+			return fmt.Errorf("v342v1 WJIA prefix attrs %s: %w", prefix, gErr)
+		}
+		if info.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0 {
+			return fmt.Errorf("%w: %s traverses a reparse point at %s (v342v1 WJIA descent)",
+				ErrUnresolvedPath, w.name, prefix)
+		}
+	}
+	f, err := os.OpenFile(w.name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		return err
+	}
+	return v342v1WWrite(f)
+}
+
+// v342v1WYi = 乙 on Windows: os.Root descent pinning every ancestor, leaf opened ON the
+// pinned child Root. pathComponents excludes the volume, so EVERY listed component is a
+// descent step under the volume root and the last one is the leaf.
+func v342v1WYi(w v342v1WWorld) error {
+	comps := pathComponents(w.name)
+	if len(comps) < 2 {
+		return fmt.Errorf("v342v1 WYI: unexpected spelling %q", w.name)
+	}
+	vol := filepath.VolumeName(w.name)
+	if vol == "" {
+		return fmt.Errorf("v342v1 WYI: no volume in %q", w.name)
+	}
+	root, err := os.OpenRoot(vol + string(os.PathSeparator))
+	if err != nil {
+		return fmt.Errorf("v342v1 WYI open volume root: %w", err)
+	}
+	defer root.Close()
+	cur := root
+	for _, comp := range comps[:len(comps)-1] {
+		next, err := cur.OpenRoot(comp)
+		if err != nil {
+			return fmt.Errorf("v342v1 WYI descend %s: %w", comp, err)
+		}
+		if cur != root {
+			_ = cur.Close()
+		}
+		cur = next
+	}
+	defer cur.Close()
+	f, err := cur.OpenFile(filepath.Base(w.name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		return fmt.Errorf("v342v1 WYI leaf on pinned parent: %w", err)
+	}
+	return v342v1WWrite(f)
+}
+
+// mkJunctionE is the error-returning twin of the package's mkJunction helper (that one
+// calls t.Fatalf, which would end the racer goroutine instead of counting a flipErr).
+func mkJunctionE(link, target string) error {
+	if err := v342v1WMklinkJ(link, target); err != nil {
+		return err
+	}
+	if !reparseAt(link) {
+		return fmt.Errorf("mklink /J reported success but %s is not a reparse point", link)
+	}
+	return nil
+}
+
+// TestV342v1WindowsLeafSwapAfterGuardIsTheResidualLeafLeg answers whether 甲's Windows
+// face has the same residual the shipped guard already books for the leaf
+// (winsec_windows.go:361-365): deterministic, no racer — guard passes, leaf swapped to a
+// junction, then the open. It is NOT this ticket's ancestor leg; the row is here because
+// the cost table's "甲 Windows = check-then-act" claim is only honest if the platform
+// truly has no act-time non-following write for either position.
+func TestV342v1WindowsLeafSwapAfterGuardIsTheResidualLeafLeg(t *testing.T) {
+	w := v342v1WStage(t)
+	if err := w.toReal(); err != nil {
+		t.Fatalf("seed: %v", err)
+	}
+	// leaf slot is a plain file inside a real ancestor directory
+	if err := os.WriteFile(w.name, []byte("placeholder"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := preOpenLeafGuard(w.name); err != nil {
+		t.Fatalf("guard on a plain name refused (%v); the row needs it to pass", err)
+	}
+	// swap the LEAF for a junction into the foreign dir, after the guard answered
+	if err := os.Remove(w.name); err != nil {
+		t.Fatal(err)
+	}
+	if err := mkJunctionE(w.name, w.foreign); err != nil {
+		t.Fatalf("plant leaf junction: %v", err)
+	}
+	f, err := os.OpenFile(w.name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	kind, sz := v342v1WReadWitness(w)
+	if err != nil {
+		t.Logf("V342V1 W-LEAFSWAP: open after the guard's verdict REFUSED err=%v; witness kind=%s", err, kind)
+		return
+	}
+	_, _ = f.Write([]byte("truncating through the swapped leaf"))
+	_ = f.Close()
+	kind2, sz2 := v342v1WReadWitness(w)
+	t.Logf("V342V1 W-LEAFSWAP: open err=<nil> (before: kind=%s size=%d); witness now kind=%s size=%d => the leaf swap after the guard's verdict still reaches the foreign object=%v", kind, sz, kind2, sz2, kind2 != "body")
+	if kind2 == "body" {
+		t.Logf("V342V1 W-LEAFSWAP note: the foreign DIRECTORY was named, so no file damage in this row (a junction to a directory truncates nothing).")
+	}
+}
+
+// TestV342v1WindowsOsRootFollowsInRootRelativeFileLink decides, by measurement, whether
+// the leg's "乙's Windows half pins ancestors but not the leaf" is a real missing world
+// or a probe defect. Three sub-rows, all with the SAME fixture spelling:
+//   ROOT-FILE-LINK : in-root RELATIVE file symlink at the leaf, opened on a Root
+//   ROOT-JUNCTION  : junction at an ANCESTOR, descended with OpenRoot
+//   ROOT-ABSLINK   : absolute-target file symlink at the leaf (needs privilege; skipped
+//                    when the host has none, and that skip is reported, not hidden)
+func TestV342v1WindowsOsRootFollowsInRootRelativeFileLink(t *testing.T) {
+	dir := SealableTempDirForTest124(t)
+	victim := filepath.Join(dir, "victim.bin")
+	const body = "v342v1-W-rootsym-victim"
+	if err := os.WriteFile(victim, []byte(body), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	link := filepath.Join(dir, "link.bin")
+	symErr := os.Symlink("victim.bin", link)
+	if symErr != nil {
+		t.Logf("V342V1 W-ROOTSYM: os.Symlink(relative) failed: %v (no symlink privilege on this host => the leaf half of the Root claim is NOT measurable here)", symErr)
+	} else {
+		root, err := os.OpenRoot(dir)
+		if err != nil {
+			t.Fatalf("OpenRoot: %v", err)
+		}
+		f, oErr := root.OpenFile("link.bin", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+		if oErr != nil {
+			got, _ := os.ReadFile(victim)
+			t.Logf("V342V1 W-ROOTSYM VERDICT: Root.OpenFile on the in-root RELATIVE leaf link REFUSED err=%v; victim intact=%v => Root DOES refuse the leaf link", oErr, string(got) == body)
+		} else {
+			_, _ = f.Write([]byte("X"))
+			_ = f.Close()
+			got, _ := os.ReadFile(victim)
+			li, _ := os.Lstat(link)
+			followed := string(got) != body
+			t.Logf("V342V1 W-ROOTSYM VERDICT: Root.OpenFile err=<nil>; victim now %q; link-still-there=%v => followed=%v", got, li != nil && li.Mode()&os.ModeSymlink != 0, followed)
+			if followed {
+				t.Logf("V342V1 W-ROOTSYM CONSEQUENCE: os.Root pins ancestors but NOT the leaf on this platform, so a Windows 乙 landing keeps needing an identity re-check for the leaf that this package does not have today (winsec_windows.go:371-373 states that leg is open and belongs to ticket 120's Windows half).")
+			}
+		}
+		root.Close()
+		_ = os.Remove(link)
+	}
+	// ancestor junction under a Root: refused at act time?
+	outer := SealableTempDirForTest124(t)
+	target := filepath.Join(outer, "tsub")
+	if err := os.MkdirAll(target, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	blob := filepath.Join(target, "blob.bin")
+	if err := os.WriteFile(blob, []byte("v342v1-W-junction-victim"), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	jn := filepath.Join(dir, "junc")
+	if err := mkJunctionE(jn, target); err != nil {
+		t.Fatalf("mklink /J: %v", err)
+	}
+	root2, err := os.OpenRoot(dir)
+	if err != nil {
+		t.Fatalf("OpenRoot 2: %v", err)
+	}
+	defer root2.Close()
+	f2, err := root2.OpenFile(filepath.Join("junc", "blob.bin"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		got, _ := os.ReadFile(blob)
+		t.Logf("V342V1 W-ROOTJUNC VERDICT: Root.OpenFile through an in-root JUNCTION REFUSED err=%v; foreign blob intact=%v", err, string(got) == "v342v1-W-junction-victim")
+	} else {
+		_, _ = f2.Write([]byte("Y"))
+		_ = f2.Close()
+		got, _ := os.ReadFile(blob)
+		t.Logf("V342V1 W-ROOTJUNC VERDICT: Root.OpenFile through an in-root JUNCTION SUCCEEDED; foreign blob now %q => Root does NOT pin junction ancestors either", got)
+	}
+}

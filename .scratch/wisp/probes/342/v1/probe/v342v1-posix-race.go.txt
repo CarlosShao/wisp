@@ -1,0 +1,492 @@
+//go:build linux
+
+// Ticket 342, leg 342-v1 ADJUDICATION RE-RUN PROBE. Not tracked by the repository:
+// these bytes are written by 342-v1 from its own reading of winsec.go:141-174 and
+// winsec_other.go:29/:149-207, and are placed ONLY into exported trees under
+// D:\tmp\wisp\20261018\342v1\ (physical bytes of a git archive, never the shared
+// working tree). It is NOT a copy of 342-a1's probe: different world struct,
+// different damage decomposition, different leg classifier. The question it answers
+// is ticket 342's own: does the ANCESTOR leg of that open actually move bytes on this
+// platform, and does a candidate shape close the truncating branch or not.
+//
+// Rows (all on ONE world shape and ONE racer, so the numbers are comparable):
+//   VBASE  by-name open exactly as privateFile composes it (no seal, no unlink)
+//   VPROD  the shipped production route PrivateFile(name, payload, 0600)
+//   VJIA   per-component openat(O_NOFOLLOW) from "/", leaf opened on the pinned parent fd
+//   VYI    the package's own pinPlacement(parent) walk, leaf opened fd-relative
+//   VBING  by-name open FIRST, then pinPlacement(parent) re-verify (report after the act)
+//
+// Damage decomposition, which 342-a1's rows mixed together and which matters for
+// ticket 348: a damaged witness is counted as TRUNCATED when it still exists with the
+// wrong bytes/size, and as DELETED when reading it reports not-exist. Those are the two
+// system calls in question (open with O_TRUNC versus Remove), not one number.
+package winsec
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"testing"
+)
+
+const (
+	v342v1Body     = "v342v1 foreign witness bytes, not yours to truncate"
+	v342v1Own      = "v342v1 the tree's own blob"
+	v342v1Payload  = "v342v1 private payload"
+	v342v1Attempts = 1500
+)
+
+type v342v1World struct {
+	base      string
+	foreign   string
+	witness   string
+	anc       string
+	name      string
+	stageReal string
+	stageLink string
+}
+
+func v342v1Stage(t *testing.T) v342v1World {
+	t.Helper()
+	w := v342v1World{base: SealableTempDirForTest124(t)}
+	w.foreign = filepath.Join(w.base, "someone-elses-tree")
+	if err := os.MkdirAll(w.foreign, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.witness = filepath.Join(w.foreign, "blob.bin")
+	v342v1RestockWitness(t, w)
+	w.stageReal = filepath.Join(w.base, "stage-real")
+	if err := os.MkdirAll(w.stageReal, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.stageLink = filepath.Join(w.base, "stage-link")
+	if err := os.Symlink(w.foreign, w.stageLink); err != nil {
+		t.Fatalf("stage link: %v", err)
+	}
+	data := filepath.Join(w.base, "root", "data")
+	if err := os.MkdirAll(data, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.anc = filepath.Join(data, "sub")
+	w.name = filepath.Join(w.anc, "blob.bin")
+	return w
+}
+
+func v342v1RestockWitness(t *testing.T, w v342v1World) {
+	t.Helper()
+	if err := os.WriteFile(w.witness, []byte(v342v1Body), 0o666); err != nil {
+		t.Fatalf("restock witness: %v", err)
+	}
+}
+
+// v342v1Clear removes whatever stands at the ancestor name WITHOUT following it:
+// a symlink is unlinked, a real directory is emptied and rmdir'ed.
+func v342v1Clear(name string) error {
+	info, err := os.Lstat(name)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return os.Remove(name)
+	}
+	if info.IsDir() {
+		_ = os.Remove(filepath.Join(name, "blob.bin"))
+		return os.Remove(name)
+	}
+	return os.Remove(name)
+}
+
+func (w v342v1World) toReal() error {
+	if err := v342v1Clear(w.anc); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(w.stageReal, "blob.bin"), []byte(v342v1Own), 0o600); err != nil {
+		return err
+	}
+	if err := os.Rename(w.stageReal, w.anc); err != nil {
+		return err
+	}
+	return os.Mkdir(w.stageReal, 0o700)
+}
+
+// toLink counts a flip only when the ancestor name is PROVED to be a symlink after the
+// rename, so flips is evidence the name entered the link state (the leg's Windows racer
+// used the same liveness rule with reparseAt).
+func (w v342v1World) toLink() error {
+	if err := v342v1Clear(w.anc); err != nil {
+		return err
+	}
+	if err := os.Rename(w.stageLink, w.anc); err != nil {
+		return err
+	}
+	if info, err := os.Lstat(w.anc); err != nil {
+		return err
+	} else if info.Mode()&os.ModeSymlink == 0 {
+		return fmt.Errorf("ancestor %s is not a symlink after the flip", w.anc)
+	}
+	if err := os.Symlink(w.foreign, w.stageLink); err != nil && !errors.Is(err, os.ErrExist) {
+		return err
+	}
+	return nil
+}
+
+type v342v1Tally struct {
+	attempts  int
+	flips     int32
+	flipErrs  int32
+	damage    int
+	truncated int
+	deleted   int
+	legs      map[string]int
+	firstRows []string
+}
+
+// v342v1ReadWitness returns (kind, size) where kind is body / truncated / deleted /
+// unreadable. It reads the FOREIGN object only, never the tree's own name.
+func v342v1ReadWitness(w v342v1World) (string, int64) {
+	body, rErr := os.ReadFile(w.witness)
+	if rErr != nil {
+		if strings.Contains(rErr.Error(), "no such file") {
+			return "deleted", -1
+		}
+		return "unreadable:" + rErr.Error(), -1
+	}
+	info, sErr := os.Lstat(w.witness)
+	if sErr != nil {
+		return "unreadable-lstat:" + sErr.Error(), -1
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return "link-in-witness-slot", info.Size()
+	}
+	if string(body) != v342v1Body {
+		return "truncated", info.Size()
+	}
+	return "body", info.Size()
+}
+
+func v342v1AttemptsN() int {
+	if v := os.Getenv("V342V1_ATTEMPTS"); v != "" {
+		var n int
+		if _, err := fmt.Sscanf(v, "%d", &n); err == nil && n > 0 {
+			return n
+		}
+	}
+	return v342v1Attempts
+}
+
+// v342v1Run drives one shape against the racer. openFn returns (err). The witness is
+// sampled immediately after every attempt and re-stocked when damaged, so one row
+// measures the rate, not a single accident.
+func v342v1Run(t *testing.T, shape string, openFn func(w v342v1World) error) *v342v1Tally {
+	t.Helper()
+	w := v342v1Stage(t)
+	if err := w.toReal(); err != nil {
+		t.Fatalf("seed real state: %v", err)
+	}
+	// Liveness precondition, measured not assumed: the world must be able to stand in
+	// the LINK state with the leaf resolving into the foreign tree at all.
+	if err := w.toLink(); err != nil {
+		t.Fatalf("liveness seed link: %v", err)
+	}
+	if _, sz := v342v1ReadWitness(w); sz < 0 {
+		stop, done := make(chan struct{}), make(chan struct{})
+		_ = stop
+		_ = done
+		t.Fatalf("liveness setup cannot read the witness")
+	}
+	if err := w.toReal(); err != nil {
+		t.Fatalf("liveness reseed real: %v", err)
+	}
+
+	var tally v342v1Tally
+	tally.legs = map[string]int{}
+	var mu sync.Mutex
+	var firstFlip string
+	note := func(err error) {
+		if err == nil {
+			atomic.AddInt32(&tally.flips, 1)
+			return
+		}
+		atomic.AddInt32(&tally.flipErrs, 1)
+		mu.Lock()
+		if firstFlip == "" {
+			firstFlip = err.Error()
+		}
+		mu.Unlock()
+	}
+	stop, done := make(chan struct{}), make(chan struct{})
+	var once sync.Once
+	stopRacer := func() { once.Do(func() { close(stop) }); <-done }
+	go func() {
+		defer close(done)
+		defer func() {
+			if p := recover(); p != nil {
+				note(fmt.Errorf("racer panic: %v", p))
+			}
+		}()
+		wantLink := false
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+			}
+			if wantLink {
+				note(w.toLink())
+			} else {
+				note(w.toReal())
+			}
+			wantLink = !wantLink
+		}
+	}()
+	defer stopRacer()
+
+	n := v342v1AttemptsN()
+	tally.attempts = n
+	for i := 0; i < n; i++ {
+		err := openFn(w)
+		klass := "ok"
+		if err != nil {
+			klass = v342v1Classify(err)
+		}
+		kind, sz := v342v1ReadWitness(w)
+		tally.legs[klass+"/"+kind]++
+		if kind != "body" {
+			tally.damage++
+			switch kind {
+			case "truncated", "link-in-witness-slot":
+				tally.truncated++
+			case "deleted":
+				tally.deleted++
+			}
+			if len(tally.firstRows) < 3 {
+				tally.firstRows = append(tally.firstRows, fmt.Sprintf("i=%d err=%v kind=%s size=%d", i, err, kind, sz))
+			}
+			v342v1RestockWitness(t, w)
+		}
+	}
+	stopRacer()
+	tally.flips = atomic.LoadInt32(&tally.flips)
+	tally.flipErrs = atomic.LoadInt32(&tally.flipErrs)
+	t.Logf("V342V1 %s: attempts=%d flips=%d flipErrs=%d damage=%d truncated=%d deleted=%d firstFlipErr=%s",
+		shape, tally.attempts, tally.flips, tally.flipErrs, tally.damage, tally.truncated, tally.deleted, firstFlip)
+	for k, c := range tally.legs {
+		t.Logf("V342V1 %s leg=%s : %d", shape, k, c)
+	}
+	for _, r := range tally.firstRows {
+		t.Logf("V342V1 %s damageRow %s", shape, r)
+	}
+	if tally.flips == 0 {
+		t.Errorf("V342V1 %s DEAD INSTRUMENT: 0 landed flips (firstErr=%q) => damage=%d proves nothing", shape, firstFlip, tally.damage)
+	}
+	return &tally
+}
+
+func v342v1Classify(err error) string {
+	s := err.Error()
+	switch {
+	case strings.Contains(s, "too many levels"):
+		return "ELOOP"
+	case strings.Contains(s, "reaches it through the link at"):
+		return "floor"
+	case strings.Contains(s, "pinned object at"):
+		return "pinrefuse"
+	case strings.Contains(s, "no such file"):
+		return "enoent"
+	case strings.Contains(s, "not a directory"):
+		return "enotdir"
+	case strings.Contains(s, "permission denied"):
+		return "eacces"
+	}
+	if len(s) > 60 {
+		s = s[:60]
+	}
+	return "other:" + s
+}
+
+// v342v1Jia: my own per-component openat descent. Content of the shape, written here.
+func v342v1Jia(path string, flags int) (*os.File, error) {
+	comps := pathComponents(path)
+	if len(comps) == 0 {
+		return nil, fmt.Errorf("v342v1 jia: no components in %q", path)
+	}
+	fd, err := syscall.Open("/", syscall.O_RDONLY|syscall.O_DIRECTORY|syscall.O_NOFOLLOW, 0)
+	if err != nil {
+		return nil, fmt.Errorf("v342v1 jia root: %w", err)
+	}
+	for _, comp := range comps[:len(comps)-1] {
+		next, err := syscall.Openat(fd, comp, syscall.O_RDONLY|syscall.O_DIRECTORY|syscall.O_NOFOLLOW, 0)
+		_ = syscall.Close(fd)
+		if err != nil {
+			return nil, fmt.Errorf("v342v1 jia descend %s: %w", comp, err)
+		}
+		fd = next
+	}
+	lfd, err := syscall.Openat(fd, comps[len(comps)-1], flags|syscall.O_NOFOLLOW, 0o600)
+	_ = syscall.Close(fd)
+	if err != nil {
+		return nil, fmt.Errorf("v342v1 jia leaf: %w", err)
+	}
+	return os.NewFile(uintptr(lfd), path), nil
+}
+
+// v342v1Yi: the package's own pin walk on the PARENT, leaf fd-relative.
+func v342v1Yi(path string, flags int) (*os.File, error) {
+	parent := filepath.Dir(path)
+	pinned, err := pinPlacement(parent)
+	if err != nil {
+		return nil, err
+	}
+	defer pinned.Close()
+	lfd, err := syscall.Openat(int(pinned.Fd()), filepath.Base(path), flags|syscall.O_NOFOLLOW, 0o600)
+	if err != nil {
+		return nil, fmt.Errorf("v342v1 yi leaf on pinned parent: %w", err)
+	}
+	return os.NewFile(uintptr(lfd), path), nil
+}
+
+func v342v1WriteThrough(f *os.File) error {
+	if _, err := f.Write([]byte(v342v1Payload)); err != nil {
+		_ = f.Close()
+		return err
+	}
+	return f.Close()
+}
+
+func TestV342v1PosixAncestorRaceRows(t *testing.T) {
+	t.Run("VBASE", func(t *testing.T) {
+		v342v1Run(t, "VBASE", func(w v342v1World) error {
+			f, err := os.OpenFile(w.name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+			if err != nil {
+				return err
+			}
+			return v342v1WriteThrough(f)
+		})
+	})
+	t.Run("VPROD", func(t *testing.T) {
+		v342v1Run(t, "VPROD", func(w v342v1World) error {
+			return PrivateFile(w.name, []byte(v342v1Payload), 0o600)
+		})
+	})
+	t.Run("VJIA", func(t *testing.T) {
+		v342v1Run(t, "VJIA", func(w v342v1World) error {
+			f, err := v342v1Jia(w.name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+			if err != nil {
+				return err
+			}
+			return v342v1WriteThrough(f)
+		})
+	})
+	t.Run("VYI", func(t *testing.T) {
+		v342v1Run(t, "VYI", func(w v342v1World) error {
+			f, err := v342v1Yi(w.name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+			if err != nil {
+				return err
+			}
+			return v342v1WriteThrough(f)
+		})
+	})
+	t.Run("VBING", func(t *testing.T) {
+		// 丙: act by name, then re-verify through the shipped identity gate. It can
+		// refuse the write; it cannot un-truncate.
+		v342v1Run(t, "VBING", func(w v342v1World) error {
+			f, err := os.OpenFile(w.name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+			if err != nil {
+				return err
+			}
+			pinned, pErr := pinPlacement(filepath.Dir(w.name))
+			if pErr != nil {
+				_ = f.Close()
+				return pErr
+			}
+			st, sErr := pinned.Stat()
+			_ = pinned.Close()
+			if sErr != nil {
+				_ = f.Close()
+				return sErr
+			}
+			if st.Mode()&os.ModeSymlink != 0 {
+				_ = f.Close()
+				return fmt.Errorf("v342v1 bing: parent became a link")
+			}
+			return v342v1WriteThrough(f)
+		})
+	})
+}
+
+// TestV342v1A1DeterministicAncestorFollow is the non-racing shape: ancestor already a
+// link BEFORE the call, opened by name with the shipped flag set.
+func TestV342v1A1DeterministicAncestorFollow(t *testing.T) {
+	w := v342v1Stage(t)
+	if err := w.toLink(); err != nil {
+		t.Fatalf("plant ancestor link: %v", err)
+	}
+	f, err := os.OpenFile(w.name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	if err != nil {
+		t.Errorf("V342V1 A1 CONTRADICTS the shipped self-report: the by-name open refused with err=%v while oNoFollowPlatform was carried; the comment at winsec.go:128-133 would then be wrong", err)
+		return
+	}
+	if err := v342v1WriteThrough(f); err != nil {
+		t.Fatalf("write through the followed ancestor: %v", err)
+	}
+	kind, sz := v342v1ReadWitness(w)
+	t.Logf("V342V1 A1 VERDICT: open err=<nil>; foreign witness now kind=%s size=%d => ancestor leg is %s",
+		kind, sz, map[string]string{"truncated": "OPEN (the truncation landed in the foreign object)", "body": "not followed (contradiction)"}[kind])
+	if kind != "truncated" {
+		t.Errorf("V342V1 A1 shape wrong: witness reads %s (size %d), want truncated", kind, sz)
+	}
+	// Contrast row: same flag at the LEAF position answers ELOOP (ticket 322's pin).
+	leaf := filepath.Join(w.base, "leaf-slot.lnk")
+	if err := os.Symlink(w.witness, leaf); err != nil {
+		t.Fatal(err)
+	}
+	_, lErr := os.OpenFile(leaf, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	lKind, _ := v342v1ReadWitness(w)
+	t.Logf("V342V1 A1 contrast: leaf-position open err=%v; foreign witness kind=%s", lErr, lKind)
+	if lErr == nil || !strings.Contains(lErr.Error(), "too many levels") {
+		t.Errorf("V342V1 A1 CONTRADICTION: oNoFollowPlatform did not answer ELOOP at the leaf (%v)", lErr)
+	}
+}
+
+// TestV342v1A3RefusalPathUnlink is the deterministic second-damage row for ticket 348:
+// the seal-failure branch of privateFile runs _ = os.Remove(resolved) by NAME, and
+// Remove resolves ancestor links. Driven on the shipped primitives, no racer.
+func TestV342v1A3RefusalPathUnlink(t *testing.T) {
+	w := v342v1Stage(t)
+	if err := w.toLink(); err != nil {
+		t.Fatalf("plant ancestor link: %v", err)
+	}
+	f, err := os.OpenFile(w.name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	if err != nil {
+		t.Fatalf("A3 setup: the open refused (%v); this row needs it to follow the ancestor", err)
+	}
+	_, _ = f.Write([]byte(v342v1Payload))
+	_ = f.Close()
+	reopen, rErr := os.OpenFile(w.name, os.O_RDONLY, 0)
+	if rErr != nil {
+		t.Fatalf("A3 reopen for the seal: %v", rErr)
+	}
+	sealErr := sealHandle(reopen)
+	_ = reopen.Close()
+	kindAfterSeal, _ := v342v1ReadWitness(w)
+	rmErr := os.Remove(w.name)
+	kindAfterRm, szAfterRm := v342v1ReadWitness(w)
+	_, ancLstat := os.Lstat(w.anc)
+	ancInfo, ancErr := os.Lstat(w.anc)
+	t.Logf("V342V1 A3 row1: sealHandle err=%v witness-after-seal=%s", sealErr, kindAfterSeal)
+	t.Logf("V342V1 A3 row2: os.Remove(%s) err=%v; foreign witness now=%s(size %d); ancestor link still standing=%v(%v)",
+		w.name, rmErr, kindAfterRm, szAfterRm, ancErr == nil && ancInfo.Mode()&os.ModeSymlink != 0, ancLstat)
+	if kindAfterRm == "deleted" {
+		t.Logf("V342V1 A3 VERDICT: the refusal-path unlink resolved THROUGH the ancestor link and deleted the FOREIGN object = damage shape 2, deterministic, not a race")
+	} else {
+		t.Errorf("V342V1 A3 did not reproduce: witness after the unlink reads %s; either the route changed or this probe's shape is wrong", kindAfterRm)
+	}
+}
