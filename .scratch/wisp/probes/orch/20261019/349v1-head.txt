@@ -1,0 +1,23 @@
+派单＝票 349 终裁腿 349-v1（非实现者裁决腿·只读产码）｜编排者＝新任 harness｜发出 2026-10-19 13:0x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 你是谁
+你是票 **349** 的**终裁腿**（裁决者≠实现者）。实现腿＝`349-r1`（写·注释面，★7 笔但主题起头有两种形＝见下"名册尺"）。
+★你是盘上第一枚 `349-v*`（编排者现跑＝锚定前缀 0 笔＋`.scratch/wisp/probes/349/v1` 不存在）。
+你的写面**只有三处**：`docs/evidence/s1/349-v1-verdict.md` ＋ `.scratch/wisp/probes/349/v1/**`（短名、⛔ 写出被禁字面字符〔码位 U+00A7；⚠ 别与腿主题常用的间隔号 U+00B7 混〕、逐枚非 0 字节、⛔ `.out`）＋票 349 末尾**一条**只追加 bullet。⛔ 任何 `.go` 字节、⛔ 翻框、⛔ 改票名／`Status:`／`-done`、⛔ push。
+
+## 要裁什么
+票面＝`.scratch/wisp/issues/349-blacklist-provenance-comments-name-undefined-symbols-fires-taskscope-cleanup.md`（七格 AC#0…AC#6，现量未翻）。
+靶子＝实现腿把四枚"注释点名不存在的符号"改准了：`fires()`（`blacklist.go`）／`Complete`→`SyncDetectionComplete`（`syncdirs.go`）／`taskScopeID`→`scopeID`（`provenance.go`）／`disposalScope`→散文形（`provenance.go`）。
+
+## ★起手必须知道的三件事（编排者已独立跑过，⛔ 你复算、⛔ 采信我给的话）
+1. **名册尺形**：`349-r1` 的主题起头有**两种**＝4 笔「票 349 落地腿 349-r1·」＋3 笔「349-r1 …」⇒ 单锚一把尺只吃到 4 笔。⇒ 你用「单次 `git log --all --format='%H%x09%s'` 导出＋内存内 `index($2,P)==1`」时**两把锚都要跑**（`票 349 落地腿 349-r1` ⇄ `349-r1`）并集去重＝**7 笔**（我已逐枚 `git merge-base --is-ancestor … HEAD` 现验 7 枚全在祖先链：`bf7f13bc`/`07f178df`/`db2f9eab`/`7d56962b`/`ed8db1ea`/`88416a68`/`695581d0`）。★定式（`A1045`/`A1048`）＝⛔ 子串 `--grep`、⛔ 假设其后分隔符、⛔ 拿某时刻枚数当通则。
+2. **★我已抓到这枚腿一处归因错，你独立复跑再定性**（⛔ 抄我的裁定）：它把 Windows 那 4 枚红（`TestSyncAncestorActableLegFailsClosedOnMovedAncestor116`／`TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116`／`TestSyncAncestorLegReResolvesThroughJunctionToRealTree`／`TestSyncAncestorLegNotExemptedStaysFailClosed`）说成"⛔ 我造的、与 `343-v1` 同包读数逐字同名＝存量"。我对撞 `343-v1` 两份日志＝`pair/pair-summary.log` 是 **`247/136/5/1`（台损发：POSIX 形 `GOTMPDIR` 致 `mklink Invalid switch`，`343-v1` 自己已具名⛔ 计入判据）**、`pair2/pair2-summary.log` 才是干净判据发＝**`247/140/1/1`、只剩 C26 一枚合法存量红、那 4 枚消失**。⇒ 我的初步裁＝**那 4 枚是台面造的红、⛔ 存量在册红**；但它"本腿新增红 0"的核心结论仍成立（它自己 base⇄del 两侧红名集**同集**、作差 0）。★你要：自己重打两侧成对四数＋红名册逐名、确认"新增红 0"是否真、并给我这处归因的独立定性（⛔ 认同我就顶回来）。
+3. **★剥注释结构尺＝本票最硬的凭据，两侧必须取 blob、⛔ 磁盘副本**（这枚腿自己栽过一次并已改正：`internal/risk/provenance.go` **磁盘是 CRLF、blob 是 LF**＝拿磁盘比必假红）。我自己从零算过的三枚（起手锚 `7b633fa9` ⇄ 现 HEAD）＝`blacklist.go` `b1610acf…`/232 行同、`provenance.go` `1df28906…`/621 行同、`syncdirs.go` `00fb159a…`/435 行同。⇒ **你另起一把独立形**（例：先删整行 `^//` 再剥行尾 ⇄ 我这把 `sed 's://.*::'`）自己算三枚，⛔ 抄我这串号。
+
+## 四枚逐格要裁的
+- **AC#0**＝它加的那把"同族还有几枚"尺（三形：驼峰 SA／调用形 SB／声明形 SC）：它报"起手侧非 GREEN 12 枚＝TRUE 恰四枚＋8 枚假阳逐枚具名、交件侧 TRUE 0"。★你自己重跑三形尺、独立数终数，并**裁它判的 8 枚 FP 对不对**（它列的样本里 `CloseScope`＝票 160 **故意删掉**的历史名、那句自陈"Before it…"＝词面与假话不可分；`Defer`＝别包真方法；`DEFERRED`＝标记约定；`macOS`／`Nutstore`＝平台名／厂商名）。
+- ★**它另交回 4 枚候选归口给我**（`pathresolver_junction_windows_test.go:362` 的 `and`／`taintmatch.go:256` 的 `documents`／`syncdirs_test.go:298` 的 `valueName`／`taintmatch_test.go:171` 的 `winStrs`）＝我逐行现读后裁＝全是它 SC 形假阳或格式串／历史名散文、⛔ 动 ⛔ 立票。**你要复核我这一裁**（⛔ 认同就顶回来给凭据；那枚 `winStrs` 是"注释明写 dead"的历史名、`valueName` 在格式串里，我读过原文）。
+- **AC#1／AC#2**＝完成判据逐条现跑：①交件侧四枚死名**精确形** 0 命中（★⛔ 裸子串：`Complete` 作子串会命中 `SyncDetectionComplete`＝我第一轮就被这把坏尺骗过一次＝它报 27"命中"其实是 substring 噪声；正控＝`SyncDetectionComplete` 多枚在场）；②`git diff -U0` 每枚 `^[+-]` 行以 `//` 开头、非注释行 0；③★那把结构尺三枚各自两侧同串（上面第 3 条）。
+- **AC#3**＝它判"⛔ 上通用仪器"（自己跑出的 precision＝起手 4/12＝33%、交件 0/7＝0%；最硬否证＝SC 形全 package 14 枚命中里 GREEN-pkg＝0＝放宽切词只给一把 0 真阳的尺加噪声＝与 `343-v1`"放宽即 142 枚红"同向）。★你复核⛔ 抄＋给独立结论；有界词表 `^a[A-Z]…` 形＝⛔ 你造门（已另有票 350 承接、`AC#0` 待人拍板）。
+- **AC#4**＝`./internal/risk/` 两平台成对四数（⛔ 混用⛔ 相减、红名册逐名作差）＋★票 336 那 8 枚牙它报 8/8 全红 11 次还原 match=YES（台件现成 `.scratch/wisp/probes/336/v1/sh/run-ac2-sweep.sh`，★这枚路径我 `cat-file -e` 现验存在＝票 349 曾有的一处假路径已改正、你复认）——你重打一次。唯一合法红＝`TestC26Rewrite…` 存量（`A380`／票 200／216）；★那 4 枚 `…116` 族的定性见上面第 2 条；`TestResolvePerCallBudget` 争用假红＝安静复量 3 发。门禁四数只在共享树、跑前 `unset GOTMPDIR TMPDIR TEMP TMP`。⛔ `./cmd/wisp` 整包、⛔ `go test ./...`。
+- **AC#5／AC#6**＝它自抓两枚当场改正（结构尺第一版取工作树副本＝CRLF 假红；清被禁字符第一把脚本因 bash 双引号吃 `$1` 造双重编码乱码、第二把按字节形改正三枚正文件重落）＋枚数自抓（7 笔⇄锚定 4 笔）＝你复核"有没有污染任何一格读数"（我的复跑＝没有；你⛔ 抄我）。★另裁我一处：票 349 的**票面文字**我曾就地改过三处（假路径→真身、"六格"→七格、名册扩到四枚）＝我按"我自己票里的笔误就地改＋追加段记原委"处理，与"实质判据⛔ 就地改只追加"是否冲突？你给一句裁语。
