@@ -1,0 +1,309 @@
+### A. 全仓 fs.ErrNotExist 命中（尺＝git grep -n "fs.ErrNotExist" -- "*.go"）
+###    分类：PROD=非 _test.go 且不在 .scratch/ ；TEST=*_test.go；SCRATCH=.scratch/**（别腿散件，⛔ 生产消费者）
+TOTAL_HITS=116
+PROD_HITS=35
+SCRATCH_HITS=38
+--- PROD 名册逐枚（file:line + 该函数名）---
+cmd/wisp/config_reload.go:360:	case errors.Is(err, fs.ErrNotExist):
+cmd/wisp/firstrun.go:55:// The absence test is os.Stat + errors.Is(err, fs.ErrNotExist) - the exported
+cmd/wisp/firstrun.go:76:	if _, err := os.Stat(cfgPath); !errors.Is(err, fs.ErrNotExist) {
+cmd/wisp/resident_approval_windows.go:477:		if errors.Is(err, fs.ErrNotExist) {
+cmd/wisp/resident_approval_windows.go:485:		// fs.ErrNotExist is the same type-level test internal/config's own
+internal/config/loader.go:74:			// reads fs.ErrNotExist off it for cause=missing, and 票 223 AC#4
+internal/config/parse.go:234:	return errors.Is(err, fs.ErrNotExist)
+internal/memory/artifacts.go:115:		if errors.Is(err, fs.ErrNotExist) {
+internal/memory/artifacts.go:125:			if errors.Is(err, fs.ErrNotExist) {
+internal/memory/artifacts.go:152:					if errors.Is(iErr, fs.ErrNotExist) {
+internal/memory/artifacts.go:204:			if rErr := winsec.RemoveUnlinked(full); rErr != nil && !errors.Is(rErr, fs.ErrNotExist) {
+internal/memory/artifacts.go:214:		if err := winsec.RemoveUnlinked(full); err != nil && !errors.Is(err, fs.ErrNotExist) {
+internal/memory/artifacts.go:264:			!errors.Is(rmErr, fs.ErrNotExist) {
+internal/memory/artifacts.go:286:		if errors.Is(err, fs.ErrNotExist) {
+internal/memory/artifacts.go:307:		if err := os.Remove(filepath.Join(s.artifactsDir, a.Name)); err != nil && !errors.Is(err, fs.ErrNotExist) {
+internal/panel/assets.go:87:	if errors.Is(err, fs.ErrNotExist) {
+internal/panel/git.go:318:		case errors.Is(err, fs.ErrNotExist):
+internal/panel/git.go:421:	case errors.Is(err, fs.ErrNotExist):
+internal/proc/envfork.go:171:		if !errors.Is(err, fs.ErrNotExist) {
+internal/proc/envfork.go:221:		if !errors.Is(err, fs.ErrNotExist) {
+internal/secret/configrefs.go:25:	if errors.Is(err, fs.ErrNotExist) {
+internal/secret/list.go:38:		if errors.Is(err, fs.ErrNotExist) {
+internal/secret/list.go:50:			if errors.Is(err, fs.ErrNotExist) {
+internal/secret/migrate.go:88:	if errors.Is(err, fs.ErrNotExist) {
+internal/secret/migrate.go:168:	if _, statErr := os.Stat(backupPath); errors.Is(statErr, fs.ErrNotExist) {
+internal/secret/store.go:106:		if errors.Is(err, fs.ErrNotExist) {
+internal/secret/store.go:140:	case errors.Is(err, fs.ErrNotExist):
+internal/secret/store.go:149:// absent blob reports fs.ErrNotExist wrapped, so callers can distinguish
+internal/secret/store.go:162:		if errors.Is(err, fs.ErrNotExist) {
+internal/winsec/resolve.go:264:		if !errors.Is(err, fs.ErrNotExist) {
+internal/winsec/winsec.go:251:		if !errors.Is(err, fs.ErrNotExist) {
+internal/winsec/winsec_other.go:438:	if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
+internal/winsec/winsec_windows.go:683:		if errors.Is(err, fs.ErrNotExist) {
+internal/winsec/winsec_windows.go:732:	if errors.Is(err, fs.ErrNotExist) {
+internal/winsec/winsec_windows.go:748:	if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
+
+### B. winsec 三枚入口的生产调用者名册（尺＝git grep -n "winsec\.\(PrivateFile\|PrivateFileExclusive\|SealFile\)" -- "*.go"）
+internal/agent/spill.go:166:		if wErr := winsec.PrivateFile(tmp, []byte(capped), 0o600); wErr != nil {
+internal/agent/spill.go:343:	return winsec.PrivateFileExclusive(path, data)
+internal/config/migrate.go:89:	// other local accounts. winsec.PrivateFile seals the handle before the first
+internal/config/migrate.go:93:	if err := winsec.PrivateFile(backup, raw, 0o600); err != nil {
+internal/config/parse.go:215:	if err := winsec.SealFile(tmpName); err != nil {
+internal/memory/artifacts.go:75:	if err := winsec.PrivateFileExclusive(filepath.Join(s.artifactsDir, name), data); err != nil {
+internal/memory/artifacts.go:204:			if rErr := winsec.RemoveUnlinked(full); rErr != nil && !errors.Is(rErr, fs.ErrNotExist) {
+internal/memory/artifacts.go:214:		if err := winsec.RemoveUnlinked(full); err != nil && !errors.Is(err, fs.ErrNotExist) {
+internal/secret/migrate.go:169:		if werr := winsec.PrivateFile(backupPath, raw, 0o600); werr != nil {
+internal/secret/migrate.go:174:	} else if serr := winsec.SealFile(backupPath); serr != nil {
+internal/secret/migrate.go:189:	if werr := winsec.PrivateFile(tmpPath, out, 0o600); werr != nil {
+internal/secret/store.go:79:	if err := winsec.PrivateFile(s.blobPath(id), blob, 0o600); err != nil {
+
+### C. 逐枚调用者的错误处理块：有无对 fs.ErrNotExist / os.IsNotExist 的判定（±14 行窗口）
+===== CALLER internal/agent/spill.go:166 =====
+163			// a model re-reading the path sees either the whole old output or the
+164			// whole new one, never a torn artifact.
+165			tmp := path + ".retry"
+166			if wErr := winsec.PrivateFile(tmp, []byte(capped), 0o600); wErr != nil {
+167				return Spill{}, observe.Wrap(observe.ClassResource, wErr, "agent: write spill artifact retry")
+168			}
+169			if rErr := os.Rename(tmp, path); rErr != nil {
+170				_ = os.Remove(tmp)
+171				return Spill{}, observe.Wrap(observe.ClassResource, rErr, "agent: replace spill artifact")
+172			}
+173		} else if err != nil {
+174			return Spill{}, observe.Wrap(observe.ClassResource, err, "agent: write spill artifact")
+175		}
+176	
+177		head := takeTokens(capped, s.b.SpillHeadTokens)
+178		tail := takeTokensLast(capped, s.b.SpillTailTokens)
+179		out.KeptHead = ApproxTokens(head)
+180		out.KeptTail = ApproxTokens(tail)
+181		// The notice slot sits BETWEEN "约 %d token" and "，全文见 %s" - the same
+182		// position ticket 174's already-accepted tools leg put it in - so the
+===== CALLER internal/agent/spill.go:343 =====
+340		// the bytes only ever land in a descriptor that is already in place: on
+341		// Windows the 0o600 below used to be the only access control claimed, and it
+342		// controls nothing.
+343		return winsec.PrivateFileExclusive(path, data)
+344	}
+345	
+346	// takeTokens returns the leading budget tokens of s (4 bytes per token under
+347	// the shared heuristic, cut on a rune boundary).
+348	func takeTokens(s string, budget int) string {
+349		if budget <= 0 {
+350			return ""
+351		}
+352		n := budget * 4
+353		if n >= len(s) {
+354			return s
+355		}
+356		for n > 0 && !utf8Start(s[n]) {
+357			n--
+358		}
+359		return s[:n]
+===== CALLER internal/config/migrate.go:89 =====
+86		// config.toml may hold them). A mode argument does not land on Windows
+87		// (ticket 89, A51①), so 0o600 here was decoration: the bytes landed with
+88		// whatever the parent directory's DACL hands down, which is readable by
+89		// other local accounts. winsec.PrivateFile seals the handle before the first
+90		// content byte and refuses the write if the seal fails; because this call
+91		// rewrites an existing backup rather than skipping it, PrivateFile is also
+92		// the repair path for a wide backup left by an older build.
+93		if err := winsec.PrivateFile(backup, raw, 0o600); err != nil {
+94			return nil, observe.Wrap(observe.ClassConfig, err, "config.toml migration backup write")
+95		}
+96		if err := atomicWrite(path, data); err != nil {
+97			return nil, observe.Wrap(observe.ClassConfig, err, "config.toml migration rewrite")
+98		}
+99		return data, nil
+100	}
+101	
+102	// migrateV1toV2 maps the D36 draft model onto the catalog schema (SPEC-03
+103	// sec 3.1):
+104	//
+105	//	llm.timeout                    -> llm.timeout_ms
+===== CALLER internal/config/migrate.go:93 =====
+90		// content byte and refuses the write if the seal fails; because this call
+91		// rewrites an existing backup rather than skipping it, PrivateFile is also
+92		// the repair path for a wide backup left by an older build.
+93		if err := winsec.PrivateFile(backup, raw, 0o600); err != nil {
+94			return nil, observe.Wrap(observe.ClassConfig, err, "config.toml migration backup write")
+95		}
+96		if err := atomicWrite(path, data); err != nil {
+97			return nil, observe.Wrap(observe.ClassConfig, err, "config.toml migration rewrite")
+98		}
+99		return data, nil
+100	}
+101	
+102	// migrateV1toV2 maps the D36 draft model onto the catalog schema (SPEC-03
+103	// sec 3.1):
+104	//
+105	//	llm.timeout                    -> llm.timeout_ms
+106	//	llm.temperature                -> llm.roles.chat.temperature
+107	//	llm.default_provider (+model)  -> llm.text_chain[0], llm.roles.chat.{provider,model}
+108	//	llm.fallback_provider (+model) -> llm.text_chain[1]
+109	//	providers.<n>.model            -> providers.<n>.models.<model>{enabled=true}
+===== CALLER internal/config/parse.go:215 =====
+212		// empty file leaks nothing; a wide file holding the serialized config -
+213		// endpoints, model paths, and on an un-migrated machine a plaintext
+214		// api_key - leaks to every local account.
+215		if err := winsec.SealFile(tmpName); err != nil {
+216			_ = tmp.Close()
+217			return observe.Wrap(observe.ClassConfig, err, "config.toml temp file seal")
+218		}
+219		if _, err := tmp.Write(data); err != nil {
+220			tmp.Close()
+221			return observe.Wrap(observe.ClassConfig, err, "config.toml write")
+222		}
+223		if err := tmp.Close(); err != nil {
+224			return observe.Wrap(observe.ClassConfig, err, "config.toml write")
+225		}
+226		if err := os.Rename(tmpName, path); err != nil {
+227			return observe.Wrap(observe.ClassConfig, err, "config.toml replace")
+228		}
+229		return nil
+230	}
+231	
+===== CALLER internal/memory/artifacts.go:75 =====
+72		if err := validArtifactName(name); err != nil {
+73			return err
+74		}
+75		if err := winsec.PrivateFileExclusive(filepath.Join(s.artifactsDir, name), data); err != nil {
+76			return err
+77		}
+78		// Quota is enforced on the write path, not only by the retention job: the
+79		// job runs on a schedule, and an attachment big enough to blow the cap must
+80		// not wait for it to become visible in the accounting.
+81		if _, _, err := s.enforceArtifactsQuota(ctx, ArtifactsQuotaBytes); err != nil {
+82			return fmt.Errorf("memory: enforce artifacts quota after %q: %w", name, err)
+83		}
+84		return nil
+85	}
+86	
+87	// ValidArtifactName is the exported half of this package's name guard, so a
+88	// caller that must refuse BEFORE it holds any bytes (a panel rejecting a
+89	// file name that spells a path) refuses with the same verdict the store would
+90	// reach at write time rather than with a divergent copy of the rules.
+91	func ValidArtifactName(name string) error { return validArtifactName(name) }
+===== CALLER internal/memory/artifacts.go:204 =====
+201					return nil
+202				}
+203				full := filepath.Join(s.artifactsDir, rel)
+204				if rErr := winsec.RemoveUnlinked(full); rErr != nil && !errors.Is(rErr, fs.ErrNotExist) {
+205					return fmt.Errorf("memory: remove artifacts stray file %q: %w", rel, rErr)
+206				}
+207				return nil
+208			})
+209		if err != nil {
+210			return fmt.Errorf("memory: reclaim artifacts stray %q: %w", name, err)
+211		}
+212		for i := len(dirs) - 1; i >= 0; i-- {
+213			full := filepath.Join(s.artifactsDir, dirs[i])
+214			if err := winsec.RemoveUnlinked(full); err != nil && !errors.Is(err, fs.ErrNotExist) {
+215				return fmt.Errorf("memory: reclaim artifacts stray dir %q: %w", dirs[i], err)
+216			}
+217		}
+218		return nil
+219	}
+220	
+===== CALLER internal/memory/artifacts.go:214 =====
+211		}
+212		for i := len(dirs) - 1; i >= 0; i-- {
+213			full := filepath.Join(s.artifactsDir, dirs[i])
+214			if err := winsec.RemoveUnlinked(full); err != nil && !errors.Is(err, fs.ErrNotExist) {
+215				return fmt.Errorf("memory: reclaim artifacts stray dir %q: %w", dirs[i], err)
+216			}
+217		}
+218		return nil
+219	}
+220	
+221	// enforceArtifactsQuota applies the LRU quota: while the directory total
+222	// exceeds quota bytes, oldest-written entries are deleted. Returns how many
+223	// entries were removed and how many bytes were freed - an entry is one
+224	// conforming file, or one non-conforming subtree (whose bytes were all counted
+225	// against the cap before any of it was reclaimed). Quota of exactly the current
+226	// size is compliant (strictly over triggers cleanup).
+227	func (s *Store) enforceArtifactsQuota(ctx context.Context, quota int64) (files int, freed int64, err error) {
+228		arts, strays, err := listArtifactsDir(s.artifactsDir)
+229		if err != nil {
+230			return 0, 0, err
+===== CALLER internal/secret/migrate.go:169 =====
+166		// because the branch above refuses to overwrite it.
+167		backupPath := configPath + BackupSuffix
+168		if _, statErr := os.Stat(backupPath); errors.Is(statErr, fs.ErrNotExist) {
+169			if werr := winsec.PrivateFile(backupPath, raw, 0o600); werr != nil {
+170				return nil, fmt.Errorf("secret: migrate: write backup %s: %w", backupPath, werr)
+171			}
+172		} else if statErr != nil {
+173			return nil, fmt.Errorf("secret: migrate: stat backup %s: %w", backupPath, statErr)
+174		} else if serr := winsec.SealFile(backupPath); serr != nil {
+175			return nil, fmt.Errorf("secret: migrate: seal existing backup %s: %w", backupPath, serr)
+176		}
+177		report.BackupPath = backupPath
+178	
+179		// Atomic rewrite: temp file in the same directory, then rename.
+180		out, err := toml.Marshal(tree)
+181		if err != nil {
+182			return nil, fmt.Errorf("secret: migrate: serialize: %w", err)
+183		}
+184		tmpPath := configPath + migrateTmpSuffix
+185		// Same reason as the backup, and the same shape AC#2's "the directory chain
+===== CALLER internal/secret/migrate.go:174 =====
+171			}
+172		} else if statErr != nil {
+173			return nil, fmt.Errorf("secret: migrate: stat backup %s: %w", backupPath, statErr)
+174		} else if serr := winsec.SealFile(backupPath); serr != nil {
+175			return nil, fmt.Errorf("secret: migrate: seal existing backup %s: %w", backupPath, serr)
+176		}
+177		report.BackupPath = backupPath
+178	
+179		// Atomic rewrite: temp file in the same directory, then rename.
+180		out, err := toml.Marshal(tree)
+181		if err != nil {
+182			return nil, fmt.Errorf("secret: migrate: serialize: %w", err)
+183		}
+184		tmpPath := configPath + migrateTmpSuffix
+185		// Same reason as the backup, and the same shape AC#2's "the directory chain
+186		// has to carry it" argument names: this is a pre-rename temp, the class of
+187		// file that exists only for a moment and is never sealed by anybody else.
+188		// Rename preserves the descriptor, so this also lands on configPath.
+189		if werr := winsec.PrivateFile(tmpPath, out, 0o600); werr != nil {
+190			return nil, fmt.Errorf("secret: migrate: write %s: %w", tmpPath, werr)
+===== CALLER internal/secret/migrate.go:189 =====
+186		// has to carry it" argument names: this is a pre-rename temp, the class of
+187		// file that exists only for a moment and is never sealed by anybody else.
+188		// Rename preserves the descriptor, so this also lands on configPath.
+189		if werr := winsec.PrivateFile(tmpPath, out, 0o600); werr != nil {
+190			return nil, fmt.Errorf("secret: migrate: write %s: %w", tmpPath, werr)
+191		}
+192		if rerr := os.Rename(tmpPath, configPath); rerr != nil {
+193			_ = os.Remove(tmpPath)
+194			return nil, fmt.Errorf("secret: migrate: replace %s: %w", configPath, rerr)
+195		}
+196	
+197		// User-visible notice (D33). The fields logged are paths and counts only.
+198		slog.Warn("plaintext api_key migrated to DPAPI-protected references (D33)",
+199			"config", configPath,
+200			"fields", len(report.Migrated),
+201			"paths", strings.Join(report.Migrated, ","),
+202			"backup", report.BackupPath)
+203		return report, nil
+204	}
+205	
+===== CALLER internal/secret/store.go:79 =====
+76		if err != nil {
+77			return err
+78		}
+79		if err := winsec.PrivateFile(s.blobPath(id), blob, 0o600); err != nil {
+80			return fmt.Errorf("secret: store: write blob: %w", err)
+81		}
+82		return nil
+83	}
+84	
+85	// Resolve returns the secret a ref names (SPEC-03 U+00A75.3). "env:NAME" reads the
+86	// process environment (missing or empty -> explicit error, never a default);
+87	// "dpapi:<blob-id>" decrypts the blob file. Under portable mode a decrypt
+88	// failure returns ErrPortableDecrypt (P13) - never a fallback value.
+89	func (s *Store) Resolve(ref string) (string, error) {
+90		kind, value, err := ParseRef(ref)
+91		if err != nil {
+92			return "", err
+93		}
+94		switch kind {
+95		case RefKindEnv:

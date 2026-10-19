@@ -1,0 +1,18 @@
+BASE_ANCHOR=fde1df02e06ed9d0c2f2ea6975336f31bd636ef9
+LAND_ANCHOR=9581a48c93405556ef0f3ec03c11e695ddfcfd6b
+BASE_winsec_blob=67783ae062dcbdefbe74a72ddf4307b3ac9cedf7
+LAND_winsec_blob=07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+treeB GO_FILES=772 WINSEC_GO=46
+treeL GO_FILES=775 WINSEC_GO=49
+--- pristine 清单（internal/winsec 全枚 sha256，两棵并排，差异＝落地面）---
+DIFFERENT_OR_ONLY_IN_ONE=5
+3a4
+> 189e55e8613249db148fb47f627509c98e8f89b0c6609816c8729bdeece4b272 *pinnedleaf_342_unix.go
+12d12
+< 41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d *winsec.go
+16a17
+> 5b3c0ca18ac4710441a4dfc14222d796746a5b9f54b8da6c2473df2a5baf2351 *pinnedleaf_342_fallback.go
+26a28
+> 9086f2bbbf531823ed5c4a615391785f5af749542df15c046b5fb4f2da6f2331 *winsec.go
+33a36
+> b9dc39aea15670e8f24689fa8d5f8157f2a1ffe310996203670c37dcf4d5643b *pinnedleaf_342_windows.go

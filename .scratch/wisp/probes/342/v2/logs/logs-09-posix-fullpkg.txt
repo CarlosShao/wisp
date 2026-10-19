@@ -1,0 +1,14 @@
+iv01-treeB-fullpkg-1 RC=1 RUN=74 PASS_TOP=43 FAIL_TOP=3 SKIP=0
+  RED_NAMES=3
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	2.604s
+FAIL
+iv01-treeB-fullpkg-2 RC=1 RUN=74 PASS_TOP=43 FAIL_TOP=3 SKIP=0
+  RED_NAMES=3
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	2.870s
+FAIL
+iv01-treeL-fullpkg-1 RC=0 RUN=74 PASS_TOP=46 FAIL_TOP=0 SKIP=0
+  RED_NAMES=0
+iv01-treeL-fullpkg-2 RC=0 RUN=74 PASS_TOP=46 FAIL_TOP=0 SKIP=0
+  RED_NAMES=0

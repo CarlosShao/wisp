@@ -1,0 +1,35 @@
+time=2026-10-19T17:25:43.208+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+=== RUN   TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1/junction
+    ancestorworld_342_348_windows_test.go:386: settle the world back to the real state: remove C:\Users\swq\AppData\Local\Temp\TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAF236384076\001\data\sub: The directory is not empty.
+=== RUN   TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1/symlink-dir
+    ancestorworld_342_348_windows_test.go:386: settle the world back to the real state: remove C:\Users\swq\AppData\Local\Temp\TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAF106747209\001\data\sub: The directory is not empty.
+--- FAIL: TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 (1.07s)
+    --- FAIL: TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1/junction (0.51s)
+    --- FAIL: TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1/symlink-dir (0.56s)
+=== RUN   TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+    ancestorunlink_348_windows_test.go:38: AC#2 (ticket 348, Windows in-root ancestor form: the removal face): form=symlink-dir attempts=400 cycles=53 provedReparse=53 formBLegRefusals=0 truncated=10 deleted=0 returnedNil=108 flipErrs=13
+    ancestorunlink_348_windows_test.go:38: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': leg that answered = the installed C26 resolver's own refusal (resolveString -> risk), i.e. steady state BEFORE any act : 192 attempts
+    ancestorunlink_348_windows_test.go:38: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': leg that answered = a seal refusal on this route : 2 attempts
+    ancestorunlink_348_windows_test.go:38: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': leg that answered = C26 resolveString refused the spelling : 12 attempts
+    ancestorunlink_348_windows_test.go:38: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': leg that answered = some other failure : 86 attempts
+    ancestorunlink_348_windows_test.go:38: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': leg that answered = none: the call returned nil : 108 attempts
+    ancestorunlink_348_windows_test.go:38: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': first proof verbatim: witness body replaced after attempt 10 (size 44 of 44, content "raced private payload 342r1 windows ancestor")
+    ancestorunlink_348_windows_test.go:38: AC#2 (ticket 348, Windows in-root ancestor form: the removal face)': first racer error verbatim: rename C:\Users\swq\AppData\Local\Temp\TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAFor1772635868\001\data\sub C:\Users\swq\AppData\Local\Temp\TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAFor1772635868\001\data\parked-real-sub: Access is denied.
+    ancestorunlink_348_windows_test.go:45: AC#2 RED instrument: reparseAt proved 53 flipped cycles and the landing's own legs answered 0 attempts across 400 (flipErrs=13, first "rename C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAFor1772635868\\001\\data\\sub C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAFor1772635868\\001\\data\\parked-real-sub: Access is denied.") - so the zero above is not evidence about a removal that was ever reachable
+--- FAIL: TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 (0.64s)
+=== RUN   TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1
+    ancestorunlink_348_windows_test.go:56: AC#2 (ticket 348 + the leaf residual, Windows leaf-symlink form): form=leaf-symlink attempts=400 cycles=71 provedReparse=71 formBLegRefusals=0 truncated=10 deleted=0 returnedNil=114 flipErrs=29
+    ancestorunlink_348_windows_test.go:56: AC#2 (ticket 348 + the leaf residual, Windows leaf-symlink form)': leg that answered = preOpenLeafGuard's leaf refusal (ticket 322's Windows leaf leg) : 1 attempts
+    ancestorunlink_348_windows_test.go:56: AC#2 (ticket 348 + the leaf residual, Windows leaf-symlink form)': leg that answered = the installed C26 resolver's own refusal (resolveString -> risk), i.e. steady state BEFORE any act : 263 attempts
+    ancestorunlink_348_windows_test.go:56: AC#2 (ticket 348 + the leaf residual, Windows leaf-symlink form)': leg that answered = C26 resolveString refused the spelling : 17 attempts
+    ancestorunlink_348_windows_test.go:56: AC#2 (ticket 348 + the leaf residual, Windows leaf-symlink form)': leg that answered = some other failure : 5 attempts
+    ancestorunlink_348_windows_test.go:56: AC#2 (ticket 348 + the leaf residual, Windows leaf-symlink form)': leg that answered = none: the call returned nil : 114 attempts
+    ancestorunlink_348_windows_test.go:56: AC#2 (ticket 348 + the leaf residual, Windows leaf-symlink form)': first proof verbatim: witness body replaced after attempt 76 (size 44 of 44, content "raced private payload 342r1 windows ancestor")
+    ancestorunlink_348_windows_test.go:56: AC#2 (ticket 348 + the leaf residual, Windows leaf-symlink form)': first racer error verbatim: remove C:\Users\swq\AppData\Local\Temp\TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDele3754531456\001\data\sub\leaf-342r1w.bin: The process cannot access the file because it is being used by another process.
+    ancestorunlink_348_windows_test.go:80: AC#2' leaf-leg split: preOpenLeafGuard (check before the open)=1, openPinnedLeaf re-check (after the open)=0, provedReparse=71 - that split IS the residual story of ticket 322's Windows leaf leg
+    ancestorunlink_348_windows_test.go:87: AC#2' RESIDUAL OBSERVED, counted and NOT claimed closed: 10 of 400 attempts left the foreign witness with its body replaced, so that open still followed the flipped leaf name and truncated it before the re-check ran (first: witness body replaced after attempt 76 (size 44 of 44, content "raced private payload 342r1 windows ancestor")). The bytes were refused and the name was not removed; the truncation itself is this platform's named residual (ticket 322's Windows leaf leg + ticket 342).
+--- PASS: TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1 (0.66s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	2.419s
+FAIL

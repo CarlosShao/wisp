@@ -1,0 +1,26 @@
+TOTAL_LINES=5523
+UNION_COUNT=17
+ANCHOR1_HEAD=17
+ANCHOR2_HEAD_BARE=0
+ANYWHERE_SUBSTRING=26
+.scratch/wisp/probes/342/v2/sh/01-roster-two-anchors.sh: line 17: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+.scratch/wisp/probes/342/v2/sh/01-roster-two-anchors.sh: line 18: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+票 342 落地腿 342-r1 第 1 笔＝POSIX 落码第一枚＝新增 internal/winsec/pinned
+票 342 落地腿 342-r1 第 2 笔＝POSIX 落码第二枚＝新增另两枚平台侧形�
+票 342 落地腿 342-r1 第 3 笔＝两票的落点本体＝`internal/winsec/winsec.go` �
+票 342 落地腿 342-r1 第 4 笔＝常驻竞态钉的共享台面＝新增 `internal/win
+票 342 落地腿 342-r1 第 5 笔＝票 342 的常驻竞态钉＝新增 `internal/winsec/
+票 342 落地腿 342-r1 第 6 笔＝票 348 的常驻钉（两枚）＝新增 `internal/w
+票 342 落地腿 342-r1 第 7 笔＝帽序②Windows 半边落码＝`internal/winsec/pinn
+票 342 落地腿 342-r1 第 8 笔＝帽序②的 Windows 常驻钉台面＝新增 `intern
+票 342 落地腿 342-r1 第 9 笔＝Windows 那发截断支的常驻钉＝新增 `interna
+票 342 落地腿 342-r1 第 10 笔＝票 348 的 Windows 常驻钉＋★叶子残差的�
+票 342 落地腿 342-r1 第 11 笔＝Windows 仪器件的**两枚台面自抓修正**（�
+票 342 落地腿 342-r1 第 12 笔＝两票尾各**一条**只追加 bullet（帽前必�
+票 342 落地腿 342-r1 第 13 笔＝帽前必交件＝新增 `.scratch/wisp/probes/342/r
+票 342 落地腿 342-r1 第 14 笔＝Windows 那桶未归类读数的**归因结果＝仪
+票 342 落地腿 342-r1 第 15 笔＝读数与续点入库（三枚证据件，⛔ 产码
+票 342 落地腿 342-r1 第 16 笔＝两枚仪器自抓修正（★⛔ 产码字节、⛔
+票 342 落地腿 342-r1 第 17 笔＝去牙反控两发入库（票 342 AC#3 ⇄ 票 348 

@@ -1,0 +1,32 @@
+i01-treeB-shot1 RC=1 RUN=3 PASS_TOP=0 FAIL_TOP=3 SKIP=0
+AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link): target=rel attempts=1500 cycles=150 provedLinkCycles=150 pinnedWalkRefusals=22 pinnedParentBeforeOpen=0 refusedAfterOpen=22 truncated=0 deleted=72 narrowed=0 untouched=1428 enoentGaps=131 flipErrs=17
+AC#2 (ticket 348, deleted gate, relative ancestor link under the racer): target=rel attempts=1500 cycles=144 provedLinkCycles=144 pinnedWalkRefusals=32 pinnedParentBeforeOpen=0 refusedAfterOpen=32 truncated=0 deleted=86 narrowed=0 untouched=1414 enoentGaps=110 flipErrs=17
+-----
+i01-treeB-shot2 RC=1 RUN=3 PASS_TOP=0 FAIL_TOP=3 SKIP=0
+AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link): target=rel attempts=1500 cycles=147 provedLinkCycles=147 pinnedWalkRefusals=22 pinnedParentBeforeOpen=0 refusedAfterOpen=22 truncated=0 deleted=65 narrowed=0 untouched=1435 enoentGaps=116 flipErrs=21
+AC#2 (ticket 348, deleted gate, relative ancestor link under the racer): target=rel attempts=1500 cycles=131 provedLinkCycles=131 pinnedWalkRefusals=25 pinnedParentBeforeOpen=0 refusedAfterOpen=25 truncated=0 deleted=71 narrowed=0 untouched=1429 enoentGaps=120 flipErrs=15
+-----
+i01-treeB-shot3 RC=1 RUN=3 PASS_TOP=0 FAIL_TOP=3 SKIP=0
+AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link): target=rel attempts=1500 cycles=152 provedLinkCycles=152 pinnedWalkRefusals=21 pinnedParentBeforeOpen=0 refusedAfterOpen=21 truncated=0 deleted=66 narrowed=0 untouched=1434 enoentGaps=116 flipErrs=19
+AC#2 (ticket 348, deleted gate, relative ancestor link under the racer): target=rel attempts=1500 cycles=135 provedLinkCycles=135 pinnedWalkRefusals=22 pinnedParentBeforeOpen=0 refusedAfterOpen=22 truncated=0 deleted=73 narrowed=0 untouched=1427 enoentGaps=126 flipErrs=16
+-----
+i01-treeB-shot4 RC=1 RUN=3 PASS_TOP=0 FAIL_TOP=3 SKIP=0
+AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link): target=rel attempts=1500 cycles=137 provedLinkCycles=137 pinnedWalkRefusals=22 pinnedParentBeforeOpen=0 refusedAfterOpen=22 truncated=0 deleted=79 narrowed=0 untouched=1421 enoentGaps=119 flipErrs=18
+AC#2 (ticket 348, deleted gate, relative ancestor link under the racer): target=rel attempts=1500 cycles=138 provedLinkCycles=139 pinnedWalkRefusals=20 pinnedParentBeforeOpen=0 refusedAfterOpen=20 truncated=0 deleted=73 narrowed=0 untouched=1427 enoentGaps=117 flipErrs=11
+-----
+i01-treeL-shot1 RC=0 RUN=3 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link): target=rel attempts=1500 cycles=171 provedLinkCycles=171 pinnedWalkRefusals=42 pinnedParentBeforeOpen=25 refusedAfterOpen=17 truncated=0 deleted=0 narrowed=0 untouched=1500 enoentGaps=108 flipErrs=31
+AC#2 (ticket 348, deleted gate, relative ancestor link under the racer): target=rel attempts=1500 cycles=159 provedLinkCycles=159 pinnedWalkRefusals=28 pinnedParentBeforeOpen=22 refusedAfterOpen=6 truncated=0 deleted=0 narrowed=0 untouched=1500 enoentGaps=105 flipErrs=15
+-----
+i01-treeL-shot2 RC=0 RUN=3 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link): target=rel attempts=1500 cycles=158 provedLinkCycles=158 pinnedWalkRefusals=31 pinnedParentBeforeOpen=22 refusedAfterOpen=9 truncated=0 deleted=0 narrowed=0 untouched=1500 enoentGaps=105 flipErrs=25
+AC#2 (ticket 348, deleted gate, relative ancestor link under the racer): target=rel attempts=1500 cycles=152 provedLinkCycles=152 pinnedWalkRefusals=32 pinnedParentBeforeOpen=26 refusedAfterOpen=6 truncated=0 deleted=0 narrowed=0 untouched=1500 enoentGaps=103 flipErrs=14
+-----
+i01-treeL-shot3 RC=0 RUN=3 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link): target=rel attempts=1500 cycles=160 provedLinkCycles=160 pinnedWalkRefusals=27 pinnedParentBeforeOpen=14 refusedAfterOpen=13 truncated=0 deleted=0 narrowed=0 untouched=1500 enoentGaps=124 flipErrs=22
+AC#2 (ticket 348, deleted gate, relative ancestor link under the racer): target=rel attempts=1500 cycles=146 provedLinkCycles=147 pinnedWalkRefusals=43 pinnedParentBeforeOpen=25 refusedAfterOpen=18 truncated=0 deleted=0 narrowed=0 untouched=1500 enoentGaps=96 flipErrs=20
+-----
+i01-treeL-shot4 RC=0 RUN=3 PASS_TOP=3 FAIL_TOP=0 SKIP=0
+AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link): target=rel attempts=1500 cycles=169 provedLinkCycles=169 pinnedWalkRefusals=37 pinnedParentBeforeOpen=29 refusedAfterOpen=8 truncated=0 deleted=0 narrowed=0 untouched=1500 enoentGaps=101 flipErrs=17
+AC#2 (ticket 348, deleted gate, relative ancestor link under the racer): target=rel attempts=1500 cycles=156 provedLinkCycles=156 pinnedWalkRefusals=26 pinnedParentBeforeOpen=15 refusedAfterOpen=11 truncated=0 deleted=0 narrowed=0 untouched=1500 enoentGaps=110 flipErrs=30
+-----

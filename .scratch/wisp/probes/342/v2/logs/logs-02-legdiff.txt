@@ -1,0 +1,45 @@
+ROSTER_FIRST=6c010667f23052b3442aed1a2188dbda24449676
+ROSTER_LAST=9581a48c93405556ef0f3ec03c11e695ddfcfd6b
+ROSTER_LAST_SUBJECT=票 342 落地腿 342-r1 第 17 笔＝去牙反控两发入�
+PARENT_OF_FIRST=510a15190582933dc47c1c3f4077c89f318086f4
+PARENT_SUBJECT=票 349 终裁腿 349-v1·第 7 笔＝8 枚牙逐名对回落点表＋★�
+--- NAME-STATUS over PARENT..LAST ---
+NAMESTATUS_LINES=17
+M	.scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md
+M	.scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md
+A	.scratch/wisp/probes/342/r1/readings-windows.md
+A	.scratch/wisp/probes/342/r1/readings.md
+A	.scratch/wisp/probes/342/r1/report-blocked.md
+A	.scratch/wisp/probes/342/r1/teeth.md
+A	.scratch/wisp/probes/348/r1/readings.md
+A	internal/winsec/ancestoropen_342_unix_test.go
+A	internal/winsec/ancestoropen_342_windows_test.go
+A	internal/winsec/ancestorunlink_348_unix_test.go
+A	internal/winsec/ancestorunlink_348_windows_test.go
+A	internal/winsec/ancestorworld_342_348_unix_test.go
+A	internal/winsec/ancestorworld_342_348_windows_test.go
+A	internal/winsec/pinnedleaf_342_fallback.go
+A	internal/winsec/pinnedleaf_342_unix.go
+A	internal/winsec/pinnedleaf_342_windows.go
+M	internal/winsec/winsec.go
+--- per-commit name-only ⊆ check (17) ---
+PER_COMMIT_HEADS=17
+--- unique files touched across the leg ---
+UNIQUE_FILES=17
+UNIQUE_GO=10
+--- added vs modified .go ---
+GO_ADDED=9
+GO_MODIFIED=1
+internal/winsec/ancestoropen_342_unix_test.go
+internal/winsec/ancestoropen_342_windows_test.go
+internal/winsec/ancestorunlink_348_unix_test.go
+internal/winsec/ancestorunlink_348_windows_test.go
+internal/winsec/ancestorworld_342_348_unix_test.go
+internal/winsec/ancestorworld_342_348_windows_test.go
+internal/winsec/pinnedleaf_342_fallback.go
+internal/winsec/pinnedleaf_342_unix.go
+internal/winsec/pinnedleaf_342_windows.go
+---MOD---
+internal/winsec/winsec.go
+--- diffstat of the modified .go ---
+20	3	internal/winsec/winsec.go
