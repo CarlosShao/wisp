@@ -1,0 +1,23 @@
+票 349 落地腿 349-r1·AC#1 第③④枚＝provenance.go 两枚注释改准（只动注释行、可执行字节 0）
+
+两枚都先追一手（git log -S ＋逐提交 grep ＋"它当过定义吗"的反尺），⛔ 猜原本想指什么：
+
+枚③ taskScopeID（:54）＝自 73b60571（票 19 落 C25 那笔）起就只在注释行里出现，全仓⛔ 任何定义
+（func taskScopeID 历史 0 笔、introducing tree grep 0 定义）⇒ 它从来不是符号＝散文占位。盘上真身＝
+Detector(scopeID string)（provenance.go:858），⇒ 占位换成那枚方法自己的形参名 scopeID（包内 GREEN-bound）。
+
+枚④ disposalScope（:427）＝同一来路 73b60571、introducing tree 亦 0 定义。真身＝别包类型
+internal/plugin.DisposalScope（internal/plugin/disposal.go:129）＋其方法 Defer（:186）。按票面 AC#1
+"别包的要写全包路径"点名＝internal/plugin.DisposalScope；写成散文形 deferring this closure
+（⛔ 用 DisposalScope.Defer(...) 紧跟左括号那形＝会被调用形尺再算一枚 SB 命中、自造同族残留）。
+
+尺（逐枚现跑，读数进 logs/03）：
+- 两枚旧锚各现量 before=1→after=0、新锚 after=1；★枚④旧锚取行内连续串（`e.g.` 在 :426 行尾、
+  调用形在 :427 行首＝跨行不连续），⛔ 用绝对行号落刀
+- git diff -U0 本笔 ^[+-]＝2 换 2，逐枚以 // 开头；非注释变化行＝0；numstat 2/2
+- 剥注释三把尺 GS1／GS2／GB：起手 blob d634aae0 ⇄ 交件 blob 两侧同串（＋cmp）；provenance.go
+  工作副本是 CRLF（存量）而 blob 是 LF ⇒ 结构尺一律跑 blob 侧（⛔ 拿磁盘副本比不 tr \r 的 GB 尺）
+- 全文件最长行＝267（起手侧同值＝没新造长行）
+
+写面＝internal/risk/provenance.go 注释面＋.scratch/wisp/probes/349/r1/**（本笔）。
+⛔ push、⛔ 翻任何 AC 框、⛔ 改票名／Status／加 -done；⛔ internal/winsec。

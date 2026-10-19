@@ -51,7 +51,7 @@ import (
 //
 // Wiring to the assessor: the frozen C19 seam is TaintDetector.TaintHit(params)
 // — it carries no tool name — so callers bind it per scope:
-// assessor.WithTaintDetector(prov.Detector(taskScopeID)) yields the
+// assessor.WithTaintDetector(prov.Detector(scopeID)) yields the
 // conservative shape-based verdict; loop code that knows the tool name should
 // prefer Inspect()/CheckText() directly (wiring lands with tickets 20/21/22/26).
 //
@@ -424,7 +424,7 @@ func (s *Scope) ID() string {
 // never double-drops, the second call just reports ErrScopeAlreadyClosed.
 //
 // Wire it on the boundary that owns the task lifetime, e.g.
-// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
+// the task's internal/plugin.DisposalScope deferring this closure — the handle, not the id,
 // is what the deferred closure carries.
 func (s *Scope) Close() error {
 	if s == nil || s.p == nil {
