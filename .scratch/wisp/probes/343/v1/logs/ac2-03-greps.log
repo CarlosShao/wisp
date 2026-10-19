@@ -1,0 +1,6 @@
+== 10. git grep -c 'func aEquiv' HEAD -- internal/risk (expect 0 hits) ==
+== 11. git grep -n aEquiv HEAD -- internal/risk (delivery side, expect 0 hits) ==
+-- positive control for the same grep shape: aEq ==
+HEAD:internal/risk/blacklist.go:7
+== 12. start-side control: aEquiv DID exist at 29d258f9 ==
+29d258f9:internal/risk/blacklist.go:193:// provably expanded fails CLOSED (aEquiv / aUnder report such a miss as a

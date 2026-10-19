@@ -1,0 +1,7 @@
+START GAUGE 1b — `git status --porcelain -- internal/risk` at 343-v1 start (343-v1, ran it myself)
+command (verbatim): git status --porcelain -- internal/risk   (run in repo root, branch dev)
+result: EMPTY OUTPUT = 0 lines  => working tree of internal/risk clean; 343-r1 delivered, write lane silent.
+The raw redirect kept at D:\tmp\wisp\20261019\343v1\logs\02-status-risk.txt is itself 0 bytes (= the proof of 0 lines).
+This file exists so my tracked evidence roster carries no 0-byte member (dispatch hygiene rule: every evidence file non-0 bytes).
+Positive control that the same gauge shape CAN produce non-empty output (so "0 lines" is a reading, not a broken gauge):
+  start-02b-status-repo-wide.log = the identical gauge widened to the whole repo, run in the same moment.

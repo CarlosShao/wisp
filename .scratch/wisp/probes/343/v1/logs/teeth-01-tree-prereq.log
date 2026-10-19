@@ -1,0 +1,52 @@
+== manual pieces presence (working tree, untracked) ==
+EXISTS build files=156
+EXISTS third_party/sherpa-onnx files=4
+EXISTS frontend/dist files=4
+EXISTS docs files=687
+EXISTS scripts files=38
+EXISTS models files=2
+EXISTS internal files=646
+EXISTS cmd files=144
+EXISTS tools files=26
+EXISTS go.mod files=1
+EXISTS go.sum files=1
+== dll files ==
+build/33p1-receipt.exe
+build/33p1-reentry.exe
+build/33p1q1.exe
+build/33p1q2.exe
+build/33p1q3.exe
+build/SHA256SUMS
+build/balldebug.exe
+build/leak.json
+build/models/manifest.json
+build/models/manifest.json.minisig
+build/onnxruntime.dll
+build/settle.json
+build/sherpa-onnx-c-api.dll
+build/sherpa-onnx-cxx-api.dll
+build/slo/slo-no-conclusion.json
+build/sloprobe.exe
+build/w228run/stderr.txt
+build/w228run/stdout.txt
+build/wisp-2026-10-07-1157.exe
+build/wisp-296.exe
+build/wisp.exe
+build/wisp228.exe
+build/wisp77.exe
+build/wisp77_partial.exe
+third_party/sherpa-onnx/.cache-manifest.json
+third_party/sherpa-onnx/onnxruntime.dll
+third_party/sherpa-onnx/sherpa-onnx-c-api.dll
+third_party/sherpa-onnx/sherpa-onnx-cxx-api.dll
+== check-ignore ==
+.gitignore:14:build/	build
+.gitignore:12:third_party/	third_party/sherpa-onnx
+== go/ast availability for AC#0 third gauge ==
+go version go1.27.1 windows/amd64
+== 336 teeth test files present in HEAD? ==
+2
+internal/risk/anchor_fallback_teeth_336_other_test.go
+internal/risk/anchor_fallback_teeth_336_windows_test.go
+== risk package file roster in HEAD ==
+49

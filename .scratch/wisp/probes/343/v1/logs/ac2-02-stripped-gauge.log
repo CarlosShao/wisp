@@ -1,0 +1,30 @@
+== 3. stripped (executable-only) sha256 BOTH SIDES ==
+b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 */d/tmp/wisp/20261019/343v1/ac2/exe-start.txt
+b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 */d/tmp/wisp/20261019/343v1/ac2/exe-head.txt
+== 4. stripped line counts (orchestrator claimed 232 each) ==
+  232 /d/tmp/wisp/20261019/343v1/ac2/exe-start.txt
+  232 /d/tmp/wisp/20261019/343v1/ac2/exe-head.txt
+  464 total
+== 5. cmp (0 = identical) ==
+CMP=IDENTICAL
+== 6. byte counts of the two stripped files ==
+ 6396 /d/tmp/wisp/20261019/343v1/ac2/exe-start.txt
+ 6396 /d/tmp/wisp/20261019/343v1/ac2/exe-head.txt
+12792 total
+== 7. symdiff of stripped sides (must be empty) ==
+DIFF=EMPTY
+== 8. second, independently-shaped stripped gauge: delete whole //-lines then strip inline ==
+-- start --
+b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 *-
+-- head --
+b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 *-
+== 9. what actually differs in the raw blobs (proof: only one comment line) ==
+193,194c193,197
+< // provably expanded fails CLOSED (aEquiv / aUnder report such a miss as a
+< // hit) instead of quietly dropping a path from A into B.
+---
+> // provably expanded fails CLOSED: aEq / aUnder delegate to aRelates, which
+> // reports such a miss as a hit when anchorMatches found nothing AND
+> // uncertainAnchorMiss held, instead of quietly dropping a path from A into B.
+> // anchorMatches on its own does not do that - ticket 334 needs the two apart
+> // because aRuleReason has to say which of them produced the verdict.

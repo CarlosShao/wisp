@@ -1,0 +1,14 @@
+== 台件本体逐字取回（⛔ 改一字，我从盘上原样用） ==
+454da3ee5feabf39cb63ef1bea95178e8ea2c432
+7346a690fca9c94b2de6a90ecf31d53ec20f6b00b01497bb6be34b4dfa32d6ed *.scratch/wisp/probes/336/v1/sh/run-ac2-sweep.sh
+  88 5518 .scratch/wisp/probes/336/v1/sh/run-ac2-sweep.sh
+== 台件的 env 契约（它认哪些变量／默认落点） ==
+5:# three pre-existing instruments, then restore. Judge-run; own tree, own GOTMPDIR.
+12:TREE="${TREE:?exported tree root}"
+14:GOTMPROOT="${GOTMPROOT:?D-volume gotmp root}"
+15:F="$TREE/internal/risk/blacklist.go"
+17:export GOPATH='D:\work\base\gopath'
+18:export PATH="$TREE/third_party/sherpa-onnx:$TREE/build:$PATH"
+29:  local gt="$GOTMPROOT/$2"; mkdir -p "$gt" || { echo "  mkdir_gotmp_rc=NONZERO"; return 1; }
+30:  ( cd "$TREE" && GOTMPDIR="$gt" go test ./internal/risk/ -run "$1" -count=1 -timeout 30m -v ) > "$LOGDIR/$2" 2>&1
+51:echo "### AC#2 sweep: anchor=$ANCHOR pristine=$PRISTINE tree=$TREE"

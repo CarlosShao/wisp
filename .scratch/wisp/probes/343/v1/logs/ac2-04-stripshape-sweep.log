@@ -1,0 +1,23 @@
+== variant sweep: does any shape give 265 lines / 97796acc ? ==
+sed: -e expression #1, char 5: unknown command: `/'
+sed: -e expression #1, char 5: unknown command: `/'
+sed: -e expression #1, char 5: unknown command: `/'
+sed: -e expression #1, char 5: unknown command: `/'
+v1     lines=0/0 shaA=e3b0c442 shaB=e3b0c442 full=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 EQ=SAME
+v2     lines=404/407 shaA=8da74ec8 shaB=b1ba5fc6 full=8da74ec8957105f7ef4a575a45b79f50f0de97f593f8152072c34046fee8c490 EQ=DIFF
+v3     lines=0/0 shaA=9de81d0d shaB=9de81d0d full=9de81d0d20c9420a1d590f53cbf010388aadcbb5e1d9df099b072f74b839d07e EQ=SAME
+sed: -e expression #1, char 5: unknown command: `/'
+sed: -e expression #1, char 5: unknown command: `/'
+sed: -e expression #1, char 5: unknown command: `/'
+sed: -e expression #1, char 5: unknown command: `/'
+v4     lines=0/0 shaA=e3b0c442 shaB=e3b0c442 full=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 EQ=SAME
+v5     lines=232/232 shaA=1efd7ee0 shaB=1efd7ee0 full=1efd7ee0d2f03486aa4fe765e16ba9ce13a2fd50599a96c3f336ee246db60608 EQ=SAME
+v6     lines=404/407 shaA=82cc2bb1 shaB=9b570ce4 full=82cc2bb13166a1b07dbb53d58bf49841755de827c34cd631004d322a0aed68f1 EQ=DIFF
+v7     lines=232/232 shaA=1efd7ee0 shaB=1efd7ee0 full=1efd7ee0d2f03486aa4fe765e16ba9ce13a2fd50599a96c3f336ee246db60608 EQ=SAME
+v8     lines=265/265 shaA=97796acc shaB=97796acc full=97796acc2690b59e6d9bf5857768377d6948ba560e992b884a93d4500b379bd3 EQ=SAME
+v9     lines=232/232 shaA=82975537 shaB=82975537 full=829755370bfd87e457e767f7e1220f060e249fe9873121d0698abf02203d7ae5 EQ=SAME
+v10    lines=232/232 shaA=b1610acf shaB=b1610acf full=b1610acfcfb84851dd53a47c1230026d2b9a28415e1968a16b167a9a29924908 EQ=SAME
+== also: raw file line counts for reference ==
+  404 /d/tmp/wisp/20261019/343v1/ac2/raw-start.go
+  407 /d/tmp/wisp/20261019/343v1/ac2/raw-head.go
+  811 total

@@ -1,0 +1,12 @@
+== 0. full blob hashes (start / head) ==
+c1799cd24afce19e6accef23db23a7d7ee746dec
+62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+== 1. raw sha256 (different expected: comment line changed) ==
+bc00f4eab8617b96b1bfb83ada903d6df16058de3f010f19d7c10f843314aad1 */d/tmp/wisp/20261019/343v1/ac2/raw-start.go
+8fc54f75a60fab5f4759eeea945585a20c13b2b8f46276aae50b8165911ab7ea */d/tmp/wisp/20261019/343v1/ac2/raw-head.go
+== 2. raw line counts / byte counts / CR count ==
+  404 16819 /d/tmp/wisp/20261019/343v1/ac2/raw-start.go
+  407 17058 /d/tmp/wisp/20261019/343v1/ac2/raw-head.go
+  811 33877 total
+CR_start=0
+CR_head=0

@@ -1,0 +1,22 @@
+== build treeBase (29d258f9) ==
+BUILT_OK_treeBase
+== build treeDel (31d4a476) ==
+BUILT_OK_treeDel
+== non-empty proofs ==
+treeBase go_files=766
+treeBase dlls=6
+treeBase docs_PLAN=yes
+treeBase blacklist_blob=c1799cd24afce19e6accef23db23a7d7ee746dec
+treeBase frontend_dist=4
+treeDel go_files=766
+treeDel dlls=6
+treeDel docs_PLAN=yes
+treeDel blacklist_blob=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+treeDel frontend_dist=4
+== expected: treeBase blob = c1799cd2… ; treeDel blob = 62f2dddb… ==
+== cd form test (D:/... forward slash in git-bash) ==
+/d/tmp/wisp/20261019/343v1/treeDel
+internal/risk
+CD_FORM_OK
+/d/tmp/wisp/20261019/343v1/treeDel
+CD_DRIVEFORM_OK
