@@ -1,0 +1,343 @@
+package main
+
+// 343-v1 AC#0 third gauge + AC#3 false-positive remeasurement.
+//
+// Three shapes over the COMMENT text of one package:
+//   SA  = camel-ish identifier (lowercase-initial with an uppercase later)   [the ticket's own shape]
+//   SB  = any identifier immediately followed by "(" (asserts "callable")
+//   SW  = the bounded wordlist ^a[A-Z]... only (the leg's proposed cheap gate)
+// plus BEXCL = the call-shape hits that are Go builtins/keywords (pure noise class,
+// reported separately so the AC#3 misfire surface is auditable).
+//
+// A candidate is RED when the name has no definition in the scanned package.
+// RED is then split by a second, repo-wide definition roster:
+//   RED@elsewhere  = the name IS defined in another package (a package-scoped gate
+//                    would misfire on it: prose / foreign API / other package's symbol)
+//   RED@nowhere    = no definition anywhere in the repo (true family member,
+//                    subject to human read of what the comment asserts)
+// READ-ONLY. Prints to stdout. Writes nothing.
+import (
+	"flag"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strings"
+)
+
+var camelRe = regexp.MustCompile(`\b[a-z][a-z0-9_]*[A-Z][A-Za-z0-9_]*\b`)
+// SB = strict adjacency: "foo(" with no space (the leg's stated shape B).
+// SBL = loose: "foo (" or "foo (" i.e. optional space before "(" — this is where
+// prose like "the candidate (raw)" gets read as a call, and it is the reason a
+// call-shape gate's noise depends on the tokenizer, not on the language.
+var callRe = regexp.MustCompile(`\b([A-Za-z_][A-Za-z0-9_]*)\(`)
+var callLooseRe = regexp.MustCompile(`\b([A-Za-z_][A-Za-z0-9_]*)\s+\(`)
+var wordRe = regexp.MustCompile(`\b(a[A-Z][A-Za-z0-9_]*)\b`)
+
+var builtins = set("append cap close complex copy delete imag len make new panic print println real recover min max clear")
+var keywords = set("break case chan const continue default defer else fallthrough for func go goto if import interface map package range return select struct switch type var true false nil iota")
+var predecl = set("string error bool int int8 int16 int32 int64 uint uint8 uint16 uint32 uint64 uintptr byte rune any comparable")
+
+func set(s string) map[string]bool {
+	m := map[string]bool{}
+	for _, w := range strings.Fields(s) {
+		m[w] = true
+	}
+	return m
+}
+
+type nameInfo struct {
+	cat  string // func / method / type / const / var / param / field / local ...
+	where string // first file that defines it
+}
+
+func walkGo(roots []string) []string {
+	var out []string
+	for _, root := range roots {
+		filepath.Walk(root, func(p string, info os.FileInfo, err error) error {
+			if err != nil || info.IsDir() {
+				return nil
+			}
+			if strings.HasSuffix(p, ".go") && !strings.Contains(p, string(filepath.Separator)+".git"+string(filepath.Separator)) {
+				out = append(out, p)
+			}
+			return nil
+		})
+	}
+	sort.Strings(out)
+	return out
+}
+
+var _ = filepath.Separator
+
+func collect(fset *token.FileSet, files []string, rosters ...map[string]nameInfo) ([]*ast.File, []string) {
+	var parsed []*ast.File
+	var paths []string
+	for _, f := range files {
+		file, err := parser.ParseFile(fset, f, nil, parser.ParseComments)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "PARSE_FAIL %s: %v\n", f, err)
+			continue
+		}
+		parsed = append(parsed, file)
+		paths = append(paths, filepath.ToSlash(f))
+		for _, m := range rosters {
+			addFile(m, file, filepath.ToSlash(f))
+		}
+	}
+	return parsed, paths
+}
+
+func addFile(m map[string]nameInfo, file *ast.File, path string) {
+	put := func(n, cat string) {
+		if n == "" || n == "_" {
+			return
+		}
+		if _, ok := m[n]; !ok {
+			m[n] = nameInfo{cat: cat, where: path}
+		}
+	}
+	for _, d := range file.Decls {
+		switch x := d.(type) {
+		case *ast.FuncDecl:
+			if x.Recv != nil && len(x.Recv.List) > 0 {
+				put(x.Name.Name, "method("+recv(x)+")")
+			} else {
+				put(x.Name.Name, "func")
+			}
+			if x.Type.Params != nil {
+				for _, p := range x.Type.Params.List {
+					for _, n := range p.Names {
+						put(n.Name, "param")
+					}
+				}
+			}
+			if x.Type.Results != nil {
+				for _, p := range x.Type.Results.List {
+					for _, n := range p.Names {
+						put(n.Name, "result")
+					}
+				}
+			}
+		case *ast.GenDecl:
+			for _, sp := range x.Specs {
+				switch s := sp.(type) {
+				case *ast.TypeSpec:
+					put(s.Name.Name, "type")
+					if st, ok := s.Type.(*ast.StructType); ok {
+						for _, fl := range st.Fields.List {
+							for _, n := range fl.Names {
+								put(n.Name, "field")
+							}
+						}
+					}
+					if it, ok := s.Type.(*ast.InterfaceType); ok {
+						for _, fl := range it.Methods.List {
+							for _, n := range fl.Names {
+								put(n.Name, "method(iface)")
+							}
+						}
+					}
+				case *ast.ValueSpec:
+					c := strings.ToLower(x.Tok.String())
+					for _, n := range s.Names {
+						put(n.Name, c)
+					}
+				}
+			}
+		}
+	}
+	ast.Inspect(file, func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.AssignStmt:
+			if x.Tok == token.DEFINE {
+				for _, l := range x.Lhs {
+					if id, ok := l.(*ast.Ident); ok {
+						put(id.Name, "local")
+					}
+				}
+			}
+		case *ast.RangeStmt:
+			if x.Tok == token.DEFINE {
+				for _, e := range []ast.Expr{x.Key, x.Value} {
+					if id, ok := e.(*ast.Ident); ok {
+						put(id.Name, "rangevar")
+					}
+				}
+			}
+		case *ast.DeclStmt:
+			if gd, ok := x.Decl.(*ast.GenDecl); ok {
+				for _, sp := range gd.Specs {
+					if vs, ok2 := sp.(*ast.ValueSpec); ok2 {
+						for _, n2 := range vs.Names {
+							put(n2.Name, "local-"+strings.ToLower(gd.Tok.String()))
+						}
+					}
+				}
+			}
+		case *ast.FuncLit:
+			if x.Type != nil && x.Type.Params != nil {
+				for _, p := range x.Type.Params.List {
+					for _, n2 := range p.Names {
+						put(n2.Name, "param")
+					}
+				}
+			}
+		}
+		return true
+	})
+}
+
+func recv(f *ast.FuncDecl) string {
+	t := f.Recv.List[0].Type
+	if sx, ok := t.(*ast.StarExpr); ok {
+		t = sx.X
+	}
+	if id, ok := t.(*ast.Ident); ok {
+		return id.Name
+	}
+	return "?"
+}
+
+type cand struct {
+	shape, name, verdict, cat, where, file string
+	line                                   int
+}
+
+func main() {
+	pkgDir := flag.String("pkg", "internal/risk", "package dir whose comments get scanned")
+	rootsCSV := flag.String("roots", "internal,cmd,tools", "repo-wide definition roots")
+	only := flag.String("file", "", "restrict comment scan to this basename (e.g. blacklist.go)")
+	flag.Parse()
+
+	fset := token.NewFileSet()
+	pkgFiles := walkGo([]string{*pkgDir})
+	repoFiles := walkGo(strings.Split(*rootsCSV, ","))
+
+	pkgR := map[string]nameInfo{}
+	repoR := map[string]nameInfo{}
+	parsed, pkgPaths := collect(fset, pkgFiles, pkgR)
+	collect(fset, repoFiles, repoR)
+	// every package name is by definition also a repo name
+	for k, v := range pkgR {
+		if _, ok := repoR[k]; !ok {
+			repoR[k] = v
+		}
+	}
+
+	var out []cand
+	seen := map[string]bool{}
+	add := func(shape, name string, pos token.Position, file string) {
+		key := shape + "|" + name + "|" + file + "|" + fmt.Sprint(pos.Line)
+		if seen[key] {
+			return
+		}
+		seen[key] = true
+		v := "RED-nowhere"
+		cat, where := "", ""
+		if d, ok := pkgR[name]; ok {
+			v = "IN-PKG"
+			cat, where = d.cat, d.where
+		} else if d, ok := repoR[name]; ok {
+			v = "RED-elsewhere"
+			cat, where = d.cat, d.where
+		}
+		out = append(out, cand{shape: shape, name: name, verdict: v, cat: cat, where: where, file: filepath.Base(file), line: pos.Line})
+	}
+
+	for i, file := range parsed {
+		path := pkgPaths[i]
+		if *only != "" && filepath.Base(path) != *only {
+			continue
+		}
+		for _, cg := range file.Comments {
+			for _, c := range cg.List {
+				pos := fset.Position(c.Pos())
+				text := c.Text
+				for _, m := range camelRe.FindAllString(text, -1) {
+					add("SA", m, pos, path)
+				}
+				for _, mm := range callRe.FindAllStringSubmatch(text, -1) {
+					nm := mm[1]
+					if builtins[nm] || keywords[nm] || predecl[nm] {
+						key := "BEXCL|" + nm + "|" + path + "|" + fmt.Sprint(pos.Line)
+						if !seen[key] {
+							seen[key] = true
+							out = append(out, cand{shape: "BEXCL", name: nm, verdict: "builtin-or-keyword", file: filepath.Base(path), line: pos.Line})
+						}
+						continue
+					}
+					add("SB", nm, pos, path)
+				}
+				// SBL = the LOOSE call shape (space before the paren). Reported only when the
+				// strict shape did not already flag this name on this line, so the two are
+				// additive and auditable: SBL rows are the tokenizer-noise class.
+				for _, mm := range callLooseRe.FindAllStringSubmatch(text, -1) {
+					nm := mm[1]
+					if seen["SB|"+nm+"|"+fmt.Sprint(pos.Line)] || seen["BEXCL|"+nm+"|"+path+"|"+fmt.Sprint(pos.Line)] {
+						continue
+					}
+					if builtins[nm] || keywords[nm] || predecl[nm] {
+						continue
+					}
+					add("SBL", nm, pos, path)
+				}
+				for _, m := range wordRe.FindAllString(text, -1) {
+					add("SW", m, pos, path)
+				}
+			}
+		}
+	}
+
+	sort.SliceStable(out, func(a, b int) bool {
+		if out[a].shape != out[b].shape {
+			return out[a].shape < out[b].shape
+		}
+		if out[a].file != out[b].file {
+			return out[a].file < out[b].file
+		}
+		if out[a].line != out[b].line {
+			return out[a].line < out[b].line
+		}
+		return out[a].name < out[b].name
+	})
+	fmt.Printf("# pkg=%s pkgfiles=%d repofiles=%d pkgRoster=%d repoRoster=%d only=%q\n",
+		*pkgDir, len(pkgFiles), len(repoFiles), len(pkgR), len(repoR), *only)
+	for _, c := range out {
+		fmt.Printf("%-5s %-24s %-14s %-16s %-58s %s:%d\n", c.shape, c.name, c.verdict, c.cat, c.where, c.file, c.line)
+	}
+	fmt.Println("# --- counters ---")
+	count := func(shape string) {
+		tot, redElse, redNow, inpkg := 0, 0, 0, 0
+		for _, c := range out {
+			if c.shape != shape {
+				continue
+			}
+			tot++
+			switch c.verdict {
+			case "RED-elsewhere":
+				redElse++
+			case "RED-nowhere":
+				redNow++
+			case "IN-PKG":
+				inpkg++
+			}
+		}
+		fmt.Printf("shape=%-5s TOTAL=%d IN-PKG=%d RED-elsewhere=%d RED-nowhere=%d (RED all=%d)\n",
+			shape, tot, inpkg, redElse, redNow, redElse+redNow)
+	}
+	for _, s := range []string{"SA", "SB", "SBL", "SW", "BEXCL"} {
+		count(s)
+	}
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}

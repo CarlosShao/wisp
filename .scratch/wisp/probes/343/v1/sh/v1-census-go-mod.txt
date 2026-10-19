@@ -1,0 +1,3 @@
+module census343v1
+
+go 1.24
