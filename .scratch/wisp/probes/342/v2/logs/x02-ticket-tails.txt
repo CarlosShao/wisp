@@ -1,0 +1,21 @@
+BEFORE .scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md LINES=61 BYTES=30480 SHA16=01e0752b723789d2
+  last_byte=\n
+BEFORE .scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md LINES=47 BYTES=14553 SHA16=b76686ee2992c320
+  last_byte=\n
+BEFORE T342 x=1 open=6
+BEFORE T348 x=0 open=7
+AFTER .scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md LINES=64 BYTES=39250
+AFTER .scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md LINES=50 BYTES=22028
+### 纯追加证明（尺＝git diff --numstat；删除列须=0）
+3	0	.scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md
+3	0	.scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md
+DELETED_LINES_TOTAL=0
+### 逐字未动的旧行（前 61/47 行 before⇄after 全同＝diff 里只该有 + 行）
+0
+AFTER T342 x=1 open=6
+AFTER T348 x=0 open=7
+### 票名/Status 未动（第一行＋Status 行 before⇄after 同串）
+# 342 — `privateFile` 那次 open 的**祖先那一支**今天两支平台都开着（POSIX 只护最后一枚组件；Windows 连 `O_NOFOLLOW` 都没有）＝票 322 按边界留下、本仓⛔ 主人的一支
+- Status: **已立，未派**（2026-10-18 13:5x 编排者�
+# 348 — 拒绝路径那句 `_ = os.Remove(resolved)` 自己**沿祖先链接删掉树外对象**＝票 342 的截断之外**第二枚损伤形状**（甲／乙两形都⛔ 防它）
+- Status: **已立，未派**（2026-10-18 23:3x 编排者�

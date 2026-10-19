@@ -1,0 +1,5 @@
+.scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md HEAD_HITS=1 WORKTREE_HITS=1 MY_ADDED_LINES_HITS=0
+.scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md HEAD_HITS=0 WORKTREE_HITS=0 MY_ADDED_LINES_HITS=0
+MY_BULLETS_HITS: 342=0 348=0
+VERDICTS_HITS: 342=0 348=0
+POSITIVE_CONTROL HANDOVER=199
