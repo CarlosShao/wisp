@@ -1,0 +1,5 @@
+FAIL	github.com/CarlosShao/wisp/internal/winsec [build failed]
+# github.com/CarlosShao/wisp/internal/winsec [github.com/CarlosShao/wisp/internal/winsec.test]
+internal\winsec\v342v1win_test.go:189:9: undefined: v342v1Attempts
+internal\winsec\v342v1win_test.go:414:12: undefined: v342v1WMklinkJ
+FAIL

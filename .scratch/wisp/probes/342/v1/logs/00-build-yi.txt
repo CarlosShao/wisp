@@ -1,0 +1,9 @@
+== pre-cut ==
+old-anchor hits = 1 (want 1)
+pristine-sha winsec.go = 41ba9a9b8fcf705023a8b5a29e0e6c8f3e1fbfd0d096eb98354a934960b7b94d
+== post-cut ==
+old-anchor after cut = 0 (want 0) ; new-anchor = 1 (want 1)
+mutated-sha winsec.go = 3c786d1df368b26c848b6feddc0ef6013ff47dd3283324a0614766191d4b808a
+b4252ee31f1541ad9cd1b5ff44f652ddccd3c6ce7a2337a8faf6204b3f001de6 */d/tmp/wisp/20261018/342v1/mut-yi/internal/winsec/v342v1landing_linux.go
+f128da3ac8428c92402b387c29ebf60587d075bce9afb40841f1e65cbb6f56b6 */d/tmp/wisp/20261018/342v1/mut-yi/internal/winsec/v342v1race_test.go
+BUILD-OK yi

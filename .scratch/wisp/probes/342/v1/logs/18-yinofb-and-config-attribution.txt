@@ -1,0 +1,44 @@
+RAW=/d/tmp/wisp/20261018/342v1/logs/17-colorB-col-yinofb.log
+RECOMPUTED: RUN=71 PASS_TOP=39 FAIL_TOP=4 SKIP=0
+--- top-level red names (verbatim, 4 expected):
+--- FAIL: TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1
+--- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+--- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3
+--- FAIL: TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3
+
+--- per-test verbatim RED sentences:
+===== TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1
+    openleaf_322_other_test.go:192: AC#1 paired reading on one screen: attempts=3000 flips=562 flipErrs=0 damagedWitnesses=0 leafLegRefusals=0 foreignsNarrowed=0 foreignsHoldingPayload=0
+    openleaf_322_other_test.go:196: AC#1' leg that answered = placement floor before the act (platformVerifyPlacement) : 2691 attempts
+    openleaf_322_other_test.go:196: AC#1' leg that answered = some other failure : 309 attempts
+    openleaf_322_other_test.go:206: AC#1 RED instrument: across 3000 raced attempts the leaf leg ("too many levels of symbolic links") answered 0 and the racer landed 562 flips (0 errors, first ""), so the damaged count above is not evidence about a window that was never reached
+===== TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (open /tmp/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern1573692285/001/blob-322r1.bin: v342v1 mis-shape on the pinned parent: file exists), which breaks storing the same id twice replaces the blob in place
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "secret-value-one, longer than the replacement" (err <nil>), want "secret-value-two" - storing the same id twice replaces the blob in place
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (open /tmp/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern3650568476/001/config-backup-322r1.toml: v342v1 mis-shape on the pinned parent: file exists), which breaks this call is the repair path for a wide backup left by an older build
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "a wide backup left by an older build, longer than the replacement" (err <nil>), want "narrow" - this call is the repair path for a wide backup left by an older build
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (open /tmp/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern1830272980/001/wisp-secrets-322r1.toml.tmp: v342v1 mis-shape on the pinned parent: file exists), which breaks a pre-rename temp left by a crash is overwritten, not refused
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "tmp body from the run that crashed" (err <nil>), want "tmp body from this run" - a pre-rename temp left by a crash is overwritten, not refused
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (open /tmp/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern3184969850/001/artifact-322r1.bin.retry: v342v1 mis-shape on the pinned parent: file exists), which breaks a leftover .retry temp is overwritten (D31 last-writer-wins)
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "first spill that needed a retry" (err <nil>), want "retry spill bytes" - a leftover .retry temp is overwritten (D31 last-writer-wins)
+===== TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject120r3
+    sealhandle_privateroute_120_other_test.go:83: AC#1' private-file-route-name-carries-another-real-object: leg that spoke = some other failure
+    sealhandle_privateroute_120_other_test.go:83: AC#1 RED private-file-route-name-carries-another-real-object: the refusal does not carry ErrNotSealable: open /tmp/TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject12757160572/001/caller-object-120r3.bin: v342v1 mis-shape on the pinned parent: file exists
+    sealhandle_privateroute_120_other_test.go:83: AC#1 RED private-file-route-name-carries-another-real-object: the refusal does not carry ErrUnresolvedPath: open /tmp/TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject12757160572/001/caller-object-120r3.bin: v342v1 mis-shape on the pinned parent: file exists
+    sealhandle_privateroute_120_other_test.go:83: AC#1 RED private-file-route-name-carries-another-real-object: refusal came from some other failure, want the leg carrying "this descriptor is not the object the name carries now, so the bytes would not land in what was just sealed"; verbatim: open /tmp/TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject12757160572/001/caller-object-120r3.bin: v342v1 mis-shape on the pinned parent: file exists
+    sealhandle_privateroute_120_other_test.go:85: AC#1 RED: the refused write left the name carrying a file, want it unlinked; err=open /tmp/TestAC1POSIXPrivateFileRefusesWhenNameCarriesAnotherRealObject12757160572/001/caller-object-120r3.bin: v342v1 mis-shape on the pinned parent: file exists
+    sealhandle_privateroute_120_other_test.go:87: AC#1' tree after the refusal: 3 readable entries, none carrying the payload
+===== TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal120r3
+    sealhandle_privateroute_120_other_test.go:110: AC#1' private-file-route-name-becomes-a-sibling-link: leg that spoke = some other failure
+    sealhandle_privateroute_120_other_test.go:110: AC#1 RED private-file-route-name-becomes-a-sibling-link: the refusal does not carry ErrNotSealable: open /tmp/TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal956939131/001/caller-object-120r3.bin: v342v1 mis-shape on the pinned parent: file exists
+    sealhandle_privateroute_120_other_test.go:110: AC#1 RED private-file-route-name-becomes-a-sibling-link: the refusal does not carry ErrUnresolvedPath: open /tmp/TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal956939131/001/caller-object-120r3.bin: v342v1 mis-shape on the pinned parent: file exists
+    sealhandle_privateroute_120_other_test.go:110: AC#1 RED private-file-route-name-becomes-a-sibling-link: refusal came from some other failure, want the leg carrying "the name carries a link, so this descriptor is not the object the caller named"; verbatim: open /tmp/TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal956939131/001/caller-object-120r3.bin: v342v1 mis-shape on the pinned parent: file exists
+    sealhandle_privateroute_120_other_test.go:120: AC#1 RED: the refused write left the name carrying a file, want the link unlinked; err=open /tmp/TestAC1POSIXPrivateFileRefusesWhenNameBecomesLinkAfterPinnedSeal956939131/001/caller-object-120r3.bin: v342v1 mis-shape on the pinned parent: file exists
+    sealhandle_privateroute_120_other_test.go:122: AC#1' tree after the refusal: 2 readable entries, none carrying the payload
+
+===== baseline contrast: top-level FAIL count on the SAME container config, pristine treeC:
+0
+===== A-config (this leg's mistake) baseline treeC reds, kept so the attribution is checkable:
+--- FAIL: TestAC1POSIXSealHandleNameCarriesAnotherRealObject120r3
+--- FAIL: TestPOSIX120SealWindowAncestorRelativeLinkIsClosed
+A-config four numbers were RUN=71 PASS_TOP=41 FAIL_TOP=2 SKIP=0 (13-color-treeC.log, two invocations: 2 and 3 reds); B-config (matched to the leg's driver env, no GOTMPDIR bind) is 71/43/0/0 three times.

@@ -1,0 +1,17 @@
+=== RUN   TestV342v1PosixLandedProductionRow
+=== RUN   TestV342v1PosixLandedProductionRow/VPROD-LANDED
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED: attempts=1500 flips=269 flipErrs=20 damage=50 truncated=0 deleted=50 firstFlipErr=remove /tmp/TestV342v1PosixLandedProductionRowVPROD-LANDED2894878790/001/root/data/sub: directory not empty
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED leg=other:winsec: cannot apply a private security descriptor: /tmp/Tes/deleted : 15
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED leg=other:winsec: cannot apply a private security descriptor: /tmp/Tes/body : 21
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED leg=pinrefuse/deleted : 1
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED leg=enoent/deleted : 34
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED leg=floor/body : 1128
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED leg=enoent/body : 108
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED leg=ok/body : 193
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED damageRow i=0 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixLandedProductionRowVPROD-LANDED2894878790/001/root/data/sub/blob.bin: openat sub: no such file or directory kind=deleted size=-1
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED damageRow i=34 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixLandedProductionRowVPROD-LANDED2894878790/001/root/data/sub/blob.bin: openat sub: no such file or directory kind=deleted size=-1
+    v342v1landed_test.go:17: V342V1 VPROD-LANDED damageRow i=117 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixLandedProductionRowVPROD-LANDED2894878790/001/root/data/sub/blob.bin: statat blob.bin: no such file or directory kind=deleted size=-1
+--- PASS: TestV342v1PosixLandedProductionRow (0.24s)
+    --- PASS: TestV342v1PosixLandedProductionRow/VPROD-LANDED (0.24s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.255s

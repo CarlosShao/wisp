@@ -1,0 +1,54 @@
+//go:build windows
+
+// v342v1 SIMULATED LANDING (甲 on Windows) — physical bytes only in exported trees under
+// D:\tmp\wisp\20261018\342v1\col-win-jia. Never tracked; 342-v1 is read-only.
+//
+// 甲's Windows face = widen the shipped preOpenLeafGuard's own call
+// (winsec_windows.go:374-395: CreateFile with FILE_FLAG_OPEN_REPARSE_POINT +
+// GetFileInformationByHandle) to every ancestor PREFIX, refuse a prefix that reports
+// reparse, then perform the by-name create-and-truncate the platform offers. The handle
+// cannot become the write path: the guard's own comment states that writing through a
+// reparse-point handle reports success while the bytes go nowhere (winsec_windows.go
+// :341-348), so this shape is check-then-act BY NECESSITY. Whether that residual actually
+// moves bytes is measured, not asserted: see the WJIA race rows.
+package winsec
+
+import (
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"syscall"
+
+	"golang.org/x/sys/windows"
+)
+
+func openPrivateAt(path string, flags int, perm fs.FileMode) (*os.File, error) {
+	pieces := pathPieces(path)
+	if len(pieces) < 2 {
+		return nil, fmt.Errorf("v342v1 win jia: unexpected spelling %q", path)
+	}
+	for _, prefix := range pieces[:len(pieces)-1] {
+		h, err := windows.CreateFile(windows.StringToUTF16Ptr(prefix),
+			windows.FILE_READ_ATTRIBUTES,
+			windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE|windows.FILE_SHARE_DELETE,
+			nil, windows.OPEN_EXISTING,
+			windows.FILE_FLAG_OPEN_REPARSE_POINT|windows.FILE_FLAG_BACKUP_SEMANTICS, 0)
+		if err != nil {
+			if errors.Is(err, syscall.ERROR_FILE_NOT_FOUND) || errors.Is(err, syscall.ERROR_PATH_NOT_FOUND) {
+				continue // an ancestor not there yet is not a link (the floor's own rule)
+			}
+			return nil, preOpenRefusal(prefix, fmt.Sprintf("the ancestor reparse probe could not read the name: %v", err))
+		}
+		var info windows.ByHandleFileInformation
+		if gErr := windows.GetFileInformationByHandle(h, &info); gErr != nil {
+			_ = windows.CloseHandle(h)
+			return nil, preOpenRefusal(prefix, fmt.Sprintf("the ancestor reparse probe could not read the handle it opened: %v", gErr))
+		}
+		_ = windows.CloseHandle(h)
+		if info.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0 {
+			return nil, preOpenRefusal(path, fmt.Sprintf("the spelling traverses a reparse point at %s, refused by the descent", prefix))
+		}
+	}
+	return os.OpenFile(path, flags, perm)
+}

@@ -1,0 +1,12 @@
+gate-4 go vet ./internal/winsec/ — shared working tree, run before every commit in this batch.
+command (bash, git-bash, PATH prefixed with /d/work/base/gopath/bin):
+  unset GOTMPDIR TMPDIR TEMP TMP ; go vet ./internal/winsec/ > logs/g-4-vet.txt 2>&1 ; echo RC4=$?
+RC4=0
+stdout+stderr = zero bytes by construction (go vet prints nothing when a package is clean),
+which is why this note exists at all: the dispatch bans 0-byte artefacts in the write face, and a
+clean `go vet` literally produces none. The reading is therefore carried here as text, and the
+empty-by-design file is kept next to it (D:\tmp\wisp\20261018\342v1\logs\g-4-vet.txt) for rerun.
+Companion gates from the same run: gofumpt -l on this leg's write face rc=0 (with the positive
+control `gofumpt -l internal/winsec/winsec.go` rc=0, proving the ruler ran), sh scripts/d22scan.sh
+rc=0 ("clean - no D22 ban violations"), sh scripts/check-path-length-budget.sh rc=0 ("VERDICT
+GREEN", worst tracked path 229 chars, roster 60 entries = pre-existing).

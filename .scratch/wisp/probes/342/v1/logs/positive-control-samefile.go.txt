@@ -1,0 +1,22 @@
+package main
+
+import ("fmt"; "os"; "path/filepath")
+
+func samefileProbe(label, dir string) {
+	if dir == "" { return }
+	a := filepath.Join(dir, "sf-a.bin")
+	b := filepath.Join(dir, "sf-b.bin")
+	_ = os.WriteFile(a, []byte("A"), 0o600)
+	_ = os.WriteFile(b, []byte("B"), 0o600)
+	fa, _ := os.Open(a)
+	ia, _ := fa.Stat()
+	_ = os.Rename(a, b) // b now carries the object fa names; the name a is gone
+	na, _ := os.Lstat(b)
+	fmt.Printf("%s: dir=%s SameFile(handle, renamed-name)=%v ; chmod-then-readback:", label, dir, os.SameFile(ia, na))
+	_ = fa.Chmod(0o644)
+	st, _ := fa.Stat()
+	fmt.Printf(" asked=0644 got=%v\n", st.Mode().Perm())
+	_ = fa.Close(); _ = os.Remove(b)
+}
+
+func main() { samefileProbe("tmp-default", os.TempDir()); samefileProbe("bindmount", os.Getenv("V342V1_MOUNT_TMP")) }

@@ -32,6 +32,7 @@ import (
 	"sync/atomic"
 	"syscall"
 	"testing"
+	"time"
 )
 
 const (
@@ -182,6 +183,21 @@ func v342v1AttemptsN() int {
 	return v342v1Attempts
 }
 
+// v342v1RacerPace is the pacing knob for the attribution question in mandatory (i):
+// this leg's racer lands far more flips than the census leg's and leaves the ancestor
+// ABSENT for most attempts (ENOENT), so the truncating open itself rarely runs. Slowing
+// the racer makes the name sit in a real state longer, which is the world the leg
+// measured. 0 = unthrottled (the shape above).
+func v342v1RacerPace() time.Duration {
+	if v := os.Getenv("V342V1_RACER_US"); v != "" {
+		var us int
+		if _, err := fmt.Sscanf(v, "%d", &us); err == nil && us >= 0 {
+			return time.Duration(us) * time.Microsecond
+		}
+	}
+	return 0
+}
+
 // v342v1Run drives one shape against the racer. openFn returns (err). The witness is
 // sampled immediately after every attempt and re-stocked when damaged, so one row
 // measures the rate, not a single accident.
@@ -225,6 +241,7 @@ func v342v1Run(t *testing.T, shape string, openFn func(w v342v1World) error) *v3
 	stop, done := make(chan struct{}), make(chan struct{})
 	var once sync.Once
 	stopRacer := func() { once.Do(func() { close(stop) }); <-done }
+	pace := v342v1RacerPace()
 	go func() {
 		defer close(done)
 		defer func() {
@@ -245,6 +262,9 @@ func v342v1Run(t *testing.T, shape string, openFn func(w v342v1World) error) *v3
 				note(w.toReal())
 			}
 			wantLink = !wantLink
+			if pace > 0 {
+				time.Sleep(pace)
+			}
 		}
 	}()
 	defer stopRacer()

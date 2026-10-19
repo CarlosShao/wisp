@@ -1,0 +1,17 @@
+=== RUN   TestV342v1PosixAncestorRaceRows
+=== RUN   TestV342v1PosixAncestorRaceRows/VBING
+    v342v1race_test.go:420: V342V1 VBING: attempts=1500 flips=649 flipErrs=67 damage=523 truncated=523 deleted=0 firstFlipErr=remove /tmp/TestV342v1PosixAncestorRaceRowsVBING2296349153/001/root/data/sub: directory not empty
+    v342v1race_test.go:420: V342V1 VBING leg=ELOOP/truncated : 3
+    v342v1race_test.go:420: V342V1 VBING leg=ok/body : 408
+    v342v1race_test.go:420: V342V1 VBING leg=enoent/body : 449
+    v342v1race_test.go:420: V342V1 VBING leg=other:winsec: cannot apply a private security descriptor: /tmp/Tes/body : 120
+    v342v1race_test.go:420: V342V1 VBING leg=other:winsec: cannot apply a private security descriptor: /tmp/Tes/truncated : 296
+    v342v1race_test.go:420: V342V1 VBING leg=ok/truncated : 137
+    v342v1race_test.go:420: V342V1 VBING leg=enoent/truncated : 87
+    v342v1race_test.go:420: V342V1 VBING damageRow i=8 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixAncestorRaceRowsVBING2296349153/001/root/data/sub: openat sub: path escapes from parent kind=truncated size=0
+    v342v1race_test.go:420: V342V1 VBING damageRow i=9 err=<nil> kind=truncated size=22
+    v342v1race_test.go:420: V342V1 VBING damageRow i=13 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixAncestorRaceRowsVBING2296349153/001/root/data/sub: openat sub: path escapes from parent kind=truncated size=0
+--- PASS: TestV342v1PosixAncestorRaceRows (0.70s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VBING (0.70s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.707s

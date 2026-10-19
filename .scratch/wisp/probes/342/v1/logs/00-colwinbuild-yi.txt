@@ -1,0 +1,7 @@
+== pre-cut ==
+old-anchor hits = 1 (want 1)
+== post-cut ==
+old = 0 (want 0) ; new = 1 (want 1)
+landing lines = 53
+winsec.go sha = 3c786d1df368b26c848b6feddc0ef6013ff47dd3283324a0614766191d4b808a
+COLWIN-BUILD-OK yi

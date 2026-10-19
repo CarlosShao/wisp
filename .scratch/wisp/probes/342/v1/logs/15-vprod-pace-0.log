@@ -1,0 +1,15 @@
+=== RUN   TestV342v1PosixAncestorRaceRows
+=== RUN   TestV342v1PosixAncestorRaceRows/VPROD
+    v342v1race_test.go:395: V342V1 VPROD: attempts=1500 flips=218 flipErrs=13 damage=56 truncated=0 deleted=56 firstFlipErr=remove /tmp/TestV342v1PosixAncestorRaceRowsVPROD3442348390/001/root/data/sub: directory not empty
+    v342v1race_test.go:395: V342V1 VPROD leg=ok/body : 218
+    v342v1race_test.go:395: V342V1 VPROD leg=other:winsec: cannot apply a private security descriptor: /tmp/Tes/deleted : 27
+    v342v1race_test.go:395: V342V1 VPROD leg=floor/body : 999
+    v342v1race_test.go:395: V342V1 VPROD leg=enoent/body : 227
+    v342v1race_test.go:395: V342V1 VPROD leg=enoent/deleted : 29
+    v342v1race_test.go:395: V342V1 VPROD damageRow i=1 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixAncestorRaceRowsVPROD3442348390/001/root/data/sub/blob.bin: openat sub: path escapes from parent kind=deleted size=-1
+    v342v1race_test.go:395: V342V1 VPROD damageRow i=48 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixAncestorRaceRowsVPROD3442348390/001/root/data/sub/blob.bin: openat sub: path escapes from parent kind=deleted size=-1
+    v342v1race_test.go:395: V342V1 VPROD damageRow i=57 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixAncestorRaceRowsVPROD3442348390/001/root/data/sub/blob.bin: openat sub: path escapes from parent kind=deleted size=-1
+--- PASS: TestV342v1PosixAncestorRaceRows (0.22s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VPROD (0.22s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.233s

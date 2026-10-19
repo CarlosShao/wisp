@@ -1,0 +1,78 @@
+342-v1 scatter table (mandatory question (i)) -- every number recomputed from the RAW log named on its own line; the bench of this leg, built from git archive (⛔ the census leg's trees).
+
+== POSIX bench=golang:1.27 container, CGO_ENABLED=0 GOPROXY=off, host module cache ro ; A-config = GOTMPDIR bound to a D: dir (this leg's own bench defect, see verdict 7); B-config = matched to the leg's driver env (no bind) ==
+
+-- VBASE (shipped by-name open, A-config, RAW 10-race-smoke.log / 10-race-r1..r3.log):
+   smoke  att=200 flips=152 damage=36 trunc=36 del=0
+   r1     att=1500 flips=1074 damage=484 trunc=484 del=0
+   r2     att=1500 flips=1089 damage=458 trunc=458 del=0
+   r3     att=1500 flips=1066 damage=479 trunc=479 del=0
+-- VPROD (production PrivateFile, A-config, same RAWs):
+   smoke  att=200 flips=265 damage=2 trunc=1 del=1
+   r1     att=1500 flips=1581 damage=2 trunc=2 del=0
+   r2     att=1500 flips=1487 damage=2 trunc=1 del=1
+   r3     att=1500 flips=1526 damage=1 trunc=1 del=0
+-- VJIA (甲 simulated landing, A-config):
+   smoke  att=200 flips=172 damage=0 trunc=0 del=0
+   r1     att=1500 flips=1231 damage=0 trunc=0 del=0
+   r2     att=1500 flips=1226 damage=0 trunc=0 del=0
+   r3     att=1500 flips=1221 damage=0 trunc=0 del=0
+-- VYI (乙 simulated landing, A-config):
+   smoke  att=200 flips=206 damage=0 trunc=0 del=0
+   r1     att=1500 flips=1516 damage=0 trunc=0 del=0
+   r2     att=1500 flips=1514 damage=0 trunc=0 del=0
+   r3     att=1500 flips=1466 damage=0 trunc=0 del=0
+-- VBING (丙 report-after-the-act, A-config):
+   smoke  att=200 flips=219 damage=37 trunc=37 del=0
+   r1     att=1500 flips=1297 damage=123 trunc=123 del=0
+   r2     att=1500 flips=1521 damage=189 trunc=189 del=0
+   r3     att=1500 flips=1508 damage=206 trunc=206 del=0
+
+-- VBING re-run B-config, 2 repeats (RAW 20-vbingB-r1.log / 20-vbingB-r2.log):
+   r1      att=1500 flips=649 damage=523 trunc=523 del=0
+   r2      att=1500 flips=621 damage=498 trunc=498 del=0
+
+-- VPROD racer-pacing sweep (attribution of the magnitude miss), B-config, attempts=1500 each (RAW 15-vprod-pace-{0,100,300,1000}.log):
+   pace=0    us att=1500 flips=218 damage=56 trunc=0 del=56
+   pace=100  us att=1500 flips=81 damage=18 trunc=0 del=18
+   pace=300  us att=1500 flips=107 damage=32 trunc=0 del=32
+   pace=1000 us att=1500 flips=92 damage=28 trunc=0 del=28
+
+-- landed production rows (甲/乙 IN the shipped route), B-config (RAW 16-landed-{jia,yi}-r{1,2}.log):
+   jia  r1  att=1500 flips=242 damage=58 trunc=0 del=58
+   jia  r2  att=1500 flips=232 damage=49 trunc=0 del=49
+   yi   r1  att=1500 flips=269 damage=50 trunc=0 del=50
+   yi   r2  att=1500 flips=259 damage=54 trunc=0 del=54
+
+== Windows bench = this host, go1.27.1 windows/amd64, GOTMPDIR/TMPDIR/TEMP/TMP unset; linkStateFlips = flips proved reparseAt(ancestor)=true ==
+-- WBASE (by-name open, oNoFollowPlatform==0) RAW 31-win-race-r1..r3.log:
+   r1       v342v1win_test.go:331: V342V1 WBASE: attempts=1500 linkStateFlips=118 flipErrs=65 damage=975 truncated=975 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWBASE1963610048\001\root\data\sub: The directory is not empty.
+   r2       v342v1win_test.go:331: V342V1 WBASE: attempts=1500 linkStateFlips=123 flipErrs=79 damage=871 truncated=871 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWBASE2786623747\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+   r3       v342v1win_test.go:331: V342V1 WBASE: attempts=1500 linkStateFlips=131 flipErrs=83 damage=878 truncated=878 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWBASE2324590658\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+-- WPROD (production PrivateFile):
+   r1       v342v1win_test.go:340: V342V1 WPROD: attempts=1500 linkStateFlips=63 flipErrs=131 damage=7 truncated=7 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWPROD1493518561\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+   r2       v342v1win_test.go:340: V342V1 WPROD: attempts=1500 linkStateFlips=65 flipErrs=107 damage=6 truncated=6 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWPROD1397413131\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+   r3       v342v1win_test.go:340: V342V1 WPROD: attempts=1500 linkStateFlips=70 flipErrs=126 damage=4 truncated=4 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWPROD1096383035\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+-- WJIA (甲's Windows face, widened reparse probe + by-name open):
+   r1       v342v1win_test.go:345: V342V1 WJIA: attempts=1500 linkStateFlips=59 flipErrs=13 damage=3 truncated=3 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWJIA898995902\001\root\data\sub: The directory is not empty.
+   r2       v342v1win_test.go:345: V342V1 WJIA: attempts=1500 linkStateFlips=56 flipErrs=16 damage=5 truncated=5 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWJIA2744777471\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+   r3       v342v1win_test.go:345: V342V1 WJIA: attempts=1500 linkStateFlips=63 flipErrs=21 damage=5 truncated=5 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWJIA102667225\001\root\data\sub\blob.bin: The process cannot access the file because it is being used by another process.
+-- WYI (乙's Windows face, os.Root descent):
+   r1       v342v1win_test.go:348: V342V1 WYI: attempts=1500 linkStateFlips=66 flipErrs=2 damage=0 truncated=0 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWYI173519062\001\root\data\sub: The directory is not empty.
+   r2       v342v1win_test.go:348: V342V1 WYI: attempts=1500 linkStateFlips=65 flipErrs=3 damage=0 truncated=0 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWYI1764506699\001\root\data\sub: The directory is not empty.
+   r3       v342v1win_test.go:348: V342V1 WYI: attempts=1500 linkStateFlips=64 flipErrs=2 damage=0 truncated=0 deleted=0 firstFlipErr=remove C:\Users\swq\TestV342v1WindowsFormsRaceWYI2185804792\001\root\data\sub: The directory is not empty.
+
+== shape verdicts (量级/形状, ⛔ 逐字相同 requirement) ==
+reproduced: VBASE open (484/458/479 vs leg by-name 242 = same open shape, higher rate);
+            VJIA/VYI damage=0 (truncating branch closed); VBING damage>0 (reported, did not prevent);
+            WBASE 975/871/878 vs leg 897 = magnitude reproduced; WPROD 7/6/4 vs leg 3 = same tier;
+            WYI 0/0/0 with root-refuse ~1341-1390 = reproduced; A3 deterministic delete-shape = reproduced 3/3.
+NOT reproduced, stated as a finding, no smoothing:
+  (1) VPROD magnitude: leg 106 vs this leg 2/2/1 (A-config) and 56/18/32/28 (B-config pacing sweep).
+      Attribution: racer tempo. This leg's racer lands ~4x the flips (1581 vs 358) and leaves the ancestor
+      ABSENT on 1353/1500 attempts (ENOENT), so the truncating open itself rarely runs; under throttling
+      (flips back to the leg's tier) damage returns to 18-56 and is then almost entirely DELETED, not truncated.
+  (2) WJIA damage: leg reported 0, this leg measures 3/5/5 with flips 59/56/63.
+      Reading: on Windows 甲's criterion does not close the truncating branch, it only shrinks it.
+  (3) leg's yinofb red-sentence shape: it claimed 4 reds naming openleaf_322_other.go:200 as a DAMAGED red;
+      this leg's same control makes that nail red on the LIVENESS line instead (:206, RED instrument).

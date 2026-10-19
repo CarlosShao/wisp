@@ -1,0 +1,33 @@
+//go:build linux
+
+// v342v1 SIMULATED LANDING (丙 on POSIX) — exported trees only, never tracked.
+//
+// 丙 = the report-after-the-act shape: the open stays exactly the shipped by-name open
+// (so the truncating act still lands wherever resolution lands at that instant), then
+// the package's OWN identity machinery (pinPlacement on the parent, the same gate the
+// seal uses) is consulted and a refusal follows. It can stop the private bytes; it cannot
+// un-truncate. Behavioural magnitude for this shape is the VBING race rows; this file
+// exists so its COLOUR face (does it remove anybody's existing tooth) is measured and not
+// asserted, the way 甲 and 乙's were.
+package winsec
+
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+)
+
+func openPrivateAt(path string, flags int, perm fs.FileMode) (*os.File, error) {
+	f, err := os.OpenFile(path, flags|oNoFollowPlatform, perm)
+	if err != nil {
+		return nil, err
+	}
+	pinned, pErr := pinPlacement(filepath.Dir(path))
+	if pErr != nil {
+		_ = f.Close()
+		return nil, fmt.Errorf("v342v1 bing report after the act: %w", pErr)
+	}
+	_ = pinned.Close()
+	return f, nil
+}

@@ -1,0 +1,53 @@
+//go:build windows
+
+// v342v1 SIMULATED LANDING (乙 on Windows) — exported trees only, never tracked.
+//
+// 乙's premise on this platform is NOT reuse: this package has no handle-pinning family
+// for Windows (winsec_windows.go:413 sealHandle = applyDescriptor(f.Name(), false), and
+// pinPlacement lives behind //go:build !windows in winsec_other.go). The only act-time
+// spelling available is the stdlib's os.Root chain, which is what the package's POSIX
+// pinPlacement itself is built from (winsec_other.go:165-188). So 乙 on Windows = NEW
+// platform code, and this file is that new code in miniature: OpenRoot on the volume,
+// OpenRoot each ancestor component, leaf opened ON the pinned child Root.
+//
+// What this shape does NOT cover, measured in v342v1-windows-forms (W-ROOTSYM row):
+// os.Root on Windows follows an in-root RELATIVE FILE symlink, so the LEAF leg is not
+// pinned here either — a landing would still need the sameObjectPinned identity re-check
+// that this package does not have for Windows today.
+package winsec
+
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+)
+
+func openPrivateAt(path string, flags int, perm fs.FileMode) (*os.File, error) {
+	comps := pathComponents(path)
+	if len(comps) < 2 {
+		return nil, fmt.Errorf("v342v1 win yi: unexpected spelling %q", path)
+	}
+	vol := filepath.VolumeName(path)
+	if vol == "" {
+		return nil, fmt.Errorf("v342v1 win yi: no volume in %q", path)
+	}
+	root, err := os.OpenRoot(vol + string(os.PathSeparator))
+	if err != nil {
+		return nil, fmt.Errorf("v342v1 win yi: open volume root: %w", err)
+	}
+	defer root.Close()
+	cur := root
+	for _, comp := range comps[:len(comps)-1] {
+		next, err := cur.OpenRoot(comp)
+		if err != nil {
+			return nil, fmt.Errorf("v342v1 win yi: descend %s: %w", comp, err)
+		}
+		if cur != root {
+			_ = cur.Close()
+		}
+		cur = next
+	}
+	defer cur.Close()
+	return cur.OpenFile(filepath.Base(path), flags, perm)
+}

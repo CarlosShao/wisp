@@ -1,0 +1,11 @@
+=== RUN   TestV342v1A1DeterministicAncestorFollow
+    v342v1race_test.go:441: V342V1 A1 VERDICT: open err=<nil>; foreign witness now kind=truncated size=22 => ancestor leg is OPEN (the truncation landed in the foreign object)
+    v342v1race_test.go:453: V342V1 A1 contrast: leaf-position open err=open /gotmp/TestV342v1A1DeterministicAncestorFollow4058746416/001/leaf-slot.lnk: too many levels of symbolic links; foreign witness kind=truncated
+--- PASS: TestV342v1A1DeterministicAncestorFollow (0.13s)
+=== RUN   TestV342v1A3RefusalPathUnlink
+    v342v1race_test.go:484: V342V1 A3 row1: sealHandle err=winsec: cannot apply a private security descriptor: /gotmp/TestV342v1A3RefusalPathUnlink1489764730/001/root/data/sub/blob.bin: openat sub: path escapes from parent witness-after-seal=truncated
+    v342v1race_test.go:485: V342V1 A3 row2: os.Remove(/gotmp/TestV342v1A3RefusalPathUnlink1489764730/001/root/data/sub/blob.bin) err=<nil>; foreign witness now=deleted(size -1); ancestor link still standing=true(<nil>)
+    v342v1race_test.go:488: V342V1 A3 VERDICT: the refusal-path unlink resolved THROUGH the ancestor link and deleted the FOREIGN object = damage shape 2, deterministic, not a race
+--- PASS: TestV342v1A3RefusalPathUnlink (0.15s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.337s

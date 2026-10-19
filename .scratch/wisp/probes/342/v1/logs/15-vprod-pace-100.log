@@ -1,0 +1,16 @@
+=== RUN   TestV342v1PosixAncestorRaceRows
+=== RUN   TestV342v1PosixAncestorRaceRows/VPROD
+    v342v1race_test.go:395: V342V1 VPROD: attempts=1500 flips=81 flipErrs=10 damage=18 truncated=0 deleted=18 firstFlipErr=remove /tmp/TestV342v1PosixAncestorRaceRowsVPROD238539656/001/root/data/sub: directory not empty
+    v342v1race_test.go:395: V342V1 VPROD leg=ok/body : 286
+    v342v1race_test.go:395: V342V1 VPROD leg=enoent/deleted : 13
+    v342v1race_test.go:395: V342V1 VPROD leg=floor/body : 1114
+    v342v1race_test.go:395: V342V1 VPROD leg=other:winsec: cannot apply a private security descriptor: /tmp/Tes/deleted : 5
+    v342v1race_test.go:395: V342V1 VPROD leg=pinrefuse/body : 1
+    v342v1race_test.go:395: V342V1 VPROD leg=enoent/body : 81
+    v342v1race_test.go:395: V342V1 VPROD damageRow i=5 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixAncestorRaceRowsVPROD238539656/001/root/data/sub/blob.bin: openat blob.bin: no such file or directory kind=deleted size=-1
+    v342v1race_test.go:395: V342V1 VPROD damageRow i=71 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixAncestorRaceRowsVPROD238539656/001/root/data/sub/blob.bin: openat sub: no such file or directory kind=deleted size=-1
+    v342v1race_test.go:395: V342V1 VPROD damageRow i=159 err=winsec: cannot apply a private security descriptor: /tmp/TestV342v1PosixAncestorRaceRowsVPROD238539656/001/root/data/sub/blob.bin: openat sub: no such file or directory kind=deleted size=-1
+--- PASS: TestV342v1PosixAncestorRaceRows (0.18s)
+    --- PASS: TestV342v1PosixAncestorRaceRows/VPROD (0.18s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.195s
