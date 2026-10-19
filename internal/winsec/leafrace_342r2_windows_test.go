@@ -80,7 +80,7 @@ var winLeafLegs342r2 = []struct{ why, name string }{
 	{"this handle is not the object the name carries now", "openPinnedLeaf re-check, SameFile face"},
 	{"the name carries a reparse point", "preOpenLeafGuard's leaf refusal (the steady state answers first)"},
 	{"the reparse-point probe could not read the name", "preOpenLeafGuard's unreadable-name refusal"},
-	{"path escapes from parent", "os.Root containment (⛔ 在⛔ 形上出现＝拼写写错了，当场判仪器红)"},
+	{"path escapes from parent", "os.Root containment (must stay ZERO on this spelling: the target is a bare name, so if this row is non-zero the world was built wrong and the reading below is void)"},
 	{"cannot apply a private security descriptor", "a seal refusal on this route"},
 	{"path traverses a reparse point", "the installed C26 resolver's steady-state refusal"},
 	{"not provably resolved", "resolveString refused the spelling"},
