@@ -1,0 +1,11 @@
+anchor(全窗测量基准)=7c44446a
+A) 整包终态（票227 AC#5 欠的那发）：四数 RUN=2317 PASS_TOP=1529 FAIL_TOP=29 SKIP=8 rc=1；GOTMPDIR=长 D 卷形
+B) 逐名归类（29 枚）：CI 存量 10（run 39124122121 在场）＋落地续体 2（342r1 钉＝342-v2 已判部分成立）＋台损 17（详见下）
+   台损细分：junction 造不出 9（mklink 前置缺失：20r2/bridge×3/sweep/waved/…116×4 一族）
+     ＋长 GOTMPDIR SID 卷形 2（票311 在册）＋缺 .git 2＋GOTMPDIR 落 C 卷根的跨卷 1
+     ＋dirOf 切在 gotmp 根上 1＋composer 0 painted states（导出树缺前端产物）1＋AC4 安装目录 ACL 出带 1
+C) 短路径（%LOCALAPPDATA% 同卷＝票311 认可形）串行复跑归因：
+   - TestAC2SealNotice：落地树 PASS ⇄ 基线树（fde1df02）2 发 PASS ＝⛔落地引入、且长路径下发红＝台面形状敏感
+   - panel Test20r2Junction rc=0（短路径）
+   - cmd/wisp Test20r2Junction 见本次 final-attr.log
+   - TestDirOfBaseOfCut…／TestAC4InstallDir…／TestCrossVolume…＝见 final-attr.log（未出现则记'没测到'）
