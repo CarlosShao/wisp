@@ -1,0 +1,26 @@
+派单＝票 342＋票 348 Windows 续体落地腿 342-r2（★写腿·产码·只写测试仪器）｜编排者＝新任 harness｜发出 2026-10-19 21:0x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 你是谁／你的授权从哪来
+你是票 **342** 与票 **348** 的**续体落地腿**（写·产码）。★授权依据＝台账 `A1046` 第④节口令「批 342＋348 落乙」＋`A1049` 增量解冻＝**这两票选形乙的整批落地已在人工批准在册**；本波不是新批准＝那批里⛔ 做完的那半边（★票 342 `AC#1` 与票 348 `AC#2` 的 **Windows 半区**，两把尺都点名缺哪一枚件）。撤销形＝"撤 `A1046`／撤 `A1049` 解冻"。
+★终裁在案（⛔ 你重述、⛔ 你推翻）＝`docs/evidence/s1/342-v2-verdict.md` 与 `348-v1-verdict.md`（裁腿 `342-v2`）：①落地侧 `junction`／`symlink-dir` 仍有 **0~2/400 的 `truncated` 漏出＝真漏**（它用三条凭据排除了台损与仪器形状）＝缺"祖先只在 open 之后翻"的**确定性窗口件**；②票 348"修前分子>0 在 Windows 取⛔ 到"＝**缺世界**（稳态被 `risk` 的 C26 resolver／`preOpenLeafGuard` 抢先回答）；③叶子复验那三行＝**未量到**（`os.Root` 的 containment 面先答，`sameObjectPinnedWindows` 两半门在该形到⛔ 达；"同目录裸兄弟"形 `Root.OpenFile` 照跟随）。
+★实现者＝你，⛔ 你给自己翻任何框、⛔ 你写判语；交件后我另派非实现者裁腿。
+
+## 你要做的（★按这个优先级，做不完就交已做＋报名）
+1. **★那枚确定性窗口件（本票最值钱）**：Windows 侧造出"父钉已拿到、祖先在 open 那一跳**之后**才翻"的世界，并且**复现性⛔ 依赖撞运气**（POSIX 对应物＝本包 `inIdentityWindow120r3` 那类 seam，见 `ancestorunlink_348_unix_test.go:83`；Windows 现无对应物）。⇒ ★先现读包内既有 seam／钩子名册再决定：**能复用就复用**；★若必须新造一枚接缝（＝产码新增名字／新导出面／改函数形状）**立刻停手上报**，那属第二道人工批准、我摆机主，⛔ 你自己加。
+2. **damage ⇄ refusal 两栏分栏取证**（`342-r1` 在它 `.scratch/wisp/probes/342/r1/report-blocked.md`（锚 `9581a48c`）写的下一步第②条）＝你那件要各自量出"截断损伤"与"拒绝回答"两栏分子，⛔ 混成一个数。
+3. **叶子复验那格给它一个能答的形**（裁腿已证：带 reparse 位的组件在 `OpenRoot` 那跳就被拒；"同目录裸兄弟名"才走得到复验）＝把仪器世界按后者造，⛔ 用前者当"已量到"。
+4. ★⛔ 动 `winsec.go:430` 的 `wrapPath`（那枚 `%v`→`%w` 错误分类差＝**待机主拍**，在册未批；你这波⛔ 碰它一个字节）。★⛔ 动 `internal/risk/**`⇄`internal/config/**`⇄`cmd/wisp/**`⇄`internal/panel/**` 任何字节。★⛔ 放宽任何断言、⛔ 改 SLO／golden／`thresholds.go`、⛔ 改契约（C／D 表）、⛔ 碰 `frontend/**`⇄`design/**`。
+★写面＝`internal/winsec/**`（★优先只新增／修改 `*_test.go` 仪器件；产码改动须逐枚写进交件并自证"⛔ 新导出名、⛔ 函数形状变化"）＋`.scratch/wisp/probes/342/r2/**`＋两票尾各一条只追加 bullet。
+
+## Git／测量纪律（公共块全文照做）
+★**跨腿耦合（本波特有，务必照做）**：`227-v2` 正同时在飞，它跑**门禁四数用的是共享工作树**（`gofumpt -l`／`d22scan`／长度预算）⇒ 你在 `internal/winsec` 的**半保存编辑态会洗脏它的门禁读数**。⇒ 你每次"编辑→自查→commit"的停留⛔ 超过一次测量所需（⛔ 攒一批改动最后统一提交）；★每枚 `.go` 落盘后先 `gofumpt -l <你自己那枚字面路径>` 验干净、再 commit（＝你交出去的文件在任何时刻都对他人是格式干净的）；⛔ `gofumpt -w` 扫全仓或别人的文件。
+
+## 台面与读数（★今天在这两票上踩过的坑，逐条照做）
+- 竞态／liveness：★容器 `TMPDIR`⇄`GOTMPDIR` ⛔ 绑 Windows 卷（`os.SameFile` 在 bind mount 失真＝身份门被台面摘掉）；★本机侧临时根⛔ 用长 D 卷路径（`342-v2` 与我都量到：长根下 9 枚真 junction 前置 `mklink /J` 建不出来＝一片假红）⇒ 用 `%LOCALAPPDATA%` 同卷短形（票 311 认可）。
+- 突变（去牙／反形）⛔ 在共享工作树做：先 `git archive` 到仓外导出树、⛔ `-overlay`；落刀前后各验一次锚命中数（⛔ 一把没咬住的尺报"没红＝没问题"）；报 pristine⇄还原哈希。
+- ★还原文件一律 `git cat-file blob HEAD:<path> > <path>`、⛔ 碰 `checkout`（今天一枚裁腿因此自报真损）。
+- 四数只在 `^=== RUN`／`^--- PASS`／`^--- FAIL`／`^--- SKIP` 取；成对读数（基线⇄落地）⛔ 混用、⛔ 相减；竞态读数⛔ 要求逐字相同＝复现量级与形状。★`go test` 把正文印在 `--- FAIL` **之前**（⛔ 事后 grep 配错行）。
+- ★仓外树跑 `.exe` 取 DLL：整条 `PATH` 一律 `cygpath -w`＋**分号**（⛔ 混 POSIX 冒号形＝会造"零枚 `--- FAIL` 的整包死"）。
+- 取脚本退码＝重定向文件＋`echo RC=$?` 紧跟裸命令（⛔ 管进 `tail`）。
+- ★摆动名册（撞红先安静复量 3 发再归因、⛔ 记成新造红）＝票 346 两枚＋`internal/risk` 的 `…116` 族 4 枚＋`internal/config` 的 `TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed`（mtime 粒度）；唯一合法存量红＝`TestC26RewriteAccountIsConsumedAtEverySecurityLeg`。
+- ★⛔ 跑 `./cmd/wisp` 整包（★本波那面唯一持跑者＝正在飞的 `227-v2`，⛔ 抢它 CPU）；⛔ `go test ./...`；门禁四数只在共享工作树、跑前 `unset GOTMPDIR TMPDIR TEMP TMP`；`go vet` 交叉档⛔ 与本机档成对判红绿。
