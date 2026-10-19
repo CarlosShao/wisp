@@ -1,0 +1,7 @@
+-// provably expanded fails CLOSED (aEquiv / aUnder report such a miss as a
+-// hit) instead of quietly dropping a path from A into B.
++// provably expanded fails CLOSED: aEq / aUnder delegate to aRelates, which
++// reports such a miss as a hit when anchorMatches found nothing AND
++// uncertainAnchorMiss held, instead of quietly dropping a path from A into B.
++// anchorMatches on its own does not do that - ticket 334 needs the two apart
++// because aRuleReason has to say which of them produced the verdict.

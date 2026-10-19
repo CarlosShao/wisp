@@ -1,0 +1,30 @@
+############ AC#3 STRICT call-shape (foo( , no space) — my own re-measurement ############
+== production-only (non _test.go) row/name counts, START side ==
+shape=SA prodrows=193 prodREDrows=9 prodREDunique=6 prodINPKGunique=110
+shape=SB prodrows=34 prodREDrows=9 prodREDunique=6 prodINPKGunique=15
+shape=SBL prodrows=255 prodREDrows=185 prodREDunique=142 prodINPKGunique=42
+shape=SW prodrows=15 prodREDrows=1 prodREDunique=1 prodINPKGunique=5
+
+== the strict-SB production RED names, START side, one per line with file:line and where-field ==
+SB    CloseScope               RED-nowhere                                                                                provenance.go:365
+SB    Complete                 RED-elsewhere  method(Gate)     internal/agent/approval/gate.go                            syncdirs.go:453
+SB    DEFERRED                 RED-nowhere                                                                                doc.go:15
+SB    Defer                    RED-elsewhere  method(DisposalScope) internal/plugin/disposal.go                                provenance.go:427
+SB    Nutstore                 RED-nowhere                                                                                syncdirs.go:15
+SB    fires                    RED-elsewhere  field            internal/config/unwired.go                                 blacklist.go:307
+
+== count ==
+6
+== and the leg's own claim set for comparison (28 claims / 11 dangling): what I get is above ==
+
+== DEFERRED(...) marker rows (the FP class the leg named) ==
+internal/risk/blacklist.go:113:// DEFERRED, or a dead volume) there is exactly one form and no evidence of a
+internal/risk/blacklist.go:358://     on a platform whose resolver is still DEFERRED (pathresolver_other.go),
+internal/risk/doc.go:15:// DEFERRED(R1-R9/PathResolver/Provenance): implemented by tickets 17, 18 and
+internal/risk/pathresolver_other.go:5:// DEFERRED(macOS/Linux): SPEC-06 <U+00A7>4 requires realpath + lstat symlink reject
+internal/risk/provenance.go:58:// DEFERRED(C25-loop-wiring): the agent loop / tool providers (tickets 10, 20,
+internal/risk/syncdirs.go:239:		// Platforms without handle-based resolution (see the DEFERRED marker
+internal/risk/syncdirs_other.go:8:// docs/PRECHECK.md <U+00A7>P12 alongside the DEFERRED marker below); failing every
+internal/risk/syncdirs_other.go:17:// DEFERRED(P12-macos): sync-client probing for the macOS port (ticket 55) —
+(cwd note: this last block runs in repo root only if cd'ed; harmless if empty)
+AC3STRICT_DONE

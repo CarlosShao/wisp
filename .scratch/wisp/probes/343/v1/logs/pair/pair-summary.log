@@ -1,0 +1,35 @@
+=== 343-v1 AC#4 Windows paired full-package run on MY OWN exported trees ===
+date: 2026-10-19T10:18:51+08:00
+### win-base-29d258f9 tree=/d/tmp/wisp/20261019/343v1/treeBase blob=c1799cd24afce19e6accef23db23a7d7ee746dec
+  rc=1
+  RUN=247 PASS_TOP=136 FAIL_TOP=5 SKIP=1
+  red names:
+    RED --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    RED --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+    RED --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+    RED --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+    RED --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+  TestResolvePerCallBudget line(s):
+    --- PASS: TestResolvePerCallBudget (1.19s)
+### win-del-31d4a476 tree=/d/tmp/wisp/20261019/343v1/treeDel blob=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+  rc=1
+  RUN=247 PASS_TOP=136 FAIL_TOP=5 SKIP=1
+  red names:
+    RED --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    RED --- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 
+    RED --- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 
+    RED --- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree 
+    RED --- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed 
+  TestResolvePerCallBudget line(s):
+    --- PASS: TestResolvePerCallBudget (1.37s)
+=== red-name set symdiff ===
+  5 /d/tmp/wisp/20261019/343v1/logs/pair/red-base.txt
+  5 /d/tmp/wisp/20261019/343v1/logs/pair/red-del.txt
+ 10 total
+REDSET_SYMDIFF=0
+=== RUN-name set symdiff ===
+  247 /d/tmp/wisp/20261019/343v1/logs/pair/run-base.txt
+  247 /d/tmp/wisp/20261019/343v1/logs/pair/run-del.txt
+  494 total
+RUNSET_SYMDIFF=0
+PAIR_DONE

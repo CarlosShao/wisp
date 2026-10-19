@@ -1,0 +1,24 @@
+== line counts of the leg's authored positive files (cap = 160) ==
+   123 .scratch/wisp/probes/343/r1/report.md
+   139 .scratch/wisp/probes/343/r1/report-sec-b.md
+    48 .scratch/wisp/probes/343/r1/report-sec-c.md
+   105 .scratch/wisp/probes/343/r1/logs/01-ac4-color-pair-two-platform.txt
+    47 .scratch/wisp/probes/343/r1/logs/02-ac1-comment-face.txt
+   156 .scratch/wisp/probes/343/r1/logs/03-ac0-same-family-census.txt
+   105 .scratch/wisp/probes/343/r1/logs/04-gates-shared-tree.txt
+
+== mojibake scan over the leg's tracked files: U+FFFD and literal '??' runs ==
+FFFD_hits=0
+question-pair_hits=0
+non-utf8_files=
+== banned literal char (U+00A7) over the leg's write surface (positive control HANDOVER=199) ==
+HANDOVER=199
+leg_r1=0
+ticket343=0
+== zero-byte tracked files anywhere under probes/343 (both legs) ==
+== .out extension among tracked files under probes/343 ==
+0
+== ticket tail: my bullet will be the only append after 137044b6; current tail lines ==
+  - `AC#4`＝`./internal/risk/` 两平台成对四数（各自逐枚点名、⛔ 混用⛔ 相减）：Windows 基线 `2
+  - 凭据与提交＝`.scratch/wisp/probes/343/r1/logs/`＋`sh/linux-343.sh`：`31d4a476`＝注释面那一枚 `.go`（
+DONE3

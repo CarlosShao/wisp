@@ -1,0 +1,1266 @@
+=== run: whole package, START side (treeBase) ===
+# pkg=internal/risk pkgfiles=49 repofiles=754 pkgRoster=989 repoRoster=14300 only=""
+BEXCL len                      builtin-or-keyword                                                                             assessor.go:111
+BEXCL len                      builtin-or-keyword                                                                             pathresolver_anchor_spelling_windows_test.go:126
+BEXCL len                      builtin-or-keyword                                                                             pathresolver_volumeless_spelling_308_test.go:22
+BEXCL func                     builtin-or-keyword                                                                             provenance.go:427
+BEXCL rune                     builtin-or-keyword                                                                             provenance.go:495
+BEXCL len                      builtin-or-keyword                                                                             rules_scale.go:11
+BEXCL len                      builtin-or-keyword                                                                             syncdirs_windows_test.go:118
+SA    shellAllowlisted         IN-PKG         func             internal/risk/rules_shell.go                               allow_substring_pin_216_test.go:18
+SA    hostAllowlisted          IN-PKG         func             internal/risk/rules_network.go                             allow_substring_pin_216_test.go:19
+SA    overrideApplies          IN-PKG         func             internal/risk/blacklist.go                                 allow_substring_pin_216_test.go:20
+SA    substringOperators216    IN-PKG         var              internal/risk/allow_substring_pin_216_test.go              allow_substring_pin_216_test.go:29
+SA    allowSidePin216          IN-PKG         type             internal/risk/allow_substring_pin_216_test.go              allow_substring_pin_216_test.go:33
+SA    functionWindow216        IN-PKG         func             internal/risk/allow_substring_pin_216_test.go              allow_substring_pin_216_test.go:124
+SA    substringOperatorHits216 IN-PKG         func             internal/risk/allow_substring_pin_216_test.go              allow_substring_pin_216_test.go:172
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_other_test.go:16
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        anchor_fallback_teeth_336_other_test.go:18
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              anchor_fallback_teeth_336_other_test.go:19
+SA    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:12
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:12
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:13
+SA    anchorMatches            IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:23
+SA    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:24
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:24
+SA    anchorMatches            IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:24
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:24
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:28
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        anchor_fallback_teeth_336_windows_test.go:29
+SA    classifyForms            IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:35
+SA    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:42
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:42
+SA    teeth336Roster           IN-PKG         func             internal/risk/anchor_fallback_teeth_336_windows_test.go    anchor_fallback_teeth_336_windows_test.go:42
+SA    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:44
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:44
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:46
+SA    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:47
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:48
+SA    teeth336Leaves           IN-PKG         var              internal/risk/anchor_fallback_teeth_336_windows_test.go    anchor_fallback_teeth_336_windows_test.go:62
+SA    teeth336Installed        IN-PKG         func             internal/risk/anchor_fallback_teeth_336_windows_test.go    anchor_fallback_teeth_336_windows_test.go:69
+SA    teeth336Anchor           IN-PKG         func             internal/risk/anchor_fallback_teeth_336_windows_test.go    anchor_fallback_teeth_336_windows_test.go:80
+SA    anchorPath               IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:81
+SA    classifyForms            IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:81
+SA    teeth336Candidate        IN-PKG         func             internal/risk/anchor_fallback_teeth_336_windows_test.go    anchor_fallback_teeth_336_windows_test.go:94
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              anchor_miss_reason_334_test.go:15
+SA    pathForms                IN-PKG         type             internal/risk/pathresolver.go                              anchor_miss_reason_334_test.go:15
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        anchor_miss_reason_334_test.go:16
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              anchor_miss_reason_334_test.go:19
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_334_test.go:20
+SA    pathExists               IN-PKG         func             internal/risk/pathresolver.go                              anchor_miss_reason_334_test.go:33
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_334_test.go:40
+SA    candidateInsideProfile   IN-PKG         param            internal/risk/anchor_miss_reason_334_test.go               anchor_miss_reason_334_test.go:77
+SA    newWorld334              IN-PKG         func             internal/risk/anchor_miss_reason_334_test.go               anchor_miss_reason_334_test.go:77
+SA    candidateOffAnchorChain334 IN-PKG         func             internal/risk/anchor_miss_reason_334_test.go               anchor_miss_reason_334_test.go:114
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_334_test.go:116
+SA    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_334_test.go:123
+SA    quotedFold334            IN-PKG         func             internal/risk/anchor_miss_reason_334_test.go               anchor_miss_reason_334_test.go:123
+SA    classifyForms            IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_334_test.go:125
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_334_test.go:125
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        anchor_miss_reason_339_other_test.go:16
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              anchor_miss_reason_339_other_test.go:18
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_339_other_test.go:20
+SA    wispCfgLeaf334           IN-PKG         const            internal/risk/anchor_miss_reason_334_test.go               anchor_miss_reason_339_other_test.go:38
+SA    candidateOffAnchorChain334 IN-PKG         func             internal/risk/anchor_miss_reason_334_test.go               anchor_miss_reason_339_other_test.go:39
+SA    candidateOffAnchorChain334 IN-PKG         func             internal/risk/anchor_miss_reason_334_test.go               anchor_miss_reason_339_other_test.go:41
+SA    candidateInsideProfile   IN-PKG         param            internal/risk/anchor_miss_reason_334_test.go               anchor_miss_reason_339_other_test.go:70
+SA    newWorld334              IN-PKG         func             internal/risk/anchor_miss_reason_334_test.go               anchor_miss_reason_339_other_test.go:70
+SA    candidateOffAnchorChain334 IN-PKG         func             internal/risk/anchor_miss_reason_334_test.go               anchor_miss_reason_339_other_test.go:107
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_339_other_test.go:109
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_339_other_test.go:118
+SA    assessorFor              RED-elsewhere  method(Bridge)   internal/tools/bridge.go                                   assessor.go:30
+SA    assessCtx                IN-PKG         type             internal/risk/assessor.go                                  assessor.go:253
+SA    builtinRules             IN-PKG         var              internal/risk/assessor.go                                  assessor.go:263
+SA    runBuiltin               IN-PKG         func             internal/risk/assessor.go                                  assessor.go:276
+SA    runSubAssessor           IN-PKG         func             internal/risk/assessor.go                                  assessor.go:291
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              blacklist.go:64
+SA    overrideApplies          IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:67
+SA    bOverrides               IN-PKG         param            internal/risk/blacklist.go                                 blacklist.go:75
+SA    overrideApplies          IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:97
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:129
+SA    normDir                  IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:144
+SA    anchorPath               IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:152
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:153
+SA    normDir                  IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:154
+SA    sepStr                   IN-PKG         const            internal/risk/pathresolver.go                              blacklist.go:154
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              blacklist.go:155
+SA    classifyWith             IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:181
+SA    classifyForms            IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:187
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              blacklist.go:188
+SA    pathForms                IN-PKG         type             internal/risk/pathresolver.go                              blacklist.go:188
+SA    aEquiv                   RED-nowhere                                                                                blacklist.go:193
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SA    anchorPath               IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:208
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              blacklist.go:209
+SA    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:214
+SA    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:265
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:265
+SA    isUnder                  IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:266
+SA    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:274
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:276
+SA    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:284
+SA    anchorMatches            IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:284
+SA    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:286
+SA    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:287
+SA    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:306
+SA    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:307
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:314
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:321
+SA    aAnyForm                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:333
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:344
+SA    hasGitConfigSegment      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:369
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:370
+SA    isBrowserCredentialStore IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:381
+SA    declaredPath             IN-PKG         field            internal/risk/taintmatch.go                                hostpath_185.go:23
+SA    fragmentIndex            IN-PKG         type             internal/risk/taintmatch.go                                hostpath_185.go:23
+SA    runeIndexOf              IN-PKG         func             internal/risk/taintmatch.go                                hostpath_185.go:25
+SA    hostPath                 IN-PKG         param            internal/risk/provenance.go                                hostpath_185.go:27
+SA    hostPathBox              RED-elsewhere  type             internal/tools/bridge.go                                   hostpath_185.go:28
+SA    hostMintedPathFor        IN-PKG         method(Provenance) internal/risk/hostpath_185.go                              hostpath_185.go:61
+SA    redLine                  IN-PKG         func             internal/risk/mode.go                                      mode.go:191
+SA    assertSameAssess216      IN-PKG         func             internal/risk/name_claim_two_arm_216_test.go               name_claim_two_arm_216_test.go:45
+SA    pathExists               IN-PKG         func             internal/risk/pathresolver.go                              name_claim_two_arm_216_test.go:77
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 name_claim_two_arm_216_test.go:79
+SA    candidateOffAnchorChain334 IN-PKG         func             internal/risk/anchor_miss_reason_334_test.go               name_claim_two_arm_216_test.go:84
+SA    anchorForms              IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:31
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:31
+SA    expandInput              IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:142
+SA    expandAccounted          IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:155
+SA    lexCanonical             IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:204
+SA    sepStr                   IN-PKG         const            internal/risk/pathresolver.go                              pathresolver.go:216
+SA    sepStr                   IN-PKG         const            internal/risk/pathresolver.go                              pathresolver.go:220
+SA    unifySeparators          IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:223
+SA    normalizeLocalUNC        IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:236
+SA    lexCanonical             IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:244
+SA    stripExtendedPrefix      IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:271
+SA    pathForms                IN-PKG         type             internal/risk/pathresolver.go                              pathresolver.go:300
+SA    pathForms                IN-PKG         type             internal/risk/pathresolver.go                              pathresolver.go:302
+SA    maxAnchorWalk            IN-PKG         const            internal/risk/pathresolver.go                              pathresolver.go:339
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:343
+SA    anchorCache              IN-PKG         var              internal/risk/pathresolver.go                              pathresolver.go:377
+SA    pathForms                IN-PKG         type             internal/risk/pathresolver.go                              pathresolver.go:384
+SA    anchorForms              IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:390
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:390
+SA    tailExistsBelow          IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:408
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        pathresolver.go:409
+SA    pathExists               IN-PKG         func             internal/risk/pathresolver.go                              pathresolver.go:427
+SA    namesSameFile            IN-PKG         func             internal/risk/pathresolver_anchor_spelling_windows_test.go pathresolver_anchor_spelling_windows_test.go:26
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              pathresolver_anchor_spelling_windows_test.go:28
+SA    driveShare               IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_anchor_spelling_windows_test.go:101
+SA    volumeInvariantSpellings IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_anchor_spelling_windows_test.go:102
+SA    getShortPath             IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_anchor_spelling_windows_test.go:111
+SA    driveShare               IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_anchor_spelling_windows_test.go:118
+SA    volumeInvariantSpellings IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_anchor_spelling_windows_test.go:119
+SA    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_anchor_spelling_windows_test.go:127
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              pathresolver_anchor_spelling_windows_test.go:166
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              pathresolver_anchor_spelling_windows_test.go:183
+SA    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_anchor_spelling_windows_test.go:316
+SA    overrideApplies          IN-PKG         func             internal/risk/blacklist.go                                 pathresolver_anchor_spelling_windows_test.go:317
+SA    warmResolve              IN-PKG         func             internal/risk/pathresolver_bench_test.go                   pathresolver_bench_test.go:22
+SA    resolveBudget            IN-PKG         const            internal/risk/pathresolver_budget_norace_test.go           pathresolver_budget_norace_test.go:10
+SA    expandInput              IN-PKG         func             internal/risk/pathresolver.go                              pathresolver_expansion_test.go:15
+SA    lexCanonical             IN-PKG         func             internal/risk/pathresolver.go                              pathresolver_expansion_test.go:28
+SA    c26Pipeline              IN-PKG         type             internal/risk/winsec_c26.go                                pathresolver_expansion_test.go:33
+SA    resolveTarget            IN-PKG         method(syncSet)  internal/risk/syncdirs.go                                  pathresolver_expansion_test.go:36
+SA    syncSet                  IN-PKG         type             internal/risk/syncdirs.go                                  pathresolver_expansion_test.go:36
+SA    requireSameTreeOrRefusal IN-PKG         func             internal/risk/pathresolver_expansion_test.go               pathresolver_expansion_test.go:38
+SA    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_junction_windows_test.go:20
+SA    mkJunction               IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_junction_windows_test.go:47
+SA    getShortPath             IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_junction_windows_test.go:56
+SA    driveShare               IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_junction_windows_test.go:152
+SA    haveShare                IN-PKG         local            internal/risk/pathresolver_junction_windows_test.go        pathresolver_junction_windows_test.go:159
+SA    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_junction_windows_test.go:176
+SA    namesSameFile            IN-PKG         func             internal/risk/pathresolver_anchor_spelling_windows_test.go pathresolver_junction_windows_test.go:178
+SA    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_junction_windows_test.go:202
+SA    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_junction_windows_test.go:320
+SA    overrideApplies          IN-PKG         func             internal/risk/blacklist.go                                 pathresolver_junction_windows_test.go:321
+SA    macOS                    RED-nowhere                                                                                pathresolver_other.go:5
+SA    canonicalReaders         IN-PKG         func             internal/risk/pathresolver_rewrite_account_test.go         pathresolver_rewrite_account_test.go:211
+SA    readsCanonicalField      IN-PKG         func             internal/risk/pathresolver_rewrite_account_test.go         pathresolver_rewrite_account_test.go:255
+SA    driveShare               IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_volumeless_spelling_308_test.go:10
+SA    normalizeLocalUNC        IN-PKG         func             internal/risk/pathresolver.go                              pathresolver_volumeless_spelling_308_test.go:21
+SA    volumeID                 RED-elsewhere  func             internal/tools/platform_other.go                           pathresolver_volumeless_spelling_308_test.go:23
+SA    volumeRootOf             RED-elsewhere  func             internal/tools/platform_other.go                           pathresolver_volumeless_spelling_308_test.go:24
+SA    driveShare               IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_volumeless_spelling_308_test.go:28
+SA    volumeInvariantSpellings IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_volumeless_spelling_308_test.go:38
+SA    driveShare               IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_volumeless_spelling_308_test.go:43
+SA    driveShare               IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_volumeless_spelling_308_test.go:68
+SA    volumeInvariantSpellings IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_volumeless_spelling_308_test.go:68
+SA    driveShare               IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_volumeless_spelling_308_test.go:76
+SA    driveShare               IN-PKG         func             internal/risk/pathresolver_volumeless_spelling_308_test.go pathresolver_volumeless_spelling_308_test.go:90
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        pathresolver_windows.go:19
+SA    reparseComponents        IN-PKG         func             internal/risk/pathresolver_other.go                        pathresolver_windows.go:54
+SA    normalizeLocalUNC        IN-PKG         func             internal/risk/pathresolver.go                              pathshape_portable_test.go:12
+SA    foreignSep               IN-PKG         func             internal/risk/pathshape_portable_test.go                   pathshape_portable_test.go:23
+SA    lexCanonical             IN-PKG         func             internal/risk/pathresolver.go                              pathshape_portable_test.go:94
+SA    normalizeLocalUNC        IN-PKG         func             internal/risk/pathresolver.go                              pathshape_portable_test.go:95
+SA    bOverrides               IN-PKG         param            internal/risk/blacklist.go                                 pathshape_portable_test.go:172
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 pathshape_portable_test.go:174
+SA    baseName                 IN-PKG         func             internal/risk/blacklist.go                                 pathshape_portable_test.go:188
+SA    deepestExistingAncestor  IN-PKG         func             internal/risk/syncdirs.go                                  pathshape_portable_test.go:252
+SA    newFragmentIndex         IN-PKG         func             internal/risk/taintmatch.go                                pointer_183_test.go:12
+SA    ptr183Almost             IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:26
+SA    ptr183Twin               IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:26
+SA    ptr183Path               IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:34
+SA    contractMinFragmentChars IN-PKG         const            internal/risk/taintmatch.go                                pointer_183_test.go:39
+SA    ptr183Path               IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:39
+SA    ptr183Twin               IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:39
+SA    ptr183Secret             IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:46
+SA    ptr183Body               IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:51
+SA    ptr183Body               IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:57
+SA    ptr183BodyNoTwin         IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:57
+SA    ptr183Almost             IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:64
+SA    ptr183BodyWithAlmost     IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:70
+SA    ptr183Foreign            IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:75
+SA    ptr183DirSpelling        IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:80
+SA    runeWindowHits           IN-PKG         func             internal/risk/pointer_183_test.go                          pointer_183_test.go:87
+SA    runeDifferences          IN-PKG         func             internal/risk/pointer_183_test.go                          pointer_183_test.go:110
+SA    ptr183Span               IN-PKG         func             internal/risk/pointer_183_test.go                          pointer_183_test.go:126
+SA    runeIndexOf              IN-PKG         func             internal/risk/taintmatch.go                                pointer_183_test.go:186
+SA    ptr183BodyAbsentPath     IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:333
+SA    ptr183DirSpelling        IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:336
+SA    declaredNorm             IN-PKG         local            internal/risk/provenance.go                                pointer_183_test.go:344
+SA    runeIndexOf              IN-PKG         func             internal/risk/taintmatch.go                                pointer_183_test.go:344
+SA    declaredNorm             IN-PKG         local            internal/risk/provenance.go                                pointer_183_test.go:358
+SA    ptr185Path               IN-PKG         const            internal/risk/pointer_185_test.go                          pointer_185_test.go:38
+SA    ptr185Sibling            IN-PKG         const            internal/risk/pointer_185_test.go                          pointer_185_test.go:42
+SA    ptr185Almost             IN-PKG         const            internal/risk/pointer_185_test.go                          pointer_185_test.go:47
+SA    ptr185Path               IN-PKG         const            internal/risk/pointer_185_test.go                          pointer_185_test.go:47
+SA    ptr185SameBasename       IN-PKG         const            internal/risk/pointer_185_test.go                          pointer_185_test.go:52
+SA    ptr185ModelFile          IN-PKG         const            internal/risk/pointer_185_test.go                          pointer_185_test.go:58
+SA    contractMinFragmentChars IN-PKG         const            internal/risk/taintmatch.go                                pointer_185_test.go:64
+SA    ptr185Twin               IN-PKG         const            internal/risk/pointer_185_test.go                          pointer_185_test.go:64
+SA    ptr185DirSpelling        IN-PKG         const            internal/risk/pointer_185_test.go                          pointer_185_test.go:69
+SA    ptr185Stub               IN-PKG         const            internal/risk/pointer_185_test.go                          pointer_185_test.go:76
+SA    ptr185Body               IN-PKG         func             internal/risk/pointer_185_test.go                          pointer_185_test.go:83
+SA    ptr185Spells             IN-PKG         func             internal/risk/pointer_185_test.go                          pointer_185_test.go:94
+SA    contractMinFragmentChars IN-PKG         const            internal/risk/taintmatch.go                                pointer_185_test.go:95
+SA    writeGate                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:47
+SA    taskScopeID              RED-nowhere                                                                                provenance.go:54
+SA    sensitiveSourceTools     IN-PKG         var              internal/risk/provenance.go                                provenance.go:97
+SA    channelTable             IN-PKG         var              internal/risk/provenance.go                                provenance.go:129
+SA    writeChannelKeys         IN-PKG         var              internal/risk/provenance.go                                provenance.go:143
+SA    writeGate                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:149
+SA    pathKeys                 IN-PKG         var              internal/risk/provenance.go                                provenance.go:152
+SA    remoteSinkKeys           IN-PKG         var              internal/risk/provenance.go                                provenance.go:158
+SA    remoteSinkSuffixes       IN-PKG         var              internal/risk/provenance.go                                provenance.go:166
+SA    remoteSinkSchemes        IN-PKG         var              internal/risk/provenance.go                                provenance.go:169
+SA    defaultMaxParamDepth     IN-PKG         const            internal/risk/provenance.go                                provenance.go:180
+SA    defaultMaxScopeSources   IN-PKG         const            internal/risk/provenance.go                                provenance.go:184
+SA    defaultMaxSourceRunes    IN-PKG         const            internal/risk/provenance.go                                provenance.go:186
+SA    defaultMaxScanRunes      IN-PKG         const            internal/risk/provenance.go                                provenance.go:188
+SA    defaultMaxParamDepth     IN-PKG         const            internal/risk/provenance.go                                provenance.go:206
+SA    channelTable             IN-PKG         var              internal/risk/provenance.go                                provenance.go:224
+SA    taintMark                IN-PKG         type             internal/risk/provenance.go                                provenance.go:236
+SA    scopeReg                 IN-PKG         type             internal/risk/provenance.go                                provenance.go:258
+SA    disposalScope            RED-nowhere                                                                                provenance.go:427
+SA    hostPath                 IN-PKG         param            internal/risk/provenance.go                                provenance.go:483
+SA    hostPath                 IN-PKG         param            internal/risk/provenance.go                                provenance.go:486
+SA    runeIndexOf              IN-PKG         func             internal/risk/taintmatch.go                                provenance.go:494
+SA    normalizeTaint           IN-PKG         func             internal/risk/taintmatch.go                                provenance.go:495
+SA    hostPath                 IN-PKG         param            internal/risk/provenance.go                                provenance.go:498
+SA    taintMark                IN-PKG         type             internal/risk/provenance.go                                provenance.go:504
+SA    hostPath                 IN-PKG         param            internal/risk/provenance.go                                provenance.go:511
+SA    attachDeclaredPath       IN-PKG         method(fragmentIndex) internal/risk/taintmatch.go                                provenance.go:516
+SA    hostPath                 IN-PKG         param            internal/risk/provenance.go                                provenance.go:545
+SA    hostMintedPathFor        IN-PKG         method(Provenance) internal/risk/hostpath_185.go                              provenance.go:549
+SA    scopeMarks               IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:682
+SA    writeGate                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:723
+SA    writeGate                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:877
+SA    pathKeys                 IN-PKG         var              internal/risk/provenance.go                                provenance.go:900
+SA    pathKeys                 IN-PKG         var              internal/risk/provenance.go                                provenance.go:924
+SA    isPathKey                IN-PKG         func             internal/risk/provenance.go                                provenance.go:947
+SA    hasRemoteSink            IN-PKG         func             internal/risk/provenance.go                                provenance.go:958
+SA    isRemoteSinkKey          IN-PKG         func             internal/risk/provenance.go                                provenance.go:988
+SA    looksRemoteSink          IN-PKG         func             internal/risk/provenance.go                                provenance.go:1003
+SA    pathTargets              IN-PKG         func             internal/risk/provenance.go                                provenance.go:1036
+SA    isPathKey                IN-PKG         func             internal/risk/provenance.go                                provenance.go:1039
+SA    collectStrings           IN-PKG         func             internal/risk/provenance.go                                provenance.go:1062
+SA    maxDepth                 IN-PKG         field            internal/risk/provenance.go                                provenance.go:1062
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        provenance_syncdirs_other_test.go:22
+SA    writeGate                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance_syncdirs_other_test.go:23
+SA    membershipEngine         IN-PKG         func             internal/risk/syncdirs_test.go                             provenance_syncdirs_other_test.go:31
+SA    baseOptions              IN-PKG         func             internal/risk/provenance_test.go                           provenance_syncdirs_windows_test.go:12
+SA    writeGate                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance_syncdirs_windows_test.go:23
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        provenance_syncdirs_windows_test.go:25
+SA    m7Engine                 IN-PKG         func             internal/risk/provenance_test.go                           provenance_syncdirs_windows_test.go:35
+SA    baseOptions              IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:28
+SA    fixtureProfile           IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:29
+SA    testProv                 IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:30
+SA    fixtureProfile           IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:50
+SA    fixtureSyncRoot          IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:51
+SA    nonSyncTargetOf          IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:71
+SA    syncTargetOf             IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:71
+SA    nonSyncTargetOf          IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:74
+SA    mustClose                IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:338
+SA    m7Engine                 IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:450
+SA    membershipEngine         IN-PKG         func             internal/risk/syncdirs_test.go                             provenance_test.go:455
+SA    pathKeys                 IN-PKG         var              internal/risk/provenance.go                                provenance_test.go:616
+SA    writeGate                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance_test.go:616
+SA    injectIgnorable          IN-PKG         func             internal/risk/provenance_test.go                           provenance_test.go:747
+SA    scopeMarks               IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance_test.go:933
+SA    ruleDeclared             IN-PKG         func             internal/risk/rules_gateway.go                             rules_gateway.go:5
+SA    rulePathAllowlist        IN-PKG         func             internal/risk/rules_gateway.go                             rules_gateway.go:28
+SA    ruleSensitivePath        IN-PKG         func             internal/risk/rules_gateway.go                             rules_gateway.go:56
+SA    ruleTaint                IN-PKG         func             internal/risk/rules_gateway.go                             rules_gateway.go:97
+SA    irreversibleClassReason  IN-PKG         var              internal/risk/rules_irreversible.go                        rules_irreversible.go:5
+SA    ruleIrreversible         IN-PKG         func             internal/risk/rules_irreversible.go                        rules_irreversible.go:16
+SA    deniedProtocols          IN-PKG         var              internal/risk/rules_network.go                             rules_network.go:13
+SA    webProtocols             IN-PKG         var              internal/risk/rules_network.go                             rules_network.go:25
+SA    ruleNetwork              IN-PKG         func             internal/risk/rules_network.go                             rules_network.go:32
+SA    isPrivateHost            IN-PKG         func             internal/risk/rules_network.go                             rules_network.go:92
+SA    hostAllowlisted          IN-PKG         func             internal/risk/rules_network.go                             rules_network.go:114
+SA    ruleBatchScale           IN-PKG         func             internal/risk/rules_scale.go                               rules_scale.go:10
+SA    shellMetachars           IN-PKG         const            internal/risk/rules_shell.go                               rules_shell.go:8
+SA    ruleShell                IN-PKG         func             internal/risk/rules_shell.go                               rules_shell.go:14
+SA    findMetachars            IN-PKG         func             internal/risk/rules_shell.go                               rules_shell.go:55
+SA    shellMetachars           IN-PKG         const            internal/risk/rules_shell.go                               rules_shell.go:56
+SA    shellAllowlisted         IN-PKG         func             internal/risk/rules_shell.go                               rules_shell.go:91
+SA    stubCanon                IN-PKG         type             internal/risk/rules_test.go                                rules_test.go:11
+SA    errOn                    IN-PKG         field            internal/risk/rules_test.go                                rules_test.go:12
+SA    panicOn                  IN-PKG         field            internal/risk/rules_test.go                                rules_test.go:12
+SA    hostPath                 IN-PKG         param            internal/risk/provenance.go                                shape_a_exemption_test.go:18
+SA    shapeAPath               IN-PKG         const            internal/risk/shape_a_exemption_test.go                    shape_a_exemption_test.go:23
+SA    shapeAGhost              IN-PKG         const            internal/risk/shape_a_exemption_test.go                    shape_a_exemption_test.go:26
+SA    shapeAPath               IN-PKG         const            internal/risk/shape_a_exemption_test.go                    shape_a_exemption_test.go:26
+SA    shapeASecret             IN-PKG         const            internal/risk/shape_a_exemption_test.go                    shape_a_exemption_test.go:32
+SA    shapeAStub               IN-PKG         const            internal/risk/shape_a_exemption_test.go                    shape_a_exemption_test.go:34
+SA    shapeAForeign            IN-PKG         const            internal/risk/shape_a_exemption_test.go                    shape_a_exemption_test.go:38
+SA    shapeAForeignGhost       IN-PKG         const            internal/risk/shape_a_exemption_test.go                    shape_a_exemption_test.go:41
+SA    shapeACorrupt            IN-PKG         const            internal/risk/shape_a_exemption_test.go                    shape_a_exemption_test.go:44
+SA    shapeAPath               IN-PKG         const            internal/risk/shape_a_exemption_test.go                    shape_a_exemption_test.go:45
+SA    shapeAGhost              IN-PKG         const            internal/risk/shape_a_exemption_test.go                    shape_a_exemption_test.go:117
+SA    gradeConfirmed           IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs.go:57
+SA    syncSet                  IN-PKG         type             internal/risk/syncdirs.go                                  syncdirs.go:71
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:82
+SA    detectSyncSet            IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs.go:86
+SA    errTargetUnverified      IN-PKG         var              internal/risk/syncdirs.go                                  syncdirs.go:177
+SA    rawPath                  IN-PKG         param            internal/risk/syncdirs.go                                  syncdirs.go:182
+SA    resolveTarget            IN-PKG         method(syncSet)  internal/risk/syncdirs.go                                  syncdirs.go:189
+SA    deepestExistingAncestor  IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs.go:244
+SA    macOS                    RED-nowhere                                                                                syncdirs.go:249
+SA    deepestExistingAncestor  IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs.go:258
+SA    hasFoldedDotDot          IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs.go:300
+SA    lexCanonical             IN-PKG         func             internal/risk/pathresolver.go                              syncdirs.go:301
+SA    splitPathComponents      IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs.go:315
+SA    resolveTarget            IN-PKG         method(syncSet)  internal/risk/syncdirs.go                                  syncdirs.go:421
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:423
+SA    isUnder                  IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:424
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:427
+SA    anchorForms              IN-PKG         func             internal/risk/pathresolver.go                              syncdirs.go:427
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              syncdirs.go:427
+SA    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:429
+SA    isUnder                  IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:438
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:439
+SA    isUnder                  IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:440
+SA    probeEnv                 IN-PKG         type             internal/risk/syncdirs.go                                  syncdirs.go:478
+SA    registryValueSource      IN-PKG         type             internal/risk/syncdirs.go                                  syncdirs.go:493
+SA    subKeys                  IN-PKG         method(iface)    internal/risk/syncdirs.go                                  syncdirs.go:498
+SA    registryProbeFor         IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs.go:504
+SA    envConfiguredRoots       IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs.go:537
+SA    clientConfigProbe        IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs.go:577
+SA    fixtureRoots             IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs.go:634
+SA    tryShortPath             IN-PKG         func             internal/risk/syncdirs_redteam_windows_test.go             syncdirs_alias_307_windows_test.go:18
+SA    alias307LongName         IN-PKG         const            internal/risk/syncdirs_alias_307_windows_test.go           syncdirs_alias_307_windows_test.go:27
+SA    alias307Pair             IN-PKG         func             internal/risk/syncdirs_alias_307_windows_test.go           syncdirs_alias_307_windows_test.go:35
+SA    isUnder                  IN-PKG         func             internal/risk/blacklist.go                                 syncdirs_alias_307_windows_test.go:54
+SA    expandInput              IN-PKG         func             internal/risk/pathresolver.go                              syncdirs_alias_307_windows_test.go:103
+SA    resolveTarget            IN-PKG         method(syncSet)  internal/risk/syncdirs.go                                  syncdirs_ancestor_actable_leg_116_test.go:14
+SA    deepestExistingAncestor  IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs_ancestor_actable_leg_116_test.go:26
+SA    expandAccounted          IN-PKG         func             internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:29
+SA    lexCanonical             IN-PKG         func             internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:30
+SA    anceCanon                IN-PKG         local            internal/risk/syncdirs.go                                  syncdirs_ancestor_actable_leg_116_test.go:43
+SA    anceCanon                IN-PKG         local            internal/risk/syncdirs.go                                  syncdirs_ancestor_actable_leg_116_test.go:47
+SA    anceCanon                IN-PKG         local            internal/risk/syncdirs.go                                  syncdirs_ancestor_actable_leg_116_test.go:52
+SA    anceCanon                IN-PKG         local            internal/risk/syncdirs.go                                  syncdirs_ancestor_actable_leg_116_test.go:53
+SA    ancPairName              IN-PKG         const            internal/risk/syncdirs_ancestor_actable_leg_116_test.go    syncdirs_ancestor_actable_leg_116_test.go:70
+SA    rawPairName              IN-PKG         const            internal/risk/syncdirs_ancestor_actable_leg_116_test.go    syncdirs_ancestor_actable_leg_116_test.go:73
+SA    firstPairName            IN-PKG         const            internal/risk/syncdirs_ancestor_actable_leg_116_test.go    syncdirs_ancestor_actable_leg_116_test.go:77
+SA    movedDir                 IN-PKG         const            internal/risk/syncdirs_ancestor_actable_leg_116_test.go    syncdirs_ancestor_actable_leg_116_test.go:81
+SA    plainDir                 IN-PKG         const            internal/risk/syncdirs_ancestor_actable_leg_116_test.go    syncdirs_ancestor_actable_leg_116_test.go:84
+SA    hiddenLeaf               IN-PKG         const            internal/risk/syncdirs_ancestor_actable_leg_116_test.go    syncdirs_ancestor_actable_leg_116_test.go:87
+SA    resolveTarget            IN-PKG         method(syncSet)  internal/risk/syncdirs.go                                  syncdirs_ancestor_actable_leg_116_test.go:88
+SA    ticket116MovedTree       IN-PKG         func             internal/risk/syncdirs_ancestor_actable_leg_116_test.go    syncdirs_ancestor_actable_leg_116_test.go:92
+SA    movedDir                 IN-PKG         const            internal/risk/syncdirs_ancestor_actable_leg_116_test.go    syncdirs_ancestor_actable_leg_116_test.go:94
+SA    ticket116Engine          IN-PKG         func             internal/risk/syncdirs_ancestor_actable_leg_116_test.go    syncdirs_ancestor_actable_leg_116_test.go:124
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        syncdirs_ancestor_actable_leg_116_test.go:129
+SA    resolveTarget            IN-PKG         method(syncSet)  internal/risk/syncdirs.go                                  syncdirs_ancestor_actable_leg_116_test.go:159
+SA    resolveTarget            IN-PKG         method(syncSet)  internal/risk/syncdirs.go                                  syncdirs_ancestor_reparse_ticket105_windows_test.go:13
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        syncdirs_ancestor_reparse_ticket105_windows_test.go:20
+SA    anceCanon                IN-PKG         local            internal/risk/syncdirs.go                                  syncdirs_ancestor_reparse_ticket105_windows_test.go:26
+SA    isUnder                  IN-PKG         func             internal/risk/blacklist.go                                 syncdirs_ancestor_reparse_ticket105_windows_test.go:28
+SA    junctionTargetAndLink    IN-PKG         func             internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go syncdirs_ancestor_reparse_ticket105_windows_test.go:34
+SA    resolveTarget            IN-PKG         method(syncSet)  internal/risk/syncdirs.go                                  syncdirs_ancestor_reparse_ticket105_windows_test.go:74
+SA    deepestExistingAncestor  IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs_ancestor_reparse_ticket105_windows_test.go:75
+SA    pathHandleVerify         IN-PKG         const            internal/risk/syncdirs_other.go                            syncdirs_other.go:5
+SA    macOS                    RED-nowhere                                                                                syncdirs_other.go:12
+SA    registryProbe            IN-PKG         func             internal/risk/syncdirs_other.go                            syncdirs_other.go:12
+SA    macOS                    RED-nowhere                                                                                syncdirs_other.go:17
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        syncdirs_other_test.go:17
+SA    macOS                    RED-nowhere                                                                                syncdirs_other_test.go:18
+SA    membershipEngine         IN-PKG         func             internal/risk/syncdirs_test.go                             syncdirs_other_test.go:24
+SA    macOS                    RED-nowhere                                                                                syncdirs_other_test.go:30
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        syncdirs_other_test.go:31
+SA    registryProbe            IN-PKG         func             internal/risk/syncdirs_other.go                            syncdirs_other_test.go:105
+SA    tryShortPath             IN-PKG         func             internal/risk/syncdirs_redteam_windows_test.go             syncdirs_redteam_windows_test.go:25
+SA    shortPathOf              IN-PKG         func             internal/risk/syncdirs_redteam_windows_test.go             syncdirs_redteam_windows_test.go:49
+SA    tryShortPath             IN-PKG         func             internal/risk/syncdirs_redteam_windows_test.go             syncdirs_redteam_windows_test.go:49
+SA    syncSandbox              IN-PKG         func             internal/risk/syncdirs_redteam_windows_test.go             syncdirs_redteam_windows_test.go:59
+SA    gatedWrite               IN-PKG         func             internal/risk/syncdirs_redteam_windows_test.go             syncdirs_redteam_windows_test.go:262
+SA    syncEnv                  IN-PKG         type             internal/risk/syncdirs_test.go                             syncdirs_test.go:29
+SA    membershipEngine         IN-PKG         func             internal/risk/syncdirs_test.go                             syncdirs_test.go:33
+SA    membershipEngine         IN-PKG         func             internal/risk/syncdirs_test.go                             syncdirs_test.go:41
+SA    m7Engine                 IN-PKG         func             internal/risk/provenance_test.go                           syncdirs_test.go:45
+SA    syncSandbox              IN-PKG         func             internal/risk/syncdirs_redteam_windows_test.go             syncdirs_test.go:45
+SA    syncSet                  IN-PKG         type             internal/risk/syncdirs.go                                  syncdirs_test.go:49
+SA    syncSet                  IN-PKG         type             internal/risk/syncdirs.go                                  syncdirs_test.go:50
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        syncdirs_test.go:51
+SA    macOS                    RED-nowhere                                                                                syncdirs_test.go:52
+SA    outOfProfile             IN-PKG         func             internal/risk/syncdirs_test.go                             syncdirs_test.go:95
+SA    envConfiguredRoots       IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs_test.go:262
+SA    fakeRegistry             IN-PKG         type             internal/risk/syncdirs_test.go                             syncdirs_test.go:295
+SA    valueName                RED-nowhere                                                                                syncdirs_test.go:298
+SA    membershipEngine         IN-PKG         func             internal/risk/syncdirs_test.go                             syncdirs_test.go:390
+SA    reparseComponents        IN-PKG         func             internal/risk/pathresolver_other.go                        syncdirs_test.go:444
+SA    hasFoldedDotDot          IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs_test.go:452
+SA    membershipEngine         IN-PKG         func             internal/risk/syncdirs_test.go                             syncdirs_test.go:458
+SA    pathHandleVerify         IN-PKG         const            internal/risk/syncdirs_other.go                            syncdirs_windows.go:18
+SA    registryProbe            IN-PKG         func             internal/risk/syncdirs_other.go                            syncdirs_windows.go:23
+SA    registryProbeFor         IN-PKG         func             internal/risk/syncdirs.go                                  syncdirs_windows.go:24
+SA    liveRegistry             IN-PKG         type             internal/risk/syncdirs_windows.go                          syncdirs_windows.go:31
+SA    registryValueSource      IN-PKG         type             internal/risk/syncdirs.go                                  syncdirs_windows.go:31
+SA    subKeys                  IN-PKG         method(iface)    internal/risk/syncdirs.go                                  syncdirs_windows.go:34
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        syncdirs_windows_test.go:14
+SA    syncSet                  IN-PKG         type             internal/risk/syncdirs.go                                  syncdirs_windows_test.go:16
+SA    syncSet                  IN-PKG         type             internal/risk/syncdirs.go                                  syncdirs_windows_test.go:17
+SA    resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        syncdirs_windows_test.go:19
+SA    macOS                    RED-nowhere                                                                                syncdirs_windows_test.go:20
+SA    registryProbe            IN-PKG         func             internal/risk/syncdirs_other.go                            syncdirs_windows_test.go:20
+SA    membershipEngine         IN-PKG         func             internal/risk/syncdirs_test.go                             syncdirs_windows_test.go:27
+SA    macOS                    RED-nowhere                                                                                syncdirs_windows_test.go:31
+SA    membershipEngine         IN-PKG         func             internal/risk/syncdirs_test.go                             syncdirs_windows_test.go:68
+SA    registryProbe            IN-PKG         func             internal/risk/syncdirs_other.go                            syncdirs_windows_test.go:116
+SA    contractMinFragmentChars IN-PKG         const            internal/risk/taintmatch.go                                taintmatch.go:26
+SA    isIgnorableTaintRune     IN-PKG         func             internal/risk/taintmatch.go                                taintmatch.go:32
+SA    normalizeTaint           IN-PKG         func             internal/risk/taintmatch.go                                taintmatch.go:47
+SA    hashWindow               IN-PKG         func             internal/risk/taintmatch.go                                taintmatch.go:67
+SA    fragmentIndex            IN-PKG         type             internal/risk/taintmatch.go                                taintmatch.go:80
+SA    newFragmentIndex         IN-PKG         func             internal/risk/taintmatch.go                                taintmatch.go:81
+SA    declaredPath             IN-PKG         field            internal/risk/taintmatch.go                                taintmatch.go:90
+SA    declaredPath             IN-PKG         field            internal/risk/taintmatch.go                                taintmatch.go:99
+SA    declaredPath             IN-PKG         field            internal/risk/taintmatch.go                                taintmatch.go:106
+SA    attachDeclaredPath       IN-PKG         method(fragmentIndex) internal/risk/taintmatch.go                                taintmatch.go:113
+SA    newFragmentIndex         IN-PKG         func             internal/risk/taintmatch.go                                taintmatch.go:120
+SA    windowExcluded           IN-PKG         func             internal/risk/taintmatch.go                                taintmatch.go:181
+SA    runeIndexOf              IN-PKG         func             internal/risk/taintmatch.go                                taintmatch.go:196
+SA    normalizeTaint           IN-PKG         func             internal/risk/taintmatch.go                                taintmatch.go:199
+SA    paramNorm                IN-PKG         param            internal/risk/taintmatch.go                                taintmatch.go:220
+SA    paramNorm                IN-PKG         param            internal/risk/taintmatch.go                                taintmatch.go:221
+SA    attachDeclaredPath       IN-PKG         method(fragmentIndex) internal/risk/taintmatch.go                                taintmatch.go:253
+SA    spellsDeclaredPath       IN-PKG         func             internal/risk/taintmatch.go                                taintmatch.go:261
+SA    winStrs                  RED-nowhere                                                                                taintmatch_test.go:171
+SA    c26Pipeline              IN-PKG         type             internal/risk/winsec_c26.go                                winsec_c26.go:24
+SB    TempDir                  RED-nowhere                                                                                anchor_miss_reason_334_test.go:126
+SB    fires                    RED-elsewhere  field            internal/config/unwired.go                                 blacklist.go:307
+SB    DEFERRED                 RED-nowhere                                                                                doc.go:15
+SB    Screen                   IN-PKG         method(Mode)     internal/risk/mode.go                                      mode.go:122
+SB    TempDir                  RED-nowhere                                                                                name_claim_two_arm_216_test.go:74
+SB    TempDir                  RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:31
+SB    EqualFold                RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:76
+SB    TempDir                  RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:77
+SB    ToLower                  RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:124
+SB    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_anchor_spelling_windows_test.go:127
+SB    Resolve                  IN-PKG         func             internal/risk/pathresolver.go                              pathresolver_anchor_spelling_windows_test.go:166
+SB    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              pathresolver_anchor_spelling_windows_test.go:166
+SB    certain                  IN-PKG         method(pathForms) internal/risk/pathresolver.go                              pathresolver_anchor_spelling_windows_test.go:177
+SB    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_anchor_spelling_windows_test.go:316
+SB    TempDir                  RED-nowhere                                                                                pathresolver_junction_windows_test.go:18
+SB    TempDir                  RED-nowhere                                                                                pathresolver_junction_windows_test.go:176
+SB    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_junction_windows_test.go:176
+SB    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_junction_windows_test.go:202
+SB    tmpHome                  IN-PKG         func             internal/risk/pathresolver_junction_windows_test.go        pathresolver_junction_windows_test.go:320
+SB    DEFERRED                 RED-nowhere                                                                                pathresolver_other.go:5
+SB    ToLower                  RED-nowhere                                                                                pathresolver_volumeless_spelling_308_test.go:13
+SB    TempDir                  RED-nowhere                                                                                pathresolver_volumeless_spelling_308_test.go:70
+SB    VolumeName               RED-nowhere                                                                                pathresolver_volumeless_spelling_308_test.go:71
+SB    contains                 IN-PKG         method(fragmentIndex) internal/risk/taintmatch.go                                pointer_183_test.go:15
+SB    contains                 IN-PKG         method(fragmentIndex) internal/risk/taintmatch.go                                pointer_183_test.go:359
+SB    Mark                     IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:16
+SB    Inspect                  IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:21
+SB    CheckText                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:40
+SB    TaintHit                 IN-PKG         method(iface)    internal/risk/assessor.go                                  provenance.go:52
+SB    Detector                 IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:54
+SB    WithTaintDetector        IN-PKG         method(RiskAssessor) internal/risk/assessor.go                                  provenance.go:54
+SB    CheckText                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:56
+SB    Inspect                  IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:56
+SB    DEFERRED                 RED-nowhere                                                                                provenance.go:58
+SB    Mark                     IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:66
+SB    Inspect                  IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:67
+SB    Mark                     IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:97
+SB    CloseScope               RED-nowhere                                                                                provenance.go:365
+SB    OpenScope                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:365
+SB    OpenScope                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:372
+SB    Close                    IN-PKG         method(Scope)    internal/risk/provenance.go                                provenance.go:427
+SB    Defer                    RED-elsewhere  method(DisposalScope) internal/plugin/disposal.go                                provenance.go:427
+SB    contains                 IN-PKG         method(fragmentIndex) internal/risk/taintmatch.go                                provenance.go:520
+SB    TempDir                  RED-nowhere                                                                                provenance_syncdirs_other_test.go:12
+SB    TempDir                  RED-nowhere                                                                                provenance_syncdirs_other_test.go:13
+SB    TempDir                  RED-nowhere                                                                                provenance_syncdirs_windows_test.go:13
+SB    TempDir                  RED-nowhere                                                                                provenance_syncdirs_windows_test.go:18
+SB    SyncDetectionComplete    IN-PKG         method(Provenance) internal/risk/syncdirs.go                                  provenance_syncdirs_windows_test.go:37
+SB    CloseScope               RED-nowhere                                                                                provenance_test.go:312
+SB    CloseScope               RED-nowhere                                                                                provenance_test.go:339
+SB    SyncDetectionComplete    IN-PKG         method(Provenance) internal/risk/syncdirs.go                                  provenance_test.go:457
+SB    Nutstore                 RED-nowhere                                                                                syncdirs.go:15
+SB    Resolve                  IN-PKG         func             internal/risk/pathresolver.go                              syncdirs.go:82
+SB    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:82
+SB    Resolve                  IN-PKG         func             internal/risk/pathresolver.go                              syncdirs.go:270
+SB    Resolve                  IN-PKG         func             internal/risk/pathresolver.go                              syncdirs.go:273
+SB    add                      IN-PKG         local            internal/risk/pathresolver.go                              syncdirs.go:424
+SB    Complete                 RED-elsewhere  method(Gate)     internal/agent/approval/gate.go                            syncdirs.go:453
+SB    SyncRoots                IN-PKG         field            internal/risk/provenance.go                                syncdirs.go:471
+SB    root                     IN-PKG         local            internal/risk/anchor_fallback_teeth_336_windows_test.go    syncdirs.go:482
+SB    add                      IN-PKG         local            internal/risk/pathresolver.go                              syncdirs_alias_307_windows_test.go:91
+SB    add                      IN-PKG         local            internal/risk/pathresolver.go                              syncdirs_alias_307_windows_test.go:102
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:13
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:16
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:19
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:38
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:39
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:43
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:52
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:75
+SB    SyncDetectionComplete    IN-PKG         method(Provenance) internal/risk/syncdirs.go                                  syncdirs_ancestor_actable_leg_116_test.go:128
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:151
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_actable_leg_116_test.go:159
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_reparse_ticket105_windows_test.go:14
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              syncdirs_ancestor_reparse_ticket105_windows_test.go:17
+SB    isUnder                  IN-PKG         func             internal/risk/blacklist.go                                 syncdirs_ancestor_reparse_ticket105_windows_test.go:28
+SB    TempDir                  RED-nowhere                                                                                syncdirs_ancestor_reparse_ticket105_windows_test.go:31
+SB    DEFERRED                 RED-nowhere                                                                                syncdirs_other.go:17
+SB    DEFERRED                 RED-nowhere                                                                                syncdirs_other_test.go:18
+SB    SyncDetectionComplete    IN-PKG         method(Provenance) internal/risk/syncdirs.go                                  syncdirs_other_test.go:20
+SB    SyncDetectionComplete    IN-PKG         method(Provenance) internal/risk/syncdirs.go                                  syncdirs_other_test.go:43
+SB    finalize                 IN-PKG         method(syncSet)  internal/risk/syncdirs.go                                  syncdirs_other_test.go:60
+SB    match                    IN-PKG         local            internal/risk/pointer_183_test.go                          syncdirs_other_test.go:84
+SB    DEFERRED                 RED-nowhere                                                                                syncdirs_other_test.go:106
+SB    DEFERRED                 RED-nowhere                                                                                syncdirs_test.go:52
+SB    match                    IN-PKG         local            internal/risk/pointer_183_test.go                          syncdirs_test.go:57
+SB    match                    IN-PKG         local            internal/risk/pointer_183_test.go                          syncdirs_test.go:265
+SB    SyncDetectionComplete    IN-PKG         method(Provenance) internal/risk/syncdirs.go                                  syncdirs_test.go:388
+SB    SyncDetectionComplete    IN-PKG         method(Provenance) internal/risk/syncdirs.go                                  syncdirs_test.go:455
+SB    SyncDetectionComplete    IN-PKG         method(Provenance) internal/risk/syncdirs.go                                  syncdirs_windows_test.go:18
+SB    DEFERRED                 RED-nowhere                                                                                syncdirs_windows_test.go:20
+SB    contains                 IN-PKG         method(fragmentIndex) internal/risk/taintmatch.go                                taintmatch.go:130
+SB    contains                 IN-PKG         method(fragmentIndex) internal/risk/taintmatch.go                                taintmatch.go:167
+SB    Mark                     IN-PKG         method(Provenance) internal/risk/provenance.go                                taintmatch_test.go:170
+SB    Actable                  IN-PKG         method(Result)   internal/risk/pathresolver.go                              winsec_c26.go:51
+SBL   A                        RED-elsewhere  field            internal/ball/tokens.go                                    allow_substring_pin_216_test.go:10
+SBL   targets                  IN-PKG         local            internal/risk/pathresolver_anchor_spelling_windows_test.go allow_substring_pin_216_test.go:17
+SBL   numbers                  RED-nowhere                                                                                allow_substring_pin_216_test.go:22
+SBL   place                    RED-elsewhere  local            internal/winsec/placement_symlink_113_other_test.go        allow_substring_pin_216_test.go:34
+SBL   uses                     RED-nowhere                                                                                allow_substring_pin_216_test.go:97
+SBL   returns                  RED-nowhere                                                                                anchor_fallback_teeth_336_other_test.go:18
+SBL   lands                    RED-elsewhere  field            internal/config/unwired.go                                 anchor_fallback_teeth_336_other_test.go:25
+SBL   operand                  RED-nowhere                                                                                anchor_fallback_teeth_336_windows_test.go:12
+SBL   B                        RED-elsewhere  field            internal/ball/position.go                                  anchor_fallback_teeth_336_windows_test.go:16
+SBL   leaf                     IN-PKG         rangevar         internal/risk/anchor_fallback_teeth_336_windows_test.go    anchor_fallback_teeth_336_windows_test.go:19
+SBL   verdict                  RED-elsewhere  local            cmd/wisp/config_readers_255.go                             anchor_fallback_teeth_336_windows_test.go:22
+SBL   red                      RED-elsewhere  local            internal/observe/diagnostics.go                            anchor_fallback_teeth_336_windows_test.go:31
+SBL   branch                   RED-elsewhere  rangevar         internal/agent/ticket285_corr_distinct_rulers_test.go      anchor_fallback_teeth_336_windows_test.go:45
+SBL   bytes                    RED-elsewhere  field            cmd/wisp/slo_windows.go                                    anchor_fallback_teeth_336_windows_test.go:117
+SBL   formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              anchor_miss_reason_334_test.go:15
+SBL   returning                RED-nowhere                                                                                anchor_miss_reason_334_test.go:17
+SBL   uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_334_test.go:20
+SBL   red                      RED-elsewhere  local            internal/observe/diagnostics.go                            anchor_miss_reason_334_test.go:23
+SBL   half                     RED-elsewhere  local            internal/audio/level_test.go                               anchor_miss_reason_334_test.go:28
+SBL   pathExists               IN-PKG         func             internal/risk/pathresolver.go                              anchor_miss_reason_334_test.go:33
+SBL   parse                    RED-nowhere                                                                                anchor_miss_reason_334_test.go:35
+SBL   UNPROVEN                 RED-nowhere                                                                                anchor_miss_reason_334_test.go:36
+SBL   machine                  RED-elsewhere  local            cmd/wisp/models.go                                         anchor_miss_reason_334_test.go:37
+SBL   uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_334_test.go:40
+SBL   is                       RED-elsewhere  local            cmd/wisp/leg_dispatch_gate_133_test.go                     anchor_miss_reason_334_test.go:42
+SBL   machine                  RED-elsewhere  local            cmd/wisp/models.go                                         anchor_miss_reason_334_test.go:48
+SBL   leaf                     IN-PKG         rangevar         internal/risk/anchor_fallback_teeth_336_windows_test.go    anchor_miss_reason_334_test.go:62
+SBL   absent                   RED-elsewhere  local-var        cmd/wisp/dataroot_128_test.go                              anchor_miss_reason_334_test.go:79
+SBL   installed                IN-PKG         local            internal/risk/anchor_fallback_teeth_336_windows_test.go    anchor_miss_reason_334_test.go:105
+SBL   shapes                   RED-elsewhere  local            cmd/wisp/firstrun_257_test.go                              anchor_miss_reason_334_test.go:125
+SBL   control                  IN-PKG         local            internal/risk/pathresolver_rewrite_account_test.go         anchor_miss_reason_334_test.go:209
+SBL   unmeasured               RED-nowhere                                                                                anchor_miss_reason_334_test.go:228
+SBL   resolveHandle            IN-PKG         func             internal/risk/pathresolver_other.go                        anchor_miss_reason_339_other_test.go:16
+SBL   returns                  RED-nowhere                                                                                anchor_miss_reason_339_other_test.go:17
+SBL   uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_339_other_test.go:20
+SBL   here                     RED-nowhere                                                                                anchor_miss_reason_339_other_test.go:24
+SBL   resolver                 RED-elsewhere  var              internal/winsec/resolve.go                                 anchor_miss_reason_339_other_test.go:30
+SBL   build                    RED-elsewhere  local            cmd/wisp/panel_host_gate_test.go                           anchor_miss_reason_339_other_test.go:40
+SBL   leaf                     IN-PKG         rangevar         internal/risk/anchor_fallback_teeth_336_windows_test.go    anchor_miss_reason_339_other_test.go:55
+SBL   absent                   RED-elsewhere  local-var        cmd/wisp/dataroot_128_test.go                              anchor_miss_reason_339_other_test.go:72
+SBL   installed                IN-PKG         local            internal/risk/anchor_fallback_teeth_336_windows_test.go    anchor_miss_reason_339_other_test.go:98
+SBL   lands                    RED-elsewhere  field            internal/config/unwired.go                                 anchor_miss_reason_339_other_test.go:120
+SBL   set                      RED-elsewhere  local            cmd/wisp/firstrun_198r2_test.go                            assessor.go:10
+SBL   card                     RED-elsewhere  local            cmd/wisp/approval_always.go                                assessor.go:12
+SBL   L2                       IN-PKG         const            internal/risk/assessor.go                                  assessor.go:16
+SBL   L2                       IN-PKG         const            internal/risk/assessor.go                                  assessor.go:17
+SBL   dependencies             RED-nowhere                                                                                assessor.go:28
+SBL   today                    RED-nowhere                                                                                assessor.go:29
+SBL   L2                       IN-PKG         const            internal/risk/assessor.go                                  assessor.go:33
+SBL   contributions            RED-nowhere                                                                                assessor.go:36
+SBL   level                    IN-PKG         field            internal/risk/assessor.go                                  assessor.go:40
+SBL   window                   IN-PKG         param            internal/risk/allow_substring_pin_216_test.go              assessor.go:47
+SBL   outright                 RED-nowhere                                                                                assessor.go:51
+SBL   rule                     IN-PKG         local            internal/risk/blacklist.go                                 assessor.go:71
+SBL   IDs                      RED-nowhere                                                                                assessor.go:75
+SBL   A                        RED-elsewhere  field            internal/ball/tokens.go                                    assessor.go:80
+SBL   B                        RED-elsewhere  field            internal/ball/position.go                                  assessor.go:80
+SBL   hit                      IN-PKG         local            internal/risk/provenance_syncdirs_other_test.go            assessor.go:81
+SBL   target                   IN-PKG         local            internal/risk/pathresolver_anchor_spelling_windows_test.go assessor.go:82
+SBL   closed                   IN-PKG         field            internal/risk/provenance.go                                assessor.go:86
+SBL   authorization            RED-nowhere                                                                                assessor.go:97
+SBL   RiskLevel                RED-elsewhere  field            internal/agent/tools.go                                    assessor.go:105
+SBL   paths                    RED-elsewhere  param            cmd/wisp/resident_grant_writer_265_windows_test.go         assessor.go:107
+SBL   affects                  RED-nowhere                                                                                assessor.go:110
+SBL   target                   IN-PKG         local            internal/risk/pathresolver_anchor_spelling_windows_test.go assessor.go:113
+SBL   vector                   RED-nowhere                                                                                assessor.go:115
+SBL   shell                    RED-nowhere                                                                                assessor.go:117
+SBL   L2                       IN-PKG         const            internal/risk/assessor.go                                  assessor.go:118
+SBL   programs                 RED-nowhere                                                                                assessor.go:120
+SBL   classes                  IN-PKG         local            internal/risk/rules_irreversible.go                        assessor.go:122
+SBL   overwritten              RED-nowhere                                                                                assessor.go:125
+SBL   literal                  IN-PKG         field            internal/risk/anchor_fallback_teeth_336_windows_test.go    assessor.go:132
+SBL   one                      RED-elsewhere  rangevar         cmd/wisp/leg_sink_gate_131_test.go                         assessor.go:133
+SBL   domains                  RED-nowhere                                                                                assessor.go:134
+SBL   C26                      RED-nowhere                                                                                assessor.go:137
+SBL   entry                    IN-PKG         rangevar         internal/risk/rules_network.go                             assessor.go:139
+SBL   exemption                RED-nowhere                                                                                assessor.go:148
+SBL   lists                    RED-elsewhere  local            internal/memory/privacy_test.go                            assessor.go:158
+SBL   provenance               RED-elsewhere  result           cmd/wisp/resident_approval_windows.go                      assessor.go:164
+SBL   scoring                  RED-nowhere                                                                                assessor.go:172
+SBL   system                   RED-elsewhere  local            internal/winsec/winsec_windows.go                          assessor.go:179
+SBL   dormant                  RED-nowhere                                                                                assessor.go:188
+SBL   resolver                 RED-elsewhere  var              internal/winsec/resolve.go                                 assessor.go:194
+SBL   blacklist                RED-nowhere                                                                                assessor.go:200
+SBL   engine                   RED-nowhere                                                                                assessor.go:207
+SBL   judge                    RED-elsewhere  field            internal/agent/spill.go                                    assessor.go:214
+SBL   order                    RED-elsewhere  field            cmd/wisp/panel_transport_35r2_test.go                      assessor.go:263
+SBL   objects                  RED-nowhere                                                                                assessor_test.go:94
+SBL   card                     RED-elsewhere  local            cmd/wisp/approval_always.go                                assessor_test.go:96
+SBL   blacklists               RED-nowhere                                                                                blacklist.go:10
+SBL   entry                    IN-PKG         rangevar         internal/risk/rules_network.go                             blacklist.go:15
+SBL   override                 RED-elsewhere  result           internal/llm/systemproxy_windows.go                        blacklist.go:26
+SBL   sink                     RED-elsewhere  param            cmd/wisp/dataroot_128_test.go                              blacklist.go:49
+SBL   decision                 RED-elsewhere  local-var        cmd/wisp/ticket224_assembly_test.go                        blacklist.go:50
+SBL   only                     RED-elsewhere  local            internal/models/assembly_reachability_121_test.go          blacklist.go:61
+SBL   again                    RED-elsewhere  local            internal/agent/approval/pending_read_test.go               blacklist.go:64
+SBL   saw                      RED-elsewhere  local            cmd/wisp/plan_assembled_165r2_test.go                      blacklist.go:65
+SBL   narrower                 RED-nowhere                                                                                blacklist.go:67
+SBL   side                     RED-nowhere                                                                                blacklist.go:99
+SBL   form                     RED-elsewhere  rangevar         cmd/wisp/firstrun_257_test.go                              blacklist.go:106
+SBL   opened                   IN-PKG         local            internal/risk/allow_substring_pin_216_test.go              blacklist.go:112
+SBL   path                     IN-PKG         param            internal/risk/blacklist.go                                 blacklist.go:132
+SBL   itself                   RED-nowhere                                                                                blacklist.go:136
+SBL   unified                  RED-nowhere                                                                                blacklist.go:153
+SBL   exist                    RED-nowhere                                                                                blacklist.go:157
+SBL   CLOSED                   RED-nowhere                                                                                blacklist.go:193
+SBL   anchor                   IN-PKG         field            internal/risk/anchor_fallback_teeth_336_windows_test.go    blacklist.go:206
+SBL   tier                     RED-elsewhere  local            cmd/wisp/config_readers_255.go                             blacklist.go:213
+SBL   reason                   IN-PKG         field            internal/risk/assessor.go                                  blacklist.go:218
+SBL   tier                     RED-elsewhere  local            cmd/wisp/config_readers_255.go                             blacklist.go:241
+SBL   in                       IN-PKG         param            internal/risk/name_claim_two_arm_216_test.go               blacklist.go:242
+SBL   trustworthy              RED-nowhere                                                                                blacklist.go:276
+SBL   candidate                RED-elsewhere  local            internal/config/settings.go                                blacklist.go:286
+SBL   assembled                RED-elsewhere  local            internal/panel/l2_grant_boundary_test.go                   blacklist.go:306
+SBL   them                     RED-nowhere                                                                                blacklist.go:309
+SBL   shapes                   RED-elsewhere  local            cmd/wisp/firstrun_257_test.go                              blacklist.go:321
+SBL   test                     IN-PKG         param            internal/risk/blacklist.go                                 blacklist.go:333
+SBL   open                     IN-PKG         result           internal/risk/provenance.go                                blacklist.go:348
+SBL   DEFERRED                 RED-nowhere                                                                                blacklist.go:355
+SBL   forms                    RED-elsewhere  local            cmd/wisp/secret_test.go                                    blacklist.go:370
+SBL   name                     IN-PKG         local            internal/risk/allow_substring_pin_216_test.go              blacklist.go:382
+SBL   R9                       IN-PKG         const            internal/risk/assessor.go                                  doc.go:1
+SBL   gate                     RED-elsewhere  field            cmd/wisp/approval_reply.go                                 doc.go:1
+SBL   PathResolver             RED-nowhere                                                                                doc.go:2
+SBL   taint                    IN-PKG         field            internal/risk/assessor.go                                  doc.go:2
+SBL   L0                       IN-PKG         const            internal/risk/assessor.go                                  doc.go:5
+SBL   L1                       IN-PKG         const            internal/risk/assessor.go                                  doc.go:5
+SBL   L2                       IN-PKG         const            internal/risk/assessor.go                                  doc.go:6
+SBL   conclusion               RED-nowhere                                                                                doc.go:7
+SBL   errors                   RED-nowhere                                                                                doc.go:9
+SBL   execution                RED-nowhere                                                                                doc.go:12
+SBL   queue                    RED-elsewhere  local-var        cmd/wisp/leg_dispatch_gate_133_test.go                     doc.go:12
+SBL   storage                  RED-nowhere                                                                                doc.go:13
+SBL   path                     IN-PKG         param            internal/risk/blacklist.go                                 hostpath_185.go:7
+SBL   approved                 RED-elsewhere  field            internal/config/manager.go                                 hostpath_185.go:16
+SBL   stamped                  RED-nowhere                                                                                hostpath_185.go:24
+SBL   declares                 RED-nowhere                                                                                hostpath_185.go:26
+SBL   provenance               RED-elsewhere  result           cmd/wisp/resident_approval_windows.go                      hostpath_185.go:31
+SBL   list                     IN-PKG         param            internal/risk/provenance_test.go                           hostpath_185.go:33
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     hostpath_185.go:38
+SBL   body                     IN-PKG         param            internal/risk/pointer_183_test.go                          hostpath_185.go:46
+SBL   evidence                 RED-elsewhere  result           tools/d22scan/selftest.go                                  hostpath_185.go:51
+SBL   mint                     RED-elsewhere  field            internal/session/manage.go                                 hostpath_185.go:59
+SBL   modes                    RED-elsewhere  field            cmd/wisp/run.go                                            mode.go:4
+SBL   modes                    RED-elsewhere  field            cmd/wisp/run.go                                            mode.go:13
+SBL   L1                       IN-PKG         const            internal/risk/assessor.go                                  mode.go:17
+SBL   L2                       IN-PKG         const            internal/risk/assessor.go                                  mode.go:25
+SBL   here                     RED-nowhere                                                                                mode.go:30
+SBL   forever                  RED-nowhere                                                                                mode.go:32
+SBL   R1                       IN-PKG         const            internal/risk/assessor.go                                  mode.go:36
+SBL   R2                       IN-PKG         const            internal/risk/assessor.go                                  mode.go:36
+SBL   R3                       IN-PKG         const            internal/risk/assessor.go                                  mode.go:37
+SBL   R4                       IN-PKG         const            internal/risk/assessor.go                                  mode.go:38
+SBL   R5                       IN-PKG         const            internal/risk/assessor.go                                  mode.go:38
+SBL   R8                       IN-PKG         const            internal/risk/assessor.go                                  mode.go:38
+SBL   mode                     RED-elsewhere  local-var        cmd/wisp/approval_reply_stdin_windows.go                   mode.go:43
+SBL   modes                    RED-elsewhere  field            cmd/wisp/run.go                                            mode.go:58
+SBL   order                    RED-elsewhere  field            cmd/wisp/panel_transport_35r2_test.go                      mode.go:72
+SBL   Mode                     IN-PKG         type             internal/risk/mode.go                                      mode.go:121
+SBL   modes                    RED-elsewhere  field            cmd/wisp/run.go                                            mode.go:127
+SBL   verdict                  RED-elsewhere  local            cmd/wisp/config_readers_255.go                             mode.go:143
+SBL   given                    RED-nowhere                                                                                mode.go:152
+SBL   line                     IN-PKG         local            internal/risk/allow_substring_pin_216_test.go              mode.go:153
+SBL   silently                 RED-nowhere                                                                                mode.go:172
+SBL   B                        RED-elsewhere  field            internal/ball/position.go                                  name_claim_two_arm_216_test.go:11
+SBL   them                     RED-nowhere                                                                                name_claim_two_arm_216_test.go:19
+SBL   blacklist                RED-nowhere                                                                                name_claim_two_arm_216_test.go:22
+SBL   allowlist                IN-PKG         param            internal/risk/rules_network.go                             name_claim_two_arm_216_test.go:23
+SBL   allowlist                IN-PKG         param            internal/risk/rules_network.go                             name_claim_two_arm_216_test.go:24
+SBL   Cf                       RED-nowhere                                                                                name_claim_two_arm_216_test.go:32
+SBL   surface                  RED-elsewhere  local            cmd/wisp/approval_reply.go                                 name_claim_two_arm_216_test.go:73
+SBL   unproven                 RED-nowhere                                                                                name_claim_two_arm_216_test.go:77
+SBL   here                     RED-nowhere                                                                                name_claim_two_arm_216_test.go:78
+SBL   level                    IN-PKG         field            internal/risk/assessor.go                                  name_claim_two_arm_216_test.go:87
+SBL   directory                RED-nowhere                                                                                name_claim_two_arm_216_test.go:137
+SBL   PathResolver             RED-nowhere                                                                                pathresolver.go:13
+SBL   expand                   RED-nowhere                                                                                pathresolver.go:16
+SBL   forbidden                RED-elsewhere  rangevar         cmd/wisp/config_receipt_255_test.go                        pathresolver.go:20
+SBL   inside                   IN-PKG         local            internal/risk/pointer_183_test.go                          pathresolver.go:21
+SBL   violation                RED-nowhere                                                                                pathresolver.go:27
+SBL   purpose                  RED-elsewhere  rangevar         internal/models/manifest_real_test.go                      pathresolver.go:43
+SBL   held                     RED-elsewhere  local            internal/agent/approval/cancel_key_label_260r4_test.go     pathresolver.go:47
+SBL   resolution               RED-nowhere                                                                                pathresolver.go:53
+SBL   exception                RED-nowhere                                                                                pathresolver.go:60
+SBL   succeeded                RED-nowhere                                                                                pathresolver.go:63
+SBL   step                     RED-elsewhere  rangevar         cmd/wisp/approval_reply_201_test.go                        pathresolver.go:71
+SBL   Canonical                IN-PKG         field            internal/risk/pathresolver.go                              pathresolver.go:75
+SBL   fix                      RED-nowhere                                                                                pathresolver.go:84
+SBL   reparse_point_exceptions RED-nowhere                                                                                pathresolver.go:102
+SBL   exist                    RED-nowhere                                                                                pathresolver.go:136
+SBL   variables                RED-nowhere                                                                                pathresolver.go:142
+SBL   codebase                 RED-nowhere                                                                                pathresolver.go:205
+SBL   file                     IN-PKG         field            internal/risk/allow_substring_pin_216_test.go              pathresolver.go:217
+SBL   OS                       RED-nowhere                                                                                pathresolver.go:219
+SBL   human                    RED-nowhere                                                                                pathresolver.go:220
+SBL   here                     RED-nowhere                                                                                pathresolver.go:242
+SBL   which                    RED-elsewhere  param            internal/ball/live_guard_windows_test.go                   pathresolver.go:243
+SBL   and                      RED-elsewhere  method(jsParser) cmd/wisp/panel_transport_35r2_test.go                      pathresolver.go:244
+SBL   comparison               RED-nowhere                                                                                pathresolver.go:284
+SBL   environment              RED-nowhere                                                                                pathresolver.go:289
+SBL   form                     RED-elsewhere  rangevar         cmd/wisp/firstrun_257_test.go                              pathresolver.go:291
+SBL   one                      RED-elsewhere  rangevar         cmd/wisp/leg_sink_gate_131_test.go                         pathresolver.go:292
+SBL   closed                   IN-PKG         field            internal/risk/provenance.go                                pathresolver.go:300
+SBL   verbatim                 RED-nowhere                                                                                pathresolver.go:310
+SBL   build                    RED-elsewhere  local            cmd/wisp/panel_host_gate_test.go                           pathresolver.go:311
+SBL   on                       IN-PKG         local            internal/risk/hostpath_185.go                              pathresolver.go:314
+SBL   open                     IN-PKG         result           internal/risk/provenance.go                                pathresolver.go:319
+SBL   spelling                 IN-PKG         rangevar         internal/risk/anchor_fallback_teeth_336_other_test.go      pathresolver.go:339
+SBL   know                     RED-nowhere                                                                                pathresolver.go:411
+SBL   in                       IN-PKG         param            internal/risk/name_claim_two_arm_216_test.go               pathresolver_anchor_spelling_windows_test.go:13
+SBL   f278c57f                 RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:17
+SBL   file                     IN-PKG         field            internal/risk/allow_substring_pin_216_test.go              pathresolver_anchor_spelling_windows_test.go:18
+SBL   family                   RED-elsewhere  param            cmd/wisp/panel_host_windows_test.go                        pathresolver_anchor_spelling_windows_test.go:28
+SBL   back                     RED-elsewhere  local            internal/config/unwired_test.go                            pathresolver_anchor_spelling_windows_test.go:31
+SBL   verdict                  RED-elsewhere  local            cmd/wisp/config_readers_255.go                             pathresolver_anchor_spelling_windows_test.go:34
+SBL   junction                 RED-elsewhere  field            internal/tools/bridge_junction_windows_test.go             pathresolver_anchor_spelling_windows_test.go:43
+SBL   ClassNone                IN-PKG         const            internal/risk/blacklist.go                                 pathresolver_anchor_spelling_windows_test.go:47
+SBL   correctly                RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:79
+SBL   closed                   IN-PKG         field            internal/risk/provenance.go                                pathresolver_anchor_spelling_windows_test.go:82
+SBL   names                    IN-PKG         local            internal/risk/pathresolver_junction_windows_test.go        pathresolver_anchor_spelling_windows_test.go:100
+SBL   here                     RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:106
+SBL   here                     RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:127
+SBL   each                     RED-elsewhere  local-const      internal/agent/control_test.go                             pathresolver_anchor_spelling_windows_test.go:129
+SBL   all                      RED-elsewhere  local            cmd/wisp/approval_reply_201_test.go                        pathresolver_anchor_spelling_windows_test.go:131
+SBL   ancestors                RED-elsewhere  local            internal/winsec/winsec_other.go                            pathresolver_anchor_spelling_windows_test.go:169
+SBL   verdict                  RED-elsewhere  local            cmd/wisp/config_readers_255.go                             pathresolver_anchor_spelling_windows_test.go:175
+SBL   md                       RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:178
+SBL   share                    IN-PKG         local            internal/risk/pathresolver.go                              pathresolver_anchor_spelling_windows_test.go:227
+SBL   mutation                 RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:233
+SBL   B                        RED-elsewhere  field            internal/ball/position.go                                  pathresolver_anchor_spelling_windows_test.go:309
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     pathresolver_anchor_spelling_windows_test.go:312
+SBL   spelling                 IN-PKG         rangevar         internal/risk/anchor_fallback_teeth_336_other_test.go      pathresolver_anchor_spelling_windows_test.go:318
+SBL   deny                     RED-elsewhere  rangevar         internal/agent/instructions_test.go                        pathresolver_anchor_spelling_windows_test.go:322
+SBL   assertion                RED-nowhere                                                                                pathresolver_anchor_spelling_windows_test.go:323
+SBL   exists                   RED-elsewhere  local            cmd/wisp/panel_transport_35r2_test.go                      pathresolver_anchor_spelling_windows_test.go:343
+SBL   open                     IN-PKG         result           internal/risk/provenance.go                                pathresolver_anchor_spelling_windows_test.go:344
+SBL   budget                   RED-elsewhere  param            cmd/wisp/panel_locked_naming_33r11_windows_test.go         pathresolver_bench_test.go:9
+SBL   machinery                RED-nowhere                                                                                pathresolver_budget_norace_test.go:15
+SBL   pass                     RED-elsewhere  param            cmd/wisp/doctor.go                                         pathresolver_budget_norace_test.go:20
+SBL   expandInput              IN-PKG         func             internal/risk/pathresolver.go                              pathresolver_expansion_test.go:15
+SBL   mandated                 RED-nowhere                                                                                pathresolver_expansion_test.go:16
+SBL   normalizer               RED-nowhere                                                                                pathresolver_expansion_test.go:30
+SBL   back                     RED-elsewhere  local            internal/config/unwired_test.go                            pathresolver_expansion_test.go:35
+SBL   refuses                  RED-elsewhere  field            internal/tools/paths_twocontainments_252_r2_test.go        pathresolver_expansion_test.go:39
+SBL   PathResolver             RED-nowhere                                                                                pathresolver_junction_windows_test.go:16
+SBL   artifacts                RED-elsewhere  local            internal/agent/spill_path_invariant_test.go                pathresolver_junction_windows_test.go:17
+SBL   J                        RED-nowhere                                                                                pathresolver_junction_windows_test.go:47
+SBL   resolver                 RED-elsewhere  var              internal/winsec/resolve.go                                 pathresolver_junction_windows_test.go:86
+SBL   disabled                 RED-nowhere                                                                                pathresolver_junction_windows_test.go:122
+SBL   binary                   RED-nowhere                                                                                pathresolver_junction_windows_test.go:155
+SBL   gear                     RED-nowhere                                                                                pathresolver_junction_windows_test.go:158
+SBL   namesSameFile            IN-PKG         func             internal/risk/pathresolver_anchor_spelling_windows_test.go pathresolver_junction_windows_test.go:178
+SBL   asks                     RED-elsewhere  local-var        internal/config/manager_223_test.go                        pathresolver_junction_windows_test.go:318
+SBL   design                   RED-nowhere                                                                                pathresolver_junction_windows_test.go:322
+SBL   classifies               RED-nowhere                                                                                pathresolver_other.go:8
+SBL   fix                      RED-nowhere                                                                                pathresolver_rewrite_account_test.go:11
+SBL   stays                    RED-nowhere                                                                                pathresolver_rewrite_account_test.go:11
+SBL   filled                   RED-elsewhere  field            internal/proc/shutdown_hooks.go                            pathresolver_rewrite_account_test.go:15
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     pathresolver_rewrite_account_test.go:16
+SBL   option                   RED-nowhere                                                                                pathresolver_rewrite_account_test.go:79
+SBL   leg                      IN-PKG         param            internal/risk/pathresolver_expansion_test.go               pathresolver_rewrite_account_test.go:119
+SBL   evaluation               RED-nowhere                                                                                pathresolver_volumeless_spelling_308_test.go:16
+SBL   VolumeName               RED-nowhere                                                                                pathresolver_volumeless_spelling_308_test.go:23
+SBL   layer                    RED-nowhere                                                                                pathresolver_volumeless_spelling_308_test.go:28
+SBL   surface                  RED-elsewhere  local            cmd/wisp/approval_reply.go                                 pathresolver_volumeless_spelling_308_test.go:30
+SBL   TestClassifySpellingInvariance IN-PKG         func             internal/risk/pathresolver_anchor_spelling_windows_test.go pathresolver_volumeless_spelling_308_test.go:39
+SBL   NAME                     RED-nowhere                                                                                pathresolver_volumeless_spelling_308_test.go:76
+SBL   shape                    RED-elsewhere  local            cmd/wisp/panel_host_gate_test.go                           pathresolver_volumeless_spelling_308_test.go:83
+SBL   reader                   RED-elsewhere  param            cmd/wisp/slo_windows.go                                    pathresolver_volumeless_spelling_308_test.go:118
+SBL   flags                    RED-elsewhere  param            cmd/wisp/run.go                                            pathresolver_windows.go:12
+SBL   path                     IN-PKG         param            internal/risk/blacklist.go                                 pathresolver_windows.go:19
+SBL   names                    IN-PKG         local            internal/risk/pathresolver_junction_windows_test.go        pathresolver_windows.go:22
+SBL   points                   RED-elsewhere  result           internal/tools/toolrequest_nail_309_test.go                pathresolver_windows.go:55
+SBL   this                     RED-elsewhere  field            cmd/wisp/panel_transport_35r2_test.go                      pathshape_portable_test.go:15
+SBL   lexCanonical             IN-PKG         func             internal/risk/pathresolver.go                              pathshape_portable_test.go:94
+SBL   tier                     RED-elsewhere  local            cmd/wisp/config_readers_255.go                             pathshape_portable_test.go:117
+SBL   index                    RED-elsewhere  param            cmd/wisp/panel_transport_35r2_test.go                      pointer_183_test.go:12
+SBL   DEDUPED                  RED-nowhere                                                                                pointer_183_test.go:14
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     pointer_183_test.go:23
+SBL   pass                     RED-elsewhere  param            cmd/wisp/doctor.go                                         pointer_183_test.go:29
+SBL   produced                 RED-elsewhere  local            internal/agent/declared_l0_risk_179_test.go                pointer_183_test.go:35
+SBL   ptr183Path               IN-PKG         const            internal/risk/pointer_183_test.go                          pointer_183_test.go:39
+SBL   changed                  RED-elsewhere  local            cmd/wisp/run.go                                            pointer_183_test.go:64
+SBL   position                 RED-elsewhere  param            internal/agent/approval/pending_read_test.go               pointer_183_test.go:76
+SBL   cost                     IN-PKG         local            internal/risk/pathresolver_budget_norace_test.go           pointer_183_test.go:82
+SBL   hay                      IN-PKG         param            internal/risk/pointer_183_test.go                          pointer_183_test.go:88
+SBL   differ                   RED-nowhere                                                                                pointer_183_test.go:111
+SBL   REFEREE                  RED-nowhere                                                                                pointer_183_test.go:148
+SBL   code                     RED-elsewhere  local            cmd/wisp/always_write_no_clobber_226_test.go               pointer_183_test.go:151
+SBL   today                    RED-nowhere                                                                                pointer_183_test.go:168
+SBL   match                    IN-PKG         local            internal/risk/pointer_183_test.go                          pointer_183_test.go:186
+SBL   repetition               RED-nowhere                                                                                pointer_183_test.go:197
+SBL   fixture                  RED-elsewhere  param            internal/agent/harness_test.go                             pointer_183_test.go:218
+SBL   leg                      IN-PKG         param            internal/risk/pathresolver_expansion_test.go               pointer_183_test.go:235
+SBL   shape                    RED-elsewhere  local            cmd/wisp/panel_host_gate_test.go                           pointer_183_test.go:263
+SBL   exemption                RED-nowhere                                                                                pointer_183_test.go:285
+SBL   path                     IN-PKG         param            internal/risk/blacklist.go                                 pointer_183_test.go:291
+SBL   exemption                RED-nowhere                                                                                pointer_183_test.go:298
+SBL   NOTHING                  RED-nowhere                                                                                pointer_183_test.go:343
+SBL   M3                       RED-nowhere                                                                                pointer_183_test.go:344
+SBL   code                     RED-elsewhere  local            cmd/wisp/always_write_no_clobber_226_test.go               pointer_183_test.go:355
+SBL   and                      RED-elsewhere  method(jsParser) cmd/wisp/panel_transport_35r2_test.go                      pointer_183_test.go:364
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     pointer_183_test.go:365
+SBL   r1                       IN-PKG         local            internal/risk/pathresolver_junction_windows_test.go        pointer_185_test.go:3
+SBL   c1                       RED-elsewhere  local            internal/agent/corr_percall_242_test.go                    pointer_185_test.go:6
+SBL   defect                   RED-nowhere                                                                                pointer_185_test.go:10
+SBL   anchor                   IN-PKG         field            internal/risk/anchor_fallback_teeth_336_windows_test.go    pointer_185_test.go:17
+SBL   pass                     RED-elsewhere  param            cmd/wisp/doctor.go                                         pointer_185_test.go:27
+SBL   candidate                RED-elsewhere  local            internal/config/settings.go                                pointer_185_test.go:59
+SBL   face                     RED-elsewhere  param            internal/agent/approval/cancel_key_label_260r4_test.go     pointer_185_test.go:70
+SBL   scope                    IN-PKG         field            internal/risk/provenance.go                                pointer_185_test.go:148
+SBL   catcher                  RED-nowhere                                                                                pointer_185_test.go:165
+SBL   mutant                   RED-nowhere                                                                                pointer_185_test.go:168
+SBL   fixture                  RED-elsewhere  param            internal/agent/harness_test.go                             pointer_185_test.go:191
+SBL   code                     RED-elsewhere  local            cmd/wisp/always_write_no_clobber_226_test.go               pointer_185_test.go:218
+SBL   roster                   RED-elsewhere  param            cmd/wisp/leg_dispatch_gate_133_test.go                     pointer_185_test.go:223
+SBL   again                    RED-elsewhere  local            internal/agent/approval/pending_read_test.go               pointer_185_test.go:246
+SBL   mark                     RED-elsewhere  param            cmd/wisp/config_reload_223_test.go                         pointer_185_test.go:281
+SBL   measured                 RED-elsewhere  local-var        cmd/wisp/ticket224_assembly_test.go                        pointer_185_test.go:320
+SBL   permanently              RED-nowhere                                                                                pointer_185_test.go:350
+SBL   path                     IN-PKG         param            internal/risk/blacklist.go                                 pointer_185_test.go:386
+SBL   candidate                RED-elsewhere  local            internal/config/settings.go                                pointer_185_test.go:394
+SBL   channels                 RED-elsewhere  field            internal/agent/approval/gate.go                            provenance.go:14
+SBL   channels                 RED-elsewhere  field            internal/agent/approval/gate.go                            provenance.go:25
+SBL   text                     IN-PKG         param            internal/risk/provenance.go                                provenance.go:29
+SBL   DIR                      RED-nowhere                                                                                provenance.go:31
+SBL   URL                      IN-PKG         field            internal/risk/assessor.go                                  provenance.go:32
+SBL   name                     IN-PKG         local            internal/risk/allow_substring_pin_216_test.go              provenance.go:34
+SBL   value                    RED-elsewhere  param            cmd/wisp/panel_assets.go                                   provenance.go:36
+SBL   yet                      RED-nowhere                                                                                provenance.go:39
+SBL   call                     RED-elsewhere  local            cmd/wisp/exec_holder_toggle_321_test.go                    provenance.go:47
+SBL   caught                   RED-nowhere                                                                                provenance.go:50
+SBL   directly                 RED-nowhere                                                                                provenance.go:56
+SBL   providers                RED-elsewhere  param            internal/config/catalog.go                                 provenance.go:58
+SBL   must                     RED-elsewhere  rangevar         internal/panel/composer_test.go                            provenance.go:59
+SBL   inside                   IN-PKG         local            internal/risk/pointer_183_test.go                          provenance.go:62
+SBL   today                    RED-nowhere                                                                                provenance.go:64
+SBL   and                      RED-elsewhere  method(jsParser) cmd/wisp/panel_transport_35r2_test.go                      provenance.go:68
+SBL   persisted                RED-nowhere                                                                                provenance.go:70
+SBL   limits                   RED-elsewhere  param            internal/llm/ratelimit.go                                  provenance.go:72
+SBL   floor                    RED-elsewhere  local            internal/agent/prompt_test.go                              provenance.go:77
+SBL   marked                   RED-elsewhere  local            internal/agent/approval/zz_201_a1_junction_marker_windows_test.go provenance.go:80
+SBL   title                    RED-elsewhere  param            cmd/balldebug/diff_windows.go                              provenance.go:87
+SBL   is                       RED-elsewhere  local            cmd/wisp/leg_dispatch_gate_133_test.go                     provenance.go:93
+SBL   set                      RED-elsewhere  local            cmd/wisp/firstrun_198r2_test.go                            provenance.go:97
+SBL   channels                 RED-elsewhere  field            internal/agent/approval/gate.go                            provenance.go:115
+SBL   text                     IN-PKG         param            internal/risk/provenance.go                                provenance.go:130
+SBL   dir                      IN-PKG         local            internal/risk/anchor_fallback_teeth_336_other_test.go      provenance.go:144
+SBL   exemption                RED-nowhere                                                                                provenance.go:148
+SBL   once                     RED-elsewhere  local-var        cmd/wisp/resident_audio_247_live_windows_test.go           provenance.go:153
+SBL   present                  IN-PKG         local            internal/risk/pathresolver_volumeless_spelling_308_test.go provenance.go:154
+SBL   destination              RED-nowhere                                                                                provenance.go:158
+SBL   budgets                  RED-elsewhere  field            internal/agent/prompt.go                                   provenance.go:177
+SBL   tail                     IN-PKG         param            internal/risk/pathresolver.go                              provenance.go:182
+SBL   defaults                 RED-elsewhere  local            cmd/wisp/resident_tray_mute_293_windows_test.go            provenance.go:193
+SBL   STRICTER                 RED-nowhere                                                                                provenance.go:197
+SBL   in                       IN-PKG         param            internal/risk/name_claim_two_arm_216_test.go               provenance.go:197
+SBL   source                   IN-PKG         local            internal/risk/rules_gateway.go                             provenance.go:199
+SBL   missed                   RED-elsewhere  local            internal/panel/display_scrub_216_test.go                   provenance.go:200
+SBL   scanned                  RED-elsewhere  local            cmd/wisp/panel_host_gate_test.go                           provenance.go:203
+SBL   hit                      IN-PKG         local            internal/risk/provenance_syncdirs_other_test.go            provenance.go:207
+SBL   sources                  RED-elsewhere  field            cmd/wisp/panel_assets.go                                   provenance.go:212
+SBL   gate                     RED-elsewhere  field            cmd/wisp/approval_reply.go                                 provenance.go:213
+SBL   Resolve                  IN-PKG         func             internal/risk/pathresolver.go                              provenance.go:217
+SBL   roots                    IN-PKG         field            internal/risk/syncdirs.go                                  provenance.go:219
+SBL   probes                   RED-elsewhere  param            cmd/wisp/panel_resident_windows_test.go                    provenance.go:226
+SBL   entirely                 RED-nowhere                                                                                provenance.go:231
+SBL   written                  IN-PKG         local            internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go provenance.go:262
+SBL   tool                     IN-PKG         param            internal/risk/assessor.go                                  provenance.go:276
+SBL   origin                   IN-PKG         param            internal/risk/hostpath_185.go                              provenance.go:277
+SBL   fragment                 RED-elsewhere  method(toolAssembler) internal/llm/openaichat/toolasm.go                         provenance.go:278
+SBL   options                  RED-elsewhere  param            cmd/wisp/panel_control_windows.go                          provenance.go:291
+SBL   lifetime                 RED-nowhere                                                                                provenance.go:362
+SBL   claimed                  IN-PKG         local            internal/risk/name_claim_two_arm_216_test.go               provenance.go:370
+SBL   itself                   RED-nowhere                                                                                provenance.go:383
+SBL   now                      RED-elsewhere  local            cmd/wisp/config_reload_223_test.go                         provenance.go:399
+SBL   untouched                RED-elsewhere  local            internal/winsec/acl_windows_test.go                        provenance.go:420
+SBL   scope                    IN-PKG         field            internal/risk/provenance.go                                provenance.go:453
+SBL   taint                    IN-PKG         field            internal/risk/assessor.go                                  provenance.go:475
+SBL   declaration              RED-nowhere                                                                                provenance.go:482
+SBL   content                  IN-PKG         param            internal/risk/pathresolver_junction_windows_test.go        provenance.go:484
+SBL   R4                       IN-PKG         const            internal/risk/assessor.go                                  provenance.go:489
+SBL   coordinates              RED-nowhere                                                                                provenance.go:494
+SBL   recorded                 RED-elsewhere  local            cmd/wisp/panel_host_windows_test.go                        provenance.go:499
+SBL   roster                   RED-elsewhere  param            cmd/wisp/leg_dispatch_gate_133_test.go                     provenance.go:506
+SBL   dedupe                   RED-elsewhere  func             internal/agent/compress.go                                 provenance.go:519
+SBL   R4                       IN-PKG         const            internal/risk/assessor.go                                  provenance.go:523
+SBL   side                     RED-nowhere                                                                                provenance.go:528
+SBL   mark                     RED-elsewhere  param            cmd/wisp/config_reload_223_test.go                         provenance.go:532
+SBL   path                     IN-PKG         param            internal/risk/blacklist.go                                 provenance.go:537
+SBL   roster                   RED-elsewhere  param            cmd/wisp/leg_dispatch_gate_133_test.go                     provenance.go:543
+SBL   provenance               RED-elsewhere  result           cmd/wisp/resident_approval_windows.go                      provenance.go:547
+SBL   them                     RED-nowhere                                                                                provenance.go:552
+SBL   basename                 RED-nowhere                                                                                provenance.go:555
+SBL   Ordering                 RED-nowhere                                                                                provenance.go:580
+SBL   nothing                  RED-nowhere                                                                                provenance.go:588
+SBL   as                       RED-elsewhere  local            cmd/wisp/leg_dispatch_gate_133_test.go                     provenance.go:612
+SBL   R4                       IN-PKG         const            internal/risk/assessor.go                                  provenance.go:616
+SBL   taint                    IN-PKG         field            internal/risk/assessor.go                                  provenance.go:632
+SBL   page                     RED-elsewhere  local            cmd/wisp/subagent_carrier_197_test.go                      provenance.go:644
+SBL   sources                  RED-elsewhere  field            cmd/wisp/panel_assets.go                                   provenance.go:653
+SBL   information              RED-nowhere                                                                                provenance.go:675
+SBL   all                      RED-elsewhere  local            cmd/wisp/approval_reply_201_test.go                        provenance.go:683
+SBL   pass                     RED-elsewhere  param            cmd/wisp/doctor.go                                         provenance.go:686
+SBL   snapshot                 RED-elsewhere  method(geoSink255r1) cmd/wisp/panel_reshow_255r1_windows_test.go                provenance.go:699
+SBL   name                     IN-PKG         local            internal/risk/allow_substring_pin_216_test.go              provenance.go:714
+SBL   order                    RED-elsewhere  field            cmd/wisp/panel_transport_35r2_test.go                      provenance.go:715
+SBL   parameters               RED-nowhere                                                                                provenance.go:718
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     provenance.go:724
+SBL   payload                  IN-PKG         rangevar         internal/risk/provenance_test.go                           provenance.go:754
+SBL   field                    RED-elsewhere  param            cmd/wisp/config_receipt_255_test.go                        provenance.go:761
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     provenance.go:792
+SBL   text                     IN-PKG         param            internal/risk/provenance.go                                provenance.go:823
+SBL   Inspect                  IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance.go:825
+SBL   scan                     RED-elsewhere  param            internal/memory/dao_tasklog.go                             provenance.go:857
+SBL   gate                     RED-elsewhere  field            cmd/wisp/approval_reply.go                                 provenance.go:875
+SBL   rule                     IN-PKG         local            internal/risk/blacklist.go                                 provenance.go:883
+SBL   caught                   RED-nowhere                                                                                provenance.go:886
+SBL   closes                   RED-nowhere                                                                                provenance.go:889
+SBL   sink                     RED-elsewhere  param            cmd/wisp/dataroot_128_test.go                              provenance.go:892
+SBL   open                     IN-PKG         result           internal/risk/provenance.go                                provenance.go:896
+SBL   them                     RED-nowhere                                                                                provenance.go:898
+SBL   short                    IN-PKG         local            internal/risk/pathresolver_junction_windows_test.go        provenance.go:904
+SBL   sync                     IN-PKG         field            internal/risk/provenance.go                                provenance.go:924
+SBL   names                    IN-PKG         local            internal/risk/pathresolver_junction_windows_test.go        provenance.go:988
+SBL   sink                     RED-elsewhere  param            cmd/wisp/dataroot_128_test.go                              provenance.go:1005
+SBL   order                    RED-elsewhere  field            cmd/wisp/panel_transport_35r2_test.go                      provenance.go:1037
+SBL   target                   IN-PKG         local            internal/risk/pathresolver_anchor_spelling_windows_test.go provenance.go:1045
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     provenance.go:1064
+SBL   too                      RED-nowhere                                                                                provenance.go:1077
+SBL   demands                  RED-nowhere                                                                                provenance_syncdirs_other_test.go:13
+SBL   half                     RED-elsewhere  local            internal/audio/level_test.go                               provenance_syncdirs_other_test.go:18
+SBL   half                     RED-elsewhere  local            internal/audio/level_test.go                               provenance_syncdirs_other_test.go:20
+SBL   subject                  RED-elsewhere  local            cmd/wisp/slo_windows.go                                    provenance_syncdirs_other_test.go:28
+SBL   failure                  RED-elsewhere  method(widenRun) cmd/wisp/approval_always_201_test.go                       provenance_syncdirs_other_test.go:42
+SBL   ancestor                 IN-PKG         result           internal/risk/syncdirs_ancestor_actable_leg_116_test.go    provenance_syncdirs_other_test.go:75
+SBL   directory                RED-nowhere                                                                                provenance_syncdirs_windows_test.go:17
+SBL   lands                    RED-elsewhere  field            internal/config/unwired.go                                 provenance_syncdirs_windows_test.go:25
+SBL   grade                    IN-PKG         param            internal/risk/syncdirs_test.go                             provenance_syncdirs_windows_test.go:39
+SBL   HomeDir                  IN-PKG         field            internal/risk/provenance.go                                provenance_test.go:29
+SBL   fixture                  RED-elsewhere  param            internal/agent/harness_test.go                             provenance_test.go:73
+SBL   source                   IN-PKG         local            internal/risk/rules_gateway.go                             provenance_test.go:101
+SBL   AC                       RED-nowhere                                                                                provenance_test.go:147
+SBL   transcript               RED-nowhere                                                                                provenance_test.go:149
+SBL   exfil                    RED-nowhere                                                                                provenance_test.go:163
+SBL   L2                       IN-PKG         const            internal/risk/assessor.go                                  provenance_test.go:167
+SBL   announce                 RED-nowhere                                                                                provenance_test.go:203
+SBL   six                      RED-nowhere                                                                                provenance_test.go:203
+SBL   hit                      IN-PKG         local            internal/risk/provenance_syncdirs_other_test.go            provenance_test.go:205
+SBL   further                  RED-nowhere                                                                                provenance_test.go:216
+SBL   exfil                    RED-nowhere                                                                                provenance_test.go:257
+SBL   seam                     RED-nowhere                                                                                provenance_test.go:269
+SBL   DisposalScope            RED-elsewhere  type             internal/plugin/disposal.go                                provenance_test.go:294
+SBL   scope                    IN-PKG         field            internal/risk/provenance.go                                provenance_test.go:306
+SBL   clean                    RED-elsewhere  field            cmd/wisp/secret_dataroot_119b_test.go                      provenance_test.go:307
+SBL   CheckText                IN-PKG         method(Provenance) internal/risk/provenance.go                                provenance_test.go:367
+SBL   scope                    IN-PKG         field            internal/risk/provenance.go                                provenance_test.go:374
+SBL   adapter                  RED-elsewhere  method(httptestServer) internal/llm/openaichat/adapter_test.go                    provenance_test.go:427
+SBL   gated                    RED-elsewhere  local-var        cmd/wisp/run_test.go                                       provenance_test.go:436
+SBL   membershipEngine         IN-PKG         func             internal/risk/syncdirs_test.go                             provenance_test.go:455
+SBL   decide                   RED-elsewhere  method(Replies)  internal/agent/approval/replies.go                         provenance_test.go:463
+SBL   channel                  IN-PKG         field            internal/risk/provenance.go                                provenance_test.go:544
+SBL   all                      RED-elsewhere  local            cmd/wisp/approval_reply_201_test.go                        provenance_test.go:589
+SBL   OneDrive                 IN-PKG         field            internal/risk/syncdirs.go                                  provenance_test.go:619
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     provenance_test.go:682
+SBL   exempt                   RED-elsewhere  local-var        internal/ball/tokens_table_test.go                         provenance_test.go:685
+SBL   passing                  RED-nowhere                                                                                provenance_test.go:716
+SBL   characters               RED-nowhere                                                                                provenance_test.go:747
+SBL   weakened                 RED-nowhere                                                                                provenance_test.go:792
+SBL   A                        RED-elsewhere  field            internal/ball/tokens.go                                    provenance_test.go:795
+SBL   stricter                 RED-nowhere                                                                                provenance_test.go:805
+SBL   runes                    RED-elsewhere  local            cmd/wisp/approval_reply.go                                 provenance_test.go:806
+SBL   floor                    RED-elsewhere  local            internal/agent/prompt_test.go                              provenance_test.go:807
+SBL   goroutine                RED-nowhere                                                                                provenance_test.go:849
+SBL   risk                     RED-elsewhere  param            internal/agent/journal.go                                  provenance_test.go:862
+SBL   reason                   IN-PKG         field            internal/risk/assessor.go                                  provenance_test.go:867
+SBL   miss                     RED-elsewhere  local            internal/panel/inbound_roster_253_test.go                  provenance_test.go:870
+SBL   criterion                RED-nowhere                                                                                provenance_test.go:901
+SBL   silent                   RED-elsewhere  local            cmd/wisp/resident_audio_247_windows_test.go                provenance_test.go:933
+SBL   criterion                RED-nowhere                                                                                provenance_test.go:949
+SBL   criterion                RED-nowhere                                                                                provenance_test.go:983
+SBL   L2                       IN-PKG         const            internal/risk/assessor.go                                  rules_gateway.go:31
+SBL   L2                       IN-PKG         const            internal/risk/assessor.go                                  rules_gateway.go:57
+SBL   authorization            RED-nowhere                                                                                rules_gateway.go:99
+SBL   L2                       IN-PKG         const            internal/risk/assessor.go                                  rules_network.go:37
+SBL   ranges                   RED-elsewhere  local-var        cmd/wisp/leg_dispatch_gate_133_test.go                     rules_network.go:93
+SBL   job                      RED-elsewhere  local            internal/llm/adaptertest/childjob_windows.go               rules_network.go:96
+SBL   colons                   RED-nowhere                                                                                rules_network.go:102
+SBL   entry                    IN-PKG         rangevar         internal/risk/rules_network.go                             rules_network.go:115
+SBL   edge                     RED-elsewhere  field            cmd/balldebug/diff_windows.go                              rules_scale.go:5
+SBL   R6                       IN-PKG         const            internal/risk/assessor.go                                  rules_shell.go:8
+SBL   vector                   RED-nowhere                                                                                rules_shell.go:14
+SBL   name                     IN-PKG         local            internal/risk/allow_substring_pin_216_test.go              rules_shell.go:92
+SBL   A                        RED-elsewhere  field            internal/ball/tokens.go                                    shape_a_exemption_test.go:8
+SBL   file                     IN-PKG         field            internal/risk/allow_substring_pin_216_test.go              shape_a_exemption_test.go:13
+SBL   behavior                 RED-nowhere                                                                                shape_a_exemption_test.go:18
+SBL   sentences                RED-elsewhere  local            cmd/wisp/approval_reply_201_test.go                        shape_a_exemption_test.go:19
+SBL   stub                     RED-elsewhere  local            internal/tools/pointer_183_cli_seam_test.go                shape_a_exemption_test.go:24
+SBL   host                     IN-PKG         param            internal/risk/name_claim_two_arm_216_test.go               shape_a_exemption_test.go:27
+SBL   stub                     RED-elsewhere  local            internal/tools/pointer_183_cli_seam_test.go                shape_a_exemption_test.go:39
+SBL   path                     IN-PKG         param            internal/risk/blacklist.go                                 shape_a_exemption_test.go:42
+SBL   place                    RED-elsewhere  local            internal/winsec/placement_symlink_113_other_test.go        shape_a_exemption_test.go:47
+SBL   leg                      IN-PKG         param            internal/risk/pathresolver_expansion_test.go               shape_a_exemption_test.go:55
+SBL   dropped                  IN-PKG         local            internal/risk/pathresolver_anchor_spelling_windows_test.go shape_a_exemption_test.go:57
+SBL   mark                     RED-elsewhere  param            cmd/wisp/config_reload_223_test.go                         shape_a_exemption_test.go:70
+SBL   exemption                RED-nowhere                                                                                shape_a_exemption_test.go:84
+SBL   with                     RED-elsewhere  method(traceCapture) internal/agent/compress_trace_test.go                      shape_a_exemption_test.go:87
+SBL   fixture                  RED-elsewhere  param            internal/agent/harness_test.go                             shape_a_exemption_test.go:117
+SBL   provide                  RED-nowhere                                                                                shape_a_exemption_test.go:120
+SBL   source                   IN-PKG         local            internal/risk/rules_gateway.go                             shape_a_exemption_test.go:157
+SBL   ordering                 RED-nowhere                                                                                shape_a_exemption_test.go:197
+SBL   SILENTLY                 RED-nowhere                                                                                shape_a_exemption_test.go:199
+SBL   bodies                   RED-elsewhere  local            internal/agent/control_test.go                             shape_a_exemption_test.go:201
+SBL   Ordering                 RED-nowhere                                                                                shape_a_exemption_test.go:227
+SBL   locator                  RED-nowhere                                                                                shape_a_exemption_test.go:230
+SBL   detection                RED-nowhere                                                                                syncdirs.go:13
+SBL   folder                   RED-nowhere                                                                                syncdirs.go:15
+SBL   variables                RED-nowhere                                                                                syncdirs.go:20
+SBL   registry                 RED-elsewhere  param            internal/audio/audio.go                                    syncdirs.go:21
+SBL   locations                RED-nowhere                                                                                syncdirs.go:23
+SBL   file                     IN-PKG         field            internal/risk/allow_substring_pin_216_test.go              syncdirs.go:24
+SBL   evidence                 RED-elsewhere  result           tools/d22scan/selftest.go                                  syncdirs.go:29
+SBL   conclusion               RED-nowhere                                                                                syncdirs.go:32
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     syncdirs.go:32
+SBL   yet                      RED-nowhere                                                                                syncdirs.go:38
+SBL   way                      RED-nowhere                                                                                syncdirs.go:43
+SBL   client                   RED-elsewhere  field            internal/audio/wasapi_windows.go                           syncdirs.go:47
+SBL   discovered               RED-nowhere                                                                                syncdirs.go:50
+SBL   counts                   RED-elsewhere  method(t90gate)  internal/perm/ticket90_persist_test.go                     syncdirs.go:59
+SBL   succeeded                RED-nowhere                                                                                syncdirs.go:83
+SBL   spelling                 IN-PKG         rangevar         internal/risk/anchor_fallback_teeth_336_other_test.go      syncdirs.go:145
+SBL   unresolvable             RED-elsewhere  local            internal/tools/paths_shortname_252_r1_test.go              syncdirs.go:158
+SBL   matched                  IN-PKG         local            internal/risk/anchor_fallback_teeth_336_windows_test.go    syncdirs.go:173
+SBL   channel                  IN-PKG         field            internal/risk/provenance.go                                syncdirs.go:181
+SBL   query                    RED-elsewhere  param            internal/agent/inject.go                                   syncdirs.go:190
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     syncdirs.go:194
+SBL   one                      RED-elsewhere  rangevar         cmd/wisp/leg_sink_gate_131_test.go                         syncdirs.go:205
+SBL   verify                   RED-nowhere                                                                                syncdirs.go:235
+SBL   resolution               RED-nowhere                                                                                syncdirs.go:239
+SBL   POSIX                    RED-nowhere                                                                                syncdirs.go:243
+SBL   shape                    RED-elsewhere  local            cmd/wisp/panel_host_gate_test.go                           syncdirs.go:247
+SBL   remaining                RED-elsewhere  local            internal/plugin/disposal.go                                syncdirs.go:259
+SBL   guess                    RED-elsewhere  local            internal/agent/spill_path_invariant_test.go                syncdirs.go:264
+SBL   cleaning                 RED-nowhere                                                                                syncdirs.go:301
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     syncdirs.go:304
+SBL   one                      RED-elsewhere  rangevar         cmd/wisp/leg_sink_gate_131_test.go                         syncdirs.go:321
+SBL   hardening                RED-nowhere                                                                                syncdirs.go:393
+SBL   us                       RED-nowhere                                                                                syncdirs.go:423
+SBL   family                   RED-elsewhere  param            cmd/wisp/panel_host_windows_test.go                        syncdirs.go:427
+SBL   test                     IN-PKG         param            internal/risk/blacklist.go                                 syncdirs.go:438
+SBL   roots                    IN-PKG         field            internal/risk/syncdirs.go                                  syncdirs.go:452
+SBL   location                 RED-nowhere                                                                                syncdirs.go:467
+SBL   roots                    IN-PKG         field            internal/risk/syncdirs.go                                  syncdirs.go:469
+SBL   net                      RED-nowhere                                                                                syncdirs.go:471
+SBL   a                        IN-PKG         local            internal/risk/anchor_fallback_teeth_336_other_test.go      syncdirs.go:478
+SBL   logic                    RED-nowhere                                                                                syncdirs.go:494
+SBL   key                      IN-PKG         param            internal/risk/blacklist.go                                 syncdirs.go:498
+SBL   value                    RED-elsewhere  param            cmd/wisp/panel_assets.go                                   syncdirs.go:500
+SBL   nodes                    RED-nowhere                                                                                syncdirs.go:517
+SBL   Nutstore                 RED-nowhere                                                                                syncdirs.go:530
+SBL   the                      RED-nowhere                                                                                syncdirs.go:531
+SBL   preference               RED-nowhere                                                                                syncdirs.go:590
+SBL   fallback                 IN-PKG         param            internal/risk/blacklist.go                                 syncdirs.go:635
+SBL   GREEN                    RED-nowhere                                                                                syncdirs_alias_307_windows_test.go:14
+SBL   OS                       RED-nowhere                                                                                syncdirs_alias_307_windows_test.go:18
+SBL   fails                    RED-elsewhere  field            internal/audio/hotplug_test.go                             syncdirs_alias_307_windows_test.go:22
+SBL   purpose                  RED-elsewhere  rangevar         internal/models/manifest_real_test.go                      syncdirs_alias_307_windows_test.go:24
+SBL   fallback                 IN-PKG         param            internal/risk/blacklist.go                                 syncdirs_alias_307_windows_test.go:95
+SBL   narrowly                 RED-nowhere                                                                                syncdirs_ancestor_actable_leg_116_test.go:12
+SBL   resolveTarget            IN-PKG         method(syncSet)  internal/risk/syncdirs.go                                  syncdirs_ancestor_actable_leg_116_test.go:14
+SBL   passes                   RED-nowhere                                                                                syncdirs_ancestor_actable_leg_116_test.go:38
+SBL   separator                RED-nowhere                                                                                syncdirs_ancestor_actable_leg_116_test.go:63
+SBL   answers                  RED-elsewhere  field            cmd/wisp/secret_test.go                                    syncdirs_ancestor_actable_leg_116_test.go:126
+SBL   there                    RED-nowhere                                                                                syncdirs_ancestor_actable_leg_116_test.go:130
+SBL   directory                RED-nowhere                                                                                syncdirs_ancestor_actable_leg_116_test.go:267
+SBL   reparse_point_exception  RED-nowhere                                                                                syncdirs_ancestor_reparse_ticket105_windows_test.go:19
+SBL   leaf                     IN-PKG         rangevar         internal/risk/anchor_fallback_teeth_336_windows_test.go    syncdirs_ancestor_reparse_ticket105_windows_test.go:20
+SBL   tree                     IN-PKG         result           internal/risk/syncdirs_ancestor_actable_leg_116_test.go    syncdirs_ancestor_reparse_ticket105_windows_test.go:34
+SBL   resolve                  RED-elsewhere  local            cmd/wisp/panel_transport_35r2_test.go                      syncdirs_ancestor_reparse_ticket105_windows_test.go:74
+SBL   platforms                RED-nowhere                                                                                syncdirs_other.go:7
+SBL   macOS                    RED-nowhere                                                                                syncdirs_other.go:12
+SBL   probing                  RED-nowhere                                                                                syncdirs_other.go:13
+SBL   probes                   RED-elsewhere  param            cmd/wisp/panel_resident_windows_test.go                    syncdirs_other.go:14
+SBL   port                     RED-elsewhere  param            internal/tools/ticket176r1_start_port_test.go              syncdirs_other.go:17
+SBL   properly                 RED-nowhere                                                                                syncdirs_other_test.go:23
+SBL   LANDS                    RED-nowhere                                                                                syncdirs_other_test.go:27
+SBL   verbatim                 RED-nowhere                                                                                syncdirs_other_test.go:35
+SBL   definition               RED-nowhere                                                                                syncdirs_other_test.go:51
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     syncdirs_other_test.go:109
+SBL   team                     RED-nowhere                                                                                syncdirs_redteam_windows_test.go:14
+SBL   OS                       RED-nowhere                                                                                syncdirs_redteam_windows_test.go:20
+SBL   all                      RED-elsewhere  local            cmd/wisp/approval_reply_201_test.go                        syncdirs_redteam_windows_test.go:26
+SBL   point                    RED-elsewhere  type             internal/ball/win32_windows.go                             syncdirs_redteam_windows_test.go:102
+SBL   L1                       IN-PKG         const            internal/risk/assessor.go                                  syncdirs_redteam_windows_test.go:148
+SBL   through                  RED-elsewhere  local            internal/winsec/seam_bypass_108_windows_test.go            syncdirs_redteam_windows_test.go:169
+SBL   wiring                   RED-nowhere                                                                                syncdirs_redteam_windows_test.go:263
+SBL   bottom                   RED-elsewhere  field            cmd/wisp/panel_geometry_255_winlive_test.go                syncdirs_test.go:12
+SBL   purpose                  RED-elsewhere  rangevar         internal/models/manifest_real_test.go                      syncdirs_test.go:33
+SBL   fixtures                 RED-elsewhere  local            cmd/wisp/config_receipt_255_test.go                        syncdirs_test.go:45
+SBL   CANONICAL                RED-nowhere                                                                                syncdirs_test.go:49
+SBL   source                   IN-PKG         local            internal/risk/rules_gateway.go                             syncdirs_test.go:103
+SBL   root                     IN-PKG         local            internal/risk/anchor_fallback_teeth_336_windows_test.go    syncdirs_test.go:183
+SBL   reality                  RED-nowhere                                                                                syncdirs_test.go:194
+SBL   up                       RED-elsewhere  local            cmd/wisp/panel_host_windows_live_test.go                   syncdirs_test.go:202
+SBL   NAIL                     RED-nowhere                                                                                syncdirs_test.go:223
+SBL   NAIL                     RED-nowhere                                                                                syncdirs_test.go:248
+SBL   handed                   RED-nowhere                                                                                syncdirs_test.go:263
+SBL   TestSyncConfirmedGradeDisarmsFallbackWindows RED-nowhere                                                                                syncdirs_test.go:269
+SBL   TestSyncNoGradeIsConfirmedOnPosix IN-PKG         func             internal/risk/syncdirs_other_test.go                       syncdirs_test.go:270
+SBL   TestSyncRegistryProbeLive IN-PKG         func             internal/risk/syncdirs_windows_test.go                     syncdirs_test.go:357
+SBL   plain                    IN-PKG         param            internal/risk/name_claim_two_arm_216_test.go               syncdirs_test.go:384
+SBL   subject                  RED-elsewhere  local            cmd/wisp/slo_windows.go                                    syncdirs_test.go:391
+SBL   suspect                  RED-nowhere                                                                                syncdirs_test.go:413
+SBL   sync                     IN-PKG         field            internal/risk/provenance.go                                syncdirs_test.go:437
+SBL   lexical                  RED-nowhere                                                                                syncdirs_test.go:452
+SBL   run                      RED-elsewhere  func             cmd/llmrecord/main.go                                      syncdirs_test.go:503
+SBL   state                    RED-elsewhere  field            cmd/balldebug/diff_windows.go                              syncdirs_test.go:506
+SBL   flags                    RED-elsewhere  param            cmd/wisp/run.go                                            syncdirs_windows.go:10
+SBL   logic                    RED-nowhere                                                                                syncdirs_windows.go:23
+SBL   GRADE                    RED-nowhere                                                                                syncdirs_windows_test.go:18
+SBL   POSIX                    RED-nowhere                                                                                syncdirs_windows_test.go:19
+SBL   subjects                 RED-nowhere                                                                                syncdirs_windows_test.go:24
+SBL   LANDS                    RED-nowhere                                                                                syncdirs_windows_test.go:31
+SBL   net                      RED-nowhere                                                                                syncdirs_windows_test.go:68
+SBL   half                     RED-elsewhere  local            internal/audio/level_test.go                               syncdirs_windows_test.go:72
+SBL   evidence                 RED-elsewhere  result           tools/d22scan/selftest.go                                  syncdirs_windows_test.go:112
+SBL   implementation           RED-nowhere                                                                                syncdirs_windows_test.go:116
+SBL   platforms                RED-nowhere                                                                                syncdirs_windows_test.go:123
+SBL   matching                 RED-nowhere                                                                                taintmatch.go:9
+SBL   REJECTED                 RED-nowhere                                                                                taintmatch.go:15
+SBL   hit                      IN-PKG         local            internal/risk/provenance_syncdirs_other_test.go            taintmatch.go:22
+SBL   floor                    RED-elsewhere  local            internal/agent/prompt_test.go                              taintmatch.go:26
+SBL   direction                RED-elsewhere  param            internal/config/manager.go                                 taintmatch.go:29
+SBL   marks                    IN-PKG         field            internal/risk/provenance.go                                taintmatch.go:34
+SBL   nothing                  RED-nowhere                                                                                taintmatch.go:34
+SBL   width                    RED-elsewhere  param            cmd/wisp/panel_control_windows.go                          taintmatch.go:53
+SBL   construction             RED-nowhere                                                                                taintmatch.go:81
+SBL   read                     RED-elsewhere  local            cmd/wisp/leg_sink_gate_131_test.go                         taintmatch.go:87
+SBL   read                     RED-elsewhere  local            cmd/wisp/leg_sink_gate_131_test.go                         taintmatch.go:90
+SBL   runes                    RED-elsewhere  local            cmd/wisp/approval_reply.go                                 taintmatch.go:94
+SBL   content                  IN-PKG         param            internal/risk/pathresolver_junction_windows_test.go        taintmatch.go:95
+SBL   src                      IN-PKG         param            internal/risk/allow_substring_pin_216_test.go              taintmatch.go:96
+SBL   of                       RED-nowhere                                                                                taintmatch.go:109
+SBL   mark                     RED-elsewhere  param            cmd/wisp/config_reload_223_test.go                         taintmatch.go:111
+SBL   norm                     IN-PKG         local            internal/risk/provenance.go                                taintmatch.go:120
+SBL   match                    IN-PKG         local            internal/risk/pointer_183_test.go                          taintmatch.go:122
+SBL   spans                    IN-PKG         local            internal/risk/pointer_183_test.go                          taintmatch.go:126
+SBL   form                     RED-elsewhere  rangevar         cmd/wisp/firstrun_257_test.go                              taintmatch.go:139
+SBL   src                      IN-PKG         param            internal/risk/allow_substring_pin_216_test.go              taintmatch.go:168
+SBL   Overlap                  RED-nowhere                                                                                taintmatch.go:182
+SBL   span                     RED-elsewhere  field            cmd/wisp/resident_audio_247_live_windows_test.go           taintmatch.go:185
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     taintmatch.go:186
+SBL   paramNorm                IN-PKG         param            internal/risk/taintmatch.go                                taintmatch.go:220
+SBL   runes                    RED-elsewhere  local            cmd/wisp/approval_reply.go                                 taintmatch.go:223
+SBL   it                       RED-elsewhere  rangevar         cmd/wisp/panel_pump.go                                     taintmatch.go:254
+SBL   window                   IN-PKG         param            internal/risk/allow_substring_pin_216_test.go              taintmatch.go:261
+SBL   declared                 IN-PKG         local            internal/risk/pointer_185_test.go                          taintmatch.go:262
+SBL   AC                       RED-nowhere                                                                                taintmatch_test.go:9
+SBL   hit                      IN-PKG         local            internal/risk/provenance_syncdirs_other_test.go            taintmatch_test.go:37
+SBL   match                    IN-PKG         local            internal/risk/pointer_183_test.go                          taintmatch_test.go:41
+SBL   read                     RED-elsewhere  local            cmd/wisp/leg_sink_gate_131_test.go                         taintmatch_test.go:48
+SBL   fragment                 RED-elsewhere  method(toolAssembler) internal/llm/openaichat/toolasm.go                         taintmatch_test.go:54
+SBL   leak                     RED-elsewhere  param            cmd/wisp/slo_windows.go                                    taintmatch_test.go:58
+SBL   contiguous               RED-nowhere                                                                                taintmatch_test.go:67
+SBL   mark                     RED-elsewhere  param            cmd/wisp/config_reload_223_test.go                         taintmatch_test.go:88
+SBL   acute                    RED-nowhere                                                                                taintmatch_test.go:89
+SBL   fragment                 RED-elsewhere  method(toolAssembler) internal/llm/openaichat/toolasm.go                         taintmatch_test.go:122
+SBL   window                   IN-PKG         param            internal/risk/allow_substring_pin_216_test.go              taintmatch_test.go:143
+SBL   budget                   RED-elsewhere  param            cmd/wisp/panel_locked_naming_33r11_windows_test.go         taintmatch_test.go:168
+SBL   window                   IN-PKG         param            internal/risk/allow_substring_pin_216_test.go              taintmatch_test.go:172
+SBL   C26                      RED-nowhere                                                                                winsec_c26.go:5
+SBL   winsec                   RED-nowhere                                                                                winsec_c26.go:8
+SBL   anywhere                 RED-nowhere                                                                                winsec_c26.go:12
+SBL   exists                   RED-elsewhere  local            cmd/wisp/panel_transport_35r2_test.go                      winsec_c26.go:28
+SBL   tree                     IN-PKG         result           internal/risk/syncdirs_ancestor_actable_leg_116_test.go    winsec_c26.go:34
+SBL   named                    IN-PKG         local            internal/risk/provenance.go                                winsec_c26.go:37
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:12
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:12
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:24
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:24
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:42
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:42
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:44
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:44
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:46
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:47
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:48
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_334_test.go:123
+SW    aEquiv                   RED-nowhere                                                                                blacklist.go:193
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:214
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:265
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:265
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:274
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:284
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:286
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:287
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:306
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:307
+SW    aAnyForm                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:333
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:427
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:429
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:439
+# --- counters ---
+shape=SA    TOTAL=453 IN-PKG=435 RED-elsewhere=4 RED-nowhere=14 (RED all=18)
+shape=SB    TOTAL=95 IN-PKG=64 RED-elsewhere=3 RED-nowhere=28 (RED all=31)
+shape=SBL   TOTAL=676 IN-PKG=187 RED-elsewhere=257 RED-nowhere=232 (RED all=489)
+shape=SW    TOTAL=27 IN-PKG=26 RED-elsewhere=0 RED-nowhere=1 (RED all=1)
+shape=BEXCL TOTAL=7 IN-PKG=0 RED-elsewhere=0 RED-nowhere=0 (RED all=0)

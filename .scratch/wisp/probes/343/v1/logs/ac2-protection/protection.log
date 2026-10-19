@@ -1,0 +1,31 @@
+== protected instruments: blob equality START(29d258f9) vs HEAD ==
+   SAME start=a429cdae head=a429cdae  internal/risk/anchor_fallback_teeth_336_windows_test.go
+   SAME start=f5f888de head=f5f888de  internal/risk/anchor_fallback_teeth_336_other_test.go
+   SAME start=e7b13c39 head=e7b13c39  internal/risk/anchor_miss_reason_339_other_test.go
+   SAME start=5147c189 head=5147c189  internal/risk/anchor_miss_reason_334_test.go
+   SAME start=15349e28 head=15349e28  internal/risk/pathresolver.go
+   SAME start=37c42e94 head=37c42e94  internal/risk/pathresolver_other.go
+   SAME start=c96d4b9d head=c96d4b9d  internal/risk/assessor.go
+   SAME start=7125b08a head=7125b08a  internal/risk/syncdirs.go
+   SAME start=d634aae0 head=d634aae0  internal/risk/provenance.go
+   SAME start=b60acc61 head=b60acc61  internal/panel/tokens_fourway_test.go
+   SAME start=6668f19b head=6668f19b  internal/panel/l2_grant_boundary_test.go
+   SAME start=f923c19b head=f923c19b  internal/perm/ticket90_persist_test.go
+   SAME start=e2677b11 head=e2677b11  internal/observe/thresholds.go
+== blacklist.go itself: the ONLY .go that changed across the leg's 6 commits ==
+  CHANGED internal/risk/blacklist.go
+== what changed repo-wide in internal/** between leg start and leg delivery ==
+1	0	.scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md
+2	0	.scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md
+6	0	.scratch/wisp/issues/343-blacklist-comment-names-aEquiv-a-symbol-that-does-not-exist-in-the-package.md
+39	0	.scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md
+71	0	docs/evidence/s1/341-v1-verdict.md
+45	0	docs/reports/HANDOVER.md
+40	0	docs/reports/pending-and-issues.md
+5	2	internal/risk/blacklist.go
+== the 4 protected-instrument blobs (short, as leg reported) ==
+anchor_fallback_teeth_336_windows_test.go start=a429cdae head=a429cdae
+anchor_fallback_teeth_336_other_test.go start=f5f888de head=f5f888de
+anchor_miss_reason_339_other_test.go start=e7b13c39 head=e7b13c39
+anchor_miss_reason_334_test.go start=5147c189 head=5147c189
+DONE2

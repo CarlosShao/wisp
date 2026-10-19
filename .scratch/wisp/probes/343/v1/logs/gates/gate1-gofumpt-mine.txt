@@ -1,0 +1,8 @@
+GATE 1 = gofumpt.exe -l internal/risk/blacklist.go   (shared working tree, run with GOTMPDIR/TMPDIR/TEMP/TMP unset)
+RESULT = rc=0 and ZERO files listed => the file this ticket touched is gofumpt-clean; new bytes are LF (whole-file CRLF count = 0).
+The raw stdout of that command is itself empty; this annotated file stands in for the empty redirect so the evidence roster carries no 0-byte member.
+registry of pre-existing gofumpt-dirty files (NOT mine, NOT touched, named per dispatch):
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+internal\risk\provenance.go
+cmd\wisp\models.go

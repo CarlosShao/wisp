@@ -1,0 +1,25 @@
+== symdiff of NOT-DEF sets (side START vs side DELIVERY) ==
+  466 logs/census/gauge3/nd-start.txt
+  468 logs/census/gauge3/nd-del.txt
+  934 total
+52d51
+< NOT-DEF   aEquiv
+159a159
+> NOT-DEF   delegate
+169a170
+> NOT-DEF   do
+229a231
+> NOT-DEF   held
+337a340
+> NOT-DEF   produced
+365d367
+< NOT-DEF   report
+== count of NOT-DEF tokens per side (upper bound: prose words included) ==
+START=466 DELIVERY=468
+-- the camel-ish subset only (the ticket's shape), both sides --
+nd-start camelish=aEquiv bOverrides 
+nd-del camelish=bOverrides 
+-- the a[A-Z] wordlist subset, both sides --
+nd-start aword=aEquiv 
+nd-del aword=
+DONE3

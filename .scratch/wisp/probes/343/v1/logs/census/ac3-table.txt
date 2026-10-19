@@ -1,0 +1,37 @@
+############ AC#3 misfire surface, measured by 343-v1 (my own gauge, 3 shapes) ############
+# scope = production .go files only (non *_test.go), the whole internal/risk package
+# side  = START (blob c1799cd2) — the state a gate would have been installed against
+shape=SA  lines=193   redlines=9     uniquered=6     TRUEPOS(of that set)=3
+shape=SB  lines=289   redlines=194   uniquered=146   TRUEPOS(of that set)=0
+shape=SW  lines=15    redlines=1     uniquered=1     TRUEPOS(of that set)=1
+
+== the TRUE family members as each shape sees them (START side) ==
+aEquiv         SA=1 SB=0 SW=1
+fires          SA=0 SB=1 SW=0
+taskScopeID    SA=1 SB=0 SW=0
+disposalScope  SA=1 SB=0 SW=0
+
+== per-shape RED-nowhere name list (production files, START side) ==
+-- SA --
+SA    aEquiv                   RED-nowhere                                                                                blacklist.go:193
+SA    disposalScope            RED-nowhere                                                                                provenance.go:427
+SA    macOS                    RED-nowhere                                                                                pathresolver_other.go:5
+SA    taskScopeID              RED-nowhere                                                                                provenance.go:54
+-- SW --
+SW    aEquiv                   RED-nowhere                                                                                blacklist.go:193
+-- SB (first 40 unique names) --
+C26 CLOSED CloseScope DEFERRED DIR IDs Nutstore OS Ordering Overlap POSIX PathResolver REJECTED STRICTER affects anywhere authorization basename blacklist blacklists caught classifies cleaning closes codebase colons comparison conclusion construction contributions coordinates declaration declares dependencies destination detection directly discovered domains dormant 
+-- SB unique-name count --
+102
+-- SB RED-elsewhere unique names (production) --
+44
+
+== classification helper: how many SB RED-nowhere names are plain English prose words? ==
+102 /d/tmp/wisp/20261019/343v1/logs/census/sb-rednames.txt
+-- names that are all-lowercase alphabetic (prose-word candidates) --
+86
+-- sample --
+affects anywhere authorization basename blacklist blacklists caught classifies cleaning closes codebase colons comparison conclusion construction contributions coordinates declaration declares dependencies destination detection directly discovered domains dormant engine entirely environment errors 
+-- the non-prose remainder (uppercase-initial / markers) --
+C26 CLOSED CloseScope DEFERRED DIR IDs Nutstore OS Ordering Overlap POSIX PathResolver REJECTED STRICTER macOS reparse_point_exceptions 
+AC3TABLE_DONE

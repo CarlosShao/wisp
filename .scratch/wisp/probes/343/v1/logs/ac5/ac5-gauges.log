@@ -1,0 +1,93 @@
+############ AC#5 discipline gauges (343-v1, own runs, v2 = no byte-truncation) ############
+== roster anchored, two independent gauges (want 6 both) ==
+gauge1_anchored_gitlog=6
+gauge2_index0_COUNT=6
+contrast_NONANCHORED_gitlog=7
+-- unanchored MINUS anchored: all 7 unanchored hits listed below (my comm/awk join used
+-- 7-char vs 40-char hashes, so this list is the union, not the difference). The one hit whose
+-- SUBJECT does not start with the prefix -- 83ac5f91 (orchestrator's own correction commit,
+-- whose BODY quotes the leg prefix) -- is exactly the one the anchored form correctly drops:
+-- anchored 6 vs unanchored 7 = the same-family trap re-measured on today's HEAD.
+  SWALLOWED 137044b6 票 343 落地腿 343-r1 交件（第 6 笔）＝三枚 report 的自我读数改正（同族笔误当场自抓）。
+  SWALLOWED 2b6f8a9a 票 343 落地腿 343-r1 交件（第 2 笔）＝AC#4 Linux 侧台件一枚。
+  SWALLOWED 31d4a476 票 343 落地腿 343-r1 交件（第 1 笔）＝改准 `blacklist.go:193` 那句点名的符号。
+  SWALLOWED 360a6af6 票 343 落地腿 343-r1 交件（第 3 笔）＝`AC#4` 读数入库（成对四数⇄原始 stdout 一对不拆）。
+  SWALLOWED 70caae94 票 343 落地腿 343-r1 交件（第 5 笔）＝交件报告三枚正文件入库。
+  SWALLOWED 83ac5f91 ★更正上一条 4.0eu 第③段那枚"341-v1 1 笔"＝坏读数（⛔ 回改已入库那条、按要更正就追加＝新开 4.0euc 一节）：真值＝341-v1 与 342-v1 各 0
+  SWALLOWED bf5977f4 票 343 落地腿 343-r1 交件（第 4 笔）＝票尾**一条**只追加 bullet（AC#5 纪律格）。
+
+== per-commit name-only for the 6 leg commits ==
+----- 31d4a476 -----
+  31d4a476 票 343 落地腿 343-r1 交件（第 1 笔）＝改准 `blacklist.go:193` 那句点名的符号。
+  
+  internal/risk/blacklist.go
+----- 2b6f8a9a -----
+  2b6f8a9a 票 343 落地腿 343-r1 交件（第 2 笔）＝AC#4 Linux 侧台件一枚。
+  
+  .scratch/wisp/probes/343/r1/sh/linux-343.sh
+----- 360a6af6 -----
+  360a6af6 票 343 落地腿 343-r1 交件（第 3 笔）＝`AC#4` 读数入库（成对四数⇄原始 stdout 一对不拆）。
+  
+  .scratch/wisp/probes/343/r1/logs/01-ac4-color-pair-two-platform.txt
+  .scratch/wisp/probes/343/r1/logs/02-ac1-comment-face.txt
+  .scratch/wisp/probes/343/r1/logs/03-ac0-same-family-census.txt
+  .scratch/wisp/probes/343/r1/logs/04-gates-shared-tree.txt
+  .scratch/wisp/probes/343/r1/logs/linux-base-343.log
+  .scratch/wisp/probes/343/r1/logs/linux-del-343.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/ac2-00-pristine-teeth.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/ac2-MU-1a-teeth.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/ac2-MU-1b-teeth.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/ac2-MU-1c-teeth.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/ac2-MU-1d-teeth.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/ac2-MU-1e-teeth.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/ac2-MU-1f-teeth.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/ac2-MU-1g-teeth.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/ac2-MU-1h-teeth.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/ac2-sweep-runner.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/pair-base-risk.log
+  .scratch/wisp/probes/343/r1/logs/teeth-sweep/pair-del-risk.log
+----- bf5977f4 -----
+  bf5977f4 票 343 落地腿 343-r1 交件（第 4 笔）＝票尾**一条**只追加 bullet（AC#5 纪律格）。
+  
+  .scratch/wisp/issues/343-blacklist-comment-names-aEquiv-a-symbol-that-does-not-exist-in-the-package.md
+----- 70caae94 -----
+  70caae94 票 343 落地腿 343-r1 交件（第 5 笔）＝交件报告三枚正文件入库。
+  
+  .scratch/wisp/probes/343/r1/report-sec-b.md
+  .scratch/wisp/probes/343/r1/report-sec-c.md
+  .scratch/wisp/probes/343/r1/report.md
+----- 137044b6 -----
+  137044b6 票 343 落地腿 343-r1 交件（第 6 笔）＝三枚 report 的自我读数改正（同族笔误当场自抓）。
+  
+  .scratch/wisp/probes/343/r1/report-sec-b.md
+  .scratch/wisp/probes/343/r1/report-sec-c.md
+  .scratch/wisp/probes/343/r1/report.md
+
+== union of the 6 commits' paths, and the write-surface test ==
+union_paths=24
+go_files=1
+  GO internal/risk/blacklist.go
+outside_allowed_surface=0
+
+== ticket boxes (want 6 unchecked / 0 checked) ==
+unchecked_AC=6
+checked_any=0
+== ticket subject line and Status line, WHOLE, current HEAD ==
+# 343 — `blacklist.go:193` 那句注释点名的 **`aEquiv` 在包里根本没有定义**（只有这句注释自己提到它）＝一句指向不存在符号的产码注释
+- Status: **已立，未派**（2026-10-18 14:3x 编排者立；来源＝非实现者终裁腿 `336-v1` 具名上报（`.scratch/wisp/probes/336/v1/logs/NN-blocked-1.log`）＋编排者自己复跑坐实；账＝台账 `A1037`）
+== the same two lines at the leg's start anchor 29d258f9 ==
+# 343 — `blacklist.go:193` 那句注释点名的 **`aEquiv` 在包里根本没有定义**（只有这句注释自己提到它）＝一句指向不存在符号的产码注释
+- Status: **已立，未派**（2026-10-18 14:3x 编排者立；来源＝非实现者终裁腿 `336-v1` 具名上报（`.scratch/wisp/probes/336/v1/logs/NN-blocked-1.log`）＋编排者自己复跑坐实；账＝台账 `A1037`）
+== unchanged? (byte compare of lines 1 and 3) ==
+LINES_1_3_IDENTICAL=YES
+== filename unchanged (no -done), uniqueness gauged on the INDEX of commits (tracked tree) ==
+  .scratch/wisp/issues/343-blacklist-comment-names-aEquiv-a-symbol-that-does-not-exist-in-the-package.md
+== tail append-only: numstat 29d258f9 -> HEAD for the ticket, plus deletions ==
+6	0	.scratch/wisp/issues/343-blacklist-comment-names-aEquiv-a-symbol-that-does-not-exist-in-the-package.md
+deleted_lines_in_ticket_diff=0
+== which commit(s) touched the ticket since the leg started ==
+  bf5977f4 票 343 落地腿 343-r1 交件（第 4 笔）＝票尾**一条**只追加 bullet（AC#5 纪律格）。
+
+== my own roster (343-v1, anchored) at the time of this run ==
+  528bc90e 票 343 终裁腿 343-v1 交件（第 1 笔）＝起手三尺＋AC#2 结构尺（独立再算）＋我自己重导树上的 8 枚牙。
+AC5_V2_DONE

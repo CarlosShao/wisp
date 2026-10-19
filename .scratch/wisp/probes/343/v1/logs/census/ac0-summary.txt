@@ -1,0 +1,64 @@
+############ AC#0 same-family census: blacklist.go, three shapes, both sides ############
+== START side (blob c1799cd2) RED-nowhere, per shape ==
+SA    aEquiv                   RED-nowhere                                                                                blacklist.go:193
+SB    CLOSED                   RED-nowhere                                                                                blacklist.go:193
+SB    DEFERRED                 RED-nowhere                                                                                blacklist.go:355
+SB    blacklists               RED-nowhere                                                                                blacklist.go:10
+SB    exist                    RED-nowhere                                                                                blacklist.go:157
+SB    itself                   RED-nowhere                                                                                blacklist.go:136
+SB    narrower                 RED-nowhere                                                                                blacklist.go:67
+SB    side                     RED-nowhere                                                                                blacklist.go:99
+SB    them                     RED-nowhere                                                                                blacklist.go:309
+SB    trustworthy              RED-nowhere                                                                                blacklist.go:276
+SB    unified                  RED-nowhere                                                                                blacklist.go:153
+SW    aEquiv                   RED-nowhere                                                                                blacklist.go:193
+
+== DELIVERY side (blob 62f2dddb) RED-nowhere, per shape ==
+SB    DEFERRED                 RED-nowhere                                                                                blacklist.go:358
+SB    blacklists               RED-nowhere                                                                                blacklist.go:10
+SB    exist                    RED-nowhere                                                                                blacklist.go:157
+SB    itself                   RED-nowhere                                                                                blacklist.go:136
+SB    narrower                 RED-nowhere                                                                                blacklist.go:67
+SB    side                     RED-nowhere                                                                                blacklist.go:99
+SB    them                     RED-nowhere                                                                                blacklist.go:312
+SB    trustworthy              RED-nowhere                                                                                blacklist.go:279
+SB    unified                  RED-nowhere                                                                                blacklist.go:153
+
+== DELIVERY side RED-elsewhere (shape SB) = the FP class for a package-scoped gate ==
+SB    again                    RED-elsewhere  local            internal/agent/approval/pending_read_test.go               blacklist.go:64
+SB    assembled                RED-elsewhere  local            internal/panel/l2_grant_boundary_test.go                   blacklist.go:309
+SB    candidate                RED-elsewhere  local            internal/config/settings.go                                blacklist.go:289
+SB    decision                 RED-elsewhere  local-var        cmd/wisp/ticket224_assembly_test.go                        blacklist.go:50
+SB    fires                    RED-elsewhere  field            internal/config/unwired.go                                 blacklist.go:310
+SB    form                     RED-elsewhere  rangevar         cmd/wisp/firstrun_257_test.go                              blacklist.go:106
+SB    forms                    RED-elsewhere  local            cmd/wisp/secret_test.go                                    blacklist.go:373
+SB    only                     RED-elsewhere  local            internal/models/assembly_reachability_121_test.go          blacklist.go:61
+SB    override                 RED-elsewhere  result           internal/llm/systemproxy_windows.go                        blacklist.go:26
+SB    saw                      RED-elsewhere  local            cmd/wisp/plan_assembled_165r2_test.go                      blacklist.go:65
+SB    shapes                   RED-elsewhere  local            cmd/wisp/firstrun_257_test.go                              blacklist.go:324
+SB    sink                     RED-elsewhere  param            cmd/wisp/dataroot_128_test.go                              blacklist.go:49
+SB    tier                     RED-elsewhere  local            cmd/wisp/config_readers_255.go                             blacklist.go:216
+SB    tier                     RED-elsewhere  local            cmd/wisp/config_readers_255.go                             blacklist.go:244
+
+== union sets ==
+ 12 /d/tmp/wisp/20261019/343v1/logs/census/set-start-red.txt
+  9 /d/tmp/wisp/20261019/343v1/logs/census/set-del-red.txt
+ 21 total
+-- symdiff start vs delivery (only aEquiv lines expected) --
+1,2d0
+< SA aEquiv :
+< SB CLOSED :
+12d9
+< SW aEquiv :
+-- SA-shape RED-nowhere names, delivery --
+-- SW-shape RED-nowhere names, delivery --
+-- SB-shape RED-nowhere names, delivery (the fires() family) --
+DEFERRED :
+blacklists :
+exist :
+itself :
+narrower :
+side :
+them :
+trustworthy :
+unified :

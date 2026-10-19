@@ -1,0 +1,30 @@
+=== 343-v1 AC#4 Windows paired rerun (GOTMPDIR in Windows form) ===
+date: 2026-10-19T10:20:35+08:00
+### win2-base-29d258f9 tree=/d/tmp/wisp/20261019/343v1/treeBase GOTMPDIR=D:\tmp\wisp\20261019\343v1\gotmp2\win2-base-29d258f9 blob=c1799cd24afce19e6accef23db23a7d7ee746dec
+  rc=1
+  RUN=247 PASS_TOP=140 FAIL_TOP=1 SKIP=1
+  red names:
+    RED --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    BUDGET --- PASS: TestResolvePerCallBudget (1.34s)
+### win2-del-31d4a476 tree=/d/tmp/wisp/20261019/343v1/treeDel GOTMPDIR=D:\tmp\wisp\20261019\343v1\gotmp2\win2-del-31d4a476 blob=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+  rc=1
+  RUN=247 PASS_TOP=140 FAIL_TOP=1 SKIP=1
+  red names:
+    RED --- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg 
+    BUDGET --- PASS: TestResolvePerCallBudget (1.21s)
+=== red-name symdiff ===
+  1 /d/tmp/wisp/20261019/343v1/logs/pair2/red-base.txt
+  1 /d/tmp/wisp/20261019/343v1/logs/pair2/red-del.txt
+  2 total
+REDSET_SYMDIFF=0
+=== RUN-name symdiff ===
+  247 /d/tmp/wisp/20261019/343v1/logs/pair2/run-base.txt
+  247 /d/tmp/wisp/20261019/343v1/logs/pair2/run-del.txt
+  494 total
+RUNSET_SYMDIFF=0
+=== stage-fault forensics on the FIRST attempt (why 5 reds there) ===
+  428:    syncdirs_ancestor_actable_leg_116_test.go:182: precondition: deepestExistingAncestor("D:\\tmp\\wisp\\20261019\\343v1\\gotmp\\win-base-29d258f9\\TestSyncAncestorActableLeg
+  433:    syncdirs_ancestor_actable_leg_116_test.go:286: precondition: the ~ spelling must resolve under the relocated home "D:/tmp/wisp/20261019/343v1/gotmp/win-base-29d258f9\\Tes
+  438:    syncdirs_ancestor_reparse_ticket105_windows_test.go:59: mklink /J D:\tmp\wisp\20261019\343v1\gotmp\win-base-29d258f9\TestSyncAncestorLegReResolvesThroughJunctionToRealTre
+  441:    syncdirs_ancestor_reparse_ticket105_windows_test.go:116: mklink /J D:\tmp\wisp\20261019\343v1\gotmp\win-base-29d258f9\TestSyncAncestorLegNotExemptedStaysFailClosed1174714
+PAIR2_DONE

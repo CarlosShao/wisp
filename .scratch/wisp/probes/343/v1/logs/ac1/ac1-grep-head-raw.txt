@@ -1,0 +1,7 @@
+AC#1 judgement ①: `git grep -n aEquiv HEAD -- internal/risk`
+RAW stdout of that command = 0 lines (that IS the reading the ticket asks for: delivery side 0 hits).
+rc=1 (git grep with no match returns 1; the 0 here is the gauge working, not the gauge being broken):
+  - same grep shape on the START anchor 29d258f9 returns 1 hit -> ac1-grep-start-raw.txt
+  - same shape on a name that DOES exist (`aEq`) returns hits -> ac1-gauges.log (positive control)
+This annotated file stands in for the empty redirect so my evidence roster carries no 0-byte member.
+Raw redirect also kept outside the repo: D:\tmp\wisp\20261019\343v1\logs\_grep_head.txt (0 bytes).

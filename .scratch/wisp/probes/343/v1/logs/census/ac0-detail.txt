@@ -1,0 +1,78 @@
+== whole-package DELIVERY: SA RED-elsewhere (4) ==
+SA    assessorFor              RED-elsewhere  method(Bridge)   internal/tools/bridge.go                                   assessor.go:30
+SA    hostPathBox              RED-elsewhere  type             internal/tools/bridge.go                                   hostpath_185.go:28
+SA    volumeID                 RED-elsewhere  func             internal/tools/platform_other.go                           pathresolver_volumeless_spelling_308_test.go:23
+SA    volumeRootOf             RED-elsewhere  func             internal/tools/platform_other.go                           pathresolver_volumeless_spelling_308_test.go:24
+
+== whole-package DELIVERY: SA RED-nowhere (13) ==
+SA    macOS                    RED-nowhere                                                                                pathresolver_other.go:5
+SA    taskScopeID              RED-nowhere                                                                                provenance.go:54
+SA    disposalScope            RED-nowhere                                                                                provenance.go:427
+SA    macOS                    RED-nowhere                                                                                syncdirs.go:249
+SA    macOS                    RED-nowhere                                                                                syncdirs_other.go:12
+SA    macOS                    RED-nowhere                                                                                syncdirs_other.go:17
+SA    macOS                    RED-nowhere                                                                                syncdirs_other_test.go:18
+SA    macOS                    RED-nowhere                                                                                syncdirs_other_test.go:30
+SA    macOS                    RED-nowhere                                                                                syncdirs_test.go:52
+SA    valueName                RED-nowhere                                                                                syncdirs_test.go:298
+SA    macOS                    RED-nowhere                                                                                syncdirs_windows_test.go:20
+SA    macOS                    RED-nowhere                                                                                syncdirs_windows_test.go:31
+SA    winStrs                  RED-nowhere                                                                                taintmatch_test.go:171
+
+== whole-package DELIVERY: SW (bounded wordlist a[A-Z]..) all lines ==
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:12
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:12
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:24
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:24
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:42
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:42
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:44
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:44
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:46
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:47
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 anchor_fallback_teeth_336_windows_test.go:48
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 anchor_miss_reason_334_test.go:123
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:197
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:217
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:268
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:268
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:277
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:287
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:289
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:290
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:309
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:310
+SW    aAnyForm                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:336
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:427
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:429
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 syncdirs.go:439
+
+== whole-package START: SW RED-nowhere ==
+SW    aEquiv                   RED-nowhere                                                                                blacklist.go:193
+
+== unique SA RED names (delivery, whole pkg), with file ==
+assessorFor | assessor.go:30 
+disposalScope |  
+hostPathBox | hostpath_185.go:28 
+macOS |  
+taskScopeID |  
+valueName |  
+volumeID | pathresolver_volumeless_spelling_308_test.go:23 
+volumeRootOf | pathresolver_volumeless_spelling_308_test.go:24 
+winStrs |  
+
+== BEXCL (builtin/keyword call-shape noise) whole pkg delivery ==
+      1 cap
+      1 error
+      1 false
+      1 for
+      1 func
+      5 go
+      1 if
+      5 len
+      1 range
+      1 real
+      2 rune

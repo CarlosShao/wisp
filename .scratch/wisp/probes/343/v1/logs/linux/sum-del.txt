@@ -1,0 +1,15 @@
+tree=D:/tmp/wisp/20261019/343v1/treeDel label=lin-del-31d4a476 modcache=D:\work\base\gopath\pkg\mod
+wrote=/d/tmp/wisp/20261019/343v1/logs/linux/lin-del-31d4a476.log bytes=32306
+=== four numbers (RUN / PASS_TOP / FAIL_TOP / SKIP) ===
+RUN=195
+PASS_TOP=115
+FAIL_TOP=1
+SKIP=1
+=== red roster (top-level names) ===
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (2.28s)
+=== skip roster ===
+--- SKIP: TestC26RewrittenSyncRootDoesNotDisarmSuspectNet (0.00s)
+=== GO_TEST_RC ===
+GO_TEST_RC=1
+=== 台面故障名册 ===
+none

@@ -1,0 +1,2 @@
+GATE 4 = go vet ./internal/risk/  (shared working tree, GOTMPDIR unset, GOPATH D:\work\base\gopath)
+RESULT = rc=0, empty stdout. Annotated stand-in for an empty redirect (⛔ 0-byte evidence member).

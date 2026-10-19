@@ -1,0 +1,97 @@
+=== run 2: blacklist.go only (the ticket's target file, delivery side) ===
+# pkg=internal/risk pkgfiles=49 repofiles=754 pkgRoster=989 repoRoster=14300 only="blacklist.go"
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              blacklist.go:64
+SA    overrideApplies          IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:67
+SA    bOverrides               IN-PKG         param            internal/risk/blacklist.go                                 blacklist.go:75
+SA    overrideApplies          IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:97
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:129
+SA    normDir                  IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:144
+SA    anchorPath               IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:152
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:153
+SA    normDir                  IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:154
+SA    sepStr                   IN-PKG         const            internal/risk/pathresolver.go                              blacklist.go:154
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              blacklist.go:155
+SA    classifyWith             IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:181
+SA    classifyForms            IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:187
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              blacklist.go:188
+SA    pathForms                IN-PKG         type             internal/risk/pathresolver.go                              blacklist.go:188
+SA    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SA    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SA    anchorMatches            IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:194
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:195
+SA    anchorMatches            IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:196
+SA    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:197
+SA    anchorPath               IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:211
+SA    formsOf                  IN-PKG         func             internal/risk/pathresolver.go                              blacklist.go:212
+SA    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:217
+SA    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:268
+SA    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:268
+SA    isUnder                  IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:269
+SA    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:277
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:279
+SA    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:287
+SA    anchorMatches            IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:287
+SA    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:289
+SA    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:290
+SA    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:309
+SA    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:310
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:317
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:324
+SA    aAnyForm                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:336
+SA    uncertainAnchorMiss      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:347
+SA    hasGitConfigSegment      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:372
+SA    normPath                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:373
+SA    isBrowserCredentialStore IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:384
+SB    fires                    RED-elsewhere  field            internal/config/unwired.go                                 blacklist.go:310
+SBL   blacklists               RED-nowhere                                                                                blacklist.go:10
+SBL   entry                    IN-PKG         rangevar         internal/risk/rules_network.go                             blacklist.go:15
+SBL   override                 RED-elsewhere  result           internal/llm/systemproxy_windows.go                        blacklist.go:26
+SBL   sink                     RED-elsewhere  param            cmd/wisp/dataroot_128_test.go                              blacklist.go:49
+SBL   decision                 RED-elsewhere  local-var        cmd/wisp/ticket224_assembly_test.go                        blacklist.go:50
+SBL   only                     RED-elsewhere  local            internal/models/assembly_reachability_121_test.go          blacklist.go:61
+SBL   again                    RED-elsewhere  local            internal/agent/approval/pending_read_test.go               blacklist.go:64
+SBL   saw                      RED-elsewhere  local            cmd/wisp/plan_assembled_165r2_test.go                      blacklist.go:65
+SBL   narrower                 RED-nowhere                                                                                blacklist.go:67
+SBL   side                     RED-nowhere                                                                                blacklist.go:99
+SBL   form                     RED-elsewhere  rangevar         cmd/wisp/firstrun_257_test.go                              blacklist.go:106
+SBL   opened                   IN-PKG         local            internal/risk/allow_substring_pin_216_test.go              blacklist.go:112
+SBL   path                     IN-PKG         param            internal/risk/blacklist.go                                 blacklist.go:132
+SBL   itself                   RED-nowhere                                                                                blacklist.go:136
+SBL   unified                  RED-nowhere                                                                                blacklist.go:153
+SBL   exist                    RED-nowhere                                                                                blacklist.go:157
+SBL   anchor                   IN-PKG         field            internal/risk/anchor_fallback_teeth_336_windows_test.go    blacklist.go:209
+SBL   tier                     RED-elsewhere  local            cmd/wisp/config_readers_255.go                             blacklist.go:216
+SBL   reason                   IN-PKG         field            internal/risk/assessor.go                                  blacklist.go:221
+SBL   tier                     RED-elsewhere  local            cmd/wisp/config_readers_255.go                             blacklist.go:244
+SBL   in                       IN-PKG         param            internal/risk/name_claim_two_arm_216_test.go               blacklist.go:245
+SBL   trustworthy              RED-nowhere                                                                                blacklist.go:279
+SBL   candidate                RED-elsewhere  local            internal/config/settings.go                                blacklist.go:289
+SBL   assembled                RED-elsewhere  local            internal/panel/l2_grant_boundary_test.go                   blacklist.go:309
+SBL   them                     RED-nowhere                                                                                blacklist.go:312
+SBL   shapes                   RED-elsewhere  local            cmd/wisp/firstrun_257_test.go                              blacklist.go:324
+SBL   test                     IN-PKG         param            internal/risk/blacklist.go                                 blacklist.go:336
+SBL   open                     IN-PKG         result           internal/risk/provenance.go                                blacklist.go:351
+SBL   DEFERRED                 RED-nowhere                                                                                blacklist.go:358
+SBL   forms                    RED-elsewhere  local            cmd/wisp/secret_test.go                                    blacklist.go:373
+SBL   name                     IN-PKG         local            internal/risk/allow_substring_pin_216_test.go              blacklist.go:385
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:193
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:197
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:217
+SW    aEq                      IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:268
+SW    aUnder                   IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:268
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:277
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:287
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:289
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:290
+SW    aRuleReason              IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:309
+SW    aRelates                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:310
+SW    aAnyForm                 IN-PKG         func             internal/risk/blacklist.go                                 blacklist.go:336
+# --- counters ---
+shape=SA    TOTAL=43 IN-PKG=43 RED-elsewhere=0 RED-nowhere=0 (RED all=0)
+shape=SB    TOTAL=1 IN-PKG=0 RED-elsewhere=1 RED-nowhere=0 (RED all=1)
+shape=SBL   TOTAL=31 IN-PKG=9 RED-elsewhere=13 RED-nowhere=9 (RED all=22)
+shape=SW    TOTAL=14 IN-PKG=14 RED-elsewhere=0 RED-nowhere=0 (RED all=0)
+shape=BEXCL TOTAL=0 IN-PKG=0 RED-elsewhere=0 RED-nowhere=0 (RED all=0)

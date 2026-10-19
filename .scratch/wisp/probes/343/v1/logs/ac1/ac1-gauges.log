@@ -1,0 +1,26 @@
+== ① delivery-side grep (want 0 hits) ==
+rc=1 hits=0
+-- positive control: same grep on start anchor 29d258f9 (want 1 hit, and it is a comment line) --
+rc=0 hits=1
+29d258f9:internal/risk/blacklist.go:193:// provably expanded fails CLOSED (aEquiv / aUnder report such a miss as a
+-- func-shape grep both sides --
+
+== ② the single .go commit: 31d4a476 numstat + -U0 +/- line classification ==
+31d4a47626ec7997666b6e0b190a760cdc535da0 票 343 落地腿 343-r1 交件（第 1 笔）＝改准 `blacklist.go:193` 那句点名的符号。
+
+5	2	internal/risk/blacklist.go
+-- all ^[+-] content lines from git diff -U0 (start-anchor parent -> impl commit) --
+changed_lines=7 comment_lines=7 noncomment_lines=0
+-- verbatim --
+-// provably expanded fails CLOSED (aEquiv / aUnder report such a miss as a|EOL
+-// hit) instead of quietly dropping a path from A into B.|EOL
++// provably expanded fails CLOSED: aEq / aUnder delegate to aRelates, which|EOL
++// reports such a miss as a hit when anchorMatches found nothing AND|EOL
++// uncertainAnchorMiss held, instead of quietly dropping a path from A into B.|EOL
++// anchorMatches on its own does not do that - ticket 334 needs the two apart|EOL
++// because aRuleReason has to say which of them produced the verdict.|EOL
+
+== whole-commit file list for 31d4a476 (must be 1 .go) ==
+internal/risk/blacklist.go
+== full-HEAD numstat of that commit (any other file touched?) ==
+5	2	internal/risk/blacklist.go
