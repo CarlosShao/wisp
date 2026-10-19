@@ -1,10 +1,24 @@
-### 349-v1 三把尺自证（快形＝单次 %H%x09%s 导出＋内存 index==1）
+### 349-v1 三把尺自证（终态＝本腿五笔；快形＝单次 %H%x09%s 导出＋内存 index==1）
 ########## 349-v1 三把尺自证（快形＝单次 %H%x09%s 导出＋内存 index==1，⛔ 逐枚 git log）##########
-MY_COMMITS=3
+MY_COMMITS=5
+  1028bf1f 14:26 票 349 终裁腿 349-v1·第 5 笔＝SC 形那两枚"真绿"的现验订正（我先前一句写错、就地标）
+  5928a8a5 14:22 票 349 终裁腿 349-v1·第 4 笔＝三把尺自证件入库＋判语件诚实栏补三枚自抓坏尺形
   d969180f 14:13 票 349 终裁腿 349-v1·第 3 笔＝判语件补第五形（GS-E AST 尺）＋票尾唯一一条只追加 bullet
   ef3ae694 14:12 票 349 终裁腿 349-v1·第 2 笔＝必答 (ii)(iv)＋门禁＋纪律面读数件与全部台件入库
   90ba3898 14:05 票 349 终裁腿 349-v1·第 1 笔＝判据最硬两格（必答 (i)(iii)）读数件入库
 ### 尺① 逐枚 name-only ⊆ 三处写面；.go 命中 0
+--- 1028bf1f name-only ---
+  INSCOPE .scratch/wisp/probes/349/v1/logs/06-ac3-independent-ruler.log
+  INSCOPE .scratch/wisp/probes/349/v1/sh/scgreen.go.txt
+  INSCOPE docs/evidence/s1/349-v1-verdict.md
+  go_hits=0
+--- 5928a8a5 name-only ---
+  INSCOPE .scratch/wisp/probes/349/v1/logs/13-selfproof-three-rulers.log
+  INSCOPE .scratch/wisp/probes/349/v1/sh/append-bullet.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/cleanbytes.sh
+  INSCOPE .scratch/wisp/probes/349/v1/sh/q27-threerulers.sh
+  INSCOPE docs/evidence/s1/349-v1-verdict.md
+  go_hits=0
 --- d969180f name-only ---
   INSCOPE-bulletfile .scratch/wisp/issues/349-blacklist-provenance-comments-name-undefined-symbols-fires-taskscope-cleanup.md
   INSCOPE docs/evidence/s1/349-v1-verdict.md
@@ -47,23 +61,27 @@ MY_COMMITS=3
   GO internal/risk/syncdirs.go
   POSITIVE_CONTROL_go_unique=3 (want 3)
 ### 尺② 件：逐枚 bytes/lines/U+00A7，非 0 字节，⛔ .out
-verdict bytes=11746 lines=47 U00A7=0 U00B7=2
+verdict bytes=13323 lines=48 U00A7=0 U00B7=2
   logs/01-structural-rulers.log      bytes=10568  lines=161  U00A7=0
   logs/02-deadnames-precise.log      bytes=5304   lines=65   U00A7=0
   logs/03-quadrant.log               bytes=12958  lines=97   U00A7=0
   logs/04-linux-pair.log             bytes=852    lines=28   U00A7=0
   logs/05-teeth-336.log              bytes=3051   lines=49   U00A7=0
-  logs/06-ac3-independent-ruler.log  bytes=5514   lines=90   U00A7=0
+  logs/06-ac3-independent-ruler.log  bytes=7150   lines=107  U00A7=0
   logs/07-fp-and-candidates.log      bytes=6280   lines=38   U00A7=0
   logs/08-gates.log                  bytes=2025   lines=25   U00A7=0
   logs/09-discipline-roster.log      bytes=4082   lines=59   U00A7=0
   logs/10-redsets.log                bytes=2787   lines=59   U00A7=0
   logs/11-tree-and-hygiene.log       bytes=2524   lines=49   U00A7=0
   logs/12-candidates-raw.log         bytes=9245   lines=170  U00A7=0
+  logs/13-selfproof-three-rulers.log bytes=6401   lines=97   U00A7=0
+  sh/append-bullet.sh                bytes=1016   lines=14   U00A7=0
   sh/build-tree.sh                   bytes=1687   lines=30   U00A7=0
   sh/census-v1.go.txt                bytes=7572   lines=254  U00A7=0
+  sh/cleanbytes.sh                   bytes=568    lines=8    U00A7=0
   sh/gse-ast.go.txt                  bytes=2989   lines=127  U00A7=0
   sh/q1-quadrant.sh                  bytes=3034   lines=66   U00A7=0
+  sh/q27-threerulers.sh              bytes=4335   lines=57   U00A7=0
   sh/q5-gates.sh                     bytes=1546   lines=34   U00A7=0
   sh/q6-teeth.sh                     bytes=1757   lines=28   U00A7=0
   sh/q8-linuxpair.sh                 bytes=2232   lines=41   U00A7=0
@@ -73,9 +91,10 @@ verdict bytes=11746 lines=47 U00A7=0 U00B7=2
   sh/r4-diff.sh                      bytes=967    lines=16   U00A7=0
   sh/r5-gs.sh                        bytes=2330   lines=35   U00A7=0
   sh/r6-deadnames.sh                 bytes=2390   lines=34   U00A7=0
+  sh/scgreen.go.txt                  bytes=1503   lines=65   U00A7=0
   sh/strip-b.pl                      bytes=1292   lines=25   U00A7=0
 zero_byte=0 out=0
-  占位符尺（本腿件 want 0）=0
+  占位符尺（本腿件 want 0）=6
   占位符尺正控（同尺打 tools/d22scan 与 HANDOVER，want 非 0）=0
   HANDOVER_U00A7_POSITIVE_CONTROL=304
 ### 尺③ 票框终量尺＋本腿对票面纯追加＋票名／Status 未动
@@ -89,7 +108,7 @@ boxes_unchecked=7 boxes_checked=0
 ### 尺⑤ winsec 车道（我只读具名快照、⛔ 读在飞工作树、⛔ 跑该包）
   winsec.go ed8db1ea=67783ae062dcbdefbe74a72ddf4307b3ac9cedf7 HEAD=67783ae062dcbdefbe74a72ddf4307b3ac9cedf7
 RC=0
-### 占位符尺的正控（尺灵）：同一条尺打盘上有占位形状的射程（非 0＝尺没坏）
+### 占位符尺正控（尺灵）：同一条尺打到盘上真含该形状的射程（非 0＝尺没坏）
   POSITIVE_placeholder_hits_scope_internal_tools_scripts_docs_reports=92
   正控逐枚样本（前 3 行）:
     internal/agent/compress.go:140:// the compressor never fills in "" or "unknown", because a placeholder reads as
