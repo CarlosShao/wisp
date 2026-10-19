@@ -1,0 +1,141 @@
+//go:build windows
+
+// 342-v2 仓外探针件（★只存在于 D:\tmp 的拷贝树 mut-W／mut-WB，⛔ 入库、⛔ 任何跟踪字节）。
+// 目的＝把派单必答(ii) 那三件里能用**确定性**回答的两件一次答掉，⛔ 靠 racer 撞运气：
+//   W1 稳态祖先形（symlink-dir ⇄ junction）下 PrivateFile 到底答在哪一支、外来见证动不动得了
+//       ⇒ 裁票 348 "修前分子>0 在 Windows 取⛔ 到"是〔缺世界〕还是〔仪器没做对〕还是〔真漏〕。
+//   W2 叶子复验（openPinnedLeaf 里那两半门）在"链接目标留在已钉住的那枚目录内"这一形上答没答过
+//       ⇒ 裁票 342 AC#5 押的"叶子复验量到没量到"（腿报＝撞 racer 空转、答没答过未知）。
+package winsec
+
+import (
+	"os"
+	"os/exec"
+	"path/filepath"
+	"syscall"
+	"testing"
+
+	"golang.org/x/sys/windows"
+)
+
+func p342v2MkdirAll(t *testing.T, d string) {
+	t.Helper()
+	if err := os.MkdirAll(d, 0o700); err != nil {
+		t.Fatalf("mkdir %s: %v", d, err)
+	}
+}
+
+func p342v2Write(t *testing.T, name, body string) {
+	t.Helper()
+	if err := os.WriteFile(name, []byte(body), 0o600); err != nil {
+		t.Fatalf("write %s: %v", name, err)
+	}
+}
+
+// p342v2IsLink ＝平台自己的谓词（FILE_ATTRIBUTE_REPARSE_POINT）的本地副本：本探针件同时打进基线树与
+// 落地树的拷贝，基线树⛔ 有落地那枚 entryIsLink ⇒ 借来用会编译失败＝四数全 0 的假读数。
+func p342v2IsLink(info os.FileInfo) bool {
+	attr, ok := info.Sys().(*syscall.Win32FileAttributeData)
+	return ok && attr.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0
+}
+
+// W1a：祖先＝**相对目标目录符号链接**，稳态摆好，再打一发产码入口。
+func TestP342V2W1SteadyAncestorSymlinkDir(t *testing.T) {
+	base := SealableTempDirForTest124(t)
+	data := filepath.Join(base, "data")
+	foreign := filepath.Join(base, "someone-elses-tree-w")
+	p342v2MkdirAll(t, data)
+	p342v2MkdirAll(t, foreign)
+	p342v2Write(t, filepath.Join(foreign, "leaf-342r1w.bin"), "FOREIGN-WITNESS-BODY-longer-on-purpose")
+	p342v2Write(t, filepath.Join(foreign, "inner.txt"), "foreign-inner")
+	sub := filepath.Join(data, "sub")
+	if err := os.Symlink(filepath.Join("..", "someone-elses-tree-w"), sub); err != nil {
+		t.Skipf("no directory symlink here: %v (developer mode?)", err)
+	}
+	name := filepath.Join(sub, "leaf-342r1w.bin")
+	err := PrivateFile(name, []byte("P342V2-PAYLOAD"), 0o600)
+	t.Logf("W1a SYMDIR steady: PrivateFile err=%v", err)
+	body, rerr := os.ReadFile(filepath.Join(foreign, "leaf-342r1w.bin"))
+	t.Logf("W1a FOREIGN witness now=%q err=%v", body, rerr)
+}
+
+// W1b：祖先＝junction（绝对替换名），稳态摆好。
+func TestP342V2W1SteadyAncestorJunction(t *testing.T) {
+	base := SealableTempDirForTest124(t)
+	data := filepath.Join(base, "data")
+	foreign := filepath.Join(base, "someone-elses-tree-w")
+	p342v2MkdirAll(t, data)
+	p342v2MkdirAll(t, foreign)
+	p342v2Write(t, filepath.Join(foreign, "leaf-342r1w.bin"), "FOREIGN-WITNESS-BODY-longer-on-purpose")
+	sub := filepath.Join(data, "sub")
+	out, err := exec.Command("cmd", "/c", "mklink", "/J", sub, foreign).CombinedOutput()
+	if err != nil {
+		t.Fatalf("mklink /J: %v (%s)", err, out)
+	}
+	t.Cleanup(func() { _ = RemoveUnlinked(sub) })
+	name := filepath.Join(sub, "leaf-342r1w.bin")
+	err = PrivateFile(name, []byte("P342V2-PAYLOAD"), 0o600)
+	t.Logf("W1b JUNCTION steady: PrivateFile err=%v", err)
+	body, rerr := os.ReadFile(filepath.Join(foreign, "leaf-342r1w.bin"))
+	t.Logf("W1b FOREIGN witness now=%q err=%v", body, rerr)
+}
+
+// W2：叶子链接的目标**留在已钉住的那枚父目录里**（裸兄弟名＝containment 拦不住的那一形）。
+// ⇒ 产码路由的 open 若跟随，落地那道叶子复验（entryIsLink ⇄ SameFile）必须把它拒回来；
+//    若这一发⛔ 拒、外来/树内那枚被写＝真漏；若拒＝复验答过（票 342 AC#5 的"叶子那一支量到"）。
+func TestP342V2W2LeafLinkInsidePinnedDir(t *testing.T) {
+	base := SealableTempDirForTest124(t)
+	sub := filepath.Join(base, "data", "sub")
+	p342v2MkdirAll(t, sub)
+	sibling := filepath.Join(sub, "sibling.bin")
+	p342v2Write(t, sibling, "IN-PINNED-DIR-SIBLING-BODY")
+	name := filepath.Join(sub, "leaf-342r1w.bin")
+	p342v2Write(t, name, "REAL-OWN-BODY")
+	if err := os.Remove(name); err != nil {
+		t.Fatalf("remove own leaf: %v", err)
+	}
+	if err := os.Symlink("sibling.bin", name); err != nil {
+		t.Skipf("no file symlink here: %v (developer mode?)", err)
+	}
+	info, lerr := os.Lstat(name)
+	if lerr != nil {
+		t.Fatalf("Lstat the planted leaf link: %v", lerr)
+	}
+	// ★⛔ 调用落地件自己的 entryIsLink：基线树没有那枚函数＝编译不过＝假读数（四数全 0 那一味）。
+	//   这里自己按平台谓词算同一件事，两棵树都能编译。
+	t.Logf("W2 planted leaf link: mode=%v isLink=%v", info.Mode(), p342v2IsLink(info))
+	err := PrivateFile(name, []byte("P342V2-PAYLOAD"), 0o600)
+	t.Logf("W2 PrivateFile err=%v", err)
+	sib, serr := os.ReadFile(sibling)
+	t.Logf("W2 IN-PINNED-DIR sibling now=%q err=%v <== 被改写＝复验没能拦住＝真漏", sib, serr)
+	own, oerr := os.Lstat(name)
+	t.Logf("W2 leaf name now: err=%v mode=%v", oerr, func() os.FileMode {
+		if own == nil {
+			return 0
+		}
+		return own.Mode()
+	}())
+}
+
+// W3：叶子链接目标出父目录（＝仪器 leaf-symlink 形的构造）⇒ 稳态对照，看答在哪一支。
+func TestP342V2W3LeafLinkEscapingPinnedDir(t *testing.T) {
+	base := SealableTempDirForTest124(t)
+	sub := filepath.Join(base, "data", "sub")
+	foreign := filepath.Join(base, "someone-elses-tree-w")
+	p342v2MkdirAll(t, sub)
+	p342v2MkdirAll(t, foreign)
+	witness := filepath.Join(foreign, "leaf-342r1w.bin")
+	p342v2Write(t, witness, "FOREIGN-WITNESS-BODY-longer-on-purpose")
+	name := filepath.Join(sub, "leaf-342r1w.bin")
+	p342v2Write(t, name, "REAL-OWN-BODY")
+	if err := os.Remove(name); err != nil {
+		t.Fatalf("remove own leaf: %v", err)
+	}
+	if err := os.Symlink(filepath.Join("..", "..", "someone-elses-tree-w", "leaf-342r1w.bin"), name); err != nil {
+		t.Skipf("no file symlink here: %v (developer mode?)", err)
+	}
+	err := PrivateFile(name, []byte("P342V2-PAYLOAD"), 0o600)
+	t.Logf("W3 ESCAPING leaf: PrivateFile err=%v", err)
+	body, rerr := os.ReadFile(witness)
+	t.Logf("W3 FOREIGN witness now=%q err=%v", body, rerr)
+}

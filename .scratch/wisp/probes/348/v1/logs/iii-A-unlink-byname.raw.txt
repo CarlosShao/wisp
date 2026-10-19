@@ -1,0 +1,43 @@
+=== RUN   TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link): target=rel attempts=1500 cycles=158 provedLinkCycles=158 pinnedWalkRefusals=29 pinnedParentBeforeOpen=20 refusedAfterOpen=9 truncated=0 deleted=47 narrowed=0 untouched=1453 enoentGaps=109 flipErrs=23
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)': leg that answered = pinned walk, sameObjectPinned link face (winsec_other.go through pinPlacement) : 29 attempts
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)': leg that answered = placement floor before the act (platformVerifyPlacement) : 660 attempts
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)': leg that answered = the racer's own clear-then-rename gap (ENOENT): absent, not followed : 109 attempts
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)': leg that answered = none: the call returned nil : 702 attempts
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)': first proof verbatim: refused by the pinned parent before the open: winsec: path is not provably resolved, refusing to seal: /tmp/TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAFor728308880/001/data/sub: pinned object at sub is not what the name carries: the name carries a link, so the pinned object is not what the spelling reaches (winsec: cannot apply a private security descriptor)
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)': first gap verbatim: open /tmp/TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAFor728308880/001/data/sub/leaf-342r1.bin: no such file or directory
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)': first racer error verbatim: remove /tmp/TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAFor728308880/001/data/sub: directory not empty
+    ancestoropen_342_unix_test.go:49: AC#1 RED: 0 attempts found the foreign witness's body replaced and 47 found it gone, so this route's act reached THROUGH an ancestor swapped into a link after resolveString had answered (first: refused by the pinned parent before the open: winsec: path is not provably resolved, refusing to seal: /tmp/TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAFor728308880/001/data/sub: pinned object at sub is not what the name carries: the name carries a link, so the pinned object is not what the spelling reaches (winsec: cannot apply a private security descriptor)). Both numerators count here on purpose: on this route an O_TRUNC that lands is very often followed by the refusal-path unlink taking the name away, so a gate reading only the surviving body would go GREEN on a damaged tree - the shape ticket 342 AC#3 refuses. Ticket 348's own gate is the removal alone and does not borrow this reading.
+--- FAIL: TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 (0.52s)
+=== RUN   TestAC2POSIXRefusalPathWithASwappedAncestorNeverDeletesAForeignFile342r1
+    ancestorunlink_348_unix_test.go:114: AC#2' refusal verbatim (the leg that answered): winsec: path is not provably resolved, refusing to seal: /tmp/TestAC2POSIXRefusalPathWithASwappedAncestorNeverDeletesAForeignF2441366576/001/data/sub/leaf-342r1.bin: pinned object at /tmp/TestAC2POSIXRefusalPathWithASwappedAncestorNeverDeletesAForeignF2441366576/001/data/sub/leaf-342r1.bin is not what the name carries: this descriptor is not the object the name carries now, so the bytes would not land in what was just sealed (winsec: cannot apply a private security descriptor)
+    ancestorunlink_348_unix_test.go:118: AC#2 RED: the foreign witness is GONE after the refusal-path unlink (lstat /tmp/TestAC2POSIXRefusalPathWithASwappedAncestorNeverDeletesAForeignF2441366576/001/data/someone-elses-tree/leaf-342r1.bin: no such file or directory), so the removal re-resolved the caller's spelling through the swapped ancestor and deleted a name in somebody else's tree - ticket 348's shape, the second damage of the pair
+--- FAIL: TestAC2POSIXRefusalPathWithASwappedAncestorNeverDeletesAForeignFile342r1 (0.00s)
+=== RUN   TestAC2POSIXPrivateFileRaceThroughASwappedAncestorNeverDeletesAForeignFile342r1
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer): target=rel attempts=1500 cycles=155 provedLinkCycles=155 pinnedWalkRefusals=33 pinnedParentBeforeOpen=18 refusedAfterOpen=15 truncated=0 deleted=52 narrowed=0 untouched=1448 enoentGaps=101 flipErrs=23
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer)': leg that answered = pinned walk, sameObjectPinned link face (winsec_other.go through pinPlacement) : 33 attempts
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer)': leg that answered = placement floor before the act (platformVerifyPlacement) : 656 attempts
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer)': leg that answered = the racer's own clear-then-rename gap (ENOENT): absent, not followed : 101 attempts
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer)': leg that answered = none: the call returned nil : 710 attempts
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer)': first proof verbatim: witness ABSENT after attempt 8 (lstat /tmp/TestAC2POSIXPrivateFileRaceThroughASwappedAncestorNeverDeletesAF3769279904/001/data/someone-elses-tree/leaf-342r1.bin: no such file or directory)
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer)': first gap verbatim: open /tmp/TestAC2POSIXPrivateFileRaceThroughASwappedAncestorNeverDeletesAF3769279904/001/data/sub/leaf-342r1.bin: no such file or directory
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer)': first racer error verbatim: remove /tmp/TestAC2POSIXPrivateFileRaceThroughASwappedAncestorNeverDeletesAF3769279904/001/data/sub: directory not empty
+    ancestorunlink_348_unix_test.go:148: AC#2 RED: 52 of 1500 attempts found the foreign witness GONE, so the refusal-path unlink in privateFile re-resolved the spelling through an ancestor swapped into a link and removed a name in somebody else's tree (first: witness ABSENT after attempt 8 (lstat /tmp/TestAC2POSIXPrivateFileRaceThroughASwappedAncestorNeverDeletesAF3769279904/001/data/someone-elses-tree/leaf-342r1.bin: no such file or directory))
+--- FAIL: TestAC2POSIXPrivateFileRaceThroughASwappedAncestorNeverDeletesAForeignFile342r1 (0.49s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+--- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.01s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.00s)
+    --- PASS: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	1.034s
+FAIL

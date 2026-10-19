@@ -1,0 +1,21 @@
+time=2026-10-19T18:02:55.343+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestP342V2W1SteadyAncestorSymlinkDir
+    probe_342v2_windows_test.go:57: W1a SYMDIR steady: PrivateFile err=winsec: refusing to seal C:\Users\swq\AppData\Local\Temp\TestP342V2W1SteadyAncestorSymlinkDir302624852\001\data\sub\leaf-342r1w.bin: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions
+    probe_342v2_windows_test.go:59: W1a FOREIGN witness now="FOREIGN-WITNESS-BODY-longer-on-purpose" err=<nil>
+--- PASS: TestP342V2W1SteadyAncestorSymlinkDir (0.01s)
+=== RUN   TestP342V2W1SteadyAncestorJunction
+    probe_342v2_windows_test.go:78: W1b JUNCTION steady: PrivateFile err=winsec: refusing to seal C:\Users\swq\AppData\Local\Temp\TestP342V2W1SteadyAncestorJunction3720906165\001\data\sub\leaf-342r1w.bin: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions
+    probe_342v2_windows_test.go:80: W1b FOREIGN witness now="FOREIGN-WITNESS-BODY-longer-on-purpose" err=<nil>
+--- PASS: TestP342V2W1SteadyAncestorJunction (0.06s)
+=== RUN   TestP342V2W2LeafLinkInsidePinnedDir
+    probe_342v2_windows_test.go:106: W2 planted leaf link: mode=Lrw-rw-rw- isLink=true
+    probe_342v2_windows_test.go:108: W2 PrivateFile err=winsec: refusing to seal C:\Users\swq\AppData\Local\Temp\TestP342V2W2LeafLinkInsidePinnedDir2461641241\001\data\sub\leaf-342r1w.bin: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions
+    probe_342v2_windows_test.go:110: W2 IN-PINNED-DIR sibling now="IN-PINNED-DIR-SIBLING-BODY" err=<nil> <== 被改写＝复验没能拦住＝真漏
+    probe_342v2_windows_test.go:112: W2 leaf name now: err=<nil> mode=Lrw-rw-rw-
+--- PASS: TestP342V2W2LeafLinkInsidePinnedDir (0.00s)
+=== RUN   TestP342V2W3LeafLinkEscapingPinnedDir
+    probe_342v2_windows_test.go:138: W3 ESCAPING leaf: PrivateFile err=winsec: refusing to seal C:\Users\swq\AppData\Local\Temp\TestP342V2W3LeafLinkEscapingPinnedDir1460483639\001\data\sub\leaf-342r1w.bin: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions
+    probe_342v2_windows_test.go:140: W3 FOREIGN witness now="FOREIGN-WITNESS-BODY-longer-on-purpose" err=<nil>
+--- PASS: TestP342V2W3LeafLinkEscapingPinnedDir (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.109s

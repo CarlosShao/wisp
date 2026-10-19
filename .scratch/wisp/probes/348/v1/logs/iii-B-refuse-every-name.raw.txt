@@ -1,0 +1,42 @@
+=== RUN   TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link): target=rel attempts=1500 cycles=143 provedLinkCycles=143 pinnedWalkRefusals=0 pinnedParentBeforeOpen=0 refusedAfterOpen=0 truncated=0 deleted=0 narrowed=0 untouched=1500 enoentGaps=0 flipErrs=0
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)': leg that answered = placement floor before the act (platformVerifyPlacement) : 586 attempts
+    ancestoropen_342_unix_test.go:47: AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)': leg that answered = some other failure : 914 attempts
+    ancestoropen_342_unix_test.go:58: AC#1 RED instrument: the racer proved 143 link-state cycles and the parent pin refused 0 attempts BEFORE any open (walk-after-open answers: 0, attempts: 1500, flipErrs=0, first "") - so the zeroes above are not evidence about a window that was ever reached, and a refusal that came after the open proves nothing about it
+--- FAIL: TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 (0.49s)
+=== RUN   TestAC2POSIXRefusalPathWithASwappedAncestorNeverDeletesAForeignFile342r1
+    ancestorunlink_348_unix_test.go:108: AC#2 RED instrument: the plant never landed
+--- FAIL: TestAC2POSIXRefusalPathWithASwappedAncestorNeverDeletesAForeignFile342r1 (0.00s)
+=== RUN   TestAC2POSIXPrivateFileRaceThroughASwappedAncestorNeverDeletesAForeignFile342r1
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer): target=rel attempts=1500 cycles=140 provedLinkCycles=141 pinnedWalkRefusals=0 pinnedParentBeforeOpen=0 refusedAfterOpen=0 truncated=0 deleted=0 narrowed=0 untouched=1500 enoentGaps=0 flipErrs=0
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer)': leg that answered = placement floor before the act (platformVerifyPlacement) : 596 attempts
+    ancestorunlink_348_unix_test.go:146: AC#2 (ticket 348, deleted gate, relative ancestor link under the racer)': leg that answered = some other failure : 904 attempts
+    ancestorunlink_348_unix_test.go:153: AC#2 RED instrument: the racer proved 141 link-state cycles and the pinned walk refused 0 attempts across 1500 (flipErrs=0, first ""), so the zero above is not evidence about a removal that was ever reachable
+--- FAIL: TestAC2POSIXPrivateFileRaceThroughASwappedAncestorNeverDeletesAForeignFile342r1 (0.46s)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (open /tmp/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern4217359324/001: permission denied), which breaks storing the same id twice replaces the blob in place
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "secret-value-one, longer than the replacement" (err <nil>), want "secret-value-two" - storing the same id twice replaces the blob in place
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (open /tmp/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern4259781279/001: permission denied), which breaks this call is the repair path for a wide backup left by an older build
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "a wide backup left by an older build, longer than the replacement" (err <nil>), want "narrow" - this call is the repair path for a wide backup left by an older build
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (open /tmp/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern340148496/001: permission denied), which breaks a pre-rename temp left by a crash is overwritten, not refused
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "tmp body from the run that crashed" (err <nil>), want "tmp body from this run" - a pre-rename temp left by a crash is overwritten, not refused
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166
+    openleaf_overwrite_322_test.go:70: AC#2 RED: PrivateFile refused an existing name (open /tmp/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1intern3316927380/001: permission denied), which breaks a leftover .retry temp is overwritten (D31 last-writer-wins)
+    openleaf_overwrite_322_test.go:73: AC#2 RED: content is "first spill that needed a retry" (err <nil>), want "retry spill bytes" - a leftover .retry temp is overwritten (D31 last-writer-wins)
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite
+    openleaf_overwrite_322_test.go:95: first write: open /tmp/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1the_en3066474346/001: permission denied
+=== RUN   TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name
+    openleaf_overwrite_322_test.go:122: first exclusive create: open /tmp/TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1the_ex1698589033/001: permission denied
+--- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 (0.01s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/store.go:79_Store.Set (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/config/migrate.go:93 (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/secret/migrate.go:189 (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/internal/agent/spill.go:166 (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_entry_stays_private_after_the_rewrite (0.00s)
+    --- FAIL: TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1/the_exclusive_branch_still_refuses_an_occupied_regular_name (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.969s
+FAIL
