@@ -20,9 +20,15 @@
 ⇒ 该结论＝交编排者裁的**票面补强**（票面第 2 行那句只钉了两枚仪器＋`winsec.go`/`winsec_other.go` 两锚）。
 
 ## 二、两枚仪器的落位 ＝ 本票最要紧的一格（射程尺）
-- 尺＝`^(=== RUN|--- (PASS|FAIL|SKIP)): <名>` 于五份归一日志（件00 第一节）＋本机整包日志：
+- 尺＝`^(=== RUN|--- (PASS|FAIL|SKIP)): <名>` 于五份归一日志（件00 第三节）＋本机整包日志：
   两枚名**只在 `test-core`（Linux）**现身；`test-windows`（`win.norm.log`）各 0 命中；
   本机整包 `D:\tmp\wisp\20261019\orch227-b\full.log`（1544211B，四数 2317/1529/29/8）各 **0 命中**。
+- ★⚠ 那一发的**射程更正（本腿自己抓到、与编排者 `0ca0966a` 那句Ⓐ⇄"未跑到 179 枚"独立同向）**＝
+  `orch227-b/full.log` **⛔ 是整包终态名册**：本腿现量＝最后一枚包结果行是 L10587
+  `FAIL github.com/CarlosShao/wisp/internal/winsec 37.588s`，**其后⛔ 任何包行**（文件到尾＝该发到 winsec 收口即止，
+  `cmd/wisp` 那批⛔ 轮到；全文只有 1 处出现 `cmd/wisp` 字样＝正文里的路径提及、⛔ 包结果行）。
+  ⇒ 那两枚"0 命中"在此**只作旁证**；★决定性凭据＝下面那条**读码**尺（`//go:build !windows`＝两枚 Windows 档
+  结构上⛔ 编译，与该发跑到⛔ 跑到哪里无关）。本腿⛔ 拿"⛔ 在这一发出现"当"在本机绿"。
 - 机制（读码，⛔ 运行）＝两枚文件第 1 行都是 `//go:build !windows`
   （尺＝逐枚 `Get-Content -TotalCount 3`；★同包对照＝`winsec_windows.go`＝`//go:build windows`）。
   ⇒ 在 Windows 主机 ⇄ CI Windows 档**根本没参与编译**＝⛔ 绿、⛔ 红、⛔ 弃权。
