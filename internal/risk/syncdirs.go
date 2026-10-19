@@ -450,7 +450,7 @@ func (s *syncSet) match(rawPath string) SyncStatus {
 }
 
 // Roots returns the detected roots (panel/debug view). The suspect fallback
-// is reported via Complete()==false, not as a root.
+// is reported via SyncDetectionComplete()==false, not as a root.
 func (p *Provenance) SyncRoots() []SyncRoot {
 	if p.sync == nil {
 		return nil

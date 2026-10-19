@@ -1,0 +1,16 @@
+票 349 落地腿 349-r1·AC#1 第②枚＝syncdirs.go:453 注释改准（只动注释行、可执行字节 0）
+
+现读该句断言的是"可疑回落支不是一条 root，而是靠『检测未完备』那个读数报出来的"。包内真名＝
+SyncDetectionComplete（同文件 :472 定义；本票票面 AC#1 也具名给了这一对号）。`Complete()`＝
+包内⛔ 此方法＝同族里那枚**纯小写调用形**样本：驼峰形尺结构上看不到它，只有"调用形尺"抓得到
+⇒ 旧裸名换成盘上真名，⛔ 动可执行字节、⛔ 新增符号。
+
+尺（逐枚现跑，读数进 logs/02）：
+- 内容锚（带前导空格的 ` via Complete()==false`，防新名把旧名当子包包着造成假命中）
+  before=1 → after=0；新锚 after=1
+- `git diff -U0` 本枚 `^[+-]`＝1 换 1，逐枚以 `//` 开头；非注释变化行＝0；numstat 1/1
+- 剥注释三把尺 GS1／GS2／GB：起手 blob 7125b08a ⇄ 交件 blob 两侧同串（＋cmp IDENTICAL）
+- 行尾＝LF（CR 0⇄0）；改后该枚 65 字符 ≤ 本包注释面 100 形
+
+写面＝internal/risk/syncdirs.go 注释面＋.scratch/wisp/probes/349/r1/**（本笔）。
+⛔ push、⛔ 翻任何 AC 框、⛔ 改票名／Status／加 -done；⛔ internal/winsec。
