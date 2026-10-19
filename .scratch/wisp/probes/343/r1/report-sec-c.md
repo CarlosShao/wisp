@@ -6,19 +6,21 @@ B 半＝`report-sec-b.md`（起手三读数／成对四数／8 枚牙／门禁�
 
 ## 九 交件自证（三把尺）
 ```
-尺① 逐枚提交号 ⇄ `git show --name-only`（⊆ 三处写面、.go 命中恰 1）
+尺① 名册尺＝单次 `git log --all --format=%H%x09%s` 导出＋内存内比前缀（⛔ --grep、
+  ⛔ 假设其后任何分隔符＝编排者 27cefc8f 那条改正）；逐枚 `git show --name-only` 取
+  并集 ⇒ ⊆ 三处写面、并集 24 枚、★.go 命中恰 1（正控＝同尺打 339-r1 读出 10 笔）：
   31d4a476  internal/risk/blacklist.go                                    （.go＝1）
   2b6f8a9a  .scratch/wisp/probes/343/r1/sh/linux-343.sh                   （.go＝0）
   360a6af6  .scratch/wisp/probes/343/r1/logs/ 18 枚（4 正文件＋14 原始 stdout）（.go＝0）
   bf5977f4  .scratch/wisp/issues/343-…-in-the-package.md（票尾一条）      （.go＝0）
-  ＋本三笔 report.md／report-sec-b.md／report-sec-c.md                      （.go＝0）
+  ＋report.md／report-sec-b.md／report-sec-c.md（3 枚）                       （.go＝0）
   ★编排者自己那把名册尺已独立读到过我（27cefc8f 里"343-r1 的 2 笔为真、现验都在 HEAD
   祖先链"）＝正控在盘上、⛔ 我自己盖章。
 尺② 证据件绝对路径＋字节＋行数＋占位符尺
   根＝`D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\343\r1\`；逐枚
-  `wc -c`＋行数现跑（`Get-ChildItem` 同尺、下表字节＝现量）：
-    `report.md` 10343／121 ＋ `report-sec-b.md` 10043／136 ＋ 本件｜`sh\linux-343.sh` 1506 B／32 行
-    `logs\01` 7407 B／105｜`logs\02` 2960 B／47｜`logs\03` 10764 B／156｜`logs\04` 9674 B／105
+  `wc -c` 现跑（下表字节＝一次现量快照；★行数⛔ 抄死＝抄死随每次补笔过期、尺现跑）：
+    `report.md` ＋ `report-sec-b.md` ＋ 本件（三枚＝报告笔）｜`sh\linux-343.sh` 1506 B
+    `logs\01` 7407 B｜`logs\02` 2960 B｜`logs\03` 10764 B｜`logs\04` 9674 B
     `logs\linux-{base,del}-343.log` 32297／32306 B、各 428 行
     `logs\teeth-sweep\ac2-sweep-runner.log` 15827 B／218｜`pair-{base,del}-risk.log`
       42912／42895 B、各 543｜`ac2-MU-1{a..h}-teeth.log` 8 枚 4484..5801 B、各 51

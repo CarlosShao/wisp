@@ -77,7 +77,10 @@ blob: c1799cd2…（起手，未动）-> 62f2dddb…（交件）；★我的新�
   anchor_fallback_teeth_336_other_test.go    f5f888de == f5f888de  SAME=True
   anchor_miss_reason_339_other_test.go       e7b13c39 == e7b13c39  SAME=True
   anchor_miss_reason_334_test.go             5147c189 == 5147c189  SAME=True
-我 6 笔全部文件名集（逐枚 `git show --name-only`）＝1×.go + 1×sh + 18×logs + 1×票 md
+笔数尺见 `report-sec-c.md` 尺①（⛔ 在此抄死笔数＝抄死随每补一笔过期）。逐枚
+  `git show --name-only` 取并集实测＝24 枚＝1×.go（blacklist.go）＋1×sh＋18×logs
+  （4 枚读数正文件＋14 枚原始 stdout）＋1×票 md＋3×report md ⇒ ⊆ 三处写面、
+  ★.go 命中恰 1 枚、⛔ 任何别腿件
   + 2×report md ⇒ .go 命中恰 1 枚＝blacklist.go；⛔ 任何别腿件
 `git status --porcelain -- internal/risk` 起手／交件前／交件后都＝0 行＝全程独占
 ```
