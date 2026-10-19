@@ -4,9 +4,10 @@
 # 3) 退码＝go 命令裸跑重定向到文件后立刻取 $LASTEXITCODE（无管道、无 tail）。
 param([string]$Gotmp = 'C:\Users\swq\AppData\Local\wisp-test-gotmp\227v2-a',
        [string]$Log = 'D:\tmp\wisp\20261019\227v2\full.log',
+       [string]$Tree = 'D:\tmp\wisp\20261019\227v2\tree',
        [string]$Sel = './cmd/wisp ./internal/...')
 $ErrorActionPreference = 'Continue'
-$tree = 'D:\tmp\wisp\20261019\227v2\tree'
+$tree = $Tree
 New-Item -ItemType Directory -Force -Path $Gotmp | Out-Null
 $env:GOTMPDIR = $Gotmp
 Remove-Item Env:TMPDIR -ErrorAction SilentlyContinue
