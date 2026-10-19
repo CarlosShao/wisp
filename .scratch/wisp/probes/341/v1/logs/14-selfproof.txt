@@ -1,0 +1,219 @@
+########## 尺一：逐枚提交号 + 逐枚 git show --name-only（应⊆ 三处写面），.go 命中 ===== 0 ##########
+--- 95b1015d ---
+     subject=票 341 终裁腿 341-v1·AC#1 四格去牙逐格我自己重打（P2／P3／P5／P6）＋起手尺
+  
+  .scratch/wisp/probes/341/v1/logs/00-start-gauges.txt
+  .scratch/wisp/probes/341/v1/logs/01-ac0-census-and-landings.txt
+  .scratch/wisp/probes/341/v1/logs/03-color-base.txt
+  .scratch/wisp/probes/341/v1/logs/04-color-deliv.txt
+  .scratch/wisp/probes/341/v1/logs/05-controls.txt
+  .scratch/wisp/probes/341/v1/logs/10-mu-p2.txt
+  .scratch/wisp/probes/341/v1/logs/10-mu-p3.txt
+  .scratch/wisp/probes/341/v1/logs/10-mu-p5.txt
+  .scratch/wisp/probes/341/v1/logs/10-mu-p6.txt
+  .scratch/wisp/probes/341/v1/scripts/run1-trees.sh
+  .scratch/wisp/probes/341/v1/scripts/run2-color.sh
+  .scratch/wisp/probes/341/v1/scripts/run3-mu.sh
+  .scratch/wisp/probes/341/v1/scripts/run5-controls.sh
+--- 67596f91 ---
+     subject=票 341 终裁腿 341-v1·AC#2/AC#3/AC#4/AC#5/AC#6 尺＋判语件本体
+  
+  .scratch/wisp/probes/341/v1/logs/05-controls.txt
+  .scratch/wisp/probes/341/v1/logs/06-ac2-quote-shape-and-ac3.txt
+  .scratch/wisp/probes/341/v1/logs/07-ac2356-residual.txt
+  .scratch/wisp/probes/341/v1/logs/08-gates-and-ac5.txt
+  .scratch/wisp/probes/341/v1/logs/09-final-state.txt
+  .scratch/wisp/probes/341/v1/logs/11-quoteshape.txt
+  .scratch/wisp/probes/341/v1/scripts/run10-final.sh
+  .scratch/wisp/probes/341/v1/scripts/run11-quoteshape.sh
+  .scratch/wisp/probes/341/v1/scripts/run7-gates.sh
+  .scratch/wisp/probes/341/v1/scripts/run8-ac23.sh
+  .scratch/wisp/probes/341/v1/scripts/run9-residual.sh
+  docs/evidence/s1/341-v1-verdict.md
+--- 7d91f761 ---
+     subject=票 341 终裁腿 341-v1·判语件终形＋票面追加尺＋本腿违令②具名留盘
+  
+  .scratch/wisp/probes/341/v1/logs/12-append-bullet.txt
+  .scratch/wisp/probes/341/v1/logs/13-my-discipline-slip-reset.txt
+  .scratch/wisp/probes/341/v1/scripts/run12-append-bullet.sh
+  docs/evidence/s1/341-v1-verdict.md
+--- f5d5165c ---
+     subject=票 341 终裁腿 341-v1·票尾一条只追加 bullet＋本腿两枚纪律违规具名自报＋AC#
+  
+  .scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md
+-- my 4 commits: .go hits (want 0) --
+0
+-- POSITIVE CONTROL: same ruler on 341-r1's 6 commits (want 1) --
+     carrier: internal/config/writeguard_unnailed_341_test.go
+-- my commits ⊆ allowed面? list anything else (want empty) --
+-- roster scale (strict prefix per-hash, want 4) --
+f5d5165c 09:27 票 341 终裁腿 341-v1·票尾一条只追加 bullet�
+7d91f761 09:26 票 341 终裁腿 341-v1·判语件终形＋票面追�
+67596f91 09:20 票 341 终裁腿 341-v1·AC#2/AC#3/AC#4/AC#5/AC#6 尺�
+95b1015d 23:58 票 341 终裁腿 341-v1·AC#1 四格去牙逐格我自
+-- count = 4
+
+########## 尺二：判语件绝对路径 + wc -c + 行数 + 占位符尺 0 命中（正控非零）+ 逐枚非 0 字节 ##########
+ABS = D:\work\workspace\projects plans\Wisp\docs\evidence\s1\341-v1-verdict.md
+bytes=15287 lines=71
+placeholder ruler (TODO/FIXME/XXX) hits in verdict = 0
+   POSITIVE CONTROL same ruler on HANDOVER.md = 1 (XXX 1 hit = ruler alive)
+banned-char ruler hits in verdict = 0
+   POSITIVE CONTROL same ruler on HANDOVER.md files = 1
+CR in verdict = 0
+-- every file in my write面: zero-byte count (want 0) --
+0
+26
+-- .out extension count (want 0) --
+0
+-- per-file bytes --
+   .scratch/wisp/probes/341/v1/logs/00-start-gauges.txt                     2241
+   .scratch/wisp/probes/341/v1/logs/01-ac0-census-and-landings.txt          8426
+   .scratch/wisp/probes/341/v1/logs/03-color-base.txt                       1800
+   .scratch/wisp/probes/341/v1/logs/04-color-deliv.txt                      1802
+   .scratch/wisp/probes/341/v1/logs/05-controls.txt                         7061
+   .scratch/wisp/probes/341/v1/logs/06-ac2-quote-shape-and-ac3.txt          11284
+   .scratch/wisp/probes/341/v1/logs/07-ac2356-residual.txt                  8349
+   .scratch/wisp/probes/341/v1/logs/08-gates-and-ac5.txt                    3510
+   .scratch/wisp/probes/341/v1/logs/09-final-state.txt                      4093
+   .scratch/wisp/probes/341/v1/logs/10-mu-p2.txt                            2529
+   .scratch/wisp/probes/341/v1/logs/10-mu-p3.txt                            3723
+   .scratch/wisp/probes/341/v1/logs/10-mu-p5.txt                            1965
+   .scratch/wisp/probes/341/v1/logs/10-mu-p6.txt                            1951
+   .scratch/wisp/probes/341/v1/logs/11-quoteshape.txt                       728
+   .scratch/wisp/probes/341/v1/logs/12-append-bullet.txt                    706
+   .scratch/wisp/probes/341/v1/logs/13-my-discipline-slip-reset.txt         1188
+   .scratch/wisp/probes/341/v1/scripts/run1-trees.sh                        1718
+   .scratch/wisp/probes/341/v1/scripts/run10-final.sh                       4262
+   .scratch/wisp/probes/341/v1/scripts/run11-quoteshape.sh                  645
+   .scratch/wisp/probes/341/v1/scripts/run12-append-bullet.sh               1458
+   .scratch/wisp/probes/341/v1/scripts/run2-color.sh                        1585
+   .scratch/wisp/probes/341/v1/scripts/run3-mu.sh                           6722
+   .scratch/wisp/probes/341/v1/scripts/run5-controls.sh                     2867
+   .scratch/wisp/probes/341/v1/scripts/run7-gates.sh                        2995
+   .scratch/wisp/probes/341/v1/scripts/run8-ac23.sh                         4282
+   .scratch/wisp/probes/341/v1/scripts/run9-residual.sh                     4475
+
+########## 尺三：决定性读数汇总（四格成对红句逐字 + 还原哈希 + 四数 + 门禁 rc + 票框终量尺）##########
+-- AC#4 成对四数（我的两棵从零导出树，两把临时根） --
+   ### tree=treeB label=base-A tmp=A rc=0
+   RUN=190
+   PASS_TOP=109
+   FAIL_TOP=0
+   SKIP=0
+   ### tree=treeB label=base-B tmp=B rc=0
+   RUN=190
+   PASS_TOP=109
+   FAIL_TOP=0
+   SKIP=0
+   ### tree=treeD label=deliv-A tmp=A rc=0
+   RUN=195
+   PASS_TOP=114
+   FAIL_TOP=0
+   SKIP=0
+   ### tree=treeD label=deliv-B tmp=B rc=0
+   RUN=195
+   PASS_TOP=114
+   FAIL_TOP=0
+   SKIP=0
+-- 四发去牙：四数 + 目标⇄正控逐名 + 还原哈希 --
+   ===== p2 =====
+     RUN=195
+     PASS_TOP=113
+     FAIL_TOP=1
+     SKIP=0
+     -- restored hash (want == pristine) --
+     -- old anchor hits after restore (want 1) --
+     TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = PASS:
+     TestHandDeletedDefaultValuedLineIsRestoredInvisibly = FAIL:
+     TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = PASS:
+     TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed = PASS:
+     TestHandDeletedProviderBaseUrlComesBackAsThePresetValue = PASS:
+     TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile = PASS:
+     red roster: TestHandDeletedDefaultValuedLineIsRestoredInvisibly 
+   ===== p3 =====
+     RUN=195
+     PASS_TOP=102
+     FAIL_TOP=12
+     SKIP=0
+     -- restored hash (want == pristine) --
+     -- old anchor hits after restore (want 1) --
+     TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = FAIL:
+     TestHandDeletedDefaultValuedLineIsRestoredInvisibly = PASS:
+     TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = FAIL:
+     TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed = PASS:
+     TestHandDeletedProviderBaseUrlComesBackAsThePresetValue = FAIL:
+     TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile = FAIL:
+     red roster: TestAC11SettingWriteKeepsAForeignHandEditedKey TestAC1AllowedDirsWriteKeepsAHandEditedKey TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept TestAC3AdoptionClaimsOnlyWhatThisWriteProduced TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory TestAC4PermissionModeWriteKeepsAHandEditedKey TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile TestHandDeletedMapEntryIsNotRestored TestHandDeletedProviderBaseUrlComesBackAsThePresetValue TestHandDeletedScalarLineComesBackAtSchemaDefault TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory 
+   ===== p5 =====
+     RUN=195
+     PASS_TOP=112
+     FAIL_TOP=2
+     SKIP=0
+     -- restored hash (want == pristine) --
+     -- old anchor hits after restore (want 1) --
+     TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = PASS:
+     TestHandDeletedDefaultValuedLineIsRestoredInvisibly = PASS:
+     TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = PASS:
+     TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed = FAIL:
+     TestHandDeletedProviderBaseUrlComesBackAsThePresetValue = PASS:
+     TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile = PASS:
+     red roster: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed TestTicket257R1AC1CleanMachineRefusesAllSevenFields 
+   ===== p6 =====
+     RUN=195
+     PASS_TOP=112
+     FAIL_TOP=2
+     SKIP=0
+     -- restored hash (want == pristine) --
+     -- old anchor hits after restore (want 1) --
+     TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = PASS:
+     TestHandDeletedDefaultValuedLineIsRestoredInvisibly = PASS:
+     TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory = PASS:
+     TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed = PASS:
+     TestHandDeletedProviderBaseUrlComesBackAsThePresetValue = FAIL:
+     TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile = PASS:
+     red roster: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue TestLoadFilePresetInheritance 
+-- 门禁四数（共享工作树，跑前 unset GOTMPDIR TMPDIR TEMP TMP） --
+   GOFUMPPT_RC=0
+   VET_RC=0
+   D22_RC=0
+   PATHLEN_RC=0
+-- 禁区三枚 blob（我的 rev-parse ⇄ 腿报 ⇄ 我导出树物理字节） --
+   internal/config/writeguard.go HEAD=0ebc415b05651104fa13d6e71c76e61ba8fdd93c
+   internal/config/loader.go HEAD=9100ba92e220e6a839142893b54429cb435fa80e
+   internal/config/migrate.go HEAD=78d85e22e9518aeec84362ec68a784c01dc06afe
+-- 票框终量尺（七格一枚没翻） --
+   unchecked=7  checked=0  lines=45
+   title  = # 341 — 票 227 交件�...
+   Status = - Status: **已立，未�...
+   my bullet numstat vs parent:
+     1	0	.scratch/wisp/issues/341-four-hand-edit-shapes-still-unnailed-and-two-226-sentences-overclaim.md
+   leg bullet still present = 1 (未抹)
+
+-- worktree/index hygiene --
+   index count = 0
+   my lanes status = []
+   HEAD = f5d5165c 票 341 终裁腿 341-v1·票尾一条只
+   internal/risk (343-r1 lane, untouched by me) = []
+########## 尺三补：四发 pristine ⇄ 还原哈希逐字（同一把尺 sha256sum、⛔ 摘录）##########
+--- p2 ---
+   entry   = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+   mutated = ba4adc5ff4c9ca3e7b00c74a91aff84e0fef2ed586ae1d59d3e84855a5b05b88
+   restored= efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+   pristine(ref) = 
+--- p3 ---
+   entry   = efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+   mutated = b481aa484229804bbb75de2d1d12b28b562e89844ecfc568735e0220f68d46e7
+   restored= efe12661e71b940f1fcf99d722f1c25e4403431997e90041491d5eae337d47bd
+   pristine(ref) = 
+--- p5 ---
+   entry   = 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
+   mutated = 95fddf8f032623738d1c11a31f5cff57f482402f3d9fce4a381bf92259df870d
+   restored= 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
+   pristine(ref) = 
+--- p6 ---
+   entry   = 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
+   mutated = 0724936dec8a938067ed94bb097800377c39be2889f3c6d1670f31a0dff740bc
+   restored= 40cb3e12b9bb4257148dec97fca4a443dbe68c9458c29b2700ea2635b747bbdb
+   pristine(ref) = 
+-- head-of-run pristine declarations (each shot file carries the entry hash) --

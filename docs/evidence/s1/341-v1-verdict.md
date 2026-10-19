@@ -5,7 +5,7 @@
 - 起手锚＝我自己现跑的 `6c625a8c…`（⛔ 抄任何人的号）；`git status --porcelain -- internal/config cmd/wisp`＝零行。
 - ★四格去牙（P2／P3／P5／P6）**全部由我从零重打**，⛔ 抄编排者那一发（他那只证了 P6）、⛔ 抄腿。
 - 台面＝我自己 `git archive` 的两棵仓外导出树 `D:\tmp\wisp\20261018\341v1\treeB|treeD`（八件套＋`docs/`＋手工三件；`.go` 592 枚非空现验）；突变只打导出树物理字节、⛔ `-overlay`、内容锚⛔ 行号。
-- 逐格尺的逐字输出＝`.scratch/wisp/probes/341/v1/logs/00..13-*.txt`；台件脚本＝同处 `scripts/run1..run12`。
+- 逐格尺的逐字输出＝`.scratch/wisp/probes/341/v1/logs/00..14-*.txt`；台件脚本＝同处 `scripts/run1..run13`；交件自证三把尺的逐字＝`logs/14-selfproof.txt`（★票尾那条 bullet 写的是它落笔时的 `00..13／run1..run12`，其后只**增加**了 `logs/14`＋`scripts/run13` 这枚自证件，⛔ 改动任何已交读数）。
 - ⛔ 翻框（本判语只裁）、⛔ 动 226 判语件一字、⛔ 任何 `.go` 字节、⛔ `./cmd/wisp` 整包、⛔ `go test ./...`、⛔ `internal/risk`。
 
 ## AC#0 起手现量＝**成立**（与票面四行相符，与腿的表相符，另有一处我加细）
@@ -50,7 +50,7 @@
 
 ## AC#5 禁区＝**成立**
 
-三枚禁区产码 blob 我逐枚 `git rev-parse` 现验⇄腿报同串⇄⇄我自己导出树物理字节 sha256 同值：`writeguard.go 0ebc415b0565`／`loader.go 9100ba92e220`／`migrate.go 78d85e22e951`＝**一字未动含注释**（含腿起手锚 `98dbf20a` 处 same=YES）。
+三枚禁区产码 blob 我逐枚 `git rev-parse` 现验⇄腿报同串⇄我自己导出树物理字节 sha256 同值：`writeguard.go 0ebc415b0565`／`loader.go 9100ba92e220`／`migrate.go 78d85e22e951`＝**一字未动含注释**（含腿起手锚 `98dbf20a` 处 same=YES）。
 `git log 98dbf20a..HEAD -- 'internal/config/*.go'`＝非测试件**只新增**那枚 `writeguard_unnailed_341_test.go`（389/0），⛔ 一行产码改动、⛔ 新导出名、⛔ 新 JSON 键。
 ★P5 那枚⛔ 夹带乙形（迁移-on-读真写盘）：它只**观测**今天的形态（删版本行⇒写支把行钉回当前版、mtime 动、注释丢、落 `bak-1`），文件里对 `SaveFile`／`applyMigrations`／`readConfigFile` 的提及**全在注释行**（`logs/07` 逐行列出），行为变更归票 345。
 
