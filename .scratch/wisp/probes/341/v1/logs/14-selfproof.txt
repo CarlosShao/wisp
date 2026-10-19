@@ -259,3 +259,7 @@ CR in verdict = 0
   logs/02-filecheck.txt (2500B级, 件形尺逐字输出; 内含对自身大小的快照说明)
   logs/14-selfproof.txt (追加 32 行: 写面件目录逐枚现量 = 14 枚 script + 17 枚 log, 零字节 0)
   verdict.md 引用号改准 = logs/00..14 + run1..run13 (上一笔已含)
+########## 尺二补三（勘枚数，具名⛔ 掩盖）##########
+  上面那段14 枚 script ＋ 17 枚 log是在 logs/02-filecheck.txt 建出来之前取的数＝枚数取早了一枚。
+  现跑终值＝script 14 枚 ＋ log 18 枚、零字节 0 枚、.out 0 枚。
+  ⛔ 改动上面已交的任何读数行、只追加这一枚更正；判语件里logs/00..14 ＋ run1..run13的号段与终值一致（log 18 枚＝00..14 含 10-mu 四枚、script 14 枚＝run1..run13 含 commit1.sh）。
