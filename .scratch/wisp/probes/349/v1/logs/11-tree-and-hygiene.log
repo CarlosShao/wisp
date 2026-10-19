@@ -1,0 +1,49 @@
+### 建树逐枚读数（我自己的两棵，blob 对回锚）
+### build-tree anchor=070de7fa1b38b5c5d52445564c7ae19d1a73d6bd full=070de7fa1b38b5c5d52445564c7ae19d1a73d6bd dir=/d/tmp/wisp/20261019/349v1/treeBase date=2026-10-19T13:20:13+08:00
+go_files=766
+dll_files=6
+docs_PLAN=yes
+frontend_dist_files=4
+shortname_check=0
+blob_blacklist_in_tree=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+blob_provenance_in_tree=d634aae0f1e31a33a6f155ee13912a05006273dd
+blob_syncdirs_in_tree=7125b08a84211e51ed6ddbb68f1a2b625d03b8c3
+### done
+### build-tree anchor=ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc full=ed8db1ea27eb50d3057dd0cd7d5c955a13e978fc dir=/d/tmp/wisp/20261019/349v1/treeDel date=2026-10-19T13:20:15+08:00
+go_files=766
+dll_files=6
+docs_PLAN=yes
+frontend_dist_files=4
+shortname_check=0
+blob_blacklist_in_tree=964ee75a4befc7a51424f409a95745296e369da3
+blob_provenance_in_tree=eff984f8c194116a5e99471fbaecf7a4ab691574
+blob_syncdirs_in_tree=8dfe18602fa749ea1740ecfbbbcfcc30b38ea27f
+### done
+### 两锚 blob 同一性（派单锚 7b633fa9 ⇄ 我算的 base 070de7fa）
+### 7b633fa9 三枚 blob ⇄ 070de7fa 三枚 blob 是否同一（我的 base 锚 ⇄ 派单锚）
+blacklist  7b633fa9=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b  070de7fa=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+provenance  7b633fa9=d634aae0f1e31a33a6f155ee13912a05006273dd  070de7fa=d634aae0f1e31a33a6f155ee13912a05006273dd
+syncdirs  7b633fa9=7125b08a84211e51ed6ddbb68f1a2b625d03b8c3  070de7fa=7125b08a84211e51ed6ddbb68f1a2b625d03b8c3
+### 形GS-B（整文件状态机→删空白） 与 形GS-C（先删整行^//→再状态机→删空白）
+### CRLF⇄LF（⛔ 读工作树比）
+--- CR count check: disk vs blob for provenance.go ---
+BLOB_CR=0
+BLOB_LF=1115
+DISK_CR=1115
+DISK_LF=1115
+RC=0
+### 第五枚卫生：入库 logs 空跑假读数自查（唯一命中＝本件重做前那条 printf 噪声，已重落）
+### 形状读数（为何我的两把文本形在此面等价、⛔ 巧合）
+### 行尾注释（代码后跟 //）枚数（非整行注释面）
+blacklist wholeline=142 nonwholeline_with_dslashslash=5
+provenance wholeline=439 nonwholeline_with_dslashslash=25
+syncdirs wholeline=190 nonwholeline_with_dslashslash=16
+### 原始字面量内部有没有整行 //（＝两形会分叉的地方）
+blacklist rawstring_line_comment=0
+provenance rawstring_line_comment=0
+syncdirs rawstring_line_comment=0
+### 三枚文件里 ` 出现行数（奇偶＝是否闭合）
+blacklist backtick_lines=16
+provenance backtick_lines=11
+syncdirs backtick_lines=27
+RC=0

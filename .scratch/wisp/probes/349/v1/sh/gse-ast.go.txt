@@ -1,0 +1,127 @@
+package main
+
+// 第五形 GS-E＝AST 尺：go/parser 解析 → 剥掉 File.Comments 与所有 Doc/Comment 字段
+// → 用 go/printer 重新打印可执行面 → 去空白 → sha256。
+// 与文本形（正则／状态机／整行删）结构性不同：它先要文件能被语法解析，
+// 输出＝gofmt 归一的代码面 ⇒ 任何可执行字节改动（含运算符、括号、字面量）必变哈希。
+import (
+	"bytes"
+	"crypto/sha256"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/printer"
+	"go/token"
+	"os"
+	"regexp"
+)
+
+var ws = regexp.MustCompile(`\s+`)
+
+func main() {
+	if len(os.Args) < 2 {
+		fmt.Fprintln(os.Stderr, "usage: gse <file.go> [...]")
+		os.Exit(2)
+	}
+	for _, path := range os.Args[1:] {
+		src, err := os.ReadFile(path)
+		if err != nil {
+			fmt.Printf("%s READ_ERR=%s\n", path, err)
+			continue
+		}
+		fset := token.NewFileSet()
+		f, err := parser.ParseFile(fset, path, src, parser.ParseComments)
+		if err != nil {
+			fmt.Printf("%s PARSE_ERR=%s\n", path, err)
+			continue
+		}
+		nComments := len(f.Comments)
+		f.Comments = nil
+		f.Doc = nil
+		ast.Inspect(f, func(n ast.Node) bool {
+			switch x := n.(type) {
+			case *ast.FuncDecl:
+				x.Doc = nil
+				if x.Recv != nil {
+					clearFields(x.Recv)
+				}
+				clearFields(x.Type.Params)
+				clearFields(x.Type.Results)
+				clearBodyComments(x.Body)
+			case *ast.GenDecl:
+				x.Doc = nil
+				for _, sp := range x.Specs {
+					switch v := sp.(type) {
+					case *ast.ValueSpec:
+						v.Doc = nil
+						v.Comment = nil
+					case *ast.TypeSpec:
+						v.Doc = nil
+						v.Comment = nil
+						if st, ok := v.Type.(*ast.StructType); ok && st.Fields != nil {
+							clearFields(st.Fields)
+						}
+						if it, ok := v.Type.(*ast.InterfaceType); ok && it.Methods != nil {
+							clearFields(it.Methods)
+						}
+					}
+				}
+			case *ast.FuncLit:
+				if x.Type != nil {
+					clearFields(x.Type.Params)
+					clearFields(x.Type.Results)
+				}
+				clearBodyComments(x.Body)
+			}
+			return true
+		})
+		var buf bytes.Buffer
+		if err := printer.Fprint(&buf, fset, f); err != nil {
+			fmt.Printf("%s PRINT_ERR=%s\n", path, err)
+			continue
+		}
+		code := ws.ReplaceAllString(buf.String(), "")
+		h := sha256.Sum256([]byte(code))
+		fmt.Printf("GS_E file=%s sha256=%x codelen=%d comments_dropped=%d\n", path, h, len(code), nComments)
+	}
+}
+
+func clearFields(fl *ast.FieldList) {
+	if fl == nil {
+		return
+	}
+	for _, f := range fl.List {
+		f.Doc = nil
+		f.Comment = nil
+	}
+}
+
+func clearBodyComments(b *ast.BlockStmt) {
+	if b == nil {
+		return
+	}
+	for _, s := range b.List {
+		clearStmtComments(s)
+	}
+}
+
+func clearStmtComments(s ast.Stmt) {
+	if d, ok := s.(*ast.DeclStmt); ok {
+		if g, ok2 := d.Decl.(*ast.GenDecl); ok2 {
+			g.Doc = nil
+			for _, sp := range g.Specs {
+				switch v := sp.(type) {
+				case *ast.ValueSpec:
+					v.Doc = nil
+					v.Comment = nil
+				case *ast.TypeSpec:
+					v.Doc = nil
+					v.Comment = nil
+					if st, ok3 := v.Type.(*ast.StructType); ok3 && st.Fields != nil {
+						clearFields(st.Fields)
+					}
+				}
+			}
+		}
+	}
+}

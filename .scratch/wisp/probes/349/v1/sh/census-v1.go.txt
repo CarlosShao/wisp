@@ -1,0 +1,254 @@
+package main
+
+// 349-v1 AC#0 independent census (different shape from 349-r1's three-ruler census).
+// Design: build the package's DECLARED-name sets with go/ast, then take the SUPERSET
+// of identifier tokens appearing in comments that "look like a symbol"
+//   SA = contains an uppercase letter (camel family)
+//   SB = immediately followed by '('
+//   SC = immediately preceded by func/type/var/const
+// and subtract declared names. Output every survivor with file:line, shape flags,
+// comment text, and whether the name exists at package level in the whole repo view.
+// Usage: census <dir-of-internal/risk> [prodOnly]
+
+import (
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strings"
+)
+
+var builtins = map[string]bool{}
+
+func init() {
+	list := "true false nil iota len cap make new append copy delete close panic recover " +
+		"int int8 int16 int32 int64 uint uint8 uint16 uint32 uint64 uintptr byte rune string bool error " +
+		"any comparable complex64 complex128 float32 float64 " +
+		"func type var const struct interface map chan range if else for switch case default break continue goto return " +
+		"package import select defer go nil"
+	for _, w := range strings.Fields(list) {
+		builtins[w] = true
+	}
+}
+
+type hit struct {
+	file  string
+	line  int
+	name  string
+	sa, sb, sc bool
+	inPkg bool
+	inAny bool
+	text  string
+}
+
+func main() {
+	dir := os.Args[1]
+	prodOnly := len(os.Args) > 2 && os.Args[2] == "prodOnly"
+	fset := token.NewFileSet()
+	pkgFiles, _ := filepath.Glob(filepath.Join(dir, "*.go"))
+	sort.Strings(pkgFiles)
+
+	pkgNames := map[string]bool{}
+	anyNames := map[string]bool{} // incl. bound (params, fields, locals, receivers)
+	walkFile := func(f *ast.File, pkg bool) {
+		ast.Inspect(f, func(n ast.Node) bool {
+			switch x := n.(type) {
+			case *ast.FuncDecl:
+				if pkg { pkgNames[x.Name.Name] = true }
+				anyNames[x.Name.Name] = true
+				if x.Recv != nil {
+					for _, p := range x.Recv.List {
+						for _, id := range p.Names { anyNames[id.Name] = true }
+					}
+				}
+			case *ast.FuncLit:
+				if x.Type != nil && x.Type.Params != nil {
+					for _, p := range x.Type.Params.List {
+						for _, id := range p.Names { anyNames[id.Name] = true }
+					}
+				}
+			case *ast.FuncType:
+				var flds []*ast.Field
+				if x.Params != nil { flds = append(flds, x.Params.List...) }
+				if x.Results != nil { flds = append(flds, x.Results.List...) }
+				for _, p := range flds {
+					for _, id := range p.Names { anyNames[id.Name] = true }
+				}
+			case *ast.TypeSpec:
+				if pkg { pkgNames[x.Name.Name] = true }
+				anyNames[x.Name.Name] = true
+				if st, ok := x.Type.(*ast.StructType); ok && st.Fields != nil {
+					for _, fld := range st.Fields.List {
+						for _, id := range fld.Names { anyNames[id.Name] = true }
+					}
+				}
+				if it, ok := x.Type.(*ast.InterfaceType); ok && it.Methods != nil {
+					for _, fld := range it.Methods.List {
+						for _, id := range fld.Names { anyNames[id.Name] = true }
+					}
+				}
+			case *ast.ValueSpec:
+				for _, id := range x.Names {
+					if pkg { pkgNames[id.Name] = true }
+					anyNames[id.Name] = true
+				}
+			case *ast.AssignStmt:
+				for _, lhs := range x.Lhs {
+					if id, ok := lhs.(*ast.Ident); ok { anyNames[id.Name] = true }
+				}
+			case *ast.LabeledStmt:
+				anyNames[x.Label.Name] = true
+			}
+			return true
+		})
+	}
+	for _, p := range pkgFiles {
+		if prodOnly && strings.HasSuffix(filepath.Base(p), "_test.go") {
+			continue
+		}
+		f, err := parser.ParseFile(fset, p, nil, parser.ParseComments)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "PARSE_ERR", p, err)
+			continue
+		}
+		walkFile(f, true)
+	}
+
+	idRe := regexp.MustCompile(`[A-Za-z_][A-Za-z0-9_]*`)
+	kwRe := regexp.MustCompile(`(func|type|var|const)\s+$`)
+	var hits []hit
+	for _, p := range pkgFiles {
+		if prodOnly && strings.HasSuffix(filepath.Base(p), "_test.go") {
+			continue
+		}
+		src, err := os.ReadFile(p)
+		if err != nil {
+			continue
+		}
+		lines := strings.Split(string(src), "\n")
+		for i, ln := range lines {
+			t := strings.TrimSpace(ln)
+			if !strings.HasPrefix(t, "//") {
+				continue
+			}
+			for _, m := range idRe.FindAllStringIndex(t, -1) {
+				name := t[m[0]:m[1]]
+				if builtins[name] {
+					continue
+				}
+				rest := t[m[1]:]
+				sb := strings.HasPrefix(rest, "(")
+				sc := kwRe.MatchString(t[:m[0]])
+				sa := strings.ContainsAny(name, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") &&
+					strings.ContainsAny(name, "abcdefghijklmnopqrstuvwxyz")
+				if !sa && !sb && !sc {
+					continue
+				}
+				if !anyNames[name] {
+					hits = append(hits, hit{file: filepath.Base(p), line: i + 1, name: name,
+						sa: sa, sb: sb, sc: sc, inPkg: pkgNames[name], inAny: false, text: t})
+				}
+			}
+		}
+	}
+	sort.Slice(hits, func(i, j int) bool {
+		if hits[i].file != hits[j].file {
+			return hits[i].file < hits[j].file
+		}
+		return hits[i].line < hits[j].line
+	})
+	fmt.Printf("PKG_DECL_COUNT=%d ANY_DECL_COUNT=%d PRODONLY=%v DIR=%s\n", len(pkgNames), len(anyNames), prodOnly, dir)
+	fmt.Printf("UNDECLARED_COMMENT_SYMBOLS=%d\n", len(hits))
+	// symbol-looking subset: SB call shape, or camelCase-with-internal-uppercase,
+	// or SC declaration shape. Excludes sentence-initial plain words (The/It/Two)
+	// and single-capital vendor names (Dropbox/Windows).
+	symRe := regexp.MustCompile(`^([a-z][A-Za-z0-9]*[A-Z][A-Za-z0-9]*)$|^([A-Z][a-z0-9]+[A-Z][A-Za-z0-9]*)$`)
+	var sym []hit
+	for _, h := range hits {
+		if h.sb || h.sc || symRe.MatchString(h.name) {
+			sym = append(sym, h)
+		}
+	}
+	fmt.Printf("SYMBOLLOOKING=%d\n", len(sym))
+	for _, h := range sym {
+		sh := ""
+		if h.sa { sh += "SA" }
+		if h.sb { sh += "+SB" }
+		if h.sc { sh += "+SC" }
+		fmt.Printf("SYM %s:%d\t%s\t%s\t%s\n", h.file, h.line, h.name, sh, h.text)
+	}
+	fmt.Printf("--- full undeclared list ---\n")
+	for _, h := range hits {
+		sh := ""
+		if h.sa { sh += "SA" }
+		if h.sb { sh += "+SB" }
+		if h.sc { sh += "+SC" }
+		fmt.Printf("%s:%d\t%s\t%s\t%s\n", h.file, h.line, h.name, sh, h.text)
+	}
+	// shape totals incl. declared ones (for the AC#3 SC GREEN-pkg=0 claim)
+	var scTot, scGreenPkg int
+	for _, p := range pkgFiles {
+		if prodOnly && strings.HasSuffix(filepath.Base(p), "_test.go") {
+			continue
+		}
+		src, _ := os.ReadFile(p)
+		for _, ln := range strings.Split(string(src), "\n") {
+			t := strings.TrimSpace(ln)
+			if !strings.HasPrefix(t, "//") {
+				continue
+			}
+			for _, m := range idRe.FindAllStringIndex(t, -1) {
+				name := t[m[0]:m[1]]
+				if builtins[name] {
+					continue
+				}
+				if kwRe.MatchString(t[:m[0]]) {
+					scTot++
+					if pkgNames[name] {
+						scGreenPkg++
+					}
+				}
+			}
+		}
+	}
+	// module-wide package-level roster (all dirs under the module root given as arg3)
+	if len(os.Args) > 3 {
+		mroot := os.Args[3]
+		modPkg := map[string]bool{}
+		filepath.Walk(mroot, func(path string, info os.FileInfo, err error) error {
+			if err != nil || info.IsDir() {
+				return nil
+			}
+			if !strings.HasSuffix(path, ".go") {
+				return nil
+			}
+			f, e := parser.ParseFile(fset, path, nil, parser.ParseComments)
+			if e != nil {
+				return nil
+			}
+			ast.Inspect(f, func(n ast.Node) bool {
+				switch x := n.(type) {
+				case *ast.FuncDecl:
+					modPkg[x.Name.Name] = true
+				case *ast.TypeSpec:
+					modPkg[x.Name.Name] = true
+				case *ast.ValueSpec:
+					for _, id := range x.Names { modPkg[id.Name] = true }
+				}
+				return true
+			})
+			return nil
+		})
+		fmt.Printf("MODULE_PKG_DECL=%d\n", len(modPkg))
+		for _, h := range hits {
+			if modPkg[h.name] {
+				fmt.Printf("MODHIT %s:%d\t%s\tinThisPkg=%v\n", h.file, h.line, h.name, h.inPkg)
+			}
+		}
+	}
+	fmt.Printf("SC_SHAPE_TOTAL=%d SC_GREEN_PKG=%d\n", scTot, scGreenPkg)
+}

@@ -1,0 +1,170 @@
+### 349-v1 必答(ii) 原始现读块（逐字，⛔ 摘要）＝四枚候选 ±6 行上下文 ⇄ 8 枚 FP 逐枚原文 ⇄ 声明形计数
+### 取数＝git cat-file blob（⛔ 工作树副本），交件侧 ed8db1ea／起手侧 070de7fa
+######## 4 CANDIDATES VERBATIM (from blob at LEG, with context) ########
+=== internal/risk/pathresolver_junction_windows_test.go line 362 (+/-6 context) ===
+       1		}
+       2		if !r1.Resolved {
+       3			t.Fatal("existing file must resolve via handle (Resolved=true)")
+       4		}
+       5	}
+       6	
+       7	// Case 10: env-var and ~ expansion feed the pipeline.
+       8	func TestResolveExpansion(t *testing.T) {
+       9		home := tmpHome(t)
+      10		t.Setenv("WISP_TEST_HOME", home)
+      11		for _, in := range []string{
+      12			`%WISP_TEST_HOME%\.git-credentials`,
+      13			strings.ReplaceAll(filepath.Join(home, ".git-credentials"), `\`, "/"),
+--- exact line ---
+// Case 10: env-var and ~ expansion feed the pipeline.
+=== internal/risk/taintmatch.go line 256 (+/-6 context) ===
+       1		return "", false
+       2	}
+       3	
+       4	// attachDeclaredPath hangs the ONE host-minted path of ticket 177 shape A on the
+       5	// index built for the mark that declared it (ticket 183). Callers must invoke it
+       6	// while the mark is still local, before the index is published to a scope, so
+       7	// the immutability the type documents keeps holding for every reader.
+       8	func (f *fragmentIndex) attachDeclaredPath(hostPathNorm string) {
+       9		f.declaredPath = []rune(hostPathNorm)
+      10	}
+      11	
+      12	// spellsDeclaredPath reports whether window (the caller's candidate window, n
+      13	// runes) occurs as a contiguous run inside declared (the normalized path this
+--- exact line ---
+// the immutability the type documents keeps holding for every reader.
+=== internal/risk/syncdirs_test.go line 298 (+/-6 context) ===
+       1		}
+       2	}
+       3	
+       4	// fakeRegistry drives the portable half of the P12 registry probe.
+       5	type fakeRegistry struct {
+       6		sub map[string][]string
+       7		val map[string]string // "<key>|<valueName>" -> data
+       8	}
+       9	
+      10	func (f fakeRegistry) subKeys(key string) []string { return f.sub[key] }
+      11	func (f fakeRegistry) string(key, name string) string {
+      12		return f.val[key+`|`+name]
+      13	}
+--- exact line ---
+	val map[string]string // "<key>|<valueName>" -> data
+=== internal/risk/taintmatch_test.go line 171 (+/-6 context) ===
+       1		}
+       2	}
+       3	
+       4	// --- M-5 memory/latency budget (go test -bench . -benchmem) ------------------
+       5	
+       6	// BenchmarkMarkFullSource measures one Mark() of a MaxSourceRunes-sized
+       7	// tainted source: with the dead winStrs table removed the index should cost
+       8	// ~8 bytes per window (~2 MiB for 262144 runes), not ~12 MiB.
+       9	func BenchmarkMarkFullSource(b *testing.B) {
+      10		src := strings.Repeat("敏感-token-内容 ", 20000) // > MaxSourceRunes once normalized
+      11		p := NewProvenance(ProvOptions{NoProbe: true})
+      12		h := p.OpenScope("s")
+      13		b.ReportAllocs()
+--- exact line ---
+// tainted source: with the dead winStrs table removed the index should cost
+
+######## does each claimed name exist as a package-level definition anywhere in internal/risk? ########
+NAME=and  declLines_in_risk=0
+  wordOccurrences_in_risk=605
+NAME=documents  declLines_in_risk=0
+  wordOccurrences_in_risk=1
+NAME=valueName  declLines_in_risk=0
+  wordOccurrences_in_risk=1
+NAME=winStrs  declLines_in_risk=0
+  wordOccurrences_in_risk=1
+######## 8 leg-claimed FP lines verbatim (base blob, to classify myself) ########
+=== internal/risk/provenance.go:427 (BASE side) ===
+// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
+=== internal/risk/provenance.go:58 (BASE side) ===
+// DEFERRED(C25-loop-wiring): the agent loop / tool providers (tickets 10, 20,
+=== internal/risk/provenance.go:365 (BASE side) ===
+// functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could
+=== internal/risk/provenance.go:534 (BASE side) ===
+// of internal/risk/pointer_183_test.go (ruler: grep -n "^func Test"
+=== internal/risk/provenance.go:1077 (BASE side) ===
+	case []byte: // byte payloads are text carriers too (B-2 type escape)
+=== internal/risk/syncdirs.go:249 (BASE side) ===
+		// ticket 55 still owns is the OTHER half of the macOS line: a real
+=== internal/risk/syncdirs.go:15 (BASE side) ===
+// Writing into a cloud-sync folder (OneDrive / Dropbox / Nutstore(坚果云) /
+=== internal/risk/syncdirs.go:59 (BASE side) ===
+// counts (env var the sync client sets, registry record, client config file);
+### 别包真身逐枚（MODHIT＝我尺模块级包级名册命中行，base 侧）
+MODHIT assessor.go:30	New	inThisPkg=false
+MODHIT assessor.go:30	assessorFor	inThisPkg=false
+MODHIT assessor.go:179	New	inThisPkg=false
+MODHIT hostpath_185.go:28	hostPathBox	inThisPkg=false
+MODHIT hostpath_185.go:39	TestPointer185AnotherTaskCannotBorrowTheRoster	inThisPkg=false
+MODHIT hostpath_185.go:47	TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan	inThisPkg=false
+MODHIT pathresolver.go:20	Parse	inThisPkg=false
+MODHIT pathresolver.go:219	Open	inThisPkg=false
+MODHIT pathresolver.go:377	Env	inThisPkg=false
+MODHIT provenance.go:19	DisposalScope	inThisPkg=false
+MODHIT provenance.go:34	Tools	inThisPkg=false
+MODHIT provenance.go:62	Defer	inThisPkg=false
+MODHIT provenance.go:63	DisposalScope	inThisPkg=false
+MODHIT provenance.go:63	DisposalScope	inThisPkg=false
+MODHIT provenance.go:65	Remaining	inThisPkg=false
+MODHIT provenance.go:372	Go	inThisPkg=false
+MODHIT provenance.go:427	Defer	inThisPkg=false
+MODHIT provenance.go:536	TestPointer183WorstCaseOfTheLandedExemptionIsPinned	inThisPkg=false
+MODHIT provenance.go:737	Build	inThisPkg=false
+MODHIT syncdirs.go:267	Go	inThisPkg=false
+MODHIT syncdirs.go:452	Roots	inThisPkg=false
+MODHIT syncdirs.go:453	Complete	inThisPkg=false
+MODHIT taintmatch.go:88	Dropped	inThisPkg=false
+MODHIT taintmatch.go:113	Set	inThisPkg=false
+MODHIT winsec_c26.go:8	RedactSecret	inThisPkg=false
+MODHIT winsec_c26.go:9	PrivateDirAll	inThisPkg=false
+MODHIT winsec_c26.go:38	ResolvePath	inThisPkg=false
+### CloseScope 那句全段（358-372）＋票 160 换形状的历史笔
+### 亲眼读：CloseScope 那句（provenance.go:360-372, BASE 侧）
+     1		}
+     2		return p
+     3	}
+     4	
+     5	// --- scope lifetime (handle carries its own closer) --------------------------
+     6	//
+     7	// This is ticket 160's shape. Before it, scope lifetime was TWO independent
+     8	// functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could
+     9	// name any id, and "forgot to close" was only a breach of discipline. The
+    10	// close side is now a method on the handle the open side hands back, and the
+    11	// id it closes is a private field of that handle.
+    12	//
+    13	// What this does NOT buy, measured rather than claimed (see
+    14	// docs/evidence/s1/160-handle-r1.md SEC3, rig .scratch/wisp/probes/160/r1/ac1/):
+    15	// Go imposes no use-the-return-value rule, so `p.OpenScope(id)` as a statement
+### CloseScope 现在还有定义吗？（交件侧 + 全仓）
+### 票 160 那笔删掉它的证据：git log -S CloseScope
+f576cf08 09-27 票 160（160-r1 第②格）AC#2 换形状：OpenScope 交回自带关闭动作、认身份的句柄
+c091ee2b 09-20 fix(risk): close the C25 taint-gate escapes found by adversarial acceptance (B-1/B-2/M-1..M-6)
+c33d10b4 09-20 docs(risk): C25 P12 conclusion + self-hosted sync-probe evidence; ticket 19 to review
+73b60571 09-20 feat(risk): C25 provenance taint engine with fail-closed exfil gating (ticket 19)
+### Defer 真身（别包方法）：internal/plugin/disposal.go
+ed8db1ea:internal/plugin/disposal.go:186:func (s *DisposalScope) Defer(fn func()) bool {
+ed8db1ea:internal/plugin/disposal.go:191:func (s *DisposalScope) DeferNamed(name string, fn func()) bool {
+### provenance.go:62-63 那句（"Defer it onto the task's DisposalScope"）
+     1	// the boundary that owns the task — LANDED as a SHAPE by ticket 160: OpenScope
+     2	// now returns *Scope, the close is a method on it, and it refuses a caller who
+     3	// does not hold it. Still OPEN inside (1): the "Defer it onto the task's
+     4	// DisposalScope" half, because no *plugin.DisposalScope reaches the plugin agent command
+     5	// in production today (160-c1 SEC2.2) and laying that pipe means touching
+     6	// internal/agent — outside what ticket 160 was approved to open. Remaining
+     7	// items, unchanged: (2) call Mark(...) on every SPEC-06 SEC5 sensitive
+### 票框终量尺：盘上 AC 框枚数与翻勾情况
+BOXES_TOTAL=7
+BOXES_CHECKED=0
+### internal/risk 与 internal/winsec 的包交集（证明两车道不交）
+0
+0_winsec_depends_on_risk
+### risk 是否依赖 winsec（消费者方向）
+1
+ed8db1ea:internal/risk/pathresolver_expansion_test.go
+ed8db1ea:internal/risk/winsec_c26.go
+RC=0
+### winStrs 历史两笔（git log -S）
+c091ee2b 09-20 fix(risk): close the C25 taint-gate escapes found by adversarial acceptance (B-1/B-2/M-1..M-6)
+73b60571 09-20 feat(risk): C25 provenance taint engine with fail-closed exfil gating (ticket 19)

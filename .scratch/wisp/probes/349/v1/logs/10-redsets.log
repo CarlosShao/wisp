@@ -1,0 +1,59 @@
+### 四象限红名册逐名（base⇄del × 台损档⇄干净档），逐名作差
+--- dmg-base.rednames ---
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+TestSyncAncestorLegNotExemptedStaysFailClosed
+TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+--- dmg-del.rednames ---
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+TestSyncAncestorLegNotExemptedStaysFailClosed
+TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+--- clean-base.rednames ---
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+--- clean-del.rednames ---
+TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+--- 象限内作差（同形两侧）与跨形作差（同侧两形）---
+### === QUADRANT REDSET DIFFS ===
+-- symdiff dmg-base ⇄ dmg-del --
+-- symdiff clean-base ⇄ clean-del --
+-- symdiff dmg-base ⇄ clean-base --
+TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+TestSyncAncestorLegNotExemptedStaysFailClosed
+TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+-- symdiff dmg-del ⇄ clean-del --
+TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+TestSyncAncestorLegNotExemptedStaysFailClosed
+TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+### counts matrix
+### counts matrix
+dmg-base RUN=247 PASS=136 FAIL=5 SKIP=1
+dmg-del RUN=247 PASS=136 FAIL=5 SKIP=1
+clean-base RUN=247 PASS=140 FAIL=1 SKIP=1
+clean-del RUN=247 PASS=140 FAIL=1 SKIP=1
+### QUADRANT_DONE 2026-10-19T13:22:05+08:00
+--- 实现腿 349-r1 自己那发（POSIX 形 GOTMP＝台损档）四数与红名册（盘上原样件＝同尺对撞）---
+### label=base tree=/d/tmp/wisp/20261019/349r1/treeBase rc=1
+RUN=247
+PASS_TOP=136
+FAIL_TOP=5
+SKIP=1
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.06s)
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.00s)
+--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.06s)
+--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed (0.07s)
+### label=del tree=/d/tmp/wisp/20261019/349r1/treeDel rc=1
+RUN=247
+PASS_TOP=136
+FAIL_TOP=5
+SKIP=1
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.04s)
+--- FAIL: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.00s)
+--- FAIL: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+--- FAIL: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.04s)
+--- FAIL: TestSyncAncestorLegNotExemptedStaysFailClosed (0.04s)

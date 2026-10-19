@@ -1,0 +1,38 @@
+### 349-v1 必答(ii)＝它列的 8 枚 FP 逐枚〔真阳⇄假阳〕分类＋它交回 4 枚候选的独立复核
+### 尺＝我自己的独立 AC#0 尺（读数件 logs/06）＋逐枚 blob 现读原文（⛔ 工作树副本）；起手侧 base＝070de7fa、交件侧 del＝ed8db1ea
+### 逐字原文见同目录 logs/06（SYM 名册逐枚行）＋本件末段"原始现读块"；两把尺的射程差具名在第 3 节
+
+## 一、它列的 8 枚 FP：我逐枚现读后的独立分类＝★8 枚全 FP 成立（⛔ 一枚被我改判成漏网真阳）
+
+| # | file:line | 形·名 | 我的判定 | 凭据（现读＋尺，量到的） |
+|---|---|---|---|---|
+| 1 | provenance.go:427 | SB `Defer` | FP | 别包真方法＝`internal/plugin/disposal.go:186 func (s *DisposalScope) Defer(fn func()) bool`（blob 现验）；我尺 MODHIT `Defer`＝2 行（模块级有同名定义）；谎在同句 `disposalScope`，⛔ 它 |
+| 2 | provenance.go:58 | SB `DEFERRED` | FP | 逐字 `// DEFERRED(C25-loop-wiring): the agent loop / tool providers (tickets 10, 20,`＝本仓标记约定（`AGENTS.md` 1.1：`DEFERRED(D-xx)` 须与 `SPEC-12` 第 5 节 1:1）；同形另三处＝doc.go:15／pathresolver_other.go:5／syncdirs_other.go:17＝约定、⛔ 符号断言 |
+| 3 | provenance.go:365 | SB `CloseScope` | FP ★句子自陈、我读到段末 | 逐字 `This is ticket 160's shape. Before it, scope lifetime was TWO independent functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could name any id, and "forgot to close" was only a breach of discipline.`＋同文件 `:689` `by-id CloseScope gone`；`git log -S CloseScope` 现验引入＝`73b60571`（票 19）、换形状＝`f576cf08`（票 160 AC#2）；交件侧包级定义形 0（我尺 MODHIT `CloseScope`＝0 行）⇒ **票 160 故意删掉的历史名**、词面与假话不可分＝诚实句 |
+| 4 | provenance.go:534 | SC `Test` | FP | 逐字 `// of internal/risk/pointer_183_test.go (ruler: grep -n "^func Test"`＝散文里嵌的**命令串**被 SC 形当声明；我这把尺在全 package 同族另抓 `pointer_183_test.go:25`／`pointer_185_test.go:23` 两枚 `Test`＝同味噪声 |
+| 5 | provenance.go:1077 | SC `escape` | FP（★射程差一枚，具名） | 逐字 `	case []byte: // byte payloads are text carriers too (B-2 type escape)`＝行尾括注名词短语；★我这把尺只扫整行注释 ⇒ 这枚在我名册里**根本没出现**＝两把尺射程不同（它的形含行尾注释、我的含不了），⛔ 我判它错 |
+| 6 | syncdirs.go:249 | SA `macOS` | FP | 平台名（`the OTHER half of the macOS line`）；同族另两处 syncdirs_other.go:12／:17 我尺同样吃到＝平台名册 |
+| 7 | syncdirs.go:15 | SB `Nutstore` | FP | 厂商名，全角左括号 `Nutstore(坚果云)` 才被切成调用形；同句 `OneDrive`／`Dropbox`／`Google Drive`＋`:47`／`:530` 同级＝厂牌名册 |
+| 8 | syncdirs.go:59 | SC `the` | FP | 逐字 `// counts (env var the sync client sets, registry record, client config file);`＝散文冠词被 SC 形切成声明；★同族我尺另抓 `so`(mode.go:96)／`and`(junction_windows_test.go:362)／`that`／`whose`／`name`／`marker`＝同一味、⛔ 孤例 |
+
+⇒ 我这把尺在射程三枚产码文件的 precision＝TRUE 4／非 GREEN 22＝**18%**（比它报的 4/12＝33% 更低＝尺越宽越差、方向一致，见 logs/06）。
+⇒ ★我独立数的同族终数＝**恰票面那四枚**（`fires`／`taskScopeID`／`disposalScope`／`Complete`）：SYM 名册 base⇄del 作差 base-only 五行里 `provenance.go:427 Defer` 与 `disposalScope` 同句同行＝⛔ 第五枚残留（del-only 那 1 行＝改准后的真名 `DisposalScope`，别包 disposal.go:129 有定义＝我尺 MODHIT 3 行坐实）。
+
+## 二、它交回归口的 4 枚候选＝我逐行现读后的独立复核 ⇒ ★同意编排者"⛔ 动 ⛔ 立票"（这处我没顶回来，给凭据）
+
+| 枚 | 逐字原文（blob 现读，含上下文行号） | 判定 | 凭据 |
+|---|---|---|---|
+| a | `pathresolver_junction_windows_test.go:362`＝`// Case 10: env-var and ~ expansion feed the pipeline.` | FP 散文冠词 | 与第 8 枚同味（我这把 SC 形同样吃到）；`and` 包级声明形 0、词面 605 枚 |
+| b | `taintmatch.go:256`＝`// the immutability the type documents keeps holding for every reader.` | FP 散文动词 | `documents` 全包只此一处、包级声明形 0；句子读作"该类型文档所述的不可变性"，⛔ 符号断言 |
+| c | `syncdirs_test.go:298`＝`	val map[string]string // "<key>|<valueName>" -> data` | FP 串位符占位 | 名在**格式串**内（同处 `key`／`data` 同形）；真身＝相邻 `func (f fakeRegistry) string(key, name string)` 的形参名；测试面 |
+| d | `taintmatch_test.go:171`＝`// tainted source: with the dead winStrs table removed the index should cost` | FP 明写 dead 的历史名 | ★`git log -S winStrs -- internal/risk` 现验两笔＝`73b60571`（票 19 引入真符号）⇄`c091ee2b`（改掉）＝"这是 X 之前的名字"形，句子自带 `dead`＋`removed` 限定＝正是 `AC#1` 要的诚实形，⛔ 再改 |
+
+⇒ 四枚⛔ 属同族真残留、⛔ 立新票；c／d 两枚在 `_test.go` 面＝本包产码注释⛔ 指它们。
+⇒ ★我尺摊出的其余同族（`so`／`that`／`whose`／`name`／`marker`／`Test`×3）与这四枚同一味切词噪声＝**加强 AC#3"⛔ 上通用仪器"，而非加强立票**。
+
+## 三、射程声明（尺的边界，⛔ 藏）
+本尺注释面＝整行 `^[[:space:]]*//`（⛔ 行尾注释、⛔ `/* */` 内文）；声明名册＝`go/ast` 非测试件包级 269 枚＋绑定名（形参/字段/局部/接收者）509 枚；别包真身另出一把＝模块包级 9982 枚（`MODHIT`）。
+它的三形尺含行尾注释面（第 5 枚即证）⇒ 两把尺⛔ 完全重合，差异已逐枚具名。
+
+## 四、原始现读块（逐字、带 file:line，⛔ 摘要）
+见本目录 `logs/06-ac3-independent-ruler.log`（SYM 名册逐枚行＋作差）与仓外 `D:\tmp\wisp\20261019\349v1\logsQ\candidates.txt`（四枚候选 ±6 行上下文原文＋四枚候选词声明形计数）⇄ `logs/final-readings.txt` 第 4 节（`Defer`/`CloseScope`/`DEFERRED`/`Nutstore` 的 MODHIT 逐枚计数）。

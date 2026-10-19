@@ -1,0 +1,25 @@
+### gate 1: gofumpt -l（本腿写面＝.md/.txt/.log/.sh，⛔ .go；三枚 risk 产码件按名打，验交件字节干净）
+gofumpt_worktree_rc=0 offenders_below
+internal\risk\provenance.go
+### gofumpt against blob form (LF) — my bytes verdict
+blob blacklist rc=0 listing=0bytes
+blob provenance rc=0 listing=0bytes
+blob syncdirs rc=0 listing=0bytes
+### gate 2: d22scan
+d22scan_rc=0
+d22scan: scope ban #7 internal/tools/   examined  25 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined 116 text files
+d22scan: scope ban #8 internal/         examined 592 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=592, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 592 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+### gate 3: check-path-length-budget
+pathlen_rc=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+### gate 4: go vet ./internal/risk/
+vet_rc=0
+### named: worktree dirty state of internal/risk at this moment
+RC=0

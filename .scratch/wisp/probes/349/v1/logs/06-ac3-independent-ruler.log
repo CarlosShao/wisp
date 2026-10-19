@@ -1,0 +1,90 @@
+### 349-v1 AC#3 独立尺（第五把形）＝注释全标识符超集 ⊖ go/ast 声明名册（含形参/字段/局部/接收者＝绑定名）
+### 与 349-r1 三形尺不同：本尺拿绑定名也算 GREEN，并另出"像符号"子集 SYM 与模块级真身 MODHIT（模块包级声明名册 9982 枚）
+
+--- 总读数（prodOnly＝internal/risk 去 _test.go）---
+PKG_DECL_COUNT=269 ANY_DECL_COUNT=509 PRODONLY=true DIR=D:/tmp/wisp/20261019/349v1/treeBase/internal/risk
+UNDECLARED_COMMENT_SYMBOLS=452
+SYMBOLLOOKING=63
+MODULE_PKG_DECL=9982
+SC_SHAPE_TOTAL=4 SC_GREEN_PKG=0
+PKG_DECL_COUNT=269 ANY_DECL_COUNT=509 PRODONLY=true DIR=D:/tmp/wisp/20261019/349v1/treeDel/internal/risk
+UNDECLARED_COMMENT_SYMBOLS=448
+SYMBOLLOOKING=59
+MODULE_PKG_DECL=9982
+SC_SHAPE_TOTAL=4 SC_GREEN_PKG=0
+
+--- SYM 名册作差（base ⇄ del，逐 file:line＋NAME）---
+base=62 del=58
+-- base-only (want exactly the 4 leg-dead entries) --
+blacklist.go:310 fires
+provenance.go:427 Defer
+provenance.go:427 disposalScope
+provenance.go:54 taskScopeID
+syncdirs.go:453 Complete
+-- del-only (want empty) --
+
+--- base-only 五行逐枚原文（＝本腿判定"恰四枚真残留"的凭据；Defer 与 disposalScope 同句同行）---
+SYM blacklist.go:310	fires	+SB	// AC#1), and it reads nothing but the reason: fires()/aRelates above decided
+SYM provenance.go:54	taskScopeID	SA	// assessor.WithTaintDetector(prov.Detector(taskScopeID)) yields the
+SYM provenance.go:427	disposalScope	SA	// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
+SYM provenance.go:427	Defer	SA+SB	// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
+SYM syncdirs.go:453	Complete	SA+SB	// is reported via Complete()==false, not as a root.
+
+--- del-only 那一枚（改准后的真名，MODHIT 坐实＝别包包级有定义）---
+SYM provenance.go:427	DisposalScope	SA	// the task's internal/plugin.DisposalScope deferring this closure — the handle, not the 
+MODHIT provenance.go:19	DisposalScope	inThisPkg=false
+MODHIT provenance.go:63	DisposalScope	inThisPkg=false
+MODHIT provenance.go:63	DisposalScope	inThisPkg=false
+
+--- 射程三文件 SYM 逐枚（base 22 / del 18）：precision＝4/22＝18% ---
+SYM blacklist.go:310	fires	+SB	// AC#1), and it reads nothing but the reason: fires()/aRelates above
+SYM provenance.go:19	DisposalScope	SA	// the session's DisposalScope and a new session never inherit
+SYM provenance.go:54	taskScopeID	SA	// assessor.WithTaintDetector(prov.Detector(taskScopeID)) yields
+SYM provenance.go:58	DEFERRED	+SB	// DEFERRED(C25-loop-wiring): the agent loop / tool providers (tic
+SYM provenance.go:63	DisposalScope	SA	// DisposalScope" half, because no *plugin.DisposalScope reach
+SYM provenance.go:63	DisposalScope	SA	// DisposalScope" half, because no *plugin.DisposalScope reach
+SYM provenance.go:365	CloseScope	SA+SB	// functions — OpenScope(id) and CloseScope(id) — so any 
+SYM provenance.go:427	disposalScope	SA	// disposalScope.Defer(func() { _ = scope.Close() }) — the 
+SYM provenance.go:427	Defer	SA+SB	// disposalScope.Defer(func() { _ = scope.Close() }) — the handl
+SYM provenance.go:534	Test	SA+SC	// of internal/risk/pointer_183_test.go (ruler: grep -n "^func Test
+SYM provenance.go:536	TestPointer183WorstCaseOfTheLandedExemptionIsPinned	SA	// TestPointer183WorstC
+SYM provenance.go:689	CloseScope	SA	// by-id CloseScope gone, the only way to reach "not registered"
+SYM syncdirs.go:15	Nutstore	SA+SB	// Writing into a cloud-sync folder (OneDrive / Dropbox / Nutstore
+SYM syncdirs.go:48	GoogleDrive	SA	// "GoogleDrive"); suspect fallback uses "sync-suspect".
+SYM syncdirs.go:59	the	+SC	// counts (env var the sync client sets, registry record, client config f
+SYM syncdirs.go:249	macOS	SA	// ticket 55 still owns is the OTHER half of the macOS line: a real
+SYM syncdirs.go:250	CloudStorage	SA	// CloudStorage/nsurlcaches directory probe as confirmed-grade
+SYM syncdirs.go:453	Complete	SA+SB	// is reported via Complete()==false, not as a root.
+SYM syncdirs.go:484	UserFolder	SA	// UserFolder this is the only configured-location signal in place
+SYM syncdirs.go:494	UserFolder	SA	// Injecting it keeps the probe logic (which subkey names carry a 
+SYM syncdirs.go:512	UserFolder	SA	// OneDrive: HKCU\Software\Microsoft\OneDrive\Accounts\<Personal|B
+SYM syncdirs.go:530	InstallPath	SA	// Nutstore (坚果云): InstallPath is the client install dir, n
+
+--- SC 声明形（含 _test.go 全 package）逐枚＋我尺 SC_SHAPE_TOTAL/GREEN_PKG ---
+SYM mode.go:96	so	+SC	// type so a config error can name the vocabulary without string matching.
+SYM provenance.go:534	Test	SA+SC	// of internal/risk/pointer_183_test.go (ruler: grep -n "^func Test"
+SYM syncdirs.go:59	the	+SC	// counts (env var the sync client sets, registry record, client config file);
+SYM taintmatch.go:256	documents	+SC	// the immutability the type documents keeps holding for every reader.
+UNDECLARED_COMMENT_SYMBOLS=1029
+SYMBOLLOOKING=134
+SC_SHAPE_TOTAL=13 SC_GREEN_PKG=2
+UNDECLARED_COMMENT_SYMBOLS=1025
+SYMBOLLOOKING=130
+SC_SHAPE_TOTAL=13 SC_GREEN_PKG=2
+--- 两枚 GREEN-pkg 是测试件 func Test 前缀切词（真绿 0 枚残留）---
+
+--- 有界词表形 ^a[A-Z] 名册（⛔ 造门、只复量；两侧全有定义＝红 0）---
+aAnyForm
+aEq
+aRelates
+aRuleReason
+aUnder
+  aAnyForm declLines=1
+  aEq declLines=1
+  aRelates declLines=1
+  aRuleReason declLines=1
+  aUnder declLines=1
+aAnyForm
+aEq
+--- 该形⛔ 抓 fires() 的机读凭据：fires 不匹配 ^a[A-Z] ---
+fires matches ^a[A-Z] ? 0
