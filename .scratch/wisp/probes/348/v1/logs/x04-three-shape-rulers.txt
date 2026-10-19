@@ -1,0 +1,32 @@
+### 尺 1＝winsec.go 那笔可执行行变化枚数（`git diff -U0` 里 `^[+-]` 逐枚判是否以 // 开头或为注释续行）
+CHANGED_LINES=23 COMMENT_LINES=12 EXECUTABLE_LINES=11
+--- 可执行行逐字（应只＝一次 open 换形＋两处删除换形＋父钉那三行）---
+-	f, err := os.OpenFile(resolved, flags|oNoFollowPlatform, perm)
++	parent, err := pinnedParent(resolved)
++	if err != nil {
++		return err
++	}
++	defer func() { _ = parent.close() }()
++	f, err := openPinnedLeaf(parent, filepath.Base(resolved), flags|oNoFollowPlatform, perm)
+-		_ = os.Remove(resolved)
++		unlinkPinnedLeaf(parent, filepath.Base(resolved))
+-		_ = os.Remove(resolved)
++		unlinkPinnedLeaf(parent, filepath.Base(resolved))
+
+### 尺 2＝新增顶层导出标识符枚数（^func [A-Z] ⇄ ^var [A-Z] ⇄ ^type [A-Z] ⇄ ^const [A-Z]，只看落地 9 枚新件）
+NEW_GO_FILES=9
+  internal/winsec/ancestoropen_342_unix_test.go -> func TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 
+  internal/winsec/ancestoropen_342_windows_test.go -> func TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 
+  internal/winsec/ancestorunlink_348_unix_test.go -> func TestAC2POSIXRefusalPathWithASwappedAncestorNeverDeletesAForeignFile342r1 func TestAC2POSIXPrivateFileRaceThroughASwappedAncestorNeverDeletesAForeignFile342r1 
+  internal/winsec/ancestorunlink_348_windows_test.go -> func TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 func TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1 
+EXPORTED_TOP_LEVEL_IDENTIFIERS=6
+--- 分栏：产码件（⛔ _test.go）的导出顶层标识符＝本票"⛔ 新导出名"的自证 ---
+  internal/winsec/pinnedleaf_342_fallback.go -> 0
+  internal/winsec/pinnedleaf_342_unix.go -> 0
+  internal/winsec/pinnedleaf_342_windows.go -> 0
+  winsec.go: landed=8 baseline=8  (symdiff 逐名)
+  winsec.go EXPORTED SYMBOL SET IDENTICAL
+PROD_CODE_EXPORTED_TOP_LEVEL_IDENTIFIERS=0  (须=0)
+
+### 尺 3＝每枚 .go 的行数＋sha256 前 16（落地树 blob ⇄ 我的仓外树同串自证）
+  64 lines  5d0807fc1b8cd740  ancestoropen_342_unix_test.go
