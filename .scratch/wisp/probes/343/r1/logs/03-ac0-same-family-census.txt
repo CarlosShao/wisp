@@ -1,0 +1,156 @@
+# 343-r1 AC#0 same-family census.
+# Question, per name: blacklist.go comments point at this identifier - does it have a
+# definition in the package? Ticket 334 lesson = ONE hit found means the family may have
+# more, so shipping only aEquiv would repeat that mistake.
+#
+# run against = MY exported BASE tree at 29d258f9 (blacklist.go blob c1799cd2 = as-found,
+# before my byte). Raw dumps (949 lines) live outside the repo at
+#   D:\tmp\wisp\20261018\343r1\logs\census-basetree.txt  and  ...\callshape-base.txt
+# (kept outside the repo because of the 160-line cap on evidence files; the verdict below
+#  is derived from them, the dumps are not inlined).
+# census pkgdir=D:\tmp\wisp\20261018\343r1\treeBase\internal\risk ownFiles=49 subPkgs=0 commentTokens=756
+
+## gauge 1 = census.exe (go/ast). camelCase identifier tokens in the comment face of
+##   internal/risk/*.go (non-test) collided with the package definition roster = funcs +
+##   methods + types + fields + package vars/consts + PARAMS + RESULTS + locals.
+##   (params/fields/locals were added after the FIRST pass proved blind: bOverrides is a
+##   param, not a package symbol, yet a comment may still name it truly.)
+
+## blacklist.go comment face = 77 token-rows over 45 distinct names
+   DEFINED in the package (21): aAnyForm aEq anchorMatches anchorPath aRelates aRuleReason aUnder bOverrides classifyForms classifyWith formsOf hasGitConfigSegment isBrowserCredentialStore isUnder normDir normPath overrideApplies PathDecision pathForms sepStr uncertainAnchorMiss
+   NOT defined in the package (24): AC aEquiv ALLOW AND BE BOTH CLOSED COMPARISON CRITICAL DEFERRED DIFFERENT MUST NARROWER NOT ONE OS PLATFORM POSIX RUNNER SPEC STILL UNC USERPROFILE WITHOUT
+
+## the 24 not-defined names, one by one, classified. This IS the
+## false-positive surface gauge 1 alone would hand a hypothetical instrument; the meter
+## over all 160 package-level none-names is file 04.
+  AC              ticket acceptance-criterion label (AC#1 / AC#2)
+  aEquiv          FABRICATED camelCase, 0 definitions repo-wide = THE TICKET (fixed by AC#1)
+  ALLOW           prose emphasis
+  AND             prose emphasis
+  BE              prose emphasis
+  BOTH            prose emphasis
+  CLOSED          prose emphasis
+  COMPARISON      prose emphasis
+  CRITICAL        prose emphasis
+  DEFERRED        the DEFERRED(...) code-marker word + SPEC-12 registry term
+  DIFFERENT       prose emphasis
+  MUST            prose emphasis (RFC-2119 style)
+  NARROWER        prose emphasis
+  NOT             prose emphasis
+  ONE             prose emphasis
+  OS              prose abbreviation (operating system)
+  PLATFORM        prose emphasis
+  POSIX           platform name
+  RUNNER          8.3 short-form example inside RUNNER~1
+  SPEC            spec document name (SPEC-06)
+  STILL           prose emphasis
+  UNC             path-shape abbreviation
+  USERPROFILE     Windows environment-variable NAME (a real OS thing, not a Go symbol)
+  WITHOUT         prose emphasis
+
+## gauge 2 = callshape.exe, closing gauge 1 blind spot. A camelCase-only gauge is
+##   STRUCTURALLY blind to every all-lowercase Go identifier, so this gauge enumerates the
+##   names a comment writes in CALL SHAPE ("foo(" / "foo()") - a claim about a callable -
+##   and collides each with the package func/method roster (402 callables).
+   fires                          NOT-IN-PKG             blacklist.go:307
+   // AC#1), and it reads nothing but the reason: fires()/aRelates above decided
+   FAMILY-CANDIDATE fires
+
+## ANSWER TO AC#0: the family inside blacklist.go has TWO members, not one.
+  1. aEquiv   blacklist.go:193   camelCase-shaped; git grep -c "func aEquiv" HEAD --
+     internal/risk = rc=1 / 0 hits; the ONLY occurrence repo-wide was the comment itself
+     (ticket 343 readings rows 1-2, both re-run by me and reproduced). Introduced by
+     f1033e1e 2026-09-21 (git log -S aEquiv, re-run = ticket readings row 3).
+     = THIS ticket. Fixed by AC#1.
+  2. fires()  blacklist.go:307 (base) = blacklist.go:310 after my +3-line byte:
+     all-lowercase and call-shaped; package risk has NO func or method named fires
+     (git grep -nE "func [A-Za-z_]*fires" HEAD -- internal/risk = 0 hits). The "fires"
+     identifier that DOES exist belongs to another package: internal/config/unwired.go:54
+     struct field "fires func(*Config) bool". So the sentence claims a callable the
+     package does not have - same defect class as aEquiv, one day old: introduced by
+     e052b11a 2026-10-17, i.e. the ticket 334 leg itself, in the sentence where it split
+     aRelates into anchorMatches + uncertainAnchorMiss.
+     NOT FIXED BY ME, ON PURPOSE: ticket 343 AC#1 is scoped to "that one comment line"
+     (= line 193; the ticket title and xie-cheng say one line, comment face only).
+     Editing line 310 would widen the ticket beyond the ruling = forbidden by my dispatch
+     ("if there are more: fix the comment OR name them to the orchestrator for a new
+     ticket; do NOT casually widen this ticket"). NAMED here for the orchestrator to
+     decide whether it rides in a new ticket. Verdict: report, do not fix.
+
+## the same two gauges run over the WHOLE package (not just blacklist.go) surfaced two more,
+## both outside my write face and outside this ticket, reported for the ledger:
+   disposalScope  internal/risk/provenance.go:427  lowerCamel, 0 IDENT occurrences repo-wide
+   taskScopeID    internal/risk/provenance.go:54   lowerCamel, 0 IDENT occurrences repo-wide
+   (repo-wide = tracked non-.scratch .go. .scratch mutation copies are excluded: they are
+    not shipped bytes and would make every probe tree look like a definition site.)
+
+## ===========================================================================
+## AC#3 (same file on purpose: the census above IS the false-positive sample)
+## Question: should "a comment names a symbol that does not exist" go on an
+## instrument? AC#3 = CONCLUSION + MEASURED PRICE ONLY. I did not build a gate,
+## did not add a test, did not touch tools/d22scan or its allowlist (a new gate is
+## contract-adjacent = human approval).
+
+### VERDICT: NO - not as a general gate. The only affordable shape is one scoped to a
+### named vocabulary, and such a shape by construction protects only the file family it
+### was tuned on. Measured, two shapes, both run just now over internal/risk:
+
+#### SHAPE A = the ticket literal sketch: camelCase comment tokens collided with the
+####   PACKAGE symbol roster, absent => red.
+  internal/risk: 160 distinct names are named by comments and absent from the package
+  roster. A gate author camelCase filter (starts lower, contains an upper, no 2+ digit
+  run, so AC / SPEC-06 / D32 / 8.3 drop out) flags exactly 6:
+    hostPathBox   real: internal/tools/bridge.go:670 type hostPathBox            FP
+    assessorFor   real: internal/tools/bridge.go:1004 method assessorFor         FP
+    macOS         platform name in prose ("the macOS line")                      FP
+    aEquiv        dangling, never an IDENT repo-wide  = THIS TICKET            TRUE
+    disposalScope dangling, never an IDENT repo-wide (provenance.go:427)       TRUE-ish
+    taskScopeID   dangling, never an IDENT repo-wide (provenance.go:54)       TRUE-ish
+  Honest FP reading, both ways: 3 of 6 = 50% are certainly false (they ARE real
+  identifiers or a platform word); the other 3 are dangling names of the SAME family
+  as aEquiv, so a gate flagging them is right that "nothing by that name exists" and
+  wrong only that a human never meant a symbol. Shape A is therefore CHEAP (6 reds
+  for one package) but not free, and the residual noise is exactly the case no
+  word-shape rule can separate.
+
+#### SHAPE B = the shape that catches what shape A is blind to: all-lowercase names
+####   written in CALL SHAPE ("foo(" / "foo()"), which is a claim about a callable;
+####   collided with the package func/method roster (402 callables).
+  blacklist.go  :  1 claim, 1 dangling (fires)
+  internal/risk : 28 claims, 11 dangling. Composition, each one verified by hand:
+    len(Paths) x2      Go builtin, never in any roster                     FP
+    func() {...}       Go keyword inside a pseudocode snippet              FP
+    DEFERRED(...) x4   the DEFERRED code-marker convention (SPEC-12)       FP
+    Nutstore(...)      vendor product name + parenthetical                 FP
+    CloseScope(id)     a name ticket 160 DELIBERATELY REMOVED; the sentence
+                       reads "Before it, scope lifetime was TWO independent
+                       functions - OpenScope(id) and CloseScope(id)" =
+                       honest history, indistinguishable from a lie          FP
+    Complete()==false  SyncStatus fields are {Sync, Root, Why}, there is NO
+                       Complete; the real name is the method
+                       Provenance.SyncDetectionComplete (syncdirs.go:472)    TRUE
+    fires()/aRelates   package risk has no func/method fires                 TRUE
+  FP rate = 9 of 11 = 82% over ONE package.
+
+### The trade the two shapes expose (this is the finding, not an opinion):
+  - Shape A is affordable but MISSES fires() (camelCase filter). Shape B catches
+    fires() and the third family member (Complete) for 82% noise.
+  - Root cause is not the tokenizer: the CLAIM a comment makes about a name is not
+    recoverable from the name. CloseScope is a deliberate historical reference and
+    looks exactly like a dangling callable; DEFERRED is a documented marker and looks
+    exactly like a call. Any rule separating them is a rule a human wrote, i.e. an
+    allowlist - and the fix for a new gate being "maintain an allowlist" is the
+    tools/d22scan/allowlist.txt shape, a frozen no-touch path for a leg like me.
+  - Cheaper shape that would actually pay (OFFERING, not building): scope the rule to
+    a named vocabulary instead of to English. "every token in blacklist.go comments
+    matching ^a[A-Z][A-Za-z]*$ must be a func/method of package risk" = 6 names total
+    (aEq aUnder aAnyForm aRelates aRuleReason + the defect), FP surface bounded by
+    that vocabulary. It catches aEquiv-class drift in THIS file family and costs ~0
+    noise. It does NOT catch fires() and it does NOT generalize; and it is still
+    contract-adjacent = human approval, so it needs a ticket, not a leg.
+  - ? aEquiv had ZERO runtime footprint: my own AC#4 proves it (247/140/1/1 unchanged,
+    red-name symdiff 0, RUN-name symdiff 0, on both platforms). That is why no
+    existing instrument could have caught it, and why "put it on an instrument" needs
+    a NEW dimension rather than widening an existing gate.
+  - Two more same-family names found in this package and NOT in my write face,
+    reported for a separate ticket: disposalScope + taskScopeID (provenance.go).

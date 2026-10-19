@@ -1,0 +1,105 @@
+# 343-r1 AC#4 color gauges: ./internal/risk/ PAIRED four numbers, TWO platforms
+# rulers, verbatim: RUN= grep -c "^=== RUN"  PASS_TOP= grep -c "^--- PASS"  FAIL_TOP= grep -c "^--- FAIL"  SKIP= grep -c "^--- SKIP"
+# each run = go test ./internal/risk/ -count=1 -timeout 30m -v in its OWN exported tree; every number transcribed from that .log.
+# four numbers are NEVER mixed and NEVER subtracted: each side is its own reading.
+
+## platform=WINDOWS   baseline(29d258f9, blob c1799cd2) <-> delivered(31d4a476, blob 62f2dddb)
+  baseline   RUN=247 PASS_TOP=140 FAIL_TOP=1 SKIP=1
+  delivered  RUN=247 PASS_TOP=140 FAIL_TOP=1 SKIP=1
+  baseline   red names  = TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+  delivered  red names  = TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+  RED-NAME symdiff baseline<->delivered = 0  (want 0)
+  RUN-NAME symdiff  baseline<->delivered = 0  (want 0; base roster=247 del roster=247)
+  SKIP roster (both sides): --- SKIP: TestSyncRegistryProbeLive (0.00s)
+
+## platform=LINUX   baseline(29d258f9, blob c1799cd2) <-> delivered(31d4a476, blob 62f2dddb)
+  baseline   RUN=195 PASS_TOP=115 FAIL_TOP=1 SKIP=1
+  delivered  RUN=195 PASS_TOP=115 FAIL_TOP=1 SKIP=1
+  baseline   red names  = TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+  delivered  red names  = TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+  RED-NAME symdiff baseline<->delivered = 0  (want 0)
+  RUN-NAME symdiff  baseline<->delivered = 0  (want 0; base roster=195 del roster=195)
+  SKIP roster (both sides): --- SKIP: TestC26RewrittenSyncRootDoesNotDisarmSuspectNet (0.00s)
+
+## the single red on both platforms and both sides is a PRE-EXISTING stock red, verbatim lines from the WINDOWS baseline log:
+   pathresolver_rewrite_account_test.go:200: ..\..\internal\panel\composer.go:127 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer
+   pathresolver_rewrite_account_test.go:200: ..\..\internal\panel\display_scrub_216.go:26 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer
+   pathresolver_rewrite_account_test.go:200: ..\..\internal\panel\display_scrub_216.go:37 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer
+   pathresolver_rewrite_account_test.go:200: ..\..\internal\panel\display_scrub_216.go:218 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer
+   # same name is the ONLY red in leg 339-r1 reading of this package (its report.md rows for the C26 stock red);
+   # it is a static source audit over internal/panel consumers and reads no blacklist.go bytes.
+
+## TestResolvePerCallBudget (the in-book contention piece) on all four runs:
+   WIN-base: --- PASS: TestResolvePerCallBudget (1.20s)
+   WIN-del: --- PASS: TestResolvePerCallBudget (1.19s)
+   LIN-base: --- PASS: TestResolvePerCallBudget (2.07s)
+   LIN-del: --- PASS: TestResolvePerCallBudget (1.73s)
+   # all four PASS on the first take = no quiet re-measure was needed; no false red was counted.
+
+## TICKET 336 EIGHT TEETH on my delivered bytes (full-package run, then the mutation sweep)
+  full-package result (delivered tree, windows build tag):
+    --- PASS: TestAnchorFallbackTeethPerAnchor336 (0.14s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/kube (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/kube/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain (0.01s)
+
+  mutation sweep = run-ac2-sweep.sh (ticket 336-v1 rig) re-run in MY OWN exported tree
+  tree=D:/tmp/wisp/20261018/343r1/treeDel  anchor=31d4a476  pristine=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+    MU-1a teeth_red=2 leg_red=0
+    MU-1b teeth_red=2 leg_red=0
+    MU-1c teeth_red=3 leg_red=0
+    MU-1d teeth_red=2 leg_red=0
+    MU-1e teeth_red=2 leg_red=2
+    MU-1f teeth_red=2 leg_red=2
+    MU-1g teeth_red=2 leg_red=0
+    MU-1h teeth_red=2 leg_red=0
+
+  per-mutation teeth red SUBTEST NAMES (the row that lost its branch):
+    MU-1a red-rows = git-credentials
+    MU-1b red-rows = wisp-config-under
+    MU-1c red-rows = wisp-config-under,wisp-config-eq
+    MU-1d red-rows = ssh
+    MU-1e red-rows = aws
+    MU-1f red-rows = kube
+    MU-1g red-rows = dpapi-protect
+    MU-1h red-rows = local-credentials
+
+  restore proof: pristine hash re-checked at start, after the positive control and after EVERY leg:
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [start]
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-pristine]
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1a]
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1b]
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1c]
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1d]
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1e]
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1f]
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1g]
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [after-MU-1h]
+    hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [final]
+
+  sweep tail (self-reported tally + shared-worktree non-dirtiness):
+      hash=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b expected=62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b match=YES  [final]
+      shared_worktree_dirty_internal_cmd=0
+    ### red roster, teeth legs, per mutation (names only)
+    MU-1a teeth_red=2 leg_red=0
+    MU-1b teeth_red=2 leg_red=0
+    MU-1c teeth_red=3 leg_red=0
+    MU-1d teeth_red=2 leg_red=0
+    MU-1e teeth_red=2 leg_red=2
+    MU-1f teeth_red=2 leg_red=2
+    MU-1g teeth_red=2 leg_red=0
+    MU-1h teeth_red=2 leg_red=0
+    ac2_sweep_rc=0

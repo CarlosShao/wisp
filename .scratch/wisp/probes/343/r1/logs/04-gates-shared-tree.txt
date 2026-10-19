@@ -1,0 +1,105 @@
+# 343-r1 gate four-number readings, SHARED WORKING TREE, taken after my delivered byte
+# precondition run verbatim in the same shell: unset GOTMPDIR TMPDIR TEMP TMP
+#   (ticket 311 AC#1 shape B GUARD reads GOTMPDIR on a foreign volume as rc=2 RANGE
+#    REFUSAL, not red - ledger A1027 section 5; my temp root is on D: so it must be off)
+# repo=D:/work/workspace/projects plans/Wisp branch=dev
+
+## GATE 1  gofumpt -l internal/risk/blacklist.go
+  listed-files=0  rc=0  (0 = my file is gofumpt-clean)
+  my new bytes are LF: CRLF pairs in blacklist.go = 0 (0 = whole file is LF, matching the tracked blob)
+  named stock dirties (PRE-EXISTING, other legs files, NOT touched by me):
+    internal\agent\approval\pending_read.go
+    internal\agent\tools.go
+    internal\risk\provenance.go
+    cmd\wisp\models.go
+  my file among them = 0
+
+## GATE 2  sh scripts/d22scan.sh     (positive control first, then the real scan)
+  rc=0  clean. scan denominators printed by the gate itself:
+    scan_test.go:1002: ban #6 examined 7 and fired in all 7 extension classes
+    scan_test.go:1155: ban #8 examined 7 and fired in all 7 frontend/ file classes, incl. .mjs, .md and extension-less
+    scan_test.go:2207: ban #6 examined 116 frontend/ text files in the real repo
+    d22scan: examined 16 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261018-233555-636738/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_12198653618/001
+    d22scan: scope bans #1-5 internal/      examined  15 production Go files
+    d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+    d22scan: scope ban #6 frontend/         examined   1 text files
+    d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+    d22scan: scope ban #8 design/           examined   1 text files
+    d22scan: scope ban #8 frontend/         examined   1 text files
+    d22scan: scope ban #8 internal/         examined  15 Go files, comments and _test.go included
+    d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+    d22scan: examined 14 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261018-233555-636738/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_24166490254/001
+    d22scan: scope bans #1-5 internal/      examined  13 production Go files
+    d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+    d22scan: scope ban #6 frontend/         examined   1 text files
+    d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+    d22scan: scope ban #8 design/           examined   1 text files
+    d22scan: scope ban #8 frontend/         examined   1 text files
+    d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+    d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+    stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+    d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261018-233555-636738/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel2594075517/001
+    d22scan: scope bans #1-5 internal/      examined  14 production Go files
+    d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+    d22scan: scope ban #6 frontend/         examined   2 text files
+    d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+    d22scan: scope ban #8 design/           examined   1 text files
+    d22scan: scope ban #8 frontend/         examined   2 text files
+    d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+    d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+    d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261018-233555-636738/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared3441164928/001
+    d22scan: scope bans #1-5 internal/      examined  14 production Go files
+    d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+    d22scan: scope ban #6 frontend/         examined   0 text files
+    d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+    d22scan: scope ban #8 design/           examined   1 text files
+    d22scan: scope ban #8 frontend/         examined   0 text files
+    d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+    d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+    stderr=d22scan: ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+    d22scan: examined 14 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261018-233555-636738/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li2212259482/001
+    d22scan: scope bans #1-5 internal/      examined  13 production Go files
+    d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+    d22scan: scope ban #6 frontend/         examined   1 text files
+    d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+    d22scan: scope ban #8 design/           examined   1 text files
+    d22scan: scope ban #8 frontend/         examined   1 text files
+    d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+    d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+    stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+    d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/wisp-test-gotmp/d22scan-20261018-233555-636738/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_01334509045/001
+    d22scan: scope bans #1-5 internal/      examined  14 production Go files
+    d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+    d22scan: scope ban #6 frontend/         examined   1 text files
+    d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+    d22scan: scope ban #8 design/           examined   1 text files
+    d22scan: scope ban #8 frontend/         examined   1 text files
+    d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+    d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+    d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+    d22scan: examined 283 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+    d22scan: scope bans #1-5 internal/      examined 241 production Go files
+    d22scan: scope bans #1-5 cmd/           examined  42 production Go files
+    d22scan: scope ban #6 frontend/         examined 116 text files
+    d22scan: scope ban #7 internal/tools/   examined  25 production Go files
+    d22scan: scope ban #8 design/           examined  39 text files
+    d22scan: scope ban #8 frontend/         examined 116 text files
+    d22scan: scope ban #8 internal/         examined 592 Go files, comments and _test.go included
+    d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+    d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=241, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=592, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 592 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+  note: d22scan exempts COMMENTS for bans #1-5 but NOT for ban #8 (emoji); my byte is an
+  English comment with no U+1F000-U+1FAFF / U+2200-U+22FF / U+2600-U+27BF / U+2B00-U+2BFF
+  / U+FE0F code point, so it passes ban #8 by construction. Verified by this rc=0.
+
+## GATE 3  sh scripts/check-path-length-budget.sh
+  rc=0  VERDICT GREEN:
+    check-path-length-budget.sh: denominator: tracked paths=16258  over-budget=60  covered by roster=60  not in roster=0
+    check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+    check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+
+## GATE 4  go vet ./internal/risk/
+  rc=0  (0 = clean, package compiles and vets with my comment byte)
+
+## TABLE-FAULT word-scan over my own gate output: none of these words appears in any of
+## the four readings above: "walk", "build failed", "no test files", "setup failed",
+## "creating work dir", "0xc0000135"  (dispatch: any of them = rig fault, never a verdict).

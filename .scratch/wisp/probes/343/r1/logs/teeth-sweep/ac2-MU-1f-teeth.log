@@ -1,0 +1,51 @@
+time=2026-10-18T23:26:01.146+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAnchorFallbackTeethPerAnchor336
+=== RUN   TestAnchorFallbackTeethPerAnchor336/git-credentials
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=git-credentials class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-under
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-eq
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/ssh
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=ssh class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/ssh/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/aws
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=aws class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/aws/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/kube
+    anchor_fallback_teeth_336_windows_test.go:129: class: got class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*", want A: the fail-closed branch of ~/.kube/config carries this verdict
+    anchor_fallback_teeth_336_windows_test.go:132: this shape stopped being non-overridable: class=B allow=false needL2=true reason="B-list sensitive path; single-file override requires one L2 confirm: id_*"
+    anchor_fallback_teeth_336_windows_test.go:135: an A deny carried by ~/.kube/config was unlocked by an override key: class=B allow=true needL2=false reason="B-list single-file override (one L2 confirm + logged): id_*"
+    anchor_fallback_teeth_336_windows_test.go:138: the reason must name THIS anchor "~/.kube/config" (the switch is ordered: naming another anchor means this case stopped firing): B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:141: the reason must admit the case fired on the branch: B-list sensitive path; single-file override requires one L2 confirm: id_*
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=kube class=B matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/kube/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/dpapi-protect
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/local-credentials
+    anchor_fallback_teeth_336_windows_test.go:148: TEETH336 operand=local-credentials class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain
+--- FAIL: TestAnchorFallbackTeethPerAnchor336 (0.15s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws/offchain (0.01s)
+    --- FAIL: TestAnchorFallbackTeethPerAnchor336/kube (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/kube/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials (0.01s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.180s
+FAIL

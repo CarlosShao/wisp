@@ -1,0 +1,47 @@
+# 343-r1 AC#1 gauges -- the changed face is COMMENT-ONLY and aEquiv is gone
+# repo=D:\work\workspace\projects plans\Wisp  branch=dev
+base_commit      = 29d258f9f221ef12e407308ed18fedae31d56ad1
+delivered_commit = 31d4a47626ec7997666b6e0b190a760cdc535da0
+
+## R1  git diff --numstat  base..delivered -- internal/risk/blacklist.go
+5	2	internal/risk/blacklist.go
+
+## R2  git diff -U0  verbatim (index line dropped)
+diff --git a/internal/risk/blacklist.go b/internal/risk/blacklist.go
+--- a/internal/risk/blacklist.go
++++ b/internal/risk/blacklist.go
+@@ -193,2 +193,5 @@ func classifyWith(canonical string) (Class, string) {
+-// provably expanded fails CLOSED (aEquiv / aUnder report such a miss as a
+-// hit) instead of quietly dropping a path from A into B.
++// provably expanded fails CLOSED: aEq / aUnder delegate to aRelates, which
++// reports such a miss as a hit when anchorMatches found nothing AND
++// uncertainAnchorMiss held, instead of quietly dropping a path from A into B.
++// anchorMatches on its own does not do that - ticket 334 needs the two apart
++// because aRuleReason has to say which of them produced the verdict.
+
+## R2 verdict: changed +/- lines = 7 ; lines whose content does NOT start with // = 0  (want 0 = executable-line-change 0)
+
+## R3  aEquiv occurrences  base vs delivered  (git grep -n, scope internal/risk)
+  base=29d258f9 :
+    29d258f9f221ef12e407308ed18fedae31d56ad1:internal/risk/blacklist.go:193:// provably expanded fails CLOSED (aEquiv / aUnder report such a miss as a
+  delivered=31d4a476 : rc=1 hits=0  (0 hits = AC#1 criterion #1 met)
+  git grep -c 'func aEquiv' base : rc=1 (rc=1 = zero matches = the symbol never had a definition; ticket 343 census row 2)
+
+## R4  EXECUTABLE BYTES UNCHANGED: strip every // comment line, trim trailing ws, LF-join, sha256
+  base       stripped-code sha256 = 97796acc2690b59e6d9bf5857768377d6948ba560e992b884a93d4500b379bd3  lines=265
+  delivered  stripped-code sha256 = 97796acc2690b59e6d9bf5857768377d6948ba560e992b884a93d4500b379bd3  lines=265
+  SAME_CODE = True
+
+## R5  blob identity (lane was empty at my start; my delivered blob)
+  base      blob = c1799cd24afce19e6accef23db23a7d7ee746dec
+  delivered blob = 62f2dddbde7c72eb12cbeb4cf1ec1edc2708254b
+
+## R6  the new sentence as shipped (lines 190-197 of the delivered blob)
+  190: // Ticket 72 invariant, in one line: **the verdict must not depend on the
+  191: // spelling a path arrived in.** Both sides of every A-anchor comparison below
+  192: // are therefore handle-expanded, and a comparison whose provenance is not
+  193: // provably expanded fails CLOSED: aEq / aUnder delegate to aRelates, which
+  194: // reports such a miss as a hit when anchorMatches found nothing AND
+  195: // uncertainAnchorMiss held, instead of quietly dropping a path from A into B.
+  196: // anchorMatches on its own does not do that - ticket 334 needs the two apart
+  197: // because aRuleReason has to say which of them produced the verdict.
