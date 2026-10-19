@@ -59,3 +59,23 @@
 - ★`git add -- A -- B` 的第二枚 `--` 被当 pathspec⇒`rc=128` 整笔中止（无副作用；本腿踩过一次）。
 - `x/sys/unix` 在本包 linux 侧是首次直接依赖：容器⛔ 挂下载缓存、`GOFLAGS=-mod=mod` 会红（`module lookup disabled by GOPROXY=off`）＝台损、⛔ 判据红；默认 readonly 可过（`go build` 已实测 rc=0）。
 - ⛔ 动既有 `*_test.go` 一字（113／116／119／120／322／336 的断言、⛔ 放宽、⛔ 删、⛔ Skip）；⛔ 翻框（14 格现量＝342 1/6、348 0/7，本腿一枚没翻）；⛔ push；`internal/risk/**` 一字未动。
+
+## 订正（第 14／15 笔之后追加，⛔ 回改上面原文）
+
+上面"下一程三步行"的第 1 步（归因那桶 `some other failure`）＝**本腿已就地做完**（第 14 笔 `3d365ad5`），结论＝⛔ 落地漏拒、⛔ 台面红，而是**本腿自己的名册漏了两条本平台专属措辞**；探针两侧同一条串逐字＝`winsec: refusing to seal …: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions`＝已装好的 C26 resolver 的稳态拒绝（`resolveString` → `internal/risk`）。补名册时★⛔ 把它计入 `formBLegRefusals`（⛔ 拿别人的拒答冒充自己那支的 liveness）。
+
+补完重打 3 发 × 两树 ⇒ Windows 终态读数（逐表逐字见同目录 `readings.md` ⇄ `readings-windows.md`）：
+- ★`junction` 形（绝对替换名＝act-time 面）＝落地侧 3/3 **PASS**：`truncated=0`、`deleted=0`、本落地那支答 `7/5/3`、`provedReparse=13` 同发在场；基线侧同枚红（`formBLegRefusals=0`）。
+- ★`symlink-dir` 形（相对目标、留在根内）＝`deleted` 两侧 0（票 348 那一支落地侧 3/3 不删），但 `truncated` 落地侧 **1/–/1（342 钉）与 2/–/2（348 钉）** ⇒ ★这是一枚**真实残余、本腿⛔ 归因到底**；它⛔ 是基线红（`treeBase` 全绿），所以⛔ 存量、也⛔ 写成"落地失败"＝它是 `AC#5` 要写进注释的那件事。
+- ★`leaf-symlink` 形＝`AC#2' leaf-leg split` 逐字 `preOpenLeafGuard=1/1/2, openPinnedLeaf re-check=0, provedReparse=86/81/88` ⇒ **本落地的叶子复验在 400×3 发里一发没答**＝⛔ 被证明在路上（稳态总是 322 那支先答，只有落在"判语与开之间"那枚两 syscall 宽的 gap 才轮到它）。⇒ 派单点名的"⛔ 把新写一条链当成完事"这一味，本腿的量法＝把它写成**待证**而⛔ 写成已关。
+- 本机全包成对四数（★`-v`）：`treeBase RUN=110 PASS_TOP=61 FAIL_TOP=0 SKIP=0`（两发逐字同）⇄ `treeLand v1 116/63/2/0`・`v2 116/64/1/0`；红名册逐名＝恰那两枚 Windows 新钉（`…NeverTruncates…342r1` 与 `…LeafIdentityReCheck…342r1`），基线树⛔ 有＝⛔ 存量红。
+
+⇒ ★因此本腿**⛔ 更新 `winsec.go:118-140` 的自陈为"窗口已关"**（票 342 `AC#5`／票 348 同条＝两平台都量到才许写；POSIX 已量到、Windows 那两行⛔），该段至今一字未动＝这是本腿交件里"⛔ 许诺没做到的"的落法。
+
+## 下一程（真正的续点，从锚 `3d365ad5` 之后起）
+
+1. ★归因 Windows `symlink-dir` 那 1～2/400 的 `truncated`＝两候选：(a) 采样与复位在该形上串扰（`firstProof` 被先写入的那行占住，损伤行与拒答行同源）；(b) 真残余＝某条路径在翻转态里绕开钉住的父句柄。做法＝那枚件里把"损伤证据"与"拒答证据"分栏各存一份逐字，再连打 3 发判形。
+2. ★把 `leaf-symlink` 的复验做成**确定性**件＝借本包已声明的 seam（`inIdentityWindow120r3` 那一族）在"判语与开之间"插一次翻转，⛔ 靠 racer 撞运气；那枚复验今天⛔ 被证明在路上。
+3. ★去牙反控两发（票 342 `AC#3`／票 348 `AC#3`＝成对落点⛔ 相同：一发摘新加的祖先守卫⇒常驻钉必回落红；一发换成"逢名就拒"反形⇒`openleaf_overwrite_322_test.go:70/:79/:107` 那四枚应红），⛔ `-overlay`、每发落刀前验旧锚命中＝期望、落刀后旧锚 0 且新锚≥1、跑前跑后各验 pristine 哈希并报还原哈希、两发串行。
+4. 两平台都量到之后才动 `winsec.go:118-140` 自陈；消费者面复认（`internal/risk` 等同刻有 `349-v1` 在读⇒⛔ 同刻跑同一包、撞红先安静复量 3 发再归因）。
+5. ★若第 1 步的结论是"必须新导出名才能闭环"⇒ 停手上报、⛔ 自扩批准（票 340 同形那道门）。
