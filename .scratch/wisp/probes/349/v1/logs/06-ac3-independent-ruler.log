@@ -71,7 +71,24 @@ SC_SHAPE_TOTAL=13 SC_GREEN_PKG=2
 UNDECLARED_COMMENT_SYMBOLS=1025
 SYMBOLLOOKING=130
 SC_SHAPE_TOTAL=13 SC_GREEN_PKG=2
---- 两枚 GREEN-pkg 是测试件 func Test 前缀切词（真绿 0 枚残留）---
+--- 全 package SC 形 13 枚逐枚 GREEN_PKG 现验（尺＝sh/scgreen.go.txt，跑 treeBase/internal/risk，49 枚 .go）---
+SC mode.go:96 name=so GREEN_PKG=false
+SC pathresolver_junction_windows_test.go:362 name=and GREEN_PKG=false
+SC pointer_183_test.go:25 name=Test GREEN_PKG=false
+SC pointer_185_test.go:23 name=Test GREEN_PKG=false
+SC provenance.go:534 name=Test GREEN_PKG=false
+SC provenance_test.go:15 name=marker GREEN_PKG=true
+SC syncdirs.go:59 name=the GREEN_PKG=false
+SC syncdirs_ancestor_actable_leg_116_test.go:33 name=name GREEN_PKG=true
+SC syncdirs_ancestor_actable_leg_116_test.go:63 name=whose GREEN_PKG=false
+SC syncdirs_ancestor_actable_leg_116_test.go:70 name=the GREEN_PKG=false
+SC syncdirs_ancestor_actable_leg_116_test.go:73 name=the GREEN_PKG=false
+SC syncdirs_ancestor_actable_leg_116_test.go:95 name=that GREEN_PKG=false
+SC taintmatch.go:256 name=documents GREEN_PKG=false
+TOTAL=13 GREEN=2 PKG_DECL=559 FILES=49
+★订正具名（本腿自己先前一句写错、就地标、⛔ 抹错话）：先前我写"两枚真绿是测试件 func Test 前缀切词"＝**错的**；现验两枚真绿＝`marker`（`provenance_test.go:16 const marker = "MARKER-QZX-98WVE7-TAINTED-SOURCE"`，:15 那句注释在指它）⇄`name`（`…leg_116_test.go:33` 散文里嵌的 `const name` 同名族）。
+两枚都在 `_test.go` 面＝★SC 形对**产码注释面**的真阳贡献仍是 0；其余 11 枚＝散文词（so/and/the/whose/that/documents）或命令串切词（Test×3）。
+=> 结论不变且更硬：SC 这把形在四枚死名里一枚都没抓到（`fires`/`Complete`/`Defer` 是调用形、`taskScopeID`/`disposalScope` 是驼峰形），放宽切词＝给一把 0 真阳的尺加噪声。
 
 --- 有界词表形 ^a[A-Z] 名册（⛔ 造门、只复量；两侧全有定义＝红 0）---
 aAnyForm

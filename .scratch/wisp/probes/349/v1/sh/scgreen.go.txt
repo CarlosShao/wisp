@@ -1,0 +1,65 @@
+package main
+
+// 现验：我这把尺全 package（含 _test.go）的 SC 声明形 13 枚里，哪两枚的"名"在包级有声明。
+import (
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
+)
+
+var idRe = regexp.MustCompile(`[A-Za-z_][A-Za-z0-9_]*`)
+var kwRe = regexp.MustCompile(`(func|type|var|const)\s+$`)
+
+func main() {
+	dir := os.Args[1]
+	files, _ := filepath.Glob(filepath.Join(dir, "*.go"))
+	fset := token.NewFileSet()
+	pkg := map[string]bool{}
+	for _, p := range files {
+		f, err := parser.ParseFile(fset, p, nil, parser.ParseComments)
+		if err != nil {
+			continue
+		}
+		ast.Inspect(f, func(n ast.Node) bool {
+			switch x := n.(type) {
+			case *ast.FuncDecl:
+				pkg[x.Name.Name] = true
+			case *ast.TypeSpec:
+				pkg[x.Name.Name] = true
+			case *ast.ValueSpec:
+				for _, id := range x.Names {
+					pkg[id.Name] = true
+				}
+			}
+			return true
+		})
+	}
+	total, green := 0, 0
+	for _, p := range files {
+		src, _ := os.ReadFile(p)
+		for i, ln := range strings.Split(string(src), "\n") {
+			t := strings.TrimSpace(ln)
+			if !strings.HasPrefix(t, "//") {
+				continue
+			}
+			for _, m := range idRe.FindAllStringIndex(t, -1) {
+				if !kwRe.MatchString(t[:m[0]]) {
+					continue
+				}
+				name := t[m[0]:m[1]]
+				total++
+				g := pkg[name]
+				if g {
+					green++
+				}
+				fmt.Printf("SC %s:%d name=%s GREEN_PKG=%v\n", filepath.Base(p), i+1, name, g)
+			}
+		}
+	}
+	fmt.Printf("TOTAL=%d GREEN=%d PKG_DECL=%d FILES=%d\n", total, green, len(pkg), len(files))
+}
