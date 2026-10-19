@@ -37,11 +37,17 @@ import (
 // ball.ApplyHotkeyDefaults, which is the precondition ball.HotkeySource states
 // in its own doc comment and the shape the construction half gets from
 // residentBallHotkeyChain258. The bridge does NOT keep the current bindings on
-// an empty answer: Check()'s only skip is the DeepEqual diff against what is
-// applied, and internal/ball has no all-empty guard, so four empty strings from
-// here would re-register the set and leave summon, mute and panel dead until
-// the next read - which is exactly the regression this closure caused on the
-// owner's machine (an empty [hotkey] slot means "unset", not "turned off").
+// an empty answer, and Check() has two skips, neither of them an all-empty
+// guard: a nil src keeps whatever is live, and a set DeepEqual to what was
+// applied is left alone. Four empty strings from here would therefore differ
+// from the applied set, be read at the registration end as disabled by config
+// (never attempted), and leave summon, mute and panel dead until a read
+// answers a DIFFERENT set - reading the same empties again only hits the
+// DeepEqual skip. That is the regression this closure caused on the owner's
+// machine. Whether an empty [hotkey] slot can be a user's way of turning a key
+// off is Q-82, still on the owner's list; this closure takes no position on it
+// and only says what it does today - it answers every empty slot with the
+// compiled default before the bridge ever sees the value.
 func hotkeyReloadSource296(dataDir string) ball.HotkeyConfig {
 	c, _, err := config.LoadFile(filepath.Join(dataDir, configFileName), nil)
 	if err != nil || c == nil {
