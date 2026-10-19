@@ -1,0 +1,26 @@
+派单＝票 342＋票 348 落地腿 342-r1（★写腿·产码·全编队最重的一枚；选形＝乙）｜编排者＝新任 harness｜发出 2026-10-19 13:0x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 解冻凭据（⛔ 你自解冻；这条＝你开工的钥匙）
+★人工批准已落台账 `A1046` 第④节，口令逐字＝**「批 342＋348 落乙：允许改 `internal/winsec/winsec.go`（那次 open 改走钉住的父 fd ⇄ 两处 `os.Remove`＝`:160`／`:165` 改 fd-relative）＋`winsec_windows.go` 新增本包第一枚 Windows 侧 handle pinning＋新 landing 件；⛔ 新导出名；⛔ 改 C26 入口语义；⛔ 覆盖写承诺若变须先具名点名（现量 4 枚调用者依赖它）。撤销口令「撤 A1046 解冻」」**。你开工的 report 头必须逐字引这段作为改动授权来路（＝`A487` 具名解冻口径）。⛔ 扩大这段射程的任何一行＝我直接退件。
+★**编排者同批补一枚增量解冻（＝本段＝授权的一部分，落 `A1049`；起因＝A1046 那段原文只点了 `winsec.go`⇄`winsec_windows.go` 两枚、漏了 POSIX 半边必然要碰的第三枚）**：**允许 `internal/winsec/winsec_other.go` 的 `pinPlacement`／`pinBase`／`sameObjectPinned`／`chmodPinned` 一族按需最小改动或按签名复用**（＝乙形"复用本包为密封做过的 handle pinning"在 POSIX 那一半的落点）；⛔ 再扩到别的文件；⛔ 新导出名（若复用需改签名才能闭环 ⇒ **停手上报**、⛔ 自扩）。⇒ 你的合法写面文件清单＝`winsec.go`＋`winsec_windows.go`＋`winsec_other.go`＋新增 landing 件＋`*_test.go` 新钉（⛔ 动既有 `*_test.go` 一字）。
+
+## 你是谁、要落地什么（两票同批、一枚腿——这是编排者裁过的落地形态，⛔ 拆成两腿先后动同一枚文件）
+你是票 **342** 的落地腿（实现者），★同时承票 **348**（两票同一枚 `winsec.go`、同一族祖先换手竞态；裁依据＝`A1046` 第②节＋`342-v1` 必答 (v)"认同⛔ 顶回"）。
+**票面**＝`.scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md`（七格 AC#0…AC#6）＋`.scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md`（七格 AC#0…AC#6）。
+**选形已裁＝乙**（复用本包为密封做过的 handle pinning 把父目录钉住）；裁由与代价＝`A1046` 第④节＋`342-v1` 判语必答 (vi) 六维对照表（`docs/evidence/s1/342-v1-verdict.md`）。要落的两件事：
+1. **截断那一支（票 342）**＝POSIX：`winsec.go:149` 那次 by-name `os.OpenFile(resolved, flags|oNoFollowPlatform, perm)` ⇒ 改成**在钉住的父目录 fd 上开叶子**（复用同包非导出族：`pinPlacement(string)(*os.File,error)`／`pinBase`／`sameObjectPinned`／`chmodPinned`，`winsec_other.go:149/:232/:214/:255` 一带，★行号先自己 `git grep` 重认）；Windows：本包⛔ 该族（`winsec_windows.go:413` 的 `sealHandle` 走名字、`pinPlacement` 全在 `//go:build !windows` 后）＝★**新写**（`os.Root` 链＝`OpenRoot(卷)`→逐组件→叶在钉住的 child 上开；`342-v1` 最小件雏形在 `.scratch/wisp/probes/342/v1/probe/` 可参考、⛔ 抄实现）。★已知深坑＝`os.Root` **钉祖先⛔ 钉叶子**（`W-ROOTSYM followed=true` 3/3 实证）⇒ Windows 侧必须**自带叶子身份复验**（`sameObjectPinned` 同款，Windows 今天⛔ 有）＝工作量不止"新写一条链"。
+2. **删除那一支（票 348）**＝路由今天有**两处** `_ = os.Remove(resolved)`（`:160` 密封失败支＋`:165` 写失败支；⛔ 只改一枚）⇒ 改 **fd-relative**（`unlinkat(父fd, base, 0)`）。★形变耦合（`342-v1` 必答 (v) 点名、`A1048` 我也复核了）＝**父目录 fd 必须留到路由末端**（⛔ 学它模拟件那样叶子开完就 `Close(fd)`）。
+3. ★**常驻仪器是判据的一部分**（票 342 `AC#1`）＝两平台各建一枚**驱动 `PrivateFile`＋祖先换手**的竞态钉（今天没有任何在场仪器看得见这一支＝`342-a1`/`342-v1` 双证；雏形＝`probes/342/v1/probe/v342v1-posix-race.go.txt`／`v342v1-windows-forms.go.txt`）。liveness 口径＝修前分子>0、修后 0 **且同一发证明窗口真到达过**（⛔ 拿 0 命中当凭据、⛔ 一发代两发）。
+
+## 起手（第一笔，⛔ 跳过）
+1. `git log -1 --format='%H %s'`＋`git status --porcelain -- internal/winsec`（应空＝车道已交给你）＋名册尺**锚定行首**（`git log --all --format='%H%x09%s'` 单次导出＋内存 `index($2,P)==1`，锚只到"票 342 落地腿 342-r1"、⛔ 假设其后分隔符、⛔ 子串 `--grep`＝`A1045` 定式）应为 **0**；`git log --grep='^批\|A1046'` 不用跑——口令原文在上面。
+2. 逐枚现读落点三行（我已从 `HEAD` blob 认过逐字）：`:149` ＝`\t f, err := os.OpenFile(resolved, flags|oNoFollowPlatform, perm)`；`:160`⇄`:165` 两枚 `\t\t_ = os.Remove(resolved)`。**行号⛔ 当判据**，内容锚落刀前后各验命中数。
+3. 逐枚重跑票 342「现量」六行＋票 348「现量」四行（一律取具名提交树 `git show <rev>:<path>`）。与表不符⇒当场具名更正。
+
+## 写面（越界＝退件）
+`internal/winsec/**`（产码⇄新增 landing 件⇄`*_test.go` 仪器；★落点预期＝`winsec.go`＋`winsec_windows.go`／`winsec_other.go`＋新增件＋新钉，逐枚动之前先在 report 列清单）＋`.scratch/wisp/probes/342/r1/**`＋`.scratch/wisp/probes/348/r1/**`（短名、⛔ 写出被禁字面字符〔码位 U+00A7；⚠ 别与主题常用的间隔号 U+00B7 混〕、逐枚非 0 字节、⛔ `.out`）＋**票 342 尾一条 ⇄ 票 348 尾一条**（各**只追加**、numstat 1/0 级、⛔ 回改判据原文、⛔ 撤框）。
+★`internal/risk/**`＝同波裁腿 `349-v1` 在读（你只跑消费者色、⛔ 改它任何字节）；`cmd/wisp/**`⇄`internal/panel/**`＝⛔ 写、★⛔ `go test ./cmd/wisp` 整包（单车道归编排者）；⛔ `go test ./...`；`frontend/**`、`design/**`＝零写面。
+
+## 硬约束（票面已逐字写的照抄不行、我点最要紧的五条）
+① ★⛔ 任何新导出名（乙形设计上不需要＝`342-v1` 表"三形都⛔ 新导出"；若你落地时发现⛔ 导出不闭环 ⇒ **停手上报**、⛔ 自己扩批准）；② ⛔ 改 `C26` 入口语义（`PrivateFile`/`PrivateFileExclusive` 签名⇄返回契约一字不动）；③ ★⛔ 悄悄把覆盖写改成"已存在即拒"＝4 枚调用者依赖它（`secret/store.go:79`／`config/migrate.go:93`／`secret/migrate.go:189`／`agent/spill.go:166`），常驻钉 `openleaf_overwrite_322_test.go:70/:79/:107` 一发全红＝那枚钉咬得住（`342-v1` 实证）——若你的落形确实动了这一语义⇒停手上报等我改批准；④ ⛔ 摘既有牙＝票 113／116／119／120／322／336 的断言一字⛔ 放宽⛔ 删⛔ Skip；⑤ ★`winsec.go:118-140` 那段自陈随终态更新＝**⛔ 出现"窗口已关"，除非两平台都量到**（票 342 `AC#5`＋票 348 同条）；Windows 侧残差（`os.Root` ⛔ 钉叶子那味若你复验仍留缝）＝如实写进注释、⛔ 许诺没做到的。
+禁区路径我已逐枚 `git cat-file -e HEAD:<path>` 现验存在：`internal/winsec/winsec.go`／`winsec_other.go`／`winsec_windows.go`／`openleaf_322_other_test.go`／`openleaf_overwrite_322_test.go`／`openleaf_flag_322_other_test.go`／`openleaf_guard_322_windows_test.go`／`posix_seal_window_120_other_test.go`／`sealhandle_privateroute_120_other_test.go`／`placement_symlink_113_other_test.go`／`.scratch/wisp/probes/336/v1/sh/run-ac2-sweep.sh`／`docs/evidence/s1/342-v1-verdict.md`／`.scratch/wisp/probes/342/a1/census.md`。

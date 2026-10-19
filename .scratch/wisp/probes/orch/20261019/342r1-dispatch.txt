@@ -1,0 +1,117 @@
+派单＝票 342＋票 348 落地腿 342-r1（★写腿·产码·全编队最重的一枚；选形＝乙）｜编排者＝新任 harness｜发出 2026-10-19 13:0x +08｜起手锚＝你自己第一笔 `git log -1` 现认，⛔ 用我写的号
+
+## 解冻凭据（⛔ 你自解冻；这条＝你开工的钥匙）
+★人工批准已落台账 `A1046` 第④节，口令逐字＝**「批 342＋348 落乙：允许改 `internal/winsec/winsec.go`（那次 open 改走钉住的父 fd ⇄ 两处 `os.Remove`＝`:160`／`:165` 改 fd-relative）＋`winsec_windows.go` 新增本包第一枚 Windows 侧 handle pinning＋新 landing 件；⛔ 新导出名；⛔ 改 C26 入口语义；⛔ 覆盖写承诺若变须先具名点名（现量 4 枚调用者依赖它）。撤销口令「撤 A1046 解冻」」**。你开工的 report 头必须逐字引这段作为改动授权来路（＝`A487` 具名解冻口径）。⛔ 扩大这段射程的任何一行＝我直接退件。
+★**编排者同批补一枚增量解冻（＝本段＝授权的一部分，落 `A1049`；起因＝A1046 那段原文只点了 `winsec.go`⇄`winsec_windows.go` 两枚、漏了 POSIX 半边必然要碰的第三枚）**：**允许 `internal/winsec/winsec_other.go` 的 `pinPlacement`／`pinBase`／`sameObjectPinned`／`chmodPinned` 一族按需最小改动或按签名复用**（＝乙形"复用本包为密封做过的 handle pinning"在 POSIX 那一半的落点）；⛔ 再扩到别的文件；⛔ 新导出名（若复用需改签名才能闭环 ⇒ **停手上报**、⛔ 自扩）。⇒ 你的合法写面文件清单＝`winsec.go`＋`winsec_windows.go`＋`winsec_other.go`＋新增 landing 件＋`*_test.go` 新钉（⛔ 动既有 `*_test.go` 一字）。
+
+## 你是谁、要落地什么（两票同批、一枚腿——这是编排者裁过的落地形态，⛔ 拆成两腿先后动同一枚文件）
+你是票 **342** 的落地腿（实现者），★同时承票 **348**（两票同一枚 `winsec.go`、同一族祖先换手竞态；裁依据＝`A1046` 第②节＋`342-v1` 必答 (v)"认同⛔ 顶回"）。
+**票面**＝`.scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md`（七格 AC#0…AC#6）＋`.scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md`（七格 AC#0…AC#6）。
+**选形已裁＝乙**（复用本包为密封做过的 handle pinning 把父目录钉住）；裁由与代价＝`A1046` 第④节＋`342-v1` 判语必答 (vi) 六维对照表（`docs/evidence/s1/342-v1-verdict.md`）。要落的两件事：
+1. **截断那一支（票 342）**＝POSIX：`winsec.go:149` 那次 by-name `os.OpenFile(resolved, flags|oNoFollowPlatform, perm)` ⇒ 改成**在钉住的父目录 fd 上开叶子**（复用同包非导出族：`pinPlacement(string)(*os.File,error)`／`pinBase`／`sameObjectPinned`／`chmodPinned`，`winsec_other.go:149/:232/:214/:255` 一带，★行号先自己 `git grep` 重认）；Windows：本包⛔ 该族（`winsec_windows.go:413` 的 `sealHandle` 走名字、`pinPlacement` 全在 `//go:build !windows` 后）＝★**新写**（`os.Root` 链＝`OpenRoot(卷)`→逐组件→叶在钉住的 child 上开；`342-v1` 最小件雏形在 `.scratch/wisp/probes/342/v1/probe/` 可参考、⛔ 抄实现）。★已知深坑＝`os.Root` **钉祖先⛔ 钉叶子**（`W-ROOTSYM followed=true` 3/3 实证）⇒ Windows 侧必须**自带叶子身份复验**（`sameObjectPinned` 同款，Windows 今天⛔ 有）＝工作量不止"新写一条链"。
+2. **删除那一支（票 348）**＝路由今天有**两处** `_ = os.Remove(resolved)`（`:160` 密封失败支＋`:165` 写失败支；⛔ 只改一枚）⇒ 改 **fd-relative**（`unlinkat(父fd, base, 0)`）。★形变耦合（`342-v1` 必答 (v) 点名、`A1048` 我也复核了）＝**父目录 fd 必须留到路由末端**（⛔ 学它模拟件那样叶子开完就 `Close(fd)`）。
+3. ★**常驻仪器是判据的一部分**（票 342 `AC#1`）＝两平台各建一枚**驱动 `PrivateFile`＋祖先换手**的竞态钉（今天没有任何在场仪器看得见这一支＝`342-a1`/`342-v1` 双证；雏形＝`probes/342/v1/probe/v342v1-posix-race.go.txt`／`v342v1-windows-forms.go.txt`）。liveness 口径＝修前分子>0、修后 0 **且同一发证明窗口真到达过**（⛔ 拿 0 命中当凭据、⛔ 一发代两发）。
+
+## 起手（第一笔，⛔ 跳过）
+1. `git log -1 --format='%H %s'`＋`git status --porcelain -- internal/winsec`（应空＝车道已交给你）＋名册尺**锚定行首**（`git log --all --format='%H%x09%s'` 单次导出＋内存 `index($2,P)==1`，锚只到"票 342 落地腿 342-r1"、⛔ 假设其后分隔符、⛔ 子串 `--grep`＝`A1045` 定式）应为 **0**；`git log --grep='^批\|A1046'` 不用跑——口令原文在上面。
+2. 逐枚现读落点三行（我已从 `HEAD` blob 认过逐字）：`:149` ＝`\t f, err := os.OpenFile(resolved, flags|oNoFollowPlatform, perm)`；`:160`⇄`:165` 两枚 `\t\t_ = os.Remove(resolved)`。**行号⛔ 当判据**，内容锚落刀前后各验命中数。
+3. 逐枚重跑票 342「现量」六行＋票 348「现量」四行（一律取具名提交树 `git show <rev>:<path>`）。与表不符⇒当场具名更正。
+
+## 写面（越界＝退件）
+`internal/winsec/**`（产码⇄新增 landing 件⇄`*_test.go` 仪器；★落点预期＝`winsec.go`＋`winsec_windows.go`／`winsec_other.go`＋新增件＋新钉，逐枚动之前先在 report 列清单）＋`.scratch/wisp/probes/342/r1/**`＋`.scratch/wisp/probes/348/r1/**`（短名、⛔ 写出被禁字面字符〔码位 U+00A7；⚠ 别与主题常用的间隔号 U+00B7 混〕、逐枚非 0 字节、⛔ `.out`）＋**票 342 尾一条 ⇄ 票 348 尾一条**（各**只追加**、numstat 1/0 级、⛔ 回改判据原文、⛔ 撤框）。
+★`internal/risk/**`＝同波裁腿 `349-v1` 在读（你只跑消费者色、⛔ 改它任何字节）；`cmd/wisp/**`⇄`internal/panel/**`＝⛔ 写、★⛔ `go test ./cmd/wisp` 整包（单车道归编排者）；⛔ `go test ./...`；`frontend/**`、`design/**`＝零写面。
+
+## 硬约束（票面已逐字写的照抄不行、我点最要紧的五条）
+① ★⛔ 任何新导出名（乙形设计上不需要＝`342-v1` 表"三形都⛔ 新导出"；若你落地时发现⛔ 导出不闭环 ⇒ **停手上报**、⛔ 自己扩批准）；② ⛔ 改 `C26` 入口语义（`PrivateFile`/`PrivateFileExclusive` 签名⇄返回契约一字不动）；③ ★⛔ 悄悄把覆盖写改成"已存在即拒"＝4 枚调用者依赖它（`secret/store.go:79`／`config/migrate.go:93`／`secret/migrate.go:189`／`agent/spill.go:166`），常驻钉 `openleaf_overwrite_322_test.go:70/:79/:107` 一发全红＝那枚钉咬得住（`342-v1` 实证）——若你的落形确实动了这一语义⇒停手上报等我改批准；④ ⛔ 摘既有牙＝票 113／116／119／120／322／336 的断言一字⛔ 放宽⛔ 删⛔ Skip；⑤ ★`winsec.go:118-140` 那段自陈随终态更新＝**⛔ 出现"窗口已关"，除非两平台都量到**（票 342 `AC#5`＋票 348 同条）；Windows 侧残差（`os.Root` ⛔ 钉叶子那味若你复验仍留缝）＝如实写进注释、⛔ 许诺没做到的。
+禁区路径我已逐枚 `git cat-file -e HEAD:<path>` 现验存在：`internal/winsec/winsec.go`／`winsec_other.go`／`winsec_windows.go`／`openleaf_322_other_test.go`／`openleaf_overwrite_322_test.go`／`openleaf_flag_322_other_test.go`／`openleaf_guard_322_windows_test.go`／`posix_seal_window_120_other_test.go`／`sealhandle_privateroute_120_other_test.go`／`placement_symlink_113_other_test.go`／`.scratch/wisp/probes/336/v1/sh/run-ac2-sweep.sh`／`docs/evidence/s1/342-v1-verdict.md`／`.scratch/wisp/probes/342/a1/census.md`。
+派单公共块（2026-10-19 第六波，编排者＝新任 harness；逐条都是现行铁律，缺一条我就退回你那笔交件）
+
+## 编队规则（本波＝第六波，12:5x–13:0x 放出＝写腿 `342-r1`（乙形落地·winsec 产码）＋裁腿 `349-v1`（裁票 349·risk 只读））
+在飞 **2** 条＝**`342-r1`**（★写·`internal/winsec/**` 产码＝票 342 乙形落地＋票 348 同批；人工批准＝台账 `A1046` 第④节口令「批 342＋348 落乙」已在册）∥**`349-v1`**（裁·`internal/risk/**` 只读＝裁 `349-r1` 的四枚注释改准）。★两面包不交（winsec⇄risk）；两枚都⛔ 跑 `go test ./cmd/wisp` 整包（那面单车道＝归编排者：票 227 `AC#5`/`AC#6` 欠账，本波⛔ 抢）。已交件并收件＝`341-r1`/`341-v1`（票 341 `-done`）／`342-a1`/`342-v1`（三形表裁毕、1 勾 6 待落地）／`343-r1`/`343-v1`（票 343 `-done`）／`349-r1`（四枚死名改准、★现归 `349-v1` 裁）。
+写面互斥：`internal/winsec/**`＝`342-r1` 独占（★别的腿⛔ 写；`349-v1` 只读不碰它）；`internal/risk/**`＝`349-v1`（只读＋跑该包色；`349-r1` 已交件、写面静默、`blacklist.go` blob 现＝`964ee75a`）；`internal/config/**`＝空；`cmd/wisp/**`⇄`internal/panel/**`＝零写腿。`frontend/**`、`design/**`＝机主外部 agent（零写面）。
+★CPU 争用口径（本波两枚会同刻吃 CPU）＝成对四数与竞态／突变复跑若撞红一律安静复量 3 发为准（`internal/risk` 在册件 `TestResolvePerCallBudget`；`internal/winsec` 在册摆动枚＝票 346 那两枚 `TestPOSIX120SealWindowLeafSwapIsClosed`／`TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1`＋Windows 那 4 枚 `…116`／`…Junction…` 族＝`A1048` 第②节新证：它们在台损档红、干净档全绿 ⇒ **⛔ 把台面造的红当存量红、也⛔ 拿干净档的绿当"已钉住"的凭据**），⛔ 记成腿的新造红；放腿闸＝CPU≤70% 现量。
+★写腿 1＜3 按交接书 13.1 节例外运行、理由具名：其余可派写票全卡人工批准门＝票 340（AC#2 新导出名）／票 345（AC#5）／票 344（AC#1 卡机主一拍）／票 347（AC#0 待人拍板、默认二）／票 350（AC#0 待人拍板、默认不上）／票 346（第一趟只许普查）／票 341 已 `-done`、票 349 等裁。⛔ 为凑数派一枚撞批准门的写腿＝比写腿不足更坏。
+
+## 临时根（★机主 2026-10-18 新铁律，覆盖上一波的写法）
+⛔ 在**任何盘符根**（`D:\`、`C:\` 之类）建临时树／中转件／日志镜像。仓外导出树、`GOTMPDIR`、突变拷贝一律落 **`D:\tmp\wisp\<日期>\<腿名>`**（例：`D:\tmp\wisp\20261018\341r1\treeA`）。⛔ 把落点搬回盘符根去"绕开"票 311 那道 GUARD；⛔ 删任何东西（临时件只建不删）。
+
+★**腿身份双唯一键（2026-10-18 17:0x 编排者补；起因＝编排者自己重复放了两枚同名 `227-v1` 腿、在同一棵共享工作树上同时落笔）**：一条腿的唯一键＝**注册名＋主题前缀＋写面根**，三者全局唯一。⇒ 编排者侧定式：**放腿前先跑一把"该主题前缀盘上有几笔／写面根下最近谁在写"的尺**（`git log --all --grep='<前缀>' --format='%h %ad'`＋`find <写面根> -newermt '-30 minutes'`）；已有同名在飞 ⇒ ⛔ 放第二枚，除非**故意双盲对拉**且事先给两枚**不同的写面根＋不同的主题前缀**。⇒ 腿侧定式：**发现自己写面根下有别腿在落笔 ⇒ 立刻具名落盘＋⛔ 读／⛔ 提交／⛔ 采信对方任何字节**（今天两枚腿都这么做对了：交集 0 枚、各自自证没卷走对方件）。★同形复发＝`A1033` 那枚"主题前缀⛔ 唯一键"收件尺盲区，今天以"两条真腿共用一个前缀"复发（实测：前缀命中 **23 笔**＝两腿之和 ⇒ 编排者的收件尺会把两条腿混成一册）。
+
+★**突变落刀前后都要验命中数（2026-10-18 17:0x 编排者补；两枚腿各自独立提同一条）**：`sed`／`awk`／`perl` 落刀**前**先量"锚命中枚数＝期望值"、落刀**后**再量一次（新锚命中＋旧锚归零），两把都对得上才认那一发的 `rc`。⇒ 否则**空操作会伪装成一次成功复跑**（编排者本人踩过＝`A1033` 第②节：`sed` 删 0 行、sha 未变、`rc=0`；腿踩过＝锚跨 Go 字面续行⇒命中 0⇒那发 `PASS` 是假读数）。
+
+## git
+⛔ **push**（推送只由编排者做，且现在被机主按住）。`git add` 与 `git commit` 两处都要**逐枚显式 pathspec**——⛔ `add -A`／`add .`／目录形、★⛔ `git commit -F <正文> -- .`（那个 `.` 曾把机主在飞的 24 枚工作树字节记进历史，台账 `A1011` 第⑧节）；⛔ `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；⛔ 在仓内建 worktree 或 checkout。临时件**只建不删**。撞 `.git/index.lock`：⛔ 删锁，等它自己散再重试同一笔。
+★**改名结案（`git mv` 加 `-done` 那一类）两处定式（2026-10-19 编排者自己破了唯一键换来，台账 `A1045`／停车点 4.0ev）**：① `git mv 旧 新` 之后，★**commit 的 pathspec 必须同时带【新路径⇄旧路径】两枚字面路径**——只带新名会让 `git mv` 暂存的"旧路径删除"⛔ 进那一笔 ⇒ 已入库的 `ls-tree` 里**新旧两枚并存**＝防重领唯一键被破；补正只能**追加一笔**带旧路径（⛔ `--amend`／⛔ `reset`）。② ★唯一性尺**一律数已入库**＝`git ls-tree HEAD --name-only -- .scratch/wisp/issues/ | grep -c 'issues/NN-'`（须＝1），⛔ `git ls-files`（它数的是 **index**＝暂存态会骗人：删除已暂存时看着＝1＝假绿）。改名前另跑长度门（新名会变长）。
+
+## 票面
+⛔ 翻任何 AC 框、⛔ 改票名／`Status:`／加 `-done`（裁决者≠实现者；翻框只由编排者凭非实现者判语做）。只许在你被指定的票尾**追加一条** bullet。
+
+## 台面配方（仓外导出树，缺一味就假红）
+`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models`（**八件套**）＋★仓根 `docs/`（有些测试读 `docs/PLAN.md`；`internal/panel/git_test.go` 一族要它）＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`——都⛔ 跟踪）。树放 **`D:` 卷且目录名要产生 8.3 短名别名**（放 C 卷 Temp ⇒ 短名族打红＝台面故障）；`GOTMPDIR` 指到 `D:` 上**先 `mkdir -p`**（没建＝`creating work dir` 红，长得像判据响）。取出后**先数 `.go` 证非空**（"0"⛔ 是读数）。⛔ 在共享工作树跑 `go test`／`go build`。
+
+## 颜色尺
+`RUN=`＝`grep -c '^=== RUN'`（含子测试）⇄ `PASS_TOP=`＝`grep -c '^--- PASS'`（只顶层）⇄ `FAIL_TOP=`＝`^--- FAIL` ⇄ `SKIP=`。**四数不许混用、不许相减**。一律 `-count=1 -timeout 30m` 或更长；⛔ `go test ./...`。★跑 `cmd/wisp` 必须带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，否则 `0xc0000135`＋零枚 `--- FAIL`＝那包根本没跑（台面故障，⛔ 计入判据）。★**仓外导出树里跑 Windows `.exe` 取 DLL 时，`PATH` 必须用 `cygpath -w` 转成 Windows 形＋分号分隔**（Git Bash 里 `$PWD`／`/d/...` 那套 POSIX 形传不动 Windows 二进制的 DLL 搜索路径⇒造出"**零枚 `--- FAIL` 的整包死**"、四数 `0/0/0/0`、长得像判据响其实是台损；`338-v1` 踩出、账 `A1042` 第④节）。已知本机一格：`cmd/wisp` 整包有真窗区整进程死亡（`resident_*` 只在整进程真窗区死亡的台面从不执行）⇒ estate 颜色取自定向 `-run`，⛔ 拿整包当"全绿"或"我的字节把包打红"。★枚数⛔ 是单枚字节的函数：`338-v1` 在只差一枚 `.go` 的单差异台面上两侧 `RUN` 名集逐字同（腿那对 `207⇄203` 的 −4 复现不出来）⇒ ⛔ 用整包 `RUN`/`PASS_TOP` 的差当"我的字节改了 N 枚测试"，红名册要逐名作差。
+
+## 门禁四数（只在共享工作树）
+`/d/work/base/gopath/bin/gofumpt.exe -l <你的文件>`（⚠ 本机工作树 6 枚既有件因 CRLF 被标脏＝存量，**你的新字节必须 LF**，⛔ 顺手重排别腿文件；具名登记即可）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`go vet ./<你的包>/`，逐枚落 `rc=`。★`d22scan` 指到缺 `design/` 的树会 exit 2＝GUARD 射程拒绝⛔ 读成红；长度门要 `.git`。凡红句含 `walk`／`build failed`／`no test files`／`setup failed`／`0xc0000135` ⇒ 判台面故障、具名写是哪一行，⛔ 计入判据。
+★**跑这四道门之前先 `unset GOTMPDIR TMPDIR`**（2026-10-18 编排者坐实的定式，台账 `A1027` 第⑤节）：本波落点新铁律把测试临时根指到 `D:`，而 `d22scan` 里票 311 AC#1 shape B 那道 GUARD 要求"测试临时根与 `%LOCALAPPDATA%` 同卷"⇒ 带 env 时 **rc=2 射程拒绝**（offender 逐字 `GOTMPDIR=…(volume D)`），**⛔ 读成红**；unset 后 rc=0 clean。⛔ 为它放宽任何断言、⛔ 把落点搬回盘符根。
+
+## 共享 index 那一枚今天咬过的坑（10-18 实测，台账 `A1027`）
+`git commit -F <正文> -- $(git diff --cached --name-only)` **＝违规形状**：它从**共享 index** 反推路径，会把别腿已 `git add` 未 commit 的件卷进你这一笔（今天 `322-r2` 就这样替 `328-v1` 代提了一枚）。⇒ **`add` 与 `commit` 两处都要写死字面路径**（逐枚列全；⛔ 任何"从 index／从目录反推"的形，含 `xargs`、`git status --porcelain | cut`、通配 `*.log`）。
+
+## 突变（牙）
+只打在**仓外导出树**的物理字节上——⛔ 改跟踪文件、⛔ `-overlay`（那形对读盘的尺失明）；**内容锚**（函数体内那枚 token），⛔ 绝对行号；逐发**当场还原并报还原哈希**，跑前跑后各验一次 pristine 哈希；跨 shell 的 `trap`/`finally` 有竞态 ⇒ **两发串行**，⛔ 信 echo。成对两发落点必须不同，少任一发＝那把尺不敏感，⛔ 用它的绿当凭据。
+
+## 判据形状
+⛔ 为变绿放宽任何断言、⛔ 删用例、⛔ `t.Skip`、⛔ 在注释里指名一枚不存在的测试或件当凭据、⛔ 许诺未实现的能力、⛔ 动 SLO 阈值／golden／`thresholds.go`／`allowlist.txt`／三枚冻结件（真身全路径＝`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`，编排者已逐枚 `cat-file -e` 现验）／D1–D47／C1–C32／R1–R9／D43 转移表／`go.mod`／`go.sum`／`.gitignore`／`ci.yml`。⛔ 新导出名、⛔ 新 `panel.*` 方法名、⛔ 新 JSON 键。碰到未定义的事**停手上报**（写进交件具名），⛔ 自行假设。
+★**"只动空白／排版"这类改动怎么证＝⛔ 一把 `tr -d ' \t'` 尺通吃（`338-v1` 踩出、账 `A1042` 第④节 ⓔ）**：若改动落在**注释面**（如 `343-r1`），尺＝`git diff -U0` 里 `^[+-]` 行逐枚都以 `//` 开头或为注释续行（可执行行变化＝0）。但若改动**跨到 token／声明形状**（例 `gofumpt -w` 把 `type X struct{…}` 拆成 `type ( … )` 分组、补尾逗号、折空行＝"甲形"），**`tr -d ' \t'` 那把尺会 RC=1 报非空白变化、它⛔ 再当凭据**⇒ 必须换**四把内容尺**逐枚量＝①用例名 symdiff 0 ②字符串字面量**排序后 sha256 两侧同串** ③整行注释文字 symdiff 0 ④行尾注释 symdiff 0；★再加一把比"看起来只有空格"硬的＝**取 before blob、仓外只跑格式化工具到不动点、所得哈希逐枚 == HEAD blob**（＝交件字节 ≡ 工具自身输出、没夹带语义改动）。
+
+## 输出预算
+★**证据件的扩展名⛔ 用 `.out`**（`.gitignore` 里有一条全仓生效的 `*.out` ⇒ 落盘"看着成功"、`git add` 静默跳过、根本没进 commit；先例＝票 275 第 2 节那枚腿自抓）。用 `.txt`／`.log`／`.md`。
+≤4 枚正文件、每件 ≤160 行；⛔ 0 字节文件（落笔前后 `wc -c`）；**每落一枚文件就 commit**（⛔ 攒着）。轮次帽：先做判据最硬的那格，把 `logs/` 逐枚提前入库；到帽前把最新状态 commit＋票尾 bullet 落盘。
+★**帽的射程（2026-10-18 12:2x 编排者更正，⛔ 外推到代码文件）**：那枚"每件 ≤160 行"**只管正文件**＝report／census／证据散件／读数件；⛔ 适用于 `*_test.go` 与任何产码文件 ⇒ **⛔ 为凑行数帽去压注释、删用例、缩断言**（注释是本仓最贵的东西：下一程靠它判断"这枚钉为什么在这儿"）。报告写不下 ⇒ 拆具名分件（`report-sec9.md` 那种，`322-r2` 先例），⛔ 压正文。代码文件行数＝照实报、⛔ 自删。★同一条已发给 `227-r1`（它 12:1x 正打算"只压注释"＝我这句话写得不够硬，记我一枚）与 `166-r1`（它 11:1x 就为这枚帽来问过、我当时没裁＝欠它一个答复）。
+
+★**两枚帽相冲时的口径（2026-10-18 14:3x 编排者裁；裁腿 `336-v1` 具名上报＝它证据面 146 枚文件下"4–8 笔"与"每落一枚就 commit"不可能同时满足，`logs/NN-blocked-3.log`）**：**"每落一枚文件就 commit"优先**；派单里那句"提交 4–8 笔"＝**参考值、⛔ 判据、⛔ 据此退件**。理由＝攒着已经真咬过一次（本波一枚写腿攒到第 6 笔死于 150 轮帽、遗产要编排者代提＝`A1022` 第③节那形），而"笔数多"没有任何危害。⇒ 腿⛔ 为凑笔数合笔、⛔ 为守笔数攒件；按每格一笔落到 9–15 笔时具名写一句"枚数帽按公共块口径为参考值"即可（`336-v1` 正是这么做＝11 笔、不退件）。
+★同一条另两处派单文字错位由同一枚上报坐实、⛔ 回改已发出的派单正文（改为逐枚 send_message 补达）：禁区清单里我写的 `internal/tools/rules_gateway.go`／`internal/risk/thresholds.go`／`internal/risk/tokens_fourway_test.go` **三条路径树里都不存在**（真身＝`internal/risk/rules_gateway.go`／`internal/observe/thresholds.go`／`internal/panel/` 两枚冻结件＋`internal/perm/ticket90_persist_test.go`，编排者 14:2x 逐枚 `cat-file -e` 现验）⇒ 今后派单里凡列禁区路径，**落笔前逐枚 `git cat-file -e HEAD:<path>` 过一遍**。
+
+## shell
+进 shell 的正文一律单引号或**加引号 heredoc**；⛔ 双引号串里出现反引号或 `$`。中文 commit 正文先 Write 成文件再 `git commit -F`。PowerShell 内联⛔ `$_`／裸 `$b`。
+★**here-doc 定式（今天工作树里那批乱码名散件就是这个形状造出来的＝账 `A1042` 第⑤节）**：用 `<<'EOF'` 单引号定界（⛔ 裸 `<<EOF` 会做变量展开）、★终止符 `EOF` **必须独占一行**、⛔ 用 `>` 重定向把中文正文一段段写文件（正文里任何一行被 shell 当命令/重定向目标＝造出一枚以中文句子为名的 0 字节垃圾件）。最稳＝直接用 Write 工具落文件，别在 shell 里造 here-doc。
+★**`git commit -F <正文文件>` 的路径在 pwsh 里必须 Windows 形（`D:\tmp\...`）**，⛔ bash 形 `/d/tmp/...`＝pwsh→git 读不到该文件⇒整笔 commit `rc=128` 中止、⛔ 任何副作用（今天编排者自己栽过一次、338 结案那笔差点被当成已提交＝账 `A1042` 第③节）。同理⛔ 把 ASCII 双引号写进 `-m "…"` 双引号串（`A1031`：语法坏、命令中止）。⇒ 提交后**必现跑 `git log -1`＋`git status` 对回**再报"已提交"，⛔ 拿"命令没报错"当已落库。
+★**凡禁令要禁一枚字面字符（如分节符 U+00A7），⛔ 在派单正文里写出那枚字符本身、写字面码位名**（否则描述它的字自己占一枚命中＝今天编排者自己犯过一次、同族第三次＝`A1041` 第④节）。
+
+## 读数纪律
+引任何数必带"哪把尺＋射程目录＋量的还是算的"；报"0 命中"前先跑一枚已知存在的正控并看 `stderr`；`grep -c` 命中 0 会回 rc=1 ⇒ 在 `$( )` 里 `|| true`。两把尺矛盾时先假定新那把坏。**完成通知一律当未验证**——编排者收件只认盘上三把尺（提交真在／件真在／自己复跑）。
+★**取一枚脚本的退码＝先重定向到文件、`echo RC=$?` 紧跟在裸命令之后**（2026-10-18 编排者自己连错两次才取对，台账 `A1043` 第③节）：⛔ `sh scripts/x.sh 2>&1 | tail -1; echo RC=$?`——那取到的是 **`tail` 的退码**、⛔ 是脚本的（＝票 275 票面第 1 段逐字写过的同一枚坑）；⛔ 在 **PowerShell 内联**里写 `$?`／`\$?`——会被 PowerShell 抢先展开成它自己的 `$?`（打出 `True`／`False`，⛔ 是数字）。⇒ 正确形＝落进脚本文件跑：`sh scripts/x.sh >/tmp/x.out 2>&1; echo RC=$?`。
+★**竞态／非确定性读数⛔ 要求逐字相同**：同一发连打 2–3 次、逐次报分子，复现的是**量级与形状**（"敞着／关掉了／只报告"这类方向），⛔ 把"数不一样"当腿报假的凭据。
+★**名册尺锚定行首（2026-10-19 裁腿 `341-v1` 自己抓到并报，同族第十二次，台账 `A1045`）**：`git log --grep='<前缀>'` 默认匹配**整条 message（主题＋正文）**⇒ 非锚定形会把"正文里引用了别腿前缀"的那笔吃进名册（今天现量＝非锚定 9 笔⇄锚定 6 笔⇄单次导出内存 `index==1` 6 笔，多出的三枚全是裁腿自己的笔）。⇒ 名册尺①**锚只到"票 NN＋角色＋腿码"**、★⛔ 假设其后任何字符（含间隔号 U+00B7——腿自选主题形状，今天既有 `…-r1·AC#…` 也有 `…-a1 交件①…`）；②用 `--grep='^票 NN 角色 腿码'` 或"单次 `%H%x09%s` 导出＋内存内 `index($2,P)==1`"两把独立尺对撞；③⚠ 枚数随 HEAD 漂 ⇒ **⛔ 把某时刻的枚数当通则**（那族第五次形），只认逐枚 `%s` 起头。
+
+## 交件自证（三把尺，⛔ 只说"已完成"）
+① 逐枚提交号＋逐枚 `git show --name-only`（应只含你被允许的写面）；② 证据件**绝对路径**＋`wc -c`＋行数＋占位符尺 0 命中；③ 决定性那把尺的逐字输出（起手侧⇄交件侧都带 `file:line`）＋成对红句逐字＋还原哈希＋四数＋门禁 `rc=`。另加派单里的**必答题**（⛔ 你自己盖章不算）。
+票 342＋348 落地腿专属（逐格怎么做＋必答＋帽＋交件自证）
+
+## 逐格（两票合起来一趟做，但判据分票逐格交）
+**票 342 AC#1／票 348 AC#2（★两平台各一发、liveness 必须在场）**：台面＝`git archive <具名锚>` 仓外导出树两棵（基线锚⇄交件），POSIX 档＝`golang:1.27`＋`CGO_ENABLED=0`＋`GOPROXY=off`＋宿主 module 缓存只读挂载＋`MSYS_NO_PATHCONV=1`；Windows 档＝本机。★**容器档⛔ 把 `TMPDIR`/`GOTMPDIR` 绑 Windows 卷**（`A1046` 第③节定式＝`os.SameFile` 在 bind mount 失真＝身份门被台面摘掉、造出"长得像判据响"的红）；★仓外树跑 Windows `.exe` 取 DLL 时 `PATH` 必须 `cygpath -w`＋`;`（POSIX 形＝"零枚 `--- FAIL` 的整包死"＝台损）。每形连打 2–3 次逐次报分子（竞态读数⛔ 要求逐字相同、要复现的是**量级与形状**），并给 liveness 钥匙（POSIX＝祖先换手真到达过；Windows＝`reparseAt(ancestor)` 复证）。
+
+**票 342 AC#3／票 348 AC#3（去牙反控）**：成对两发**落点必须不同**（一发＝摘新加的祖先守卫＝仪器必回落到红；一发＝把守卫换成"逢名就拒"反形＝常驻钉里那几枚该红、红句逐字进件）；⛔ `-overlay`、只打仓外导出树物理字节；★每发落刀前验旧锚命中＝期望、落刀后旧锚 0 且新锚≥1、跑前跑后各验一次 pristine 哈希、报还原哈希；跨 shell 的 echo ⛔ 信、两发串行。★`342-v1` 已给一把可抄的"尺敏感"起点＝误形 `O_EXCL` 那发打红 4 枚（`openleaf_322_other.go:206`／`openleaf_overwrite_322:70`／`sealhandle_privateroute_120` 两枚）——你落地后同一把尺必须**不再**因你的字节打红那四枚（＝覆盖写承诺没被动）。
+
+**票 342 AC#4／票 348 AC#5（颜色与门禁）**：`./internal/winsec/` 两平台成对（四数逐枚点名⛔ 混用⛔ 相减）＋红名册**逐名**作差＝⛔ 新增红；★在册摆动枚（票 346 那两枚 `TestPOSIX120SealWindowLeafSwapIsClosed`／`TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1`）＋Windows `…116` 那族 4 枚读到红 ⇒ **先安静复量 3 发再归因**（`A1048` 第②节新证＝它们台损档红、干净档全绿＝⛔ 把台面红当存量、⛔ 拿干净档绿当"已钉住"）；消费者面复认＝`internal/risk`／`secret`／`config`／`agent`／`memory` Linux 档与本机全 ok 成对（★同波 `349-v1` 在读 `internal/risk` ⇒ 你只读不写、并⛔ 与它同刻跑同一包＝撞红就复量、⛔ 记成对方的）。门禁四数只在共享工作树、跑前 `unset GOTMPDIR TMPDIR TEMP TMP`（票 311 shape B GUARD＝rc=2 射程拒绝⛔ 读成红）；`go vet` 带 `GOOS=darwin`／`GOOS=linux` 交叉档时★⛔ 与本机档成对判红绿（`A1032` 第③节＝Windows 宿主交叉档默认关 cgo 必红＝存量）。⛔ `./cmd/wisp` 整包。
+**票 342 AC#5（注释与票面口径）**＝`winsec.go:118-140` 那段自陈随终态更新＝两平台都量到才许写"关"，Windows 残差如实写；★票 322 判据文字⛔ 回头改（它已 `-done`，要更正只追加）。
+**票 342 AC#6／票 348 AC#6（纪律格）**＝⛔ 翻任何框（两票共 14 格由非实现者裁）、⛔ 改票名／`Status:`／`-done`；两票尾各**一条**只追加 bullet。
+
+## 必答（⛔ 你盖章不算，我逐条复跑）
+(i) 改动清单逐枚＝文件:行＋diffstat；两票各自的"截断那一支"⇄"删除那一支"分别由哪几行堵住（⛔ 混成一件事）。
+(ii) ★父目录 fd 生命周期：你在路由哪一步拿到、哪一步释放；★证它活过 `:160`／`:165` 两处删除那一跳（＝`342-v1` 点名那枚形变耦合，⛔ 学它模拟件叶子开完就 Close）。
+(iii) Windows 侧你新写的 `os.Root` 链：★叶子身份复验用了什么（`os.Root` ⛔ 钉叶子＝`W-ROOTSYM followed=true` 实证）？没有复验就明说⛔ 复验＝本维残差（并⛔ 在注释里宣称已关）。
+(iv) 覆盖写语义：4 枚依赖它的调用者逐枚现读调用点、给"我这形动没动它"的结论＋凭那枚钉（`openleaf_overwrite_322_test.go`）复跑读数。
+(v) ★零新导出名自证＝`git diff` 里新增顶层导出标识符枚数＝0（`go/ast` 或声明形 grep 均可、给尺）；若你确实需要一枚新导出名 ⇒ **停手上报、⛔ 自扩批准**（＝票 340 同形那道门）。
+(vi) 两平台各自竞态散布表（每形连打次数与逐次分子，含 liveness 分子）。
+
+## 帽与节奏（★这枚腿最容易被 150 轮帽打断，按此序做）
+① 先落**POSIX 半边**（落码＋常驻钉＋两平台成对里的容器那一发）并 commit ⇒ 交个"半可验"态；② 再落 **Windows 半边**；③ 最后补注释自陈与两票尾 bullet。每落一枚文件就 commit（枚数帽＝参考值⛔ 判据，公共块 14:3x 口径）；★到帽前**必须**把最新状态 commit＋票尾 bullet 落盘＋写一枚 `report-blocked.md` 具名说清"哪半落了、哪半没落、下一程从哪个锚续"（先例＝`322-r1` 死于帽、遗产要我代提＝我至今记着那笔）。正文件 ≤4 枚、每件 ≤160 行（★该帽只管"你撰写的正文件"、⛔ 外推到产码／测试件、更⛔ 为凑帽压注释）。
+
+## Git／shell（★你今天最容易栽的）
+新文件先 `git add` 才进得了 commit pathspec（⛔ 直接写进 pathspec＝整笔 rc=128 中止＝我栽过两次 `A1042`/`A1046`）；`add`／`commit` 两处逐枚字面 pathspec（★同一条共享 index 上有 `349-v1` 落笔，⛔ 从 index 反推）；中文正文 Write 成文件再 `git commit -F`、`-F` 路径 Windows 形；⛔ 并行跑改文件的脚本；取脚本退码＝重定向文件＋`echo RC=$?` 紧跟裸命令；⛔ `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；⛔ 删任何临时件（只建不删；你的树落 `D:\tmp\wisp\20261019\342r1\`）。
+
+## 交件自证（三把尺）
+① 逐枚提交号＋逐枚 `git show --name-only` ⇒ ⊆ 上面声明的写面、`.go` 枚数逐枚点名（产码⇄测试件分开数）；★名册尺＝单次导出＋内存 `index==1`（锚只到"票 342 落地腿 342-r1"、⛔ 假设其后分隔符；⚠ 你主题⛔ 中途换起头形＝`A1048` 那枚账）；② 证据件绝对路径＋`wc -c`＋行数＋占位符尺 0 命中（正控非零）＋逐枚非 0 字节＋U+00A7 命中 0（正控 `HANDOVER.md` 非零）＋⛔ `.out`；③ 决定性逐字（起手侧⇄交件侧带 `file:line`）＋两平台四数＋竞态散布表＋去牙两发红句与还原哈希＋门禁 `rc=`＋两票框终量尺（14 格一枚没翻）。做完或卡住 send_message 报 lead。
