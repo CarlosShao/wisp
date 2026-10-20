@@ -1,0 +1,106 @@
+# 321-v1 独立读数底片（★每行都是本腿自己现跑的数，⛔ 抄腿；尺名见 00-ruler-register.md）
+# 生成时刻＝2026-10-20 21:5x +08｜仓＝D:\work\workspace\projects plans\Wisp｜全程只读
+
+## S1. 判据件在位⇄未被篡改（尺 R1/R1b/R1c/R6，量的；全对入库 blob）
+git cat-file -e HEAD:cmd/wisp/exec_holder_toggle_321_test.go            -> RC=0（在位）
+git rev-parse 58de465a:P   = 851936e396458aa2b6d19cea0da8f71d7d9593f7
+git rev-parse HEAD:P       = 851936e396458aa2b6d19cea0da8f71d7d9593f7
+git hash-object -- P       = 851936e396458aa2b6d19cea0da8f71d7d9593f7
+git rev-parse c673f67b:P   = 851936e396458aa2b6d19cea0da8f71d7d9593f7
+git rev-parse fd091cd1:P   = 851936e396458aa2b6d19cea0da8f71d7d9593f7
+git rev-parse 16e2522a:P   = 851936e396458aa2b6d19cea0da8f71d7d9593f7
+两种算法同源：blob-id(SHA-1) 851936e3… ⇄ sha256 717b2d2d9b76d8ae9d413e53a14e11f1669b834fcb056af6b884e01febb63738
+  sha256(HEAD blob) = 717b2d2d9b76d8ae9d413e53a14e11f1669b834fcb056af6b884e01febb63738
+  sha256(工作树)    = 717b2d2d9b76d8ae9d413e53a14e11f1669b834fcb056af6b884e01febb63738
+blob 维度：bytes=8671 lines=200 CR(tr -cd '\015'|wc -c)=0 CR(od '^0d$' 计数)=0
+  CR 尺正控（已知含量 1 枚的件）= 1  ← ★本腿 R3b 曾把该正控写成 0 是因为 $( ) 吃换行，已换形重量
+动过该路径的笔（git log --all -- <path> 逐笔）= 只 1 笔 = 58de465a | 10-15 20:03 | 321-r1 落地腿交件（票 321，零产码）…
+  正控：同尺对 cmd/wisp/no_such_file_321v1.go = 0（尺没瞎）
+工作树⇄HEAD⇄index：git diff --numstat HEAD -- P = 空；git diff --numstat --cached HEAD -- P = 空
+  git status --porcelain --untracked-files=all -- cmd/wisp/ 行数 = 0
+同名/近名尺（防第二枚同形尺）：git ls-files 里 321 名下 cmd/**.go 只 cmd/wisp/exec_holder_toggle_321_test.go 一枚
+用例名（grep '^func Test' 对 blob）= :140 TestAC321PanelHopDrivesTheHolderToggle ／ :165 TestAC321NamedExecutorIsTheToggleRoad
+
+## S2. 牙（尺 R6/R10a/R21/R2f/R7，量的）
+红句在库（grep -F -c 对 blob）：
+  'AC#1 RED: this hop is NOT toggle semantics' = 2（行 158 接线尺／行 198 能力尺）
+  'executor set' = 1 ／ 'drives NO executor on' = 1 ／ 'want exactly one toggle' = 1 ／ 'which lacks' = 1 ／ 'RequestToggle' = 2
+  腿引四枚 file:line（154/158/173/198）逐行对回 = 四枚都是 t.Fatalf 那一行，⛔ 空指
+★方法学（本腿独立判，凭 R2f 抽到的两个提取器本体）：
+  resident_hotkey_258_test.go:25 runResidentBody258 -> parser.ParseFile(fset, filepath.Join(".","resident_windows.go"), nil, parser.ParseComments)
+  resident_ball_228_test.go:64   productionFiles228 -> os.ReadDir(".") ＋ 逐件 parser.ParseFile(fset, filepath.Join(".", n), nil, …)
+  第三参 nil ⇒ 测试运行时自己开盘上产码 ⇒ -overlay（只换 go 命令编译期输入）变异被测量那一边 ⇒ 尺恒绿＝假读数
+  同族射程现量：cmd/wisp 里 parser.ParseFile 命中 26 枚件、os.ReadDir 命中 16 枚件 ⇒ 该定式适用于全部读盘 AST 钉
+变异复现（★只在仓外副本 .go.txt 上做物理改写，⛔ 碰仓内字节、⛔ 跑 go test/build）：
+  旧批 pristine  sha256(58de465a blob) = 816017b68c495b6ca3770b08e01b0cf502d91822cb31dec0305eedafb5f9d90d  ⇄ 腿报同串 REPRODUCED
+  旧批 内容锚行 = 269；落刀前 holder.toggle(via)=1 holder.show(via)=0 → 落刀后 0/1；diff 变动行数=2（1 加 1 删）
+  旧批 突变甲  sha256 = 248d5baebb9a651f850ad58876fbfe0503ceb7f8e0122504428588602c90d57e ⇄ 腿报**全 64 位同串** REPRODUCED
+  新批 pristine  sha256(HEAD blob)   = 4f7a10b30d1801325a5fdf95c3c975de1bff29057b98bebf09ebe83145837237 ⇄ 腿报同串 REPRODUCED
+  新批 内容锚行 = 289（⇄旧批 269＝行号漂 20；腿报 :289 对回）
+  新批 突变甲  sha256 = 5f32c10272aed98afa28c228edf02f595c6b8228621bd0b69733c868b10dc7bc ⇄ 腿报 5f32c102… 前缀 MATCH
+  新批 突变乙  sha256 = cba71d39cca3dc206a8a27a1c19b2bbe10bf5273ba7c6d01c98db6324f914b60 ⇄ 腿报 cba71d39… 前缀 MATCH
+  还原链：.bak@HEAD sha256 = 816017b6… 且 cmp ⇄ 58de465a blob = SAME；sha-baseline.txt ⇄ sha-restored.txt 同串
+  能力面复认：panelHolder.toggle 体今天发 [Lock Unlock isFinished spawn Info RequestToggle]；show 体发 [Lock Unlock isFinished spawn Info RequestShow RequestRaise] ⇄ 腿报甲形红句里那串 posts 逐字同序
+  反面用例在库：cmd/wisp/panel_resident_windows_test.go:1009 func TestBallPanelGesturesReachThePanelThread（＝旧批证据件引的号今天仍对）
+  红句里引用的件：.scratch/wisp/probes/319/v/03-ac2-live-adjudication.txt = EXISTS（裸形 probes/319/v/… = ABSENT，尺⛔ 误判）
+
+## S3. 成对逐名作差（尺 R7/R7c，量的；原件＝D:\tmp\wisp\20261020\321r1\logs\，41 枚 .txt 在盘）
+四数（grep -c '^=== RUN' ⇄ '^--- PASS' ⇄ '^--- FAIL' ⇄ '^--- SKIP'，四数⛔ 混用⛔ 相减）：
+  b-family.txt              RUN=23 PASS_TOP=18 FAIL_TOP=3 SKIP=2   （腿报 23/18/3/2 同号）
+  mA-family.txt             RUN=23 PASS_TOP=16 FAIL_TOP=5 SKIP=2   （腿报 23/16/5/2 同号）
+  b-pos1.txt               RUN=2  PASS_TOP=2  FAIL_TOP=0 SKIP=0
+  m-pos1.txt               RUN=2  PASS_TOP=0  FAIL_TOP=2 SKIP=0
+  mB-pos1.txt              RUN=2  PASS_TOP=0  FAIL_TOP=2 SKIP=0
+  m-restored-rerun.txt     RUN=2  PASS_TOP=2  FAIL_TOP=0 SKIP=0
+  b-pair-assembly.txt      RUN=5  PASS_TOP=5  FAIL_TOP=0 SKIP=0
+  m-pair-assembly-restored RUN=5  PASS_TOP=5  FAIL_TOP=0 SKIP=0
+  b-255-roster.txt         RUN=1  PASS_TOP=1  FAIL_TOP=0 SKIP=0
+  m-neg-ruler.txt          RUN=1  PASS_TOP=1  FAIL_TOP=0 SKIP=0  ← 突变甲在飞时反面尺仍绿＝缺口属实
+逐名作差（comm 尺，正控先行）：
+  基线红 3 枚 = Test258BridgeMutationNoSrcKeepsOldBinding / Test258OccupiedCombinationNamesTheNewValue / Test258V1ProbeSummonEditRebindsLiveBall
+  突变红 5 枚 = 那 3 枚 + TestAC321NamedExecutorIsTheToggleRoad + TestAC321PanelHopDrivesTheHolderToggle
+  comm -13（新增红）= 恰那 2 枚判据自己；comm -23（消失红）= 空；SKIP 名册 diff = 空（分母没动）
+  正控：突变册含 TestAC321PanelHopDrivesTheHolderToggle=1、基线册=0
+台面同一性：treeB ⇄ treeM 的 cmd/wisp 138 枚 .go 逐枚 cmp = 差异 0 枚；两树 resident_windows.go sha256 = 4f7a10b3… = HEAD blob
+归因复认：wisp.exe pid 21892 此刻仍在场（tasklist 量的，60,168 K）；底片逐字 'mute=Ctrl+Alt+M occupied by another app'、'panel=Ctrl+Alt+P occupied by another app'、'live slots after the rebind = 1, want 2'
+★本腿⛔ 复跑（硬闸）⇒ 缺的一味＝一枚⛔ 321 身份的腿在同刻三无写面窗口重打"基线⇄变异"那对；异腿既有旁证只有**绿侧**（尺 R24）：
+  orch-322v1-ac4-cmdwisp-full.txt(10-16)／surface-c.log(10-17)／329 两枚(10-17)／322 两枚(10-18) 均 --- PASS: TestAC321…（×2）、FAIL 计数 0
+
+## S4. AC#2 门禁面核（尺 R8/R7f/R24，量的＋算的具名）
+两批 rc 底片（原件字节数与自报逐枚同号）：gate-build=0／gate-gofumpt=0／gate-gofmt=0／gate-vet-winline=0／gate-d22scan=23774／gate-length=2369
+  d22scan 末行逐字 'd22scan: clean - no D22 ban violations; … ban #8 cmd/=143 …'（旧批同尺＝cmd/136、internal/563；新批＝cmd/143、internal/603）
+  长度门末行逐字 '… VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree'；bands over the hat=60 roster entries=60
+  vet 正控原件 106 字节逐字 'cmd\wisp\zz321r1vetprobe_windows.go:11:38: fmt.Printf format %d has arg "not-an-int" of wrong type string'；另坏包名那发 rc=1
+射程漂移解释（本腿现量）：tracked cmd/**.go=144（cmd/wisp=139）、internal/**.go=607 ⇒ 136→143 是件真在长，⛔ 假读数
+★可比性窗口：腿跑门自陈 HEAD=4e0ac985（19:13，git merge-base --is-ancestor 对 HEAD=YES）
+  判据件／被测量件／两枚提取器宿主在 4e0ac985 ⇄ 今天 HEAD：五枚 blob 全 SAME；git diff --name-only 4e0ac985 HEAD -- cmd/wisp/ = 0 枚
+  但门禁三把的射程含整包编译闭包：cmd/wisp 直 import internal/winsec 的件 = cmd/wisp/secret_dataroot_119b_test.go（1 处）
+    ＋传递：cmd/wisp prod 引 internal/agent 5 处 → internal/agent/spill.go 引 internal/winsec 1 处
+  internal/winsec/** 在 19:13 之后被动过的笔 = 3a509e50(20:19) fa395b33(20:36) 110ed00b(20:41) ffc3c62a(21:17)（尺＝git show --name-only 元数据，⛔ 读其内容）
+  此刻仍脏的 winsec 件 mtime = winsec.go 20:31:37 / pinnedleaf_342_fallback.go 20:31:22 / pinnedleaf_342_unix.go 20:31:09 / pinnedleaf_342_windows.go 20:28:17
+⇒ 编排者 20:0x 那发 build/d22scan/vet rc=0 对本裁**只算"曾经绿"**；AC#2 判**部分成立**（五把交过＋带正控，缺"今天这一发"）
+
+## S5. 重放这件事⇄归因（尺 R16/R3/R23/R12/R14/R15/R22，量的）
+放腿那一刻（18:45，1104fea8）：
+  git log 1104fea8 --grep='^票 321 落地腿 321-r1' --oneline = 1（派单存档自己）
+  严格形 git log 1104fea8^ --format='%s' | grep -c '^票 321 落地腿 321-r1' = 0
+  1104fea8 正文逐字：'防双派四尺全过＝前缀 0 笔、cmd/wisp 60 分被动 0、工作树脏 0、352-r1 续跑被令⛔ 再碰 winsec＝cmd/wisp 编译面冻结'
+  18:45 前 60 分钟动过 cmd/wisp 的笔 = 0；票 321 最后一次入库笔 = 58de465a（10-15 20:03）
+名册三把（今天现量，5689 笔全史）：锚定 '^票 321 落地腿 321-r1' = 8（含派单存档）／非锚定 '票 321' = 12／腿码任意位 '321-r1' = 14
+  旧批两笔主题起头逐字：58de465a = [321-r1 落地腿交件（票 321，零产码）：]（"票 321"在括号内）／c673f67b = [收件 321-r1＋120-r2（编排者各复跑一]
+  %B 全文尺：58de465a '票 321' 命中 = 1（%s 亦 1）；c673f67b '票 321' 命中 = **0**（正控 '321-r1' = 1）⇒ 命中 c673f67b 的是腿码那把
+★c7f813c7（编排者代提遗产四枚）：锚定 ^票 321 落地腿 321-r1 = 0／非锚定 票 321 = 0／腿码任意位 = 1 ⇒ ⛔ 计入腿名册；按两栏记账
+  该笔四枚件入库 blob（R4 形，⛔ $( ) 那把坏尺）：build-final.sh 3394/44、final-head.txt 4255/66、tree-equal.sh 2228/34、tree-equal-v1-broken.sh 1352/22，CR 各 0、⛔ 0 字节、后缀 .sh/.txt
+★★编排者自报⇄盘上不符（本腿⛔ 圆）：
+  ① 台账 A1068 那一节**不存在**：grep -c '^## A1068' docs/reports/pending-and-issues.md = 0；git grep -l -F A1068 HEAD = 2 枚（＝我派单＋predispatch-rulers.sh 注释）
+     正控＝同尺 A1069 = 5 枚文件／A1070 = 3 枚；台账序号列 …A1066/A1067/**（无 A1068）**/A1069/A1070
+  ② 派单"今天同腿重放 8 笔 e0c8cbf6→fd091cd1"＝该区间实为 **7 笔**（笔①…⑦），第 8 枚锚定命中是 1104fea8 派单存档
+  ③ "internal/agent⇄internal/models⇄cmd/wisp 都 import internal/winsec"＝**只对两枚**：internal/models 直 import winsec 处数 = 0
+     （尺＝逐件 import 块抽取；models 只 import buildinfo/not/observe/statemachine，这三者引 winsec 各 0；包内 7 枚 'internal/winsec' 命中**全是注释/引文**）
+     agent = spill.go 1 处（prod）、cmd/wisp = secret_dataroot_119b_test.go 1 处（test）＋经 agent 传递 ⇒ 禁跑三包的闸⛔ 放松，但那句归因⛔ 成立
+防再重放：predispatch-rulers.sh 的③（判据件维度，脚本自陈"不传路径＝⛔ 不许据此放腿"）入库时刻＝f1415309 20:35 ＝**晚于** 18:45 那趟放腿 ⇒ 单靠"建议补尺"防不住下一颗脑袋
+
+## S6. 票 321 框终量⇄写面（尺 R5/C1，量的）
+对票面 HEAD blob：未勾 '^- [ ]' = 2 ／已勾 '^- [x]' = 0 ／正控 '^- [' 全形 = 5（2 枚 AC 框＋3 条 Progress bullet）
+Status 行 = '3:**Status:** 待派（小票；面=`cmd/wisp` 的 319 宿主装配＋其测试件）'；票名⛔ -done；blob 10437 字节/25 行/CR 0 ⇄ 工作树同字节（numstat 空）
+⇒ 本腿一枚没翻；追加额度已被 64d14a70⑤ 占（HEAD blob 第 25 行＝'[2026-10-20 19:2x +08] 落地腿 `321-r1` **第二趟（复验趟）**交件'）⇒ 本腿话落本 probes 件＋裁决表，⛔ 补第二条 bullet
