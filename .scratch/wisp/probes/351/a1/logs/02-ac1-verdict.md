@@ -66,8 +66,14 @@ cmd/wisp/config_reload_223_test.go:544-545  if !Contains(shown,"risk.permission_
 3. 盘上既有**已渲染**卡片正文逐字（含 key 名）＝`.scratch/wisp/probes/221/v1/logs/ac5-full.txt` L142：
    `[确认 L2 config.reload] config.toml 里手改的这一条会放宽 [fs]：[fs.allowed_dirs]。…`
    ＝"这一跳真的会把 keys 印出来"的实测形状。★⚠ 诚实边界：盘上**没有** `[risk]：[risk.permission_mode]` 的已渲染件
-   （尺＝`git grep -F '会放宽 [risk]' HEAD`＝0 命中），所以第 3 条只证 `fs` 那支的渲染形状；
+   （尺＝`git grep -F -n '会放宽 [risk]' HEAD -- ':!.scratch/wisp/probes/351/a1'`＝**0 命中**；★那把不带排除的尺
+   （`git grep -F '会放宽 [risk]' HEAD`）现在＝1 命中＝**吃进我自己这份件的这一句描述**＝`A1045`⇄`A1033` 那族
+   "尺把自己的归档件吃进去"在本腿身上复发一发，具名记我＝**写档之后该尺必排除本腿写面**），
+   所以第 3 条只证 `fs` 那支的渲染形状；
    `risk` 那支靠第 1＋2 条（同一条码路＋同一次调用的 keys 读数）。⛔ 把这条写满＝写"我⛔ 量到的"。
+   ★同族另一枚读数＝尺 `git grep -F -n '会放宽 [fs]' HEAD`＝3 命中里有 **1 枚是另一句产码**
+   （`cmd/wisp/approval_always.go:92`＝D45 长期规则那句、同词⛔ 同句）⇒ 凡"含某串"的尺⛔ 自动等于同一句，
+   本件所有 needle 一律带文件＋行号定位。
 4. `internal/config/manager_test.go:170-171` 已把"钩子收到的 keys ＝ `fs.allowed_dirs`"钉住（⛔ 本腿跑、引用既有件）。
 
 ## 四、〔CI 环境〕那支＝**只算放大器、⛔ 独立成因**；机主常驻 `wisp.exe` 抢键那形＝**不在射程**
