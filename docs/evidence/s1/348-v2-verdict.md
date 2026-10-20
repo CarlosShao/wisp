@@ -33,3 +33,7 @@
 ## 一句话终态
 
 票 348 那一支＝**POSIX 半边关掉并量到**（前裁在册）；**Windows 半边＝`342-r2` 把"缺世界"从形容词升成带阳性对照的分栏读数（本腿两树各 3 发复现＝做到的一味），但"修前分子>0"照旧取⛔ 到**＝**`AC#2` 部分成立、⛔ 结案**；★本腿把"缺"钉成因＝**seam 站错了跳＋祖先那一支经 H1..H4 实测为结构性进⛔ 去**（⇒ 第二道批准签⛔ 该批），同次测量确定性量到的名字那一跳＝**签新立一票**（⛔ 属本票族）。⇒ `AC#0`/`AC#1`/`AC#3`/`AC#4`/`AC#5`/`AC#6` 成立、`AC#2` **部分成立**＝**本票⛔ 结案**。
+
+## ★本腿更正自笔（追加、⛔ 抹原句；尺＝`probes/342/v3/logs/10|11|14` 的 `^--- FAIL` 逐行现读）
+
+`AC#5` 那格里"＝`treeLandMinus` 同两枚在场"这句**按逐名读不准确**，本腿提交后现跑对回抓到：落地 r2 的两枚名＝`{…NeverTruncatesAForeignFile342r1, TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1}` ⇄ minus 那发（本腿只跑过**一发**）＝`{…NeverTruncatesAForeignFile342r1, TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1}`＝**共用第一枚、第二枚名不同**。⇒ 成立的只到**族级**＝三发红⛔ 例外全姓 `342r1`、两棵树红名册里⛔ 出现任何 `342r2` 名＝**"这 3 枚红与它字节无关"本腿复现到族、⛔ 复现到逐名同号**＝本票 `AC#5` 的判定⛔ 改（落地侧新增红仍＝0 枚）；另⛔ 把"`342-r2` 报的 3 枚"当本腿复现过的数＝本腿落地两发＝1⇄2 枚红、⛔ 到过 3（竞态⛔ 要求逐字相同这条同样约束本腿，⛔ 拿它轮的数当自己量过）。同把尺顺手坐实基线侧那枚红＝`{TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2}` ×2 发逐字同＝有牙红⛔ 存量。

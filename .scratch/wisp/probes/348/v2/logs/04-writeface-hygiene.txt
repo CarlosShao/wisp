@@ -111,3 +111,16 @@ Commit 10 therefore records the roster as a rule, not as a number, and appends i
 tracked files so probes/342/v3=48 and probes/348/v2=13 (the numbers the landed verdicts and the two
 ticket tails assert) stay true. Chasing the number with more commits would repeat the mistake.
 This is the leg's own instance of the 声称⇄实际 family; named here instead of glossed.
+
+########## commit 11: the drift this leg knowingly creates, measured ##########
+Appending the correction into the two verdicts invalidates the line/byte figures that this leg's
+TWO ticket-tail bullets quote (the tails are append-only and each already carries its one allowed
+bullet, so they cannot be corrected in place). Before/after, measured with wc -l / wc -c:
+  342-v3-verdict.md  was 45 lines / 16497 bytes (tail quotes 45/16428 - already drifted by the
+     commit-9 hygiene fold, now again) -> now 54 lines / 18907 bytes
+  348-v2-verdict.md  was 35 lines / 10891 bytes (tail quotes 35/10891) -> now 39 lines / 12113 bytes
+  cap check (<=130 lines each): 342=54 348=39
+What does NOT move: the two file counts the verdicts and both tails assert, because commit 11
+appends into existing tracked files only => probes/342/v3=48 probes/348/v2=13.
+Frames untouched by this leg throughout: 342 [x]=5/[ ]=2, 348 [x]=6/[ ]=1.
+No Go byte anywhere in this leg: git diff 677d4837..HEAD -- 'internal/**' '*.go' => 0 paths.
