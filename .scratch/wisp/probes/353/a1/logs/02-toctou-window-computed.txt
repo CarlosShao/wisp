@@ -1,0 +1,19 @@
+票 353 普查腿 353-a1 计算件＝乙的删除前同一性复验窗口〔算的〕（⛔ 跑测试猜；本腿零枚 go test）
+
+读码锚（全部＝`git cat-file blob HEAD:<path>` 于锚 c16ff47e；本机 GOROOT＝D:\work\base\go、go1.27.1、x/sys v0.48.0 by go.mod）：
+- openPinnedLeaf＝pinnedleaf_342_windows.go:171-199（`p.root.OpenFile(base, flags, perm)`→`f.Stat()`:177→`p.root.Lstat(base)`:185→link 面:190→SameFile 面:194→return f:198）
+- unlinkPinnedLeaf＝同文件 :212-217（`_ = p.root.Remove(base)`；此刻叶子句柄已 `f.Close()`＝winsec.go:176/:181 在 unlink 前先关）
+- 路由两枚删除支＝winsec.go:175-184（seal 失败支／write 失败支；两支都是 close→unlink）
+- stdlib：`Root.Remove`→rootRemove（root_openat.go:210-218）→doInRoot（:340 起，单段名＝零中间 open）→removeat＝root_windows.go:352-353→`windows.Deleteat`（Go 1.27 真身在 internal/syscall/windows；＝2 枚 NtOpenFile〔第一枚 ACCESS_DENIED 才走第二枚〕＋SetFileInformationByHandle(FileDispositionInfoEx)＋CloseHandle，逐枚现读 zsyscall/types 于 GOROOT 与 x/sys@v0.48.0）
+- `Root.Lstat`→rootStat（root_windows.go:211-244）＝openat(`O_FILE_FLAG_OPEN_REPARSE_POINT`)＝NtCreateFile＋statHandle（GetFileType＋GetFileInformationByHandleEx＝2 次查询）＋CloseHandle
+
+【算的】复验→绑定 的窗口（乙＝在 Remove 之前插一发 Lstat＋SameFile，不匹配则不删）：
+  窗口起点＝Lstat 那发 NtCreateFile 返回所见 entry 之后；终点＝Deleteat 的第一枚 NtOpenFile 按名解析并绑定那一刻。
+  中间逐枚＝GetFileType、GetFileInformationByHandleEx、CloseHandle、SameFile〔用户态〕、rootRemove/incref/splitPathInRoot〔用户态〕、NtOpenFile。
+  ＝**跨内核面 4 枚＋用户态 2 段**〔算的〕；同发 ACCESS_DENIED 重试形再 +2（第二枚 NtOpenFile＋CloseHandle）。
+  量级＝单次内核往返本机典型亚微秒到几微秒 ⇒ 窗口 ≈**个位到十几微秒**〔算的，非量：本腿⛔ 跑任何计时＝读码数出来的跨数，不冒充实测〕。
+对照现码敞口（今天＝复验在 open 内、删除在 seal/write 之后）：
+  起点＝openPinnedLeaf 的 SameFile 应答（:194），终点＝Deleteat 绑定；中间＝SetNamedSecurityInfo＋verifyPrivate 读回（GetNamedSecurityInfo，winsec_windows.go:303/:308→:35-38 缝）＋f.Write＋f.Close＋路由两段＝
+  **跨内核面 ≥8 枚且含两枚按名的安全描述符重操作**〔算的〕⇒ 现窗＝百微秒到毫秒级＋攻击者节奏天然先于删除（342-v3 logs/03：外部进程 remove＋rename 两发 `<nil>`，随后产码 `Root.Remove=<nil>`）。
+  ⇒ 乙把敞口从"整个 seal＋write 段"缩到"删除前一跳"＝**短 1–2 个数量级〔算的〕、⛔ 归零**；平台无"按身份删"单发原语（Deleteat 的绑定就是按名），这与票 348 `AC#1` 甲语"名与对象同一性由内核在同一发里回答"在 Windows 拿不到＝同一枚事实的两面。
+  ⚠ 诚实边角：logs/03 那形里攻击者**不赢这扇微秒窗也已成伤**（plant 先于复验）⇒ 乙对"plant 已落地"的世界确定性拦住（复验必不匹配⇒不删⇒damage 0），对"复验之后、绑定之前才顶入"的世界⛔ 拦不住＝窗口的残余射程就只剩这一小段〔算的〕。
