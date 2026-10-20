@@ -1,0 +1,17 @@
+== 0) 正控（尺须灵）==
+  HANDOVER.md U00A7=304 (须>0)
+== 1) 本腿 5 笔逐枚：commit 正文枚数 ⇄ 入库 blob CR ⇄ 名==
+  0593dd23  body_U00A7=0  01-my-rulers.sh[CR=0 B=13117] 
+  ed2bfc62  body_U00A7=0  01-my-rulers.txt[CR=0 B=7469] 
+  9cff42da  body_U00A7=0  02-quote-provenance.sh[CR=0 B=6046] 
+  9e340ec8  body_U00A7=0  02-quote-provenance.txt[CR=0 B=5601] 
+  a0bed7c0  body_U00A7=1  352-v1-verdict.md[CR=0 B=14082] 
+== 2) 交付物本体（判语件 blob）枚数＝
+  verdict blob U00A7=0 CR=0 行数=76 字节=14082
+== 3) 名册尺（锚定本腿自己那枚前缀；含本笔之后会漂＝逐枚 %s 起头才算）==
+  锚定枚数=5
+  awk index==1 枚数=5
+== 4) 票 352 框终量（本腿一枚没翻）⇄票面尺==
+  未勾=4 已勾=0 总框=4 行数=29 Status行=22
+== 5) 写面自证（本腿全部笔里 .go 枚数须＝0）==
+0
