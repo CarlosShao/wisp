@@ -1,0 +1,22 @@
+派单＝票 353 落地腿 353-r1（★写腿·乙形＝机主 2026-10-20 19:2x 拍板）｜编排者＝新任 harness｜发出 19:3x +08
+★主题起头⛔ 换形：每笔逐字「**票 353 落地腿 353-r1**」开头。
+★射程来源（起手先现读三处，⛔ 抄本派单）：票面＝`.scratch/wisp/issues/353-pinned-name-swap-after-seal-deletes-an-object-the-caller-never-named.md`；三形代价表＝`docs/evidence/s1/353-a1-census.md`（乙形第 2 节＋必答②③）；仪器形状草案＝`.scratch/wisp/probes/353/a1/logs/04-ac2-instrument-shape-draft.txt`。
+
+## 机主已批的那味（⛔ 扩）
+乙＝**保留按名删＋删除前做一次"名字⇄句柄对象"同一性复验**。拍板同时已认下这两味残余，⛔ 再回来问：① 复验拒了之后**仍留着调用者那枚名字**＝攻击态可观测行为变化；② 窗内那一支（复验之后、绑定之前才顶入）⛔ 拦得住。
+⇒ **⛔ 甲**（⛔ 改删除语义、⛔ 新写句柄面原语、⛔ 重述票 348 已批落地的删除形）；**⛔ 丙**；⛔ 新导出名、⛔ 新接缝（＝`342-v3` 已否那枚）、⛔ 动 `privateFile` 返回值（＝C26 契约、另批）、⛔ 碰 `pinnedleaf_342_windows.go:11-20`⇄`:158-170` 两处归因注释（〔丙〕＝另批）、⛔ 动票 342/348 任何已批落地语义。
+
+## 要做（照票面 AC#2／AC#3／AC#4）
+- **AC#2 仪器落地（写腿）**：按 `logs/04` 草案，⛔ 新缝／⛔ 新导出名／⛔ 改函数对外形状：既有件 `ancestorwindow_342r2_windows_test.go:283-304` 已用本包**已声明的** `applyDescriptor`（`winsec_windows.go:35-38`）把真 seal 先跑完再腾空＋顶名 ⇒ 照用。成对两列＝`entered`（落地 `3/3` ⇄ 基线 `0/3`＋逐字红句具名报、⛔ 冒充绿）⇄ `damage`（乙成⇒这枚分子＝0）。liveness 钥匙＝同发 `realSealRanFirst=true`＋`entered=3/3`（⛔ 借 `truncated`／`deleted` 任何一枚）。敏感度去牙两发落点⛔ 同（摘删除那步 ⇒ damage 归 0 而 `entered` 照 3；`openPinnedLeaf` 换按名开 ⇒ `entered` 归 0）。★**判据必须逐字写进用例与票面：复验之后、绑定之前那一支顶入测不到**（要钩在 `Deleteat` 的 `NtOpenFile` 之内＝平台内部）＝⛔ 让仪器在它⛔ 覆盖的世界上报绿（先例形＝票 322 `AC#1`"报窗口、⛔ 圆窗口"）。
+- **乙的落地本体**＝census 第 2 节那几枚：`openPinnedLeaf`（`:171-199`）今天把 `pinned`/`now` 两枚身份读数算完就丢 ⇒ 带出来（内部函数形状，`leafPin` 按值传 `:50-53` 装⛔ 下额外状态＝你自己定形）＋`unlinkPinnedLeaf` 删除前做同一性复验＋`winsec.go:177/:182` 两处传参。★⛔ 改删除原语（`Root.Remove(base)` 照旧）、⛔ 动旗标行 `winsec.go:96/:106`、⛔ 动 `fs.ErrExist` 那一支、⛔ 动 `resolveString`/`ResolvePath`/`RemoveUnlinked`、⛔ 动 `:207-211` 那句自陈、⛔ 动 `sealError` 幂等判定。
+- ★两处必改的旧文字（census 点名）＝① `pinnedleaf_342_windows.go:165-167` 那句 "the removal … cannot delete a foreign name either" ⇒ 乙之后改成"复验拦得住先到的顶入、拦不住窗内的"；② `ancestorwindow_342r2_windows_test.go:371-374` 那枚既有钉（红句 `AC#5's half-made file survived the refusal`）在"先顶入"世界必红⇒判据文字要同时重述，`:381-388` 的 RESIDUAL 分支改写。⛔ 改两枚用例的**错误文字**以外的东西可让 `leafrace_342r2_windows_test.go:84-85`⇄`ancestorworld_342_348_windows_test.go:86` 的归因名册照绿（它们按 `why` 子串作差）＝落地后逐名验。
+- **AC#3 颜色与门禁**＝`./internal/winsec/` 两平台成对＋逐名红册＋四道门 rc；★⛔ 跑 `./cmd/wisp` 整包（321-r1 写面）；摆动名册照公共块（winsec 两枚 `!windows` 仪器＝本机/CI windows 档⛔ 编译＝既⛔ 绿也⛔ 弃权；`…116` 族 4 枚）。
+- **AC#4 纪律格**＋票 353 尾**一条**只追加 bullet（★若已被占则⛔ 补第二条、落 probes，先例＝票 352 续跑这么做对了）。★⛔ 翻框（AC#0 已由我翻，AC#2/3/4 归非实现者裁）。
+
+## 跨腿耦合（放腿前现量 19:2x）
+★落刀次序（照上波 `352-r1`⇄`351-r2` 同形定式）＝① 先在新仪器上把**乙未落时的现形**量完并入库（成对基线侧＝修前红、逐字红句）；② 乙本体那几枚改动**最后落**＝每次"编辑→`gofumpt -l` 只验自己那枚→即时 commit"，停留⛔ 超一次编译所需、⛔ 攒一批；③ 那两处旧文字重述随本体同笔或其后一笔。⇒ 理由＝`cmd/wisp` 的导入图含 `internal/winsec`，你改 winsec 产码会进 `321-r1` 的 `cmd/wisp` 编译面（它在跑装配判据的成对色）。
+在飞写腿三包互斥＝`internal/winsec`（你）⇄`cmd/wisp` 测试面（321-r1）⇄`internal/models`（109-r1 重放）；读/裁腿＝115-v1⇄230-v1⇄352-v1（⛔ 跑任何 `go test`＝你落笔会造半保存态）。你⛔ 动那三包＋`internal/risk/**`＋三枚冻结件＋golden/阈值＋`go.mod`/`go.sum`/`ci.yml`＋`frontend/**`/`design/**`。`winsec.go` 今天 blob＝`f3c1b68e`（352 那枚双 `%w` 已落、恒住）＝你若要传参改到它，⛔ 碰 `wrapPath` 那一行。
+
+## 铁律（全量＝先 Read `.scratch/wisp/probes/orch/20261020/352r1-dispatch.txt` 尾公共块）
+⛔ push、⛔ `add -A`/`.`/目录形/从共享 index 反推、⛔ amend/reset/rebase/stash/checkout ./clean；`add`⇄`commit` 两处逐枚显式 pathspec；中文正文先落文件再 `git commit -F D:\tmp\...`（Windows 形）；提交后 `git log -1`＋`git show --name-only` 对回；每落一枚就 commit。台面四味（`GOTMPDIR` 反斜杠短形先建；`cygpath -wp` 只仓外取 DLL；判据只认到达数；blob 落仓外、副本⛔ 叫 `.go`）。★变异/去牙只打仓外导出树物理字节、内容锚⛔ 行号、落刀前后各验命中数、当场还原报哈希。★取退码＝重定向后 `echo RC=$?` 紧跟裸命令。★CR/码位一律对**入库 blob** 量（`git cat-file blob`），且字节数用 `tr -cd '\r' | wc -c`、⛔ `grep -c $'\r'`（＝本机报行计数的钝尺，352-r1 与编排者今天各栽一次、具名在 `probes/352/r1`＋台账 `A1066`③/`A1067`）。证据件⛔ `.out`、⛔ 0 字节；正文件 ≤160 行（⛔ 适用 `*_test.go`）。临时件落 `D:\tmp\wisp\20261020\353r1\`、⛔ 盘符根、只建不删。凡报数带尺名＋射程＋量/算；完成通知一律当未验证。
+交件 send_message 报 `lead`＝逐枚提交号＋名册三把尺同号＋写面自证（逐枚 name-only＋`.go` 名册）＋成对四数（两平台，逐名作差＝新增红 0）＋去牙两发（落点不同＋还原哈希）＋liveness 分子逐字＋那两处旧文字重述的改前⇄改后逐字＋★"乙窗内测不到"那味写进判据的位置（file:line）＋门禁各把 rc＋票 353 框终量（须仍 AC#0 一勾、其余未勾＝你没翻）＋票尾 numstat。若途中发现"非改删除语义/非加新缝不可"＝**立刻停手上报**（⛔ 自行扩射程）。

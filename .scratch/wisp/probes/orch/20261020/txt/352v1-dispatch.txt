@@ -1,0 +1,24 @@
+派单＝票 352 终裁腿 352-v1（★非实现者·只读·裁决者≠实现者）｜编排者＝新任 harness｜发出 2026-10-20 19:3x +08
+★主题起头⛔ 换形：每笔逐字「**票 352 终裁腿 352-v1**」开头。
+
+## 你是谁／裁什么
+票 **352**＝`wrapPath` 的 errno 那半 `%v`→`%w`（机主已批＝`A1056`④⇄`A1058`，来源＝终裁腿 `342-v2` 必答(v)）。票面＝`.scratch/wisp/issues/352-wrappath-errno-half-stringified-so-fs-ernotexist-cannot-punch-through-private-route.md`（现量 4 格全未勾＝`AC#0`..`AC#3`）。
+被裁对象＝实现腿 `352-r1` 的 **11 笔**（原 9 笔 `0fb399c3`→`8a10a7e3`＋续跑 2 笔 `e74762b5`⑩`a651c086`⑪）。★它的交件自报一律当未验证：每把你都另起尺复跑、⛔ 抄它的数；凡引用数带尺名＋射程目录＋"量的还是算的"。
+
+## ★四处它自抓的"入库正文枚数⇄盘上现量"不符（具名给你，你要独立判"是否歪了判据内容"）
+① 笔① `0fb399c3` 正文"3 枚文件"⇄现量 5；② 笔③ `aacde632` 正文"8 枚"⇄现量 9（漏 `probe-copy-of-stage.txt`）；③ 笔⑤ `06aa2abf` 正文"1 报告＋27 散件"⇄现量 41；④ 笔⑦报告件 `readings-ac3*.md:45` 写"票尾 numstat＝3 增 0 删"⇄票尾真值 **5 增 0 删**。
+编排者已逐处复跑＝四处的文件枚数都坐实（详见台账 `A1067`，落 `docs/reports/pending-and-issues.md`）。⇒ 你判：这些**枚数叙述**错在哪个层面、**四格判据内容有没有被歪**（它自陈"皆枚数叙述、四格判据内容经复核未被歪"＝⛔ 采信它的自陈，你自己读正文）。⛔ 改写历史、⛔ 让它 amend。
+另两处它判"非不符⛔ 冒报"＝你要复核：笔⑥"8 行 CRLF"⇄利尺 `tr -cd '\r'|wc -c`＝8 字节（钝尺 `grep -c $'\r'` 本机报行计数＝假 1948/3470）；笔⑨ `ANCHORED_COUNT=8`＝其时末笔自数、现 11＝随 HEAD 漂。**★CR/字节一律对入库 blob 用 `tr -cd` 量，⛔ 对工作树用 `grep -c $'\r'`**（编排者今天栽过＝`A1066`③）。
+
+## 逐格判什么（现读票面字面判据，⛔ 抄我这封）
+- `AC#0` 改前钉死＝两平台"父目录不存在"那跳的两个真值（`fs.ErrNotExist`＝false ⇄ `ErrNotSealable`＝true）逐字红/绿句在库；它报＝POSIX 6＋Win 经 wrapPath 4。
+- `AC#1` 落地那一行＝`fmt.Errorf("%w: %s: %w", ErrNotSealable, path, err)`；★判据＝改后**两分类并存**（`fs.ErrNotExist` 可穿 **且** `ErrNotSealable` 照旧 true；只把不可穿换成另一种不可穿＝没修）。你★自己现读 `git cat-file blob HEAD:internal/winsec/winsec.go` 的 `wrapPath` 函数体逐字＋验 `git show -U0 ecffb93b` 净变动＝可执行 2 行、函数签名⛔ 变、`sealError` ⛔ 碰。它报第二发逐名点名里有一味**⛔ 射程**的东西（Win 落地 false/true＝R1/R2/R10/R13，其中 R1⇄R2 ⛔ 经 `wrapPath`）＝你判这条自陈是不是把"没修到的地方"如实报了、还是报歪。
+- `AC#2` 消费者面＝五包（`internal/secret`⇄`config`⇄`memory`⇄`agent`⇄`panel`）两档 12 格逐名新增红 0；★具名连带 `private_fail_test.go:37/50/61/72/75` 五枚 `ErrNotSealable` 判定须仍绿、读 `ErrUnresolvedPath` 的 `openleaf_322`⇄`placement_symlink_113` ⛔ 受影响。凭据件＝`probes/352/r1/logs/perpkg-diff.txt`⇄`ac2-*`＋具名复验 `logs/08-named-evidence.txt`。★你这趟⛔ 跑 `go test`（两枚写腿在 `internal/winsec`〔353-r1 若放〕与 `cmd/wisp`⇄`internal/models` 落笔＝跑了必读到半保存态）⇒ 你的复算只能走**既有底片＋blob＋CI 日志**；判语里凡"没能独立复跑实测"的格，★明写缺哪一味＋该由谁补，⛔ 圆判。
+- `AC#3` 纪律格＝名册 11 笔两把锚同号（你自己跑：锚定行首⇄内存 `index==1`）＋越界 0＋★`GO_FILES_TOUCHED` 应＝**1**（只 `winsec.go`、且在 `ecffb93b` 那一枚）＋禁区逐枚命中 0（含 `pinnedleaf_342_windows.go`）＋票尾 numstat 纯追加＋★票面现量第 9 行那味留账"wrapPath 调用点…落地腿逐枚现数并点名"＝续跑笔⑩补了 `readings-ticket9-callsites.md`（定义 1＋调用点 24 枚逐枚 file:line、起手锚⇄落地同数）＝你验那 24 枚点名成不成立（`git grep -c` 现算对撞）。
+- ★票面"现量"那几行它有没有改写历史（票面 29 行、`Status:` 仍在 `:22` 逐字未动＝你自己对 `bf509bb8`）。
+
+## 写面与铁律
+写面＝★只两枚：`docs/evidence/s1/352-v1-verdict.md`＋`.scratch/wisp/probes/352/v1/**`（＋票 352 尾**至多一条**只追加 bullet；★那条已被实现腿 `1c787282` 占掉"尾只许追加一条"的额度⇒若你判需要留话，落你的 probes 件、⛔ 补第二条 bullet、⛔ 动 `Status:`）。
+⛔ 动任何 `.go` 字节、⛔ 跑任何 `go test`/`go build`、⛔ 翻任何框（翻勾归编排者凭你判语）、⛔ push、⛔ 改票名/`Status:`/`-done`。
+全量铁律＝先 Read `.scratch/wisp/probes/orch/20261020/352r1-dispatch.txt` 尾公共块（两处显式 pathspec、`-F` Windows 形、每落一枚就 commit、提交后对回、⛔ amend/reset/stash/`add -A`、证据件⛔ `.out`、⛔ 0 字节、正文件 ≤160 行、临时件落 `D:\tmp\wisp\20261020\352v1\` 只建不删、凡报数带尺名）。
+交件 send_message 报 `lead`＝逐枚提交号＋名册两把尺同号＋判语件绝对路径＋字节/行＋★四格逐格判语（成立／部分成立＋缺哪一味／不成立，各带独立尺读数）＋四处枚数不符的独立判语（含"判据内容有没有被歪"那句）＋写面自证（逐枚 `git show --name-only`＝`.go` 0 枚）＋票 352 框终量（你一枚没翻）＋票面 29 行与 `Status:` 未动的对回尺。
