@@ -1,0 +1,76 @@
+# 230-v1 · 01 字节⇄blob⇄名册（逐字输出，全部对入库对象量）
+# 尺＝V1-a／V1-A／V1-B／V1-B2；原始全量件＝D:\tmp\wisp\20261020\230v1\{roster-anchored.txt,v1-a-bytes.out.txt,v1-b-stripped.out.txt,v1-j-writeface.out.txt}
+
+## 1. 名册尺（锚定行首，⛔ 非锚定子串）——被裁的 8 笔真在盘上
+$ git log --grep='^票 230 落地腿 230-r1' --format='%h %ad %s' --date=format:'%H:%M'
+ca0ad6bd 18:22 票 230 落地腿 230-r1 笔⑧＝★本腿自抓：笔⑦那条 bullet 的时间戳是我新造的独形＝改回池内主流形（纯更正一行）
+c1349524 18:17 票 230 落地腿 230-r1 笔⑦＝票尾那一条只追加 bullet（★纯追加尺咬过：删除行 0）
+dcaf3995 18:08 票 230 落地腿 230-r1 笔⑥＝续跑自己现跑的定向色落件（03-colour.txt·前腿那份报的同一枚死指针）
+19d2f92c 18:06 票 230 落地腿 230-r1 笔⑤＝续跑自己现跑的门禁四把⇄可执行字节变动＝0 那把尺落件（02-gates.txt）
+1e497544 17:56 票 230 落地腿 230-r1 笔④＝断腿遗产入库（probes/230/r1/01-rulers.txt·第二枚）
+495ba902 17:55 票 230 落地腿 230-r1 笔③＝断腿遗产入库（probes/230/r1/00-report.md·整目录未跟踪那枚）
+c73df208 16:51 票 230 落地腿 230-r1 笔②＝AC#2 同文件第二处同一枚谎话（Queue.alias 字段注释·只改注释）
+c489eacc 16:48 票 230 落地腿 230-r1 笔①＝AC#2 那枚假注释改成实话（lookupForRefusalLocked 函数文档·只改注释）
+COUNT=8（锚⇄非锚同值＝8⇄8 ⇒ 名册尺灵，无别腿笔混入）
+起手锚＝c16ff47e 2026-10-20 16:29 票 352 落地腿 352-r1 笔④；c16ff47e ⇄ HEAD 均为 `merge-base --is-ancestor` rc=0。
+
+## 2. 可执行字节变动（V1-A，⛔ 抄腿的那把尺）
+### 笔① c489eacc
+hunk＝@@ -262,3 +262,11 @@ func (q *Queue) lookupForRefusalLocked(corr string) *qitem {
+加 11 枚逐条判：11/11 首非空两字节＝`//`（COMMENT）；非注释变动行＝0
+删 3 枚逐条判：3/3＝COMMENT；非注释变动行＝0
+被删原文（逐字，= 今天被裁的那枚谎话）：
+  // stays an unknown correlation id. This function is the only reader of q.alias
+  // and Queue.reject is its only caller, so the alias table cannot reach the
+  // allow side from here. Caller holds q.mu.
+ADDED_total=11 ADDED_noncomment=0 REMOVED_total=3 REMOVED_noncomment=0
+### 笔② c73df208
+hunk＝@@ -87,2 +87,5 @@ type Queue struct {
+ADDED_total=5 ADDED_noncomment=0 REMOVED_total=2 REMOVED_noncomment=0
+### 两笔累计
+变动行＝14⇄7＝**21 枚**；非注释变动行＝**0**；⛔ `go test`／⛔ build 参与。
+⇒ 与腿报"笔① 14 枚⇄笔② 7 枚、累计 21／0"**同值**（本腿独立复现，⛔ 抄）。
+
+## 3. 剥注释后正文逐字同（V1-B，一律 `git cat-file blob <rev>:<path>`）
+core.autocrlf = true ⇒ 工作树随时 CRLF，本腿全程⛔ 对工作树量。
+rawlines：c16ff47e=621 ⇄ c73df208=632 ⇄ ca0ad6bd=632（注释面 +11 行，⛔ 是正文）
+剥整行注释后：
+  c16ff47e strippedlines=421 sha256=fadaf8d1dd30abb511569184c48bb63c5b04f2ceecaf2eaa29a8d8e6dba5089f
+  c73df208 strippedlines=421 sha256=fadaf8d1dd30abb511569184c48bb63c5b04f2ceecaf2eaa29a8d8e6dba5089f
+  ca0ad6bd strippedlines=421 sha256=fadaf8d1dd30abb511569184c48bb63c5b04f2ceecaf2eaa29a8d8e6dba5089f
+  HEAD     strippedlines=421 sha256=fadaf8d1dd30abb511569184c48bb63c5b04f2ceecaf2eaa29a8d8e6dba5089f
+diff（c16ff47e ⇄ c73df208 剥注释两侧）＝DIFF_RC=0 DIFF_BYTES=0
+更严一把（再剥空行）＝382⇄382⇄382，sha256 同串 c8645d14d223ad6f3721d8873e1dd910116a7eb17e71f944ddf0939f66c97edd
+⇒ 腿报"421⇄421、sha256 同串 fadaf8d1…5089f"**全串复现**。
+
+## 4. blob 尺（V1-B2）＝续跑对 .go 零字节
+git rev-parse <rev>:internal/agent/approval/queue.go
+  c16ff47e = 66fec7ae375344d7bc741270b42c4ec5050cf41f
+  c489eacc^= 66fec7ae375344d7bc741270b42c4ec5050cf41f   （＝起手锚⇄笔①父同字节 ⇒ 中间别腿⛔ 碰过这枚文件）
+  c489eacc = 8751a40fad22201b788006a7ccd0fa1da93398f7
+  c73df208 = dcef3fa8c46c6182d53bb2d3204e6469351b1a80
+  495ba902/1e497544/19d2f92c/dcaf3995/c1349524/ca0ad6bd/HEAD 全 = dcef3fa8c46c6182d53bb2d3204e6469351b1a80
+git hash-object <仓外副本 cat-file 落盘> = dcef3fa8c46c6182d53bb2d3204e6469351b1a80 ＝ `rev-parse HEAD:` 同值
+⇒ 腿报"工作树⇄HEAD 同 blob dcef3fa8…＝续跑对 .go 零字节"**成立且可复现**（本腿另加一把：八枚逐笔全列，只有 ①② 变）。
+
+## 5. 逐枚写面名册（V1-J，`git show --format='' --name-only`）
+--- c489eacc  files=1 gopackage_files=1
+      internal/agent/approval/queue.go
+--- c73df208  files=1 gopackage_files=1
+      internal/agent/approval/queue.go
+--- 495ba902  files=1 gopackage_files=0
+      .scratch/wisp/probes/230/r1/00-report.md
+--- 1e497544  files=1 gopackage_files=0
+      .scratch/wisp/probes/230/r1/01-rulers.txt
+--- 19d2f92c  files=1 gopackage_files=0
+      .scratch/wisp/probes/230/r1/02-gates.txt
+--- dcaf3995  files=1 gopackage_files=0
+      .scratch/wisp/probes/230/r1/03-colour.txt
+--- c1349524  files=1 gopackage_files=0
+      .scratch/wisp/issues/230-four-cells-left-unfinished-inside-closed-tickets.md
+--- ca0ad6bd  files=1 gopackage_files=0
+      .scratch/wisp/issues/230-four-cells-left-unfinished-inside-closed-tickets.md
+⇒ 越界 0 枚；`.go` 只 ①② 两笔各一枚；`*.out` 0 枚（`.gitignore` 第 8 行 `*.out` 在场）。
+票尾 numstat＝笔⑦ **3/0**（纯追加）、笔⑧ **1/1**（只重写自己刚追加的那条）；
+`git diff --numstat c1349524^ HEAD -- <票230>` = 3 0；逐行作差 ADDED=3 DELETED=0；票名前 5 行 diff 空。
+票 230 现量＝OPEN 5／DONE 0／43 行／12436 字节；起手侧（c489eacc^）同一把尺＝5／0（一枚没翻）。
