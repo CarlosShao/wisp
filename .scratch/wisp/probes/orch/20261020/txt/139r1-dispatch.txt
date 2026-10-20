@@ -1,0 +1,16 @@
+派单＝票 139 落地腿 139-r1（★写腿·`internal/agent/**` 压缩痕两格）｜编排者＝新任 harness｜发出 2026-10-20 20:3x +08
+★主题起头⛔ 换形：每笔逐字「**票 139 落地腿 139-r1**」开头。
+票面＝`.scratch/wisp/issues/139-context-compression-leaves-no-trace-zero-log-calls-in-compress-go-zero-readers-of-res-compression.md`（未勾 2 格＝`AC#2` 最小落盘面＋`AC#3` 牙；来源＝owner 批准的 `Q-43` 后半＝GAP-18 Go 侧那半，面板那半⛔ 做）。
+
+## 要做（照票面两格；起手先现读票面逐字判据、⛔ 抄我这封）
+- **AC#2**＝"事后答得出"＝压缩发生时留一条可查的痕（日志/记录面，⛔ 任何 UI）。落点＝`internal/agent/compress.go`（今天全文零条日志调用）⇄`loop.go` 的 `Result` 出线。★先现读票面给这格的全部约束（含它要"答得出什么数"）。
+- **AC#3**（牙）＝一枚用例钉住"压缩成功 ⇒ 痕必须存在"；★判据照公共块＝修前必须红（红名与断言原文先进票面或 probes 件）＋变异（把留痕那行摘掉⇒用例必须红；两发落点⛔ 同、落刀前后各验锚命中数、当场还原报 pristine 哈希）；⛔ 为变绿放宽断言/删用例/`t.Skip`。
+- ★票面 `Packages` 那句逐字警告照做＝⛔ 动 `internal/observe/**`（"此刻可能有别的程在跑"＝今天没有、但本格落盘面只用 `internal/agent/**` 那半；observe 地界⛔ 碰）；冻结面照旧禁改（D32 阈值/`thresholds.go`/golden/`internal/risk/**`/三枚冻结件）。
+
+## 跨腿耦合（放腿前现量 20:2x）
+在飞＝写 `353-r1`（`internal/winsec` 乙形：`openPinnedLeaf`/`unlinkPinnedLeaf` 内部形状＋`winsec.go` 传参＋仪器重述）＋写 `109-r1` v2（`internal/models`）＋读 `115-v1`（15 笔在落、正往票 230/115 面追加＝它交件前我⛔ 碰那两枚票面）。⇒ ①你⛔ 动那两包任何字节；②★你跑色限 `./internal/agent/...` 定向＋仓外导出树成对（两棵唯一差异＝你的字节），⛔ 整包 `./cmd/wisp`（真窗区整进程死亡＋`321-r1` 刚落过的测试面刚收线）、⛔ `./internal/winsec/`⇄`./internal/models/`（在飞写腿）、⛔ `./...`；③若你的色撞上点名 `internal/winsec/**`⇄`internal/models/**` 的红＝具名上报、⛔ 动它字节、⛔ 据此判自己失败；④机主常驻 `wisp.exe` 热键族＝弃权名册。
+- ★★今天新定式（`go.mod` 0 字节事故＝`A1069`③）：**任何输出重定向⛔ 落仓根冻结件（`go.mod`/`go.sum`/`ci.yml`/`.gitignore`）**；⛔ `go mod edit`/`go mod tidy` 在共享工作树里跑（要模块信息＝`git cat-file blob HEAD:go.mod` 读；导出树里也⛔ 动 go.mod）；你每次交件自证的"tracked 脏"尺＝⛔ 只报计数、**逐枚列名＋mtime**（＝那起事故第一回就是这么漏的）。
+
+## 铁律（全量＝先 Read `.scratch/wisp/probes/orch/20261020/352r1-dispatch.txt` 尾公共块）
+⛔ push（机主按住）、⛔ 翻框（AC#2/AC#3 归非实现者裁）、⛔ 改票名/`Status:`；票 139 尾一条只追加 bullet＋Progress log 一行（★票面无该节则照自带 `did=` 一条形的 11 枚先例、⛔ 新造节）。`git add`⇄`git commit` 两处逐枚显式 pathspec；⛔ `add -A`/`.`/目录形/从共享 index 反推；⛔ amend/reset/rebase/stash/checkout ./clean；中文正文先 Write 成文件再 `git commit -F D:\tmp\...`（★Windows 形）；提交后 `git log -1`＋`git show --name-only` 对回；每落一枚就 commit、⛔ 攒着。台面四味（`GOTMPDIR`/`TMPDIR` 反斜杠短形先建；`cygpath -wp` 只仓外取 DLL；判据只认到达数；blob 落仓外、副本⛔ 叫 `.go`）。门禁四把跑前 `unset GOTMPDIR TMPDIR TEMP TMP`（＝`d22scan` 的 rc=0 今天由我在 20:0x 复证过、⛔ 拿我的数当你量过）。★CR/码位一律对**入库 blob** 量（`git cat-file blob`＋`tr -cd '\r' | wc -c`），⛔ 对工作树 `grep -c $'\r'`＝钝尺（今天编排者与两枚腿各栽过＝`A1066`③/`A1067`②/`A1069`③）。取退码＝重定向到文件后 `echo RC=$?` 紧跟裸命令；⛔ 把 `go test` 输出直接重定向进跟踪文件。证据件⛔ `.out`、⛔ 0 字节；正文件 ≤160 行（⛔ 适用 `*_test.go`）；⛔ 注释里指名不存在的用例/件当凭据。临时件只建不删、一律 `D:\tmp\wisp\20261020\139r1\`（⛔ 盘符根、⛔ 仓内）。凡报数带尺名＋射程＋量/算；报 0 命中前先跑正控；完成通知一律当未验证。
+交件 send_message 报 `lead`＝逐枚提交号＋名册三把尺（锚定行首⇄非锚定子串⇄内存 `index==1`）同号＋写面自证（逐枚 `git show --name-only`：`.go` 只许 `internal/agent/**`、越界 0）＋修前红句逐字＋变异两发（落点、命中数前后、还原哈希）＋成对四数（`RUN/PASS_TOP/FAIL_TOP/SKIP`，落地⇄基线逐名作差＝新增红 0）＋门禁各把 `rc=`＋tracked 脏逐枚列名尺＋票 139 框终量（须 0 勾／2 未勾＝你一枚没翻）＋票尾 numstat（纯追加）。若发现"痕要落 `internal/observe` 才答得出"那形＝停手上报（⛔ 自己扩地界）。
