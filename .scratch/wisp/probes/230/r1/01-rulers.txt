@@ -1,0 +1,111 @@
+== 0. 改后注释原文（逐字，取自 git cat-file blob HEAD:internal/agent/approval/queue.go）==
+-- 0a. Queue.alias 字段文档（HEAD :86-:94，声明在 :94）--
+    86		// alias is the reject-direction index: every extra name a live card answers
+    87		// to (qitem.names) plus the item that owns it. Of the readers, only
+    88		// lookupForRefusalLocked resolves a reply into an item; indexLocked (on the
+    89		// way in) and unindexLocked (on the way out) touch the map too, but each
+    90		// only moves the one item handed to it and never answers a name. The allow
+    91		// side goes through lookupForAllowLocked,
+    92		// which cannot see this field, so a grant stays spendable only on the exact
+    93		// key the queue issued and the index can only ever make a REFUSAL land.
+    94		alias   map[string]map[*qitem]bool
+-- 0b. lookupForRefusalLocked 函数文档（HEAD :262-:276，函数体从 :276 起）--
+   262	//
+   263	// An alias naming more than one live item is NOT guessed: with two cards on
+   264	// screen that a reply cannot tell apart, the reply means neither of them and
+   265	// stays an unknown correlation id. The reachability claim, written to match
+   266	// this file instead of to flatter itself: this function is the only reader of
+   267	// q.alias that turns a reply into an item, and it is NOT the only reader in
+   268	// the file - the index-maintenance pair indexLocked (run by push) and
+   269	// unindexLocked (run by dropLocked) reads the same map too, each touching only
+   270	// the buckets of the one item handed to it, so neither resolves a reply and
+   271	// neither can settle anything. On the caller side the old claim holds as
+   272	// written: Queue.reject is the only caller of this function. Together with
+   273	// lookupForAllowLocked, whose body reads q.byID and nothing else, that is why
+   274	// a borrowed name cannot reach the allow side from here; the direction itself
+   275	// is pinned by TestAnAliasCanNeverBuyAnAllow. Caller holds q.mu.
+   276	func (q *Queue) lookupForRefusalLocked(corr string) *qitem {
+
+== 1. 内容锚（⛔ 绝对行号）==
+-- 起手侧（对 c16ff47ec465749f1977efa94a2b024cc8931e27 跑）--
+c16ff47ec465749f1977efa94a2b024cc8931e27:internal/agent/approval/queue.go:262:// stays an unknown correlation id. This function is the only reader of q.alias
+c16ff47ec465749f1977efa94a2b024cc8931e27:internal/agent/approval/queue.go:87:	// to (qitem.names) plus the item that owns it. Its only reader is
+c16ff47ec465749f1977efa94a2b024cc8931e27:internal/agent/approval/queue.go:262:// stays an unknown correlation id. This function is the only reader of q.alias
+-- 交件侧（旧锚须归零＝落刀后验一次，公共块 20261018 定式）--
+OLD_ANCHOR_HITS_RC=1 (1 = 0 hits)
+OLD_ANCHOR2_HITS_RC=1 (1 = 0 hits)
+-- 新锚命中（两枚）--
+HEAD:internal/agent/approval/queue.go:87:	// to (qitem.names) plus the item that owns it. Of the readers, only
+HEAD:internal/agent/approval/queue.go:267:// q.alias that turns a reply into an item, and it is NOT the only reader in
+
+== 2. q.alias 读者名册 ==
+-- 起手锚 c16ff47ec465749f1977efa94a2b024cc8931e27 上的全部命中 --
+c16ff47ec465749f1977efa94a2b024cc8931e27:internal/agent/approval/queue.go:212:		set := q.alias[n]
+c16ff47ec465749f1977efa94a2b024cc8931e27:internal/agent/approval/queue.go:215:			q.alias[n] = set
+c16ff47ec465749f1977efa94a2b024cc8931e27:internal/agent/approval/queue.go:225:		set := q.alias[n]
+c16ff47ec465749f1977efa94a2b024cc8931e27:internal/agent/approval/queue.go:231:			delete(q.alias, n)
+c16ff47ec465749f1977efa94a2b024cc8931e27:internal/agent/approval/queue.go:262:// stays an unknown correlation id. This function is the only reader of q.alias
+c16ff47ec465749f1977efa94a2b024cc8931e27:internal/agent/approval/queue.go:272:	if set := q.alias[corr]; len(set) == 1 {
+-- 交件 HEAD 上的全部命中 --
+HEAD:internal/agent/approval/queue.go:215:		set := q.alias[n]
+HEAD:internal/agent/approval/queue.go:218:			q.alias[n] = set
+HEAD:internal/agent/approval/queue.go:228:		set := q.alias[n]
+HEAD:internal/agent/approval/queue.go:234:			delete(q.alias, n)
+HEAD:internal/agent/approval/queue.go:267:// q.alias that turns a reply into an item, and it is NOT the only reader in
+HEAD:internal/agent/approval/queue.go:283:	if set := q.alias[corr]; len(set) == 1 {
+-- 全仓复尺（子串 .alias[ 在三棵产码树下）--
+HEAD:internal/agent/approval/queue.go:215:		set := q.alias[n]
+HEAD:internal/agent/approval/queue.go:218:			q.alias[n] = set
+HEAD:internal/agent/approval/queue.go:228:		set := q.alias[n]
+HEAD:internal/agent/approval/queue.go:283:	if set := q.alias[corr]; len(set) == 1 {
+-- 定义⇄调用点（HEAD 行号）--
+HEAD:internal/agent/approval/queue.go:183:	q.indexLocked(it)
+HEAD:internal/agent/approval/queue.go:213:func (q *Queue) indexLocked(it *qitem) {
+HEAD:internal/agent/approval/queue.go:226:func (q *Queue) unindexLocked(it *qitem) {
+HEAD:internal/agent/approval/queue.go:313:	q.unindexLocked(it)
+-- 调用侧那半句为真的尺（唯一非注释调用点）--
+HEAD:internal/agent/approval/queue.go:88:	// lookupForRefusalLocked resolves a reply into an item; indexLocked (on the
+HEAD:internal/agent/approval/queue.go:256:// lookupForRefusalLocked finds the live pending item a refusal names. The queue
+HEAD:internal/agent/approval/queue.go:276:func (q *Queue) lookupForRefusalLocked(corr string) *qitem {
+HEAD:internal/agent/approval/queue.go:495:// The lookup is the refusal-direction one (see lookupForRefusalLocked): a reply
+HEAD:internal/agent/approval/queue.go:504:	it := q.lookupForRefusalLocked(corr)
+-- internal/ 里 queue.go 之外的命中（应当只有注释）--
+-- allow 侧只读 byID 的尺（HEAD :249-:254）--
+   249	func (q *Queue) lookupForAllowLocked(corr string) *qitem {
+   250		if corr == "" {
+   251			return nil
+   252		}
+   253		return q.byID[corr]
+   254	}
+
+== 3. 判据尺（可执行字节变动＝0）==
+commit=c489eacc changed_lines=14 noncomment_changed_lines=0
+commit=c73df208 changed_lines=7 noncomment_changed_lines=0
+-- 累计（起手锚→HEAD）--
+accum_changed=21 accum_noncomment=0
+-- 剥整行注释后的正文逐字相同 --
+before_lines=421 after_lines=421
+EXEC_BYTE_DIFF_RC=0 diff_bytes=0
+fadaf8d1dd30abb511569184c48bb63c5b04f2ceecaf2eaa29a8d8e6dba5089f */d/tmp/wisp/20261020/230r1/w/before-nc.txt
+fadaf8d1dd30abb511569184c48bb63c5b04f2ceecaf2eaa29a8d8e6dba5089f */d/tmp/wisp/20261020/230r1/w/after-nc.txt
+-- numstat 逐枚 --
+11	3	internal/agent/approval/queue.go
+5	2	internal/agent/approval/queue.go
+-- name-only 笔① --
+internal/agent/approval/queue.go
+-- name-only 笔② --
+internal/agent/approval/queue.go
+
+== 4. 票 230 框尺（本腿一枚没翻）==
+HEAD: unchecked=5 checked=0 total=5
+-- 起手侧同一把尺（对 c16ff47ec465749f1977efa94a2b024cc8931e27 的 blob 跑）--
+start: unchecked=5 checked=0 total=5
+
+== 5. 被新注释点名的用例真在盘上 ==
+75:func TestAnAliasCanNeverBuyAnAllow(t *testing.T) {
+149:func TestEveryRefusalRouteOnAnUnknownEntryStillRefuses(t *testing.T) {
+(读数见 03-colour.txt)
+
+== 6. 名册尺（锚定行首＝票 230＋角色＋腿码）==
+c73df208 16:51:46 票 230 落地腿 230-r1 笔②＝AC#2 同文件第二处同一枚谎话（Queue.alias 字段注释·只改注释）
+c489eacc 16:48:25 票 230 落地腿 230-r1 笔①＝AC#2 那枚假注释改成实话（lookupForRefusalLocked 函数文档·只改注释）
