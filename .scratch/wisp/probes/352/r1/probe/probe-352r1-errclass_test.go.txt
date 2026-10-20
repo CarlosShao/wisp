@@ -1,0 +1,81 @@
+// 352-r1 仓外探针件（★只存在于 D:\tmp 的拷贝树，⛔ 入库、⛔ 任何跟踪字节）。
+// 目的＝把票 352 AC#0/AC#1 那一跳的**分类**在两平台、两棵树上逐枚 sentinel 现打：
+//
+//	errors.Is(err, fs.ErrNotExist) ⇄ errors.Is(err, ErrNotSealable) ⇄ ErrUnresolvedPath ⇄ ErrExist
+//
+// 外加 *os.PathError 的 Op 与 errno 逐字。★⛔ 任何断言＝只 Logf：这是一把尺，不是一枚钉，
+// 它同时打进基线树与落地树，落地专属的字节不在它射程里。
+// 尺名 R1..R13 逐枚固定＝两侧成对作差靠名字对，不靠行号。
+package winsec
+
+import (
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"syscall"
+	"testing"
+)
+
+func p352r1Classify(t *testing.T, tag string, err error) {
+	t.Helper()
+	if err == nil {
+		t.Logf("%s: err=nil", tag)
+		return
+	}
+	var pe *os.PathError
+	op, eno := "<no *os.PathError>", "<n/a>"
+	if errors.As(err, &pe) {
+		op = pe.Op
+		if e, ok := pe.Err.(syscall.Errno); ok {
+			eno = e.Error()
+		} else {
+			eno = fmt.Sprintf("%T:%v", pe.Err, pe.Err)
+		}
+	}
+	t.Logf("%s: isErrNotExist=%v isNotSealable=%v isErrExist=%v isUnresolved=%v isReparse=%v PathError{Op:%s errno:%s} verbatim=%q",
+		tag,
+		errors.Is(err, fs.ErrNotExist),
+		errors.Is(err, ErrNotSealable),
+		errors.Is(err, fs.ErrExist),
+		errors.Is(err, ErrUnresolvedPath),
+		errors.Is(err, ErrIsReparsePoint),
+		op, eno, err.Error())
+}
+
+func TestP352R1ErrClassify(t *testing.T) {
+	dir := SealableTempDirForTest124(t)
+	// ── 点名那一跳：父目录不存在 ──
+	missing := filepath.Join(dir, "no-such-dir", "leaf.bin")
+	p352r1Classify(t, "R1 parent-missing PrivateFile", PrivateFile(missing, []byte("x"), 0o600))
+	p352r1Classify(t, "R2 parent-missing PrivateFileExclusive", PrivateFileExclusive(missing, []byte("x")))
+	// ── 被改那一行的本体：wrapPath 直打一枚可穿 sentinel ──
+	p352r1Classify(t, "R3 wrapPath direct fs.ErrNotExist", wrapPath("the/spelling", fs.ErrNotExist))
+	// ── 两平台都经 wrapPath 的 Seal 跳（AC#1 的 Windows 半边靠它）──
+	p352r1Classify(t, "R4 SealFile missing-leaf in existing dir", SealFile(filepath.Join(dir, "no-such-leaf.bin")))
+	p352r1Classify(t, "R5 SealFile parent-missing", SealFile(missing))
+	p352r1Classify(t, "R6 SealDir parent-missing", SealDir(filepath.Join(dir, "no-such-dir", "sub")))
+	// ── 控制跳：两棵树上须逐字同（⛔ 本票射程）──
+	existing := filepath.Join(dir, "exists.bin")
+	if err := os.WriteFile(existing, []byte("old"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	p352r1Classify(t, "R7 PrivateFile overwrite existing", PrivateFile(existing, []byte("new"), 0o600))
+	p352r1Classify(t, "R8 exclusive-on-existing", PrivateFileExclusive(existing, []byte("new")))
+	p352r1Classify(t, "R9 empty spelling", PrivateFile("", []byte("x"), 0o600))
+	p352r1Classify(t, "R10 relative spelling", PrivateFile("relative/leaf.bin", []byte("x"), 0o600))
+	p352r1Classify(t, "R11 SealFile existing ok", SealFile(existing))
+	link := filepath.Join(dir, "link.bin")
+	if err := os.Symlink(filepath.Join(dir, "target.bin"), link); err != nil {
+		t.Logf("R12/R13 skipped: symlink unavailable: %v", err)
+	} else {
+		p352r1Classify(t, "R12 leaf-is-symlink", PrivateFile(link, []byte("x"), 0o600))
+	}
+	// ── 注入 seal 失败那一形＝private_fail_test 的五枚判定同形：两分类里只许 ErrNotSealable 为真，
+	//    两棵树都须如此＝证明落地⛔ 把不可穿换成另一种不可穿、也⛔ 造出第三种分类 ──
+	injected := errors.New("injected: descriptor could not be applied")
+	withInjectedSealFailure(t, injected)
+	p352r1Classify(t, "R13 injected seal failure PrivateFileExclusive",
+		PrivateFileExclusive(filepath.Join(dir, "inject.bin"), []byte("x")))
+}
