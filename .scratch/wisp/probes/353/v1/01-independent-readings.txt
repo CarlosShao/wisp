@@ -1,0 +1,80 @@
+# 票 353 终裁腿 `353-v1` 独立读数（逐字；尺册＝同目录 `00-ruler-register.md`；★每把都是本腿自己现跑、⛔ 抄实现腿⇄编排者的数）
+
+## S1 锚⇄blob⇄名册（尺 R01/R21b，量的）
+
+- 起手锚＝`git log -1`＝`51aa922e`（22:31）；基线锚＝`a59f5630`（20:04，票 115 腿那笔）＝`353-r1` 读数件所指的那枚。
+- 三枚承重 blob：`a59f5630:winsec.go=f3c1b68e…`／`:pinnedleaf_342_windows.go=db077e30…`／`:winsec_windows.go=63714a83…`＝与 census/`342-v3`/`353-r1` 三处各写的同一串逐枚对上（量的）；`HEAD:winsec_windows.go=63714a83…`＝**全程未动**。
+- HEAD 侧：`pinnedleaf_342_windows.go=70ed3b61…`／`winsec.go=757b16a8…`／`nametopup_353_windows_test.go=5a537db6…`／`ancestorwindow_342r2_windows_test.go=e9a5139d…`。
+- 逐笔 pinnedleaf blob（★这条与编排者的读数不符，见 S8）＝`a59f5630 db077e30` ⇄ `3a509e50 db077e30` ⇄ **`fa395b33 b749abb9`** ⇄ `110ed00b b749abb9` ⇄ **`ffc3c62a 70ed3b61`** ⇄ `HEAD 70ed3b61`。
+- 名册三把（射程逐字写明）＝① 锚定行首打在 `git log --all --format='%s'` 导出＝**6**；② 非锚定子串打同一导出＝**6**；③ 单次 `%H%x09%s` 导出＋内存 `index($2,P)==1`＝**6**。逐枚＝`3a509e50`/`fa395b33`/`110ed00b`/`ffc3c62a`/`ad2704d0`/`0b75e40b`。正控＝同尺 `^票 353 普查腿 353-a1`=6、`^票 353 终裁腿 353-v1`=0（＝本腿此刻还没落笔那发所量）。
+- `git diff --name-only a59f5630 HEAD -- '*.go'`＝11 枚：`internal/models` 5 枚（别腿）＋`internal/winsec` 6 枚（`ancestorwindow_342r2`/`nametopup_353`/`pinnedleaf_342_{fallback,unix,windows}`/`winsec.go`）＝`353-r1` 六笔的 `.go` 全落这 6 枚内、越界 0。
+
+## S2 乙本体形状＝机主那一形（尺 R02/R03/R15，量的；内容锚对入库 blob）
+
+- `openPinnedLeaf` HEAD `:185` 返回三枚（`*os.File, fs.FileInfo, error`）、`:212`＝`return f, pinned, nil`；BASE `:171` 返回两枚、`:199` 附近 `pinned` 算完即丢＝census 第 2 节那句"带出来"照做。
+- `unlinkPinnedLeaf` HEAD `:243-255`＝`if p.root == nil || pinned == nil {return}` → `now, err := p.root.Lstat(base)` → `if err != nil || !os.SameFile(pinned, now) {return}` → `_ = p.root.Remove(base)`。
+- ★删除原语逐字照旧＝`_ = p.root.Remove(base)` 在 BASE⇄HEAD 各命中 **1**（HEAD 现位 `:254`）。
+- ⛔ 改旗标⇄`fs.ErrExist`：`os.O_WRONLY|os.O_CREATE|os.O_TRUNC`⇄`os.O_EXCL` 两行 BASE⇄HEAD 同位同串（`:96`/`:106`）；`winsec.go` 里 `fs.ErrExist` 两侧各 1 枚且行集作差空。
+- ⛔ 动 `privateFile` 返回值：签名⇄全部 `return` 语句行集合两侧作差**空**。
+- ⛔ 新接缝／⛔ 新导出名：包级导出名 `func|var|type|const` 后跟大写字母者，BASE 并集 **8** ⇄ HEAD 并集 **8**、`comm -13`＝**新增 0**；包级 `var` 行两侧逐字同；`pinnedleaf` 的 `func` 名集作差＝新增 0／消失 0。
+- ⛔ 碰 `:11-20`＝该 10 行 `diff -u0` 空。`:158-170`＝`:163-175` 被改写（census 点名的重述①）；原句 `cannot delete a foreign name either` 在 HEAD 命中 **0**；同段"truncation 那味留着 ⇄ winsec.go 的自陈说着而不写窗已关"两枚子句 HEAD `:173-175` 仍逐字在场。
+- ★`:207-211` 自陈段本腿的独立尺＝段取（`// The error is still discarded` → `the removal itself is now safe.`）＋sha256：`a59f5630`／`fa395b33`／`ffc3c62a`／`HEAD` **四枚同串 `6c2448515378…`、各 5 行**；正控＝同件 `identity` 一词命中 BASE **2** ⇄ HEAD **5**（尺看得见这次改动、只是看不见那 5 行被改）。`now verifies identity first` 那串在四枚 blob 命中全 **0**＝中途写过的那句话没跨笔留存。
+- 笔④＝纯注释＝剥行首注释与空行后的可执行行集合，`fa395b33` ⇄ `HEAD` 在 `pinnedleaf_342_windows.go`⇄`pinnedleaf_342_unix.go` 两枚上都**逐字同**；正控＝同尺 `a59f5630` ⇄ `fa395b33`＝**22 行**差。
+- unix⇄fallback＝只同步签名（`return f, nil, nil`、`unlinkPinnedLeaf(p, base, pinned fs.FileInfo)` 仍那发 `unix.Unlinkat(...,0)`／fallback 仍空体），注释逐字写着"taken here and NOT used"。
+
+## S3 成对⇄牙（尺 R10/R11/R13/R23，量的；底片＝`D:\tmp\wisp\20261020\353r1\logs\`）
+
+- 定向成对：`final-dir-B`＝`RUN=3 PASS=1 FAIL=2 SKIP=0` ⇄ `final-dir-L`＝`RUN=3 PASS=3 FAIL=0 SKIP=0`；旧批 `base353-s1-treeB`⇄`s2-treeL`＝各 `3/2/1/0`。
+- 分子行逐字（两侧同位 `nametopup_353_windows_test.go:147`）＝`353r1 AC#2 over 3 shots: entered=3/3, worlds the platform froze=0, unnamed objects left with no name (DAMAGE)=3, refusals that left the caller's name standing=0`（B）⇄ 同串 `(DAMAGE)=0 … standing=3`（L）。
+- liveness 逐字＝两侧各 **6** 枚 `realSealRanFirst=true windowEntered=true plantErr=<none>`（3 发×2 行）＋`:110` 那行逐字写着 `leg=seal refusal on this route (case one injects it through applyDescriptor …)`；红句（B）＝`:151` `353r1 AC#2 RED: 3 of 3 entered worlds left the swapped-in object with NO name …`；绿行（L）＝`:157 AC#2 GREEN SCOPE …`；正控两侧＝`:183 … name=absent (GetFileAttributesEx … The system cannot find the file specified.) | dir entries []`。
+- 既有钉同发（`ancestorwindow_342r2_windows_test.go:400`）＝B `entered=3 … no name=3, name kept=0` ⇄ L `entered=3 … no name=0, name kept=3`；B 侧还打出 `:408 AC#1-one RED …`、L 侧 `:417 AC#1-one GUARD HELD …`。
+- 台面对齐（本腿自量，sha256 前 12）：HEAD blob `pinnedleaf=66a22239f5b8`、`winsec=23c2f1e4a369`、`nametopup=1f619b4cf6eb`、`ancestorwindow=0a905d05fb32`；BASE blob `pinnedleaf=b9dc39aea156`、`winsec=2f2887ab283d`。树侧：`finalB` 四枚＝`b9dc39ae/2f2887ab/1f619b4c/0a905d05` ⇄ `finalL`＝`66a22239/23c2f1e4/1f619b4c/0a905d05`＝★两侧同一对测试字节、产码只差乙那一枚。
+- 去牙三发（终量批）：三棵突变树 `pinnedleaf` sha256 前 16＝`34462e8fbd121ba1`／`97ed89b1103a5a2b`／`a8246ee6fe36796b`＝互异且异 `finalL`；每棵相对 `finalL` 只有**一行换一行**（逐字见 R23 输出）；三把新锚在各自树 1、另两棵⇄`finalL` 0；`finalL`⇄`finalB` 交件后仍分别 == HEAD blob ⇄ 基线 blob。
+  - 发 1 ⇒ `RUN=3 PASS=2 FAIL=1`、红名＝`TestAC2WindowsRemovalStillRunsWhenNobodyTopsUpTheName353r1`（正控转红）、分子仍 `entered=3/3 DAMAGE=0`、正控行 `name=present (size 0 body [])`。
+  - 发 2 ⇒ `entered=0/3, worlds the platform froze=3`、红名＝主用例、逐字 `AC#2 RED: world 1/3 did not ENTER …`＋`ancestorwindow …:360 NOT AN ENTERED WORLD`。
+  - 发 3 ⇒ 回到 `DAMAGE=3`、红名＝主用例＋`TestAC1…ReportsDamageAndRefusalAsTwoNumbers342r2`。
+- ⚠ 具名一处：终量三发的 `RESTORE_SHA256=` 逐字只在**旧批**（`logs/mut-{1,2,3}.raw.txt`＝笔⑤之前那轮，串＝`3e5f539bd16336f7…`）；交件批只留盘上 stdout。本腿改用更硬那条（发后 `finalL` 字节 == HEAD blob）替它坐实。
+
+## S4 `AC#3` 色（尺 R12/R25，量的；现势色归 `gw-1`）
+
+- 整包两侧 `RUN=121`；四数（腿 tsv 与本腿 `grep -c` 双取同号）＝B `66/4`⇄`64/6`、L `69/1`⇄`67/3`。
+- 逐名（本腿自取名集）：`B∪` 6 枚 ⇄ `L∪` 4 枚；`comm -13` 新增红＝**0**；`comm -23`＝2 枚（`…NameTopUp…353r1`⇄`…NameSwappedAfterTheSealVerdict…342r2`＝本票仪器⇄被重述的钉）。★跨七批并集版（`final-full`×2＋`mx`×2＋`fullpair`＋`pername`＋`colpair`）＝新增红仍 **0**、`B−L` 仍那 2 枚。
+- 逐名全表（B1 B2 L1 L2）＝`…LeafRecheckAnswersOnTheBareSiblingForm342r2 green RED green RED`／`…NeverTruncatesAForeignFile342r1 RED RED RED RED`／`…LeafIdentityReCheckRefusesAForeignName… green RED green RED`／`…NeverDeletesAForeignFile342r1 RED RED green green`（★本腿另取六批发片＝该枚 B 侧 4 红 2 绿、L 侧 2 红 4 绿＝真摆动，⛔ 单批定因）。
+- container＝两侧各 1 发 `RC=0 RUN=74 PASS_TOP=46 FAIL_TOP=0 SKIP=0 SHAPE=OK`；本腿复量尾行＝`ok github.com/CarlosShao/wisp/internal/winsec 5.523s`／`4.527s`，`^FAIL` 行 0 ⇄ `^ok` 行 1。
+- ⛔ 跑 `./cmd/wisp`＝底片里包名 `CarlosShao/wisp/cmd/wisp` 命中 **0**（正控 winsec 命中 **56**＝尺灵）。
+- 门禁底片（本腿⛔ 重跑，只验在位⇄自洽）＝`gates.txt` 头部 `HEAD_FULL_SHA=0b75e40b…`；`GOFUMPT_RC=0 LISTED=0`（0 字节＝正常形）；`D22_RC=0`＋末行 `d22scan: clean`＋`ban #8 internal/=607`（23773 B）；`LEN_RC=0`＋`VERDICT GREEN … roster equals the tree`（1462 B）；`VET_NATIVE_RC=0`/`LINUX`/`DARWIN` 各输出 0 B。★`git log 0b75e40b..HEAD -- internal/winsec`＝**0 笔**＝这批门至今对 winsec 字节仍合现势；⛔ 对"今天整仓 HEAD"的现势色＝归 `gw-1`（`3e370700` 主题逐字＝`gw-1 量色腿 gw-1 笔①＝味① 五把门对今天 HEAD 重跑的读数件入库`）。
+
+## S5 两味落点（尺 R18/R25，量的；行号＝本腿对 HEAD blob 现取）
+
+- 仪器件 `nametopup_353_windows_test.go`：`:29-39` 注释块（逐字 `NOT refused and NOT measurable here … a hook INSIDE the platform's NtOpenFile … this package has no seam there and must not gain one … Same shape as ticket 322 AC#1's "report the window, do not paper over it": a blade that covers one world may not report green for another`）；`:156-163` 运行期绿行（只在 `entered==3 && damage==0` 那支）；`:113-121` 把"⛔ 进得去"写成红；`:166-195` 正控用例（逐字 `a damage numerator that can only ever read 0 is not evidence` ⇄ `would be a blade that bites nothing, not a guard`）。
+- 产码件 `pinnedleaf_342_windows.go`：`:172`（窗）⇄`:228-231`（味①）⇄`:232-236`（味②＋`must not gain one`＋`ticket 322 AC#1's shape`）。
+- 既有钉 `ancestorwindow_342r2_windows_test.go`：`:411-413`（红支里写着"⛔ 覆盖窗内那一支"）⇄`:417-422`（`GUARD HELD … and it is the attacker's object standing there. NOT covered and NOT claimed …`）。
+- ★票面 `AC#2` 那一格＝第 15 行，六个 token（`残余`/`绑定之前`/`NtOpenFile`/`测不到`/`仍留着调用者那枚名字`/`可观测行为变化`）打在**该行**命中全 **0**；同一把尺打在**第 14 行（`AC#1` 那格）**命中各 **1**（尺灵）＝那句"故 `AC#2` 判据必须逐字承认测不到那支"写在 `AC#1`、⛔ 抄进 `AC#2` bullet。
+- ★先例形本腿现读＝票 322 票面 `:30` 那格逐字只有"成对读数＋修后 0 且 liveness 非零"、"报窗口"三字在票 322 面命中 **0**；那味真身在 `openleaf_322_other_test.go:8`（`Nothing here claims the window is closed;`）⇄`:207`。⇒ 先例＝写进判码⇄台账、⛔ 写进票面 bullet。
+- 另具名＝票面 `AC#2` bullet 现文本"成对＝落地 `damage>0` ⇄ 基线 `entered=0`"起草早于 `AC#1` 裁形〔算的〕，与〔乙〕"落地 `damage=0`"按字面冲突；腿走的是"落地绿 ⇄ 修前那枚字节红 ⇄ `entered=0` 由去牙发 2 复现"＝两半各有凭据，⚠ 该由编排者更正那句过期文字。
+
+## S6 "读数件第 5 节 C 段"那味（尺 R16/R17/R19/R25，量的；⛔ 借任何一族绿）
+
+- 交替批 `leaf-symlink` 逐字（`alt-summary.txt`＋本腿从 `alt-*.raw.txt` 各重取同号）：基线 6 发 `flipErrs`＝`31366/21815/9130/20929/29885/30048`（区间 **9,130..31,366**）；落地 4 发＝`16/6/14/8`（区间 **6..16**）＝三个数量级、**无交叠**；`provedReparse` 基线 `2/32/98/54/4/3` ⇄ 落地 `102/152/153/129`。
+- ★本腿补的第二批（非交替 `swing-*`，同一对树同一时段各 4 发）＝基线 `27935/24401/23835/28160` ⇄ 落地 `10/18/14/13`＝同换档 ⇒ ⛔ 依赖单一批次。
+- ⚠ 底片形状＝本腿量到一处实现腿⛔ 报过的东西：`sh/35` 的输出名只按 `alt-$round-$TREE.raw.txt` 取，而每轮打的是 `finalB finalL finalL finalB`＝**同轮同树两发写同名原件⇒后发覆盖先发**。⇒ 12 发里只有 6 发的原始 stdout 幸存（幸存＝每轮第 3、4 发：`21815/20929/30048` ⇄ 落地 `none/6/8`），另 6 发的原件不可复原（含基线那 **`31366`/`9130`/`29885`** 三行⇄落地那 `16`/`14` 两行）＝这 5 行的逐字凭据只在 `alt-summary.txt`（每发 append、**12 行全在**，其中 2 行＝`none`）。本腿双取＝summary 12 行逐字＋幸存 raw 6 枚与之同号 ⇒ ★两侧区间（基线 9,130..31,366 ⇄ 落地 6..16）仍成立、⛔ 被"原件缺失"动摇，但下一位复量时⛔ 只用 `alt-*.raw.txt` 那六枚当全部凭据。幸存的空底片 `alt-1-finalL.raw.txt` 逐字全文＝一行 slog + `--- FAIL: TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 (2.97s)` + `ancestorworld_342_348_windows_test.go:386: settle the world back to the real state: remove …\data\sub: The directory is not empty.` + `FAIL`（＝那族仪器自己的 fixture 收尾失败那一形、⛔ 分子）。⇒ 腿在交件件里写"（那发⛔ 打印分子）"＝⛔ 藏读数、处置正确；尺形更正建议（⛔ 本腿动它字节）＝输出名带轮内序号。
+- `truncated` 非零全表（尺 R32＝只打 `*.raw.txt`、按文件名定侧；改正尺，量的）＝非零分子行 **20** 枚＝**基线侧 9 枚**（`final-full-B-1` junction=1／`fullpair-s1-treeB` symlink-dir=**5**／`mx-treeB2-1` symlink-dir=1／`recheck-treeB2-2`=2／`recheck-treeB2-3`=1／`recheck2-treeB2-2` junction=1＋symlink-dir=1／`recheck2-treeB2-3` junction=1／`pername-s1-treeB2` symlink-dir=1）⇄**落地侧 11 枚**（`swing-finalL-4`=2／`final-full-L-2` symlink-dir=3＋leaf-symlink=1／`fullpair-s2-treeL`=2／`mx-treeL-2`=1／`pername-s2-treeL` 三枚／`recheck-treeL-2`＝1／`recheck-treeL-3`=1／`recheck2-treeL-2`=2）。⇒ ★"上台阶"那道章**站不住**＝撤回得对（量的）。⚠ 本腿自抓一枚钝尺＝更早那把 R19 报"24 枚/基线侧 10 枚"＝把 `recheck-summary.txt`（腿自己的汇总件、⛔ raw 原件）里 4 枚重复行算了进去；改正＝只打 `*.raw.txt`＝**20/9/11**，主件第 5 件与本件都按改正数写（原件 `trunc-rows.txt` 留在盘上）。
+- `deleted`＝正控先行：`deleted=` 串命中 **93** 次 ⇄ `deleted=[1-9]` 命中 **0**＝那枚 0 是验过的读数； census 第 1 节"只可能更小"兑现。
+- 本票判据⛔ 碰这两族＝本腿量过：仪器件里 `deleted=` 命中 **0**、`truncated` 只在注释第 26 行（`… read 0 in this world, and borrowing either would be borrowing the other ticket's green`）；四枚计数器（`entered/damage/frozen/refused`）各自自增、绿支只读 `entered`⇄`damage`＝⛔ 合并⛔ 相减；`AC#3` 的尺只有名集作差。⇒ `AC#2`/`AC#3` 的绿未被污染。
+- 语义现读（尺 R24）＝`flipErrs`⇄`provedReparse` 是 `ancestorunlink_348_windows_test.go` 那族 racer 自己的台振计数器（`:44-48`/`:74-79` 那两支红句把它们当"这发到底到没到过链接态"的哨兵用）＝它们换档说明"产码在中间是否删掉攻击者那枚 link"变了（机制那半＝算的，见尺册）。
+
+## S7 族件名册⇄结案态⇄台账号（尺 R24/R28，量的）
+
+- 逐 pattern（`git ls-tree --name-only HEAD internal/winsec/`）＝`ancestoropen_342_*`=2、`ancestorunlink_348_*`=2、`ancestorworld_342_348_*`=2、`leafrace_342r2_*`=1、`openleaf_*_322`=4、`posix_seal_window_120_*`=1、`sealhandle_privateroute_120_*`=1＝**13 枚**（⚠ 派单写 11 枚）。
+- 票 118/120/342/348/353 入库名（尺＝`git ls-tree` 数已入库）＝`118-…-done.md`／`120-…-done.md`／`342-…no-ticket-owns-it.md`／`348-…deletes-a-foreign-file.md`／`353-…never-named.md`＝★118⇄120 均 `-done`、342⇄348 现均⛔ `-done`（＝续体还在）。
+- 台账号逐枚 `grep -c '^## <号>'`＝`A1062/A1066/A1067/A1069/A1070/A1071/A1072` 各 **1**；正控＝`A9999`＝**0**。
+
+## S8 具名上报（⛔ 替任何一方圆）
+
+1. ★编排者那句"自陈段 `:207-211` 内容锚尺三笔同串 `2235e21e`"＝本腿两把尺都⛔ 复现：本腿的段取尺给的是"四枚同串 `6c2448515378…`"（＝结论同向＝还原成立），但本腿的整件 blob 尺给的是 `fa395b33/110ed00b=b749abb9` ⇄ `ffc3c62a/HEAD=70ed3b61`＝**两枚不同串**；`2235e21e` 在本腿任何一把尺上都未出现。⇒ 编排者那把尺的射程⇄口径具名可疑（本腿那味结论靠自己的尺，⛔ 靠它）。
+2. ★353-r1 派单**自相矛盾**：第 7 行写⛔ 碰 `pinnedleaf_342_windows.go:11-20`⇄`:158-170`（〔丙〕另批），第 12 行又命令"census 点名的重述①＝`:165-167`"＝落在 `:158-170` 内。腿照第 12 行做了＝本腿判它处置正确；下一波派单里这类"区间禁区"应先与"必改旧文字"作差。
+3. 实现腿报的两味位置（`:33`/`:118`/`:159`/`:172`/`:413`/`:421`）⇄本腿 HEAD blob 现量（`:29-39`/`:113-121`/`:156-163`/`:172`/`:411-413`/`:417-422`）＝同一批字节的两套行号混用（它在 `readings-ac2-baseline.md:64` 自己具名声明过"笔④后行号重取"）＝⛔ 判虚报、只记口径。
+4. ★终量三发的还原哈希逐字只在旧批底片（S3 那条）；交件批的还原行没落 `logs`。实质由"发后字节 == HEAD blob"替它坐实。
+5. 派单"盯这味的件＝11 枚"⇄本腿逐 pattern 现量＝**13 枚**。
+6. ★本腿自抓六处（⛔ 藏；完整登记＝`00-ruler-register.md` 末节"本腿自证违令登记"）＝① `sh/20-misc-rulers.sh` 第 39 行引号破损⇒该把尺只前 5 节有效，改正尺＝`sh/21b-misc.sh` 全部重跑；② ★`sh/19-full-table.sh` 坏尺作废＝把腿自己的汇总件 `recheck-summary.txt`（⛔ 是 raw 原件）算进"非零行"⇒ 报 `truncated` 非零 24／基线 10，改正尺 `sh/32`＝**20／9／11**＝方向结论⛔ 变；③ ★`sh/42` 的 CR 正控初稿写成 `tr -cd '\r'|wc -l`（数行数）⇒自造 2 枚 CR 读出 0＝假正控，改正＝`wc -c` 读回 2；④ ★**本腿笔① `3ac9d761` ⇄ 笔② `4fb6c088` 两枚 commit 消息各带 1 枚字面被禁分节码位**（尺＝`sh/44` 把 `git log --format=%B -1 <笔>` 取出的已入库消息打在同一把双字节尺上＝各 1；同尺打本腿交付件＝0）＝按规矩⛔ 改写已入库历史⇒⛔ `--amend`＝只在尺册末节具名登记，此后本腿全部正文（含交件）只用码位名；⑤ ★`sh/46` 那把"前缀逐字节 cmp"的射程只适用末尾追加形＝本次追加落在表格中间⇒它报 `PREFIX_IDENTICAL=NO`＝⛔ 是字节被改、而是尺不适用＝改逐行尺 `sh/47`（净增 13／净删 0／`LOST_LINES=0`）＝"两把尺矛盾先假定新那把坏"用在自己身上；⑥ 首版判语主件带同一枚字面码位＋把必判第 2 件误判成"票面没写⇒缺味"＝**两处都在入库前抓到并改正**（尺＝`sh/43` 落笔前预检读出 1、改正后复量 0＝⛔ 涉已入库字节）；教训＝判"缺味"要先现读先例那枚真身的落点（票 322 那味也在票面命中 0、真身在仪器件 `:8`），⛔ 只比对派单字面。
+7. `git status` 未跟踪那一大片（数百枚历史遗留件＋仓根乱码名件）＝起手即如此、⛔ 本腿字节；本腿对 tracked 脏净贡献＝0 枚（＝起手 2 枚 `issues/115-…-done.md`⇄`probes/orch/predispatch-rulers.sh` 都⛔ 本腿写面）。
