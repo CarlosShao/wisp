@@ -84,8 +84,11 @@ type Queue struct {
 	pending []*qitem
 	byID    map[string]*qitem
 	// alias is the reject-direction index: every extra name a live card answers
-	// to (qitem.names) plus the item that owns it. Its only reader is
-	// lookupForRefusalLocked; the allow side goes through lookupForAllowLocked,
+	// to (qitem.names) plus the item that owns it. Of the readers, only
+	// lookupForRefusalLocked resolves a reply into an item; indexLocked (on the
+	// way in) and unindexLocked (on the way out) touch the map too, but each
+	// only moves the one item handed to it and never answers a name. The allow
+	// side goes through lookupForAllowLocked,
 	// which cannot see this field, so a grant stays spendable only on the exact
 	// key the queue issued and the index can only ever make a REFUSAL land.
 	alias   map[string]map[*qitem]bool
