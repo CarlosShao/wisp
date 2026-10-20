@@ -45,3 +45,6 @@ tails numstat:
 .scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md [x]=5 [ ]=2 mybullets=1
 .scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md [x]=6 [ ]=1 mybullets=1
 HEAD counts: probes/342/v3=48 probes/348/v2=13
+
+########## 笔⑦更正（追加＝照 342-r2 笔⑧形；⛔ --amend ⛔ reset ##########
+笔⑦正文写"只追加到 logs/22 与 logs/30 两枚已入库件"⇄该笔 git show --name-only = 4 枚（probes/342/v3/logs/22＋logs/30 ⇄ probes/348/v2/logs/02-copy＋logs/04-copy）＝本腿自己在"正文声称枚数⇄实际枚数"同族上撞一回＝提交后现跑尺抓到、当场具名认。枚数不变＝48/13（新增 0 枚文件）＝各处声称照旧成立。本笔＝1 枚文件（logs/30 追加本段）＝名字与正文相符才报已提交。
