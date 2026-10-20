@@ -1,0 +1,11 @@
+--- PASS: TestAC42UnnamedFileAndDirAreRefused (0.15s)
+    --- PASS: TestAC42UnnamedFileAndDirAreRefused/loose_file_next_to_the_model (0.03s)
+    --- PASS: TestAC42UnnamedFileAndDirAreRefused/empty_directory_nobody_named (0.04s)
+    --- PASS: TestAC42UnnamedFileAndDirAreRefused/file_added_inside_a_named_directory (0.04s)
+    --- PASS: TestAC42UnnamedFileAndDirAreRefused/plausible_sibling_of_the_model_file (0.04s)
+=== RUN   TestAC43HandOffRefusesAnUnnamedFile
+    verify_tree_121_test.go:171: hand-off refused at Error: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in D:\tmp\wisp\20261020\109r1v2\gtmp\TestAC43HandOffRefusesAnUnnamedFile2360109962\002\models\kws-fixture: model dir holds 1 entry the signed manifest does not name: extra.bin - re-hashing only the named files cannot see an added one, so a loader that opens this directory by name could be handed bytes nobody verified
+--- PASS: TestAC43HandOffRefusesAnUnnamedFile (0.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/models	5.602s
+FAIL

@@ -1,0 +1,10 @@
+$ go build ./cmd/wisp/   (in the OUT-OF-REPO landing export = HEAD + only this leg's bytes)
+CMD_WISP_BUILD_RC=0   <- go build prints nothing on success; that line is the reading.
+Reproduced verbatim from: /d/tmp/wisp/20261020/109r1v2/logs/build_cmdwisp_landing.log (0 bytes = clean build)
+Why build and not test: cmd/wisp's test face belongs to 321-r1 (in flight) and the dispatch bars
+this leg from running ./cmd/wisp at all; this line only proves the models-side change did not break
+the consumer's compile face. The cmd/wisp call sites are quoted from source, not from a run here:
+  cmd/wisp/models.go:305  bridge := models.WireDownloading(ms.mgr, machine)
+  cmd/wisp/models.go:249  if err := store.mgr.VerifyInstalled(id); err != nil {
+Reachability is judged by the instrument, see shared-worktree-models-count2.log:
+  --- PASS: TestAC3CapabilityPackagesReachTheCompositionRoot/GOOS=windows|linux|darwin

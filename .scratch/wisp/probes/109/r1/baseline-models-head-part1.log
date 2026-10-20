@@ -158,9 +158,3 @@ time=2026-10-20T19:44:31.993+08:00 level=ERROR msg="state machine rejected trans
     --- PASS: TestAC42UnnamedFileAndDirAreRefused/loose_file_next_to_the_model (0.26s)
     --- PASS: TestAC42UnnamedFileAndDirAreRefused/empty_directory_nobody_named (0.16s)
     --- PASS: TestAC42UnnamedFileAndDirAreRefused/file_added_inside_a_named_directory (0.14s)
-    --- PASS: TestAC42UnnamedFileAndDirAreRefused/plausible_sibling_of_the_model_file (0.16s)
-=== RUN   TestAC43HandOffRefusesAnUnnamedFile
-    verify_tree_121_test.go:171: hand-off refused at Error: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\TestAC43HandOffRefusesAnUnnamedFile60005301\002\models\kws-fixture: model dir holds 1 entry the signed manifest does not name: extra.bin - re-hashing only the named files cannot see an added one, so a loader that opens this directory by name could be handed bytes nobody verified
---- PASS: TestAC43HandOffRefusesAnUnnamedFile (0.23s)
-PASS
-ok  	github.com/CarlosShao/wisp/internal/models	8.528s

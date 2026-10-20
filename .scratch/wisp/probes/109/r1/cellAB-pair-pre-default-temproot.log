@@ -1,0 +1,45 @@
+=== RUN   TestAC41NailByteFaceUnnamedFileBreaksTheWidth
+    handoff_ac4_109r1_test.go:96: planted 1 unnamed entry inside Ensure's post-verification window: [attacker.onnx]
+    handoff_ac4_109r1_test.go:133: AC#4/R-109-2 byte face: Ensure handed back a tree holding attacker.onnx as available. The nail's first界 sanctions the inherited write that placed it, so the width has to stop somewhere in bytes too; model.onnx still hashes exactly as the signed manifest pins it, which is precisely why hashing the named subset cannot answer 'how wide is this'.
+--- FAIL: TestAC41NailByteFaceUnnamedFileBreaksTheWidth (0.17s)
+=== RUN   TestAC42NailByteFaceExtraDirectoryBreaksTheWidth
+    handoff_ac4_109r1_test.go:96: planted 1 unnamed entry inside Ensure's post-verification window: [sub/w.onnx]
+    handoff_ac4_109r1_test.go:150: AC#4/R-109-2 byte face: Ensure handed back a tree holding an entire extra directory (sub/w.onnx) - the second PROBE2 shape, and the reason 'verified' has to mean the whole tree rather than the named subset
+--- FAIL: TestAC42NailByteFaceExtraDirectoryBreaksTheWidth (0.09s)
+=== RUN   TestAC43NailByteFaceCountIsExact
+    handoff_ac4_109r1_test.go:96: planted 4 unnamed entries inside Ensure's post-verification window: [a1.onnx a2.onnx a3.onnx sub/deep.bin]
+    handoff_ac4_109r1_test.go:171: AC#4/R-109-2 byte face: three loose unnamed files plus an unnamed directory and its byte verified clean through Ensure
+--- FAIL: TestAC43NailByteFaceCountIsExact (0.14s)
+=== RUN   TestAC44NailByteFaceCleanTreeStillPasses
+    handoff_ac4_109r1_test.go:96: planted 0 unnamed entries inside Ensure's post-verification window: []
+    handoff_ac4_109r1_test.go:205: clean tree still passes the byte face (named dir dict/ intact): C:\Users\swq\TestAC44NailByteFaceCleanTreeStillPasses2045644762\002\models\kws-fixture
+--- PASS: TestAC44NailByteFaceCleanTreeStillPasses (0.10s)
+=== RUN   TestAC4R3NailBreakLineTwoSeesAnExplicitGrantByAnyPrincipal
+    handoff_ac4_principal_109r1_windows_test.go:104: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_ac4_principal_109r1_windows_test.go:115: install dir descriptor after planting an EXPLICIT Everyone:(OI)(CI)(M):
+    handoff_ac4_principal_109r1_windows_test.go:150: AC#4 break line 2 catches the hand-placed grant whoever holds it: [Everyone (OI)(CI)(M)]
+--- PASS: TestAC4R3NailBreakLineTwoSeesAnExplicitGrantByAnyPrincipal (3.63s)
+=== RUN   TestAC4R4NailBreakLineTwoStaysQuietOnInheritedWidth
+    handoff_ac4_principal_109r1_windows_test.go:157: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_ac4_principal_109r1_windows_test.go:186: principal-agnostic break line stays quiet on the sanctioned inherited width: [BUILTIN\Users (I)(OI)(CI)(M)]
+--- PASS: TestAC4R4NailBreakLineTwoStaysQuietOnInheritedWidth (0.39s)
+=== RUN   TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath
+    handoff_guard_109r1_test.go:73: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:111: AC#2/R-109-4 (shape 1): Ensure returned a model directory as available although 1 byte of model.onnx was swapped after the last check that ran on its return path. dir=C:\Users\swq\TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath3362631390\002\models\kws-fixture swaps=1 - a caller that uses Manager.Ensure directly, without DownloadingBridge, gets the hand-off with no guard on it at all, which is exactly what R-109-4 says the bridge-only placement left open.
+--- FAIL: TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath (0.07s)
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded/cache_hit
+    handoff_guard_109r1_test.go:73: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:160: AC#2/R-109-4: the cache-hit return path handed back a store whose model.onnx was swapped after its verification (swaps=1)
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded/local_override
+    handoff_guard_109r1_test.go:190: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:204: AC#2/R-109-4: the local_override return path announced a sideloaded model available although 1 byte was swapped after its verification (swapped=true)
+--- FAIL: TestAC22CacheHitAndOverrideReturnPathsAreGuarded (0.12s)
+=== RUN   TestAC23ReverseLegCleanHandOffsAreNotBroken
+    handoff_guard_109r1_test.go:248: server hits: install=1, second-instance reuse=0
+--- PASS: TestAC23ReverseLegCleanHandOffsAreNotBroken (0.09s)
+    handoff_window_109_windows_test.go:159: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:176: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:200: AC#4 nail: install dir kws-fixture inherits [BUILTIN\Users (I)(OI)(CI)(M)] (parent policy, guard is the re-verify)
+--- PASS: TestAC4InstallDirWidthIsDeliberateAndHasABreakLine (0.58s)
+FAIL	github.com/CarlosShao/wisp/internal/models	5.464s
