@@ -1,0 +1,1 @@
+go vet ./cmd/wisp/ produced NO stdout/stderr; rc=0 recorded in 20-gates.txt G5. (Text added so this evidence file is not 0 bytes; raw capture was empty.)

@@ -1,0 +1,75 @@
+commit 1d6b0cf9dc7c98c448d60366b2963f719a540a3b
+Author: CarlosShao <1933942520@qq.com>
+Date:   Mon Oct 19 23:01:19 2026 +0800
+
+    票 296 落地腿 296-r2 交件①＝AC#5 三处注释改成说实话（★纯注释面·`cmd/wisp/resident_windows.go` 一枚文件）
+    
+    三处过头话（`hotkeyReloadSource296` 文档块末段，内容锚＝派单三条）：
+    ① `Check()'s only skip is the DeepEqual diff` ⇒ 不成立。`internal/ball/hotkey_reload.go`
+       的 `Check()` 有两条不重绑出口（我自己现读 HEAD blob：`:87 if r.src == nil {` 与
+       `:93 if r.exists && reflect.DeepEqual(r.applied, cfg) {`），而 nil 那一条恰恰就是
+       这句注释否认的"保持当前绑定"＝用另一种形状把 AC#2 删掉的旧承诺又许了一遍。
+       改后逐枚点名两条跳过，并具名"两条都不是 all-empty 守卫"。
+    ② `dead until the next read` ⇒ 把恢复条件说轻。改后写"until a read answers a
+       DIFFERENT set"，并补一句"再读到同一组空串只会撞上 DeepEqual 那一支跳过"。
+    ③ 末句括注 `(an empty [hotkey] slot means "unset", not "turned off")` ⇒ 以行为语义
+       口吻触到 `Q-82` 未拍的那条线。改后只描述"今天这一支怎么处理空串"＝每一枚空槽在
+       桥看见值之前先用编译期默认值答掉，并具名"空槽能不能算用户主动关掉一枚键＝`Q-82`、
+       仍在机主清单上、这一枚闭包不表态"。⛔ 没写成契约裁决、⛔ 没引入 `none`/`off` 归一化。
+    
+    ★零可执行字节变化（我这趟最硬的一把尺，件 `logs/00-diff-comment-only.txt`）：
+    `git diff -U0` 变动 16 行（另有 `+++`/`---` 两枚文件头行）＝11 增 5 删（numstat），
+    逐行首字符统计＝`+//` 11 枚、`-//` 5 枚；以 `^[+-]` 开头而不以 `+//`/`-//` 开头的
+    变动行＝**0 枚**。`func hotkeyReloadSource296` 那两枚 `return` 一字未动。
+    
+    ⛔ 未碰：`internal/ball/**`（两条出口是事实）、`internal/config/schema.go` 的 `[hotkey]`
+    四枚默认值、机主那份 `config.toml`（未读未写）、票 258 既有断言（含"源可以返回全空"）、
+    `hotCfg258` ⇄ `hotReload258` 两枚闭包（未合并＝那条 Warn 时机没变）；⛔ 翻任何框；
+    `frontend/**`／`design/**`／三枚冻结件／golden／`thresholds.go`／D43 表零字节；⛔ push。
+    
+    `-run 'Test296|Test258'` 定向读数（★改前两发⇄改后两发逐字相同，串行、同台面）：
+    四发皆 `RUN=13 / PASS_TOP=8 / FAIL_TOP=3 / SKIP=2`、逐名名册逐字一致＝我这枚注释
+    既没把包打红、也没把它打绿。`rc=1` 的三枚红＋两枚弃权同一成因、具名上报＝本机有一枚
+    **活着的 `build\wisp.exe`（PID 21892，机主自己的常驻进程）占着 `Ctrl+Alt+Q`/`M`/`P`**
+    （红句逐字 `hotkey occupied by another program, not registered` ⇄
+    `resident_hotkey_258_windows_test.go:361 the old binding did not survive a no-rebind host`⇄
+    `:448`/`:453` 与 `resident_hotkey_v1probe_test.go:108` 的"boot verdict lost the live-count shape"；
+    两枚 `Test296BridgeKeeps*` 走 `resident_hotkey_296_windows_test.go:172`/`:213` 的 SKIP-LOUD），
+    ＝票面 `AC#4` 起手前"⛔ 有活着的 wisp.exe"那一枚台面前提今天不满足。我没有停掉机主的进程。
+    ★另两处台面自纠也具名：第一次配方把整条 PATH 过 `cygpath -wp` ⇒ gcc 所在目录掉出 PATH
+    ⇒ `go env CGO_ENABLED` 从 1 掉到 0 ⇒ sherpa 那枚包被 build constraint 全排除＝
+    `setup failed`＋`RUN=0` 的"零枚 `--- FAIL` 的整包死"（假红，⛔ 计入判据）；改用派单点名
+    的那条形（`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"` 配绝对路径 `go.exe`）后
+    CGO=1、13 枚 `RUN` 到齐。
+    
+    门禁（★只在共享工作树取，件 `logs/10-gates.txt`）：
+    `GOFLAGS= go build ./...` rc=0；`sh scripts/d22scan.sh` rc=0（clean，ban#8 cmd/ 143 枚）；
+    并排两把格式尺＝工作树 `gofmt -l cmd/wisp` 1 枚（`models.go`＝已知 CRLF 存量，⛔ 顺手洗）、
+    `gofumpt -l cmd/wisp` 1 枚（同一枚；`gofumpt` 不在本次 PATH 里＝裸打具名 rc=127，⛔ 当"跳过"），
+    判据尺＝`git archive HEAD cmd/wisp` 落仓外同一把尺 **0 枚**；`go vet ./cmd/wisp/` rc=0；
+    `sh scripts/check-path-length-budget.sh` rc=0（VERDICT GREEN）；跑门前后 `unset GOTMPDIR TMPDIR`。
+    可比性 seed：四发起手时现跑 `git rev-parse HEAD:internal/winsec/winsec.go` 同串
+    `07300bfffc3e5b14c017029d6f84fb5a7ede3db8`（`342-r2` 在写 `internal/winsec/**`＝我没碰一个字节、
+    也没据它判自己失败；本次定向读数里没出现过点名 winsec 的红）。
+
+diff --git a/cmd/wisp/resident_windows.go b/cmd/wisp/resident_windows.go
+index 37915a5a..5011e5d0 100644
+--- a/cmd/wisp/resident_windows.go
++++ b/cmd/wisp/resident_windows.go
+@@ -40,5 +40,11 @@ import (
+-// an empty answer: Check()'s only skip is the DeepEqual diff against what is
+-// applied, and internal/ball has no all-empty guard, so four empty strings from
+-// here would re-register the set and leave summon, mute and panel dead until
+-// the next read - which is exactly the regression this closure caused on the
+-// owner's machine (an empty [hotkey] slot means "unset", not "turned off").
++// an empty answer, and Check() has two skips, neither of them an all-empty
++// guard: a nil src keeps whatever is live, and a set DeepEqual to what was
++// applied is left alone. Four empty strings from here would therefore differ
++// from the applied set, be read at the registration end as disabled by config
++// (never attempted), and leave summon, mute and panel dead until a read
++// answers a DIFFERENT set - reading the same empties again only hits the
++// DeepEqual skip. That is the regression this closure caused on the owner's
++// machine. Whether an empty [hotkey] slot can be a user's way of turning a key
++// off is Q-82, still on the owner's list; this closure takes no position on it
++// and only says what it does today - it answers every empty slot with the
++// compiled default before the bridge ever sees the value.

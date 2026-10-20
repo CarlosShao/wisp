@@ -1,0 +1,18 @@
+G1_WORKTREE_GOFMT_COUNT=1
+  G1| cmd\wisp\models.go
+G2_ARCHIVE_RC=0
+G2_TAR_X_RC=0
+G2_GO_FILES_IN_ARCHIVE=139
+G2_ARCHIVE_GOFMT_COUNT=0
+G2P_WDIR_EXISTS=True
+G2P_PLANTED=True
+G2_POSCTRL_COUNT=1
+  G2P| D:\tmp\wisp\20261019\296v2\gate-cmdwisp-posctrl\cmd\wisp\zz_296v2_posctrl.go
+G3_GO_BUILD_ALL_RC=0
+G4_D22SCAN_RC=0
+G5_VET_CMDWISP_RC=0
+G6_PATHLEN_RC=0
+G7_WORKTREE_GOFUMPT_COUNT=1
+  G7| cmd\wisp\models.go
+G7_ARCHIVE_GOFUMPT_COUNT=1
+  G7A| D:\tmp\wisp\20261019\296v2\gate-cmdwisp-posctrl\cmd\wisp\zz_296v2_posctrl.go
