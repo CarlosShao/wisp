@@ -1,0 +1,32 @@
+READ FACE（353-a1·只读·⛔ go test·取 blob 全落仓外＝公共块 o 第④味）
+起手锚（本腿第一笔 git log -1 现认）＝c16ff47ec465749f1977efa94a2b024cc8931e27（Tue Oct 20 16:29:06 2026 +0800）
+分支＝dev（git rev-parse --abbrev-ref HEAD 现量）
+导出件（git cat-file blob HEAD:<path> 落 D:\tmp\wisp\20261020\353a1\head，⛔ 叫 .go，用 .go.txt／原名散件）：
+  342-v3-verdict.md                 bytes=18961 lines=54
+  pinnedleaf_342_windows.go.txt     bytes=12931 lines=250
+  winsec.go.txt                     bytes=21658 lines=446
+  winsec_windows.go.txt             bytes=35486 lines=801
+  pinnedleaf_342_unix.go            bytes=9422  lines=174
+  pinnedleaf_342_fallback.go        bytes=2825  lines=53
+  ancestorwindow_342r2_windows_test.go.txt  lines=673
+  private_fail_test.go.txt          （AC#5 那两枚钉的正文）
+  logs/01-bench-platform-lock-and-name.txt   bytes=15766 lines=135
+  logs/03-bench-crossproc-attacker.txt       bytes=5556  lines=47
+  logs/15-teeth-A-B-rows.txt                 bytes=662   lines=15
+  logs/18-teeth-C-rows.txt                   bytes=354   lines=7
+blob 首 8 位（尺＝git rev-parse HEAD:<path>；只作本腿读面指纹，⛔ 当"字节没被别腿动"的通则）：
+  f3c1b68e  internal/winsec/winsec.go
+  db077e30  internal/winsec/pinnedleaf_342_windows.go
+  a7223c73  internal/winsec/pinnedleaf_342_unix.go
+  028f75b0  internal/winsec/pinnedleaf_342_fallback.go
+  63714a83  internal/winsec/winsec_windows.go
+  57fa4df7  internal/winsec/ancestorwindow_342r2_windows_test.go
+  ⚠ 本腿读它时 `352-r1` 正在改 `internal/winsec/winsec.go`（台账 A1063①＝它笔 ecffb93b 已落 wrapPath 双 %w）⇒ 凡引用 winsec.go 的行号都注"锚 c16ff47e 的 blob"。
+
+票 353 框尺（公共块＝凡报"几格"先跑框尺；尺＝^- 两把锚见 02 件）：现量未勾 5 枚／已勾 0 枚。
+
+名册尺（公共块＝锚定行首＋两把独立锚；⛔ 拿 A..B 区间数"谁动了某文件"）：
+  本腿主题前缀逐字＝「票 353 普查腿 353-a1」；放腿前盘上该前缀笔数＝见 02 件末段。
+
+台面纪律自证：本腿零枚 go test／零枚 go build／零枚 .go 字节写（唯一 .go 名出现＝读面导出件与逐枚字面 pathspec）；
+  写面只三处＝.scratch/wisp/probes/353/a1/**、docs/evidence/s1/353-a1-census.md、票 353 尾一条追加 bullet。
