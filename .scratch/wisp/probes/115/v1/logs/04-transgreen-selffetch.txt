@@ -1,0 +1,69 @@
+# 04 转绿链＝本腿自取三份 job 日志的逐字读数
+# 取数时刻＝2026-10-20 17:01:08 +0800；起手锚＝c16ff47e
+
+## job 106361546809  rc=0  bytes=403969  lines=3006  stderr=0
+   首行＝﻿2026-09-21T13:53:48.8126112Z Current runner version: '2.337.0'
+   winsec 四数行＝
+      2026-09-21T13:55:32.8898401Z winsec-tests.sh: four numbers (all from -v output): === RUN=82  --- PASS=40  --- FAIL=2  --- SKIP=0
+   C26 装上行（票面 next= 要求仍在）＝
+      2026-09-21T13:55:32.1440552Z 2026/09/21 13:55:24 INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2
+      2026-09-21T13:55:43.5791925Z 2026/09/21 13:55:43 INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2
+   顶层 FAIL 逐名（尺＝grep -oE 时间戳前缀之后的 ^--- FAIL: 名）＝
+      TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree
+      TestNoticeAttributionKeepsTwoTreesApart
+      TestTicket101ManualSwitchSurvivesRestart
+      TestTicket101UntouchedConfigRestartsAtDefault
+      TestTicket101SessionGrantDoesNotCrossRestart
+      TestComposedGateBlocksAWriteForTwoSeconds
+      TestClassifyAnchorSpellingIsNotVerdict
+      TestCanonicalInputGainsNoSecondForm
+      TestAListWinsWhereBothTablesHit
+      TestPathResolverShortNameAListDenied
+      TestPathResolverUNCAListDenied
+      TestPathResolverExtendedLengthPrefixAListDenied
+   两枚 115 新用例结论：PASS 行＝
+      2026-09-21T13:55:32.1691669Z --- FAIL: TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree (0.07s)
+      2026-09-21T13:55:32.1697506Z --- FAIL: TestNoticeAttributionKeepsTwoTreesApart (0.04s)
+   === RUN 两枚新用例行＝
+      2026-09-21T13:55:32.1653532Z === RUN   TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree
+      2026-09-21T13:55:32.1692113Z === RUN   TestNoticeAttributionKeepsTwoTreesApart
+   三句 Fatal 在场尺（票面 next= 逐字要求各 0 次）＝
+      [the instrument planted nothing] 命中 = 0
+      [not attributable through spelling] 命中 = 0
+      [the instrument measured nothing] 命中 = 0
+   sha256＝
+      cbd773e0eb08f4b89b4d921294993b5392eba5112a4dd8be3ba9df7419f9e5cd */d/tmp/wisp/20261020/115v1/remote/job-106361546809.log
+
+## job 106389418059  rc=0  bytes=413232  lines=3044  stderr=0
+   首行＝﻿2026-09-21T15:07:30.8917956Z Current runner version: '2.337.0'
+   winsec 四数行＝
+      2026-09-21T15:09:12.1356475Z winsec-tests.sh: four numbers (all from -v output): === RUN=82  --- PASS=42  --- FAIL=0  --- SKIP=0
+   C26 装上行（票面 next= 要求仍在）＝
+      2026-09-21T15:09:11.2681621Z 2026/09/21 15:09:02 INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2
+      2026-09-21T15:09:35.4558039Z 2026/09/21 15:09:35 INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2
+   顶层 FAIL 逐名（尺＝grep -oE 时间戳前缀之后的 ^--- FAIL: 名）＝
+      TestTicket101ManualSwitchSurvivesRestart
+      TestTicket101UntouchedConfigRestartsAtDefault
+      TestTicket101SessionGrantDoesNotCrossRestart
+      TestComposedGateBlocksAWriteForTwoSeconds
+      TestLayoutForTestEnv
+      TestClassifyAnchorSpellingIsNotVerdict
+      TestCanonicalInputGainsNoSecondForm
+      TestAListWinsWhereBothTablesHit
+      TestPathResolverShortNameAListDenied
+      TestPathResolverUNCAListDenied
+      TestPathResolverExtendedLengthPrefixAListDenied
+      TestBListDefaultDenyAndOverride
+   两枚 115 新用例结论：PASS 行＝
+      2026-09-21T15:09:11.3035440Z --- PASS: TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree (0.06s)
+      2026-09-21T15:09:11.3037013Z --- PASS: TestNoticeAttributionKeepsTwoTreesApart (0.10s)
+   === RUN 两枚新用例行＝
+      2026-09-21T15:09:11.3010647Z === RUN   TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree
+      2026-09-21T15:09:11.3036276Z === RUN   TestNoticeAttributionKeepsTwoTreesApart
+   三句 Fatal 在场尺（票面 next= 逐字要求各 0 次）＝
+      [the instrument planted nothing] 命中 = 0
+      [not attributable through spelling] 命中 = 0
+      [the instrument measured nothing] 命中 = 0
+   sha256＝
+      813a48f727128a73532abf0e82fd20f2efa16a1b5174f8de05efeffb47d72d3d */d/tmp/wisp/20261020/115v1/remote/job-106389418059.log
+
