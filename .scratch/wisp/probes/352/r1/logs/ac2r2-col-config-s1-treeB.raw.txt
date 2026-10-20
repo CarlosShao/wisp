@@ -1,0 +1,458 @@
+time=2026-10-20T08:34:37.784Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+=== RUN   TestBoundaryNoPlaintextSecretFields
+--- PASS: TestBoundaryNoPlaintextSecretFields (0.00s)
+=== RUN   TestBoundaryNoRuntimeObservationFields
+--- PASS: TestBoundaryNoRuntimeObservationFields (0.00s)
+=== RUN   TestRoundTripLoadMarshalLoad
+--- PASS: TestRoundTripLoadMarshalLoad (0.01s)
+=== RUN   TestRoundTripBytes
+--- PASS: TestRoundTripBytes (0.00s)
+=== RUN   TestResolvedNeverPersists
+--- PASS: TestResolvedNeverPersists (0.00s)
+=== RUN   TestAC1POSIXSeamHoldsC26Pipeline125
+    c26_seam_posix_125_test.go:55: fixture: TMPDIR="/tmp" resolves="/tmp"
+    c26_seam_posix_125_test.go:75: reading: installed risk.c26Pipeline answered "/tmp/TestAC1POSIXSeamHoldsC26Pipeline1254288544613/001/../wisp-125-probe" with "/tmp/TestAC1POSIXSeamHoldsC26Pipeline1254288544613/wisp-125-probe"
+--- PASS: TestAC1POSIXSeamHoldsC26Pipeline125 (0.00s)
+=== RUN   TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125
+=== RUN   TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125/control_plain_temp
+    c26_seam_posix_125_test.go:152: reading: child TMPDIR="/tmp/TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125676707458/001/real125/tmproot125" rc=0
+    c26_seam_posix_125_test.go:156: child: time=2026-10-20T08:34:37.813Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+    c26_seam_posix_125_test.go:156: child: --- PASS: TestAC1POSIXSeamHoldsC26Pipeline125 (0.00s)
+=== RUN   TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125/measured_symlink_spelled_temp
+    c26_seam_posix_125_test.go:152: reading: child TMPDIR="/tmp/TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125676707458/001/varlink125/tmproot125" rc=0
+    c26_seam_posix_125_test.go:156: child: time=2026-10-20T08:34:37.826Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+    c26_seam_posix_125_test.go:156: child: --- PASS: TestAC1POSIXSeamHoldsC26Pipeline125 (0.00s)
+--- PASS: TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125 (0.03s)
+    --- PASS: TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125/control_plain_temp (0.01s)
+    --- PASS: TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125/measured_symlink_spelled_temp (0.01s)
+=== RUN   TestValidateTextChainValid
+--- PASS: TestValidateTextChainValid (0.00s)
+=== RUN   TestValidateTextChainUnknownElement
+--- PASS: TestValidateTextChainUnknownElement (0.00s)
+=== RUN   TestValidateVoiceCloudChains
+=== RUN   TestValidateVoiceCloudChains/valid_cloud_chains
+=== RUN   TestValidateVoiceCloudChains/unknown_element_named
+=== RUN   TestValidateVoiceCloudChains/local-sherpa_never_in_chains
+--- PASS: TestValidateVoiceCloudChains (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/valid_cloud_chains (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/unknown_element_named (0.00s)
+    --- PASS: TestValidateVoiceCloudChains/local-sherpa_never_in_chains (0.00s)
+=== RUN   TestValidateRoleReferences
+=== RUN   TestValidateRoleReferences/both_empty_is_unset-ok
+=== RUN   TestValidateRoleReferences/provider_without_model
+=== RUN   TestValidateRoleReferences/model_without_provider
+=== RUN   TestValidateRoleReferences/unknown_provider_named
+=== RUN   TestValidateRoleReferences/unknown_model_named
+=== RUN   TestValidateRoleReferences/valid_pair
+--- PASS: TestValidateRoleReferences (0.00s)
+    --- PASS: TestValidateRoleReferences/both_empty_is_unset-ok (0.00s)
+    --- PASS: TestValidateRoleReferences/provider_without_model (0.00s)
+    --- PASS: TestValidateRoleReferences/model_without_provider (0.00s)
+    --- PASS: TestValidateRoleReferences/unknown_provider_named (0.00s)
+    --- PASS: TestValidateRoleReferences/unknown_model_named (0.00s)
+    --- PASS: TestValidateRoleReferences/valid_pair (0.00s)
+=== RUN   TestValidateRealtimeReferences
+=== RUN   TestValidateRealtimeReferences/disabled_with_dangling_pair_tolerated
+=== RUN   TestValidateRealtimeReferences/enabled_requires_existing_pair
+=== RUN   TestValidateRealtimeReferences/enabled_without_pair_rejected
+=== RUN   TestValidateRealtimeReferences/enabled_valid_pair
+--- PASS: TestValidateRealtimeReferences (0.00s)
+    --- PASS: TestValidateRealtimeReferences/disabled_with_dangling_pair_tolerated (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_requires_existing_pair (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_without_pair_rejected (0.00s)
+    --- PASS: TestValidateRealtimeReferences/enabled_valid_pair (0.00s)
+=== RUN   TestSplitChainElement
+--- PASS: TestSplitChainElement (0.00s)
+=== RUN   TestTicket261P1MissingEnabledKeyDecodesFalse
+--- PASS: TestTicket261P1MissingEnabledKeyDecodesFalse (0.00s)
+=== RUN   TestTicket261P1SettingsWriteMaterializesFalse
+time=2026-10-20T08:34:37.846Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.mock261.models.t261-nokey.context_window wrote=[llm.providers.mock261.models.t261-nokey.context_window]
+--- PASS: TestTicket261P1SettingsWriteMaterializesFalse (0.01s)
+=== RUN   TestLoadFileMergesDefaultsAndOverrides
+--- PASS: TestLoadFileMergesDefaultsAndOverrides (0.00s)
+=== RUN   TestLoadFileUnknownKeyErrorNamesLine
+--- PASS: TestLoadFileUnknownKeyErrorNamesLine (0.00s)
+=== RUN   TestLoadFileUnknownKeyLineNumbersAreOneBased
+--- PASS: TestLoadFileUnknownKeyLineNumbersAreOneBased (0.00s)
+=== RUN   TestLoadFileWrongTypeErrorHasPosition
+--- PASS: TestLoadFileWrongTypeErrorHasPosition (0.00s)
+=== RUN   TestLoadFileRejectsInvalidValues
+--- PASS: TestLoadFileRejectsInvalidValues (0.00s)
+=== RUN   TestLoadFilePresetInheritance
+--- PASS: TestLoadFilePresetInheritance (0.00s)
+=== RUN   TestLoadFileUnknownProviderNeedsProtocol
+--- PASS: TestLoadFileUnknownProviderNeedsProtocol (0.00s)
+=== RUN   TestLoadFileResolvesSecrets
+--- PASS: TestLoadFileResolvesSecrets (0.00s)
+=== RUN   TestLoadFileResolveFailureIsError
+--- PASS: TestLoadFileResolveFailureIsError (0.00s)
+=== RUN   TestLoadFileNilResolverSkipsResolution
+--- PASS: TestLoadFileNilResolverSkipsResolution (0.00s)
+=== RUN   TestLoadFileNewerSchemaVersionRejected
+--- PASS: TestLoadFileNewerSchemaVersionRejected (0.00s)
+=== RUN   TestSaveFileRoundTripsThroughLoad
+--- PASS: TestSaveFileRoundTripsThroughLoad (0.00s)
+=== RUN   TestConfirmLockedRunsOutsideTheManagerLock
+time=2026-10-20T08:34:37.903Z level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestConfirmLockedRunsOutsideTheManagerLock (0.02s)
+=== RUN   TestCheckAndReloadAsksOncePerFileChange
+time=2026-10-20T08:34:37.917Z level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestCheckAndReloadAsksOncePerFileChange (0.01s)
+=== RUN   TestManagerHotTierAppliesImmediately
+--- PASS: TestManagerHotTierAppliesImmediately (0.01s)
+=== RUN   TestManagerRestartTierKeepsOldValues
+--- PASS: TestManagerRestartTierKeepsOldValues (0.01s)
+=== RUN   TestManagerThemeIsHotInsideApp
+--- PASS: TestManagerThemeIsHotInsideApp (0.01s)
+=== RUN   TestManagerReloadTierEmitsEvent
+--- PASS: TestManagerReloadTierEmitsEvent (0.01s)
+=== RUN   TestManagerVoiceHotKeysDoNotEmitReload
+--- PASS: TestManagerVoiceHotKeysDoNotEmitReload (0.01s)
+=== RUN   TestManagerLockedLooseningRejectedKeepsOld
+time=2026-10-20T08:34:38.000Z level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedLooseningRejectedKeepsOld (0.01s)
+=== RUN   TestManagerLockedLooseningApprovedApplies
+time=2026-10-20T08:34:38.014Z level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedLooseningApprovedApplies (0.01s)
+=== RUN   TestManagerLockedTighteningHotAppliesWithoutHook
+time=2026-10-20T08:34:38.028Z level=INFO msg="config: locked section tightened, hot-applied" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedTighteningHotAppliesWithoutHook (0.01s)
+=== RUN   TestManagerLockedNilConfirmHookDenies
+time=2026-10-20T08:34:38.042Z level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestManagerLockedNilConfirmHookDenies (0.01s)
+=== RUN   TestManagerLockedBothDirectionsLogged
+--- PASS: TestManagerLockedBothDirectionsLogged (0.02s)
+=== RUN   TestManagerLoadErrorKeepsCurrentConfig
+--- PASS: TestManagerLoadErrorKeepsCurrentConfig (0.02s)
+=== RUN   TestManagerMissingFileKeepsCurrentAndErrors
+--- PASS: TestManagerMissingFileKeepsCurrentAndErrors (0.00s)
+=== RUN   TestMigrateV1Fixture
+--- PASS: TestMigrateV1Fixture (0.01s)
+=== RUN   TestMigrateNoVersionKeyAssumedV1
+--- PASS: TestMigrateNoVersionKeyAssumedV1 (0.00s)
+=== RUN   TestMigrateCorruptFileUntouched
+--- PASS: TestMigrateCorruptFileUntouched (0.00s)
+=== RUN   TestMigrateUnsupportedVersionUntouched
+--- PASS: TestMigrateUnsupportedVersionUntouched (0.00s)
+=== RUN   TestMigrateHigherIntermediateVersionRejected
+--- PASS: TestMigrateHigherIntermediateVersionRejected (0.00s)
+=== RUN   TestAC11SettingWriteReportsTheKeyPathItChanged
+time=2026-10-20T08:34:38.116Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+--- PASS: TestAC11SettingWriteReportsTheKeyPathItChanged (0.01s)
+=== RUN   TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure
+time=2026-10-20T08:34:38.121Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-chat.context_window wrote=[llm.providers.deepseek.models.deepseek-chat.context_window]
+--- PASS: TestAC11MultiFieldSaveIsOneWritePerKeyAndStopsOnFailure (0.01s)
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/negative_context_window
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/negative_price
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/a_provider_the_config_does_not_declare
+=== RUN   TestAC7InvalidValueLeavesTheFileByteIdentical/a_model_the_provider's_catalog_does_not_list
+--- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical (0.02s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/plaintext_credential_in_the_reference_field (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_context_window (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/negative_price (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/chat_model_that_is_not_in_the_catalog (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_provider_the_config_does_not_declare (0.00s)
+    --- PASS: TestAC7InvalidValueLeavesTheFileByteIdentical/a_model_the_provider's_catalog_does_not_list (0.00s)
+=== RUN   TestAC11SettingWriteKeepsAForeignHandEditedKey
+time=2026-10-20T08:34:38.155Z level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC11SettingWriteKeepsAForeignHandEditedKey (0.01s)
+=== RUN   TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit
+time=2026-10-20T08:34:38.169Z level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit (0.01s)
+=== RUN   TestAC3SettingWriteStoresARefNeverAValue
+time=2026-10-20T08:34:38.174Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+--- PASS: TestAC3SettingWriteStoresARefNeverAValue (0.00s)
+=== RUN   TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes
+time=2026-10-20T08:34:38.178Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+time=2026-10-20T08:34:38.179Z level=INFO msg="config: config.toml already carries this key; this write added nothing (the file's bytes and mtime stayed put only because its schema_version was already current; a file behind on schema_version had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order are not preserved)" key=llm.providers.deepseek.base_url
+--- PASS: TestAC11WritingTheValueTheFileAlreadyHoldsChangesNoBytes (0.01s)
+=== RUN   TestTicket257R1AC1CleanMachineRefusesAllSevenFields
+    settings_257_test.go:183: clean machine, seven refusals by reason: map[第 2 种拒因：行不存在:7] (fields: 7)
+--- PASS: TestTicket257R1AC1CleanMachineRefusesAllSevenFields (0.01s)
+=== RUN   TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields
+time=2026-10-20T08:34:38.191Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.base_url wrote=[llm.providers.deepseek.base_url]
+time=2026-10-20T08:34:38.194Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+time=2026-10-20T08:34:38.198Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-chat.context_window wrote=[llm.providers.deepseek.models.deepseek-chat.context_window]
+time=2026-10-20T08:34:38.201Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-chat.price.in wrote=[llm.providers.deepseek.models.deepseek-chat.price.in]
+time=2026-10-20T08:34:38.203Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-chat.price.out wrote=[llm.providers.deepseek.models.deepseek-chat.price.out]
+time=2026-10-20T08:34:38.206Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.roles.chat.model wrote=[llm.roles.chat.model]
+time=2026-10-20T08:34:38.208Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.api_key_ref wrote=[llm.providers.deepseek.api_key_ref]
+--- PASS: TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields (0.02s)
+=== RUN   TestTicket257R1AC2MissingFileIsItsOwnSentence
+--- PASS: TestTicket257R1AC2MissingFileIsItsOwnSentence (0.00s)
+=== RUN   TestTicket257R1AC2MissingRowIsItsOwnSentence
+--- PASS: TestTicket257R1AC2MissingRowIsItsOwnSentence (0.01s)
+=== RUN   TestTicket257R1AC2InvalidValueIsItsOwnSentence
+--- PASS: TestTicket257R1AC2InvalidValueIsItsOwnSentence (0.00s)
+=== RUN   Test313CreateProviderRowCreatesAPresetRowAndItsModel
+time=2026-10-20T08:34:38.222Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.stepfun wrote=[llm.providers.stepfun]
+--- PASS: Test313CreateProviderRowCreatesAPresetRowAndItsModel (0.01s)
+=== RUN   Test313CreateProviderRowRefusesNonPresetAndExistingRow
+=== RUN   Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_non-preset_provider_name
+=== RUN   Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_row_the_config_already_declares
+time=2026-10-20T08:34:38.233Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.stepfun wrote=[llm.providers.stepfun]
+--- PASS: Test313CreateProviderRowRefusesNonPresetAndExistingRow (0.01s)
+    --- PASS: Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_non-preset_provider_name (0.00s)
+    --- PASS: Test313CreateProviderRowRefusesNonPresetAndExistingRow/a_row_the_config_already_declares (0.00s)
+=== RUN   Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa
+time=2026-10-20T08:34:38.239Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.stepfun wrote=[llm.providers.stepfun]
+time=2026-10-20T08:34:38.241Z level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=voice.cloud_asr_chain wrote=[voice.cloud_asr_chain] kept_in_file_not_in_memory="[llm.providers.stepfun.base_url llm.providers.stepfun.protocol]"
+time=2026-10-20T08:34:38.245Z level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=voice.cloud_tts_chain wrote=[voice.cloud_tts_chain] kept_in_file_not_in_memory="[llm.providers.stepfun.base_url llm.providers.stepfun.protocol]"
+--- PASS: Test313VoiceCloudChainNeedsTheCatalogRowAndRefusesLocalSherpa (0.01s)
+=== RUN   Test313RoleChatPairWritesBothKeysOrNeither
+time=2026-10-20T08:34:38.250Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.roles.chat wrote="[llm.roles.chat.model llm.roles.chat.provider]"
+--- PASS: Test313RoleChatPairWritesBothKeysOrNeither (0.01s)
+=== RUN   Test313RealtimeHalfPairFollowsTheEnabledRule
+time=2026-10-20T08:34:38.254Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=voice.realtime.provider wrote=[voice.realtime.provider]
+time=2026-10-20T08:34:38.257Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=voice.realtime.model wrote=[voice.realtime.model]
+time=2026-10-20T08:34:38.260Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=voice.realtime.model wrote=[voice.realtime.model]
+--- PASS: Test313RealtimeHalfPairFollowsTheEnabledRule (0.01s)
+=== RUN   Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers
+time=2026-10-20T08:34:38.265Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.billing wrote=[llm.providers.deepseek.billing]
+time=2026-10-20T08:34:38.268Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.billing wrote=[llm.providers.deepseek.billing]
+time=2026-10-20T08:34:38.272Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.billing wrote=[llm.providers.deepseek.billing]
+--- PASS: Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers (0.01s)
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName
+time=2026-10-20T08:34:38.276Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.local-gw wrote=[llm.providers.local-gw]
+time=2026-10-20T08:34:38.279Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.local-gw-bare wrote=[llm.providers.local-gw-bare]
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/a_preset_name_belongs_to_provider_row_create
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/an_empty_base_url
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/a_protocol_outside_the_enum
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/a_row_the_config_already_declares
+=== RUN   Test320CreateCustomProviderRowLandsAndRefusesByName/no_name_at_all
+time=2026-10-20T08:34:38.284Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.local-gw-four wrote=[llm.providers.local-gw-four]
+--- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName (0.01s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/a_preset_name_belongs_to_provider_row_create (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/an_empty_base_url (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/a_protocol_outside_the_enum (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/a_row_the_config_already_declares (0.00s)
+    --- PASS: Test320CreateCustomProviderRowLandsAndRefusesByName/no_name_at_all (0.00s)
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice
+time=2026-10-20T08:34:38.289Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-new-under-test-320 wrote=[llm.providers.deepseek.models.deepseek-new-under-test-320]
+time=2026-10-20T08:34:38.291Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-new-under-test-320.context_window wrote=[llm.providers.deepseek.models.deepseek-new-under-test-320.context_window]
+time=2026-10-20T08:34:38.293Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-new-under-test-320.price.in wrote=[llm.providers.deepseek.models.deepseek-new-under-test-320.price.in]
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_undeclared_provider
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_entry_that_already_exists
+=== RUN   Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/no_model_id_at_all
+time=2026-10-20T08:34:38.300Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=llm.providers.deepseek.models.deepseek-second-under-test-320 wrote=[llm.providers.deepseek.models.deepseek-second-under-test-320]
+--- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice (0.02s)
+    --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_undeclared_provider (0.00s)
+    --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/an_entry_that_already_exists (0.00s)
+    --- PASS: Test320CreateModelRowSeedsFromDefaultsAndRefusesTwice/no_model_id_at_all (0.00s)
+=== RUN   TestEverySectionHasATierInRegistry
+--- PASS: TestEverySectionHasATierInRegistry (0.00s)
+=== RUN   TestRegistryCoversSchemaSectionsGreen
+--- PASS: TestRegistryCoversSchemaSectionsGreen (0.00s)
+=== RUN   TestPerKeySectionsAreRegisteredPerKey
+--- PASS: TestPerKeySectionsAreRegisteredPerKey (0.00s)
+=== RUN   TestVoicePerKeyRowsMirrorPlanVoiceWalks
+--- PASS: TestVoicePerKeyRowsMirrorPlanVoiceWalks (0.00s)
+=== RUN   TestEveryAppKeyIsRegisteredInTierRegistry
+--- PASS: TestEveryAppKeyIsRegisteredInTierRegistry (0.00s)
+=== RUN   TestAppKeyWalkSeesTheRosterItClaims
+--- PASS: TestAppKeyWalkSeesTheRosterItClaims (0.00s)
+=== RUN   TestUnwiredSecurityKeysFailLoudly
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist
+=== RUN   TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides
+=== RUN   TestUnwiredSecurityKeysFailLoudly/net.allowlist
+=== RUN   TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges
+--- PASS: TestUnwiredSecurityKeysFailLoudly (0.02s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_enabled (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.allow_shell_string (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.shell_allowlist (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/risk.blacklist_overrides (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/net.allowlist (0.00s)
+    --- PASS: TestUnwiredSecurityKeysFailLoudly/net.block_private_ranges (0.00s)
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/empty_file
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads
+=== RUN   TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected
+--- PASS: TestUnwiredGuardLeavesHonestConfigsAlone (0.01s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/empty_file (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/guarded_keys_at_defaults (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads (0.00s)
+    --- PASS: TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected (0.00s)
+=== RUN   TestUnwiredGuardFiresBeforeAnyFileWrite
+--- PASS: TestUnwiredGuardFiresBeforeAnyFileWrite (0.00s)
+=== RUN   TestUnwiredGuardIsScopedNotABigStick
+--- PASS: TestUnwiredGuardIsScopedNotABigStick (0.00s)
+=== RUN   TestUnwiredKeysStillRoundTripAtTheByteLevel
+--- PASS: TestUnwiredKeysStillRoundTripAtTheByteLevel (0.00s)
+=== RUN   TestEveryLockedSectionKeyIsAccountedFor
+--- PASS: TestEveryLockedSectionKeyIsAccountedFor (0.00s)
+=== RUN   TestValidateDefaultsPass
+--- PASS: TestValidateDefaultsPass (0.00s)
+=== RUN   TestValidateEnumErrors
+=== RUN   TestValidateEnumErrors/theme
+=== RUN   TestValidateEnumErrors/observe.level
+=== RUN   TestValidateEnumErrors/proxy.mode
+=== RUN   TestValidateEnumErrors/over_budget
+=== RUN   TestValidateEnumErrors/protocol
+=== RUN   TestValidateEnumErrors/provider_billing
+=== RUN   TestValidateEnumErrors/model_billing
+=== RUN   TestValidateEnumErrors/thinking_intensity
+=== RUN   TestValidateEnumErrors/thinking_levels_element
+--- PASS: TestValidateEnumErrors (0.00s)
+    --- PASS: TestValidateEnumErrors/theme (0.00s)
+    --- PASS: TestValidateEnumErrors/observe.level (0.00s)
+    --- PASS: TestValidateEnumErrors/proxy.mode (0.00s)
+    --- PASS: TestValidateEnumErrors/over_budget (0.00s)
+    --- PASS: TestValidateEnumErrors/protocol (0.00s)
+    --- PASS: TestValidateEnumErrors/provider_billing (0.00s)
+    --- PASS: TestValidateEnumErrors/model_billing (0.00s)
+    --- PASS: TestValidateEnumErrors/thinking_intensity (0.00s)
+    --- PASS: TestValidateEnumErrors/thinking_levels_element (0.00s)
+=== RUN   TestValidateEnumAcceptsEveryListedValue
+--- PASS: TestValidateEnumAcceptsEveryListedValue (0.00s)
+=== RUN   TestValidateHardcodedReadOnly
+=== RUN   TestValidateHardcodedReadOnly/audio.half_duplex=false
+=== RUN   TestValidateHardcodedReadOnly/privacy.keep_transcript=true
+=== RUN   TestValidateHardcodedReadOnly/privacy.keep_audio=true
+=== RUN   TestValidateHardcodedReadOnly/models.verify_signature=false
+--- PASS: TestValidateHardcodedReadOnly (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/audio.half_duplex=false (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/privacy.keep_transcript=true (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/privacy.keep_audio=true (0.00s)
+    --- PASS: TestValidateHardcodedReadOnly/models.verify_signature=false (0.00s)
+=== RUN   TestValidateBallSizeRange
+--- PASS: TestValidateBallSizeRange (0.00s)
+=== RUN   TestValidateRiskConfirmTimeoutRange
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_30
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_10
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_3601
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_99999
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_0
+=== RUN   TestValidateRiskConfirmTimeoutRange/reject_-1
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_31
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_300
+=== RUN   TestValidateRiskConfirmTimeoutRange/accept_3600
+--- PASS: TestValidateRiskConfirmTimeoutRange (0.01s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_30 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_10 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_3601 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_99999 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_0 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/reject_-1 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_31 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_300 (0.00s)
+    --- PASS: TestValidateRiskConfirmTimeoutRange/accept_3600 (0.00s)
+=== RUN   TestValidateRiskConfirmTimeoutBandRejectsWarningLeadPlusOne
+--- PASS: TestValidateRiskConfirmTimeoutBandRejectsWarningLeadPlusOne (0.00s)
+=== RUN   TestValidateAPIKeyRefFormat
+=== RUN   TestValidateAPIKeyRefFormat/empty_is_keyless
+=== RUN   TestValidateAPIKeyRefFormat/dpapi_ref
+=== RUN   TestValidateAPIKeyRefFormat/env_ref
+=== RUN   TestValidateAPIKeyRefFormat/plaintext_key
+=== RUN   TestValidateAPIKeyRefFormat/bare_blob_id
+=== RUN   TestValidateAPIKeyRefFormat/traversal_blob_id
+=== RUN   TestValidateAPIKeyRefFormat/empty_env_name
+=== RUN   TestValidateAPIKeyRefFormat/unknown_scheme
+--- PASS: TestValidateAPIKeyRefFormat (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/empty_is_keyless (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/dpapi_ref (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/env_ref (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/plaintext_key (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/bare_blob_id (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/traversal_blob_id (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/empty_env_name (0.00s)
+    --- PASS: TestValidateAPIKeyRefFormat/unknown_scheme (0.00s)
+=== RUN   TestValidateRealtimeAPIKeyRefFormat
+--- PASS: TestValidateRealtimeAPIKeyRefFormat (0.00s)
+=== RUN   TestAC1AllowedDirsWriteKeepsAHandEditedKey
+time=2026-10-20T08:34:38.361Z level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC1AllowedDirsWriteKeepsAHandEditedKey (0.02s)
+=== RUN   TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit
+--- PASS: TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit (0.01s)
+=== RUN   TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept
+--- PASS: TestAC2GuardedWriteReportsTheKeysItWroteAndTheOnesItKept (0.01s)
+=== RUN   TestAC2CleanWriteReportsOneKeyAtInfoLevel
+--- PASS: TestAC2CleanWriteReportsOneKeyAtInfoLevel (0.00s)
+=== RUN   TestAC2UnreadableFileIsRefusedAndNothingIsWritten
+--- PASS: TestAC2UnreadableFileIsRefusedAndNothingIsWritten (0.01s)
+=== RUN   TestAC3AdoptionClaimsOnlyWhatThisWriteProduced
+time=2026-10-20T08:34:38.411Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=fs.allowed_dirs wrote=[fs.allowed_dirs]
+time=2026-10-20T08:34:38.435Z level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC3AdoptionClaimsOnlyWhatThisWriteProduced (0.03s)
+=== RUN   TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory
+time=2026-10-20T08:34:38.451Z level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[fs.allowed_dirs]
+time=2026-10-20T08:34:38.452Z level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory (0.02s)
+=== RUN   TestAC4PermissionModeWriteKeepsAHandEditedKey
+time=2026-10-20T08:34:38.466Z level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=risk.permission_mode wrote=[risk.permission_mode] kept_in_file_not_in_memory=[ball.size]
+time=2026-10-20T08:34:38.469Z level=INFO msg="config: wrote merged change into config.toml (ticket 226: only the keys listed changed value, every other key keeps the value the file already held; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value)" key=risk.permission_mode wrote=[risk.permission_mode]
+--- PASS: TestAC4PermissionModeWriteKeepsAHandEditedKey (0.02s)
+=== RUN   TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber
+time=2026-10-20T08:34:38.483Z level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[ball.size]
+--- PASS: TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber (0.01s)
+=== RUN   TestAddAllowedDirStillRefusesARelativeHop
+--- PASS: TestAddAllowedDirStillRefusesARelativeHop (0.01s)
+=== RUN   TestGuardedWriteFailureRollsBackMemory
+--- PASS: TestGuardedWriteFailureRollsBackMemory (0.00s)
+=== RUN   TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt
+time=2026-10-20T08:34:38.512Z level=INFO msg="config: config.toml already carries this key; this write added nothing (the file's bytes and mtime stayed put only because its schema_version was already current; a file behind on schema_version had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs
+--- PASS: TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt (0.01s)
+=== RUN   TestDiffKeyPathsNamesRealKeyPaths
+--- PASS: TestDiffKeyPathsNamesRealKeyPaths (0.00s)
+=== RUN   TestHandDeletedScalarLineComesBackAtSchemaDefault
+--- PASS: TestHandDeletedScalarLineComesBackAtSchemaDefault (0.02s)
+=== RUN   TestHandDeletedMapEntryIsNotRestored
+time=2026-10-20T08:34:38.544Z level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved; a key line the operator deleted by hand comes back at its schema default value" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[llm.providers.deepseek]
+--- PASS: TestHandDeletedMapEntryIsNotRestored (0.02s)
+=== RUN   TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+    writeguard_handedit_227_test.go:136: mtime did not move on a stale-schema file that logged 'added nothing' - the migration-on-read boundary is no longer being exercised
+--- FAIL: TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent (0.02s)
+=== RUN   TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent
+time=2026-10-20T08:34:38.574Z level=INFO msg="config: config.toml already carries this key; this write added nothing (the file's bytes and mtime stayed put only because its schema_version was already current; a file behind on schema_version had already been re-laid in canonical form by the re-read, so comments and hand-chosen key order are not preserved)" key=fs.allowed_dirs
+--- PASS: TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent (0.01s)
+=== RUN   TestDeletedLineRestorationIsNotClaimedAsAWrittenKey
+--- PASS: TestDeletedLineRestorationIsNotClaimedAsAWrittenKey (0.01s)
+=== RUN   TestHandDeletedDefaultValuedLineIsRestoredInvisibly
+--- PASS: TestHandDeletedDefaultValuedLineIsRestoredInvisibly (0.01s)
+=== RUN   TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory
+--- PASS: TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory (0.01s)
+=== RUN   TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+--- PASS: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed (0.02s)
+=== RUN   TestHandDeletedProviderBaseUrlComesBackAsThePresetValue
+--- PASS: TestHandDeletedProviderBaseUrlComesBackAsThePresetValue (0.01s)
+=== RUN   TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile
+--- PASS: TestHandDeletedBaseUrlOfAnUnknownProviderStaysEmptyInTheFile (0.02s)
+=== RUN   TestConfirmTimeoutFloorSitsAboveApprovalWarningLead
+--- PASS: TestConfirmTimeoutFloorSitsAboveApprovalWarningLead (0.00s)
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_30
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_10
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_1
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_2
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_20
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_3601
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_99999
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_0
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/reject_-1
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_31
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_300
+=== RUN   TestConfirmTimeoutIsBandedOnTheLoadPath/accept_3600
+--- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath (0.03s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_30 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_10 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_1 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_2 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_20 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_3601 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_99999 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_0 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/reject_-1 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_31 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_300 (0.00s)
+    --- PASS: TestConfirmTimeoutIsBandedOnTheLoadPath/accept_3600 (0.00s)
+=== RUN   TestMinimumLegalConfirmTimeoutKeepsC18Warning
+    validate_267_test.go:136: smallest legal timeout 31s, warning lead 30s, arming lead 1s > 0
+--- PASS: TestMinimumLegalConfirmTimeoutKeepsC18Warning (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.938s
+FAIL

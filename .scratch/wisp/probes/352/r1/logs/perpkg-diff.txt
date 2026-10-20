@@ -1,0 +1,81 @@
+##### PAIR ac2-host-pair-s1-treeB.raw.txt  <->  ac2-host-pair-s2-treeL.raw.txt
+internal/secret    B RUN=29   PASS_TOP=21   FAIL_TOP=0   SKIP=0   | L RUN=29   PASS_TOP=21   FAIL_TOP=0   SKIP=0   | NEW_RED=0 GONE=0
+     B_reds=[]
+     L_reds=[]
+internal/config    B RUN=195  PASS_TOP=114  FAIL_TOP=0   SKIP=0   | L RUN=195  PASS_TOP=114  FAIL_TOP=0   SKIP=0   | NEW_RED=0 GONE=0
+     B_reds=[]
+     L_reds=[]
+internal/memory    B RUN=80   PASS_TOP=43   FAIL_TOP=0   SKIP=2   | L RUN=80   PASS_TOP=43   FAIL_TOP=0   SKIP=2   | NEW_RED=0 GONE=0
+     B_reds=[]
+     L_reds=[]
+internal/agent     B RUN=114  PASS_TOP=90   FAIL_TOP=0   SKIP=0   | L RUN=114  PASS_TOP=90   FAIL_TOP=0   SKIP=0   | NEW_RED=0 GONE=0
+     B_reds=[]
+     L_reds=[]
+internal/panel     B RUN=268  PASS_TOP=163  FAIL_TOP=7   SKIP=0   | L RUN=268  PASS_TOP=163  FAIL_TOP=7   SKIP=0   | NEW_RED=0 GONE=0
+     B_reds=[TestApprovalCardViewJSONKeysMatchFrontendTypes TestC21DesignTokensFourWayAgree TestComposerContractTypesMatchFrontend TestComposerRenderFixtureTellsTheTruth TestReadGitOnThisRepositoryIsSelfConsistent TestStreamLogDroppedNamingLedgerIsNotBounded35r8 TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 ]
+     L_reds=[TestApprovalCardViewJSONKeysMatchFrontendTypes TestC21DesignTokensFourWayAgree TestComposerContractTypesMatchFrontend TestComposerRenderFixtureTellsTheTruth TestReadGitOnThisRepositoryIsSelfConsistent TestStreamLogDroppedNamingLedgerIsNotBounded35r8 TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 ]
+internal/winsec    B RUN=119  PASS_TOP=66   FAIL_TOP=2   SKIP=0   | L RUN=119  PASS_TOP=66   FAIL_TOP=2   SKIP=0   | NEW_RED=1 GONE=1
+     NEW_RED_NAMES: TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 
+     GONE_NAMES: TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 
+     B_reds=[TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1 TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1 ]
+     L_reds=[TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1 TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 ]
+   == 票面具名连带逐枚（纯字符串尺＝整枚 raw，⛔ 依赖包切块）==
+     TestAC5FailedSealRefusesTheWrite                                       B=PASS    L=PASS    SAME
+     TestAC5FailureIsNotSwallowedByTheHappyPath                             B=PASS    L=PASS    SAME
+     TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1              B=PASS    L=PASS    SAME
+     TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1         B=PASS    L=PASS    SAME
+     TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1             B=PASS    L=PASS    SAME
+     TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 B=ABSENT  L=ABSENT  SAME
+     TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone B=ABSENT  L=ABSENT  SAME
+     TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth                   B=ABSENT  L=ABSENT  SAME
+     TestAC1POSIXSealDirThroughASymlinkRefuses                              B=ABSENT  L=ABSENT  SAME
+     TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing          B=ABSENT  L=ABSENT  SAME
+     TestAC1POSIXSealFileThroughABackslashNamedLink                         B=ABSENT  L=ABSENT  SAME
+     TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree           B=ABSENT  L=ABSENT  SAME
+     TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator                    B=ABSENT  L=ABSENT  SAME
+   == private_fail_test.go:37/50/61/72/75 五枚 ErrNotSealable 判定的宿主＝四枚子测试逐枚 ==
+     TestAC5FailedSealRefusesTheWrite/exclusive_artifact                    B=PASS    L=PASS    SAME
+     TestAC5FailedSealRefusesTheWrite/replacement_write                     B=PASS    L=PASS    SAME
+     TestAC5FailedSealRefusesTheWrite/directory_chain                       B=PASS    L=PASS    SAME
+     TestAC5FailedSealRefusesTheWrite/seal_file_and_dir_direct              B=PASS    L=PASS    SAME
+
+##### PAIR ac2-col-s1-treeB.raw.txt  <->  ac2-col-s2-treeL.raw.txt
+internal/secret    B RUN=4    PASS_TOP=4    FAIL_TOP=0   SKIP=0   | L RUN=4    PASS_TOP=4    FAIL_TOP=0   SKIP=0   | NEW_RED=0 GONE=0
+     B_reds=[]
+     L_reds=[]
+internal/config    B RUN=196  PASS_TOP=111  FAIL_TOP=2   SKIP=0   | L RUN=196  PASS_TOP=113  FAIL_TOP=0   SKIP=0   | NEW_RED=0 GONE=2
+     GONE_NAMES: TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent 
+     B_reds=[TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent ]
+     L_reds=[]
+internal/memory    B RUN=79   PASS_TOP=42   FAIL_TOP=0   SKIP=2   | L RUN=79   PASS_TOP=42   FAIL_TOP=0   SKIP=2   | NEW_RED=0 GONE=0
+     B_reds=[]
+     L_reds=[]
+internal/agent     B RUN=113  PASS_TOP=89   FAIL_TOP=0   SKIP=0   | L RUN=113  PASS_TOP=89   FAIL_TOP=0   SKIP=0   | NEW_RED=0 GONE=0
+     B_reds=[]
+     L_reds=[]
+internal/panel     B RUN=268  PASS_TOP=163  FAIL_TOP=7   SKIP=0   | L RUN=268  PASS_TOP=163  FAIL_TOP=7   SKIP=0   | NEW_RED=0 GONE=0
+     B_reds=[TestApprovalCardViewJSONKeysMatchFrontendTypes TestC21DesignTokensFourWayAgree TestComposerContractTypesMatchFrontend TestComposerRenderFixtureTellsTheTruth TestReadGitOnThisRepositoryIsSelfConsistent TestStreamLogDroppedNamingLedgerIsNotBounded35r8 TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 ]
+     L_reds=[TestApprovalCardViewJSONKeysMatchFrontendTypes TestC21DesignTokensFourWayAgree TestComposerContractTypesMatchFrontend TestComposerRenderFixtureTellsTheTruth TestReadGitOnThisRepositoryIsSelfConsistent TestStreamLogDroppedNamingLedgerIsNotBounded35r8 TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 ]
+internal/winsec    B RUN=74   PASS_TOP=46   FAIL_TOP=0   SKIP=0   | L RUN=74   PASS_TOP=46   FAIL_TOP=0   SKIP=0   | NEW_RED=0 GONE=0
+     B_reds=[]
+     L_reds=[]
+   == 票面具名连带逐枚（纯字符串尺＝整枚 raw，⛔ 依赖包切块）==
+     TestAC5FailedSealRefusesTheWrite                                       B=PASS    L=PASS    SAME
+     TestAC5FailureIsNotSwallowedByTheHappyPath                             B=PASS    L=PASS    SAME
+     TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1              B=PASS    L=PASS    SAME
+     TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1         B=ABSENT  L=ABSENT  SAME
+     TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1             B=ABSENT  L=ABSENT  SAME
+     TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 B=PASS    L=PASS    SAME
+     TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone B=PASS    L=PASS    SAME
+     TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth                   B=PASS    L=PASS    SAME
+     TestAC1POSIXSealDirThroughASymlinkRefuses                              B=PASS    L=PASS    SAME
+     TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing          B=PASS    L=PASS    SAME
+     TestAC1POSIXSealFileThroughABackslashNamedLink                         B=PASS    L=PASS    SAME
+     TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree           B=PASS    L=PASS    SAME
+     TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator                    B=PASS    L=PASS    SAME
+   == private_fail_test.go:37/50/61/72/75 五枚 ErrNotSealable 判定的宿主＝四枚子测试逐枚 ==
+     TestAC5FailedSealRefusesTheWrite/exclusive_artifact                    B=PASS    L=PASS    SAME
+     TestAC5FailedSealRefusesTheWrite/replacement_write                     B=PASS    L=PASS    SAME
+     TestAC5FailedSealRefusesTheWrite/directory_chain                       B=PASS    L=PASS    SAME
+     TestAC5FailedSealRefusesTheWrite/seal_file_and_dir_direct              B=PASS    L=PASS    SAME
+
