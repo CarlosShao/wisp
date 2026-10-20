@@ -1,0 +1,17 @@
+续跑派单＝票 352 落地腿 352-r1（写腿·winsec `%w`）｜编排者＝新任 harness｜发出 2026-10-20 17:3x +08
+★你是续跑：原腿 15:3x 放出、已落 9 笔（首笔 `0fb399c3`、末笔 `8a10a7e3` 17:12），被网关重启打断。主题起头⛔ 换形：续跑的每笔仍以逐字「**票 352 落地腿 352-r1**」开头（收件名册尺锚定它）。
+
+## 盘上断点（编排者 17:2x 现量，你起手自己复核、⛔ 盲信）
+- HEAD＝`8a10a7e3`（17:12 笔⑨＝交件前纪律尺逐字输出入库）。9 笔名册＝`0fb399c3`笔①尺与驱动 → `aacde632`笔③AC#0 改前读数 → `c16ff47e`笔④AC#1 落地读数 → `ecffb93b`笔②那一行落地（winsec.go 双 `%w`，机主已批）→ `06aa2abf`笔⑤AC#2 消费者面五包作差 → `3ecdea30`笔⑥自抓整改 → `5c9402f8`笔⑦AC#3 纪律格＋门禁四数 → `1c787282`笔⑧票尾 bullet → `8a10a7e3`笔⑨纪律尺输出。
+- ★`internal/winsec/**` 写面最近 40 分钟 0 被动＝无活体、你是唯一写者。
+- `wrapPath` 现读逐字＝`fmt.Errorf("%w: %s: %w", ErrNotSealable, path, err)` 已落。
+
+## 你这趟要做的
+① 现读票面＋你已入库的 9 笔正文，判定 AC#0..AC#3 的产出还缺哪一味（票面 4 格全未勾是⛔ 你翻的——翻框归非实现者）。
+② 缺的补齐；不缺则直接写交件：send_message 报 lead＝逐枚提交号名册（9＋你补的笔）＋写面自证尺（`git show --name-only` 逐枚＝winsec.go 只在 `ecffb93b`，其余笔只 probes/票尾）＋`git show -U0 ecffb93b` 可执行变动行数＋门禁四数 rc＋成对读数落点＋票 352 框终量（须 4 未勾／0 勾＝你一枚没翻）＋票尾 numstat（纯追加）。
+③ 若发现任何一处已入库正文与实际盘上不符＝具名停手上报，⛔ 自行改写历史（禁 amend/reset）。
+
+## 铁律（全量见 `.scratch/wisp/probes/orch/20261020/352r1-dispatch.txt` 原文＋其尾公共块——起手先 Read 那份全文）
+- ★写面只三处＝`internal/winsec/winsec.go`（且⛔ 再动它，那一行已落＝任何新产码字节都算越界）＋`.scratch/wisp/probes/352/r1/**`＋票 352 尾只追加。
+- ⛔ push、⛔ 翻框、⛔ 改票名/Status、⛔ `add -A`/amend/reset/rebase/stash/checkout ./clean、add 与 commit 两处显式 pathspec、`-F` Windows 形路径、提交后 `git log -1`＋`git show --name-only` 对回。
+- ⛔ 跑 `./cmd/wisp`⇄`./internal/agent/**` 包测（别腿写面；`230-r1` 续跑正在 approval 包）。临时件只建不删、一律 `D:\tmp\wisp\20261020\352r1cont\`。

@@ -1,0 +1,19 @@
+续跑派单＝票 230 注释面落地腿 230-r1（写腿·只改注释）｜编排者＝新任 harness｜发出 2026-10-20 17:3x +08
+★你是续跑：原腿 15:3x 放出、已落 2 笔（`c489eacc`笔①＝`lookupForRefusalLocked` 函数文档、`c73df208`笔②＝`Queue.alias` 字段注释），被网关重启打断。主题起头⛔ 换形：续跑每笔仍以逐字「**票 230 落地腿 230-r1**」开头。
+
+## 盘上断点（编排者 17:2x 现量，你起手自己复核）
+- `internal/agent/approval/queue.go` 16:49 有过一次写（笔②落地）；最近 40 分钟＝你是唯一写者（其余进程为噪声）。
+- ★`.scratch/wisp/probes/230/**` 整目录未跟踪未入库＝断腿遗产，先 `git status --porcelain -- .scratch/wisp/probes/230/` 看清、逐枚 add＋commit（显式 pathspec 逐枚列全）。
+- 票 230 现框量＝open 5／done 0（你一枚没翻、也不许翻）。
+
+## 你这趟要做的（收尾＝AC#2 那格的纪律与交件）
+① 现读两笔已入库正文＋票面 AC#2 判据，核两处注释改动是否就是 `AC#2` 全射程（`git grep -n 'only reader of q.alias'` 内容锚现量应＝命中 0＝已改；若还有第三处假话残留＝具名上报）。
+② 门禁四把落 rc＝`GOFLAGS= go build ./...`／`sh scripts/d22scan.sh`／`gofmt -l`⇄`gofumpt -l internal/agent/approval/queue.go` 并排（跑门先 `unset GOTMPDIR TMPDIR TEMP TMP`）。
+③ 可执行字节变动＝0 的量证：`git show -U0 c489eacc`＋`git show -U0 c73df208` 逐变动行都以 `//` 开头，自己算出来写进件。
+④ 票 230 尾一条只追加 bullet＋Progress log 一行（numstat 纯追加尺自证）。
+⑤ 交件：send_message 报 lead＝逐枚提交号＋定位尺命中处 file:line＋改后注释原文逐字＋"其余读者"名册＋门禁 rc＋框终量（须 5 未勾／0 勾）＋numstat＋probes 入库名册。
+
+## 铁律（全量见 `.scratch/wisp/probes/orch/20261020/230r1-dispatch.txt` 原文＋尾公共块——起手先 Read 那份全文）
+- ★写面＝`internal/agent/approval/queue.go`（只注释）＋`.scratch/wisp/probes/230/r1/**`＋票 230 尾只追加。⛔ 动任何可执行语句、⛔ 把 `Queue.reject` 分支改宽、⛔ 动授权判定。
+- ★跑色限 `./internal/agent/...` 定向；⛔ 整包 `./cmd/wisp`、⛔ `./...`、⛔ `./internal/winsec/`（`352-r1` 续跑写面）。
+- ⛔ push、⛔ 翻框、⛔ 改票名/Status/`-done`、两处显式 pathspec、`-F` Windows 形、提交后对回。临时件落 `D:\tmp\wisp\20261020\230r1cont\`。

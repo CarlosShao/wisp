@@ -1,0 +1,20 @@
+续跑派单＝票 115 七项检查表出表腿 115-v1（只读·非实现者）｜编排者＝新任 harness｜发出 2026-10-20 17:3x +08
+★你是续跑：原腿 15:3x 放出，16:55→17:11 在盘上连落 11 枚 logs＋一枚 24KB 判语件，**提交 0 笔**，17:1x 被网关重启打断。主题起头⛔ 换形：续跑每笔以逐字「**票 115 出表腿 115-v1**」开头（⚠ 原派单那句是"票 115 出表腿"，盘上名册尺现量 0 笔＝一枚都没提交，不存在换形问题）。
+
+## 盘上断点（编排者 17:2x 现量，你起手自己复核）
+- 全部**未入库**（`git status --porcelain` 显示 `?? .scratch/wisp/probes/115/` ＋ `?? docs/evidence/s1/115-adversarial-acceptance.md`）。
+- `probes/115/v1/logs/` 11 枚：`00-start-rulers`5471B／`01-denominator`3257B／`02-remote-recompute`1658B／`03-redpoints-verbatim`6734B／`04-transgreen-selffetch`4285B／`05-d22scan-credential`4973B／`06-ci-d22scan-on-115-bytes`1029B／`07-lint-d22scan-ledger`7488B／`08-ci-scan-verdict-lines`10847B／`09-closing-rulers`4892B／`11-attribution-and-controls`3320B。★注意 **`10-` 缺号**＝断在第十枚之前或它跳号了，你自查正文有无指代。
+- `docs/evidence/s1/115-adversarial-acceptance.md` 24071B 17:16 落盘＝七项检查主件，⚠ **超公共块 160 行帽**：先 `wc -l` 量行数，超了按公共块口径拆具名分件（`115-adversarial-acceptance-secN.md` 形，`322-r2` 先例），⛔ 为凑帽压正文／删判据。
+- 票 115＝`115-seal-notices-carry-the-resolvers-ans…`（`-done` 名，⛔ 改名）现框量 open 2／done 3；票 230 open 5／done 0。★原派单第 9 行要你先报那处"三个分母彼此不合同"（115 未勾2/已勾3 vs 票 230 写"7 格全未勾" vs `AC#1` 裁定"3 格抽过剩 4"）＝`logs/01-denominator` 应是它的产出，验它有没有真定出分母。
+
+## 你这趟要做的
+① 先 Read 原派单全文 `.scratch/wisp/probes/orch/20261020/115v1-dispatch.txt`（含七项检查判据形状与边界）。
+② 逐枚复核 11 枚 logs＋判语件的**自洽性**：凡引用数有无带尺名＋射程＋量/算；七项标题是否逐字抄自 `docs/specs/SPEC-10-*.md` 第 8 节（⛔ 凭记忆）。有错按"追加更正"形处理，⛔ 改写已写正文。
+③ 逐枚 `git add`＋`git commit`（两处显式 pathspec、每落一枚就 commit、⛔ 攒），提交后 `git log -1`＋`git show --name-only` 对回。
+④ 票 115 尾一条只追加 bullet（＋若需具名一句可只在票 230 尾追加一条，⛔ 改原句）。
+⑤ 交件 send_message 报 lead＝逐枚提交号＋表件绝对路径＋字节/行＋`find docs/evidence -name "115*"` 前后读数＋七格各自结论与凭据（含"缺哪一味"清单）＋票 115／票 230 框终量尺（两票你一枚没翻）＋票尾 numstat（纯追加）。
+
+## 铁律（全量见原派单尾公共块）
+- ★**只读腿**：⛔ 跑任何 `go test`（`352-r1` 在写 `internal/winsec`、`230-r1` 在写 `internal/agent/approval`）；⛔ 动任何 `.go` 字节；⛔ 翻票 115／票 230 任何框；⛔ 改 `-done` 名；⛔ push。
+- 写面＝`docs/evidence/s1/115-*.md`（含拆出的分件）＋`.scratch/wisp/probes/115/v1/**`＋票 115 尾只追加（＋票 230 尾至多一条只追加）。
+- ★你⛔ 结案：交付的是票 230 `AC#1` 欠的那张表，翻勾归编排者凭**别的**非实现者判语。临时件落 `D:\tmp\wisp\20261020\115v1cont\`。
