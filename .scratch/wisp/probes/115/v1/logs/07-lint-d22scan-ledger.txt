@@ -1,0 +1,82 @@
+# 07 lint job 106389417800（run 35616790753 head d1056c0，含票 115 末笔 c6dbbf9）
+   rc=0 bytes=59618 lines=618 stderr=0
+   sha256＝916cc89f0573bc079e8f30ec9638ecc3eaacbd822d7297f65f5c6b7ca6d6a74a */d/tmp/wisp/20261020/115v1/remote/lint-106389417800.log
+
+## A. D22 七条禁令＋emoji 那一步（step 5）的逐字输出
+   192:2026-09-21T15:07:43.1466094Z ##[group]Run bash tools/d22scan/runtests.sh -C tools/d22scan ./...
+   335:2026-09-21T15:07:45.0830953Z ##[group]Run sh scripts/d22scan.sh
+   ---- d22scan 判决行 ----
+   257:2026-09-21T15:07:45.0706600Z     scan_test.go:1157: rc=1 stdout=d22scan: examined 16 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_12868844770/001
+   258:2026-09-21T15:07:45.0707620Z         d22scan: scope bans #1-5 internal/      examined  15 production Go files
+   259:2026-09-21T15:07:45.0708268Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+   260:2026-09-21T15:07:45.0708866Z         d22scan: scope ban #6 frontend/         examined   1 text files
+   261:2026-09-21T15:07:45.0709483Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+   262:2026-09-21T15:07:45.0710078Z         d22scan: scope ban #8 design/           examined   1 text files
+   263:2026-09-21T15:07:45.0710914Z         d22scan: scope ban #8 frontend/         examined   1 text files
+   264:2026-09-21T15:07:45.0711652Z         d22scan: scope ban #8 internal/         examined  15 Go files, comments and _test.go included
+   265:2026-09-21T15:07:45.0712444Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+   267:2026-09-21T15:07:45.0715031Z         stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+   269:2026-09-21T15:07:45.0716878Z     scan_test.go:1157: rc=2 stdout=d22scan: examined 14 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_22557199010/001
+   270:2026-09-21T15:07:45.0717887Z         d22scan: scope bans #1-5 internal/      examined  13 production Go files
+   271:2026-09-21T15:07:45.0718571Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+   272:2026-09-21T15:07:45.0719166Z         d22scan: scope ban #6 frontend/         examined   1 text files
+   273:2026-09-21T15:07:45.0719786Z         d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+   274:2026-09-21T15:07:45.0720653Z         d22scan: scope ban #8 design/           examined   1 text files
+   275:2026-09-21T15:07:45.0721236Z         d22scan: scope ban #8 frontend/         examined   1 text files
+   276:2026-09-21T15:07:45.0721950Z         d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+   277:2026-09-21T15:07:45.0722737Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+   278:2026-09-21T15:07:45.0724111Z         stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+   ---- 台账八数（ban #… =N）----
+   ban #6 frontend/=1
+   ban #6 frontend/=40
+   ban #7 internal/tools/=1
+   ban #7 internal/tools/=18
+   ban #8 cmd/=1
+   ban #8 cmd/=29
+   ban #8 design/=1
+   ban #8 design/=16
+   ban #8 frontend/=1
+   ban #8 frontend/=40
+   ban #8 internal/=14
+   ban #8 internal/=374
+
+## B. 正控制那一步（seeded red）逐字
+   256:2026-09-21T15:07:45.0705540Z === RUN   TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1
+   257:2026-09-21T15:07:45.0706600Z     scan_test.go:1157: rc=1 stdout=d22scan: examined 16 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_12868844770/001
+   326:2026-09-21T15:07:45.0765519Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1 (0.01s)
+   334:2026-09-21T15:07:45.0792703Z runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0
+   339:2026-09-21T15:07:45.0947973Z d22scan.sh: positive control - runtests.sh -C tools/d22scan ./...
+   400:2026-09-21T15:07:46.3152254Z === RUN   TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1
+   401:2026-09-21T15:07:46.3153309Z     scan_test.go:1157: rc=1 stdout=d22scan: examined 16 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_11628194292/001
+   470:2026-09-21T15:07:46.3219056Z     --- PASS: TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1 (0.01s)
+
+## C. gofmt/gofumpt 与 go vet 两步的逐字（票 115 AC#6 那几样的仪器级读数）
+   490:2026-09-21T15:07:46.6694286Z ##[group]Run go install mvdan.cc/gofumpt@latest
+   491:2026-09-21T15:07:46.6694709Z [36;1mgo install mvdan.cc/gofumpt@latest[0m
+   492:2026-09-21T15:07:46.6695084Z [36;1mOUT="$(gofumpt -l . tools/d22scan tools/mockllm)"[0m
+   494:2026-09-21T15:07:46.6695711Z [36;1m  echo "gofumpt would reformat:"[0m
+   500:2026-09-21T15:07:47.0071497Z go: downloading mvdan.cc/gofumpt v0.12.0
+   504:2026-09-21T15:07:49.1532480Z ##[group]Run go vet ./...
+   505:2026-09-21T15:07:49.1533005Z [36;1mgo vet ./...[0m
+   511:2026-09-21T15:08:00.1774360Z ##[group]Run go vet ./...
+   512:2026-09-21T15:08:00.1774661Z [36;1mgo vet ./...[0m
+   598:2026-09-21T15:08:26.3792100Z ##[group]Run go vet ./...
+   599:2026-09-21T15:08:26.3792399Z [36;1mgo vet ./...[0m
+
+## D. staticcheck 那一步的颜色（票面记它属票 85）
+   515:2026-09-21T15:08:00.2834771Z ##[group]Run go install honnef.co/go/tools/cmd/staticcheck@2026.2.1
+   516:2026-09-21T15:08:00.2835301Z [36;1mgo install honnef.co/go/tools/cmd/staticcheck@2026.2.1[0m
+   524:2026-09-21T15:08:00.2837377Z [36;1m  echo "=== staticcheck module: $mod ==="[0m
+   527:2026-09-21T15:08:00.2838403Z [36;1m  m_out=$(cd "${mod}" && staticcheck ./... 2>&1) || step_rc=$?[0m
+   537:2026-09-21T15:08:00.2843337Z [36;1mecho "staticcheck self-report: version=$(staticcheck --version) modules=$modcount packages=$pkgs findings=$findings toolchain-crash-lines=$crashes (step exit is $rc)"[0m
+   548:2026-09-21T15:08:12.6049701Z === staticcheck module: . ===
+   589:2026-09-21T15:08:25.5022877Z === staticcheck module: tools/d22scan ===
+   593:2026-09-21T15:08:25.7891417Z === staticcheck module: tools/mockllm ===
+   549:2026-09-21T15:08:25.4901694Z ##[error]cmd/wisp/doctor.go:267:6: func dataDirForDisplay is unused (U1000)
+   550:2026-09-21T15:08:25.4912413Z ##[error]cmd/wisp/run.go:109:2: field probeSink is unused (U1000)
+   551:2026-09-21T15:08:25.4913875Z ##[error]cmd/wisp/run.go:213:2: field logf is unused (U1000)
+   552:2026-09-21T15:08:25.4915667Z ##[error]cmd/wisp/run.go:285:2: should replace loop with allowed = append(allowed, cfg.FS.AllowedDirs...) (S1011)
+   553:2026-09-21T15:08:25.4917160Z ##[error]cmd/wisp/run_test.go:70:2: field calls is unused (U1000)
+   554:2026-09-21T15:08:25.4920621Z ##[error]frontend/embed.go:4:1: ineffectual compiler directive due to extraneous space: "// go:embed below is the ONLY way those bytes reach wisp.exe. There is no" (SA9009)
+   555:2026-09-21T15:08:25.4924034Z ##[error]internal/agent/approval/approval.go:316:22: func (*grantStore).live is unused (U1000)
+   556:2026-09-21T15:08:25.4926445Z ##[error]internal/agent/approval/fakes_test.go:104:2: field views is unused (U1000)
