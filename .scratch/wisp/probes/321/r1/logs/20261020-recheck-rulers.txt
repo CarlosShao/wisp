@@ -1,0 +1,153 @@
+# 321-r1 复验 2026-10-20 逐字读数（每段带尺名＋射程＋量的还是算的；本件由 logs/20261020-recheck-build-rulers.sh 现生成）
+
+## A. 起手三把尺（盘上物证，⛔ 采信票尾 2026-10-15 那条 bullet 的任何读数）
+$ git rev-parse HEAD
+4e0ac98590db3df6a0267473847c28b0987b4a9e
+$ git branch --show-current
+dev
+$ git cat-file -e HEAD:cmd/wisp/exec_holder_toggle_321_test.go && echo EXISTS
+EXISTS
+$ git show HEAD:cmd/wisp/exec_holder_toggle_321_test.go | wc -l
+200
+$ sha256sum cmd/wisp/exec_holder_toggle_321_test.go   (盘上)
+717b2d2d9b76d8ae9d413e53a14e11f1669b834fcb056af6b884e01febb63738 *cmd/wisp/exec_holder_toggle_321_test.go
+$ git show HEAD:cmd/wisp/exec_holder_toggle_321_test.go | sha256sum   (HEAD blob)
+717b2d2d9b76d8ae9d413e53a14e11f1669b834fcb056af6b884e01febb63738 *-
+
+## B. 名册尺（防双派那把为什么漏＝锚定⇄非锚定对照；尺＝git log --grep，射程＝--all）
+$ git log --all --grep="^票 321" --format="%h %ad %s" | 按字符截 90
+1104fea8 10-20 18:45 票 321 落地腿 321-r1 派单存档（先存档再发）＝★第三枚写腿补位＝写 3 达标（机主 15:0x 规矩）｜面＝cmd/wisp 
+$ git log --all --grep="票 321" --format="%h %ad %s" | 按字符截 90   (非锚定＝4 笔)
+1104fea8 10-20 18:45 票 321 落地腿 321-r1 派单存档（先存档再发）＝★第三枚写腿补位＝写 3 达标（机主 15:0x 规矩）｜面＝cmd/wisp 
+41673704 10-15 21:21 两枚**待派**存档（★按 A993 定式：存档≠在飞，件首行具名写释放条件）：321-v1（票 321 接线钉的非实现者终裁，含"等价改
+58de465a 10-15 20:03 321-r1 落地腿交件（票 321，零产码）：给托盘/球/热键那一跳的执行器接线装上常驻判据。新件 cmd/wisp/exec_hold
+f19bce28 10-15 15:21 319 收口：319-v2 判 AC#2/#3 成立⇒五格齐 -done（面板死而能复活＋二次启动显示+抬前台全链闭环）＋接线无钉另立票 
+$ git log --all --grep="321-r1" --format="%h %ad %s" | 按字符截 70
+1104fea8 10-20 18:45 票 321 落地腿 321-r1 派单存档（先存档再发）＝★第三枚写腿补位＝写 3 达标（机主 1
+03da4941 10-15 21:04 270-r1 落地腿交件（票 270，形＝甲／A990 裁③）：task.spawn 的那次无条件
+c673f67b 10-15 20:53 收件 321-r1＋120-r2（编排者各复跑一把：两枚 AST 尺 PASS／容器严格档三形 0
+58de465a 10-15 20:03 321-r1 落地腿交件（票 321，零产码）：给托盘/球/热键那一跳的执行器接线装上常驻判据。新
+78ea61e2 10-15 19:34 接手对账＋A990 三裁（privateFile 另立票 322／r 权限收紧接受／票 270 选
+7c261377 10-15 16:15 台账 A983：pool-r2 收件＋按机主令把写腿铺到规格上限（写×4：135-r1/120-r
+$ git merge-base --is-ancestor 58de465a HEAD
+YES
+
+## C. 内容锚（⛔ 绝对行号；装配处今天＝resident_windows.go:288-290＝票面写的 :268-270 已漂 20 行）
+$ git grep -n "holder.toggle" HEAD -- cmd/wisp/resident_windows.go
+HEAD:cmd/wisp/resident_windows.go:289:		return holder.toggle(via)
+$ git grep -n "withPanelHost(" HEAD -- cmd/wisp/
+HEAD:cmd/wisp/exec_holder_toggle_321_test.go:8:// The gap: resident_windows.go hands the ball host withPanelHost(func(via string) bool {
+HEAD:cmd/wisp/exec_holder_toggle_321_test.go:20:// (withPanelHost(holder.toggle)) or a ticket-296-style hoisted executor reddens it by
+HEAD:cmd/wisp/resident_ball_windows.go:147:func withPanelHost(showPanel func(via string) bool) ballHostHook {
+HEAD:cmd/wisp/resident_windows.go:288:	rb := startResidentBall(rt.Registry, ra.vetoByEsc, hotCfg258, hotReload258, withPanelHost(func(via string) bool {
+$ git grep -n "holder := newPanelHolder"   (holder 绑定＝尺认构造器不认变量名)
+HEAD:cmd/wisp/resident_windows.go:221:	holder := newPanelHolder(rt.Registry, rp)
+$ git grep -n "func (h \*panelHolder) toggle"   (能力尺要去解析的那枚声明)
+HEAD:cmd/wisp/resident_windows.go:625:func (h *panelHolder) toggle(via string) bool {
+
+## D. pristine（跑前⇄跑后各验；尺＝sha256sum／git status --porcelain，射程＝共享树＋两棵仓外导出树）
+$ git status --porcelain -- cmd/wisp/ | wc -l   (共享树整趟＝0)
+0
+$ git show HEAD:cmd/wisp/resident_windows.go | sha256sum   (HEAD blob)
+4f7a10b30d1801325a5fdf95c3c975de1bff29057b98bebf09ebe83145837237 *-
+$ 两棵导出树起步 sha（须与 HEAD blob 同串）
+4f7a10b30d1801325a5fdf95c3c975de1bff29057b98bebf09ebe83145837237 */d/tmp/wisp/20261020/321r1/treeB/cmd/wisp/resident_windows.go
+$ 取出后先数 .go 证非空（"0"⛔ 是读数）
+treeB .go=777
+treeM .go=777
+
+## E. 变异自证（★仓外物理改写＋sha 还原，⛔ -overlay：两枚尺运行时 parser.ParseFile/os.ReadDir 读盘上产码，overlay 只换编译期输入⇒恒绿＝假读数）
+落刀前锚（尺＝grep -c，射程＝treeM/cmd/wisp/resident_windows.go）：holder.toggle(via)=1 ／ holder.show(via)=0 ／ 正控（报 0 命中前先跑）startResidentBall=5 非零
+突变甲（票面指定形）落刀后：holder.toggle(via)=0 ／ holder.show(via)=1；sha 4f7a10b3… -> 5f32c102…；全文件 diff＝289c289＝加 1 删 1（单行）
+突变乙（反形：闭包体 return false，不驱动任何 holder 方法）落刀后：holder.toggle(via)=0 ／ holder.show(via)=0；sha -> cba71d39…；全文件 diff＝289c289＝加 1 删 1
+两轮还原后 sha 均＝下面那串（与 HEAD blob 逐字同串），锚回 1/0：
+4f7a10b30d1801325a5fdf95c3c975de1bff29057b98bebf09ebe83145837237 */d/tmp/wisp/20261020/321r1/treeM/cmd/wisp/resident_windows.go
+还原后 holder.toggle(via) 锚（须 1）= 1
+还原后 holder.show(via) 锚（须 0）= 0
+备份件（留底、⛔ 未删）＝D:\tmp\wisp\20261020\321r1\resident_windows.go.treeM.bak
+
+### E1. 突变甲红句（逐字，尺＝grep -n 'AC#1 RED'，射程＝仓外 logs/m-pos1.txt）
+7:    exec_holder_toggle_321_test.go:158: AC#1 RED: this hop is NOT toggle semantics - runResident (resident_windows.go) hands the ball host the executor set [show] on newPanelHolder (receiver "holder", argument a function literal), want exactly [toggle]. A panel hop that shows instead of flipping is the rewiring ticket 319-r3 split the two executors to forbid: it hid the operator's window on a do
+10:    exec_holder_toggle_321_test.go:198: AC#1 RED: this hop is NOT toggle semantics by capability either - the executor show the panel hop drives posts [Lock Unlock isFinished spawn Info RequestShow RequestRaise], which lacks RequestToggle: the tray item, the ball and the panel hot key no longer flip the panel's state
+
+### E2. 突变乙红句（逐字，logs/mB-pos1.txt）
+7:    exec_holder_toggle_321_test.go:154: AC#1 RED: the panel hop in runResident (resident_windows.go) is a function literal that drives NO executor on newPanelHolder (receiver "") - the tray item, the ball and the panel hot key now execute nothing, whatever this file is named
+10:    exec_holder_toggle_321_test.go:173: AC#1 RED: the panel hop (resident_windows.go) drives [] executor(s), want exactly one toggle - no single method here has a capability that could be checked
+
+### E3. 反面尺在突变甲下仍绿（＝缺口属实被复认；票面明说那枚⛔ 冒充本格）
+尺＝-run TestBallPanelGesturesReachThePanelThread ＋ 突变甲在飞：RUN=1 PASS_TOP=1 FAIL_TOP=0 SKIP=0 rc=0
+--- PASS: TestBallPanelGesturesReachThePanelThread (1.10s)
+
+## F. 成对四数（尺＝grep -c '^=== RUN' ⇄ '^--- PASS' ⇄ '^--- FAIL' ⇄ '^--- SKIP'；四数不混用不相减；射程＝仓外导出树 ./cmd/wisp/ 定向 -run；量的）
+正则＝AC321|Test258|TestAC228|Test296|BallPanel|TrayStop|AssemblyRoot（同一枚、两棵树串行；⛔ ./...）
+-- 基线 treeB：logs/b-family.txt --
+-- 突变甲 treeM：logs/mA-family.txt --
+-- 逐名作差：新增红名册（须＝判据那两枚，不多不少）--
+--- FAIL: TestAC321NamedExecutorIsTheToggleRoad
+--- FAIL: TestAC321PanelHopDrivesTheHolderToggle
+-- 反证：基线红、突变后消失（须空＝没把别枚打绿）--
+-- 逐名作差：新增 SKIP（须空＝分母没动）--
+-- 存量红⇄弃权名册逐字（机主常驻 wisp.exe pid 21892 在场占热键那一族；⛔ 归因给本腿字节）--
+time=2026-10-20T19:10:35.591+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=1 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), 
+time=2026-10-20T19:10:35.634+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=defaults hotkeys_live=0 hotkeys="summon=Ctrl+Alt+Q occupied by another app, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only
+time=2026-10-20T19:10:36.117+08:00 level=INFO msg="ball: the resident leg created the floating ball window" hotkeys_provenance=config hotkeys_live=1 hotkeys="summon=Ctrl+Alt+Z live, mute=Ctrl+Alt+M occupied by another app, cancel=Esc not bound while idle (cancel is borrowed only during Confirming), 
+    resident_hotkey_258_windows_test.go:453: live slots after the rebind = 1, want 2 (summon+mute; cancel is standby, panel is taken)
+-- 同一枚正则下两棵树 PASS 名册差（须＝那两枚判据）--
+--- PASS: TestAC321NamedExecutorIsTheToggleRoad
+--- PASS: TestAC321PanelHopDrivesTheHolderToggle
+
+### F1. 正控两发（还原态／基线，判据本身恒绿）
+-- treeB -run AC321（logs/b-pos1.txt）--
+-- treeM 还原后 -run AC321（logs/m-restored-rerun.txt）--
+-- 装配族成对（定向 5 枚，logs/b-pair-assembly.txt ⇄ m-pair-assembly-restored.txt）--
+
+## G. 门禁（只在共享工作树；跑前 unset GOTMPDIR TMPDIR TEMP TMP，验到 GOTMPDIR/TMPDIR=[unset]）
+GOFLAGS= go build ./...                                   -> rc=0  输出 0 字节
+sh scripts/d22scan.sh                                     -> rc=0  clean - no D22 ban violations（射程含 cmd/ 143 枚 Go 文件、注释与 _test.go）
+/d/work/base/gopath/bin/gofumpt.exe -l <判据件>            -> rc=0  输出 0 字节
+gofmt -l <判据件>（并排那把）                               -> rc=0  输出 0 字节
+go vet -tags winlive ./cmd/wisp/（票面 AC#2 逐字那把）      -> rc=0  输出 0 字节
+sh scripts/check-path-length-budget.sh --with-self-test    -> rc=0  VERDICT GREEN
+-- 逐枚字节数（尺＝wc -c）--
+gate-build.txt bytes=0
+gate-d22scan.txt bytes=23774
+gate-gofumpt.txt bytes=0
+gate-gofmt.txt bytes=0
+gate-vet-winline.txt bytes=0
+gate-length.txt bytes=2369
+-- 长度门末行逐字 --
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+-- d22scan 末行逐字 --
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=244, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=603, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files
+-- vet 件字节＝0 ⇒ 下面这把正控证明 go vet 真在跑（故意带一枚坏包名应有 rc≠0 的形⛔ 用；改取『件非空』尺）--
+gate-vet-winline.txt bytes=0
+
+## H. 票面框终量⇄写面自证（尺＝grep -c 行首，射程＝票面文件）
+未勾框 ^- [ ] = 2
+已勾框 ^- [x] = 0
+正控 ^- [ 全形 = 4
+Status 行 = 3:**Status:** 待派（小票；面＝`cmd/wisp` 的 319 宿主装配＋其测试件）
+本腿 cmd/wisp 产码字节＝0 枚、测试字节＝0 枚（判据 200 行已在 HEAD＝58de465a，盘上⇄HEAD 同 sha 见 §A）
+前腿具名的那枚 255 存量红今天已消（尺＝-run TestTicket255RosterStillMatchesTheActualReadSites，logs/b-255-roster.txt）：
+--- PASS: TestTicket255RosterStillMatchesTheActualReadSites (1.18s)
+-- 基线 treeB：logs/b-family.txt --
+  RUN=23 PASS_TOP=18 FAIL_TOP=3 SKIP=2
+-- 突变甲 treeM：logs/mA-family.txt --
+  RUN=23 PASS_TOP=16 FAIL_TOP=5 SKIP=2
+-- 正控 treeB -run AC321：logs/b-pos1.txt --
+  RUN=2 PASS_TOP=2 FAIL_TOP=0 SKIP=0
+-- 正控 treeM 还原后 -run AC321 --
+  RUN=2 PASS_TOP=2 FAIL_TOP=0 SKIP=0
+-- 装配族成对 定向 5 枚 --
+  RUN=5 PASS_TOP=5 FAIL_TOP=0 SKIP=0
+  RUN=5 PASS_TOP=5 FAIL_TOP=0 SKIP=0
+
+## I. 门禁那把尺的正控（★尺必须先证明能红，rc=0 才算读数）
+尺＝go vet -tags winlive ./cmd/wisp/，射程＝第三棵仓外树 treeV＝treeB 的副本＋一枚故意带坏 printf 的探针件（⛔ 共享树、⛔ 成对那两棵，pristine 主张不受影响）
+$ cat treeV/cmd/wisp/zz321r1vetprobe_windows.go 里的坏行：fmt.Printf("%d", "not-an-int")
+$ go vet -tags winlive ./cmd/wisp/  (treeV)
+RC=1
+cmd\wisp\zz321r1vetprobe_windows.go:11:38: fmt.Printf format %d has arg "not-an-int" of wrong type string
+⇒ 同一把尺在真树（共享工作树）上 rc=0＋0 字节输出＝过；在带坏字节上的树 rc=1＋点名诊断＝尺有牙。
+
+另一把正控（同段）：go vet -tags winlive ./cmd/wisp-does-not-exist-321r1/ -> RC=1（stat ... directory not found）＝包路径打错时尺会响，不会静默 rc=0。
