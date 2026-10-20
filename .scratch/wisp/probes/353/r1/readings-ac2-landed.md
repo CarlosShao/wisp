@@ -52,21 +52,29 @@ TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 |B
 ```
 ★新增红＝**0 枚**（尺＝名集作差 `comm -13`，⛔ 四数差）；Linux／container＝finalB ⇄ finalL 各 `RC=0 RUN=74 PASS_TOP=46 FAIL_TOP=0 SKIP=0 SHAPE=OK`、逐名新增红＝**0 枚**、★⛔ 跑 `./cmd/wisp`（321-r1 写面）。
 
-## 五、摆动名册定因（★两族分子⛔ 合并、⛔ 相减＝票 348 AC#3 那条；尺＝`sh/27`⇄`sh/30`⇄`sh/32`⇄`sh/33`，定向两侧各 4 发＋整包两侧各 2 发）
+## 五、摆动名册定因⇄★本落地的连带（两味分开）（★两族分子⛔ 合并、⛔ 相减＝票 348 AC#3 那条；尺＝`sh/27`⇄`sh/30`⇄`sh/32`⇄`sh/33`⇄`sh/35`＝定向两侧各 4 发＋整包两侧各 2 发＋同时段交替 12 发）
 
 **A 族＝`ancestorunlink_348_windows_test.go` 的 400 发 racer 分子行**（`truncated`＝票 342 的号、`deleted`＝票 348 的号）：
-`deleted=0`＝★两侧全部 15 枚分子行都是 0（＝census 第 1 节那句"`deleted` 只可能更小"兑现＝本落地⛔ 把它推高过）；`truncated`＝基线侧 6 发全 0 ⇄ 落地侧 9 发里 3 发非零（`2`／`1`／`3`，皆 400 发内）＝★两味合起来具名上报（下面那张表＋第十节第 7⇄8 条），⛔ 借它、也⛔ 把它藏起来。
-另＝同族 `provedReparse`⇄`flipErrs` 两侧量级**换档**，尺＝`sh/33-truncated-attribution.sh` 逐发表（★量的＝分子；比值＝算的）＝
+`deleted=0`＝★两批共 26 枚分子行都是 0（＝census 第 1 节那句"`deleted` 只可能更小"兑现＝本落地⛔ 把它推高过；本票那枚号⛔ 在这一族里）。`truncated`＝一批里基线 6 发全 0 ⇄ 落地 9 发里 3 发非零，★另一批（同时段交替）11 枚逐发都 0＝⛔ 复现⇒★本腿⛔ 据它盖章（笔⑥ 当场撤回该条），两批的数都摆着交裁腿复量＝详见下面"换档"那两味（第九节第 7⇄8 条具名上报）。
+另＝同族 `provedReparse`⇄`flipErrs` 两侧量级**换档**＝★这味随字节走、⛔ 随时段走。尺＝`sh/35-alternating-attribution.sh`＝两侧在同一时段**交替**各打（⛔ 先打完一侧再打另一侧＝那形会把台面负载漂移误当成字节差），`form=leaf-symlink` 那枚逐字＝
 
-| 侧 | 发 | `provedReparse`(leaf-symlink) | `truncated` | `deleted` | 伤率 `trunc/cycles` |
+| 交替发序 | 树 | `provedReparse` | `flipErrs` | `truncated` | `deleted` |
 |---|---|---|---|---|---|
-| 基线 | 定向 1..4 | 19／16／45／7 | 0／0／0／0 | 0 | 0.000 |
-| 基线 | 整包 1..2 | 66／2 | 0／0 | 0 | 0.000 |
-| 落地 | 定向 1..4 | 150／115／126／153 | 0／0／0／**2** | 0 | 0.013（一发） |
-| 落地 | 整包 1..2 | 123／154 | 0／**1** | 0 | 0.006（一发） |
-| 落地 | symlink-dir 形 | 110／118／118 | 0／0／**3** | 0 | 0.025（一发） |
+| r1-1 | finalB | 2 | 31366 | 0 | 0 |
+| r1-2 | **finalL** | 102 | **16** | 0 | 0 |
+| r1-3 | **finalL** | （那发⛔ 打印分子） | — | — | — |
+| r1-4 | finalB | 32 | 21815 | 0 | 0 |
+| r2-1 | finalB | 98 | 9130 | 0 | 0 |
+| r2-2 | **finalL** | 152 | **6** | 0 | 0 |
+| r2-3 | finalB | 54 | 20929 | 0 | 0 |
+| r3-1 | finalB | 4 | 29885 | 0 | 0 |
+| r3-2 | **finalL** | 153 | **14** | 0 | 0 |
+| r3-3 | **finalL** | 129 | **8** | 0 | 0 |
+| r3-4 | finalB | 3 | 30048 | 0 | 0 |
 
-⇒ 两味一起出来＝①★落地侧那枚 racer 的顶入**更容易落地**（`cycles` 由 2..66 跳到 115..154；`flipErrs` 由 ≈2.4e4 掉到 ≈1e1）〔算的归因，本腿⛔ 跑计时〕＝乙在"名字带着那枚暂挂 link"的世界⛔ 再 `Remove` 它（同一性复验必不匹配⇒跳过删）⇒ 攻击者那枚 staged link **活下来**、下一发的 restock 不必重建⇒顶入落得更多；②随之 342 那枚 `truncated` 由基线 6 发全 0 变成落地 9 发里 3 发非零（1..3／400＝★量级＝`342-v2` 逐字在册的"still leaks 0~2/400"）。★伤⛔ 换类（truncation 发生在 `openPinnedLeaf` 那发⛔ 撤销不了的 follow-open 之内＝票 322 Windows 叶那一支的具名残差，乙⛔ 声称关它、本票判据逐字写着"⛔ 撤销那发 follow 已经造成的 truncation"），★伤换的＝**敞口频次**＝这正是机主随拍认下的那味①"复验拒了之后仍留着调用者那枚名字"的下游形状。⇒ ★本腿⛔ 处置、⛔ 借此停手、⛔ 动那件（`ancestorunlink_348_*`⇄`ancestoropen_342_*` 都不在本腿写面），★具名上报给编排者／`353-v1` 裁（第九节第 7⇄8 条）。
+⇒ 分离**干净到没有交叠**＝基线 6 发 `flipErrs` ∈ 9,130..31,366、落地 4 发 ∈ 6..16（★三个数量级、两侧无交叠、交替打仍如此）。归因〔算的，本腿⛔ 跑计时〕＝乙之前，那一路由在"名字带着攻击者那枚暂挂 link"的世界照样 `Root.Remove(base)`（`Deleteat` 带 `FILE_OPEN_REPARSE_POINT`）⇒**把攻击者的 staged link 删掉**⇒racer 下一发必须重建它＝那两三万枚 `flipErrs` 的来源；乙之后同一性复验⛔ 匹配⇒跳过删除⇒★那枚 link 活着⇒restock ⛔ 必重建⇒`provedReparse` 上到 102..153。⇒ ★这正是机主随拍认下的那味①"复验拒了之后仍留着调用者那枚名字"的下游形状，且它落在⛔ 属本票的世界＝留着的那枚⛔ 可能是攻击者的对象。本腿⛔ 处置（改成"也删 link"＝重述票 118/120-r3 已批的"link 本身⛔ 跟随、只 unlink"那批形＝另批、⛔ 本腿权）、⛔ 借此停手＝具名上报交编排者／`353-v1` 裁。
+
+★同批的 `truncated`＝**⛔ 成立为"上了台阶"，本腿当场撤回那条盖章**＝上面交替的 11 枚分子逐发 `truncated=0`、`deleted=0`，⛔ 复现早前 `sh/32`⇄`sh/33` 那批里落地侧 9 发中 3 发非零（`2`/`1`/`3`，皆 400 发内；基线那批 6 发全 0）。两批冲突时⛔ 能用"先假定新那把坏"裁＝两把都是本腿的尺、只差时段⇄负载，⇒★本腿⛔ 据任何一批说"342 那枚漏得更多了"，只把两批各自的数摆出来＋交裁腿用 `sh/35` 的交替形自行复量。`deleted`＝两批全部分子行都是 0＝census 第 1 节那句"只可能更小"兑现＝本落地⛔ 把它推高过；本票那枚号是 `damage`（第二、三节＝落地侧⛔ 论几发都 0、去牙发 3 摘掉复验立刻回到 3）＝★本票判据自始至终⛔ 读那两族的任何数。
 
 **B 族＝`leafrace_342r2_windows_test.go` 自己的 `AC#1-leaf DAMAGE` 行**：`gone=0`＝★两侧 8 发全 0（那枚⛔ 会把见证删掉）；`truncated`＝基线 `30/29/25/42` ⇄ 落地 `40/25/32/43`＝同量级；`re-check answered`＝基线 `31/29/25/42` ⇄ 落地 `36/24/31/42`＝同量级；`guard`＝基线 4 发全 3 ⇄ 落地 `4/0/0/3`＝★那枚用例响的是"没半门答话"的 RED instrument 支、两侧都响＝摆动。
 **C＝票 342 的 `TestAC1…NeverTruncates…342r1`＝两侧 2 发整包＋4 发定向全红＝★既有红、非本腿造。**
@@ -109,10 +117,12 @@ TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1 |B
 4. ★`GOOS=js GOARCH=wasm go build ./internal/winsec/` rc=1＝存量形状（offender 逐字＝`winsec_other.go:29 undefined: syscall.O_NOFOLLOW` 等四枚＝`pinnedleaf_342_fallback.go:8-9` 逐字在册的 DEAD CODE），本笔⛔ 改那档可编译性＝★报数、⛔ 判红。
 5. ★PowerShell 内联取退码那枚坑本腿也中过一次（`echo RC=$?` 被 pwsh 抢先展开成 `True`）＝同公共块"读数纪律"逐字那条形；正解＝一律落 `.sh` 文件跑（`sh/06` 起所有退码都取自重定向后的裸命令）。
 6. ★在飞写腿脏字节：`internal/models/downloader.go`（＋未跟踪 `handoff_guard_109r1_test.go`）＝109-r1 的写面，本腿⛔ add⛔ commit⛔ 采信；`cmd/wisp` 全程⛔ 跑、⛔ 动。
-7. ★★本落地与票 342 那枚 `truncated` 分子的耦合（⛔ 藏、⛔ 自行处置，归编排者／`353-v1` 裁）＝各 4 发里落地侧出现一发 `form=leaf-symlink … truncated=2`（基线侧 8 发全 0）。形状⇄量级＝`342-v2` 逐字在册的那句"the landing side still leaks 0~2/400 `truncated`"⇒伤在 `openPinnedLeaf` 那发⛔ 撤销不了的 follow-open 之内＝★早于本腿任何改动、⛔ 是本票那一跳（本票那枚号是 `damage`＝"顶进来的对象⛔ 剩一枚名"，落地侧 8 发全 0）；本腿⛔ 动 open 那步、⛔ 为变绿改那件的任何断言。⇒ 若裁腿要把它钉成"乙之后仍漏"，凭据应取这一形；本腿只报形状、⛔ 盖章。
-8. ★同族另一味连带（同一批 4 发）＝基线侧 ⇄ 落地侧的 `provedReparse`⇄`flipErrs` 量级换了档（`cycles=7..45 / flipErrs≈2.4e4` ⇄ `cycles=115..153 / flipErrs≈1e1`）〔算的归因，本腿⛔ 跑计时〕＝乙在"名字带 link"的世界⛔ 再删那枚名字⇒racer 的 restock 所对着的暂挂 link 存活⇒顶入更容易落地。★这是"本落地改了那台仪器的世界"、⛔ "改了那台仪器的字节"＝那件一字⛔ 动（`ancestorunlink_348_windows_test.go` 不在本腿写面）；由裁腿决定是否要把那句"⛔ 借 `truncated`／`deleted`"改成带条件的口径。
+7. ★★本落地⇄票 342/348 那两族仪器的耦合＝**两味分开报**（⛔ 藏、⛔ 自行处置，归编排者／`353-v1` 裁）：
+   · ★**成立的那一味＝`flipErrs`／`provedReparse` 换档**（量的＝`sh/35` 交替那张表 11 枚分子；算的＝归因，⛔ 跑计时）：基线 6 发 `flipErrs` ∈ 9,130..31,366 ⇄ 落地 4 发 ∈ 6..16＝★三个数量级、两侧无交叠、★同一时段交替打仍如此⇒随字节走、⛔ 随时段漂移。机制＝乙之前那一路由在"名字带着攻击者那枚暂挂 link"的世界照样 `Root.Remove(base)`（`Deleteat` 带 `FILE_OPEN_REPARSE_POINT`）⇒把攻击者的 staged link 删掉⇒racer 下一发必重建它＝那两三万枚 `flipErrs` 的来源；乙之后复验⛔ 匹配⇒跳过删除⇒★那枚 link 活着⇒`provedReparse` 上到 102..153。⇒ ★这正是机主随拍认下的那味①"复验拒了仍留着调用者那枚名字"的下游形状、且落在⛔ 属本票的世界＝留着的那枚⛔ 可能是攻击者的对象；改成"也删 link"＝重述票 118/120-r3 已批那批"link 本身⛔ 跟随、只 unlink"＝另批、⛔ 本腿权⇒★只报不处置。
+   · ★**⛔ 成立、本腿当场撤回盖章的那一味＝"`truncated` 敞口上了台阶"**：`sh/32`/`sh/33` 那批里落地侧 9 发有 3 发非零（`2`/`1`/`3`）、基线 6 发全 0；同一时段交替的 `sh/35` 那 11 枚分子逐发 `truncated=0`＝⛔ 复现⇒★本腿⛔ 据它说"342 那枚漏得更多了"，只把两批的数都摆出来，交裁腿用 `sh/35` 的交替形自行复量。`deleted`＝两批共 26 枚分子★全 0＝census 第 1 节"只可能更小"兑现＝⛔ 任何一族的数被本落地推高过。
+8. ★那两族仪器件（`ancestorunlink_348_*`⇄`ancestoropen_342_*`⇄`leafrace_342r2_*`）都不在本腿写面＝一字⛔ 动、⛔ 为变绿改任何断言；★票面 AC#2 那句"⛔ 借 `truncated`／`deleted` 任何一枚"本腿⛔ 改口径、也⛔ 需要改＝本票判据（`damage`⇄`entered`＋正控）自始至终⛔ 读那两族的任何数（第二／三节可逐字复核）＝所以第七节这两味＝★连带读数上报、⛔ 判据的一部分。
 
 
 ## 十、纪律自证（三把尺）
 
-名册三把尺同号＝锚定 `^票 353 落地腿 353-r1` 4 笔 ⇄ 非锚定 4 笔 ⇄ 单次导出＋内存 `index==1` 4 笔（★本腿主题里没一枚在正文引用别腿前缀，故两把同值＝⛔ 把同值当通则）。写面越界尺（更正版＝逐枚前缀计数）＝`FILES_TOTAL=27 OUT_OF_RANGE=0`；`.go` 名册去重＝6 枚全在 `internal/winsec/`。★入库 blob CR＝0（尺＝`git cat-file blob | tr -cd '\r' | wc -c`；★正控＝同一条尺在 `.scratch/wisp/issues/300-*.md` 报 `CR=1`＝尺没瞎；钝尺对照＝对工作树 `grep -c $'\r'` 冒报 288＝台账 `A1066③` 那枚坑本腿也踩过一次、已弃用）。票 353 框终量＝★未勾 3／已勾 2（`AC#0`⇄`AC#1`＝编排者翻）＝本腿一枚⛔ 翻；本腿 4 笔触碰票面＝0 笔（票尾唯一追加名额已被 `353-a1` 占⇒本腿话落本件）；票名／`Status:`／`-done` 一字⛔ 动。⛔ push；⛔ `add -A`/`.`/目录形／从共享 index 反推；`add`⇄`commit` 两处逐枚显式 pathspec；⛔ amend/reset/rebase/stash/checkout ./clean；临时件只建不删＝`D:\tmp\wisp\20261020\353r1\{finalB,finalL,mut-final-*,incoming,base,logs,gocache-*}`（★⛔ 盘符根）。正文件行数＝本件 71 行＋`readings-ac2-baseline.md` 74 行＝帽 160 内（帽⛔ 适用 `*_test.go`：仪器件 195 行照实报）。★`internal/models` 那枚脏文件⇄`cmd/wisp`＝别腿在飞字节＝本腿⛔ add⛔ commit⛔ 采信。
+名册三把尺＝锚定 `^票 353 落地腿 353-r1` ⇄ 非锚定子串 ⇄ 单次导出 `%s`＋内存 `index(...)==1`（尺＝`sh/34-final-roster.sh`，可逐字重跑；★枚数随 HEAD 漂⇒本件不写死枚数、只认逐枚 `%s` 起头＝公共块"名册尺"那条第五形）。写面越界尺＝`sh/29` 的逐枚前缀计数形（★⛔ 用 sh/28 那把坏尺＝它把目录前缀钉了行尾⇒永⛔ 匹配⇒整表误判"越界"，本腿自抓已换）＝`OUT_OF_RANGE=0`；`.go` 名册去重＝6 枚全在 `internal/winsec/`。★入库 blob CR＝0（尺＝`git cat-file blob | tr -cd '\r' | wc -c`；★正控＝同一条尺在 `.scratch/wisp/issues/300-*.md` 报 `CR=1`＝尺没瞎、0 是真 0；钝尺对照＝对工作树 `grep -c $'\r'` 冒报 288＝台账 `A1066③` 同一条坑，本腿也踩过一次、已弃用）。票 353 框终量＝★未勾 3／已勾 2（`AC#0`⇄`AC#1`＝编排者翻）＝本腿一枚⛔ 翻；本腿各笔触碰票面＝0 笔（票尾唯一追加名额已被 `353-a1` 占⇒本腿话落本件⇄交件正文）；票名／`Status:`／`-done` 一字⛔ 动。⛔ push；⛔ `add -A`/`.`/目录形／从共享 index 反推；`add`⇄`commit` 两处逐枚显式 pathspec；⛔ amend/reset/rebase/stash/checkout ./clean；临时件只建不删＝`D:\tmp\wisp\20261020\353r1\{finalB,finalL,mut-final-*,incoming,base,logs,gocache-*}`（★⛔ 盘符根）。正文件行数＝本件⇄`readings-ac2-baseline.md` 都⛔ 超帽 160（帽⛔ 适用 `*_test.go`：仪器件 195 行照实报）。★`internal/models` 那枚脏文件⇄`cmd/wisp`＝别腿在飞字节＝本腿⛔ add⛔ commit⛔ 采信。
