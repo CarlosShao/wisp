@@ -428,7 +428,7 @@ func pathComponents(path string) []string {
 }
 
 func wrapPath(path string, err error) error {
-	return fmt.Errorf("%w: %s: %v", ErrNotSealable, path, err)
+	return fmt.Errorf("%w: %s: %w", ErrNotSealable, path, err)
 }
 
 // sealError normalizes any sealing failure to ErrNotSealable at the API
