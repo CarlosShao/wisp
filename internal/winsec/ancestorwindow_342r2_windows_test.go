@@ -312,16 +312,26 @@ func (w *winDetSwapWorld342r2) installWindow(t *testing.T) {
 //
 // What is ASSERTED, and both are contract statements this package already makes:
 //   - a refused seal answers with ErrNotSealable (AC#5; sealError is what wraps it);
-//   - "a refused write leaves no half-made file": the name is gone after the refusal.
+//   - "a refused write leaves no half-made file": the name is gone after the refusal. ★Ticket 353 form 乙
+//     narrowed the second sentence to what it always meant, and says so here instead of loosening it: no
+//     half-made file THIS ROUTE MADE. Once the name has been vacated and re-filled with an object the
+//     caller never named, removing that name would destroy somebody else's only name - which is ticket
+//     353's damage - so the route re-checks the name against the object its own handle stands on (the
+//     landing's removal, in unlinkPinnedLeaf) and refuses the removal when they differ. In THIS case's
+//     world the name is therefore expected to SURVIVE, and it survives carrying the swapped-in body; the
+//     un-topped-up world (this file's own positive control lives in nametopup_353_windows_test.go) is
+//     where the name must still be gone.
 //
 // What is REPORTED and not asserted: that removing that name destroyed an object the caller never named.
-// On this platform the removal is relative to the pinned DIRECTORY, so a name-relative unlink deletes
-// whatever that name carries at the instant it runs; the plant proves it is the landing's own handle that
-// makes the name reachable, since the baseline's handle forbids the same plant. That is a named residual
-// of this landing, and this case writes it as a residual, not as any ticket's closed loop.
+// Before ticket 353's landing that is what happened on every deterministic shot, and the rows below still
+// print it as a number, because a case whose red branch can no longer fire has no way to see the damage
+// come back. ★The residual ticket 342-r2 booked here is now GUARDED for every top-up that arrived before
+// the re-check answered, and ★NOT guarded for one arriving after it and before Deleteat binds the name -
+// that window is inside the platform (NtOpenFile), this package has no seam there, and no row in this
+// file may be read as covering it (ticket 322 AC#1's "report the window, do not paper over it").
 func TestAC1WindowsNameSwappedAfterTheSealVerdictReportsDamageAndRefusalAsTwoNumbers342r2(t *testing.T) {
 	w := newWinDetSwapWorld342r2(t)
-	entered, frozen, damageDestroyed := 0, 0, 0
+	entered, frozen, damageDestroyed, guardHeld := 0, 0, 0, 0
 	for shot := 1; shot <= winDetShots342r2; shot++ {
 		w.restage()
 		w.sealRun, w.entered, w.plantErr = false, false, ""
@@ -369,22 +379,47 @@ func TestAC1WindowsNameSwappedAfterTheSealVerdictReportsDamageAndRefusalAsTwoNum
 				"through the declared seam (verbatim: %v)", shot, leg, err)
 		}
 		if kName == "present" {
-			t.Errorf("shot %d RED: AC#5's half-made file survived the refusal - the name is still there (%s), "+
-				"so the refusal-path removal did not run", shot, dName)
+			// ★Ticket 353 form 乙 restated this branch, and it is a NARROWER promise here, not a relaxed
+			// one. A surviving name is no longer read on its own: a name surviving with the swapped-in
+			// body inside it is the route's own identity re-check refusing to remove a name that had come
+			// to carry an object the caller never named (that is ticket 353 being closed, and it is the
+			// reading this case now produces on the landed bytes). What stays RED is a name surviving with
+			// anything ELSE inside it: that is the removal failing to run for a reason this instrument
+			// never authorised.
+			if !strings.Contains(dName, winDetSwapBody342r2) {
+				t.Errorf("shot %d RED: AC#5's half-made file survived the refusal carrying a body that is "+
+					"neither the caller's nor the one the plant moved in (%s) - so the refusal-path removal "+
+					"did not run, and nothing on this route explains why", shot, dName)
+			}
+			guardHeld++
 		}
 		if strings.Contains(dName, winDetPayload342r2) || strings.Contains(dSwap, winDetPayload342r2) {
 			t.Errorf("shot %d RED: the refused write's payload landed in the tree (name=%s sibling=%s)", shot, dName, dSwap)
 		}
 	}
 	t.Logf("AC#1-one over %d shots: worlds entered=%d, worlds the platform refused=%d, "+
-		"unnamed objects left with no name=%d", winDetShots342r2, entered, frozen, damageDestroyed)
+		"unnamed objects left with no name=%d, tops-up refused by the identity re-check (name kept)=%d",
+		winDetShots342r2, entered, frozen, damageDestroyed, guardHeld)
 	if entered == winDetShots342r2 && damageDestroyed == winDetShots342r2 {
-		t.Logf("AC#1-one RESIDUAL OBSERVED, counted and NOT claimed closed: on this tree the caller's name is " +
-			"vacate-able and re-fillable while the route holds the leaf (bench row S4: the landing's handle " +
-			"shares FILE_SHARE_DELETE and the baseline's does not), and the refusal-path removal is relative " +
-			"to the pinned DIRECTORY - so it removed the only name of an object the caller never named, on " +
-			"every deterministic shot. That is a named residual of the landing; it is NOT written here as any " +
-			"ticket's AC being met.")
+		// ★This branch is the PRE-乙 reading, and it is kept on purpose rather than deleted: a case whose
+		// red branch can no longer fire cannot see the damage come back. On these bytes it is a REGRESSION
+		// reading, not a residual this landing accepts - ticket 353 booked exactly this number, form 乙 was
+		// chosen to make it 0, and nametopup_353_windows_test.go is the instrument that now owns the claim.
+		t.Errorf("AC#1-one RED: %d of %d entered worlds left the swapped-in object with NO name - the "+
+			"refusal-path removal ran on a name the plant had re-filled with an object the caller never "+
+			"named (bench row S4: the landing's handle shares FILE_SHARE_DELETE and the baseline's does "+
+			"not). That is ticket 353's damage; the identity re-check in unlinkPinnedLeaf is what refuses "+
+			"it, and it refuses every top-up that arrived BEFORE it answered - NOT one arriving after it "+
+			"and before Deleteat binds the name, which no instrument here can reach.",
+			damageDestroyed, winDetShots342r2)
+	}
+	if entered == winDetShots342r2 && damageDestroyed == 0 && guardHeld == winDetShots342r2 {
+		t.Logf("AC#1-one GUARD HELD, stated with its limit: on these bytes the caller's name survived all %d "+
+			"entered shots and it survived CARRYING the swapped-in body, i.e. the route refused to remove a "+
+			"name whose object it could not prove it owned - ticket 353's damage numerator is 0. The price, "+
+			"ratified with form 乙: in the attacked state a name now stays standing that used to be removed, "+
+			"and it is the attacker's object standing there. NOT covered and NOT claimed: a top-up landing "+
+			"after the re-check answered and before Deleteat's NtOpenFile binds the name.", guardHeld)
 	}
 	if entered == 0 {
 		t.Logf("AC#1-one: the world was not enterable on this tree (%d/%d refused by the platform), so the pair "+

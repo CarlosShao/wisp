@@ -26,7 +26,7 @@ for TREE in treeB treeL; do
       cp -f "$src" "$ROOT/$MUT/internal/winsec/$f"
       echo "SYNCED $src -> $ROOT/$MUT/internal/winsec/$f"
     else
-      echo "NO_SYNC_FOR_$TREE_$f (keeps the tree's own bytes)"
+      echo "NO_SYNC_FOR_${TREE}_${f} (keeps the tree's own bytes)"
     fi
   done
   OUT="$LOGS/${LABEL}-s$i-$TREE.raw.txt"
