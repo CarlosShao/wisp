@@ -1,0 +1,75 @@
+# 09 收口尺
+## A. R-115-1 今天还在不在：归属函数的生产读取者（尺＝git grep 锚定 HEAD，非测试 vs 测试分档）
+   非测试 .go 里的调用点（⛔ _test.go） = 7
+   逐枚（应只见定义与注释）：
+     HEAD:internal/winsec/resolve.go:428://   - noticeNamesTree (winsec_windows.go:106) attributes a seal's notice to the
+     HEAD:internal/winsec/winsec_windows.go:74:// noticeNamesTree reports whether a notice is about the tree that spelling names.
+     HEAD:internal/winsec/winsec_windows.go:106:func noticeNamesTree(n narrowNotice, spelling string) bool {
+     HEAD:internal/winsec/winsec_windows.go:114:// noticesAboutTree is noticeNamesTree over a captured set: the tree-shaped
+     HEAD:internal/winsec/winsec_windows.go:120:func noticesAboutTree(got []narrowNotice, spelling string) []narrowNotice {
+     HEAD:internal/winsec/winsec_windows.go:123:		if noticeNamesTree(n, spelling) {
+     HEAD:internal/winsec/winsec_windows.go:316:		// moves the *comparison* onto the tree instead: noticeNamesTree.
+   测试侧调用枚数 = 30
+   测试侧调用文件枚数 = 7
+     HEAD:internal/winsec/absoluteness_attribution_129_windows_test.go
+     HEAD:internal/winsec/inherited_narrow_notice_104_windows_test.go
+     HEAD:internal/winsec/narrow_notice_windows_test.go
+     HEAD:internal/winsec/notice_attribution_115_windows_test.go
+     HEAD:internal/winsec/notice_kind_and_everyone_118_windows_test.go
+     HEAD:internal/winsec/private_set_sid_windows_test.go
+     HEAD:internal/winsec/volume_attribution_126_windows_test.go
+
+## B. 检查项 4：本票三枚 commit 有没有碰契约承载文件（尺＝git rev-list 逐枚计数）
+   internal/winsec/resolve.go 被 391878a..c6dbbf9 区间内票115三枚碰的次数 = 0
+   internal/observe/thresholds.go 被 391878a..c6dbbf9 区间内票115三枚碰的次数 = 0
+   internal/agent 被 391878a..c6dbbf9 区间内票115三枚碰的次数 = 0
+   internal/config 被 391878a..c6dbbf9 区间内票115三枚碰的次数 = 0
+   internal/tools 被 391878a..c6dbbf9 区间内票115三枚碰的次数 = 0
+   docs/PLAN.md 被 391878a..c6dbbf9 区间内票115三枚碰的次数 = 0
+   同区间别腿的笔（具名，⛔ 记成 115 的）：
+
+## C. 检查项 1/5 的 AC#5 形状尺（票面那六样禁形状，逐枚现量 @HEAD）
+   internal/winsec/winsec_windows.go t.Skip=0
+   internal/winsec/notice_attribution_115_windows_test.go t.Skip=0
+   internal/winsec/narrow_notice_windows_test.go t.Skip=0
+   internal/winsec/inherited_narrow_notice_104_windows_test.go t.Skip=0
+   internal/winsec/private_set_sid_windows_test.go t.Skip=0
+   continue-on-error 在 ci.yml 的射程现量 = 17
+   新用例里 n.Path == "" 那条仪器腿在场 = 1
+
+## D. 527d303 那 6 行的极性对拉（尺＝git show 逐枚 +/- 行，断言文案对不对）
+   -		if strings.EqualFold(n.Path, path) {
+   +		if noticeNamesTree(n, path) {
+   -			if n := perChild[strings.ToLower(k)]; n > 1 {
+   +			if n := len(noticesAboutTree(*got, k)); n > 1 {
+   -			if n := perChild[strings.ToLower(k)]; n != 1 {
+   +			if n := len(noticesAboutTree(*got, k)); n != 1 {
+   -			if strings.EqualFold(path, p) {
+   +			if noticeNamesTree(narrowNotice{Path: path}, p) {
+   -		if strings.EqualFold(n.Path, inherited) {
+   +		if noticeNamesTree(n, inherited) {
+   -		if n.Path == root {
+   +		if noticeNamesTree(n, root) {
+
+## E. 门禁：本腿只跑不编译的 gofumpt -l（⛔ go vet/go test/go run）
+   载具＝仓外导出树（git archive c16ff47e 的 HEAD blob，LF 形；⛔ 读共享工作树＝避开别腿半保存态与 CRLF 存量标脏）
+   gofumpt 存在＝v0.12.0 (go1.27.1)
+   gofumpt -l internal/winsec/winsec_windows.go -> 标脏行数 = 0
+   gofumpt -l internal/winsec/notice_attribution_115_windows_test.go -> 标脏行数 = 0
+   gofumpt -l internal/winsec/narrow_notice_windows_test.go -> 标脏行数 = 0
+   gofumpt -l internal/winsec/inherited_narrow_notice_104_windows_test.go -> 标脏行数 = 0
+   gofumpt -l internal/winsec/private_set_sid_windows_test.go -> 标脏行数 = 0
+   正控（同尺打一枚已知会被 gopumpt 判脏的形）＝
+     printf "a :=  1\n" 件 -> 1
+     同一件原样（应 0）-> 0
+   （尺＝gofumpt -l 逐枚，⛔ -w ⇒ 本腿零写字节；⛔ go vet/go build/go test 全程零次）
+
+## F. CI 仪器级门禁颜色（载具＝06/07/08 号件，本腿自取）
+   lint job 106389417800 @head d1056c0（含 c6dbbf9＝票115 末笔）：
+     step4 D22 positive control = success
+     step5 D22 seven-ban + emoji scan = success
+     step6 gofmt (gofumpt) = success
+     step7 go vet (module) = success
+     step8 go vet (tools/d22scan module) = success
+     step9 staticcheck = failure（票 85 地界，票面 ① 已具名不归本票）
+   ⇒ 本腿⛔ 自己跑 d22scan.sh/go vet：脚本内含 go run + runtests.sh(go test)＝撞本腿边界，凭据取自 CI 仪器步
