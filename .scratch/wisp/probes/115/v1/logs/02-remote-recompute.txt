@@ -1,0 +1,22 @@
+# 02 远程独立复算（尺＝gh api 取 job 日志＋grep -c 四数；本腿自己取、未转述任何腿的读数）
+# 起手锚＝c16ff47e；取数时刻＝2026-10-20 16:59:19 +0800
+
+## 取数判据（票 115 票面 ①A 那四条正向形状判据，本腿逐条复跑）
+### job 106331840177
+  --- 判据1：HTTP 状态行 ---
+  rc=0  首行＝HTTP/1.1 200 OK
+  stderr＝0 字节
+### job 106319703680
+  --- 判据1：HTTP 状态行 ---
+  rc=0  首行＝HTTP/1.1 200 OK
+  stderr＝0 字节
+
+## 说明：gh api -i 只回头部；日志体走不带 -i 的第二发
+  job 106331840177 rc=0 bytes=234680 lines=1477 stderr=0
+    首行＝﻿2026-09-21T12:25:35.3349822Z Current runner version: '2.337.0'
+    ##[group]Run bash scripts/winsec-tests.sh 落点＝187:2026-09-21T12:26:22.7219604Z ##[group]Run bash scripts/winsec-tests.sh 
+    四数行＝2026-09-21T12:27:14.8580352Z portable-tests.sh: four numbers (all from -v output): === RUN=80  --- PASS=36  --- FAIL=4  --- SKIP=0 2026-09-21T12:27:15.0231460Z winsec-tests.sh: four numbers (all from -v output): === RUN=80  --- PASS=36  --- FAIL=4  --- SKIP=0 
+  job 106319703680 rc=0 bytes=214419 lines=1378 stderr=0
+    首行＝﻿2026-09-21T11:44:17.7227666Z Current runner version: '2.337.0'
+    ##[group]Run bash scripts/winsec-tests.sh 落点＝187:2026-09-21T11:45:22.7635207Z ##[group]Run bash scripts/winsec-tests.sh 
+    四数行＝2026-09-21T11:46:30.7224735Z portable-tests.sh: four numbers (all from -v output): === RUN=71  --- PASS=32  --- FAIL=3  --- SKIP=0 2026-09-21T11:46:30.8779133Z winsec-tests.sh: four numbers (all from -v output): === RUN=71  --- PASS=32  --- FAIL=3  --- SKIP=0 
