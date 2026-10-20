@@ -1,0 +1,76 @@
+# 230-v1 · 03 射程⇄纪律（判语 第 4 节／第 5 节／第 6 节 的凭据，逐字输出）
+# 原始全量件＝D:\tmp\wisp\20261020\230v1\{v1-e-format.out.txt,v1-o-anchor.out.txt,v1-p-famil.out.txt,v1-t2-ctrl.out.txt,v1-s2-precedent.out.txt,v1-u-lengthgate.raw.txt,v1-u-singlevar.out.txt,v1-q-legscope.sh 的 stdout}
+
+## 1. 内容锚正反控（V1-G2）
+$ git grep -c 'only reader of q.alias' HEAD -- internal/agent/approval/queue.go
+  （无输出）RC=1                    <- 反控：旧锚在 HEAD 归零
+$ git grep -n 'only reader of q.alias' c16ff47e -- internal/agent/approval/queue.go
+  c16ff47e:internal/agent/approval/queue.go:262:// stays an unknown correlation id. This function is the only reader of q.alias
+  RC=0                              <- 正控：尺灵、起手锚侧 1 命中
+★本腿新起一把诚实尺（V1-P 第 3 段）：把行首 `//` 标记剥掉、按行拼接后再 grep 同一枚锚 ——
+  HEAD   HIT: "only reader of q.alias that turns a reply into an item"  count=1
+  c16ff47e HIT: "only reader of q.alias and Queue.reject is its only caller"
+⇒ 那枚 0 有一半是**换行伪证**（新文本里 `of` 与 `q.alias` 被折到两行）。
+⇒ "谎话被删"的真凭据＝02 件的逐句对码，⛔ 这枚 0。腿用它当"已改"的判据＝证据力过位（判语 第 5.2 节）。
+
+## 2. 同族扫描的射程梯（V1-I＋V1-O，⛔ 抄腿的数）
+腿的原样正则＝sole reader|only user|唯一读者|唯一调用者
+  -- queue.go 一枚           ＝0 命中 rc=1（与腿报同值 ✓）
+  -- internal/agent/approval ＝1 命中＝gate.go:595 "its only user verb is veto"
+  -- internal cmd（词界修正，剔 con|sole reader 噪声 4 枚）＝同这 1 枚
+  -- 全仓 tracked *.go        ＝5 命中（含上述 4 枚 "console reader" 子串噪声＝非锚定尺的假命中，具名剔）
+  -- 全仓任意文本（⛔ --include）＝134 命中（多为腿件/台账/票面转述，⛔ 门料）
+⇒ 腿落档的尺（只读旁证＝`D:\tmp\wisp\20261020\230r1cont\sh\01-metric-exec-bytes.sh:68`）
+   射程＝`-- internal/agent/approval/queue.go` 一枚，⛔ 包⛔ 产码树。
+⇒ 票尾 bullet 那句「★AC#2 **全射程**复核」名不副实（数对、射程⛔ 全）＝判语 第 5.1 节。
+   实质结论另立：那 1 枚命中今天为真（02 件 E-3），故"无第三处假话残留"**成立**，凭据是本腿宽射程＋逐枚真值。
+
+## 3. 门禁里本腿能跑的（⛔ build／d22scan／vet／色＝硬约束，判语 第 4 节／第 5.4 节 明列为未验证）
+正控（先证两把尺灵，V1-T 第 1 段）：
+$ gofmt   -l badctl.go            -> 列出 badctl.go            rc=0
+$ gofumpt -l badctl.go            -> 列出 badctl.go            rc=0
+同一把尺对被裁字节（对象＝HEAD blob 的仓外副本，⛔ 工作树）：
+$ gofmt   -l blob/queue.go        -> 列 0 枚                   rc=0
+$ gofumpt -l blob/queue.go        -> 列 0 枚                   rc=0
+$ gofmt   -d blob/queue.go        -> 输出 0 字节（DIFF_BYTES=0）
+起手锚侧同一把尺（改前同形，证明"并排"⛔ 只量了交件态）：
+  c16ff47e 的 blob 两把都列 0 rc=0
+长度门（本腿亲跑，⛔ 调 go、纯只读，跑前 unset GOTMPDIR TMPDIR TEMP TMP）：
+$ sh scripts/check-path-length-budget.sh   rc=0
+  denominator: tracked paths=17219  over-budget=60  covered by roster=60  not in roster=0
+  VERDICT GREEN - every over-budget tracked path is rostered by name … roster equals the tree
+  ⇒ 与腿报"rc=0 VERDICT GREEN／over-budget=60＝roster=60"复现
+裸 gofumpt 不在 PATH：$ command -v gofumpt -> rc=1（旁证腿报 rc=127 的形状属实）
+码位带一把（算）：queue.go blob 对 tools/d22scan 声明的 6 段 band ＝ **0 命中**
+d22scan 射程（源码现读 emojiScopes ⇄ walkGo）＝design/ ＋ frontend/（everyFile）＋ internal/（goOnly）＋ cmd/（goOnly）
+  ⇒ `.scratch/**` 与 docs/** 均⛔ 仪器射程 ⇒ 本判语与票尾那条的码位形状⛔ 门料（本腿仍按码位名写正文）
+
+## 4. 定向色的"单变量"前提（本腿能查的那半，V1-U）
+$ git diff --name-only 3eeaa2e2 c73df208  ->  internal/agent/approval/queue.go   （恰 1 枚＝腿报"唯一差异"成立）
+$ git rev-parse 3eeaa2e2:<queue.go> = 66fec7ae… = `git rev-parse c16ff47e:<queue.go>`（base＝起手字节，可比性成立）
+$ git rev-parse c489eacc^ = 3eeaa2e2832393def7dd4a23c72587b779917754（＝腿具名的 base 真身）
+本机 ci-logs 名册＝.scratch/ci-logs/*{run-37158259050, run-37166458550-failed, red-fd269de1, red-941805d0}
+$ grep -rl {c489eacc,c73df208,19d2f92c,dcaf3995,ca0ad6bd} .scratch/ci-logs/ ＝ **0 命中**（正控＝同尺族 grep 'd22scan: clean' 命中 2 枚 ⇒ ⛔ 钝尺）
+⇒ 这 8 笔⛔ 远程 run（⛔ push＝编排者权利且被机主按住）⇒ 色与三把编译类门**只有腿报**＝判语 第 5.4 节 缺的那一味。
+
+## 5. 腿具名请裁①＝票尾"只追加一条"守没守（V1-T3/T4/T5/T6 ＋ V1-S2）
+事实核：票 230 `grep -c '^## Progress log'` ＝ **0**（池内 242 枚有该节）⇒ 腿说的"票面无该节"为真。
+先例尺（逐字重跑腿的 sh/17 形，射程＝.scratch/wisp/issues/*.md 工作树现读）：
+  无 Progress log 节 + 带 `- [2026-… HH:Mx +08] agent=` 形尾条的文件枚数 = **12**
+  减去票 230 自己（腿跑那发时它还没落）＝ **11** ⇒ 腿报"11 枚同形先例"复现（本腿没抄，差 1 的来源具名）
+追加纪律：笔⑦ numstat 3/0；笔⑦父⇄HEAD 逐行 ADDED=3 DELETED=0；票名+Status 前 5 行 diff 空 rc=0；
+  票尾 `^- \[2026` 条数＝1（唯一）；两笔⛔ 新造任何节标题（`^[+-]#` 变动行＝0）
+时间戳三把：`HH:[0-9]x` 形 39 枚文件 ⇄ 光 `HH:x` 形 **0** 枚 ⇄ 真实分钟 10 枚 ⇒ 笔⑧"改回主流形"方向正确。
+⇒ 裁＝**算守住**（判语 第 6.1 节）。
+
+## 6. 纪律尺（本腿自己的＋实现腿的）
+实现腿：8 笔名册⛔ 出写面（01 件第 5 段）；⛔ 一枚 `.out`；⛔ push（本地 dev）；票框 5/0 一枚没翻。
+本腿：主题逐字「票 230 终裁腿 230-v1」起头、⛔ 换形；前缀唯一性起量＝`git log --grep='^票 230 终裁腿 230-v1' --oneline | wc -l` ＝ **0**（落笔前）；
+  add／commit 两处逐枚显式 pathspec；`git commit -F` 用 Windows 形正文；每落一枚就 commit；
+  提交后 `git log -1`＋`git show --format='' --name-only` 对回（逐字落各笔正文）；
+  临时件全部落 D:\tmp\wisp\20261020\230v1\，只建不删；⛔ 动任何 `.go` 字节（工作树 queue.go 干净＝`git status --porcelain` 0 行）；
+  ⛔ `go test`／⛔ `go build`／⛔ push／⛔ 改票名与 Status／⛔ 翻任何框／⛔ `add -A`／⛔ amend/reset/stash/checkout/clean。
+本腿自抓一枚（照实入账⛔ 藏）：判语初稿 第 5.5 节 曾指"腿件用例名抄写滑笔"，逐字重跑三处（注释 :275 ⇄ 腿件 :90 ⇄
+  盘上真名 :75）＝一字不差 ⇒ 那枚是**本判语自己的滑笔**，已就地改正＋具名登记，⛔ 记到腿账上。
+另两枚同族踩坑（第 0 节 读法提醒）：`cut -c`／`awk substr` 按字节截中文＝非法 UTF-8（本腿第一发纪律件 3 行不可解，
+  重跑成 v1-g2）；`git show --format=… --name-only` 与 `-s` 同用＝fatal，名册尺会**静默数到 0**（V1-I 第一发中了）。
