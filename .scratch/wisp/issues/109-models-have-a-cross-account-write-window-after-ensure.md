@@ -136,3 +136,76 @@
   ⚠ 工具输出里出现过的非指令文本：本票内 **0 次**伪造"编排者备注/停手/请 revert"（`MUTATOR FAIL`/`fatal: not a git repository`
   那两行是我自己脚本的失真产物，已当轮改正重跑，不是外部指令）。
   next= 交验收出 `docs/evidence/s1/109-*.md`；AC#3 若要往 `internal/winsec` 加 rename 描述符守卫，那是 106/108 地界，本票按硬闸停在调用层。
+
+- 2026-10-20 21:1x（agent 109-r1 v2 重放·写腿）：**先记台面一件事**（⛔ 判据、⛔ 据此判本腿失败）＝起手把
+  `GOTMPDIR` 指到 `D:\tmp\wisp\…` 时，`TestAC4InstallDirWidthIsDeliberateAndHasABreakLine` 在**不含本腿任何字节**的
+  HEAD 导出树上红一次，红句逐字 `removing the parent's grant left an explicit foreign ACE on the install dir -
+  out-of-band by ticket 89's definition: [BUILTIN\Users (I)(RX) BUILTIN\Users (I)(OI)(CI)(IO)(GR,GE)]`；
+  量到的原因＝`D:\tmp\wisp` 自身带机器范围的 `BUILTIN\Users:(I)(RX)`＋`(I)(OI)(CI)(IO)(GR,GE)` 两条继承
+  （`icacls D:\tmp\wisp` 原文），而 `icacls /remove` 撤得掉本对象显式授权、**撤不掉祖先链的继承** ⇒ 那条"整格被封＝破"
+  的界读到的是我的台根策略。安静复量 3 发（默认台根）全 PASS，之后跑色一律 `unset GOTMPDIR TMPDIR TEMP TMP`。
+  四枚台面件＝`probes/109/r1/testbed-*.log`。**防双派三把尺先过**：`git status --porcelain internal/models/` 空、
+  `git log --oneline -6 -- internal/models/` 末格 `890dd4ad`（票 121 自己那批）、`git status --porcelain --
+  .scratch/wisp/probes/109/` 空且该目录当时不存在 ⇒ 无人同写。
+  **v2 口径现读与盘上相符**（裁决表 `:44` 逐字＝两味挂 `AC#4`，⛔ `AC#2`）⇒ 本腿不动 `AC#1/#3/#5` 的既有读数。
+  〔甲〕`AC#2` 选**形①＝守卫挪到 `Ensure` 的返回路径上**（`internal/models/downloader.go` 新增 `handOffCheck`，
+  override `:195`／缓存命中 `:205`／新装 `:241` 三条成功路径全部在 `progress(PhaseDone)` 之后、返回之前复验；
+  `VerifyInstalled` 改调同一判据）。为什么不选形②：票 121 已 done 且**装配链真在跑**——
+  `cmd/wisp/models.go:305` 调 `models.WireDownloading`、`cmd/wisp/models.go:249` 直调 `Manager.VerifyInstalled`，
+  可达性仪器 `internal/models/assembly_reachability_121_test.go:126`
+  `TestAC3CapabilityPackagesReachTheCompositionRoot` 在本腿基线树 GOOS=windows/linux/darwin 三档**全 PASS**
+  （逐字读数＝`probes/109/r1/baseline-models-head.log`）⇒ 形②那枚"没人调"红钉今天会恒绿＝它要挡的事已经不存在，
+  而它治不了裁决表点名的另一半（`R-109-4`：守卫"是调用点自带的、不是 choke point 强制的"，绕过 bridge 直接
+  `Manager.Ensure` 的调用者拿到的仍是只有旧验签的交还）。
+  **修前红逐字**（HEAD `fd091cd1` 产码不动、只加测试件；`probes/109/r1/cellA-pre-red.log`）：
+  `--- FAIL: TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath`，断言原文
+  `AC#2/R-109-4 (shape 1): Ensure returned a model directory as available although 1 byte of model.onnx was swapped
+  after the last check that ran on its return path. dir=… swaps=1 - a caller that uses Manager.Ensure directly,
+  without DownloadingBridge, gets the hand-off with no guard on it at all, which is exactly what R-109-4 says the
+  bridge-only placement left open.`；另 `TestAC22CacheHitAndOverrideReturnPathsAreGuarded` 的 `cache_hit` 与
+  `local_override` 两支各红一次（`…handed back a store whose model.onnx was swapped after its verification (swaps=1)` ⇄
+  `…announced a sideloaded model available although 1 byte was swapped after its verification (swapped=true)`）。
+  换字节这件事同样是**构造出来的**而非假设：种在 `Ensure` 自己的 `Progress(PhaseDone)` 回调里＝该分支最后一次
+  落点侧检查之后、返回之前。**反半边没砸**：`server hits: install=1, second-instance reuse=0` 修前修后同读数，
+  `TestAC23ReverseLegCleanHandOffsAreNotBroken` 修前就绿。
+  〔乙〕`AC#4` 补两洞（逐字按裁决表 `:44` "补进 AC#4 的用例"）：
+  `R-109-2`＝`internal/models/handoff_ac4_109r1_test.go` 把**字节面**装进那枚钉子自己走的动词（`Ensure` 返回路径，
+  ⛔ 需要调用方记得去问的 `VerifyInstalled`）——`TestAC41NailByteFaceUnnamedFileBreaksTheWidth`（PROBE2 的
+  `attacker.onnx`，且 `model.onnx` 逐字节仍与 pin 相符＝证哈希面看不见它）⇄
+  `TestAC42NailByteFaceExtraDirectoryBreaksTheWidth`（PROBE2 第二形＝整枚 extra 目录 `sub/w.onnx`）⇄
+  `TestAC43NailByteFaceCountIsExact`（拒绝句必须带准确枚数 5＝"宽到什么程度算破"得是个可量的数）⇄
+  `TestAC44NailByteFaceCleanTreeStillPasses`（反半边：没种东西的同一棵树照旧交还、点名子目录 `dict/` ⛔ 被当入侵者）。
+  修前红三枚逐字见 `probes/109/r1/cellB-pre-red.log`（`handoff_ac4_109r1_test.go:133/:150/:171`）。
+  `R-109-3`＝`handoff_ac4_principal_109r1_windows_test.go` 新增单一判据 `ac4BreakLineTwo`（对象上**所有**非 `(I)` 的
+  ACE，⛔ 再按单一主体过滤），并把**已入库的那枚钉子** `TestAC4InstallDirWidthIsDeliberateAndHasABreakLine`
+  改为调用同一判据（仓内不留两套口径）；种的是裁决表 `:253` 那形 `Everyone:(OI)(CI)(M)`、由 `*S-1-1-0` 播种、
+  由 `allTrusteesOn` 独立复核它真落在对象上。修前红逐字
+  `AC#4/R-109-3: break line 2 reports nothing while this object carries an explicit non-inherited write grant for
+  Everyone (Everyone:(OI)(CI)(M)). … the object has 1 ACE(s) that did not arrive by inheritance: []`；
+  反半边 `TestAC4R4NailBreakLineTwoStaysQuietOnInheritedWidth`＝新装目录实测**一条非 (I) 都没有**，
+  所以"对象上有非继承 ACE"⇄"有人手工加宽了这一枚对象"是同一件事、票 95 那份继承宽仍读"允许"。
+  口径边界照裁决表 `:321` 逐字执行（"判据实现落 `internal/models/` 测试"）⇒ **本腿 `internal/winsec/**` 零字节**。
+  **变异两发（落点⛔ 同，仓外 `git archive` 导出树；逐枚 `probes/109/r1/mutation-M-{A,B}-transcript.log`）**：
+  M-A 退回 `Ensure` 三条返回路径的 `handOffCheck` 调用（`VerifyInstalled` 那枚不动）⇒ 落刀前锚命中 1/2/1、
+  落刀后 0/0＋死守卫行 3、`go build` rc=0、红＝`TestAC21`＋`TestAC22`＋`AC#4` 三枚字节面，
+  绿＝`TestAC1HandoffRefuses…`（bridge 守卫仍在）＋`TestAC2NormalInstall…`＋`TestAC3WideTemp…` ⇒ 只咬本腿落点；
+  还原哈希 `079430b4d12b…8a3738a8c` == pristine。M-B 把 `ac4BreakLineTwo` 换回按单一主体过滤 ⇒ 1/0 → 0/1、
+  `go vet` rc=0、红＝`TestAC4R3…`，绿＝反半边＋已入库那枚钉子 ⇒ 咬在判据本身；
+  还原哈希 `d3de244d1cbb…4c9b7e56` == pristine。
+  **POSIX 那半真跑**（`golang:1.27`＋`CGO_ENABLED=0`，仓库字节走 tar on stdin、容器内先 `ls -l` 证明看得见
+  `/w/go.mod` 与三枚新件 ⇒ ⛔ Git Bash `-v C:\…` 静默挂空假绿）＝10 枚可移植用例全 PASS、
+  `reuse=0` 与 Windows 同读数、`go vet ./internal/models/` rc=0、`DOCKER_RC=0`
+  （逐字＝`probes/109/r1/posix-docker-golang1.27.log`；本机档 `GOOS=linux go vet ./internal/models/` 亦 rc=0，
+  与裁决表 `:221` 那条"派单写本机永远 rc=1"的读数一致＝我这台也是 rc=0，仍⛔ 当"测过了"）。
+  **成对四数**（`-count=1` 逐名作差）：基线 HEAD 树 RUN=51 PASS_TOP=38 FAIL_TOP=0 SKIP=2 →
+  落地树 RUN=62 PASS_TOP=47 FAIL_TOP=0 SKIP=2；新增 9 枚名全 PASS、消失 0 枚、**新增红 0**；
+  `-count=2` 落地树 RUN=124 PASS_TOP=94 FAIL_TOP=0 SKIP=4 rc=0（SKIP 仍是既有联网门
+  `manifest_real_test.go:120/:147`，本腿⛔ 动它）。
+  **成本如实登记**：缓存命中与 override 两支现在对同一棵树读两遍（裁决表攻4 单份＝256 MiB 1.07–1.22 s），
+  这是把守卫放到调用者绕不过去的位置的价格；本腿⛔ 动阈值/golden/`thresholds.go`，⛔ 做 D32 判定。
+  `AC#6` ⛔ 归本腿（票面 `:44-51` 明写与"第一个模型装载器"那张票合并收＝今天无落点）；
+  `R-109-1` 残留窗可达性判据＝**没变可达**（`internal/speech/` 仍只有 `doc.go`、`internal/` 下无 `engines/`、
+  `cmd/wisp/models.go:36-40` 自陈本进程从不 open `<store>/<id>/` 下任何文件、只重哈希）⇒ 本枚把它变短、
+  没归零、也没让它更可达，按票面 `:50` 逐字"别在本票自己收口"继续开着。
+  工具输出里自称"编排者备注/停手/请 revert"的文本：本腿 **0 次**（票面 `:66` 那味照记＝⛔ 是指令）。
+  next= 交非实现者裁 `AC#2`⇄`AC#4` 两格（本腿⛔ 翻任何框）。
