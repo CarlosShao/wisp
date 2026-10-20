@@ -1,0 +1,135 @@
+BENCH ROOT=D:\tmp\wisp\20261020\342v3\bench\run2 shots=3
+
+ANCESTOR-MOVE shot 1: chain D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\data\sub\leaf.bin
+    A nothing held: rename(data)  [S5 control]                       err=<nil>  (the move LANDED)
+            restore parkA -> data                                    err=<nil>  (the move LANDED)
+    A nothing held: rename(sub)   [S5 control]                       err=<nil>  (the move LANDED)
+            restore parkA2 -> sub                                    err=<nil>  (the move LANDED)
+    A nothing held: remove(data) (delete, not rename)                err=<nil>  (the move LANDED)
+    B BASELINE at removal (by-name handle CLOSED): rename(data) [S1] err=<nil>  (the move LANDED)
+            restore parkB -> data                                    err=<nil>  (the move LANDED)
+    B BASELINE at removal: rename(sub)                          [S1] err=<nil>  (the move LANDED)
+            restore parkB2 -> sub                                    err=<nil>  (the move LANDED)
+    C BASELINE seal hop (by-name handle OPEN): rename(data)          err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\data D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\parkC: Access is denied.
+    C BASELINE seal hop (by-name handle OPEN): rename(sub)           err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\data\sub D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\parkC2: Access is denied.
+    C BASELINE seal hop: vacate the leaf NAME (os.Remove)      [S3]  err=remove D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+    C BASELINE seal hop: rename a SIBLING dir (scope of the lock)    err=<nil>  (the move LANDED)
+            restore parkC3 -> sibling-dir                            err=<nil>  (the move LANDED)
+    D LANDING at removal (pin HELD, leaf closed): rename(data)  [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\data D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\parkD: Access is denied.
+    D LANDING at removal (pin HELD): rename(sub)=the pinned dir [S2b] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\data\sub D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\parkD2: The process cannot access the file because it is being used by another process.
+    D LANDING at removal (pin HELD): remove(data) (delete)           err=remove D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\data: The directory is not empty.
+    D LANDING at removal (pin HELD): rename a SIBLING dir (scope)    err=<nil>  (the move LANDED)
+            restore parkD3 -> sibling-dir                            err=<nil>  (the move LANDED)
+D   the chain still intact: present size=0 body=[]
+    E LANDING seal hop (pin + leaf handle OPEN): rename(data)   [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\data D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\parkE: Access is denied.
+    E LANDING seal hop: rename(sub)                            [S2b] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\data\sub D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\parkE2: The process cannot access the file because it is being used by another process.
+    E => a plant at the route's own mid-hop: rename(data)       [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\data D:\tmp\wisp\20261020\342v3\bench\run2\anc012156692644\parkE3: Access is denied.
+    F pin RELEASED: rename(data)  [S5]                               err=<nil>  (the move LANDED)
+            restore parkF -> data                                    err=<nil>  (the move LANDED)
+F   sub reachable: dir [[leaf.bin]]
+F   sibling reachable: dir [[]]
+
+NAME-SWAP shot 1: caller name=D:\tmp\wisp\20261020\342v3\bench\run2\nam012460329329\data\sub\leaf.bin
+    G BASELINE by-name handle alive: vacate the caller's name   [S3] err=remove D:\tmp\wisp\20261020\342v3\bench\run2\nam012460329329\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+G   the caller's name now: present size=0 body=[]
+    G BASELINE: rename(the unnamed object INTO the caller's name) [S3] err=skipped because the name could not be vacated
+G   => the baseline's own handle forbids this world (reported, NOT counted as a green)
+    H LANDING Root handle alive: vacate the caller's name       [S4] err=<nil>  (the move LANDED)
+H   the caller's name now: absent (The system cannot find the file specified.)
+    H LANDING: rename(the unnamed object INTO the caller's name) [S4] err=<nil>  (the move LANDED)
+H   the unnamed object's OWN name after the plant: absent (The system cannot find the file specified.)
+H   the handle is still open; identity=<GetNameByHandle unavailable>
+    H LANDING Root.Remove(base) with the foreign object at that name err=<nil>  (the move LANDED)
+H   after Remove: the caller's name = absent (The system cannot find the file specified.)
+H   after Remove: the unnamed object's OWN name = absent (The system cannot find the file specified.)
+    H   write through the still-open handle after the Remove         err=<nil>  (the move LANDED)
+
+ANCESTOR-MOVE shot 2: chain D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\data\sub\leaf.bin
+    A nothing held: rename(data)  [S5 control]                       err=<nil>  (the move LANDED)
+            restore parkA -> data                                    err=<nil>  (the move LANDED)
+    A nothing held: rename(sub)   [S5 control]                       err=<nil>  (the move LANDED)
+            restore parkA2 -> sub                                    err=<nil>  (the move LANDED)
+    A nothing held: remove(data) (delete, not rename)                err=<nil>  (the move LANDED)
+    B BASELINE at removal (by-name handle CLOSED): rename(data) [S1] err=<nil>  (the move LANDED)
+            restore parkB -> data                                    err=<nil>  (the move LANDED)
+    B BASELINE at removal: rename(sub)                          [S1] err=<nil>  (the move LANDED)
+            restore parkB2 -> sub                                    err=<nil>  (the move LANDED)
+    C BASELINE seal hop (by-name handle OPEN): rename(data)          err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\data D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\parkC: Access is denied.
+    C BASELINE seal hop (by-name handle OPEN): rename(sub)           err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\data\sub D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\parkC2: Access is denied.
+    C BASELINE seal hop: vacate the leaf NAME (os.Remove)      [S3]  err=remove D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+    C BASELINE seal hop: rename a SIBLING dir (scope of the lock)    err=<nil>  (the move LANDED)
+            restore parkC3 -> sibling-dir                            err=<nil>  (the move LANDED)
+    D LANDING at removal (pin HELD, leaf closed): rename(data)  [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\data D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\parkD: Access is denied.
+    D LANDING at removal (pin HELD): rename(sub)=the pinned dir [S2b] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\data\sub D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\parkD2: The process cannot access the file because it is being used by another process.
+    D LANDING at removal (pin HELD): remove(data) (delete)           err=remove D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\data: The directory is not empty.
+    D LANDING at removal (pin HELD): rename a SIBLING dir (scope)    err=<nil>  (the move LANDED)
+            restore parkD3 -> sibling-dir                            err=<nil>  (the move LANDED)
+D   the chain still intact: present size=0 body=[]
+    E LANDING seal hop (pin + leaf handle OPEN): rename(data)   [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\data D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\parkE: Access is denied.
+    E LANDING seal hop: rename(sub)                            [S2b] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\data\sub D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\parkE2: The process cannot access the file because it is being used by another process.
+    E => a plant at the route's own mid-hop: rename(data)       [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\data D:\tmp\wisp\20261020\342v3\bench\run2\anc024103428381\parkE3: Access is denied.
+    F pin RELEASED: rename(data)  [S5]                               err=<nil>  (the move LANDED)
+            restore parkF -> data                                    err=<nil>  (the move LANDED)
+F   sub reachable: dir [[leaf.bin]]
+F   sibling reachable: dir [[]]
+
+NAME-SWAP shot 2: caller name=D:\tmp\wisp\20261020\342v3\bench\run2\nam021783671658\data\sub\leaf.bin
+    G BASELINE by-name handle alive: vacate the caller's name   [S3] err=remove D:\tmp\wisp\20261020\342v3\bench\run2\nam021783671658\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+G   the caller's name now: present size=0 body=[]
+    G BASELINE: rename(the unnamed object INTO the caller's name) [S3] err=skipped because the name could not be vacated
+G   => the baseline's own handle forbids this world (reported, NOT counted as a green)
+    H LANDING Root handle alive: vacate the caller's name       [S4] err=<nil>  (the move LANDED)
+H   the caller's name now: absent (The system cannot find the file specified.)
+    H LANDING: rename(the unnamed object INTO the caller's name) [S4] err=<nil>  (the move LANDED)
+H   the unnamed object's OWN name after the plant: absent (The system cannot find the file specified.)
+H   the handle is still open; identity=<GetNameByHandle unavailable>
+    H LANDING Root.Remove(base) with the foreign object at that name err=<nil>  (the move LANDED)
+H   after Remove: the caller's name = absent (The system cannot find the file specified.)
+H   after Remove: the unnamed object's OWN name = absent (The system cannot find the file specified.)
+    H   write through the still-open handle after the Remove         err=<nil>  (the move LANDED)
+
+ANCESTOR-MOVE shot 3: chain D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\data\sub\leaf.bin
+    A nothing held: rename(data)  [S5 control]                       err=<nil>  (the move LANDED)
+            restore parkA -> data                                    err=<nil>  (the move LANDED)
+    A nothing held: rename(sub)   [S5 control]                       err=<nil>  (the move LANDED)
+            restore parkA2 -> sub                                    err=<nil>  (the move LANDED)
+    A nothing held: remove(data) (delete, not rename)                err=<nil>  (the move LANDED)
+    B BASELINE at removal (by-name handle CLOSED): rename(data) [S1] err=<nil>  (the move LANDED)
+            restore parkB -> data                                    err=<nil>  (the move LANDED)
+    B BASELINE at removal: rename(sub)                          [S1] err=<nil>  (the move LANDED)
+            restore parkB2 -> sub                                    err=<nil>  (the move LANDED)
+    C BASELINE seal hop (by-name handle OPEN): rename(data)          err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\data D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\parkC: Access is denied.
+    C BASELINE seal hop (by-name handle OPEN): rename(sub)           err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\data\sub D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\parkC2: Access is denied.
+    C BASELINE seal hop: vacate the leaf NAME (os.Remove)      [S3]  err=remove D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+    C BASELINE seal hop: rename a SIBLING dir (scope of the lock)    err=<nil>  (the move LANDED)
+            restore parkC3 -> sibling-dir                            err=<nil>  (the move LANDED)
+    D LANDING at removal (pin HELD, leaf closed): rename(data)  [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\data D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\parkD: Access is denied.
+    D LANDING at removal (pin HELD): rename(sub)=the pinned dir [S2b] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\data\sub D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\parkD2: The process cannot access the file because it is being used by another process.
+    D LANDING at removal (pin HELD): remove(data) (delete)           err=remove D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\data: The directory is not empty.
+    D LANDING at removal (pin HELD): rename a SIBLING dir (scope)    err=<nil>  (the move LANDED)
+            restore parkD3 -> sibling-dir                            err=<nil>  (the move LANDED)
+D   the chain still intact: present size=0 body=[]
+    E LANDING seal hop (pin + leaf handle OPEN): rename(data)   [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\data D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\parkE: Access is denied.
+    E LANDING seal hop: rename(sub)                            [S2b] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\data\sub D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\parkE2: The process cannot access the file because it is being used by another process.
+    E => a plant at the route's own mid-hop: rename(data)       [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\data D:\tmp\wisp\20261020\342v3\bench\run2\anc033677064010\parkE3: Access is denied.
+    F pin RELEASED: rename(data)  [S5]                               err=<nil>  (the move LANDED)
+            restore parkF -> data                                    err=<nil>  (the move LANDED)
+F   sub reachable: dir [[leaf.bin]]
+F   sibling reachable: dir [[]]
+
+NAME-SWAP shot 3: caller name=D:\tmp\wisp\20261020\342v3\bench\run2\nam03412415404\data\sub\leaf.bin
+    G BASELINE by-name handle alive: vacate the caller's name   [S3] err=remove D:\tmp\wisp\20261020\342v3\bench\run2\nam03412415404\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+G   the caller's name now: present size=0 body=[]
+    G BASELINE: rename(the unnamed object INTO the caller's name) [S3] err=skipped because the name could not be vacated
+G   => the baseline's own handle forbids this world (reported, NOT counted as a green)
+    H LANDING Root handle alive: vacate the caller's name       [S4] err=<nil>  (the move LANDED)
+H   the caller's name now: absent (The system cannot find the file specified.)
+    H LANDING: rename(the unnamed object INTO the caller's name) [S4] err=<nil>  (the move LANDED)
+H   the unnamed object's OWN name after the plant: absent (The system cannot find the file specified.)
+H   the handle is still open; identity=<GetNameByHandle unavailable>
+    H LANDING Root.Remove(base) with the foreign object at that name err=<nil>  (the move LANDED)
+H   after Remove: the caller's name = absent (The system cannot find the file specified.)
+H   after Remove: the unnamed object's OWN name = absent (The system cannot find the file specified.)
+    H   write through the still-open handle after the Remove         err=<nil>  (the move LANDED)
+
+BENCH DONE

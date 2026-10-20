@@ -1,0 +1,39 @@
+SEAM-POSSIBILITY ROOT=D:\tmp\wisp\20261020\342v3\seam\runs shots=3
+
+SEAM shot 1: D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\data
+    H0 nothing held: rename(data)                                          err=<nil>
+    H1 pin held, BEFORE the leaf open: rename(data)                        err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\data D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\parkH1: Access is denied.
+    H1 pin held, BEFORE the leaf open: rename(sub)                         err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\parkH1s: The process cannot access the file because it is being used by another process.
+    H2 pin + leaf handle: rename(data)                                     err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\data D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\parkH2: Access is denied.
+    H2 pin + leaf handle: rename(sub)                                      err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\parkH2s: The process cannot access the file because it is being used by another process.
+    H3 pin held, leaf closed (= row D): rename(data)                       err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\data D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\parkH3: Access is denied.
+    H3 pin held, leaf closed (= row D): rename(sub)                        err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\parkH3s: The process cannot access the file because it is being used by another process.
+    H4 pin RELEASED, leaf handle alive: rename(data)                       err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\data D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\parkH4: Access is denied.
+    H4 pin RELEASED, leaf handle alive: rename(sub)                        err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam011773404948\parkH4s: Access is denied.
+SEAM shot 1 summary: landed at H1=false|false H2=false|false H3=false|false
+
+SEAM shot 2: D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\data
+    H0 nothing held: rename(data)                                          err=<nil>
+    H1 pin held, BEFORE the leaf open: rename(data)                        err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\data D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\parkH1: Access is denied.
+    H1 pin held, BEFORE the leaf open: rename(sub)                         err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\parkH1s: The process cannot access the file because it is being used by another process.
+    H2 pin + leaf handle: rename(data)                                     err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\data D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\parkH2: Access is denied.
+    H2 pin + leaf handle: rename(sub)                                      err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\parkH2s: The process cannot access the file because it is being used by another process.
+    H3 pin held, leaf closed (= row D): rename(data)                       err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\data D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\parkH3: Access is denied.
+    H3 pin held, leaf closed (= row D): rename(sub)                        err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\parkH3s: The process cannot access the file because it is being used by another process.
+    H4 pin RELEASED, leaf handle alive: rename(data)                       err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\data D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\parkH4: Access is denied.
+    H4 pin RELEASED, leaf handle alive: rename(sub)                        err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam022264058390\parkH4s: Access is denied.
+SEAM shot 2 summary: landed at H1=false|false H2=false|false H3=false|false
+
+SEAM shot 3: D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\data
+    H0 nothing held: rename(data)                                          err=<nil>
+    H1 pin held, BEFORE the leaf open: rename(data)                        err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\data D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\parkH1: Access is denied.
+    H1 pin held, BEFORE the leaf open: rename(sub)                         err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\parkH1s: The process cannot access the file because it is being used by another process.
+    H2 pin + leaf handle: rename(data)                                     err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\data D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\parkH2: Access is denied.
+    H2 pin + leaf handle: rename(sub)                                      err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\parkH2s: The process cannot access the file because it is being used by another process.
+    H3 pin held, leaf closed (= row D): rename(data)                       err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\data D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\parkH3: Access is denied.
+    H3 pin held, leaf closed (= row D): rename(sub)                        err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\parkH3s: The process cannot access the file because it is being used by another process.
+    H4 pin RELEASED, leaf handle alive: rename(data)                       err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\data D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\parkH4: Access is denied.
+    H4 pin RELEASED, leaf handle alive: rename(sub)                        err=rename D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\data\sub D:\tmp\wisp\20261020\342v3\seam\runs\seam033869659634\parkH4s: Access is denied.
+SEAM shot 3 summary: landed at H1=false|false H2=false|false H3=false|false
+
+SEAM DONE

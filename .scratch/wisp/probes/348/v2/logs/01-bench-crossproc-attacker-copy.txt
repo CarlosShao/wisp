@@ -1,0 +1,47 @@
+===== holder-anc shot 1 : attacker (a DIFFERENT process) while the holder's handle stands =====
+  ATTACKER: attacker rename(ancestor data) err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-anc-1\data D:\tmp\wisp\20261020\342v3\benchx\runs\holder-anc-1\park-data: Access is denied.
+  ATTACKER: attacker rename(ancestor sub)  err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-anc-1\data\sub D:\tmp\wisp\20261020\342v3\benchx\runs\holder-anc-1\park-sub: The process cannot access the file because it is being used by another process.
+  ATTACKER: attacker remove(caller's name)  err=<nil>
+  ATTACKER: attacker rename(mine -> caller's name) err=<nil>
+  ATTACKER: attacker my file's own name now exists=false
+  holder exitcode=0
+  HOLDER: holder-anc Root.Remove(leaf.bin) after the attacker's turn: err=<nil>
+===== holder-anc shot 2 : attacker (a DIFFERENT process) while the holder's handle stands =====
+  ATTACKER: attacker rename(ancestor data) err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-anc-2\data D:\tmp\wisp\20261020\342v3\benchx\runs\holder-anc-2\park-data: Access is denied.
+  ATTACKER: attacker rename(ancestor sub)  err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-anc-2\data\sub D:\tmp\wisp\20261020\342v3\benchx\runs\holder-anc-2\park-sub: The process cannot access the file because it is being used by another process.
+  ATTACKER: attacker remove(caller's name)  err=<nil>
+  ATTACKER: attacker rename(mine -> caller's name) err=<nil>
+  ATTACKER: attacker my file's own name now exists=false
+  holder exitcode=0
+  HOLDER: holder-anc Root.Remove(leaf.bin) after the attacker's turn: err=<nil>
+===== holder-leaf shot 1 : attacker (a DIFFERENT process) while the holder's handle stands =====
+  ATTACKER: attacker rename(ancestor data) err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-leaf-1\data D:\tmp\wisp\20261020\342v3\benchx\runs\holder-leaf-1\park-data: Access is denied.
+  ATTACKER: attacker rename(ancestor sub)  err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-leaf-1\data\sub D:\tmp\wisp\20261020\342v3\benchx\runs\holder-leaf-1\park-sub: The process cannot access the file because it is being used by another process.
+  ATTACKER: attacker remove(caller's name)  err=<nil>
+  ATTACKER: attacker rename(mine -> caller's name) err=<nil>
+  ATTACKER: attacker my file's own name now exists=false
+  holder exitcode=0
+  HOLDER: holder-leaf leaf handle still alive=true | Root.Remove(leaf.bin)=<nil> | Root.Lstat(leaf.bin)=err=statat leaf.bin: The system cannot find the file specified.
+  HOLDER: holder-leaf write through that handle after the Remove: err=<nil>
+===== holder-leaf shot 2 : attacker (a DIFFERENT process) while the holder's handle stands =====
+  ATTACKER: attacker rename(ancestor data) err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-leaf-2\data D:\tmp\wisp\20261020\342v3\benchx\runs\holder-leaf-2\park-data: Access is denied.
+  ATTACKER: attacker rename(ancestor sub)  err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-leaf-2\data\sub D:\tmp\wisp\20261020\342v3\benchx\runs\holder-leaf-2\park-sub: The process cannot access the file because it is being used by another process.
+  ATTACKER: attacker remove(caller's name)  err=<nil>
+  ATTACKER: attacker rename(mine -> caller's name) err=<nil>
+  ATTACKER: attacker my file's own name now exists=false
+  holder exitcode=0
+  HOLDER: holder-leaf leaf handle still alive=true | Root.Remove(leaf.bin)=<nil> | Root.Lstat(leaf.bin)=err=statat leaf.bin: The system cannot find the file specified.
+  HOLDER: holder-leaf write through that handle after the Remove: err=<nil>
+===== holder-base shot 1 : attacker (a DIFFERENT process) while the holder's handle stands =====
+  ATTACKER: attacker rename(ancestor data) err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-1\data D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-1\park-data: Access is denied.
+  ATTACKER: attacker rename(ancestor sub)  err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-1\data\sub D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-1\park-sub: Access is denied.
+  ATTACKER: attacker remove(caller's name)  err=remove D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-1\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+  holder exitcode=0
+  HOLDER: holder-base os.Remove(leaf) while its own handle lives: err=remove D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-1\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+===== holder-base shot 2 : attacker (a DIFFERENT process) while the holder's handle stands =====
+  ATTACKER: attacker rename(ancestor data) err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-2\data D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-2\park-data: Access is denied.
+  ATTACKER: attacker rename(ancestor sub)  err=rename D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-2\data\sub D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-2\park-sub: Access is denied.
+  ATTACKER: attacker remove(caller's name)  err=remove D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-2\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+  holder exitcode=0
+  HOLDER: holder-base os.Remove(leaf) while its own handle lives: err=remove D:\tmp\wisp\20261020\342v3\benchx\runs\holder-base-2\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+CROSSPROC DONE

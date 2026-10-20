@@ -1,0 +1,15 @@
+# 342-v3 bench: the platform handle lock, measured on the platform's own primitives, with NO repo code.
+# Rows (each >=2 shots): S1 baseline state at its removal hop / S2 landing state at the same hop /
+# S2b rename the pinned dir itself / S3 baseline holds the by-name leaf open: vacate+refill the name /
+# S4 landing holds the Root-opened leaf open: vacate+refill the name / S5 positive control (nothing open).
+$ErrorActionPreference = 'Continue'
+$base = 'D:\tmp\wisp\20261020\342v3\bench'
+New-Item -ItemType Directory -Force -Path $base | Out-Null
+Write-Output "GOFLAGS=$env:GOFLAGS"
+Push-Location $base
+$env:GOTMPDIR = $null; $env:TMPDIR = $null
+go vet ./... 2>&1 | Out-String
+Write-Output "VET_RC=$LASTEXITCODE"
+go run . 2>&1 | Out-String
+Write-Output "RUN_RC=$LASTEXITCODE"
+Pop-Location

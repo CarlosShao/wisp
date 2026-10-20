@@ -1,0 +1,68 @@
+== gate 0: gofumpt on a .md = tool misuse, rc recorded, NOT read as a red ==
+gofumpt-on-md rc=2
+== gate 1: gofumpt -l over my write face (0 .go files today) ==
+(skipped: no-arg gofumpt walks the tree; my write face has no .go bytes today)
+== gate 2: d22scan ==
+d22scan rc=0
+d22scan: scope ban #8 frontend/         examined 116 text files
+d22scan: scope ban #8 internal/         examined 603 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=244, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=603, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 603 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+== gate 3: path length budget ==
+length rc=0
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+== gate 4: go vet ./internal/winsec/ (local = windows) ==
+vet-local rc=0
+== cross vet (registered as compiler coverage only, NOT paired red/green with local) ==
+vet-linux rc=0
+vet-darwin rc=0
+== box rulers (the AC frames as they stand NOW, before my legs) ==
+.scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md  [x]=5  [ ]=2
+.scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md  [x]=6  [ ]=1
+== open frames by name ==
+--- .scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md
+- [ ] **AC#1 ★成对读数
+- [ ] **AC#4 门禁＋消费
+--- .scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md
+- [ ] **AC#2 ★liveness 要
+== winsec.go identity ==
+07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+-- the :118-140 block sha16 (my ruler = sha1sum over sed -n '118,140p'; 342-v2 reported sha16 e8a2f33dea8cdeab over the same range: compare) --
+88f51af530a75de9
+-- what 342-v2's own number covers: its ruler was sed -n 118,140p too. Print first/last line of the range --
+// Ticket 322 is the second half of that sentence, and it is only half closed.
+//     shipped platform.
+== tail of the 342-v2 quote: is the ancestor-Windows sentence at :138 or :140? ==
+     1	//   - on Windows O_NOFOLLOW does not exist (oNoFollowPlatform is 0), so the leaf
+     2	//     leg is closed there by preOpenLeafGuard probing the name for a reparse
+     3	//     point before the open. That probe answers a question, it does not lock the
+     4	//     answer, so the leaf leg on Windows has a residual window of its own, and
+     5	//     the ancestor leg is open there too. See the Windows file for its own
+     6	//     statement; nothing here may be read as "the window is closed" on the
+     7	//     shipped platform.
+     8	func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
+== production callers unchanged ==
+0
+177:		unlinkPinnedLeaf(parent, filepath.Base(resolved))
+182:		unlinkPinnedLeaf(parent, filepath.Base(resolved))
+== the seam 342-r2 leaned on exists at baseline too (so case one is not landing-only plumbing) ==
+38:var applyDescriptor = applyDescriptorWindows
+413:func sealHandle(f *os.File) error { return applyDescriptor(f.Name(), false) }
+413:func sealHandle(f *os.File) error { return applyDescriptor(f.Name(), false) }
+== the two instrument files: line counts (ruler = wc -l over HEAD blobs) ==
+internal/winsec/ancestorwindow_342r2_windows_test.go lines=673
+internal/winsec/leafrace_342r2_windows_test.go lines=393
+== POSIX-family liveness names inside the two Windows instruments (expect 0 = no borrowed green) ==
+internal/winsec/ancestorwindow_342r2_windows_test.go borrowed-POSIX-key-hits=0
+internal/winsec/leafrace_342r2_windows_test.go borrowed-POSIX-key-hits=0
+== where those two names actually live ==
+internal/winsec/ancestoropen_342_unix_test.go
+internal/winsec/ancestorunlink_348_unix_test.go
+internal/winsec/ancestorworld_342_348_unix_test.go
+== the landing's SameFile face: hits inside the re-check roster across ALL my logs ==
+/d/tmp/wisp/20261020/342v3/logs/treeL-det-r1.log:0
+/d/tmp/wisp/20261020/342v3/logs/treeL-det-r2.log:0
+/d/tmp/wisp/20261020/342v3/logs/treeL-det-r3.log:0
