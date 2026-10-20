@@ -1,0 +1,15 @@
+派单＝票 321 落地腿 321-r1（★写腿·面＝`cmd/wisp` 的 319 宿主装配测试件）｜编排者＝新任 harness｜发出 2026-10-20 18:4x +08
+★主题起头⛔ 换形：每笔主题以逐字「**票 321 落地腿 321-r1**」开头。
+票面＝`.scratch/wisp/issues/321-tray-hotkey-gesture-wiring-to-holder-toggle-has-no-case-that-reds-if-rewired.md`（2 格未勾＝AC#1 常驻判据＋AC#2 门禁面核）。来源＝`319-v2` 对抗验收表 `docs/evidence/s1/ticket319-319-v2-accept-v1.md` 的"toggle 语义"格（判附条件：语义有钉、**接线无钉**）。
+
+## 要做（照票面两格）
+- **AC#1** 给"托盘/热键那一跳 → `holder.toggle`"装一枚**常驻判据**：装配处换成 `holder.show`（仓外变异／`-overlay`⛔ 用——公共块禁）⇒ 必须红且红名点到"这一跳不是 toggle 语义"。★定位＝内容锚（`git grep -n 'withPanelHost\|holder.toggle\|\.toggle' HEAD -- cmd/wisp/`）＝⛔ 拿绝对行号（行号会漂，今天有一枚腿栽在 `:430⇄:431` 这种 1 行漂上）。判据只认**到达数**分子＋红名册逐名。⛔ 动装配处产码字节＝本票面＝测试面（若发现必须改产码才能钉住＝停手上报）。
+- **AC#2** 门禁四把落 rc：`GOFLAGS= go build ./...`／`sh scripts/d22scan.sh`／`gofumpt -l <你的件>`⇄`gofmt -l` 并排／`go vet -tags winlive ./cmd/wisp/`（票面逐字带 `winline` tag＝先现读票面确认）；跑门前 `unset GOTMPDIR TMPDIR TEMP TMP`。
+- ★成对色＝仓外导出树两棵（基线⇄你的字节），`cmd/wisp` 必须带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`（否则 `0xc0000135`＋零枚 `--- FAIL`＝台损⛔ 计判据）；整包 `cmd/wisp` 有真窗区整进程死亡（`resident_*` 那族）⇒ 定向 `-run` 取色、⛔ 拿整包当全绿/当被红。变异落刀前/后各验锚命中数＋当场还原报哈希。
+
+## 跨腿耦合（放腿前现量）
+在飞＝写 `352-r1`（winsec 交件趟＝编排者已令⛔ 再碰 winsec 字节＝`cmd/wisp` 编译面冻结）＋写 `109-r1`（限 `internal/models/**`、跑色限 models 定向）＋读 `115-v1`（⛔ 跑 go test）。⇒ ①你⛔ 动 `internal/winsec/**`⇄`internal/models/**`⇄`internal/agent/**`⇄`cmd/wisp/config_reload_223_test.go`（票 351 刚落面的形状件；读可以、写⛔）；②你跑色限 `./cmd/wisp/` 定向（含你的新件）；③`wisp.exe`（机主常驻 pid 21892 在场）占 `Ctrl+Alt/Q M P` 那族热键红⇄弃权＝公共块弃权名册、⛔ 归因给自己字节。
+
+## 铁律（全量见公共块＝先 Read `.scratch/wisp/probes/orch/20261020/352r1-dispatch.txt` 尾段）
+★写面＝`cmd/wisp/**` 测试件（⛔ 产码）＋`.scratch/wisp/probes/321/r1/**`＋票 321 尾一条只追加 bullet。⛔ 翻框、⛔ 改票名/`Status:`、⛔ push、⛔ `add -A`/amend/reset/rebase/stash/checkout ./clean、两处显式 pathspec、`-F` Windows 形、提交后 `git log -1`＋`git show --name-only` 对回、每落一枚就 commit、新件先 `git add`。证据件⛔ `.out`、⛔ 0 字节；≤160 行帽只管正文件（`*_test.go` 照实报）。临时件落 `D:\tmp\wisp\20261020\321r1\`、⛔ 盘符根、只建不删。凡报数带尺名＋射程＋量/算；完成通知一律当未验证。
+交件 send_message 报 `lead`：逐枚提交号＋名册锚定尺＋变异自证（红名逐字＋落刀前后命中数＋还原哈希）＋成对四数（逐名作差＝新增红 0）＋门禁各把 rc＋框终量（须 0 勾）＋票尾 numstat（纯追加）＋写面自证（逐枚 name-only＝⛔ 产码字节）。
