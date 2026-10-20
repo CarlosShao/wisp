@@ -51,3 +51,32 @@
 行数＝124、字节＝16630、blob CR 枚数＝**0**（全 LF，`tr -cd '\r' | wc -c` 那把尺）。
 票尾最后一行＝第 12 节那枚"今天可派三格"bullet 的结尾（逐字以「⛔ AC 框本轮一枚未动。」收）＝
 本腿追加行的前缀锚＝这一整枚文件，追加后 `cmp` 前 124 行须逐字节相同、diff 删除行须＝0。
+
+## 第 F 节 交件侧复量（追加，2026-10-20 22:04:05 +0800，当时 HEAD=0b75e40b＝本腿笔⑧之后又有别腿两笔）
+★本件第 A 节那张三枚表＝**21:0x 那一发的读数**，随别腿提交而变（规矩＝⛔ 把某时刻枚数当通则）；本节＝收线发。
+尺同第 A 节（`git status --porcelain` 滤 `^ M` 后逐枚 `stat -c '%y'`，量的，射程＝整树）。
+tracked 脏＝**1 枚，⛔ 本腿字节**：
+
+| mtime | 文件 | 归属 |
+|---|---|---|
+| 2026-10-20 20:24:44 | `.scratch/wisp/issues/115-seal-notices-…-caller-spelling-done.md` | 出表腿 `115-v1` 面（第 A 节那枚仍在＝它自己没提交完） |
+
+⇄ 第 A 节另外两枚 `internal/models/*`（downloader.go 20:38:05 ⇄ handoff_window_109_windows_test.go 21:04:42）**已变干净**＝
+`109-r1` 自己逐笔提交了（`0242dc07`／`3951247f`／`a2234c00`／`3493332d`）；`353-r1` 那枚读数件亦由它自己提交（`0b75e40b`）。
+⇒ 全部变化＝别腿落笔⇄自提，⛔ 本腿手。⇒ 本腿对 tracked 脏的净贡献＝**0 枚**（复算尺＝`git status --porcelain -- internal/agent`
+空 ⇄ `git diff --numstat HEAD -- internal/agent` 空 ⇄ 本腿八笔的 `git show --name-only` 件名全在 `probes/139/r1/**` ⇄ 票 139 面）。
+仓根冻结件复量（同第 C 节那把尺）＝`go.mod` 1026B／mtime 19:50:08 ⇄ `go.sum` 6237B／09-01 09:47:42 ⇄
+`.gitignore` 1404B／09-27 11:16:34＝三枚 mtime 全部早于本腿起手（20:31）＝零触碰，全程⛔ `go mod edit`／`tidy`／`get`。
+
+★门禁第三把的交件侧变好＝具名登记、⛔ 当自己功劳：收线发 `sh scripts/d22scan.sh` **rc=0**
+（原件 `D:\tmp\wisp\20261020\139r1\gate-d22scan-delivery.txt` 23775 字节）。那枚 phantom-citation 的串在 HEAD blob
+的命中已从 1 → **0**＝`353-r1` 笔④ `ffc3c62a`（21:17:17，主题逐字含"自抓自修门禁 ban#9"）**自己修掉的**，
+本腿⛔ 碰 `internal/winsec/**` 一字（第 A／C 节"越界 0 枚"仍成立）。日志里剩下的 `internal/bad/leak.go:5`
+＝`d22scan` 自己测试里的内存夹具（`git cat-file -e HEAD:internal/bad/leak.go`＝**不存在**）＝⛔ 真 finding、⛔ 本腿面。
+
+★本腿又一把自抓的坏尺（照实入账⛔ 藏）＝收线第一发把"七枚痕用例是否仍绿"打在**剥了状态的逐名表**（`sed` 去过
+`(0.00s)`⇄状态前缀的 `/tmp/rf.txt`）上⇒命中 **0**＝假读数（＝"报 0 命中前先跑正控"第三次救场）；
+改正＝打回 `-v` 原始件＝命中 **7**、七枚逐名见 `03-final-roster.txt` 附节。
+
+★收线四数（成对两棵仓外树、`./internal/agent/...` 定向、`-count=1 -timeout 30m -v`）＝起手锚
+`212/168/0/1`（PANIC 0）⇄ 交件侧 HEAD 含本腿全部字节 `212/168/0/1`（PANIC 0）、逐名 169⇄169 `diff` rc=0＝**新增红 0 枚**。
