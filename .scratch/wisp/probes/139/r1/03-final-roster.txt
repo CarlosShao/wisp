@@ -20,3 +20,24 @@ ec826c63 | 派单存档＝编排者那笔（⛔ 本腿笔，不计入本腿写�
 ## 尺的底片（可逐字重跑）
 grep -c "^$PFX" /tmp/subs.txt ⇄ awk -F'\t' 'index($2,P)==1' /tmp/full.txt | wc -l
 git show --name-only --format='' <每枚> | grep -c '\.go$'（正控＝1acdd032 给 4 枚）
+
+## 附：交件侧复量（追加，2026-10-20 22:04:05 +0800，HEAD=0b75e40b）
+名册三把尺（同一枚前缀、射程逐字同第 A 节）＝尺1 锚定行首 **9** ⇄ 尺2 非锚定子串 **9** ⇄ 尺3 内存 index==1 **9**＝**三把同号**。
+正控＝`^票 230 落地腿 230-r1` 同尺命中 **8**＝尺灵。
+枚数构成＝编排者那枚派单存档 `ec826c63` ＋ 本腿 **8 笔**（时序＝`eb623bee`① ⇄ `b0191a0e`② ⇄ `6f397118`③ ⇄ `259f8087`④ ⇄
+`2340b8de`⑤ ⇄ `b3030f7e`⑥ ⇄ `c3e76454`⑦ ⇄ `f0cd6d46`⑧＝票尾那一笔）。
+★逐枚写面自证（尺＝`git show --name-only` 后 `grep -c '\.go$'`；正控＝同尺打在 `1acdd032` 给 **4**＝尺灵）＝八笔全部
+`.go` **0 枚**、越界（⛔ 非 `probes/139/r1/**` ⇄ ⛔ 非票 139 面）**0 枚**。逐笔 numstat（量的）：
+`eb623bee` 93/0（00 新建）｜`b0191a0e` 1/1（00 那行指法更正）｜`6f397118` 22/0（03 新建）｜`259f8087` 94/0（01 新建）｜
+`2340b8de` 53/0（02 新建）｜`b3030f7e` 51/0（04 新建）｜`c3e76454` 1/1＋1/1（02⇄04 各改掉一枚字面码位）｜
+`f0cd6d46` **6/0**（票尾纯追加、删除列 0＝硬尺见 02 第 D 节⇄本笔 commit 正文）。
+★票 139 框终量（尺＝`git cat-file blob HEAD:票面` 行首锚定 grep，一律对**入库 blob**）＝未勾 **2**（`AC#2`⇄`AC#3`）／
+已勾 **2**（`AC#1`⇄`AC#4`）＝**本腿一枚没翻**；票面 blob 130 行／22644 字节／CR **0**（`eol=lf` 生效）／码位 U+00A7 **21** 枚
+＝全部早于本腿（本腿追加的 6 行命中 0，尺＝awk 双字节 RS 形，正控同把打在⛔ 追加段上＝0）。
+★收线四数＝起手锚 `212/168/0/1`（PANIC 0）⇄ 交件侧（HEAD 含本腿全部字节）`212/168/0/1`（PANIC 0）、
+逐名 169⇄169 `diff` rc=0＝**新增红 0 枚**；七枚痕用例收线侧逐枚 **PASS**＝
+`TestCompressionTraceBooksCountsOnSuccess` ⇄ `…SilentWhenNothingFolded` ⇄ `…SurvivesTheLoopWiring` ⇄
+`…DoesNotAlterTheFold` ⇄ `…SilentWhenNothingFoldableOverThreshold` ⇄ `…CarriesTheOwningTaskID` ⇄ `…NeverInventsATaskID`。
+★门禁收线发＝`gofumpt -l` 本腿三枚射程文件 rc=0 列 0 ⇄ 整包 rc=0 列 2 枚存量；`check-path-length-budget.sh` rc=0；
+`go vet` 两形 rc=0；`sh scripts/d22scan.sh` 交件侧 rc=**0**（＝`353-r1` 笔④ `ffc3c62a` 自修那枚 phantom-citation，⛔ 本腿功劳，
+详见 02 第 F 节）。
