@@ -1,0 +1,31 @@
+票 353 普查腿 353-a1 草案件＝`AC#2` 确定性仪器形状（⛔ 本腿落地＝只给形状，⛔ 选形、⛔ 动产码/测试字节）
+
+读面＝HEAD blob 96a2eeb7 导出于仓外（`D:\tmp\wisp\20261020\353a1cont\head\*.go.txt`）；三枚承重 blob 与断腿 15:3x 锚 `c16ff47e` 逐枚同串（`f3c1b68e`/`db077e30`/`63714a83`〔量的，尺＝`git rev-parse <锚>:<path>`，射程＝`internal/winsec` 三枚）。
+
+## 一、仪器要量的那一味（和⛔ 量的那一味）
+- 量＝**拒绝路径那一步删除删掉了调用者⛔ 点名的对象**：分子 `damage`＝顶进来的那枚对象在调用者那枚名字下再无名字。
+- ⛔ 量祖先那一跳（票面 `AC#2` 第④判据）：`342-v3` 已量到那两族分子（`truncated`／`deleted` 走翻转祖先）在本味逐发＝0〔量的，出处＝`342-v3-verdict.md:40`＋`probes/342/v3/logs/01|03`，**本腿⛔ 复跑＝不是本腿量过的数**〕。
+- ⛔ 借覆盖写⇄独占那一支的绿：成功路径⛔ 进本仪器。
+
+## 二、世界怎么造（确定性、⛔ racer）
+既有件已把这个世界造出来过：`ancestorwindow_342r2_windows_test.go:283-304`（`installWindow`）＝走本包**已声明的** `applyDescriptor` 缝（`winsec_windows.go:35-38`，注释自陈"Tests replace it to inject a failure (AC#5)"），★真 seal 先跑（`w.sealRun=true` 逐发点名）→ 缝内 `os.Remove(caller's name)`＋`os.Rename(unnamed, caller's name)` → 缝再返回注入的失败 ⇒ 路由落到删除支时世界已改。
+⇒ `AC#2` 的落地腿⛔ 新造缝、⛔ 新导出名、⛔ 改函数形状：这一味已经过 `342-r2` 落地、`342-v3` 独立复现（〔量的，`logs/04|05|06`：落地侧 3×3 发 `worlds entered=3`＋`unnamed objects left with no name=3`＋`realSealRanFirst=true`；基线侧 `logs/07..09`＝`entered=0`＋`refused=3`，逐字红句＝`The process cannot access the file because it is being used by another process.`＝平台把名冻住那一发**不是**绿、⛔ 计入判据〕）。
+跨进程那一味已由 `342-v3` 的仓外台架打过（`logs/03`＝独立进程 remove＋rename 两发 `<nil>`、随后产码 `Root.Remove(base)=<nil>`〔量的，同上〕）⇒ `AC#2` **⛔ 需要**第二个进程；但判语应⛔ 把"同进程缝内顶入"写成"跨进程可达性的凭据"，只写成"同一枚平台事实的两个面"。
+
+## 三、成对判据（两枚分子⛔ 合并、⛔ 相减）
+| 列 | 落地侧期望 | 基线侧期望 | 凭据形状 |
+|---|---|---|---|
+| `entered`（世界进⛔ 进去） | `3/3` | `0/3`＋逐字红句具名报、⛔ 冒充绿 | 平台句柄共享掩码之差（`at_windows.go:151` 带 `FILE_SHARE_DELETE` ⇄ `syscall_windows.go:395` `READ|WRITE`）＝**两列都算读数**、⛔ 一把尺两种形状都放行 |
+| `damage`（无名对象数） | 选**甲／乙** ⇒ `0`；选**丙** ⇒ `3/3` 且这一列**就是红** | 不适用 | liveness 钥匙＝同发 `realSealRanFirst=true`＋`entered=3/3`（⛔ 借 `truncated`／`deleted`） |
+| 成功路径两枚钉 | 照绿 | 照绿 | `openleaf_overwrite_322_test.go:36`＋`private_fail_test.go:26/:99`＝覆盖写⇄独占⇄AC#5 的**别的世界**，⛔ 借它们答本味 |
+
+## 四、敏感度（成对去牙＝两发落点⛔ 同、少任一发＝那把尺⛔ 敏感）
+- 发 A＝摘 `unlinkPinnedLeaf` 那一步（`pinnedleaf_342_windows.go:216` 的 `_ = p.root.Remove(base)`）⇒ `damage 3→0`、`entered` 照 3、其余照绿。
+- 发 B＝`openPinnedLeaf`（`:173`）换成基线那形按名开 ⇒ `entered 3→0`。
+- ★`342-v3` 已把这两发打过的数**⛔ 算本腿量过**（〔量的，`logs/15`＝mutA RC=1／mutB RC=0＋还原逐字回 pristine `B9DC39AE…`×2；射程＝它自己那棵仓外树〕）⇒ 落地腿要**自己重打**、只押形状与量级、⛔ 要求逐字同号（竞态行⛔ 要求逐字＝公共块读数纪律）。
+
+## 五、`AC#2` ⛔ 能设计成什么（本趟最硬的一条，⛔ 由我裁）
+★**乙形的那扇残余窗⛔ 能被一枚确定性仪器证伪**：要造"复验已答话、绑定之前才顶入"那枚世界，需要在 `Deleteat` 的 `NtOpenFile`（`internal/syscall/windows/at_windows.go:247`）**之内**插一枚钩子＝平台内部、本包⛔ 有接缝、也⛔ 该有 ⇒ 乙的可证伪面只到"顶入先于复验"那一支（确定性、可打）；窗内那一支**只能〔算的〕报量级**（＝本腿 `logs/03` 那 4 枚内核面／5 枚重试支）。
+⇒ 若编排者 `AC#1` 选乙，`AC#2` 的判据必须**逐字承认这条测不到**（形＝票 322 `AC#1` 那枚"报窗口、⛔ 圆窗口"的先例），并把残余登记进台账；否则那枚仪器会在一个它⛔ 覆盖的世界上报绿＝本仓已入账的"blade that bites nothing reporting green"。
+- 甲形：`damage` 归 0 **且** `unnamed object 存活` 这两枚都可确定性证伪 ⇒ 可证伪性最好，代价全在语义批准那一栏。
+- 丙形：仪器恒红（＝把证伪搬到台账＋CI），可证伪性＝对"读数存在"最好、对"代码行为"＝⛔ 证伪任何东西。
