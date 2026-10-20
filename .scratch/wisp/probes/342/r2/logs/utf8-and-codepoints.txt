@@ -1,0 +1,31 @@
+== iconv decode ruler, authored files ==
+OK  report.md
+OK  logs/bench-probes-verbatim.txt
+OK  logs/gates-and-roots.txt
+OK  logs/appended-lines.txt
+OK  sh/codepoint-ruler.pl
+OK  sh/commit-evidence.sh
+OK  sh/gates-and-roots.sh
+OK  sh/roots-and-faults.sh
+OK  sh/self-proof-rulers.sh
+OK  sh/final-sweep.sh
+OK  sh/utf8-and-codepoints.sh
+UTF8_BAD=0
+
+== raw go-test logs (27 files, verbatim captures) ==
+RAW_UTF8_BAD=0 of 27
+
+== codepoint ruler (banned U+00A7 must be 0; U+00B7 printed so the two are not conflated) ==
+report.md lines=110 U+00A7=0 U+00B7=6
+logs/bench-probes-verbatim.txt lines=74 U+00A7=0 U+00B7=0
+logs/gates-and-roots.txt lines=59 U+00A7=0 U+00B7=1
+logs/appended-lines.txt lines=6 U+00A7=0 U+00B7=2
+
+== positive control on the same codepoint ruler (a file that DOES carry U+00A7) ==
+docs/reports/HANDOVER.md lines=3847 U+00A7=304 U+00B7=290
+
+== inventory / caps ==
+PROBE_ROOT_FILES=39
+REPORT_MD_LINES=110
+ZERO_BYTE=0
+OUT_EXTENSION=0

@@ -5,7 +5,15 @@ cd "/d/work/workspace/projects plans/Wisp" || exit 1
 OUT=.scratch/wisp/probes/342/r2/logs/gates-and-roots.txt
 {
   echo "== HEAD at gate time =="
-  git log -1 --format='%H %s' | cut -c1-90
+  # NOTE (本腿自抓＝散件里的一处真损): this line used to be `git log -1 --format='%H %s' | cut -c1-90`,
+  # and `cut -c` counts BYTES, so it cut a CJK commit subject in the middle of a multi-byte character
+  # and left an undecodable byte in the evidence file (iconv -f UTF-8 -t UTF-8 reports it; a grep that
+  # tolerates invalid bytes does not). Nothing after this point byte-cuts multi-byte text.
+  git log -1 --format='%H %h' | sed 's/^/HEAD_FULL_SHA=/'
+  git log -1 --format='%s' | sed 's/^/HEAD_SUBJECT=/'
+  echo '(subject printed whole: cut -c counts BYTES and would split a multi-byte character. And NO'
+  echo ' backticks inside a double-quoted echo string - that is command substitution: it once leaked'
+  echo ' a whole git log into this evidence file, caught by reading the generated head back.)'
   echo
   echo "== gate 1: gofumpt -l, my two literal paths, run before unset too (same answer either way) =="
   unset GOTMPDIR TMPDIR TEMP TMP
