@@ -15,7 +15,7 @@
 ## 第 B 节 ★超 160 行的整发读数＝**留在盘上、⛔ 纳入 commit**（照本票自家先例，⛔ 自创第三条路）
 公共块把"每件 ≤160 行"的射程写成 report／census／证据散件／**读数件** ⇒ 整发 `-v` 输出装不进那把帽；
 而⛔ 为凑帽删读数、⛔ 压正文、⛔ 只交摘要。处置＝照**本票验收程自己的先例**：
-`docs/evidence/s1/139-…-accept-r1.md` §0 逐字把三枚探针副本
+`docs/evidence/s1/139-…-accept-r1.md` 第 0 节逐字把三枚探针副本
 （`leg-e2e-probe_test.go.txt` 8813B ⇄ `leg-ladders-probe_test.go.txt` 3858B ⇄ `loop-anchor.go.txt` 38148B）
 写成"未纳入 commit"、留在 `.scratch/wisp/probes/139/accept-r1/`。⇒ 本腿同形，两处各一份、⛔ 删（临时件只建不删）：
 - 仓内 `.scratch/wisp/probes/139/r1/raw/`（19 枚⇄本目录 41 枚，全部盘上可读）
