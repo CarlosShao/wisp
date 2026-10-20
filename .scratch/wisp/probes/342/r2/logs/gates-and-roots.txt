@@ -53,3 +53,10 @@ mutB-targeted-r1 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=15  USERPROFILE-direct
 land-det-shortroot.log:0
 base-det-shortroot.log:0
 leaf-base-r1.log:0
+
+== correction record (this leg's own claim<->actual catch) ==
+commit 4b784fea body claimed 35 files; git show --name-only --format= | grep -c . = 36.
+cause: sh/commit-evidence.sh was added to the pathspec list AFTER the count was written.
+action: append-only correction commit (no --amend, no reset); table in report.md updated to 36.
+LF ruler on my two .go blobs: CR-bytes=0 each (git cat-file blob HEAD:<path> | tr -cd '\r' | wc -c).
+subject-anchored roster before this commit: 7 rows matching '^票 342＋票 348 落地腿 342-r2'.
