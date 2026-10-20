@@ -1,0 +1,158 @@
+# 12 续跑更正件的尺底片（115-v1 续跑腿；每把尺带尺名＋射程＋量/算；⛔ 编译全程零次）
+# 复核时刻＝2026-10-20 18:0x–18:5x +08｜复核时 HEAD＝a651c086（分支 dev）
+# ★本件正文⛔ 写出被禁字面字符〔码位 U+00A7〕：凡需点出遗产件里那枚，一律写「U+00A7」＋字节证据（第 C 节）。
+
+## A. 补 `logs/03` 的三枚空读数（载具＝仓外原件 D:\tmp\wisp\20261020\115v1\remote\，⛔ 表任何腿的转述）
+# 尺＝grep -n / grep -E 'Z *--- FAIL: '（射程＝整枚 job 日志全文；量的）
+  job-106319703680.log（run 35595651898；214419 字节／1378 行；sha256 前 12＝7e64d4c8b3d6）
+    205 行逐字：2026-09-21T11:46:30.3947954Z === RUN   TestSealReportsThePrincipalsItCleared
+    206 行逐字：2026-09-21T11:46:30.3948845Z --- PASS: TestSealReportsThePrincipalsItCleared (0.03s)
+    204 行逐字：2026-09-21T11:46:30.3942522Z … ERROR winsec: refusing to install a path resolver …
+    1359 行四数：RUN=71 PASS=32 FAIL=3 SKIP=0
+    顶层 --- FAIL 枚数＝3，逐名：
+      TestSealNarrowsAndNamesThePrincipalItRemovedBySID (0.02s)
+      TestC26PipelineIsWiredIntoWinsec (0.00s)
+      TestAC3JunctionInputIsRefusedNotSealed (0.09s)
+    子测试 --- FAIL 枚数＝2，逐名：
+      TestAC3JunctionInputIsRefusedNotSealed/existing_directory_behind_the_link
+      TestAC3JunctionInputIsRefusedNotSealed/missing_directory_under_the_link
+  job-106331840177.log（run 35599458439；234680 字节／1477 行；sha256 前 12＝557c72982ba8）
+    204 行逐字：2026-09-21T12:27:14.4844913Z … INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2
+    1458 行四数：RUN=80 PASS=36 FAIL=4 SKIP=0
+    顶层 --- FAIL 枚数＝4，逐名：
+      TestAC1SealFileReportsTheInheritedGrantItCleared (0.05s)
+      TestAC2InheritedNoticeHasANoiseBound (0.23s)
+      TestSealReportsThePrincipalsItCleared (0.03s)
+      TestSealNarrowsAndNamesThePrincipalItRemovedBySID (0.05s)
+    子测试 --- FAIL 枚数＝1：TestAC2InheritedNoticeHasANoiseBound/sealing_only_children_reports_each_of_them_once
+  ⇒ 判语件第 4 节(a) 那句「顶层 FAIL 逐名 4 枚」＝**量的**、复现（4 枚逐名同上）；
+    那句「四数 80/36/4/0」与「80 顶层 PASS=36」自洽（36 顶层 PASS ⇄ FAIL_TOP=4，两数不同口径⛔ 相减）。
+
+## B. 补 `logs/09` 第 B 节那枚空读数（尺＝git log --format='%h %s' 391878a8^..c6dbbf94；量的）
+  区间总笔数＝23（尺＝git rev-list --count 391878a8^..c6dbbf94＝23）
+  票 115 自己的 3 笔＝391878a8 / 527d3036 / c6dbbf94 ⇒ 别腿的笔＝**20** 枚，逐枚主题（⛔ 记成 115 的账）：
+    c6dbbf94 票 115（R-115-2）              823d4572 docs(92 结案补真,121 预检读数入库,A95)
+    2152f321 docs(115,AC#3 后半格坐实)      c9907bb2 docs(111 读数,123,85 更正,A94)
+    aca704d8 docs(92-done,114+AC#8-11,A93)  a13c6dcd docs(A92+④b)
+    c069f19e docs(115,AC#3 补账)            5383dd31 docs(A91,A92,121 裁定)
+    63fdbd25 docs(116,交件 sha)             80e248ca test(116,AC#1-AC#6)
+    e563a61a feat(85a)                      527d3036 票 115（AC#3 后半格）
+    d3cc9ed8 docs(122,A89b)                 65f85a64 docs(H7,Q-31..33)
+    ac38f7ff docs(111,Progress log 补记)    88d89564 docs(111,Progress log)
+    95bb9ad2 docs(HANDOVER+4.0g)            07a3e36a docs(85 裁定,85-preflight)
+    7699ec3f ci(111,AC#9/AC#10)             82c7fdf9 docs(115,AC#3 批准续作)
+    76fc5b07 docs(113-done,109→rejected,119,120,121,A89)   add8b6a0 docs(115,交件)
+    391878a8 票 115（AC#2#3#4）
+  ⇒ 具名：区间内**文档笔与别腿测试笔混在一起**，判语件第 2 节第 3／4 项那把 `git rev-list --count … -- <path>`
+    数的只是"该路径被这几枚碰过几次"，射程＝单路径 ⇒ 全＝0 成立；但**⛔ 拿整个区间当票 115 的落地面**。
+
+## C. 遗产件里码位 U+00A7 那枚字面符的逐枚证据（尺＝grep -n $'\xc2\xa7' ＋ od 逐字节；量的）
+  判语件 115-adversarial-acceptance.md＝**6 行 6 枚**（:6 :11 :37 :110 :115 :117）
+  logs/00-start-rulers.txt＝**2 行 2 枚**（:31 自己的节标题；:34 是票 230 :19 原句的逐字引文）
+  logs/05-d22scan-credential.txt＝**1 行 1 枚**（:18 是 103-adversarial-acceptance.md:25 那行的逐字引文，位于该行第 519 字节处）
+  合计＝**12 枚（9 行）**（尺＝grep -o $'\xc2\xa7' | wc -l 逐枚相加 ⇄ grep -c 逐行；★本腿第一版在此写"8 枚"＝拿行数当枚数，已就地改正＝更正件 C-1 自带的那枚）
+  od 逐字节认形＝c2 a7（该码位的 UTF-8 编码）
+  ⇒ 违的是原派单第 18 行那条"入库正文⛔ 写出被禁字面字符〔码位 U+00A7〕"；成因＝内部节引用＋逐字引文两族。
+  ⇒ 本腿处置＝⛔ 改任何遗产字节，只在更正件 C-1 登记＋把处置权具名交回编排者。
+
+## D. 四数射程（更正件 C-3 的凭据；尺＝grep -n 'Z *##\[group\]Run '＋grep -n 'four numbers'；量的）
+  job-106389418059.log（run 35616790753；413232 字节／3044 行）内的测试步组起点：
+    186 行 Run bash scripts/winsec-tests.sh          ⇒ 1456 行 winsec-tests.sh: four numbers … RUN=82 PASS=42 FAIL=0 SKIP=0
+    1478 行 Run powershell -NoProfile
+    1513 行 Run bash scripts/wisp-cli-tests.sh       ⇒ 1917 行 portable-tests.sh: … RUN=73 PASS=35 FAIL=4 SKIP=0
+    1921 行 Run bash scripts/portable-tests.sh       ⇒ 3003 行 portable-tests.sh: … RUN=409 PASS=265 FAIL=13 SKIP=1
+    3016 行 Run bash tools/d22scan/runtests.sh
+  该 job 内 '--- FAIL:' 命中 **18** 行，行号分布 1656–2726 ⇒ **全在 winsec 步（186–1456）之外**
+  ⇒ 所以「12 枚 FAIL 名」＝整 job 口径（`logs/04` 那两列）、「82/42/0/0」＝winsec 单步口径，两数⛔ 混用。
+
+## E. 更正件 C-4 ①（冻结件存在性；尺＝git ls-tree / git cat-file -e；量的）
+  391878a8^:internal/panel/tokens_fourway_test.go      ⇒ **存在**（ls-tree 命中 1 行；cat-file -e rc=0）
+  391878a8^:internal/panel/l2_grant_boundary_test.go   ⇒ **不存在**（cat-file -e rc=1）
+  391878a^:internal/perm/ticket90_persist_test.go      ⇒ 存在（rc=0）
+  三枚在 HEAD ⇒ 全存在；`git rev-list --count 391878a8^..c6dbbf94 -- <各一枚>` ⇒ **0／0／0**
+  ⇒ 判语件那句"tokens_fourway 在 391878a^ 尚不存在"＝**枚名张冠李戴**（该说的是 l2_grant_boundary），
+    但它那一格的判据（三枚未被票 115 碰过）由 rev-list＝0 独立给出 ⇒ 结论不动。
+
+## F. 更正件 C-4 ②③（票面行号漂移；尺＝git show 票面 | tr -d '\r' | sed -n '<n>p'；量的）
+  票面 blob 9c57acaf7df012f6aab2f146ef941f8c66c22538 在 c16ff47e ⇄ 06aa2abf ⇄ HEAD **三锚同串**（⇒ 行号不会因漂动）
+  字节 234680／行 1477 那串 ⇒ 实际在票面 **`:125`**（`:126` 是"首行 Current runner version"那句）
+  本机 RUN=82 PASS=42 ⇒ 在 **`:141`**（`bash scripts/winsec-tests.sh` 在 9141d4c 上 rc=0）与 **`:254`**
+    （portable-tests.sh 同串）；判语件写的 `:253` 那行是其上的说明句（`:251` 另有一枚 RUN=164 PASS=84 属本机 `-count=2`）
+  ⇒ 三处差 1–2 行，读数本身全对 ⇒ 更正＝指路行号，⛔ 撤结论。
+
+## G. 更正件 C-5（三枚枚数的多把尺并排；量的）
+  mock|stub|fake 词形：
+    git grep -lE '\b(mock|stub|fake)\b' HEAD -- 'internal/**' 'cmd/**'          只 *.go＝**169** ／ 全类型＝**192**
+    git grep -lE '\b(mock|stub|fake)\b' HEAD -- '*.go'                          ＝**267**
+    git grep -lE 'mock|stub|fake'       HEAD -- 'internal/**' 'cmd/**'（无词界）只 go＝**212**
+    同一把尺打 c16ff47e／06aa2abf／HEAD 三锚＝**169／192**（⇄ 169／192，不漂）
+    ⇒ 遗产件那枚 **173**：本腿四把尺都≠173 ⇒ 复现不出；正控方向（非 0、量级同）不变。
+  DEFERRED(：
+    git grep -l 'DEFERRED(' HEAD -- internal cmd tools scripts ＝**28**；不限目录＝**277**；只 *.go＝**159**
+    git grep -hoE 'DEFERRED\(D-[0-9]+\)' HEAD -- internal cmd tools scripts ＝**0** 枚（该形不存在）
+    ⇒ 遗产件那枚 **48**：本腿三把尺都≠48 ⇒ 复现不出；该格结论靠的是 0 枚＋`docs/DEFERRED.md` HEAD 无（rc=1），两样本腿都复量到。
+  emoji 正控打 AGENTS.md（尺＝perl -CSD 打仪器字符类 U+1F000-1FAFF／U+2200-22FF／U+2600-27BF／U+2B00-2BFF／U+FE0F）：
+    逐**字符**计数＝**16**；逐**行**命中＝**12**；其中 U+26A0 单独＝4 ⇒ 遗产件那枚 12＝"逐行"口径，具名补此一句。
+  五枚件 emoji 尺逐枚＝**0／0／0／0／0**（同尺，量的）⇄ 与判语件第 2 节第 5 项一致。
+  U+2461 那两枚：`winsec_windows.go:186`／`:724`（尺＝仓外 LF 副本 grep -n '②' ＋ od 认字节 e2 91 a1；量的）
+    ⇒ 落点与码位都对；该码位在 U+2460-24FF＝仪器刻意留的空隙 ⇒ ⛔ 算票 115 的账，与判语件一致。
+
+## H. 本件与遗产 12 枚的关系（⛔ 改写）
+  遗产 12 枚字节未动：判语件 sha256 前 12＝e33ee4f04b86（24071B／133 行）；logs 11 枚字节＝
+  5471／3257／1658／6734／4285／4973／1029／7488／10847／4892／3320（＝续跑派单第 6 行逐枚所记，一枚不差）。
+
+## I. 续跑第二发补的尺（2026-10-20 19:1x–19:3x，全部现跑；⛔ 编译零次）
+  I-1 U+00A7 枚数⇄行数是两回事（更正件 C-1 那枚"本腿自己第一版数错"的凭据）
+      尺＝grep -o $'\xc2\xa7' <file> | wc -l（枚／字符级）⇄ grep -c（行级）
+        115-adversarial-acceptance.md  枚=9  行=6   （:6 :11 :115 :117 各 1 枚；:37 三枚；:110 两枚）
+        logs/00-start-rulers.txt       枚=2  行=2   （:31 :34）
+        logs/05-d22scan-credential.txt 枚=1  行=1   （:18，位于该行第 519 字节处）
+      合计＝枚 **12**／行 **9**（本腿第一版写"8 枚"＝拿行当枚 ⇒ 已在更正件与 logs/12 本段两处改正）
+      ★本腿自己那一笔 commit 正文＝8f23e235（笔①）含该码位 **1 枚**（尺＝git log -1 --format=%B | grep -o … | wc -l，
+        六笔已提交正文逐枚＝1/0/0/0/0/0）＝违"新提交别新增"那半条；⛔ amend ⇒ 追加更正＝更正件 C-9。
+  I-2 logs/08 那套行号＝切片内相对序号（偏移恒 334；更正件 C-4 ④ 的凭据）
+      尺＝对仓外原件 lint-106389417800.log 逐枚 sed -n '<335+n-1>p' ⇄ log08 该行内容作对拉：
+        log08:5   -> 原件 339  d22scan.sh: positive control - runtests.sh …        匹配
+        log08:67  -> 原件 401  scan_test.go:1157: rc=1 stdout=d22scan: examined 16 … 匹配
+        log08:144 -> 原件 478  runtests.sh: OK - packages=[./…] PASS=21 FAIL=0 SKIP=0 匹配
+        log08:146 -> 原件 480  d22scan: examined 223 production Go files …          匹配
+        log08:155 -> 原件 489  d22scan: clean … bans #1-5 internal/=202 …            匹配
+      ⇒ ⛔ 与本件第 A／第 H 节那套"原件绝对行号"混用；两枚件各⛔ 错，只是号不同尺。
+  I-3 log09 第 B 节剩那一把尺（本腿补值）
+      git rev-list --count 391878a8^..c6dbbf94 -- internal/winsec/resolve.go = **0**
+      同尺两枚正控（本票自己碰过的件）＝winsec_windows.go **1**、notice_attribution_115_windows_test.go **2**
+      ⇒ 那六枚 0⛔ 是"尺坏/空集"假绿（同尺打得响）。
+  I-4 log05 第 D 节 run id 枚数＝**6**（本腿数该节正文行：grep -cE '^[[:space:]]+[0-9]{9,} ' = 6；
+      尺底片＝本条；本腿在笔⑧正文第一版写"七枚"＝数错，已在提交前改正）
+  I-5 log08 第 78 行那个 0 的含义（本腿独立复量）
+      grep -cE 'd22scan:.*winsec' 原件 = **0**；grep -c 'notice_attribution_115' 原件 = **0**
+      同尺打真扫那行的聚合数 ban #8 internal/ = **374**（原件 489 行那句逐字在场）
+      ⇒ 该 0 ＝"d22scan 判决行只报 scope 聚合数、⛔ 不落逐枚文件名"，⛔ 读成"票 115 那枚件没被扫"。
+  I-6 交付物那七枚标题的现读对拉（⛔ 凭记忆；尺＝sed -n '108,119p' docs/specs/SPEC-10-testing-acceptance.md）
+      SPEC 现读七个粗体名＝stub 扫描／DEFERRED 双向交叉核对／SLO 测量完整性／契约偏离检查／
+        D22 禁止清单七条新增禁令静态扫描／场景↔切片双向核对／失败预演报告＋本切片缺口审计（第 7 项两个粗体名）
+      判语件 ### 一..七 逐枚对拉＝七枚齐全⛔ 合并⛔ 省项；★唯一偏离＝第 7 项那处码位改写作「第 7 节」，
+        主件 :11-13 自己已具名登记（＝C-1 同一味）。
+      每格三件套在场尺＝awk 按节计"盘上凭据/结论"行：七格各 凭据=1 结论≥1 ⇒ 形状合规。
+
+## J. 更正件 C-5 那两枚枚数的**成因定案**（19:3x–19:4x 现跑；量的）
+  J-1 173＝**复现**（差一味 `-i`）
+      git grep -liE '\b(mock|stub|fake)\b' HEAD -- 'internal/**' 'cmd/**' | grep '\.go$'  = **173**
+      同一把不带 -i                                                                       = 169
+      三锚复量：c16ff47e -i=173／不带=169；06aa2abf -i=173／不带=169；HEAD -i=173／不带=169 ⇒ 不漂
+      ⇒ 定性＝判语件那把尺实际带了大小写不敏感、⛔ 写出来；`logs/11:15` 那句"全仓 tracked"＝射程写歪
+        （真射程＝internal+cmd 的 *.go）。★⛔ 判遗产件读错，更正＝补尺名那一味。
+  J-2 48＝**复现不出**（与 173 不同形，⛔ 混为一谈）
+      git grep -l  'DEFERRED(' HEAD -- internal cmd tools scripts = **28**
+      git grep -li 'DEFERRED(' HEAD -- internal cmd tools scripts = **28**（⇒ 该处 -i 不改读数）
+      其余各把：不限目录 278／只 *.go 70／+docs 87／工作树 grep -rl 与 -rli 各 28／*.go+*.md+*.sh+*.yml 215
+      ⇒ 七把都≠48 ⇒ 本腿复现不出、⛔ 圆判；★该格结论⛔ 依赖这枚数（依赖的两样本腿都复量到＝
+        `DEFERRED(D-<数字>)` 形 0 枚 ＋ `docs/DEFERRED.md` HEAD 无＝rc=1）。
+  J-3 ★本腿自记一枚：本腿在 19:3x 那发曾把"48＝带 -i"当结论写进更正件，**那发⛔ 跑过 -i 形**＝
+      未验先说（＝公共块"预测⛔ 当事实说出口前先现读"那味，落在我自己尺上）。
+      处置＝C-5 那行已按现量改写；本段留作该枚改写的来路。⛔ 改任何已提交笔（⛔ amend）。
+  J-4 名册尺复量（log11 第 A 节八发祖先尺逐枚本腿自复，算的）
+      c6dbbf94→d1056c0 YES｜527d3036→d1056c0 YES｜391878a8→d1056c0 YES
+      527d3036→a13c6dc YES｜391878a8→a13c6dc YES
+      391878a8→399a783 NO｜527d3036→399a783 NO｜391878a8→88d8956 YES
+      ⇒ 与 log11 逐字所记八发**全对**（YES YES YES YES YES NO NO YES）。
