@@ -1,0 +1,102 @@
+== R1 名册尺①＝锚定行首 --grep（⛔ 假设其后任何字符）==
+8a10a7e3|17:12|票 352 落地腿 352-r1 笔⑨＝交件前最后一遍纪律尺的逐字输出入库（枚数与号对回）
+1c787282|17:10|票 352 落地腿 352-r1 笔⑧＝票尾那一条只追加 bullet＋Progress log 一行（★纯追加尺咬过：删除行 0）
+5c9402f8|17:08|票 352 落地腿 352-r1 笔⑦＝AC#3 纪律格自证＋门禁四数入库
+3ecdea30|17:07|票 352 落地腿 352-r1 笔⑥＝★三枚本腿自抓的整改入库（钝尺⇄0 字节⇄入库正文净化，全在收件尺咬到之前自己抓到）
+06aa2abf|16:52|票 352 落地腿 352-r1 笔⑤＝AC#2 消费者面入库＝落地⇄基线成对逐名作差＝新增红 0 枚
+c16ff47e|16:29|票 352 落地腿 352-r1 笔④＝AC#1 落地读数入库＝两分类并存（判据成立）
+aacde632|16:28|票 352 落地腿 352-r1 笔③＝AC#0 改前读数入库（现状钉死＝两平台四值对照的改前那一半）
+ecffb93b|16:15|票 352 落地腿 352-r1 笔②＝★那一行落地＝wrapPath 的 errno 那半 %v→%w（机主已批＝A1056④/A1058，来源＝342-v2 必答(v) 独立签）
+0fb399c3|16:14|票 352 落地腿 352-r1 笔①＝尺与驱动入库（AC#0 之前的台面件）
+ANCHORED_COUNT=9
+NON_ANCHORED_COUNT=9
+== R2 名册尺②＝单次 %H%x09%s 导出＋内存内行首锚（独立实现，⛔ 同 --grep 机制）==
+NEEDLE_BYTES=24
+INMEMORY_ANCHOR_HEAD_COUNT=9
+8a10a7e3
+1c787282
+5c9402f8
+3ecdea30
+06aa2abf
+c16ff47e
+aacde632
+ecffb93b
+0fb399c3
+  （★正控＝同尺换 needle，证明这把尺咬得动别的名而不⛔ 本名）
+  CONTROL_NEEDLE_A1063:
+    NEEDLE_BYTES=5
+    INMEMORY_ANCHOR_HEAD_COUNT=1
+    36d6456e
+  NEGATIVE_NEEDLE_COUNT=INMEMORY_ANCHOR_HEAD_COUNT=0
+== R3 逐枚 name-only ⇄ 枚数 ⇄ winsec.go 命中 ⇄ 越界 ==
+0fb399c3 FILES=5 GO=0 WINSEC_GO=0 TICKET352=0
+ecffb93b FILES=1 GO=1 WINSEC_GO=1 TICKET352=0
+aacde632 FILES=9 GO=0 WINSEC_GO=0 TICKET352=0
+c16ff47e FILES=9 GO=0 WINSEC_GO=0 TICKET352=0
+06aa2abf FILES=41 GO=0 WINSEC_GO=0 TICKET352=0
+3ecdea30 FILES=15 GO=0 WINSEC_GO=0 TICKET352=0
+5c9402f8 FILES=6 GO=0 WINSEC_GO=0 TICKET352=0
+1c787282 FILES=1 GO=0 WINSEC_GO=0 TICKET352=1
+8a10a7e3 FILES=1 GO=0 WINSEC_GO=0 TICKET352=0
+== R4 全部笔路径并集 ⇄ 允许写面之外枚数 ⇄ 产码 .go 枚数 ==
+PATHS_TOTAL=79
+OUTSIDE_ALLOWED_WRITEFACE=0
+GO_FILES_TOUCHED=1
+  FORBIDDEN[pinnedleaf_342_windows.go]=0
+  FORBIDDEN[winsec_other.go]=0
+  FORBIDDEN[winsec_windows.go]=0
+  FORBIDDEN[internal/risk]=0
+  FORBIDDEN[internal/config]=0
+  FORBIDDEN[cmd/wisp]=0
+  FORBIDDEN[internal/agent]=0
+  FORBIDDEN[internal/panel]=0
+  FORBIDDEN[frontend/]=0
+  FORBIDDEN[design/]=0
+  FORBIDDEN[go.mod]=0
+  FORBIDDEN[go.sum]=0
+  FORBIDDEN[.gitignore]=0
+  FORBIDDEN[ci.yml]=0
+== R5 winsec.go blob 逐笔分段（⛔ 区间尺）==
+  0fb399c3 07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+  ecffb93b f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  aacde632 f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  c16ff47e f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  06aa2abf f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  3ecdea30 f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  5c9402f8 f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  1c787282 f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  8a10a7e3 f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  START_ANCHOR_bf509bb8 07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+  NOW_HEAD c134952498b8c8b329ff1d225bb37bef2c366915 HEAD_BLOB f3c1b68ee60d8d5d42b816e47633d31f1ba191f5 WORKTREE_BLOB f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+== R6 那一行那笔的 -U0 全貌 ⇄ numstat ⇄ 可执行变动行数 ==
+diff --git a/internal/winsec/winsec.go b/internal/winsec/winsec.go
+index 07300bff..f3c1b68e 100644
+--- a/internal/winsec/winsec.go
++++ b/internal/winsec/winsec.go
+@@ -431 +431 @@ func wrapPath(path string, err error) error {
+-	return fmt.Errorf("%w: %s: %v", ErrNotSealable, path, err)
++	return fmt.Errorf("%w: %s: %w", ErrNotSealable, path, err)
+1	1	internal/winsec/winsec.go
+  EXEC_LINES_CHANGED=2 (1 增 1 删＝同一枚 return 语句的格式串；函数签名行⛔ 在 diff 里)
+== R7 票 352 框终量（行首锚＋自校）＋正控票 348 ==
+  BOX_CHECKED=0 BOX_UNCHECKED=4 BOX_ANY=4 SELFCHECK_SUM=4
+  CONTROL_348_CHECKED=6 CONTROL_348_UNCHECKED=1 CONTROL_348_ANY=7
+  MY_TAIL_BULLETS=1
+  TICKET_LINES=29
+== R8 票尾 numstat（须纯追加＝0 deletions）⇄ 票名与 Status 对回起手锚 ==
+5	0	.scratch/wisp/issues/352-wrappath-errno-half-stringified-so-fs-ernotexist-cannot-punch-through-private-route.md
+  MINUS_CONTENT_LINES=0
+  TICKET_NAME_AND_STATUS_UNCHANGED=YES
+== R9 写面纯度：0 字节 ⇄ .out ⇄ U+00A7 ⇄ winsec.go 入库 CR ==
+  ZERO_BYTE_FILES=0
+  TRACKED_IN_PROBES=77
+  OUT_EXT_FILES=0
+  MY_PROBE_TAIL_U00A7_IN_HEAD=0
+  POSITIVE_CONTROL_HANDOVER_U00A7=304
+  WINSEC_GO_BLOB_CR=446
+== R10 ⛔ push 自证 ⇄ 本腿笔未推枚数 ==
+  UNPUSHED_TOTAL=92
+  UNPUSHED_MINE=9
+== R11 internal/winsec 写面活体尺（续跑起手 90 分钟窗内落笔枚数）==
+  RECENT90=0
+DONE

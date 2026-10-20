@@ -1,0 +1,43 @@
+# 352-r1 · 交件号对账（枚数一律以盘上现量尺为准，⛔ 任何正文里的枚数当尺）
+
+★问题形状＝票 352 尾那条 bullet（＝本票尾**唯一**追加，随笔 `1c787282` 入库）写的是"交件 8 笔"，
+而它自己的号⛔ 取得到＝写完才发现后面还有笔⑨；这类"正文自述枚数随 HEAD 漂"＝公共块名册尺那条点过的第五形
+（⛔ 把某时刻的枚数当通则）。⇒ 本枚文件⛔ 再写任何"我共 N 笔"的自述，只交可重跑的尺。
+
+## 尺（可逐字重跑，两把独立对撞）
+
+```
+git log --grep='^票 352 落地腿 352-r1' --format='%h %ad %s'      # 锚定行首
+git log --format='%H%x09%s' | 内存内 index($2,"票 352 落地腿 352-r1")==0   # 第二把（sh/06 R2）
+```
+
+两把同数＝真枚数；★⛔ 非锚定形（吃正文引用）、★⛔ 拿 `A..B` 区间数"谁动了某文件"（区间里有别腿的笔）。
+
+## 写面与产码枚数的定尺（同 `sh/06` R3/R5/R12）
+
+```
+本腿全部笔的路径并集 → OUTSIDE_ALLOWED_WRITEFACE（应 0）
+                       → grep -c '\.go$'（应 1 ＝ internal/winsec/winsec.go）
+                       → 禁区逐枚命中（pinnedleaf_342_windows.go／winsec_{other,windows}.go／
+                          pinnedleaf_342_{unix,fallback}.go／internal/risk／internal/config／
+                          frontend／design／cmd/wisp／internal/agent／internal/panel 都应 0）
+```
+
+## `winsec.go` blob 分段（供编排者判 `351-r2` 读数可比性）
+
+| 段 | commit 序列 | blob |
+|---|---|---|
+| 改前 | 起手锚 `bf509bb8` ⇄ 笔① `0fb399c3` | `07300bfffc3e5b14c017029d6f84fb5a7ede3db8` |
+| 改后 | 笔② `ecffb93b` 起，其后各笔（⛔ `.go` 字节） | `f3c1b68ee60d8d5d42b816e47633d31f1ba191f5` |
+
+⇒ ★笔② 之前⇄之后＝两侧读数⛔ 混比；笔② 之后每一笔都⛔ 动 `.go`＝对 `351-r2` 的编译面读数⛔ 变。
+
+## 票框终量的定尺（含正控，⛔ 采信任何正文里的数）
+
+```
+T=.scratch/wisp/issues/352-*.md
+grep -cE '^- \[x\] ' "$T"      # CHECKED
+grep -cE '^- \[ \] ' "$T"      # UNCHECKED
+grep -cE '^- \[[ x]\] ' "$T"   # ANY ⇒ 自校：CHECKED+UNCHECKED 必＝ANY，否则那把尺钝（本腿第一版就钝过一次）
+正控＝同两把尺数票 348（应有勾）
+```
