@@ -1,0 +1,92 @@
+== R1 名册尺＝锚定行首（⛔ 假设其后任何字符、⛔ 非锚定子串）==
+06aa2abf Tue Oct 20 16:52:01 2026 +0800 票 352 落地腿 352-r1 笔⑤＝AC#2 消费者面入库＝落地⇄基线成对逐名作差＝新增红 0 枚
+c16ff47e Tue Oct 20 16:29:06 2026 +0800 票 352 落地腿 352-r1 笔④＝AC#1 落地读数入库＝两分类并存（判据成立）
+aacde632 Tue Oct 20 16:28:21 2026 +0800 票 352 落地腿 352-r1 笔③＝AC#0 改前读数入库（现状钉死＝两平台四值对照的改前那一半）
+ecffb93b Tue Oct 20 16:15:44 2026 +0800 票 352 落地腿 352-r1 笔②＝★那一行落地＝wrapPath 的 errno 那半 %v→%w（机主已批＝A1056④/A1058，来源＝342-v2 必答(v) 独立签）
+0fb399c3 Tue Oct 20 16:14:22 2026 +0800 票 352 落地腿 352-r1 笔①＝尺与驱动入库（AC#0 之前的台面件）
+ANCHORED_COUNT=5
+NON_ANCHORED_COUNT=5  （非锚定＝会吃进正文引用了本前缀的别腿笔＝A1045 那味）
+
+== R2 第二把独立尺＝单次 %H%x09%s 导出＋内存内 index($2,P)==1 ==
+INMEMORY_ANCHOR0_COUNT=5
+  MY: 06aa2abfaaf3055dfa38eecf371caa84232f738e	票 352 落地腿 352-r1 笔⑤＝AC#2 消费者面入库＝落地⇄基线成对逐名作差＝新增红 0 枚
+  MY: c16ff47ec465749f1977efa94a2b024cc8931e27	票 352 落地腿 352-r1 笔④＝AC#1 落地读数入库＝两分类并存（判据成立）
+  MY: aacde6321d3b4a64b71f61981fe702c96dc189e7	票 352 落地腿 352-r1 笔③＝AC#0 改前读数入库（现状钉死＝两平台四值对照的改前那一半）
+  MY: ecffb93be03bd86f647c1de468783bcef35a9fc9	票 352 落地腿 352-r1 笔②＝★那一行落地＝wrapPath 的 errno 那半 %v→%w（机主已批＝A1056④/A1058，来源＝342-v2 必答(v) 独立签）
+  MY: 0fb399c308644b754085627afbca36cae5cb2d30	票 352 落地腿 352-r1 笔①＝尺与驱动入库（AC#0 之前的台面件）
+
+== R3 写面自证＝逐枚 name-only（只数本腿那几笔，⛔ 区间）==
+PATHS_TOTAL=65
+OUTSIDE_ALLOWED_WRITEFACE=0
+GO_FILES_TOUCHED=1  （★产码只 1 枚＝internal/winsec/winsec.go；⛔ 一枚 .go 是别腿的）
+WINSEC_GO_LINES=1
+
+== R4 那一行那笔的 -U0 全貌＝只动那一枚格式串（⛔ 任何别枚字节）==
+COMMIT=票 352 落地腿 352-r1 笔②＝★那一行落地＝wrapPath 的 errno 那半 %v→%w（机主已批＝A1056④/A1058，来源＝342-v2 必答(v) 独立签）
+
+diff --git a/internal/winsec/winsec.go b/internal/winsec/winsec.go
+index 07300bff..f3c1b68e 100644
+--- a/internal/winsec/winsec.go
++++ b/internal/winsec/winsec.go
+@@ -431 +431 @@ func wrapPath(path string, err error) error {
+-	return fmt.Errorf("%w: %s: %v", ErrNotSealable, path, err)
++	return fmt.Errorf("%w: %s: %w", ErrNotSealable, path, err)
+NET_DIFFSTAT=1 insertions 1 deletions
+
+== R5 禁区逐枚现验＝⛔ 动过==
+  internal/winsec/pinnedleaf_342_windows.go     命中本腿笔数=0
+  internal/winsec/winsec.go                     命中本腿笔数=1
+  internal/winsec/winsec_other.go               命中本腿笔数=0
+  internal/winsec/winsec_windows.go             命中本腿笔数=0
+  internal/winsec/pinnedleaf_342_unix.go        命中本腿笔数=0
+  internal/winsec/pinnedleaf_342_fallback.go    命中本腿笔数=0
+  internal/risk                                 命中本腿笔数=0
+  internal/config                               命中本腿笔数=0
+  frontend                                      命中本腿笔数=0
+  design                                        命中本腿笔数=0
+  cmd/wisp                                      命中本腿笔数=0
+  internal/agent                                命中本腿笔数=0
+  internal/panel                                命中本腿笔数=0
+
+== R6 票 352 框尺（现量，⛔ 采信任何旧叙述）==
+BOX_CHECKED=0
+BOX_UNCHECKED=4
+BOX_ANY=4   （★CHECKED+UNCHECKED 必＝ANY，否则那把尺钝）
+AC_NAMES=AC#0 AC#1 AC#2 AC#3   （★凡报几格先跑框尺＝本票分母＝4 格 AC#0..AC#3）
+  ★正控（报 0 命中前先跑一枚已知存在的正控）＝同两把尺数票 348（应有勾）：
+    CONTROL_348_CHECKED=6 CONTROL_348_UNCHECKED=1 CONTROL_348_ANY=7
+
+== R7 票尾 numstat＝须纯追加（0 deletions）==
+  06aa2abf 票 352 落地腿 352-r1 笔⑤＝AC#2 消费者面入库＝落地⇄基线成对逐名作差＝新增红 0 枚
+     （本笔⛔ 碰票面件）
+  c16ff47e 票 352 落地腿 352-r1 笔④＝AC#1 落地读数入库＝两分类并存（判据成立）
+     （本笔⛔ 碰票面件）
+  aacde632 票 352 落地腿 352-r1 笔③＝AC#0 改前读数入库（现状钉死＝两平台四值对照的改前那一半）
+     （本笔⛔ 碰票面件）
+  ecffb93b 票 352 落地腿 352-r1 笔②＝★那一行落地＝wrapPath 的 errno 那半 %v→%w（机主已批＝A1056④/A1058，来源＝342-v2 必答(v) 独立签）
+     （本笔⛔ 碰票面件）
+  0fb399c3 票 352 落地腿 352-r1 笔①＝尺与驱动入库（AC#0 之前的台面件）
+     （本笔⛔ 碰票面件）
+
+== R8 被禁字面字符（码位 U+00A7）尺＝只数我写面的字节；正控＝同尺数 HANDOVER.md ==
+MY_WRITEFACE_U00A7_TOTAL=0
+POSITIVE_CONTROL_HANDOVER_U00A7=304  （正控在场＝尺灵）
+
+== R9 零字节尺＋.out 尺（我写面逐枚）==
+ZERO_BYTE_FILES=0  OUT_EXT_FILES=0
+
+== R10 起手锚⇄现 HEAD＋winsec.go blob 各笔串（供编排者判 351-r2 读数可比性）==
+  0fb399c3 winsec_blob=07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+  ecffb93b winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  aacde632 winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  c16ff47e winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  06aa2abf winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  START_ANCHOR=bf509bb837aa1328617320608be38e4bca5a5d35 winsec_blob=07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+  NOW_HEAD=06aa2abfaaf3055dfa38eecf371caa84232f738e winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5 worktree_hash=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+
+== R11 ⛔ push 自证＝本地 dev ⇄ origin/dev ==
+UNPUSHED_COMMITS_TOTAL=79
+UNPUSHED_COMMITS_MINE=5
+
+== R12 ⛔ 越界碰别腿写面（本腿笔里应⛔ 含 cmd/wisp／agent/approval 任何字节）==
+  CROSSLEG_HITS=0（上面无输出＝0）

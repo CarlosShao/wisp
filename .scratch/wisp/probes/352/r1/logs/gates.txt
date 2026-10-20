@@ -1,0 +1,43 @@
+== HEAD at gate time（⛔ cut -c：按字节截中文＝非法 UTF-8）==
+HEAD_FULL_SHA=36d6456e480f628557115612598618187df5d3b8
+HEAD_SUBJECT=A1063＋4.0ff＋票351收件bullet＋第十五波放行记档＝①★★机主那句"批"真落地且我当场验⛔ 越界＝352-r1笔ecffb93b写面只internal/winsec/winsec.go一枚、git show -U0净变动2行（删1加1）、现读wrapPath函数体逐字fmt.Errorf("%w: %s: %w", ErrNotSealable, path, err)＝双%w落定＝"父目录不存在"从此能被errors.Is(fs.ErrNotExist)认出且ErrNotSealable照旧true（两分类并存才叫修）＋函数签名⛔ 变⛔ 碰sealError⛔ 碰:118-140＝批准的射程守住没被顺手扩（它还在跑两平台成对读数与消费者五包色未交件）｜②收351-r2（票351落地趟只动测试面五笔4e946c88→9e7bf8b7）三把尺全过＝名册锚定「票351落地腿351-r2」5笔逐枚祖先Y越界0★非_test.go的.go＝0（只动测试面成立；主题形照派单没换形＝这轮我预定的锚真用上）；件尺三枚3859/3385/4209B逐枚CR0裸码位0.out0；★产码字节变动＝0我另起一把独立算（git show -U0 4e946c88＝变动49行★唯一删除行逐字"shown := r.h.out.String()"＝那枚老单读stdout读源加行全测试形状/注释无产码语句）＝它自报验真；我读三格落点原文＝G1 settle（plant前awaitAudit armed＋before:=windowCount()须0＋awaitStdout配置热加载已接管）⇄G2在场（分子windowCount-before==1＋awaitStdout"[确认L2…]"独立一格）⇄G3点名（★needle risk.permission_mode逐字未改只换读源到G2返回值）；它把判据句写进注释"only G2 green with G3 red is a product defect"＝三形拆得开且⛔ 自发明（点名来源351-a1＋包内先例ticket224_assembly:270/272⇄panel_pump:232+443；三格全⛔ 需新产码接缝⇒"要产码才带得上key"那形未成立＝⛔ 触发第二道批准与342-r2真停手那形并列正确）；敏感度两发拆得开＝牙A删run.go:1441印字⇒:585＋:592都红⇄牙B只摘keys⇒只G3红G2绿两发还原哈希逐字回pristine 7874d87f/72762bd5＋vet各rc=0＝⛔ 一把尺两形都放行；★成对读数最值钱＝基线同码两发一红一绿（B1 1/23/9/1复现票面:545那枚红⇄B2 0/23/10/0）＝时序形状在它自己台面再现＝尺有牙⛔ 恒绿；落地两发都稳绿逐名symdiff=0；框终量3/2＝它一枚没翻票尾1/0纯追加门禁四把rc0 winsec.go起手07300bff与352-r1并发下可比（交件时漂到f3c1b68e＝352-r1合法落%w它⛔ 碰⛔ 判自己失败）；⇒★形状与凭据我认但翻勾⛔ 我做＝AC#2/AC#3归下一枚非实现者351-v2（裁决者≠实现者对我喜欢的结果一视同仁）｜③★按机主"写腿≥3"此刻仍差一枚我⛔ 糊也⛔ 凑＝16:3x现查三枚候选写票都可核理由⛔ 合用＝票316已撤（Status:withdrawn口令「316撤」10-14已用）票234被票222验收按住（票面逐字"必须按住到票222验收腿交完"它要跑突变＝编译面）票321撞cmd/wisp同包⛔ 两写腿；★agent/approval显示近40分0被动⛔ 代表230-r1空闲（它⛔ 开始编辑＝未改＝正常）我⛔ 拿"包空闲"当派腿依据；下一波现查整池再定第三枚捞不到就如实报查法；在飞4＝写352-r1⇄230-r1∥读353-a1（票353三形表）⇄115-v1（票115七项表★派单里我主动把"三个框数彼此⛔ 合同"＝115未勾2已勾3⇄票230写7格全未勾⇄AC#1裁定3格抽过剩4交给它定真分母并回报⛔ 让下一颗脑袋继续拿旧叙述当分母）；351-r2收线｜④未推现量见下behind0脏0；★⛔ 推（四枚在飞推送自起runner抢CPU＝A1055/A1056那形今日⛔ 犯第三次）；结案仍8票；待拍更新＝%w已批已落⛔ 再是待拍、Q-82未拍默认不做、347/350/337/344照默认＋★一件待点头＝票353新票形状等353-a1出表我摆详；机主在场窗口欠账不变（票296 AC#3ⓒ⇄票290 AC#3ⓒ⇄票293 AC#5⇄票247 AC#6）；⛔ 清理（押到所有票完成后）｜本笔我方.go字节0
+
+== unset GOTMPDIR TMPDIR TEMP TMP ==
+GOTMPDIR=[<unset>] TMPDIR=[<unset>] TEMP=[<unset>] TMP=[<unset>]
+
+== gate 1: gofumpt -l internal/winsec/winsec.go（只验自己这枚；⛔ -w）==
+GOFUMPT_RC=0
+(空列出＝干净；本机工作树有既有件因 CRLF 被标脏＝存量，本腿⛔ 顺手重排别腿文件)
+
+== gate 1b: 既有 CRLF 脏枚数登记（同一条尺、只数不改）==
+GOFUMPT_ALL_RC=2  LISTED=1
+MY_FILE_LISTED=0
+
+== gate 2: sh scripts/d22scan.sh ==
+D22_RC=0
+d22scan: scope ban #8 cmd/              examined 143 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=244, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=603, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 603 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+
+== gate 3: sh scripts/check-path-length-budget.sh（要 .git）==
+LEN_RC=0
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=60  of which in the 122..180 middle=57  past the old debt line(180)=3  in the wall interval=0  roster entries=60
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+
+== gate 4: go vet ./internal/winsec/（本机档＝判红绿的那一枚）==
+VET_NATIVE_RC=0
+VET_NATIVE_OUTPUT_BYTES=0
+
+== gate 4b: 交叉档＝只登记这档能编译＋vet 无声，★⛔ 与本机档成对判红绿 ==
+VET_LINUX_RC=0
+VET_LINUX_OUTPUT_BYTES=0
+VET_DARWIN_RC=0
+VET_DARWIN_OUTPUT_BYTES=0
+
+== winsec.go blob 各笔串（供编排者判 351-r2 读数可比性）==
+HEAD_BLOB=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+WORKTREE_BLOB=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+BLOB_AT_0fb399c3=07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+BLOB_AT_ecffb93b=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+BLOB_AT_aacde632=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+BLOB_AT_c16ff47e=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
