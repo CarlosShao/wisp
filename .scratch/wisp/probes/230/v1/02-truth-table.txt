@@ -1,0 +1,85 @@
+# 230-v1 · 02 AC#2 真值表（本腿自己算的读者名册＋逐句对码）
+# 尺＝V1-C／V1-D／V1-F；对象一律＝`git cat-file blob HEAD:internal/agent/approval/queue.go`（入库 blob，⛔ 工作树）
+# 定位＝内容锚（票面 :247 已漂；本腿现量＝字段文档 :86-:93／声明 :94，函数文档 :256-:275／函数体 :276）
+
+## A. `q.alias` 的全部读点（V1-C 第 8 段逐字）
+  queue.go:215  set := q.alias[n]                       <- indexLocked 体内（读）
+  queue.go:218  q.alias[n] = set                        <- indexLocked 体内（写）
+  queue.go:228  set := q.alias[n]                       <- unindexLocked 体内（读）
+  queue.go:234  delete(q.alias, n)                      <- unindexLocked 体内（删）
+  queue.go:283  if set := q.alias[corr]; len(set) == 1  <- lookupForRefusalLocked 体内（唯一"按回答的名字检索"）
+  queue.go:267  // ...it is NOT the only reader in      <- 注释自己
+其余＝:86/:94 声明与文档、:118 NewQueue 初始化（写，非读者）、:191/:224/:241/:257/:263/:459/:501 注释。
+包外命中＝0（字段非导出）。唯一非产码副本＝`.scratch/wisp/probes/259/r2/before/queue.go`（死副本，⛔ 参与编译，具名剔）。
+
+## B. 调用侧（V1-C 第 1 段＋V1-D 第 B 段）
+  indexLocked    def :213  ← 调用点 :183，宿主＝push（def :159）
+  unindexLocked  def :226  ← 调用点 :313，宿主＝dropLocked（def :305）
+  lookupForRefusalLocked def :276 ← 唯一非注释调用点 :504，宿主＝Queue.reject（def :502）
+  lookupForAllowLocked   def :249 ← 调用点 :396（allowScoped）＋:468（sessionSubject）＋测试件 1 枚
+  allowScoped def :394 ← :377 传 false（q.allow）／gate.go:670 传 true（allowSession）
+  reject 体内方向字面量唯一＝:517 `answer{a: tools.AnswerReject, …}`（无 AnswerAllow 分支）
+
+## C. allow 侧"读什么"（V1-C 逐字函数体）
+  249 func (q *Queue) lookupForAllowLocked(corr string) *qitem {
+  250   if corr == "" {
+  251     return nil
+  252   }
+  253   return q.byID[corr]
+  254 }
+⇒ 体内只有 `q.byID`，"reads q.byID and nothing else" 逐字为真。
+
+## D. 注释逐句 ⇄ 上面名册（判语 第 2 节 的凭据）
+字段文档 :86-:93
+  S1 "reject-direction index: every extra name a live card answers to (qitem.names)"
+     ⇄ otherNames :192-（取 d.CorrelationID／d.TaskID，剥空与同号）＋indexLocked :214 `for _, n := range it.names` ✓
+  S2 "Of the readers, only lookupForRefusalLocked resolves a reply into an item"
+     ⇄ A 段：只有 :283 用 `corr`（回答带来的名字）检索；:215/:228 用 `n`（卡片自己的别名）、
+        且 :215/:228 的 for 变量来自传入的 it，⛔ 拿外部输入的名字 ✓
+  S3 "indexLocked (on the way in) and unindexLocked (on the way out) touch the map too,
+      but each only moves the one item handed to it and never answers a name"
+     ⇄ B 段：:183 push 进队列时登记、:313 dropLocked 离场时摘除；两者只动 `it` 自己的桶 ✓
+  S4 "The allow side goes through lookupForAllowLocked, which cannot see this field"
+     ⇄ C 段＋B 段两条 allow 侧调用 ✓
+  S5 "the index can only ever make a REFUSAL land"
+     ⇄ :283 唯一出口是 :504，:504 唯一宿主是 reject，reject 唯一方向字面量是 AnswerReject(:517) ✓
+函数文档 :256-:275
+  F1 "The queue key always wins" ⇄ :280 `if it := q.byID[corr]; it != nil && it.state == statePending` ✓
+  F2 "An alias naming more than one live item is NOT guessed" ⇄ :283 `len(set) == 1` ✓
+  F3 "the only reader of q.alias **that turns a reply into an item**" ⇄ A 段 ✓（限定后的主张＝真话）
+  F4 "it is NOT the only reader in the file — indexLocked (run by push) and unindexLocked (run by dropLocked)"
+     ⇄ A＋B ✓（宿主名本腿现推 enclosing，⛔ 抄腿的行号）
+  F5 "each touching only the buckets of the one item handed to it, so neither resolves a reply
+      and neither can settle anything" ⇄ 二者签名 `(*qitem)`、体内⛔ 调 deliver、⛔ 返回条目 ✓
+  F6 "Queue.reject is the only caller of this function"（旧句那半句"holds as written"）⇄ B 段 ✓
+  F7 "lookupForAllowLocked, whose body reads q.byID and nothing else" ⇄ C 段 ✓
+  F8 "the direction itself is pinned by TestAnAliasCanNeverBuyAnAllow"
+     ⇄ `git grep -n 'func TestAnAliasCanNeverBuyAnAllow' HEAD` ＝ ticket97_alias_direction_test.go:75；
+       注释 :275 里那枚名与盘上真名逐字相同 ⇒ ⛔"注释里指名一枚不存在的测试当凭据"那一味也过。
+       该用例的绿＝既有日志/CI 旁证（⛔ 列本腿读数）。
+  F9 "Caller holds q.mu" ⇄ reject 体 :503 `q.mu.Lock()` ✓
+
+## E. 射程外两枚同族陈述（腿具名请裁②，本腿独立复核）
+1) gate.go:659-662（allowSession 上方）"The alias index is not in this path, so a refusal alias
+   cannot be used to point a grant at some other call."
+   真值链：:663 `g.q.sessionSubject(corr)` → :468 `lookupForAllowLocked`（只 byID）；
+   :670 `g.q.allowScoped(corr, grant, true)` → :396 同一条 lookup。⇒ 全程⛔ 触 :215/:218/:228/:234/:283 任一点。
+   判定＝**今天为真**（腿的判断成立；腿⛔ 动它字节＝正确，本腿也⛔ 动）。
+2) approval.go:496-501（denialMisbound 文档）"No routed call can produce this value — Queue.allowScoped
+   presents the item's own stored digest — so the only callers that reach it are inside this package
+   and hand spend two different digests by hand: …  Those cases pin the store part."
+   真值链：`spend` 非测试唯一调用点＝queue.go:425 `it.grants.spend(nonce, it.bind)`＝值对自身；
+   `it.bind` 全仓唯一赋值＝queue.go:180（push，bindDigest）；`grantNonce` :369 `it.grants.issue(nonce, it.bind)`
+   签进同一枚 ⇒ routed 侧构造不出 misbound。真打到 denialMisbound 的两处＝
+   ticket242_binding_test.go:169 `itA.grants.spend(nonceA, itB.bind)`（:170 断言 `!= denialMisbound`）⇄
+   ticket259_denial_rulers_test.go:170 `s.spend("nonce-259-misbound", minted+"-tampered")`（:171 同断言），
+   两文件 package 行逐字＝`package approval` ⇒ "inside this package" 字面有据。
+   判定＝**今天为真**（同上：腿⛔ 动字节＝正确）。
+3) 顺带本腿扫到的第三枚同族（腿⛔ 点名、本腿具名补上，⛔ 动字节）：gate.go:592-596 promptFor 文档
+   "there is exactly one call site that passes a non-empty value: PendingApproval … The L1 route passes ""
+   because a countdown window has no allow action at all - its only user verb is veto, and refusing never needs proof."
+   真值：promptFor 调用点恰两枚＝:293（PendingWindow 内，末位实参 `""`）⇄ :534（PendingApproval 内，末位实参 `nonce`）；
+   PendingWindow 体内用户动词出口＝:302 `case v := <-w.vetoes:` ⇒ :323 `return tools.AnswerVeto`；
+   倒计时到点＝:325→:338 `decision=timeout->execute`（＝超时自动放行，⛔ 需要用户授权、⛔ 需要 grant）；
+   其余 AnswerReject 那几枚（:255/:275/:284/:297）＝fail-closed 与 R7 升级转投 L2（:270 转给 PendingApproval）。
+   ⇒ **今天为真**。⇒ 全仓"唯一读者"那一族今天没有第二处假话（这条是判语 第 5.1 节 的实质凭据）。
