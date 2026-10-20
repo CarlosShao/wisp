@@ -1,0 +1,97 @@
+== R0 起手锚（量的；★⛔ cut -c 截中文＝按字节切＝非法 UTF-8＝本腿第一版在此踩中并当场改掉）==
+HEAD=da221145 2026-10-20 20:57
+A1070＋4.0fk＋票230翻AC#1/AC#2＝收 115-v1（20 笔三把同号 20/20/20、祖先 20/20、numstat 删除列合计 0、.go 触碰 0、交付物 24071B／133 行＝未超帽、推翻我续跑单那句"疑超帽"）⇒★AC#1 凭"那张表交付了"翻＝但⛔ 等于票 115 结案（表内检查项二⇄七不成立、六部分成立⇒三味归人工批准/S1 级腿）；AC#2 凭 230-v1 判语＋我两把独立尺翻＝门绿分档（编译三把我复跑 rc=0、定向色仍＝实现腿自报⛔ 在别腿半保存态取色＝挂账）｜★★它 C-10 推翻我对 CR 钝尺的归因＝正控跑完（tr/od＝2/4/0/6 真值、grep -c＝3/5/3/6）＝两说同一坏法两面⇒定式"数字节⛔ 用 grep -c、必带已知含量正控"｜★./cp 空目录＝go.mod 同分钟 mishap 两半、⛔ 删（规矩 8）｜它三枚待人拍我按 A1051 裁＝豁免存量码位／追加形更正／编译面另派有窗口的腿｜顺带纠我三处旧叙述（票 230 :10"7 格全未勾"＝过期读数）＝append-only｜账＝A1070
+== R1 AC#1：HEAD 的 wrapPath 函数体逐字（量的）==
+func wrapPath(path string, err error) error {
+	return fmt.Errorf("%w: %s: %w", ErrNotSealable, path, err)
+}
+  BLOB_AT_HEAD_NOW=757b16a805facf2da557204213b3085f84496e83  HEAD=da221145
+  ★本趟期间 HEAD 被别腿推进＝blob 逐锚报清（量的）：
+    bf509bb8  winsec.go blob=07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+    ecffb93b  winsec.go blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+    a651c086  winsec.go blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+    HEAD      winsec.go blob=757b16a805facf2da557204213b3085f84496e83
+  那一枚格式串自 ecffb93b 起被改过否（尺＝git diff ecffb93b..HEAD 里含 wrapPath 行的增删枚数）= 0
+  ⇐ 0＝353-r1 那 6 行漂移⛔ 碰 wrapPath（漂移本身＝另票〔乙〕＝⛔ 本票射程，具名登记）
+== R2 AC#1：ecffb93b 净变动（量的）==
+-	return fmt.Errorf("%w: %s: %v", ErrNotSealable, path, err)
++	return fmt.Errorf("%w: %s: %w", ErrNotSealable, path, err)
+  numstat=1	1	internal/winsec/winsec.go
+  签名行改前⇄改后同否=SAME (func wrapPath(path string, err error) error {)
+  sealError 体 435-446 改前后 symdiff 行数=0
+== R3 AC#1：两分类并存（量的，尺＝对入库底片 grep 逐名；★tag 里带.＝第一版 [a-zA-Z -]+ 漏咬 R3 那一枚，本腿自抓并改成 [^:]+，改前读数照实在 logs 里具名）==
+  -- ac1-col-s2-mut-2-treeL --
+    R1 parent-missing PrivateFile: isErrNotExist=true isNotSealable=true
+    R2 parent-missing PrivateFileExclusive: isErrNotExist=true isNotSealable=true
+    R3 wrapPath direct fs.ErrNotExist: isErrNotExist=true isNotSealable=true
+    R4 SealFile missing-leaf in existing dir: isErrNotExist=true isNotSealable=true
+    R5 SealFile parent-missing: isErrNotExist=true isNotSealable=true
+    R6 SealDir parent-missing: isErrNotExist=true isNotSealable=true
+  -- ac1-host-s2-mut-2-treeL --
+    R3 wrapPath direct fs.ErrNotExist: isErrNotExist=true isNotSealable=true
+    R4 SealFile missing-leaf in existing dir: isErrNotExist=true isNotSealable=true
+    R5 SealFile parent-missing: isErrNotExist=true isNotSealable=true
+    R6 SealDir parent-missing: isErrNotExist=true isNotSealable=true
+  Windows 落地侧仍 false/true 的跳（量的＝⛔ 射程那两枚要照实点名）＝
+    R1 parent-missing PrivateFile: isErrNotExist=false isNotSealable=true
+    R2 parent-missing PrivateFileExclusive: isErrNotExist=false isNotSealable=true
+    R10 relative spelling: isErrNotExist=false isNotSealable=true
+    R13 injected seal failure PrivateFileExclusive: isErrNotExist=false isNotSealable=true
+  同一把尺数 POSIX 落地侧 false/true（量的）＝
+    R13 injected seal failure PrivateFileExclusive: isErrNotExist=false isNotSealable=true
+== R4 名册两把独立尺（量的）==
+  锚定行首 --grep='^票 352 落地腿 352-r1' = 11
+  内存内 index==1 = 11
+  非锚定形 = 11
+  正控（票 321 同一对尺，两把都须 >0）= 8 8
+== R5 写面⇄.go 枚数（算的，尺＝逐枚 git show --name-only）==
+        1 internal/winsec/winsec.go
+  越界枚数（⛔ 三处写面之外）= 0
+  禁区 pinnedleaf_342_windows.go 命中笔数 = 0
+== R6 票面那味留账：wrapPath 调用点（量的，尺＝git grep 现算）==
+  全仓命中（含定义）= 25；定义 = 1；调用点 = 24
+  winsec.go                        行号=430,445,
+  winsec_other.go                  行号=167,173,179,192,198,217,257,261,264,294,298,
+  winsec_windows.go                行号=298,306,540,543,547,571,574,
+  pinnedleaf_342_windows.go        行号=79,91,103,130,
+  pinnedleaf_342_fallback.go       行号=40,
+  起手锚 bf509bb8 上同尺逐枚枚数=winsec.go:2 winsec_other.go:11 winsec_windows.go:7 pinnedleaf_342_windows.go:4 pinnedleaf_342_fallback.go:1 
+  _test.go 命中枚数 = 0
+== R7 票面尺（量的）==
+  行数=29  Status 所在行=22
+  未勾=4  已勾=0  总框=4
+  正控票 348 同三把尺 = 6/1/7
+== R8 票面⛔ 改写历史（量的）==
+  bf509bb8⇄HEAD 删除行数 = 0
+  numstat=5	0	.scratch/wisp/issues/352-wrappath-errno-half-stringified-so-fs-ernotexist-cannot-punch-through-private-route.md
+  票尾 bullet 枚数 = 2
+  前 24 行逐字节同否 = IDENTICAL
+== R9 AC#2 消费者面独立复算（量的，尺＝对入库底片整枚文件级四数＋逐名 comm；★本腿⛔ 跑 go test）==
+  ac2-host-pair-s1-treeB     RUN=805 PASS_TOP=497 FAIL_TOP=9 SKIP=2
+  ac2-host-pair-s2-treeL     RUN=805 PASS_TOP=497 FAIL_TOP=9 SKIP=2
+  ac2-col-s1-treeB           RUN=734 PASS_TOP=455 FAIL_TOP=9 SKIP=2
+  ac2-col-s2-treeL           RUN=734 PASS_TOP=457 FAIL_TOP=7 SKIP=2
+  本机档逐名作差：新增红（只在落地侧）＝1 枚；消失红＝1 枚
+  容器档逐名作差：新增红＝0 枚；消失红＝2 枚
+  ★那枚换位名不在三发复量并集里（量的）：
+    L_union: TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+    L_union: TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1
+== R9b winsec 竞态族四发并集作差（量的，尺＝首发 raw 的 ^--- FAIL ＋复量三枚 .rednames.txt 各自并集）==
+  四发 B 并集枚数=3 ⇄ L 并集枚数=3
+  ★并集作差：新增红=0 消失红=0
+  （那三枚名的产地尺＝git grep -l 现算）
+    internal/winsec/ancestorunlink_348_unix_test.go
+    internal/winsec/ancestorunlink_348_windows_test.go
+== R9c config 容器档那族：四发并集作差（量的，★⛔ 把名册件那行 # RED_NAMES=0 说明行当名＝先 grep -v 注释）==
+  B 并集=2 ⇄ L 并集=2 新增红=0 消失红=0
+== R9d 底片⇄字节的两根绳（量的，尺＝sha256 对回 blob）：tsv 里 WINSEC_SHA256 那列＝哪棵树的哪个 blob ==
+  treeB 真身 sha256 前 24＝9086f2bbbf531823ed5c4a61
+  treeL 真身 sha256 前 24＝2f2887ab283d80ae71e1bfcd
+  底片所记＝WINSEC_SHA256=2f2887ab283d80ae71e1bfcd
+  底片所记＝WINSEC_SHA256=9086f2bbbf531823ed5c4a61
+== R10 具名连带五枚（量的）==
+  37:		if !errors.Is(err, ErrNotSealable) {
+  50:		if !errors.Is(err, ErrNotSealable) {
+  61:		} else if !errors.Is(err, ErrNotSealable) {
+  72:		if err := SealFile(p); !errors.Is(err, ErrNotSealable) {
+  75:		if err := SealDir(dir); !errors.Is(err, ErrNotSealable) {
