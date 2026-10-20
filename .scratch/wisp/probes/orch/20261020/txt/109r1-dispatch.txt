@@ -1,0 +1,21 @@
+派单＝票 109 返工落地腿 109-r1（★写腿·落点限 `internal/models/**`）｜编排者＝新任 harness｜发出 2026-10-20 17:4x +08
+★主题起头⛔ 换形：每笔主题以逐字「**票 109 返工腿 109-r1**」开头。
+
+## 你是谁／这一趟的射程从哪来
+票 **109**＝模型文件在 `Ensure` 交还之后的跨账户写窗（`.scratch/wisp/issues/109-models-have-a-cross-account-write-window-after-ensure.md`，`Status: rejected-needs-fix`）。
+★返工口径⛔ 由本派单新造——起手先现读两处、按其执行：
+1. 票面 `Status:` 头部逐字：唯一阻塞项 `R-109-4`（"接线"半）已归票 121，★票 121 现 `Status: done`（09-23 结案，现读 `121-*-done.md` 头部坐实）⇒ 本票只欠票面自陈的那"两格小账"＝**AC#2 的落点语义**＋**`R-109-2`（未点名的文件/子目录不参与哈希）与 `R-109-3`（按名字而不是按 SID 过滤 ACL）**。
+2. 退回裁决表＝`docs/evidence/s1/109-adversarial-acceptance.md`（`acceptor-ticket109b` 出）里 `R-109-2`/`R-109-3` 两条的原文判据。
+若现读发现票面/裁决表与上面口径不符 ⇒ **停手上报**（send_message 具名，⛔ 自行扩射程）。
+
+## 硬边界
+- ★写面限 `internal/models/**`＋`.scratch/wisp/probes/109/r1/**`＋票 109 尾一条只追加 bullet＋Progress log 一行。⛔ 碰 `internal/winsec/**` 任何字节（票面逐字：缝/祖先链归 108、私有集归 106 地界；AC#3 若要往 winsec 加守卫＝停手登记交回）。
+- ★⛔ 在飞冲突（放腿前编排者现量＝`internal/models` 近 2 小时被动 0、最近提交 09-22；三枚在飞腿写面/读面＝`internal/winsec`⇄`internal/agent/approval`⇄只读两枚）⇒ 你⛔ 跑 `./internal/winsec/`⇄`./cmd/wisp`⇄`./internal/agent/**` 整包测；跑色限 `./internal/models/` 定向＋仓外导出树成对。
+- ★门禁四把落 rc（跑门前 `unset GOTMPDIR TMPDIR TEMP TMP`）：`GOFLAGS= go build ./...`／`sh scripts/d22scan.sh`／`gofmt -l`⇄`gofumpt -l internal/models/`／`go vet ./internal/models/`；`GOOS=linux go vet` 交叉档⛔ 与本机档成对判红绿。
+- ★判据照票面 AC#5 那味＝修前必须红＋变异牙（把收口那行退回旧实现⇒用例必须红）；⛔ 为变绿放宽断言、⛔ 删用例、⛔ `t.Skip`。修前红名与断言原文先进票面（AC#5 逐字），再落修。
+- ⛔ push（机主按住）、⛔ 翻框（AC#2/AC#5 归非实现者裁）、⛔ 改票名/`Status:`；`add`/`commit` 两处显式 pathspec；⛔ amend/reset/rebase/stash/checkout ./clean/`add -A`；`-F` Windows 形路径；提交后 `git log -1`＋`git show --name-only` 对回；每落一枚就 commit。
+- 公共块 o 全量照做＝先 Read `.scratch/wisp/probes/orch/20261020/352r1-dispatch.txt` 尾公共块（台面四味：`GOTMPDIR` 反斜杠短根；`cygpath -wp` 只仓外取 DLL 用；判据只认到达数；blob 落仓外、副本⛔ 叫 `.go`；⛔ `cut -c` 截中文；证据件⛔ `.out`；≤160 行只管正文件）。临时件落 `D:\tmp\wisp\20261020\109r1\`、只建不删。
+- ★共树自证：起手跑 `git status --porcelain internal/models/`＋`find internal/models -newermt '-30 minutes'` 两把尺入库（防双派体检＝票面 09-21 那条定式照做）。
+
+## 交件（send_message 报 lead）
+逐枚提交号＋AC#2 落点语义的"为什么这一条路真在跑"的凭据（引用装配可达性仪器＝票 121 的 AC#3 用例，⛔ 口头承诺）＋`R-109-2`⇄`R-109-3` 各自改后形状＋修前红逐字＋变异牙两发（落点不同＋还原哈希）＋成对四数（`RUN/PASS_TOP/FAIL_TOP/SKIP`，落地⇄基线逐名作差＝新增红 0）＋门禁四把 rc＋票 109 框终量（须 0 勾）＋票尾 numstat（纯追加）＋写面自证尺（逐枚 `git show --name-only`）。
