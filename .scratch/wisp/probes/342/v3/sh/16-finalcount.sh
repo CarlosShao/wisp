@@ -87,3 +87,23 @@ for t in treeL treeT; do
 done
 } > /d/tmp/wisp/20261020/342v3/logs/restore-verify.txt 2>&1
 cat /d/tmp/wisp/20261020/342v3/logs/restore-verify.txt
+
+# ---- appended: roster-final.sh (the ruler whose A/C/UNION output commit 9 reported) ----
+#!/bin/sh
+cd "/d/work/workspace/projects plans/Wisp" || exit 1
+git log --format='%H%x09%s' > /d/tmp/wisp/20261020/342v3/all3.tsv
+perl -ne 'chomp; @f=split(/\t/,$_,2); print "$f[0]\n" if defined $f[1] && $f[1]=~/^票 342＋票 348 续体终裁腿 342-v3·/' /d/tmp/wisp/20261020/342v3/all3.tsv > /d/tmp/wisp/20261020/342v3/rA.txt
+perl -ne 'chomp; @f=split(/\t/,$_,2); print "$f[0]\n" if defined $f[1] && $f[1]=~/^342-v3 commit-/' /d/tmp/wisp/20261020/342v3/all3.tsv > /d/tmp/wisp/20261020/342v3/rC.txt
+echo "A=$(wc -l < /d/tmp/wisp/20261020/342v3/rA.txt) C=$(wc -l < /d/tmp/wisp/20261020/342v3/rC.txt)"
+cat /d/tmp/wisp/20261020/342v3/rA.txt /d/tmp/wisp/20261020/342v3/rC.txt | sort -u > /d/tmp/wisp/20261020/342v3/rU.txt
+echo "UNION=$(wc -l < /d/tmp/wisp/20261020/342v3/rU.txt)"
+echo "B=$(git log --grep='^票 342＋票 348 续体终裁腿 342-v3·' --format='%h' | wc -l)"
+echo "-- per commit names/outside/prodgo --"
+while read -r c; do
+  n=$(git show --name-only --format= "$c" | grep -c . || true)
+  o=$(git show --name-only --format= "$c" | grep -vE '^(docs/evidence/s1/(342-v3|348-v2)-verdict\.md|\.scratch/wisp/probes/34[28]/v[23]/|\.scratch/wisp/issues/(342|348)-)' | grep -c . || true)
+  p=$(git show --name-only --format= "$c" | grep -cE '\.go$' || true)
+  echo "$(echo "$c" | cut -c1-8) names=$n outside=$o anygo=$p anc=$(git merge-base --is-ancestor "$c" HEAD && echo Y || echo N)"
+done < /d/tmp/wisp/20261020/342v3/rU.txt
+echo "go_bytes=$(git diff --name-only 677d4837..HEAD | grep -cE '\.go$' || true)"
+echo "HEAD=$(git rev-parse --short HEAD)"

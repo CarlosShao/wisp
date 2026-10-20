@@ -88,3 +88,4 @@ vet-darwin rc=0
 0
 
 ########## appended by commit 9: the post-commit self-proof v2 + restore verification live in probes/342/v3/logs/30 (same file this root copies) ##########
+########## appended by commit 10: commit 9's roster number is stale by one BY CONSTRUCTION; see probes/342/v3/logs/30 ##########
