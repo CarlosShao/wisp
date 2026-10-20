@@ -1,0 +1,21 @@
+PRISTINE_SHA256=079430b4d12b161664b49d81145c25e31277dda8a8b682e02e7c214ea3738a8c
+PRE-刀 anchors: Ensure-override-if=1 (want 1) Ensure-installDir-if=2 (want 2) VerifyInstalled-return=1 (want 1, stays UNTOUCHED)
+POST-刀: Ensure anchors=0/0 (want 0/0) VerifyInstalled=1 (want 1) dead-guard lines=3 (want 3)
+195:		if err := error(nil); err != nil {
+205:		if err := error(nil); err != nil {
+241:	if err := error(nil); err != nil {
+BUILD_RC=0
+TEST_RC=1 (want 1)
+--- FAIL: TestAC41NailByteFaceUnnamedFileBreaksTheWidth (0.06s)
+--- FAIL: TestAC42NailByteFaceExtraDirectoryBreaksTheWidth (0.06s)
+--- FAIL: TestAC43NailByteFaceCountIsExact (0.06s)
+--- PASS: TestAC44NailByteFaceCleanTreeStillPasses (0.05s)
+--- FAIL: TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath (0.05s)
+--- FAIL: TestAC22CacheHitAndOverrideReturnPathsAreGuarded (0.07s)
+--- PASS: TestAC23ReverseLegCleanHandOffsAreNotBroken (0.05s)
+--- PASS: TestAC2NormalInstallAndSecondInstanceReuseAreNotBroken (0.06s)
+--- PASS: TestAC3WideTempRenameIsGuardedByTheReverifyNotByTheDescriptor (0.06s)
+--- PASS: TestAC1HandoffRefusesAModelSwappedAfterEnsureIsVerified (0.05s)
+RESTORE:
+RESTORED_SHA256=079430b4d12b161664b49d81145c25e31277dda8a8b682e02e7c214ea3738a8c
+RESTORE_PRISTINE=YES

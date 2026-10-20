@@ -1,0 +1,47 @@
+=== RUN   TestAC41NailByteFaceUnnamedFileBreaksTheWidth
+    handoff_ac4_109r1_test.go:96: planted 1 unnamed entry inside Ensure's post-verification window: [attacker.onnx]
+    handoff_ac4_109r1_test.go:133: AC#4/R-109-2 byte face: Ensure handed back a tree holding attacker.onnx as available. The nail's first界 sanctions the inherited write that placed it, so the width has to stop somewhere in bytes too; model.onnx still hashes exactly as the signed manifest pins it, which is precisely why hashing the named subset cannot answer 'how wide is this'.
+--- FAIL: TestAC41NailByteFaceUnnamedFileBreaksTheWidth (0.04s)
+=== RUN   TestAC42NailByteFaceExtraDirectoryBreaksTheWidth
+    handoff_ac4_109r1_test.go:96: planted 1 unnamed entry inside Ensure's post-verification window: [sub/w.onnx]
+    handoff_ac4_109r1_test.go:150: AC#4/R-109-2 byte face: Ensure handed back a tree holding an entire extra directory (sub/w.onnx) - the second PROBE2 shape, and the reason 'verified' has to mean the whole tree rather than the named subset
+--- FAIL: TestAC42NailByteFaceExtraDirectoryBreaksTheWidth (0.03s)
+=== RUN   TestAC43NailByteFaceCountIsExact
+    handoff_ac4_109r1_test.go:96: planted 4 unnamed entries inside Ensure's post-verification window: [a1.onnx a2.onnx a3.onnx sub/deep.bin]
+    handoff_ac4_109r1_test.go:171: AC#4/R-109-2 byte face: three loose unnamed files plus an unnamed directory and its byte verified clean through Ensure
+--- FAIL: TestAC43NailByteFaceCountIsExact (0.03s)
+=== RUN   TestAC44NailByteFaceCleanTreeStillPasses
+    handoff_ac4_109r1_test.go:96: planted 0 unnamed entries inside Ensure's post-verification window: []
+    handoff_ac4_109r1_test.go:205: clean tree still passes the byte face (named dir dict/ intact): C:\Users\swq\AppData\Local\Temp\TestAC44NailByteFaceCleanTreeStillPasses3028930548\002\models\kws-fixture
+--- PASS: TestAC44NailByteFaceCleanTreeStillPasses (0.03s)
+=== RUN   TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath
+    handoff_guard_109r1_test.go:73: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:111: AC#2/R-109-4 (shape 1): Ensure returned a model directory as available although 1 byte of model.onnx was swapped after the last check that ran on its return path. dir=C:\Users\swq\AppData\Local\Temp\TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath1464163933\002\models\kws-fixture swaps=1 - a caller that uses Manager.Ensure directly, without DownloadingBridge, gets the hand-off with no guard on it at all, which is exactly what R-109-4 says the bridge-only placement left open.
+--- FAIL: TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath (0.03s)
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded/cache_hit
+    handoff_guard_109r1_test.go:73: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:160: AC#2/R-109-4: the cache-hit return path handed back a store whose model.onnx was swapped after its verification (swaps=1)
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded/local_override
+    handoff_guard_109r1_test.go:190: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:204: AC#2/R-109-4: the local_override return path announced a sideloaded model available although 1 byte was swapped after its verification (swapped=true)
+--- FAIL: TestAC22CacheHitAndOverrideReturnPathsAreGuarded (0.03s)
+    --- FAIL: TestAC22CacheHitAndOverrideReturnPathsAreGuarded/cache_hit (0.00s)
+    --- FAIL: TestAC22CacheHitAndOverrideReturnPathsAreGuarded/local_override (0.01s)
+=== RUN   TestAC23ReverseLegCleanHandOffsAreNotBroken
+    handoff_guard_109r1_test.go:248: server hits: install=1, second-instance reuse=0
+--- PASS: TestAC23ReverseLegCleanHandOffsAreNotBroken (0.03s)
+=== RUN   TestAC2NormalInstallAndSecondInstanceReuseAreNotBroken
+    handoff_reuse_109_test.go:59: server hits: install=1, second-instance reuse=0
+--- PASS: TestAC2NormalInstallAndSecondInstanceReuseAreNotBroken (0.03s)
+=== RUN   TestAC3WideTempRenameIsGuardedByTheReverifyNotByTheDescriptor
+    handoff_reuse_109_test.go:98: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_reuse_109_test.go:105: rename-into-place covered by the hand-off re-verify: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\AppData\Local\Temp\TestAC3WideTempRenameIsGuardedByTheReverifyNotByTheDescriptor3458782948\002\kws-fixture: model.onnx: sha256 mismatch (pins 785b0751fc2c..., got dd7bafd7c0c4...)
+--- PASS: TestAC3WideTempRenameIsGuardedByTheReverifyNotByTheDescriptor (0.03s)
+=== RUN   TestAC1HandoffRefusesAModelSwappedAfterEnsureIsVerified
+    handoff_window_109_test.go:95: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_window_109_test.go:109: hand-off refused the swapped model: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\AppData\Local\Temp\TestAC1HandoffRefusesAModelSwappedAfterEnsureIsVerified1737994058\002\models\kws-fixture: model.onnx: sha256 mismatch (pins 785b0751fc2c..., got dd7bafd7c0c4...)
+--- PASS: TestAC1HandoffRefusesAModelSwappedAfterEnsureIsVerified (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/models	0.343s
+FAIL

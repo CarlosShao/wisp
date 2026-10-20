@@ -1,0 +1,14 @@
+PRISTINE_SHA256=d3de244d1cbb5757d385bee1f9ff89c5874cd0a0ea01c8bedbf3241a4c9b7e56
+PRE-刀: object-wide loop=1 (want 1) single-principal loop=0 (want 0)
+POST-刀: object-wide loop=0 (want 0) single-principal loop=1 (want 1)
+77:	for _, l := range aceLinesOwnedBy(t, path, `BUILTIN\Users`) {
+VET_RC=0 (compile gate for the mutated test face)
+TEST_RC=1 (want 1)
+--- FAIL: TestAC4R3NailBreakLineTwoSeesAnExplicitGrantByAnyPrincipal (2.96s)
+--- PASS: TestAC4R4NailBreakLineTwoStaysQuietOnInheritedWidth (0.27s)
+--- PASS: TestAC1TheWriteWindowIsAnInheritedCrossAccountRight (0.35s)
+--- PASS: TestAC4InstallDirWidthIsDeliberateAndHasABreakLine (0.56s)
+--- red sentence ---
+    handoff_ac4_principal_109r1_windows_test.go:135: AC#4/R-109-3: break line 2 reports nothing while this object carries an explicit non-inherited write grant for Everyone (Everyone:(OI)(CI)(M)). A hand-placed grant the ticket 95 width ruling does NOT sanction is invisible to all three界 because the judgment examines one principal's lines; the object has 1 ACE(s) that did not arrive by inheritance: [] (full descriptor: [Everyone (OI)(CI)(M) BUILTIN\Users (I)(OI)(CI)(M) NT AUTHORITY\SYSTEM (I)(OI)(CI)(F) BUILTIN\Administrators (I)(OI)(CI)(F) DESKTOP-LVS7839\swq (I)(OI)(CI)(F)])
+RESTORED_SHA256=d3de244d1cbb5757d385bee1f9ff89c5874cd0a0ea01c8bedbf3241a4c9b7e56
+RESTORE_PRISTINE=YES

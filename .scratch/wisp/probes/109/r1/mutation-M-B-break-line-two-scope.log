@@ -1,0 +1,27 @@
+=== RUN   TestAC4R3NailBreakLineTwoSeesAnExplicitGrantByAnyPrincipal
+    handoff_ac4_principal_109r1_windows_test.go:104: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_ac4_principal_109r1_windows_test.go:115: install dir descriptor after planting an EXPLICIT Everyone:(OI)(CI)(M):
+          [Everyone (OI)(CI)(M) BUILTIN\Users (I)(OI)(CI)(M) NT AUTHORITY\SYSTEM (I)(OI)(CI)(F) BUILTIN\Administrators (I)(OI)(CI)(F) DESKTOP-LVS7839\swq (I)(OI)(CI)(F)]
+    handoff_ac4_principal_109r1_windows_test.go:135: AC#4/R-109-3: break line 2 reports nothing while this object carries an explicit non-inherited write grant for Everyone (Everyone:(OI)(CI)(M)). A hand-placed grant the ticket 95 width ruling does NOT sanction is invisible to all three界 because the judgment examines one principal's lines; the object has 1 ACE(s) that did not arrive by inheritance: [] (full descriptor: [Everyone (OI)(CI)(M) BUILTIN\Users (I)(OI)(CI)(M) NT AUTHORITY\SYSTEM (I)(OI)(CI)(F) BUILTIN\Administrators (I)(OI)(CI)(F) DESKTOP-LVS7839\swq (I)(OI)(CI)(F)])
+--- FAIL: TestAC4R3NailBreakLineTwoSeesAnExplicitGrantByAnyPrincipal (1.96s)
+=== RUN   TestAC4R4NailBreakLineTwoStaysQuietOnInheritedWidth
+    handoff_ac4_principal_109r1_windows_test.go:157: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_ac4_principal_109r1_windows_test.go:186: principal-agnostic break line stays quiet on the sanctioned inherited width: [BUILTIN\Users (I)(OI)(CI)(M)]
+--- PASS: TestAC4R4NailBreakLineTwoStaysQuietOnInheritedWidth (0.19s)
+=== RUN   TestAC1TheWriteWindowIsAnInheritedCrossAccountRight
+    handoff_window_109_windows_test.go:74: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:91: BEFORE the hand-off guard - install dir kws-fixture: [BUILTIN\Users (I)(OI)(CI)(M)]
+    handoff_window_109_windows_test.go:92: BEFORE the hand-off guard - installed file model.onnx: [BUILTIN\Users (I)(M)]
+    handoff_window_109_windows_test.go:111: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_window_109_windows_test.go:123: hand-off refused the swap made through that right: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\AppData\Local\Temp\TestAC1TheWriteWindowIsAnInheritedCrossAccountRight1968598933\002\models\kws-fixture: model.onnx: sha256 mismatch (pins 785b0751fc2c..., got dd7bafd7c0c4...)
+    handoff_window_109_windows_test.go:134: AFTER the hand-off guard ran - install dir: [BUILTIN\Users (I)(OI)(CI)(M)]
+    handoff_window_109_windows_test.go:135: AFTER the hand-off guard ran - installed file: [BUILTIN\Users (I)(M)]
+--- PASS: TestAC1TheWriteWindowIsAnInheritedCrossAccountRight (0.25s)
+=== RUN   TestAC4InstallDirWidthIsDeliberateAndHasABreakLine
+    handoff_window_109_windows_test.go:159: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:176: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:214: AC#4 nail: install dir kws-fixture inherits [BUILTIN\Users (I)(OI)(CI)(M)] (parent policy, guard is the re-verify)
+--- PASS: TestAC4InstallDirWidthIsDeliberateAndHasABreakLine (0.29s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/models	2.730s
+FAIL

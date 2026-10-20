@@ -1,0 +1,7 @@
+=== RUN   TestAC4InstallDirWidthIsDeliberateAndHasABreakLine
+    handoff_window_109_windows_test.go:159: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:176: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:200: AC#4 nail: install dir kws-fixture inherits [BUILTIN\Users (I)(OI)(CI)(M)] (parent policy, guard is the re-verify)
+--- PASS: TestAC4InstallDirWidthIsDeliberateAndHasABreakLine (2.40s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/models	2.457s
