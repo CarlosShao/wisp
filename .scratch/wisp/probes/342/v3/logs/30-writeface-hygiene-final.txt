@@ -48,3 +48,54 @@ HEAD counts: probes/342/v3=48 probes/348/v2=13
 
 ########## 笔⑦更正（追加＝照 342-r2 笔⑧形；⛔ --amend ⛔ reset ##########
 笔⑦正文写"只追加到 logs/22 与 logs/30 两枚已入库件"⇄该笔 git show --name-only = 4 枚（probes/342/v3/logs/22＋logs/30 ⇄ probes/348/v2/logs/02-copy＋logs/04-copy）＝本腿自己在"正文声称枚数⇄实际枚数"同族上撞一回＝提交后现跑尺抓到、当场具名认。枚数不变＝48/13（新增 0 枚文件）＝各处声称照旧成立。本笔＝1 枚文件（logs/30 追加本段）＝名字与正文相符才报已提交。
+
+########## POST-COMMIT SELF-PROOF v2 at final HEAD (no /dev/stderr: that capture corrupted the first attempt) ##########
+== HEAD ==
+5064c9761bf495e1d95285d31b883fbb15ea861c 10-20 11:57 342-v3 commit-8 = append-only correct
+== roster shape A (anchored subject) ==
+A=7
+== roster shape B (--grep anchored) ==
+B=7
+== roster shape C (the ASCII-subject correction commit) ==
+5064c976 342-v3 commit-8 = append-only correction of commit 
+== union by hash (A+B+C) ==
+UNION=8
+== per-commit membership over the union ==
+  02c0f304 names=1 outside=0 prodgo=0 ancestor=Y
+  2084b6d2 names=48 outside=0 prodgo=0 ancestor=Y
+  3e811429 names=1 outside=0 prodgo=0 ancestor=Y
+  3f8783a9 names=1 outside=0 prodgo=0 ancestor=Y
+  5064c976 names=1 outside=0 prodgo=0 ancestor=Y
+  85b59f30 names=4 outside=0 prodgo=0 ancestor=Y
+  c1c9eaa2 names=13 outside=0 prodgo=0 ancestor=Y
+  e8d6d23a names=1 outside=0 prodgo=0 ancestor=Y
+== non-_test .go touched by the leg over 677d4837..HEAD (expect 0) ==
+prodgo=0
+== _test .go touched by the leg (expect empty: the leg wrote no .go at all) ==
+anygo=0
+== verdict files ==
+  /d/work/workspace/projects plans/Wisp/docs/evidence/s1/342-v3-verdict.md bytes=16497 lines=45 CR=0 A7=0
+  /d/work/workspace/projects plans/Wisp/docs/evidence/s1/348-v2-verdict.md bytes=10891 lines=35 CR=0 A7=0
+== write-face counts at HEAD (ls-tree) ==
+  probes/342/v3=48 probes/348/v2=13
+  zero=0 dotout=0
+  A7 over roots=0
+== winsec.go HEAD blob ==
+07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+== box rulers + tails ==
+  342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md [x]=5 [ ]=2 mybullets=1
+  348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md [x]=6 [ ]=1 mybullets=1
+2	0	.scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md
+2	0	.scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md
+== dirty state of my write faces (expect 0) ==
+  dirty=0
+== unpushed count (for the record; the leg never pushes) ==
+  ahead=60
+
+########## RESTORE VERIFICATION: teeth restores == git cat-file blob HEAD:<path> (sha256) ##########
+treeL: HEAD-blob sha256=b9dc39aea15670e8f24689fa8d5f8157f2a1ffe310996203670c37dcf4d5643b
+treeL: restored  sha256=b9dc39aea15670e8f24689fa8d5f8157f2a1ffe310996203670c37dcf4d5643b  equal=YES
+treeT: HEAD-blob sha256=b9dc39aea15670e8f24689fa8d5f8157f2a1ffe310996203670c37dcf4d5643b
+treeT: restored  sha256=b9dc39aea15670e8f24689fa8d5f8157f2a1ffe310996203670c37dcf4d5643b  equal=YES
+treeL winsec.go equal-to-HEAD=YES blob=07300bff
+treeT winsec.go equal-to-HEAD=YES blob=07300bff
