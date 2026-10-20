@@ -1,0 +1,66 @@
+# 321-r1 终局复量（HEAD 漂过 3 笔之后重跑；尺名＋射程＋量/算逐段标）
+HEAD＝fd091cd1
+
+## K1. 三笔 mid-run 漂动逐枚 name-only（证明零 Go 字节⇒成对读数可比）
+-- b964da8f --
+.scratch/wisp/issues/353-pinned-name-swap-after-seal-deletes-an-object-the-caller-never-named.md
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
+-- 1431a63b --
+.scratch/wisp/probes/orch/20261020/txt/109r1-dispatch-v2.txt
+.scratch/wisp/probes/orch/20261020/txt/352v1-dispatch.txt
+.scratch/wisp/probes/orch/20261020/txt/353r1-dispatch.txt
+-- 4e0ac985 --
+docs/evidence/s1/115-adversarial-acceptance.md
+--交集尺：git diff --name-only 1104fea8..HEAD -- cmd/wisp internal/winsec internal/models internal/agent --（须空）
+
+## K2. 成对台面 == 最终 HEAD 的 139 枚 cmd/wisp blob（尺 v2＝git hash-object ⇄ git ls-tree）
+★尺 v1 坏在哪：--format 第 1 列取了 %(objecttype)，awk $1 ⇒ 拿到 'blob' 字、⛔ blob 号 ⇒ 报 139/139 MISMATCH＝假
+（两把尺矛盾时先假定新那把坏＝公共块 读数纪律；两枚单点 hash-object 都对得上才去修尺）
+851936e396458aa2b6d19cea0da8f71d7d9593f7
+HEAD now = fd091cd1
+cmd/wisp: checked=139 mismatches=0
+treeM(已还原)：checked=139 mismatches=0
+--正控：⛔ 动 treeB（它是成对读数的基线）⇒ 另取一枚 throwaway 副本 treeX 故意改坏，这把尺必须报 MISMATCH--
+treeX hash=9495582342013749ccc97a99b2007ddb93c268de
+HEAD  hash=4a6badd6496bad2c176ea9c11f9839678f5f9d03
+CONTROL OK：尺看得见坏字节
+--treeB 全程未动的证据：逐枚 hash-object == HEAD 且 sha 与成对读数时同串--
+5673635c640053eea3f1ee60f1082b735b443b7cdc5428960fe6ad7ab18b0a64 */d/tmp/wisp/20261020/321r1/treeB/cmd/wisp/versioninfo_other.go
+4f7a10b30d1801325a5fdf95c3c975de1bff29057b98bebf09ebe83145837237 */d/tmp/wisp/20261020/321r1/treeB/cmd/wisp/resident_windows.go
+
+## K3. 最终 HEAD 上的门禁四把＋判据两枚重跑（跑前 unset GOTMPDIR TMPDIR TEMP TMP）
+$ GOFLAGS= go build ./...                     RC=0（件＝fg-build.txt，0 字节）
+$ gofumpt -l cmd/wisp/exec_holder_toggle_321_test.go  RC=0 bytes=0
+$ go vet -tags winlive ./cmd/wisp/            RC=0 bytes=0
+$ sh scripts/d22scan.sh                       RC=0
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=244, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=603, ban #8 
+$ 判据重跑（尺＝-run AC321 ./cmd/wisp/，射程＝treeB＝最终 HEAD 字节）
+TREE=/d/tmp/wisp/20261020/321r1/treeB PAT=AC321 MODE=posix
+GOTMPDIR=D:\tmp\wisp\20261020\321r1\gotmp
+PATH_HEAD=/d/tmp/wisp/20261020/321r1/treeB/third_party/sherpa-onnx:/d/tmp/wisp/20261020/321r1/treeB/build
+RC=0
+RUN=2
+PASS_TOP=2
+FAIL_TOP=0
+SKIP=0
+--top names--
+--- PASS: TestAC321NamedExecutorIsTheToggleRoad
+--- PASS: TestAC321PanelHopDrivesTheHolderToggle
+--bench-failure markers (non-empty = 台面故障, never a reading)--
+
+## K4. 共享树终态（尺＝git status --porcelain）
+tracked 脏行数（整仓）＝0
+cmd/wisp 行数（含未跟踪，须 0＝我没在仓里留任何件）＝0
+--票 321 框终量复量（交完 8 笔后仍须 未勾2/已勾0）--
+未勾= 2
+已勾= 0
+--本腿名册锚定尺（逐枚 %s 起头，按字符截）--
+fd091cd1 票 321 落地腿 321-r1 笔⑦＝具名分件入库（.scratch/wisp/probes/321/r1/
+a09674fc 票 321 落地腿 321-r1 笔⑥＝复验主件更正（★逐枚复核后改归因：`c673f67b` 那笔收件**不
+b964da8f A1067＋4.0fi＋票353翻AC#1＝★★机主 19:2x 拍〔乙〕⇒裁语逐字写进翻勾行（甲⛔ 批＝三条
+64d14a70 票 321 落地腿 321-r1 笔⑤＝票 321 尾**一条**只追加 bullet（★纯追加尺＝git d
+95691aa4 票 321 落地腿 321-r1 笔④＝复验读数件的生成器入库（.scratch/wisp/probes/32
+f17eeb4c 票 321 落地腿 321-r1 笔③＝今天那把颜色尺定式件入库（.scratch/wisp/probes/3
+1431a63b 第十六波补档＝机主 19:2x 拍〔乙〕⇒ 三份派单入库（先存档再发）：353-r1 写腿（乙形＝保留按名删＋
+ed7d183b 票 321 落地腿 321-r1 笔②＝复验主件交件报告入库（判据本体⇄三态⇄上报；★本腿零 Go 字节＝AC
