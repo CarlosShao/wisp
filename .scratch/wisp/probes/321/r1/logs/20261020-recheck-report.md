@@ -18,7 +18,8 @@
 | 判据件在不在 HEAD | `git cat-file -e HEAD:cmd/wisp/exec_holder_toggle_321_test.go` | **EXISTS**（200 行／8671 字节） |
 | 盘上⇄HEAD 同字节 | `sha256sum` ⇄ `git show HEAD:… \| sha256sum` | 两枚同为 `717b2d2d9b76d8ae9d413e53a14e11f1669b834fcb056af6b884e01febb63738` |
 
-★两处归因逐枚复核过（笔⑤之后本腿自己把三把尺各跑一遍，件＝仓外 `roster-recheck.sh`，逐字输出在读数件 §J）：
+★两处归因逐枚复核过（笔⑤之后本腿自己把三把尺各跑一遍，尺件＝仓外 `roster-recheck.sh`，
+逐字输出＝同目录具名分件 `20261020-recheck-roster.txt`）：
 `c673f67b`（收件那笔）**不**含字面"票 321"（`git log -1 --format=%B c673f67b | grep -c '票 321'`＝**0**，
 正控＝同件 `grep -c '321-r1'`＝**1**）⇒ 命中它的是**第三把**尺（腿码任意位），⛔ 记在非锚定那把上。
 `58de465a`（落地那笔）两把都命中（`grep -c '票 321'`＝**1**）。⚠ 枚数随 HEAD 漂＝公共块 名册尺 那条通则今天再中一次：

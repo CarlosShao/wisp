@@ -1,0 +1,27 @@
+== ruler A: --grep='^票 321' ==
+64d14a70 95691aa4 f17eeb4c ed7d183b e0c8cbf6 1104fea8 
+count=6
+== ruler B: --grep='票 321' (non-anchored, whole message) ==
+64d14a70 95691aa4 f17eeb4c ed7d183b e0c8cbf6 1104fea8 41673704 58de465a f19bce28 
+count=9
+== ruler C: --grep='321-r1' (leg code anywhere) ==
+64d14a70 95691aa4 f17eeb4c 1431a63b ed7d183b e0c8cbf6 1104fea8 03da4941 c673f67b 58de465a 78ea61e2 7c261377 
+count=12
+== does c673f67b (the receiving commit) contain the literal 票 321 ? ==
+0
+positive control on that ruler (does it contain 321-r1 ?):
+1
+== does 58de465a (the landing commit) contain 票 321 ? ==
+1
+== 58de465a subject head (first 40 chars, char-safe) ==
+321-r1 落地腿交件（票 321，零产码）：给托盘/球/热键那一跳的执行器接
+
+== 交件后复量（本腿 5 笔落库之后＝枚数随 HEAD 漂的那条通则今天再中一次）==
+ruler A ^票 321 count=6
+本腿 5 笔逐枚 subject 起头（尺＝%s 按字符截 30）:
+b964da8f A1067＋4.0fi＋票353翻AC#1＝★★机主 19:2x 拍〔乙〕⇒裁语逐字写进翻勾行（甲⛔ 
+64d14a70 票 321 落地腿 321-r1 笔⑤＝票 321 尾**一条**只追加 bullet（★纯追加尺＝g
+95691aa4 票 321 落地腿 321-r1 笔④＝复验读数件的生成器入库（.scratch/wisp/probe
+f17eeb4c 票 321 落地腿 321-r1 笔③＝今天那把颜色尺定式件入库（.scratch/wisp/prob
+1431a63b 第十六波补档＝机主 19:2x 拍〔乙〕⇒ 三份派单入库（先存档再发）：353-r1 写腿（乙形＝保留
+ed7d183b 票 321 落地腿 321-r1 笔②＝复验主件交件报告入库（判据本体⇄三态⇄上报；★本腿零 Go 字
