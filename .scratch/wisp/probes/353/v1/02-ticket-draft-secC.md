@@ -52,3 +52,11 @@
 - `sealhandle_privateroute_120_other_test.go`＝1
 
 ★新票 `AC#0` 要先钉清楚的一件事实（本腿现读，尺＝`sh/49`＝逐枚 `git cat-file blob HEAD:internal/winsec/<件> | grep -c`）＝⛔ 是"只有两三枚件打这两枚号"（本腿草案初稿这么写了一次、量完当场作废＝记一枚）：`flipErrs` 在 **11 枚**在册件里命中（`ancestoropen_342_{unix:2,windows:2}`／`ancestorunlink_348_{unix:2,windows:4}`／`ancestorworld_342_348_{unix:6,windows:6}`／`leafrace_342r2:6`／`openleaf_322_other:5`／`openleaf_guard_322_windows:4`／`posix_seal_window_120_other:4`／`sealhandle_privateroute_120_other:4`）、`provedReparse` 只在 **3 枚**（`ancestoropen_342_windows`=3／`ancestorunlink_348_windows`=7／`ancestorworld_342_348_windows`=4）。⇒ 真正**声明⇄自增⇄打印**这两枚号的是共享台架 `ancestorworld_342_348_windows_test.go`（字段 `:127`/`:135`/`:151`、取数 `:422-423`、分子行 `:458-459`＝腿底片里那行 `form=… flipErrs=…` 的产地），各族用例只是各自 gate 它（`ancestorunlink_348_windows:44`/`:74`、`ancestoropen_342_windows:55`、`leafrace:364`）＝⚠ `leafrace_342r2`／`openleaf_*`／`*_120_*` 那几枚各自有**自己的** `flipErrs` 计数、⛔ 同一枚号、⛔ 与 A 族那批发片数混着报（票 348 `AC#3`"两列⛔ 合并"那条在此复发一次）。⇒ 新票 `AC#0` 第一问＝"这味动的是**共享台架**那枚 `flipErrs`、还是各族自己的"，⛔ 一张"13 枚都要变"的清单。
+
+## 8. ★追加更正（本件第 3 节那枚建议票名末尾的两处口径；⛔ 抹上面原句＝走本仓"追加一笔改正"那形，凭据＝`01-independent-readings.txt` 第 S6 节那两行逐字分子＋尺 `sh/53`）
+
+1. 第 3 节括号里写的「`provedReparse` **3..54** → 102..153」＝作废前半：交替批 `leaf-symlink` 那枚基线六发逐字＝`2/32/98/54/4/3`＝区间＝**2..98**（落地四发逐字 `102/152/153/129`＝**102..153** 那半句无误）；「`flipErrs` 9,130..31,366 → 6..16」两半句都对（基线逐字 `31366/21815/9130/20929/29885/30048`、落地 `16/6/14/8`＝量的）。⇒ 建议票名末尾照此改成「`flipErrs` 9,130..31,366 → 6..16 ⇄ `provedReparse` 2..98 → 102..153」。
+2. ★`form=symlink-dir` 那枚⛔ 够成对照＝基线只有 1 发 `17` ⇄ 落地 3 发 `24/27/31`＝**方向还相反**＝新票⛔ 拿它当凭据；要它先补足样本。
+3. ★非交替那批（`swing-*`，同两棵树）的 `leaf-symlink` 区间＝**10..18**（基线 `27935/24401/23835/28160`）＝⛔ 10..31（31 是同文件里 `symlink-dir` 那枚的数，本腿先前混过一次；判语主件已按 `leaf-symlink` 单列改正）。
+4. ★上面 `AC#0` 那格里"6 发里 3 发的原始 stdout 不可复原"＝作废（本腿口径错）：本腿现量（尺 `sh/54`）＝交替批 `alt-*.raw.txt` 在盘 **6 枚**、`alt-summary.txt` **12 行**（每发 append＝12 发全在、其中 2 行 `none`）；6 枚 raw 里 **5 枚含 `leaf-symlink` 分子行**（基线 `21815/20929/30048`⇄落地 `6/8`）、`alt-1-finalL` 那枚只有那族仪器自己的收尾失败 ⇒ **原件不可复原的行＝5 行**（基线 `31366/9130/29885`＋落地 `16/14`）＝逐字凭据只在 summary。`AC#0` 那句照此读＝"12 发里 5 行的原件⛔ 在盘"。
+＝本节＝"⛔ 让一枚没过量够的数留在盘上当凭据"那形在本腿自己身上的应用（记一枚口径错、⛔ 判退件）。
