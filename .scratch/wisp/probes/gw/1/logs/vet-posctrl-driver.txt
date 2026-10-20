@@ -1,0 +1,30 @@
+== pristine 锚 ⇄ 副本 ==
+HEAD_FULL=a19d5bf2c915b24b836016fa80be47dba4e76abc
+MUT_TREE=/d/tmp/wisp/20261020/gw1/gwL-vetmut
+GO_FILES=781
+TARGET=/d/tmp/wisp/20261020/gw1/gwL-vetmut/cmd/wisp/vet_posctrl_gw1.go.txt
+PRE_TEST_RC_UNUSED=placeholder
+PRE_LIST=1
+SUFFIXED=.go.txt＝⛔ 编译面＝此时 vet 必须照 0（负档：证明那枚 0 ⛔ 是被新件搅出来的）
+VET_NEG_RC=0
+VET_NEG_BYTES=0
+
+== 落刀＝把 .go.txt 改成 .go（⛔ 跟踪面＝全在仓外副本）==
+MOVED=/d/tmp/wisp/20261020/gw1/gwL-vetmut/cmd/wisp/vet_posctrl_gw1.go  EXISTS=yes
+VET_POS_RC=1
+VET_POS_BYTES=93
+  POS cmd\wisp\vet_posctrl_gw1.go:8:20: fmt.Printf call has arguments but no formatting directives
+
+== 还原＝删掉副本里那枚文件（只动副本；⛔ git checkout／⛔ 动共享树）==
+VET_RESTORE_RC=0
+VET_RESTORE_BYTES=0
+
+== 还原哈希对回＝副本 cmd/wisp 与 gwL cmd/wisp 逐枚 cmp（差异枚数须 0）==
+RESTORE_DIFF_RC=1
+RESTORE_DIFF_LINES=1
+  DIFF Only in /d/tmp/wisp/20261020/gw1/gwL-vetmut/cmd/wisp: vet_posctrl_gw1.go.txt
+
+== 共享树复量（⛔ 任何字节改动；再打一次那把 vet 证其 0 复现）==
+VET_SHARED_REPEAT_RC=0
+VET_SHARED_REPEAT_BYTES=0
+HEAD_FULL_END=a19d5bf2c915b24b836016fa80be47dba4e76abc

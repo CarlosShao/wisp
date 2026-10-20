@@ -1,0 +1,45 @@
+== HEAD ==
+HEAD_FULL=247d7f9e03d4b5d62fd54adbd69548221ae61d5c
+
+== 尺1＝锚定行首打在 --format='%s' 的导出（射程＝只有主题）==
+R1_ANCHORED_SUBJECT=3
+
+== 尺2＝git log --grep 锚定 ^（射程＝整条 message 的首行）==
+R2_GREP_ANCHORED=3
+  R2 247d7f9e 10-20 23:46 gw-1 量色腿 gw-1 笔③＝味③ 票 353 `AC#3` winsec 两平台成对色读数件入库（`.scratch/wisp/probes/gw/1/03-winsec.md`；★只测不写＝本笔零 `.go` 字节；尺本体已随笔②入库＝`sh/05`⇄`sh/15`⇄`sh/16`）＝
+  R2 8f86e936 10-20 23:45 gw-1 量色腿 gw-1 笔②＝味② 票 352 `AC#2` 五包成对色＋逐名 `comm` 读数件入库（`.scratch/wisp/probes/gw/1/02-five-packages.md`＋尺本体 `sh/12..sh/16`＝具名逐枚色／config 三发复量／winsec 三发复量／交件三把尺／named colors；★只测不写＝本笔零 `.go` 字节）＝
+  R2 3e370700 10-20 23:04 gw-1 量色腿 gw-1 笔①＝味① 五把门对今天 HEAD 重跑的读数件入库（.scratch/wisp/probes/gw/1/01-gates.md＋sh/01..sh/11 全部尺本体；★只测不写＝本笔零 `.go` 字节、⛔ 洗已知脏件、⛔ `-w`）＝
+
+== 尺3＝单次 '%H%x09%s' 导出＋内存 index($2,PFX)==1 ==
+R3_MEM_INDEX=3
+  R3 247d7f9e03
+  R3 8f86e93643
+  R3 3e3707000a
+
+== 非锚定子串对照（★⛔ 当名册＝公共块那形：会吃进正文引用）==
+R4_UNANCHORED_SUBJECT_LINE=3
+R5_UNANCHORED_FULLMSG=3
+
+== ★正控（证明锚定尺⛔ 瞎）＝同一条尺打一枚在册的别腿前缀 ==
+  POSCTRL ^票 139 落地腿 139-r1 = 11
+  POSCTRL ^票 321 终裁腿 321-v1 = 6
+  POSCTRL ^票 353 落地腿 353-r1 = 6
+
+== 写面自证＝本腿名册逐枚 git show --name-only ＋ .go 枚数（★正控＝同尺打一枚含 .go 的别腿笔）==
+  WF 247d7f9e03 total=1 go=0 out_of_face=0
+  WF 8f86e93643 total=6 go=0 out_of_face=0
+  WF 3e3707000a total=12 go=0 out_of_face=0
+  （正控＝同尺打在 353-r1 笔① 的 .go 枚数）
+  POSCTRL_353pen1 total=8 go=1
+
+== tracked 脏＝逐枚列名＋mtime（★⛔ 只报计数）==
+DIRTY_TRACKED_LINES=1
+  DIRTY [ M] .scratch/wisp/issues/115-seal-notices-carry-the-resolvers-answer-while-the-cases-compare-caller-spelling-done.md mtime=2026-10-20 20:24:44
+  .go 脏枚数＝0
+
+== 仓根冻结件监视（A1069③ 那形＝⛔ 0 字节）==
+  FROZEN go.mod bytes=1026 mtime=2026-10-20 19:50:08 blob_cr=0
+  FROZEN go.sum bytes=6237 mtime=2026-10-01 09:47:42 blob_cr=0
+  FROZEN .gitignore bytes=1404 mtime=2026-09-27 11:16:34 blob_cr=0
+  FROZEN .github/workflows/ci.yml bytes=64794 mtime=2026-10-15 13:35:44 blob_cr=0
+  （正控＝tr 尺对自造 2 枚 CR 件读出 2）

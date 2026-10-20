@@ -1,0 +1,47 @@
+== 五枚判定逐枚点名（色＝顶层用例 ⇄ 四枚子测试；:72⇄:75 同住 seal_file_and_dir_direct）==
+SOURCE                     TOP       exclusive replacement dirchain  sealfiledir
+p352w-s1-gwB-winsec        PASS      PASS      PASS      PASS      PASS     
+p352w-s2-gwL-winsec        PASS      PASS      PASS      PASS      PASS     
+p353-s1-gwW-winsec         PASS      PASS      PASS      PASS      PASS     
+p353-s2-gwL-winsec         PASS      PASS      PASS      PASS      PASS     
+c352w-s1-gwB-winsec        PASS      PASS      PASS      PASS      PASS     
+c352w-s2-gwL-winsec        PASS      PASS      PASS      PASS      PASS     
+c353-s1-gwW-winsec         PASS      PASS      PASS      PASS      PASS     
+c353-s2-gwL-winsec         PASS      PASS      PASS      PASS      PASS     
+
+== TestAC5FailureIsNotSwallowedByTheHappyPath（同文件另一枚 fs.ErrExist 判定）==
+  p352w-s1-gwB-winsec        PASS
+  p352w-s2-gwL-winsec        PASS
+  p353-s1-gwW-winsec         PASS
+  p353-s2-gwL-winsec         PASS
+  c352w-s1-gwB-winsec        PASS
+  c352w-s2-gwL-winsec        PASS
+  c353-s1-gwW-winsec         PASS
+  c353-s2-gwL-winsec         PASS
+
+== 读 ErrUnresolvedPath 的两族逐枚（openleaf_322 ⇄ placement_symlink_113）==
+  TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 ABS ABS ABS ABS PASS PASS PASS PASS
+  TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone ABS ABS ABS ABS PASS PASS PASS PASS
+  TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth                   ABS ABS ABS ABS PASS PASS PASS PASS
+  TestAC1POSIXSealDirThroughASymlinkRefuses                              ABS ABS ABS ABS PASS PASS PASS PASS
+  TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing          ABS ABS ABS ABS PASS PASS PASS PASS
+  TestAC1POSIXSealFileThroughABackslashNamedLink                         ABS ABS ABS ABS PASS PASS PASS PASS
+  TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree           ABS ABS ABS ABS PASS PASS PASS PASS
+  TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks      ABS ABS ABS ABS PASS PASS PASS PASS
+  TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator                    ABS ABS ABS ABS PASS PASS PASS PASS
+  TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1              PASS PASS PASS PASS PASS PASS PASS PASS
+  TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1         PASS PASS PASS PASS ABS ABS ABS ABS
+  TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1             PASS PASS PASS PASS ABS ABS ABS ABS
+  列序＝pB-host pL-host pW-host pL-host(353) cB-cont cL-cont cW-cont cL-cont(353)
+
+== ★正控两把（同尺）==
+  POSCTRL(在场名应读 PASS)=PASS
+  NEGCTRL(不存在名应空)=""
+
+== 具名连带的两侧字节同一性（尺＝git rev-parse <锚>:<path>，量的）==
+  internal/winsec/private_fail_test.go                           0fb399c3=e95d48aa 3a509e50=e95d48aa a19d5bf2=e95d48aa
+  internal/winsec/openleaf_overwrite_322_test.go                 0fb399c3=39026065 3a509e50=39026065 a19d5bf2=39026065
+  internal/winsec/openleaf_322_other_test.go                     0fb399c3=dfaddac8 3a509e50=dfaddac8 a19d5bf2=dfaddac8
+  internal/winsec/placement_symlink_113_other_test.go            0fb399c3=3a18a3d4 3a509e50=3a18a3d4 a19d5bf2=3a18a3d4
+  internal/winsec/openleaf_guard_322_windows_test.go             0fb399c3=b2b71590 3a509e50=b2b71590 a19d5bf2=b2b71590
+  internal/winsec/nametopup_353_windows_test.go                  0fb399c3= 3a509e50=e236e1e6 a19d5bf2=5a537db6

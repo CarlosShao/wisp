@@ -1,0 +1,62 @@
+== START anchor ==
+HEAD_FULL=4fb6c088ceccf2036b3e755d9ab0220792d87513
+### 复量发 1 ###
+ws3 s1 /d/tmp/wisp/20261020/gw1/gwW MODE=host RC=1 RUN=121 PASS_TOP=67 FAIL_TOP=3 SKIP=0 SHAPE=OK
+   RED=3
+     TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2
+     TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+     TestAC2WindowsNameTopUpBeforeTheReCheckLeavesTheTopUpObjectNamed353r1
+ws3 s1 /d/tmp/wisp/20261020/gw1/gwL MODE=host RC=1 RUN=121 PASS_TOP=68 FAIL_TOP=2 SKIP=0 SHAPE=OK
+   RED=2
+     TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+     TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1
+  -- 单发作差 s1 --
+   NEWRED TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1
+   GONERED TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2
+   GONERED TestAC2WindowsNameTopUpBeforeTheReCheckLeavesTheTopUpObjectNamed353r1
+### 复量发 2 ###
+ws3 s2 /d/tmp/wisp/20261020/gw1/gwW MODE=host RC=1 RUN=121 PASS_TOP=67 FAIL_TOP=3 SKIP=0 SHAPE=OK
+   RED=3
+     TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2
+     TestAC2WindowsNameTopUpBeforeTheReCheckLeavesTheTopUpObjectNamed353r1
+     TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+ws3 s2 /d/tmp/wisp/20261020/gw1/gwL MODE=host RC=1 RUN=121 PASS_TOP=68 FAIL_TOP=2 SKIP=0 SHAPE=OK
+   RED=2
+     TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2
+     TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+  -- 单发作差 s2 --
+   NEWRED TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+   GONERED TestAC2WindowsNameTopUpBeforeTheReCheckLeavesTheTopUpObjectNamed353r1
+   GONERED TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+### 复量发 3 ###
+ws3 s3 /d/tmp/wisp/20261020/gw1/gwW MODE=host RC=1 RUN=121 PASS_TOP=67 FAIL_TOP=3 SKIP=0 SHAPE=OK
+   RED=3
+     TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+     TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1
+     TestAC2WindowsNameTopUpBeforeTheReCheckLeavesTheTopUpObjectNamed353r1
+ws3 s3 /d/tmp/wisp/20261020/gw1/gwL MODE=host RC=1 RUN=121 PASS_TOP=68 FAIL_TOP=2 SKIP=0 SHAPE=OK
+   RED=2
+     TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+     TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+  -- 单发作差 s3 --
+   NEWRED TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+   GONERED TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1
+   GONERED TestAC2WindowsNameTopUpBeforeTheReCheckLeavesTheTopUpObjectNamed353r1
+
+== ★三发并集作差（＝判据那一把）==
+UNION_W=5
+  W TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2
+  W TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+  W TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1
+  W TestAC2WindowsNameTopUpBeforeTheReCheckLeavesTheTopUpObjectNamed353r1
+  W TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+UNION_L=4
+  L TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2
+  L TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+  L TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1
+  L TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+NEW_RED_UNION=0
+GONE_RED_UNION=1
+  GONERED_UNION TestAC2WindowsNameTopUpBeforeTheReCheckLeavesTheTopUpObjectNamed353r1
+== END anchor ==
+HEAD_FULL_END=4fb6c088ceccf2036b3e755d9ab0220792d87513

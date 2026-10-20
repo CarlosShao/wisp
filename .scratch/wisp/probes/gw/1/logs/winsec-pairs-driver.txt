@@ -1,0 +1,59 @@
+== driver START anchor ==
+HEAD_FULL=a012480344b2631896efce6a7b2fc3b500a6d8e2
+
+### 对甲 host（gwW ⇄ gwL）###
+p353 s1 gwW ./internal/winsec/ MODE=host RC=1 RUN=121 PASS_TOP=67 FAIL_TOP=3 SKIP=0 SHAPE=OK VOIDKIND=none GOTMP=C:\Users\swq\AppData\Local\wisp-test-gotmp\gw1-20261020-232549-813096
+  RED_NAMES=4
+   TAIL| FAIL	github.com/CarlosShao/wisp/internal/winsec	44.753s
+   TAIL| FAIL
+p353 s2 gwL ./internal/winsec/ MODE=host RC=1 RUN=121 PASS_TOP=67 FAIL_TOP=3 SKIP=0 SHAPE=OK VOIDKIND=none GOTMP=C:\Users\swq\AppData\Local\wisp-test-gotmp\gw1-20261020-232641-813096
+  RED_NAMES=4
+   TAIL| FAIL	github.com/CarlosShao/wisp/internal/winsec	50.017s
+   TAIL| FAIL
+== 逐名作差（每枚包分别 comm，⛔ 混包）==
+-- ./internal/winsec/ NEW_RED(only in landed)=2 GONE_RED(only in base)=2
+   NEWRED TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2
+   NEWRED TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1
+   GONERED TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1
+   GONERED TestAC2WindowsNameTopUpBeforeTheReCheckLeavesTheTopUpObjectNamed353r1
+
+### 对乙 host（gwB ⇄ gwL）###
+p352w s1 gwB ./internal/winsec/ MODE=host RC=1 RUN=119 PASS_TOP=65 FAIL_TOP=3 SKIP=0 SHAPE=OK VOIDKIND=none GOTMP=C:\Users\swq\AppData\Local\wisp-test-gotmp\gw1-20261020-232739-813223
+  RED_NAMES=4
+   TAIL| FAIL	github.com/CarlosShao/wisp/internal/winsec	54.343s
+   TAIL| FAIL
+p352w s2 gwL ./internal/winsec/ MODE=host RC=1 RUN=121 PASS_TOP=69 FAIL_TOP=1 SKIP=0 SHAPE=OK VOIDKIND=none GOTMP=C:\Users\swq\AppData\Local\wisp-test-gotmp\gw1-20261020-232841-813223
+  RED_NAMES=2
+   TAIL| FAIL	github.com/CarlosShao/wisp/internal/winsec	54.251s
+   TAIL| FAIL
+== 逐名作差（每枚包分别 comm，⛔ 混包）==
+-- ./internal/winsec/ NEW_RED(only in landed)=0 GONE_RED(only in base)=2
+   GONERED TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1
+   GONERED TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1
+
+### 对甲 container（gwW ⇄ gwL）###
+c353 s1 gwW ./internal/winsec/ MODE=container RC=0 RUN=74 PASS_TOP=46 FAIL_TOP=0 SKIP=0 SHAPE=OK VOIDKIND=none GOTMP=(container /tmp)
+  RED_NAMES=1
+   TAIL| PASS
+   TAIL| ok  	github.com/CarlosShao/wisp/internal/winsec	4.019s
+c353 s2 gwL ./internal/winsec/ MODE=container RC=0 RUN=74 PASS_TOP=46 FAIL_TOP=0 SKIP=0 SHAPE=OK VOIDKIND=none GOTMP=(container /tmp)
+  RED_NAMES=1
+   TAIL| PASS
+   TAIL| ok  	github.com/CarlosShao/wisp/internal/winsec	3.875s
+== 逐名作差（每枚包分别 comm，⛔ 混包）==
+-- ./internal/winsec/ NEW_RED(only in landed)=0 GONE_RED(only in base)=0
+
+### 对乙 container（gwB ⇄ gwL）###
+c352w s1 gwB ./internal/winsec/ MODE=container RC=0 RUN=74 PASS_TOP=46 FAIL_TOP=0 SKIP=0 SHAPE=OK VOIDKIND=none GOTMP=(container /tmp)
+  RED_NAMES=1
+   TAIL| PASS
+   TAIL| ok  	github.com/CarlosShao/wisp/internal/winsec	3.893s
+c352w s2 gwL ./internal/winsec/ MODE=container RC=0 RUN=74 PASS_TOP=46 FAIL_TOP=0 SKIP=0 SHAPE=OK VOIDKIND=none GOTMP=(container /tmp)
+  RED_NAMES=1
+   TAIL| PASS
+   TAIL| ok  	github.com/CarlosShao/wisp/internal/winsec	3.940s
+== 逐名作差（每枚包分别 comm，⛔ 混包）==
+-- ./internal/winsec/ NEW_RED(only in landed)=0 GONE_RED(only in base)=0
+
+== driver END anchor ==
+HEAD_FULL_END=4fb6c088ceccf2036b3e755d9ab0220792d87513

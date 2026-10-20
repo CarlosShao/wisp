@@ -1,0 +1,45 @@
+== START anchor ==
+HEAD_FULL=607d661a55363968beb948aeb715ecf9b54b1644
+cfg r1 gwB MODE=container RC=1 RUN=196 PASS_TOP=112 FAIL_TOP=1 SKIP=0
+  RED=1
+   RED TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+cfg r1 gwL MODE=container RC=1 RUN=196 PASS_TOP=112 FAIL_TOP=1 SKIP=0
+  RED=1
+   RED TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+  -- 并集作差 r1 --
+   NEWRED TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+   GONERED TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+cfg r2 gwB MODE=container RC=1 RUN=196 PASS_TOP=111 FAIL_TOP=2 SKIP=0
+  RED=2
+   RED TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+   RED TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+cfg r2 gwL MODE=container RC=1 RUN=196 PASS_TOP=112 FAIL_TOP=1 SKIP=0
+  RED=1
+   RED TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+  -- 并集作差 r2 --
+   GONERED TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+cfg r3 gwB MODE=container RC=1 RUN=196 PASS_TOP=112 FAIL_TOP=1 SKIP=0
+  RED=1
+   RED TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+cfg r3 gwL MODE=container RC=1 RUN=196 PASS_TOP=111 FAIL_TOP=2 SKIP=0
+  RED=2
+   RED TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+   RED TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+  -- 并集作差 r3 --
+   NEWRED TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+
+== ★三发并集（⛔ 拿单发换位当新增红）==
+UNION_B=2
+  B TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+  B TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+UNION_L=2
+  L TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed
+  L TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent
+NEW_RED_UNION=0
+SAME_UNION=YES
+
+== 逐字红句（两侧各取一枚，供裁腿对判据形状）==
+-- /d/tmp/wisp/20261020/gw1/logs/cfg-r1-gwB.raw.txt --
+-- /d/tmp/wisp/20261020/gw1/logs/cfg-r1-gwL.raw.txt --
+== END anchor ==
+HEAD_FULL_END=a012480344b2631896efce6a7b2fc3b500a6d8e2
