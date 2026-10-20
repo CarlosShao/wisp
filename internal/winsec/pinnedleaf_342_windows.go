@@ -162,22 +162,36 @@ func pinRefusal(path, at string, err error) error {
 //
 // Refusing after the open is not cosmetic. privateFile writes only after sealHandle returns nil, so a
 // refusal here stops the bytes from landing in the followed object at all, and the removal this route
-// then performs is fd-relative, so it cannot delete a foreign name either. What it does NOT undo is a
-// truncation the open itself already carried out on the followed object: this package's Windows leaf
-// leg keeps that residual, and winsec.go's statement says so instead of claiming the window closed.
+// then performs is fd-relative, so it cannot reach a name in ANOTHER directory. ★What ticket 353
+// measured is that fd-relative is not object-relative: the name it removes lives inside the pinned
+// directory, and this platform's handle shares FILE_SHARE_DELETE
+// (internal/syscall/windows/at_windows.go:151), so that name can be vacated and re-filled with an
+// object the caller never named while this route holds the leaf - and a name-relative removal then
+// deletes that object's only name. unlinkPinnedLeaf therefore re-verifies the name against this
+// handle's object immediately before removing: that stops every top-up that arrived BEFORE the check
+// answered, and ★does NOT stop one arriving after it and before Deleteat binds the name. What it does
+// NOT undo is a truncation the open itself already carried out on the followed object: this package's
+// Windows leaf leg keeps that residual, and winsec.go's statement says so instead of claiming the
+// window closed.
+//
+// ★Ticket 353 form 乙: the handle's own identity reading (`pinned` below) is RETURNED instead of being
+// discarded where it is computed. That is what makes the refusal-path removal able to ask "does the
+// name I am about to remove still carry THIS object" one hop before it acts. It is an internal function
+// shape change and nothing wider: no new exported name, no new seam, no new production var, and no
+// change to what privateFile returns.
 //
 // The error shape keeps the by-name open's: *os.PathError with Op "open" and the full spelling, so the
 // leaf-leg attribution rule ticket 322 paid for ("open " and not "openat ") still means one thing here.
-func openPinnedLeaf(p leafPin, base string, flags int, perm fs.FileMode) (*os.File, error) {
+func openPinnedLeaf(p leafPin, base string, flags int, perm fs.FileMode) (*os.File, fs.FileInfo, error) {
 	full := filepath.Join(p.dir, base)
 	f, err := p.root.OpenFile(base, flags, perm)
 	if err != nil {
-		return nil, &os.PathError{Op: "open", Path: full, Err: underlyingErrorOf(err)}
+		return nil, nil, &os.PathError{Op: "open", Path: full, Err: underlyingErrorOf(err)}
 	}
 	pinned, err := f.Stat()
 	if err != nil {
 		_ = f.Close()
-		return nil, &os.PathError{Op: "open", Path: full, Err: underlyingErrorOf(err)}
+		return nil, nil, &os.PathError{Op: "open", Path: full, Err: underlyingErrorOf(err)}
 	}
 	// The name is read through the SAME pinned handle, with a non-following open (Root.Lstat), so this
 	// question is about the entry the caller named inside the object the route stands on - not about a
@@ -185,17 +199,17 @@ func openPinnedLeaf(p leafPin, base string, flags int, perm fs.FileMode) (*os.Fi
 	now, err := p.root.Lstat(base)
 	if err != nil {
 		_ = f.Close()
-		return nil, &os.PathError{Op: "open", Path: full, Err: underlyingErrorOf(err)}
+		return nil, nil, &os.PathError{Op: "open", Path: full, Err: underlyingErrorOf(err)}
 	}
 	if entryIsLink(now) {
 		_ = f.Close()
-		return nil, placementRefusalWindows(full, base, "the name carries a link, so this handle is not the object the caller named")
+		return nil, nil, placementRefusalWindows(full, base, "the name carries a link, so this handle is not the object the caller named")
 	}
 	if !os.SameFile(pinned, now) {
 		_ = f.Close()
-		return nil, placementRefusalWindows(full, base, "this handle is not the object the name carries now, so the bytes would not land in what the route pinned")
+		return nil, nil, placementRefusalWindows(full, base, "this handle is not the object the name carries now, so the bytes would not land in what the route pinned")
 	}
-	return f, nil
+	return f, pinned, nil
 }
 
 // unlinkPinnedLeaf removes the leaf name through the pinned parent handle: the fd-relative form of
@@ -204,13 +218,36 @@ func openPinnedLeaf(p leafPin, base string, flags int, perm fs.FileMode) (*os.Fi
 // unlinked, never followed, which is the behaviour tickets 118 and 120-r3 pin on the other platform.
 // There is no spelling left to re-resolve, so an ancestor swap cannot move this unlink.
 //
+// ★Ticket 353 form 乙 adds the identity re-check that the fd-relative removal cannot itself perform.
+// Being relative to the pinned DIRECTORY fixes which directory the name is looked up in; it does not
+// fix which object that name carries at the instant Deleteat binds it. So this takes the handle's
+// identity from openPinnedLeaf and asks the name, immediately before removing it, whether it still
+// carries that object. If it does not - a top-up landed before this check - the removal is skipped:
+// the object the caller never named keeps its only name.
+//
+// ★The two residuals this leaves, in the machine owner's own words when form 乙 was ratified:
+//   - a refused removal LEAVES the caller's name standing, and in the attacked state that name carries
+//     an object the caller never asked for. That is an observable behaviour change in the attack state
+//     (it used to be removed), and it is the accepted price of not deleting something un-named;
+//   - a top-up that lands AFTER this check answers and BEFORE Deleteat's NtOpenFile binds the name is
+//     NOT stopped. Closing that window needs a hook inside the platform's own NtOpenFile
+//     (internal/syscall/windows/at_windows.go:247); this package has no seam there and must not gain
+//     one, so the window is reported and not papered over (ticket 322 AC#1's shape).
+//
 // The error is still discarded, deliberately, exactly as `_ = os.Remove(resolved)` did: the route
 // returns the seal failure or the write failure, which is the more specific truth the caller has to
 // see, and changing what privateFile returns would be a change to C26's entry contract that this
 // landing is not authorised to make. Ticket 348's own table records the swallowing as an observed
 // cost of that boundary; the one thing this changes is that the removal itself is now safe.
-func unlinkPinnedLeaf(p leafPin, base string) {
-	if p.root == nil {
+func unlinkPinnedLeaf(p leafPin, base string, pinned fs.FileInfo) {
+	if p.root == nil || pinned == nil {
+		return
+	}
+	now, err := p.root.Lstat(base)
+	if err != nil || !os.SameFile(pinned, now) {
+		// Either the name cannot be answered, or it carries something other than the object this route
+		// opened. Both refuse the removal: neither may be resolved by deleting a name whose object this
+		// route cannot prove it owns.
 		return
 	}
 	_ = p.root.Remove(base)

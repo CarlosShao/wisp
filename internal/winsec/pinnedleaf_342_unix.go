@@ -91,6 +91,18 @@ func (p leafPin) close() error {
 
 // openPinnedLeaf opens the leaf name on the pinned parent descriptor.
 //
+// ★Ticket 353's third return value is answered with nil HERE, on purpose. The route is untagged
+// (winsec.go), so the Windows landing's identity re-check forces this signature onto every build set;
+// what it must NOT force onto this platform is behaviour. This file adds no extra syscall and no new
+// failure branch, and unlinkPinnedLeaf below keeps the fd-relative unlinkat exactly as ticket 348
+// landed it, because the damage 353 measured is a Windows-shape damage: it exists because this
+// package's Windows leaf handle carries FILE_SHARE_DELETE
+// (internal/syscall/windows/at_windows.go:151), which is what lets the leaf name be vacated and
+// re-filled while the route holds it. POSIX has no such sharing mask, and this platform's route
+// already answers the identity question twice before the removal - in pinPlacement's walk
+// (sameObjectPinned) and in sealHandle's inline faces below - so the parameter is taken and ignored,
+// and said out loud rather than silently.
+//
 // unix.O_CLOEXEC is not decoration: os.OpenFile marks the descriptor close-on-exec inside the Go
 // runtime and a raw openat does not inherit that behaviour. Without it every private write would
 // hand the leaf descriptor to whatever child process this process spawns, and the leak would
@@ -105,11 +117,11 @@ func (p leafPin) close() error {
 // openleaf_322_other_test.go tells ticket 322's leaf leg apart from pinPlacement's chain ELOOP by
 // precisely that difference ("open " and not "openat "), so renaming the operator here would
 // silence a pin that ticket 322 paid for.
-func openPinnedLeaf(p leafPin, base string, flags int, perm fs.FileMode) (*os.File, error) {
+func openPinnedLeaf(p leafPin, base string, flags int, perm fs.FileMode) (*os.File, fs.FileInfo, error) {
 	path := filepath.Join(p.name, base)
 	fd, err := unix.Openat(int(p.fd()), base, flags|unix.O_CLOEXEC, openModeBits(perm))
 	if err != nil {
-		return nil, &os.PathError{Op: "open", Path: path, Err: err}
+		return nil, nil, &os.PathError{Op: "open", Path: path, Err: err}
 	}
 	f := os.NewFile(uintptr(fd), path)
 	if f == nil {
@@ -118,9 +130,9 @@ func openPinnedLeaf(p leafPin, base string, flags int, perm fs.FileMode) (*os.Fi
 		// is the fact os.NewFile is reporting, and the descriptor is released here
 		// rather than leaked.
 		_ = unix.Close(fd)
-		return nil, &os.PathError{Op: "open", Path: path, Err: syscall.EBADF}
+		return nil, nil, &os.PathError{Op: "open", Path: path, Err: syscall.EBADF}
 	}
-	return f, nil
+	return f, nil, nil
 }
 
 // unlinkPinnedLeaf removes the leaf name through the pinned parent: unlinkat with flag 0, the
@@ -142,7 +154,12 @@ func openPinnedLeaf(p leafPin, base string, flags int, perm fs.FileMode) (*os.Fi
 // truth the caller has to see. Ticket 348's own现量 records the swallowing as an observed cost;
 // changing what this route returns would be a change to C26's entry contract, which is not this
 // landing's to make. The one thing this file does is make the removal itself safe.
-func unlinkPinnedLeaf(p leafPin, base string) {
+//
+// ★The `pinned` parameter is ticket 353's Windows identity reading, taken here and NOT used, for the
+// reason stated on openPinnedLeaf above: the route is untagged, so the signature travels to every
+// build set while the damage it guards was measured on the platform whose leaf handle shares DELETE.
+// Nothing on this branch changed: same unlinkat, same flag 0, same swallowing.
+func unlinkPinnedLeaf(p leafPin, base string, pinned fs.FileInfo) {
 	_ = unix.Unlinkat(int(p.fd()), base, 0)
 	runtime.KeepAlive(p.dir)
 }

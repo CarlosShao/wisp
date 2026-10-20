@@ -44,10 +44,16 @@ func pinnedParent(resolved string) (leafPin, error) {
 func (leafPin) close() error { return nil }
 
 // openPinnedLeaf refuses: with no pinned descriptor there is no leaf open that is not a by-name one.
-func openPinnedLeaf(leafPin, string, int, fs.FileMode) (*os.File, error) {
-	return nil, &os.PathError{Op: "open", Path: "unpinned", Err: errNoActTimePrimitive}
+//
+// ★The signatures of these two primitives are the route's (untagged winsec.go), so ticket 353's
+// Windows identity reading and re-check reach every build set. The extra reading is answered with nil
+// here because nothing is opened to describe: this build set refuses before any act, which is the
+// established direction (never wider, never silently by name), and the removal below still does
+// nothing. No behaviour on this build set changed.
+func openPinnedLeaf(leafPin, string, int, fs.FileMode) (*os.File, fs.FileInfo, error) {
+	return nil, nil, &os.PathError{Op: "open", Path: "unpinned", Err: errNoActTimePrimitive}
 }
 
 // unlinkPinnedLeaf does nothing: the by-name removal it would have to stand in for is the damage
 // ticket 348 booked, and doing nothing keeps the refused entry standing instead.
-func unlinkPinnedLeaf(leafPin, string) {}
+func unlinkPinnedLeaf(leafPin, string, fs.FileInfo) {}

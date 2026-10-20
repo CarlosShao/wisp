@@ -163,7 +163,7 @@ func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
 		return err
 	}
 	defer func() { _ = parent.close() }()
-	f, err := openPinnedLeaf(parent, filepath.Base(resolved), flags|oNoFollowPlatform, perm)
+	f, pinned, err := openPinnedLeaf(parent, filepath.Base(resolved), flags|oNoFollowPlatform, perm)
 	if err != nil {
 		// Returned verbatim, and deliberately NOT run through sealError: this is
 		// the open refusing, not a seal, and the entry that made it refuse is
@@ -174,12 +174,12 @@ func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
 	}
 	if err := sealHandle(f); err != nil {
 		_ = f.Close()
-		unlinkPinnedLeaf(parent, filepath.Base(resolved))
+		unlinkPinnedLeaf(parent, filepath.Base(resolved), pinned)
 		return sealError(resolved, err)
 	}
 	if _, err := f.Write(data); err != nil {
 		_ = f.Close()
-		unlinkPinnedLeaf(parent, filepath.Base(resolved))
+		unlinkPinnedLeaf(parent, filepath.Base(resolved), pinned)
 		return err
 	}
 	if err := f.Close(); err != nil {
