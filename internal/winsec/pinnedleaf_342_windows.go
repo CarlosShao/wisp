@@ -165,7 +165,7 @@ func pinRefusal(path, at string, err error) error {
 // then performs is fd-relative, so it cannot reach a name in ANOTHER directory. ★What ticket 353
 // measured is that fd-relative is not object-relative: the name it removes lives inside the pinned
 // directory, and this platform's handle shares FILE_SHARE_DELETE
-// (internal/syscall/windows/at_windows.go:151), so that name can be vacated and re-filled with an
+// (the sharing mask Go's own at_windows.go passes for a Root open), so that name can be vacated and re-filled with an
 // object the caller never named while this route holds the leaf - and a name-relative removal then
 // deletes that object's only name. unlinkPinnedLeaf therefore re-verifies the name against this
 // handle's object immediately before removing: that stops every top-up that arrived BEFORE the check
@@ -230,9 +230,10 @@ func openPinnedLeaf(p leafPin, base string, flags int, perm fs.FileMode) (*os.Fi
 //     an object the caller never asked for. That is an observable behaviour change in the attack state
 //     (it used to be removed), and it is the accepted price of not deleting something un-named;
 //   - a top-up that lands AFTER this check answers and BEFORE Deleteat's NtOpenFile binds the name is
-//     NOT stopped. Closing that window needs a hook inside the platform's own NtOpenFile
-//     (internal/syscall/windows/at_windows.go:247); this package has no seam there and must not gain
-//     one, so the window is reported and not papered over (ticket 322 AC#1's shape).
+//     NOT stopped. Closing that window needs a hook inside the platform's own NtOpenFile, which Go
+//     reaches through its at_windows.go syscall layer (the same one os.Root's descent opens on); this
+//     package has no seam there and must not gain one, so the window is reported and not papered over
+//     (ticket 322 AC#1's shape).
 //
 // The error is still discarded, deliberately, exactly as `_ = os.Remove(resolved)` did: the route
 // returns the seal failure or the write failure, which is the more specific truth the caller has to

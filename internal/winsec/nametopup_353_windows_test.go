@@ -31,7 +31,8 @@
 // so it refuses deterministically every top-up that landed BEFORE that re-check. A top-up that lands
 // in the window AFTER the re-check has answered and BEFORE `Deleteat`'s `NtOpenFile` binds the name
 // is NOT refused and NOT measurable here: producing that world needs a hook INSIDE the platform's
-// `NtOpenFile` (`internal/syscall/windows/at_windows.go:247`), and this package has no seam there and
+// `NtOpenFile` (Go reaches it through its own at_windows.go syscall layer, the one `os.Root`'s descent
+// opens on), and this package has no seam there and
 // must not gain one. The damage case below is therefore a claim about "a top-up that arrived before
 // the re-check" and about nothing else, and its green says so out loud. Same shape as ticket 322
 // AC#1's "report the window, do not paper over it": a blade that covers one world may not report

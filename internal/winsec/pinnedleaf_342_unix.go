@@ -97,7 +97,8 @@ func (p leafPin) close() error {
 // failure branch, and unlinkPinnedLeaf below keeps the fd-relative unlinkat exactly as ticket 348
 // landed it, because the damage 353 measured is a Windows-shape damage: it exists because this
 // package's Windows leaf handle carries FILE_SHARE_DELETE
-// (internal/syscall/windows/at_windows.go:151), which is what lets the leaf name be vacated and
+// (Go's at_windows.go passes that mask for a Root open; the os package's by-name open does not), which
+// is what lets the leaf name be vacated and
 // re-filled while the route holds it. POSIX has no such sharing mask, and this platform's route
 // already answers the identity question twice before the removal - in pinPlacement's walk
 // (sameObjectPinned) and in sealHandle's inline faces below - so the parameter is taken and ignored,
