@@ -1,0 +1,49 @@
+# 11 归因尺＋正控
+## A. 祖先尺（把每枚 CI head 与票 115 三枚 commit 的关系钉死）
+   c6dbbf94 是否是 d1056c0 的祖先：YES-含
+   527d3036 是否是 d1056c0 的祖先：YES-含
+   391878a8 是否是 d1056c0 的祖先：YES-含
+   527d3036 是否是 a13c6dc 的祖先：YES-含
+   391878a8 是否是 a13c6dc 的祖先：YES-含
+   391878a8 是否是 399a783 的祖先：NO-不含
+   527d3036 是否是 399a783 的祖先：NO-不含
+   391878a8 是否是 88d8956 的祖先：YES-含
+   （尺＝git merge-base --is-ancestor，算的）
+
+## B. 检查项 1 的 stub 尺正控（同尺打已知含 TODO/mock 的件）
+   全仓 tracked *.go 里 TODO|FIXME 命中文件枚数（正控，应非 0） = 0
+   全仓 tracked *.go 里 mock/stub/fake 词形命中文件枚数（正控） = 173
+   票 115 五枚件里这三词形命中枚数（本尺射程＝5 枚 HEAD blob） = 0
+   票 115 五枚件里 todo!()/unimplemented!() 命中枚数 = 0
+
+## C. AC#5 那味 continue-on-error：ci.yml 的命中是注释还是真用（尺＝逐枚现读）
+   6:# skippable: no `if: false`, no continue-on-error, no skip flags. Runner
+   34:  # No `if:`, no continue-on-error, no skip flag anywhere in this block
+   105:        # an `if:`, or made continue-on-error (D22 run-away mode 6).
+   126:        # skippability, or given continue-on-error (D22 run-away mode 6).
+   141:        # step was moved, edited, deleted, given an `if:`, or made continue-on-error
+   185:      # `if:`, or made continue-on-error. It sits directly BELOW the gofmt step
+   287:        #    answers. continue-on-error is NOT used (D22 run-away mode 6,
+   344:        # edited, deleted, reordered, given continue-on-error, or has its own
+   384:        # continue-on-error is not used (D22 run-away mode 6). It matters here
+   527:  # step was deleted, and NO step here carries `continue-on-error`, whose entire
+   571:        # continue-on-error (D22 run-away mode 6).
+   584:        # continue-on-error, and the package stays in the list.
+   660:        # non-setup steps in this job carry. No continue-on-error, no job-level
+   735:        # step here carries `continue-on-error` (D22 run-away mode 6) - a red
+   882:  # deliberately not a skip (no `if:`, no continue-on-error, no -Skip switch) -
+   933:          # unconditional (no `if:`, no continue-on-error, D22 mode-6), so the
+   969:  # D22 mode-6: no `if:`, no `continue-on-error`, no skip flag, no path filter.
+   票 115 三枚 commit 碰过 ci.yml 几次（尺＝git rev-list --count 区间内逐枚 name-only 复核）：
+     391878a8 -> 0
+     527d3036 -> 0
+     c6dbbf94 -> 0
+
+## D. 票 115 的六处比对面今天仍是按树（@HEAD blob，⛔ 别腿脏件）
+   narrow_notice :79/:90 = 			if noticeNamesTree(narrowNotice{Path: path}, p) {|		if noticeNamesTree(n, inherited) {|
+   EqualFold 在这三枚用例文件里残余次数（尺＝grep -c）= 0
+
+## E. RewrittenRoots 生产读取者（115 自述不推翻 105那一半，本腿独立复算）
+   HEAD:internal/tools/bridge.go:1168:	// account. Until here the only consumers of Roots()/RewrittenRoots()/
+   HEAD:internal/tools/bridge.go:1226:	return b.paths.Roots(), b.paths.RewrittenRoots(), b.paths.UnusableRoots()
+   HEAD:internal/tools/paths.go:262:func (p *PathCanonicalizer) RewrittenRoots() []string {
