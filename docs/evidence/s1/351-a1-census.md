@@ -2,7 +2,8 @@
 
 HEAD 起手锚＝本腿第一笔 `git log -1` 现认＝`14e5d8395adaf54bec14199f6858382b57fa49dd`（`dev`，2026-10-20 09:58:30 +08）。
 散件＝`.scratch/wisp/probes/351/a1/logs/`：`00-rulers.md`（五把尺＋正控＋四数复尺）／`01-ac0-roster.md`（名册）／
-`02-ac1-verdict.md`（定性＋三支凭据＋到达数分子）／`03-ac2-shape.md`（形状＋AC#3 判定）。
+`02-ac1-verdict.md`（定性＋三支凭据＋到达数分子）／`03-ac2-shape.md`（形状＋AC#3 判定）／`04-red-windows.md`
+（★两枚决定性红窗逐字入库＋"逐行与源件对回"的尺）。
 ★台面＝⛔ 任何 `go test`（本波 `296-v2` 正在 `cmd/wisp` 上定向色）；凭据只来自**盘上既有日志＋CI 日志＋`git grep HEAD`**。
 
 ## 一、结论（三句）
