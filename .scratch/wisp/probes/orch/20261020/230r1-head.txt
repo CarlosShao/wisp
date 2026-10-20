@@ -1,0 +1,13 @@
+派单＝票 230 注释面落地腿 230-r1（★写腿·只改注释·`internal/agent/approval/queue.go`）｜编排者＝新任 harness｜发出 2026-10-20 15:2x +08
+★主题起头⛔ 换形：每笔主题以逐字「**票 230 落地腿 230-r1**」开头。
+
+## 你是谁／这一趟只做一格
+票 230 有 5 格（现量 `grep -cE '^- \[ \]'`＝5、已勾 0），★你这趟**只做 `AC#2`**＝把那枚假注释改成实话。`AC#1`（票 115 七项检查表）＝另派了 `115-v1` 读腿；`AC#3`/`AC#4`＝编排者裁后再排；`AC#5`＝纪律格。票面＝`.scratch/wisp/issues/230-four-cells-left-unfinished-inside-closed-tickets.md`。
+`AC#2` 原句＝"`queue.go` 里那句'本函数是 `q.alias` 的唯一读者、`Queue.reject` 是唯一调用者'是假话——同文件另有读者"。★**内容锚**（⛔ 用绝对行号，行号已漂：编排者 15:2x 现读 `queue.go:247` 已是别的语句）＝自己 `git grep -n 'only reader of q.alias' HEAD -- internal/agent/approval/queue.go` 定位那段文档注释，再读上下文确认它今天还假在哪（`file:line` 点名其余读者）。
+★判据（票面逐字）＝**只改注释、不改行为**：把"唯一读者"改成说实话（点名其余读者＋说明为什么 allow 侧仍不可达），或把那几处读者的存在具名解释掉；⛔ 不许把 `Queue.reject` 分支改宽、⛔ 动 `Queue` 任何授权判定。判据尺＝`git show -U0` 每枚变动行都以 `//` 开头（★可执行字节变动＝0；与 `296-r2` 同一把尺，你自己算出来给我看）＋改完注释与盘上形状一致＋门绿。
+
+## ★跨腿耦合（放腿前现读）
+另两枚写腿在跑：`352-r1`（`internal/winsec/winsec.go:430`）、`351-r2`（`cmd/wisp` 测试面）；两枚读腿在跑。⇒ ①你⛔ 动那两包任何字节；②★`queue.go` 与票 220 同包＝**只你一枚写它**（票 220 今天⛔ 派）；③你跑色限 `./internal/agent/...` 定向（★⛔ 整包 `./cmd/wisp`、⛔ `./...`、⛔ 跑 `./internal/winsec/`）；④★每次"编辑→`gofumpt -l` 只验自己那枚→即时 commit"，⛔ 攒一批、⛔ `-w` 扫别人文件（别人写面的半保存态会洗脏彼此读数）。
+台面四味＋Git 纪律见公共块 o（★`GOTMPDIR` 反斜杠短根；★`cygpath -wp` 只仓外取 DLL；★判据只认到达数；取 blob 落仓外、副本⛔ 叫 `.go`；⛔ `cut -c` 按字节截中文；⛔ 并行跑改文件脚本；新件先 `git add`；`-F` Windows 形；提交后 `git log -1`＋`git show --name-only` 对回）。门禁：`GOFLAGS= go build ./...`／`sh scripts/d22scan.sh`／`gofmt -l`⇄`gofumpt -l` 并排两把（⛔ 洗别人已知脏件、⛔ 把裸 gofumpt 的 rc=127 当"跳过"）各落 `rc=`。
+写面＝`internal/agent/approval/queue.go`（注释）＋`.scratch/wisp/probes/230/r1/**`＋票 230 尾一条只追加 bullet＋Progress log 一行。⛔ 翻框（`AC#2` 归非实现者裁）、⛔ 改票名/`Status:`/`-done`、⛔ 把任何 `-done` 改名回来"解决"（那后缀是防重领唯一键）、⛔ push。
+做完或卡住 send_message 报 lead：逐枚提交号＋`git show -U0` 可执行字节变动＝0 的量证＋定位尺（内容锚命中处 `file:line`）＋改后注释原文（逐字）＋"其余读者"名册＋门禁四把 rc＋票 230 框终量（须 0 勾／5 未勾＝你一枚没翻）＋票尾 numstat（须纯追加）。

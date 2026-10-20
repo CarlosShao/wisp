@@ -1,0 +1,19 @@
+派单＝票 352 落地腿 352-r1（★写腿·产码＝一行 `wrapPath` errno 那半 `%v`→`%w`）｜编排者＝新任 harness｜发出 2026-10-20 15:2x +08
+★主题起头⛔ 换形：每笔 commit 的主题必须以逐字串「**票 352 落地腿 352-r1**」开头（⛔ 英文、⛔ 全角变体、⛔ 中途改形状＝编排者收件尺锚定它，今天已有两枚腿因此被迫逐枚 hash 复验＝`A1045`）。
+
+## 你是谁／授权
+你是票 **352** 的落地腿（写·产码）。票面＝`.scratch/wisp/issues/352-wrappath-errno-half-stringified-so-fs-ernotexist-cannot-punch-through-private-route.md`（4 格全未勾）。
+★这道改动**机主已批**（口令＝"批"，落档 `A1056`④⇄`A1058`，来源＝终裁腿 `342-v2` 必答(v) 独立签"修回 errno 可穿"）＝**你⛔ 再谈该不該批、⛔ 扩射程**：本票只此一行语义，多一枚文件的改动都算越界。
+写面只有三处＝`internal/winsec/winsec.go`（★只许 `wrapPath` 函数体内那一枚格式的串）＋`.scratch/wisp/probes/352/r1/**`＋票 352 尾**一条**只追加 bullet＋Progress log 一行。
+
+## ★跨腿耦合（本波特有，放腿前现读）
+另两枚写腿同时在跑：`351-r2` 编辑 `cmd/wisp/**`、`230-r1` 编辑 `internal/agent/approval/**`。★`cmd/wisp` 的导入图含 `internal/winsec`＝**你改 `winsec.go` 会进它的编译面** ⇒ ①你每次"编辑→`gofumpt -l internal/winsec/winsec.go`（只验自己这枚）→即时 commit"，停留⛔ 超过一次编译所需、⛔ 攒一批；②★先把 `AC#0`（改前基线读数）打完、**最后再落那一行**；③⛔ `gofumpt -w`／`go fmt` 扫全仓或别人文件；④⛔ 跑 `./cmd/wisp`⇄`./internal/agent/**` 的包测（那是别腿写面）。
+
+## 要做（按票面四格；⛔ 翻框＝AC#0..AC#3 全归非实现者裁）
+- **AC#0 改前钉死**：两平台各量"父目录不存在"那一跳今天的两个真值（`errors.Is(err, fs.ErrNotExist)`＝false ⇄ `errors.Is(err, ErrNotSealable)`＝true），逐字红/绿句入库＝AC#1 的对照物。
+- **AC#1 落地那一行**＝`fmt.Errorf("%w: %s: %w", ErrNotSealable, path, err)`（双 `%w`，go1.27 OK）。★判据＝改后**两分类并存**：`fs.ErrNotExist` 可穿 **且** `ErrNotSealable` 照旧 true（只把不可穿换成另一种不可穿＝没修）。POSIX（容器）⇄Windows（本机）各≥2 发逐字。★⛔ 动任何其他跳分类、⛔ 动 `sealError` 幂等判定、⛔ 新增导出名、⛔ 改函数签名、⛔ 碰 `pinnedleaf_342_windows.go:11-20`/`:158-170`（＝〔丙〕另批）、⛔ 碰 `:118-140` 自陈段。
+- **AC#2 消费者面**＝`internal/secret`⇄`config`⇄`memory`⇄`agent`⇄`panel` 五包各自跑色＋落地⇄基线成对逐名作差＝新增红 0 枚；★具名连带：`private_fail_test.go:37/50/61/72/75` 五枚 `ErrNotSealable` 判定须仍绿、读 `ErrUnresolvedPath` 的 `openleaf_322`⇄`placement_symlink_113` ⛔ 受影响。★`cmd/wisp` 整包⛔ 跑（本波明令＝归编排者那窗，且会撞 `351-r2` 写面）。
+- **AC#3 纪律**＝名册＋写面自证（见公共块）。
+
+台面四味＋Git 纪律见派单尾"公共块"（★`GOTMPDIR` 反斜杠短根；★`cygpath -wp` 只仓外取 DLL 用、共享树⛔ 转；★判据只认到达数；⛔ 并行跑改文件脚本；新件先 `git add`；`-F` 用 Windows 形路径；提交后 `git log -1`＋`git show --name-only` 对回）。★容器 `TMPDIR`⇄`GOTMPDIR` ⛔ 绑 Windows 卷（`os.SameFile` 失真）；门禁四数只在共享树、跑前 `unset GOTMPDIR TMPDIR TEMP TMP`；`go vet` 交叉档⛔ 与本机档成对判红绿。
+150 轮帽＝真的，先做 AC#0/AC#1。做完或卡住 send_message 报 lead：逐枚提交号＋`git show --name-only` 越界⇄`.go` 枚数（★产码只 1 枚、且该笔 diff 只含 `wrapPath` 那一行＝把 `git show -U0` 逐行贴出来当凭据）＋改前后两平台四值对照（逐字）＋五包成对逐名作差表＋门禁四数 rc＋票 352 框终量（须 0 勾／4 未勾＝你一枚没翻）＋票尾 numstat（须纯追加）＋`winsec.go` 各笔 blob 串（供我判 `351-r2` 读数可比性）。

@@ -1,0 +1,22 @@
+派单＝票 351 落地趟 351-r2（★写腿·只动测试面＝`cmd/wisp/config_reload_223_test.go` 函数体·三格确定性形状）｜编排者＝新任 harness｜发出 2026-10-20 15:2x +08
+★主题起头⛔ 换形：每笔主题以逐字「**票 351 落地腿 351-r2**」开头（今天两枚腿换形逼我逐枚 hash 复验＝`A1045`，别再给我加一遍）。
+
+## 你是谁／凭据从哪来
+你是票 **351** 的落地腿（写·**⛔ 动任何产码字节**）。票面＝`.scratch/wisp/issues/351-*.md`（现量 3 勾／2 未勾＝未勾的 `AC#2`⇄`AC#3`）。
+★`AC#2` 的形状⛔ 由你发明——普查腿 `351-a1` 已给出三格形状（普查件 `docs/evidence/s1/351-a1-census.md` 124 行／12739 字节＋`probes/351/a1/logs/03-ac2-shape.md`）＝你照它落，⛔ 放宽它给的判据；`AC#1` 已定性＝**仪器形状（运行学时序）**、⛔ 产品缺陷、⛔ CI 环境，所以 AC#3（若判真缺陷）本趟**不该触发**（若你落 G1..G3 时发现它其实要产码带 key＝★立刻停手上报＝那是 `351-a1` 具名的"需新产码接缝＝第二道批准"那形，先例 `342-r2`）。
+你的写面＝★**只有 `cmd/wisp/config_reload_223_test.go` 那枚已存在的函数体**（`351-a1` 明写⛔ 新文件⛔ 新 helper）＋`.scratch/wisp/probes/351/r2/**`＋票 351 尾一条只追加 bullet＋Progress log 一行。
+
+## ★跨腿耦合（放腿前我现读出来的）
+`352-r1` 同时在改 `internal/winsec/winsec.go:430`（机主已批的 `%v`→`%w`），而 `cmd/wisp` 的导入图含 `internal/winsec` ⇒ ①你每次编译可能撞到它半保存态：★红句若点名 `internal/winsec/**`＝**具名上报、⛔ 你去动它、⛔ 据此判自己失败**；②★你改前两发起手现跑 `git rev-parse HEAD:internal/winsec/winsec.go` 把那颗 blob 记进件（＝可比性凭据）；③`230-r1` 在写 `internal/agent/approval`＝⛔ 你碰；④★⛔ 跑 `go test ./internal/winsec/` 整包。
+
+## 要做（三格各自可失败；★这格最容易被糊过去，我先把话说死）
+- **G1 settle**＝`plant` 前先 `awaitAudit(state=armed)`＋基线 `before := windowCount()`（应＝0）＋`awaitStdout("配置热加载已接管")`；★现量＝plant 7 处只有 3 处先等 armed、你改的是 `:541` 那枚裸种。
+- **G2 通知在场**＝分子＝`windowCount() - before == 1`＋`awaitStdout("[确认 L2 config.reload]"…)` **独立一格**（⛔ 和文案格合并）。
+- **G3 文案点名**＝在 G2 返回的那条流上 `Contains(…, "risk.permission_mode")`（★串⛔ 改，只把读源从"单读 `r.h.out.String()`"换成"await 的返回值"）。
+★判据＝**G2 绿⇄G3 红才是"真缺陷"那一形**；两格都绿＝修好；G2 红＝时序没 settle（仪器问题）。包内先例＝同文件 `:402⇄:405` 两格并列、`ticket224_assembly:270/:272` 分子差值、现成尺 `:117/:148`＋`run.go:929`。
+★★⛔ 三件：⛔ 放宽任何既有断言（尤其⛔ 把 `Contains(key)` 改成"有句话就行"＝把问题扫到地毯下）；⛔ 加 `time.Sleep` 哄时序；⛔ 用 `t.Skip` 绕（无具名登记面的裸 Skip 本仓禁止）。
+- **AC#3 敏感度自证（★这趟最硬的一味）**＝仓外导出树两发去牙：①删 `run.go:1441` 那枚印字 ⇒ **G2 与 G3 都该红**；②只删 keys 那味 ⇒ 只 G3 红。两发都⛔ 碰跟踪文件、⛔ `-overlay`、落刀前后各验锚命中＋报 pristine⇄还原哈希（逐字回）；`go vet ./cmd/wisp/` 每发各 rc=0。★⛔ 一把两种形状都放行的尺。
+- 读数＝`-run 'TestTicket223'`（含同族别枚）基线⇄落地成对各≥2 发、四数只在 `^=== RUN`/`^--- PASS`/`^--- FAIL`/`^--- SKIP` 取、逐名作差；★`go test` 把正文印在 `--- FAIL` **之前**（⛔ 事后 grep 配错行）；取退码＝重定向文件＋`echo RC=$?` 紧跟裸命令（⛔ 管进 `tail`）。
+
+台面四味＋Git 纪律见公共块 o（★`GOTMPDIR` 反斜杠短根＝长根/正斜杠会让真 junction 建不出造一片假红；★`cygpath -wp` 只仓外取 DLL 用、共享树⛔ 转；★判据只认到达数；⛔ 并行跑改文件脚本；新件先 `git add`；`-F` Windows 形；提交后对回）。★机主常驻 `wisp.exe`（现量在场）占 `Ctrl+Alt+Q/M/P`＝`cmd/wisp` 里热键族红⛔ 归你新造、⛔ 据此判失败、⛔ 停他的进程。⛔ `cmd/wisp` **整包**⛔ 跑（唯一持跑者＝编排者那窗）＝你只定向 `-run`。
+150 轮帽＝真的，先落 G1..G3＋AC#3 去牙。做完或卡住 send_message 报 lead：逐枚提交号＋`git show --name-only` 越界⇄`.go` 枚数（★产码字节变动＝0 的凭据＝`git show -U0` 逐行首字符统计）＋三格各自的红/绿句（成对）＋两发去牙红句与还原哈希＋`winsec.go` 那颗 blob＋定向四数逐名作差＋票 351 框终量（须 3 勾／2 未勾＝你一枚没翻）＋票尾 numstat 纯追加。
