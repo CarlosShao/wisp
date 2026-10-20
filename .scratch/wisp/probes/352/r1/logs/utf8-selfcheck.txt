@@ -1,0 +1,9 @@
+== 正控（按字节截断的中文＝该报 INVALID＝尺灵）==
+/d/tmp/wisp/20261020/352r1/posctrl-bad-utf8.txt              UTF8=INVALID CR=0 BYTES=2
+== 我写面净化后的六枚（该全 VALID、CR=0）==
+ac2-col-s1-treeB.raw.txt                                     UTF8=VALID CR=0 BYTES=241078
+ac2-col-s2-treeL.raw.txt                                     UTF8=VALID CR=0 BYTES=240722
+ac2-host-fiv-s1-treeB.raw.txt                                UTF8=VALID CR=8 BYTES=204218
+ac2-host-fiv-s2-treeL.raw.txt                                UTF8=VALID CR=8 BYTES=204211
+ac2-host-pair-s1-treeB.raw.txt                               UTF8=VALID CR=8 BYTES=471017
+ac2-host-pair-s2-treeL.raw.txt                               UTF8=VALID CR=8 BYTES=470927

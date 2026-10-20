@@ -1,0 +1,42 @@
+== 净化前逐枚命中 ==
+NO_HITS_BEFORE
+== 净化后命中（应全 0）==
+HITS_AFTER=0
+== 正控：U+00B7（间隔号）在场与否＝同一 perl 尺另数，证那枚没被顺手换 ==
+MIDDLE_DOT_U00B7_TOTAL_IN_LOGS=0
+== 净化行数＝只那六枚有命中的件被改（其余件字节⛔ 动＝sha 对回）==
+a6bfef6e1b0f2a330f4f11a702f02be6298539e485b29f09e55299a6f344482e *ac2-col-s1-treeB.raw.txt
+88056abb4d8232c00cf8af597735249aa4ba12614a8b834850c63fbcbd5cdd81 *ac2-col-s2-treeL.raw.txt
+4ae21e67ab0afe6535483d4ddfbf928533f4db2dc6955da96d5d35e4fecf8bdf *ac2-host-fiv-s1-treeB.raw.txt
+9ba8557b0ba12021b84477ef310a1b69196ee4938fbb08493c83bc8a4ae3b8ba *ac2-host-fiv-s2-treeL.raw.txt
+69965bf9ec85b436d5b70954feb2b6c99da35b10d0b06edc96d0aacec2921e9f *ac2-host-pair-s1-treeB.raw.txt
+0e6e7216fff02f9680abc2f7c600d3dd016567c0560b26717a7987304192821b *ac2-host-pair-s2-treeL.raw.txt
+== ★diff 纯度尺＝那六枚里每个 hunk 都只改那一枚字符（增删行逐字对偶）==
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-col-s1-treeB.raw.txt', LF will be replaced by CRLF the next time Git touches it
+ac2-col-s1-treeB.raw.txt           NUMSTAT=2增 2删
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-col-s1-treeB.raw.txt', LF will be replaced by CRLF the next time Git touches it
+   PAIRED_ROWS=2/2  (★每枚删除行换码位名后逐字＝对应增加行 ⇒ 只换那一枚字符、⛔ 动读数)
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-col-s2-treeL.raw.txt', LF will be replaced by CRLF the next time Git touches it
+ac2-col-s2-treeL.raw.txt           NUMSTAT=2增 2删
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-col-s2-treeL.raw.txt', LF will be replaced by CRLF the next time Git touches it
+   PAIRED_ROWS=2/2  (★每枚删除行换码位名后逐字＝对应增加行 ⇒ 只换那一枚字符、⛔ 动读数)
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-host-fiv-s1-treeB.raw.txt', LF will be replaced by CRLF the next time Git touches it
+ac2-host-fiv-s1-treeB.raw.txt      NUMSTAT=2增 2删
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-host-fiv-s1-treeB.raw.txt', LF will be replaced by CRLF the next time Git touches it
+   PAIRED_ROWS=2/2  (★每枚删除行换码位名后逐字＝对应增加行 ⇒ 只换那一枚字符、⛔ 动读数)
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-host-fiv-s2-treeL.raw.txt', LF will be replaced by CRLF the next time Git touches it
+ac2-host-fiv-s2-treeL.raw.txt      NUMSTAT=2增 2删
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-host-fiv-s2-treeL.raw.txt', LF will be replaced by CRLF the next time Git touches it
+   PAIRED_ROWS=2/2  (★每枚删除行换码位名后逐字＝对应增加行 ⇒ 只换那一枚字符、⛔ 动读数)
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-host-pair-s1-treeB.raw.txt', LF will be replaced by CRLF the next time Git touches it
+ac2-host-pair-s1-treeB.raw.txt     NUMSTAT=2增 2删
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-host-pair-s1-treeB.raw.txt', LF will be replaced by CRLF the next time Git touches it
+   PAIRED_ROWS=2/2  (★每枚删除行换码位名后逐字＝对应增加行 ⇒ 只换那一枚字符、⛔ 动读数)
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-host-pair-s2-treeL.raw.txt', LF will be replaced by CRLF the next time Git touches it
+ac2-host-pair-s2-treeL.raw.txt     NUMSTAT=2增 2删
+warning: in the working copy of '.scratch/wisp/probes/352/r1/logs/ac2-host-pair-s2-treeL.raw.txt', LF will be replaced by CRLF the next time Git touches it
+   PAIRED_ROWS=2/2  (★每枚删除行换码位名后逐字＝对应增加行 ⇒ 只换那一枚字符、⛔ 动读数)
+== UTF-8 合法性＋CR 尺（⛔ iconv：那命令在这台 shell 里没有，命令找不到时的BAD_UTF8是假警＝公共块报 0 命中前先跑正控同味）==
+"deencode" is not exported by the Encode module
+Can't continue after import errors at /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/352/r1/sh/09-utf8-ruler.pl line 4.
+BEGIN failed--compilation aborted at /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/352/r1/sh/09-utf8-ruler.pl line 4.

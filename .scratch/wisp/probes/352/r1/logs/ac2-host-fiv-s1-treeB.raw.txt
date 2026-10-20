@@ -1787,7 +1787,7 @@ time=2026-10-20T16:19:40.568+08:00 level=INFO msg="startup WAL checkpoint (TRUNC
           bridge.go:107: inbound envelope ComposerRequest can bind the JSON key "outcome" - a verdict a page can set, which D33/F2 and R20 keep native-side only: Outcome string `json:"outcome,omitempty"`
 === RUN   TestPlantedGrantWiringGoesRedInASnapshot/B_Go_answering_panel.approval.request_goes_red
     l2_grant_boundary_test.go:2283: red as required:
-          bridge.go:154: Go answers the inbound route "panel.approval.request", whose own name is an approval decision - a panel-side allow door (AGENTS.md §1.2 ban #6, D33/F2)
+          bridge.go:154: Go answers the inbound route "panel.approval.request", whose own name is an approval decision - a panel-side allow door (AGENTS.md U+00A71.2 ban #6, D33/F2)
 === RUN   TestPlantedGrantWiringGoesRedInASnapshot/E_a_guard_route_reached_through_a_var_or_a_concatenation_is_named,_not_dropped
     l2_grant_boundary_test.go:2320: loud as required, and the names are not invented:
           bridge.go:156: "panel.review." + acceptE3Tail
@@ -1802,7 +1802,7 @@ time=2026-10-20T16:19:40.568+08:00 level=INFO msg="startup WAL checkpoint (TRUNC
           l2-plant-h.go:8: inbound envelope grantByFieldName can bind the JSON key "Outcome" - a verdict a page can set, which D33/F2 and R20 keep native-side only: Outcome string `json:",omitempty"`
 === RUN   TestPlantedGrantWiringGoesRedInASnapshot/C_a_wired_grant_door_goes_red_on_both_halves
     l2_grant_boundary_test.go:2477: red as required:
-          bridge.go:154: Go answers the inbound route "panel.approval.request", whose own name is an approval decision - a panel-side allow door (AGENTS.md §1.2 ban #6, D33/F2)
+          bridge.go:154: Go answers the inbound route "panel.approval.request", whose own name is an approval decision - a panel-side allow door (AGENTS.md U+00A71.2 ban #6, D33/F2)
           grant_handler.go:8: inbound envelope grantThrough can bind the JSON key "outcome" - a verdict a page can set, which D33/F2 and R20 keep native-side only: Outcome string `json:"outcome"`
 === RUN   TestPlantedGrantWiringGoesRedInASnapshot/D_the_historical_JSX_button_is_invisible_to_this_instrument
     l2_grant_boundary_test.go:2501: ZERO INSTRUMENT COVERAGE, measured not assumed: a tree holding the verbatim 53a1359^ button (send("grant") -> panel.approval.request carrying outcome:"grant") reads CLEAN to this instrument, because it reads Go and the violation is drawn in JSX.

@@ -55,6 +55,8 @@ for TREE in treeB treeL; do
   LINE="$LABEL s$i $TREE MODE=$MODE RC=$RC RUN=$RUN PASS_TOP=$PT FAIL_TOP=$FT SKIP=$SK SHAPE=$SHAPE WINSEC_SHA256=$POST RESTORE=$RESTORE GOTMP=$GT"
   echo "$LINE"
   echo "$LINE" >> "$LOGS/four-counts-consumers.tsv"
-  grep -E '^--- FAIL' "$OUT" | sed 's/^--- FAIL: //; s/ *([0-9.]*s)//' | sort > "$LOGS/${LABEL}-s$i-$TREE.rednames.txt"
+  grep -E '^--- FAIL' "$OUT" | sed 's/^--- FAIL: //; s/ *([0-9.]*s)//' | sort > "$LOGS/${LABEL}-s$i-$TREE.rednames.body"
+  { echo "# RED_NAMES=$(grep -c . "$LOGS/${LABEL}-s$i-$TREE.rednames.body" || true)（★⛔ 0 字节件：零枚红时名册仍写这行说明；尺＝^--- FAIL 计数，同发四数见 four-counts-consumers.tsv）"; cat "$LOGS/${LABEL}-s$i-$TREE.rednames.body"; } > "$LOGS/${LABEL}-s$i-$TREE.rednames.txt"
+  rm -f "$LOGS/${LABEL}-s$i-$TREE.rednames.body" 2>/dev/null || true
   echo "  RED_NAMES=$(wc -l < "$LOGS/${LABEL}-s$i-$TREE.rednames.txt")"
 done
