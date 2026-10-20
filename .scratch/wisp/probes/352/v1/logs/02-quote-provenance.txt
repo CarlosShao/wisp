@@ -1,0 +1,64 @@
+== A) AC#0 报告件标称"逐字"的六行引文，逐枚在底片里逐字节找（尺＝grep -qF 整行）==
+   报告件＝readings-ac0-before.md :53-56（POSIX 档）⇄ :61-64（Windows 档）
+   射程＝HEAD 下 probes/352/** 全件（含 md／sh／tsv，⛔ 只扫 logs）＝93 枚
+  report:54 [R1] 命中件= ac0-col-base-s1-mut-1-treeB.raw.txt
+  report:55 [R3] 命中件= ac0-col-base-s1-mut-1-treeB.raw.txt ac0-col-base-s2-mut-2-treeB.raw.txt ac0-col-base1-mut-treeB.raw.txt ac0-host-base-s1-mut-1-treeB.raw.txt ac0-host-base-s2-mut-2-treeB.raw.txt ac0-host-base1-mut-treeB.raw.txt ac1-col-s1-mut-1-treeB.raw.txt ac1-col2-s1-mut-1-treeB.raw.txt ac1-host-s1-mut-1-treeB.raw.txt ac1-host2-s1-mut-1-treeB.raw.txt
+  report:56 [R4] 命中件= ac0-col-base-s1-mut-1-treeB.raw.txt
+  report:62 [R1] 命中件=  (零命中＝该行不在任何入库件里)
+  report:63 [R3] 命中件= ac0-col-base-s1-mut-1-treeB.raw.txt ac0-col-base-s2-mut-2-treeB.raw.txt ac0-col-base1-mut-treeB.raw.txt ac0-host-base-s1-mut-1-treeB.raw.txt ac0-host-base-s2-mut-2-treeB.raw.txt ac0-host-base1-mut-treeB.raw.txt ac1-col-s1-mut-1-treeB.raw.txt ac1-col2-s1-mut-1-treeB.raw.txt ac1-host-s1-mut-1-treeB.raw.txt ac1-host2-s1-mut-1-treeB.raw.txt
+  report:64 [R4] 命中件=  (零命中＝该行不在任何入库件里)
+== B) 拼接坐实：被引那枚 Windows R1 行的 run 根⇄测试目录名分属两枚不同底片 ==
+  ac0-host-base-s1-mut-1-treeB     352r1-20261020-160844-1453 TestP352R1ErrClassify1935309345 
+  ac0-host-base-s2-mut-2-treeB     352r1-20261020-160850-1453 TestP352R1ErrClassify2519664488 
+  ac0-host-base1-mut-treeB         352r1-20261020-160437-1512 TestP352R1ErrClassify1725796622 
+  report:62 所引那一行        352r1-20261020-160844-1453 TestP352R1ErrClassify1725796622 (两个形各自只在一枚底片里出现＝拼接)
+== C) 那三枚底片里 R1⇄R4 的分类位（＝判据承载位，逐枚现量）==
+  ac0-host-base-s1-mut-1-treeB R1  isErrNotExist=false isNotSealable=true isErrExist=false isUnresolved=true
+     同底片 R4                  isErrNotExist=false isNotSealable=true isErrExist=false isUnresolved=false
+  ac0-host-base-s2-mut-2-treeB R1  isErrNotExist=false isNotSealable=true isErrExist=false isUnresolved=true
+     同底片 R4                  isErrNotExist=false isNotSealable=true isErrExist=false isUnresolved=false
+  ac0-host-base1-mut-treeB R1      isErrNotExist=false isNotSealable=true isErrExist=false isUnresolved=true
+     同底片 R4                  isErrNotExist=false isNotSealable=true isErrExist=false isUnresolved=false
+  report:62 所引那一行 R1     isErrNotExist=false isNotSealable=true isErrExist=false isUnresolved=true
+  report:64 所引那一行 R4     isErrNotExist=false isNotSealable=true isErrExist=false isUnresolved=false
+== D) AC#1 报告件标称"逐字"的六行（:50-52 POSIX ⇄ :58-60 Windows）同尺对撞 ==
+  report:50 逐字节在 ac1-col-s2-mut-2-treeL ＝YES
+  report:51 逐字节在 ac1-col-s2-mut-2-treeL ＝YES
+  report:52 逐字节在 ac1-col-s2-mut-2-treeL ＝YES
+  report:58 逐字节在 ac1-host-s2-mut-2-treeL ＝YES
+  report:59 逐字节在 ac1-host-s2-mut-2-treeL ＝YES
+  report:60 逐字节在 ac1-host-s2-mut-2-treeL ＝YES
+== E) probe-copy-of-stage.txt：件内首行自我声明 ⇄ 它在 HEAD 的跟踪状态 ==
+  首行＝// 352-r1 仓外探针件（★只存在于 D:\tmp 的拷贝树，⛔ 入库、⛔ 任何跟踪字节）。
+  git ls-files 跟踪状态＝TRACKED（与首行声明相反）
+  与 probe/ 那枚的逐字节差行数＝0（0＝同一件的两份拷贝）
+  入库笔数尺＝1 笔首次加入
+== F) 笔⑥"8 行 CRLF＝原始读数照实保留"的层面坐实（★CR 一律对入库 blob 量）==
+  ac2-host-pair-s1-treeB     入库blob CR=0  工作树 CR=8
+  ac2-host-fiv-s1-treeB      入库blob CR=0  工作树 CR=8
+  ac2-col-s1-treeB           入库blob CR=0  工作树 CR=0
+  git core.autocrlf＝true  ⇄ .gitattributes 那味＝* text=auto
+  结论尺＝那 8 枚 CR 只活在导出树⇄工作树那一层；入库 blob＝0＝被 git 归一化吞掉（⛔ 腿的净化，也⛔照实保留）
+  判据承载性＝那 8 行是否 ^--- FAIL／^=== RUN／^--- PASS 形：0 枚（0＝⛔ 判据行）
+== G) 名册尺随 HEAD 漂（＝笔⑦/笔⑨那类点时读数的独立复量）==
+  到 0fb399c3 为止锚定枚数=1 路径并集=5
+  到 ecffb93b 为止锚定枚数=2 路径并集=6
+  到 aacde632 为止锚定枚数=3 路径并集=15
+  到 c16ff47e 为止锚定枚数=4 路径并集=24
+  到 06aa2abf 为止锚定枚数=5 路径并集=65
+  到 3ecdea30 为止锚定枚数=6 路径并集=72
+  到 5c9402f8 为止锚定枚数=7 路径并集=78
+  到 1c787282 为止锚定枚数=8 路径并集=79
+  到 8a10a7e3 为止锚定枚数=9 路径并集=79
+  到 e74762b5 为止锚定枚数=10 路径并集=83
+  到 a651c086 为止锚定枚数=11 路径并集=95
+  ⇄ 入库件 readings-ac3-discipline.md 当时所记＝
+    11:| 锚定 `--grep='^票 352 落地腿 352-r1'` | 行首锚 | **5 笔（本文件提交时＝6）** |
+    12:| 单次 `%H%x09%s` 导出＋内存内 `index($2,P)==0` | 独立实现 | **同 5 笔** |
+    13:| 非锚定 `--grep='票 352 落地腿 352-r1'` | 会吃正文引用 | 5 笔（此波⛔ 别腿在正文引用本
+    20:- 本腿全部笔的路径并集＝**65 枚**；`OUTSIDE_ALLOWED_WRITEFACE=0`；★产码 `.go` 枚数＝**1**＝
+  ⇄ discipline.txt 在笔⑦那一笔里的值＝
+    ANCHORED_COUNT=5
+    NON_ANCHORED_COUNT=5  （非锚定＝会吃进正文引用了本前缀的别腿笔＝A1045 那味）
+    PATHS_TOTAL=65
+DONE
