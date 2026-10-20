@@ -16,9 +16,9 @@ UTF8_BAD=0
 RAW_UTF8_BAD=0 of 27
 
 == codepoint ruler (banned U+00A7 must be 0; U+00B7 printed so the two are not conflated) ==
-report.md lines=110 U+00A7=0 U+00B7=6
+report.md lines=119 U+00A7=0 U+00B7=6
 logs/bench-probes-verbatim.txt lines=74 U+00A7=0 U+00B7=0
-logs/gates-and-roots.txt lines=59 U+00A7=0 U+00B7=1
+logs/gates-and-roots.txt lines=59 U+00A7=0 U+00B7=0
 logs/appended-lines.txt lines=6 U+00A7=0 U+00B7=2
 
 == positive control on the same codepoint ruler (a file that DOES carry U+00A7) ==
@@ -26,6 +26,6 @@ docs/reports/HANDOVER.md lines=3847 U+00A7=304 U+00B7=290
 
 == inventory / caps ==
 PROBE_ROOT_FILES=39
-REPORT_MD_LINES=110
+REPORT_MD_LINES=119
 ZERO_BYTE=0
 OUT_EXTENSION=0

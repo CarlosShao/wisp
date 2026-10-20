@@ -2,7 +2,10 @@
 # 342-r2 consolidated gate + root-classification evidence. Everything in the output file is taken by the
 # commands themselves (no hand-written numbers).
 cd "/d/work/workspace/projects plans/Wisp" || exit 1
-OUT=.scratch/wisp/probes/342/r2/logs/gates-and-roots.txt
+# Absolute OUT: the brace group below cd's into the log directory and brace groups run in the SAME shell,
+# so a relative path made the trailing `wc -l` fail (rc=1) even though every number in the log was
+# correct. 本腿自抓第二枚同类(第一枚=utf8-and-codepoints.sh),都修在入库前,⛔ 带着一枚说不清的 rc=1 交件。
+OUT="$PWD/.scratch/wisp/probes/342/r2/logs/gates-and-roots.txt"
 {
   echo "== HEAD at gate time =="
   # NOTE (本腿自抓＝散件里的一处真损): this line used to be `git log -1 --format='%H %s' | cut -c1-90`,

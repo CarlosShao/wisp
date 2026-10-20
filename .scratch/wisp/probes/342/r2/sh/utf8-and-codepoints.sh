@@ -7,7 +7,12 @@
 #   * the codepoint ruler (sh/codepoint-ruler.pl) = the banned codepoint U+00A7 and the neighbouring
 #     U+00B7 per file, so the two are never confused.
 cd "/d/work/workspace/projects plans/Wisp" || exit 1
-OUT=.scratch/wisp/probes/342/r2/logs/utf8-and-codepoints.txt
+cd "/d/work/workspace/projects plans/Wisp" || exit 1
+# The block below cd's into the probe root and back; capture to an ABSOLUTE path so the trailing `cat`
+# resolves after the cd. (A relative OUT here made the very first run exit 1 on `cat: No such file`
+# while the file itself was written correctly - the rc belonged to the wrapper, not to the ruler.
+# 本腿自抓,具名入库,⛔ 留一枚说不清原因的 rc=1 在交件里。)
+OUT="$PWD/.scratch/wisp/probes/342/r2/logs/utf8-and-codepoints.txt"
 {
   echo "== iconv decode ruler, authored files =="
   cd .scratch/wisp/probes/342/r2 || exit 1
