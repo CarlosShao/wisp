@@ -1,0 +1,25 @@
+# 321-v1 交件侧窗口复量（★时间敏感那句的更正性复量；笔①②③ 已入库后于 22:0x 现跑）
+
+尺名＝C-WINDOW-RECHECK｜时刻＝2026-10-20 22:03 +08｜全程只读、⛔ 动字节、⛔ go test／go build
+脚本底片＝`D:\tmp\wisp\20261020\321v1\sh\CG.sh` ⇄ `CFINAL.sh`（临时根，⛔ 盘符根、只建不删）
+
+## 1. ★具名更正判语件第 4 件里那句"此刻仍有在飞字节"的**读数时刻**
+判语件（`docs/evidence/s1/321-v1-verdict.md` 第 4 件）写"此刻"＝**本腿 21:0x–21:3x 那把尺的时点**（尺 R8f：tracked 脏 4 枚＝`internal/winsec/winsec.go` 20:31:37／`pinnedleaf_342_fallback.go` 20:31:22／`pinnedleaf_342_unix.go` 20:31:09／`pinnedleaf_342_windows.go` 20:28:17，另 `internal/models/downloader.go` 20:38:05）。
+22:03 复量（尺＝`git status --porcelain --untracked-files=all -- internal/winsec/`，量的）＝**0 行**；五枚件 mtime＝`winsec.go` 20:31:37、`pinnedleaf_342_windows.go` 21:13:37、`pinnedleaf_342_unix.go` 21:13:47、`pinnedleaf_342_fallback.go` 20:31:22、`nametopup_353_windows_test.go` 21:14:00 ⇒ 那批在飞字节已被 `353-r1` 自己的笔（`fa395b33` 20:36／`110ed00b` 20:41／`ffc3c62a` 21:17／`0b75e40b` 22:01）陆续提交入库。
+⇒ **判语第 4 件的结论⛔ 变**：`internal/winsec/**` 在腿跑门（19:13）之后被 4 笔动过这一条仍成立（尺＝`git show --name-only` 元数据）；而 HEAD 在复量时点仍在漂（`ffc3c62a` 21:17 → `0b75e40b` 22:01）＝**写腿活体在场** ⇒ "曾经绿"≠"今天判据绿"、要的那一味（一枚⛔ 321 身份的腿在四面三无写面的干净窗口对今天 HEAD 重跑五把门禁）⛔ 因此省掉。
+
+## 2. 撞车面复量（★只列名＋mtime，⛔ 读任何内容）
+- `docs/evidence/s1/` 现量：脏＋未跟踪行数＝**0**；`115-adversarial-acceptance.md`⇄`-corrections.md`⇄`352-v1-verdict.md`⇄本腿 `321-v1-verdict.md` 四枚俱 `AT_HEAD`（尺＝`git cat-file -e`）⇒ 派单警告那批 `115-*` 未入库件**已被 115-v1 自己入库**，本腿全程⛔ 读其内容、⛔ 卷进任何一笔（这点在本件里具名为事实，⛔ 追认任何读数）。
+- 整仓 tracked 脏（尺＝`git status --porcelain --untracked-files=no` 逐枚列名，⛔ 只报计数）＝**1 枚**＝`[M] .scratch/wisp/issues/115-seal-notices-…-done.md` mtime 20:24:44＝票 115 面在飞腿的未提交追加＝⛔ 本腿字节、⛔ 入本腿任何一笔。其中 `.go` 枚数＝**0**。
+- 仓根冻结件（A1069③ 那一形的监视尺）＝`go.mod` 1026 字节 mtime 19:50:08 ⇄ `go.sum` 6237／`.gitignore` 1404／`.github/workflows/ci.yml` 64794 ⇒ 四枚俱非 0 字节、mtime ⛔ 落在本腿任何一次操作之后（本腿全程⛔ 任何重定向落仓根）。
+- 本腿写面（`docs/evidence/s1/321-v1-verdict.md` ⇄ `.scratch/wisp/probes/321/v1/**`）在 `git status` 里行数＝**0**＝三枚已入库、无残留。
+
+## 3. 本腿名册终量（三把尺同号＝4，含那枚派单存档）
+锚定行首 `^票 321 终裁腿 321-v1`＝**4**；`git log --all --grep='^…'`＝**4**；单次导出＋内存内 `index($2,P)==1`＝**4**（尺＝R3/CFINAL 第 b 段，射程＝全史 5689→5692 笔）。
+逐枚 `%s` 起头：`b3327327` 笔③／`5c1c1f50` 笔②／`ebe03e36` 笔①／**`16e2522a`＝编排者的"派单存档"，同前缀但⛔ 本腿的笔** ⇒ 本腿交付＝**3 笔**（枚数帽按公共块口径＝参考值，"每落一枚就 commit"优先）。
+正控＝同尺对 `^票 115 出表腿 115-v1`＝20（尺没瞎）；非锚定 `票 321`＝15（随 HEAD 漂＝⛔ 当通则，公共块 名册尺 那条今天第四次应验）。
+`c7f813c7`（编排者代提遗产四枚）具名剔离终量＝锚定 321-v1 **0**／锚定 321-r1 **0**／非锚定 `票 321` **0**／腿码任意位 **1** ⇒ ⛔ 计入本腿名册、亦⛔ 计入重放腿名册，按"编排者 1 笔代提（内容属腿的读数面）"单栏记账。
+
+## 4. 票 321 框终量（交件侧再量，★⛔ 写死预期值＝现量并具名报尺）
+尺＝`git cat-file blob HEAD:<票>` → `grep -c '^- \[ \]'`／`'^- [x]'`／正控 `'^- \['`：未勾 **2**／已勾 **0**／全形 **5**（＝2 枚 AC 框＋3 条 Progress bullet）；票面 blob `43a0542a49075ca754fb2cd9ead1f6ed35b78278` ⇄ 派单笔（`16e2522a`）时刻**同串**＝本腿⛔ 动票面一个字节；`Status:` 仍 `待派`、票名⛔ `-done`；工作树⇄HEAD `--numstat` 空。
+⇒ 本腿一枚框没翻、⛔ 补第二条 bullet（额度已被重放腿 `64d14a70`⑤ 占）。翻勾与"10-15 已落地"那句具名登记归编排者凭判语件去做。
