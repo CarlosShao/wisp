@@ -1,0 +1,31 @@
+票 353 普查腿 353-a1 复算件＝断腿 `logs/02` 那枚乙形 TOCTOU 量窗的**独立复算**（续跑腿自己重读现码，⛔ 采信别的脑袋算过的数）
+
+## 读码面（全部＝只读，⛔ go test／⛔ go build／⛔ 动任何 `.go` 字节）
+- 产码＝`git cat-file blob HEAD:<path>` 于本腿续跑锚 `96a2eeb7`（17:34）；导出落仓外 `D:\tmp\wisp\20261020\353a1cont\head\*.go.txt`。
+- 三枚承重 blob 在 15:3x 锚 `c16ff47e` ⇄ 本锚**逐字未变**（尺＝`git rev-parse <锚>:<path>`，射程＝`internal/winsec` 三枚：`winsec.go f3c1b68e`⇄`f3c1b68e`／`pinnedleaf_342_windows.go db077e30`⇄`db077e30`／`winsec_windows.go 63714a83`⇄`63714a83`〔量的〕＝断腿算的那份码与本腿复算的是同一份字节。
+- 平台真身＝本机 GOROOT `D:\work\base\go`（`go version` 现量 `go1.27.1 windows/amd64`）＋`go.mod:12` 钉 `golang.org/x/sys v0.48.0`；`os.Root` 走的是 stdlib 自带的 `internal/syscall/windows`（尺＝`grep -rn 'func Deleteat' /d/work/base/go/src/`＝唯一命中 `at_windows.go:236`，⛔ 走 `x/sys`）。
+
+## 逐枚现读到的形状（本腿自己数出来的，⛔ 抄 02）
+- `openPinnedLeaf`＝`pinnedleaf_342_windows.go:171-199`：`p.root.OpenFile`:173 → `f.Stat()`:177 → `p.root.Lstat(base)`:185 → link 面:190 → SameFile 面:194 → `return f`:198。两枚身份读数（`pinned`／`now`）**算完就丢**＝乙要复验必须先把它们带出来（改函数形状）。
+- `unlinkPinnedLeaf`＝同文件 `:212-217`：`_ = p.root.Remove(base)`（:216）；此刻叶子句柄已被路由关掉（`winsec.go:176`／`:181` 的 `_ = f.Close()` 都在 :177／:182 的 unlink **之前**）。
+- 路由两枚删除支＝`winsec.go:175-184`；`defer parent.close()`:165。
+- `Root.Lstat`＝`root.go:209`→`root_windows.go:211 rootStat`：`doInRoot` 单段名＝**零中间 open**（`root_openat.go:408-412` 终段直接 `f(dirfd, part)`），叶开＝`openat(..., O_FILE_FLAG_OPEN_REPARSE_POINT)`＝`windows.Openat`→**1 枚 `NtCreateFile`**（`at_windows.go:151`）；句柄面查询＝`statHandle`＝`GetFileType`＋`GetFileInformationByHandle`（`stat_windows.go:108-118`），**`GetFileInformationByHandleEx` 只在 attrs 带 REPARSE_POINT 那一支才打**（`types_windows.go:55-61`）⇒ 顶进来的普通文件＝2 枚查询，顶进来的是链接＝3 枚；随后 `CloseHandle`。
+- `Root.Remove`＝`root.go:188`→`root_openat.go:210 rootRemove`→`doInRoot`（`incref`＋`splitPathInRoot`→Windows 侧 `rootCleanPath`→`syscall.FullPath`＝**1 枚 GetFullPathName**，`root_windows.go:39-59`）→`removeat`＝`root_windows.go:352-354`→`windows.Deleteat`＝**`NtOpenFile` 第一枚（`READ_ATTRIBUTES|DELETE`）⇒ 仅当 `STATUS_ACCESS_DENIED` 才第二枚（`DELETE`）**＋`NtSetInformationFile(FileDispositionInfoEx)`＋defer `CloseHandle`（`at_windows.go:236-317`，尺＝`sed -n '236,317p' | grep -c 'NtOpenFile('`＝**2**〔量的〕）；不支持时才 `deleteatFallback`（:326 起，另加 1~3 枚）。
+- 删除是**按名绑定**：`Deleteat` 的绑定就是 `OBJECT_ATTRIBUTES{RootDirectory=pin, Name=base}` 那一次名称解析＝平台没有"按身份删"的单发原语。
+- `SameFile` 两侧都是 `*fileStat` 且 `vol/idxhi/idxlo` 已填、`path` 被刻意置空（`types_windows.go:74-77` 注释逐字写明"prevent os.SameFile doing it again"）⇒ 复验的比较＝**纯用户态，0 枚内核面**。
+
+## 【算的】乙形复验→绑定 的窗口
+起点＝复验那发 `Lstat` 的 `NtCreateFile` 返回它所见 entry 之后；终点＝`Deleteat` 第一枚 `NtOpenFile` 按名解析并绑定那一刻。
+中间逐枚＝`GetFileType`、`GetFileInformationByHandle`、`CloseHandle`〔3 枚句柄面〕＋`GetFullPathName`〔1 枚路径面〕＋`SameFile`／`incref`〔用户态 2 段〕⇒ **内核面 4 枚、用户态 2 段**；`STATUS_ACCESS_DENIED` 那一支再加 **1 枚**（第二枚 `NtOpenFile`）。
+量级＝个位到十几微秒〔算的，非量：本腿⛔ 跑任何计时〕。
+
+### 对 `logs/02` 的判定＝形状与量级**对得上**，两处具名更正（都⛔ 改结论）
+1. 02 写"statHandle（GetFileType＋**GetFileInformationByHandleEx**＝2 次查询）"＝**第二枚查询的名字错了**：句柄面第二发是 `GetFileInformationByHandle`，`...ByHandleEx(FileAttributeTagInfo)` 只在 `FILE_ATTRIBUTE_REPARSE_POINT` 那一支打＝顶进普通文件的世界**不**走它。计数仍＝2 ⇒ 窗口枚数⛔ 变。
+2. 02 写 ACCESS_DENIED 重试形"再 **+2**（第二枚 NtOpenFile＋CloseHandle）"＝**多算 1 枚**：deferred `CloseHandle` 落在 disposition **之后**、在窗口终点（绑定）之外 ⇒ 重试只加 **1** 枚在窗内的 `NtOpenFile`。
+3. 02 的现码敞口（对照）本腿复算＝起点 `openPinnedLeaf` SameFile 应答（:194）、终点同一枚绑定，中间＝`sealHandle`→`applyDescriptorWindows`（`winsec_windows.go:291-320`：`foreignPrincipals`→`readDACL`＝**GetNamedSecurityInfo**＋`privateSetSIDSet`（`user.Current`＋3×`canonicalSIDString`）→`SetNamedSecurityInfo`→`verifyPrivate`＝**再一次 GetNamedSecurityInfo**＋再一次 `privateSet`）＋`f.Write`＋`f.Close`＋`GetFullPathName` ⇒ **内核面 ≥8 枚、含 3 枚按名的安全描述符重操作**（两读一写）＝**百微秒到毫秒级**〔算的〕。⇒ 02 那句"乙把敞口从整个 seal＋write 段缩到删除前一跳＝短 1~2 个数量级、⛔ 归零"**成立入库**。
+   ★本腿顺手量到 02 没写的一味：那 3 枚按名 SD 操作**自身**也是绑定按名解析的＝顶名窗口不止喂"删除"这一跳，也喂"贴描述符"那一跳（＝票 120 在 Windows 的明写残腿，`pinnedleaf_342_windows.go:31-33`）〔算的〕。
+
+## 本腿另算的两枚（AC#1 裁形要用，02 里没有）
+- **甲形没有这一跳**：句柄侧删除＝`ReOpenFile(h, DELETE, READ|WRITE|DELETE 共享, OPEN_REPARSE_POINT|BACKUP_SEMANTICS)`＋`SetFileInformationByHandle(FileDispositionInfoEx)`（两枚**句柄面**原语，`x/sys`/`syscall` 都在手，`at_windows.go:341` 的 fallback 就在用同形）⇒ **零枚按名解析＝乙那扇微秒窗在甲里不存在**〔算的〕。代价＝甲要新增一枚本平台产码里还没有的句柄处置原语，且必须在 `f.Close()` **之前**动手（现路由先关后删，`winsec.go:176-177`）。
+- **乙的复验拿得到身份吗**＝拿得到但⛔ 免费：`leafPin{root,dir}`（:50-53）按值传，`pinned`/`now` 现在被丢弃 ⇒ 乙＝`openPinnedLeaf` 多返回一枚身份＋`unlinkPinnedLeaf` 多收一枚参数＝**内部函数形状改动**（⛔ 新导出名、⛔ 新接缝＝不需 `342-v3` 那枚"第二道接缝"批准，但属产码改动＝要 `AC#1`／`AC#2` 的写腿）。
+- **POSIX 侧同形进⛔ 去**＝本腿读 `pinnedleaf_342_unix.go:108-148`：`openPinnedLeaf`＝`unix.Openat`（⛔ 任何身份复验，注释自陈"O_NOFOLLOW answers inside the open"）、`unlinkPinnedLeaf`＝`unix.Unlinkat(dirfd, base, 0)`＝同样按**钉目录里的名字**删 ⇒ "名字那一跳"在 POSIX 原则上也在（本腿**未测**，`342-v3` 的读数只在 Windows〔算的／⛔ 量的〕）；而 POSIX **没有**按句柄删的原语 ⇒ 甲在 unix 面⛔ 可implementable。凡 AC#1 选甲，`AC#3` 那句"两平台成对"必须改成"Windows 修／unix 具名挂"。
