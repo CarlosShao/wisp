@@ -1,0 +1,94 @@
+# 139-r1 · 尺底片（原始读数逐字，⛔ 摘要）｜起手锚 ec826c63 ⇄ 交件侧 da221145
+
+## 第 A 节 blob 三把尺（AC#2 落点在场性）
+
+$ git cat-file blob HEAD:internal/agent/compress.go | grep -nE '\.Info\(|\.Warn\(|\.Debug\(|\.Error\('
+240:	c.log().Info("agent: history compressed", attrs...)
+（枚数＝1；正控＝同尺对 HEAD:internal/agent/loop.go 命中 3 枚＝尺灵）
+
+$ git cat-file blob HEAD:internal/agent/compress.go | grep -c '"<key>"'   # 逐枚
+tokens_before=1 tokens_after=1 threshold=1 msgs_before=1 msgs_after=1 compressed_msgs=1 kept_raw_rounds=1 history_changed=2
+
+$ git cat-file blob HEAD:internal/agent/loop.go | grep -n 'l.comp.Need\|withTraceTask(ctx, taskID)\|res.Compression = rep'
+406:		if l.comp.Need(hist) {
+412:			nh, rep, err := l.comp.Compress(withTraceTask(ctx, taskID), hist)
+417:				res.Compression = rep
+$ git cat-file blob HEAD:internal/agent/loop.go | grep -n 'Compression CompressionReport'
+100:	Compression CompressionReport
+
+## 第 B 节 名册（HEAD 的 compress_trace_test.go，尺＝grep '^func Test'）
+177:TestCompressionTraceBooksCountsOnSuccess
+269:TestCompressionTraceSilentWhenNothingFolded
+302:TestCompressionTraceSurvivesTheLoopWiring
+366:TestCompressionTraceDoesNotAlterTheFold
+426:TestCompressionTraceSilentWhenNothingFoldableOverThreshold
+478:TestCompressionTraceCarriesTheOwningTaskID
+534:TestCompressionTraceNeverInventsATaskID
+（枚数＝7；起手锚 ec826c63 同尺亦＝7 ⇒ 本腿未加不减）
+
+## 第 C 节 成对四数（两棵仓外导出树，⛔ 整包 cmd/wisp）
+BASE（treeBASE＝git archive ec826c63 八件套＋docs）
+  BASE_TEST_RC=0
+  TAG=base RUN=212 PASS_TOP=168 FAIL_TOP=0 SKIP=1 PANIC=0 BUILDFAIL=0
+HEAD（treeHEAD＝git archive da221145 同八件套；treeHEAD_go=778＝正控非空）
+  HEAD_TEST_RC=0
+  TAG=head RUN=212 PASS_TOP=168 FAIL_TOP=0 SKIP=1 PANIC=0 BUILDFAIL=0
+逐名作差：base_roster_lines=169 head_roster_lines=169 ROSTER_DIFF_RC=0
+  only_in_base=0 only_in_head=0 ⇒ 新增红 0 枚
+两侧包结果行：ok internal/agent / ok internal/agent/approval（两侧同）
+唯一 SKIP 两侧同名＝--- SKIP: TestDefaultDeadlineWallClockMeasurement（存量弃权）
+7 枚痕用例两侧全绿（逐行原文＝盘上件 .scratch/wisp/probes/139/r1/raw/base-v.txt ⇄ head-v.txt 各 552 行；
+  ★这批整发读数按 04-manifest 第 B 节的帽口径**留在盘上⛔ 入库**，本件第 C 节已把它的关键行逐字抄下＝可核性来源）
+
+## 第 D 节 变异两发
+pristine sha256(compress.go) 16e153d8b8b4bd78d8f3dc050ce62eb425a6d1652cec88c5207be1727c7c2f50
+
+M1（摘痕＝删 emission 整行；票面 AC#3 逐字反向判据）
+  hits_fixed_all=1 (expect 1)  hits_code_line=1 (expect 1)
+  post_anchor_hits=0 (expect 0)  mutated_sha=661c222911f9c7195047a86a12be8c6d3fb30f97ea8ec40ffede789557dea2d8  MUT_CHANGED=YES
+  M1b_BUILD_RC=0
+  M1b_TEST_RC=1  M1b RUN=114 PASS_TOP=86 FAIL_TOP=4 SKIP=0
+  M1bFAIL: TestCompressionTraceBooksCountsOnSuccess / ...SurvivesTheLoopWiring / ...CarriesTheOwningTaskID / ...NeverInventsATaskID
+  红句逐字: compress_trace_test.go:549: "agent: history compressed" records = 0, want 1 for a pass that folded
+  M1b_RESTORED_SHA256=16e153d8…  M1b_RESTORE_MATCH=YES  TREE_DIFF_NONE
+  ⚠本腿自抓：第一发（m1）锚里 ( ) 未转义 ⇒ hits_before=0＝空操作 ⇒ 那发 114/90/0/0 rc=0 是**假读数**，
+    原始件留档＝盘上件 .scratch/wisp/probes/139/r1/raw/m1-v.txt（322 行，⛔ 删⛔ 入库，帽口径见 04 第 B 节），凭据以 M1b 这发为准。
+
+M2（痕恒打＝if rep.Ran { → if true {；第二枚落点，与 M1 ⛔ 同）
+  M2_anchor_hits_before=1 (expect 1)
+  M2_new_anchor_hits=1 (expect 1)  M2_old_anchor_hits=0 (expect 0)
+  M2_TEST_RC=1  M2 RUN=114 PASS_TOP=88 FAIL_TOP=2 SKIP=0
+  M2FAIL: TestCompressionTraceSilentWhenNothingFolded / TestCompressionTraceSilentWhenNothingFoldableOverThreshold
+  M2_RESTORED_SHA256=16e153d8…  M2_RESTORE_MATCH=YES  TREE_DIFF_NONE
+
+## 第 E 节 门禁四把（共享树，先 unset GOTMPDIR TMPDIR TEMP TMP，export GOFLAGS=）
+gofumpt.exe -l <本腿三枚射程文件>            RC=0  输出 0 字节
+gofumpt.exe -l internal/agent                RC=0  列 2 枚＝approval\pending_read.go / tools.go
+  二者 git status --porcelain 空 ⇄ git diff --numstat HEAD -- internal/agent 空 ⇒ 存量、⛔ 本腿字节
+sh scripts/d22scan.sh                        RC=1  三发安静复量 RC 全＝1、offender 逐枚同串
+sh scripts/check-path-length-budget.sh       RC=0  VERDICT GREEN（over=60 roster=60 not-in-roster=0）
+go vet ./internal/agent/                     RC=0  空
+go vet ./internal/agent/...                  RC=0  空
+
+d22scan offender 逐字（两处、三发同）：
+  internal/winsec/pinnedleaf_342_unix.go:100: [phantom-citation] comment cites repo path "internal/syscall/windows/at_windows.go" which does not exist on disk (ticket 212 ban #9)
+  internal/bad/leak.go:5: [bare-goroutine] bare `go worker(...)` is banned（＝d22scan 自身测试的内存夹具：
+    git cat-file -e HEAD:internal/bad/leak.go ⇒ NOT_TRACKED_IN_HEAD、find 零枚 ⇒ ⛔ 盘上件、⛔ 本腿面）
+归因（尺＝git cat-file blob 对修订 grep -c，量的）：
+  hits_at_my_anchor(ec826c63)=0  hits_at_HEAD(da221145)=1
+  introduced_by=fa395b33 2026-10-20 20:36:28 +0800 票 353 落地腿 353-r1 笔②＝★乙本体落地
+  cited_target_in_HEAD=NO（fatal: path 'internal/syscall/windows/at_windows.go' does not exist in 'HEAD'）
+  扫描日志里 internal/agent 命中＝0（正控＝同尺命中 winsec 那枚 ⇒ 尺灵）
+⇒ 本腿⛔ 动 internal/winsec/** 一字、⛔ 据此判自己失败（派单第 11 行第③条）
+
+## 第 F 节 交件侧 tracked 脏（逐枚列名＋mtime，⛔ 只报计数＝A1069③ 新定式）
+见 02-dirty-tracked.txt（本腿落笔前后各一发）
+
+## 第 G 节 名册三把尺（主题前缀＝「票 139 落地腿 139-r1」，锚定行首）
+★同一把尺的射程口径＝`git log --all --format='%s'`（只导主题，⛔ 拿整条 message 匹配＝公共块第 83 行那枚坑）。
+落笔前（起手侧复量，21:0x）＝ R1 锚定行首 **1** ⇄ R2 非锚定子串 **1** ⇄ R3 内存 index($2,P)==1 **1**＝三把同号，
+唯一命中＝ec826c6330 派单存档（编排者那一笔，⛔ 本腿笔）。
+正控＝POSCTRL_ticket230_legprefix=8 枚（同尺能打非零 ⇒ 尺灵，⛔ 把 1 当"尺坏了"）。
+交件侧复量＝见 03-final-roster.txt（随本腿笔数增长，⛔ 把某时刻枚数当通则＝公共块第 83 行第五形）。
+★本腿自抓一枚尺形错：第一发把锚定尺打在 `%H%x09%s` 的导出上（行首＝哈希）⇒ 锚定命中 **0**＝假读数；
+改正＝锚定尺只打在 `%s` 单独导出上，非锚定子串⇄内存 index 两把打在 `%H%x09%s` 上，三把各自射程逐字写明。
