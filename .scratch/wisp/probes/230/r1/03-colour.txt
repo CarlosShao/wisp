@@ -1,0 +1,85 @@
+== 票 230 `AC#2` 腿 `230-r1` 续跑：定向色（★续跑自己现跑，⛔ 采信前腿读数）==
+
+射程＝`go test ./internal/agent/... -count=1 -timeout 30m`；
+⛔ 整包 `./cmd/wisp`（本波归编排者那窗＋撞 `351-r2` 写面）⛔ `./...` ⛔ `./internal/winsec/`（`352-r1` 续跑写面）。
+只在**仓外导出树**跑色（⛔ 共享工作树跑 `go test`／`go build`）。
+
+== 0. ★续跑自抓一枚钝尺（先记账，再报数）==
+
+第一发我把 `go test ./internal/agent/... -count=1 -timeout 30m`（**没带 `-v`**）的四数尺打下去＝
+
+    SIDE=base RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+    SIDE=now  RUN=0 PASS_TOP=0 FAIL_TOP=0 SKIP=0
+
+＝四数全 0 而 `TEST_RC=0`、两侧包级 `ok` 行逐字在同 ⇒ 这不是"零枚 FAIL 的全绿"，是**尺钝**：
+`^=== RUN`／`^--- PASS` 那些锚只有 `-v` 才存在。`0 命中与真值 0 撞脸`＝公共块"读数纪律"那一味
+（先例＝`352-r1` 笔⑥那枚框尺 `^  - \[x\]` 恒 0 的同形），★本腿自己犯在色尺上、当场抓到、
+换 `-v` 重打（第 2 节），钝那一发的原始件照实留档＝
+`D:\tmp\wisp\20261020\230r1cont\logs\colour.txt`＋`colour-base.raw.txt`＋`colour-now.raw.txt`，⛔ 删。
+那发里仍有效的一行＝包级 `ok`/`?` 两侧 `PKG_DIFF_RC=0`（⛔ 拿它当四数）。
+
+== 1. 台面⇄两棵树的唯一差异 ==
+
+    HEAD 那发＝118049450e（17:40:45，别腿 109-r1 的存档笔）；建树＝`git archive HEAD` 八件套＋docs
+    treeB（base）＝archive 后把 internal/agent/approval/queue.go 换回起手锚 blob
+    treeN（now） ＝archive 原样
+    BLOB_BASE（c16ff47e:queue.go）＝66fec7ae375344d7bc741270b42c4ec5050cf41f
+    BLOB_HEAD（HEAD:queue.go）    ＝dcef3fa8c46c6182d53bb2d3204e6469351b1a80
+    两侧 `git hash-object` 对回＝逐一等于上面两串（落地⇄未落地各自坐实）
+    treeN_go=777 ⇄ treeB_go=777（起手先数 `.go` 证非空＝"0"⛔ 是读数）
+    diff -rq 两棵＝只报一枚 ⇒ 隔离的正是本腿那 21 枚注释变动行
+      Files .../treeB/internal/agent/approval/queue.go and .../treeN/internal/agent/approval/queue.go differ
+    GOTMPDIR='D:\tmp\wisp\20261020\230r1cont\gottmp'（★反斜杠短形＋先 mkdir -p；跑前 unset TMPDIR TEMP TMP）
+    全程不动 PATH ⇒ 没碰 `cygpath -wp` 那一味；★本射程不需要它：
+      `git grep -l -E 'sherpa|onnxruntime' -- internal/agent` ＝ 0 命中、`"C"` 伪包＝0 命中
+      ⇒ `./internal/agent/...` 的导入图里没有 CGO／DLL 那两味，⛔ 那形"零枚 --- FAIL 的整包死"。
+
+可比性另补一把（＝前腿 00-report 第 6 节那句我自己复跑）：
+    base 那枚 `3eeaa2e2:queue.go` 与起手锚 `c16ff47e:queue.go` **同哈希** 66fec7ae…
+    （`3eeaa2e2`⇄`36d6456e` 是编排者的笔、`--name-only` 只碰 `.scratch/wisp/probes/orch/**`⇄台账）
+    `git merge-base --is-ancestor c16ff47e c489eacc` rc=0；`c16ff47e..c489eacc` 里动过 queue.go 的
+    ＝只有笔① 那一枚 ⇒ 中间没别腿在我文件上落字。
+
+== 2. 四数（尺＝`^=== RUN` / `^--- PASS` / `^--- FAIL` / `^--- SKIP`，带 -v；⛔ 混用、⛔ 相减）==
+
+    正控（先证尺灵）＝单枚 `-run TestAnAliasCanNeverBuyAnAllow` 在 treeN 上：rc=0
+        POSCTRL_RUN=1  POSCTRL_PASS=1
+    SIDE=base RUN=212 PASS_TOP=168 FAIL_TOP=0 SKIP=1 BYTES=58845
+    SIDE=now  RUN=212 PASS_TOP=168 FAIL_TOP=0 SKIP=1 BYTES=58855
+    TEST_RC_BASE=0  TEST_RC_NOW=0
+    ⇒ 与前腿 00-report 第 6 节那对数（212/168/0/1 ⇄ 212/168/0/1）**复现成立**（同一发我用 `-v` 独立打到同值）。
+
+== 3. 红名册⇄名册作差（判据只认到达数，⛔ 拿总数大当到达）==
+
+    RED_NAMES_base=0  RED_NAMES_now=0  RED_SYMDIFF=0 字节
+    SKIP 名册两侧同名同枚＝TestDefaultDeadlineWallClockMeasurement（＝存量弃权，两侧同枚，⛔ 当闭环）
+    顶层结果名册（含状态词、剥耗时）base=169 行 ⇄ now=169 行，TOP_SYMDIFF_RC=0／0 字节，
+        两侧 sha256 同串 73aeb060dc42711ce9fc4a259f4991c702d0c3a85f7ed10db67d017bc804801b
+        （前腿 00-report 第 6 节报的 169 枚同数；它那串 f4ac5a80… 与我这串⛔ 同＝两把尺的归一化不同
+         ＝它剥的不一定是同一套后缀；★⛔ 据此说谁错，只登记"名集逐字同"这把独立尺：
+         只取名字的 `v2-names-{base,now}.txt` 两侧 sha256 同串 771a4070…、NAMES_SYMDIFF 0 字节）
+    `^=== RUN` 名集两侧作差＝RUN_NAMES 212 ⇄ 212、RUN_SYMDIFF 0 字节
+        （公共块那一味：⛔ 拿整包 RUN/PASS_TOP 的差当"我的字节改了 N 枚测试"＝要逐名；这里逐名为 0 差）
+    包级 ok/FAIL 两侧对回＝PKG_DIFF_RC=0：
+        ok  github.com/CarlosShao/wisp/internal/agent
+        ok  github.com/CarlosShao/wisp/internal/agent/approval
+        ?   github.com/CarlosShao/wisp/internal/agent/scheduler  [no test files]
+
+== 4. 被新注释点名的用例＝两侧都到达且绿（★分子）==
+
+    TestAnAliasCanNeverBuyAnAllow                     base: === RUN + --- PASS   now: === RUN + --- PASS
+    TestEveryRefusalRouteOnAnUnknownEntryStillRefuses base: --- PASS + 5 枚子测试逐枚 PASS
+                                                      now : --- PASS + 5 枚子测试逐枚 PASS
+    （子测试名两侧同集＝veto / native_reject / panel_reject / decide_from_native / decide_from_panel）
+    ⇒ 注释里具名当凭据的那枚用例真在盘上、真到达、真绿（⛔ 在注释里指名一枚不存在的测试）。
+
+== 5. 台面健康尺（凡红句含 walk／build failed／no test files／setup failed／0xc0000135 ＝台损）==
+
+    SIDE=base has_0xc0000135=0 has_build_failed=0 has_setup_failed=0 has_walk=0
+    SIDE=now  has_0xc0000135=0 has_build_failed=0 has_setup_failed=0 has_walk=0
+    （`? … [no test files]` 那一行＝`scheduler` 包本身没有测试文件，⛔ 本腿新增、两侧同现、⛔ 计入判据）
+
+== 6. 两发之间没并行 ==
+
+第 2 节 base⇄now 两发在同一脚本里**串行**（`&&` 顺序，⛔ 后台化、⛔ 并行跑改文件的脚本），
+两棵树物理目录不同、唯一差异文件只读 ⇒ ⛔ 互相洗读数；本腿也没在共享工作树跑过任何 `go test`。
