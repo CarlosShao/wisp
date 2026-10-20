@@ -1,0 +1,53 @@
+# 139-r1 · 交件自证 · tracked 脏逐枚列名＋mtime ⇄ 零字节读数说明 ⇄ 码位尺
+
+## 第 A 节 tracked 脏（★逐枚列名＋mtime，⛔ 只报计数＝A1069③ 那起事故第一回就是这么漏的）
+尺＝`git status --porcelain | grep '^ M'` 后对每枚 `stat -c '%y'`（量的，射程＝整树 porcelain）。
+本腿交件现量（21:0x）＝**3 枚，全部⛔ 本腿字节**：
+
+| mtime | 文件 | 归属 |
+|---|---|---|
+| 2026-10-20 20:24:44 | `.scratch/wisp/issues/115-seal-notices-…-done.md` | 在飞出表腿 `115-v1` 面（编排者 20:30 那笔台账已点名它有未提交追加） |
+| 2026-10-20 20:38:05 | `internal/models/downloader.go` | 在飞写腿 `109-r1` 面（⛔ 本腿射程，一字未动） |
+| 2026-10-20 21:04:42 | `internal/models/handoff_window_109_windows_test.go` | 同上（mtime 晚于本腿起手 ⇒ 落笔期间别腿正在写，本腿⛔ 碰） |
+
+★起手侧对照（20:3x，本腿进场第一发）＝6 枚脏：`…/115-…-done.md`、`…/230-…-done.md`、
+`internal/winsec/pinnedleaf_342_{fallback,unix,windows}.go`、`internal/winsec/winsec.go`。
+⇒ 其间 230 面与 winsec 四枚变干净＝`353-r1` 笔②③ 自己提交了（`fa395b33`／`110ed00b`），
+本腿没动它们一枚字节；`internal/models` 两枚＝`109-r1` 在落笔（＝派单第 11 行那枚在飞写腿）。
+⇒ 本腿对 tracked 脏的净贡献＝**0 枚**（`git diff --numstat HEAD -- internal/agent` 空 ⇄
+`git status --porcelain -- internal/agent .scratch/wisp/issues/139-…` 除本腿自己的 probes 新件外空）。
+
+## 第 B 节 零字节读数件（说明，⛔ 入库＝公共块"⛔ 0 字节"）
+下列 6 枚在 `/d/tmp/wisp/20261020/139r1/` 里是 **0 字节**，且**0 字节就是它们的读数**＝"工具没列出任何东西"：
+`g1-myfiles.txt`（gofumpt -l 本腿三枚＝空＝干净，rc=0）· `gate-vet.txt`／`g4-vet.txt`／`g4b-vet-pkg.txt`
+（go vet 空输出，rc=0）· `m1b-build.txt`（go build rc=0）· `roster-diff.txt`（两侧名册逐名 0 差，diff rc=0）。
+⇒ 本腿⛔ 把这 6 枚空件 `git add`（入库件⛔ 0 字节），只在上面这行说明里逐枚写清"空＝什么结论＋配哪把 rc"。
+⇒ 同一段结论的可入库版本在 `01-rulers.txt` 第 C／E 节（带 rc 的逐字行）。
+★更正（追加，⛔ 抹上面那句"仓内 raw 目录实际入库＝非零那 13 枚"＝那是**改处置之前**的旧计划）＝最终处置变了：
+160 行那把帽的射程按公共块 12:2x 更正＝report／census／证据散件／**读数件**，而本腿整发 `-v` 与 d22scan 输出
+（552／322–327／253／169 行）装不进那把帽、⛔ 为凑帽删读数 ⇒ 照**本票自家先例**（`139-r1-accept-r1` §0 把三枚探针
+副本写成"未纳入 commit"、留在 probes/139/accept-r1/）＝`raw/` 与 `sh-*.txt` 全部**留在盘上⛔ 入库**（两处：仓内
+`.scratch/wisp/probes/139/r1/raw/` 19 枚⇄仓外 `D:\tmp\wisp\20261020\139r1\` 原件，⛔ 删）。⇒ 入库的只有五枚正文件
+（00..04），全部结论逐字在 `01-rulers.txt` ⇄ `00-verdict.md` 内，处置与可核性补法具名在 `04-manifest.txt` 第 B 节。
+
+## 第 C 节 仓根冻结件完整性（A1069③ 那枚事故的自证尺）
+| 文件 | 字节 | mtime | 入库 blob CR 枚数 |
+|---|---|---|---|
+| `go.mod` | 1026 | 2026-10-20 19:50:08 | 0 |
+| `go.sum` | 6237 | 2026-10-01 09:47:42 | 0 |
+| `.gitignore` | 1404 | 2026-09-27 11:16:34 | 0 |
+⇒ 三枚 mtime 全部**早于本腿起手（20:31）**＝本腿零触碰；★本腿全程⛔ `go mod edit`／`go mod tidy`／`go get`、
+⛔ 任何输出重定向落仓根冻结件；模块信息取自 `git cat-file blob HEAD:go.mod`（要读时读的是 blob）。
+
+## 第 D 节 票 139 框量与追加硬尺（落笔前基线）
+★更正（追加，⛔ 抹上面第 A／B／C 节）＝本节初稿写过一枚字面分节符（码位 U+00A7）＝违反入库正文禁令，
+本笔改为码位名。尺（`LC_ALL=C grep -o $'\xc2\xa7' | wc -l`，双字节形；正控＝票面 **21** 枚＝尺灵）：
+`00-verdict.md` 1→**0**（同样改掉一处）／本文件 1→**0**／`01-rulers.txt` **0**；raw 那批逐字工具输出 **0**。
+⇒ 本腿三枚正文件＋19 枚 raw 复量后合计 U+00A7＝**0**。另记两把**作废的坏尺**：
+`perl -ne '/\x{a7}/g'` 在票面上给 69＝把中文 UTF-8 续字节 0xA7 也数进去（字节形⛔ 码位形）；
+`od | grep -c '^c2'` 给 29＝把 U+00B7 的前导字节 C2 也数进去（与间隔号混）。⇒ 只认上面那把 `grep -oP` 双字节形。
+尺＝`git cat-file blob HEAD:票面`（★对入库 blob 量，⛔ 对工作树＝本机钝尺）：
+未勾 **2**（`:53 AC#2` ⇄ `:59 AC#3`）／已勾 **2**（`:46 AC#1` ⇄ `:64 AC#4`）＝**本腿一枚没翻**。
+行数＝124、字节＝16630、blob CR 枚数＝**0**（全 LF，`tr -cd '\r' | wc -c` 那把尺）。
+票尾最后一行＝第 12 节那枚"今天可派三格"bullet 的结尾（逐字以「⛔ AC 框本轮一枚未动。」收）＝
+本腿追加行的前缀锚＝这一整枚文件，追加后 `cmp` 前 124 行须逐字节相同、diff 删除行须＝0。
