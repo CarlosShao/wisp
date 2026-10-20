@@ -1,0 +1,48 @@
+===== A) panel 那 7 枚红名⇄两侧 raw 在场（逐名）=====
+TestApprovalCardViewJSONKeysMatchFrontendTypes BASE_FAIL=1 LAND_FAIL=1
+TestC21DesignTokensFourWayAgree BASE_FAIL=1 LAND_FAIL=1
+TestComposerContractTypesMatchFrontend BASE_FAIL=1 LAND_FAIL=1
+TestComposerRenderFixtureTellsTheTruth BASE_FAIL=1 LAND_FAIL=1
+TestReadGitOnThisRepositoryIsSelfConsistent BASE_FAIL=1 LAND_FAIL=1
+TestStreamLogDroppedNamingLedgerIsNotBounded35r8 BASE_FAIL=1 LAND_FAIL=1
+TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 BASE_FAIL=1 LAND_FAIL=1
+===== B) private_fail_test.go 宿主钉⇄子测试在两侧逐名 PASS =====
+TestAC5FailedSealRefusesTheWrite HOST_BASE_PASS=1 HOST_LAND_PASS=1
+TestAC5FailureIsNotSwallowedByTheHappyPath HOST_BASE_PASS=1 HOST_LAND_PASS=1
+TestAC2OverwritePromiseHoldsForEveryProductionCaller322r1 HOST_BASE_PASS=1 HOST_LAND_PASS=1
+SUBTESTS_B=4
+SUBTESTS_L=4
+===== C) 容器档具名两族 PASS（openleaf_322 / placement_symlink_113）=====
+457
+TestAC1POSIXOpenThroughASwappedLeafLinkNeverTruncatesAForeignFile322r1 COL_BASE=1 COL_LAND=1
+===== D) 票尾真实 numstat⇄笔⑦正文那句 "3 增 0 删"（不符具名）=====
+5	0	.scratch/wisp/issues/352-wrappath-errno-half-stringified-so-fs-ernotexist-cannot-punch-through-private-route.md
+45:⇒ ★**本腿一枚框没翻**＝票 352 终量 0 勾／4 未勾；票名／`Status:`／`-done` 一字未动；票尾 numstat＝**纯追加**（`3 增 0 删`＝空行＋空行＋一条 bullet，`git diff -U0 | grep -c '^-[^-]'`=0）。
+===== E) 那枚未入库孤儿件的字节形制（CR⇄autocrlf）=====
+true
+core.autocrlf true
+ORPHAN_CR=43
+ORPHAN_BYTES=2312
+===== F) 我本趟新落的尺件/输出件的 LF⇄UTF-8⇄U+00A7 三味 =====
+01-roster-nameonly.sh CR=24 U00A7=0 UTF8RC=0 BYTES=1300
+02-cont-verify.sh CR=75 U00A7=0 UTF8RC=0 BYTES=6451
+03-gates-and-winsec.sh CR=31 U00A7=0 UTF8RC=0 BYTES=1645
+04-body-vs-disk.sh CR=49 U00A7=0 UTF8RC=0 BYTES=4296
+05-anti-phantom.sh CR=39 U00A7=0 UTF8RC=0 BYTES=2762
+06-pair-readings.sh CR=28 U00A7=0 UTF8RC=0 BYTES=2348
+07-callsites-and-purity.sh CR=28 U00A7=0 UTF8RC=0 BYTES=1920
+08-named-evidence-and-shape.sh CR=40 U00A7=0 UTF8RC=0 BYTES=3010
+12-roster-inmemory.pl CR=19 U00A7=0 UTF8RC=0 BYTES=742
+01-roster-nameonly.txt CR=127 U00A7=0 UTF8RC=0 BYTES=6832
+02-cont-verify.txt CR=84 U00A7=0 UTF8RC=0 BYTES=3185
+03-gates.txt CR=30 U00A7=0 UTF8RC=0 BYTES=2448
+04-body-vs-disk.txt CR=80 U00A7=0 UTF8RC=0 BYTES=3790
+05-anti-phantom.txt CR=51 U00A7=0 UTF8RC=0 BYTES=1983
+06-pair-readings.txt CR=47 U00A7=0 UTF8RC=0 BYTES=5036
+07-callsites.txt CR=254 U00A7=0 UTF8RC=0 BYTES=108502
+08-named-evidence.txt CR=42 U00A7=0 UTF8RC=0 BYTES=2588
+gate-1-gofumpt.txt CR=0 U00A7=0 UTF8RC=0 BYTES=0
+gate-2-d22scan.txt CR=252 U00A7=0 UTF8RC=0 BYTES=23771
+gate-3-length.txt CR=11 U00A7=0 UTF8RC=0 BYTES=1462
+gate-4-govet.txt CR=0 U00A7=0 UTF8RC=0 BYTES=0
+DONE

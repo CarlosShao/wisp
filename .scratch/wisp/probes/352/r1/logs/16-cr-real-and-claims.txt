@@ -1,0 +1,41 @@
+===== A) CR 三把尺对撞（利尺 tr ⇄两把钝尺）=====
+ac2-col-s1-treeB CRBYTES_tr=0 CRPCT_perl=0 LINES=2148 MKLINK_CRLF_LINES=0
+ac2-col-s2-treeL CRBYTES_tr=0 CRPCT_perl=0 LINES=2145 MKLINK_CRLF_LINES=0
+ac2-host-fiv-s1-treeB CRBYTES_tr=8 CRPCT_perl=8 LINES=1948 MKLINK_CRLF_LINES=8
+ac2-host-fiv-s2-treeL CRBYTES_tr=8 CRPCT_perl=8 LINES=1948 MKLINK_CRLF_LINES=8
+ac2-host-pair-s1-treeB CRBYTES_tr=8 CRPCT_perl=8 LINES=3470 MKLINK_CRLF_LINES=147
+ac2-host-pair-s2-treeL CRBYTES_tr=8 CRPCT_perl=8 LINES=3469 MKLINK_CRLF_LINES=147
+  （正控＝造一枚含 2 个 CR 的件：tr 报 2、perl 报 2、grep -c 报 3＝行计数⇒grep 钝）
+  CONTROL tr=2 perl=2 grep=3 lines=3
+===== B) 逐枚笔按类枚数⇄正文自述 =====
+COMMIT 0fb399c3 TOTAL=5 READINGS=0 LOGS=1 SH=3 TICKET=0
+    CLAIM: 枚数＝本笔 3 枚文件，越界 0、.go 枚 0（★探针件是 .go.txt）
+COMMIT ecffb93b TOTAL=1 READINGS=0 LOGS=0 SH=0 TICKET=0
+COMMIT aacde632 TOTAL=9 READINGS=1 LOGS=7 SH=0 TICKET=0
+    CLAIM: 枚数＝本笔 8 枚文件、越界 0、.go 枚 0；⛔ 翻框（票 352 现量 0 勾／4 未勾）⛔ 改票名／Status:／-done ⛔ push ⛔ 动 pinned
+COMMIT c16ff47e TOTAL=9 READINGS=1 LOGS=8 SH=0 TICKET=0
+    CLAIM: 枚数＝本笔 9 枚文件、越界 0、.go 枚 0
+COMMIT 06aa2abf TOTAL=41 READINGS=1 LOGS=38 SH=2 TICKET=0
+    CLAIM: 枚数＝本笔 1 枚报告＋27 枚读数散件，越界 0、.go 枚 0
+COMMIT 3ecdea30 TOTAL=15 READINGS=0 LOGS=9 SH=6 TICKET=0
+    CLAIM: 枚数＝本笔 15 枚文件（尺＝`git diff --cached --name-only | grep -c .`＝15；6 枚净化读数＋1 枚名册＋4 枚新尺件＋1 
+COMMIT 5c9402f8 TOTAL=6 READINGS=1 LOGS=3 SH=2 TICKET=0
+    CLAIM: 枚数＝本笔 6 枚文件、越界 0、.go 枚 0
+COMMIT 1c787282 TOTAL=1 READINGS=0 LOGS=0 SH=0 TICKET=1
+    CLAIM: 枚数＝本笔 1 枚文件＝票 352 自己那枚（写面第三处＝允许）；正文含被禁字面字符（码位 U+00A7）＝0（尺＝sh/07，正控 HANDOVER.md＝304 在场
+COMMIT 8a10a7e3 TOTAL=1 READINGS=0 LOGS=1 SH=0 TICKET=0
+    CLAIM: 枚数＝本笔 1 枚文件、越界 0、.go 枚 0；⛔ 翻框 ⛔ push
+===== C) 票尾 numstat 逐枚（真值⇄readings-ac3 第 45 行那句）=====
+5	0	.scratch/wisp/issues/352-wrappath-errno-half-stringified-so-fs-ernotexist-cannot-punch-through-private-route.md
+⇒ ★**本腿一枚框没翻**＝票 352 终量 0 勾／4 未勾；票名／`Status:`／`-done` 一字未动；票尾 numstat＝**纯追加**（`3 增 0 删`＝空行＋空行＋一条 bullet，`git diff -U0 | grep -c '^-[^-]'`=0）。
+===== D) 名册枚数随 HEAD 漂（笔⑨正文那两把尺的数 vs 现量）=====
+  NOW_ANCHORED=9
+  CLAIM: ANCHORED_COUNT=8
+  CLAIM: INMEMORY_ANCHOR0_COUNT=8
+  CLAIM: UNPUSHED_COMMITS_MINE=8
+===== E) probes/352/r1 之下工作树⇄HEAD 差异（除我那两枚新件外须 0）=====
+?? .scratch/wisp/probes/352/r1/logs/13-cont-roster.txt
+?? .scratch/wisp/probes/352/r1/logs/handoff-number-reconcile.txt
+?? .scratch/wisp/probes/352/r1/readings-ticket9-callsites.md
+?? .scratch/wisp/probes/352/r1/sh/13-cont-roster.sh
+DONE

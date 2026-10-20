@@ -1,0 +1,31 @@
+PWD=/d/work/workspace/projects plans/Wisp
+ENV GOTMPDIR=[UNSET] TMPDIR=[UNSET] TEMP=[UNSET] TMP=[UNSET]
+===== 门1 gofumpt -l internal/winsec/winsec.go =====
+RC=0
+  LISTED_LINES=0
+===== 门2 sh scripts/d22scan.sh =====
+RC=0
+  clean - no D22 ban violations
+  clean - no D22 ban violations
+  internal/=603
+===== 门3 sh scripts/check-path-length-budget.sh =====
+RC=0
+  over-budget=60
+  not in roster=0
+  roster entries=60
+  VERDICT GREEN
+===== 门4 go vet ./internal/winsec/ =====
+RC=0
+  VET_OUT_BYTES=0
+===== 交叉档（只登记"能编译＋vet 无声"，⛔ 与本机档成对判红绿）=====
+RC_linux=0
+RC_darwin=0
+===== 存量具名（⛔ 我动、⛔ 顺手重排）gofumpt -l internal cmd tools =====
+RC=0
+  STOCK_DIRTY=4
+    internal\agent\approval\pending_read.go
+    internal\agent\tools.go
+    internal\risk\provenance.go
+    cmd\wisp\models.go
+===== 那 4 枚存量件里有没有我这趟新造的（应全住别腿/别处，⛔ 我产码）=====
+DONE

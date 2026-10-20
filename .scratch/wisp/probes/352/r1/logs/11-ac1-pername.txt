@@ -1,0 +1,80 @@
+##### ac1-host-s2-mut-2-treeL
+R1 NN=false NS=true
+R10 NN=false NS=true
+R12 NN=false NS=false
+R13 NN=false NS=true
+R2 NN=false NS=true
+R3 NN=true NS=true
+R4 NN=true NS=true
+R5 NN=true NS=true
+R6 NN=true NS=true
+R8 NN=false NS=false
+R9 NN=false NS=false
+TT=4 FT=4 OTHER=3
+##### ac1-host2-s2-mut-2-treeL
+R1 NN=false NS=true
+R10 NN=false NS=true
+R12 NN=false NS=false
+R13 NN=false NS=true
+R2 NN=false NS=true
+R3 NN=true NS=true
+R4 NN=true NS=true
+R5 NN=true NS=true
+R6 NN=true NS=true
+R8 NN=false NS=false
+R9 NN=false NS=false
+TT=4 FT=4 OTHER=3
+##### ac1-col-s2-mut-2-treeL
+R1 NN=true NS=true
+R10 NN=false NS=false
+R12 NN=false NS=false
+R13 NN=false NS=true
+R2 NN=true NS=true
+R3 NN=true NS=true
+R4 NN=true NS=true
+R5 NN=true NS=true
+R6 NN=true NS=true
+R8 NN=false NS=false
+R9 NN=false NS=false
+TT=6 FT=1 OTHER=4
+##### ac1-col2-s2-mut-2-treeL
+R1 NN=true NS=true
+R10 NN=false NS=false
+R12 NN=false NS=false
+R13 NN=false NS=true
+R2 NN=true NS=true
+R3 NN=true NS=true
+R4 NN=true NS=true
+R5 NN=true NS=true
+R6 NN=true NS=true
+R8 NN=false NS=false
+R9 NN=false NS=false
+TT=6 FT=1 OTHER=4
+##### ac1-host-s1-mut-1-treeB
+R1 NN=false NS=true
+R10 NN=false NS=true
+R12 NN=false NS=false
+R13 NN=false NS=true
+R2 NN=false NS=true
+R3 NN=false NS=true
+R4 NN=false NS=true
+R5 NN=false NS=true
+R6 NN=false NS=true
+R8 NN=false NS=false
+R9 NN=false NS=false
+TT=0 FT=8 OTHER=3
+##### ac1-col-s1-mut-1-treeB
+R1 NN=false NS=true
+R10 NN=false NS=false
+R12 NN=false NS=false
+R13 NN=false NS=true
+R2 NN=false NS=true
+R3 NN=false NS=true
+R4 NN=false NS=true
+R5 NN=false NS=true
+R6 NN=false NS=true
+R8 NN=false NS=false
+R9 NN=false NS=false
+TT=0 FT=7 OTHER=4
+##### 正控：R3 那行逐字（证明含点号的名字本被上一把尺漏掉）
+5:    probe_352r1_err_test.go:54: R3 wrapPath direct fs.ErrNotExist: isErrNotExist=true isNotSealable=true isErrExist=false isUnresolved=false isReparse=false PathError{Op:<no *os.PathError> errno:<n/a>} verbatim="winsec: cannot apply a private security descriptor: the/spelling: file does not exist"

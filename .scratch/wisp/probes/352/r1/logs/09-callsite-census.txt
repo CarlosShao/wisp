@@ -1,0 +1,101 @@
+===== A) wrapPath 定义⇄调用点逐枚点名（HEAD 树，尺＝git grep -n + 剥定义行）=====
+TOTAL_LINES=25
+DEFINES=1
+--- 逐枚（已入库探针件里⛔ 出现＝只数产码文件）---
+internal/winsec/pinnedleaf_342_fallback.go:40:	return leafPin{}, wrapPath(resolved, errNoActTimePrimitive)
+internal/winsec/pinnedleaf_342_windows.go:79:		return leafPin{}, wrapPath(resolved, err)
+internal/winsec/pinnedleaf_342_windows.go:91:			return leafPin{}, wrapPath(resolved, err)
+internal/winsec/pinnedleaf_342_windows.go:103:		return leafPin{}, wrapPath(resolved, errors.New("the spelling names no directory to pin"))
+internal/winsec/pinnedleaf_342_windows.go:130:		return wrapPath(path, err)
+internal/winsec/winsec.go:430:func wrapPath(path string, err error) error {
+internal/winsec/winsec.go:445:	return wrapPath(path, err)
+internal/winsec/winsec_other.go:167:		return nil, wrapPath(path, err)
+internal/winsec/winsec_other.go:173:			return nil, wrapPath(path, err)
+internal/winsec/winsec_other.go:179:			return nil, wrapPath(path, err)
+internal/winsec/winsec_other.go:192:		return nil, wrapPath(path, err)
+internal/winsec/winsec_other.go:198:		return nil, wrapPath(path, err)
+internal/winsec/winsec_other.go:217:		return wrapPath(path, err)
+internal/winsec/winsec_other.go:257:		return wrapPath(path, err)
+internal/winsec/winsec_other.go:261:		return wrapPath(path, err)
+internal/winsec/winsec_other.go:264:		return wrapPath(path, fmt.Errorf("mode is %v, want %v (%s stores no usable permission bits)",
+internal/winsec/winsec_other.go:294:		return wrapPath(name, err)
+internal/winsec/winsec_other.go:298:		return wrapPath(name, err)
+internal/winsec/winsec_windows.go:298:		return wrapPath(path, err)
+internal/winsec/winsec_windows.go:306:		return wrapPath(path, err)
+internal/winsec/winsec_windows.go:540:		return wrapPath(path, err)
+internal/winsec/winsec_windows.go:543:		return wrapPath(path, fmt.Errorf("DACL is missing or unprotected, so inherited grants still apply: %s", object.sddl))
+internal/winsec/winsec_windows.go:547:		return wrapPath(path, err)
+internal/winsec/winsec_windows.go:571:		return wrapPath(path, fmt.Errorf("DACL names principals outside the private set (%v): %s", foreign, object.sddl))
+internal/winsec/winsec_windows.go:574:		return wrapPath(path, fmt.Errorf("DACL grants the current user nothing on this object: %s", object.sddl))
+CALLSITES_PROD=24
+TESTHITS=0
+===== B) winsec.go 自身那 2 枚（票面现量第 9 行那个数）⇄逐字 ---
+430:func wrapPath(path string, err error) error {
+445:	return wrapPath(path, err)
+===== C) 起手锚 bf509bb8 上同一条尺（⛔ 漂）=====
+internal/winsec/pinnedleaf_342_fallback.go:1
+internal/winsec/pinnedleaf_342_windows.go:4
+internal/winsec/winsec.go:2
+internal/winsec/winsec_other.go:11
+internal/winsec/winsec_windows.go:7
+===== D) Windows 本机档落地侧 FALSETRUE 四枚到底是哪四名（尺名点名）=====
+R1 parent-missing PrivateFile: isErrNotExist=false isNotSealable=true
+R2 parent-missing PrivateFileExclusive: isErrNotExist=false isNotSealable=true
+R10 relative spelling: isErrNotExist=false isNotSealable=true
+R13 injected seal failure PrivateFileExclusive: isErrNotExist=false isNotSealable=true
+--- 同发 TRUETRUE 四枚名 ---
+R4 SealFile missing-leaf in existing dir: isErrNotExist=true isNotSealable=true
+R5 SealFile parent-missing: isErrNotExist=true isNotSealable=true
+R6 SealDir parent-missing: isErrNotExist=true isNotSealable=true
+--- 容器落地侧 FALSETRUE 那名 ---
+R13 injected seal failure PrivateFileExclusive: isErrNotExist=false isNotSealable=true
+===== E) internal/winsec 写面活体尺（最近 90 分钟谁在落笔）=====
+RECENT90=0
+===== F) internal/winsec 最近三笔（⛔ 区间尺，只列号与时间）=====
+ecffb93b|10-20 16:15|票 352 落地腿 352-r1 笔②＝★那一行落地＝wrapPath 的 e
+0e487f06|10-19 23:43|票 342＋票 348 落地腿 342-r2·交件⑤＝注释面更正（pro
+4ff76a0c|10-19 23:36|票 342＋票 348 落地腿 342-r2·交件④＝仪器名册一行改
+===== G) 工作树里本腿名下未入库件（只数 probes/352/r1）=====
+?? .scratch/wisp/probes/352/r1/logs/handoff-number-reconcile.txt
+===== H) 本趟临时根清单（只建不删）=====
+/d/tmp/wisp/20261020/352r1cont:
+logs
+sh
+tmp
+
+/d/tmp/wisp/20261020/352r1cont/logs:
+01-roster-nameonly.txt
+02-cont-verify.txt
+03-gates.txt
+04-body-vs-disk.txt
+05-anti-phantom.txt
+06-pair-readings.txt
+07-callsites.txt
+08-named-evidence.txt
+09-callsite-census.txt
+gate-1-gofumpt.txt
+gate-2-d22scan.txt
+gate-3-length.txt
+gate-4-govet.txt
+
+/d/tmp/wisp/20261020/352r1cont/sh:
+01-roster-nameonly.sh
+02-cont-verify.sh
+03-gates-and-winsec.sh
+04-body-vs-disk.sh
+05-anti-phantom.sh
+06-pair-readings.sh
+07-callsites-and-purity.sh
+08-named-evidence-and-shape.sh
+09-callsite-census.sh
+12-roster-inmemory.pl
+
+/d/tmp/wisp/20261020/352r1cont/tmp:
+04-iconv.err
+04-valid.txt
+all-subjects.txt
+anchored.txt
+cs-all.txt
+head-subjects.txt
+needle.txt
+DONE

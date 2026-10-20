@@ -1,0 +1,29 @@
+===== A) core.autocrlf ⇄ .gitattributes 是否管到 probes 下 .txt =====
+true
+.scratch/wisp/probes/352/r1/logs/ac2-host-pair-s1-treeB.raw.txt: text: auto
+.scratch/wisp/probes/352/r1/logs/ac2-host-pair-s1-treeB.raw.txt: eol: unspecified
+.scratch/wisp/probes/352/r1/logs/handoff-number-reconcile.txt: text: auto
+.scratch/wisp/probes/352/r1/logs/handoff-number-reconcile.txt: eol: unspecified
+.gitattributes
+1:* text=auto
+17:docker/model-mirror/fixtures/** binary
+===== B) 那六枚净化过的 raw 件：入库 blob 里 CR 枚数（⛔ 采信正文）=====
+ac2-col-s1-treeB WORKTREE_CR=2148 BLOB_CR=2148 BLOB=c27fb169
+ac2-col-s2-treeL WORKTREE_CR=2145 BLOB_CR=2145 BLOB=0484199a
+ac2-host-fiv-s1-treeB WORKTREE_CR=1948 BLOB_CR=1948 BLOB=b273eae4
+ac2-host-fiv-s2-treeL WORKTREE_CR=1948 BLOB_CR=1948 BLOB=130e24d9
+ac2-host-pair-s1-treeB WORKTREE_CR=3470 BLOB_CR=3470 BLOB=b9d34346
+ac2-host-pair-s2-treeL WORKTREE_CR=3469 BLOB_CR=3469 BLOB=e6d46dfe
+===== C) mklink 那 8 行 CRLF 句在入库 blob 里还在不在（逐字尺）=====
+147
+190:        Successfully processed 1 files; Failed processing 0 files$
+197:        Successfully processed 1 files; Failed processing 0 files$
+206:        Successfully processed 1 files; Failed processing 0 files$
+===== D) 票面现量第 9 行那把尺逐字重跑（HEAD ⇄ 起手锚）=====
+HEAD_COUNT=2
+BF509_COUNT=2
+===== E) 全仓 wrapPath 命中：⛔ 测试件里有无调用（决定"调用点"分母）=====
+TEST_HITS=0
+===== F) 已入库 probes 件里有⛔ 有"调用点逐枚现数"那一味（票面第 9 行欠账）=====
+CALLSITE_DOC=0
+DONE
