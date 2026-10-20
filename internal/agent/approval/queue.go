@@ -259,9 +259,17 @@ func (q *Queue) lookupForAllowLocked(corr string) *qitem {
 //
 // An alias naming more than one live item is NOT guessed: with two cards on
 // screen that a reply cannot tell apart, the reply means neither of them and
-// stays an unknown correlation id. This function is the only reader of q.alias
-// and Queue.reject is its only caller, so the alias table cannot reach the
-// allow side from here. Caller holds q.mu.
+// stays an unknown correlation id. The reachability claim, written to match
+// this file instead of to flatter itself: this function is the only reader of
+// q.alias that turns a reply into an item, and it is NOT the only reader in
+// the file - the index-maintenance pair indexLocked (run by push) and
+// unindexLocked (run by dropLocked) reads the same map too, each touching only
+// the buckets of the one item handed to it, so neither resolves a reply and
+// neither can settle anything. On the caller side the old claim holds as
+// written: Queue.reject is the only caller of this function. Together with
+// lookupForAllowLocked, whose body reads q.byID and nothing else, that is why
+// a borrowed name cannot reach the allow side from here; the direction itself
+// is pinned by TestAnAliasCanNeverBuyAnAllow. Caller holds q.mu.
 func (q *Queue) lookupForRefusalLocked(corr string) *qitem {
 	if corr == "" {
 		return nil
