@@ -1,0 +1,26 @@
+# 06 CI d22scan 步在含票 115 落地字节的 head 上的读数（本腿 gh api 自取）
+## run 35616790753（head d1056c0，含 c6dbbf9＝票 115 末笔）的 job 名册
+   rc=0 stderr=0
+   106389417800 lint failure
+   106389418050 lint-frontend success
+   106389418059 test-windows failure
+   106389418067 slo-smoke success
+   106389418393 slo-full success
+   106389418586 test-core success
+
+## lint job 的步名册（找 d22scan 那一步）
+   lint job id = 106389417800
+   rc=0
+   1 Set up job => success
+   2 Run actions/checkout@v4 => success
+   3 Run actions/setup-go@v5 => success
+   4 D22 scanner positive control (tools/d22scan tests, seeded red) => success
+   5 D22 seven-ban + emoji scan (tools/d22scan) => success
+   6 gofmt (gofumpt) => success
+   7 go vet (module) => success
+   8 go vet (tools/d22scan module) => success
+   9 staticcheck => failure
+   10 mockllm module vet => success
+   19 Post Run actions/setup-go@v5 => skipped
+   20 Post Run actions/checkout@v4 => success
+   21 Complete job => success
