@@ -538,9 +538,56 @@ func TestTicket223ModeLooseningChangesTheRunningModeAfterAllow(t *testing.T) {
 		if before := r.rt.modes.PermissionMode(); before != risk.ModeAskEveryStep {
 			t.Fatalf("this case's premise moved: the run came up in %v, want the strictest档", before)
 		}
+		// G1 (ticket 351 AC#2) - settle BEFORE the plant.
+		//
+		// Why this arm exists: the surface that counts a card and the surface
+		// that prints it are two different faces of one call. consoleApprovalUI
+		// Prompt books the card first and only then writes its lines
+		// (cmd/wisp/run.go:1423 cards++ -> :1431 live.record -> :1441 Fprintf,
+		// and the comment at :1425-1429 says in so many words that the grant is
+		// booked before anything is printed). awaitCard polls the LEDGER
+		// (:259 -> liveCards.pending), so it can return while the card's own
+		// text is still in flight on stdout. Reading stdout once at that moment
+		// - which is what this case used to do - is a real window, not a product
+		// bug: ticket 351 AC#1 classified the three-places-two-green-one-red
+		// reading as instrumentation shape on that evidence.
+		//
+		// So each arm reads the face it is about, and reads it waited-for.
+		// Nothing here sleeps, skips, or loosens: armed is the tick's own
+		// statement that it is watching this file, the card count is the run's
+		// own counter (run.go:929 windowCount), and the banner is awaited with
+		// the bounded monotonic helper this file already owns. A settle that
+		// never settles reddens at reloadCaseBudget.
+		r.awaitAudit(t, "config: HOT-RELOAD state=armed")
+		before := r.rt.windowCount()
+		if before != 0 {
+			t.Fatalf("this case's premise moved: %d card(s) were already displayed before the plant, want 0", before)
+		}
+		r.awaitStdout(t, "配置热加载已接管")
 		r.plant(t, "[risk]\n", "[risk]\npermission_mode = \"auto_approve\"\n")
 		card := r.awaitCard(t, configReloadTool)
-		shown := r.h.out.String()
+		// G2 (ticket 351 AC#2) - the notification is PRESENT, as its own arm,
+		// and as a numerator rather than a substring: exactly one more card than
+		// the baseline this case took before planting. The shape is the package
+		// precedent, not an invention (cmd/wisp/ticket224_assembly_test.go:270
+		// and :272 take windowCount() before and subtract it after), and the
+		// paired presence-naming two-arm reading is this file's own :402/:405.
+		//
+		// It is separate from G3 on purpose. One arm that only asked "does the
+		// stream contain the key" could not tell three different facts apart:
+		// no card at all, a card nobody printed, and a printed card that never
+		// names what it is asking about. Only the third one is a product defect
+		// (G2 green with G3 red); the second is the timing shape ticket 351
+		// measured, and the first is the numerator going red by itself.
+		if n := r.rt.windowCount() - before; n != 1 {
+			t.Errorf("one hand-edited [risk] loosening displayed %d new card(s), want exactly 1", n)
+		}
+		shown := r.awaitStdout(t, "[确认 L2 "+configReloadTool+"]")
+		// G3 (ticket 351 AC#2) - the card NAMES the key, asserted on the stream
+		// G2 just waited for. The needle and this message are unchanged from the
+		// assertion this case has always carried: only WHERE it reads moved, from
+		// the single pre-plant-window read of r.h.out.String() to the awaited
+		// return value. Weakening the needle itself is what 票 351 禁区 2 forbids.
 		if !strings.Contains(shown, "risk.permission_mode") {
 			t.Errorf("the card does not name risk.permission_mode: %s", shown)
 		}
