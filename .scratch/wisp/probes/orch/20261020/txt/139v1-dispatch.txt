@@ -1,0 +1,18 @@
+派单＝票 139 终裁腿 139-v1（★非实现者·只读·裁决者≠实现者）｜编排者发出 2026-10-20 22:4x +08｜★主题逐字「票 139 终裁腿 139-v1」
+## 你是谁／裁什么
+被裁对象有两批＝★旧批（痕与牙的真正落地笔）`1acdd032`（09-25 实现腿）＋`ff550f38`/`b23c7f77`（09-26 票 153 两笔，票 153 现 `-done`）⇄新批（今天的复验趟）`139-r1` 10 笔 `eb623bee`→`bdbbc8e3`（★它对 `.go` **零字节**＝起手发现两格早已入库、按派单末句停手改交复验）。
+票面＝`.scratch/wisp/issues/139-context-compression-leaves-no-trace-zero-log-calls-in-compress-go-zero-readers-of-res-compression.md`（现量未勾 2＝`AC#2`⇄`AC#3`／已勾 2）。
+起手现读＝①票面两格字面判据（⛔ 抄我这封）＋★票面 §0 那句"compress.go 今天全文零条日志"⇄第 12 节 10-03 由腿 `139-a1` 自己复认过期的那段（＝今天这味是我派单尺的缺陷、见台账 `A1071`⑥）②验收件 `docs/evidence/s1/139-*-accept*.md` ③复验腿五枚正文件 `.scratch/wisp/probes/139/r1/{00-verdict.md,01-rulers.txt,02-dirty-tracked.txt,03-final-roster.txt,04-manifest.txt}` ④公共块＝`probes/orch/20261020/352r1-dispatch.txt` 尾段。
+
+## 必判五件（★每把你另起尺，⛔ 抄任何一枚腿的数；报 0 命中前先跑正控）
+1. **痕是否真在盘且＝票面 `AC#2` 字面要求**＝`git cat-file blob HEAD:internal/agent/compress.go` 现读那条 `Info("agent: history compressed", attrs...)`（腿报 `:240`＝行号会漂、★用内容锚）＋票面 `AC#2` 逐味对码（`tokens_before`⇄`tokens_after`⇄`history_changed`；★只记计数与布尔＝守 `keep_transcript` 那味有没有被违背）＋"事后答得出"到底答得出什么数＝你按票面字面判、⛔ 拿腿的转述当凭据。
+2. **牙**＝`compress_trace_test.go` 用例逐枚点名（腿报 7 枚）＋`loop.go` 接线三点（`Need`→`Compress(withTraceTask…)`→`res.Compression = rep`）＋`Result` 出线字段＝在不在 HEAD。
+3. **复验腿那两发变异可信度**＝它交 M1 摘痕（锚命中 1→0、`go build` rc=0、`114/86/4/0` rc=1、逐名红 4 枚、还原 pristine `16e153d8…` MATCH）⇄M2 痕恒打（`if rep.Ran`→`if true`、`114/88/2/0`、反向 2 枚咬住、还原同串）＝落点⛔ 同＝★你从入库底片逐枚复量四数与红名册＋验"修前红不存在"这个判断成不成立（＝要造修前红只能先删已入库的痕＝破坏已结案面？你独立判这句）。
+4. **`AC#2`/`AC#3` 到底能不能翻**＝①旧批落地笔的写面⇄判据逐枚对回（`git show --name-only 1acdd032` 等）＋②今天复验批能不能当凭据（＝同 `321-v1` 第⑤件那味：件在位＋哈希复现可当、红侧须异腿/干净窗口＝⚠ 此刻 `gw-1` 正在跑 `./internal/agent/` 的成对色＝它的数回来你能不能用＝★你⛔ 跑 `go test`/`go build`，要现势色就具名写"该味归 `gw-1`"）。
+5. **★票面那半真正还欠的**＝腿具名上报两件：(a) 生产侧常见路径今天走不到压缩＝要动 `KeepRawRounds`/`Need()`＝**契约变更、归人工批准**；(b)"痕到不到得了盘"那半落点⛔ 属 `internal/agent`（⛔ 它扩地界）。⇒ 你判：这两件该另立一格、另立一票、还是登"已知残缺"，★并给判据草案（编排者规矩＝⛔ 凭实现腿推荐立票＝必须先有你这枚非实现者签名）。
+
+## 写面与铁律
+写面＝只 `docs/evidence/s1/139-v1-verdict.md`＋`.scratch/wisp/probes/139/v1/**`。★票 139 尾"只追加一条"额度已被复验腿 `f0cd6d46`⑧ 占＝你的话落 probes 件、⛔ 补第二条 bullet、⛔ 动 `Status:`/票名/`-done`（还有两格未闭＝防重领唯一键）。
+⛔ 动任何 `.go` 字节、⛔ 跑 `go test`/`go build`/`d22scan`（含 `go run`）、⛔ 翻框、⛔ push、⛔ 改台账；两处逐枚字面 pathspec（⛔ `add -A`/`.`/目录形/从共享 index 反推）；⛔ amend/reset/rebase/stash/checkout ./clean；中文正文先 Write 成文件再 `git commit -F D:\tmp\...`；每落一枚就 commit；提交后 `git log -1`＋`git show --name-only` 对回；主题逐字「**票 139 终裁腿 139-v1**」⛔ 换形。
+★今天新出的定式全照做：CR/码位对**入库 blob** 用 `tr -cd` 量（⛔ 对工作树、⛔ 用 `grep -c` 数字节）；重定向⛔ 落仓根冻结件；"tracked 脏"必**逐枚列名＋mtime**；交件框终量⛔ 写死预期＝现量并报尺；凡引用任何 `A##`/`Q##`/`R##` 前先 `grep -c '^## <号>'` 验存在（我栽过空号）；名册尺⛔ 拿 `A..B` 区间数"谁交了几笔"；★凡写"已放 X 腿"必先有 id 或盘上 `-send` 动作（今天中我两回）；★说依赖写"依赖闭包含 winsec"⇄"直 import"两把分开（`A1071`③ 我这枚语义混了）；取退码＝重定向后 `echo RC=$?`；⛔ `cut -c` 截中文；证据件⛔ `.out`⛔ 0 字节、正文件 ≤160 行；★`icacls /remove` 类用例台根⛔ 落 `D:\tmp\wisp`；临时件 `D:\tmp\wisp\20261020\139v1\`、只建不删；⛔ 注释/正文指名不存在的件或用例当凭据；碰到派单没覆盖的＝停下具名上报、⛔ 自行假设。
+交件 send_message 报 `lead`＝逐枚提交号＋名册三把尺同号＋判语件路径＋字节/行＋★五件逐件判语（各带独立尺读数）＋立格／立票建议（含判据草案）＋写面自证（`.go` 0 枚）＋票 139 框终量（你一枚没翻）＋tracked 脏逐枚列名。复验腿自报⇄盘上任何不符＝具名写进判语、⛔ 替它圆；它自抓的 6 枚坏尺形与两处已入库正文带码位那味＝你复核处置对不对（⛔ 改写历史）。
