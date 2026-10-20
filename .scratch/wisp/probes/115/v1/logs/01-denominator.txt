@@ -1,0 +1,37 @@
+# 01 真分母尺（每把尺带尺名＋射程）
+# 起手锚＝c16ff47e（115-v1 第一笔 git log -1 现认）；本尺跑时 HEAD＝06aa2abf
+
+## A. 票面 AC 格全名册（尺＝awk：行首 '- ' 且含 '**AC#<n>'；不数框、不数 emoji）
+   AC#1  no-box   line 44
+   AC#2  [x]      line 47
+   AC#3  [x]      line 52
+   AC#4  [ ]      line 58
+   AC#5  no-box   line 61
+   AC#6  [ ]      line 64
+   AC#7  [x]      line 68
+   AC#2  no-box   line 103
+   AC#3  no-box   line 307
+
+## B. 三把尺同尺对拉（尺名逐字）
+   尺B1 grep -cE "^- \[ \]"   （带框·未勾） = 2
+   尺B2 grep -cE "^- \[x\]"    （带框·已勾） = 3
+   尺B3 grep -cE "^- \["        （带框行合计） = 5
+   尺B4 awk 行首-且含**AC#（判据格合计） = 9
+   尺B5 awk 判据格中「不带框」的枚数 = 4
+   尺B5 逐枚落点：
+     line 44: - ⛔ **（2026-09-29 18:5x `gate-rerun-1` 处置＝账在仍开放的票名下，本格不再占结案票的分母；原句逐字保留、续行未动。判性来源＝只读腿 `undone-28-1` 的"丙"行＋派单票 234 AC#5，台账 `A446`；读数与 sha 请引接收票那一格，别引本行。）** **AC#1** 独立复算上面四条红（**逐字**贴你跑出来的红点），并复算"上一枚 run 里 `TestSealReportsThePrincipalsItCleared` 是 PASS"这句 ⇒ **指向**＝票 230 `:19`（AC#1 具名要 115 名下的裁决表，230 开放）
+     line 61: - ⛔ **AC#5** **不许用以下方式变绿**：删用例、`Skip` 掉、把断言改成恒真、调阈值、给 CI 步骤加 `continue-on-error`、
+     line 103: - 2026-09-21 21:2x（`agent-ticket115`）：交件。**AC#2 裁定 = 方向 B（按树不按拼写）；四枚红的落点在只读用例的比对面 ⇒ AC#3 那半登记待你定序，见本条 ③。**
+     line 307: - 2026-09-21 21:4x（`agent-ticket115b`）：交 **AC#3 的后半格**——批准的那 6 处只读比对已落地 = commit `527d303`（3 文件 +6/-6，逐处一行，未动任何阈值/期望数/golden）。**AC#3 的框我不翻**：那 6 行落地之后 CI step4 仍会红 2 枚，而红点不在这 6 行里（见 ③）。
+
+## C. 票 230:11 那把 54/14 尺今天复跑＋逐票点名
+   未勾框总数（grep -h -- "^- [ ]" *-done.md | wc -l） = 4
+   含未勾的 -done 票数（grep -l | wc -l） = 3
+   逐票点名（尺＝grep -c 每枚 -done.md）：
+     07-ball-state-machine-core-done.md  未勾=1
+     115-seal-notices-carry-the-resolvers-answer-while-the-cases-compare-caller-spelling-done.md  未勾=2
+     92-panel-composer-mode-attachments-workspace-done.md  未勾=1
+   -done 票总数 = 151
+
+## D. 票 115 的 AC#1 那一格（09-29 摘框）处置句逐字开头
+   - ⛔ **（2026-09-29 18:5x `gate-rerun-1` 处置＝账在仍开放的票名下，本格不再占结案票的分母；原句逐字保留、续行未动。判性来源＝只读腿 `undone-28-1` 的"丙"行＋派单票 234 AC#5，台账 `A446`；读数与 sha 请引接收票那一格，别引本行。）** **AC#1** 独立复算上面四条红（**逐字**贴你跑出来的红点），并复算"上一枚 run 里 `TestSealReportsThePrincipalsItCleared` 是 PASS"这句 ⇒ **指向**＝票 230 `:19`（AC#1 具名要 115 名下的裁决表，230 开放）
