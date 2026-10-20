@@ -1,0 +1,1 @@
+go vet ./internal/winsec/ on the mutated export tree: rc=0, empty stdout/stderr (the file exists so the ruling is recorded, not an untouched byte). See logs/15/18 rows for the rc lines.

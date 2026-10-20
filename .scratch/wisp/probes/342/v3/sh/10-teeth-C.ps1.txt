@@ -1,0 +1,51 @@
+$ErrorActionPreference = 'Continue'
+# 342-v3 teeth shot C. Landing point DIFFERENT from both of 342-r2's two shots (it: removed BOTH re-check
+# halves; replaced the identity gate with a refuse-every-name twin). Mine: empty ONLY the re-check's LINK
+# face inside openPinnedLeaf -- predicate still evaluated, refusal gone. If the re-check is what converts
+# the followed open into a refusal, its link-face count must fall to 0 while the DAMAGE column (witness
+# truncated) must NOT fall to 0: that is the "reports, does not prevent" claim measured with a blade.
+# Only physical bytes of an export tree; pristine hashes before/after; no -overlay; serial; no checkout.
+$log = 'D:\tmp\wisp\20261020\342v3\logs'
+$tree = 'D:\tmp\wisp\20261020\342v3\treeT'
+$env:GOTMPDIR = "$env:LOCALAPPDATA\Temp\v3-342v3"
+$env:TMPDIR = $env:GOTMPDIR
+$env:GOPROXY = 'off'
+$leaf = Join-Path $tree 'internal\winsec\pinnedleaf_342_windows.go'
+function HashOf($p) { (Get-FileHash $p -Algorithm SHA256).Hash }
+
+$bytes = [System.IO.File]::ReadAllBytes($leaf)
+$text = [System.Text.Encoding]::UTF8.GetString($bytes)
+$pristine = HashOf $leaf
+Write-Output "PRISTINE=$pristine"
+
+# anchors: OLD = the four-line link-face refusal block (unique to the re-check half), NEW = the MUT tag.
+$nl = [System.Environment]::NewLine
+$block = @(
+  "`tif entryIsLink(now) {",
+  "`t`t_ = f.Close()",
+  "`t`treturn nil, placementRefusalWindows(full, base, `"the name carries a link, so this handle is not the object the caller named`")",
+  "`t}"
+)
+$old = [string]::Join([char]10, $block)
+$oldCount = ([regex]::Matches($text, [regex]::Escape($old))).Count
+Write-Output "OLD anchor before the cut = $oldCount (expect 1)"
+if ($oldCount -ne 1) { Write-Output 'ABORT: pre-cut anchor count != expected'; exit 1 }
+
+$new = [string]::Join([char]10, @("`tif entryIsLink(now) { // MUT-C 342v3: predicate kept, the link-face refusal removed", "`t}"))
+$mut = $text.Replace($old, $new)
+$oldAfter = ([regex]::Matches($mut, [regex]::Escape($old))).Count
+$newAfter = ([regex]::Matches($mut, [regex]::Escape('MUT-C 342v3'))).Count
+Write-Output "after the cut: OLD=$oldAfter (expect 0) NEW=$newAfter (expect 1)"
+if ($oldAfter -ne 0 -or $newAfter -ne 1) { Write-Output 'ABORT: post-cut anchors not as expected'; exit 1 }
+
+[System.IO.File]::WriteAllText($leaf, $mut, (New-Object System.Text.UTF8Encoding($false)))
+Write-Output "MUT HASH=$(HashOf $leaf)"
+Push-Location $tree
+& go test -v -count=1 -timeout 30m -run 'TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2' ./internal/winsec/ > "$log\mutC-leaf-r1.log" 2>&1
+Write-Output "mutC RC=$LASTEXITCODE"
+& go vet ./internal/winsec/ > "$log\mutC-vet.log" 2>&1
+Write-Output "mutC vet RC=$LASTEXITCODE"
+Pop-Location
+[System.IO.File]::WriteAllBytes($leaf, $bytes)
+$nowHash = HashOf $leaf
+Write-Output "RESTORED=$nowHash MATCH=$($nowHash -eq $pristine)"

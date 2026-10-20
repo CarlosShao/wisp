@@ -1,0 +1,48 @@
+BENCH ROOT=D:\tmp\wisp\20261020\342v3\bench\run1 go=windows
+
+ANCESTOR-MOVE shot 1: chain D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\data\sub\leaf.bin
+    A nothing held: rename(data)   [S5 positive control]           err=<nil>  (the move LANDED)
+          restore parkA -> data                                    err=<nil>  (the move LANDED)
+    A nothing held: rename(sub)    [S5 positive control]           err=<nil>  (the move LANDED)
+          restore parkA2 -> sub                                    err=<nil>  (the move LANDED)
+    A leaf still reachable: present size=21 body=[the caller's own body]
+    B BASELINE at removal (by-name handle closed): rename(data)  [S1] err=<nil>  (the move LANDED)
+          restore parkB -> data                                    err=<nil>  (the move LANDED)
+    B BASELINE at removal (by-name handle closed): rename(sub)   [S1] err=<nil>  (the move LANDED)
+          restore parkB2 -> sub                                    err=<nil>  (the move LANDED)
+    C BASELINE seal hop (by-name handle OPEN): rename(data)        err=rename D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\data D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\parkC: Access is denied.
+    C BASELINE seal hop (by-name handle OPEN): vacate the leaf name err=remove D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+C   the caller's name now: present size=0 body=[]
+    C BASELINE seal hop: rename(sibling into the caller's name) [S3] err=rename D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\data\sub\sibling-C.bin D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\data\sub\leaf.bin: Access is denied.
+    D LANDING at removal (parent pin HELD, leaf closed): rename(data)   [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\data D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\parkD: Access is denied.
+    D LANDING at removal (parent pin HELD): rename(sub)=the pinned dir  [S2b] err=rename D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\data\sub D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\parkD2: The process cannot access the file because it is being used by another process.
+D   the chain still intact: present size=0 body=[]
+    E LANDING seal hop (pin + leaf handle OPEN): rename(data)          [S2] err=rename D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\data D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\parkE: Access is denied.
+    E LANDING seal hop (pin + leaf handle OPEN): rename(sub)           [S2b] err=rename D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\data\sub D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\parkE2: The process cannot access the file because it is being used by another process.
+    F pin RELEASED: rename(data)   [S5]                            err=<nil>  (the move LANDED)
+          restore parkF -> data                                    err=<nil>  (the move LANDED)
+F   sub reachable: present size=0 unreadable=read D:\tmp\wisp\20261020\342v3\bench\run1\anc01548882278\data\sub: Incorrect function.
+
+NAME-SWAP shot 1: caller name=D:\tmp\wisp\20261020\342v3\bench\run1\nam011641650532\data\sub\leaf.bin
+    G BASELINE by-name handle alive: vacate the caller's name  [S3] err=remove D:\tmp\wisp\20261020\342v3\bench\run1\nam011641650532\data\sub\leaf.bin: The process cannot access the file because it is being used by another process.
+G   the caller's name now: present size=0 body=[]
+    G BASELINE: rename(the unnamed object INTO the caller's name) [S3] err=rename D:\tmp\wisp\20261020\342v3\bench\run1\nam011641650532\data\sub\the-unnamed-object.bin D:\tmp\wisp\20261020\342v3\bench\run1\nam011641650532\data\sub\leaf.bin: Access is denied.
+G   sibling's own name: present size=55 body=[an object the caller never named, in the same directory]
+G   => the baseline's own handle forbids this world (not counted as a green)
+    H LANDING Root handle alive: vacate the caller's name  [S4]    err=<nil>  (the move LANDED)
+H   the caller's name now: absent (The system cannot find the file specified.)
+    H LANDING: rename(the unnamed object INTO the caller's name) [S4] err=<nil>  (the move LANDED)
+H   sibling's own name after the plant: absent (The system cannot find the file specified.)
+panic: Failed to find GetNameByHandle procedure in kernel32.dll: The specified procedure could not be found.
+
+goroutine 1 [running]:
+syscall.(*LazyProc).mustFind(...)
+	D:/work/base/go/src/syscall/dll_windows.go:359
+syscall.(*LazyProc).Call(0x7ff73f543c00, {0x97b6bf2a7b0, 0x5, 0x5})
+	D:/work/base/go/src/syscall/dll_windows.go:375 +0x59
+main.nameByHandle(0x97b6bf1e108)
+	D:/tmp/wisp/20261020/342v3/bench/main.go:42 +0xd4
+main.rowNameSwap({0x7ff73f446a50, 0x9}, {0x97b6bf2ca40?, 0x5?}, 0x1)
+	D:/tmp/wisp/20261020/342v3/bench/main.go:229 +0x7c5
+main.main()
+	D:/tmp/wisp/20261020/342v3/bench/main.go:263 +0x138

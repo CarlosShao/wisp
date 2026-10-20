@@ -1,0 +1,28 @@
+== how many commits actually sit inside the leg's anchor range (NOT the leg) ==
+37
+== the leg's own 10 commits, per-commit A/M split + non-test .go ==
+bfcac9ed A=0 M=5 D=0 prodgo=0 testgo=0
+3efa4bf0 A=3 M=3 D=0 prodgo=0 testgo=0
+70aac8c0 A=0 M=2 D=0 prodgo=0 testgo=0
+4b784fea A=36 M=0 D=0 prodgo=0 testgo=0
+2b3b1787 A=0 M=2 D=0 prodgo=0 testgo=0
+0e487f06 A=0 M=2 D=0 prodgo=0 testgo=2
+4ff76a0c A=0 M=1 D=0 prodgo=0 testgo=1
+2626119a A=0 M=1 D=0 prodgo=0 testgo=1
+a782196e A=1 M=0 D=0 prodgo=0 testgo=1
+4f4f8419 A=1 M=0 D=0 prodgo=0 testgo=1
+== union of A/M paths over the leg's 10 commits (by git log --name-only over the explicit set) ==
+43
+-- of those, non-_test .go (expect 0) --
+0
+-- of those, .go at all --
+internal/winsec/ancestorwindow_342r2_windows_test.go
+internal/winsec/leafrace_342r2_windows_test.go
+== write-face membership: anything outside the two instrument files + two tickets + probes/342/r2 ==
+0
+== anchored roster, dispatch's continuation shape (expect 0 = A1045) ==
+0
+== who owns the three unanchored 342-v3 mentions (they are the orchestrator's own commits) ==
+dc3d1f61a867690a188d250f1c767ccf71bf9b84
+677d48372ea07bda4e77fd70bb4b8cd16dacb443
+14e5d8395adaf54bec14199f6858382b57fa49dd

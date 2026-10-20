@@ -1,0 +1,47 @@
+== R1 subject-only anchored index (perl over a single export) ==
+10
+== R1b same ruler, my dispatch's continuation form (expect 0) ==
+3
+== R2 --grep anchored at start of subject (independent ruler) ==
+10
+== R2b NON-anchored --grep=342-r2 (forbidden shape; shown only to prove the anchors matter) ==
+25
+== R2c union of the two anchors (R1 set + R2 set, by hash) ==
+10
+== R3 whole-leg diff --name-status 3abbb639..bfcac9ed (the leg's own start anchor .. its tip) ==
+136
+-- status letter classification --
+    126 A
+     10 M
+-- non _test.go .go touched across the whole leg (expect 0) --
+1
+-- _test.go .go touched (names) --
+A	internal/winsec/ancestorwindow_342r2_windows_test.go
+A	internal/winsec/leafrace_342r2_windows_test.go
+-- winsec.go touched by the leg (expect no line) --
+0
+== R4 per-commit production .go + winsec.go blob (10 commits) ==
+bfcac9ed2843277c4a0ecc7d0dcd8951bd50632d files=5 anygo=0 prodgo=0 winsec.go=07300bff
+3efa4bf011f38b15788177e35b953a4eef0a84d6 files=6 anygo=0 prodgo=0 winsec.go=07300bff
+70aac8c09c9f5a5e061869a5c99caaf2bef32b2c files=2 anygo=0 prodgo=0 winsec.go=07300bff
+4b784feac5ca3bf4808a1c66b1bb76c9c4752f1f files=36 anygo=0 prodgo=0 winsec.go=07300bff
+2b3b17871295f65a45b4d75c3021986b163558ce files=2 anygo=0 prodgo=0 winsec.go=07300bff
+0e487f06a9123b3f7889fa35ff6b7e59beed9594 files=2 anygo=2 prodgo=0 winsec.go=07300bff
+4ff76a0cb2bd3e3e13f8fd4b0e64f17210ae87b5 files=1 anygo=1 prodgo=0 winsec.go=07300bff
+2626119a5b750e16a1a25733f48be3bc94e9e61f files=1 anygo=1 prodgo=0 winsec.go=07300bff
+a782196e199235ad1feb0bf75bc36e607608b1df files=1 anygo=1 prodgo=0 winsec.go=07300bff
+4f4f8419ad80ede1dab87a00917b58500ceb5a77 files=1 anygo=1 prodgo=0 winsec.go=07300bff
+== R5 :118-140 sha16 per leg commit (self-statement never edited) ==
+bfcac9ed2843277c4a0ecc7d0dcd8951bd50632d :118-140 sha16=88f51af530a75de9
+3efa4bf011f38b15788177e35b953a4eef0a84d6 :118-140 sha16=88f51af530a75de9
+70aac8c09c9f5a5e061869a5c99caaf2bef32b2c :118-140 sha16=88f51af530a75de9
+4b784feac5ca3bf4808a1c66b1bb76c9c4752f1f :118-140 sha16=88f51af530a75de9
+2b3b17871295f65a45b4d75c3021986b163558ce :118-140 sha16=88f51af530a75de9
+0e487f06a9123b3f7889fa35ff6b7e59beed9594 :118-140 sha16=88f51af530a75de9
+4ff76a0cb2bd3e3e13f8fd4b0e64f17210ae87b5 :118-140 sha16=88f51af530a75de9
+2626119a5b750e16a1a25733f48be3bc94e9e61f :118-140 sha16=88f51af530a75de9
+a782196e199235ad1feb0bf75bc36e607608b1df :118-140 sha16=88f51af530a75de9
+4f4f8419ad80ede1dab87a00917b58500ceb5a77 :118-140 sha16=88f51af530a75de9
+== R6 HEAD blob of winsec.go and the two instrument files ==
+07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+88f51af530a75de9

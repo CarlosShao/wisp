@@ -1,0 +1,308 @@
+//go:build windows
+
+// 342-v3 independent bench (v2): the Windows handle-lock asymmetry between the pre-landing route's
+// handle state and the landing's, measured with NOTHING but the platform's own primitives - no repo
+// code, no seam, no simulation, no test harness. Rows are labelled against 342-r2's comment roster
+// (S1/S2/S2b/S3/S4/S5) so the two measurements can be compared line by line, but this code is this
+// leg's own and every row prints its verbatim error.
+package main
+
+import (
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"syscall"
+	"unsafe"
+)
+
+var (
+	modkernel32           = syscall.NewLazyDLL("kernel32.dll")
+	modkernelbase         = syscall.NewLazyDLL("kernelbase.dll")
+	procGetFileAttrByName = modkernel32.NewProc("GetFileAttributesW")
+	procNameByHandleK     = modkernelbase.NewProc("GetNameByHandle")
+	procNameByHandleK32   = modkernel32.NewProc("GetNameByHandle")
+)
+
+const fileAttributeReparsePoint = 0x400
+
+func isReparse(p string) bool {
+	ptr, err := syscall.UTF16PtrFromString(p)
+	if err != nil {
+		return false
+	}
+	r, _, _ := procGetFileAttrByName.Call(uintptr(unsafe.Pointer(ptr)))
+	if r == uintptr(syscall.InvalidHandle) {
+		return false
+	}
+	return r&fileAttributeReparsePoint != 0
+}
+
+func nameByHandle(f *os.File) string {
+	var buf [1024]uint16
+	var used uint32
+	for _, p := range []*syscall.LazyProc{procNameByHandleK, procNameByHandleK32} {
+		if p.Find() != nil {
+			continue
+		}
+		r, _, _ := p.Call(f.Fd(), uintptr(unsafe.Pointer(&buf[0])), uintptr(len(buf)), uintptr(unsafe.Pointer(&used)), 0)
+		if r != 0 {
+			return syscall.UTF16ToString(buf[:used])
+		}
+	}
+	return "<GetNameByHandle unavailable>"
+}
+
+func mkchain(base string) (data, sub, leaf string) {
+	data = filepath.Join(base, "data")
+	sub = filepath.Join(data, "sub")
+	leaf = filepath.Join(sub, "leaf.bin")
+	if err := os.MkdirAll(sub, 0o700); err != nil {
+		panic(err)
+	}
+	if err := os.WriteFile(leaf, []byte("the caller's own body"), 0o600); err != nil {
+		panic(err)
+	}
+	return
+}
+
+func try(label string, err error) {
+	if err == nil {
+		fmt.Printf("    %-64s err=<nil>  (the move LANDED)\n", label)
+		return
+	}
+	fmt.Printf("    %-64s err=%v\n", label, err)
+}
+
+func stateOf(p string) string {
+	st, err := os.Lstat(p)
+	if err != nil {
+		var pe *fs.PathError
+		if errors.As(err, &pe) {
+			return fmt.Sprintf("absent (%v)", pe.Err)
+		}
+		return "absent (" + err.Error() + ")"
+	}
+	tag := ""
+	if isReparse(p) {
+		tag = " [reparse]"
+	}
+	if st.IsDir() {
+		e, dErr := os.ReadDir(p)
+		if dErr != nil {
+			return fmt.Sprintf("dir%s unreadable=%v", tag, dErr)
+		}
+		names := make([]string, 0, len(e))
+		for _, x := range e {
+			names = append(names, x.Name())
+		}
+		return fmt.Sprintf("dir%s [%s]", tag, fmt.Sprint(names))
+	}
+	body, rErr := os.ReadFile(p)
+	if rErr != nil {
+		return fmt.Sprintf("present%s size=%d unreadable=%v", tag, st.Size(), rErr)
+	}
+	return fmt.Sprintf("present%s size=%d body=[%s]", tag, st.Size(), body)
+}
+
+func restore(from, to string) {
+	if _, e := os.Lstat(from); e == nil {
+		try("        restore "+filepath.Base(from)+" -> "+filepath.Base(to), os.Rename(from, to))
+	}
+}
+
+// rowAncestorMove measures, in each handle state, whether an ancestor can be moved.
+func rowAncestorMove(tag, base string, shot int) {
+	data, sub, leaf := mkchain(base)
+	sibling := filepath.Join(base, "sibling-dir")
+	if err := os.MkdirAll(sibling, 0o700); err != nil {
+		panic(err)
+	}
+	fmt.Printf("\n%s shot %d: chain %s\\sub\\leaf.bin\n", tag, shot, data)
+
+	// A: nothing open inside the tree (positive control: the moves are possible at all).
+	try("A nothing held: rename(data)  [S5 control]", os.Rename(data, filepath.Join(base, "parkA")))
+	restore(filepath.Join(base, "parkA"), data)
+	try("A nothing held: rename(sub)   [S5 control]", os.Rename(sub, filepath.Join(base, "parkA2")))
+	restore(filepath.Join(base, "parkA2"), sub)
+	try("A nothing held: remove(data) (delete, not rename)", os.RemoveAll(data))
+	_ = os.MkdirAll(sub, 0o700)
+	_ = os.WriteFile(leaf, []byte("the caller's own body"), 0o600)
+
+	// B: the baseline route's state AT ITS REMOVAL (leaf opened by name, handle closed, nothing pinned).
+	f, err := os.OpenFile(leaf, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		fmt.Println("    B open failed:", err)
+		return
+	}
+	_ = f.Close()
+	try("B BASELINE at removal (by-name handle CLOSED): rename(data) [S1]", os.Rename(data, filepath.Join(base, "parkB")))
+	restore(filepath.Join(base, "parkB"), data)
+	try("B BASELINE at removal: rename(sub)                          [S1]", os.Rename(sub, filepath.Join(base, "parkB2")))
+	restore(filepath.Join(base, "parkB2"), sub)
+
+	// C: the baseline route's state at the SEAL hop (by-name leaf handle still open).
+	f2, err := os.OpenFile(leaf, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		fmt.Println("    C open failed:", err)
+		return
+	}
+	try("C BASELINE seal hop (by-name handle OPEN): rename(data)", os.Rename(data, filepath.Join(base, "parkC")))
+	restore(filepath.Join(base, "parkC"), data)
+	try("C BASELINE seal hop (by-name handle OPEN): rename(sub)", os.Rename(sub, filepath.Join(base, "parkC2")))
+	restore(filepath.Join(base, "parkC2"), sub)
+	try("C BASELINE seal hop: vacate the leaf NAME (os.Remove)      [S3]", os.Remove(leaf))
+	try("C BASELINE seal hop: rename a SIBLING dir (scope of the lock)", os.Rename(sibling, filepath.Join(base, "parkC3")))
+	restore(filepath.Join(base, "parkC3"), sibling)
+	_ = f2.Close()
+	if _, e := os.Lstat(leaf); e != nil {
+		_ = os.WriteFile(leaf, []byte("the caller's own body"), 0o600)
+	}
+
+	// D: the landing route's state AT ITS REMOVAL (parent pinned by handle, leaf closed).
+	pin, err := os.OpenRoot(sub)
+	if err != nil {
+		fmt.Println("    D OpenRoot failed:", err)
+		return
+	}
+	lf, err := pin.OpenFile("leaf.bin", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		fmt.Println("    D leaf open failed:", err)
+		_ = pin.Close()
+		return
+	}
+	_ = lf.Close()
+	try("D LANDING at removal (pin HELD, leaf closed): rename(data)  [S2]", os.Rename(data, filepath.Join(base, "parkD")))
+	restore(filepath.Join(base, "parkD"), data)
+	try("D LANDING at removal (pin HELD): rename(sub)=the pinned dir [S2b]", os.Rename(sub, filepath.Join(base, "parkD2")))
+	restore(filepath.Join(base, "parkD2"), sub)
+	try("D LANDING at removal (pin HELD): remove(data) (delete)", os.Remove(data))
+	try("D LANDING at removal (pin HELD): rename a SIBLING dir (scope)", os.Rename(sibling, filepath.Join(base, "parkD3")))
+	restore(filepath.Join(base, "parkD3"), sibling)
+	fmt.Printf("D   the chain still intact: %s\n", stateOf(leaf))
+
+	// E: the landing's state at the SEAL hop (pin held AND leaf handle alive).
+	lf2, err := pin.OpenFile("leaf.bin", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		fmt.Println("    E open failed:", err)
+		_ = pin.Close()
+		return
+	}
+	try("E LANDING seal hop (pin + leaf handle OPEN): rename(data)   [S2]", os.Rename(data, filepath.Join(base, "parkE")))
+	restore(filepath.Join(base, "parkE"), data)
+	try("E LANDING seal hop: rename(sub)                            [S2b]", os.Rename(sub, filepath.Join(base, "parkE2")))
+	restore(filepath.Join(base, "parkE2"), sub)
+	// The decisive row for the second approval: could a hook INSIDE the route (between the pin's
+	// descent and the acts that follow) move an ancestor at all? This is exactly that instant.
+	try("E => a plant at the route's own mid-hop: rename(data)       [S2]", os.Rename(data, filepath.Join(base, "parkE3")))
+	restore(filepath.Join(base, "parkE3"), data)
+	_ = lf2.Close()
+	_ = pin.Close()
+
+	// F: after the pin is released the same moves land again (the refusal was the lock, not the world).
+	try("F pin RELEASED: rename(data)  [S5]", os.Rename(data, filepath.Join(base, "parkF")))
+	restore(filepath.Join(base, "parkF"), data)
+	fmt.Printf("F   sub reachable: %s\n", stateOf(sub))
+	fmt.Printf("F   sibling reachable: %s\n", stateOf(sibling))
+}
+
+// rowNameSwap measures the FILE_SHARE_DELETE face of the same pair.
+func rowNameSwap(tag, base string, shot int) {
+	_, sub, leaf := mkchain(base)
+	sibling := filepath.Join(sub, "the-unnamed-object.bin")
+	restock := func() {
+		_ = os.WriteFile(leaf, []byte("the caller's own body"), 0o600)
+		_ = os.WriteFile(sibling, []byte("an object the caller never named, in the same directory"), 0o600)
+	}
+	restock()
+	fmt.Printf("\n%s shot %d: caller name=%s\n", tag, shot, leaf)
+
+	// G: baseline shape = open by name (Go's syscall.Open shares READ|WRITE, no DELETE).
+	g, err := os.OpenFile(leaf, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		fmt.Println("    G open failed:", err)
+		return
+	}
+	gVacate := os.Remove(leaf)
+	try("G BASELINE by-name handle alive: vacate the caller's name   [S3]", gVacate)
+	fmt.Printf("G   the caller's name now: %s\n", stateOf(leaf))
+	gRefill := func() error {
+		if gVacate != nil {
+			return errors.New("skipped because the name could not be vacated")
+		}
+		return os.Rename(sibling, leaf)
+	}()
+	try("G BASELINE: rename(the unnamed object INTO the caller's name) [S3]", gRefill)
+	if gVacate != nil || gRefill != nil {
+		fmt.Println("G   => the baseline's own handle forbids this world (reported, NOT counted as a green)")
+	}
+	_ = g.Close()
+	restock()
+
+	// H: landing shape = open through a pinned os.Root handle (Go's root descent shares READ|WRITE|DELETE).
+	pin, err := os.OpenRoot(sub)
+	if err != nil {
+		fmt.Println("    H OpenRoot failed:", err)
+		return
+	}
+	h, err := pin.OpenFile("leaf.bin", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		fmt.Println("    H open failed:", err)
+		_ = pin.Close()
+		return
+	}
+	hVacate := os.Remove(leaf)
+	try("H LANDING Root handle alive: vacate the caller's name       [S4]", hVacate)
+	fmt.Printf("H   the caller's name now: %s\n", stateOf(leaf))
+	hRefill := func() error {
+		if hVacate != nil {
+			return errors.New("skipped: the name was not vacated")
+		}
+		return os.Rename(sibling, leaf)
+	}()
+	try("H LANDING: rename(the unnamed object INTO the caller's name) [S4]", hRefill)
+	fmt.Printf("H   the unnamed object's OWN name after the plant: %s\n", stateOf(sibling))
+	fmt.Printf("H   the handle is still open; identity=%s\n", nameByHandle(h))
+	if hVacate == nil && hRefill == nil {
+		rem := pin.Remove("leaf.bin")
+		try("H LANDING Root.Remove(base) with the foreign object at that name", rem)
+		fmt.Printf("H   after Remove: the caller's name = %s\n", stateOf(leaf))
+		fmt.Printf("H   after Remove: the unnamed object's OWN name = %s\n", stateOf(sibling))
+		_, wErr := h.Write([]byte("payload through the handle the caller named"))
+		try("H   write through the still-open handle after the Remove", wErr)
+	}
+	_ = h.Close()
+	_ = pin.Close()
+}
+
+func main() {
+	root := os.Getenv("V3BENCHROOT")
+	if root == "" {
+		fmt.Println("V3BENCHROOT not set")
+		os.Exit(2)
+	}
+	if err := os.MkdirAll(root, 0o700); err != nil {
+		panic(err)
+	}
+	shots := 3
+	if s := os.Getenv("V3BENCHSHOTS"); s != "" {
+		if n, err := fmt.Sscanf(s, "%d", &shots); err != nil || n != 1 {
+			shots = 3
+		}
+	}
+	fmt.Printf("BENCH ROOT=%s shots=%d\n", root, shots)
+	for shot := 1; shot <= shots; shot++ {
+		b, err := os.MkdirTemp(root, fmt.Sprintf("anc%02d", shot))
+		if err != nil {
+			panic(err)
+		}
+		rowAncestorMove("ANCESTOR-MOVE", b, shot)
+		c, err := os.MkdirTemp(root, fmt.Sprintf("nam%02d", shot))
+		if err != nil {
+			panic(err)
+		}
+		rowNameSwap("NAME-SWAP", c, shot)
+	}
+	fmt.Println("\nBENCH DONE")
+}

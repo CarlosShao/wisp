@@ -1,0 +1,21 @@
+== candidate ranges on HEAD:internal/winsec/winsec.go ==
+sed -n '118,138p'  HEAD=12bd42aab9590ff9  BASELINE=12bd42aab9590ff9  same=YES
+sed -n '118,140p'  HEAD=88f51af530a75de9  BASELINE=88f51af530a75de9  same=YES
+sed -n '118,141p'  HEAD=b07dd8bfdbd0e96a  BASELINE=b07dd8bfdbd0e96a  same=YES
+sed -n '117,140p'  HEAD=fa59c912de5b4b21  BASELINE=fa59c912de5b4b21  same=YES
+== working-tree bytes vs blob bytes (CRLF?) ==
+88f51af530a75de9
+88f51af530a75de9
+== byte counts of the range on HEAD vs baseline (identity by bytes, not labels) ==
+HEAD=1646 BASE=1646
+== whole-file sha16 for reference ==
+07300bfffc3e5b14
+== the whole comment block that mentions the ancestor legs: true extent ==
+118:// Ticket 322 is the second half of that sentence, and it is only half closed.
+133://     adjudicated for this ticket. This window is not claimed closed anywhere.
+138://     the ancestor leg is open there too. See the Windows file for its own
+== does the AC#5 ticket text say 118-138 while the verdict said 118-140? ==
+      2 .scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md::118-138
+      2 .scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md::118-140
+      1 docs/evidence/s1/342-v2-verdict.md::118-140
+      1 docs/evidence/s1/348-v1-verdict.md::118-140

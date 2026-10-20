@@ -1,0 +1,26 @@
+===== ROOT .scratch/wisp/probes/342/v3 =====
+files=48 zero=0 dotout=0 cr_bytes=0 not-utf8=0
+-- codepoint ruler (perl, :encoding(UTF-8) so it counts CODEPOINTS, not bytes) --
+  A7=0 B7=2 .scratch/wisp/probes/342/v3/report.md
+-- total codepoint hits over the root (A7 must be 0) --
+A7=0 B7=2
+===== ROOT .scratch/wisp/probes/348/v2 =====
+files=13 zero=0 dotout=0 cr_bytes=0 not-utf8=0
+-- codepoint ruler (perl, :encoding(UTF-8) so it counts CODEPOINTS, not bytes) --
+-- total codepoint hits over the root (A7 must be 0) --
+A7=0 B7=0
+===== ROOT docs/evidence/s1/342-v3-verdict.md =====
+files=1 zero=0 dotout=0 cr_bytes=0 not-utf8=0
+-- codepoint ruler (perl, :encoding(UTF-8) so it counts CODEPOINTS, not bytes) --
+  A7=0 B7=2 docs/evidence/s1/342-v3-verdict.md
+-- total codepoint hits over the root (A7 must be 0) --
+A7=0 B7=2
+===== ROOT docs/evidence/s1/348-v2-verdict.md =====
+files=1 zero=0 dotout=0 cr_bytes=0 not-utf8=0
+-- codepoint ruler (perl, :encoding(UTF-8) so it counts CODEPOINTS, not bytes) --
+  A7=0 B7=3 docs/evidence/s1/348-v2-verdict.md
+-- total codepoint hits over the root (A7 must be 0) --
+A7=0 B7=3
+===== verdict line/byte budget (dispatch: <=130 lines each, <=8 lines per cell) =====
+docs/evidence/s1/342-v3-verdict.md bytes=16497 lines=45
+docs/evidence/s1/348-v2-verdict.md bytes=10891 lines=35

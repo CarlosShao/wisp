@@ -1,0 +1,130 @@
+//go:build windows
+
+// 342-v3 seam-possibility bench: if the second approval were granted, the hook would sit at one of three
+// instants inside privateFile's act sequence. This measures whether ANY of them can move an ancestor,
+// using the platform's own handles (no repo code):
+//   H1 = after pinnedParent's descent, before the leaf open  (pin held, nothing open on the leaf)
+//   H2 = after openPinnedLeaf's open, before sealHandle      (pin held + leaf handle alive)
+//   H3 = after sealHandle, before the removal                (pin held, leaf handle closed) = bench row D
+//   H4 = the "release the pin early" variant (pin CLOSED, only the Root-opened leaf handle alive)
+// A hook is only worth approving if the move LANDS at some instant.
+package main
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+)
+
+func mk(base string) (data, sub, leaf string) {
+	data = filepath.Join(base, "data")
+	sub = filepath.Join(data, "sub")
+	leaf = filepath.Join(sub, "leaf.bin")
+	if err := os.MkdirAll(sub, 0o700); err != nil {
+		panic(err)
+	}
+	if err := os.WriteFile(leaf, []byte("body"), 0o600); err != nil {
+		panic(err)
+	}
+	return
+}
+
+func attempt(label, from, to string) bool {
+	err := os.Rename(from, to)
+	fmt.Printf("    %-70s err=%v\n", label, err)
+	return err == nil
+}
+
+func main() {
+	root := os.Getenv("V3SEAMROOT")
+	if root == "" {
+		fmt.Println("V3SEAMROOT not set")
+		os.Exit(2)
+	}
+	shots := 3
+	if err := os.MkdirAll(root, 0o700); err != nil {
+		panic(err)
+	}
+	fmt.Printf("SEAM-POSSIBILITY ROOT=%s shots=%d\n", root, shots)
+	for shot := 1; shot <= shots; shot++ {
+		base, err := os.MkdirTemp(root, fmt.Sprintf("seam%02d", shot))
+		if err != nil {
+			panic(err)
+		}
+		data, sub, _ := mk(base)
+		fmt.Printf("\nSEAM shot %d: %s\n", shot, data)
+
+		// control: nothing at all held
+		if attempt("H0 nothing held: rename(data)", data, filepath.Join(base, "park0")) {
+			_ = os.Rename(filepath.Join(base, "park0"), data)
+		}
+
+		// H1: pin held, leaf not opened yet
+		pin, err := os.OpenRoot(sub)
+		if err != nil {
+			fmt.Println("    H1 OpenRoot:", err)
+			return
+		}
+		l1 := attempt("H1 pin held, BEFORE the leaf open: rename(data)", data, filepath.Join(base, "parkH1"))
+		s1 := attempt("H1 pin held, BEFORE the leaf open: rename(sub)", sub, filepath.Join(base, "parkH1s"))
+		if l1 {
+			_ = os.Rename(filepath.Join(base, "parkH1"), data)
+		}
+		if s1 {
+			_ = os.Rename(filepath.Join(base, "parkH1s"), sub)
+		}
+
+		// H2: pin held + leaf handle alive (the instant right after openPinnedLeaf returns)
+		h, err := pin.OpenFile("leaf.bin", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+		if err != nil {
+			fmt.Println("    H2 leaf open:", err)
+			_ = pin.Close()
+			return
+		}
+		l2 := attempt("H2 pin + leaf handle: rename(data)", data, filepath.Join(base, "parkH2"))
+		s2 := attempt("H2 pin + leaf handle: rename(sub)", sub, filepath.Join(base, "parkH2s"))
+		if l2 {
+			_ = os.Rename(filepath.Join(base, "parkH2"), data)
+		}
+		if s2 {
+			_ = os.Rename(filepath.Join(base, "parkH2s"), sub)
+		}
+
+		// H3: the seal hop is over, the leaf handle closed, the pin still held (production's removal hop)
+		_ = h.Close()
+		l3 := attempt("H3 pin held, leaf closed (= row D): rename(data)", data, filepath.Join(base, "parkH3"))
+		s3 := attempt("H3 pin held, leaf closed (= row D): rename(sub)", sub, filepath.Join(base, "parkH3s"))
+		if l3 {
+			_ = os.Rename(filepath.Join(base, "parkH3"), data)
+		}
+		if s3 {
+			_ = os.Rename(filepath.Join(base, "parkH3s"), sub)
+		}
+
+		// H4: the "release the pin early" variant -- pin Closed, only the Root-opened leaf handle alive
+		_ = pin.Close()
+		h4, err := os.OpenRoot(sub)
+		if err != nil {
+			fmt.Println("    H4 re-open for the handle-only case:", err)
+		} else {
+			leafOnly, e := h4.OpenFile("leaf.bin", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+			if e == nil {
+				_ = h4.Close() // the pin is gone; only the leaf handle lives (the shape 348 AC#1 forbids)
+				l4 := attempt("H4 pin RELEASED, leaf handle alive: rename(data)", data, filepath.Join(base, "parkH4"))
+				s4 := attempt("H4 pin RELEASED, leaf handle alive: rename(sub)", sub, filepath.Join(base, "parkH4s"))
+				if l4 {
+					_ = os.Rename(filepath.Join(base, "parkH4"), data)
+				}
+				if s4 {
+					_ = os.Rename(filepath.Join(base, "parkH4s"), sub)
+				}
+				_ = leafOnly.Close()
+			} else {
+				fmt.Println("    H4 leaf open:", e)
+				_ = h4.Close()
+			}
+		}
+		fmt.Printf("SEAM shot %d summary: landed at H1=%v|%v H2=%v|%v H3=%v|%v\n", shot, l1, s1, l2, s2, l3, s3)
+	}
+	fmt.Println("\nSEAM DONE")
+}

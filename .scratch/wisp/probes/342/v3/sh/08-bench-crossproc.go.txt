@@ -1,0 +1,130 @@
+//go:build windows
+
+// 342-v3 cross-process bench: holder.exe pins/openes inside a tree and waits; attacker.exe, a DIFFERENT
+// process, attempts (a) the ancestor rename while the holder's handle stands there and (b) vacate +
+// rename-into the caller's name while the holder's leaf handle stands open. This closes the loophole
+// that the in-process bench could be an artifact of same-process sharing.
+package main
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+)
+
+func wait(forPath string, d time.Duration) {
+	deadline := time.Now().Add(d)
+	for time.Now().Before(deadline) {
+		if _, err := os.Lstat(forPath); err == nil {
+			return
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+}
+
+func main() {
+	mode := ""
+	if len(os.Args) > 1 {
+		mode = os.Args[1]
+	}
+	dir := os.Getenv("V3XDIR")
+	if dir == "" {
+		fmt.Println("V3XDIR not set")
+		os.Exit(2)
+	}
+	data := filepath.Join(dir, "data")
+	sub := filepath.Join(data, "sub")
+	leaf := filepath.Join(sub, "leaf.bin")
+	sibling := filepath.Join(sub, "sibling.bin")
+	goPath := filepath.Join(dir, "go.txt")
+	okPath := filepath.Join(dir, "ok.txt")
+
+	switch mode {
+	case "holder-anc":
+		// State L (landing): hold a parent pin on `sub`, leaf closed. Signal, wait, then report the
+		// removal the production route would do at that instant.
+		pin, err := os.OpenRoot(sub)
+		if err != nil {
+			fmt.Println("holder-anc OpenRoot:", err)
+			os.Exit(3)
+		}
+		lf, err := pin.OpenFile("leaf.bin", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+		if err != nil {
+			fmt.Println("holder-anc leaf open:", err)
+			os.Exit(3)
+		}
+		_ = lf.Close()
+		_ = os.WriteFile(goPath, []byte("pin-held"), 0o600)
+		wait(okPath, 25*time.Second)
+		rem := pin.Remove("leaf.bin")
+		fmt.Printf("holder-anc Root.Remove(leaf.bin) after the attacker's turn: err=%v\n", rem)
+		_ = pin.Close()
+	case "holder-leaf":
+		// State at the seal hop (landing): pin + leaf handle both alive.
+		pin, err := os.OpenRoot(sub)
+		if err != nil {
+			fmt.Println("holder-leaf OpenRoot:", err)
+			os.Exit(3)
+		}
+		h, err := pin.OpenFile("leaf.bin", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+		if err != nil {
+			fmt.Println("holder-leaf open:", err)
+			os.Exit(3)
+		}
+		_ = os.WriteFile(goPath, []byte("leaf-open"), 0o600)
+		wait(okPath, 25*time.Second)
+		fmt.Printf("holder-leaf leaf handle still alive=%v | Root.Remove(leaf.bin)=%v | Root.Lstat(leaf.bin)=%v\n",
+			h != nil, pin.Remove("leaf.bin"), errStr(pin.Lstat("leaf.bin")))
+		fmt.Printf("holder-leaf write through that handle after the Remove: err=%v\n", func() error {
+			if h == nil {
+				return errors.New("no handle")
+			}
+			_, e := h.Write([]byte("payload through the handle the caller named"))
+			return e
+		}())
+		_ = h.Close()
+		_ = pin.Close()
+	case "holder-base":
+		// State B/S3 (baseline): by-name handle open, nothing pinned.
+		f, err := os.OpenFile(leaf, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+		if err != nil {
+			fmt.Println("holder-base open:", err)
+			os.Exit(3)
+		}
+		_ = os.WriteFile(goPath, []byte("byname-open"), 0o600)
+		wait(okPath, 25*time.Second)
+		fmt.Printf("holder-base os.Remove(leaf) while its own handle lives: err=%v\n", os.Remove(leaf))
+		_ = f.Close()
+	case "attacker":
+		wait(goPath, 25*time.Second)
+		// (a) ancestor rename while the holder's handle stands inside it
+		e1 := os.Rename(data, filepath.Join(dir, "park-data"))
+		fmt.Printf("attacker rename(ancestor data) err=%v\n", e1)
+		e1b := os.Rename(sub, filepath.Join(dir, "park-sub"))
+		fmt.Printf("attacker rename(ancestor sub)  err=%v\n", e1b)
+		// (b) the name window: vacate the caller's name, then move MY file into it
+		e2 := os.Remove(leaf)
+		fmt.Printf("attacker remove(caller's name)  err=%v\n", e2)
+		if e2 == nil {
+			e3 := os.Rename(sibling, leaf)
+			fmt.Printf("attacker rename(mine -> caller's name) err=%v\n", e3)
+			if e3 == nil {
+				st, _ := os.Lstat(sibling)
+				fmt.Printf("attacker my file's own name now exists=%v\n", st != nil)
+			}
+		}
+		_ = os.WriteFile(okPath, []byte("attacker-done"), 0o600)
+	default:
+		fmt.Println("usage: holder <holder-anc|holder-leaf|holder-base|attacker>")
+		os.Exit(2)
+	}
+}
+
+func errStr(_ os.FileInfo, err error) string {
+	if err != nil {
+		return "err=" + err.Error()
+	}
+	return "err=<nil>"
+}

@@ -1,0 +1,59 @@
+$ErrorActionPreference = 'Continue'
+# 342-v3 teeth/mutation runs. Both landings differ from 342-r2's two shots (it: removed the re-check
+# halves; replaced the identity gate with a refuse-every-name twin). Mine:
+#  mut A = unlinkPinnedLeaf made a no-op  => case one's DAMAGE numerator must fall to 0 while
+#          entered stays 3/3  (proves the damage is the ROUTE's removal, not the plant)
+#  mut B = openPinnedLeaf's open switched to the by-name baseline shape => case one's entered must fall
+#          to 0 (proves FILE_SHARE_DELETE on the handle is what makes the name window enterable)
+# Only physical bytes of the export tree are touched; pristine hashes before/after; no -overlay; serial.
+$log = 'D:\tmp\wisp\20261020\342v3\logs'
+$tree = 'D:\tmp\wisp\20261020\342v3\treeL'
+$env:GOTMPDIR = "$env:LOCALAPPDATA\Temp\v3-342v3"
+$env:TMPDIR = $env:GOTMPDIR
+$env:GOPROXY = 'off'
+$leaf = Join-Path $tree 'internal\winsec\pinnedleaf_342_windows.go'
+
+function HashOf($p) { (Get-FileHash $p -Algorithm SHA256).Hash }
+
+Write-Output '== pristine hash =='
+$pristine = HashOf $leaf
+Write-Output "PRISTINE=$pristine"
+
+Write-Output '== anchor counts BEFORE any cut (expect: A=1, B=1) =='
+$a = (Select-String -Path $leaf -Pattern '_ = p\.root\.Remove\(base\)' -AllMatches).Matches.Count
+$b = (Select-String -Path $leaf -Pattern 'f, err := p\.root\.OpenFile\(base, flags, perm\)' -AllMatches).Matches.Count
+Write-Output "anchorA=$a anchorB=$b"
+if ($a -ne 1 -or $b -ne 1) { Write-Output 'ANCHOR PRECHECK FAILED - ABORT'; exit 1 }
+
+# ---- mut A ----
+Copy-Item $leaf "$leaf.pristine" -Force
+(Get-Content $leaf -Raw).Replace('	_ = p.root.Remove(base)', '	// MUT-A 342v3: the route no longer removes the name') | Set-Content $leaf -Encoding utf8NoBOM -NoNewline
+$a2 = (Select-String -Path $leaf -Pattern '_ = p\.root\.Remove\(base\)' -AllMatches).Matches.Count
+$a3 = (Select-String -Path $leaf -Pattern 'MUT-A 342v3' -AllMatches).Matches.Count
+Write-Output "mutA anchors after: old=$a2 new=$a3 (expect 0/1)"
+Push-Location $tree
+& go test -v -count=1 -timeout 30m -run 'TestAC1WindowsNameSwappedAfterTheSealVerdictReportsDamageAndRefusalAsTwoNumbers342r2' ./internal/winsec/ > "$log\mutA-det.log" 2>&1
+Write-Output "mutA RC=$LASTEXITCODE"
+& go vet ./internal/winsec/ > "$log\mutA-vet.log" 2>&1
+Write-Output "mutA vet RC=$LASTEXITCODE"
+Pop-Location
+Write-Output "mutA HASH=$(HashOf $leaf)"
+Copy-Item "$leaf.pristine" $leaf -Force
+Write-Output "restored HASH=$(HashOf $leaf) MATCH=$(((HashOf $leaf) -eq $pristine))"
+
+# ---- mut B ----
+Copy-Item $leaf "$leaf.pristine2" -Force
+(Get-Content $leaf -Raw).Replace('	f, err := p.root.OpenFile(base, flags, perm)', '	f, err := os.OpenFile(filepath.Join(p.dir, base), flags, perm) // MUT-B 342v3') | Set-Content $leaf -Encoding utf8NoBOM -NoNewline
+$b2 = (Select-String -Path $leaf -Pattern 'f, err := p\.root\.OpenFile\(base, flags, perm\)' -AllMatches).Matches.Count
+$b3 = (Select-String -Path $leaf -Pattern 'MUT-B 342v3' -AllMatches).Matches.Count
+Write-Output "mutB anchors after: old=$b2 new=$b3 (expect 0/1)"
+Push-Location $tree
+& go test -v -count=1 -timeout 30m -run 'TestAC1WindowsNameSwappedAfterTheSealVerdictReportsDamageAndRefusalAsTwoNumbers342r2' ./internal/winsec/ > "$log\mutB-det.log" 2>&1
+Write-Output "mutB RC=$LASTEXITCODE"
+& go vet ./internal/winsec/ > "$log\mutB-vet.log" 2>&1
+Write-Output "mutB vet RC=$LASTEXITCODE"
+Pop-Location
+Write-Output "mutB HASH=$(HashOf $leaf)"
+Copy-Item "$leaf.pristine2" $leaf -Force
+Write-Output "restored HASH=$(HashOf $leaf) MATCH=$(((HashOf $leaf) -eq $pristine))"
+Write-Output 'TEETH DONE'

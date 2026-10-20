@@ -1,0 +1,21 @@
+$ErrorActionPreference = 'Continue'
+$env:GOTMPDIR = "$env:LOCALAPPDATA\Temp\v3-342v3"
+$env:TMPDIR = $env:GOTMPDIR
+$env:GOPROXY = 'off'
+$env:CGO_ENABLED = '1'
+$log = 'D:\tmp\wisp\20261020\342v3\logs'
+$plan = @(
+  @{ t = 'treeL'; n = 2 },
+  @{ t = 'treeB'; n = 2 },
+  @{ t = 'treeM2'; n = 1 }
+)
+foreach ($p in $plan) {
+  Push-Location ("D:\tmp\wisp\20261020\342v3\" + $p.t)
+  for ($i = 1; $i -le $p.n; $i++) {
+    $out = "$log\" + $p.t + "-full-r" + $i + ".log"
+    & go test -v -count=1 -timeout 40m ./internal/winsec/ > $out 2>&1
+    Write-Output ($p.t + " r" + $i + " RC=" + $LASTEXITCODE + " -> " + $out)
+  }
+  Pop-Location
+}
+Write-Output 'FULL PAIRS DONE'

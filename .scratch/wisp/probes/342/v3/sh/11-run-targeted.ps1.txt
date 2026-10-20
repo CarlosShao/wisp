@@ -1,0 +1,17 @@
+# 342-v3 targeted instrument runs, landing ⇄ baseline, 3 shots each. Sequential (race readings).
+$ErrorActionPreference = 'Continue'
+$env:GOTMPDIR = "$env:LOCALAPPDATA\Temp\v3-342v3"
+$env:TMPDIR = $env:GOTMPDIR
+$env:GOPROXY = 'off'
+$env:CGO_ENABLED = '1'
+$log = 'D:\tmp\wisp\20261020\342v3\logs'
+$run = 'TestAC1WindowsNameSwappedAfterTheSealVerdictReportsDamageAndRefusalAsTwoNumbers342r2|TestAC2WindowsSteadyStateAncestorJunctionReportsDamageAndRefusalAsTwoNumbers342r2|TestAC1WindowsAncestorMoveIsRefusedWhileAParentHandleIsHeld342r2|TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2'
+foreach ($tree in 'treeL', 'treeB') {
+  Push-Location ("D:\tmp\wisp\20261020\342v3\" + $tree)
+  for ($i = 1; $i -le 3; $i++) {
+    & go test -v -count=1 -timeout 30m -run $run ./internal/winsec/ > "$log\$tree-det-r$i.log" 2>&1
+    Write-Output "$tree det r$i RC=$LASTEXITCODE"
+  }
+  Pop-Location
+}
+Write-Output 'TARGETED DONE'
