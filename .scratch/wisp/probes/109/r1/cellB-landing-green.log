@@ -1,0 +1,33 @@
+=== RUN   TestAC41NailByteFaceUnnamedFileBreaksTheWidth
+    handoff_ac4_109r1_test.go:96: planted 1 unnamed entry inside Ensure's post-verification window: [attacker.onnx]
+    handoff_ac4_109r1_test.go:141: byte break line (file) holds: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\AppData\Local\Temp\TestAC41NailByteFaceUnnamedFileBreaksTheWidth885752511\002\models\kws-fixture: model dir holds 1 entry the signed manifest does not name: attacker.onnx - re-hashing only the named files cannot see an added one, so a loader that opens this directory by name could be handed bytes nobody verified
+--- PASS: TestAC41NailByteFaceUnnamedFileBreaksTheWidth (0.06s)
+=== RUN   TestAC42NailByteFaceExtraDirectoryBreaksTheWidth
+    handoff_ac4_109r1_test.go:96: planted 1 unnamed entry inside Ensure's post-verification window: [sub/w.onnx]
+    handoff_ac4_109r1_test.go:156: byte break line (directory) holds: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\AppData\Local\Temp\TestAC42NailByteFaceExtraDirectoryBreaksTheWidth92439479\002\models\kws-fixture: model dir holds 2 entries the signed manifest does not name: sub/, sub/w.onnx - re-hashing only the named files cannot see an added one, so a loader that opens this directory by name could be handed bytes nobody verified
+--- PASS: TestAC42NailByteFaceExtraDirectoryBreaksTheWidth (0.04s)
+=== RUN   TestAC43NailByteFaceCountIsExact
+    handoff_ac4_109r1_test.go:96: planted 4 unnamed entries inside Ensure's post-verification window: [a1.onnx a2.onnx a3.onnx sub/deep.bin]
+    handoff_ac4_109r1_test.go:184: byte break line (exact count) holds: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\AppData\Local\Temp\TestAC43NailByteFaceCountIsExact1377430859\002\models\kws-fixture: model dir holds 5 entries the signed manifest does not name: a1.onnx, a2.onnx, a3.onnx, sub/, sub/deep.bin - re-hashing only the named files cannot see an added one, so a loader that opens this directory by name could be handed bytes nobody verified
+--- PASS: TestAC43NailByteFaceCountIsExact (0.05s)
+=== RUN   TestAC44NailByteFaceCleanTreeStillPasses
+    handoff_ac4_109r1_test.go:96: planted 0 unnamed entries inside Ensure's post-verification window: []
+    handoff_ac4_109r1_test.go:205: clean tree still passes the byte face (named dir dict/ intact): C:\Users\swq\AppData\Local\Temp\TestAC44NailByteFaceCleanTreeStillPasses1704125657\002\models\kws-fixture
+--- PASS: TestAC44NailByteFaceCleanTreeStillPasses (0.04s)
+=== RUN   TestAC4R3NailBreakLineTwoSeesAnExplicitGrantByAnyPrincipal
+    handoff_ac4_principal_109r1_windows_test.go:104: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_ac4_principal_109r1_windows_test.go:115: install dir descriptor after planting an EXPLICIT Everyone:(OI)(CI)(M):
+          [Everyone (OI)(CI)(M) BUILTIN\Users (I)(OI)(CI)(M) NT AUTHORITY\SYSTEM (I)(OI)(CI)(F) BUILTIN\Administrators (I)(OI)(CI)(F) DESKTOP-LVS7839\swq (I)(OI)(CI)(F)]
+    handoff_ac4_principal_109r1_windows_test.go:150: AC#4 break line 2 catches the hand-placed grant whoever holds it: [Everyone (OI)(CI)(M)]
+--- PASS: TestAC4R3NailBreakLineTwoSeesAnExplicitGrantByAnyPrincipal (2.04s)
+=== RUN   TestAC4R4NailBreakLineTwoStaysQuietOnInheritedWidth
+    handoff_ac4_principal_109r1_windows_test.go:157: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_ac4_principal_109r1_windows_test.go:186: principal-agnostic break line stays quiet on the sanctioned inherited width: [BUILTIN\Users (I)(OI)(CI)(M)]
+--- PASS: TestAC4R4NailBreakLineTwoStaysQuietOnInheritedWidth (0.21s)
+=== RUN   TestAC4InstallDirWidthIsDeliberateAndHasABreakLine
+    handoff_window_109_windows_test.go:159: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:176: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:214: AC#4 nail: install dir kws-fixture inherits [BUILTIN\Users (I)(OI)(CI)(M)] (parent policy, guard is the re-verify)
+--- PASS: TestAC4InstallDirWidthIsDeliberateAndHasABreakLine (0.38s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/models	2.877s

@@ -187,6 +187,20 @@ func TestAC4InstallDirWidthIsDeliberateAndHasABreakLine(t *testing.T) {
 		t.Fatalf("AC#4: the install dir of a store root that grants Users Modify inherits nothing - either this class got sealed "+
 			"(re-open ticket 95's ruling) or the width arrived by hand: icacls %s", icaclsRun(t, dir2))
 	}
+	// Break line 2, read the way it is written. Ticket 109 shipped this loop over the
+	// lines belonging to ONE principal (BUILTIN\Users), which acceptor-ticket109b
+	// measured sliding (docs/evidence/s1/109-adversarial-acceptance.md:119-123 and
+	// :246-266: an explicit `Everyone:(OI)(CI)(M)` on the same object left all three
+	// break lines reading "allowed"). "安装目录自己 DACL 上出现非 (I) 的外来 ACE＝破"
+	// is a sentence about this object, so the set it looks at is every ACE on it -
+	// identity still resolved by SID, never by comparing the text icacls prints
+	// (ticket 121 AC#4's correction, kept). The judgment itself is ac4BreakLineTwo,
+	// shared with TestAC4R3NailBreakLineTwoSeesAnExplicitGrantByAnyPrincipal, which
+	// plants a real explicit ACE and requires this nail to see it.
+	for _, l := range ac4BreakLineTwo(t, dir2) {
+		t.Errorf("AC#4 break line: explicit foreign grant on the install dir %q (the tree this package installs "+
+			"carries no non-inherited ACE at all, so any such line is somebody widening this one object by hand)", l)
+	}
 	for _, l := range lines {
 		if !strings.Contains(l, "(I)") {
 			t.Errorf("AC#4 break line: explicit foreign grant on the install dir %q", l)

@@ -1,0 +1,29 @@
+=== RUN   TestAC41NailByteFaceUnnamedFileBreaksTheWidth
+    handoff_ac4_109r1_test.go:96: planted 1 unnamed entry inside Ensure's post-verification window: [attacker.onnx]
+    handoff_ac4_109r1_test.go:133: AC#4/R-109-2 byte face: Ensure handed back a tree holding attacker.onnx as available. The nail's first界 sanctions the inherited write that placed it, so the width has to stop somewhere in bytes too; model.onnx still hashes exactly as the signed manifest pins it, which is precisely why hashing the named subset cannot answer 'how wide is this'.
+--- FAIL: TestAC41NailByteFaceUnnamedFileBreaksTheWidth (0.06s)
+=== RUN   TestAC42NailByteFaceExtraDirectoryBreaksTheWidth
+    handoff_ac4_109r1_test.go:96: planted 1 unnamed entry inside Ensure's post-verification window: [sub/w.onnx]
+    handoff_ac4_109r1_test.go:150: AC#4/R-109-2 byte face: Ensure handed back a tree holding an entire extra directory (sub/w.onnx) - the second PROBE2 shape, and the reason 'verified' has to mean the whole tree rather than the named subset
+--- FAIL: TestAC42NailByteFaceExtraDirectoryBreaksTheWidth (0.04s)
+=== RUN   TestAC43NailByteFaceCountIsExact
+    handoff_ac4_109r1_test.go:96: planted 4 unnamed entries inside Ensure's post-verification window: [a1.onnx a2.onnx a3.onnx sub/deep.bin]
+    handoff_ac4_109r1_test.go:171: AC#4/R-109-2 byte face: three loose unnamed files plus an unnamed directory and its byte verified clean through Ensure
+--- FAIL: TestAC43NailByteFaceCountIsExact (0.05s)
+=== RUN   TestAC44NailByteFaceCleanTreeStillPasses
+    handoff_ac4_109r1_test.go:96: planted 0 unnamed entries inside Ensure's post-verification window: []
+    handoff_ac4_109r1_test.go:205: clean tree still passes the byte face (named dir dict/ intact): C:\Users\swq\AppData\Local\Temp\TestAC44NailByteFaceCleanTreeStillPasses1933579136\002\models\kws-fixture
+--- PASS: TestAC44NailByteFaceCleanTreeStillPasses (0.05s)
+=== RUN   TestAC4R3NailBreakLineTwoSeesAnExplicitGrantByAnyPrincipal
+    handoff_ac4_principal_109r1_windows_test.go:92: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_ac4_principal_109r1_windows_test.go:103: install dir descriptor after planting an EXPLICIT Everyone:(OI)(CI)(M):
+          [Everyone (OI)(CI)(M) BUILTIN\Users (I)(OI)(CI)(M) NT AUTHORITY\SYSTEM (I)(OI)(CI)(F) BUILTIN\Administrators (I)(OI)(CI)(F) DESKTOP-LVS7839\swq (I)(OI)(CI)(F)]
+    handoff_ac4_principal_109r1_windows_test.go:123: AC#4/R-109-3: break line 2 reports nothing while this object carries an explicit non-inherited write grant for Everyone (Everyone:(OI)(CI)(M)). A hand-placed grant the ticket 95 width ruling does NOT sanction is invisible to all three界 because the judgment examines one principal's lines; the object has 1 ACE(s) that did not arrive by inheritance: [] (full descriptor: [Everyone (OI)(CI)(M) BUILTIN\Users (I)(OI)(CI)(M) NT AUTHORITY\SYSTEM (I)(OI)(CI)(F) BUILTIN\Administrators (I)(OI)(CI)(F) DESKTOP-LVS7839\swq (I)(OI)(CI)(F)])
+--- FAIL: TestAC4R3NailBreakLineTwoSeesAnExplicitGrantByAnyPrincipal (3.00s)
+=== RUN   TestAC4R4NailBreakLineTwoStaysQuietOnInheritedWidth
+    handoff_ac4_principal_109r1_windows_test.go:145: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_ac4_principal_109r1_windows_test.go:174: principal-agnostic break line stays quiet on the sanctioned inherited width: [BUILTIN\Users (I)(OI)(CI)(M)]
+--- PASS: TestAC4R4NailBreakLineTwoStaysQuietOnInheritedWidth (0.28s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/models	3.557s
+FAIL
