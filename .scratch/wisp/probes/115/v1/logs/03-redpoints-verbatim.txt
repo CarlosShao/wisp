@@ -1,0 +1,34 @@
+# 03 逐字红点（本腿独立取数；载具字节＝仓外 job-106331840177.log 234680B / job-106319703680.log 214419B）
+
+## A. 上一枚 run（job 106319703680 = run 35595651898）里 TestSealReportsThePrincipalsItCleared 的结论
+   尺＝grep -n '^--- PASS: TestSealReportsThePrincipalsItCleared' ＋ 该行号上下文
+   同枚用例的 === RUN 行：
+   该轮 winsec 四数行：
+1359:2026-09-21T11:46:30.8779133Z winsec-tests.sh: four numbers (all from -v output): === RUN=71  --- PASS=32  --- FAIL=3  --- SKIP=0
+   该轮 C26 那行（票面 ①A 说第 204 行是 ERROR refusing to install）：
+204:2026-09-21T11:46:30.3942522Z 2026/09/21 11:46:16 ERROR winsec: refusing to install a path resolver into the sealing seam resolver=risk.c26Pipeline reason="it answered \"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\wisp-108-tree-ownership-probe\" with \"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\wisp-108-tree-ownership-probe\", which is not inside the tree \"C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\" it answered for that path's own parent \"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\": the seam may not be used to move a seal into another tree" consequence="the incumbent resolver, or the built-in floor, stays in place"
+   该轮 FAIL 逐名：
+
+## B. 本轮（job 106331840177 = run 35599458439）四枚红的逐字红点
+   该轮 winsec 四数行＋C26 装上行：
+1458:2026-09-21T12:27:15.0231460Z winsec-tests.sh: four numbers (all from -v output): === RUN=80  --- PASS=36  --- FAIL=4  --- SKIP=0
+204:2026-09-21T12:27:14.4844913Z 2026/09/21 12:27:07 INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2
+   该轮 FAIL 逐名（^--- FAIL 锚定行首）：
+
+   --- 红点 1（inherited_narrow_notice_104_windows_test.go:134 那条）---
+219:2026-09-21T12:27:14.4904436Z     inherited_narrow_notice_104_windows_test.go:134: AC#1: sealing one child that lost an *inherited* foreign grant reported 0 notice(s), want exactly 1; all notices: [{Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC1SealFileReportsTheInheritedGrantItCleared60916060\001\store\readable-by-inheritance.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]}]
+   --- 红点 2（AC#2 leg 3 / ca.txt got 0 WARN）---
+273:2026-09-21T12:27:14.5022420Z     inherited_narrow_notice_104_windows_test.go:307: AC#2 leg 3 / AC#1's shape: ca.txt got 0 WARN(s), want exactly 1: [{Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\ca.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]} {Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\cb.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]} {Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\cc.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]} {Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\cd.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]}]
+274:2026-09-21T12:27:14.5030204Z     inherited_narrow_notice_104_windows_test.go:307: AC#2 leg 3 / AC#1's shape: cb.txt got 0 WARN(s), want exactly 1: [{Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\ca.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]} {Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\cb.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]} {Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\cc.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]} {Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\cd.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]}]
+275:2026-09-21T12:27:14.5037216Z     inherited_narrow_notice_104_windows_test.go:307: AC#2 leg 3 / AC#1's shape: cc.txt got 0 WARN(s), want exactly 1: [{Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\ca.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]} {Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\cb.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]} {Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\cc.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]} {Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC2InheritedNoticeHasANoiseBoundsealing_only_children_repor4289119522\001\widewide\cd.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]}]
+   --- 红点 3（narrow_notice: seal cleared a grant on data without reporting it）---
+285:2026-09-21T12:27:14.5060470Z     narrow_notice_windows_test.go:88: seal cleared a grant on data without reporting it; notices: [{Path:C:\Users\runneradmin\AppData\Local\Temp\TestSealReportsThePrincipalsItCleared2511659878\001\data Principals:[S-1-1-0(A;OICI;0x1200a9;;;WD)] Inherited:[]} {Path:C:\Users\runneradmin\AppData\Local\Temp\TestSealReportsThePrincipalsItCleared2511659878\001\data\shared-with-a-service-account.txt Principals:[S-1-1-0(A;;0x1200a9;;;WD)] Inherited:[]}]
+   --- 红点 4（private_set_sid: named the cleared principal by spelling only）---
+343:2026-09-21T12:27:14.5114445Z     private_set_sid_windows_test.go:340: the notice named the cleared principal by spelling only, not by the resolved SID it holds: cleared="", want S-1-1-0 in it (root DACL now [0/0x0=S-1-5-18 0/0xb=S-1-5-18 0/0x0=S-1-5-32-544 0/0xb=S-1-5-32-544 0/0x0=S-1-5-21-3699639565-2515463329-295617607-500 0/0xb=S-1-5-21-3699639565-2515463329-295617607-500])
+
+## C. 对拉：票面 ①B 自陈的字节/行数 ⇄ 本腿现量
+   票面 ①B 写＝234680 字节 / 1477 行（run 35599458439）⇄ 本腿现量＝234680 字节 / 1477 行
+   票面 ①A 写＝214419 字节 / 1378 行（run 35595651898）⇄ 本腿现量＝214419 字节 / 1378 行
+   日志体 sha256（本腿取的原件，供后逐字对拉）：
+557c72982ba8e59993c0be8d432a72b20b5d6b3a05919a93bce0c275d2c3ed3d */d/tmp/wisp/20261020/115v1/remote/job-106331840177.log
+7e64d4c8b3d6859e4bcc75b57a88f8df71860ee2aedc810182f0a49c66b63c9b */d/tmp/wisp/20261020/115v1/remote/job-106319703680.log
