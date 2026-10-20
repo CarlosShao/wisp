@@ -1,0 +1,13 @@
+time=2026-10-19T23:27:05.509+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2
+    leafrace_342r2_windows_test.go:325: AC#1-leaf attempts=400 flippedCycles=38 flipErrs=22 firstFlipErr="move the staged link onto the caller's name: rename C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r21768194224\\001\\staged-link-342r2v C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r21768194224\\001\\leaf-342r2v.bin: Access is denied."
+    leafrace_342r2_windows_test.go:328: AC#1-leaf DAMAGE : witness truncated=6 gone=0 unreadable=0 | first truncation="attempt 25: size 0 body []" | first absence="" (sampled after every attempt from the main goroutine; sampling races the racer's own restock so it can UNDER-count and cannot over-count)
+    leafrace_342r2_windows_test.go:334: AC#1-leaf': leg that answered = preOpenLeafGuard's leaf refusal (the steady state answers first) : 4 attempts
+    leafrace_342r2_windows_test.go:334: AC#1-leaf': leg that answered = the installed C26 resolver's steady-state refusal : 261 attempts
+    leafrace_342r2_windows_test.go:334: AC#1-leaf': leg that answered = resolveString refused the spelling : 12 attempts
+    leafrace_342r2_windows_test.go:339: AC#1-leaf': leg that answered = none: the call returned nil : 123 attempts
+    leafrace_342r2_windows_test.go:365: AC#1-leaf NOT YET MEASURED even on the answerable form: the guard answered 4 and the re-check answered 0 across 400 attempts with 38 proved flips - so either the gap was never landed in (timing, reportable) or the re-check cannot answer this form (shape, and the adjudication's premise needs re-deriving). Either way this platform's leaf gate stays open and this red says so instead of borrowing the guard's green.
+--- FAIL: TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2 (0.46s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.502s
+FAIL

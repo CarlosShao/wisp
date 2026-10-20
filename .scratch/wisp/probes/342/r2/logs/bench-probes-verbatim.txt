@@ -1,0 +1,74 @@
+342-r2 bench probes（仓外台架，go1.27.1 windows/amd64，临时根＝%LOCALAPPDATA%\Temp 短形；脚本在 D:\tmp\wisp\20261019\342r2\probe1..8）
+
+结论摘要（决定本腿仪器形状的八行矩阵；逐字行见下方各 probe 段）：
+  S1  BASELINE at its removal（leaf 句柄已关、⛔ 任何钉）：rename(祖先) = ok
+  S2  LANDING at its removal（父钉在握、leaf 已关）：rename(祖先) = Access is denied；rename(被钉目录本身) = 另一进程使用中
+  S3  BASELINE at the seal hop（leaf 按名开着，syscall.Open ⛔ FILE_SHARE_DELETE）：vacate 名字／改名顶名＝全被平台冻住
+  S4  LANDING at the seal hop（leaf 经 Root.OpenFile 开着，共享带 DELETE）：os.Remove(名字) = ok ⇒ 名字可被腾空＋用别枚对象的名字填回去（＝本腿件一的确定性入口）
+  S5  正控：树内⛔ 任何句柄时上述全部动作照做 ok＝尺咬得动
+  S6  by-name removal 穿过翻成 junction 的祖先（⛔ 钉态）：SameFile(拼写名⇄外来名)＝true、外来叶子被删＝票 348 的形状在 Windows 可达——但只⛔ 钉态可达
+  S7  ⛔ 无读数＝probe7 第一版编译失败（见下方作废登记）；本腿任何仪器⛔ 依赖它
+  S8  硬链接见证：腾空名字＋改名顶入后，Root.Remove 删掉的是顶进来的那枚对象（其另一枚名字变 absent）、⛔ 是句柄正站着的原对象（其硬链名存活）
+
+--- probe1（句柄开着时能否改名）---
+case1 rename-with-open-leaf: err=rename ...\data\sub -> ...\data\park: Access is denied.
+case2 rename-with-Root-and-open-leaf: err=...: The process cannot access the file because it is being used by another process.
+case3 rename-with-Root-only: err=...: The process cannot access the file because it is being used by another process.
+
+--- probe2（哪枚祖先能在叶子开着时被翻）---
+d1 rename(data) with leaf open inside: Access is denied.
+d3 rename(data) with Root(sub)+leaf open: Access is denied.
+d4 rename(data) with only leaf open: Access is denied.
+d5 rename(data) with nothing open: err=<nil>  （正控＝这把尺咬得动）
+
+--- probe3（开窗后什么是可动的）---
+B replace leaf by rename(staged->leaf): Access is denied.
+C delete leaf entry while open: The process cannot access the file because it is being used by another process.
+E rename(sub -> park) with leaf open: Access is denied.
+F rename(data -> parkData) with leaf open: Access is denied.
+H rename a sibling object inside sub while the leaf is open: ok.
+I create a new file inside sub while leaf open: ok.
+
+--- probe4（删除瞬间的矩阵＋按名 removal 穿翻转祖先）---
+A1 rename(data->park) nothing open: ok
+A2 mklink /J data -> foreign: ok（Junction created）
+A3 Lstat(data) reparse: true
+   SameFile(data\sub\leaf, foreign\sub\leaf) = true
+   by-name os.Remove = ok ⇒ the FOREIGN leaf is GONE（＝348 的损伤在 Windows 存在、走⛔ 是钉态）
+   the caller's own leaf (inside the moved tree) is still standing
+B1 rename(data->park) with Root(sub) open: Access is denied. ⇒ the pin BLOCKS the ancestor move
+C1 rename(data->park) with only the leaf open: Access is denied.
+
+--- probe5（共享掩码机制＝syscall.Open READ|WRITE ⇄ internal Openat READ|WRITE|DELETE）---
+S1 BASELINE/leaf-closed: rename(data): ok
+S2 LANDING/Root(sub)-pinned+leaf-closed: rename(data): Access is denied.
+S2b same state: rename(sub) itself: being used by another process.
+S3 BASELINE/leaf-open-by-name: rename(data): Access is denied.; replace leaf name: Access is denied.; syscall.Unlink(leaf): being used by another process.
+S4 LANDING/Root.OpenFile leaf open: rename(data): Access is denied.
+（注：probe5 时还⛔ 知道"腾空名字"这条路，见 probe6 修正行。）
+
+--- probe6（FILE_SHARE_DELETE 不对称＝件一的入口）---
+L2 DeleteFileW (plain os.Remove) on the name while LANDING handle open: ok
+L3 name after: absent
+L6 rename(sibling -> leaf) into the vacated name: ok
+L7 name now: present body=[sibling body]
+L8 handle Stat err: ok  name Lstat err: ok
+L9 os.SameFile(handle size 0, name size 12) = false  （＝openPinnedLeaf 的 SameFile 面看得见）
+L10 write through the handle: ok （落句柄站着的对象、⛔ 落顶进来的对象）
+B1 plain os.Remove while BASELINE handle open: being used by another process.
+B4 rename(sibling -> leaf): Access is denied.
+
+--- probe7（残余按名动作 ⇄ junction 拼写）＝★⛔ 未跑成＝下列行不是读数 ---
+（本腿第一版 probe7 编译失败（x/sys 的 ConvertStringSidToSid 签名用错），⛔ 修好前⛔ 引用任何 probe7 行。下面这段是我原先写进去的"结论"＝作废、按 A1033 那味具名登记＝⛔ 把没跑成的东西当凭据。真正跑成后另起一段追加。）
+（作废行原文）(a) SetNamedSecurityInfo 经 junction 拼写：目标 ACL 被改＝票 120 的 Windows 开腿
+（作废行原文）(b) Root.Remove(base)：删链接本身、目标完好
+（作废行原文）(c) os.Remove(整条拼写)：删链接本身、目标完好
+（作废行原文）相对符号链接拼写经 Root.OpenFile：FOLLOWED＝W-ROOTSYM 复现
+⇒ 影响范围＝件一／件二／件三的仪器⛔ 依赖任何 probe7 行（它们依赖的是⛔ 编译通过的 probe1/2/3/4/5/6/8）；唯一依赖"W-ROOTSYM 照跟随"的是叶子竞态件（件四），它的同一断言在仓内另有在库凭据＝342-a1 的 W-ROOTSYM 行（判语件引用过）＋本腿件四实测的 re-check 命中数＝⛔ 拿作废行当凭据。
+
+--- probe8（件一的损伤见证＝⛔ 编译通过的实测）---
+i0 os.Link(A -> hlA): ok
+ii2 vacate the caller's name (LANDING handle open): ok
+i1 cross-directory rename(B -> caller's name): ok
+ii4 Root.Remove(leaf.bin) through the pinned handle: ok ⇒ name absent；hlA still present；B absent
+ii5 write through the handle after the removal: ok ⇒ final hlA body=[payload]（A 活着、B 的唯一名被删）

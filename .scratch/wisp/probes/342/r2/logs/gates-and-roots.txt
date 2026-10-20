@@ -1,0 +1,55 @@
+== HEAD at gate time ==
+2b3b17871295f65a45b4d75c3021986b163558ce 票 342＋票 348 落地腿 342-r2·交件⑥＝�
+
+== gate 1: gofumpt -l, my two literal paths, run before unset too (same answer either way) ==
+GOFUMPT_RC=0 (empty listing above = clean)
+
+== gate 2: d22scan ==
+D22_RC=0
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=244, bans #1-5 cmd/=42, ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116, ban #8 internal/=603, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116 text files; internal/ 603 Go files, comments and _test.go included; cmd/ 143 Go files, comments and _test.go included
+
+== gate 3: path-length budget ==
+LEN_RC=0
+check-path-length-budget.sh: VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree
+
+== gate 4: go vet, native + cross (cross files are NOT paired against the native one) ==
+VET_NATIVE_RC=0
+VET_NATIVE_OUTPUT_BYTES=0
+VET_LINUX_RC=0
+VET_LINUX_OUTPUT_BYTES=0
+VET_DARWIN_RC=0
+VET_DARWIN_OUTPUT_BYTES=0
+(a 0-byte vet log with rc=0 = no diagnostics, recorded as such instead of being skipped)
+
+== temp-root actually used by each reading (measured off the logs themselves) ==
+land-targeted-1 : D-gotmp-rows=17  LOCALAPPDATA-temp-rows=0  USERPROFILE-direct-rows=0
+base-targeted-1 : D-gotmp-rows=15  LOCALAPPDATA-temp-rows=0  USERPROFILE-direct-rows=0
+land-full-1 : D-gotmp-rows=543  LOCALAPPDATA-temp-rows=15  USERPROFILE-direct-rows=0
+base-full-1 : D-gotmp-rows=390  LOCALAPPDATA-temp-rows=15  USERPROFILE-direct-rows=0
+land-full-2 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=292  USERPROFILE-direct-rows=0
+base-full-2 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=286  USERPROFILE-direct-rows=0
+land-full-3 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=292  USERPROFILE-direct-rows=0
+base-full-3 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=286  USERPROFILE-direct-rows=0
+landminus-full-1 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=279  USERPROFILE-direct-rows=0
+land-det-r1 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=14  USERPROFILE-direct-rows=0
+land-det-r2 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=14  USERPROFILE-direct-rows=0
+land-det-r3 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=14  USERPROFILE-direct-rows=0
+base-det-r1 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=14  USERPROFILE-direct-rows=0
+base-det-r2 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=14  USERPROFILE-direct-rows=0
+base-det-r3 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=14  USERPROFILE-direct-rows=0
+land-det-shortroot : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=0  USERPROFILE-direct-rows=14
+base-det-shortroot : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=0  USERPROFILE-direct-rows=14
+leaf-base-r1 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=0  USERPROFILE-direct-rows=0
+leaf-base-r2 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=0  USERPROFILE-direct-rows=0
+leaf-base-r3 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=0  USERPROFILE-direct-rows=0
+leaf-land-v2-r1 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=0  USERPROFILE-direct-rows=0
+leaf-land-v2-r2 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=0  USERPROFILE-direct-rows=0
+leaf-land-v2-r3 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=0  USERPROFILE-direct-rows=0
+mutA-targeted-r1 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=6  USERPROFILE-direct-rows=0
+mutA-targeted-r2 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=6  USERPROFILE-direct-rows=0
+mutB-targeted-r1 : D-gotmp-rows=0  LOCALAPPDATA-temp-rows=15  USERPROFILE-direct-rows=0
+
+== junction-construction health (A1053 = long D roots break mklink /J) ==
+land-det-shortroot.log:0
+base-det-shortroot.log:0
+leaf-base-r1.log:0

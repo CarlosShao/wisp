@@ -1,0 +1,12 @@
+time=2026-10-19T23:28:04.629+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2
+    leafrace_342r2_windows_test.go:325: AC#1-leaf attempts=400 flippedCycles=54 flipErrs=12 firstFlipErr="move the staged link onto the caller's name: rename C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r23739209018\\001\\staged-link-342r2v C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r23739209018\\001\\leaf-342r2v.bin: Access is denied."
+    leafrace_342r2_windows_test.go:328: AC#1-leaf DAMAGE : witness truncated=49 gone=0 unreadable=0 | first truncation="attempt 28: size 0 body []" | first absence="" (sampled after every attempt from the main goroutine; sampling races the racer's own restock so it can UNDER-count and cannot over-count)
+    leafrace_342r2_windows_test.go:334: AC#1-leaf': leg that answered = openPinnedLeaf re-check, link face (the gate this case exists to reach) : 48 attempts
+    leafrace_342r2_windows_test.go:334: AC#1-leaf': leg that answered = the installed C26 resolver's steady-state refusal : 285 attempts
+    leafrace_342r2_windows_test.go:334: AC#1-leaf': leg that answered = resolveString refused the spelling : 1 attempts
+    leafrace_342r2_windows_test.go:339: AC#1-leaf': leg that answered = none: the call returned nil : 66 attempts
+    leafrace_342r2_windows_test.go:372: AC#1-leaf MEASURED: openPinnedLeaf's re-check answered 48 of 400 attempts on the bare-sibling form (guard=0, proved flips=54) - the gate 342-v2 recorded as unreachable is reached with the target spelling fixed to a bare name, with NO new seam and NO production change
+--- PASS: TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2 (0.55s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.595s
