@@ -1,0 +1,20 @@
+=== RUN   TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath
+    handoff_guard_109r1_test.go:73: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:111: AC#2/R-109-4 (shape 1): Ensure returned a model directory as available although 1 byte of model.onnx was swapped after the last check that ran on its return path. dir=C:\Users\swq\AppData\Local\Temp\TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath3140296293\002\models\kws-fixture swaps=1 - a caller that uses Manager.Ensure directly, without DownloadingBridge, gets the hand-off with no guard on it at all, which is exactly what R-109-4 says the bridge-only placement left open.
+--- FAIL: TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath (0.06s)
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded/cache_hit
+    handoff_guard_109r1_test.go:73: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:160: AC#2/R-109-4: the cache-hit return path handed back a store whose model.onnx was swapped after its verification (swaps=1)
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded/local_override
+    handoff_guard_109r1_test.go:190: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:204: AC#2/R-109-4: the local_override return path announced a sideloaded model available although 1 byte was swapped after its verification (swapped=true)
+--- FAIL: TestAC22CacheHitAndOverrideReturnPathsAreGuarded (0.06s)
+    --- FAIL: TestAC22CacheHitAndOverrideReturnPathsAreGuarded/cache_hit (0.01s)
+    --- FAIL: TestAC22CacheHitAndOverrideReturnPathsAreGuarded/local_override (0.01s)
+=== RUN   TestAC23ReverseLegCleanHandOffsAreNotBroken
+    handoff_guard_109r1_test.go:248: server hits: install=1, second-instance reuse=0
+--- PASS: TestAC23ReverseLegCleanHandOffsAreNotBroken (0.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/models	0.262s
+FAIL

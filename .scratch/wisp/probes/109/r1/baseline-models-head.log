@@ -1,0 +1,166 @@
+=== RUN   TestAC47TrusteesAreJudgedBySIDNotByText
+=== RUN   TestAC47TrusteesAreJudgedBySIDNotByText/canonical_name_resolves_to_the_wanted_SID
+=== RUN   TestAC47TrusteesAreJudgedBySIDNotByText/short_spelling_of_the_same_account_is_the_same_principal
+=== RUN   TestAC47TrusteesAreJudgedBySIDNotByText/a_trustee_icacls_could_not_resolve_is_still_an_identity
+=== RUN   TestAC47TrusteesAreJudgedBySIDNotByText/the_wanted_principal_arriving_as_a_bare_SID_is_found,_not_skipped
+--- PASS: TestAC47TrusteesAreJudgedBySIDNotByText (0.00s)
+    --- PASS: TestAC47TrusteesAreJudgedBySIDNotByText/canonical_name_resolves_to_the_wanted_SID (0.00s)
+    --- PASS: TestAC47TrusteesAreJudgedBySIDNotByText/short_spelling_of_the_same_account_is_the_same_principal (0.00s)
+    --- PASS: TestAC47TrusteesAreJudgedBySIDNotByText/a_trustee_icacls_could_not_resolve_is_still_an_identity (0.00s)
+    --- PASS: TestAC47TrusteesAreJudgedBySIDNotByText/the_wanted_principal_arriving_as_a_bare_SID_is_found,_not_skipped (0.00s)
+=== RUN   TestAC48WrongSIDFindsNothing
+--- PASS: TestAC48WrongSIDFindsNothing (0.00s)
+=== RUN   TestAC49UnresolvableTrusteeIsReportedNotSkipped
+--- PASS: TestAC49UnresolvableTrusteeIsReportedNotSkipped (0.00s)
+=== RUN   TestAC3CapabilityPackagesReachTheCompositionRoot
+=== RUN   TestAC3CapabilityPackagesReachTheCompositionRoot/GOOS=windows
+=== RUN   TestAC3CapabilityPackagesReachTheCompositionRoot/GOOS=linux
+=== RUN   TestAC3CapabilityPackagesReachTheCompositionRoot/GOOS=darwin
+=== NAME  TestAC3CapabilityPackagesReachTheCompositionRoot
+    assembly_reachability_121_test.go:169: GOOS=windows: -e set == plain set (27 of this module's packages), so the -e the non-host legs depend on is not hiding a broken edge on the leg where it can be checked
+--- PASS: TestAC3CapabilityPackagesReachTheCompositionRoot (1.66s)
+    --- PASS: TestAC3CapabilityPackagesReachTheCompositionRoot/GOOS=windows (0.39s)
+    --- PASS: TestAC3CapabilityPackagesReachTheCompositionRoot/GOOS=linux (0.28s)
+    --- PASS: TestAC3CapabilityPackagesReachTheCompositionRoot/GOOS=darwin (0.30s)
+=== RUN   TestDownloadingWalkSuccess
+--- PASS: TestDownloadingWalkSuccess (0.03s)
+=== RUN   TestDownloadingWalkFailure
+--- PASS: TestDownloadingWalkFailure (0.01s)
+=== RUN   TestDownloadingWalkRejectsIllegalEnter
+time=2026-10-20T19:44:31.993+08:00 level=ERROR msg="state machine rejected transition" from=Sleeping event=onboarding.model-missing err="statemachine: illegal transition Sleeping + onboarding.model-missing (no D43 row; undefined = stop)"
+--- PASS: TestDownloadingWalkRejectsIllegalEnter (0.01s)
+=== RUN   TestTamperedModelByteRejectedAndDeleted
+--- PASS: TestTamperedModelByteRejectedAndDeleted (0.01s)
+=== RUN   TestTamperedManifestFailsBeforeAnyDownload
+--- PASS: TestTamperedManifestFailsBeforeAnyDownload (0.01s)
+=== RUN   TestVerifySignatureFalseIsHardError
+--- PASS: TestVerifySignatureFalseIsHardError (0.01s)
+=== RUN   TestResumeContinuesAtByteOffset
+--- PASS: TestResumeContinuesAtByteOffset (0.02s)
+=== RUN   TestMirrorFailoverAndProgressEvents
+--- PASS: TestMirrorFailoverAndProgressEvents (0.02s)
+=== RUN   TestCancelCleansStagingNoPartialsOutside
+--- PASS: TestCancelCleansStagingNoPartialsOutside (0.02s)
+=== RUN   TestLocalOverrideIntegrityNoNetwork
+--- PASS: TestLocalOverrideIntegrityNoNetwork (0.01s)
+=== RUN   TestCacheHitReverifiedEveryTime
+--- PASS: TestCacheHitReverifiedEveryTime (0.02s)
+=== RUN   TestArchiveModelExtractsFlattensInstalls
+--- PASS: TestArchiveModelExtractsFlattensInstalls (0.05s)
+=== RUN   TestAC2NormalInstallAndSecondInstanceReuseAreNotBroken
+    handoff_reuse_109_test.go:59: server hits: install=1, second-instance reuse=0
+--- PASS: TestAC2NormalInstallAndSecondInstanceReuseAreNotBroken (0.06s)
+=== RUN   TestAC3WideTempRenameIsGuardedByTheReverifyNotByTheDescriptor
+    handoff_reuse_109_test.go:98: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_reuse_109_test.go:105: rename-into-place covered by the hand-off re-verify: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\TestAC3WideTempRenameIsGuardedByTheReverifyNotByTheDescriptor3624430363\002\kws-fixture: model.onnx: sha256 mismatch (pins 785b0751fc2c..., got dd7bafd7c0c4...)
+--- PASS: TestAC3WideTempRenameIsGuardedByTheReverifyNotByTheDescriptor (0.06s)
+=== RUN   TestAC1HandoffRefusesAModelSwappedAfterEnsureIsVerified
+    handoff_window_109_test.go:95: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_window_109_test.go:109: hand-off refused the swapped model: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\TestAC1HandoffRefusesAModelSwappedAfterEnsureIsVerified3572856001\002\models\kws-fixture: model.onnx: sha256 mismatch (pins 785b0751fc2c..., got dd7bafd7c0c4...)
+--- PASS: TestAC1HandoffRefusesAModelSwappedAfterEnsureIsVerified (0.06s)
+=== RUN   TestAC1TheWriteWindowIsAnInheritedCrossAccountRight
+    handoff_window_109_windows_test.go:74: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:91: BEFORE the hand-off guard - install dir kws-fixture: [BUILTIN\Users (I)(OI)(CI)(M)]
+    handoff_window_109_windows_test.go:92: BEFORE the hand-off guard - installed file model.onnx: [BUILTIN\Users (I)(M)]
+    handoff_window_109_windows_test.go:111: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_window_109_windows_test.go:123: hand-off refused the swap made through that right: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\TestAC1TheWriteWindowIsAnInheritedCrossAccountRight2732746123\002\models\kws-fixture: model.onnx: sha256 mismatch (pins 785b0751fc2c..., got dd7bafd7c0c4...)
+    handoff_window_109_windows_test.go:134: AFTER the hand-off guard ran - install dir: [BUILTIN\Users (I)(OI)(CI)(M)]
+    handoff_window_109_windows_test.go:135: AFTER the hand-off guard ran - installed file: [BUILTIN\Users (I)(M)]
+--- PASS: TestAC1TheWriteWindowIsAnInheritedCrossAccountRight (3.57s)
+=== RUN   TestAC4InstallDirWidthIsDeliberateAndHasABreakLine
+    handoff_window_109_windows_test.go:159: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:176: store root seeded with: [BUILTIN\Users (OI)(CI)(M)]
+    handoff_window_109_windows_test.go:200: AC#4 nail: install dir kws-fixture inherits [BUILTIN\Users (I)(OI)(CI)(M)] (parent policy, guard is the re-verify)
+--- PASS: TestAC4InstallDirWidthIsDeliberateAndHasABreakLine (0.47s)
+=== RUN   TestRealManifestInRepoVerifies
+--- PASS: TestRealManifestInRepoVerifies (0.02s)
+=== RUN   TestRealManifestAuthoringConsistency
+--- PASS: TestRealManifestAuthoringConsistency (0.00s)
+=== RUN   TestRealDownloadVadThroughPipeline
+    manifest_real_test.go:120: real-network spot check; set WISP_IT_REAL_MIRROR=1 to run
+--- SKIP: TestRealDownloadVadThroughPipeline (0.00s)
+=== RUN   TestRealDownloadPuncArchiveThroughPipeline
+    manifest_real_test.go:147: real-network spot check; set WISP_IT_REAL_MIRROR=1 to run
+--- SKIP: TestRealDownloadPuncArchiveThroughPipeline (0.00s)
+=== RUN   TestP3BlockedModelRefused
+--- PASS: TestP3BlockedModelRefused (0.04s)
+=== RUN   TestManifestParseSingleArtifact
+--- PASS: TestManifestParseSingleArtifact (0.00s)
+=== RUN   TestManifestParseMultiArtifactWithArchive
+--- PASS: TestManifestParseMultiArtifactWithArchive (0.00s)
+=== RUN   TestManifestRejectsStructuralDrift
+--- PASS: TestManifestRejectsStructuralDrift (0.00s)
+=== RUN   TestManifestCombinedDigestContract
+--- PASS: TestManifestCombinedDigestContract (0.00s)
+=== RUN   TestMinisignRoundTrip
+--- PASS: TestMinisignRoundTrip (0.00s)
+=== RUN   TestMinisignTamperDetection
+--- PASS: TestMinisignTamperDetection (0.00s)
+=== RUN   TestMinisignFormatExactness
+--- PASS: TestMinisignFormatExactness (0.00s)
+=== RUN   TestMinisignRealKeyAcceptsBuildinfoPlaceholder
+    minisign_test.go:112: buildinfo carries a parseable public key (expected after C29 dev-key landing)
+--- PASS: TestMinisignRealKeyAcceptsBuildinfoPlaceholder (0.00s)
+=== RUN   TestMinisignRandomKeygenShape
+--- PASS: TestMinisignRandomKeygenShape (0.00s)
+=== RUN   TestAC3EveryInstalledFileIsReverifiedAtReadTime
+--- PASS: TestAC3EveryInstalledFileIsReverifiedAtReadTime (0.12s)
+=== RUN   TestAC3ExtractionIsDeliberatelyNotSealed
+    no_seal_ruling_windows_test.go:34: wide staging parent C:\Users\swq\TestAC3ExtractionIsDeliberatelyNotSealed2368638570\001\staging
+        C:\Users\swq\TestAC3ExtractionIsDeliberatelyNotSealed2368638570\001\staging BUILTIN\Users:(OI)(CI)(RX)
+                                                                                    NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                    BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                    DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    no_seal_ruling_windows_test.go:54: icacls C:\Users\swq\TestAC3ExtractionIsDeliberatelyNotSealed2368638570\001\staging\kws-fixture\model.onnx
+        C:\Users\swq\TestAC3ExtractionIsDeliberatelyNotSealed2368638570\001\staging\kws-fixture\model.onnx BUILTIN\Users:(I)(RX)
+                                                                                                           NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                           BUILTIN\Administrators:(I)(F)
+                                                                                                           DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    no_seal_ruling_windows_test.go:54: icacls C:\Users\swq\TestAC3ExtractionIsDeliberatelyNotSealed2368638570\001\staging\kws-fixture\tokens.txt
+        C:\Users\swq\TestAC3ExtractionIsDeliberatelyNotSealed2368638570\001\staging\kws-fixture\tokens.txt BUILTIN\Users:(I)(RX)
+                                                                                                           NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                           BUILTIN\Administrators:(I)(F)
+                                                                                                           DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    no_seal_ruling_windows_test.go:54: icacls C:\Users\swq\TestAC3ExtractionIsDeliberatelyNotSealed2368638570\001\staging\kws-fixture\dict\inner.txt
+        C:\Users\swq\TestAC3ExtractionIsDeliberatelyNotSealed2368638570\001\staging\kws-fixture\dict\inner.txt BUILTIN\Users:(I)(RX)
+                                                                                                               NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                               BUILTIN\Administrators:(I)(F)
+                                                                                                               DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    no_seal_ruling_windows_test.go:54: icacls C:\Users\swq\TestAC3ExtractionIsDeliberatelyNotSealed2368638570\001\staging\kws-fixture\README.md
+        C:\Users\swq\TestAC3ExtractionIsDeliberatelyNotSealed2368638570\001\staging\kws-fixture\README.md BUILTIN\Users:(I)(RX)
+                                                                                                          NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                          BUILTIN\Administrators:(I)(F)
+                                                                                                          DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC3ExtractionIsDeliberatelyNotSealed (1.06s)
+=== RUN   TestAC41CleanInstallStillVerifies
+    verify_tree_121_test.go:73: clean install verifies: C:\Users\swq\TestAC41CleanInstallStillVerifies14382421\002\models\kws-fixture holds exactly the manifest's 4 named files plus dict/
+--- PASS: TestAC41CleanInstallStillVerifies (0.17s)
+=== RUN   TestAC42UnnamedFileAndDirAreRefused
+=== RUN   TestAC42UnnamedFileAndDirAreRefused/loose_file_next_to_the_model
+    verify_tree_121_test.go:138: refused and named: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\TestAC42UnnamedFileAndDirAreRefusedloose_file_next_to_the_model2567023319\002\models\kws-fixture: model dir holds 1 entry the signed manifest does not name: zz-unnamed-extra.onnx - re-hashing only the named files cannot see an added one, so a loader that opens this directory by name could be handed bytes nobody verified
+=== RUN   TestAC42UnnamedFileAndDirAreRefused/empty_directory_nobody_named
+    verify_tree_121_test.go:138: refused and named: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\TestAC42UnnamedFileAndDirAreRefusedempty_directory_nobody_named1789159339\002\models\kws-fixture: model dir holds 1 entry the signed manifest does not name: sub/ - re-hashing only the named files cannot see an added one, so a loader that opens this directory by name could be handed bytes nobody verified
+=== RUN   TestAC42UnnamedFileAndDirAreRefused/file_added_inside_a_named_directory
+    verify_tree_121_test.go:138: refused and named: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\TestAC42UnnamedFileAndDirAreRefusedfile_added_inside_a_named_di874923670\002\models\kws-fixture: model dir holds 1 entry the signed manifest does not name: dict/extra.txt - re-hashing only the named files cannot see an added one, so a loader that opens this directory by name could be handed bytes nobody verified
+=== RUN   TestAC42UnnamedFileAndDirAreRefused/plausible_sibling_of_the_model_file
+    verify_tree_121_test.go:138: refused and named: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\TestAC42UnnamedFileAndDirAreRefusedplausible_sibling_of_the_mod445912381\002\models\kws-fixture: model dir holds 1 entry the signed manifest does not name: model.int8.onnx - re-hashing only the named files cannot see an added one, so a loader that opens this directory by name could be handed bytes nobody verified
+--- PASS: TestAC42UnnamedFileAndDirAreRefused (0.71s)
+    --- PASS: TestAC42UnnamedFileAndDirAreRefused/loose_file_next_to_the_model (0.26s)
+    --- PASS: TestAC42UnnamedFileAndDirAreRefused/empty_directory_nobody_named (0.16s)
+    --- PASS: TestAC42UnnamedFileAndDirAreRefused/file_added_inside_a_named_directory (0.14s)
+    --- PASS: TestAC42UnnamedFileAndDirAreRefused/plausible_sibling_of_the_model_file (0.16s)
+=== RUN   TestAC43HandOffRefusesAnUnnamedFile
+    verify_tree_121_test.go:171: hand-off refused at Error: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\TestAC43HandOffRefusesAnUnnamedFile60005301\002\models\kws-fixture: model dir holds 1 entry the signed manifest does not name: extra.bin - re-hashing only the named files cannot see an added one, so a loader that opens this directory by name could be handed bytes nobody verified
+--- PASS: TestAC43HandOffRefusesAnUnnamedFile (0.23s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/models	8.528s

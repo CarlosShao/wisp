@@ -1,0 +1,19 @@
+=== RUN   TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath
+    handoff_guard_109r1_test.go:73: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:123: Ensure's own return path refused the post-verification swap: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\AppData\Local\Temp\TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath941287569\002\models\kws-fixture: model.onnx: sha256 mismatch (pins 785b0751fc2c..., got dd7bafd7c0c4...)
+--- PASS: TestAC21FreshInstallIsGuardedOnEnsuresOwnReturnPath (0.07s)
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded/cache_hit
+    handoff_guard_109r1_test.go:73: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:166: cache-hit return path refused: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\AppData\Local\Temp\TestAC22CacheHitAndOverrideReturnPathsAreGuarded1191596615\002\models\kws-fixture: model.onnx: sha256 mismatch (pins 785b0751fc2c..., got dd7bafd7c0c4...)
+=== RUN   TestAC22CacheHitAndOverrideReturnPathsAreGuarded/local_override
+    handoff_guard_109r1_test.go:190: swapped 1 byte of model.onnx inside the post-verification window
+    handoff_guard_109r1_test.go:210: local_override return path refused: model: hand-off re-verification: model kws-fixture installed files no longer match the signed manifest in C:\Users\swq\AppData\Local\Temp\TestAC22CacheHitAndOverrideReturnPathsAreGuardedlocal_override2294033614\001\sideload: model.onnx: sha256 mismatch (pins 785b0751fc2c..., got dd7bafd7c0c4...)
+--- PASS: TestAC22CacheHitAndOverrideReturnPathsAreGuarded (0.07s)
+    --- PASS: TestAC22CacheHitAndOverrideReturnPathsAreGuarded/cache_hit (0.00s)
+    --- PASS: TestAC22CacheHitAndOverrideReturnPathsAreGuarded/local_override (0.01s)
+=== RUN   TestAC23ReverseLegCleanHandOffsAreNotBroken
+    handoff_guard_109r1_test.go:248: server hits: install=1, second-instance reuse=0
+--- PASS: TestAC23ReverseLegCleanHandOffsAreNotBroken (0.06s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/models	0.270s

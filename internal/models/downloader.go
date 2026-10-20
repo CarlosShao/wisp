@@ -137,6 +137,33 @@ func defaultHTTPClient() *http.Client {
 //     reuse it (tamper surveillance on every hit).
 //  3. download: mirror chain -> HTTP Range resume -> retry/backoff ->
 //     sha256 verify -> archive extract -> atomic move into <DataDir>/<id>.
+//
+// Ticket 109 rework leg 109-r1, AC#2 shape (1) / R-109-4: every one of those
+// branches now ends in handOffCheck, so the re-verification that closes the
+// cross-account write window is on Ensure's OWN return path instead of only on
+// the DownloadingBridge that happens to call it.
+//
+// WHY THIS LANDING. Ticket 109 put the guard at bridge.go:58, and
+// acceptor-ticket109b's 攻2 measured what that bought: the guard "是调用点自带的，
+// 不是 choke point 强制的" - `Manager.Ensure` is exported, so any caller that
+// reaches for it directly (the panel, an engine loader, a CLI sub-command) was
+// handed a directory whose only assurance was a check made earlier, inside a
+// different function it never called. The rework table's minimal set (
+// docs/evidence/s1/109-adversarial-acceptance.md:43-44) names this as the thing
+// to move; the same table's R-109-4 says the bridge-only placement is the same
+// defect as AC#2's landing.
+//
+// WHAT IT COSTS. Branches 1 and 2 verified this same tree microseconds ago, so
+// for a clean store handOffCheck is a pure second read of the installed files -
+// twice the bytes ticket 121 AC#6 measured for one cache hit (its 256 MiB sample
+// ran 1.07-1.22 s per VerifyDir call). That is the deliberate price of putting
+// the guard where a caller cannot step around it.
+//
+// WHAT IT DOES NOT CLOSE (stated rather than glossed, and unchanged by moving
+// the guard): a write landing AFTER this return is still invisible to this
+// process, because the install directory stays inherit-wide on purpose (ticket
+// 95's ruling). R-109-1's residual span therefore gets shorter, not zero, and it
+// only becomes reachable when a loader exists that opens these bytes.
 func (m *Manager) Ensure(ctx context.Context, id string, onProgress ...func(ProgressEvent)) (string, error) {
 	entry, err := m.opts.Manifest.FindModel(id)
 	if err != nil {
@@ -165,6 +192,9 @@ func (m *Manager) Ensure(ctx context.Context, id string, onProgress ...func(Prog
 				fmt.Sprintf("local_override %q failed integrity check: %v", id, err))
 		}
 		progress(ProgressEvent{ModelID: id, Phase: PhaseDone, ArtifactCount: entry.ArtifactCount(), Percent: 100})
+		if err := m.handOffCheck(entry, dir); err != nil {
+			return "", err
+		}
 		return dir, nil
 	}
 
@@ -172,6 +202,9 @@ func (m *Manager) Ensure(ctx context.Context, id string, onProgress ...func(Prog
 	installDir := filepath.Join(m.opts.DataDir, id)
 	if err := m.VerifyDir(entry, installDir); err == nil {
 		progress(ProgressEvent{ModelID: id, Phase: PhaseDone, ArtifactCount: entry.ArtifactCount(), Percent: 100})
+		if err := m.handOffCheck(entry, installDir); err != nil {
+			return "", err
+		}
 		return installDir, nil
 	}
 
@@ -205,7 +238,35 @@ func (m *Manager) Ensure(ctx context.Context, id string, onProgress ...func(Prog
 	}
 	m.removeStaging(id)
 	progress(ProgressEvent{ModelID: id, Phase: PhaseDone, ArtifactCount: entry.ArtifactCount(), Percent: 100})
+	if err := m.handOffCheck(entry, installDir); err != nil {
+		return "", err
+	}
 	return installDir, nil
+}
+
+// handOffCheck is the re-verification ticket 109 exists for, in ONE place, so a
+// caller cannot step around it by picking a different entry point. It re-reads
+// and re-hashes the tree Ensure is about to hand back and refuses the hand-off if
+// the bytes no longer match the signed manifest.
+//
+// Why a fresh install needs it too, since downloadEntry already hashed the same
+// bytes inside staging: the move (install -> os.Rename/copyFile) is the last thing
+// that touches them, and it lands them in a directory the ticket 95 ruling keeps
+// inherit-wide. Anything that can write there - measured at SID level by
+// handoff_window_109_windows_test.go, and the whole reason this window is a window
+// rather than a paranoia - owns the span between that move and this return. The
+// staging hash answers "were the bytes we downloaded correct"; only a check on the
+// destination answers "are these still the bytes".
+//
+// It takes the entry it verifies instead of an id: Ensure already resolved it, and
+// re-resolving here would let a manifest that changed mid-call decide which tree
+// counts as correct.
+func (m *Manager) handOffCheck(entry *ModelEntry, dir string) error {
+	if err := m.VerifyDir(entry, dir); err != nil {
+		return observeWrap(ClassModel, "hand-off re-verification",
+			fmt.Errorf("model %s installed files no longer match the signed manifest in %s: %w", entry.ID, dir, err))
+	}
+	return nil
 }
 
 // VerifyInstalled re-checks an installed model against the signed manifest at
@@ -222,9 +283,13 @@ func (m *Manager) Ensure(ctx context.Context, id string, onProgress ...func(Prog
 // and it is reachable without a *ModelEntry because that is exactly what a
 // hand-off site does not have.
 //
-// It re-reads and re-hashes; it does not trust anything cached about a previous
-// pass. Cost is one more full read of the installed files at hand-off, the same
-// cost Ensure's cache-hit branch already pays per call.
+// Since ticket 109's rework this is the same handOffCheck Ensure runs on its own
+// return paths, reached by id instead of by an entry the caller does not have.
+// It exists because a swap can land between two hand-offs: `wisp models verify`
+// calls it on a tree nobody is currently installing. It re-reads and re-hashes;
+// it does not trust anything cached about a previous pass. Cost is one more full
+// read of the installed files at hand-off, the same cost Ensure's cache-hit
+// branch already pays per call.
 func (m *Manager) VerifyInstalled(id string) error {
 	entry, err := m.opts.Manifest.FindModel(id)
 	if err != nil {
@@ -234,11 +299,7 @@ func (m *Manager) VerifyInstalled(id string) error {
 	if override, ok := m.opts.LocalOverride[id]; ok {
 		dir = override
 	}
-	if err := m.VerifyDir(entry, dir); err != nil {
-		return observeWrap(ClassModel, "hand-off re-verification",
-			fmt.Errorf("model %s installed files no longer match the signed manifest in %s: %w", id, dir, err))
-	}
-	return nil
+	return m.handOffCheck(entry, dir)
 }
 
 // Cancel aborts an in-flight Ensure for id. The aborted run cleans its
