@@ -1,0 +1,89 @@
+== 票 230 `AC#2` 腿 `230-r1` 续跑：门禁四把（★续跑自己现跑，⛔ 采信前腿读数）==
+
+跑门时刻＝2026-10-20 17:4x +08；那发 HEAD＝`118049450e3ec078783135e33ff1b328aa975805`
+（`票 109 返工腿 109-r1 派单存档`，17:40:45）＝别腿的笔，⛔ 我的写面。
+只在**共享工作树**跑；驱动＝`D:\tmp\wisp\20261020\230r1cont\sh\02-gates.sh`；
+逐字读数＝`D:\tmp\wisp\20261020\230r1cont\logs\gates.txt`（9,312 字节）。
+退码取法＝先重定向到文件、`echo RC=$?` 紧跟裸命令（公共块 A1043③ 定式）。
+
+== 0. 跑门前的环境净化 ==
+
+    BEFORE unset: GOTMPDIR=[] TMPDIR=[/tmp] TEMP=[/tmp] TMP=[/tmp]
+    AFTER  unset: GOTMPDIR=[] TMPDIR=[]     TEMP=[]    TMP=[]
+    （`unset GOTMPDIR TMPDIR TEMP TMP`＋`export GOFLAGS=`；票 311 那道 GUARD 带 env 会 rc=2＝射程拒绝，⛔ 读成红）
+
+== 1. 四把门（逐枚落 rc）==
+
+    门① GOFLAGS= go build ./...                          rc=0   输出 0 字节
+    门② sh scripts/d22scan.sh                             rc=0   clean（见下面第 3 行的逐字收尾句）
+    门③ gofmt   -l internal/agent/approval/queue.go      rc=0   列 0 枚
+    门④ /d/work/base/gopath/bin/gofumpt.exe -l <同一枚>   rc=0   列 0 枚
+    并排两把＝门③⇄门④ 对同一枚文件都列 0 ⇒ 该文件在两把尺下同形。
+    另两把（公共块门禁段也列）＝
+        go vet ./internal/agent/...                      rc=0   输出 0 字节
+        sh scripts/check-path-length-budget.sh           rc=0   VERDICT GREEN（over-budget=60＝roster=60＝⛔ 新增）
+
+    ★裸 gofumpt -l internal/agent/approval/queue.go       rc=127  `gofumpt: command not found`
+      ⇒ 具名登记＝它不在本机 PATH，真身走全路径；⛔ 把这枚 127 当"跳过"、⛔ 据此判门没跑。
+
+d22scan 收尾逐字（`logs/g2-d22scan.txt` 倒数第 1 行）＝
+    d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=244, bans #1-5 cmd/=42,
+    ban #6 frontend/=116, ban #7 internal/tools/=25, ban #8 design/=39, ban #8 frontend/=116,
+    ban #8 internal/=603, ban #8 cmd/=143; ban #8 emoji coverage: design/ 39 text files; frontend/ 116
+    text files; internal/ 603 Go files, comments and _test.go included; cmd/ 143 Go files, …
+    （`internal/` 603 枚＝含注释与 `_test.go`，与前腿 00-report 第 5 节那句同尺同值）
+
+== 2. 并排两把的仓外延尺：整仓名册（⛔ 洗别人已知脏件＝只具名登记）==
+
+    gofmt   -l .   rc=2   列 49 行
+    gofumpt -l .   rc=2   列 55 行
+    REPO_ROSTER_DIFF_RC=1（两把⛔ 同册；差集全在 `.scratch/wisp/probes/**` 那批突变/负控件里）
+    两把 rc=2 的原因＝那批 `probes/**` 里的突变样本本身是**故意坏**的 `.go`（逐字例子＝
+      `.scratch/wisp/probes/161/r1/runs/unp-bad/internal/a/p_unp.go:5:14: expected ')', found '{'`
+      `.scratch/wisp/probes/33/r5/block_ac13_ac14.go:16:1: expected 'package', found 'func'`）
+    ⇒ 整仓那两把在共享工作树上先天不可用（＝台损，⛔ 计入判据、⛔ 据此判门红）；
+      能用的那把＝对**本腿写面**单枚跑（第 1 节门③⇄门④，两把都 rc=0/列 0）。
+
+    本腿写面在整仓名册里吗（期望 0）＝`grep -c 'approval/queue.go' <gofmt 整仓名册>` ＝ **0**
+    那批 tracked 脏件＝4 枚，逐枚 `git ls-files --eol` 具名（★全部＝存量 CRLF，前腿 00-report 第 5 节也这么报；本腿零字节）＝
+        i/lf w/crlf attr/text eol=lf  cmd/wisp/models.go
+        i/lf w/crlf attr/text eol=lf  internal/agent/approval/pending_read.go
+        i/lf w/crlf attr/text eol=lf  internal/agent/tools.go
+        i/lf w/crlf attr/text eol=lf  internal/risk/provenance.go
+    （⇒ 它们被 `gofmt -l` 标脏＝工作树 CRLF 对 `eol=lf` 属性，⛔ 我动一个字节、⛔ `-w` 扫任何一枚；
+      `internal/agent/approval/pending_read.go` 与我同包但⛔ 我的写面＝派单那句"queue.go 只你一枚写它"的边界。）
+
+== 3. 本腿新字节是否 LF（尺＝入库 blob 的 CR 计数，非工作树）==
+
+    blob_CR(.scratch/wisp/probes/230/r1/00-report.md) = 0   ls-files --eol: i/lf w/lf attr/text eol=lf
+    blob_CR(.scratch/wisp/probes/230/r1/01-rulers.txt)= 0   ls-files --eol: i/lf w/lf attr/text=auto
+    （`.gitattributes` 现量第 4/5 行＝`*.go text eol=lf` ⇄ `*.md text eol=lf`；`core.autocrlf=true` 在场，
+      ⇒ 提交时 git 对那枚 `.txt` 发过一句 "LF will be replaced by CRLF the next time Git touches it"＝
+      工作树侧提示，入库 blob 仍是 LF＝上面 CR=0 那把尺；⛔ 因此改属性、⛔ 因此重写文件。）
+    queue.go 本趟零字节（尺＝`git hash-object internal/agent/approval/queue.go`）＝
+        dcef3fa8c46c6182d53bb2d3204e6469351b1a80 ＝ `git rev-parse HEAD:internal/agent/approval/queue.go` 同值
+        `git status --porcelain -- internal/agent/approval/queue.go` ＝ 0 行（该文件工作树干净）
+
+== 4. 可执行字节变动＝0（★续跑自己算的三把，⛔ 抄前腿）==
+
+    尺1 `git show -U0 <commit>` 的每枚 ^[+-] 变动行（剥 +/- 与前导空白后）是否以 // 开头：
+        commit=c489eacc changed_lines=14 noncomment_changed_lines=0   （逐枚打印前 2 字节＝14 枚全 [//]）
+        commit=c73df208 changed_lines=7  noncomment_changed_lines=0   （7 枚全 [//]）
+    尺2 累计＝起手锚→HEAD 只算那枚文件：accum_changed=21 accum_noncomment=0
+    尺3 剥整行注释后的正文两侧逐字相同（这把我读成最硬＝"可执行字节变动＝0"的直接量证）：
+        file_lines start=621 head=632        （注释面 621→632＝+11 行，⛔ 是正文）
+        剥整行注释后 start=421 head=421
+        EXEC_BYTE_DIFF_RC=0 diff_bytes=0
+        sha256 两侧同串 fadaf8d1dd30abb511569184c48bb63c5b04f2ceecaf2eaa29a8d8e6dba5089f
+    尺4 越界尺＝`git diff --name-only c16ff47e..HEAD` 里我的写面只有那枚 `.go`（其余全是别腿⇄编排者的件）；
+        逐枚 `git show --name-only`＝笔①⇄笔② 各只含 `internal/agent/approval/queue.go` 一枚；
+        `--numstat`＝笔①`11 3`、笔②`5 2`。
+    正控（尺灵）＝`git grep -c 'only reader of q.alias' c16ff47e -- <file>`＝1 命中 rc=0；
+        同一把尺对 HEAD＝0 命中 rc=1 ⇒ 旧锚真归零、⛔"空操作伪装成一次成功复跑"。
+
+== 5. ⛔ 做的事（逐条零字节）==
+
+⛔ 把 `Queue.reject` 分支改宽 ⛔ 动 `Queue` 任何授权判定 ⛔ 放宽任何断言 ⛔ 删用例／`t.Skip`
+⛔ 动 SLO 阈值／golden／`thresholds.go`／三枚冻结件 ⛔ 新导出名／新 `panel.*` 方法名／新 JSON 键
+⛔ `-w` 扫别人文件 ⛔ 翻任何框 ⛔ 改票名／`Status:`／`-done` ⛔ push
+跑色限 `./internal/agent/...` 定向；⛔ 整包 `./cmd/wisp` ⛔ `./...` ⛔ `./internal/winsec/`（`352-r1` 续跑写面）
