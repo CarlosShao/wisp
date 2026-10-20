@@ -1,0 +1,22 @@
+派单＝`gw-1` 干净窗口量色腿（★只测不写·⛔ 落任何产码/测试字节·⛔ push·⛔ 翻框）｜编排者＝新任 harness｜发出 2026-10-20 22:3x +08
+★主题起头⛔ 换形：每笔逐字「**gw-1 量色腿 gw-1**」开头。
+★你是"读数腿"＝你⛔ 改任何字节；你只交付**成对读数＋门禁 rc**，替四枚裁腿共同点名欠的那味（"曾经绿⛔ 今天判据绿"）取到今天的数。
+
+## 背景（为什么是你、为什么是现在）
+车道此刻真空（六枚腿全收线、五包近 12 分钟被动＝0、CPU 45/39/39）。四件裁腿判语都卡在同一个缺口＝**落地字节从未被现势跑过色／CI⛔ 覆盖**：
+- `352-v1` 第③件＝票 352 `AC#2` 五包（`internal/secret`⇄`config`⇄`memory`⇄`agent`⇄`panel`）成对色缺现势实测（尺＝`git merge-base --is-ancestor ecffb93b origin/dev` rc=1＝CI 从未见过落地字节）。
+- `321-v1` 第④件＝票 321 `AC#2` 五把门只到"曾经绿"（腿跑门时 HEAD=`4e0ac985`、此后 winsec 被 4 笔动过）。
+- `353-r1` 交件＝票 353 `AC#3` 报了两平台成对色（Win `RUN=121`／container `RUN=74`）＝缺一枚⛔ 353 身份的腿独立复量。
+⇒ ★这些数**只要有任一枚写腿落进相应包就立刻作废**＝这就是编排者 22:2x 没先派写腿的原因（见台账 `A1072`②）。你跑完我立刻补写腿。
+
+## 要做的三味（按此序做，先做判据最硬的；轮次帽前把最新状态 commit＋票尾⛔ 你动、话全落你的件）
+**① 五把门禁对今天 HEAD 重跑**（＝321 `AC#2`）＝共享工作树、跑前 `unset GOTMPDIR TMPDIR TEMP TMP`＋`export GOFLAGS=`：`GOFLAGS= go build ./...`／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`/d/work/base/gopath/bin/gofumpt.exe -l`⇄`gofmt -l`（并排两把、⛔ 洗已知脏件，存量具名登记）／`go vet -tags winlive ./cmd/wisp/`（★这把我要求你连正控一起做＝在**仓外**副本造一枚坏 `printf` 让 vet rc=1 逐字打印＝证那枚 0 是验过的读数）。逐枚落 `rc=`＋末行逐字。
+**② 五包成对色＋逐名作差**（＝票 352 `AC#2`）＝★两棵仓外导出树＝`ecffb93b^`（＝落地那一行的父＝改动前）⇄今天的 HEAD；每包 `-count=1 -timeout 30m -v` 定向（`./internal/secret/ ./internal/config/ ./internal/memory/ ./internal/agent/ ./internal/panel/`）、★四数 `RUN/PASS_TOP/FAIL_TOP/SKIP` ⛔ 混用⛔ 相减、红名册**逐名 `comm`**（新增红枚数＋逐名列全）；★`private_fail_test.go:37/50/61/72/75` 那五枚 `ErrNotSealable` 判定逐枚点名两侧色＋读 `ErrUnresolvedPath` 的 `openleaf_322`⇄`placement_symlink_113` 两侧色；⛔ 跑整包 `./cmd/wisp`（票 352 票面逐字归编排者那窗＝我这窗交给你的是五包＋①的 vet，⛔ cmd/wisp 整包）。
+**③ winsec 两平台成对色**（＝票 353 `AC#3`）＝同一把尺：基线侧＝`3a509e50`（乙本体落地前那一笔）⇄落地侧＝今天 HEAD，`./internal/winsec/` 定向 `-count=1 -v`＋逐名 `comm`＝新增红枚数；★摆动名册照公共块（两枚 `!windows` 仪器＝既⛔ 绿也⛔ 弃权；`…116` 族 4 枚；`TestTicket223ModeLoosening…`＝票 351 已定性仪器形状）；机主常驻 `wisp.exe`（pid 21892 在场）热键族＝弃权、⛔ 归因给字节。
+②③ 各自跑前先 `git rev-parse HEAD` 记下锚＝**你全程⛔ 提交任何 `.go` 字节⇒HEAD 若在你跑动中漂了，具名重跑受影响那发**（＝今天 352-v1/321-v1 都栽在"读数时点与字节时点对不上"）。
+
+## 台面（缺一味就假红，全量先 Read `.scratch/wisp/probes/orch/20261020/352r1-dispatch.txt` 尾公共块）
+`git archive <锚> go.mod go.sum internal cmd tools scripts frontend models` 八件套＋仓根 `docs/`＋手工补三件（`build/*.dll`、`third_party/sherpa-onnx/*.dll`、`frontend/dist`）；树放 `D:` 卷短名形；`GOTMPDIR`/`TMPDIR`＝`cygpath -w` 反斜杠形＋先 `mkdir -p`；★`cygpath -wp` 整条 PATH 只在仓外取 DLL 时用；★跑 `cmd/wisp`⇄`panel` 相关必须带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`（否则 `0xc0000135`＋零枚 `--- FAIL`＝台损⛔ 计判据）；★★`D:\tmp\wisp` 那味（109-r1 量到的）＝**任何会 `icacls /remove` 再判"继承还在不在"的用例，台根⛔ 落 `D:\tmp\wisp`**（那里带机器范围 `BUILTIN\Users` 两条继承、撤不掉）＝撞红先按台损具名、⛔ 计入判据；取出后先数 `.go` 证非空；⛔ 在共享工作树跑 `go test`。
+取退码＝重定向到文件后 `echo RC=$?` 紧跟裸命令；★凡报数带尺名＋射程目录＋量的还是算的；报"0 命中"前先跑正控；★CR/码位一律对**入库 blob** 用 `tr -cd` 量（⛔ 对工作树、⛔ 用 `grep -c` 数字节＝今天四枚腿＋编排者各栽过）；⛔ `cut -c` 截中文；证据件⛔ `.out`、⛔ 0 字节；正文件 ≤160 行（⛔ 适用产码/测试文件）；每落一枚就 commit、⛔ 攒着。
+写面＝只 `.scratch/wisp/probes/gw/1/**`（＋一枚汇总件）。⛔ 动任何 `.go`/票面/台账、⛔ 翻框、⛔ push、两处逐枚显式 pathspec、⛔ amend/reset/stash/checkout/clean/`add -A`、`-F` Windows 形、提交后 `git log -1`＋`git show --name-only` 对回。临时件 `D:\tmp\wisp\20261020\gw1\`、⛔ 盘符根、只建不删。★任何输出重定向⛔ 落仓根冻结件（`go.mod` 今天被一枚腿截成 0 字节＝`A1069`③）。
+交件 send_message 报 `lead`＝逐枚提交号＋名册三把尺同号＋★三味各自〔跑动锚（`git rev-parse HEAD` 起手⇄交件）＋逐把 rc／成对四数＋逐名作差红名册〕＋台损枚数具名（`0xc0000135`/`build failed`/`walk`/弃权族各计数）＋写面自证（逐枚 name-only＝`.go` **0 枚**）＋tracked 脏**逐枚列名**尺。⛔ 圆判：跑不到的那味具名写"缺哪一味＋为什么"。
