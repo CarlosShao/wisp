@@ -24,3 +24,24 @@ A7=0 B7=3
 ===== verdict line/byte budget (dispatch: <=130 lines each, <=8 lines per cell) =====
 docs/evidence/s1/342-v3-verdict.md bytes=16497 lines=45
 docs/evidence/s1/348-v2-verdict.md bytes=10891 lines=35
+
+########## POST-COMMIT SELF-PROOF (6 commits; append-only; frames unchanged) ##########
+3f8783a9b273999bed4b5fc6c9dc32f4a8325cbc 票 342＋票 348 续体终�
+3e8114291c39211117bcc7799729a04bfcefb2f5 票 342＋票 348 续体终�
+c1c9eaa242ce62177d735bdd2976699a6c8cb197 票 342＋票 348 续体终�
+2084b6d23f135ed981c0555f8d0ba52ac6943546 票 342＋票 348 续体终�
+e8d6d23a28ae604c251d52d9fc5471ed1d3d718b 票 342＋票 348 续体终�
+02c0f304ffe3ea14ab5110ea6bebf8e4d2729f98 票 342＋票 348 续体终�
+3f8783a9 names=1 outside=0 prodgo=0
+3e811429 names=1 outside=0 prodgo=0
+c1c9eaa2 names=13 outside=0 prodgo=0
+2084b6d2 names=48 outside=0 prodgo=0
+e8d6d23a names=1 outside=0 prodgo=0
+02c0f304 names=1 outside=0 prodgo=0
+winsec.go diff over my six commits: 0 files; HEAD blob = 07300bfffc3e5b14c017029d6f84fb5a7ede3db8
+tails numstat:
+2	0	.scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md
+2	0	.scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md
+.scratch/wisp/issues/342-privatefile-open-follows-a-swapped-ancestor-on-both-platforms-no-ticket-owns-it.md [x]=5 [ ]=2 mybullets=1
+.scratch/wisp/issues/348-refusal-path-remove-follows-an-ancestor-link-and-deletes-a-foreign-file.md [x]=6 [ ]=1 mybullets=1
+HEAD counts: probes/342/v3=48 probes/348/v2=13
