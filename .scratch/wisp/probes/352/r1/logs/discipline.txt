@@ -1,14 +1,20 @@
 == R1 名册尺＝锚定行首（⛔ 假设其后任何字符、⛔ 非锚定子串）==
+1c787282 Tue Oct 20 17:10:16 2026 +0800 票 352 落地腿 352-r1 笔⑧＝票尾那一条只追加 bullet＋Progress log 一行（★纯追加尺咬过：删除行 0）
+5c9402f8 Tue Oct 20 17:08:27 2026 +0800 票 352 落地腿 352-r1 笔⑦＝AC#3 纪律格自证＋门禁四数入库
+3ecdea30 Tue Oct 20 17:07:44 2026 +0800 票 352 落地腿 352-r1 笔⑥＝★三枚本腿自抓的整改入库（钝尺⇄0 字节⇄入库正文净化，全在收件尺咬到之前自己抓到）
 06aa2abf Tue Oct 20 16:52:01 2026 +0800 票 352 落地腿 352-r1 笔⑤＝AC#2 消费者面入库＝落地⇄基线成对逐名作差＝新增红 0 枚
 c16ff47e Tue Oct 20 16:29:06 2026 +0800 票 352 落地腿 352-r1 笔④＝AC#1 落地读数入库＝两分类并存（判据成立）
 aacde632 Tue Oct 20 16:28:21 2026 +0800 票 352 落地腿 352-r1 笔③＝AC#0 改前读数入库（现状钉死＝两平台四值对照的改前那一半）
 ecffb93b Tue Oct 20 16:15:44 2026 +0800 票 352 落地腿 352-r1 笔②＝★那一行落地＝wrapPath 的 errno 那半 %v→%w（机主已批＝A1056④/A1058，来源＝342-v2 必答(v) 独立签）
 0fb399c3 Tue Oct 20 16:14:22 2026 +0800 票 352 落地腿 352-r1 笔①＝尺与驱动入库（AC#0 之前的台面件）
-ANCHORED_COUNT=5
-NON_ANCHORED_COUNT=5  （非锚定＝会吃进正文引用了本前缀的别腿笔＝A1045 那味）
+ANCHORED_COUNT=8
+NON_ANCHORED_COUNT=8  （非锚定＝会吃进正文引用了本前缀的别腿笔＝A1045 那味）
 
 == R2 第二把独立尺＝单次 %H%x09%s 导出＋内存内 index($2,P)==1 ==
-INMEMORY_ANCHOR0_COUNT=5
+INMEMORY_ANCHOR0_COUNT=8
+  MY: 1c787282cab1e710fdbcb68065ca20fd3479e6b9	票 352 落地腿 352-r1 笔⑧＝票尾那一条只追加 bullet＋Progress log 一行（★纯追加尺咬过：删除行 0）
+  MY: 5c9402f807c9adfa98097c56b6dce9aba846bcc9	票 352 落地腿 352-r1 笔⑦＝AC#3 纪律格自证＋门禁四数入库
+  MY: 3ecdea30c7e60a2ca52d9571ecac960a64601937	票 352 落地腿 352-r1 笔⑥＝★三枚本腿自抓的整改入库（钝尺⇄0 字节⇄入库正文净化，全在收件尺咬到之前自己抓到）
   MY: 06aa2abfaaf3055dfa38eecf371caa84232f738e	票 352 落地腿 352-r1 笔⑤＝AC#2 消费者面入库＝落地⇄基线成对逐名作差＝新增红 0 枚
   MY: c16ff47ec465749f1977efa94a2b024cc8931e27	票 352 落地腿 352-r1 笔④＝AC#1 落地读数入库＝两分类并存（判据成立）
   MY: aacde6321d3b4a64b71f61981fe702c96dc189e7	票 352 落地腿 352-r1 笔③＝AC#0 改前读数入库（现状钉死＝两平台四值对照的改前那一半）
@@ -16,7 +22,7 @@ INMEMORY_ANCHOR0_COUNT=5
   MY: 0fb399c308644b754085627afbca36cae5cb2d30	票 352 落地腿 352-r1 笔①＝尺与驱动入库（AC#0 之前的台面件）
 
 == R3 写面自证＝逐枚 name-only（只数本腿那几笔，⛔ 区间）==
-PATHS_TOTAL=65
+PATHS_TOTAL=79
 OUTSIDE_ALLOWED_WRITEFACE=0
 GO_FILES_TOUCHED=1  （★产码只 1 枚＝internal/winsec/winsec.go；⛔ 一枚 .go 是别腿的）
 WINSEC_GO_LINES=1
@@ -57,6 +63,12 @@ AC_NAMES=AC#0 AC#1 AC#2 AC#3   （★凡报几格先跑框尺＝本票分母＝4
     CONTROL_348_CHECKED=6 CONTROL_348_UNCHECKED=1 CONTROL_348_ANY=7
 
 == R7 票尾 numstat＝须纯追加（0 deletions）==
+  1c787282 票 352 落地腿 352-r1 笔⑧＝票尾那一条只追加 bullet＋Progress log 一行（★纯追加尺咬过：删除行 0）
+5	0	.scratch/wisp/issues/352-wrappath-errno-half-stringified-so-fs-ernotexist-cannot-punch-through-private-route.md
+  5c9402f8 票 352 落地腿 352-r1 笔⑦＝AC#3 纪律格自证＋门禁四数入库
+     （本笔⛔ 碰票面件）
+  3ecdea30 票 352 落地腿 352-r1 笔⑥＝★三枚本腿自抓的整改入库（钝尺⇄0 字节⇄入库正文净化，全在收件尺咬到之前自己抓到）
+     （本笔⛔ 碰票面件）
   06aa2abf 票 352 落地腿 352-r1 笔⑤＝AC#2 消费者面入库＝落地⇄基线成对逐名作差＝新增红 0 枚
      （本笔⛔ 碰票面件）
   c16ff47e 票 352 落地腿 352-r1 笔④＝AC#1 落地读数入库＝两分类并存（判据成立）
@@ -81,12 +93,15 @@ ZERO_BYTE_FILES=0  OUT_EXT_FILES=0
   aacde632 winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
   c16ff47e winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
   06aa2abf winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  3ecdea30 winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  5c9402f8 winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  1c787282 winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
   START_ANCHOR=bf509bb837aa1328617320608be38e4bca5a5d35 winsec_blob=07300bfffc3e5b14c017029d6f84fb5a7ede3db8
-  NOW_HEAD=06aa2abfaaf3055dfa38eecf371caa84232f738e winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5 worktree_hash=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
+  NOW_HEAD=1c787282cab1e710fdbcb68065ca20fd3479e6b9 winsec_blob=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5 worktree_hash=f3c1b68ee60d8d5d42b816e47633d31f1ba191f5
 
 == R11 ⛔ push 自证＝本地 dev ⇄ origin/dev ==
-UNPUSHED_COMMITS_TOTAL=79
-UNPUSHED_COMMITS_MINE=5
+UNPUSHED_COMMITS_TOTAL=83
+UNPUSHED_COMMITS_MINE=8
 
 == R12 ⛔ 越界碰别腿写面（本腿笔里应⛔ 含 cmd/wisp／agent/approval 任何字节）==
   CROSSLEG_HITS=0（上面无输出＝0）
