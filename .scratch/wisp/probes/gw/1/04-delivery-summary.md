@@ -68,3 +68,16 @@ winsec（对甲 `3a509e50`⇄HEAD）：host 四发＝`121/67/3/0`（基线）⇄
 4. ★本腿自抓三把坏尺（照实入账）：① `gofumpt -l ./...` 用法坏（`./...`＝包模式⛔ 路径⇒rc=2 `open …\.git`）；② `comm` 名册两侧路径不同形⇒35 枚全误判"只在本地脏"；③ 钝 CR 尺 `tr -cd '\r' | wc -l`（只数换行⇒读 0）——本汇总里所有 CR 数都取自 `wc -c` 形＋正控（自造 2 枚 CR 件读出 **2**）。
 5. ★这里⛔ 一枚读数能替 352/321/353 三张票的 AC 盖章＝本腿是读数腿：⛔ 翻框、⛔ 动票面/台账、⛔ push。★CI 那味现量两把（量的、只报数）＝`git merge-base --is-ancestor ecffb93b origin/dev`＝**rc=1** ⇄ `--is-ancestor 54963e61 origin/dev`＝**rc=1** ⇒ 落地字节与本腿五笔读数件都仍⛔ 在 `origin/dev` 之外＝"CI 从未见过落地字节"那一味照旧成立（⛔ 本腿处置＝推送只由编排者做、且机主按住）。
 6. ★临时件只建不删＝`D:\tmp\wisp\20261020\gw1\{gwB,gwW,gwL,gwL-vetmut,blobcheck,posctrl,gocache-win,gocache-col-*,logs}`（162 枚原始底片留仓外 `logs/`＝帽口径先例＝139-r1 `04` 第 B 节；★可逐字重跑的尺 16 枚已入库 `sh/01..sh/16`）。
+
+## 八、台损那一行的精确形（★纯追加＝⛔ 抹上面原句；起因＝本腿复量时抓到自己第五枚钝尺）
+
+第五节那张表里"34 发"⇄"walk＝0 枚"两格⛔ 是精确读数，改正如下（两把尺都现跑、都带正控）：
+
+| 问 | 精确读数 | 尺 |
+|---|---|---|
+| 跑色发数 | **40 发**＝味② 20（10 host＋10 container）＋味③ 8 成对＋6 复量（`ws3`）＋6 复量（`cfg`） | `wc -l` ⇄ `ls *.raw.txt \| wc -l`＝**40 枚**原始件（量的，射程＝仓外 `logs/`）；第五节写"34"＝我只数了带 `SHAPE=` 字段的那 34 行（28 行 `SHAPE=OK VOIDKIND=none`＋6 行 `ws3` 只带 `SHAPE=OK`）而 `sh/14` 那 6 发 `cfg` 复量的行形⛔ 带该字段＝**计数尺的射程⛔ 覆盖全部发**＝本腿第五枚钝尺，照实入账 |
+| 零到达（台损那一形） | **0 枚** | 逐枚 `grep -c '^=== RUN'` 打在全部 40 枚原始件上＝`ZERO_RUN_COUNT=0`；★正控＝同一条尺在 40/40 枚里都读得出 `=== RUN` 行（`grep -rl` 命中 40/40＝尺⛔ 瞎） |
+| `0xc0000135`／`build failed`／`setup failed`／`no test files` | **各 0 枚** | `grep -rl` 打在 40 枚原始件上＝命中 0；★先正控（同尺读 `=== RUN`＝40/40） |
+| `walk` | 台面故障形＝**0 枚**；★⛔ 拿朴素 `grep -i walk` 的命中当读数＝它命中 **30 枚**原始件 | 朴素那把钝尺⛔ 用（＝公共块"名册尺⛔ 非锚定子串"同形）：30 枚命中**逐字全是用例名与日志正文**（`TestAC4SealedWalkSkipsLinks`／`TestAC4DirectorySymlinkInsideSealedTreeIsNotWalked`／`leg that answered = pinned walk`／`pinnedWalkRefusals=61`）；精确那把＝`grep -E "walk [A-Z]:\|walk .*: The system"`（＝d22scan GUARD  offender 那形）命中 **0 枚** |
+
+⇒ 本节只更正"我数了几发、`walk` 那格用的哪把尺"（发数 34→**40**；`walk` 的尺从朴素子串换成台面形那把＝仍 0 枚）＝★判据读数⛔ 变＝三味四数⇄逐名红册⇄新增红枚数全部出自 `RUN>0` 的 40 枚原始件（逐枚量过）；⛔ 改任何一枚色、⛔ 翻任何框、⛔ 落任何 `.go` 字节。
