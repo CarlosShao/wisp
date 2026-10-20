@@ -1,0 +1,88 @@
+# 08 CI 真扫那一步（step 5 = sh scripts/d22scan.sh）的判决行与台账（载具＝本腿自取 lint-106389417800.log sha256 916cc89f…）
+## step5 组起点＝第 335 行；取 335..500 区间内 d22scan 判决/台账/clean 行
+   5:2026-09-21T15:07:45.0947973Z d22scan.sh: positive control - runtests.sh -C tools/d22scan ./...
+   67:2026-09-21T15:07:46.3153309Z     scan_test.go:1157: rc=1 stdout=d22scan: examined 16 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_11628194292/001
+   68:2026-09-21T15:07:46.3154485Z         d22scan: scope bans #1-5 internal/      examined  15 production Go files
+   69:2026-09-21T15:07:46.3155117Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+   70:2026-09-21T15:07:46.3155797Z         d22scan: scope ban #6 frontend/         examined   1 text files
+   71:2026-09-21T15:07:46.3157031Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+   72:2026-09-21T15:07:46.3157768Z         d22scan: scope ban #8 design/           examined   1 text files
+   73:2026-09-21T15:07:46.3158323Z         d22scan: scope ban #8 frontend/         examined   1 text files
+   74:2026-09-21T15:07:46.3159033Z         d22scan: scope ban #8 internal/         examined  15 Go files, comments and _test.go included
+   75:2026-09-21T15:07:46.3159823Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+   77:2026-09-21T15:07:46.3162476Z         stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+   79:2026-09-21T15:07:46.3164103Z     scan_test.go:1157: rc=2 stdout=d22scan: examined 14 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_24258342939/001
+   80:2026-09-21T15:07:46.3165088Z         d22scan: scope bans #1-5 internal/      examined  13 production Go files
+   81:2026-09-21T15:07:46.3165723Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+   82:2026-09-21T15:07:46.3166470Z         d22scan: scope ban #6 frontend/         examined   1 text files
+   83:2026-09-21T15:07:46.3167071Z         d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+   84:2026-09-21T15:07:46.3167651Z         d22scan: scope ban #8 design/           examined   1 text files
+   85:2026-09-21T15:07:46.3168193Z         d22scan: scope ban #8 frontend/         examined   1 text files
+   86:2026-09-21T15:07:46.3168888Z         d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+   87:2026-09-21T15:07:46.3169656Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+   88:2026-09-21T15:07:46.3171350Z         stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+   90:2026-09-21T15:07:46.3173822Z     scan_test.go:1157: rc=1 stdout=d22scan: examined 15 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel682505762/001
+   91:2026-09-21T15:07:46.3175356Z         d22scan: scope bans #1-5 internal/      examined  14 production Go files
+   92:2026-09-21T15:07:46.3175998Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+   93:2026-09-21T15:07:46.3176585Z         d22scan: scope ban #6 frontend/         examined   2 text files
+   94:2026-09-21T15:07:46.3177194Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+   95:2026-09-21T15:07:46.3177793Z         d22scan: scope ban #8 design/           examined   1 text files
+   96:2026-09-21T15:07:46.3178343Z         d22scan: scope ban #8 frontend/         examined   2 text files
+   97:2026-09-21T15:07:46.3179046Z         d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+   98:2026-09-21T15:07:46.3179825Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+   100:2026-09-21T15:07:46.3182138Z         stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+   102:2026-09-21T15:07:46.3184007Z     scan_test.go:1157: rc=2 stdout=d22scan: examined 15 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared2746736232/001
+   103:2026-09-21T15:07:46.3185043Z         d22scan: scope bans #1-5 internal/      examined  14 production Go files
+   104:2026-09-21T15:07:46.3185789Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+   105:2026-09-21T15:07:46.3186398Z         d22scan: scope ban #6 frontend/         examined   0 text files
+   106:2026-09-21T15:07:46.3187011Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+   107:2026-09-21T15:07:46.3187588Z         d22scan: scope ban #8 design/           examined   1 text files
+   108:2026-09-21T15:07:46.3188523Z         d22scan: scope ban #8 frontend/         examined   0 text files
+   109:2026-09-21T15:07:46.3189698Z         d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+   110:2026-09-21T15:07:46.3190858Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+   113:2026-09-21T15:07:46.3194445Z     scan_test.go:1157: rc=2 stdout=d22scan: examined 14 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li696158607/001
+   114:2026-09-21T15:07:46.3195633Z         d22scan: scope bans #1-5 internal/      examined  13 production Go files
+   115:2026-09-21T15:07:46.3196269Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+   116:2026-09-21T15:07:46.3196866Z         d22scan: scope ban #6 frontend/         examined   1 text files
+   117:2026-09-21T15:07:46.3197479Z         d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+   118:2026-09-21T15:07:46.3198074Z         d22scan: scope ban #8 design/           examined   1 text files
+   119:2026-09-21T15:07:46.3198745Z         d22scan: scope ban #8 frontend/         examined   1 text files
+   120:2026-09-21T15:07:46.3199494Z         d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+   121:2026-09-21T15:07:46.3200544Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+   122:2026-09-21T15:07:46.3201742Z         stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+   124:2026-09-21T15:07:46.3203590Z     scan_test.go:1157: rc=0 stdout=d22scan: examined 15 production Go files under internal/ and cmd/ of /tmp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_01886915025/001
+   125:2026-09-21T15:07:46.3204584Z         d22scan: scope bans #1-5 internal/      examined  14 production Go files
+   126:2026-09-21T15:07:46.3205230Z         d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+   127:2026-09-21T15:07:46.3205810Z         d22scan: scope ban #6 frontend/         examined   1 text files
+   128:2026-09-21T15:07:46.3206421Z         d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+   129:2026-09-21T15:07:46.3207488Z         d22scan: scope ban #8 design/           examined   1 text files
+   130:2026-09-21T15:07:46.3208484Z         d22scan: scope ban #8 frontend/         examined   1 text files
+   131:2026-09-21T15:07:46.3209686Z         d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+   132:2026-09-21T15:07:46.3211450Z         d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+   133:2026-09-21T15:07:46.3215823Z         d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+   144:2026-09-21T15:07:46.3225695Z runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0
+   146:2026-09-21T15:07:46.6611619Z d22scan: examined 223 production Go files under internal/ and cmd/ of /home/runner/work/wisp/wisp
+   147:2026-09-21T15:07:46.6612959Z d22scan: scope bans #1-5 internal/      examined 202 production Go files
+   148:2026-09-21T15:07:46.6613721Z d22scan: scope bans #1-5 cmd/           examined  21 production Go files
+   149:2026-09-21T15:07:46.6614406Z d22scan: scope ban #6 frontend/         examined  40 text files
+   150:2026-09-21T15:07:46.6615092Z d22scan: scope ban #7 internal/tools/   examined  18 production Go files
+   151:2026-09-21T15:07:46.6615752Z d22scan: scope ban #8 design/           examined  16 text files
+   152:2026-09-21T15:07:46.6616352Z d22scan: scope ban #8 frontend/         examined  40 text files
+   153:2026-09-21T15:07:46.6617452Z d22scan: scope ban #8 internal/         examined 374 Go files, comments and _test.go included
+   154:2026-09-21T15:07:46.6618556Z d22scan: scope ban #8 cmd/              examined  29 Go files, comments and _test.go included
+   155:2026-09-21T15:07:46.6621954Z d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=202, bans #1-5 cmd/=21, ban #6 frontend/=40, ban #7 internal/tools/=18, ban #8 design/=16, ban #8 frontend/=40, ban #8 internal/=374, ban #8 cmd/=29; ban #8 emoji coverage: design/ 16 text files; frontend/ 40 text files; internal/ 374 Go files, comments and _test.go included; cmd/ 29 Go files, comments and _test.go included
+
+## 台账八数（同区间逐字）
+
+## winsec 那枚文件是否在本次扫描射程内（ban #8 internal/ 含 _test.go 与注释）
+0
+
+## gofumpt / vet 两步判决（step 6 / 7 / 8 皆 success，逐字行）
+   2026-09-21T15:07:46.6694286Z ##[group]Run go install mvdan.cc/gofumpt@latest
+   2026-09-21T15:07:46.6694709Z [36;1mgo install mvdan.cc/gofumpt@latest[0m
+   2026-09-21T15:07:46.6695084Z [36;1mOUT="$(gofumpt -l . tools/d22scan tools/mockllm)"[0m
+   2026-09-21T15:07:46.6695711Z [36;1m  echo "gofumpt would reformat:"[0m
+   2026-09-21T15:07:46.6696226Z [36;1m  exit 1[0m
+   2026-09-21T15:07:47.0071497Z go: downloading mvdan.cc/gofumpt v0.12.0
+   2026-09-21T15:07:49.1532480Z ##[group]Run go vet ./...
+   2026-09-21T15:08:00.1774360Z ##[group]Run go vet ./...
