@@ -92,7 +92,7 @@ func TestTicket255RestartTierKeysAreBackedByATest(t *testing.T) {
 // tier engine: Manager.plan/planApp decide, this only reads what they booked.
 func reloadOneAppKey255(t *testing.T, key, from, to string) *config.Report {
 	t.Helper()
-	path := filepath.Join(t.TempDir(), configFileName)
+	path := filepath.Join(sealableTempDir124(t), configFileName)
 	if err := config.SaveFile(path, config.NewDefaults()); err != nil {
 		t.Fatalf("SaveFile canonical config: %v", err)
 	}

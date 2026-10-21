@@ -219,7 +219,7 @@ func firstByteDiff198r2(want, got []byte) string {
 // instrument 198-v1 §6-甲-1 asked for: the file the production entry wrote,
 // against the tags rendered independently of NewDefaults.
 func TestTicket198R2AC2CreatedFileCarriesNothingButTheSchemaDefaultTags(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	cfgPath := filepath.Join(dir, configFileName)
 
 	expect, leaves := tagDefaults198r2(t)
@@ -361,7 +361,7 @@ var wispCommand198r2 = regexp.MustCompile(`\bwisp ([a-z][a-z0-9-]*)`)
 // package's own AST. Operator text naming an entry point that does not exist is
 // the failure mode this guards.
 func TestTicket198R2AC4ReceiptNamesTheRealEntryPoints(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	cfgPath := filepath.Join(dir, configFileName)
 	code, _, stderrText := run198(t, dir)
 	if code != 2 {
@@ -459,7 +459,7 @@ func TestTicket198R2J1TheAssemblyRootStillCreatesNothing(t *testing.T) {
 	// (b) the user-started entry over the same shape of root must still create
 	// it - otherwise (a) would be green for the wrong reason (creation broken
 	// everywhere) and this case would pin nothing.
-	runDir := t.TempDir()
+	runDir := sealableTempDir124(t)
 	runCode, _, runStderr := run198(t, runDir)
 	if runCode != 2 {
 		t.Fatalf("runTextTask over a fresh root: exit %d, want 2, stderr:\n%s", runCode, runStderr)

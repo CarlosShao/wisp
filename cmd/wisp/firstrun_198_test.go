@@ -72,7 +72,7 @@ func staticSectionHeads198(t *testing.T) []string {
 // implementation (an in-memory flag, a non-atomic rewrite, defaults smuggled
 // in from a previous read).
 func TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	cfgPath := filepath.Join(dir, configFileName)
 
 	if _, err := os.Stat(cfgPath); !os.IsNotExist(err) {
@@ -155,7 +155,7 @@ func TestTicket198AC1FirstRunCreatesConfigThenLeavesItAlone(t *testing.T) {
 // under the config name. "stat failed -> create" would rename straight over it;
 // the fs.ErrNotExist test must treat a directory as present and stay out.
 func TestTicket198AC1DirectoryShapedConfigIsNeverOverwritten(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	cfgPath := filepath.Join(dir, configFileName)
 	if err := os.Mkdir(cfgPath, 0o700); err != nil {
 		t.Fatal(err)
@@ -190,7 +190,7 @@ func TestTicket198AC1DirectoryShapedConfigIsNeverOverwritten(t *testing.T) {
 // leaves maps nil (defaults.go:77-78), and filling one "so the file looks
 // complete" is exactly the invented-default the ticket forbids.
 func TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	cfgPath := filepath.Join(dir, configFileName)
 	if code, _, stderrText := run198(t, dir); code != 2 {
 		t.Fatalf("exit %d, want 2, stderr:\n%s", code, stderrText)
@@ -235,7 +235,7 @@ func TestTicket198AC1CreatedFileHoldsEveryStaticSectionAndNoInventedTables(t *te
 // 旧配置") is a lie for a boot that has no previous config. The creation
 // receipt therefore shares none of that sentence's markers.
 func TestTicket198FirstRunReceiptStaysOutOfTheFourCauseSentences(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	_, _, stderrText := run198(t, dir)
 	if !strings.Contains(stderrText, "新建默认配置") {
 		t.Fatalf("no creation receipt to test against; stderr:\n%s", stderrText)

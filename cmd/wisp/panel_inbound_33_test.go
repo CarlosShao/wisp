@@ -60,7 +60,7 @@ func runInboundLeg33(t *testing.T, stdin, dataDir string) (code int, out, errLog
 // is a fine thing to test but not the one AC#9 asks for.
 func newInboundDataDir33(t *testing.T, mode string) string {
 	t.Helper()
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	cfg := "[risk]\npermission_mode = \"" + mode + "\"\n"
 	path := filepath.Join(dir, configFileName)
 	if err := os.WriteFile(path, []byte(cfg), 0o600); err != nil {

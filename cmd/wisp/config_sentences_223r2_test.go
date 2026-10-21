@@ -102,7 +102,7 @@ func TestTicket223R2FailureSentenceRouting(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			path := filepath.Join(t.TempDir(), "config.toml")
+			path := filepath.Join(sealableTempDir124(t), "config.toml")
 			if err := config.SaveFile(path, config.NewDefaults()); err != nil {
 				t.Fatalf("seed canonical config: %v", err)
 			}

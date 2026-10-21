@@ -49,7 +49,7 @@ const seed313Empty = `schema_version = 2
 
 func empty313Dir(t *testing.T) string {
 	t.Helper()
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	if err := os.WriteFile(filepath.Join(dir, configFileName), []byte(seed313Empty), 0o600); err != nil {
 		t.Fatalf("seed config.toml: %v", err)
 	}
@@ -293,7 +293,7 @@ func Test313MultiElementCommaChainKeepsEveryElement(t *testing.T) {
 enabled = true
 context_window = 32000
 `
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	if err := os.WriteFile(filepath.Join(dir, configFileName), []byte(seed), 0o600); err != nil {
 		t.Fatalf("seed config.toml: %v", err)
 	}

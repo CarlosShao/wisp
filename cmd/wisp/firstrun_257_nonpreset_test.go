@@ -47,7 +47,7 @@ const t257npGhost = "t257-r2-ghost-gateway"
 // 257 file so neither half can be silenced by the other being renamed.
 func t257npCleanMachine(t *testing.T) (dir, cfgPath, receipt string) {
 	t.Helper()
-	dir = t.TempDir()
+	dir = sealableTempDir124(t)
 	cfgPath = filepath.Join(dir, configFileName)
 	if _, err := os.Stat(cfgPath); !errors.Is(err, fs.ErrNotExist) {
 		t.Fatalf("AC#1 premise broke: the clean machine already holds %q", cfgPath)

@@ -71,7 +71,7 @@ const (
 // (runTextTask -> ensureFirstRunConfig), never hand-placed by this test.
 func t257CleanMachine(t *testing.T) (dir, cfgPath, receipt string) {
 	t.Helper()
-	dir = t.TempDir()
+	dir = sealableTempDir124(t)
 	cfgPath = filepath.Join(dir, configFileName)
 	if _, err := os.Stat(cfgPath); !errors.Is(err, fs.ErrNotExist) {
 		t.Fatalf("AC#1 premise broke: the clean machine already holds %q (stat err %v)", cfgPath, err)
