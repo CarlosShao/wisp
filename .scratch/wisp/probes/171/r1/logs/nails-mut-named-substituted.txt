@@ -1,0 +1,17 @@
+== attrib.sh --self-test: the classifier, fed as text (v0.12.0 (go1.27.1))
+   PASS  want rc=1 verdict=UNATTRIBUTABLE    got rc=1  .scratch/wisp/probes/999/bad-sample.go (path claims ticket 999 but .scratch/wisp/issues/999-*.md does not exist, class=untracked, parse_err=0) <== REAL INJURY
+   PASS  want rc=1 verdict=UNATTRIBUTABLE    got rc=1  .scratch/wisp/probes/999/bad-sample.go (path claims ticket 999 but .scratch/wisp/issues/999-*.md does not exist, class=untracked, parse_err=1) <== REAL INJURY
+   PASS  want rc=1 verdict=UNATTRIBUTABLE    got rc=1  .scratch/wisp/probes/999/another-fake-ticket.go (path claims ticket 999 but .scratch/wisp/issues/999-*.md does not exist, class=untracked, parse_err=0) <== REAL INJURY
+   PASS  want rc=1 verdict=UNATTRIBUTABLE    got rc=1  internal/tools/not_a_bench_path.go (no probes/<NN>/ path segment, class=untracked, parse_err=0) <== REAL INJURY
+   PASS  want rc=1 verdict=TRACKED<CI-RED>   got rc=1  tools/d22scan/main.go (parse_err=0) <== TRACKED BYTES ARE DIRTY
+   PASS  want rc=0 verdict=ticket-161        got rc=0  .scratch/wisp/probes/161/r5/negative-control/bad-sample.go (untracked, parse_err=0)
+   PASS  want rc=0 verdict=ticket-161        got rc=0  .scratch/wisp/probes/161/r5/negative-control/bad-sample.go (untracked, parse_err=1)
+   PASS  want rc=0 verdict=ticket-169        got rc=0  .scratch/wisp/probes/169/a-bench-sample.go (untracked, parse_err=0)
+   PASS  want rc=2+roster-names-the-sample  got rc=2 rows=1  throwaway tracked tree left at: /tmp/wisp-275-r2-rosterctl.Uzee0X
+   FAIL  roster assertion  want ring=5 silent=3 named=3  got ring=5 silent=3
+         why (every reason that held, one per line):
+           named-missing: a NAMED must-ring sample is not among the cases that ran (the COUNT can still be right if a different sample was substituted for that name)
+         missing must-ring sample(s), verbatim:
+           .scratch/wisp/probes/777/second-fake-ticket.go
+attrib.sh: --self-test cases=10 failures=1
+attrib.sh: SELF-TEST RED - the FAIL line above names which case wanted what and got what (classifier cases, the ticket 275 roster control, and ticket 171's roster nails are separate cases); do not 'fix' the expectations, fix the ruler they test

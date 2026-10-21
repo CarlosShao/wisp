@@ -1,0 +1,17 @@
+make-mutants.sh: source lines - 777 must-ring at :345, 169 must-stay-silent at :362
+  ok    sh -n attrib-mut-named-deleted.sh rc=0
+  ok    attrib-mut-named-deleted.sh differs on 1 removed / 0 added line(s), as intended
+        345d344
+        <     st_case 1 UNATTRIBUTABLE '.scratch/wisp/probes/777/second-fake-ticket.go'
+  ok    sh -n attrib-mut-named-substituted.sh rc=0
+  ok    attrib-mut-named-substituted.sh differs on 1 removed / 1 added line(s), as intended
+        345c345
+        <     st_case 1 UNATTRIBUTABLE '.scratch/wisp/probes/777/second-fake-ticket.go'
+        ---
+        >     st_case 1 UNATTRIBUTABLE '.scratch/wisp/probes/999/another-fake-ticket.go'
+  ok    sh -n attrib-mut-silent-deleted.sh rc=0
+  ok    attrib-mut-silent-deleted.sh differs on 1 removed / 0 added line(s), as intended
+        362d361
+        <     st_case 0 ticket-169 '.scratch/wisp/probes/169/a-bench-sample.go'
+  ok    positive control: an unmutated copy diffs to 0 lines against .scratch/wisp/probes/161/r5/attrib.sh
+make-mutants.sh: GREEN - three mutants + one control built
