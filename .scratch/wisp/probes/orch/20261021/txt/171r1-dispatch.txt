@@ -1,0 +1,50 @@
+【派单·票 171 落地腿 171-r1】写腿·2026-10-21 09:2x +08 编排者
+
+■ 身份
+你是**写腿**（实现者）。裁决者≠实现者：⛔ 给自己的活出终裁、⛔ 翻任何票框、⛔ 改票名/`Status:`/`-done`。
+票面＝`.scratch/wisp/issues/171-three-ruler-holes-ticket-161-cannot-carry-aggregate-rs.md`（先通读，★逐格看 §"尺洞①/②/③"）。
+
+■ 目标（票 171 未闭三格）
+`AC#1`（尺洞②＝尾随注释）／`AC#3`（尺洞①＝接 CI，**只许新增步骤**）／`AC#9`（把"表到底被核到几分"补齐）。
+★`AC#5 契约轴` 是你的**天花板条款**，逐字照它做。
+
+■ 写面天花板（⛔ 越界＝作废）
+- **只许**：`.scratch/wisp/probes/171/**`（你的台件与尺）＋`.scratch/wisp/probes/161/**`（若洞在 `attrib.sh` 本体）＋
+  `.github/workflows/ci.yml` 的**新增步骤**（★⛔ 改既有步骤一个字节）＋你自己的证据件 `docs/evidence/s1/171-r1-*.md`。
+- ⛔ 不碰 `internal/**`、`cmd/**`、`tools/d22scan/**`、`docs/PLAN.md`、`docs/specs/**`、`go.mod`/`go.sum`/`.gitignore`、
+  `frontend/**`、`design/**`、任何阈值/golden。
+- ★★**`ci.yml` 的写权本波只有你**（另一枚写腿 `136-r1` 已按此禁；你若要在它上面加步，只许**追加**、⛔ 改/删既有的）。
+
+■ 开工前必做（⛔ 跳步＝空跑作废）
+1. `git status --porcelain`；`.scratch/wisp/probes/171/**` 或 `ci.yml` 有别人的未提交改动 ⇒ **停手上报**。
+2. ★**票面前提新鲜度（尺 v4 的⑧）**：票面里每一条"`attrib.sh` 今天怎么响 / CI 那步在哪 / 三枚洞的第几枚还开着"的断言，
+   **逐条现跑**并把读数写进交件。任一条过期 ⇒ **停手上报**。
+   ★提醒：CI 真跑形的**权威行**是 `ci.yml:240` 的 `run: sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only`。
+   ⚠ 仓里**没有** `scripts/attrib.sh`——谁给你这个路径都**先现跑验存在性**，⛔ 照抄。
+3. 现跑基线（逐条贴末行）：`sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only`（今天 rc 应为 1，`tracked-dirty=35`）、
+   `--self-test`（应 `cases=9 failures=0`）。
+
+■ 做法（⛔ 硬约束）
+- `AC#1` 尾随注释洞：**两发对照**台件（一发"只有同行注释"，一发"注释＋真违规"）⇒ 证明今天这套尺**看不见**尾随注释那一形、
+  修完**看得见**；把两发都入册（正控＝已知会响的那发必须响）。
+- `AC#3` 接 CI：**只在 `ci.yml` 追加一步**跑 `attrib.sh --self-test`（或等价入口）；⛔ 改既有步骤；⛔ 让新步骤 `continue-on-error` 来假绿
+  （本仓已裁定 `continue-on-error` 是零执行命中形、⛔ 采）。
+- `AC#9` 补齐"表被核到几分"：把你**实际跑了哪几把尺、各读到什么**逐行写清，⛔ 只给结论。
+- ⛔ 恒真判据；⛔ 洗既有 19 枚格式脏件（那是存量 known-red、另有票）；⛔ `gofumpt -w` 碰别人件；⛔ `.gitattributes`。
+- ⛔ `.out` 后缀（gitignored）；临时件只建不删 ⇒ `D:\tmp\wisp\20261021\171r1\**`（⛔ 盘符根、⛔ 仓内）。
+
+■ Git 纪律（逐条硬）
+- 只 commit、**⛔ push**；`add`/`commit` **两处显式 pathspec**（`ci.yml` 单独点名）；⛔ `add -A`/`add .`；
+  ⛔ amend/reset/rebase/stash/checkout ./clean。提交前 `git diff --cached --name-only` 出现清单外路径 ⇒ **停手上报**。
+- 主题逐字以 `票 171 落地腿 171-r1` 开头；正文 `-F` ＋ `/d/tmp/...` 形路径。
+- ⛔ 交付件与提交正文里任何被禁码位（`§`/`✓`/`≤`/emoji/带圈数字）⇒ 要写就写"U+00A7"名称形。
+
+■ 交件（缺一算未交）
+1. `docs/evidence/s1/171-r1-impl.md`（**≤160 行**，过帽拆 `-partN`）：三格逐格做了什么／每发对照的 rc 与被判红的行逐字／
+   `ci.yml` 新增的那一步逐字（含它为什么⛔ 会让既有 job 变松）／门禁 rc。
+2. 门禁你自己现跑贴末行：`GOFLAGS= go build ./...`、`sh scripts/d22scan.sh`、`sh scripts/check-path-length-budget.sh` 每把 rc。
+3. ★`ci.yml` 合法性自证：改完后 CI 步骤名名册**只增不减**（逐名作差），并把新增那步的 `run:` 逐字贴出。
+4. 提交号逐枚＋逐枚 `git show --name-only` 的 `.go`（应为 **0**）与越界枚数（正控＝同尺打你自己一笔真提交）。
+
+■ ⛔
+⛔ push／⛔ 翻框／⛔ 改台账／⛔ 改既有 CI 步骤／⛔ 碰 `internal/**`·`cmd/**`／⛔ 判自己过。未定义即停，⛔ 自行假设。

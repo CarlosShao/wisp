@@ -1,0 +1,45 @@
+【派单·票 174 落地腿 174-r1】写腿·2026-10-21 09:2x +08 编排者
+
+■ 身份
+你是**写腿**（实现者）。裁决者≠实现者：你**⛔ 不许**给自己的活出终裁、⛔ 翻任何票框、⛔ 改票名/`Status:`/`-done`。
+票面＝`.scratch/wisp/issues/174-task-output-points-at-a-file-the-model-cannot-read-by-declared-defaults.md`（先通读，靶子就在里面）。
+
+■ 目标（票 174）
+把 `task.output` 那句"全文见 <路径>"的许诺，在**默认配置**下变成**模型真读得到**、或者**回执不要说谎**。
+写面天花板（⛔ 越界）＝`internal/tools/**` ＋ `internal/agent/spill.go` 的**回执文案/断言**侧。
+⛔ 不碰 `[fs]` 的默认值本身（那是契约面，票面逐字禁止）；⛔ 不碰 `frontend/**`、`design/**`（机主外部 agent）；
+⛔ 不碰 `internal/risk/**`、`tools/d22scan/**`、`thresholds.go`、任何 golden/断言阈值；⛔ 不碰 `go.mod`/`go.sum`/`.gitignore`/`ci.yml`。
+
+■ 开工前必做（⛔ 跳步＝空跑作废）
+1. `git status --porcelain` 先看一眼；`cmd/wisp/**` 或 `internal/proc/**` 有别人的未提交改动 ⇒ **停手上报**，别替别人提交。
+2. ★**票面前提新鲜度（尺 v4 的⑧）**：票面 §现量 里凡是"可现跑的断言"，逐条现跑并把读数记进交件；
+   若某条**已过期**（票面说的现状与今天 HEAD 不符）⇒ **停手上报**，⛔ 照过期前提动手。
+3. 现量并记录：`fs.read` 的默认授权名单今天到底是不是空的（尺＝`git grep -n 'AllowedDirs' HEAD -- internal/config internal/tools`，
+   ⛔ 只报计数）；`internal/agent/spill.go` 的截断阈值与那句回执文案的逐字原文。
+
+■ 做法（⛔ 硬约束）
+- 只在接缝注入测：`C8 AudioSource`(wav) / `C5 LlmProvider`(golden SSE) / `C17 PanelBridge` / CLI `wisp run`。
+  ⛔ 用 mock 代替真的来假报完成。
+- 每一处行为改动都要有**一枚今天响、不修不响**的用例（⛔ 恒真判据、⛔ `t.Skip`、⛔ 放宽断言换绿）。
+- ★**反向判据**：把你新加的那一跳/那句话摘掉，你新加的用例必须转红并**逐名报出红行**；先证变异落地（`grep -n` 原文 ＋ `go build` rc=0）再读数。
+- 跑门前：`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；`cmd/wisp` 需 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`。
+- ⛔ 在共享工作树里建 worktree/checkout；⛔ 改 `.gitattributes`；⛔ `gofumpt -w` 洗别人的件。
+
+■ Git 纪律（逐条硬）
+- 只 commit、**⛔ push**。`git add` 与 `git commit` **两处都带显式 pathspec**（⛔ `add -A`/`add .`/目录形）。
+- ⛔ `--amend` / `reset` / `rebase` / `stash` / `checkout .` / `clean`。提交前 `git diff --cached --name-only` 里出现清单外路径 ⇒ **停手上报**。
+- 提交主题**逐字**以 `票 174 落地腿 174-r1` 开头，一笔一件事；正文用 `-F <文件>`（⛔ Windows 反斜杠路径塌陷，用 `/d/tmp/...` 形）。
+- ★提交正文与所有交付件里 **⛔ 任何被禁码位**（`§`、`✓`、`≤`、emoji、带圈数字）；要写就用文字名（"U+00A7"）。
+- 临时件**只建不删**，落 `D:\tmp\wisp\20261021\174r1\**`（⛔ 盘符根、⛔ 仓内）；⛔ `.out` 后缀（gitignored）。
+
+■ 交件（缺一算未交）
+1. `docs/evidence/s1/174-r1-impl.md`（**≤160 行**，过帽就拆 `-partN`，⛔ 压行凑数）：改了什么／每枚用例名＋它今天为什么响／反向判据读数／门禁读数。
+2. 门禁**你自己现跑并贴末行逐字**：`GOFLAGS= go build ./...`、`go vet ./internal/tools/ ./internal/agent/`、
+   `go test -count=1 ./internal/tools/ ./internal/agent/`（四数＝`^=== RUN`/`^--- PASS`/`^--- FAIL`/`^--- SKIP` **分开报、⛔ 相减**）、
+   `sh scripts/d22scan.sh`、`sh scripts/check-path-length-budget.sh` 每把 rc。
+3. 你跑出来的**红名册逐名**（⛔ 只报枚数）；新增红必须 **0 枚**，若有必须逐名具名并说明归属。
+4. 交件时报告：提交号逐枚＋逐枚 `git show --name-only` 的 `.go` 枚数与越界枚数（正控＝同尺打一笔你自己的真提交）。
+
+■ ⛔ 不许做的
+⛔ push／⛔ 翻框／⛔ 改台账（`docs/reports/**` 归编排者）／⛔ 碰别人的写面／⛔ 判自己过。
+碰到"方案没覆盖的情况"⇒ **停手上报**（未定义即停，D22 闸门③），⛔ 自行假设。

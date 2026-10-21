@@ -1,0 +1,49 @@
+【派单·票 136 落地腿 136-r1】写腿·2026-10-21 09:2x +08 编排者
+
+■ 身份
+你是**写腿**（实现者）。裁决者≠实现者：⛔ 给自己的活出终裁、⛔ 翻任何票框、⛔ 改票名/`Status:`/`-done`。
+票面＝`.scratch/wisp/issues/136-the-zero-sample-fail-closed-guard-underneath-the-freshness-nail-has-no-test.md`（先通读）。
+
+■ 目标（票 136）
+票 134 那格交易的**收紧半**（"没有效样本不许久藏"）今天没有用例钉住 ⇒ 给它补承重墙：
+`internal/observe/sampler.go` 的**零样本 fail-closed 守**必须有"今天响、摘掉不响"的用例。
+
+■ 写面天花板（⛔ 越界＝作废）
+- 允许：`internal/observe/**`（测试面为主）、`scripts/slo-freshness.sh`、`scripts/slo-check.ps1`、`.github/workflows/slo-fresh.yml`。
+- ★★**本波 ⛔ 动 `.github/workflows/ci.yml` 一个字节**（那枚文件的写权本波独占给另一枚写腿 `171-r1`；你要 `ci.yml` 的改动⇒**停手上报**，只登记不落笔）。
+- ⛔ 不碰 `internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`；⛔ `frontend/**`、`design/**`。
+- ★★**阈值面一个字不许动**：D32 的 `Sleeping` CPU ≤0.5% / RSS ≤25MB、`thresholds.go`、任何 golden。
+- ⛔ 改 `SampleState` 那侧语义；⛔ 把既有 `TestCheckSettle*` 两枚改成 Skip。
+- 若确认非改生产码不可 ⇒ 只许动票面已具名解冻的那一处 `internal/observe/sampler.go:470-501`（**只此一处**），
+  改之前先读票面那格确认解冻范围**仍然**是这一处（行号可能已漂 ⇒ 用内容锚定，⛔ 信行号）。
+
+■ 开工前必做（⛔ 跳步＝空跑作废）
+1. `git status --porcelain`：`internal/observe/**` 有别人的未提交改动 ⇒ **停手上报**。
+2. ★**票面前提新鲜度（尺 v4 的⑧）**：票面 §现量 逐条现跑；任一条与今天 HEAD 不符 ⇒ **停手上报**。
+3. 现量并记进交件：`CheckSettle` 今天的 fail-closed 分支逐字原文（按**内容锚定**取，⛔ 用固定行号跨锚）、
+   既有 `TestCheckSettle*` 两枚的逐名与今天的色（`-run` 只跑这两枚，贴四数）。
+
+■ 做法（⛔ 硬约束）
+- ★核心＝**变异自证**：把零样本 fail-closed 那一步摘掉/短路 ⇒ 你的新用例必须红、**红名点到它**；还原 ⇒ 复绿。
+  先证变异落地（`grep -n` 原文 ＋ `go build` rc=0）再读数；三个读数（红／还原绿／原样绿）都要逐字贴。
+- ⛔ 恒真判据；⛔ 放宽既有断言换绿；⛔ `t.Skip`。
+- 跑门前 `unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；`GOTMPDIR`/`TMPDIR` 用 `cygpath -w` 反斜杠形并先 `mkdir -p`。
+- ⛔ 共享工作树跑 `go test ./cmd/wisp`（本波别碰）；⛔ `-overlay` 骗 AST-on-disk 的钉子（运行时读盘⇒overlay＝永久假绿）。
+
+■ Git 纪律（逐条硬）
+- 只 commit、**⛔ push**；`add`/`commit` **两处显式 pathspec**；⛔ `add -A`/`add .`；⛔ amend/reset/rebase/stash/checkout ./clean。
+- 提交前 `git diff --cached --name-only` 出现清单外路径 ⇒ **停手上报**。
+- 主题逐字以 `票 136 落地腿 136-r1` 开头；正文 `-F` + `/d/tmp/...` 形路径。
+- ⛔ 交付件与提交正文里任何被禁码位（`§`/`✓`/`≤`/emoji/带圈数字）；要写就写"U+00A7"这种名称形。
+- 临时件只建不删 ⇒ `D:\tmp\wisp\20261021\136r1\**`；⛔ `.out` 后缀。
+
+■ 交件（缺一算未交）
+1. `docs/evidence/s1/136-r1-impl.md`（**≤160 行**，过帽拆 `-partN`，⛔ 压行）：改了哪几处／新用例逐名＋为什么今天响／
+   ★三读数（变异红／还原绿／原样绿）逐字／门禁 rc。
+2. 门禁你自己现跑贴末行：`GOFLAGS= go build ./...`、`go vet ./internal/observe/`、
+   `go test -count=1 ./internal/observe/`（四数分开报、⛔ 相减）、`sh scripts/d22scan.sh`、`sh scripts/check-path-length-budget.sh`。
+3. 红名册**逐名**，新增红必须 0；`go test -count=2` 也跑一遍报是否摆动（摆动逐名）。
+4. 提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界枚数（正控＝同尺打你自己一笔真提交）。
+
+■ ⛔
+⛔ push／⛔ 翻框／⛔ 改台账／⛔ 碰 `ci.yml`／⛔ 动阈值／⛔ 判自己过。未定义即停，⛔ 自行假设。
