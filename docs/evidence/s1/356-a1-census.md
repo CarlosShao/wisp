@@ -118,7 +118,7 @@ R2-only：注意：这条路径现在读不到，它不在你被授权的目录�
   - **`f32fa0f4`** —— 第 7 节改成可复量口径 `7 insertions(+), 2 deletions(-)`。
   - 列到 `f32fa0f4` 为止是**有意的下界**：在它之后落的每一笔（含把本行写下的这一笔）都由上面那条 `git log` 命令列出，不在本文里点名，以免再次自我过期。
 - 每一笔的 `git add` 与 `git commit` 两处都带**显式 pathspec** `-- docs/evidence/s1/356-a1-census.md`；全程无 `add -A`、无 `add .`、无 amend/reset/rebase/stash/checkout/clean。
-- 逐笔 `.go` = **0**、越界 = **0**（`logs/50-writeface-all.log` 打前三笔，正控在同一文件每一轮都打 `a8eb0d51` 读回 `.go = 2`、`OUT OF RANGE = 2`；后续各笔只改本文件一行到几行，路径集不变）。
+- 逐笔 `.go` = **0**、越界 = **0**（`logs/50-writeface-final.log` 对本腿每一笔逐笔打一遍，每一笔都是 `files touched = 1 / .go files = 0 / IN RANGE = 1 / OUT OF RANGE = 0`；正控在同一文件每一轮都打 `a8eb0d51` 读回 `.go = 2`、`OUT OF RANGE = 2`）。
 - 正控尺（证明「数 `.go` 的尺」不是恒 0）：同一把 `sh/50-writeface.sh` 打 `a8eb0d51`（`174-r1`）读回 `.go = 2`、`IN RANGE = 0`、`OUT OF RANGE = 2`，尺会红。
 - 落件之外的写面：`D:\tmp\wisp\20261021\356a1\**`（`sh/` 八枚、`logs/` 十来枚、`copy/` 一份 HEAD 导出加两枚探针测试件、`commit-msg-*.txt`）。临时件**只建不删**；无 `.out` 后缀、无 `-overlay`。
 
