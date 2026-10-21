@@ -1,0 +1,43 @@
+【编排者裁决·票 355 的钉子 ⇄ 票 358 的新语义冲突】2026-10-21 17:3x +08
+
+■ 你让开得对，但这一枚该由我裁，现在我裁了：**改票 355 那颗钉子**（⛔ 让你绕路）
+- 冲突本体（你报得准）：`cmd/wisp/compression_trace_355_test.go:143` 的 `TestCompressionTraceSilentWhenNothingCompressed` 逐字要求
+  "**过了阈值但一枚都没折**"这一形在 `compressionLine` 上**静默**（`ok=false` 且 `line==""`）；而票 358 要的是这一形**可读**。
+- ★**我判它该改，因为它的前提今天被 358 打掉了**：
+  `run.go` 那段注释自己写着理由——"`ok=false` covers both 'this run never compressed' and 'the run is not the one that compressed'…
+  **That is stated rather than papered over — a line printing zeros would claim a measurement nobody took.**"
+  那段话**在 355 当时是对的**（当时两形在报告上**完全同形**：`Ran=false`、没有任何可区分字段）。
+  但 358 之后 `CompressionReport` 有了 `CompressionState`（`skipped`／`attempted`／`compacted`，`compress.go:61-105`）
+  ⇒ **"从没触发"与"触发了但压不动"在类型上已经能分开** ⇒ 那颗钉子守的"两形不可分"前提**不存在了**，
+  继续守它就等于**用一颗过时的钉子挡住新读数**——那正是"规格与仪器分叉"的旧病（`A201②` 那族）。
+- ★**按铁律**（`AGENTS.md` ⓪⓪⓪ 第 1／2 条）：⛔ 因"改既有测试有风险"就绕路；该改就**按新语义改**，并把改的理由写进测试注释。
+
+■ 改法（硬，写腿照做）
+**目标**：`compressionLine` 让**三态各说各话**，且**⛔ 让既有绿变噪**。
+1) `CompressionCompacted` ⇒ 输出**现在那一行**，**逐字不变**（`TestCompressionTraceReachesStdout` 与 355 的其余钉子必须原样绿）。
+2) `CompressionAttempted` ⇒ 输出**新的一行**，**明说"超了阈值但一枚都没折"**（❌ 不许只印零、❌ 不许说"没触发"），并带 `tokens_before`／`tokens_after`／`trigger`／`source` 四项读数。
+3) `CompressionSkipped` ⇒ **仍静默**（`ok=false`）——这一形"没触发"，**印东西就是噪**。
+4) ★`Ran` 的镜像语义不动（`rep.Ran = State==Compacted`），⛔ 改 `Ran` 在 11 处旧读者上的含义。
+5) ★**改那颗钉子**：把它从"attempted 必须静默"改成"**attempted 必须明说不折**、`skipped` 必须静默"两半都钉住
+   （这样它比原来**更强**，⛔ 只是把断言删掉换绿——那是放宽，⛔ 做）。
+   ★并在测试注释里**逐字写下改的理由**（引本裁决）。
+
+■ 边界（⛔ 越界＝作废）
+- 允许动：`cmd/wisp/run.go` 的 `compressionLine`／`printCompressionTrace` 一带；`cmd/wisp/compression_trace_355_test.go`（**只许按上面第 5 条改那一枚钉子的判据**）；
+  `cmd/wisp/compression_trace_358_*.go`（若你要新起测试件）；`docs/evidence/s1/358-r1-impl.md`（追加一节）。
+- ⛔ 动 `internal/agent/**`（358 的产码面已交，⛔ 再改）；⛔ 动 355 的其它钉子；⛔ 动 `budgets.go`／`docs/PLAN.md`／`docs/specs/**`。
+- ⛔ 新造前端事件／`panel.*`／JSON 键（`SPEC-08` 第 5.2 节白名单）。
+- ★**这一改属"改既有测试的判据"、⛔ 改契约文字**（D 表无此条）⇒ **我拍**。若你认为这已触及 355 的验收结论，**停手上报**，我另处理。
+
+■ 牙（一个不少）
+1) 三形各一枚用例：`compacted` 逐字不变／`attempted` 明说不折／`skipped` 静默；
+2) ★**反向判据**＝把"attempted 那一行"摘掉 ⇒ 用例必须转红并**逐名报红行**；先证落地（`grep -n` ＋ `go build` rc=0）再读数；
+3) ★**三读数**（变异红／还原绿／原样绿）逐字贴 ＋ **还原核 `sha256`**；
+4) `go test -count=1 ./cmd/wisp/ -run 'CompressionTrace'` 四数分开报，★**355 与 358 的钉子全部同发跑一遍**，证明 355 的其余钉子没被碰坏。
+
+■ 另两件我收下（⛔ 你重做）
+- **`cmd/wisp` rc=1 ⛔ 本票的伤**：你的同尺对照（只把本票动的两枚文件换回 HEAD blob）⇒ **同样 rc=1、同样死在真窗族**；按名作差两向皆空 ⇒ **新增红 0**。我认。
+  ★**两发死点不同名**（当前树 `TestAC14GoSideEvalPushReachesThePage`／HEAD 基线 `TestPanelThreadIsSTAAndExitsCleanly`）＋`-skip` 掉 9 枚真窗族**仍 rc=1**（死点前移）⇒ **整包那 126 枚从未跑到的用例无法用整包判色，属票 314 射程**。这条我登进台账（`A1100`）。
+- ★**你"回 HEAD blob"的处理我判对**：本票要改的两枚文件与 HEAD 必然不等（差＝本票改动），所以你改测 `cmd/wisp/run.go`
+  （`git hash-object` = `4865cfde…d3ae` = `git rev-parse HEAD:cmd/wisp/run.go`，逐字相等）⇒ **这是正确口径**，比硬套"回 HEAD blob"更对。
+  ★另：你交付件**正好 160 行**（帽上）——本仓规矩是"过帽才拆"，160 不算过；但我记一笔：**下一笔追加会立刻超帽**，追加时**必须拆 `-part2`**。

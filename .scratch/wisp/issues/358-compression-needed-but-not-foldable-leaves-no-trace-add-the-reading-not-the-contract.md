@@ -62,6 +62,15 @@ OpenAI Codex 侧有两条 issue 记的正是"用陈旧 token 数触发压缩导�
       - **(b) D15 契约文字**：本票实现完成后**必然**要改 D15 那段文字（它今天逐字写"超过 12000 token 就压"），
         ⇒ 契约文字那一步**单列一格摆机主批**（属铁律第 4 条的三类之一），但**⛔ 意味着实现要按"不动"的样子做**。
 - [ ] **AC#2 落地＋牙（写腿）**：按裁定那一形做；每处改动配**一枚今天响、不修不响**的用例；
+      > **2026-10-21 17:3x 编排者**追加裁决（`358-ruling-nail-355.txt`，`358-r1` 交件后）：**票 355 那颗钉子按本票新语义改**
+      > 冲突：`cmd/wisp/compression_trace_355_test.go:143` 要求"过了阈值但一枚都没折"这一形在 `compressionLine` 上**静默**；
+      > 本票 `AC#1` 要它**可读**。★**我判 355 那颗钉子该改**，因为**它的前提今天被 358 打掉了**：
+      > 它守的是"`ok=false` 同时覆盖'从没压缩'与'不是压缩的那轮'**两形不可分**，所以印一行会声称一次没人做过的测量"；
+      > 而 358 之后 `CompressionReport` 有 `CompressionState`（`skipped`／`attempted`／`compacted`）⇒ **两形在类型上已分得开** ⇒ 前提不存在。
+      > **改法（硬）**：`Compacted` ⇒ 输出**逐字不变**；`Attempted` ⇒ 输出**新的一行**、明说"超了阈值但一枚都没折"（⛔ 只印零／⛔ 说"没触发"）、带 `tokens_before`／`tokens_after`／`trigger`／`source`；
+      > `Skipped` ⇒ **仍静默**（`ok=false`）；`Ran` 镜像语义不动（⛔ 改 11 处旧读者的含义）。
+      > ★**那颗钉子要改成两半都钉**（attempted 必须明说不折 ＋ skipped 必须静默）＝**比原来更强**，⛔ 删断言换绿。
+      > ★这是"改既有测试的判据"、⛔ 改契约文字（D 表无此条）⇒ **我拍**；写腿若认为触及 355 的验收结论 ⇒ **停手上报**。
       ★反向判据＝把新加的那一跳摘掉 ⇒ 用例必须转红并**逐名报红行**；先证变异落地（`grep -n` ＋ `go build` rc=0）再读数，三读数逐字贴。
       ★**⛔ 动 `Need()` 的判据、⛔ 动 `KeepRawRounds` 的值、⛔ 动 12000／4000 两个阈值**（那是 D15 预算语义）。
 - [ ] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet ./internal/agent/`／`go test -count=1 ./internal/agent/`（四数分开报、⛔ 相减）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
