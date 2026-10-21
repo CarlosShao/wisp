@@ -147,13 +147,14 @@ Windows 上 `os.TempDir()` 返回**空串**，`t.TempDir()` 因此给出 `\TestX
 |---|---|---|---|
 | `7835d67fa93aceedcf128b9dcefc1e2f2d67af04` | 新增 POSIX 用例（本腿主笔） | `internal/winsec/sameabsoluteness_359_other_test.go`、`docs/evidence/s1/359-r1-impl.md` | **1** |
 | `c9bd2a03df7793db8ed9f79d378e0443e54f01da` | 交付件清被禁码位（self-scan 判据 0） | `docs/evidence/s1/359-r1-impl.md` | **0**（如实登记：本笔零代码改动） |
+| `cc5665d73`（本件所在那笔，自指只能写短号） | 交付件补本段 + 收到帽内 | `docs/evidence/s1/359-r1-impl.md` | **0**（同上：零代码改动） |
 
-**越界 0 处**：两笔路径全部落在允许写面（新增测试件 ＋ 交付件）。第 2 笔 `.go` 0 枚是因它只改交付件、不碰代码。
-**正控**（同一把尺打含 `.go` 的真提交，证明这把尺会响而不只会出 0）：`6b712571a0b8ff662557b13460fb596e926043c5`
-（票 124 落地腿 124-r3，cmd/wisp 37 枚）= **9 枚**；`99f1f9c7fed7565b57c14e1e3096b1798a985b5a`
-（票 124 落地腿 124-r2，internal/tools 35 枚）= **15 枚**。
-
+**越界 0 处**：三笔路径全部落在允许写面（新增测试件 ＋ 交付件）。后两笔 `.go` 0 枚是因它们只改交付件、
+不碰代码——不是漏交。第 3 笔无法在自己的正文里写全号（bodysha 取决于本件内容），只能写短号，全号用
+`git log --oneline -3` 现读可核。**正控**（同一把尺打含 `.go` 的真提交，证明这把尺会响而不只会出 0）：
+`6b712571a0b8ff662557b13460fb596e926043c5`（票 124 落地腿 124-r3，cmd/wisp 37 枚）= **9 枚**；
+`99f1f9c7fed7565b57c14e1e3096b1798a985b5a`（票 124 落地腿 124-r2，internal/tools 35 枚）= **15 枚**。
 新件在 `HEAD` 树里恰好一枚：`git ls-tree -r --name-only HEAD | grep -c sameabsoluteness_359_other_test.go` = **1**；
-交付件同尺 = **1**；提交后工作树 `git status --porcelain`（winsec ＋ 交付件）= **0 行**。提交后复量：
-`git show HEAD:.../<新件>` sha256 = `373b46fb...0f5c` = sec 3 被测快照同值（=> 被测的就是交上去的），
-`resolve.go` 仍为 `8e64efd7...c6e4`；重跑 build rc=0／vet rc=0／固定 9 名子集 **11/9/0/0 rc=0**，与提交前逐数相同。
+交付件同尺 = **1**；提交后 `git status --porcelain`（winsec ＋ 交付件）= **0 行**。提交后复量：
+`git show HEAD:.../<新件>` sha256 = `373b46fb...0f5c` = sec 3 被测快照同值，`resolve.go` 仍为
+`8e64efd7...c6e4`；重跑 build rc=0／vet rc=0／固定 9 名子集 **11/9/0/0 rc=0**，与提交前逐数相同。
