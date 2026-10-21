@@ -1,6 +1,6 @@
 # 321 — 托盘/热键那一跳的**执行器接线无钉**：把 `withPanelHost` 里的 `holder.toggle` 换成别的执行器，今天**没有任何用例会红**（`319-v2` 交回的具名缺口）
 
-**Status:** 待派（小票；面＝`cmd/wisp` 的 319 宿主装配＋其测试件）
+**Status:** **DONE（2026-10-21 22:2x 编排者收口＝两格全闭、文件名加 `-done`）** ~~待派（小票；面＝`cmd/wisp` 的 319 宿主装配＋其测试件）~~
 **Type:** 判据缺口（"接了但接线没人守"族；与票 121/131/133/135 同族）
 **来源:** `319-v2` 的对抗验收表 `docs/evidence/s1/ticket319-319-v2-accept-v1.md` 的"toggle 语义"格（判**附条件**：语义有钉、**接线无钉**）；编排者 2026-10-15 17:4x **代码级复核** `cmd/wisp/resident_windows.go:268-270`（`withPanelHost(func(via string) bool { return holder.toggle(via) })`）。
 
@@ -13,7 +13,16 @@
 ## AC（1:1；裁决表 `docs/evidence/s1/321-*.md` 由**非实现者**出）
 
 - [x] **AC#1** 给"托盘/热键那一跳 → `holder.toggle`"装一枚**常驻判据**：把装配处换成 `holder.show`（`-overlay`／仓外变异）⇒ **必须红且红名点到"这一跳不是 toggle 语义"**；还原 ⇒ 绿＋`git diff` 0 字节。
-- [ ] **AC#2** 门禁＋面核：`go build ./...`／gofumpt／`go vet -tags winlive ./cmd/wisp/`／`sh scripts/d22scan.sh`／长度门；改动逐枚 pathspec；⛔ 不碰 `frontend/**`／`design/**`／冻结件。
+- [x] **AC#2** 门禁＋面核：`go build ./...`／gofumpt／`go vet -tags winlive ./cmd/wisp/`／`sh scripts/d22scan.sh`／长度门；改动逐枚 pathspec；⛔ 不碰 `frontend/**`／`design/**`／冻结件。
+  > **2026-10-21 22:2x 编排者翻框（五把门我自己现跑，全部 rc=0）＝成立**
+  > `GOFLAGS= go build ./...` **rc=0**／`go vet -tags winlive ./cmd/wisp/` **rc=0**／`sh scripts/d22scan.sh` **rc=0 clean**／
+  > `sh scripts/check-path-length-budget.sh` **rc=0 GREEN**／**`gofumpt` rc=0（0 枚）**。
+  > ★**`gofumpt` 那一把按本轮新裁定读「入库 blob」**（裁定件＝`docs/evidence/s1/pipe-format-gate-reads-tracked-blob-not-worktree.md`，提交 `06f92cd7`）：
+  > 甲尺＝`git archive HEAD | tar -x` 到仓外纯 blob 树后跑 `gofumpt -l cmd/wisp` ⇒ **0 枚**（**判据用这把**）；
+  > 乙尺＝对工作树跑 ⇒ **1 枚 `cmd/wisp/models.go`（只作诊断）**，其根因是本机 `core.autocrlf=true` 把该枚检出成 CRLF
+  > （工作树 CR=**334**／blob CR=**0**、`hash-object == HEAD` **同串**）⇒ **本机 autocrlf 假红、⛔ 本票缺陷**。
+  > ★按裁定第 2 条：**两把都报、甲尺判据**，⛔ 只报乙尺（那会让本机配置决定门禁颜色）。
+  > ⚠ **`cmd/wisp` 整包 `rc=1` ⛔ 本票的伤**（既有真窗族＋进程级截断，`A1079`／`A1100`）⇒ 本格按"五把门"判、⛔ 按"整包绿"判。
 - 备注：可与票 255 的装配钉同批（同一枚文件族 `cmd/wisp` 的 assembly 测试），但**不许**用"手势到得了线程"那一枚冒充本格（见上"反面"）。
 
 **撤销口令**：「撤 321」。
