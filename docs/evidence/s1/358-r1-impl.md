@@ -146,7 +146,15 @@ RECOVERED:                                       (end)   <- 空
 `TestBookedSnapshotReachesHostBitForBit329`，RUN 207 / PASS 151 / FAIL 0 / SKIP 1），印证"死点会漂"；
 整包那 **126 枚从未跑到**的用例本票无法用整包这一发判色，**属票 314 射程，不是本票的伤**。
 
-## 8 未定义即停 与 越界自查
+## 8 提交号、越界 与 未定义即停
+
+**提交号＝`05f76ad6cefbe408bf0302088b6b83fb72ad79c4`**（`05f76ad6`，主题逐字以"票 358 落地腿 358-r1"开头，**未 push**）。
+`git show --name-only` 逐枚＝`docs/evidence/s1/358-r1-impl.md`、`internal/agent/compress.go`、
+`internal/agent/compress_state_358_test.go`、`internal/agent/compress_trigger_358_test.go`、`internal/agent/loop.go`，
+共 **5 枚、其中 `.go` 4 枚**；**越界 0 枚**（同尺筛"5 枚允许清单之外"，逐行输出为空）。
+新件 `ls-tree -r --name-only HEAD | grep -c` 逐枚 **== 1**（`compress_state_358_test.go`=1、`compress_trigger_358_test.go`=1、`358-r1-impl.md`=1）。
+**正控（同尺打一笔含 `.go` 的真提交）**＝`b676092dae7a9fd31b5f9bf4a683edc0e187c36d`（票 355 落地腿 355-r1），
+同尺读出 `.go` **3 枚**，故尺是活的，"越界 0 / `.go` 4"不是瞎尺读数。
 
 乙案**没有做不到的地方**：三态在 `CompressionReport` 落得下，两处出口（`Result.Compression` 与 slog 痕）都接得住；
-`cmd/wisp` 那一格因票 355 钉子归零改动（sec 7），**不因此降级成甲案或丙案**。越界 **0 枚**，`git show --name-only` 逐枚见提交正文；写面外零字节。
+`cmd/wisp` 那一格因票 355 钉子归零改动（sec 7），**不因此降级成甲案或丙案**。写面外零字节。
