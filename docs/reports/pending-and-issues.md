@@ -20180,3 +20180,24 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
 
 **⑤ 车道**＝裁腿 **1**（`171-v1`）＋只读 **1**（`356-a1`）＋写腿 **0**。未推 **224**、⛔ 推、⛔ 清理、⛔ 改契约。结案 **9** 票。
 
+## A1086（2026-10-21 12:0x +08，编排者）★★收 `356-a1`（`AC#0` 普查腿，13 笔）＝**票 356 前提为真，且它量到比 `174-v1` 更狠一格**｜它两条机制断言我逐条另尺复核通过
+
+**① 收件三把尺（⛔ 采信自报）**
+- 提交真在＝`40fddae0^..HEAD -- docs/evidence/s1/356-a1-census.md` 我现量 **13 笔**，逐笔 `--name-only` **各 1 件、`.go` 各 0**（逐笔列在账外，此处只给判据：正控＝同尺打 `a8eb0d51` 读回 `.go`=2）。
+- 件真在＝`docs/evidence/s1/356-a1-census.md` **123 行／14440 B／CR 0／U+00A7 0／末字节 `0a`**＝帽内、干净。
+- 自己复跑＝**代码面 `git diff --stat a8f5ad0a..HEAD -- internal/ cmd/ scripts/ tools/ .github/` ＝ 0 行**（我另跑）⇒ 它确系只读腿、没碰产品字节；票 356 本体 0 行未动。
+
+**② ★它两条机制断言我自己复核过（这是它交件里最有价值的部分）**
+- (a) **`RiskLevel` 分不出"只判到 L2"与"被判 Deny"**：`internal/tools/bridge.go:1379-1386` 的 `levelString` 逐字 `case risk.L2, risk.Deny: return memory.RiskL2` ⇒ **Deny 被折进 L2 一列**（账表只认 L0/L1/L2）⇒ "看 `RiskLevel` 分两种形状"这条路**走不通**。✅ 我核过。
+- (b) **能分开两种形状的现成 seam 是 `refusalKindOf`**：`internal/tools/refusal.go` 逐字 `RefusalOutOfAllowlist = "out-of-allowlist"` ⇄ `RefusalRedTeamDenied = "redteam-denied"`，且 `:72` 起 `if level == risk.Deny { return RefusalRedTeamDenied }` ⇒ **R3=`redteam-denied`／R2-only=`out-of-allowlist`**。✅ 我核过。⇒ **这条直接决定 `356 AC#1` 该怎么改**（⛔ 靠 `RiskLevel`）。
+
+**③ ★★它量到比 `174-v1` 更狠的一格（我已复核分支结构）**：把 home 树整棵加进 `allowed_dirs`（目标变 in-scope）之后——`fs.read` 仍是 `Deny [R3]`、`approval` **0 次**，而 `task.output` **完全沉默（notice 0 字节）**。
+- 我读 `task.go` 的 `pointerNotice` 确认：它的分支只有 ①判级者未接线 ②`err != nil`（C26 规范化失败）③`!d.Paths.InAllowlist(canon)` ④`os.Stat` 失败 ⑤非普通文件——**没有任何一支处理"在 allowlist 内但被判 Deny"**（`:845-872` 逐字）。
+- ⇒ **notice 那"两条回来的路"在 R3 形状下两条都假**（不只是"卡不存在"：加目录也无效）；且 **in-scope 但被 Deny 这一形连"读不到"都不说**。
+- ⇒ ★**对票 `356 AC#1` 的直接后果**：若只改 allowlist 支的措辞，会**漏掉**这一形。⇒ `AC#1` 的范围必须扩成"notice 要区分三种形状：只判到 L2／被判 Deny（无论 in/out of allowlist）／其余"，并在 `356-r1` 派单里写死用 `refusalKindOf` 那一对值当判据（⛔ 用 `RiskLevel`）。
+
+**④ 它如实登记的三条（我收下、⛔ 当已判）**＝①`gofumpt` 不在 PATH ⇒ 票面"19 枚脏件"**它没复量**（具名未判）；②`-race`／`cmd/wisp` 端到端／`fs.list` 与写半边**未量**（不在 `AC#0` 射程）；③票面第 3 项"**同一路径**改到 R2-only"实现上不成立（A 档按锚点/文件名匹配、换拼法移不出 A）⇒ 它把"同一路径"落实成"同一台子、只让 R3 不命中"，两目标分类读数（A 对 none）都打出来了＝**口径改得对且写明了**。
+- ★它给 `356-r1` 的提醒＝`internal/agent/spill.go` 与 `task.go` 的 notice **运行时逐字节同形 246=246**（它驱动两腿实测）⇒ `AC#1` 改措辞**必须两处一起改**，否则破 `174-r1` 那个性质。✅ 这条我认（`174-r1` 与 `174-v1` 都量过 246=246，三处独立同号）。
+
+**⑤ 车道**＝裁腿 **1**（`171-v1`，仍在飞）＋写腿 **0**（`356-a1` 已收线）⇒ ★写腿欠账持续。未推 **240**（现量；★我初稿写 `237` 是猜的、落笔前现跑改回＝`A1085⑤` 同族"数字必须现跑"）、⛔ 推、⛔ 清理、⛔ 改契约。结案 **9** 票。
+
