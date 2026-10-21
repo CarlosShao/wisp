@@ -1,0 +1,47 @@
+【编排者裁决·票 124 落地腿 124-r1·批 1 边界】2026-10-21 14:0x +08
+
+■ 你的早期上报我收下，三条判断我逐条上盘核过、全部成立
+1) 派单那把尺（`winsec.` 乘 `TempDir`）今天恒等于"已修"状态 —— 成立。我现量那 20 处逐行看：
+   19 处已是 `winsec.SealableTempDirForTest124(t)` 调用、1 行是注释；`winsec` 与 `t.TempDir`/`os.TempDir` 同行 = 0 命中。
+   ⇒ 我给的基线（20）是"已转换后的形态"，它不再能测"还剩多少没转"。**这条是我的派单缺陷**。
+2) 单行形态在 HEAD 上已是 0 枚 —— 成立（`winsec.[A-Za-z0-9_]*(...TempDir` = 0 命中）。
+3) 但票 124 `AC#2b` 的终判据（软链形红名数 = 0）今天不成立，你量到 only-in-link 108 枚 / 37 文件
+   （扣票 123 三枚豁免后 105）—— 这条我认：它远大于任何一批历史批次（40/43/43/5），
+   而票面 :81 逐字写着"要全批落地后一次性复算" ⇒ 缺口是真账、不算你的活没干。
+
+■ 裁决＝(a)：只做 `internal/config` 一包，tools / cmd-wisp 排后续批
+理由（可核）：①config 最内聚（33 枚红 / 8 枚文件 / 与别票零交集 / 今日写面干净）；
+②`internal/tools`（38 枚 / 16 文件）与 `cmd/wisp`（37 枚 / 13 文件）体量各比 config 大，塞一批会变成"一腿干三包"；
+③`cmd/wisp` 是共享编译面，按 AGENTS.md「每波只许一枚写腿」必须单排
+  ⇒ 它不与你抢，但不该由你在同一批里顺手做掉（否则下一枚 cmd/wisp 写腿就没面了）。
+
+■ 批 1 的硬边界（越界＝整批作废）
+- 写面只许 `internal/config/**` 的 `*_test.go` 与该包已有的 `sealableTempDir124` helper（一行委托 `proc.SealableRoot`、不新增走法）。
+- 不许改 `internal/config` 的生产码（你要改 ⇒ 停手上报）；不许改 `internal/winsec` 语义；
+  不碰 `internal/tools/**`、`cmd/**`、`internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、`thresholds.go`、任何 golden；
+  不碰 `go.mod`/`go.sum`/`.gitignore`/`.github/**`；不碰 `frontend/**`、`design/**`、`docs/PLAN.md`、`docs/specs/**`、`docs/reports/**`。
+- 不许把放行侧放宽换绿（票面 `AC#3` 逐字）：票 113/119 那两族拒绝用例一枚都不许变成通过方式；
+  交件要贴 `git diff` 证判定分支未动。
+
+■ 三读数（照派单，一个不能少）
+1) 变异红：把新加的那层解析拆掉 ⇒ 你那 33 枚红名逐名（你已有 PRE-LINK 基线 33 枚）；
+2) 还原绿：还原后复跑，同一把尺；
+3) 原样绿：不动码跑一次。
+每发都要先证落地（`grep -n` 原文与 `go build` rc=0）再读数；每发读完立刻单独还原并核 `sha256` 回 HEAD blob。
+
+■ 终判据（批 1 的出口，不许拿全票的 0 红当出口——那是全批做完才许算的）
+- `internal/config` 一包：软链形红名数 = 0，且普通形一枚不许多红（两形逐名 `comm` 作差，不许相减）。
+- 两形四数分开报（`^=== RUN`/`^--- PASS`/`^--- FAIL`/`^--- SKIP`），不许相加、不许相减。
+- 台面与票面 `AC#2b` 同：纯净快照 `git archive HEAD`、`golang:1.27`、每形一枚新容器、
+  软链形 `ln -s /realpriv /varlink` 加 `TMPDIR=/varlink/w124tmp` 加 `exit 97/98` 断言。
+- 票 123 那族三枚（`TestL1Write...`/`TestLateVeto...`/`TestFSReadOnlyNeverOpensACard`）按账豁免：
+  不计入你的红名分母、不去修它们；交件里逐名列出并注明"豁免、归票 123"。
+
+■ 交回时同时给我：tools（38 枚 / 16 文件）与 cmd/wisp（37 枚 / 13 文件）的文件级逐名清单
+（每枚文件：几枚红、红名、属"自家块内打印 not provably resolved"还是"间接经 secret/memory/config manager"）
+⇒ 我据此排批 2 与批 3。这批不许碰它们一个字节。
+
+■ 纪律照旧：只 commit 不 push；`add`/`commit` 两处显式 pathspec；不许 `add -A`/`.`；不许 amend/reset/rebase/stash/checkout ./clean；
+主题逐字以 `票 124 落地腿 124-r1` 开头；正文先写 `/tmp/xxx` 再 `-F`；
+提交正文与交付件不许含被禁码位（U+00A7／U+2713／U+2264／U+2260／U+2192／U+21D2／U+26D4／emoji／带圈数字）⇒ 写 `sec N`/`=> `/`NOT`/`(1)`；
+临时件只建不删 ⇒ `D:\tmp\wisp\20261021\124r1\**`；不许 `.out`。
