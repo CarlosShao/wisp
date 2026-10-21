@@ -7,8 +7,7 @@
 ## 0 开工前
 
 - `git status --porcelain -- cmd/wisp/ internal/agent/ docs/evidence/s1/` 起手＝**空**（写面内零残留）。
-- 三枚涉改件**改前 sha256**（`D:\tmp\wisp\20261021\358r1b\pre-change-sha256.txt`）：
-  `d9dfee30...794be3 run.go`｜`f85a9ceb...9233b9 compression_trace_355_test.go`｜`a23d4287...b80a0e1 compress.go`。
+- 三枚涉改件**改前 sha256**（`D:\tmp\wisp\20261021\358r1b\pre-change-sha256.txt`）：`d9dfee30...794be3 run.go`｜`f85a9ceb...9233b9 compression_trace_355_test.go`｜`a23d4287...b80a0e1 compress.go`。
 - 上一枚结论**复认不重做**：358 三态已在盘（`internal/agent/**` 本笔**零改动**，`git hash-object` = `b23910d9...6d37` = `git rev-parse HEAD:internal/agent/compress.go`，逐字相等）。
 
 ## 1 改了哪几行（逐行）
@@ -33,26 +32,23 @@
 
 | 用例 | 钉什么 | 为什么**今天响**（NOT 恒真／NOT 只印零） |
 |---|---|---|
-| `...CompactedLineIsTheOne355Shipped` | `compacted` 那一行**逐字不变**：真压缩机真折叠的 report 过**产码** formatter，整行 `!=` 期望即红；再走 `printCompressionTrace` 比"整行＋恰好一个换行" | 期望串是 355 产码原文**抄进测试**的独立副本 => 改动/换序/换字段都红。变异 M3（"折进"=>"折入"）即红（sec 3.2） |
+| `...CompactedLineIsTheOne355Shipped` | `compacted` 那一行**逐字不变**：真压缩机真折叠的 report 过**产码** formatter，整行 `!=` 期望即红；再走 `printCompressionTrace` 比"整行＋恰好一个换行" | 期望串是 355 产码原文**抄进测试**的独立副本 => 改动/换序/换字段都红。变异 M3（"折进"=>"折入"）即红（sec 3.1） |
 | `...AttemptedSaysItFoldedNothing` | `attempted` **必须明说不折**：(1)必须出话 (2)必须含"超了阈值但一枚都没折" (3)**不许**含"没触发/未触发/跳过" (4)四项读数逐名带真值 (5)隐私哨兵 (6)出口字节＝行＋换行。**两形都驱动**：`keep_raw_rounds_floor`（过阈值打地板）＋`provider_triggered_under_fold_budget`（provider 说超、估算没超，`tokens_before==tokens_after<阈值`） | 改前对非 `Ran` 一律 `return "", false` => (1) 直接 `t.Fatalf`，红。**两形必须给出不同的行**（末尾比对）=> "回一句固定话／只印零"都过不了：第二形两数相等，只印零会被读成"没触发" |
-| `...SkippedStaysSilent` | `skipped` **仍静默**：(1)`ok=false` 且 `line==""` (2)`printCompressionTrace` 返 false (3)**写 0 字节**（NOT 空行）。**两形都驱动**：`filled_skipped_report`（真压缩机跑过、`State=skipped`）＋`zero_value_no_pass_ran`（零值报告，`State` 是空串） | 这一半是**反向牙**：把 skipped 也印出来即红（变异 M2，sec 3.2）。零值那格同时堵"只特判空 struct"的假绿 |
+| `...SkippedStaysSilent` | `skipped` **仍静默**：(1)`ok=false` 且 `line==""` (2)`printCompressionTrace` 返 false (3)**写 0 字节**（NOT 空行）。**两形都驱动**：`filled_skipped_report`（真压缩机跑过、`State=skipped`）＋`zero_value_no_pass_ran`（零值报告，`State` 是空串） | 这一半是**反向牙**：把 skipped 也印出来即红（变异 M2，sec 3.1）。零值那格同时堵"只特判空 struct"的假绿 |
 | （钉子，改判据）`TestCompressionTraceSilentWhenNothingCompressed` | **两半都钉**：(a) 零值报告静默；(b) `attempted` **必须明说不折**＋四项读数＋不许说"没触发"；(c) **新增第三半**：填好的 `skipped` 报告也必须静默（防只特判 `{}`） | 比 355 原判据**更强**：原来只有 silent 一侧，现在 silent 与"必须出声"两侧都在。NOT 删断言换绿，`(a)` 原句一字未删，另加 `(b)(c)` |
 
 **改理由（逐字进测试注释，引裁决）**：原钉子论据是"`ok=false` 同时覆盖'从没压缩'与'不是压缩的那轮'，两形不可分 => 印一行就是在声称一次没人做过的测量"（`run.go` 原注释逐字）。**那论据当时是对的**，但它依赖的前提（两形在报告上**完全同形**）已被 358 的 `CompressionState` 打掉（`skipped`／`attempted`／`compacted` 是一个字段的三个值）。继续守它就等于**用一颗过时的钉子挡住新读数**（台账 `A201` 第二点那族"规格与仪器分叉"）。裁决全文＝`.scratch/wisp/probes/orch/20261021/txt/358-ruling-nail-355.txt`，测试注释按名引了。
 
 ## 3 三读数逐字（变异红／还原绿／原样绿）＋ `sha256`
 
-每变异**先证落地**（`grep -n` 原文＋`go build ./...` rc=0）再读数；还原＝按字节拷回 M0 快照再核 sha256。
-
-### 3.1 证落地
+### 3.1 变异红（逐名报红行）
+每变异**先证落地**（`grep -n` 原文＋`go build ./...` rc=0），三条落地读数：
 ```
 M1  grep -n "MUTATION 358-r1b M1" cmd/wisp/run.go  =>  1347:  // MUTATION 358-r1b M1: the attempted line removed (reverse judgement).
 M2  grep -n "MUTATION 358-r1b M2" cmd/wisp/run.go  =>  1356:  return fmt.Sprintf("wisp run: 压缩痕：没触发（tokens_before=%d）", rep.TokensBefore), true // MUTATION 358-r1b M2
 M3  grep -n "压缩痕：压前" cmd/wisp/run.go          =>  1343:  （"折进摘要"=>"折入摘要"，格式串其余逐字不动）
 三次 go build ./... 均 rc=0
 ```
-
-### 3.2 变异红（逐名报红行）
 **M1＝把 attempted 那一行摘掉（派单第 2 条那颗反向判据）**：`rc=1`
 ```
 --- FAIL: TestCompressionTraceSilentWhenNothingCompressed (0.00s)
@@ -64,16 +60,14 @@ M3  grep -n "压缩痕：压前" cmd/wisp/run.go          =>  1343:  （"折进�
 ```
 **M2＝让 skipped 也印（反向：把静默那半去掉）**：`rc=1`，三枚同时红
 ```
---- FAIL: TestCompressionTraceSilentWhenNothingCompressed (0.00s)
+--- FAIL: TestCompressionTraceSilentWhenNothingCompressed
     compression_trace_355_test.go:183: a run that never reached the compressor printed "wisp run: 压缩痕：没触发（tokens_before=0）" (ok=true); a line of zeros would claim a measurement nobody took
-    compression_trace_355_test.go:252: a report that names the skipped state printed ... (ok=true); that shape never attempted a fold, so a line there is noise
---- FAIL: TestCompressionTraceReachesStdout (0.00s)
+--- FAIL: TestCompressionTraceReachesStdout
     compression_trace_355_test.go:285: printCompressionTrace claimed a print for a run that never compressed
-    compression_trace_355_test.go:288: a run that never compressed wrote "wisp run: 压缩痕：没触发（tokens_before=0）\n", want zero bytes
---- FAIL: TestCompressionTraceSkippedStaysSilent (0.00s)
+--- FAIL: TestCompressionTraceSkippedStaysSilent
     compression_trace_358_test.go:248: a report (state="skipped") that attempted no fold printed ... (ok=true); that shape never tried, so a line there is noise
-    （同句在 zero_value_no_pass_ran 子用例再报一次，state="unknown()"、tokens_before=0）
 ```
+
 **M3＝把 compacted 那一行改一个字**：`rc=1`
 ```
 --- FAIL: TestCompressionTraceCompactedLineIsTheOne355Shipped (0.00s)
@@ -81,40 +75,29 @@ M3  grep -n "压缩痕：压前" cmd/wisp/run.go          =>  1343:  （"折进�
     compression_trace_358_test.go:86: what reached stdout is not the pinned line plus one newline:
 ```
 
-### 3.3 还原绿 ＋ 还原核 `sha256`（逐字）
+### 3.2 还原绿 ＋ 还原核 `sha256`（逐字）
 ```
-还原后 58e8d8d6d173a7cf99d73b005de95f3826ed142387a25a5f1e9ceaf346ab3bfb *cmd/wisp/run.go
-M0快照 58e8d8d6d173a7cf99d73b005de95f3826ed142387a25a5f1e9ceaf346ab3bfb */d/tmp/wisp/20261021/358r1b/head/run.go        <- 逐字相等
-还原后 4aa4fe448450ec1e381be0f4feac2c7a44fc8aaedcc38be584f9650e9f114262 *cmd/wisp/compression_trace_355_test.go
-M0快照 4aa4fe448450ec1e381be0f4feac2c7a44fc8aaedcc38be584f9650e9f114262 */d/tmp/.../compression_trace_355_test.go   <- 逐字相等
-还原后 939eae292b9d37e9900328dcae517c42de1473a54119b8b6ab0cbddc0845939b *cmd/wisp/compression_trace_358_test.go
-M0快照 939eae292b9d37e9900328dcae517c42de1473a54119b8b6ab0cbddc0845939b */d/tmp/.../compression_trace_358_test.go   <- 逐字相等
-grep -c MUTATION cmd/wisp/run.go  =>  0
-还原绿：family_rc=0，六枚顶层 PASS、零 FAIL（逐字见 sec 4）
+还原后 run.go    58e8d8d6d173a7cf99d73b005de95f3826ed142387a25a5f1e9ceaf346ab3bfb == M0 快照逐字相等
+还原后 355 test  4aa4fe448450ec1e381be0f4feac2c7a44fc8aaedcc38be584f9650e9f114262 == M0 快照逐字相等
+还原后 358 test  939eae292b9d37e9900328dcae517c42de1473a54119b8b6ab0cbddc0845939b == M0 快照逐字相等
+grep -c MUTATION cmd/wisp/run.go => 0；还原绿 family_rc=0，六枚顶层 PASS、零 FAIL（逐字见 sec 4）
 ```
 **"回 HEAD blob"为何换成快照 sha**：本票要改的 `run.go` 与 `compression_trace_355_test.go` **与 HEAD 必然不等**（差＝本票改动），故按上一枚已认的口径测**另一枚本票未改的文件**：`compress.go` `git hash-object` = `b23910d9b9390d73675461b112060d4c0a7e6d37` = `git rev-parse HEAD:internal/agent/compress.go`，**逐字相等**。
 
-### 3.4 原样绿（未改的 HEAD blob 上打同一发，`-overlay`，工作树零触碰）
+### 3.3 原样绿（未改的 HEAD blob 上打同一发，`-overlay`，工作树零触碰）
 ```
 overlay：cmd/wisp/run.go => git show HEAD:cmd/wisp/run.go（blob 4865cfde...d3ae，与 HEAD 逐字相等）
-grep -c "超了阈值但一枚都没折" <HEAD blob>  =>  0（那一行今天不在）
-go test -count=1 -overlay <json> ./cmd/wisp/ -run CompressionTrace -v  =>  rc=1
+grep -c "超了阈值但一枚都没折" <HEAD blob> => 0（那一行今天不在）；同一发 rc=1
 --- FAIL: TestCompressionTraceSilentWhenNothingCompressed
     compression_trace_355_test.go:214: ...answered "" (ok=false): the state is "attempted"...
 --- FAIL: TestCompressionTraceAttemptedSaysItFoldedNothing
     compression_trace_358_test.go:172: ...answered "" (ok=false); state="attempted"...
 ```
-=> "**今天不响、改完才响**"：同一断言在 HEAD 上红、本树上绿；NOT 我在未改码上把它跑绿过。
-（`CompactedLineIsTheOne355Shipped` 与 `SkippedStaysSilent` 在 HEAD 上也**绿**，符合预期：本笔**只**改 attempted 那一跳 => 红只落在 attempted 相关两枚，正是"改一处、响一处"。）
+=> "**今天不响、改完才响**"：同一断言在 HEAD 上红、本树上绿；NOT 我在未改码上把它跑绿过。（`CompactedLineIsTheOne355Shipped` 与 `SkippedStaysSilent` 在 HEAD 上也**绿**，符合预期：本笔**只**改 attempted 那一跳 => 红只落在 attempted 相关两枚，正是"改一处、响一处"。）
 
 ## 4 同发跑全族（四数分开，NOT 相减）
 
-`go test -count=1 ./cmd/wisp/ -run 'CompressionTrace' -v` => **rc=0**
-```
-顶层 RUN = 6   子测试 RUN = 4
-顶层 PASS = 6  子测试 PASS = 4
-顶层 FAIL = 0  顶层 SKIP = 0
-```
+`go test -count=1 ./cmd/wisp/ -run 'CompressionTrace' -v` => **rc=0**；顶层 RUN **6** / 子测试 RUN **4** / 顶层 PASS **6** / 子测试 PASS **4** / 顶层 FAIL **0** / 顶层 SKIP **0**
 逐名（355 三枚与 358 三枚**同发全绿**，证明 355 其余钉子没被碰坏）：
 ```
 --- PASS: TestCompressionTraceThreeFlavoursReachTheClosingLine (0.00s)      <- 355
@@ -161,16 +144,17 @@ NEW ON POST (本笔后才有名):          本笔三枚 TestCompressionTrace*(At
 
 | 提交 | 主题 | 件数 | `.go` 枚 | 越界枚 |
 |---|---|---|---|---|
-| `PENDING-1` | `票 358 落地腿 358-r1b：attempted 变成 CLI 可读（三态各说各话）` | 3 | **3**（`run.go`、`compression_trace_355_test.go`、`compression_trace_358_test.go`） | **0** |
-| `PENDING-2` | `票 358 落地腿 358-r1b：交付件 358-r1-impl-part2` | 1 | **0** | **0** |
+| `43f44f59a99f658a60ecad12c3574589c7cba7f0`（`43f44f59`） | `票 358 落地腿 358-r1b：attempted 变成 CLI 可读（三态各说各话）` | 3 | **3**（`cmd/wisp/run.go`、`cmd/wisp/compression_trace_355_test.go`、`cmd/wisp/compression_trace_358_test.go`） | **0** |
+| `a8ae09cebe2d5781258fe0c5d0783e7541ae0c2a`（`a8ae09ce`） | `票 358 落地腿 358-r1b：交付件 358-r1-impl-part2` | 1（`docs/evidence/s1/358-r1-impl-part2.md`） | **0** | **0** |
 
-- 越界判据＝派单白名单（`cmd/wisp/run.go` 的 `compressionLine`／`printCompressionTrace` 一带、`cmd/wisp/compression_trace_355_test.go`、`cmd/wisp/compression_trace_358_*.go`、`docs/evidence/s1/358-r1-impl.md`／新 `-part2.md`）之外的件数；读数 **0**。
-- 正控（同尺打一笔含 `.go` 的真提交，证明尺不是恒 0）：见 sec 7 现跑读数。
+- 越界判据＝派单白名单（`cmd/wisp/run.go` 的 `compressionLine`／`printCompressionTrace` 一带、`cmd/wisp/compression_trace_355_test.go`、`cmd/wisp/compression_trace_358_*.go`、`docs/evidence/s1/358-r1-impl.md`／新 `-part2.md`）之外的件数；两笔合并跑 `grep -vE` 逐行输出**为空** => 读数 **0**。
+- 新件唯一性：`git ls-tree -r --name-only HEAD | grep -c '<新件名>'` => `compression_trace_358_test.go` = **1**、`358-r1-impl-part2.md` = **1**。
+- **正控**（同尺打一笔含 `.go` 的真提交，证明尺不是恒 0）＝`b676092d`（票 355 落地腿）=> `.go` **3** 枚；**负控**＝`3ed3fdce`（纯交件）=> `.go` **0** 枚。两向都可读，故"`.go` 3 / 越界 0"不是瞎尺读数。
+- 未 push（`git log --oneline -2` 两笔都在本地 `dev` 上）。
 
 ## 7 未做／未假设
 
 - NOT 翻任何票面框、NOT 改票名/`Status:`/`-done`/台账、NOT push。
 - `Q-312`（`KeepRawRounds`／`Need()` 预算契约）**零触碰**；本笔只让 attempted 这一形**可读**，NOT 改它何时发生。
-- 前端/面板零字节（`SPEC-08` 5.2 白名单零触碰）；未造事件、未加 `panel.*`、未加 JSON 键。
-- `internal/agent/**` 零字节（358 产码面已交，本笔只读 `State`）。
+- 前端/面板零字节（`SPEC-08` 5.2 白名单零触碰）；未造事件、未加 `panel.*`、未加 JSON 键。`internal/agent/**` 零字节（358 产码面已交，本笔只读 `State`）。
 - **未定义即停**：未遇到需要自行假设的分叉 => 无停手项。
