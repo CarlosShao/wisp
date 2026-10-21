@@ -1,7 +1,7 @@
 # 票 356 普查腿 356-a1 — R3 A 档下 `task.output` 的 notice 对 `fs.read` 的实际行为（只读成对读数）
 
 - 角色：**只读腿**（`AC#0`）。未翻任何格、未改票名/`Status:`/台账、未落任何 `.go` 字节进仓、未 push。
-- 起手 `HEAD=a8f5ad0a`；本腿跑门禁时 `HEAD=c0c8aaa9`（两者之间只动 `docs/reports/pending-and-issues.md` 一枚，代码面 md5 逐枚相同，见第 5 节）。分支 `dev`。
+- 起手 `HEAD=a8f5ad0a`；跑门禁时 `HEAD=c0c8aaa9`；落件后 `HEAD=d1493a9b`（本腿两笔）。期间编排者插了 `c8da185f`（只动 `docs/reports/**`）。`git diff --stat a8f5ad0a..HEAD -- internal/ cmd/ scripts/ tools/ .github/` 输出 **0 行**（代码面从起手到现在零字节变动），六枚生产件 md5 HEAD 对工作树逐枚 `same=yes`（见第 5 节）。分支 `dev`。
 - 尺册：`D:\tmp\wisp\20261021\356a1\sh\*.sh`（10/11/20/21/30/31/40/50 八枚）；读数 `logs/`；探针**只**写在 `D:\tmp\wisp\20261021\356a1\copy\`（`git archive HEAD` 导出的仓外私有副本，**无 `.git`**），两枚 `zzz_356a1_*_test.go`。共享树 `git status --porcelain -- internal/ cmd/ scripts/ tools/ .github/` 起手与终态皆 **0 行**。
 
 ## 1. 票面前提新鲜度（逐条；未采信 `174-v1` 任何数）
@@ -94,7 +94,7 @@ R2-only：注意：这条路径现在读不到，它不在你被授权的目录�
 |---|---|---|
 | `GOFLAGS= go build ./...` | **0** | 无输出（0 行） |
 | `GOFLAGS= go vet ./internal/tools/` | **0** | 无输出（0 行） |
-| `GOFLAGS= go test -count=1 -run '174r1' -v ./internal/tools/` | **0** | `ok  github.com/CarlosShao/wisp/internal/tools  0.424s` |
+| `GOFLAGS= go test -count=1 -run '174r1' -v ./internal/tools/` | **0** | `ok  github.com/CarlosShao/wisp/internal/tools  0.424s`（落件后复跑 `0.162s`，四数同） |
 | `GOFLAGS= go test -count=1 -run 'TestPointer|TestTaskOutputPointer|TestHealthyPointer|TestSensitiveFileIsDeniedNotEscalated|TestEmptyAllowlistAuthorizesNothing' -v ./internal/tools/` | **0** | `ok  ...  0.723s` |
 
 **四数分开（不相减）**：`174r1` 选择器 `RUN=4 / PASS=4 / FAIL=0 / SKIP=0`；宽选择器 `RUN=23 / PASS=23 / FAIL=0 / SKIP=0`（缩进层 `^    --- PASS` 两侧皆 **0**，与上面不同分母）。
