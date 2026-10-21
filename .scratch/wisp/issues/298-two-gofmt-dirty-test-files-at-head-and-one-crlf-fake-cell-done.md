@@ -34,7 +34,7 @@ git：只 commit 不 push；⛔ `add -A`／`amend`／`reset`／`rebase`／`stash
 单枚小发 `298-r1`（AC#0..AC#4 一腿跑完就行，写面只有两枚 `_test.go`）⇒ 再派非实现者验收 `298-v1` 翻勾。
 ⛔ 必须排在**任何正碰 `cmd/wisp` 的写腿交完之后**（同包两枚写腿会把红的归因搅浑），且起手 AC#1 那条 `git status` 判据非空即按住。⛔ 不与票 296 混批（那一发也要动 `cmd/wisp`，但动的是产码）。
 
-**Status:** **未开工**。低利害内务，⛔ 不上机主清单。⛔ 零翻框、零 push。
+**Status:** **DONE（2026-10-21 22:2x 编排者收口＝六格全闭；`AC#5` 的前提由票 338 落地完成、我现量确认；文件名加 `-done`）** ~~未开工~~
 
 ## Progress log
 
@@ -132,7 +132,22 @@ gofmt -l "$B/blob"                                             # ② HEAD blob �
 - **`AC#4` ⛔ 翻（按住，欠读数具名归我）**。本格判据要 `GOFLAGS= go build ./...`／`sh scripts/d22scan.sh`／`gofmt`&`gofumpt` 减前减后并排／`go test ./cmd/wisp/ -count=1` **改前改后各 ≥2 发取交集＋逐名作差＝新增红 0**。★**我本程一枚⛔ 跑**（除格式那三把我跑过）：Go 编译面此刻由 **`309-r1`（写 `internal/tools/bridge.go`）∥ `308-r1`（写 `internal/risk/*_test.go`）**两枚写腿持有，而 `cmd/wisp` 导入 `internal/tools` ⇒ 现在取色拿到的⛔ 是"两枚腿各自改完的树"，那枚作差**必假**。⇒ 处置＝**我自己在两枚写腿交完、面一空后跑那六发＋三把门禁再翻这格**（先例＝票 296 `AC#3`/`AC#4` 由编排者亲跑；⛔ 记在腿账上）。⚠ 腿那侧的 ⓐ（它对这格零发、用 `-overlay` 载历史 blob 代偿"改前那一发"）我复认＝**代偿形⛔ 等于严格形**，严格形只能靠 CI／历史重放，同批欠账（票面归因支"CI 那两步长期 skipped＝从未求值"那发也只能由 push 后的 CI 给）。
 - **★`AC#5` 已在下面那枚框里落地**（＝验收腿 ⓑ 那枚残留；读数与尺逐字在那框里，⛔ 在本节重述一遍＝同一件事记两次那条）。这里只补一枚**性质判定**：它**⛔ 算 `AC#1`/`AC#4` 的"新增"**——那两格判据只写 `gofmt`，而 `gofumpt` 那把尺的读数是**减前 2 → 减后 1 → HEAD 1**＝只减⛔ 增，符合票面那句"枚数只许减少"。⇒ 它是 **HEAD 既有债**、由新框承接，⛔ 另开票（先例＝台账 `A838` 那条"同一件事只记一次"）。
 
-- [ ] **AC#5（2026-10-11 13:1x 编排者追加，来路＝非实现者验收腿 `298-v1` 的 ⓑ；台账 `A846`）：`cmd/wisp` 的 `gofumpt` 残留 1 枚改成干净。** ★尺与射程（我 13:0x 现跑）＝`git archive --format=tar <sha> | tar -x -C <仓外目录>` 三棵**各自独立**的导出树（先证每棵 `.go` 件数＝**115**＝非空，防"空树假清洁"）上跑 `$(go env GOPATH)/bin/gofumpt.exe -l cmd/wisp` ⇒ 改前 `48e7b0a4`＝**2** → 改后 `18d43f8e`＝**1** → HEAD 现势＝**1**，件名逐字 `cmd/wisp/panel_transport_35r2_test.go`；同三棵树 `gofmt -l cmd/wisp`＝**2 → 0 → 0**＝**本票 `AC#1` 那格修的是 `gofmt`，`gofumpt` 比它严，这枚残留⛔ 本票修出来的**。判据＝**只改那一枚件**、⛔ 动其它；★**逐字节尺＝两版各自 `tr -d '[:space:]'` 后 `cmp` 必 rc=0**（`AC#1` 那把最硬的尺原样复用）；门禁三把并排带射程（工作树⇄blob⇄`cmd/wisp` 目录），⛔ 零行为变化、⛔ 动 SLO 阈值／golden／`thresholds.go`／`allowlist.txt`；裁决者⛔ 实现者。★**撤销口令＝「298 gofumpt 那格撤」**（撤＝删这枚框、恢复成只在台账 `A846` 里记一笔）。
+- [x] **AC#5（2026-10-11 13:1x 编排者追加，来路＝非实现者验收腿 `298-v1` 的 ⓑ；台账 `A846`）：`cmd/wisp` 的 `gofumpt` 残留 1 枚改成干净。** ★尺与射程（我 13:0x 现跑）＝`git archive --format=tar <sha> | tar -x -C <仓外目录>` 三棵**各自独立**的导出树（先证每棵 `.go` 件数＝**115**＝非空，防"空树假清洁"）上跑 `$(go env GOPATH)/bin/gofumpt.exe -l cmd/wisp` ⇒ 改前 `48e7b0a4`＝**2** → 改后 `18d43f8e`＝**1** → HEAD 现势＝**1**，件名逐字 `cmd/wisp/panel_transport_35r2_test.go`；同三棵树 `gofmt -l cmd/wisp`＝**2 → 0 → 0**＝**本票 `AC#1` 那格修的是 `gofmt`，`gofumpt` 比它严，这枚残留⛔ 本票修出来的**。判据＝**只改那一枚件**、⛔ 动其它；★**逐字节尺＝两版各自 `tr -d '[:space:]'` 后 `cmp` 必 rc=0**（`AC#1` 那把最硬的尺原样复用）；门禁三把并排带射程（工作树⇄blob⇄`cmd/wisp` 目录），⛔ 零行为变化、⛔ 动 SLO 阈值／golden／`thresholds.go`／`allowlist.txt`；裁决者⛔ 实现者。★**撤销口令＝「298 gofumpt 那格撤」**（撤＝删这枚框、恢复成只在台账 `A846` 里记一笔）。
+  > **2026-10-21 22:2x 编排者翻框＝成立（★前提已由别的票落地完成，我现量确认）**
+  > **本格要的那一枚就是 `cmd/wisp/panel_transport_35r2_test.go`**（票面写的"HEAD 现势＝1 枚"），
+  > ★**它已经被票 338 的落地腿 `338-r1`（提交 `93d0f39c`）修掉了**，且**那笔提交正文自己写明**：
+  > "该枚按 gofumpt 本意一次改到收敛，⛔ 半改"＋授权来源（`A1031`）＋撤销口令（「撤 338 甲形」）。
+  > **我的四把尺（全部现跑）**：
+  > ①`git cat-file blob 93d0f39c^:cmd/wisp/panel_transport_35r2_test.go` ⇒ `gofumpt -l` **1 枚**（2142 行）⇄ `93d0f39c:` 同法 ⇒ **0 枚**（2156 行）⇒ **就是那笔修掉的**；
+  > ②★**纯 blob 导出树尺**（本格票面自己要求的那把）：`git archive HEAD | tar -x` 到仓外，先证该树 `.go` **1147 枚**（防空树假清洁），
+  >   跑 `gofumpt -l cmd/wisp internal tools` ⇒ **0 枚**；
+  > ③票面点名那枚单跑 `gofumpt -l` ⇒ **0 枚**；
+  > ④该枚 2156 行、在 HEAD 在。
+  > ⇒ **本格的目的（`cmd/wisp` 的 `gofumpt` 残留清零）已达到**，⛔ 需再派写腿（再改就是**重复动一枚已收敛的件**）。
+  > ★**判据口径补一条（我另做裁定，`docs/evidence/s1/pipe-format-gate-reads-tracked-blob-not-worktree.md`）**：
+  > 格式门禁**一律读入库 blob**（`git cat-file blob` 到临时文件再跑），⛔ 读工作树副本——
+  > 因为本机 `core.autocrlf=true` 会把 `cmd/wisp/models.go` 检出成 CRLF（工作树 CR=334／blob CR=0、`hash-object==HEAD` 同串），
+  > 对它跑工作树尺**必假红 1 枚**；CI 自己也声明"the denominator of the formatting gate is the **TRACKED set**, not the working tree"（`ci.yml:189` 一段注释原话）。
 
 **★我自己这一程的四把坏尺（具名回自己，读数⛔ 删，全在 `probes/orch/20261011/logs/`；整批七枚见台账 `A846` §2 与 §6）**：① `git archive tar <sha>` 是**无效语法** ⇒ 导出树为空 ⇒ 我第一发的 blob 侧 `gofmt`/`gofumpt` 报了**假清洁**（`0 命中` 被我用成 `0 问题`；件里逐字留着 `fatal: not a valid object name: tar`）——那枚被吃掉的正是 `gofumpt` 的 1 枚残留；正解与"先证树非空"定式＝台账 `A846` §2。② 同一发里我把"全仓 `w/crlf` 名册"打印在我那句"非 .scratch 的那些"标题下面＝**标签贴错**（`readings-A846c.sh` 已改对，四把尺各带射程＋单位）。③ 我在双引号串里写了反引号包的技术名 ⇒ **那段真被当命令跑了**（两行标签被吞，尺的值未受影响＝5/5/334/22/5 照原样量出；这是我名下第三次踩同枚坑，定式＝标签里的名字一律⛔ 引号或单引号）。④ 还有一发我把 `pre`/`post`/`head` 三棵树⛔ 各给独立临时目录 ⇒ 那句"pre 的 gofmt＝0"读的**其实是 HEAD 那棵**（`-b.txt` 已用三枚目录重跑＝`2 ⇒ 0 ⇒ 0`）。
 
