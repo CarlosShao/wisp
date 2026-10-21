@@ -20064,3 +20064,22 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
 
 **③ 车道**＝写腿 **1**（`171-r1` 续跑）＋裁腿 **1**（`174-v1`）。CPU 三发 `99/100/100`＝**满载** ⇒ ⛔ 硬塞第三枚写腿。未推 **214**、⛔ 推、⛔ 清理、⛔ 改契约。结案 **9** 票。
 
+## A1079（2026-10-21 10:1x +08，编排者）★★`cmd/wisp` 整包撞 10 分钟超时＝**已排查到底**：不是挂死、不是缺陷，是**一枚用例按契约故意等满 40 秒 ×２** ＋ go 命令默认 `-timeout 10m`
+
+**① 起问**＝`136-r1b` 报"整包 `go test ./cmd/wisp/` 撞 `panic: test timed out after 10m0s`、1 枚用例（`TestTicket101SessionGrantDoesNotCrossRestart`）无判决行"。机主问"到底什么原因，查一下"。
+
+**② 我自己现跑的排查链（每一步都是量的，⛔ 推测）**
+- (a) **单跑那枚用例**：`go test -timeout 150s -run '^TestTicket101SessionGrantDoesNotCrossRestart$' -v ./cmd/wisp/` ⇒ **`--- PASS (85.57s)`、rc=0**。⇒ **它不挂死、也没 flaky**，就是慢。
+- (b) **慢在哪**：它的日志两段各空 ~**40 秒**（`10:11:56`⇄`10:12:37`⇄`10:13:17`）。用例自己的注释写清了：`firstErr` **来自批准卡跑到超时**（"the L2 route auto-rejects"），即"没人批 ⇒ 卡自然到期"。
+- (c) **40 秒来自配置**：`cmd/wisp/run_mode101_test.go:110` 逐字 `riskLines := "[risk]\nl1_window_sec = 1\nconfirm_timeout_sec = 40\n"` ⇒ **用例自己把确认超时设成 40 秒**，而它**要测的就是"没人批时被拒"** ⇒ 必须等满 40 秒，两段＝~85 秒。**设计如此，不是缺陷。**
+- (d) **那能不能把 40 调小**⇒**⛔ 不能**（契约强制的）：`internal/config/validate.go:128` `confirmTimeoutSecMin = 31`；同件 `:108-118` 逐字给了理由＝"下界不是口味问题，是 **C18 预警的生存条件**"：`approval/gate.go:528` 只在 `Timeout() - WarningLead() > 0` 时才武装预警，而 queue 在没生产者传 lead 时回落到 `DefaultApprovalWarning = 30s`；⇒ **任何 ≤30 秒的超时会静默删掉一层保护**，所以带的下界**严格高于** 30。⇒ 该用例取 40 是**贴着契约下界的合法最小值**。
+- (e) **同族兄弟用例做对照**：`TestTicket224ProductionSessionDoesNotSurviveRestart`（同 `t101boot`、同族语义）单跑 **7.09s**；与 101 合跑 **83.13 + 5.45 = 88.81s**。⇒ 慢的是**101 那一枚**（它测的是"跨重启的授权不越界"＝要两段各等满一张卡），不是整族。
+- (f) **10 分钟是谁定的**：`go test` 命令**默认** `-timeout 10m`（`go help testflag` 的 `-timeout d`），包内没有任何 `TestMain` 把它抬高。
+
+**③ 结论（一句话）**＝**台面事实，不是产品缺陷、不是 flaky、不需改产品码**：`./cmd/wisp` 整包今天有**至少一枚按契约注定要跑 85 秒**的用例，而整包 344 枚在**本机当前负载**（我量的：Harness 进程 16 万 CPU 秒、CPU 三发 99/100/100）下超过 go 的默认 10m 预算 ⇒ 超时 panic 吃掉最后一枚无判决行。
+⇒ **正确用法＝跑整包必须显式抬 `-timeout`**（例 `-timeout 30m`），且**报读数时把"被 panic 吃掉的那枚"逐名登记**（⛔ 当"通过"、⛔ 当"失败"）。
+- ★**⛔ 立票改它**：要改只能改"用例把 40 调小"，而那被 `validate.go` 的契约带**禁止**（≤30 静默删保护）；要改就动 `confirmTimeoutSecMin`／`DefaultApprovalWarning`＝**契约变更、归机主**。⇒ 我**不立票**，只把这条写进"台面事实"清单。
+- ★**副作用一条要记住**：谁报"I ran the whole `./cmd/wisp` package, 0 failures"都要被问一句"**你的 `-timeout` 是多少、有没有一枚被 panic 吃掉**"（本仓昨天已有同类教训：`136-r1b` 那次就是 `FAIL=6` 只覆盖跑完的 343 枚）。
+
+**④ 车道**＝写腿 **1**（`171-r1`）＋裁腿 **1**（`174-v1`）；CPU `99/100/100` 满载 ⇒ ⛔ 硬塞。未推 **215**、⛔ 推、⛔ 清理、⛔ 改契约。结案 **9** 票。
+
