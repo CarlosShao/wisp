@@ -1225,7 +1225,8 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// above, because costLine's contract is the C23 cost figure (CostMicros /
 	// Currency / Usage) and notifyBody's is the reply-or-failure text; folding
 	// compression into either would make one helper answer two questions.
-	// Silent when nothing was compressed - see compressionLine.
+	// One line per STATE, and silent only for the shapes where nothing was
+	// attempted - see compressionLine (ticket 358 AC#2).
 	printCompressionTrace(rt.stdout, res.Compression)
 	if res.Message != "" {
 		fmt.Fprintf(rt.stdout, "wisp run: %s\n", res.Message)
@@ -1285,10 +1286,14 @@ func costLine(res agent.Result) string {
 		res.Usage.InputTokens, res.Usage.OutputTokens)
 }
 
-// printCompressionTrace writes the AC#2 line to w and reports whether it wrote
-// one. Extracted from execute() so the shipped formatter and its writer are the
-// same code the test drives: a test that re-implemented the concatenation would
-// pass while the production line said something else.
+// printCompressionTrace writes the compression line to w and reports whether it
+// wrote one. Extracted from execute() so the shipped formatter and its writer
+// are the same code the test drives: a test that re-implemented the
+// concatenation would pass while the production line said something else.
+//
+// false means zero bytes were written - not a blank line. That is what the
+// skipped state and the never-reached-compressor report both answer (ticket 358
+// AC#2); the compacted and attempted states each write exactly one line.
 func printCompressionTrace(w io.Writer, rep agent.CompressionReport) bool {
 	line, ok := compressionLine(rep)
 	if !ok {
@@ -1298,30 +1303,57 @@ func printCompressionTrace(w io.Writer, rep agent.CompressionReport) bool {
 	return true
 }
 
-// compressionLine renders ticket 355 AC#2's answer from the report the loop
-// already returns: how big the history was before the pass, how big it is
-// after, and whether the bytes actually moved.
+// compressionLine renders the compression reading from the report the loop
+// already returns. It answers per STATE, not per Ran (ticket 358 AC#2, on the
+// orchestrator ruling archived at
+// .scratch/wisp/probes/orch/20261021/txt/358-ruling-nail-355.txt):
 //
-// The three values come from ONE place - CompressionReport - and
-// history_changed is the compressor's own reading (it can contradict Ran: a
-// pass that folded rounds into a summary of the same size has Ran true and
-// HistoryChanged false). Recomputing it here from other counters would let the
-// two disagree, which is why the field was added rather than derived.
+//   - CompressionCompacted: the line ticket 355 shipped, byte for byte. The
+//     three values come from ONE place - CompressionReport - and
+//     history_changed is the compressor's own reading (it can contradict Ran: a
+//     pass that folded rounds into a summary of the same size has Ran true and
+//     HistoryChanged false). Recomputing it here from other counters would let
+//     the two disagree, which is why the field was added rather than derived.
 //
-// ok=false covers both "this run never compressed" and "the run is not the one
-// that compressed": compression only fires when the history is over its
-// threshold AND more than KeepRawRounds raw rounds can be folded, so the
-// common shape answers nothing. That is stated rather than papered over - a
-// line printing zeros would claim a measurement nobody took. (The budget
-// contract behind that shape is Q-312's and is deliberately NOT touched here.)
+//   - CompressionAttempted: a new line that says out loud that the trigger
+//     cleared the threshold and not one round was folded, carrying the four
+//     readings that make the statement checkable - tokens_before, tokens_after,
+//     trigger and source. This is the shape ticket 358 exists for: until the
+//     tri-state landed it answered nothing at all, so "该压但压不动" read
+//     exactly like "没触发" on every surface. Zeros alone would not do; a reader
+//     has to be told the attempt happened. Nor does this line say the fold was
+//     never triggered, because it was.
+//
+//   - CompressionSkipped, and the unfilled report that a run which never
+//     reached the compressor carries (its State is the zero string, which the
+//     enum deliberately keeps outside its three values): nothing. Those two
+//     shapes folded nothing because nothing was attempted, so a line would be
+//     noise, and a line of zeros would claim a measurement nobody took. (The
+//     budget contract that decides the skipped shape is Q-312's and is
+//     deliberately NOT touched here.)
+//
+// Ran is not consulted: State is authoritative and Ran is its compatibility
+// mirror (rep.Ran == (rep.State == CompressionCompacted), assigned once in
+// internal/agent/compress.go and pinned there), so reading the state here
+// changes no old reader's meaning.
 func compressionLine(rep agent.CompressionReport) (string, bool) {
-	if !rep.Ran {
-		return "", false
+	switch rep.State {
+	case agent.CompressionCompacted:
+		return fmt.Sprintf(
+			"wisp run: 压缩痕：压前 %d tokens => 压后 %d tokens（history_changed=%t，%d 条消息被折进摘要，保留 %d 轮原文）",
+			rep.TokensBefore, rep.TokensAfter, rep.HistoryChanged,
+			rep.CompressedMsgs, rep.KeptRawRounds), true
+	case agent.CompressionAttempted:
+		// source is printed as the report carries it. An empty one stays empty
+		// rather than being filled with "estimate": absence is a fact about the
+		// report, and inventing a numerator would be this line claiming a basis
+		// nobody recorded.
+		return fmt.Sprintf(
+			"wisp run: 压缩痕：超了阈值但一枚都没折（tokens_before=%d，tokens_after=%d，trigger=%d tokens，source=%s，保留 %d 轮原文）",
+			rep.TokensBefore, rep.TokensAfter, rep.TriggerTokens,
+			string(rep.TriggerSource), rep.KeptRawRounds), true
 	}
-	return fmt.Sprintf(
-		"wisp run: 压缩痕：压前 %d tokens => 压后 %d tokens（history_changed=%t，%d 条消息被折进摘要，保留 %d 轮原文）",
-		rep.TokensBefore, rep.TokensAfter, rep.HistoryChanged,
-		rep.CompressedMsgs, rep.KeptRawRounds), true
+	return "", false
 }
 
 // taskLogState maps the loop's terminal state onto the memory.task_log.state
