@@ -73,7 +73,13 @@ OpenAI Codex 侧有两条 issue 记的正是"用陈旧 token 数触发压缩导�
       > ★这是"改既有测试的判据"、⛔ 改契约文字（D 表无此条）⇒ **我拍**；写腿若认为触及 355 的验收结论 ⇒ **停手上报**。
       ★反向判据＝把新加的那一跳摘掉 ⇒ 用例必须转红并**逐名报红行**；先证变异落地（`grep -n` ＋ `go build` rc=0）再读数，三读数逐字贴。
       ★**⛔ 动 `Need()` 的判据、⛔ 动 `KeepRawRounds` 的值、⛔ 动 12000／4000 两个阈值**（那是 D15 预算语义）。
-- [ ] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet ./internal/agent/`／`go test -count=1 ./internal/agent/`（四数分开报、⛔ 相减）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
+- [x] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet ./internal/agent/`／`go test -count=1 ./internal/agent/`（四数分开报、⛔ 相减）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
+  > **2026-10-21 18:1x 编排者翻框（六把门我自己现跑，⛔ 抄任何腿）**：
+  > `GOFLAGS= go build ./...` **rc=0**／`go vet ./cmd/wisp/ ./internal/agent/` **rc=0**／`go test -count=1 ./internal/agent/` **rc=0**／
+  > `sh scripts/d22scan.sh` **rc=0 clean**（`ban #8 cmd/` 144→**145**＝新增那枚 `.go`）／`sh scripts/check-path-length-budget.sh` **rc=0 GREEN**（`over the hat=60`／`roster=60`）／
+  > `gofumpt`（绝对路径）对三枚改动件**列出 0 枚**。
+  > ★**全族同发**我也现跑：`go test -run 'CompressionTrace' -v ./cmd/wisp/` ⇒ **rc=0**，355 三枚（`ThreeFlavours…`／`SilentWhenNothingCompressed`／`ReachesStdout`）＋358 三枚（`CompactedLineIsTheOne355Shipped`／`AttemptedSaysItFoldedNothing` 双子用例／`SkippedStaysSilent`）**全部 PASS**。
+  > ⚠ **`cmd/wisp` 整包 rc=1 仍未解**、且**⛔ 本票缺陷**（`A1100`：既有真窗族红＋进程级截断、每发恰 1 枚 RUN 无判决行且死点漂）⇒ 本格按"六把门"判、⛔ 按"整包绿"判；整包那 203 枚从未跑到的一批**无法判色、属票 314 射程**。
 - [ ] **AC#4 D15 契约文字同步（★**属铁律第 4 条三类之一：改契约文字，必须摆机主批**）**：本票实现完成后，D15 那段文字**必然要改**
       （它今天逐字写"会话历史 > 12000 token ⇒ 对最老轮次压缩"，而本票把触发基数换成 provider 真值、并把三态留痕写进可观测面）。
       ⇒ 由我把**改前／改后逐字对照**摆机主批；⛔ agent 单方面改 `docs/PLAN.md` 一字。
@@ -83,7 +89,11 @@ OpenAI Codex 侧有两条 issue 记的正是"用陈旧 token 数触发压缩导�
       `Need()` 在 `loop.go:405` 被调用时，**上一轮的 `turn.Usage` 就在手边**（`:447` 才用掉）⇒ 把真值喂给触发判据是**接线**、⛔ 新造管路。
       ★判据：①真值可用时用真值（`Usage.InputTokens > 0`）、**真值不可用（首轮／provider 不报）时回落到本地估算**并**在痕里标明用了哪个**；
       ②两形（真值／估算）各一枚用例；③⛔ 因此改动 `HistoryCompressTokens` 的取值语义（阈值本身不变，只换"分子"的来源）。
-- [ ] **AC#6 纪律格**：⛔ 翻任何框（本票各格由非实现者裁）、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 139／355 任何原句。
+- [x] **AC#6 纪律格**：⛔ 翻任何框（本票各格由非实现者裁）、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 139／355 任何原句。
+  > **2026-10-21 18:1x 编排者翻框（纪律格由编排者判，⛔ 需非实现者）**：本票两枚实例（`358-r1`／`358-r1b`）
+  > **零翻框**（票面 `[x]` 只有我给的 `AC#1`）、**零改票名／`Status:`／`-done`**、**零 push**（`origin/dev..HEAD` 只涨本地）、**零碰票 139／355 原句**
+  > （★它改的是 `cmd/wisp/compression_trace_355_test.go` 那颗**钉子**——但那是**我裁决授权**它在 `358-ruling-nail-355.txt` 里改的、且只改那一枚，355 票面本身零字节）。
+  > ★另记它一处**主动**处置（比纪律要求的更好）：提交账不写死自身 sha、改成"可重跑命令＋已实测两笔"，理由逐字＝"每改一次交付件就又生成一笔、表立刻过期"。
 
 ## 硬约束
 
