@@ -68,6 +68,17 @@ type CompressionReport struct {
 	RawIDsInsideSummary []string
 	TokensBefore        int
 	TokensAfter         int
+	// HistoryChanged reports whether this pass actually moved the history:
+	// it is the same expression the trace records as "history_changed"
+	// (TokensAfter != TokensBefore || the message count changed), NOT a copy
+	// of Ran. The two can disagree - a pass can fold rounds whose summary is
+	// the same size, leaving Ran true and the bytes identical - and a caller
+	// that asked "did the history move" must be able to hear that.
+	//
+	// It is a read-only reading of a completed pass: Compress sets it, nothing
+	// in this package consults it. It exists so the answer stops living only
+	// on the log line (ticket 355 AC#2).
+	HistoryChanged bool
 }
 
 // Compressor applies the D15(4) policy against a scaled budget set.
@@ -219,6 +230,12 @@ func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Me
 		// actually returned instead of echoing rep.Ran, so it can contradict
 		// the fold flag and a reader is never told the history moved when the
 		// bytes coming back are the same size.
+		//
+		// Ticket 355 AC#2: the same value is stored on the report instead of
+		// living only on this record. It is computed ONCE here - the expression
+		// is unchanged - and both readers take it from rep, so the log line and
+		// the caller's reading cannot drift apart.
+		rep.HistoryChanged = rep.TokensAfter != rep.TokensBefore || len(out) != len(hist)
 		attrs := []any{
 			"tokens_before", rep.TokensBefore,
 			"tokens_after", rep.TokensAfter,
@@ -227,7 +244,7 @@ func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Me
 			"msgs_after", len(out),
 			"compressed_msgs", rep.CompressedMsgs,
 			"kept_raw_rounds", rep.KeptRawRounds,
-			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist),
+			"history_changed", rep.HistoryChanged,
 		}
 		// Ticket 153 AC#2: whose pass this was. The key is "task", the name the
 		// loop already uses for the same value (loop.go's task_log Warns), and

@@ -1220,6 +1220,13 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	fmt.Fprintln(rt.stdout)
 	fmt.Fprintf(rt.stdout, "wisp run: 任务 %s 结束（%s，%d 轮，%d 次工具调用，成本 %s）\n",
 		res.TaskID, res.Status, res.Rounds, res.ToolCalls, costLine(res))
+	// Ticket 355 AC#2: the compression dimension, on a line of its own.
+	// It is a separate paragraph rather than a sixth field of the cost line
+	// above, because costLine's contract is the C23 cost figure (CostMicros /
+	// Currency / Usage) and notifyBody's is the reply-or-failure text; folding
+	// compression into either would make one helper answer two questions.
+	// Silent when nothing was compressed - see compressionLine.
+	printCompressionTrace(rt.stdout, res.Compression)
 	if res.Message != "" {
 		fmt.Fprintf(rt.stdout, "wisp run: %s\n", res.Message)
 	}
@@ -1276,6 +1283,45 @@ func costLine(res agent.Result) string {
 	return fmt.Sprintf("%d micro-%s（in %d / out %d tokens）",
 		res.CostMicros, orDefaultS(res.Currency, "CNY"),
 		res.Usage.InputTokens, res.Usage.OutputTokens)
+}
+
+// printCompressionTrace writes the AC#2 line to w and reports whether it wrote
+// one. Extracted from execute() so the shipped formatter and its writer are the
+// same code the test drives: a test that re-implemented the concatenation would
+// pass while the production line said something else.
+func printCompressionTrace(w io.Writer, rep agent.CompressionReport) bool {
+	line, ok := compressionLine(rep)
+	if !ok {
+		return false
+	}
+	fmt.Fprintln(w, line)
+	return true
+}
+
+// compressionLine renders ticket 355 AC#2's answer from the report the loop
+// already returns: how big the history was before the pass, how big it is
+// after, and whether the bytes actually moved.
+//
+// The three values come from ONE place - CompressionReport - and
+// history_changed is the compressor's own reading (it can contradict Ran: a
+// pass that folded rounds into a summary of the same size has Ran true and
+// HistoryChanged false). Recomputing it here from other counters would let the
+// two disagree, which is why the field was added rather than derived.
+//
+// ok=false covers both "this run never compressed" and "the run is not the one
+// that compressed": compression only fires when the history is over its
+// threshold AND more than KeepRawRounds raw rounds can be folded, so the
+// common shape answers nothing. That is stated rather than papered over - a
+// line printing zeros would claim a measurement nobody took. (The budget
+// contract behind that shape is Q-312's and is deliberately NOT touched here.)
+func compressionLine(rep agent.CompressionReport) (string, bool) {
+	if !rep.Ran {
+		return "", false
+	}
+	return fmt.Sprintf(
+		"wisp run: 压缩痕：压前 %d tokens => 压后 %d tokens（history_changed=%t，%d 条消息被折进摘要，保留 %d 轮原文）",
+		rep.TokensBefore, rep.TokensAfter, rep.HistoryChanged,
+		rep.CompressedMsgs, rep.KeptRawRounds), true
 }
 
 // taskLogState maps the loop's terminal state onto the memory.task_log.state
