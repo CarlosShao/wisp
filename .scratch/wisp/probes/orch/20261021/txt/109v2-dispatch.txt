@@ -1,0 +1,33 @@
+【派单·票 109 终裁腿 109-v2】非实现者裁腿·2026-10-21 13:1x +08 编排者
+
+■ 身份
+**非实现者裁腿**（裁决者≠实现者）。⛔ 落任何 `.go` 字节、⛔ 翻任何框、⛔ 改票名/`Status:`/`-done`/台账、⛔ push。
+票面＝`.scratch/wisp/issues/109-models-have-a-cross-account-write-window-after-ensure.md`（先通读，★六格逐格看）。
+被裁对象＝实现腿 `109-r1` **v2 那批**（交件＝`.scratch/wisp/probes/109/r1/report-109r1-v2.md`；判据表＝`docs/evidence/s1/109-adversarial-acceptance.md`）。
+
+■ 你要裁什么（三条）
+1. **`109-r1` v2 是否真的把 `AC#2` 与 `AC#4` 那两格做到了**（★注意口径：权威判据表 `docs/evidence/s1/109-adversarial-acceptance.md` 的 `:44` 附近逐字把 `R-109-2`／`R-109-3` 归在 **`AC#4`**，⛔ 归 `AC#2`——我此前一份派单把这个口径写错过一次，已作废，你要**独立从判据表复读**、⛔ 采信我这句话）。
+2. **`109-r1` 交件第 12 节具名登记的"NTFS 命名流／硬链接绕哈希面"那味，该不该另立票**（它自己判"⛔ 在派单射程内、交编排者裁"）。
+3. **`AC#1`／`AC#3`／`AC#5` 今天的状态**：哪些能把框翻、哪些还缺读数（⛔ 凭实现腿自报翻）。
+
+■ 必判清单（每项另起尺、⛔ 采信任何腿自报）
+1. **票面前提新鲜度（尺 v4 ⑧，硬闸）**：票面 §现量 里每条可判定断言对 **HEAD blob** 复量（⛔ 对工作树、⛔ 凭自述）；票面点名的每枚落件 `git cat-file -e HEAD:<path>`。任一条过期 ⇒ 停手上报。
+2. **`109-r1` v2 的写面与纪律**：`git log --format='票 109 落地腿 109-r1'` 类锚定尺取全名册（★锚定行首 = 逐字前缀，⛔ 用区间 `A..B` 计数当枚数）；逐笔 `git show --name-only` 判 `.go` 枚数与越界（射程＝`internal/models/**` ＋ 它自己的证据件）；正控＝同尺打一笔**含 `.go`** 的真提交。
+3. **那两格（`AC#2`／`AC#4`）**：逐字比对"票面判据 ⇄ 落地产码/判据件 ⇄ `109-r1` 自报"三者；★**自己跑**能跑的读数（`go test` 相关包，四数分开报、⛔ 相减）；它报的每一把数你都另跑或另算一遍。
+4. **`AC#5`（修前必须红）**：核它有没有把"修前红"的红名与断言原文**先进票面**；若只有自述没有盘上证据 ⇒ 判缺。
+5. **NTFS 命名流／硬链接那味**：把它在交件第 12 节的原文引出来，判：(a) 是不是真绕得过；(b) 属不属本票射程；(c) 该另立票还是并入现有哪张（给出理由与代价）。
+6. **门禁复跑**（你自己现跑、⛔ 抄）：`GOFLAGS= go build ./...`／`go vet ./internal/models/`／`go test -count=1 ./internal/models/`（四数分开报）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`，各 rc＋末行逐字。跑门前 `unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`。
+7. **红名册逐名**（⛔ 只报枚数），新增红必须 0；有就逐名判归属。
+
+■ 纪律（硬）
+- 写面**只许**：`docs/evidence/s1/109-v2-verdict.md`（≤160 行，过帽拆 `-partN`）＋`D:\tmp\wisp\20261021\109v2\**`（仓外）。
+- ⛔ 改 `internal/**`、`cmd/**`、`scripts/**`、`.github/**`、`.scratch/wisp/**`、`docs/reports/**`、`docs/PLAN.md`、`docs/specs/**`。
+- 只 commit **⛔ push**；`add`/`commit` **两处显式 pathspec**；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+- 主题**逐字**以 `票 109 终裁腿 109-v2` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+- ★提交正文与交付件里 **⛔ 被禁码位**（`§`/`✓`/`≤`/`≠`/`→`/`⇒`/`⛔`/emoji/带圈数字）⇒ 写"sec N"/"=> "/"NOT"/(1)。★提交前自己扫一遍。
+- 临时件只建不删；⛔ `.out`；⛔ 共享树建 worktree/checkout；⛔ `-overlay`。
+
+■ 交件（缺一算未交）
+`docs/evidence/s1/109-v2-verdict.md`：①七项逐项判语＋读数（每项另起尺）；②**逐格结论**（六格各：能翻／⛔ 翻＋缺什么）；③NTFS 那味的三问答案（含立票建议与代价）；④门禁 rc 与末行逐字；⑤红名册逐名；⑥建议编排者翻哪几格（⛔ 你自己翻）；⑦提交号＋逐枚 `.go`／越界＋正控。
+
+■ 未定义即停：方案没覆盖 ⇒ **停手上报**，⛔ 自行假设。

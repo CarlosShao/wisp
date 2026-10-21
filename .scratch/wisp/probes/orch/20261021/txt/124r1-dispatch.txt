@@ -1,0 +1,44 @@
+【派单·票 124 落地腿 124-r1】写腿·2026-10-21 13:1x +08 编排者
+
+■ 身份
+**写腿**（实现者）。裁决者≠实现者：⛔ 给自己的活出终裁、⛔ 翻任何票框、⛔ 改票名/`Status:`/`-done`。
+票面＝`.scratch/wisp/issues/124-posix-harness-hands-the-sealing-floor-an-unresolved-temp-root.md`（先通读全票，含"不许动"那节）。
+
+■ 目标
+把"**把 `t.TempDir()` / `os.TempDir()` 的答案直接交给 `winsec`**"的那批**用例侧调用点**，改成与票 119 生产路同一条纪律：
+**OS 给的答案先过 `proc.SealableRoot`，再递给密封底线**。
+
+■ 写面天花板（⛔ 越界＝作废）
+- 允许：`internal/**` 与 `cmd/**` 里的**用例侧**（`*_test.go`）调用点；以及把你**必须**改的那一两个 helper 的**测试侧**实现。
+- ⛔ **不改 `internal/winsec` 的语义**（票面逐字）；⛔ 改生产码的判级/密封语义；⛔ 碰 `internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、`thresholds.go`、任何 golden；
+  ⛔ `go.mod`/`go.sum`/`.gitignore`/`.github/**`；⛔ `frontend/**`、`design/**`、`docs/PLAN.md`、`docs/specs/**`、`docs/reports/**`。
+- ★**同包只一枚写腿**：你要动的包若与别人冲突，`git status --porcelain` 会告诉你 ⇒ 停手上报。
+- ⚠ 票面写明：**别与票 119 返修同时动 `internal/proc/**`**。今天 `internal/proc/**` 无在飞腿，你可以动它的**测试**面；但要改 `internal/proc` 的**生产码** ⇒ **停手上报**。
+
+■ 开工前必做（⛔ 跳步＝空跑作废）
+1. `git status --porcelain`：写面内有**别人的**未提交改动 ⇒ 停手上报。
+2. ★**票面前提新鲜度（尺 v4 ⑧）**：票面 §现量 里每条可现跑的断言**逐条现跑**并记读数。★我已替你跑了一条基线（你要独立复跑、⛔ 抄）：
+   `git grep -n 'winsec\.' HEAD -- '*_test.go' | grep -E 'TempDir|os\.TempDir'` 今天命中 **20** 处；任一条过期 ⇒ **停手上报**。
+3. 列出你要改的**逐枚文件清单**（⛔ 只给计数），并在交件里逐枚说明"它原来把什么直接交给了 winsec"。
+
+■ 做法（硬）
+- ★**不许把放行侧放宽换绿**（票面 `AC#3` 逐字）：票 113/119 那两族**拒绝**用例一枚都不许变成通过方式；`git diff` 要能证**判定分支未动**。
+- 每一处行为改动配**一枚今天响、不修不响**的用例；★反向判据＝把你新加的那一跳摘掉，用例必须转红并**逐名报出红行**；先证变异落地（`grep -n` 原文 ＋ `go build` rc=0）再读数，三读数（变异红／还原绿／原样绿）逐字贴。
+- ⛔ 恒真判据、⛔ `t.Skip`、⛔ 放宽既有断言。
+- 跑门前 `unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；★`GOTMPDIR`/`TMPDIR` 若要设**只许 C: 卷**（换卷会让既有门变色＝票 311 守卫会拒跑）。
+- ⛔ 共享工作树里建 worktree/checkout；⛔ `-overlay` 用于 AST-on-disk 钉子；⛔ `.gitattributes`；⛔ `gofumpt -w` 洗别人的件（现存 19 枚存量脏件另有票）。
+
+■ Git 纪律（逐条硬）
+- 只 commit、**⛔ push**；`add` 与 `commit` **两处显式 pathspec**；⛔ `add -A`/`add .`/目录形；⛔ amend/reset/rebase/stash/checkout ./clean。
+- 提交前/后各跑一把：`git diff --cached --name-only`（清单外路径 ⇒ 停手）＋`git ls-tree -r HEAD | grep -c` 自门。
+- 主题**逐字**以 `票 124 落地腿 124-r1` 开头，一笔一件事；正文先写 `/tmp/xxx` 再 `git commit -F /tmp/xxx`。
+- ★提交正文与**所有**交付件里 **⛔ 被禁码位**（`§`/`✓`/`≤`/`≠`/`→`/`⇒`/`⛔`/emoji/带圈数字）⇒ 写"sec N"/"=> "/"NOT"/(1) 这种名称形。★提交前**自己扫一遍**。
+- 临时件只建不删 ⇒ `D:\tmp\wisp\20261021\124r1\**`（⛔ 盘符根、⛔ 仓内）；⛔ `.out` 后缀。
+
+■ 交件（缺一算未交）
+1. `docs/evidence/s1/124-r1-impl.md`（**≤160 行**，过帽拆 `-partN`，⛔ 压行凑数）：改了哪几枚文件（逐名）／每枚"原来交了什么、现在过哪一跳"／新用例逐名＋为什么今天响／三读数逐字／门禁 rc。
+2. 门禁你**自己现跑贴末行**：`GOFLAGS= go build ./...`；`go vet` 你动过的包；`go test -count=1` 你动过的包（四数 `^=== RUN`/`^--- PASS`/`^--- FAIL`/`^--- SKIP` **分开报、⛔ 相减**）；`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh` 各 rc。
+3. 红名册**逐名**（⛔ 只报枚数），新增红必须 **0**；有就逐名说明归属。
+4. 报告里给：提交号逐枚＋逐枚 `git show --name-only` 的 `.go` 枚数与越界枚数（正控＝同尺打一笔**含 `.go`** 的真提交，证明尺不恒零）。
+
+■ ⛔ push／⛔ 翻框／⛔ 改台账／⛔ 判自己过。方案没覆盖 ⇒ **停手上报**（未定义即停，D22 闸门③）。
