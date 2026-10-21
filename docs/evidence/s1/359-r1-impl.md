@@ -81,7 +81,7 @@ CONTROL 六条（第 83-100 行）挡住"直接 `return false` 也能过"：`a/b
 --- FAIL: TestSameAbsolutenessPOSIXIsTheOnlyLegBetweenTwoRoots359 (0.00s)
 ```
 
-***分母形状对照**：既有 74 枚在四发里**全部同数**（RUN 74／PASS 46／FAIL 0，四发一致），
+**分母形状对照**：既有 74 枚在四发里**全部同数**（RUN 74／PASS 46／FAIL 0，四发一致），
 所以上表 RUN 75／PASS 47 比 74／46 多出来的**正好是本腿新增的这 1 枚**（`-run` 未加过滤，整包跑）。
 换话说：**本腿把"摘了无人察觉"变成"摘了必有一枚红、且红行指到两处合取各自的语义"**。
 
@@ -118,9 +118,9 @@ CONTROL 六条（第 83-100 行）挡住"直接 `return false` 也能过"：`a/b
 `TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1`、
 `TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1`（第三次那枚）。
 三枚全在**票 342 系竞态**、原样即红、与本合取无关；两次红数 3 与 2 之差即该族在 1~2 抖。
-与普查件 `121/68/2/0 rc=1` 同形。***故正控只用固定 9 名子集，不用全包 FAIL 数。**
+与普查件 `121/68/2/0 rc=1` 同形。**故正控只用固定 9 名子集，不用全包 FAIL 数。**
 
-***一处环境坑，登记给下一条腿**：本机若把 `TEMP`/`TMP` 清空（"清 `GOTMPDIR TMPDIR TEMP TMP`"那条按字面执行），
+**一处环境坑，登记给下一条腿**：本机若把 `TEMP`/`TMP` 清空（"清 `GOTMPDIR TMPDIR TEMP TMP`"那条按字面执行），
 Windows 上 `os.TempDir()` 返回**空串**，`t.TempDir()` 因此给出 `\TestXxx...` 这种**没有盘符**的路径，
 `filepath.IsAbs` 判否 => 固定 9 名子集里 4 枚假红（`TestAttributionFaceNeverSees...`／
 `TestAC1DriveRelative...`／`TestAC1SeamVouches...`／`TestAC1SealLands...`），与本票无关。
