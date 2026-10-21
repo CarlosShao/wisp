@@ -111,15 +111,10 @@ R2-only：注意：这条路径现在读不到，它不在你被授权的目录�
 ## 7. 提交号 / 逐枚 `.go` / 越界枚数 / 正控尺
 
 - 本腿落件：**只** `docs/evidence/s1/356-a1-census.md`（本件）。逐枚 `.go` = **0**；越界枚数 = **0**。
-- 提交：**笔次不手写计数**（手写会自我指涉：补一笔就多一笔，且每笔都会把上一笔写的数变陈旧）。可复量的定义：
-  `git log --oneline 40fddae0^..HEAD -- docs/evidence/s1/356-a1-census.md` 打出来的每一笔，其主题都以「票 356 普查腿 356-a1」开头，`--name-only` 都只列本文件一枚。
-  该命令在落件时刻读出（供交叉核）：
-  - **`40fddae0`** —— 本件初版 `1 file changed, 115 insertions(+)`。
-  - **`d1493a9b`** —— 回填笔一提交号 `1 insertion(+), 1 deletion(-)`。
-  - **`4420cfa1`** —— 第 3 行补三个 HEAD、门禁表补复跑读数 `2 insertions(+), 2 deletions(-)`。
-  - **`833d9b32`** —— 第 7 节提交清单 `5 insertions(+), 1 deletion(-)`。
-  - **`f32fa0f4`** —— 第 7 节改成可复量口径 `7 insertions(+), 2 deletions(-)`。
-  - 列到 `f32fa0f4` 为止是**有意的下界**：在它之后落的每一笔（含把本行写下的这一笔）都由上面那条 `git log` 命令列出，不在本文里点名，以免再次自我过期。
+- 提交：**首笔（承重那笔）＝ `40fddae0`**，`1 file changed, 115 insertions(+)`，`A docs/evidence/s1/356-a1-census.md`。之后每一笔都是对同一文件同一路径的校字笔（本件把"读一次就写死"的口径逐处收掉的过程都留在主题里）。
+  权威名册不是本文手写的列表，而是这条可复量命令的输出（**笔次不在此写死**，否则每补一笔就自我过期）：
+  `git log --oneline 40fddae0^..HEAD -- docs/evidence/s1/356-a1-census.md`
+  ——每一笔的主题都以「票 356 普查腿 356-a1」开头，`--name-only` 都只列本文件一枚，逐笔 `.go` 都是 0。
 - 每一笔的 `git add` 与 `git commit` 两处都带**显式 pathspec** `-- docs/evidence/s1/356-a1-census.md`；全程无 `add -A`、无 `add .`、无 amend/reset/rebase/stash/checkout/clean。
 - 逐笔 `.go` = **0**、越界 = **0**（`logs/50-writeface-final.log` 对本腿每一笔逐笔打一遍，每一笔都是 `files touched = 1 / .go files = 0 / IN RANGE = 1 / OUT OF RANGE = 0`；正控在同一文件每一轮都打 `a8eb0d51` 读回 `.go = 2`、`OUT OF RANGE = 2`）。
 - 正控尺（证明「数 `.go` 的尺」不是恒 0）：同一把 `sh/50-writeface.sh` 打 `a8eb0d51`（`174-r1`）读回 `.go = 2`、`IN RANGE = 0`、`OUT OF RANGE = 2`，尺会红。
