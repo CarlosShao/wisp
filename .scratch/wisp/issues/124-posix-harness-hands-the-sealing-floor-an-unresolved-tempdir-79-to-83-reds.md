@@ -339,3 +339,23 @@ tools 的回收站那枚、approval 的无门拒 L1、llm 的 `RefusesSilentRuns
 - [2026-10-21 14:3x +08] agent=`编排者` did=**登两枚 POSIX-only 摇摆进"已知摇摆"账**（裁腿 `124-v1` 具名要求，我核过它的 `-count=20` 四台读数）next=⛔ 修（不是本票那族）、⛔ 计入任何 124 出口判据。
   - `TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent`／`TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed`（两者均住 `internal/config`；失败断言**只有** `mtime did not move` 一条，字节断言 0 命中）。
   - ★**同登一条一般事实**＝`internal/config` 整包**普通形**的顶层 FAIL 数在 **0..2** 之间**非确定**（8 发：`0×3／1×4／2×?`，从未冒出第三名）⇒ 谁报"该包 0 红"都要给**名册**、⛔ 只报枚数。
+
+- [2026-10-21 18:0x +08] agent=`编排者` did=**收 `124-r2`（批 2：`internal/tools`）＝三笔 `99f1f9c7`／`d055326e`／`c832ac3f`，`38 => 3` 成立** next=批 3（`cmd/wisp`，按容器档 **68** 立账）待派；三条请示已裁（见下）。
+  - **三把尺（我现跑）**：`99f1f9c7` 15 件／`.go` **15**／`numstat +28 −28`；`d055326e` 3 件／`.go` 0；`c832ac3f` 4 件／`.go` 0。
+    四份件 **126／130／154／49 行**全在 160 帽内、末字节 `0a`、被禁码位 **0**。
+    ★**删除侧 28 行我逐行看**＝全是"根路径怎么来"那一个表达式（`dir := t.TempDir()`／`cfgPath := filepath.Join(t.TempDir(), …)`／`outside := tempCanonical(t)`／`ArtifactsDir: …t.TempDir()…`），
+    断言／阈值／golden／`t.Skip`／判定分支 **0 hunk** ⇒ 合 `AC#3`。
+    ★**两枚 helper 没碰**（`git show --numstat` 非测试件为空）⇒ 零新增走法、`R-125-2` 副本账不增行。
+    门禁我自己现跑：`go test ./internal/tools/` **rc=0**（`ok … 21.063s`）／`vet rc=0`／`d22scan rc=0`。
+  - ★**它补齐了上一批被记的那条缺陷**：还原时 **`sha256` 三处逐字相同**（提交版／还原台／`git show HEAD:` blob：`3d949a47…`／`9c4b7381…`）＋`diff -rq post3 restored3` rc=0 ⇒ 我在 `A1093`② 记的"只做到一半"**本批补齐**。
+  - **三条请示的裁决（按 `AGENTS.md` ⓪⓪⓪ 铁律）**：
+    (1) **"本包软链形红名到不了 0、只能到 3"** ⇒ **成立，⛔ 判它缺陷**。那三枚（`TestL1Write…`／`TestLateVeto…`／`TestFSReadOnlyNeverOpensACard`）住在 `wiring_test.go`（我现跑确认 `:112`／`:182`／`:291`），
+        本腿**零 hunk**、且按账**豁免归票 123** ⇒ 出口判据按 **`38 => 3`、且那 3 名逐名等于豁免三枚** 成立（⛔ 硬要 0）。
+    (2) **"变异连带 24 名（62 而非 38）"** ⇒ **采它，⛔ 要求"只翻本腿那 35 名"**。理由：两批用的是**同一族 helper**，摘掉必然一起红；要求"只翻 35"等于要求**变异**逐条区分"谁转的"，
+        而**变异的设计目的恰恰是"证明这一族覆盖还在"**——62 名里有 38 名**逐名回归**（`comm -23` 0 行）＋24 名同族连带，这正是**更强的**读数。
+        ★定式：**变异红名 = 本批目标名（逐名全部回归）＋ 同族连带名**；判据是**前者必须全覆盖**、后者**只许增不许减**，⛔ 用"总数相等"。
+    (3) **"本腿不新写用例"** ⇒ **准**。写面只许已有 helper、且本包不存在"能把软链形失败复现成绿"的新用例形状 ⇒ **35 枚既有用例 ＋ 变异逐名回归**＝合格的反向判据；
+        ⛔ 为了凑"新写一枚"去解写面限制（那是为形式而扩面）。
+  - ★**两处自纠我收下**（⛔ 当无事）：①第一版转换器用 Python 写文件带入 **CRLF**（`.gitattributes` 要求 `*.go text eol=lf`），它按字节还原为 LF、`gofmt -l` 才归 0；
+    ②中途摘掉 `ticket175r2_stamp_live_test.go:143` 一处（那处两形都 PASS、不满足"今天响"），按名登记为"有意不改"——**处置对**。
+
