@@ -99,7 +99,22 @@ cmd\wisp\run.go:1323:42: rep.HistoryChanged undefined (type agent.CompressionRep
 
 ---
 
-## 6. 未覆盖／未假设
+## 6. 提交账（逐枚 `git show --name-only`；含正控）
+
+| 提交 | 主题 | 件数 | `.go` 枚 | 越界枚 |
+|---|---|---|---|---|
+| `b676092d` | `票 355 落地腿 355-r1 笔(1)=压缩痕三味出产码口（H3 收尾摘要行）+ CompressionReport 只读字段` | 5 | **3**（`cmd/wisp/run.go`、`internal/agent/compress.go`、`cmd/wisp/compression_trace_355_test.go`） | **0** |
+
+- 逐枚 `git show --name-only b676092d` 原件：`cmd/wisp/compression_trace_355_test.go`、`cmd/wisp/run.go`、
+  `docs/evidence/s1/355-r1-impl-part2.md`、`docs/evidence/s1/355-r1-impl.md`、`internal/agent/compress.go`。
+- 越界判据＝白名单五枚之外的件数；读数 **0**。自门：`git ls-tree -r HEAD | grep compression_trace_355_test.go`
+  => `100644 blob 980c634b690e3edc100d851e2243192da6ecf388`（件真在盘上、真在树里）。
+- **正控（同尺打一笔含 `.go` 的真提交，证明尺不是恒 0）**：`d32b459c` => `.go` **4 枚**；
+  同尺打 `abd09226`（纯交件）=> `.go` **0 枚**（能分辨）。故 `.go` 枚数这把尺**两向都可读**。
+
+---
+
+## 7. 未覆盖／未假设
 
 - `Q-312`（`KeepRawRounds`／`Need()` 预算契约＝"常见路径走不到压缩"）**零触碰**，只按票面如实答"这一形没有痕"。
 - H6（诊断包）**未接线**：今天零产码调用者，接线＝新增 CLI 动词/出口，超出"把已有的痕变成可答"。**已知残余**，NOT 假装已解。
