@@ -1,0 +1,57 @@
+【派单·票 124 终裁腿 124-v1】非实现者裁腿·2026-10-21 14:2x +08 编排者
+
+■ 身份
+非实现者裁腿（裁决者不等于实现者）。不许落任何 `.go` 字节、不许翻任何框、不许改票名/`Status:`/`-done`/台账、不许 push。
+票面＝`.scratch/wisp/issues/124-posix-harness-hands-the-sealing-floor-an-unresolved-temp-root.md`（先通读，六格逐格看）。
+被裁对象＝实现腿 `124-r1` **本轮**（码 `d32b459c`、件 `abd09226`）。
+★注意名册尺：本票实现腿的历史主题前缀是 `票 124 落地腿 124-r1`（已现量命中，含我自己的派单存档）
+——**前缀必须你从盘上现量取、不许凭印象写**（这条是我上一轮犯过的错，别继承）。
+
+■ 你要裁什么（四条）
+1) **本轮 6 处递根点是否真接上票 119 那条纪律**（OS 答案先过 `proc.SealableRoot` 再递给密封底线），
+   且**零新增走法**（复用本包既有的一行委托 `sealableTempDir124`，定义在 `tempdir_resolved_124_test.go:31-34`）。
+2) **批 1 出口是否达成**：`internal/config` 一包「软链形 only-in-link 红名 = 0」且「普通形一枚没多红」。
+   它自报：PRE-LINK `186/150/35/1`（mech=35）=> MUT-LINK `186/143/42/1`（mech=41）
+   => RESTORED-LINK `194/191/2/1`（mech=0）=> POST-LINK `194/192/1/1`（mech=0）；
+   普通形 `196/194/2/0` => `196/196/0/0`；only-in-link **33 => 0**、新增红 **0**。
+   ⇒ **你自己跑**（或至少独立复算名册差集），不许采信这几个数。
+3) **`AC#3`（不许把放行侧放宽换绿）**：核票 113/119 那两族**拒绝**用例一枚都没变成通过方式、判定分支未动。
+   它自报「删除侧全是 `t.TempDir()` 那一个表达式、新增侧除同名替换只有 4 行注释」⇒ 你**逐行核**。
+4) **那 2 枚残余红是否真是既有、非本腿引入**：`TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent` /
+   `TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed`。
+   它自报在**改前普通形**就红（PRE-PLAIN FAIL=2 正是这两名），且第二枚在纯净 HEAD 快照上 `-count=5`
+   量到**摇摆**（2 PASS / 3 FAIL）＝既有 flake。⇒ 你独立复量这个摇摆。
+   ★第二枚在台账里 **0 命中**（未登记）⇒ 若摇摆成立，你要判「是否需登进台账」并写进判语。
+
+■ 必判清单（每项另起尺、不许采信任何腿自报）
+1) **票面前提新鲜度**（硬闸）：票面里每条可判定断言对 **HEAD blob** 复量（不许对工作树、不许凭自述）。
+   ★已知腐坏：派单曾用「`winsec.` 与 `TempDir` 同行」那把尺，今天**恒等于已修态**（20 处全是已转换形态）
+   ——你要**独立确认**这一点，并判「`AC#2b` 的票面判据今天该按什么量」。
+2) **写面与纪律**：逐笔 `git show --name-only` 判 `.go` 枚数与越界（射程＝`internal/config/**` 的 `*_test.go` 与它自己的证据件）；
+   正控＝同尺打一笔**含 `.go`** 的真提交。
+3) **逐行核 `d32b459c` 的删除侧与新增侧**（判「判定分支未动」）。
+4) **三读数（变异红／还原绿／原样绿）的可信度**：判它的变异是否真落地（`grep -n` 原文 ＋ `go build` rc=0）、
+   是否逐发单独还原并核 sha 回 HEAD。★它自报「第一发 `go vet` rc=1 是 unused import 的编译错、不是行为读数」
+   ——你要判这个处置对不对。
+5) **门禁复跑**（你自己现跑、不许抄）：`GOFLAGS= go build ./...`／`go vet ./internal/config/`／
+   `go test -count=1 ./internal/config/`（四数分开报、不许相减）／`sh scripts/d22scan.sh`／
+   `sh scripts/check-path-length-budget.sh`，各 rc 与末行逐字。跑前 `unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`。
+6) **红名册逐名**（不许只报枚数），新增红必须 **0**；有就逐名判归属。
+7) ★交回时给我一份**批 2／批 3 可行性读数**：`internal/tools`（38 枚/16 文件）与 `cmd/wisp`（37 枚/13 文件）的
+   文件级逐名清单是否齐全、`cmd/wisp` 作为**共享编译面**能不能与 `tools` 同批（按 AGENTS.md 每波只许一枚写腿）。
+
+■ 纪律（硬）
+写面**只许**：`docs/evidence/s1/124-v1-verdict.md`（不超过 160 行，过帽拆 `-partN`）与 `D:\tmp\wisp\20261021\124v1\**`（仓外）。
+不许改 `internal/**`、`cmd/**`、`scripts/**`、`.github/**`、`.scratch/wisp/**`、`docs/reports/**`、`docs/PLAN.md`、`docs/specs/**`。
+只 commit **不许 push**；`add`/`commit` 两处显式 pathspec；不许 `add -A`/`.`/目录形；不许 amend/reset/rebase/stash/checkout ./clean。
+主题**逐字**以 `票 124 终裁腿 124-v1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+提交正文与交付件**不许含被禁码位**（U+00A7／U+2713／U+2264／U+2260／U+2192／U+21D2／U+26D4／emoji／带圈数字）=> 写 `sec N`/`=> `/`NOT`/`(1)`。
+临时件只建不删；不许 `.out`；不许共享树建 worktree/checkout；不许 `-overlay`。
+
+■ 交件（缺一算未交）
+`docs/evidence/s1/124-v1-verdict.md`：一、七项逐项判语与读数（每项另起尺）；
+二、逐格结论（`AC#2b` 能不能翻、`AC#2`/`AC#3`/`AC#4` 各能不能翻、缺什么）；
+三、那 2 枚残余红的独立复量与「要不要登台账」的判；四、门禁 rc 与末行逐字；五、红名册逐名；
+六、批 2／批 3 可行性读数；七、建议编排者翻哪几格（不许你自己翻）；八、提交号与逐枚 `.go`/越界与正控。
+
+■ 未定义即停：方案没覆盖 => 停手上报，不许自行假设。
