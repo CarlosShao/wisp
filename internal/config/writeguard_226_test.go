@@ -358,7 +358,7 @@ func TestAddAllowedDirStillRefusesARelativeHop(t *testing.T) {
 // The other pinned safety behaviour: a failed write cannot leave memory holding
 // what the file does not.
 func TestGuardedWriteFailureRollsBackMemory(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 	if err := os.WriteFile(path, []byte(matrixBase), 0o600); err != nil {
 		t.Fatal(err)

@@ -17,7 +17,11 @@ import (
 // content and sleeps a tick so mtime/size polling sees the change.
 func newTestManager(t *testing.T, initial string) (*Manager, string, func(string)) {
 	t.Helper()
-	dir := t.TempDir()
+	// Ticket 124: SaveFile seals the directory it writes into, so the root is the
+	// OS answer run through proc.SealableRoot before it reaches the floor (see
+	// tempdir_resolved_124_test.go). Handing the harness's own spelling straight
+	// to SaveFile refused the write before a single assertion ran.
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 	if err := os.WriteFile(path, []byte(initial), 0o600); err != nil {
 		t.Fatal(err)
@@ -277,7 +281,7 @@ func TestManagerLoadErrorKeepsCurrentConfig(t *testing.T) {
 }
 
 func TestManagerMissingFileKeepsCurrentAndErrors(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 	_ = os.WriteFile(path, []byte(matrixBase), 0o600)
 	m, err := NewManager(path, nil)

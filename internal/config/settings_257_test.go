@@ -99,7 +99,7 @@ func writableRosterWalk() []settingsField {
 // every production NewManager call passes - ledger A560).
 func cleanMachineManager(t *testing.T) (*Manager, string, string) {
 	t.Helper()
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 
 	if _, err := os.Stat(path); !errors.Is(err, fs.ErrNotExist) {
@@ -187,7 +187,7 @@ func TestTicket257R1AC1CleanMachineRefusesAllSevenFields(t *testing.T) {
 // (c) says they are added, unlock all seven. This is the difference between an
 // honest refusal and a dead end.
 func TestTicket257R1AC1HandAddedRowsUnlockAllSevenFields(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 	if err := SaveFile(path, NewDefaults()); err != nil {
 		t.Fatalf("first-run SaveFile: %v", err)
@@ -274,7 +274,7 @@ enabled = true
 
 // AC#2 reason 1: no config.toml. Planted by asking for none.
 func TestTicket257R1AC2MissingFileIsItsOwnSentence(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "config.toml")
+	path := filepath.Join(sealableTempDir124(t), "config.toml")
 	_, err := NewManager(path, nil)
 	if err == nil {
 		t.Fatal("NewManager succeeded with no file")
@@ -319,7 +319,7 @@ func TestTicket257R1AC2MissingRowIsItsOwnSentence(t *testing.T) {
 
 	// A row that exists but carries no such model is still reason 2, and the pin
 	// ticket 261 put on this sentence keeps its wording.
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 	if err := os.WriteFile(path, []byte(settingsBase), 0o600); err != nil {
 		t.Fatal(err)
@@ -343,7 +343,7 @@ func TestTicket257R1AC2MissingRowIsItsOwnSentence(t *testing.T) {
 // reason 2 - this proves its reason-3 branch is still reachable when the provider
 // really is named.
 func TestTicket257R1AC2InvalidValueIsItsOwnSentence(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 	if err := os.WriteFile(path, []byte(settingsBase), 0o600); err != nil {
 		t.Fatal(err)
