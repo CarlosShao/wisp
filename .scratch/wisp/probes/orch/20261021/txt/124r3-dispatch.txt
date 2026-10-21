@@ -1,0 +1,60 @@
+【派单·票 124 落地腿 124-r3（批 3：`cmd/wisp`）】写腿·2026-10-21 18:0x +08 编排者
+★**本派单已存档但尚未发出**——等 `358-r1` 续跑实例收线后放（`cmd/wisp` 是共享编译面、每波只许一枚写腿）。
+
+■ 身份
+写腿（实现者）。⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`／台账。票面＝`.scratch/wisp/issues/124-posix-harness-hands-the-sealing-floor-an-unresolved-temp-root.md`。
+
+■ 一句话目标（批 3，最后一批）
+把 `cmd/wisp` 里"**该转还没转**"的用例侧递根点接上票 119 纪律（OS 答案先过 `proc.SealableRoot` 再递密封底线）。
+按非实现者裁腿 `124-v1` 现量的分母：**37 枚 / 13 文件**（★它同时量到 `cmd/wisp` 两形都红 **顶层 68 + 子 9**，**不是**台账旧记的 28——见下"分母"）。
+
+■ ★分母必须先搞清（⛔ 抄任何一个数）
+- 裁腿 `124-v1` 量到：`internal/tools` 那批是 38 名；`cmd/wisp` **37 名 / 13 文件**（only-in-link）。
+- ★但它同时量到 `cmd/wisp` **两形都红＝顶层 68 + 子 9**，失败串几乎全是 **`secret: DPAPI is only available on Windows`**（`internal/secret/protect_other.go:19`）——
+  ★那文件带 **`//go:build !windows`**（我核过）⇒ 那些红是**容器（Linux）档才有、宿主 Windows 档不红**，且与票 124 那族**无因果**。
+- ⇒ **你自己的分母必须两把分开报**：①**only-in-link（票 124 那族）**＝你要清到 0 的那批；②**两形都红（DPAPI 那族）**＝⛔ 你修、⛔ 计入你的出口判据，但**必须具名登记**（否则包级 rc 会被读成破口）。
+- ★⛔ 用"`winsec.` 与 `TempDir` 同行"那把**静态尺**当分母（今天已饱和、恒 20）；⛔ 用枚数相等当出口判据（只认**名册集合**）。
+
+■ 写面天花板（越界＝作废）
+- 允许：`cmd/wisp/**` 的 `*_test.go` ＋ 该包**已有**的 sealable-tempdir helper（没有就不许新写走法 ⇒ 停手上报）。
+- ⛔ 改 `cmd/wisp` 的**生产码**（要改 ⇒ 停手上报）；⛔ `internal/{agent,tools,config,winsec,proc,risk}/**`、`tools/d22scan/**`、`allowlist.txt`、`thresholds.go`、任何 golden、
+  `go.mod`/`go.sum`/`.gitignore`/`.github/**`、`frontend/**`、`design/**`、`docs/PLAN.md`、`docs/specs/**`、`docs/reports/**`。
+- ★**本波唯一碰 `cmd/wisp` 的写腿**（共享编译面）⇒ 你要动别的包就停手上报。
+- ★**不许把放行侧放宽换绿**（票面 `AC#3`）：票 113/119 那两族**拒绝**用例一枚都不许变成通过方式；贴 `git diff` 证判定分支未动。
+
+■ 开工前（⛔ 跳步＝空跑作废）
+1) `git status --porcelain`：`cmd/wisp/**` 有**别人的**未提交改动 ⇒ 停手上报（票 355／358 的腿可能还在动）。
+2) ★**票面前提新鲜度**：票面每条可现跑断言逐条现跑。
+3) 独立复跑你的分母（两把分开报，见上）。
+
+■ 做法（硬）
+- 台面与票面 `AC#2b` 同：纯净快照 `git archive HEAD`、`golang:1.27`、每形一枚新容器、软链形 `ln -s /realpriv /varlink` ＋ `TMPDIR=/varlink/w124tmp` ＋ `exit 97/98` 断言。
+- **出口判据＝名册集合**：`only-in-link` 里**票 124 那族**清到 **0**（或只剩**具名豁免**）；**新增红 0**（名册 `comm`，⛔ 枚数相等）。
+- 每处改动配**一枚今天响、不修不响**的用例；★反向判据＝把新加那层解析摘掉 ⇒ 用例必须转红并**逐名报红行**；先证落地（`grep -n` ＋ `go build` rc=0）再读数。
+  ★**变异红名的判据（本仓已定式）**＝"**本批目标名逐名全部回归** ＋ **同族连带名只许增不许减**"，⛔ 用总数相等。
+- ★**三读数**（变异红／还原绿／原样绿）逐字贴 ＋ **还原核 `sha256`**（三处逐字相同：提交版／还原台／`git show HEAD:` blob——批 2 已把这个做成合格样本，照它做）。
+- ⛔ 恒真判据、⛔ `t.Skip`、⛔ 放宽既有断言、⛔ 为了让门禁绿改既有测试。
+
+■ 环境（照做，否则读数不可信）
+`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；`cmd/wisp` 要 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`；
+⛔ `CGO_ENABLED=0`（本仓必然编不过，sherpa 全文件被 build constraint 排除，那不是缺陷）；
+★`cmd/wisp` 整包**必抬 `-timeout 30m`**（`A1079`）；
+★★**`cmd/wisp` 整包 `rc=1` 今天不能当判据**（`A1100`）：那包有**既有真窗族红**＋**进程级截断**（每发恰 1 枚 RUN 无判决行、且每次落在不同面板用例、死点 277-343s）。
+  ⇒ 只能"**按名作差** ＋ **逐发登记死点**"，⛔ 把既有红算你头上。
+★`gofumpt` 用**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（裸名 rc=127，⛔ 据此判"本机没有"）。
+★`.gitattributes` 要求 `*.go text eol=lf` ⇒ 你用脚本改文件时**⛔ 带入 CRLF**（批 2 曾踩、已登）。
+
+■ Git 纪律
+只 commit **⛔ push**；`add`/`commit` 两处显式 pathspec；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+★涉新文件：提交后跑 `git ls-tree -r --name-only HEAD | grep -c '<新件名>'` == 1。
+主题**逐字**以 `票 124 落地腿 124-r3` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★提交正文与交付件 **⛔ 被禁码位**（`§`/`✓`/`≤`/`≠`/`→`/`⇒`/`⛔`/emoji/带圈数字）⇒ 写 `sec N`／`=> `／`NOT`／`(1)`；提交前自己扫一遍。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261021\124r3\**`；⛔ `.out`。
+
+■ 交件（缺一算未交）
+1) `docs/evidence/s1/124-r3-impl.md`（**≤160 行**，过帽拆 `-partN`）：两把分母分开报（票 124 族／DPAPI 族）／13 枚文件逐枚"原来交了什么、现在过哪一跳"／两形名册 `comm` 差集／新用例逐名／三读数逐字＋sha256 三处相同／门禁 rc。
+2) 门禁你自己现跑贴末行：`GOFLAGS= go build ./...`；`go vet ./cmd/wisp/`；`go test -count=1 ./cmd/wisp/` 与 `-timeout 30m` 两发（★按名作差、逐发登记死点）；`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh`。
+3) 红名册**逐名**，新增红必须 **0**；豁免/既有红逐名列出并注明归属（票 123／真窗族／DPAPI 族）。
+4) 提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界枚数（正控＝同尺打一笔**含 `.go`** 的真提交）。
+
+■ 未定义即停：方案没覆盖 ⇒ **停手上报**，⛔ 自行假设。
