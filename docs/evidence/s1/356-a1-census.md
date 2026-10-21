@@ -1,7 +1,7 @@
 # 票 356 普查腿 356-a1 — R3 A 档下 `task.output` 的 notice 对 `fs.read` 的实际行为（只读成对读数）
 
 - 角色：**只读腿**（`AC#0`）。未翻任何格、未改票名/`Status:`/台账、未落任何 `.go` 字节进仓、未 push。
-- 起手 `HEAD=a8f5ad0a`；跑门禁时 `HEAD=c0c8aaa9`；落件后 `HEAD=d1493a9b`（本腿两笔）。期间编排者插了 `c8da185f`（只动 `docs/reports/**`）。`git diff --stat a8f5ad0a..HEAD -- internal/ cmd/ scripts/ tools/ .github/` 输出 **0 行**（代码面从起手到现在零字节变动），六枚生产件 md5 HEAD 对工作树逐枚 `same=yes`（见第 5 节）。分支 `dev`。
+- 起手 `HEAD=a8f5ad0a`；跑门禁时 `HEAD=c0c8aaa9`；落件之后本腿每一笔都记在第 7 节（**不在此处写死终态 HEAD**，那会随每一笔自我过期）。期间编排者插了 `c8da185f`（只动 `docs/reports/**`）。`git diff --stat a8f5ad0a..HEAD -- internal/ cmd/ scripts/ tools/ .github/` 输出 **0 行**（代码面从起手到现在零字节变动），六枚生产件 md5 HEAD 对工作树逐枚 `same=yes`（见第 5 节）。分支 `dev`。
 - 尺册：`D:\tmp\wisp\20261021\356a1\sh\*.sh`（10/11/20/21/30/31/40/50 八枚）；读数 `logs/`；探针**只**写在 `D:\tmp\wisp\20261021\356a1\copy\`（`git archive HEAD` 导出的仓外私有副本，**无 `.git`**），两枚 `zzz_356a1_*_test.go`。共享树 `git status --porcelain -- internal/ cmd/ scripts/ tools/ .github/` 起手与终态皆 **0 行**。
 
 ## 1. 票面前提新鲜度（逐条；未采信 `174-v1` 任何数）
@@ -108,17 +108,18 @@ R2-only：注意：这条路径现在读不到，它不在你被授权的目录�
 ## 7. 提交号 / 逐枚 `.go` / 越界枚数 / 正控尺
 
 - 本腿落件：**只** `docs/evidence/s1/356-a1-census.md`（本件）。逐枚 `.go` = **0**；越界枚数 = **0**。
-- 提交：**笔次不手写计数**（手写会自我指涉：补一笔就多一笔）。可复量的定义＝
-  `git log --oneline 40fddae0^..HEAD -- docs/evidence/s1/356-a1-census.md` 打出来的每一笔，
-  其主题都以「票 356 普查腿 356-a1」开头。已落盘的前四笔：
-  - 笔一 **`40fddae0`**：本件初版，`1 file changed, 115 insertions(+)`。
-  - 笔二 **`d1493a9b`**：把笔一的提交号回填进本行（`1 insertion(+), 1 deletion(-)`）。
-  - 笔三 **`4420cfa1`**：第 3 行补齐三个 HEAD 与「代码面 `git diff --stat a8f5ad0a..HEAD` 输出 0 行」，门禁表补落件后复跑读数（`2 insertions(+), 2 deletions(-)`）。
-  - 笔四 **`833d9b32`**：第 7 节提交清单补齐三笔（`5 insertions(+), 1 deletion(-)`）。
-  - 本笔（笔五）把上面的「三笔」改成可复量的口径，不写死枚数。
+- 提交：**笔次不手写计数**（手写会自我指涉：补一笔就多一笔，且每笔都会把上一笔写的数变陈旧）。可复量的定义：
+  `git log --oneline 40fddae0^..HEAD -- docs/evidence/s1/356-a1-census.md` 打出来的每一笔，其主题都以「票 356 普查腿 356-a1」开头，`--name-only` 都只列本文件一枚。
+  该命令在落件时刻读出（供交叉核）：
+  - **`40fddae0`** —— 本件初版 `1 file changed, 115 insertions(+)`。
+  - **`d1493a9b`** —— 回填笔一提交号 `1 insertion(+), 1 deletion(-)`。
+  - **`4420cfa1`** —— 第 3 行补三个 HEAD、门禁表补复跑读数 `2 insertions(+), 2 deletions(-)`。
+  - **`833d9b32`** —— 第 7 节提交清单 `5 insertions(+), 1 deletion(-)`。
+  - **`f32fa0f4`** —— 第 7 节改成可复量口径 `7 insertions(+), 2 deletions(-)`。
+  - 列到 `f32fa0f4` 为止是**有意的下界**：在它之后落的每一笔（含把本行写下的这一笔）都由上面那条 `git log` 命令列出，不在本文里点名，以免再次自我过期。
 - 每一笔的 `git add` 与 `git commit` 两处都带**显式 pathspec** `-- docs/evidence/s1/356-a1-census.md`；全程无 `add -A`、无 `add .`、无 amend/reset/rebase/stash/checkout/clean。
-- 每一笔逐枚 `.go` = **0**、越界 = **0**（`logs/50-writeface-all.log` 打前三笔；正控在同一文件每一轮都打 `a8eb0d51` 读回 `.go = 2`、`OUT OF RANGE = 2`）。
+- 逐笔 `.go` = **0**、越界 = **0**（`logs/50-writeface-all.log` 打前三笔，正控在同一文件每一轮都打 `a8eb0d51` 读回 `.go = 2`、`OUT OF RANGE = 2`；后续各笔只改本文件一行到几行，路径集不变）。
 - 正控尺（证明「数 `.go` 的尺」不是恒 0）：同一把 `sh/50-writeface.sh` 打 `a8eb0d51`（`174-r1`）读回 `.go = 2`、`IN RANGE = 0`、`OUT OF RANGE = 2`，尺会红。
-- 落件之外的写面：`D:\tmp\wisp\20261021\356a1\**`（`sh/` 八枚、`logs/` 九枚、`copy/` 一份 HEAD 导出加两枚探针测试件）。临时件**只建不删**；无 `.out` 后缀、无 `-overlay`。
+- 落件之外的写面：`D:\tmp\wisp\20261021\356a1\**`（`sh/` 八枚、`logs/` 十来枚、`copy/` 一份 HEAD 导出加两枚探针测试件、`commit-msg-*.txt`）。临时件**只建不删**；无 `.out` 后缀、无 `-overlay`。
 
 **本腿未做（具名边界）**：`-race` 未跑；`cmd/wisp` 端到端 `wisp run` 未跑；`gofumpt` 不在 PATH（票面「19 枚脏件」未复量）；`fs.list` 与写半边未量（不在 `AC#0` 射程）。
