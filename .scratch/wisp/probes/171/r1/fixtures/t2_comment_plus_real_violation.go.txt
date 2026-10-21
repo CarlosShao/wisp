@@ -1,0 +1,34 @@
+// Ticket 171 AC#1, shot T2 of the two-shot contrast: "trailing comment PLUS a real
+// violation" (派单: 一发注释＋真违规).
+//
+// WHY THIS SHAPE. Both halves sit in one file:
+//   (a) a REAL opening call to the open side, and
+//   (b) the closing side named only in a trailing comment.
+// A ruler that reads the comment as a call sees the pair as CLOSED and stays silent
+// about a leak that is really there. This is the dangerous direction of the same
+// hole: the comment buys the file an alibi.
+//
+// EXPECTED (same tree, only the ruler differs)
+//   unmodified ruler : NOT COUNTED (0 unpaired - the comment bought it a close) <- the hole
+//   fixed ruler      : COUNTED     (1 unpaired - the leak is finally named)     <- positive control
+//
+// WHY THERE IS NO OpenTask DEFINITION BELOW. The paired-census ruler drops lines that
+// start with "func " but the run() family does NOT, so a definition line would inflate
+// the run numerator with something that is not a call site. This file is never compiled
+// (it only ever lives in a throwaway tree that `git grep` reads), so the open side can
+// stay undeclared here - the shape probes/171/r3/fixtures/s3_fake_close_comment.go.txt
+// already uses for the same reason.
+//
+// Not part of any Go package: copied into a throwaway repository under $TMPDIR by
+// r1-two-shots.sh, never compiled here. gofumpt-clean on purpose.
+
+package fake171
+
+type router struct{}
+
+func startLeak(rt router, taskID string) error {
+	if err := rt.OpenTask(taskID); err != nil {
+		return err
+	}
+	return nil // and it is closed later, see CloseTask in the disposal hook
+}

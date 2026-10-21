@@ -1,0 +1,11 @@
+flip-declaration.sh: anchor f4d64fcc (the gate reads the COMMITTED tree at this anchor, never the working tree)
+== (0) baseline: committed declarations, untouched
+  FAIL  14 legs each say what it does -> rc=1 (want zero)
+   legs booked: 腿数＝14   mismatched: 声明与实测不符＝1
+== (stale) raise one baseline above its own measurement: rc must stay 0 AND a table must appear
+   the baseline line this run differs by:
+   < want_n 8
+   > want_n 9
+  FAIL  G5neg 基线 8->9（实测 8）still exits 0 (变好了不算言行不一) -> rc=1 (want zero)
+  ok    the stale baseline is its own readable table row: # STALE 腿=G5neg 声明=ring 基线=9枚 实测=9枚 差=0枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+

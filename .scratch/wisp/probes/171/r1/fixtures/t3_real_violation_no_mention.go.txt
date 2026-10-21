@@ -1,0 +1,27 @@
+// Ticket 171 AC#1, shot T3 - this leg's own control, not one of the dispatch's two shots.
+//
+// WHY IT EXISTS. The two-shot contrast says "T1 went from counted to not counted". On its
+// own that reading is ambiguous: a ruler that stopped seeing anything at all produces the
+// same "not counted". T3 closes that direction: a real opening call with NO mention of the
+// closing side anywhere - not in code, not in a comment - must be counted by BOTH rulers.
+// If T3 ever reads 0 on the fixed ruler, the fix blinded the ruler instead of sharpening it.
+//
+// EXPECTED
+//   unmodified ruler : COUNTED (1 unpaired)
+//   fixed ruler      : COUNTED (1 unpaired)   <- unchanged, by design
+//
+// Same "no definition, never compiled" shape as T2 (see that file's note).
+//
+// Not part of any Go package: copied into a throwaway repository under $TMPDIR by
+// r1-two-shots.sh, never compiled here. gofumpt-clean on purpose.
+
+package fake171
+
+type router struct{}
+
+func openOnly(rt router, taskID string) error {
+	if err := rt.OpenTask(taskID); err != nil {
+		return err
+	}
+	return nil
+}

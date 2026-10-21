@@ -1,0 +1,25 @@
+// Ticket 171 AC#1, shot T1 of the two-shot contrast: "word roots live ONLY in a
+// trailing comment" (派单: 一发只有同行注释).
+//
+// WHY THIS SHAPE. The open-side word root appears exactly once in the file, and it
+// sits at the END of a line of real code. No call to the open side exists anywhere.
+// A ruler that counts this line has read a MENTION as a CALL - it cannot tell the
+// trailing comment from code, which is precisely the hole AC#1 names.
+//
+// EXPECTED (measured by r1-two-shots.sh, same tree, only the ruler differs)
+//   unmodified ruler (drops whole-line comments only) : COUNTED     <- the hole
+//   fixed ruler      (drops the trailing comment too) : NOT COUNTED <- what AC#1 asks for
+//
+// Not part of any Go package: copied into a throwaway repository under $TMPDIR by
+// r1-two-shots.sh, never compiled here. gofumpt-clean on purpose.
+
+package fake171
+
+type taskConfig struct {
+	Name string
+}
+
+func mentionOnly(cfg taskConfig) error {
+	cfg.Name = "retention-job" // scheduled through OpenTask by the caller, never here
+	return nil
+}
