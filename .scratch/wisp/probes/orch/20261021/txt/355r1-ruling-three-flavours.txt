@@ -1,0 +1,46 @@
+【编排者裁决·票 355 落地腿 355-r1·关于"三味怎么变可答"的选型】2026-10-21 15:0x +08
+
+■ 你中途上报的两条事实我上盘核过、**都成立**
+1) `history_changed` **不是** `CompressionReport` 的字段——它只在 `internal/agent/compress.go:230` 那枚 slog 的 attrs 里现算
+   （`rep.TokensAfter != rep.TokensBefore || len(out) != len(hist)`，刻意不复用 `rep.Ran`）。我现读字段表确认：`CompressionReport` 只有
+   `Ran`／`CompressedMsgs`／`KeptRawRounds`／`PreservedIDs`／`RawIDsInsideSummary`／`TokensBefore`／`TokensAfter` **七枚，无此味**。
+   且 `cmd/wisp` 侧确实还原不出迭代次数 I ⇒ 单看 `Result.Compression` 只能答两味。**你说得对。**
+2) `cmd/wisp` 全包 **`Logger:` 0 处**（我 `git grep 'Logger:' HEAD -- cmd/wisp` 现量 **0**）⇒ 压缩机的记录走 `slog.Default()`。**你说得对。**
+
+■ ★裁决＝**走主 flow，⛔ 走 (2) 的 slog tap**
+**放开 `internal/agent/compress.go` 的写面**（只放开"加一枚只读字段 + 一处赋值"，见下红线）。
+**理由（按 `AGENTS.md` ⓪⓪⓪ 铁律，⛔ 按"守写面天花板"这种风险考虑）**：
+- **① 主流 harness 的返回对象带全量结构化读数，⛔ 从日志里反捞状态。** 你的 (2) 提案本质是**装一个 handler 去截留自己刚打出去的日志行**，
+  再把它当成 API 返回值用。这条路的技术债是**活的**：日志级别一变、handler 链一改、记录被采样/丢弃，读数就**静默变空**，
+  而调用方看不出"没有读数"和"读数真的是 0"的区别——**这正好是本仓反复咬人的那一类假绿**（`A1090` 那枚"仪器扫不到≠判它清白"同族）。
+- **② 价值差距是真的，不是口味。** 加一枚字段＝**一次声明 + 一处赋值**，三味从此**同源同 struct**；
+  slog tap ＝ **新引入一条隐式的、时序相关的耦合**（"最后一条记录"这种时间窗假设），而且它把 `cmd/wisp` 与 logging 实现绑死。
+- **③ "复杂"不加分也不减分**（铁律第 3 条）：这里加字段**比 slog tap 更简单**，所以两个方向都指向同一边。
+- **④ 派单写面天花板是我写的、我可以改**——它当初的目的是"别让票 355 回头重做票 139 已结案的痕产码面"，
+  ⛔ 是"不许给已结案的东西补一个只读字段"。本裁决**不解除**那条目的。
+
+■ 落笔形状（硬，⛔ 越界＝整批作废）
+- **允许动 `internal/agent/compress.go`，但只许两处**：
+  (a) `CompressionReport` 里**加一枚只读字段** `HistoryChanged bool`（跟着现有字段走，位置与注释自己安排）；
+  (b) 在 `:230` 那处**已在算**的那个表达式上，**把那枚值同时存进 `rep.HistoryChanged`**——
+       ★**⛔ 改那个表达式的判定语义**（它必须仍是 `rep.TokensAfter != rep.TokensBefore || len(out) != len(hist)`，一字不改），
+       ⛔ 改成复用 `rep.Ran`、⛔ 改 `Ran` 的现有含义。
+- **⛔ 动 `compress.go` 的其它任何东西**：⛔ 改 `Need()`、⛔ 改 `KeepRawRounds`、⛔ 改阈值、⛔ 改 fold 逻辑、⛔ 改那枚 slog 的既有 attrs。
+- **⛔ 动 `internal/agent` 的其它文件**（`loop.go`／`spill.go`／`types.go` 等一律零字节）。
+- 允许动 `cmd/wisp/**` 的收尾出口（`run.go:1221-1222` 一带）与 `docs/evidence/s1/355-r1-*.md`。
+- **⛔ 装 slog tap / handler 截留**（本裁决明确否决那条路）；⛔ 新增前端事件／`panel.*` 方法／JSON 键（`SPEC-08` 第 5.2 节白名单）。
+- ⛔ 碰 `Q-312` 那根链（`KeepRawRounds`／`Need()` 的契约面）。
+
+■ 牙（照派单，一个不少）
+1) **正向**：一枚用例证明"真压了历史"时三味都对（`tokens_before`／`tokens_after`／`history_changed`）；
+2) **反向**：把 (b) 那处赋值**摘掉** ⇒ 用例必须转红并逐名报红行；先证落地（`grep -n` ＋ `go build` rc=0）再读数；
+3) **还原**：单独还原并**核 `sha256` 回 HEAD blob**（★这一项上一批 `124-r1` 只做到一半、被我记了缺陷，本批必考）；
+4) 三读数（变异红／还原绿／原样绿）逐字贴。
+
+■ 已在盘的两条现场事实我收下
+- 你量到基线 `go test ./cmd/wisp/` 起手就 **rc=1**、红名册**恰一枚** `TestAC14GoSideEvalPushReachesThePage`（`panel_resident_windows_test.go:944/946`）⇒ 与本腿无关，按"新增红＝0"记账**对**。
+- 锚点 `ac2847d5 → 6633c45d` 只动 `docs/reports/pending-and-issues.md` 一枚、`cmd/`／`internal/` 零字节 ⇒ 不构成写面冲突，**读数不作废**。
+
+■ 如果你已经按 (2) 落了笔
+⇒ **⛔ 回退它**（⛔ 用 checkout／restore／reset；用 `git show HEAD:<path> > <path>` 或自行改正后重新提交），
+然后按本裁决的主 flow 重做。★这一条是本裁决对你唯一可能"浪费已做工作"的地方，我明写在这里，不让它变成事后争议。
