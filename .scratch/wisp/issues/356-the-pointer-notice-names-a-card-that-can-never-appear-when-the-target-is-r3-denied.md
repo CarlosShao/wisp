@@ -22,6 +22,14 @@
       必须**逐字**给：notice 原文（`announceOf`）、`fs.read` 的 `isError`／`level`／`class`／正文逐字、
       **`approval` 被问的次数（今天应为 0）**。★另起尺、⛔ 抄 `174-v1` 的数；★正控＝同一路径在 R2-only 形状下 approval＝1（证明尺分得清两种形状）。
 - [ ] **AC#1 改写口径（文案面）**：让回执能区分"只判到 L2（两条路都真）"与"被判 Deny（没有卡、批也无效）"。
+      ★**范围扩充（机主 2026-10-21 14:2x 拍「扩」）＝必须同时覆盖第三种形状：目标在 allowlist 内、但被判 Deny**
+      （`普查腿 356-a1` 现量——把 home 树整棵加进 `allowed_dirs` 后，`fs.read` 仍 `Deny [R3]`、
+      `approval` 被问 **0 次**，而 `task.output` **完全沉默、notice 0 字节**）。我复核过 `pointerNotice` 的分支结构：
+      它只有 ①判级者未接线 ②`err != nil` ③`!InAllowlist` ④`os.Stat` 失败 ⑤非普通文件——**没有任何一支处理"in-scope 但被判 Deny"**。
+      ⇒ 本格要求的三种形状＝**（i）只判到 L2**（两条路都真）／**（ii）被判 Deny 且在 allowlist 外**（没有卡、加目录也无效）／
+      **（iii）被判 Deny 但在 allowlist 内**（今天连"读不到"都不说）。
+      ★判据必须用 `refusalKindOf` 那一对值（`redteam-denied` ⇄ `out-of-allowlist`）**区分形状**，
+      ⛔ 用 `RiskLevel`（我复核过 `internal/tools/bridge.go:1379-1386` 的 `levelString` 把 `risk.Deny` 折进 `L2` 一列 ⇒ 分不出）。
       落点＝`internal/tools/task.go` 的 `pointerNotice`（或它的同级读取）；★改后必须使**两条腿仍逐字节同形**
       （`internal/agent/spill.go` 的同族回执），判据＝两腿 notice 区逐字节 `cmp` 相同（`174-r1` 量到 246=246，本票要保住这个性质）。
       ⛔ 只在**文案与判据**面动；⛔ 动 R3/R2 判级语义、⛔ 改 `PLAN.md`／`docs/specs/**`、⛔ 新增授权能力。
