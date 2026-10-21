@@ -20814,3 +20814,32 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
 **④ 三张我先手看过、判**⛔ 能立刻派**（登记，供 `pool-a1` 交叉）**：票 **293** `AC#5`（托盘勾选**真机肉眼**⇒ C 档）／票 **290** `AC#3`（**真机读数**两形⇒ C 档）／票 **216** `AC#5`（前端提示语分支⇒ `frontend/**` 是机主外部 agent 面⇒ C 档）。
 
 **⑤ 状态**＝结案 **14**、未结 178、在飞 **1**（`pool-a1` 只读）。未推 **326**、⛔ 推、⛔ 清理、⛔ 改契约。
+
+## A1110（2026-10-21 22:1x +08，编排者）★★`pool-a1` **死腿**（零提交零残留）｜★我改自己扫票池，查出**两处卡点**：票 321 `AC#2`／票 352 `AC#2` 都因**本机 autocrlf 假脏＋既知红**而 ⛔ 能翻
+
+**① `pool-a1` 死腿（`1e02ed2d`）＝没交件就挂了，零残留**
+- 我按 `issues/README` 规则先查遗产：`git log --since='90 minutes ago' | grep pool` ＝ **零提交**；`git status --porcelain | grep -iE 'pool-a1|triage'` ＝ **零件**；全仓 tracked 脏（除已知假脏）＝ **空** ⇒ **无遗产可代提**。
+- ★它其实**跑到 22:05**（`D:\tmp\wisp\20261021\poola1\` 里有 **33 支 `probes*.sh`** ＋ 5 份门禁日志），但**死在交件前**、没落任何可用产物 ⇒ **不采信其过程、不代提**。
+
+**② 我改自己扫（这活儿我有全套尺，不必再派腿）**
+- 尺：`tr -d '\r' < f | grep -c '^- \[ \]'`（★剥 CR 必须，否则 `grep -c` 输出脏、`[ -ge ]` 报 `integer expected`——我第一版就踩了）。
+- **57 张 1–2 格票**里，剩余格行文含「门禁｜分账｜契约轴｜逐条说明｜纪律格｜收口｜面核」的＝**13 张**（这类**本该我跑尺就能翻**、⛔ 派写腿）；其余 33 张要真读判据。
+- ★**逐张列 Status 时又踩一次 `sort`**：`sort -t= -k2` 遇中文报 `Invalid or incomplete multibyte` ⇒ **`export LC_ALL=C`** 才过。★两把尺的坑都进账。
+
+**③ ★★两处卡点（我实跑出来的，都 ⛔ 能翻）**
+- **票 321 `AC#2`（门禁＋面核，五把门）**：`go build` **0**／`go vet -tags winlive ./cmd/wisp/` **0**／`d22scan` **0**／长度门 **0**／★**`gofumpt` 列出 1 枚＝`cmd/wisp/models.go`**。
+  - 我查到底：该枚 **`hash-object == HEAD` ＝ YES（内容同串）**、**工作树 CR=334 / blob CR=0** ⇒ **本机 `core.autocrlf=true` 的假脏**（gofumpt 读工作树副本、CI 读 blob）。
+  - ⇒ **按 blob 判它是干净的**；但**票面字面要求"gofumpt 过"**，而本机跑必红 ⇒ ★**这是一个"本机永远跑不出绿"的格子**，⛔ 我能靠解释翻。
+  - ★**这与我昨天给 `298` 的判定同源**（票 298 `AC#5` 也是 gofumpt 残留 1 枚）⇒ **两张票卡在同一个本机环境事实上**。
+- **票 352 `AC#2`（五包成对色，新增红必须 0）**：`secret ok`／`config ok`／`memory ok`／**`panel` FAIL**。
+  - 我逐名抓 **5 枚**：`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestStreamLogFloodBelowKeyBoundIsNotBounded35r8`／`TestStreamLogDroppedNamingLedgerIsNotBounded35r8`／`TestComposerContractTypesMatchFrontend`／`TestC21DesignTokensFourWayAgree`。
+  - 台账命中 **21／3／3／23／38** 次 ⇒ **全是既知红**（票 321 那 7 枚之一族）。
+  - ⇒ 按"**新增红 0**"判**成立**（这 5 枚不是票 352 造的）；但★**票面要求"五包各自跑色"且 `panel` 今天不是绿的** ⇒ 字面读仍有红。
+
+**④ ★我判：这两格都不翻，登记为"卡在既知红／本机环境事实上"**
+- ⛔ 翻的理由（⛔ 拿"解释"当"绿"）：本仓规矩是"**不许为了变绿放宽任何断言**"，反过来"**不许拿解释替红**"同样成立。
+- ★**处置建议（⛔ 我自决：涉及"票面判据要不要改口径"）**：
+  - 票 321 `AC#2`：可考虑把 gofumpt 那把改成"**对入库 blob 跑**"（`git cat-file blob` 喂临时文件），那与本机 autocrlf 脱钩、且与 CI 读的东西一致 ⇒ 这是**判据口径改动**，我倾向按铁律自己拍，但**先记在这里**、下一轮跑通再说。
+  - 票 352 `AC#2`：`panel` 那 5 枚是**票 321 门前置**（面板契约类），得先清那族才谈得上"五包各自跑色"绿 ⇒ 属**等证据**档。
+
+**⑤ 状态**＝结案 **14**、未结 178、在飞 **0**（`pool-a1` 死）。未推 **326**、⛔ 推、⛔ 清理、⛔ 改契约。
