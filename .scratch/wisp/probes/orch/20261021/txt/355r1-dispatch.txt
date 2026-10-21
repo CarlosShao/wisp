@@ -1,0 +1,56 @@
+【派单·票 355 落地腿 355-r1】写腿·2026-10-21 14:3x +08 编排者
+
+■ 身份
+写腿（实现者）。裁决者不等于实现者：不许给自己的活出终裁、不许翻任何框、不许改票名/`Status:`/`-done`。
+票面＝`.scratch/wisp/issues/355-the-compression-trace-reaches-disk-but-nothing-in-production-ever-reads-it.md`（先通读）。
+★**普查腿 `355-a1` 的三把尺读数已入库**：`docs/evidence/s1/355-a1-census.md` ＋ `-part2.md`（你**必须先读**，但**不许采信**它的数——凡你要用的数都自己复跑）。
+
+■ 一句话目标
+把"压缩痕"从"只在日志里、没人读"变成"**生产侧答得出**"：让 `tokens_before` ／ `tokens_after` ／ `history_changed` 三味
+出现在一条**有产码读者的出口**上。票面 `AC#2` 要求**先量后选**、并写明"为什么选它"。
+
+■ ★已量清的落点事实（普查腿量的、你要独立复跑确认）
+- **H3＝`cmd/wisp/run.go` 的收尾摘要行才是唯一"差一行"的落点**，现行号 **`:1221-1222`**（⭐⛔ 票面 10-03 写的 `:1144` 已漂 77 行）。
+- ⛔ **三味塞不进 `costLine`（现 `:1272-1279`，只读 `CostMicros`/`Currency`/`Usage`）或 `notifyBody`（现 `:1261`，只读 `Text`/`Message`/`Status`）**
+  ⇒ 要**新起一段**，别硬塞（硬塞会破坏那两个 helper 的字段契约）。
+- **H6（诊断包 `BuildDiagnosticsBundle`）今天只是潜力不是通路**：它**零产码调用者**、且 `internal/observe/diagnostics.go` 对 `Compression` **零命中**。
+  ⇒ 若你选 H6，必须同时回答"**零调用者怎么变成可达**"（⛔ 只说"接上就顺带带走了"）。
+
+■ 写面天花板（越界＝作废）
+- 允许：`cmd/wisp/**`（读数出口那一段）＋ `docs/evidence/s1/355-r1-*.md`。
+- ⛔ **`internal/agent/**`**（痕的产码面已结案，票 139 已 `-done`——你**不许**回头改它）。
+- ⛔ 任何 **Go→前端事件／新 `panel.*` 方法／新 JSON 键** ＝ `SPEC-08` 第 5.2 节枚举白名单 ＝ **契约变更**（票面 `AC#2` 那两条 ⚠ 逐字照抄）⇒ 碰到就**停手上报**。面板那半归 owner 外部 agent。
+- ⛔ `internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、`thresholds.go`、任何 golden；⛔ `go.mod`/`go.sum`/`.gitignore`/`.github/**`；
+  ⛔ `frontend/**`、`design/**`、`docs/PLAN.md`、`docs/specs/**`、`docs/reports/**`。
+- ★**写面互斥**：本波唯一碰 `cmd/wisp` 的写腿（按 AGENTS.md「每波只许一枚写腿」）⇒ 你要动别的包就停手上报。
+- ★**⛔ 碰 `Q-312` 那根链**（`KeepRawRounds`／`Need()` 的预算契约＝契约变更、归机主）：你**不许**改它、也不许借它绕路。
+
+■ 开工前（⛔ 跳步＝空跑作废）
+1) `git status --porcelain`：`cmd/wisp/**` 有**别人的**未提交改动 ⇒ 停手上报。
+2) ★**票面前提新鲜度（尺 v4 ⑧）**：票面里每条可现跑断言**逐条现跑**并把读数记进交件。★已知一处腐坏：票 355 的判据引用自票 139 的读数、而票 139 已 `-done`；凡引 `file:line` 都要**现跑复认**（本仓行号腐烂已 ≥5 次）。
+3) 独立复跑普查腿那三条落点读数（`:1221-1222`／`costLine` 字段表／`notifyBody` 字段表／`BuildDiagnosticsBundle` 零调用者）。
+
+■ 做法（硬）
+- **先选型再落笔**：交给我的交件里必须有一句"**选 H3 还是 H6、为什么、代价是什么**"，且若选 H6 要写清"零调用者怎么变可达"。
+- 每一处行为改动配**一枚今天响、不修不响**的用例；★反向判据＝把新加的那段摘掉 ⇒ 用例必须转红并**逐名报红行**；
+  先证变异落地（`grep -n` 原文 ＋ `go build` rc=0）再读数，三读数（变异红／还原绿／原样绿）逐字贴。
+- ⛔ 把"原文内容"落进读数（`[privacy] keep_transcript` 硬约束）——只许记**计数**。⛔ 记 token 之外的用户内容。
+- ⛔ 恒真判据、⛔ `t.Skip`、⛔ 放宽既有断言。
+- 跑门前 `unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；★`cmd/wisp` 要 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`；
+  ⛔ `CGO_ENABLED=0`（本仓必然编不过，sherpa 全文件被 build constraint 排除——那不是缺陷）。
+- ★`cmd/wisp` 整包测试**必抬 `-timeout`**（默认 10m 不够：有一枚按契约要跑 85 秒的用例，见台账 `A1079`）⇒ 用 `-timeout 30m`。
+
+■ Git 纪律
+只 commit **⛔ push**；`add`/`commit` 两处显式 pathspec；⛔ `add -A`/`.`/目录形；⛔ amend/reset/rebase/stash/checkout ./clean。
+提交前后各跑 `git diff --cached --name-only`（清单外 ⇒ 停手）＋`git ls-tree -r HEAD | grep -c '<你的新件名>'` 自门。
+主题**逐字**以 `票 355 落地腿 355-r1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+提交正文与交付件**⛔ 被禁码位**（U+00A7／U+2713／U+2264／U+2260／U+2192／U+21D2／U+26D4／emoji／带圈数字）=> 写 `sec N`／`=> `／`NOT`／`(1)`；提交前自己扫一遍。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261021\355r1\**`；⛔ `.out`。
+
+■ 交件（缺一算未交）
+1) `docs/evidence/s1/355-r1-impl.md`（**≤160 行**，过帽拆 `-partN`，⛔ 压行）：选了哪一处＋为什么＋代价／改了哪几行／新用例逐名＋为什么今天响／三读数逐字／门禁 rc。
+2) 门禁你自己现跑贴末行：`GOFLAGS= go build ./...`；`go vet ./cmd/wisp/`；`go test -count=1 -timeout 30m ./cmd/wisp/`（四数分开报、⛔ 相减，★并把被 panic 吃掉的枚名登记）；`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh`。
+3) 红名册**逐名**（⛔ 只报枚数），新增红必须 **0**；有就逐名判归属。
+4) 提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界枚数（正控＝同尺打一笔**含 `.go`** 的真提交）。
+
+■ 未定义即停：方案没覆盖 ⇒ **停手上报**，⛔ 自行假设。★特别是"选型"这一步——若两个落点都答不出"三味可见"，**停手上报**、⛔ 自己发明第三种出口。
