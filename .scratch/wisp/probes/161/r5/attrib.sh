@@ -11,6 +11,12 @@
 #                           directions: lines that must ring and lines that must
 #                           stay silent. This is what lets the physical negative
 #                           control stop being load-bearing (see r5/README.md).
+#                           SINCE TICKET 171 AC#3 it also asserts its OWN ROSTER:
+#                           how many must-ring and how many must-stay-silent cases
+#                           are registered (nailed separately, not as one total) and
+#                           that every NAMED must-ring sample is still among the
+#                           cases that ran. Read the block above st_case() for why
+#                           a printed case count was not enough.
 #   --tracked-only          runs ruler (A) alone, with the same hollow guard.
 #                           This is the shape CI executes.
 #   negative-control sample copied to probes/161/r5/negative-control/, so a
@@ -80,13 +86,15 @@
 # the `TRACKED_GO -gt 0` guard and a ruler handed nothing reports "empty", which is
 # the mistake this file's own ancestor made once (see r4 header: `git ls-files -Z`
 # is not a switch). Delete either direction of `--self-test` and the classifier is
-# back to being believed rather than checked.
+# back to being believed rather than checked. Delete one must-ring st_case line and
+# (since ticket 171 AC#3) the run exits 1 naming the missing sample - before that,
+# it exited 0 with a smaller `cases=` number and nobody was reading that number.
 #
 # USAGE
 #   sh .scratch/wisp/probes/161/r5/attrib.sh                       # both rulers
 #   sh .scratch/wisp/probes/161/r5/attrib.sh --quiet               # verdicts + summary
 #   sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only        # what CI runs (form A)
-#   sh .scratch/wisp/probes/161/r5/attrib.sh --self-test           # classifier both directions + the ticket 275 roster control
+#   sh .scratch/wisp/probes/161/r5/attrib.sh --self-test           # classifier both directions + the ticket 275 roster control + the ticket 171 roster nails
 #   sh .scratch/wisp/probes/161/r5/attrib.sh --classify-line 'some/path.go'   # one line, rc 0/1
 # Exit codes as listed above. UNTRACKED/IGNORED lines never change the exit code on
 # their own - being attributable is what keeps them out of it.
@@ -265,12 +273,58 @@ fi
 if [ "$MODE" = selftest ]; then
     ST_FAIL=0
     ST_RUN=0
+    # ---- THE SELF-TEST'S OWN ROSTER (ticket 171 AC#3) ----------------------
+    # WHY THIS BLOCK EXISTS, stated as the injury it closes. Until ticket 171 this
+    # mode counted exactly one thing, `cases=$ST_RUN`, and compared exactly two
+    # readings per case (want rc, want verdict token). Not one line of it asserted
+    # how many must-RING samples were REGISTERED, so deleting one of those samples
+    # did not ring: the run simply reported a smaller `cases=` number with
+    # `failures=0` and exited 0. That is not hypothetical - this file's own `:313`
+    # records the 275-v1 pass that commented a print block out and read
+    # `cases=8 failures=0` GREEN while stdout went from 23 rows to 1. A case count
+    # that is only PRINTED is a reading nobody checks; a count that is ASSERTED can
+    # only move when someone moves the registration.
+    #
+    # THREE NAILS, NOT ONE, because each one catches a corruption the others miss:
+    #   (1) how many must-RING cases are registered          -> one deleted: fires
+    #   (2) how many must-STAY-SILENT cases are registered    -> the mirror deletion: fires
+    #   (3) every NAMED must-ring sample is present           -> "delete one, add another"
+    # (1) and (2) are nailed SEPARATELY on purpose: one combined total would let one
+    # ring case be traded for one silent case and read exactly as before, which is
+    # the count-blind shape ticket 171 was filed for. (3) exists because (1) alone is
+    # satisfied by substituting a DIFFERENT ring sample for a deleted one - the
+    # number would not move while the coverage the number stood for is gone.
+    #
+    # WHAT THESE VALUES ARE. A registration, not a reading: the st_case lines two
+    # blocks below declare 5 must-ring and 3 must-stay-silent cases, and the names in
+    # ST_RING_NAMED are the samples that must be there BY NAME (the 777 one is the
+    # sample a previous pass measured as "delete it and the self-test still reads
+    # GREEN"). A future leg that adds or removes a case moves these values in the
+    # same edit - that is the whole point: no sample enters or leaves silently, in
+    # either direction.
+    ST_RING_EXPECT=5
+    ST_SILENT_EXPECT=3
+    ST_RING_NAMED=".scratch/wisp/probes/999/bad-sample.go
+.scratch/wisp/probes/777/second-fake-ticket.go
+internal/tools/not_a_bench_path.go"
+    ST_RING_SEEN=0
+    ST_SILENT_SEEN=0
+    ST_RING_LINES=""
     # st_case <expect: ring|silent> <expected verdict token> <raw line>
     st_case() {
         want=$1
         want_verdict=$2
         line=$3
         ST_RUN=$((ST_RUN + 1))
+        # The registration tally is taken HERE, at the one place every case passes
+        # through, so a deleted st_case line cannot leave a stale count behind.
+        if [ "$want" = 1 ]; then
+            ST_RING_SEEN=$((ST_RING_SEEN + 1))
+            ST_RING_LINES="$ST_RING_LINES$line
+"
+        else
+            ST_SILENT_SEEN=$((ST_SILENT_SEEN + 1))
+        fi
         classify_line "$line"
         got=$CL_RC
         ok=1
@@ -396,12 +450,68 @@ if [ "$MODE" = selftest ]; then
             tail -3 "$ctl_dir/selftest-roster-stderr.txt" 2>/dev/null | sed 's/^/         err: /' || true
         fi
     fi
+    # ---- the three roster nails (ticket 171 AC#3) --------------------------
+    # Counted as ONE further case in the `cases=` summary, because that is what it
+    # is: a case that reads the registration rather than a line. (Before ticket 171
+    # this file finished at cases=9: 8 classifier cases + the ticket 275 roster
+    # control. It now finishes at cases=10, and the number is printed by the same
+    # code path as before.)
+    ST_RUN=$((ST_RUN + 1))
+    # Read the registration tallies collected in st_case() against the values this
+    # file registers, and require every NAMED must-ring sample to be present in the
+    # lines that were actually fed to the classifier. Same exit code as any other
+    # self-test failure (rc=1) and a FAIL line that prints the missing name(s)
+    # verbatim, so a deletion is named rather than merely counted.
+    # THE THREE NAILS ARE INDEPENDENT CHECKS, NOT AN ELIF CHAIN. That is deliberate:
+    # deleting one must-ring line trips the count nail AND the named nail at once, and
+    # the named one is the reading the dispatch asks for ("name which sample is gone").
+    # A chain would report "count is 4, expected 5" and stop, which tells the reader a
+    # number moved but not which sample left - the same red-with-zero-names shape the
+    # ticket 275 control above exists to refuse. So all three run, all three can fail,
+    # and the FAIL block prints every reason that held.
+    ro_fails=""
+    ro_missing=""
+    if [ "$ST_RING_SEEN" != "$ST_RING_EXPECT" ]; then
+        ro_fails="${ro_fails}ring-count: registered must-RING cases=$ST_RING_SEEN, this file declares $ST_RING_EXPECT (a must-ring sample was deleted or added without moving ST_RING_EXPECT)
+"
+    fi
+    if [ "$ST_SILENT_SEEN" != "$ST_SILENT_EXPECT" ]; then
+        ro_fails="${ro_fails}silent-count: registered must-STAY-SILENT cases=$ST_SILENT_SEEN, this file declares $ST_SILENT_EXPECT (a must-stay-silent sample was deleted or added without moving ST_SILENT_EXPECT)
+"
+    fi
+    while IFS= read -r ro_name; do
+        [ -n "$ro_name" ] || continue
+        if ! printf '%s' "$ST_RING_LINES" | grep -Fxq -- "$ro_name"; then
+            ro_missing="$ro_missing$ro_name
+"
+        fi
+    done <<EOF
+$ST_RING_NAMED
+EOF
+    if [ -n "$ro_missing" ]; then
+        ro_fails="${ro_fails}named-missing: a NAMED must-ring sample is not among the cases that ran (the COUNT can still be right if a different sample was substituted for that name)
+"
+    fi
+    if [ -z "$ro_fails" ]; then
+        printf '   PASS  want ring=%s silent=%s named=%s  got ring=%s silent=%s  all named must-ring samples present\n' \
+            "$ST_RING_EXPECT" "$ST_SILENT_EXPECT" "$(printf '%s\n' "$ST_RING_NAMED" | grep -c . || true)" "$ST_RING_SEEN" "$ST_SILENT_SEEN"
+    else
+        ST_FAIL=$((ST_FAIL + 1))
+        printf '   FAIL  roster assertion  want ring=%s silent=%s named=%s  got ring=%s silent=%s\n' \
+            "$ST_RING_EXPECT" "$ST_SILENT_EXPECT" "$(printf '%s\n' "$ST_RING_NAMED" | grep -c . || true)" "$ST_RING_SEEN" "$ST_SILENT_SEEN"
+        printf '         why (every reason that held, one per line):\n'
+        printf '%s' "$ro_fails" | sed 's/^/           /'
+        if [ -n "$ro_missing" ]; then
+            printf '         missing must-ring sample(s), verbatim:\n'
+            printf '%s' "$ro_missing" | sed 's/^/           /'
+        fi
+    fi
     echo "attrib.sh: --self-test cases=$ST_RUN failures=$ST_FAIL"
     if [ "$ST_FAIL" = 0 ]; then
-        echo "attrib.sh: SELF-TEST GREEN - the classifier rings on a line it cannot attribute and stays silent on a line a real ticket owns, and the ticket 275 roster control saw an A-ROSTER row naming its own sample"
+        echo "attrib.sh: SELF-TEST GREEN - the classifier rings on a line it cannot attribute and stays silent on a line a real ticket owns, the ticket 275 roster control saw an A-ROSTER row naming its own sample, and the roster nails hold (registered counts match, every named must-ring sample is present)"
         exit 0
     fi
-    echo "attrib.sh: SELF-TEST RED - the FAIL line above names which case wanted what and got what (classifier cases and the ticket 275 roster control are separate cases); do not 'fix' the expectations, fix the ruler they test"
+    echo "attrib.sh: SELF-TEST RED - the FAIL line above names which case wanted what and got what (classifier cases, the ticket 275 roster control, and ticket 171's roster nails are separate cases); do not 'fix' the expectations, fix the ruler they test"
     exit 1
 fi
 

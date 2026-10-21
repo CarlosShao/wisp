@@ -394,6 +394,54 @@ jobs:
         if: ${{ !cancelled() }}
         run: bash scripts/portable-tests-selftest.sh
 
+      # ADDED STEP ONLY (ticket 171 AC#3, leg 171-r1): the attribution instrument's
+      # OWN SELF-TEST, run in CI. No existing step was moved, edited, deleted, given
+      # an `if:` it did not have, or made continue-on-error.
+      #
+      # WHY THIS IS THE STEP THAT WAS MISSING, in the ticket's own words: the gofmt
+      # step above runs `attrib.sh --tracked-only`, i.e. ONE of that instrument's two
+      # rulers. The instrument also carries a self-test (`--self-test`) that checks its
+      # classifier in both directions - a line it cannot attribute must ring, a line a
+      # real ticket owns must stay silent - and NOTHING IN CI RAN IT. So the day
+      # somebody broke the self-test, CI said nothing. That is the same shape ticket
+      # 161 was filed for ("the gate reports pass while it cannot see").
+      #
+      # WHY THE SELF-TEST HAD TO GET A ROSTER FIRST, and why this step would have been
+      # decoration without it. Before this leg the self-test's only count was
+      # `cases=$ST_RUN`, PRINTED and asserted by nobody: delete one must-ring sample
+      # and the run read `cases=8 failures=0`, rc=0. Measured on the ruler as it stood
+      # at HEAD: unmutated `cases=9 failures=0` rc=0, the same ruler with the 777
+      # must-ring line deleted `cases=8 failures=0` rc=0 - a silent hole in both the
+      # unmodified and the wired-up version. Wiring a count-only self-check to an alarm
+      # would have automated exactly that blindness. The roster nails landed first
+      # (three of them, in that file: how many must-ring cases are registered, how many
+      # must-stay-silent cases are registered, nailed separately rather than as one
+      # total, and every NAMED must-ring sample still present), and THEN this step
+      # wires them to CI. Delete the same line today and the runner exits 1 naming
+      # `.scratch/wisp/probes/777/second-fake-ticket.go`.
+      #
+      # NO continue-on-error, and that is a repo-level ruling rather than a preference:
+      # this tree already settled that continue-on-error is the zero-execution shape
+      # (D22 run-away mode 6), so a self-test wired that way would report success by
+      # never being allowed to fail. The step reddens the job like every other gate.
+      #
+      # WHY `if: ${{ !cancelled() }}`: copied from the guards this job already carries
+      # (staticcheck, mockllm module vet, and the carrier self-test directly above).
+      # This job has known-red steps above it, and a step with the default implicit
+      # `success()` would be reported `skipped` and print nothing - the hole ticket 111
+      # AC#5 names. The guard changes what this step REPORTS, not whether it can fail.
+      #
+      # POSITION: the next free slot at the bottom of this job, following the rule this
+      # file wrote for itself when ticket 161 added a step ("the new leg takes the next
+      # free slot instead of overtaking anybody"). It reads no Go and builds nothing:
+      # the classifier cases are fed as text, and the one case that really runs gofumpt
+      # builds a throwaway tracked tree under mktemp (outside the checkout, left in
+      # place per this repo's create-only rule). It needs `go env GOPATH` to locate
+      # gofumpt, which the setup-go step above already provides.
+      - name: "Attribution instrument self-test with its roster nails (ticket 171 AC#3 - the mutation goes red)"
+        if: ${{ !cancelled() }}
+        run: sh .scratch/wisp/probes/161/r5/attrib.sh --self-test
+
   # ----------------------------------------------------------- test-core ----
   # Pure-Go logic tests on ubuntu (SPEC-11 §6 scope) + golden replay +
   # the compose mock-llm wiring (started, probed, used by the probe test).
