@@ -145,14 +145,14 @@ NEW ON POST (本笔后才有名):          本笔三枚 TestCompressionTrace*(At
 | 提交 | 主题 | 件数 | `.go` 枚 | 越界枚 |
 |---|---|---|---|---|
 | `43f44f59a99f658a60ecad12c3574589c7cba7f0`（`43f44f59`） | `票 358 落地腿 358-r1b：attempted 变成 CLI 可读（三态各说各话）` | 3 | **3**（`cmd/wisp/run.go`、`cmd/wisp/compression_trace_355_test.go`、`cmd/wisp/compression_trace_358_test.go`） | **0** |
-| `a8ae09cebe2d5781258fe0c5d0783e7541ae0c2a`（`a8ae09ce`） | `票 358 落地腿 358-r1b：交付件 358-r1-impl-part2` | 1（本件） | **0** | **0** |
-| `10214eec8`（尾笔） | `票 358 落地腿 358-r1b：交付件压到帽内并补齐提交号` | 1（本件，176 行压到 160 行） | **0** | **0** |
+| `a8ae09cebe2d5781258fe0c5d0783e7541ae0c2a`（`a8ae09ce`） | `票 358 落地腿 358-r1b：交付件 358-r1-impl-part2` | 1（本件首次落盘） | **0** | **0** |
+| 本件其后各笔（压到帽内、补齐提交号） | 主题均以 `票 358 落地腿 358-r1b：` 开头 | 各 1（本件） | **0** | **0** |
 
-- 越界判据＝派单白名单（`cmd/wisp/run.go` 的 `compressionLine`／`printCompressionTrace` 一带、`cmd/wisp/compression_trace_355_test.go`、`cmd/wisp/compression_trace_358_*.go`、`docs/evidence/s1/358-r1-impl.md`／新 `-part2.md`）之外的件数；三笔合并跑 `grep -vE` 逐行输出**为空** => 读数 **0**。
+- 本表不写自己那一笔的 sha（写了就立刻过期）。现跑尺：`git log --format='%h %s' e1de7bab..HEAD -- docs/evidence/s1/358-r1-impl-part2.md` 得本件全链；`.go` 逐枚数 `git show --name-only --format='' <sha> | grep -c '\.go$'`。
+- 越界判据＝派单白名单（`cmd/wisp/run.go` 的 `compressionLine`／`printCompressionTrace` 一带、`cmd/wisp/compression_trace_355_test.go`、`cmd/wisp/compression_trace_358_*.go`、`docs/evidence/s1/358-r1-impl.md`／新 `-part2.md`）之外的件数；逐笔合并跑 `grep -vE` 逐行输出**为空** => 读数 **0**（`43f44f59` 那笔实测：3 件全在白名单内）。
 - 新件唯一性：`git ls-tree -r --name-only HEAD | grep -c '<新件名>'` => `compression_trace_358_test.go` = **1**、`358-r1-impl-part2.md` = **1**。
 - **正控**（同尺打一笔含 `.go` 的真提交，证明尺不是恒 0）＝`b676092d`（票 355 落地腿）=> `.go` **3** 枚；**负控**＝`3ed3fdce`（纯交件）=> `.go` **0** 枚。两向都可读，故"`.go` 3 / 越界 0"不是瞎尺读数。
-- 未 push（三笔都在本地 `dev` 上）；只有 code 那一笔带 `.go`，两笔交付件零 `.go`。
-
+- 未 push（各笔都在本地 `dev` 上）；只有 code 那一笔带 `.go`，交付件各笔零 `.go`。
 ## 7 未做／未假设
 
 - NOT 翻任何票面框、NOT 改票名/`Status:`/`-done`/台账、NOT push。
