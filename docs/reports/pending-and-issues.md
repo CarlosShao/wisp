@@ -20273,3 +20273,26 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
 
 **④ 状态**＝结案 **10** 票、车道＝写 **1**（`124-r1`）＋裁 **1**（`109-v2`）＋读 **1**（`355-a1`）＝**写 1 < 3**（⛔ 达标，但 CPU 与写面双重限制下先取三枚中最该派的三枚）。⛔ 推、⛔ 清理、⛔ 改契约。
 
+## A1090（2026-10-21 13:2x +08，编排者）★收 `355-a1`（`AC#1` 只读普查）＝**"生产侧零读者"成立**，锚点结论+三条后果我逐条复核｜★另认一条**台面事实**（`CGO_ENABLED=0` 全仓编不过）
+
+**① 收件三把尺**＝提交 `4df5705b`（**2 件、`.go`=0**、`numstat` `116/0`＋`144/0` 纯插入）；两枚件在盘：`355-a1-census.md` **116 行/11216 B/末字节 `0a`/U+00A7 0**、`-part2` **144 行/10931 B/`0a`/0** ⇒ 两枚各自 ≤160（★合计 260 行但**分件合规**，它主动按规矩拆了，⛔ 判超帽）。
+
+**② 锚点结论我独立复量＝成立**：`git grep -n 'Compression' HEAD -- cmd internal` 我现量 **28** 处；逐行分账后**产码侧只有 `internal/agent/loop.go:417 res.Compression = rep` 一处（等号左边＝写）**，其余全是注释／声明／构造／测试 ⇒ **`res.Compression` 的产码读取者 = 0 枚**。它另外三条正控（`.Rounds` 3 行含真读者 `run.go:1222`／`.Usage` 54 行／`Compression` 打 `docs/` 67 行）证明这把尺**不瞎**。
+- 尺2（`wisp-*.jsonl` 产码读者）＝**0 枚**：产码 5 行全是注释或常量；唯一真读内容的 `diagnostics.go:111 os.ReadFile(full)` 住在`零调用者`的 `BuildDiagnosticsBundle` 里 ⇒ **不可达**。四形反控同号。
+- 尺3（`BuildDiagnosticsBundle` 产码调用者）＝**0 枚**（定义 1＋注释 2＋**测试真调用 3**）；AST 形同号。正控＝`observe.InitLog` 同尺产码真调用 2 ⇒ 尺灵。
+
+**③ 它给下一腿的三条后果（我认，且决定 `356`／`355` 的派单口径）**
+- (a) **H6（诊断包）今天只是潜力不是通路**：`diagnostics.go` 对 `Compression` **零命中**＋`BuildDiagnosticsBundle` **零产码调用者** ⇒ 走 H6 等于"先给零调用者接一根线"。
+- (b) **H3（`cmd/wisp` 收尾那行）才是唯一"差一行"的落点**，且★**正确行号是 `run.go:1221-1222` 那行 `fmt.Fprintf`**，⛔ 是票面 10-03 写的 `:1144`；**三味不能塞进 `costLine`（`:1272`，只读 CostMicros/Currency/Usage）或 `notifyBody`（`:1261`，只读 Text/Message/Status）** ⇒ 要新起一段。
+- (c) **Composition 侧无暗道**：`panel_control_windows.go:746` 的 `json.Marshal(res)` 那个 `res` 是 callbinding 返回值、⛔ `agent.Result`；`agent.Result` 的产码读者只有 `run.go:1261` 与 `:1272` 两枚。
+- ⇒ **票 `355` 的 `AC#2` 选型口径**：写腿必须**先量后选**，若选 H6 须同时回答"零调用者怎么变成可达"；⛔ 凭票面 `:1144` 那个旧行号动手。
+
+**④ ★★一条**台面事实**（它报、我复量确认）＝`CGO_ENABLED=0 go build ./...` 在本仓**必然失败****
+- 它报"第一发设了 `CGO_ENABLED=0` 得 rc=1、第二发不设才 rc=0"，并把两种环境都写进件。
+- 我现量：不设 CGO ⇒ **rc=0**；`CGO_ENABLED=0` ⇒ 逐字 `imports github.com/k2-fsa/sherpa-onnx-go-windows: build constraints exclude all Go files in …sherpa-onnx-go-windows@v1.13.8`。
+- ⇒ **定式**：本仓任何"`go build ./...` 绿"的读数**必须注明"未设 `CGO_ENABLED=0`"**；谁拿 `CGO_ENABLED=0` 跑出红来当缺陷报 ⇒ 先把这条台面事实摆出来（⛔ 算回归、⛔ 算腿的错）。
+
+**⑤ 它报的前提漂移（我认可作为票面腐坏第 4 条，归我补记）**＝票面第 12 节"管道七跳三态"的**三态判语一跳动未变**，但引的 `file:line` **五跳已漂**：H3 偏 **+77**（`run.go:1144`⇒`:1222`）、H5 偏 **+77**（`run.go:998`⇒`:1075`）、H1/H2 偏 **+7**（`loop.go:399/402/404`⇒`:406/415/417`、`run.go:1106`⇒`:1183`）；H0／H3b／H6 **同号未漂**；H7 的 `logging.go:82` 现是 `_ = w.Close()`、`min_level` 语义落在 `cmd/wisp/logsink.go:82` 与 `:184`。
+
+**⑥ 车道**＝写 **1**（`124-r1`，未落笔＝在读票面）＋裁 **1**（`109-v2`，未落笔）＋读 **0**（`355-a1` 收线）。未推 **251**、结案 **10**、⛔ 推、⛔ 清理、⛔ 改契约。
+
