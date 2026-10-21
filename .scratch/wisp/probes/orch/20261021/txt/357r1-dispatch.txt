@@ -1,0 +1,71 @@
+【派单·票 357 落地腿 `357-r1`】写腿·2026-10-21 23:1x +08 编排者
+
+■ 身份
+写腿（实现者）。⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ 改台账、⛔ push。
+票面＝`.scratch/wisp/issues/357-the-guard-verifies-a-different-directory-than-the-reader-opens-plus-two-ntfs-faces.md`（六格，先通读）。
+★`AC#0`／`AC#1`／`AC#2` 已由编排者翻；**你要做的是 `AC#3`（落地＋牙）＋ `AC#4`（门禁）**。
+
+■ 一句话
+按我已拍定的 **〔丁〕形** 落地：让 `wisp models verify` 在报"与已验签清单一致"时，**若目录里存在"清单没点名的第二数据流"（ADS），必须明说一句**——
+把今天的"**静默通过**"变成"**说了再通过**"。
+
+■ ★已拍的形（⛔ 重新讨论、⛔ 换形）
+**〔丁〕的全部判据（逐条照做）**：
+1. `verify` 在 **rc=0 的路径上**、若**枚举到 ADS**（目录项里有清单未点名的备用数据流）⇒ **输出具名一句**（含**流名** ＋ "清单未点名"字样）。
+2. ★**rc 仍 0**（⛔ 变红、⛔ 改退出码语义）——这是**报告**、⛔ 新增拒绝。
+3. ★**没枚举到 ADS** ⇒ **输出与本改前逐字相同**（⛔ 给既有绿加噪）。
+4. ⛔ 新造 Windows-only 平台件（〔乙〕那套 `FindFirstStreamW` 枚举＋`nlink>1` 判定**已明确否决**：它保护的对象今天不存在、复杂买不到真价值）。
+   ★★**但注意**：要"枚举 ADS"本身就得读 NTFS 流——★**允许你用最小可行的只读枚举手段**（见下"技术选型我拍"），
+   ⛔ 把它做成一个"平台件/抽象层/接口"。
+5. ⛔ 改哈希面语义、⛔ 改 `VerifyDir` 的实参、⛔ 动 `pinnedleaf_342`／`winsec` 的判定。
+
+■ ★★技术选型（我拍，⛔ 你自己换）
+- **〔丁〕要读 ADS，但⛔ 造平台件** ⇒ 用**最小可行**：在 **`internal/models` 包内**写一枚**只读枚举函数**（例如 `listAlternateStreams(dir string) ([]string, error)`），
+  - **Windows 实现**：用 `golang.org/x/sys/windows` 里已有的 `FindFirstStreamW`/`FindNextStreamW`（**先 `grep` 确认该依赖已在 `go.mod` 里**；
+    ★**若不在 ⇒ 停手上报**，⛔ 自己加依赖——加依赖是"改构建面"，属我另一手裁的范畴）；
+  - **非 Windows 实现**：**恒返回空**（POSIX 无 ADS，`//go:build !windows`）⇒ **本形的牙只在 Windows 侧可验**，交件里必须**具名说清**"POSIX 侧这枚用例只能是控制腿"。
+- ★**为什么这样拍**（按 `AGENTS.md` ⓪⓪⓪ 铁律第 2／3 条）：①最有价值＝一次改动就把**今天唯一真静默的那味**变可观测（普查腿量的 D1：主体+ADS ⇒ `与已验签清单一致` rc=0）；②⛔ 造抽象层＝复杂买不到额外价值；③⛔ 选〔乙〕＝Windows-only 新平台件、而它保护的对象今天不存在。
+
+■ 写面（越界＝作废）
+- 允许：`internal/models/**`（那枚只读枚举函数 ＋ `verify` 那句话的出口）；`cmd/wisp/**` **仅当** `verify` 的输出在 CLI 侧拼（★**本波唯一碰 `cmd/wisp` 的写腿**）；`docs/evidence/s1/357-r1-*.md`。
+- ⛔ 改 `internal/models` 的**哈希／pin／seal 判定**；⛔ 动 `internal/{winsec,proc,risk,agent,tools,config}/**`、`tools/d22scan/**`、`allowlist.txt`、`thresholds.go`、任何 golden、
+  `go.mod`／`go.sum`（★要动 ⇒ **停手上报**）、`.gitignore`／`.github/**`、`frontend/**`、`design/**`、`docs/PLAN.md`、`docs/specs/**`、`docs/reports/**`。
+- ★**不许把放行侧放宽换绿**；⛔ 为了绿改既有测试。
+
+■ 开工前（⛔ 跳步＝空跑作废）
+1) `git status --porcelain`：写面内有**别人的**未提交改动 ⇒ 停手上报。
+2) ★**票面前提新鲜度**：票面里每条可现跑断言**逐条现跑**。★已知票面腐坏（普查腿抓的，我核过）：
+   - 票面 `:9` 写"签名＝`109-v2` 判语**第 2 条**" ⇒ 实为 **sec 5(c)**（我已就地更正）；
+   - 票面 `:6` 的 `grep -rln '模型装载器'`"只命中 109 自己" ⇒ **今天命中 2 枚**（109＋357）；
+   - 票面 `:11` 说票 342/348 是 `-done` ⇒ **不成立**（两枚 `Status:` 逐字"已立，未派"）。
+3) 复跑普查腿的两条关键读数（`docs/evidence/s1/357-a1-census.md`）：**D1 主体+ADS ⇒ rc=0 静默通过**；`ReadDir` **列不出 ADS**。
+
+■ 做法（硬）
+1) **先量后写**：交件先给"改前 D1 那一发的逐字输出与 rc"（应为 `与已验签清单一致`／rc=0），再给改后同发的逐字输出与 rc（应为**多了一句点名**／**rc 仍 0**）。
+2) 每处改动配**一枚今天响、不修不响**的用例；★**反向判据**＝把新加那句**摘掉** ⇒ 用例必须转红并**逐名报红行**；先证落地（`grep -n` ＋ `go build` rc=0）再读数。
+3) ★**三读数**（变异红／还原绿／原样绿）逐字贴 ＋ **还原核 `sha256` 三处逐字相同**（提交版／还原台／`git show HEAD:` blob——票 124 批 2/3 已做成合格样本，照它做）。
+4) ★**正例 G 必须仍绿**：没有 ADS 的目录 ⇒ `verify` 输出**与改前逐字相同**（这条是〔丁〕第 3 点的牙、⛔ 省）。
+5) ★**格式门禁按本轮裁定读入库 blob**（`docs/evidence/s1/pipe-format-gate-reads-tracked-blob-not-worktree.md`）：
+   甲尺＝`git archive HEAD | tar -x` 到仓外后跑 `gofumpt -l`；乙尺＝工作树（**只作诊断**）⇒ **两把都报、甲尺判据**。
+
+■ 环境
+`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；`cmd/wisp` 要 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`；
+⛔ `CGO_ENABLED=0`（本仓必然编不过、⛔ 当缺陷）；★`cmd/wisp` 整包**必抬 `-timeout 30m`** 且 **`rc=1` 今天不能当判据**（既有真窗族＋进程级截断，`A1079`／`A1100`）⇒ 只能按名作差＋逐发登记死点；
+★`gofumpt` 用**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（裸名 rc=127，⛔ 据此判"本机没有"）；
+★`.gitattributes` 要求 `*.go text eol=lf` ⇒ 脚本改文件⛔ 带 CRLF；★变异读数必须与整包门禁**串行**。
+
+■ Git
+只 commit **⛔ push**；`add`/`commit` 两处**显式 pathspec**；★**涉新文件或改名的提交，pathspec 逐个文件名字面点名**（⛔ glob——本仓这坑犯过 6 次）；
+⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。主题**逐字**以 `票 357 落地腿 357-r1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★提交正文与交付件 **⛔ 被禁码位**（`§`/`✓`/`≤`/`≠`/`→`/`⇒`/`⛔`/`⚠`/emoji/带圈数字）⇒ 写 `sec N`／`=> `／`NOT`／`NOTE`／`(1)`；提交前自己扫一遍。
+★**改自己新增的文字时 ⛔ 用 `\n\n` 猜段落边界**（我用它修过既有正文），用**行号范围**（`sed -n 'A,Bp'`），改完必 `diff HEAD` 验"只该有我加的那几行"。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261021\357r1\**`；⛔ `.out`。
+
+■ 交件（缺一算未交）
+`docs/evidence/s1/357-r1-impl.md`（**≤160 行**，过帽拆 `-partN`）：改哪几行（逐行）／新用例逐名＋为什么今天响／**改前改后 D1 那一发逐字**／三读数逐字＋sha256／正例 G 仍绿／门禁 rc。
+门禁自己现跑：`GOFLAGS= go build ./...`；`go vet ./internal/models/ ./cmd/wisp/`；`go test -count=1 ./internal/models/`（四数分开报、⛔ 相减）；
+`go test -count=1 -timeout 30m ./cmd/wisp/`（★按名作差）；`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh`。
+红名册**逐名**（⛔ 只报枚数），新增红必须 **0**。提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界（正控＝同尺打一笔**含 `.go`** 的真提交）。
+
+■ 未定义即停 ⇒ **停手上报**，⛔ 自行假设。★特别是：①`golang.org/x/sys/windows` 若不在 `go.mod` ⇒ **停手上报**（⛔ 自己加依赖）；
+②若你发现"枚举 ADS 必须动 `internal/winsec`"⇒ **停手上报**（那块是别的湖）。
