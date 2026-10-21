@@ -20029,3 +20029,21 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
 
 **⑤ 车道**＝在飞写腿 **2**（`174-r1`／`171-r1`）＋只读 **1**（`136-r1b`）＝**写腿 2 < 3（机主规矩）**。★本账落笔时 CPU 三发 `100/90/100` 远超 70% ⇒ 按规矩⛔ 硬塞第三枚；**CPU 一回落即补**（候选＝票 124 posix harness／票 175 需与 174 错开同包／票 132 待 129 结案）。未推 **209**、⛔ 推、⛔ 清理、⛔ 改契约。结案 **9** 票。
 
+## A1077（2026-10-21 09:3x +08，编排者）★收 `174-r1`（两笔）｜★它交了一枚**派单外**的东西＝改回执文案说"回来的路有两条"，理由是一条安全机制断言 ⇒ 我**⛔ 自己盖章**，派 `174-v1` 非实现者裁｜我自己现跑的四把尺
+
+**① 收 `174-r1`（起手 `b482968f`；`a8eb0d51`＝`internal/tools/task.go`＋新判据件 `.go` 2 枚／越界 0；`56c07eeb`＝交件 `.go` 0／越界 0）＝盘上三把尺我逐把现跑**
+- 提交真在：两笔 `git log -1` 逐枚确认；逐笔 `git show --name-only` ⇒ `.go` **2／0** 枚、越界 **0／0**。
+- 件真在：`docs/evidence/s1/174-r1-impl.md`＝**148 行**（帽 160 内）；新判据件四枚逐名在 HEAD（`TestPointerOutsideAllowlistNamesEveryRoadBack174r1`／`…SecondRoadBackIsRealOnThisBridge174r1`／`…SecondRoadBackIsBookedAsACard174r1`／`…TwoRoadNoticeLeaksNoPathOrRoots174r1`）。
+- 自己复跑（⛔ 抄它的数）：`build rc=0`（0 字节输出）／`vet ./internal/tools/ ./internal/agent/ rc=0`（0 字节）／**四枚用例我另跑全 PASS**（`ok … internal/tools 0.144s`）；它自报第 5 条（`task.go` 的 U+26A0 系存量）我复量＝`HEAD` 与起手锚 `b482968f` **各 1 枚**＝属实、非本腿引入。
+
+**② ★★它交了一枚**派单外**的东西（⛔ 我预想到的），且理由是一条安全机制断言**
+- 动作：把 `task.go` allowlist 支的回执从"…**要**用户先把所属目录加进 `[fs] allowed_dirs` **才**读得回来"改成"…会要一张 L2 卡，没人批就是直接拒；回来的路有两条——要么加进 `[fs] allowed_dirs`，要么批下那一张卡"。
+- 它给的理由（我**部分**独立复量、但⛔ 盖章）：`[fs] allowed_dirs` 是**风险判级输入、不是执行硬边界**；`internal/tools/fs.go` 的 `open` 只 `Canonicalize`、**不复查授权根**；它用真桥两臂对拼量到"批准一张 L2 卡 ⇒ **20000 字节整读回**"，而 `NoGate` 臂 `isError=true L2 user_rejected`。
+- ★**我自己量到的机制面（可复核）**＝`cmd/wisp/run.go:510-514` 把 `cfg.FS.AllowedDirs` 喂给 `tools.NewPathCanonicalizer(allowed, …)`；`internal/risk/assessor.go:79` 逐字 `R2 RuleID = "R2" // path outside authorized allowlist`；`internal/tools/fs.go` 的 `open` 逐字只做 `d.Paths.Canonicalize(raw)` ＋ `"??"` 检查后返回 ⇒ **"allowlist 只决定判级、不拦住已被批的执行"这一半在代码面上成立**。
+- ★★**但我不给它盖章**：这条若成立就是**能力边界级**的安全断言（等于写进产品文案"被批的卡能读根外路径"）；写过头就是往文案里塞假话。⇒ 派 `174-v1`＝`3f84319a-53c4-461d-95b4-abcbafc79e79`（非实现者，七项必判：票面前提新鲜度／`AC#2b` 两条路是否兑现／★那句安全断言的**两臂对拼复量**／四枚判据承重性（自己抽 1-2 发变异＋逐发还原）／写面纪律（特别核 `internal/agent/` 是否 0 行）／门禁复跑／红名册逐名）。
+- ⛔ 我翻任何框（`AC#2`／`AC#2b` 都等 `174-v1` 判语 + 它是否被认定"派单外扩面"）。
+
+**③ 它在交件里如实登记的六条边界（我逐条收下，⛔ 当已完成）**＝只动 allowlist 一支／端到端 `wisp run` 真进程未跑（`cmd/**` 零字节）／`-race` 与整包 `cmd/wisp` 未跑／`internal/agent` 两枚 `gofumpt` 漂移系存量（`git diff --stat HEAD` 为空＝我复量 `internal/agent/spill.go` 区间 diff **0 行**、blob `098d93ef` 两侧同串 ⇒ 属实）／`task.go:648` 的 U+26A0 系存量／它不裁自己。
+
+**④ 车道**＝写腿 **1**（`171-r1`，`ci.yml` 至今**未动**＝符合"只许新增步骤"）＋裁腿 **2**（`174-v1`／`136-r1b`）。CPU 三发 `91/85/99` ⇒ 仍 ⛔ 硬塞第三枚写腿。未推 **210＋**、⛔ 推、⛔ 清理、⛔ 改契约。结案 **9** 票。
+
