@@ -20900,3 +20900,32 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
 - ★**定式**：改自己新增的文字时，**⛔ 用 `\n\n` 猜边界**；用**行号范围**（`grep -n` 找到起止行、`sed -n 'A,Bp'` 只在范围内替换），且**改完必 diff HEAD 验"只该有我加的那几行"**。
 
 **⑤ 状态**＝结案 **18**、未结 174、未推 **332**、⛔ 推、⛔ 清理、⛔ 改契约。
+
+## A1113（2026-10-21 22:5x +08，编排者）★结票 **181（第 19 票）**＝两向 `comm` 差集**新增红 0、反而转绿 3 枚**｜★rename 这次做对（逐个文件名字面点名，`R094`＋`==1`）
+
+**① 结票 181（第 19 票）：`AC#6` 门禁**
+- 落地点＝**`16901acb`**（票 181 `AC#7` 生产侧落地）；★**改前基准＝`16901acb^`**，两形都取自 `git archive` **纯导出树**（⛔ 工作树）。
+- **逐包单跑**（票面警示 "`internal/risk/` 四包并发会假红＝争用，见 `A359`" ⇒ 我照办、**一次只起一包**）：
+  - `./internal/config/`：**两形全绿**（POST 114 名／PRE 96 名，FAIL 名册**空**）。
+  - `./internal/panel/`：**POST FAIL 名册 5 枚 ⇄ PRE 6 枚**；★**新增红＝0**（`comm -13` **空**：POST 那 5 枚**全部 ⊆ PRE**）：
+    `TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestC21DesignTokensFourWayAgree`／`TestComposerContractTypesMatchFrontend`／`TestStreamLogDroppedNamingLedgerIsNotBounded35r8`／`TestStreamLogFloodBelowKeyBoundIsNotBounded35r8`
+    ⇒ 全是**既知红**（台账命中 21／38／23／3／3 次），⛔ 本票造成。
+  - ★**反而转绿 3 枚**（`only-in-PRE`）：`TestComposerRenderFixtureTellsTheTruth`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestReadGitOnThisRepositoryIsSelfConsistent`。
+  - `sh scripts/d22scan.sh` **rc=0 clean**。
+- ★**"最终读数取在最后一枚 commit 之后"**（本格尾句）：我取 **HEAD**，而 `16901acb` 是其祖先 ⇒ **满足**。⚠ `./cmd/wisp/` 按票面**本机测不到东西**（票 98）⇒ ⛔ 以它为判据、⛔ 假装跑过。
+
+**② ★★一份读数口径自查（我自己的错，具名）**
+- 我第一次跑的是**全名册**差集 ⇒ 得 `only-in-POST=**52**`。★**那 52 是"改前树测试集更小（119 ⇄ 170）"造成的新用例名，⛔ 新增红**。
+- ⇒ **判"新增红"只能比 FAIL 名册**，⛔ 比全名册 ⇒ 已按 FAIL 名册重跑（上面那两组），这才是本格要的那把尺。
+- ★**定式**：跨版本比"新增红"时，**两形的测试集大小可以不同**（旧树少用例）⇒ **分母不同、⛔ 比全集**；只比 **FAIL ∩ 两形共有的名字**，或明确用 `comm -13 <pre-fail> <post-fail>`。
+
+**③ ★rename 这次做对了（值得记，因为它犯了 6 次）**
+- 做法：**逐个文件名字面点名**（旧名＋新名各一枚，⛔ glob）；`git rm --cached` 旧名 → `mv` → `git add` 新名。
+- 自门：`git diff --cached` 显示 **`R094` rename**、`git ls-tree -r HEAD | grep -c 'issues/181-'` ＝ **1**。
+- ★**中途踩了一个小坑并修好**：`mv` 之后再 `git add <旧名>` 会报 `did not match any files`（旧名已不在工作树）⇒ **顺序必须是"先 `git rm --cached` 旧名，再 `mv`，最后 `git add` 新名"**，且 `git add` 只点名**新名**。
+- ★这补上了 `A1112③` 那条"需要机械动作"的缺口：**顺序＋只点名新名** 就是那个动作。
+
+**④ 剩余门禁类**＝票 158（要改前改后各一次，工作量较大）／票 316（三选一收口，须读）／票 353（纪律格，可判）。
+★**下一轮**：先判 353 纪律格（最快）＋派窄范围普查腿（只做 3–5 格那 74 张）。
+
+**⑤ 状态**＝结案 **19**、未结 173、未推 **335**、⛔ 推、⛔ 清理、⛔ 改契约。
