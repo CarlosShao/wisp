@@ -126,3 +126,7 @@ config `34 => 40`（+6）、tools `38 => 62`（+24）、wisp `37 => 41`（+4）�
 4. 那条"AC#6 移交 359 / 本票按 7 格结"的落账行、以及 sec 2 那两条口径更正，**要编排者写**；
    票面勾选状态、`Status:`、`-done` 后缀、台账、`docs/reports/**` 我**一字未动**。
 5. 票面 AC#5 那句"`gofumpt v0.7.0 存在`"与今天手上的二进制（**v0.12.0**）不同；四批各报自己那一枚的处置我沿用（`ci.yml` 是 `@latest` 未钉版本）。
+6. ★**收口期间树在动**：票 `359` 在 20:25–20:32 落地（`7835d67f`／`4ca369d5`／`0cea1927`），我 20:4x 收尾时现量到并在它上面补打了两发
+   （基线 `75/47/0/0`、两发变异各 `75/46/1/0` 红名同一枚 `TestSameAbsolutenessPOSIXIsTheOnlyLegBetweenTwoRoots359`）。
+   它只动 `internal/winsec/sameabsoluteness_359_other_test.go` 与 359 自己的件与票面，`resolve.go` blob 五处同一串 `e0b0e22f`；
+   `git diff --name-only ef4c9702 0cea1927 -- internal/config internal/tools cmd/wisp` **空** => **本票三批的读数不受它影响**。
