@@ -50,9 +50,10 @@
 
 **真机正控（证明这不是 fixture 角落）**：用本机**真实存在的** `C:\Users\swq\.git-credentials`（120 字节，`Classify=A`，未搬 `USERPROFILE`、未造锚点）重跑：notice 同为 243 字节且逐字相同；`fs.read` `isError=true level="L2" class="permission_denied"` 233 字节、前 40 字节同形；**approval=0**；真判级 `Deny [R2 R3]`。
 
-## 3. 正控：同一路径改成 R2-only 形状，`approval` = **1**（尺分得清两种形状）
+## 3. 正控：同一台子上的 R2-only 形状，`approval` = **1**（尺分得清两种形状）
 
-同一桥、同一 `*PathCanonicalizer`（同一根外根）、同一读法，只把目标换成 `...\tool-output-356a1-r2only.txt`（`Classify=none`，在根外）：
+同一桥、同一 `*PathCanonicalizer`（同一根外根）、同一读法，只把目标换成 `...\tool-output-356a1-r2only.txt`（`Classify=none`，在根外）。
+**口径说明**：票面写的是"同一路径改到 R2-only 形状"，但一条路径不可能同时「命中 A 档」又「在 R3 之外」——`Classify` 的 A 档是按锚点/文件名匹配的，改拼法不会把它移出 A。所以这里把「同一路径」落实为「**同一台子、同一根外形状，只让 R3 不命中**」，并把两个目标各自的分类读数都打出来（`A` 对 `none`），让这一步是可核的而不是被默认的。
 
 | 读数 | R3 A 档（第 2 节） | R2-only（正控） |
 |---|---|---|
