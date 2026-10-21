@@ -20047,3 +20047,20 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
 
 **④ 车道**＝写腿 **1**（`171-r1`，`ci.yml` 至今**未动**＝符合"只许新增步骤"）＋裁腿 **2**（`174-v1`／`136-r1b`）。CPU 三发 `91/85/99` ⇒ 仍 ⛔ 硬塞第三枚写腿。未推 **210＋**、⛔ 推、⛔ 清理、⛔ 改契约。结案 **9** 票。
 
+## A1078（2026-10-21 10:0x +08，编排者）★收 `136-r1b`（`AC#10` 只读量：接缝**今天不响且不是"读不到"、是"没有那枚用例"**）｜★裁 `171-r1` 两条过期（① 认＝票面腐坏 ② 认＝**真伤口**，裁〔甲〕加自检名册断言）
+
+**① 收 `136-r1b`（`1cbd025b`，一件 `docs/evidence/s1/136-r1-ac10-readonly.md` 159 行、`.go`=**0**）＝盘上三把尺我逐把现跑**
+- 提交真在／件真在：`git log -1 1cbd025b` 逐字；159 行（帽内）。
+- ★**它那条结论我自己复核过**：`run.Pass` 链路在 `cmd/wisp/slo_windows.go` 真在（`:399` `if !run.Pass {` ⇄ `:336-339` `run.Pass = rep.Pass && observer.Pass`）；而 `git grep -c 'run\.Pass' HEAD -- cmd/wisp` ⇒ **只有 `slo_windows.go` 4 处、`cmd/wisp/*_test.go` 里 0 处** = 我另跑的，**与它同号**。
+- ⇒ 结论＝`AC#10` 那枚接缝**今天无可观察者**（不是"读不到"、不是"不存在"，是"没有那枚用例"），且它**⛔ 造钉子、⛔ 写用例**（照我给的边界）。
+- ★它另报两条我收下：**(a)** `AC#10` 全格 `:149-176` **没点名任何一枚 Go 用例名**（`grep -E 'Test[A-Za-z0-9_]+'` 0 命中）⇒ 我派单里"`-run '<AC#10 点名的用例>'`"**没有值可填**＝**我的派单缺陷**（第三类：我按票面自述写派单）；它改用改写块 `:166` 自己点名的那把尺＋正/负控，处置正确。**(b)** 尺 B `go test -count=1 -v ./cmd/wisp/` **10 分钟超时 panic** 吃掉 1 枚无判决行的用例（`TestTicket101SessionGrantDoesNotCrossRestart`）⇒ `FAIL=6` **只覆盖跑完的 343 枚、⛔ 当整包结论**，它照实分开报。★这条要记进"`./cmd/wisp` 整包**超 10 分钟**"这个台面事实（以后谁跑整包都得先抬 `-timeout`，否则读数天然缺口）。
+- ★它报的 6 枚红（`TestAC14GoSideEvalPushReachesThePage`／`Test258BridgeMutationNoSrcKeepsOldBinding`／`Test258OccupiedCombinationNamesTheNewValue`／`Test258V1ProbeSummonEditRebindsLiveBall`／`TestAC1ResidentLegInstallsItsLogListenerOnDisk`／`TestAC246DevLegIgnoresTheTestTaskInjection`）**无一枚属 SLO/settle 族**；它报 `^TestSLO` 尺 A 红名册＝0。⇒ 归"存量红/他票"、⛔ 本波处置。
+
+**② 裁 `171-r1` 的两条过期（它按⑧先上报＝**这次⑧真拦住了**，与 `A1076`① 那次相反，记一笔正例）**
+- **过期①＝成立**（`AC#1`／`AC#9` 的代码早已落地）：我现量核过 `171-r3` 三笔 `f4d64fcc`（`probes/171/r3/*`）⇄ `2a5489d3`（★真动了 `probes/154/gate-clauses.sh` ＋ `probes/161/r6/flip-declaration.sh`）⇄ `7cb9d570`（证据）；且票面 `Progress log` 里 `171-r3`／`171s` **各 0 命中** ⇒ **票面读到的是 09-27 旧状态＝票面腐坏**。⇒ 裁＝**按"已有落地＋它今天复跑 GREEN"结**，⛔ 另造台件、⛔ 重做；票面补记归我。
+- **过期②＝成立，且是本票真伤口**：它实测**只删 `st_case 1 UNATTRIBUTABLE '.scratch/wisp/probes/777/second-fake-ticket.go'` 一行** ⇒ `--self-test` 仍 `cases=8 failures=0` **GREEN**。★我读码确认根因＝`attrib.sh` 的 `st_case()` 只递增 `ST_RUN`、只比 `want` ⇄ `got`，**没有任何一枚断言"登记了几个 must-ring 样本"或"某具名样本必须在场"**；脚本 `:313` 那段注释自己就记着"275-v1 把 print 注释掉、读到 `cases=8 failures=0` GREEN"的前科。⇒ 纯加 CI 步骤＝给"少一条样本"开绿灯。
+- ⇒ **裁〔甲〕**：两腿都要＝(a) 在 `probes/161/r5/attrib.sh` 里加**名册断言**（must-ring 枚数／must-stay-silent 枚数**分开钉**＋每个具名 must-ring 样本必须在场＋**删行变异必须转红并逐字报出缺了哪个样本名**＋还原复绿）；(b) 再在 `ci.yml` **只追加一步**跑 `--self-test`（⛔ `continue-on-error`、⛔ 改既有步骤），并自证步骤名名册**只增不减**。已派续跑＝`d3137548-2650-46d8-8254-2b0c2554df27`（同身份 `171-r1`）。
+- 它另问的 `probes/154/gate-clauses.sh` `rc=2`（`腿数＝14 声明与实测不符＝2`，两枚 BAD＝G1b／G6neg）⇒ 裁＝**⛔ 归它**，只**具名登记**、⛔ 顺手修。
+
+**③ 车道**＝写腿 **1**（`171-r1` 续跑）＋裁腿 **1**（`174-v1`）。CPU 三发 `99/100/100`＝**满载** ⇒ ⛔ 硬塞第三枚写腿。未推 **214**、⛔ 推、⛔ 清理、⛔ 改契约。结案 **9** 票。
+
