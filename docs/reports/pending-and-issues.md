@@ -20006,3 +20006,26 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
 
 **④ 纪律自查（本节笔落之前）**＝新票两枚写面＝`.scratch/wisp/issues/**`（本波无写腿在该面）；`Q-312` 号位现量＝`grep -cE 'Q-312([^0-9]|$)'`＝**0**（正控 `Q-311`＝8、`Q-310`＝16）；两枚草案原件仍在 `.scratch/wisp/probes/139/v1/` ⇄ `.scratch/wisp/probes/353/v1/`（⛔ 删、⛔ 搬）。
 
+## A1076（2026-10-21 09:3x +08，编排者）★★收 `136-r1` 停手上报（判得对，我三条前提全过期）｜★★它抓到**我自己造成的门禁红**并已修绿（`bd305c52`）｜派 `136-r1b` 只读量 `AC#10` 接缝
+
+**① 收 `136-r1`（`a045bbaa`，一件 `docs/evidence/s1/136-r1-impl.md`、`.go`=**0**、越界=**0**、正控＝同尺打 `4fc65dd5` 给 `.go`=1 证明尺不瞎）**＝我收了，且它的停手判**对**。三条前提我**自己现量**核过（⛔ 采信它的自报）：
+- (a) 票面 `AC#9` **已是 `[x]`**（09-24 00:0x 依终裁表翻的）；它点名的两枚钉 `4fc65dd5` ⇄ `d8390aaf` 我 `git rev-parse --verify` 都**在 HEAD**。
+- (b) `TestCheckSettle*` 今天 **8 枚**（尺＝`git grep -hoE 'func (TestCheckSettle[A-Za-z0-9_]*)' HEAD -- internal/observe`），⛔ 我派单写的"两枚"。
+- (c) 真件名＝`136-...-has-no-nail-54-tests-stay-green-without-it.md`（票池现量），⛔ 我派单写的 `...-has-no-test.md` **盘上不存在**；且标题里的"54"今天已 **71**。
+⇒ **它的判断我认**：13 发变异逐发单落、逐发先证落地再读数、逐发单独还原并核 sha 回 HEAD，**13 发全部被今天既有用例抓住、0 发存活**（含 **M4**＝AC#9 点名那发，把 `<= 0` 放宽成 `< 0` ⇒ `rc=1` 71/68/3/0，红名点到 `TestCheckSettleZeroFootprintDropsAreCountedToo`／`TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured`／`TestCheckSettleZeroTrustworthySamplesFailsClosed`）。★它拒写"哑针"＝**正确**（再加一枚断言同一件事的用例在 13 发下跟着老人一起绿、不增加分辨力＝正是派单自禁的恒真形状）⇒ **⛔ 判它偏离**。
+- ★**我的派单缺陷（第三类，与本账①同族）**＝我据票面**自述**（"54 枚仍绿／两枚 TestCheckSettle*／AC#9 未翻"）写派单，**⛔ 先跑尺 v4 的⑧（票面前提新鲜度）**。这是 ⑧ 那把尺**第一次**本可以拦住却没拦的实例：我写了它、入了库、却**没在放腿前跑它**。⇒ 定式升级：**⑧ 不是"建议跑"，是放腿前的硬闸**（落笔前必须贴出 ⑧ 的现跑读数，⛔ 只有"我会跑"）。
+
+**② ★★`136-r1` 报回的那道红＝**我自己造成的**，已修（`bd305c52`）**
+- 现象：`sh scripts/check-path-length-budget.sh` `rc=1`，两条 RED 都指向票 139 那份件：A 侧"新名 `...-done.md` 超预算且**不在名册**"＋B 侧"名册里旧名**已不在树**（roster drifted away from the tree）"。
+- 根因＝我 09:0x 给票 139 结案加 `-done` 后缀**只改了树、没改 `scripts/check-path-length-budget.sh` 那行名册**。★这与 `A1074`⑦(a) 的 `git mv` 半删同族：**改名类动作有第二处必须同步的盘面（名册＝数据，不是注释）**。
+- 修法＝照本仓既有惯例（同件 `172`/`174`/`126`/`143` 那四行同形）：`R["...139-...-res-compression-done.md"] = "hist: ... ; closed 2026-10-21 (name now carries -done; the roster follows the rename)"`。
+- 现量＝`bash -n` rc=0；`tracked=17423 / over-budget=60 / covered by roster=60 / not in roster=0 / VERDICT GREEN`；`--with-self-test` 亦 GREEN。
+- ★**它没认领这道红是对的**（那不是它的面；认领＝放宽门禁换绿）⇒ 我不给它记任何缺陷，反而记它一次**具名上报**（⛔ 圆判）。
+
+**③ 三项拍板（回 `136-r1`）**＝(1) **`AC#9` 不再做**＝准（判据已在 HEAD 独立复现；它 13 发变异进交件留档）。(2) **改票 136 标题**（"54"→71 已腐坏）＝**暂不改**：改题面属人工批准面、且那是标题里的历史标记不是判据 ⇒ 登进本节"票名腐坏清单"，等机主一并放行。(3) **`AC#10` 的 `cmd/wisp` 端到端＝授权只读量一遍** ⇒ 已派 `136-r1b`＝`aeb310f5-7dbc-435e-8cef-255569917bed`（只读：⛔ 落 `.go`、⛔ 写用例、⛔ 改断言；写面只 `docs/evidence/s1/136-r1-ac10-readonly.md`）。
+
+**④ ★票名腐坏清单（新开，等机主一并放行改名/改题；⛔ 本波任何腿擅动）**
+- `136-...-has-no-nail-54-tests-stay-green-without-it.md`＝标题里的 **54** 今天已是 **71**（`136-r1` 现量）。
+
+**⑤ 车道**＝在飞写腿 **2**（`174-r1`／`171-r1`）＋只读 **1**（`136-r1b`）＝**写腿 2 < 3（机主规矩）**。★本账落笔时 CPU 三发 `100/90/100` 远超 70% ⇒ 按规矩⛔ 硬塞第三枚；**CPU 一回落即补**（候选＝票 124 posix harness／票 175 需与 174 错开同包／票 132 待 129 结案）。未推 **209**、⛔ 推、⛔ 清理、⛔ 改契约。结案 **9** 票。
+
