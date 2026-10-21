@@ -380,6 +380,11 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 	guard := NewGuard(l.guard)
 	cost := Cost{Currency: l.opt.Config.Currency}
 	res := Result{TaskID: taskID, Status: StatusCompleted}
+	// prevUsage is the provider-reported usage of the previous response in this
+	// task (ticket 358 AC#5). It starts zero - a first turn has nothing observed
+	// yet, so the trigger falls back to the local estimate - and is refreshed
+	// from every turn whose usage is non-zero, further down this loop.
+	var prevUsage llm.Usage
 
 	l.append(userMessage(input))
 	if err := j.startTask(ctx, input); err != nil {
@@ -403,17 +408,32 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 		l.drainSteering()
 
 		hist := l.History()
-		if l.comp.Need(hist) {
+		// Ticket 358 AC#5: the trigger's numerator is the provider-reported
+		// input-token count of the PREVIOUS response when there is one. It is
+		// in hand right here - prevUsage is assigned from turn.Usage at the
+		// bottom of this loop, before the next iteration reads it - and only a
+		// first turn (or a provider that reports no usage) falls back to the
+		// local estimate. Trigger names which one it used; nothing is mixed
+		// silently.
+		trig := l.comp.Trigger(hist, prevUsage.InputTokens)
+		if trig.Need {
 			// DEFERRED(D28-1): the Warm-window hook owns this call; the
 			// synchronous fallback here is what the S1 slice accepts.
 			// withTraceTask is what lets the record the compressor books say
 			// which task paid for it (ticket 153 AC#2): run() is the only place
 			// the id exists, and the compressor is shared across tasks.
-			nh, rep, err := l.comp.Compress(withTraceTask(ctx, taskID), hist)
+			nh, rep, err := l.comp.Compress(withTraceTask(ctx, taskID), hist, WithTrigger(trig))
 			if err != nil {
 				l.log().Warn("agent: history compression failed", "err", err)
 			} else if rep.Ran {
 				l.replaceHistory(nh)
+				res.Compression = rep
+			} else {
+				// Ticket 358 AC#1: "该压但压不动" is a reportable outcome, not
+				// a non-event. It rides the same outwire field a successful
+				// pass does, so a reader sees the attempt (and the numerator
+				// behind it) instead of a zero report indistinguishable from
+				// "this run never came near the budget".
 				res.Compression = rep
 			}
 		}
@@ -447,6 +467,16 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 		if !turn.Usage.IsZero() {
 			delta := cost.AddUsage(l.opt.Config.Price, turn.Usage)
 			guard.AddCost(delta)
+			// Ticket 358 AC#5: the provider's own input-token count for THIS
+			// response is the next iteration's trigger numerator. It REPLACES
+			// the previous reading rather than max-merging with it: the number
+			// describes one request, and the freshest request is the one whose
+			// context most resembles what the next call will send. A turn that
+			// reports no input tokens leaves the last real measurement in
+			// place instead of zeroing it.
+			if turn.Usage.InputTokens > 0 {
+				prevUsage = turn.Usage
+			}
 			if guard.AddUsage(turn.Usage) {
 				l.publishUsage(&res, cost)
 				return l.brakeStuck(ctx, root, j, guard, cost, &res, BrakeToken,

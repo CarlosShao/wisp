@@ -58,8 +58,122 @@ type Summarizer interface {
 //
 // Privacy: [privacy] keep_transcript forbids putting history text on this
 // line, so every attribute is a count or a flag.
+// CompressionState is the outcome of one compression pass (ticket 358 AC#1,
+// the shape the orchestrator ruled: a tri-state enum, NOT a companion bool).
+//
+// Why an enum and not a second bool on Ran: "did not trigger" and "triggered
+// but could not fold" are different answers to different questions, and two
+// booleans can express the illegal pair Ran=true && Skipped=true. A single
+// enum makes exactly one state readable at a time. The vocabulary is the one
+// mainstream compaction uses.
+type CompressionState string
+
+const (
+	// CompressionSkipped: this pass was not an attempt. The trigger never said
+	// the history was over its budget, so the fold loop was never entered.
+	CompressionSkipped CompressionState = "skipped"
+	// CompressionAttempted: the pass WAS an attempt - the trigger said the
+	// history is over budget, or the fold loop was entered - and it folded
+	// nothing. This is the state ticket 358 exists for: "该压但压不动" used to
+	// be indistinguishable from "没触发" on every surface Wisp has.
+	//
+	// Two shapes reach it, and the report's own numbers tell them apart:
+	//   - the fold loop was entered and broke at the KeepRawRounds floor
+	//     (TokensBefore > Threshold, KeptRawRounds == KeepRawRounds);
+	//   - the provider-reported input tokens cleared the threshold while this
+	//     pass's own estimate says the history is under the fold budget
+	//     (TokensBefore <= Threshold): the trigger fired, the fold had
+	//     nothing of its own to take.
+	CompressionAttempted CompressionState = "attempted"
+	// CompressionCompacted: at least one round was folded into the summary
+	// block. Ran is the compatibility mirror of this state.
+	CompressionCompacted CompressionState = "compacted"
+)
+
+// Valid reports whether s is one of the three states.
+func (s CompressionState) Valid() bool {
+	switch s {
+	case CompressionSkipped, CompressionAttempted, CompressionCompacted:
+		return true
+	}
+	return false
+}
+
+// String makes the state readable in a record or a failure message.
+func (s CompressionState) String() string {
+	if s.Valid() {
+		return string(s)
+	}
+	return "unknown(" + string(s) + ")"
+}
+
+// TriggerSource names the numerator a trigger decision was made on (ticket 358
+// AC#5). The two are never mixed silently: the state report carries the source
+// and so does every trace record, because "we compressed because the provider
+// said 40k" and "we compressed because our own estimate said 40k" are
+// different facts about one run.
+type TriggerSource string
+
+const (
+	// TriggerEstimate: the local approximation (ApproxTokensOf). This is what
+	// Need() has always used and what a first turn has to use - nothing has
+	// been observed yet.
+	TriggerEstimate TriggerSource = "estimate"
+	// TriggerProviderUsage: the input-token count the provider itself reported
+	// for the previous response (llm.Usage.InputTokens). Mainstream harnesses
+	// trigger compaction on this number, and it is the only one that knows
+	// what the request actually cost on the wire.
+	TriggerProviderUsage TriggerSource = "provider_usage"
+)
+
+// Valid reports whether s names a numerator.
+func (s TriggerSource) Valid() bool {
+	return s == TriggerEstimate || s == TriggerProviderUsage
+}
+
+// TriggerReading is one trigger decision WITH its basis (ticket 358 AC#5).
+// Tokens is the numerator that was compared, Threshold the frozen budget it was
+// compared against; nothing else decides the trigger.
+type TriggerReading struct {
+	Need      bool
+	Tokens    int
+	Threshold int
+	Source    TriggerSource
+	// Observed is the provider-reported input-token count handed in (0 when
+	// the caller had none: first turn, or a provider that reports nothing).
+	Observed int
+}
+
+// skip-reason values carried by the "attempted" trace record. They name WHY an
+// attempt folded nothing, so a reader does not have to infer it.
+const (
+	// skipReasonKeepRawFloor: the fold loop ran and stopped at the D15(4) floor
+	// - the last KeepRawRounds rounds must stay verbatim, so there was nothing
+	// left to fold.
+	skipReasonKeepRawFloor = "keep_raw_rounds_floor"
+	// skipReasonUnderFoldBudget: the trigger fired (on the provider's number)
+	// while this pass's own estimate puts the history at or under the fold
+	// budget, so the fold loop never took a round.
+	skipReasonUnderFoldBudget = "under_fold_budget"
+)
+
 type CompressionReport struct {
-	Ran            bool
+	// Ran is the compatibility mirror of State == CompressionCompacted. State
+	// is authoritative: every report Compress returns satisfies
+	// Ran == (State == CompressionCompacted) (pinned by
+	// TestCompressionStateRanIsTheMirrorOfCompacted).
+	Ran bool
+	// State is the three-state outcome (ticket 358 AC#1). Every report Compress
+	// returns carries one of the three valid states. The empty string is NOT a
+	// state: it is what a CompressionReport nobody filled in holds, i.e. "no
+	// pass ran at all" (the loop's Result.Compression for a run that never
+	// reached the compressor). Keeping that outside the enum is deliberate - an
+	// unfilled struct must not read as "we looked and decided not to".
+	State CompressionState
+	// TriggerSource and TriggerTokens are the basis this pass was triggered on
+	// (ticket 358 AC#5): never defaulted silently, always named.
+	TriggerSource  TriggerSource
+	TriggerTokens  int
 	CompressedMsgs int
 	KeptRawRounds  int
 	PreservedIDs   []string
@@ -126,9 +240,49 @@ func (c *Compressor) TotalTokens(hist []llm.Message) int {
 	return n
 }
 
-// Need reports whether the history is over the compression threshold.
+// Need reports whether the history is over the compression threshold, measured
+// with the local estimate. Its threshold semantics are the frozen D15 ones and
+// are NOT touched by ticket 358; it is the estimate-only reading, kept because
+// callers that have no provider measurement (and the tests that pin the budget)
+// still need it.
+//
+// The loop does not call this any more: it calls Trigger, which prefers the
+// provider-reported input tokens and only falls back to exactly this estimate
+// when the provider reported nothing (ticket 358 AC#5).
 func (c *Compressor) Need(hist []llm.Message) bool {
 	return c.TotalTokens(hist) > c.b.HistoryCompressTokens
+}
+
+// Trigger decides whether to compress and records which numerator decided it
+// (ticket 358 AC#5).
+//
+// observed is the input-token count the provider reported for the PREVIOUS
+// response (llm.Usage.InputTokens), or 0 when there is none - the first turn of
+// a task, or a provider that reports no usage. The two numerators are never
+// mixed silently: whichever one produced the decision is named in the reading
+// and travels into the compression report and its trace.
+//
+// The threshold is the same frozen scaled HistoryCompressTokens in both
+// branches: ticket 358 changes the numerator, never the threshold.
+func (c *Compressor) Trigger(hist []llm.Message, observed int) TriggerReading {
+	th := c.b.HistoryCompressTokens
+	if observed > 0 {
+		return TriggerReading{
+			Need:      observed > th,
+			Tokens:    observed,
+			Threshold: th,
+			Source:    TriggerProviderUsage,
+			Observed:  observed,
+		}
+	}
+	est := c.TotalTokens(hist)
+	return TriggerReading{
+		Need:      est > th,
+		Tokens:    est,
+		Threshold: th,
+		Source:    TriggerEstimate,
+		Observed:  observed,
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -179,12 +333,67 @@ type round struct {
 	isSummary bool
 }
 
+// CompressOption tweaks a single Compress call. The option list is open by
+// design, so existing callers compile unchanged.
+type CompressOption func(*compressCall)
+
+// compressCall carries the per-call inputs that are not part of the frozen
+// signature.
+type compressCall struct {
+	// trigger is the reading that made the loop enter the compressor, or the
+	// zero TriggerReading when the caller did not compute one. It is what turns
+	// a pass that folded nothing from "we do not know why" into "attempted,
+	// and here is the numerator that said so".
+	trigger TriggerReading
+	// hasTrigger distinguishes "the caller computed a reading" from "the zero
+	// reading", which matter differently: with no reading the pass reports its
+	// own estimate as the basis.
+	hasTrigger bool
+}
+
+// WithTrigger hands Compress the trigger reading the caller already computed
+// (ticket 358 AC#5). Compress does not re-decide the trigger - the loop owns
+// that decision - but a pass that folds nothing must still be able to say
+// whether it was an attempt, and on which numerator.
+func WithTrigger(r TriggerReading) CompressOption {
+	return func(cc *compressCall) {
+		cc.trigger = r
+		cc.hasTrigger = true
+	}
+}
+
 // Compress folds the oldest rounds until the history fits the threshold or
 // only KeepRawRounds raw rounds remain. It never mutates the input slices'
 // content and always returns a freshly built history.
-func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Message, CompressionReport, error) {
-	rep := CompressionReport{TokensBefore: c.TotalTokens(hist)}
+//
+// Ticket 358 AC#1: the returned report carries a three-state outcome. A pass
+// that was triggered and folded nothing is CompressionAttempted, and it leaves
+// a trace of its own ("agent: history compress skipped") - the state that used
+// to be invisible everywhere.
+func (c *Compressor) Compress(ctx context.Context, hist []llm.Message, opts ...CompressOption) ([]llm.Message, CompressionReport, error) {
+	var call compressCall
+	for _, o := range opts {
+		o(&call)
+	}
+
+	rep := CompressionReport{
+		TokensBefore:  c.TotalTokens(hist),
+		TriggerSource: TriggerEstimate,
+		TriggerTokens: c.TotalTokens(hist),
+	}
+	if call.hasTrigger {
+		rep.TriggerSource = call.trigger.Source
+		rep.TriggerTokens = call.trigger.Tokens
+	}
 	rounds := groupRounds(hist)
+	// entered is the fact the tri-state keys on: did this pass actually try to
+	// fold? Two things can make it true - the caller's trigger reading, or this
+	// pass's own estimate clearing the fold budget (a bare Compress call with
+	// no reading is still an attempt when the history is over).
+	entered := call.hasTrigger && call.trigger.Need
+	if c.totalOf(rounds) > c.b.HistoryCompressTokens {
+		entered = true
+	}
 	// ledger accumulates every tool_call id ever folded, so it can only grow.
 	var ledger []string
 
@@ -224,6 +433,20 @@ func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Me
 	rep.KeptRawRounds = len(rawRoundIndexes(rounds))
 	rep.PreservedIDs = dedupe(append(allToolCallIDs(out), ledger...))
 	rep.RawIDsInsideSummary = dedupe(ledger)
+
+	// Ticket 358 AC#1: exactly one of the three states, decided here and
+	// nowhere else. Ran stays the mirror of the compacted state so every
+	// existing reader keeps its meaning.
+	switch {
+	case rep.Ran:
+		rep.State = CompressionCompacted
+	case entered:
+		rep.State = CompressionAttempted
+	default:
+		rep.State = CompressionSkipped
+	}
+	rep.Ran = rep.State == CompressionCompacted
+
 	if rep.Ran {
 		// The one trace a successful pass leaves (AC#2): counts only, never the
 		// folded text. "history_changed" is recomputed from what this call
@@ -237,6 +460,7 @@ func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Me
 		// the caller's reading cannot drift apart.
 		rep.HistoryChanged = rep.TokensAfter != rep.TokensBefore || len(out) != len(hist)
 		attrs := []any{
+			"state", rep.State.String(),
 			"tokens_before", rep.TokensBefore,
 			"tokens_after", rep.TokensAfter,
 			"threshold", c.b.HistoryCompressTokens,
@@ -246,6 +470,12 @@ func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Me
 			"kept_raw_rounds", rep.KeptRawRounds,
 			"history_changed", rep.HistoryChanged,
 		}
+		// Ticket 358 AC#5: which numerator triggered this pass. Named on every
+		// record - a reader must never have to guess whether "token" meant the
+		// provider's number or our own estimate.
+		attrs = append(attrs,
+			"trigger_source", string(rep.TriggerSource),
+			"trigger_tokens", rep.TriggerTokens)
 		// Ticket 153 AC#2: whose pass this was. The key is "task", the name the
 		// loop already uses for the same value (loop.go's task_log Warns), and
 		// the value is the id the Result and every Event of that run carry, so
@@ -255,6 +485,35 @@ func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Me
 			attrs = append(attrs, "task", task)
 		}
 		c.log().Info("agent: history compressed", attrs...)
+	} else if rep.State == CompressionAttempted {
+		// Ticket 358 AC#1: the shape this whole ticket is about. The history
+		// was over its budget on the numerator that counts, and the pass folded
+		// nothing. Without this record the run is indistinguishable from one
+		// whose history was never over budget - which is exactly the hole the
+		// ticket names. Same search prefix as its two siblings ("agent:
+		// history compress"), so one grep answers all three outcomes.
+		reason := skipReasonUnderFoldBudget
+		if rep.TokensBefore > c.b.HistoryCompressTokens {
+			reason = skipReasonKeepRawFloor
+		}
+		attrs := []any{
+			"state", string(CompressionAttempted),
+			"reason", reason,
+			"tokens_before", rep.TokensBefore,
+			"tokens_after", rep.TokensAfter,
+			"threshold", c.b.HistoryCompressTokens,
+			"msgs_before", len(hist),
+			"msgs_after", len(out),
+			"compressed_msgs", 0,
+			"kept_raw_rounds", rep.KeptRawRounds,
+			"history_changed", false,
+			"trigger_source", string(rep.TriggerSource),
+			"trigger_tokens", rep.TriggerTokens,
+		}
+		if task := traceTaskID(ctx); task != "" {
+			attrs = append(attrs, "task", task)
+		}
+		c.log().Info("agent: history compress skipped", attrs...)
 	}
 	return out, rep, nil
 }
