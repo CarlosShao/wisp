@@ -1,6 +1,6 @@
 # 181 — 面板要显示"当前分支／远端分支／已有工作树"这件事，**Go 侧一行读 git 的代码都没有**（四把尺全 0 命中）；而"切分支／开新工作树"那两枚**动作**要动 C17 白名单（今天只有四枚 `panel.*`）＝契约变更 ⇒ **只读那半我推进，动作那半默认不做**（`Q-64`）
 
-- Status: **ready-for-agent（只读普查＋一支只读落地）**；⚠ 本票**不含**任何改变 git 状态的写侧动作，那半在 `Q-64`、默认不做。
+- Status: **DONE（2026-10-21 22:5x 编排者收口＝七格全闭、文件名加 `-done`）** ~~**ready-for-agent（只读普查＋一支只读落地）**；⚠ 本票**不~~、默认不做。
 - 来路：09-28 10:2x，前端那侧递给 owner 的"要拍板三件事"里第 ③ 件（"git 分支/工作树 — 需要 Go 侧读 `.git/HEAD` 并推送分支名 ＋ 本地分支列表 ＋ 已有工作树，再加两条请求：切分支、开新工作树。这是 C17 白名单加方法，属于契约变更，得走批准"）。**它这句"C17 白名单加方法＝契约变更"是对的，我复算成立**；但它把**只读显示**与**写侧动作**捆成一件事交给 owner，于是 owner 被摆了一道本不必现在拍的题。⇒ 本票把两半**拆开**。台账 `A360`。
 - 关联：票 145（快照扩成真载体——本票那几枚字段是它的邻居）· 票 92（composer 的 mode/工作区两格，同一形状："面板不许自造，Go 送真值"）· 票 163（`shell.session`，D34 表里那枚活会话）· `AGENTS §2` 未定义即停清单里那条"`C24` 初始集与 **`C17` 方法白名单定稿**"
 
@@ -30,7 +30,21 @@
 - [x] **AC#3 反向判据（防"把 git 读成工具"这一形走偏）**：交付里**不许出现**任何模型可调用的 `git.*` 工具、不许动 `docs/PLAN.md` 的 D34 表、`internal/panel/bridge.go:42-45` 那四枚 `panel.*` **一枚不许加**（只读显示走**已有的快照推送通道**，不需要新请求方法）。⇒ 若实现判"必须加方法才能读到"，**停手上报**，那说明它把只读那一半和动作那一半又捆上了。
 - [x] **AC#4 非 git 目录那一形必须显式回答**：工作区不是一棵 git 树（今天 `wisp run` 允许任意授权根）时，快照里这一维画什么？⚠ 三档候选（不显示／显示"非代码工作区"／显示未知）各给一句后果，**由我裁、不由写手自选**；不许静默给空数组（那与票 145 判"空数组＝按钮不画"是同一个坑）。
 - [x] **AC#5 契约轴**：`docs/PLAN.md`（D34／D36／D38 三节都近邻）、`docs/specs/**`、`allowlist.txt`、`thresholds.go`／golden 一字节不许动；`C1–C32`／`D1–D47` 任何一处措辞都不许在本票里改。**本票的读面是宿主内部实现，不是新契约**。
-- [ ] **AC#6 门禁**：逐包 `go test -count=1 ./internal/panel/ ./internal/config/`（⚠ `./cmd/wisp/` 本机测不到东西＝票 98；⚠ `./internal/risk/` 要单跑，四包并发会假红＝争用，见 `A359`）＋`sh scripts/d22scan.sh`＋名册两向 `comm` 差集；⚠ **最终读数取在最后一枚 commit 之后**。
+- [x] **AC#6 门禁**：逐包 `go test -count=1 ./internal/panel/ ./internal/config/`（⚠ `./cmd/wisp/` 本机测不到东西＝票 98；⚠ `./internal/risk/` 要单跑，四包并发会假红＝争用，见 `A359`）＋`sh scripts/d22scan.sh`＋名册两向 `comm` 差集；⚠ **最终读数取在最后一枚 commit 之后**。
+  > **2026-10-21 22:5x 编排者翻框（两向 `comm` 差集，我自己现跑）＝成立，新增红 0**
+  > 落地点＝**`16901acb`**（票 181 `AC#7` 生产侧落地）；★**改前基准＝`16901acb^`**，两形都取自 `git archive` 纯导出树（⛔ 工作树）。
+  > **逐包单跑**（票面警示"`internal/risk/` 四包并发会假红＝争用，见 `A359`"，我照办、一次只起一包）：
+  > - `./internal/config/`：**两形全绿**（POST 114 名 / PRE 96 名，FAIL 名册**空**）。
+  > - `./internal/panel/`：**POST FAIL 名册 5 枚 ⇄ PRE 6 枚**；
+  >   ★**新增红＝0**（`comm -13` 空：POST 那 5 枚 **全部⊆PRE**）：
+  >   `TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestC21DesignTokensFourWayAgree`／`TestComposerContractTypesMatchFrontend`／`TestStreamLogDroppedNamingLedgerIsNotBounded35r8`／`TestStreamLogFloodBelowKeyBoundIsNotBounded35r8`；
+  >   ★**反而转绿 3 枚**（`only-in-PRE`）：`TestComposerRenderFixtureTellsTheTruth`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestReadGitOnThisRepositoryIsSelfConsistent`。
+  >   ⇒ 那 5 枚是**既知红**（台账命中 21／38／23／3／3 次），⛔ 本票造成。
+  > - `sh scripts/d22scan.sh` **rc=0 clean**。
+  > ★**"最终读数取在最后一枚 commit 之后"**（本格尾句要求）：我取的是 **HEAD `93259425`**，而 `16901acb` 是其祖先 ⇒ **满足**。
+  > ⚠ `./cmd/wisp/` 按票面**本机测不到东西**（票 98）⇒ 本格 ⛔ 以它为判据、⛔ 假装跑过。
+  > ★**一份读数口径自查**：我第一次跑的是**全名册**差集，得 `only-in-POST=52`——**那 52 是"改前树测试集更小（119⇄170）"造成的新用例名，⛔ 新增红**；
+  > 判"新增红"**只能比 FAIL 名册**（上面那两组）⇒ 已按 FAIL 名册重跑，这才是本格要的那把尺。
 
 - [x] **AC#7（09-28 17:1x 由 `181-r2` 的现量新立，编排者写；⚠ 本格不是 AC#1-5 的缺陷，是修复之后新暴露的一格）**：⚠⚠ **今天这枚"消费改写账户"在结构上是空转的**——`panel.WorkspaceView.Rewritten` 这枚字段**没有任何生产者会把它填成 `true`**。现量（`181-r2` 交、我复跑同向）：快照那条路的构造者 `WorkspaceViewFromRoot`（`internal/panel/workspace.go:60-68`）只塞 `Set`／`Canonical`／`Reason`，`Rewritten` **留零值**；而唯一写真值的那一路在 `workspace.go:104-106` 的成功分支，上游 `:85` 的 `res.Actable()` 对任何改写先返回 `ErrRewrittenPath`（`internal/risk/pathresolver.go:94-97`），`internal/tools/paths_workspace.go:64-66` 再拦一次。⇒ **`AC#1-5` 的"面板显示当前工作树"今天拿到的永远是没被改写过的坐标，所以 `181-r2` 那个分支今天不会走到**（它自己也在表 §② 具名说了"三档今天完全等价"）。⇒ **要做的**：把 producer 侧填成真值（要么 `WorkspaceRoot()` 连账户一起回、要么 `WorkspaceViewFromRoot` 收一枚带账户的结构），⚠ 写面在 `internal/tools/`＋`internal/panel/`，**都在 `181-r2` 那程之外，所以我没顺手修**；判据要能区分"填了账户"与"字段恒 false"（**别拿"编译通过"当证明**）。⚠ **这一格不许被"红已转绿"顶掉**：红转绿只证明**消费那一跳接上了**，不证明**生产者会说话**。
 
