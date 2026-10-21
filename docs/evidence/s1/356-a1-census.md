@@ -70,7 +70,7 @@
 
 ## 4. 反控：两形状 notice 原文并排，逐字指出 R3 形状下错在哪几个字
 
-`task.output` 两侧 notice **逐字节相同（243 = 243）**；`announceOf` 之差（428 对 435）只来自各自 fixture 的 `全文见 <path>`，那是指针句（`PLAN.md:2564` 冻结），不算回执。
+`task.output` 两侧 notice **逐字节相同（243 = 243，每次跑都相同）**；`announceOf` 的差（428 对 435、426 对 433 等，随 fixture 临时目录名的位数浮动）只来自各自 fixture 的 `全文见 <path>`，那是指针句（`PLAN.md:2564` 冻结），不算回执。
 
 ```
 R3 A 档：注意：这条路径现在读不到，它不在你被授权的目录范围内：fs.read 会要一张 L2 卡，没人批就是直接拒；回来的路有两条——要么用户把所属目录加进 [fs] allowed_dirs，要么批下那一张卡
@@ -95,7 +95,7 @@ R2-only：注意：这条路径现在读不到，它不在你被授权的目录�
 | `GOFLAGS= go build ./...` | **0** | 无输出（0 行） |
 | `GOFLAGS= go vet ./internal/tools/` | **0** | 无输出（0 行） |
 | `GOFLAGS= go test -count=1 -run '174r1' -v ./internal/tools/` | **0** | 首跑 `ok  github.com/CarlosShao/wisp/internal/tools  0.424s`；落件前后多次复跑 `0.162s` / `0.126s`，四数逐次相同 |
-| `GOFLAGS= go test -count=1 -run 'TestPointer|TestTaskOutputPointer|TestHealthyPointer|TestSensitiveFileIsDeniedNotEscalated|TestEmptyAllowlistAuthorizesNothing' -v ./internal/tools/` | **0** | `ok  ...  0.723s` |
+| `GOFLAGS= go test -count=1 -run 'TestPointer|TestTaskOutputPointer|TestHealthyPointer|TestSensitiveFileIsDeniedNotEscalated|TestEmptyAllowlistAuthorizesNothing' -v ./internal/tools/` | **0** | `ok  ...  0.723s`（该选择器共跑起来 23 名，四数见下） |
 
 **四数分开（不相减）**：`174r1` 选择器 `RUN=4 / PASS=4 / FAIL=0 / SKIP=0`；宽选择器 `RUN=23 / PASS=23 / FAIL=0 / SKIP=0`（缩进层 `^    --- PASS` 两侧皆 **0**，与上面不同分母）。
 代码面 md5（HEAD blob 对工作树，六枚全 `same=yes`）：`task.go 432a52be...`、`bridge.go 0f754371...`、`fs.go cc22d191...`、`paths.go adeb51d9...`、`rules_gateway.go acec8584...`、`assessor.go 94271869...`。
