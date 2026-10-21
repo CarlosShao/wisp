@@ -1,0 +1,57 @@
+【派单·票 358 落地腿 358-r1】写腿·2026-10-21 16:0x +08 编排者
+
+■ 身份
+写腿（实现者）。裁决者≠实现者：⛔ 给自己的活出终裁、⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`／台账。
+票面＝`.scratch/wisp/issues/358-compression-needed-but-not-foldable-leaves-no-trace-add-the-reading-not-the-contract.md`（先通读，七格）。
+★**选型已由编排者按铁律拍定（`AGENTS.md` ⓪⓪⓪），⛔ 重新讨论、⛔ 换个更"稳"的弱化版**。
+
+■ 一句话目标
+①让"**该压但压不动**"这一形**留得下痕**（三态：attempted／skipped／compacted）；②把**触发基数**从"本地估算"换成"provider 回报的实际 input token"（**真值不可用时回落估算并在痕里标明**）。
+
+■ ★已拍的选型（逐条照做，⛔ 自己改形）
+**AC#1 裁形＝〔乙〕三态枚举**（理由：主流 compaction 都有 attempted/skipped/compacted 三态；〔甲〕"给 `Ran` 加伴生字段"用两布尔表达三态**必然留下非法组合**；〔丙〕"日志追一个键"**不构成状态**）。
+**AC#5 触发基数＝升进正题、本票做**（我核过管路现成：`internal/llm/events.go:92` 的 `Usage` 已带 `InputTokens`；`internal/agent/loop.go:447-455` 已在消费它；`Need()` 在 `loop.go:405` 被调用时**上一轮 `turn.Usage` 就在手边**（`:447` 才用掉）⇒ **接线即可、⛔ 新造管路**）。
+
+■ 写面天花板（越界＝作废）
+- 允许：`internal/agent/compress.go`（三态字段与判据）、`internal/agent/loop.go`（**只许**把上一轮 `turn.Usage.InputTokens` 喂给 `Need`／或喂给压缩机）、`cmd/wisp/**`（若痕需要出口；★本波唯一碰 `cmd/wisp` 的写腿）、`docs/evidence/s1/358-r1-*.md`。
+- ⛔ **改 D15 的任何预算数字**：`Need()` 的**阈值语义**、`KeepRawRounds = 3`（`budgets.go:42`）、`refHistoryTokens = 12000`、`refTokenBudget = 200000`、`ReferenceContextWindow = 128000`（`budgets.go:16-18`）—— ⛔ 碰这些数字与判据。
+- ⛔ 改 `docs/PLAN.md`／`docs/specs/**`（**契约文字改动归机主批，另一步**，⛔ 你碰）。
+- ⛔ 新造 Go→前端事件／新 `panel.*` 方法／新 JSON 键（`SPEC-08` 第 5.2 节白名单＝契约变更）⇒ 碰到就**停手上报**。
+- ⛔ `internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、`thresholds.go`、任何 golden、`frontend/**`、`design/**`。
+- ★**写面互斥**：`internal/agent/**` 与 `cmd/wisp/**` 本波你独占；⛔ 动 `internal/tools/**`、`internal/config/**`、`internal/winsec/**`（别的腿在那两面）。
+
+■ 开工前（⛔ 跳步＝空跑作废）
+1) `git status --porcelain`：`internal/agent/**`／`cmd/wisp/**` 有**别人的**未提交改动 ⇒ 停手上报。
+2) ★**票面前提新鲜度（尺 v4 ⑧）**：票面里每条可现跑断言**逐条现跑**并记读数。★已知一处需你复认：`compress.go:180-183` 的
+   `for … { if len(raw) <= c.b.KeepRawRounds { break } }` 就是"该压但压不动"的**真实发生位置**（我核过；你独立复跑确认）。
+3) 现量并记录：`Need()` 今天走哪条路（`TotalTokens` ⇒ `ApproxTokensOf`）；`turn.Usage.InputTokens` 在 `loop.go` 的可用点（`:405` 与 `:447` 的先后）。
+
+■ 做法（硬）
+- **先量后写**：交件里必须先给"三态今天各是什么读数"（造三发历史：①没到阈值 ②真压了 ③超阈值但只剩 `KeepRawRounds` 那 3 轮压不动），
+  再给"你加了什么让 ③ 留得下痕"。
+- 每一处行为改动配**一枚今天响、不修不响**的用例；★反向判据＝把新加的那一跳摘掉 ⇒ 用例必须转红并**逐名报红行**；
+  先证变异落地（`grep -n` 原文 ＋ `go build` rc=0）再读数。
+- ★**三读数**（变异红／还原绿／原样绿）逐字贴；★**还原必须核 `sha256` 回 HEAD blob**（上一批 `124-r1` 只做到一半被我记了缺陷，本批必考）。
+- ★**触发基数那条（AC#5）的判据**：①真值可用（`Usage.InputTokens > 0`）时用真值；②真值不可用（首轮／provider 不报）时**回落到本地估算**，
+  并**在痕里标明用了哪个**（⛔ 静默混用）；③真值／估算**两形各一枚用例**。
+- ⛔ 恒真判据、⛔ `t.Skip`、⛔ 放宽既有断言、⛔ 为了让门禁绿而改既有测试。
+
+■ 环境（照做，否则读数不可信）
+跑门前 `unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；`cmd/wisp` 要 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`；
+⛔ `CGO_ENABLED=0`（本仓必然编不过，sherpa 全文件被 build constraint 排除，那不是缺陷）；
+★`cmd/wisp` 整包测试**必抬 `-timeout 30m`**（`A1079`）；★`gofumpt` 用**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（裸名 rc=127，⛔ 据此判"本机没有"）。
+
+■ Git 纪律
+只 commit **⛔ push**；`add`/`commit` 两处显式 pathspec；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+★**若涉及新文件**：提交后必跑 `git ls-tree -r --name-only HEAD | grep -c '<你的新件名>'` **== 1**。
+主题**逐字**以 `票 358 落地腿 358-r1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★提交正文与交付件 **⛔ 被禁码位**（`§`/`✓`/`≤`/`≠`/`→`/`⇒`/`⛔`/emoji/带圈数字）⇒ 写 `sec N`／`=> `／`NOT`／`(1)`；提交前自己扫一遍。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261021\358r1\**`；⛔ `.out`。
+
+■ 交件（缺一算未交）
+1) `docs/evidence/s1/358-r1-impl.md`（**≤160 行**，过帽拆 `-partN`，⛔ 压行）：三态现读（三发）／选了哪一形＋为什么／改了哪几行（逐行）／新用例逐名＋为什么今天响／三读数逐字＋sha256 还原证明／门禁 rc。
+2) 门禁你自己现跑贴末行：`GOFLAGS= go build ./...`；`go vet ./internal/agent/ ./cmd/wisp/`；`go test -count=1 ./internal/agent/`（四数分开报、⛔ 相减）；`go test -count=1 -timeout 30m ./cmd/wisp/`（同上，★把被 panic 吃掉的枚名登记）；`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh`。
+3) 红名册**逐名**（⛔ 只报枚数），新增红必须 **0**；有就逐名判归属。
+4) 提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界枚数（正控＝同尺打一笔**含 `.go`** 的真提交）。
+
+■ 未定义即停：方案没覆盖 ⇒ **停手上报**，⛔ 自行假设。★特别是"三态字段该长什么样"——如果你发现我拍的〔乙〕在某处**做不到**（不是"更麻烦"而是"做不到"）⇒ **停手上报并说清哪里做不到**，⛔ 自己降级成甲或丙。

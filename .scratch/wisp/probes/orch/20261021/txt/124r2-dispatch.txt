@@ -1,0 +1,54 @@
+【派单·票 124 落地腿 124-r2（批 2：internal/tools）】写腿·2026-10-21 16:0x +08 编排者
+
+■ 身份
+写腿（实现者）。⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`／台账。票面＝`.scratch/wisp/issues/124-posix-harness-hands-the-sealing-floor-an-unresolved-temp-root.md`。
+
+■ 一句话目标（批 2）
+把 `internal/tools` 里"**该转还没转**"的那批用例侧递根点，接上票 119 那条纪律（OS 答案先过 `proc.SealableRoot` 再递给密封底线）——
+按非实现者裁腿 `124-v1` 现量的分母：**可转 35 枚**（已扣票 123 那三枚 300s 豁免），**16 枚文件**。
+
+■ 前一批的事实（批 1 已结，⛔ 重做）
+- `internal/config` 一包已由 `124-r1` 清零（`only-in-link 33 => 0`、新增红 0），其 `AC#3`/`AC#4` 已由我翻（非实现者裁 `124-v1` 判语 `docs/evidence/s1/124-v1-verdict.md`）。
+- ★**出口判据已换**（裁腿推翻我原来那条）："**普通形一枚没多红**"**单发根本测不出来**——8 发重复量两侧顶层 FAIL 都横跨 **0..2**、从未冒出第三名。
+  ⇒ **只认名册集合**（两形逐名 `comm` 差集），⛔ 用枚数相等当判据。
+- ★**两枚既有 POSIX-only 摇摆**（`TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent`／`TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed`，均住 `internal/config`）已登台账；
+  ⛔ 你去修它们、⛔ 计入你的分母。
+- ★**票 123 那族三枚 300s 腿按账豁免**（`TestL1Write…`／`TestLateVeto…`／`TestFSReadOnlyNeverOpensACard`）：⛔ 计入分母、⛔ 顺手修。
+
+■ 写面天花板（越界＝作废）
+- 允许：`internal/tools/**` 的 `*_test.go` ＋ 该包**已有**的 sealable-tempdir helper（若没有，⛔ 新写第四份走法 ⇒ 停手上报；批 1 用的是 `internal/config` 自己的 `sealableTempDir124`，一行委托 `proc.SealableRoot`）。
+- ⛔ 改 `internal/tools` 的**生产码**（要改 ⇒ 停手上报）。
+- ⛔ `internal/agent/**`、`cmd/wisp/**`（**本波别的写腿在那两面**）、`internal/config/**`、`internal/winsec/**`、`internal/proc/**` 生产码。
+- ⛔ `internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、`thresholds.go`、任何 golden、`go.mod`/`go.sum`/`.gitignore`/`.github/**`、`frontend/**`、`design/**`、`docs/PLAN.md`、`docs/specs/**`、`docs/reports/**`。
+- ★**不许把放行侧放宽换绿**（票面 `AC#3`）：票 113/119 那两族**拒绝**用例一枚都不许变成通过方式；交件要贴 `git diff` 证**判定分支未动**。
+
+■ 开工前（⛔ 跳步＝空跑作废）
+1) `git status --porcelain`：`internal/tools/**` 有**别人的**未提交改动 ⇒ 停手上报。
+2) ★**票面前提新鲜度**：票面每条可现跑断言逐条现跑。★已知腐坏：那把"`winsec.` 与 `TempDir` 同行"的静态尺**今天恒等于已修态**（分母恒 20／已饱和）⇒ ⛔ 用任何"出现次数"静态尺当分母，**只许用终判据**（纯净快照＋两形各一枚新容器＋逐包 `-count=1 -v`＋两形名册 `comm` 差集取 only-in-link）。
+3) 自己复跑一遍分母：`internal/tools` 今天 **35 枚可转 / 16 文件**（裁腿量到的数；你要独立复跑，⛔ 抄）。
+
+■ 做法（硬）
+- 台面与票面 `AC#2b` 同：纯净快照 `git archive HEAD`、`golang:1.27`、每形一枚新容器、软链形 `ln -s /realpriv /varlink` ＋ `TMPDIR=/varlink/w124tmp` ＋ `exit 97/98` 断言。
+- **出口判据＝名册集合**：两形逐名 `comm` 差集 ⇒ 你的目标包里 **only-in-link 红名 = 0**、**新增红 0**（⛔ 枚数相等）。
+- 每处改动配**一枚今天响、不修不响**的用例；★反向判据＝把新加的那层解析摘掉 ⇒ 用例必须转红并**逐名报红行**；先证落地（`grep -n` ＋ `go build` rc=0）再读数。
+- ★**三读数**（变异红／还原绿／原样绿）逐字贴 ＋ **还原必须核 `sha256` 回 HEAD blob**（上一批只做到一半、被记了缺陷，本批必考）。
+- ⛔ 恒真判据、⛔ `t.Skip`、⛔ 放宽既有断言。
+
+■ 环境
+跑前 `unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；★`GOTMPDIR`/`TMPDIR` 若要设**只许 C: 卷**（换卷会让票 311 守卫拒跑）；
+`gofumpt` 用**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（裸名 rc=127，⛔ 据此判"本机没有"）。
+
+■ Git 纪律
+只 commit **⛔ push**；`add`/`commit` 两处显式 pathspec；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+★**涉及新文件**：提交后必跑 `git ls-tree -r --name-only HEAD | grep -c '<新件名>'` == 1。
+主题**逐字**以 `票 124 落地腿 124-r2` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★提交正文与交付件 **⛔ 被禁码位**（`§`/`✓`/`≤`/`≠`/`→`/`⇒`/`⛔`/emoji/带圈数字）⇒ 写 `sec N`／`=> `／`NOT`／`(1)`；提交前自己扫一遍。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261021\124r2\**`；⛔ `.out`。
+
+■ 交件（缺一算未交）
+1) `docs/evidence/s1/124-r2-impl.md`（**≤160 行**，过帽拆 `-partN`）：逐枚文件（16 枚）＋每枚"原来交了什么、现在过哪一跳"／两形名册 `comm` 差集读数／新用例逐名／三读数逐字＋sha256 还原／门禁 rc。
+2) 门禁你自己现跑贴末行：`GOFLAGS= go build ./...`；`go vet ./internal/tools/`；`go test -count=1 ./internal/tools/`（四数分开报、⛔ 相减）；`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh`。
+3) 红名册**逐名**，新增红必须 **0**；豁免三枚逐名列出并注明"归票 123"。
+4) 提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界枚数（正控＝同尺打一笔**含 `.go`** 的真提交）。
+
+■ 未定义即停：方案没覆盖 ⇒ **停手上报**，⛔ 自行假设。
