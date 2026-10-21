@@ -845,8 +845,19 @@ func (d TaskDeps) pointerNotice(raw string) string {
 		// this same failure, so both legs now say the same thing.
 		notes = append(notes, "注意：这条路径现在读不到，C26 连规范化都没通过")
 	case !d.Paths.InAllowlist(canon):
-		notes = append(notes, "注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；"+
-			"要用户先把所属目录加进 [fs] allowed_dirs 才读得回来")
+		// Both roads back are named, because both exist. [fs] allowed_dirs is a
+		// risk-TIER input, not an execution wall: FSDeps.open canonicalizes and
+		// never re-checks the allowlist, so one L2 card answered yes really does
+		// fetch these bytes (the criterion in
+		// task_output_pointer_notice_174rr1_test.go measures that on the same
+		// bridge). The previous sentence said flatly "fs.read 会被拒 ... 才读得
+		// 回来", which is true only of the nobody-approves case and made this leg
+		// contradict internal/agent/spill.go, which has told the model both roads
+		// for this identical verdict since 174-c2 measured the asymmetry. One
+		// promise, two legs: they now say the same thing.
+		notes = append(notes, "注意：这条路径现在读不到，它不在你被授权的目录范围内："+
+			"fs.read 会要一张 L2 卡，没人批就是直接拒；回来的路有两条——"+
+			"要么用户把所属目录加进 [fs] allowed_dirs，要么批下那一张卡")
 	}
 	if st, statErr := os.Stat(raw); statErr != nil {
 		notes = append(notes, "注意：这条路径现在读不到，宿主登记的那份副本文件并不存在")
