@@ -41,7 +41,7 @@
 | `fs.read` `level`（`ToolOutcome.RiskLevel`） | **`L2`** —— **不是 `Deny`**：`levelString`（`bridge.go:1383`）把 `Deny` 折进 `L2` 一列（账表 `risk_level` 只认 L0/L1/L2 三值，`memory/models.go:130-133`） |
 | `fs.read` 真判级（`OnDecision`） | `Level=Deny`、`RulesHit=[R2 R3]`、`DecisionColumn=reject` |
 | `fs.read` `class` | **`permission_denied`** |
-| `fs.read` 正文前 40 字节（hex） | `e8af a5e7 9bae e6a0 87e8 a2ab e7bb 9de5 afb9 e7a6 81e6 ada2 e8ae bfe9 97ae efbc 8852 3320 4120 e6a1` = `该目标被绝对禁止访问（R3 A ` 加「档」字的**前两字节**；byte[39]=`0xA1` 是续字节，40 字节处切在 rune 中间。正文总 **339** 字节 |
+| `fs.read` 正文前 40 字节（hex） | `e8af a5e7 9bae e6a0 87e8 a2ab e7bb 9de5 afb9 e7a6 81e6 ada2 e8ae bfe9 97ae efbc 8852 3320 4120 e6a1` = `该目标被绝对禁止访问（R3 A ` 加「档」字的**前两字节**；byte[39]=`0xA1` 是续字节，40 字节处切在 rune 中间。正文长度随 fixture 临时目录名的位数浮动（多次跑读到 337 / 339 字节），前 44 字节逐次相同 |
 | `fs.read` 正文逐字 | `该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：R2: 目标路径在授权目录之外: C:\...\.ssh\id_ed25519_356a1; R3: 命中 A 档敏感路径，拒绝（不可豁免）: C:\...\.ssh\id_ed25519_356a1` |
 | **`approval` 被问次数** | **0**（`fs.read` 前后 `windows 0->0 / approvals 0->0`，累计 0；`task.output` 那一发也 0） |
 | 机器可辨值（对比用） | `refusalKindOf(..., Deny)` = **`redteam-denied`** |
@@ -102,7 +102,7 @@ R2-only：注意：这条路径现在读不到，它不在你被授权的目录�
 
 ## 6. 红名册（逐名）
 
-`^(---|    ---) (FAIL|SKIP)` 在两份日志上命中 **0 行**，称**无一名需要归属**（本腿没造红，也没既有红）。
+`^(---|    ---) (FAIL|SKIP)` 在本腿每一份 `-v` 日志（`logs/30-gates*.log`、`logs/31-gates-wide.log`、`logs/2*-paired*.log`）上命中 **0 行**，称**无一名需要归属**（本腿没造红，也没既有红）。
 实际跑起来的 4 名（`174r1` 选择器全量）：`TestPointerOutsideAllowlistNamesEveryRoadBack174r1`、`TestPointerSecondRoadBackIsRealOnThisBridge174r1`、`TestPointerSecondRoadBackIsBookedAsACard174r1`、`TestPointerTwoRoadNoticeLeaksNoPathOrRoots174r1`。宽选择器的 23 名逐名见 `logs/31-gates-wide.log`。
 
 ## 7. 提交号 / 逐枚 `.go` / 越界枚数 / 正控尺
