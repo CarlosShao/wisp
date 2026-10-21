@@ -20515,3 +20515,35 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
 **⑥ ★它比 `109-v2` 多量到的一格（重要）**：目录外种链再从外部名字写入 ⇒ `ReadDir`／`dir /r`／`nlink` **全程无痕**，但**哈希面第 4 步抓到**（`got a33238fcb04b…`, rc=1）⇒ **硬链接不是一律绕过；真正静默通过的只有 ADS**。另 ADS 耐久性：`os.Rename`（主路 `:771`）**流跟着走**、Go `io.Copy`（`copyFile` `:781` 兜底）**流丢掉**。
 
 **⑦ 车道**＝写 **2**（`358-r1`／`124-r2`，均未落笔但活）＋读 **0**（`357-a1` 收线）。未推 **283**、结案 **11**、⛔ 推、⛔ 清理、⛔ 改契约。
+
+## A1100（2026-10-21 17:3x +08，编排者）★收 `358-r1`（两笔）｜★★按铁律裁**票 355 那颗钉子该改**（⛔ 让写腿绕路）｜派续跑实例执行
+
+**① 收 `358-r1`（`05f76ad6` 5 件／`.go` **4**／越界 0；`3ed3fdce` 1 件／`.go` 0；交件 `358-r1-impl.md` **160 行**（帽上、⛔ 过帽）、末字节 `0a`、U+00A7 0）**
+- ★它**先量后写**：三态今天各是什么读数（`BudgetsFor(4096)` 阈值 384）：形(1) 没到阈值 `Need=false/Ran=false/32→32/痕 0`；形(2) 真压 `true/true/1236→780/痕 1`；
+  **形(3) 超阈但只剩 `KeepRawRounds` `Need=true/Ran=false/618→618/痕 0`** ⇒ ★**病根量化＝形(1) 与形(3) 改前完全同形**（`Ran` 都 false、痕都 0）⇒ "该压但压不动"在每个出口都读成"没触发"。
+- 〔乙〕三态枚举**没降级**：`CompressionState` 三值（`skipped`／`attempted`／`compacted`，`compress.go:61-105`），判定只在 `Compress` 尾部一处；空串 `Valid()=false` ⇒ 未填报告读成"压根没跑"；
+  `Ran` 保留为 `compacted` 的镜像（`rep.Ran = State==Compacted`）⇒ **11 处旧读者语义不变**。
+- `AC#5` 触发基数：**`Need()` 一字未改**；新增 `Trigger(hist, observed)` ⇒ `observed>0` 用 provider 真值、否则回落估算，**`Source` 一路带到报告与两条痕**（⛔ 静默混用）；`loop.go` 只做接线（`prevUsage` 由 `turn.Usage.InputTokens>0` 刷新）。
+- 牙：**13 枚新用例**逐枚今天响；突变 M1–M5 **各先证落地**（`grep -n` ＋ `go build` rc=0，无一靠编译错误冒充红）各转红并逐名报；还原绿 5/5、原样绿 12/12。
+- 门禁：`build 0`／`vet 0`／`agent 0`（顶层 RUN 102／PASS 102／FAIL 0／SKIP 0）／`d22scan 0`／`path-length 0 GREEN`（tracked 17510）／`gofumpt 0`（绝对路径）。
+
+**② ★★它报的冲突是真冲突，我按铁律裁了：票 355 那颗钉子该改**
+- 冲突：`cmd/wisp/compression_trace_355_test.go:143` `TestCompressionTraceSilentWhenNothingCompressed` 逐字要求"过了阈值但一枚都没折"这一形在 `compressionLine` 上**静默**；票 358 要它**可读**。
+- ★**我判它该改，因为它的前提今天被 358 打掉了**：`run.go` 那段注释自己写着理由——"`ok=false` 同时覆盖'从没压缩'与'不是压缩的那轮'**两形不可分**…
+  **That is stated rather than papered over — a line printing zeros would claim a measurement nobody took**"。那段话**在 355 当时是对的**（当时两形在报告上完全同形）；
+  但 358 之后有 `CompressionState` ⇒ **两形在类型上已分得开** ⇒ 前提不存在。继续守它＝**用一颗过时的钉子挡住新读数**（`A201②` 那族旧病）。
+- **按铁律第 1／2 条**：⛔ 因"改既有测试有风险"就绕路；该改就**按新语义改**，并把理由写进测试注释。
+- **改法**：`Compacted` ⇒ 输出**逐字不变**；`Attempted` ⇒ 输出**新的一行**明说"超了阈值但一枚都没折"（⛔ 只印零／⛔ 说"没触发"）带 `tokens_before`／`tokens_after`／`trigger`／`source`；
+  `Skipped` ⇒ **仍静默**；`Ran` 镜像语义不动。★那颗钉子改成**两半都钉**＝**比原来更强**，⛔ 删断言换绿。
+- ★它**让开得对**（"我不能改、也不能放宽别人的钉子，整枚退回 `run.go`"）——这是正确处置；**但裁决该我做**，所以现在由我改。
+
+**③ 我收下它另两件（⛔ 它重做）**
+- **`cmd/wisp` rc=1 ⛔ 本票的伤**：同尺对照（只把本票动的两枚文件 `-overlay` 换回 HEAD blob）⇒ **同样 rc=1、同样死在真窗族**；按名作差两向皆空 ⇒ **新增红 0**。
+  ★**两发死点不同名**（当前树 `TestAC14GoSideEvalPushReachesThePage`／HEAD 基线 `TestPanelThreadIsSTAAndExitsCleanly`）＋`-skip` 掉 9 枚真窗族**仍 rc=1**（死点前移 `TestBookedSnapshotReachesHostBitForBit329`）
+  ⇒ ★**整包那 126 枚从未跑到的用例无法用整包判色，属票 314 射程**。⇒ **定式**：本仓 `./cmd/wisp` 整包**今天不能当判据**，只能"按名作差 + 逐发登记死点"。
+- ★**它"回 HEAD blob"的处理我判对**：本票要改的两枚文件与 HEAD **必然不等**（差＝本票改动），所以它改测 `cmd/wisp/run.go`（`git hash-object` = `4865cfde…d3ae` ＝ `git rev-parse HEAD:cmd/wisp/run.go`，逐字相等）⇒ **口径正确**，比硬套"回 HEAD blob"更对。
+
+**④ 派续跑实例执行**＝`988ff6a3-17c9-4275-90af-0bc6a3c92c0c`（★派前按 `A1096` 定式验三项全静：临时件停在 17:24、`go` 进程 **0**、写面空 ⇒ 才放）。
+- ★**交件落点改 `-part2`**：`358-r1-impl.md` **已正好 160 行（帽上）**，追加必超帽。
+
+**⑤ 车道**＝写 **2**（`124-r2`／`358-r1` 续跑）＋读 0。未推 **287**、结案 **11**、⛔ 推、⛔ 清理、⛔ 改契约。
