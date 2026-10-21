@@ -20579,3 +20579,31 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
   **`cmd/wisp` 整包 `rc=1` 今天不能当判据**（`A1100`：既有真窗族红＋进程级截断、每发恰 1 枚 RUN 无判决行且死点漂）⇒ 只能按名作差＋逐发登记死点。
 
 **⑥ 车道**＝写 **1**（`358-r1` 续跑，活）＋读 0。未推 **291**、结案 **11**、⛔ 推、⛔ 清理、⛔ 改契约。
+
+## A1102（2026-10-21 18:1x +08，编排者）★收 `358-r1b`（五笔）｜翻票 358 `AC#3`／`AC#6`（六把门＋全族同发我自己跑）｜★放两枚腿（`358-v1` 裁／`124-r3` 写）
+
+**① 收 `358-r1b`（五笔，末笔 `cfa8bff2`）＝三把尺我现跑**
+- 提交真在：代码笔 `43f44f59` **3 件全 `.go`**（`cmd/wisp/run.go`、`compression_trace_355_test.go`、新 `compression_trace_358_test.go`）、越界 0；其后 4 笔只交付件（`.go` 0）。
+- 件真在：`358-r1-impl-part2.md` **正好 160 行**（帽上）、末字节 `0a`、U+00A7 **0**；★**前作 `358-r1-impl.md` 一字未动**（`numstat` 0 行）⇒ 它压帽时没动前作。
+- ★**它自己报"第一版 182 行超帽、自己压到 160"** ⇒ 处置对（⛔ 我替它圆，也 ⛔ 夸）。
+
+**② ★它最强那条我独立复现**：`compressionLine` 三态实码**逐字符合裁决**——`Compacted` 那一行**逐字不变**／`Attempted` 新行带 `tokens_before`／`tokens_after`／`trigger`／`source` 四项／其余 `return "", false`（静默）。
+- ★**它还写了一处我没想到的细节**：`source` 为空就**保持空**、⛔ 填 `estimate`；注释逐字＝"absence is a fact about the report, and inventing a numerator would be this line claiming a basis nobody recorded"。
+  ⇒ **我认这条，它比我的裁决更严**（我的裁决只说"⛔ 静默混用"，它进一步做到"缺失就是缺失，不许补一个假来源"）。
+
+**③ 翻两格（六把门＋全族同发我自己现跑）**
+- `AC#3`：`build 0`／`vet 0`／`agent 0`／`d22scan 0 clean`（`ban #8 cmd/` 144→**145**）／长度门 `0 GREEN`（60／60）／`gofumpt`（绝对路径）三枚改动件**列 0 枚**。
+  ★**全族同发**：`go test -run 'CompressionTrace' -v ./cmd/wisp/` ⇒ **rc=0**，355 三枚（`ThreeFlavours…`／`SilentWhenNothingCompressed`／`ReachesStdout`）＋358 三枚（`CompactedLineIsTheOne355Shipped`／`AttemptedSaysItFoldedNothing` 双子用例／`SkippedStaysSilent`）**全 PASS**。
+  ⚠ **`cmd/wisp` 整包 rc=1 仍未解、⛔ 本票缺陷**（`A1100`）⇒ 本格按"六把门"判、⛔ 按"整包绿"判；整包那 **203 枚从未跑到的**属票 314 射程、**无法判色**。
+- `AC#6`（纪律格，由编排者判）：两枚实例**零翻框**（票面 `[x]` 只有我给的 `AC#1`）、**零改票名／`Status:`／`-done`**、**零 push**、**零碰票 139／355 原句**
+  （★它改的是 `cmd/wisp/compression_trace_355_test.go` 那颗**钉子**——但那是**我裁决授权**它在 `358-ruling-nail-355.txt` 里改的、且只改那一枚，**355 票面本身零字节**）。
+  ★另记它一处**主动**处置（比纪律要求更好）：提交账**不写死自身 sha**、改成"可重跑命令＋已实测两笔"，理由逐字＝"每改一次交付件就又生成一笔、表立刻过期"。
+
+**④ 放两枚腿（派前按 `A1096` 三项全静：临时件停 18:10／`go` 进程 **0**／写面空；CPU 74／80／79）**
+- `358-v1`＝`df95418a-78df-41d0-803d-a51aff2da6d1`（**非实现者裁腿**·票 358）：八项必判，★**重头是"票 355 那颗钉子改得对不对"**——
+  要它自己造反例（让 attempted 静默 ⇒ 必红／让 skipped 印 ⇒ 必红）、并与 `git show 05f76ad6^:` 的**改前**那颗钉子逐条比对判"有没有被删/被弱化"。
+  并要它**自己造变异**（⛔ 只看腿报的 M1–M5）＋独立复核 `compacted` 行是否**逐字等于 355 原行**（尺＝取 `b676092d` 版原格式串对比）。
+- `124-r3`＝`348b0bf5-e20d-423b-ac04-04c79dc2470d`（**写腿·票 124 批 3，最后一批**）：`cmd/wisp`。派单写死**分母两把分开报**（票 124 族 37 名／13 文件 vs DPAPI 族 68+9）＋
+  **`cmd/wisp` 整包 rc=1 不能当判据**（按名作差＋逐发登记死点）＋变异红名按"目标名全回归＋同族连带只许增"＋⛔ 带 CRLF。
+
+**⑤ 车道**＝写 **1**（`124-r3`）＋裁 **1**（`358-v1`）。未推 **297**、结案 **11**、⛔ 推、⛔ 清理、⛔ 改契约。
