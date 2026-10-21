@@ -1,0 +1,35 @@
+【编排者裁决·票 357 落地腿 `357-r1`·枚举 API 用哪一枚】2026-10-21 23:2x +08
+
+■ 你停手是对的：**我的派单前提事实上错了**
+- 派单 `:23-26` 逐字写"用 `golang.org/x/sys/windows` 里**已有的** `FindFirstStreamW`／`FindNextStreamW`"。
+- ★**我独立核实你那条读数，完全成立**（我自己跑，⛔ 采信你的转述）：`golang.org/x/sys@v0.48.0/windows` 27 枚 `*.go`，
+  `FindFirstStreamW` **0**／`FindNextStreamW` **0**／`WIN32_FIND_STREAM_DATA` **0**；
+  **正控** `func CreateFile`／`func FindClose`／`func GetFileInformationByHandleEx`／`FileStreamInfo` **各 1 枚命中** ⇒ **尺是活的**。
+- ⇒ **错在我**：我在派单里把一个**不存在于该版本的封装**写成"已有"。★这与本仓那条老病同族——**引 API 名不现跑就写进派单**。
+
+■ ★裁决＝**(甲)** 改用 `GetFileInformationByHandleEx` ＋ `windows.FileStreamInfo`
+**为什么（按 `AGENTS.md` ⓪⓪⓪ 铁律）**：
+1. **最有价值**：你已经**量通了**（真 NTFS、零 mock）——G（只有主体）`named=[]` **0 枚**；D1（主体＋`model.onnx:attacker` 19 B）`named=[":attacker:$DATA"]` **1 枚、流名点了名**。⇒ **正是〔丁〕形要的读数**。
+2. **⛔ 选（乙）手写 `FindFirstStreamW`**：按铁律第 3 条——多一片手写 syscall 面（`NewLazySystemDLL`＋`NewProc`＋手映 `WIN32_FIND_STREAM_DATA`），**买不到额外价值**（同样一个流名枚举，已有一条现成导出 API 走通）。
+3. **零新依赖、零手写 syscall、零 `internal/winsec` 改动** ⇒ 三条停手条款**全部不触发**。
+4. ★**手映 24 字节 `FILE_STREAM_INFO` 我判可**：那与本仓既有做法**同形**（`internal/ball/win32_windows.go:160` 起一串手映结构体＋`unsafe.Sizeof`），**不是**新开一扇门。
+
+■ 落地硬条（照做，⛔ 省）
+1. ★**必须带 `ERROR_MORE_DATA` 重试**：你量到 4096 B 单次缓冲在 **200 条**短流时返回 `More data is available` 且 `all=[]`；
+   ★**不加这个重试，流多时退化成假阴**——那会让〔丁〕形在"真有问题"的文件上**静默放行**，比不做更糟。⇒ 重试要有**上界**（⛔ 无限循环），上界内仍拿不全 ⇒ **具名报**（⛔ 静默当空）。
+2. ★**只能逐文件调**（你量到目录句柄返回空列表且 `err=nil`）⇒ ⛔ 指望目录句柄一次列全。
+3. ★**枚举的目录必须沿 `internal/models/downloader.go:298-302` 的 `dir`**（有 `local_override` 时是 **override 目录**），**⛔ 用 `store.root`**——
+   那正是"味一"留的坑（CLI 打 `store=` 而守卫验 override）。★这条你已钉住，我确认：**这条是本票最容易做错的地方**。
+4. 〔丁〕原判据不变：枚举到 ADS ⇒ `cmd/wisp/models.go:253-255` 那句之后**明说一句**（含**流名**＋"清单未点名"）、**rc 仍 0**；
+   没枚举到 ⇒ 输出**与本改前逐字相同**。
+5. 非 Windows：`//go:build !windows` **恒返空**；交件**具名说清**"POSIX 侧那枚用例只能是控制腿、⛔ 当牙"。
+
+■ 你已打好的地基我照收（⛔ 重做）
+- D1 静默通过**今晚复量成立**（`与已验签清单一致` rc=0）＋ G 输出**逐字相同**＝〔丁〕第 3 点的**基线**。
+- 票面三处腐坏**逐条现跑三处都成立**（sec 5(c)／`grep` 命中 2 枚／342·348"已立，未派"）⇒ 我已把这些写进 `A1116`。
+- `go build ./...` rc=0／`go vet ./internal/models/` rc=0／`go test -count=1 ./internal/models/` rc=0。
+- ★**你 156 行的停手件合格**（`.go` 0、末字节 `0a`、U+00A7 **0**）⇒ 我认它是**有效交付**，⛔ 当"白跑"。
+
+■ 下一步
+按原派单**一次做完** `AC#3`（落地＋今天响的用例＋反向判据转红**逐名报红行**＋三读数＋**正例 G 仍绿**）＋`AC#4`（门禁）。
+★交付件写**新的** `docs/evidence/s1/357-r1-impl-part2.md`（⛔ 追加到那 156 行件里——它已近帽，追加必超 160）。
