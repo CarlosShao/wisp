@@ -145,7 +145,7 @@ func TestPointerOutsideAuthorizedRootSpeaks(t *testing.T) {
 // path that is not there. Pre-fix this took the "有指针" branch and stayed
 // silent, so "后半段不可找回" never fired either - the stub pointed at air.
 func TestPointerToMissingCopyFileSpeaks(t *testing.T) {
-	dir := tempCanonical(t)
+	dir := sealableTempCanonical124(t)
 	body := asciiRun(20000)
 	ghost := filepath.Join(dir, "tool-output-does-not-exist.txt")
 	if _, err := os.Stat(ghost); !os.IsNotExist(err) {
@@ -202,7 +202,7 @@ func TestPointerToNonRegularPathSpeaks(t *testing.T) {
 // file. Pre-fix silence here was accidental; post-fix silence is the contract,
 // and it must coincide with fs.read actually returning the whole text.
 func TestHealthyPointerStaysSilent(t *testing.T) {
-	dir := tempCanonical(t)
+	dir := sealableTempCanonical124(t)
 	body := asciiRun(20000)
 	good := mustWriteFile(t, filepath.Join(dir, "tool-output-174-healthy.txt"), body)
 
@@ -348,7 +348,7 @@ func TestPointerNoticeKeepsTheD153StubShape(t *testing.T) {
 // numbers, nothing appended. Honesty was added where a fact demanded it, not
 // sprayed over every stub.
 func TestHealthyReplyStillMatchesThePreFixTemplate(t *testing.T) {
-	dir := tempCanonical(t)
+	dir := sealableTempCanonical124(t)
 	body := asciiRun(20000)
 	good := mustWriteFile(t, filepath.Join(dir, "tool-output-174-template.txt"), body)
 	roster := NewTaskRoster()
@@ -495,7 +495,7 @@ func TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3(t *testing.T) {
 // the same bridge returns the whole body at L0). The sweep therefore
 // discriminates by BRANCH, not by the token's presence.
 func TestLeakProbeTokenOnALegalPathStaysSilent174r3(t *testing.T) {
-	rootA, rootB := tempCanonical(t), tempCanonical(t)
+	rootA, rootB := sealableTempCanonical124(t), sealableTempCanonical124(t)
 	body := asciiRun(20000)
 	legal := mustWriteFile(t, filepath.Join(rootA, leakProbeSegment174r3+".txt"), body)
 

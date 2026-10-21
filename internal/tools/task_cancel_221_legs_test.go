@@ -79,7 +79,7 @@ func build221(t *testing.T, gate Gate, provider func() llm.LlmProvider, withJour
 	}
 	var j agent.Journal
 	if withJournal {
-		x.mem = openStore(t, t.TempDir())
+		x.mem = openStore(t, sealableTempDir124(t))
 		mustStartTask(t, x.mem, parent197)
 		j = x.mem
 	}

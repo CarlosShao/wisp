@@ -56,7 +56,7 @@ const joinBudget176r1 = 2 * time.Second
 // legs is that the bytes land on disk.
 func backfill176r1(t *testing.T) (*TaskRoster, *agent.Spiller, string) {
 	t.Helper()
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	roster := NewTaskRoster()
 	spills := agent.NewSpiller(filepath.Join(dir, "artifacts"), agent.BudgetsFor(0))
 	return roster, spills, dir

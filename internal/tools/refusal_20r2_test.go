@@ -179,7 +179,7 @@ func Test20r2DenyIsRedTeamNeverAskable(t *testing.T) {
 // cmd/wisp/approval_always.go already drives; nothing here touches the
 // canonicalizer.
 func Test20r2FirstUseAskFlowGoesOnlyThroughConfig(t *testing.T) {
-	cfgPath := filepath.Join(t.TempDir(), "config.toml")
+	cfgPath := filepath.Join(sealableTempDir124(t), "config.toml")
 	base := "schema_version = 2\n\n[fs]\nallowed_dirs = []\n"
 	if err := os.WriteFile(cfgPath, []byte(base), 0o600); err != nil {
 		t.Fatal(err)
@@ -189,7 +189,7 @@ func Test20r2FirstUseAskFlowGoesOnlyThroughConfig(t *testing.T) {
 		t.Fatalf("NewManager: %v", err)
 	}
 
-	outside := tempCanonical(t)
+	outside := sealableTempCanonical124(t)
 	target := writeUnder(t, outside, "wanted.txt", "the bytes the ask is about")
 	offer := filepath.Dir(target) // the line an ask would offer: [fs] allowed_dirs += offer
 
@@ -273,7 +273,7 @@ func Test20r2FirstUseAskFlowGoesOnlyThroughConfig(t *testing.T) {
 // locked-section change, and it takes effect only if ConfirmLocked approves.
 // This test only ever changes the FILE — no in-process widen call exists.
 func Test20r2DirectionEngineAdjudicatesFileLevelAdditions(t *testing.T) {
-	cfgPath := filepath.Join(t.TempDir(), "config.toml")
+	cfgPath := filepath.Join(sealableTempDir124(t), "config.toml")
 	base := "schema_version = 2\n\n[fs]\nallowed_dirs = []\n"
 	if err := os.WriteFile(cfgPath, []byte(base), 0o600); err != nil {
 		t.Fatal(err)
@@ -282,7 +282,7 @@ func Test20r2DirectionEngineAdjudicatesFileLevelAdditions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewManager: %v", err)
 	}
-	outside := tempCanonical(t)
+	outside := sealableTempCanonical124(t)
 	target := writeUnder(t, outside, "wanted.txt", "reload-leg bytes")
 	loosened := strings.Replace(base, "allowed_dirs = []",
 		"allowed_dirs = ["+strconv.Quote(outside)+"]", 1)

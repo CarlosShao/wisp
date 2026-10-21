@@ -81,7 +81,7 @@ func runCallerLoop287(t *testing.T, x *harness221, asKind string) (agent.Result,
 		},
 		Config: agent.Config{
 			Model: "probe-287", ContextWindow: 8192,
-			ArtifactsDir:                filepath.Join(t.TempDir(), "artifacts"),
+			ArtifactsDir:                filepath.Join(sealableTempDir124(t), "artifacts"),
 			PerToolTimeout:              10 * time.Second,
 			PassThroughUnclassifiedRisk: false,
 		},

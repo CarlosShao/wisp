@@ -39,7 +39,7 @@ func Test285RosterRowsCarryDistinctCorrPerCall(t *testing.T) {
 		AdmitTask: func(string) func() { return func() {} },
 		Config: agent.Config{
 			Model: "probe-285", ContextWindow: 8192,
-			ArtifactsDir:                filepath.Join(t.TempDir(), "artifacts"),
+			ArtifactsDir:                filepath.Join(sealableTempDir124(t), "artifacts"),
 			PerToolTimeout:              10 * time.Second,
 			PassThroughUnclassifiedRisk: false,
 		},

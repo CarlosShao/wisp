@@ -163,7 +163,7 @@ var pointerRe = regexp.MustCompile(`全文见 (\S+)…`)
 // bytes must equal the original output the roster holds. The announced total
 // length must equal the real artifact length, not the stub's length.
 func TestLongOutputPointerRecoversEveryByte(t *testing.T) {
-	dir := tempCanonical(t)
+	dir := sealableTempCanonical124(t)
 	full := asciiRun(20000) // 5000 tokens under the 4-bytes-per-token heuristic
 
 	// The artifact is landed by the host, exactly as D15(3) does it, and the
@@ -344,7 +344,7 @@ func TestNoCopyFileAnnouncesLoss(t *testing.T) {
 // approved and fs.read grows an offset, this test goes red and forces this
 // ticket's cell to be re-read. Nothing in it is widened to look better.
 func TestPointerPast256KiBIsNotFullyReadable(t *testing.T) {
-	dir := tempCanonical(t)
+	dir := sealableTempCanonical124(t)
 	full := asciiRun(300 * 1024) // > the 256 KiB single-read ceiling
 	name := "tool-output-164-big.txt"
 	p := filepath.Join(dir, name)

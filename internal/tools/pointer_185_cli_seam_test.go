@@ -90,7 +90,7 @@ func p185Payload(prefix string) string {
 // allowed root, so the artifact the pointer names is readable through C26.
 func p185Seam(t *testing.T) (*TaskRoster, *agent.Spiller, string) {
 	t.Helper()
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	spills := agent.NewSpiller(filepath.Join(dir, "artifacts"), agent.BudgetsFor(128000))
 	return NewTaskRoster(), spills, dir
 }

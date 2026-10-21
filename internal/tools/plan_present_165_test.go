@@ -206,7 +206,7 @@ func Test165PlanPresentAsksThroughTheExistingL2Card(t *testing.T) {
 // that the plan never listed must still raise its own question, and the plan
 // approval must not have left a grant row behind.
 func Test165PlanApprovalRingsAgainForAnUnlistedWrite(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	g := &plan165Gate{answer: AnswerAllow}
 	led := &plan165Ledger{}
 	b, decs := plan165Bridge(t, dir, g, led)

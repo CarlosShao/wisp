@@ -192,7 +192,7 @@ func t224Seed(t *testing.T, paths *PathCanonicalizer, grants *t224Grants, target
 // that never consults grants and a bridge whose check silently never matches both
 // produce "zero windows", which is also what a working feature produces.
 func TestTicket224LiveGrantStopsTheL1Question(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	target := filepath.Join(dir, "notes.txt")
 	if err := os.WriteFile(target, []byte("x"), 0o600); err != nil {
 		t.Fatal(err)
@@ -243,7 +243,7 @@ func TestTicket224LiveGrantStopsTheL1Question(t *testing.T) {
 // match executing the call would let one remembered file authorize an
 // unremembered neighbour, which is wider than what the user clicked.
 func TestTicket224PartialPathCoverageStillAsks(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	var targets []string
 	for _, n := range []string{"a.txt", "b.txt", "c.txt"} {
 		p := filepath.Join(dir, n)
@@ -385,7 +385,7 @@ func TestTicket224SessionGrantNeverCoversDeny(t *testing.T) {
 // seam can fail: it reports it could not look, and it blows up. Both must put the
 // question back on the user rather than assume the answer.
 func TestTicket224GrantSourceThatCannotAnswerMeansAsking(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	target := filepath.Join(dir, "notes.txt")
 	if err := os.WriteFile(target, []byte("x"), 0o600); err != nil {
 		t.Fatal(err)
@@ -445,7 +445,7 @@ func TestTicket224PathlessCallIsNeverGranted(t *testing.T) {
 // memory/schema.go:76 already freeze) and WHICH rule paid for it
 // (tool_call.grant_id, SPEC-02 §3's column).
 func TestTicket224GrantedCallBooksAllowSessionGrantWithItsRow(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	target := filepath.Join(dir, "notes.txt")
 	if err := os.WriteFile(target, []byte("x"), 0o600); err != nil {
 		t.Fatal(err)

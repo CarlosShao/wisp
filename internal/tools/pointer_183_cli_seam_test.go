@@ -91,7 +91,7 @@ func r183Payload(extraPrefix string) string {
 // allowed root, so the artifact the pointer names is readable through C26.
 func r183Seam(t *testing.T) (*TaskRoster, *agent.Spiller, string) {
 	t.Helper()
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	// BudgetsFor(128000) is the CLI's own 128k row: SpillTokens 4000, so the
 	// 20000-byte answer below really spills instead of riding along whole.
 	spills := agent.NewSpiller(filepath.Join(dir, "artifacts"), agent.BudgetsFor(128000))

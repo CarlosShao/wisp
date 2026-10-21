@@ -38,7 +38,7 @@ import (
 // name a path the store itself owns.
 func openStore224r2(t *testing.T) *memory.Store {
 	t.Helper()
-	s, err := memory.Open(filepath.Join(t.TempDir(), "data"))
+	s, err := memory.Open(filepath.Join(sealableTempDir124(t), "data"))
 	if err != nil {
 		t.Fatalf("memory.Open: %v", err)
 	}
@@ -98,7 +98,7 @@ func rowByCorr224r2(t *testing.T, s *memory.Store, corr string) memory.ToolCall 
 // holds the id of the approval_grant row that covered the call, written by the
 // bridge and read back by a second handle on the same database.
 func TestTicket224GrantIDColumnRoundTripsThroughTheRealStore(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	target := filepath.Join(dir, "notes.txt")
 	if err := os.WriteFile(target, []byte("x"), 0o600); err != nil {
 		t.Fatal(err)

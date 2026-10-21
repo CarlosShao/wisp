@@ -181,7 +181,7 @@ func TestTaskOutputStampedOnRealBridge175r2(t *testing.T) {
 // turns the R4 gate into a refusal machine. A result that only confirms what
 // this process just did is not outside content.
 func TestNonContentResultStaysUnmarked175r2(t *testing.T) {
-	dir := tempCanonical(t)
+	dir := sealableTempCanonical124(t)
 	b, prov := stamp175r2Bridge(t, NewTaskRoster(), nil, dir)
 
 	const task = "175r2-plain"
@@ -205,7 +205,7 @@ func TestNonContentResultStaysUnmarked175r2(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestForeignMentionOfHostPathStillHitsR4OnRealBridge175r2(t *testing.T) {
-	dir := tempCanonical(t)
+	dir := sealableTempCanonical124(t)
 	full := asciiRun(20000) // > the spill budget, so the stub (and a pointer) is produced
 	pointer := writeArtifact175r2(t, dir, "tool-output-175r2-call.txt", full)
 
@@ -278,7 +278,7 @@ func TestForeignMentionOfHostPathStillHitsR4OnRealBridge175r2(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestHostMintedPointerRereadStaysCleanOnRealBridge175r2(t *testing.T) {
-	dir := tempCanonical(t)
+	dir := sealableTempCanonical124(t)
 	full := asciiRun(20000)
 	pointer := writeArtifact175r2(t, dir, "tool-output-175r2-ac3.txt", full)
 

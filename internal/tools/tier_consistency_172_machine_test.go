@@ -33,7 +33,7 @@ func tier172Bridge(t *testing.T, allowed string) *Bridge {
 // written here: this is only the glue telling the machine which situation to judge.
 func tier172Calls(t *testing.T) ([]tier172Call, *Bridge) {
 	t.Helper()
-	in, out := t.TempDir(), t.TempDir()
+	in, out := sealableTempDir124(t), sealableTempDir124(t)
 	existing := writeUnder(t, in, "there.txt", "172\n")
 	outside := writeUnder(t, out, "outside.txt", "172\n")
 	if err := os.Mkdir(filepath.Join(in, "sub"), 0o755); err != nil {
