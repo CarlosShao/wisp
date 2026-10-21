@@ -13,7 +13,8 @@
   `pre-r3 e4d363f2` / `post-r3 6b712571`。容器 `golang:1.27` / `go1.27.1 linux/amd64` / `GOPROXY=off` / `CGO_ENABLED=1` /
   每形一枚新容器 / `--rm`；每发先打挂载自证 `go.mod 1026` + `md5 0c266f4d…` + `resolve.go b6876a5e…`（与前各批逐字同字）。
 - 软链形 `ln -s /realpriv /varlink` + `TMPDIR=/varlink/w124tmp` + `exit 90/97/98`；普通形 `[ ! -e /varlink ] || exit 99` + `/plainroot`。
-  全台 22 发 `-v`，四把形状断言**零命中**，`panic` 与 `test timed out` 各 **0**；判据只用**名册集合**（逐名 `comm`），NOT 枚数相减。
+  全台容器 **26 发 `-v`** ＋宿主 **9 发**，四把形状断言**零命中**，`panic` 与 `test timed out` 各 **0**；
+  判据只用**名册集合**（逐名 `comm`），NOT 枚数相减。
 
 ## 1. 八项判语与读数（每项另起尺）
 
