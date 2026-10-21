@@ -1,6 +1,6 @@
 # 359 — `sameAbsoluteness` 那条合取在 POSIX 侧**零分母**（注释性结论没有任何用例钉住）
 
-- Status: **ready-for-agent**（`AC#0` 只读现量可先派；`AC#1` 动码须先过裁形）
+- Status: **DONE（2026-10-21 20:2x 编排者收口＝五格全闭、文件名加 `-done` 防重领键）** ~~ready-for-agent~~
 - 立案：2026-10-21 19:3x +08 编排者立（从票 124 的 `AC#6` 拆出——★那格与本票三批工作**零交集**，⛔ 混为一格）。
 - 来源：票 124 `AC#6` 原文（09-23 14:0x 编排者追加；来路＝票 129 验收方 `acceptor-ticket129-r1` 的 `R-129-2` + 实现者 `next=` N2）。
 - 关联：票 124（三批已交：`internal/config` 33→0／`internal/tools` 38→3／`cmd/wisp` 37→0）· 票 129（`-done`）· `internal/winsec/resolve.go`
@@ -44,11 +44,33 @@
   > ③⛔ 改 `sameAbsoluteness` 的判定语义、⛔ 改注释（甲形不改注释）；④★**两侧都要报**：Windows 侧固定 9 名子集必须仍全绿（⛔ 用全包 FAIL 数——本机全包原样就 `121/68/2/0 rc=1` 且红数在 1~2 抖，普查腿已具名）。
       〔乙〕把那段注释**改成实话**（"这一形在非 Windows 上未有分母"），⛔ 补用例；〔丙〕两者都做。
       ★**未裁形任何实现都⛔ 开工**。
-- [ ] **AC#2 落地＋牙（写腿）**：按裁定那一形做；每处改动配**一枚今天响、不修不响**的用例；
+- [x] **AC#2 落地＋牙（写腿）**：按裁定那一形做；每处改动配**一枚今天响、不修不响**的用例；
+  > **2026-10-21 20:2x 编排者翻框＝成立（形〔甲〕落地），三读数我逐条核过**
+  > 新件＝`internal/winsec/sameabsoluteness_359_other_test.go`（`//go:build !windows`、`package winsec`、96 行）；
+  > ★它**同时钉住两处调用点**：`:456`（`sameTree`）与 `:552`（`answerInsideTree`）各有一条**只靠自身才红**的断言（`:67/:70` 与 `:73/:76`）——
+  > 这是必要的：普查腿量到"只问 `sameTree` 的话摘 `:552` 仍绿"。
+  > **POSIX 三读数**（真容器 `golang:1.27`／`GOOS=linux`／仓外 `git archive` 快照）：原样 `75/47/0/0 rc=0`　⇄　摘 `:456` **`75/46/1/0 rc=1`**（红 `:67/:70`）　⇄　摘 `:552` **`75/46/1/0 rc=1`**（红 `:73/:76`）　⇄　还原 `75/47/0/0 rc=0`；
+  > **`sha256` 三处逐字相同**（提交版／还原台／`git show HEAD:` blob ＝ `8e64efd7…c6e4`）；既有 74 枚四发同数、多的 1 枚正好是新件。
+  > ★**`resolve.go` 工作树 == HEAD blob**（我另量 `hash-object` == `rev-parse`），注释 `:516-518` 与 `pathComponents` **零字节改动** ⇒ 合〔甲〕"⛔ 改判定语义／⛔ 改注释"。
+  > **Windows 侧**：固定 9 名子集 **`11/9/0/0 rc=0`**（★我自己跑其中 4 枚关键名 **全 PASS**）；新件在 `GOOS=windows` 下进 `IgnoredGoFiles` ⇒ ⛔ 进 Windows 分母。
+  > **全包副口径（⛔ 判据）**：我现跑 `RUN=121／PASS_TOP=68／FAIL_TOP=2`，两枚红逐名＝`TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1`／`TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1`
+  > ⇒ **全是票 342 系竞态、原样即红**、与合取无关 ⇒ **新增红 0**（普查腿已具名该族红数在 1~2 抖，故 ⛔ 用全包 FAIL 数当判据）。
       ★反向判据＝把新加的那一跳摘掉 ⇒ 用例必须转红并**逐名报红行**；三读数（变异红／还原绿／原样绿）逐字贴 ＋ **还原核 `sha256`**。
-- [ ] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet ./internal/winsec/`／`go test -count=1 ./internal/winsec/`（四数分开报、⛔ 相减）／
+- [x] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet ./internal/winsec/`／`go test -count=1 ./internal/winsec/`（四数分开报、⛔ 相减）／
+  > **2026-10-21 20:2x 编排者翻框（我自己现跑，⛔ 抄任何腿）＝成立**
+  > `GOFLAGS= go build ./...` **rc=0**／`go vet ./internal/winsec/` **rc=0**／`sh scripts/d22scan.sh` **rc=0 clean**／`sh scripts/check-path-length-budget.sh` **rc=0 GREEN**／
+  > `gofumpt -l`（**绝对路径** v0.12.0）对新件 **0 行**／`gofmt -l` 新件 **0 行**。
+  > `go test -count=1 ./internal/winsec/` **rc=1**，四数分开报：**RUN=121／PASS_TOP=68／FAIL_TOP=2／SKIP_TOP=0**；
+  > ★两枚红逐名＝`…NeverTruncatesAForeignFile342r1`／`…RefusesAForeignNameAndNeverDeletesIt342r1` ⇒ **全是票 342 系竞态、原样即红**、与合取无关 ⇒ **新增红 0**（普查腿已具名该族红数在 **1~2 抖**，故 ⛔ 用全包 FAIL 数当判据）。
       `sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。★`CGO_ENABLED=0` 本仓必然编不过（sherpa），⛔ 当缺陷。
-- [ ] **AC#4 纪律格**：⛔ 翻任何框（本票各格由非实现者裁）、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 124／129 任何原句。
+- [x] **AC#4 纪律格**：⛔ 翻任何框（本票各格由非实现者裁）、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 124／129 任何原句。
+  > **2026-10-21 20:2x 编排者翻框（纪律格由编排者判，⛔ 需非实现者）＝成立**
+  > 本票两枚腿（`359-a1` 只读／`359-r1` 写）**零翻框**（票面 `[x]` 只有我给的 `AC#0`/`AC#1`/`AC#2`）、**零改票名／`Status:`／`-done`**、**零 push**、**零碰票 124／129 原句**。
+  > ★`359-r1` 额外守住〔甲〕边界：`resolve.go` **零字节改动**（我另量 `hash-object` == `rev-parse`）、注释 `:516-518` 与 `pathComponents` 未碰、⛔ 新写第四份走法。
+  > ★**一处它报的观察我判"报告有误、做法无害"**（见 `A1106`）：它说"按字面清 `TEMP`/`TMP` 会让 `os.TempDir()` 返回空串 ⇒ `t.TempDir()` 给出无盘符路径 ⇒ 固定 9 名里 4 枚假红"。
+  > **我实测三条全否**：带环境＝`C:\Users\swq\AppData\Local\Temp`（`IsAbs=true`）；清 `TEMP`+`TMP` ⇒ `C:\Users\swq`（`IsAbs=true`）；再清 `HOME` 同值
+  > ⇒ **Go 在 Windows 上回落到 `C:\Users\swq`，⛔ 返回空串**。⇒ 它"只清 `GOTMPDIR`/`TMPDIR`、留 `TEMP`/`TMP`"**做法无害**（照它口径跑 Windows 侧 4 枚关键名全 PASS），
+  > 但**理由错**、⛔ 当结论留给下一条腿。
 
 ## 硬约束
 
@@ -68,3 +90,13 @@
 （追加式；每条 `- [日期 时刻 +08] agent=… did=… next=…`，钟点由 `date` 插值，不手打。）
 
 - [2026-10-21 19:3x +08] agent=`编排者` did=立案（从票 124 `AC#6` 拆出；★那格与票 124 三批工作零交集，⛔ 混为一格＝`A1099`② 那族"把两件事混成一格"）next=派 `359-a1` 只读腿出 `AC#0` 现读＋变异复现。
+
+- [2026-10-21 20:2x +08] agent=`编排者` did=**收 `359-r1`（四笔 `7835d67f`／`c9bd2a03`／`cc5665d7`／`3ec3a87d`）⇒ 五格全闭、结案** next=无（票完）。
+  - 三把尺：`7835d67f` 2 件/`.go` **1**（新件＋交付件）／其后三笔各 1 件/`.go` 0／越界 **0**；交付件 `359-r1-impl.md` **160 行**（帽上）、末字节 `0a`、被禁码位 **0**。
+  - ★**新件我读过**：`internal/winsec/sameabsoluteness_359_other_test.go`（`//go:build !windows`、`package winsec`）——核心断言 `sameTree(rel, abs) == false` **且镜像序也断言**，另钉 `answerInsideTree` 两个方向；`:456` 与 `:552` **各有一条只靠自身才红**的断言。
+  - ★**POSIX 三读数**（真容器）：原样 `75/47/0/0` ⇄ 摘 `:456` `75/46/1/0`（红 `:67/:70`）⇄ 摘 `:552` `75/46/1/0`（红 `:73/:76`）⇄ 还原 `75/47/0/0`；`sha256` 三处逐字相同。
+  - ★**`resolve.go` 工作树 == HEAD blob**（我另量）⇒ 未碰判定语义与注释 ⇒ 合〔甲〕边界。
+  - **四份/五把门我自己现跑**：`build 0`／`vet 0`／`d22scan 0 clean`／长门 `0 GREEN`／`gofumpt` 新件 **0 行**／`gofmt` 新件 **0 行**。
+  - **全包 `RUN=121／PASS_TOP=68／FAIL_TOP=2／SKIP_TOP=0`**：两枚红逐名全是 `…342r1` ⇒ **票 342 系竞态、原样即红** ⇒ **新增红 0**。
+  - ★**该登的一条我的实测反驳**（`A1106`）：它报"清 `TEMP`/`TMP` 会让 `os.TempDir()` 返回空串 ⇒ 4 枚假红"——**我实测三条全否**，Windows 上 Go 回落到 `C:\Users\swq`（`IsAbs=true`）。**做法无害、理由错**，⛔ 当结论留给下一条腿。
+  - ★**它问的"提交号表要不要每笔全号"我裁**：⛔ 要。含该表的提交**无法在自己的正文里写自己的全号**（bodysha 依内容而定）⇒ 自指只能写短号 ＋ 给可重跑命令（`git log --oneline -N`）。**它按可行做法停住是对的**，⛔ 为凑全号再追加一笔（那会无限后退）。
