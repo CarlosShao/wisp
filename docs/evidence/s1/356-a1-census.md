@@ -50,6 +50,8 @@
 
 **真机正控（证明这不是 fixture 角落）**：用本机**真实存在的** `C:\Users\swq\.git-credentials`（120 字节，`Classify=A`，未搬 `USERPROFILE`、未造锚点）重跑：notice 同为 243 字节且逐字相同；`fs.read` `isError=true level="L2" class="permission_denied"` 233 字节、前 40 字节同形；**approval=0**；真判级 `Deny [R2 R3]`。
 
+**第三方旁证（本仓既有、已验收的判据，本腿现跑，不是我的探针）**：`TestSensitiveFileIsDeniedNotEscalated`（`fs_test.go:157`）与 `TestBridgeRefusesTheRealShortNameOfAnAListFile`（`bridge_junction_windows_test.go:475`）各 `--- PASS`，两者断言逐字相同：A 档读必须 `permission_denied` 且 `window=0 approval=0`。也就是说 `approval=0` 这个承重读数不是我这台子造出来的。
+
 ## 3. 正控：同一台子上的 R2-only 形状，`approval` = **1**（尺分得清两种形状）
 
 同一桥、同一 `*PathCanonicalizer`（同一根外根）、同一读法，只把目标换成 `...\tool-output-356a1-r2only.txt`（`Classify=none`，在根外）。
