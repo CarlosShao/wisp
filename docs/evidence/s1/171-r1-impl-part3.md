@@ -69,3 +69,62 @@ docs/evidence/s1/171-r1-impl-part2.md
   要在 CI 上看见它绿，得等编排者推送后的那一 run。
 - **`--self-test` 的 `cases=9` 会随名册变化**：并发腿加了名册钉子后它变成 `cases=10`。
   这不是过期，是同一枚尺的枚数随登记增长；本件两处读数都带时刻与来源（改前 552 行／改后 662 行）。
+
+---
+
+## 11. 提交自证（提交号＋逐枚名册＋越界数＋正控）
+
+**提交号**：`2a5ae70a3557238574524d535c6129371fb72ea2`（只 commit，未 push）。
+
+名册命令（按票面 AC#4 那条方法学：路径筛先关 quotePath）：
+`git -c core.quotePath=false show --name-only --format='' <commit>`
+
+| 尺 | 我的提交 `2a5ae70a` | 正控 `a8eb0d51`（已知动了 `.go`） |
+|---|---|---|
+| 名册枚数 | **29** | （正控只取两个数） |
+| 其中 `.go` 枚数（应为 0） | **0** | **2** |
+| 越界枚数（写面外，应为 0） | **0** | — |
+| 禁用前缀枚数（`internal|cmd|tools/d22scan|frontend|design|docs/PLAN|docs/specs|docs/reports|go.mod|go.sum|.gitignore|.gitattributes|.github`） | **0** | **2** |
+
+⇒ 同一把尺在正控上打出非零（2 与 2），在我的提交上打出 0 与 0 ⇒ 这两个 0 是**真零**，不是尺子哑了。
+（本腿第一次挑的两枚正控提交 `2a5489d3`／`31b5cd36` 自己也不含 `.go`，所以那两个 0 不能当正控——改用 `a8eb0d51`。）
+
+29 枚名册逐枚：
+
+```
+.scratch/wisp/probes/171/r1/attrib-mut-noring.sh
+.scratch/wisp/probes/171/r1/attrib-mut2-noring.sh
+.scratch/wisp/probes/171/r1/doors-fixed/logs/flip-1.txt
+.scratch/wisp/probes/171/r1/doors-fixed/logs/flip-baseline.txt
+.scratch/wisp/probes/171/r1/doors-fixed/r1-door-fixed-honest.sh
+.scratch/wisp/probes/171/r1/doors-fixed/r1-door-fixed-lie.sh
+.scratch/wisp/probes/171/r1/doors-unfixed/logs/flip-1.txt
+.scratch/wisp/probes/171/r1/doors-unfixed/logs/flip-baseline.txt
+.scratch/wisp/probes/171/r1/doors-unfixed/r1-door-unfixed-lie.sh
+.scratch/wisp/probes/171/r1/fixtures/gate-lie-columns-r1.sh
+.scratch/wisp/probes/171/r1/fixtures/t1_only_trailing_comment.go.txt
+.scratch/wisp/probes/171/r1/fixtures/t2_comment_plus_real_violation.go.txt
+.scratch/wisp/probes/171/r1/fixtures/t3_real_violation_no_mention.go.txt
+.scratch/wisp/probes/171/r1/flip-unfixed-2a5489d3-parent.sh
+.scratch/wisp/probes/171/r1/gate-unfixed-2a5489d3-parent.sh
+.scratch/wisp/probes/171/r1/logs/flip-fixed-honest.txt
+.scratch/wisp/probes/171/r1/logs/flip-fixed-lie.txt
+.scratch/wisp/probes/171/r1/logs/flip-unfixed-lie.txt
+.scratch/wisp/probes/171/r1/logs/gate-fixed-T1.txt
+.scratch/wisp/probes/171/r1/logs/gate-fixed-T2.txt
+.scratch/wisp/probes/171/r1/logs/gate-fixed-T3.txt
+.scratch/wisp/probes/171/r1/logs/gate-unfixed-T1.txt
+.scratch/wisp/probes/171/r1/logs/gate-unfixed-T2.txt
+.scratch/wisp/probes/171/r1/logs/gate-unfixed-T3.txt
+.scratch/wisp/probes/171/r1/r1-flip-columns.sh
+.scratch/wisp/probes/171/r1/r1-two-shots.sh
+docs/evidence/s1/171-r1-impl-part2.md
+docs/evidence/s1/171-r1-impl-part3.md
+docs/evidence/s1/171-r1-impl.md
+```
+
+**没有进入本提交的、同在 `probes/171/r1/` 下的 10 枚**（mtime 10:25-10:28，是**并发腿**写的，
+与本腿提交的 09:48-10:05 批次按时间可切开）：`r1-roster-nails.sh`、`r1-roster-nails-mutants.sh`、
+`r1-unfixed-probe.sh`、`ci-delta.py`、`attrib-mut-named-deleted.sh`、`attrib-mut-named-substituted.sh`、
+`attrib-mut-silent-deleted.sh`、`attrib-mut-control-identical.sh`、`attrib-prefix-head.sh`、
+`attrib-prefix-head-noring.sh`；另有 `logs/nails-*.txt` 6 枚（同一批）。本腿**未 add、未改、未删**它们。
