@@ -55,7 +55,7 @@ step 4 verify => model.onnx: sha256 mismatch (pins 206402cab345..., got a33238fc
 **3.4 哪一层该拦（本腿判语）**
 - **哈希面（再验一次哈希）**：对**硬链接写入**有效（3.2 第 4 步红），对 **ADS 原理性无效**（验的是主体那条流）。
 - **目录项面（`WalkDir` + 未点名判定，票 121 已落地）**：对目录内硬链接有效（D2），对 **ADS 与目录外硬链接无效**（D1/D3）。
-- **读取面**：今天**没有这一层**（读取者不存在，见 part1 sec 2.5）。
+- **读取面**：今天**没有这一层**（读取者不存在，见 主件 sec 2.5）。
 => **判语：味二该拦的一层是"读取面契约"**（读的人只许开清单点名的那条流、那个名字），不是哈希面也不是目录项面。
 理由：哈希面已证明对 ADS 无效；目录项面受 NTFS 语义限制（流不是目录项）；真要把 ADS 挡在门外的机制
 （`FindFirstStreamW` 枚举 ＋ `nlink>1` 判定）是**新增的 Windows-only 平台件**，而它保护的那个读取者今天不存在。
@@ -68,7 +68,7 @@ step 4 verify => model.onnx: sha256 mismatch (pins 206402cab345..., got a33238fc
 
 **4.1 行号尺**：`git show HEAD:<path> | grep -n` / `sed -n`。射程＝**HEAD blob 的 1-based 行号**，含注释与 `_test.go`
 （本件只引非测试文件）；不含工作树 CRLF 差异、不含跨行子串（单行正则）。正控：同尺命中 `:293`
-`func (m *Manager) VerifyInstalled`（part1 sec 1.5 表）；再打一枚必不命中的 `VerifyInstalledXXX` => 0 命中。
+`func (m *Manager) VerifyInstalled`（主件 sec 1.5 表）；再打一枚必不命中的 `VerifyInstalledXXX` => 0 命中。
 
 **4.2 "0 处读取者"那把尺（读 0，已换第二把独立形复读）**
 - 尺 A（文本）：`git grep -n -E "(DataDir|store\.root|ms\.root|installDir)" HEAD -- cmd/ internal/ | grep -v _test.go | grep -E "Open|ReadFile|OpenFile"`
@@ -81,7 +81,7 @@ step 4 verify => model.onnx: sha256 mismatch (pins 206402cab345..., got a33238fc
   （只能证明"装载器包不存在"，不能证明"没有别的读法"）。正控：同尺 `grep -c wisp/internal/models` => 1（数得到真包）。
 - 两把尺给同一答案（0）=> "今天可达性 0"不是单尺结论。
 
-**4.3 `cat-file -e` 尺**：射程＝**该 path 是否在 HEAD tree 里**；不解引用子模块、不判内容。正控见 part1 sec 1.1。
+**4.3 `cat-file -e` 尺**：射程＝**该 path 是否在 HEAD tree 里**；不解引用子模块、不判内容。正控见 主件 sec 1.1。
 
 **4.4 `d22scan` 尺**（"禁码位"那条的仪器）：射程＝`U+1F000–1FAFF`、`U+2200–22FF`、`U+2600–27BF`、`U+2B00–2BFF`、
 `U+FE0F`、`U+1F1E6–1F1FF`；**注释豁免、字符串不豁免**；**箭头 `U+2190–21FF` 与带圈数字 `U+2460–24FF` 刻意不扫**。
@@ -102,26 +102,29 @@ D2 => `rc=1` 点名 `hard.onnx`。两发都红 => 尺不是恒绿。
 
 ## 6 写面与纪律格
 
-- **提交号：`a8f22b99`**（`a8f22b99eb964c9d82bf7825e90764348abc38e9`），主题逐字以 `票 357 普查腿 357-a1` 开头，
-  正文经 `/tmp/msg-357a1.txt` ＋ `-F` 提交。`add`/`commit` 两处都用显式 pathspec（两枚 `docs/evidence/s1/357-a1-census*`）。
-- 仓内**只落两枚读数件**（`357-a1-census.md` ＋ `357-a1-census-part2.md`，222 行合计，单件 101/121 行，均未过帽）；
+- **提交号：本腿两笔 `a8f22b99`（读数件本体）＋ `47a631be`（本 sec 6 补提交号与正控读数）**，
+  主题都逐字以 `票 357 普查腿 357-a1` 开头，正文经 `/tmp/msg-357a1{,b}.txt` ＋ `-F` 提交。
+  `add`/`commit` 两处都用显式 pathspec。
+- 仓内**只落两枚读数件**（`357-a1-census.md` ＋ `357-a1-census-part2.md`，本笔后 101/129 行，均未过 160 帽）；
   仓外 `D:\tmp\wisp\20261021\357a1\**`（`bin/` `probe/` `ntfsprobe/` `copyshape/` `manifest/` `data{A,B,C,D}/`
   `ntfs/` `durab/` `logs/` `shots.ps1`）只建不删。
-- 逐枚 `.go`（本笔 `a8f22b99`）：**0 枚**（`git show --name-only --pretty= HEAD | grep -c "\.go$"` => 0）。
-  越界枚数：**0**（`internal/`/`cmd/`/`scripts/`/`.github/`/`.scratch/wisp/`/`docs/reports/` 前缀逐条 grep 合计 0）。
-  本笔文件全集只有那两枚 `docs/evidence/s1/` 件。
+- 逐枚 `.go`（本腿两笔逐笔现读）：`a8f22b99` **0 枚**、`47a631be` **0 枚**（`git show --name-only --pretty= <c> | grep -c "\.go$"`）。
+  越界枚数：**0**（两笔文件并集只有那两枚 `docs/evidence/s1/` 件；`internal/`/`cmd/`/`scripts/`/`.github/`/
+  `.scratch/wisp/`/`docs/reports/` 前缀合计 0）。
 - 正控尺（同尺打一枚已知非零的样本）：`git show --name-only --pretty= a7dfca91` => 7 文件 / **7 `.go`**（尺活）；
-  打本笔 => 2 文件 / 0 `.go`。
+  打本腿两笔 => 2 文件 + 1 文件 / 各 0 `.go`。
 - 禁码位尺（本件＋提交正文）：射程见 sec 4.4，**注释不豁免于我的自扫**（我按派单逐字避开）。
   正控：同尺打一行含 U+00A7 与 U+2192 的探针串 => 命中 2 枚（尺活）；打本件两枚与提交正文 => 各 **0 行**。
 - 临时件只建不删；未产 `.out`；未 `add -A`/`.`；未 amend/reset/rebase/stash/checkout ./clean；**未 push**
-  （`git log origin/dev..HEAD` 现读仍含本笔，即它只在本机）；未翻任何框、未改票面/台账/`Status:`。
+  （`git rev-list --count origin/dev..HEAD` 现读 279，本腿两笔都在其中，即只在本机）；
+  未翻任何框、未改票面/台账/`Status:`（`git diff --name-only c50218bf..HEAD -- .scratch/wisp/` => 0 枚；
+  `docs/reports/` 那 1 枚是 `e61861b4` 编排者自己的台账笔，NOT 本腿）。
 
 ## 7 两件必须摆给编排者的
 
 1. **味一的判据要改写一格**：今天不是"守卫验错了目录"，而是"**守卫验的是 override、CLI 说的是 store，而交还值没人接**"。
-   part1 sec 2.5 的两把独立尺把"读者 open 错目录"这一后果压到**可达性 0**。若仍要按"守卫验的目录 == 读者 open 的目录"
-   立判据，落点应是**给未来读取者一条强制 handing 契约**（拿 `Ensure` 的返回值，别自己拼 `store/_root/id`），
+   sec 2.5（主件）的两把独立尺把"读者 open 错目录"这一后果压到**可达性 0**。若仍要按"守卫验的目录 == 读者 open 的目录"
+   立判据，落点应是**给未来读取者一条强制 handing 契约**（拿 `Ensure` 的返回值，别自己拼 `store/<root>/<id>`），
    而不是改 `VerifyDir`。
 2. **味二的 A 档代价（`AC#2` 要用）**：流枚举（`FindFirstStreamW`，本机已跑通）＋`nlink` 判定
    （`GetFileInformationByHandle`，`fs.FileInfo` 不带）都是 **Windows-only 新平台件**，且它们保护的对象今天不存在
