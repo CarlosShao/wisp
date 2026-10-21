@@ -108,7 +108,11 @@ R2-only：注意：这条路径现在读不到，它不在你被授权的目录�
 ## 7. 提交号 / 逐枚 `.go` / 越界枚数 / 正控尺
 
 - 本腿落件：**只** `docs/evidence/s1/356-a1-census.md`（本件）。逐枚 `.go` = **0**；越界枚数 = **0**。
-- 提交：笔一 **`40fddae0`**（本件 115 行初版，`1 file changed, 115 insertions(+)`）；笔二＝本笔（只把笔一自己的提交号回填进本行，仍是同一枚路径）。两笔的 `git add`/`git commit` 都带**显式 pathspec**：`-- docs/evidence/s1/356-a1-census.md`。
+- 提交（三笔，逐笔各带**显式 pathspec** `-- docs/evidence/s1/356-a1-census.md`，`add` 与 `commit` 两处都带；无 `add -A`、无 `add .`、无 amend/reset/rebase/stash/checkout/clean）：
+  - 笔一 **`40fddae0`**：本件初版，`1 file changed, 115 insertions(+)`。
+  - 笔二 **`d1493a9b`**：把笔一的提交号回填进本行（`1 insertion(+), 1 deletion(-)`）。
+  - 笔三 **`4420cfa1`**：第 3 行补齐三个 HEAD 与「代码面 `git diff --stat a8f5ad0a..HEAD` 输出 0 行」，门禁表补落件后复跑读数（`2 insertions(+), 2 deletions(-)`）。
+  - 三笔逐枚 `.go` = **0**、越界 = **0**（`logs/50-writeface-all.log`，正控同文件内每轮都打 `a8eb0d51` 读回 `.go = 2`）。
 - 正控尺（证明「数 `.go` 的尺」不是恒 0）：同一把 `sh/50-writeface.sh` 打 `a8eb0d51`（`174-r1`）读回 `.go = 2`、`IN RANGE = 0`、`OUT OF RANGE = 2`，尺会红。
 - 落件之外的写面：`D:\tmp\wisp\20261021\356a1\**`（`sh/` 八枚、`logs/` 九枚、`copy/` 一份 HEAD 导出加两枚探针测试件）。临时件**只建不删**；无 `.out` 后缀、无 `-overlay`。
 
