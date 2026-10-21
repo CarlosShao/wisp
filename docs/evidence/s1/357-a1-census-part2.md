@@ -102,12 +102,20 @@ D2 => `rc=1` 点名 `hard.onnx`。两发都红 => 尺不是恒绿。
 
 ## 6 写面与纪律格
 
-- 仓内**只落本件两枚**（`357-a1-census-part1.md` ＋ `-part2.md`）；仓外 `D:\tmp\wisp\20261021\357a1\**`
-  （`bin/` `probe/` `ntfsprobe/` `copyshape/` `manifest/` `data{A,B,C,D}/` `ntfs/` `durab/` `logs/` `shots.ps1`）只建不删。
-- 逐枚 `.go`（本次提交）：**0 枚**。越界枚数：**0**（`internal/**`/`cmd/**`/`scripts/**`/`.github/**`/`.scratch/wisp/**`/
-  `docs/reports/**` 各 0 枚）。
-- 正控尺（同尺打一枚已知非零的样本）：`git show --name-only --pretty= a7dfca91` => 7 文件 / **7 `.go`**（尺活）。
-- 临时件只建不删；未产 `.out`；未 `add -A`/`.`；未 amend/reset/rebase/stash/checkout ./clean；未 push；未翻任何框。
+- **提交号：`a8f22b99`**（`a8f22b99eb964c9d82bf7825e90764348abc38e9`），主题逐字以 `票 357 普查腿 357-a1` 开头，
+  正文经 `/tmp/msg-357a1.txt` ＋ `-F` 提交。`add`/`commit` 两处都用显式 pathspec（两枚 `docs/evidence/s1/357-a1-census*`）。
+- 仓内**只落两枚读数件**（`357-a1-census.md` ＋ `357-a1-census-part2.md`，222 行合计，单件 101/121 行，均未过帽）；
+  仓外 `D:\tmp\wisp\20261021\357a1\**`（`bin/` `probe/` `ntfsprobe/` `copyshape/` `manifest/` `data{A,B,C,D}/`
+  `ntfs/` `durab/` `logs/` `shots.ps1`）只建不删。
+- 逐枚 `.go`（本笔 `a8f22b99`）：**0 枚**（`git show --name-only --pretty= HEAD | grep -c "\.go$"` => 0）。
+  越界枚数：**0**（`internal/`/`cmd/`/`scripts/`/`.github/`/`.scratch/wisp/`/`docs/reports/` 前缀逐条 grep 合计 0）。
+  本笔文件全集只有那两枚 `docs/evidence/s1/` 件。
+- 正控尺（同尺打一枚已知非零的样本）：`git show --name-only --pretty= a7dfca91` => 7 文件 / **7 `.go`**（尺活）；
+  打本笔 => 2 文件 / 0 `.go`。
+- 禁码位尺（本件＋提交正文）：射程见 sec 4.4，**注释不豁免于我的自扫**（我按派单逐字避开）。
+  正控：同尺打一行含 U+00A7 与 U+2192 的探针串 => 命中 2 枚（尺活）；打本件两枚与提交正文 => 各 **0 行**。
+- 临时件只建不删；未产 `.out`；未 `add -A`/`.`；未 amend/reset/rebase/stash/checkout ./clean；**未 push**
+  （`git log origin/dev..HEAD` 现读仍含本笔，即它只在本机）；未翻任何框、未改票面/台账/`Status:`。
 
 ## 7 两件必须摆给编排者的
 
