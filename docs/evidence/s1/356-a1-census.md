@@ -94,7 +94,7 @@ R2-only：注意：这条路径现在读不到，它不在你被授权的目录�
 |---|---|---|
 | `GOFLAGS= go build ./...` | **0** | 无输出（0 行） |
 | `GOFLAGS= go vet ./internal/tools/` | **0** | 无输出（0 行） |
-| `GOFLAGS= go test -count=1 -run '174r1' -v ./internal/tools/` | **0** | `ok  github.com/CarlosShao/wisp/internal/tools  0.424s`（落件后复跑 `0.162s`，四数同） |
+| `GOFLAGS= go test -count=1 -run '174r1' -v ./internal/tools/` | **0** | 首跑 `ok  github.com/CarlosShao/wisp/internal/tools  0.424s`；落件前后多次复跑 `0.162s` / `0.126s`，四数逐次相同 |
 | `GOFLAGS= go test -count=1 -run 'TestPointer|TestTaskOutputPointer|TestHealthyPointer|TestSensitiveFileIsDeniedNotEscalated|TestEmptyAllowlistAuthorizesNothing' -v ./internal/tools/` | **0** | `ok  ...  0.723s` |
 
 **四数分开（不相减）**：`174r1` 选择器 `RUN=4 / PASS=4 / FAIL=0 / SKIP=0`；宽选择器 `RUN=23 / PASS=23 / FAIL=0 / SKIP=0`（缩进层 `^    --- PASS` 两侧皆 **0**，与上面不同分母）。
