@@ -1,6 +1,6 @@
-# 票 124 落地腿 124-r2 交件 part3（sec 8..9）
+# 票 124 落地腿 124-r2 交件 part3（sec 8..10）
 
-> 前接 `docs/evidence/s1/124-r2-impl.md`（sec 0..4）与 `124-r2-impl-part2.md`（sec 5..7）。
+> 前接 `docs/evidence/s1/124-r2-impl.md`（sec 0..4）与 `124-r2-impl-part2.md`（sec 5..7）；后接 `124-r2-impl-part4.md`（sec 11）。
 
 ## 8. 门禁（我自己现跑，逐条贴末行；四数分开报，NOT 相减）
 
@@ -151,3 +151,4 @@ RESTORED only-in-link =  3   （与 POST3 逐名双向 0 行差）
    如果裁腿要的是"新写一枚从没红过的用例"，那超出本腿写面（本包不存在能把软链形失败复现成绿的新用例形状）。
 4. **两形 `RUN` 差**：本包四台恒 255、SKIP 恒 4，票面 15:3x 那条副作用**不复现**（已核）。
 5. **`cmd/wisp` 与 `internal/config` 不在本腿写面**，本腿零 hunk；`internal/config` 那两枚 POSIX 摇摆不在本包名册。
+

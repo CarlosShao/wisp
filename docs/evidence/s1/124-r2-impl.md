@@ -121,4 +121,6 @@ $ git diff --numstat -- internal/tools
 决定性一条与批 1 同形：sec 5 的 35 枚 `went-green` 在**改前普通形逐名 PASS**（`PRE-PLAIN` 那侧）=> 断言本就成立，
 这次摘掉的只是 harness 形状造成的那次拒，**放宽换绿在这个形状下无从发生**。
 
-> 本件因 160 行帽拆两份：本件 = sec 0..4；`124-r2-impl-part2.md` = sec 5..9（三读数、新用例、门禁、红名册、提交）。
+> 本件因 160 行帽拆四份：本件 = sec 0..4；`124-r2-impl-part2.md` = sec 5..7（三读数与 sha256 还原、
+> 名册集合出口判据、豁免逐名）；`124-r2-impl-part3.md` = sec 8..10（门禁 rc、红名册逐名、未验证项）；
+> `124-r2-impl-part4.md` = sec 11（提交号、逐枚 `.go`、越界与正控）。

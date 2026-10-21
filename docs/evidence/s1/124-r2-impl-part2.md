@@ -126,4 +126,5 @@ TestTicket224LiveGrantStopsTheL1Question, TestTicket224PartialPathCoverageStillA
 （`TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent`／`TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed`）
 **不在本包名册**，本腿未碰、未计入任何出口判据。
 
-> 本件续 `124-r2-impl-part3.md`（sec 8..9：门禁 rc、红名册逐名、提交号与越界）。
+> 本件续 `124-r2-impl-part3.md`（sec 8..10：门禁 rc、红名册逐名、未验证项）
+> 与其后的 `124-r2-impl-part4.md`（sec 11：提交号、逐枚 `.go`、越界与正控）。
