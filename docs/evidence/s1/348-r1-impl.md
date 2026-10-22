@@ -45,7 +45,7 @@
 | **原样绿**（未动过的 `land2`） | `land2` | `--- PASS`（§2 ②③ 那 4 发同源） |
 
 ★**还原核**：`sha256sum norow/internal/winsec/ancestorworld_342_348_windows_test.go` ＝ `9c195e5ac7fd5a6a91657bac97ea767c1eec433cd81a5a059036517980998d6b` ＝ `git show HEAD:internal/winsec/ancestorworld_342_348_windows_test.go | sha256sum` ⇒ **MATCH**。★**谁算的、什么算法、几位**：两边都是 `sha256sum`＝**SHA-256／64 位十六进制**；`git hash-object` 是 **SHA-1／40 位**，本件**没有**拿它跟上面那个数比（`A1149②`）。
-★另两枚同形反向判据（台损修的）：`toReal` 幂等块摘掉 ⇒ `settle the world back to the real state: remove …\data\sub: The directory is not empty.`（6 发里 2 发命中；修前仪器在主检出上 3 发 1 发）；摘跳树那 5 发红见 §2 ①′。还原后 `--- PASS`，字节回 pristine（上面同一把 sha256 尺）。
+★另两枚同形反向判据（台损修的）：`toReal` 幂等块摘掉 ⇒ `settle the world back to the real state: remove …\data\sub: The directory is not empty.`（10 发里 2 发命中、两批各 1 发；修前仪器在主检出上 3 发 1 发）；摘跳树那 5 发红见 §2 ①′。还原后 `--- PASS`，字节回 pristine（上面同一把 sha256 尺）。
 
 ## 5. 门禁 rc（共享工作树、`GOFLAGS=`、四个临时变量 unset；四数分开、⛔ 相减）
 
@@ -66,7 +66,7 @@
 - `e9caddff4dccb3e5a3fb7b4d2f622890de5968b6`：2 枚路径，`.go`=2，写面外=0（同上两枚）。
 - 两笔都只 **＋行**（第一笔 `2 files changed, 104 insertions(+)`；第二笔 `+7 −2`，那 −2 是本腿**自己**前一笔的 7 行里挪常量，⛔ 别人字节）。
 - ★**正控**（同尺打一笔**含 `.go`** 的真提交）：同一把 `git show --name-only`＋`grep -c '\.go$'` 打 `195ce6d0f` ⇒ `go=2`（尺有牙）；再打一笔**不含 `.go`** 的真提交 `efa950a3`（票 164 续跑腿的判语件）⇒ `go=0`（尺不虚报）。
-- 本腿写面现状：`git status --porcelain -- internal/winsec/ docs/evidence/s1/` ⇒ 只有本件（`docs/evidence/s1/348-r1-impl.md`）。
+- 本腿写面现状：`git status --porcelain -- internal/winsec/ docs/evidence/s1/` 为空；本腿新增的唯一路径就是本件（`docs/evidence/s1/348-r1-impl.md`）。
 
 ## 8. ★停手项（未定义即停，照实报）
 
