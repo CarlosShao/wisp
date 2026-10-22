@@ -49,6 +49,9 @@ func TestWritebackDoesNotAdoptMemoryTheFileKeepsTheHandEdit(t *testing.T) {
 	}
 	fileSize := readLoaded(t, path).Ball.Size
 	memSize := m.Config().Ball.Size
+	// Printed so the two states are readable in the -v log, not only asserted:
+	// this is the reading the ticket names (file=60 mem=56).
+	t.Logf("STATE 1 after writeback: file.ball.size=%d mem.ball.size=%d", fileSize, memSize)
 	if fileSize != 60 {
 		t.Errorf("after the writeback the file no longer carries the hand edit: file.ball.size=%d, want 60 "+
 			"(the write re-read the file as its base, so a foreign key must survive it)", fileSize)
@@ -76,6 +79,8 @@ func TestWritebackDoesNotAdoptMemoryTheFileKeepsTheHandEdit(t *testing.T) {
 		adoptedFile = readLoaded(t, path).Ball.Size
 		adoptedMem = m.Config().Ball.Size
 	}
+	t.Logf("STATE 2 after one Adopt pass: mem.ball.size=%d file.ball.size=%d report.Hot=%v",
+		adoptedMem, adoptedFile, hot)
 	if adoptedMem != 60 || adoptedFile != 60 || !slices.Contains(hot, "ball") {
 		t.Fatalf("the Adopt control did not produce the other state: mem.ball.size=%d file.ball.size=%d "+
 			"report.Hot=%v, want 60 / 60 / [ball]; without it the readings above cannot tell two states apart",
