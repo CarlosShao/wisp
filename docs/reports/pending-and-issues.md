@@ -21031,3 +21031,35 @@ cd .scratch/wisp/issues && ls *.md | grep -v -- "-done" | grep -v "^README"   # 
 **⑤ 派续跑**＝`295cf216-b8e5-4b62-ba7a-9e408dfdf641`（★派前三项全静：`go` 进程 **0**／写面空／临时件停 23:19）；★交件落 `357-r1-impl-part2.md`（⛔ 追加到 156 行那件、必超帽）。
 
 **⑥ 状态**＝结案 **20**、真待推进 **164**、在飞 **1**（`357-r1` 续跑）、未推 **342**、⛔ 推、⛔ 清理、⛔ 改契约。
+
+## A1118（2026-10-22 10:0x +08，编排者）★★收 `357-r1` ⇒ **结票 357（第 21 票，六格全闭）**＝"静默通过"变"说了再通过"｜★★`path-length` 门禁 RED 的根因**是我**、已修｜★票 109 `AC#6` 收口但**我不改它的 `rejected` 状态**
+
+**① 收 `357-r1`（续跑实例，两笔）＝三把尺我现跑**
+- `aeea4e5b` **8 件全 `.go`**／越界 **0**／`+1016 −3`；`3843d651` 交付件 **118 行**、末字节 `0a`、U+00A7 **0**。
+
+**② 票 357 落地形状（〔丁〕形，零手写 syscall）**
+- `internal/models/ads_windows.go`：`GetFileInformationByHandleEx` ＋ `windows.FileStreamInfo` ＋ 手映 **24 B** `FILE_STREAM_INFO`（与 `internal/ball/win32_windows.go:160` **同形**）；
+  ★**`ERROR_MORE_DATA` 重试**：起点 4096 B、×4、**上界 16 MiB**、撞界**返具名错误**（⛔ 静默当空）。
+- `internal/models/ads_other.go`：`!windows` 恒返空；文件头**具名写** POSIX 那枚只是**控制腿、⛔ 牙**。
+- `internal/models/ads.go`：`UnnamedStreams` 走 **`resolveInstalledDir`**（`ads.go:46`）⇒ ★**裁决书第 3 条那个坑在码面上被钉住**（override 目录、⛔ `store.root`），配**成对**用例 `…ReportsTheVerifiedTreeNotTheStoreRoot` ＋ 配对负例 `…StoreRootNamingIsNotWhatTheReportUses`。
+- `cmd/wisp/models.go`：`:253-254` 那句 `store=…` **逐字未动**、`:262` 换 `announceUnnamedStreams357`、**rc 仍 0**。
+- ★**变异三发**：①渲染成空 ⇒ 4 枚 CLI 用例红逐名报；②**摘掉调用、渲染函数留着** ⇒ **只有** `Test357VerifyTailIsStillOnThePassingPath` 红、其余五枚全绿
+  ⇒ **正是"钩子尺"的价值**（没有它，摘钩后整包全绿而命令退回静默）；③去掉重试 ⇒ **`200 planted -> 0 enumerated`**＝**复现裁决书点名的假阴**。
+- ★**正例 G 仍绿**：stdout **116 B 逐字节相同**（`SequenceEqual=True`、sha256 `B6B2D4AA…E45`、CR=0）。
+- **六把门我自己跑**：`build 0`／`vet 0`／`models 0`／`d22scan 0 clean`／★格式甲尺（blob 树）**0 枚**；★`Test357*` **六枚同发全 PASS**。
+- `cmd/wisp` 整包 `rc=1` ⛔ 本票伤：红 **1 枚** `TestAC14GoSideEvalPushReachesThePage`（既有红，台账 `:20471`）＋死点 1 枚（`A1100` 同族）⇒ **新增红 0**。
+
+**③ ★★`path-length` 门禁 RED 的根因是**我**（⛔ 腿）——同一坑第 2 次**
+- 门禁报三条红：`issues/181-…`／`issues/275-…` 超预算且不在名册 ＋ `count guard: roster 60 ⇄ tree 61`。
+- ★**根因**：我改名 `181`／`275` 加 `-done` 后缀 ⇒ 文件名变长**超预算**，而 `check-path-length-budget.sh` 名册里写的是**旧名**（`275` 根本没条目）。
+- **修法**：`181` 旧名→新名 1 处 ＋ **补 `275` 条目** ⇒ 现跑 `over-budget=61 / covered=61 / not in roster=0`、**VERDICT GREEN**。
+- ★**这是同一坑第 2 次**（`A1076` 记过第 1 次）⇒ **定式**：**改名加 `-done` 后必须同笔把名册一起改**，且**立刻现跑门禁**（⛔ 等别人报）。
+
+**④ ★票 109 `AC#6` 收口（迁出目标票 357 已闭环），但★我不改它的 `rejected-needs-fix`**
+- `AC#6` 于 2026-10-21 14:4x **迁入票 357**，票面逐字写「**迁出不等于完成**，判据与牙全在票 357」；★我今天现跑确认 **357 已六格全闭**（`-done`、`d2a78bbd5`）⇒ 按"移交且已闭"**翻**。
+- ★**本票另三笔账全部有归宿**：`R-109-2`／`R-109-3` 已在 `AC#4` 落地；**唯一阻塞项 `R-109-4` 归票 121，而 121 已 `-done`**。
+- ★★**但 `Status` 仍是 `rejected-needs-fix`（2026-09-21 的总判 FAIL-退回），我不动它**：那一判的**理由是"落点"**（`internal/models` 不在 `cmd/wisp` 依赖图、`DownloadingBridge.Run` 生产调用者 **0**），
+  落点问题**已由票 121 解决**，但 **`rejected` 改判要一次**非实现者总判**、⛔ 我在翻一格时顺手改**。
+- ⇒ **票 109 现状：六格全勾、但⛔ 加 `-done`、`Status` 原样**，等一次总判。
+
+**⑤ 状态**＝结案 **21**（票 357）＋票 109 "格满待总判"；未推 **350**、⛔ 推、⛔ 清理、⛔ 改契约。
