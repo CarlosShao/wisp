@@ -93,6 +93,13 @@ EXEC err=<nil> isError=false text="hello"          ← 工具真跑了，返回�
   - **正控（本腿现跑，证明这把尺不是瞎尺）**：`ec520750`（票 179 修法那一笔，**非本程**）⇒ **2 枚**（`internal/agent/loop.go`、`internal/agent/declared_l0_risk_179_test.go`）⇒ ★尺在真 `.go` 提交上**报得出来**。
   - **本件的预期读数**：1 枚、`docs/evidence/s1/363-a1-census.md`、**`.go`=0**、`internal/`+`cmd/`=**0**。
 
+### §8b 提交后复量（★读数在提交之后取）
+
+- 本件第 1 笔＝**`7866ad4e`**：`git show --name-only --format= 7866ad4e | grep -c .` ⇒ **1 枚** ＝ `docs/evidence/s1/363-a1-census.md`；
+  ★`.go`＝**0**、`internal/`＋`cmd/`＝**0**、全在写面内。★**正控尺**（§8）：同一把尺打 `ec520750` ⇒ **2 枚 `.go`** ⇒ **0 是真 0、⛔ 瞎尺**。
+- **提交后**（HEAD `7866ad4e`）两道门重跑：`sh scripts/d22scan.sh` ⇒ **rc=0**；`sh scripts/check-path-length-budget.sh` ⇒ **rc=0**。
+- ★本件**自己的**（放本节这一笔的）提交号不写进本件——同 §8 的先例，防自我推翻。
+
 ## §9 对 AC#1 的输入（★我判读、⛔ 我裁形）
 
 - ★**乙（`mode.Screen` 认 `L0`）不是"可选的美化"，是正确性**：`L0` 是认得的级（§4）⇒ 现支的判据把"已知"当"未知"。甲单独做，`Decision.ModeKept` 会继续在**每一发 L0** 上写着"无法识别的风险级"，`Screen` 的自述契约继续是假。
