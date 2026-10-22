@@ -8,31 +8,45 @@ import (
 	"github.com/CarlosShao/wisp/internal/agent"
 )
 
-// Ticket 164 AC#2 - the BEFORE reading, at CALL level.
+// Guard, not a historical reading: the shape of the unknown-tool refusal and
+// its D37 class.
 //
-// The question the ticket asks is not "is the string task.output in a registry"
-// (that is the ruler ticket 164 AC#1 already ran, and a judgement that reuses
-// it can never be falsified by an implementation). It is: "start something in
-// the background, then read what it printed" - can that call be made to land
-// today? So this probe sends one real request through the real C1/C3/C19/C25
-// bridge (internal/tools/bridge.go Execute, the same choke point the loop
-// calls) against the roster production registers today, which is
-// tools.BuiltinFSEntries (cmd/wisp/run.go).
+// This case is NOT evidence for ticket 164 AC#2 ("start something in the
+// background, then read what it printed - can it be done today"). That reading
+// was taken on the real tree at anchor f206e9f and lives in the ticket's AC#2
+// note; this file cannot speak for it, because the bridge below is composed
+// from BuiltinFSEntries, which is the fs family only, while the production
+// composition root appends the task family separately (cmd/wisp/run.go,
+// BuiltinTaskEntries). What this file pins is the bridge's own contract at the
+// choke point every tool call crosses (Bridge.Execute):
 //
-// What "before" looks like is asserted, not narrated: the call must fall into
-// the Lookup failure branch at bridge.go:247-253 - an IsError outcome whose
-// text names the tool as unknown, error class "tool" (D37: self-correctable,
-// so the task keeps running), and NOT a Go error (a rejection is not a fault).
+//  1. REFUSAL SHAPE - an unknown name falls into the Lookup-failure branch and
+//     comes back as DATA, not as a Go error: err == nil, because D37 says a
+//     rejection is not a fault (SPEC-07 2 states the C3 rule as a refusal, not
+//     as an error). The text names the requested tool as unknown and points the
+//     model at list_tools, and it does not echo anything it never looked up.
+//  2. D37 CLASS - that refusal carries class "tool" (observe.ClassTool:
+//     self-correctable, so the task keeps running), never "internal".
+//  3. FS ENTRY POINT - BuiltinFSEntries does not smuggle a task.* name into the
+//     directory: the fs family stays single-purpose. This clause is about the
+//     fs registration path only. It is NOT a claim about the production
+//     registry, which does carry task.output today.
 //
-// This file deliberately references no task.output implementation, so it
-// compiles and runs against the pre-implementation tree: the reading below is
-// reproducible by
+// The teeth were measured in both directions on 2026-10-22 (tree ce84d53d):
+// rewording the refusal opener in bridge.go makes this red on the shape
+// assertion; switching that branch's class to internal makes it red on the
+// class assertion; restoring bridge.go (same sha256) makes it green. It pins
+// the live behaviour of the fs-only bridge, so it is green on a tree where the
+// feature has already landed (the measurement above was taken on one).
 //
-//	go test -count=1 -v -run TestTaskOutputAC2 ./internal/tools/
+// Reproduce:
 //
-// The AFTER half of the comparison is TestTaskOutputAC2AfterLegIsReachable in
-// task_output_leg_test.go, which issues the identical request against the
-// roster that carries the tool.
+//	go test -count=1 -v -run '^TestTaskOutputAC2BeforeLegIsUnreachable$' ./internal/tools/
+//
+// The file name and the test name are historical keys - ticket 164 AC#2b, the
+// archived anchor instrument .scratch/wisp/probes/164/v1/ac2-anchor-reading.sh
+// and the CI logs address this case by them - so they are kept unchanged even
+// though the case no longer signs itself as a before/after reading.
 
 func TestTaskOutputAC2BeforeLegIsUnreachable(t *testing.T) {
 	dir := tempCanonical(t)
@@ -49,14 +63,14 @@ func TestTaskOutputAC2BeforeLegIsUnreachable(t *testing.T) {
 		t.Fatalf("Execute must answer a rejection as data, not as a Go error (D37): %v", err)
 	}
 
-	t.Logf("AC#2 BEFORE verbatim: IsError=%v ErrorClass=%q Truncated=%v Text=%q",
+	t.Logf("unknown-tool refusal: IsError=%v ErrorClass=%q Truncated=%v Text=%q",
 		out.IsError, out.ErrorClass, out.Truncated, out.Text)
 
 	if !out.IsError {
-		t.Fatalf("expected the pre-implementation call to be refused, got a success: %+v", out)
+		t.Fatalf("expected an unknown-tool call to be refused, got a success: %+v", out)
 	}
 	if !strings.Contains(out.Text, "未知工具") || !strings.Contains(out.Text, "task.output") {
-		t.Fatalf("expected the unknown-tool branch (bridge.go:247), got: %q", out.Text)
+		t.Fatalf("expected the unknown-tool refusal (Bridge.Execute, Lookup-failure branch), got: %q", out.Text)
 	}
 	if out.ErrorClass != "tool" {
 		t.Errorf("error_class = %q, want tool (an unknown tool is self-correctable, D37)", out.ErrorClass)
@@ -64,8 +78,9 @@ func TestTaskOutputAC2BeforeLegIsUnreachable(t *testing.T) {
 	if out.Text != "" && strings.Contains(out.Text, "bg-1") {
 		t.Errorf("the refusal leaked the task id it never looked up: %q", out.Text)
 	}
-	// And the mirror of AC#1's claim, at call level: the directory the model is
-	// shown today holds no task.* entry, so the model cannot even learn to ask.
+	// The fs entry point itself: the directory BuiltinFSEntries builds must not
+	// carry a task.* name. Scope note: this is the fs registration path only;
+	// the production composition root registers the task family on top of it.
 	dir1 := tempCanonical(t)
 	b2, _ := fsBridgeWith(t, nil, NoGate{}, dir1)
 	tools, err := b2.Tools(t.Context())
@@ -74,7 +89,7 @@ func TestTaskOutputAC2BeforeLegIsUnreachable(t *testing.T) {
 	}
 	for _, ti := range tools {
 		if strings.HasPrefix(ti.Name, "task.") {
-			t.Fatalf("a task.* tool is registered: %s", ti.Name)
+			t.Fatalf("BuiltinFSEntries carried a task.* name: %s", ti.Name)
 		}
 	}
 }
