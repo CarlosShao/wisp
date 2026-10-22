@@ -1,0 +1,63 @@
+【派单·票 227 落地腿 `227-r1`】写腿·2026-10-22 12:5x +08 编排者
+
+■ 身份
+写腿（实现者）。⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ 改台账、⛔ push。
+票面＝`.scratch/wisp/issues/227-guarded-write-delete-shapes-and-migration-on-read-are-unasserted.md`（先通读）。
+★本票**只剩 `AC#6` 一格**。
+
+■ 一句话
+给"**真轮询之下，手改仍看得见**"那一跳补**一枚常驻用例**。
+
+■ ★票面 `AC#6` 的判据（逐字照做）
+- 背景（票面逐字）：票 226 那枚**唯一走真宿主**的用例 `cmd/wisp/always_write_no_clobber_226_test.go` 注释里写着「nothing polls」（`:43-44`）——
+  **从 `248095d1`（票 223 接上每 1s 的 tick）起这句就是假的**。⚠ 更糟的是它 `:102` **断的方向与 D36 热档相反**，实测 3/3 PASS 却**只因为整发跑不满 1 秒**（1.11／0.91／0.93 秒）。
+- ⇒ **要补的**：一枚**常驻用例**，钉住「**真轮询之下，手改仍看得见**」这一跳。
+- ★★**⛔ 作弊手法（票面逐字禁止）**："**不许用'把 tick 间隔调大／把用例 sleep 缩短'让它继续靠时序侥幸过关**——那等于**把唯一还在跑的证人的嘴捂住**"。
+
+■ ★我已现跑核过的前提（⛔ 你重做，但这三条是实测）
+1. ★**`cmd/wisp/always_write_no_clobber_226_test.go` 在盘**，`:43-44` 注释逐字仍是 "while the process is running and **nothing polls**" ⇒ **它今天仍是假的**（`248095d1` 之后每 1s tick）。
+2. ★**`:102` 断言逐字**：`t.Errorf("the guarded write applied the hand-edited theme to the running process (got %q, want the dark this run loaded): reading a hand edit back is ticket 223", got)`
+   ⇒ 断的是"**仍读到旧值**"，而 D36 热档要求"**手改要被读回来**" ⇒ **方向相反**（票面说的没错）。
+3. ★**`248095d1` 在盘**（`代落 223-r1 的死腿现场`）；`cmd/wisp/config_reload.go:32` 注释逐字 "It wakes on a time.Ticker at 1s and calls CheckAndReload" ⇒ **轮询确实在**。
+
+■ 做法（硬）
+1. **先量后写**：先给"**今天**那一发在**真轮询**下是什么读数"（票面说 3/3 PASS 只因整发跑不满 1 秒 ⇒ 你要证明"跑满 1 秒后它会怎样"），再给补的用例读数。
+2. ★**新用例必须"常驻"**（走真轮询路径、⛔ 裸 Manager、⛔ 手动 `CheckAndReload`）：票面逐字"今天 5 处手动 `CheckAndReload` 全在包内裸 Manager，**生产路径零常驻用例**"。
+3. ★**反向判据**＝把新用例**钉的那一跳摘掉**（或把轮询停掉）⇒ 用例必须**转红并逐名报红行**；先证落地（`grep -n` ＋ `go build` rc=0）再读数。
+4. ★**三读数**（变异红／还原绿／原样绿）逐字贴 ＋ **还原核 `sha256` 三处逐字相同**（提交版／还原台／`git show HEAD:` blob）。
+5. ★★**⛔ 用"调大 tick 间隔／缩短 sleep"让旧用例过关**——那是票面**点名禁止**的。若你发现**非这样不可** ⇒ **停手上报**（那说明这一跳在现行设计下不可测，要我先裁）。
+
+■ 写面（越界＝作废）
+- 允许：`cmd/wisp/**` 的**测试件**（新常驻用例＋必要时那枚 226 用例的注释更正——★注释更正属"就地追加"、⛔ 删原句）；`docs/evidence/s1/227-r1-*.md`。
+- ⛔ 改 `cmd/wisp` 的**生产码**（要改 ⇒ **停手上报**）；⛔ 改 `scripts/portable-tests.sh`（那是票 302 的射程）。
+- ⛔ `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件；⛔ `frontend/**`／`design/**`（**零读零写零转述**）；⛔ 新增导出名；
+  ⛔ `internal/**`、`tools/d22scan/**`、`go.mod`/`go.sum`、`.github/**`。
+- ★**本波唯一碰 `cmd/wisp` 的写腿**。
+
+■ 开工前（⛔ 跳步＝空跑作废）
+1) `git status --porcelain`：`cmd/wisp/**` 有**别人的**未提交改动 ⇒ 停手上报。
+2) ★**票面前提新鲜度**：票面每条可现跑断言**逐条现跑**（★本仓票面腐坏已 ≥8 次）。
+3) 复跑我给的基线：`cmd/wisp` 既有红逐名（今天应为 `TestAC14GoSideEvalPushReachesThePage` 那 1 枚）。
+
+■ 环境
+`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`；⛔ `CGO_ENABLED=0`（本仓必然编不过、⛔ 当缺陷）；
+★`cmd/wisp` 整包**必抬 `-timeout 30m`**；
+★★**整包读数有一族会被"字母序截断"整族跳过**（`A1124⑤`）：`panel_*` 之后的族（`slo_*`／`session*`／`tools*`／`winsec*`）在整包里**恒 `RUN=0`**。
+  ⇒ 你新加的用例若落在这些族里，**必须另跑显式 `-run` 选择器**取数、⛔ 拿"整包绿"当"我的用例在工作"。
+★`gofumpt` 用**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（裸名 rc=127，⛔ 判"本机没有"）；
+★`.gitattributes` 要求 `*.go text eol=lf` ⇒ 脚本改文件⛔ 带 CRLF；★变异读数与整包门禁**串行**（`cmd/wisp` 有族用例运行时从盘上 parse `run.go`）。
+
+■ Git
+只 commit **⛔ push**；`add`/`commit` 两处**显式 pathspec**；★**涉新文件的提交，pathspec 逐个文件名字面点名**（⛔ glob）；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+主题**逐字**以 `票 227 落地腿 227-r1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★提交正文与交付件 **⛔ 被禁码位**（`sec`/`✓`/`≤`/`≠`/`→`/`⇒`/`⛔`/`⚠`/emoji/带圈数字）⇒ 写 `sec N`／`=> `／`NOT`／`NOTE`／`(1)`；提交前自己扫一遍。
+★**改自己新增的文字时 ⛔ 用 `\n\n` 猜段落边界**，用**行号范围**（`sed -n 'A,Bp'`），改完必 `diff HEAD` 验。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261022\227r1\**`；⛔ `.out`。
+
+■ 交付件（缺一算未交）
+`docs/evidence/s1/227-r1-impl.md`（**≤160 行**，过帽拆 `-partN`）：改前"真轮询下"的读数（含"跑满 1 秒"的证据）／新用例逐名＋为什么今天响／它走的是**真轮询**路径的证据（⛔ 裸 Manager）／反向判据三读数逐字＋sha256／门禁 rc。
+门禁自己现跑：`go build ./...`；`go vet ./cmd/wisp/`；`go test -count=1 -timeout 30m ./cmd/wisp/`（★按名作差、逐发登记死点）；
+★**另跑显式选择器**取你新用例的读数（`-run '<你的用例名>' -v`）；`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh`。
+红名册**逐名**，新增红必须 **0**。提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界（正控＝同尺打一笔**含 `.go`** 的真提交）。
+
+■ 未定义即停 ⇒ **停手上报**，⛔ 自行假设。★特别是：①若"真轮询下手改仍看得见"这一跳**在现行设计下不可测**（例如 tick 与手改无法确定性对齐）⇒ **停手上报并说清**，⛔ 用调间隔／缩短 sleep 硬凑；②若你发现票面那两条前提（`:43-44` 注释假、`:102` 方向反）**已不成立** ⇒ **停手上报并给读数**。
