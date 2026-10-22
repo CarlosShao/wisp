@@ -2,7 +2,7 @@
 
 - 身份：写腿（实现者）。⛔ 翻框、⛔ 改票名／`Status:`／`-done`、⛔ 改台账、⛔ push。
 - 写面：`internal/winsec/**`（只动测试字节）＋本件。★**产码零改动**：`winsec.go`（`23c2f1e4…`）／`winsec_windows.go`（`5cdef881…`）／`pinnedleaf_342_windows.go`（`66a22239…`）逐枚 sha256 与本腿起手锚一致（尺＝`sha256sum`，SHA-256／64 位）。
-- 起手锚 `e94a5b177`；本腿两笔 `195ce6d0f`／`e9caddff`（§7 逐枚）。
+- 起手锚 `e94a5b177`；本腿四笔 `195ce6d0f`／`e9caddff`／`5476e2417`／`73aa88049`（§7 逐枚）。
 - 全部逐字日志与台架住 `D:\tmp\wisp\20261022\348r1\`（`logs\` / `trees\` / `bench\` / `sh\`），仓外、只建不删。
 - 台面：Windows 本机 `go1.27.1 windows/amd64`；POSIX 面＝容器 `golang:1.27`（`3680233e3204`），宿主 module 缓存**只读**挂入、容器 `/tmp` 是唯一临时根、`GOFLAGS=`、`GOTMPDIR/TMPDIR/TEMP/TMP` unset。
 - 三棵**仓外**导出树（`D:\tmp\wisp\20261022\348r1\trees\`）：`base2`＝`fde1df02`（修前，`winsec.go=41ba9a9b…`；`pinnedleaf_342_*` 尚不存在）⇄ `land2`＝落地（`winsec.go=23c2f1e4…`、`pinnedleaf_342_windows.go=66a22239…`）⇄ `mut`＝`land2` 只把**本腿那一跳**换回修前那一句（`pinnedleaf_342_windows.go=269a84bc…`）。★四枚仪器件在 `base2`／`land2` **逐枚同 sha256**（如 `ancestorunlink_348_windows_test.go=40aec991…`、`ancestorworld_342_348_windows_test.go=9c195e5a…`）⇒ 成对差异**只有产码**。
@@ -64,7 +64,9 @@
 - `195ce6d0f2737a356114c2acb97550e411e7559a`：2 枚路径，`.go`=2，写面外=0。
   `internal/winsec/ancestorunlink_348_windows_test.go`／`internal/winsec/ancestorworld_342_348_windows_test.go`。
 - `e9caddff4dccb3e5a3fb7b4d2f622890de5968b6`：2 枚路径，`.go`=2，写面外=0（同上两枚）。
-- 两笔都只 **＋行**（第一笔 `2 files changed, 104 insertions(+)`；第二笔 `+7 −2`，那 −2 是本腿**自己**前一笔的 7 行里挪常量，⛔ 别人字节）。
+- `5476e2417fe8847f91ce864af00f7001f1362e97`：1 枚路径，`.go`=0，写面外=0（`docs/evidence/s1/348-r1-impl.md`，本件）。
+- `73aa88049`：1 枚路径，`.go`=0，写面外=0（本件两处读数更正）。
+- 前两笔只 **＋行**（`195ce6d0f` `2 files changed, 104 insertions(+)`；`e9caddff` `+7 −2`，那 −2 是本腿**自己**前一笔那 7 行里挪常量，⛔ 别人字节）。
 - ★**正控**（同尺打一笔**含 `.go`** 的真提交）：同一把 `git show --name-only`＋`grep -c '\.go$'` 打 `195ce6d0f` ⇒ `go=2`（尺有牙）；再打一笔**不含 `.go`** 的真提交 `efa950a3`（票 164 续跑腿的判语件）⇒ `go=0`（尺不虚报）。
 - 本腿写面现状：`git status --porcelain -- internal/winsec/ docs/evidence/s1/` 为空；本腿新增的唯一路径就是本件（`docs/evidence/s1/348-r1-impl.md`）。
 
