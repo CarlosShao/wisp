@@ -1,0 +1,55 @@
+【派单·票 360 终裁腿 `360-v1b`】非实现者裁腿·2026-10-22 21:5x +08 编排者
+
+■ 身份
+**非实现者裁腿**（裁决者≠实现者）。⛔ 落任何 `.go` 字节、⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`／台账、⛔ push。
+票面＝`.scratch/wisp/issues/360-writeback-does-not-adopt-memory-indirectly-nailed-directly-not.md`（★**五格全勾、未结案**）。
+
+■ 一句话
+终裁 `360-r2` 的补强**是否真的堵住了 `360-v1` 判的那个洞**。
+
+■ ★★背景（前任终裁腿 `360-v1` 判了什么、我为什么撤回了翻框）
+- `360-v1`（`docs/evidence/s1/360-v1-verdict.md` 86 行＋`-part2.md` 117 行、`0c85c5035`）判 **`AC#2` ⛔ 翻**：
+  判据原文是"**摘掉 Adopt 臂** **或** **把断言改成恒真** ⇒ 必须转红"，而 `360-r1` 交的用例**`改恒真` 那一半漏了**。
+- ★★**决定性反证 `M1＋M3b`**：**同时**摘掉 Adopt 臂（`:73-81` 整条 `if/else`）**和**把该臂断言（`:84`）改 `if false` ⇒ **`RC=0` 仍绿**。
+  机理：摘臂后 `adoptedMem=-1`、`memSize=56` ⇒ `:89` 的两态守卫 `-1 == 56` **不咬**；`:84` 被恒真后**整条正控没有任何牙**。
+- ★**编排者已独立复现该反证**（`A1134③`）：`STATE 2 … mem.ball.size=-1 …` ⇒ `--- PASS (0.04s)`。
+- ★**因此我撤回了 `AC#2` 的翻框**（`5cd0b9bfd`），`360-r2` 随后补强。
+
+■ ★`360-r2` 补了什么（`095699f2`／`16898169a`／`7ad0c83e4`；件 `docs/evidence/s1/360-r2-impl.md` 160 行＋`-part2.md` 89 行）
+- `internal/config/writeguard_adopt_360_test.go` **93 → 107 行**：
+  `:72` `ranAdopt := false` 哨兵／`:78` 在 `CheckAndReload` 成功的 `else` 体内置 `ranAdopt = true`／
+  ★`:93-97` **独立前置断** `if !ranAdopt || adoptedMem < 0 || adoptedFile < 0 { t.Fatalf("the Adopt arm did not run: …") }`，**放在臂值断 `:98` 之前**。
+- ★它称该断**只读三个哨兵**、**不读 `:98` 的中间量**、**不依赖 `:103` 的两态守卫** ⇒ **不可被同臂断言吞掉**。
+- ★编排者已独立复现那一发：`:85` 红 `the Adopt arm did not run: ranAdopt=false …` ⇒ `--- FAIL (0.05s)`。
+
+■ 必判清单（每项另起尺、⛔ 采信腿自报、⛔ 采信编排者的复现）
+1) **票面前提新鲜度**：票面每条可现跑断言对 **HEAD blob** 复量。
+2) ★★**本格唯一判点＝"那条前置断是否真的不可被吞掉"**：
+   - ★**你自己造 `M1＋M3b`**（同时摘臂 ＋ 把 `:98` 改恒真）⇒ 必须**转红并逐名报红行**。⛔ 只看编排者/前任的读数。
+   - ★★**再造一发更狠的**：摘臂 ＋ 把 `:55`／`:59`／`:64` 三条状态 1 断与 `:98` 臂断言**全部**弄哑（`if false && …` 编译得过的恒真形）⇒ 用例**仍必须红**（整条用例只剩这一条前置断在咬时它也要红）。
+3) ★**`M3b 单独恒真仍绿` 算不算缺口——你判**（`360-r2` 说"⛔ 构成缺口"，因为单独弄哑 `:98` 时臂**真的跑过**、`ranAdopt=true`、哨兵 `60/60`）。
+4) **原样必须仍绿**：未变异树上那枚用例 **PASS**、两态读数照旧（`file=60 mem=56` ⇄ `mem=60 file=60 report.Hot=[ball]`）。
+5) **零产码复核**：五枚产码（`allowdirs.go`／`writeguard.go`／`manager.go`／`settings.go`／`permmode.go`）逐枚 `git rev-parse HEAD:<p>` 对 `git hash-object <p>` ⇒ 必须全 SAME。
+6) **门禁复跑**（你自己现跑、⛔ 抄）：`GOFLAGS= go build ./...`／`go vet ./internal/config/`／`go test -count=1 ./internal/config/`（四数分开报、⛔ 相减）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`。
+   ★**格式门禁甲乙两尺都报**（甲＝入库 blob 树、判据；乙＝工作树、只作诊断），裁定件＝`docs/evidence/s1/pipe-format-gate-reads-tracked-blob-not-worktree.md`。
+7) **红名册逐名**（⛔ 只报枚数），新增红必须 **0**。★**名册取主检出**、⛔ 取导出树（导出树无 `.git` ⇒ `internal/tools` 8 枚假红，见 `A1134⑦b`）。
+8) **写面纪律**：三笔逐笔 `git show --name-only` 判 `.go` 与越界；正控＝同尺打一笔**含 `.go`** 的真提交。
+
+■ 纪律（硬）
+写面**只许**：`docs/evidence/s1/360-v1b-verdict.md`（≤160 行，过帽拆 `-partN`）＋`D:\tmp\wisp\20261022\360v1b\**`（仓外）。
+⛔ 改 `internal/**`、`cmd/**`、`scripts/**`、`.github/**`、`.scratch/wisp/**`、`docs/reports/**`、`docs/PLAN.md`、`docs/specs/**`；⛔ 落任何 `.go`（临时探针只放仓外）。
+只 commit **⛔ push**；`add`/`commit` 两处显式 pathspec；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+主题**逐字**以 `票 360 终裁腿 360-v1b` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★**文档里可以自由用 `★`／`⛔`／`⇒`／带圈数字**（`d22scan` 的 `ban #8` 只扫 `internal/`／`cmd/` 的 `.go`、⛔ 扫 `docs/`，见 `A1131①`）；但 **`.go` 里**注释豁免、字符串不豁免。
+临时件只建不删；⛔ `.out`；`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；⛔ `CGO_ENABLED=0`；★变异读数与整包门禁**串行**。
+★**判 `gofumpt`／`gofmt` 输出归属必须用 `[\\/]`**（Windows 上输出反斜杠，见 `A1140⑥`）。
+
+■ ★开工前必读（本仓刚立的检查表）
+`.scratch/wisp/probes/orch/20261022/txt/ruler-scope-checklist.md`（65 行）——★**8 处"尺的射程"的错**。★落笔前四问：①这把尺量的是哪个对象？②输出形状是什么？③我数的是"代码"还是"注释"？④这个数有没有和总数对上？
+
+■ 交件（缺一算未交）
+`docs/evidence/s1/360-v1b-verdict.md`：①八项逐项判语＋读数（每项另起尺）／②★**`AC#2` 能翻／⛔翻＋缺什么**（含"那条前置断是否真的不可被吞掉"）／
+③★**`M1＋M3b` 你自己造的逐字红行**／④★**"更狠那一发"（全弄哑）的逐字红行**／⑤原样仍绿的两态读数／⑥零产码复核读数／
+⑦门禁 rc 与末行逐字／⑧红名册逐名／⑨提交号＋逐枚 `.go`／越界＋正控。
+
+■ 未定义即停 ⇒ **停手上报**，⛔ 自行假设。

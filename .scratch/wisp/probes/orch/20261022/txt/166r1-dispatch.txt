@@ -1,0 +1,65 @@
+【派单·票 166 落地腿 `166-r1`】写腿·2026-10-22 21:5x +08 编排者
+
+■ 身份
+写腿（实现者）。⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ 改台账、⛔ push。
+票面＝`.scratch/wisp/issues/166-the-gate-stands-outside-the-shape-that-is-live-today-openscope-closescope-has-no-clause-and-the-bridge-scope-open-is-guarded-only-in-another-package.md`
+★**先通读**；★**本票只剩 `AC#2` 一格**。
+
+■ 一句话（`AC#2` 逐字）
+**四件最小出口**：**列**（按时间／按工作区）、**搜**（标题与正文）、**改名**、**归档带撤销**。
+每件都要答"**这一发在未修码上响不响**"。
+
+■ ★我已现跑核过的前提（⛔ 你重做，但这条是实测）
+- ★**票面 `Status` 逐字**："**ready-for-agent，但立而不派**（排在票 158 验收与 161 之后；本票只做 **Go 侧**，`skipped=frontend(owner-delegated)`）"。
+- ★★**前置已满足**：**票 158 已 `-done`**（我 2026-10-22 结的）、**票 161 已 `-done`** ⇒ ★**"立而不派"的理由消失了、我定：现在派**。
+- ★**`AC#3`／`AC#4`／`AC#5`／`AC#6` 已勾** ⇒ 本腿**只做 `AC#2`**。
+- ★**`AC#6` 已给出的地基**（你可以直接用、但★**要自己复跑**）：`internal/session/manage.go:93` 写的是 `m.now().Unix()`（**秒级**）、
+  `internal/memory/dao_session.go:125` 排 `ORDER BY updated_at DESC, id DESC`、`id` 由 `internal/session/session.go:96` 的 `rand.Read` 铸
+  ⇒ 同一秒内建的两条会话次序随机。
+
+■ `AC#2` 的做法（硬）
+1) **四件各要给"在未修码上响不响"的读数**：★**先量后写**——在**仓外导出树**（或 `-overlay`）上造"未修"的形态，跑一发看它**响不响**；再给修后的读数。
+   ★**"不响"也要如实报**（⛔ 假设它会响）。
+2) ★**每件配一枚今天响、不修不响的用例**；★**反向判据**＝把新加的那一跳**摘掉** ⇒ 用例必须**转红并逐名报红行**；先证落地（`grep -n` ＋ `go build` rc=0）再读数。
+3) ★**三读数**（变异红／还原绿／原样绿）逐字贴 ＋ **还原核 `sha256` 三处逐字相同**（提交版／还原台／`git show HEAD:` blob）。
+4) ★**"归档带撤销"那件必须有真撤销路径**：⛔ 只写"能归档"就算完——★**撤销要能被触发**（⛔ 纸上）。
+5) ★**格式门禁甲乙两尺都报**：甲＝`git archive` 到仓外跑 `gofumpt -l`（**判据**）／乙＝工作树（**只作诊断**）。
+
+■ 写面（越界＝作废）
+- 允许：`internal/session/**` ＋ `internal/memory/**` 的**测试件与产码**（本票要落地）；`docs/evidence/s1/166-r1-*.md`。
+- ⛔ `cmd/**`（★本波 `cmd/wisp` 归别的腿）、`scripts/**`、`.github/**`、`tools/d22scan/**`、`go.mod`/`go.sum`、
+  `docs/PLAN.md`／`docs/specs/**`（★**契约文字须人工批准**）、`docs/reports/**`、`frontend/**`／`design/**`（零读零写零转述）、
+  `thresholds.go`／golden／`allowlist.txt`／三枚冻结件。
+- ★**`internal/panel/**` 与 `internal/risk/**` 归别的腿** ⇒ ⛔ 动。
+
+■ 开工前（⛔ 跳步＝空跑作废）
+1) `git status --porcelain`：写面内有**别人的**未提交改动 ⇒ 停手上报。
+2) ★**票面前提新鲜度**：票面每条可现跑断言**逐条现跑**（★本仓票面腐坏已 ≥9 次）。
+3) 复跑基线：`go test -count=1 ./internal/session/ ./internal/memory/`（四数分开报）。
+
+■ 环境
+`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；⛔ `CGO_ENABLED=0`（本仓必然编不过、⛔ 当缺陷）；
+★`gofumpt` 用**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（裸名 rc=127，⛔ 判"本机没有"）；
+★`*.go text eol=lf` ⇒ 脚本改文件⛔ 带 CRLF；★变异读数与整包门禁**串行**。
+
+■ ★开工前必读（本仓刚立的检查表）
+`.scratch/wisp/probes/orch/20261022/txt/ruler-scope-checklist.md`（65 行）——★**8 处"尺的射程"的错**。
+★**落笔前四问**：①这把尺量的是哪个对象？②输出形状是什么（正/反斜杠、缩进）？③我数的是"代码"还是"注释"？④这个数有没有和总数对上？
+★**判 `gofumpt`／`gofmt` 输出归属必须用 `[\\/]`**（Windows 上输出反斜杠，见 `A1140⑥`）。
+★**名册取主检出**、⛔ 取导出树（导出树无 `.git` ⇒ `internal/tools` 8 枚假红，见 `A1134⑦b`）。
+
+■ Git
+只 commit **⛔ push**；`add`/`commit` 两处**显式 pathspec**；★**涉新文件的提交，pathspec 逐个文件名字面点名**（⛔ glob）；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+主题**逐字**以 `票 166 落地腿 166-r1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★**文档里可以自由用 `★`／`⛔`／`⇒`／带圈数字**（`ban #8` 只扫 `internal/`／`cmd/` 的 `.go`）；但 **`.go` 里**注释豁免、字符串不豁免。
+★**改自己新增的文字时 ⛔ 用 `\n\n` 猜段落边界**，用**行号范围**（`sed -n 'A,Bp'`），改完必 `diff HEAD` 验。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261022\166r1\**`；⛔ `.out`。
+
+■ 交付件（缺一算未交）
+`docs/evidence/s1/166-r1-impl.md`（**≤160 行**，过帽拆 `-partN`）：**四件逐件**"未修码上响不响"的读数（★**"不响"也要如实报**）／
+每件的新用例逐名＋为什么今天响／反向判据三读数逐字＋sha256／"归档带撤销"的撤销路径证据／门禁 rc。
+门禁自己现跑：`GOFLAGS= go build ./...`；`go vet ./internal/session/ ./internal/memory/`；`go test -count=1 ./internal/session/ ./internal/memory/`（四数分开报、⛔ 相减）；
+`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh`。
+红名册**逐名**（★**取主检出**），新增红必须 **0**。提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界（正控＝同尺打一笔**含 `.go`** 的真提交）。
+
+■ 未定义即停 ⇒ **停手上报**，⛔ 自行假设。★特别是：①若某一件**必须改 `docs/specs/**` 或 `PLAN.md`** ⇒ **停手上报**（那是改契约文字、须人工批准）；②若四件里有一件**今天做不到**（缺接缝／缺数据）⇒ **停手上报并说清**，⛔ 造一个假出口凑数。
