@@ -66,13 +66,16 @@ func TestWritebackDoesNotAdoptMemoryTheFileKeepsTheHandEdit(t *testing.T) {
 	}
 
 	// STATE 2 - the positive control, on the same table: one Adopt pass. The
-	// readings start at an impossible value, so deleting this arm leaves state 1
-	// as the only reading and fails the case below instead of passing quietly.
+	// readings start at an impossible value and a flag records that the arm body
+	// executed, so deleting this arm leaves state 1 as the only reading and fails
+	// the case below instead of passing quietly.
+	ranAdopt := false
 	adoptedMem, adoptedFile := -1, -1
 	var hot []string
 	if rep, err := m.CheckAndReload(); err != nil {
 		t.Fatalf("CheckAndReload (the Adopt path this control drives): %v", err)
 	} else {
+		ranAdopt = true
 		if rep != nil {
 			hot = rep.Hot
 		}
@@ -81,6 +84,17 @@ func TestWritebackDoesNotAdoptMemoryTheFileKeepsTheHandEdit(t *testing.T) {
 	}
 	t.Logf("STATE 2 after one Adopt pass: mem.ball.size=%d file.ball.size=%d report.Hot=%v",
 		adoptedMem, adoptedFile, hot)
+	// THE PRE-CONDITION (ticket 360-r2). Every assertion below reads the control
+	// arm's output, so first prove the arm ran at all. This is a separate statement
+	// with its own Fatalf and it reads nothing but the sentinels above, so it sits
+	// before the value assertions on purpose: neutering those assertions, or letting
+	// their two-state guard fall silent, cannot silence this one. Remove the arm and
+	// ranAdopt stays false while both sentinels stay at -1, so this fires first.
+	if !ranAdopt || adoptedMem < 0 || adoptedFile < 0 {
+		t.Fatalf("the Adopt arm did not run: ranAdopt=%v mem.ball.size=%d file.ball.size=%d; "+
+			"the positive control never executed, so the state 1 readings above are unbacked",
+			ranAdopt, adoptedMem, adoptedFile)
+	}
 	if adoptedMem != 60 || adoptedFile != 60 || !slices.Contains(hot, "ball") {
 		t.Fatalf("the Adopt control did not produce the other state: mem.ball.size=%d file.ball.size=%d "+
 			"report.Hot=%v, want 60 / 60 / [ball]; without it the readings above cannot tell two states apart",
