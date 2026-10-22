@@ -1,0 +1,67 @@
+【派单·票 160 终裁腿 `160-v1`】非实现者裁腿·2026-10-22 22:4x +08 编排者
+
+■ 身份
+**非实现者裁腿**（裁决者≠实现者）。⛔ 落任何 `.go` 字节、⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`／台账、⛔ push。
+★**票面用 glob 找**：`.scratch/wisp/issues/160-*.md`（★**先通读**；★**`AC#4`／`AC#5` 两格都未勾**）。
+
+■ 一句话
+终裁 `160-r1` 交的 `AC#4`（**明写"它治不到什么"**）与 `AC#5`（契约轴），**两格分别能不能翻**。
+
+■ ★`AC#4` 的判据（逐字）
+> **明写它治不到什么**（这条不许省）：**从不动的泄漏**它照样漏；**借用那一形不该由它治**——
+> `Detector(scopeID)` 返回的是绑定过的借用对象（`provenance.go:603-612`），在那儿补关会**弄坏它**。
+> ⇒ 与票 158"今天响不响"那格是**两格**，不许并成一格结掉。
+
+■ ★被裁对象 `160-r1`（3 笔）
+- `c4d65e4e`＝**代码 2 枚 `.go`**：`internal/risk/provenance.go` **`+25/−1`** ＋**新增** `internal/risk/provenance_160_boundary_test.go`（**164 行**）
+- `f895fe5c`／`02b3882c`＝件 `docs/evidence/s1/160-r1-impl.md`（**147 行**）
+- ★**它交的"那一跳"**：`Detector(scopeID)` 交回的是**借用** ⇒ 把 `boundDetector.p` 的静态类型从 `*Provenance` **收窄成 `detectorSeam`（只有 `Inspect` 一个方法）**（`provenance.go:872-880`／`:884`／`:886-889`）。
+  ⇒ **"在借用点补关"从此得先把缝加宽**、是**可评审的一笔**而⛔ 顺手一行。
+- ★**它自报四条钉子全绿**：`…UntouchedLeakIsSilent`／`…BorrowedDetectorOwnsNothing`／`…OwnerlessRegistrationHasNoCloser`／`…BorrowFaceCarriesNoCloser`。
+
+■ 必判清单（每项另起尺、⛔ 采信腿自报、⛔ 采信编排者的复现）
+1) **票面前提新鲜度**：票面每条可现跑断言对 **HEAD blob** 复量。
+   ★★**它报了 5 处票面腐坏，你要逐条复核**：`provenance.go:603-612` → 它说今天 **`:868-870`／`:886-889`**；
+   `allowdirs.go:157-163` → **`:157-162`**（**它说是对的**）；`assessor.go:228`／`bridge.go:610` → **`:230`／`:297-299`**；
+   `loop.go:360-366`／`run.go:557-565` → **`loop.go:373-379`／`run.go:1025-1039`**。
+2) ★★**`AC#4` 核心判点一："它治不到什么"是否真的**可核**、⛔ 含糊的"部分覆盖"**
+   - ★**"从不动的泄漏它照样漏"**：它给的读数 `registered=true owner_was_issued=true taints=1 logged_lines=0` ⇒ ★**你自己造一发复现**（生产形状 `cmd/wisp/panel_assets.go:243` 的 `_ = prov.OpenScope`）⇒ 判**"泄漏在、没人说话"这件事有没有被一枚用例钉住**。
+   - ★**"借用那一形在那儿补关会弄坏它"**：★**你自己造补关变异**（它叫 `M-BORROW-CLOSE`）⇒ 必须**红**并逐名报红行。
+   - ★**它报"补关会连带打红 `TestSyncWriteNegative`（本票之前就存在）"** ⇒ **你核那枚是不是真的既有红**（★**⛔ 顺手把既有红算成新红**）。
+3) ★★**`AC#4` 核心判点二：那个"收窄成 `detectorSeam`"的改动**是不是**只改形状、⛔ 改判定语义**
+   - ★**`AC#2` 冻住了判定语义**（它说现读 `assessor.go:230`／`bridge.go:297-299`）⇒ ★**你核：这一笔有没有碰任何判定**。
+   - ★**核"25 增 1 删"是不是真就这些**（⛔ 1115 行重写）：`git show c4d65e4e --numstat` 现读。
+4) **反向判据**：★**你自己造一发**（摘掉那一跳）⇒ 必须**红**并逐名报红行；★**它说"未修码上也响"** ⇒ 你核这一句。
+5) **`AC#5` 契约轴（逐字）**：本票**只许**动 `internal/risk/provenance.go` 及其测试 ＋ 自己的证据件；`docs/PLAN.md`、`docs/specs/**`、`thresholds.go`、golden、`allowlist.txt`、`tools/d22scan/**`、`frontend/**`、`design/**` **零字节**。★**名册按 commit 号集合算**（`--no-walk` 必须有）、**逐枚现量**。
+6) ★★**"新增红 0"你要独立核**（★**编排者已核过一条，你另起尺**）：它报 `risk` 包 `rc=1`、**PASS=144／FAIL=1／SKIP=1／RUN=251**，唯一红＝`TestC26RewriteAccountIsConsumedAtEverySecurityLeg`。
+   ★**编排查法**：仓外导出树 `c4d65e4e^`（父提交）上跑同一枚 ⇒ **也 FAIL** ⇒ "新增红 0"成立。★**你自己另跑一遍**。
+7) **门禁复跑**（你自己现跑、⛔ 抄）：`GOFLAGS= go build ./...`／`go vet ./internal/risk/`／`go test -count=1 ./internal/risk/`（**四数分开报、⛔ 相减**）／
+   `sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`。
+   ★**格式门禁甲乙两尺都报**（甲＝入库 blob 树、判据；乙＝工作树、只作诊断），裁定件＝`docs/evidence/s1/pipe-format-gate-reads-tracked-blob-not-worktree.md`。
+8) **写面纪律**：三笔逐笔 `git show --name-only` 判 `.go` 与越界；正控＝同尺打一笔**含 `.go`** 的真提交。
+9) ★**它 §7 交了三笔给验收程，你判这三笔该不该算本票欠账**：
+   ①`AC#2` 的"挂到任务 `DisposalScope`"支**未做**（要动 `agent`/`tools`/`cmd` 三层、**它说超批准单位**）；
+   ②`bridge.go:942-943` 的 `close_err=%v` **仍无人钉**；③**无主登记（`provenance.go:628`）没有新增清理路径**。
+10) ★**它自报一处副作用你判**：`provenance.go` 工作树原本 **CRLF**（`i/lf w/crlf`、`git diff` 为**空**）⇒ 它按 `.gitattributes` 归一成 **LF**、**对 git 零差异**。★**这算不算越界？**（★它与票 361／362 的 CRLF 那批同现象，且它**只治了自己写面内的那一枚、另三枚没碰**。）
+
+■ 纪律（硬）
+写面**只许**：`docs/evidence/s1/160-v1-verdict.md`（≤160 行，过帽拆 `-partN`）＋`D:\tmp\wisp\20261022\160v1\**`（仓外）。
+⛔ 改 `internal/**`、`cmd/**`、`scripts/**`、`.github/**`、`.scratch/wisp/**`、`docs/reports/**`、`docs/PLAN.md`、`docs/specs/**`；⛔ 落任何 `.go`（临时探针只放仓外）。
+只 commit **⛔ push**；`add`/`commit` 两处显式 pathspec；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+主题**逐字**以 `票 160 终裁腿 160-v1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★**文档里可以自由用 `★`／`⛔`／`⇒`／带圈数字**（`ban #8` 只扫 `internal/`／`cmd/` 的 `.go`、⛔ 扫 `docs/`）；但 **`.go` 里**注释豁免、字符串不豁免。
+临时件只建不删；⛔ `.out`；`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；⛔ `CGO_ENABLED=0`；★变异读数与整包门禁**串行**。
+★**判 `gofumpt`／`gofmt` 输出归属必须用 `[\\/]`**（Windows 上输出反斜杠）。
+★**判 CRLF 必须 `tr -cd "\r" | wc -c`**（`grep -c $(printf "\r")` 是**盲尺**）。
+★★**核 hash 前先问"谁算的、什么算法、几位"**：`git hash-object`＝**SHA-1**／`sha256sum`＝**SHA-256**、⛔ 混比。
+
+■ ★开工前必读（本仓刚立的检查表）
+`.scratch/wisp/probes/orch/20261022/txt/ruler-scope-checklist.md`（**73 行**）——★**9 处"尺的射程"的错**。
+★**落笔前五问**：①这把尺量的是哪个对象？②输出形状是什么？③我数的是"代码"还是"注释"？④这个数有没有和总数对上？⑤**这个数是谁算的、用什么算法、几位？**
+
+■ 交件（缺一算未交）
+`docs/evidence/s1/160-v1-verdict.md`：①十项逐项判语＋读数（每项另起尺）／②★**`AC#4` 能翻／⛔翻＋缺什么**／③★**`AC#5` 能翻／⛔翻＋名册现量**／
+④★**你自造的补关变异与反向判据的逐字读数**／⑤**"只改形状⛔改语义"你的判法＋结论**／⑥**"新增红 0"你的独立核**／
+⑦门禁 rc 与末行逐字／⑧红名册逐名／⑨提交号＋逐枚 `.go`／越界＋正控／⑩三项欠账与 CRLF 归一那两件的判语。
+
+■ 未定义即停 ⇒ **停手上报**，⛔ 自行假设。
