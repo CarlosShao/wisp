@@ -1,6 +1,6 @@
 # 223-r3 实施腿（写腿）：票 223 剩的两格 `AC#2`／`AC#7` 的逐档读数
 
-- 起手锚 `e94a5b17`（`git status --porcelain -- internal/config cmd/wisp docs/evidence/s1` 起手＝**空**）；本腿三枚提交：①`394cc212`（新用例）②`<本件提交>`（本件）③末笔补号提交（只把本件占位符换成②的 hash，不回改任何读数，见 §9）。
+- 起手锚 `e94a5b17`（`git status --porcelain -- internal/config cmd/wisp docs/evidence/s1` 起手＝**空**）；本腿三枚提交：①`394cc212`（新用例）②`d989a217`（本件）③末笔补号提交（只把本件占位符换成②的 hash，不回改任何读数，见 §9）。
 - 身份＝写腿：⛔ 翻框、⛔ 改 `Status:`／票名／`-done`、⛔ 台账、⛔ push；写面只碰 `internal/config/**` 与本件。
 - **一句话结论**：`AC#7` 的出口**今天在生产里已经存在**（本腿交读数、零产码改动）；`AC#2` 的 hot／restart 两档本腿在 config 层补齐**逐档用例＋逐键真值**；`AC#2` 的 **reload 档生产消费者仍＝0**（唯一非测试赋值在 `cmd/balldebug`），是**票 233** 的格，本腿具名交回、⛔ 冒充已闭合。
 
@@ -92,7 +92,7 @@
 | 提交 | 内容 | 该提交的 `.go` | 越界 |
 |---|---|---|---|
 | `394cc212` | `internal/config/tiers_223r3_test.go`（+298，新件按名字面点名入 pathspec） | **1** | **0** |
-| `<本件提交>` | `docs/evidence/s1/223-r3-impl.md` | **0** | **0** |
+| `d989a217` | `docs/evidence/s1/223-r3-impl.md` | **0** | **0** |
 | ③ 末笔补号提交 | 只把本件两处 `‹本件提交›` 占位符换成上一行 hash；不回改任何读数 | **0** | **0** |
 - 尺＝`git show --name-only --format= <c> | grep -c '\.go$'`＋逐名对写面。
 - **正控（同一把尺打一笔含 `.go` 的真提交）**：`17cfe8cf` ⇒ `.go`＝**2**（`internal/memory/dao_session.go`／`internal/session/ticket166r1_ac2_gaps_test.go`）⇒ 这把尺**能看见 `.go`**，本表两行 0／1 不是恒 0 的装饰。**负控**：`b4102f1e`（docs-only）⇒ `.go`＝**0**。
