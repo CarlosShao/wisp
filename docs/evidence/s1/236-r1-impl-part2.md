@@ -91,9 +91,14 @@ failed=$(count '^--- FAIL') skipped=$(count '^--- SKIP')
 | 写面之外零改动 | `git status --porcelain -- internal cmd scripts .github`（起手） | 0 行 |
 | `docs/evidence/s1` 起手 | `git status --porcelain -- docs/evidence/s1` | 0 行（无别人未提交改动） |
 | 本腿新增文件 | `236-r1-impl.md`(123 行)、`236-r1-impl-part2.md`(99 行)、`236-r1-instrument-note.md`(189 行) | 3 枚 |
-| 禁码位扫描（两份都扫） | 本件与仪器说明 | **0 命中** |
+| 禁码位扫描（三枚都扫） | 三枚件 | **0 命中** |
 
 **具名没做**：
 - 未跑 `cmd/wisp` 的 `-race`（本票射程外，且与 `227-r1` 抢同一枚重包）。
 - 未复跑 CI（`gh`）读数：`236-a1/census.md:141`／`:142` 的 CI 侧数字是**转述**，我本腿只做本机读数。
 - 未证票面那枚 223 用例"曾经是计时红"；只证"**今天三发整包全绿**"。
+
+**本腿自记一笔（原句不抹）**：第一笔提交里我报 `236-r1-impl.md` 是 158 行，**错的**。
+我用的是 PowerShell `Measure-Object -Line`（**跳过空行**），真值要用 `wc -l`（214 行，故过帽）。
+=> 今后本仓任何"件有多少行"的读数，尺一律写 `wc -l`，不写 `Measure-Object -Line`。
+本笔已按 `wc -l` 复量：123／99／189。
