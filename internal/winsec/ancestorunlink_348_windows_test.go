@@ -70,7 +70,7 @@ func TestAC2WindowsPinRefusalOnAnAbsentAncestorIsNotFiledAsASealRefusal348r1(t *
 			"case never reached the walk it is about (name %s)", name)
 	}
 	leg := spokeWinAnc342r1(err)
-	want := winAncLegs342r1[8].name
+	want := winAncPinWalkLeg348r1
 	if leg != want {
 		t.Fatalf("AC#2 RED: an ABSENT ancestor was filed as %q; want the pin-walk row %q. Both the pin "+
 			"and the seal wrap ErrNotSealable, so without this split an absent world is counted as the "+

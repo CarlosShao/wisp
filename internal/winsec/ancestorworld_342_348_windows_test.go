@@ -77,6 +77,11 @@ const (
 	winAncFormLeafSym  = "leaf-symlink"
 )
 
+// winAncPinWalkLeg348r1 names the row this leg added, so the reverse criterion can be stated by NAME:
+// dropping the row from the roster has to move the answer elsewhere, and a case that reached the row by
+// index would silently keep passing (the index would then name whatever moved up into that slot).
+const winAncPinWalkLeg348r1 = "pinned chain, the walk could not pin a component (reason in the text: absent, or refused by the platform)"
+
 // winAncLegs342r1 are the answers this route can produce on this platform, in a declared order so two
 // runs diff line by line. The first three are form 乙's Windows face; the rest were already on the
 // route before this landing and keep their own names.
@@ -96,7 +101,7 @@ var winAncLegs342r1 = []struct{ why, name string }{
 	// 400-attempt run reported 395 "seal refusals" while the ancestor was parked (absent) for those
 	// attempts. pinRefusal's own prefix separates them; the four reparse-specific rows above are
 	// asked first so this one only catches the leftovers (absent, unreadable, sharing violation).
-	{"pinned object at ", "pinned chain, the walk could not pin a component (reason in the text: absent, or refused by the platform)"},
+	{"pinned object at ", winAncPinWalkLeg348r1},
 	{"cannot apply a private security descriptor", "a seal refusal on this route"},
 	{"not provably resolved", "C26 resolveString refused the spelling"},
 }
