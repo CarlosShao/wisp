@@ -89,6 +89,14 @@ var winAncLegs342r1 = []struct{ why, name string }{
 	{"the name carries a reparse point", "preOpenLeafGuard's leaf refusal (ticket 322's Windows leaf leg)"},
 	{"reaches it through the link at", "placement floor before the act (platformVerifyPlacement)"},
 	{"path traverses a reparse point", "the installed C26 resolver's own refusal (resolveString -> risk), i.e. steady state BEFORE any act"},
+	// ★348-r1: this row sits ABOVE the seal row on purpose, and the order is the whole point. A pin
+	// refusal and a seal refusal both carry ErrNotSealable, so "cannot apply a private security
+	// descriptor" alone files BOTH under the seal - and a walk that could not pin an ABSENT ancestor
+	// then reads as "the seal refused", i.e. as a world. Measured before this row existed: a
+	// 400-attempt run reported 395 "seal refusals" while the ancestor was parked (absent) for those
+	// attempts. pinRefusal's own prefix separates them; the four reparse-specific rows above are
+	// asked first so this one only catches the leftovers (absent, unreadable, sharing violation).
+	{"pinned object at ", "pinned chain, the walk could not pin a component (reason in the text: absent, or refused by the platform)"},
 	{"cannot apply a private security descriptor", "a seal refusal on this route"},
 	{"not provably resolved", "C26 resolveString refused the spelling"},
 }
@@ -278,6 +286,16 @@ func (w *winAncWorld342r1) stageFlip() error {
 // `sub` itself, while the leaf form keeps `sub` real and flips only the leaf name - so asking the leaf
 // form to remove `sub` would fail ENOTEMPTY (a directory holding a link) and the first settle would
 // end the run with a bench fault instead of a reading.
+//
+// SETTLING IS IDEMPOTENT, and that is a measured requirement rather than tidiness (348-r1). The racer
+// calls toReal at the end of every cycle and stopRacer calls it once more before the reading is taken,
+// so the last call can arrive while the world is ALREADY ordinary: the racer's own last settle landed,
+// or the flip it tried next was refused by the platform (which is the landing's normal answer, not an
+// error - the pin holds the parent). The first version removed `sub` unconditionally, and an ordinary
+// `sub` carries the caller's leaf, so RemoveUnlinked answered "The directory is not empty", stopRacer
+// Fatal'd, and the whole reading was lost - measured on this leg: three runs of the AC#2 instrument on
+// ONE tree gave settle-fault red / liveness-gate red / green. That is an instrument reporting on its
+// own fixture, so the state is read first and a real directory is left standing.
 func (w *winAncWorld342r1) toReal() error {
 	if w.form == winAncFormLeafSym {
 		if err := removeWinAnc(w.name); err != nil {
@@ -286,6 +304,12 @@ func (w *winAncWorld342r1) toReal() error {
 		if err := os.MkdirAll(w.sub, 0o700); err != nil {
 			return err
 		}
+		return os.WriteFile(w.name, []byte(winAncOwnBody342r1), 0o600)
+	}
+	// Already ordinary (a directory that is NOT a reparse point): nothing to move. A junction reports
+	// IsDir()==true as well, which is why the reparse answer is asked separately - the same predicate
+	// the racer's own toFlip proves with.
+	if info, err := os.Lstat(w.sub); err == nil && info.IsDir() && !reparseAt(w.sub) {
 		return os.WriteFile(w.name, []byte(winAncOwnBody342r1), 0o600)
 	}
 	if err := removeWinAnc(w.sub); err != nil {
@@ -334,6 +358,18 @@ func (w *winAncWorld342r1) toFlip() error {
 	return w.stageFlip()
 }
 
+// resettle heals a flip that stopped half-way. Both halves are needed: land the ordinary state AND
+// re-arm the staged name. toFlip consumes the staged name by renaming it into place, so a failure
+// after that rename (the reparse proof, or the next stageFlip) leaves nothing to move in next time -
+// without the re-arm the racer would keep failing on a missing staged name and the world would stand
+// parked while the attempts reported on an absent ancestor.
+func (w *winAncWorld342r1) resettle() error {
+	if err := w.toReal(); err != nil {
+		return err
+	}
+	return w.stageFlip()
+}
+
 func (w *winAncWorld342r1) startRacer() {
 	w.stop = make(chan struct{})
 	w.done = make(chan struct{})
@@ -352,6 +388,18 @@ func (w *winAncWorld342r1) startRacer() {
 			}
 			if err := w.toFlip(); err != nil {
 				w.noteFlip(err)
+				// A HALF-FINISHED FLIP IS NOT A WORLD THIS CASE MAY MEASURE (348-r1). toFlip moves the
+				// ancestor out before it moves the link in, so a failure in between leaves the ancestor
+				// PARKED: `sub` absent, `parked-real-sub` holding the caller's tree. Retrying the flip
+				// from there can only fail (`rename sub` on an absent name), and every later attempt
+				// then meets an ABSENT ancestor - which this package refuses too, with a text that the
+				// roster below used to file under "a seal refusal on this route". Measured: one
+				// 400-attempt run spent 395 attempts on that state, proved three flips, and still
+				// passed the liveness floor - a zero dressed as a reading. Healing first means the two
+				// states the attempts meet are the two this case claims.
+				if rErr := w.resettle(); rErr != nil {
+					w.noteFlip(rErr)
+				}
 				continue
 			}
 			atomic.AddInt32(&w.cycles, 1)

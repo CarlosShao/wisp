@@ -27,8 +27,64 @@
 package winsec
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 )
+
+// TestAC2WindowsPinRefusalOnAnAbsentAncestorIsNotFiledAsASealRefusal348r1 is the case for the one
+// roster row this leg added, and it is deterministic rather than raced.
+//
+// WHY THE ROW NEEDS A CASE. A pin refusal and a seal refusal both carry ErrNotSealable, so the roster's
+// coarse "cannot apply a private security descriptor" row filed BOTH under "a seal refusal on this
+// route". That is not a cosmetic mislabel: this file's liveness gate counts attempts the ROUTE answered
+// about a flipped ancestor, and an ancestor that is ABSENT is not a flipped ancestor - so a 400-attempt
+// run that spent 395 attempts on a parked (absent) ancestor reported 395 "seal refusals", proved three
+// flips, and passed. Measured before the row existed (348-r1, this machine).
+//
+// WHY THE WORLD IS BUILT THIS WAY. The ancestor is deleted outright and nothing is ever flipped: no
+// reparse point is involved anywhere, so no reparse leg can answer, and the only possible answer is the
+// pinned walk failing to pin `sub`. That makes the attribution question - not the damage question - the
+// whole subject, and it makes the case independent of the racer's timing.
+func TestAC2WindowsPinRefusalOnAnAbsentAncestorIsNotFiledAsASealRefusal348r1(t *testing.T) {
+	base := SealableTempDirForTest124(t)
+	data := filepath.Join(base, "data")
+	sub := filepath.Join(data, "sub")
+	name := filepath.Join(sub, winAncLeaf342r1)
+	if err := os.MkdirAll(sub, 0o700); err != nil {
+		t.Fatalf("stage the ancestor: %v", err)
+	}
+	if err := os.WriteFile(name, []byte(winAncOwnBody342r1), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	// Park the ancestor: the caller's leaf goes with it, exactly as a half-finished flip leaves it.
+	if err := os.Remove(name); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Remove(sub); err != nil {
+		t.Fatal(err)
+	}
+	err := PrivateFile(name, []byte(winAncPayload342r1), 0o600)
+	if err == nil {
+		t.Fatalf("AC#2 RED instrument: a private write under an absent ancestor returned nil, so this "+
+			"case never reached the walk it is about (name %s)", name)
+	}
+	leg := spokeWinAnc342r1(err)
+	want := winAncLegs342r1[8].name
+	if leg != want {
+		t.Fatalf("AC#2 RED: an ABSENT ancestor was filed as %q; want the pin-walk row %q. Both the pin "+
+			"and the seal wrap ErrNotSealable, so without this split an absent world is counted as the "+
+			"seal leg - and the seal leg is what the liveness gate reads as 'the route met a flipped "+
+			"ancestor'. verbatim: %v", leg, want, err)
+	}
+	if winAncIsFormLeg342r1(leg) {
+		t.Fatalf("AC#2 RED: an absent ancestor was counted as one of form 乙's reparse legs (%q), so "+
+			"the liveness gate would read a world that never reached the link state as having reached it",
+			leg)
+	}
+	t.Logf("AC#2' attribution: the absent ancestor is answered by the pin-walk row, not by the seal "+
+		"row (verbatim: %v)", err)
+}
 
 func TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342r1(t *testing.T) {
 	w := newWinAncWorld342r1(t, winAncFormSymDir)
