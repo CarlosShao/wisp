@@ -1,0 +1,54 @@
+【派单·票 164 终裁腿 `164-v1`】非实现者裁腿·2026-10-22 22:2x +08 编排者
+
+■ 身份
+**非实现者裁腿**（裁决者≠实现者）。⛔ 落任何 `.go` 字节、⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`／台账、⛔ push。
+★**票面用 glob 找**：`.scratch/wisp/issues/164-*.md`（★**先通读**）。
+
+■ 一句话
+终裁 `164-r1` 交的 `AC#2b`：**那枚用例到底是"守卫"还是"恒真装饰品"**，以及**改署名有没有偷偷动断言**。
+
+■ ★被裁对象 `164-r1`（4 笔）
+- `62a1521c`＝**唯一 `.go`**：`internal/tools/task_output_ac2_before_test.go`（`+41/−26`）
+- `ec8786e1`＝件 `docs/evidence/s1/164-r1-impl.md`（142 行）／`0786b5c6`／`1146f803`＝件内补提交号与引文
+- ★**它自报**：只改**注释／说明文字**（署名＋3 处 Logf/Fatalf 措辞），**断言逻辑一字未动**；**文件名与函数名保留**（理由＝它们是**历史键**：票面按文件名点它、`.scratch/wisp/probes/164/v1/ac2-anchor-reading.sh:41,44` 与 CI 日志按函数名跑它；改名会让那支归档仪器变成 `no tests to run` 的**假绿**）。
+
+■ 必判清单（每项另起尺、⛔ 采信腿自报、⛔ 采信编排者的复现）
+1) **票面前提新鲜度**：票面每条可现跑断言对 **HEAD blob** 复量。
+   ★★**它报了三条票面腐坏，你要逐条复核**：①票面 `:4` "`task.output` 全仓零命中"**已不成立**（它说现 **17 枚** `.go`）；
+   ②票面 `:56` "`RunAsync` 生产零调用点"**已不成立**（它说 `cmd/wisp/run.go:1176`、`internal/tools/subagent_197.go:372`）；③票面 `:52`/`:59` 引的 `bridge.go:251`/`:247-253` **已漂到 `:272-278`**（文案本体 `:276`）。
+2) ★★**本格核心判点＝"它是守卫还是恒真装饰品"——你自己造两向变异**（⛔ 只看它报的）：
+   - **M1**：改坏 `internal/tools/bridge.go` 的**拒绝文案**（它说 `:276`）⇒ 那枚用例必须**红**并逐名报红行。
+   - **M2**：改错 **D37 分类**（它说 `:277` 的 `observe.ClassTool`）⇒ 必须**红**。
+   - ★**原样必须绿**。每发先证落地（`grep -n` ＋ `go build` rc=0）再读数；**读完立刻单独还原**。
+3) ★★**"断言一字未动"你要独立核**：★别只看它报。建议：`git show 62a1521c -- <该文件>` 逐行读 diff，判**有没有任何一行是断言逻辑**（⛔ 只数 `Fatalf`/`Errorf` 计数——★**计数相同不等于逻辑没动**）。
+4) **署名是否真的改到位**：件 `164-r1-impl.md` §2 的引文与文件 `:11-49` 是否**逐字相同**（它说第一次引文末三行换行不同、已改 ⇒ 核）。
+5) **零产码复核**：`internal/tools` 的**产码**逐枚 `git rev-parse HEAD:<p>` 对 `git hash-object <p>` ⇒ 必须全 SAME。
+   ★★**注意**：`git hash-object` 是 **SHA-1**；若件里报的是 **SHA-256**（64 位），要用 `sha256sum` 核（★**编排者本轮就栽在这上面**）。
+6) **门禁复跑**（你自己现跑、⛔ 抄）：`GOFLAGS= go build ./...`／`go vet ./internal/tools/`／`go test -count=1 ./internal/tools/`（**四数分开报、⛔ 相减**）／
+   `sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`。
+   ★**格式门禁甲乙两尺都报**（甲＝入库 blob 树、判据；乙＝工作树、只作诊断），裁定件＝`docs/evidence/s1/pipe-format-gate-reads-tracked-blob-not-worktree.md`。
+7) **红名册逐名**（⛔ 只报枚数），新增红必须 **0**。★**名册取主检出**、⛔ 取导出树（导出树无 `.git` ⇒ `internal/tools` 的 8 枚 `TestTicket252*` 与 `TestReadGitOnThisRepositoryIsSelfConsistent` **假红**）。
+8) **写面纪律**：四笔逐笔 `git show --name-only` 判 `.go` 与越界；正控＝同尺打一笔**含 `.go`** 的真提交。
+9) ★**它 §8 记的两条残余你判**：①**第三节那颗牙射程窄**（只钉 `BuiltinFSEntries` 不夹带 `task.*`、**不是**关于生产注册表的断言）——★**旧注释"模型今天看到的目录没有 `task.*` 条目，所以连问都学不会"对生产是假的那句，它说已按射程改写** ⇒ 你核改写后那句**⛔ 变成假话**；
+   ②**文件名与函数名保留**这个决定**你判对不对**（★它给的理由是"改名会让归档仪器假绿"——★这个理由**是否成立**由你判）。
+
+■ 纪律（硬）
+写面**只许**：`docs/evidence/s1/164-v1-verdict.md`（≤160 行，过帽拆 `-partN`）＋`D:\tmp\wisp\20261022\164v1\**`（仓外）。
+⛔ 改 `internal/**`、`cmd/**`、`scripts/**`、`.github/**`、`.scratch/wisp/**`、`docs/reports/**`、`docs/PLAN.md`、`docs/specs/**`；⛔ 落任何 `.go`（临时探针只放仓外）。
+只 commit **⛔ push**；`add`/`commit` 两处显式 pathspec；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+主题**逐字**以 `票 164 终裁腿 164-v1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★**文档里可以自由用 `★`／`⛔`／`⇒`／带圈数字**（`ban #8` 只扫 `internal/`／`cmd/` 的 `.go`、⛔ 扫 `docs/`）；但 **`.go` 里**注释豁免、字符串不豁免。
+临时件只建不删；⛔ `.out`；`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；⛔ `CGO_ENABLED=0`；★变异读数与整包门禁**串行**。
+★**判 `gofumpt`／`gofmt` 输出归属必须用 `[\\/]`**（Windows 上输出反斜杠）。
+★**判 CRLF 必须 `tr -cd "\r" | wc -c`**（★它自报一把盲尺：`grep -c $(printf "\r")` 对 225 个 CR 的文件读出 0）。
+
+■ ★开工前必读（本仓刚立的检查表）
+`.scratch/wisp/probes/orch/20261022/txt/ruler-scope-checklist.md`（65 行）——★**9 处"尺的射程"的错**（含本轮新加的 SHA-1／SHA-256 那条）。
+★**落笔前四问**：①这把尺量的是哪个对象？②输出形状是什么？③我数的是"代码"还是"注释"？④这个数有没有和总数对上？
+
+■ 交件（缺一算未交）
+`docs/evidence/s1/164-v1-verdict.md`：①九项逐项判语＋读数（每项另起尺）／②★**`AC#2b` 能翻／⛔翻＋缺什么**／
+③★**M1／M2／原样三发你自己造的逐字读数**／④★**"断言一字未动"你的独立核法＋结论**／⑤三条票面腐坏的逐条复核／
+⑥门禁 rc 与末行逐字／⑦红名册逐名／⑧提交号＋逐枚 `.go`／越界＋正控／⑨两条残余的判语。
+
+■ 未定义即停 ⇒ **停手上报**，⛔ 自行假设。
