@@ -1,0 +1,53 @@
+【派单·票 158 AC#5（门禁）】写腿·2026-10-22 10:3x +08 编排者
+
+■ 身份
+写腿（实现者）。⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 动台账。
+票面＝`.scratch/wisp/issues/158-the-gate-stands-outside-the-shape-that-is-live-today-openscope-closescope.md`。
+
+■ 一句话（AC#5：门禁）
+按票面要求跑门禁四数（改前改后各一次）＋名册两向 `comm` 差集。★**判据只认数字与名册**，⛔ 用“绿/红”等主观词；⛔ 放宽断言换绿。
+
+■ ★已交底（派单存档里逐条说清，这里摘要）
+票 158 的 `AC#5` 文字：“一律逐包单跑”，指 `internal/tools` 与 `cmd/wisp` 各两次（改前 / 改后）。
+→ **你必须跑四次测试**，每次单独记录四数（`RUN/PASS/FAIL/SKIP` 分开报），再比**名册两向 `comm`**。
+→ ⛔ 用“整包 rc=0”当通过——本仓 `cmd/wisp` 整包**今天不能当判据**（`A1079`／`A1100`／`A1118`），只能按名作差＋逐发登记死点。
+
+■ ★停手上报清单（必核，缺一条就停）
+1. `git status --porcelain`：写面内（`internal/tools/**`／`cmd/wisp/**`）有别人的未提交改动 ⇒ **停手上报**。
+2. `go.mod`：**`golang.org/x/sys/windows`** 在不在？→ 若需依赖 ⇒ **停手上报**（⛔ 自己加依赖是“改构建面”，我另一手裁的范畴）。
+   → 我已核过该依赖在 `go.mod:12`，这票你只需确认它在（**不用删或改**）。
+3. `check-path-length-budget.sh`：先跑正控 → **必须 GREEN**，否则修名册（同票 357 的路径：旧名→新名／补条目）。
+   → 我这轮刚把名册修到 `over-budget=61 covered=61 not in roster=0`。
+
+■ ★门禁四数（逐包四次，分开报）
+对于 `internal/tools` 和 `cmd/wisp`：
+- ①改前：`go test -count=1 <pkg>` （四数 `RUN PASS FAIL SKIP` 分列，**不合并**）
+- ②改后：同一包同样指令
+- ③重复一次 `cmd/wisp`（因 `CGO_ENABLED=0` 编不过，⛔ 当缺陷；但本票要测的是用例侧，所以正常跑 `-timeout 30m`）
+- ④**名册两向 `comm`**：改前 vs 改后 ⇒ `only-in-POST`（新增红）、`only-in-PRE`（消失）、`both`（共存）
+- ★**新增红必须 0 枚**；消失红若有，必须能解释（如“某类用例被移除”、“某文件被删除”），否则**停手上报**。
+
+■ ★格式门禁（甲乙尺都报）
+- **甲尺（入库 blob）**：`git archive HEAD | tar -x` 到仓外 → `gofumpt -l`（绝对路径 `/d/work/base/gopath/bin/gofumpt.exe`）⇒ **列出 0 枚** ⇒ `RC=0`。
+- **乙尺（工作树，诊断）**：对当前工作树跑 ⇒ 若列出 1 枚且是本机 `autocrlf=true` 假红 ⇒ **注明诊断**，不判违规。
+- ★**交付件里必须贴这两把尺的读数**（不可省略乙尺）。
+
+■ 环境
+`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；`cmd/wisp` 要 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`；
+⛔ `CGO_ENABLED=0`（本仓必然编不过、⛔ 当缺陷）；★`cmd/wisp` 整包**必抬 `-timeout 30m`** 且**按名作差**。
+★`gofumpt` 用**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（裸名 rc=127，⛔ 判“本机没有”）；
+★`.gitattributes` 要求 `*.go text eol=lf` ⇒ 脚本改文件⛔ 带 CRLF；
+★变异读数与整包门禁**串行**（⛔ 并发）。
+
+■ Git
+只 commit **⛔ push**；`add`/`commit` 两处显式 pathspec；★**涉新文件的提交，pathspec 逐个文件名点名**（⛔ glob）；
+⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。主题**逐字**以 `票 158 AC#5 门禁` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★提交正文与交付件 **⛔ 被禁码位**（`sec`/`✓`/`≤`/`≠`/`→`/`⇒`/`⛔`/`⚠`/emoji/带圈数字）⇒ 写 `sec N`／`=> `／`NOT`／`NOTE`／`(1)`；提交前自己扫一遍。
+★**改自己新增的文字时 ⛔ 用 `\n\n` 猜段落边界**（我用它误改过既有正文，`A1119` 记过），用**行号范围**（`sed -n 'A,Bp'`），改完必 `diff HEAD` 验。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261022\158r1\**`；⛔ `.out`。
+
+■ 交付件（缺一算未交）
+`docs/evidence/s1/158-r1-ac5.md`（≤160 行）：四包次四数（改前/改后 × 两包）｜名册两向 `comm` 结果｜甲尺 0 枚｜乙尺诊断（若有）｜新增红 0 枚证｜死点逐名｜门禁 rc。
+★交付件首行写"**本次门铃声**：四数四包 + 名册两向”。
+
+■ 未定义即停 ⇒ **停手上报**，⛔ 自行假设。★特别是：①如果 `check-path-length-budget.sh` 不是 GREEN ⇒ **停手上报并贴名册修正步骤**；②如果名册里有“超预算且不在名册”的红行 ⇒ **停手上报并修名册**。

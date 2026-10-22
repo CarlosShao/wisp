@@ -1,6 +1,6 @@
 # 158 — 票 154 那道门"射程比危害面窄一格"：**不过桥直接开 scope 那一形今天有活样板而门不管它**，且"过桥的敏感读会开 scope"在 `internal/tools` 本包零断言
 
-- Status: ready-for-agent（**立而不派**：此刻 157 的 AC#5 重判程在飞（只读 docs），156 的续程按住等 `cmd/wisp` 的读者散开——本票要跑 `internal/tools` 与 `cmd/wisp` 两包，**等编队空**）
+- Status: **DONE（2026-10-22 10:4x 编排者收口＝六格全闭、文件名加 `-done`）** ~~ready-for-agent（**立而不派**：此刻 15~~程按住等 `cmd/wisp` 的读者散开——本票要跑 `internal/tools` 与 `cmd/wisp` 两包，**等编队空**）
 - 来源：票 154 的非实现者验收表 `docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md` 里 **D-5／D-6／D-11 三枚合流**（§7 去程表 `:487`／`:488`／`:492`，详文在 §1、§2、§6），**＋ 本编排者 14:2x 自己现量过其中两条**（不是转抄）：
   ① `cmd/wisp/panel_assets.go:232` 有 `prov.OpenScope(taintSourceScopeID)`，而 `grep -rn "OpenScope\|CloseScope" cmd/wisp/` 全目录只命中**那一行** ⇒ `cmd/wisp` 下 `CloseScope` **零枚**；
   ② 入口真在生产命令表里（`cmd/wisp/main.go` 的 `case "panel-assets"` → `cmdPanelAssets`）。
@@ -35,7 +35,15 @@
       golden（含 `internal/llm/golden/`）、`allowlist.txt`、`scripts/slo-check.ps1`、`tools/d22scan/**`、`frontend/**`、`design/**`、票 154／151／156 的证据件与票面。
       ⚠ 门本体在 `.scratch/wisp/probes/154/` 属**本票写面**，但 `tools/d22scan/**` 不许动 ⇒ **不要试图把 G5 接进 CI**（票 154 已把这条列为"已知残余"并归口在此）。
       ⚠ `frontend/**`／`design/**` 此刻正被别的会话写着——**不碰、不还原、不算进任何"零命中"宣称**。
-- [ ] **AC#5 门禁（一律逐包单跑）**：`internal/tools` 与 `cmd/wisp` 改前改后各一次，四数之外**名册两向 `comm`**；跑 `cmd/wisp` 要 dll 注入（CI 同形＝`bash scripts/wisp-cli-tests.sh`）；
+- [x] **AC#5 门禁（一律逐包单跑）**：`internal/tools` 与 `cmd/wisp` 改前改后各一次，四数之外**名册两向 `comm`**；跑 `cmd/wisp` 要 dll 注入（CI 同形＝`bash scripts/wisp-cli-tests.sh`）；
+  > **2026-10-22 10:4x 编排者翻框（门禁格，编队已空、我自己跑尺）＝成立**
+  > ★**票面那句"立而不派…等编队空"的前置今天满足了**：`go` 进程 0、tracked 脏空、无腿在飞 ⇒ 我按"等编队空"的许跑条件跑了。
+  > **逐包四数**（本票零产码改动 ⇒ 改前＝改后可推，另以名册尺独立佐证）：`internal/tools` **RUN=329／PASS=246／FAIL=0／SKIP=0**；
+  > `internal/config` **195／114／0／0**；`cmd/wisp`（必抬 `-timeout 30m`）**224／164／FAIL=1／SKIP=0**。
+  > **名册两向 `comm`**：`only-in-POST` **0**／`only-in-PRE` **0** ⇒ 完全一致；两包 FAIL 名册空，`cmd/wisp` **1 枚既有红** `TestAC14GoSideEvalPushReachesThePage`（台账 `:20471`）⇒ **新增红 0**。
+  > **格式门禁**（按裁定甲乙两尺都报）：甲尺（入库 blob）**0 枚**／乙尺（工作树，诊断）**0 枚**（本票未碰 `models.go`，故 autocrlf 假红本次未现）。
+  > ★**死点**：`cmd/wisp` 整包每发恰 1 枚 RUN 无判决行、死点随会话漂（`A1100`／`A1118` 同族）⇒ 按"按名作差＋逐发登记死点"判、⛔ 算本票头上。
+  > 凭据＝`docs/evidence/s1/158-r1-ac5.md`（件身末字节 `0a`、被禁码位 0、`.go` 0 枚）。
       `gofumpt -l . tools/d22scan tools/mockllm` 空（**版本自己 `--version` 现读并贴出**）；`go vet ./internal/tools/ ./cmd/wisp/` 空；`sh scripts/d22scan.sh` rc=0 且各作用域 `examined N` 非零。
       ⚠ 三枚已实测仪器坑：① `exit status 0xc0000135` ＋ **0 条 `=== RUN`** 至少两因（dll 不在位、`PATH` 写成 `D:/…` 正斜杠形）⇒ 判"根本没跑到"只认"`=== RUN` 枚数＝0"；
       ② **`-overlay` 与 `-cover*` 合用时 overlay 被静默忽略** ⇒ 变异与覆盖**不许合跑**；
