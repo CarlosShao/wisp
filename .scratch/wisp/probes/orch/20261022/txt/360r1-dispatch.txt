@@ -1,0 +1,61 @@
+【派单·票 360 落地腿 `360-r1`】写腿·2026-10-22 17:3x +08 编排者
+
+■ 身份
+写腿（实现者）。⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ 改台账、⛔ push。
+票面＝`.scratch/wisp/issues/360-writeback-does-not-adopt-memory-indirectly-nailed-directly-not.md`（五格，先通读；`AC#0`／`AC#1` 已由我翻／拍）。
+
+■ 一句话
+按我拍的 **〔甲〕形**：**只加一枚用例**钉住"写回之后内存仍持旧值"这一跳，**⛔ 动任何产码**。
+
+■ ★★我拍的形（⛔ 换形、⛔ 加码）
+**〔甲〕只加一枚用例（零产码）**。理由（`AGENTS.md` ⓪⓪⓪ 铁律第 2／3 条）：
+- 本票题目是「**直接未钉**」——缺的是**一枚"以这一跳为题目、自带两态正控"的用例**，⛔ 缺一次产码改动。
+- 〔乙〕产码侧显式 Adopt 的代价已被普查腿实测：**当场红 9 枚**＋**与 D36 rule 1（`ConfirmLocked` 先行）正面相撞** ⇒ **买不到真价值**、⛔ 选。
+- ★**一条硬边界**：〔甲〕**⛔ 意味着"这一跳不重要"**——它意味着**这一跳今天不该被产码改变**（一改就撞 D36 rule 1）。将来要改产码＝**独立行为变更、须重新立案**。
+
+■ ★`360-a1` 已给的地基（⛔ 重做，直接用）
+- **`statOwnWrite` 分层**（raw grep 5 行）：**1 定义** `internal/config/allowdirs.go:157`（体 `:157-163`，**只写 `seenMtime`/`seenSize`/`seenValid`、从不认领内容**）
+  ＋**1 代码调用** `internal/config/writeguard.go:179`（在 `mergeWrite` 的 `if len(diverged)==0` 支内）＋**3 注释**（`allowdirs.go:150`／`writeguard.go:105`／`writeguard_226_test.go:186`）。
+- **两条路互不相连**：写回入口 3 枚（`allowdirs.go:62`／`:109->:139->:142`；`permmode.go:70->:79`；`settings.go:259->:303`）汇聚到 `writeguard.go:111 mergeWrite`（`:118` 读盘当 base、**`:163 SaveFile` 从不回读**）；
+  **Adopt 全仓只有一条**：`manager.go:142 CheckAndReload -> :160 LoadFile -> :193 plan.commit` 写 `cur`；生产驱动 `config_reload.go:123`／`:92`／`:157`。
+- **复现读数（它现量）**：`READ A2 file.ball.size=60 mem.ball.size=56`；`diffKeyPaths(memory,file) n=1 [ball.size]`。
+- **正控读数（它现量）**：同台面多跑一次 Adopt 路 ⇒ `mem=60 file=60`、`report.Hot=[ball]`；第三臂干净写 `file=56 mem=56`、poll 后 `report=nil`。
+★**这些是它的读数、你要自己复跑**（本仓票面/件腐坏已 ≥8 次）。
+
+■ `AC#2` 的判据（逐条照做）
+1) 新增**一枚**用例，题目就是这一跳：**断 `file=60` 而 `mem=56`**（写回之后内存仍持旧值）。
+2) ★**必须自带两态正控**：同台面再跑一次 **Adopt 路** ⇒ `mem=60 file=60` ⇒ ★**证明台子能分辨两态**（⛔ 只有一态读数）。
+3) ★**反向判据**：把"Adopt 路那一臂"摘掉（或把断言改成恒真）⇒ 用例必须**转红并逐名报红行**；先证落地（`grep -n` ＋ `go build` rc=0）再读数。
+4) ★**三读数**（变异红／还原绿／原样绿）逐字贴 ＋ **还原核 `sha256` 三处逐字相同**（提交版／还原台／`git show HEAD:` blob）。
+5) ★**格式门禁甲乙两尺都报**（裁定件 `docs/evidence/s1/pipe-format-gate-reads-tracked-blob-not-worktree.md`）：甲＝`git archive` 到仓外跑 `gofumpt -l`（**判据**）／乙＝工作树（**只作诊断**）。
+
+■ 写面（越界＝作废）
+- 允许：`internal/config/**` 的**测试件**（新用例）；`docs/evidence/s1/360-r1-*.md`。
+- ⛔ **改 `internal/config` 的产码**（`allowdirs.go`／`writeguard.go`／`manager.go`／`settings.go`／`permmode.go` **零字节**）——★若你发现**非动不可** ⇒ **停手上报**。
+- ⛔ `cmd/**`（★本波 `cmd/wisp` 另有别的腿）、`scripts/**`、`.github/**`、`tools/d22scan/**`、`go.mod`/`go.sum`、
+  `docs/PLAN.md`／`docs/specs/**`／`docs/reports/**`、`frontend/**`／`design/**`（零读零写零转述）、`thresholds.go`／golden／`allowlist.txt`／三枚冻结件。
+
+■ 开工前（⛔ 跳步＝空跑作废）
+1) `git status --porcelain`：写面内有**别人的**未提交改动 ⇒ 停手上报。
+2) ★**票面前提新鲜度**：票面每条可现跑断言**逐条现跑**。
+3) **复跑 `360-a1` 的复现＋正控两组读数**（⛔ 抄它的）。
+
+■ 环境
+`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；⛔ `CGO_ENABLED=0`（本仓必然编不过、⛔ 当缺陷）；
+★`gofumpt` 用**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（裸名 rc=127，⛔ 判"本机没有"）；
+★`.gitattributes` 要求 `*.go text eol=lf` ⇒ 脚本改文件⛔ 带 CRLF；★变异读数与整包门禁**串行**。
+
+■ Git
+只 commit **⛔ push**；`add`/`commit` 两处**显式 pathspec**；★**涉新文件的提交，pathspec 逐个文件名字面点名**（⛔ glob）；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+主题**逐字**以 `票 360 落地腿 360-r1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★提交正文与交付件：★**文档里可以自由用 `★`／`⛔`／`⇒`／带圈数字**（`d22scan` 的 `ban #8` **只扫 `internal/`／`cmd/` 的 `.go`**、⛔ 扫 `docs/`，见 `A1131①`）——⛔ 再为此白费功夫。
+★但 **`.go` 文件里**：注释豁免、字符串**不**豁免，⛔ 在 `.go` 里放 emoji／`⇒`／带圈数字。
+★**改自己新增的文字时 ⛔ 用 `\n\n` 猜段落边界**，用**行号范围**（`sed -n 'A,Bp'`），改完必 `diff HEAD` 验。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261022\360r1\**`；⛔ `.out`。
+
+■ 交付件（缺一算未交）
+`docs/evidence/s1/360-r1-impl.md`（**≤160 行**，过帽拆 `-partN`）：新用例逐名＋为什么今天响／**两态读数逐字**（`file=60 mem=56` ⇄ Adopt 后 `mem=60 file=60`）／反向判据三读数逐字＋sha256／门禁 rc。
+门禁自己现跑：`GOFLAGS= go build ./...`；`go vet ./internal/config/`；`go test -count=1 ./internal/config/`（四数分开报、⛔ 相减）；`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh`。
+红名册**逐名**，新增红必须 **0**。提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界（正控＝同尺打一笔**含 `.go`** 的真提交）。
+
+■ 未定义即停 ⇒ **停手上报**，⛔ 自行假设。★特别是：①若**非动产码不可** ⇒ 停手上报（那说明〔甲〕做不到）；②若 `360-a1` 的复现读数**今天复现不出来** ⇒ 停手上报并给读数。
