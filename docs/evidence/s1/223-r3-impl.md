@@ -1,6 +1,6 @@
 # 223-r3 实施腿（写腿）：票 223 剩的两格 `AC#2`／`AC#7` 的逐档读数
 
-- 起手锚 `e94a5b17`（`git status --porcelain -- internal/config cmd/wisp docs/evidence/s1` 起手＝**空**）；本腿三枚提交：①`394cc212`（新用例）②`d989a217`（本件）③末笔补号提交（只把本件占位符换成②的 hash，不回改任何读数，见 §9）。
+- 起手锚 `e94a5b17`（`git status --porcelain -- internal/config cmd/wisp docs/evidence/s1` 起手＝**空**）；本腿四枚提交：①`394cc212`（新用例）②`d989a217`（本件）③`4824c267`（补号，只换本件两处占位符）④末笔更正提交（§4 一处行号 `:287`→`:285`＋本行计数；提交号见腿终报，⛔ 自引用）。
 - 身份＝写腿：⛔ 翻框、⛔ 改 `Status:`／票名／`-done`、⛔ 台账、⛔ push；写面只碰 `internal/config/**` 与本件。
 - **一句话结论**：`AC#7` 的出口**今天在生产里已经存在**（本腿交读数、零产码改动）；`AC#2` 的 hot／restart 两档本腿在 config 层补齐**逐档用例＋逐键真值**；`AC#2` 的 **reload 档生产消费者仍＝0**（唯一非测试赋值在 `cmd/balldebug`），是**票 233** 的格，本腿具名交回、⛔ 冒充已闭合。
 
@@ -44,7 +44,7 @@
 | `TestTicket223R3RestartTierTellsTheHostWhyAndKeepsTheOldValue` | 旧值不动＋恰好一次通知＋why 两行 | `manager.go:202` `m.OnRestartPending(rep.Restart)`；`tiers.go:48` `app.language:"restart"` | `:151 OnRestartPending = [], want exactly one [app] notice`／`:156 TierOf(app.language)="hot"/true, want restart` |
 | `TestTicket223R3ReloadTierAppliesAndSignalsTheOwningSubsystem` | 值应用＋事件恰好一次 | `manager.go:199` `m.OnReload(rep.Reload)` | `:185 OnReload = [], want exactly one [voice] event` |
 | `TestTicket223R3OneEditGivesTwoDifferentObservables` | 同一发里 A／B 两个可观察物 | 上述两跳（A←`manager.go:358`，B←`:202`） | M5 ⇒ `:218 app.theme = "dark", want light`；M3 ⇒ `:225 OnRestartPending = [], want one [app] notice` |
-| `TestTicket223R3EveryAppKeyLandsInTheBucketItsTierNames`（子测试：`app.theme`／`app.language`／`app.autostart`／`app.single_instance`） | 逐键落桶＝`TierRegistry`（why 的真值） | `manager.go:354-356` 的三键比较 ＋ `:358` 的 theme | 键若从 `planApp` 删掉⇒落 0 桶红 `:287`；M4 ⇒ `:262 want "restart"` |
+| `TestTicket223R3EveryAppKeyLandsInTheBucketItsTierNames`（子测试：`app.theme`／`app.language`／`app.autostart`／`app.single_instance`） | 逐键落桶＝`TierRegistry`（why 的真值） | `manager.go:354-356` 的三键比较 ＋ `:358` 的 theme | 键若从 `planApp` 删掉⇒落 0 桶红 `:285`；M4 ⇒ `:262 want "restart"` |
 
 - 今天五枚**全绿**（`…/app.*` 四子测试也逐名 PASS）；它们只在被护的那一跳被摘掉时转红——§5 是实测，不是声明。
 
@@ -93,7 +93,8 @@
 |---|---|---|---|
 | `394cc212` | `internal/config/tiers_223r3_test.go`（+298，新件按名字面点名入 pathspec） | **1** | **0** |
 | `d989a217` | `docs/evidence/s1/223-r3-impl.md` | **0** | **0** |
-| ③ 末笔补号提交 | 只把本件两处 `‹本件提交›` 占位符换成上一行 hash；不回改任何读数 | **0** | **0** |
+| `4824c267` | 补号：只把本件两处占位符换成 `d989a217`；不回改任何读数 | **0** | **0** |
+| ④ 末笔更正提交 | 只改 §4 一处行号（`:287`→`:285`）＋本表与 §0 的提交计数 | **0** | **0** |
 - 尺＝`git show --name-only --format= <c> | grep -c '\.go$'`＋逐名对写面。
 - **正控（同一把尺打一笔含 `.go` 的真提交）**：`17cfe8cf` ⇒ `.go`＝**2**（`internal/memory/dao_session.go`／`internal/session/ticket166r1_ac2_gaps_test.go`）⇒ 这把尺**能看见 `.go`**，本表两行 0／1 不是恒 0 的装饰。**负控**：`b4102f1e`（docs-only）⇒ `.go`＝**0**。
 
