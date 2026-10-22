@@ -59,7 +59,7 @@
 - `go vet ./internal/config/` ⇒ **rc=0**
 - `go test -count=1 -v ./internal/config/` ⇒ **rc=0**，四数**分开报**：`RUN=196`／`PASS=115`（顶层）／`FAIL=0`／`SKIP=0`，另 `^panic:` **0**（⛔ 相减）
 - `sh scripts/d22scan.sh` ⇒ **rc=0**，末行逐字 `d22scan: clean - no D22 ban violations`（分母 `ban #8 internal/ 617 Go files` 是**文件数**、⛔ 违规数）
-- `sh scripts/check-path-length-budget.sh` ⇒ **rc=0**，`VERDICT GREEN`、`tracked paths=17571  over-budget=61  covered by roster=61  not in roster=0`
+- `sh scripts/check-path-length-budget.sh` ⇒ **rc=0**，`VERDICT GREEN`、`tracked paths=17571  over-budget=61  covered by roster=61  not in roster=0`（读数取自本件入库**前**那棵树；本件自身入库后分母变 **17572**，同一把尺在最终 HEAD 上复跑仍 `rc=0`／`VERDICT GREEN`／`not in roster=0`，见 §6 末行）
 - **格式门禁两把尺（裁定件 `pipe-format-gate-reads-tracked-blob-not-worktree.md`）**：
   - **甲＝入库 blob 尺（判据）**：`git archive HEAD` 到仓外 `tree-final`，对 1156 枚 `.go` 跑 `/d/work/base/gopath/bin/gofumpt.exe -l`（`v0.12.0 (go1.27.1)`）⇒ **列 20 枚**，**全部在 `.scratch/wisp/probes/**`**（本仓既有的故意做坏样本，属别的票的台件、**不在本票写面**）；**本腿新增件 0 命中**（`grep -c writeguard_adopt_360_test.go` ⇒ `0`）。★**对照读数**：同一把尺打父提交 `HEAD~1` 的导出树 ⇒ **同样 20 枚、`diff` 逐字相同** ⇒ **本腿新增 0 枚**。
   - **乙＝工作树尺（只作诊断）**：整树 ⇒ **列 55 枚**、rc=123（`xargs` 因列表过长分批后最后一批 rc，⛔ 当判据）；**本腿新增件 0 命中**；单文件直跑 `gofumpt -l internal/config/writeguard_adopt_360_test.go` ⇒ **空、rc=0**。⇒ 甲绿乙红的差＝本机检出副本（`core.autocrlf` 假红），按裁定件 §4.2 **登记一句、⛔ 判该票失败**。
@@ -86,3 +86,4 @@
 - **M3 单独恒真仍绿**已照实登记（§3），判据的"摘臂"那一半由 **M1** 承担，⛔ 声称三发全红。
 - **`cmd/wisp` 整包未跑**（派单口径 `A1126`／`A1127`：整包读数⛔ 当判据；本腿未需要）。
 - 格式门禁**第三把仪器**（`attrib.sh --tracked-only`）的既有 35 枚红已登记，**归属与是否该修由编排者裁**（在写面外）。
+- **最终 HEAD 复跑（本件入库后）**：`go build ./...` rc=0／`go vet ./internal/config/` rc=0／`go test -count=1 ./internal/config/` rc=0（`RUN=196 PASS=115 FAIL=0 SKIP=0`）／`d22scan` rc=0／`pathlen` rc=0（`tracked paths=17572  over-budget=61  covered by roster=61  not in roster=0`、`VERDICT GREEN`）／甲尺 `git archive HEAD` ⇒ **仍 20 枚、与父提交 `diff` 逐字相同、本腿新增件 0 命中**。⇒ **§5 的每个 rc 在最终 HEAD 上原样成立**。
