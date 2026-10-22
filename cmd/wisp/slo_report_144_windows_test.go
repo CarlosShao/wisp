@@ -750,6 +750,43 @@ func TestSLO149CorruptLegsWithoutADecoderErrorKeepTheirOwnEnd(t *testing.T) {
 // reading: it is this selector's UNMUTATED baseline, 21/14/0, pasted into the
 // sentence that promises the mutation's numbers (probes/152/mut-post/asis.log, and
 // 21/14/0 again at this anchor: probes/156/mut-156-r2/r2-asis-152-surface.log).
+//
+// Ticket 159 AC#2 (C2), appended by the record-level cleanup leg: all three of the
+// sentences above went stale the moment 1d53526c put the re-measured numbers into
+// :739, and this block historicises each of them WITHOUT editing one of them. The
+// pill-quoted fragments below are byte-equal to the tail of the lines they name,
+// which is what makes "the original is still there" and "the correction quotes it
+// rather than paraphrases it" two assertions a test can hold at once.
+//
+// 159 (1) :742 - |Correction of that triple, measured at this anchor instead of copied|
+// "This anchor" was the head at the moment of writing, 0f18652 - the parent of
+// 2ce77e18, the commit that introduced this block - and it still means 0f18652. It
+// never meant "the bytes as you find them now": on 2026-10-22 the head stood 4076
+// commits past that one and this file had been rewritten in between, so a reader
+// who takes the deictic at face value measures a tree this sentence was never
+// measured on.
+//
+// 159 (2) :749 - |block names says 20/13/0 as well. So "=== RUN=21, PASS=14, FAIL=0" is neither|
+// 159 (2) :750 - |reading: it is this selector's UNMUTATED baseline, 21/14/0, pasted into the|
+// Those two lines were true when written and are false now: the sentence that
+// promises the mutation's numbers is :739, and 1d53526c put 20/13/0 in it. The stale
+// triple survives in this file only as this block's own quotation of it.
+//
+// 159 (3) :752 - |21/14/0 again at this anchor|
+// The same deictic as (1), the same referent (0f18652), the same expiry.
+//
+// The numbers did not expire, and that is the half of the paragraph above still
+// worth keeping: all six claims re-count off the tracked logs on 2026-10-22 as
+// case-off 20/13/0, case-live 21/13/1, and the unmutated baseline 21/14/0 twice. The
+// case that re-counts them ships with this package, and it is also what re-counts
+// these fragments: TestSLO159Case14CommentKeepsItsTenseAndItsNumbers.
+//
+// The price of inserting a block here is paid where it lands, not hidden: the self
+// line-pointers further down in the Case 13 block kept the numbers they were
+// written with, and this insertion moved every one of their targets by its own
+// height. The note appended at the end of that block states the current numbers,
+// and the same case asserts that the note still designates its lines.
+//
 // Who was misled, and by which sentence, until this commit: a reader re-running
 // case 14's claim read 21/14/0 at slo_report_144_windows_test.go:739, measured
 // 20/13, and - a short === RUN count being exactly how a swallowed or renamed
@@ -877,6 +914,25 @@ func TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne(t *testing.T) {
 // AC#3 - which asked for a case that rings, and drew no letter at all - had a
 // ruling attached to it here. Lines 849-857 already say whose letter it is; this
 // block only says where to look when the first line is all the grep returned.
+//
+// Ticket 159 AC#2 follow-up: the line numbers this Case 13 block quotes were
+// written when this file was shorter, and the correction block appended above the
+// case 14 "who is misled" paragraph made every one of them short by its own height.
+// None of the sentences below is edited - a reading keeps the number it was taken
+// at - so where each pointer lands now is stated here as CONTENT, not as a number:
+// a number written down here would expire the next time this file grows, which is
+// exactly the defect this ticket is closing. TestSLO159Case14CommentKeepsItsTense-
+// AndItsNumbers resolves each "what was said at N" pointer to the current line and
+// asserts that the content named below is on it.
+//
+// 159 ptr said |Case 13 header|835|872|Case 13 - AC#3's ruling is
+// 159 ptr said |the Case 13 header's md5 target|835|872|a756e044366a5c957bef470027a86bc0
+// 159 ptr said |the elided evidence path|851|888|docs/evidence/s1/152-...-accept-r1.md
+// 159 ptr said |the "which letter" block|849|886|Which
+// 159 ptr said |the same block's last line|857|894|Neither ruling moved one assertion
+//
+// The case 14 block's own :739 pointer is NOT in this table: the correction block
+// was appended BELOW line 739, so 739 still designates line 739.
 func TestSLO149ExitedGiveUpSentenceCarriesTheLastReading(t *testing.T) {
 	dead := exec.Command("cmd.exe", "/c", "exit", "7")
 	_ = dead.Run() // a non-zero exit is the fixture, not a failure of this test
