@@ -8,8 +8,8 @@
 ## §1 `AC#1`——只登记事实：修前那一发的逐字拒绝行＋尾态
 
 **台件替换（必须先说清）**：`probes/176/r1/zz176r1_e2e_test.go` **今天编不过**，两条独立原因：
-① 它调 `rt.execute("…")`，现签名是 `func (rt *agentRuntime) execute(parent context.Context, task string) int`（`cmd/wisp/run.go:1067`）⇒ `go test -overlay=probes/179/r2/overlay-e2e.json … -run TestReread…` 逐字 `zz179r2_e2e_test.go:349:22: not enough arguments in call to rt.execute / have (string) / want (context.Context, string)`（`logs/01-head-as-is.txt`）；
-② 它用 `contentText`，`cmd/wisp` 今天**没有**这个符号（尺：`git grep -n "func contentText" -- cmd/wisp` ⇒ rc=1、0 命中）。
+① 它 `:320` 调 `rt.execute("…")`，现签名是 `func (rt *agentRuntime) execute(parent context.Context, task string) int`（`cmd/wisp/run.go:1067`）⇒ 台件原样 overlay 进 `cmd/wisp`，逐字 `zz176r1_e2e_test.go:320:22: not enough arguments in call to rt.execute / have (string) / want (context.Context, string)`（`logs/05-176-probe-as-is.txt`；`179/r2` 的台件同一处 `:349:22` 同形，`logs/01-head-as-is.txt`）；
+② 它用 `contentText`（`:81`/`:99`/`:160`），而 `cmd/wisp` 的 tracked 源码里**没有**这个符号（尺：`git grep -n "func contentText" -- cmd/wisp` ⇒ rc=1、0 命中）——`179/r2` 的台件正是为此刻意自建了 `contentText179r2`（它自己的注释逐字说明了这一条）。
 ⇒ 按票面 `AC#1` 的补法所指，改用**同一发端到端的后继台件** `probes/179/r2/zz179r2_e2e_test.go`（同一 payload 20000 字节、同一条 `task.output → 指针 → fs.read` 路径），**复制到 `D:\tmp\…\zz179r1_e2e_test.go` 后只做 4 处 rig 改动**：`execute(ctx,…)` 签名、`"context"` 导入、删掉用不上的 `"runtime"` 导入、读数落点改 `WISP179R1_LOGDIR`；外加今天配置模式要求的 `enabled = true`（否则 `wisp run` 退 2 并在 `stderr` 说 `model "m1" … is disabled (enabled=false)`，`logs/02-head-probe.txt`）。★**这 4＋1 处都不碰门**（仓里 `probes/**` 一字节未改：尺 `git status --porcelain -- .scratch/wisp/probes/179` 只列出 `179-r3` 那批**未跟踪**日志，`LastWriteTime` 全是 **2026-10-14**，早于本程；`176/r1` 同理）。
 
 **发**（`logs/20-e2e-prefix-historical.*`，HEAD **`b4102f1e`**）：`-overlay` 只把 `internal/agent/loop.go` 换成**修法之前**那一版（`git cat-file blob 039efb47:internal/agent/loop.go`，尺：`git rev-parse --short ec520750^` ⇒ **`039efb47`**；该 blob 里 `grep -n "case RiskL0"` ⇒ **0 命中**、`风险未分级` 在 `:785`），`go build ./internal/agent/` 在该 overlay 下 **rc=0**（历史文件与今天的树兼容，票面补法可用）。
@@ -103,7 +103,7 @@ call kind=success tool=fs.read    risk=L0 decision=allow outcome=success rules_h
 1. ★**`MODE-REDLINE … still asks` 是一句假话，每发 e2e 出现 3 次**（`logs/50-final-green-readings/e2e-readings.txt`，逐字 `MODE-REDLINE mode=ask_every_step still asks tool=fs.read rules=[] because=无法识别的风险级，fail-closed 保留询问`；3 枚属于 `task.output`×1＋`fs.read`×2）。机制：`internal/tools/bridge.go:311` 把 **L0 判定**交给 `mode.Screen`，而 `internal/risk/mode.go:163-165` 只认 `L1/L2/Deny`，其余一律回 `Kept="无法识别的风险级，fail-closed 保留询问"`；`bridge.go:324` 据此打印 "still asks"，但 `bridge.go:352` 的 `route` 对 L0 直接放行 ⇒ **一行说"还要问"，一行没人问、卡 0 枚**。⇒ 这是"日志里编造出一个不存在的动作"那一族（票 97 已定过案）。**两处都在我的写面之外**（`internal/risk/**`、`internal/tools/**`），⇒ 只登记，请编排者裁是否开票。
 2. ★**`AC#1` 的台件今天编不过**（§1 两条独立原因）⇒ 票面 `AC#1` 留给下一程的"补法"应当改写成"用 `probes/179/r2` 的台件＋`D:\tmp` 适配副本"，⛔ 不要再照"复跑 176/r1 台件"字面执行。
 3. ★**`logs/20-*` 的尾态与 09-28 `176-r1` 的尾态不同**（★这一条我先按票面写过一次，现读旧件后**改正**，见 §10）：旧件 `probes/176/r1/logs/last-run.txt`（27580 字节）里 `run B: tool call task.output` 逐字 **8 枚**、`风险未分级` 逐字 **7 枚**、任务尾态 `结束（stuck` **1 枚**（另一枚 `completed`）⇒ 旧尾态＝**重试到 `stuck`**；我这一发＝**1 枚** `task.output`、1 枚拒绝、两枚任务都 `completed`、探针 FAIL。⇒ **拒绝行同形，尾态不同**，⛔ 不要拿我这一发的尾态去替换旧读数。★另记一条尺的射程：`grep -c "卡住"` 对这枚旧件 ⇒ **0**，因为状态值是英文 `stuck`——**关键词≠语境**（检查表第 6 例同族）。
-4. ★**HEAD 漂移**：本程 6 次（`163ae626`→`b4dfe165`→`d0194273`→`b4102f1e`→`e94a5b17`→`4c771f48`→`811054e1`），全部是**别的腿**的提交；`git status --porcelain -- internal/agent` 在本程首、中、尾三次均为**空**。
+4. ★**HEAD 漂移**：我这一程的**读数窗口内**漂了 6 次（`163ae626`→`b4dfe165`→`d0194273`→`b4102f1e`→`e94a5b17`→`4c771f48`→`811054e1`），此后继续漂（`32c8eeac`＝本件第一笔、`394cc212`、`0aa30ede`＝本件第三笔）；全部是**别的腿**的提交。⇒ ★**引用本件任何读数都要连它那一行的 HEAD 一起引**；`git status --porcelain -- internal/agent` 在本程首、中、尾三次均为**空**。
 
 ## §8 本程**没有**做的事
 
