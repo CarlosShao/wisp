@@ -81,6 +81,7 @@
 - `internal/config` 整包 **FAIL=0** ⇒ 红名册空、**新增红 0**。
 - `cmd/wisp` 我**只按名单跑两枚**：`TestTicket223RestartTierSaysItWillNotApply` **PASS 2.72s**、`TestTicket255RestartTierKeysAreBackedByATest` **PASS 0.11s（3 子测试）**；⛔ **不跑、不报整包四数**（`A1126`）。★我核了腿件：§8 明写"不跑、也不报"整包，全文没有 `cmd/wisp` 整包四数 ⇒ **它没偷偷用整包数**。
 - 归因注：我跑门时工作树有**别的腿**一枚未提交 `.go`＝`internal/tools/task.go`（diff 逐字 `_ = cancel // MUT164v1b-V1`），在 `internal/config` 之外；我的 `internal/config` 读数在该子树干净的前提下取得。
+- ⚠ **收工后并发（不是本腿）**：23:53:49 另一腿在 `cmd/wisp/run.go` 留了未提交突变 `MUT164v1b-V3`（`context.Background()` 替换 `bg.Root().Ctx`），它出现在我五道门之后。我的 `cmd/wisp` 两枚读数取自仓外 `exp/` 导出树（`git archive` 的干净 HEAD），**不受工作树突变影响**；`internal/config` 子树仍干净。
 
 ## §8 写面纪律（四笔逐笔＋正控）
 
