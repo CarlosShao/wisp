@@ -121,8 +121,8 @@ rc=1
 写后**只剩后者**；前者这一跑是绿的 ＝ 计时噪声，★**⛔ 当成"改好了"**。**新增红 = 0**。
 ★**对账**（自洽不等于正确，必须和总数对上）：`RUN 247→251` ＝ **+4，恰是本笔四枚**；`PASS 139→144` ＝ +4（本笔）**＋1**（写前那枚计时红这一跑转绿）；`FAIL 2→1`／`SKIP 1→1` 是同一件事的另一面。四笔能互相解释，⛔ 有一笔悬空。
 
-**格式门禁（甲乙两尺都报）**：甲（判据）＝`git archive c4d65e4e` 到仓外跑
-`/d/work/base/gopath/bin/gofumpt.exe -l` ⇒ **20 行红，`internal/`+`cmd/`+`tools/` 下 0 行**，与写前基线**逐行相同**（`comm` 双向零新增、零消失），20 行**全在 `.scratch/`**（那些是探针变异件）。
+**格式门禁（甲乙两尺都报）**：甲（判据）＝`git archive` 到仓外跑
+`/d/work/base/gopath/bin/gofumpt.exe -l`（`c4d65e4e` 与 `f895fe5c` **各跑一遍，逐行相同**）⇒ **20 行红，`internal/`+`cmd/`+`tools/` 下 0 行**，与写前基线**逐行相同**（`comm` 双向零新增、零消失），20 行**全在 `.scratch/`**（那些是探针变异件），本笔两枚 `.go` **一枚都不在红行里**。
 乙（只作诊断）＝工作树同尺 ⇒ 54 行，其中 `.scratch` 51 行、**非 `.scratch` 3 行**（`cmd\wisp\models.go`／`internal\agent\approval\pending_read.go`／`internal\agent\tools.go`，现读全为 `i/lf w/crlf`）⇒
 这三行是**工作树 CRLF 假红**、甲尺里不存在、也⛔ 是本笔碰的（本笔的两枚文件在乙尺里都不出现）。★归判一律用 `[\\/]`。
 
@@ -142,4 +142,6 @@ rc=1
 | 本件 | `docs/evidence/s1/160-r1-impl.md` | 1 枚，越界 = 0 |
 
 **正控**（同尺打一笔含 `.go` 的真提交）：`027ff82e` ⇒ 21 枚、`.go` = 1（`provenance.no-identity.go`）⇒ 这把尺**看得见 `.go`**。
+★**本件自身的提交号不写在本件里**（写进去就会被下一次改本件推翻）：它的尺是 `git log --oneline -- docs/evidence/s1/160-r1-impl.md`。
+★**并发留痕**：我两枚提交之间插进了别的腿一枚 `0786b5c6`（票 164，docs-only）。上表三处 `sha256` 在它之后复量**逐字不变**，且 `git log c4d65e4e..HEAD -- internal/risk/provenance.go` **零命中** ⇒ 我的两枚文件没被别人动过。
 ★**另记一笔**：`provenance.go` 的工作树原本是 **CRLF**（`i/lf w/crlf`、`git diff` 为空），随手落笔会混出两种行尾 ⇒ 先按 `.gitattributes` 的 `*.go text eol=lf` 归一成 LF；**对 git 零差异**（提交 diff 仍是 25 增 1 删，⛔ 1115 行重写），甲尺本来也看不到它，乙尺那枚假红顺手消失。
