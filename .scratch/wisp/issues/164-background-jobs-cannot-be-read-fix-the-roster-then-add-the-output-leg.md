@@ -56,7 +56,15 @@
 - [x] **AC#3 输出太长那一格**：截断策略必须**带可找回的指针**（"全文在哪、怎么续读"），不许只截不指（dsh 那形：内联上限＋落盘＋告诉模型怎么再读；我们 `PLAN.md:431` 本来就有"超 4000 token 落 artifacts、上下文留头尾＋路径"的既有规矩 ⇒ **按那条做，不新造**）。
   > **09-27 20:1x 编排者翻勾（判语＝〔成立·带条件〕，条件三条一条不减，出处同上表 §4／§5／§6）**：**正向〔成立〕**——四段断言都是真的（指针是从桩文本里**解析出来**的，再分别用 `os.ReadFile` 和**同一座真桥**上的真 `fs.read` 读回来，逐字节对得上全文，且反向断言"宣布的总长不是桩自己的长度"）；**反向〔成立〕**——两枚变异验收程**自己全部重跑**且各自先证落地（摘掉 `，全文见 %s` ⇒ 那枚读回用例红；`refTaskSpillHeadTokens` 500→400 ⇒ 全库只 `TestTruncationShapeIsTheD15Triple` 红），还原后 `git status --porcelain -- internal/tools/` 为空。**为什么不是裸〔成立〕（三条条件，验收程原样给的）**：① 本格的〔成立〕**只覆盖"截断与指针形状"，不覆盖"真机能读到"**；② `task.output` 对真模型目前**不可达**（名册零写者、`RunAsync` 零调用点，两枚都由验收程现量），**下一格（后台起跑口）没做之前不许把它算进产品能力**——这一条是本票 AC#1 那笔硬账的**新形状**（从"零实现"前进到"零写者"）；③ 指针能不能被模型**自己**走通，取决于**票 174**（artifacts 目录默认不在 `[fs] allowed_dirs`）——**不归本票、本程没测**。**另登记一条本表补出的形状缺口（不构成本格退回，已归口票 174）**：`task.go:227` 只判 `rec.ArtifactPath != ""`、**没有任何 stat** ⇒ "路径是假的／是枚目录"那一形走的是**有指针那一支**，"后半段不可找回"那一记响**不会响**；⚠ **"响"今天只覆盖 `ArtifactPath==""` 一种**。⇒ **"响亮地做不到，仍然是做不到"**（验收程语）这句连同三条条件一起留在票面，**不许**被"AC#3 已勾"这五个字压缩掉。
 - [ ] **AC#4 取消要真取消**：取消之后不许有"还在写"的尾巴（拿一发变异证：取消后仍写输出 ⇒ 必须红）。
-- [ ] **AC#5 契约轴**：`docs/specs/**`、`internal/risk/**`、`internal/panel/**`、`thresholds.go`、golden、`allowlist.txt`、`frontend/**`、`design/**` 零字节；`D34` 那一行若要动＝owner 单独批准、原文落台账。
+- [x] **AC#5 契约轴**：`docs/specs/**`、`internal/risk/**`、`internal/panel/**`、`thresholds.go`、golden、`allowlist.txt`、`frontend/**`、`design/**` 零字节；`D34` 那一行若要动＝owner 单独批准、原文落台账。
+> **2026-10-22 23:5x 编排者翻框（纪律格，我自己跑尺）＝成立**
+> ★**本格是契约轴（纪律格）⇒ 编排者可自己跑尺后翻**（`AGENTS.md` ⓘⓘⓘ 那条：门禁/纪律两格可由编排者自己跑尺后翻）。
+> **① 名册现量（票 164 全部 6 笔提交的并集）**——★**只 5 枚文件**：
+> `.scratch/wisp/probes/164/v1/ac2-anchor-reading.sh`／`docs/evidence/s1/164-r1-impl.md`／`docs/evidence/s1/164-r2-impl.md`／
+> `internal/tools/task_164_ac4_cancel_tail_test.go`／`internal/tools/task_output_ac2_before_test.go`
+> **② ★禁区命中逐条现跑（全 0）**：`docs/specs/` **0**／`internal/risk/` **0**／`internal/panel/` **0**／`thresholds.go` **0**／`allowlist.txt` **0**。
+> **③ ★零产码**：两枚 `.go` **都是测试件**（`*_test.go`）⇒ `internal/tools` 的**产码零字节**。
+> **④ ★一处要说明的**：本票**动过 `.scratch/wisp/probes/164/v1/ac2-anchor-reading.sh`**——那是**本票自己的归档仪器**（★**修的是它 grep 的标签射程**、见 `AC#2b` 那节的 `164-v1` 第⑨项：**假绿形状已落地**）⇒ **⛔ 越界**、且**在票面授权内**（票面 `AC#2b` 要求"钉住这一跳"、仪器是它的钉法）。
 
 
 > **09-27 18:5x 编排者定案（来路＝只读设计核 `164-c1`，表 `docs/evidence/s1/164-task-output-design-core-c1.md`，提交 `a0ab9b1f`，228 行／删除列 0）**。它带回三问要我拍，我按 owner `A322` 那句"全做、照你的推荐"裁如下（**每条都给人话后果＋反悔口令**）：

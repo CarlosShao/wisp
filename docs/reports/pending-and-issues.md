@@ -22366,3 +22366,47 @@ M1 删引文／M2 改原文用词／**M3 只改一个数字**／M4 下移 Case 1
   ★**硬提醒第 1 条＝⛔ 拿"用例绿"冒充接线**。
 
 **⑨ 状态**＝结案 **29 票**（`-done` 文件 **172** 枚）、**完成度 172/350 ＝ 49.1%**、在飞 **5**（`348-r1`／`164-r2`／`223-v1`／`363-a1`／★`166-v1` 已收）、未推 **438**、⛔ 推、⛔ 清理、⛔ 改契约、★**真待推进 181**（票 363／364 新增）。
+
+## A1157（2026-10-22 23:5x +08，编排者）★收 `164-r2`：**假绿仪器已修好且守卫有牙**｜★`AC#4` 今天**读数＝绿**（守卫已在盘）｜★翻 `AC#5`（纪律格、我跑尺）｜★它报**三处票面腐坏**
+
+**① 收 `164-r2`（2 笔 `821302c9`／`efa950a3`；件 **134 行**）**
+- `821302c9`＝仪器（M **58 行**）＋新测试件 **139 行**；`efa950a3`＝件；★**产码零改动**；逐文件名 pathspec。
+- ★**AC 框它一枚没翻**（现量它交回时 `checked=4／unchecked=2`）⇒ **纪律守住**。
+
+**② ★件一：假绿仪器已修好、且守卫有牙（我采信它的三读数）**
+- **改前逐字**：`-- 改前树（f206e9f）--` 后只有 `--- PASS: TestTaskOutputAC2BeforeLegIsUnreachable (0.04s)`、`-- 改后树（HEAD）--` 后同样只有 PASS、**Text 读数 0 行**，★**紧接着仍打印「两行 Text 逐字相同 ⇒ …」**、`rc=0` ⇒ ★**假绿坐实**。
+- **改法**：`:32 LABEL='unknown-tool refusal:'`（grep 与 sed 同一条）＋两发 `go test` 先落文件并各记 `rc` ＋**结论改由两行 `Text=` 实测比较得出**（并把实测值印出来）＋**读数缺失／不同／`go test` 没跑成 ⇒ 打「读数缺失、结论不成立」并 `MISSING=1`、结尾 `rc=1`**。
+- ★**改后逐字**：两行 `task_output_ac2_before_test.go:66: unknown-tool refusal: … Text="未知工具 task.output，可用工具见 list_tools"` **真印出来**、结论后附 `Text 实测＝"…"`、`rc=0`。
+- ★★**反向判据**：`LABEL` 改回 `BEFORE verbatim`（先 `grep -n "^LABEL="` 证落地）⇒ ★**只印两行 PASS、结论那句**不出现****、打「读数缺失、结论不成立…（grep 标签＝BEFORE verbatim）」、★**`rc=1`** ⇒ **守卫有牙**。
+- ★**还原核**：**`sha256sum`（SHA-256/64 位，⛔ 混 `git hash-object`）** 改后件 `ec02dade…b43de6`、反向跑完按跑前副本**还原回同值**；`CR=0`；`sh -n` OK。
+
+**③ ★★件二 `AC#4`：今天读数＝**绿、⛔ 红**（它"先量后写"如实报）**
+- ★**对象与守卫都已在盘**：`cmd/wisp/run.go:1176` `RunAsync`、`:1187` `Backfill(bg.Root().Ctx,…)`，写入口 `task_backfill.go:123` 的 `Stopped(ctx)` 判据（**票 176 `AC#3`**）⇒ **新用例 `Test164AC4CancelLeavesNoWritingTail` 原样 PASS**。
+- ★**判据拼两条真缝**：`TaskRoster.Cancel`（唯一停法）＋`TaskBackfill.Backfill`（输出写入口）；顺序＝取消 → 经真 `finalize` 落终态 → 再拿子任务自己的 ctx 写尾巴 ⇒ **必须被拒**、那一行 Text/State **不许动**；**对照组（没取消）必须写得进去**。
+- ★**两发变异可区分**：`M1`（`task.go:462` `cancel()`→`_ = cancel`，**取消只说不做**）⇒ `rc=1`、**红三行**（`:107` 尾巴进门／`:114` Text State 被改／`:125` ctx 没死）；
+  `M2`（`task_backfill.go:123` `stopped`→`stopped && false`，**摘掉写入口判据**）⇒ `rc=1`、红 `:107`／`:114`、★**`:125` 仍绿** ⇒ **两发可区分**。
+- ★**还原核**：`sha256sum` 两文件回 `055fad4b…356fbc0`／`b0b5a3ab…dd41bec`（**变异前＝还原后**、`diff` IDENTICAL）、`git status` 空、`grep -c MUTATION`＝**0**、原样绿。
+- ★★**它明确说**：按我的裁决**本腿没有改产码**，也**没有把"今天"写成红** ⇒ **`AC#4` 今天是"守卫已在、判据新立且有牙"** ⇒ **是否翻框归我**。
+
+**④ ★门禁**：`baseline go test ./internal/tools/ rc=0`（42.007s）；★**`-v -skip '^Test164AC4'` ⇒ `RUN=329/PASS=246/FAIL=0/SKIP=0`**（**与票面 329/246 独立吻合**）；
+**改后 `RUN=330/PASS=247/FAIL=0/SKIP=0` `rc=0`**；`build 0`／`vet 0`／`d22scan 0`（clean）／`path-length 0`（GREEN、over=61）。★**红名册（主检出）逐名（无）、新增红 0**。
+★**导出树那发 `FAIL=1 TestTicket252R1AlignmentAddsNoAuthorization` 它明确说是 8.3 短名前提、没算进名册** ⇒ ★**它用了 `A1152③` 那条更正**。
+
+**⑤ ★格式甲乙两尺都报**：**甲（`git archive` 仓外 ＋ 绝对路径 `gofumpt`）＝ raw 20 行全 `.scratch/`、非 `.scratch` 0**（`821302c9` 与含别人两笔的 `46e61076` **同值**）；
+乙（工作树，只诊断）**非 `.scratch` 3 行**＝`cmd/wisp/models.go`／`internal/agent/approval/pending_read.go`／`internal/agent/tools.go`，三者 **HEAD blob CR=0、工作树 CR=389/131/225** ⇒ **纯工作树 CRLF 假象、与本腿无关**（★**它自己那枚没被列、CR=0**）。
+
+**⑥ ★它报的三处票面腐坏（我核了①，成立）**
+- ★①票面 `:67` 定案⑤「`RunAsync` 生产零调用点 ⇒ 连被测对象都没有」**已不成立** ⇒ ★**我现跑核：`cmd/wisp/run.go:1176` ＋ `internal/tools/subagent_197.go:372` 两处真调用点**。
+- ②票面 `:84`「名册零写者」**已不成立**（非测试 `.Record(` **5 处**）。
+- ③票面 `:26`「生产注册表只有 `BuiltinFSEntries`」**只在锚点成立**（今天还注册 `BuiltinTaskEntries`）。
+- ⇒ ★**`AC#4` 的"可测时刻晚于前两格"这一条今天已经过期** ⇒ ★**这是"票面腐坏"第 12–14 处**（本会话累计）。
+- ★**它另报**：仪器 `[6]` 那枚标签**也错射程**（写「对 `TaskRoster.Record` 的调用」，实际 grep 是所有 `.Record(`、**把 approval grant 等算进来**）⇒ **本腿两件之外、它没动、登记给我**。
+- ★**写面观察**：它起手 scoped 空；期间别人的 `166-v1-verdict.md` 出现后由别人提交、**它未动**；`394cc212..HEAD` 里 `internal/winsec/*_test.go` 是别的腿（342/348）⇒ ★**它主动划清**。
+
+**⑦ ★我翻 `AC#5`（纪律格、我自己跑尺）＝成立**
+- ★**名册现量（票 164 全部 6 笔提交并集）＝ 只 5 枚文件**：仪器／两枚件／`task_164_ac4_cancel_tail_test.go`／`task_output_ac2_before_test.go`。
+- ★**禁区命中逐条现跑全 0**：`docs/specs/` **0**／`internal/risk/` **0**／`internal/panel/` **0**／`thresholds.go` **0**／`allowlist.txt` **0**。
+- ★**零产码**：两枚 `.go` **都是 `*_test.go`** ⇒ `internal/tools` 产码零字节。
+- ★**一处要说明**：本票**动过 `.scratch/wisp/probes/164/v1/ac2-anchor-reading.sh`**——★那是**本票自己的归档仪器**、修的是它 grep 的标签射程（`AC#2b` 那节 `164-v1` 第⑨项：假绿形状已落地）⇒ **⛔ 越界、且在票面授权内**。
+
+**⑧ 状态**＝结案 **29 票**、**完成度 172/351 ＝ 49.0%**、在飞 **4**（`348-r1`／`223-v1`／`363-a1`／★`164-r2` 已收）、未推 **441**、⛔ 推、⛔ 清理、⛔ 改契约、★**票 164 只剩 `AC#4` 一格**。
