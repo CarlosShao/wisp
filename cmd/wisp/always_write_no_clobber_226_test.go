@@ -42,6 +42,22 @@ func TestAC1AlwaysBranchDoesNotRevertAHandEditedKey(t *testing.T) {
 
 	// The edit lands after assembly, while the process is running and nothing
 	// polls: [app] theme, a key with nothing whatever to do with [fs].
+	//
+	// CORRECTION (ticket 227 AC#6): the "nothing polls" half of that sentence
+	// stopped being true at 248095d1, when ticket 223 wired a 1s tick that `wisp
+	// run` arms on every start (cmd/wisp/config_reload.go:123 -> configReloadTick
+	// -> reloadOnce -> Manager.CheckAndReload). The words are kept above rather
+	// than rewritten because they are the reason the last assertion below is
+	// shaped the way it is. What that means for this case, measured in
+	// docs/evidence/s1/227-r1-impl-part1.md sec 1: the edit DOES get read back, on the
+	// tick's clock, so the theme assertion at the end of this function is
+	// satisfied only while this case's own hand-edit-to-read window stays under
+	// one tick (measured 58ms unmodified here; held past 2.5s, the same case
+	// reddens there with got "light", want the dark this run loaded). The
+	// direction that is true under the production tick is pinned, on this same
+	// host and this same hand edit, by TestAC6AHandEditIsStillSeenUnderTheRealPoll
+	// in always_write_no_clobber_227_test.go - this case is not that ruler and
+	// its assertion was not written to be one.
 	inner := w.h.rtHook
 	w.h.rtHook = func(rt *agentRuntime) {
 		data, err := os.ReadFile(cfgPath)
