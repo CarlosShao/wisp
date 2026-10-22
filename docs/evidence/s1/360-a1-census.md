@@ -1,8 +1,8 @@
 # 票 360 普查腿 360-a1 交付件（只读，AC#0）
 
-- 时刻＝2026-10-22 17:1x +08｜起手锚＝本腿 `git rev-parse HEAD` 现认 `a9b4513d`（`a9b4513dd825adf151b7781b06d1072ce061d546`）；交件时 HEAD＝`40339d01`（腿间漂移，见 (8)）。
+- 时刻＝2026-10-22 17:2x +08｜起手锚＝本腿 `git rev-parse HEAD` 现认 `a9b4513d`（`a9b4513dd825adf151b7781b06d1072ce061d546`）；交件时父提交＝`40339d01`，本腿提交＝`48a37be7`。
 - 本腿零 `.go` 落仓、零产码字节、零票面/台账改动；临时件全在仓外 `D:\tmp\wisp\20261022\360a1\**`。
-- 承重文件在起手锚与交件时**同串**（`git hash-object` 工作树 vs `git rev-parse HEAD:path` 逐枚同；起手锚..交件 HEAD 之间 `git diff --name-only -- '*.go'` ＝ **0 枚**）：writeguard.go=`0ebc415b0565`／allowdirs.go=`ef54b37c094f`／manager.go=`f53d8a0749cd`／permmode.go=`6f385353ec36`／loader.go=`9100ba92e220`／settings.go=`c4e3b09b2131`／writeguard_226_test.go=`0e5895ccb2e0`／writeguard_handedit_227_test.go=`f60b308b6b2e`／always_write_no_clobber_226_test.go=`38b32a55750e`／always_write_no_clobber_227_test.go=`058328d6b21e`。
+- 承重文件在起手锚与交件时**同串**（`git hash-object` 工作树 vs `git rev-parse HEAD:path` 逐枚同；起手锚..交件父提交之间 `git diff --name-only -- '*.go'` ＝ **0 枚**，6 件漂移全在 `.scratch`/`docs`）：writeguard.go=`0ebc415b0565`／allowdirs.go=`ef54b37c094f`／manager.go=`f53d8a0749cd`／permmode.go=`6f385353ec36`／loader.go=`9100ba92e220`／settings.go=`c4e3b09b2131`／config_reload.go=`990d148b1138`／writeguard_226_test.go=`0e5895ccb2e0`／writeguard_handedit_227_test.go=`f60b308b6b2e`／always_write_no_clobber_226_test.go=`38b32a55750e`／always_write_no_clobber_227_test.go=`058328d6b21e`。
 
 ## (1) 票面前提新鲜度（逐条对 HEAD blob 现跑复认）
 
@@ -81,9 +81,9 @@ Adopt（把盘上字节读回**接管内存**），全仓只有一条：
 
 ## (8) 提交号 + 写面尺 + 正控尺
 
-- 本腿提交＝见交回正文的 hash；写面尺 `git show --name-only --format= <c>`：件数 1、`.go` **0**、越界 **0**（唯一路径 `docs/evidence/s1/360-a1-census.md`）。
+- 本腿提交＝`48a37be7`（父 `40339d01`）；写面尺 `git show --name-only --format= 48a37be7`：件数 1、`.go` **0**、越界 **0**（唯一路径 `docs/evidence/s1/360-a1-census.md`）。
 - 正控尺（同尺打含 `.go` 的真提交 `ecebc7a9`）＝文件 4、`.go` **2**（尺 NOT 空转）；负控（纯文档笔 `9fc2be02`）＝`.go` **0**。
-- 腿间漂移具名：起手 `a9b4513d` -> 交件 `40339d01`，中间 6 件全在 `.scratch`/`docs`（`*.go` **0** 枚），故 (1)-(6) 的读数对交件 HEAD 仍成立。
+- 腿间漂移具名：起手 `a9b4513d` -> 交件父提交 `40339d01`，中间 6 件全在 `.scratch`/`docs`（`*.go` **0** 枚），故 (1)-(6) 的读数对交件 HEAD 仍成立。
 - 只 commit、未 push；未翻任何框、未碰票 226/227/360 票面与台账一字。
 
 ## (9) 台面件清单（只建不删，全在仓外）
