@@ -1,0 +1,51 @@
+【派单·票 159 落地腿 `159-r1`】写腿·2026-10-22 11:5x +08 编排者
+
+■ 身份
+写腿（实现者）。⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ 改台账、⛔ push。
+票面＝`.scratch/wisp/issues/159-record-level-cleanup-c1-c5-left-by-ticket-156-acceptance.md`（先通读）。
+
+■ 一句话
+`AC#2`（C2）是本票唯一未勾格：`cmd/wisp/slo_report_144_windows_test.go` 里**三处时态已过期**——**就地追加更正**，并补一把"**防再漂**"的尺。
+
+■ ★开工前必读的三条（我现跑核过，⛔ 你重做）
+1. ★**票 158 已 `-done`**：票面 Status 写"排在票 156 结案之后、票 158 之前或之后由编排者定" ⇒ **我定：现在派**。
+2. ★**票 232 已 `-done`（第 23 票）** ⇒ `cmd/wisp` 昨天的在飞写腿已收线，**你现在独占这一面**（本波唯一碰 `cmd/wisp` 的写腿）。
+3. ★`cmd/wisp` 整包今天 `rc=1` 有**既有红 1 枚**（`TestAC14GoSideEvalPushReachesThePage`，台账 `:20471`）＋**每发恰 1 枚 RUN 无判决行、死点随会话漂** ⇒ ⛔ 当判据，只能**按名作差＋逐发登记死点**（`A1100`／`A1118`／`A1120`）。
+
+■ `AC#2` 的做法（硬）
+1. **先量**：逐处把那三句过期的时态**逐字抄进交付件**（原文），并给"它今天为什么过期"的**盘上依据**（改了哪笔、票号、`file:line`）。
+2. **就地追加更正**：⛔ 删原句（本仓 append-only 口径）；在过期句**紧后**追加更正，写清"原句是什么／现在是什么／依据哪笔"。
+3. ★**补一把"防再漂"的尺**：那是一枚**用例**，它必须能**在时态再漂时转红**。
+   ★**反向判据**＝把那句更正**改回原样**（或摘掉新加的断言）⇒ 用例必须**转红并逐名报红行**；先证落地（`grep -n` ＋ `go build` rc=0）再读数。
+4. ★**三读数**（变异红／还原绿／原样绿）逐字贴 ＋ **还原核 `sha256` 三处逐字相同**（提交版／还原台／`git show HEAD:` blob）。
+
+■ 写面（越界＝作废）
+- 允许：`cmd/wisp/slo_report_144_windows_test.go`（三处更正）＋`cmd/wisp/**` 的**测试件**（那枚"防再漂"的尺）；`docs/evidence/s1/159-r1-*.md`。
+- ⛔ 改 `cmd/wisp` 的**生产码**（要改 ⇒ **停手上报**）。
+- ⛔ `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件；⛔ `frontend/**`／`design/**`（**零读零写零转述**）；⛔ 新增导出名；
+  ⛔ `internal/**`、`tools/d22scan/**`、`go.mod`/`go.sum`、`.github/**`、`scripts/**`。
+- ★**本波唯一碰 `cmd/wisp` 的写腿**。
+
+■ 开工前（⛔ 跳步＝空跑作废）
+1) `git status --porcelain`：`cmd/wisp/**` 有**别人的**未提交改动 ⇒ 停手上报。
+2) ★**票面前提新鲜度**：票面每条可现跑断言**逐条现跑**（★本仓票面腐坏已 ≥8 次）。
+3) 复跑基线：`cmd/wisp` 既有红逐名（应为那 1 枚）。
+
+■ 环境
+`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`；⛔ `CGO_ENABLED=0`（本仓必然编不过、⛔ 当缺陷）；
+★`cmd/wisp` 整包**必抬 `-timeout 30m`**；★`gofumpt` 用**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（裸名 rc=127，⛔ 判"本机没有"）；
+★`.gitattributes` 要求 `*.go text eol=lf` ⇒ 脚本改文件⛔ 带 CRLF；★变异读数与整包门禁**串行**。
+
+■ Git
+只 commit **⛔ push**；`add`/`commit` 两处**显式 pathspec**；★**涉新文件的提交，pathspec 逐个文件名字面点名**（⛔ glob）；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+主题**逐字**以 `票 159 落地腿 159-r1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★提交正文与交付件 **⛔ 被禁码位**（`sec`/`✓`/`≤`/`≠`/`→`/`⇒`/`⛔`/`⚠`/emoji/带圈数字）⇒ 写 `sec N`／`=> `／`NOT`／`NOTE`／`(1)`；提交前自己扫一遍。
+★**改自己新增的文字时 ⛔ 用 `\n\n` 猜段落边界**，用**行号范围**（`sed -n 'A,Bp'`），改完必 `diff HEAD` 验。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261022\159r1\**`；⛔ `.out`。
+
+■ 交付件（缺一算未交）
+`docs/evidence/s1/159-r1-impl.md`（**≤160 行**，过帽拆 `-partN`）：三处过期句**原文逐字**／每处的盘上依据／更正后逐字／"防再漂"用例逐名＋为什么今天响／反向判据三读数逐字＋sha256／门禁 rc。
+门禁自己现跑：`go build ./...`；`go vet ./cmd/wisp/`；`go test -count=1 -timeout 30m ./cmd/wisp/`（★按名作差、逐发登记死点）；`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh`。
+红名册**逐名**，新增红必须 **0**。提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界（正控＝同尺打一笔**含 `.go`** 的真提交）。
+
+■ 未定义即停 ⇒ **停手上报**，⛔ 自行假设。★特别是：①若那三处"过期"其实**没过期**（我或票面判断错）⇒ **停手上报并给读数**；②若"防再漂"的尺必须动**生产码**才做得到 ⇒ **停手上报**。
