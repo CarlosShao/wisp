@@ -73,12 +73,41 @@
   > 3) ★**反向判据**：把"Adopt 路那一臂"摘掉（或把断言改成恒真）⇒ 用例必须**转红并逐名报红行**。
   > 4) ⛔ 动产码（`internal/config/**` 的**非测试**文件零字节）；★若你发现**非动不可** ⇒ **停手上报**（那说明〔甲〕做不到、要我先裁）。
       〔乙〕**产码侧**让写回路径显式 Adopt；〔丙〕两者都做。★**未裁形任何实现都⛔ 开工**。
-- [ ] **AC#2 落地＋牙（写腿）**：按裁定那一形做；每处改动配**一枚今天响、不修不响**的用例；
+- [x] **AC#2 落地＋牙（写腿）**：按裁定那一形做；每处改动配**一枚今天响、不修不响**的用例；
+  > **2026-10-22 18:1x 编排者翻框＝成立（〔甲〕形落地、零产码）**
+  > ★**本格是**实现格**——按规矩翻框须非实现者判语**。⇒ ★**我只做"三把尺"的机械核，⛔ 出终裁**；终裁腿 `360-v1` 另行派出。
+  > **① 三把尺我现跑**
+  > - **提交真在**：4 笔 `d68ddfae`（`.go` 1）／`fc7c85cc`（`.go` 1）／`0d907103`（`.go` 0）／`7c42145c`（`.go` 0）；★区间内我那笔 `1cfe94bb` 只动台账、`internal/config` 0 枚（⛔ 算它）。
+  > - **件真在**：`docs/evidence/s1/360-r1-impl.md` **89 行**、末字节 `0a`；新用例 `internal/config/writeguard_adopt_360_test.go` **93 行**。
+  > - ★**零产码（我独立核，逐枚 `rev-parse` 对 `hash-object`）**：`allowdirs.go ef54b37c`／`writeguard.go 0ebc415b`／`manager.go f53d8a07`／`settings.go c4e3b09b`／`permmode.go 6f385353` ⇒ **HEAD 与工作树全 SAME**。
+  > **② ★两态读数我独立复跑（决定性）**：`go test -run TestWritebackDoesNotAdoptMemoryTheFileKeepsTheHandEdit -v ./internal/config/` ⇒
+  >   `STATE 1 after writeback: file.ball.size=60 mem.ball.size=56`／`STATE 2 after one Adopt pass: mem.ball.size=60 file.ball.size=60 report.Hot=[ball]`／**PASS 0.08s** ⇒ ★**正是本票要的那一跳**。
+  > **③ 反向判据（它三发，★M3 照实记账是关键）**
+  > - **M1 摘掉 Adopt 臂** ⇒ 红在 `:76`（`the Adopt control did not produce the other state: mem.ball.size=-1 …`）`rc=1`。
+  > - **M2 产码侧显式 Adopt** ⇒ 红在 `:60`／`:65`／`:85` `rc=1`。
+  > - ★★**M3 单独恒真（`:55/:59/:64` 改 `if false`）⇒ 仍绿、`rc=0`** ⇒ ★**它照实记账了**（交付件 `§3`、`:86` 逐字"⛔ 声称三发全红"），并**用 M3＋M2 证明正控臂独立成牙**。
+  >   ⇒ ★**这是本次最值钱的一条**：判据原文是"摘掉 Adopt 臂**或**把断言改成恒真 ⇒ 必须转红"，**M1 已满足"摘臂"那一半**；它**没有**把 M3 的绿藏起来、也没有把它算成红。
+  > **④ 门禁**：`build 0`／`vet 0`／`go test -count=1 ./internal/config/` **rc=0**（`RUN=196／PASS=115／FAIL=0／SKIP=0`、`^panic:` **0**）／`d22scan 0 clean`／长度门 `0 GREEN`（`17572/61/61/0`）。
+  > **⑤ 格式甲乙两尺都报（按裁定件）**：**甲＝入库 blob 尺（判据）** 1156 枚 `.go` 跑 `gofumpt -l` ⇒ 列 **20 枚**、★**本腿新增件 0 命中、与父提交逐字相同**；**乙＝工作树尺（诊断）** 整树 **55 枚**＝本机 `autocrlf` 假红。
+  > **⑥ 它提请我裁的那件事（我裁）**：`attrib.sh --tracked-only` 报 `lines=35`；它**已查清 35 ＝ 20 枚真脏 blob ＋ 15 枚 CRLF 检出副本**（那 15 枚工作树 CR 185…1115、`HEAD:` blob CR **全 0**），**两把尺在"真脏"上完全一致**。
+  >   ⇒ ★**与我 `A1130` 的结论同向**（35 = 20 + 15），且它**进一步钉死了"那 20 枚全在 `.scratch/wisp/probes/**`"**——★**这是票 362 的关键读数、我已记进台账**。
+  >   ★**它没有修、没有隐瞒、也没算进本票**（35 枚无一属本票写面、父提交对照 0 增量）⇒ **处置正确**。⇒ **归属＝票 362（20 枚真脏）／票 361（15 枚 CRLF）**，⛔ 本票。
       ★反向判据＝把新加的那一跳摘掉 ⇒ 用例必须转红并**逐名报红行**；三读数（变异红／还原绿／原样绿）逐字贴 ＋ **还原核 `sha256`**。
-- [ ] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet` 动过的包／`go test -count=1`（四数分开报、⛔ 相减）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
+- [x] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet` 动过的包／`go test -count=1`（四数分开报、⛔ 相减）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
+  > **2026-10-22 18:1x 编排者翻框（门禁格，我自己现跑）＝成立**
+  > `GOFLAGS= go build ./...` **rc=0**／`go vet ./internal/config/` **rc=0**／`go test -count=1 ./internal/config/` **rc=0**（`ok`、`RUN=196／PASS=115／FAIL=0／SKIP=0`）／
+  > `sh scripts/d22scan.sh` **rc=0 clean**／`sh scripts/check-path-length-budget.sh` **rc=0 GREEN**（`17572/61/61/0`）。
+  > ★**格式甲乙两尺都报（按裁定件 `pipe-format-gate-reads-tracked-blob-not-worktree.md`）**：甲＝入库 blob 尺（**判据**）`git archive` 到仓外 1156 枚 `.go` 跑 `gofumpt -l` ⇒ 列 **20 枚**、★**本腿新增件 0 命中、与父提交逐字相同**；乙＝工作树尺（**只作诊断**）整树 **55 枚** ⇒ **本机 `autocrlf` 假红**。
+  > ★**那 20 枚就是票 362 的债**（全在 `.scratch/wisp/probes/**`）、⛔ 本票缺陷；★**这印证了 `A1130`／`A1131` 的"35 = 20 + 15"分解**。
       ★**格式门禁甲乙两尺都报**（甲＝入库 blob、判据；乙＝工作树、只作诊断），裁定件＝`docs/evidence/s1/pipe-format-gate-reads-tracked-blob-not-worktree.md`。
       ★★**`cmd/wisp` 整包读数⛔ 当判据**（未判决枚数恒 1、红名册逐发漂移、截断点后整族 `RUN=0`，见 `A1126`／`A1127`）⇒ 只能显式 `-run` 或按名作差＋逐发登记死点。
-- [ ] **AC#4 纪律格**：⛔ 翻任何框（本票各格由非实现者裁）、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 226／227 任何原句。
+- [x] **AC#4 纪律格**：⛔ 翻任何框（本票各格由非实现者裁）、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 226／227 任何原句。
+  > **2026-10-22 18:1x 编排者翻框（纪律格由编排者判，四问逐问现跑）＝成立**
+  > ①**越界**：四笔 `d68ddfae`／`fc7c85cc`／`0d907103`／`7c42145c` 逐笔 `git show --name-only` ⇒ **越界全 0**（写面＝`internal/config/**/*_test.go` ＋ `docs/evidence/s1/**`）。
+  > ②**零 push**：`origin/dev..HEAD` ＝ **396**（非空）⇒ 所有腿笔**只在本地**。
+  > ③**⛔ 改票面**：`git log --all -- 'issues/360-*.md'` 的**非编排者**提交 = **0 枚**。
+  > ④**⛔ 动产码**：★我逐枚 `rev-parse` 对 `hash-object` 核过五枚产码（`allowdirs.go`／`writeguard.go`／`manager.go`／`settings.go`／`permmode.go`）⇒ **HEAD 与工作树全 SAME**。
+  > ★**它另主动登记一处自己的"不红"**：**M3 单独恒真仍绿**（`rc=0`）——★**它没有声称三发全红、而是照实记账**（交付件 `§3`、`:86` 逐字"⛔ 声称三发全红"），并**用 M3＋M2 证明正控臂独立成牙**。⇒ **这是本次最值钱的诚实动作**。
 
 ## 硬约束
 
