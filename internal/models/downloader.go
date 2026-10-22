@@ -295,11 +295,29 @@ func (m *Manager) VerifyInstalled(id string) error {
 	if err != nil {
 		return err
 	}
-	dir := filepath.Join(m.opts.DataDir, id)
+	return m.handOffCheck(entry, m.resolveInstalledDir(id))
+}
+
+// resolveInstalledDir is the ONE spelling of "the directory this id is installed
+// in", and ticket 357 exists because there used to be two.
+//
+// The rule is unchanged from Ensure's local_override branch and from the version
+// of VerifyInstalled above: <DataDir>/<id>, unless config names a local_override
+// for this id, in which case that directory is the install. What is new is that
+// every reader of that rule now calls this function, so a report ABOUT the
+// verified tree cannot be assembled from a different path than the one that was
+// verified - the ticket's first face was measured on exactly that split (the
+// guard verified ...\override while the CLI printed store=...\models).
+//
+// It is a getter, not a policy: no cleaning, no absolute-ing, no fallback. The
+// override value is used exactly as config spelled it, which is what Ensure has
+// always done with it. It also takes no entry: which directory an id lives in is a
+// property of the store, not of a manifest that may have changed since.
+func (m *Manager) resolveInstalledDir(id string) string {
 	if override, ok := m.opts.LocalOverride[id]; ok {
-		dir = override
+		return override
 	}
-	return m.handOffCheck(entry, dir)
+	return filepath.Join(m.opts.DataDir, id)
 }
 
 // Cancel aborts an in-flight Ensure for id. The aborted run cleans its

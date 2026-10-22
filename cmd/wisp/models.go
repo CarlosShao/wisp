@@ -252,7 +252,62 @@ func modelsVerify(io_ modelsIO, argv []string) int {
 	}
 	fmt.Fprintf(io_.out(), "wisp models verify: %s 与已验签清单一致（store=%s，%.2fs）\n",
 		id, store.root, time.Since(started).Seconds())
+	// Ticket 357 (form 丁): the hash face cannot see a second data stream and
+	// os.ReadDir cannot list one, so a tree can match every pinned byte and still
+	// carry bytes nobody signed - measured before this block existed, a 12-byte
+	// model.onnx plus a 19-byte model.onnx:attacker printed 与已验签清单一致 with rc=0.
+	// The sentence this adds is a REPORT, not a refusal: the verdict above and the
+	// exit code below are unchanged, and a tree with no such stream prints exactly
+	// the bytes it printed before.
+	return announceUnnamedStreams357(io_, id, store.mgr)
+}
+
+// unnamedStreamsLister357 is the one capability the ticket-357 tail needs from the
+// store: "which second streams stand on the tree of this id, and which directory was
+// that". Manager is the production implementation; naming the shape here is what
+// lets a case drive the real enumeration with a fixture manifest, without a signed
+// manifest whose key matches this binary's buildinfo key.
+type unnamedStreamsLister357 interface {
+	UnnamedStreams(id string) (dir string, streams []string, err error)
+}
+
+// announceUnnamedStreams357 is the passing path's tail, in one function so what it
+// prints and what it returns are read together: one sentence per unnamed stream,
+// and 0 - the exit code the verification above had already earned.
+//
+// The directory it names comes from UnnamedStreams, which resolves it the same way
+// VerifyInstalled does (the local_override directory when config names one), NOT
+// from the store root printed on the line above. That distinction is ticket 357's
+// first face: a report about a directory nobody verified is the same defect in a
+// new place.
+//
+// A failed enumeration prints its own sentence on stderr and still returns 0. It is
+// NOT read as "no streams here" - the ticket's ruling forbids that - and it is not
+// promoted to a refusal either, because this command's exit code answers "are the
+// bytes I hashed what the manifest pinned", which it can still answer.
+func announceUnnamedStreams357(io_ modelsIO, id string, l unnamedStreamsLister357) int {
+	dir, streams, err := l.UnnamedStreams(id)
+	if err != nil {
+		fmt.Fprintf(io_.err(), "wisp models verify: %s 的备用数据流没枚举完（%v）；放行结论不变，但这一面今天没看全\n", id, err)
+		return 0
+	}
+	for _, s := range streams {
+		fmt.Fprint(io_.out(), streamNotice357(id, s, dir))
+	}
 	return 0
+}
+
+// streamNotice357 is the sentence itself, and it names three things on purpose:
+// the model, the stream as the OS spells it (so an operator can check it with
+// `dir /r` without this program), and the directory that was actually enumerated.
+//
+// It says 清单未点名 rather than "unexpected" because that is exactly the claim:
+// the signed manifest names files, and a second data stream on one of those files
+// is not among them. It does not say the bytes are malicious, and nothing in this
+// command refuses because of it - see modelsVerify's comment.
+func streamNotice357(id, stream, dir string) string {
+	return fmt.Sprintf("wisp models verify: %s 在 %s 上枚举到清单未点名的备用数据流（ADS dir=%s）；本次一致结论只覆盖清单点名的文件\n",
+		id, stream, dir)
 }
 
 // modelsEnsure performs the full walk: download-or-reuse, then the hand-off
