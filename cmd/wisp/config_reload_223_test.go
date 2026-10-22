@@ -17,9 +17,11 @@ package main
 // dies at load (0xc0000135) unless third_party/sherpa-onnx is on PATH.
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -42,6 +44,34 @@ const reloadCaseBudget = 40 * time.Second
 // because 票 272 AC#3 forbids touching an existing assertion.
 const restartSentence272 = "本次运行不会生效"
 
+// bannerSeed232Env is ticket 232 AC#4's seed, as a PARAMETER rather than a
+// product edit. Set to "1", this test host's start-up stream carries the
+// restart notice's own words BEFORE the case plants anything - the shape the
+// ticket names ("启动横幅里先含同样字样，之后才种改动") and the one that must not
+// be able to stand in for the notice itself.
+//
+// Why a parameter and not a rewritten sentence: 232's 禁区 forbids changing the
+// operator's notice to make a case green, and the direction this ticket cares
+// about is the opposite one - the words alone must NOT be enough.
+//
+// The seeding lives in this file's constructor (newReloadRun223), so it lands in
+// the stream before live() assembles the runtime and therefore before `mark` and
+// `prePlant` are taken. That ordering IS the shape: a copy printed earlier than
+// the plant is a copy nobody planted.
+const bannerSeed232Env = "WISP_232R1_BANNER_SEED"
+
+// seedBanner232 prints the seeded banner when the child parameter is set, and
+// prints nothing otherwise - so an ordinary run pays no bytes and no assertion
+// moves. Keeping the no-op branch is what lets AC#4's control (the same child
+// with the parameter absent) be a clean green.
+func seedBanner232(out *syncWriter) {
+	if os.Getenv(bannerSeed232Env) != "1" {
+		return
+	}
+	fmt.Fprintf(out, "wisp run: 232-r1 seeded start-up banner: 这些段的改动本次运行不会生效"+
+		"（启动横幅先带字样，之后才种改动）\n")
+}
+
 type reloadRun223 struct {
 	h  *replyHost
 	pw *io.PipeWriter
@@ -51,6 +81,9 @@ type reloadRun223 struct {
 func newReloadRun223(t *testing.T, l2Wait time.Duration) *reloadRun223 {
 	t.Helper()
 	r := &reloadRun223{h: newReplyHost(t, l2Wait)}
+	// 票 232 AC#4: the banner seed, before the runtime is assembled and therefore
+	// before the case takes its marks. Off unless the parameter asks for it.
+	seedBanner232(r.h.out)
 	pr, pw := io.Pipe()
 	r.pw = pw
 	r.h.reply = pr
@@ -841,4 +874,114 @@ func TestTicket223PanelInboundSaysHotReloadIsDisabled(t *testing.T) {
 			t.Errorf("the disabled sentence carries %q, which belongs to another cause:\n%s", other, errLog)
 		}
 	}
+}
+
+// TestTicket232R1ASeededStartupBannerCannotCarryTheRestartTier is ticket 232
+// AC#4, the last unfilled row: "种一发『启动横幅里先含同样字样、之后才种改动』的
+// 文件／参数，断用例不许通过". The seed is bannerSeed232Env (a parameter, not a
+// product edit) and the case under test is
+// TestTicket223RestartTierSaysItWillNotApply, driven as a real child of this
+// binary - a test cannot start another test in its own process, and the point
+// here is what the OTHER case answers, not what this one thinks of it.
+//
+// The two readings, both in this one case:
+//
+//	control  (parameter absent)  the child PASSES  -> the seed is off by default
+//	seeded   (parameter present) the child FAILS   -> the words alone do not pay
+//
+// Without the second reading the seed would be decoration; without the first a
+// permanently red case would look like a working nail. The FAILING reading must
+// be the ticket-272 arm 1 assertion by name, NOT the 40s await deadline: an
+// await timeout would mean the case merely got slower, while the ticket asks
+// that a planted-before banner cannot satisfy the content assertions at all.
+// So this case pins the red sentence and explicitly rejects the timeout shape.
+func TestTicket232R1ASeededStartupBannerCannotCarryTheRestartTier(t *testing.T) {
+	// run232Child runs the restart-tier case as a child with the banner seed set
+	// or cleared, and returns its combined output plus its exit code.
+	run232Child := func(t *testing.T, seed bool) (string, int) {
+		t.Helper()
+		exe, err := os.Executable()
+		if err != nil {
+			t.Fatalf("os.Executable: %v", err)
+		}
+		cmd := exec.Command(exe,
+			"-test.run=^TestTicket223RestartTierSaysItWillNotApply$",
+			"-test.v=true", "-test.timeout=300s")
+		env := os.Environ()
+		if seed {
+			env = append(env, bannerSeed232Env+"=1")
+		} else {
+			// Explicitly cleared, so the control cannot inherit a seed from the
+			// environment this suite itself was started in.
+			env = append(env, bannerSeed232Env+"=")
+		}
+		cmd.Env = env
+		var buf bytes.Buffer
+		cmd.Stdout, cmd.Stderr = &buf, &buf
+		err = cmd.Run()
+		code := 0
+		if err != nil {
+			ee, ok := err.(*exec.ExitError)
+			if !ok {
+				t.Fatalf("run the child case: %v (output opens: %s)", err, headRunes232(buf.String(), 400))
+			}
+			code = ee.ExitCode()
+		}
+		return buf.String(), code
+	}
+
+	// (1) The control: no seed, so the child must be green. This is what makes
+	// the seeded reading below attributable to the banner and to nothing else.
+	controlOut, controlCode := run232Child(t, false)
+	if controlCode != 0 {
+		t.Fatalf("the control child (no banner seed) exited %d, so a seeded red would prove nothing about the seed. Output:\n%s",
+			controlCode, controlOut)
+	}
+	if !strings.Contains(controlOut, "--- PASS: TestTicket223RestartTierSaysItWillNotApply") {
+		t.Fatalf("the control child exited 0 without a PASS line for the case under test. Output:\n%s", controlOut)
+	}
+
+	// (2) The seed: the SAME child, the SAME case, one parameter different.
+	seededOut, seededCode := run232Child(t, true)
+	if seededCode == 0 {
+		t.Fatalf("a start-up banner carrying the restart notice's own words BEFORE the plant did not move this case: it exited 0. The seed is back to being decoration - the shape ticket 232 AC#4 names is passing again. Output:\n%s",
+			seededOut)
+	}
+	if strings.Contains(seededOut, "--- PASS: TestTicket223RestartTierSaysItWillNotApply") {
+		t.Errorf("the seeded child exited %d yet still printed a PASS line for the case under test. Output:\n%s",
+			seededCode, seededOut)
+	}
+
+	// (3) WHICH nail fired. Arm 1 bans a pre-plant copy wherever it sits; the
+	// await deadline is a different failure ("it got slower"). Only the first is
+	// the ticket's reading, so the second is a hard failure here.
+	if strings.Contains(seededOut, "never carried") && strings.Contains(seededOut, "AFTER the plant within") {
+		t.Fatalf("the seeded child reddened on the await DEADLINE, not on the pre-plant ban - that is the case merely getting slower, which is not what 232 AC#4 asks it to notice. Output:\n%s",
+			seededOut)
+	}
+	if !strings.Contains(seededOut, "a copy nobody planted cannot be evidence") {
+		t.Fatalf("the seeded child failed, but not on ticket 272 arm 1's assertion, so nothing here shows a pre-plant banner is refused. Output:\n%s",
+			seededOut)
+	}
+	// (4) The red must be ABOUT the seeded bytes: arm 1 dumps the pre-plant
+	// stream, and that dump has to contain the seed's own marker. Otherwise the
+	// child could have reddened over some unrelated pre-plant copy.
+	if !strings.Contains(seededOut, "232-r1 seeded start-up banner") {
+		t.Errorf("the seeded child reddened without its pre-plant dump carrying the seeded banner, so the reading is not about these bytes. Output:\n%s",
+			seededOut)
+	}
+	// (5) And the case under test still ends in failure overall, not a skip.
+	if strings.Contains(seededOut, "--- SKIP: TestTicket223RestartTierSaysItWillNotApply") {
+		t.Errorf("the seeded child SKIPPED the case under test, which is neither red nor evidence. Output:\n%s", seededOut)
+	}
+}
+
+// headRunes232 bounds a child's output in a failure message so a noisy run does
+// not bury the verdict. Test-only, no exported name.
+func headRunes232(s string, n int) string {
+	r := []rune(s)
+	if len(r) <= n {
+		return s
+	}
+	return string(r[:n]) + "... (truncated)"
 }
