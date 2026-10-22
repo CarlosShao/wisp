@@ -3,7 +3,11 @@
 - Status: **ready-for-agent**（`AC#0` 只读现量可先派；`AC#1` 裁形须我先拍）
 - 立案：2026-10-22 16:3x +08 编排者立
 - ★**来路（两枚非实现者签名，缺一不可）**：
-  - `226-v2` sec ⑥ 第 8 条（非实现者对抗验收腿，件 `docs/evidence/s1/226-config-write-no-clobber-v2.md`）
+  - `226-v2` sec (6) 第 8 条（非实现者对抗验收腿，件 `docs/evidence/s1/226-config-write-no-clobber-v2.md`）
+    > ★**2026-10-22 17:2x 编排者更正（依据 `360-a1` 普查腿现读）＝这条引用错了**：`226-v2` HEAD `:170` 的第 8 条讲的是
+    > 「**排程先于票 223／生产侧尚无轮询者**」、NOT "Adopt 内存"；该文**六枚历史 blob** 里 "Adopt 内存" 与 "确定性用例" 命中均 **0**
+    > （它那 3 处 `Adopt` 是"**突变③ 无条件 adopt**"与用例名、NOT 这一跳）。★**那句逐字首见于 `227-r1-impl-part2.md:58` 与 `227-v1-verdict.md:90`**
+    > ⇒ ★**承重判语实际在 `227-v1` 第 (10) 项、票面引用链改指它**（原句保留不抹）。
   - `227-v1` 第 10 项（非实现者终裁腿，件 `docs/evidence/s1/227-v1-verdict.md`、提交 `6e838c16`）
 - 关联：票 226（配置写回不 clobber）· 票 227（真轮询下重载）· `cmd/wisp/writeguard.go`
 
@@ -19,7 +23,31 @@
 
 ## 结案判据
 
-- [ ] **AC#0 现读＋归因（只读，⛔ 动任何产码字节）**：把这一跳量成可复跑读数——
+- [x] **AC#0 现读＋归因（只读，⛔ 动任何产码字节）**：把这一跳量成可复跑读数——
+  > **2026-10-22 17:2x 编排者翻框＝成立（凭只读普查腿 `360-a1`，件 `docs/evidence/s1/360-a1-census.md` 93 行/12759 字节、7 笔提交、`.go` 0）**
+  > ★**本格是只读格**，判据＝"把这一跳量成可复跑读数"；它逐条给了、且**前提今天成立、无须停手上报**。
+  > **① `statOwnWrite` 分层（正是我点的那把尺）**：raw grep **5 行 ＝ 1 定义 ＋ 1 代码调用 ＋ 3 注释**——
+  >   定义 `internal/config/allowdirs.go:157`（体 `:157-163`，**只写 `seenMtime`/`seenSize`/`seenValid`、从不认领内容**）；代码调用 `writeguard.go:179`（在 `mergeWrite` 的 `if len(diverged)==0` 支内）；
+  >   注释 `allowdirs.go:150`／`writeguard.go:105`／`writeguard_226_test.go:186`。★**我独立复量：同 5 行、同分层**。
+  >   ★旧普查的 `allowdirs.go:116`／`permmode.go:78` 调用点**已不存在**（票 226 之前的形状），今 HEAD `permmode.go` 零命中。
+  > **② 两条路逐名**：写回入口 **3 枚**（`allowdirs.go:62`／`:109->:139->:142`；`permmode.go:70->:79`；`settings.go:259->:303`）汇聚到 `writeguard.go:111 mergeWrite`（`:118` 读盘当 base、**`:163 SaveFile` 从不回读**）；
+  >   **Adopt 全仓只有一条**：`manager.go:142 CheckAndReload -> :160 LoadFile -> :193 plan.commit` 写 `cur`，生产驱动 `config_reload.go:123`／`:92`／`:157` ⇒ **两者互不相连**。
+  >   ★**易混形状具名**：`statOwnWrite` 与 `manager.go:162-165` 失败支的认领**只改 seen-stat、不改 `m.cur`** ⇒ **⛔ Adopt**。
+  > **③ 复现（`-overlay` 挂仓外探针、仓内零 `.go`）**：`READ A2 file.ball.size=60 mem.ball.size=56`；`diffKeyPaths(memory,file) n=1 [ball.size]`；探针 PASS（红闸 `REPRO GONE` 在 `:44`）⇒ ★**前提今天复现**。
+  > **④ 正控（台面能分辨两态）**：同台面多跑一次 Adopt 路 ⇒ `mem=60 file=60`、`report.Hot=[ball]`（红闸在 `:83`）；第三臂干净写 `file=56 mem=56`、poll 后 `report=nil`。
+  > **⑤ ★它多做了一发（我没要求、但决定 `AC#1` 的代价）**：自造 **M-ADOPT 突变**＝让写回路径**真的**接管内存（`writeguard.go:169` 后插 `m.cur = deepCopyConfig(base)`）⇒ `go build rc=0`；
+  >   `internal/config` 控制发全绿 ⇄ 突变发 **`rc=1` 红 8 枚逐名**（`settings_248_test.go:206`／`writeguard_226_test.go:89,:224,:248,:259,:285`／`writeguard_handedit_227_test.go:50`／`writeguard_unnailed_341_test.go:183,:327`）；
+  >   宿主车道同突变显式 `-run TestAC1AlwaysBranch...` 红在 `always_write_no_clobber_226_test.go:119`；还原 `sha256` 逐字回原。
+  >   ⇒ ★**归因：这 9 枚全是**别的票别格的顺带断言**，没有任何一枚**以这一跳为题目且自带两态正控**** ⇒ ★**"间接已钉、直接未钉"成立**（这是本票的立案根据、它给证了）。
+  >   ⇒ ★**`AC#1` 的代价事实**：〔乙〕产码侧显式 Adopt **今天当场红 9 枚**、且**分叉支 Adopt 与 D36 rule 1（`ConfirmLocked` 先行）正面相撞** ⇒ 任何乙/丙形都得**先交代这 9 枚**；〔甲〕只加用例的形状**就是 ③④ 那组读数**、**零产码**。
+  > **⑥ 它复现了"间接那一发"**：插无条件 `statOwnWrite` ⇒ 控制 `PASS 3.46s rc=0`、突变 `go build rc=0` 但红在 `always_write_no_clobber_227_test.go:198`、`FAIL 42.55s rc=1`；还原 `sha256 efe12661…47bd` 与 HEAD blob 逐字同串（14930 字节）。
+  > **⑦ 门禁**：`go build ./...` **rc=0**／`sh scripts/d22scan.sh` **rc=0**（末行 `clean - no D22 ban violations`、`289 production Go files` 是**分母**⛔ 违规数）；★`cmd/wisp` **只用显式 `-run` 单枚、无整包名册**（合 `A1126`／`A1127` 定式）。
+  > **⑧ 写面**：`40339d01..HEAD` **7 笔、文件并集 1 枚、逐笔 `.go` 0、越界 0**；正控尺打 `ecebc7a9` ⇒ `.go` **2**（不空转）、负控 `9fc2be02` ⇒ **0**。
+  > **⑨ ★它自报一处自己的台损并修正**：首棵导出树经 **PowerShell 管道**时 **32 枚中文名 `.scratch` 台件被转码**（另落 17 枚乱码名）、只有 **17549** 枚；
+  >   ★改 **Git Bash 直出 tar** 后 **17564/17564**，**所有承重读数已在完整树上逐发重跑复现**。★我独立核：我这边的导出树 **17569 ＝ `git ls-files` 17569**（当刻）⇒ **Git Bash 直出不丢件、它报的台损是真的**。
+  > **⑩ ★两处我照它的请示办了**：(a) **来路引用链更正**（原句保留）——`226-v2` HEAD `:170` 第 8 条讲的是"排程先于票 223／生产侧尚无轮询者"、**⛔ Adopt 内存**；
+  >   该文六枚历史 blob 里"Adopt 内存"与"确定性用例"命中均 **0**（它那 3 处 `Adopt` 是"**突变③ 无条件 adopt**"与用例名）⇒ **承重判语实际在 `227-v1` 第 (10) 项**。
+  >   (b) 我顺手清掉自己那段里的 **2 枚带圈数字 `(6)`**（被禁码位 `U+2460-24FF`）⇒ 现全件那两枚码位（U+00A7／U+2460-24FF）**均 0**。
       ①`statOwnWrite` 的**定义与全部调用点**逐名列出（⛔ 只给计数）；②**写回路径**与**Adopt 路径**各自在哪（`file:line` 现跑复认）；
       ③造一发"写回之后内存仍持旧值"的读数（★**先证今天能复现**，⛔ 假设）；
       ④**正控**：同一台面造一发"Adopt 之后内存是新值"⇒ 证明你的台子能分辨两态。
@@ -45,4 +73,4 @@
 
 ## Progress log
 
-- [2026-10-22 16:3x +08] agent=`编排者` did=立案（来路＝`226-v2` sec ⑥ 第 8 条 ＋ `227-v1` 第 10 项；★票面写明"间接已钉、直接未钉"防下一位误读）next=派 `360-a1` 只读腿。
+- [2026-10-22 16:3x +08] agent=`编排者` did=立案（来路＝`226-v2` sec (6) 第 8 条 ＋ `227-v1` 第 10 项；★票面写明"间接已钉、直接未钉"防下一位误读）next=派 `360-a1` 只读腿。
