@@ -66,6 +66,7 @@
 - `e9caddff4dccb3e5a3fb7b4d2f622890de5968b6`：2 枚路径，`.go`=2，写面外=0（同上两枚）。
 - `5476e2417fe8847f91ce864af00f7001f1362e97`：1 枚路径，`.go`=0，写面外=0（`docs/evidence/s1/348-r1-impl.md`，本件）。
 - `73aa88049`：1 枚路径，`.go`=0，写面外=0（本件两处读数更正）。
+- ★从 `5476e2417` 起，本腿其余各笔**只碰本件**：判据＝`git log --format='%H %s' --grep='^票 348 落地腿 348-r1'` 现跑得名册、再逐枚 `git show --name-only` 数 `.go` 与写面外（都是 0）——这条**不依赖枚数**，本件自身再改几笔也不必回来改它。
 - 前两笔只 **＋行**（`195ce6d0f` `2 files changed, 104 insertions(+)`；`e9caddff` `+7 −2`，那 −2 是本腿**自己**前一笔那 7 行里挪常量，⛔ 别人字节）。
 - ★**正控**（同尺打一笔**含 `.go`** 的真提交）：同一把 `git show --name-only`＋`grep -c '\.go$'` 打 `195ce6d0f` ⇒ `go=2`（尺有牙）；再打一笔**不含 `.go`** 的真提交 `efa950a3`（票 164 续跑腿的判语件）⇒ `go=0`（尺不虚报）。
 - 本腿写面现状：`git status --porcelain -- internal/winsec/ docs/evidence/s1/` 为空；本腿新增的唯一路径就是本件（`docs/evidence/s1/348-r1-impl.md`）。
