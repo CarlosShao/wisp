@@ -84,9 +84,9 @@
 //	go test -count=1 -v -run '^TestTaskOutputAC2BeforeLegIsUnreachable$' ./internal/tools/
 //
 // The file name and the test name are historical keys - ticket 164 AC#2b, the
-// archived instrument .scratch/wisp/probes/164/v1/ac2-anchor-reading.sh and the
-// CI logs address this case by them - so they are kept unchanged even though
-// the case no longer signs itself as a before/after reading.
+// archived anchor instrument .scratch/wisp/probes/164/v1/ac2-anchor-reading.sh
+// and the CI logs address this case by them - so they are kept unchanged even
+// though the case no longer signs itself as a before/after reading.
 ```
 
 同批改的三处**说明文字**（不是断言）：`t.Logf` 标签 `AC#2 BEFORE verbatim:`→`unknown-tool refusal:`；两处 `Fatalf` 措辞去掉了过期行号 `bridge.go:247`；`a task.* tool is registered`→`BuiltinFSEntries carried a task.* name`。
@@ -123,7 +123,7 @@
 - ① `62a1521cb411421c069b7dcf960fe1c2490b95a3` —— 本格**唯一 `.go`**：`git show --name-only` 列 1 枚
   `internal/tools/task_output_ac2_before_test.go`（`grep -c '\.go$'`＝1；写面外＝0）；1 file changed，+41/−26，全在注释／措辞。
 - ② `ec8786e18…`（`ec8786e1`）—— 承载**本件**：`--name-only` 列 1 枚 `docs/evidence/s1/164-r1-impl.md`（`.go`＝0；写面外＝0）。
-- ③ 把 ② 的提交号写进本节的那笔**也是 docs-only**（只列本件、`.go`＝0）——本行不写死它自己的号，命令可核。
+- ③ 之后对**本件**的两笔补记（写死 ② 的提交号、把 §2 引文与交付文件逐字对齐）**也是 docs-only**：`--name-only` 只列本件、`.go`＝0——本行不写死它们自己的号，命令可核。
 - **正控（证明这把 `--name-only` 尺不是瞎子）**：同尺打在上面那笔**含 `.go` 的真提交**上 ⇒
   `git show --name-only --format="" 62a1521cb` 输出 **1 枚**＝`internal/tools/task_output_ac2_before_test.go`（`grep -c '\.go$'`＝**1**）⇒ 尺能看见 `.go`，"没列 `.go`"才是真读数。
 - 越界：`internal/session/**`／`internal/memory/**`／`internal/risk/**`／`internal/panel/**`／`internal/config/**`／`cmd/**`／`scripts/**`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件＝**零字节**（写面只有上列两枚）。⛔ push；⛔ 台账；⛔ 票名／`Status:`／`-done`。
