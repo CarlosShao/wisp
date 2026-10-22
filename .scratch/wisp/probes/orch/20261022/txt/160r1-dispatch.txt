@@ -1,0 +1,64 @@
+【派单·票 160 落地腿 `160-r1`】写腿·2026-10-22 21:5x +08 编排者
+
+■ 身份
+写腿（实现者）。⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ 改台账、⛔ push。
+票面用 glob 找：`.scratch/wisp/issues/160-*.md`（★**先通读**；★**本票只剩 `AC#4` 一格未勾**，`AC#5` 是契约轴＝纪律格、我自己判）。
+
+■ 一句话（`AC#4` 逐字）
+**明写它治不到什么**（这条不许省）：**从不动的泄漏**它照样漏；**借用那一形不该由它治**——
+`Detector(scopeID)` 返回的是绑定过的借用对象（`provenance.go:603-612`），在那儿补关会**弄坏它**。
+⇒ 与票 158"今天响不响"那格是**两格**，不许并成一格结掉。
+
+■ ★这条为什么是"不许省"的活
+- ★本仓反复踩过的坑：**一个守卫写成"它管一切"**，于是**没人知道它到底管到哪**。
+- ★`AC#4` 要的是**把"它治不到什么"写成可核的句子**、⛔ 含糊的"部分覆盖"。
+- ★**"从不动的泄漏它照样漏"**：`statOwnWrite` 只认领**自己写出来的内容**（`allowdirs.go:157`，体 `:157-163` 只写 `seenMtime`/`seenSize`/`seenValid`）。
+- ★**"借用那一形不该由它治"**：`Detector(scopeID)` 返回**绑定过的借用对象**（`provenance.go:603-612`）⇒ 在那儿补关**会弄坏它**。
+
+■ 做法（硬）
+1) **先量后写**：★**上盘现读** `internal/risk/provenance.go` 的 `Detector`（`:603-612`）与那条守卫的实际射程；
+   ★**逐条给出它"治得到"与"治不到"的边界**（每一条带 `file:line`）。
+2) ★**"治不到"那几条必须各有一发可核读数**：造一发"从不动的泄漏"（守卫**照样漏**）＋一发"借用那一形"（**证明在那儿补关会弄坏它**）；
+   ★**这两发要能在未修码上响**（⛔ 只写在纸上）。
+3) ★**反向判据**：把新加的那一跳**摘掉** ⇒ 必须**转红并逐名报红行**；先证落地（`grep -n` ＋ `go build` rc=0）再读数。
+4) ★**三读数**（变异红／还原绿／原样绿）逐字贴 ＋ **还原核 `sha256` 三处逐字相同**。
+5) ★**格式门禁甲乙两尺都报**：甲＝`git archive` 到仓外跑 `gofumpt -l`（**判据**）／乙＝工作树（**只作诊断**）。
+
+■ 写面（越界＝作废；`AC#5` 逐字）
+- ★**只许动** `internal/risk/provenance.go` 及其测试 ＋ `docs/evidence/s1/160-r1-*.md`。
+- ⛔ `docs/PLAN.md`／`docs/specs/**`（★契约文字须人工批准）、`thresholds.go`／golden／`allowlist.txt`／`tools/d22scan/**`、
+  `frontend/**`／`design/**`（零读零写零转述）、`cmd/**`、`scripts/**`、`.github/**`、`go.mod`/`go.sum`、`docs/reports/**`。
+- ★**`internal/session/**`／`internal/memory/**`／`internal/panel/**` 归别的腿** ⇒ ⛔ 动。
+
+■ 开工前（⛔ 跳步＝空跑作废）
+1) `git status --porcelain`：写面内有**别人的**未提交改动 ⇒ 停手上报。
+2) ★**票面前提新鲜度**：票面每条可现跑断言**逐条现跑**（★本仓票面腐坏已 ≥9 次）。★特别核 `provenance.go:603-612` 与 `allowdirs.go:157-163` 的**行号**今天是否还对。
+3) 复跑基线：`go test -count=1 ./internal/risk/`（四数分开报）。
+
+■ 环境
+`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；⛔ `CGO_ENABLED=0`（本仓必然编不过、⛔ 当缺陷）；
+★`gofumpt` 用**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（裸名 rc=127，⛔ 判"本机没有"）；
+★`*.go text eol=lf` ⇒ 脚本改文件⛔ 带 CRLF；★变异读数与整包门禁**串行**。
+
+■ ★开工前必读（本仓刚立的检查表）
+`.scratch/wisp/probes/orch/20261022/txt/ruler-scope-checklist.md`（65 行）——★**8 处"尺的射程"的错**。
+★**落笔前四问**：①这把尺量的是哪个对象？②输出形状是什么？③我数的是"代码"还是"注释"？④这个数有没有和总数对上？
+★**判 `gofumpt`／`gofmt` 输出归属必须用 `[\\/]`**（Windows 上输出反斜杠）。
+★**名册取主检出**、⛔ 取导出树（导出树无 `.git` ⇒ `internal/tools` 8 枚假红）。
+
+■ Git
+只 commit **⛔ push**；`add`/`commit` 两处**显式 pathspec**；★**涉新文件的提交，pathspec 逐个文件名字面点名**（⛔ glob）；⛔ `add -A`/`.`；⛔ amend/reset/rebase/stash/checkout ./clean。
+主题**逐字**以 `票 160 落地腿 160-r1` 开头；正文先写 `/tmp/xxx` 再 `-F`。
+★**文档里可以自由用 `★`／`⛔`／`⇒`／带圈数字**；但 **`.go` 里**注释豁免、字符串不豁免。
+★**改自己新增的文字时 ⛔ 用 `\n\n` 猜段落边界**，用**行号范围**（`sed -n 'A,Bp'`），改完必 `diff HEAD` 验。
+临时件只建不删 ⇒ `D:\tmp\wisp\20261022\160r1\**`；⛔ `.out`。
+
+■ 交付件（缺一算未交）
+`docs/evidence/s1/160-r1-impl.md`（**≤160 行**，过帽拆 `-partN`）：
+★**"它治得到什么／治不到什么"逐条表**（每条带 `file:line`）／
+★**"从不动的泄漏它照样漏"那一发的读数**／★**"借用那一形在那儿补关会弄坏它"那一发的读数**／
+反向判据三读数逐字＋sha256／门禁 rc。
+门禁自己现跑：`GOFLAGS= go build ./...`；`go vet ./internal/risk/`；`go test -count=1 ./internal/risk/`（四数分开报、⛔ 相减）；`sh scripts/d22scan.sh`；`sh scripts/check-path-length-budget.sh`。
+红名册**逐名**（★**取主检出**），新增红必须 **0**。提交号逐枚＋逐枚 `git show --name-only` 的 `.go`／越界（正控＝同尺打一笔**含 `.go`** 的真提交）。
+
+■ 未定义即停 ⇒ **停手上报**，⛔ 自行假设。★特别是：①若 `AC#4` 要求改 `docs/specs/**` 或 `PLAN.md` ⇒ **停手上报**；②若"借用那一形"今天**已经不需要补关**（现状已对）⇒ **停手上报并给读数**（那说明这一条前提过期）。
