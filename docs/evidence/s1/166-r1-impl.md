@@ -129,7 +129,7 @@ Manager 方法调用点 rc=1；`internal/panel`／`cmd/wisp` 对 `memory.Session
 | 提交 | `git show --name-only` | `.go` 枚 | 越界 |
 |---|---|---|---|
 | `17cfe8cf` | `internal/memory/dao_session.go`、`internal/session/ticket166r1_ac2_gaps_test.go` | **2** | 0 |
-| **本笔**（本件） | `docs/evidence/s1/166-r1-impl.md` | 0 | 0 |
+| **本笔**（本件；首次入库 `b4dfe165`，本笔只补这一行的哈希） | `docs/evidence/s1/166-r1-impl.md` | 0 | 0 |
 
 越界尺：把路径逐个打 `^(internal/session/\|internal/memory/\|docs/evidence/s1/166-r1-[^/]*\.md$)` ⇒ 越界行 **0**（rc=1）。
 正控（同尺）：`17cfe8cf` 的 go-files=**2**（尺看得见 `.go`）／docs-only 提交 `f895fe5c` go-files=**0**（尺不会乱数）。
