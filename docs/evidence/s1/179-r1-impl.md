@@ -102,7 +102,7 @@ call kind=success tool=fs.read    risk=L0 decision=allow outcome=success rules_h
 
 1. ★**`MODE-REDLINE … still asks` 是一句假话，每发 e2e 出现 3 次**（`logs/50-final-green-readings/e2e-readings.txt`，逐字 `MODE-REDLINE mode=ask_every_step still asks tool=fs.read rules=[] because=无法识别的风险级，fail-closed 保留询问`；3 枚属于 `task.output`×1＋`fs.read`×2）。机制：`internal/tools/bridge.go:311` 把 **L0 判定**交给 `mode.Screen`，而 `internal/risk/mode.go:163-165` 只认 `L1/L2/Deny`，其余一律回 `Kept="无法识别的风险级，fail-closed 保留询问"`；`bridge.go:324` 据此打印 "still asks"，但 `bridge.go:352` 的 `route` 对 L0 直接放行 ⇒ **一行说"还要问"，一行没人问、卡 0 枚**。⇒ 这是"日志里编造出一个不存在的动作"那一族（票 97 已定过案）。**两处都在我的写面之外**（`internal/risk/**`、`internal/tools/**`），⇒ 只登记，请编排者裁是否开票。
 2. ★**`AC#1` 的台件今天编不过**（§1 两条独立原因）⇒ 票面 `AC#1` 留给下一程的"补法"应当改写成"用 `probes/179/r2` 的台件＋`D:\tmp` 适配副本"，⛔ 不要再照"复跑 176/r1 台件"字面执行。
-3. ★**`logs/20-*` 的尾态与 09-28 `176-r1` 的尾态不同**：那一发是"7 次拒绝后判卡住"，我这一发是"拒绝 1 次→桩主动收尾→两任务都 completed、退出码 0"。⇒ 拒绝行同形，**尾态不同**，⛔ 不要拿我这一发的尾态去替换旧读数。
+3. ★**`logs/20-*` 的尾态与 09-28 `176-r1` 的尾态不同**（★这一条我先按票面写过一次，现读旧件后**改正**，见 §10）：旧件 `probes/176/r1/logs/last-run.txt`（27580 字节）里 `run B: tool call task.output` 逐字 **8 枚**、`风险未分级` 逐字 **7 枚**、任务尾态 `结束（stuck` **1 枚**（另一枚 `completed`）⇒ 旧尾态＝**重试到 `stuck`**；我这一发＝**1 枚** `task.output`、1 枚拒绝、两枚任务都 `completed`、探针 FAIL。⇒ **拒绝行同形，尾态不同**，⛔ 不要拿我这一发的尾态去替换旧读数。★另记一条尺的射程：`grep -c "卡住"` 对这枚旧件 ⇒ **0**，因为状态值是英文 `stuck`——**关键词≠语境**（检查表第 6 例同族）。
 4. ★**HEAD 漂移**：本程 6 次（`163ae626`→`b4dfe165`→`d0194273`→`b4102f1e`→`e94a5b17`→`4c771f48`→`811054e1`），全部是**别的腿**的提交；`git status --porcelain -- internal/agent` 在本程首、中、尾三次均为**空**。
 
 ## §8 本程**没有**做的事
@@ -116,3 +116,9 @@ call kind=success tool=fs.read    risk=L0 decision=allow outcome=success rules_h
 - 片刻后另一条腿把 HEAD 推到 `394cc212`，我在**同一棵树＋一枚别人的提交**上再取一次细读数（`logs/62-postcommit-gates-detail.txt`）：d22scan **rc=0**（`clean - no D22 ban violations`；`ban #8 internal/=620`、`cmd/=148`）、pathlen **rc=0**、gofumpt 甲尺 **rc=0** 且 `total=20 / internal=0 / cmd=0 / docs=0 / .scratch=20`。
 - `.go`／越界尺（★**正控＝同尺打一笔含 `.go` 的真提交**）：`32c8eeac`（本件）⇒ 1 枚、**`.go`=0**、`internal/`+`cmd/`=**0**、写面内；`ec520750`（**正控**，票 179 修法那一笔，非本程）⇒ **2 枚 `.go`**（`internal/agent/loop.go`、`internal/agent/declared_l0_risk_179_test.go`）⇒ 同尺在真 `.go` 提交上**报得出来**，不是瞎尺。
 - 终态：`git status --porcelain -- internal/agent` **空**；`internal/agent/loop.go` 的工作树与 `HEAD` blob sha256 同为 **`e14f73b1458c411511523ed19e91f7f19a79ce0c863d5abd6358605fc476df72`**。
+
+## §10 本件自己的一处**更正**（照检查表"关键词≠语境"抓出来的）
+
+- 我先按票面文字把旧尾态写成"7 次拒绝后判**卡住**"；**现读旧件**（尺：`grep -o "run B: tool call task.output" probes/176/r1/logs/last-run.txt | wc -l` ⇒ **8**、`grep -ac "风险未分级" …` ⇒ **7**、`grep -o "wisp run: 任务 [^ ]* 结束（[a-z]*" …` ⇒ `stuck` 1 枚 ＋ `completed` 1 枚）后改正为 §7 第 3 条现在的写法。
+- ★**陷阱**：`grep -c "卡住"` 对旧件 ⇒ **0**（状态值是英文 `stuck`），只看这个数会得出"旧件没说卡住"的**反向**错读数。这正是 `ruler-scope-checklist` 第 6 例／落笔四问第 ③ 问。
+- ⇒ **本件的读数凡未亲跑的都标了出处**；凡我发现票面／我自己的转述与读数不符，一律以读数为准并在这里留痕。
