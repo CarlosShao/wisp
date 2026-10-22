@@ -1,6 +1,6 @@
 # 357 — 守卫验的目录必须等于读取者真正 open 的目录（「第一个模型装载器」归口票）
 
-- Status: **ready-for-agent**（`AC#0`／`AC#1` 是只读现量，可先派；`AC#2` 动码，须先过非实现者裁形）
+- Status: **DONE（2026-10-22 10:0x 编排者收口＝六格全闭、文件名加 `-done`）** ~~**ready-for-agent**（`AC#0`／`AC#1` 是只读现量，~~
 - 立案：2026-10-21 14:3x +08 编排者立（**机主当场批**：「1. 可以」＝为「第一个模型装载器」立票）。
 - **为什么现在立**：票 109 的 `AC#6` 票面逐字写着"与「第一个模型装载器」那张票合并收"，但**盘上从来没有那张票**
   （立案时刻读数：`grep -rln '模型装载器'` 只命中票 109 自己；**今天已命中 2 枚**＝109＋357，故该句只可当立案时刻读数引）
@@ -54,11 +54,38 @@
   > **判据（写给写腿）**：`verify` 在 rc=0 的路径上，若枚举到 ADS ⇒ 输出**具名一句**（含流名与"清单未点名"），**rc 仍 0**（⛔ 变红）；若没枚举到 ⇒ 输出与本改前逐字相同（**⛔ 让既有绿变噪**）。
       ★**A 档代价必须写明**：味二要动 `internal/winsec` 加流枚举与 `nlink` 判定＝**Windows-only 新平台件**、且今天**可达性 0**
       （读取者不存在）⇒ 本仓既有口径是"别给没人走的路加第二把锁"。**未拍形任何实现都⛔ 开工。**
-- [ ] **AC#3 落地＋牙（写腿）**：按拍定那一形做；每处改动配**一枚今天响、不修不响**的用例；
+- [x] **AC#3 落地＋牙（写腿）**：按拍定那一形做；每处改动配**一枚今天响、不修不响**的用例；
+  > **2026-10-22 10:0x 编排者翻框＝成立（〔丁〕形落地；三把尺我现跑）**
+  > **新件**：`internal/models/ads_windows.go`（`GetFileInformationByHandleEx`＋`windows.FileStreamInfo`＋手映 **24 B** `FILE_STREAM_INFO`，与 `internal/ball/win32_windows.go:160` 同形）
+  > ／`internal/models/ads_other.go`（`!windows` 恒返空、**文件头具名写 POSIX 那枚只是控制腿⛔ 牙**）／`internal/models/ads.go`（`UnnamedStreams` 走 **`resolveInstalledDir`**）。
+  > ★**裁决书第 3 条那个坑在码面上被钉住**：`ads.go:46` ＝ `dir = m.resolveInstalledDir(id)`（**override 目录**），⛔ `store.root`；
+  > 且`cmd/wisp/models.go:254` 那句 `store=…` **逐字未动**、`:262` 换成 `announceUnnamedStreams357`、**rc 仍 0**。配两枚**成对**用例：`Test357VerifyTailReportsTheVerifiedTreeNotTheStoreRoot` ＋ 配对负例 `Test357StoreRootNamingIsNotWhatTheReportUses`。
+  > ★**`ERROR_MORE_DATA` 重试**：起点 4096 B、×4 增长、**上界 16 MiB**、撞界**返具名错误**（⛔ 静默当空）——正是裁决书点名的那条（不加重试会退化成**假阴**）。
+  > ★**变异 1**（渲染成空）⇒ 4 枚 CLI 用例红逐名报；★**变异 2**（把调用摘掉、渲染函数留着）⇒ **只有** `Test357VerifyTailIsStillOnThePassingPath` 红、其余五枚全绿
+  > ⇒ **这发正是"钩子尺"的价值**：没有它，摘钩后整包全绿而命令退回静默；★**变异 3**（去掉重试）⇒ **`200 planted -> 0 enumerated`**＝**复现了假阴**。
+  > ★**三读数**：还原后 `ads.go`／`ads_windows.go` 两处 sha256 三处同串；`models.go` 归一 CRLF 后三处同为 `B0FE3890…603`（本机 autocrlf 检出形态、入库 blob **389 LF／0 CR**）。
+  > ★**正例 G 仍绿**：stdout **116 B 逐字节相同**（`SequenceEqual=True`、两枚 sha256 `B6B2D4AA…E45`、CR=0）＋ `Test357VerifyTailWithoutAStreamPrintsNothing`（stdout/stderr 都是空串）。
       ★反向判据＝把你新加的那一跳摘掉 ⇒ 用例必须转红并**逐名报红行**；先证变异落地（`grep -n` ＋ `go build` rc=0）再读数。
-- [ ] **AC#4 门禁**：`GOFLAGS= go build ./...`／`go vet` 动过的包／`go test -count=1` 动过的包（四数分开报、⛔ 相减）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
+- [x] **AC#4 门禁**：`GOFLAGS= go build ./...`／`go vet` 动过的包／`go test -count=1` 动过的包（四数分开报、⛔ 相减）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
+  > **2026-10-22 10:0x 编排者翻框（六把门我自己现跑）＝成立**
+  > `GOFLAGS= go build ./...` **rc=0**／`go vet ./internal/models/ ./cmd/wisp/` **rc=0**／`go test -count=1 ./internal/models/` **rc=0**（`ok`）／
+  > `sh scripts/d22scan.sh` **rc=0 clean**／★**格式甲尺（入库 blob 树）0 枚**。
+  > ★**`Test357*` 六枚我单独同发跑：全 PASS**（`VerifyTailSaysOneSentenceAndKeepsRC0`／`VerifyTailWithoutAStreamPrintsNothing`／`VerifyTailReportsTheVerifiedTreeNotTheStoreRoot`／`StreamNoticeIsTheOneSentence`／`VerifyTailIsStillOnThePassingPath`／`StoreRootNamingIsNotWhatTheReportUses`）。
+  > ⚠ **`cmd/wisp` 整包 `rc=1` ⛔ 本票的伤**：红名 **1 枚** `TestAC14GoSideEvalPushReachesThePage`＝**既有红**（台账 `:20471` 早就具名）＋**死点 1 枚**（`A1100` 同族）⇒ **新增红 0**。
+  > ★★**path-length 门禁一开始 RED，根因是**我**、⛔ 它**：我改名 `181`／`275` 加 `-done` 后**超预算**，而名册里写的是**旧名**（`275` 根本没条目）。
+  > 我已修名册（`181` 旧名→新名 1 处 ＋ 补 `275` 条目）⇒ 现跑 `over-budget=61 / covered by roster=61 / not in roster=0`、**VERDICT GREEN**。
+  > ★这是**同一坑第 2 次**（`A1076` 记过第 1 次）⇒ 定式：**改名加 `-done` 后必须同笔把名册一起改**，且**立刻现跑门禁**（⛔ 等别人报）。
       ★`cmd/wisp` 整包必抬 `-timeout 30m`（台账 `A1079`）；⛔ `CGO_ENABLED=0`（本仓必然编不过）。
-- [ ] **AC#5 纪律格**：⛔ 翻任何框（本票各格由非实现者裁）、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 109 任何原句（互指只在本票尾追加）。
+- [x] **AC#5 纪律格**：⛔ 翻任何框（本票各格由非实现者裁）、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 109 任何原句（互指只在本票尾追加）。
+  > **2026-10-22 10:0x 编排者翻框（纪律格由编排者判，四问逐问现跑）＝成立**
+  > ①**越界**：票 357 全部腿笔（`357-a1` 普查／`357-r1` 落地含停手件与交付件）逐笔 `git show --name-only` 判——
+  >   `3843d651`／`aeea4e5b`／`876aa377`／`fc9ffa95`／`47a631be` **越界合计 0**；其中 `aeea4e5b` 是**唯一带 `.go` 的一笔（8 枚全 `.go`）**。
+  > ②**零 push**：`origin/dev..HEAD` ＝ **346**（非空）⇒ 所有腿笔**只在本地**。
+  > ③**⛔ 改票面**：`git log --all -- 'issues/357-*.md'` 的**非编排者**提交 = **0 枚** ⇒ 票面只我动过。
+  > ④**⛔ 改台账**：同上，非编排者提交 = **0 枚**。
+  > ★**两条停手都是正当的**：第一发撞"派单前提事实上错了"（`FindFirstStreamW` 在 x/sys v0.48.0 **不存在**，我独立核实）⇒ **停手对**；
+  > 续跑发**零手写 syscall**（用 `GetFileInformationByHandleEx`）、**未动 `internal/winsec`**、**未加依赖** ⇒ 三条停手条款均未触发。
+  > ★**它另主动登记一处自己的错**：`cmd/wisp` 新用例件初版真被 `gofumpt` 咬一格（`"…tell "+` 应写成 `"…tell +`），已改、改后 0 命中 ⇒ **自报不掩**。
 
 ## 硬约束
 
