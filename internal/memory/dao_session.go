@@ -188,14 +188,21 @@ func (s *Store) RenameSession(ctx context.Context, id, title string) error {
 // SetSessionArchived archives (archived=true) or restores (false) a session.
 // Archiving is reversible by construction: the undo is the same call with
 // archived=false, and neither branch deletes a row or a turn.
+//
+// The two branches write archived_at and NOTHING ELSE (ticket 166 AC#2, item 4:
+// "归档带撤销"). updated_at is the row's last-activity stamp — it is what
+// ListSessions/SearchSessions order by — so a stamp written here would buy two
+// lies at once: archiving would count as activity, and the UNDO would move the
+// row to the top of "newest first", i.e. undoing would not put the conversation
+// back where it was. An undo that reorders the list is not an undo; the ticket's
+// whole point is that archive is a mask the user can take back.
 func (s *Store) SetSessionArchived(ctx context.Context, id string, archived bool) error {
-	now := observe.NowWallUTC().Unix()
 	var stamp any
 	if archived {
-		stamp = now
+		stamp = observe.NowWallUTC().Unix()
 	}
 	return s.write(ctx, func(ctx context.Context, tx *sql.Tx) error {
-		res, err := tx.ExecContext(ctx, `UPDATE session SET archived_at=?, updated_at=? WHERE id=?`, stamp, now, id)
+		res, err := tx.ExecContext(ctx, `UPDATE session SET archived_at=? WHERE id=?`, stamp, id)
 		if err != nil {
 			return err
 		}
@@ -253,9 +260,10 @@ func (s *Store) ForkSession(ctx context.Context, parentID, newID string) (Sessio
 //
 // Appending a turn IS a touch of the conversation, so the same transaction
 // refreshes session.updated_at to the stamp of the turn it just wrote (ticket 326
-// AC#1): without it, "list newest-first" sorts by the last time the user renamed,
-// archived or forked the conversation and never by the last thing they said, so a
-// live chat cannot rise to the top of the list.
+// AC#1): without it, "list newest-first" sorts by the last time the user renamed
+// or forked the conversation and never by the last thing they said, so a live
+// chat cannot rise to the top of the list. (Archiving is deliberately NOT in that
+// list of touches any more — see SetSessionArchived: undo has to be exact.)
 //
 // Two constraints shape the how:
 //   - ONE transaction. The INSERT and the UPDATE share s.write, so a kill between
