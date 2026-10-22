@@ -1,7 +1,7 @@
 # 票 360 终裁腿 `360-v1b` 判语 —— `360-r2` 的补强堵住了 `360-v1` 判的那个洞
 
 - 身份：**非实现者终裁腿**（裁决者≠实现者）。⛔ 落任何 `.go`／⛔ 翻任何框／⛔ 改票名·`Status:`·`-done`·台账／⛔ push。
-- 时间：2026-10-22 21:4x–22:2x +08。判据树 HEAD `02b3882c`（开跑 `5b6338f6`；其间他腿 9 笔，`internal/config/` 逐字节未变，见 ⑨）。
+- 时间：2026-10-22 21:4x–22:2x +08。判据树 HEAD `02b3882c`（开跑 `5b6338f6`；其间他腿 9 笔，`internal/config/` 逐字节未变：17 枚非测试 `.go` 工作树 diff 0，见 ⑥）。
 - 被测件：`internal/config/writeguard_adopt_360_test.go` **107 行**、blob `7077bc2b353f0009e593b5cebd3aa3a35d13bb4c`；★**HEAD＝工作树＝仓外导出树三处同串**。
 - 变异台：仓外 `D:\tmp\wisp\20261022\360v1b\tree`（`git archive` 直出 tar；**17582/17582 件、1156/1156 `.go`**，零缺件、零乱码名）。
 - 结论：**`AC#2` 能翻**。那条前置断**不可被同臂断言吞掉** ⇒ `M1＋M3b` 与"全弄哑"两发都**转红在它**（逐字见 ③④）。
@@ -13,7 +13,7 @@
 - **③ 复现**：`STATE 1 after writeback: file.ball.size=60 mem.ball.size=56`（主检出**连跑 5 次不抖**；导出树同）。
 - **④ 正控**：`STATE 2 after one Adopt pass: mem.ball.size=60 file.ball.size=60 report.Hot=[ball]`（同上）。
 - **⑤ `M-ADOPT` 前提（票面"红 8 枚"）**：我在导出树 `writeguard.go:169` 后插 `m.cur = deepCopyConfig(base)` ⇒ `go build` **rc=0**、`internal/config` 红 **9 枚**：`TestAC11ControlSnapshotWriteIsWhatRevertsTheHandEdit`／`TestAC1AllowedDirsWriteKeepsAHandEditedKey`／`TestAC3AdoptionClaimsOnlyWhatThisWriteProduced`／`TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory`／`TestAC4PermissionModeWriteKeepsAHandEditedKey`／**`TestWritebackDoesNotAdoptMemoryTheFileKeepsTheHandEdit`**／`TestHandDeletedScalarLineComesBackAtSchemaDefault`／`TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory`／`TestHandDeletedProviderBaseUrlComesBackAsThePresetValue`。
-  ★**9 ＝ 票面那 8 枚 ＋ 本票新用例 1 枚**（新用例当年还不存在、量不到）⇒ 票面"8"的**数字今天已不可逐字复现，但结论（那 8 枚全是他票格的顺带断言）成立**；且新用例在 `:60`／`:65`／`:99` 红 ⇒ **它对产码侧那一跳有牙**。还原 `sha256 efe12661…47bd` ＝ HEAD blob。
+  ★**9 ＝ 票面那 8 枚 ＋ 本票新用例 1 枚**（新用例当年还不存在、量不到；那 8 枚逐名落在票面那四个文件上：`settings_248` 1／`writeguard_226` 4／`writeguard_handedit_227` 1／`writeguard_unnailed_341` 2）⇒ 票面"8"的**数字今天已不可逐字复现，但结论（那 8 枚全是他票格的顺带断言）成立**；且新用例在 `:60`／`:65`／`:99` 红 ⇒ **它对产码侧那一跳有牙**。还原 `sha256 efe12661…47bd` ＝ HEAD blob。
 - **⑥ "间接已钉"那一发：★我没复量**。原因＝**环境限制**：`cmd/wisp` 测试二进制在本机导出树起不来（`exit status 0xc0000135`＝`STATUS_DLL_NOT_FOUND`，**未变异基线同码**）⇒ 非突变所致；`TestAC6AHandEditIsStillSeenUnderTheRealPoll` 全仓只在 `cmd/wisp/always_write_no_clobber_227_test.go:125`，`internal/config` 无同题用例。★⛔ 当"我复现了"。
 
 ## ② 本格唯一判点：那条前置断是否真的不可被吞掉
