@@ -120,8 +120,10 @@
 
 ## 6 提交（逐枚；`git show --name-only` 逐枚核 `.go` 与越界）
 
-- ① `62a1521cb411421c069b7dcf960fe1c2490b95a3` —— 本格的 **`.go`**（1 file changed，+41/−26，全在注释／措辞）。
-- ② 承载**本件**的提交：`git log -1 --format=%h -- docs/evidence/s1/164-r1-impl.md` ⇒ `git show --name-only` 应**只列本件**、**零 `.go`**（本件落库即成事实，命令可复核）。
+- ① `62a1521cb411421c069b7dcf960fe1c2490b95a3` —— 本格**唯一 `.go`**：`git show --name-only` 列 1 枚
+  `internal/tools/task_output_ac2_before_test.go`（`grep -c '\.go$'`＝1；写面外＝0）；1 file changed，+41/−26，全在注释／措辞。
+- ② `ec8786e18…`（`ec8786e1`）—— 承载**本件**：`--name-only` 列 1 枚 `docs/evidence/s1/164-r1-impl.md`（`.go`＝0；写面外＝0）。
+- ③ 把 ② 的提交号写进本节的那笔**也是 docs-only**（只列本件、`.go`＝0）——本行不写死它自己的号，命令可核。
 - **正控（证明这把 `--name-only` 尺不是瞎子）**：同尺打在上面那笔**含 `.go` 的真提交**上 ⇒
   `git show --name-only --format="" 62a1521cb` 输出 **1 枚**＝`internal/tools/task_output_ac2_before_test.go`（`grep -c '\.go$'`＝**1**）⇒ 尺能看见 `.go`，"没列 `.go`"才是真读数。
 - 越界：`internal/session/**`／`internal/memory/**`／`internal/risk/**`／`internal/panel/**`／`internal/config/**`／`cmd/**`／`scripts/**`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件＝**零字节**（写面只有上列两枚）。⛔ push；⛔ 台账；⛔ 票名／`Status:`／`-done`。
