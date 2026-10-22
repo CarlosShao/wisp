@@ -50,7 +50,18 @@
       锚点=承载行为那一行、同链 `grep -n` 证落地、`go build` rc=0 先过；
       门禁按包 `-count=2 -v` 四数 + `gofmt` + d22scan 纯净快照 rc=0 台账不降。
 
-- [ ] **AC#6**（**2026-09-23 10:1x 编排者加**，来源＝`acceptor-ticket121` 的「`R-109-1` 仍开」+ `R-121-3`）：
+- [x] **AC#6**（**2026-09-23 10:1x 编排者加**，来源＝`acceptor-ticket121` 的「`R-109-1` 仍开」+ `R-121-3`）：
+  > **2026-10-22 10:0x 编排者翻框＝成立（★这一格是"移交给票 357 且 357 已闭环"，⛔ 本票自己做的）**
+  > 本格于 2026-10-21 14:4x **迁入票 357**（机主批「1. 可以」），票面逐字写「**本格⛔ 在本票翻（迁出不等于完成）**，判据与牙全在票 357」。
+  > ★**我今天现跑确认票 357 已六格全闭**（`357-…-done.md`、`已勾 6／未勾 0`、结案提交 `d2a78bbd5`）⇒ **迁出目标已完成** ⇒ 本格按"移交且已闭"翻。
+  > **票 357 对本格的覆盖（逐条可核）**：它的 `AC#0` 整段承接本格原文＝"守卫验的目录 ⇄ CLI 打印的 `store=` 行 ⇄ 读取者真正 open 的目录，三者有/无 `local_override` 两发逐字摆出"；
+  > `AC#1` 承接裁腿 `109-v2` 新量到的 NTFS 命名流/硬链接面；`AC#2` 由我拍〔丁〕（`verify` 报"与清单一致"时若枚举到 ADS **必须明说一句**、rc 仍 0）；
+  > `AC#3` 落地（`internal/models/ads.go:46` 走 **`resolveInstalledDir`** ＝ override 目录、⛔ `store.root`；`ERROR_MORE_DATA` 重试上界 16 MiB）；`AC#4`／`AC#5` 门禁与纪律。
+  > ★**本格那句原始症状**（真进程量到"store 里一个字节都没有，却报与已验签清单一致"）在票 357 已有**成对用例**：`Test357VerifyTailReportsTheVerifiedTreeNotTheStoreRoot`（正向）＋ `Test357StoreRootNamingIsNotWhatTheReportUses`（配对负例）。
+  > ★**本票 `R-109-2`／`R-109-3` 两格小账**：均已在 `AC#4` 落地（`handoff_ac4_109r1_test.go` 字节面钉子／`handoff_ac4_principal_109r1_windows_test.go` 的 `ac4BreakLineTwo`）；
+  > ★**唯一阻塞项 `R-109-4`**（守卫"是调用点自带的、不是 choke point 强制的"）**归票 121**，而 **票 121 已 `-done`** ⇒ 三笔账全部有归宿。
+  > ⚠ **本票 `Status` 仍是 `rejected-needs-fix`（2026-09-21 的总判 FAIL-退回）**——那一判的**理由是"落点"**（`internal/models` 不在 `cmd/wisp` 依赖图、`DownloadingBridge.Run` 生产调用者 0），
+  > 而那个落点问题**已经由票 121 解决**（接线＋通用仪器）。⇒ 本格翻**不自动**把 `rejected` 改成通过：★**那要另一次非实现者总判**，⛔ 我在这一格里顺手改。
       **守卫验的目录必须等于读取者真正 open 的目录**。验收方实测到：`VerifyInstalled` 的目标**跟着 config 走**——
       有 `local_override` 时验的是覆盖目录，而 CLI **同一行仍打印 `store=…models`** ⇒
       真进程量到「store 里一个字节都没有，却报与已验签清单一致」；去掉那行 config 后同一枚被篡改 store ⇒ rc=1 并点名 sha256 mismatch。
