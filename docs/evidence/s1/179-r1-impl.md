@@ -108,3 +108,11 @@ call kind=success tool=fs.read    risk=L0 decision=allow outcome=success rules_h
 ## §8 本程**没有**做的事
 
 ⛔ 未翻框／未改票面（含 Progress log）／未改台账／未 push。⛔ 未动 `cmd/**`（因此 `AC#8` 的证据只能是台件读数，不是 tracked test）。⛔ 未开新票（`MODE-REDLINE` 那枚归编排者裁）。⛔ 未替票 177/175/176 翻它们的框——§2 只是**它们要的那一发读数**，勾不勾由各自裁决程判。
+
+## §9 提交后复量（★最后一次读数在最后一枚提交之后取）
+
+- 本件的提交＝`32c8eeac`：`git show --name-only` ⇒ **1 枚**：`docs/evidence/s1/179-r1-impl.md`。★**本件自己的提交号不写进本件**（防自我推翻，票 160 `02b3882c` 的先例）；本节这枚补写落在**下一笔**。
+- **提交后**（HEAD `32c8eeac`）五道门重跑：`go build ./...` **rc=0**／`go vet ./internal/agent/` **rc=0**／`sh scripts/d22scan.sh` **rc=0**／`sh scripts/check-path-length-budget.sh` **rc=0**／gofumpt 甲尺 **rc=0**；`go test -count=1 ./internal/agent/` ⇒ **rc=0、`PASS=102 FAIL=0 SKIP=0 RUN=131`、`ok … 9.330s`**。
+- 片刻后另一条腿把 HEAD 推到 `394cc212`，我在**同一棵树＋一枚别人的提交**上再取一次细读数（`logs/62-postcommit-gates-detail.txt`）：d22scan **rc=0**（`clean - no D22 ban violations`；`ban #8 internal/=620`、`cmd/=148`）、pathlen **rc=0**、gofumpt 甲尺 **rc=0** 且 `total=20 / internal=0 / cmd=0 / docs=0 / .scratch=20`。
+- `.go`／越界尺（★**正控＝同尺打一笔含 `.go` 的真提交**）：`32c8eeac`（本件）⇒ 1 枚、**`.go`=0**、`internal/`+`cmd/`=**0**、写面内；`ec520750`（**正控**，票 179 修法那一笔，非本程）⇒ **2 枚 `.go`**（`internal/agent/loop.go`、`internal/agent/declared_l0_risk_179_test.go`）⇒ 同尺在真 `.go` 提交上**报得出来**，不是瞎尺。
+- 终态：`git status --porcelain -- internal/agent` **空**；`internal/agent/loop.go` 的工作树与 `HEAD` blob sha256 同为 **`e14f73b1458c411511523ed19e91f7f19a79ce0c863d5abd6358605fc476df72`**。
