@@ -69,9 +69,9 @@
 | 提交 | 主题 | 文件数 | `.go` | 越界 |
 |---|---|---|---|---|
 | `095699f2` | 票 360 续跑腿 360-r2: 把"该 Adopt 臂真的跑过"独立成一条不可被同臂断言吞掉的前置断 | **1**（`internal/config/writeguard_adopt_360_test.go`） | **1** | **0** |
-| `（见 §11.1）` | 票 360 续跑腿 360-r2: 交付件（补强读数／判据红行／sha256／门禁） | **2**（`360-r2-impl.md`、`360-r2-impl-part2.md`） | **0** | **0** |
+| `16898169a` | 票 360 续跑腿 360-r2: 交付件（补强读数／`M1＋M3b` 判据红行／`sha256`／零产码／门禁） | **2**（`360-r2-impl.md`、`360-r2-impl-part2.md`） | **0** | **0** |
 
-★§11.1 的提交号由本腿在提交后现填（填法同 `360-r1`：逐笔 `git show --name-only` 现核）。
+★**§11.1 本节的现填笔**：本节把上表第二行的提交号与逐笔读数补上，自身另成一笔（主题同以 `票 360 续跑腿 360-r2` 开头），`git show --name-only` 读数见下。
 
 - 越界判据＝`internal/config/*_test.go` ∨ `docs/evidence/s1/*` ⇒ **OUT_OF_SCOPE=0**。
 - `git rev-parse 095699f2:internal/config/writeguard_adopt_360_test.go` ⇒ `7077bc2b…` ＝ `git hash-object` 工作树同串 ⇒ **提交内容与工作树逐字相同**。
