@@ -855,12 +855,36 @@ func (p *Provenance) matchText(scopeID string, marks []*taintMark, ch Channel, t
 
 // Detector returns the frozen C19 TaintDetector seam bound to one scope.
 // Without a tool name it applies the conservative generic scan (see Inspect).
+//
+// What comes back is a BORROW, not an ownership (ticket 160 AC#4). The caller
+// may read this scope's taints; it may not close it, and this function hands
+// out nothing that could close it. Closing at the borrow point would drop marks
+// that the scope's own handle still owes the rest of the task's life, so the
+// ordinary SECOND TaintHit on the same borrowed detector - not an attack, just
+// the next call - would answer "no taint" while the task's content is unchanged:
+// silent, and in the fail-open direction. The live shape this protects is
+// (*taintSourceFlag).detector in cmd/wisp/panel_assets.go, which opens one
+// process-lifetime scope and hands its Detector to the card's assembler.
 func (p *Provenance) Detector(scopeID string) TaintDetector {
 	return boundDetector{p, scopeID}
 }
 
+// detectorSeam is the ONLY face of the engine a borrowed detector is given: one
+// read method, no route to the scope map, no close-shaped method to call. The
+// point is what cannot be written through it - "close it where it was borrowed"
+// needs this interface WIDENED first, which is a visible, reviewable act instead
+// of a stray line. TestScopeBoundary160BorrowFaceCarriesNoCloser reads the
+// method set off this type, so a second method cannot land here unnoticed.
+type detectorSeam interface {
+	Inspect(scopeID, tool string, params map[string]any) (Hit, bool)
+}
+
+// The engine keeps its full face; only the borrow is narrowed. If Inspect's own
+// signature ever moves, this line stops building before any verdict can.
+var _ detectorSeam = (*Provenance)(nil)
+
 type boundDetector struct {
-	p     *Provenance
+	p     detectorSeam // borrowed: one read method, no closer (see detectorSeam)
 	scope string
 }
 
