@@ -143,3 +143,10 @@ after refused migration: schema_version = 3   rows = 2
 5. **台面**：照派单字面 `unset TMPDIR TEMP TMP` 会在 `internal/memory` 造一枚**假红**（§7 末），与本笔无关；后续腿照抄会把假红读成新红。
 
 ★一句话：**〔乙〕的形状是对的（名册一处权威、SQL 由 Go 生成、v4 重建走同一条 3→4、先点名再动手），读数是真的，反向判据是真的，老库是真能打开 —— 这票可以结。** 它交的 4 条写面外事项，处置**全部正确**，其中 ② 已由 `196-c1` 闭环、① 已由票 365 接住。
+
+## §11 本笔提交号与提交后复跑（⛔ amend，追加一笔）
+
+- 本件提交 **`0071e0d8e`**：`git show --name-status` ⇒ **1 枚 `A docs/evidence/s1/196-v1-verdict.md`**，⛔ push。提交前 `git diff --cached --name-status` 只有这一行（无 `D`／无误带 `A`）。
+- 提交后复跑（`unset GOTMPDIR`、`GOFLAGS=`；复跑时 HEAD `191dfdf0b`——本笔之后 `132-r1` 又落了 2 枚件）：`sh scripts/check-path-length-budget.sh` **rc=0** ⇒ `tracked paths=17628  over-budget=61  covered by roster=61  not in roster=0` `VERDICT GREEN`；`sh scripts/d22scan.sh` **rc=0** `clean`（internal 630／cmd 148 Go 文件）。
+  ★**§7 里的 `17625` 是提交前快照**：`+3`＝本件 1 ＋ `132-r1` 那 2 枚；`over-budget`／`roster` 两数**没变**。这就是我在 §1 批评它"引用会腐"时说的那件事——**我自己也把数锚在 HEAD 上，所以提交后重取一次**。
+- ★**`git log 6e19f4a43..HEAD -- internal/memory internal/statemachine` 复跑仍为 0 笔** ⇒ 本件 §2–§9 的代码读数不因这几笔而变。
