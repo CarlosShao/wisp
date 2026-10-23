@@ -2,7 +2,8 @@
 
 - 腿＝`362-r1`（**写腿／实现者**）。⛔ 翻框、⛔ 改票名／`Status:`／`-done`、⛔ 改台账、⛔ push。
 - 写面实动：`.github/workflows/ci.yml`（**只那一处调用面 ＋ 那步注释**）＋ 本件。`internal/`／`cmd/`／`scripts/`／`tools/` **零字节**。
-- 台面：起手锚 `51bb042b`（导出树 1）／`8d3ad434`（交件时 HEAD，导出树 2）。★两树之间 `.go` 改动 **0 枚**（`git diff --name-only 76ae3bbb..HEAD -- '*.go'` 空）⇒ 下面 20 枚在两根树上逐枚同名。
+- 台面：起手锚 `51bb042b`（导出树 1）／`8d3ad434`（导出树 2 时 HEAD）。★两树之间 `.go` 改动 **0 枚**（`git diff --name-only 76ae3bbb..8d3ad434 -- '*.go'` 空）⇒ 下面 20 枚在两根树上逐枚同名。
+- ★本件所有可复跑命令一律写**具名提交号**、⛔ 写 `HEAD`：派单锚＝`76ae3bbb`，本腿起手时 HEAD 已漂到 `51bb042b`、导出树 2 时 `8d3ad434`，之后 HEAD 继续漂（别的腿在提交）⇒ `..HEAD` 这种写法在本仓会当场腐坏。
 - 环境：`unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；`gofumpt` 一律**绝对路径** `/d/work/base/gopath/bin/gofumpt.exe`（`v0.12.0 (go1.27.1)`）。
 
 ## 0 ★机主批准（逐字）
