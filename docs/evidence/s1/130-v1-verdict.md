@@ -103,4 +103,4 @@
 | 1 | `b19c6612e` | `docs/evidence/s1/130-r1-impl.md`（A）＋`internal/observe/earlylog_takeover_130r1_test.go`（A）＋`internal/observe/logging.go`（M） | **0** |
 | 2–5 | `8f205a6db`／`66e16de00`／`759b10677`／`701448b79` | 各只改 A 件一枚 | **0** |
 - 五笔 `.scratch/wisp/**` 零命中（票面未被改）；`logging.go` 相对 `b19c6612e^`＝**55 增 / 2 删**（`--numstat`；`--stat` 的 57 是增删合计），无 `D`、无写面外 `A`。
-- **本件**：第一笔只落本件；第二笔只落本行提交号（`SELF`）。
+- **本件**：第一笔 `c3ca063d0` 只落本件；第二笔只落本行（写面仍只本件一行）。索引核：`git diff --cached --name-status` 里另有一笔**他腿已入索引的改名**（票 132 `…-done.md`，`R075`）⇒ 本件两笔都用**显式 pathspec 提交**，未吞、未动它。
