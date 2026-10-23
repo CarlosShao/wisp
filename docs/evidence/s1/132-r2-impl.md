@@ -106,7 +106,7 @@
 | `go build ./...` | **0** | 日志 0 字节 |
 | `go vet ./cmd/wisp/` | **0** | — |
 | `sh scripts/d22scan.sh` | **0** | `clean`；`bans #1-5 internal/=248 cmd/=42`；`ban #8 internal/=631 cmd/=148`（与 `132-v1-verdict.md:100` 逐字同 ⇒ 没动被计的东西） |
-| `sh scripts/check-path-length-budget.sh` | **0** | `VERDICT GREEN`；`tracked paths=17638  over-budget=61  covered by roster=61  not in roster=0` |
+| `sh scripts/check-path-length-budget.sh` | **0** | `VERDICT GREEN`；交付树（`442b6c588`）现读 `tracked paths=17639  over-budget=61  covered by roster=61  not in roster=0`。分母**随别家提交动**：落笔时 17637；并发腿 `130-r3`（`3256480ee`）先落地 ＋1；本件 ＋1 ⇒ **17639**（首笔 `442b6c588` 写的是 17638，那是我按落笔时的树算的；本笔按交付树现读改正 —— 这正是本票要治的那类"数字比树旧"） |
 | `gofumpt -l cmd/wisp`（绝对路径） | 0 | **1 行 `cmd\wisp\models.go`** —— ⛔ 不是本笔，见 §5 |
 | `gofmt -l cmd/wisp/logsink.go` | 0 | **0 行** |
 | CRLF（`tr -cd "\r" \| wc -c`） | — | 落笔 4 枚**全 0** |
