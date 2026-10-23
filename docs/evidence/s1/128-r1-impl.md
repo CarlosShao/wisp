@@ -113,4 +113,7 @@ wisp: boot failed: 数据根无法解析：用户配置目录不可得（OS 原�
 ## 11. 提交
 
 - **`internal/proc` 那半 ⛔ 未提交**：它与 `cmd/wisp` 那半必须**同笔**才同时满足 AC#5 ① 与"新增红=0"（只落 proc 半 ⇒ `dataroot_128_windows_test.go:76` 一枚新红，§3 已实测）。派单⛔ `cmd/**` ⇒ 按"要动先停手上报"，交 §8 的 patch 由编排者裁。
-- 本笔唯一提交：本件 `docs/evidence/s1/128-r1-impl.md`（写面内）；提交号见件尾。
+- 本笔唯一提交：本件 `docs/evidence/s1/128-r1-impl.md`（写面内），提交号 **`d9e9fbc5a`**。
+  - 同尺读数：`git show --name-only d9e9fbc5a` 只带这一枚路径；`.go` 命中 **0**；写面外命中 **0**。
+  - **正控**（证尺能看见 `.go`）：同尺打 `bf25809a3`（135-r1 的一枚真提交）⇒ `.go` 命中 **1**（`internal/proc/envfork_test.go`）。
+- 窄射程补一枚对照：改前（`HEAD`）同一 `-run` 名单 **6 枚 PASS**（两枚本笔用例在 HEAD 里不存在）；改后 **7 枚 PASS／0 FAIL**。
