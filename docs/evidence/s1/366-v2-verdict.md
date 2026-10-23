@@ -66,7 +66,7 @@
 - **四源同值 16/16**：工作树＝`posttree`＝`restoretree`＝`git cat-file blob HEAD:` 逐枚相等（`logs/95`），且 `git status --porcelain -- internal/memory` **0 行**。
 - ★**归因核（逐条都是可复现的值，不是说法）**：`366r1/posttree/internal/memory/open.go` 的 SHA-256 **＝** `3D9F265541DFD34A046A6D92F15F4B04E79321DCB6AC88222715ECC8D3D70F56`、**len 26745**；r1 入库 blob（`567e4347f`，`c2e47f70c:internal/memory/open.go`）**＝** `d13000B18C2BD5C38D0FEFA8AFE33624AF9DA09F5A985683E61506D0921CE6DF`、**len 26781**；**26781−26745＝36**，而 `diff -u` 恰是 **3 行删／3 行增**、位置＝`ForeignKeyAudit()` 的 doc（旧 `(see ForeignKeyAudit's doc comment) and never…` → 新 `(the ForeignKeyAudit type's doc comment says why, with the measurement) and never…`）；三行字节 **187／223 ⇒ 差 36**（与文件差**逐字节对上**）。
 - ⇒ **r2 的归因对**：r1 量在"最后一次注释改写之前的那份 posttree"，之后没与交付字节对齐；**不是**变异产物（v1 的 M1 `dde55d69…`／len 26728、M2 `977b6bdd…`／len 26972，我现算复核，两值都对；**不是**别的文件：r1 同目录另三枚＝r1 自己的入库 blob，只有 `open.go` 差）。
-- 时序：四枚量在 **M5 之后**（`restoretree` 是最后一发变异之后才导出，`logs/71`）；提交后复跑绿 `rc=0`。
+- 时序：四枚量在 **M5 之后**（`restoretree` 是最后一发变异之后才导出，`logs/71`）；**提交后复跑 G3**：`rc=0`、120/66/0/2（`ok 24.414s`，`logs/99`）。
 
 ## ⑥ 两条小上报（我自己数／自己造牙）
 
@@ -90,7 +90,7 @@
 | `M4` | 去 clone（算出即弃） | **rc=1**；1／0 | `:635` |
 | `M5` | 坏尺变锁（仅审计步 `!Checked` ⇒ 拒开） | **rc=1**；1／3 | `:524,:570,:593` |
 
-- 还原核时机＝**最后一发变异（M5 窄形）之后**：`restoretree` 现导，全包 **rc=0／120 RUN／66 顶层 PASS／0 FAIL／2 SKIP**（`ok 25.247s`）；原样绿（`posttree`）与工作树 G3 同值（`ok 26.086s`，G3 在提交前跑，但只提交文档 ⇒ Go 字节与提交后逐字同）；工作树四枚 hash 与 `posttree`／blob 逐枚相同（⑤）。
+- 还原核时机＝**最后一发变异（M5 窄形）之后**：`restoretree` 现导，全包 **rc=0／120 RUN／66 顶层 PASS／0 FAIL／2 SKIP**（`ok 25.247s`）；工作树 G3 提交前 **120/66/0/2**（`ok 26.086s`）、**提交后复跑同四数**（`ok 24.414s`）；工作树四枚 hash 与 `posttree`／blob 逐枚相同（⑤）。
 
 ## ⑨ 门禁 rc（逐门分开、⛔ 走管道取 rc）＋格式两尺
 
@@ -98,7 +98,7 @@
 |---|---|---|
 | G1 | `GOFLAGS= go build ./...` | **rc=0**（0 字节输出） |
 | G2 | `GOFLAGS= go vet ./internal/memory/` | **rc=0**（0 字节输出） |
-| G3 | `GOFLAGS= go test -count=1 -v ./internal/memory/` | **rc=0**；四数分开：`ok 26.086s`／`=== RUN` **120**／`--- PASS`（顶层）**66**／`--- FAIL` **0**／`--- SKIP`（顶层）**2** |
+| G3 | `GOFLAGS= go test -count=1 -v ./internal/memory/` | **rc=0**；四数分开：`ok 26.086s`／`=== RUN` **120**／`--- PASS`（顶层）**66**／`--- FAIL` **0**／`--- SKIP`（顶层）**2**（提交后复跑：rc=0、同四数、`ok 24.414s`） |
 | G4 | `sh scripts/d22scan.sh` | **rc=0**（`clean - no D22 ban violations`） |
 | G5 | `sh scripts/check-path-length-budget.sh` | **rc=0**（`VERDICT GREEN`；over-the-hat 61） |
 
