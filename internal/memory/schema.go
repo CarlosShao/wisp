@@ -382,10 +382,11 @@ const pragmaForeignKeysQuery = "PRAGMA foreign_keys"
 // anything is written, and the message names the pragma, the child table and
 // the fix. It does NOT make the rebuild work under enforcement ON - it cannot,
 // see pragmaForeignKeysQuery. SQLite's documented 12-step ALTER procedure
-// disables enforcement for the duration of a rebuild (its step 1); this package
-// gets that for free because dsn() never sets the pragma (open.go), so what the
-// guard buys is the difference between an accidental precondition and a
-// declared one.
+// disables enforcement for the duration of a rebuild (its step 1); the migration chain
+// takes that step for itself in migrationDSN (open.go), which drops every foreign_keys
+// entry from the shared list and appends exactly one OFF. This guard is therefore a
+// backstop rather than the load-bearing precondition: it fires if that declaration is
+// ever lost.
 //
 // Cost, stated so nobody has to rediscover it: a database that would have
 // survived by luck (zero tool_call rows) is refused too. That is deliberate - a
@@ -416,9 +417,9 @@ func requireForeignKeysOff(tx txExec) error {
 	return fmt.Errorf("memory: refusing to rebuild task_log with PRAGMA foreign_keys=ON: " +
 		"tool_call.task_id REFERENCES task_log(id), so the DROP TABLE the v4 rebuild needs would " +
 		`abort on SQLite's "FOREIGN KEY constraint failed" and name neither a table nor a row. ` +
-		"SQLite's 12-step ALTER procedure disables enforcement for a rebuild (its step 1); this " +
-		"package relies on dsn() never setting the pragma, so something added it - drop the " +
-		"foreign_keys pragma from the migration DSN and retry. Nothing was modified.")
+		"SQLite's 12-step ALTER procedure disables enforcement for a rebuild (its step 1), and " +
+		"the migration connection is supposed to declare that itself (migrationDSN in open.go): " +
+		"something removed that declaration. Nothing was modified.")
 }
 
 // applyV4 rebuilds task_log with the state CHECK (ticket 196).
