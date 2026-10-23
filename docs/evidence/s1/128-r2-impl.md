@@ -41,7 +41,7 @@
 
 - 真进程四行（`cmd/wisp` 定向 `-count=2 -v`，两轮同值，日志逐字 `dataroot_128_windows_test.go:70`）：**run rc=2／secret-list rc=2／doctor rc=1／resident rc=1**；四条子用例两轮 **8/8 PASS**。
 - `assertDirEmpty128`：该 `-v` 流里 `grep -c "wrote into the start-up directory"`＝**0**（两轮 × 四腿＝**8 发全过**）。我另用独立脚本（`run-legs.sh`，四腿+models+providers）现量每个 CWD 事后 `find` 结果＝**空串**（`cwd=[]`），即 **CWD 一个字节都不多**。
-- 定向发汇总：`go test -count=2 -v -run '^(TestAC2[A-Z]|TestAC5|TestDefaultLayout|TestUserConfigDir|TestLayout)' ./cmd/wisp/` ⇒ **rc=0**，`=== RUN` 72／顶层 PASS 36（×2 轮）／`--- FAIL` **0**／SKIP **0**。
+- 定向发汇总：`go test -count=2 -v -run '^(TestAC2[A-Z]|TestAC5|TestDefaultLayout|TestUserConfigDir|TestLayout)' ./cmd/wisp/` ⇒ **rc=0**；尺＝行首 `=== RUN`／`--- PASS`：**顶层 RUN 36（18 用例 ×2 轮）＋子 RUN 36＝`=== RUN` 72 行；顶层 `--- PASS` 36＋子 PASS 36；`--- FAIL` 0／`SKIP` 0**。
 - `go test -count=2 ./internal/proc/` ⇒ **rc=0**、`ok … 3.386s`。
 
 ## 5. 「五条 CLI 腿文本零变化」我自己复现（471 字节／同一 `sha256`）
@@ -92,4 +92,4 @@
   4. `internal/proc/envfork.go`
   5. `internal/proc/envfork_test.go`
 - 提交前 `git diff --cached --name-status` 只有这五枚 `M`，**零 `D`／零 `A`**；`internal/observe/**`、`.scratch/**`、`docs/reports/**` 未入索引（`git status` 里别人的 `M` 原样留着）。提交后索引空、五枚工作树干净。
-- 件笔：本文件（`docs/evidence/s1/128-r2-impl.md`）单独一笔，含上面那枚提交号。
+- 件笔：本文件自己的提交＝**`811f127ed`**（首笔）；其后若有一处行内更正，以**追加笔**补入（本仓禁 `--amend`），⛔ 不动上面那枚代码笔。
