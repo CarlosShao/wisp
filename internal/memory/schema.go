@@ -356,6 +356,71 @@ func taskLogStatesOutsideRoster(ctx context.Context, tx txExec) ([]string, error
 	return out, nil
 }
 
+// pragmaForeignKeysQuery reads the connection's foreign-key enforcement switch.
+//
+// It is READ ONLY on purpose. SQLite makes "PRAGMA foreign_keys=..." a no-op
+// while a transaction is open, and the migration chain already runs every step
+// inside one (open.go's applyMigrationStep). Measured on this driver: with the
+// switch off, setting it ON inside the step's transaction leaves it at 0, while
+// the same statement on the same connection with no transaction open flips it
+// to 1. So applyV4 cannot disable enforcement for itself - it can only refuse
+// to run under it, which is what requireForeignKeysOff does.
+const pragmaForeignKeysQuery = "PRAGMA foreign_keys"
+
+// requireForeignKeysOff is the guard ticket 196's r2 leg puts around the rebuild.
+//
+// The v4 rebuild drops task_log and recreates it, while tool_call.task_id
+// carries a REFERENCES task_log(id) clause (ddlV1). Under enforcement ON,
+// DROP TABLE runs an implicit DELETE FROM first, so with any tool_call row
+// present it aborts on SQLite's "FOREIGN KEY constraint failed" - a message
+// that names neither the table nor a row, and that arrives three statements
+// into a destructive sequence, after the CREATE and the INSERT..SELECT have
+// already run inside the same transaction. That is the failure this guard
+// replaces.
+//
+// Refusing here moves the failure to the first statement of the step, before
+// anything is written, and the message names the pragma, the child table and
+// the fix. It does NOT make the rebuild work under enforcement ON - it cannot,
+// see pragmaForeignKeysQuery. SQLite's documented 12-step ALTER procedure
+// disables enforcement for the duration of a rebuild (its step 1); this package
+// gets that for free because dsn() never sets the pragma (open.go), so what the
+// guard buys is the difference between an accidental precondition and a
+// declared one.
+//
+// Cost, stated so nobody has to rediscover it: a database that would have
+// survived by luck (zero tool_call rows) is refused too. That is deliberate - a
+// rebuild whose success depends on how many child rows happen to exist is not a
+// rebuild worth running.
+//
+// A driver that answers the PRAGMA with no row leaves the pre-r2 behaviour in
+// place rather than refusing to open every database on earth; the read itself
+// failing is reported, because that is a real defect rather than a dialect gap.
+func requireForeignKeysOff(tx txExec) error {
+	rows, err := tx.QueryContext(context.Background(), pragmaForeignKeysQuery)
+	if err != nil {
+		return fmt.Errorf("memory: read PRAGMA foreign_keys before the task_log rebuild: %w", err)
+	}
+	defer rows.Close()
+	on := 0
+	if rows.Next() {
+		if err := rows.Scan(&on); err != nil {
+			return fmt.Errorf("memory: read PRAGMA foreign_keys before the task_log rebuild: %w", err)
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("memory: read PRAGMA foreign_keys before the task_log rebuild: %w", err)
+	}
+	if on == 0 {
+		return nil
+	}
+	return fmt.Errorf("memory: refusing to rebuild task_log with PRAGMA foreign_keys=ON: " +
+		"tool_call.task_id REFERENCES task_log(id), so the DROP TABLE the v4 rebuild needs would " +
+		`abort on SQLite's "FOREIGN KEY constraint failed" and name neither a table nor a row. ` +
+		"SQLite's 12-step ALTER procedure disables enforcement for a rebuild (its step 1); this " +
+		"package relies on dsn() never setting the pragma, so something added it - drop the " +
+		"foreign_keys pragma from the migration DSN and retry. Nothing was modified.")
+}
+
 // applyV4 rebuilds task_log with the state CHECK (ticket 196).
 //
 // It refuses BY NAME before touching anything: if a row already holds a word the
@@ -365,8 +430,16 @@ func taskLogStatesOutsideRoster(ctx context.Context, tx txExec) ([]string, error
 // whoever has to repair the database. Refusing here keeps the promise the
 // ticket's second hard boundary makes: a database that satisfies today's
 // vocabulary must open, and a database that does not must say why.
+//
+// Order matters: the foreign-key precondition is checked FIRST, because it is
+// about the connection rather than about the rows, and because SQLite's own
+// procedure puts it at step 1. A run that is wrong in both ways therefore hears
+// about the environment problem before the data problem.
 func applyV4(tx txExec) error {
 	ctx := context.Background()
+	if err := requireForeignKeysOff(tx); err != nil {
+		return err
+	}
 	off, err := taskLogStatesOutsideRoster(ctx, tx)
 	if err != nil {
 		return err
