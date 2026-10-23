@@ -130,8 +130,25 @@ func InitLogWithRegistry(cfg LogConfig, reg *Registry) (*LogPipeline, error) {
 // (including the ticket-03 panic sink) flows through redaction.
 func (p *LogPipeline) Handler() slog.Handler { return p.handler }
 
-// InstallAsDefault makes the pipeline the process-wide slog default.
-func (p *LogPipeline) InstallAsDefault() { slog.SetDefault(slog.New(p.handler)) }
+// InstallAsDefault makes the pipeline the process-wide slog default, and hands
+// it the records spoken before it existed (ticket 130, 130-r1: see the early log
+// buffer block below, "WHO HANDS THE BUFFER OVER").
+//
+// The replay runs BEFORE the default moves, so the file opens with the boot
+// verdict and not with whatever the listener says first. Between the two
+// statements the buffer is already closed and the default has not moved yet, so
+// a record emitted by ANOTHER goroutine exactly there would reach the console and
+// not the file. No leg has another writer at this instant - it is the boot act,
+// and the installer is the only goroutine running - and the ordering it buys is
+// the claim the file is read for.
+//
+// Counts are discarded here on purpose: the caller holds the pipeline and can
+// read the file; FlushEarlyLogRecords stays the way to book the numbers, and it
+// reports 0 after this has run because there is nothing left to hand over.
+func (p *LogPipeline) InstallAsDefault() {
+	_, _ = earlyLogs.drain(p.handler)
+	slog.SetDefault(slog.New(p.handler))
+}
 
 // FlushNow flushes buffered log lines to the current file (no fsync; the
 // periodic flusher also runs while the pipeline is open).
@@ -452,6 +469,34 @@ var _ io.WriteCloser = (*rollingWriter)(nil)
 // design is therefore today's failure set plus a record on disk: if the process
 // dies before a listener is installed, or runs a leg that never installs one,
 // everything it would have printed today still prints.
+//
+// WHO HANDS THE BUFFER OVER (ticket 130's second landing, 130-r1). Two instants,
+// both of them acts that make a listener live, and neither of them construction:
+//
+//   - InstallAsDefault: the pipeline is becoming the process default, which IS
+//     the installation (this package's spelling of slog.SetDefault). The boot
+//     records are replayed into the pipeline here, before the default moves, so
+//     the file opens with the verdict and not with the first thing the listener
+//     decided to say.
+//   - FlushEarlyLogRecords: a caller that wires its own fan-out by hand (the
+//     shape cmd/wisp/logsink.go takes, because it needs the console mirror on
+//     top of the pipeline) asks for the records explicitly. Same replay, same
+//     order.
+//
+// Why the handover is NOT in InitLog: ticket 132 reads the file seal at exactly
+// that instant and needs the boot file to still hold zero bytes
+// (logprivate_132_test.go's TestLogFileIsSealedBeforeTheFirstContentByte132r1).
+// Moving the replay into construction would spend a seal reading this ticket has
+// no business spending - and "the pipeline exists" is not yet "the process
+// listens", which is the distinction the two hooks above make.
+//
+// Why it is not the caller's job alone: it was, until 130-r1, and one leg in the
+// shipped tree already did not do it - `wisp slo` opens the same pipeline
+// through InitLog and its JSONL held zero records while its console printed the
+// sealing verdict. A handover every caller has to remember is the shape this
+// repository has booked as "capability finished, nobody listening" more than
+// once; the sink taking over what preceded it is the shape that cannot be
+// forgotten.
 // ---------------------------------------------------------------------------
 
 const (
@@ -533,6 +578,14 @@ func init() {
 // This is called by cmd/wisp/logsink.go immediately after slog.SetDefault and
 // BEFORE the install record, which is what puts a record made before the
 // listener ahead of the listener's own booking in the same file.
+//
+// It is the SECOND of the two handover instants (ticket 130, 130-r1): a caller
+// that installs the pipeline with InstallAsDefault has already handed the
+// records over, and this then returns 0/0 for "there was nothing left to give
+// you" rather than a count of a replay that happened before the call. A leg that
+// wires its own fan-out (cmd/wisp's installLogSink) does not call
+// InstallAsDefault and keeps using this, which is why the numbers it books are
+// unchanged.
 func FlushEarlyLogRecords(next slog.Handler) (flushed, dropped int) {
 	return earlyLogs.drain(next)
 }
