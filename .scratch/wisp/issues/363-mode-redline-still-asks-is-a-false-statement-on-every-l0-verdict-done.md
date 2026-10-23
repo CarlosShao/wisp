@@ -1,6 +1,6 @@
 # 363 — 生产日志每一发 L0 都在说假话：`MODE-REDLINE … still asks` 而实际放行
 
-- Status: **ready-for-agent**
+- Status: **DONE（2026-10-23 10:4x 编排者收口＝五格全闭＋两格判语到位、文件名加 `-done`）** ~~**ready-for-agent**~~
 - 立案：2026-10-22 23:2x +08 编排者立
 - ★**来路（非实现者签名）**：`179-r1`（写腿，件 `docs/evidence/s1/179-r1-impl.md`、4 笔 `32c8eeac`／`18e3f670`／`0aa30ede`／`8956ece7`）§7① 具名上报
 - ★**编排者已现跑核实四条链**（见下）
@@ -112,12 +112,38 @@
 > - ★**`Deny` 那条**：日志要**说真话**（它是**禁令**、⛔ "会问"），★**但 `Deny` 的 `Kept` 语义按 `mode.go:143-146` 是"只在红线拒绝静默时非空"** ⇒ ★**落地腿必须先读清 `Kept` 契约再动**。
 > - ★★**两包顺序**：`internal/risk`（`Screen` 一形）与 `internal/tools`（日志一形）**必须串行或同一腿**（★**同包只一枚写腿、跨包也要避免与别的腿撞**）。
       〔乙〕**`mode.Screen` 认 L0**（让它返回 `Kept=""`、不进"无法识别"支）；〔丙〕**两者都做**。★**未裁形任何实现都⛔ 开工**。
-- [ ] **AC#2 落地＋牙（写腿）**：按裁定那一形做；★**每处改动配一枚今天响、不修不响的用例**；
+- [x] **AC#2 落地＋牙（写腿）**：按裁定那一形做；★**每处改动配一枚今天响、不修不响的用例**；
+> **2026-10-23 10:4x 编排者翻框＝`AC#2` 成立、`AC#3` 成立（凭**非实现者** `363-v1`，件 `docs/evidence/s1/363-v1-verdict.md` **157 行**／0 CR、提交 `fede8ab88`＋`062030af3`、**零 `.go` 字节**）**
+> **① 它自造的读数（⛔ 采信自报：仓外 `-overlay` 探针、真 D34 声明／真 R1–R9／真 C26，卡数＝`Gate` 两回调）**
+> - **`L0` 三档**：★**无任何 `MODE-` 行**、`kept=""`、`CARDS 0/0`、`decision=allow`、`text="hello"`、`ModeKept=""`／`ModeSilenced=false`。
+> - **`Deny` 两档**：`MODE-REDLINE … refuses … (a Deny never reaches a gate: no card is raised)`、`0/0`、`decision=reject`、`isError=true`。
+> - ★**正控**：`L1/ask_every_step` 窗口＝1 且**没有那行**；`L1/ask_high_risk` 0 卡走 `MODE-SILENCE … not an allow`；`L2` 两档各 **1 张审批卡**且 `still asks` **是真的**；
+>   ★★**它另加 `L2/ask_every_step` ⇒ 1 卡、无 `MODE-REDLINE`（没人扣住它）** ⇒ ★**证明不是"把日志全关了"**。
+> **② 四档无回归（各一发）**：`L0` 放行／`L1` 窗口 1 ＋ **写入真落盘**／`L2` 审批 1／`Deny` 拒；
+>   ★`bridge.go` **`+13/−0`（全文零删除）**、`mode.go` **`+25/−1` 且唯一的 `−1` 是注释** ⇒ ★**`route` 的 `case risk.L0`（现 446–448）一字未动、两文件纯插入** ⇒ ★**这是"没动行为"最硬的证明形状**。
+> **③ ★`Kept` 契约未动（判语逐字核）**：`mode.go:143-146` 逐字未变、`Deny` 的 `Kept` 文本逐字未变；
+>   ★**`L0` 由"无法识别…"变空 ＝ 把**违反契约的旧值**改回契约**；★`ModeKept`／`ModeSilenced` 在 `cmd/**`、`internal/panel/**` **零读取**。
+> **④ ★★三条具名残余（判语 §9，我写进票尾）**
+>   1. ★`mode.go:141` 那句 `Silenced is true when the caller must NOT ask` 与 `L0` 的 `Silenced=false` 在**字面**上相冲 —— ★**但修前 `L0` 也是 `false`** ⇒ **既存口径差、⛔ 本笔引入**；★**改那句属"改契约文字"⇒ 须机主批**。
+>   2. ★两枚新用例注释里的**活指针行号是改前的**（`433-435` → 现 `446-448`；`437-439` → 现 `450-452`）。
+>   3. ★`L2` 被扣住但 **gate 未接线**（`NoGate`）的组合里，`still asks` 仍会打在 **0 卡**上 —— ★**属"审批层没接线"**、⛔ 本笔。
+> **⑤ 反向判据（它自造、⛔ 只看实现腿的）**：`M1` 摘 `mode.go:184-186` ⇒ `rc=1`（`ScreenRecognizesL0`(4)／`FourLevelsKeepTheirRoute`(3)／`L0ReadNeverClaimsAQuestion`(15)）；
+>   `M2` 摘 `bridge.go:323-335` ⇒ `rc=1`、**只红** `DenyIsRefusedNotAsked`(6)；
+>   ★★**互不代偿**双向各证一次**（★`M1` 下 `Deny` 仍绿、`M2` 下 `L0` 仍绿），★**且它自己的探针在同一对突变体下也各自红**（★**两把尺互证**）。
+>   ★`git hash-object`＝**SHA-1/40 位**、四枚 **4/4 同串**（导出树同 4/4）。
+> **⑥ ★`AC#3` 门禁（判语现跑、先 `unset GOTMPDIR`）**：`build 0`／`vet 0`／两包 `go test` `rc=1`（**两发同形 `RUN=399 PASS=397 FAIL=1 SKIP=1`，唯一红＝既存 `TestC26…`**）／
+>   `./internal/perm/ ./internal/agent/approval/` **0**／★**`d22scan` 主检出 `rc=0`**／导出树 `0`（`ban #8 internal/=623`＋`ban #7=25`＋`cmd/=148`）／路径长度 **0**（GREEN、17612→提交后 17617）。
+>   ★格式**甲（blob 树）：20 行全 `.scratch/**`、非 `.scratch` ＝ 0**；**乙（工作树）：0 行**、四枚 `CR=0`。
+>   ★★**它报 `d22scan` 主检出今天是 `rc=0`、⛔ 派单预期的 `rc=1`，并归因对**：`docs/evidence/s1/196-r1-impl.md` **已落盘并入库**（我现跑核：在 HEAD 里、`12979` 字节），
+>   引用只在票 196 腿**未提交**的 `internal/memory/schema.go:26/:157`（`git show HEAD:` **无命中**）⇒ ban #9 是"注释引的路径不存在"、**文件一在即消**
+>   ⇒ ★**这是树的状态、⛔ 票 363 的功劳**（★**它主动划清、⛔ 抢功**）。
+> **⑦ ★新增红 0（它自造基线）**：同一批测试文件、只把 `mode.go`／`bridge.go` 用 overlay 换回 `d59af9a^` ⇒ `RUN=399 PASS=393 FAIL=5 SKIP=1`（红＝`TestC26…`＋**4 枚新用例**）
+>   ⇒ ★**终态 1 红是基线的**真子集** ⇒ 新增红 0**。★**它明确说实现腿报的 `396/2` 它没复现**（`TestResolvePerCallBudget` **逐发漂**、它两发都绿）⇒ ★**按红名集合判、⛔ 按四数判**（`A1126` 那条）。
       ★**反向判据**＝把新加的那一跳摘掉 ⇒ 用例必须**转红并逐名报红行**；三读数（变异红／还原绿／原样绿）逐字贴 ＋ **还原核**。
-- [ ] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet` 动过的包／`go test -count=1`（**四数分开报、⛔ 相减**）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
+- [x] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet` 动过的包／`go test -count=1`（**四数分开报、⛔ 相减**）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
       ★**格式门禁甲乙两尺都报**（甲＝入库 blob、**判据**；乙＝工作树、**只作诊断**）。
       ★★**`cmd/wisp` 整包四数 ⛔ 当判据**（未判决恒 1、红名册逐发漂移、截断点后整族 `RUN=0`）⇒ 只按名作差＋逐发登记死点。
-- [ ] **AC#4 纪律格**：⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 179/183/185 任何原句。
+- [x] **AC#4 纪律格**：⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 179/183/185 任何原句。
 
 ## ★写面（初判，裁形后可能收窄）
 
@@ -136,3 +162,13 @@
 ## Progress log
 
 - [2026-10-22 23:2x +08] agent=`编排者` did=立案（来路＝`179-r1` §7①；★四条链编排者已现跑核实：`bridge.go:311`／`mode.go:163-165`／`bridge.go:324`／`bridge.go:352`）next=派 `363-a1` 只读腿。
+
+## ★残余（2026-10-23 10:4x 编排者按 `363-v1` §9 写进票尾，⛔ 随 `-done` 蒸发）
+
+1. ★**`mode.go:141` 字面口径相冲**：那句 `Silenced is true when the caller must NOT ask` 与 `L0` 的 `Silenced=false` 在**字面**上相冲
+   —— ★**但修前 `L0` 也是 `false`** ⇒ **既存口径差、⛔ 本笔引入**；★**改那句属"改契约文字"⇒ 须机主批**。
+2. ★**两枚新用例注释的活指针是改前行号**：`ticket363_screen_l0_test.go:55` 的 `433-435` → 现 `446-448`；`ticket363_test.go:269` 的 `437-439` → 现 `450-452`。
+3. ★**`L2` 被扣住但 gate 未接线（`NoGate`）** 的组合里，`still asks` 仍会打在 **0 卡**上 —— ★属"**审批层没接线**"、⛔ 本笔。
+
+★**另记一条本轮学到的**：`d22scan` 在主检出今天 `rc=0`、⛔ 派单预期的 `rc=1` —— ★**因为 `196-r1-impl.md` 已落盘**（`git show HEAD:` 对 `internal/memory/schema.go` 无命中 ⇒ ban #9 是"注释引的路径不存在"、**文件一在即消**）
+  ⇒ ★**这是树的状态、⛔ 本票的功劳**（★`363-v1` 主动划清、⛔ 抢功）。
