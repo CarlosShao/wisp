@@ -140,7 +140,7 @@ roster nails 逐项 **`PASS want ring=5 silent=3 named=3 / got ring=5 silent=3 /
 
 ## §12 提交
 
-本件 `docs/evidence/s1/362-v1-verdict.md`（143 行，**≤160 ⇒ 未拆 `-part`**）。
+本件 `docs/evidence/s1/362-v1-verdict.md`（**收手 146 行**；第一笔时 143 行、本笔补 §12 到 146；**≤160 ⇒ 未拆 `-part`**）。
 - 本笔第一笔：**`74fc2e4fb`**（父 `eac86c4e7`），`git show --name-only` ＝ **1 文件**、`.go` **0**。
 - **提交后复跑**（`git archive 74fc2e4fb` → 仓外 `T_POST`，17621 件、`tracked .go` **1165**、`*.go` 的 CR **0**）：
   门① **0 行**；门② **rc=0／0 行**，分母 `handed=805 total=1165 subtracted=360` ⇒ **绿是提交后的绿，不是提交前的**。
