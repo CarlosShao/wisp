@@ -152,3 +152,6 @@ EXEC isError=true text="该目标被绝对禁止访问（R3 A 档，任何授权
 ★两枚突变全程 `-overlay`（替换文件在仓外 `…\363v1\mut\`）⇒ **无工作树突变窗口、无窗口期提交**；工作树在突变前后各查一次 `-- internal/risk internal/tools` 均空。临时件只建不删（`D:\tmp\wisp\20261023\363v1\**`、⛔ `.out`）。
 ★本笔 `add`／`commit` 两处**逐个文件名字面点名**（`docs/evidence/s1/363-v1-verdict.md`），⛔ `add -A`／`.`；提交前 `git diff --cached --name-status` 核索引（只应出现这一个 `A`）。
 ★本笔提交号见件尾追加那条（⛔ amend；按 164／362 的先例用**追加一笔**把 sha 写回件里）。
+
+- ★**本笔提交**＝`fede8ab88`（本件首笔：`A docs/evidence/s1/363-v1-verdict.md`）；★**提交后 HEAD 立刻被别腿推进**（`2c3628679` 196 腿〔补二〕，只动它自己的件）⇒ 共享工作树并发、⛔ 我的提交被改写：四枚 `.go` 的 blob 仍是 `d59af9a` 的 **4/4**，`git log d59af9a..HEAD -- internal/risk internal/tools` ⇒ 仍 **0 笔**。
+- ★**提交后复跑**（把本件计入树）：`sh scripts/check-path-length-budget.sh` ⇒ **rc=0**、`tracked paths=17617 over-budget=61 covered=61 not in roster=0`、`VERDICT GREEN`（17612→17617 是并发别腿的件，⛔ 本笔）。
