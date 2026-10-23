@@ -22496,3 +22496,32 @@ M1 删引文／M2 改原文用词／**M3 只改一个数字**／M4 下移 Case 1
 **④ ★它这条补交还澄清了一件要紧事**：★**它的 `cmd/wisp` 读数取自**仓外导出树**、不受工作树突变影响** ⇒ ★**这是"污染窗口"的正确规避方式**（★与 ② 那条定式同向）。
 
 **⑤ 状态**＝结案 **29 票**、完成度 **49.0%**（172/351）、在飞 **2**（`164-v1b`／`363-r1` 待派）、未推 **448**、⛔ 推、⛔ 清理、⛔ 改契约。
+
+## A1160（2026-10-23 09:3x +08，编排者）★★★**推送成功**：`6f808a83..21b528d6  dev -> dev`（**465 笔**）｜★推前三道检查全过｜★前一小时连不上 github.com 的两个独立根因
+
+**① ★★推送结果（现跑三把尺同值）**
+- ★**命令**：`git -c http.proxy=http://127.0.0.1:7890 push origin dev` ⇒ ★**`6f808a83..21b528d6  dev -> dev`、`push rc=0`**。
+- ★**三把尺核实**：`ls-remote origin dev` ＝ **`21b528d6d2b6d29b211574df83fb5484c3095b07`**；`git rev-parse HEAD` ＝ **同一串**；
+  `origin/dev..HEAD` ＝ **0**、`HEAD..origin/dev` ＝ **0** ⇒ ★**本地与远端完全一致**。
+- ★**465 笔**（`21b528d6` 比原 `6f808a83` 多 465）。
+
+**② ★推前三道检查（全过、⛔ 跳步）**
+- **车道真空**：teammates 全 `inactive`（`go` 进程 1 枚是 subagent 遗留、⛔ 门禁在跑）。
+- ★**工作树生产码零脏**：只有 `.scratch` 三族的**行尾（CRLF）差异**——★**`git diff --stat` 为空**（内容零差异）⇒ ⛔ 需提交。
+- ★★**上游是 `cnb/dev`、⛔ `origin/dev`** ⇒ ★**裸推会去 cnb**（正是规矩禁的那条）⇒ ★**我用显式 `push origin dev`**、全程 ⛔ 使用裸推、⛔ force。
+
+**③ ★前一小时连不上 `github.com` 的两个**独立**根因（诊断过程留档）**
+- ★**HTTPS：`github.com` 被定向到 fake-IP、TLS 被断**——
+  `github.com` 解析到 **`198.18.0.64`**（代理 fake-IP 段 `198.18.0.0/15`）；★**TCP 443 能连、`CONNECT` 隧道建成功（`HTTP/1.1 200`）、之后 TLS 握手被断**（`error:0A000126:SSL routines::unexpected eof while reading`）。
+  ★**关键分化**：同一代理下 **`api.github.com` 200 OK／`codeload.github.com` 301**，★**只有 `github.com` 这一个域名不通** ⇒ ★**FlClash 把它路由到直连**、直连撞 fake-IP。
+- ★**SSH：传输层是通的、密钥没注册** —— `ssh -T git@github.com` 与 `ssh -p 443 -T git@ssh.github.com` **都回 `Permission denied (publickey)`**（★**那是"连上了但没授权"、⛔ "连不上"**）；
+  本机密钥指纹 `SHA256:QqXsO+9nF1pbQLfPo8Dp2jrs1nGVpopz7hTa7MI4zHk`。
+- ★**试过的绕法（全试、全部失败）**：走代理 3 次／直连／`http.version=HTTP/1.1`／`http.sslVersion=tlsv1.2`／SSH 22／SSH 443 ⇒ ★**⛔ 硬试、⛔ force、⛔ 改远端、⛔ 改 hosts**。
+- ★**恢复**：机主一句「再试试」之后重试 ⇒ ★**代理与直连都立刻通了**（**三发 `ls-remote` 同值**）⇒ ★**是那段网络/代理规则的问题、⛔ 仓库或凭据的问题**。
+
+**④ ★这条给以后的接手者（进尺）**
+> **推之前先跑这一发**：`git -c http.proxy=http://127.0.0.1:7890 ls-remote --heads origin` —— ★**它同时验"网络通"与"凭据可用"**，比直接 `push` 试错便宜。
+> ★**`github.com` 单域名不通而 `api.github.com` 通** ⇒ ★**先怀疑代理规则路由、⛔ 怀疑凭据**。
+> ★★**⛔ 裸推**（上游是 `cnb/dev`）⇒ ★**永远写 `push origin dev`**。
+
+**⑤ 状态**＝结案 **29 票**、完成度 **49.0%**（172/351）、在飞 **2**（`164-v1b`／`363-r1` 待派）、★**未推 0**、⛔ 清理（押到全部票完成）、⛔ 改契约。
