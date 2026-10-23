@@ -22846,3 +22846,30 @@ M1 删引文／M2 改原文用词／**M3 只改一个数字**／M4 下移 Case 1
 - ★**要求它落笔前先 `ls`**（★`348-v2-verdict.md` 被 `342-v3` 占用那件事的定式）。
 
 **⑦ 状态**＝结案 **31 票**（`-done` **174** 枚）、完成度 **174/352 ＝ 49.4%**、在飞 **2**（`348-v2`／`362-v1`）、未推 **34**、⛔ 推、⛔ 清理、⛔ 改契约、★**摆机主 1 件**（票 196 契约文字）。
+
+## A1168（2026-10-23 10:5x +08，编排者）★★"尺的射程"**第 12 例＝我自己**：`cmd | tail` 之后 `$?` 取的是 **`tail` 的 rc**、⛔ `cmd` 的｜★我独立复跑 `362-r2` 那条读数为真
+
+**① ★★我犯的错（第 12 例）**
+- ★我现跑验 `attrib.sh --tracked-only` 时写成 `sh attrib.sh … 2>&1 | tail -3` 然后读 `$?` ⇒ **读出 `rc=0`**。
+- ★★**但那是 `tail` 的 rc**：★**管道里 `$?` ＝ 最后一个命令的退出码** ⇒ ★**我把 `tail` 的成功当成了 `attrib.sh` 的成功**。
+- ★**正确取法**：★**先重定向到文件、再取 `$?`** —— `sh attrib.sh … > out.txt 2>&1; rc=$?` ⇒ ★**真 `rc=1`**。
+- ⇒ ★★**定式（第 12 例）**：
+  > ★**凡要判"某个命令 rc"⇒ ⛔ 把它放进管道后再读 `$?`**（★**`| tail`／`| grep`／`| head` 全都会把 rc 换成下游的**）。
+  > ★**正确形状**：`cmd > out 2>&1; rc=$?; then read out`。
+  > ★**若必须用管道**：`set -o pipefail`（★但 `attrib.sh` 自己内部未必设，⛔ 假设）。
+- ★★**为什么这一例特别危险**：★**它把"红"读成"绿"**——★**方向是最坏的那种**（前 11 例多数把绿读成红或读歪，这一例**会把失败当成功**）。
+
+**② ★我独立复跑、`362-r2` 的读数为真（三条）**
+- ★**主检出工作树**：★**真 `rc=1`**、`tracked-dirty=3 files_dirty=3`、**分母 `805 tracked .go`（总 `1165`、排除 `360`）**、**12 行输出**。
+- ★**那 3 枚就是 CRLF 假红**（我前一条已逐枚核：`pending_read.go` blob 0／wt 131、`tools.go` 0／225、`models.go` 0／389，`git diff` 全 **0 行**）。
+- ⇒ ★**它报的"乙尺 `rc=1`／`lines=3`"**逐字为真**、★**它报的"改前 34 行 → 改后 3 行"的"3"也对我现跑**。
+- ★**且它新加的那句自动说明**（我现跑读到）★**自己就把这个话题说清了**：
+  > `DENOMINATOR: this ruler and the CI gofmt step above agree today by two DIFFERENT definitions (a named EXCLUSION here, a named INCLUSION of the five production directories there), and they agree only while no tracked .go falls inside one and outside the other. When they stop agreeing, this is the ruler that names the file; that divergence is the finding, not a rounding difference. This one additionally refuses to answer when handed 0 files.`
+  ⇒ ★★**这句话把"两把尺用两种定义"这件事**写在仪器自己的输出里**** ⇒ ★**将来谁看到 RED 都不会误以为是"排除没生效"** ⇒ ★**这是"仪器自带说明书"、我表扬**。
+
+**③ ★`AC#3` 的判语（重申、⛔ 改）**
+- ★**"入库字节"这把尺上 ＝ `rc=0`**（CI 新检出、blob 全 LF）⇒ **`AC#3` 成立**；★**本机工作树 `rc=1`／3 行 ＝ `autocrlf` 假象**。
+- ★**⛔ 归一那 3 枚**（★洗字节）、★**⛔ 断言化**（★把尺改成读 blob ⇒ **对真脏也失去眼睛**）。
+- ★**CI 是判据环境、本机是诊断环境** ⇒ ★**这条要写进票尾**（⛔ 让后人在本机看到 RED 以为票没做完）。
+
+**④ 状态**＝结案 **31 票**、完成度 **174/352 ＝ 49.4%**、在飞 **2**（`348-v2`／`362-v1`）、未推 **33**、⛔ 推、⛔ 清理、⛔ 改契约、★**摆机主 1 件**（票 196 契约文字）。
