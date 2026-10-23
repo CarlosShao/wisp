@@ -30,6 +30,7 @@
 | `good ruler control on the same fixture` | 同一 `purge` 夹具、尺好 ⇒ `Checked=true`、`OrphanRows=3`、`ChildTables=[tool_call]` ⇒ **与坏尺读数不同**（子例内显式比较：两读数同则红） |
 
 - 为什么"区分得开"必须写死：只测"尺坏 ⇒ `Checked=false`"，一个恒 `false` 的实现也会绿；对照发把 `{true,3,[tool_call]}` 也要到。
+- 牙的两向都在：①"假装检查过"（`Checked=true`）⇒ M3 红；②"坏尺变锁"（`!Checked` 就拒开）⇒ M5 红（§6）。
 - 真库级坏尺的 `Open` 日志逐字（`logs/10`）：`level=WARN msg="migration foreign-key baseline could not be read; opening anyway" component=memory schema_version=4 err="memory: PRAGMA foreign_key_check: SQL logic error: foreign key mismatch - \"t366_child\" referencing \"t366_parent\" (1)"`。
 
 ## §3 缺 2：8 处措辞逐字（改前 → 改后；终裁给的措辞**照抄**，行号现跑）
@@ -57,7 +58,7 @@
 | `internal/memory/taskstate_196r2_test.go` | `A34A2591026E911AF5041DE22E91BCC4CCA98CACB3DBA1482F5F3C258D4D6303` | 8831 |
 | `internal/memory/migration_fkcheck_366_test.go` | `4A9E75DD00587AEDD44F7DC2258AA2F181ED46020C4C7D4ECC8C8E613006D86A` | 26657 |
 
-- 算法＝**SHA-256**（`Get-FileHash -Algorithm SHA256` 与 `sha256sum` 交叉各算一次，同值）；**量在最后一发变异（M4）之后**；**工作树＝`posttree`＝`restoretree` 三处逐字相同**（12 次比较全同）；提交后再与 `git show <commit>:<path>` 的 blob 比（§10）。
+- 算法＝**SHA-256**（`Get-FileHash -Algorithm SHA256` 与 `sha256sum` 交叉各算一次，同值）；**量在最后一发变异（M5）之后**（M5 后重量：12/12 仍同值，四枚值不变）；**工作树＝`posttree`＝`restoretree` 三处逐字相同**；提交后再与 `git show 43ca90fc8:<path>` 的 blob 比（§10，三枚逐枚相同）。
 - **为什么 r1 的 `3d9f2655…` 对不上**（⛔ 猜，可复现）：它逐字等于 r1 那份 `D:\tmp\wisp\20261023\366r1\posttree\internal\memory\open.go` 的 SHA-256 全文＝`3D9F265541DFD34A046A6D92F15F4B04E79321DCB6AC88222715ECC8D3D70F56`（len 26745）；入库 blob 是 `d13000b1…`（len 26781）。差 **36 字节＝3 行注释重排**（`ForeignKeyAudit()` 的 doc：posttree 写 `(see ForeignKeyAudit's doc comment) and never / deletes a row (tool_call is the forensic surface)`；入库写 `(the ForeignKeyAudit type's doc comment says why, with the measurement) and never / deletes a row ...`）⇒ **它量在"最后一次注释改写之前的那份 posttree"上，之后没把 posttree 与交付字节重新对齐**；既不是"量在变异之间"（M1＝`dde55d69…`、M2＝`977b6bdd…`），也不是别的文件的 hash。佐证：r1 同目录另三枚与 HEAD blob **逐字相同**，只有 `open.go` 差。⇒ 这是"读数不可复现"，不是"读数不符"——我能复现 `3d9f2655…`，复现出来的是那份旧副本。
 
 ## §5 两条小上报
@@ -74,6 +75,7 @@
 | `M2` | 把记录改成门槛（`OrphanRows>0 ⇒ Rollback+拒开`，硬边界 #1） | rc=1；**5 顶层／6 子例**（排除新增＝**3／5**）；`Open refused a database with 3/2/1/1 orphan row(s)`；红行 `:275×4,:333,:396`（＋新 `:600,:625`） |
 | `M3`（本腿补牙专用） | 坏尺分支**谎报** `Checked=true`（"假装检查过"） | rc=1；1 顶层／4 子例；红行 `:499,:530,:554,:575,:580,:611` |
 | `M4`（`slices.Clone` 专用） | 去掉 clone（算出即弃） | rc=1；1 顶层；红行 `:635` |
+| `M5`（坏尺变锁专用） | `!audit.Checked ⇒ Rollback+拒开`（把 ⑧ 的坏尺变成永久锁） | rc=1；1 顶层／3 子例（坏尺两发＋对照发）；红行 `:524,:570,:593` |
 
 - ② **还原绿**：`restoretree`（新导 HEAD＋三枚交付字节）`go test -count=1 -v ./internal/memory/` ⇒ **rc=0**、120 RUN／66 PASS／0 FAIL／2 SKIP（`logs/71`）。
 - ③ **原样绿**：`posttree`（同一交付字节，变异前）⇒ **rc=0**、120／66／0／2（`logs/31`）。
@@ -114,6 +116,6 @@
 
 ## §10 提交
 
-- 本件提交＝**`43ca90fc8`**（`4 files changed, 371 insertions(+), 21 deletions(-)`：3 枚 `.go` ＋本件）；`add`/`commit` 各自只点四个文件名（字面点名、⛔ glob）；提交前 `git diff --cached --name-status` 只见 **`A` 本件＋`M` 三枚**（无 `D`）。
+- 本件提交＝**`43ca90fc8`**（`4 files changed, 371 insertions(+), 21 deletions(-)`：3 枚 `.go` ＋本件）；`add`/`commit` 各自只点四个文件名（字面点名、⛔ glob）；提交前 `git diff --cached --name-status` 只见 **`A` 本件＋`M` 三枚**（无 `D`）。本件其后另有**只改本件**的补录（`5bc0ff51c`＝§10；另有一笔＝§2/§4/§6 加 `M5`，见 `git log -1`），产码字节 0 变化。
 - **格式甲复核（入库 blob＝判据）**：`git archive 43ca90fc8` 导出三枚 `.go` 到仓外再 `gofumpt -l` ⇒ **0 行**（rc=0）；三枚 blob 的 SHA-256 逐枚等于 §4 表（`08BDFA15…`／`DF2C99…`／`4A9E75DD…`）⇒ **还原核落在入库字节上**（`taskstate_196r2_test.go` 未改，其 blob 仍＝`A34A2591…`，与 §4 同）。
 - ⛔ push；台账／票面／`196` 原句 0 字节改动。
