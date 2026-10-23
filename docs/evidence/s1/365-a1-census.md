@@ -20,7 +20,7 @@
 
 ## 2. `Status` 对账表（逐枚；六枚常量一颗不漏）
 
-尺：常量集合＝`internal/agent/loop.go:40-55` 的 `const` 块，并用 `:58-65 Valid()` 反向核（`Valid` 列的六枚＝常量块六枚；`grep "Status[A-Za-z]* Status ="` 亦只六行）⇒ **没有第七枚**。返回词取自 HEAD blob 的 `case` 体。
+尺：常量集合＝`internal/agent/loop.go:40-55` 的 `const` 块，并用 `:58-65 Valid()` 反向核（`Valid` 列的六枚＝常量块六枚；`grep -rn "Status[A-Za-z]* Status =" internal/agent cmd/wisp` 非测试亦只六行——射程：这两包，⛔ 全仓）⇒ **没有第七枚**。返回词取自 HEAD blob 的 `case` 体。
 
 | `Status` 常量 | 底层串 | `internal/agent`（loop.go:1048） | `cmd/wisp`（run.go:1361） | 同？ |
 |---|---|---|---|---|
