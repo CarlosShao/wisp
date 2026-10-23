@@ -100,6 +100,8 @@ EXEC err=<nil> isError=true text="该目标被绝对禁止访问（R3 A 档，�
 
 ★**"今天响、不修不响"**：同一批用例在修前（`03-new-tests-before-fix.txt`）红 4 枚、修后全绿；两枚**正控**用例在修前**就是绿的**且修后仍绿（`TestTicket363UnknownLevelStillKeepsItsQuestion`、`TestTicket363OtherLevelsKeepTellingTheTruth`）⇒ 牙不是恒红、也不是恒绿。
 
+★**还原核**（★先问"谁算的、什么算法、几位"）：`git hash-object` ＝ **SHA-1（40 位十六进制）**，⛔ 与 `sha256sum`(64) 混比。四枚逐枚"工作树 blob ⇄ `d59af9a:` 里的 blob" ⇒ **4/4 `same=YES`**（`4de3bdac…`／`69822c75…`／`93ed19fa…`／`250c56db…`）。★**本来就没有"还原"这一步可核**：两次突变全程 `-overlay`（替换文件在 `D:\tmp\…\mut\`），**工作树与索引在突变前后各查一次均为空**（`git status --porcelain -- internal/risk internal/tools`）⇒ **无突变窗口、无窗口期提交**。
+
 ## §7 正控（硬闸）
 
 - **`L1` 不动那行仍没有**：`ask_every_step` ＋ `fs.write` 新文件 ⇒ 窗口 **1**、日志里 `MODE-REDLINE` **0 行**、`MODE-SILENCE` **0 行**。
@@ -144,7 +146,7 @@ EXEC err=<nil> isError=true text="该目标被绝对禁止访问（R3 A 档，�
 
 ## §12 终态复跑（★读数取在最后一枚 commit 之后）
 
-- **码**：`d59af9a`（产码 4 枚）；**件**：`613f2d87b`（那一笔 **143 行**），本笔把 §12 与 §9／§10 两处数字补上后为 **150 行**；`internal/**` 字节**自 `d59af9a` 起未再动** ⇒ 上面各门读数对码仍然有效。
+- **码**：`d59af9a`（产码 4 枚）；**件**：`613f2d87b`（143 行）＋`de79f2660`（§12 与 §9／§10 数字）＋本笔（§6 还原核）；终态行数见盘上 `wc -l`（≤160 帽，过帽即拆 `-partN`）；`internal/**` 字节**自 `d59af9a` 起未再动** ⇒ 上面各门读数对码仍然有效。
 - **`git archive 613f2d87b` 导出树**：`sh scripts/d22scan.sh` ⇒ **rc=0**、`clean - no D22 ban violations`（`ban #7 internal/tools/=25`、`ban #8 internal/=623`、`cmd/=148`）、`runtests.sh: OK … PASS=35 FAIL=0 SKIP=0`；`gofumpt -l .` ⇒ **20 行、非 `.scratch` ＝ 0**；`go test -count=1 -run TestTicket363 ./internal/risk/ ./internal/tools/` ⇒ 两包 **ok**、rc=0。
 - **主检出**：`sh scripts/check-path-length-budget.sh` ⇒ **rc=0**、`tracked paths=17610 over-budget=61 covered=61 not in roster=0`、`VERDICT GREEN`。
 - ★**主检出的 `d22scan` 仍 rc=1**（§9 已归因：196 腿未提交的 `internal/memory/schema.go`）；本腿提交的导出树 **rc=0** ⇒ 本腿的贡献是 **0 违规**，这一点由**同一把尺、两个对象**分别给出。
