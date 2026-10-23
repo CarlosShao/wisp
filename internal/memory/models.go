@@ -59,7 +59,7 @@ type TaskLog struct {
 	ID              string // task UUID
 	StartedAt       int64  // unix seconds
 	EndedAt         *int64 // nil while running
-	State           string // terminal state (incl. 'interrupted')
+	State           string // roster value (taskstate.go); CHECK from schema v4
 	QueryText       string // redacted upstream
 	SummaryText     *string
 	CostTokensIn    int64
@@ -188,6 +188,12 @@ func validateTaskLog(tl TaskLog) error {
 	}
 	if tl.State == "" {
 		return fmt.Errorf("memory: task_log.state is required")
+	}
+	// Ticket 196: the column is not free text any more. The roster in
+	// taskstate.go is the judge, and since schema v4 the DDL carries the same
+	// set as a CHECK, so a writer that goes around this DAO is refused too.
+	if !ValidTaskState(tl.State) {
+		return invalidTaskStateError(tl.State)
 	}
 	if tl.ErrorClass != "" {
 		// D37: task_log.error_class accepts exactly the 17 observe classes.

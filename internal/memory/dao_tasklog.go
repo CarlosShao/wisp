@@ -47,10 +47,12 @@ func (s *Store) StartTaskLog(ctx context.Context, tl TaskLog) error {
 // token/cost accounting and the D37 error class. ValidateErrorClass guards
 // the error_class enum (ticket 03's reserved hook).
 func (s *Store) FinishTaskLog(ctx context.Context, id, state, summary string, tokensIn, tokensOut, costMicro int64, errorClass string) error {
-	if errorClass != "" {
-		if err := validateTaskLog(TaskLog{ID: id, State: state, ErrorClass: errorClass}); err != nil {
-			return err
-		}
+	// Ticket 196: validate on EVERY finish, not only when an error class came
+	// with it. Until this change the gate below opened only for
+	// errorClass != "", so the ordinary clean-exit path wrote state unchecked -
+	// the widest of the three doors the ticket measured.
+	if err := validateTaskLog(TaskLog{ID: id, State: state, ErrorClass: errorClass}); err != nil {
+		return err
 	}
 	now := observe.NowWallUTC().Unix()
 	err := s.write(ctx, func(ctx context.Context, tx *sql.Tx) error {

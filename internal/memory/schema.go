@@ -3,18 +3,29 @@ package memory
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strings"
 )
 
 // Schema v1 (D35 / SPEC-02 §3) + schema v2 (provider_health, SPEC-02 §3
-// note). The DDL below is CONTRACT-LEVEL: it must stay byte-identical to the
-// ```sql blocks of docs/specs/SPEC-02-data-storage.md §3 (including
+// note). ddlV1/ddlV2/ddlV3 are CONTRACT-LEVEL: they must stay byte-identical to
+// the ```sql blocks of docs/specs/SPEC-02-data-storage.md §3 (including
 // comments). No added or removed columns, tables, indexes or constraints —
 // the acceptance test introspects sqlite_master against the same contract.
 // Enum-shaped columns (task_log.error_class, tool_call
 // risk_level/decision/outcome) are validated at the DAO layer
 // (observe.ValidateErrorClass and friends), NOT as SQL CHECKs, precisely so
 // this text never forks from the spec.
+//
+// ⚠ ONE DELIBERATE EXCEPTION, since schema v4 (ticket 196): task_log.state now
+// carries a SQL CHECK. It is added by ddlV4 — a REBUILD step, not an edit of
+// ddlV1 — so ddlV1's text and statement count stay exactly what SPEC-02 §3
+// declares, and a fresh database reaches the constrained shape through the same
+// 3->4 step an existing one does (the rule ddlV3 states below). The owner
+// approved touching D35 for this (ticket 196's shape ruling, owner's words
+// quoted in docs/evidence/s1/196-r1-impl.md), and SPEC-02 §3's text still has
+// no CHECK: that is a spec-note debt recorded for the owner, not a drift this
+// file is allowed to paper over by editing the spec.
 //
 // provider_health (SPEC-02 §3 note) is schema v2 and landed with ticket 09:
 // the DAO primitive lives in dao_providerhealth.go; ticket 11 writes real
@@ -131,12 +142,20 @@ CREATE TABLE plugin_state (
 //	     migration step so NO text of ddlV1/ddlV2 changes: new databases reach
 //	     v3 through the same 2->3 step old databases do, so the two paths
 //	     cannot fork on which side creates which table (ticket 166 AC#3).
+//	v4 - task_log.state gets an explicit CHECK (ticket 196). Same rule again:
+//	     ddlV1 is untouched and every database, fresh or existing, reaches the
+//	     constrained shape through the 3->4 rebuild in ddlV4. The accepted
+//	     values come from taskStateRoster, so the SQL and the DAO cannot fork
+//	     either.
 //
 // ⚠ D35 is a frozen contract (AGENTS.md §1.1) and SPEC-02 §3 still lists nine
 // tables; this v3 roster extension carries a spec-note debt that
 // ticket 166's progress note names for the owner (per AGENTS.md §0 "改契约＝
-// 人工批准" and probes/166/a2 §H).
-const SchemaVersionTarget = 3
+// 人工批准" and probes/166/a2 §H). v4 adds a second debt of the same kind:
+// SPEC-02 §3's task_log block carries no CHECK, and the owner's approval to
+// touch D35 does not edit the spec text. Both are named in
+// docs/evidence/s1/196-r1-impl.md rather than fixed by an agent.
+const SchemaVersionTarget = 4
 
 // ddlV2 appends the provider_health table (SPEC-02 §3 note, schema v2). The
 // DDL below mirrors the ```sql block in docs/specs/SPEC-02-data-storage.md
@@ -169,8 +188,13 @@ type migrationStep struct {
 }
 
 // txExec is the subset of *sql.Tx the steps need (keeps the chain testable).
+// QueryContext joined the set for ticket 196's v4 step, which has to read the
+// offending values out of task_log.state BEFORE it rebuilds the table: a raw
+// CHECK failure names the constraint but never the row, and an operator staring
+// at "CHECK constraint failed" with no value in it has nothing to fix.
 type txExec interface {
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 }
 
 // migrationChain is the ordered version chain. The base step creates the
@@ -179,6 +203,7 @@ var migrationChain = []migrationStep{
 	{from: 0, to: 1, apply: applyV1},
 	{from: 1, to: 2, apply: applyV2},
 	{from: 2, to: 3, apply: applyV3},
+	{from: 3, to: 4, apply: applyV4},
 }
 
 // applyV1 creates the eight D35 tables + indexes and seeds schema_version=1.
@@ -245,6 +270,115 @@ CREATE INDEX idx_session_turn_session ON session_turn(session_id, seq);`
 func applyV3(tx txExec) error {
 	for _, stmt := range splitSQLStatements(ddlV3) {
 		if _, err := tx.ExecContext(context.Background(), stmt); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ddlV4 rebuilds task_log with an explicit CHECK on state (ticket 196).
+//
+// Why a rebuild and not an edit of ddlV1: SQLite has no ALTER TABLE ADD
+// CONSTRAINT, and ddlV1 is a frozen contract whose text and statement count the
+// introspection test pins. The rebuild follows SQLite's documented 12-step
+// procedure (create new -> copy rows -> drop old -> rename -> recreate indexes),
+// all inside the one transaction the migration chain already wraps each step in.
+//
+// The accepted values are GENERATED from taskStateRoster, never spelled a second
+// time here. That is the whole point of ticket 196's shape: the Go roster is the
+// authority, and the CHECK is one of its two mouths (the DAO's validator is the
+// other). Hand-copying the list into this string is exactly the fork the ticket
+// exists to close.
+var ddlV4 = buildDDLV4()
+
+func buildDDLV4() string {
+	quoted := make([]string, len(taskStateRoster))
+	for i, ts := range taskStateRoster {
+		quoted[i] = "'" + string(ts) + "'"
+	}
+	return `-- task_log 重建（schema v4：票 196，state 列加显式 CHECK）
+-- 接受的值＝internal/memory/taskstate.go 的 taskStateRoster（Go 侧唯一权威），
+-- 由 buildDDLV4 生成；这里不是第二份手抄名册。
+-- 重建走 SQLite 官方 12 步 ALTER 过程：建新表 -> 搬行 -> 删旧表 -> 改名 -> 重建索引。
+CREATE TABLE task_log_v4 (
+  id             TEXT PRIMARY KEY,
+  started_at     INTEGER NOT NULL,
+  ended_at       INTEGER,
+  state          TEXT NOT NULL CHECK (state IN (` + strings.Join(quoted, ", ") + `)),
+  query_text     TEXT NOT NULL,
+  summary_text   TEXT,
+  cost_tokens_in  INTEGER NOT NULL DEFAULT 0,
+  cost_tokens_out INTEGER NOT NULL DEFAULT 0,
+  cost_amount_micro INTEGER NOT NULL DEFAULT 0,
+  currency       TEXT NOT NULL DEFAULT 'CNY',
+  error_class    TEXT
+);
+INSERT INTO task_log_v4 (id, started_at, ended_at, state, query_text, summary_text,
+    cost_tokens_in, cost_tokens_out, cost_amount_micro, currency, error_class)
+  SELECT id, started_at, ended_at, state, query_text, summary_text,
+    cost_tokens_in, cost_tokens_out, cost_amount_micro, currency, error_class
+  FROM task_log;
+DROP TABLE task_log;
+ALTER TABLE task_log_v4 RENAME TO task_log;
+CREATE INDEX idx_task_log_started ON task_log(started_at);`
+}
+
+// taskLogStatesOutsideRoster lists the distinct task_log.state values the v4
+// roster would reject. An empty result means every existing row survives the
+// rebuild, which is what makes "an old database still opens" a measured fact
+// rather than a hope.
+func taskLogStatesOutsideRoster(ctx context.Context, tx txExec) ([]string, error) {
+	names := TaskStateRoster()
+	ph := make([]string, len(names))
+	args := make([]any, len(names))
+	for i, n := range names {
+		ph[i] = "?"
+		args[i] = n
+	}
+	rows, err := tx.QueryContext(ctx,
+		`SELECT DISTINCT state FROM task_log WHERE state NOT IN (`+strings.Join(ph, ",")+`) ORDER BY state`,
+		args...)
+	if err != nil {
+		return nil, fmt.Errorf("memory: census task_log.state for v4: %w", err)
+	}
+	defer rows.Close()
+	var out []string
+	for rows.Next() {
+		var s string
+		if err := rows.Scan(&s); err != nil {
+			return nil, fmt.Errorf("memory: census task_log.state for v4: %w", err)
+		}
+		out = append(out, s)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("memory: census task_log.state for v4: %w", err)
+	}
+	return out, nil
+}
+
+// applyV4 rebuilds task_log with the state CHECK (ticket 196).
+//
+// It refuses BY NAME before touching anything: if a row already holds a word the
+// roster does not accept, the step stops and says which words those are. The
+// alternative - letting the INSERT..SELECT hit the CHECK - aborts the migration
+// with "CHECK constraint failed" and no row identity, which is a dead end for
+// whoever has to repair the database. Refusing here keeps the promise the
+// ticket's second hard boundary makes: a database that satisfies today's
+// vocabulary must open, and a database that does not must say why.
+func applyV4(tx txExec) error {
+	ctx := context.Background()
+	off, err := taskLogStatesOutsideRoster(ctx, tx)
+	if err != nil {
+		return err
+	}
+	if len(off) > 0 {
+		return fmt.Errorf("task_log.state holds %d value(s) outside the v4 roster (%s); "+
+			"refusing to rebuild rather than abort on a CHECK that cannot name a row. "+
+			"Accepted values: %s",
+			len(off), strings.Join(off, ", "), strings.Join(TaskStateRoster(), "|"))
+	}
+	for _, stmt := range splitSQLStatements(ddlV4) {
+		if _, err := tx.ExecContext(ctx, stmt); err != nil {
 			return err
 		}
 	}

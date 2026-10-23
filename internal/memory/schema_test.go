@@ -247,14 +247,15 @@ func TestSchemaContractIntrospection(t *testing.T) {
 		t.Run("indexes/"+table, func(t *testing.T) { checkIndexes(t, db, table, spec) })
 	}
 
-	// 3. schema_version = 3 seeded (v1 D35 core + v2 provider_health + v3 session).
+	// 3. schema_version = 4 seeded (v1 D35 core + v2 provider_health + v3 session
+	// + v4 task_log state CHECK, ticket 196).
 	var v string
 	if err := db.QueryRowContext(context.Background(),
 		`SELECT value FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatalf("read schema_version: %v", err)
 	}
-	if v != "3" {
-		t.Errorf("schema_version = %q, want %q", v, "3")
+	if v != "4" {
+		t.Errorf("schema_version = %q, want %q", v, "4")
 	}
 
 	// 4. The DDL scripts round-trip through SQLite (statement splitting is
@@ -270,6 +271,11 @@ func TestSchemaContractIntrospection(t *testing.T) {
 	// v3: 2 CREATE TABLE + 3 CREATE INDEX = exactly 5 statements.
 	if n := len(splitSQLStatements(ddlV3)); n != 5 {
 		t.Errorf("splitSQLStatements(ddlV3) produced %d statements, want 5 (2 tables + 3 indexes)", n)
+	}
+	// v4: create + copy + drop + rename + reindex = exactly 5 statements
+	// (ticket 196's rebuild; its own guard lives in taskstate_196_test.go).
+	if n := len(splitSQLStatements(ddlV4)); n != 5 {
+		t.Errorf("splitSQLStatements(ddlV4) produced %d statements, want 5", n)
 	}
 }
 
@@ -376,16 +382,16 @@ func TestMigrateFreshDatabaseCreatesCurrentVersion(t *testing.T) {
 		`SELECT value FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatal(err)
 	}
-	if v != "3" {
+	if v != "4" {
 		t.Errorf("schema_version after reopen = %q", v)
 	}
-	// Reopen must not have written more backups: the three migration backups
-	// (0->1, 1->2 and 2->3) exist exactly once from the first open.
+	// Reopen must not have written more backups: the four migration backups
+	// (0->1, 1->2, 2->3 and 3->4) exist exactly once from the first open.
 	entries, err := os.ReadDir(s.backupDir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wantBackups := []string{"wisp.db.bak-0-1", "wisp.db.bak-1-2", "wisp.db.bak-2-3"}
+	wantBackups := []string{"wisp.db.bak-0-1", "wisp.db.bak-1-2", "wisp.db.bak-2-3", "wisp.db.bak-3-4"}
 	if len(entries) != len(wantBackups) {
 		t.Errorf("backup dir after reopen = %v, want %v", namesOf(entries), wantBackups)
 	}
@@ -404,18 +410,18 @@ func namesOf(entries []os.DirEntry) []string {
 	return out
 }
 
-// withTestMigration registers a test-only v3->v4 step so the chain mechanics
+// withTestMigration registers a test-only v4->v5 step so the chain mechanics
 // (backup name, single transaction, watermark update) are exercised without
-// polluting the production chain. The anchor is 3->4 (not 2->3) because the
-// production chain now owns 2->3 (the v3 session tables): nextStep returns the
-// FIRST step with a matching `from`, so a test step pinned at 2->3 would never
-// run. It mutates the package chain and restores it at cleanup.
+// polluting the production chain. The anchor is 4->5 (not any lower) because the
+// production chain now owns 0->1 through 3->4: nextStep returns the FIRST step
+// with a matching `from`, so a test step pinned at 3->4 would never run. It
+// mutates the package chain and restores it at cleanup.
 func withTestMigration(t *testing.T, next func(tx txExec) error) Option {
 	t.Helper()
 	saved := migrationChain
 	t.Cleanup(func() { migrationChain = saved })
 	return func(o *storeOptions) {
-		migrationChain = append(saved, migrationStep{from: 3, to: 4, apply: next})
+		migrationChain = append(saved, migrationStep{from: 4, to: 5, apply: next})
 	}
 }
 
@@ -441,22 +447,22 @@ func TestMigrationChainWithBackup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// 2. Reopen targeting v4 via a test-only migration that adds a table in
-	// its own transaction (on top of the production 0->1, 1->2 and 2->3 steps).
+	// 2. Reopen targeting v5 via a test-only migration that adds a table in
+	// its own transaction (on top of the production 0->1 through 3->4 steps).
 	mkV2 := withTestMigration(t, func(tx txExec) error {
 		_, err := tx.ExecContext(context.Background(),
 			`CREATE TABLE schema_probe_v2(x INTEGER NOT NULL)`)
 		return err
 	})
-	s2, err := Open(dir, mkV2, withSchemaTarget(4))
+	s2, err := Open(dir, mkV2, withSchemaTarget(5))
 	if err != nil {
-		t.Fatalf("open v3: %v", err)
+		t.Fatalf("open v5: %v", err)
 	}
 	defer s2.Close()
 
 	// 3. Backup written before the step, named per SPEC-02 §7, and it still
 	// holds the pre-migration content (v1 backup = full db copy).
-	bakPath := filepath.Join(dir, "backup", "wisp.db.bak-3-4")
+	bakPath := filepath.Join(dir, "backup", "wisp.db.bak-4-5")
 	fi, err := os.Stat(bakPath)
 	if err != nil {
 		t.Fatalf("pre-migration backup missing: %v", err)
@@ -470,8 +476,8 @@ func TestMigrationChainWithBackup(t *testing.T) {
 	if err := s2.reader.QueryRowContext(ctx, `SELECT CAST(value AS INTEGER) FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatal(err)
 	}
-	if v != 4 {
-		t.Errorf("schema_version = %d, want 4", v)
+	if v != 5 {
+		t.Errorf("schema_version = %d, want 5", v)
 	}
 	// Pre-existing data survived the migration.
 	var n int
@@ -516,13 +522,13 @@ func TestMigrationFailedStepIsAtomic(t *testing.T) {
 			`INSERT INTO schema_probe_v2(x) VALUES(NULL)`)
 		return err
 	})
-	_, err = Open(dir, failStep, withSchemaTarget(4))
+	_, err = Open(dir, failStep, withSchemaTarget(5))
 	if err == nil {
 		t.Fatal("Open succeeded despite failing migration step")
 	}
 
-	// The production 2->3 step committed (session tables present) while the
-	// failing test-only 3->4 probe rolled back with its watermark: strict
+	// The production 3->4 step committed (the task_log CHECK is in force) while
+	// the failing test-only 4->5 probe rolled back with its watermark: strict
 	// per-step all-or-nothing.
 	db, err := sql.Open(DriverName, dsn(filepath.Join(dir, dbFileName), true))
 	if err != nil {
@@ -533,8 +539,8 @@ func TestMigrationFailedStepIsAtomic(t *testing.T) {
 	if err := db.QueryRow(`SELECT CAST(value AS INTEGER) FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatal(err)
 	}
-	if v != 3 {
-		t.Errorf("schema_version after failed step = %d, want 3 (2->3 committed, 3->4 rolled back)", v)
+	if v != 4 {
+		t.Errorf("schema_version after failed step = %d, want 4 (3->4 committed, 4->5 rolled back)", v)
 	}
 	var probe int
 	if err := db.QueryRow(`SELECT count(*) FROM sqlite_master WHERE name='schema_probe_v2'`).Scan(&probe); err != nil {
@@ -552,7 +558,7 @@ func TestMigrationFailedStepIsAtomic(t *testing.T) {
 		t.Error("v3 session table missing after a later step failed (partial commit)")
 	}
 	// Pre-backup for the failing step exists.
-	if _, err := os.Stat(filepath.Join(dir, "backup", "wisp.db.bak-3-4")); err != nil {
+	if _, err := os.Stat(filepath.Join(dir, "backup", "wisp.db.bak-4-5")); err != nil {
 		t.Errorf("pre-migration backup missing: %v", err)
 	}
 }
