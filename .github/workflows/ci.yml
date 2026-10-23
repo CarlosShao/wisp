@@ -171,7 +171,7 @@ jobs:
 
       # CALL SURFACE CHANGED (ticket 362, AC#1 form (A'), owner-approved edit of
       # .github/**; the approval is docs/reports/pending-and-issues.md A1161 (1),
-      # and the dispatch that carries it is commit 76ae3bbb). Three claims:
+      # and the dispatch that carries it is commit 76ae3bbb). Four claims:
       #
       # WHY. This step used to read `gofumpt -l . tools/d22scan tools/mockllm`,
       # which walks the WHOLE tree - and `.scratch/**` is the directory this repo
@@ -185,24 +185,35 @@ jobs:
       #
       # WHAT THAT DOES TO THE DENOMINATOR. "The denominator of the formatting gate
       # is the TRACKED set, not the working tree" is the claim the census step
-      # below is built on, and it is no longer true OF THIS STEP: the denominator
-      # here is now the PRODUCTION DIRECTORY SET named above, not every tracked
-      # .go. Measured at the anchor: of 1160 tracked .go files, 800 sit in those
-      # five directories (internal 621, cmd 149, tools 18, scripts 11, frontend 1),
-      # 360 sit under .scratch/ and 0 sit at the repo root, and no tracked .go
-      # file's first path segment is anything else - so the five directories are
-      # exactly "production" and .scratch/ is exactly what leaves this
-      # denominator. The reading is still taken over tracked bytes on a checkout;
-      # what narrowed is which tracked bytes are counted.
+      # below is built on, and it is no longer true OF THIS STEP as written: the
+      # denominator here is now the PRODUCTION DIRECTORY SET named above, not every
+      # tracked .go. Measured at the 362-r2 anchor (2026-10-23, re-derived with
+      # `git ls-files`, not carried over): of 1162 tracked .go files, 802 sit in
+      # those five directories (internal 623, cmd 149, tools 18, scripts 11,
+      # frontend 1), 360 sit under .scratch/ and 0 sit at the repo root, and no
+      # tracked .go file's first path segment is anything else - so the five
+      # directories are exactly "production" and .scratch/ is exactly what leaves
+      # this denominator. The reading is still taken over tracked bytes on a
+      # checkout; what narrowed is which tracked bytes are counted. These counts
+      # rot as the tree grows: re-derive them before citing them (362-r1 wrote
+      # 1160/800/621 here, and by 362-r2 all three were already wrong).
       #
       # WHAT IT GIVES UP, stated rather than left to be discovered: a bench sample
       # that somebody one day places under one of those five directories WOULD be
       # scanned here and would redden this step. That count is 0 today - all 20
       # dirty tracked files are under .scratch/ - and it should stay 0, because
       # those directories are where the gate has to bite: a sample parked there is
-      # either a mistake or belongs in .scratch/. Unchanged: no -w, the first
-      # non-empty output still exits 1, and the census step below is a separate
-      # ruler that still reads every tracked .go - this edit does not move it.
+      # either a mistake or belongs in .scratch/. Unchanged: no -w, and the first
+      # non-empty output still exits 1.
+      #
+      # WHAT MOVED ONE LEG LATER (ticket 362-r2), because the paragraph above used
+      # to end by pointing at the census step: that step no longer reads every
+      # tracked .go either. It now reads the tracked set MINUS one named exclusion
+      # (.scratch/**), so the two steps agree on the bytes today (802 each) by two
+      # DIFFERENT definitions - a named INCLUSION here, a named EXCLUSION there -
+      # and they stop agreeing the moment a tracked .go falls inside one and
+      # outside the other. That divergence is a finding, not a rounding difference:
+      # when it happens the census step names the file and this step does not.
       - name: gofmt (gofumpt)
         if: ${{ !cancelled() }}
         run: |
@@ -432,13 +443,18 @@ jobs:
       # OWN SELF-TEST, run in CI. No existing step was moved, edited, deleted, given
       # an `if:` it did not have, or made continue-on-error.
       #
-      # WHY THIS IS THE STEP THAT WAS MISSING, in the ticket's own words: the gofmt
-      # step above runs `attrib.sh --tracked-only`, i.e. ONE of that instrument's two
-      # rulers. The instrument also carries a self-test (`--self-test`) that checks its
-      # classifier in both directions - a line it cannot attribute must ring, a line a
-      # real ticket owns must stay silent - and NOTHING IN CI RAN IT. So the day
-      # somebody broke the self-test, CI said nothing. That is the same shape ticket
-      # 161 was filed for ("the gate reports pass while it cannot see").
+      # WHY THIS IS THE STEP THAT WAS MISSING, in the ticket's own words: the census
+      # step above (`gofmt (gofumpt) - the tracked set is the denominator`) runs
+      # `attrib.sh --tracked-only`, i.e. ONE of that instrument's two rulers. Since
+      # ticket 362-r2 that ruler's denominator is the tracked set MINUS one named
+      # exclusion (.scratch/**), not every tracked .go - so it is a ruler that can
+      # go green on this tree at all, instead of one that is red on the same 20
+      # deliberately-broken bench samples forever. The instrument also carries a
+      # self-test (`--self-test`) that checks its classifier in both directions - a
+      # line it cannot attribute must ring, a line a real ticket owns must stay
+      # silent - and NOTHING IN CI RAN IT. So the day somebody broke the self-test,
+      # CI said nothing. That is the same shape ticket 161 was filed for ("the gate
+      # reports pass while it cannot see").
       #
       # WHY THE SELF-TEST HAD TO GET A ROSTER FIRST, and why this step would have been
       # decoration without it. Before this leg the self-test's only count was
