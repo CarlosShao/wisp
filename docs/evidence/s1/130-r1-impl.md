@@ -56,6 +56,15 @@ time=2026-10-23T11:53:46.700+08:00 level=WARN msg="winsec: seal cleared principa
 
 （1312→1311 的 1 字节是 RFC3339Nano 小数位随机长度，不是内容差；两发 `records=4` 与 booking 两个计数逐字相同 ⇒ **已经能落盘的腿，读数不变**——这是本笔的硬约束。）
 
+**受控 A/B（同一棵树、只差 `logging.go` 一枚 blob）**：共享树在我干活期间被别的腿改过（`cmd/wisp/doctor.go`、`cmd/wisp/dataroot_128*_test.go`、`internal/proc/envfork*.go`，mtime 12:11，均⛔ 本笔写面）。为排除这层干扰，我把 `b19c6612e^` 的 `logging.go`（sha256 `13d8180e…db16b12`）换回来建 `wisp-pre2.exe`、再换回本笔的（`76ce5f24…b87203`）建 `wisp-post2.exe`，**同一棵工树、同一发参数、等长数据根**：
+
+```
+leg-slo-E-pre  exe=wisp-pre2.exe  rc=0 console=2 bytes=0   records=0
+leg-slo-F-fix  exe=wisp-post2.exe rc=0 console=2 bytes=623 records=2
+```
+
+⇒ 差异只可能来自那**一条语句**。
+
 ## 4. 与票 132 的 seal 一跳共存（⛔ 没退回它）
 
 - `git diff -U0 -- internal/observe/logging.go` 全量 hunk 里**没有一行**提到 `PrivateDirAll` / `sealLogFile` / `ensureFileLocked`（尺：`git diff -U0 … | grep -nE 'PrivateDirAll|sealLogFile|ensureFileLocked'` ⇒ `NO DIFF LINE MENTIONS THE SEAL HOPS`）。
@@ -115,4 +124,5 @@ time=2026-10-23T11:53:46.700+08:00 level=WARN msg="winsec: seal cleared principa
 - **正控（同一把尺打真提交，证明它有牙）**：`6e19f4a43`（票 196）⇒ 同名尺列出 `.go` 五枚 `internal/memory/{dao_tasklog,migrate_v1seed_test,models,schema,schema_test}.go`，越界筛**逐枚点名**；`d59af9a98`（票 363）⇒ `internal/risk/mode.go`、`internal/tools/bridge.go` **被点名**。⇒ 我这笔之所以输出 `NO OUT-OF-SCOPE PATH`，是**因为真没有**，不是因为尺看不见 `.go`。
 - **提交后复跑（在提交树上重做，不是"提交前那次"）**：`go test ./internal/observe -count=2 -v` ⇒ **RUN=162 / PASS=162 / FAIL=0 / SKIP=0**，rc=0；`go build ./cmd/wisp` rc=0 后两腿再跑一发：`wisp slo -settle` **624 字节 / 2 条**、`wisp secret list` **4 条**且 booking 仍 `early_records=2, early_dropped=0`。
 - **第二笔** `8f205a6db3ac268351146d47315f65afad7d4a50`（只改本件）：`git show --name-only` 一枚 `docs/evidence/s1/130-r1-impl.md`，**零 `.go`**。
-- **第三笔**（只追加这一行）：号由 `git log --oneline -1 -- docs/evidence/s1/130-r1-impl.md` 现取，`--name-only` 同样只该有本件一枚。**追号不再追号**——到此为止，三笔全在 `git log -- docs/evidence/s1/130-r1-impl.md` 里。
+- **第三笔** `66e16de00`（只含本件 §10 末两行）。`git show --name-only` 一枚本件，**零 `.go`**。
+- **第四笔**（把 §3 的"受控 A/B"写进来）：号由 `git log --oneline -1 -- docs/evidence/s1/130-r1-impl.md` 现取，`--name-only` 同样只有本件一枚。**追号不再追号**——四笔全在 `git log -- docs/evidence/s1/130-r1-impl.md` 里。
