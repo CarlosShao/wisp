@@ -145,3 +145,14 @@ modernc 会**先排序再逐条执行** `_pragma`（`sqlite.go:433-449`，v1.59.
 3. ★⛔ 动 `ddlV1`–`ddlV4`、⛔ 动 12 枚名册、⛔ 动 `196-r2` 的护栏：`requireForeignKeysOff`／`pragmaForeignKeysQuery` 一字未动（§2-B 的"摘护栏"只存在于**仓外叠加**里，是读数手段，⛔ 是改动）。
 4. ★⛔ 动 `docs/PLAN.md`／`docs/specs/**`：未动。
 5. `internal/memory/schema.go`：**未动**（连注释都没改；`schema.go:386` 那句"relies on dsn() never setting the pragma"现在读起来略旧 —— 它描述的是 r2 当时的事实，本腿没被授权改它，留给裁决者定是否补一句）。
+
+## 10 提交与四数对账
+
+| 项 | 值 |
+|---|---|
+| 提交 | `da38c2bf4`（父 `61220f85a`，只动了 `docs/reports/pending-and-issues.md`，未碰本腿写面） |
+| `git show --stat` | **3 files changed, 413 insertions(+), 8 deletions(-)** |
+| 对账 | 79 ＋ 187 ＋ 147 ＝ **413** ✓；删除 8 ＝ 8 ✓（★两个方向都合得上，⛔ 只靠一个数自洽） |
+| 提交后包测 | `go test ./internal/memory -count=1` ⇒ **rc=0** |
+| 路径预算（新件入列后再跑） | `rc=0`，分母 17645→**17646**，`VERDICT GREEN`、roster=61 |
+| 提交字节 ＝ 量过的字节 | `git show HEAD:<p>` 经 `sha256sum` 与 `Get-FileHash -Algorithm SHA256` **三件逐一相等**（同为 64 位十六进制）⇒ 读的就是提交的那份 |
