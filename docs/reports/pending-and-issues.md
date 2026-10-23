@@ -24327,3 +24327,63 @@ is supposed to declare that itself (migrationDSN in open.go): something removed 
 - ★**改了四处**：①**标题**（"永远到不了" → "**我们设的天花板从未发给供应商**"）＋ **一条更正段** ②**新增「两条必读的射程」** ③**`AC#0` 加第 ⑤ 条**（量"供应商自己的上限"那条）④**`AC#2` 验收加第 ② 条**（屏幕说哪个词）。
 
 **⑥ 状态**＝结案 **37 票**（`-done` **180** 枚）、**完成度 180/357 ＝ 50.4%**、在飞 **0**、未推 **141**（攒着）、⛔ 清理、★**摆机主 0 件**。
+
+## A1202（2026-10-23 18:2x +08，编排者）★★`367-a1` 把**病根**找到了：`Set` **判的是「目标是不是 `auto_approve`」、⛔ 「是不是变宽」**｜★我拍〔甲′〕**修类、⛔ 修实例**｜★派 `367-r1`
+
+**① ★★普查的核心读数（`367-a1`、件 **159 行**、`cc45a4b81`＋`f3a4055d2`、★**逐枚 `.go`＝0`）**
+- ★**票面三条行号均未漂**（对 HEAD blob `4ee57d318` 复量）：`store.go:175 func (s *Store) Set`／`composer_handlers.go:141 h.Modes.Set`／`composer_handlers.go:133 if modeIsWidening(from, to) && h.Confirm == nil {`
+  ⇒ ★**且它看清了 `:141` 在 `:133` 的 `if` 之外、函数尾**（★**这个细节对**）。
+- ★**`114-r1` 三发它用真 `perm.Store`（⛔ 假 writer）复现**：深度 1 拒／`set_writes=0`；深度 2 拒／0；正控过／1。
+- ★★**`Set` 调用者：产线 `1` 枚**（`composer_handlers.go:141`）；★**测试 `12` 枚／`3` 文件**（逐枚 `file:line` 都给了）。
+  ★**并查了全仓 `func (…) Set(`**：★**只 3 个真实现**（`perm.Store` ＋ 2 个测试假腿）、**3 个同名不同物已剔** ⇒ **这个剔法对**。
+
+**② ★★★「变宽→门」表（病根就在这一张）**
+- ★★**`Set` 里唯一看方向的分支**是 `store.go:191` 逐字 `if to == risk.ModeAutoApprove {` ＋ `:192 if s.confirm == nil {`；★**上游只挡** `:185 if from == to`。
+  ⇒ ★★**它判的是「**目标**是不是 `auto_approve`」、⛔ 「是不是**变宽**」**。
+- ★**3 对变宽**：★`AE→AA` **拦**、★`AH→AA` **拦**、★★**`AE→AH` **不拦****。
+- ★**3 对变窄全不拦**（★**设计如此**）。
+- ★**档位是它自己现跑枚举的**（`Valid()` 只有 int `0/1/2`、无第四档）⇒ ⛔ 信票面。
+
+**③ ★★"非 auto 变宽"那一发（量出来的逐字，⛔ 读码推断）**
+```
+A1|NONAUTO|from=ask_every_step|to=ask_high_risk|set_err="<nil>"|read_after=ask_high_risk|applied=1
+  |file="permission_mode = 'ask_high_risk'"|last_result=applied|last_detail=""
+```
+⇒ ★★**零确认、零拒绝、文件真落盘**；★★**审计 `detail=""`（没有一句"为什么变宽"）** ⇒ **`Set` 这层确实无门**。
+
+**④ ★正控（尺双向、⛔ "一律拒"）**
+- ★**逐字拒绝句**：`perm: 切到 auto_approve 需要一次 L2 强确认，但本机没有接入确认通道（fail-closed 未切）`；★配套 `refused-confirm`／`applied=0`／**文件未变**。
+- ★**反向**：★`Confirm` 答 **yes** ⇒ `confirm_calls=1 applied=1 read_after=auto_approve`；★答 **no** ⇒ `perm: 切到 auto_approve 被拒绝: operator clicked deny`。
+  ⇒ ★★**尺双向** ⇒ ★**这也是我要求的那种"正控能过、负控也响"的形状**。
+
+**⑤ ★★路数与判（"加固 vs 补洞"的答案）**
+- ★★**产线调用点 `1` 枚；入口 `2` 枚**：★`cmd/wisp/panel_host_windows.go:948 m.disp.Handle`（resident 页面 `dispatchRaw`）／★`cmd/wisp/panel_inbound.go:164 disp.Handle`（CLI stdin）
+  ⇒ ★**两入口装**同一条链** `newComposerDispatchChain`（`panel_inbound.go:240`）、★**两层 `Confirm` 都 `nil`**（`:254`／`:264`）、★**实测两发都拒**、`set_writes=0`
+  ⇒ ★★**这条产线路**已过门****。
+- ★**测试 `12` 枚**：★**都绕过 handler 门直调 `Set`**（★测的是 `Set` 自己的语义）。
+- ⇒ ★★**判：加固（latent seam）、⛔ 补洞（live hole）**。★**活洞需要"第二条产线路"或"产线门被绕"、今天都没有。**
+
+**⑥ ★★它报的三条（都成立）**
+1. ★★**`cmd/wisp/run.go:687` 建了一枚**带真 `Confirm` 的** `ModeWriteHandler` 存进 `rt.modeWrites`、★**零读点**（`run.go:333` 自陈 "Nothing reads this field yet"）
+   ⇒ ★★**今天不是路、但它是**现成入口****：★**哪天有人把它接到 dispatch 上，`AE→AH` 就会过 handler 门进 `Set`、而 `Set` 对它**没有门****
+   ⇒ ★**这恰是〔甲′〕要定价的那条缝**（见 ⑦）。
+2. ★★**票面前提一处已过期**：★`composer_handlers.go:36-40` 仍写 "**Nothing calls this handler yet**"，★**实际 `composer_dispatch.go:204` 已调它、两条入口都到**
+   ⇒ ★**"今天不可从页面到达"的**理由**应改成「handler `:133` 拒」、⛔ 再写「跳不存在」**（★**结论不变**）⇒ **票面腐坏第 23 处**。
+3. ★**另两条"改档位不经过 `Set`"的路都不通向 `Set`**：★`Manager.SetPermissionMode` 产线唯一调用者**就是 `store.go:208`**（`Set` 内部）；
+   ★设置页 `config.set` **按名字拒 `permission_mode`**（`config_handlers.go:131-132` 逐字"设置页不写它"）⇒ ★**这个排除做得干净**。
+
+**⑦ ★★★我的裁形＝〔甲′〕把门的判据从「目标是不是 `auto_approve`」改成「是不是变宽」**
+- ★★**为什么是这一形（三条理由）**：
+  1. ★★**修的是**类**、⛔ 实例**：★`AE→AH` 只是今天枚举到的那一个 ⇒ ★**下次再加一档又会漏**。
+  2. ★★★**而那个谓词**已经存在****：★`composer_handlers.go:133` 逐字 `if modeIsWidening(from, to) && h.Confirm == nil {`
+     ⇒ ★★**同一个概念、两处判据不一样** ⇒ ★**这正是"两个转换点"病**（★**票 365 同形**）。
+  3. ★★**符合主流 harness**：★**门的判据应与**危险的方向**一致、⛔ 与**某一个特定目标值**一致**。
+- ★★**代价（我写清）**：★`Set` 对 `AE→AH` 会开始**要求确认** ⇒ ★**而两条产线路的 `Confirm` 都是 `nil`** ⇒ ★**它们今天就会拒**
+  ⇒ ★**这是好事**（**与 handler 门同向**）；★**但 12 枚直调 `Set` 的测试里若有测 `AE→AH` 的会变红** ⇒ **那是正确行为变化、要更新测试**。
+- ★★**四条硬边界**：①⛔ 改"变窄"语义（**必须仍不拦**）②⛔ 把"变宽"改成"任何变化"③⛔ 动名册／`ddlV*` ④⛔ 顺手接 `rt.modeWrites`（**另一件事**）。
+- ★★**并要求它先核依赖方向**（★**`perm` ↔ `panel` 能不能 import**）—— ★**本仓刚栽过：我没核 import 方向就要求放某层**（`A1200②`）。
+
+**⑧ ★门禁**：`go build 0`／`go vet ./internal/perm ./internal/panel 0`／`go test ./internal/perm 0`／★**`./internal/panel` `1`（既有红 5 枚、与 `114-r1` **同集**：2 枚 frontend 耦合 ＋ `TestC21DesignTokensFourWayAgree`（`design/assets/tokens.css` 不存在）＋ 2 枚 35-r8 内存上界；本腿 **0** 字节改动）**／`d22scan 0` clean／长度门 `0` GREEN。
+- ★★**它主动划清"别人在飞的脏"**：★`M internal/memory/open.go`／`M internal/memory/schema.go` 与 `.scratch/**` 一堆 `??.go` 是**他腿在飞**的、★**未进它的索引、未进它的两笔** ⇒ **这份划清做得对**。
+
+**⑨ 状态**＝结案 **37 票**（`-done` **180** 枚）、**完成度 180/357 ＝ 50.4%**、在飞 **2**（`366-r1`／`367-r1`）、未推 **132**（攒着）、⛔ 清理、★**摆机主 0 件**。
