@@ -228,6 +228,54 @@ func ApplyPortableOverride(env buildinfo.Env, l Layout, exeDir string) (Layout, 
 	return l, true, nil
 }
 
+// ErrUserConfigDirUnresolved is the class every leg refuses with when the OS
+// cannot answer where the user's config directory is (ticket 128 AC#2's ruling:
+// refuse to start, never fall back to the start-up directory). It carries no
+// command prefix because every leg prints it behind its own one, and it lives
+// here - in the package that owns the OS read - because this is the one place the
+// sentence is allowed to be written (ticket 128 AC#5: one seam, one text; a
+// second copy of this wording is exactly the drift the AC forbids).
+var ErrUserConfigDirUnresolved = errors.New("数据根无法解析：用户配置目录不可得")
+
+// UserConfigDirUnresolved words the refusal so it can be acted on, for every leg
+// that reaches the OS read - the resident (GUI) leg through DefaultLayout, and the
+// CLI legs through cmd/wisp's resolveDataDir / resolveSecretLayout, which call this
+// function rather than keeping a sentence of their own.
+//
+// The three things A105 item 7 booked as the price of AC#2 (the run leg goes on
+// such a machine from "degraded but usable" to "not usable at all") are: which
+// variable is missing (the OS's own words), the tree the data root belongs in for
+// this env fork, and what to set to get it back. The start-up directory is named
+// only to say it is deliberately not a fallback any more, with the measured
+// consequence of that fallback (ticket 128 AC#1: logs, config.toml, the DPAPI
+// store and memory.db moving with the start-up directory, and the next start in
+// another directory reading an empty config).
+//
+// The "where it belongs" clause is the one thing that differs per env, and it has
+// to tell the truth on all three: dev forks to wisp-dev, prod to wisp, and the
+// test env does not read this directory for its data root at all (LayoutFor hands
+// it WISP_TEST_DATA_DIR or %TEMP%\wisp-test-<pid>), so naming a fork there would
+// send a reader looking for a tree this process never uses. The spacing is spelled
+// with filepath.Separator so the sentence names the path shape of the platform it
+// is printed on.
+func UserConfigDirUnresolved(env buildinfo.Env, cause error) error {
+	sep := string(filepath.Separator)
+	where := "<用户配置目录>" + sep + "wisp"
+	switch env {
+	case buildinfo.EnvDev:
+		where = "<用户配置目录>" + sep + "wisp-dev"
+	case buildinfo.EnvTest:
+		// TestLayout's data root comes from the harness, not from the OS answer
+		// that just failed; saying so is the difference between a true line and
+		// one that sends the reader to a directory this process never opens.
+		where = TestDataDirEnv + " 或 %TEMP%" + sep + "wisp-test-<pid>"
+	}
+	return fmt.Errorf("%w（OS 原话：%v）：数据根本应是 %s，"+
+		"而 Wisp 拒绝把它回落到当前工作目录（票 128 AC#1 量到回落会搬家：日志、config.toml、DPAPI 私钥存储与 memory.db 跟着启动目录走，换目录再启动就读到空配置）。"+
+		"修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。",
+		ErrUserConfigDirUnresolved, cause, where)
+}
+
 // DefaultLayout resolves LayoutFor against the OS user config dir and then
 // applies the portable-mode override (portable.txt next to the running exe;
 // SPEC-02 §6). It is the single resolution order used by Boot, Summarize and
@@ -235,7 +283,7 @@ func ApplyPortableOverride(env buildinfo.Env, l Layout, exeDir string) (Layout, 
 func DefaultLayout(env buildinfo.Env) (Layout, error) {
 	dir, err := os.UserConfigDir()
 	if err != nil {
-		return Layout{}, fmt.Errorf("proc: user config dir: %w", err)
+		return Layout{}, UserConfigDirUnresolved(env, err)
 	}
 	// Ticket 119: $HOME/.config is a symlink on a great many real Linux setups
 	// (dotfiles managers), and winsec's placement floor refuses any root that

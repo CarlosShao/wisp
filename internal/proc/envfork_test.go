@@ -1,6 +1,7 @@
 package proc
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -329,7 +330,9 @@ func TestDefaultLayoutUnknownEnvFails(t *testing.T) {
 	}
 }
 
-// TestDefaultLayoutRefusesWithNoUserConfigDir is ticket 135 AC#5 (R-128-5).
+// TestDefaultLayoutRefusesWithNoUserConfigDir is ticket 135 AC#5 (R-128-5) and,
+// since ticket 128 AC#5, also the resident leg's readability pin.
+//
 // The resident leg's refusal on a machine whose OS has no user config dir had
 // exactly one witness, and it is a //go:build windows case in another package
 // driven through a compiled exe, so on POSIX that shape had no denominator at
@@ -337,6 +340,14 @@ func TestDefaultLayoutUnknownEnvFails(t *testing.T) {
 // from here on every GOOS, so the shape is pinned where it is produced: unset
 // both answers os.UserConfigDir reads and require a refusal instead of a data
 // root. That is the shape R-128-5 measured as `dir = "."` in DefaultLayout.
+//
+// Ticket 128 AC#5 then found the sentence itself unusable: the refusal read
+// `proc: user config dir: %AppData% is not defined`, i.e. it said the OS read
+// failed and nothing about where the data belongs or how to set it - AC#2's
+// booked cost ("the run leg goes from degraded-but-usable to not usable at all
+// on such a machine") only holds for a line a human can act on. The three
+// demands are pinned here by name, plus the order they are read in, so a refusal
+// that degenerates into a bag of tokens fails even with all six markers present.
 func TestDefaultLayoutRefusesWithNoUserConfigDir(t *testing.T) {
 	// os.UserConfigDir reads %AppData% on Windows and $XDG_CONFIG_HOME then $HOME
 	// elsewhere; clearing all three leaves the OS without an answer on either.
@@ -353,7 +364,97 @@ func TestDefaultLayoutRefusesWithNoUserConfigDir(t *testing.T) {
 	if l.DataDir != "" {
 		t.Errorf("AC#5 RED: a refusing DefaultLayout still handed back the data dir %q", l.DataDir)
 	}
-	if !strings.Contains(err.Error(), "user config dir") {
-		t.Errorf("AC#5 RED: the refusal does not say which OS read failed, so the resident leg's line cannot be acted on: %v", err)
+	if !errors.Is(err, ErrUserConfigDirUnresolved) {
+		t.Errorf("AC#5 RED: the refusal is not of the class ErrUserConfigDirUnresolved, so cmd/wisp cannot print it through the package's one wording point: %v", err)
+	}
+
+	// The same six strings cmd/wisp/dataroot_128_test.go's rescueMarkers128 holds.
+	// They are spelled out here rather than imported because that list lives in a
+	// package's test file; the two lists are meant to be the same six things, and
+	// the resident leg's real-process row in cmd/wisp is driven by that one.
+	markers := []string{
+		"用户配置目录不可得",       // the verdict, and the OS read that failed
+		"当前工作目录",          // the statement that "." is no longer a fallback
+		"APPDATA",         // the Windows variable to set
+		"XDG_CONFIG_HOME", // the POSIX variable to set
+		"可写目录",            // what a correct value looks like
+		"数据根本应是",          // where the data root belongs
+	}
+	sentence := err.Error()
+	var missing []string
+	for _, m := range markers {
+		if !strings.Contains(sentence, m) {
+			missing = append(missing, m)
+		}
+	}
+	if len(missing) > 0 {
+		t.Errorf("AC#5 RED: the resident leg's refusal refuses but cannot be acted on - it never says %s.\nThe line a human reads:\n%s",
+			strings.Join(missing, " / "), sentence)
+	}
+
+	// A bag of six markers is not a sentence. The three demands are read in the
+	// order a person needs them: what failed, where it belongs (hanging off the
+	// no-fallback statement), then the way out - and the way out comes last.
+	clauses := []struct{ what, text string }{
+		{"which OS read failed, in the OS's own words", "数据根无法解析：用户配置目录不可得（OS 原话："},
+		{"where the data root belongs, on the no-fallback statement it hangs off", "数据根本应是 " + filepath.Join("<用户配置目录>", "wisp-dev") + "，而 Wisp 拒绝把它回落到当前工作目录"},
+		{"what to set to get the data root back", "修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。"},
+	}
+	at := -1
+	for _, c := range clauses {
+		i := strings.Index(sentence, c.text)
+		if i < 0 {
+			t.Errorf("AC#5 RED: the refusal does not read as a sentence that says %s - the clause %q is not in it:\n%s", c.what, c.text, sentence)
+			continue
+		}
+		if i < at {
+			t.Errorf("AC#5 RED: the clause that says %s reads before the one before it, so the three demands are a bag of tokens rather than a sentence:\n%s", c.what, sentence)
+		}
+		at = i
+	}
+	if !strings.HasSuffix(sentence, "然后重试。") {
+		t.Errorf("AC#5 RED: the refusal does not end with the fix and its full stop, so the last thing a human reads is not the way out:\n%s", sentence)
+	}
+}
+
+// TestUserConfigDirUnresolvedNamesTheEnvFork pins the one thing that differs per
+// env in the shared sentence: the tree the data root belongs in. A single wording
+// point is only worth having if it still tells the truth per env - and the test
+// env is the case where the honest answer is "not a fork at all": LayoutFor hands
+// it WISP_TEST_DATA_DIR or %TEMP%\wisp-test-<pid>, so naming wisp or wisp-dev
+// there would send the reader to a tree this process never opens.
+func TestUserConfigDirUnresolvedNamesTheEnvFork(t *testing.T) {
+	cause := errors.New("%AppData% is not defined")
+	sep := string(filepath.Separator)
+	for _, tc := range []struct {
+		env     buildinfo.Env
+		want    string
+		notWant []string
+	}{
+		{buildinfo.EnvDev, "<用户配置目录>" + sep + "wisp-dev，", []string{"<用户配置目录>" + sep + "wisp，"}},
+		{buildinfo.EnvProd, "<用户配置目录>" + sep + "wisp，", []string{"<用户配置目录>" + sep + "wisp-dev，"}},
+		{buildinfo.EnvTest, TestDataDirEnv, []string{"<用户配置目录>" + sep + "wisp，"}},
+	} {
+		err := UserConfigDirUnresolved(tc.env, cause)
+		// The reading the交回件 quotes verbatim, per env.
+		t.Logf("UserConfigDirUnresolved(%q) with cause %q says:\n%s", tc.env, cause, err)
+		if !errors.Is(err, ErrUserConfigDirUnresolved) {
+			t.Errorf("AC#5 RED: UserConfigDirUnresolved(%q) is not of the ErrUserConfigDirUnresolved class: %v", tc.env, err)
+		}
+		if !strings.Contains(err.Error(), tc.want) {
+			t.Errorf("AC#5 RED: UserConfigDirUnresolved(%q) does not name the tree the data root belongs in (%q):\n%s", tc.env, tc.want, err)
+		}
+		// The other env's tree must not also be named, or the sentence
+		// contradicts the env it is printed under. The sentence-final comma is
+		// part of the match: "wisp" is a prefix of "wisp-dev", so a bare
+		// Contains would flag every dev sentence.
+		for _, forbidden := range tc.notWant {
+			if strings.Contains(err.Error(), forbidden) {
+				t.Errorf("AC#5 RED: UserConfigDirUnresolved(%q) also names %q, so the sentence contradicts the env it is printed under:\n%s", tc.env, forbidden, err)
+			}
+		}
+		if !strings.Contains(err.Error(), cause.Error()) {
+			t.Errorf("AC#5 RED: UserConfigDirUnresolved(%q) swallows the OS's own words (%q), so nobody learns which variable is missing:\n%s", tc.env, cause, err)
+		}
 	}
 }

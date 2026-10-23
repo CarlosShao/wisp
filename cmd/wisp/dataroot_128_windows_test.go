@@ -39,10 +39,11 @@ import (
 type realProcessLeg128 struct {
 	name string
 	argv []string
-	// markers are the pieces the refusing line has to contain. Every leg except
-	// the resident one now speaks with this package's single voice
-	// (dataDirUnresolved128); the resident leg's sentence is produced by
-	// internal/proc's DefaultLayout and is checked for that instead.
+	// markers are the pieces the refusing line has to contain. Ticket 128 AC#5
+	// put every leg on one sentence (internal/proc's UserConfigDirUnresolved), so
+	// the resident row is held to the very same six markers as the other three -
+	// before that, its row only asked for "user config dir", i.e. it pinned that
+	// the leg refused and nothing about whether a human could act on it.
 	markers []string
 }
 
@@ -60,7 +61,7 @@ func TestAC2RealProcessRefusesOnEveryLegWithoutAppData128(t *testing.T) {
 		{name: "run", argv: []string{"run", "票 128 探针"}, markers: rescueMarkers128},
 		{name: "secret-list", argv: []string{"secret", "list"}, markers: rescueMarkers128},
 		{name: "doctor", argv: []string{"doctor"}, markers: rescueMarkers128},
-		{name: "resident", argv: nil, markers: []string{"user config dir", "%AppData% is not defined"}},
+		{name: "resident", argv: nil, markers: rescueMarkers128},
 	} {
 		t.Run(leg.name, func(t *testing.T) {
 			cwd := t.TempDir()

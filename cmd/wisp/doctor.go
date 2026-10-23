@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -279,22 +278,26 @@ var userConfigDir = os.UserConfigDir
 // errDataDirUnresolved is the class a caller may test for with errors.Is: the
 // data root has no answer, so this leg refuses. It carries no command prefix
 // because every leg prints it behind its own one.
-var errDataDirUnresolved = errors.New("数据根无法解析：用户配置目录不可得")
+//
+// Ticket 128 AC#5: the value is internal/proc's sentinel verbatim. The resident
+// (GUI) leg reaches the same OS read through proc.DefaultLayout and cannot go
+// through this package, so the single point of the sentence - and of the class -
+// is the package that owns the read; this alias is what keeps the five CLI legs
+// on that one point instead of a second, drifting copy.
+var errDataDirUnresolved = proc.ErrUserConfigDirUnresolved
 
 // dataDirUnresolved128 words the refusal so it can be acted on. A105 ⑦ booked the
 // cost of AC#2's ruling out loud: the run leg goes on such a machine from
 // "degraded but usable" to "not usable at all", which only holds if the line that
 // stops it names the missing variable, the tree the data root belongs in, and the
 // fact that the start-up directory is deliberately not a fallback any more.
+//
+// Ticket 128 AC#5: the sentence itself lives in internal/proc
+// (UserConfigDirUnresolved), the package that owns the OS read, because the
+// resident leg reaches that read without passing through this file. This function
+// stays as this package's name for it so no caller changes.
 func dataDirUnresolved128(env string, cause error) error {
-	fork := "wisp"
-	if env == "dev" {
-		fork = "wisp-dev"
-	}
-	return fmt.Errorf("%w（OS 原话：%v）：数据根本应是 <用户配置目录>%s%s，"+
-		"而 Wisp 拒绝把它回落到当前工作目录（票 128 AC#1 量到回落会搬家：日志、config.toml、DPAPI 私钥存储与 memory.db 跟着启动目录走，换目录再启动就读到空配置）。"+
-		"修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。",
-		errDataDirUnresolved, cause, string(filepath.Separator), fork)
+	return proc.UserConfigDirUnresolved(buildinfo.Env(env), cause)
 }
 
 func probeWritable(dir string) error {

@@ -650,3 +650,55 @@ func captureStdout128(t *testing.T, fn func()) string {
 	r.Close()
 	return out
 }
+
+// TestAC5RefusalSentenceHasOneWordingPoint128 pins ticket 128 AC#5's first
+// closing criterion: the sentence every refusing leg prints is written in
+// exactly one place - internal/proc.UserConfigDirUnresolved, the package that
+// owns the OS read - and this package delegates to it instead of keeping a copy.
+//
+// Two directions, because either half alone is satisfiable by a fake:
+//   - the line this package produces must be literally the one proc produces
+//     (a delegation that rewords while delegating fails here), and
+//   - no production file of this package may hold a copy of the sentence (a
+//     second template that happens to agree today fails here first).
+//
+// The second direction is what R-121-2's family is about: a list of markers can
+// be shortened, but a sentence written twice drifts the moment one copy is
+// edited, and the resident leg - which never passes through this package - is
+// the copy nobody would remember to edit.
+func TestAC5RefusalSentenceHasOneWordingPoint128(t *testing.T) {
+	assertNoPortableOverride128(t)
+	failConfigDir128(t)
+	dir, err := resolveDataDir("dev")
+	if err == nil {
+		t.Fatalf("AC#5 RED: resolveDataDir(dev) answered %q with no error, so there is no sentence to compare", dir)
+	}
+	want := proc.UserConfigDirUnresolved(buildinfo.EnvDev, planted128Cause).Error()
+	if got := err.Error(); got != want {
+		t.Errorf("AC#5 RED: this package refuses with a sentence of its own rather than the one wording point.\ngot:  %s\nwant: %s", got, want)
+	}
+
+	files, err := filepath.Glob("*.go")
+	if err != nil || len(files) == 0 {
+		t.Fatalf("AC#5 RED (the instrument): cannot list this package's sources (%v, %d files)", err, len(files))
+	}
+	var production int
+	for _, f := range files {
+		if strings.HasSuffix(f, "_test.go") {
+			continue
+		}
+		production++
+		body, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatalf("reading %s: %v", f, err)
+		}
+		for _, fragment := range []string{"数据根本应是", "修法：Windows 把 APPDATA"} {
+			if strings.Contains(string(body), fragment) {
+				t.Errorf("AC#5 RED: %s still holds a copy of the refusal sentence (%q) - the resident leg would keep reading the copy written here, not the one in internal/proc", f, fragment)
+			}
+		}
+	}
+	if production == 0 {
+		t.Fatalf("AC#5 RED (the instrument): no production file was read, so nothing above was measured")
+	}
+}
