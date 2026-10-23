@@ -135,3 +135,14 @@ env：只 `unset GOTMPDIR`；**未** `unset TMPDIR/TEMP/TMP`（清了 `os.TempDi
 **落笔前五问**：①**量的是哪个对象**＝`15` 量的是 `ddlV1` 这一份 DDL 文本（编译期真值、经 `go test` 包内注入），非我另写的切分器；②**输出形状**＝gofumpt 在 Windows 吐**反斜杠**⇒ 归属用 `[\\/]`，diff 剥标记后**行内注释不以 `--` 开头**⇒ 换前缀/后缀逐字节判据（§5）；③**数的是代码还是注释**＝本腿**只动注释**，`prefix_identical=True` 就是"代码一字节没动"的证明；④**和总数对上没有**＝四数 `91=89+0+2` 自洽、甲尺 `17640 files` 与 `17640 tracked paths` 对上；⑤**谁算的、什么算法、几位**＝语句数由**仓内真实函数**算（非复刻）、格式由 `mvdan.cc/gofumpt`（`D:\work\base\gopath\bin\gofumpt.exe`）算、CR 由 `tr -cd "\r" | wc -c` 算。
 
 **一处方法论错，已当场改正**：首次取 rc 写成 `bash -c "…; echo \"rc=$?\""` ⇒ PowerShell 先把自己的 `$?` 求值，打出 `RC=True`。⇒ rc 一律由**脚本文件内**的 `cmd > out 2>&1; rc=$?` 产出（`gate.sh`），⛔ 不经 PowerShell 插值、⛔ 不走管道。
+
+## 9. 本笔提交号与提交后复跑
+
+- **提交**：`7537627ef5f58d383c0a6176b1450f1cf7002849`（`dev`，⛔ 未 push）
+- **提交内容**：3 文件、`+140 / -3`（`A docs/evidence/s1/196-c3-impl.md` 137 行 ＋ `M schema.go` 2 行 ＋ `M taskstate_196_test.go` 4 行）
+- **提交后复跑（尺不变）**：
+  - 提交里那一枚 blob 的 `:68`：`  state          TEXT NOT NULL,          -- 任务状态（含 'interrupted'）` ⇒ 与 `SPEC-02:60` 逐字节相同；
+  - 提交里 `taskstate_196_test.go:449` 仍是 `if n := len(splitSQLStatements(ddlV1)); n != 15 {` ⇒ 断言一字未动、行号未漂；
+  - 行数：`schema.go=411`、`taskstate_196_test.go=452`、本件 `=137`（与改前同，未膨胀）；
+  - 格式**甲**改用 **`git archive HEAD`** 再导出一次到仓外：`gofumpt -l internal cmd tools scripts frontend` ⇒ **0 行，rc=0**；
+  - 写面复跑：`git status --porcelain -- internal/memory/ docs/evidence/s1/` ⇒ **空**。
