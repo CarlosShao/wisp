@@ -143,8 +143,8 @@ A1P|POSCTL|to=ask_high_risk|handle_err="<nil>"|reply=""|handler_confirm_calls=0|
 
 ## ⑧ 提交
 
-- 提交号：首笔（件入库）`__C1__`；号回填笔 `__C2__`（只改本节这一行）。
-- 逐枚文件（两笔各只含这 1 个）：`docs/evidence/s1/367-a1-census.md`
+- 提交号：**`cc45a4b81`**（本文件入库那一笔；`git log -2 -- docs/evidence/s1/367-a1-census.md` 可见紧随其后的号回填笔，只改本节这一行）。
+- 逐枚文件（每笔各只含这 1 个）：`docs/evidence/s1/367-a1-census.md`
 - 逐枚 `.go`：**0**
 
 ## 附：尺与射程（落笔前五问的自答）
