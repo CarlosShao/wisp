@@ -2,7 +2,7 @@
 
 - 腿＝`366-r2`（写腿）· 派单主体＝`docs/evidence/s1/366-v1-verdict.md`（114 行）· 被补对象＝`366-r1`（`d4ce46f97`／`2abf150b2`／`c2e47f70c`，件 143 行）· 起始 HEAD＝`b0bf991b1`（含终裁 `a803c6c16`）· 2026-10-23 19:1x–2x +08
 - 写面＝`internal/memory/**`（`open.go`／`schema.go` **只改注释措辞**；`ForeignKeyAudit` 的 `slices.Clone` 是裁决特批的一处行为）＋测试 ＋本件；写面外 **0 字节**。
-- 仓外树：`D:\tmp\wisp\20261023\366r2\{headtree,posttree,restoretree,mut,logs,probes}\**`；**四个变异全用 `go test -overlay`**（`posttree` 自身从未被写）⇒ 工作树无突变窗口。
+- 仓外树：`D:\tmp\wisp\20261023\366r2\{headtree,posttree,restoretree,mut,logs,probes}\**`；**五个变异全用 `go test -overlay`**（`posttree` 自身从未被写）⇒ 工作树无突变窗口。
 - **尺的射程（先写清）**：夹具＝生产链建的真 v3 库（`Open(dir, withSchemaTarget(3))`）；孤儿＝生产调用（`PurgeTaskLogs`／`DeleteTaskLog`／raw INSERT／`RunRetentionOnce`）；迁移＝生产 `Open(dir)`；`fkc`＝迁移后另开业务连接数 `PRAGMA foreign_key_check` 行数；计数＝`Store.ForeignKeyAudit()`；**hash＝SHA-256、64 位十六进制**（`Get-FileHash -Algorithm SHA256` 与 `sha256sum` 两把同算法尺；⛔ `git hash-object`＝SHA-1/40 位，不混比）。
 
 ## §1 先复跑 `366-v1` 的核心读数（⛔ 抄；我在 `headtree`＝HEAD 导出树上自己跑，`logs/10`）
@@ -79,7 +79,7 @@
 
 - ② **还原绿**：`restoretree`（新导 HEAD＋三枚交付字节）`go test -count=1 -v ./internal/memory/` ⇒ **rc=0**、120 RUN／66 PASS／0 FAIL／2 SKIP（`logs/71`）。
 - ③ **原样绿**：`posttree`（同一交付字节，变异前）⇒ **rc=0**、120／66／0／2（`logs/31`）。
-- 还原核时机＝**最后一发变异（M4）之后**（§4 的 12 次比较）；⛔ 在变异之间量。
+- 还原核时机＝**最后一发变异（M5）之后**（§4 的 12 次比较，M5 后重量）；⛔ 在变异之间量。
 - `M1` 为什么是"最小摘除"而不是整条回滚：新用例在 HEAD 原码上编不过（`ForeignKeyAudit`／`foreignKeyCheck`／`pragmaForeignKeyCheckQuery` 都还不存在）⇒ 只会得到"编译红"。
 
 ## §7 四数（`go test -count=1 ./internal/memory/`，改前／改后**分开**、⛔ 相减；`-v` 下计）
@@ -94,6 +94,7 @@
 | `--- SKIP`（顶层） | **2** | **2** |
 
 新用例 1＋4 子例＋clone 用例 1＝**+6 RUN**；`+2` 顶层 PASS。★尺：`--- PASS` 只数**顶层**（子例缩进，不计）；`=== RUN` 含子例 ⇒ 两列不同尺。
+**提交后复跑**（`ec042da5f` 的字节，产码未改）：rc=**0**、120 RUN／66 PASS／0 FAIL／2 SKIP、`ok … 27.846s`（`logs/90`）⇒ 与上表改后列同值。
 
 ## §8 门禁 rc（逐门分开、⛔ 走管道取 rc）＋格式两尺
 
@@ -116,6 +117,6 @@
 
 ## §10 提交
 
-- 本件提交＝**`43ca90fc8`**（`4 files changed, 371 insertions(+), 21 deletions(-)`：3 枚 `.go` ＋本件）；`add`/`commit` 各自只点四个文件名（字面点名、⛔ glob）；提交前 `git diff --cached --name-status` 只见 **`A` 本件＋`M` 三枚**（无 `D`）。本件其后另有**只改本件**的补录（`5bc0ff51c`＝§10；另有一笔＝§2/§4/§6 加 `M5`，见 `git log -1`），产码字节 0 变化。
+- 本件提交＝**`43ca90fc8`**（`4 files changed, 371 insertions(+), 21 deletions(-)`：3 枚 `.go` ＋本件）；`add`/`commit` 各自只点四个文件名（字面点名、⛔ glob）；提交前 `git diff --cached --name-status` 只见 **`A` 本件＋`M` 三枚**（无 `D`）。本件其后另有**只改本件**的补录（见 `git log --oneline -- docs/evidence/s1/366-r2-impl.md`：`5bc0ff51c`＝§10、`ec042da5f`＝M5 等），产码字节 0 变化。
 - **格式甲复核（入库 blob＝判据）**：`git archive 43ca90fc8` 导出三枚 `.go` 到仓外再 `gofumpt -l` ⇒ **0 行**（rc=0）；三枚 blob 的 SHA-256 逐枚等于 §4 表（`08BDFA15…`／`DF2C99…`／`4A9E75DD…`）⇒ **还原核落在入库字节上**（`taskstate_196r2_test.go` 未改，其 blob 仍＝`A34A2591…`，与 §4 同）。
 - ⛔ push；台账／票面／`196` 原句 0 字节改动。
