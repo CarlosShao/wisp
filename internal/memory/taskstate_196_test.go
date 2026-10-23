@@ -444,8 +444,8 @@ func TestTaskState196DDLV4KeepsTheShape(t *testing.T) {
 			t.Errorf("ddlV4 statement %q is missing; the rebuild is not the documented 12-step shape", want)
 		}
 	}
-	// ddlV1 must be untouched: this ticket adds a step, it does not edit the
-	// frozen contract text.
+	// ddlV1's structure and statements must be untouched: this ticket adds a step,
+	// it does not edit the DDL; one wording-only comment was corrected (196-c2/196-c3).
 	if n := len(splitSQLStatements(ddlV1)); n != 15 {
 		t.Errorf("splitSQLStatements(ddlV1) = %d, want 15: ddlV1 must not be edited by ticket 196", n)
 	}

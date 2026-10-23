@@ -65,7 +65,7 @@ CREATE TABLE task_log (
   id             TEXT PRIMARY KEY,       -- 任务 UUID
   started_at     INTEGER NOT NULL,
   ended_at       INTEGER,
-  state          TEXT NOT NULL,          -- 结束态（含 'interrupted'）
+  state          TEXT NOT NULL,          -- 任务状态（含 'interrupted'）
   query_text     TEXT NOT NULL,          -- 已脱敏；模式匹配掩码是尽力而为，须标注（§14.4）
   summary_text   TEXT,
   cost_tokens_in  INTEGER NOT NULL DEFAULT 0,
