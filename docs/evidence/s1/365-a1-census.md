@@ -114,4 +114,4 @@ PROBE365A1-CLI | label=completed | fixture=text-reply | exit=0 | task=3c9843ab-1
 - **仓内 `.go` 改动 0 枚**：`git status --porcelain -- '*.go'` 共 77 行、**全部是 `??`**（`?? .scratch/…` 的历史探针残留、非本腿）；tracked 的 `M/D/A` **0 行**。两发探针都在 `D:\tmp\wisp\20261023\365a1\`，靠 `-overlay` 入场。
 - ★**已知环境红（⛔ 记本票头上）**：`go test ./cmd/wisp/` **不加** `third_party/sherpa-onnx` 到 PATH ⇒ 整包 `exit status 0xc0000135`（STATUS_DLL_NOT_FOUND、测试进程一次没起、0.133s）。病因：`sherpa-onnx-go-windows` 走 cgo（`CGO_ENABLED=1`）。本件 cmd/wisp 的读数**都是加了 PATH 之后**跑的：`export PATH="…/third_party/sherpa-onnx:$PATH"`，不改仓内一个字节。
 - **正控尺**：§4（`StatusCompleted` 两处同词 `done`，两发都是真库读数）⇒ 不是全红。
-- **提交**：本件入库提交见文件末行（只这一枚文件、显式 pathspec）；⛔ push。
+- **提交**：`b04cbeaba`（本件入库，117 行、只这一枚文件、显式 pathspec）；本行随后由一枚补记提交追加（`git log -1 -- docs/evidence/s1/365-a1-census.md`）。⛔ push。
