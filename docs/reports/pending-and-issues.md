@@ -23215,3 +23215,50 @@ M1 删引文／M2 改原文用词／**M3 只改一个数字**／M4 下移 Case 1
 - ★★**它自己交的两个硬提醒我都收进派单**：★**⛔ 走管道取 rc**、★**只 `unset GOTMPDIR`**。
 
 **⑤ 状态**＝结案 **34 票**（`-done` **177** 枚）、完成度 **177/352 ＝ 50.3%**、在飞 **3**（`132-v1`／`130-r1`／`128-r2`）、未推 **60**（攒着）、⛔ 清理、★**摆机主 1 件**（`SPEC-02`「结束态」措辞）。
+
+## A1178（2026-10-23 12:3x +08，编排者）★收 `130-r1`：**根因判对了**（⛔ "缓冲没落"、是"交接绑在调用者身上"）｜★产码只 **1 条语句**｜★它自报一处**跨票的仪器问题**｜派 `130-v1` 终裁
+
+**① ★收 `130-r1`（5 笔、HEAD `701448b79`、首笔码 `b19c6612e`；件 **130 行**）**
+- ★★**产码只 1 条语句**：`internal/observe/logging.go:149` 逐字 `_, _ = earlyLogs.drain(p.handler)`，★**在 `InstallAsDefault`（`:148`）里、`slog.SetDefault` 之前**。
+- ★**我现跑核过**：`FlushEarlyLogRecords` 生产调用者 **只有 `cmd/wisp/logsink.go:173`** 一处 ⇒ **它说的根因成立**。
+
+**② ★★根因判语（很准）**
+- ★★**根因 ⛔ "缓冲没落"、是"交接被绑在调用者身上"**：★`FlushEarlyLogRecords` 是**调用者的义务**、★**全树只有 `logsink.go:173` 一处调它**、
+  ★**而 `wisp slo`（`slo_windows.go:272` `observe.InitLog` ＋ `:281` `InstallAsDefault`）从来没调过**。
+- ★**它的原话**："**本仓已记过 ≥6 次的形状；本票的第 2 位调用者已经忘了**" ⇒ ★**这是"能力造出来了、产品里没人调"那一族的第 N 次**（票 166／132 同形）。
+
+**③ ★它量出来的（"记录在、听众在、文件在、0 字节"）**
+| 腿（`HEAD` 现建二进制）| 控制台 | 盘上文件 | 字节 | 记录 |
+|---|---|---|---|---|
+| `wisp slo -settle` | 2 条 | `logs\wisp-20261023-001.jsonl` | ★**0** | ★**0** |
+| `wisp secret list` | 4 条 | 同规则文件 | 1312 | 4 |
+| `wisp providers` | 1 条 | ★**连 `logs` 目录都没有** | — | — |
+
+- ★**受控 A/B（同树、只差 `logging.go` 一枚 blob）**：`wisp-pre2.exe`（`13d8180e…`）⇒ **0 字节／0 条**；`wisp-post2.exe`（`76ce5f24…`）⇒ **2 条**
+  ★**记录 0 逐字** `{"…","msg":"winsec: sealing path resolver installed","resolver":"risk.c26Pipeline","probes_passed":2}`。
+- ★★**硬约束它验了**：`wisp secret list` **4 条不变**、booking `early_records=2, early_dropped=0` **逐字不变**（★**已能落盘的腿读数不动**）。
+- ★**用例 4 枚**（`earlylog_takeover_130r1_test.go`）：★**改前逐枚红** `:194`／`:256`／`:280`／`:317`；
+  ★**反向判据**：`M-1` 删那一跳 ⇒ **4/4 红**／`M-2` **挪进 `InitLog`** ⇒ **1/4 红** `:181`（**158 字节 want 0**）／`M-3` 绕过 redaction ⇒ `:321`；原样 `-count=2` **PASS=8 FAIL=0**。
+- ★**还原核**：`sha256(logging.go)=76ce5f24…b87203`（SHA-256／64 位、**Git Bash `sha256sum`**、★**它自己算的**）；★**每次还原 `diff -q` 对 `logging.go.pristine` ＝ IDENTICAL**。
+
+**④ ★★它自报一处**跨票的仪器问题**（我表扬、已让终裁核）**
+- ★**头号用例第一版裸 `os.Stat` 量"构造后 0 字节"** ⇒ ★**`M-2` 下仍绿**（★**它量的是 `bufio`、⛔ 补发**）⇒ **改成先 `FlushNow` 再量才红**。
+- ★★**它并主动指出**："**票 132 那条'0 字节'用例在 `M-2` 下也是绿的，同理**" ⇒ ★★**这是跨票的仪器问题、而且它替我刚结的票 132 报的**。
+  ⇒ ★**这正是"`A1167④` 那条『⛔ 为了让读数好看而改』的反面"**：★**它发现自己的用例在变异下仍绿、主动改成更强版、并顺手指出别的票有同样问题**。
+
+**⑤ ★选型（它拍的、主流 harness）**
+- ★**`InstallAsDefault` 在 `slog.SetDefault` 之前 `earlyLogs.drain(p.handler)`** ⇒ ★**"装上＝交接时刻"**（`slog.SetDefault`／`zap.ReplaceGlobals`／`otel.SetLoggerProvider` 都是这一个动作；`log4j2` 的 `StatusLogger` 缓冲＋配置完成时补发是最接近的原型）。
+- ★**排除的另外三形各带读数/硬约束**：留在调用者手里（`slo` 已丢）／**塞进 `InitLog`（会花掉票 132 "构造瞬间 0 字节"的封印判据）**／懒补发（`slo -settle` 装完一条都不写、懒＝仍 0）。
+  ⇒ ★★**第二条是**跨票约束**、我让终裁现跑核"票 132 那条用例是不是真会被花掉"**。
+
+**⑥ ★门禁（它跑）**：`internal/observe -count=2 -v` **162/162/0/0 `rc=0`**；`gofmt -l` **3 行全在别人写面**（`pending_read.go`／`agent/tools.go`／`cmd/wisp/models.go`）；`gofumpt` 本笔 **0 行**；`vet` 双 GOOS `rc=0`；`d22scan rc=0` clean（**八 scope 对最近登记一枚不降**）；长度门 GREEN。
+- ★**红名册**：`internal/observe` 两发各 **77 RUN／0 红**、逐字相同；★**`cmd/wisp` sink 家族 8 枚：HEAD 8/8 绿、本笔 7/8**、
+  红名 `TestAC1ResidentLegInstallsItsLogListenerOnDisk`（`:498` "never reached the event loop"）—— ★**它说 `HEAD` 上单跑 3/3 也红（本笔 1/3 红）⇒ 环境时序 flake ⇒ 新增红 0** ⇒ ★**我让终裁核这个归因**。
+- ★★**它与票 132 的共存它验了**：★**`git diff -U0` 无一行提 `PrivateDirAll|sealLogFile|ensureFileLocked`**；★**票 132 六枚用例全绿**。
+
+**⑦ ★它交回三条残余（我记）**：①`logsink` 不走 `InstallAsDefault`（要 console 镜像）、仍靠 `FlushEarlyLogRecords`，其**计数语义后续落在 `cmd/**`** ②**无 pipeline 的腿仍只有控制台**（票 131 域）③**补发在 `SetDefault` 之前存在"已关缓冲＋旧默认"的微窗口**（引导期只有安装者一个 goroutine）。
+
+**⑧ ★它另报树况（重要、我核过）**：★它干活期间**别的腿**在共享树落了未提交改动（`cmd/wisp/doctor.go`／`dataroot_128*`／`internal/proc/envfork*` ＝ **票 128 收口腿正在跑**）＋未跟踪 `docs/evidence/s1/132-v1-verdict.md`；
+  ★**它一枚都没碰、且"受控 A/B 就是为排除它们才做的"** ⇒ ★**这是"共享工作树里怎么取干净读数"的正面示范**。
+
+**⑨ 状态**＝结案 **34 票**（`-done` **177** 枚）、完成度 **177/352 ＝ 50.3%**、在飞 **3**（`132-v1`／`128-r2`／`130-v1`）、未推 **64**（攒着）、⛔ 清理、★**摆机主 1 件**（`SPEC-02`「结束态」措辞）。
