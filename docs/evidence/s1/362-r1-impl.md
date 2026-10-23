@@ -135,7 +135,7 @@ CR＝0（工作树与 HEAD blob 都是 0）；非 ASCII 行数**改前 14＝改�
 |---|---|---|---|
 | ① | `2dc05b81` | `.github/workflows/ci.yml` | **0** |
 | ② | `8ea04e82` | `docs/evidence/s1/362-r1-impl.md`（新建） | **0** |
-| ③ | 本笔（号在交件消息给） | `docs/evidence/s1/362-r1-impl.md`（本表更新） | **0** |
+| ③… | 本件后续每一笔（号见交件消息；尺件 `logs/11-commit-scope.txt`） | 同上**单路径** | **0** |
 
 - ★**行数读数自查（我又错一次、已改）**：第二笔提交消息写"121 行"＝ PowerShell `Measure-Object -Line` 的读数（**它跳过空行**）；`wc -l`＝**153**、`git show --numstat` 同 ⇒ **本件 153 行**，≤160。
 
@@ -144,7 +144,7 @@ CR＝0（工作树与 HEAD blob 都是 0）；非 ASCII 行数**改前 14＝改�
 
 ## 9 ★★两条须编排者裁的问题（本腿⛔ 自行假设、⛔ 越写面）
 
-① ★**本腿只把两道格式门里的一道变绿。** 紧随其后的 census 步（161 AC#7 form A，改后 `:222` 起）跑 `sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only`，其 ruler A 逐字是 `git ls-files -z '*.go' | xargs -0 "$GOFUMPT" -l`（`attrib.sh:540-544`）＝**全 tracked 集** ⇒ 那 20 枚仍在它分母里 ⇒ **它今天仍会以同样 20 个名字 rc=1**；`attrib.sh:637` 那句 "The CI gofmt step and this step read the same denominator" 随本笔**失真**。后果：票 `AC#3` 的「`attrib.sh --tracked-only` 必须转绿（rc=0）」在形〔甲′〕下**取不到**——要它绿只能①洗字节（本腿硬禁）②改 `attrib.sh`（⛔ 写面外）。**要不要一起动，请裁。**
+① ★**本腿只把两道格式门里的一道变绿。** 紧随其后的 census 步（161 AC#7 form A；改后步名 `:223`、`run:` 在 `:274`）跑 `sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only`，其 ruler A 逐字是 `git ls-files -z '*.go' | xargs -0 "$GOFUMPT" -l`（`attrib.sh:540-544`）＝**全 tracked 集** ⇒ 那 20 枚仍在它分母里 ⇒ **它今天仍会以同样 20 个名字 rc=1**；`attrib.sh:637` 那句 "The CI gofmt step and this step read the same denominator" 随本笔**失真**。后果：票 `AC#3` 的「`attrib.sh --tracked-only` 必须转绿（rc=0）」在形〔甲′〕下**取不到**——要它绿只能①洗字节（本腿硬禁）②改 `attrib.sh`（⛔ 写面外）。**要不要一起动，请裁。**
 ② 那句原话「the denominator of the formatting gate is the TRACKED set, not the working tree」**逐字活在另一道步的注释里**（改前 `:194-195`／改后 `:228-229`），**不在**派单点名的"那步"（原 `:172`，那步原本无注释）。我按写面只改了我这步的注释、**没动**它；要不要同笔改、以及要不要改 `attrib.sh:637` 那句，请裁。
 
 ## 10 ★未测／未做
