@@ -90,6 +90,8 @@
 | `TestMigration366AuditIsLogged`（`clean`／`orphans` 两子例） | **日志半**：`orphan_rows=0`（Info）与 `orphan_rows=2`＋`child_tables=tool_call`＋`opening anyway`（Warn），且**无 `level=ERROR`** | 日志一行都不打 ⇒ 4 条 `strings.Contains` 全红 |
 | `TestMigration366AuditFlagIsOnTheRebuildStep` | 审计只挂在**重建那一步**（`3->4` 恰好一枚），`Store` 只存一枚基线 | 不红（它钉的是声明面，不是那一跳；**如实记**） |
 
+★**未钉的一支（如实记，⛔ 冒充已覆盖）**：`auditForeignKeys` 里"**审计自己读失败** ⇒ Warn ＋ `Checked=false`、照常开库"那一支**没有用例**——要注入一枚坏尺（让 `PRAGMA foreign_key_check` 报错）才能响，本腿没做这个注入；它的行为由代码读得、由 §2 的判决要求，但**没有牙**。留给 `366-v1` 判要不要补。
+
 ## §6 反向判据：三读数 ＋ **还原核**
 
 变异**全部在仓外 `posttree`**（`cp` 变体 → 跑 → 还原），本仓工作树**未当靶**。两发变异都落在**最终字节**（gofumpt 之后）上。
@@ -100,6 +102,7 @@
 | **M2＝把记录改成门槛**（硬边界 #1） | 取完审计后 `if audit.OrphanRows > 0 { return audit, fmt.Errorf(...) }` | **红**：3 枚顶层用例／6 个子例（`RecordsOrphans…` 四子例 `Open refused a database with N orphan row(s)`、`NeverLocks…`、`IsLogged/orphans`）；红行 `:271(×4),329,392` |
 
 **三读数**：① 变异红（上表两行，rc=1）② 还原绿（`logs/23-final-restore-green.txt`：`rc=0`、`PASS 5 / FAIL 0`）③ 原样绿（`logs/20-final-pristine-green.txt`：`rc=0`、`PASS 5 / FAIL 0`）。
+★**为什么反向判据用 M1 而不是"把整条改动拿回 HEAD"**：新用例文件在 HEAD 原码上**编不过**（`ForeignKeyAudit`／`foreignKeyCheck`／`pragmaForeignKeyCheckQuery` 都还不存在）⇒ 那只会得到"编译红"，⛔ 不是"用例红"。M1＝**编译得过的最小摘除**（只去掉取审计那一跳），所以它红出来的每一条都是**用例自己的判据**在响。
 **还原核（时机＝最后一发变异之后量的）**：`sha256sum` 四枚逐字相等 ——
 `open.go 3d9f2655…`／`schema.go 3f2e62ea…`／`taskstate_196r2_test.go a34a2591…`／`migration_fkcheck_366_test.go 8730ae29…`
 （`posttree` 与工作树各算一次，**四次比较全同**；⛔ 在变异之间量，那量到的是变异产物）。
