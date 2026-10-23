@@ -124,7 +124,7 @@ EXEC err=<nil> isError=true text="该目标被绝对禁止访问（R3 A 档，�
 | `go test -count=1 ./internal/perm/` | 主检出（跨包复核 `Screen`） | **0** | `ok` |
 | `sh scripts/d22scan.sh` | **本腿提交导出树** | **0** | `clean - no D22 ban violations`；`ban #8 internal/=623`（基线值 +2＝本腿两枚新用例 ×1 各）、`ban #7 internal/tools/=25` |
 | `sh scripts/d22scan.sh` | 主检出 | **1** | ★**不是本腿**：唯一违规＝`internal/memory/schema.go:25`→`:26`（196 腿正在改，行号随它漂）引 `docs/evidence/s1/196-r1-impl.md`（文件尚不存在）。`git status --porcelain -- internal/memory` ⇒ ` M schema.go`(+138/−4)／` M dao_tasklog.go`／` M models.go`；`git show HEAD:internal/memory/schema.go｜sed -n 25p` ⇒ `value TEXT NOT NULL`（**HEAD 上不是那句**）⇒ 随 196 腿的**未提交**工作树来。★我自己那枚同类违规（注释里把 `internal/tools/gate.go` 写成 `tools/gate.go`）**当场改正**后消失。 |
-| `sh scripts/check-path-length-budget.sh` | 主检出 | **0** | `denominator: tracked paths=17609 over-budget=61 covered by roster=61 not in roster=0`；`VERDICT GREEN` |
+| `sh scripts/check-path-length-budget.sh` | 主检出 | **0** | `denominator: tracked paths=17610 over-budget=61 covered by roster=61 not in roster=0`；`VERDICT GREEN`（本件入库前 17609） |
 
 ★**导出树上 `internal/tools` 另有一枚红**：`TestTicket252R1AlignmentAddsNoAuthorization` —— 它要求**仓根父路径有 8.3 短名别名**（`paths_shortname_252_r1_test.go:163-166`：「本探针不许 skip」），而 `D:\tmp\wisp\20261023\363r1\…` 没有；**同一用例在主检出通过** ⇒ 导出树**位置**造成的前置条件缺失，⛔ 产品回归。故 `go test` 的判据读数取主检出（含 `.git`、路径可生短名），导出租**只**用于**甲尺**与 `d22scan`。
 
@@ -133,7 +133,7 @@ EXEC err=<nil> isError=true text="该目标被绝对禁止访问（R3 A 档，�
 1. **量的是哪个对象**：卡数＝`Gate` 两个回调的**调用次数**（⛔ UI／tick／日志行数）；行为＝`Bridge.Execute` 的 `ToolOutcome` ＋ `OnDecision` 的 `Decision`（`DecisionColumn` 由 `route` 在 `emit` **之后**写，故 `decision=` 从**审计行**读，⛔ 从 `OnDecision` 读）；格式甲＝`git archive` 的**入库字节**、乙＝工作树。
 2. **输出形状**：`gofumpt -l` 在 Windows 出**反斜杠** ⇒ 一律 `tr '\\' '/'` 后按 `^\.scratch/` 判（⛔ 裸 `^\.scratch/`）。
 3. **数代码还是注释**：`d22scan` 违规行是**注释里的引用**（ban #9），`ban #8` 注释豁免、字符串不豁免；两枚新用例的注释里不写会 ring 的路径形态。
-4. **和总数对上**：`399 = 393 + 6`（新用例逐枚数）；`PASS 397 = 390 + 6 + 1`（时序用例转绿）；`FAIL 1 = 2 − 1`；`d22scan ban #8 internal/ 623 = 621 + 2`。
+4. **和总数对上**：`RUN 399 = 393 + 6`（新用例逐枚数，6 枚＝risk 3 + tools 3）；`PASS = 390 + 6 + k`、`FAIL = 2 − k`，其中 `k∈{0,1}` 就是那枚**时序**用例（`TestResolvePerCallBudget`）逐发漂的一个数（两发读数已在 §9 并列，⛔ 挑好看的那发）；`d22scan ban #8 internal/ 623 = 621 + 2`（本腿两枚新用例各 +1）。
 5. **谁算的、什么算法、几位**：行号＝`sed -n '<N>p'` on 工作树；提交名册＝`git show --name-only --format= <sha>`；`.go` 枚数＝同一输出 `tr -d "\r"` ＋ `tr "\\" "/"` ＋ `grep -Ec "\.go$"`；`grep -cE` 计 `=== RUN`／`--- PASS`／`--- FAIL`／`--- SKIP`（顶层，`^… [^/]* ` 排除子测试）；⛔ 无 hash 混比（本件不报 hash）。
 
 ## §11 纪律格与残余
@@ -141,3 +141,10 @@ EXEC err=<nil> isError=true text="该目标被绝对禁止访问（R3 A 档，�
 ① ★**需编排者拍的一件事（我如实登记，⛔ 自行修）**：`d59af9a` 除我 4 枚写面路径外，**还带走了 `.scratch/wisp/issues/164-…-leg.md` 的删除**（95 行）。成因：该删除**在我 `git add` 之前就已在索引里**（我 `git add` 用的是**显式四路径**、⛔ 没清索引），而 `git commit` 落的是**整个索引**；我开工前只查了 `git status --porcelain -- internal/risk internal/tools`（派单要求的那两包），**没查全索引**——这是我的漏。影响面：`164-…-leg-done.md`（防重领 key）**仍在**且本笔未碰。⛔ 我不用 amend/reset（明令禁）；**追加恢复**等于替 164 腿撤销它 staged 的清理意图 ⇒ **等口令**。
 ② ⛔ 翻框、⛔ 改票名／`Status:`／`-done`、⛔ 改台账、⛔ 改 `docs/PLAN.md`／`docs/specs/**`、⛔ push、⛔ 碰票 179/183/185 原句；临时件只建不删（`D:\tmp\wisp\20261023\363r1\**`，⛔ `.out`）；两次突变全走 `-overlay`（**工作树零突变窗口**）。
 ③ **残留（不在本票、已具名不修）**：`Gate` 未接线（`NoGate`）或 `L2` 卡面不可达时，"still asks" 仍会打在一条没有卡可开的组合上——那属"审批层没接线"，是另一条（今天生产组合 `cmd/wisp` 接了 `approval.Gate`，见 `run.go:764-788`）。本票只保证：**接线了 gate 的组合里，"still asks" ⇒ 同发真开卡**。
+
+## §12 终态复跑（★读数取在最后一枚 commit 之后）
+
+- **码**：`d59af9a`（产码 4 枚）；**件**：`613f2d87b`（那一笔 **143 行**），本笔把 §12 与 §9／§10 两处数字补上后为 **150 行**；`internal/**` 字节**自 `d59af9a` 起未再动** ⇒ 上面各门读数对码仍然有效。
+- **`git archive 613f2d87b` 导出树**：`sh scripts/d22scan.sh` ⇒ **rc=0**、`clean - no D22 ban violations`（`ban #7 internal/tools/=25`、`ban #8 internal/=623`、`cmd/=148`）、`runtests.sh: OK … PASS=35 FAIL=0 SKIP=0`；`gofumpt -l .` ⇒ **20 行、非 `.scratch` ＝ 0**；`go test -count=1 -run TestTicket363 ./internal/risk/ ./internal/tools/` ⇒ 两包 **ok**、rc=0。
+- **主检出**：`sh scripts/check-path-length-budget.sh` ⇒ **rc=0**、`tracked paths=17610 over-budget=61 covered=61 not in roster=0`、`VERDICT GREEN`。
+- ★**主检出的 `d22scan` 仍 rc=1**（§9 已归因：196 腿未提交的 `internal/memory/schema.go`）；本腿提交的导出树 **rc=0** ⇒ 本腿的贡献是 **0 违规**，这一点由**同一把尺、两个对象**分别给出。
