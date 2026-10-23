@@ -130,6 +130,8 @@
 **格式两尺**：**甲＝入库 blob（判据）**：把 `git show <commit>:<path>` 取出到仓外再 `gofumpt -l` ⇒ **0 命中**；**乙＝工作树（只作诊断）**：`/d/work/base/gopath/bin/gofumpt.exe -l internal/memory` ⇒ **0 字节输出**（`[\\/]` 过滤后 0 行）。
 ★**CRLF 尺⛔ 用 `gofumpt -l`**（它读工作树）：`git show HEAD:<p> | tr -cd "\r" | wc -c` ⇒ `open.go=0`／`schema.go=0`／`taskstate_196r2_test.go=0`（**LF**，与入库一致）。
 
+**提交后复跑（同一提交 `d4ce46f97` 的字节，⛔ 未改一行）**：G1–G5 **全 0**；G5 这一发才**看得见**新文件（它量 **tracked** 路径，提交前那枚 `??` 不在射程内）⇒ `VERDICT GREEN`；G3 本次 `ok … 26.134s`（机器上另有腿在飞，**rc 不变**，时长⛔ 当判据）。
+
 ## §9 纪律格
 
 - **只 commit、⛔ push**；`add`/`commit` 两处**显式 pathspec**（5 枚文件名字面点名，⛔ glob）。
