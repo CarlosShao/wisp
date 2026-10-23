@@ -24059,3 +24059,55 @@ is supposed to declare that itself (migrationDSN in open.go): something removed 
 **⑥ ★我另领一条（它没提、我记）**：★**"票面腐坏"第 21 处** —— ★**票 112 票面的"三条红"今天已不成立** ⇒ ★**它改完后要把这句改准**（★**⛔ 让票面继续指向已愈的三枚**）。
 
 **⑦ 状态**＝结案 **36 票**（`-done` **179** 枚）、完成度 **179/353 ＝ 50.7%**、在飞 **4**（`365-r1`／`366-a1`／`112-r1`／`114-r1`）、未推 **125**（攒着）、⛔ 清理、★**摆机主 0 件**。
+
+## A1197（2026-10-23 17:2x +08，编排者）★★`114-r1` **正确地停在两条硬停手条件上**（零产码）｜★★它给的读数很硬（★`M-2b`：「既返回拒绝又照样写」必须红）｜★我裁三件 ＋ 立票 **367**
+
+**① ★★它为什么停（两条硬停手同时命中）**
+1. ★**"绕过也拦得住" ⇒ 门已在原生层**。
+2. ★★**票面唯一未做格 `AC#3` 的落点**全在 `cmd/wisp/panel_inbound.go:249-267`**（`newComposerDispatchChain`、两条产线共用）⇒ ★**`cmd/**` 本波禁动**（`365-r1` 在飞）⇒ **无一处可在 `internal/panel/**` 内落地**。
+
+**② ★★它的三条读数（都硬）**
+1. ★**票面前提已过期**：★`ParseComposerRequest` 非测试·非 `.scratch` 命中 **10 行** ＝ ★**定义 `internal/panel/bridge.go:134`** ＋ ★**调用 `internal/panel/composer_dispatch.go:178`** ＋ **8 行 `//` 注释**
+   ⇒ ★★**产线调用者 ＝ 1、⛔ 0**。`Handle` 产码听众 **2 枚**（`cmd/wisp/panel_host_windows.go:948`／`panel_inbound.go:164`）。
+   ★**真二进制跑非变宽封套逐字**：`wisp panel-inbound: 第 1 行已受理，处理器已被调用`（`rc=0`）。
+   ⇒ ★**标题「生产里零调用者」、票面 `:44`「通路仍不存在」、`:21`「生产调用者=0」三处全过期**（★**票面腐坏第 22 处**）。
+2. ★★**绕过那一发（`-overlay` 探针、仓外、工作树零突变）**：★按产线原样装配 `ModeWriteHandler{Confirm: nil}`
+   - ★**深度 1（跳 composer ＋ 派发表直调 `HandleModeRequest`）⇒ 拒、写腿 0 次**
+   - ★**深度 2（只跳 composer 走 `dispatch`）⇒ 拒、0 次**
+   - ★★**正控（只把 `Confirm` 接上）⇒ 过、1 次** ⇒ ★**拦它的正是 `Confirm == nil` 那一跳**
+   ★**逐字拒绝句**：`panel: 确认腿未接入，档位不得变宽: 请求 "bypass-depth1" 要把档位从 ask_every_step 放宽到 ask_high_risk，而本机没有接入 L2 确认腿（R20/M4：只有变宽要确认）`
+   ★**真二进制同句**（`to=auto_approve` 与 `to=ask_high_risk` 两发 `rc=1`、audit 行 `detail="档位未变化：写入腿没有被调用"`）⇒ ★**三发后 `data/config.toml:124` 仍是 `permission_mode = 'ask_every_step'`**
+3. ★★★**反向判据（它用 `AC#2` **既有**钉，证它不是装饰）**：★基线 **6/6 绿** `rc=0`；★`M-1` 删 nil 检查 ⇒ 红 `composer_handlers_test.go:137`；★`M-2` 只记日志不拒 ⇒ 红 `:137`；
+   ★★**`M-2b` 既返回拒绝又照样写**（插一行 `h.Modes.Set`）⇒ `rc=1`、★**红在 `:145`**：
+   `the injected ModeWriter was called 1 time(s) despite the refusal - the gate did not stop the write`
+   ⇒ ★★**"写腿未被调用，不是返回了 error"** —— ★**这正是票面要的判据** ⇒ **这一发是本轮最值钱的读数**（★**它区分了"拒了"和"真拦住了"**）。
+
+**③ ★"真正的门"该在哪一层（它的判语、我认）**
+- ★★**就是票面点名的那一层**（Go 侧 mode 写入处理器、`composer_handlers.go:133`）⇒ ★**且**已在盘上**。
+- ★**可核理由**：★**能改档的只有 `(*perm.Store).Set`（`internal/perm/store.go:175`）**，★**它只有 1 枚产线调用者 ＝ `composer_handlers.go:141`**、★**就在那道 nil 门之后**
+  ⇒ ★★**门与副作用之间**无第二条产线岔路****。
+- ★`perm` 自己那道门**只盖 `auto_approve`**、补不了 `ask_every_step → ask_high_risk`；★而票面 `Packages` 逐字 **`internal/perm/`（存储语义别改）** ⇒ ★**不该挪进 `perm`**。
+
+**④ ★★我裁三件**
+1. ★★**`AC#3` **要**开 `cmd/**`** —— ★**最小形状**：★把 `cmd/wisp/run.go:687-694` 那枚**已接好 L2 腿**的 `rt.modeWrites`（★`run.go:333` 自陈 "Nothing reads this field yet"）**交给 `newComposerDispatchChain`**（`panel_inbound.go:249-267` 的**两处 `Confirm: nil`**）
+   ⇒ ★**一处改动、两条产线同时"变宽可走卡"**。
+   ★★**但必须**串行**：★`365-r1` **正在同目录**改 `cmd/wisp/run.go`** ⇒ ★**本波⛔ 派 `114-r2`**、★**等 `365-r1` 回来再派**（★**这就 `A1196④` 那条"一波一写腿"的同一纪律**）。
+2. ★**票面三处过期句**（标题／`:21`／`:44`）⇒ ★**要改**（★**票面腐坏第 22 处**）⇒ ★**归 `114-r2` 一并做**（★它已在 `cmd/**` 之外、改票面是编排者或腿都行、**我让腿做**）。
+3. ★★**深度 3 潜伏缝** ⇒ ★**单独立票 367**（见 ⑤）。
+
+**⑤ ★立票 367（`perm.Store.Set` 对非 `auto_approve` 变宽不设门）**
+- ★★**票面写清了"为什么现在不是活洞"**：★`Set` 的**产线调用者只有 1 枚**、★**就在 `Confirm == nil` 门之后**、★**绕过实验双向都拒** ⇒ ★**潜伏缝、⛔ 活洞**。
+- ★★**并写清"今天不可达 ⛔ 永远不可达"**：★**`Set` 是 `exported`** ⇒ **任何包都能调** ⇒ ★**一旦有人绕过 `composer_handlers.go`、那条变宽就没有门**。
+- ★**`AC#1` 三形**：〔甲〕门下沉到 `Set`（★**可能撞票面"存储语义别改"**）／★〔乙〕**把 `Set` 降级为非导出、只留受门包装**（★**用编译期把第二条路堵死、最符合主流 harness** ⇒ ★**但**改 API 面 ＝ 改契约 ⇒ 须摆机主**）／〔丙〕`d22scan` 加一条 ban（★**要改 `tools/d22scan/**`**）。
+- ★**票名 `367-perm-store-set-has-no-gate-for-non-auto-approve-widening-a-latent-seam.md`**（★**文件名 63 字符、相对路径 84 ≤121** ⇒ **我按 `A1170` 先算过**）。
+
+**⑥ ★它的纪律自报（我表扬）**
+- ★**它为取默认 `config.toml` 跑过一次 `wisp run`**（★它不认 `-data`、落到 `%APPDATA%\wisp-dev\` 并起过 WebView2 面板）⇒ ★**只杀了本程进程 PID 81876**、★**他腿的 `wisp`（PID 21892／`build\wisp.exe`／10-15 起）未动** ⇒ ★**此后改用 `-overlay` 种子 ＋ `panel-inbound`**。
+  ⇒ ★★**"我只杀了我自己启的那个"** —— ★**这是共享机器上的正确边界**。
+- ★**并自报**：★`cmd/wisp` 相关命令**一律带 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`**（★**首跑 `rc=127` 缺 DLL ＝ 假失败、已重跑**）⇒ ★**它用了我 `A1190` 那条情报**。
+
+**⑦ ★门禁**：`go build 0`／`go vet ./internal/panel/ 0`／`gofumpt -l internal/panel` **0 输出**／`d22scan 0 clean`（★八 scope 逐项：`internal 248`／`cmd 42`／`frontend 116`／`tools 25`／`design 39`／`frontend-emoji 116`／`internal-emoji 635`／`cmd-emoji 149`、`examined 290`）；
+`go test ./internal/panel/` **`rc=1`** ⇒ ★**甲（`-v` 顶层）`RUN 268 / PASS 165 / FAIL 5 / SKIP 0`**、乙（包级）`FAIL … 17.535s`
+★**5 红与票面历史「3 枚前端耦合 ＋ 2 枚 35-r8」同集、本波零新增**（★**本腿 `panel` 零改动**）。
+
+**⑧ 状态**＝结案 **36 票**（`-done` **179** 枚）、**真待推进 174 ＋ 新票 366／367 ⇒ 176**、完成度 **179/354 ＝ 50.6%**、在飞 **3**（`365-r1`／`366-a1`／`112-r1`）、未推 **128**（攒着）、⛔ 清理、★**摆机主 0 件**。
