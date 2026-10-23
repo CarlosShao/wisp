@@ -137,7 +137,7 @@ git diff -U0 -- .github/workflows/ci.yml | grep -E '^-' | grep -vE '^---' | grep
 | 长度门 | `sh scripts/check-path-length-budget.sh --with-self-test` | **0** | `VERDICT GREEN - every over-budget tracked path is rostered by name…` |
 
 **提交后复跑（在"我的树"上，⛔ 不靠共享工树）**：`git clone --shared` 到仓外 → `git checkout -q b833be20f` ⇒ d22scan **rc=0**、长度门 **rc=0／GREEN**（`tracked paths=17629`、`over-budget=61  covered by roster=61  not in roster=0`）。
-★**共享工作树此刻是 rc=1（RED）**：两行 RED 都是别人**暂存未提交**的 `.scratch/wisp/issues/196-…-in-use-done.md`（`git status` 读 `R065`）⇒ **归因清楚、⛔ 我这两枚文件**；我提交前那次 GREEN 是改名前的树（`17627`）。**这正是派单"⛔ 在主检出上量"的理由。**
+★**共享工作树在 11:5x 那一刻是 rc=1（RED）**：两行 RED 都是别人**暂存未提交**的 `.scratch/wisp/issues/196-…-in-use-done.md`（`git status` 读 `R065`）⇒ **归因清楚、⛔ 我这两枚文件**；我提交前那次 GREEN 是改名前的树（`17627`）。**该改名随后由编排者 `1fdda4c47` 收编并补 roster ⇒ 12:0x 现工树复跑 `rc=0／GREEN`。**（这正是派单"⛔ 在主检出上量"的理由：同一棵工树，几分钟内能从 RED 变 GREEN，变的不是门。）
 
 **尺的射程注**：d22scan 的 live scope 印 `internal/ 630`、`cmd/ 148` —— 那是**含未提交改动的工树**计数，**不是** §2 的 tracked `626/149`；两者不同对象、不同算法，⛔ 互相当核对。
 
