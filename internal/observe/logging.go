@@ -483,12 +483,17 @@ var _ io.WriteCloser = (*rollingWriter)(nil)
 //     top of the pipeline) asks for the records explicitly. Same replay, same
 //     order.
 //
-// Why the handover is NOT in InitLog: ticket 132 reads the file seal at exactly
-// that instant and needs the boot file to still hold zero bytes
-// (logprivate_132_test.go's TestLogFileIsSealedBeforeTheFirstContentByte132r1).
-// Moving the replay into construction would spend a seal reading this ticket has
-// no business spending - and "the pipeline exists" is not yet "the process
-// listens", which is the distinction the two hooks above make.
+// Why the handover is NOT in InitLog: the reading a replay would spend is this
+// ticket's own, not ticket 132's. Moving the replay into construction turns
+// earlylog_takeover_130r1_test.go's "after InitLog (and a flush) the boot file
+// holds 0 bytes" red - that case flushes before it measures, so it is the one
+// reading that separates a replay from a buffer. Ticket 132's six cases stay
+// green under the same move (6 PASS / 0 FAIL, measured in
+// docs/evidence/s1/130-v1-verdict.md §6): they stat the file without flushing,
+// so they read the writer's bufio, not the handover.
+// What stands on its own is the distinction the two hooks above make:
+// "the pipeline exists" is not yet "the process listens", and a pipeline built
+// but not installed has no business writing the boot verdict into its own file.
 //
 // Why it is not the caller's job alone: it was, until 130-r1, and one leg in the
 // shipped tree already did not do it - `wisp slo` opens the same pipeline

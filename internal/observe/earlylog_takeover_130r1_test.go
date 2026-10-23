@@ -13,11 +13,13 @@ package observe
 // The instant is InstallAsDefault and NOT InitLog, for two reasons that are
 // readings rather than preferences:
 //
-//  1. ticket 132 reads the seal at the construction instant
-//     (logprivate_132_test.go's TestLogFileIsSealedBeforeTheFirstContentByte132r1
-//     requires the boot file to hold 0 bytes right after InitLog). A construction
-//     that writes the boot records would make that reading unreadable, and the
-//     seal question it answers is not this ticket's to spend.
+//  1. the reading a construction-time replay would spend is this file's own, not
+//     ticket 132's: moving the replay into InitLog turns
+//     TestInstallAsDefaultTakesOverTheBootRecord130R1 red on its "after InitLog
+//     (and a flush) the boot file holds 0 bytes" assertion. Ticket 132's six
+//     cases stay green under the same move (6 PASS / 0 FAIL, measured in
+//     docs/evidence/s1/130-v1-verdict.md §6): they stat the file without
+//     flushing, so they read the writer's bufio.
 //  2. "the pipeline became the listener" is exactly what InstallAsDefault means -
 //     it is this package's spelling of slog.SetDefault, the act every mainstream
 //     logger treats as the installation (zap.ReplaceGlobals,
