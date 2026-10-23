@@ -22659,3 +22659,60 @@ M1 删引文／M2 改原文用词／**M3 只改一个数字**／M4 下移 Case 1
    ⇒ ★**那是"仪器丢世界"的报警、⛔ "删除变安全了"** ⇒ ★**这条写进票面**（★⛔ 让人把报警当好消息）。
 
 **⑧ 状态**＝结案 **30 票**、完成度 **173/351 ＝ 49.3%**、在飞 **4**（`363-r1`／`196-r1`／`362-r2`／★`348-r2` 已收）、未推 **12**、⛔ 推、⛔ 清理、⛔ 改契约、★**票 348 `AC#2` 待非实现者判**。
+
+## A1164（2026-10-23 10:2x +08，编排者）★收 `363-r1`（形〔丙〕全落地、四档零回归、反向判据两跳**互不代偿**）｜★答它那句"待拍"｜派两枚终裁腿
+
+**① 收 `363-r1`（`d59af9a` 4 枚 `.go` ＋ 三笔件；件 **152 行**／CR=0）**
+- `d59af9a`＝`internal/risk/mode.go`（`+25/−1`）／`internal/tools/bridge.go`（`+13/−0`）／`internal/risk/ticket363_screen_l0_test.go`（新）／`internal/tools/ticket363_test.go`（新）。
+
+**② ★★〔乙〕它怎么改的（★**它做的取舍比派单更细**）**
+- ★`Screen` 新增 `if d.Level == L0 { return Silenced{Level: L0, Mode: m} }`（★**Deny 之后、`!=L1 && !=L2` 之前**）。
+- ★`Kept=""`（契约只留给**被红线留住的询问**）、★`Silenced=false`。
+- ★★**它写清了为什么 `Silenced=false`**：★**置 `true` 会把"mode 移走了一个询问"写进每一行只读 `tool_call`、并把 bridge 引到 `MODE-SILENCE`"a silenced question"那条假话上**
+  ⇒ ★★**这是"修一个假话时别造出第二个假话"** ⇒ **比我派单里要求的更细，我表扬这一处**。
+- ★**fail-closed 支只收窄不删**（`Level(42)` 仍保留询问）；★**`route` 的 `case risk.L0` 放行语义一字未动**。
+
+**③ ★★〔甲〕它怎么改的**
+- ★`bridge.go` 在 `case sil.Kept != "":` **之前**新增 `case sil.Kept != "" && sil.Level == risk.Deny:` → 打 `refuses … (a Deny never reaches a gate: no card is raised)`。
+- ★**`Kept` 契约语义一字未动**（Deny 的 `Kept` 文本原样）⇒ ★**派单停手条件①（若必须动 `Kept` 契约语义 ⇒ 停手）未触发** ⇒ **它守住了**。
+- ★**真正会开卡的 `L1`／`L2` 仍打 `still asks`**（★**那里是真的**）⇒ ★**没有把日志一刀关掉**。
+
+**④ ★两向读数（修前／修后，它现跑）**
+- **修前 `L0` 三档**：`MODE-REDLINE … still asks … because=无法识别的风险级，fail-closed 保留询问` ＋ 同发 `CARDS TOTAL=0` ＋ `decision=allow` ＋ **已执行完**。
+- **修前 `Deny` 两档**：`still asks … because=拒绝级 verdict（Deny 级不受任何模式影响）` ＋ 同发 `CARDS TOTAL=0` ＋ `kind=denied decision=reject` ⇒ ★**两个方向都在说假话**。
+- **修后 `L0`**：★**无任何 `MODE-` 行**、`kept=""`、`TOTAL=0`、`decision=allow`、`text="hello"`。
+- **修后 `Deny`**：`refuses … (a Deny never reaches a gate: no card is raised)` ＋ `TOTAL=0` ＋ `decision=reject`。
+
+**⑤ ★★四档无回归（各一发）＋ 反向判据"两跳互不代偿"**
+- **`L0` 放行**（0/0 卡）／**`L1` 窗口 1**（`ask_every_step`，无 kept 行）／**`L2` 审批 1**（两档，`still asks` 且 because 为真）／**`Deny` 拒**（0/0 卡、`decision=reject`）；
+  ★`L1` 被 `ask_high_risk` 静默仍是 `MODE-SILENCE`、0 卡。
+- **反向判据（`-overlay`、仓外突变体、工作树零突变）**：★`M1` 摘 `mode.go` 的 `L0` 一跳 ⇒ `rc=1`、逐名红（`TestTicket363ScreenRecognizesL0`(4)＋`TestTicket363FourLevelsKeepTheirRoute`(3)＋`TestTicket363L0ReadNeverClaimsAQuestion`(15 条)）；
+  ★★`M2` 摘 `bridge.go` 的 `Deny` 一跳 ⇒ `rc=1`、**只红 `TestTicket363DenyIsRefusedNotAsked`(6 条)、`L0` 那枚仍绿** ⇒ ★★**两跳互不代偿**（★**这正是判据够细的证据**）。
+- ★**还原核**：`git hash-object`（SHA-1/40 位）四枚 **4/4 同串**；★**正控：那两枚正控用例修前就是绿的** ⇒ **牙不恒红也不恒绿**。
+
+**⑥ ★门禁**：`build 0`／`vet 0`／两包 `go test` `rc=1`（`RUN=399 PASS=396 FAIL=2 SKIP=1`，另一发 `397/1`）
+★**红名集合与基线逐名相同**：`TestResolvePerCallBudget`（**时序**，`1.013 ms/op > 1.000`、逐发漂）＋`TestC26RewriteAccountIsConsumedAtEverySecurityLeg`（**既存红**、对象是 `internal/panel/**`）；
+★`internal/perm`（`Screen` 语义表所在包、非它写面）**`rc=0`**。
+- ★★**`d22scan`：它提交的导出树 `rc=0` clean**（`ban #8 internal/=623` ＝ 621+2、`ban #7 internal/tools/=25`、自检 `PASS=35 FAIL=0`）⇒ ★**它用导出树取干净读数、正确**；
+  ★**主检出 `rc=1`**，唯一违规是 `196-r1` 未提交的 `internal/memory/schema.go` ⇒ ★**归因件里逐条给了尺**。
+- ★`check-path-length-budget.sh 0`：`tracked=17610 over-budget=61 covered=61 not-in-roster=0` GREEN。
+- ★格式**甲＝导出树 `gofumpt -l .` 20 行全 `.scratch`、非 `.scratch` ＝ 0**；**乙＝工作树 0**。
+
+**⑦ ★★答它那句"待拍"（`d59af9a` 卷进的那枚删除）⇒ 我已在 `A1162` 裁过：①留在史里**
+- ★**它问得对、态度也对**（⛔ 自行恢复、⛔ amend、先问）。
+- ★**答案（逐字重申）**：★**留**。★**理由**：①**那枚删除是我 `164` 结票时 `git rm --cached` 留下的 staged 残留**（★**我的提交 pathspec 只点了新名、没点旧名**）、**⛔ 它的越界**；
+  ②**终态是对的**（旧名该删、`-done` 在）⇒ **"晚落一步" ⛔ "落错"**；③★**恢复它反而错**——那会把**已改名结票的票**变回"两个名字都在"。
+- ★**它只需在件里记一句**（★**它已在 §交件里记了"用途成因"**）⇒ ★**够了、⛔ 再展开**。
+
+**⑧ ★派两枚终裁腿（票 348／票 363）**
+
+| 腿 | id | 票 | 判什么 |
+|---|---|---|---|
+| `348-v2` | `4b7feddb` | 348 | ★`AC#2`（**成对三件 × 两平台**；★含"POSIX 半边是**复用**算不算现跑"这一条；★含"Windows ① 本来就取得到"与"第二道批准本来不必要"两条自我更正的判语）|
+| `363-v1` | `e515253f` | 363 | ★`AC#2`（落地＋牙）＋`AC#3`（门禁）；★含"`Kept` 契约有没有被动"这一条 |
+
+- ★**给 `348-v2` 的重点**：★**要它独立判"加缝前 Windows ① 到底取不取得"**（★**造"不注入密封失败" vs "注入"两发**）；
+  ★**要它判"`T4` 承重归因"**（**钉不阻止删除被搬走 ⇒ 真正承重的是 fd-相对那一半**）。
+- ★**给 `363-v1` 的重点**：★**要它独立造两向读数 ＋ 正控（`L1`/`L2` 仍对）**；★**要它判四档无回归**（★**⛔ 修日志修出行为回归**）。
+
+**⑨ 状态**＝结案 **30 票**、完成度 **173/351 ＝ 49.3%**、在飞 **4**（`362-r2`／`196-r1`／`348-v2`／`363-v1`）、未推 **15**、⛔ 推、⛔ 清理、⛔ 改契约。
