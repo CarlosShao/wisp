@@ -23480,3 +23480,43 @@ M1 删引文／M2 改原文用词／**M3 只改一个数字**／M4 下移 Case 1
 - ★**但我已经把 `D` 落定** ⇒ ★**它下次核索引会看到干净** ⇒ **不需要额外指令**。
 
 **⑥ 状态**＝结案 **36 票**（`-done` **179** 枚）、完成度 **179/352 ＝ 50.9%**、在飞 **2**（`132-r2`／`130-r3`）、未推 **82**（攒着）、⛔ 清理、★**摆机主 1 件**（`SPEC-02`「结束态」措辞）。
+
+## A1184（2026-10-23 13:4x +08，编排者）★收 `130-r3`：**只改字符串**、`+5/−2`、四数逐数相同｜★它**自己复现了** `130-v1` §6（132 六枚在 `M-2` 下 6 PASS）｜★并给出**真代价的铁证**
+
+**① ★收 `130-r3`（`3256480ee`；件 `130-r3-impl.md` **116 行**）**
+- ★**改的只有一处字符串**：`internal/observe/earlylog_takeover_130r1_test.go:184-188`。
+- ★**改前逐字**：`"handover instant - ticket 132 reads the file seal exactly there, and a replay this early makes " / "that reading unreadable"`
+- ★**改后逐字**：`"handover instant - a replay moved here is caught by this case's own flushed reading, not by " / "ticket 132's six, which stay green under the same move (6 PASS / 0 FAIL, " / "docs/evidence/s1/130-v1-verdict.md section 6): the one case there that reads the boot file's " / "size at construction stats it without flushing, so it reads the writer's bufio rather than the " / "handover, and the other five never take that reading"`
+  ⇒ ★★**新文案把三件事都说清了**：①**真代价是哪条钉子**（本笔自己那条带 flush 的）②**132 六枚在 `M-2` 下仍绿**（6 PASS/0 FAIL、引 §6）③**为什么**（那一枚 `os.Stat` 不 flush、读的是 `bufio`）。
+
+**② ★★它自己复现了判语的 §6（⛔ 转述）**
+- ★**`M-2` 定义它自己给的**：`logging.go` 的 `p.flushDone = h.Done()` 后插 `_, _ = earlyLogs.drain(handler)`；★**仓外 `-overlay`、仓内零 `logging.go` 字节**。
+- ★**读数**：★**132 六枚 `M-2` 下 `RUN=6 / PASS=6 / FAIL=0 / SKIP=0`、`rc=0`** ⇒ ★**那条假话不成立、它复现到了**。
+- ★★**机制自证**：★**`logprivate_132_test.go:64-70` 的 `os.Stat` ＋ `info.Size()!=0` **不 flush****（★另一枚 `:83` 是先 `FlushNow` 的**另一个**读数）⇒ ★**它把"哪一枚为什么不 flush"指到了行**。
+
+**③ ★★真代价的铁证（这是本轮最硬的一条）**
+- ★**四名逐数相同**（同一 `-run` 正则、`-count=1`）：★**改前 `4/4/0/0 rc=0`** → ★**改后 `4/4/0/0 rc=0`** ⇒ ★**只换了"红的时候说的话"**。
+- ★★**`:182` 换 `error(nil)`**：
+  - ★**`M-2` ＋ 去 flush ⇒ `4/4/0/0 rc=0`（改前、改后都是）**
+  - ★★**对照 `M-2` ＋ 保 flush ⇒ `3 PASS / 1 FAIL rc=1`**，★**红行逐字含 `holds 158 bytes, want 0` ＋**新文案全文****
+  ⇒ ★★**真代价 ＝ 本笔自己那条带 flush 的钉子、与 132 无关**（★**这正是新文案写的那件事**）。
+
+**④ ★零码路径取证（它给的、很干净）**
+- ★`git diff -U0` **只有一处 hunk** `@@ -184,2 +184,5 @@`、**`+5/−2`**。
+- ★★**变更行里**非字符串字面量 `0` 行**、含 `if`／`!=`／`==`／`Fatalf(` 的行 **0 行** ⇒ ★**只改了 `Fatalf` 的**参数文本**、没动断言条件**。
+
+**⑤ ★门禁（它现跑、rc ⛔ 走管道）**
+- ★`go build ./...` **`0`**／`go test -count=2 ./internal/observe/` **`0`**（`ok … 9.274s`）／`d22scan` **`0`** clean（`internal/` **631** Go、`cmd/` **148**；计数 `248/42/116/25/39/116/631/148`）／长度门 **`0` GREEN**（`longest=185`、`worst=229`、`over=61`、`wall interval=0`、`roster=61`）。
+- ★`gofumpt` 本件 **0 行**；★**全树 54 行 ＝ 51 `.scratch` ＋ 3 eol 伪红**（CR `131/225/389`、索引 `i/lf w/crlf`、**全非本笔**）；★**本件 `CR=0`（`i/lf w/lf`）**。
+
+**⑥ ★它核了派单的"未定义即停项①"（我让它查的）**
+- ★★**全仓 grep 那三句** ⇒ ★**`.go` 里只有本文件一处**（★其余命中全在 `docs/`／`issues/` **叙述**里、⛔ `strings.Contains` 断言）
+  ⇒ ★**改文案不会让别的用例的红行断言失效** ⇒ ★**停手项①不成立**。
+- ⇒ ★**这正是我要求"改文案前先 grep 全树有没有别的用例 `strings.Contains` 那段文案"**那句话的用处（★**它照做了**）。
+
+**⑦ ★它报了一件要我知道的（我记）**
+- ★★**它提交后索引里出现 **`132-r2` 的暂存件**（`M cmd/wisp/logsink.go`／`M,A docs/evidence/s1/132-r*-impl*.md`）**、**没有进它的 commit**（`git show --name-status HEAD` **只两枚**）、**原样留在索引里给我**。
+- ★★**它还提醒**："`docs/evidence/s1/` 这个目录现同时有我的一枚与他们的三枚、**⛔ 混提交**" ⇒ ★**这是 `A1162`／`A1183` 两次事故之后，腿主动核对索引并提醒我的第二次**。
+  ⇒ ★★**"写面互斥"在这条腿上执行得最干净**：**它连"同一目录里有别人的件"都点出来了**。
+
+**⑧ 状态**＝结案 **36 票**（`-done` **179** 枚）、完成度 **179/352 ＝ 50.9%**、在飞 **2**（`132-r2` 收尾中／★`130-r3` 已收）、未推 **84**（攒着）、⛔ 清理、★**摆机主 1 件**（`SPEC-02`「结束态」措辞）。
