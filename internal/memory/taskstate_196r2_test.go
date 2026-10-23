@@ -130,7 +130,7 @@ func TestTaskState196RefusesRebuildWithForeignKeysOn(t *testing.T) {
 		t.Fatalf("open control: %v", err)
 	}
 	defer dbOff.Close()
-	if err := applyMigrationStep(dbOff, step, logger); err != nil {
+	if _, err := applyMigrationStep(dbOff, step, logger); err != nil {
 		t.Fatalf("control: the same fixture failed to migrate with foreign_keys OFF: %v", err)
 	}
 	var offVersion, offChildren int
@@ -162,7 +162,7 @@ func TestTaskState196RefusesRebuildWithForeignKeysOn(t *testing.T) {
 		t.Fatalf("subject connection has foreign_keys = %d, want 1: this half would measure nothing", fk)
 	}
 
-	err = applyMigrationStep(dbOn, step, logger)
+	_, err = applyMigrationStep(dbOn, step, logger)
 	if err == nil {
 		t.Fatal("the 3->4 step ran to completion with foreign_keys ON and a tool_call row present: " +
 			"either the pragma stopped taking effect or the rebuild stopped dropping task_log - " +

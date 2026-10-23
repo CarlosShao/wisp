@@ -100,6 +100,10 @@ type Store struct {
 	writer *sql.DB // single-connection write pool behind db-writer
 	queue  *writeQueue
 
+	// fkAudit is the referential-integrity baseline the migration took while
+	// opening this store (ticket 366). Zero value = no audited step ran.
+	fkAudit ForeignKeyAudit
+
 	closeOnce sync.Once
 	closeErr  error
 }
@@ -258,10 +262,14 @@ func Open(dir string, opts ...Option) (*Store, error) {
 	if err := winsec.PrivateDirAll(s.artifactsDir, 0o700); err != nil {
 		return nil, fmt.Errorf("memory: create artifacts dir: %w", err)
 	}
-	if err := s.migrate(); err != nil {
+	audit, err := s.migrate()
+	if err != nil {
 		return nil, err
 	}
-
+	// Kept on the store so a caller can read what the migration measured without
+	// scraping logs (ForeignKeyAudit); the same numbers went to the log inside the
+	// step, which is the operator's side of the same record.
+	s.fkAudit = audit
 	// Pools: reader pool may hold several concurrent connections; the writer
 	// pool is capped at exactly one connection so the single-writer invariant
 	// holds at the SQL layer too (defense in depth behind the db-writer
@@ -318,6 +326,24 @@ func (s *Store) Dir() string { return s.dir }
 // ArtifactsDir returns the artifacts directory path.
 func (s *Store) ArtifactsDir() string { return s.artifactsDir }
 
+// ForeignKeyAudit returns the referential-integrity baseline the migration chain
+// took while opening this store: SQLite's PRAGMA foreign_key_check, run inside the
+// v4 rebuild's transaction after the rebuild and before the commit (the 12-step
+// ALTER procedure's step 10; ticket 366).
+//
+// Read it as "what the migration saw", not as "what is true now": later writes can
+// add or remove orphan rows, and only a rebuild re-measures. Checked is false when
+// this Open ran no audited step - the database was already at SchemaVersionTarget,
+// which is the normal path from the second start onwards - or when the check
+// itself could not be read (the log names that case). In both, opening was not
+// affected.
+//
+// The count is a record on purpose: a non-zero value never refuses the database
+// (the ForeignKeyAudit type's doc comment says why, with the measurement) and never
+// deletes a row (tool_call is the forensic surface). To see the rows themselves,
+// run `PRAGMA foreign_key_check` against the database.
+func (s *Store) ForeignKeyAudit() ForeignKeyAudit { return s.fkAudit }
+
 // Close flushes the write queue, checkpoints the WAL, and closes all
 // connections. Idempotent.
 func (s *Store) Close() error {
@@ -361,23 +387,27 @@ func (s *Store) write(ctx context.Context, fn func(ctx context.Context, tx *sql.
 // the foreign-key switch is declared here rather than inherited from dsn().
 // ---------------------------------------------------------------------------
 
-func (s *Store) migrate() error {
+// migrate runs the chain and returns the referential-integrity baseline the
+// audited step took (ticket 366). A database already at the target takes no step,
+// so its audit says Checked=false: there was no rebuild in this Open to check.
+func (s *Store) migrate() (ForeignKeyAudit, error) {
 	boot, err := sql.Open(DriverName, migrationDSN(s.dbPath))
 	if err != nil {
-		return fmt.Errorf("memory: open for migration: %w", err)
+		return ForeignKeyAudit{}, fmt.Errorf("memory: open for migration: %w", err)
 	}
 	version, fresh, err := readSchemaVersion(boot)
 	if err != nil {
 		_ = boot.Close()
-		return err
+		return ForeignKeyAudit{}, err
 	}
+	audit := ForeignKeyAudit{SchemaVersion: version}
 	if version == s.target {
 		_ = boot.Close()
-		return nil
+		return audit, nil
 	}
 	if version > s.target {
 		_ = boot.Close()
-		return &SchemaError{
+		return audit, &SchemaError{
 			CurrentVersion: version,
 			TargetVersion:  s.target,
 			Reason:         "database was written by a newer Wisp binary; downgrading is not supported",
@@ -386,7 +416,7 @@ func (s *Store) migrate() error {
 	steps, err := planMigration(version, fresh, s.target)
 	if err != nil {
 		_ = boot.Close()
-		return err
+		return audit, err
 	}
 
 	// Apply each step: pre-backup (files, no open handles), then the single
@@ -394,26 +424,31 @@ func (s *Store) migrate() error {
 	// is consistent.
 	for _, step := range steps {
 		if err := boot.Close(); err != nil {
-			return fmt.Errorf("memory: close before backup: %w", err)
+			return audit, fmt.Errorf("memory: close before backup: %w", err)
 		}
 		if err := s.backupDatabase(step.from, step.to); err != nil {
-			return err
+			return audit, err
 		}
 		boot, err = sql.Open(DriverName, migrationDSN(s.dbPath))
 		if err != nil {
-			return fmt.Errorf("memory: reopen for migration: %w", err)
+			return audit, fmt.Errorf("memory: reopen for migration: %w", err)
 		}
-		if err := applyMigrationStep(boot, step, s.logger); err != nil {
+		stepAudit, err := applyMigrationStep(boot, step, s.logger)
+		if err != nil {
 			_ = boot.Close()
-			return fmt.Errorf("memory: migration %d->%d failed (database restored from backup is at %s): %w",
+			return audit, fmt.Errorf("memory: migration %d->%d failed (database restored from backup is at %s): %w",
 				step.from, step.to, s.backupPath(step.from, step.to), err)
+		}
+		if stepAudit.Checked {
+			audit = stepAudit
 		}
 		version = step.to
 	}
+	audit.SchemaVersion = version
 	_ = boot.Close()
 	s.logger.Info("schema migration complete",
 		"component", "memory", "schema_version", version)
-	return nil
+	return audit, nil
 }
 
 // planMigration picks the chain steps from the current version. A fresh
@@ -458,34 +493,92 @@ func nextStep(from int) (migrationStep, bool) {
 
 // applyMigrationStep runs one step in a single transaction and updates the
 // watermark inside it. Start/end times are recorded (SPEC-02 §7).
-func applyMigrationStep(db *sql.DB, step migrationStep, logger *slog.Logger) error {
+//
+// It also takes the step's referential-integrity baseline when the step asks for
+// one (auditForeignKeys, ticket 366) and hands it back so Open can keep it for
+// ForeignKeyAudit. The baseline never decides whether the step commits: it is a
+// record, and its own failure is logged rather than raised (see auditForeignKeys).
+func applyMigrationStep(db *sql.DB, step migrationStep, logger *slog.Logger) (ForeignKeyAudit, error) {
 	ctx := context.Background()
 	start := observe.NewTimeout(0)
 	startWall := observe.NowWallUTC()
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("begin migration tx: %w", err)
+		return ForeignKeyAudit{}, fmt.Errorf("begin migration tx: %w", err)
 	}
 	if err := step.apply(tx); err != nil {
 		_ = tx.Rollback()
-		return fmt.Errorf("apply: %w", err)
+		return ForeignKeyAudit{}, fmt.Errorf("apply: %w", err)
+	}
+	// SQLite's 12-step procedure checks referential integrity after the rebuild
+	// and before the commit (its step 10). Reading it here, with the rebuilt
+	// tables and the old rows both visible to this transaction, is what makes the
+	// count describe the state that is about to become the user's database.
+	audit := ForeignKeyAudit{}
+	if step.auditForeignKeys {
+		audit = auditForeignKeys(ctx, tx, step.to, logger)
 	}
 	if _, err := tx.ExecContext(ctx,
 		`INSERT INTO schema_meta(key, value) VALUES(?, ?)
 		 ON CONFLICT(key) DO UPDATE SET value=excluded.value`,
 		schemaMetaVersionKey, itoa(step.to)); err != nil {
 		_ = tx.Rollback()
-		return fmt.Errorf("update schema_version: %w", err)
+		return audit, fmt.Errorf("update schema_version: %w", err)
 	}
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("commit migration: %w", err)
+		return audit, fmt.Errorf("commit migration: %w", err)
 	}
 	logger.Info("schema migration step applied",
 		"component", "memory",
 		"from", step.from, "to", step.to,
 		"started_at", observe.WallTimestampUTC(startWall),
 		"duration_ms", start.Elapsed().Milliseconds())
-	return nil
+	if audit.Checked {
+		logForeignKeyAudit(logger, audit)
+	}
+	return audit, nil
+}
+
+// auditForeignKeys takes the referential-integrity baseline for one step and
+// NEVER fails the migration.
+//
+// Why a diagnostic may not refuse a database: the whole point of this record is
+// that a non-zero count is not a reason to lock the user out (ForeignKeyAudit says
+// why, with the measurement). A check that cannot be read is the same class of
+// event - a broken ruler must not become the lock either - so it is reported at
+// Warn and the step continues with Checked=false, which is what tells a later
+// reader that the baseline is missing rather than zero.
+func auditForeignKeys(ctx context.Context, tx txExec, version int, logger *slog.Logger) ForeignKeyAudit {
+	audit := ForeignKeyAudit{SchemaVersion: version}
+	rows, err := foreignKeyCheck(ctx, tx)
+	if err != nil {
+		logger.Warn("migration foreign-key baseline could not be read; opening anyway",
+			"component", "memory", "schema_version", version,
+			"err", err, "error_class", string(observe.ClassOfOrInternal(err)))
+		return audit
+	}
+	audit.Checked = true
+	audit.OrphanRows = len(rows)
+	audit.ChildTables = foreignKeyChildTables(rows)
+	return audit
+}
+
+// logForeignKeyAudit says what the baseline found, in the two shapes an operator
+// meets: clean (Info, so it is visibly measured and not merely absent) and
+// dangling (Warn, naming the count, the child tables, and the exact statement that
+// lists the rows). Nothing here is a refusal and nothing is deleted.
+func logForeignKeyAudit(logger *slog.Logger, audit ForeignKeyAudit) {
+	if audit.OrphanRows == 0 {
+		logger.Info("migration baseline: PRAGMA foreign_key_check found no dangling references",
+			"component", "memory", "schema_version", audit.SchemaVersion, "orphan_rows", 0)
+		return
+	}
+	logger.Warn("migration baseline: PRAGMA foreign_key_check found dangling references; "+
+		"recorded and opening anyway (rows are never deleted here - run "+
+		"`PRAGMA foreign_key_check` on the database to list them)",
+		"component", "memory", "schema_version", audit.SchemaVersion,
+		"orphan_rows", audit.OrphanRows,
+		"child_tables", strings.Join(audit.ChildTables, ","))
 }
 
 // readSchemaVersion reads the migration watermark. fresh=true means the file

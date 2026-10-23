@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -185,6 +186,19 @@ type migrationStep struct {
 	from  int
 	to    int
 	apply func(tx txExec) error
+
+	// auditForeignKeys asks the chain to run PRAGMA foreign_key_check inside
+	// this step's transaction - after the step's own statements, before the
+	// commit - and to record what it found (ticket 366).
+	//
+	// It is declared on the step rather than inside apply because the check has
+	// to read the state the transaction is about to commit, and a step's apply
+	// only sees the txExec interface at the moment it is written: the 3->4
+	// rebuild is SQLite's documented 12-step ALTER procedure, and this is its
+	// step 10. A future step that rebuilds a table opts in the same way.
+	//
+	// The record is deliberately NOT a gate: see ForeignKeyAudit.
+	auditForeignKeys bool
 }
 
 // txExec is the subset of *sql.Tx the steps need (keeps the chain testable).
@@ -203,7 +217,9 @@ var migrationChain = []migrationStep{
 	{from: 0, to: 1, apply: applyV1},
 	{from: 1, to: 2, apply: applyV2},
 	{from: 2, to: 3, apply: applyV3},
-	{from: 3, to: 4, apply: applyV4},
+	// auditForeignKeys: the 3->4 step is the one that rebuilds a table, so it is
+	// the one whose transaction has to be checked before it commits (ticket 366).
+	{from: 3, to: 4, apply: applyV4, auditForeignKeys: true},
 }
 
 // applyV1 creates the eight D35 tables + indexes and seeds schema_version=1.
@@ -283,6 +299,12 @@ func applyV3(tx txExec) error {
 // introspection test pins. The rebuild follows SQLite's documented 12-step
 // procedure (create new -> copy rows -> drop old -> rename -> recreate indexes),
 // all inside the one transaction the migration chain already wraps each step in.
+//
+// Step 10 of that procedure - PRAGMA foreign_key_check - cannot live in this
+// string: it has to read the transaction's own uncommitted state. It runs in
+// applyMigrationStep for the step carrying auditForeignKeys (the 3->4 entry of
+// migrationChain), and its result is recorded rather than enforced (ticket 366;
+// the record's shape is ForeignKeyAudit).
 //
 // The accepted values are GENERATED from taskStateRoster, never spelled a second
 // time here. That is the whole point of ticket 196's shape: the Go roster is the
@@ -481,5 +503,104 @@ func splitSQLStatements(script string) []string {
 		}
 		out = append(out, p)
 	}
+	return out
+}
+
+// pragmaForeignKeyCheckQuery is SQLite's referential-integrity check: the step 10
+// of the documented 12-step ALTER TABLE procedure that the v4 rebuild follows
+// (ddlV4), and the one step this chain did not run until ticket 366.
+//
+// It works whether or not enforcement is switched on (it reads the schema and the
+// rows, it does not enforce), which is why it can run on the migration connection
+// even though migrationDSN turns foreign_keys OFF for the rebuild.
+const pragmaForeignKeyCheckQuery = "PRAGMA foreign_key_check"
+
+// ForeignKeyAudit is the migration chain's step-10 record: how many dangling
+// references PRAGMA foreign_key_check saw in the state the step was about to
+// commit, and where they live.
+//
+// It is a RECORD, never a gate (ticket 366). Refusing to open a database whose
+// check is non-zero would make that database unopenable forever rather than once:
+// the rebuild's transaction rolls back, so schema_version stays at 3, and the next
+// start takes the same path and refuses again (open.go's `version == s.target`
+// shortcut only runs for a database that reached the target). Measured, not
+// inferred: probes/orch/20261022 census 366-a1 §5 refused all four orphan
+// fixtures and left the file at v3. So the number is kept, logged, and returned,
+// and the database opens.
+//
+// The rows are not deleted either: tool_call is the forensic surface ("what did it
+// actually do to my machine"), so removing rows is an irreversible act that is not
+// this package's to take.
+type ForeignKeyAudit struct {
+	// Checked reports whether the check ran at all in this Open. It is false when
+	// no audited step ran (the database was already at SchemaVersionTarget - the
+	// normal path from the second start on) or when the check itself could not be
+	// read (the log says which, and the Open continues).
+	Checked bool
+	// SchemaVersion is the version the audited step reached (the version this
+	// store opens at).
+	SchemaVersion int
+	// OrphanRows is the number of rows PRAGMA foreign_key_check reported.
+	// Meaningful only when Checked is true.
+	OrphanRows int
+	// ChildTables names, deduplicated and sorted, the child tables those rows
+	// live in. Empty when Checked is false or when OrphanRows is 0.
+	ChildTables []string
+}
+
+// foreignKeyCheckRow is one row of PRAGMA foreign_key_check: which child table
+// holds a row, that row's ROWID, the parent table it points at, and which of the
+// child's foreign keys is violated.
+type foreignKeyCheckRow struct {
+	Child  string
+	RowID  int64
+	Parent string
+	FKID   int
+}
+
+// foreignKeyCheck runs PRAGMA foreign_key_check inside the caller's transaction
+// and drains it completely. Draining matters: the rows have to be closed before
+// the step writes its watermark on the same connection.
+//
+// The ROWID is read as an int64 rather than scanned into an int: SQLite reports a
+// NULL rowid for WITHOUT ROWID child tables, and this package must not turn a
+// dialect detail into a failed migration. No table in this schema is WITHOUT
+// ROWID today; the scan shape is what keeps that true tomorrow.
+func foreignKeyCheck(ctx context.Context, tx txExec) ([]foreignKeyCheckRow, error) {
+	rows, err := tx.QueryContext(ctx, pragmaForeignKeyCheckQuery)
+	if err != nil {
+		return nil, fmt.Errorf("memory: PRAGMA foreign_key_check: %w", err)
+	}
+	defer rows.Close()
+	var out []foreignKeyCheckRow
+	for rows.Next() {
+		var r foreignKeyCheckRow
+		var rowID sql.NullInt64
+		if err := rows.Scan(&r.Child, &rowID, &r.Parent, &r.FKID); err != nil {
+			return nil, fmt.Errorf("memory: read PRAGMA foreign_key_check: %w", err)
+		}
+		r.RowID = rowID.Int64
+		out = append(out, r)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("memory: read PRAGMA foreign_key_check: %w", err)
+	}
+	return out, nil
+}
+
+// foreignKeyChildTables lists the child tables the violations live in, once
+// each, in a stable order so the log line and the audit value do not depend on
+// scan order.
+func foreignKeyChildTables(rows []foreignKeyCheckRow) []string {
+	seen := make(map[string]bool, len(rows))
+	out := make([]string, 0, len(rows))
+	for _, r := range rows {
+		if seen[r.Child] {
+			continue
+		}
+		seen[r.Child] = true
+		out = append(out, r.Child)
+	}
+	sort.Strings(out)
 	return out
 }
