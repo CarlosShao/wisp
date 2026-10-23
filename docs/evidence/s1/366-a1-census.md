@@ -146,7 +146,7 @@
 
 ## §9 纪律格：提交号 · 逐枚 `.go`（应为 0）· 正控尺
 
-- 提交号：`<填于提交后>`（只 commit、⛔ push；`add`/`commit` 两处显式 pathspec，逐个文件名字面点名）。
+- 提交号：`9b9a3e0899ed243fb0ffa0999e3a270f434cfd60`（本件首笔，160 行；补录本行的一笔见 `git log -1`）。只 commit、⛔ push；`add`/`commit` 两处显式 pathspec，逐个文件名字面点名。
 - **本腿落进仓的 `.go`＝0 枚**。判据（三把，⛔ 只看一把）：①`git status --porcelain -- '*.go'` 里没有本腿新增/修改（只有别的腿的两枚 `M` 与一批别的腿的 `??`）②本件之外本腿只写了 `docs/evidence/s1/366-a1-census.md` ③探针文件路径在 `D:\tmp\wisp\20261023\366a1\probes\**`（仓外）。
 - **正控尺（导出一致性）**：`git hash-object` 逐个比 `git rev-parse HEAD:<path>`——`schema.go 60c9b69c…`／`open.go 43726beb…`／`dao_tasklog.go 8ef59d1c…`／`dao_toolcall.go e53b7485…`／`retention.go 2846718e…`／`models.go 2166333a…`／`journal.go 82d6db71…`；gate、inject 两个变体用完**都还原并复验**（3 次全 `SAME`）。
 - 变体 diff 两枚（仓外）：`diff-open-gate.txt`（+18 行：门槛＋计数函数）、`diff-open-inject.txt`（+1 行：`foreign_keys(1)`）。
