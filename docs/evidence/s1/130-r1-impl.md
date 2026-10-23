@@ -108,3 +108,10 @@ time=2026-10-23T11:53:46.700+08:00 level=WARN msg="winsec: seal cleared principa
 1. **`cmd/wisp/logsink.go` 不走 `InstallAsDefault`**（它要 console 镜像，自己 `SetDefault` 一个 fan-out），所以它**仍然靠** `FlushEarlyLogRecords`；两条路**互斥且都只交一次**（`TestInstallThenFlushDeliversOnce130R1` 钉住）。⇒ 它的 `early_records=2` **不变**（§3）。**代价落点**：若将来有腿先 `InstallAsDefault` 再手动补发，那条 booking 的计数会读 0（"没有可交的了"）——**这是那条腿要自己报数的事**，本笔没有为此加 API（`cmd/**` 不在写面）。
 2. **没有 pipeline 的腿**（`wisp providers`/`wisp doctor`/panel inbound）**仍然只有控制台**：它们连文件都没有，"丢"的判据不成立；属票 131 的枚举域。
 3. **窗口（已写进 `InstallAsDefault` 的注释）**：补发在 `SetDefault` **之前**，所以补发与换默认之间若**别的 goroutine** 出声，会进"已关闭的缓冲 ＋ 旧默认"⇒ 只上控制台。这笔代价是为"文件第一行必须是启动裁决"付的，且发生在**引导那一刻**（此时进程只有安装者一个 goroutine）。
+
+## 10. 提交号 ／ `git show --name-only` ／ 正控 ／ 提交后复跑
+
+- **提交 1** `b19c6612e38e975ffba78c4fd53f65db7497fda0`（主题逐字以「票 130 落地腿 130-r1」开头）。`git show --name-only` 三枚：`docs/evidence/s1/130-r1-impl.md`、`internal/observe/earlylog_takeover_130r1_test.go`、`internal/observe/logging.go`。`.go` 两枚**均在写面内**；越界筛（`git show --name-only | tr '\\' '/' | grep -vE '<写面白名单>'`）⇒ **`NO OUT-OF-SCOPE PATH`**。`git diff --cached --name-status` 无 `D`、无写面外 `A`。
+- **正控（同一把尺打真提交，证明它有牙）**：`6e19f4a43`（票 196）⇒ 同名尺列出 `.go` 五枚 `internal/memory/{dao_tasklog,migrate_v1seed_test,models,schema,schema_test}.go`，越界筛**逐枚点名**；`d59af9a98`（票 363）⇒ `internal/risk/mode.go`、`internal/tools/bridge.go` **被点名**。⇒ 我这笔之所以输出 `NO OUT-OF-SCOPE PATH`，是**因为真没有**，不是因为尺看不见 `.go`。
+- **提交后复跑（在提交树上重做，不是"提交前那次"）**：`go test ./internal/observe -count=2 -v` ⇒ **RUN=162 / PASS=162 / FAIL=0 / SKIP=0**，rc=0；`go build ./cmd/wisp` rc=0 后两腿再跑一发：`wisp slo -settle` **624 字节 / 2 条**、`wisp secret list` **4 条**且 booking 仍 `early_records=2, early_dropped=0`。
+- **第二笔提交**（本件 §10 的追加）＝ `git log --oneline -1 -- docs/evidence/s1/130-r1-impl.md` 可现取；它的 `--name-only` 只该有 `docs/evidence/s1/130-r1-impl.md` 一枚（零 `.go`）。
