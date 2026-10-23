@@ -127,7 +127,7 @@
 
 ## ⑫ 提交 ＋ 逐笔越界
 
-- 本件入库那一笔：**见紧随其后的号回填笔**（`git log -2 -- docs/evidence/s1/367-v1-verdict.md` 可见）。
+- 本件入库那一笔：**`6576470ed`**（本行由紧随其后的回填笔改成这个号，只改这一行）。
 - 逐枚文件（每笔只含这 1 个）：`docs/evidence/s1/367-v1-verdict.md`。逐枚 `.go`：**0**。
 - 越界核对：⛔ 改 `internal/**`／`cmd/**`／`scripts/**`／`.github/**`／`.scratch/wisp/**`／`docs/reports/**`／`docs/PLAN.md`／`docs/specs/**`；⛔ 落 `.go`；⛔ 翻框／改票名／`Status:`／`-done`／台账；⛔ push。探针／突变全在仓外，**工作树 0 突变**。
 
