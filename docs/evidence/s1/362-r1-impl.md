@@ -129,12 +129,15 @@ CR＝0（工作树与 HEAD blob 都是 0）；非 ASCII 行数**改前 14＝改�
 ## 8 ★红名册／★逐枚提交越界＋正控
 
 - **红名册（本腿）＝（无）、新增红＝0**。读数形状：本腿逐笔 `git show --name-only` **零 `.go`** ⇒ 结构上无法新增红；`go build ./...` rc=0 作编译面读数。**整包 `go test` 未取**，理由具名＝主检出此刻是 `363-r1` 的写窗（§7），现在取出的名册量的是它的半成品；按"突变窗口⛔ 混入读数"不能记本腿账（已列 §10）。
-- 提交逐枚（`git show --name-only --format='%h %s'`）：
+- 提交逐枚（`git show --name-only --format='%h %s'`；三笔各**单路径**）：
 
 | # | 提交 | 文件 | 越界 |
 |---|---|---|---|
 | ① | `2dc05b81` | `.github/workflows/ci.yml` | **0** |
-| ② | 本件那一笔（号在交件消息给） | `docs/evidence/s1/362-r1-impl.md` | **0** |
+| ② | `8ea04e82` | `docs/evidence/s1/362-r1-impl.md`（新建） | **0** |
+| ③ | 本笔（号在交件消息给） | `docs/evidence/s1/362-r1-impl.md`（本表更新） | **0** |
+
+- ★**行数读数自查（我又错一次、已改）**：第二笔提交消息写"121 行"＝ PowerShell `Measure-Object -Line` 的读数（**它跳过空行**）；`wc -l`＝**153**、`git show --numstat` 同 ⇒ **本件 153 行**，≤160。
 
 - **正控（同一把越界尺）**：`a782196e`（真含 1 枚 `.go`＝`internal/winsec/leafrace_342r2_windows_test.go`）⇒ 尺**报出该枚越界**；空控 `fccf31a9`／`15d00c78`（零 `.go`）⇒ **0** ⇒ 尺不是恒 0。
 - ★纪律现记：我 `add` 后 `git diff --cached --name-only` 有 **2 行**——索引里另有一枚**别人**已 staged 的 `.scratch/wisp/issues/164-…-done.md`。两处都用**显式 pathspec**，`git show --name-only HEAD` 逐字**只列 `ci.yml`**，那枚**没被带进**、也仍在索引里（未被我动）。
