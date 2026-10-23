@@ -89,7 +89,7 @@
 
 ## 提交与写面
 
-- 本腿提交：**`<本笔>`**（单笔，只此一件）。
+- 本腿提交：**`d1ca3e643`**（单笔，只此一件）。
 - 逐枚点名：`docs/evidence/s1/348-v3-verdict.md`（`A`）。索引核验 `git diff --cached --name-status` 现跑＝**只此一行**，⛔ 出现本笔不该有的 `D`/`A`。
 - 正控：同一把尺打 `5ffa553e3`（`A docs/…/348-r2-impl.md`／`A internal/winsec/deleteseam_348r2_windows_test.go`／`M internal/winsec/winsec.go`）与 `195ce6d0f`／`e9caddff`（两枚 `.go`）⇒ 尺**认 `.go`**，⛔ 空白尺。
 - 越界：**0**（`internal/**` 之外零字节；`cmd/**`／`scripts/**`／`.github/**`／`.scratch/wisp/**`／`docs/reports/**`／`docs/PLAN.md`／`docs/specs/**` 一字未动）。
