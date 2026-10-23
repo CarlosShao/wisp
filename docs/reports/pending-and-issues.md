@@ -23963,3 +23963,56 @@ M1 删引文／M2 改原文用词／**M3 只改一个数字**／M4 下移 Case 1
 ★**甲尺 `gofumpt` 0 行、乙尺 3 行且无一属 `r3` 文件**；★**四数分开**：`rc=0`、`RUN=101`（**顶层 61**）、`PASS_top=59`、`FAIL_top=0`、`SKIP_top=2` ⇒ ★**相对 `r2` 时代顶层 +3、`RUN` +8（+5 subtest）、对得上**。
 
 **⑨ 状态**＝结案 **36 票**（`-done` **179** 枚）、完成度 **179/352 ＝ 50.9%**、在飞 **1**（`196-r4`）、未推 **115**（攒着）、⛔ 清理、★**摆机主 0 件**。
+
+## A1195（2026-10-23 17:0x +08，编排者）★收 `196-r4`：两处过时叙述改准（★**两处旧措辞命中 0`）、四数逐数相同、★`M4` 无牙回归实证已造｜★并立票 **366**（第 10 步）
+
+**① ★收 `196-r4`（`66e9dc568`；件 `docs/evidence/s1/196-r4-impl.md` ≤160 行）**
+- ★**两处按 `196-v3` §8 逐字改**：
+  1. ★`schema.go:385-389`（注释）—— 旧 `dsn() never sets the pragma … accidental precondition / declared one` ⇒ ★**新**：`migrationDSN … drops every foreign_keys entry … appends exactly one OFF … backstop`
+  2. ★★`schema.go:417-422`（**报错串**）—— 旧 `relies on dsn() never setting the pragma … **drop the foreign_keys pragma from the migration DSN** and retry`
+     ⇒ ★**新**：`the migration connection is supposed to declare that itself (migrationDSN in open.go): something removed that declaration`
+     ⇒ ★★**关键**：★**旧串叫用户做一件**已经做不到的事****（`migrationPragmas()` 会全删再追加恰好一条 OFF）⇒ ★**现在这句话不再指路到坏改法**。
+
+**② ★我现跑核实（三把尺）**
+- ★`git diff --numstat HEAD~1 HEAD -- internal/memory/schema.go` ⇒ ★**`8 7`**（**8 删 / 7 增**）⇒ ★**与它报的逐字一致**。
+- ★**新措辞在位**：`:386` `takes that step for itself in migrationDSN (open.go), which drops every foreign_keys` ／ `:421` `the migration connection is supposed to declare that itself (migrationDSN in open.go):`
+- ★★**两处旧措辞命中 0**：`drop the foreign_keys pragma from the migration DSN` ⇒ **0**；`dsn() never setting the pragma` ⇒ **0**。
+  ⇒ ★**这是"改注释/串"的正确验收形状**：★**⛔ "改了什么"、而是"旧的还在不在"**。
+
+**③ ★★四数逐数相同（这是"只改了措辞"的硬证明）**
+- ★改前 `RUN_all=101 / RUN_top=61 / PASS_top=59 / FAIL_top=0 / SKIP_top=2 / rc=0`
+- ★改后 **逐数相同**
+- ★**名字列表比对相同**（★持续时长后缀剥离后）⇒ ★★**"只有红的时候说的话变了"**。
+
+**④ ★★★`M4` 无牙回归实证（它照我派单造了）**
+- ★**做法**：★`HEAD` 导出树上把 `open.go:365/402` 的 `migrationDSN(s.dbPath)` → `dsn(s.dbPath, true)`；★`diff -u` **仅两个变量替换、零其他突变**。
+- ★★**读数**：★**`go test -count=1 ./internal/memory/` `rc=0`**、`ok … 19.066s`、★**两枚相关用例 `PASS`**。
+- ⇒ ★★**"今天 `dsn()` 不带 FK；改回不改变任何行为 ⇒ 没有套件能分辨"** ⇒ ★**这正是 `196-v3` §8 说的真风险**：
+  ★**过时注释招来"删掉迁移声明"的错误修复、而当前测试**无法捕获**。**
+- ⇒ ★**我裁：这条实证很有价值** ⇒ ★**它是"注释过时"升级成"注释在指路"的证据**（★**⛔ 只是文风问题**）。
+
+**⑤ ★运行时消息（探针实测、逐字）**
+```
+memory: refusing to rebuild task_log with PRAGMA foreign_keys=ON: tool_call.task_id REFERENCES task_log(id), so the
+DROP TABLE the v4 rebuild needs would abort on SQLite's "FOREIGN KEY constraint failed" and name neither a table nor
+a row. SQLite's 12-step ALTER procedure disables enforcement for a rebuild (its step 1), and the migration connection
+is supposed to declare that itself (migrationDSN in open.go): something removed that declaration. Nothing was modified.
+```
+⇒ ★★**这段话现在**答得出三件事****：①**为什么拒**（子表引用 ＋ `DROP` 会炸）②**谁该负责**（`migrationDSN`）③**现在是什么坏了**（"**something removed that declaration**"）
+  ⇒ ★**比原来的 `(787)` 强了不止一个量级**。
+
+**⑥ ★门禁五门全 `rc=0`**：`go build ./...`／`go vet ./internal/memory/`／`go test -count=1 ./internal/memory/`／
+`d22scan`（★`ban #8`：`internal/` **633** files／`cmd/` **148**、clean）／长度门（**GREEN**）。
+- ★**gofumpt 乙尺 3 行非本腿文件**（`pending_read.go`／`tools.go`／`models.go`）、★**`schema.go` 无影响**。
+
+**⑦ ★它问我两件（我答）**
+1. ★"**若你看到任何一行断言因字符串变化而失效请停手上报**" —— ★**我已现跑核：四数逐数相同、名字列表相同 ⇒ 无断言失效**；★**它自己也 grep 过全库** ⇒ **两向都过**。
+2. ★"**是否需要同步更新台账**（该条目已具名指向 `r4`）" —— ★**要、我已落本条**；★**但⛔ 它来写**（★**台账归编排者**）。
+
+**⑧ ★我另立票 366（`196-v3` 点名"必须真立成票"）**
+- ★**票名**：`366-applyV4-never-runs-foreign-key-check-step-10-so-orphans-can-be-left-silently.md`（★**文件名 80 字符 ≤100、相对路径 104 ≤121** ⇒ ★**我按 `A1170` 的定式先算过**）。
+- ★★**票面写清了"为什么今天⛔ 能直接加硬门槛"**：★`196-v2` 造孤儿库实测**迁移前后 `foreign_key_check` 都 ＝ 1**、**孤儿可达三条路径**（`PurgeTaskLogs`／`DeleteTaskLog`／手工 INSERT）
+  ⇒ **硬门槛会让那类库打不开** ⇒ ★**"今天不能加" ⛔ "永远不该有"**。
+- ★**并标了一条**：★`AC#1` 的〔乙〕"**先清孤儿**"会**删用户的取证数据**（`tool_call` 是**审计面**）⇒ ★**若选它、必须摆机主**（**不可逆动作**）。
+
+**⑨ 状态**＝结案 **36 票**（`-done` **179** 枚）、**真待推进 174 ＋ 新票 366 ⇒ 175**、完成度 **179/353 ＝ 50.7%**、在飞 **0**、未推 **118**（攒着）、⛔ 清理、★**摆机主 0 件**。
