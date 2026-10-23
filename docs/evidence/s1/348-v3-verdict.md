@@ -55,18 +55,23 @@
 
 ## ⑦ 门禁 rc（四数分开报；★跑前 `unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`）
 
-| 门 | rc | 读数 |
-|---|---|---|
-| `go build ./...` | **0** | — |
-| `go vet ./internal/winsec/` | **0** | — |
-| `GOOS=linux` / `GOOS=darwin` 各 build＋vet | **0/0/0/0** | 四发全 0 |
-| `gofumpt -l internal/winsec`（**甲＝blob 树**／判据） | **0** | 0 行；`[\\/]` 归属核命中 **0**（＝真没列文件，⛔"列了被过滤"） |
-| 同上（**乙＝工作树**／只诊断） | **0** | 0 行 |
-| `sh scripts/check-path-length-budget.sh` | **0** | `VERDICT GREEN`、`tracked paths=17612`、`over-budget=61`、`in roster=61`、`not in roster=0` |
-| `sh scripts/d22scan.sh` | **0** | 正控 `PASS=35 FAIL=0 SKIP=0`、`=== RUN=77`；真扫 290 枚产码体 **`clean - no D22 ban violations`** |
-| 整包 `go test -count=1 -v ./internal/winsec/` | **1** | 三发四数（RUN/PASS/FAIL/SKIP）＝**`123/121/2/0`**、**`123/120/3/0`**、**`123/121/2/0`**；每发 `PASS+FAIL+SKIP==RUN` 逐发对上（⛔ 相减） |
+★★**两枚锚必须分开报**：起手锚 `7e99ccf81`（build／vet／gofumpt／整包三发都在它上面跑）⇄ **收手时 HEAD＝`47987d32`**（跑完我又回头复跑了 build／vet／d22scan／pathlen）。**`internal/winsec` 在两锚之间逐字节未变**（`git diff --stat 7e99ccf81..47987d32 -- internal/winsec` 为空）⇒ **winsec 的读数与 `348-r2` 两笔文件全部照原样结转**。
 
-★★**`d22scan` 归因（用"能区分两棵树"的尺）**：编排者预告"今天会 rc=1"**已经不复现**——本腿现跑 **rc=0**。归因两把尺：`git show HEAD:internal/memory/schema.go` 的第 26 行是 `);`（**⛔ 含引用**）⇄ `Get-Content internal/memory/schema.go` 第 26 行**含** `docs/evidence/s1/196-r1-impl.md` ⇒ 那枚 phantom-citation 只在**工作树**、是票 196 的腿在飞；且被引的那枚文件**现在磁盘上已在**（`Test-Path`＝True）但 **`git ls-files` 为空＝⛔ 跟踪**。⇒ 该红属**票 196**，⛔ 票 348；`348-r2` 当时报的 `rc=1`／`PASS=33 FAIL=2` 在这两件事都变了之后**已自然转绿**（它给的归因口径是对的）。
+| 门 | rc | 读数 | 锚 |
+|---|---|---|---|
+| `go build ./...` | **0** | — | 两锚都 0 |
+| `go vet ./internal/winsec/` | **0** | — | 两锚都 0 |
+| `GOOS=linux` / `GOOS=darwin` 各 build＋vet | **0/0/0/0** | 四发全 0 | `7e99ccf81` |
+| `gofumpt -l internal/winsec`（**甲＝blob 树**／判据） | **0** | 0 行；`[\\/]` 归属核命中 **0**（＝真没列文件，⛔"列了被过滤"） | `7e99ccf81` |
+| 同上（**乙＝工作树**／只诊断） | **0** | 0 行 | `7e99ccf81` |
+| `sh scripts/check-path-length-budget.sh` | ★**0（锚A）／1（锚B）** | 锚A：`VERDICT GREEN`、`tracked=17612`、`over-budget=61`、`in roster=61`、`not in roster=0`；锚B：**`VERDICT RED`**、`over-budget=62` 而 roster 仍 **61** | 见下 |
+| `sh scripts/d22scan.sh` | **0** | 锚A：正控 `PASS=35 FAIL=0 SKIP=0`、`RUN=77`、真扫 290 枚产码体 `clean`；锚B：正控同号、真扫 **`clean - no D22 ban violations`** | 两锚都 0 |
+| 整包 `go test -count=1 -v ./internal/winsec/` | **1** | 三发四数（RUN/PASS/FAIL/SKIP）＝**`123/121/2/0`**、**`123/120/3/0`**、**`123/121/2/0`**；每发 `PASS+FAIL+SKIP==RUN` 逐发对上（⛔ 相减） | `7e99ccf81` |
+
+★★**`pathlen` 锚B 那枚红归谁（用"能区分两棵树"的尺）**：唯一新增越界件＝`.scratch/wisp/issues/365-two-taskLogState-…-on-the-other.md`（relative **126**、末名 **105**、full **170** ＞ hat 165）⇒ `git log -1 -- <该路径>` ＝ **`8beec66b1`（编排者 A1166：立票 365）** ⇒ **属票 365 的立票件、⛔ 票 348**；票 348／`348-r2` 两笔在该锚下仍 **0** 条越界。★**这枚也说明"门禁绿"必须连锚一起写**：同一把尺在同一小时内由 GREEN 转 RED，红因⛔ 本票。
+★★**我自己抓的一处尺的错（`A1168` 第 12 例同一个坑）**：第一遍我跑 `sh scripts/check-path-length-budget.sh | tail -4`，`$?` 取到的是 **`tail` 的 rc=0**，读成 `pathlen_rc=0 GREEN`，而脚本真 rc 是 **1**。⇒ **不带管重跑**才是真值（本表已按重跑值写）；`d22scan` 同理**不带管**取 rc。
+
+`d22scan` 归因（★两锚都说）：锚A 时编排者预告的"今天会 rc=1"**已不复现**——phantom-citation 当时**只在工作树**（`git show HEAD:…/schema.go` 那行是 `);` ⇄ `Get-Content` 那行含 `docs/evidence/s1/196-r1-impl.md`）；★**收手时它已随票 196 的落地笔（`6e19f4a43`）进 HEAD，且被引件 `196-r1-impl.md` 现已跟踪**（`git ls-files` 命中 1）⇒ 幻影两个方向都消掉，锚B 仍 **0**。⇒ 该红自始至终属**票 196**、⛔ 票 348；`348-r2` 当时报的 `rc=1`／`PASS=33 FAIL=2` 在其后**自然转绿**（它的归因口径是对的）。
 
 ## ⑧ 新增红 0 —— **我的核**（⛔ 采信它的名册）
 
@@ -89,7 +94,7 @@
 
 ## 提交与写面
 
-- 本腿提交：**`d1ca3e643`**（单笔，只此一件）。
+- 本腿提交：**`d1ca3e643`**（第一笔，`A` 本件）→ **`48554984c`**（第二笔，把第一笔的号补进本件）→ **本笔**（第三笔，门禁两锚复跑＋我自己那处尺的错的更正）。三笔都只碰 `docs/evidence/s1/348-v3-verdict.md` 一枚。
 - 逐枚点名：`docs/evidence/s1/348-v3-verdict.md`（`A`）。索引核验 `git diff --cached --name-status` 现跑＝**只此一行**，⛔ 出现本笔不该有的 `D`/`A`。
 - 正控：同一把尺打 `5ffa553e3`（`A docs/…/348-r2-impl.md`／`A internal/winsec/deleteseam_348r2_windows_test.go`／`M internal/winsec/winsec.go`）与 `195ce6d0f`／`e9caddff`（两枚 `.go`）⇒ 尺**认 `.go`**，⛔ 空白尺。
 - 越界：**0**（`internal/**` 之外零字节；`cmd/**`／`scripts/**`／`.github/**`／`.scratch/wisp/**`／`docs/reports/**`／`docs/PLAN.md`／`docs/specs/**` 一字未动）。
@@ -99,5 +104,6 @@
 ## 结语
 
 `AC#2` **能翻**：两平台三件逐格成立，且**两发都是本腿现跑**（POSIX 容器／Windows 本机），"复用"判语另有字节同一性支撑但已不承重。
-`348-r2` 的两条推翻**都成立**（① 本就取得到／根因射程不够），`T4` 承重归因**成立且被第五臂加固**，接缝**确是最小面**，门禁**全绿**（`d22scan` 的 rc=1 已自然转绿、归因票 196），新增红 **0**（★名册射程要收窄：有票 348 的**仪器地板** flake，已 A/B 证明是接缝前既有）。
+`348-r2` 的两条推翻**都成立**（① 本就取得到／根因射程不够），`T4` 承重归因**成立且被第五臂加固**，接缝**确是最小面**；门禁在**锚A 全绿**（build／vet／两平台 build＋vet／gofumpt 甲乙／pathlen／d22scan 全 0），**锚B 除 `pathlen` 一枚红外仍全绿**，而那枚红 **归因票 365 的立票件（`8beec66b1`）、⛔ 本票**；`d22scan` 的 rc=1 已自然转绿、归因票 196；新增红 **0**（★名册射程要收窄：有票 348 的**仪器地板** flake，已 A/B 证明是接缝前既有）。
+★**我自己的一处尺的错也已入件**：`pathlen | tail -4` 的 `$?` 是 `tail` 的 rc（读成 0 GREEN），不带管重跑才是真值 1（`A1168` 第 12 例同一个坑）。
 三条残余：①对（写法要改成"取得到但不稳"）②半对且今天过期（要等的是**跟踪进仓**）③对（那是"仪器丢世界"报警）。
