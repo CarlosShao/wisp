@@ -181,8 +181,11 @@ func TestInstallAsDefaultTakesOverTheBootRecord130R1(t *testing.T) {
 	}
 	if got := fileBytes130r1(t, dir); got != 0 {
 		t.Fatalf("after InitLog (and a flush) the boot file holds %d bytes, want 0: construction is not the "+
-			"handover instant - ticket 132 reads the file seal exactly there, and a replay this early makes "+
-			"that reading unreadable", got)
+			"handover instant - a replay moved here is caught by this case's own flushed reading, not by "+
+			"ticket 132's six, which stay green under the same move (6 PASS / 0 FAIL, "+
+			"docs/evidence/s1/130-v1-verdict.md section 6): the one case there that reads the boot file's "+
+			"size at construction stats it without flushing, so it reads the writer's bufio rather than the "+
+			"handover, and the other five never take that reading", got)
 	}
 
 	p.InstallAsDefault()
