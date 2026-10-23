@@ -1,7 +1,10 @@
 package memory
 
-// Ticket 366 leg r1: the 3->4 rebuild now runs SQLite's 12-step procedure step 10
-// (PRAGMA foreign_key_check) inside its transaction and RECORDS the result.
+// Ticket 366: the 3->4 rebuild runs an extra referential-integrity check (PRAGMA
+// foreign_key_check) inside its transaction and RECORDS the result. It is extra
+// insurance that may coincide with step 10 of SQLite's 12-step ALTER procedure;
+// that step is unverified here and is conditional on enforcement having been ON,
+// which it never is in this package (migrationDSN turns it OFF).
 //
 // Why the record is not a gate, in one sentence: refusing on a non-zero count
 // rolls the rebuild back, so schema_version stays at 3, and every later start takes
@@ -18,6 +21,7 @@ package memory
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -421,6 +425,215 @@ func TestMigration366AuditFlagIsOnTheRebuildStep(t *testing.T) {
 	}
 	if got := strings.Join(audited, ","); got != "3->4" {
 		t.Errorf("audited steps = %q, want exactly 3->4 (the v4 rebuild): the Store keeps one baseline, "+
-			"and a step that does not rebuild a table has nothing for step 10 to check", got)
+			"and a step that does not rebuild a table has nothing for the extra check to look at", got)
+	}
+}
+
+// t366FailingTx is a txExec whose every call fails. It is the seam the audit's
+// "the ruler itself could not be read" branch needs: auditForeignKeys accepts the
+// interface, so a test can hand it a broken ruler without changing one production
+// byte or touching a real database file.
+type t366FailingTx struct{}
+
+func (t366FailingTx) ExecContext(context.Context, string, ...any) (sql.Result, error) {
+	return nil, errors.New("t366: injected write failure")
+}
+
+func (t366FailingTx) QueryContext(context.Context, string, ...any) (*sql.Rows, error) {
+	return nil, errors.New("t366: injected read failure")
+}
+
+// t366PlantUnreadableRuler makes PRAGMA foreign_key_check fail on a real database
+// through SQLite itself, not through a fake transaction: a child table whose
+// foreign key names a parent column that does not exist is legal DDL, and SQLite
+// then answers foreign_key_check for the whole database with "foreign key
+// mismatch". That is the broken ruler an end-to-end Open can meet.
+func t366PlantUnreadableRuler(t *testing.T, dir string) {
+	t.Helper()
+	db, err := sql.Open(DriverName, dsn(filepath.Join(dir, dbFileName), false))
+	if err != nil {
+		t.Fatalf("open to plant the unreadable ruler: %v", err)
+	}
+	defer db.Close()
+	ctx := context.Background()
+	for _, stmt := range []string{
+		`CREATE TABLE t366_ruler_parent (id TEXT PRIMARY KEY)`,
+		`CREATE TABLE t366_ruler_child (
+		   id INTEGER PRIMARY KEY,
+		   parent_id TEXT REFERENCES t366_ruler_parent(no_such_column)
+		 )`,
+	} {
+		if _, err := db.ExecContext(ctx, stmt); err != nil {
+			t.Fatalf("plant the unreadable ruler (%s): %v", stmt, err)
+		}
+	}
+	// Prove the ruler is broken BEFORE the migration: a later green must not be
+	// explained by the plant never having taken effect.
+	rows, err := db.QueryContext(ctx, pragmaForeignKeyCheckQuery)
+	if err == nil {
+		for rows.Next() {
+		}
+		err = rows.Err()
+		rows.Close()
+	}
+	if err == nil {
+		t.Fatal("the planted schema still answers PRAGMA foreign_key_check cleanly; the fixture is not a broken ruler")
+	}
+}
+
+// TestMigration366AuditNeverTurnsABrokenRulerIntoALock pins the branch that is
+// closest to hard boundary #1: when the audit cannot read its own ruler, the
+// store still opens, says Checked=false (not "checked, zero"), and keeps every
+// row. A broken ruler must not become the lock, and a missing measurement must
+// not be reported as a clean one.
+//
+// Both halves are in this one test on purpose. "Checked=false under a broken
+// ruler" alone would also pass if Checked were a constant: the control subcase
+// runs the SAME orphan fixture under a WORKING ruler and requires a different
+// reading ({true, 3, [tool_call]}), so the two states are told apart.
+func TestMigration366AuditNeverTurnsABrokenRulerIntoALock(t *testing.T) {
+	t.Run("failing transaction", func(t *testing.T) {
+		logger, buf := bufLogger(t)
+		audit := auditForeignKeys(context.Background(), t366FailingTx{}, SchemaVersionTarget, logger)
+		if audit.Checked {
+			t.Error("auditForeignKeys reported Checked=true although the PRAGMA could not be read: " +
+				"a missing measurement must not be reported as a measurement")
+		}
+		if audit.SchemaVersion != SchemaVersionTarget || audit.OrphanRows != 0 || len(audit.ChildTables) != 0 {
+			t.Errorf("audit = {version %d, orphans %d, tables %v}, want {%d, 0, []} for an unreadable ruler",
+				audit.SchemaVersion, audit.OrphanRows, audit.ChildTables, SchemaVersionTarget)
+		}
+		logs := buf.String()
+		for _, want := range []string{"level=WARN", "could not be read", "opening anyway", "schema_version=4"} {
+			if !strings.Contains(logs, want) {
+				t.Errorf("the unreadable-ruler warning is missing %q:\n%s", want, logs)
+			}
+		}
+		if strings.Contains(logs, "level=ERROR") {
+			t.Errorf("an unreadable ruler was logged at ERROR although it must never fail anything:\n%s", logs)
+		}
+	})
+
+	t.Run("broken ruler with orphans", func(t *testing.T) {
+		dir := t366OrphanFixture(t, "purge-tasklogs")
+		t366PlantUnreadableRuler(t, dir)
+		dbPath := filepath.Join(dir, dbFileName)
+		logger, buf := bufLogger(t)
+		s, err := Open(dir, WithLogger(logger))
+		if err != nil {
+			t.Fatalf("Open with an unreadable foreign_key_check refused the database: %v - "+
+				"a broken ruler must not become the lock", err)
+		}
+		defer s.Close()
+		audit := s.ForeignKeyAudit()
+		if audit.Checked {
+			t.Error("audit.Checked = true although PRAGMA foreign_key_check failed: " +
+				"the store would claim it measured the baseline when it did not")
+		}
+		if audit.SchemaVersion != SchemaVersionTarget || audit.OrphanRows != 0 || len(audit.ChildTables) != 0 {
+			t.Errorf("audit = {version %d, orphans %d, tables %v}, want {%d, 0, []}",
+				audit.SchemaVersion, audit.OrphanRows, audit.ChildTables, SchemaVersionTarget)
+		}
+		if got := t366Scalar(t, dbPath,
+			`SELECT count(*) FROM tool_call WHERE task_id NOT IN (SELECT id FROM task_log)`); got != 3 {
+			t.Errorf("orphan rows after the migration = %d, want 3: the audit never deletes rows", got)
+		}
+		if got := t366Scalar(t, dbPath, `SELECT count(*) FROM tool_call`); got != 3 {
+			t.Errorf("tool_call = %d after the migration, want 3: forensic rows are never deleted", got)
+		}
+		if v := t366Scalar(t, dbPath, `SELECT value FROM schema_meta WHERE key='schema_version'`); v != 4 {
+			t.Errorf("schema_version = %d, want 4: the step committed even though the ruler was broken", v)
+		}
+		logs := buf.String()
+		for _, want := range []string{"level=WARN", "could not be read", "opening anyway", "schema_version=4"} {
+			if !strings.Contains(logs, want) {
+				t.Errorf("the unreadable-ruler warning is missing %q:\n%s", want, logs)
+			}
+		}
+		if strings.Contains(logs, "found no dangling references") {
+			t.Errorf("a broken ruler logged the clean-database line: not reading is being reported as reading zero:\n%s", logs)
+		}
+		if strings.Contains(logs, "level=ERROR") {
+			t.Errorf("the migration logged at ERROR although it opened fine:\n%s", logs)
+		}
+	})
+
+	t.Run("broken ruler on a clean database", func(t *testing.T) {
+		dir, seed := t366SeedV3(t)
+		if err := seed.Close(); err != nil {
+			t.Fatalf("close the clean v3 fixture: %v", err)
+		}
+		t366PlantUnreadableRuler(t, dir)
+		logger, buf := bufLogger(t)
+		s, err := Open(dir, WithLogger(logger))
+		if err != nil {
+			t.Fatalf("Open on a clean database with an unreadable foreign_key_check: %v", err)
+		}
+		defer s.Close()
+		audit := s.ForeignKeyAudit()
+		if audit.Checked || audit.OrphanRows != 0 || len(audit.ChildTables) != 0 {
+			t.Errorf("audit = {checked %v, orphans %d, tables %v}, want {false, 0, []}",
+				audit.Checked, audit.OrphanRows, audit.ChildTables)
+		}
+		logs := buf.String()
+		if strings.Contains(logs, "found no dangling references") {
+			t.Errorf("the clean-database line was logged although the check never ran: "+
+				"a clean database must not false-green a broken ruler:\n%s", logs)
+		}
+		if !strings.Contains(logs, "could not be read") || !strings.Contains(logs, "level=WARN") {
+			t.Errorf("the unreadable ruler was not reported on a clean database:\n%s", logs)
+		}
+	})
+
+	t.Run("good ruler control on the same fixture", func(t *testing.T) {
+		brokenDir := t366OrphanFixture(t, "purge-tasklogs")
+		t366PlantUnreadableRuler(t, brokenDir)
+		brokenStore, err := Open(brokenDir)
+		if err != nil {
+			t.Fatalf("Open (broken ruler): %v", err)
+		}
+		defer brokenStore.Close()
+
+		goodDir := t366OrphanFixture(t, "purge-tasklogs")
+		goodStore, err := Open(goodDir)
+		if err != nil {
+			t.Fatalf("Open (good ruler): %v", err)
+		}
+		defer goodStore.Close()
+
+		broken := brokenStore.ForeignKeyAudit()
+		good := goodStore.ForeignKeyAudit()
+		if !good.Checked || good.OrphanRows != 3 || strings.Join(good.ChildTables, ",") != "tool_call" {
+			t.Fatalf("good-ruler reading = {checked %v, orphans %d, tables %v}, want {true, 3, [tool_call]}: "+
+				"the control fixture is not the one this test assumes", good.Checked, good.OrphanRows, good.ChildTables)
+		}
+		if broken.Checked == good.Checked || broken.OrphanRows == good.OrphanRows {
+			t.Errorf("broken-ruler reading %+v is indistinguishable from the good-ruler reading %+v: "+
+				"the test cannot tell 'ruler did not run' from 'ruler ran and found 3'", broken, good)
+		}
+	})
+}
+
+// TestMigration366AuditChildTablesIsACopy pins the accessor's value semantics.
+// ForeignKeyAudit returns a struct copy, so ChildTables must not share its
+// backing array with the store: otherwise one caller editing the slice rewrites
+// the baseline every later caller reads.
+func TestMigration366AuditChildTablesIsACopy(t *testing.T) {
+	dir := t366OrphanFixture(t, "purge-tasklogs")
+	s, err := Open(dir)
+	if err != nil {
+		t.Fatalf("Open: %v", err)
+	}
+	defer s.Close()
+	first := s.ForeignKeyAudit()
+	if len(first.ChildTables) != 1 || first.ChildTables[0] != "tool_call" {
+		t.Fatalf("first reading's ChildTables = %v, want [tool_call]", first.ChildTables)
+	}
+	first.ChildTables[0] = "tampered-by-the-caller"
+	second := s.ForeignKeyAudit()
+	if len(second.ChildTables) != 1 || second.ChildTables[0] != "tool_call" {
+		t.Errorf("ForeignKeyAudit().ChildTables shares its backing array with the store: "+
+			"after a caller wrote %q the next read returned %v",
+			"tampered-by-the-caller", second.ChildTables)
 	}
 }

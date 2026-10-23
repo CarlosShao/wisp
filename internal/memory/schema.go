@@ -191,11 +191,20 @@ type migrationStep struct {
 	// this step's transaction - after the step's own statements, before the
 	// commit - and to record what it found (ticket 366).
 	//
+	// An extra referential-integrity guard around the v4 rebuild. SQLite's
+	// 12-step ALTER TABLE procedure may run the same check at its step 10, but
+	// this repository has not verified that text, and that step is conditional
+	// on enforcement having been ON - which it never is here (migrationDSN turns
+	// it OFF). Extra insurance that may coincide with step 10; not a step this
+	// code claims to follow.
+	//
 	// It is declared on the step rather than inside apply because the check has
 	// to read the state the transaction is about to commit, and a step's apply
 	// only sees the txExec interface at the moment it is written: the 3->4
-	// rebuild is SQLite's documented 12-step ALTER procedure, and this is its
-	// step 10. A future step that rebuilds a table opts in the same way.
+	// rebuild is SQLite's documented 12-step ALTER procedure, and this is an
+	// extra check at the point where that procedure may check integrity
+	// (unverified here). A future step that rebuilds a table opts in the same
+	// way.
 	//
 	// The record is deliberately NOT a gate: see ForeignKeyAudit.
 	auditForeignKeys bool
@@ -300,11 +309,12 @@ func applyV3(tx txExec) error {
 // procedure (create new -> copy rows -> drop old -> rename -> recreate indexes),
 // all inside the one transaction the migration chain already wraps each step in.
 //
-// Step 10 of that procedure - PRAGMA foreign_key_check - cannot live in this
-// string: it has to read the transaction's own uncommitted state. It runs in
-// applyMigrationStep for the step carrying auditForeignKeys (the 3->4 entry of
-// migrationChain), and its result is recorded rather than enforced (ticket 366;
-// the record's shape is ForeignKeyAudit).
+// The integrity check (possibly step 10 of that procedure; unverified here) -
+// PRAGMA foreign_key_check - cannot live in this string: it has to read the
+// transaction's own uncommitted state. It runs in applyMigrationStep for the
+// step carrying auditForeignKeys (the 3->4 entry of migrationChain), and its
+// result is recorded rather than enforced (ticket 366; the record's shape is
+// ForeignKeyAudit).
 //
 // The accepted values are GENERATED from taskStateRoster, never spelled a second
 // time here. That is the whole point of ticket 196's shape: the Go roster is the
@@ -506,18 +516,19 @@ func splitSQLStatements(script string) []string {
 	return out
 }
 
-// pragmaForeignKeyCheckQuery is SQLite's referential-integrity check: the step 10
-// of the documented 12-step ALTER TABLE procedure that the v4 rebuild follows
-// (ddlV4), and the one step this chain did not run until ticket 366.
+// pragmaForeignKeyCheckQuery is SQLite's referential-integrity check: an extra
+// guard for the v4 rebuild (possibly the same place as step 10 of the documented
+// procedure; unverified here), and the one check this chain did not run until
+// ticket 366.
 //
 // It works whether or not enforcement is switched on (it reads the schema and the
 // rows, it does not enforce), which is why it can run on the migration connection
 // even though migrationDSN turns foreign_keys OFF for the rebuild.
 const pragmaForeignKeyCheckQuery = "PRAGMA foreign_key_check"
 
-// ForeignKeyAudit is the migration chain's step-10 record: how many dangling
-// references PRAGMA foreign_key_check saw in the state the step was about to
-// commit, and where they live.
+// ForeignKeyAudit is the migration chain's post-rebuild integrity record: how many
+// dangling references PRAGMA foreign_key_check saw in the state the step was about
+// to commit, and where they live.
 //
 // It is a RECORD, never a gate (ticket 366). Refusing to open a database whose
 // check is non-zero would make that database unopenable forever rather than once:

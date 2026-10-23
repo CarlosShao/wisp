@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -328,8 +329,9 @@ func (s *Store) ArtifactsDir() string { return s.artifactsDir }
 
 // ForeignKeyAudit returns the referential-integrity baseline the migration chain
 // took while opening this store: SQLite's PRAGMA foreign_key_check, run inside the
-// v4 rebuild's transaction after the rebuild and before the commit (the 12-step
-// ALTER procedure's step 10; ticket 366).
+// v4 rebuild's transaction after the rebuild and before the commit (extra
+// insurance that may coincide with step 10 of the 12-step ALTER procedure;
+// unverified here; ticket 366).
 //
 // Read it as "what the migration saw", not as "what is true now": later writes can
 // add or remove orphan rows, and only a rebuild re-measures. Checked is false when
@@ -342,7 +344,14 @@ func (s *Store) ArtifactsDir() string { return s.artifactsDir }
 // (the ForeignKeyAudit type's doc comment says why, with the measurement) and never
 // deletes a row (tool_call is the forensic surface). To see the rows themselves,
 // run `PRAGMA foreign_key_check` against the database.
-func (s *Store) ForeignKeyAudit() ForeignKeyAudit { return s.fkAudit }
+//
+// The returned value is a copy: ChildTables never shares a backing array with the
+// store, so a caller cannot rewrite a later reading by editing the slice it got.
+func (s *Store) ForeignKeyAudit() ForeignKeyAudit {
+	audit := s.fkAudit
+	audit.ChildTables = slices.Clone(audit.ChildTables)
+	return audit
+}
 
 // Close flushes the write queue, checkpoints the WAL, and closes all
 // connections. Idempotent.
@@ -510,8 +519,9 @@ func applyMigrationStep(db *sql.DB, step migrationStep, logger *slog.Logger) (Fo
 		_ = tx.Rollback()
 		return ForeignKeyAudit{}, fmt.Errorf("apply: %w", err)
 	}
-	// SQLite's 12-step procedure checks referential integrity after the rebuild
-	// and before the commit (its step 10). Reading it here, with the rebuilt
+	// An extra integrity check after the rebuild and before the commit (where the
+	// 12-step procedure may put one; that step is conditional on enforcement
+	// having been ON, and is unverified here). Reading it here, with the rebuilt
 	// tables and the old rows both visible to this transaction, is what makes the
 	// count describe the state that is about to become the user's database.
 	audit := ForeignKeyAudit{}
