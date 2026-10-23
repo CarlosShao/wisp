@@ -102,7 +102,10 @@ D:\tmp\wisp\20261023\132r1\data-fresh-after\logs NT AUTHORITY\SYSTEM:(F)
 
 **AC#2 两问（同账户零影响／审计照写）**：
 - 同账户读：`head -c 400` 读得出，4 条记录完好。
-- `wisp slo -settle` 在封过的根上**连跑两发 rc=0**（第二发走 `O_APPEND` 同文件续写，rc 仍 0）；
+- **续写**（"同一天第二个进程 `O_APPEND` 同一枚文件"这一支，本腿现跑）：在同一棵**已封过**的根上再跑一发
+  （另一个 ref）⇒ `rc=0`，文件 **1004 ⇒ 1550 字节 / 7 条**，`icacls` 仍**全显式窄**、`/findsid *S-1-5-11` 仍
+  `No files with a matching SID was found`、目录里仍只有那一枚文件（无侧车）⇒ 续写不会把封条冲掉。
+- `wisp slo -settle` 在同一根上连跑两发 `rc=0`；
   `wisp doctor` 在同一根上 `[PASS] data dir writable (test)`。
   （`doctor` 整包 rc=1，FAIL 项全是 DLL 共置／pin，与改前**逐行相同**——见 §6 红名册。）
 
