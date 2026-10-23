@@ -23686,3 +23686,60 @@ M1 删引文／M2 改原文用词／**M3 只改一个数字**／M4 下移 Case 1
 - ⇒ ★★**第 2 条是"数了 diff 头"的经典坑** ⇒ ★**我记下**：★**`grep -cE '^[+-]'` 会数到 `---`／`+++`，正确形状是 `grep -cE '^[+-][^+-]'` 或先剥头**。
 
 **⑧ 状态**＝结案 **36 票**（`-done` **179** 枚）、完成度 **179/352 ＝ 50.9%**、在飞 **0**、未推 **95**（攒着）、⛔ 清理、★**摆机主 0 件**。
+
+## A1189（2026-10-23 14:4x +08，编排者）★★收 `196-r2`：**隐患坐实、但今天不炸**｜★★★它量出的 `P2` 一条读数**决定了整个选型**｜★派 `196-v2` 终裁
+
+**① ★★收 `196-r2`（`0c08eca14` 码＋测试＋件；`7178f7f12` 件两处尺误自纠；件 **118 行**）**
+
+**它量到的三条（我采信、终裁会复核）**
+1. ★**`applyV4` 的重建 5 句**：`CREATE TABLE task_log_v4` → `INSERT…SELECT` → ★**`DROP TABLE task_log`** → `RENAME` → `CREATE INDEX`
+   ⇒ ★**"别的表对 `task_log` 的引用"一处都没处理**（不删子行、不搬子行、无 `foreign_key_check`、不碰 `legacy_alter_table`）。
+   ★**而引用确实存在**：★`ddlV1:82` 逐字 `  task_id        TEXT NOT NULL REFERENCES task_log(id),`（表 `tool_call`、`ddlV1:80`）。
+2. ★★**今天炸不炸：**不炸**** —— `PRAGMA foreign_keys` 在生产 `dsn()` 上 ＝ **0**；生产 `Open()` ⇒ `<nil>`、`schema_version=4`。
+   ★**FK 开**（`dsn()` 加 `&_pragma=foreign_keys(1)`，**唯一差别**）⇒ ★**逐字** `apply: constraint failed: FOREIGN KEY constraint failed (787)`
+   ★★**且**在第 3 句才炸**（前两句已建表搬行）。
+3. ★★**今天谁设 FK：**没有人设**** —— 全仓唯一挂 pragma 的是 `open.go:146 func dsn`，四枚（`busy_timeout`／`journal_mode(WAL)`／`synchronous`／`wal_autocheckpoint` ＋ `forWriter`）、★**没有 `foreign_keys`** ⇒ 走默认＝关。
+   ★**仓里没有任何"将来要开 FK"的票**（★它明说 ⛔ 编）★**但有三条"FK 声明了不生效"的欠账**（`pending-and-issues.md:11196` 的 166-a1 普查／`326-append-updated.md:147`／`326-v1-verdict.md:78`）＝★**有人会去开它的现实路径**。
+
+**② ★★★`P2`：一条读数决定了整个选型**
+- ★★**事务内 `PRAGMA foreign_keys=ON` 后读回仍是 0**（★**同一句在事务外读回 1 作正控**）
+  ⇒ ★★**`applyV4` 不可能自己关 FK（no-op）**；★**真正"关 FK"只能落在 `open.go` 的 `migrate()`／`dsn()`（开事务之前）＝不属它写面**。
+- ⇒ ★**它据此选〔甲〕**：★**在 `applyV4` 里显式断言"重建期间 FK 必须是关的"** ⇒ ★**失败点从第 3 句挪到第 1 句、报错从 `(787)` 换成人话**。
+- ★**它引的主流 harness 依据**：★**SQLite 官方 12 步的第 1 步就是关 FK**，而 ★**`ddlV4` 的注释自称走 12 步（`schema.go:283-284`）却漏了第 1 步与结尾的 `foreign_key_check`**
+  ⇒ ★**"把恰好成立的前提改成声明出来的前提"** ⇒ ★**这句话判得很准**。
+
+**③ ★它的〔乙〕〔丙〕不选理由（都带读数/硬约束）**
+- ★**〔乙〕改重建顺序**：①要枚举子表（★**多一张引用方就静默复发、比护栏更坏，因为看起来治好了**）②要往 `ddlV4` 加语句（撞硬边界 ＋ 撞既有钉测 `TestTaskState196DDLV4KeepsTheShape` want 5）③只买到"FK 开着也能重建"、不答"FK 为什么会被开"。
+- ★**〔丙〕只写测试**：单测只钉今天会发生的失败＝**钉 `(787)`**；〔甲〕把〔丙〕顺带做了。
+- ★**代价它写明了**：★**零 `tool_call` 行的库本来能"靠运气"过、现在也拒** —— **故意**（★"成功取决于子行数的重建不值得跑"）。
+
+**④ ★它改了什么（边界极干净）**
+- ★`schema.go` **`+73/−0`**、只 `applyV4` 邻域（`pragmaForeignKeysQuery`／`requireForeignKeysOff`／一处调用＋顺序注释）。
+- ★★**`ddlV4` 的 SQL 一字未动（5 句仍 5 句）**；★**`ddlV1/V2/V3` 零 diff**；★**12 枚名册 `taskstate.go` 零 diff**；★**`PLAN.md`／`specs` 未动**。
+- ★**新用例 2 枚**（`taskstate_196r2_test.go` **213 行**）：
+  ①`…LegacyV3WithToolCallRowsStillOpens`（★**绊线**、走生产 `Open()`）—— ★**今天绿、`dsn()` 一开 FK 就红**
+  ②`…RefusesRebuildWithForeignKeysOn`（★**同一夹具跑两遍真的 `applyMigrationStep`、唯一差别是 pragma**；控制半必须绿、主体半必须拒且**拒得可读**、★**且拒绝后一个字节没动**）。
+
+**⑤ ★★反向判据三读数（单变量）**
+- `R1` 交付形状 ⇒ 两枚绿 `rc=0`。
+- `R2` ＋FK ⇒ 两枚红 `rc=1`、`Open()` 变成**可读地拒**（`refusing to rebuild task_log with PRAGMA foreign_keys=ON: tool_call.task_id REFERENCES task_log(id), …`）。
+- ★★`R3` **再删掉那 3 行＝改前形状** ⇒ 两枚红 `rc=1`、报错**退回 `apply: constraint failed: FOREIGN KEY constraint failed (787)`**
+  ⇒ ★★**"护栏就是那 3 行换来的"（★单变量、diff 只这 3 行）** ⇒ **这是最硬的归因形状**。
+- ★**还原核**：`sha256sum`（64 hex）前后同值 `schema.go 6b985a28…`／`test 9ac9ef48…`；`cmp` 仓内 vs 导出树 `rc=0`；提交后 `git status --porcelain -- internal/memory` 为空。
+- ★★**它诚实补一条**：★**`R2`/`R3` 里绊线用例也红了**（因为它的控制半假定 `dsn()` 不设 pragma）⇒ ★**"那是第二条护栏：前提一变就喊"** ⇒ **它没把这条藏起来**。
+
+**⑥ ★四数（Δ 恰是新用例）**
+- ★改前 `rc=0` **`RUN=91 / PASS_TOP=54 / FAIL_TOP=0 / SKIP=2`** → ★改后 `rc=0` **`RUN=93 / PASS_TOP=56 / FAIL_TOP=0 / SKIP=2`**
+  ⇒ ★**`Δ = +2/+2` 恰两枚新用例、`FAIL` 前后皆 0**。
+- ★**门禁**：`build 0`／`vet 0`／gofumpt 两件 **0 枚**（★**做了正控：故意错格式文件被列出 1 枚**、⛔ 空口信 0）／`d22scan 0` clean／长度门 **0** GREEN。
+
+**⑦ ★★它上交的两件（我已让终裁判）**
+1. ★**真修法在 `open.go`**：按官方第 1 步在 `migrate()` **开事务之前**钉 `PRAGMA foreign_keys=OFF`（`dsn()` 加 `_pragma=foreign_keys(0)`）、重建后 `PRAGMA foreign_key_check` ⇒ ★**归别的腿、与本腿护栏不冲突（FK 关时护栏是 no-op）**。
+2. ★★**结尾那道 `foreign_key_check` 它**故意没加****：★**今天 FK 关着、老库可能已有孤儿 `tool_call` 行**（166-a1／326 那两条欠账）⇒ ★★**做成硬门槛会让那类库**打不开**＝派单停手条件③** ⇒ ★**要么另开票配"孤儿先清后校"、要么与 1) 一起做**。
+   ⇒ ★★**这条判断我认**：★**它没有为了"把隐患一次修完"而造出"老库打不开"的新隐患**。
+
+**⑧ ★它自报一处尺误（`A1127` 那族）**
+- ★**件里把 test 件行数写成"224"（**估的**）**、现量 `wc -l` ＝ **213**；★另把 `open.go:152-153` 压成一行、读起来像 152 就是整句。
+- ★**两处已在 `7178f7f12` 改正**、并**写明病根**："**把估算当读数落笔**"；★**码与测试零字节改动（两枚 `sha256` 与改正前同值）**。
+
+**⑨ 状态**＝结案 **36 票**（`-done` **179** 枚）、完成度 **179/352 ＝ 50.9%**、在飞 **2**（`365-a1`／`196-v2`）、未推 **98**（攒着）、⛔ 清理、★**摆机主 0 件**。
