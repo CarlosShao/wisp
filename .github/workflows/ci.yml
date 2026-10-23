@@ -186,17 +186,35 @@ jobs:
       # WHAT THAT DOES TO THE DENOMINATOR. "The denominator of the formatting gate
       # is the TRACKED set, not the working tree" is the claim the census step
       # below is built on, and it is no longer true OF THIS STEP as written: the
-      # denominator here is now the PRODUCTION DIRECTORY SET named above, not every
-      # tracked .go. Measured at the 362-r2 anchor (2026-10-23, re-derived with
-      # `git ls-files`, not carried over): of 1162 tracked .go files, 802 sit in
-      # those five directories (internal 623, cmd 149, tools 18, scripts 11,
-      # frontend 1), 360 sit under .scratch/ and 0 sit at the repo root, and no
-      # tracked .go file's first path segment is anything else - so the five
-      # directories are exactly "production" and .scratch/ is exactly what leaves
-      # this denominator. The reading is still taken over tracked bytes on a
-      # checkout; what narrowed is which tracked bytes are counted. These counts
-      # rot as the tree grows: re-derive them before citing them (362-r1 wrote
-      # 1160/800/621 here, and by 362-r2 all three were already wrong).
+      # denominator here is now the PRODUCTION DIRECTORY SET named above, not
+      # every tracked .go. The counts are deliberately NOT written here (ticket
+      # 362-r3): a hand-copied count is honest about some tree and silent about
+      # which one. Re-derive them, in the checkout you are actually reasoning
+      # about, with one recipe, two lines:
+      #
+      #     git ls-files '*.go' | wc -l
+      #     git ls-files '*.go' | cut -d/ -f1 | sort | uniq -c | sort -rn
+      #
+      # The first line is the denominator. The second is the same set split by
+      # first path segment: the sum of internal, cmd, tools, scripts and
+      # frontend is what this step is handed, and the `internal` line is the
+      # number the previous version of this paragraph quoted on its own. That
+      # split also re-proves, instead of repeating, the structural claim this
+      # paragraph depends on - if a tracked .go file's first path segment is
+      # anything else it prints as its own line (a file at the repo root prints
+      # under its own name), so "the five directories are exactly production and
+      # .scratch/ is exactly what leaves this denominator" is a reading you
+      # take, not a sentence you trust. The reading is still taken over tracked
+      # bytes on a checkout; what narrowed is which tracked bytes are counted.
+      #
+      # WHY NO NUMBERS: this paragraph has carried two hand-written count sets
+      # (362-r1's, then 362-r2's), and the second does not reproduce on the
+      # commit that wrote it - it matches, exactly, the tree of 938216b8e,
+      # eleven commits behind that commit. Nothing about it was invented; it
+      # was measured on a real tree. But a reader who tries to reproduce it at
+      # the commit it claims gets different numbers and concludes the gate
+      # moved. A count that rots is bad; a count that rots and then misleads is
+      # worse than no count at all.
       #
       # WHAT IT GIVES UP, stated rather than left to be discovered: a bench sample
       # that somebody one day places under one of those five directories WOULD be
@@ -209,11 +227,11 @@ jobs:
       # WHAT MOVED ONE LEG LATER (ticket 362-r2), because the paragraph above used
       # to end by pointing at the census step: that step no longer reads every
       # tracked .go either. It now reads the tracked set MINUS one named exclusion
-      # (.scratch/**), so the two steps agree on the bytes today (802 each) by two
-      # DIFFERENT definitions - a named INCLUSION here, a named EXCLUSION there -
-      # and they stop agreeing the moment a tracked .go falls inside one and
-      # outside the other. That divergence is a finding, not a rounding difference:
-      # when it happens the census step names the file and this step does not.
+      # (.scratch/**), so the two steps agree on the bytes today by two DIFFERENT
+      # definitions - a named INCLUSION here, a named EXCLUSION there - and they
+      # stop agreeing the moment a tracked .go falls inside one and outside the
+      # other. That divergence is a finding, not a rounding difference: when it
+      # happens the census step names the file and this step does not.
       - name: gofmt (gofumpt)
         if: ${{ !cancelled() }}
         run: |
