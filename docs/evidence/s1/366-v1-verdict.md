@@ -101,7 +101,7 @@
 
 ## ⑫ 提交号＋逐笔越界
 
-- 本件提交（`git log -1` 见提交后回填）；`add`/`commit` 两处**显式 pathspec**，只点 `docs/evidence/s1/366-v1-verdict.md` 一枚；提交前 `git diff --cached --name-status` 只见 **`A`** 这一行。⛔ push。
+- 本件提交＝**`a803c6c16`**（首笔 114 行；补录本行的一笔见 `git log -1`）；`add`/`commit` 两处**显式 pathspec**，只点 `docs/evidence/s1/366-v1-verdict.md` 一枚；提交前 `git diff --cached --name-status` 只见 **`A`** 这一行。⛔ push。
 - 越界：仓内 `.go`＝**0 枚**；`internal/**`／`cmd/**`／`scripts/**`／`.github/**`／`.scratch/wisp/**`／`docs/reports/**`／`docs/PLAN.md`／`docs/specs/**`＝**0 字节改动**；临时件全在 `D:\tmp\wisp\20261023\366v1\**`（另有首次 `git archive` 误落到 `366v1\` 根的一份导出树，未参与任何读数）。
 
 ---
