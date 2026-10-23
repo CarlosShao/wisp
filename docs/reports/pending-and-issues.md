@@ -24225,3 +24225,63 @@ is supposed to declare that itself (migrationDSN in open.go): something removed 
 - ⇒ ★★**这条规矩今天**第 5 次**救场**（`A1120`／`A1183`／本次）⇒ ★**"先查再重试"必须写进每份派单**（★**已经在了**）。
 
 **⑧ 状态**＝结案 **36 票**（`-done` **179** 枚）、**真待推进 177 ＋ 新票 369 ⇒ 178**、完成度 **179/356 ＝ 50.3%**、在飞 **1**（`365-r1`）、未推 **134**（攒着）、⛔ 清理、★**摆机主 0 件**。
+
+## A1200（2026-10-23 18:0x +08，编排者）★★收 `365-r1`：**两处统一走权威、库里的词真的变了**｜★★它用**import cycle** 推翻了我派单的层级要求（**理由对、判决比我好**）｜★它给了真配方（⛔ 造假 `Result`）｜★派 `365-v1` 终裁 ＋ 立票 370
+
+**① ★★收 `365-r1`（`6b9a83c04`；件 **150 行**；★5 文件、**零删除**）**
+
+**② ★★★它用 **import cycle** 推翻了我派单的层级要求（这条最要紧）**
+- ★**我派单写的是**：★"**形由你定：可以是 `memory.TaskStateFor(status)` 一类；若权威今天没有接 `agent.Status` 的入口 ⇒ 你加一个薄的、但 ⛔ 把值域逻辑写回两处**"，★**并要求"若必须动 `internal/memory` ⇒ 说明为什么"**。
+- ★★**它现跑量出**：★**`agent` 已 import `memory`**（`journal.go:8`／`tools.go:11`）、★**`memory` 对 `agent` 的 import 数 ＝ `0`**
+  ⇒ ★★**让 `memory` 收 `agent.Status` **必造环**** ⇒ ★**所以 `internal/memory` **一个字节未动****。
+- ★★**它落的形**：★**一根梯子搬进 `internal/agent/loop.go:1069` `func TaskLogState(s Status) memory.TaskState`**、
+  ★**返回值全是 `memory` 的 `TaskState` 常量、零字符串字面量**；★调用点 `:1014` 改 `string(TaskLogState(status))`。
+  ★**`cmd/wisp/run.go:1366` 原裸 `switch` 整个删掉**、只剩 `return string(agent.TaskLogState(s))`。
+- ⇒ ★★**判决是**：★**`memory` 仍拥有**词表**、`agent` 只拥有「把这枚枚举**投影**到词表」的那一跳** ⇒ ★**这是正确的分层**（★**依赖朝下、词表在下、投影在中间层**）。
+  ⇒ ★★**我派单那句"必须是 `memory.TaskStateFor(status)`"是**想当然**** —— ★**我没先核 import 方向**。
+  ★**定式**：★**派单要求"某函数放某层"之前，先跑一次 `git grep` 核**依赖方向**（★`memory` 与 `agent` 是**单向依赖**、⛔ 双向）。
+
+**③ ★★★四条读数（★**都是库里的真读数**、⛔ 函数返回值）**
+| 项 | `internal/agent` 写进库 | `cmd/wisp` 写进库 | 变了 |
+|---|---|---|---|
+| `Stuck` | ★**`"stuck"`**（真 Journal ＋ 真 SQLite）| ★**`"stuck"`**（真 `wisp run` 一发）| ★**库里 `error` → `stuck`** |
+| `Truncated` | ★**`"interrupted"`** | `"interrupted"`（★函数读数）| ★**`error` → `interrupted`** |
+| 默认支／未知 | ★**`"error"`** | ★**`"error"`** | ★**`agent` 侧 `done` → `error`（唯一行为变更、fail-closed）** |
+| ★**正控** `Completed`／`Cancelled`／`Failed` | `done`／`cancelled`／`error` | 同（★**三发真跑**）| ★**全不变** |
+
+- ★★★**它给的 `Stuck` 真配方（⛔ 造假 `Result`）**：★**`context_window = 1`** ⇒ **冻结的 200k C22 预算缩到 2 token** ⇒ **第一发即超支** ⇒ `brakeStuck` ⇒ **真 `StatusStuck`、退出码 3**
+  ⇒ ★★**这个配方很值钱**：★**它用**配置**造出真状态、⛔ 构造 `Result` 冒充**（★`A1134④` 那族的正解）。
+
+**④ ★★"屏幕与库不再两套"逐字（真 `wisp run`）**
+- ★**改后**：★`wisp run: 任务 <id> 结束（stuck，1 轮，0 次工具调用，成本 0 CNY（未计价））` ／ ★**`task_log.state = "stuck"`** ⇒ **屏幕与库同词**。
+- ★★**改前（`-overlay` 换回 HEAD `run.go`）**：★**屏幕同上、库 `"error"`** ⇒ ★**缺陷原样复现** ⇒ **这是"修好了"的硬对照**。
+
+**⑤ ★★它上报两条（我裁）**
+1. ★★**`StatusTruncated`：屏幕词 `truncated` ≠ 权威词 `interrupted`**（★我派单的停手条件①）⇒ ★**它没有停手不落**、★**理由**：★**权威词在 `taskstate.go:63` 是**定义好**的**（注释逐字 "truncated by the round/token ceiling"）、
+   ★**`runExitCode`（`run.go:80`）本来就把 `Stuck`／`Truncated` 归同一档「环路刹车＝3」**、★**而"同词"在本票内**不可能达成**** —— **`truncated` 不在 12 枚名册、加词＝改名册＋升 schema（硬边界 2）**。
+   ⇒ ★★**我裁：它判得对、⛔ 停手是对的**；★**"要不要让屏幕也说库的词" ＝ 改屏幕文案 ＝ **另一张票****（★我**不**在本票裁它）。
+   ★**理由**：★**库那一侧现在是**权威的词**（`interrupted`）⇒ **本票的目标（"库里不再和屏幕两套"）在库侧已达成**；★**屏幕文案是**用户可见的话**、改它要单独判**（★**它可能故意要说 `truncated`（用户语汇）**）。
+2. ★★**`StatusTruncated` 在 `cmd/wisp` 路径上**今天不可达****：★`[llm.roles.chat].max_output_tokens` **已落进 `llm.Endpoint`**（`resolver.go:205`），
+   ★**但 `agent.Config` 无承接字段**、★**`agent.Assembler.MaxOutputTokens`（`prompt.go:132`）**全仓无赋值**** ⇒ ★**`Request.MaxOutputTokens` 恒 `0`** ⇒ **供应商无从撞天花板**。
+   ★★**修它要动 `cmd/wisp` 组装**（超出它写面）⇒ ★**它只报不修** ⇒ ★**我立票 370**。
+
+**⑥ ★★它的反向判据（含一处**极诚实**的射程声明）**
+- ★**`M1`「摘掉 cmd 那一跳」** ⇒ `rc=1`、★红行逐名：★`taskLogState("stuck")="error" want "stuck"`／`("truncated")="error" want "interrupted"`／两处 `the two paths disagree`／
+  ★真跑 `task_log.state="error" for a stuck task`／★`screen "stuck", row "error"` ⇒ ★**正控仍 PASS**（★**尺不是全红**）。
+- ★**`M2`「`agent` 默认支改回 `done`」** ⇒ `rc=1`、★红行 `TaskLogState("")`／未知值／`("failed")="done"` ＋ journal `"done" for failed`。
+- ★★★**它主动声明射程**：★"**`failed` 那两行是变异把显式 `Failed` 支折进默认支造成的，**改前真实的红只有未知值两行**，★**我不拿 `M2` 冒充改前**"**
+  ⇒ ★★**这是"变异红"与"改前红"的正确区分**（★`A1182③` 那族）⇒ **它没有把变异造成的红说成"改前就红"**。
+
+**⑦ ★四数（分开报、⛔ 相减）**
+- ★`internal/agent`：★改前 **`131/102/0/0`** → 改后全量 **`138/105/0/0`**（**+7 RUN／+3 PASS ＝ 本笔 3 用例 ＋ 4 子用例**）
+  ⇒ ★★**改后 `-skip '^Test365'` ＝ `131/102/0/0`** **逐数相同** ⇒ ★**干净的"零新增红"证明**。
+- ★`internal/memory`：**`101/59/0/2`** 改前改后**逐数相同**（★**未动一字节**）。
+- ★`cmd/wisp -run '^TestRunTextTask'`（★带 DLL `PATH`）：改前 **3 PASS `rc=0`** ／ 改后 **3 PASS `rc=0`**。
+- ★★**整包 `go test ./internal/agent/ ./internal/memory/ ./cmd/wisp/`**：★`agent ok 8.007s`／`memory ok 25.111s`／★**`cmd/wisp FAIL 327.637s`（死点 `MARK299 before CreateWindowExW`）**
+  ⇒ ★**按派单 ⛔ 当判据**、★**只登记死点**（★**与我 `A1191` 判的 `MARK299 before Embed` 同族、只是死在更早一步**）。
+
+**⑧ ★门禁**：`build 0`／`vet 0`／★**gofumpt 甲（index blob）`0`、乙（工作树）`0`**／`d22scan 0` clean／长度门 **`0` GREEN**。
+**⑨ ★纪律**：★**未翻框／未动票名／未改台账／未 push／未 amend**；★`add`/`commit` 两处**逐个文件名字面点名**（⛔ glob）；
+★**临时件全在仓外**、**工作树零突变**；★**并核了"与并发腿无交集"**（`git diff --stat a8155492f..771bf451e -- internal/agent internal/memory cmd/wisp` ⇒ **空**）。
+
+**⑩ 状态**＝结案 **36 票**（`-done` **179** 枚）、**真待推进 178 ＋ 新票 370 ⇒ 179**、完成度 **179/357 ＝ 50.1%**、在飞 **1**（`365-v1`）、未推 **137**（攒着）、⛔ 清理、★**摆机主 0 件**。
