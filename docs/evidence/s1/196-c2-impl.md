@@ -84,22 +84,25 @@ sh scripts/d22scan.sh → rc=0; scanned internal/cmd docs 631+148 Go, ban #8 cle
 sh scripts/check-path-length-budget.sh → rc=0; VERDICT GREEN over-budget=61, rostered=61
 ```
 
-## 7. Git commit spec（⛔ push, ⛔ `-A`, ⛔ glob）
+## 7. Git 实名读数（⛔ push、⛔ `-A`、⛔ glob、⛔ amend）
 
-主题（逐字）：
+**commit** = `55209da93a0376ba28537d0d8060c27ef02dae76`
+
+**主题（逐字、一字不差）**：`票 196 契约措辞腿 196-c2`
+
+**正文**：全文在 commit 自身里（`git log -1 --format=%B 55209da93`）；它比本节短摘要长，引了机主那句「可以」逐字、
+把"2 行差 → 3 行差"具名记账、并列了 `.go` 两个 blob 前后同值。⛔ 本文件重抄一遍（会与 commit 分叉）。
+
+**本 commit 的 `--numstat`（= commit 真身，⛔ 工作树）**：
 ```text
-票 196 契约文字腿 196-c2
-
-正文：
-机主原话「可以」逐字为依据；改 `docs/specs/SPEC-02-data-storage.md`
-§3 `task_log.state` 列注释：`-- 结束态（含 'interrupted'）` →
-`-- 任务状态（含 'interrupted'）`；只改一字，不动 .go。
-
-两处 today 差 2 行 -> 3 行的具名记账：ASCII vs CJK (`<=`/`->` vs `≤`/`→`)
-仍差 2 行，新增 1 行为本单修改。
+110	0	docs/evidence/s1/196-c2-impl.md
+1	1	docs/specs/SPEC-02-data-storage.md
 ```
 
-显式 pathspec（逐个文件名字面点名、⛔ glob、⛔ `add -A`/`.`）：
+**staged 名册（`git diff --cached --name-status`，commit 前）**：`A docs/evidence/s1/196-c2-impl.md` ＋ `M docs/specs/SPEC-02-data-storage.md`
+⇒ 只有这 2 个文件、**0 枚 `.go`**、无本笔不该有的 `D`。
+
+**显式 pathspec（逐个文件名字面点名、⛔ glob、⛔ `add -A`/`.`）**：
 ```bash
 git add docs/specs/SPEC-02-data-storage.md
 git add docs/evidence/s1/196-c2-impl.md
