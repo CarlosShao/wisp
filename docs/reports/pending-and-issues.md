@@ -23262,3 +23262,44 @@ M1 删引文／M2 改原文用词／**M3 只改一个数字**／M4 下移 Case 1
   ★**它一枚都没碰、且"受控 A/B 就是为排除它们才做的"** ⇒ ★**这是"共享工作树里怎么取干净读数"的正面示范**。
 
 **⑨ 状态**＝结案 **34 票**（`-done` **177** 枚）、完成度 **177/352 ＝ 50.3%**、在飞 **3**（`132-v1`／`128-r2`／`130-v1`）、未推 **64**（攒着）、⛔ 清理、★**摆机主 1 件**（`SPEC-02`「结束态」措辞）。
+
+## A1179（2026-10-23 12:3x +08，编排者）★收 `128-r2`：**patch apply、两半同笔、自验全绿**｜★它**照实报了与派单不合的一处**（发1 有 1 枚既有红）｜★我裁 **⛔ 另派成对整包**
+
+**① ★收 `128-r2`（代码笔 `4c40a23f2` ＋ 件笔 `811f127ed` ＋ 口径更正笔 `c393740ec`；件 **95 行**）**
+- ★**我现跑核**：`4c40a23f2` ＝ **5 file changed**，★**五枚路径逐枚**（`cmd/wisp/dataroot_128_test.go`／`dataroot_128_windows_test.go`／`doctor.go`／`internal/proc/envfork.go`／`envfork_test.go`）⇒ ★**两半同一笔**（★`AC#5` ① 要求单一文案点、**⛔ 能拆**）。
+- ★**落地我现跑核过**：`internal/proc/envfork.go` 里 `UserConfigDirUnresolved` **6 命中**；`cmd/wisp/doctor.go` 里 `proc.ErrUserConfigDirUnresolved` **1 命中**（委派）⇒ **两半都真在树里**。
+- ★**`git apply` 它给的逐字＝空**：`--check` `rc=0`／`apply` `rc=0`、**11 hunks**、`git diff --numstat` 五枚 ＝ **`+224 −19`**（★**与 patch 声明逐字一致**）。
+- ★★**它另做了一件稳的事**：HEAD 漂了（`130-r1` 落了 3 笔＋我一笔，**只碰 `internal/observe/**`＋`docs/**`、与它五枚零交集**）⇒ ★**它又对 `944bdb9e8` 做 `git archive` 仓外树、用 `git -c core.autocrlf=false apply` 复验 `rc=0`、五枚与工作树 `cmp` 逐字节相同**。
+- ★**一处必要小修（它报得对）**：patch 末行 `\ No newline at end of file`（`cmd/wisp/dataroot_128_test.go`）⇒ **gofmt／gofumpt 都点名** ⇒ ★**它只补 1 个 `\n`**（`32631→32632`）、**改动一字未重写**、此后两把格式尺全空。
+
+**② ★它自验的读数（全部本腿现跑、⛔ 只看上一腿）**
+- ★**改前（`HEAD` 树编 exe、`APPDATA` 真删、`WISP_ENV=dev`、空 CWD）**：常驻腿逐字 **67 字节** `wisp: boot failed: proc: user config dir: %AppData% is not defined`；★**六枚自救 marker `0/6`**。
+- ★**改后同形 490 字节**、★**六枚逐枚在场**（偏移 **43/115/196/396/416/447**）。
+- ★★**五条 CLI 腿它自己复现了**：**抽句 471 字节**、★**`old`／`new` `cmp` 全等**、★**`sha256` 同一枚 `4410bb0b…83c55`**（★**`sha256sum`＝SHA-256/64 位**）；
+  ★**整份输出归一 `time=` 后 `run`／`models`／`providers`／`secret` 逐字节同**、`doctor` 只差两行 `DLL colocated …bin-old ⇄ bin-new`（★**exe 所在夹、⛔ 句子**）。
+- ★**四腿 `rc` ＝ run 2／secret 2／doctor 1／常驻 1**；★**`assertDirEmpty128` 两轮 × 四腿 ＝ 8 发全过**、★**它另跑六腿逐枚 `cwd=[]`**。
+- ★**定向 `cmd/wisp -count=2 -v` `rc=0`**：顶层 **18 用例 ×2 ＝ RUN 36／PASS 36**、子 **36/36**、FAIL 0、SKIP 0。
+- ★★**反向判据它自造（⛔ 看我的）**：`MUT-A` 退回 `fmt.Errorf("proc: user config dir: %w", err)` ⇒ `internal/proc` 红 `TestDefaultLayoutRefusesWithNoUserConfigDir`（六枚逐名＋三条语序＋句尾）、★**`cmd/wisp` 红 `TestAC2RealProcessRefusesOnEveryLegWithoutAppData128/resident`**（另三腿仍 PASS）；
+  `MUT-B` 摘「修法…然后重试。」⇒ 同测试红（`APPDATA`／`XDG_CONFIG_HOME`／可写目录 ＋ 句尾）。
+  ★★**它自报一处自己的错**：第一次突变把行尾 `+` 留原处 ⇒ **`build rc=1`** ⇒ ★**它改的是**突变**（连 `+` 一并删）、第二次 `build rc=0` 才读红** ⇒ **处置正确**。
+- ★**还原核**：`sha256sum`（SHA-256/64 位）＝`a37c4ecc…1bc3a`、★**pristine／还原后／工作树三处同值**；★**突变窗口 `12:18:05→12:19:20`／`12:19:31→12:20:20` 只记在仓外树、窗口期零提交**（★**守了 `A1159②`**）。
+
+**③ ★门禁**：`build 0`／`vet 0`／`internal/proc -count=2` **0**／定向 `cmd/wisp` **0**／`d22scan 0` clean（正控 `PASS=35 FAIL=0 SKIP=0`、`RUN=77`）／长度门 **0 GREEN**（17630 tracked、over-budget 61、roster 61）。
+- ★格式**甲乙都报**：★**甲＝archive 仓外树（判据）、gofmt／gofumpt 全空**；乙＝工作树同空；★**五枚 CR 各 0**（`tr -cd "\r" | wc -c`）。
+
+**④ ★★它照实报了与派单不合的一处（这是本轮最该表扬的）**
+- ★**我派单写的是**"整包 `cmd/wisp` 两发都**零 `--- FAIL`**、整进程终止"。
+- ★★**它发1（`12:20:49→12:26:13`）实测**：`FAIL … 318.640s`、顶层 **RUN 169／PASS 167／FAIL 1**／SKIP 0，★**红＝`TestAC14GoSideEvalPushReachesThePage`**、死点 `TestPanelThreadIsSTAAndExitsCleanly`（有 RUN 无判决）。
+- ★它发2（`12:26:50→12:32:00`）：`FAIL … 304.464s`、**RUN 168／PASS 167／FAIL 0**、死点同一枚。
+- ⇒ ★**"两发都终止、无 panic、无 `test timed out`"复现成立**；★★**但"零 `--- FAIL`"只在发2 成立、发1 不是** ⇒ **它明说"我没有把它记成零红"**。
+- ★**归因它给了两条**：①那枚是**台账在册的既有红**（★**我现跑核：`TestAC14GoSideEvalPushReachesThePage` 在台账里出现 **29 次****、`A508` 那族；★**且票 111 就在管它**）②**与我五枚路径无依赖路径**。
+- ★★★**它还明说**："我**没有**再跑一发'无本笔'的整包对照（成本），归因依据＝台账在册＋无依赖路径" ⇒ ★**这是"我做到哪、没做到哪"划得最清的一次**。
+
+**⑤ ★★我裁：⛔ 另派成对整包跑**（逐条理由）
+- ★**`cmd/wisp` 整包四数**本来就明令 ⛔ 当判据**（`A1126`：未判决恒 1、红名册逐发漂移、截断点后整族 `RUN=0`）⇒ ★**为"⛔ 当判据的数"再花 ~10 分钟做成对跑 ＝ 浪费**。
+- ★**它的发2 已经给了 `FAIL 0`** ⇒ **那一发就是干净读数**。
+- ★**那枚红在台账里 29 次、且票 111 在管它** ⇒ ★**它不是本笔的问题、也不需要本笔来证明**。
+- ⇒ ★**⛔ 派腿；但记一条**：★**`TestAC14GoSideEvalPushReachesThePage` 是"整包 `cmd/wisp` 恒红的来源之一"** ⇒ ★**将来谁想用它当门禁，先看这条**。
+  ★**定式（新）**：★**派单里凡写"某发零 FAIL"⇒ 必须同时给"那一发的时间窗与漂移史"**，★**否则腿会照字面判成"派单不对"**（★这次它照实报了、**做得对**）。
+
+**⑥ 状态**＝结案 **34 票**（`-done` **177** 枚）、完成度 **177/352 ＝ 50.3%**、在飞 **2**（`132-v1`／`130-v1`）、未推 **71**（攒着）、⛔ 清理、★**摆机主 1 件**（`SPEC-02`「结束态」措辞）。
