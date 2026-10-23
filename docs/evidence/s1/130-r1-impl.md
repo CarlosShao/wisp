@@ -122,7 +122,9 @@ leg-slo-F-fix  exe=wisp-post2.exe rc=0 console=2 bytes=623 records=2
 
 - **提交 1** `b19c6612e38e975ffba78c4fd53f65db7497fda0`（主题逐字以「票 130 落地腿 130-r1」开头）。`git show --name-only` 三枚：`docs/evidence/s1/130-r1-impl.md`、`internal/observe/earlylog_takeover_130r1_test.go`、`internal/observe/logging.go`。`.go` 两枚**均在写面内**；越界筛（`git show --name-only | tr '\\' '/' | grep -vE '<写面白名单>'`）⇒ **`NO OUT-OF-SCOPE PATH`**。`git diff --cached --name-status` 无 `D`、无写面外 `A`。
 - **正控（同一把尺打真提交，证明它有牙）**：`6e19f4a43`（票 196）⇒ 同名尺列出 `.go` 五枚 `internal/memory/{dao_tasklog,migrate_v1seed_test,models,schema,schema_test}.go`，越界筛**逐枚点名**；`d59af9a98`（票 363）⇒ `internal/risk/mode.go`、`internal/tools/bridge.go` **被点名**。⇒ 我这笔之所以输出 `NO OUT-OF-SCOPE PATH`，是**因为真没有**，不是因为尺看不见 `.go`。
-- **提交后复跑（在提交树上重做，不是"提交前那次"）**：`go test ./internal/observe -count=2 -v` ⇒ **RUN=162 / PASS=162 / FAIL=0 / SKIP=0**，rc=0；`go build ./cmd/wisp` rc=0 后两腿再跑一发：`wisp slo -settle` **624 字节 / 2 条**、`wisp secret list` **4 条**且 booking 仍 `early_records=2, early_dropped=0`。
+- **提交后复跑（在提交树上重做，不是"提交前那次"）**：`go test ./internal/observe -count=2 -v` ⇒ **RUN=162 / PASS=162 / FAIL=0 / SKIP=0**，rc=0；`go build ./cmd/wisp` rc=0 后两腿再跑一发：`wisp slo -settle` **2 条**（字节数在 623/624 之间抖，见下）、`wisp secret list` **4 条**且 booking 仍 `early_records=2, early_dropped=0`。
+  ⚠ **623 与 624 不是矛盾，是尺**：`time` 是 RFC3339Nano（去掉尾随零），小数位长度每次都可能不同，所以**跨数据根/跨发比字节是错的尺**；本笔所有"没丢"的结论都落在**记录数**（0→2、4→4）与**属性值**（`early_records=2`）上。
 - **第二笔** `8f205a6db3ac268351146d47315f65afad7d4a50`（只改本件）：`git show --name-only` 一枚 `docs/evidence/s1/130-r1-impl.md`，**零 `.go`**。
 - **第三笔** `66e16de00`（只含本件 §10 末两行）。`git show --name-only` 一枚本件，**零 `.go`**。
-- **第四笔**（把 §3 的"受控 A/B"写进来）：号由 `git log --oneline -1 -- docs/evidence/s1/130-r1-impl.md` 现取，`--name-only` 同样只有本件一枚。**追号不再追号**——四笔全在 `git log -- docs/evidence/s1/130-r1-impl.md` 里。
+- **第四笔** `759b10677`（§3 的"受控 A/B"）：`git show --name-only` 一枚本件，**零 `.go`**。
+- **第五笔**（把 §10 "提交后复跑"那条的 623/624 说清：字节是错的尺，记录数才是）：号由 `git log --oneline -1 -- docs/evidence/s1/130-r1-impl.md` 现取，`--name-only` 同样只有本件一枚。**追号不再追号**——五笔全在 `git log -- docs/evidence/s1/130-r1-impl.md` 里。
