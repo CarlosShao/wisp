@@ -169,11 +169,45 @@ jobs:
         if: ${{ !cancelled() }}
         run: sh scripts/check-path-length-budget.sh --with-self-test
 
+      # CALL SURFACE CHANGED (ticket 362, AC#1 form (A'), owner-approved edit of
+      # .github/**; the approval is docs/reports/pending-and-issues.md A1161 (1),
+      # and the dispatch that carries it is commit 76ae3bbb). Three claims:
+      #
+      # WHY. This step used to read `gofumpt -l . tools/d22scan tools/mockllm`,
+      # which walks the WHOLE tree - and `.scratch/**` is the directory this repo
+      # fills with DELIBERATELY broken samples. At the anchor 20 TRACKED .go files
+      # under `.scratch/wisp/probes/**` are not gofumpt-clean on purpose (two exist
+      # only as negative controls: a file named badly_formatted.go, and
+      # gofumpt-negctl/probe.go). Formatting them would destroy what they were
+      # created to prove, so the old criterion was satisfiable only by deleting or
+      # laundering somebody else's evidence. It now reads
+      # `gofumpt -l internal cmd tools scripts frontend`.
+      #
+      # WHAT THAT DOES TO THE DENOMINATOR. "The denominator of the formatting gate
+      # is the TRACKED set, not the working tree" is the claim the census step
+      # below is built on, and it is no longer true OF THIS STEP: the denominator
+      # here is now the PRODUCTION DIRECTORY SET named above, not every tracked
+      # .go. Measured at the anchor: of 1160 tracked .go files, 800 sit in those
+      # five directories (internal 621, cmd 149, tools 18, scripts 11, frontend 1),
+      # 360 sit under .scratch/ and 0 sit at the repo root, and no tracked .go
+      # file's first path segment is anything else - so the five directories are
+      # exactly "production" and .scratch/ is exactly what leaves this
+      # denominator. The reading is still taken over tracked bytes on a checkout;
+      # what narrowed is which tracked bytes are counted.
+      #
+      # WHAT IT GIVES UP, stated rather than left to be discovered: a bench sample
+      # that somebody one day places under one of those five directories WOULD be
+      # scanned here and would redden this step. That count is 0 today - all 20
+      # dirty tracked files are under .scratch/ - and it should stay 0, because
+      # those directories are where the gate has to bite: a sample parked there is
+      # either a mistake or belongs in .scratch/. Unchanged: no -w, the first
+      # non-empty output still exits 1, and the census step below is a separate
+      # ruler that still reads every tracked .go - this edit does not move it.
       - name: gofmt (gofumpt)
         if: ${{ !cancelled() }}
         run: |
           go install mvdan.cc/gofumpt@latest
-          OUT="$(gofumpt -l . tools/d22scan tools/mockllm)"
+          OUT="$(gofumpt -l internal cmd tools scripts frontend)"
           if [ -n "$OUT" ]; then
             echo "gofumpt would reformat:"
             echo "$OUT"
