@@ -123,6 +123,10 @@ CREATE TABLE plugin_state (
 );
 ```
 
+**`task_log.state` 的值域（票 196；本段与代码同源，⛔ 是第二份手工名册）**：合法取值＝**12 枚**，顺序＝`internal/memory/taskstate.go` 的 `taskStateRoster`（`schema.go` 的 `buildDDLV4` 按该切片顺序生成 CHECK；改一处须同改另一处）：
+`running` · `done` · `succeeded` · `cancelled` · `interrupted` · `stuck` · `error`（既有词 7 枚；`running`＝行已打开、尚无终态；`succeeded` 已无生产者，只为旧行保留）＋ `Thinking` · `Settling` · `Muted` · `Stuck` · `Error`（D43 名 5 枚，任务行可合法持有；⛔ 全 20 枚——`Sleeping`/`Listening` 是球的状态）。
+⚠ `stuck`/`Stuck` 与 `error`/`Error` 是**两对大小写不同的独立取值**（TEXT 默认 BINARY 比较），⛔ 当成笔误合并成一枚。**名册之外的写入被 CHECK 拒绝**（`CHECK constraint failed`）⇒ 遇到"库拒绝"先照这张名册核，⛔ 当 bug；该 CHECK 由 schema v4 的 `task_log` 重建迁移加上（SPEC-02 §3 的 v1 DDL 块本身不含 CHECK）。
+
 - **`provider_health`（schema v2 追加，2026-09-19 用户批准——LLM 接入补充，SPEC-03 §3.1）**：
   `provider` PK · `model` PK（联合主键）· `probe{text,vision,audio_in,audio_out,thinking,fc}`（JSON）
   · `last_probe_at` · `last_error` · `last_error_at` · `latency_ms_p50` · `quota_state`。
