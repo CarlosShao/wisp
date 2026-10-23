@@ -93,7 +93,7 @@ PROBE365A1-CLI | label=completed | fixture=text-reply | exit=0 | task=3c9843ab-1
 ## 6. 归因（为什么分裂还活着）
 
 1. **发布组合里只有一个 Loop 装配点**：`cmd/wisp/run.go:1072-1100`，且 `Journal: nil`（`:1080`；同义注释在 `internal/tools/bridge.go:1151`——tool_call 行由 bridge 写，Loop 必须 nil 否则双写）⇒ **`internal/agent` 那处 `taskLogState` 在已发布二进制里没有调用者**，它被 `Options.Journal != nil` 这道门关着（`loop.go:159-160`），而唯一装配点把门关死了。我这次拿真读数，正是**把 `memory.Store` 挂成 `Journal`** 才让那条链真跑起来（§3 路径甲）。
-2. `task.spawn` 的子环路继承父装配（`internal/tools/subagent_197.go:347 opt := base`）⇒ 子也没有 Journal。
+2. `task.spawn` 的子环路继承父装配（`internal/tools/subagent_197.go:320 opt := base` → `:347 agent.New(opt)`）⇒ 子也没有 Journal。
 3. ⇒ **今天库里所有 `StatusStuck` 行都是 `error`**（cmd 侧写的）；`stuck`／`interrupted` 在当前组合下无生产者——与票 196 的"Census 四旧词"里没有它们吻合。
 4. **票 196 的甲（权威映射）也没有生产者**：`TaskStateFor`／`TaskStateFromD43`／`TaskLog.D43State` 在 `cmd/**`＋`internal/**` 的非测试代码里 **0 个调用者**（现跑 grep 只命中 `internal/memory/taskstate.go` 自身）⇒ 名册只当了守门的。**这就是"源头没除根"的准确形状。**
 5. ★**第三处同形映射（具名上报）**：`internal/tools/subagent_197.go` 有**两份一模一样**的 `switch res.Status`（`:451-457` `finalize`、`:480-486` `answer`），把 `StatusStuck` 映射成 **`Settling`**（`subagentStateSettled`，`:108`）——同一枚 `StatusStuck` 的**第三种答案**。★但它量的对象不同：名册 `TaskOutput.State`（D43 名、判据 `statemachine.Valid`、票 188；`task.go:162-166` 明说"memory 侧那套旧词表属票 196，本维不接它"）⇒ ⛔ 与 `task_log.state` 同一把尺。列出来只为让 AC#1 裁形时别以为"只有两处"。
