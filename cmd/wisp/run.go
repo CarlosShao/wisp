@@ -1357,18 +1357,14 @@ func compressionLine(rep agent.CompressionReport) (string, bool) {
 }
 
 // taskLogState maps the loop's terminal state onto the memory.task_log.state
-// vocabulary.
+// vocabulary. It is a one-line delegation on purpose (ticket 365): the ladder
+// itself lives in agent.TaskLogState, which answers in memory's TaskState
+// constants, so this command and the loop's own journal cannot spell one
+// status two ways. A switch here would be a second conversion point, and the
+// defect this fixes was exactly that - StatusStuck rowed as "error" here while
+// the loop would have rowed it "stuck".
 func taskLogState(s agent.Status) string {
-	switch s {
-	case agent.StatusCompleted:
-		return "done"
-	case agent.StatusCancelled:
-		return "cancelled"
-	case agent.StatusControl:
-		return "done"
-	default:
-		return "error"
-	}
+	return string(agent.TaskLogState(s))
 }
 
 // chainOptions carries the [net] and [llm.retry] settings into the provider

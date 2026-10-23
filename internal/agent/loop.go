@@ -14,6 +14,7 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/llm"
+	"github.com/CarlosShao/wisp/internal/memory"
 	"github.com/CarlosShao/wisp/internal/observe"
 )
 
@@ -1010,7 +1011,7 @@ func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
 	// wall-clock difference (D42#9).
 	wctx, cancelWrite := terminalWriteCtx(ctx)
 	defer cancelWrite()
-	if err := j.finishTask(wctx, taskLogState(status), firstRunes(summary, 400),
+	if err := j.finishTask(wctx, string(TaskLogState(status)), firstRunes(summary, 400),
 		int64(cost.Usage.InputTokens), int64(cost.Usage.OutputTokens),
 		cost.Micros, errClass); err != nil {
 		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
@@ -1043,22 +1044,44 @@ func (l *Loop) publishUsage(res *Result, cost Cost) {
 	res.Currency = cost.Currency
 }
 
-// taskLogState maps a loop status onto the task_log.state vocabulary (a
-// free-text column; 'running' and 'interrupted' are memory's own values).
-func taskLogState(s Status) string {
+// TaskLogState maps a loop status onto memory's task_log.state vocabulary
+// (ticket 365). It is the ONE conversion from Status to a state word: both
+// producers of a task_log row - this package's journal and cmd/wisp - call it,
+// so a status cannot be spelled one way on one path and another way on the
+// other. Ticket 196's roster is the authority: every return is one of
+// memory's TaskState constants, not a string literal, so widening or renaming
+// the column is an edit in internal/memory alone.
+//
+// The ladder lives here rather than in internal/memory because the direction
+// of the dependency makes that impossible: this package imports memory
+// (journal.go, tools.go), so memory cannot name Status without an import
+// cycle. memory still owns the vocabulary; this function owns the projection
+// of one enum onto it.
+//
+// Two mappings deserve their reason in the open:
+//   - StatusTruncated -> TaskStateInterrupted: memory spells "cut off at the
+//     round/token ceiling" as interrupted (see taskstate.go), and truncated is
+//     not on the roster - writing it would be refused by both the DAO and the
+//     SQL CHECK.
+//   - the default arm -> TaskStateError: an unknown status has no evidence
+//     behind it, and rowing it as "done" would report an unnamed ending as a
+//     success. Fail closed; the screen still prints the status it really got.
+func TaskLogState(s Status) memory.TaskState {
 	switch s {
-	case StatusCompleted:
-		return "done"
+	case StatusCompleted, StatusControl:
+		// StatusControl never opens a row (no LLM call, no task_log), so this
+		// arm is reachable only through a caller that logs one anyway; it
+		// answers "the task ended with an answer", which is what happened.
+		return memory.TaskStateDone
 	case StatusStuck:
-		return "stuck"
+		return memory.TaskStateStuck
 	case StatusCancelled:
-		return "cancelled"
+		return memory.TaskStateCancelled
 	case StatusTruncated:
-		return "interrupted"
-	case StatusFailed:
-		return "error"
+		return memory.TaskStateInterrupted
 	default:
-		return "done"
+		// StatusFailed and anything off the enum: ended without an answer.
+		return memory.TaskStateError
 	}
 }
 
