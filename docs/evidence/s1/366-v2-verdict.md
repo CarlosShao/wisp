@@ -107,7 +107,7 @@
 
 ## ⑩ 提交＋逐笔越界
 
-- 本件提交＝**`030352c6e`**（首笔 120 行；**记本行的一笔**只改本件、号见 `git log -1`）；`add`/`commit` 两处**显式 pathspec**、只点 `docs/evidence/s1/366-v2-verdict.md` 一枚；提交前 `git diff --cached --name-status` 只见 **`A`** 这一行（无 `D`/意外 `A`）。⛔ push。
+- 本件提交＝**`030352c6e`**（首笔 120 行）；其后**只改本件**的补录两笔：`9157283fb`（记首笔号）／`f8a089e3d`（补提交后 G3 读数）＋**本笔**（把三笔一口气点名，此后不再补录）；三笔 `git show --name-status` **都只有本件一行**，产码与判语 0 变化。`add`/`commit` 两处**显式 pathspec**、只点 `docs/evidence/s1/366-v2-verdict.md` 一枚；首笔提交前 `git diff --cached --name-status` 只见 **`A`** 这一行（无 `D`/意外 `A`）。⛔ push。
 - **越界＝0**：仓内 `.go` **0 枚**；`internal/**`／`cmd/**`／`scripts/**`／`.github/**`／`.scratch/wisp/**`／`docs/reports/**`／`docs/PLAN.md`／`docs/specs/**` **0 字节改动**；五发变异全 `-overlay`，`git status --porcelain -- internal/memory` **空**；临时件全在 `D:\tmp\wisp\20261023\366v2\**`。
 
 ---
