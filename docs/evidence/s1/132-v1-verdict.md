@@ -133,3 +133,9 @@
 
 1. **`cmd/wisp/logsink.go:44-46` 的 `INTERIM (ticket 117 AC#3)` 已过期 —— 成立**。它写 "nothing here seals or un-seals the log file"，又写"日志算不算私有数据是 owner 没答的那一问"；owner 09-23 已批 `Q-31`「算、要锁」，且管线现在真的封。该文件在 `cmd/**` ＝它禁写，它**如实拒绝动**，对。⇒ 排队给下一波 `cmd/wisp` 写腿。
 2. **运行中途 roll 封失败 ⇒ `slog` 吞错 —— 成立**。代码：`:299` 失败即 `f.Close()`＋返回错；`redactHandler.Handle` 原样 `return h.next.Handle(...)`（`:176-182`），`slog.Logger` 不向调用方上报 Handler 错误 ⇒ 记录**消失**、产品侧**没有一行"seal 失败"**；启动时那一半仍响（`run`／`resident` 打印 `持久日志未启用（…）…不会落盘`，`cmd/wisp/run.go:222`／`resident_windows.go:114`）。"不许没锁但能写"这条是关的，"失败有一行名字"这条**没有**。⇒ 编排者把它放"残余、另开票"的处置**对**；建议单开一枚"Handler 失败必须有一行"的票。
+
+## 件尾（本笔自己）
+
+- **本笔提交号**：`be7a4dd6d`（`A docs/evidence/s1/132-v1-verdict.md` 一枚；`git diff --cached --name-status` 只此一行）。
+- **提交后复跑**（HEAD `be7a4dd6d`）：`sh scripts/check-path-length-budget.sh` **rc=0** ⇒ `tracked paths=17634／over=61／roster=61` `VERDICT GREEN`；`sh scripts/d22scan.sh` **rc=0** `clean`（`bans #1-5 internal/=248 cmd/=42`）。
+- **仓外探针一枚（具名）**：`D:\tmp\wisp\20261023\132v1\after\internal\observe\zz132v1_rollprobe_windows_test.go`（滚动文件封条探针，只在导出树；**未入仓**）。第一次的无效对照树 `head-noleg` 亦在仓外，已作废并在 §⑧ 留痕。
