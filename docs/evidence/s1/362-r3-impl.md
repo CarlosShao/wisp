@@ -29,8 +29,7 @@
 ```sh
 unset GOTMPDIR TMPDIR TEMP TMP; export GOFLAGS=
 git archive --format=tar 0754fa7d9 -o /d/tmp/wisp/20261023/362r3/0754fa7d9.tar   # rc=0
-mkdir -p /d/tmp/wisp/20261023/362r3/tree-0754fa7d9
-tar -xf /d/tmp/wisp/20261023/362r3/0754fa7d9.tar -C /d/tmp/wisp/20261023/362r3/tree-0754fa7d9   # rc=0
+mkdir -p /d/tmp/wisp/20261023/362r3/tree-0754fa7d9 && tar -xf /d/tmp/wisp/20261023/362r3/0754fa7d9.tar -C /d/tmp/wisp/20261023/362r3/tree-0754fa7d9   # rc=0
 cd /d/tmp/wisp/20261023/362r3/tree-0754fa7d9
 
 find . -type f -name '*.go' | wc -l
@@ -128,8 +127,7 @@ git diff -U0 -- .github/workflows/ci.yml | grep -E '^-' | grep -vE '^---' | grep
 #  （无输出）
 ```
 
-**更强的一条（语义而非文本）**：把 HEAD 与工作树各自 `yaml.safe_load`，取 `jobs.lint` 里 `name == "gofmt (gofumpt)"` 的那一步 ⇒ `RUN_EQUAL=True`、`IF_EQUAL=True`、`NAME_EQUAL=True`（`run` 逐字 `go install mvdan.cc/gofumpt@latest\nOUT="$(gofumpt -l internal cmd tools scripts frontend)"\n…`）。
-另：`grep -nE '(^|[^0-9])(1162|802|623|805|626|1165)([^0-9]|$)' ci.yml` ⇒ **0 命中**。（`:619` 的 `360-minute` 是超时分钟数，不是分母，未动。）
+**更强的一条（语义而非文本）**：把 HEAD 与工作树各自 `yaml.safe_load`，取 `jobs.lint` 里 `name == "gofmt (gofumpt)"` 的那一步 ⇒ `RUN_EQUAL=True`、`IF_EQUAL=True`、`NAME_EQUAL=True`（`run` 逐字 `go install mvdan.cc/gofumpt@latest\nOUT="$(gofumpt -l internal cmd tools scripts frontend)"\n…`）；另 `grep -nE '(^|[^0-9])(1162|802|623|805|626|1165)([^0-9]|$)' ci.yml` ⇒ **0 命中**（`:619` 的 `360-minute` 是超时分钟数、不是分母，未动）。
 
 ## §7 门禁 `rc`（跑前 `unset GOTMPDIR TMPDIR TEMP TMP`、`GOFLAGS=`；⛔ 走管道）
 
@@ -138,13 +136,15 @@ git diff -U0 -- .github/workflows/ci.yml | grep -E '^-' | grep -vE '^---' | grep
 | d22scan | `sh scripts/d22scan.sh` | **0** | `d22scan: clean - no D22 ban violations`（`ban #8` 实扫 `internal/`＋`cmd/`＋**`design/`＋`frontend/`** —— 派单写"只 `internal/`＋`cmd/`"**偏窄**；但"⛔ 扫 `.github/`"这一点不变，故本笔安全） |
 | 长度门 | `sh scripts/check-path-length-budget.sh --with-self-test` | **0** | `VERDICT GREEN - every over-budget tracked path is rostered by name…` |
 
+**提交后复跑（在"我的树"上，⛔ 不靠共享工树）**：`git clone --shared` 到仓外 → `git checkout -q b833be20f` ⇒ d22scan **rc=0**、长度门 **rc=0／GREEN**（`tracked paths=17629`、`over-budget=61  covered by roster=61  not in roster=0`）。
+★**共享工作树此刻是 rc=1（RED）**：两行 RED 都是别人**暂存未提交**的 `.scratch/wisp/issues/196-…-in-use-done.md`（`git status` 读 `R065`）⇒ **归因清楚、⛔ 我这两枚文件**；我提交前那次 GREEN 是改名前的树（`17627`）。**这正是派单"⛔ 在主检出上量"的理由。**
+
 **尺的射程注**：d22scan 的 live scope 印 `internal/ 630`、`cmd/ 148` —— 那是**含未提交改动的工树**计数，**不是** §2 的 tracked `626/149`；两者不同对象、不同算法，⛔ 互相当核对。
 
 ## §8 两处要报的偏差（⛔ 阻塞，但不许含糊过去）
 
 1. **派单/`362-v1` 的"旧 12 笔 / 基 `6e19f4a43`"对不上**（现跑）：`938216b8e..ade547ac8` ＝ **11**；`938216b8e..6e19f4a43` ＝ **9**；`ade547ac8^` ＝ **`8ebbc1491`**（**不是** `6e19f4a43`）。⇒ **那两枚数都该改**。但**结论不动**：三数**确系 `938216b8e`** —— 这次不是靠减法推的，是**直接量了 `938216b8e` 的树**（§2），尺从"数提交"换成"数树里的文件"。
-2. **停手条件②命中，但我判它在本笔写面内**：`ci.yml` 里写这三个数的只有两处 —— `:191-193` 与 **`:212` 的 `(802 each)`**，**两处都在同一道 gofumpt 步的注释块里**（换行后 `:186-234`，步头 `:235`）。按写面"只那道步的注释"它在我面上；且 `802` 正是三个数之一，留着会成孤儿数 ⇒ **同笔一并去掉数（不改语义）**。**其它步／job 0 处**。★这条是我唯一越过字面三行的一步，**要收窄请裁、我再追加一笔**。
-   - 另核：`.scratch/wisp/probes/161/r5/attrib.sh` 的分母是**运行时算的**（`$TRACKED_GO`／`$TRACKED_GO_ALL`），**⛔ 写死数** ⇒ 仓里再没有第二处硬编码这三个数的地方。
+2. **停手条件②命中，但我判它在本笔写面内**：`ci.yml` 里写这三个数的只有两处 —— `:191-193` 与 **`:212` 的 `(802 each)`**，**两处都在同一道 gofumpt 步的注释块里**（换行后 `:186-234`，步头 `:235`）。按写面"只那道步的注释"它在我面上；且 `802` 正是三个数之一，留着会成孤儿数 ⇒ **同笔一并去掉数（不改语义）**。**其它步／job 0 处**；另核 `.scratch/wisp/probes/161/r5/attrib.sh` 分母是**运行时算的**（`$TRACKED_GO`／`$TRACKED_GO_ALL`）、⛔ 写死数 ⇒ 仓里无第二处硬编码。★这条是我唯一越过字面三行的一步，**要收窄请裁、我再追加一笔**。
 3. **停手条件①未命中**：那道门的口径**五个目录全印**、加 `.scratch` 与根 ⇒ 无"没印的第三个数"；`626+149+18+11+1=805`、`805+360=1165`。
 
 ## §9 落笔前五问（`ruler-scope-checklist.md`）
