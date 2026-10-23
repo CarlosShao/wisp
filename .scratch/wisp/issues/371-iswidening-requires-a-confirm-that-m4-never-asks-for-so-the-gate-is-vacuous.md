@@ -65,3 +65,22 @@
 ## Progress log
 
 - [2026-10-23 18:5x +08] agent=`编排者` did=立案（★来路＝`367-r1` 第 2 条；★它实测 `AE→AH` ＋ 真 `Confirm` ⇒ **`confirm_calls=0`**、`applied=1` ⇒ **门要求的确认，M4 从来不问**；★`367` 的目标是**堵静默变宽**、它做到了（`arm=half` `applied=0`）；★**让 `AE→AH` 也出卡要动 `cmd/wisp` ＋ 改 `M4`** ⇒ 另一笔）next=派 `371-a1` 只读腿。
+
+## ★★补充证据（2026-10-23 18:5x 编排者现跑、`A1204` 记）
+
+★**`M4` 的出处我找到了，而且它**被一条断言钉死****：
+
+```
+cmd/wisp/run_mode101_test.go:232
+	// R20/M4 is asymmetric: only the switch INTO auto_approve costs a card.
+cmd/wisp/run_mode101_test.go:251
+	t.Errorf("L2 confirmations asked = %v, want exactly [auto_approve] (R20/M4)", gotAsked)
+```
+
+⇒ ★★★**`want exactly [auto_approve]`** ⇒ **产品被钉死为「`AE→AH` 绝不出卡」** ⇒
+★★**所以 `367-r1` 那道门对 `AE→AH` 是**空的****：★**它要求一条确认通道、而产品被钉死为**永不对它出卡****。
+
+★**这条对 `AC#1` 裁形的影响**：
+- ★**〔甲〕让 `M4` 也对所有变宽出卡** ⇒ ★**必须改 `run_mode101_test.go:251` 那条断言**（★**那是**改产品决定**、⛔ 改注释**）。
+- ★**它是不是 `D` 级契约？** ⇒ ★**`AC#0` 要核**：★`R20`／`M4` 在 `docs/PLAN.md` 或 `docs/specs/**` 里**有没有具名条目**（★**若有 ⇒ 改契约文字 ⇒ 摆机主**）。
+- ★**〔乙〕把门降回只对 `AA`** ⇒ ★**那 `367` 的收益全没了**、且**`AE→AH` 静默变宽会回来** ⇒ ★**⛔ 推荐**。
