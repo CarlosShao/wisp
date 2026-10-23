@@ -106,6 +106,27 @@ func PrivateFileExclusive(path string, data []byte) error {
 	return privateFile(path, data, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
 }
 
+// removeRefusedLeaf is the seam ticket 348's AC#2 needed a SECOND human approval for, and it exists
+// for one reason: the refusal-path removal is the act that ticket booked, and on the shipped platform
+// a racer cannot put the route into that act's world. Measured on this box before it was added
+// (348-r2, logs/03-*): while the leaf handle is open the kernel refuses every ancestor rename
+// (`Access is denied` when the leaf was opened by name), and while the pinned parent is open a rename
+// that MOVES the pinned directory out of its parent answers `The process cannot access the file
+// because it is being used by another process`. What the pin does NOT refuse is a rename of the pinned
+// directory to a name inside that same parent (measured `err=<nil>`), which is the form the instrument
+// below uses - because that is the form this route's attacker has. What makes the world unreachable to
+// a racer is narrower: the pre-landing route's only free-handed instant is between `_ = f.Close()` and
+// `os.Remove(resolved)`, two syscalls. With the removal branch forced to run, the pre-fix route still
+// deletes the foreign witness only 8-10 times in 400 attempts (logs/11-*).
+//
+// It is a var, and not a parameter of anything, for the same reason applyDescriptor is one: a test
+// replaces it to ACT AT THAT INSTANT and then calls the original, so what the reading measures is this
+// route's removal rather than a test that deletes files on its own. The default value IS the landing's
+// removal, the signature is the one unlinkPinnedLeaf already had, nothing new is exported, and no
+// caller outside this package can see any of it. The reverse criterion reads the same var the other
+// way: give it the pre-landing body and the test that gates this act must turn red.
+var removeRefusedLeaf = unlinkPinnedLeaf
+
 // privateFile creates with the given flags, seals the empty file, and only then
 // writes. A seal that fails leaves no content behind: the entry is removed
 // before the error is returned, so the failure is "this artifact was not
@@ -174,12 +195,12 @@ func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
 	}
 	if err := sealHandle(f); err != nil {
 		_ = f.Close()
-		unlinkPinnedLeaf(parent, filepath.Base(resolved), pinned)
+		removeRefusedLeaf(parent, filepath.Base(resolved), pinned)
 		return sealError(resolved, err)
 	}
 	if _, err := f.Write(data); err != nil {
 		_ = f.Close()
-		unlinkPinnedLeaf(parent, filepath.Base(resolved), pinned)
+		removeRefusedLeaf(parent, filepath.Base(resolved), pinned)
 		return err
 	}
 	if err := f.Close(); err != nil {
