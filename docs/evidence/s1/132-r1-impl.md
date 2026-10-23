@@ -130,7 +130,10 @@ D:\tmp\wisp\20261023\132r1\data-fresh-after\logs NT AUTHORITY\SYSTEM:(F)
 ## §5 反向判据：三读数 ＋ 还原核
 
 **还原核声明**：`sha256sum`（**SHA-256，64 位十六进制**）；⛔ 不与 `git hash-object`（SHA-1，40 位）混比。
-pristine `internal/observe/logging.go` = `b0dc8be9b2d6e007d3f8acba50285dd3403795608cda08551f779501af036324`。
+被突变的那个 blob ＝ **提交里的那一枚**：`13d8180e2c2ce5aa90549a83121a1d9da81621cef015d00633edf73c5db16b12`
+（`sha256sum internal/observe/logging.go` 与 `git show HEAD:internal/observe/logging.go | sha256sum` **同值**）。
+⚠ 留痕：本腿第一轮突变是在一个更早的 blob `b0dc8be9…` 上跑的（差别只有一段注释：把"before the first content byte"
+改成"before THIS RUN's first content byte"）；两轮对同一批突变给出**逐名相同的红集合**（6/4/3/1），本表用第二轮＝提交里那一枚。
 
 | 突变 | 摘掉哪一跳 | `go test -run 132r1` | 红名（逐名） |
 |---|---|---|---|
