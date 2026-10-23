@@ -12,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/CarlosShao/wisp/internal/winsec"
 )
 
 // JSONL log pipeline (ticket 08; SPEC-01 §3, [observe] config section).
@@ -21,6 +23,27 @@ import (
 // A resident "log-flusher" goroutine (D38b roster, spawned through the
 // registry so it carries the recover boundary) flushes the buffer every
 // flushInterval and sweeps expired files once per retention sweep.
+//
+// PRIVATE DATA, and therefore sealed (ticket 132; owner's ruling on Q-31,
+// 2026-09-23: "算、要锁"). A log file here holds every security notice the
+// process made and every path rewrite the run leg booked, which is the record of
+// what this user said to the agent - the same class as config.toml, the DPAPI
+// blob and memory.db, all of which land inside a sealed tree. Two seals, and
+// they are the two AC#2 of that ticket names:
+//
+//   - the DIRECTORY is created through winsec.PrivateDirAll and not os.MkdirAll,
+//     so the descriptor is private BEFORE the level exists rather than narrowed
+//     after files were already born inside it. That is also the repair path: an
+//     existing <data>\logs from an older build is sealed on the next InitLog;
+//   - every rolled FILE is sealed by winsec.SealFile between its create and the
+//     first content byte (ensureFileLocked). Inheritance from the sealed
+//     directory would already carry the descriptor, but "the child inherits it"
+//     is an inference about the platform, and this ticket's whole subject is what
+//     happens when an inference stands where a reading should.
+//
+// Both failures are loud: there is no branch that keeps writing to a file whose
+// seal failed. The direction is the package one (winsec.ErrNotSealable's doc):
+// a failed seal means the bytes are refused, never that they land wider.
 //
 // Log line format: one JSON object per line (slog JSONHandler); timestamps
 // are wall-clock UTC - a persisted record, per the package clock rules.
@@ -69,8 +92,12 @@ func InitLogWithRegistry(cfg LogConfig, reg *Registry) (*LogPipeline, error) {
 	if cfg.Dir == "" {
 		return nil, New(ClassConfig, "observe: log dir is empty")
 	}
-	if err := os.MkdirAll(cfg.Dir, 0o755); err != nil {
-		return nil, Wrap(ClassConfig, err, "observe: create log dir")
+	// 0o700, not the 0o755 this used to pass: on POSIX perm is what the mode
+	// means, and a log tree that another account can traverse is exactly the
+	// reading ticket 132 exists to remove. On Windows the descriptor decides and
+	// this argument is ignored (winsec.PrivateFile's doc).
+	if err := winsec.PrivateDirAll(cfg.Dir, 0o700); err != nil {
+		return nil, Wrap(ClassConfig, err, "observe: create private log dir")
 	}
 	w, err := newRollingWriter(cfg.Dir, cfg.RollSizeMB, cfg.RollDays)
 	if err != nil {
@@ -169,6 +196,15 @@ type rollingWriter struct {
 	closed  bool
 }
 
+// sealLogFile is the seal ensureFileLocked runs on a freshly created log file.
+// It is a var, and winsec.SealFile is what it holds, so a test can ACT AT THAT
+// INSTANT: the refusal direction ("the seal failed, so the bytes must not land")
+// has no reachable filesystem state that produces it on the shipped platform, and
+// an untestable failure branch is the branch that quietly becomes a skip. The
+// same shape winsec uses for applyDescriptor and removeRefusedLeaf, for the same
+// reason, and nothing new is exported: this name stays inside this package.
+var sealLogFile = winsec.SealFile
+
 func newRollingWriter(dir string, sizeMB, days int) (*rollingWriter, error) {
 	return newRollingWriterClock(dir, sizeMB, days, time.Now)
 }
@@ -241,9 +277,28 @@ func (w *rollingWriter) ensureFileLocked(newDayCheck bool) error {
 		w.day = day
 	}
 	name := filepath.Join(w.dir, fmt.Sprintf("%s%s-%03d%s", logFilePrefix, w.day, w.seq, logFileExt))
-	f, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+	f, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o600)
 	if err != nil {
 		return Wrap(ClassResource, err, "observe: open log file")
+	}
+	// SEAL, then write - the order is the guarantee, not a detail. This function
+	// is the only place a log file is ever opened, and its callers write nothing
+	// until it returns nil (Write below; newRollingWriterClock at boot), so a seal
+	// that runs here has landed before THIS RUN's first content byte.
+	//
+	// The entry may already exist: a second process on the same UTC day opens
+	// <day>-001 again and O_APPEND continues it. Sealing that one is the repair
+	// path, and it is the reason a failed seal closes the handle instead of
+	// removing the entry - the bytes already in it belong to an earlier run, and
+	// deleting evidence to tidy up a refusal is the wrong direction.
+	//
+	// Not inherit-only: the directory above is sealed too, so this file would be
+	// born narrow without this call on the shipped platform. This call is what
+	// makes it narrow on the platform's own terms (an explicit descriptor) and
+	// what keeps the guarantee from resting on an inheritance rule nobody reads.
+	if err := sealLogFile(name); err != nil {
+		_ = f.Close()
+		return Wrap(ClassResource, err, "observe: seal log file")
 	}
 	w.file = f
 	w.bw = bufio.NewWriterSize(f, bufferedLogBytes)
