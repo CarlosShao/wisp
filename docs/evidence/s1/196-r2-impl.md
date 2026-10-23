@@ -51,7 +51,8 @@
 :149  "&_pragma=journal_mode(WAL)" +
 :150  "&_pragma=synchronous(NORMAL)" +
 :151  "&_pragma=wal_autocheckpoint(" + itoa(pragmaWALAutocheckpoint) + ")"
-:152  if forWriter { d += "&_txlock=immediate" }
+:152  if forWriter {
+:153      d += "&_txlock=immediate"
 ```
 四枚 pragma **没有 `foreign_keys`** ⇒ 走 SQLite 默认＝**关**（P1 实测 `0`）。尺：`git grep -n '_pragma=' -- internal/memory` ⇒ 只有上面 4 行。
 尺：`git grep -n 'foreign_keys' -- '*.go' '*.sh' '*.yml' '*.ps1' '*.toml'` ⇒ **本腿之前 0 命中**；本腿之后只剩我自己新增的 7 行（`schema.go:361/368/401/407/411/416/421`）。独立旁证两枚：`docs/evidence/s1/326-append-updated.md:147`、`326-v1-verdict.md:78`（都复跑出 0 命中 rc=1）。
@@ -76,7 +77,7 @@
 
 ## §5 新用例逐名 ＋ 为什么它**今天**就响
 
-`internal/memory/taskstate_196r2_test.go`（新，224 行）：
+`internal/memory/taskstate_196r2_test.go`（新，213 行；尺＝`wc -l`）：
 
 1. **`TestTaskState196LegacyV3WithToolCallRowsStillOpens`**（`:63`）——**绊线**。走**生产 `Open()`**，夹具＝v3 库 ＋ 1 枚 `tool_call` 行；断言 `schema_version=4`、子行仍在且仍指向**同一**父、`task_log_v4` 残留 0。
    ★**今天响的理由**：它把 `dsn()` **今天**的状态变成判据——`dsn()` 里加一枚 pragma（那件"为了让 `REFERENCES` 名副其实"的下一步），这枚用例立刻红。§6 的 R2/R3 就是我先把它打红的读数，⛔ 空口径。
