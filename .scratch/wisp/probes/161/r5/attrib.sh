@@ -40,9 +40,13 @@
 # allowlist, and not "the working-tree reading does not count". It is TWO RULERS,
 # each of which can actually produce the reading it names:
 #
-#   (A) TRACKED TREE   git ls-files '*.go' | xargs gofumpt -l
+#   (A) TRACKED TREE   git ls-files '*.go' ':(exclude).scratch/**' | xargs gofumpt -l
 #       MUST BE EMPTY. This is the form CI executes, because a CI checkout
-#       contains tracked bytes and nothing else.
+#       contains tracked bytes and nothing else. SINCE TICKET 362-r2 it carries ONE
+#       NAMED EXCLUSION, .scratch/** - that directory is where this repo puts
+#       deliberately-broken samples, and a ruler that counts them can only go green
+#       by laundering evidence. Read the block above ruler_a() before moving it; the
+#       exclusion is a named git pathspec, not a switch that stops measuring.
 #   (B) WORKING TREE   gofumpt -l . tools/d22scan tools/mockllm
 #       EXPECTED NON-EMPTY on a bench tree. Non-empty is fine ONLY if every line
 #       can be attributed to a named ticket's intentional bad sample. A line that
@@ -536,26 +540,64 @@ report() {
 # a hard stop here rather than a footnote (that mistake was made writing the r4
 # version of this file: `git ls-files -Z` is not a switch, the pipeline still exited
 # 0, and the first reading it ever printed was vacuously green).
+#
+# THE ONE NAMED EXCLUSION (ticket 362-r2). Read this paragraph before touching the
+# two git commands below, because it is the only thing standing between this ruler
+# and "the bench samples make it structurally red forever".
+#
+# WHAT IT IS. A_N_EXCLUDE is a git pathspec with exclude magic: it NAMES one path,
+# and git subtracts exactly that path from the roster. It is not a rule, not a
+# "skip .scratch-ish directories" heuristic, and not a widened allowlist. Every
+# tracked .go file that is not under .scratch/ is still handed to gofumpt, is still
+# named in a TRACKED-DIRTY row, and still exits 1.
+#
+# WHY IT HAS TO EXIST. .scratch/** is the directory this repo fills with
+# DELIBERATELY broken samples. At the 362-r2 anchor 20 tracked .go files under
+# .scratch/wisp/probes/** are not gofumpt-clean ON PURPOSE, and two of them exist
+# only as negative controls (probes/241/v1/posctl/badly_formatted.go and
+# probes/259/r1/gofumpt-negctl/probe.go: the names are the intent). Formatting them
+# to make this ruler green is the named forbidden action of ticket 362. Without an
+# exclusion the ruler can only be red forever, which reads exactly like a real
+# regression - the same complaint that made ticket 161 re-read its criterion as two
+# forms in the first place.
+#
+# WHY IT IS NOT BLIND, stated as the two readings that hold it up. (1) The block
+# below runs every time and prints the denominator as three numbers - total tracked
+# .go, handed to gofumpt, subtracted by this one path - so a widened exclusion moves
+# a printed reading instead of quietly shrinking the roster. (2) --self-test's
+# roster control plants `rosterctl/zz_roster_ctl_unformatted.go`, a path OUTSIDE
+# .scratch/, and requires gofumpt to exit 2 AND print an A-ROSTER row naming it; if
+# the exclusion ever ate production-shaped paths, that case fails. On top of both,
+# ticket 362-r2 measured a planted dirty file under internal/ in an out-of-repo
+# export tree: listed by name, rc=1.
+#
+# HOW TO REVERT (ticket 362-r2's reverse judgment): delete the two "$A_N_EXCLUDE"
+# arguments below and this assignment. Measured on the same export tree, that puts
+# the same 20 .scratch names back verbatim and rc back to 1.
+A_N_EXCLUDE=':(exclude).scratch/**'
 ruler_a() {
-    TRACKED_GO=$(git ls-files -z '*.go' | tr -dc '\0' | wc -c | tr -d ' ') || TRACKED_GO=0
-    [ "$TRACKED_GO" -gt 0 ] || { echo "attrib.sh: (A) ruler saw 0 tracked .go files - refusing to report 'empty' from a ruler that was handed nothing" >&2; exit 2; }
-    [ "$QUIET" = 1 ] || echo "== (A) tracked tree: git ls-files -z '*.go' | xargs -0 $GOFUMPT -l   (tracked .go files handed to it: $TRACKED_GO)"
+    TRACKED_GO_ALL=$(git ls-files -z '*.go' | tr -dc '\0' | wc -c | tr -d ' ') || TRACKED_GO_ALL=0
+    TRACKED_GO=$(git ls-files -z '*.go' "$A_N_EXCLUDE" | tr -dc '\0' | wc -c | tr -d ' ') || TRACKED_GO=0
+    [ "$TRACKED_GO" -gt 0 ] || { echo "attrib.sh: (A) ruler saw 0 tracked .go files after its one named exclusion ($A_N_EXCLUDE) - refusing to report 'empty' from a ruler that was handed nothing" >&2; exit 2; }
+    [ "$QUIET" = 1 ] || echo "== (A) tracked tree: git ls-files -z '*.go' '$A_N_EXCLUDE' | xargs -0 $GOFUMPT -l"
+    [ "$QUIET" = 1 ] || echo "   (A) denominator: handed to gofumpt = $TRACKED_GO; total tracked .go = $TRACKED_GO_ALL; subtracted by the one named exclusion $A_N_EXCLUDE = $((TRACKED_GO_ALL - TRACKED_GO))"
     A_RC=0
-    A_OUT=$(git ls-files -z '*.go' | xargs -0 "$GOFUMPT" -l 2>&1) || A_RC=$?
+    A_OUT=$(git ls-files -z '*.go' "$A_N_EXCLUDE" | xargs -0 "$GOFUMPT" -l 2>&1) || A_RC=$?
     if [ "$A_RC" -gt 1 ]; then
         echo "attrib.sh: (A) gofumpt exited $A_RC on the tracked set (>=2 means a file would not parse) - the tracked tree is not readable by this ruler" >&2
         # 275-r1 / A663 (shape 丁): print the per-file roster gofumpt DID emit (A_OUT)
         # to stdout BEFORE exiting, so this step is red WITH names instead of red with
         # zero names (the rc=2 path used to exit here, before the loop below ever ran).
         # Nothing about the verdict moves: exit code stays 2, the >1 guard stays, the
-        # denominator stays every tracked *.go, .scratch/** is not excluded, and no
+        # denominator stays exactly the roster this run was handed (every tracked *.go
+        # except the one named exclusion .scratch/**, printed two lines above), and no
         # sample is touched. gofumpt -l lists every file that needs formatting on stdout
         # and prints the parse-error diagnostic on stderr even while exiting non-zero, so
         # A_OUT already carries one row per flagged file plus that diagnostic; this only
         # makes those already-computed rows visible. Raw as gofumpt printed it (repo-
         # relative path; backslashes on Windows, forward slashes in a CI checkout).
         if [ -n "$A_OUT" ]; then
-            echo "== (A) roster: every row of A_OUT printed raw, and A_OUT was captured with 2>&1, so these rows are gofumpt's stdout list AND its stderr parse-error diagnostics folded into one stream (count them as rows, not as files); the whole capture is here, it is not a prefix cut off at the unparseable file. exit code unchanged, denominator unchanged:"
+            echo "== (A) roster: every row of A_OUT printed raw, and A_OUT was captured with 2>&1, so these rows are gofumpt's stdout list AND its stderr parse-error diagnostics folded into one stream (count them as rows, not as files); the whole capture is here, it is not a prefix cut off at the unparseable file. exit code unchanged, denominator unchanged (the same roster the run above was handed, one named exclusion .scratch/** and nothing else):"
             while IFS= read -r roster_line; do
                 [ -n "$roster_line" ] || continue
                 printf '   A-ROSTER	%s\n' "$roster_line"
@@ -632,9 +674,10 @@ if [ "$MODE" = tracked ]; then
     RC=0
     [ "$TRACKED_DIRTY" -gt 0 ] && RC=1
     if [ "$RC" = 0 ]; then
-        echo "attrib.sh: GREEN (tracked-only) - (A) empty over $TRACKED_GO tracked .go files"
+        echo "attrib.sh: GREEN (tracked-only) - (A) empty over $TRACKED_GO tracked .go files ($TRACKED_GO_ALL tracked in total; the one named exclusion $A_N_EXCLUDE subtracted $((TRACKED_GO_ALL - TRACKED_GO)))"
     else
-        echo "attrib.sh: RED (tracked-only) - tracked-dirty=$TRACKED_DIRTY files_dirty=$A_FILES. The CI gofmt step and this step read the same denominator; this one additionally refuses to answer when handed 0 files."
+        echo "attrib.sh: RED (tracked-only) - tracked-dirty=$TRACKED_DIRTY files_dirty=$A_FILES, over $TRACKED_GO tracked .go files ($TRACKED_GO_ALL tracked in total; the one named exclusion $A_N_EXCLUDE subtracted $((TRACKED_GO_ALL - TRACKED_GO)))."
+        echo "attrib.sh: RED (tracked-only) - DENOMINATOR: this ruler and the CI gofmt step above agree today by two DIFFERENT definitions (a named EXCLUSION here, a named INCLUSION of the five production directories there), and they agree only while no tracked .go falls inside one and outside the other. When they stop agreeing, this is the ruler that names the file; that divergence is the finding, not a rounding difference. This one additionally refuses to answer when handed 0 files."
     fi
     exit "$RC"
 fi
