@@ -146,3 +146,11 @@ env：只 `unset GOTMPDIR`；**未** `unset TMPDIR/TEMP/TMP`（清了 `os.TempDi
   - 行数：`schema.go=411`、`taskstate_196_test.go=452`、本件 `=137`（与改前同，未膨胀）；
   - 格式**甲**改用 **`git archive HEAD`** 再导出一次到仓外：`gofumpt -l internal cmd tools scripts frontend` ⇒ **0 行，rc=0**；
   - 写面复跑：`git status --porcelain -- internal/memory/ docs/evidence/s1/` ⇒ **空**。
+
+## 10. 分母口径补正（防一个会被人当成错的数）
+
+§7 的 `17640` 是**甲尺导出当时**的真值（那棵导出树里本件**还没进索引**），并与**当时** `check-path-length-budget.sh`
+自报的 `denominator: tracked paths=17640` 对上 ⇒ 两数同刻、确实相等。
+**提交之后**分母变成 **17641**，`+1` 就是**本件这一枚**从"未跟踪"变成"已跟踪"。
+⇒ §9 那次 `git archive HEAD` 的导出树是 **17641** 个文件，gofumpt 仍 **0 行 rc=0**。
+⇒ gofumpt 不读 `.md`，故这 +1 对本腿的格式判据**零影响**；写清它是为了下一个人复跑时**不会**把 `17640` 当成错数。
