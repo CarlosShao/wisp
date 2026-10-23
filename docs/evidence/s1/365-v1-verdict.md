@@ -115,5 +115,5 @@ Z365V1-CMD   | task=cee2ca3d-36ca-4245-aaa4-a75316f4a30d | task_log.state="stuck
 
 ## §11 提交与越界
 
-- 本件 `docs/evidence/s1/365-v1-verdict.md`（本腿**唯一**仓内写面）；提交号：见本行后的补记提交（`git log --oneline -- docs/evidence/s1/365-v1-verdict.md`）。
-- 逐笔越界：本腿共 2 笔（本件＋补记提交号一行），**每笔只有这一个文件**、无 `D`/`A` 越界；`internal/**`、`cmd/**`、`scripts/**`、`.github/**`、`.scratch/**`、`docs/reports/**`、`docs/PLAN.md`、`docs/specs/**` **零改动**。
+- 本件 `docs/evidence/s1/365-v1-verdict.md`（本腿**唯一**仓内写面）；首笔提交 **`97bd0cc91`**（119 行、1 文件、0 删除），本行由补记提交追加第二笔。
+- 逐笔越界：本腿共 2 笔（首笔 `97bd0cc91` 本件全文；补记笔＝只改本 §11 这一行），**每笔只有这一个文件**、无 `D`/`A` 越界；`internal/**`、`cmd/**`、`scripts/**`、`.github/**`、`.scratch/**`、`docs/reports/**`、`docs/PLAN.md`、`docs/specs/**` **零改动**；未 push。
