@@ -127,8 +127,7 @@
 
 ## ⑫ 提交 ＋ 逐笔越界
 
-- 本件入库那一笔：**`6576470ed`**（正文，`+140`）。此后对同一文件的每一笔**都只改一行**（⛔ amend）：
-  `git log --oneline -- docs/evidence/s1/367-v1-verdict.md` 逐笔可见，`git show --numstat <hash>` 应为 `1 1`。逐枚 `.go`：**0**。
+- 本件入库那一笔：**`6576470ed`**（正文，`+140`）。其后对本文件的续笔见 `git log --oneline -- docs/evidence/s1/367-v1-verdict.md`，每笔只做一处**具名**更正（⛔ amend、⛔ 碰别处）。逐枚 `.go`：**0**。
 - 逐枚文件（每笔只含这 1 个）：`docs/evidence/s1/367-v1-verdict.md`。逐枚 `.go`：**0**。
 - 越界核对：⛔ 改 `internal/**`／`cmd/**`／`scripts/**`／`.github/**`／`.scratch/wisp/**`／`docs/reports/**`／`docs/PLAN.md`／`docs/specs/**`；⛔ 落 `.go`；⛔ 翻框／改票名／`Status:`／`-done`／台账；⛔ push。探针／突变全在仓外，**工作树 0 突变**。
 
