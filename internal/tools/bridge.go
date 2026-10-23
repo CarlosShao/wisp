@@ -320,6 +320,19 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 		b.log("tools: MODE-SILENCE mode=%s assessed=%s effective=%s tool=%s rules=%v "+
 			"(a silenced question, not an allow: no user click happened)",
 			mode, verdict.Level, sil.Level, req.Name, verdict.RulesHit)
+	case sil.Kept != "" && sil.Level == risk.Deny:
+		// A kept red line is not always a kept QUESTION (ticket 363). route()
+		// below sends a Deny straight to reject ("Deny never reaches a gate"),
+		// so this verdict is refused outright: no card, no click, nobody asked.
+		// "still asks" was false in the opposite direction from the L0 case -
+		// the same sentence lied on every L0 (nothing asked, call executed) and
+		// on every Deny (nothing asked, call refused) - so the line names which
+		// of the two it is. The claim is about a CARD, and the only place that
+		// knows a card exists is route(); a level that reaches PendingWindow or
+		// PendingApproval keeps the "still asks" wording, which is true there.
+		b.log("tools: MODE-REDLINE mode=%s refuses tool=%s rules=%v because=%s "+
+			"(a Deny never reaches a gate: no card is raised)",
+			mode, req.Name, verdict.RulesHit, sil.Kept)
 	case sil.Kept != "":
 		b.log("tools: MODE-REDLINE mode=%s still asks tool=%s rules=%v because=%s",
 			mode, req.Name, verdict.RulesHit, sil.Kept)

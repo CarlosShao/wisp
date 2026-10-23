@@ -152,13 +152,37 @@ type Silenced struct {
 // must do. It never raises a level above the verdict it was given (that would
 // be a second judge) and it never lowers a red line (that is the point).
 //
-// The shape is deliberate: Deny and any unknown level are handled first, so
+// The shape is deliberate: Deny, L0 and an unknown level are handled first, so
 // every later branch can assume it is looking at L1 or L2 only.
 func (m Mode) Screen(d Decision) Silenced {
 	// Fail-closed floor: an impossible level is not something a mode may wave
 	// through, whatever the mode says.
 	if d.Level == Deny {
 		return Silenced{Level: Deny, Kept: "拒绝级 verdict（Deny 级不受任何模式影响）", Mode: m}
+	}
+	// L0 is a level this function RECOGNISES, not an unknown one (ticket 363).
+	// It is the judge's own zero value and its "read-only, no side effects -
+	// execute directly" verdict (assessor.go:45-46), Level.String() renders it,
+	// and both exits below already EMIT it for a silenced L1/L2. So it cannot
+	// fall into the fail-closed "unidentified level" branch, which exists for a
+	// judge that returned something impossible: that branch used to stamp
+	// Kept="无法识别的风险级..." onto every read-only call.
+	//
+	// Nothing is asked at L0 in any mode, so the mode has nothing to remove and
+	// no red line to name:
+	//
+	//	Kept stays ""     the contract (Silenced.Kept above) reserves it for a
+	//	                  question a red line KEPT, and there was none;
+	//	Silenced stays    no question existed to remove, so marking one removed
+	//	  false           would put that claim in every read-only tool_call row
+	//	                  (internal/tools/gate.go:43-47) and route it onto the
+	//	                  MODE-SILENCE line, whose text says "a silenced question".
+	//
+	// The "do not ask" step itself is the caller's own `case risk.L0` (the
+	// route switch in internal/tools/bridge.go); this returns the level
+	// untouched so that step stays the one place that decides it.
+	if d.Level == L0 {
+		return Silenced{Level: L0, Mode: m}
 	}
 	if d.Level != L1 && d.Level != L2 {
 		return Silenced{Level: d.Level, Kept: "无法识别的风险级，fail-closed 保留询问", Mode: m}
