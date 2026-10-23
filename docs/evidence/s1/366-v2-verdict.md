@@ -90,7 +90,7 @@
 | `M4` | 去 clone（算出即弃） | **rc=1**；1／0 | `:635` |
 | `M5` | 坏尺变锁（仅审计步 `!Checked` ⇒ 拒开） | **rc=1**；1／3 | `:524,:570,:593` |
 
-- 还原核时机＝**最后一发变异（M5 窄形）之后**：`restoretree` 现导，全包 **rc=0／120 RUN／66 顶层 PASS／0 FAIL／2 SKIP**（`ok 25.247s`）；原样绿（`posttree`）与提交后复跑同值（`ok 26.086s`）；工作树四枚 hash 与会话开始一致（⑤）。
+- 还原核时机＝**最后一发变异（M5 窄形）之后**：`restoretree` 现导，全包 **rc=0／120 RUN／66 顶层 PASS／0 FAIL／2 SKIP**（`ok 25.247s`）；原样绿（`posttree`）与工作树 G3 同值（`ok 26.086s`，G3 在提交前跑，但只提交文档 ⇒ Go 字节与提交后逐字同）；工作树四枚 hash 与 `posttree`／blob 逐枚相同（⑤）。
 
 ## ⑨ 门禁 rc（逐门分开、⛔ 走管道取 rc）＋格式两尺
 
@@ -107,7 +107,7 @@
 
 ## ⑩ 提交＋逐笔越界
 
-- 本件提交＝**`（见补录一笔：首笔号在 git log -1 的正文里）`**；`add`/`commit` 两处**显式 pathspec**、只点 `docs/evidence/s1/366-v2-verdict.md` 一枚；提交前 `git diff --cached --name-status` 只见 **`A`** 这一行（无 `D`/`A` 意外项）。⛔ push。
+- 本件提交＝**`030352c6e`**（首笔 120 行；**记本行的一笔**只改本件、号见 `git log -1`）；`add`/`commit` 两处**显式 pathspec**、只点 `docs/evidence/s1/366-v2-verdict.md` 一枚；提交前 `git diff --cached --name-status` 只见 **`A`** 这一行（无 `D`/意外 `A`）。⛔ push。
 - **越界＝0**：仓内 `.go` **0 枚**；`internal/**`／`cmd/**`／`scripts/**`／`.github/**`／`.scratch/wisp/**`／`docs/reports/**`／`docs/PLAN.md`／`docs/specs/**` **0 字节改动**；五发变异全 `-overlay`，`git status --porcelain -- internal/memory` **空**；临时件全在 `D:\tmp\wisp\20261023\366v2\**`。
 
 ---
