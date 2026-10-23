@@ -43,6 +43,7 @@ const (
 	// PRAGMA values (D35 rule 3 / SPEC-02 §2, contract-level).
 	pragmaBusyTimeoutMS      = 3000
 	pragmaWALAutocheckpoint  = 1000
+	pragmaForeignKeysOff     = "foreign_keys(OFF)"
 	startupCheckpointQuery   = "PRAGMA wal_checkpoint(TRUNCATE)"
 	integrityCheckQuery      = "PRAGMA integrity_check"
 	walPageSizeQuery         = "PRAGMA page_size"
@@ -143,12 +144,81 @@ func withSchemaTarget(v int) Option { return func(o *storeOptions) { o.target = 
 // (D35 rule 3). The writer DSN additionally takes the immediate tx lock:
 // with a single writer this removes SQLITE_BUSY upgrade deadlocks entirely,
 // so no ad-hoc busy-retry logic exists anywhere (D35 rule 3).
+//
+// This function answers the foreign-key question with silence: its pragma list
+// never mentions PRAGMA foreign_keys, so a business connection keeps whatever
+// the caller sets (and SQLite's default, OFF, otherwise). The migration chain
+// no longer leans on that silence - it declares the switch for itself in
+// migrationDSN, exactly once, which is why turning enforcement on here one day
+// cannot break a migration and cannot be turned off by this package either.
 func dsn(path string, forWriter bool) string {
-	d := "file:" + filepath.ToSlash(path) +
-		"?_pragma=busy_timeout(" + itoa(pragmaBusyTimeoutMS) + ")" +
-		"&_pragma=journal_mode(WAL)" +
-		"&_pragma=synchronous(NORMAL)" +
-		"&_pragma=wal_autocheckpoint(" + itoa(pragmaWALAutocheckpoint) + ")"
+	return buildDSN(path, forWriter, dsnPragmas())
+}
+
+// dsnPragmas is the single authority for the PRAGMA list a connection inherits.
+// It is a function rather than four inline literals so the migration DSN can be
+// derived from the same list instead of being a second hand-kept copy of it.
+func dsnPragmas() []string {
+	return []string{
+		"busy_timeout(" + itoa(pragmaBusyTimeoutMS) + ")",
+		"journal_mode(WAL)",
+		"synchronous(NORMAL)",
+		"wal_autocheckpoint(" + itoa(pragmaWALAutocheckpoint) + ")",
+	}
+}
+
+// migrationDSN is the DSN the migration chain runs on (migrate, not the pools).
+//
+// Why a separate DSN and not a global setting: PRAGMA foreign_keys is a
+// per-connection switch, never a property of the file, so the two pools that
+// outlive this call are untouched by anything said here - they are built from
+// dsn() and keep the caller's value. Ticket 196's v4 step rebuilds task_log
+// (CREATE -> INSERT..SELECT -> DROP -> RENAME) while tool_call.task_id carries
+// REFERENCES task_log(id) (ddlV1); the DROP runs an implicit DELETE FROM first,
+// so enforcement ON aborts the step with SQLite's "FOREIGN KEY constraint failed
+// (787)" - before this DSN existed, Open() could not open such a database at
+// all. SQLite's documented 12-step ALTER procedure disables enforcement for the
+// rebuild (its step 1); this is that step, taken before the transaction begins,
+// because the pragma is a no-op inside one.
+func migrationDSN(path string) string {
+	return buildDSN(path, true, migrationPragmas(dsnPragmas()))
+}
+
+// migrationPragmas forces the migration connection's foreign-key switch OFF,
+// carrying the shared list over otherwise.
+//
+// It contradicts the shared list instead of overriding it, because overriding
+// does not work on this driver: modernc sorts the _pragma values (sqlite.go:439
+// in v1.59.0, busy_timeout first, the rest lexicographically) and applies them
+// in that order, so with both foreign_keys(0) and foreign_keys(1) present the
+// "1" is always applied last and wins - measured, 200 of 200 fresh connections,
+// whichever order the DSN listed them in. A duplicate key would therefore make
+// this function silently inert the day the shared list gains one; dropping the
+// shared entry and appending exactly one keeps the outcome a property of this
+// list rather than of a sort.
+func migrationPragmas(shared []string) []string {
+	out := make([]string, 0, len(shared)+1)
+	for _, p := range shared {
+		if isForeignKeysPragma(p) {
+			continue
+		}
+		out = append(out, p)
+	}
+	return append(out, pragmaForeignKeysOff)
+}
+
+// isForeignKeysPragma recognises a pragma assignment to foreign_keys in any
+// spelling a DSN can carry ("foreign_keys(1)", "foreign_keys = ON", ...).
+func isForeignKeysPragma(p string) bool {
+	n := strings.NewReplacer(" ", "", "\t", "").Replace(strings.ToLower(p))
+	return strings.HasPrefix(n, "foreign_keys(") || strings.HasPrefix(n, "foreign_keys=")
+}
+
+// buildDSN renders path plus the pragma list into the driver's "file:" form:
+//
+//	file:<slash-path>?_pragma=a&_pragma=b[&_txlock=immediate]
+func buildDSN(path string, forWriter bool, pragmas []string) string {
+	d := "file:" + filepath.ToSlash(path) + "?_pragma=" + strings.Join(pragmas, "&_pragma=")
 	if forWriter {
 		d += "&_txlock=immediate"
 	}
@@ -287,11 +357,12 @@ func (s *Store) write(ctx context.Context, fn func(ctx context.Context, tx *sql.
 // ---------------------------------------------------------------------------
 // Migration chain (SPEC-02 §7): hand-written, no framework. Each step runs in
 // one transaction after a pre-backup; unmigratable databases fail without
-// modification.
+// modification. Every connection this chain uses comes from migrationDSN, so
+// the foreign-key switch is declared here rather than inherited from dsn().
 // ---------------------------------------------------------------------------
 
 func (s *Store) migrate() error {
-	boot, err := sql.Open(DriverName, dsn(s.dbPath, true))
+	boot, err := sql.Open(DriverName, migrationDSN(s.dbPath))
 	if err != nil {
 		return fmt.Errorf("memory: open for migration: %w", err)
 	}
@@ -328,7 +399,7 @@ func (s *Store) migrate() error {
 		if err := s.backupDatabase(step.from, step.to); err != nil {
 			return err
 		}
-		boot, err = sql.Open(DriverName, dsn(s.dbPath, true))
+		boot, err = sql.Open(DriverName, migrationDSN(s.dbPath))
 		if err != nil {
 			return fmt.Errorf("memory: reopen for migration: %w", err)
 		}
