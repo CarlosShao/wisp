@@ -46,6 +46,7 @@
 - **en 总句**（代码注释，落 `schema.go:194-201`，逐字照抄）：`An extra referential-integrity guard around the v4 rebuild. SQLite's 12-step ALTER TABLE procedure may run the same check at its step 10, but this repository has not verified that text, and that step is conditional on enforcement having been ON - which it never is here (migrationDSN turns it OFF). Extra insurance that may coincide with step 10; not a step this code claims to follow.`
 - **中文句**（本件口径）：`额外保险（可能与官方 12 步的第 10 步重合；官方原文本机取不回、未核；且官方那一步以"原本开着 FK"为前提，本仓迁移连接一直是 OFF）`。
 - ⚠ **三处改不动的旧措辞（终裁点名，⛔ 硬改；如实记）**：`schema.go:334`（原 `:324`，**在 `ddlV4` 字符串里**，动它就破硬边界 2）· `open.go:185-186`（原 `:184-185`）· `schema.go:416-417`（原 `:406-407`）与 `schema.go:452`（原 `:442`）—— 后三处属 `196-r3`。
+- ★**牙在哪儿（如实）**：以上 8 处**全是注释**，运行时行为 0 变化 ⇒ **没有、也不该假称有**"今天响"的用例；它们的判据是**终裁逐字对照**＋`gofmt/gofumpt`/`go vet`。本腿真正带牙的改动只有两处行为面：坏尺分支（§2，M3）与 `slices.Clone`（§5，M4）。
 
 ## §4 缺 3：还原核 4 枚 SHA-256（**64 位全文**、算法写明、量在最后一发变异之后）
 
@@ -113,4 +114,6 @@
 
 ## §10 提交
 
-- 本件提交＝**`（提交后补录）`**；`add`/`commit` 各自只点四个文件名（3 枚 `.go` ＋本件）；提交前 `git diff --cached --name-status` 只见这四行。
+- 本件提交＝**`43ca90fc8`**（`4 files changed, 371 insertions(+), 21 deletions(-)`：3 枚 `.go` ＋本件）；`add`/`commit` 各自只点四个文件名（字面点名、⛔ glob）；提交前 `git diff --cached --name-status` 只见 **`A` 本件＋`M` 三枚**（无 `D`）。
+- **格式甲复核（入库 blob＝判据）**：`git archive 43ca90fc8` 导出三枚 `.go` 到仓外再 `gofumpt -l` ⇒ **0 行**（rc=0）；三枚 blob 的 SHA-256 逐枚等于 §4 表（`08BDFA15…`／`DF2C99…`／`4A9E75DD…`）⇒ **还原核落在入库字节上**（`taskstate_196r2_test.go` 未改，其 blob 仍＝`A34A2591…`，与 §4 同）。
+- ⛔ push；台账／票面／`196` 原句 0 字节改动。
