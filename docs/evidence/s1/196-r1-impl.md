@@ -125,8 +125,8 @@ hash 口径先问清楚：**`sha256sum` ＝ SHA-256 ＝ 64 位十六进制**（�
 | `go vet ./...` | **0** | |
 | `sh scripts/d22scan.sh` | **0** | 本件写出后复跑；先前那次 rc=1 的唯一 finding 就是本件还没落盘（`[phantom-citation] … 196-r1-impl.md`） |
 | `bash scripts/check-path-length-budget.sh` | **0** | `VERDICT GREEN`，17612 条 tracked，over-budget 61 全在名册 |
-| `gofumpt -l` **甲尺**（`git archive 6e19f4a43` → **仓外** `commit-tree`，判据） | **0** | 输出 **0 行**（空＝过）。★这条是判据。 |
-| `gofumpt -l internal cmd tools scripts frontend` **乙尺**（工作树，只作诊断） | **1** | ★**⛔ 我造成的**：3 枚**写面外**文件在工作树里是 CRLF（`internal/agent/approval/pending_read.go` CR=131、`internal/agent/tools.go` CR=225、`cmd/wisp/models.go` CR=389，各自 CR 数＝各自行数）。`git status` 对这三枚**无输出**。★**同一批文件在甲尺的导出树里全清**（tar 从 LF blob 落地）⇒ 差异是**工作树字节**，⛔ 提交内容。我的 7 枚文件 CR **全 0**，乙尺单点也全清。 |
+| `gofumpt -l` **甲尺**（`git archive <sha>` → **仓外** 导出树，判据） | 自身 **rc=0**、**输出 0 行** | ★**这条是判据**。两枚 sha 都过：`6e19f4a43`（我这一笔）与当班 `e89d1fe98`（含别的腿插进来的提交）——都是 0 行。 |
+| `gofumpt -l internal cmd tools scripts frontend` **乙尺**（工作树，只作诊断） | 自身 **rc=0**、**输出 3 行** | ★**尺的射程**：`gofumpt -l` 列出文件时**自身仍 rc=0**，CI 那步的判据是**输出非空 ⇒ exit 1**（`ci.yml` 里就是 `if [ -n "$OUT" ]`）。3 枚全在**写面外**：`internal/agent/approval/pending_read.go` CR=131/131 行、`internal/agent/tools.go` CR=225/225、`cmd/wisp/models.go` CR=389/389 ⇒ **CR 数＝行数**，整文件 CRLF；`git status` 对这三枚**无输出**。★**同一批文件在甲尺导出树里全清**（tar 从 LF blob 落地）⇒ 差异是**工作树字节**，⛔ 提交内容，也⛔ 我的写面。我的 8 枚文件 CR 全 0，`gofumpt -l internal/memory docs/evidence` 输出 0 行。 |
 | `go test ./cmd/wisp/` | **1（预存）** | `exit status 0xc0000135` ＝ STATUS_DLL_NOT_FOUND，**测试进程一次没起**（0.12–0.19s）。★已用 `git archive HEAD` 导到仓外的**原样 HEAD 树**复跑：**同样 0xc0000135** ⇒ 与本次改动无关。 |
 | `go test ./internal/{memory,statemachine,agent,session,tools}/` | **0** | memory `ok`、statemachine `ok`、agent `ok 7.225s`、session `ok 6.403s`、tools `ok 30.095s` |
 | `go test ./internal/memory/ ./internal/statemachine/` **在甲尺的导出树上**（`commit-tree`） | **0** | `ok 22.339s` / `ok 0.331s` ⇒ **提交里的那棵树**自己也绿，⛔ 靠工作树里的未提交件 |
