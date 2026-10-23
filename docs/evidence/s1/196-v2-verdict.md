@@ -93,6 +93,6 @@ FK 开＋1 枚子行的连接上，**直接**在事务内调 `applyV4(tx)`：
 
 ## §3 提交号 ＋ 逐笔越界
 
-- 本件提交号：`<待填>`（提交后回填；只 `A docs/evidence/s1/196-v2-verdict.md` 一枚，`git diff --cached --name-status` 提交前已核）。
+- 本件提交号：**`047f8fb67`**（本笔＝裁决正文；回填笔只改本行，⛔ amend）。提交前 `git diff --cached --name-status` 只有 `A docs/evidence/s1/196-v2-verdict.md` 一枚。
 - 逐笔越界：`0c08eca14`＝3 枚（件 A／`schema.go` M +73/−0／测试 A 213 行），无 `cmd`／`scripts`／`.github`／`PLAN`／`specs`；`7178f7f12`＝1 枚（只件）；`234ff1997`＝1 枚（只台账，非 r2 写面）。★**零越界**。
 - 本腿写面：本件 ＋ 仓外 `/d/tmp/wisp/20261023/196v2/**`（探针 `treeA..treeE`、`treeBase`、日志）。⛔ 改仓内任何 `.go`／`internal/**`；工作树 `git status --porcelain -- internal/memory docs/evidence/s1` 在落笔前为空。
