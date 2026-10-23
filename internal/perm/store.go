@@ -9,8 +9,12 @@
 //     mutates, and it fail-closes to the strictest档 when the config is missing
 //     or unreadable.
 //   - WRITE (Set): the only function in the system that changes the mode at
-//     runtime. A switch INTO auto_approve costs one L2 strong confirmation
-//     (R20/M4); the other two switches cost nothing but are still audited.
+//     runtime. Its gate is the DIRECTION, not a target value: a switch that
+//     makes the档 wider is refused outright when no confirmation channel was
+//     wired (fail-closed), so no widening is reachable on a machine that cannot
+//     ask - including the non-auto_approve ones. On top of that gate, the
+//     switch INTO auto_approve costs one answered L2 strong confirmation
+//     (R20/M4's asymmetry); the other two cost no ask but are still audited.
 //   - RECORD: every switch writes one audit line through the sink the project
 //     already uses for security decisions (the Logf family that cmd/wisp renders
 //     as "[audit] ..."), carrying from/to, time, origin and actor. No second
@@ -95,8 +99,10 @@ type ConfirmFunc func(ctx context.Context, req Switch) error
 type Options struct {
 	// Manager is required; without a config to read there is no mode.
 	Manager ConfigManager
-	// Confirm is the L2 strong confirmation for the switch INTO auto_approve.
-	// nil = auto_approve is unreachable (fail closed).
+	// Confirm is the L2 strong confirmation the store may ask for a widening.
+	// nil = NO widening is reachable (fail closed), not just auto_approve: the
+	// gate below is directional (see IsWidening), and a composition with no way
+	// to ask must not be able to loosen the档 at all.
 	Confirm ConfirmFunc
 	// Logf is the audit sink (the project's existing "[audit]" family).
 	Logf func(format string, args ...any)
@@ -167,11 +173,19 @@ func (s *Store) PermissionMode() risk.Mode {
 // session and a restart; nothing else does).
 //
 // The confirmation rule is R20/M4 and it is asymmetric on purpose: only the
-// switch INTO auto_approve costs an L2 strong confirmation, because that is the
-// only档 that can remove a question about a call the operator would otherwise
-// have been asked about. The audit log, by contrast, records ALL THREE档
-// switches - a security posture change you cannot reconstruct from the log is
+// switch INTO auto_approve costs an answered L2 strong confirmation, because
+// that is the only档 that can remove a question about a call the operator would
+// otherwise have been asked about. The audit log, by contrast, records ALL THREE
+// 档 switches - a security posture change you cannot reconstruct from the log is
 // not an audited one.
+//
+// The GATE in front of it is directional rather than target-valued, and that is
+// ticket 367's correction: a switch that makes the档 wider is refused when this
+// store was handed no confirmation channel, whatever the target is. Judging
+// "is the target auto_approve?" is how ask_every_step -> ask_high_risk used to
+// walk past this function ungated on every call site outside the panel handler.
+// Widening and only widening is what the gate covers - a narrowing switch is
+// never refused for lack of a channel (R20: getting stricter guards nothing).
 func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) error {
 	if !to.Valid() {
 		s.audit(Switch{
@@ -188,13 +202,24 @@ func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) err
 		return nil
 	}
 
+	// The gate is the DIRECTION (ticket 367). Judging the TARGET instead is how
+	// ask_every_step -> ask_high_risk used to walk past this function: whoever
+	// wrote the caller checked "is it auto_approve?", so every other widening
+	// was ungated on every call site that was not the panel handler.
+	if IsWidening(from, to) && s.confirm == nil {
+		sw.Result = ResultRefused
+		sw.Detail = fmt.Sprintf(
+			"把档位从 %s 放宽到 %s 需要一条确认通道，但本机没有接入（fail-closed 未切）", from, to)
+		s.audit(sw)
+		return fmt.Errorf("perm: %s", sw.Detail)
+	}
+	// R20/M4's asymmetry stands on top of that gate: of the widenings, only
+	// auto_approve costs an answered L2 card. There is no nil test here on
+	// purpose - `from` is always one of the three modes (PermissionMode
+	// fail-closes to ask_every_step, internal/config/permmode.go:36-45), so
+	// auto_approve is necessarily a widening from a different current mode and
+	// the gate above has already refused a store with no channel.
 	if to == risk.ModeAutoApprove {
-		if s.confirm == nil {
-			sw.Result = ResultRefused
-			sw.Detail = "切到 auto_approve 需要一次 L2 强确认，但本机没有接入确认通道（fail-closed 未切）"
-			s.audit(sw)
-			return fmt.Errorf("perm: %s", sw.Detail)
-		}
 		started := s.now()
 		if err := s.confirm(ctx, sw); err != nil {
 			sw.Result, sw.Detail = classifyConfirmFailure(err), "L2 强确认未通过："+err.Error()

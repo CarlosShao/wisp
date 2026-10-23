@@ -18,6 +18,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/CarlosShao/wisp/internal/perm"
 	"github.com/CarlosShao/wisp/internal/risk"
 )
 
@@ -82,11 +83,14 @@ func modeLadder(t *testing.T) []risk.Mode {
 }
 
 // TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree nails the premise
-// of modeIsWidening, which is a raw `to > from` over risk.Mode's constants. The
-// vocabulary is a list, so it is nailed three ways: exact equality (a rename or
-// a reorder goes red), a length floor and a strict-prefix negative assertion
-// (a SHRUNKEN list goes red on its own line, not only inside the equality -
-// A109(2) measured that a 6-to-5 trim leaves per-entry assertions green).
+// of perm.IsWidening, which is a raw `to > from` over risk.Mode's constants and
+// is now the ONE predicate both gates call (ticket 367 moved the definition to
+// internal/perm so the store judges the same direction instead of judging the
+// target's name). The vocabulary is a list, so it is nailed three ways: exact
+// equality (a rename or a reorder goes red), a length floor and a strict-prefix
+// negative assertion (a SHRUNKEN list goes red on its own line, not only inside
+// the equality - A109(2) measured that a 6-to-5 trim leaves per-entry assertions
+// green).
 func TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree(t *testing.T) {
 	names := risk.ModeNames()
 	want := []string{risk.ModeAskEveryStepName, risk.ModeAskHighRiskName, risk.ModeAutoApproveName}
@@ -105,11 +109,11 @@ func TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree(t *testing.T) {
 	}
 	ladder := modeLadder(t)
 	for i := 1; i < len(ladder); i++ {
-		if !modeIsWidening(ladder[i-1], ladder[i]) {
+		if !perm.IsWidening(ladder[i-1], ladder[i]) {
 			t.Fatalf("%s -> %s must read as widening; risk.Mode's constants are ordered strict -> loose on purpose",
 				names[i-1], names[i])
 		}
-		if modeIsWidening(ladder[i], ladder[i-1]) {
+		if perm.IsWidening(ladder[i], ladder[i-1]) {
 			t.Fatalf("%s -> %s must read as narrowing (R20: getting stricter is never blocked)",
 				names[i], names[i-1])
 		}

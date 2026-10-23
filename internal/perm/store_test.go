@@ -215,10 +215,18 @@ func TestTicket90ConfirmRefusalLeavesModeAlone(t *testing.T) {
 // TestTicket90PersistFailureKeepsMemory is the anti-split-state half of M3: if
 // the write to config.toml fails, the runtime must not run a档 the next start
 // will not read back.
+//
+// The confirmation channel is part of the fixture as of ticket 367: Set refuses
+// EVERY widening when no channel is wired (ask_every_step -> ask_high_risk is
+// one), so without it the switch would be refused before it ever reached the
+// write this test is about. What this asserts is unchanged - a failed persist
+// must not be mistaken for an applied switch.
 func TestTicket90PersistFailureKeepsMemory(t *testing.T) {
 	mc := &memConfig{mode: risk.ModeAskEveryStepName, fail: errors.New("disk gone")}
 	rec := &recorder{}
-	s, err := New(Options{Manager: mc, Logf: rec.logf})
+	s, err := New(Options{Manager: mc, Logf: rec.logf, Confirm: func(context.Context, Switch) error {
+		return nil
+	}})
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}

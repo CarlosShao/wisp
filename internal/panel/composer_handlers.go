@@ -2,16 +2,21 @@ package panel
 
 // Ticket 114 AC#2 - the native side of the composer's mode write (R-92-2).
 //
-// WHY A GATE HERE WHEN perm.Store ALREADY HAS ONE. internal/perm's Set refuses
-// the switch INTO auto_approve when it was handed no confirmation leg
-// (internal/perm/store.go's `if s.confirm == nil`). That covers one档 of three
-// and it is the store's own business. What this file owns is the caller-side
-// property R-92-2 actually named: a host that starts calling Set from a panel
-// request must not be able to widen the档 on a machine where nobody wired a
-// confirmation leg at all. The status table measured the difference
-// (docs/evidence/s1/114-ac1-status-table.md ②.1): a handler that only
-// "inherits Set's semantics" lets a panel move ask_every_step -> ask_high_risk
-// with no leg attached anywhere in the process.
+// WHY A GATE HERE AT ALL, NOW THAT perm.Store.Has ONE TOO. Both layers judge the
+// same thing and they judge it with the same function (perm.IsWidening), so this
+// is not a second opinion that can drift - it is the same opinion applied at the
+// two points a widening has to cross. The store's gate is what makes the
+// invariant true for every caller, including the ones that never come through
+// this file; this gate is what refuses a panel request BEFORE a write leg is
+// even asked, so the refusal the page sees is a panel refusal with a panel
+// error code rather than whatever the store happened to say.
+//
+// HISTORY THAT MATTERS: until ticket 367 the two layers judged DIFFERENTLY - the
+// store asked "is the target auto_approve?" while this file asked "is the
+// direction widening?" - so a panel request that widened to ask_high_risk was
+// refused here and would have been applied unchanged by Set had anything else
+// called it. docs/evidence/s1/114-ac1-status-table.md ②.1 measured exactly that
+// hole. The single predicate is the fix for the class, not for that one pair.
 //
 // THE RULE, in owner's R20 direction-asymmetry as settled for this ticket: a
 // request that makes the档 WIDER needs a leg; a request that makes it NARROWER
@@ -44,6 +49,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/CarlosShao/wisp/internal/perm"
 	"github.com/CarlosShao/wisp/internal/risk"
 )
 
@@ -98,14 +104,6 @@ type ModeWriteHandler struct {
 	Actor string
 }
 
-// modeIsWidening reports whether going from -> to removes questions.
-//
-// risk.Mode declares its constants strict -> loose on purpose, and
-// internal/risk/mode.go says "Do not reorder these constants". The ladder test
-// in composer_handlers_test.go re-pins that order against risk.ModeNames() so a
-// reorder cannot silently flip the meaning of this one comparison.
-func modeIsWidening(from, to risk.Mode) bool { return to > from }
-
 // HandleModeRequest answers one parsed panel.mode.request (bridge.go's
 // MethodModeRequest). It returns the refusal it made, never a swallowed one.
 func (h *ModeWriteHandler) HandleModeRequest(ctx context.Context, req ComposerRequest) error {
@@ -130,14 +128,16 @@ func (h *ModeWriteHandler) HandleModeRequest(ctx context.Context, req ComposerRe
 		h.record(req, refused, "(不可读)", to.String())
 		return refused
 	}
-	if modeIsWidening(from, to) && h.Confirm == nil {
+	if perm.IsWidening(from, to) && h.Confirm == nil {
 		refused := fmt.Errorf("%w: 请求 %q 要把档位从 %s 放宽到 %s，而本机没有接入 L2 确认腿（R20/M4：只有变宽要确认）",
 			ErrNoL2Confirm, req.RequestID, from, to)
 		h.record(req, refused, from.String(), to.String())
 		return refused
 	}
 	// The leg is attached, so R20/M4's ask is the write leg's to make - exactly
-	// one card, raised by Set, for the one档 that costs it.
+	// one card, raised by Set, for the one档 that costs it. Set judges the same
+	// direction with the same predicate and would refuse the same request on its
+	// own if nothing had; this layer exists so the refusal carries a panel error.
 	if err := h.Modes.Set(ctx, to, PanelModeOrigin, h.actor()); err != nil {
 		return err
 	}
