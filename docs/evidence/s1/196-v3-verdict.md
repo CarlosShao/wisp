@@ -156,5 +156,5 @@
 - **甲（判据）**：`git archive HEAD` 导出仓外 `treeFmt`，`gofumpt -l internal cmd tools scripts frontend` ⇒ **0 行**；单跑 `open.go`／`open_196r3_test.go`／`schema.go` ⇒ **0 行**。
 - **乙（只诊断，工作树）**：**3 行**，按 `[\\/]` 归属＝`internal\agent\approval\pending_read.go`／`internal\agent\tools.go`／`cmd\wisp\models.go`（**与 r2 判过的同一 3 枚，⛔ 本腿文件**）；`git ls-files --eol` 三件 r3 文件全 `i/lf w/lf`。
 
-**提交号**：本件 `________`（本笔＝裁决正文；回填笔只改本行，⛔ amend）。提交前 `git diff --cached --name-status` 只有 `A docs/evidence/s1/196-v3-verdict.md` 一枚。
+**提交号**：本件 `f3711c6eb`（本笔＝裁决正文；回填笔只改本行，⛔ amend）。提交前 `git diff --cached --name-status` 只有 `A docs/evidence/s1/196-v3-verdict.md` 一枚。
 **写面**：本件 ＋ 仓外 `D:\tmp\wisp\20261023\196v3\**`；⛔ 改 `internal/**`／`cmd/**`／`scripts/**`／`.github/**`／`.scratch/wisp/**`／`docs/reports/**`／`docs/PLAN.md`／`docs/specs/**`；⛔ 落任何 `.go`。
