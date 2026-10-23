@@ -72,3 +72,28 @@
    **运行中途 roll 的新文件**封失败 ⇒ 本腿关句柄、`Write` 返回错 ⇒ **记录被拒**，但 `slog` 吞 Handler 错误 ⇒
    产品侧**没有一行"seal 失败"**，可观测形状是"记录消失"而非"宽写"。⇒ **"不许没锁但能写"这条是关的**，
    "中途那次失败有一行叫得出名字"这条**没有**；要那一条得在 `observe` 里直写 stderr，本腿未做、也⛔ 假称做了。
+
+---
+
+## 更正（票 132 收尾腿 `132-r2`，2026-10-23）：§9 第 1 条"在创建每一层之前就封"同样是假话
+
+**这是文字更正，⛔ 产物改动**：`internal/winsec/**` 与 `internal/observe/**` 一字未动；本件此后**追加**，⛔ amend。
+
+**原句逐字**（§9 第 1 条，`132-r1-impl-part2.md:53-54`）：
+
+> 1. **`SealDir`（导出函数）生产调用者仍是 0**。落地用的是 `winsec.PrivateDirAll`——它在**创建每一层之前**就封
+>    （`MkdirAll`+`SealDir` 做不到，正是 AC#2「创建时就」的语义），且 `privateDirAll` 内部调的就是同一枚 `sealDir` 原语。
+
+**错在哪**：与 `132-r1-impl.md` §2 那处是**同一个错法**。`privateDirAll` 是**先建后封**：`os.Mkdir`
+（`internal/winsec/winsec.go:283`）之后紧接 `sealError(missing[i], sealDir(missing[i]))`（`:292`），循环 `:282`
+从最外层往里走 ⇒ **创建与封同一次调用、父先于子**，⛔ "先于创建"。
+
+**导出文档逐字**（`internal/winsec/winsec.go:223-229`）：sealing **every level it creates** before descending into it……
+The order this guarantees is "sealed parent, then any child"。
+
+**这条里其余各句仍然成立、⛔ 一并抹掉**：`SealDir` 导出函数的生产调用者**仍是 0**；`privateDirAll` 内部调的**仍是同一枚
+`sealDir` 原语**；"请裁决者按能力而非函数名读"这个请求也仍然成立——要改的只是**能力的语义**：按"创建即封、父先于子"读。
+
+**§9 第 2 条所请的那一步，已由本腿做完**（留痕，免得下一位以为注释还旧）：`cmd/wisp/logsink.go:44-50` 的标签已由
+`INTERIM (ticket 117 AC#3)` 改成 `SEALING, formerly INTERIM (ticket 117 AC#3)`，正文改成"封在下一层（`internal/observe`）、
+本件只管落点与 stderr 镜像"；行数 7→7，故本件与别处引的 `logsink.go:71/:82/:149/:153` 等行号**一个都没漂**。

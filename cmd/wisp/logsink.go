@@ -41,13 +41,13 @@ package main
 //     sealed inside it). Never a world-shared temp default: a security outlet
 //     that anyone on the machine can read is a leak path, not a listener.
 //
-// INTERIM (ticket 117 AC#3): whether a log file counts as private data is the
-// one question of ticket 95's that owner has not answered, so nothing here
-// seals or un-seals the log file - it neither adds nor removes that decision.
-// What this file does guarantee is *placement*: the sink is created only under
-// the resolved data dir of the running env, so the question owner has to answer
-// is about one directory, not about a temp file. See logSinkDir and its
-// invariant test.
+// SEALING, formerly INTERIM (ticket 117 AC#3): the question it deferred is
+// answered - owner ruled under Q-31 that a log file counts as private data
+// and is to be locked - and ticket 132 landed that lock one layer down, in
+// internal/observe: InitLog creates the directory through winsec.PrivateDirAll
+// and sealLogFile seals every rolled file. So nothing here seals or un-seals
+// the log file: what this file decides is *placement*, under the resolved data
+// dir, plus the mirrored stderr copy. See logSinkDir and its invariant test.
 //
 // PLATFORM, written because ticket 117 over-claimed this file once (R-117-C,
 // corrected by ticket 127 AC#2): being untagged only means this file

@@ -150,3 +150,39 @@ M0 的红行逐字（最能说明"读的是盘上对象"）：
 
 
 > **续件**：§6–§9（门禁 rc／红名册／提交／诚实边界）在 `132-r1-impl-part2.md`——交付帽 160 行，整件 189 行故拆。
+
+---
+
+## 更正（票 132 收尾腿 `132-r2`，2026-10-23）：§2 那句"封条在层出现之前就位"是假话
+
+**这是文字更正，⛔ 产物改动**：`internal/winsec/**` 与 `internal/observe/**` 一字未动；本件此后**追加**，⛔ amend 已提交的件
+（本仓规矩：已推送的历史不改写，要更正就追加；未推送的同此办理）。
+
+**原句逐字**（§2 表里 `:99` 那行的"为什么"格）：
+
+> | `:99` | `os.MkdirAll(cfg.Dir, 0o755)` | `winsec.PrivateDirAll(cfg.Dir, 0o700)` | 封条**在层出现之前**就位（父先于子），且既有树走修复分支 |
+
+**错在哪**：没有层，就没有对象可封——"层出现之前就封"断言的是**先封后建**。`privateDirAll` 是**先建后封**，逐层如此。
+现跑读数（本腿在 `HEAD` 上现读，⛔ 沿用任何转述）：
+
+| 位置（现读） | 逐字 |
+|---|---|
+| `internal/winsec/winsec.go:283` | `if err := os.Mkdir(missing[i], perm); err != nil {` |
+| `internal/winsec/winsec.go:292` | `if err := sealError(missing[i], sealDir(missing[i])); err != nil {` |
+| `internal/winsec/winsec.go:282` | `for i := len(missing) - 1; i >= 0; i-- {` ⇒ 从最外层往里走 |
+
+⇒ 站得住的那句是：**创建与封在同一个循环体、同一次调用里完成，父先于子**。
+
+**导出文档里的强保证，逐字**（`internal/winsec/winsec.go:223-229`）：
+
+> PrivateDirAll creates path and any missing parents, sealing **every level it creates** before descending into it.
+> Sealing afterwards is not enough: a child inherits the ACL it had at creation time, so a directory created wide and
+> tightened later leaves everything written during that window wide. The order this guarantees is "sealed parent, then
+> any child", which is what makes one seal cover files nobody seals individually - SQLite's -wal/-shm and a
+> pre-rename retry temp.
+
+**替换读法**：把"封条在层出现之前就位"读成 **"创建与封同一次调用、父先于子"**。这不是措辞洁癖，两个说法判的是两件事：
+前一句在断言一件做不到的事（对一个还不存在的对象设 ACL），后一句才是覆盖 `-wal`／`-shm` 的那条真保证——封落在
+**任何子层／子文件被写之前**，⛔ "落在层存在之前"。
+
+**同一错法的第二处**：`132-r1-impl-part2.md` §9 第 1 条写的"它在**创建每一层之前**就封"⇒ 该件同时追加了一笔同口径更正。
