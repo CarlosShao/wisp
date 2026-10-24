@@ -24,7 +24,7 @@
 | `internal/memory/dao_tasklog.go:140-155`（件三） | 注释改成事实 | 原逐字 `// PurgeTaskLogs removes every task row (privacy: one-click clear). Forensic / // tool_call rows are governed by their own domain and retention window.` ⇒ 新注释写明：清空**含** `tool_call`；旧说法**没有契约出处**（现跑：`git grep -n PrivacyTaskLog -- docs/specs docs/PLAN.md` **0 命中**，rc=1；命中只在 `docs/evidence/**` 5 文件＋台账 9 行，都是本票讨论） |
 | `internal/memory/migration_fkcheck_366_test.go:107-183` | 夹具改 raw 播种 | `purge-tasklogs`／`delete-tasklog` 改用 `t366RawParentDelete`（只删父，复刻 pre-373）；`retention` 直接手写"父已没、三列全 NULL 的 legacy 子"。**仍测原来那件事**：`3/2/1/1` 的 **legacy 孤儿库**照样被 3→4 迁移**记录**且不删行；变的只是"谁来写这份 legacy 状态"（同 `368-r1` 的 `raw 播种` 办法） |
 
-- 新增用例：`internal/memory/cascade_373_test.go`（341 行，5 枚顶层／2 子例）。**⛔ 新增 `cmd/wisp` 测试文件**（写面明写"`cmd/wisp/**` 的其他文件"禁改）⇒ 件一的用例走**仓外 `-overlay`**（同 `373-a1` 普查的办法），见 §5。
+- 新增用例：`internal/memory/cascade_373_test.go`（367 行，5 枚顶层／2 子例）。**⛔ 新增 `cmd/wisp` 测试文件**（写面明写"`cmd/wisp/**` 的其他文件"禁改）⇒ 件一的用例走**仓外 `-overlay`**（同 `373-a1` 普查的办法），见 §5。
 
 ## §3 三处各一发（改前 `fkc` → 改后 `0`）
 
@@ -125,4 +125,4 @@
 ## §13 提交
 
 - 本件 ＋ 4 个 `.go`（`cmd/wisp/run.go`、`internal/memory/dao_tasklog.go`、`internal/memory/retention.go`、`internal/memory/migration_fkcheck_366_test.go`）＋ 1 个新测试（`internal/memory/cascade_373_test.go`）**同一笔**；`git add`／`commit` 均**逐个文件名字面点名**（⛔ glob／`-A`／`.`）；主题逐字以 `票 373 落地腿 373-r1` 开头；**⛔ push**。
-- `git diff --numstat`：`cmd/wisp/run.go 98/4`、`internal/memory/dao_tasklog.go 32/3`、`internal/memory/retention.go 40/3`、`internal/memory/migration_fkcheck_366_test.go 42/36`；新文件 `cascade_373_test.go` 341 行。
+- `git diff --numstat`：`cmd/wisp/run.go 98/4`、`internal/memory/dao_tasklog.go 32/3`、`internal/memory/retention.go 40/3`、`internal/memory/migration_fkcheck_366_test.go 42/36`；新文件 `cascade_373_test.go` 367 行。
