@@ -77,5 +77,5 @@
 
 ## ⑧ 提交与 `.go` 计数
 
-- 本件提交读回：`git log -1 --format=%h -- docs/evidence/s1/375-a1-census.md`（⛔ amend，故正文不写死哈希）；读数基线 `8ced487bb`。
-- **本笔 `.go` 改动＝0 枚**：`git show --name-only --format= <本件提交>` 应只有本文件；5 发探针全在仓外、经 `-overlay` 注入。
+- ★**本件两枚提交（⭐第一枚主题写错，已按"⛔ amend"改走追加）**：正文 `cd774a511`（**主题缺了"票 375 普查腿 375-a1"前缀**，内容无缺陷）；本枚主题修正 `git log -1 --format='%h %s' -- docs/evidence/s1/375-a1-census.md` 读回，主题逐字以 `票 375 普查腿 375-a1` 开头。⛔ amend，故正文不写死本枚哈希；读数基线 `8ced487bb`。
+- **本笔 `.go` 改动＝0 枚**：`git show --name-only --format= <本件提交>` 只有本文件（已核 `cd774a511`：1 个 `A`、`.go` 0 枚）；5 发探针全在仓外、经 `-overlay` 注入。
