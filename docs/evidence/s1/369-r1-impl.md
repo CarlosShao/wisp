@@ -114,7 +114,8 @@ route 枚逐发 `shot 0/1/2 = "path traverses a reparse point"`（三次重复�
 - `go build ./...` ⇒ **rc=0**；`go vet ./internal/winsec/` ⇒ **rc=0**；`go vet -tags wisp342probe ./internal/winsec/` ⇒ **rc=0**。
 - `sh scripts/d22scan.sh` ⇒ **rc=0**，逐字 `d22scan: clean - no D22 ban violations`（`ban #8 internal/ examined 643`）。
 - `sh scripts/check-path-length-budget.sh` ⇒ **rc=0**，`VERDICT GREEN … roster equals the tree`（`61 paths`，两单位一致）。
-- **格式甲乙两尺**：甲（入库 blob）＝`git show :<path> | gofumpt -d` 逐枚空、`rc=0`；乙（工作树）＝`gofumpt -l` 只列本腿 4 枚 ⇒ **空**（`gofumpt -l internal/winsec/` 输出 **0 行**；⛔ 用 `-l .`，它扫 `.scratch` 的故意坏件）。
+- **格式甲乙两尺**：甲（入库 blob）＝`git show HEAD:<path> | gofumpt -d` 逐枚 `diff_lines=0`；乙（工作树）＝`gofumpt -l internal/winsec/` 输出 **0 行**（⛔ 用 `-l .`，它扫 `.scratch` 的故意坏件）。两尺都空。
+- **linux 腿的编译期**（CI `test-core` 跑 `./internal/winsec/...`）：`GOOS=linux go test -run TestZZNoSuchTest ./internal/winsec/` ⇒ **编译通过**、只在执行阶段失败（逐字 `fork/exec … winsec.test: %1 is not a valid Win32 application`，即在 Windows 上跑 ELF）⇒ 新加的无 tag 文件（接线门）不破 linux 构建。
 - `git diff --cached --name-status`（提交前核索引）⇒ 只有本腿 4 条 `A/M`（⛔ 出现本笔不该有的 `D`/`A`）。
 
 ## 12. 未定义即停／具名上报
@@ -123,3 +124,11 @@ route 枚逐发 `shot 0/1/2 = "path traverses a reparse point"`（三次重复�
 2. **"移出后 CI 门能绿"不成立**，红的换了人（§8）⇒ 这是本腿**量出来的**结论，⛔ 假设；处置权在编排者（票 342 落地／或另裁）。
 3. **"两枚红其实是仪器错"部分成立**：两枚的**红因**（"什么都没量到"）确是仪器错——仪器用一个**时钟量**当判据；**守卫腿与 re-check 本身没坏**（坏腿变异下它们照样被抓）。故本票**改性质＝改判据**，⛔ 改性质成"产码洞"。
 4. **接线门读盘、不吃 `-overlay`**（§6 诚实边界）⇒ 它抓"有人删/挪调用"，抓不到"overlay 里的产码"。
+
+## 13. 提交与纪律
+
+- 提交：`7d9e5b481`（首笔＝本件正文＋四枚 `.go`；**本笔只补录该号与 linux 编译读数**，⛔ 动别的字）。
+- `git show --name-only --format= 7d9e5b481` ⇒ **5 枚**：本件＋`openleaf_guard_322_windows_test.go`／`ancestorunlink_348_windows_test.go`／`leafrace_342r2_windows_test.go`／`routeguard_369_test.go`；`5 files changed, 597 insertions(+), 109 deletions(-)`。
+- `add`／`commit` 两处 pathspec **逐枚字面点名**；⛔ `add -A`／`.`；⛔ amend／reset／rebase／stash／`checkout .`／`clean`；⛔ push。提交正文用 `-F <真临时文件>`（⛔ 反引号、⛔ `$()`）。
+- ★**别人的脏**：开工时写面内有一枚在飞腿 `376-a1` 的未提交件 `docs/evidence/s1/376-a1-census.md`（mtime 12:42）⇒ **一枚未碰、未 add**；收尾时写面 `git status --porcelain -- internal/winsec scripts docs/evidence/s1` **为空**。
+- ⛔ 翻框、⛔ 改票名／`Status:`／`-done`、⛔ 改台账、⛔ 动票 346／342 原句、⛔ 动 `internal/winsec/winsec.go`（本笔 0 字节产码改动：`git show --numstat` 里产码枚数＝**0**，四枚全是 `_test.go`）。
