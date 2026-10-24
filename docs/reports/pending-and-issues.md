@@ -25948,3 +25948,64 @@ fmt.Fprintf(u.out, "  窗口 %.1fs\n", shownWindow.Seconds())
 
 **⑧ ★状态**＝结案 **44 票**（`-done` **187** 枚）、**真待推进 177**、**完成度 187/364 ＝ 51.4%**、
 在飞 **1**（`375-r1`）、未推 **230**（攒着）、⛔ 清理、★**摆机主 0 件**。
+
+## A1238（2026-10-24 15:5x +08，编排者）★★★收 `375-r1`：**三条验收读数全过**（★`READ-F`／`READ-S` 从「写入成功」变「拒」、★`READ-W` 仍拒）｜★★★**`nil ≠ false` 的兼容性设计**很硬｜★派 `375-v1`（★**特别要它核那 2 处句子改动**）
+
+**① ★★收 `375-r1`（`b63d56413`、**14 文件、`+1090/−16`**；件 **110 行**）**
+
+**② ★★形（〔乙〕动作层、四个落点）**
+- ★★**新件 `internal/agent/approval/reach.go`**（**162 行**）：★`AnswerSource` **活谓词** ／ ★`Gate.answerable()` ／ ★`UnsilencedMode` **档位读包装**
+- ★★**`gate.go` 的 L1 路由守卫**（★**R7 升级之后、开窗之前拒**）
+- ★**`cmd/wisp` 装配根**（`runSpec.answer`、**一个谓词喂两半**）
+- ★★★**⛔ 未碰 `internal/perm`／`internal/risk`／`internal/tools`／`run.go` 的 `consoleApprovalUI.Prompt`**
+  ★**硬证明**：★`git diff -- cmd/wisp/run.go | grep -c '^[+-].*Prompt'` ＝ **0** ⇒ ★**与票 376 不重叠**（★**这正是我派单里那条新边界**）
+
+**③ ★★★`nil ≠ false` 的兼容性设计（本腿最硬的一处判断）**
+- ★**未声明 ＝ 保持今天行为**（★**否则会把全仓 `fake` 闸门与 12 个既有测试一起判死**）
+- ★**声明 `false` ＝ 拒**
+⇒ ★★**这是"新机制必须能**渐进接入**"的正确做法** ⇒ **已要 `375-v1` 判它对不对**。
+
+**④ ★★★三条验收读数（全过）**
+| 发 | 改前 | 改后 |
+|---|---|---|
+| ★★**`READ-F`** | `cards=0 executed=true 26ms`（`MODE-SILENCE effective=L0`）| ★★**`cards=0 executed=false 26ms`**、`MODE-UNANSWERABLE configured=auto_approve effective=ask_every_step` ＋ `L1-UNANSWERABLE … decision=reject`、★**文件不在盘上** |
+| ★★**`READ-S`** | `cards=1 executed=true 2.027s`（`timeout->execute`）| ★★**`cards=0 executed=false 21ms`**（还原核 `27ms`）|
+| ★**`READ-W`** | `cards=1 executed=false 31.016s timeout->reject` | ★**同形 `31.051s`**（还原核 `31.027s`）|
+- ★★**它登记一处非零漂移**：★**`MODE-REDLINE still asks` 不再出现**（★**有效档已是最严档、红线豁免不再是理由**；★`configured=` 由 `MODE-UNANSWERABLE` 行携带）⇒ **已要 `375-v1` 判可接受不可接受**。
+
+**⑤ ★★四个装配逐条（它报的）**
+- **A** `wisp run`：★**两档都从「写入成功」变拒**
+- ★★**B 常驻任务 runtime**：★**无球时旧路是 `ballCardUI.Prompt` 的 `errResidentNoBall`（该面恰好诚实）、但 `auto_approve` 下**根本不到闸门**** ⇒ ★**同形的洞** ⇒ 改后**闸门自己拒**
+- **C** `panel-inbound`：★**无闸门/无 bridge**、**票 372 的 `nil-leg` 降级仍是唯一机制、零改动**
+- ★★**D**：★**腿在 `:224`、球在 `:309`（早 85 行）** ⇒ ★**用活谓词 `ra.ui.hasBall` 每次调用现读、覆盖**
+  ⇒ ★★**这正是普查说"〔甲〕判不了"的那一格** ⇒ **活谓词把它治了**。
+
+**⑥ ★★正控（有答复源、`io.Pipe`）**：★L1 `2.033→2.041s` **仍 `timeout->execute`**；★L2 未答 `31.023→31.024s` **仍拒**；★L2 答 yes `268→180ms` **仍 `ANSWER-ALLOW`** ⇒ ★**正常路径一字未变**
+
+**⑦ ★★反向判据（三发、归因精确）**
+- ★**摘模式读跳** ⇒ `READ-F` 回**写入成功** `20ms`
+- ★★**摘闸门跳** ⇒ 回**「2s 后写入成功」`2.025s`** ⇒ ★**这是"这一跳真的在治"的硬证据**
+- ★**两跳都摘** ⇒ `29ms`
+- ★**还原核在最后一发变异之后**量（`48ms`／`27ms` ＋ `sha256` 对账）
+
+**⑧ ★★用例（新增 10 枚）＋ 一个诚实的区分**
+- ★**其中三枚不引用新 API、已用 overlay 在 `HEAD` 跑出**运行红****（★`Unattended` 两子案 **FAIL**、`ResidentGate` **FAIL**、**正控 PASS**）
+- ★★**引用新缝的 2 枚**诚实标为「**编译红**」**
+⇒ ★★**"运行红"与"编译红"分开标** ⇒ ★**这是"红有几种"的正确区分**（★`A1217③` 那族的补强）。
+
+**⑨ ★★四数（改前/改后分列）**
+- ★`cmd/wisp` 定向 **69 名**：★**`68/1`**（★`TestAC246DevLegIgnoresTheTestTaskInjection` ＝ 桌面态红、**`HEAD` 同样红**）→ ★**`68/1`**
+- ★**超集 83 名 → `83/0`**
+- ★`internal/agent/approval`：★**`97` 案 → `108` 案/0**
+- ★`internal/tools`（**零字节改动**）★**`337` 案/0**
+- ★**门禁**：★`build rc=0`／`vet` 三包 `rc=0`／`d22scan rc=0 clean`／★**格式甲乙两尺 13 枚皆空**
+- ★**已知非本笔红**：★`internal/risk` 的 `TestC26RewriteAccountIsConsumedAtEverySecurityLeg`、★**`HEAD` 复跑同样红** ⇒ **它核了 `HEAD`**
+
+**⑩ ★★★它两条要我知道的（第 2 条是 `375-v1` 必判的）**
+1. ★★**`perm.Store.PermissionMode()`／面板快照仍是**配置值****（★**票 372 的降级在 `internal/perm`、本笔写面不含**）⇒ ★**bridge 读 `ask_every_step`、展示读 `auto_approve`**
+   ⇒ ★**这正是 `374-a1` ⑤⑥ 的记账面/展示面残留** ⇒ **归票 376（已结）／票 377**
+2. ★★★**测试适配 9 处全是"给出答复源"**；★**另 2 处改的是「为何被拒」的句子而非结果**
+   ★**它明说**："★**这两处请在 `375-v1` 里复核是否可接受**" ⇒ **已写进 `375-v1` 的必判清单第 7 项**（★**并要它判"把哨兵读数移到 L2 面"是否丢掉了 L1 的覆盖**）。
+
+**⑪ ★状态**＝结案 **44 票**（`-done` **187** 枚）、**真待推进 177**、**完成度 187/364 ＝ 51.4%**、
+在飞 **1**（`375-v1`）、未推 **233**（攒着）、⛔ 清理、★**摆机主 0 件**。
