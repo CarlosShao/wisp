@@ -13,11 +13,13 @@ import (
 // Enum-shaped columns (risk_level/decision/outcome/error_class) are validated
 // at this boundary; the DDL stays CHECK-free by contract.
 
-// InsertToolCall records a tool invocation (pending decision/outcome).
+// InsertToolCall records a tool invocation (pending decision/outcome) and fills
+// in the aging timestamps the row itself says have already happened.
 func (s *Store) InsertToolCall(ctx context.Context, tc ToolCall) (int64, error) {
 	if err := validateToolCall(tc); err != nil {
 		return 0, err
 	}
+	stampToolCallInsert(&tc, observe.NowWallUTC().Unix())
 	var id int64
 	err := s.write(ctx, func(ctx context.Context, tx *sql.Tx) error {
 		res, err := tx.ExecContext(ctx,
@@ -40,6 +42,65 @@ func (s *Store) InsertToolCall(ctx context.Context, tc ToolCall) (int64, error) 
 	}
 	return id, nil
 }
+
+// stampToolCallInsert fills the aging timestamps a row proves have already
+// happened, so that nothing this DAO writes can reach the retention pass with
+// all three columns NULL. That matters because retention ages tool_call by
+//
+//	COALESCE(ended_at, started_at, decided_at)
+//
+// and a row whose expression is NULL matches no pass: such a child outlives its
+// task_log parent for ever and every later pass skips it again (ticket 368;
+// census 368-a1 section 4 measured two passes leaving the same orphan, and
+// section 7 measured the same shape with the production writer). The fallback
+// belongs here rather than in a reader, in the retention expression, or in one
+// writer: InsertToolCall is the only way a tool_call row is created, so one
+// fallback covers every writer that exists or will exist. Today those are
+// agent.taskJournal.startCall (the loop's pre-gate row) and tools.Bridge.book
+// (the authoritative post-hoc row, which drops the returned id and therefore
+// can never be updated afterwards).
+//
+// Which column gets which instant is the row's own vocabulary, not one blanket
+// value. decision and outcome are exactly the columns whose empty string means
+// "pending" (models.go), so:
+//
+//   - decision != ""  the call was already decided when it was booked, so the
+//     booking instant is the decision instant: decided_at = now.
+//   - outcome != ""   the call had already finished, so ended_at = now.
+//   - both empty      the row is inserted before the call runs, so the insert
+//     instant IS its start: started_at = now. The one exception is a row whose
+//     caller already supplied an ended_at (a call recorded after the fact
+//     without an outcome): the insert instant would sit after that end, so the
+//     start is left unknown instead of contradicting the finish.
+//
+// So a booked row never borrows a start it did not observe (Bridge sees the
+// verdict and the outcome, possibly minutes after the call began), while a
+// pending row still carries the one instant it genuinely owns - which is also
+// the instant the privacy listing looks for first (privacy.go reads started_at,
+// then decided_at, then unix 0). Caller-supplied values always win: this is a
+// NULL fallback, never a rewrite, so an explicit timestamp from a replay or a
+// backfill survives byte for byte.
+func stampToolCallInsert(tc *ToolCall, now int64) {
+	if tc.Decision == "" && tc.Outcome == "" {
+		// A row inserted before the call runs owns its start. If the caller
+		// already supplied an ended_at the call is being booked after the fact
+		// instead, and the insert instant would land after that end - so the
+		// start stays unknown rather than later than the finish.
+		if tc.StartedAt == nil && tc.EndedAt == nil {
+			tc.StartedAt = unixPtr(now)
+		}
+		return
+	}
+	if tc.Decision != "" && tc.DecidedAt == nil {
+		tc.DecidedAt = unixPtr(now)
+	}
+	if tc.Outcome != "" && tc.EndedAt == nil {
+		tc.EndedAt = unixPtr(now)
+	}
+}
+
+// unixPtr boxes one unix-second reading for a nullable timestamp column.
+func unixPtr(v int64) *int64 { return &v }
 
 // DecideToolCall records the approval decision (and optional grant linkage).
 func (s *Store) DecideToolCall(ctx context.Context, id int64, decision string, grantID *int64) error {

@@ -136,17 +136,29 @@ func t366OrphanFixture(t *testing.T, path string) string {
 		if ierr != nil {
 			t.Fatalf("manual insert: %v", ierr)
 		}
-	case "retention": // a NULL-timestamp child outlives its parent (journal.startCall)
+	case "retention": // a NULL-timestamp child outlives its parent (pre-368 writer)
 		now := time.Now()
 		old := now.Add(-31 * 24 * time.Hour).Unix()
 		if err := s.StartTaskLog(ctx, TaskLog{ID: "task-old", StartedAt: old, State: "done", QueryText: "q-old"}); err != nil {
 			t.Fatalf("retention: seed task-old: %v", err)
 		}
-		if _, err := s.InsertToolCall(ctx, ToolCall{
-			TaskID: "task-old", Seq: 1, Tool: "read_file",
-			ArgsJSON: `{}`, RiskLevel: RiskL0, CorrelationID: "c-old-null",
-		}); err != nil {
-			t.Fatalf("retention: seed the NULL-timestamp child: %v", err)
+		// Since ticket 368 the DAO stamps started_at on every pending row, so
+		// the three-NULL shape can no longer leave this package's writers. It is
+		// still what a database upgraded from an earlier build holds, and the
+		// migration must still record it - so the child is written by hand, as
+		// the pre-368 statement wrote it, column for column. Same fixture, same
+		// expected counts; only the writer that produces the legacy row moved.
+		legacy, err := sql.Open(DriverName, dsn(filepath.Join(dir, dbFileName), false))
+		if err != nil {
+			t.Fatalf("retention: open for the legacy child: %v", err)
+		}
+		_, lerr := legacy.ExecContext(ctx,
+			`INSERT INTO tool_call(task_id, seq, tool, args_json, risk_level, decision, decided_at,
+			   started_at, ended_at, outcome, error_class, correlation_id, grant_id)
+			 VALUES('task-old', 1, 'read_file', '{}', 'L0', NULL, NULL, NULL, NULL, NULL, NULL, 'c-old-null', NULL)`)
+		legacy.Close()
+		if lerr != nil {
+			t.Fatalf("retention: seed the legacy NULL-timestamp child: %v", lerr)
 		}
 		oldTS := old
 		if _, err := s.InsertToolCall(ctx, ToolCall{
