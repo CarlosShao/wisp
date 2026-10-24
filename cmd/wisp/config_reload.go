@@ -275,8 +275,11 @@ func (rt *agentRuntime) confirmLockedLoosening(section string, keys []string) bo
 	}
 	revoke := rt.gate.AdmitTextTask(configReloadTaskID)
 	defer revoke()
-	// The mode this run is screening under, read through Manager.Config() while
-	// the card below is still unanswered. It is only safe because ticket 223
+	// The mode this run is screening under, read while the card below is still
+	// unanswered. Since ticket 377 it comes from perm.Store (the EFFECTIVE档,
+	// whose configured half still reaches Manager.Config()), so the bookkeeping
+	// here names the档 this process actually screens with rather than the file's
+	// value ticket 372 may have collapsed. It is only safe because ticket 223
 	// moved the ask off the Manager's mutex; on the old shape this line
 	// deadlocked the whole config layer.
 	mode := rt.permissionMode()

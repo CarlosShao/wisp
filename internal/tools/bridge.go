@@ -269,16 +269,32 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 	if req.CorrelationID == "" {
 		req.CorrelationID = req.TaskID
 	}
+	// Ticket 377: the permission mode is read HERE, once per call, before any
+	// branch can refuse. It used to be read only after C3 and the argument
+	// decode, which meant a call refused for a capability or a bad argument
+	// carried no mode at all - and the audit line now prints one on every call.
+	//
+	// Two surfaces consume this one value: the screening below (mode.Screen)
+	// and the `tools: call` line book() writes. One read is the point: a
+	// booking that asked the ModeSource a second time could report a switch
+	// made while the tool was RUNNING against a call that had already been
+	// screened, and "why was I not asked?" must not depend on that race.
+	//
+	// It is the EFFECTIVE档 (perm.Store.PermissionMode, ticket 372's read-side
+	// collapse), never config.toml's value: a record that says auto_approve
+	// while the process asked about everything is the defect this ticket owns.
+	mode := b.permissionMode()
 	entry, ok := b.reg.Lookup(req.Name)
 	if !ok {
 		// Unknown tool: class tool (self-correctable, D37), never internal.
-		return b.reject(ctx, req, Decision{Tool: req.Name},
+		return b.reject(ctx, req, Decision{Tool: req.Name, Mode: mode},
 			"未知工具 "+req.Name+"，可用工具见 list_tools",
 			string(observe.ClassTool), OutcomeKindNotFound)
 	}
 
 	// --- C3: capability enforcement, ahead of any risk work or execution ----
 	dec, why := b.checkCaps(req, entry)
+	dec.Mode = mode
 	if why != "" {
 		return b.reject(ctx, req, dec, why, string(observe.ClassPermissionDenied), OutcomeKindCapability)
 	}
@@ -302,12 +318,12 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 	dec.SessionOverrideBlocked = verdict.SessionOverrideBlocked
 
 	// --- ticket 90: the permission mode screens that verdict -----------------
-	// Read once per call (AC#1: an explicit value, never a package global), then
-	// handed to route as a PARAMETER. dec.Level keeps the assessed level, because
-	// that is what the tool_call row's risk_level column means; the mode's effect
-	// travels as Mode/ModeSilenced/ModeKept so "why was nobody asked" is readable
-	// from the record.
-	mode := b.permissionMode()
+	// The value was read once at the top of Execute (AC#1: an explicit value,
+	// never a package global), then handed to route as a PARAMETER. dec.Level
+	// keeps the assessed level, because that is what the tool_call row's
+	// risk_level column means; the mode's effect travels as
+	// Mode/ModeSilenced/ModeKept so "why was nobody asked" is readable from the
+	// record - and since ticket 377 the audit line carries dec.Mode itself.
 	sil := mode.Screen(verdict)
 	dec.Mode = mode
 	dec.ModeSilenced = sil.Silenced
@@ -1168,14 +1184,26 @@ func (b *Bridge) emit(d Decision) {
 // internal/tools/ticket90_test.go:444 forbids a grant-shaped member on Decision,
 // and that ban is correct: the verdict a caller can set is the bug this
 // repository keeps re-registering.
+//
+// mode= is ticket 377's field, and it is the EFFECTIVE档: the same value this
+// call was screened under (Execute reads it once into dec.Mode), never
+// config.toml's own value. The two differ whenever perm.Store was handed no
+// confirmation channel, because ticket 372 collapses a configured auto_approve
+// or ask_high_risk to ask_every_step on the read side - and a line that printed
+// the file would then answer "why was I not asked?" with the exact opposite of
+// what happened. It is appended AFTER reason= on purpose: the fields in front of
+// it are matched as contiguous runs ("risk=L0 decision=allow outcome=success",
+// ticket 173's shape filter), so inserting a token mid-line would break readers
+// that never asked for this one.
 func (b *Bridge) book(ctx context.Context, req agent.ToolRequest, dec Decision,
 	grantID int64, kind OutcomeKind,
 ) {
 	b.log("tools: call kind=%s task=%s corr=%s tool=%s risk=%s decision=%s "+
-		"outcome=%s rules_hit=%v in_allowlist_scope=%s grant_id=%d refusal=%s reason=%q",
+		"outcome=%s rules_hit=%v in_allowlist_scope=%s grant_id=%d refusal=%s reason=%q mode=%s",
 		kind, req.TaskID, orDefault(req.CorrelationID, req.TaskID), req.Name,
 		dec.LevelString(), dec.DecisionColumn, kind.outcomeColumn(),
-		dec.RulesHit, b.scopeVerdictOf(dec).token(), grantID, dec.Refusal.refusalToken(), dec.Reason)
+		dec.RulesHit, b.scopeVerdictOf(dec).token(), grantID, dec.Refusal.refusalToken(), dec.Reason,
+		dec.Mode)
 
 	// Ticket 105 AC#2: this is the production reader of ticket 102's rewrite
 	// account. Until here the only consumers of Roots()/RewrittenRoots()/

@@ -144,15 +144,35 @@ func (s *replySurface) runWidening(ctx context.Context, fromCorr, dir, rule stri
 }
 
 // permissionMode reads the档 this run is screening under, so the widening card
-// carries the mode the audit trail expects (tools.Decision.Mode's own comment:
-// 「why was I not asked?」 has to be answerable from the record). An unreadable
-// mode is booked as the strictest档 rather than the safest-sounding one, which is
-// config.PermissionMode's own fail-closed reading.
+// carries the mode the audit trail expects. tools.Decision.Mode's own comment
+// spells the requirement out: the field is 「the permission mode this call was
+// screened under」, answerable from the record rather than from config.toml's
+// current contents, because 「why was I not asked?」 is the question it exists
+// for. The D36 re-confirmation card next door (config_reload.go) books this same
+// read.
+//
+// Ticket 377: it asks the STORE, not the config. perm.Store.PermissionMode is
+// the EFFECTIVE档 - the read side ticket 372 collapses to ask_every_step when
+// this process was handed no confirmation channel - while
+// config.Config.PermissionMode answers config.toml's value. On the `wisp run`
+// seam the two are equal by construction (confirm is the confirmModeSwitch
+// method value, never nil, so 372's collapse cannot fire); they come apart on
+// the `wisp panel-inbound` seam, which has no leg at all, and on any future
+// assembly that forgets one. Reading the file there would book a档 this process
+// never ran - a record that says "全自动" about a run that asked about
+// everything.
+//
+// An unreadable mode is booked as the strictest档: with no store there is no
+// evidence a channel exists, and the store itself already fail-closes to
+// ask_every_step when it cannot answer (perm.Store.PermissionMode).
 func (rt *agentRuntime) permissionMode() risk.Mode {
-	if rt == nil || rt.mgr == nil {
+	if rt == nil {
 		return risk.DefaultMode()
 	}
-	return rt.mgr.Config().PermissionMode()
+	if rt.modes != nil {
+		return rt.modes.PermissionMode()
+	}
+	return risk.DefaultMode()
 }
 
 // bookWaitingState is ticket 201 AC#6's production caller: every time this run
