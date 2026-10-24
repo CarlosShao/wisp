@@ -22,13 +22,23 @@
 // and (b) the landing's leaf leg actually spoke; the truncation count is printed for the record, and
 // winsec.go's statement keeps that residual named rather than writing "the window is closed".
 //
+// 票 369 (leg 369-r1) REPLACED (b): it used to be "guardSpoke+recheckSpoke > 0 in 400 raced attempts",
+// which is a count of how often the racer landed inside a two-syscall gap, and it read guard=0 here
+// and re-check=0 there on unchanged bytes (0/400 and 1/400 on runner head 23b663c2). (b) is now the
+// landing's own leg DRIVEN DETERMINISTICALLY on a bare-sibling leaf link - the one spelling containment
+// cannot answer (342-v2's adjudication, restated in leafrace_342r2_windows_test.go:5-14) - so it is red
+// when the re-check is broken and green when it is not, on every machine. The raced world stays, and
+// keeps its own numerator: `deleted`, which is ticket 348's and is the half that must never move.
+//
 // Judged per ticket 348 AC#3: `deleted` is this ticket's numerator, gated here on both forms.
 // `truncated` is ticket 342's and is gated in its own file on the junction form.
 package winsec
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -105,36 +115,97 @@ func TestAC2WindowsPrivateFileThroughASwappedAncestorNeverDeletesAForeignFile342
 }
 
 func TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1(t *testing.T) {
+	// (A) THE LANDING'S OWN LEG, DRIVEN DETERMINISTICALLY, and this is 票 369's replacement for the old
+	// `guardSpoke+recheckSpoke > 0`. The spelling is the bare sibling (§342-v2: containment has nothing to
+	// refuse, so the package's own identity gate is the only leg that CAN answer), the leaf link is
+	// constructed and not raced, and the leg is called the way the route calls it. Red when the re-check
+	// is broken, green when it is not, on every machine.
+	dir := SealableTempDirForTest124(t)
+	sub := filepath.Join(dir, "sub")
+	if err := os.MkdirAll(sub, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	bystander := filepath.Join(sub, "bystander-348r1.bin")
+	const bystanderBody = "an object the caller never named, standing in the same directory, longer on purpose"
+	if err := os.WriteFile(bystander, []byte(bystanderBody), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	linked := filepath.Join(sub, winAncLeaf342r1)
+	if err := os.Symlink(filepath.Base(bystander), linked); err != nil {
+		t.Skipf("cannot construct the relative file symlink this leg is about: %v (needs developer mode or "+
+			"SeCreateSymbolicLinkPrivilege; acceptance has to count this SKIP, never a quiet pass)", err)
+	}
+	if !reparseAt(linked) {
+		t.Fatalf("%s is not a reparse point, so this case measured nothing", filepath.Base(linked))
+	}
+	pin, err := pinnedParent(linked)
+	if err != nil {
+		// A pin failure here would be the world, not the leg: the leaf form keeps `sub` real.
+		t.Fatalf("AC#2 RED instrument: pinning the parent of a real directory failed: %v", err)
+	}
+	handle, _, leafErr := openPinnedLeaf(pin, filepath.Base(linked), os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollowPlatform, 0o600)
+	_ = pin.close()
+	if handle != nil {
+		_ = handle.Close()
+	}
+	const wantLinkFace = "the name carries a link, so this handle is not the object the caller named"
+	if leafErr == nil {
+		t.Fatalf("AC#2 RED: openPinnedLeaf returned a usable handle for a name that carries a link, so this "+
+			"route's bytes land in an object the caller never named (name %s) - the re-check is the leg that "+
+			"stops it and it did not answer", linked)
+	}
+	if !strings.Contains(leafErr.Error(), wantLinkFace) {
+		t.Fatalf("AC#2 RED: the refusal did not carry the re-check's link face %q, so some other leg answered; "+
+			"verbatim: %v", wantLinkFace, leafErr)
+	}
+	if !errors.Is(leafErr, ErrUnresolvedPath) || !errors.Is(leafErr, ErrNotSealable) {
+		t.Fatalf("AC#2 RED: the re-check's refusal lost a sentinel (ErrUnresolvedPath/ErrNotSealable): %v", leafErr)
+	}
+	t.Logf("AC#2' the landing's own leg answered, verbatim: %v", leafErr)
+	// The residual, measured rather than raced: the followed open carried out the truncation BEFORE the
+	// re-check could refuse it. Reported and NOT gated - a future landing that closes it must make this
+	// line read "intact", and gating "truncated" would forbid exactly that improvement.
+	after, rErr := os.ReadFile(bystander)
+	t.Logf("AC#2' RESIDUAL, deterministic on this spelling: the followed open left the bystander as %q "+
+		"(read err %v) - the bytes were refused afterwards and the NAME was never removed, which is the half "+
+		"this platform may claim", after, rErr)
+
+	// (B) LIVENESS, deterministically: the flipped state is entered by construction and PROVED, instead of
+	// being inferred from a racer's count. Keep that apart from (C): a liveness proof is about the world,
+	// never about the leg.
 	w := newWinAncWorld342r1(t, winAncFormLeafSym)
+	if err := w.toFlip(); err != nil {
+		t.Fatalf("AC#2 RED instrument: the world cannot enter the flipped leaf state at all: %v", err)
+	}
+	if !reparseAt(w.name) {
+		t.Fatalf("AC#2 RED instrument: %s is not a reparse point after the synchronous flip, so the liveness "+
+			"this case used to read off the racer was never proved", w.name)
+	}
+	t.Logf("AC#2' liveness: the flipped leaf state is entered synchronously and proved by reparseAt(%s)=true",
+		filepath.Base(w.name))
+	if err := w.toReal(); err != nil {
+		t.Fatalf("settle the world back to the ordinary state: %v", err)
+	}
+
+	// (C) THE RACED WORLD, judged only on ticket 348's numerator.
 	st := w.run(winAncAttempts342r1, func() error {
 		return PrivateFile(w.name, []byte(winAncPayload342r1), 0o600)
 	})
 	st.print(t, "AC#2 (ticket 348 + the leaf residual, Windows leaf-symlink form)")
-	// (a) the removal may not reach the foreign name, on this platform either.
 	if st.deleted > 0 {
 		t.Errorf("AC#2 RED: %d of %d attempts found the foreign witness GONE after a leaf name carrying a "+
 			"link, so the refusal-path removal still resolved into somebody else's tree (first: %s)",
 			st.deleted, st.attempts, st.firstProof)
 	}
-	// (b) SOME leaf leg has to have answered, or this reading says nothing about the leaf. Two legs can
-	// answer a flipped leaf on this platform and they are NOT interchangeable: preOpenLeafGuard probes
-	// the NAME before the open (ticket 322's Windows leg, and it answers first in the steady state),
-	// while openPinnedLeaf's re-check answers only in the gap between that verdict and the open - which
-	// is the residual 322-r1 named and the very reason the re-check exists. Both counts are printed and
-	// the gate requires the pair to be non-zero; the landing's own leg is reported separately rather than
-	// demanded, because demanding it would make this instrument a claim about how often a racer lands
-	// inside a two-syscall window instead of a claim about the removal.
+	// The split is a READING about the clock: which gap a racer lands in is not a property of the landing,
+	// and this file stopped gating it in 票 369 (see the file header). Printed so the residual story stays
+	// readable, never demanded.
 	guardSpoke := st.legs["preOpenLeafGuard's leaf refusal (ticket 322's Windows leaf leg)"]
 	recheckSpoke := st.legs["leaf identity re-check inside openPinnedLeaf (os.Root pins ancestors, NOT the leaf)"] +
 		st.legs["leaf identity re-check, SameFile face"]
-	if guardSpoke+recheckSpoke == 0 || st.provedReparse == 0 {
-		t.Errorf("AC#2 RED instrument: no leaf leg answered (guard=%d, landing's re-check=%d) while reparseAt "+
-			"proved %d flipped leaf cycles across %d (flipErrs=%d, first %q) - so nothing here shows a leaf "+
-			"leg is on the route rather than on the shelf",
-			guardSpoke, recheckSpoke, st.provedReparse, st.attempts, st.flipErrs, st.firstFlip)
-	}
-	t.Logf("AC#2' leaf-leg split: preOpenLeafGuard (check before the open)=%d, openPinnedLeaf re-check (after "+
-		"the open)=%d, provedReparse=%d - that split IS the residual story of ticket 322's Windows leaf leg",
+	t.Logf("AC#2' leaf-leg split, REPORTED and not gated: preOpenLeafGuard (check before the open)=%d, "+
+		"openPinnedLeaf re-check (after the open)=%d, provedReparse=%d - that split IS the residual story of "+
+		"ticket 322's Windows leaf leg, and it is a reading about the racer's timing, not about the landing",
 		guardSpoke, recheckSpoke, st.provedReparse)
 	// (c) the residual, REPORTED and not gated: a truncation the followed open already carried out is
 	// not undone by a refusal after it. Naming the number is what keeps winsec.go's statement honest,

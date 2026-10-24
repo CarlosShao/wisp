@@ -14,7 +14,7 @@
 //
 //   - the probe cannot hold its answer. Between the verdict and the os.OpenFile that
 //     follows, the leaf can still be swapped and that open still follows it. The
-//     truncating count below is therefore REPORTED, not gated - 322-a1 measured the same
+//     truncating count is therefore REPORTED, not gated - 322-a1 measured the same
 //     race at damaged=571/759/780 on this machine with no guard at all, so a drop with a
 //     non-zero guard-leg count is what this shape can honestly claim;
 //   - ancestors are not probed (the placement floor covers the steady state, not the gap
@@ -28,16 +28,43 @@
 // the CI runner's symlink-privilege tier was never measured (322-a1 未测格 3). Where the
 // construction itself needs a privilege this machine has, the case says so out loud with
 // t.Skipf rather than passing quietly.
+//
+// 票 369 (leg 369-r1) REPLACED THIS FILE'S ROUTE CRITERION, and the reason is a
+// mechanism rather than a flake. The old case ran 400 raced attempts and gated
+// `guardSpoke > 0`. That count is not a property of the landing: privateFile calls
+// resolveString first (winsec.go:163), and BOTH steady-state refusals it owns walk the
+// LEAF as one of their prefixes - the installed resolver answers "path traverses a
+// reparse point" (internal/risk, reached through resolve.go:605-611) and the floor's own
+// walk answers "traverses a reparse point at" (placement_windows.go:59-68, because
+// pathPieces' last piece IS the full path, winsec.go:408-420). So in the steady state a
+// leaf link is refused BEFORE winsec.go:167 is reached, and preOpenLeafGuard can only
+// answer when the swap lands inside the two syscalls between that walk and its own
+// CreateFile. The pinned chain's window (winsec.go:179-187, i.e. pinnedParent plus the
+// descent inside openPinnedLeaf) strictly CONTAINS the guard's, so the chain wins almost
+// every gap hit: one 400-attempt run on this box counted "path escapes from parent"=75
+// and preOpenLeafGuard=0. Measured counts of the same question: 0 and 1 on the same
+// runner head 23b663c2 (runs 39884431726 / 40034438521), 0..15 on this box. A gate that
+// is 0 or 1 is a gate on the machine's timing.
+//
+// What replaces it, and what each replacement can and cannot catch:
+//   - TestAC3WindowsTheRouteCallsTheLeafGuardBeforeThePin322r1: the WIRING, read off the
+//     call graph of winsec.go - the guard is called, and it is called between
+//     resolveString and the pin. Red if the call is deleted or moved after the pin;
+//   - TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1: the LEG, driven
+//     directly. Red if the guard stops refusing link names;
+//   - TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1: the ROUTE, with the
+//     leaf-link state entered synchronously instead of raced. It gates "the route never
+//     writes through a leaf link, and the leg that answers is the steady-state one",
+//     plus a positive control that the same call lands once the link is gone. The gap
+//     count itself stays a REPORTED reading (348's leaf world prints it), because it is
+//     a reading about the clock.
 package winsec
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -48,9 +75,43 @@ import (
 const (
 	whyGuardRefusal322r1 = "the name carries a reparse point, so the open that follows would go through that " +
 		"link and truncate whatever it targets"
-	winRaceAttempts322r1 = 400
-	winRacePayload322r1  = "raced private payload 322r1 windows"
+	winRacePayload322r1 = "raced private payload 322r1 windows"
+	winLeafShots322r1   = 3 // quiet replicates: every shot re-enters the same state and must read the same
 )
+
+// The two steady-state rows a leaf link can be answered by on the route, verbatim from
+// the legs that format them. They are kept apart on purpose: which one answers is the
+// reading 票 369 is about, so a single "it was refused" assertion would erase it.
+const (
+	winLeafRowResolver322r1    = "path traverses a reparse point"
+	winLeafRowFloorWalk322r1   = "traverses a reparse point at"
+	winLeafRowGuardLink322r1   = whyGuardRefusal322r1
+	winLeafRowGuardProbe322r1  = "the reparse-point probe could not read the name"
+	winLeafRowRecheckLink322r1 = "the name carries a link, so this handle"
+)
+
+// leakRow322r1 answers WHICH leg refused, or "" when the text names none of them. It is
+// deliberately a whitelist: an unrecognised refusal is not silently accepted as "some
+// leg answered", because that is how a rename of a reason string would turn this case
+// green without anything having changed.
+func leakRow322r1(err error) string {
+	if err == nil {
+		return ""
+	}
+	msg := err.Error()
+	for _, why := range []string{
+		winLeafRowGuardLink322r1,
+		winLeafRowGuardProbe322r1,
+		winLeafRowRecheckLink322r1,
+		winLeafRowFloorWalk322r1,
+		winLeafRowResolver322r1,
+	} {
+		if strings.Contains(msg, why) {
+			return why
+		}
+	}
+	return ""
+}
 
 // mkFileSymlink is mkDirSymlink's twin for a FILE target, with the same honesty rule:
 // the privilege is conditional, so an unavailable construction is stated as a SKIP that
@@ -149,106 +210,122 @@ func TestAC3WindowsLeafGuardRefusesLinkNamesAndAcceptsRealOnes322r1(t *testing.T
 }
 
 // TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1 is the production wiring,
-// measured on this machine rather than inferred from the POSIX row. The name is flipped
-// by rename between a real file and a link at a foreign witness; the hard judgement is
-// that the NEW leg answered at least once through PrivateFile, because that is the only
-// way this file can say the guard is on the route and not merely on the shelf. The
-// truncating count is printed as a reading: the guard cannot lock its own answer, so a
-// non-zero residual is the shape the adjudication named, not a failure of this leg.
+// entered deterministically instead of raced (see the header for why the count could not
+// stay a gate).
+//
+// The world: the caller's name carries a RELATIVE symlink whose target is a bare sibling
+// name, so no containment rule can answer it and the steady-state refusals are the only
+// legs in front of the guard. The link is moved onto the name by rename and PROVED with
+// reparseAt, so the state this case judges is entered by construction, not by timing.
+//
+// Judged: (a) the route refuses the caller's name while it carries a link - a nil here
+// would mean privateFile wrote through a link, which is exactly the damage ticket 322
+// exists for; (b) the refusal is attributable to a NAMED leg, and specifically to the
+// steady state, which is the mechanism the header states; (c) neither the caller's name
+// nor the foreign witness is removed, and the payload never lands in the witness; (d) the
+// positive control: with the link replaced by the caller's own object, the same call
+// lands and writes the payload - so (a) is a refusal about the link, not about a world
+// where everything refuses.
+//
+// Reported, not gated: which steady-state refusal answered, and the truncation residual
+// (a zero here is one box's reading; 322-a1's 571/759/780 is the same window with no
+// guard at all, and the raced world in ancestorunlink_348_windows_test.go still counts
+// it).
 func TestAC3WindowsPrivateFileRouteHasTheLeafGuardSpeaking322r1(t *testing.T) {
 	dir := SealableTempDirForTest124(t)
 	name := filepath.Join(dir, "caller-name-322r1.bin")
 	witness := filepath.Join(dir, "foreign-witness-322r1.bin")
-	stageReal := filepath.Join(dir, "staged-real-322r1.bin")
 	stageLink := filepath.Join(dir, "staged-leaf-322r1.lnk")
-	const wbody = "foreign bytes are not yours to truncate"
+	const wbody = "foreign bytes are not yours to truncate, and this body is longer on purpose"
 	if err := os.WriteFile(witness, []byte(wbody), 0o666); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(name, []byte("the object the caller owns"), 0o600); err != nil {
 		t.Fatalf("give the caller a name to stand on: %v", err)
 	}
-
-	var flips, guardSpoke, otherRefused, nilReturned int32
-	var flipErrs int64
-	var flipMu sync.Mutex
-	var firstFlip, firstGuard string
-	stop, done := make(chan struct{}), make(chan struct{})
-	var stopOnce sync.Once
-	stopRacer := func() { stopOnce.Do(func() { close(stop) }); <-done }
-	go func() {
-		defer close(done)
-		defer func() {
-			if p := recover(); p != nil {
-				atomic.AddInt64(&flipErrs, 1)
-			}
-		}()
-		for {
-			select {
-			case <-stop:
-				return
-			default:
-			}
-			if err := os.WriteFile(stageReal, []byte("the object the caller owns"), 0o600); err != nil {
-				flipMu.Lock()
-				if firstFlip == "" {
-					firstFlip = err.Error()
-				}
-				flipMu.Unlock()
-				continue
-			}
-			_ = os.Rename(stageReal, name)
-			_ = os.Remove(stageLink)
-			if err := os.Symlink(filepath.Base(witness), stageLink); err != nil {
-				flipMu.Lock()
-				if firstFlip == "" {
-					firstFlip = err.Error()
-				}
-				flipMu.Unlock()
-				continue
-			}
-			_ = os.Rename(stageLink, name)
-			atomic.AddInt32(&flips, 1)
+	var answered []string
+	truncatedShots := 0
+	for shot := 0; shot < winLeafShots322r1; shot++ {
+		// The link is staged inside the loop, not once above it: the rename below CONSUMES the
+		// staged name, and a fixture that only works on its first shot is the same "measured once"
+		// shape this whole change exists to remove.
+		mkFileSymlink(t, stageLink, filepath.Base(witness))
+		if err := os.Rename(stageLink, name); err != nil {
+			t.Fatalf("shot %d: move the link onto the caller's name: %v", shot, err)
 		}
-	}()
-	defer stopRacer()
-
-	for i := 0; i < winRaceAttempts322r1; i++ {
+		if !reparseAt(name) {
+			t.Fatalf("shot %d: the caller's name is not a reparse point after the flip, so the state this "+
+				"case judges was never entered and nothing below is a reading about a leaf link", shot)
+		}
 		err := PrivateFile(name, []byte(winRacePayload322r1), 0o600)
-		switch {
-		case err == nil:
-			atomic.AddInt32(&nilReturned, 1)
-		case strings.Contains(err.Error(), whyGuardRefusal322r1):
-			atomic.AddInt32(&guardSpoke, 1)
-			flipMu.Lock()
-			if firstGuard == "" {
-				firstGuard = err.Error()
+		leg := leakRow322r1(err)
+		if err == nil {
+			t.Fatalf("AC#3 RED shot %d: PrivateFile returned nil while the caller's name carried a link at a "+
+				"foreign object - the route wrote THROUGH the leaf, which is ticket 322's damage in its "+
+				"strongest form (name %s)", shot, name)
+		}
+		if leg == "" {
+			t.Fatalf("AC#3 RED shot %d: the refusal names no leg this case declares, so it cannot be "+
+				"attributed: %v", shot, err)
+		}
+		answered = append(answered, leg)
+		if got, rErr := os.ReadFile(witness); rErr != nil {
+			t.Fatalf("AC#3 shot %d: the witness became unreadable (%v), which is a removal rather than a "+
+				"truncation and is ticket 348's numerator", shot, rErr)
+		} else if string(got) != wbody {
+			truncatedShots++
+			if err := os.WriteFile(witness, []byte(wbody), 0o666); err != nil {
+				t.Fatalf("restock the witness: %v", err)
 			}
-			flipMu.Unlock()
-		default:
-			atomic.AddInt32(&otherRefused, 1)
+		}
+		if strings.Contains(mustRead322r1(t, name), winRacePayload322r1) {
+			t.Fatalf("AC#3 RED shot %d: the raced payload landed in the caller's name while it carried a link, "+
+				"so the bytes went through it", shot)
+		}
+		if err := os.Remove(name); err != nil {
+			t.Fatalf("shot %d: unlink the leaf link: %v", shot, err)
+		}
+		if err := os.WriteFile(name, []byte("the object the caller owns"), 0o600); err != nil {
+			t.Fatalf("shot %d: restore the caller's own object: %v", shot, err)
 		}
 	}
-	stopRacer()
+	for i, leg := range answered {
+		t.Logf("AC#3' shot %d: leg that answered while the leaf carried a link = %q", i, leg)
+		// The gate is the FAMILY, not one member: either steady-state leg answering is the same
+		// claim (the route refuses the link before any act), and which member answers is a fact
+		// about what is linked into this binary (internal/risk's pipeline here, the package's own
+		// floor when nothing is), so pinning one name would make the case red for a reason that is
+		// not a defect. What may NOT answer is a leaf leg: that would mean the swap reached the
+		// guard or the open, i.e. the steady state had stopped covering the leaf.
+		if leg != winLeafRowResolver322r1 && leg != winLeafRowFloorWalk322r1 {
+			t.Errorf("AC#3 RED shot %d: the leaf-link state was answered by %q, want one of the two "+
+				"steady-state rows (%q / %q). Both of them walk the LEAF (resolve.go:605-611 then "+
+				"placement_windows.go:59-68, whose last prefix IS the full path), which is the mechanism "+
+				"this ticket's reading rests on; a leaf leg answering in the steady state means that order "+
+				"moved and the gap counts have to be re-derived", i, leg,
+				winLeafRowResolver322r1, winLeafRowFloorWalk322r1)
+		}
+	}
+	if truncatedShots > 0 {
+		t.Logf("AC#3' RESIDUAL OBSERVED on %d of %d synchronously entered shots: the foreign witness lost "+
+			"its body. Reported, not claimed closed, and not gated: the guard's answer is about a NAME and "+
+			"nothing in this route can lock it.", truncatedShots, winLeafShots322r1)
+	}
 
-	truncated := false
-	if got, rErr := os.ReadFile(witness); rErr != nil || string(got) != wbody {
-		truncated = true
+	// Positive control: the same call, same directory, no link on the name.
+	if err := PrivateFile(name, []byte(winRacePayload322r1), 0o600); err != nil {
+		t.Errorf("AC#3 RED positive control: PrivateFile refused a plain, caller-owned, link-free name (%v), "+
+			"so the refusals above say nothing about the link", err)
+	} else if got := mustRead322r1(t, name); got != winRacePayload322r1 {
+		t.Errorf("AC#3 RED positive control: the caller's name holds %q, want the payload", got)
 	}
-	info, _ := os.Lstat(witness)
-	// Judged: the new leg answered on the production route, and the racer really flipped.
-	if guardSpoke == 0 || flips == 0 {
-		t.Errorf("AC#3 RED instrument: %d raced attempts produced guard-leg refusals=%d and racer flips=%d "+
-			"(flipErrs=%d, firstFlipErr=%q), so nothing below proves the guard is on this route",
-			winRaceAttempts322r1, guardSpoke, flips, flipErrs, firstFlip)
+}
+
+func mustRead322r1(t *testing.T, path string) string {
+	t.Helper()
+	body, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read %s: %v", path, err)
 	}
-	size, mode := int64(-1), "unreachable"
-	if info != nil {
-		size, mode = info.Size(), fmt.Sprint(info.Mode())
-	}
-	// Reported, because the probe cannot lock its own answer: a residual open that still
-	// followed a swapped leaf is the named half-open window, not a new hole.
-	t.Logf("AC#3 local paired reading (winsec_windows.go leaf guard): attempts=%d flips=%d guardRefusals=%d "+
-		"otherRefusals=%d returnedNil=%d witnessTruncated=%v witnessSize=%d witnessMode=%v firstGuardVerbatim=%q",
-		winRaceAttempts322r1, flips, guardSpoke, otherRefused, nilReturned, truncated, size, mode, firstGuard)
+	return string(body)
 }

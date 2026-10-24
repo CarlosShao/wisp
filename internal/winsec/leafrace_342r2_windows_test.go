@@ -1,4 +1,29 @@
-//go:build windows
+//go:build windows && wisp342probe
+
+// 〔票 369 leg 369-r1: THIS FILE IS OUT OF THE CI GATE, BY RULING, NOT BY WEAKENING.〕
+//
+// What it gates is a COUNT: `TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2` is red while
+// openPinnedLeaf's re-check has not answered in 400 raced attempts, and its own message says so
+// ("NOT YET MEASURED"). The ruling that moved it out (A1122, re-stated as A1196④) is 112-r1's finding:
+// a probe whose red means "the racer never landed inside a two-syscall window" sits in the CI step
+// (scripts/winsec-tests.sh, which runs the WHOLE package), so that step cannot be stably green until
+// ticket 342 lands - and the same unchanged bytes read recheck=41/400 and 0/400 on this box, i.e. the
+// gate was reporting the clock. It is a reading about timing, and a reading about timing may not decide
+// a step's colour.
+//
+// Where it moved to: nowhere on disk - `.scratch/wisp/probes/342/**` is outside this leg's write
+// surface - so the in-surface mechanism is this build tag. The file stays exactly where it was, is no
+// longer part of the default build, and is run by hand:
+//
+//	go test -tags wisp342probe -v -count=1 -run '^TestAC1WindowsLeafRecheckAnswersOnTheBareSiblingForm342r2$' ./internal/winsec/
+//
+// What replaces its claim in the gate: ancestorunlink_348_windows_test.go's part (A) drives
+// openPinnedLeaf's re-check DETERMINISTICALLY on the same bare-sibling spelling, so "the re-check
+// refuses a leaf link" is still gated - red when the re-check is broken, green when it is not. What is
+// NOT gated anywhere any more, stated plainly: that the re-check is REACHED through PrivateFile in the
+// steady state. It is not, and cannot be: resolveString refuses a leaf link before the route reaches
+// it (see openleaf_guard_322_windows_test.go's header for the measured mechanism). That reachability
+// stays a timing fact, printed by 348's raced world, and is no longer allowed to colour a gate.
 
 // Ticket 342 AC#1/AC#5 + 348 AC#2's leaf face, leg 342-r2: the leaf re-check given the ONE form the
 // adjudication proved can reach it.
