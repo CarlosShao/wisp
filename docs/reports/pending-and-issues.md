@@ -25762,3 +25762,62 @@ A1|NONAUTO|from=ask_every_step|to=ask_high_risk|set_err="<nil>"|read_after=ask_h
 
 **⑥ ★状态**＝结案 **42 票**（`-done` **185** 枚）、**真待推进 179**、**完成度 185/364 ＝ 50.8%**、
 在飞 **2**（`373-v1` 写件中／`376-r1`）、未推 **221**（攒着）、⛔ 清理、★**摆机主 0 件**。
+
+## A1234（2026-10-24 13:3x +08，编排者）★★收 `376-r1`：〔乙′〕落地（`5/1`、`gate.go:534` 一字未动）｜★★**牙两枚都用假钟**（★不把 5 分钟塞进 CI）｜★派 `376-v1` ＋ **`cmd/wisp` 空了 ⇒ 派 `375-r1`**
+
+**① ★★收 `376-r1`（`ceef4d069`；件 **118 行**）**
+- ★**`cmd/wisp/run.go` numstat `5/1`**（★**现跑行号 `1657-1661`**；★**票面的 `1563` 已被 `373-r1` 漂走**）
+- ★★**`gate.go:534` **一个字没动****（逐字仍是 `p := g.promptFor(d, corr, 0, g.q.Timeout(), nil, nonce)`）⇒ ★**这是"没有走甲形"的硬证据**
+- ★**`internal/agent/approval/**` **零字节改动****；★新增 `cmd/wisp/approval_card_window_376_test.go`
+
+**② ★那 5 行（它逐行给了）**
+```go
+shownWindow := p.Window
+if p.Level == "L2" { // an L2 card's Window is 0 by construction; its wait is Deadline
+    shownWindow = p.Deadline
+}
+fmt.Fprintf(u.out, "  窗口 %.1fs\n", shownWindow.Seconds())
+```
+⇒ ★**L1 读 `Window`、L2 读 `Deadline`**；★**`Prompt.Window` 在 L2 上仍是 `0`**；★**`replies.go:83`「zero on an L2 card」**仍为真****
+
+**③ ★★★必给读数（真钟探针、真 printer ＋ 真 `approval.Gate`）**
+| 发 | 卡上 | 真等 | 判据 |
+|---|---|---|---|
+| ★**L2 带底 `31`** | ★`窗口 31.0s` | ★`Queue().Timeout()=31s`、★**实测 `31.002s`** | ★**`EQUAL=true`** |
+| ★**L2 默认 `300`** | `300.0s` | `300.0s` | ★**`EQUAL=true`** |
+| ★★**L1（配置 `1s` → 夹 `2s`）** | ★`2.0s` | ★`Gate.Window()=2s`、★实测 `2.001s` | ★**`EQUAL=true`、`L1_ZERO=false`** |
+⇒ ★★★**`L1` 那一行是"乙形会失败"的反证**（★**乙形会把这里印成 `0.0s`**）。
+
+**④ ★★"别处不印 `Window`" 它独立复核（⛔ 抄普查）**
+- ★**卡片印发点**只有 `run.go:1657`****；★球卡无时长字段、★面板卡没有时长字段、★**boot 审计行是 `slog`（两个数都对）** ⇒ **未触发停手上报**
+- ★**并报**：★**`Prompt.Deadline` 从本笔起有了第一个生产读者** ⇒ ★**这是〔乙′〕应有之义**
+
+**⑤ ★★★牙两枚（新写；普查点名：仓里原本 **0 枚**钉着卡面那行）**
+1. ★★**`Test376R1L2CardPrintsQueueTimeout`**：★**期望值取闸门自己的 `Queue().Timeout()`（⛔ 字面 `300`）**、★**从真实控制台输出读回卡上那个数**
+   ★**`HEAD` 传实测红**：★`test.go:248 the L2 card printed "窗口 0.0s", but the gate waits Queue().Timeout() = 300.0s (5m0s)`
+2. ★★**`Test376R1L1CardKeepsItsBlockLength`**：★**乙形反例守门**（绿前绿后）、钉 `Gate.Window()==MinL1Window`、卡印 `2.0s`、`≠0`
+3. ★★**两枚都用假钟**（`approval.Clock` 缝）⇒ ★**300s 判据只用微秒、不把 5 分钟塞进 CI** ⇒ ★★**这是"测试不许慢"的正确做法**
+
+**⑥ ★★反向判据（归因精确）**
+- ★**变异红**（仓外 `cut.go` **只摘掉那一跳**）：`rc=1`、`--- FAIL: Test376R1L2CardPrintsQueueTimeout` ＋ 红行 `test.go:248`
+- ★★★**同一次 L1 那枚仍 PASS** ⇒ ★**说明红的是被摘那一跳** ⇒ **归因精确**
+- ★**还原绿 `rc=0`**／★**原样绿 `rc=0`**；★**还原核（最后一发变异之后）**：★`sha256sum` 前后 `565ff346…5ea6da` **逐位相同**、★`git diff --numstat` 仍 `5 1`
+
+**⑦ ★四数（分开、⛔ 相减）**
+- ★`cmd/wisp` 定向（带 `PATH`）：★**改前 `13/0/0` `rc=0`（`113.834s`）** ⇒ ★**改后 `15/0/0` `rc=0`（`125.327s`）** ⇒ ★**差 2 ＝ 新加两枚**
+  ★**它说明白了"改前怎么造"**：★**用 `-overlay` 把 `run.go` 钉回 `HEAD` 且把新测试件删出编译** ⇒ ★**口径清楚**
+- ★`internal/agent/approval` 整包：★**`97/0/1` `rc=0` 两遍**（★**该包零字节改动、独立跑两遍**）⇒ ★**这是"我没碰它"的硬证明**
+- ★`SKIP=1` 是 `TestDefaultDeadlineWallClockMeasurement`
+
+**⑧ ★门禁＋格式**：★`build rc=0`／★`vet` 两包 `rc=0`／★`d22scan rc=0 clean`（`examined cmd/ 151`、`internal/ 643`）／★**甲尺 `gofumpt -l` 两枚空**／★**乙尺 `gofmt -l` 两枚空**
+- ★**纪律格**：★**提交只有三枚**（`run.go 5/1`、`test 320/0`、`evidence 118/0`）、★**票面 `git status` 空**（未翻框）
+
+**⑨ ★派两条**
+1. ★**`376-v1`（终裁）**：★必判十项，其中三发要它自己造 —— ★**`L2` 两发（`EQUAL=true`）**／★**`L1` 那发（卡印 ＝ `Gate.Window()`）**／★**"把 `if p.Level=="L2"` 改恒真 ⇒ L1 那枚必须红"**（★**这是"牙真能抓住乙形"的证明**）
+2. ★★**`375-r1`（动作层）** —— ★**`cmd/wisp` 空了**（`376-r1` 已提交）
+   ★★**我给它写死四条边界**，其中一条是新的：★**⛔ 顺手改 `run.go` 的 `consoleApprovalUI.Prompt`**（★**票 376 刚改过那里**）⇒ ★**若落点在那里 ⇒ 停手上报**
+   ★★★**验收判据只有一条**：★**`READ-F` 必须从"写入成功"变成"拒"**（★**⛔ "2s 后成功"、⛔ "日志里出现降级行"**）
+   ★★**并且 `READ-W`（L2）必须仍"超时拒"**（★**⛔ 被本腿改坏**）
+
+**⑩ ★状态**＝结案 **42 票**（`-done` **185** 枚）、**真待推进 179**、**完成度 185/364 ＝ 50.8%**、
+在飞 **3**（`373-v1`／`375-r1`／`376-v1`）、未推 **223**（攒着）、⛔ 清理、★**摆机主 0 件**。
