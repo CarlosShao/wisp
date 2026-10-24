@@ -104,3 +104,47 @@
 > ★★**「新写入的行不再永生；父删⇒子删只有子自己的 `COALESCE` 也过线时才成立」**
 
 ⇒ ★★**所以 `368` 结案后，孤儿的**产生**仍有三条路（`coexist`／悬空插行／存量）** ⇒ **全部归本票**。
+
+---
+
+## ★★★`AC#1` 裁形（2026-10-24 12:4x 编排者，凭 `373-a1` 普查 `docs/evidence/s1/373-a1-census.md` 136 行）
+
+### ★★我裁：**〔甲〕DAO 层显式同删 ＋ 先父后子**；⛔〔乙〕（开 FK ＋ `ON DELETE CASCADE`）
+
+**为什么⛔〔乙〕**（★普查实测、⛔ 推断）：
+1. ★★★**`FK=ON` 下插入无父的子 ＝ `787`**、★**而 `bridge.go:1225-1227`／`journal.go:83-85` **吞错****
+   ⇒ ★★**每发 `wisp run` 的取证行会**静默全丢**** ⇒ ★**那是新开一个洞来补另一个洞**
+2. ★**〔乙〕要升 schema `4→5`、`dsnPragmas()` 加一行、`366-a1` 的 `787` 逐字复现**、★**且 `CASCADE` 是必需**（`C1`：`FK_ON` ＋ plain FK 父删 ＝ `787`）
+3. ★★**`CASCADE` **不追溯**清存量**
+
+**为什么选〔甲〕**（★**最有价值**）：
+- ★**3 个函数、≤3 条 SQL、**0 DDL、0 schema****
+- ★★**三处**已经**在同一 `s.write` tx 内** ⇒ ★**无需新管道**、只需多一句**且在父删之前**
+- ★★★**用最小的机制面关掉整个孤儿类**、★**⛔ 为了让"数据库自己保证"而引入一个会吞掉取证行的新失败模式**
+
+### ★★★三件事（`AC#2` 的射程）
+
+**件一：先父后子（〔甲〕与〔乙〕的**共同前提**）**
+- ★★**普查实测**：★`run.go:777` 给 Bridge 传 `Journal: mem` ⇒ ★**子行在跑任务时写**（`bridge.go:1225`）、★**父行在 `:1243`（`Wait()` 之后）才写** ⇒ ★**先子后父**
+  ★`E1`（父从未落）`fkc=1`／★`E2`（同序父后到）`fkc=0`
+- ⇒ ★**把 `StartTaskLog` 提到 `RunAsync` 之前** ⇒ ★**"插悬空行"那条路**自动消失**
+
+**件二：三处父删点级联删子（★子删必须在**父删之前**）**
+- ★`dao_tasklog.go:134`（`PurgeTaskLogs`）／★`dao_tasklog.go:118`（`DeleteTaskLog`）／★**`retention.go`（★普查量到是**两条独立语句**：`:146` 父删 与 `:154-155` 子删）**
+- ★★★**`B1` 实测**：★**父先 ⇒ `787`**；★**`B2`（子先父后、同 tx）⇒ 两句 `nil`／`commit=nil`／`fkc=0`** ⇒ ★**顺序是硬的**
+
+**件三：改那句会变成假话的注释**
+- ★★`dao_tasklog.go:129-130` 逐字：★`// PurgeTaskLogs removes every task row (privacy: one-click clear). Forensic` ／ `// tool_call rows are governed by their own domain and retention window.`
+- ★★★**而 `PrivacyTaskLog` 在 `docs/specs/SPEC-02-data-storage.md`／`docs/PLAN.md`／**全部 specs** 里 **0 命中****（★我 `A1225` 现跑量过）
+  ⇒ ★**所以"`tool_call` 归自己的域"只是**代码注释**里的说法、**没有契约出处**** ⇒ ★**⛔ 用它挡**
+  ⇒ ★★**我拍：`PurgeTaskLogs` 要级联删子**（★**"一键清空任务日志"的用户意图是"把记录全清掉"，留着含工具名/参数的 `tool_call` 行就是没清干净**）
+
+### ★★我复核了 `373-a1` 的第 ④ 条问题
+- ★**它报的第四处**：`schema.go:353 DROP TABLE task_log`（`ddlV4` 重建内）⇒ ★**它判"不是孤儿源"**
+  ★**判据（同 tx、id 逐行搬、重建前 `taskLogStatesOutsideRoster` 先查、`migrationDSN` 强制 FK OFF）** ⇒ ★★**我复核：判定成立、⛔ 当孤儿源**。
+
+### ★★★存量孤儿：`373-a1` 量了，⛔ 当"级联已生效"的证据
+- ★★**`368-a1` 只看了 `%APPDATA%\wisp`（确实只有 `logs\`）**；★★**真实数据根是 `%APPDATA%\wisp-dev\`**
+- ★读数：`wisp.db` 139,264 B、`-wal` **0 字节**；★拷贝 SHA-256 **逐位相同**、`mode=ro`＋`query_only=1` 读后 hash 不变
+- ★★**`schema_version=4`、`task_log=0`／`tool_call=0`／`session=0`／`session_turn=0`、`fkc=0`、孤儿 `0`**
+  ⇒ ★★★**"存量孤儿 ＝ 0，但是**空库意义上的 0**"** ⇒ **⛔ 当"级联已生效"的证据**
