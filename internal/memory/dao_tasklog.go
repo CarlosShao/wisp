@@ -112,9 +112,20 @@ func (s *Store) ListTaskLogs(ctx context.Context) ([]TaskLog, error) {
 	return out, rows.Err()
 }
 
-// DeleteTaskLog removes one task row by id.
+// DeleteTaskLog removes one task row by id, and its forensics children with it
+// (ticket 373). tool_call.task_id references task_log(id) but this store's
+// connections never turn foreign_keys on (open.go's dsnPragmas), so nothing
+// else would ever delete them: the census behind the ticket measured the
+// children surviving as orphans and PRAGMA foreign_key_check reporting 2 of
+// them for this one call. The child delete comes FIRST and shares the same
+// write transaction: child-before-parent is the order an enforced foreign key
+// requires (census 373-a1 section 4, B1/B2), and the single transaction is what
+// makes "both or neither" true instead of "parent gone, children stranded".
 func (s *Store) DeleteTaskLog(ctx context.Context, id string) error {
 	return s.write(ctx, func(ctx context.Context, tx *sql.Tx) error {
+		if _, err := tx.ExecContext(ctx, `DELETE FROM tool_call WHERE task_id=?`, id); err != nil {
+			return err
+		}
 		res, err := tx.ExecContext(ctx, `DELETE FROM task_log WHERE id=?`, id)
 		if err != nil {
 			return err
@@ -126,11 +137,29 @@ func (s *Store) DeleteTaskLog(ctx context.Context, id string) error {
 	})
 }
 
-// PurgeTaskLogs removes every task row (privacy: one-click clear). Forensic
-// tool_call rows are governed by their own domain and retention window.
+// PurgeTaskLogs removes every task row AND every tool_call row (privacy:
+// one-click clear, ticket 373). The user's intent for "clear the task log" is
+// that the records are gone; tool_call carries the tool name and the arguments,
+// so leaving it behind was not a cleared log but a half-cleared one - and,
+// because tool_call.task_id references task_log(id) while foreign keys are off,
+// it was also the widest orphan source this package had (census 373-a1 section
+// 2, P1: 3 orphan rows after this call). An earlier comment here claimed
+// tool_call was "governed by their own domain and retention window"; no
+// contract says that (PrivacyTaskLog has zero hits in docs/specs and
+// docs/PLAN.md), it was a code comment, and the domain still has its own
+// PurgeToolCalls for a caller that wants exactly that.
+//
+// Children are deleted first, in the same transaction as the parents: the
+// order an enforced foreign key requires (census B1/B2), and the transaction
+// that makes the pair atomic. Every tool_call row has a parent among the rows
+// the second statement removes - including rows whose parent an older build
+// already deleted - so "all children" is exactly this purge's closure.
 func (s *Store) PurgeTaskLogs(ctx context.Context) (int64, error) {
 	var n int64
 	err := s.write(ctx, func(ctx context.Context, tx *sql.Tx) error {
+		if _, err := tx.ExecContext(ctx, `DELETE FROM tool_call`); err != nil {
+			return err
+		}
 		res, err := tx.ExecContext(ctx, `DELETE FROM task_log`)
 		if err != nil {
 			return err

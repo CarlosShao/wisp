@@ -41,6 +41,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/CarlosShao/wisp/internal/agent"
@@ -1094,6 +1095,62 @@ func (rt *agentRuntime) noteTask(taskID string) {
 	rt.seenTasks = append(rt.seenTasks, taskID)
 }
 
+// taskLifecycleJournal is the task-row half of agent.Journal, and the ONLY part
+// of that interface this package hands the root loop (ticket 373 件一). The loop
+// calls StartTaskLog from the task's own goroutine at its start
+// (internal/agent/loop.go:391), after AdmitTask and before the first model call,
+// so the parent row exists before any tool_call row that names it can be
+// written. Every other method is deliberately inert: tool_call rows stay the
+// bridge's (Options.Journal's comment above execute), and the task row is closed
+// there, once, after Wait() on a detached context with the numbers the CLI
+// presents - not by forwarding the loop's own finish, which would write the same
+// row twice with two different summary truncations.
+type taskLifecycleJournal struct {
+	store     *memory.Store
+	rowOpened atomic.Bool
+}
+
+// opened reports whether the parent row really landed. execute reads it after
+// bg.Wait() joined the task goroutine (the channel close is the barrier).
+func (j *taskLifecycleJournal) opened() bool { return j.rowOpened.Load() }
+
+// StartTaskLog opens the parent row. The loop passes the task root's context,
+// which a caller may already have cancelled (Ctrl-C before the first turn -
+// ticket 365's cancelled control). The write site this replaces ran after
+// Wait() on context.Background with a 5s bound and persisted the row anyway;
+// WithoutCancel keeps that promise from the earlier point, and the bound keeps a
+// hung store from holding the task's goroutine.
+func (j *taskLifecycleJournal) StartTaskLog(ctx context.Context, tl memory.TaskLog) error {
+	c, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+	defer cancel()
+	err := j.store.StartTaskLog(c, tl)
+	if err == nil {
+		j.rowOpened.Store(true)
+	}
+	return err
+}
+
+// FinishTaskLog is inert on purpose: see the type comment. Returning nil keeps
+// the loop's "task_log finish failed" warning out of a close this file owns.
+func (j *taskLifecycleJournal) FinishTaskLog(context.Context, string, string, string, int64, int64, int64, string) error {
+	return nil
+}
+
+// InsertToolCall / DecideToolCall / FinishToolCall are the bridge's job: a
+// second row per call would make tool_call a guess instead of a record. 0 is
+// the interface's own "no row booked" value (a nil Journal answers it too).
+func (j *taskLifecycleJournal) InsertToolCall(context.Context, memory.ToolCall) (int64, error) {
+	return 0, nil
+}
+
+func (j *taskLifecycleJournal) DecideToolCall(context.Context, int64, string, *int64) error {
+	return nil
+}
+
+func (j *taskLifecycleJournal) FinishToolCall(context.Context, int64, string, string) error {
+	return nil
+}
+
 // execute runs one task through the loop and presents the result.
 //
 // parent is the context the task derives from, and the three-way default is the
@@ -1114,7 +1171,10 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 		// The loop's own tool_call rows are deliberately NOT booked: the
 		// bridge already writes the authoritative one (assessed level, gate
 		// decision, outcome, correlation id). Two rows per call would make
-		// tool_call a guess instead of a record.
+		// tool_call a guess instead of a record. It is the ROOT loop below that
+		// gets the one journal half this file does hand over - the task row -
+		// and only for its StartTaskLog: see the taskLifecycleJournal
+		// assignment after rt.loopOpt.
 		Journal: nil,
 		// D47: only a task the TEXT loop registered may reach a gate, and the
 		// loop owns its task id, so registration travels through this hook.
@@ -1135,7 +1195,24 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// subagent is assembled by the SAME host wiring as its parent (same provider,
 	// same admission hook, same budgets) and not by a runtime invented here.
 	rt.loopOpt, rt.loopOptSet = opts, true
-	loop, err := agent.New(opts)
+	// Ticket 373 件一 (parent before child): the parent task_log row must exist
+	// before the first tool_call row can name it. The only point in this tree
+	// that knows the loop-minted task id before a tool can run is the loop's own
+	// journal start (internal/agent/loop.go:391, after admission and before the
+	// first model call), so the ROOT loop is handed that one half of the
+	// interface. This is the same write order the journal has always used for
+	// any loop that had a store; what this file used to do instead - open the row
+	// after bg.Wait() - booked every child before its parent (census 373-a1
+	// section 3, E1/E2). rt.loopOpt above keeps Journal nil on purpose: the
+	// child loops task.spawn derives must keep exactly the write set they have
+	// today, and this ticket's sweep is the root task's row.
+	loopOpts := opts
+	var rootRows *taskLifecycleJournal
+	if rt.store != nil {
+		rootRows = &taskLifecycleJournal{store: rt.store}
+		loopOpts.Journal = rootRows
+	}
+	loop, err := agent.New(loopOpts)
 	if err != nil {
 		fmt.Fprintf(rt.stderr, "wisp run: agent 环路装配失败：%v\n", err)
 		return 1
@@ -1240,8 +1317,25 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 			CostTokensIn: int64(res.Usage.InputTokens), CostTokensOut: int64(res.Usage.OutputTokens),
 			CostAmountMicro: res.CostMicros, Currency: res.Currency, ErrorClass: class,
 		}
-		if err := rt.store.StartTaskLog(c, tl); err != nil {
-			rt.auditf("wisp run: task_log open failed: %v", err)
+		// Ticket 373: when the loop's journal opened the row at the task's own
+		// start (the usual path), this site only CLOSES it - the numbers and the
+		// terminal state are still this composition root's, written once, on a
+		// context that survives the task's own cancellation.
+		//
+		// The fallback below covers the shapes that never reached that start:
+		// a control word returns before the loop opens a row
+		// (internal/agent/loop.go:349), and a start write that failed. Neither
+		// is a parent-first case being silently reordered: a control word
+		// dispatches no tool, so it has no child to orphan, and a failed start
+		// is exactly the E1 shape the ticket measured (child first, parent
+		// never) - writing the parent here, after the children, still heals it
+		// to foreign_key_check = 0 with foreign keys off, which is the same
+		// thing this file did for every task before this change.
+		opened := rootRows != nil && rootRows.opened()
+		if !opened {
+			if err := rt.store.StartTaskLog(c, tl); err != nil {
+				rt.auditf("wisp run: task_log open failed: %v", err)
+			}
 		}
 		summary := res.Text
 		if len(summary) > 400 {

@@ -84,7 +84,11 @@ func (c RetentionConfig) withDefaults() RetentionConfig {
 
 // RetentionResult is one pass's outcome, logged and returned for tests.
 type RetentionResult struct {
-	TaskLogDeleted  int64
+	TaskLogDeleted int64
+	// ToolCallDeleted counts every tool_call row this pass removed: those
+	// cascaded from an expiring parent and those that aged out on their own
+	// window (ticket 373 folded the two, because "what did the pass delete"
+	// is one question and the ticket's acceptance counts the rows).
 	ToolCallDeleted int64
 	CostDayDeleted  int64
 	GrantDeleted    int64
@@ -143,6 +147,19 @@ func (s *Store) runRetention(ctx context.Context, c RetentionConfig) (res Retent
 	err := s.write(ctx, func(ctx context.Context, tx *sql.Tx) error {
 		var err error
 		now := c.Now()
+		// Ticket 373: the parent window and the child window are independent
+		// statements, so a parent can age out while its child is still inside
+		// its own window (census 373-a1 section 2, P4: parent started 31 days
+		// ago, child 5 days ago -> the parent went, the child stayed an orphan
+		// for ever). Children of every expiring parent go FIRST - all of them,
+		// not only the ones that have themselves passed the window - and the
+		// parent delete follows. Child before parent is the order an enforced
+		// foreign key requires (census B1/B2); both statements share this
+		// pass's single transaction, so a failure leaves neither change.
+		res.ToolCallDeleted, err = deleteChildrenOfOlderParents(ctx, tx, "started_at", c.TaskLogTTL, now)
+		if err != nil {
+			return err
+		}
 		res.TaskLogDeleted, err = deleteOlderThan(ctx, tx, "task_log", "started_at", c.TaskLogTTL, now)
 		if err != nil {
 			return err
@@ -150,12 +167,16 @@ func (s *Store) runRetention(ctx context.Context, c RetentionConfig) (res Retent
 		// tool_call ages by the last timestamp the row actually carries:
 		// ended_at, falling back to started_at, then decided_at. Rows with a
 		// NULL ended_at (never finished) still age out via the fallback — no
-		// NULL combination may make a row immortal (adversarial MINOR-4).
-		res.ToolCallDeleted, err = deleteOlderThan(ctx, tx, "tool_call",
+		// NULL combination may make a row immortal (adversarial MINOR-4). What
+		// this statement still owns after the cascade above is the children
+		// whose parent is KEPT: an old child of a live parent is a forensic row
+		// past its window, and it goes by itself.
+		aged, err := deleteOlderThan(ctx, tx, "tool_call",
 			"COALESCE(ended_at, started_at, decided_at)", c.TaskLogTTL, now)
 		if err != nil {
 			return err
 		}
+		res.ToolCallDeleted += aged
 		res.CostDayDeleted, err = deleteCostOlderThan(ctx, tx, c.CostTTL, now)
 		if err != nil {
 			return err
@@ -195,6 +216,22 @@ func (s *Store) runRetention(ctx context.Context, c RetentionConfig) (res Retent
 func deleteOlderThan(ctx context.Context, tx *sql.Tx, table, tsExpr string, ttl time.Duration, now time.Time) (int64, error) {
 	cutoff := now.Add(-ttl).Unix()
 	q := fmt.Sprintf(`DELETE FROM %s WHERE %s IS NOT NULL AND %s < ?`, table, tsExpr, tsExpr)
+	res, err := tx.ExecContext(ctx, q, cutoff)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
+}
+
+// deleteChildrenOfOlderParents removes the tool_call rows whose task_log parent
+// the parent delete is about to remove, using the same column and the same
+// cutoff. It is a second statement rather than ON DELETE CASCADE because this
+// store's connections never enable foreign keys (open.go's dsnPragmas), which
+// makes a CASCADE clause a dead term; task_log.started_at is NOT NULL by DDL,
+// so "started_at < cutoff" names exactly the parents deleteOlderThan removes.
+func deleteChildrenOfOlderParents(ctx context.Context, tx *sql.Tx, tsExpr string, ttl time.Duration, now time.Time) (int64, error) {
+	cutoff := now.Add(-ttl).Unix()
+	q := fmt.Sprintf(`DELETE FROM tool_call WHERE task_id IN (SELECT id FROM task_log WHERE %s < ?)`, tsExpr)
 	res, err := tx.ExecContext(ctx, q, cutoff)
 	if err != nil {
 		return 0, err

@@ -104,23 +104,43 @@ func t366SeedV3(t *testing.T) (string, *Store) {
 	return dir, s
 }
 
-// t366OrphanFixture builds a v3 database carrying orphan tool_call rows through
-// the production path that reaches them, and returns the directory with the store
-// closed - ready for the migration under test.
+// t366RawParentDelete removes task_log rows the way a pre-373 build did: the
+// parent only, no cascade. Ticket 373 made the production DAO delete the
+// children with the parent (dao_tasklog.go), so an upgraded install's orphans
+// can no longer be produced through today's entry points - and the database the
+// migration actually meets was written by the old build. This statement
+// reproduces that state column for column; it is a seeder, not a second product
+// path, and nothing in the product calls it.
+func t366RawParentDelete(t *testing.T, dir, where string) {
+	t.Helper()
+	db, err := sql.Open(DriverName, dsn(filepath.Join(dir, dbFileName), false))
+	if err != nil {
+		t.Fatalf("raw parent delete: open: %v", err)
+	}
+	defer db.Close()
+	if _, err := db.ExecContext(context.Background(), `DELETE FROM task_log `+where); err != nil {
+		t.Fatalf("raw parent delete %s: %v", where, err)
+	}
+}
+
+// t366OrphanFixture builds a v3 database carrying orphan tool_call rows and
+// returns the directory with the store closed - ready for the migration under
+// test. Re-seeded by ticket 373: "purge-tasklogs", "delete-tasklog" and
+// "retention" used to reach their shape through the production paths, which no
+// longer leave a child behind (that is the fix). The shapes themselves are
+// unchanged - the same databases an older build leaves on disk - so the
+// migration's 3/2/1/1 readings still measure the same thing; what moved is only
+// the hand that writes the legacy state (same move ticket 368 made for the
+// three-NULL row).
 func t366OrphanFixture(t *testing.T, path string) string {
 	t.Helper()
 	dir, s := t366SeedV3(t)
 	ctx := context.Background()
 	switch path {
-	case "purge-tasklogs": // privacy one-click clear: parents go, children stay
-		n, err := s.PurgeTaskLogs(ctx)
-		if err != nil || n != 2 {
-			t.Fatalf("purge: rows=%d err=%v, want 2 and nil", n, err)
-		}
-	case "delete-tasklog": // one task removed, its children stay
-		if err := s.DeleteTaskLog(ctx, "task-A"); err != nil {
-			t.Fatalf("delete task-A: %v", err)
-		}
+	case "purge-tasklogs": // pre-373 one-click clear: parents went, children stayed
+		t366RawParentDelete(t, dir, ``)
+	case "delete-tasklog": // pre-373 single delete: task-A went, its children stayed
+		t366RawParentDelete(t, dir, `WHERE id='task-A'`)
 	case "manual-insert": // a writer that bypasses the DAO
 		db, err := sql.Open(DriverName, dsn(filepath.Join(dir, dbFileName), false))
 		if err != nil {
@@ -137,17 +157,16 @@ func t366OrphanFixture(t *testing.T, path string) string {
 			t.Fatalf("manual insert: %v", ierr)
 		}
 	case "retention": // a NULL-timestamp child outlives its parent (pre-368 writer)
-		now := time.Now()
-		old := now.Add(-31 * 24 * time.Hour).Unix()
-		if err := s.StartTaskLog(ctx, TaskLog{ID: "task-old", StartedAt: old, State: "done", QueryText: "q-old"}); err != nil {
-			t.Fatalf("retention: seed task-old: %v", err)
-		}
-		// Since ticket 368 the DAO stamps started_at on every pending row, so
-		// the three-NULL shape can no longer leave this package's writers. It is
-		// still what a database upgraded from an earlier build holds, and the
-		// migration must still record it - so the child is written by hand, as
-		// the pre-368 statement wrote it, column for column. Same fixture, same
-		// expected counts; only the writer that produces the legacy row moved.
+		// Since ticket 368 the DAO stamps started_at on every pending row, so the
+		// three-NULL shape can no longer leave this package's writers; since
+		// ticket 373 the retention pass deletes every child of an expiring
+		// parent, so the parent-taken/child-left shape cannot leave it either.
+		// Both are still what a database upgraded from an earlier build holds,
+		// and the migration must still record them - so the survivor is written
+		// by hand, as the pre-368 statement wrote it, column for column, with its
+		// parent already absent (which is the state the old pass produced). Same
+		// fixture, same expected counts; only the writer that produces the
+		// legacy row moved.
 		legacy, err := sql.Open(DriverName, dsn(filepath.Join(dir, dbFileName), false))
 		if err != nil {
 			t.Fatalf("retention: open for the legacy child: %v", err)
@@ -159,19 +178,6 @@ func t366OrphanFixture(t *testing.T, path string) string {
 		legacy.Close()
 		if lerr != nil {
 			t.Fatalf("retention: seed the legacy NULL-timestamp child: %v", lerr)
-		}
-		oldTS := old
-		if _, err := s.InsertToolCall(ctx, ToolCall{
-			TaskID: "task-old", Seq: 2, Tool: "read_file",
-			ArgsJSON: `{}`, RiskLevel: RiskL0, CorrelationID: "c-old-ts",
-			StartedAt: &oldTS, EndedAt: &oldTS,
-		}); err != nil {
-			t.Fatalf("retention: seed the old-timestamp child: %v", err)
-		}
-		res := s.RunRetentionOnce(ctx, RetentionConfig{Now: func() time.Time { return now }})
-		if res.TaskLogDeleted != 1 || res.ToolCallDeleted != 1 {
-			t.Fatalf("retention: deleted task_log=%d tool_call=%d, want 1 and 1",
-				res.TaskLogDeleted, res.ToolCallDeleted)
 		}
 	default:
 		t.Fatalf("unknown orphan path %q", path)
