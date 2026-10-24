@@ -105,7 +105,7 @@ panel: 确认腿未接入，档位不得变宽: 请求 "probe-depth1" 要把档�
 | **m6** | `panel_inbound.go:236` 的 CLI 调用改成塞一枚非 nil 腿 | **1** | CLI 管那枚 | `:160 …must be refused with ErrNoL2Confirm; got <nil>` ／ `:163 the pipe widened the档 to "ask_high_risk" with no card anywhere` |
 
 ★**三读数**：基线绿 **5/5** ／ 变异红（上表逐名）／ ★**还原绿**（仓外树 `mut/m4-restored.txt`：`go test -run TestTicket114r2` ⇒ **5/5 PASS, rc=0**）。
-★**还原核（时机＝最后一发变异 m4 之后量）**：`sha256sum` 六件 ＝ `e8f8ce64…`(panel_inbound.go) `da77ac93…`(run.go) `0b092eb1…`(resident_approval_windows.go) `2e0a541d…`(resident_windows.go) `b08ad82c…`(panel_resident_windows.go) `c622eb5d…`(新用例)；仓外树还原件与 pristine 逐字同值 `2e0a541d…`；`git status --porcelain -- cmd/wisp` ＝ **0 行**。
+★**还原核（时机＝★全部六发变异之后量；m1–m3/m5/m6 走 `-overlay`、m4 走仓外树，两者都不写工作树；本行数值在 m6 之后又逐件复量一次、逐值同）**：`sha256sum` 六件 ＝ `e8f8ce64…`(panel_inbound.go) `da77ac93…`(run.go) `0b092eb1…`(resident_approval_windows.go) `2e0a541d…`(resident_windows.go) `b08ad82c…`(panel_resident_windows.go) `c622eb5d…`(新用例)；仓外树还原件与 pristine 逐字同值 `2e0a541d…`；`git status --porcelain -- cmd/wisp` ＝ **0 行**。
 
 ## §9 四数
 
