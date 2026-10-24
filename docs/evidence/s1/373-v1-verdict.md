@@ -82,6 +82,7 @@
 | M4 | `loopOpts.Journal = rootRows` | **只 E1 红**：`max_fkc=1`、`child_without_parent=1`（审计 `child`@`05:16:30.010`→`parent`@`.023`） |
 
 - ★**还原核（时机＝最后一发变异 M4 @13:16:30 之后）**：`sha256sum` vs `git show HEAD:<f>` ⇒ **4/5 SAME**（`dao_tasklog.go 9a22f389…`／`retention.go a771c0f9…`／`migration_fkcheck_366_test.go 86e19845…`／`cascade_373_test.go 4f28956b…`）；★**`run.go` 判 DIFF，原因见件头：别人（376）的 `5+/1-` 未提交改**，`git diff HEAD -- cmd/wisp/run.go` **只有那一个 hunk**，373 的 hunk 逐字未动。`git status --porcelain -- internal/memory` ＝**空**；`go test ./internal/memory` **rc=0（78/0/2）**；E1 probe **PASS**（`max_fkc=0`）。
+- ★**13:3x 收口复核（376-r1 以 `ceef4d069` 落库之后）**：`cmd/wisp/run.go` 现 `git status` **空**、与 HEAD `sha256` **SAME（`565ff346…`）**、373 的三处 hunk（`taskLifecycleJournal`／`loopOpts.Journal = rootRows`／`rootRows.opened()`）**仍在** ⇒ **还原核 5/5 逐位相同成立**（HEAD 的 `run.go` 另含 376 那一笔，与本笔无关）。
 
 ## §9 ★★三条上报：该不该在本票做
 
