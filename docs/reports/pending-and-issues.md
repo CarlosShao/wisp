@@ -25883,3 +25883,21 @@ fmt.Fprintf(u.out, "  窗口 %.1fs\n", shownWindow.Seconds())
 
 **⑪ ★状态**＝结案 **43 票**（`-done` **186** 枚）、**真待推进 178**、**完成度 186/364 ＝ 51.1%**、
 在飞 **2**（`375-r1`／`376-v1`）、未推 **227**（攒着）、⛔ 清理、★**摆机主 0 件**。
+
+## A1236（2026-10-24 14:0x +08，编排者）★`376-v1` **中途失败、没留任何残留**（★无件、无提交）⇒ **重派**｜★核 `375-r1` 在飞（★它新建了 `internal/agent/approval/reach.go`）
+
+**① ★`376-v1` 失败（干净失败）**
+- ★**盘上核过**：★`ls docs/evidence/s1/376-v1*` ⇒ **无**；★`git ls-tree HEAD | grep 376-v1` ⇒ **无**；★**`git log` 里也没有它的提交**
+  ⇒ ★★**所以是**干净失败**、无需清理**（★**这是"失败"与"半成品"的区别**：★**它一个字都没落**）。
+- ★**重派 `376-v1`**（★**同号、派单压缩到七项必判**）⇒ ★**并写死了新的写面冲突警告**：
+  ★★**`375-r1` 正在写 `cmd/wisp/{run.go,resident_approval_windows.go,resident_task_source_windows.go}` ＋ `internal/agent/approval/{gate.go,reach.go,reach_375_test.go}`**
+  ⇒ ★**它的读数**必须**走 `HEAD` blob**（★**本会话第 6 次用这个做法**）。
+
+**② ★★核 `375-r1` 在飞（它干得对）**
+- ★**工作树里**：★`M cmd/wisp/resident_approval_windows.go`／`resident_task_source_windows.go`／`run.go`／`internal/agent/approval/gate.go`
+  ★★**新件**：★**`internal/agent/approval/reach.go`** ＋ `reach_375_test.go`
+- ⇒ ★★★**它新建了 `reach.go`** —— ★**这正是"可问性"（reachability）那个抽象** ⇒ ★**符合我拍的〔乙〕动作层**（★**"能不能问到人"要有一个独立的判据**）。
+  ★★**而且它落在 `internal/agent/approval`**（★**我允许的包**）⇒ **⛔ 越界**。
+
+**③ ★状态**＝结案 **43 票**（`-done` **186** 枚）、**真待推进 178**、**完成度 186/364 ＝ 51.1%**、
+在飞 **2**（`375-r1`／`376-v1` 重派）、未推 **226**（攒着）、⛔ 清理、★**摆机主 0 件**。
