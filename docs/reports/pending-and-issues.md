@@ -26074,3 +26074,67 @@ fmt.Fprintf(u.out, "  窗口 %.1fs\n", shownWindow.Seconds())
 
 **⑬ ★状态**＝结案 **45 票**（`-done` **188** 枚）、**真待推进 176**、**完成度 188/364 ＝ 51.6%**、
 在飞 **1**（`377-r1`）、未推 **236**（攒着）、⛔ 清理、★**摆机主 0 件**。
+
+## A1240（2026-10-24 17:4x +08，编排者）★★★收 `377-r1`：**`AC#2` 读数逐字给了整行**（★`mode=ask_every_step`、**既非原值也非切档后值**）｜★★★**它核了"追加位置"**（行内字段有连续子串读者）｜★★它报了一条"宽一格"的边界、**只报不改**｜★派 `377-v1`（最后一张票的终裁）
+
+**① ★★收 `377-r1`（`5cac443a5`、**6 文件、`+617/−17`**；件 **122 行**；基线 `5eddc62`）**
+
+**② ★★落点（〔丁〕、四个）**
+1. ★**`internal/tools/bridge.go:1201`**：`tools: call` 行尾加 ` mode=%s`（实参 `dec.Mode`）
+   ★★★**追加在 `reason=` 之后** —— ★**理由**：★**"行内字段有**连续子串读者**"**（★`ticket363_test.go:258` 的 `risk=L0 decision=allow outcome=success`、★`fs_edit_ac5_gate_r4_test.go:206`）
+   ⇒ ★**中段插入会破不该被本票碰的断言** ⇒ ★★**这是"追加位置也要核读者"的细心**（★**⛔ 随便插**）
+2. ★★**`bridge.go:286/297/327`**：★**有效档提到 `Execute` 顶部读一次**、未知工具分支带 `Mode`、`checkCaps` 后 `dec.Mode = mode`；★**删掉原第二次 `permissionMode()` 读**
+   ⇒ ★**行上的 `mode=` **就是** `mode.Screen` 用过的那个值**（**一次读、全链一致**）
+   ★★**并顺带补上"能力/坏参数被拒那两发原本无可记档"的洞**
+3. ★**`cmd/wisp/approval_always.go:168`**：`permissionMode()` 改读 `rt.modes.PermissionMode()`（**有效档**）、`rt.modes == nil` 回 `DefaultMode()`；★**两枚卡**（`runWidening:122`／`confirmLockedLoosening:294`）随之
+4. ★**`cmd/wisp/config_reload.go:278`**：★**仅注释**
+
+**③ ★★★`AC#2` 读数（它逐字给了整行）**
+```
+tools: call kind=success task=task-377 corr=corr-377 tool=fs.write risk=L1 decision=allow outcome=success rules_hit=[R1] in_allowlist_scope=true grant_id=0 refusal=none reason="R1: 工具声明为下界（L1）" mode=ask_every_step
+```
+- ★★**既非文件原值 `auto_approve`、也非切档后 `ask_high_risk`**
+- ★★★**它说"用例把这两个错答案**逐名断言为红**"** ⇒ ★**这不是"字段存在"、不是只测 `Decision.Mode`** ✓（★**这正是我派单写的验收判据**）
+
+**④ ★★两发对照（★它把"存在性同向"钉住了）**
+- ★`confirm=nil` ⇒ `Decision.Mode=ask_every_step`／`mode=ask_every_step`／**1 个 L1 窗**
+- ★`confirm=leg` ⇒ `auto_approve`／`mode=auto_approve`／**0 窗**＋`MODE-SILENCE mode=auto_approve assessed=L1 effective=L0`
+- ★★**它说用例把 `mode=` 与 `MODE-SILENCE` 的**存在性同向**钉住** ⇒ **⛔ 只钉其中一个**
+
+**⑤ ★★改前/改后 ＋ 正控**
+- ★**改前该行行尾**没有** `mode`**（`-overlay` 换回 `HEAD`、**逐字**）
+- ★★**正控（真 `wisp run` seam、有腿、`config=auto_approve`）**：★`mode=auto_approve` ⇒ ★**没被改成"一律 `ask_every_step`"**
+
+**⑥ ★★反向判据三发（★M0 是"换回 HEAD"、这比"摘跳"更硬）**
+- ★`M1` 摘掉新加那一跳 ⇒ `internal/tools` **三枚逐名红**（行尾回到"没有 `mode`"）
+- ★`M2` 让 `PermissionMode()` 回配置档 ⇒ 两发对照印 `mode=auto_approve`＋`windows=0`（**逐名红**）
+- ★★**`M0` 换回 `HEAD` ⇒ `cmd/wisp` 用例红**（`the widening card would book auto_approve…`）
+- ★**还原绿 `rc=0`**；★★**还原核：最后一发变异后 `17:31:35` 量、全部跑完 `17:37:15` **复量**** ⇒ **两次**、五枚 `sha256` 与 `git diff --numstat`（`26/6`、`5/2`、`37/9`）**逐字相同**
+
+**⑦ ★★四数（改后／改前、⛔ 不相减）**：★`internal/tools` `0/21.326s` vs `0/20.492s`；★`approval` `0/0.727s` vs `0/0.678s`；★`perm`（**未改、旁证**）`0/0.571s` vs `0/0.544s`；★`cmd/wisp` 定向 `0/207.246s` vs `0/192.763s`
+- ★**门禁**：★`build 0`／`vet 0`／`d22scan rc=0 clean`（**292 枚生产 `.go`**）／★**格式甲 `gofumpt -l` 空、乙 `gofmt -l` 空**／★**EOL `0x0D`=0**
+
+**⑧ ★★新增用例**：★`internal/tools/booked_mode_377_test.go`（**3 名**）＋ `cmd/wisp/permission_mode_effective_377_test.go`（**1 红 ＋ 2 枚正控/fail-closed、改前亦绿、刻意**）
+⇒ ★**"改前亦绿"的两枚是**刻意的正控**** ⇒ **已要 `377-v1` 判"⛔ 当没牙"**。
+
+**⑨ ★★★硬边界自检（全过）**
+- ★`internal/perm/**` **零字节**（`Set` 的 `from/to`、`store.go:158` **未动**；`m1`/`m2` **只在核心结论面复跑、不落地**）
+- ★`R20/M4` **未动**；★`internal/{winsec,memory,panel}/**` **空**
+- ★★**`cmd/wisp/run.go`（含 `consoleApprovalUI.Prompt`）、`internal/agent/approval/reach.go`、`gate.go` **零改动****
+
+**⑩ ★★★它报的一条边界（**本笔不改、只报**）**
+- ★★**`wisp run` 给桥的是 `approval.UnsilencedMode(rt.modes, answer, …)`**（`run.go:864`）、★**而 `permissionMode()` 读的是**裸 `store`** 的 372 有效面**
+  ⇒ ★**所以"无人可答的 console 跑"里，卡上的 `Mode` 会比桥上实际筛的**宽一格****（★**375 的谓词面**；★**375 已用 `MODE-UNANSWERABLE configured=… effective=…` 落行、信息不丢**）
+  ⇒ ★**要收这条需把 `answer` 引进 runtime 或让卡也用包装源** ⇒ ★**它判"属 375 的射程、不在〔丁〕裁形内"** ⇒ **已要 `377-v1` 判它判得对不对**
+
+**⑪ ★★★它报的导出树坑（很有用）**
+- ★**导出树首次跑 `internal/tools` 红 9 枚**（**8 枚 252 短名前提 ＋ 1 枚 309 走 `../../scripts`**）
+  ⇒ ★**全是导出树缺件/路径形状**、★**补齐后 `rc=0`** ⇒ ★**⛔ 别拿那 9 枚当 `HEAD` 缺陷**
+  ⇒ ★★**这是"假红"的第 N 种来源**（★**导出树 ≠ 仓**）⇒ **已写进 `377-v1` 的派单**。
+
+**⑫ ★派 `377-v1`（最后一张票的终裁）**
+- ★**必判十一项**，其中三发要它自己造：★**`AC#2` 那一行**／★**那两枚"错答案"用例（⛔ 只看"能读出正确值"）**／★**正控**
+- ★★**并要它判**：★**"一次读、全链一致"对不对**（★**含"两次读真的可能不一致吗"**）／★**追加位置那条理由**（★**自己 `grep` 那两个测试**）／★**`m1`/`m2` 有没有落地**／★**"宽一格"那条边界该不该在本票做**
+
+**⑬ ★状态**＝结案 **45 票**（`-done` **188** 枚）、**真待推进 176**、**完成度 188/364 ＝ 51.6%**、
+在飞 **1**（`377-v1`）、未推 **238**（攒着）、⛔ 清理、★**摆机主 0 件**。
