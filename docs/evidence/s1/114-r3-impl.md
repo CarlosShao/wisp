@@ -1,6 +1,6 @@
 # 114-r3 写腿交件 —— 过期措辞收口（只四处，⛔ 零行为变更）
 
-**身份**：写腿（实现者）。**起手锚**：`03179ea65`；**收手时 HEAD**＝`11ede6ef5`（窗口内他腿推进，只落 `docs/evidence/s1/m4-survey.md`，与本笔零交集）。
+**身份**：写腿（实现者）。**起手锚**：`03179ea65`；**本笔 commit**：`e66c8eb65`（父 `26132d82e`）。窗口内他腿推进两笔（`11ede6ef5` 调研件／`26132d82e` 台账＋票 372），`git diff --stat 03179ea65..e66c8eb65 -- '*.go'` ⇒ **只有本笔那 1 个文件 6/6**，故四数不需复跑。
 **判据**：四处全是注释／票面文字 ⇒ `go test` 四数必须与改前**逐数相同**（§5）。**写面（只有三处）**：`internal/panel/composer_handlers.go`（只那两处）＋`.scratch/wisp/issues/114-…-must-be-native.md`（只追加一节）＋本件。
 
 ## §0 起手核（⛔ 跳步）
@@ -133,7 +133,7 @@ go test -count=1 -run "TestTicket114r2" ./cmd/wisp/` ⇒ **rc=0**、`ok … 9.58
 | vet | `go vet ./internal/panel/` | **0** | 空 |
 | gofumpt | `/d/work/base/gopath/bin/gofumpt.exe -l internal/panel/composer_handlers.go` | **0** | **0 行**（绝对路径；⛔ 拿 `gofumpt -l` 判 HEAD 是不是 CRLF） |
 | d22scan | `sh scripts/d22scan.sh` | **0** | `clean - no D22 ban violations`；scope：`ban #8 internal/=639`（含注释与 `_test.go`）／`cmd/=150`／`design/=39`／`frontend/=116`；`bans #1-5 internal/=249`／`cmd/=42`；`ban #6 frontend/=116`；`ban #7 tools/=25` |
-| 长度门 | `sh scripts/check-path-length-budget.sh --with-self-test` | **0** | `VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree`；pre-stage `tracked=17680  over-budget=61  rostered=61  not in roster=0`；**staged 后**（本件入册）`tracked=17681`，over-budget 仍 61／全 rostered |
+| 长度门 | `sh scripts/check-path-length-budget.sh --with-self-test` | **0** | `VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree`；pre-stage `tracked=17680  over-budget=61  rostered=61  not in roster=0`；**staged 后** `tracked=17681`；**收手再跑** `tracked=17682`，over-budget 仍 61／全 rostered |
 
 ★本笔在 `.go` 里**零新增符号**：没有 `★`／`⛔`／`⇒`／带圈数字进 `.go`（改后注释全 ASCII；字符串只换 4 个字）——d22scan `ban #8` rc=0 即仪器读数。
 
