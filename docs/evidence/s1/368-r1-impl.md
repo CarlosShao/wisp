@@ -30,7 +30,7 @@
 | 两者都 `""` | 尚未决定、尚未结束 ⇒ **插入就是开始**（`startCall` 的行） | `started_at = now` |
 | 两者都 `""` 但调用方已给 `ended_at` | 事后补记的行：插入时刻会**晚于**它自己的结束 | **⛔ 不写**（宁可 NULL 也不自相矛盾） |
 
-★**`startCall` 那发"该不该变"＝该变**：它插入时 DECISION/OUTCOME 都还没有 ⇒ 插入时刻就是它**唯一真拥有**的瞬间；不写它，`COALESCE` 仍读到 NULL ⇒ 这类行照样永生，`retention.go:150-153` 注释承诺的 "no NULL combination may make a row immortal" 就**仍是假话**。★**`book` 那发"不该有 `started_at"`**：`Bridge` 只看到裁决与结局（调用可能几分钟前就开始了），给它编一个开始时刻就是让列说谎 ⇒ 它 `started_at` 保持 NULL（本件 §4 读数）。
+★**`startCall` 那发"该不该变"＝该变**：它插入时 DECISION/OUTCOME 都还没有 ⇒ 插入时刻就是它**唯一真拥有**的瞬间；不写它，`COALESCE` 仍读到 NULL ⇒ 这类行照样永生，`retention.go:150-153` 注释承诺的 "no NULL combination may make a row immortal" 就**仍是假话**。★**`book` 那发"不该有 `started_at`"**：`Bridge` 只看到裁决与结局（调用可能几分钟前就开始了），给它编一个开始时刻就是让列说谎 ⇒ 它 `started_at` 保持 NULL（本件 §4 读数）。
 ★规则本身**不允许**任何插入形状三列全 NULL：pending 拿到 `started_at`、decided 拿到 `decided_at`、finished 拿到 `ended_at`、事后补记的行自带 `ended_at`。
 
 ## §3 改了什么（逐行）
@@ -40,8 +40,8 @@
 | `internal/memory/dao_toolcall.go` | `:16-17` | `InsertToolCall` 的 doc 一句改为"并填上行自己证明已经发生过的时间戳" |
 | 同上 | **`:22`** | 新增一跳 `stampToolCallInsert(&tc, observe.NowWallUTC().Unix())`（★**反向判据就是摘掉这一行**） |
 | 同上 | `:46-82` | 规则的长注释：为什么在 DAO、覆盖哪两个写者、三列各按什么状态填、调用方给的值永不覆盖 |
-| 同上 | `:83-101` | `func stampToolCallInsert(tc *ToolCall, now int64)`（上表四行判据，共 17 行） |
-| 同上 | `:103` | `func unixPtr(v int64) *int64`（可空时间戳装箱，2 行） |
+| 同上 | `:83-100` | `func stampToolCallInsert(tc *ToolCall, now int64)`（上表四行判据，**18 行**） |
+| 同上 | `:102-103` | `func unixPtr(v int64) *int64`（可空时间戳装箱，**2 行**） |
 | `internal/memory/migration_fkcheck_366_test.go` | `:139`、`:151-161` | ★**披露**：票 366 的 "retention" 夹具原来靠 `InsertToolCall` 造成"三列全 NULL 的子行"；现在 DAO **再也造不出这种行**，故改成**手写 pre-368 那条 INSERT**（同一列、同一字节形状），**断言与期望数一个没动**（`task_log_deleted=1`／`toolcall_deleted=1`、孤儿 1、子行 4）——该形状对**从旧版本升上来的库**仍然真实，迁移审计必须继续看得见它 |
 | `internal/memory/dao_toolcall_368_test.go` | 新件 **321 行** | 7 枚用例（§8 逐名） |
 
@@ -51,7 +51,7 @@
 
 夹具：父 `task_log` 在"现在"，探针把 retention 的 `Now` 钉到 **+31 天** ⇒ 子行"现在插入"即被判 31 天老。
 
-| 读数 | 改前（HEAD `5b4e0e0…` 之前＝`75c2395c3` 的 blob） | **改后** |
+| 读数 | 改前（`tree-before`＝`75c2395c3` 的 blob，本腿未改它） | **改后** |
 |---|---|---|
 | 行三列（`decision=allow outcome=success` 不变） | `decided_at=<NULL> started_at=<NULL> ended_at=<NULL>` | ★**`decided_at=1792812005`／`started_at=<NULL>`／`ended_at=1792812005`** |
 | retention #1 | `tasklog_deleted=1`／**`toolcall_deleted=0`**、`fkc` **0→1** | ★**`1`／`1`**、`tool_call=0`、**`fkc=0`** |
@@ -67,7 +67,7 @@
 | 行三列 | `decided_at=<NULL> started_at=<NULL> ended_at=<NULL>` | ★**`decided_at=<NULL>`／`started_at=1792812005`／`ended_at=<NULL>`**（**不是**三列全 NULL 了，★只多这一列） |
 | retention #1／#2 | `1/0`、`fkc 1` ／ `0/0`、`fkc 仍 1` | ★**`1/1`、`fkc=0`** ／ `0/0`、`fkc=0` |
 
-★**该变，且只该变 `started_at`**（理由见 §2 末）：`decision`／`outcome` 仍 pending ⇒ 给它们时间戳就是假账；★loop 正常收尾时 `decide`／`finish` 后写的时间戳 **≥ 插入时刻** ⇒ 行内顺序 `started_at ≤ decided_at ≤ ended_at` 成立（用例 §8-⑤ 钉住）。
+★**该变，且只该变 `started_at`**（理由见 §2 末）：`decision`／`outcome` 仍 pending ⇒ 给它们时间戳就是假账；★loop 正常收尾时 `decide`／`finish` 后写的时间戳 **≥ 插入时刻** ⇒ 行内顺序 `started_at ≤ decided_at ≤ ended_at` 成立（用例 §7-⑤ 钉住）。
 
 ## §6 正控：**已有值的行不被覆盖** ＋ 「正常老化仍工作」
 
@@ -77,7 +77,7 @@
 | **P4 正常老化**（只给老 `ended_at`，无 decision/outcome，父 31 天） | `started_at=<NULL>`；retention **`1/1`**、`fkc 0` | ★`started_at=<NULL>`（§2 末行判据：已给 `ended_at` ⇒ 不编开始）；retention **`1/1`**、`fkc 0` |
 | **P2 loop 全生命周期**（insert → decide → finish） | `started_at=<NULL>`、`decided=ended`；retention `1/1` | 三列**都有值**（同一秒）；retention `1/1`、`fkc 0` |
 
-⇒ ★**尺没坏**：三列原本有值的行照旧与父同清（§5 普查正控复现）、且**兜底 ⛔ 覆盖**它们；`fkc` 在所有"该清"的夹具上归 **0**。
+⇒ ★**尺没坏**：三列原本有值的行照旧与父同清（普查 §5 的正控在本件 P3 复现）、且**兜底 ⛔ 覆盖**它们；`fkc` 在所有"该清"的夹具上归 **0**。
 
 ## §7 新用例逐名 ＋「为什么今天响」（`internal/memory/dao_toolcall_368_test.go`）
 
