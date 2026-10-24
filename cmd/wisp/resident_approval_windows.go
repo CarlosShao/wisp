@@ -61,6 +61,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/agent/approval"
 	"github.com/CarlosShao/wisp/internal/ball"
 	"github.com/CarlosShao/wisp/internal/config"
+	"github.com/CarlosShao/wisp/internal/perm"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/session"
 	"github.com/CarlosShao/wisp/internal/statemachine"
@@ -86,6 +87,30 @@ const residentCardTool = "resident.confirmation"
 // reached" and fails closed, so a resident leg whose ball never came up refuses
 // every confirmation instead of asking a question nobody can see.
 var errResidentNoBall = errors.New("常驻进程没有悬浮球窗口，卡片无处呈现")
+
+// confirmModeSwitch is this process's R20/M4 L2 leg for the PANEL's mode chain
+// (ticket 114 AC#3, R-92-2's other half). It is not a second card body: it is the
+// same confirmModeSwitchVia the run seam uses (cmd/wisp/run.go), handed THIS
+// process's gate - the one built above with ballCardUI, which is what makes the
+// card appear on the orb and, for an L1 window, borrow the cancel key.
+//
+// WHY THE PANEL CHAIN NEEDS IT AT ALL. Without a leg, ModeWriteHandler refuses
+// every widening request before Store.Set is reached (composer_handlers.go:131),
+// so the page could never ask for a looser档 even with a human sitting in front of
+// the orb. With it, the handler steps aside and R20/M4 decides: only the switch
+// INTO auto_approve raises a card, exactly one, through this gate. Nothing here
+// widens M4's reach.
+//
+// WHY IT IS THE RESIDENT GATE AND NOT run.go's rt.modeWrites: the panel host is
+// built at boot (resident_windows.go:214), and the task pipeline that owns
+// rt.modeWrites is assembled later - and not at all in the no-console launch shape
+// (startResidentTaskSource's early return), which is the shape the user actually
+// launches. This gate exists from boot in every shape, so the leg does too. The
+// adapter is the same panelModeConfirm the run seam uses, so the sentences cannot
+// drift.
+func (ra *residentApproval) confirmModeSwitch(ctx context.Context, sw perm.Switch) error {
+	return confirmModeSwitchVia(ra.gate, ctx, sw)
+}
 
 // residentApproval is this process's approval gate: the handle the assembly root
 // builds and injects into the ball host, plus the task root the D38(e) cancel

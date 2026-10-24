@@ -211,7 +211,17 @@ func runResident() {
 	// path scope; a boot whose panel did not come up passes nil, and the task
 	// source then binds nothing (its switches are refused by name rather than
 	// narrowing a scope no panel can reach).
-	rp, panelScope, rpErr := newResidentPanelManager(rt.Layout.DataDir)
+	//
+	// Ticket 114 AC#3 (R-92-2's other half): the panel's mode chain is handed the
+	// L2 leg HERE, and the leg is this process's own approval gate. Until this line
+	// the chain assembled its own handler with Confirm nil, so a widening request
+	// from the page was refused before Store.Set - the gate held, but R20/M4's card
+	// had no way to be raised from the panel at all. The gate above (ra) is built
+	// unconditionally at boot, so the leg exists in the no-console launch shape too;
+	// rt.modeWrites is assembled later, by the task source, and not at all without a
+	// console. panelModeConfirm is the same adapter run.go uses, and both close over
+	// confirmModeSwitchVia, so there is one card body and one sentence.
+	rp, panelScope, rpErr := newResidentPanelManager(rt.Layout.DataDir, panelModeConfirm(ra.confirmModeSwitch))
 	// Ticket 319 AC#1: the assembly root's handle on the panel thread is a HOLDER
 	// now, not the thread itself. The one thing that changes in a visible way:
 	// after the thread has ended (any way at all - the owner's X, a system

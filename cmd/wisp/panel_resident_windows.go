@@ -212,6 +212,11 @@ func panelGeometrySource(dataDir string) func() (width, height int) {
 // newResidentComposerDispatch builds the resident panel's chain and attaches
 // ticket 186's workspace socket to a holder this function also returns.
 //
+// confirm is ticket 114 AC#3's L2 leg, and it is threaded through rather than
+// built here: the surface that shows the card is the orb, which belongs to the
+// assembly root (resident_windows.go), and a chain that assembled its own leg
+// would be the second card body this repository keeps refusing to open.
+//
 // WHY A HOLDER AND NOT THE SCOPE ITSELF. The scope this panel must narrow is the
 // TASK PIPELINE's tools.PathCanonicalizer, and that object does not exist yet at
 // panel-host bring-up: the pipeline is assembled later, by the task source
@@ -220,12 +225,12 @@ func panelGeometrySource(dataDir string) func() (width, height int) {
 // write that would race the page's own dispatch goroutine. Until the task source
 // binds it, the handler refuses by name - this process has no tree to switch to
 // yet, and saying so beats narrowing a scope nothing else uses.
-func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc) (*panel.ComposerDispatch, *panel.WorkspaceScopeHolder, error) {
+func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm panel.ModeConfirm) (*panel.ComposerDispatch, *panel.WorkspaceScopeHolder, error) {
 	// Said once per start, same posture the CLI seam takes: name the tier that was
 	// not taken rather than leave the operator to infer it.
 	auditf("%s", residentPanelHotReloadNote)
 	scope := panel.NewWorkspaceScopeHolder()
-	disp, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope)
+	disp, err := newComposerDispatchChain(dataDir, auditf, residentPanelActor, scope, confirm)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -235,10 +240,19 @@ func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc) (*panel
 // newResidentPanelManager is the assembly the resident leg uses. The chain is the
 // production one (the same five constructors cmd/wisp/panel_inbound.go assembles
 // for the CLI seam and run.go:648 builds for the run seam): config Manager ->
-// perm.Store -> panel.ModeWriteHandler -> panel.ComposerDispatch. Confirm stays
-// nil on purpose: this leg has no card of its own, so a widening request is
-// refused before Store.Set is ever reached, and the panel side never produces an
-// "allow" (internal/agent/approval/ui.go: PanelAPI has no Allow method).
+// perm.Store -> panel.ModeWriteHandler -> panel.ComposerDispatch.
+//
+// CONFIRM USED TO BE NIL HERE ON PURPOSE, AND THAT POSTURE IS NOW THE WRONG ONE
+// (ticket 114 AC#3). The old note read "this leg has no card of its own, so a
+// widening request is refused before Store.Set is ever reached" - true of this
+// file, false of this PROCESS: the assembly root builds the orb's approval gate
+// (resident_approval_windows.go) before this function is called, and a card on the
+// orb is exactly the native surface R20/M4 asks for. So the leg arrives as a
+// parameter now, and the root hands it panelModeConfirm(ra.confirmModeSwitch):
+// the same adapter and the same card body the run seam uses (run.go's
+// rt.modeWrites), over the one gate this process has. What did NOT change is
+// M4's reach - only the switch INTO auto_approve raises a card, and this file
+// neither widens nor narrows that.
 //
 // The actor is named for what actually drives it, so the audit line cannot be read
 // as the CLI seam's.
@@ -246,13 +260,13 @@ func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc) (*panel
 // The returned holder is ticket 186's: the caller hands it to the task source,
 // which binds this process's runtime scope into it. The panel host itself keeps
 // knowing nothing about paths - it only remembers which object to bind.
-func newResidentPanelManager(dataDir string) (*PanelManager, *panel.WorkspaceScopeHolder, error) {
+func newResidentPanelManager(dataDir string, confirm panel.ModeConfirm) (*PanelManager, *panel.WorkspaceScopeHolder, error) {
 	auditf := func(format string, args ...any) {
 		line := fmt.Sprintf(format, args...)
 		slog.Info("panel host: " + line)
 		fmt.Printf("wisp: %s\n", line)
 	}
-	disp, workspaceScope, err := newResidentComposerDispatch(dataDir, auditf)
+	disp, workspaceScope, err := newResidentComposerDispatch(dataDir, auditf, confirm)
 	if err != nil {
 		return nil, nil, err
 	}

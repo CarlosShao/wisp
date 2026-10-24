@@ -39,6 +39,15 @@ package main
 // none: a request that widens the档 is refused, audited, and says which leg is
 // missing.
 //
+// WHO PASSES A LEG, SINCE TICKET 114 AC#3. The chain below is shared with the
+// resident panel host (panel_resident_windows.go), whose process DOES have a card
+// surface, so the leg arrives as a parameter now. This file keeps handing in nil
+// and that nil stays load-bearing: a leg that cannot ask is not a leg, and because
+// ModeWriteHandler reads only nil-ness, any non-nil value here would switch the
+// gate off and let the pipe widen with no card at all. The resident leg is
+// built by the assembly root from the orb's own approval gate - see
+// resident_windows.go's newResidentPanelManager call.
+//
 // WHAT THIS IS NOT, stated so nobody infers it from the file's existence:
 //   - it is not the WebView2 receiver (H2/H3). The page's postMessage still has
 //     no listener in this tree, and no go.mod dependency moved for this slice.
@@ -220,15 +229,29 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 	// nil: this seam owns no task pipeline, so there is no tree to narrow and the
 	// workspace route keeps refusing by name (ticket 186 left that refusal in
 	// place on purpose - see newComposerDispatchChain's own note).
-	return newComposerDispatchChain(dir, auditf, panelInboundActor, nil)
+	// Second nil: no L2 leg either - a stdin/stdout pipe has nowhere to show a
+	// card, so handing this chain one would only teach it to widen unasked (the
+	// header's CONFIRM IS NIL note, and
+	// TestTicket114r2ANonNilLegAtTheCLISeamWouldUngateThePipe runs that shape).
+	return newComposerDispatchChain(dir, auditf, panelInboundActor, nil, nil)
 }
 
 // newComposerDispatchChain is the five-constructor body behind
 // newPanelInboundDispatch, with the audit actor as a parameter. The actor is not
 // decoration: the MODE-SWITCH audit line names whoever asked, so a chain built for
 // the resident panel must not sign itself as the CLI seam (ticket 33's resident
-// wiring passes "resident-panel"). Every other property of the chain is unchanged,
-// including the two nils that keep a widening request from reaching Store.Set.
+// wiring passes "resident-panel"). What keeps a widening request from reaching
+// Store.Set is no longer a constant of this function: it is `confirm`, and both
+// layers that can judge a widening are handed the same value (ticket 114 AC#3).
+//
+// WHICH IS WHY THE LEG IS A PARAMETER AND NOT A FIELD TO FILL LATER. perm.New
+// copies Confirm into the Store at construction and ModeWriteHandler reads its own
+// copy's nil-ness per request, so a leg attached after this function returns
+// cannot reach either: a holder would have to be non-nil (which switches the
+// handler's gate off forever) or would arrive too late to matter (the Store keeps
+// the nil it was born with and refuses every widening). A caller that has a card
+// surface therefore passes it HERE, at assembly time; one that does not passes nil
+// and keeps the refusal.
 //
 // ws is ticket 186's socket parameter: the assembly that owns a task pipeline
 // hands in the holder its runtime scope is bound into, and the panel's
@@ -237,7 +260,7 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 // not an oversight and not a stub - the CLI seam has no pipeline, and the router's
 // ErrNoHandlerAttached is the honest answer there rather than a handler wired to
 // a tree that does not exist.
-func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, ws *panel.WorkspaceScopeHolder) (*panel.ComposerDispatch, error) {
+func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, ws *panel.WorkspaceScopeHolder, confirm panel.ModeConfirm) (*panel.ComposerDispatch, error) {
 	cfgPath := filepath.Join(dir, configFileName)
 	mgr, err := config.NewManager(cfgPath, nil)
 	if err != nil {
@@ -248,10 +271,10 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	// host it does not know.
 	store, err := perm.New(perm.Options{
 		Manager: mgr,
-		// nil: no L2 card on this leg, so auto_approve is unreachable and every
-		// widening request is refused before Set is ever reached. Not an
-		// oversight - see this file's header.
-		Confirm: nil,
+		// The SAME leg the handler below gets, in perm's shape. nil stays nil:
+		// perm.Store.Set reads it to refuse every widening, so a closure that
+		// only refused when called would turn that gate off (store.go:209).
+		Confirm: storeConfirmFromPanel(confirm),
 		Logf:    auditf,
 	})
 	if err != nil {
@@ -260,8 +283,9 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	modeWrites := &panel.ModeWriteHandler{
 		Modes: store,
 		// The handler reads only this field's nil-ness to refuse a widening
-		// request; the forward below is run.go's, and this leg has no card.
-		Confirm: nil,
+		// request; it never calls it. R20/M4's one card is raised by Set, i.e.
+		// by the Store's copy of the same leg.
+		Confirm: confirm,
 		Audit:   auditf,
 		Actor:   actor,
 	}
@@ -306,6 +330,25 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 		Models: modelsList,
 		Audit:  auditf,
 	}, nil
+}
+
+// storeConfirmFromPanel narrows the panel handler's ModeConfirm into perm's
+// ConfirmFunc, because the two layers want the same leg in two shapes: the handler
+// takes (from, to, origin, actor) and never looks at the body, the Store takes one
+// perm.Switch record and is the only one that calls it.
+//
+// A nil panel leg stays a nil perm leg. That is not a convenience: perm.Store.Set's
+// gate is `IsWidening(from, to) && s.confirm == nil` (store.go:209), so returning a
+// closure that merely refused when called would hand the Store a non-nil leg and
+// let every widening through the gate into Set - the exact hole ticket 367 closed
+// on the storage side and ticket 114 AC#2 keeps closed on the handler side.
+func storeConfirmFromPanel(confirm panel.ModeConfirm) perm.ConfirmFunc {
+	if confirm == nil {
+		return nil
+	}
+	return func(ctx context.Context, sw perm.Switch) error {
+		return confirm(ctx, sw.From, sw.To, sw.Origin, sw.Actor)
+	}
 }
 
 const panelInboundUsage = `用法：wisp panel-inbound -data <目录>

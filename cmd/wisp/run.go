@@ -330,13 +330,18 @@ type agentRuntime struct {
 	modes *perm.Store
 	// modeWrites is ticket 114 AC#2's gate: the one handler a panel mode request
 	// is answered by, assembled with the SAME L2 leg the Store above was handed.
-	// Nothing reads this field yet: the "event -> ParseComposerRequest" hop now
-	// exists (composer_dispatch.go:159, reached from `wisp panel-inbound` and the
-	// panel host), but every leg that reaches it assembles its own handler chain
-	// (cmd/wisp/panel_inbound.go, the resident leg's newResidentComposerDispatch)
-	// and nothing attaches this one - so this is the gate's other half, not a
-	// path: the leg that gets wired to it later cannot assemble a wider档 without
-	// a confirmation leg.
+	// The FIELD still has no reader in production, and that did not change in
+	// 114-r2: the two legs that reach the panel router assemble their own chain
+	// (cmd/wisp/panel_inbound.go for the CLI seam, the resident host's
+	// newResidentComposerDispatch), and neither can wait for this object - the
+	// resident panel is built at boot (resident_windows.go:214), long before the
+	// task source assembles this runtime. What 114-r2 closed is the gap this field
+	// was reserved for, from the other end: the chain now takes the leg as a
+	// parameter, and the resident root hands it panelModeConfirm over the orb's own
+	// approval gate. Both sides close over confirmModeSwitchVia, so the confirmation
+	// this field would raise and the one the panel raises cannot drift into two
+	// cards with two sentences. The CLI seam keeps passing nil, and that nil is its
+	// gate, not a stub (panel_inbound.go's CONFIRM IS NIL note).
 	modeWrites *panel.ModeWriteHandler
 	// pump assembles the packet the panel is rendered from, out of the live
 	// objects this struct already holds (ticket 35's data half). It is the first
@@ -686,10 +691,13 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// confirmModeSwitch reads only From/To.
 	rt.modeWrites = &panel.ModeWriteHandler{
 		Modes: modeStore,
-		Confirm: func(ctx context.Context, from, to risk.Mode, origin, actor string) error {
-			return confirm(ctx, perm.Switch{From: from, To: to, Origin: origin, Actor: actor})
-		},
-		Audit: rt.auditf,
+		// The one adapter from perm's ConfirmFunc to the panel handler's
+		// ModeConfirm. Ticket 114-r2 shares it with the resident panel's chain
+		// (resident_windows.go hands panelModeConfirm(ra.confirmModeSwitch) to
+		// newResidentPanelManager), so the panel's L2 card and this one are the
+		// same card with the same sentence rather than two lookalikes.
+		Confirm: panelModeConfirm(confirm),
+		Audit:   rt.auditf,
 	}
 
 	// Which posture this boot came up in has to be readable in the log, not
@@ -883,13 +891,25 @@ const modeSwitchToolName = "permission.mode"
 // own synthetic task id for the duration of the confirmation and revokes it on
 // the way out.
 func (rt *agentRuntime) confirmModeSwitch(ctx context.Context, sw perm.Switch) error {
-	if rt.gate == nil {
+	return confirmModeSwitchVia(rt.gate, ctx, sw)
+}
+
+// confirmModeSwitchVia is that body, with the gate as a parameter. It is factored
+// out rather than copied because ticket 114 AC#3 gave the resident panel's mode
+// chain a confirmation leg too, and its card surface is the orb, not this runtime:
+// whatever raises it must still be ONE body, or the panel's card and a console
+// run's card become two sentences that a reader has to reconcile by eye (the same
+// reason panel_inbound.go shares one audit sink across both halves of its hop).
+// The argument is a value and may be nil; a nil gate keeps the refusal below
+// instead of panicking on it.
+func confirmModeSwitchVia(gate *approval.Gate, ctx context.Context, sw perm.Switch) error {
+	if gate == nil {
 		return fmt.Errorf("审批 gate 未装配，无法为切到 %s 签发 L2 卡片", sw.To)
 	}
 	const taskID = "host:mode-switch"
-	revoke := rt.gate.AdmitTextTask(taskID)
+	revoke := gate.AdmitTextTask(taskID)
 	defer revoke()
-	ans, why := rt.gate.PendingApproval(ctx, tools.Decision{
+	ans, why := gate.PendingApproval(ctx, tools.Decision{
 		TaskID: taskID,
 		Tool:   modeSwitchToolName,
 		Level:  risk.L2,
@@ -904,6 +924,24 @@ func (rt *agentRuntime) confirmModeSwitch(ctx context.Context, sw perm.Switch) e
 		return fmt.Errorf("L2 强确认未通过（%s）：%s", ans, why)
 	}
 	return nil
+}
+
+// panelModeConfirm is the ONE adapter from perm's ConfirmFunc to the panel
+// handler's ModeConfirm shape (from, to, origin, actor). Both the run seam
+// (rt.modeWrites) and the resident panel's chain build their leg through it, so
+// "the leg a panel request is judged by" has one translation, not two.
+//
+// nil in, nil out, on purpose: ModeWriteHandler reads only nil-ness, and perm's
+// Store reads its own nil-ness to refuse every widening, so an adapter that turned
+// nil into a always-refusing closure would silently open both gates (see
+// storeConfirmFromPanel's note for the gate itself).
+func panelModeConfirm(confirm perm.ConfirmFunc) panel.ModeConfirm {
+	if confirm == nil {
+		return nil
+	}
+	return func(ctx context.Context, from, to risk.Mode, origin, actor string) error {
+		return confirm(ctx, perm.Switch{From: from, To: to, Origin: origin, Actor: actor})
+	}
 }
 
 // auditModeUnreadable is AC#3's loud half. It writes the same "[audit] perm:"
