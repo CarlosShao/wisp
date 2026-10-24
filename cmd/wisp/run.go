@@ -1654,7 +1654,11 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 	if len(p.Paths) > 0 {
 		fmt.Fprintf(u.out, "  影响路径：%s\n", strings.Join(p.Paths, ", "))
 	}
-	fmt.Fprintf(u.out, "  窗口 %.1fs\n", p.Window.Seconds())
+	shownWindow := p.Window
+	if p.Level == "L2" { // an L2 card's Window is 0 by construction; its wait is Deadline
+		shownWindow = p.Deadline
+	}
+	fmt.Fprintf(u.out, "  窗口 %.1fs\n", shownWindow.Seconds())
 	// The address the operator answers against. Without it C18's 「回复按
 	// correlationId 路由」 is a rule a terminal user cannot obey, and a reply
 	// that names nothing is a reply the gate has to refuse as an unknown
