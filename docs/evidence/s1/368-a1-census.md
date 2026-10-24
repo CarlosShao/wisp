@@ -82,14 +82,14 @@ DELETE FROM tool_call WHERE COALESCE(ended_at, started_at, decided_at) IS NOT NU
 | retention #2 | 1 | 2 | **1** | `0`／`0` ⇒ ★**孤儿永不被第二轮选中** |
 | 生产 `Open()` 迁移 → 再数 | 1 | 2 | **1** | `open_err=<nil>`、`schema_version=4`、`ForeignKeyAudit{Checked:true, OrphanRows:1, ChildTables:[tool_call]}`；孤儿行 `task_id=task-old` 一字未动 |
 
-★**判**：孤儿**造得出**（⛔"造不出"）、**fkc 0→1**、**迁移既不清也不造**、**今天能开**、**第二轮甚至第 N 轮 retention 都删不掉它** ⇒"永生"**成立**（对三列全 NULL 的行）。★另：**第二次 `Open()`** 现跑 `audit.Checked=**false**` ⇒ `open.go:413` 的 `version==s.target` 早退被复认（票面硬提醒 1 引的 `:374` 就是这处）。
+★**判**：孤儿**造得出**（⛔"造不出"）、**fkc 0→1**、**迁移既不清也不造**、**今天能开**、**第二轮甚至第 N 轮 retention 都删不掉它** ⇒"永生"**成立**（对三列全 NULL 的行）。★另：**第二次 `Open()`** 现跑 **`audit.Checked=false`** ⇒ `open.go:413` 的 `version==s.target` 早退被复认（票面硬提醒 1 引的 `:374` 就是这处）。
 
 ## §5 正控（硬闸）：三列都有值 ⇒ 必须和父一起清掉
 
 | 夹具 | 读数 |
 |---|---|
-| **F2 正控**（`task-old` 31 天 ＋ `B`：**decided_at/started_at/ended_at 三列都＝40 天前**；`task-fresh` ＋ `G` 同形、父活着） | `tasklog_deleted=1`／`toolcall_deleted=**2**` ⇒ `task_log=1`、`tool_call=**0**`、fkc=**0**；迁移 `open_err=<nil>`、`audit{Checked:true, OrphanRows:**0**}`、迁移後 1/0／fkc=0 |
-| **F3 三臂＋顺序**（`C` 只 decided_at／`D` 只 started_at／`E` 只 ended_at，均 40 天；`I`＝ended 40 天但 started/decided 29 天；`H`＝ended 29 天但 started/decided 40 天、父活着） | `toolcall_deleted=**4**`（C,D,E,I）、幸存**只有 `id=5`（H）**、fkc=**0** |
+| **F2 正控**（`task-old` 31 天 ＋ `B`：**decided_at/started_at/ended_at 三列都＝40 天前**；`task-fresh` ＋ `G` 同形、父活着） | `tasklog_deleted=1`／**`toolcall_deleted=2`** ⇒ `task_log=1`、**`tool_call=0`**、fkc=**0**；迁移 `open_err=<nil>`、**`audit{Checked:true, OrphanRows:0}`**、迁移後 1/0／fkc=0 |
+| **F3 三臂＋顺序**（`C` 只 decided_at／`D` 只 started_at／`E` 只 ended_at，均 40 天；`I`＝ended 40 天但 started/decided 29 天；`H`＝ended 29 天但 started/decided 40 天、父活着） | **`toolcall_deleted=4`**（C,D,E,I）、幸存**只有 `id=5`（H）**、fkc=**0** |
 
 ★**正控成立**：三列有值 ⇒ **与父同清**（F2 归零）；**三条 COALESCE 臂各自单独有值都能被读到**（C/D/E 全删）；**顺序＝ended_at 优先**（I 删、H 留，两条只差"哪个时间戳在外"）⇒ **尺能读出"正常老化"，孤儿不是尺坏了**。
 
@@ -105,16 +105,16 @@ DELETE FROM tool_call WHERE COALESCE(ended_at, started_at, decided_at) IS NOT NU
 | 子行有父吗 | `parents_in_task_log=1` | **`=0`（悬空）** | **`=0`（悬空）** |
 | 子行三列 | `decided_at`/`ended_at` 有值、`started_at=<NULL>` | 同左（**有值**） | 同左（**有值**） |
 | 造好後 fkc | **0** | **1** | **1** |
-| 跑 retention（`Now=+31 天`） | — | `toolcall_deleted=**1**` ⇒ 0 行、fkc **0** | — |
+| 跑 retention（`Now=+31 天`） | — | **`toolcall_deleted=1`** ⇒ 0 行、fkc **0** | — |
 
 ★**判**：★**`startCall` 照写**（整链＝`startTask` 失败 → 只 `Warn` → 继续跑 → `executeCalls` `:671` 插行 → `task_id` 无父 → fkc 1；⛔ 只看最后一跳）。★**但**这条路径的孤儿**带 `decided_at`/`ended_at`** ⇒ 30 天后**会被清掉**（实测 `toolcall_deleted=1`）⇒ **"暂时孤儿"，⛔ 永生**。
-★**且生产装配下整条链不可达**：`cmd/wisp/run.go:1080` `Journal: nil`，而 `journal.go:71-73`／`:126-128` 对 nil 是 `return 0`／`return nil`。实测（NJ）：`startTask_err=<nil>`、`startCall_rowID=**0**`、`finishTask_err=<nil>` ⇒ **`startTask` 根本不会失败、`startCall` 一行都不插**。
+★**且生产装配下整条链不可达**：`cmd/wisp/run.go:1080` `Journal: nil`，而 `journal.go:71-73`／`:126-128` 对 nil 是 `return 0`／`return nil`。实测（NJ）：`startTask_err=<nil>`、**`startCall_rowID=0`**、`finishTask_err=<nil>` ⇒ **`startTask` 根本不会失败、`startCall` 一行都不插**。
 
 ## §7 ★★**第六条路径（具名上报）：`tools.Bridge.book` 才是今天真正的"永生"写入者**
 
-- **代码**：`internal/tools/bridge.go:1171 func (b *Bridge) book(...)`；`:1210-1221` 构造 `memory.ToolCall{TaskID, Seq, Tool, ArgsJSON, RiskLevel, **Decision**, **Outcome**, ErrorClass, CorrelationID, GrantID}` —— **三列时间戳一个都不设**；`:1225` `if _, err := b.j.InsertToolCall(ctx, tc); err != nil {` **把返回的 id 丢掉** ⇒ 这行**再也无法被 update**。
+- **代码**：`internal/tools/bridge.go:1171 func (b *Bridge) book(...)`；`:1210-1221` 构造 `memory.ToolCall{TaskID, Seq, Tool, ArgsJSON, RiskLevel, Decision, Outcome, ErrorClass, CorrelationID, GrantID}`（Decision/Outcome 有值） —— **三列时间戳一个都不设**；`:1225` `if _, err := b.j.InsertToolCall(ctx, tc); err != nil {` **把返回的 id 丢掉** ⇒ 这行**再也无法被 update**。
 - **为什么它是"生产唯一"**：`cmd/wisp/run.go:764` `tools.New(tools.Options{…})` 的 `:769` 是 `Journal:  mem`；`:1072` `agent.Options{…}` 的 `:1080` 是 `Journal: nil`（注释逐字 "the loop's own tool_call rows are deliberately NOT booked: the bridge already writes the authoritative one"）。全仓 `InsertToolCall` 只有两个调用点（`journal.go:75`、`bridge.go:1225`）；`DecideToolCall`/`FinishToolCall` 的唯一生产调用者是 `journal.go:101`/`:118`，而它们的守卫 `:98-100`/`:112-114` 在 `j == nil` 时直接 `return` ⇒ **bridge 的行没有任何可能的更新者**。
-- **实测 B1**（真 `Bridge` ＋ 真 `Store` 当 journal，一发 L0 调用）：行＝`decision=allow outcome=success decided_at=<NULL> started_at=<NULL> ended_at=<NULL>` ⇒ **decision/outcome 有值、三列仍全 NULL**；`RunRetentionOnce` ⇒ `tasklog_deleted=1`／`toolcall_deleted=**0**`、fkc **0→1**；**第二轮** `0`／`0`、fkc 仍 **1**（永生）；**正控**：把该行 `ended_at` 手动写成 40 天前 ⇒ 同一发 retention `toolcall_deleted=**1**`、fkc **0**（⇒ 不是尺坏，是 NULL）。
+- **实测 B1**（真 `Bridge` ＋ 真 `Store` 当 journal，一发 L0 调用）：行＝`decision=allow outcome=success decided_at=<NULL> started_at=<NULL> ended_at=<NULL>` ⇒ **decision/outcome 有值、三列仍全 NULL**；`RunRetentionOnce` ⇒ `tasklog_deleted=1`／**`toolcall_deleted=0`**、fkc **0→1**；**第二轮** `0`／`0`、fkc 仍 **1**（永生）；**正控**：把该行 `ended_at` 手动写成 40 天前 ⇒ 同一发 retention **`toolcall_deleted=1`**、fkc **0**（⇒ 不是尺坏，是 NULL）。
 - ★**射程（⛔ 夸大）**：它造的是**"会变成孤儿"的永生子行**，不是"当场孤儿"——父还在时 fkc＝0。父一旦没（今天：`PurgePrivacy(PrivacyTaskLog)` → `privacy.go:177` → `dao_tasklog.go:134 DELETE FROM task_log`，用户一键；接线后：retention）⇒ 立刻变孤儿且**永不老化**。
 
 ## §8 "接线之后会怎样"：判据（⛔ 猜）
