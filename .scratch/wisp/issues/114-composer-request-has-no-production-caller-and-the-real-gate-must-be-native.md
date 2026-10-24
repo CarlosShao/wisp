@@ -116,3 +116,49 @@
 - 2026-10-14 16:4x +08 `agent-ticket114-v1` did=验收腿收件（非实现者；只读＋overlay／仓外真种盘＋重跑；锚 `9b51859b`，窗口内 `20-r2` 在飞）：**四格判语**＝**AC#4 成立**（自造"单删 `.json`"变异⇒新对齐尺红且逐字点名；全量回退旧 7 类⇒点名 9 枚；旧集下 `.json` 种形同时逃过结构钉 unknown 2≠3 与门二少点名＝"改前逃过两枚仪器"复读）／**AC#7 成立（抽核口径）**（panel 整包 `223/143/5/0` 与 `88c7e752` 对照件 `220/141/5/0` 红集逐名同集；vet rc=0／gofumpt -l 零行／`bash -n`×2 rc=0 亲跑；d22scan 全跑／长度门／POSIX 三合包未复跑具名）／**AC#8 成立**（仓外树真种盘页侧 `config.set`⇒`config.sets`⇒新门 FAIL 逐字点名 `config.set`，而同一棵树 253 尺 `6/6/6` 与 N7 PASS＝旧盲新有牙；253 盲据＝其尺 `:19-20`"reads nothing outside internal/panel's production sources"）／**AC#9 成立（钉半支**；仓外树旧根 overlay 对种门树仍绿 `89 files scanned, 2 host call sites`＝"绿与事实无关"复现、新根同树 FAIL 点名 `public/ac92-v1-door.js`；真树 `113 files scanned, 2 host call sites` 绿；junction 只登记不演练）。**两停手格复核**＝**AC#3 停得对**（`composer_handlers.go:133` `ErrNoL2Confirm`／`panel_inbound.go:254/:264` 两 `Confirm: nil`／`run.go:340/:677` `rt.modeWrites` 零读者死码；J1 无具名）／**AC#11 停得对**（`ci.yml:1026` 后无 `git diff`、`grep -c exit-code`=0；票 111/85 双 open 未让渡；措辞更正＝"契约邻接"→"他票占用未让渡＋CI 治理面"，`.github` 不在明列冻结）。**拆分表抽核**（`shuf -e AC#5 AC#6 AC#10 -n 2`⇒**AC#10、AC#5**）＝AC#5 判对（一处更正：`config_handlers.go:108` 拒 7 族＋2 叶名，非"两族"）；**AC#10 ②面判不成立⇒停手上报**（普查 `:198` 列其为仪器格、本行① 落点全 Go、真门 `w.Bind`@`panel_host_windows.go:842`＋const `:80` 而钉正则 `composer_test.go:441` 只认 `.postMessage(`；③"本波不落"站得住）——请编排者按已挂的"AC#10 去向"重裁面签。交件＝`docs/evidence/s1/ticket114-114-v1-accept-v1.md`＋`probes/114/v1/`（锚＋logs 5）；仓内零突变（两测试件 sha256 前后同值）、框未翻、零 push。next=编排者裁 AC#10 面签＋AC#7 未复跑三处的接受度（d22scan 全跑／长度门／POSIX）。
 - 2026-10-14 17:0x +08 `agent-ticket114-r6` did=写腿落地 AC#10「可达性钉认第三装法」（实现者；⛔ 未翻框/未动 `Status:`、票名/零 push；起手锚 `6c5515e8`，窗口内他腿 `201-a1` 落件、`frontend/` 被界面侧续写）。**①落点**＝新件 `internal/panel/bound_dispatch_door_114_test.go`（530 行；产码 commit `3b6f170f`）／`TestTheBoundDispatchDoorIsReachableFromThePage`，能力形两侧同名：host 侧 AST 走 `cmd/wisp` 产码取每个 `w.Bind(<名>,回调)`，`<名>` 须为包级字符串常量（`:80` `panelDispatchBinding="wispDispatch"`→`:842` `w.Bind` 即此；单参 `ws.Bind(run.paths)` 记 skipped；literal 的 `wispProbeRT` 不入 reviewed），page 侧要求该常量值＝`frontend/src/lib/panel.ts` 以 `window.<名>` 读到、且整棵 `frontend/` 该门读只许在 panel.ts（`//`／`/* */`／`<!-- -->` 注释剥掉，`:329` 的 prose 顶不了数）；floor＝reviewed 空即红。⛔ 未动 `cmd/wisp/**` 产码一字节、未动 `frontend/**`。**②三向读数（`probes/114/r6/logs/` 逐字）**＝基线绿 `bound door held: 36 cmd/wisp production file(s), 2 w.Bind door site(s) […:842 binds "wispDispatch" via panelDispatchBinding; …:892 binds "wispProbeRT"…], 27 window.* read site(s)… panel.ts:350 window.wispDispatch`；仓外真种盘（`git archive HEAD` 树，A713）三突变各自 FAIL 且点名：m1 摘 `w.Bind`〔span `[42508,42619)` 换 `error(nil)`〕⇒"bind no door through a w.Bind(<package-level string constant>…"＋剩余站点清单；m2 常量值换名⇒`binds "wispDispatchX" through w.Bind, and … never reads window.wispDispatchX`；m3 页读换名（宿主不动）⇒`… binds "wispDispatch" … never reads window.wispDispatch - … panel.ts:350 window.wispDispatchX`；同树上旧 `.postMessage(` 尺三发全 PASS（m3 系页面侧改动仍在其射程外）＝"旧盲新牙"现场；③既有牙不回退＝`red as required: 3 outside call sites, 1 assembled routes, 3 unknown literals…` 逐字不动。**③抽核**＝`internal/panel` 整包同树 A/B `225/142/7` vs `223/141/7` **红集 diff SAME SET**（树 7 红＝live 既有 5＋两枚树工件：树无 `.git`、导出件 CRLF 而 fixture 尺分隔符写字面 `" -->\n"`）；live 整包 `225/144/5/0 rc=1`，5 红与 v1/a5 记录**同集**。**④门禁**＝build rc=0／vet rc=0／gofumpt -l 零行／`sh scripts/d22scan.sh` clean rc=0／长度门 VERDICT GREEN（60=60）／`-run` rc=0。**⑤具名没做**＝未跑 `go test ./cmd/wisp`（314 死区，派单禁）／POSIX 三合包／真窗；`panel.ts:146/329` 注释自陈"两种装法"那半按派单归前端；AC#10 判语与翻勾留非实现者。交件＝`.scratch/wisp/probes/114/r6/00-anchor-and-gates.md`＋logs 4；产码/交付两笔提交、显式 pathspec、仓内零突变（`cmd/wisp/panel_host_windows.go` `45c1059b…`／`panel.ts` `2b7a9fd0…`／`composer_test.go` `d2b2e848…` 起手＝收手）。next=编排者派非实现者复核本钉（两侧同名能力形＋三突变点名）后裁 AC#10 勾。
 - 2026-10-14 17:1x +08 `agent-ticket114-v2` did=验收腿收件（非实现者；只读＋仓外真种盘跨树突变＋重跑；起手锚 `7e8ac3fa`，窗口内 `318-r1` 在飞）：**AC#10 判 成立**（编排者重裁口径"让可达性钉认第三装法"）——第三装法被两侧同名读盘钉住：host 36 枚产码取 `:842 w.Bind(panelDispatchBinding,…)`（常量 `:80`＝`"wispDispatch"`）、页 `panel.ts:350 window.wispDispatch` 且全 `frontend/` 只许 panel.ts 读。**我自己的 9 发种形**（仓外树 `D:\tmp\wisp114v2\tree` 真盘＋sha256 逐发；⛔ 不用 overlay）＝8 红 1 绿：t1 摘常量绑 `w.Bind` 红（floor 逐字、剩余站点列 `:886 wispProbeRT`）／t2 常量声明搬家 `run.go` **绿**（跨文件解析成立）／t2b 声明与调用拼写不一致红（两半各点名 `names … no package-level string constant…`＋floor `"<unreadable>"`）／t3 页真读改注释红（`never reads window.wispDispatch`，prose 在 :329 同样剥掉）／t4 第二文件读门红（点名 `config-view.ts:168`）／t5 reviewed 空形 A（实参换 literal、两 Bind 都在）红／t6 reviewed 空形 B（binds 全空）红／t7 单参 skip 翻双参红（`:311` 边界 fail-closed）／t8 `cmd/wisp` 根消失红（`not walkable`）；**旧 `.postMessage(` 尺同树两发 PASS**（t1/t3，`113 files scanned, 2 host call sites`）＝旧盲新牙现场；**射程四条逐条独立核**（skipped 单参／literal 不入 reviewed／注释剥离／only-panel.ts，各抽一行现读＋对应种形）。**基线**＝live 新钉 rc=0（绿句逐字）＋live 整包 `225/144/5/0 rc=1` 5 红与 r6/v1/a5 **同集**（抽 2 名逐字）；同树 A/B（有新钉 `225/142/7` vs 移走 `223/141/7`）**FAIL 名集 diff rc=0＝SAME SET**。**门禁**＝build rc=0／两枚 `-run` rc=0／`sh scripts/d22scan.sh` clean rc=0（ban #8 internal/=556）／长度门 `VERDICT GREEN`（60=60，tracked=12876）。**留档句**①常量窄口径（literal 不入 reviewed，可预见唯一摩擦）②AC#10 原信 `AddHostObjectToScript` 半支：Go 生产零命中为真、本钉仅在红句散文陈述、未成门（注释半归前端，要门须另派）。**具名没做**＝`go test ./cmd/wisp`（派单禁）／POSIX／真窗／r6 的 span 数值未复核（其结论由我自有九发独立复核）。交件＝`docs/evidence/s1/ticket114-114-v2-accept-v1.md`＋`probes/114/v2/`（锚＋logs 4）；仓内零突变（5 枚关键件 sha256 起手＝收手 `45c1059b…`／`2b7a9fd0…`／`d2b2e848…`／`6924b8e1…`／`016b6943…`）、框未翻、零 push。next=编排者按判语＋留档句①②裁 AC#10 翻勾。
+
+## ★前提更正（2026-10-24，凭 `114-r1`/`114-r2` 现跑）
+
+> **本节只更正前提**：⛔ 不改上面任何一句原文、⛔ 不勾任何框、⛔ 不动 `Status:` 与票名（那些是编排者的动作）。
+> 原文留着，是为了让后来人看见"当时为什么那么写"；**引用时应引本节这一份读数**。
+> 下表每一行的读数都由写腿 `114-r3` **自己现跑**（尺与原始输出见下面「现跑的尺」），⛔ 不是抄的。
+
+**原文当时为什么为真**：2026-09-21 立案时，面板→Go 的入向那一跳**整层不存在**，所以
+`ParseComposerRequest`／`HandleModeRequest`／`perm.Store.Set` 的生产调用者确实都是 **0**，票 33（C27 宿主）
+与票 35（C17 桥）也确实是 ready-for-agent（`docs/evidence/s1/114-ac1-status-table.md` ①.1 量的正是那个状态）。
+**那一跳后来真的落地了**（宿主 `w.Bind` 门 + `wisp panel-inbound` 管两条入口），三处说法因此过期。
+
+### 三处过期句 ↔ 现跑读数（原文逐字，⛔ 未改）
+
+| 位置 | 原文（逐字） | 现跑读数 |
+|---|---|---|
+| **标题**（`:1`） | 「`ParseComposerRequest` 在**生产里零调用者**」 | **≠ 0**：非 test 调用点 `internal/panel/composer_dispatch.go:178`（`req, err := ParseComposerRequest(raw)`；定义在 `internal/panel/bridge.go:134`） |
+| **`:21`** | 「`ParseComposerRequest` 的**生产调用者 = 0**，`perm.Store.Set` 的**生产调用者 = 0**」 | **两半都不是 0**：①`ParseComposerRequest` ⇒ `composer_dispatch.go:178`；②`perm.Store.Set`（`internal/perm/store.go:189`）⇒ 全仓非 test **恰 1 处**：`internal/panel/composer_handlers.go:141`（经本地 `ModeWriter` 接口；`internal/tools/mode.go:20-22` 自陈写侧不在 tools，读侧只有 `PermissionMode`） |
+| **`:44`** | 「⚠ 门已立，**通路仍不存在**（P0 地界：宿主那一跳留票 33/35）」 | **通路已在**，且两条产线入口都到同一枚 `ComposerDispatch.Handle`（`internal/panel/composer_dispatch.go:176`）：① **页面门**＝`cmd/wisp/panel_host_windows.go:929` `w.Bind(panelDispatchBinding, …)` → `:930 m.dispatchRaw` → `:948 m.disp.Handle(ctx, raw)`；② **CLI 管**＝`cmd/wisp/panel_inbound.go:173` `reply, err := disp.Handle(ctx, raw)`（`wisp panel-inbound`）。router 的 `dispatch` 在 `composer_dispatch.go:204` 把 `MethodModeRequest` 这一 case 交给 `HandleModeRequest`（实现 `composer_handlers.go:109`） |
+
+### 现跑的尺（四条，逐条可重跑）
+
+```
+git grep -n "ParseComposerRequest(" -- '*.go' ':!*_test.go'
+# ⇒ internal/panel/bridge.go:134(定义) ＋ internal/panel/composer_dispatch.go:178(调用)
+git grep -n "HandleModeRequest(" -- '*.go' ':!*_test.go'
+# ⇒ composer_dispatch.go:73(接口) ＋ :204(调用) ＋ composer_handlers.go:109(实现)
+git grep -n "\.Set(ctx" -- '*.go' ':!*_test.go'
+# ⇒ composer_handlers.go:141（全仓唯一一处；锚的是调用形 ".Set(ctx"，⛔ 裸符号名）
+git grep -n "disp.Handle(ctx, raw)" -- 'cmd/wisp/*.go'
+# ⇒ panel_inbound.go:173 ＋ panel_host_windows.go:948
+```
+
+### 仍未变的两条（⛔ 把本节读成"票 114 的活变小了"）
+
+1. **`Confirm` 的 nil 语义一字未变**：处理器读的仍是 `h.Confirm` 的 nil-ness（`composer_handlers.go:131`）；
+   `wisp panel-inbound` 那条入口**仍递 nil**（`panel_inbound.go:236` → `newComposerDispatchChain(…, nil)`，
+   理由自陈在 `:33-40`），所以**管这一路的变宽仍被拒**。常驻面板那条入口递的是
+   `panelModeConfirm(ra.confirmModeSwitch)`（`cmd/wisp/panel_resident_windows.go:233`），与 `wisp run` 同一条腿。
+2. **AC#3 仍未做**：本节只更正"有没有人调"，⛔ 不构成反向对照（真机 L2 卡片 + 300s 超时＝拒）的证据；那一格仍空。
+
+- ★**同一批前提的另外两处已由 `114-r3` 就地改准**（写腿；在本票面之外的两枚产码注释／字符串）：
+  `internal/panel/composer_handlers.go:41-45` 的「Nothing calls this handler yet … tickets 33/35 are still
+  ready-for-agent」⇒ 改成点名两条产线入口；`:132` 括注「R20/M4：只有变宽要确认」⇒ 改回机主原话
+  「**只有全自动要确认**」（出处＝`docs/reports/pending-and-issues.md:3019` 的裁定 `R20` 逐字；旧措辞在
+  `PLAN.md`／`specs`／台账 **0 命中**）。逐处改前／改后与现跑读数见 `docs/evidence/s1/114-r3-impl.md`。

@@ -38,11 +38,11 @@ package panel
 // all three档 (R20). No branch of this file is silent, and adding the gate
 // removes no line the wiring would have written.
 //
-// WHAT THIS IS NOT: a path. Nothing calls this handler yet, because the
-// WebView2 "event -> ParseComposerRequest" hop does not exist in this tree
-// (status table ①.1; tickets 33/35 are still ready-for-agent). AC#2 is the
-// precondition for that hop, not a substitute for it - the panel still cannot
-// change the档, and this file must not be read as if it could.
+// WHO CALLS THIS NOW: the earlier "nothing calls this handler yet" was true
+// while the inbound hop did not exist, and it is not true now. Both production
+// doors reach this handler through one router - the page's door at
+// panel_host_windows.go:929/948, `wisp panel-inbound` at panel_inbound.go:173 -
+// and ComposerDispatch.dispatch routes the mode case here (composer_dispatch.go:204).
 
 import (
 	"context"
@@ -129,7 +129,7 @@ func (h *ModeWriteHandler) HandleModeRequest(ctx context.Context, req ComposerRe
 		return refused
 	}
 	if perm.IsWidening(from, to) && h.Confirm == nil {
-		refused := fmt.Errorf("%w: 请求 %q 要把档位从 %s 放宽到 %s，而本机没有接入 L2 确认腿（R20/M4：只有变宽要确认）",
+		refused := fmt.Errorf("%w: 请求 %q 要把档位从 %s 放宽到 %s，而本机没有接入 L2 确认腿（R20/M4：只有全自动要确认）",
 			ErrNoL2Confirm, req.RequestID, from, to)
 		h.record(req, refused, from.String(), to.String())
 		return refused
