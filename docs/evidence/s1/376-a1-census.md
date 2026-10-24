@@ -2,6 +2,7 @@
 
 - 腿 `376-a1`（只读）。读数时 HEAD `8ced487bb`（2026-10-24 12:26 +08）。本笔**未落任何 `.go`**、未改票面/台账/`Status:`、未 push。
 - 探针全在仓外 `D:\tmp\wisp\20261024\376a1\`：`zz376a1_probe_test.go`（6 用例）经 `-overlay` 注入 `cmd/wisp`；三枚变体 overlay 另把 `gate.go`/`run.go` 的**仓外副本**换进编译，仓内零字节改动。读数原文件：`head-run.txt`／`jia-run.txt`／`yi-run.txt`／`yip-run.txt`／`bing-run.txt`／`floor31-run.txt`。
+- ★**复跑钉 HEAD 字节**：读数期间 `cmd/wisp/run.go` 被**票 373 的写腿**改过（工作树 mtime 12:31:51，改点在我引的行号之前）⇒ 全部读数用 `pin_*.json` 把 `gate.go`＋`run.go` **钉回 HEAD blob 副本**再跑一遍，数字与首轮逐项一致（`pin-*-run.txt`）。**行号永远对 `git show HEAD:` 取，⛔ 对工作树。**
 - ★**尺的射程（落笔前五问）**：①对象＝`approval.Prompt` 的**两个字段**及其唯一印发点，⛔ 不是 Win32 的 window；②形状＝`file:line`＋读/写＋那一处的语义，行号一律 `git show HEAD:` 现取；③数的是**代码**：`Window|Deadline` 原始命中 **5569** 行（其中 3484 行在 `_test.go`，且绝大多数是 `CreateWindowExW`/`ContextWindow`/`FocusWindow`）⇒ 再用字段访问尺收窄到**生产** 16 行，两字段共 **9** 条（含 2 条「没有这个读者」）；④总数核对：生产 `.go`（非 `_test.go`）292 枚，逐条表 9 行、测试组 5 行，与收窄后的数相等；⑤秒数＝`time.Duration.Seconds()` 现算，卡面按 `%.1f` 打印、故一位小数。
 
 ## ① 两处逐字（现跑，HEAD blob）
@@ -87,13 +88,14 @@ $ git show HEAD:cmd/wisp/run.go | sed -n '1563p'
 
 - **甲 overlay**（仓外副本把 `gate.go:534` 的 `0` 换成 `g.q.Timeout()`）：`CARD_LINE="  窗口 300.0s"`、`QUEUE_TIMEOUT=5m0s` ⇒ `PRINTED_SECONDS=300.0 QUEUE_TIMEOUT_SECONDS=300.0 EQUAL=true`；同一次运行 L1 卡仍 `"  窗口 2.0s"`（`L1_ANSWER=timeout elapsed=2.001s`）。
 - **乙／乙′／丙 overlay** 同 `EQUAL=true`（L2 均 `300.0s`）。
+- ★**带底 31s 的甲 overlay**：卡印 `窗口 31.0s`，而同一次**实测等了** `elapsed=31.001s` ⇒ 印出的秒数**等于真实等待**（不只是等于 `Queue().Timeout()`）。HEAD 同一发：印 `0.0s`、等 `31.005s`。
 - **反控（HEAD）**：`PRINTED_SECONDS=0.0 EQUAL=false`。
 ⇒ ★尺读得出「对的值」：同一台 printer，`win` 带真值就印 `300.0s`，且**逐位等于** `Queue().Timeout()`；印出的数不是另一套换算，就是 `p.Window.Seconds()`。
 
 ## ⑦ 门禁 rc
 
 - `go build ./...` ⇒ **rc=0**；`go vet ./cmd/wisp ./internal/agent/approval` ⇒ **rc=0**；`d22scan`（`tools/d22scan` 自成 module，`-root ../..`）⇒ **rc=0**（`examined 291 production Go files under internal/ and cmd/`，`clean`）。
-- `go test -overlay <变体> ./cmd/wisp -run 'Test376a1' -count=1`（`PATH="$PWD/third_party/sherpa-onnx:$PATH"`、`GOFLAGS=`、未 unset `TMPDIR/TEMP/TMP`）：`head`／`jia`／`yi`／`yip`／`bing` 各 **rc=0**；`floor31` 单独一发 **rc=0**（31.01s）。输出：`D:\tmp\wisp\20261024\376a1\*-run.txt`。
+- `go test -overlay <变体> ./cmd/wisp -run 'Test376a1' -count=1`（`PATH="$PWD/third_party/sherpa-onnx:$PATH"`、`GOFLAGS=`、未 unset `TMPDIR/TEMP/TMP`）：`head`／`jia`／`yi`／`yip`／`bing`（首轮 overlay）与 `pin_head`／`pin_jia`／`pin_yi`／`pin_yip`／`pin_bing`（**钉 HEAD 字节**复跑）各 **rc=0**；`floor31` 与 `pin_floor31` 各 **rc=0**（31.0–31.2s）。输出：`D:\tmp\wisp\20261024\376a1\*-run.txt` 与 `pin-*-run.txt`。
 - 格式尺：本笔 `.go` 零字节 ⇒ `gofumpt` 无事可判（⛔ 用 `gofumpt -l .` 判 HEAD 的 CRLF：会扫 `.scratch` 里故意写坏的探针）。两条被改的仓外副本与 HEAD blob 的 diff 用 `git diff --no-index --numstat` 量的（1/1、1/1、5/1），⛔ 不是 `grep '^[+-][^+-]'`。
 
 ## ⑧ 提交与 `.go` 计数
