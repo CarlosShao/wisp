@@ -1,6 +1,7 @@
 # 票 368 / 腿 `368-r1` 落地（写腿）— DAO 层给三列时间戳兜底：**booked 行带 `decided_at`+`ended_at`、pending 行带 `started_at`**
 
 - 腿＝`368-r1`（**写腿**）；开工 anchor HEAD＝`75c2395c3b9dc21d6467dbda5b1ec6b60465cf5b`；★裁形＝**〔丁〕在 DAO 层 `InsertToolCall` 兜底**（编排者已拍，本腿未改形）。
+- 提交：**`c0eea973b`**（父＝`29c9d2b20`，编排者清索引残留那一笔，只动 `docs/reports/pending-and-issues.md`）；★`git show --name-status` 只有本件 4 枚路径；⛔ push。
 - 写面＝`internal/memory/**`（3 枚 `.go`：`dao_toolcall.go`／新增 `dao_toolcall_368_test.go`／`migration_fkcheck_366_test.go` 里**一枚夹具的播种行**）＋本件。★`internal/{agent,tools,cmd}/**`、`scripts/**`、`ddlV*`、`thresholds.go`、golden、`allowlist.txt`、`docs/PLAN.md`、`docs/specs/**`、`docs/reports/**`、`frontend/**`、`design/**` **零字节**。
 - ★★三枚硬边界**一条未越**：①`retention.go:154-155` 那条 `COALESCE` SQL **一字未动**；②**未加** `foreign_key_check` 硬门槛；③`ddlV*`／12 枚名册／`196-r2` 护栏／`196-r3` 的 `migrationDSN` **一字未动**。
 - 探针／变异**全在仓外**：`D:\tmp\wisp\20261024\368r1\{tree-before,tree-after,probes,mut,out}`；★变异一律 `-overlay` 换 `dao_toolcall.go` ⇒ **无工作树突变窗口**（`git hash-object` 变异前后同一 `5b4e0e02…`）。
@@ -129,7 +130,9 @@
 
 ## §11 纪律格 ＋ 残余
 
-- **索引核对（开工）**：`git diff --cached --name-status` ＝ **一条** `A .scratch/wisp/issues/114-…-done.md`（★**别人的** `.scratch` 暂存，**不在**本腿写面）。★本腿 `add`/`commit` **两处显式 pathspec、逐字点名**、⛔ `-A` ⇒ 那条暂存项**进不了**本腿的提交（提交后 `git show --name-status` 复核只有本件三枚 `.go` ＋ 本件）。
+- **索引核对（开工）**：`git diff --cached --name-status` ＝ **一条** `A .scratch/wisp/issues/114-…-done.md`（★**别人的** `.scratch` 暂存，**不在**本腿写面；**上报、未碰**）。★它后来被编排者自己那一笔 `29c9d2b20` 清掉；★本腿 `add`/`commit` **两处显式 pathspec、逐字点名**、⛔ `-A` ⇒ **提交后复核** `git show --name-status c0eea973b` 只有本件三枚 `.go` ＋ 本件，那条暂存项**始终没进**本腿的提交。
+- **改前读数的归属**：开工 anchor `75c2395c3` 与提交父 `29c9d2b20` 之间 `git diff --stat -- internal/ cmd/`＝**空** ⇒ §4–§9 的"改前"读数与被提交的父代码是**同一份**（`29c9d2b20` 只动台账）。
+- **提交后复核（甲尺的对象）**：`HEAD:<path>` 三枚 blob ＝ `5b4e0e02`／`c62d7b41`／`6100af22`，与工作树 `git hash-object` **同值**；把三枚 `HEAD:` blob 导出成副本跑 `gofumpt -l`（空、`rc=0`）／`-d`（**0 字节**）⇒ §10 的 G6 与 G7 是**同一份字节**。
 - **工作树**：开工/收尾 `git status --porcelain -- internal/memory/ docs/evidence/s1/` 只有本腿三枚 `.go`；★工作树里别人的脏（`.scratch/**` 的 `M`／`?? $null`／`-`／`-dummy` 等）**一个没碰、一个没清**。
 - **临时件**：只建不删，全在 `D:\tmp\wisp\20261024\368r1\**`；★`.out` 一枚没有（日志一律 `.txt`／`.log`）。
 - ★**残余（⛔ 本票的活，逐条具名）**：
