@@ -98,7 +98,7 @@
 | M3 | retention 的 `deleteChildrenOfOlderParents` 调用 | `:198/203/208/211/222`（`deleted=0`／留 `task-old`／`fkc=2`） |
 | M4 | `run.go:1213` 的 `loopOpts.Journal = rootRows` | `p373r1_e1_probe_test.go:109/113`（`max_fkc=1`、`child_without_parent_seen=true`） |
 
-- ★**还原核（时机＝最后一发变异 M4 之后）**：M4 于 `12:46:35` 结束 ⇒ 之后现树重跑：`restore-e1-after-mutations.log`（E1 **PASS**，`max_fkc=0`）、`after-memory-full.log`（78 PASS／0 FAIL）、`after-cmdwisp-targeted.log`（10 PASS／0 FAIL）、`build-all.log`／`vet.log` 均 0 字节。文件 SHA-256（`sha256sum`）：`dao_tasklog.go 9a22f389…fdc4`／`retention.go a771c0f9…9479`／`cascade_373_test.go 4f28956b…24f0`／`migration_fkcheck_366_test.go 86e1984…3374`／`run.go 11406974…8263`。
+- ★**还原核（时机＝最后一发变异之后）**：M4 于 `12:46:35` 结束；随后 M1–M3 又用**最终测试件**重跑一遍（`mut-m{1,2,3}-final.log`，`12:55:42/46/49`，红行与上表**逐字相同**）。**最后一发变异（`12:55:49`）之后**现树重跑：`restore-memory-full.log`（rc=0）／`restore-e1-final.log`（E1 **PASS**，`max_fkc=0`）；整轮读数另见 `restore-e1-after-mutations.log`（E1 PASS）、`after-memory-full.log`（78 PASS／0 FAIL）、`after-cmdwisp-targeted.log`（10 PASS／0 FAIL）、`build-all.log`／`vet.log` 均 0 字节。5 个 `.go` 的 `sha256sum` 与 `git show HEAD:<file>` **逐位相同**（SAME×5；写面 `git status` 空）。文件 SHA-256（`sha256sum`）：`dao_tasklog.go 9a22f389…fdc4`／`retention.go a771c0f9…9479`／`cascade_373_test.go 4f28956b…24f0`／`migration_fkcheck_366_test.go 86e1984…3374`／`run.go 11406974…8263`。
 
 ## §11 四数（改前／改后分开，⛔ 相减）＋ 门禁 rc ＋ 格式甲乙两尺
 
