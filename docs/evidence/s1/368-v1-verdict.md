@@ -12,7 +12,7 @@
 | `journal.go:75-82` 的字面量不设三列 | `:75-82` **逐字未变**（只 `TaskID/Seq/Tool/ArgsJSON/RiskLevel/CorrelationID`） | ✅ 字面量 premise 真 |
 | 票面「`startCall` 插的行三列**全 NULL**」 | **已过期**：DAO 兜底后同一条行＝`decided=<NULL> started_at=1792813647 ended=<NULL>`（before＝三列全 NULL） | ⚠ 票面这句**只对改前字节成立** |
 | `retention.go:154-155` 的 `COALESCE` | blob `2846718e`，与 anchor **同值**；末句逐字 `DELETE … WHERE COALESCE(…) IS NOT NULL AND COALESCE(…) < ?`；`age==ttl` 保留 | ✅ 未动 |
-| `368-a1` §1.1「1/1、留 1 孤儿、fkc 0→1」 | 我的 raw 三-NULL 子行（§6）：retention#1 **1/0**、left **1**、fkc **1**；#2 **0/0**、fkc **1** ⇒ **永生复现**。★「1/1」的 1 是旁边老时间戳子行（普查自己已改口），我这一发没放它 ⇒ 1/0 | ✅ 事实对，口径按普查的修正 |
+| `368-a1` §1.1「1/1、留 1 孤儿、fkc 0→1」 | 我的 raw 三-NULL 子行（读数见本行）：retention#1 **1/0**、left **1**、fkc **1**；#2 **0/0**、fkc **1** ⇒ **永生复现**。★「1/1」的 1 是旁边老时间戳子行（普查自己已改口），我这一发没放它 ⇒ 1/0 | ✅ 事实对，口径按普查的修正 |
 | `368-a1` §1.2 `StartRetentionJob` 零生产调用者 | 非测试命中只有 `retention.go` 自身（`:95/:98/:100/:104/:108/:233-235`） | ✅ 仍真 |
 | `368-a1` §2 附「`started_at` 生产零写入者」 | 改前真（`UPDATE tool_call` 只有 `:113` 写 decided_at、`:142` 写 ended_at）；**改后 INSERT 自己写 started_at** | ✅ 改前真 ⚠ **改后该句失效**（`COALESCE` 第二臂不再死） |
 | `368-a1` §7 两个 `InsertToolCall` 调用点 ＋ `run.go` 装配 | `journal.go:75`／`bridge.go:1225` 仍是两个；`run.go:777 Journal: mem`／`1118 Journal: nil`（普查记 `:769`／`:1080` ⇒ **+8／+38**） | ✅ 事实真、行号漂 |
@@ -46,7 +46,7 @@
 | `Outcome` 有值 | 三列 NULL | `ended_at=1792813647`，另两列 NULL | ✅ |
 | 两者都有（book 形） | 三列 NULL | `decided_at=ended_at`，`started_at` NULL | ✅ |
 | 两者皆空＋已给 `decided_at`（边界） | decided 保留、另两列 NULL | decided 保留＋`started_at=now` | ✅ 不覆盖；⚠ 此刻 `started_at > decided_at`（调用方输入自相矛盾，两个生产写者都不产这种形；规则只承诺「不再三列全 NULL」，⛔ 不承诺校验输入顺序） |
-| 列名有值＋已给 `ended_at`（边界） | decided NULL | `decided_at=now > ended_at`（同上，输入矛盾） | ✅ 非缺陷，写进射程 |
+| `Decision` 有值＋已给 `ended_at`（边界） | decided NULL | `decided_at=now > ended_at`（同上，输入矛盾） | ✅ 非缺陷，写进射程 |
 
 - ★**全称量尺**：把 DAO 输入空间枚举成 `decision{空,allow} × outcome{空,success} × 时间戳 8 种子集` ＝ **32 形**，逐形真插入＋raw 回读 ⇒ **改后 32/32 至少一列非空、0 形三列全 NULL**；改前 **28/32**，全 NULL 的 4 形恰是「没给任何时间戳」的四种基础形。★「调用方给的值永不覆盖」：32 形里**逐列逐字**比对，**0 处被改写**。
 - ★**⑥ 正控**：预置 `decided/started/ended`＝400/401/402 天前 ⇒ 回读 `1758253647/1758167247/1758080847`，**一个秒都没动**（改前改后同值）。
@@ -60,7 +60,7 @@
 | **M2** 无条件覆盖（删掉每处 `== nil` 守卫） | **1** | ④ `ExplicitTimestampsAreNotOverwritten` | `:210 :216 :230 :249`（**4 行**） |
 | **M3** 三列一律填（每个 NULL 列都塞同一个 `now`，⛔ 按行词汇） | **1** | ①③④ `BookedRowCarries…`／`PendingRowAges…`／`ExplicitTimestamps…` | `:106 :174 :249`（**3 行**） |
 
-⇒ ★M1 红＝新跳是载荷；M2 红＝「不覆盖」是载荷；M3 红＝「⛔ 一律填」边界有牙。★**M3 与 r1 报的 2 红/2 行不同**：r1 的 M3 更窄（只动 booked 支），我的 M3 是**票面禁的那句的完整形**（每列都填），因此**多红 ③**；③ 本来就钉「pending 行不许有 decided/ended」，红得对。
+⇒ ★M1 红＝新跳是载荷；M2 红＝「不覆盖」是载荷；M3 红＝「⛔ 一律填」边界有牙。★**我的 M3 与 r1 报的不同**（它报 2 红／2 行，说明它的 M3 更窄）：我的 M3 是**票面禁的那句的完整形**（每列都填），因此**多红 ③**；③ 本来就钉「pending 行不许有 decided/ended」，红得对。
 ★**原样绿**：变异前同一条命令 `rc=0`、**7/7 PASS**；★**还原绿**：最后一发变异（M3）之后 **`rc=0`、7/7 PASS**；★**还原核**（时机＝M3 之后量）：`git hash-object` 三枚＝`5b4e0e02/c62d7b41/6100af22`，仓内文件 vs `tree-after` **逐名 `cmp` rc=0 ×3**，`git diff --numstat HEAD --` 三枚 **空**，`git status --porcelain -- internal/memory/` **空** ⇒ **无工作树突变窗口**。
 
 ## §6 ⑨ 它改票 366 那枚夹具（手写 pre-368 INSERT）——判「它还测不测原来那件事」
@@ -71,7 +71,7 @@
 
 ## §7 ⑩ 四数／格式／边界／门禁（逐门自己跑）
 
-- ★**四数**（`go test -count=1 ./internal/memory/ ./internal/tools/`，**两包分开报、⛔ 相减**）：**改前** memory **27.133s**／tools **24.540s**（rc=0，pre-r1 字节，经 3 文件 `-overlay` 在**仓路径**里跑）；**改后** memory **26.587s**／tools **24.559s**（rc=0）。★与 r1 的 46.396/39.585→36.475/30.791 **不比较**（机器负载；本腿 `368-a1` 同包 63.8s 就是同一现象）。★射程：先在导出树跑「改前」时 `TestTicket252R1Alignment…` 因 `D:\tmp` 无 8.3 别名**拒绝 skip 而红**（环境前置，⛔ 代码红）⇒ 改在仓路径＋overlay 重测，避免一次假红。
+- ★**四数**（`go test -count=1 ./internal/memory/ ./internal/tools/`，**两包分开报、⛔ 相减**）：**改前** memory **27.133s**／tools **24.540s**（rc=0，pre-r1 字节，经 3 文件 `-overlay` 在**仓路径**里跑）；**改后** memory **26.587s**／tools **24.559s**（rc=0）。★与 r1 的 46.396/39.585→36.475/30.791 **不比较**（机器负载；同包的 `368-a1` 腿 63.8s 就是同一现象）。★射程：先在导出树跑「改前」时 `TestTicket252R1Alignment…` 因 `D:\tmp` 无 8.3 别名**拒绝 skip 而红**（环境前置，⛔ 代码红）⇒ 改在仓路径＋overlay 重测，避免一次假红。
 - **G1** `GOFLAGS= go build ./...` **rc=0**、**0 字节**；**G2** `go vet ./internal/memory/ ./internal/tools/ ./internal/agent/` **rc=0**、0 字节；**G4** `sh scripts/d22scan.sh` **rc=0**：`clean - no D22 ban violations`（internal/ 641 Go 文件、cmd/ 150 逐枚过）；**G5** `sh scripts/check-path-length-budget.sh` **rc=0**：`VERDICT GREEN`、17688 tracked、over-budget 61/roster 61/not-in-roster 0、两单位同选 61。
 - **格式甲（入库 blob＝判据）**：`git cat-file blob HEAD:` 三枚导出（`git hash-object` 回读＝`5b4e0e02/c62d7b41/6100af22`）⇒ `gofumpt -l` **空、rc=0**；`gofumpt -d` **0 字节、rc=0**。
 - **格式乙（工作树＝只作诊断）**：`gofumpt -l internal/memory/dao_toolcall.go internal/memory/dao_toolcall_368_test.go internal/memory/migration_fkcheck_366_test.go` ⇒ **空、rc=0**；归属判定用 `[\\/]`（命中 `internal[\\/]memory` 的行＝0）。
