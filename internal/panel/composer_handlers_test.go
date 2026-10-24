@@ -67,7 +67,8 @@ func modeReq(to, id string) ComposerRequest {
 	return ComposerRequest{Method: MethodModeRequest, RequestID: id, Source: ComposerRequestSource, To: to}
 }
 
-// modeLadder is the order the gate's one comparison depends on.
+// modeLadder is the vocabulary these cases iterate: risk.ModeNames() parsed back
+// into the constants, in the order risk.Mode declares them.
 func modeLadder(t *testing.T) []risk.Mode {
 	t.Helper()
 	names := risk.ModeNames()
@@ -82,11 +83,12 @@ func modeLadder(t *testing.T) []risk.Mode {
 	return ladder
 }
 
-// TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree nails the premise
-// of perm.IsWidening, which is a raw `to > from` over risk.Mode's constants and
-// is now the ONE predicate both gates call (ticket 367 moved the definition to
-// internal/perm so the store judges the same direction instead of judging the
-// target's name). The vocabulary is a list, so it is nailed three ways: exact
+// TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree nails the vocabulary
+// these cases iterate, plus the ladder order the audit words "widened"/"narrowed"
+// still read. Since ticket 372 the GATE is perm.RequiresCard(target), not the
+// direction, so this test is no longer the gate's premise: it is the list's own
+// pin (exact equality, length floor, strict-prefix negative arm) with the order
+// witness perm.IsWidening still names. The vocabulary is nailed three ways: exact
 // equality (a rename or a reorder goes red), a length floor and a strict-prefix
 // negative assertion (a SHRUNKEN list goes red on its own line, not only inside
 // the equality - A109(2) measured that a 6-to-5 trim leaves per-entry assertions
@@ -120,51 +122,90 @@ func TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree(t *testing.T) {
 	}
 }
 
-// TestAWideningModeRequestIsRefusedWhenNoL2ConfirmLegIsAttached is AC#2.
-func TestAWideningModeRequestIsRefusedWhenNoL2ConfirmLegIsAttached(t *testing.T) {
+// TestOnlyTheAutoApproveTargetIsRefusedWhenNoL2ConfirmLegIsAttached is AC#2 as
+// ticket 372 re-scoped it (its 114 name was the widening one): with no leg
+// attached, requests whose TARGET is auto_approve are refused - that is the one
+// target R20/M4 cards - and every other target reaches the write leg. Refusing
+// ask_high_risk here was ticket 367's direction rule; it is exactly the request
+// M4 says costs no card, and the read-side downgrade (perm.Store.PermissionMode
+// answers ask_every_step without a leg) is what keeps a legless host safe after
+// it lands.
+func TestOnlyTheAutoApproveTargetIsRefusedWhenNoL2ConfirmLegIsAttached(t *testing.T) {
 	ladder := modeLadder(t)
 	names := risk.ModeNames()
-	cases := 0
-	refused := 0
+	cases, refused, unchanged, passed := 0, 0, 0, 0
 	for fromIdx, from := range ladder {
-		for toIdx := range ladder {
+		for toIdx, to := range ladder {
 			cases++
-			if toIdx <= fromIdx {
-				continue // narrowing or no-change: this case is about widening
-			}
 			w := &fakeModeWriter{current: from, currentOK: true}
 			var audit auditLog
 			h := &ModeWriteHandler{Modes: w, Audit: audit.f}
 			id := fmt.Sprintf("rid-%s-%s", names[fromIdx], names[toIdx])
 			err := h.HandleModeRequest(context.Background(), modeReq(names[toIdx], id))
-			if err == nil {
-				t.Fatalf("%s -> %s with no confirm leg: got nil error, the档 would have been written",
-					names[fromIdx], names[toIdx])
+			switch {
+			case from == to:
+				// No-change: the write leg owns it (Set audits no-change), so the
+				// gate must not eat that line - including the auto_approve row.
+				unchanged++
+				if err != nil {
+					t.Fatalf("%s -> %s (unchanged) was refused: %v", names[fromIdx], names[toIdx], err)
+				}
+				if w.setCalls != 1 || w.setMode != to {
+					t.Fatalf("%s unchanged: ModeWriter called %d time(s) with %s, want one call with %s",
+						names[fromIdx], w.setCalls, w.setMode, names[toIdx])
+				}
+			case perm.RequiresCard(to):
+				if err == nil {
+					t.Fatalf("%s -> %s targets auto_approve with no confirm leg: got nil error, the档 would have been written",
+						names[fromIdx], names[toIdx])
+				}
+				if !errors.Is(err, ErrNoL2Confirm) {
+					t.Fatalf("%s -> %s: error %v does not say the confirmation leg is what is missing",
+						names[fromIdx], names[toIdx], err)
+				}
+				if w.setCalls != 0 {
+					t.Fatalf("%s -> %s: the injected ModeWriter was called %d time(s) despite the refusal - the gate did not stop the write",
+						names[fromIdx], names[toIdx], w.setCalls)
+				}
+				if len(audit) != 1 {
+					t.Fatalf("%s -> %s: refusal wrote %d audit line(s), want exactly 1 (a refused switch must not be silent)",
+						names[fromIdx], names[toIdx], len(audit))
+				}
+				if !strings.Contains(audit.joined(), id) {
+					t.Fatalf("audit line %q does not name the requestId it refused", audit.joined())
+				}
+				refused++
+			default:
+				if err != nil {
+					t.Fatalf("%s -> %s targets %s, which R20/M4 does not card, but the handler refused it: %v",
+						names[fromIdx], names[toIdx], names[toIdx], err)
+				}
+				if w.setCalls != 1 || w.setMode != to {
+					t.Fatalf("%s -> %s: the write leg was called %d time(s) with %s, want exactly one call with %s",
+						names[fromIdx], names[toIdx], w.setCalls, w.setMode, names[toIdx])
+				}
+				if len(audit) != 0 {
+					t.Fatalf("%s -> %s: a request that reached the write leg must not add a second verdict, got %q",
+						names[fromIdx], names[toIdx], audit.joined())
+				}
+				passed++
 			}
-			if !errors.Is(err, ErrNoL2Confirm) {
-				t.Fatalf("%s -> %s: error %v does not say the confirmation leg is what is missing",
-					names[fromIdx], names[toIdx], err)
-			}
-			if w.setCalls != 0 {
-				t.Fatalf("%s -> %s: the injected ModeWriter was called %d time(s) despite the refusal - the gate did not stop the write",
-					names[fromIdx], names[toIdx], w.setCalls)
-			}
-			if len(audit) != 1 {
-				t.Fatalf("%s -> %s: refusal wrote %d audit line(s), want exactly 1 (a refused switch must not be silent)",
-					names[fromIdx], names[toIdx], len(audit))
-			}
-			if !strings.Contains(audit.joined(), id) {
-				t.Fatalf("audit line %q does not name the requestId it refused", audit.joined())
-			}
-			refused++
 		}
 	}
 	if cases != len(ladder)*len(ladder) {
 		t.Fatalf("the switch matrix covered %d pairs of %d modes (%d): the enumeration was shortened",
 			cases, len(ladder), len(ladder)*len(ladder))
 	}
-	if want := len(ladder) * (len(ladder) - 1) / 2; refused != want {
-		t.Fatalf("%d widening pairs asserted, want %d: some direction of the ladder went untested", refused, want)
+	// One refusal per starting档 except auto_approve itself: the target that costs
+	// a card is refused whenever it would be a change.
+	if want := len(ladder) - 1; refused != want {
+		t.Fatalf("%d auto_approve changes refused, want %d", refused, want)
+	}
+	if want := len(ladder); unchanged != want {
+		t.Fatalf("%d no-change rows reached the write leg, want %d (R20 audits all three档)", unchanged, want)
+	}
+	if want := len(ladder)*(len(ladder)-1) - (len(ladder) - 1); passed != want {
+		t.Fatalf("%d non-card changes reached the write leg, want %d: a direction rule crept back in", passed, want)
 	}
 }
 

@@ -338,10 +338,11 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 // perm.Switch record and is the only one that calls it.
 //
 // A nil panel leg stays a nil perm leg. That is not a convenience: perm.Store.Set's
-// gate is `IsWidening(from, to) && s.confirm == nil` (store.go:209), so returning a
-// closure that merely refused when called would hand the Store a non-nil leg and
-// let every widening through the gate into Set - the exact hole ticket 367 closed
-// on the storage side and ticket 114 AC#2 keeps closed on the handler side.
+// gate is `RequiresCard(to) && s.confirm == nil` (store.go:268) and the read side
+// keys the same nil-ness (PermissionMode collapses to ask_every_step), so returning
+// a closure that merely refused when called would hand the Store a non-nil leg and
+// silently restore the looser档's silencing - the hole ticket 114 AC#2 keeps closed
+// on the handler side and ticket 372 closes on the read side.
 func storeConfirmFromPanel(confirm panel.ModeConfirm) perm.ConfirmFunc {
 	if confirm == nil {
 		return nil

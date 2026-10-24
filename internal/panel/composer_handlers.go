@@ -2,35 +2,41 @@ package panel
 
 // Ticket 114 AC#2 - the native side of the composer's mode write (R-92-2).
 //
-// WHY A GATE HERE AT ALL, NOW THAT perm.Store.Has ONE TOO. Both layers judge the
-// same thing and they judge it with the same function (perm.IsWidening), so this
+// WHY A GATE HERE AT ALL, NOW THAT perm.Store HAS ONE TOO. Both layers judge the
+// same thing and they judge it with the same function (perm.RequiresCard), so this
 // is not a second opinion that can drift - it is the same opinion applied at the
-// two points a widening has to cross. The store's gate is what makes the
+// two points a mode request has to cross. The store's gate is what makes the
 // invariant true for every caller, including the ones that never come through
 // this file; this gate is what refuses a panel request BEFORE a write leg is
 // even asked, so the refusal the page sees is a panel refusal with a panel
 // error code rather than whatever the store happened to say.
 //
-// HISTORY THAT MATTERS: until ticket 367 the two layers judged DIFFERENTLY - the
-// store asked "is the target auto_approve?" while this file asked "is the
-// direction widening?" - so a panel request that widened to ask_high_risk was
-// refused here and would have been applied unchanged by Set had anything else
-// called it. docs/evidence/s1/114-ac1-status-table.md ②.1 measured exactly that
-// hole. The single predicate is the fix for the class, not for that one pair.
+// HISTORY THAT MATTERS, TWICE. Until ticket 367 the two layers judged
+// DIFFERENTLY - the store asked "is the target auto_approve?" while this file
+// asked "is the direction widening?" - so a panel request that widened to
+// ask_high_risk was refused here and would have been applied unchanged by Set had
+// anything else called it. 367 made both layers judge the DIRECTION and closed
+// that gap, but "any widening needs a leg" is not what the owner settled
+// (2026-09-21: only the switch INTO full auto costs a card), and no surveyed
+// mainstream harness gates on "wider" (docs/evidence/s1/m4-survey.md:96). Ticket
+// 372 reverted the JUDGEMENT to the target and kept the single predicate:
+// perm.RequiresCard is defined once and called here and in Set.
 //
-// THE RULE, in owner's R20 direction-asymmetry as settled for this ticket: a
-// request that makes the档 WIDER needs a leg; a request that makes it NARROWER
-// never does, and must not be blocked. Refusing to become stricter guards
-// nothing, and the档 that removes questions is the only one worth guarding.
+// THE RULE, in owner's R20/M4: a request whose TARGET is auto_approve needs a
+// leg; every other target passes, wider or narrower. The missing leg is made safe
+// for the middle档 on the READ side instead: perm.Store.PermissionMode answers
+// ask_every_step when the store has no confirmation channel, so the档 a legless
+// process actually runs is the strictest one even after ask_high_risk has been
+// persisted (ticket 372-r2).
 //
 // THE HANDLER NEVER CALLS Confirm. Asking belongs to the write leg: perm.Store.Set
 // raises the single C18 card for auto_approve (R20/M4), and an ask here on top
 // of it would be two cards for one click - two 300s windows, two timeouts, two
-// rejects. What Confirm's nil-ness buys is exactly AC#2's property, and nothing
-// else: an assembly that hands this handler no leg cannot widen anything.
-// TestAWideningModeRequestIsRefusedWhenNoL2ConfirmLegIsAttached pins that
-// Set is not reached; TestTheModeHandlerRaisesNoSecondCard pins that Confirm is
-// not called either.
+// rejects. What Confirm's nil-ness buys is exactly that property, and nothing
+// else: an assembly that hands this handler no leg cannot reach auto_approve.
+// TestOnlyTheAutoApproveTargetIsRefusedWhenNoL2ConfirmLegIsAttached pins that Set
+// is not reached for that target; TestTheModeHandlerRaisesNoSecondCard pins that
+// Confirm is not called either.
 //
 // AUDIT IS NOT THE GATE'S TRADE. Every refusal written here emits its own audit
 // line before returning, because the write leg never ran and would otherwise
@@ -58,17 +64,18 @@ import (
 // "config-file"), and the write leg owns the record - this only names the door.
 const PanelModeOrigin = "panel"
 
-// ErrNoL2Confirm is the refusal AC#2 exists for: a widening request arrived with
-// no confirmation leg attached.
+// ErrNoL2Confirm is the refusal AC#2 exists for: a request for the one target
+// that costs a card arrived with no confirmation leg attached.
 var ErrNoL2Confirm = errors.New("panel: 确认腿未接入，档位不得变宽")
 
 // ErrNoModeWriter means there is no write leg to ask for at all.
 var ErrNoModeWriter = errors.New("panel: 档位写入腿未接入")
 
-// ErrNoCurrentMode means the档 in force could not be read, so "is this request
-// wider?" has no answer. Failing closed here is not paranoia about a nil: a
-// writer that reports a loose档 it is not actually running would otherwise turn
-// every widening request into a narrowing one and switch this whole gate off.
+// ErrNoCurrentMode means the档 in force could not be read, so a refusal would
+// have no attributable starting point and the audit line would name nothing.
+// Failing closed here is not paranoia about a nil: a writer that reports a档 it
+// is not actually running would put the wrong "from" on every record this handler
+// writes.
 var ErrNoCurrentMode = errors.New("panel: 当前档位不可读")
 
 // ModeWriter is the write leg a panel mode request is handed to, and it is the
@@ -77,7 +84,9 @@ var ErrNoCurrentMode = errors.New("panel: 当前档位不可读")
 // Declared locally, with no import of internal/perm, so this package's
 // dependency face does not move for one ticket's gate.
 type ModeWriter interface {
-	// PermissionMode is the档 currently in force.
+	// PermissionMode is the EFFECTIVE档 in force: a store with no confirmation
+	// channel answers ask_every_step (ticket 372-r2), which is what this handler
+	// must name in a refusal or an audit line.
 	PermissionMode() risk.Mode
 	// Set switches and persists, confirms if R20/M4 says so, and audits.
 	Set(ctx context.Context, to risk.Mode, origin, actor string) error
@@ -128,15 +137,28 @@ func (h *ModeWriteHandler) HandleModeRequest(ctx context.Context, req ComposerRe
 		h.record(req, refused, "(不可读)", to.String())
 		return refused
 	}
-	if perm.IsWidening(from, to) && h.Confirm == nil {
-		refused := fmt.Errorf("%w: 请求 %q 要把档位从 %s 放宽到 %s，而本机没有接入 L2 确认腿（R20/M4：只有全自动要确认）",
+	if from == to {
+		// A no-change is not a request for a card. Set records it as no-change and
+		// returns without asking; refusing it here would make this layer stricter
+		// than the store about a request that changes nothing. It is also the row
+		// that lets a legless host ask for the档 it is ALREADY effectively running
+		// (config auto_approve, read-side downgrade to ask_every_step) and have
+		// that stricter value land on disk.
+		return h.Modes.Set(ctx, to, PanelModeOrigin, h.actor())
+	}
+	// Ticket 372: the gate is the TARGET, and it is the same predicate
+	// perm.Store.Set applies. A request for auto_approve with no leg is refused
+	// here, before the write leg sees it, so the page gets a panel error code;
+	// every other target reaches Set, which judges the same target the same way.
+	if perm.RequiresCard(to) && h.Confirm == nil {
+		refused := fmt.Errorf("%w: 请求 %q 要把档位从 %s 切到 %s（R20/M4：只有全自动要确认），而本机没有接入 L2 确认腿",
 			ErrNoL2Confirm, req.RequestID, from, to)
 		h.record(req, refused, from.String(), to.String())
 		return refused
 	}
 	// The leg is attached, so R20/M4's ask is the write leg's to make - exactly
-	// one card, raised by Set, for the one档 that costs it. Set judges the same
-	// direction with the same predicate and would refuse the same request on its
+	// one card, raised by Set, for the one target that costs it. Set judges the
+	// same target with the same predicate and would refuse the same request on its
 	// own if nothing had; this layer exists so the refusal carries a panel error.
 	if err := h.Modes.Set(ctx, to, PanelModeOrigin, h.actor()); err != nil {
 		return err

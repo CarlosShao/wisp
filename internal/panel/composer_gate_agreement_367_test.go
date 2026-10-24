@@ -6,16 +6,23 @@ package panel
 // this package has always judged the DIRECTION (modeIsWidening, now
 // perm.IsWidening) while perm.Store judged the TARGET ("is it auto_approve?").
 // A panel request that widened to ask_high_risk was refused here and would have
-// been applied unchanged by Set had anything else called it.
+// been applied unchanged by Set had anything else called it. Ticket 367 made both
+// layers judge the direction; ticket 372 found that judgement refuted by the
+// mainstream survey (docs/evidence/s1/m4-survey.md:96: no surveyed harness gates
+// on "wider"), reverted it to the target and kept ONE definition of the target
+// rule (perm.RequiresCard), called here and in Set.
 //
 // The rows below are the invariant, not either implementation: for every ordered
 // pair of the three modes, with no confirmation channel wired anywhere, the two
-// layers must refuse the same switches. Fixing one layer alone turns this red,
-// which is why it is a tooth for the class rather than for the pair.
+// layers must refuse the same switches. Since 372 the refused set is exactly "the
+// target is auto_approve" - the one档 R20/M4 cards - so the auto_approve rows are
+// the teeth, and ask_every_step -> ask_high_risk is the row the revert buys.
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/CarlosShao/wisp/internal/config"
@@ -43,21 +50,24 @@ func TestPanelGateAndStoreGateAgreeOnEveryPair367(t *testing.T) {
 	ladder := modeLadder(t)
 	names := risk.ModeNames()
 	ctx := context.Background()
-	pairs, widening, narrowing := 0, 0, 0
+	pairs, refused := 0, 0
+	sawMiddleWidening := false
 	for fromIdx, from := range ladder {
 		for toIdx, to := range ladder {
 			if fromIdx == toIdx {
 				continue
 			}
 			pairs++
-			if toIdx > fromIdx {
-				widening++
-			} else {
-				narrowing++
+			wantRefused := perm.RequiresCard(to)
+			if wantRefused {
+				refused++
+			}
+			if from == risk.ModeAskEveryStep && to == risk.ModeAskHighRisk {
+				sawMiddleWidening = true
 			}
 
 			// Layer 1: the real perm.Store, no confirmation channel. This is the
-			// composition both production entries build (panel_inbound.go:254).
+			// composition both production entries build (panel_inbound.go:272).
 			mgr := &t367Manager{mode: from}
 			st, err := perm.New(perm.Options{Manager: mgr})
 			if err != nil {
@@ -72,35 +82,54 @@ func TestPanelGateAndStoreGateAgreeOnEveryPair367(t *testing.T) {
 			id := fmt.Sprintf("agree-%s-%s", names[fromIdx], names[toIdx])
 			handlerErr := h.HandleModeRequest(ctx, modeReq(names[toIdx], id))
 
+			if (storeErr != nil) != wantRefused {
+				t.Errorf("%s -> %s: perm.Store refused=%v (%v), want refused=%v (target is auto_approve: %v)",
+					from, to, storeErr != nil, storeErr, wantRefused, perm.RequiresCard(to))
+			}
+			if (handlerErr != nil) != wantRefused {
+				t.Errorf("%s -> %s: panel handler refused=%v (%v), want refused=%v (target is auto_approve: %v)",
+					from, to, handlerErr != nil, handlerErr, wantRefused, perm.RequiresCard(to))
+			}
 			if (storeErr == nil) != (handlerErr == nil) {
 				t.Errorf("%s -> %s: the two gates disagree - perm.Store refused=%v (%v), panel handler refused=%v (%v)",
 					from, to, storeErr != nil, storeErr, handlerErr != nil, handlerErr)
 			}
-			// A refusal on either layer must leave the mode where it was.
-			if storeErr != nil && st.PermissionMode() != from {
-				t.Errorf("%s -> %s: the store refused but moved to %s", from, to, st.PermissionMode())
-			}
-			if handlerErr != nil && w.setCalls != 0 {
-				t.Errorf("%s -> %s: the handler refused but called the write leg %d time(s)", from, to, w.setCalls)
-			}
-			// And every widening must be the refused direction on BOTH layers:
-			// two judges that happen to agree on "refuse everything" would pass
-			// the comparison above and fail this line.
-			if toIdx > fromIdx {
-				if storeErr == nil || handlerErr == nil {
-					t.Errorf("%s -> %s is a widening and both layers must refuse it without a channel: store=%v handler=%v",
-						from, to, storeErr, handlerErr)
+			if wantRefused {
+				// A refusal on either layer must leave the PERSISTED档 where it was.
+				// The read side is deliberately not asked: without a leg it answers
+				// ask_every_step even when the file says otherwise (372-r2).
+				if mgr.mode != from {
+					t.Errorf("%s -> %s: the refusal still moved the persisted档 to %s", from, to, mgr.mode)
 				}
-			}
-			if toIdx < fromIdx {
-				if storeErr != nil || handlerErr != nil {
-					t.Errorf("%s -> %s is a narrowing and neither layer may refuse it: store=%v handler=%v",
-						from, to, storeErr, handlerErr)
+				if w.setCalls != 0 {
+					t.Errorf("%s -> %s: the handler refused but called the write leg %d time(s)", from, to, w.setCalls)
 				}
+				if !errors.Is(handlerErr, ErrNoL2Confirm) {
+					t.Errorf("%s -> %s: the refusal is not ErrNoL2Confirm: %v", from, to, handlerErr)
+				}
+				// Both ends must be named, or an operator reading the log cannot
+				// tell which switch was attempted.
+				if storeErr == nil || !strings.Contains(storeErr.Error(), from.String()) ||
+					!strings.Contains(storeErr.Error(), to.String()) {
+					t.Errorf("%s -> %s: the store refusal does not name both modes: %v", from, to, storeErr)
+				}
+				continue
+			}
+			// A target M4 does not card passes BOTH layers: nothing here is a
+			// widening rule in disguise, and the middle档 is reachable.
+			if mgr.mode != to {
+				t.Errorf("%s -> %s: the allowed switch did not persist the target (file says %s)", from, to, mgr.mode)
+			}
+			if w.setCalls != 1 || w.setMode != to {
+				t.Errorf("%s -> %s: the handler should call the write leg once with %s; called %d time(s) with %s",
+					from, to, to, w.setCalls, w.setMode)
 			}
 		}
 	}
-	if pairs != 6 || widening != 3 || narrowing != 3 {
-		t.Fatalf("matrix covered %d pairs (%d widening / %d narrowing), want 6 (3/3)", pairs, widening, narrowing)
+	if pairs != 6 || refused != 2 {
+		t.Fatalf("matrix covered %d pairs with %d refused, want 6 pairs and 2 refused (auto_approve from the two stricter档)", pairs, refused)
+	}
+	if !sawMiddleWidening {
+		t.Fatal("the ask_every_step -> ask_high_risk row is missing: the revert's own case went untested")
 	}
 }

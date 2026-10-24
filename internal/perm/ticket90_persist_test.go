@@ -100,7 +100,16 @@ func (g *t90gate) counts() (int, int) {
 func askOnce(t *testing.T, path string) (int, int) {
 	t.Helper()
 	mgr := openManager(t, path)
-	st, err := New(Options{Manager: mgr})
+	// The channel is part of the fixture as of ticket 372-r2: a Store with NO
+	// confirmation channel answers ask_every_step from PermissionMode (the
+	// read-side downgrade), so a looser key could never reach the chain. This test
+	// is about "the key changes what the chain asks" in a process ALLOWED to run
+	// the looser档 - i.e. one that can ask for the card. The downgrade itself is
+	// pinned in store_372_test.go.
+	st, err := New(Options{
+		Manager: mgr,
+		Confirm: func(context.Context, Switch) error { return nil },
+	})
 	if err != nil {
 		t.Fatalf("perm.New: %v", err)
 	}
