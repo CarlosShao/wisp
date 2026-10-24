@@ -84,7 +84,7 @@ SET config=auto_approve confirm=nil to=ask_high_risk | effective BEFORE=ask_ever
   2. **存储**：`internal/agent/approval/queue.go:32` `qitem.Dec`（整结构体存下，从不读 `Mode`）。
   3. **`LiveApprovals()`**（`pending_read.go:113-130`）→ 唯一生产者 `cmd/wisp/panel_pump.go:66`，但 `:69-77` 那 7 个键只拷 `Tool/Args/Level/RulesHit/Reason/SessionOverrideBlocked`——**`Mode` 被丢掉**；`panel.CardViewFromDecision`（`internal/panel/approval.go:72`）吃的是 `risk.Decision`，**另一枚类型**。
   4. **`Gate.Replay`**（`gate.go:755`）→ `Queue.replay`（`queue.go:609`）把 `it.Dec` 原样带回 ⇒ `Mode` **会**跟着回放；但 `Gate.Replay` **生产 0 个调用者**（唯一调用在 `internal/agent/approval/queue_test.go:283`）。
-  5. **审计／DB／卡面都不是消费者**：`tools: call` 行（`bridge.go:1174-1178`）**无 mode=**；`OnDecision`（`run.go:792-795`）**无 mode**；`tool_call` 表只有 `risk_level`／`decision`／`outcome`／`grant_id`（`memory/schema.go:87` 起）**无 mode 列**；`internal/agent/approval` 非测试代码里 **`Mode` 一词 0 命中**。
+  5. **审计／DB／卡面都不是消费者**：`tools: call` 行（`bridge.go:1174-1178`）**无 mode=**；`OnDecision`（`run.go:792-795`）**无 mode**；`tool_call` 表只有 `risk_level`／`decision`／`outcome`／`grant_id`（DDL `internal/memory/schema.go:81-96`，逐列核过）**无 mode 列**；`internal/agent/approval` 非测试代码里 **`Mode` 一词 0 命中**。
   ⇒ ★**净结论**：`Decision.Mode` 今天**写而无人读**。375-a1 说它「仅展示/记账」，实测比那更弱：**展示面也丢**。
 
 ## ⑤ 「改它会破什么」——两枚变体（仓外，各只改 `perm/store.go` 一行）
