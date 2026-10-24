@@ -138,6 +138,7 @@ DELETE FROM tool_call WHERE COALESCE(ended_at, started_at, decided_at) IS NOT NU
 ## §10 纪律格：提交号 · 逐枚 `.go`（应为 **0**）
 
 - 提交号：**首笔只含本件**；本件首笔的哈希由紧随的一笔补录在下一行（⛔ amend、⛔ 改写历史）。
+- 补录：首笔＝`bac7d5a29a7cf8ec79997d072ca3f6d673888469`（`A docs/evidence/s1/368-a1-census.md`，148 行）。
 - **本腿落进仓的 `.go`＝0 枚**。判据三把（⛔ 只看一把）：①本腿开工 `09:33` 现跑 `git status --porcelain -- internal/ cmd/ scripts/`＝**空**，收尾时出现的 5 枚 `M cmd/wisp/*.go` 归**别的腿**（本腿从未对仓内任何路径执行写命令）；②本腿只写 `docs/evidence/s1/368-a1-census.md`；③探针在 `D:\tmp\wisp\20261024\368a1\probes\**`（仓外），经 `-overlay` 生效，导出树里**不落盘**。
 - `add`/`commit` 两处显式 pathspec（逐字点名单一文件）；提交前 `git diff --cached --name-status` 核索引。
 
