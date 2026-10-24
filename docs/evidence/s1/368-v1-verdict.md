@@ -1,8 +1,8 @@
 # 票 368 / 腿 `368-v1` 终裁（非实现者）— 〔丁〕成立：形对、牙真、**「不编 `book.started_at`」这条承重判断判对**；`AC#2` 可翻（按〔丁〕射程），存量与「父删即子删」留给级联那一票
 
 - 腿＝`368-v1`（**终裁腿**，非实现者）。被裁＝`368-r1`：`c0eea973b`（码＋件）／`92ceaecdf`（件）／`7fc90d21b`（件）。
-- 我的两棵树：`tree-before`＝`git archive 75c2395c3`（r1 anchor）· `tree-after`＝`git archive 7fc90d21b`（r1 交付）；`git diff --stat 75c2395c3 c0eea973b^ -- internal cmd scripts`＝**空** ⇒ 两棵树的「改前」是同一份字节。★判的三枚 blob 在本腿观察到的 **5 个 HEAD**（`7fc90d21b`／`255d42c75`／`b4ee24cb`／`9965e86a9`／`16b1d3f3`）上**逐枚同值**（`5b4e0e02`／`c62d7b41`／`6100af22`）⇒ 下面读数对今天的 HEAD 成立（本腿期间别人推了 4 笔，HEAD 漂了 4 次，⛔ 我未跟）。
-- 写面：本件＋仓外 `D:\tmp\wisp\20261024\368v1\**`。**仓内 `.go`＝0 枚、0 字节**（判据：①本腿开工/收尾 `git status --porcelain -- internal/ cmd/ scripts/` 均**空**；②本腿只对仓内一个路径执行过写命令＝本件；③探针三枚在 `368v1\probes\**`，只进 `git archive` 导出树）。★工作树里别人的脏（`.scratch/**` 的 `M`／`??`）**一个没碰、一个没清**。
+- 我的两棵树：`tree-before`＝`git archive 75c2395c3`（r1 anchor）· `tree-after`＝`git archive 7fc90d21b`（r1 交付）；`git diff --stat 75c2395c3 c0eea973b^ -- internal cmd scripts`＝**空** ⇒ 两棵树的「改前」是同一份字节。★判的三枚 blob 在本腿观察到的 **5 个 HEAD**（`7fc90d21b`／`255d42c75`／`b4ee24cb`／`9965e86a9`／`16b1d3f3`）上**逐枚同值**（`5b4e0e02`／`c62d7b41`／`6100af22`）⇒ 下面读数对今天的 HEAD 成立（本腿期间 HEAD 移动多次、别的腿在推，⛔ 我未跟、也未 push）。
+- 写面：本件＋仓外 `D:\tmp\wisp\20261024\368v1\**`。**仓内 `.go`＝0 枚、0 字节**（判据：①本腿只对仓内一个路径执行过写命令＝本件；②开工时工作树里已有**别人**的 `M cmd/wisp/*.go`／`M internal/panel/*`／`M internal/perm/*`，本腿**一个没碰**，收尾时它们已被其主人提交、`git status --porcelain -- internal/ cmd/ scripts/ docs/` **空**；③探针三枚在 `368v1\probes\**`，只进 `git archive` 导出树）。★工作树里别人的脏（`.scratch/**` 的 `M`／`??`）**一个没碰、一个没清**。
 - ★尺的射程（五问）：①"行三列"＝**新连接** `SELECT decided_at/started_at/ended_at`（`sql.NullInt64`）⇒ `<NULL>` 是 **SQL NULL**；②`fkc`＝`PRAGMA foreign_key_check`（FK 关也答，`368-a1` §1 已证）；③retention＝**生产的** `RunRetentionOnce`，`Now` 钉到 **+31 天**（插入即 >30 天）；④"四数"是 go test 自报的两个包耗时，**分开报、⛔ 相减**；⑤hash＝`git hash-object`（SHA-1、40 位）。
 
 ## §1 ① 票面前提新鲜度（对 HEAD blob 现跑）＋`368-a1` 三条
