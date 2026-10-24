@@ -33,10 +33,12 @@ package main
 // evidence table (§2), and the real-credential reading is booked as owed.
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -71,6 +73,13 @@ func TestAC246ResidentPipelineAsksThroughTheOneGate(t *testing.T) {
 	// No bindBallHost: the no-desktop / no-window posture is the one this case is
 	// about, and it is the fail-closed direction (a card nobody can be shown must
 	// never run the call).
+	// Ticket 375: the fixture declares the same live fact the shipped leg declares
+	// (ra.ui.hasBall), because an injected gate now has to arrive with it - without
+	// it the mode read could not know that this process cannot answer at all. With
+	// no ball bound that fact answers false, which is why the call below is routed
+	// onto the L2 card: the L1 route refuses before it asks any surface (that half
+	// is Test375ResidentGateRefusesTheWindowWithNoBall's), and the surface-identity
+	// reading this case exists for stays observable on L2.
 	ar, code := assembleRuntime(runSpec{
 		stdout:  f.out,
 		stderr:  f.err,
@@ -78,6 +87,7 @@ func TestAC246ResidentPipelineAsksThroughTheOneGate(t *testing.T) {
 		gate:    ra.gate,
 		ui:      ra.ui,
 		cards:   ra.cards,
+		answer:  ra.ui.hasBall,
 		taskCtx: ra.root,
 		notify:  swallowPoster,
 	})
@@ -102,10 +112,32 @@ func TestAC246ResidentPipelineAsksThroughTheOneGate(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	// A real L1 fs.write through the bridge this assembly built. The task is
-	// admitted the way the loop admits it (D47), so the only thing that can stop
-	// this call is the gate - and the gate's UI is the resident surface.
+	// A real write through the bridge this assembly built, routed onto the L2 card
+	// (overwriting an existing file is R8, and an L2 is asked in every mode). The
+	// task is admitted the way the loop admits it (D47), so the only thing that can
+	// stop this call is the gate - and the gate's UI is the resident surface.
+	//
+	// WHY L2 AND NOT L1 SINCE TICKET 375: the L1 route now refuses a window nobody
+	// could see BEFORE it asks the surface (approval/reach.go), so on that route the
+	// surface is no longer reachable and the sentinel below could never come back.
+	// The L2 route is untouched by 375 - it keeps the surface attempt, its own
+	// fail-closed branch and its 到点即拒 polarity - which is where the same claim
+	// ("the cards this gate raises land on ra.ui, not on some other surface") is
+	// still observable from outside the package. The L1 half of this same fixture
+	// is measured by Test375ResidentGateRefusesTheWindowWithNoBall.
 	target := filepath.Join(f.dir, "resident-pipeline-write.txt")
+	if err := os.WriteFile(target, []byte("already here"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	// The gate's own sink (residentAuditf) is where the L2 route records WHY it
+	// could not show the card, and that line carries the surface's sentinel. It
+	// goes to slog as well as stdout, so capturing slog is how this file reads the
+	// gate's own words from outside the package (a captured os.Stdout would be the
+	// same fact through a heavier door).
+	var gateLog bytes.Buffer
+	prevLog := slog.Default()
+	slog.SetDefault(slog.New(slog.NewTextHandler(&gateLog, &slog.HandlerOptions{Level: slog.LevelDebug})))
+	defer slog.SetDefault(prevLog)
 	revoke := ar.gate.AdmitTextTask("host:246-one-gate")
 	defer revoke()
 	out, err := ar.bridge.Execute(ctx, agent.ToolRequest{
@@ -119,13 +151,16 @@ func TestAC246ResidentPipelineAsksThroughTheOneGate(t *testing.T) {
 	if !out.IsError {
 		t.Fatalf("a resident leg with no ball executed a write it had nowhere to confirm: %+v", out)
 	}
-	if _, statErr := os.Stat(target); !os.IsNotExist(statErr) {
-		t.Errorf("the vetoed-by-absence write landed on disk anyway: %v", statErr)
+	if body, readErr := os.ReadFile(target); readErr != nil || string(body) != "already here" {
+		t.Errorf("the refused write changed the file: %v %q", readErr, body)
 	}
-	if !strings.Contains(out.Text, errResidentNoBall.Error()) {
-		t.Fatalf("the refusal did not come from the resident surface: text = %q, want it to carry %q "+
+	if !strings.Contains(out.Text, "审批界面不可达") {
+		t.Fatalf("the refusal is not the gate's own fail-closed sentence: %q", out.Text)
+	}
+	if !strings.Contains(gateLog.String(), errResidentNoBall.Error()) {
+		t.Fatalf("the gate's log does not carry the resident surface's sentinel: want %q in\n%s"+
 			"(that sentinel is returned only by ballCardUI.Prompt, so its absence means the gate is not "+
-			"showing cards on the surface this process injected)", out.Text, errResidentNoBall)
+			"trying to show cards on the surface this process injected)", errResidentNoBall, gateLog.String())
 	}
 	if n := ra.ui.displayedCards(); n != 0 {
 		t.Errorf("the resident surface counted %d displayed cards with no window attached", n)
@@ -174,7 +209,7 @@ func TestAC246ResidentGateInjectionIsRefusedHalfAssembled(t *testing.T) {
 	}
 }
 
-// TestAC246ResidentTaskRootCancelStopsTheModelCallIs ruling 2.3 measured as a
+// TestAC246ResidentTaskRootCancelStopsTheModelCall is ruling 2.3 measured as a
 // capability rather than as a comment: when the resident leg's task root is
 // cancelled, a task started through the assembled pipeline must not reach the
 // model at all. The pair below is the ruler's positive control - the SAME call on
@@ -185,7 +220,7 @@ func TestAC246ResidentTaskRootCancelStopsTheModelCall(t *testing.T) {
 	ra := newResidentApproval()
 	ar, code := assembleRuntime(runSpec{
 		stdout: f.out, stderr: f.err, dataDir: f.dir,
-		gate: ra.gate, ui: ra.ui, cards: ra.cards, taskCtx: ra.root,
+		gate: ra.gate, ui: ra.ui, cards: ra.cards, answer: ra.ui.hasBall, taskCtx: ra.root,
 		notify: swallowPoster,
 	})
 	if code != 0 {

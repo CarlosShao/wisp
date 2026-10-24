@@ -165,6 +165,24 @@ type runSpec struct {
 	// cards is the Replies ledger the injected UI books its displayed cards
 	// into, and therefore the ledger the answer side spends grants from.
 	cards *approval.Replies
+	// answer is how an injected host declares, at the moment of a call, whether a
+	// human could answer a card raised right now (ticket 375's
+	// approval.AnswerSource). assembleRuntime hands ONE predicate to both halves
+	// of 375's fix - the approval gate's L1 guard and the mode read the bridge
+	// consults - and for an injected gate this field IS that predicate: the
+	// assembly does not OR in its own reply surface, because the resident leg's
+	// L1 window is vetoable only through the orb's cancel channel (the console
+	// stream answers L2 cards, which 375 leaves alone). A host whose gate has no
+	// predicate of its own is refused rather than half-wired - see the check in
+	// assembleRuntime.
+	//
+	// It is nil for every caller that injects no gate, and for a host that
+	// declares nothing: nil is NOT "nobody can answer", it is "this host made no
+	// statement", and it keeps the pre-375 behaviour (reach.go says why those two
+	// must stay different). The resident leg sets it to the floating ball it
+	// bound at boot, which is the live fact a boot-time reading could not see
+	// (the ball is bound 85 lines after the panel chain gets its leg).
+	answer approval.AnswerSource
 	// taskCtx is the parent of the context this run's task loop runs on. nil
 	// means context.Background(), which is what `wisp run` has always meant: the
 	// process is the task's lifetime. A host that outlives one command line names
@@ -616,10 +634,61 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// on the route (gate.go's allowSession). resident_windows.go prints the same
 	// limit at boot; widening it needs the gate itself moved into this function,
 	// which is a ruling about AC#1's form 乙, not a line this leg may write.
+
+	// Ticket 375: ONE answer-source predicate per assembly, read by BOTH halves of
+	// the fix - the L1 route's guard (the gate built below) and the mode read the
+	// bridge consults (tools.Options.Modes, further down). Two declarations could
+	// disagree, and then a call would be silenced by a mode that believes somebody
+	// can answer while the window refuses because nobody can.
+	//
+	// The two legs get the fact from the only place it exists, and NEITHER leg
+	// ORs the other's:
+	//
+	//   - no injected gate (the console leg): rt.reply != nil - a reply surface is
+	//     attached to this process. attachReplyListener writes it, and only when a
+	//     reply stream was really handed in, so this is "somebody is at this
+	//     terminal", not "a reader was configured";
+	//   - injected gate (the resident leg): s.answer, the host's own surface (the
+	//     floating ball it bound at boot), and the host declared the SAME predicate
+	//     to the gate it built - the assembly refuses the mismatch a few lines
+	//     below rather than papering over it.
+	//
+	// A run with neither fact is the unattended run this ticket is about: cards are
+	// still recorded, nobody can answer them, and the L1 route now refuses instead
+	// of resolving silence as consent.
+	answer := s.answer
+	if s.gate == nil {
+		answer = func() bool { return rt.reply != nil }
+	}
+
 	if s.gate != nil {
 		if s.cards == nil || s.ui == nil {
 			fmt.Fprintf(s.stderr, "wisp run: 注入的审批门必须连同它自己的界面与会话账本一起递进来"+
 				"（gate=%v ui=%v cards=%v），已拒绝装配\n", s.gate, s.ui, s.cards)
+			return rt, 2
+		}
+		// Ticket 375: the fourth leg. A host that injects a gate must say whether a
+		// human could answer a card right now, for the same reason it must hand over
+		// the surface and the ledger: without the fact the mode read below cannot
+		// know that a looser档 has nothing behind it, so auto_approve would silence
+		// an L1 that nobody could have been asked about - the hole this ticket is
+		// about, reached by omission instead of by a nil leg.
+		if s.answer == nil {
+			fmt.Fprintf(s.stderr, "wisp run: 注入的审批门必须连同「此刻答得出吗」的活谓词一起递进来"+
+				"（answer=nil）：没有它，档位会静默掉一个没人能答的问句，已拒绝装配\n")
+			return rt, 2
+		}
+		// Ticket 375: a host that declares an answer source must have declared it to
+		// the gate it built, not only to this function. approval.Gate copies its
+		// options in New, so the two halves of the fix are two separate
+		// declarations by construction - and if only this one arrives, the mode read
+		// below drops to ask_every_step while the gate's L1 route still runs the
+		// window and executes at expiry, i.e. the exact hole 375 is about, now with
+		// an audit line claiming otherwise. Refuse the assembly instead of trusting
+		// a host to keep two facts in step.
+		if s.gate.AnswerSource() == nil {
+			fmt.Fprintf(s.stderr, "wisp run: 注入的审批门没有声明「此刻答得出吗」的活谓词（gate.AnswerSource=nil），"+
+				"而本装配拿到了一个（answer=%v）：两半会各自为政，已拒绝装配\n", s.answer)
 			return rt, 2
 		}
 		rt.gate = s.gate
@@ -635,6 +704,11 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 			ApprovalTimeout: time.Duration(cfg.Risk.ConfirmTimeoutSec) * time.Second,
 			Logf:            rt.auditf,
 			Grants:          grantWrite,
+			// Ticket 375: a declared-but-empty answer source refuses the L1 window
+			// instead of letting its expiry mean execute. This leg's own console
+			// surface cannot tell (it happily prints a card nobody can answer), so
+			// the fact has to arrive from here.
+			Answer: answer,
 		})
 		// Bind the reply ledger to the gate it answers to (ticket 201 AC#1). The
 		// ledger had to exist before the gate, because the UI that fills it is one of
@@ -778,7 +852,16 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Journal:  mem,
 		// AC#1/AC#4's anchor line: the档 this boot read enters the decision
 		// chain here and nowhere else.
-		Modes: rt.modes,
+		//
+		// Ticket 375 wraps it: the same answer-source predicate the gate above was
+		// given also corrects the READ. A mode that would only silence a question
+		// answers ask_every_step while nobody can answer (approval/reach.go), so
+		// the silenced L1 reaches the gate and is refused instead of running
+		// unasked - which is what turns 375's READ-F from "0 cards, file written"
+		// into a refusal. The store itself is untouched: perm.Store.PermissionMode
+		// still owns 372's nil-leg downgrade and its own audit line, and a host that
+		// declared nothing gets exactly the value it always got.
+		Modes: approval.UnsilencedMode(rt.modes, answer, rt.auditf),
 		// Ticket 224 AC#1/AC#2's anchor line: this is the only place a D45
 		// session authorization enters the decision chain. Nil when this boot
 		// could not mint a session, which is the state every pre-224 assembly was

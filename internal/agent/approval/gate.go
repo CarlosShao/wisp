@@ -18,6 +18,19 @@ type Options struct {
 	// UI is the injected presentation surface. nil fails closed: no prompt
 	// means no answer means no execution.
 	UI UI
+	// Answer is the host's LIVE statement that a human could answer a card this
+	// gate would raise right now (ticket 375). nil means the host declared
+	// nothing and every behaviour stays as it was before 375; a non-nil
+	// predicate answering false makes the L1 route REFUSE to run a window
+	// nobody could see. reach.go carries the whole reading, including why nil
+	// and false are not the same answer.
+	//
+	// It is consulted on the L1 route ONLY. The L2 route already fails closed
+	// when its surface cannot be reached (PendingApproval's Prompt error branch)
+	// and an unanswered L2 is a REJECT, so a card queued with no answerer
+	// resolves correctly on its own clock - that polarity is the correct half of
+	// this pair and ticket 375 leaves it untouched.
+	Answer AnswerSource
 	// Clock is the monotonic time source (D42#9). nil uses SystemClock.
 	Clock Clock
 	// Channels states which veto channels are really loaded. nil means
@@ -83,6 +96,10 @@ type Gate struct {
 	track    int
 	q        *Queue
 	logf     func(string, ...any)
+	// answer is ticket 375's answerability predicate (Options.Answer): nil when
+	// the host declared nothing. No method on Gate answers for the host; it only
+	// reads this value on the L1 route (reach.go).
+	answer AnswerSource
 	// grants is ticket 224's write-only injection (Options.Grants). No method on
 	// Gate reads it back.
 	grants GrantRecorder
@@ -158,6 +175,7 @@ func New(o Options) *Gate {
 		q:        NewQueue(o.ApprovalTimeout, o.WarningLead, o.MaxPending, logf),
 		logf:     logf,
 		grants:   o.Grants,
+		answer:   o.Answer,
 		windows:  map[string]*window{},
 		running:  map[string]*runEntry{},
 		admitted: map[string]bool{},
@@ -249,6 +267,9 @@ func (g *Gate) admitCheck(taskID string) error {
 // the window ending unopposed means EXECUTE (AnswerTimeout, which the bridge
 // routes to allow), and a veto means the call is cancelled with the reason
 // travelling back to the model as a failure so the loop continues.
+//
+// A host that declares no answer source (Options.Answer) gets a REFUSAL instead
+// of a window: see the guard below and reach.go.
 func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answer, string) {
 	if err := g.admitCheck(d.TaskID); err != nil {
 		g.logf("approval: L1 refused by D47 guard task=%q tool=%s: %v", d.TaskID, d.Tool, err)
@@ -278,6 +299,29 @@ func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answe
 	}
 
 	bv := Aggregate(d)
+
+	// Ticket 375's guard: a window nobody could see is not a question, and its
+	// expiry is therefore not consent. 「到点即执行」 presupposes somebody who
+	// could have vetoed; when the host declares that no one can answer (no
+	// interactive input stream, no floating-ball window), the window is refused
+	// BEFORE it opens - no card is raised, no countdown is started, and the
+	// bridge books a reject. The check sits after the R7 escalation above on
+	// purpose: an escalated batch is an L2 question and keeps the L2 route's own
+	// fail-closed surface check and its 到点即拒 polarity.
+	//
+	// It is a REFUSAL, not a downgrade to "ask anyway": asking a process that
+	// cannot answer would spend the window and then execute, which is the
+	// defect (375-a1 READ-S).
+	if !g.answerable() {
+		corr := orDefaultText(d.CorrelationID, d.TaskID)
+		g.logf("approval: L1-UNANSWERABLE corr=%s tool=%s task=%s decision=reject because=no-answer-source "+
+			"(窗口到点即执行的前提是有人能看见并否决这张卡；无人可答时沉默不构成同意)",
+			corr, d.Tool, d.TaskID)
+		return tools.AnswerReject,
+			"本进程此刻没有答复源（没有可交互的控制台输入流，也没有悬浮球窗口），L1 确认窗口无人可答：" +
+				"「到点即执行」的前提是有人能看见并否决这张卡，无人可答时已 fail-closed 拒绝执行"
+	}
+
 	corr := orDefaultText(d.CorrelationID, d.TaskID)
 	w := &window{ctx: ctx, corr: corr, tool: d.Tool, taskID: d.TaskID, vetoes: make(chan Veto, len(allChannels)+1)}
 	if !g.openWindow(w) {
@@ -332,9 +376,14 @@ func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answe
 			// L1 route an operator cannot see from the card: the window ended with
 			// no veto, so the call RUNS. This line records that fact in the same
 			// ANSWER-* family the L2 queue writes; it changes nothing about it.
-			// Asking whether it *should* refuse instead is a D4 / SPEC-06 §2
-			// contract question (票 201 AC#2), not a line an implementation leg
-			// may quietly flip - see that ticket's「禁区」and docs/reports ledger.
+			// Asking whether this branch *should* refuse instead is a D4 /
+			// SPEC-06 §2 contract question (票 201 AC#2), not a line an
+			// implementation leg may quietly flip - see that ticket's「禁区」and
+			// docs/reports ledger. Ticket 375 does not flip it: the polarity
+			// below still MEANS EXECUTE whenever the window really was a
+			// question. What 375 added is upstream of this line (the
+			// answerability guard: a window nobody could see is refused before it
+			// opens, so it never reaches this branch at all).
 			g.logf("approval: ANSWER-EXPIRED corr=%s tool=%s decision=timeout->execute after=%s",
 				corr, d.Tool, g.window)
 			_ = g.ui.Update(ctx, Event{

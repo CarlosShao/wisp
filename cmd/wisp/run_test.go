@@ -32,6 +32,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -65,6 +66,15 @@ type runFixture struct {
 	notices []string
 	// rtHook receives the assembled stack while it is still open.
 	rtHook func(*agentRuntime)
+	// reply is the answer stream this run is given (ticket 375). It stays nil -
+	// "nobody can answer" - unless a case is about a route that needs an answer
+	// source to exist at all: from 375 on, a run with no reply surface refuses the
+	// L1 route instead of resolving the window's expiry as consent, so a case that
+	// measures what an UNOPPOSED window does has to hand this in. A scripted
+	// reader is the seam AGENTS.md §1.3 names for `wisp run`;
+	// strings.NewReader("") is the degenerate attached-but-silent console (EOF
+	// ends the listener, which is the honest shape when nobody types).
+	reply io.Reader
 	// calls records what the bridge booked, read back after the run.
 	mu    sync.Mutex
 	calls []string
@@ -124,6 +134,7 @@ func (f *runFixture) run(task string) int {
 		stdout:    f.out,
 		stderr:    f.err,
 		dataDir:   f.dir,
+		reply:     f.reply,
 		onRuntime: f.rtHook,
 		notify: func(title, body string) error {
 			f.mu.Lock()
@@ -333,6 +344,11 @@ func TestHostDispatchThroughTheAssembledBridge(t *testing.T) {
 // outside its own tests (A13).
 func TestComposedGateBlocksAWriteForTwoSeconds(t *testing.T) {
 	f := newRunFixture(t, "openai-chat")
+	// Ticket 375: this case measures an UNOPPOSED L1 window, which is only a
+	// question when somebody could have opposed it. The attached (silent) reply
+	// stream is what makes this run attended; without it 375's guard refuses the
+	// window before it opens and there is no 2s to measure.
+	f.reply = strings.NewReader("")
 	target := filepath.Join(f.dir, "composed-write.txt")
 	var (
 		blocked    time.Duration

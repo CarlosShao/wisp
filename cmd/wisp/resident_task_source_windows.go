@@ -275,6 +275,12 @@ func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval, ws *panel.W
 		gate:    ra.gate,
 		ui:      ra.ui,
 		cards:   ra.cards,
+		// Ticket 375: the same live fact the gate was built with (ra's own
+		// ball-presence predicate), so the bridge's mode read and the gate's L1
+		// guard cannot disagree. It is a method value over the mutex-guarded field
+		// ballCardUI.attachBall/releaseBall write, not a snapshot: this process may
+		// run a whole task with no ball window, or lose it mid-flight (detachBall).
+		answer:  ra.ui.hasBall,
 		taskCtx: ra.root,
 		// D10's result path is named rather than inherited from a default: this
 		// leg has a ball but no panel, so a finished task arrives as a

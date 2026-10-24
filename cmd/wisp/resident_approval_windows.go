@@ -399,6 +399,15 @@ func newResidentApprovalWithConfig(dataDir string) *residentApproval {
 		ApprovalTimeout: timeout,
 		Logf:            ra.residentAuditf,
 		Grants:          ra.grants,
+		// Ticket 375: the answer source is the floating ball, read LIVE at the
+		// moment of each call. It must be a closure and not a snapshot: this line
+		// runs 85 lines before ra.bindBallHost (resident_windows.go:224 vs :309), so
+		// at construction the honest answer is always "no ball yet" - and a
+		// boot-time reading is precisely what could not cover this assembly
+		// (375-a1 census §② D row). ra.ui.hasBall is the same predicate
+		// ballCardUI.Prompt already tests before it shows a card, so the guard and
+		// the surface cannot disagree about whether a window has anywhere to appear.
+		Answer: ra.ui.hasBall,
 	})
 	// The receipt is read OFF THE GATE, not off the arithmetic above: what is
 	// logged is what the object actually holds after New's own clamping, so the

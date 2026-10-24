@@ -151,6 +151,12 @@ func (h *t101host) start(t *testing.T, confirm perm.ConfirmFunc, hook func(*agen
 		stderr:      errb,
 		dataDir:     h.dir,
 		modeConfirm: confirm,
+		// Ticket 375: every case on this host measures what a MODE does to a live
+		// run, so the run must be one where a question could be answered (an
+		// attached, silent console). Without it the L1 route is refused for a
+		// reason that has nothing to do with the mode under test - the guard would
+		// be measuring itself.
+		reply: strings.NewReader(""),
 		onRuntime: func(rt *agentRuntime) {
 			if hook != nil {
 				hook(rt)

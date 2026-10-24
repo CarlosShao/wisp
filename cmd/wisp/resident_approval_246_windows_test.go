@@ -103,8 +103,15 @@ func TestAC246CardWithNoWindowFailsClosedThroughTheRealGate(t *testing.T) {
 	if ans != tools.AnswerReject {
 		t.Fatalf("answer = %s (%s), want reject: a card with nowhere to appear cannot be an allow", ans, why)
 	}
-	if !strings.Contains(why, "确认界面不可达") {
-		t.Fatalf("reason = %q, want the gate's own fail-closed sentence", why)
+	// Ticket 375 moved WHERE this refusal is decided, not whether it happens: an L1
+	// window nobody could see is now refused by the gate before it is offered to the
+	// surface (approval/reach.go), so the sentence names the missing answer source
+	// rather than the surface's own "nowhere to show it". Both branches are the same
+	// rule - a confirmation nobody can be shown must never run the call - and the
+	// readings below (nothing awaiting, nothing displayed, no live ask) are what says
+	// the outcome did not move.
+	if !strings.Contains(why, "无人可答") {
+		t.Fatalf("reason = %q, want the gate's own fail-closed sentence (ticket 375: the answer-source one)", why)
 	}
 	if _, awaiting := ra.cards.AwaitingHuman(); awaiting {
 		t.Fatal("a card that was never displayed is still waiting on a human")

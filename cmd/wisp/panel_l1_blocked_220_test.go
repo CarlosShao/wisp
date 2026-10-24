@@ -182,6 +182,10 @@ func probeL1Window220(rt *agentRuntime, target, corr string) l1Probe220 {
 
 func TestRunPacketLightsTheRosterRowOfItsLiveL1Window(t *testing.T) {
 	f := newRunFixture(t, "openai-chat")
+	// Ticket 375: an L1 window only opens when somebody could answer, so this run
+	// needs an answer source (an attached, silent console) or the guard refuses
+	// the call before there is any window for the roster to light.
+	f.reply = strings.NewReader("")
 	pinL1WindowCeiling220(t, f.dir)
 	f.srv.Control(t, "/__control/latency", `{"ms":2500}`)
 	target := filepath.Join(f.dir, "l1-220-reversible-write.txt")

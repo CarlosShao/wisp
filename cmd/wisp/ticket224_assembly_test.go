@@ -241,6 +241,11 @@ func grantLinesOf(h *replyHost) string {
 // 224-v1 §6-b row 3 names, and the control below is what keeps it honest.
 func TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking(t *testing.T) {
 	h := newReplyHost(t, 40*time.Second)
+	// Ticket 375: the control half of this case is "the same call DOES ask once",
+	// and an L1 window only opens when somebody could answer it. An attached,
+	// silent console is that somebody; without it the control is refused before
+	// any window exists and the zero below would prove nothing.
+	h.reply = strings.NewReader("")
 	asked := filepath.Join(h.dir, "never-granted.txt")
 	granted := filepath.Join(h.dir, "granted-in-this-session.txt")
 	ctx := context.Background()
