@@ -104,8 +104,8 @@
 
 ## 8. 提交号与 `.go` 枚数
 
-- 提交：`COMMIT_HASH`
-- `git show --name-only --format=%H` ⇒ 1 枚：`docs/evidence/s1/369-a1-census.md`；**`.go`＝0 枚**。
+- 提交：`ed7ecc42001194b6957c28a71b5d906316251a3d`（首笔＝本件全部正文；**本笔只补录该号**，⛔ 动别的字）。
+- `git show --name-only --format=%H ed7ecc420` ⇒ 1 枚：`docs/evidence/s1/369-a1-census.md`；**`.go`＝0 枚**。
 - 纪律：`add`／`commit` 两处 pathspec 逐枚手写；⛔ `add -A`／`.`；⛔ amend／reset／rebase／stash／`checkout .`／`clean`；⛔ push；提交正文用 `-F <真临时文件>`（⛔ 反引号、⛔ `$()`）。
 
 ## 9. 未定义即停：具名上报（四条）
