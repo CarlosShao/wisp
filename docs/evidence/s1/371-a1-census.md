@@ -145,7 +145,7 @@ github.com/CarlosShao/wisp/internal/perm.(*Store).Set(...)
 
 ## ⑧ 提交 ＋ 逐枚 `.go`（应为 0）
 
-- 本件入库：首笔见续笔补录（⛔ amend，另起一笔只改这一行）。逐枚文件：**只有本件 1 个路径**；逐枚 `.go`：**0**。越界核对：⛔ 改
+- 本件入库首笔：**`fd3c6ae09`**（`+158`、1 文件）；本行之后对本件的续笔见 `git log --oneline -- docs/evidence/s1/371-a1-census.md`。逐枚文件：**只有本件 1 个路径**；逐枚 `.go`：**0**。越界核对：⛔ 改
   `internal/**`／`cmd/**`／`scripts/**`／`.github/**`／`.scratch/wisp/**`／`docs/reports/**`／`docs/PLAN.md`／`docs/specs/**`；⛔ 落 `.go`（探针全在 `D:\tmp\wisp\20261024\371a1\**`）；⛔ 翻框／改票名／`Status:`／`-done`／台账；⛔ push。
 
 ## 附：落笔前五问（尺的射程）
