@@ -110,6 +110,6 @@
 
 ## §12 提交＋逐笔越界
 
-- 本件＝**1 枚文件**（`docs/evidence/s1/373-v1-verdict.md`）；`git add`／`commit` 两处**逐个文件名字面点名**、⛔glob／`-A`；提交前 `git diff --cached --name-status` 现跑＝**只有本件（`A`）**，无 `D`；**⛔ push**。提交号见台账回报（落件时 HEAD `5d64b118c`）。
+- 本件＝**1 枚文件**（`docs/evidence/s1/373-v1-verdict.md`）；`git add`／`commit` 两处**逐个文件名字面点名**、⛔glob／`-A`；提交前 `git diff --cached --name-status` 现跑＝**只有本件（`A`）**，无 `D`；**⛔ push**。★**本件提交＝`5977c17fe`（正文笔）＋本补录笔**，两笔各只本件 1 文件；落件时 HEAD `5d64b118c`。
 - ★**越界 0**：本腿仓内写 `internal/**`／`cmd/**`／`scripts/**`／`.scratch/wisp/**`／`docs/specs/**`／`docs/PLAN.md`／`docs/reports/**` **各 0 字节**；仓外只有 `D:\tmp\wisp\20261024\373v1\**`。★别人的脏（`.scratch/**` 大量、`cmd/wisp/run.go` 的 376 改、`?? cmd/wisp/approval_card_window_376_test.go`、`377-a1` 在读）**⛔碰、⛔清**。
 - ★**落点核**：落笔前 `ls docs/evidence/s1/373-*` ＝`373-a1-census.md`／`373-r1-impl.md` 两枚 ⇒ `373-v1-verdict.md` **空号，未改号**。
