@@ -15,7 +15,7 @@
 | 读数 | 我的 F4 | `366-a1` 报的 | 判 |
 |---|---|---|---|
 | `tasklog_deleted`／`toolcall_deleted` | **1**／**1** | 1／1 | ✅ |
-| 留下的孤儿 | **1**（`tool_call|rowid=1|parent=task_log|fkid=0`） | 1 | ✅ |
+| 留下的孤儿 | **1**（`tool_call\|rowid=1\|parent=task_log\|fkid=0`） | 1 | ✅ |
 | fkc：retention 前→後，迁移後 | **0→1**，迁移后仍 **1** | 0→1、迁移后 1 | ✅ |
 | 今天 `Open()` | **`<nil>`／schema_version=4** | 能开 | ✅ |
 
@@ -78,7 +78,7 @@ DELETE FROM tool_call WHERE COALESCE(ended_at, started_at, decided_at) IS NOT NU
 | 夹具 **F1**（`task-old` 31 天 ＋ **A：三列全 NULL**；`task-fresh` ＋ **F：三列全 NULL、父活着**） | `task_log` | `tool_call` | fkc | 逐字读数 |
 |---|---|---|---|---|
 | 造好 | 2 | 2 | **0** | `[]` |
-| `RunRetentionOnce` #1 | 1 | 2 | **1** | `tasklog_deleted=1`／`toolcall_deleted=0`／`[tool_call|rowid=1|parent=task_log|fkid=0]` |
+| `RunRetentionOnce` #1 | 1 | 2 | **1** | `tasklog_deleted=1`／`toolcall_deleted=0`／`[tool_call\|rowid=1\|parent=task_log\|fkid=0]` |
 | retention #2 | 1 | 2 | **1** | `0`／`0` ⇒ ★**孤儿永不被第二轮选中** |
 | 生产 `Open()` 迁移 → 再数 | 1 | 2 | **1** | `open_err=<nil>`、`schema_version=4`、`ForeignKeyAudit{Checked:true, OrphanRows:1, ChildTables:[tool_call]}`；孤儿行 `task_id=task-old` 一字未动 |
 
@@ -99,7 +99,7 @@ DELETE FROM tool_call WHERE COALESCE(ended_at, started_at, decided_at) IS NOT NU
 
 | 读数 | R1（**对照：不注入**） | R2（接缝拒） | R3（真 SQL 拒） |
 |---|---|---|---|
-| loop 告警 | `warn=0` | `warn=1`：`WARN|agent: task_log open failed|err=probe 368a1: injected startTask refusal` | `warn=1`：`…err=memory: start task_log ad2d923f-…: constraint failed: probe 368a1: task_log insert refused (1811)` |
+| loop 告警 | `warn=0` | `warn=1`：`WARN\|agent: task_log open failed\|err=probe 368a1: injected startTask refusal` | `warn=1`：`…err=memory: start task_log ad2d923f-…: constraint failed: probe 368a1: task_log insert refused (1811)` |
 | 任务是否继续 | `completed`、工具**真跑 1 次**、2 请求 | **同左**（⛔ 停在失败处） | **同左** |
 | `task_log`／`tool_call` 行数 | 1／1 | **0／1** | **0／1** |
 | 子行有父吗 | `parents_in_task_log=1` | **`=0`（悬空）** | **`=0`（悬空）** |
