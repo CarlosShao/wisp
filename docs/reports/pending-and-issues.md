@@ -25629,3 +25629,46 @@ A1|NONAUTO|from=ask_every_step|to=ask_high_risk|set_err="<nil>"|read_after=ask_h
 
 **⑩ ★状态**＝结案 **42 票**（`-done` **185** 枚）、**真待推进 178**、**完成度 185/363 ＝ 51.0%**、
 在飞 **2**（`373-r1`／`377-a1`）、未推 **211**（攒着）、⛔ 清理、★**摆机主 0 件**。
+
+## A1231（2026-10-24 13:1x +08，编排者）★★★收 `373-r1`：**〔甲〕落地、三处级联 ＋ 先父后子**（★`max_fkc_during_run` `1→0`）｜★★★**它自己发现一个陷阱**（"时间戳是秒粒度、不能当判据"）｜★★★**它具名报了一条新的孤儿源**（子环路无父）⇒ 立票 378
+
+**① ★★收 `373-r1`（`93fdc0496` 6 文件 ＋ `d03c500da`／`00c7468dd` 两处更正；件 **128 行**）**
+
+**② ★落地（〔甲〕、**0 DDL／0 schema／0 新管道**、⛔ 动 `ddlV1–V4`／`dsnPragmas`／schema／FK）**
+1. ★`dao_tasklog.go:126` `DeleteTaskLog` **父删前先删子**（同 `s.write` tx）；★`:160` `PurgeTaskLogs` 同理
+2. ★`retention.go:159` 新增 `deleteChildrenOfOlderParents`（`task_id IN (SELECT id FROM task_log WHERE started_at<cutoff)`）**在父删 `:163` 之前**
+3. ★件三：★`:140-155` 注释改成事实；★**它现跑** `git grep -n PrivacyTaskLog -- docs/specs docs/PLAN.md` ＝ **0 命中（`rc=1`）** ⇒ ★**坐实我 `A1225⑥` 的量**
+4. ★件一：★`run.go:1108-1152` `taskLifecycleJournal`（**只转发 `StartTaskLog`**、`WithoutCancel`+`5s`）、★`:1213` **只装 root loop**（`rt.loopOpt` **保持 `Journal` `nil`**）、★`Wait` 后 `:1334` **只在"环路没开行"才补开**
+
+**③ ★★★必给读数（全给了）**
+- ★★**三处**：`PurgePrivacy` **`fkc 3→0`**／`DeletePrivacyItem(task-A)` **`2→0`**（**留 `task-B` 的子**）／`RunRetentionOnce`（父 31d／子 5d）**`1/0/fkc=1 → 1/1/fkc=0`**
+- ★★**父子窗口不同（P4）**：改前 `1`／`0`／**孤儿 1**／`fkc=1` ⇒ ★**改后 `1/1`／`fkc=0`**
+- ★★★**先父后子 E1**（`runTextTask` 真入口 ＋ **运行期每 `2ms` 旁路读 `PRAGMA foreign_key_check`**）：★**改前 `max_fkc_during_run=1`、`child_without_parent_seen=true`** ⇒ ★**改后 `max_fkc=0`、`false`**
+  ★★★**并自己发现一个陷阱**："**时间戳是秒粒度、**不能当判据**（前后同秒）**" ⇒ ★★**所以它用"运行期旁路读 `fkc`"、⛔ 用时间戳** ⇒ **这个选择对**
+- ★**正控**：弄脏 `fkc=3` → 单 tx 清扫 ⇒ **`child`／`parent`／`commit` 全 `nil`**、`fkc=0`、`rows=[]`、`tool_call=0`
+- ★★**"删的是谁的"逐次**：P1 `[task-A,task-A,task-B]`／P2 `[task-A,task-A]`（**留 `task-B`**）／retention `[task-old]`（**留 `task-live`**）／`DeleteTaskLog(不存在的父)` **0 行 ＋ 整笔回滚**
+- ★★★**事务边界证明（这一发最硬）**：★**用 `BEFORE DELETE ON task_log RAISE(ABORT)`** ⇒ ★**父删被拒 ⇒ 子删回滚（3 行仍在）**、★**摘触发器再跑 ⇒ 1 行** ⇒ ★**证"3"是回滚**
+  ★**retention 同法（`1→0`）**；★**`B2` 原始复现 `child/parent/commit=nil`、`fkc=0`**
+- ★**新用例** `internal/memory/cascade_373_test.go`（**367 行**、5 顶层/2 子例）★**改前树 5/5 红**
+  ★**件一用例因写面禁新增 `cmd/wisp` 测试文件、走仓外 `-overlay` 的 `p373r1_e1_probe_test.go`**（改前 `:109/:113` 红）
+- ★**反向判据 M1–M4**：摘各跳 ⇒ ★**`fkc` 回 `2/3/2`**、**E1 `max_fkc=1`**
+- ★**还原核（在最后一发变异 `12:55:49` 之后）**：★**5 个 `.go` 与 `git show HEAD` **逐位相同****、`go test ./internal/memory rc=0`、E1 probe **PASS**
+- ★**门禁**：`internal/memory` **`73/0/2` → `78/0/2`**；`cmd/wisp` 定向 **`10/0/0` → `10/0/0`**；`build`／`vet`／`d22scan`／`gofmt`／`gofumpt` 全 0
+- ★★**`366` 夹具（预期内）**：★三路改 **raw 播种**（`t366RawParentDelete` ＋ 手写 legacy 三-`NULL` 子）、★**`3/2/1/1` 读数不变**
+  ★★**仍测**"legacy 孤儿库被 `3→4` 迁移记录且不删行"、★**不再测**"今天生产路径会造孤儿" ⇒ ★**这正是 `368-v1` 判过的"改夹具机制、保住测试目的"**。
+
+**④ ★★★它报的三条 ＋ 我的裁**
+1. ★★★**子环路仍不写 `task_log` 行**（`rt.loopOpt.Journal` **有意保持 `nil`**）⇒ ★**`task.spawn` 子任务的 `tool_call` 行今天仍**无父****
+   ⇒ ★★**这是"先父后子"之外的**第二类孤儿源****（★普查 `E1` **只覆盖 root**）
+   ⇒ ★**要治它得给每个子任务新增 `task_log` 行（会改隐私页列表／retention 面）** ⇒ ★**属另一个数据模型决定** ⇒ ★**它只具名上报、未动** ⇒ **处置对**
+   ⇒ ★★★**我裁：立票 378、⛔ 本票范围**。
+2. ★**`PurgeTaskLogs` 语义扩到 `tool_call` 已落地**；★**若要把"一键清空含取证行"写进契约文字（`SPEC-02 §5`）需另派／摆机主**
+   ⇒ ★**我裁：记、⛔ 本票**（★`docs/specs/**` 不在它写面、★**且那是改契约文字 ⇒ 那时摆机主**）。
+3. ★**残余**：★**开行写失败（store 故障）时回落到"父后到"**（`run.go:1335` 补开）；★**FK 关着、仍能把 `fkc` 回补到 0** ⇒ ★**只剩"开行写入失败"这一条 store 故障路径会留孤儿窗口** ⇒ **记**。
+
+**⑤ ★派 `373-v1`（终裁）**
+- ★**必判十一项**，其中三发我要它自己造：★**三处级联（含"留了谁"）**／★**E1（并判"时间戳不能当判据"对不对）**／★**事务边界那一发（`RAISE(ABORT)`）**
+- ★★**并要它判**：★**`366` 夹具"仍测什么／不再测什么"**（★**⛔ 只看"读数不变"**）／★**件一（`Journal` 保持 `nil`）对不对**／★**三条上报"该不该在本票做"**
+
+**⑥ ★状态**＝结案 **42 票**（`-done` **185** 枚）、**真待推进 178**、**完成度 185/363 ＝ 51.0%**、
+在飞 **2**（`373-v1`／`377-a1`）、未推 **217**（攒着）、⛔ 清理、★**摆机主 0 件**。
