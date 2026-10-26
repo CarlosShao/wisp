@@ -2,7 +2,7 @@
 
 **腿**：`lint-r1`（写腿／实现者）。**日期**：2026-10-26。**件名**：`docs/evidence/s1/lint-r1-impl.md`。
 **规格来源**：`docs/audit/2026-10-25-harness-reform-plan.md` §3.2 第 94–103 行七条 ＋ `--self-test` 正控。
-**写面**：只新建 `scripts/ticket-lint.sh`（675 行）与本件。⛔ 未改任何票面、⛔ 未删任何存量、⛔ 未进 CI、⛔ 未动 `scripts/check-path-length-budget.sh` 一字节。
+**写面**：只新建 `scripts/ticket-lint.sh`（676 行）与本件。⛔ 未改任何票面、⛔ 未删任何存量、⛔ 未进 CI、⛔ 未动 `scripts/check-path-length-budget.sh` 一字节。
 
 ## 一、七条读数（真票池 365 张，2026-10-26 现跑）
 
@@ -81,7 +81,7 @@ ticket-lint.sh: positive control PASSED - 22 control(s) ran, 0 failed
 
 ## 五、性能（365 张全池，含 189 张 `-done`）
 
-`1515 / 1626 / 1638 / 1721 / 1893 ms`（成品现跑五次，含 `--with-self-test` 那次 4691 ms 是自测＋全量）。一次 `awk` 走池 ＋ 一次 `awk` 出报告 ＋ 一次 `awk` 分组，无 `git log`／无逐票 fork，日常跑得起。
+`1515 / 1626 / 1638 / 1721 / 1893 ms`（成品现跑五次；`--with-self-test`＝自测＋全量，另量到 4691／4841 ms）。一次 `awk` 走池 ＋ 一次 `awk` 出报告 ＋ 一次 `awk` 分组，无 `git log`／无逐票 fork，日常跑得起。
 
 ## 六、统计输出样例（第 7 条，实测逐字）
 
