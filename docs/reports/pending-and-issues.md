@@ -28080,3 +28080,55 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ★结案 **48 票**（`-done` **191** 枚）、真待推进 **174**、完成度 **52.3%**、未推 **18**、★**摆机主 1 件（网络）**
 ★**`175` 可走终裁**（★**`AC#5` 已做、§3 是可直接粘进 `Progress log` 的底稿**）⇒ ★**但翻框须非实现者** ⇒ **要派 `175-v1`**
 ★**`246` 归票 228 ／ `316` 已撤 ⇒ ⛔ 碰**
+
+## A1280（2026-10-26 20:1x +08，编排者）★★★收 `wire-r1`（`d803344ae` 7 文件 `+2749/−31`、件 **133 行**）：**TTS 播报 ＋ 标点 ＋ warm 池三件全接上**｜★★★**三发反向判据全红**（`M1` 摘 `ChTTS` ／`M2` 摘 `SetPunctuator` ／★**`M3` 回合结束全关 ⇒ 变慢 `2.48s` vs `0s`**）｜★★**它抓到自己的两条 `U+26D4` 违规并已改**｜★★★**票 26／27／28 三张票的装配全接 ⇒ 都可走终裁**
+
+**① ★★★三件全接上（都在 `residentVoice` 附近、一次接完）**
+1. ★★★**TTS 播报路径**：★生产触发器 ＝ `run.go` 的 D10 结果呈现处 **`rt.voiceAnnounce(notifyBody(res))`**（★**与通知同一句**）→ **`risk.Prov.CheckText(scope,"tts.announce")` 闸** → **`speech.Slot` 的 TTS 族**（★`load:asr`→`close:asr`→`load:tts`、**先释放再装载、⛔ 与 ASR 共驻**）→ **`TtsEngine.Speak`** → ★★**waveOut 真出声**（★新 `cmd/wisp/voice_out_windows.go` **417 行**、★★**回答 `internal/audio` 的 `DEFERRED(playback)`**）→ ★**D43#15 `Speaking`** → ★**D43#26 `Warm`**
+   ★**读数**：★`gate_ok=1 chunk=1 samples=89611 peak=0.4686 rms=0.0702 rate=22050`；★★**真设备同机** `DEVICE rate=22050 samples=4410 ms=200 abort=0`；★**球四边 `Sleeping→Listening→Thinking→Speaking→Warm`**
+2. ★★**标点接线**：★**`adopt` 是本仓唯一造 `Transcriber` 的地方 ⇒ 唯一 `SetPunctuator` 调用点**
+   ★**对照**：★`今天下午三点提醒我开会`（`Punctuated=false`）→ ★**`今天下午三点提醒我开会。`**（`Punctuated=true`）、★**词一个没动**
+3. ★★★**warm 池接线**（★**`28-r1` 停手处**）：★`session.Scope` 按 epoch 持有唯一在驻引擎族（**+标点**）；★回合结束 `Release`+`EnterWarm`、★★**90s→Settling→dispose 级联经 `voiceOwnerClock` 落在 owner goroutine**（★**不在 runtime 定时器线程关引擎**）
+   ★**读数**：★`cold_acquire=2.9790732s` / ★★**第二回合 `acquire=0s`** / `loader_calls=1` / `loads_after_warm=0` / `mic_closes=2 stages=[Awake Awake]`（**关麦在转移之前**）/ `finals=2 handed=2`
+
+**② ★★★反向判据三发 ＋ 还原核（仓外 `mut\` ＋ `-overlay`）**
+- ★`M1` 摘 `ChTTS` 闸 ⇒ **`rc=1`**（★`timed out waiting for the gate to refuse the sentence`）
+- ★`M2` 摘 `SetPunctuator` ⇒ **`rc=1`**（★`the final reached the agent UNPUNCTUATED …`）
+- ★★★`M3` 回合结束改 `closeEpoch`（＝"回合结束就全关"）⇒ **`rc=1` 且**变慢****（★`warm wake acquire=**2.4803697s**` vs 绿 **`0s`**；★`loader_calls=**2**`）
+- ★**还原核**：★树内 `MUTANT` **0 命中**、★**变异件只差 `3/2/5` insertions**、★三改件 sha256 已记
+
+**③ ★★零回归／正控／门禁**
+- ★★**15e staging `6/6`**、★`LATENCY openDelay=262ms chunk=640ms ballLatency=902ms` **逐位同值**、★`COUNTERS drained=181/181 partials=5 finals=1 handed=1 handoffs=1 asrLoaded=true problems=[]`
+- ★★**与 `WireR1` 合计 `13 PASS／0 FAIL／0 SKIP`、`rc=0`**
+- ★（★**另一发测得 `drained=179/181`** —— 末帧抖动；★**`15e-r1` 记 178、`28-r1` 记 181、本腿 181** ⇒ **末帧数会抖、⛔ 当判据**）
+- ★★**正控**：★**120 帧静音 ⇒ 不播报、不调 `Speak`**／★空/空白 ⇒ **队前短路零装载**／★★**纯标点 `。，、！？` ⇒ 引擎自己拒**（★`silent=1 samples=0`、**⛔ 播近静音**）
+- ★**四数**：★`cmd/wisp` 定向（带 `PATH`）**`rc=0`**／★本腿全量定向 staging **`13/13` `rc=0`**／★`internal/speech` **零字节**（★未 staging `rc=1` 缺 DLL／★**staged `55/0/0` `rc=0`**）／★`internal/session` **零字节** `rc=0`
+- ★★**甲乙两尺**：★全树**各恰 3 行既存假红**（`pending_read.go`／`agent/tools.go`／`cmd/wisp/models.go`）、★**它的 3 枚新件两尺皆空**
+- ★★★**`d22scan` `rc 0 clean`**；★**分母涨**：★`ban#8 cmd/ **155→158**`、★`bans#1-5 cmd/ **43→45**`、`internal/` 679/263 **不变**
+  ★★**而它中途抓到自己两条真违规**（★**字符串里的 `U+26D4`**）⇒ **已改后复跑干净** ✅
+
+**④ ★★★四条具名残余（`§10`、⛔ 硬凑）**
+1. ★★★**播报闸的作用域寿命**：★`risk.Scope.Close` **会丢掉任务作用域的毒** ⇒ **结果句出生时"任务的毒"已没了**
+   ★**本腿读自己的进程级 `voice-announce` 作用域**（★**闸不是装饰**：`M1` 摘掉当场红、★**拦下时 `slot_loads=0` 即**合成之前**就拒**）
+   ⇒ ★**要带到播报点 ＝ 改 `internal/risk`**（★**本腿禁写面**）⇒ **记、下一波派**
+2. ★★**"关麦"是喂食门不是设备**（★**关设备会让 warm 唤醒不可达**、而 **KWS 票 41 未实现**）⇒ ★**证据写的是 `stages=[Awake …]` 这个序**
+3. ★★**换族有价、逐条给数**：★**播报 acquire `3.8–4.3s`**、★**之后 ASR 冷装载 `2.3–3.1s`**（★**`D32 16.3.3` on-demand 档**）；★另加包内常量闸 `voiceAnnounceMaxRunes=120` 字
+4. ★★**D43 两处既存空档**（`Warm+llm.first-token`／`Thinking+asr.vad-stop` 无行）★**本腿不拿表去填**、日志逐字留证
+
+**⑤ ★★★并发事实（它标得很准）**
+- ★**它开工时 `internal/` **0 行****；★**交件时 `internal/risk/**` 出现 **8 项未提交改动****（`blacklist.go`／`pathresolver*.go`／`syncdirs*.go`／`anchor_*334/336*_test.go`、**mtime 19:56–19:59**）
+- ★★★**"另一条在飞腿（看着像 334/336 的 risk-anchor 腿）在我最后一次门禁期间落的、⛔ 我的"**
+  ⇒ ★★★**那条"腿"就是 `347-r1`** ✅（**它判断对了**）
+- ★★**它并说**：★"我的 `d22scan rc 0`／`cmd/wisp` 构建是**含他们那 8 项**的树上跑的（当时绿）、**但他们若继续改、`cmd/wisp` 的绿需要重跑**" ✅ **这个提醒对**
+- ★★★**而 `347-r1` 的写面是 `internal/risk/**`、`wire-r1` 是 `cmd/wisp/**`** ⇒ **不冲突** ✅
+
+**⑥ ★★★票 26／27／28 的现状**
+| 票 | 装配 | 可终裁？ |
+|---|---|---|
+| ★**26 TTS** | ✅ **播报路径接上**（`voiceAnnounce` → `ChTTS` 闸 → slot → `Speak` → **waveOut 真出声** → D43#15/26）| ★**可**（★残余 1 要记：**闸的作用域寿命**）|
+| ★**27 标点** | ✅ **`SetPunctuator` 接上**（`adopt` 是唯一 `Transcriber` 造处）| ★**可** |
+| ★**28 warm** | ✅ **池接上**（`28-r1` 停手处已解：`cold 2.98s → 第二回合 0s`）| ★**可** |
+
+**⑦ ★状态**＝**在飞 1**（`347-r1` 落解析器）、★**goal `active`/`armed`**
+★结案 **48 票**（`-done` **191** 枚）、真待推进 **174**、完成度 **52.3%**、未推 **21**、★**摆机主 1 件（网络）**
+★**下一步**：★**①派终裁腿收 26／27／28 三张**（★**三张可一起裁**）②`347-r1` 回来后核它的红数
