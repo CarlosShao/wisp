@@ -28,9 +28,8 @@
 +      # ADDED STEP ONLY (ticket 15 AC#2, leg cerci-r1): no existing step was moved,
 +      # edited, deleted, given a new `if:`, or made continue-on-error.
 +      # [... 该块前 52 行（ci.yml:678-729）全是理由注释，逐字在提交里；8 小节＝WHAT THIS IS／
-+      #      WHAT IT PROVES／WHAT IT DOES NOT PROVE／WHY A SEPARATE STEP／WHY THE STRICT
-+      #      RUNNER／WHY `!cancelled()`／WHY UBUNTU AND WHY THE SUBPACKAGE。复核尺：
-+      #      git show 8d6e150f8 -- .github/workflows/ci.yml ...]
++      #      WHAT IT PROVES／WHAT IT DOES NOT PROVE／WHY A SEPARATE STEP／WHY THE STRICT RUNNER／
++      #      WHY `!cancelled()`／WHY UBUNTU AND WHY THE SUBPACKAGE。尺：git show 8d6e150f8 -- .github/workflows/ci.yml]
 +      - name: "CER gate over the committed ASR baseline (ticket 15 AC#2; SPEC-10:60-61, SPEC-04:125)"
 +        if: ${{ !cancelled() }}
 +        run: bash tools/d22scan/runtests.sh ./internal/speech/cer/
@@ -102,12 +101,11 @@ $ git status --porcelain -- testdata internal   ⇒ 空（提交后现跑）
 ## 7. ★★ 读数⑦：⛔ `continue-on-error`／`if: false`（新增 0）
 
 ```
-$ git diff -U0 1f1b86a5d5 8d6e150f8 -- .github/workflows/ci.yml scripts/portable-tests.sh \
-    | grep '^+' | grep -v '^+++'                   ⇒ 84 行
-$ … | grep -c 'continue-on-error:'                 ⇒ 0
-$ … | grep -cE '^\+[[:space:]]*if:[[:space:]]*false' ⇒ 0
-$ … | grep -cE '^\+[[:space:]]*if:'                ⇒ 1（新 step 的 `${{ !cancelled() }}`；本 job 每个非 setup step 都带）
+$ git diff 1f1b86a5d5 8d6e150f8 -- .github/workflows/ci.yml | grep '^+'  ⇒ 56 行（含注释）
+$ … | grep -E '^\+\s*continue-on-error:' ⇒ 0    $ … | grep -E '^\+\s*if:\s*false' ⇒ 0
+$ … | grep -E '^\+\s*if:'                ⇒ 1（新 step 的 `${{ !cancelled() }}`；本 job 每个非 setup step 都带）
 ```
+★全 range（到 `f20432bd7`）同一把**锚定**尺 ⇒ 0／0。★★但**不加锚**的全 range grep 会命中 1／3 行——那 1 行是本证据件里被引用的 grep 命令本身、另 3 行是注释/标题里的散文；⛔ 任何 YAML 键。
 ★新增 84 行**全 ASCII**（最大码位 U+007D）⇒ ⛔ emoji。
 
 ## 8. ★★ 读数⑧：父包要不要 staging ⇒ **要，故只接 `cer` 子包**
