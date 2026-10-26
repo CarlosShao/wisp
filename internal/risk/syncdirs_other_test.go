@@ -3,86 +3,52 @@
 package risk
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 )
 
 // Ticket 82, AC#2 — the POSIX tier of the sync-root grading family.
 //
-// AC#2 forbids this file from being empty or from being a wall of t.Skip, so
-// every case below asserts what POSIX ACTUALLY does today, and none of it is
-// conditional:
+// STATE AFTER TICKET 347. This file was written against a world where
+// resolveHandle (pathresolver_other.go) was the DEFERRED(macOS/Linux) stub: no
+// root could reach C26-canonical, so no grade name could be "confirmed",
+// SyncDetectionComplete() was structurally false, and the under-profile suspect
+// net was permanently armed. 347 landed realpath + lstat-reject there, and the
+// three consequences were handled rather than re-tagged:
 //
-//   - no root ever reaches C26-canonical here, because resolveHandle
-//     (pathresolver_other.go) is the DEFERRED(macOS/Linux) stub; therefore no
-//     probe grade, however strong its name, is "confirmed";
-//   - so SyncDetectionComplete() is false, the under-profile suspect net stays
-//     ARMED, and every write inside the profile fail-closes to sync-suspect —
-//     the safe side of P12, not a bug to route around;
-//   - and yet root MEMBERSHIP is still decided properly (syncdirs_test.go's
-//     membershipEngine, which all six portable cases now run through), i.e.
-//     POSIX is not "everything is dirty", it is "nothing may be EXCUSED".
+//   - the tripwire that asserted the absence (TestSyncNoGradeIsConfirmedOnPosix)
+//     is GONE, and its inverted claim is now asserted on BOTH platforms by the
+//     untagged TestSyncConfirmedGradesDisarmFallback in syncdirs_test.go. That
+//     file's own header prescribed exactly this ("delete
+//     TestSyncNoGradeIsConfirmedOnPosix") at the moment the resolver landed;
+//   - the "weak grades may never disarm anything" half did not move: it lives in
+//     TestSyncFallbackNotDisarmableByWeakRoot (untagged), which after 347 is a
+//     real tooth - the injected root is canonical there too, so the grade is the
+//     only thing keeping the net armed;
+//   - TestSyncMembershipDecidesOffProfilePosix keeps its subject (root
+//     MEMBERSHIP decides, not the blanket net) and states the flipped premise
+//     out loud instead of silently inheriting it.
 //
-// HOW THIS FILE TURNS LIVE WHEN TICKET 55 LANDS (A51⑧, spelled out so nobody
-// has to re-derive it): the moment a darwin/linux probe produces
-// confirmed-grade evidence that Resolve can canonicalize — a CloudStorage /
-// ~/Library/CloudServices directory probe on macOS, realpath+lstat in
-// resolveHandle — `TestSyncNoGradeIsConfirmedOnPosix` must FAIL. That is its
-// purpose: it is a tripwire, not a comfort. Then, in this order:
-//  1. move TestSyncConfirmedGradesDisarmFallbackWindows and
-//     TestWriteGatePlainTargetInsideProfileWindows from syncdirs_windows_test.go
-//     into syncdirs_test.go verbatim (do NOT copy: two tiers with the same
-//     expectation drift), and delete syncdirs_windows_test.go once it is empty;
-//  2. delete TestSyncNoGradeIsConfirmedOnPosix and
-//     TestSyncRegistryProbeIsAStubHere from this file;
-//  3. keep TestSyncMembershipDecidesOffProfilePosix — the out-of-profile
-//     shape stays a legitimate second configuration — and un-gate the dormant
-//     negative half of TestExfilSyncWritePosixSpellingInvariant, which
-//     provenance_syncdirs_other_test.go already parks behind
-//     SyncDetectionComplete(); that branch flips by itself and needs no edit
-//     here, which is why it was written as a branch and not as a Skip.
-//
-// Ticket 55 owns steps 1-3; nothing in this file is a substitute for that work.
-
-// TestSyncNoGradeIsConfirmedOnPosix pins the fail-closed reality behind
-// TestSyncFallbackNotDisarmableByWeakRoot's mirror half: on POSIX NO grade name
-// — not even the confirmed-grade ones — disarms the under-profile net, because
-// the second half of the definition (a C26-canonical root) can never be
-// satisfied by this platform's resolver yet.
-func TestSyncNoGradeIsConfirmedOnPosix(t *testing.T) {
-	home, _, _ := sandbox(t)
-	root := filepath.Join(home, "OneDrive")
-	if err := os.MkdirAll(root, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	// The mechanism, asserted rather than assumed: an EXISTING directory is
-	// still not handle-resolvable here, which is the single reason finalize()
-	// never sets complete. If this starts passing, everything below it is the
-	// first thing ticket 55 has to revisit.
-	if res, err := Resolve(root, nil); err != nil || res.Resolved {
-		t.Fatalf("premise of this whole tier: Resolve(%q) must report Resolved=false on POSIX, got %+v err=%v", root, res, err)
-	}
-	for _, src := range []string{"default", "fixture", "options", "", "registry", "config", "env"} {
-		p := NewProvenance(ProvOptions{
-			NoProbe: true, HomeDir: home,
-			SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: root, Source: src}},
-		})
-		if p.SyncDetectionComplete() {
-			t.Errorf("source %q: POSIX detection cannot be complete while resolveHandle is the DEFERRED stub (ticket 55)", src)
-		}
-		st := p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md"))
-		if !st.Sync || st.Root.Source != "suspect-fallback" {
-			t.Errorf("source %q: the under-profile net must stay armed and be NAMED as the reason, got %+v", src, st)
-		}
-	}
-}
+// What is still owed here, and by whom: syncdirs_other.go's registryProbe is
+// still `return nil` under a DEFERRED(P12-macos) marker, so a real POSIX machine
+// has no confirmed-grade location evidence (env/client-config only) and the
+// macOS port's CloudStorage/~/Library probe is ticket 55's. The branch parked in
+// provenance_syncdirs_other_test.go behind SyncDetectionComplete() flipped live
+// by itself with this ticket and needs no edit here, which is why it was written
+// as a branch and not as a Skip.
 
 // TestSyncMembershipDecidesOffProfilePosix is the half that ticket 75's N-9 fix
-// bought and that must not be lost again: incomplete detection means writes
-// inside the profile are suspect, NOT that every path is suspect. Both verdicts
-// below come from root membership, which match() evaluates before the fallback,
-// so they are assertable without anything ticket 55 owes us.
+// bought and that must not be lost again: an incomplete detector must not mean
+// "every path is suspect", and membership is decided before the fallback. Both
+// verdicts below come from root membership, which match() evaluates before the
+// fallback, so they are assertable without the net.
+//
+// The third block used to assert that an under-profile write fail-closes to
+// sync-suspect, which was true only while the net could never be disarmed. With
+// the resolver in place the injected registry-grade root IS canonical, detection
+// IS complete, and the same input must NOT be suspect any more. The polarity
+// flipped because the measured truth flipped; the armed direction is not lost -
+// TestSyncFallbackNotDisarmableByWeakRoot sweeps it on both platforms.
 func TestSyncMembershipDecidesOffProfilePosix(t *testing.T) {
 	e := membershipEngine(t, "registry")
 	if st := e.p.IsSyncPath(e.syncTarget); !st.Sync || st.Root.Source != "registry" {
@@ -91,13 +57,14 @@ func TestSyncMembershipDecidesOffProfilePosix(t *testing.T) {
 	if st := e.p.IsSyncPath(e.plainTarget); st.Sync {
 		t.Errorf("ESCALATING FALSE POSITIVE: a plain out-of-profile write is sync-suspect on POSIX: %+v", st)
 	}
-	if e.p.SyncDetectionComplete() {
-		t.Error("premise of this file: see TestSyncNoGradeIsConfirmedOnPosix")
+	if !e.p.SyncDetectionComplete() {
+		t.Fatal("premise of this file since ticket 347: the injected registry-grade root is a real directory, so detection must be complete here (it was structurally false before the POSIX resolver landed)")
 	}
-	// And the profile itself is exactly where the net does apply — the
-	// asymmetry the two assertions above depend on.
-	if st := e.p.IsSyncPath(filepath.Join(e.home, "Documents", "x.txt")); !st.Sync || st.Root.Source != "suspect-fallback" {
-		t.Errorf("an under-profile write must fail closed as sync-suspect, got %+v", st)
+	// The profile itself: with a confirmed root the blanket net is lifted, so an
+	// under-profile write is decided by membership like any other - and it is not
+	// under the injected root.
+	if st := e.p.IsSyncPath(filepath.Join(e.home, "Documents", "x.txt")); st.Sync {
+		t.Errorf("with detection complete an under-profile write outside every root must not be suspect, got %+v", st)
 	}
 }
 
@@ -106,7 +73,10 @@ func TestSyncMembershipDecidesOffProfilePosix(t *testing.T) {
 // `return nil` carrying a DEFERRED(P12-macos) marker, so POSIX has no
 // confirmed-grade location evidence to work with. It asserts the stub, so the
 // day ticket 55 implements the probe this test goes red and points straight at
-// the comment that promised it (step 2 of this file's header).
+// the comment that promised it.
+//
+// Ticket 347 does NOT touch this: the resolver is not the probe. That is why the
+// two halves are separate tests and why only the resolver half moved.
 func TestSyncRegistryProbeIsAStubHere(t *testing.T) {
 	home, _, _ := sandbox(t)
 	if got := registryProbe(probeEnv{Home: home}); got != nil {

@@ -125,14 +125,16 @@ func ticket116MovedTree(t *testing.T) (tree, moved, raw, ancestor string) {
 // deliberately unrelated home so the under-profile suspect net cannot be what
 // answers (the same precondition ticket 105's junction cases assert).
 //
-// SyncDetectionComplete() is NOT asserted here, unlike those tests: on POSIX no
-// injected root can be C26-canonical, because resolveHandle is unsupported
-// there (see the DEFERRED marker in pathresolver_other.go), so complete is
-// legitimately false on that platform and asserting it would make this file a
-// Windows-only test. The burden the assertion carries - "a Sync:false verdict is
-// reachable on this engine, so a mutation red means the leg let the write
-// through and not merely that the net failed to fire" - is carried instead by
-// the release control inside the ancestor test below, which holds on both
+// SyncDetectionComplete() is NOT asserted here, unlike those tests: when this
+// file was written, no POSIX root could be C26-canonical (resolveHandle was the
+// DEFERRED stub), so complete was legitimately false on that platform and
+// asserting it would have made this file a Windows-only test. Ticket 347 landed
+// the resolver, so the assertion would now hold on both platforms - it is still
+// left to the sync-tier tests because this file is about the Actable() leg and
+// nothing below depends on the grading. The burden the assertion carried - "a
+// Sync:false verdict is reachable on this engine, so a mutation red means the leg
+// let the write through and not merely that the net failed to fire" - is carried
+// by the release control inside the ancestor test below, which holds on both
 // platforms.
 func ticket116Engine(t *testing.T, tree string) *Provenance {
 	t.Helper()

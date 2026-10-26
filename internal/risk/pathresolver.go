@@ -246,6 +246,19 @@ func unifySeparators(p string) string {
 // already folded '/' to '\' two lines earlier, which is exactly why the defect
 // survived every local gate.
 func normalizeLocalUNC(p string) string {
+	if filepath.Separator != '\\' {
+		// Compile-time dead on POSIX (ticket 347). Two reasons, both measured:
+		// a leading `\\` there is a legal FILE NAME, not a UNC prefix, and a
+		// leading `//` is an ordinary absolute path (POSIX leaves its meaning
+		// implementation-defined; Go's Clean folds it to "/"). The branch below
+		// rewrites the whole string to backslashes, so waking it on POSIX would
+		// hand back a path no syscall can open. It is unreachable through
+		// Resolve today only because lexCanonical (step 2) runs first, and that
+		// ordering is exactly what a future pipeline edit could change: this
+		// early exit makes the separator question a compile-time property
+		// instead of a property of the call order.
+		return p
+	}
 	if !strings.HasPrefix(p, `\\`) && !strings.HasPrefix(p, `//`) {
 		return p // not a UNC spelling: this function has no business here
 	}
@@ -308,8 +321,9 @@ type pathForms struct {
 	// real is raw with every openable component replaced by its handle
 	// final path; components below the deepest openable one are re-appended
 	// verbatim (they do not exist yet). Empty when nothing could be opened:
-	// a non-Windows build (see pathresolver_other.go), a dead volume, or a
-	// malformed spelling.
+	// a dead volume, a malformed spelling, or a chain whose every prefix is
+	// missing or unresolvable (on POSIX that is realpath's answer too, see
+	// pathresolver_other.go).
 	real string
 	// root is the handle-resolved prefix real was built on ("" when nothing
 	// opened). Two sides with roots that are not ancestry-related cannot hide

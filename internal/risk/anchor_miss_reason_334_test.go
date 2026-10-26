@@ -10,11 +10,11 @@ import (
 	"testing"
 )
 
-// Ticket 339 shape A: this instrument is windows-tagged because its world is
+// Ticket 339 shape A: this instrument is windows-tagged because its world was
 // un-buildable on POSIX for a reason in the resolver, not in the environment.
-// formsOf (pathresolver.go:345) can only fill pathForms.root through
-// resolveHandle, and on the other platform that is the documented stub
-// pathresolver_other.go:10 returning ("", false) for every spelling - measured
+// formsOf (pathresolver.go) can only fill pathForms.root through resolveHandle,
+// and on the other platform that USED to be the documented stub
+// pathresolver_other.go returning ("", false) for every spelling - measured
 // (readings named PROBE339, .scratch/wisp/probes/339/r1/logs/probe339-posix-root
 // .log): walking a real existing directory through formsOf on linux gives
 // root == "". uncertainAnchorMiss (blacklist.go:359) needs a NON-EMPTY root on
@@ -45,80 +45,10 @@ import (
 //
 // The worlds below are built, not inherited from the host: every A-anchor leaf
 // is either installed by name or deliberately absent, so both the over-strict
-// shape and the honest-match shape are decidable on every WINDOWS machine (the
-// over-strict shape needs a resolved root, which POSIX does not supply - see
-// the ticket 339 note above).
-
-const (
-	// U+001B then U+202E (written as its UTF-8 bytes so this file stays
-	// ASCII-safe): neither can appear in a Windows path, which is the whole
-	// point - Lstat fails with "syntax is incorrect", NOT "no such file".
-	noise334a  = "已允许\x1b\xe2\x80\xae"
-	hostile334 = "id_ed25519" + noise334a
-
-	// The A rules are tried in order, and every anchor whose leaf is absent
-	// collapses to the fake home - which IS an ancestor of the candidate, so
-	// the very first absent leaf is the one that fail-closes. This ticket is
-	// about the ~/.aws/credentials sentence, so the wisp config leaf (the
-	// earliest anchor in that switch that would otherwise hijack the shape) is
-	// installed in every world below; a world then leaves out exactly the one
-	// leaf whose rule it wants to fire.
-	wispCfgLeaf334 = `AppData/Roaming/wisp/config.toml`
-)
-
-// world334 is one self-contained profile world. installed lists leaf paths
-// (slash form, relative to the fake home) that are really created; anything not
-// listed is absent, which is what makes an anchor's expansion stop short.
-type world334 struct {
-	profile string // the fake home, exists
-	work    string // existing directory the candidate is placed in
-}
-
-// newWorld334 builds the world. candidateInsideProfile=true puts work INSIDE
-// the fake home, so a candidate whose own spelling cannot be proven sits in the
-// ancestry chain of every anchor leaf that is absent (the shape ticket 334 is
-// about); =false puts it as a SIBLING of the profile, so no A anchor shares an
-// ancestry relation with it and only a real name match can fire an A rule.
-func newWorld334(t *testing.T, candidateInsideProfile bool, installed ...string) world334 {
-	t.Helper()
-	base := t.TempDir()
-	profile := filepath.Join(base, "profile")
-	work := filepath.Join(base, "work")
-	if candidateInsideProfile {
-		work = filepath.Join(profile, "work")
-	}
-	for _, d := range []string{profile, work} {
-		if err := os.MkdirAll(d, 0o755); err != nil {
-			t.Fatalf("setup mkdir %s: %v", d, err)
-		}
-	}
-	for _, leaf := range installed {
-		full := filepath.Join(profile, filepath.FromSlash(leaf))
-		if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
-			t.Fatalf("setup mkdir parent of %s: %v", full, err)
-		}
-		if err := os.WriteFile(full, []byte("installed leaf\n"), 0o600); err != nil {
-			t.Fatalf("setup write %s: %v", full, err)
-		}
-	}
-	// The anchors are read from the environment, so relocating the profile is
-	// the supported way to decide which leaves are installed (same shape as
-	// TestTierAAnchorsMatchNativeSpelling and the ticket 216 probe).
-	t.Setenv("USERPROFILE", profile)
-	t.Setenv("HOME", profile)
-	t.Setenv("APPDATA", filepath.Join(profile, "AppData", "Roaming"))
-	t.Setenv("LOCALAPPDATA", filepath.Join(profile, "AppData", "Local"))
-	return world334{profile: profile, work: work}
-}
-
-// candidateOffAnchorChain334 is ticket 334 AC#3's world for the ticket 216
-// instrument: the candidate lives beside the profile instead of inside it, so
-// no A anchor is ancestry-related to it, uncertainAnchorMiss cannot fire, and
-// what is left to observe is exactly "a claim inside a name changes no verdict".
-func candidateOffAnchorChain334(t *testing.T) string {
-	t.Helper()
-	return newWorld334(t, false).work
-}
+// shape and the honest-match shape are decidable on every WINDOWS machine. The
+// builder and its constants moved to anchor_world_334_test.go in ticket 347, so
+// the POSIX teeth read the same world instead of a copy of it; the Windows-only
+// half left here is the partial maker, hostile334 (see that file's header).
 
 // quotedFold334 puts a path into the shape aRuleReason prints it in: %q quoting
 // (backslashes doubled, control characters escaped) and lowercased, because

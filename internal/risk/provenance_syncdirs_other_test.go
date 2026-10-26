@@ -17,19 +17,20 @@ import (
 // What this leg can and cannot prove today, stated plainly:
 //   - the POSITIVE half (a write into the injected sync root must upgrade to
 //     ChSyncWrite) is meaningful and is asserted unconditionally;
-//   - the NEGATIVE half (a plain write must NOT be flagged) is not decidable on
-//     POSIX until ticket 55 lands, because sync detection is incomplete here
-//     (pathresolver_other.go's resolveHandle is still the DEFERRED stub) and
-//     writeGate fails closed on incomplete detection. That half is therefore
-//     asserted ONLY when the engine reports detection complete, which is the
-//     honest way of parking it: it starts biting the moment ticket 55 lands, and
-//     nobody can read today's green as "the POSIX negative control passes".
+//   - the NEGATIVE half (a plain write must NOT be flagged) needed sync
+//     detection to be complete, because writeGate fails closed on incomplete
+//     detection. It was parked as a live branch rather than a Skip for exactly
+//     this moment: ticket 347 gave POSIX realpath, the injected registry-grade
+//     root is now C26-canonical, the engine reports detection complete, and the
+//     branch evaluates on every run instead of logging why it cannot. Nobody may
+//     read the green as "it would have failed before" - the log line below says
+//     whether the branch was dormant, and it is expected to be absent now.
 //     Ticket 82 re-pointed the 8 same-family reds this comment used to name:
 //     their subject (the write gate, root membership) turned out to be
 //     assertable on POSIX once the fixture stopped borrowing Windows-only
 //     ground, so they run on both platforms now — see
 //     membershipEngine in syncdirs_test.go, and syncdirs_other_test.go for the
-//     grading consequence that really is absent here.
+//     grading consequence.
 
 func posixSyncEngine(t *testing.T) (p *Provenance, syncTarget, plainTarget, backslashNameInSyncRoot string) {
 	t.Helper()

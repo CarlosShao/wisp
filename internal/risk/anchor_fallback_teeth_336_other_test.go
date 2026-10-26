@@ -8,85 +8,70 @@ import (
 	"testing"
 )
 
-// Ticket 336 AC#2, the other platform's half of the same roster, named so that the
-// windows-tagged teeth cannot quietly "run less" (the ticket 339 shape: an
-// instrument whose world only exists on one OS, discovered later by a different
-// leg on a container).
+// The POSIX half of ticket 336 AC#2's world, which ticket 347 is what finally
+// made buildable. The roster and every assertion live in
+// anchor_fallback_teeth_336_roster_test.go, unchanged from the Windows file
+// ticket 336 wrote; only the way a spelling is made present-but-unprovable
+// differs here, and it is MEASURED rather than assumed:
 //
-// Why there is no tooth here, measured rather than assumed: uncertainAnchorMiss
-// requires a NON-EMPTY resolved root on both sides, and this platform's resolver is
-// the documented stub - pathresolver_other.go's resolveHandle returns ("", false) -
-// so formsOf never fills root for any candidate or any anchor, the branch can never
-// fire, and no world on this platform can make "remove this anchor's branch"
-// observable. A tooth here would be permanently red, which AC#2 forbids, and a fake
-// green would be worse: nothing below asserts the A tier.
-//
-// This is the tripwire instead. It pins the mechanism, and it goes RED the moment a
-// POSIX handle resolver lands (root stops being empty), which is exactly when
-// anchor_fallback_teeth_336_windows_test.go must be ported to this platform.
+//   - before ticket 347 this file could hold no tooth at all. resolveHandle was
+//     the DEFERRED(macOS/Linux) stub, pathForms.root stayed "" on both sides,
+//     uncertainAnchorMiss needs a non-empty root on both, so the branch was
+//     structurally unreachable and a tooth would have been permanently red.
+//     What stood here was a tripwire that said exactly that;
+//   - when the resolver landed, the tripwire went red and the ticket-334 shape
+//     still read class B with clause=false, because U+001B and U+202E are LEGAL
+//     filename bytes on POSIX: the name is merely missing, Lstat says "no such
+//     file", pathExists proves the miss and partial stays false. Copying the
+//     Windows maker here would have produced a tooth that passes for the wrong
+//     reason (or an off-chain arm that is accidentally right);
+//   - so the maker is a DANGLING SYMLINK. The entry exists (Lstat succeeds, which
+//     is what partial reports) and cannot be opened (Stat/EvalSymlinks follow it
+//     onto a target that is not there), which is the same pair the Windows name
+//     produces - exactly the "dangling reparse point" case pathForms.partial
+//     names in its own comment.
 
-func teeth336OtherAnchors(homeS, appDataS, localAppDataS string) []string {
-	return []string{
-		anchorPath(homeS, ".git-credentials"),
-		anchorPath(appDataS, "wisp"),
-		anchorPath(appDataS, "wisp", "config.toml"),
-		anchorPath(homeS, ".ssh"),
-		anchorPath(homeS, ".aws", "credentials"),
-		anchorPath(homeS, ".kube", "config"),
-		anchorPath(appDataS, "microsoft", "protect"),
-		anchorPath(localAppDataS, "microsoft", "credentials"),
+// teeth336Candidate places the hostile candidate in the roster row's directory,
+// after checking the setup facts the whole shape rests on. The first two are
+// ticket 336's verbatim (the leaf under test is absent, the candidate was not
+// there before); the third is this platform's partial maker, asserted rather
+// than assumed.
+func teeth336Candidate(t *testing.T, w world334, tc teeth336Case) string {
+	t.Helper()
+	dir := w.work
+	if tc.relCand != "work" {
+		dir = filepath.Join(w.profile, filepath.FromSlash(tc.relCand))
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatalf("setup mkdir %s: %v", dir, err)
+		}
 	}
+	if _, err := os.Lstat(filepath.Join(w.profile, filepath.FromSlash(tc.omit))); err == nil {
+		t.Fatalf("setup: the leaf under test must be absent: %s", tc.omit)
+	}
+	cand := filepath.Join(dir, hostilePOSIX347)
+	if _, err := os.Lstat(cand); err == nil {
+		t.Fatalf("setup: the hostile candidate must not exist at %q", cand)
+	}
+	if err := os.Symlink(danglingTarget347, cand); err != nil {
+		t.Fatalf("setup symlink %s: %v", cand, err)
+	}
+	if _, err := os.Stat(cand); err == nil {
+		t.Fatalf("setup: the partial maker must not be openable, got a following stat for %q", cand)
+	}
+	if _, err := os.Lstat(cand); err != nil {
+		t.Fatalf("setup: the partial maker must still be a directory entry (Lstat is what makes the spelling unproven), got %v", err)
+	}
+	return cand
 }
 
-// TestFallbackBranchHasNoWorldOnThisPlatform336 is the named POSIX half of ticket
-// 336 AC#2: every A-tier anchor and every candidate has an empty resolved root here,
-// so the fail-closed branch cannot be load-bearing on any input.
-func TestFallbackBranchHasNoWorldOnThisPlatform336(t *testing.T) {
-	base := t.TempDir()
-	profile := filepath.Join(base, "profile")
-	work := filepath.Join(profile, "work")
-	for _, d := range []string{profile, work, filepath.Join(base, "work")} {
-		if err := os.MkdirAll(d, 0o755); err != nil {
-			t.Fatalf("setup mkdir %s: %v", d, err)
-		}
+// teeth336OffChainCandidate is the off-chain arm's candidate: the same dangling
+// link beside the profile instead of inside it, so no A anchor is
+// ancestry-related to it and only a real name match can reach the B tier.
+func teeth336OffChainCandidate(t *testing.T, installed []string) string {
+	t.Helper()
+	cand := filepath.Join(newWorld334(t, false, installed...).work, hostilePOSIX347)
+	if err := os.Symlink(danglingTarget347, cand); err != nil {
+		t.Fatalf("setup symlink %s: %v", cand, err)
 	}
-	// Same relocation the windows teeth use. os.UserHomeDir reads HOME here and
-	// USERPROFILE on Windows, so the fake home does take effect on this platform -
-	// the missing ingredient is the resolved root, not the environment.
-	t.Setenv("HOME", profile)
-	t.Setenv("USERPROFILE", profile)
-	t.Setenv("APPDATA", filepath.Join(profile, "AppData", "Roaming"))
-	t.Setenv("LOCALAPPDATA", filepath.Join(profile, "AppData", "Local"))
-
-	homeS := normDir(userHomeDir())
-	appDataS := normDir(envOr("APPDATA", filepath.Join(userHomeDir(), "AppData", "Roaming")))
-	localAppDataS := normDir(envOr("LOCALAPPDATA", filepath.Join(userHomeDir(), "AppData", "Local")))
-
-	for _, relCand := range []string{"work", "AppData/Roaming", "AppData/Roaming/wisp/logs", "AppData/Local"} {
-		dir := work
-		if relCand != "work" {
-			dir = filepath.Join(profile, filepath.FromSlash(relCand))
-			if err := os.MkdirAll(dir, 0o755); err != nil {
-				t.Fatalf("setup mkdir %s: %v", dir, err)
-			}
-		}
-		cand := filepath.Join(dir, hostile334)
-		f := formsOf(cand)
-		if f.root != "" {
-			t.Errorf("tripwire: this platform now resolves a root (%q) - pathresolver_other.go has grown a real resolver, so the per-anchor fail-closed teeth in anchor_fallback_teeth_336_windows_test.go must be ported here (ticket 336 AC#2) or a POSIX-only downgrade will go unobserved", f.root)
-			continue
-		}
-		for _, spelling := range teeth336OtherAnchors(homeS, appDataS, localAppDataS) {
-			a := anchorForms(spelling)
-			if a.root != "" {
-				t.Errorf("tripwire: anchor %q now resolves a root (%q) on this platform; port the teeth", spelling, a.root)
-				continue
-			}
-			if uncertainAnchorMiss(f, a) {
-				t.Errorf("the branch fired with empty roots for anchor %q: uncertainAnchorMiss changed shape, re-read this file", spelling)
-			}
-		}
-		t.Logf("TEETH336-OTHER relCand=%s cand_root=EMPTY verdict=%s (the branch cannot fire here; see pathresolver_other.go)",
-			relCand, Classify(cand))
-	}
+	return cand
 }

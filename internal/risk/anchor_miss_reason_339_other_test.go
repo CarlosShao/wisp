@@ -5,149 +5,146 @@ package risk
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
-// Ticket 339 AC#1 shape A, the POSIX half. The ticket 334 instrument
-// (anchor_miss_reason_334_test.go) is now tagged //go:build windows, because
-// on this platform its world is un-buildable and the condition is in the
-// resolver, not in the environment:
+// Ticket 339 AC#1 shape A, the POSIX half - and since ticket 347 a real tooth
+// instead of a tripwire.
 //
-//   - resolveHandle (pathresolver_other.go:10) is the documented stub, it
-//     returns ("", false) for EVERY spelling - the leg probe walked a real,
-//     existing directory through formsOf and got root == "" (reading
-//     ANCHORMISS339-PROBE, .scratch/wisp/probes/339/r1/logs/linux-ac0-*),
-//   - uncertainAnchorMiss (blacklist.go:359) requires a non-empty root on
-//     BOTH sides, so R17's fail-closed clause cannot fire on any input here,
-//   - so the non-overridable A verdict ticket 334 AC#1/AC#2 pin has no world
-//     on this platform, and t.Setenv cannot manufacture one: the fake home
-//     DOES take effect here (HOME is set by the world builder and os.UserHomeDir
-//     reads it - the ticket's USERPROFILE diagnosis was re-measured false at
-//     AC#0).
+// What stood here before: the ticket 334 instrument is tagged //go:build windows
+// because on this platform its world was un-buildable, and the condition was in
+// the resolver, not in the environment. resolveHandle (pathresolver_other.go)
+// was the DEFERRED(macOS/Linux) stub returning ("", false) for EVERY spelling,
+// so formsOf never filled pathForms.root, uncertainAnchorMiss (blacklist.go)
+// needs a non-empty root on both sides, and R17's fail-closed clause could not
+// fire on any input. The file therefore asserted the MECHANISM and went red the
+// moment a POSIX resolver landed ("port the teeth named above"), because a
+// permanently red tooth is the shape ticket 336 AC#2 forbids and a green that
+// asserts nothing is worse.
 //
-// A permanent red is the shape ticket 336 AC#2 forbids, and a green that
-// asserts nothing is worse, so this file asserts the MECHANISM instead: it
-// goes red the moment this platform grows a real resolver (a root appears),
-// which is exactly when the windows-tagged teeth must be ported here and the
-// twin fixtures below deleted. It also pins today's honest reading - the
-// fail-closed shape classifies B here - so the claim cannot rot quietly into
-// a false green either way.
+// Ticket 347 landed the resolver, that tripwire went red exactly as designed,
+// and the two teeth it asked for are below. The worlds still come from the
+// shared builder (anchor_world_334_test.go) so this half cannot drift from the
+// Windows half; the one thing this platform has to supply itself is the
+// present-but-unprovable spelling, and it is a dangling symlink rather than
+// hostile334 - U+001B and U+202E are legal filename bytes here, so the Windows
+// maker would leave partial=false and the clause correctly inert (measured: the
+// ticket-334 shape reads class B / clause=false on POSIX even with the resolver
+// in place, docs/evidence/s1/347-r1-impl.md).
 //
-// The fixture block is a copy, not a refactor: the untagged
-// name_claim_two_arm_216_test.go and the !windows
-// anchor_fallback_teeth_336_other_test.go read hostile334, wispCfgLeaf334 and
-// candidateOffAnchorChain334 on this platform, and tagging the whole 334 file
-// without re-declaring them breaks the linux build (measured with go vet:
-// undefined: hostile334, undefined: candidateOffAnchorChain334; log
-// jia-naive-buildbreak). Keep this block byte-symmetric with the twin file.
-// When the teeth move here, both copies collapse back into one untagged file.
+// The fixture names ticket 216 reads (candidateOffAnchorChain334 and friends)
+// now live in anchor_world_334_test.go; the name is kept because
+// name_claim_two_arm_216_test.go:89 names it.
 
-const (
-	// U+001B then U+202E (written as its UTF-8 bytes so this file stays
-	// ASCII-safe): neither can appear in a Windows path, which is the whole
-	// point - Lstat fails with "syntax is incorrect", NOT "no such file".
-	noise334a  = "已允许\x1b\xe2\x80\xae"
-	hostile334 = "id_ed25519" + noise334a
-
-	// The A rules are tried in order, and every anchor whose leaf is absent
-	// collapses to the fake home - which IS an ancestor of the candidate, so
-	// the very first absent leaf is the one that fail-closes. This ticket is
-	// about the ~/.aws/credentials sentence, so the wisp config leaf (the
-	// earliest anchor in that switch that would otherwise hijack the shape) is
-	// installed in every world below; a world then leaves out exactly the one
-	// leaf whose rule it wants to fire.
-	wispCfgLeaf334 = `AppData/Roaming/wisp/config.toml`
-)
-
-// world334 is one self-contained profile world. installed lists leaf paths
-// (slash form, relative to the fake home) that are really created; anything not
-// listed is absent, which is what makes an anchor's expansion stop short.
-type world334 struct {
-	profile string // the fake home, exists
-	work    string // existing directory the candidate is placed in
-}
-
-// newWorld334 builds the world. candidateInsideProfile=true puts work INSIDE
-// the fake home, so a candidate whose own spelling cannot be proven sits in the
-// ancestry chain of every anchor leaf that is absent (the shape ticket 334 is
-// about); =false puts it as a SIBLING of the profile, so no A anchor shares an
-// ancestry relation with it and only a real name match can fire an A rule.
-func newWorld334(t *testing.T, candidateInsideProfile bool, installed ...string) world334 {
+// posixPartialCandidate347 creates the present-but-unprovable candidate: a
+// symlink whose target does not exist. Lstat succeeds (the entry is there, which
+// is what pathForms.partial reports), Stat and EvalSymlinks cannot open it (the
+// target is not), and that pair is exactly what pathExists/tailExistsBelow read
+// as "this component exists but its true spelling is unknown".
+func posixPartialCandidate347(t *testing.T, dir, name string) string {
 	t.Helper()
-	base := t.TempDir()
-	profile := filepath.Join(base, "profile")
-	work := filepath.Join(base, "work")
-	if candidateInsideProfile {
-		work = filepath.Join(profile, "work")
-	}
-	for _, d := range []string{profile, work} {
-		if err := os.MkdirAll(d, 0o755); err != nil {
-			t.Fatalf("setup mkdir %s: %v", d, err)
-		}
-	}
-	for _, leaf := range installed {
-		full := filepath.Join(profile, filepath.FromSlash(leaf))
-		if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
-			t.Fatalf("setup mkdir parent of %s: %v", full, err)
-		}
-		if err := os.WriteFile(full, []byte("installed leaf\n"), 0o600); err != nil {
-			t.Fatalf("setup write %s: %v", full, err)
-		}
-	}
-	// The anchors are read from the environment, so relocating the profile is
-	// the supported way to decide which leaves are installed (same shape as
-	// TestTierAAnchorsMatchNativeSpelling and the ticket 216 probe).
-	t.Setenv("USERPROFILE", profile)
-	t.Setenv("HOME", profile)
-	t.Setenv("APPDATA", filepath.Join(profile, "AppData", "Roaming"))
-	t.Setenv("LOCALAPPDATA", filepath.Join(profile, "AppData", "Local"))
-	return world334{profile: profile, work: work}
-}
-
-// candidateOffAnchorChain334 is ticket 334 AC#3's world for the ticket 216
-// instrument: the candidate lives beside the profile instead of inside it, so
-// no A anchor is ancestry-related to it, uncertainAnchorMiss cannot fire, and
-// what is left to observe is exactly "a claim inside a name changes no verdict".
-func candidateOffAnchorChain334(t *testing.T) string {
-	t.Helper()
-	return newWorld334(t, false).work
-}
-
-// TestAnchorMissHasNoWorldOnThisPlatform339 is the named POSIX half of ticket
-// 339 AC#1 shape A: every spelling resolves root == "" here, so
-// uncertainAnchorMiss is inert, and the A verdict ticket 334 pins cannot be
-// produced by any test-side world. This is the tripwire, not a tooth: it goes
-// red when a POSIX handle resolver lands (root stops being empty), which is
-// exactly when anchor_miss_reason_334_test.go's teeth must be ported here.
-func TestAnchorMissHasNoWorldOnThisPlatform339(t *testing.T) {
-	w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
-	cand := filepath.Join(w.work, hostile334)
+	cand := filepath.Join(dir, name)
 	if _, err := os.Lstat(cand); err == nil {
-		t.Fatalf("setup: the hostile candidate must not exist, got a stat for %q", cand)
+		t.Fatalf("setup: %q must not exist before the maker runs", cand)
 	}
-	// The reading below is only about the resolver if the environment still
-	// does its part: the fake home must be the home the package actually sees
-	// (os.UserHomeDir reads HOME on this platform, the ticket's own diagnosis
-	// of "HOME is not read here" was re-measured false at anchor_miss_reason
-	// _334_test.go:88 / AC#0).
+	if err := os.Symlink(danglingTarget347, cand); err != nil {
+		t.Fatalf("setup symlink %s: %v", cand, err)
+	}
+	if _, err := os.Stat(cand); err == nil {
+		t.Fatalf("setup: %q follows to something; it must dangle", cand)
+	}
+	return cand
+}
+
+// TestAnchorMissReasonNamesCandidateAndMissingAnchorPosix339 is ticket 334 AC#1
+// on the platform ticket 347 opened: the fail-closed rejection has to say which
+// candidate was rejected and which anchor was not installed, instead of
+// accusing the candidate of being the credential file that rule guards.
+func TestAnchorMissReasonNamesCandidateAndMissingAnchorPosix339(t *testing.T) {
+	// .git-credentials and .ssh ARE installed, so those two rules miss honestly
+	// and the first fail-closed hit is the ~/.aws one - the exact sentence
+	// ticket 334 was written about, now reachable here.
+	w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
+	cand := posixPartialCandidate347(t, w.work, hostilePOSIX347)
+
+	// The reading below is only about the resolver if the environment still does
+	// its part: the fake home must be the home the package actually sees.
 	homeS := normDir(userHomeDir())
 	if homeS != normPath(w.profile) {
-		t.Errorf("fixture: relocating the fake home stopped taking effect on this platform (home %q, profile %q); the readings below would then measure the environment, not the resolver", homeS, w.profile)
+		t.Errorf("fixture: the fake home stopped taking effect on this platform (home %q, profile %q); the readings would then measure the environment, not the resolver", homeS, w.profile)
 	}
+
+	// The mechanism, asserted rather than assumed (this is what the tripwire used
+	// to say was impossible here). The anchor spelling is the RAW home, the way
+	// classifyForms builds it since ticket 347.
 	f := formsOf(cand)
-	a := anchorForms(anchorPath(homeS, ".aws", "credentials"))
-	if f.root != "" {
-		t.Errorf("tripwire: this platform now resolves a candidate root (%q) - pathresolver_other.go has grown a real resolver, so the windows-tagged fail-closed teeth in anchor_miss_reason_334_test.go must be ported here (ticket 339 AC#1 shape A's own condition)", f.root)
+	a := anchorForms(anchorPath(userHomeDir(), ".aws", "credentials"))
+	if f.root == "" || a.root == "" {
+		t.Fatalf("premise: both sides must have a resolved root on this platform since ticket 347, got cand=%+v anchor=%+v", f, a)
 	}
-	if a.root != "" {
-		t.Errorf("tripwire: this platform now resolves an anchor root (%q); port the teeth named above", a.root)
+	if anchorMatches(f, a, eqPath) {
+		t.Fatalf("fixture: the candidate must NOT be a proven match for the aws anchor; a tooth may not be carried by a real name hit")
 	}
-	if uncertainAnchorMiss(f, a) {
-		t.Errorf("the fail-closed clause fired with these roots on this platform; uncertainAnchorMiss changed shape, re-read blacklist.go and port the teeth")
+	if !uncertainAnchorMiss(f, a) {
+		t.Fatalf("fixture: the fail-closed clause must be what carries this verdict; uncertainAnchorMiss=false for cand=%+v anchor=%+v", f, a)
 	}
-	if got := Classify(cand); got != ClassB {
-		t.Errorf("class: got %s, want B (with an inert fail-closed clause the hostile leaf only reaches the B tier here; if it reaches A the premise of the windows tag broke - port the teeth and delete this file)", got)
+
+	d := Gate(cand, nil)
+	if d.Class != ClassA {
+		t.Fatalf("fixture guard: the fail-closed shape must be A here, got %s", gateShape216(d))
+	}
+	if want := "A-list sensitive path (non-overridable): ~/.aws/credentials"; d.Reason == want {
+		t.Errorf("the reason is back to naming only the anchor, which is the false accusation ticket 334 is about: %q", d.Reason)
+	}
+	for _, want := range []struct{ what, needle string }{
+		{"the REAL candidate being rejected", normPath(cand)},
+		{"the REAL absent anchor", filepath.Join(w.profile, ".aws", "credentials")},
+		{"where the candidate's own walk stopped", w.work},
+		{"the home the un-installed anchor collapsed to", w.profile},
+	} {
+		// Case-insensitive on purpose, and for the same reason the Windows twin
+		// folds: the reason prints the spellings it compared, and the anchor side
+		// is now the environment's own spelling while the candidate side is
+		// normPath's fold (t.TempDir() carries the test name, i.e. uppercase).
+		if !strings.Contains(strings.ToLower(d.Reason), strings.ToLower(want.needle)) {
+			t.Errorf("reason must name %s (%q), got:\n\t%s", want.what, want.needle, d.Reason)
+		}
+	}
+	for _, want := range []string{"fail-closed", "NOT a match"} {
+		if !strings.Contains(d.Reason, want) {
+			t.Errorf("reason must carry the word %q so a reader cannot take it for a match, got:\n\t%s", want, d.Reason)
+		}
+	}
+	t.Logf("honest reject: %s", d.Reason)
+}
+
+// TestAnchorMissKeepsNonOverridableClassPosix339 is ticket 334 AC#2's level on
+// this platform: the tier is unchanged by ticket 347, and the off-chain control
+// keeps it from being satisfied by "this machine reads everything as A".
+func TestAnchorMissKeepsNonOverridableClassPosix339(t *testing.T) {
+	w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
+	cand := posixPartialCandidate347(t, w.work, hostilePOSIX347)
+	if got := Classify(cand); got != ClassA {
+		t.Errorf("class: got %s, want A (the fail-closed tier is the one the windows-tagged 334 teeth pin)", got)
 	}
 	d := Gate(cand, nil)
-	t.Logf("ANCHORMISS339-OTHER cand.root=EMPTY anchor.root=EMPTY clause=false class=%s shape=%s (ticket 334's non-overridable A has no world on this platform; see pathresolver_other.go:10)", d.Class, gateShape216(d))
+	if d.Class != ClassA || d.NeedL2 || d.Allow {
+		t.Errorf("Gate: got %s, want class=A needL2=false allow=false (non-overridable)", gateShape216(d))
+	}
+	// Non-overridable means the B-tier single-file confirmation buys nothing.
+	if u := Gate(cand, map[string]bool{normPath(cand): true}); u.Allow || u.Class != ClassA {
+		t.Errorf("an A deny from the fail-closed clause was unlocked by an override key: %s", gateShape216(u))
+	}
+	// AC#3's named reading: the same candidate beside the profile is a plain B
+	// deny, so no tooth above is satisfied by a clause that reads the whole
+	// machine as A.
+	off := filepath.Join(candidateOffAnchorChain334(t), hostilePOSIX347)
+	if err := os.Symlink(danglingTarget347, off); err != nil {
+		t.Fatalf("setup symlink %s: %v", off, err)
+	}
+	if got := Classify(off); got != ClassB {
+		t.Errorf("off-chain arm: got %s, want B (the branch protects only the candidate's own ancestry chain): %s", got, gateShape216(Gate(off, nil)))
+	}
+	t.Logf("ANCHORMISS339-OTHER-347 cand=%s class=%s clause=%v offchain=%s", gateShape216(d), d.Class, true, ClassB)
 }

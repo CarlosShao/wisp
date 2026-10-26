@@ -2,11 +2,15 @@
 
 package risk
 
-// pathHandleVerify is false here: pathresolver_other.go has no handle-based
-// resolution yet, so C26 can only offer lexical forms. Sync-root membership
-// therefore stays best-effort on these platforms (documented in
-// docs/PRECHECK.md §P12 alongside the DEFERRED marker below); failing every
-// candidate closed would flag every write, not just the risky ones.
+// pathHandleVerify is false here: it is the alternative to the Windows
+// "unverifiable existing ancestor fail-closes" rule (syncdirs.go), and ticket
+// 347 did NOT change it. C26 now resolves paths on these platforms (realpath,
+// pathresolver_other.go), so an existing directory normally comes back
+// Resolved; what this flag still covers is the residue where the OS refuses to
+// re-open a component a plain Lstat accepted (EACCES on a parent, a dangling
+// link), and there the lexical form has always been the answer on POSIX.
+// Turning it on is a separate decision with its own denominator - it tightens
+// sync-root membership for that residue - so it stays as it was.
 const pathHandleVerify = false
 
 // registryProbe is a Windows-only P12 probe. macOS (S8) will need its own

@@ -109,10 +109,10 @@ func Gate(canonical string, bOverrides map[string]bool) PathDecision {
 //   - the key must equal that resolved form, so a confirmation recorded for a
 //     non-canonical string never unlocks the real file behind it either.
 //
-// When nothing on the path can be opened (a platform whose resolver is still
-// DEFERRED, or a dead volume) there is exactly one form and no evidence of a
-// second one, so the lookup falls back to it — that is the pre-ticket-72
-// behavior, not a widening.
+// When nothing on the path can be opened (a dead volume, a malformed spelling,
+// or a chain whose every prefix is missing) there is exactly one form and no
+// evidence of a second one, so the lookup falls back to it — that is the
+// pre-ticket-72 behavior, not a widening.
 func overrideApplies(cand pathForms, bOverrides map[string]bool) bool {
 	if len(bOverrides) == 0 {
 		return false
@@ -200,9 +200,23 @@ func classifyForms(cand pathForms) (Class, string) {
 	if p == "" {
 		return ClassNone, ""
 	}
-	homeS := normDir(userHomeDir())
-	appDataS := normDir(envOr("APPDATA", filepath.Join(userHomeDir(), "AppData", "Roaming")))
-	localAppDataS := normDir(envOr("LOCALAPPDATA", filepath.Join(userHomeDir(), "AppData", "Local")))
+	// Ticket 347: the anchors have to be spelled the way the ENVIRONMENT spells
+	// them, because each one below goes through formsOf, which absolutizes and
+	// Lstats it. normPath's fold (lowercase + unified separators) is a comparison
+	// shape and must never be handed to the OS - this file says so itself, see
+	// normPath's own comment - and on a case-sensitive filesystem a lowercased
+	// $HOME (/home/Alice -> /home/alice) names a DIFFERENT tree, so the walk
+	// stopped at the wrong ancestor and every partial candidate under it
+	// fail-closed. On Windows the two spellings resolve to the same real path, so
+	// the fold made no difference there and the defect could not be seen until a
+	// POSIX resolver existed. homeS/appDataS/localAppDataS stay folded for the
+	// emptiness guards; the spellings used below are the raw ones.
+	homeRaw := userHomeDir()
+	appDataRaw := envOr("APPDATA", filepath.Join(userHomeDir(), "AppData", "Roaming"))
+	localAppDataRaw := envOr("LOCALAPPDATA", filepath.Join(userHomeDir(), "AppData", "Local"))
+	homeS := normDir(homeRaw)
+	appDataS := normDir(appDataRaw)
+	localAppDataS := normDir(localAppDataRaw)
 
 	// Anchor side of the comparison: the same C26 handle pipeline the
 	// candidate went through, so RUNNER~1 and runneradmin become one shape.
@@ -220,25 +234,25 @@ func classifyForms(cand pathForms) (Class, string) {
 	// always had - the level, the tier and the non-overridability are NOT what
 	// changed, only the honesty of the reason (AC#2 pins that).
 	switch {
-	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.git-credentials`))):
-		return ClassA, aRuleReason("~/.git-credentials", anchorPath(homeS, `.git-credentials`), cand, eqPath)
+	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeRaw, `.git-credentials`))):
+		return ClassA, aRuleReason("~/.git-credentials", anchorPath(homeRaw, `.git-credentials`), cand, eqPath)
 	case aAnyForm(cand, hasGitConfigSegment):
 		return ClassA, ".git/config"
-	case aUnder(cand, anchorForms(anchorPath(appDataS, `wisp`))) &&
-		aEq(cand, anchorForms(anchorPath(appDataS, `wisp`, `config.toml`))):
-		return ClassA, aRuleReason("%APPDATA%\\wisp\\config.toml", anchorPath(appDataS, `wisp`, `config.toml`), cand, eqPath)
-	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
-		return ClassA, aRuleReason("~/.ssh/**", anchorPath(homeS, `.ssh`), cand, isUnder)
-	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.aws`, `credentials`))):
-		return ClassA, aRuleReason("~/.aws/credentials", anchorPath(homeS, `.aws`, `credentials`), cand, eqPath)
-	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`))):
-		return ClassA, aRuleReason("~/.kube/config", anchorPath(homeS, `.kube`, `config`), cand, eqPath)
+	case aUnder(cand, anchorForms(anchorPath(appDataRaw, `wisp`))) &&
+		aEq(cand, anchorForms(anchorPath(appDataRaw, `wisp`, `config.toml`))):
+		return ClassA, aRuleReason("%APPDATA%\\wisp\\config.toml", anchorPath(appDataRaw, `wisp`, `config.toml`), cand, eqPath)
+	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeRaw, `.ssh`))):
+		return ClassA, aRuleReason("~/.ssh/**", anchorPath(homeRaw, `.ssh`), cand, isUnder)
+	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeRaw, `.aws`, `credentials`))):
+		return ClassA, aRuleReason("~/.aws/credentials", anchorPath(homeRaw, `.aws`, `credentials`), cand, eqPath)
+	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeRaw, `.kube`, `config`))):
+		return ClassA, aRuleReason("~/.kube/config", anchorPath(homeRaw, `.kube`, `config`), cand, eqPath)
 	case aAnyForm(cand, func(s string) bool { return isBrowserCredentialStore(baseName(s)) }):
 		return ClassA, "browser credential store"
-	case appDataS != "" && aUnder(cand, anchorForms(anchorPath(appDataS, `microsoft`, `protect`))):
-		return ClassA, aRuleReason("%APPDATA%\\Microsoft\\Protect\\** (DPAPI master keys)", anchorPath(appDataS, `microsoft`, `protect`), cand, isUnder)
-	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
-		return ClassA, aRuleReason("%LOCALAPPDATA%\\Microsoft\\Credentials\\**", anchorPath(localAppDataS, `microsoft`, `credentials`), cand, isUnder)
+	case appDataS != "" && aUnder(cand, anchorForms(anchorPath(appDataRaw, `microsoft`, `protect`))):
+		return ClassA, aRuleReason("%APPDATA%\\Microsoft\\Protect\\** (DPAPI master keys)", anchorPath(appDataRaw, `microsoft`, `protect`), cand, isUnder)
+	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataRaw, `microsoft`, `credentials`))):
+		return ClassA, aRuleReason("%LOCALAPPDATA%\\Microsoft\\Credentials\\**", anchorPath(localAppDataRaw, `microsoft`, `credentials`), cand, isUnder)
 	}
 
 	// ---- B tier (default deny + single-file override) ----
@@ -355,8 +369,9 @@ func aAnyForm(cand pathForms, test func(string) bool) bool {
 // The clause is bounded on purpose, so it stays a fail-closed tie-breaker
 // rather than a blanket deny:
 //   - it needs a resolved root on both sides. A path on a dead volume, or one
-//     on a platform whose resolver is still DEFERRED (pathresolver_other.go),
-//     has no root and cannot hide inside a live anchor tree;
+//     whose spelling names nothing the OS can resolve (ticket 347 landed
+//     realpath on POSIX, so "no resolver here" is no longer such a case), has
+//     no root and cannot hide inside a live anchor tree;
 //   - the roots must be ancestry-related, i.e. one tree could contain the
 //     other. Unrelated trees are a proven miss.
 func uncertainAnchorMiss(cand, anchor pathForms) bool {

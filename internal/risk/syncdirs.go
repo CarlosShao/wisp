@@ -236,8 +236,10 @@ func (s *syncSet) resolveTarget(raw string) (string, error) {
 			// offline volume) -> the spelling is unproven.
 			return "", errTargetUnverified
 		}
-		// Platforms without handle-based resolution (see the DEFERRED marker
-		// in pathresolver_other.go): the lexical form is all C26 can offer
+		// Platforms without the handle verification flag (see syncdirs_other.go;
+		// ticket 347 gave POSIX realpath, so this is now about an ancestor C26
+		// still cannot re-open - a permission refusal or a dangling link - not
+		// about a missing resolver): the lexical form is all C26 can offer
 		// there; the ancestor chain at least is known to exist.
 		//
 		// This branch used to be UNREACHABLE on POSIX (adversarial

@@ -10,56 +10,29 @@ import (
 
 // Ticket 82, AC#1/AC#2 — the WINDOWS tier of the sync-root grading family.
 //
-// Everything in this file asserts a consequence of ONE capability that exists
-// only here: a sync root can become C26-CANONICAL, because resolveHandle
-// (pathresolver_windows.go) asks the OS for the final path of an existing
-// directory. syncSet.add sets canonical=true only on that answer, and
-// syncSet.finalize counts a root as "confirmed" only when it is BOTH canonical
-// and confirmed-GRADE (env/registry/config). So `SyncDetectionComplete()` is
-// structurally always false on POSIX (pathresolver_other.go's resolveHandle is
-// the DEFERRED(macOS/Linux) stub, syncdirs_other.go's registryProbe returns nil)
-// — those were the 8 reds, and they were red on a precondition, not on a
-// verdict.
+// Everything in this file asserts a consequence of ONE capability: a sync root
+// can become C26-CANONICAL, because resolveHandle asks the OS for the final path
+// of an existing directory. syncSet.add sets canonical=true only on that answer,
+// and syncSet.finalize counts a root as "confirmed" only when it is BOTH
+// canonical and confirmed-GRADE (env/registry/config).
 //
-// The portable subjects (root membership, the payload-key-blind write gate, the
-// N-10 `..` hardening, the weak grades that may never disarm anything) stayed in
-// syncdirs_test.go / provenance_test.go and now run on both platforms via
-// membershipEngine. What is left here is only what needs a disarmed blanket net,
-// i.e. a verdict that POSIX cannot produce yet. syncdirs_other_test.go asserts
-// that absence instead of inheriting these expectations as a red.
+// TICKET 347 CHANGED WHAT IS LEFT HERE. Until it landed, resolveHandle
+// (pathresolver_other.go) was the DEFERRED(macOS/Linux) stub, so canonical - and
+// with it SyncDetectionComplete() - was structurally unreachable on POSIX and
+// every case below was Windows-only for that reason. POSIX now resolves paths
+// (realpath + lstat-reject, PLAN.md:2385's macOS half), so the grade consequence
+// itself is no longer platform-bound: TestSyncConfirmedGradesDisarmFallback was
+// MOVED (not copied) into syncdirs_test.go, per the instruction this file used to
+// carry, and the POSIX tripwire that asserted the absence went with it.
 //
-// WHEN TICKET 55 LANDS (the macOS/Linux probe), this file is the donor: move
-// each case below into syncdirs_test.go verbatim and delete this file with its
-// //go:build windows line. Do NOT copy them — a duplicated expectation is how
-// the two tiers drift apart.
-
-// TestSyncConfirmedGradesDisarmFallbackWindows is the mirror half of
-// TestSyncFallbackNotDisarmableByWeakRoot: which grades are strong enough to
-// switch the under-profile suspect net off. Windows-only today for the reason
-// stated in this file's header.
-func TestSyncConfirmedGradesDisarmFallbackWindows(t *testing.T) {
-	home, _, _ := sandbox(t)
-	root := filepath.Join(home, "OneDrive")
-	if err := os.MkdirAll(root, 0o755); err != nil { // confirmed roots are real dirs
-		t.Fatal(err)
-	}
-	for _, src := range []string{"registry", "config", "env"} {
-		p := NewProvenance(ProvOptions{
-			NoProbe: true, HomeDir: home,
-			SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: root, Source: src}},
-		})
-		if !p.SyncDetectionComplete() {
-			t.Errorf("source %q must count as confirmed", src)
-		}
-		if p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md")).Sync {
-			t.Errorf("source %q: confirmed root must lift the blanket suspect net", src)
-		}
-		// ...while the confirmed root itself keeps flagging.
-		if !p.IsSyncPath(filepath.Join(root, "notes.md")).Sync {
-			t.Errorf("source %q: writes under the confirmed root must be sync", src)
-		}
-	}
-}
+// What stays: the case whose subject really is this platform's API
+// (TestWriteGatePlainTargetInsideProfileWindows is Windows-only by name and by
+// the write-gate fixture it uses), and the live registry probe below. Neither may
+// be moved by a ticket that does not own the write gate, so ticket 55's step 1
+// ("move each case below") is now half done and this note says which half.
+//
+// syncdirs_other.go's registryProbe still returns nil, which is why the live
+// probe below remains the only evidence this platform can produce.
 
 // TestWriteGatePlainTargetInsideProfileWindows is the assertion the four
 // TestWriteGate* cases used to carry as their own precondition, and the one

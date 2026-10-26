@@ -46,12 +46,14 @@ type syncEnv struct {
 // syncdirs_redteam_windows_test.go) put the root and the plain directory INSIDE
 // the profile, so "not a sync write" there could only mean "the under-profile
 // suspect net was disarmed", and disarming it takes a root that is both
-// confirmed-GRADE and C26-CANONICAL (syncSet.finalize). Canonicalization is the
-// half POSIX does not have: syncSet.add only sets canonical=true when Resolve
-// reports Resolved, and pathresolver_other.go's resolveHandle is the
-// DEFERRED(macOS/Linux) stub that ticket 55 owns. So that precondition has no
-// object on POSIX — it is not an assertion that happens to fail, there is
-// nothing there to assert on.
+// confirmed-GRADE and C26-CANONICAL (syncSet.finalize). Canonicalization was the
+// half POSIX did not have until ticket 347 landed realpath there: syncSet.add
+// only sets canonical=true when Resolve reports Resolved, and before 347 that was
+// the DEFERRED(macOS/Linux) stub. The fixture stays as it is anyway, and that is
+// not inertia: what it bought is the ISOLATION, not the absence of a resolver -
+// with both directories outside the profile, membership is the only thing that
+// can flip either verdict, on either platform, and that stays true now that a
+// POSIX root can also be canonical.
 //
 // Moving both directories out of the profile removes the net from the
 // decision without removing anything from the subject: match() compares the
@@ -210,6 +212,16 @@ func TestSyncFallbackNotDisarmableByWeakRoot(t *testing.T) {
 			NoProbe: true, HomeDir: home,
 			SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: root, Source: src}},
 		})
+		// TICKET 347 turned this into a tooth rather than a consequence of a
+		// missing resolver: the injected root is a real directory, so it is now
+		// C26-CANONICAL on BOTH platforms. The only thing that can still keep the
+		// net armed is the grade - which is exactly the claim this case is about
+		// (before 347 a POSIX green here could have been read as "canonical was
+		// false", i.e. as nothing).
+		if roots := p.SyncRoots(); len(roots) != 1 || !p.sync.roots[0].canonical {
+			t.Fatalf("source %q: premise - the injected root must be C26-canonical now (ticket 347); roots=%+v canonical=%v",
+				src, roots, len(roots) == 1 && p.sync.roots[0].canonical)
+		}
 		if p.SyncDetectionComplete() {
 			t.Errorf("source %q must not count as confirmed", src)
 		}
@@ -228,6 +240,48 @@ func TestSyncFallbackNotDisarmableByWeakRoot(t *testing.T) {
 		// a claim about a rule instead of a claim about a constant.
 		if st := p.IsSyncPath(outside); st.Sync {
 			t.Errorf("source %q: %q is outside the profile and outside the injected root, must NOT be sync: %+v", src, outside, st)
+		}
+	}
+}
+
+// TestSyncConfirmedGradesDisarmFallback is the mirror half of
+// TestSyncFallbackNotDisarmableByWeakRoot: which grades are strong enough to
+// switch the under-profile suspect net off.
+//
+// Ticket 82 wrote it in syncdirs_windows_test.go as
+// TestSyncConfirmedGradesDisarmFallbackWindows, because the consequence it
+// asserts needs a C26-CANONICAL root and POSIX had no resolver. Ticket 347
+// landed realpath+lstat on POSIX, and that file carried the instruction to MOVE
+// (never copy) this case into syncdirs_test.go at that moment; this is that
+// move. The assertions are the ones ticket 82 wrote, with two additions the
+// platform merge makes necessary and useful:
+//   - the POSIX positive case has to assert the same thing, so the loop runs on
+//     both platforms instead of being tagged apart;
+//   - the canonical half is asserted explicitly, because otherwise a POSIX green
+//     could still be read as "the net was armed for a different reason".
+func TestSyncConfirmedGradesDisarmFallback(t *testing.T) {
+	home, _, _ := sandbox(t)
+	root := filepath.Join(home, "OneDrive")
+	if err := os.MkdirAll(root, 0o755); err != nil { // confirmed roots are real dirs
+		t.Fatal(err)
+	}
+	for _, src := range []string{"registry", "config", "env"} {
+		p := NewProvenance(ProvOptions{
+			NoProbe: true, HomeDir: home,
+			SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: root, Source: src}},
+		})
+		if roots := p.SyncRoots(); len(roots) != 1 || !p.sync.roots[0].canonical {
+			t.Fatalf("source %q: premise - the confirmed root must be C26-canonical, got roots=%+v", src, roots)
+		}
+		if !p.SyncDetectionComplete() {
+			t.Errorf("source %q must count as confirmed", src)
+		}
+		if p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md")).Sync {
+			t.Errorf("source %q: confirmed root must lift the blanket suspect net", src)
+		}
+		// ...while the confirmed root itself keeps flagging.
+		if !p.IsSyncPath(filepath.Join(root, "notes.md")).Sync {
+			t.Errorf("source %q: writes under the confirmed root must be sync", src)
 		}
 	}
 }
@@ -263,11 +317,11 @@ func TestSyncUnverifiedRootKeepsFallback(t *testing.T) {
 // is a pure function of the environment it is handed (grade, provider, the
 // blank-value trim), and the verdict for a write under that root is decided by
 // ROOT MEMBERSHIP, which match() checks before the fallback, so it is assertable
-// on POSIX too. What is NOT assertable there is the grade's consequence — that
-// env evidence switches the under-profile net off — because on POSIX no root is
-// ever C26-canonical: that consequence is pinned per platform by
-// TestSyncConfirmedGradeDisarmsFallbackWindows (windows) and
-// TestSyncNoGradeIsConfirmedOnPosix (!windows).
+// on POSIX too. The grade's consequence - that env evidence switches the
+// under-profile net off - was untestable on POSIX while no root could be
+// C26-canonical; ticket 347 landed the resolver, so it is now asserted on both
+// platforms by the untagged TestSyncConfirmedGradesDisarmFallback above (moved
+// out of syncdirs_windows_test.go, which carried that instruction).
 func TestSyncEnvConfiguredRoots(t *testing.T) {
 	home, _, _ := sandbox(t)
 	root := filepath.Join(home, "OneDrive")

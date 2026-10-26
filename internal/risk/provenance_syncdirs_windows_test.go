@@ -20,13 +20,15 @@ import (
 // the half whose subject matter is a path shape that only exists here: '/' and
 // '\' being two spellings of one file.
 //
-// Why the negative half can only live on Windows: writeGate fails closed
-// whenever sync detection is incomplete, and on POSIX detection is incomplete
-// until ticket 55 lands (pathresolver_other.go's resolveHandle is still the
-// DEFERRED stub). That is precisely the family of 8 reds this ticket is
-// forbidden to paper over, so a "plain write must NOT be flagged" assertion is
-// not decidable there yet — see provenance_syncdirs_other_test.go for the
-// dormant version that wakes up when ticket 55 lands.
+// Why the negative half used to live only on Windows: writeGate fails closed
+// whenever sync detection is incomplete, and on POSIX detection was incomplete
+// while resolveHandle (pathresolver_other.go) was the DEFERRED stub. Ticket 347
+// landed realpath there, so the negative half is decidable on both platforms now
+// and provenance_syncdirs_other_test.go's branch, parked as a live branch
+// instead of a Skip for exactly this moment, evaluates on every Linux run. This
+// file stays Windows-only for its actual subject - two separator spellings of one
+// file - not as a workaround; the POSIX equivalent is that file's
+// backslash-inside-a-name case.
 
 // TestExfilSyncWriteWindowsSpellingInvariant pins both directions of the
 // channel on one platform where the verdict is decidable: every separator
@@ -34,10 +36,12 @@ import (
 // ChSyncWrite, and no spelling of a real file outside it does. The engine comes
 // from m7Engine, which since ticket 82 builds its root and its plain directory
 // OUTSIDE the profile so that membership — not the under-profile suspect net,
-// and not a SyncDetectionComplete() POSIX cannot ever report — is what makes
-// the positive and the negative mean "membership" rather than "everything is
-// dirty"; the windows-only consequence of a confirmed grade (disarming that net
-// for an in-profile target) is pinned in syncdirs_windows_test.go.
+// and not a SyncDetectionComplete() that POSIX could not report before ticket
+// 347 — is what makes the positive and the negative mean "membership" rather
+// than "everything is dirty"; the consequence of a confirmed grade (disarming
+// that net for an in-profile target) is now pinned on BOTH platforms by
+// TestSyncConfirmedGradesDisarmFallback in syncdirs_test.go (moved there by
+// ticket 347), and this file keeps only its own separator-shape subject.
 func TestExfilSyncWriteWindowsSpellingInvariant(t *testing.T) {
 	p, syncTarget, plain := m7Engine(t)
 
