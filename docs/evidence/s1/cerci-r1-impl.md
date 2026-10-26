@@ -1,7 +1,7 @@
 # CER 门禁 CI 接线腿 `cerci-r1` —— 落地件（写腿）
 
 > **尺**：开工 `HEAD=1f1b86a5d5`（`dev`），现跑 2026-10-26 18:10–18:2x +08。★八项读数逐条在 §1–§8，全为现跑，⛔ 转述。
-> **代码提交**：`8d6e150f8`（2 文件、+84 行：`ci.yml` +56、`scripts/portable-tests.sh` +28）／本证据件随后一提交。⛔ push。
+> **代码提交**：`8d6e150f8`（2 文件、+84 行：`ci.yml` +56、`scripts/portable-tests.sh` +28）／本证据件另计提交（`f20432bd7` 起，⛔ 代码）。⛔ push。
 > **写面**：`ci.yml` ＋ `scripts/portable-tests.sh` ＋ 本文件。⛔ `testdata/**`、⛔ `internal/**`、⛔ `cmd/**`、⛔ `frontend/**`／`design/**`、⛔ 票面／台账／`docs/specs/**`。
 > **临时件（只建不删）**：`D:\tmp\wisp\20261026\cerci\{logs,mut,bin}`。★突变走**仓外件 ＋ `-overlay`** ⇒ 无工作树突变窗口。
 
@@ -105,7 +105,7 @@ $ git diff 1f1b86a5d5 8d6e150f8 -- .github/workflows/ci.yml | grep '^+'  ⇒ 56 
 $ … | grep -E '^\+\s*continue-on-error:' ⇒ 0    $ … | grep -E '^\+\s*if:\s*false' ⇒ 0
 $ … | grep -E '^\+\s*if:'                ⇒ 1（新 step 的 `${{ !cancelled() }}`；本 job 每个非 setup step 都带）
 ```
-★全 range（到 `f20432bd7`）同一把**锚定**尺 ⇒ 0／0。★★但**不加锚**的全 range grep 会命中 1／3 行——那 1 行是本证据件里被引用的 grep 命令本身、另 3 行是注释/标题里的散文；⛔ 任何 YAML 键。
+★全 range 同一把**锚定**尺 ⇒ 0／0。★★但**不加锚**的全 range grep 会命中**散文**（本件标题与正文引用的命令、注释里那句「no continue-on-error」）——⛔ 任何 YAML 键；这正是尺锚在行首缩进的原因（数字不写死，免得一改就腐）。
 ★新增 84 行**全 ASCII**（最大码位 U+007D）⇒ ⛔ emoji。
 
 ## 8. ★★ 读数⑧：父包要不要 staging ⇒ **要，故只接 `cer` 子包**
