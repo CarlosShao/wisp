@@ -27705,3 +27705,71 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ★结案 **48 票**（`-done` **191** 枚）、真待推进 **174**、完成度 **52.3%**、未推 **5**、★**摆机主 0 件**
 ★**票 26／27 的现状**：★**票 26 = `AC4`/`AC5` 可翻**、★**票 27 = `AC1`/`AC3`/`AC4` 可翻 ＋ `AC2` 带边界 ＋ `AC5` ⛔** ⇒ ★**两张都可以走终裁**
 ★**而两张都缺同一件**：★**`cmd/wisp` 的装配**（票 26 的播报路径 ＋ 票 27 的 `SetPunctuator`）⇒ ★**要单开一条 `cmd/wisp` 写腿**
+
+## A1272（2026-10-26 19:2x +08，编排者）★★★收 `28-r1`（session scope warm）：**冷启 `3.4086s` → Warm `171.35ms` ＝ **19.9x****｜★★★**正控最漂亮**：**Warm 之后再开新会话仍付 `2.4496s` 冷装载 ＋ 终稿仍对** ⇒ **"热是每会话、不是全局泄漏缓存，冷路径没坏"**｜★★★**三张票（26／27／28）都卡在同一件**：**`cmd/wisp` 的生产装配**｜★★★**网络断了：推送 8 笔全失败（`TLS eof`、走本地代理也不通）⇒ 要摆机主**
+
+**① ★★交付（`5fd0e9f58` 实现＋证据 ＋ `6bbd160cb` 件行数校正）**
+- ★**1 枚生产件 ＋ 3 枚测试件 ＋ 件**：`internal/session/scope.go`／`scope_test.go`／`scope_cascade_test.go`／`scope_engines_windows_test.go`／`28-r1-impl.md`
+- ★★**`internal/session` 从 `doc.go` 的承诺变成真 keep-alive 所有者**
+
+**② ★★★八项读数（关键）**
+| AC | 判 | 读数 |
+|---|---|---|
+| ★`AC1` Cold vs Warm | ✅ **可翻** | ★★**冷 `acquire=3.2586296s`／首文本 `150.0ms`／第一请求 `3.4086s`**；★★**Warm-1 `acquire=0ns`／`171.35ms`／**19.9x****（四发 **17.7–33.2x**）；★**`LoadsAfterWarm=0`**（portable 5 轮 ＋ 真引擎 3 轮）、★**Loader 全程只调 2 次** |
+| ★`AC2` Timers | ✅ **可翻** | ★**89s Warm／90s **Settling（`EnginesHot=2`、`closes=0`）**／92.999s 仍 Settling／93s Disposed**（各 `closes=1`、`Pending=0`）；★**Conversation 30.000s 落 Warm 且 `mic.close` 下标 ＜ SCOPE-WARM 日志、`MicClose` 内读到 `Stage()=Awake`**；★断电器 15s/30s |
+| ★★`AC3` Path C 全双工 | ⛔ **残余** | ★**`59-p15-aec-spike.md` 现读 `ready-for-agent`、无 `-done`、7 格 0 勾** ⇒ **不碰 AEC／不开播期麦／不出 400ms 数／不填预算行** ✅ |
+| ★`AC4` 隐私门 | ✅ **可翻** | ★**两次 enable ⇒ `prompts=1`、`CONVERSATION-PRIVACY-CONFIRM granted` 恰 1 行**；★拒绝/未接线一律 **fail-closed** |
+| ★`AC5` dispose 级联＋RSS | ✅ **可翻** | ★**序 `engine.close:*` ＜ `panel.hide` ＜ `free-os-memory` ＜ `grants.expire`**（两条 teardown 路径都过）；★采样器 `base=474016 during=50806312 after=479112`、★**`samples=0`（8.58ms）**（48MiB 载荷、10s 预算）|
+| ★`AC6` refcount | ✅ **可翻** | ★**100 轮、`loader calls=200`、每类 `closes=100`、每轮 `Refs=0/Hot=0`、`goroutines base=2 after=2`** |
+
+**③ ★★★反向判据（两发、变慢被具名）**
+- ★**变异 A（Warm 卸载＝没 warm 池）** ⇒ portable **5 红/15** ＋ 真引擎红（`EnginesHot=0`）
+- ★★**变异 B（唤醒重装）** ⇒ portable **2 红** ＋ 真引擎 **`2.735s` vs 冷 `4.371s`「the wake paid for a load」** ⇒ **变慢被具名** ✅
+- ★★**还原绿 `rc 0`（42 PASS；真引擎 `26.5x`）／原样绿 `rc 0`（42 PASS；`19.9x`）**
+- ★★★**还原核在最后一发变异之后**：★`scope.go` sha256 `T1=T2=9EDAAAC0…FE6E0E`、★树内 `MUTANT` **0**、★两枚变异件对树 `git diff --no-index` 各 **8 insertions/0 deletions**
+
+**④ ★★★正控（本笔最漂亮的一条）**
+- ★**冷轮真转出 `嗯嗯嗯嗯嗯嗯哦哦`**
+- ★★★**Warm 之后**再开**新** `SessionScope` ⇒ **`acquire=2.4495831s`（又付冷装载）＋ 终稿仍对**
+  ⇒ ★★★**证明"冷路径没坏、热是**每会话**、不是全局泄漏缓存"** ✅
+  ⇒ ★**这是"warm 有效"与"warm 没作弊"的分界线**
+
+**⑤ ★★零回归**
+- ★★**15e staging `6/6`**、★**`LATENCY openDelay=262ms chunk=640ms ballLatency=902ms` 逐位同值**、★`handoffs=1 finals=1 handed=1 partials=5 drained=181/181`
+- ★★★**`cmd/wisp` **零字节****（`git status` 0 行）⇒ **`15-e` 三处落点语义一行未动** ✅
+- ★**`internal/speech` 原 31 名 `missing=0`**／★`internal/audio` `rc 0`（零字节）／★**`internal/session` `27 → 42 PASS/0/0`**
+
+**⑥ ★★技术细节（它想到门禁了）**
+- ★★**真引擎那条走 `-tags wisp_voice_engines`**（`//go:build windows && wisp_voice_engines`）
+  ⇒ ★**`internal/session` 在 portable core scope 上不带 tag **不编译**、分母不变** ✅
+- ★**三层口径**：★无 ⇒ `0xc0000135`／★PATH ⇒ **`System32` 的 ORT 1.17.1 被具名拒绝**／★staging ⇒ 1.28 全绿
+- ★**`d22scan` `rc 0 clean`**、★**`ban#8 internal/=679`**（★`15-v1` 记 666 ⇒ **+13 ＝ 它 4 ＋ 另一腿 9**）
+  ★**中途一发 `rc 1` 的唯一 finding 是另一腿未跟踪件 `punctuate.go:132` 的 phantom-citation、其落盘后复跑即 0** ✅
+- ★**两尺**：全树恰 3 条既存假红；**它 4 枚新文件两尺皆空**
+- ★**纪律**：★`testdata/` **0**、★`frontend|design|scripts|.github|docs/specs|docs/PLAN|docs/audit|docs/reports` **0**、★`internal/{speech,audio,models,agent}/` **0**、★**包内零裸 `go func(`、生产代码零 `time.Now`**
+
+**⑦ ★★★它按硬边界停手的那处（我认）**
+> ★**`cmd/wisp` 生产调用者 **0**：把 warm 池接进 `residentVoice` **必须改 `15-e` 的落点语义**（那条腿在回合结束就 `stop()` 全关引擎）⇒ 命中派单第 1 条硬边界 ⇒ **停手上报、⛔ 动**
+> ★**"本腿交付是'库＋读数齐、装配等下一波'（与票 166 当时 `生产调用者 0/0/0/0/0` 同形状）"**
+⇒ ★**处置对**、★**并建议单独派一条能改 `15-e` 的腿**
+
+**⑧ ★★★而这里浮出一个**结构性事实**：三张票（26／27／28）**都卡在同一件** —— `cmd/wisp` 的生产装配**
+| 票 | 缺什么 |
+|---|---|
+| ★**26 TTS** | ★**播报路径**：`grep '\.Speak(' cmd internal` 除本腿与 seam 外**零命中** ⇒ `risk.ChTTS` **零入口** |
+| ★**27 标点** | ★**`residentVoice` 里没有 `SetPunctuator` 的调用点** |
+| ★**28 warm** | ★**warm 池没接进 `residentVoice`**（`15-e` 回合结束即 `stop()` 全关引擎）|
+⇒ ★★★**所以要派一条**能改 `15-e` 落点语义**的 `cmd/wisp` 装配腿**（★**每波一枚写腿**）
+
+**⑨ ★★残余（`28-r1` 具名）**
+★`AC3` Path C（**59**）／★**生产调用者 0**／★**KWS 断电器常驻 OFF**（Armed 无 session、**票 41**）／★**Conversation UI 半边**（panel/33）／★**Warm 异步活儿只有 `Hooks.WarmWindow` 口子**（执行器属 29/10）／★**`doc.go` 的 `DEFERRED(SessionScope)` 摘标记属 225**
+
+**⑩ ★★★网络故障（要摆机主）**
+- ★**推送连试 3 次全失败**：★`fatal: unable to access … TLS connect error: error:0A000126:SSL routines::unexpected eof while reading`
+- ★**诊断**：★DNS `github.com → 198.18.0.88`、★**TCP 443 ＝ `True`**；★**`http.proxy` 未设**、★环境变量代理未设；★**`127.0.0.1:7890` 在听**（代理软件在跑）；★**`curl` 直连 `http_code = 000`**
+- ★★**走本地代理 `git -c http.proxy=http://127.0.0.1:7890` 也失败**（**同一 `TLS eof`**）
+⇒ ★★★**所以是 GitHub 侧/更上游、⛔ 我能修** ⇒ **摆机主**
+- ★★★**而内容安全**：★**未推 8 笔**、★**索引干净**、★**机械闸 `done=191`** ⇒ **本地一笔不丢**
+
+**⑪ ★状态**＝**在飞 0**、★**goal `active`/`armed`**
+★结案 **48 票**（`-done` **191** 枚）、真待推进 **174**、完成度 **52.3%**、★**未推 8**、★**摆机主 1 件（网络）**
