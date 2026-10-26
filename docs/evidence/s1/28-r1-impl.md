@@ -1,7 +1,7 @@
 # 票 28 落地腿 `28-r1` —— SessionScope 落地件（写腿）
 
 > **尺**：`HEAD=ba9ca8fa7`（`dev`），现跑 2026-10-26 18:31–19:05 +08。★**读数逐条现跑**，⛔ 转述。
-> **写面**：`internal/session/**` —— **新 4 枚**（`scope.go` 752 行／`scope_test.go` 773 行／`scope_cascade_test.go` 196 行／`scope_engines_windows_test.go` 375 行）＋本文件（**95 行**，未过 170 帽 ⇒ 不拆 `-partN`）。
+> **写面**：`internal/session/**` —— **新 4 枚**（`scope.go` 820 行／`scope_test.go` 838 行／`scope_cascade_test.go` 212 行／`scope_engines_windows_test.go` 406 行，`git show --stat` 口径）＋本文件（**123 行**，未过 170 帽 ⇒ 不拆 `-partN`）。
 > **零字节**：`cmd/wisp/**`（`git status --porcelain -- cmd/wisp` ＝ **0 行**）、`internal/speech/**`（0 行，见 §7 的归属）、`internal/audio/**`（0 行）、`testdata/**`、`frontend/**`、`design/**`、`scripts/**`、`.github/**`、票面、台账、`docs/specs/**`。
 > **临时件（只建不删）**：`D:\tmp\wisp\20261026\28r1\{bin,bin15e,speechbin,cases,cases15e,logs,mut,overlay}`。★**变异走仓外件 ＋ `-overlay`** ⇒ **工作树零突变窗口**。
 
