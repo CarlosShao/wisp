@@ -116,7 +116,7 @@ Linux 名册差（`124−3+7`）：删 `TestFallbackBranchHasNoWorldOnThisPlatfo
 ## 10. 提交与门禁 rc
 
 - 门禁 rc：Linux `core` **rc=1**（基线也 rc=1；差集只有上面那 1 枚 config）；Windows `windows` **rc=1**（红集与基线**逐名相同**，零差）。包级 Linux `rc=1`（只剩存量 panel 那枚）、Windows `rc=1`（同）。
-- 提交：`add`/`commit` 两处**逐枚字面 pathspec**，主题逐字以「票 347 落解析器腿 347-r1」开头；**⛔ push**。
+- 提交：`0c730cac2`（20 枚文件，`+1064/−608`）。`add`/`commit` 两处**逐枚字面 pathspec**，主题逐字以「票 347 落解析器腿 347-r1」开头；`git show --name-only HEAD | grep '^cmd/'` **＝0**；**⛔ push**。**提交后复跑**（按 `git archive HEAD` 导出的树，⛔ 只信工作树）：Linux 包级 **`127/1/0` 同数**、红同枚。
 - **遗留（具名，⛔ 藏）**：①`internal/config` 那 1 枚门禁新红（禁写面，已上报）；②`pathHandleVerify` 仍 `false`（`syncdirs_other.go`，只改注释）——落地后它只剩"Lstat 能过而 realpath 过不了"的残留（EACCES 等），收紧它属**独立决定＋独立分母**；③`syncdirs.go` 的 `s.home`／`roots[].canon` 仍是折叠形喂 `formsOf`（同类折叠缺陷，只影响精度不影响颜色，未动）；④macOS 的 `t.TempDir()` 走 `/var→/private/var`，**会被这枚默认拒命中**（本腿在 Linux 容器里复现了同形：§4.3 的 config 红）⇒ 票 55 落地前必须先解决例外注入。
 
 ## 11. 我没核（⛔ 当已核）
