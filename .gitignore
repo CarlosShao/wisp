@@ -59,3 +59,53 @@ testdata/local/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# --- Repository-root junk (added 2026-10-26; reform plan 0-4, leg ignore-r1) ---
+# Everything below is residue that was found sitting at the repository ROOT,
+# not a convention: compiler output from ad-hoc C probes, output dumps from
+# shell redirects that were typed into the wrong place, and directories that
+# exist because a command redirected into something shaped like a flag.
+# Every pattern is rooted ("/...") on purpose, so a legitimately named file or
+# directory deeper in the tree is never swallowed by a root-only accident.
+# Nothing was deleted to write this section (rule 8): the files still on disk
+# are listed in docs/evidence/s1/ignore-r1-impl.md and wait for a one-shot
+# sweep that the owner authorises.
+#
+# A PowerShell-style redirect that landed on disk instead of the null device.
+/$null
+#
+# Flag-shaped names left behind by an argument that was never quoted.
+/-
+/-dummy
+#
+# gcc -S / gcc -c / windres residue from the C probes: 18 files whose mktemp
+# prefixes came out as cc*/bcc*/Ccc*. The leading "/" is what makes a bare
+# "*.s" safe here: Go assembly IS tracked (four files under
+# .scratch/wisp/probes/220/*/), so an unanchored "*.s" would tell the next
+# reader that tracked source is disposable. Root-only, and no tracked file
+# lives at the root with these extensions.
+/*.o
+/*.s
+/*.res
+#
+# Empty directories created by redirecting into a flag-like path. The last one
+# really does carry a fullwidth colon (U+FF1A), not an ASCII one.
+/cp/
+/git/
+/show/
+/HEAD：cmd/
+#
+# Single output dumps: a portable-tests.sh run log, a `wc -l` tally, a grep
+# hit, sparse punctuation, and a bare date from an unquoted argument.
+/2379
+/397
+/4
+/;
+/2026-09-24
+#
+# Interleaved grep dumps from the ticket-154 trigger-gate probes. The middle
+# word is not stable (state1/state2/nog6/stale), so it is matched by position:
+# eight files, part<N>-<anything>-{fixed,pristine}.txt.
+/part[0-9]*-*.txt
+/core-after.*.txt
+/g-f-*.txt
