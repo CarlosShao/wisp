@@ -1,0 +1,11 @@
+# Binary fixtures: never apply text conversion, never diff them as text.
+*.wav binary
+
+# Text that must stay byte-stable across platforms. The reference transcripts
+# feed CER directly, so a CRLF checkout would put a stray CR in every line and
+# silently poison any comparison that does not trim.
+*.txt text eol=lf
+*.tsv text eol=lf
+*.md  text eol=lf
+*.py  text eol=lf
+LICENSE text eol=lf
