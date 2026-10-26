@@ -1361,7 +1361,7 @@ func c21FileConsts(t *testing.T, path string) []c21ConstInfo {
 //   - the 80 panel-only CSS declarations the native side never copied. They are
 //     not missing rows; the panel's native slice (ticket 33+) owns them.
 
-const c21TokensCSSPath = "design/assets/tokens.css"
+const c21TokensCSSPath = "internal/ball/testdata/tokens_c21.css"
 
 // c21CSSValue is one custom-property declaration read out of tokens.css.
 type c21CSSValue struct {
