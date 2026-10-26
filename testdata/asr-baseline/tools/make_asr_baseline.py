@@ -17,8 +17,20 @@ What it builds
                then a 6 kHz FIR low-pass and a -6 dB gain to fake far-field.
                This is a SIMULATION, not a real far-field recording.
 
+What it writes at the top level
+  sources.tsv        the frozen manifest: file/sha256/speaker/condition/origin,
+                     5 columns, 100 rows, header byte-identical to the one
+                     internal/speech/cer/sources.go pins (manifestHeader).
+  sources-extra.tsv  the derivation columns the reader never sees:
+                     file/source_utt_id/duration_s/snr_db/noise_source/text_raw,
+                     6 columns, same 100 rows in the same order.
+  The reference text is not a column in either file: it lives in the sibling
+  <utt>.txt, which is byte-identical to what text_norm would have held.
+
 Determinism: no RNG state leaks between files, no wall-clock, no dict-iteration
 order. Every choice is a pure function of SEED plus sorted upstream identifiers.
+Both tables are written with a fixed column order and a fixed row order, so
+re-running over an already-generated tree rewrites the same bytes.
 Only numpy is required (stdlib `wave`/`hashlib` do the rest).
 
 Usage:
@@ -57,6 +69,11 @@ FIR_TAPS = 129        # odd length, symmetric
 NOISES = ("cafe", "car", "white")  # cycled in this fixed order
 
 SENTINEL = "<UNK>"
+
+# origin column, one value per condition. near_clean ships AISHELL-1 audio
+# untouched; noisy_far is AISHELL-1 speech plus additive THCHS-30 noise, and the
+# cell names both because the noise is the part that is not AISHELL-1.
+ORIGIN = {"near_clean": "aishell-1", "noisy_far": "aishell-1+thchs30-noise"}
 
 
 # ------------------------------------------------------------------- helpers
@@ -116,6 +133,22 @@ def sha256_file(path: str) -> str:
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def write_tsv(path: str, cols: list[str], rows: list[list[str]]) -> None:
+    """Tab separated, LF only, one header line then the data rows.
+
+    Byte-stable by construction: no quoting, no BOM, no padding, no trailing
+    whitespace, and the caller fixes both the column order and the row order --
+    so regenerating over an existing tree rewrites the identical bytes.
+    """
+    out = ["\t".join(cols)]
+    for cells in rows:
+        if len(cells) != len(cols):
+            raise SystemExit(f"{path}: row has {len(cells)} cells, header has {len(cols)}")
+        out.append("\t".join(cells))
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(out) + "\n")
 
 
 def lowpass_kernel(sr: int, cutoff_hz: float, taps: int) -> np.ndarray:
@@ -316,18 +349,23 @@ def main() -> int:
         print(f"  {utt} {name:5s} off={off:7d} snr_mix={snr_mix:6.2f} "
               f"snr_chain={snr_chain:6.2f} peak={peak:.3f}")
 
-    # ---- sources.tsv
-    cols = ["file", "sha256", "source_utt_id", "duration_s",
-            "speaker", "condition", "snr_db", "noise_source", "text_raw", "text_norm"]
-    tsv = "\t".join(cols) + "\n"
-    for r in rows:
-        tsv += "\t".join([
-            r["file"], r["sha"], r["utt"], f"{r['dur']:.3f}",
-            r["speaker"], r["cond"], r["snr"], r["noise"],
-            " ".join(r["text"]), r["text"],
-        ]) + "\n"
-    with open(os.path.join(args.out, "sources.tsv"), "w", encoding="utf-8", newline="\n") as f:
-        f.write(tsv)
+    # ---- the two tables. Split by audience: sources.tsv is the frozen manifest
+    # the CER reader parses (header pinned in internal/speech/cer/sources.go,
+    # manifestHeader); sources-extra.tsv carries the derivation columns that
+    # reader never sees. Row order is the report order in both: near_clean, then
+    # noisy_far, each in the order take() picked them.
+    write_tsv(
+        os.path.join(args.out, "sources.tsv"),
+        ["file", "sha256", "speaker", "condition", "origin"],
+        [[r["file"], r["sha"], r["speaker"], r["cond"], ORIGIN[r["cond"]]]
+         for r in rows],
+    )
+    write_tsv(
+        os.path.join(args.out, "sources-extra.tsv"),
+        ["file", "source_utt_id", "duration_s", "snr_db", "noise_source", "text_raw"],
+        [[r["file"], r["utt"], f"{r['dur']:.3f}", r["snr"], r["noise"],
+          " ".join(r["text"])] for r in rows],
+    )
 
     total_bytes = 0
     for r in rows:
@@ -346,7 +384,8 @@ def main() -> int:
         print(f"  dur_s: min={min(durs):.3f} mean={np.mean(durs):.3f} max={max(durs):.3f}")
     print(f"\nTOTAL wav bytes={total_bytes} = {total_bytes / 1048576:.2f} MiB "
           f"= {total_bytes / 1000000:.2f} MB")
-    print(f"rows in sources.tsv: {len(rows)}")
+    print(f"rows in sources.tsv: {len(rows)} (5 cols) "
+          f"and sources-extra.tsv: {len(rows)} (6 cols)")
     return 0
 
 

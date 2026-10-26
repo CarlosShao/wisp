@@ -195,13 +195,24 @@ for s in S0764 S0765 S0766 S0767 S0768 S0769 S0770 S0901 S0902 S0903 S0904 \
 done   # inner members are "test/S####/*.wav", so this yields wav/test/S####/*.wav
 tar -xzf resource.tgz -C "$TMP"          # -> $TMP/resource/noise/{cafe,car,white}/*.wav
 
-# 3. generate (needs python3 + numpy; writes the wavs, the .txt files and sources.tsv)
+# 3. generate (needs python3 + numpy; writes the wavs, the .txt files,
+#    sources.tsv and sources-extra.tsv)
 cd /d/work/workspace/"projects plans"/Wisp
 python3 testdata/asr-baseline/tools/make_asr_baseline.py \
   --aishell "$TMP/aishell" \
   --noise   "$TMP/resource/noise" \
   --out     testdata/asr-baseline
 ```
+
+Step 3 writes both tables: `sources.tsv` (5 columns, the frozen manifest the CER
+reader parses) and `sources-extra.tsv` (6 columns, the derivation columns that
+reader never sees). Both are written with a fixed column order and a fixed row
+order, so re-running step 3 over an already-generated tree rewrites identical
+bytes: `sources.tsv` stays at sha256
+`54b50a499e5b33c0e722f4a1995e02023f3cc25daec6aefa48dc6089f64db537` and
+`sources-extra.tsv` at
+`531677f225b7cc24f5530505fc058458a1bccd356eb96ef028bc27f91b2686dd`. The
+reference text is not a column in either file: it is the sibling `<utt>.txt`.
 
 `--n-near` / `--n-far` override the counts, for trial runs only.
 
