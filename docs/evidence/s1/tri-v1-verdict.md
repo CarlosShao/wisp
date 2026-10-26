@@ -31,14 +31,14 @@
 | **26-AC7** `ChTTS` 闸＋26 侧闸测 | **⛔** | 调用点✓（`speak():854`，合成**之前**，M1 摘掉即红）；`ChTTS`=`provenance.go:122`、`TestFourChannelExfilSuite` ✓。**缺两条**：①**任务的毒到不了播报点**——`voice-announce` 作用域在生产**零 `Mark`**（全仓只有测试 `resident_voice_wire_r1_windows_test.go:569` 往里打毒），故闸**生产上永不命中**；②**命中后没有"换 L2 确认"**：`speak()` 只 `noteProblem` 就 return，全文件无 confirm／card 字样（AC 原文要"replaced by the L2 confirmation (source named)"）。 |
 | **27-AC1** 带标点 E2E 到 agent | **能翻（边界）** | 我这一发 **`今天下午三点提醒我开会` → `…会。`**、`Punctuated=1`、剥标点后逐字相等；★边界：到 `voiceTranscriptSink`（生产同一 sink），**mock LLM 断言属票 12/15-e**。 |
 | **27-AC2** ≤300ms P50/P95，入 SLO 附录 | **能翻（边界）** | 我这一发：**P50 8.565ms／P95 18.292ms／max 19.037ms**（80 调用、暖机排除、预算 300ms，**16.4×**）；★边界：**附录没回填**，且 `27-r1` 的"`docs/SLO.md` 不存在"**是过期**——文件在，**行 77** 仍 `未测 → 待票 27（S4）`。 |
-| **27-AC3** 300 字主观 ≥8/10 | **能翻（边界）** | `302 字 ⇒ 26 标点`、逐界对照 **8/10**（漏一个逗号）；★边界：**实现者自评、单一样本、非人评**。 |
+| **27-AC3** 300 字主观 ≥8/10 | **能翻（边界）** | ★我这一发：`302 characters in, 26 marks out, kinds=[。 ， ？]`；★**8/10 是 27-r1 自评**（漏一个逗号）；★边界：**单一样本、非人评**。 |
 | **27-AC4** 关掉／加载失败降级 | **能翻（边界）** | 两条都测（原串＋`Punctuated=false`；4 类坏件各具名错误、句子照出）；★边界：**生产开关没读**——`Voice.Punctuation`（`schema.go:252`）在 `cmd/wisp` **零引用**，`OpenPunctuation(…, true)` 硬编码；"关"今天只能靠模型路径为空。 |
 | **27-AC5** 标点计入 Warm 驻留（sampler） | **⛔** | **缺采样器**：只有 `engines_hot=2`（标点搭 ASR epoch 的计数，见 §4），**无 RSS 归因**；`SLO.md:77` 仍写"未测"。 |
 | **28-AC1** 冷 vs 暖唤醒 | **能翻（边界）** | 端到端：**冷 2.8185095s／第二回合 0s／`loader_calls=1`／`loads_after_warm=0`**（`finals=2 partials=10 handed=2 drained=326`）；★边界："second-round **first-token**"那半用的是 28-r1 的带 tag 读数（150→171ms），本腿未复跑带 tag 面。 |
 | **28-AC2** 90s→Settling→dispose；30s→Warm 先关麦；断电器 | **能翻（边界）** | 90/3/30/15 全在 `internal/session` 42/42（我复跑）＋e2e `90s→Disposed`；**序**成立（`[Awake Awake]`＝钩子先于翻面）。★两条边界：①"关麦"见 §10-Q2；②**断电器档没被装配根选中**（`openScope` 不设 `ScopeOptions.BatterySaver`）。 |
 | **28-AC3** Path C 全双工 | **⛔** | 同 26-AC3：**59 未 done**；AEC／≤400ms／Conversation 内存预算行全缺。 |
 | **28-AC4** 首开隐私确认＋落日志 | **能翻（边界）** | 库级：`prompts=1`、二次不再问、拒绝 `(false,nil)` 仍 OFF、`PrivacyConfirm=nil` ⇒ **具名错误（fail-closed）**。★边界：**生产没接卡片** ⇒ 今天 `EnableConversation` 必被拒；原生卡归 33/面板。 |
-| **28-AC5** dispose 级联序＋RSS ≤10s | **能翻（边界）** | 序断言 `engine.close < panel.hide < free-os-memory < grants.expire`；`base 474016 / during 50806312 / after 479112`、**8.58ms**（48MiB 载荷）；e2e `WARM-IDLE stage=Disposed engine_closes=1`。★边界：采样器是**测试内合成载荷**，不是生产采样器。 |
+| **28-AC5** dispose 级联序＋RSS ≤10s | **能翻（边界）** | 序断言 `engine.close < panel.hide < free-os-memory < grants.expire`；★**我这一发**：`base=451768 during=50784064 after=451768 samples=0 elapsed=7.6318ms`（48MiB 载荷）；e2e `WARM-IDLE stage=Disposed engine_closes=1`。★边界：采样器是**测试内合成载荷**，不是生产采样器。 |
 | **28-AC6** 100 轮 refcount 归零 | **能翻** | `loader calls=200`、每类 `closes=100`、每轮 `Refs=0 EnginesHot=0 LoadsAfterWarm=0`、`goroutines 2→2`（我在 42/42 里跑到）。 |
 
 ## 3 三件反向判据（**我自己造**，仓外 `mut\` ＋ `-overlay`，⛔ 改工作树）
@@ -105,7 +105,7 @@
 - **判**：AC7 的"命中即换 L2 确认"与"把任务的毒带到播报点"两条都缺；后者要动 `internal/risk`（作用域寿命／跨作用域快照），正是 `wire-r1` 的禁写面 ⇒ **具名残余归 26**。★**⛔ 直接把 `req.scope` 换任务 id**：任务结束后会落 `unbound` 分支，**每句播报都被 fail-closed 拒**（那是另一个 bug，不是修法）。
 
 ### Q2 "关麦是喂食门不是设备" ⇒ **序读数对；"喂食门"这句不实，是唤醒闩**
-- **事实**：`onMicClose = func(){ rv.warmFeed.Store(true) }`（`resident_voice_windows.go:482`）；`warmFeed` 全仓只有三处（`:308/:482/:830/:854`）；**`run()` 仍把每一帧 `tr.Accept(...)`**（`:683`，无 `warmFeed` 判断）；`HalfDuplexGate` 的 `SetSpeaking` **零生产调用**。`consume` 里 `warmFeed` 只决定"这句转写要不要先走唤醒"。
+- **事实**：`onMicClose = func(){ rv.warmFeed.Store(true) }`（`resident_voice_windows.go:482`）；`warmFeed` 全仓只有**四处**（声明 `:308`／置真 `:482`／判读 `:830`／置假 `:854`）；**`run()` 仍把每一帧 `tr.Accept(...)`**（`:683`，无 `warmFeed` 判断）；`HalfDuplexGate` 的 `SetSpeaking` **零生产调用**。`consume` 里 `warmFeed` 只决定"这句转写要不要先走唤醒"。
 - **判**：`stages=[Awake Awake]` 只证**钩子先于翻面**（AC2 的括号只要求"order asserted"⇒ 该格成立）；但它**⛔ 证"麦关了"**。Warm 期间麦克风**是开的**、音频**在进 ASR**、设备**没关**、门**没关**。⇒ 证据第 2 条把 latch 说成 feed gate，属**过度表述**；"Warm＝mic CLOSED"（票面 Key constraint／D43#26）**未实现**，且**在 41 落地前无法实现**（ASR 是唯一唤醒源）。具名残余归 28。
 
 ### Q3 换族有价 vs 26-AC4 ⇒ **AC4 的冷档被打穿，且装配把冷档变成常态**
@@ -128,7 +128,7 @@
 |---|---|---|---|
 | `wire-r1`（被裁件） | **`d803344ae`** | **7 文件 ＋2749／−31**：`A` 3 `.go`＋`M` 3 `.go`＋`A` 本证据件 | `--name-status` 4 `A`＋3 `M`、**无 `D`**、**无 `testdata/`／`internal/`／`.scratch/`** |
 | `HEAD`（裁时父） | `09e865a6d` | 编排者 `A1280` 收件笔 | 只证据＋台账 |
-| 本腿 | 见 §13 回的 commit | **只 `docs/evidence/s1/tri-v1-verdict.md`** | `add`／`commit` 两处**显式单文件 pathspec**；`--cached --name-status` 提交前核过（只 1 行 `A`） |
+| 本腿 | **`e062fce06`**（正文 134 行）＋ **本笔**（三处读数校正：28-AC5 换我这一发、27-AC3 标自评、warmFeed 三处→四处；**⛔ amend**，改正追加新笔） | **只 `docs/evidence/s1/tri-v1-verdict.md`** | `add`／`commit` 两处**显式单文件 pathspec**；`--cached --name-status` 两笔提交前各核过（只 1 行 `A`／`M`） |
 
 ## 13 交回父代理
 **未定义即停：无。** ★三件装配**真在盘上**（三发变异全红＋还原绿），但"能不能翻"与"装配在不在"是两把尺：**12/18 可翻、6/18 ⛔**；★**26 不要整票结**（三条通道/毒源缺口），**27/28 可带具名残余结**。★两条口径错（`docs/SLO.md` 存在、`[voice] punctuation` 键已存在）**改的是下一腿该干什么**，不是本裁的判据。
