@@ -1,101 +1,101 @@
-file	sha256	source_utt_id	duration_s	speaker	condition	snr_db	noise_source	text_raw	text_norm
-near_clean/BAC009S0764W0121.wav	46dbc998c9d1d48111267c40741dd3200f2e5bcf4075f8c4c97f4451160dce50	BAC009S0764W0121	4.204	S0764	near_clean			甚 至 出 现 交 易 几 乎 停 滞 的 情 况	甚至出现交易几乎停滞的情况
-near_clean/BAC009S0765W0121.wav	60cca1290fb34656b085a6fa079a7cbc3c6ee3b78bad157748bc43322803c003	BAC009S0765W0121	3.092	S0765	near_clean			一 线 城 市 出 现 日 光 盘	一线城市出现日光盘
-near_clean/BAC009S0766W0121.wav	3448e857c9e907de282c385d6f71be6f60508fd7b5881092df4c7a181c8e61de	BAC009S0766W0121	3.174	S0766	near_clean			实 现 数 字 化 整 合 营 销	实现数字化整合营销
-near_clean/BAC009S0767W0121.wav	cbbc28473d697ce946ebb60fa2e8dba36be6de676015ee3c5ae6a0acc257eb36	BAC009S0767W0121	4.588	S0767	near_clean			时 刻 保 持 创 新 和 变 革 意 识	时刻保持创新和变革意识
-near_clean/BAC009S0768W0122.wav	738850b36d0f66e5ac8de4d27669c575e1fe5013adac30334240a3f5a608ffe7	BAC009S0768W0122	3.915	S0768	near_clean			明 年 初 料 迎 供 应 淡 季	明年初料迎供应淡季
-near_clean/BAC009S0769W0123.wav	ebfd0a52d445bd1d2be0b99ba9c59055e45de21937d73b0350602b5032789463	BAC009S0769W0123	4.137	S0769	near_clean			彩 虹 之 门 建 筑 净 高 三 十 米	彩虹之门建筑净高三十米
-near_clean/BAC009S0770W0122.wav	aa59c7635c8617bdfd778c5ad1643eebe655ad48b38eef5550fd12abd245a876	BAC009S0770W0122	4.702	S0770	near_clean			开 发 商 进 驻 一 二 线 城 市	开发商进驻一二线城市
-near_clean/BAC009S0901W0121.wav	8e73399519ed2ad3179cc415dd06730bfcc157538ab7a5eccbff89522b0f3766	BAC009S0901W0121	3.098	S0901	near_clean			作 为 一 线 城 市 的 北 京	作为一线城市的北京
-near_clean/BAC009S0764W0122.wav	5760c7ace0923a499f605d373011c7aaf658e304a0999a493c63669c756384e1	BAC009S0764W0122	4.115	S0764	near_clean			一 二 线 城 市 虽 然 也 处 于 调 整 中	一二线城市虽然也处于调整中
-near_clean/BAC009S0765W0123.wav	feace288211e2859581c63b94a80646d105a2abb25397f08dbc77234b57f40cd	BAC009S0765W0123	3.302	S0765	near_clean			经 济 热 点 导 读 专 家 认 为	经济热点导读专家认为
-near_clean/BAC009S0766W0122.wav	29ff8f9c016406ae60e604d8dd10ad1a18fe8bd55e25151a7c6010be89b9d4bb	BAC009S0766W0122	3.146	S0766	near_clean			是 当 今 广 告 行 业 的 需 要	是当今广告行业的需要
-near_clean/BAC009S0767W0124.wav	4dad48ef369e2c067218615ab6ebf9264caad72b7407fb146a02d81527c71d7e	BAC009S0767W0124	3.778	S0767	near_clean			今 久 从 最 初 的 几 十 个 人	今久从最初的几十个人
-near_clean/BAC009S0768W0125.wav	f978546264142bd23ada36e99ad3550143c6842a1eaaffad17fdfb144c2ad58a	BAC009S0768W0125	4.317	S0768	near_clean			年 初 往 往 是 土 地 供 应 的 淡 季	年初往往是土地供应的淡季
-near_clean/BAC009S0769W0124.wav	40d9795f338fe65596f77daf8dac2474231764ad2b8b4d708c03b544adf36680	BAC009S0769W0124	4.667	S0769	near_clean			为 双 拱 形 非 中 心 对 称 建 筑	为双拱形非中心对称建筑
-near_clean/BAC009S0770W0124.wav	e594a0480c1a8f82347777808f388b5434760890d232f9becbff2b57bd5cfc80	BAC009S0770W0124	3.940	S0770	near_clean			遇 到 毛 利 率 低 的 问 题	遇到毛利率低的问题
-near_clean/BAC009S0901W0125.wav	df5a98b491da6b2bfd434028b3d43992edb0d4ec78add730288c905853fbace3	BAC009S0901W0125	3.338	S0901	near_clean			盘 活 各 地 公 积 金 资 源	盘活各地公积金资源
-near_clean/BAC009S0764W0123.wav	2c566703c6b1b075568cac56810846a48bb127c740d7a36de66084816035dd42	BAC009S0764W0123	4.000	S0764	near_clean			但 因 为 聚 集 了 过 多 公 共 资 源	但因为聚集了过多公共资源
-near_clean/BAC009S0765W0125.wav	0e6f1a6932146c3c117a296c21da1e5e4353e0515716e2e7327222820910c5ad	BAC009S0765W0125	3.669	S0765	near_clean			为 了 将 后 辈 的 婚 姻 分 险 隔 断	为了将后辈的婚姻分险隔断
-near_clean/BAC009S0766W0123.wav	3d88b7e45e1c39dd6fda170d1163a4862fb128a8fbfec5f0cac3af74a22ad989	BAC009S0766W0123	3.928	S0766	near_clean			消 费 者 行 为 的 变 化 及 技 术 的 进 步	消费者行为的变化及技术的进步
-near_clean/BAC009S0767W0125.wav	d353d58d72581fdb9c5bb99d9cdaf0fc1a9afa6beb973ddfe2e8723cbe0b4acb	BAC009S0767W0125	4.239	S0767	near_clean			今 久 商 品 房 销 售 额 首 次 上 涨	今久商品房销售额首次上涨
-near_clean/BAC009S0768W0129.wav	cfc6c6a54d1ff503cc82a71bf1adde0d4d11762867f21c82c87fc2002654fa29	BAC009S0768W0129	3.945	S0768	near_clean			叠 加 春 节 因 素 的 影 响	叠加春节因素的影响
-near_clean/BAC009S0769W0125.wav	947a59852e6792d59db5ecb4643d2108e7f3998703a3b7d7a9724a1a8527bfb4	BAC009S0769W0125	3.909	S0769	near_clean			新 京 报 讯 记 者 张 旭 报 道	新京报讯记者张旭报道
-near_clean/BAC009S0770W0127.wav	9fcdd6572253b0d5161eb7ff28170aa9c3e8595349dfc5241821f2b156d28c05	BAC009S0770W0127	4.626	S0770	near_clean			一 线 城 市 超 过 三 成	一线城市超过三成
-near_clean/BAC009S0901W0126.wav	5e723ef650a7961d0895ceb2431fee4548f1f02912e4df41966a08d05c7adb61	BAC009S0901W0126	4.883	S0901	near_clean			以 北 京 提 高 公 积 金 贷 款 最 高 额 度 为 例	以北京提高公积金贷款最高额度为例
-near_clean/BAC009S0764W0125.wav	a07893010d11c87c8b2752c3960656f5516a1d66cb80706709482511eab85b16	BAC009S0764W0125	4.311	S0764	near_clean			标 杆 房 企 必 然 调 整 市 场 战 略	标杆房企必然调整市场战略
-near_clean/BAC009S0765W0127.wav	0be0469e5846793628dc931184eb2eea56fdf5388e892e6e0edf240ddd6c3afa	BAC009S0765W0127	3.162	S0765	near_clean			按 公 司 持 有 房 产 计 征	按公司持有房产计征
-near_clean/BAC009S0766W0124.wav	2f1ad0d2a82fe8c87c1cbe02b52b82aed57ded9821f559e8cb657b75652d3ff4	BAC009S0766W0124	4.519	S0766	near_clean			催 生 了 广 告 领 域 新 的 变 革 和 创 新	催生了广告领域新的变革和创新
-near_clean/BAC009S0767W0126.wav	31beabae21bfe78e5d853d64cfde90b90d888a691b925eb7d8f8f5aa8ce8bd6e	BAC009S0767W0126	4.014	S0767	near_clean			房 地 产 投 资 增 速 仍 下 降	房地产投资增速仍下降
-near_clean/BAC009S0768W0130.wav	5fcb890f9da0fbe72e5f69de6f891af93da23d558de0220dd95174c2e8ce61b9	BAC009S0768W0130	4.634	S0768	near_clean			这 种 情 况 在 二 月 可 能 较 明 显	这种情况在二月可能较明显
-near_clean/BAC009S0769W0126.wav	cc85977223b6e816e480eda551b1cbb141c4f18bd4d5e1361b1f25377c2ccbbe	BAC009S0769W0126	4.304	S0769	near_clean			北 京 去 年 土 地 出 让 落 下 大 幕	北京去年土地出让落下大幕
-near_clean/BAC009S0770W0128.wav	5812a30aa0afa1ff9977b8ab254f883395f5114239123a1de2e7c232c14367af	BAC009S0770W0128	4.401	S0770	near_clean			三 线 及 以 下 为 一 成	三线及以下为一成
-near_clean/BAC009S0901W0127.wav	6dd7cb82808d9eca80869396eb466911563ecba1814f6d9e06139834fc204af8	BAC009S0901W0127	3.885	S0901	near_clean			据 伟 嘉 安 捷 数 据 统 计 显 示	据伟嘉安捷数据统计显示
-near_clean/BAC009S0764W0126.wav	d07d21f2a7c72a440e24982b3bf57da9899787425e5ff6505ab08a082fb278b1	BAC009S0764W0126	3.500	S0764	near_clean			因 此 土 地 储 备 至 关 重 要	因此土地储备至关重要
-near_clean/BAC009S0765W0128.wav	537e993f7818c1a0ef8273e8ba19581e8d685c02313af8d155f2080b86ce819d	BAC009S0765W0128	2.987	S0765	near_clean			相 关 公 司 股 票 走 势	相关公司股票走势
-near_clean/BAC009S0766W0126.wav	ac5df3a0a19c22ebb0367c10de066334ce855c33dfa6cf7c9374e8302847d6a2	BAC009S0766W0126	3.575	S0766	near_clean			今 久 整 合 营 销 集 团 就 是 如 此	今久整合营销集团就是如此
-near_clean/BAC009S0767W0127.wav	05cfa67bd255e83325bb99e8b87b52fb5161518121416d9ddcf97214a016c7c0	BAC009S0767W0127	4.059	S0767	near_clean			大 智 慧 阿 思 达 克 通 讯 社	大智慧阿思达克通讯社
-near_clean/BAC009S0768W0132.wav	c0431088120be7740f9b4eb8819aae0de82253da625479531dcca530beb36fec	BAC009S0768W0132	3.813	S0768	near_clean			不 利 于 继 续 大 规 模 拿 地	不利于继续大规模拿地
-near_clean/BAC009S0769W0129.wav	a05f86f3850497edf6a0537b30bcb3d070850ecdb94f0374619b79e5061d0cb9	BAC009S0769W0129	3.461	S0769	near_clean			同 比 去 年 增 长 五 成	同比去年增长五成
-near_clean/BAC009S0770W0134.wav	0f66a0bf747b9db1a2f40923d7c13a2dafd9bcde9befa2d5580e088219452dff	BAC009S0770W0134	4.693	S0770	near_clean			可 以 重 点 关 注 如 何 做 强	可以重点关注如何做强
-near_clean/BAC009S0901W0128.wav	8eb80e36a67d1d6d5ecf7867c31d2b8e9cc330ba3bf72bca8896b475dfe5c0bf	BAC009S0901W0128	3.773	S0901	near_clean			该 政 策 在 七 月 份 实 施 一 周 后	该政策在七月份实施一周后
-near_clean/BAC009S0764W0127.wav	d71591e70d4e5f35a793ea4d69dbfb5cddda2beb4b8d3e0409283e4b63a8d7ea	BAC009S0764W0127	4.453	S0764	near_clean			中 原 地 产 首 席 分 析 师 张 大 伟 说	中原地产首席分析师张大伟说
-near_clean/BAC009S0765W0129.wav	425537a23f2bd9caae1f0c2bbbc756e76a118318fb719bc5a9383cd1f442bee2	BAC009S0765W0129	4.142	S0765	near_clean			房 价 起 飞 前 购 置 了 十 几 套 房 产	房价起飞前购置了十几套房产
-near_clean/BAC009S0766W0127.wav	3b7f0430dea6acbe239c876c2732dd981aade19f2e55bdb3ec6f3c9abf02a772	BAC009S0766W0127	4.014	S0766	near_clean			成 为 圈 子 里 首 屈 一 指 的 超 大 企 业	成为圈子里首屈一指的超大企业
-near_clean/BAC009S0767W0129.wav	12ce9fb3d4ee7ce0d40581f9c562690be9b28d240f2ef833d0257592365d2866	BAC009S0767W0129	4.633	S0767	near_clean			全 国 房 地 产 开 发 投 资 三 万 亿 元	全国房地产开发投资三万亿元
-near_clean/BAC009S0768W0133.wav	a50fa41f71b4cee7f5e52524e5f644fb8325ba171fcd203797257ed4441641e5	BAC009S0768W0133	3.991	S0768	near_clean			国 家 统 计 局 数 据 显 示	国家统计局数据显示
-near_clean/BAC009S0769W0131.wav	501313a4764b7181aa71f1743f08f53b73db2d3cd456c8d838c0821838588ea3	BAC009S0769W0131	4.314	S0769	near_clean			确 保 完 成 六 万 户 搬 迁 改 造 任 务	确保完成六万户搬迁改造任务
-near_clean/BAC009S0770W0135.wav	a8f97d962074b3a449377b67fc1c2bfa3aa3257498fc9af01032092048052fdc	BAC009S0770W0135	4.927	S0770	near_clean			在 自 身 优 势 领 域 发 力	在自身优势领域发力
-near_clean/BAC009S0901W0129.wav	ff706df865211258383765d77f440197e2cdfa7a8b16bb5f92a753a3138678ac	BAC009S0901W0129	3.071	S0901	near_clean			公 积 金 贷 款 额 度 的 提 高	公积金贷款额度的提高
-near_clean/BAC009S0764W0128.wav	f5430b710e5b27a3174ee7e5964cc307eeee47443bba6fce32179a88e60b1a92	BAC009S0764W0128	3.571	S0764	near_clean			一 线 城 市 土 地 供 应 量 减 少	一线城市土地供应量减少
-near_clean/BAC009S0765W0130.wav	2281d99ed0b8172a623c47462d55d0dbdacbc3318e8e946a6f1af00735e51139	BAC009S0765W0130	3.135	S0765	near_clean			目 前 总 估 值 已 过 亿 元	目前总估值已过亿元
-near_clean/BAC009S0766W0130.wav	18d1056c1c088a2bb95ab56ad1af85542823b86859f6d49d570dfacd3ea31058	BAC009S0766W0130	4.224	S0766	near_clean			开 创 了 蔓 延 全 国 的 青 年 社 区 概 念	开创了蔓延全国的青年社区概念
-near_clean/BAC009S0767W0130.wav	bac75b2ca5cbe7989dc09a62ed60023c1339a7c1f4002a1596df42cfaf8f53ca	BAC009S0767W0130	3.396	S0767	near_clean			同 比 名 义 增 长 许 多	同比名义增长许多
-near_clean/BAC009S0768W0135.wav	1ca0cc668e3389e813c645426dacacb13d660e27021f1f372e330c69c20a54b7	BAC009S0768W0135	4.571	S0768	near_clean			增 速 比 三 月 回 落 六 个 百 分 点	增速比三月回落六个百分点
-near_clean/BAC009S0769W0135.wav	1340a31c683642aad9d23da48c9685ad7dd8a805d171cefea2c1c1aff0b66381	BAC009S0769W0135	4.272	S0769	near_clean			开 工 建 设 公 租 房 不 低 于 三 万 套	开工建设公租房不低于三万套
-near_clean/BAC009S0770W0139.wav	9e787a9bf067391e18129d0fff9745a096d2c08d608ed1bfca6c766d975a6f03	BAC009S0770W0139	4.410	S0770	near_clean			今 年 万 科 拿 下 九 宗 地 块	今年万科拿下九宗地块
-near_clean/BAC009S0901W0131.wav	6beac7a2a07b8da9776cc0d5f8982ecc4ec13df2d09b3dc7bb358f673762de4f	BAC009S0901W0131	4.596	S0901	near_clean			中 原 地 产 首 席 分 析 师 张 大 伟 认 为	中原地产首席分析师张大伟认为
-near_clean/BAC009S0764W0129.wav	0d12af0837abd1c0526a92ecdcefb0f309d7bb5a540675b0308b2373932c0243	BAC009S0764W0129	3.595	S0764	near_clean			也 助 推 了 土 地 市 场 的 火 爆	也助推了土地市场的火爆
-near_clean/BAC009S0765W0131.wav	8e4928afe1b36c4f21a988e842ef5cd55749dc0b0e639276a2109e412763656a	BAC009S0765W0131	3.705	S0765	near_clean			这 些 房 产 全 由 宋 芳 自 己 打 理	这些房产全由宋芳自己打理
-near_clean/BAC009S0766W0131.wav	23f06692e87fa0b80c8d2ae1c52537cd3e4eea49df990e9b4971bf92f3e8f087	BAC009S0766W0131	3.947	S0766	near_clean			确 立 了 无 人 撼 动 的 行 业 老 大 地 位	确立了无人撼动的行业老大地位
-near_clean/BAC009S0767W0132.wav	1cfee5b64c010039f37f35899be7b41bb49a77a11230b978bc9cd3456e5a9ebc	BAC009S0767W0132	4.340	S0767	near_clean			全 国 商 品 房 销 售 额 两 万 亿 元	全国商品房销售额两万亿元
-noisy_far/BAC009S0902W0122.wav	f5752178f67d232f989472d9dceb829efa8696506ed4026eb8b08e0c9ca4f09a	BAC009S0902W0122	4.650	S0902	noisy_far	10.0048	cafe	作 为 取 之 于 民 用 之 于 民 的 住 房 公 积 金	作为取之于民用之于民的住房公积金
-noisy_far/BAC009S0903W0121.wav	44c5846cfa437313f53b74f832acd41ba550c7911ccf1ba68f902c9b6dfaa972	BAC009S0903W0121	3.841	S0903	noisy_far	9.9949	car	进 而 选 择 此 类 方 式 购 房	进而选择此类方式购房
-noisy_far/BAC009S0904W0121.wav	1ea9ef96976aac6794d34ea3db5f07a3444243d8acfacf53d78f6a5dd388fbcd	BAC009S0904W0121	3.056	S0904	noisy_far	11.2916	white	为 了 解 决 额 度 荒 的 问 题	为了解决额度荒的问题
-noisy_far/BAC009S0905W0121.wav	96191348462e2896b14e8f252820d04a5dfb8706c333c821a0ca7a814dda52f5	BAC009S0905W0121	3.601	S0905	noisy_far	10.0039	cafe	公 积 金 贷 款 额 度 的 提 高	公积金贷款额度的提高
-noisy_far/BAC009S0906W0122.wav	23236be2a6b1c342e76ea8dbdeb3dff1d19c436321c9b2e7d4d6e28d55cef8e4	BAC009S0906W0122	4.299	S0906	noisy_far	9.9980	car	人 民 币 未 来 贬 值 压 力 依 然 较 大	人民币未来贬值压力依然较大
-noisy_far/BAC009S0907W0122.wav	c90d37f1f565d12521fd0e8f0d582e0504454726bd8418cc0e5595753e505fbe	BAC009S0907W0122	4.636	S0907	noisy_far	11.2943	white	背 后 可 能 蕴 含 着 开 发 商 更 多 的 窘 境	背后可能蕴含着开发商更多的窘境
-noisy_far/BAC009S0908W0122.wav	42a3f687e075986985134b88f3797fc4e8376235a72ff66df8ef3d249e4a4801	BAC009S0908W0122	4.902	S0908	noisy_far	9.9642	cafe	加 速 今 年 楼 市 成 交 复 苏 回 暖	加速今年楼市成交复苏回暖
-noisy_far/BAC009S0912W0121.wav	9f73c0eb2bfff93e9e5e29a8b6c85b5026fdd3c74031ad74b945db29c6f7da67	BAC009S0912W0121	3.965	S0912	noisy_far	9.9945	car	房 地 产 相 关 领 域 问 题 频 发	房地产相关领域问题频发
-noisy_far/BAC009S0902W0125.wav	648a07ab4cb985ee6231ee513817719f0658ec551db733fdbd7c57a081391046	BAC009S0902W0125	4.098	S0902	noisy_far	11.2980	white	后 续 要 加 大 公 积 金 贷 款 的 便 利 性	后续要加大公积金贷款的便利性
-noisy_far/BAC009S0903W0122.wav	b89a20b2af998d882e744d5de4b0c30741063b7f199c8e43b1b70a86d6f1fd59	BAC009S0903W0122	4.650	S0903	noisy_far	10.0074	cafe	另 外 要 处 理 公 积 金 异 地 使 用 的 问 题	另外要处理公积金异地使用的问题
-noisy_far/BAC009S0904W0124.wav	5750e22ac5188eb1268386d3ec1aa189072c150fc9feab7f21896521649ac06d	BAC009S0904W0124	4.457	S0904	noisy_far	9.9844	car	公 积 金 贷 款 与 商 业 贷 款 之 间 的 利 息 差 额	公积金贷款与商业贷款之间的利息差额
-noisy_far/BAC009S0905W0126.wav	7264ecbb6c85de0d00f7a3ead873ec5f74ac66de9345cc45760f79615f622585	BAC009S0905W0126	4.889	S0905	noisy_far	11.2989	white	在 住 房 公 积 金 贷 款 的 申 请 过 程 中	在住房公积金贷款的申请过程中
-noisy_far/BAC009S0906W0129.wav	a9c1358edb06db3f797b4627918bfb987cd793f91fa5c62551924764ac716502	BAC009S0906W0129	4.971	S0906	noisy_far	9.9767	cafe	公 积 金 贷 款 首 付 款 比 例 不 低 于 百 分 之 七	公积金贷款首付款比例不低于百分之七
-noisy_far/BAC009S0907W0123.wav	7e7b3490d32afaa5789574b11bf29ccfac36c17706cfb8546122c423522a6899	BAC009S0907W0123	4.701	S0907	noisy_far	9.9524	car	本 世 纪 网 至 本 世 纪 经 济 报 道	本世纪网至本世纪经济报道
-noisy_far/BAC009S0908W0125.wav	930b0ef14ed8e7fb2f836037428237599af8ed819bce30a8794d8cf1491e19ae	BAC009S0908W0125	4.149	S0908	noisy_far	11.2744	white	贷 款 额 度 上 限 调 整 为 一 百 万 元	贷款额度上限调整为一百万元
-noisy_far/BAC009S0912W0124.wav	a853d25af2dff310b6f4f14382685ca69f3f622f34169157ac082e743a9de053	BAC009S0912W0124	4.267	S0912	noisy_far	9.9983	cafe	土 地 相 关 的 审 查 成 为 重 点 之 一	土地相关的审查成为重点之一
-noisy_far/BAC009S0902W0126.wav	ca7945ab14b344fb2901d4dada656271550393505cf767cb95771351b58ae562	BAC009S0902W0126	3.670	S0902	noisy_far	9.9903	car	鼓 励 购 房 者 积 极 缴 纳 公 积 金	鼓励购房者积极缴纳公积金
-noisy_far/BAC009S0903W0123.wav	134ae29d04fae6e4199b6e1902b269b20c1048d9cd76d70a76f7422237d8de0a	BAC009S0903W0123	4.408	S0903	noisy_far	11.2869	white	这 对 于 目 前 一 线 城 市 来 说 很 紧 要	这对于目前一线城市来说很紧要
-noisy_far/BAC009S0904W0125.wav	e3061a1353536bfdae701d96e156b17d92cb6a96d805cdd22d47f7254c461efb	BAC009S0904W0125	3.156	S0904	noisy_far	10.0008	cafe	由 公 积 金 中 心 向 银 行 支 付	由公积金中心向银行支付
-noisy_far/BAC009S0905W0127.wav	7360c174b7ce61fd8147e10f1928f321a013709c8c9c58c1058e2b1fc265c43f	BAC009S0905W0127	4.224	S0905	noisy_far	9.9907	car	有 些 要 与 房 企 具 体 项 目 挂 钩	有些要与房企具体项目挂钩
-noisy_far/BAC009S0906W0131.wav	19d27098df6898edfb0a1764fb4ec56ee38442bdd49bc3505602d3613c2f64a9	BAC009S0906W0131	3.291	S0906	noisy_far	11.2691	white	存 销 比 已 经 见 顶 回 落	存销比已经见顶回落
-noisy_far/BAC009S0907W0125.wav	e0aec0627696a1730c6c3c52a0dcf52e489e0ea8cee1113167445a19e779c1ad	BAC009S0907W0125	4.852	S0907	noisy_far	9.9939	cafe	而 南 昌 除 了 放 松 首 套 房 界 定 标 准	而南昌除了放松首套房界定标准
-noisy_far/BAC009S0908W0127.wav	cfb7b7bd2a7af285da00671ad786926563cb7a94064b746d7312f275b4e21cc2	BAC009S0908W0127	3.925	S0908	noisy_far	9.9938	car	贷 款 最 高 额 度 仍 为 一 百 万 元	贷款最高额度仍为一百万元
-noisy_far/BAC009S0912W0125.wav	34228beb02db769d43e02c674043c013aa4aa413ab4d0411802f144ec5e23e6d	BAC009S0912W0125	3.352	S0912	noisy_far	11.2860	white	刘 家 义 在 报 告 中 指 出	刘家义在报告中指出
-noisy_far/BAC009S0902W0127.wav	2791af13eda453e873f928d111d7241a2d9ffb0bbb93ae469f626bc5141eaf28	BAC009S0902W0127	3.127	S0902	noisy_far	9.9900	cafe	进 而 选 择 此 类 方 式 购 房	进而选择此类方式购房
-noisy_far/BAC009S0903W0124.wav	7f611160de6684f6f201aafccab6bec7211d1cad01677bab97184b0f4d0f0f20	BAC009S0903W0124	3.769	S0903	noisy_far	9.9971	car	很 多 人 受 限 购 政 策 的 影 响	很多人受限购政策的影响
-noisy_far/BAC009S0904W0126.wav	0e4018b091c78ea8db397fb4c1fa0b06bfc841d6bcfa0d9acdeafb2448f0e9c0	BAC009S0904W0126	3.935	S0904	noisy_far	11.2837	white	重 点 城 市 公 积 金 贷 额 款 度 也 有 限 制	重点城市公积金贷额款度也有限制
-noisy_far/BAC009S0905W0128.wav	f602dd49c56d32f21347df6b34b10c55fd8471b6d624b9e5379f322493269f4a	BAC009S0905W0128	4.784	S0905	noisy_far	10.0109	cafe	在 公 积 金 贷 款 额 度 上 调 后 一 个 月 内	在公积金贷款额度上调后一个月内
-noisy_far/BAC009S0906W0132.wav	98a7347eca8b2a05bf13e5cee03f7316487cf1a11aefaa0bfd75202e04930ed8	BAC009S0906W0132	3.800	S0906	noisy_far	9.9856	car	房 价 下 跌 压 力 将 趋 于 缓 解	房价下跌压力将趋于缓解
-noisy_far/BAC009S0907W0126.wav	827a0467895d69e9f0c492baab7ceedcb0effb5d14ee89cb783f1fa283ff36b4	BAC009S0907W0126	4.885	S0907	noisy_far	11.2715	white	还 降 低 了 首 套 房 公 积 金 首 付	还降低了首套房公积金首付
-noisy_far/BAC009S0908W0135.wav	7a51b0e9b660b5cccb31b683a8870bb57301228d8045721b41cfa243d33b3255	BAC009S0908W0135	4.294	S0908	noisy_far	9.9713	cafe	很 多 人 需 要 支 付 大 额 首 付	很多人需要支付大额首付
-noisy_far/BAC009S0912W0127.wav	2c1cfaf192a8e186688326b4aa7c9964fa27843dccd3ff80cf71e3285aa5b699	BAC009S0912W0127	4.000	S0912	noisy_far	9.9974	car	二 零 零 八 年 至 二 零 一 五 年	二零零八年至二零一五年
-noisy_far/BAC009S0902W0128.wav	e1ce1f4e7736ac4f0b39a24cd7417791069435d4ad7592fbe49edd0159c57b53	BAC009S0902W0128	4.152	S0902	noisy_far	11.2677	white	另 外 要 处 理 公 积 金 异 地 使 用 的 问 题	另外要处理公积金异地使用的问题
-noisy_far/BAC009S0903W0125.wav	ed82d4c7d2c4211558ddecf2fb6bcb77bc4b5658607dfd5a44608b314f155187	BAC009S0903W0125	4.300	S0903	noisy_far	10.0023	cafe	难 以 在 周 边 城 市 用 公 积 金 购 房	难以在周边城市用公积金购房
-noisy_far/BAC009S0904W0127.wav	cec0b2aafd097220170cb7a6abea1d51e51cce56cc01be59fe1b72a90e556fb8	BAC009S0904W0127	4.746	S0904	noisy_far	9.9980	car	比 如 北 京 和 上 海 家 庭 最 高 贷 款 额 度 均 为 一 百 万 元	比如北京和上海家庭最高贷款额度均为一百万元
-noisy_far/BAC009S0905W0133.wav	747ea92d5d78432709b3b32ed6226ef550cfbdf6a113ef0853dc1f8284aa1621	BAC009S0905W0133	4.594	S0905	noisy_far	11.2873	white	相 关 公 司 股 票 走 势 招 商 银 行	相关公司股票走势招商银行
-noisy_far/BAC009S0906W0140.wav	210b4d316bf75c429bfe36ed591cfa5a16c9a14e5f738d0a88c6bfae7c628248	BAC009S0906W0140	3.499	S0906	noisy_far	9.9962	cafe	参 照 首 套 房 贷 款 政 策	参照首套房贷款政策
-noisy_far/BAC009S0907W0127.wav	6a6ec77583219e4bb310575ba41a9745bbc37773ce7440b98ad8692a7f319edb	BAC009S0907W0127	3.916	S0907	noisy_far	9.9827	car	国 家 住 房 银 行 箭 在 弦 上	国家住房银行箭在弦上
-noisy_far/BAC009S0908W0137.wav	20d832a9a907465a2602bd69d517466cd24185dfe39e4ccab698fa8d0840b0db	BAC009S0908W0137	3.366	S0908	noisy_far	11.1142	white	此 番 公 积 金 政 策 调 整	此番公积金政策调整
-noisy_far/BAC009S0912W0128.wav	bab3148af17f88d92599cb019195908aa438f33da27341138e01bb2568408faf	BAC009S0912W0128	4.946	S0912	noisy_far	10.0018	cafe	这 些 地 区 批 准 建 设 用 地 二 百 万 公 顷	这些地区批准建设用地二百万公顷
+file	sha256	speaker	condition	origin
+near_clean/BAC009S0764W0121.wav	46dbc998c9d1d48111267c40741dd3200f2e5bcf4075f8c4c97f4451160dce50	S0764	near_clean	aishell-1
+near_clean/BAC009S0765W0121.wav	60cca1290fb34656b085a6fa079a7cbc3c6ee3b78bad157748bc43322803c003	S0765	near_clean	aishell-1
+near_clean/BAC009S0766W0121.wav	3448e857c9e907de282c385d6f71be6f60508fd7b5881092df4c7a181c8e61de	S0766	near_clean	aishell-1
+near_clean/BAC009S0767W0121.wav	cbbc28473d697ce946ebb60fa2e8dba36be6de676015ee3c5ae6a0acc257eb36	S0767	near_clean	aishell-1
+near_clean/BAC009S0768W0122.wav	738850b36d0f66e5ac8de4d27669c575e1fe5013adac30334240a3f5a608ffe7	S0768	near_clean	aishell-1
+near_clean/BAC009S0769W0123.wav	ebfd0a52d445bd1d2be0b99ba9c59055e45de21937d73b0350602b5032789463	S0769	near_clean	aishell-1
+near_clean/BAC009S0770W0122.wav	aa59c7635c8617bdfd778c5ad1643eebe655ad48b38eef5550fd12abd245a876	S0770	near_clean	aishell-1
+near_clean/BAC009S0901W0121.wav	8e73399519ed2ad3179cc415dd06730bfcc157538ab7a5eccbff89522b0f3766	S0901	near_clean	aishell-1
+near_clean/BAC009S0764W0122.wav	5760c7ace0923a499f605d373011c7aaf658e304a0999a493c63669c756384e1	S0764	near_clean	aishell-1
+near_clean/BAC009S0765W0123.wav	feace288211e2859581c63b94a80646d105a2abb25397f08dbc77234b57f40cd	S0765	near_clean	aishell-1
+near_clean/BAC009S0766W0122.wav	29ff8f9c016406ae60e604d8dd10ad1a18fe8bd55e25151a7c6010be89b9d4bb	S0766	near_clean	aishell-1
+near_clean/BAC009S0767W0124.wav	4dad48ef369e2c067218615ab6ebf9264caad72b7407fb146a02d81527c71d7e	S0767	near_clean	aishell-1
+near_clean/BAC009S0768W0125.wav	f978546264142bd23ada36e99ad3550143c6842a1eaaffad17fdfb144c2ad58a	S0768	near_clean	aishell-1
+near_clean/BAC009S0769W0124.wav	40d9795f338fe65596f77daf8dac2474231764ad2b8b4d708c03b544adf36680	S0769	near_clean	aishell-1
+near_clean/BAC009S0770W0124.wav	e594a0480c1a8f82347777808f388b5434760890d232f9becbff2b57bd5cfc80	S0770	near_clean	aishell-1
+near_clean/BAC009S0901W0125.wav	df5a98b491da6b2bfd434028b3d43992edb0d4ec78add730288c905853fbace3	S0901	near_clean	aishell-1
+near_clean/BAC009S0764W0123.wav	2c566703c6b1b075568cac56810846a48bb127c740d7a36de66084816035dd42	S0764	near_clean	aishell-1
+near_clean/BAC009S0765W0125.wav	0e6f1a6932146c3c117a296c21da1e5e4353e0515716e2e7327222820910c5ad	S0765	near_clean	aishell-1
+near_clean/BAC009S0766W0123.wav	3d88b7e45e1c39dd6fda170d1163a4862fb128a8fbfec5f0cac3af74a22ad989	S0766	near_clean	aishell-1
+near_clean/BAC009S0767W0125.wav	d353d58d72581fdb9c5bb99d9cdaf0fc1a9afa6beb973ddfe2e8723cbe0b4acb	S0767	near_clean	aishell-1
+near_clean/BAC009S0768W0129.wav	cfc6c6a54d1ff503cc82a71bf1adde0d4d11762867f21c82c87fc2002654fa29	S0768	near_clean	aishell-1
+near_clean/BAC009S0769W0125.wav	947a59852e6792d59db5ecb4643d2108e7f3998703a3b7d7a9724a1a8527bfb4	S0769	near_clean	aishell-1
+near_clean/BAC009S0770W0127.wav	9fcdd6572253b0d5161eb7ff28170aa9c3e8595349dfc5241821f2b156d28c05	S0770	near_clean	aishell-1
+near_clean/BAC009S0901W0126.wav	5e723ef650a7961d0895ceb2431fee4548f1f02912e4df41966a08d05c7adb61	S0901	near_clean	aishell-1
+near_clean/BAC009S0764W0125.wav	a07893010d11c87c8b2752c3960656f5516a1d66cb80706709482511eab85b16	S0764	near_clean	aishell-1
+near_clean/BAC009S0765W0127.wav	0be0469e5846793628dc931184eb2eea56fdf5388e892e6e0edf240ddd6c3afa	S0765	near_clean	aishell-1
+near_clean/BAC009S0766W0124.wav	2f1ad0d2a82fe8c87c1cbe02b52b82aed57ded9821f559e8cb657b75652d3ff4	S0766	near_clean	aishell-1
+near_clean/BAC009S0767W0126.wav	31beabae21bfe78e5d853d64cfde90b90d888a691b925eb7d8f8f5aa8ce8bd6e	S0767	near_clean	aishell-1
+near_clean/BAC009S0768W0130.wav	5fcb890f9da0fbe72e5f69de6f891af93da23d558de0220dd95174c2e8ce61b9	S0768	near_clean	aishell-1
+near_clean/BAC009S0769W0126.wav	cc85977223b6e816e480eda551b1cbb141c4f18bd4d5e1361b1f25377c2ccbbe	S0769	near_clean	aishell-1
+near_clean/BAC009S0770W0128.wav	5812a30aa0afa1ff9977b8ab254f883395f5114239123a1de2e7c232c14367af	S0770	near_clean	aishell-1
+near_clean/BAC009S0901W0127.wav	6dd7cb82808d9eca80869396eb466911563ecba1814f6d9e06139834fc204af8	S0901	near_clean	aishell-1
+near_clean/BAC009S0764W0126.wav	d07d21f2a7c72a440e24982b3bf57da9899787425e5ff6505ab08a082fb278b1	S0764	near_clean	aishell-1
+near_clean/BAC009S0765W0128.wav	537e993f7818c1a0ef8273e8ba19581e8d685c02313af8d155f2080b86ce819d	S0765	near_clean	aishell-1
+near_clean/BAC009S0766W0126.wav	ac5df3a0a19c22ebb0367c10de066334ce855c33dfa6cf7c9374e8302847d6a2	S0766	near_clean	aishell-1
+near_clean/BAC009S0767W0127.wav	05cfa67bd255e83325bb99e8b87b52fb5161518121416d9ddcf97214a016c7c0	S0767	near_clean	aishell-1
+near_clean/BAC009S0768W0132.wav	c0431088120be7740f9b4eb8819aae0de82253da625479531dcca530beb36fec	S0768	near_clean	aishell-1
+near_clean/BAC009S0769W0129.wav	a05f86f3850497edf6a0537b30bcb3d070850ecdb94f0374619b79e5061d0cb9	S0769	near_clean	aishell-1
+near_clean/BAC009S0770W0134.wav	0f66a0bf747b9db1a2f40923d7c13a2dafd9bcde9befa2d5580e088219452dff	S0770	near_clean	aishell-1
+near_clean/BAC009S0901W0128.wav	8eb80e36a67d1d6d5ecf7867c31d2b8e9cc330ba3bf72bca8896b475dfe5c0bf	S0901	near_clean	aishell-1
+near_clean/BAC009S0764W0127.wav	d71591e70d4e5f35a793ea4d69dbfb5cddda2beb4b8d3e0409283e4b63a8d7ea	S0764	near_clean	aishell-1
+near_clean/BAC009S0765W0129.wav	425537a23f2bd9caae1f0c2bbbc756e76a118318fb719bc5a9383cd1f442bee2	S0765	near_clean	aishell-1
+near_clean/BAC009S0766W0127.wav	3b7f0430dea6acbe239c876c2732dd981aade19f2e55bdb3ec6f3c9abf02a772	S0766	near_clean	aishell-1
+near_clean/BAC009S0767W0129.wav	12ce9fb3d4ee7ce0d40581f9c562690be9b28d240f2ef833d0257592365d2866	S0767	near_clean	aishell-1
+near_clean/BAC009S0768W0133.wav	a50fa41f71b4cee7f5e52524e5f644fb8325ba171fcd203797257ed4441641e5	S0768	near_clean	aishell-1
+near_clean/BAC009S0769W0131.wav	501313a4764b7181aa71f1743f08f53b73db2d3cd456c8d838c0821838588ea3	S0769	near_clean	aishell-1
+near_clean/BAC009S0770W0135.wav	a8f97d962074b3a449377b67fc1c2bfa3aa3257498fc9af01032092048052fdc	S0770	near_clean	aishell-1
+near_clean/BAC009S0901W0129.wav	ff706df865211258383765d77f440197e2cdfa7a8b16bb5f92a753a3138678ac	S0901	near_clean	aishell-1
+near_clean/BAC009S0764W0128.wav	f5430b710e5b27a3174ee7e5964cc307eeee47443bba6fce32179a88e60b1a92	S0764	near_clean	aishell-1
+near_clean/BAC009S0765W0130.wav	2281d99ed0b8172a623c47462d55d0dbdacbc3318e8e946a6f1af00735e51139	S0765	near_clean	aishell-1
+near_clean/BAC009S0766W0130.wav	18d1056c1c088a2bb95ab56ad1af85542823b86859f6d49d570dfacd3ea31058	S0766	near_clean	aishell-1
+near_clean/BAC009S0767W0130.wav	bac75b2ca5cbe7989dc09a62ed60023c1339a7c1f4002a1596df42cfaf8f53ca	S0767	near_clean	aishell-1
+near_clean/BAC009S0768W0135.wav	1ca0cc668e3389e813c645426dacacb13d660e27021f1f372e330c69c20a54b7	S0768	near_clean	aishell-1
+near_clean/BAC009S0769W0135.wav	1340a31c683642aad9d23da48c9685ad7dd8a805d171cefea2c1c1aff0b66381	S0769	near_clean	aishell-1
+near_clean/BAC009S0770W0139.wav	9e787a9bf067391e18129d0fff9745a096d2c08d608ed1bfca6c766d975a6f03	S0770	near_clean	aishell-1
+near_clean/BAC009S0901W0131.wav	6beac7a2a07b8da9776cc0d5f8982ecc4ec13df2d09b3dc7bb358f673762de4f	S0901	near_clean	aishell-1
+near_clean/BAC009S0764W0129.wav	0d12af0837abd1c0526a92ecdcefb0f309d7bb5a540675b0308b2373932c0243	S0764	near_clean	aishell-1
+near_clean/BAC009S0765W0131.wav	8e4928afe1b36c4f21a988e842ef5cd55749dc0b0e639276a2109e412763656a	S0765	near_clean	aishell-1
+near_clean/BAC009S0766W0131.wav	23f06692e87fa0b80c8d2ae1c52537cd3e4eea49df990e9b4971bf92f3e8f087	S0766	near_clean	aishell-1
+near_clean/BAC009S0767W0132.wav	1cfee5b64c010039f37f35899be7b41bb49a77a11230b978bc9cd3456e5a9ebc	S0767	near_clean	aishell-1
+noisy_far/BAC009S0902W0122.wav	f5752178f67d232f989472d9dceb829efa8696506ed4026eb8b08e0c9ca4f09a	S0902	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0903W0121.wav	44c5846cfa437313f53b74f832acd41ba550c7911ccf1ba68f902c9b6dfaa972	S0903	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0904W0121.wav	1ea9ef96976aac6794d34ea3db5f07a3444243d8acfacf53d78f6a5dd388fbcd	S0904	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0905W0121.wav	96191348462e2896b14e8f252820d04a5dfb8706c333c821a0ca7a814dda52f5	S0905	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0906W0122.wav	23236be2a6b1c342e76ea8dbdeb3dff1d19c436321c9b2e7d4d6e28d55cef8e4	S0906	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0907W0122.wav	c90d37f1f565d12521fd0e8f0d582e0504454726bd8418cc0e5595753e505fbe	S0907	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0908W0122.wav	42a3f687e075986985134b88f3797fc4e8376235a72ff66df8ef3d249e4a4801	S0908	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0912W0121.wav	9f73c0eb2bfff93e9e5e29a8b6c85b5026fdd3c74031ad74b945db29c6f7da67	S0912	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0902W0125.wav	648a07ab4cb985ee6231ee513817719f0658ec551db733fdbd7c57a081391046	S0902	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0903W0122.wav	b89a20b2af998d882e744d5de4b0c30741063b7f199c8e43b1b70a86d6f1fd59	S0903	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0904W0124.wav	5750e22ac5188eb1268386d3ec1aa189072c150fc9feab7f21896521649ac06d	S0904	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0905W0126.wav	7264ecbb6c85de0d00f7a3ead873ec5f74ac66de9345cc45760f79615f622585	S0905	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0906W0129.wav	a9c1358edb06db3f797b4627918bfb987cd793f91fa5c62551924764ac716502	S0906	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0907W0123.wav	7e7b3490d32afaa5789574b11bf29ccfac36c17706cfb8546122c423522a6899	S0907	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0908W0125.wav	930b0ef14ed8e7fb2f836037428237599af8ed819bce30a8794d8cf1491e19ae	S0908	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0912W0124.wav	a853d25af2dff310b6f4f14382685ca69f3f622f34169157ac082e743a9de053	S0912	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0902W0126.wav	ca7945ab14b344fb2901d4dada656271550393505cf767cb95771351b58ae562	S0902	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0903W0123.wav	134ae29d04fae6e4199b6e1902b269b20c1048d9cd76d70a76f7422237d8de0a	S0903	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0904W0125.wav	e3061a1353536bfdae701d96e156b17d92cb6a96d805cdd22d47f7254c461efb	S0904	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0905W0127.wav	7360c174b7ce61fd8147e10f1928f321a013709c8c9c58c1058e2b1fc265c43f	S0905	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0906W0131.wav	19d27098df6898edfb0a1764fb4ec56ee38442bdd49bc3505602d3613c2f64a9	S0906	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0907W0125.wav	e0aec0627696a1730c6c3c52a0dcf52e489e0ea8cee1113167445a19e779c1ad	S0907	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0908W0127.wav	cfb7b7bd2a7af285da00671ad786926563cb7a94064b746d7312f275b4e21cc2	S0908	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0912W0125.wav	34228beb02db769d43e02c674043c013aa4aa413ab4d0411802f144ec5e23e6d	S0912	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0902W0127.wav	2791af13eda453e873f928d111d7241a2d9ffb0bbb93ae469f626bc5141eaf28	S0902	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0903W0124.wav	7f611160de6684f6f201aafccab6bec7211d1cad01677bab97184b0f4d0f0f20	S0903	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0904W0126.wav	0e4018b091c78ea8db397fb4c1fa0b06bfc841d6bcfa0d9acdeafb2448f0e9c0	S0904	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0905W0128.wav	f602dd49c56d32f21347df6b34b10c55fd8471b6d624b9e5379f322493269f4a	S0905	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0906W0132.wav	98a7347eca8b2a05bf13e5cee03f7316487cf1a11aefaa0bfd75202e04930ed8	S0906	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0907W0126.wav	827a0467895d69e9f0c492baab7ceedcb0effb5d14ee89cb783f1fa283ff36b4	S0907	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0908W0135.wav	7a51b0e9b660b5cccb31b683a8870bb57301228d8045721b41cfa243d33b3255	S0908	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0912W0127.wav	2c1cfaf192a8e186688326b4aa7c9964fa27843dccd3ff80cf71e3285aa5b699	S0912	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0902W0128.wav	e1ce1f4e7736ac4f0b39a24cd7417791069435d4ad7592fbe49edd0159c57b53	S0902	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0903W0125.wav	ed82d4c7d2c4211558ddecf2fb6bcb77bc4b5658607dfd5a44608b314f155187	S0903	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0904W0127.wav	cec0b2aafd097220170cb7a6abea1d51e51cce56cc01be59fe1b72a90e556fb8	S0904	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0905W0133.wav	747ea92d5d78432709b3b32ed6226ef550cfbdf6a113ef0853dc1f8284aa1621	S0905	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0906W0140.wav	210b4d316bf75c429bfe36ed591cfa5a16c9a14e5f738d0a88c6bfae7c628248	S0906	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0907W0127.wav	6a6ec77583219e4bb310575ba41a9745bbc37773ce7440b98ad8692a7f319edb	S0907	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0908W0137.wav	20d832a9a907465a2602bd69d517466cd24185dfe39e4ccab698fa8d0840b0db	S0908	noisy_far	aishell-1+thchs30-noise
+noisy_far/BAC009S0912W0128.wav	bab3148af17f88d92599cb019195908aa438f33da27341138e01bb2568408faf	S0912	noisy_far	aishell-1+thchs30-noise

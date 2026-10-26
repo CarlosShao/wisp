@@ -37,23 +37,40 @@ S0908, S0912 (5 utts each). Overlap between the two sets: none.
 ## `sources.tsv`
 
 Tab separated, header row, then exactly 100 data rows in a fixed order
-(`near_clean` first, then `noisy_far`). Columns:
+(`near_clean` first, then `noisy_far`). The header is frozen at five columns, in
+this order, by the CER reader (`internal/speech/cer`, `manifestHeader`), which
+refuses any other first line; the row order is the report order. Columns:
 
 | column | meaning |
 |---|---|
-| `file` | path relative to this directory, e.g. `near_clean/BAC009S0764W0121.wav` |
+| `file` | path relative to this directory, e.g. `near_clean/BAC009S0764W0121.wav`; its first segment is the condition |
 | `sha256` | sha256 of the shipped wav. For `near_clean` this equals the sha256 of the upstream AISHELL-1 file, because those files are byte-identical copies |
-| `source_utt_id` | AISHELL-1 utterance id, e.g. `BAC009S0764W0121` |
-| `duration_s` | duration in seconds, 3 decimals, measured from the shipped wav |
 | `speaker` | AISHELL-1 speaker id |
 | `condition` | `near_clean` or `noisy_far` |
+| `origin` | provenance of the audio: `aishell-1` for `near_clean`; `aishell-1+thchs30-noise` for `noisy_far`, whose utterances are AISHELL-1 with additive THCHS-30 noise |
+
+`file` and `condition` are what the reader uses; `sha256` is the integrity
+record; `speaker` and `origin` keep the rows attributable without
+re-downloading 15.6 GB.
+
+## `sources-extra.tsv`
+
+The derivation columns live here, same 100 rows in the same order, joined to
+`sources.tsv` by `file`. They are not part of the frozen manifest, so the reader
+never sees them:
+
+| column | meaning |
+|---|---|
+| `file` | joins to `sources.tsv` |
+| `source_utt_id` | AISHELL-1 utterance id, e.g. `BAC009S0764W0121` |
+| `duration_s` | duration in seconds, 3 decimals, measured from the shipped wav |
 | `snr_db` | measured in-file SNR for `noisy_far`; empty for `near_clean` |
 | `noise_source` | `cafe`, `car` or `white`; empty for `near_clean` |
 | `text_raw` | upstream transcript, space separated as published |
-| `text_norm` | normalized reference text, identical to the `.txt` file |
 
-The first four columns are the minimum a CER run needs; the rest make the
-derivation auditable without re-downloading 15.6 GB.
+`text_norm` appears in neither file: it is byte-identical to the sibling `.txt`
+for all 100 rows, so the `.txt` is the reference and there is one source of
+truth.
 
 ## Reference text
 
