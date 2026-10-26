@@ -27134,3 +27134,77 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **⑦ ★状态**＝**在飞 1**（`15d2-r1` 基线集、下载 15.6 GB 中）、★**goal `active`/`armed`**
 ★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **2**、★**摆机主 0 件**
 ★**下一步**：★**①`15d2-r1` 交件 ⇒ 核它的 `sources.tsv` 是否符合 `15d-r1` 冻结的四条** ②**派 `15-a`（引擎基座）** ③**然后票 15 可以走终裁**
+
+## A1263（2026-10-26 17:5x +08，编排者）★★★收 `15a-r1`（票 15 最后一片 引擎基座）：**五片全落地**｜★★★**`C9` 四接口定义出、且有**运行时互换证明****（★假引擎走真判停器、`19 partial / 1 final`、`Latency == samplesDuration(Fed())` 逐位成立）｜★★**它要我裁一处：放宽 `15-c` 的参数类型换接口有消费者** ⇒ **我准**
+
+**① ★★收 `15a-r1`（`2c0be38dd` 4 文件 `655+/6−` ＋ `9685c578b`；件 `docs/evidence/s1/15a-r1-impl.md` **127 行**）**
+- ★`internal/speech/engines.go` **227 行**／`engines_test.go` **293 行**／`transcriber.go` **8 增 6 删**／件
+- ★**`cmd/` 命中 0**、★顶层目录去重 ＝ `docs`/`internal`
+- ★**开工三步核过**：①索引空 ②`internal/speech`/`testdata`/`internal/audio`/`internal/models` **无未提交脏**（★**它认出 `testdata/` 是 `15-d` 基线集腿的在飞件、一字节未碰**) ③★**`PLAN.md:1365` 逐字读过、`C9` 在 `PLAN.md`/`SPEC-*` 里没有别的定义**（只有 `:1365` 契约行 ＋ `:1535`/`:1588` 引用 ＋ `SPEC-01:51`/`SPEC-04:65` 转述）
+
+**② ★★`C9` 四接口（★`PLAN.md:1365` 逐字：「本地 sherpa 与云端 provider **可互换**；D47 增 `RealtimeEngine`（见 C32）：云端 S2S realtime，opt-in、**零工具权限**」）**
+| 接口 | 方法 | 契约哪句 |
+|---|---|---|
+| ★`AsrEngine` | `Begin`／`Feed`／`Partial`／`Finish`／`InFlight`／`Fed`／`Close` | 「可互换」**ASR 半边** |
+| ★`TtsEngine` | `Speak(text, emit)`／`SampleRate`／`Close` | 「可互换」**TTS 半边** |
+| ★`WakeWordEngine` | `Accept([]float32, []KeywordHit)`／`Close` | 「可互换」**唤醒半边** |
+| ★`RealtimeEngine` | `Send`／`SampleRate`／`Suspend`／`Resume`／`Close` | 「D47 增…**零工具权限**」|
+- ★★**三条签名理由（它写进注释了）**：★`AsrEngine` **无 `ctx` 无 `error`**（★**单 owner goroutine ＋ D37 的「空 final 即没听清」信号 ⇒ 云端报错与本地听错在缝上同一件事**）；★`Fed()` 是**音频钟**（D42#9）；★`TtsEngine.Speak` 的 **emit-错误即中止**抄 `C5` 同一份协作式中止契约
+
+**③ ★★零回归（硬要求、它做到了）**
+- ★★**`internal/speech` staging **28 PASS → 31 PASS****（**31/31、0 FAIL、0 SKIP、`rc 0`**）；★**原 28 条逐名差集 `missing=0`**、新增恰 3 条
+- ★★★**`cmd/wisp` 15e staging **6/6 复跑 `rc 0`****、★**`openDelay=262ms chunk=640ms ballLatency=902ms`、`partials=5 finals=1 handed=1 handoffs=1`、静音正控 `handoffs=0 finals=0 ball=[] state=Sleeping` **逐位同值**
+- ★**未改件 10 枚 `git hash-object` 与 `HEAD` **逐枚同值****；★`internal/speech` **19 文件/152,258 B → 21 文件/172,823 B**
+
+**④ ★★★接口的牙（五发、全走仓外 `mut\` ＋ `-overlay`）**
+| 发 | 变异 | 结果 |
+|---|---|---|
+| ★A | `Fed`→`FedSamples` | ★**编译失败** `*StreamingAsr does not implement AsrEngine (missing method Fed)` |
+| ★B | 整段合成 TTS | ★`want Speak(string, func([]float32) error) error` |
+| ★C | 只会报词的 KWS | ★`want Accept([]float32, []KeywordHit) []KeywordHit` |
+| ★★D | `e.CallTool(...)` | ★**`e.CallTool undefined`** ⇒ **零工具权限是结构性的** |
+| ★★★E | 给 `WakeWordEngine` **加**一个方法 | ★**编过、名册钉跑红**（`roster = [Accept Armed Close], want [Accept Close]`）|
+- ★★★**它自己的判语**：★**"`E` 是唯一的"加法"钉子：Go 对加方法是瞎的、只有 `reflect` 名册钉会响"** ✅ **这是很深的理解**
+
+**⑤ ★★门禁双向（★分母涨了 = 不是空跑绿）**
+- ★`gofmt -l internal/speech` **空→空**／★`gofumpt` **空→空**／★`go vet` `rc0→rc0`
+- ★★**`d22scan` `rc0 clean` → `rc0 clean`**（★**bans#1-5 internal/ **258→259**、ban#8 internal/ **664→666**、分母涨 2**）✅
+
+**⑥ ★★它选的读法（⛔ 静默选、它具名说清）**
+- ★**甲"只定义 3 个、`RealtimeEngine` 归 C32"弃**／★**丙"只定义有实现的"弃**／★**乙"4 个都定义、`RealtimeEngine` 语义仍以 C32 为准"**选**
+- ★**理由**：★**`C9` 关键内容就是"可互换"**；★`SPEC-04 §3` **已有 `[AecSource] 仅接口位` 的家法**；★**甲会让一个名字继续零定义 ＝ `15-a1` 的病复发**
+- ★**代价写明**：★**`RealtimeEngine` 方法集在票 60 前**定死一版****（★**现在零实现零 importer ⇒ 改它便宜一个量级**）
+- ★**明确没放进接口的两条**：★**opt-in／「音频将上传」告知**（**宿主策略、不是引擎形状**）；★**VAD**（**`C9` 四个名字里没有 `VadEngine`、`Detector` 保持具体类型**）
+
+**⑦ ★★四数／格式**
+- ★`internal/audio` **零字节**、`rc0`（15.892s→15.929s）／★`cmd/wisp` 定向（`PATH` 带 sherpa）**`rc0 PASS`**／★15e staging **6/6**
+- ★**甲乙两尺对 `internal/speech` **双空****
+- ★★★**而它纠正我派单的一句多余**：★**我写"＋`internal/speech` 的相关件（已知假红）"、它报「本树上没有实测对象、据实报空」** ✅ **它没照抄我的错**
+
+**⑧ ★★★它要我裁的一处（我准）**
+> ★**它放宽了 `15-c` 的 `NewTranscriber(det *Detector, asr *StreamingAsr)` → `asr AsrEngine`**（★`transcriber.go` 两处类型 ＋ 两处注释、**零行为改动**）
+> ★★**理由**：★**不这么做、`C9` 接口就**零消费者**、纯装饰** —— ★**正是 `15-a1` 判的「建了没人调」**
+> ★★★**做了之后才有运行时互换证明**：★**`TestTheTranscriberRunsOverAnyAsrEngine` 用与 sherpa **零共享代码**的假引擎走**真判停器**（staging）读出 `19 partial(s), 1 final(s) … over 28608 samples (1.792s)`、且 `Latency == samplesDuration(Fed())` **逐位成立****
+- ★★★**我准。理由（按铁律"最有价值"）**：
+  1. ★**`C9` 的价值就在"可互换"** ⇒ **⛔ 有消费者就是装饰** ⇒ ★**这正是否掉 `15-a1` 判的「建了没人调」**
+  2. ★**零行为改动**（只改类型 ＋ 注释）⇒ **代价极小**
+  3. ★★**而它拿到了**运行时互换证明**（假引擎 ＋ 真判停器 ＋ `Latency == samplesDuration` 逐位成立）⇒ **这才是"接口真能换引擎"的证据**
+  4. ★★**而"不许动参数类型"会让这条证明消失** ⇒ ★**那是"为守纪律而丢价值"** ⇒ **铁律第 1 条禁止的正是这个**
+
+**⑨ ★★它声明未做（⛔ 蹭）**
+★`TtsEngine`(26)／`WakeWordEngine`(41)／`RealtimeEngine`(60) **未实现**；★`AsrEngine` 云端 ＝ 61；★**零配置键**（引擎选择仍读 `[voice]` 已有字段）
+- ★★★**"不认领任何 AC 勾"**：★`15-a1` 拆片表把 `15-a` 记成「AC6 ＋ AC4 机制」、★**而 AC6 的实测已由 `15-b`/`15-c` 落地、AC4 的 slot 实测要 TTS** ⇒ ★**本片没有新增 AC 读数** ✅ **它没硬凑**
+
+**⑩ ★★★票 15 五片现状**
+| 片 | 状态 |
+|---|---|
+| ★`15-a` 引擎基座 | ★**已落（本片）** |
+| ★`15-b` VAD | ✅ |
+| ★`15-c` 流式 ASR | ✅ |
+| ★`15-d` CER | ★**计算器已落**、★**基线集在飞**（`15d2-r1`、下载 15.6 GB）|
+| ★`15-e` 装配与端到端 | ✅ |
+⇒ ★★**票 15 只差**：★**基线集的 `sources.tsv`** ＋ **CI 接线** ＋ **终裁**
+
+**⑪ ★状态**＝**在飞 1**（`15d2-r1`）、★**goal `active`/`armed`**
+★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **2**、★**摆机主 0 件**
+★**下一步**：★**派 `15-v1` 终裁**（★**五片全落、可以裁了**；★**基线集与 CI 接线作残余具名**）
