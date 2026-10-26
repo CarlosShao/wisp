@@ -1,6 +1,6 @@
 # 三票终裁腿 `tri-v1` —— 26 TTS／27 标点／28 session warm 逐格终裁（非实现者）
 
-> **尺**：`HEAD=09e865a6d`（`dev`，2026-10-26 20:0x–20:2x +08）。★**导出树**＝`git clone --shared` → `D:\tmp\wisp\20261026\triv1\export`（`HEAD` 同值、`git status` 0 行）——★**工作树 `internal/risk/**` 有 `347-r1` 在飞 15 项，本腿零碰、零清、零当自己的**。
+> **尺**：`HEAD=09e865a6d`（`dev`，2026-10-26 20:0x–20:2x +08）。★**导出树**＝`git clone --shared` → `D:\tmp\wisp\20261026\triv1\export`（`HEAD` 同值、`git status` 0 行）——★**工作树 `internal/risk/**` 有 `347-r1` 在飞（开工 15 项、收工 18 项，在飞数会动），本腿零碰、零清、零当自己的**。
 > **写面**：本文件 ＋ `D:\tmp\wisp\20261026\triv1\**`。★**落点前 `ls`：`docs/evidence/s1/tri-v1-verdict.md` 不存在**（20:01）；`D:\tmp\…\triv1` 也不存在 ⇒ 新建；**未过 180 行 ⇒ 不拆 `-partN`**。
 > **方法**：三张票现读 ＋ 六份落地件通读；每格核"票面点名的串/行还在不在"；测试全 **staging**（三 DLL 同二进制目录＋`WISP_SILERO_MODEL`/`WISP_SPIKE_MODELS`/`WISP_PUNC_MODEL`/`WISP_TTS_DIR`/`WISP_15E_TMP`）；三发变异全走**仓外 `mut\` ＋ `-overlay`**；**还原核在最后一发变异之后**；`d22scan` 在导出树跑 ＋ 两发注入正控。
 > **⛔ 未改**：`internal/**`／`cmd/**`／`testdata/**`／`.scratch/wisp/**`／`docs/reports/**`／`docs/specs/**`／`docs/PLAN.md`／`docs/audit/**`；**⛔ push**。★工作树 `internal/speech`／`internal/session`／`cmd/wisp` 三面 `git status` **0 行**。
@@ -109,7 +109,7 @@
 - **判**：`stages=[Awake Awake]` 只证**钩子先于翻面**（AC2 的括号只要求"order asserted"⇒ 该格成立）；但它**⛔ 证"麦关了"**。Warm 期间麦克风**是开的**、音频**在进 ASR**、设备**没关**、门**没关**。⇒ 证据第 2 条把 latch 说成 feed gate，属**过度表述**；"Warm＝mic CLOSED"（票面 Key constraint／D43#26）**未实现**，且**在 41 落地前无法实现**（ASR 是唯一唤醒源）。具名残余归 28。
 
 ### Q3 换族有价 vs 26-AC4 ⇒ **AC4 的冷档被打穿，且装配把冷档变成常态**
-- **读数**：播报 acquire **4.2876s（wire）／4.8244s（我）**；之后 ASR 冷装载 **2.3–3.1s**（wire）／我这一发播报后 load 窗 **6.41s**（含 hand-off 走库）；暖档 p50 **162–181ms** 只有在 **TTS 已驻留**时才成立。
+- **读数**：播报 acquire **4.2876s（wire）／4.8244s（我）**；之后 ASR 冷装载 **2.3–3.1s**（wire）；★我这一发 M3b 里"回合结束全关"后的第二回合 load 窗 **6.41s**（含 hand-off 走库，⚠ 归变异形、⛔ 归播报）；暖档 p50 **162–181ms** 只有在 **TTS 已驻留**时才成立。
 - **关系**：AC4 的 800ms 支**在生产播报路径上不可达**（`slot loads=2 closes=1`：每条播报先关 ASR 再装 TTS）；1600ms 冷档支被 **2.7–3.8×** 打穿。★D32 16.3.3 的设定档是"**TTS 常驻＋ASR 按需**"，**装配做的是反过来**（D32 那条设定在 41 缺失下不可照抄：ASR 是唯一唤醒源）。⇒ **AC4 只能以"测量完成＋冷档 NOT MET"翻**；真要补，是一张**换族／驻留策略票**（含"播报期 ASR 是否值得为 4s 首音保留"的取舍），不是再测一遍。
 
 ## 10 三张票的残余清单（逐张具名，⛔ 混）
@@ -128,7 +128,7 @@
 |---|---|---|---|
 | `wire-r1`（被裁件） | **`d803344ae`** | **7 文件 ＋2749／−31**：`A` 3 `.go`＋`M` 3 `.go`＋`A` 本证据件 | `--name-status` 4 `A`＋3 `M`、**无 `D`**、**无 `testdata/`／`internal/`／`.scratch/`** |
 | `HEAD`（裁时父） | `09e865a6d` | 编排者 `A1280` 收件笔 | 只证据＋台账 |
-| 本腿 | **`e062fce06`**（正文 134 行）＋ `4bc8e9107`（三处读数校正）＋ **本笔**（`-done` 框尺 0→4 更正；**⛔ amend**，改正一律追加新笔） | **只 `docs/evidence/s1/tri-v1-verdict.md`** | `add`／`commit` 两处**显式单文件 pathspec**；三笔提交前各核 `--cached --name-status`（只 1 行 `A`／`M`） |
+| 本腿 | **`e062fce06`**（正文 134 行）＋ `4bc8e9107`（三处读数校正）＋ `66615b3ad`（`-done` 框尺 0→4）＋ **本笔**（在飞数 15→18 标注、删一条归错源的 6.41s；**⛔ amend**，改正一律追加新笔） | **只 `docs/evidence/s1/tri-v1-verdict.md`** | `add`／`commit` 两处**显式单文件 pathspec**；四笔提交前各核 `--cached --name-status`（只 1 行 `A`／`M`） |
 
 ## 13 交回父代理
 **未定义即停：无。** ★三件装配**真在盘上**（三发变异全红＋还原绿），但"能不能翻"与"装配在不在"是两把尺：**12/18 可翻、6/18 ⛔**；★**26 不要整票结**（三条通道/毒源缺口），**27/28 可带具名残余结**。★两条口径错（`docs/SLO.md` 存在、`[voice] punctuation` 键已存在）**改的是下一腿该干什么**，不是本裁的判据。
