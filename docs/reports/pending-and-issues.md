@@ -27315,3 +27315,39 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **⑥ ★状态**＝**在飞 2**（`15d4-r1` 生成器 ／ `15-v1` 终裁）、★**goal `active`/`armed`**
 ★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **2**、★**摆机主 0 件**
+
+## A1266（2026-10-26 18:2x +08，编排者）★★★收 `15d4-r1`（生成器小修）：**重跑逐字节同 ＋ 重跑幂等**｜★★★**最硬的一条**：**`sources.tsv` 首行转发义后 `-ceq` 等于 `sources.go:26` 的 `manifestHeader` ＝ `True`**｜★★**票 15 只差 CI 接线 ＋ 终裁** ⇒ **已派 `cerci-r1`**
+
+**① ★★收 `15d4-r1`（`3ccb8c198` 生成器＋README ＋ `1f1b86a5d` 件；件 `15d4-r1-impl.md` **120 行**＝上限）**
+
+**② ★★★七项读数**
+| # | 读数 |
+|---|---|
+| ★★★1 | ★**核心：仓外重跑与提交件**逐字节相同****（★`ReadAllBytes` ＋ `SequenceEqual`、★**不只看 sha**）；★`sources.tsv` **12,917 B**／`sha256 54b50a49…db537`、★`sources-extra.tsv` **10,799 B**／`sha256 531677f2…686dd`；★★**另：在已生成树原地再跑一次 `rc=0` 且两件 sha256 不变 ⇒ **重跑幂等**** |
+| ★2 | ★**脚本 rc=0 产 5 列 / 6 列**、★**表头取自提交内 blob 的 `cat -A`**；★★★**`sources.tsv` 首行转发义后 `-ceq` 等于 `sources.go:26` 的 `manifestHeader` ＝ **`True`****（★**重跑件同 `True`**）|
+| ★★3 | ★**`origin` 规则**：★`ORIGIN = {"near_clean": "aishell-1", "noisy_far": "aishell-1+thchs30-noise"}`（`:76`）；★★**写表时 `ORIGIN[r["cond"]]`（`:360`、**缺键 `KeyError` 崩、⛔ 静默空串**）** ✅；★`text_norm` 不进任何 tsv |
+| ★★4 | ★**200 数据件零改动**：★`--numstat` 只有两行（`README 12/1`、`py 52/13`）⇒ **`.wav/.txt` 命中 0、`.go` 命中 0**；★★**重跑 vs 仓内 100 wav ＋ 100 txt 逐文件 sha256 比 `compared=200 mismatches=0`** |
+| ★5 | ★**`TestBaselineCorpusIsCommittedAndTheGateCanRun` `rc=0 PASS`**（`ok 0.102s`）|
+| ★6 | ★**`README` 只改「Regenerating」**（`12/1`、**两处 hunk 全在该小节内**）|
+| ★7 | ★**格式**：★本腿改 `.py`＋`.md`、**`.go` 命中 0**；★**`gofmt -l` 喂这两件 `rc=2 illegal character`（gofmt 只吃 `.go`）** ⇒ **如 实报"无交集"** |
+
+**③ ★★环境/前置（它核得很细）**
+- ★★**包还在**（`data_aishell.tgz` **15,582,913,665 B**、`resource.tgz` **24,813,708 B**）⇒ ★**走**真重跑**、没走"重算 tsv"退路** ✅
+- ★`python`＝**3.11.15**／`numpy 2.4.3`（`py -3`＝3.12.10 未用）；★`GOTMPDIR` 本就未设
+- ★★**边界**：★**两份 tsv 终态 sha256 与开工时**一致****、★`git status -- testdata/asr-baseline` **空**；★`LICENSE`／`frontend`／`design`／`scripts`／`.github` 未碰
+
+**④ ★一处瑕疵（它自己报）**
+- ★`1f1b86a5d` 正文把"反转义"误敲成"转发义后"（★**⛔ amend 已禁、故留档**）✅ **诚实**
+- ★`README.md:17` 目录清单仍只写 `sources.tsv …`（★**在该小节之外、⛔ 越写面**；★**且 `## sources-extra.tsv` 已单独成节**）⇒ ★**我拍：⛔ 改**（★**该行仍为真**）
+
+**⑤ ★★★派 `cerci-r1`（CER 门禁 CI 接线 —— 票 15 的 `AC#2` 最后一步）**
+- ★**门禁已写死在 `SPEC-10:57-60` ＋ `SPEC-04:125`**（逐字「两个 wav 集**必须提交进 `testdata/asr-baseline/` 并随 CI 跑**，否则基线是空话」）
+- ★★**而基线集与计算器都已落地** ⇒ **现在缺的就是"随 CI 跑"**
+- ★★★**要它解决的一个陷阱**：★**`tools/d22scan/runtests.sh:224-235` 把**任何 `--- SKIP` 判红****
+  ⇒ ★**而现在 `testdata/asr-baseline/` 有数据了 ⇒ `internal/speech/cer` 的 SKIP 应该不会出现**（★**要它自己核**）
+  ⇒ ★★**而 `internal/speech`（父包）**要 staging** ⇒ ★**父包不适合直接进 `runtests.sh`** ⇒ ★**要它判"接哪一层"**
+- ★**硬边界**：★⛔ 用 `continue-on-error`／⛔ 动 `testdata/**`／⛔ 动 `internal/**`／⛔ 动 `frontend`／`design`
+
+**⑥ ★状态**＝**在飞 2**（`cerci-r1` CI 接线 ／ `15-v1` 终裁）、★**goal `active`/`armed`**
+★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **2**、★**摆机主 0 件**
+★**票 15 只差**：★**CI 接线（在飞）** ＋ **终裁（在飞）**
