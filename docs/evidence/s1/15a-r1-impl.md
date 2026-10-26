@@ -1,6 +1,7 @@
 # 票 15a 引擎基座腿 `15a-r1` —— 落地件（写腿）
 
 > **尺**：`HEAD=654b6b50d`（`dev`，2026-10-26 17:33 +08，收 `15e-r1` 的发），现跑 2026-10-26 17:34–17:5x +08。★**七项读数逐条在 §1–§7**，全为现跑，⛔ 转述。
+> **本片代码 commit ＝ `2c0be38dd`**（★由 `2c0be38dd` **之后的补正 commit 回填** —— 规则禁 `--amend`，要更正就追加）。
 > **写面**：`internal/speech/**` —— **新增 2 枚**（`engines.go` 227 行／10,019 B、`engines_test.go` 293 行／10,396 B）＋ **改 1 枚**（`transcriber.go`，`git diff --numstat` ＝ `8 6`）＋ 本文件。
 > **零字节**：`asr.go`／`vad.go`／`endpoint.go`／`doc.go`／`fixtures_test.go`／`asr_test.go`／`transcriber_test.go`／`vad_test.go`／`endpoint_test.go`／`cgo_boundary_windows_test.go`（10 枚逐个 `git hash-object` **＝ HEAD 同值**，§6）＋ `internal/speech/cer/**`、`cmd/**`、`testdata/**`、`internal/audio/**`、`internal/models/**`、`scripts/**`、`.github/**`、`frontend/**`、`design/**`、票面、台账、`docs/specs/**`、`docs/PLAN.md`。
 > **临时件（只建不删）**：`D:\tmp\wisp\20261026\15ar1\{bin,binspeech,cases,logs,mut,overlay}`。★**五发牙全走仓外件 ＋ `-overlay`** ⇒ **工作树零突变窗口**（§3 还原核）。
