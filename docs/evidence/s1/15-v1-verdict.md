@@ -1,5 +1,5 @@
 # 票 15 终裁腿 `15-v1` —— 五片终裁（非实现者）
-> **尺**：`HEAD=f20432bd7`（`dev`，2026-10-26 18:2x +08；五笔代码提交全为祖先。读的过程中 HEAD 从 `a148fda16` 走到 `f20432bd7`，后九笔是基线集/CI/证据/台账；`git diff 2c0be38dd..HEAD -- internal cmd go.mod` **空**）。
+> **尺**：`HEAD=de02d5053`（写作时父提交；`dev`，2026-10-26 18:2x +08；五笔代码提交全为祖先。读的过程中 HEAD 从 `a148fda16` 走到 `de02d5053`，后十一笔是基线集/CI/证据/台账；`git diff 2c0be38dd..de02d5053 -- internal cmd go.mod` **空**）。
 > **写面**：本文件 ＋ `D:\tmp\wisp\20261026\15v1\**`。**落点前 `ls`：`docs/evidence/s1/15-v1-verdict.md` 不存在**（18:14）⇒ 用本号、不拆 `-partN`。
 > **方法**：五笔提交逐个 `git show --name-status`；测试全在 staging（三枚 DLL 同目录＋`WISP_SILERO_MODEL`/`WISP_SPIKE_MODELS`）跑；突变全在仓外 `mut\` ＋ `-overlay`；还原核在**最后一发变异之后**（§3、§5、§6 各一次）。
 > **⛔ 未改**：`internal/**`、`cmd/**`、`testdata/**`、`.scratch/wisp/**`、`docs/reports/**`、`docs/specs/**`、`docs/PLAN.md`、`docs/audit/**`；**⛔ push**。工作树里别人的脏（`testdata/asr-baseline/**` 基线集腿、`.scratch/**`）**零碰零清**。
@@ -149,6 +149,6 @@
 | `15-e` 装配 | `ca8834d72` | **7 files, +2129／-39** | `cmd/wisp` 4 改＋2 新＋证据；D43 表 0 diff |
 | `15-a` 基座 | `2c0be38dd` | **4 files, +655／-6** | `engines.go`／`engines_test.go`／`transcriber.go`（8/6，§8）＋证据 |
 
-★**逐笔越界 0**：15b/c/d 纯 `A`；15a **1 `M`＋3 `A`**；15e **4 `M`＋3 `A`**、**无 `D`**；五笔均无 `testdata/`、`.scratch/wisp/issues/`、`docs/specs/`、`docs/PLAN.md`、`docs/reports/`、`docs/audit/`。★五笔全为 HEAD 祖先；`git diff 2c0be38dd..HEAD -- internal cmd go.mod` **空**（后九笔只动基线集/CI/证据/台账；五片之外的 `8d6e150f8` 改 `.github/workflows/ci.yml`＋`scripts/portable-tests.sh`，是 AC2 的 CI 半边）。
+★**逐笔越界 0**：15b/c/d 纯 `A`；15a **1 `M`＋3 `A`**；15e **4 `M`＋3 `A`**、**无 `D`**；五笔均无 `testdata/`、`.scratch/wisp/issues/`、`docs/specs/`、`docs/PLAN.md`、`docs/reports/`、`docs/audit/`。★五笔全为 HEAD 祖先；`git diff 2c0be38dd..HEAD -- internal cmd go.mod` **空**（后十一笔只动基线集/CI/证据/台账；五片之外的 `8d6e150f8` 改 `.github/workflows/ci.yml`＋`scripts/portable-tests.sh`，是 AC2 的 CI 半边）。
 ## 15 交回父代理
 **未定义即停：无。** 唯一限制：`cerci-r1`（CI 接线）在**写件末落地**（`8d6e150f8`），我现跑其 `runtests.sh` **24/0/0**；其注释自陈不证真 ASR，AC2 仍 ⛔。HEAD 仍在动，复跑请以“五笔代码提交＋`git diff 2c0be38dd..HEAD -- internal cmd go.mod` 空”为快照；本文件落点时的 `ls`／HEAD／时间已写在件头。
