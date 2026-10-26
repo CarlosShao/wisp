@@ -134,6 +134,79 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 亮色块未重定义的变量（`--ball-halo`、`--on-solid`）沿用 `:root` 值 —— `LightPalette()` 以
 `DarkPalette()` 为基底覆写，与 CSS 级联语义一致。
 
+## 第四代槽位对照（第四代覆盖的 11 名 · 票 380 / `C″`）
+
+第四代设计（机主 2026-09-25 pivot，`frontend/scripts/gen-tokens.mjs` 自述 `FOURTH GENERATION`）把美术基准
+换成 beautiful-ui 的极简主题，**真相源随之迁移**：从 `design/assets/tokens.css`（第一代参考实现，
+`72b65c614` 已删）迁到 `frontend/src/styles/tokens.generated.css`（生成件，**43 个 token、其中带色 34 个**），
+由生成器里的 `TOKENS` 表逐值产出。
+
+**上面 78 行一个字节不动**：它们是原生世代（`internal/ball/tokens.go` 的 40 个 `Palette` 字段）的书面记录，
+球侧 `internal/ball/tokens_table_test.go` 仍在逐行读它们（暗 ≥40 / 亮 ≥38 ＋ 每个 `Color` 字段必须有暗行）
+—— 本节回答的是**另一个问题**：那 40 个名里**哪 11 个**在第四代有可核对的槽位。
+
+- **11（本节）＋ 23（下一节）＝ 34 ＝ 第四代带色 token 数**（43 减去 6 条 `--shadow-*`、`--panel-alpha`、两条字体栈）。
+- 两节都只有 **2 列**，故意如此：球侧解析器是 `if len(cells) != 4 { continue }`（`tokens_table_test.go:181`），
+  2 列的行它**整行跳过** ⇒ **加这两节对 `internal/ball` 零影响**（这正是选 `C″`「一行不删」而不是删行的原因）。
+- `TestC21DesignTokensFourWayAgree`（`internal/panel`）读本节：这 11 个槽位必须在 `:root`（**light**）与
+  `[data-theme="dark"]`（**dark**）**两块都声明**；且每个名在本表两个主题的配色行里**各占一行**
+  ⇒ 可对账的下界是 **2 × 11 ＝ 22**（**不是 28**：`--accent-line`／`--danger-line`／`--success-line`
+  三枚在第四代**没有对应声明**（第四代只有 `--warn-line`），14 − 3 ＝ 11）。
+
+| 原生世代 token | 第四代槽位 |
+|---|---|
+| `--bg-inset` | `--inset` |
+| `--bg-overlay` | `--surface` |
+| `--border-soft` | `--line` |
+| `--fg-primary` | `--ink` |
+| `--fg-secondary` | `--ink-2` |
+| `--fg-tertiary` | `--ink-3` |
+| `--accent` | `--accent` |
+| `--danger` | `--danger` |
+| `--warn` | `--warn` |
+| `--warn-line` | `--warn-line` |
+| `--success` | `--success` |
+
+槽位判据是**语义位**（内凹底/浮层底/边框/三级文本/四组语义色），**不是数值**：两代同一语义位的取值本来就不同
+（例：`--bg-inset` 暗 `rgba(6, 8, 11, 0.38)` vs `--inset` 暗 `#1f2022`）。**逐值相等只对同代同文件断言**：
+第四代侧由「生成器表 ↔ 生成件」逐值守（改一位就红），原生侧由球侧那 78 行逐值守。
+
+## 第四代未覆盖（第四代 token · 原生世代无对应 · 23 名 · 票 380 / `C″`）
+
+这 23 名是第四代**带色** token 里原生世代**不覆盖**的部分，加上上一节 11 名**正好 34**（＝第四代带色 token 全集）。
+机器判据（`TestC21DesignTokensFourWayAgree`）双向锁死：**本节的名字集合必须等于测试里钉死的 23 名字面量清单**
+（多一行红、少一行红），且「上一节 11 名 ∪ 本节 23 名」必须**恰好**等于第四代带色 token 集合。
+⇒ ★ 删掉一行再往本节补一行**不会变绿**：清单钉在 Go 里，加名字要改代码，评审看得见。
+
+| 第四代 token（原生世代无对应） | 为什么不覆盖 |
+|---|---|
+| `--page` | 页面底色。球是分层窗口（`UpdateLayeredWindow`）直接铺在桌面上，没有「页面」这一层；原生世代只有内凹与浮层两档底。 |
+| `--canvas` | 画布底色。原生侧的画布就是桌面本身，`tokens.go` 里没有整块铺底色的字段。 |
+| `--hover` | 悬停态底。悬浮球不响应指针悬停（只有点击与拖拽），原生世代没有 hover 这一档状态色。 |
+| `--hover-2` | 二级悬停（按下的上一层）。同上：球体没有可悬停的控件面。 |
+| `--field` | 输入控件底。原生侧不画输入框，表单在面板（票 33+ 的原生切片才是它的消费方）。 |
+| `--stripe` | 表格斑马线（8 位带 alpha）。原生侧不画表格，无行交替底。 |
+| `--stripe-bg` | 斑马线的底衬。同上：原生侧无表格结构。 |
+| `--line-strong` | 强边框。球的边框由 `looks[*].Rim` ＋ `GlassRimPx` 画（票 62）；本表边框色只有 `--border-soft` 一枚。 |
+| `--accent-ink` | accent 上的文字色。原生侧 accent 只作波环/光带单色，没有「accent 面上的字」。 |
+| `--accent-tint` | accent 淡底。原生 v2 把三段 tint 收敛成单色（本表 12 个 `--tint-*` 全是零消费者死色，见「未接线豁免表」）。 |
+| `--green` | 库原始色名；语义名 `--success: var(--green)`（`gen-tokens.mjs:87`）。原生表记的是语义名 `--success`，已覆盖 ⇒ 同一决定不占两行。 |
+| `--green-tint` | 库原始色名的淡底（`--success-soft` 才是语义名那一档）。原生 success 只有单色 ＋ 描边，没有淡底路径。 |
+| `--orange` | 库原始色名；`--warn: var(--orange)`（`gen-tokens.mjs:82`）。原生表记的 `--warn` 已覆盖。 |
+| `--orange-tint` | 库原始色名淡底；对应语义名 `--warn-soft`。原生 warn 无淡底路径。 |
+| `--red` | 库原始色名；`--danger: var(--red)`（`gen-tokens.mjs:85`）。原生表记的 `--danger` 已覆盖。 |
+| `--red-tint` | 库原始色名淡底。`render-l2` 仪器经 `--stop`→`--danger` 钉色，tint 档原生侧不读。 |
+| `--tooltip-bg` | 悬浮提示底。原生球不画提示气泡（只有角标数字），提示层是面板的活。 |
+| `--tooltip-fg` | 提示文字色。同上：原生侧无提示层。 |
+| `--tooltip-muted` | 提示里的次要文字色（时间戳/来源）。原生球不画提示层，`tokens.go` 也没有第三档文本色可对应。 |
+| `--tooltip-border` | 提示气泡描边色。原生球没有气泡，描边只有 `looks[*].Rim` ＋ `GlassRimPx` 一条路径（票 62）。 |
+| `--warn-soft` | 语义名的淡底。原生 warn 只有单色 ＋ `--warn-line` 描边，没有淡底这一层。 |
+| `--stop` | `--danger` 的别名（`render-l2` 钉死的拼法）。原生侧读 `--danger` 那一枚 ⇒ 同一决定不占两行。 |
+| `--success-soft` | 语义名的淡底。原生 success 只有单色 ＋ `--success-line` 描边。 |
+
+**这两节不是 `C1–C32` 文本**（`PLAN.md` 3611 行里 `c21-native` 0 处命中）：它们是 `C21` 契约的**书面镜像**，
+契约文字在 `PLAN.md:3308`（唯一样式真相源）与 `PLAN.md:3604`（参考实现）——票 380 把这两处指向第四代生成件。
+
 ## 几何 / 动效 token（CSS 长度与时长，96 DPI 基准，按显示器 DPI 缩放）
 
 | CSS 变量 / 规则 | 值 | Go 常量 | 用途 |

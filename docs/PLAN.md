@@ -3305,7 +3305,7 @@ D:\work\workspace\projects plans\Wisp\
 └── design\                      ← 前端原型设计目录（用户要求的"专门存放前端原型设计的"目录）
     ├── index.html               ← 原型导航 + 设计系统总览（**入口，先做这个**）
     ├── assets\
-    │   ├── tokens.css           ← C21 DesignTokens 的 CSS 参考实现（**唯一样式真相源**）
+    │   ├── tokens.css           ← 第一代 CSS 参考实现（**原件已在 `72b65c614` 删除**）；C21 的**唯一样式真相源**改为 `frontend/src/styles/tokens.generated.css`（第四代生成件，由 `frontend/scripts/gen-tokens.mjs` 的 `TOKENS` 表逐值产出）：原生侧 78 行对照表**原样保留**＋**两张 2 列对照表**（11 名槽位对照／23 名未覆盖逐名理由），第四代覆盖 **34** 个带色 token
     │   ├── base.css             ← 重置 + 排版 + 通用组件类（按钮/卡片/chip/徽标/输入）
     │   ├── icons.js             ← 内联 SVG 图标集（**零 emoji**，Lucide 风格，ISC 许可）
     │   └── theme.js             ← 明暗切换（原型控件，非产品 UI；§17.8 验收 #3 的载体）
@@ -3601,7 +3601,7 @@ blur 的 saturate 增益同步下调（1.5 / 1.4 降到 1.3 / 1.25），磨砂�
 
 | 关系 | 说明 |
 |---|---|
-| **C21 `DesignTokens`** | `tokens.css` 就是它的**参考实现**。S1 的 Direct2D 侧与 S5 的 CSS 侧都以它为准。**原型阶段发现 token 不够用 → 现在就补，不要等到 S5** |
+| **C21 `DesignTokens`** | 真相源是 **`frontend/src/styles/tokens.generated.css`**（第四代生成件，由 `frontend/scripts/gen-tokens.mjs` 的 `TOKENS` 表逐值产出；`:root` = light、`[data-theme="dark"]` = dark）。`design/assets/tokens.css` 是第一代参考实现，**原件已在 `72b65c614` 删除**。S1 的 Direct2D 侧与 S5 的 CSS 侧都以生成件为准；原生侧那张 78 行对照表（`docs/evidence/s1/c21-native-tokens.md`）**原样保留**，另加**两张 2 列对照表**（11 名→第四代槽位／23 名未覆盖逐名理由）⇒ 第四代覆盖 **34** 个带色 token。**原型阶段发现 token 不够用 → 现在就补，不要等到 S5** |
 | **D29 前端架构** | 原型**不引入 React/Tailwind/shadcn**（用户明确要求）；但 17.6 的选型已定案，S5 直接照做。原型的 HTML 结构与 class 命名**应尽量贴近 shadcn 的语义**，减少 S5 重写量 |
 | **D2 无常驻 WebView** | 悬浮球原型是 HTML **仅为设计参照**，生产是 Direct2D。**必须在 `ball.html` 顶部标注**，否则后续 agent 会误解架构 |
 | **D32 CPU 约束** | 17.5 末尾的"循环动画只允许出现在非空闲态"是硬规则 |
