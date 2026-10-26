@@ -78,8 +78,12 @@
 ## 6. ★★ 「⛔ 碰 `cmd/wisp`」的证明
 
 ```
-git show --name-only <本腿提交> | grep -c '^cmd/'     =>  0
-git grep -n '"github.com/CarlosShao/wisp/internal/speech"'  =>  0 命中（零 importer）
+git show --name-only --format= d5d25ddad          => 恰好 7 行：
+  docs/evidence/s1/15b-r1-impl.md
+  internal/speech/{cgo_boundary_windows_test,endpoint,endpoint_test,fixtures_test,vad,vad_test}.go
+git show --name-only --format= d5d25ddad | grep -c '^cmd/'   =>  0
+git diff --name-only d5d25ddad~1 d5d25ddad | 顶层目录去重     =>  docs / internal   （没有 cmd）
+git grep -n '"github.com/CarlosShao/wisp/internal/speech"'    =>  0 命中（零 importer）
 ```
 
 ★`internal/speech` **零 importer** 是硬事实：`models.go:25` 的 `handOffModel` 是 `package main`，接线在 `15-e`。本片**不需要**动 `cmd/wisp` 就拿到了全部读数（未触发停手②）。
