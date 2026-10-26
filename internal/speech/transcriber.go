@@ -57,23 +57,25 @@ type Transcript struct {
 // stream, and turns "an utterance opened / an utterance closed" into "partials
 // while it is open / one final when it closes".
 //
-// It owns neither part: the caller constructs the Detector and the
-// StreamingAsr, and closes them (C11). That keeps the expensive recognizer
-// reusable across utterances and keeps the utterance policy in one place.
+// It owns neither part: the caller constructs the Detector and the AsrEngine
+// (C9; *StreamingAsr is the local sherpa one) and closes them (C11). That keeps
+// the expensive recognizer reusable across utterances and keeps the utterance
+// policy in one place. The engine is the seam, not a concrete session: nothing
+// in this driver knows which provider it is driving.
 //
 // It starts no goroutines and is not safe for concurrent use: one owner
 // goroutine drives it (D38b), exactly like Detector.
 type Transcriber struct {
 	det *Detector
-	asr *StreamingAsr
+	asr AsrEngine
 
 	rest []float32 // input not yet filling one seam window
 	ring []float32 // tail of the audio, so an opening utterance can be replayed
 	text string    // last emitted partial, to suppress repeats
 }
 
-// NewTranscriber wires an endpointer to an ASR session.
-func NewTranscriber(det *Detector, asr *StreamingAsr) *Transcriber {
+// NewTranscriber wires an endpointer to any ASR engine (C9).
+func NewTranscriber(det *Detector, asr AsrEngine) *Transcriber {
 	return &Transcriber{det: det, asr: asr}
 }
 
