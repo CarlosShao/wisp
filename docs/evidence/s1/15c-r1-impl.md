@@ -1,6 +1,7 @@
 # 票 15c 流式 ASR 腿 `15c-r1` —— 落地件（写腿）
 
 > **尺**：`HEAD=1f2bae2a7`（`dev`），现跑 2026-10-26 16:31–16:56 +08。★**九项读数逐条在 §1–§9**，全为现跑，⛔ 转述。
+> **本片代码 commit ＝ `a736ad0ea`**；★本文件里那枚 hash 由 `a736ad0ea` **之后的补正 commit 回填**（规则禁 `--amend`，要更正就追加，不改写历史）。
 > **写面**：`internal/speech/**` 新增 **4 文件、39,257 B** —— `asr.go` 7,465／`transcriber.go` 7,463／`asr_test.go` 9,622／`transcriber_test.go` 14,707，＋本文件。
 > **零字节**：`doc.go`／`endpoint.go`／`vad.go` 与三枚 `15-b` 测试件（`vad.go` 树内 blob `af5fc14a…` **＝ HEAD 同值**）、`cmd/**`、`internal/**` 其余、`scripts/**`、票面、台账。
 > **临时件（只建不删）**：`D:\tmp\wisp\20261026\15cr1\{bin,probe,logs,overlay,mut}`。★**两发变异全走仓外件 ＋ `-overlay`** ⇒ **工作树零突变窗口**。
@@ -74,10 +75,14 @@
 ## 5. ★★ "⛔ 碰 `cmd/wisp`" 的证明
 
 ```
-git show --name-only --format= <本片 commit>   => 恰好 5 行（4 枚 .go ＋ 本文件）
-git show --name-only --format= <本片 commit> | grep -c '^cmd/'   =>  0
+git show --name-only --format= a736ad0ea        => 恰好 5 行（4 枚 .go ＋ 本文件）
+git show --name-only --format= a736ad0ea | grep -c '^cmd/'   =>  0
+git show --numstat  --format= a736ad0ea        => 1274 insertions(+), 0 deletions(-)
+git commit 顶层目录去重                          =>  docs / internal   （没有 cmd）
 git status --porcelain -- cmd/                  =>  空
 ```
+
+★**`0 deletions` 本身就是最强的那条**：整个提交**只有新增、没有一行删除/修改** ⇒ `15-b` 的 7 枚文件（`doc.go`/`endpoint.go`/`vad.go` ＋ 3 枚测试件，本片未新增任何它们的行）**一字节未被触碰**，更不用说 `cmd/wisp`。
 
 ★**并且本片不需要 `cmd/wisp` 就拿到了全部九项读数**（未触发停手②）。★`internal/speech` 仍是**零 importer**：接线（`models.go:25` 的 `handOffModel`）在 **`15-e`**，本片不碰。
 
