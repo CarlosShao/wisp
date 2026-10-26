@@ -57,13 +57,22 @@ package main
 // while it is off (internal/ball/liquid_windows.go:52). Turning that default is
 // ticket 68 AC#2's decision, not this leg's.
 //
-// What this file does NOT have: a PCM consumer. The C8 frame channel is created
-// with the seam's own bounded window and nothing drains it, because the ASR/KWS
-// side (internal/speech) is unwritten and 唤醒词／ASR／TTS are explicitly outside
-// this ticket. Every frame is therefore dropped AFTER the level has been read,
-// counted in the D38d meter and reported at most once a second by
-// meter.push's own throttle - the honest interim shape, named in the posture
-// line below so the boot report does not pretend otherwise.
+// What this file does NOT have, as of ticket 15e: nothing. It used to say the C8
+// frame channel "is created with the seam's own bounded window and nothing drains
+// it, because the ASR/KWS side (internal/speech) is unwritten". internal/speech is
+// written now (15-b/15-c/15-d), and ticket 15e drained the seam: assembleCapture
+// stores the channel on this handle (residentAudio.frames) and
+// cmd/wisp/resident_voice_windows.go's consumer is its ONE reader. The interim
+// shape this paragraph used to describe - every frame dropped AFTER the level was
+// read, counted in the D38d meter and reported at most once a second by
+// meter.push's own throttle - is now the degraded shape, taken only when the voice
+// chain cannot be built (voice.enabled=false, no capture leg, no VAD model,
+// [voice].asr.provider not local-sherpa). In that shape the boot report still says
+// which of those it is, so the posture line never pretends otherwise.
+//
+// Wake-word inference (KWS) is still nobody's: ticket 41 owns it, and this leg
+// does NOT claim a wake-word listener - what it pauses is the VAD/ASR chain
+// (resident_ball_windows.go's tray pause-wake item, attached in 15e).
 
 import (
 	"context"
@@ -92,6 +101,17 @@ type residentAudio struct {
 	// device failures can be assembled without unplugging hardware.
 	mic    captureSource
 	cancel context.CancelFunc
+
+	// frames is the consumer end of the C8 seam (D38d's bounded channel): the
+	// gate's Start pushes into it and, since ticket 15e, exactly one reader
+	// drains it. It is nil on every branch that never built a gate, which is what
+	// makes "this process has no frame channel" a fact the voice leg can read
+	// instead of an assumption.
+	frames chan []byte
+	// voice is the chain that drains frames, attached by the assembly root after
+	// this leg exists (the gate owns the producer, not the consumer). nil = no
+	// chain was built, and this handle's teardown then has no second half.
+	voice *residentVoice
 
 	// The two config facts this leg acted on, recorded so the boot line and any
 	// later reading of this handle state the same privacy posture the assembly
@@ -274,7 +294,7 @@ func assembleCapture(rt *proc.Runtime, dataDir string, out func(float32),
 
 	ctx, cancel := context.WithCancel(context.Background())
 	buf := audio.NewBoundedFrames()
-	ra.mic, ra.gate, ra.cancel = mic, gate, cancel
+	ra.mic, ra.gate, ra.cancel, ra.frames = mic, gate, cancel, buf
 
 	// The gate's Start returns nil even when the inner open failed (the failure
 	// is metered inside openInnerLocked and surfaced through Stats), so the
@@ -342,16 +362,36 @@ func assembleCapture(rt *proc.Runtime, dataDir string, out func(float32),
 	return ra
 }
 
+// attachVoice hands this leg the chain that drains its C8 frame channel (ticket
+// 15e). The assembly root calls it once, right after the voice leg exists, and it
+// is the only writer; nil is the honest "this boot built no chain" and leaves
+// stop() with a single half.
+func (ra *residentAudio) attachVoice(rv *residentVoice) {
+	if ra == nil {
+		return
+	}
+	ra.voice = rv
+}
+
 // stop is D38(e) step 4's body: cancel the consumer ctx, then hand the gate
 // the stop (which stops the inner source, and whose own join is bounded at 2s
 // inside WASAPIMicrophone.Stop). Returns the device error this leg ends with,
 // if any, so the shutdown record carries it instead of a clean-looking nil.
+//
+// Ticket 15e added the middle line: the voice chain is cancelled and joined
+// BEFORE the device stops, because the chain's teardown is what releases the
+// sherpa sessions (C11) and a session released under a thread that is still
+// decoding is the crash that order prevents. The ten-step order is untouched -
+// this is still step 4's one body, not an eleventh step.
 func (ra *residentAudio) stop() error {
 	if ra == nil || ra.gate == nil {
 		return nil
 	}
 	if ra.cancel != nil {
 		ra.cancel()
+	}
+	if ra.voice != nil {
+		ra.voice.stop()
 	}
 	err := ra.gate.Stop()
 	st := ra.mic.Stats()
@@ -370,8 +410,11 @@ func (ra *residentAudio) stop() error {
 }
 
 // posture is the boot-report sentence. It is built from the state the assembly
-// recorded, never from a hope, and it names the missing PCM consumer because
-// that is the half of the voice chain this ticket does not own.
+// recorded, never from a hope. Since ticket 15e it answers the third question a
+// reader has about a running capture leg - "does anything consume the frames" -
+// from the wiring itself (residentVoice.drainsFrames) rather than from a ticket
+// boundary, because the old answer ("ASR/KWS is unwritten") became false the
+// moment internal/speech landed.
 func (ra *residentAudio) posture() string {
 	if ra == nil {
 		return "采集腿未装配：本进程没有任何麦克风路径"
@@ -379,7 +422,11 @@ func (ra *residentAudio) posture() string {
 	if !ra.started.Load() {
 		return ra.unrunningClaim()
 	}
-	return ra.verdict + "；帧消费侧（ASR/KWS，internal/speech 一块没写）不属于本票，" +
+	if ra.voice.drainsFrames() {
+		return ra.verdict + "；帧消费侧已接上：C8 通道 1 个消费者（D38b 名册名 asr-infer，C11 作用域），" +
+			"帧进 VAD/ASR 而不是按 D38d 丢弃"
+	}
+	return ra.verdict + "；帧消费侧没有消费者（" + ra.voice.absentReason() + "），" +
 		"帧按 D38d 计数丢弃并由 meter 限流告警"
 }
 

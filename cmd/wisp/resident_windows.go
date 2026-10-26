@@ -455,6 +455,35 @@ func runResident() {
 		rb.mirrorTrayMute()
 	}
 
+	// Ticket 15e: the third and last seam `15-a1` found sitting unowned in this
+	// process, and the only line in the repository that imports internal/speech.
+	//
+	// The three things it closes are named at the top of
+	// resident_voice_windows.go; what belongs HERE is why it sits on this line:
+	//
+	//   - after startResidentAudio, because the frame channel it drains is the one
+	//     that call created (assembleCapture stores it on the handle), and a
+	//     consumer with no channel would be the same "built but nobody calls it"
+	//     shape this ticket exists to end;
+	//   - after the two mute attaches above, because the voice leg's own attach
+	//     (rb.attachWakePause + a re-projection, inside startResidentVoice) must
+	//     not be undone by the boot's earlier projection - mirrorTrayMute reads
+	//     whatever reader is attached at the moment it runs, so order is what
+	//     makes the tray checkmark true at the end of the boot;
+	//   - before the boot report below, so the report's 语音链 line is taken off a
+	//     real handle instead of a plan.
+	//
+	// voiceTasks is nil unless this process really has a task entry AND a pipeline
+	// behind it: residentTaskSource is a non-nil handle with a nil run on several
+	// degraded branches, and handing that to the voice leg as a sink would turn a
+	// transcript into a nil dereference. Nil is said out loud by the leg (the
+	// transcript stays in the readings and the line says it had no receiver).
+	var voiceTasks voiceTranscriptSink
+	if src != nil && src.run != nil {
+		voiceTasks = src
+	}
+	raudio.attachVoice(startResidentVoice(rt, raudio, rb, voiceTasks))
+
 	// The boot report names the steps this process really owns, taken off the
 	// registration rather than off a comment (AC#4's "不许撒谎" half).
 	registered := rt.RegisteredShutdownSteps()
@@ -471,6 +500,11 @@ func runResident() {
 	// the default and this leg's ruling forbids flipping, Ball.SetAudioLevel
 	// returns at once (internal/ball/liquid_windows.go:52).
 	fmt.Printf("wisp: 采集腿：%s\n", raudio.posture())
+	// Ticket 15e AC#1's last sentence, said as a reading: does the seam have a
+	// consumer, and (once a model hand-off has happened) what did it do. Taken off
+	// the same handle the capture line's consumer half reads, so the two lines
+	// cannot disagree about whether anything drains the C8 channel.
+	fmt.Printf("wisp: 语音链：%s\n", raudio.voice.posture())
 
 	// The boot report has to match what happens next: if an exit request already
 	// arrived during the ball path, printing "resident event loop running" and then

@@ -238,6 +238,23 @@ type residentBall struct {
 	// truth and the push is literally (*ball.Ball).SetTrayChecks.
 	trayMuteRead  func() (muted, ownsGate bool)
 	trayCheckPush func(muted, pausedWake bool)
+	// wakePauseToggle and wakePauseRead are ticket 15e's two halves of "the tray
+	// may pause the wake listener": the executor that flips the voice chain's
+	// paused bit and the reader that answers whether that listener exists and what
+	// it now is. They are attached late for the same reason muteGate is (the ball
+	// is built before the leg that owns the listener), under the same lock, and
+	// nil is the pre-15e shape - said out loud by mirrorTrayMute instead of being
+	// invented as a false.
+	wakePauseToggle func() (outcome string, executed bool)
+	wakePauseRead   func() (paused, ownsListener bool)
+	// voiceStates is every D43 state the voice leg (resident_voice_windows.go)
+	// projected onto this ball, oldest first. It is a record, not a flag: the
+	// projection's claim is "the orb really walked these states, in this order",
+	// and the boot report/test reads it back rather than trusting a comment.
+	// voiceStateMu is what makes that readable from the boot goroutine while the
+	// asr-infer goroutine writes it.
+	voiceStateMu sync.Mutex
+	voiceStates  []statemachine.State
 }
 
 // ballHotkeyBridge258 carries the reloader handle the host installed. The type
@@ -384,7 +401,7 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 			OnPanelHotkey:   hs.requestPanelOpen("panel-hotkey"),
 			OnTrayPanel:     hs.requestPanelOpen("tray-open-panel"),
 			OnTrayMute:      func() { rb.muteGesture("tray-mute") },
-			OnTrayPauseWake: func() { recordBallGesture("tray-pause-wake") },
+			OnTrayPauseWake: func() { rb.pauseWakeGesture() },
 			// Ticket 228 AC#11: the tray's Exit item is the one gesture in this host
 			// that both has an executor and says which. hs.requestStop is the value
 			// the assembly root injected (residentTrayStop228 in
@@ -520,8 +537,12 @@ func (rb *residentBall) stop() {
 //     (cmd/wisp/resident_task_source_windows.go), but it reads the console, and
 //     nothing here turns a click on the orb into a task; that hop is not this
 //     ticket's to invent.
-//   - the tray's pause-wake item: the wake-word listener it would pause lives in
-//     internal/speech, which is unwritten, and wake_word.enabled ships false.
+//   - the tray's pause-wake item: as of ticket 15e it HAS an executor when this
+//     process assembled a voice chain (residentVoice.togglePause), and the
+//     checkmark's second bit then follows that listener's own paused flag. Before
+//     15e the wake-word listener it would pause lived in internal/speech, which
+//     was then only a doc.go; waking by keyword is still ticket 41's, and this
+//     leg pauses the VAD/ASR chain, not a KWS engine.
 //   - the drag end and the tray Exit item state their own reasons
 //     (recordBallDragEnd, recordTrayExit) instead of this one.
 //
@@ -530,8 +551,9 @@ func (rb *residentBall) stop() {
 // always work" would become the lie the moment a host starts without it.
 const ballGestureWhy = "no executor was handed to this ball host for this gesture; the gestures with one are the " +
 	"cancel key when the assembly root injected an approval gate (ticket 246), the panel gestures when it " +
-	"injected a panel host (ticket 33) and the two mute gestures when this process assembled a capture leg " +
-	"(ticket 290) - what is left is recorded by name, never invented"
+	"injected a panel host (ticket 33), the two mute gestures when this process assembled a capture leg " +
+	"(ticket 290) and the tray's pause-wake item when it assembled a voice chain (ticket 15e) - what is left " +
+	"is recorded by name, never invented"
 
 // attachMuteGate hands this host the executor that turns a mute gesture into a
 // flip of this process's capture gate (ticket 290 AC#2). The assembly root calls
@@ -554,6 +576,100 @@ func (rb *residentBall) currentMuteGate() muteGestureFunc {
 	rb.muteMux.Lock()
 	defer rb.muteMux.Unlock()
 	return rb.muteGate
+}
+
+// attachWakePause hands this host both halves of ticket 15e's pause-wake hop:
+// `toggle` is the voice chain's own executor (it flips the chain's paused bit and
+// answers the sentence it said plus whether it really paused something), `read`
+// is the chain's answer about whether a listener exists and what its paused bit
+// now is. The assembly root calls it once, right after the voice leg exists, and
+// it is the only writer.
+//
+// Both halves are optional on purpose, exactly like the mute projection: a boot
+// with no voice chain attaches nothing, and mirrorTrayMute then writes the
+// pre-15e shape (a literal false) instead of a checkmark nobody can support.
+func (rb *residentBall) attachWakePause(toggle func() (string, bool), read func() (bool, bool)) {
+	if rb == nil {
+		return
+	}
+	rb.muteMux.Lock()
+	defer rb.muteMux.Unlock()
+	rb.wakePauseToggle = toggle
+	rb.wakePauseRead = read
+}
+
+// currentWakePauseToggle and currentWakePauseRead read the pair back under the
+// same lock the attach took, so the ui-sta thread can never see half a handoff.
+func (rb *residentBall) currentWakePauseToggle() func() (string, bool) {
+	if rb == nil {
+		return nil
+	}
+	rb.muteMux.Lock()
+	defer rb.muteMux.Unlock()
+	return rb.wakePauseToggle
+}
+
+func (rb *residentBall) currentWakePauseRead() func() (bool, bool) {
+	if rb == nil {
+		return nil
+	}
+	rb.muteMux.Lock()
+	defer rb.muteMux.Unlock()
+	return rb.wakePauseRead
+}
+
+// pauseWakeGesture is what the tray's pause-wake item runs (ticket 15e). With an
+// executor attached it flips the voice chain's paused bit, says the chain's own
+// sentence and re-projects the checkmark; without one it records the gesture as
+// unhosted in exactly the words the pre-15e file used, so a boot that built no
+// chain still says the true thing instead of reporting a pause nobody performed.
+//
+// It runs ON the ui-sta thread, so it may only do non-blocking work: the toggle is
+// one atomic and at most one D43 dispatch, and the projection is a PostTask
+// (internal/ball/sta_windows.go documents that as safe from any goroutine and
+// non-blocking). The ASR work itself stays on the asr-infer thread.
+func (rb *residentBall) pauseWakeGesture() {
+	toggle := rb.currentWakePauseToggle()
+	if toggle == nil {
+		recordBallGesture("tray-pause-wake")
+		return
+	}
+	sentence, executed := toggle()
+	slog.Info("ball: tray pause-wake", "executed", executed, "say", sentence)
+	fmt.Printf("wisp: %s\n", sentence)
+	rb.mirrorTrayMute()
+}
+
+// setVoiceState is the voice leg's projection hop onto the orb (ticket 15e): it
+// records the D43 state and, when this process really holds a window, posts it to
+// the ball. The record is what makes "the orb walked Listening -> Thinking" a
+// reading; the post is the same Ball.SetState hop the approval gate's UI already
+// uses (resident_approval_windows.go:991), so no new dependency edge and no new
+// thread are involved.
+//
+// nil rb is legal and means what it always means here: a boot that never created
+// a window still runs the voice chain, and the state it would have shown is on
+// record instead of panicking the leg.
+func (rb *residentBall) setVoiceState(s statemachine.State) {
+	if rb == nil {
+		return
+	}
+	rb.voiceStateMu.Lock()
+	rb.voiceStates = append(rb.voiceStates, s)
+	rb.voiceStateMu.Unlock()
+	if rb.b != nil {
+		rb.b.SetState(s)
+	}
+}
+
+// voiceStatesSnapshot is every state this ball was projected onto, oldest first.
+func (rb *residentBall) voiceStatesSnapshot() []statemachine.State {
+	if rb == nil {
+		return nil
+	}
+	rb.voiceStateMu.Lock()
+	defer rb.voiceStateMu.Unlock()
+	return append([]statemachine.State(nil), rb.voiceStates...)
 }
 
 // attachTrayMuteProjection hands this host the two halves of ticket 293 AC#2's
@@ -589,25 +705,25 @@ func (rb *residentBall) attachTrayMuteProjection(read func() (bool, bool), push 
 // and does not wait), so this neither blocks the message pump nor needs a thread
 // of its own: no new goroutine (D38b's resident roster stays at its booked six).
 //
-// The push's SECOND argument is a literal false, and that asymmetry is the point
-// rather than an oversight (ticket 293's ruling, 禁区②):
+// The push's SECOND argument is the pause-wake checkmark, and its history is the
+// reason this comment is long (ticket 293's ruling 禁区②, re-derived by 15e):
 //   - the mute half has a truth source to read (the gate), so leaving it undriven
 //     would show "not muted" next to a microphone the user just opened - a lie
 //     about privacy, which is what this whole hop exists to stop;
-//   - the pause-wake half has NOTHING to read yet: the wake-word listener it
-//     would pause lives in internal/speech, which is still only a doc.go, the
-//     shipped [voice].wake_word.enabled default is false, and the tray's
-//     pause-wake item is still an unhosted gesture booked by name
-//     (recordBallGesture, Events.OnTrayPauseWake above). Unchecked is therefore
-//     the true reading today, not a suppressed one; inventing a flag to make the
-//     two arguments look symmetric would create exactly the second authority
-//     this ticket forbids.
+//   - the pause-wake half had NOTHING to read until ticket 15e: the listener it
+//     would pause lived in internal/speech, which was then only a doc.go. It has
+//     one now (the voice chain's paused bit, attached through attachWakePause),
+//     so the same rule applies to it: a listener that exists and is paused must
+//     not be shown unchecked, and a boot that built no listener must not be shown
+//     as "not paused" - it is shown unchecked because there is nothing to report,
+//     and ownsListener=false is how this function knows the difference.
 func (rb *residentBall) mirrorTrayMute() bool {
 	if rb == nil {
 		return false
 	}
 	rb.muteMux.Lock()
 	read, push := rb.trayMuteRead, rb.trayCheckPush
+	wakeRead := rb.wakePauseRead
 	rb.muteMux.Unlock()
 	if read == nil || push == nil {
 		return false
@@ -618,7 +734,13 @@ func (rb *residentBall) mirrorTrayMute() bool {
 		// so there is no mute state to show and nothing is written.
 		return false
 	}
-	push(muted, false)
+	paused := false
+	if wakeRead != nil {
+		if p, ownsListener := wakeRead(); ownsListener {
+			paused = p
+		}
+	}
+	push(muted, paused)
 	return true
 }
 

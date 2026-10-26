@@ -14,16 +14,16 @@ package main
 //
 // WHAT THE PRODUCTION TRIGGER ACTUALLY IS, stated verbatim from the spec rather
 // than invented here. SPEC-04 §7.1: "首次使用某能力时下载对应模型" - the
-// download is specced to start when a capability is first used. That capability
-// does not exist in this tree: internal/speech is a doc.go-only boundary stub
-// (DEFERRED: ticket 15/26/41 per its own doc.go) and there is no
-// engines directory under internal/, so nothing loads model bytes into memory and
-// "first use of a capability" has no code behind it yet. `wisp models ensure`
+// download is specced to start when a capability is first used. Until ticket 15e
+// this paragraph was honest about the gap: internal/speech was a doc.go-only
+// stub, nothing loaded model bytes into memory, and "first use of a capability"
+// had no code behind it. 15e closed it; that call site is named below.
+// `wisp models ensure`
 // is therefore the hand-off point that DOES exist - a real process, a real
 // signature-verified manifest, a real re-verification - and it is deliberately
 // not dressed up as the engine's call site. Whichever ticket lands
-// internal/speech owns adding its own handOffModel call; this file cannot
-// become that reader by wishing, and AC#5 below says what that leaves open.
+// internal/speech owns adding its own handOffModel call. Ticket 15e added it
+// (resident_voice_windows.go's residentVoiceHandOff); AC#5 says what stays open.
 //
 // AC#5, THE RESIDUAL WINDOW THIS WIRING DOES NOT CLOSE (ticket 109's R-109-1,
 // not "fixed", not glossed over). handOffModel returns *after* VerifyInstalled
@@ -33,11 +33,11 @@ package main
 // internal/models/no_seal_ruling_windows_test.go), so every principal the
 // parent grants write to owns that span, and a swap landing after the return is
 // invisible to this process. What is NOT true after this wiring: that the
-// window is *reachable*. There is still no reader of model bytes anywhere in
-// `cmd/wisp`'s dependency graph - this process never opens a file under
-// <store>/<id>/, it only re-hashes it - so the segment has no end point in the
-// product today. It gets an end point the moment an engine loader is wired, and
-// closing it then is that ticket's work, not a sentence in this comment.
+// window is *reachable*. Until ticket 15e there was no reader of model bytes
+// anywhere in `cmd/wisp`'s dependency graph; 15e wired the first one (resident_
+// voice_windows.go opens <store>/<id>/encoder.int8.onnx after the walk returned
+// 0), so the segment now HAS an end point in the product. What stays open is
+// the span between that return and that open; closing it is another ticket's work.
 //
 // The dependency direction stays what this package has always held: cmd/wisp may
 // know every layer at once, layers know nothing of each other. models and
