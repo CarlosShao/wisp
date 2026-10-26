@@ -26987,3 +26987,50 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **⑩ ★状态**＝**在飞 1**（`15c-r1` 流式 ASR）｜**HEAD** `1f2bae2a7` 之后
 ★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **1**、★**摆机主 0 件**
 ★**下一步**：★**`15-d`（CER 量具）可以派**（★**语料已定**）＋ ★**把"wav 入库＋LICENSE＋sources.tsv"写进 `15-d` 的派单**
+
+## A1260（2026-10-26 17:0x +08，编排者）★★★收 `15c-r1`（票 15 第三片 流式 ASR）：**`1274 insertions / 0 deletions`**（只增不改）｜★★★**反向判据的 `B` 那发证明"流式真的在流"**（首字延迟 `640ms→2002.6ms`＝2.5×、flush `1.05ms→214.6ms`＝205×）｜★★**它给了 `staging` 的机理级说明**｜★**并认出 `15-d` 的在飞件、没当自己的**
+
+**① ★★收 `15c-r1`（`a736ad0ea` ＋ `37aadd1ec`；件 `docs/evidence/s1/15c-r1-impl.md` **149 行**）**
+- ★★★**`numstat 1274 insertions / 0 deletions`** ⇒ ★**只增不改**（★**这条比什么都硬**）
+- ★**`git show --name-only` 恰好 5 行、`cmd/` 命中 **0****
+- ★★**28 PASS / 0 FAIL / 0 SKIP、`rc=0`**（staging 现跑）
+
+**② ★★落地了什么（4 文件 39,257 B、纯新增）**
+- ★`asr.go`：★**流式 Paraformer(int8) 会话**。★**一个 recognizer 常驻 ＋ 每句租一条 stream**（★**165MB encoder 只加载一次**）；★`IntraOpThreads` 钉 **1**；★**`EnableEndpoint: 0`** ⇒ ★**判停仍归 Go**（★**与 `15-b` 把 silero 的 `min_silence/min_speech` 钉 0 是同一条理由**）
+- ★`transcriber.go`：★**把 `Detector`(15-b) 与 `StreamingAsr` 焊成一条缝**
+  ★★★**`EndpointStart` 不带音频** ⇒ ★**它按 `ep.Total` 从环形缓冲精确回放 `MinSpeech` 预卷**（★**句首不被截掉、且回放长度是精确值不是近似**）
+- ★★**停手四条全未触发**：★模型三枚在仓、★**流式 Paraformer 的 Go 绑定存在**（`sherpa.NewOnlineRecognizer/OnlineStream/AcceptWaveform/Decode/GetResult`）、★不需碰 `cmd/wisp`、★**未改 `endpoint.go`／`vad.go` 一字节**（**7 枚 15-b 文件 blob 全部 `git hash-object == HEAD`**）
+
+**③ ★★★九项读数（关键值）**
+| # | 读数 |
+|---|---|
+| ★1 | ★★**partials 时序表**（3s 合成谐波栈、逐 32ms 帧）：★帧 **44**→#1「哦」、帧 **63**→#2、帧 **82**→#3；★**句起点由 `fed` 反推 ＝ 第 34 帧（1088ms）**；★**节奏 608ms ＝ 19 窗 ＝ Paraformer chunk 粒度（模型属性）** |
+| ★★2 | ★**首字延迟 640ms ≤ 800ms**（余量 160ms）；★**另给 SPEC 原措辞口径：判停→final 仅 1.05ms** |
+| ★3 | ★**WER（合成、未用真实语料）**：脚本件 E/F **0.20**（S=0 D=4 I=0 over 20 词）；★**已明标"这不是词级准确率、真 WER 是 `15-d` 的基线集"** |
+| ★★★4 | ★**反向判据三读数**：★`A IntraOpThreads 1→4` ⇒ **`rc=1`、3 红**（★逐字「`NumThreads = 4, want the literal 1`」＋`15-b` 的 `TestIntraOpThreadShape` 3.79 核）；★★★**`B` 流式→整段 ⇒ `rc=1`、3 红、句内 **0 partial**、首字延迟 **640ms→2002.6ms（2.5× 预算）**、flush 腿 **1.05ms→214.6ms（205×）**；★`C` 还原 ⇒ **`rc=0` 28/28**；★**还原核在最后一发变异之后**＋★**两条独立核**（`vad.go` blob＝HEAD、树内 `MUTANT` 标记 0 命中） |
+| ★5 | ★见 ①（`numstat`）|
+| ★★★6 | ★**`staging` 的**机理级**说明**：★**Windows DLL 搜索序 ＝ 主模块目录 → `System32` → … → `PATH`**；★**`go test` 把二进制建在临时目录、那里没有 `onnxruntime.dll`** ⇒ **落到 `System32` 的 1.17.1** ⇒ ★**`OrtGetApi(28)` 返 NULL ⇒ `0xc0000005` 崩整个二进制**；★**`PATH` 排在 `System32` **之后**、顶不到前面**；★**实证**：staging 映像 `…\bin\onnxruntime.dll` **1.28.2**、`System32` 那枚 **1.17.260311…** |
+| ★7 | ★**正控**：★**3s 数字静音 ＝ 0 partial/0 final**、★**两层都测**（整条缝 ＋ 绕过 VAD 的纯 recognizer）⇒ **静音幻觉有双保险** |
+| ★8 | ★**四数**：`internal/speech` **7 文件/49,825 B → 11 文件/89,082 B（+39,257）**；`internal/audio` **零字节＋独立跑 `rc=0 ok 15.946s`**；`cmd/wisp` 定向（带 `PATH`）**PASS** |
+| ★9 | ★**格式甲乙两尺皆空**（★**中途一次 `gofumpt` 报 `internal/speech/cer/norm_test.go` —— 那是**并存 `15-d` 腿的在飞件、不在它写面** ⇒ ★**它认出来了** ✅）|
+
+**④ ★★★它给的"会改下游"三条（全收、都很要紧）**
+1. ★★★**"裸跑"的口径有三层**：★**什么都不给 ⇒ `0xc0000135`**（**进程起不来、⛔ 测试红**）／★**给 `PATH` ⇒ 能起来但拿 `System32` 的 1.17.1 ⇒ 崩或具名 skip**／★**staging ⇒ 才拿全绿**
+   ★★**而 `15-b` 报"裸跑 8 过/8 skip"与 `15-c` 报"10 过/18 skip"**口径不同**（★**包长大了**）⇒ **⛔ 当矛盾**
+   ⇒ ★**已写进检查表第 15 处、这次的机理级说明补上了**
+2. ★★★**算球延迟必须两段相加**：★**「silero 开句迟 **1088ms**（本合成夹具实测）＋ chunk **640ms**」** ⇒ ★**只算后者会低估近 **1.7 倍****
+   ★★**且两段都会随真语料变、⛔ 当常量**
+3. ★★**判停→final 只有 ~1ms** ⇒ ★**`SPEC-04:114` 那条 800ms 在本引擎上几乎没有成本**、★**延迟全在前面两段**
+   ⇒ ★**这是 `15-a1` 选流式的实测支撑**、★**也是"离线档 1500ms 省不下这条、反而把首字推到句尾"的量化依据**
+
+**⑤ ★★它自陈未做（⛔ 越界）**
+★AC5 的一次重试与「没听清」策略（★**载体已有：静音句出的是 `final ""`**）／★配置键（800ms/80 维/greedy 全是包内常量）／★真语料 CER（`15-d`）／★`handOffModel` 接线与球走态（`15-e`）
+- ★**包内零 goroutine、零裸 `go func(`、零墙钟超时**（时长一律按样本计）
+
+**⑥ ★派 `15e-r1`（票 15 最后一片、唯一碰 `cmd/wisp` 的一片）**
+- ★**三件**：★①`cmd/wisp/models.go:25` 的 `handOffModel` 接线 ②`resident_audio_windows.go:57-63`／`:373` 的 C8 帧通道消费者（★**"nothing drains it" 那个洞**）③`resident_ball_windows.go:522,596` 的唤醒监听暂停
+- ★**必给**：★**端到端一发（钩子被调几次、参数是什么）** ／★**球走态 `Listening→Thinking` 时序** ／★**C8 帧通道"0→1 消费者"的读数** ／★**延迟两段实测** ／★**反向判据（摘掉 `handOffModel` 必红）** ／★**正控（静音不调钩子）**
+- ★**硬边界**：★⛔ 动 `internal/speech` 既有语义 ／⛔ 动 `internal/audio` ／⛔ 加配置键 ／⛔ 动 `testdata/**`（有并存腿）
+
+**⑦ ★状态**＝**在飞 3（`15d-r1` CER 计算器 ／ `15d2-r1` 基线集 ／ `15e-r1` 装配）**、★**goal 已 resume（`active`/`armed`、`29/256` 轮、**无过期机制**）**
+★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **2**、★**摆机主 0 件**
