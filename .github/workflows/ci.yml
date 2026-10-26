@@ -675,6 +675,62 @@ jobs:
         if: ${{ !cancelled() }}
         run: bash scripts/portable-tests.sh --scope=core
 
+      # ADDED STEP ONLY (ticket 15 AC#2, leg cerci-r1): no existing step was moved,
+      # edited, deleted, given a new `if:`, or made continue-on-error.
+      #
+      # WHAT THIS IS. SPEC-10:60-61 and SPEC-04:125 say the two baseline wav sets "must
+      # be committed into testdata/asr-baseline/ and run with CI - otherwise the
+      # baseline is empty talk". Both halves exist now: the corpus (60 near_clean / 40
+      # noisy_far, 205 tracked files, frozen 5-column sources.tsv) and the calculator +
+      # 6%/15% gate in internal/speech/cer. What was missing is a CI verdict over them.
+      # This step is that verdict.
+      #
+      # WHAT IT PROVES, so it is not read as more than it is:
+      # TestBaselineCorpusIsCommittedAndTheGateCanRun loads both committed sets through
+      # the frozen manifest, re-hashes all 100 .wav files against their recorded
+      # sha256, requires the two conditions to share no speaker, then scores a perfect
+      # hypothesis (must PASS at CER 0) and an empty one (must FAIL at CER 100%) through
+      # the same thresholds the product uses.
+      #
+      # WHAT IT DOES NOT PROVE, stated rather than left to be discovered: no real ASR
+      # hypothesis is scored here. The 6%/15% thresholds (internal/speech/cer/gate.go,
+      # SPEC-10:60) are EXERCISED, not MET - measuring a real recogniser against this
+      # corpus needs the model files, which are not committed, and is the end-to-end
+      # ASR leg (ticket 15-e). No threshold here was moved to make that leg easier.
+      #
+      # WHY A SEPARATE STEP even though the core scope above now claims the package as
+      # well: the claim is what GUARD C/D and the package census audit, and the package
+      # lists live in scripts/portable-tests.sh (ticket 111 AC#2 - this file carries no
+      # tier list). This step is the ATTRIBUTABLE reading: the run page shows "the CER
+      # gate ran" as its own conclusion instead of one package line inside the core
+      # scope step. Precedent, not a new shape: ./internal/proc/ is in the core scope
+      # and still has its own `Environment fork assertion` step above.
+      #
+      # WHY THE STRICT RUNNER AND NOT `go test`: bare `go test` books a SKIP as `ok`,
+      # and this package's corpus test skipped by name for exactly as long as the corpus
+      # was absent - tools/d22scan/runtests.sh:234-239 makes any `--- SKIP` fatal
+      # ("either make the step's scope exclude it or run it where it can execute; do not
+      # relax this script"). With the corpus committed the package reads PASS=24 FAIL=0
+      # SKIP=0 on a windows host, so the runner is satisfied by fact, not by relaxation.
+      # No continue-on-error, no `if: false`, no skip flag, no threshold touched (D22
+      # run-away mode 6): a red here fails the job like every other gate.
+      #
+      # WHY `if: ${{ !cancelled() }}`: the guard every other non-setup step in this job
+      # already carries (ticket 111 AC#5). This job has known-red steps above it, and an
+      # unguarded step below a red one is reported `skipped` and prints nothing.
+      #
+      # WHY UBUNTU AND WHY THE SUBPACKAGE: internal/speech/cer is pure Go - zero cgo,
+      # zero //go:build lines, zero t.Skip outside the named absent-corpus branch - so
+      # it needs no audio device, no GPU and no native library, and `GOOS=linux go test
+      # -c` builds it. The PARENT package ./internal/speech/ is NOT wired here: it dies
+      # at load time without the three sherpa DLLs and it needs third_party/spike-models
+      # (a fetched directory, 0 tracked files), which is a self-hosted/staging problem,
+      # not a hosted-runner one. Its absence from CI is registered on the ticket instead
+      # of being papered over with a skip flag.
+      - name: "CER gate over the committed ASR baseline (ticket 15 AC#2; SPEC-10:60-61, SPEC-04:125)"
+        if: ${{ !cancelled() }}
+        run: bash tools/d22scan/runtests.sh ./internal/speech/cer/
+
       - name: Stop compose services
         if: always()
         run: docker compose -f docker/compose.test.yml --profile test down

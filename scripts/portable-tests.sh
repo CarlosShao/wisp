@@ -232,6 +232,32 @@ fi
 # compile-only claim - `GOOS=linux go vet` cannot produce either number.
 # The windows half stays where ticket 110 put it (its own step, own guards); the
 # two legs now cover different files of the same package, which is the point.
+#
+# ./internal/speech/cer/ JOINED THE CORE LIST 2026-10-26 (ticket 15 AC#2, leg
+# cerci-r1), and this paragraph is the reason rather than a description. SPEC-10:60-61
+# and SPEC-04:125 require the two committed sets under testdata/asr-baseline/ to run
+# WITH CI ("otherwise the baseline is empty talk"), and this package is the reader and
+# the 6%/15% gate that scores them. It is claimable on the portable tier for measured
+# reasons, not for convenience: ZERO cgo directives, ZERO //go:build lines, four test
+# files that compile on both platforms, and - now that the corpus and the frozen
+# 5-column sources.tsv are committed - `tools/d22scan/runtests.sh ./internal/speech/cer/`
+# reports PASS=24 FAIL=0 SKIP=0, so the claim buys a real denominator instead of a
+# green over nothing. Before this line the package sat UNCLAIMED-HAS-TESTS on the
+# census the windows leg runs (a package that runs only on laptops is the hole ticket
+# 111 AC#1 was filed for). The scope entry and the pin line move in the SAME commit
+# because GUARD C compares them.
+#
+# ./internal/speech/ IS DELIBERATELY NOT CLAIMED, here or in any other tier, and that
+# is a reading rather than an omission: the parent package dies at LOAD time without
+# the three sherpa DLLs (`go test ./internal/speech` = `exit status 0xc0000135` before
+# a single test runs), it locates its models under third_party/spike-models (a fetched
+# directory: `git ls-files third_party` = 0 files), and it carries 7 `t.Skip*` sites
+# that fire whenever a session cannot be created. tools/d22scan/runtests.sh:234-239
+# makes ANY `--- SKIP` fatal by design, so claiming it without a carrier that stages
+# the DLLs and the models would be a permanent red - and silencing those skips is
+# exactly what that runner exists to refuse. It stays on the census as
+# UNCLAIMED-HAS-TESTS until such a carrier claims it; nothing is hidden by leaving it
+# off this list.
 mode=core
 case "${1-}" in
     --scope=*) mode=${1#--scope=}; shift ;;
@@ -266,6 +292,7 @@ github.com/CarlosShao/wisp/internal/projctx
 github.com/CarlosShao/wisp/internal/risk
 github.com/CarlosShao/wisp/internal/secret
 github.com/CarlosShao/wisp/internal/session
+github.com/CarlosShao/wisp/internal/speech/cer
 github.com/CarlosShao/wisp/internal/statemachine
 github.com/CarlosShao/wisp/internal/tools
 github.com/CarlosShao/wisp/internal/winsec
@@ -323,6 +350,7 @@ core)
         ./internal/panel/... ./internal/ball/ ./internal/perm/
         ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
         ./internal/session/ ./internal/projctx/
+        ./internal/speech/cer/
     )
     pinned=$core_pin
     ;;
