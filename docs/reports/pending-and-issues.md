@@ -27275,3 +27275,43 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **⑧ ★状态**＝**在飞 2**（`15d3-r1` 小修 ／ `15-v1` 终裁）、★**goal `active`/`armed`**
 ★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **2**、★**摆机主 0 件**
+
+## A1265（2026-10-26 18:1x +08，编排者）★★★收 `15d3-r1`（小修）：**`LoadSet` 改前 `rc=1` → 改后 `rc=0`**（读入 60+40、`VerifyManifest` 逐 wav 重算 sha256 全对上）｜★★**零改动证明用了**两把尺****（`--numstat` ＋ `git ls-tree` 逐条 blob hash）｜★★★**但有一条必须修**：**生成器仍写 10 列 ⇒ 下次重跑就打回原形** ⇒ **已派 `15d4-r1`**
+
+**① ★★收 `15d3-r1`（`c6ea9f66e` 数据＋README ＋ `3647ea32d` 件；件 `15d3-r1-impl.md` **118 行**）**
+- ★**只碰 4 个文件**；★`internal|cmd` 命中 **0**、★`.wav/.txt` 命中 **0**、★`LICENSE` 未现
+- ★**开工前 `git diff --cached` 为空、现在索引也空** ✅
+
+**② ★★★八项读数（全对、且很细）**
+| # | 读数 |
+|---|---|
+| ★★★1 | ★**改后表头逐字**：★`file^Isha256^Ispeaker^Icondition^Iorigin$` ⇒ **5 列**（★**101/101 行唯一值 `{5}`、UTF-8 无 BOM、LF-only**）|
+| ★2 | ★**101 行**（1 表头 ＋ 100 数据；`near_clean` 60 在前、`noisy_far` 40 在后、**顺序逐行照搬**；★**`file`/`sha256`/`speaker`/`condition` 四列值逐字未改**）|
+| ★★★3 | ★**`LoadSet` 改前 vs 改后**：★**改前 `rc=1 FAIL`**（逐字 `cer: baseline manifest header is not the frozen one: line 1 is "file\tsha256\tsource_utt_id\t…\ttext_norm", want "file\tsha256\tspeaker\tcondition\torigin"`）；★★**那条「`testdata` 不存在⇒具名 SKIP」已**转成真跑、且是红的****（**⛔ SKIP**）；★★★**改后 `rc=0 ok`**、`--- PASS: TestBaselineCorpusIsCommittedAndTheGateCanRun`、★**读入 60 `near_clean` ＋ 40 `noisy_far`**、★**`VerifyManifest` 逐个 wav 重算 sha256 全对上**、★**两集 speaker 无交集** |
+| ★4 | ★**`sources-extra.tsv` ＝ 101 行 × 6 列**（`file`/`source_utt_id`/`duration_s`/`snr_db`/`noise_source`/`text_raw`）、★**行序与 `sources.tsv` 相同**；★★**`text_norm` 不搬：100/100 行与同名 `.txt` 逐字相同** |
+| ★★★5 | ★**零改动证明（**两把尺**）**：★`--numstat` 只有 3 行（`README.md 24/7`／`sources-extra.tsv 101/0`／`sources.tsv 101/101`）⇒ **200 个数据件根本不在 `numstat` 里**；★★**更强的尺**：★**`git ls-tree -r` 比对 `c6ea9f66e^` 与 `c6ea9f66e` 的 `near_clean/`+`noisy_far/` ⇒ **两侧各 200 条、逐条 blob hash 全同**** |
+| ★★6 | ★**`origin` 的选择（很细）**：★`near_clean` → `aishell-1`；★**`noisy_far` → `aishell-1+thchs30-noise`**；★**理由**：★**两种条件的语句都取自 AISHELL-1、`noisy_far` 只是加了 THCHS-30 噪声**（`cafe`/`car`/`white` ＝ 14/13/13、**三件都来自 SLR18 `resource.tgz`、`README:150-156` 已钉**）⇒ ★★**"若也写 `aishell-1` 就抹掉「这是加噪模拟件」这条真来源信息"** ✅；★**用小写的依据**：★`sources.go:46` 的 `AISHELL-1:…` 只是注释 `e.g.`、★`:169` **只判非空、⛔ 无格式约束**；★**⛔ 未把 utt id 塞进 `origin`**（★**`file` 的 stem **就是** utt id、100/100 行相等、再写一遍冗余**）✅ |
+| ★★7 | ★**抽 5 句对核**（★**规则可复跑**：`Get-Random -SetSeed 20261026`、near 3 / far 2 ⇒ 行 2/5/6/64/65）：★**6 项 × 5 行全 True**（`file` 相同／`sha256` 从盘上重算相等／`stem==source_utt_id`／`speaker==utt[6:11]`／`condition==file 首段`／`.txt`==`text_raw`）；★**`origin` 与 `noise_source` 两向自洽**（`snr/noise` 非空 ⇔ `noisy_far` ⇔ `origin` 带 `+thchs30-noise`）✅ |
+| ★8 | ★**甲乙两尺**：甲 `gofumpt -l internal cmd tools scripts`（**CI gofmt 步同口径**）⇒ **3 条既存假红**（`gofmt -l` 同 3 条）；★乙 `go vet ./...` ⇒ **`rc=0` 绿**；★**本腿提交 `.go` 命中 0、两尺读数与改动无交集** |
+
+**③ ★★三条遗留（它没越界、交我决定）**
+1. ★★★**`testdata/asr-baseline/tools/make_asr_baseline.py` **仍生成 10 列 `sources.tsv`****（★`tools/` 不在它写面）
+   ⇒ ★★**"有人照 `README`「Regenerating」重跑会把形状打回 10 列、再撞 `ErrManifestHeader`"**
+   ⇒ ★★★**生成器与交付**不一致**** ⇒ **下次重跑就破** ⇒ ★**已派 `15d4-r1` 修生成器**
+2. ★**`README.md` 目录树块第 17 行 `sources.tsv   100 data rows` 未改**（★**该句仍为真**；新件已在下面新加的「`sources-extra.tsv`」小节逐列说明）
+   ⇒ ★★**我拍：⛔ 改**（★**☑ 该句仍为真 ⇒ ⛔ 为完美而改真话**）
+3. ★**`15d2-r1-impl.md` 对 10 列的历史描述未回改**（**只追加不删原则**）
+   ⇒ ★★**我拍：⛔ 回改**（★**☑ ⛔ 改写历史**）
+
+**④ ★★派 `15d4-r1`（生成器小修）**
+- ★**做三件**：①★**让脚本生成**两件**（5 列 `sources.tsv` ＋ 6 列 `sources-extra.tsv`、列序/表头/行序照现有交付）②★**并生成 `origin`**（`near_clean` → `aishell-1`、`noisy_far` → `aishell-1+thchs30-noise`）③★**`README` 的「Regenerating」补一句**
+- ★★★**核心验收判据**：★**重跑后两件 tsv 的 sha256 与提交里**逐字节相同****
+- ★★**做法**：★**在仓外临时目录重跑**（⛔ 覆盖仓内文件）、再 `sha256sum` 比
+- ★**硬边界**：★⛔ 动 200 个数据件／⛔ 动两份 tsv（**只改脚本**）／⛔ 动 `internal/**`（`sources.go` 是冻结方）／⛔ 动 `LICENSE`
+
+**⑤ ★★`15d3-r1` 的一处判断很值得记**
+- ★★★**它把「`testdata` 不存在 ⇒ 具名 SKIP」那条**转成真跑**并**如实报红****
+  ⇒ ★**这证明 `15d-r1` 的"⛔ 永远绿"设计是**有效的****（★**数据一到位就真跑、且真能红**）✅
+
+**⑥ ★状态**＝**在飞 2**（`15d4-r1` 生成器 ／ `15-v1` 终裁）、★**goal `active`/`armed`**
+★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **2**、★**摆机主 0 件**
