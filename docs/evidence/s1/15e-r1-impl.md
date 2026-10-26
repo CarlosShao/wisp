@@ -1,7 +1,7 @@
 # 票 15e 装配与端到端腿 `15e-r1` —— 落地件（写腿）
 
 > **尺**：`HEAD=12be96ad3`（`dev`），现跑 2026-10-26 16:57–17:35 +08。★**十项读数逐条在 §1–§10**，全为现跑，⛔ 转述。
-> **写面**：`cmd/wisp/**` —— **改 4 枚**（`models.go` 注释、`resident_audio_windows.go`、`resident_ball_windows.go`、`resident_windows.go`）＋ **新 2 枚**（`resident_voice_windows.go` 954 行／40,678 B、`resident_voice_15e_windows_test.go` 670 行／28,686 B），＋本文件。
+> **写面**：`cmd/wisp/**` —— **改 4 枚**（`models.go` 注释、`resident_audio_windows.go`、`resident_ball_windows.go`、`resident_windows.go`）＋ **新 2 枚**（`resident_voice_windows.go` **1022 行**／40,678 B、`resident_voice_15e_windows_test.go` **718 行**／28,686 B），＋本文件。
 > **零字节**：`internal/**`（含 `internal/speech`／`internal/audio`／`internal/models`）、`testdata/**`、`frontend/**`、`design/**`、`scripts/**`、`.github/**`、票面、台账、`docs/specs/**`。
 > **临时件（只建不删）**：`D:\tmp\wisp\20261026\15er1\{bin,cases,logs,mut,overlay}`。★**变异走仓外件 ＋ `-overlay`** ⇒ **工作树零突变窗口**。
 
