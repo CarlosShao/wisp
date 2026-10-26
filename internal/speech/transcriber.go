@@ -50,6 +50,13 @@ type Transcript struct {
 	// Endpoint is the transition that closed the utterance; the zero value on
 	// partials. Its Samples are the audio this ASR streamed.
 	Endpoint Endpoint
+	// Punctuated reports whether Text came back from the punctuation stage
+	// (ticket 27). It is false on every partial -- partials are display-only and
+	// never punctuated -- and false on a final when the stage is switched off,
+	// did not load, or had nothing to punctuate. Downstream therefore never has
+	// to guess whether it is looking at dictation-grade text or a raw
+	// hypothesis: ticket 27 requires the raw transcript to be marked as such.
+	Punctuated bool
 }
 
 // Transcriber is the seam between the two halves of ticket 15: it drives the
@@ -66,8 +73,9 @@ type Transcript struct {
 // It starts no goroutines and is not safe for concurrent use: one owner
 // goroutine drives it (D38b), exactly like Detector.
 type Transcriber struct {
-	det *Detector
-	asr AsrEngine
+	det   *Detector
+	asr   AsrEngine
+	punct Punctuator
 
 	rest []float32 // input not yet filling one seam window
 	ring []float32 // tail of the audio, so an opening utterance can be replayed
@@ -75,9 +83,23 @@ type Transcriber struct {
 }
 
 // NewTranscriber wires an endpointer to any ASR engine (C9).
+//
+// Punctuation is attached separately (SetPunctuator) rather than taken here so
+// that this constructor keeps the signature 15-a froze, and so that the two
+// states the ticket cares about -- switched off and failed to load -- are the
+// same state, "no punctuator", all the way down.
 func NewTranscriber(det *Detector, asr AsrEngine) *Transcriber {
 	return &Transcriber{det: det, asr: asr}
 }
+
+// SetPunctuator attaches the punctuation stage that final transcripts pass
+// through (ticket 27), or detaches it when p is nil.
+//
+// This is the whole toggle: the driver does not know or care whether a nil
+// Punctuator means "the user switched punctuation off" or "the model did not
+// load", because in both cases the answer is the same raw transcript. Nothing
+// here can fail an utterance.
+func (t *Transcriber) SetPunctuator(p Punctuator) { t.punct = p }
 
 // Accept feeds samples (any length, any chunking) and appends the transcripts
 // they produce. It buffers to whole windows and drives the detector one window
@@ -163,16 +185,45 @@ func (t *Transcriber) partial(out []Transcript) []Transcript {
 	})
 }
 
-// final closes the utterance.
+// final closes the utterance, running its transcript through the punctuation
+// stage when one is attached (ticket 27).
+//
+// Punctuation happens here and only here. That is what makes "partials stay
+// unpunctuated, every final is punctuated" a property of the driver rather than
+// a rule each caller has to remember -- and a caller cannot fade it in
+// gradually by forgetting it in one branch.
 func (t *Transcriber) final(ep Endpoint, out []Transcript) []Transcript {
 	text := t.asr.Finish()
 	t.text = ""
+	punctuated, done := t.punctuate(text)
 	return append(out, Transcript{
-		Kind:     TranscriptFinal,
-		Text:     text,
-		Latency:  samplesDuration(t.asr.Fed()),
-		Endpoint: ep,
+		Kind:       TranscriptFinal,
+		Text:       punctuated,
+		Latency:    samplesDuration(t.asr.Fed()),
+		Endpoint:   ep,
+		Punctuated: done,
 	})
+}
+
+// punctuate runs one final transcript through the stage, reporting whether it
+// did. Three cases return the text untouched, and each is a different reason
+// with the same answer:
+//
+//   - no stage attached: switched off, or the model did not load;
+//   - nothing sayable: an empty final is not an invitation to punctuate;
+//   - the stage returned nothing for something: a model that eats a sentence
+//     has failed, not punctuated. Handing the empty string on would manufacture
+//     the "nothing sayable" signal AC#5's retry policy keys on, so the raw
+//     transcript wins. Punctuation may never erase an utterance.
+func (t *Transcriber) punctuate(text string) (string, bool) {
+	if t.punct == nil || text == "" {
+		return text, false
+	}
+	out := t.punct.AddPunct(text)
+	if out == "" {
+		return text, false
+	}
+	return out, true
 }
 
 // Finalize closes the stream: it zero-pads a partial trailing window, then
