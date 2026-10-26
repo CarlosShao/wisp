@@ -26605,3 +26605,82 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **⑦ ★状态**＝**阶段 0 全部完成**｜★**在飞 2**（`380-r1` 写腿／`15-a1` 普查）
 ★结案 **46 票**（`-done` **189** 枚）、真待推进 **176**、完成度 **51.9%**、未推 **0**、★**摆机主 0 件**（两项都已批）。
+
+## A1252（2026-10-26 11:4x +08，编排者）★★★收 `15-a1`：**推翻三条**（「34 张下游」真值 **17**／「不碰共享编译面」**不成立**／「CER 自包含」**只对一半**）｜★★**票 15 立在池里 **37** 天（审计和我都写 36、差 1）**｜★★**依赖齐、不用下载、不用花钱**｜★**按它推荐派 `15b-r1`（`15-b` VAD）**
+
+**① ★★★三条会改下一步的结论（它都用现跑推翻）**
+| # | 审计／我的说法 | ★它现跑 | 差 |
+|---|---|---|---|
+| ★1 | ★「解放 **34** 张下游」 | ★★**真值 17**（★四种定义：**5**／**17**／7（粗尺假阳性）／35（12+15 并集））| ★**17 张**：`16 26 27 28 41`（d1）·`29 30 32 42 43 46 60 61`（d2）·`31 36 40 45`（d3）|
+| ★★2 | ★「**不碰**共享编译面」 | ★★★**不成立** | ★见下 |
+| ★3 | ★「量具票 CER **自包含**」 | ★★**只对一半**（计算器自包含、**基线集不自包含**）| ★见下 |
+
+- ★★**它的粗尺栽在** `p15-aec-spike` 的 `p15` 和 `115-…` 上 ⇒ ★**"尺的射程"第 11/14 例同款**（★**它自己识破了**）。
+
+**② ★★★「不碰共享编译面」不成立 —— 本腿最值钱的一条**
+- ★**与 `internal/panel` 确实零重叠**（★票 15 全文无 `panel` 字样）
+- ★★★**但 `cmd/wisp` 三处是**生产代码注释逐字点的名****：
+  1. ★`cmd/wisp/models.go:25`：「Whichever ticket lands `internal/speech` **owns adding its own `handOffModel` call**」
+     ⇒ ★★**`handOffModel` 是 `package main`（`models.go:357`）、`internal/speech` **import 不到** ⇒ **只能改 `cmd/wisp`**
+  2. ★`cmd/wisp/resident_audio_windows.go:57-63` ＋ `:373`：C8 帧通道「**nothing drains it**」、消费侧「**this ticket does not own**」（本票＝票 13）⇒ **归 15**
+  3. ★`cmd/wisp/resident_ball_windows.go:522,596`：唤醒监听暂停「lives in `internal/speech`, which is **still only a `doc.go`**」
+⇒ ★★★**所以收尾片（`15-e`）必须按 `cmd/wisp` 共享编译面排队**（★**每波一枚写腿**）⇒ ★**审计方案 §3-2 那句「不碰共享编译面」要撤回或改写**
+- ★★**附带记账**：★`internal/models/assembly_reachability_121_test.go:41` 把 `internal/speech` 归入「只有 `doc.go`、无可达符号」**永久排除** ⇒ ★**15 一落地那句理由就假了**（★**测试不会红、名单是手维护的**）⇒ **收尾须同步那句注释**
+
+**③ ★★「CER 自包含」只对一半 —— 缺口是**数据**、不是代码**
+- ★**CER 今天⛔能跑**：★`testdata/` 目录**不存在**／★`git ls-files "*.wav"` ＝ **0**／★CER 代码**零命中**（唯一命中是 `internal/speech/doc.go:19` 注释）／★`ci.yml` **无 asr job**
+- ★★**`scripts/spike/speech-baseline/main.go` **不是 CER****（★量 RSS、喂全零静音 `make([]float32,512)`）
+  ★**但它是能直接抄的实据**：★`SampleRate:16000`／`FeatureDim:80`／`NumThreads: 1 // D32`／512 分块 ⇒ ★**cgo 路本机是通的**
+- ★★**门禁写死在 `SPEC-10:57-60` ＋ `SPEC-04:125`**（逐字「两个 wav 集**必须提交进 `testdata/asr-baseline/` 并随 CI 跑**，否则基线是空话」）
+⇒ ★★★**AC2 的缺口是"谁说话、什么设备、什么噪声、参考文本谁写"—— 仓里一个字都没有**
+
+**④ ★★★它报的两条**未申报**的跨票前置（票 15 的 `Blocked by` 没写）**
+- ★**票 12**（`12-cli-text-path-s1-gate`）：★`Status: review`、**6 勾 3 未勾**、末更 2026-09-20、**⛔ `-done`**
+  ⇒ ★**而票 15 的 AC1 逐字要 "transcript into agent（12 的 text path）"**
+- ★**票 26（TTS）**：★**AC4 的 slot 互斥要 ASR **和** TTS 争才凑得出实测读数** ⇒ **15 自己测不了 AC4**
+
+**⑤ ★票 15 本身的读数（它逐字核过）**
+- ★`15-speech-engines-cer-harness.md`（**57 行**）／★`**Status:** ready-for-agent`（第 3 行）／★`Claimed by: —`／★无 `-done`／无 `-void`／未被收编
+- ★`Blocked by:` ＝ **只有 3 张**（`02-s0-spike`／`13-audio-capture`／`14-model-distribution`）
+- ★★★**`Progress log`：标题下面 **0 行、0 条目****；★**`git log` 独立核：3 个 commit 全在 2026-09-19**（`144151ae2` 立票／`130c09437`／`da81a6aca`）、**此后零 commit**
+- ★**6 条 AC 全 `- [ ]`、0 条已满足**
+- ★★**一句话**：★**"在只有 `doc.go` 的 `internal/speech` 里建 silero VAD 判停 ＋ 流式 Paraformer(int8) ASR，加 slot 互斥、线程钉 1、CER 量具＋两套基线 wav"**（★KWS 归 41、TTS 归 26、AEC 归 59 —— 票面 out of scope 逐字排除）
+- ★★★**天数：2026-09-19 → 2026-10-26 ＝ **37 天****（★审计和我都写 36、**差 1**）⇒ ★**记**
+
+**⑥ ★★三张前置逐张现跑：全部 `-done` / `Status: done` / **0 未勾框****（02＝5 勾、13＝6 勾、14＝6 勾）
+⇒ ★**"前置全绿"在「`-done` ＋ 0 未勾」这把尺上**成立 3/3****
+- ★★**但"全绿"≠"无债"**：★**02 把两笔债明确过给 15**（★①`debug.SetMemoryLimit`/GOGC 调参（15 正文第 28 行自己已收进 S1 scope）②15 的 `Spec refs` 引用从未被修（02 第 57 行点名 "orchestrator to add"））
+- ★**另有 2 张在 Blocked-by 图外把活记在 15 名下**：`66:10`「D32 六态表未测，归票 15/28/33/36」／`83:134`「`voice.*` 全部配置键 📋 票 15/26/27/41/59/60/61」
+
+**⑦ ★★依赖：齐、**不用下载、不用花钱**** ⇒ ★**未触发"停手上报"③**
+- ★`go.mod:9 github.com/k2-fsa/sherpa-onnx-go v1.13.8`（direct）＋ `:21-23` 三平台模块 indirect
+- ★`third_party/sherpa-onnx/` **三个 DLL 齐**（onnxruntime／c-api／cxx-api）
+- ★`deps.toml[16]`：`version=1.13.8` ＋ Apache-2.0 ＋ archive sha256 ＋ **3 个 DLL 各自 sha256** ＋ mirror `ghfast.top` ＋ onnxruntime `1.28.2`
+- ★**模型全在 `third_party/spike-models/`**（silero_vad／asr-encoder.int8／asr-decoder.int8／asr-tokens.txt／matcha／kws／punc）
+- ★★★**关键**：★**`cmd/wisp` **已经吃 cgo**（`doctor.go`／`main.go`／`logsink_test.go` 已 import sherpa）⇒ **15 不新引入 cgo 面**
+- ★★**`internal/speech` 现状 ＝ **21 行 `doc.go`、零导出符号、零 importer****
+
+**⑧ ★★★第一步：它推荐 **甲＝`15-b` VAD 端点判停**（我采纳、已派 `15b-r1`）**
+- ★**理由（逐字）**：★**"唯一能被一条腿完整关掉的 AC（合成夹具即可，不要语料、不等票 12、不碰 `cmd/wisp`），且顺带把 cgo 边界＋单实例＋线程钉 1 在产品包内证明掉；是 AC1 的必要条件"**
+- ★**另两候选**：★乙 `15-d` CER 计算器（纯 Go、当天出读数、★**宜与甲同日并行**、★单独当第一腿不推荐——手写夹具是自证）／★丙 `15-a` 引擎基座（`C9` Go 接口在 Go 里**零定义**、`PLAN.md:1365` 只有契约行；1 天、但**没用户可见读数**）
+- ★★★**必须拆五片**：★`15-a` 引擎基座／★`15-b` VAD 端点／★`15-c` 流式 ASR／★`15-d` CER 量具／★**`15-e` 装配与端到端（**唯一碰 `cmd/wisp` 的一片**）**
+  ⇒ ★**AC4 机制在 `15-a`、读数在 `15-e`**
+
+**⑨ ★技术前提（逐条给行号、**全写死**）**
+★16k/mono/int16（`SPEC-04:33` ＋ `audio.go:43`）／★512@16k＝32ms（`SPEC-04:42` ＋ `audio.go:47`）／★`D43#11` 300ms（`PLAN.md:3081`）／★60s（`SPEC-04:53`）／★`intra_op 1`（`SPEC-04:55`＋D32）／★单 onnxruntime 实例（`SPEC-04:59`＋D5）／★CER 6%/15%（`SPEC-10:57-60`）／★模型放 `models/<id>/`（`SPEC-04:104`）
+- ★★**它自己拍的（⛔ 往机主推）**：★①**流式 Paraformer 为主**（★`SPEC-04:55` 两条并列、但 `:114` 预算分档 **800ms 流式 / 1500ms 离线**、AC1 的球延迟要 partials ⇒ 离线满足不了）★②**基线集用**公开许可的普通话 16k 语料子集**造、⛔ 机主自己录音**（★隐私＋不可复现；★**许可须逐集核实**、`14` 的 matcha P3 **BLOCKED 非商用是先例**）
+- ★**半写死一处**：★**判停 700ms 只写"【SPEC 默认】"、**没有配置键****（★`ASRConfig` 只有 provider/model、`grep -i 'silence|vad'` ＝ **0 命中**）、★而票 15:20 说 "configurable" ⇒ ★**那个 "configurable" 今天没有载体**
+  ⇒ ★**它定**：★**先做包内常量**、★**加 `[voice].asr.silence_ms` 要碰 D36 配置模型、留到有 UI 需求时单开票** ⇒ ★**我认**
+
+**⑩ ★★它踩的两个坑（值得记）**
+1. ★★**`git commit -- <paths> -F <file>` 把 `-F` 写在 `--` **后面** ⇒ **被当 pathspec、`rc=128` "outside repository"** ⇒ ★**正确形状：`-F` 在 `--` **之前****
+   ⇒ ★**已写进 `15b-r1` 的派单**
+2. ★**它顺手用 `d22scan` 的 ban#8 码位带扫了自己的 `docs` ⇒ 全红** ⇒ ★**但那是**错尺****（★**ban#8 只扫 `internal/` + `cmd/` 的 `.go`、不扫 `docs/`**、见检查表第 2 例）⇒ ★**无效警告、未据此改文档** ⇒ ★★**它自己识破了错尺**
+
+**⑪ ★派 `15b-r1`（`15-b` VAD、写腿）**
+- ★**硬边界**：★**⛔ 碰 `cmd/wisp` 一个字节**（那是 `15-e` 的地盘）／⛔ 动 `internal/audio`（去**用**它）／⛔ 加配置键（先包内常量）／⛔ `frontend`／`design`／`.github`／`scripts`
+- ★**必给**：★三条 AC3 逐条／★**端点状态机三发边界（含 699 vs 701ms）**／★**cgo 单实例的证法**／★**反向判据（700→100ms 必红、300→0 必红）**／★**"⛔ 碰 cmd/wisp"的证明**／★**正控（纯静音不产出端点）**
+
+**⑫ ★状态**＝**阶段 0 全部完成**｜★**在飞 2**（`380-r1` C21 缩／`15b-r1` VAD）
+★结案 **46 票**（`-done` **189** 枚）、真待推进 **176**、完成度 **51.9%**、未推 **1**、★**摆机主 0 件**
+  ★★**但有一件**迟早要摆**：**CER 基线 wav 集用哪个语料**（★**可能涉许可/花钱** ⇒ 铁律三类之一）
