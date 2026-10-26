@@ -27351,3 +27351,70 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **⑥ ★状态**＝**在飞 2**（`cerci-r1` CI 接线 ／ `15-v1` 终裁）、★**goal `active`/`armed`**
 ★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **2**、★**摆机主 0 件**
 ★**票 15 只差**：★**CI 接线（在飞）** ＋ **终裁（在飞）**
+
+## A1267（2026-10-26 18:3x +08，编排者）★★★收 `cerci-r1`（CER 门禁 CI 接线）：**接进 `test-core`、并且证明了「该红时会红」**（`-overlay` 让语料不存在 ⇒ `rc 1`、`SKIP=1` 判红）｜★★**它判「父包要 staging ⇒ 只接 `cer` 子包」**（否则永久红或放宽判据）｜★★★**票 15 只差终裁**
+
+**① ★★收 `cerci-r1`（`8d6e150f8` ＋ 三发件；件 `docs/evidence/s1/cerci-r1-impl.md` **138 行**）**
+- ★★**改动面＝3 个文件**：`.github/workflows/ci.yml`（**+56**）、`scripts/portable-tests.sh`（**+28**）、件
+
+**② ★★接线**
+- ★接在 **`test-core`（`ubuntu-latest`、PR gate）**
+- ★新 step 名：`CER gate over the committed ASR baseline (ticket 15 AC#2; SPEC-10:60-61, SPEC-04:125)`
+- ★命令：`bash tools/d22scan/runtests.sh ./internal/speech/cer/`、`if: ${{ !cancelled() }}`
+- ★位置 ＝ **portable core step 之后、Stop compose services 之前**；★**`test-core` step 数 7→8**
+- ★★**另在 `scripts/portable-tests.sh` 的 core scope 数组 ＋ `core_pin` 同提交各加一行**（★**GUARD C 要求同步**）
+- ★**两份理由注释写明「为什么认领」「为什么父包不认领」** ✅
+
+**③ ★★★最要紧的一条：它证明了「该红时会红」（⛔ "接了个永远绿的 step"）**
+- ★**`go test ./internal/speech/cer -count=1 -v` ⇒ `rc 0`、**24 案 24 PASS、0 FAIL、`--- SKIP` 0 条****
+  ⇒ ★**`15d-r1` 报的那条具名 SKIP **已不触发**（语料在仓）**；★**SKIP 分支仍在 `baseline_test.go:140`、只是不走到**
+- ★★**`runtests.sh` 的牙实测**：★`:224` 计 `^--- SKIP`；★`:234-239` `skipped≠0` ⇒ 打「**SKIP is not a pass … do not relax this script**」⇒ **`exit 1`**；★`:240-245` **零 PASS 零 FAIL 也 `exit 1`**
+- ★★★**两发仓外实测**：★**①`-overlay` 让语料「不存在」⇒ `rc 1`、`PASS=23 FAIL=0 SKIP=1` 判红**；★②`-run TestNoSuchThingExists` ⇒ `rc 1`「no top-level result」
+- ★**`overlay` 后 `git status --porcelain -- internal/speech/cer` 空**（**未写盘**）✅
+
+**④ ★★本地真跑**
+- ★裸 `go test` **`rc 0`**；★★**CI 用的严格 runner `rc 0`**（`OK - packages=[./internal/speech/cer/] top-level: PASS=24 FAIL=0 SKIP=0`、**冷 2.4s／热 0.2s**）
+- ★★**`--scope=core` 整层 `rc 1`，但 **`cer` 绿****（`ok (own line)`、baseline 测试 **PASS 0.18s**）
+  ⇒ ★**整体红是本机既存 7 红**（`risk` 2／`panel` 4／`winsec` 1、★**这几包一字节未动**）
+- ★**`GOOS=linux go vet` `rc 0`**、★**`go test -c` `rc 0`（4,847,276 B）** ⇒ **ubuntu 腿能编译** ✅
+- ★**YAML**：★`python yaml.safe_load` **`rc 0`「YAML OK」**（6 jobs、test-core 8 steps）
+
+**⑤ ★★边界**
+- ★`git show --name-only` 只有两件；★★**`testdata`/`internal`/`cmd`/`frontend`/`design` 命中 **0****（**4 个提交逐个验**）
+- ★`git status --porcelain -- testdata internal` **空**
+- ★★**⛔ `continue-on-error`／`if: false`**：★**锚定 YAML 键的尺在整段 range 上 `0／0`**；★**新增 `if:` 键只有 1 条 ＝ `${{ !cancelled() }}`**（**本 job 每个非 setup step 的既定形状**）；★**新增 84 行全 ASCII（最大码位 `U+007D`、无 emoji）**
+- ★★★**它自己指出**：★**"不加锚的全 range grep 会命中**散文****（证据件引用的命令、注释里「no continue-on-error」）⇒ **已在件里写明为何尺锚在行首**"** ✅ **这是"尺的射程"自觉**
+
+**⑥ ★★它判的「父包要不要 staging ⇒ 要；只接 `cer` 子包」（判断对）**
+- ★**裸跑父包 `rc 1`、`exit status 0xc0000135`**（★**三枚 DLL 不在 loader 路径、**一条测试都没跑起来****）
+- ★**模型在 `third_party/spike-models/`（fetch 目录、`git ls-files third_party`＝0 件）**
+- ★**父包 **7 处 `t.Skip*`****（`asr_test.go:65,78`／`cgo_boundary_windows_test.go:125,158,226`／`engines_test.go:248`／`vad_test.go:37`）
+- ★★★**`runtests.sh:234-239` 把任何 SKIP 判红 ⇒ 无 staging 载体时认领＝永久红、加 `-skip`／删 skip ＝ 放宽判据（⛔ 边界）** ✅
+
+**⑦ ★★附带读数（census）**
+- ★`internal/speech/cer` 由 **`4/0 NO-SCOPE <-UNCLAIMED-HAS-TESTS>`** 变 **`4/0 core`**
+- ★`unclaimed-with-tests` **2→1**
+- ★`sh scripts/d22scan.sh` **`rc 0 clean`**
+- ★`scripts/portable-tests-selftest.sh`（`lint` job、**会从 `core_pin` 现抽行数**）**`rc 0`**
+
+**⑧ ★★★唯一要接手的红（它按派单只报不修）**
+> ★**census 仍 `rc 1`，剩的那 1 个是父包 `internal/speech`（`7/0 UNCLAIMED-HAS-TESTS`）**
+> ★**来自 `15-c` 落地时没被任何 tier 认领**
+> ★★**要认领得先有像 `scripts/wisp-cli-tests.sh` 那样 stage 三枚 DLL ＋ 模型的载体**（★**模型不在仓、依赖 D26 模型分发链**）⇒ ★**否则就是永久红**
+⇒ ★★★**我判：登记在票 15 的残余里、⛔ 现在修**
+  ★**理由**：★**要 D26 模型分发链 ＋ staging 载体** ⇒ **那是另一张票**
+  ★★**而这**不影响 `AC#2`**** —— ★**`AC#2` 的门禁是"纯 Go 计算器 ＋ 已提交语料"**、**已在 `test-core` 每次 PR 跑** ✅
+
+**⑨ ★★它明写未做（我要判的一件）**
+- ★`SPEC-11:128` 的 **`asr-cer` 自托管 job**（nightly ＋ 模型变更触发）**未建**
+- ★**本腿接的是纯 Go 计算器 ＋ 已提交语料的门禁**（hosted ubuntu 每次 PR 都跑）
+- ★**真 ASR 假设下的 6%/15% 实测需模型文件、属 `15-e`**
+- ★★**"若你要单独的 `asr-cer` job（自托管/GPU）⇒ 那是另一个决策"**
+⇒ ★★★**我判：⛔ 建。理由**：
+  1. ★**`hosted ubuntu` 每次 PR 都跑的纯 Go 门禁**已经覆盖 `AC#2` 的**"随 CI 跑"**
+  2. ★**自托管/GPU 的 nightly 是"性能回归"、⛔ "门禁"**
+  3. ★**那属 `15-e` 的真 ASR 实测**、★**而模型现在不在仓**（`git ls-files third_party`＝0）⇒ **建了也跑不了**
+
+**⑩ ★状态**＝**在飞 1**（`15-v1` 终裁）、★**goal `active`/`armed`**
+★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **5**、★**摆机主 0 件**
+★★★**票 15 只差终裁** ⇒ **终裁回来就翻格结案（第 48 票）**
