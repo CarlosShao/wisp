@@ -1,6 +1,7 @@
 # 票 27 标点恢复腿 `27-r1` —— 落地件（写腿）
 
 > **尺**：`HEAD=ba9ca8fa7`（`dev`），现跑 2026-10-26 18:30–19:0x +08。★**八项读数逐条在 §1–§9**，全为现跑，⛔ 转述。
+> **本片代码 commit ＝ `7ecaaef11`**（4 文件，+1169/−7）；★本文件里那枚 hash 由**之后的补正 commit 回填**（规则禁 `--amend`，要更正就追加）。
 > **写面**：`internal/speech/**` —— **新增 2 枚**（`punctuate.go` 12,807 B／`punctuate_test.go` 27,035 B）＋ **改 1 枚**（`transcriber.go` 7,613→10,137 B，+2,524 B）＋ 本文件。
 > **零字节**：`engines.go`／`engines_test.go`／`asr.go`／`vad.go`／`endpoint.go`／`doc.go`／`fixtures_test.go`／`asr_test.go`／`vad_test.go`／`endpoint_test.go`／`transcriber_test.go`／`cgo_boundary_windows_test.go`、`internal/speech/cer/**`、`testdata/**`、`cmd/**`、`internal/**` 其余、`scripts/**`、`.github/**`、`frontend/**`、`design/**`、票面、台账、`docs/specs/**`、`docs/PLAN.md`、`docs/audit/**`。
 > **临时件（只建不删）**：`D:\tmp\wisp\20261026\27r1\{bin,mut,punc,logs}`。★**四发变异全走仓外件 ＋ `-overlay`** ⇒ **工作树零突变窗口**（§4）。
@@ -115,7 +116,7 @@ cd D:\tmp\wisp\20261026\27r1\bin && .\speech.test.exe -test.v      # => 44/44 (i
 | `internal/speech` **改前** | `git ls-tree -r --long HEAD -- internal/speech` | — | **21 文件／172,823 B** |
 | `internal/speech` **改后**（盘上） | `Get-ChildItem -Recurse -Filter *.go` | — | **30 文件／251,952 B** |
 | ★**其中我的** | — | — | **＋2 文件＋39,842 B**（`punctuate.go` 12,807／`punctuate_test.go` 27,035）＋`transcriber.go` **＋2,524 B** ＝ **我的净增 42,366 B** |
-| ★**其余 ＋7 文件／36,763 B** | — | — | 🔴 **⛔ 我的**：并存腿**票 26（TTS＋slot）**在 18:45–18:52 落进同一目录（`tts.go`／`slot.go`／`rss_other_test.go`／`rss_windows_test.go`／`slot_test.go`／`slot_real_test.go`／`tts_test.go`）。★**本片 ⛔ 碰它们**，也 ⛔ 在 commit 里带它们。 |
+| ★**其余 ＋7 文件／36,763 B** | — | — | 🔴 **⛔ 我的**：并存腿**票 26（TTS＋slot）**在 18:45–18:52 落进同一目录（`tts.go`／`slot.go`／`rss_other_test.go`／`rss_windows_test.go`／`slot_test.go`／`slot_real_test.go`／`tts_test.go`），**由该腿自己另笔提交为 `9d5052e7a`**（不是我这笔）。★**本片 ⛔ 碰它们**，也 ⛔ 在 commit 里带它们（`git show --name-only` 逐字可核：4 行、`cmd/` 0 行、`testdata/` 0 行）。 |
 | `internal/speech` staging | §6 | **0** | **44 PASS／0 FAIL／0 SKIP**（只有我的 13 案时，18:42）→ **55 PASS／0 FAIL／0 SKIP**（含票 26 的 11 案，18:52） |
 | `internal/audio`（**零字节、独立跑**） | `git status --porcelain -- internal/audio`＝**空**；`go test -count=1 ./internal/audio` | **0** | `ok … 16.587s` |
 | `cmd/wisp` **定向**（`PATH` 带 `third_party\sherpa-onnx`） | `go test -count=1 -run TestAC3LogSinkLandsInsideTheEnvDataRoot -v ./cmd/wisp` | **0** | `--- PASS … 0.01s`；`ok … 0.166s` |
