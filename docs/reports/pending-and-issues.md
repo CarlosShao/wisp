@@ -27083,3 +27083,54 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **⑧ ★状态**＝**在飞 2**（`15d2-r1` 基线集 ／ `15e-r1` 装配）、★**goal `active`/`armed`**
 ★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **4**、★**摆机主 0 件**
 ★**下一步**：★**`15d2-r1` 交件 ⇒ 先核它的 `sources.tsv` 是否符合 ④ 的四条** ⇒ **再派 CI 接线腿**
+
+## A1262（2026-10-26 17:3x +08，编排者）★★★收 `15e-r1`（票 15 最后一片 装配与端到端）：**五片全落地**｜★★★**它把「`PATH` 不够」从**推断**变成**产品级红字****（`onnxruntime 1.17.1 is older than the 1.28… shadowing`）｜★★★**延迟两段相加**（开句迟 **262ms** ＋ chunk **640ms** ＝ 球延迟 **902ms**、只算 chunk **低估 41%**）｜★★**`d22scan` 抓到它一条真违规**（`≥` U+2265 ⇒ 已改）
+
+**① ★★收 `15e-r1`（`ca8834d72` 7 文件 `2129+/39−` ＋ `df26e764e` 件；件 `docs/evidence/s1/15e-r1-impl.md` **112 行**）**
+- ★**4 改**（`models.go` 注释／`resident_audio_windows.go`／`resident_ball_windows.go`／`resident_windows.go`）＋ ★**2 新**（`resident_voice_windows.go` **1022 行**、`resident_voice_15e_windows_test.go` **718 行**）＋ 件
+- ★★**`^internal/` 命中 **0**** ✅（★**未改 `internal/speech` 那些片的一字节**）
+
+**② ★★三处落点怎么接的（逐条对 `15-a1` 的逐字）**
+1. ★`models.go:25`「owns adding its own `handOffModel` call」⇒ ★**`residentVoiceHandOff(dataDir)` 就是那个调用点**（`loadModelConfig`→`openModelStore`→`store.handOffModel`）
+   ★★**挂在第一次 `EndpointStart`**、⛔ 启动时、⛔ 每句 ✅
+2. ★`resident_audio_windows.go:57-63`「nothing drains it」⇒ ★**`assembleCapture` 存 `ra.frames`、`resident_voice_windows.go` 是**唯一**读者**；★头注释与 `posture()` 里那句"帧消费侧不属于本票"改成读接线
+3. ★`resident_ball_windows.go:522,596`「only a `doc.go`／NOTHING to read yet」⇒ ★**`OnTrayPauseWake`→`rb.pauseWakeGesture()`**
+   ★**`mirrorTrayMute` 第二 bit 从字面 `false` 改成 `wakeRead()`**（★**没接腿时仍 `false` ⇒ 293 的四条旧断言原样绿**）✅
+
+**③ ★★★十项读数**
+| # | 读数 |
+|---|---|
+| ★★★1 | ★**端到端一发**（staging 真链、**181 帧经 `WavInjector`**）：★**`handOffModel` 被调 **1 次**、参数 **`asr-streaming-paraformer-zh-en`**、**`exit=0`****；★**真签名清单验签 ＋ 三枚文件哈希复验**；★原话「已交还（`state=FirstRun`、`ticks=1`、末次进度 **100%**、**2.31s**）」；★**final `"嗯嗯嗯嗯嗯嗯嗯哦哦"`**、★`partials=5／finals=1／handed=1`（★**进票 12 的 `submitTask`、逐字同串**）／`drained=178/181` |
+| ★★2 | ★**球走态**（音频钟）：★`Sleeping+session.summon→Listening @13,824（**864ms**）`、★`Listening+asr.vad-stop→Thinking @89,600（**5.6s**、语音 **3392ms**）`；★`ball.voiceStatesSnapshot()=[Listening,Thinking]`；★**D43 表一字未改** |
+| ★★★3 | ★**C8 通道 0→1**：★**`HEAD` 上 `git grep '<-buf\|ra.frames\|<-frames' HEAD -- cmd/wisp` ＝ **0 命中****（只有分配点）；★现在 **1 个消费者**；★★**仪器正控**：★**同一构造函数没人抽 ⇒ 20 帧只收 **6**（192ms 窗口）** |
+| ★★4 | ★**唤醒暂停**：★`drained=3／paused_drops=4／fed_before_pause=2／tray_writes=2`；★**暂停时帧照旧排空但不进 VAD/ASR**、勾选跟着变；★**只用 D43#13／#29** |
+| ★★★5 | ★**延迟两段**：★**开句迟 **262ms** ＋ chunk **640ms** ＝ 球延迟 **902ms****（★**只算 chunk **低估 41%****）；★★**同一支 `Transcriber` 复现 `15-c` 的 **640ms**、逐位同值**；★★**而开句迟与 `15-c` 的 **1088ms 不同**** —— ★**本夹具前面有 250ms 数字静音 ＋ 1 帧暖机**（`15-c` 那条从第 0 样本就是语音且是反推的）⇒ ★**两段都会随语料变、如实并列**；★**首用成本另计**：★**缝到第一个字 **5.06–5.35s****（交还 2.31s ＋ 装载 ~2.2s、**每进程一次**）|
+| ★★★6 | ★**反向判据**：★**摘掉 `hook(...)` ⇒ `rc=1`、**产品级红****（★逐字「ASR 没起来（交还已通过，但字节打不开）…a file is unreadable」＋"timed out waiting"）；★**还原 ⇒ 6/6 PASS**；★**原样重跑 ⇒ 6/6 PASS 且三个延迟数逐位同值**；★**还原核**：★树内 sha256 `60431fdf…c90ca8146e` 前后同值、`MUTANT` 标记 **0** |
+| ★★7 | ★**正控**：★**纯静音 120 帧 ⇒ `handoffs=0／asrLoaded=false／finals=0／球 []／机器 Sleeping`**、★`drained=120/120`（★**"绿"不是"什么都没跑"**）|
+| ★★★8 | ★**staging 完整命令 ＋ 为什么 `PATH` 不够（本片实测）**：★**`PATH` 带 `third_party\sherpa-onnx` 但不 staging ⇒ 本腿第一条用例 **0.00s 就红****；★逐字「**`onnxruntime 1.17.1 is older than the 1.28…（a second onnxruntime.dll is shadowing the one on PATH）`**」 ⇒ ★★**这比 `15-b`/`15-c` 更硬：把"`PATH` 不够"从**推断**变成**产品级红字**** |
+| ★★9 | ★**四数**：★`cmd/wisp` 定向＋`PATH` `TestAC3LogSinkLandsInsideTheEnvDataRoot` **rc0 PASS**／★`cmd/wisp` 15e staging **6/6 rc0**／★`internal/speech` **零字节改动**（porcelain 0 行）且 staging **28 PASS**／★`internal/audio` **零字节**、`ok 17.138s` |
+| ★★10 | ★**两尺＋门禁**：★`gofmt -l cmd/wisp`／`gofumpt -l cmd/wisp` **只报既存假红 `cmd/wisp/models.go`**（★**该文件转 LF 后 `gofmt` 空 ⇒ 它的注释改动干净**）✅；★`go vet` **rc0**；★`d22scan` **rc0 clean**；★★**而 `d22scan` 抓到它一条**真违规****：★**字符串里的 `≥`(U+2265) at `resident_voice_windows.go:657`** ⇒ ★**已改「不小于 300ms」**（★同处 `→` 也改成「到」）|
+
+**④ ★★三条停手条件都没触发（它核过）**
+① ★`handOffModel(io, id, logf) int` 签名对得上（★**把 `int` 当交还判决用**）② ★**未改 `internal/speech` 任何语义**（★只用公开面 `Detector`/`StreamingAsr`/`Transcriber`/`Endpoint`）③ ★**球走态不需要 `internal/panel`**（★D43 机器在 `internal/statemachine`、投影走既有 `Ball.SetState`）
+
+**⑤ ★★它记账的残余（已写进件 §11、我全收）**
+1. ★★**D43#12 的 `Listening` 超时：机器走、球不跟**（★`internal/statemachine` 的定时器没给外部钩子）⇒ ★**本片不发明钩子、只记账** ✅
+2. ★★**首用成本落在第一句**：★**交还 2.31s ＋ 引擎装载 ~2.2s ⇒ 缝到第一个字 5.1s**；★**回放环 8s、首次下载（分钟级）会超过它、触发那句会丢**（★**如实说**）
+3. ★**切缝回放同步解码 ~0.5s ⇒ 丢最末尾 3/181 帧**（★出声句不受影响）
+4. ★AC5 的"一次重试→asr 错误"／交还被拒后的重试／KWS(41)／TTS(26)／AC4 实测(要 26) **均未做、明收在写面外**
+5. ★★**新依赖边一条**：★**`cmd/wisp → internal/speech`（首次）**；★`internal/speech` **仍不 import `cmd/wisp`** ✅
+
+**⑥ ★★票 15 五片的现状**
+| 片 | 状态 |
+|---|---|
+| ★`15-a` 引擎基座（`C9` Go 接口）| ★**待做** |
+| ★`15-b` VAD 端点判停 | ★**已落**（`15b-r1`）|
+| ★`15-c` 流式 ASR | ★**已落**（`15c-r1`）|
+| ★`15-d` CER 量具 | ★**计算器已落**（`15d-r1`）／★**基线集在飞**（`15d2-r1`）|
+| ★`15-e` 装配与端到端 | ★**已落（本片）** |
+⇒ ★★**所以票 15 只差 `15-a` ＋ `15-d` 的基线集 ＋ CI 接线**
+
+**⑦ ★状态**＝**在飞 1**（`15d2-r1` 基线集、下载 15.6 GB 中）、★**goal `active`/`armed`**
+★结案 **47 票**（`-done` **190** 枚）、真待推进 **175**、完成度 **52.1%**、未推 **2**、★**摆机主 0 件**
+★**下一步**：★**①`15d2-r1` 交件 ⇒ 核它的 `sources.tsv` 是否符合 `15d-r1` 冻结的四条** ②**派 `15-a`（引擎基座）** ③**然后票 15 可以走终裁**
