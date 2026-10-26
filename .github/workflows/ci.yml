@@ -50,6 +50,36 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}${{ github.event_name == 'push' && format('-{0}', github.sha) || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# EVERY JOB CARRIES A `timeout-minutes` (leg ci-r1, 2026-10-26). Before this,
+# the file had none, so each job inherited GitHub's 360-minute default and a
+# hang could burn six hours of runner time with nothing to read.
+#
+# WHAT THE NUMBERS ARE AND ARE NOT. They are HANG BOUNDS, not schedules, and no
+# threshold anywhere else moved to accommodate them: every assertion, every step
+# and every `if:` in this file is exactly what it was (D22 run-away mode 6 - no
+# step made non-failing, no job gated off with a constant condition, no step
+# removed, nothing relaxed).
+#
+# WHERE THE NUMBERS COME FROM (ruler: the 40 most recent ci runs at HEAD
+# f559f14f, `gh api .../actions/runs/<id>/jobs`, execution minutes =
+# completed_at - started_at, queue wait excluded):
+#   lint            max 1.90  p90 1.82   (0 of 40 finished: staticcheck died at import)
+#   test-core       max 3.03  p90 2.20   (0 of 40 finished: scope aborts on first red)
+#   test-windows    max 14.78 p90 11.90  (0 of 40 finished)
+#   slo-smoke       max 3.35  p90 2.85   (40 of 40 green)
+#   slo-full        max 35.52 p90 5.68   (31 of 40 green)
+#   lint-frontend   max 0.65  p90 0.57   (40 of 40 green)
+# Three readings are LOWER BOUNDS, not costs: a job that has never once reached
+# its last step (0 of 40) has never once paid for its last step, so `max x 1.5`
+# is not a valid ceiling there - those three take the cold-cache cost into the
+# number instead (two `go install` builds, a cold `docker compose --build`, a
+# cold third_party fetch), and each job's own comment states which shape it is.
+#
+# ONE THING THESE CANNOT DO, stated so nobody reads them as a fix for it: a job
+# timeout starts when the job STARTS, so it does not bound queue wait. The 3h26m
+# wall clock on run 40238092102 is slo-full sitting in the self-hosted queue for
+# 203 minutes (created 22:00:04Z, started 01:23:02Z) and then executing for 2.6
+# minutes; no `timeout-minutes` value changes that, only a runner that is awake.
 jobs:
   # ---------------------------------------------------------------- lint ----
   # gofumpt/vet/staticcheck + D22 seven-ban static scan (tools/d22scan) +
@@ -64,6 +94,13 @@ jobs:
   # wrapper below runs BEFORE the scan (positive control).
   lint:
     runs-on: ubuntu-latest
+    # Hang bound (see the block above `jobs:`). The 1.90 min max is a LOWER
+    # BOUND - 0 of 40 runs reached this job's end, because `staticcheck` died
+    # at import time (that is the pin fixed below), so the cost of the steps
+    # after it was never paid. 20 carries two cold `go install` builds plus the
+    # 37-package three-module scan (`go install mvdan.cc/gofumpt@latest` and
+    # `go install .../staticcheck` are both compiled from source in this job).
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -361,9 +398,39 @@ jobs:
         # This step is EXPECTED RED after this pin, red on real parseable
         # findings (37 lines across the 3 modules at d3cc9ed, linux shape);
         # lint turning green is NOT a criterion of this ticket.
+        #
+        # PIN 2026.2.1 -> 2026.2.2 (leg ci-r1, 2026-10-26). Item 1 above is
+        # correct about the CONSUMER and stale about the TOOLCHAIN: it measured
+        # go1.27.1, which writes export data version 4. CI does not run
+        # go1.27.1. `actions/setup-go@v5` is handed `go-version-file: go.mod`,
+        # whose `go` directive is `go 1.27`, and it resolves that to the newest
+        # 1.27 patch; from go1.27.2 on the toolchain writes version 5
+        # ("V5: encodes the index of methods to preserve relative order of
+        # nongeneric and generic methods", go.dev/issue/81188). x/tools v0.44.1
+        # (vendored by v0.8.1 / 2026.2.1) stops at V4 - internal/pkgbits/
+        # version.go there ends at `V4` and decoder.go:86 is the crash - so the
+        # step died exactly as it did on the 2025.1.1 pin:
+        #   -: internal error in importing "cmp" (cannot decode "cmp", export
+        #      data version 5 is greater than maximum supported version 4);
+        #      please report an issue (compile)
+        # That is the red on runs 40150060567 and 40238092102. 2026.2.2 (v0.8.2)
+        # vendors golang.org/x/tools v0.51.0, whose internal/pkgbits/version.go
+        # adds `V5` (numVersions-1 = 5), i.e. it reads what go1.27.2+ writes.
+        #
+        # MEASURED, not read off a changelog (three toolchains x two binaries,
+        # `staticcheck ./internal/ball/`, warm build cache, GOOS=windows):
+        #   go1.27.1: 2026.2.1 = 38 findings / 0 crash lines; 2026.2.2 = 38 / 0
+        #   go1.27.2: 2026.2.1 =  0 findings / 5 crash lines; 2026.2.2 = 38 / 0
+        #   go1.27.3: 2026.2.1 =  0 findings / 5 crash lines; 2026.2.2 = 38 / 0
+        # and through THIS step's own loop shape on go1.27.3:
+        #   2026.2.1 = 0 findings / 15 crash lines (3 modules, 37 packages)
+        #   2026.2.2 = 99 findings / 0 crash lines (3 modules, 37 packages)
+        # Go itself was NOT downgraded, for item 1's reason: the stale side is
+        # the consumer. No finding is suppressed by this pin either - no
+        # //nolint, no lint:ignore, no excluded package, no new `if:`.
         if: ${{ !cancelled() }}
         run: |
-          go install honnef.co/go/tools/cmd/staticcheck@2026.2.1
+          go install honnef.co/go/tools/cmd/staticcheck@2026.2.2
           rc=0
           modcount=0
           pkgs=0
@@ -534,6 +601,12 @@ jobs:
   # `grep -nE 'portable-tests|go test|internal/audio' scripts/slo-check.ps1`.
   test-core:
     runs-on: ubuntu-latest
+    # Hang bound (see the block above `jobs:`). 3.03 min is a LOWER BOUND: 0 of
+    # 40 runs finished this job (the portable core scope aborts on its first
+    # red case, and the reds are pre-existing), and the cold path that is not in
+    # that reading at all is `docker compose ... --build mock-llm`. 20 is a
+    # ceiling for a hang, not a target for the suite.
+    timeout-minutes: 20
     env:
       WISP_ENV: test
     steps:
@@ -648,6 +721,14 @@ jobs:
   # red AND every step after it must carry its own conclusion.
   test-windows:
     runs-on: windows-latest
+    # Hang bound (see the block above `jobs:`). Measured max 14.78 min, p90
+    # 11.90; 0 of 40 runs finished, so the ceiling is set from the observed
+    # shape rather than from a completed run. 30 = 2.0x that max, and the margin
+    # is deliberate: this job runs cmd/wisp (the MARK299 panel-window path),
+    # where the failure mode is a stuck window or control thread - a hang, not a
+    # slow test. A ceiling that kills a genuinely slow run would be a new red,
+    # which is the opposite of what this line is for.
+    timeout-minutes: 30
     env:
       WISP_ENV: test
     steps:
@@ -951,6 +1032,14 @@ jobs:
   # Sleeping + Warm sampling + settle + the leak self-test (SPEC-11 §6).
   slo-smoke:
     runs-on: windows-latest
+    # Hang bound (see the block above `jobs:`). Measured max 3.35 min, p90 2.85,
+    # 40 of 40 green - so unlike the two linux jobs this is a FULL-run reading
+    # and `max x 1.5` would be 5.0. It is not used, because the expensive leg
+    # nobody has measured is the cold one: `Cache third_party` is keyed on
+    # deps.toml, so any deps.toml change makes build.ps1 fetch and link
+    # sherpa-onnx from scratch, and every published reading above was taken on a
+    # cache hit. 20 bounds a hang without turning a cold cache into a red.
+    timeout-minutes: 20
     env:
       WISP_ENV: test
     steps:
@@ -1012,6 +1101,18 @@ jobs:
   # A run that DID sample and did not pass still exits 1 and still goes red.
   slo-full:
     runs-on: [self-hosted, wisp-slo]
+    # Hang bound (see the block above `jobs:`), and the one job whose number the
+    # measurement actually moved: max 35.52 min, p90 5.68 min over 40 runs
+    # (31 green). The 35.5 min reading is a real cold-deps run on this laptop, so
+    # 55 (1.5x that max) is the ceiling - not 90, which the 5.7 min p90 would
+    # have suggested, and not the 360 min default that a hung build would burn.
+    #
+    # WHAT THIS DOES NOT BOUND: queue time. The longest wall clock this workflow
+    # ever showed (3h26m, run 40238092102) is 203 min of THIS job waiting for the
+    # self-hosted runner to come up plus 2.6 min of execution. A job-level
+    # timeout starts at `started_at`; the fix for that shape is a runner that is
+    # online, not a number here.
+    timeout-minutes: 55
     env:
       WISP_ENV: test
       # The runner's job environment carries no msys64 on PATH: measured on the
@@ -1086,6 +1187,12 @@ jobs:
   # A skippable job is a job that will one day be skipped.
   lint-frontend:
     runs-on: ubuntu-latest
+    # Hang bound (see the block above `jobs:`). Measured max 0.65 min, p90 0.57,
+    # 40 of 40 green - the tightest reading in the file, and `max x 1.5` (1.0)
+    # would be under any sane floor. 10 = ~15x the observed max, which pays for
+    # a cold `npm ci` (this job is node-only: no Go, no native build, no
+    # third_party) and still ends a hung step well inside the hour.
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: frontend
