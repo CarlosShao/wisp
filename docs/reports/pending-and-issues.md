@@ -27495,3 +27495,60 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **⑬ ★状态**＝**在飞 0**、★**goal `active`/`armed`**
 ★**结案 48 票**（`-done` **191** 枚）、真待推进 **174**、完成度 **191/365**、**未推 4**、★**摆机主 0 件**
 ★★★**票 15 = 语音线的单点解锁项、现在落地了** ⇒ ★**解放下游 17 张**（`16 26 27 28 41` d1 · `29 30 32 42 43 46 60 61` d2 · `31 36 40 45` d3）
+
+## A1269（2026-10-26 18:5x +08，编排者）★★★`26-r1` 早期上报：**挖出一个我没预料到的三方冲突** —— **台账 `R5`（机主裁定）把默认 TTS 判给云、⛔ 本地 matcha、且明令"不在票 26 里偷偷塞"，而票面标题与 `SPEC-04:57` 都写本地 matcha**｜★★★**我拍：甲（测量级参考实现）**｜★★**它的技术前提是好消息**（`sherpa-onnx-go` 原生带分块回调）
+
+**① ★★★冲突三方（它逐字引、我认）**
+| 方 | 逐字 |
+|---|---|
+| ★**台账 `R5`（`:51`、2026-09-20、**用户裁定**）** | ★**"默认 TTS 走云 TTS，供应商 StepFun…票 26 的 TTS 输出层以 StepFun 云 TTS 为默认实现，与票 61 同源…⚠ 本地 matcha 条目保持 `blocked-p3` 不改…离线/无网场景的本地 TTS 缺口另立待决项，**不在票 26 里偷偷塞**"**（★`:102-104`／`:3199-3200` 三处重述；★另 `A988`（10-15）机主把 StepFun 计费口径定死）|
+| ★**票面 `26-tts-output.md:1`** | ★**标题逐字「sherpa matcha engine」**、★`:12`「on sherpa matcha/vits zh (int8)」|
+| ★**`SPEC-04:57`** | ★**也写 matcha/vits 本地** |
+⇒ ★★★**"票 26 做本地 matcha TTS"这件事本身与 `R5` 相反**、★**且 `R5` 明确禁止把本地 TTS 塞进票 26**
+⇒ ★★**这是**票面/SPEC 与机主裁定的三方冲突**、⛔ 它能拍**（`SPEC-04` 文字属契约面）
+
+**② ★★许可面其实**已经被人拍过**（它核得很细、⛔ 一刀切）**
+- ★`third_party/spike-models/matcha-icefall-zh-baker/README.md` 逐字：**"Note: The dataset is for non-commercial use only."**
+- ★`models/manifest.json` 的 `tts-matcha-zh-baker`：`status: "blocked-p3"`、★`license` 逐字 **"NON-COMMERCIAL-ONLY (data-baker free dataset terms) - **P3 BLOCKED, must not ship; dev/measurement use only**, replacement model decision pending"**
+- ★台账 `:47`（R1、2026-09-20）：★**"个人使用期可继续用（许可允许）；C29 manifest 分发被挡；默认 TTS 替代选型归票 26"**
+⇒ ★★★**所以"出货面否决、测量面允许"** —— ★**纯"许可=停"这一条不成立** ⇒ ★**它自己判对了** ✅
+
+**③ ★★★它给的三个选项**
+- ★★★**甲（它推荐、**我采纳**）**：★**按 `dev/measurement use only` 做「测量级参考实现」**
+  ★`internal/speech` 落 `tts.go`（matcha 引擎、挂在已冻结的 `TtsEngine` 上、**⛔ 动 `engines.go`**）＋ **slot 互斥** ＋ 全部读数
+  ★★**默认选型/manifest/配置一律不动**（★**`R5` 的"默认走云"原样成立、`blocked-p3` 原样不动**）
+  ★★**并在证据件里写明"此实现不可出货、默认仍走云"**
+- ★**乙**：★**完全停** ⇒ 票 26 等票 61 的云链（★**61 被 16／11／05 挡**）⇒ **AC4/AC5 读数这一波全部拿不到**
+- ★**丙**：★**只落 slot 互斥**（模型无关）、TTS 侧仍空 ⇒ **AC5 拿不到实测**
+
+**④ ★★★我的裁定：甲（四条理由）**
+1. ★★★**`R5` 的裁定是"默认走云"、⛔ "禁止测量本地"**：★逐字「**默认 TTS 走云**」＋「本地 matcha 条目**保持 `blocked-p3` 不改**」；★而 `manifest.json` 逐字 **`dev/measurement use only`** ⇒ **测量面明确允许**
+   ⇒ ★**所以"测量级实现"⛔ 违反 `R5`**
+2. ★★**乙的代价太大**：★**票 61 被 16/11/05 挡** ⇒ **票 26 的 `AC4`/`AC5` 长期拿不到读数**
+   ⇒ ★**"为了合规而让两格 AC 永远空着"** ＝ ★**铁律第 1 条禁的"为守规矩而丢价值"**
+3. ★★★**甲明确"默认选型/manifest/配置一律不动"** ⇒ ★**出货面完全不受影响**
+4. ★★**丙拿不到 `AC5` 实测** ⇒ ★**等于白做**
+- ★★**而我**不需要**把它摆机主**：★**甲**⛔ 改任何契约文字****（票面标题／`SPEC-04` 一字不动）、★**只是证据件写明"此实现不可出货"** ⇒ ★**不属铁律三类**
+
+**⑤ ★★它的技术前提是好消息（⛔ 重设计）**
+★`sherpa-onnx-go-windows@v1.13.8` **原生有离线 TTS 且带分块回调**：★`NewOfflineTts`／`OfflineTtsConfig{Model.Matcha{...}, Vocab...}`／`SampleRate()`／`Generate()`／★★**`GenerateWithProgressCallback`（**逐块回调、返回 `false` 可中止**）**／`DeleteOfflineTts`
+⇒ ★★**`TtsEngine.Speak(text, emit)` 能被**逐块真流式**实现**、★**⛔ 新 cgo 面、⛔ 改 `engines.go`** ✅
+
+**⑥ ★★写面分布（它逐格核过：7 格里只有 2 格落在它写面）**
+| AC | 要点 | 它能不能 |
+|---|---|---|
+| ★AC1 | 出声＋球 `Speaking`＋打断→`Listening` | ⛔ `internal/ball`＋`cmd/**` |
+| ★AC2 | 播报期间采集门关（13 计数器 0 帧）| ⛔ `cmd/wisp`＋`internal/audio` |
+| ★AC3 | Path C 打断 ≤400ms／不自激 | ⛔ **票面自己写 `blocked by 59`（AEC）** |
+| ★★**AC4** | ★**首音 ≤800ms warm／≤1600ms 冷载、10 轮 P50/P95** | ★**能**（要模型）|
+| ★★**AC5** | ★**ASR 与 TTS 不共驻（峰值=max）＋卸载** | ★**能**（`DisposalScope` 在 `internal/plugin`、可 import 不改）|
+| ★AC6 | P7：20 句双盲人评 ≥7/10 | ⛔ **人**（机主/双盲评分者）|
+| ★AC7 | 播报串过 `risk.ChTTS` | ★**只能做 26 侧闸测试**（生产接线在 `cmd/**`）|
+⇒ ★**所以本笔最多能翻 `AC4`/`AC5` 两格** ⇒ ★**这个预期要说清**
+
+**⑦ ★★它正在做的（零工作树突变）**
+★在 `D:\tmp\wisp\20261026\26r1\` 造探针、★用 `-overlay` 把一枚 `_test.go` **虚拟挂进** `internal/speech` 编译（**⛔ 落盘到仓**）
+★先取真数：matcha 载入耗时／PCM 样本数与时长与采样率／首块延迟／RSS delta（**复用 `internal/observe` 的 `PrivateWorkingSetBytes`**）／ASR+TTS 共驻的 RSS（sum vs max）／空文本与纯标点正控
+
+**⑧ ★状态**＝**在飞 3**（`26-r1` 取数中／`27-r1` 标点／`28-r1` session warm）、★**goal `active`/`armed`**
+★结案 **48 票**（`-done` **191** 枚）、真待推进 **174**、完成度 **52.3%**、未推 **0**、★**摆机主 0 件**
