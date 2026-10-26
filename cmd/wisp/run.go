@@ -315,6 +315,12 @@ type agentRuntime struct {
 	// under the existing risk.SrcTaskOutput source name (197 §0: no invented
 	// source names, or a child's outside text travels a channel nobody owns).
 	c25 *risk.Provenance
+	// voiceAnnounce is ticket wire-r1's announce seam: the resident voice leg's
+	// "say one sentence out loud" path, or nil when this process assembled no
+	// voice chain. execute() hands it the same text it just notified with, and
+	// every hop after that (risk.ChTTS gate, TTS engine, output device, the
+	// ball's Speaking) belongs to the leg, not to this runtime.
+	voiceAnnounce func(text string) bool
 	// provs is the built provider chain, kept for the probe path.
 	provs    []llm.LlmProvider // built chain, kept for the probe path
 	names    []string
@@ -1457,6 +1463,21 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 		fmt.Fprintf(rt.stderr, "wisp run: 通知未能发出：%v\n", err)
 		if code == 0 {
 			code = 1
+		}
+	}
+	// Ticket wire-r1: ticket 26's announcement hop, and the ONE production trigger
+	// the TTS path has. This line hands over the SAME sentence D10 just notified
+	// with, so the notification and the spoken line cannot disagree about what the
+	// result was. nil means this boot assembled no voice chain (or a `wisp run` that
+	// never will), and then nothing is claimed.
+	//
+	// The call does not block: the voice leg queues the sentence for its own owner
+	// goroutine (D38b), where the ChTTS gate, the single-family engine slot, the
+	// output device and the ball's Speaking all live. What it returns is "was the
+	// sentence taken", which is booked rather than swallowed.
+	if rt.voiceAnnounce != nil {
+		if taken := rt.voiceAnnounce(notifyBody(res)); !taken {
+			rt.auditf("wisp run: 播报没有受理（语音链未装配、TTS 模型缺失或队列已满），结果由上面的 D10 通知交付")
 		}
 	}
 	if code != 0 {

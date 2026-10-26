@@ -18,6 +18,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/proc"
+	"github.com/CarlosShao/wisp/internal/risk"
 )
 
 // hotkeyReloadSource296 is ticket 258's hot-tier [hotkey] source - the reload
@@ -482,7 +483,26 @@ func runResident() {
 	if src != nil && src.run != nil {
 		voiceTasks = src
 	}
-	raudio.attachVoice(startResidentVoice(rt, raudio, rb, voiceTasks))
+	rv := startResidentVoice(rt, raudio, rb, voiceTasks)
+	// Ticket wire-r1: the announce path's PRODUCTION TRIGGER. The D10 result
+	// presenter in run.go's execute() is the one place in this process that holds
+	// the agent's answer text, so it is the only place a sentence can be handed to
+	// the voice leg from; everything after that call - the C25 ChTTS gate, the
+	// engine family, the output device, the ball's Speaking - is the leg's.
+	//
+	// The provenance engine is the process's own (rt.c25, the one the tool bridge
+	// marks sources into), not a private copy: an announcement gated against an
+	// engine nobody marks would be a check that can never fire. attachProvenance is
+	// nil-safe and owns a fail-closed engine when this boot has none.
+	if rv != nil {
+		var prov *risk.Provenance
+		if src != nil && src.run != nil {
+			prov = src.run.c25
+			src.run.voiceAnnounce = rv.announce
+		}
+		rv.attachProvenance(prov)
+	}
+	raudio.attachVoice(rv)
 
 	// The boot report names the steps this process really owns, taken off the
 	// registration rather than off a comment (AC#4's "不许撒谎" half).

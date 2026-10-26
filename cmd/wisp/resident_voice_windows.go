@@ -100,6 +100,8 @@ import (
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/plugin"
 	"github.com/CarlosShao/wisp/internal/proc"
+	"github.com/CarlosShao/wisp/internal/risk"
+	"github.com/CarlosShao/wisp/internal/session"
 	"github.com/CarlosShao/wisp/internal/speech"
 	"github.com/CarlosShao/wisp/internal/statemachine"
 )
@@ -120,7 +122,30 @@ const (
 	voiceAsrEncoder = "encoder.int8.onnx"
 	voiceAsrDecoder = "decoder.int8.onnx"
 	voiceAsrTokens  = "tokens.txt"
+
+	// voicePunctModelID / voicePunctFile are the punctuation entry's manifest id
+	// (purpose "punctuation", status ok) and the artifact name inside its archive.
+	// 27-r1 measured the file this store path resolves to: 75,519,198 B, sha256
+	// 65a3fb9f5ad7bfb9..., which is the manifest's own pin.
+	voicePunctModelID = "punc-ct-transformer-zh-en-vocab272727"
+	voicePunctFile    = "model.int8.onnx"
+
+	// The matcha checkpoint's manifest id and the artifact names inside it. The
+	// vocoder is the manifest's second `files` entry (no archive), so it lands in
+	// the same directory. Status: blocked-p3 - this is a dev/measurement TTS, not
+	// the product's default (R5, ticket 61); nothing here selects an engine.
+	voiceTtsModelID  = "tts-matcha-zh-baker"
+	voiceTtsAcoustic = "model-steps-3.onnx"
+	voiceTtsVocoder  = "vocos-22khz-univ.onnx"
+	voiceTtsLexicon  = "lexicon.txt"
+	voiceTtsTokens   = "tokens.txt"
+	voiceTtsDict     = "dict"
 )
+
+// voiceTtsRuleFsts are the three text-normalisation graphs the checkpoint ships.
+// Missing ones are dropped rather than fatal: a date/number rule FST changes how
+// "2026" is read, not whether the engine speaks at all.
+var voiceTtsRuleFsts = []string{"date.fst", "number.fst", "phone.fst"}
 
 // voiceRingSeconds is how much audio the pre-hand-off ring keeps: the contiguous
 // history phase 2's fresh Detector replays so the utterance that opened is not
@@ -163,9 +188,12 @@ var errVoiceChainRefused = errors.New("voice: model hand-off refused")
 // "exit=0" is the walk's, not an inference from a nil error.
 type voiceChainReady struct {
 	exit int
-	asr  *speech.StreamingAsr
-	det  *speech.Detector
-	err  error
+	// asr is the C9 seam, not the concrete session: since wire-r1 the engine comes
+	// from the session scope, which hands back an AsrEngine. NewTranscriber takes
+	// the interface, so nothing downstream needs the concrete type.
+	asr speech.AsrEngine
+	det *speech.Detector
+	err error
 }
 
 // voiceHandOff is models.go's handOffModel, narrowed to the two facts this leg
@@ -199,6 +227,19 @@ type voicePlan struct {
 	// the compiled default table), so a boot line cannot imply a file it did not
 	// read.
 	Source string
+	// PunctModelPath is the CT-Transformer onnx file the dictation path attaches
+	// through Transcriber.SetPunctuator (ticket 27). Empty means the store carries
+	// no punctuation model: the chain still runs and its finals are raw, which is
+	// the "stage switched off" state 27-r1 pinned.
+	PunctModelPath string
+	// Tts is the matcha checkpoint's file set (ticket 26). Incomplete means this
+	// process cannot speak: the announcement path says so and the D10 notification
+	// remains the delivery path.
+	Tts voiceTtsFiles
+	// WarmTimeout is [session].warm_timeout_sec: how long the engines stay hot
+	// before the Settling window starts. 0 means the session package's own default
+	// (90 s), which is also the config default.
+	WarmTimeout time.Duration
 }
 
 // voiceTransition is one D43 edge this leg actually walked. AtSample is the
@@ -248,7 +289,28 @@ type residentVoice struct {
 
 	paused atomic.Bool
 
-	// handOffStarted and handOffDone are the first-use trigger's own state, owned
+	// The wire-r1 half: the owner queue (work for THIS goroutine), the engine
+	// residence (session warm epochs + the single-family slot), and the C25 scope
+	// the announce gate reads.
+	queue     *voiceOwnerQueue
+	residency *voiceResidency
+	prov      *risk.Provenance
+	provScope string
+	// newSpeaker is the render seam. Production is the waveOut device; the tests
+	// hand in a recorder so the samples an announcement produced can be read back
+	// without a sound card, and one live case uses the device itself.
+	newSpeaker func(rate int) (voiceSpeaker, error)
+
+	// warmFeed is D43 #26's mic.keep-off as this chain can honestly implement it:
+	// the frames keep draining (the detector still needs them to hear the summon)
+	// but nothing they produce reaches the text path until a wake resumes the
+	// session. Set by the session scope's MicClose hook, cleared on Resume.
+	warmFeed atomic.Bool
+
+	announceMu      sync.Mutex
+	announcePending []voiceAnnounceRequest
+
+	// handOffStarted and chainReady are the first-use trigger's own state, owned
 	// by the consumer goroutine: the walk AND the engine load run on the roster's
 	// model thread while the loop keeps draining, and the buffered channel is how
 	// the ready engines (or the reason there are none) come back.
@@ -267,6 +329,30 @@ type residentVoice struct {
 	handOffExit atomic.Int64
 	asrLoaded   atomic.Bool
 	fed         atomic.Int64
+
+	// wire-r1 counters: one per hop of the three paths, so every sentence in the
+	// evidence table is a reading and not an inference.
+	announceAsked   atomic.Uint64
+	announceEmpty   atomic.Uint64
+	announceTooLong atomic.Uint64
+	announceDropped atomic.Uint64
+	ttsGated        atomic.Uint64
+	ttsGatedOk      atomic.Uint64
+	ttsNoEngine     atomic.Uint64
+	ttsNoDevice     atomic.Uint64
+	ttsSilent       atomic.Uint64
+	ttsFailed       atomic.Uint64
+	ttsSpoken       atomic.Uint64
+	ttsChunks       atomic.Uint64
+	ttsSamples      atomic.Uint64
+	warmTurnEnd     atomic.Uint64
+	warmWake        atomic.Uint64
+	warmDiscards    atomic.Uint64
+	punctAttached   atomic.Bool
+	punctFinals     atomic.Uint64
+	// asrGone is set by the announce path when a family swap released the ASR the
+	// running transcriber still holds; the loop re-arms phase 1 on it.
+	asrGone atomic.Bool
 
 	mu       sync.Mutex
 	timeline []voiceTransition
@@ -306,13 +392,50 @@ func voiceRingAppend(ring, samples []float32) []float32 {
 // channel, the plan and the two sinks are parameters instead of being read from
 // the process.
 func newResidentVoice(frames <-chan []byte, plan voicePlan, ball *residentBall, tasks voiceTranscriptSink) *residentVoice {
+	queue := newVoiceOwnerQueue()
 	return &residentVoice{
-		frames:  frames,
-		plan:    plan,
-		ball:    ball,
-		tasks:   tasks,
-		machine: statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping}),
+		frames:     frames,
+		plan:       plan,
+		ball:       ball,
+		tasks:      tasks,
+		machine:    statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping}),
+		queue:      queue,
+		residency:  newVoiceResidency(plan, queue, nil),
+		provScope:  voiceAnnounceScope,
+		newSpeaker: openWaveOutSpeaker,
 	}
+}
+
+// attachProvenance hands the leg the process's C25 engine and opens the channel
+// scope the announce gate reads. A nil engine means this boot has no provenance
+// engine at all; the leg then owns one with the same options panel_assets.go uses
+// for its own process-lifetime scope, so the gate is never "skipped because there
+// was no engine" (CheckText on a nil engine would be a nil dereference, and a
+// skipped check is the fail-open direction).
+func (rv *residentVoice) attachProvenance(p *risk.Provenance) {
+	if rv == nil {
+		return
+	}
+	owned := false
+	if p == nil {
+		p = risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+		owned = true
+	}
+	scope := p.OpenScope(rv.provScope)
+	if scope == nil {
+		if !owned {
+			// The id is already registered by somebody else: take a private engine
+			// rather than check against a scope this leg does not own.
+			p = risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+			scope = p.OpenScope(rv.provScope)
+		}
+	}
+	if scope == nil {
+		rv.noteProblem("播报闸未接线：C25 作用域打不开，播报路径会拒绝出声（fail-closed）")
+		return
+	}
+	rv.prov = p
+	slog.Info("voice: ChTTS gate wired", "scope", rv.provScope, "channel", string(risk.ChTTS))
 }
 
 // start warms the VAD, then books the consumer on the D38b roster through the
@@ -350,6 +473,13 @@ func (rv *residentVoice) start(reg *observe.Registry) {
 	// inside run - cancel, then join, then release, which is the mandatory tail
 	// order.
 	rv.scope = plugin.NewDisposalScope("voice-15e", nil, opts...)
+	// The mic half of "Warm closes the microphone FIRST". What this chain can
+	// honestly close is the FEED, not the device: the C8 frames that carry the wake
+	// in are the capture leg's, and a chain that switched the device off in Warm
+	// would never hear the next utterance (KWS, the other wake source, is ticket
+	// 41). So the hook closes what reaches the agent, and the evidence table names
+	// that shape instead of claiming a device close it did not do.
+	rv.residency.onMicClose = func() { rv.warmFeed.Store(true) }
 	rv.scope.Go(voiceGoroutineName, func(ctx context.Context) { rv.run(ctx, phase1) })
 	slog.Info("voice: consumer booked on the D38b roster",
 		"name", voiceGoroutineName, "category", "temporary (C11 scope)", "ring_seconds", voiceRingSeconds,
@@ -378,6 +508,18 @@ func (rv *residentVoice) stop() {
 			slog.Warn("voice: disposal did not complete cleanly", "scope", res.Scope, "timed_out", res.TimedOut)
 		}
 	}
+	// The queue is closed AFTER the consumer is joined: a post that lands between
+	// the two is refused (counted) instead of growing work nobody will run.
+	if rv.queue != nil {
+		rv.queue.close()
+	}
+	// D38(e) step 4's engine half, now the session's cascade instead of a defer:
+	// whatever Warm was still holding is released here, and only here.
+	if rv.residency != nil {
+		if err := rv.residency.dispose("process-exit"); err != nil {
+			slog.Warn("voice: 引擎驻留没有干净收口", "err", err.Error())
+		}
+	}
 	if rv.machine != nil {
 		rv.machine.Close()
 	}
@@ -402,11 +544,18 @@ func (rv *residentVoice) stop() {
 // the walk returns, so the audio is continuous across the switchover as long as
 // the walk finishes inside voiceRingSeconds.
 func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
-	defer phase1.Close()
+	// phase1 is a variable, not the parameter, because the announce path can swap
+	// the engine family and re-arm a fresh endpointer (see the loop head). The defer
+	// reads the CURRENT one, so a rebuilt detector is released too.
+	defer func() {
+		if phase1 != nil {
+			_ = phase1.Close()
+		}
+	}()
 
 	var (
 		tr   *speech.Transcriber
-		asr  *speech.StreamingAsr
+		asr  speech.AsrEngine
 		eps  []speech.Endpoint
 		outs []speech.Transcript
 	)
@@ -420,6 +569,26 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 	ring := make([]float32, 0, voiceRingSamples)
 	pausedClosed := false
 	for {
+		// The family swap. An announcement loads the TTS through the slot, and the
+		// slot releases the ASR BEFORE it does (D32 16.3.3: one family resident, so
+		// the peak is max and not the sum). The transcriber this loop was driving
+		// therefore holds a released session, and the honest move is to drop it and
+		// re-arm phase 1: the next utterance pays the ASR's cold load and walks the
+		// hand-off again, which is D32's on-demand price and is counted, not hidden.
+		if rv.asrGone.Load() && tr != nil {
+			tr, asr = nil, nil
+			rv.asrGone.Store(false)
+			rv.handOffStarted = false
+			rv.asrLoaded.Store(false)
+			if det, derr := speech.NewDetector(speech.DetectorConfig{ModelPath: rv.plan.VadModelPath}); derr != nil {
+				rv.noteProblem("播报换族后重建 VAD 失败：" + derr.Error())
+				return
+			} else {
+				phase1 = det
+			}
+			slog.Info("voice: the announce swapped the engine family; phase 1 re-armed",
+				"reason", "tts-resident", "asr_released", true)
+		}
 		if rv.paused.Load() {
 			if !pausedClosed {
 				// The tray paused the listener: close whatever was open and
@@ -441,11 +610,16 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 		if tr == nil {
 			// Phase 1 (and the first-use load, if one is in flight). chainReady
 			// is nil until beginHandOff creates it, and a nil case in a select is
-			// never taken - so this is one loop, not two.
+			// never taken - so this is one loop, not two. The owner queue is the
+			// third case: session timers and announcements land HERE (see
+			// resident_voice_engines_windows.go's threading note), which is what
+			// keeps the dispose cascade off the runtime timer goroutine.
 			select {
 			case <-ctx.Done():
 				rv.abandonChain()
 				return
+			case <-rv.queue.wakeChan():
+				rv.queue.run()
 			case r := <-rv.chainReady:
 				var adoptErr error
 				tr, asr, adoptErr = rv.adopt(r)
@@ -486,6 +660,8 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 		select {
 		case <-ctx.Done():
 			return
+		case <-rv.queue.wakeChan():
+			rv.queue.run()
 		case frame, ok := <-rv.frames:
 			if !ok {
 				outs = tr.Finalize(outs[:0])
@@ -499,6 +675,11 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 			}
 			rv.drained.Add(1)
 			rv.fed.Add(int64(len(pcm)))
+			// The ring is kept for the whole life of the chain since wire-r1, not
+			// only until the first speech: a Warm wake replays it the same way the
+			// first-use switchover does, so the utterance that woke the session is
+			// not clipped at the point the feed was opened.
+			ring = voiceRingAppend(ring, voiceSamples(pcm))
 			outs = tr.Accept(voiceSamples(pcm), outs[:0])
 			rv.consume(outs)
 		}
@@ -531,29 +712,28 @@ func (rv *residentVoice) beginHandOff(start speech.Endpoint) {
 		return
 	}
 	// The walk and the load go on the roster's model thread through the same C11
-	// scope, so disposal joins them like everything else this leg started.
+	// scope, so disposal joins them like everything else this leg started. Since
+	// wire-r1 the load itself goes through the session scope's ASR epoch
+	// (resident_voice_engines_windows.go): that is what makes the engine the
+	// session keeps hot, and it is why the walk still runs BEFORE the bytes are
+	// opened - acquireTurn is the call that opens them.
 	rv.scope.Go(voiceHandOffGoroutine, func(ctx context.Context) {
 		exit := hook(voiceAsrModelID, rv.logf)
 		if exit != 0 {
 			ready <- voiceChainReady{exit: exit}
 			return
 		}
-		asr, err := speech.NewStreamingAsr(speech.AsrConfig{
-			EncoderPath: filepath.Join(rv.plan.AsrDir, voiceAsrEncoder),
-			DecoderPath: filepath.Join(rv.plan.AsrDir, voiceAsrDecoder),
-			TokensPath:  filepath.Join(rv.plan.AsrDir, voiceAsrTokens),
-		})
+		handle, _, err := rv.residency.acquireTurn(session.EngineASR, "first-use")
 		if err != nil {
 			ready <- voiceChainReady{exit: exit, err: err}
 			return
 		}
 		det, err := speech.NewDetector(speech.DetectorConfig{ModelPath: rv.plan.VadModelPath})
 		if err != nil {
-			_ = asr.Close()
 			ready <- voiceChainReady{exit: exit, err: err}
 			return
 		}
-		ready <- voiceChainReady{exit: exit, asr: asr, det: det}
+		ready <- voiceChainReady{exit: exit, asr: handle.Asr(), det: det}
 	})
 	slog.Info("voice: model hand-off and engine load started on the roster's model thread",
 		"goroutine", voiceHandOffGoroutine, "id", voiceAsrModelID, "dir", rv.plan.AsrDir)
@@ -588,7 +768,7 @@ func (rv *residentVoice) abandonChain() {
 // releases what exists): retrying a refused hand-off is a policy this slice does
 // not own, and a leg that kept running with no ASR would make the boot report's
 // "frames have a consumer" claim a half-truth.
-func (rv *residentVoice) adopt(r voiceChainReady) (*speech.Transcriber, *speech.StreamingAsr, error) {
+func (rv *residentVoice) adopt(r voiceChainReady) (*speech.Transcriber, speech.AsrEngine, error) {
 	rv.handOffExit.Store(int64(r.exit))
 	if r.exit != 0 {
 		rv.noteProblem(fmt.Sprintf("模型交还被拒绝（id=%s，exit=%d）：ASR 的字节不打开，这一句不会被转写；"+
@@ -608,23 +788,87 @@ func (rv *residentVoice) adopt(r voiceChainReady) (*speech.Transcriber, *speech.
 		"goroutine", voiceGoroutineName, "window_samples", speech.WindowSamples)
 	fmt.Printf("wisp: 语音链接管：模型交还已通过（id=%s），ASR 字节从 %s 打开，VAD 句柄换成第二枚会话接管回放\n",
 		voiceAsrModelID, rv.plan.AsrDir)
-	return speech.NewTranscriber(r.det, r.asr), r.asr, nil
+	tr := speech.NewTranscriber(r.det, r.asr)
+	// TICKET 27's call site. This is the one place a Transcriber exists in
+	// production, so it is the only place SetPunctuator can be called from: the
+	// driver punctuates in final() and nowhere else, which is what makes
+	// "partials stay raw, finals are dictation grade" a property of the code.
+	// A nil punct (no model resolved, or a stage that refused to load) is the
+	// "switched off" state 27-r1 pinned: the final is the raw hypothesis and
+	// Transcript.Punctuated says so, so nothing downstream has to guess.
+	if p := rv.residency.punctuator(); p != nil {
+		tr.SetPunctuator(p)
+		rv.punctAttached.Store(true)
+		slog.Info("voice: punctuation stage attached", "model", rv.plan.PunctModelPath,
+			"attach_point", "Transcriber.SetPunctuator", "scope", "the ASR epoch (released with it)")
+		fmt.Printf("wisp: 标点级已接上：ASR 的 final 过 %s 标点模型（%s），partial 结构性不带标点\n",
+			"CT-Transformer", rv.plan.PunctModelPath)
+	} else {
+		// "no model on this machine" and "a model that would not attach" are
+		// different facts: the first is a store without the punctuation entry and is
+		// not a problem, the second is a stage this leg failed to wire and is. Only
+		// the second goes through noteProblem.
+		if rv.plan.PunctModelPath == "" {
+			slog.Info("voice: no punctuation model resolved; finals stay raw (the switched-off state)")
+			fmt.Printf("wisp: 标点级未接：本机模型库没有标点模型（这一进程的 final 是原始假设，不带标点）\n")
+		} else {
+			rv.noteProblem("标点级未接上（这一进程的 final 是原始假设，不带标点）：" + rv.plan.PunctModelPath)
+		}
+	}
+	return tr, r.asr, nil
 }
 
 // consume fans the seam's transcripts into this leg's readings, the D43 walk and
 // the text path.
 func (rv *residentVoice) consume(outs []speech.Transcript) {
 	for _, t := range outs {
+		// The Warm wake. A transcript after Warm proves the microphone has
+		// something for the agent, whatever the D43 row that got us here was: the
+		// feed opens, the borrow is taken back and the session resumes without
+		// loading anything. Both kinds count, because a short utterance can reach
+		// its final without ever emitting a partial.
+		if rv.warmFeed.Load() && (t.Kind == speech.TranscriptPartial || t.Kind == speech.TranscriptFinal) {
+			rv.wakeFromWarm()
+		}
 		switch t.Kind {
 		case speech.TranscriptPartial:
 			rv.partials.Add(1)
 			rv.recordPartial(t)
 		case speech.TranscriptFinal:
 			rv.finals.Add(1)
+			if t.Punctuated {
+				rv.punctFinals.Add(1)
+			}
 			rv.finish(t)
 		default:
 			rv.noteProblem(fmt.Sprintf("未知的转写类型 %v", t.Kind))
 		}
+	}
+}
+
+// wakeFromWarm is D43 #29 (Warm) / #33 (Settling) plus session Resume in one
+// place, and it is the reading ticket 28 AC1 keys on: the acquire it takes is
+// supposed to cost nothing, and the session's own LoadsAfterWarm counter refutes
+// that claim if the warm path lost an engine.
+func (rv *residentVoice) wakeFromWarm() {
+	rv.warmFeed.Store(false)
+	rv.warmWake.Add(1)
+	resumed := false
+	if ok, err := rv.residency.resume("utterance-after-warm"); err == nil && ok {
+		resumed = true
+	}
+	_ = resumed
+	switch rv.machine.State() {
+	case statemachine.StateWarm:
+		rv.dispatch(statemachine.EvSummon, nil, "Warm 里听见一句：D43#29 Warm 到 Listening（零装载）")
+	case statemachine.StateSettling:
+		rv.dispatch(statemachine.EvSummon, nil, "Settling 里听见一句：D43#33 取消静置，回 Listening")
+	}
+	if _, d, err := rv.residency.acquireTurn(session.EngineASR, "warm-wake"); err != nil {
+		rv.noteProblem("唤醒后借不到 ASR：" + err.Error())
+	} else {
+		slog.Info("voice: warm wake took its ASR borrow back", "acquire", d.String(),
+			"stage", string(rv.residency.stage()), "loads_after_warm", rv.residency.stats().LoadsAfterWarm)
 	}
 }
 
@@ -655,23 +899,44 @@ func (rv *residentVoice) finish(t speech.Transcript) {
 	rv.recordTurnFinal(t, speechMS, handed)
 	rv.dispatch(statemachine.EvVadStop, &statemachine.Facts{SpeechMS: speechMS},
 		fmt.Sprintf("判停（%s）且语音 %dms 不小于 300ms：D43#11 让球走 Thinking", t.Endpoint.Kind, speechMS))
+
+	// TICKET 28's turn end, and the line the whole warm池 exists for: the engines
+	// are NOT stopped. The turn returns its borrow (Release never unloads) and the
+	// session lands in Warm, which closes the mic half FIRST and then keeps every
+	// engine hot for [session].warm_timeout_sec. Before wire-r1 the only thing
+	// that ever released an engine was process exit; ticket 28-r1 could not wire
+	// this because the seam is here.
+	rv.residency.releaseTurn(session.EngineASR)
+	if err := rv.residency.enterWarm("turn-end"); err == nil {
+		rv.warmTurnEnd.Add(1)
+		slog.Info("voice: turn ended into Warm (engines stay hot)",
+			"reason", "turn-end", "stage", string(rv.residency.stage()),
+			"loads_after_warm", rv.residency.stats().LoadsAfterWarm,
+			"engines_hot", rv.residency.stats().EnginesHot)
+	}
 }
 
 // dispatch walks one D43 edge and projects the result to the ball. An illegal
 // transition is recorded, never panicked: the table is frozen and a leg that
 // guesses an edge is worse than one that says the table refused it.
-func (rv *residentVoice) dispatch(ev statemachine.Event, facts *statemachine.Facts, say string) {
+//
+// It reports whether the edge was really walked. The announce path needs that
+// answer: "the ball moved into Speaking" is a reading, and a hop that the table
+// refused (an announcement arriving in a state with no legal row into Speaking,
+// which is every state outside Thinking/Acting/AwaitingApproval) must not be
+// reported as one.
+func (rv *residentVoice) dispatch(ev statemachine.Event, facts *statemachine.Facts, say string) bool {
 	if rv == nil || rv.machine == nil {
-		return
+		return false
 	}
 	from := rv.machine.State()
 	to, err := rv.machine.Dispatch(ev, facts)
 	if err != nil {
 		rv.noteProblem(fmt.Sprintf("D43 拒绝 %s + %s：%v", from, ev, err))
-		return
+		return false
 	}
 	if to == from {
-		return
+		return false
 	}
 	rv.mu.Lock()
 	rv.timeline = append(rv.timeline, voiceTransition{
@@ -680,6 +945,7 @@ func (rv *residentVoice) dispatch(ev statemachine.Event, facts *statemachine.Fac
 	rv.mu.Unlock()
 	rv.ball.setVoiceState(to)
 	slog.Info("voice: D43 walked", "from", string(from), "event", string(ev), "to", string(to), "why", say)
+	return true
 }
 
 // drainWhilePaused drains one frame and drops it. It returns false when the
@@ -688,6 +954,9 @@ func (rv *residentVoice) drainWhilePaused(ctx context.Context) bool {
 	select {
 	case <-ctx.Done():
 		return false
+	case <-rv.queue.wakeChan():
+		rv.queue.run()
+		return true
 	case _, ok := <-rv.frames:
 		if !ok {
 			return false
@@ -878,10 +1147,44 @@ func (rv *residentVoice) posture() string {
 	return fmt.Sprintf("C8 帧通道已接上 1 个消费者（D38b 名册名 %s，C11 作用域 %q）；"+
 		"VAD=%s；ASR 模型 id=%s，字节只在第一次开句时由模型交还通过后从 %s 打开；"+
 		"目前排空 %d 帧／部分结果 %d 条／判停 %d 句／交给文本路 %d 句／模型交还 %d 次（exit=%d）；"+
-		"配置来源 %s",
+		"标点=%s（带标点的 final %d 条）；播报=%s；%s；配置来源 %s",
 		voiceGoroutineName, "voice-15e", rv.plan.VadModelPath, voiceAsrModelID, rv.plan.AsrDir,
 		rv.drained.Load(), rv.partials.Load(), rv.finals.Load(), rv.handed.Load(),
-		rv.handOffs.Load(), rv.handOffExit.Load(), rv.plan.Source)
+		rv.handOffs.Load(), rv.handOffExit.Load(),
+		punctState(rv.plan.PunctModelPath, rv.punctAttached.Load()), rv.punctFinals.Load(),
+		rv.announceReading(), rv.residency.reading(), rv.plan.Source)
+}
+
+// punctState spells the two "no punctuation" states apart, because they are
+// different facts: no model on this machine, versus a model that is there and a
+// stage that did not attach.
+func punctState(model string, attached bool) string {
+	switch {
+	case attached:
+		return "已接上（" + model + "）"
+	case model == "":
+		return "未接（本机模型库没有标点模型）"
+	default:
+		return "未接（有模型但没有接上：" + model + "）"
+	}
+}
+
+// announceReading is the announce path's posture: every hop counted separately, so
+// "it spoke" and "it was refused by the gate" cannot be read as the same thing.
+func (rv *residentVoice) announceReading() string {
+	if rv == nil {
+		return "未装配"
+	}
+	if rv.residency == nil {
+		return "未装配"
+	}
+	if !rv.plan.Tts.complete() && rv.ttsSpoken.Load() == 0 {
+		return "没有 TTS 模型（这一进程不出声，结果只走 D10 通知）"
+	}
+	return fmt.Sprintf("闸=%d/%d（拦下 %d）引擎缺=%d 设备缺=%d 无内容=%d 失败=%d 出声=%d 句／%d 块／%d 样本",
+		rv.ttsGatedOk.Load(), rv.ttsGated.Load()+rv.ttsGatedOk.Load(), rv.ttsGated.Load(),
+		rv.ttsNoEngine.Load(), rv.ttsNoDevice.Load(), rv.ttsSilent.Load(), rv.ttsFailed.Load(),
+		rv.ttsSpoken.Load(), rv.ttsChunks.Load(), rv.ttsSamples.Load())
 }
 
 // stopLine is the teardown record: the counters the exit line carries, taken off
@@ -890,10 +1193,12 @@ func (rv *residentVoice) stopLine() string {
 	if rv == nil || rv.scope == nil {
 		return "voice leg: not assembled in this process"
 	}
-	return fmt.Sprintf("voice leg stopped: frames_drained=%d paused_drops=%d partials=%d finals=%d discarded=%d handed=%d handoffs=%d handoff_exit=%d asr_loaded=%v",
+	return fmt.Sprintf("voice leg stopped: frames_drained=%d paused_drops=%d partials=%d finals=%d discarded=%d handed=%d handoffs=%d handoff_exit=%d asr_loaded=%v punct_attached=%v punctuated_finals=%d announce_asked=%d spoken=%d gated=%d samples=%d warm_turn_end=%d warm_wake=%d",
 		rv.drained.Load(), rv.pausedDrops.Load(), rv.partials.Load(), rv.finals.Load(),
 		rv.discarded.Load(), rv.handed.Load(), rv.handOffs.Load(), rv.handOffExit.Load(),
-		rv.asrLoaded.Load())
+		rv.asrLoaded.Load(), rv.punctAttached.Load(), rv.punctFinals.Load(),
+		rv.announceAsked.Load(), rv.ttsSpoken.Load(), rv.ttsGated.Load(), rv.ttsSamples.Load(),
+		rv.warmTurnEnd.Load(), rv.warmWake.Load())
 }
 
 // startResidentVoice is the assembly root's call: resolve the plan off this
@@ -950,12 +1255,17 @@ func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tas
 
 	plan, why := resolveVoicePlan(dataDir, c)
 	plan.Source = source
+	plan.WarmTimeout = time.Duration(c.Session.WarmTimeoutSec) * time.Second
 	if why != "" {
 		rv.verdict = why
 		return rv
 	}
 	rv.plan = plan
 	rv.frames = ra.frames
+	// The residency is built with the plan it will load from: the voicePlan the
+	// constructor got is the zero one on this path, and a residency holding no
+	// paths would answer "语音链：ASR 目录为空" for every turn.
+	rv.residency = newVoiceResidency(plan, rv.queue, nil)
 	rv.verdict = "语音链已装配"
 	return rv
 }
@@ -983,7 +1293,78 @@ func resolveVoicePlan(dataDir string, c *config.Config) (voicePlan, string) {
 		VadModelPath: vad,
 		AsrDir:       filepath.Join(store, voiceAsrModelID),
 		HandOff:      residentVoiceHandOff(dataDir),
+		// Ticket 27's model and ticket 26's checkpoint, resolved off the SAME store
+		// layout 15e's ASR uses: <store>/<manifest id>/<file name inside the
+		// archive>. Both are optional on purpose - a store without them is a chain
+		// that cannot punctuate or speak, which the boot line says rather than a
+		// chain that refuses to start.
+		PunctModelPath: voicePunctModelPath(store),
+		Tts:            voiceTtsFilesIn(filepath.Join(store, voiceTtsModelID)),
 	}, ""
+}
+
+// voicePunctModelPath resolves the CT-Transformer file (manifest purpose
+// "punctuation", id voicePunctModelID). WISP_PUNC_MODEL is the same escape hatch
+// 27-r1's staging used and WISP_SILERO_MODEL already is for the VAD; it is an
+// environment variable, not a configuration key (adding [voice] punctuation would
+// move D36 and belongs to its own ticket).
+func voicePunctModelPath(store string) string {
+	p := filepath.Join(store, voicePunctModelID, voicePunctFile)
+	if voiceFileExists(p) {
+		return p
+	}
+	return os.Getenv("WISP_PUNC_MODEL")
+}
+
+// voiceTtsFilesIn resolves the matcha checkpoint's file set. WISP_TTS_DIR is the
+// staging escape hatch; production is the store directory, whose layout is the
+// archive's own (model-steps-3.onnx, lexicon.txt, tokens.txt, the three FSTs,
+// dict/) plus the vocoder the manifest lists as a separate file.
+func voiceTtsFilesIn(dir string) voiceTtsFiles {
+	if env := os.Getenv("WISP_TTS_DIR"); env != "" {
+		dir = env
+	}
+	if dir == "" {
+		return voiceTtsFiles{}
+	}
+	files := voiceTtsFiles{
+		Acoustic: filepath.Join(dir, voiceTtsAcoustic),
+		Vocoder:  filepath.Join(dir, voiceTtsVocoder),
+		Lexicon:  filepath.Join(dir, voiceTtsLexicon),
+		Tokens:   filepath.Join(dir, voiceTtsTokens),
+		DictDir:  filepath.Join(dir, voiceTtsDict),
+	}
+	// The vocoder is a SEPARATE download in the manifest, so a tree that keeps the
+	// checkpoint's archive contents in their own directory (third_party's
+	// spike-models carries matcha-icefall-zh-baker/ and vocos-22khz-univ.onnx side
+	// by side) has it one level up. The store layout has both in <store>/<id>/, and
+	// the first candidate wins there.
+	if !voiceFileExists(files.Vocoder) {
+		if up := filepath.Join(filepath.Dir(dir), voiceTtsVocoder); voiceFileExists(up) {
+			files.Vocoder = up
+		}
+	}
+	for _, fst := range voiceTtsRuleFsts {
+		files.RuleFsts = append(files.RuleFsts, filepath.Join(dir, fst))
+	}
+	// A path that is not there is not a file set: the announce path refuses a
+	// partial checkpoint with one named sentence instead of a sherpa refusal.
+	for _, p := range []string{files.Acoustic, files.Vocoder, files.Lexicon, files.Tokens} {
+		if !voiceFileExists(p) {
+			return voiceTtsFiles{}
+		}
+	}
+	if st, err := os.Stat(files.DictDir); err != nil || !st.IsDir() {
+		return voiceTtsFiles{}
+	}
+	kept := files.RuleFsts[:0]
+	for _, fst := range files.RuleFsts {
+		if voiceFileExists(fst) {
+			kept = append(kept, fst)
+		}
+	}
+	files.RuleFsts = kept
+	return files
 }
 
 // voiceFileExists is the one existence test this file uses. It answers "is there
