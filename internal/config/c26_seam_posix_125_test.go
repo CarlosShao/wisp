@@ -51,6 +51,13 @@ import (
 // links internal/risk, winsec's sealing seam has to hold the C26 pipeline. It
 // deliberately does not skip on any condition, because "POSIX has no red-capable
 // assertion here" is the defect being closed.
+//
+// The probe spelling is built on the temp base as the harness spells it, then
+// anchored to its real spelling with filepath.EvalSymlinks (every component of
+// a t.TempDir result exists, so EvalSymlinks folds every link in the chain,
+// including a darwin-style /var -> /private/var ancestor). On a link-free base
+// the call returns the spelling unchanged, so the plain shape asks exactly what
+// it always asked.
 func TestAC1POSIXSeamHoldsC26Pipeline125(t *testing.T) {
 	t.Logf("fixture: TMPDIR=%q resolves=%q", os.TempDir(), evalOrSelf(t, os.TempDir()))
 	r := winsec.PathResolverInstalled()
@@ -68,7 +75,18 @@ func TestAC1POSIXSeamHoldsC26Pipeline125(t *testing.T) {
 	// refuses a spelling that traverses ".."; the pipeline answers it with the
 	// tree's own name. If this call refuses, the installed resolver is not
 	// rewriting anything and the seam is floor-equivalent whatever its type says.
-	base := t.TempDir()
+	//
+	// base is anchored first because ticket 347's default-deny is about the
+	// spelling walked, not the object reached: a base spelled through a link
+	// would make the probe's refusal a statement about that ancestor link (which
+	// the seam's own install probes already answer) instead of about the
+	// refold-and-rewrite this leg exists to pin. The claim stays the same one on
+	// every shape: refuse what traverses "..", never rewrite, and never let a
+	// parent pointer survive the answer.
+	base, rerr := filepath.EvalSymlinks(t.TempDir())
+	if rerr != nil {
+		t.Fatalf("fixture: cannot anchor the probe base to its real spelling: %v", rerr)
+	}
 	sep := string(filepath.Separator)
 	hostile := base + sep + ".." + sep + "wisp-125-probe"
 	got, err := r.Resolve(hostile)
@@ -114,13 +132,28 @@ const childShape125 = "WISP_125_SEAM_SHAPE"
 // shapes, no second copy of the claim. A plain-TMPDIR child is run first as the
 // instrument's own control: if it fails, the link-shaped child's failure says
 // nothing about the shape.
+//
+// Ticket 347's reparse default-deny added one fact this case had to fold in
+// without dropping its subject: the measured child's TMPDIR is still spelled
+// through varlink125 (the subject - the install decision under a link-spelled
+// temp - is unchanged), so the nail's own probe spelling must not traverse that
+// ancestor link, or the refusal it reports is the ancestor's, not the probe's.
+// Anchoring the probe base with filepath.EvalSymlinks keeps the denied input the
+// probe-shaped one and leaves every assertion (no error, never a pass-through,
+// never a surviving "..") on the nail it used to sit on; the control child keeps
+// a link-free base, where EvalSymlinks is a no-op.
 func TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125(t *testing.T) {
 	base := t.TempDir()
+	realRoot, rerr := filepath.EvalSymlinks(base)
+	if rerr != nil {
+		t.Fatalf("fixture: cannot anchor the temp base %q to its real spelling: %v", base, rerr)
+	}
+	base = realRoot
 	if link := firstLink125(base); link != "" {
 		t.Skipf("fixture: the harness's temp base %q reaches itself through the link at %q, so neither child below "+
 			"is the control shape and the pair would measure one thing twice", base, link)
 	}
-	realRoot := filepath.Join(base, "real125", "tmproot125")
+	realRoot = filepath.Join(base, "real125", "tmproot125")
 	if err := os.MkdirAll(realRoot, 0o700); err != nil {
 		t.Fatalf("fixture mkdir %s: %v", realRoot, err)
 	}
