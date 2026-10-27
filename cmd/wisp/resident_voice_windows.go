@@ -301,6 +301,28 @@ type residentVoice struct {
 	// without a sound card, and one live case uses the device itself.
 	newSpeaker func(rate int) (voiceSpeaker, error)
 
+	// TICKET 26's one-needle seam (26r3): the capture half-duplex gate this
+	// process already mounts (residentAudio's *audio.HalfDuplexGate, PathT),
+	// handed in by the assembly root. On PathT SetSpeaking(true) closes capture -
+	// D16's "关闭麦克风" - and SetSpeaking(false) reopens it with zero model
+	// reload (internal/audio/gate.go). Before 26r3 the gate's own comment said it
+	// is "driven by the TTS side" and the TTS side never drove it: production
+	// callers were zero. The field is an anonymous one-method interface so the
+	// wiring stays cmd/wisp-side (this leg may not edit internal/audio) and the
+	// test can drive the production speak() against a recording gate; nil means
+	// this boot built no capture leg (the same nil-safety every other handle on
+	// this struct carries).
+	captureGate interface {
+		SetSpeaking(speaking bool)
+	}
+	// speakGateOn / speakGateOff are the needle's two observability counters:
+	// how many announcements closed the gate and how many times the chain
+	// released it (one speak() = at most one of each, whatever its outcome). The
+	// boot report's announce reading and the stop line both quote them, so
+	// "the gate was driven" is a reading and not an inference from a code path.
+	speakGateOn  atomic.Uint64
+	speakGateOff atomic.Uint64
+
 	// warmFeed is D43 #26's mic.keep-off as this chain can honestly implement it:
 	// the frames keep draining (the detector still needs them to hear the summon)
 	// but nothing they produce reaches the text path until a wake resumes the
@@ -436,6 +458,29 @@ func (rv *residentVoice) attachProvenance(p *risk.Provenance) {
 	}
 	rv.prov = p
 	slog.Info("voice: ChTTS gate wired", "scope", rv.provScope, "channel", string(risk.ChTTS))
+}
+
+// attachCaptureGate hands the announce path the capture leg's half-duplex gate
+// (ticket 26's one needle, 26r3). It is the only writer of rv.captureGate and
+// the assembly root calls it once, right after the voice leg exists - the same
+// ordering attachVoice has, because both are "the leg is told what already
+// exists" hops: the gate was mounted by assembleCapture before the voice chain
+// was built, and this hand-off is what makes the TTS side finally drive it.
+// nil-safe like every other attach here; a boot with no capture leg leaves the
+// announce path unmuted-but-honest (speakGateOn/off stay zero and the reading
+// says so).
+func (rv *residentVoice) attachCaptureGate(gate interface {
+	SetSpeaking(speaking bool)
+},
+) {
+	if rv == nil {
+		return
+	}
+	rv.captureGate = gate
+	if gate != nil {
+		slog.Info("voice: capture gate wired to the announce path",
+			"seam", "audio.HalfDuplexGate.SetSpeaking", "path", string(audio.PathT))
+	}
 }
 
 // start warms the VAD, then books the consumer on the D38b roster through the
@@ -1181,10 +1226,22 @@ func (rv *residentVoice) announceReading() string {
 	if !rv.plan.Tts.complete() && rv.ttsSpoken.Load() == 0 {
 		return "没有 TTS 模型（这一进程不出声，结果只走 D10 通知）"
 	}
-	return fmt.Sprintf("闸=%d/%d（拦下 %d）引擎缺=%d 设备缺=%d 无内容=%d 失败=%d 出声=%d 句／%d 块／%d 样本",
+	return fmt.Sprintf("闸=%d/%d（拦下 %d）引擎缺=%d 设备缺=%d 无内容=%d 失败=%d 出声=%d 句／%d 块／%d 样本 门闭=%d 放开=%d",
 		rv.ttsGatedOk.Load(), rv.ttsGated.Load()+rv.ttsGatedOk.Load(), rv.ttsGated.Load(),
 		rv.ttsNoEngine.Load(), rv.ttsNoDevice.Load(), rv.ttsSilent.Load(), rv.ttsFailed.Load(),
-		rv.ttsSpoken.Load(), rv.ttsChunks.Load(), rv.ttsSamples.Load())
+		rv.ttsSpoken.Load(), rv.ttsChunks.Load(), rv.ttsSamples.Load(),
+		rv.speakGateOn.Load(), rv.speakGateOff.Load())
+}
+
+// setSpeakingCount is the gate needle's reading for tests and the boot report:
+// on/off in one call, taken off the same atomics the stop line quotes. The
+// two must be read together - "the gate was closed 3 times" says nothing
+// without "it was reopened 3 times".
+func (rv *residentVoice) setSpeakingCount() (closed, reopened uint64) {
+	if rv == nil {
+		return 0, 0
+	}
+	return rv.speakGateOn.Load(), rv.speakGateOff.Load()
 }
 
 // stopLine is the teardown record: the counters the exit line carries, taken off
@@ -1193,12 +1250,12 @@ func (rv *residentVoice) stopLine() string {
 	if rv == nil || rv.scope == nil {
 		return "voice leg: not assembled in this process"
 	}
-	return fmt.Sprintf("voice leg stopped: frames_drained=%d paused_drops=%d partials=%d finals=%d discarded=%d handed=%d handoffs=%d handoff_exit=%d asr_loaded=%v punct_attached=%v punctuated_finals=%d announce_asked=%d spoken=%d gated=%d samples=%d warm_turn_end=%d warm_wake=%d",
+	return fmt.Sprintf("voice leg stopped: frames_drained=%d paused_drops=%d partials=%d finals=%d discarded=%d handed=%d handoffs=%d handoff_exit=%d asr_loaded=%v punct_attached=%v punctuated_finals=%d announce_asked=%d spoken=%d gated=%d samples=%d warm_turn_end=%d warm_wake=%d gate_closed=%d gate_reopened=%d",
 		rv.drained.Load(), rv.pausedDrops.Load(), rv.partials.Load(), rv.finals.Load(),
 		rv.discarded.Load(), rv.handed.Load(), rv.handOffs.Load(), rv.handOffExit.Load(),
 		rv.asrLoaded.Load(), rv.punctAttached.Load(), rv.punctFinals.Load(),
 		rv.announceAsked.Load(), rv.ttsSpoken.Load(), rv.ttsGated.Load(), rv.ttsSamples.Load(),
-		rv.warmTurnEnd.Load(), rv.warmWake.Load())
+		rv.warmTurnEnd.Load(), rv.warmWake.Load(), rv.speakGateOn.Load(), rv.speakGateOff.Load())
 }
 
 // startResidentVoice is the assembly root's call: resolve the plan off this
@@ -1226,9 +1283,22 @@ func startResidentVoice(rt *proc.Runtime, ra *residentAudio, rb *residentBall, t
 
 // buildResidentVoice is the same assembly with the data root named, so the
 // evidence table can drive the production resolution against a config it wrote.
+//
+// 26r3 found and fixed the one defect that made the whole announce path
+// unreachable in production: the literal below never built the owner queue,
+// so rv.queue was nil on this - the PRODUCTION - constructor, announce()
+// refused every sentence at its first line (the queue==nil guard), the owner
+// select's queue case never fired, and the residency's clock marshalled
+// session timers onto the runtime timer goroutine (voiceOwnerClock with a nil
+// queue runs the callback inline). Every test that ever walked the announce
+// path came through newResidentVoice, which is why the staged readings were
+// green while the production shape was dead. The queue is built here, for
+// every branch including the early returns, so a degraded boot still has the
+// honest refused-post shape instead of a nil dereference.
 func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tasks voiceTranscriptSink) *residentVoice {
 	rv := &residentVoice{
 		ball: rb, tasks: tasks,
+		queue:   newVoiceOwnerQueue(),
 		machine: statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping}),
 	}
 

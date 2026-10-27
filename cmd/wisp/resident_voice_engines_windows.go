@@ -57,6 +57,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/CarlosShao/wisp/internal/audio"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/session"
 	"github.com/CarlosShao/wisp/internal/speech"
@@ -838,13 +839,22 @@ func (rv *residentVoice) speakQueued() {
 //
 //  1. risk.ChTTS gate    CheckText before anything is synthesised
 //  2. engine             the slot's TTS family (the ASR is released first)
+//     2b. capture gate      SetSpeaking(true) once the family swap has released
+//     the ASR, so the frames the gate closes behind are
+//     already in flight and gate.go's invariant holds
 //  3. Speak              the C9 seam, samples out in playback order
 //  4. the device         waveOut queues them; Drain waits for the last one
 //  5. the ball           D43 #15 into Speaking, then #26 out to Warm
 //
 // It runs on the owner goroutine, so the audio it plays is not fed to the ASR
 // (D47's "the announcement audio must never reach ASR", which the paused and
-// warm feeds both implement by not feeding while this runs).
+// warm feeds both implement by not feeding while this runs). Since 26r3 the
+// feed is not merely withheld: the capture gate is CLOSED for the whole body -
+// including the hops that never reach the device (refused, no engine, no
+// speaker, synthesis failure, silence) - and reopened exactly once on the way
+// out, so the mic never hears the announcement and gate.go's bounded-channel
+// invariant ("frames behind a closed gate were captured before the TTS
+// started") is what the ring replay can lean on.
 func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 	text := req.text
 	// HOP 1: the C25 channel gate. A hit is not an error - it is the channel
@@ -874,6 +884,36 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 	// the ASR instead of feeding a released session.
 	if rv.asrLoaded.Load() {
 		rv.asrGone.Store(true)
+	}
+	// HOP 2b (ticket 26's one needle, 26r3): close the capture gate BEFORE the
+	// first sample can exist. The placement is the placement, not a habit: the
+	// family swap above may have Stop()ed the inner source mid-frame, and frames
+	// already in the bounded channel were captured BEFORE this sentence began -
+	// exactly the invariant internal/audio/gate.go documents for a closed gate.
+	// Closing it after Speak's first chunk would be too late by one waveOut
+	// buffer and the microphone would hear the announcement. gateRelease below
+	// is the ONLY way this body leaves, so every outcome - spoken, refused
+	// later, no engine, no device, synthesis failure, the engine's
+	// nothing-to-say guard - reopens the gate exactly once.
+	gateOpen := false
+	gateRelease := func() {
+		if gateOpen {
+			gateOpen = false
+			if rv.captureGate != nil {
+				rv.captureGate.SetSpeaking(false)
+				rv.speakGateOff.Add(1)
+			}
+			slog.Info("voice: capture gate reopened (speech ended)",
+				"reason", "announce-done", "path", string(audio.PathT))
+		}
+	}
+	defer gateRelease()
+	if rv.captureGate != nil {
+		rv.captureGate.SetSpeaking(true)
+		rv.speakGateOn.Add(1)
+		gateOpen = true
+		slog.Info("voice: capture gate closed for the announcement",
+			"reason", "speaking", "path", string(audio.PathT))
 	}
 	eng := handle.Tts()
 	if eng == nil {

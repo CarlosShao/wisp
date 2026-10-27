@@ -501,6 +501,12 @@ func runResident() {
 			src.run.voiceAnnounce = rv.announce
 		}
 		rv.attachProvenance(prov)
+		// Ticket 26's one needle (26r3): the announce path now drives the capture
+		// leg's half-duplex gate. The gate was mounted in assembleCapture (PathT,
+		// WithStartMuted(mic_muted_default)); before this line its SetSpeaking had
+		// zero production callers. Ordering is the comment above kept true: the
+		// voice leg exists, so the TTS side can be told what it owns.
+		rv.attachCaptureGate(raudio.gate)
 	}
 	raudio.attachVoice(rv)
 
