@@ -21,59 +21,71 @@ package config
 // gets its own row (see below), because a section can be hot and restart at
 // the same time (planApp/planVoice) - registering them whole would be the
 // "粒度只到段" lie ticket 255 stands on.
-var TierRegistry = map[string]string{
+//
+// TICKET 233 - THE TIER WORDS ARE THE THREE CONSTANTS, NOT WORDS. The map's
+// values are typed through config.Tier (TierHot/TierReload/TierRestart) and
+// the "locked" marker string. Before this retag the three Tier* constants had
+// zero non-test reference in the repository outside their own declaration
+// lines in schema.go - the D36 three-tier enum existed while the table that
+// actually tiered every key spelled its values as bare string literals, so a
+// typo in one of them ("het"/"relaod") would compile, pass every typed check
+// and silently re-tier a key. TierOf still returns a string so its callers
+// (cmd/wisp's receipt roster, restartTierKeys' pin) keep their shape.
+var TierRegistry = map[string]Tier{
 	// Whole-section hot (the hot-apply table in manager.go is derived from
 	// exactly these rows).
-	"ball":    "hot",
-	"session": "hot",
-	"audio":   "hot",
-	"llm":     "hot",
-	"agent":   "hot",
-	"privacy": "hot",
-	"memory":  "hot",
-	"panel":   "hot",
-	"cost":    "hot",
-	"models":  "hot",
-	"observe": "hot",
-	"hotkey":  "hot",
+	"ball":    TierHot,
+	"session": TierHot,
+	"audio":   TierHot,
+	"llm":     TierHot,
+	"agent":   TierHot,
+	"privacy": TierHot,
+	"memory":  TierHot,
+	"panel":   TierHot,
+	"cost":    TierHot,
+	"models":  TierHot,
+	"observe": TierHot,
+	"hotkey":  TierHot,
 	// Locked sections: not a reload tier - any loosening queues an L2 card
-	// (planLocked), tightening applies quietly.
-	"risk":    "locked",
-	"fs":      "locked",
-	"net":     "locked",
-	"plugins": "locked",
+	// (planLocked), tightening applies quietly. TierLocked is not one of D36's
+	// three reload tiers; it is the marker planLocked's sections carry so the
+	// completeness pin can tell "accounted for" from "forgotten".
+	"risk":    TierLocked,
+	"fs":      TierLocked,
+	"net":     TierLocked,
+	"plugins": TierLocked,
 	// [app] is per-key: theme is the one hot key, the rest restart
 	// (manager.go planApp; ticket 255 AC#2-ⓑ - registered per key).
-	"app.theme":           "hot",
-	"app.language":        "restart",
-	"app.autostart":       "restart",
-	"app.single_instance": "restart",
+	"app.theme":           TierHot,
+	"app.language":        TierRestart,
+	"app.autostart":       TierRestart,
+	"app.single_instance": TierRestart,
 	// [voice] is per-key: model-pipeline keys reload (apply + event),
 	// tuning keys are hot (manager.go planVoice; SPEC-03 sec 3).
-	"voice.enabled":              "reload",
-	"voice.wake_word.enabled":    "reload",
-	"voice.wake_word.keywords":   "reload",
-	"voice.asr":                  "reload",
-	"voice.asr.provider":         "reload",
-	"voice.asr.model":            "reload",
-	"voice.tts.provider":         "reload",
-	"voice.tts.voice":            "reload",
-	"voice.conversation_mode":    "reload",
-	"voice.aec":                  "reload",
-	"voice.aec.enabled":          "reload",
-	"voice.aec.echo_ref":         "reload",
-	"voice.realtime":             "reload",
-	"voice.realtime.enabled":     "reload",
-	"voice.realtime.provider":    "reload",
-	"voice.realtime.model":       "reload",
-	"voice.realtime.api_key_ref": "reload",
-	"voice.realtime.base_url":    "reload",
-	"voice.cloud_asr_chain":      "reload",
-	"voice.cloud_tts_chain":      "reload",
-	"voice.wake_word.thresholds": "hot",
-	"voice.wake_word.veto_words": "hot",
-	"voice.tts.speed":            "hot",
-	"voice.punctuation":          "hot",
+	"voice.enabled":              TierReload,
+	"voice.wake_word.enabled":    TierReload,
+	"voice.wake_word.keywords":   TierReload,
+	"voice.asr":                  TierReload,
+	"voice.asr.provider":         TierReload,
+	"voice.asr.model":            TierReload,
+	"voice.tts.provider":         TierReload,
+	"voice.tts.voice":            TierReload,
+	"voice.conversation_mode":    TierReload,
+	"voice.aec":                  TierReload,
+	"voice.aec.enabled":          TierReload,
+	"voice.aec.echo_ref":         TierReload,
+	"voice.realtime":             TierReload,
+	"voice.realtime.enabled":     TierReload,
+	"voice.realtime.provider":    TierReload,
+	"voice.realtime.model":       TierReload,
+	"voice.realtime.api_key_ref": TierReload,
+	"voice.realtime.base_url":    TierReload,
+	"voice.cloud_asr_chain":      TierReload,
+	"voice.cloud_tts_chain":      TierReload,
+	"voice.wake_word.thresholds": TierHot,
+	"voice.wake_word.veto_words": TierHot,
+	"voice.tts.speed":            TierHot,
+	"voice.punctuation":          TierHot,
 }
 
 // lockedSections lists the four planLocked sections; the completeness pin
@@ -90,7 +102,12 @@ var lockedSections = map[string]bool{
 // is registered at all. The panel write path (cmd/wisp) is the intended
 // caller once 255-r2 lands: the receipt's "when does this take effect"
 // sentence must be produced from this table, not hand-written per field.
+//
+// The returned tier is a string view of the Tier value the registry holds
+// (ticket 233: the values ARE the three D36 constants plus TierLocked), so
+// existing string-based callers keep compiling unchanged. A caller that wants
+// the typed value can compare against the Tier constants directly.
 func TierOf(path string) (tier string, ok bool) {
 	t, ok := TierRegistry[path]
-	return t, ok
+	return string(t), ok
 }

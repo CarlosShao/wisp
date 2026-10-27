@@ -52,14 +52,18 @@ package main
 // WHAT THE TWO CLASSES OF "有读者" MEAN HERE, STATED SO A READER CAN DISAGREE.
 // 票 180's census classes a key "R" when production code reads its value at all.
 // By that ruler [agent] and [models] have readers. This file claims "已立即生效"
-// only for the narrower class - a reader that re-reads the live Manager - because
-// the sentence is about THIS run: cmd/wisp/run.go:426-427 takes `cfg := mgr.Config()`
-// once and its own comment says "the runtime's non-mode settings stay frozen at
-// what this boot read", and execute() reads that copy (cmd/wisp/run.go:1023
-// `cfg := rt.cfg`). Calling [agent] 立即生效 on that shape is the same lie as
-// [panel], one layer deeper. Both files' evidence is in the roster strings below and
-// is pinned by config_receipt_255_test.go, so the disagreement is checkable rather
-// than buried.
+// only for the narrower class - a reader that re-reads the live Manager. Until
+// ticket 233 execute() read the boot copy (cmd/wisp/run.go:1023 `cfg := rt.cfg`,
+// taken once at run.go:426-427), which is what kept [agent] snapshot-only while
+// its own comment said "the runtime's non-mode settings stay frozen at what this
+// boot read" - calling [agent] 立即生效 on that shape was the same lie as [panel],
+// one layer deeper. Ticket 233 re-pointed execute() at the live Manager
+// (run.go:1252 `cfg := rt.mgr.Config()`), so [agent] now carries "consumed" with
+// the new read site as its cite; the boot snapshot rt.cfg still exists, still
+// frozen, and the 223/227/255 cases still read it as the "before". Both files'
+// evidence is in the roster strings below and is pinned by
+// config_receipt_255_test.go, so the disagreement is checkable rather than
+// buried.
 
 import (
 	"fmt"
@@ -109,12 +113,19 @@ var hotRowClaims = map[string]string{
 	// model swapped".
 	"llm": hotClaimConsumed + "cmd/wisp/panel_config_store.go:98 [ChatModel:      cfg.LLM.Roles.Chat.Model] - configStore.ReadSettings calls s.mgr.Config() per call",
 
-	// Read in production, but only from the boot snapshot: rt.cfg is taken once
-	// at assembly (cmd/wisp/run.go:427 [rt.cfg = cfg]) and every use reads that
-	// copy (cmd/wisp/run.go:1023 [cfg := rt.cfg]; the field is consumed at
-	// cmd/wisp/run.go:1046 [PerToolTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS)]). plan() did overwrite
-	// the memory, so the honest sentence is "值已换进内存", not "已立即生效".
-	"agent": hotClaimSnapshotOnly + "cmd/wisp/run.go:1023 [cfg := rt.cfg] - every cfg.Agent read is the boot copy, so this run keeps acting on the old value",
+	// Since ticket 233 this is a live reader, and the row moved to "consumed":
+	// execute() (cmd/wisp/run.go:1252 [cfg := rt.mgr.Config()]) now reads the
+	// LIVE Manager at the start of every task, so a hot-applied [agent] edit
+	// reaches the NEXT task's PerToolTimeoutMS / SteeringEnabled /
+	// ProjectInstructionsEnabled instead of every task acting on the boot copy
+	// forever. Before that line the reads went through the boot snapshot
+	// (cmd/wisp/run.go:1023 [cfg := rt.cfg]), which is what kept this row
+	// snapshot-only; rt.cfg still exists and is still the frozen boot snapshot
+	// its own pin (and the 223/227/255 cases) read it as, but execute() no
+	// longer sources its config from it. This is the one hot section whose
+	// claim upgraded with ticket 233 - [llm] is the other "consumed" row, its
+	// live reader unchanged (cmd/wisp/panel_config_store.go:92).
+	"agent": hotClaimConsumed + "cmd/wisp/run.go:1263 [cfg = rt.mgr.Config()] - execute() reads the live Manager per task since ticket 233, so the next task after a hot-applied [agent] edit acts on the new values (PerToolTimeoutMS / SteeringEnabled / ProjectInstructionsEnabled)",
 
 	// Read by a DIFFERENT command's process: openModelStore takes the config
 	// (cmd/wisp/models.go:163 [cfg.Models.Mirror]) but its callers are the
@@ -141,8 +152,18 @@ var hotRowClaims = map[string]string{
 	// "扫描零命中", which is the reader scan's own result for that field
 	// (TestTicket255RosterStillMatchesTheActualReadSites in
 	// config_receipt_255_test.go re-measures it on every run).
-	"ball":    hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx   int // configured orb size 44..72] - the ball's own option carries the size, and nothing outside internal/config reads cfg.Ball",
-	"session": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Session - the three session timeouts this section names drive nothing yet",
+	"ball": hotClaimNoReader + "internal/ball/ball_windows.go:64 [SizePx   int // configured orb size 44..72] - the ball's own option carries the size, and nothing outside internal/config reads cfg.Ball",
+	// Ticket 233 re-adjudicated this row: since ticket wire-r1 the resident
+	// voice leg reads one [session] key at boot (cmd/wisp/resident_voice_windows.go:1329
+	// [c.Session.WarmTimeoutSec], handed to the voice plan's warm timeout), so
+	// the old 扫描零命中 reading is no longer true. Two facts keep the verdict in
+	// other-process, the same shape [audio] carries: the read is one fresh
+	// config.LoadFile at the voice leg's construction (a changed [session]
+	// waits for the next process; nothing re-reads the live Manager), and the
+	// reader lives in the resident `wisp` process - `wisp run` builds no voice
+	// leg. The other two [session] keys (settling_sec, conversation_idle_sec)
+	// still read from nowhere.
+	"session": hotClaimOtherProcess + "cmd/wisp/resident_voice_windows.go:1329 [c.Session.WarmTimeoutSec] - the resident voice leg reads the warm timeout once at its boot LoadFile, so a hand edit reaches the next process, never this run",
 	// Ticket 247 moved [audio] out of the reader-less class: the resident
 	// process's capture assembly reads mic_muted_default at boot and hands it to
 	// audio.WithStartMuted, which is the sentence internal/audio/gate.go:55-56 wrote
@@ -202,11 +223,19 @@ var hotRowClaims = map[string]string{
 	// Per-key sections: planApp/planVoice book the SECTION name into rep.Hot, so
 	// the claim must be settled per key row and only claimed when every hot row
 	// behind the name is consumed.
+	//
+	// Ticket 233 re-measured the reader list these rows cite: ticket wire-r1's
+	// resident voice leg (cmd/wisp/resident_voice_windows.go) joined the
+	// section's production readers at its boot LoadFile - it reads [voice]
+	// enabled (:1315) and asr.provider (:1321) to decide whether the voice
+	// chain is built at all, and [session] warm_timeout_sec (:1329) for the
+	// warm plan. The four hot KEYS below still read from nowhere, so the rows
+	// stay no-reader; only the reader-list half of their verdict text changes.
 	"app.theme":                  hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.App - manager.go's planApp compares and copies it, and no component re-skins from it",
-	"voice.tts.speed":            hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the TTS knobs are not threaded to the voice path yet",
-	"voice.punctuation":          hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the punctuation switch has no consumer yet",
-	"voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet",
-	"voice.wake_word.veto_words": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the three files sectionReadSites pins) - the veto list is not consumed by the KWS path yet",
+	"voice.tts.speed":            hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the TTS knobs are not threaded to the voice path yet",
+	"voice.punctuation":          hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the punctuation switch has no consumer yet",
+	"voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet",
+	"voice.wake_word.veto_words": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the veto list is not consumed by the KWS path yet",
 }
 
 // sectionReadSites pins, per Config field, which production files the reader scan
@@ -216,8 +245,10 @@ var hotRowClaims = map[string]string{
 // making the receipt untrue. The values are file paths, not line numbers, so an
 // unrelated edit above a reader does not churn the pin.
 var sectionReadSites = map[string][]string{
-	"Ball":    nil,
-	"Session": nil,
+	"Ball": nil,
+	// Ticket 233: the resident voice leg's boot LoadFile reads WarmTimeoutSec
+	// (see the roster row above), so [session] left the reader-less class.
+	"Session": {"cmd/wisp/resident_voice_windows.go"},
 	// Ticket 247's capture assembly is the first production reader of both
 	// sections: it reads [audio] mic_muted_default into audio.WithStartMuted and
 	// [voice] enabled as "build the collector at all, or not". Both reads are
@@ -240,10 +271,12 @@ var sectionReadSites = map[string][]string{
 	// cmd/wisp/panel_config_store.go reads the cloud chains and realtime keys off
 	// the LIVE Manager (ReadSettings), and internal/panel/config_handlers.go
 	// renders that answer - its `v.Voice.*` lines read panel.SettingsView, so the
-	// scan keys on the field name and this list records what it measures. The
-	// per-key rows above stay "no-reader" because no file reads THOSE keys -
-	// a verdict about the keys, not about these three files.
-	"Voice":  {"cmd/wisp/panel_config_store.go", "cmd/wisp/resident_audio_windows.go", "internal/panel/config_handlers.go"},
+	// scan keys on the field name and this list records what it measures. Ticket
+	// wire-r1's voice leg added the fourth: it reads [voice] enabled/asr.provider
+	// and [session] warm_timeout_sec at its boot LoadFile (see the per-key rows
+	// above). The per-key rows stay "no-reader" because no file reads THOSE keys -
+	// a verdict about the keys, not about these files.
+	"Voice":  {"cmd/wisp/panel_config_store.go", "cmd/wisp/resident_audio_windows.go", "cmd/wisp/resident_voice_windows.go", "internal/panel/config_handlers.go"},
 	"Agent":  {"cmd/wisp/run.go"},
 	"Models": {"cmd/wisp/models.go"},
 	// 票 320's fetch port added a fifth live reader of [llm], and 票 324 AC#2 books it

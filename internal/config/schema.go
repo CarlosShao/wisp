@@ -41,6 +41,11 @@ const (
 	// process restart. The reload report carries the pending section so the
 	// app can surface "restart required".
 	TierRestart Tier = "restart"
+	// TierLocked is not one of D36's three reload tiers: it is the marker the
+	// four planLocked sections (risk/fs/net/plugins) carry in TierRegistry so
+	// the completeness pin can tell "accounted for by the L2 re-confirmation
+	// path" from "forgotten" (ticket 255 AC#2-ⓑ; typed by ticket 233).
+	TierLocked Tier = "locked"
 )
 
 // Direction is the security posture of a change inside a locked section

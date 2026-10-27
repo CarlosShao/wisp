@@ -85,23 +85,27 @@ func TestTicket255SplitOnlyClaimsSectionsWithALiveReader(t *testing.T) {
 	}
 	split := splitHotTier(hot)
 
-	if strings.Join(split.claimable, " ") != "llm" {
-		t.Errorf("claimable = %v, want exactly [llm]: it is the only hot section this host reads live (cmd/wisp/panel_config_store.go:92 takes s.mgr.Config() per call). A section with no live reader must never be in this list.", split.claimable)
+	// Ticket 233 re-adjudicated the [agent] row: execute() reads the live
+	// Manager per task (cmd/wisp/run.go:1263 [cfg = rt.mgr.Config()]), so the
+	// claimable set is [llm agent] - llm via the settings leg, agent via the
+	// composition root's own per-task read. Slice order fixes the join.
+	if strings.Join(split.claimable, " ") != "llm agent" {
+		t.Errorf("claimable = %v, want exactly [llm agent]: llm is read live per call by the settings leg (cmd/wisp/panel_config_store.go:92), agent by execute() per task since ticket 233 (cmd/wisp/run.go:1263). A section with no live reader must never be in this list.", split.claimable)
 	}
 	quiet := map[string]bool{}
 	for _, name := range split.quiet {
 		quiet[name] = true
 	}
 	for _, name := range hot {
-		if name == "llm" {
+		if name == "llm" || name == "agent" {
 			continue
 		}
 		if !quiet[name] {
 			t.Errorf("%q is hot-applied but appears in neither bucket - it would vanish from the receipt (摘尺当修尺, forbidden by AC#1); got claimable=%v quiet=%v", name, split.claimable, split.quiet)
 		}
 	}
-	if len(quiet) != len(hot)-1 {
-		t.Errorf("quiet = %v, want the %d non-llm hot names", split.quiet, len(hot)-1)
+	if len(quiet) != len(hot)-2 {
+		t.Errorf("quiet = %v, want the %d non-llm/agent hot names", split.quiet, len(hot)-2)
 	}
 
 	// A name plan() booked that the registry cannot explain is neither claimed nor
@@ -676,44 +680,50 @@ func TestTicket255ReceiptOmitsPanelFromTheImmediateSentence(t *testing.T) {
 }
 
 // TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere is AC#1's positive control
-// in the shape the ticket asked for, moved off [panel] by AC#4.
+// in the shape the ticket asked for, moved off [panel] by AC#4 and off [session]
+// by ticket 233.
 //
 // WHY IT MOVED HERE. Until 票 255 AC#4 landed, [panel] was the section that proved
 // the sentence can lie: its width was hot-applied into memory and read by nobody
 // anywhere. That is no longer true of it - the resident panel host re-reads it at
 // every window creation - so leaving the strongest form of the control on [panel]
 // would measure "no reader in this process" while claiming "no reader at all",
-// which is the same word doing two jobs AC#1 exists to separate. [session] takes
-// the sample over: three keys, hot-tier by internal/config/tiers.go, and still
-// zero production readers in every process of this repository (the roster row and
-// TestTicket255RosterStillMatchesTheActualReadSites both say so, and the scan
-// re-measures it on every run).
+// which is the same word doing two jobs AC#1 exists to separate. [session] took
+// the sample over then, and ticket 233 moved it once more: ticket wire-r1's
+// resident voice leg reads [session] warm_timeout_sec at its boot LoadFile
+// (cmd/wisp/resident_voice_windows.go:1329), so "no reader anywhere" stopped
+// being true of [session] too - the roster row was re-adjudicated to
+// other-process in the same batch. [ball] takes the sample: internal/config
+// tiers.go registers it hot, its size field is hot-applied by plan(), and the
+// reader scan re-measures zero production readers for it on every run (the
+// roster row's own verdict and TestTicket255RosterStillMatchesTheActualReadSites
+// both say so).
 func TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere(t *testing.T) {
 	r := newReloadRun223(t, 40*time.Second)
 	r.live(t, func() {
 		r.awaitAudit(t, "config: HOT-RELOAD state=armed")
-		r.plant(t, "[fs]", "[session]\nwarm_timeout_sec = 91\n\n[fs]")
+		r.plant(t, "[fs]", "[ball]\nsize = 66\n\n[fs]")
 
 		applied := r.awaitAudit(t, "config: HOT-RELOAD state=applied")
-		if !strings.Contains(applied, "hot=[session]") {
-			t.Errorf("the reload did not book session as hot-tier, so this proves nothing: %q", applied)
+		if !strings.Contains(applied, "hot=[ball]") {
+			t.Errorf("the reload did not book ball as hot-tier, so this proves nothing: %q", applied)
 		}
 		out := r.awaitStdout(t, "值已换进本进程内存")
 		for _, line := range strings.Split(out, "\n") {
-			if strings.Contains(line, "这些段已立即生效") && strings.Contains(line, "[session]") {
+			if strings.Contains(line, "这些段已立即生效") && strings.Contains(line, "[ball]") {
 				t.Errorf("ticket 255 AC#1: the receipt claimed a section with no reader anywhere took effect immediately: %q", line)
 			}
 		}
 		honest := lastLineWith(out, "值已换进本进程内存")
-		if !strings.Contains(honest, "[session]") {
-			t.Errorf("the honest sentence did not name [session], so the edit vanished from the receipt: %q", honest)
+		if !strings.Contains(honest, "[ball]") {
+			t.Errorf("the honest sentence did not name [ball], so the edit vanished from the receipt: %q", honest)
 		}
-		line := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section=session")
+		line := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section=ball")
 		if !strings.Contains(line, "no-reader") {
-			t.Errorf("[session] is the reader-less sample now, so its ledger row must still say no-reader: %q", line)
+			t.Errorf("[ball] is the reader-less sample now, so its ledger row must still say no-reader: %q", line)
 		}
 		if strings.Contains(line, "panel") {
-			t.Errorf("the [session] ledger row names panel, so the two verdicts are not separable: %q", line)
+			t.Errorf("the [ball] ledger row names panel, so the two verdicts are not separable: %q", line)
 		}
 	})
 }
@@ -741,6 +751,9 @@ func TestTicket255ReceiptStillNamesTheLiveReadSection(t *testing.T) {
 			t.Errorf("the reload did not book llm as hot-tier: %q", applied)
 		}
 		out := r.awaitStdout(t, "这些段已立即生效")
+		// [llm] must be claimed, and it must NOT be in the honest bucket. Since
+		// ticket 233 [agent] is claimed too (execute() reads the live Manager per
+		// task), so the honest bucket must not carry it either.
 		line := lastLineWith(out, "这些段已立即生效")
 		if !strings.Contains(line, "[llm]") {
 			t.Errorf("the live-read section is missing from the immediate sentence (摘尺): %q", line)
@@ -748,8 +761,8 @@ func TestTicket255ReceiptStillNamesTheLiveReadSection(t *testing.T) {
 		if strings.Contains(line, "[panel]") || strings.Contains(line, "[ball]") {
 			t.Errorf("the immediate sentence names a reader-less section: %q", line)
 		}
-		if h := lastLineWith(out, "值已换进本进程内存"); strings.Contains(h, "[llm]") {
-			t.Errorf("llm was ALSO put in the honest bucket, which contradicts the claim: %q", h)
+		if h := lastLineWith(out, "值已换进本进程内存"); strings.Contains(h, "[llm]") || strings.Contains(h, "[agent]") {
+			t.Errorf("a claimed section was ALSO put in the honest bucket, which contradicts the claim: %q", h)
 		}
 		// The reader itself, read off the live leg while the process is up.
 		view, err := r.rt.settings.ReadSettings(context.Background())
@@ -799,22 +812,24 @@ func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
 		if immediate == "" {
 			t.Fatalf("the immediate-tier sentence disappeared - AC#1 forbids 摘尺当修尺:\n%s", out)
 		}
-		if !strings.Contains(immediate, "[llm]") {
-			t.Errorf("the live-read section is not claimed: %q", immediate)
+		// Ticket 233: [agent] joined the claimable set (execute() reads the live
+		// Manager per task), so the immediate sentence carries it next to [llm].
+		if !strings.Contains(immediate, "[llm]") || !strings.Contains(immediate, "[agent]") {
+			t.Errorf("the live-read sections are not claimed: %q", immediate)
 		}
-		for _, forbidden := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[agent]", "[models]", "[hotkey]"} {
+		for _, forbidden := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[models]", "[hotkey]"} {
 			if strings.Contains(immediate, forbidden) {
 				t.Errorf("ticket 255 AC#1: the 已立即生效 sentence claims %s, which has no live reader in this host: %q", forbidden, immediate)
 			}
 		}
 		honest := lastLineWith(out, "值已换进本进程内存")
-		for _, want := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[agent]", "[models]", "[hotkey]"} {
+		for _, want := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[models]", "[hotkey]"} {
 			if !strings.Contains(honest, want) {
 				t.Errorf("the honest sentence omits %s, so the edit vanished from the receipt: %q", want, honest)
 			}
 		}
-		if strings.Contains(honest, "[llm]") {
-			t.Errorf("[llm] is in both buckets: %q", honest)
+		if strings.Contains(honest, "[llm]") || strings.Contains(honest, "[agent]") {
+			t.Errorf("a claimed section is in both buckets: %q", honest)
 		}
 		// Logged for the evidence file (run with -v) so both sentences are quoted
 		// off the product, not retyped from the format strings.

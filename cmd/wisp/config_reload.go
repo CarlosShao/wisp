@@ -24,6 +24,15 @@ package main
 //     (不许用「静默不生效」充当这一档). startConfigReload assigns it below,
 //     before the tick is spawned.
 //
+// TICKET 233 - THE THIRD HOOK GOT ITS CONSUMER. Manager.OnReload stayed
+// unassigned in `wisp run` through tickets 223/255 (its only non-test
+// assignment was the side program cmd/balldebug): a [voice] edit was applied
+// and its event fired into a wire nobody held, the silent shape again.
+// startConfigReload now assigns it too, and reportReloadTier below is what
+// runs: the operator is told the reload-tier change landed in memory and that
+// THIS host reloads no subsystem - the voice leg lives in the resident
+// process - instead of the event arriving nowhere.
+//
 // TRIGGER SHAPE, NAMED (AC#1). A resident tick - not a file notification, and
 // not only an explicit command: one goroutine spawned through
 // observe.Default.Spawn under the D38b roster name "watchdog", the slot SPEC-03
@@ -117,14 +126,24 @@ func (rt *agentRuntime) startConfigReload() {
 	// carries the red readings, and both lines are back.)
 	rt.mgr.ConfirmLocked = rt.confirmLockedLoosening
 	rt.mgr.OnRestartPending = rt.reportRestartPending
+	// Ticket 233: the reload tier's consumer. Before this line Manager.OnReload
+	// had zero assignments in `wisp run` (its only non-test one was the side
+	// program cmd/balldebug), so a [voice] edit - applied into memory by
+	// planVoice, booked "applied + event" by the tier table - fired an event
+	// nobody received and nothing told the operator anything: the silent shape
+	// 票 223 AC#2 forbids. This host owns no voice pipeline in `wisp run` (the
+	// resident process builds that leg), so the honest consumer is the receipt
+	// below: the values ARE live in the Manager, the event IS received, and the
+	// sentence names what still does not reload in THIS host.
+	rt.mgr.OnReload = rt.reportReloadTier
 	// AC#1's production caller. Owner names the subsystem that spawned it; the
 	// recover boundary and the roster entry come from Registry.Spawn, never from
 	// a local recover (D22 ban #1: bare `go` has no legal annotation).
 	rt.reloadHandle = observe.Default.Spawn("watchdog", "config", rt.reloadRoot, rt.configReloadTick)
 	rt.auditf("config: HOT-RELOAD state=armed tick=%s path=%q goroutine=watchdog owner=config "+
-		"d36_confirm=on restart_notice=on detail=%q",
+		"d36_confirm=on restart_notice=on reload_receipt=on detail=%q",
 		configReloadPollInterval, filepath.Join(rt.spec.dataDir, configFileName),
-		"本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效")
+		"本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效，重载档会告知事件已收到但本宿主没有可重载的子系统")
 	fmt.Fprintf(rt.stdout,
 		"wisp run: 配置热加载已接管（每 %s 检查一次 config.toml）。手改会按 D36 三档处理："+
 			"可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；"+
@@ -340,10 +359,39 @@ func (rt *agentRuntime) reportRestartPending(sections []string) {
 // this cleanup onto 255-r2): the reader was zero outside this file. It is now
 // TestTicket255RestartTierKeysAreBackedByATest in restart_tier_keys_255r2_test.go,
 // which drives each named key through the real Manager and requires it to land in
-// Report.Restart and never in Report.Hot, pins the list name-for-name, and requires
-// every named key to be registered "restart" in config.TierRegistry.
+// Report.Restart and never in Report.Hot, pins the list name-for-name, and
+// requires every named key to be registered "restart" in config.TierRegistry.
 var restartTierKeys = []string{
 	"app.language", "app.autostart", "app.single_instance",
+}
+
+// reportReloadTier is ticket 233's reload-tier consumer: the hook Manager.OnReload
+// calls after it hot-applied a reload-tier section (the "voice" family). The tier's
+// semantics (D36: 重载子系统) want the owning subsystem to act on the event - the
+// voice pipeline. `wisp run` owns no voice leg (the resident process builds it, the
+// same split the [panel]/[hotkey]/[audio] roster rows carry), so the honest
+// consumer here is the sentence: the value is live in the Manager's memory, the
+// event was received (this line only runs because it was), and what does NOT
+// happen is named - no model swap, no chain rebuild in this host.
+//
+// The line goes to stdout, the operator's own stream, because the receipt is the
+// surface an operator watching `wisp run` can act on; the audit trail already
+// carries the tier verdict on the state=applied line (reload=[voice]). stdout is
+// also what pins it: 票 223 AC#5's rule - a sentence that exists only on a stream
+// nobody who needs it reads is one more silent tier.
+func (rt *agentRuntime) reportReloadTier(sections []string) {
+	if rt == nil {
+		return
+	}
+	rt.auditf("config: RELOAD-TIER state=received sections=%v consumer=wisp-run "+
+		"effect=this-host-reloads-nothing detail=%q",
+		sections,
+		"重载档的改动已写进本进程内存、事件已送达；但本宿主（wisp run）没有可重载的子系统——语音链在常驻进程 wisp 里装配，"+
+			"本宿主不做模型换装，新值由下一次用它的组件从配置层现读。要真正重载子系统请重启常驻进程")
+	fmt.Fprintf(rt.stdout,
+		"wisp run: 重载档（%v）的改动已生效到本进程内存，但本宿主没有可重载的子系统"+
+			"（语音模型换装在常驻进程里），本次运行不会触发模型重载；"+
+			"需要真正换装请重启常驻进程。\n", sections)
 }
 
 // describeReloadFailure turns "the reload did not happen" into one sentence per

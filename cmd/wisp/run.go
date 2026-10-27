@@ -1249,7 +1249,19 @@ func (j *taskLifecycleJournal) FinishToolCall(context.Context, int64, string, st
 // root, and a host that submits one task at a time passes a root derived from it
 // so a single task can be cancelled without touching the entry that produced it.
 func (rt *agentRuntime) execute(parent context.Context, task string) int {
+	// The LIVE config, read per task: since ticket 223 a resident 1s tick hot-
+	// applies changed sections into the Manager, so reading the boot snapshot
+	// here (the shape before ticket 233) meant every task kept acting on the
+	// values this boot loaded even after the receipt had said 立即生效 - the
+	// [agent] snapshot-only verdict in cmd/wisp/config_readers_255.go was that
+	// gap. rt.cfg stays the frozen boot snapshot (its own pin, and the
+	// 223/227/255 cases read it as the "before"), so a mid-run [agent]/[llm]
+	// edit that the tick hot-applied reaches the NEXT task this way. A nil
+	// Manager (a rt built outside runTextTask) falls back to the snapshot.
 	cfg := rt.cfg
+	if rt.mgr != nil {
+		cfg = rt.mgr.Config()
+	}
 	prov := rt.provs[0]
 	info := prov.Info()
 	ep := rt.endpoint
