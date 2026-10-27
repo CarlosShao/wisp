@@ -34,6 +34,8 @@ const (
 	FamilyAsr Family = "asr"
 	// FamilyTts is the TTS family (one TtsEngine).
 	FamilyTts Family = "tts"
+	// FamilyKws is the wake-word family (one WakeWordEngine). Ticket 41.
+	FamilyKws Family = "kws"
 )
 
 // Slot is the serial engine slot: one family resident, the other released first.
@@ -47,6 +49,7 @@ type Slot struct {
 	family Family
 	asr    AsrEngine
 	tts    TtsEngine
+	kws    WakeWordEngine
 	loads  int
 	closes int
 }
@@ -73,6 +76,14 @@ func (s *Slot) Tts() TtsEngine {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.tts
+}
+
+// Kws is the resident wake-word engine, or nil when another family holds the
+// slot (ticket 41, same shape as Asr/Tts).
+func (s *Slot) Kws() WakeWordEngine {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.kws
 }
 
 // Loads and Closes are the counters the readings are made of: a session that
@@ -141,6 +152,30 @@ func (s *Slot) LoadTts(load func() (TtsEngine, error)) (TtsEngine, error) {
 	return eng, nil
 }
 
+// LoadKws makes the wake-word family resident, with the same rules as
+// LoadAsr/LoadTts: release first, then load, and a failed load leaves the slot
+// empty rather than holding a half-built engine.
+func (s *Slot) LoadKws(load func() (WakeWordEngine, error)) (WakeWordEngine, error) {
+	if load == nil {
+		return nil, errors.New("speech: slot LoadKws needs a loader")
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.family == FamilyKws && s.kws != nil {
+		return s.kws, nil
+	}
+	if err := s.releaseLocked(); err != nil {
+		return nil, err
+	}
+	eng, err := load()
+	if err != nil {
+		return nil, err
+	}
+	s.kws, s.family = eng, FamilyKws
+	s.loads++
+	return eng, nil
+}
+
 // Close releases whatever is resident (C11). Idempotent.
 func (s *Slot) Close() error {
 	s.mu.Lock()
@@ -166,6 +201,12 @@ func (s *Slot) releaseLocked() error {
 			s.closes++
 		}
 		s.tts = nil
+	case FamilyKws:
+		if s.kws != nil {
+			err = s.kws.Close()
+			s.closes++
+		}
+		s.kws = nil
 	}
 	s.family = FamilyNone
 	return err
