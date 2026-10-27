@@ -28234,3 +28234,40 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **⑧ ★状态**＝**在飞 0**、★**goal 断过一次**（★机主 10-27 两次点名）⇒ ★**本轮恢复铺腿**
 ★**结案 50 票**（`-done` **193** 枚）、真待推进 **172**、完成度 **52.9%**、★**未推 0（网络已恢复、29 笔全推上）**、★**摆机主 1 件（347 追认、告知非请示）**
+
+## A1283（2026-10-27 17:4x +08，编排者）★★★收 `41-a1`（KWS 只读普查、件 **74 行**）：**四全＝模型在／绑定在／缝在／消费表全冻结现成** ⇒ **第一步可落码**｜★**采纳它的第一步建议：派 `41-a2` 引擎腿**｜★**自报偏差我裁"接受现状"**（commit 主题带 `# ` 前缀、禁 amend、内容无误）
+
+**① ★★四全（逐条现跑）**
+1. ★★**模型在**：★`third_party/spike-models/sherpa-onnx-kws-zipformer-wenetspeech-3.3M-2024-01-01/` **17 件 36,213,421 B**（encoder/decoder/joiner 各 epoch-12+99 两套 fp32+int8、**keywords.txt 8 词**、tokens、**test_wavs 0-6.wav＋test_keywords.txt**）
+   ★★**五件 sha256 逐位对 manifest**（encoder `dd784973…`／decoder `ed834540…`／joiner `f7976005…`／tokens `72316508…`／keywords `46de8c68…`）＋tar 顶层同值＋`fetch.log:111`／`dl.log:13 OK kws`
+   ⇒ ★**`347-r1`/`27-r1` 的"fetch 完好但仓内坏件"先例**不适用**
+   ★★**许可无雷**：manifest `status:"ok"`、`license:Apache-2.0`、模型卡 front-matter 逐字 `license: Apache License 2.0` ⇒ ★**无 `14` 的 matcha P3 问题**（★matcha 自己才是 blocked-p3、对照就在同一 manifest 里）
+2. ★★**绑定在**：★`sherpa-onnx-go v1.13.8 KWS 绑定＝存在`（`go.mod:9` direct）：cgo 实装 `sherpa_onnx.go:2322-2478` —— `KeywordSpotterConfig{FeatConfig,ModelConfig.Transducer,MaxActivePaths,KeywordsFile,KeywordsScore,KeywordsThreshold,KeywordsBuf}`／`NewKeywordSpotter`（失败返 nil）／`NewKeywordStream[WithKeywords]`／`IsReady/Decode/Reset/GetResult`／★`:2466`「You MUST call it right after detecting a keyword」（★**命中后必 Reset**）
+3. ★★**缝在**：★`internal/speech/engines.go:128-134` `WakeWordEngine{Accept(samples,out []KeywordHit) []KeywordHit; Close() error}`、★`KeywordHit{Word,Veto,At}`（★**At=样本钟 D42#9**）、★名册钉 `engines_test.go:35` `[Accept Close]`
+4. ★★★**消费表全冻结现成**：★D43 全在（`PLAN.md:3071-3110`＋table.go 现跑行号）——★**#5** Sleeping+EvKwsEnabled→Armed／★**#7** Armed+EvWakeWord→Listening／★**#8**→Muted／★**#9** 超限自环**不卸 KWS**／★**#10** guard=`Facts.KwsLoaded`／★**#13** Listening+EvVeto→Warm／★**#22** Confirming+EvVeto→Acting／★**#32** KwsLoaded 选回落
+   ★**事件全存在**（`events.go:18/20`、`Facts.KwsLoaded:70`）；★★**生产派发 0**（★`EvKwsEnabled` 唯一 dispatch 在球层测试 `hotkey_live_test.go:408`、★`KwsLoaded` 生产赋值 **0**）；★**`resident_voice_windows.go:42-43` 注释已预留"41 落地时 dispatch 换 EvWakeWord、表保持 byte-identical"** ✅
+
+**② ★★★两处死结的形状（它量清了）**
+1. ★★★**设备开关的家 ＝ `internal/audio/gate.go`**：★`HalfDuplexGate.SetMuted:165`（mute 手势真关双路）／★`WithStartMuted:56` 吃 `[audio] mic_muted_default=true` ⇒ ★**今天的"麦 OFF"靠静音默认、⛔ 靠 Armed 语义**；★`SetSpeaking:130` **生产 0**
+   ★**采集腿**：★`cmd/wisp/resident_audio_windows.go:60-75` 注释自认「**KWS is still nobody's**」；★**`wire-r1` 现状**：★`onMicClose`（`resident_voice_windows.go:482`）只 `warmFeed.Store(true)`、**设备没关**
+   ⇒ ★★★**解法形状：KWS 挂在"设备"与"warmFeed"之间** —— ★**Warm 门保持开、KWS 吃帧当唤醒源、`warmFeed` 升级成真喂食门**（Warm 里 `tr.Accept` 停、KWS 继续）⇒ ★★★**这正是 `R28-2`（"`Warm=mic CLOSED` 未实现、41 前无法实现"）的解、41 是它的前置**
+2. ★★**KWS 插哪层**：★**插帧管道**（★`run()` 的 phase1 循环 `:636-655`、samples 进 ring 后喂 `kws.Accept`、Sleeping/Armed 相、hit ⇒ 派 `EvWakeWord`）、★**⛔ 插 seam 本身**（★**seam 已冻结、插点是"谁调 Accept"**）；★ASR 段 `:683` 每帧 `tr.Accept` 的现状 ＝ **唤醒闩证据四处行号与 `tri-v1` 同值**（`:308/:482/:830/:854`）
+   ★★**引擎对象的家** ＝ `voiceResidency`/`speech.Slot` —— ★★★**`slot.go:31-36` 只有 `FamilyAsr/FamilyTts` ⇒ 需增 `FamilyKws` 枚举＋`Kws()` 访问器**（★**slot.go 不在共享编译面**）
+
+**③ ★★第一步建议（★它自己拍、⛔ 推回）**
+- ★★★**`41-a2` 引擎腿**：★写面 **`internal/speech/kws.go`＋`kws_test.go` 两枚新件 ＋ `slot.go` 增 FamilyKws**；★**⛔ 不碰 `cmd/wisp`**
+- ★**能出读数**：★staging（三 DLL 同目录＋`WISP_SPIKE_MODELS`）**构造成功** ＋ ★**test_wavs 0-6.wav 经 `Accept` 得 `KeywordHit`（Word/At=样本钟）** ＋ ★**静音/非关键词 0 hit 正控** ＋ ★**Close 幂等** ＋ ★**名册钉不动** ＋ ★**`d22scan` clean**
+- ★**阈值/词表先吃包内常量**（**⛔ 加配置键**）；★**工期 1–2 天**
+- ★★★**票面并行槽 A 把"engine+Armed lifecycle"绑一条 ⇒ 它判**拆开****：★**Armed lifecycle 撞 ④-1 的设备开关决策面、先落引擎不亏读数** ✅ **我认**
+- ★**后续**：★**A2 接线腿**（cmd/wisp、**必须在 ④-1 裁定写清后派**、排共享编译面队列）；★**B veto/P14 腿**吃 A2 通道
+
+**④ ★★写面清单 ＋ 现占用**
+★**全量会碰**：★`internal/speech`（A1/B）／★`cmd/wisp`（A2）／★`internal/config`（thresholds/veto/keywords 消费 —— ★**票 255 审计已钉两键零读**：`config_readers_255.go:208-209` "not consumed by the KWS path yet"）／★`internal/models`（handOffModel 同法、`models.go:25`）
+★**零改面**：★**statemachine**（表/事件/Facts **全在**）／★**ball**（Armed/Muted 视觉已在 `statevisual.go:158`）／★**observe**（Armed 常量已在 `thresholds.go:20/27/37` ＝ 90MB/2.0/7 含 kws-infer）
+★**现占用**：★**`internal/**`、`cmd/**`、`go.mod` 现树 0 行未提交 ⇒ 今日零冲突**；★**注意 `A1282` 点名"待派 config 腿修"⇒ config 消费腿与它排队**
+
+**⑤ ★自报偏差我裁：接受现状**
+★**commit 主题含逐字串但以 `# ` 开头**（写消息带 markdown 标题符、git 未剥）⇒ ★**规矩禁 amend、内容与提交无误、仅 1 文件显式 pathspec** ⇒ ★**⛔ 为格式重开**；★**追加更正笔也不值得**（★**台账 A1283 本条已具名**）
+
+**⑥ ★状态**＝**在飞 3**（★`cfg125-r1` 修 config 新红 ／★`26-r2` 票 26 承接 ／★**`41-a1` 已交**）⇒ ★**本轮派 `41-a2` 引擎腿**（写面 `internal/speech`＋`slot.go`、与 `cfg125-r1` 的 `internal/config` 互斥 ✅）
+★结案 **50 票**（`-done` **193** 枚）、真待推进 **172**、完成度 **52.9%**、未推 **1**、★**摆机主 1 件（347 追认）**
