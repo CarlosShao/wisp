@@ -28379,3 +28379,44 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **⑦ ★状态**＝**在飞 2**（★`347-v1` 终裁 ／★`26-r3` 票 26 承接）、★**goal `active`/`armed`**
 ★结案 **50 票**（`-done` **193** 枚）、真待推进 **172**、完成度 **52.9%**、未推 **1**、★**摆机主 1 件（347 追认）**
 ★**下一轮**：★**`347-v1` 回来 ⇒ 结票 347（第 51 票）**；★**`26-r3` 回来 ⇒ 票 26 终裁**；★**设备开关裁定写清 ⇒ 派 41-A2 接线腿**
+
+## A1287（2026-10-27 19:4x +08，编排者）★★★收 `26-r3`（4 笔实现 ＋ 件 **109 行**）：**两件都做完（票 26 最小可结条件）**｜★★★**路上抓到一个生产缺陷并修了**（★`buildResidentVoice` **从不建 owner 队列** ⇒ `rv.queue=nil` ⇒ **`announce()` 首行即拒、播报链生产上整条死**；★**"测试走 `newResidentVoice` 故 staging 全绿、而生产形状是死的"**）｜★★**`d22scan ban#9` 又真抓一条**（幻影引证）
+
+**① ★★★路上抓到的生产缺陷（本腿已修、这条要单独记）**
+> ★★★**`buildResidentVoice`（**生产构造器**）**从不建 owner 队列** ⇒ `rv.queue=nil` ⇒ ★**`announce()` 首行即拒** ⇒ ★★★**播报链**生产上整条死****
+> ★**session 定时器级联直接落 runtime timer 线程**
+> ★★**"所有测试走 `newResidentVoice` 故 staging 全绿、而**生产形状是死的**"**
+- ★**已在生产构造器补建 queue**（★`ad309e0ac` 内、**注释具名**）✅
+- ⇒ ★★★**这解释了 `tri-v1`「生产调用者 0」的更深一层：不止 `SetSpeaking` 没接、**入口本身在生产构造器上是断的****
+- ⇒ ★★★**这是"测试绿 ≠ 生产活"的又一座碑**（★**检查表候选**：★**"测试构造器 vs 生产构造器是两条路"**）
+
+**② ★★★两件（`tri-v1` 最小可结条件）**
+1. ★★★**`SetSpeaking` 一针**：★`speak()` `HOP 2b` —— ★**换族（asrGone 置位）后、首个样本前 `SetSpeaking(true)`**；★★**`gateRelease` defer 是全函数唯一出口**、★**六条出口（出声/闸拦/无引擎/无设备/合成失败/引擎拒读）恰一次 `SetSpeaking(false)`**；★**闸拦与空文本两条在针之前返回（门从未闭、计数零动）**
+   ★**staged 读数**：★`GATE-26R3 closed=1 reopened=1 events=2 mid_speech_transcripts=0 spoken_samples≈89.4k gate_on=1 gate_off=1`；★**探测在 `SetSpeaking` 瞬间读 `asrGone=true/asrLoaded=true`＝**真 mid-speech****
+   ★★**接线全部在 `cmd/wisp` 侧**（★**`captureGate` 匿名单方法接口 ＋ `attachCaptureGate`、★**`internal/audio` 零改****）✅
+2. ★★**self-echo 夹具**：★`Test26R3AnnounceClosesTheCaptureGate` —— ★**播报窗口内向 C8 缝直推 6 帧（满 192ms 有界窗）** ⇒ ★**`ECHO-26R3 gate_state_during_feed=speaking(PathT capture refused)`**、★**transcript 零增量**、★**帧仍被消费侧排空**
+   ★**量的是门不是设备**（★**`tri-v1` 警句照守、⛔ 未写"设备已关"**）✅
+
+**③ ★★反向判据 ＋ 正控（仓外导出树 ＋ `-overlay`、工作树零突变）**
+- ★**M1（摘 `SetSpeaking(true)`）⇒ `rc 1`**：★`MUTANT 26r3-M1 SHAPE…closed=0…`
+- ★★★**M2（摘 `SetSpeaking(false)`）⇒ `rc 1`**：★**逐字 `MUTANT 26r3-M2 SHAPE…closed=1 reopened=0 speaking=true…stuck in Speaking…no later utterance can ever be captured again`** —— ★**"卡死的可观测后果写进红句"** ✅
+- ★**还原核（时机＝M2 之后）**：★**无 overlay 重编重跑 2/2 绿（`closed=1 reopened=1`）**、★**原样绿（终字节 16/16）**
+- ★★**正控**：★**120 帧静音 ⇒ `finals=0/announce_asked=0/spoken=0/samples=0` 且**门针零触发****（★`gate_closed=0 gate_reopened=0`、**两套计数一致**）
+
+**④ ★★零回归／门禁**
+- ★★**`TestWireR1|Test15e|Test26R3` ＝ **16 PASS/0 FAIL/0 SKIP****；★**`LATENCY 262/640/902` 逐位同值**；★**`drained=180/181`**（★**`179/181` 另发、抖动带内只当抖动报**）；★**时间线恰 2 条**；★**wire-r1 七案 `gate_closed=0`（针零回归）**
+- ★**四数**：★`cmd/wisp` 定向（staged、带 `PATH`、只 `-run`、`-timeout 30m`）**`TestAC3 PASS`**；★**`internal/speech` staging `67/0/0`**（★**`41-a2` 合入后全包**）；★**`internal/session` ok**
+- ★★**两尺**：★**工作树恰 3 行既存假红**（★**blob 终证 CR=0/0/0、原字节跑两尺不点名 ＝ `autocrlf` 显示面**、★**第 17 处定式又用上**）；★**导出树两尺空**；★**本腿 4 枚两尺皆空**
+- ★★★**`d22scan`**：★**干净导出树 `rc 0 clean`**（★分母 `bans#1-5 internal/=264 cmd/=45`、★**`ban#8 internal/=684 cmd/=159`**）；★★**正控两发（`U+2713` 串／裸 `go func`）各 `rc 1` 具名、删除后 `rc 0` 可逆**；★**⛔ 未用 ban#8 扫 docs/**
+- ★★★**而 `d22scan ban#9` 真抓它一条**（★**幻影引证**）⇒ ★**已修**（★`06609feaf`）✅ **门禁又抓到真问题**
+
+**⑤ ★★并发纪律（它守住了）**
+★**`41-a2` 期间窗口（`slot.go`/`kws.go` 在飞脏、vet 一度被 `kws.go:142` 挡）**全程零碰、未当我的脏**；★**共享 dev 追加交错提交零冲突** ✅
+
+**⑥ ★★残余（具名、归承接票）**
+★`R26-1` 打断通道／★`R26-3`→**59**／★`R26-4` 换族/驻留／★`R26-5` 毒源＋L2 确认／★`R26-6` P7 人评；★**`AC4` 冷档 `NOT MET` 注**；★**`AC5`/`AC6` 照 `tri-v1` 判**
+⇒ ★★★**票 26 现在满足 `tri-v1` 的"最小可结条件"两件** ⇒ ★**可走终裁**
+
+**⑦ ★状态**＝**在飞 2**（★`347-v1` 终裁 ／★`233-r1` D36 三档）、★**goal `active`/`armed`**
+★结案 **50 票**（`-done` **193** 枚）、真待推进 **172**、完成度 **52.9%**、未推 **5**、★**摆机主 1 件（347 追认）**
+★**本轮派 `26-v1` 终裁**（★**票 26 可裁**）
