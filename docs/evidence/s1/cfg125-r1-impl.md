@@ -60,6 +60,7 @@
 - 门禁 rc：Linux `core` 基线 rc=1 ／ 本腿 rc=1（差集＝§5 那 −1 枚）；两平台包级 rc 见 §6。
 - 提交：`add`/`commit` 两处**逐个文件名字面 pathspec**（`internal/config/c26_seam_posix_125_test.go` ＋ `docs/evidence/s1/cfg125-r1-impl.md`）；`-F` 写在 `--` 之前、正文用 `[System.IO.File]::WriteAllText` 真临时文件；主题逐字以「config 收尾腿 cfg125-r1」开头；⛔ push。
 - 提交后复跑（按新 HEAD 再导出）：目标对 rc=0 ＋ config 包红集＝§5 同一枚存量。
+- **提交后复跑（已落，`57e04ffcb`）**：`git archive HEAD` → `export-post`（归档 rc=1＝`.scratch` 里既存坏名文件所致、仓内 Go 树全数落地，test 件 SHA256 `DF80B283…` 与工作树全等）。①目标对 `10-postcommit-125-target.log` **rc=0 双 PASS**；②config 包 `10-postcommit-config-pkg.log` **1 FAIL＝存量 `NothingWritten…`**；③门禁级 core `09-gate-core-postcommit.log` **`PASS=1395 FAIL=8 SKIP=1`（`=== RUN=2052`）rc=1**，红集 8 枚＝347-r1 本腿红集 − 本枚 − writeguard 两枚（本轮轮换缺席，见 §5）⇒ **门禁级改前 `1393/10/1` → 改后 `1395/8/1`，其中真差＝−1 枚（本枚）＋2 枚容器轮换噪声**，无任何新红。`git show --name-only 57e04ffcb` 逐行＝2 件、`internal/risk/` 命中 0、`cmd/` 命中 0。
 - 中途上报：修法定案＋读数已发编排者（本会话 send_message，2026-10-27 18:3x）。
 
 ## 9. 未核／具名残余（⛔ 藏）
