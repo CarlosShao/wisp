@@ -308,7 +308,8 @@ type residentVoice struct {
 	// reload (internal/audio/gate.go). Before 26r3 the gate's own comment said it
 	// is "driven by the TTS side" and the TTS side never drove it: production
 	// callers were zero. The field is an anonymous one-method interface so the
-	// wiring stays cmd/wisp-side (this leg may not edit internal/audio) and the
+	// wiring stays on the cmd/wisp side of the seam (this leg may not edit
+	// internal/audio) and the
 	// test can drive the production speak() against a recording gate; nil means
 	// this boot built no capture leg (the same nil-safety every other handle on
 	// this struct carries).
