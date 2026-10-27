@@ -28491,3 +28491,37 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **⑧ ★状态**＝**在飞 2**（★**`347-v1` 已交已结**／★`233-r1` D36 三档）⇒ ★**本轮实为 1 在飞 ＋ 已开两承接票** ⇒ ★**写腿 1 ＋ 待派 2**
 ★**结案 52 票**（`-done` **195** 枚）、真待推进 **170**、完成度 ★**53.4%**（195/365）、未推 **1**、★**摆机主 1 件（347 追认）**
+
+## A1290（2026-10-27 21:5x +08，编排者）★★★收 `233-r1`（`bd2617652` 8 件 `540+/105-`、件 **79 行**）：**先报我派单三处过时**（★第 19 处定式又应验）｜★★★**"真热一发"是本腿最硬的**（★**同进程下一个任务真拿到 `PerToolTimeout=2.5s`、boot snapshot 仍 0**）｜★★**连带：`TestTicket255Roster` 在 `HEAD` 基线就红**（★wire-r1 新读没回名册、它重裁零放宽）
+
+**① ★★★三处派单过时（它开工现核、处置落在证据件 §0）**
+| 我的派单 | ★它现核 |
+|---|---|
+| ★**「三常量零赋值点」** | ★**为真、但分档表已存在** ＝ ★**`internal/config/tiers.go` 的 `TierRegistry`（票 255、44 行键→档）**、值是裸字符串 ⇒ ★**收法＝表换型 `map[string]Tier` ＋ 值改 `TierHot/TierReload/TierRestart` ＋ 新增 `TierLocked`（risk/fs/net/plugins 四枚 planLocked 段）**、★**值语义逐行不变**、★**四枚 255/223r3 完备性尺全绿** |
+| ★**「reload 档无生产键」** | ★**已过时 —— `planVoice` 早把 `rep.Reload` 填上、缺的是消费者** ⇒ ★**已接 `OnReload = rt.reportReloadTier`**（★audit 逐字 `config: RELOAD-TIER state=received sections=[voice] effect=this-host-reloads-nothing` ＋ stdout「已生效到本进程内存，但本宿主没有可重载的子系统」）|
+| ★**「热档动 `rt.cfg`」** | ★**⛔ —— 227 `AC#6` 钉它冻结、223/227/255 都按 "before" 读它** ⇒ ★**动的是 `execute()` 的 cfg 源**：★`cfg := rt.cfg` → **`rt.mgr.Config()`**（`run.go:1263`）|
+
+**② ★★★真热一发（本腿最硬）**
+- ★★**手改 `[agent] per_tool_timeout_ms=2500` → tick `hot=[agent]` → ★**同进程下一个任务的 loop 装配 `PerToolTimeout=2.5s`** 且 ★**boot snapshot 仍 0**（★`Test233HotTierAgentReachesTheNextTask`）
+- ★★**M2 反向**（回 snapshot）：★**FAIL `1.94s` 逐字 `PerToolTimeout=0s, want 2.5s`**；★**还原核 SHA256 逐字同**
+- ★★**M1 反向**（摘 `OnReload` 赋值）：★**FAIL 41.90s**、★**红句点名 audit 从未出现、dump 里 `reload=[voice]` 在而 RELOAD-TIER 不在**；★hot 对照同尺 PASS
+
+**③ ★★连带：`TestTicket255Roster` 在 `HEAD` 基线就红**
+- ★★**A/B 复核** ＝ ★**`wire-r1` 的新读 `[session]:1329`/`[voice]:1315` 没回 255 名册**
+- ★**本腿重裁**：★**session→other-process 新 cite**／★**agent→consumed 新 cite `run.go:1263`**／★**"无读者"阳性样本随事实搬到 `[ball]`**
+- ⇒ ★★**"方向只增读者、零断言放宽"** ⇒ ★**改后该枚绿** ✅
+
+**④ ★★一笔 HEAD 既存竞态（记台账、⛔ 顺手修）**
+- ★**`TestTicket223HandEditedFsLooseningCostsAnL2Card` 60 发 A/B**：★**base 30 发 3 红 / mine 60 发 2 红、同红行 `:436/:439`**
+- ★★★**真因 ＝ `awaitCard` 认账与 `Prompt` 渲染之间的仪器窗口**（★**同文件 mode 案例 351 已修读法、fs 案例没修**）
+- ★**修法 ＝ `:434` 单读改 `awaitStdout` 形**、★**归验收腿/票 351 射程** ⇒ ★**按"不顺手修"禁令未动** ✅
+
+**⑤ ★★零回归／门禁**
+- ★**`internal/config` `-count=3` `rc=0`**；★**`cmd/wisp` 定向 13 枚 `-count=1`/`-count=3` `rc=0`**；★**`internal/risk` 唯一红＝纯 `HEAD` 同红（A380 存量、零触碰）**
+- ★**两尺全树恰 3 行既存假红**（★**本腿 7 件皆空**）；★**vet `rc=0`**；★★**`d22scan` 导出树 `rc=0 clean`＋正控 `rc=1` 逐字命中**（★**`U+2264` 字节 `e289a4` 现量**）
+- ★**重启档复跑 4 发全绿**；★**写面 8 件全在清单内**（★**internal/config×2、cmd/wisp×5、evidence×1**）
+- ★★**它核了我落的 10 枚 commit 与它的 7 个产码/证据文件零交集**（★**06609feaf 只动注释、roster cite 在其改动点下方 1300 行**）⇒ ★**事后 roster 尺复跑 `rc=0`** ✅
+
+**⑥ ★状态**＝**在飞 0**、★**goal `active`/`armed`**
+★**结案 52 票**（`-done` **195** 枚）、真待推进 **170**（★**含新开 381/382**）、完成度 **53.4%**、未推 **1**、★**摆机主 1 件（347 追认）**
+★**本轮派 `233-v1` 终裁**（★**顺带裁票 223 的 `AC#2` 能不能翻** —— ★**233 落地了、票 223 自己写"233 落地之后再谈"**）
