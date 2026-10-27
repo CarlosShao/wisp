@@ -271,3 +271,57 @@ func Test26R3GateNeedleZeroValueSafety(t *testing.T) {
 	}
 	t.Logf("ZEROVALUE closed=0 reopened=0 stop_line_ok=1")
 }
+
+// Test26R3SilenceNeverTouchesTheGateNeedle is the needle's positive control,
+// the same shape wire-r1's silence case takes: 120 frames of digital silence
+// produce no final and no announcement, and - the sentence this leg adds -
+// the capture-gate needle never fires. "Muted means nothing speaks" is only
+// a reading if the needle that would have closed the gate stayed untouched.
+func Test26R3SilenceNeverTouchesTheGateNeedle(t *testing.T) {
+	dataDir := voice15eDataDir(t)
+	voice15eWriteConfig(t, dataDir, nil)
+	t.Setenv("WISP_MODELS_MANIFEST", voice15eRepoFile(t, filepath.Join("build", "models", "manifest.json")))
+	store := voice15eInstallAsr(t, dataDir)
+
+	speaker := &voiceWireSpeaker{rate: 22050}
+	gate := &voice26r3Gate{}
+	sink := &voice15eSink{}
+	ball := &residentBall{}
+	plan := voicePlan{
+		VadModelPath: voice15eVadModel(t),
+		AsrDir:       store,
+		Source:       "26r3 test",
+		HandOff:      residentVoiceHandOff(dataDir),
+		Tts:          voiceWireTtsFiles(t),
+	}
+	rv, frames := voiceWireStart(t, plan, ball, sink, func(rv *residentVoice) {
+		rv.newSpeaker = func(rate int) (voiceSpeaker, error) { return speaker, nil }
+		rv.attachCaptureGate(gate)
+	})
+	voice15eArm(t, frames, rv)
+
+	silent := audio.EncodeFrame(make([]int16, audio.FrameSamples))
+	for i := 0; i < 120; i++ {
+		select {
+		case frames <- silent:
+		case <-time.After(10 * time.Second):
+			t.Fatal("the leg stopped draining during the silence run")
+		}
+	}
+	voice15eWaitFor(t, "the silence run to be drained", func() bool { return rv.drained.Load() >= 121 })
+	if rv.finals.Load() != 0 || rv.handed.Load() != 0 {
+		t.Fatalf("silence produced a final: finals=%d handed=%d", rv.finals.Load(), rv.handed.Load())
+	}
+	if rv.announceAsked.Load() != 0 || rv.ttsSpoken.Load() != 0 || speaker.written() != 0 {
+		t.Fatalf("silence produced an announcement: asked=%d spoken=%d samples=%d",
+			rv.announceAsked.Load(), rv.ttsSpoken.Load(), speaker.written())
+	}
+	closed, reopened, speaking, _ := gate.snapshot()
+	if closed != 0 || reopened != 0 || speaking {
+		t.Fatalf("silence drove the capture-gate needle: closed=%d reopened=%d speaking=%v", closed, reopened, speaking)
+	}
+	if on, off := rv.setSpeakingCount(); on != 0 || off != 0 {
+		t.Fatalf("the leg's gate counters moved under silence: closed=%d reopened=%d", on, off)
+	}
+	t.Logf("SILENCE-26R3 finals=0 announce_asked=0 spoken=0 samples=0 gate_closed=0 gate_reopened=0")
+}
