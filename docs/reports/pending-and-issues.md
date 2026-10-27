@@ -28271,3 +28271,37 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **⑥ ★状态**＝**在飞 3**（★`cfg125-r1` 修 config 新红 ／★`26-r2` 票 26 承接 ／★**`41-a1` 已交**）⇒ ★**本轮派 `41-a2` 引擎腿**（写面 `internal/speech`＋`slot.go`、与 `cfg125-r1` 的 `internal/config` 互斥 ✅）
 ★结案 **50 票**（`-done` **193** 枚）、真待推进 **172**、完成度 **52.9%**、未推 **1**、★**摆机主 1 件（347 追认）**
+
+## A1284（2026-10-27 18:3x +08，编排者）★★★`cfg125-r1` 中期上报：**修法①落不下去**（★`c26Pipeline.Resolve` **逐字硬编码 `Resolve(input, nil)`**、注释 "deliberately nil … default-deny is the only policy"）⇒ **它选②强化形、我批**｜★★★**②强化形的关键洞察**：★**子进程 TMPDIR 保持穿链（主题不动）＋ 探针 base 用 `EvalSymlinks` 锚定真拼写**
+
+**① ★★★修法①为什么落不下去（它现核、⛔ 硬要做）**
+- ★**`[fs] reparse_point_exceptions` 解析端虽在**（`schema.go:489`）
+- ★★★**但 seam 读取端**不存在****：★**`risk.c26Pipeline.Resolve` 逐字硬编码 `Resolve(input, nil)`**（★`internal/risk/winsec_c26.go:40`）
+- ★**注释逐字**：★**"Reparse exceptions are deliberately nil … For placement, default-deny is the only policy"**
+⇒ ★**给子进程注入该键必须改 `internal/risk`（硬边界1）＋ 推翻 seam 刻意的默认拒**
+- ★★**它说**：★**"按未定义即停①本可停手、但②的强化形落在纯写面上、故继续"** ✅ **停是为了不越写面、不是为了不干活**
+
+**② ★★★修法②的关键洞察（这条最值钱）**
+> ★**"不能把被测子进程 TMPDIR 换成 plain —— 那它就成了第二个 control、测不了 ticket119 形状（用例自己的 fixture 守卫 `:139-141` 会当场 Fatal）"**
+> ⇒ ★**红因实为 `AC#1` **行为探针**的输入拼写如今也穿那条链**
+- ★★**落地**：★**子进程 `TMPDIR` 保持穿链（**主题不动**）＋ `AC#1` 探针 base 用 **`filepath.EvalSymlinks` 锚定到真拼写****
+  ★**依据**：★**`t.TempDir` 结果必存在 ⇒ `EvalSymlinks` ＝ realpath 等价；无链时 ＝ 恒等**
+  ★★**＋ `AC#2` fixture base 同样锚定**
+- ★★★**顺带**：★**把 darwin `/var→/private/var` 的既有 skip 世界变成真测量** ⇒ ★**这正是 `347-r1` 给票 55 那条读数的落地版**
+
+**③ ★★★我的裁定：批②强化形（三条）**
+1. ★**修法①落不下去是**查清了的事实****（★硬编码 ＋ 注释明说 deliberate）⇒ ★**硬要①就是改 `internal/risk` ＋ 改契约语义**（★**三重越界**）
+2. ★★**②强化形"主题不动"**（★子进程 TMPDIR 保持穿链）⇒ ★**ticket119 形状还在被测**、**⛔ 架空用例**
+3. ★★**`EvalSymlinks` 锚定是**契约等价**操作** ⇒ ★**断言一字未删**、★**还顺带修好 darwin skip 世界**
+- ★**它未提交、等反向判据 ＋ 还原核 ＋ 门禁级对照** ⇒ ★**等交件**
+
+**④ ★★读数已到手（它报的）**
+- ★★**Linux（golang:1.27 容器、导出树）改前 `AC#2` 红（measured child rc=1）→ 改后 ★`rc=0` 双子全绿**
+- ★**Windows config 包改前 `rc=0`／改后 `rc=0`**（★文件 `!windows` 不编译进 Windows、色不变）
+- ★★**`git diff` `internal/risk`+`cmd` 空 ＝ 零字节** ✅
+- ★**`gofumpt`/`gofmt` 双尺只报已知 3 条既存**；★**darwin+linux 交叉 vet `rc=0`**
+- ★**门禁级 `--scope=core`（无 git 导出树、复刻 `347-r1` 跑法）基线＋改后在跑**；★**反向判据突变与其后还原核排队中**
+- ★**日志**：★`D:\tmp\wisp\20261026\cfg125r1\logs\*.log`
+
+**⑤ ★状态**＝**在飞 3**（★`cfg125-r1` 收尾中 ／★`26-r3` 重派（带前腿断点捷径）／★`41-a2` KWS 引擎）、★**goal `active`/`armed`**
+★结案 **50 票**（`-done` **193** 枚）、真待推进 **172**、完成度 **52.9%**、未推 **2**、★**摆机主 1 件（347 追认）**
