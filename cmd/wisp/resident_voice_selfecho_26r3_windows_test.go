@@ -145,17 +145,27 @@ func Test26R3AnnounceClosesTheCaptureGate(t *testing.T) {
 	voice15eWaitFor(t, "the announcement to be spoken", func() bool {
 		return rv.ttsSpoken.Load() == 1
 	})
+	// The named red shapes come BEFORE the wait: a mutant must fail with its own
+	// sentence, not with a generic timeout. Wait for the sentence to be over
+	// first (the TTS slot is back in Warm), then diagnose the gate state.
+	voice15eWaitFor(t, "the announcement to end (the slot back in Warm)", func() bool {
+		return rv.residency.stage() == session.StageWarm
+	})
+	closed0, reopened0, speaking0, _ := gate.snapshot()
+	if closed0 == 0 {
+		t.Fatalf("MUTANT 26r3-M1 SHAPE: the announce path never closed the capture gate (closed=%d reopened=%d): SetSpeaking(true) is not on the path, so the D16 half-duplex close never happens and the microphone would hear the announcement", closed0, reopened0)
+	}
+	if reopened0 == 0 || speaking0 {
+		t.Fatalf("MUTANT 26r3-M2 SHAPE: the capture gate was left in Speaking after the sentence finished (closed=%d reopened=%d speaking=%v): SetSpeaking(false) is not on the path; capture stays closed - stuck in Speaking - and no later utterance can ever be captured again", closed0, reopened0, speaking0)
+	}
 	voice15eWaitFor(t, "the capture gate to be reopened after the sentence", func() bool {
 		return rv.speakGateOff.Load() == 1
 	})
 
 	closed, reopened, speaking, events := gate.snapshot()
-	// THE TWO REVERSE SHAPES. 26r3-M1 (the out-of-tree overlay removes
-	// SetSpeaking(true)) lands here: closed=0, the announce path never closes
-	// the capture gate. 26r3-M2 (the overlay removes the release) lands on the
-	// wait above timing out AND here: reopened=0, speaking stuck true - capture
-	// stays closed after the sentence, so no later utterance can ever be
-	// captured (the observable consequence of being stuck in Speaking).
+	// The exact green shape: exactly one close and one release, in that order.
+	// (The mutants are diagnosed by name above; these lines pin the un-mutated
+	// needle so a double-close or a double-release cannot count as green.)
 	if closed != 1 {
 		t.Fatalf("MUTANT 26r3-M1 SHAPE: the announce path never closed the capture gate (closed=%d reopened=%d): SetSpeaking(true) is not on the path", closed, reopened)
 	}
