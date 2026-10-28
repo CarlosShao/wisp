@@ -223,3 +223,19 @@ func escapeLike(s string) string {
 	r := strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
 	return r.Replace(s)
 }
+
+// min returns the minimum of two integers.
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// max returns the maximum of two 64-bit integers.
+func max(a, b int64) int64 {
+	if a > b {
+		return a
+	}
+	return b
+}
