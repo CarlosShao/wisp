@@ -35,14 +35,16 @@ the data-ops APIs the privacy page (40) will render.
 
 ## Acceptance criteria
 - [ ] Latency-isolation test: extraction runs post-response; first-token latency unchanged
+> 〔29-v1：⛔ 翻——主机端 `Hooks{}` 未赋 `WarmWindow`（resident_voice_engines_windows.go:439）＝待装配〕
       (statistical assertion vs baseline).
 - [ ] Golden extraction set: 10 scripted conversations → expected profile slots/values;
+> 〔29-v1：⛔ 翻——缺口＝C5 golden SSE 注入链（10 剧本×slot 对值）；impl 谈 batch-commit＝答非所问〕
       batch-commit produces one prompt-cache invalidation per task (not per fact).
-- [ ] LRU: 21st fact evicts oldest + log line + flash reflects what was evicted... (flash on
+- [x] LRU: 21st fact evicts oldest + log line + flash reflects what was evicted... (flash on
       SAVE; eviction visible in log + panel later) — assert log.
-- [ ] Undo: saving then undoing restores prior profile state exactly (row-level diff).
-- [ ] memory.save/recall: risk levels, ranking order (recency+hits), no auto-injection
+- [x] Undo: saving then undoing restores prior profile state exactly (row-level diff).
+- [x] memory.save/recall: risk levels, ranking order (recency+hits), no auto-injection
       (prompt snapshot asserts absence).
-- [ ] Privacy APIs covered by tests; export format documented (JSON schema in docs).
+- [x] Privacy APIs covered by tests; export format documented (JSON schema in docs).
 
 ## Progress log (append-only, newest last)
