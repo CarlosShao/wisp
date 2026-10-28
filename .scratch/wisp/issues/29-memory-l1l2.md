@@ -1,6 +1,6 @@
 # 29 — Memory system: L1 profile extraction, L2 explicit memory, feedback loop
 
-**Status:** ready-for-agent
+**Status:** **ready-for-review**（2026-10-28 编排者落 29-v1 裁决：LRU/Undo/排名/隐私四格翻；AC1 待装配、AC2 待 golden 链＝具名残余） ~~ready-for-agen~~
 **Claimed by:** —
 **Last update:** 2026-09-19
 **Blocked by:** 04-sqlite-core, 10-agent-loop-core, 28-session-scope-warm
