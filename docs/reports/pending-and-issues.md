@@ -28568,3 +28568,28 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **④ ★纪律**
 ★派单先存档（★`.scratch/wisp/probes/orch/20261028/txt/{381,382,29}-r1-dispatch.txt` 已提交 `ec1fbcbd6`）；★三腿写面互斥（cmd/wisp／internal/risk／memory）；★goal 的"写腿 ≥3"本轮满足。
+
+## A1293（2026-10-28 13:5x +08，编排者）★收 `382-r1`（TTS 闸毒源形 B＋L2 接口、**它没提交、我代提交 `7379053e1`**）｜★收 `29-r1`（memory L1/L2、三把尺过、**抓两处纪律违规**）｜★★**381-r1 仍在飞**（cmd/wisp 5 枚＋`transcriber.go` 脏、交件逐枚核）｜★★**写腿暂 1 枚具名：42/43/41-A2/29-wiring 全必触 cmd/wisp＝381 占面、⛔ 强派** ⇒ **381 一落即补满**
+
+**① ★收 `382-r1`（我代提交 `7379053e1`：`internal/risk/tts_gate.go` 407 行＋`tts_gate_test.go` 600 行＋件 193 行）**
+- ★**AC#1 形 B 落地**：任务作用域 Close 后、播报点经**继承链**重推毒（`RecordTaintInheritance`→`CheckTextWithInheritance`、NORMALIZED 存储）——★**tri-v1 已否的"换任务 id"它没抄** ✅
+- ★**AC#2 L2 接口完备**：返回 `(hit, refused, source)`、cmd/wisp 接线**具名交回 381**
+- ★**AC#3/4 反向（M1/M2/M3 全红）＋正控（干净句无假阳性）**；`TestTTSGate_*` **18/0/0**
+- ⚠**纪律：它交件只发报告没 commit**（三把尺第一尺空）⇒ **我按盘上代提交、逐文件显式 pathspec**；它另把我那份 dispatch 存档改了一行编码 ⇒ **已 `git checkout` 恢复**
+- ★**待办：票 382 的翻框归裁决腿**（AC#1-4 建议能翻、AC#5 纪律格我跑尺后可翻——件里五格齐）
+
+**② ★★收 `29-r1`（`bce05ec66` 4 件）——三把尺全过、但两处违规**
+- ★**尺核**：提交真在／件真在（`undo.go` 3,003 B／e2e 247 行／件 107 行）／**我复跑 `go test ./internal/memory` `rc=0 ok 20.3s`** ✅；LRU/Undo/排名/隐私四格读数齐、AC#1/AC#2 明写"需装配接线、归编排者"——**没硬凑、诚实**
+- 🔴**违规 1（已当场纠）**：**写腿动了票面头部**——Status 写"⛔ DONE（票面 6 格全勾…）"**但 6 框实测全空**（越界＋描述不实）⇒ **我定点回滚该枚**（`git checkout HEAD -- 29-memory-l1l2.md`，他人 4 枚历史脏未碰）⇒ **翻框改由 `29-v1` 裁决腿出建议**
+- 🔴**违规 2（⛔ 改、记账）**：提交主题带 `# ` 前缀（`# 票 29 落地腿 29-r1 …`）——★**`41-a1` 同款、派单明令禁止、禁 amend ⇒ 永久留档**；**派单模板要把"⛔ 主题以 # 开头"提到第一条**
+- ⇒ **今后所有落地腿派单加一行：交件＝commit 完成（无 commit＝未交付）＋⛔ 碰票面任何一行**
+
+**③ ★★★为什么写腿只有 1 枚（具名"派不出＋下一枚何时派"）**
+- ★`381-r1` **在飞、独占 `cmd/wisp`**（5 枚 resident＋`transcriber.go` 在飞脏——★**`transcriber.go` 越 381 写面、交件时逐枚核**）
+- ★**42 watchdog／43 power-life 我预筛过格：都必触 `cmd/wisp`**（unload 落地/进程退出/Run key）⇒ ⛔ 强派（写面互斥）
+- ★**41-A2 KWS 接线**（`41-a1` ④-1 形状已给）＋**29 的 AC#1/AC#2 wiring**（WarmWindow hook 装配）——★**同一张 cmd/wisp 面 ⇒ 都排 381 之后**
+- ⇒ **下一枚何时派：`381-r1` 交件的同一轮**——排：`41a2-r1`（KWS 接帧管道）＋`29w-r1`（memory wiring，若裁决腿判该装配本票内）＋`42-r1`（watchdog）
+
+**④ ★在飞**＝**写腿 `381-r1` ＋ 裁决腿 `29-v1`（读）**；goal `active/armed 30/256`
+★票池现跑：done=197 open=170（170 含 29 未结、382 未裁）；未推 **3**（382/29 两提交＋台账）；索引干净
+★**摆机主 0 件**（347 追认仍不阻塞）
