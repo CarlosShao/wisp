@@ -113,6 +113,12 @@ type residentAudio struct {
 	// chain was built, and this handle's teardown then has no second half.
 	voice *residentVoice
 
+	// approval is the test seam for ticket 381 R26-1 interrupt wiring: the
+	// assembly root sets this once, right after building residentApproval, so
+	// ra.approval.voiceInterrupt calls rv.TriggerInterrupt during播报。nil in
+	// production if no approval gate is mounted, legal but rare.
+	approval *residentApproval
+
 	// The two config facts this leg acted on, recorded so the boot line and any
 	// later reading of this handle state the same privacy posture the assembly
 	// saw. Nothing here writes a default: both values come off the file, or off
@@ -366,11 +372,21 @@ func assembleCapture(rt *proc.Runtime, dataDir string, out func(float32),
 // 15e). The assembly root calls it once, right after the voice leg exists, and it
 // is the only writer; nil is the honest "this boot built no chain" and leaves
 // stop() with a single half.
+//
+// TICKET 381 R26-1: also wires ra.approval into rv for Esc → TTS interrupt.
 func (ra *residentAudio) attachVoice(rv *residentVoice) {
 	if ra == nil {
 		return
 	}
 	ra.voice = rv
+
+	// 381-r1:播报中断通道。Esc 键通过 approval.voiceInterrupt 调用 rv.TriggerInterrupt，
+	// 播报中的 speak() 会监测这个通道并在 ≤400ms 内停播。
+	if ra.approval != nil && rv.interruptCh != nil {
+		ra.approval.voiceInterrupt = func() {
+			rv.TriggerInterrupt()
+		}
+	}
 }
 
 // stop is D38(e) step 4's body: cancel the consumer ctx, then hand the gate

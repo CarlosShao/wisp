@@ -943,6 +943,9 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 	}
 	spoke := 0
 	chunks := 0
+	// TICKET 381 R26-1:播报中打断通道。每次播放一小段前检查 ev.interrupt，
+	// 如果收到 EvInterrupt 则立即返回中断错误，导致 speak() 提前退出并
+	// dispatch EvInterrupt (≤400ms)。非阻塞 select，不会卡住播放器线程。
 	speakErr := eng.Speak(text, func(samples []float32) error {
 		if len(samples) == 0 {
 			return nil
@@ -950,12 +953,32 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 		chunks++
 		spoke += len(samples)
 		rv.ttsSamples.Add(uint64(len(samples)))
+
+		// Check interrupt before playing each chunk. ≤400ms target from hotkey/click/word
+		// to TTS pause: this select is in the innermost loop so the next iteration
+		// sees the interrupt immediately. Non-blocking default ensures we don't stall.
+		select {
+		case <-rv.interruptCh:
+			// Interrupt fired: return an error that will be treated as "interrupted" not "failed".
+			return fmt.Errorf("interrupted mid-speak")
+		default:
+			// No interrupt yet: play this chunk normally.
+		}
+
 		return speaker.Play(samples, eng.SampleRate())
 	})
 	drainErr := speaker.Drain()
 	_ = speaker.Close()
 	rv.ttsChunks.Add(uint64(chunks))
 	if speakErr != nil {
+		// 381-r1: distinguish "interrupted" from "failed"。中断是用户意图（热键/单击/否决词），
+		// 失败是技术故障（引擎问题）。中断时只 dispatch EvInterrupt，不报 problem。
+		if strings.Contains(speakErr.Error(), "interrupted") {
+			if moved {
+				rv.dispatch(statemachine.EvInterrupt, nil, "播报被打断：D43#27 回到 Listening（用户触发）")
+			}
+			return
+		}
 		if errors.Is(speakErr, speech.ErrNothingToSpeak) {
 			// The engine's own guard: empty or punctuation-only text is not a
 			// silent success (26-r1's M2 case). Nothing was emitted, so nothing

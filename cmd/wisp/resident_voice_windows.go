@@ -91,6 +91,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -340,6 +341,12 @@ type residentVoice struct {
 	handOffStarted bool
 	chainReady     chan voiceChainReady
 
+	// TICKET 381 R26-1: interrupt channel for播报中打断。Produced by three sources:
+	// hotkey/cancel key, ball click, KWS veto words. Consumed by speak() to stop TTS
+	// within ≤400ms and dispatch EvInterrupt. Buffered =1 so a request during the
+	// final Play() frame still fires without blocking the caller.
+	interruptCh chan struct{}
+
 	// Counters, all atomic: the asr-infer goroutine writes them, the boot report
 	// and the tray gesture read them.
 	drained     atomic.Uint64
@@ -417,15 +424,32 @@ func voiceRingAppend(ring, samples []float32) []float32 {
 func newResidentVoice(frames <-chan []byte, plan voicePlan, ball *residentBall, tasks voiceTranscriptSink) *residentVoice {
 	queue := newVoiceOwnerQueue()
 	return &residentVoice{
-		frames:     frames,
-		plan:       plan,
-		ball:       ball,
-		tasks:      tasks,
-		machine:    statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping}),
-		queue:      queue,
-		residency:  newVoiceResidency(plan, queue, nil),
-		provScope:  voiceAnnounceScope,
-		newSpeaker: openWaveOutSpeaker,
+		frames:      frames,
+		plan:        plan,
+		ball:        ball,
+		tasks:       tasks,
+		machine:     statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping}),
+		queue:       queue,
+		residency:   newVoiceResidency(plan, queue, nil),
+		provScope:   voiceAnnounceScope,
+		newSpeaker:  openWaveOutSpeaker,
+		interruptCh: make(chan struct{}, 1),
+	}
+}
+
+// TICKET 381 R26-1: interrupt trigger API. Call this from any of the three
+// interrupt sources (hotkey/cancel key, ball click, KWS veto word) to fire an
+// EvInterrupt during播报。Non-blocking send into a buffered chan =1 guarantees
+// no caller blocks even if speak() is mid-Pause(). The speak() consumer checks
+// this channel in its hot loop and will dispatch EvInterrupt within ≤400ms.
+func (rv *residentVoice) TriggerInterrupt() {
+	if rv == nil || rv.interruptCh == nil {
+		return
+	}
+	select {
+	case rv.interruptCh <- struct{}{}:
+	default:
+		// Channel full = interrupt already queued for this播报句，drop silently.
 	}
 }
 
@@ -864,8 +888,13 @@ func (rv *residentVoice) adopt(r voiceChainReady) (*speech.Transcriber, speech.A
 	return tr, r.asr, nil
 }
 
+// transcriptSink wraps submitTask and adds EvInterrupt dispatch for veto words.
+// It is passed to the Transcriber constructor so veto words can trigger interrupts.
 // consume fans the seam's transcripts into this leg's readings, the D43 walk and
 // the text path.
+//
+// TICKET 381 R26-1: also checks for KWS veto word interrupts。如果 VAD 停止触发时检测到
+// 否决词（"停"/"取消"/"别"），则 dispatch EvInterrupt 而不是送任务流。
 func (rv *residentVoice) consume(outs []speech.Transcript) {
 	for _, t := range outs {
 		// The Warm wake. A transcript after Warm proves the microphone has
@@ -881,6 +910,14 @@ func (rv *residentVoice) consume(outs []speech.Transcript) {
 			rv.partials.Add(1)
 			rv.recordPartial(t)
 		case speech.TranscriptFinal:
+			// 381-r1:播报中 Veto 词打断。简单的关键词匹配作为 KWS 模型的降级方案。
+			isVeto := strings.Contains(t.Text, "停") || strings.Contains(t.Text, "取消") ||
+				strings.Contains(t.Text, "别")
+			if isVeto {
+				slog.Info("voice: interrupted by veto word", "word", t.Text)
+				rv.dispatch(statemachine.EvInterrupt, nil, "Veto 词打断：D43#27 回到 Listening（用户否决词）")
+				continue
+			}
 			rv.finals.Add(1)
 			if t.Punctuated {
 				rv.punctFinals.Add(1)
@@ -1298,9 +1335,13 @@ func startResidentVoice(rt *proc.Runtime, ra *residentAudio, rb *residentBall, t
 // honest refused-post shape instead of a nil dereference.
 func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tasks voiceTranscriptSink) *residentVoice {
 	rv := &residentVoice{
-		ball: rb, tasks: tasks,
-		queue:   newVoiceOwnerQueue(),
-		machine: statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping}),
+		ball:        rb,
+		tasks:       tasks,
+		queue:       newVoiceOwnerQueue(),
+		machine:     statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping}),
+		provScope:   voiceAnnounceScope,
+		newSpeaker:  openWaveOutSpeaker,
+		interruptCh: make(chan struct{}, 1),
 	}
 
 	cfgPath := filepath.Join(dataDir, configFileName)

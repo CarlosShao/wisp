@@ -152,6 +152,10 @@ type residentApproval struct {
 	// there rather than hidden here. nil is the production reader, which is what
 	// the shipped process runs: this field has no production writer.
 	cancelKeyRead func() string
+
+	// TICKET 381 R26-1: optional voice interrupt hook。当播报进行中时，Esc 键同时触发
+	// 审批取消 +TTS 中断。nil = 无播报腿装配（不常见但合法）。
+	voiceInterrupt func()
 }
 
 // ---------------------------------------------------------------- the cancel key
@@ -636,7 +640,13 @@ func vetoDoneLine(key string, card approval.ReplyCard) string {
 // It runs ON the ui-sta thread (internal/ball fires its events inline, and the
 // contract there is "quick and non-blocking"), so it waits on nothing: the L1
 // window's veto channel is buffered and Gate.Veto only ever sends.
+//
+// TICKET 381 R26-1: if播报中，also fire the interrupt hook so TTS stops ≤400ms.
 func (ra *residentApproval) vetoByEsc() string {
+	// 381-r1:播报中断优先。播报中途的 Esc =取消 + 停 TTS，两件事并发做。
+	if ra.voiceInterrupt != nil {
+		ra.voiceInterrupt()
+	}
 	card, awaiting := ra.cards.AwaitingHuman()
 	if !awaiting {
 		// Said out loud rather than left silent: "the key was taken and there
