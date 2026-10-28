@@ -1,0 +1,6 @@
+存档 2026-10-28 08:4x · 腿 381-r1（票 381 落地腿、写）
+票面：.scratch/wisp/issues/381-tts-announce-production-breaker.md（6 格全空）
+料：26-v1-verdict.md（86）／26r3-impl.md（109）／wire-r1-impl.md（133）
+要：①生产构造器补 provScope/newSpeaker（或构造器合一）②nil 渲染缝 panic 消除 ③EvInterrupt 接生产真通道（热键/球单击/否决词至少一条）＋播报中打断 ≤400ms 读数 ④端到端：打断⇒真停＋门放＋下一句进 ⑤反向：摘打断⇒红 ⑥纪律格
+硬边界：⛔ internal/risk（382 的地盘）、⛔ internal/speech 语义、⛔ D43 表、⛔ 配置键
+cmd/wisp 本腿独占。

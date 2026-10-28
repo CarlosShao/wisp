@@ -1,0 +1,5 @@
+存档 2026-10-28 08:4x · 腿 29-r1（票 29 落地腿、写）
+票面：.scratch/wisp/issues/29-*.md（6 格全空、Blocked by 04/10/28 全 DONE）
+料：票面全文＋同族历史件（255 名册尺、D36 三档＝票 233/223 刚收口）
+要：先读票面 6 格逐条、写面按票面定（预计 internal/memory/**）；三档配置语义刚收口（tiers.go 为唯一真相源）——若该票要读配置、用 TierRegistry 现势、⛔ 自造档位判断。
+硬边界：⛔ cmd/wisp（381 独占，若必须动⇒具名交回）、⛔ internal/risk（382 独占）、⛔ internal/speech 语义、⛔ thresholds/golden、⛔ 配置键（除非票面明令）

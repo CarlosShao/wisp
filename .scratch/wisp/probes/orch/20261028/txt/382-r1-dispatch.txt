@@ -1,0 +1,6 @@
+存档 2026-10-28 08:4x · 腿 382-r1（票 382 落地腿、写）
+票面：.scratch/wisp/issues/382-tts-announce-poison-scope.md（5 格全空）
+料：wire-r1-impl.md（残余①机理）／26-v1-verdict.md（AC7）／tri-v1-verdict.md（R26-5）
+要：①任务毒活到播报点（⛔ "req.scope 换任务 id"＝tri-v1 已否、会 unbound fail-closed 每句被拒）②命中后 L2 确认（⚠ 接线触 cmd/wisp⇒具名交回，381 占着）③反向：带毒句⇒闸拒；干净句⇒放行无弹卡 ④纪律格
+硬边界：⛔ cmd/wisp（381 独占）、⛔ C26 入口语义（票 347 刚落）、⛔ internal/speech 语义、⛔ 配置键
+写面：internal/risk/**（＋若毒源产生点在别的包、先读票面判、撞即在制）。
