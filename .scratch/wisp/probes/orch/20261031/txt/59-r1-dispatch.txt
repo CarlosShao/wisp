@@ -1,0 +1,3 @@
+存档 2026-10-31 11:5x · 腿 59-r1（票 59 P15 AEC spike、写）——Blocked by 13 已 DONE、7 格全空、internal/audio 空闲
+票 59＝Path C 全双工的闸门（26-AC3/28-AC3/60 全等它）。7 格：license 判定（源/构建+license 文件入 evidence）／Go binding 在钉定工具链（mingw-w64 per BUILD.md）编译链接＋cgo smoke／回环 rig（WASAPI render TTS wav+capture mic/loopback）／跨端点漂移数据／误触发表（音乐/语音/视频×音量）／CPU 数回填 SPEC-10 §3.1（★SPEC 编辑=契约面：数留 evidence、回填摆机主）／PRECHECK P15=PASS/NO-GO（NO-GO⇒26/28 Path-C+60 全改道）。
+写面：internal/audio/**（新 aec spike 子包）＋evidence；⛔ cmd/wisp（41a2-r1）、⛔ internal/speech 语义、⛔ D43、⛔ 配置键、⛔ 仓根 testdata。
