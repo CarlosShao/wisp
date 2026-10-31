@@ -28968,3 +28968,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ★**尺核**：★`22bfc0274` 在／12 文件在／**我复跑 `internal/audio` ok** ✅
 
 **⑥ ★状态**：done=**201**／open=**171**（387 开后）；未推（本轮后现跑）；**摆机主 6 件**（347 追认／216-120-136／Wails 裁定／**AEC3 fetch 批准**／**OS-AEC 机器实测**／**DEFERRED 登记批准**）
+
+## A1307 补（2026-10-31 13:3x +08，编排者）★`59-r1` 复跑验证通过（**在册台型补 PATH 后**）｜★**第 15 处族第 3 次自踩＝裸跑 0xc0000135**
+
+- ★**我首跑 `go test ./internal/audio/...` ＝ `exit status 0xc0000135` FAIL 0.026s** —— ★**差点当缺陷记**（同 config-r1 首跑 cmd/wisp 同款）
+- ★**根因**：★**aecspike 测试真载 sherpa DLL** ⇒ 裸跑无 PATH ＝ 在册 DLL 形状（★第 15 处：什么都不给⇒0xc0000135）
+- ★**正确尺（在册台型）**：★**`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"` 复跑 ⇒ 两包 `ok`（internal/audio 16.4s／aecspike 0.136s）、53 PASS/0 FAIL/5 SKIP（live 硬件门）** ⇒ ★**`59-r1` 承重声称（0 FAIL）验证通过**
+- ★**计数差说明**：★我 `-v` 跨两包计数（53/5）vs 腿报 52 RUN（39/0/1）——★**SKIP 数随 live 硬件门机器态浮动＝在册读数非断言**；★**承重项＝0 FAIL、两包 ok＝一致**
+- ★**自踩计数**：★**第 15 处族我已自踩 3 次**（config-r1 首跑 cmd/wisp／385-r1 台面注记／本次）⇒ ★**收件复跑的默认动作升级：凡涉音频/sherpa 的包，复跑命令一律先补在册 PATH**（写进 checklist）
