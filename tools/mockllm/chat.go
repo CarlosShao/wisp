@@ -156,10 +156,12 @@ func planChat(req *chatRequest) (answer string, toolName string, toolArgs string
 	case lastUser.audio:
 		answer = "audio-ok"
 	default:
+		// No size clamp on the echo: the 8MB LimitReader above already bounds
+		// the request, per-request length control belongs to the max_tokens
+		// emulation below, and a byte clamp here cut multi-byte text
+		// mid-UTF-8-sequence and made long samples physically undeliverable
+		// (ticket 385).
 		answer = "echo: " + lastUser.text
-		if len(answer) > 400 {
-			answer = answer[:400]
-		}
 	}
 	if lastUser.thought {
 		reasoning = "thinking about: " + lastUser.text

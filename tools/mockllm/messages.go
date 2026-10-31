@@ -104,10 +104,9 @@ func planMessagesFrom(messages []msgMessage, tools []msgTool, choice json.RawMes
 	case image:
 		p.answer = "vision-ok"
 	default:
+		// No echo size clamp (ticket 385): a byte clamp cut multi-byte text
+		// mid-UTF-8-sequence; per-request length control belongs to the request.
 		p.answer = "echo: " + text
-		if len(p.answer) > 400 {
-			p.answer = p.answer[:400]
-		}
 	}
 	p.image = image
 	if strings.Contains(text, "[think]") {

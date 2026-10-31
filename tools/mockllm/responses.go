@@ -86,12 +86,11 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 			"mockllm capability mode: vision=broken rejects image input")
 		return
 	}
+	// No echo size clamp (ticket 385): a byte clamp cut multi-byte text
+	// mid-UTF-8-sequence; per-request length control belongs to the request.
 	answer := "echo: " + text
 	if image {
 		answer = "vision-ok"
-	}
-	if len(answer) > 400 {
-		answer = answer[:400]
 	}
 	reason := ""
 	// thinking=broken withholds the reasoning summary item and its delta,
