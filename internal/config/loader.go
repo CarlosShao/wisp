@@ -50,6 +50,30 @@ func LoadFile(path string, res SecretResolver) (*Config, *Resolved, error) {
 	return cfg, resolved, nil
 }
 
+// readError marks a failure to READ config.toml off the disk (the os.ReadFile
+// step in readConfigFile below): the file is missing, held by a sharing
+// conflict, or otherwise unreadable - the IO class of load failure, as opposed
+// to the content class (parse, migration, validation, secret resolution),
+// whose failures describe the bytes, not the disk. CheckAndReload classifies
+// its failure-path stat adoption on this marker (internal/config/manager.go):
+// a content failure adopts the seen stat so a file that will not fix itself
+// does not re-error every tick, while a read failure must NOT adopt - one
+// transient sharing violation against the atomic-rename writer (R-42r1-1,
+// 42-r1's concurrent-poll evidence) would otherwise adopt the failed stat and
+// hide that write until the next successful write; a real writer writes again,
+// so the next tick retries the read instead.
+//
+// Unexported on purpose - an internal classification, not a contract change:
+// Error() and Unwrap() carry the wrapped observe error unchanged, so the
+// message and the errors.Is chain (fs.ErrNotExist for cmd/wisp's cause=missing,
+// 票 223 AC#4) read exactly as before.
+type readError struct{ err error }
+
+func (e *readError) Error() string { return e.err.Error() }
+
+// Unwrap keeps the cause reachable to errors.Is / errors.As.
+func (e *readError) Unwrap() error { return e.err }
+
 // readConfigFile runs the sec 4.1 pipeline up to (and including) semantic
 // validation, and stops before api_key_ref resolution: it returns the values a
 // file declares, not the secrets behind them.
@@ -73,12 +97,12 @@ func readConfigFile(path string) (*Config, error) {
 			// original error stays in the chain: cmd/wisp's describeReloadFailure
 			// reads fs.ErrNotExist off it for cause=missing, and 票 223 AC#4
 			// forbids that branch from drifting.
-			return nil, observe.Wrap(observe.ClassConfig, err,
+			return nil, &readError{observe.Wrap(observe.ClassConfig, err,
 				"config.toml read: no file at this path yet。"+refusalFileMissing+
 					"：这一页与这条链都不新建 config.toml。在控制台运行一次 wisp run，第一次启动会写出全默认的首份配置"+
-					"（它不替你选任何模型，也不替你建任何服务商行）")
+					"（它不替你选任何模型，也不替你建任何服务商行）")}
 		}
-		return nil, observe.Wrap(observe.ClassConfig, err, "config.toml read")
+		return nil, &readError{observe.Wrap(observe.ClassConfig, err, "config.toml read")}
 	}
 	ver, peekErr := peekSchemaVersion(raw)
 	if ver == 0 && peekErr != nil {

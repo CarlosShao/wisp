@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"log/slog"
 	"os"
 	"reflect"
@@ -159,10 +160,23 @@ func (m *Manager) CheckAndReload() (*Report, error) {
 	}
 	fresh, resolved, err := LoadFile(m.path, m.res)
 	if err != nil {
-		// Adopt the stat even on failure: a newer mtime+size only appears
-		// after the next write, so this avoids re-erroring every tick on a
-		// file that is not going to fix itself.
-		m.seenMtime, m.seenSize, m.seenValid = st.ModTime(), st.Size(), true
+		// Two failure classes, and they need opposite watch-state treatment
+		// (R-42r1-1, the classification loader.go's readError marker carries).
+		// Content class (parse, migration, validation, secret resolution - the
+		// bytes are the problem): adopt the stat even on failure - a newer
+		// mtime+size only appears after the next write, so this avoids
+		// re-erroring every tick on a file that is not going to fix itself.
+		// Read class (readError: the file could not be READ - missing,
+		// sharing violation, permission): keep the OLD stat, because adopting
+		// a failed read's stat would hide that write until the next successful
+		// write - one transient sharing violation against the atomic-rename
+		// writer (42-r1's concurrent-poll evidence) is enough for the loss,
+		// and a real writer writes again, so the next tick retries the read
+		// instead.
+		var re *readError
+		if !errors.As(err, &re) {
+			m.seenMtime, m.seenSize, m.seenValid = st.ModTime(), st.Size(), true
+		}
 		m.mu.Unlock()
 		return nil, err
 	}
