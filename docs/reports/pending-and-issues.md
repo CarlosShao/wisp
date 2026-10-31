@@ -28765,3 +28765,27 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **⑥ ★在飞**＝**写 4**（`41a2-r1`/`config-r1`/`29g-r1`/`59-r1`）＋**读 1**（`12-r1`）＝ 总 5 ≤7 ✅、写 4 ≥3 ✅
 ★票池：done=**199**／open=**168**（**54.5%**，383/384 开后 open=170）；未推（本轮后现跑）
 ★**摆机主 3 件**：①347 追认 ②216/120/136 外部会话知情吗 ③Wails 裁定＝不迁移（可推翻）
+
+## A1300（2026-10-31 13:4x +08，编排者，goal round 31 续）★★★收 `41a2-r1`（KWS 全链接线、`3d41c1791` 4 件 +1139/−30）：**唤醒端到端真跑通（4.wav 命中→#7→ASR→Warm 五跳）＋`warmFeed` 真喂食门（R28-2 落地）＋零回归 21/21**｜★票 381 按 `381-v2` 裁决翻 4 格（AC#3/4 留＝R26-1 在、需 `381-r2`）｜★修 `29-r1` 的 undo.go gofmt｜★**已派 `381-r2`**
+
+**① ★★★收 `41a2-r1`（三把尺：提交 `3d41c1791` 在／4 件在／staging build `rc=0`；★我的复跑 `-test.run Test41a2` 过滤名没打中案＝记一笔，零回归由它自跑 21/21 覆盖）**
+- ★★★**唤醒端到端五跳**：0.wav 负控 0 hit → **4.wav 命中 `word=蒋友伯 At=115200`（样本钟）**→ `#7 Armed→Listening` → handoffs=1 exit=0 → **ASR 开拾 partials=11 finals=1 punctuated=1** → `#11` → Warm
+- ★★★**`warmFeed` 真喂食门（R28-2 落地）**：Warm 态 40 静音帧 ⇒ **`kws_fed` 恰 +20480／`asr_fed` 冻结 +0**；再喂命中 ⇒ **hits=2 → warm_wake=1 门重开、`loads_after_warm=0`、acquire=[2.94s, 0s]**
+- ★**opt-in ＋ manifest 拼法**：`[voice] wake_word.enabled`；epoch-12/99 两套 sha256 逐位同 ⇒ 商店路径 manifest 拼法直填 `KwsConfig`
+- ★**派发全链**：`EvWakeWord`(#7)／Warm→#29 零装载唤醒／veto→`EvVeto`(#13/#22)＋381 打断通道；★**`Facts.KwsLoaded` 生产赋值**（rv.kwsLoaded 唯一生产者）；静音手势 #8/#10；**#32 双分支真 fact 走通**（#32 事件本体仍 frozen 包内部定时器 nil facts ⇒ 由 #5 重武装自愈，具名残余）
+- ★★**过程抓到修掉两真缺陷**：①0.wav 带 LIST chunk 首版帧数读取错位（改真 chunk walk）②**dispose 重臂守卫 `stage()` 零值碰撞 ⇒ 一发唤醒开 4 次链**（收紧 tr≠nil ⇒ handoffs=1）
+- ★★★**零回归**：**`Test15e|TestWireR1|Test26R3|Test41a2r1` staged 21/21 rc=0**、**`262/640/902` 与 `drained=181/181` 逐位同**、speech 整包 67/61/0/6 逐位同、vet 净、d22scan 净＋正控有牙
+- ★**防呆未破**（生产表 0 hit 钉成管线级控制案／Score/Threshold 未动／Reset 未绕）
+- ★**残余 7 条具名**（sampler 实测数、词表热更、veto e2e、唤醒句话轮过滤、#32 facts 钩、models ensure 接 KWS、Speaking 双门）零阻塞
+
+**② ★★票 381 翻格（凭 `381-v2`）**：★**AC#1/2/5/6 翻**（构造器字段级归零／panic 消除／381-v2 三发自跑／纪律格）、★**AC#3/4 留**（≤400ms NOT MET 结构性＝**出声期 Esc 6,653ms 照播完**、token 杀下一句、`Abort()` 零调用）＋**裁决注随格**；机械闸 381 枚数 1 ✅
+
+**③ ★★修 `29-r1` 的 undo.go gofmt 真红**（编排者跑尺：gofumpt -w、memory 复跑 `ok 25.166s`、机械尺净）
+
+**④ ★已派 `381-r2`（写、cmd/wisp）**
+★**三件**：①接 `speaker.Abort()`（★出声期真停 ⇒ ≤400ms 实测 ≥5 轮分布）②speak 入口清 `interruptCh`（消"残留 token 杀下一句"）③veto 支路修或删（★具名选型；★**误伤率读数**；★**"非 Speaking 期吞句"必须消**）
+★**硬边界**：⛔ internal/risk（382 已收口）／⛔ internal/speech 语义／⛔ D43 表（打断走表内 #27）／⛔ 放宽断言（★**SLO 超标＝如实报最优值**）
+★**`R26-1` 收口判定随本腿**：★**≤400ms 达标 ⇒ R26-1 记收口**（★**票 26 `AC1` 打断半格**）
+
+**⑤ ★在飞**＝**写 1**（`381-r2` cmd/wisp）＋**裁 1**（`42-v1` 已交）＋**`12-slo-v1`（裁）在飞**；**写腿 1 ＜3** ⇒ ★**具名：`43-r1` 必触 cmd/wisp＝排队 381-r2 后；`29-AC#2` golden（`29g-r1` 在飞）已补 1 枚** ⇒ **写腿实数＝`381-r2`＋`config-r1`＋`29g-r1` ＝ 3 枚** ✅（41a2-r1 已交出 cmd/wisp）
+★票池：done=**199**／open=**169**（**54.5%**）；未推（本轮后现跑）；**摆机主 3 件**（347 追认／216-120-136 报备／Wails 裁定）
