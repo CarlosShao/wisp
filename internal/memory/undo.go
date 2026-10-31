@@ -14,8 +14,8 @@ import (
 // (D20 / ticket 29 undo requirement). Each snapshot owns a copy of every row;
 // changes after the snapshot do not affect it.
 type ProfileSnapshot struct {
-	ID        string   // unique snapshot id (uuid or similar)
-	Timestamp int64    // unix seconds (wall clock, persisted record)
+	ID        string    // unique snapshot id (uuid or similar)
+	Timestamp int64     // unix seconds (wall clock, persisted record)
 	Snapshot  []Profile // deep copy of profile table at capture time
 }
 
