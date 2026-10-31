@@ -597,6 +597,20 @@ func runResident() {
 	life := startLifecycleEvents(rt, wireLifecycleSink(rt, ra, raudio, rv, &lifecycleFastExit), &lifecycleFastExit)
 	_ = life
 
+	// Ticket 384: the ticket 42 watchdog loop, assembled on this line because
+	// every handle it needs now exists - the D43 machine (rv.machine), the
+	// panel host (rp) and the C30 Job (rt.Job). 43-r1's lifecycle wiring above
+	// is left byte-for-byte alone: sibling assembly, shared file. The root
+	// cancel is this leg's own defer - registered after the legs above, so
+	// LIFO stops the watchdog before the panel and ball teardown and before
+	// the D38(e) sequence the deferred rt.Shutdown at the top runs.
+	wd, wdRoot := startResidentWatchdog(rt, rv, rp)
+	defer wdRoot.Cancel()
+	// The loop handle's first production consumer is the dispose path's
+	// VerifySettle (ticket 42's settle gate); that dispose assembly rides the
+	// session-scope wave (ticket 28), so the handle is taken and named here.
+	_ = wd
+
 	// The boot report names the steps this process really owns, taken off the
 	// registration rather than off a comment (AC#4's "不许撒谎" half).
 	registered := rt.RegisteredShutdownSteps()
