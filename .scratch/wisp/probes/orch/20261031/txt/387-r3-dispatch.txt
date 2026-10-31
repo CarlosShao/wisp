@@ -1,0 +1,3 @@
+存档 2026-10-31 22:0x · 腿 387-r3（票 387 残余①裸跑全绿腿、写、internal/speech 独占——387-r2 已让出）
+387-r2 残余①：6 枚裸跑 FAIL 中 4 枚＝kws_test.go:399/416/430/451 直调 NewKwsEngine 后对守卫错误 Fatal（HEAD 既有裸跑形状）⇒ 补同族 test-side skip（cgo_boundary_windows_test.go:157/225 先例形状）⇒ 裸跑 rc0 全绿或具名 skip 收敛；另 2 枚 FAIL 查明定性（同法 skip 或具名）。
+⛔ 动守卫本体（387-r2 刚落）、⛔ 改 NewKwsEngine 语义；反向判据＋零回归（staging 61/0/6 不动＋裸跑读数）。

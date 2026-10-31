@@ -29410,3 +29410,24 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **⑤ ★在飞 4**＝**写 2**（★`391-r1` tools/mockllm／`387-r2` internal/speech）＋**裁 2**（★`26p-v1`/`12-v1`）——**写 2＜3 具名**：★**第三写腿＝28-PathC 集成（等 26p-v1 判语、在飞）⇒ 判语交件同轮补满**
 ★票池：done=**206**／open=**170**（391 开后）；未推（本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
+
+## A1335（2026-10-31 22:0x +08，编排者，goal round 33 续）★★★收 `387-r2`（`9d9607559` 3 枚 +97）：**守卫补齐＋裸跑零崩溃**（我复跑裸跑无 0xc0000005）｜★★**归因校正**（全包裸跑首发崩点＝TestKwsProbeSherpaDebug 直调、非 NewMatchaTts——两处都真）｜★派 `387-v1`＋`387-r3`（残余①小腿）
+
+**① ★★收 `387-r2`（尺核：★提交在／3 枚在）**
+- ★★★**AC#1 守卫补齐**：★`NewMatchaTts` 挂同族 `checkOnnxruntime`（**四先例同位同句形逐一对核**：vad.go:72/asr.go:71/kws.go:213/punctuate.go:185）；★**全包 sherpa 直调点盘点＝补完后 100% 被守卫覆盖**
+- ★★★**AC#2 裸跑零崩溃**：★全包裸跑（PATH 注入＝59-r1 遮蔽形态）**25 PASS/6 FAIL/36 SKIP 零崩溃**、skip 句含守卫具名错误「onnxruntime 1.17.1 is older than the 1.28…」——**我复跑同形（无 0xc0000005）** ✅
+- ★★★**AC#3 反向（仓外导出树真改文件、⛔-overlay＝A380 WalkDir 方法）**：★摘守卫 ⇒ **裸跑 Exception 0xc0000005 逐字复现、栈＝`_Cfunc_SherpaOnnxCreateOfflineTts`←NewMatchaTts(export tts.go:161)**＋OR7 自报机理行全在；三读数＋还原核
+- ★★★**AC#4 staging 零回归**：★改前基线与改后**各 61/0/6 rc 0**、67 行名册 diff＝空、TestKwsProbeSherpaDebug staging PASS＝守卫零改 staging 行为
+- ★★**归因校正（实质新信息）**：★**59-r1 的「go test 直跑在 NewMatchaTts 崩」是 aecspike 包视角；全包 ./internal/speech 裸跑首发崩点实测＝TestKwsProbeSherpaDebug（票 41 老探针直调 sherpa.NewKeywordSpotter、文件序先于 TTS）**；★NewMatchaTts 崩点另由定向 -run Test26 坐实于 tts.go:158——**两处都真、非误归因**（停手条件②核销）；★本腿已给探针补同族 test-side skip（cgo_boundary_windows_test.go:157/225 先例）
+- ★**残余①**：★**6 枚裸跑 FAIL 中 4 枚＝kws_test.go:399/416/430/451 直调 NewKwsEngine 后 Fatal**（HEAD 既有裸跑形状、非 AC#1 字面）⇒ **补 4 处具名 skip＝一句线后续票** ⇒ ★**派 `387-r3`**
+- ★**残余②**：★**台账 :28956 的「NewMatchaTts 崩」表述对全包裸跑不完整** ⇒ **编排者本轮修订（见下）**
+
+**② ★台账修订（编排者 own）**
+★A1307 时代 :28956 的「裸跑崩 NewMatchaTts」表述 ⇒ **修订为「全包裸跑首发崩点＝TestKwsProbeSherpaDebug 直调（票 41 老探针）；NewMatchaTts 崩点由定向 -run 另证——两处都真」**（append-only 修订、387-r2 归因校正为凭）
+
+**③ ★已派 2 条**
+- ★**`387-v1`（裁）**：五格复核（守卫同位/裸跑复跑/反向复刻/staging 零回归）＋可否收口＋残余定性
+- ★**`387-r3`（写、internal/speech 独占——387-r2 已让出）**：**残余①**＝4 处 KWS Fatalf 补具名 skip（cgo_boundary 先例形状）⇒ **裸跑 rc0 全绿或具名收敛**；另 2 枚 FAIL 查明定性；⛔ 动守卫本体
+★**写面互斥核**：387-r3=internal/speech／391-r1=tools/mockllm／384-v1？无——在飞 12-v1/26p-v1 只读——**零撞**；★**写 2 枚**——**具名：第三写腿＝28-PathC 集成（等 26p-v1 判语、在飞 2.5h）⇒ 判语交件同轮补满**
+
+**④ ★状态**：done=**206**／open=**169**；未推 **5**（网络断、本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
