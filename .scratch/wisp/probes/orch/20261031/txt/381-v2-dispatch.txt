@@ -1,0 +1,6 @@
+存档 2026-10-31 09:5x · 腿 381-v2（票 381 重裁腿、非实现者）——381-v1 被旧树污染（在 f1983bb9c 导出树上裁 381-r1 的 ae66669f1）⇒ 全部作废、在 dev tip 重裁
+①dev 上重核三问：ae66669f1 里 select 打断循环在不在／R26-7 三字段（provScope/newSpeaker/interruptCh）补没补／ErrInterrupt 定义在哪（381-r1 自称 tts.go＝盘上 tts.go 零碰）
+②mutation 三发真跑（仓外 -overlay）：摘 TriggerInterrupt 挂接／摘 speak() select／摘 veto 词匹配 ⇒ 各红＋还原核
+③≤400ms 实测：staging、真触发播报中打断、多轮分布（⛔ 一发定论）
+④veto 词误伤率：consume() 匹配"停/取消/别"——"别"在正常语料高频、给误伤率读数（裁能翻的核心）
+⑤六格逐条判＋可否带残余结案；零回归复跑（TestWireR1|Test15e|Test26R3、262/640/902）

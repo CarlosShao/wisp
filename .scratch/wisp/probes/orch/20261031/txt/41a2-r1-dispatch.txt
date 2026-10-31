@@ -1,0 +1,3 @@
+存档 2026-10-31 09:5x · 腿 41a2-r1（重派；前腿停在安全点零损失、预研全在 D:\tmp\wisp\20261028\41a2r1\ 与其报告）
+设备开关裁定（编排者按 41-a1 ④-1 拍）：Warm 门保持开、KWS 吃帧当唤醒源、warmFeed 升真喂食门（Warm 里 tr.Accept 停）＝解 R28-2；KWS 插 run() phase1 帧管道、⛔ 插 seam；命中走表内行 #5/#7/#13/#22；Facts.KwsLoaded 现翻；D43 表 ⛔ 动一字。
+防呆：demo 表 test_keywords vs 生产表 keywords（⛔ 改成每夹具必中）；Score=3.0/Threshold=0.1 包内；命中必 Reset；slot 已有 FamilyKws。

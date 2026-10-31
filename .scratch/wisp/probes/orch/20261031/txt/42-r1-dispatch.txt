@@ -1,0 +1,2 @@
+存档 2026-10-31 09:5x · 腿 42-r1（票 42 watchdog 落地腿、写）
+票面 5 格全空、Blocked by 08/28 全 DONE。写面按票面定；⛔ cmd/wisp（41a2-r1 独占）——若票面必须动 cmd/wisp ⇒ 做非 cmd/wisp 部分、其余具名交回；⛔ internal/risk（382 刚收口）/internal/speech 语义。
