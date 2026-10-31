@@ -29431,3 +29431,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ★**写面互斥核**：387-r3=internal/speech／391-r1=tools/mockllm／384-v1？无——在飞 12-v1/26p-v1 只读——**零撞**；★**写 2 枚**——**具名：第三写腿＝28-PathC 集成（等 26p-v1 判语、在飞 2.5h）⇒ 判语交件同轮补满**
 
 **④ ★状态**：done=**206**／open=**169**；未推 **5**（网络断、本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
+
+## A1336（2026-10-31 22:1x +08，编排者，goal round 33 续）★★★收 `391-r1`（`6cf941b72` 4 枚）：**mockllm 死字段补齐**——messages/responses 两方言 max_tokens 应用落齐、**选型具名＝协议合法词汇替代照抄 chat**（消费方实锤）｜★派 `391-v1` 终裁
+
+**① ★★收 `391-r1`（尺核：★提交在／4 枚在／★我复跑模块内 ok）**
+- ★★★**AC#1 两方言补齐**：★**messages/responses 合成路径应用 max_tokens/max_output_tokens**（对照 chat 方言 386-r2 的 `runeBoundaryWithin()` 同形；responses 字段名映射注意）
+- ★★★**选型具名（铁律④、证据件 §2）**：★**票面 AC#2 的「finish=length」按 386-r2 案形理解为截断终止信号泛称、两方言落各协议合法词汇**——Messages 报 `stop_reason="max_tokens"`、Responses 报 `status="incomplete"+incomplete_details.reason="max_output_tokens"`（流式终结事件 response.incomplete）；★**理由：真 Anthropic/Responses 协议无 "length" 值、照抄恰制造新不齐**；★★**消费方实锤：internal/llm/anthropic/adapter.go 对未知 stop_reason 直接报错、mapStop 与 openairesponses 映射表把三方言终止信号殊途同归到同一 C6 max_tokens**；★语义核对两方言与 chat 同义、停手①②不触发、协议形状零改动
+- ★★★**AC#3 三读数＋还原核**：修前红（stop_reason=end_turn/906 字节全文/超 400 界逐字）→修后绿→**overlay 装回修前快照复红同位**→撤复绿；★快照 sha256 与 386-r2 §4 现值一致（两文件自 386-r2 后零改动）；★**如实报：测试件首跑 responses 流子案红在漏跳 [DONE] 哨兵（测试自身缺口、按 chat 案形补跳后归位）**
+- ★★**AC#4 零回归**：★模块内全包 **36/20/0/0 rc=0**（386-r2 基线 28/18＋本腿增量吻合）＋internal/llm 七包 rc=0＋票 30 present 真管线 rc=0＋**cmd/wisp 定向名册 46/36/0/0（与 386-r2 逐位一致）**＋gofumpt/vet/build/d22scan 全清
+- ★**登记不修：无新增** ✅
+
+**② ★已派 `391-v1`（终裁）**：两方言补齐读码核／**选型具名裁（消费方实锤核）**／多字节案复跑／mutation 复刻／零回归／可否收口
+
+**③ ★在飞 4**＝**写 1**（★`387-r3` KWS skip）＋**裁 3**（★`391-v1`/`26p-v1`/`12-v1`）——**写 1＜3 具名**：★**第三写腿＝28-PathC 集成（等 26p-v1 判语、在飞 2.5h）⇒ 判语交件同轮补满**；★**387-r2/386-r2/391-r1 已让出各自写面**
+★票池：done=**206**／open=**170**；未推（网络断、本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
