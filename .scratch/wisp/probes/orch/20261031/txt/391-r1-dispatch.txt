@@ -1,0 +1,2 @@
+存档 2026-10-31 22:1x · 腿 391-r1（票 391 mockllm max_tokens 死字段、写、tools/mockllm 独占——386-r2 已让出）
+AC#1 两方言（messages/responses）补齐 max_tokens 应用（对照 chat 方言 386-r2 的 runeBoundaryWithin 形状）／AC#2 两方言各一发 max_tokens 汉字切案／AC#3 反向／AC#4 零回归（模块内跑——第 23 处）／AC#5 ⛔ cmd/wisp/internal/**。

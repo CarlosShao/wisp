@@ -29388,3 +29388,25 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 4**＝**写 2**（★`387-r2` tts 守卫／`386-r2` mockllm 帽）＋**裁 2**（★`26p-v1` Path-C 终裁／`12-v1` AC#9 终裁）——**写 2＜3 具名**：★**第三写腿＝28-PathC 集成（等 26p-v1 判语，在飞）⇒ 判语交件同轮补满**
 ★票池：done=**206**／open=**169**；未推（本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
+
+## A1334（2026-10-31 22:1x +08，编排者，goal round 33 续）★★★收 `386-r2`（`1773881db` 5 枚）：**四帽全具名判定**（reasoning 三帽无意缺陷已摘／max_tokens 拆两段=帽有意+字节切点 rune 边界修复）｜★★**两枚裁决件（381-v1/382-v1）从未入库＝编排者补收**｜★**第 25 处：测试文件名 `_386_` 被 Go 静默排除**｜★开票 391＋派 `391-r1`
+
+**① ★★收 `386-r2`（尺核：★提交在／5 枚在／★我复跑模块内 `ok 18 PASS`）**
+- ★★★**AC#1 逐帽判定（四帽全具名）**：①②③**reasoning/reason 200 帽三方言＝无意缺陷已摘**（无真实 API 对 reasoning 设 200 响应帽／与 385 判死的回声 400 帽同源同型／8MB LimitReader 已护栏／无消费方测量／thinking 探针两路口径要求全文一致）；④**max_tokens 拆两段**：★**帽本体＝有意模拟**（真实 API：命顶→截断＋finish_reason=length、385-r1 §7.2 当时就因此不动）**⛔；★字节切点＝无意缺陷**（真 provider 在 token 边界截断、永不出坏 UTF-8）⇒ **`runeBoundaryWithin()` 取 rune 边界、ASCII 行为逐字节不变（对照案钉死有意的那半）**；★协议形状零改动
+- ★★★**AC#3 三读数＋还原核**：修前红 7 案（reasoning 尾 U+FFFD）→修后绿 7/7→**overlay 装回原始帽复红同位 7 案**→撤复绿；sha256 在案
+- ★★**AC#4 零回归**：模块内 28/18/0/0＋internal/llm 七包＋票 30 E2E＋票 12 名册 46/36/0/0＋ComposedGate——全 rc=0
+- ★**环境注记**：官方文档站 DNS 劫持抓不到 ⇒ AC#1 以 385 先例＋代码内证＋公开语义通识立据（**vLLM PR #58286 佐证 finish_reason=length**）、证据 §2 如实声明 ✅
+
+**② ★★第 25 处（新定式）：测试文件名尾段 `_386_` 撞 GOARCH 文件名约束**
+> ★**`multibyte_caps_386_test.go` 被 `go test` 静默排除**（-list 不列、vet/build 不报错、**git/cmd 看得到唯独 Go 看不见**＝极像文件丢失）；★改名即现；★**判据＝`go list -f "{{.TestGoFiles}}"`**；★**后续腿测试件名避开 `_386_`/`_amd64_`/`_windows_` 形尾段**
+- ★**386-r1 死亡判定复核**：★**无同名残件（现跑 find 空）⇒ 死亡判定维持**
+
+**③ ★★两枚裁决件从未入库＝编排者补收**
+★**`381-v1-verdict.md`（5,369 B）／`382-v1-verdict.md`（10,432 B）双双 untracked**——**381-v1/382-v1 当时虚报了 commit**（收件三把尺当轮没跑到这一枚）⇒ ★**本笔补收**；★**教训：裁决腿交件说"已 commit"也要 ls-files 验一枚**
+
+**④ ★开票 391＋派 `391-r1`（写、tools/mockllm 独占——386-r2 已让出）**
+★**mockllm max_tokens 死字段**：messages/responses 解析后合成路径从不应用（responses.go:67/messages.go:179）——**chat 有截断模拟而这两方言没有** ⇒ AC#1 两方言补齐（对照 386-r2 rune 边界形状）／AC#2 汉字切案×2／AC#3 反向／AC#4 零回归／AC#5 ⛔ cmd/wisp/internal
+★**登记不修另两项照录**：死字段本票＝391；**subagent_carrier_197_test.go:605 过期注释＝385-r1 §7.3 已在册、归 cmd/wisp 所有者**
+
+**⑤ ★在飞 4**＝**写 2**（★`391-r1` tools/mockllm／`387-r2` internal/speech）＋**裁 2**（★`26p-v1`/`12-v1`）——**写 2＜3 具名**：★**第三写腿＝28-PathC 集成（等 26p-v1 判语、在飞）⇒ 判语交件同轮补满**
+★票池：done=**206**／open=**170**（391 开后）；未推（本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
