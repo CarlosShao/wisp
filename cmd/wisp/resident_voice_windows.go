@@ -92,7 +92,6 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -417,6 +416,17 @@ type residentVoice struct {
 	// final Play() frame still fires without blocking the caller.
 	interruptCh chan struct{}
 
+	// TICKET 381-r2: the abort hop of the announcement in flight. TriggerInterrupt
+	// runs on the caller's goroutine (the Esc cancel key fires on the ball's UI
+	// thread) while the owner goroutine is parked inside speaker.Drain - the one
+	// wait no chunk-boundary select in speak() can reach - so the stop is
+	// delivered HERE: Abort() resets the waveOut device and the parked Drain
+	// answers errSpeakerAborted within one wait slice. It stores func() over
+	// atomic.Value so the seam stays on the cmd/wisp side and the tests can hand
+	// in any voiceSpeaker; a Load that is not a func() (nothing speaking, or a
+	// leg that never registered one) means an interrupt while idle is inert.
+	speakAbort atomic.Value
+
 	// Counters, all atomic: the asr-infer goroutine writes them, the boot report
 	// and the tray gesture read them.
 	drained     atomic.Uint64
@@ -442,14 +452,18 @@ type residentVoice struct {
 	ttsNoDevice     atomic.Uint64
 	ttsSilent       atomic.Uint64
 	ttsFailed       atomic.Uint64
-	ttsSpoken       atomic.Uint64
-	ttsChunks       atomic.Uint64
-	ttsSamples      atomic.Uint64
-	warmTurnEnd     atomic.Uint64
-	warmWake        atomic.Uint64
-	warmDiscards    atomic.Uint64
-	punctAttached   atomic.Bool
-	punctFinals     atomic.Uint64
+	// ttsAborted counts the announcements an interrupt stopped mid-playback
+	// (ticket 381-r2): Drain answered errSpeakerAborted, the walk was #27, the
+	// sentence is never counted as spoken. It is the reading AC#3's stop claims.
+	ttsAborted    atomic.Uint64
+	ttsSpoken     atomic.Uint64
+	ttsChunks     atomic.Uint64
+	ttsSamples    atomic.Uint64
+	warmTurnEnd   atomic.Uint64
+	warmWake      atomic.Uint64
+	warmDiscards  atomic.Uint64
+	punctAttached atomic.Bool
+	punctFinals   atomic.Uint64
 	// asrGone is set by the announce path when a family swap released the ASR the
 	// running transcriber still holds; the loop re-arms phase 1 on it.
 	asrGone atomic.Bool
@@ -518,11 +532,19 @@ func newResidentVoice(frames <-chan []byte, plan voicePlan, ball *residentBall, 
 	}
 }
 
-// TICKET 381 R26-1: interrupt trigger API. Call this from any of the three
-// interrupt sources (hotkey/cancel key, ball click, KWS veto word) to fire an
-// EvInterrupt during播报。Non-blocking send into a buffered chan =1 guarantees
-// no caller blocks even if speak() is mid-Pause(). The speak() consumer checks
-// this channel in its hot loop and will dispatch EvInterrupt within ≤400ms.
+// TICKET 381 R26-1: interrupt trigger API. Call this from any of the interrupt
+// sources (hotkey/cancel key, ball click, KWS veto word) to fire an EvInterrupt
+// during播报。Non-blocking send into a buffered chan =1 guarantees no caller
+// blocks even if speak() is mid-Pause(). The speak() consumer checks this
+// channel at every chunk boundary, which covers the SYNTHESIS half.
+//
+// TICKET 381-r2: the PLAYBACK half is aborted from here. During playback the
+// owner goroutine is parked inside speaker.Drain where no select runs, so the
+// token alone can never stop the audio (381-v2 measured the sentence playing
+// out 6,653ms with the token waiting) - the abort below resets the device and
+// un-parks the Drain within one wait slice. The two halves are complementary:
+// abort drops whatever is queued or playing now, the token makes the chunk
+// callback stop feeding more chunks and is what speak()'s entry drains.
 func (rv *residentVoice) TriggerInterrupt() {
 	if rv == nil || rv.interruptCh == nil {
 		return
@@ -530,7 +552,12 @@ func (rv *residentVoice) TriggerInterrupt() {
 	select {
 	case rv.interruptCh <- struct{}{}:
 	default:
-		// Channel full = interrupt already queued for this播报句，drop silently.
+		// Channel full = a token is already pending for this播报句。The abort
+		// below still runs: stopping audible playback is not negotiable, and the
+		// stale token is what speak()'s entry drain is for.
+	}
+	if abort, ok := rv.speakAbort.Load().(func()); ok && abort != nil {
+		abort()
 	}
 }
 
@@ -1186,13 +1213,17 @@ func (rv *residentVoice) adopt(r voiceChainReady) (*speech.Transcriber, speech.A
 	return tr, r.asr, nil
 }
 
-// transcriptSink wraps submitTask and adds EvInterrupt dispatch for veto words.
-// It is passed to the Transcriber constructor so veto words can trigger interrupts.
-// consume fans the seam's transcripts into this leg's readings, the D43 walk and
-// the text path.
-//
-// TICKET 381 R26-1: also checks for KWS veto word interrupts。如果 VAD 停止触发时检测到
-// 否决词（"停"/"取消"/"别"），则 dispatch EvInterrupt 而不是送任务流。
+// consume fans the seam's transcripts into this leg's readings, the D43 walk
+// and the text path. Every final goes to the agent: the string-match veto
+// branch 381-r1 hung here is deleted (381-r2, named in the evidence table).
+// It could not do its one job - the capture gate is closed and the owner
+// goroutine is inside speak() while the machine is Speaking, so a veto final
+// can never arrive mid-announcement - and outside Speaking it matched benign
+// substrings (381-v2: 12/12), dispatched EvInterrupt from states the table
+// rejects, and its continue swallowed the user's sentence behind a
+// noteProblem. The veto channels that remain do not ride the transcript path:
+// the KWS word-level veto (onKwsHit, EvVeto rows #13/#22) and the Esc cancel
+// key (approval.voiceInterrupt -> TriggerInterrupt).
 func (rv *residentVoice) consume(outs []speech.Transcript) {
 	for _, t := range outs {
 		// The Warm wake. A transcript after Warm proves the microphone has
@@ -1208,14 +1239,12 @@ func (rv *residentVoice) consume(outs []speech.Transcript) {
 			rv.partials.Add(1)
 			rv.recordPartial(t)
 		case speech.TranscriptFinal:
-			// 381-r1:播报中 Veto 词打断。简单的关键词匹配作为 KWS 模型的降级方案。
-			isVeto := strings.Contains(t.Text, "停") || strings.Contains(t.Text, "取消") ||
-				strings.Contains(t.Text, "别")
-			if isVeto {
-				slog.Info("voice: interrupted by veto word", "word", t.Text)
-				rv.dispatch(statemachine.EvInterrupt, nil, "Veto 词打断：D43#27 回到 Listening（用户否决词）")
-				continue
-			}
+			// 381-r2: the 381-r1 veto-word branch (strings.Contains 停/取消/别) is
+			// deleted, named in the evidence table. A spoken "stop" that arrives as
+			// a transcript is a user utterance like any other: it goes to the agent
+			// through finish() below. The actual interrupt channels are Esc and the
+			// KWS veto word - see this function's header comment for why the
+			// transcript path can never be one of them.
 			rv.finals.Add(1)
 			if t.Punctuated {
 				rv.punctFinals.Add(1)
@@ -1627,10 +1656,10 @@ func (rv *residentVoice) announceReading() string {
 	if !rv.plan.Tts.complete() && rv.ttsSpoken.Load() == 0 {
 		return "没有 TTS 模型（这一进程不出声，结果只走 D10 通知）"
 	}
-	return fmt.Sprintf("闸=%d/%d（拦下 %d）引擎缺=%d 设备缺=%d 无内容=%d 失败=%d 出声=%d 句／%d 块／%d 样本 门闭=%d 放开=%d",
+	return fmt.Sprintf("闸=%d/%d（拦下 %d）引擎缺=%d 设备缺=%d 无内容=%d 失败=%d 出声=%d 句／%d 块／%d 样本 打断=%d 门闭=%d 放开=%d",
 		rv.ttsGatedOk.Load(), rv.ttsGated.Load()+rv.ttsGatedOk.Load(), rv.ttsGated.Load(),
 		rv.ttsNoEngine.Load(), rv.ttsNoDevice.Load(), rv.ttsSilent.Load(), rv.ttsFailed.Load(),
-		rv.ttsSpoken.Load(), rv.ttsChunks.Load(), rv.ttsSamples.Load(),
+		rv.ttsSpoken.Load(), rv.ttsChunks.Load(), rv.ttsSamples.Load(), rv.ttsAborted.Load(),
 		rv.speakGateOn.Load(), rv.speakGateOff.Load())
 }
 
@@ -1651,11 +1680,11 @@ func (rv *residentVoice) stopLine() string {
 	if rv == nil || rv.scope == nil {
 		return "voice leg: not assembled in this process"
 	}
-	return fmt.Sprintf("voice leg stopped: frames_drained=%d paused_drops=%d partials=%d finals=%d discarded=%d handed=%d handoffs=%d handoff_exit=%d asr_loaded=%v punct_attached=%v punctuated_finals=%d announce_asked=%d spoken=%d gated=%d samples=%d warm_turn_end=%d warm_wake=%d gate_closed=%d gate_reopened=%d kws_fed=%d kws_hits=%d kws_vetos=%d asr_fed=%d",
+	return fmt.Sprintf("voice leg stopped: frames_drained=%d paused_drops=%d partials=%d finals=%d discarded=%d handed=%d handoffs=%d handoff_exit=%d asr_loaded=%v punct_attached=%v punctuated_finals=%d announce_asked=%d spoken=%d aborted=%d gated=%d samples=%d warm_turn_end=%d warm_wake=%d gate_closed=%d gate_reopened=%d kws_fed=%d kws_hits=%d kws_vetos=%d asr_fed=%d",
 		rv.drained.Load(), rv.pausedDrops.Load(), rv.partials.Load(), rv.finals.Load(),
 		rv.discarded.Load(), rv.handed.Load(), rv.handOffs.Load(), rv.handOffExit.Load(),
 		rv.asrLoaded.Load(), rv.punctAttached.Load(), rv.punctFinals.Load(),
-		rv.announceAsked.Load(), rv.ttsSpoken.Load(), rv.ttsGated.Load(), rv.ttsSamples.Load(),
+		rv.announceAsked.Load(), rv.ttsSpoken.Load(), rv.ttsAborted.Load(), rv.ttsGated.Load(), rv.ttsSamples.Load(),
 		rv.warmTurnEnd.Load(), rv.warmWake.Load(), rv.speakGateOn.Load(), rv.speakGateOff.Load(),
 		rv.kwsFedSamples.Load(), rv.kwsHits.Load(), rv.kwsVetos.Load(), rv.asrFedSamples.Load())
 }

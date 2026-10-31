@@ -856,6 +856,17 @@ func (rv *residentVoice) speakQueued() {
 // invariant ("frames behind a closed gate were captured before the TTS
 // started") is what the ring replay can lean on.
 func (rv *residentVoice) speak(req voiceAnnounceRequest) {
+	// TICKET 381-r2: drain a stale interrupt token ONCE, here at the entry. An
+	// interrupt that fired while nothing was speaking (381-v2 §5: idle Esc leaves
+	// the token buffered, and the next announcement's first chunk callback then
+	// ate it - spoken=0, no problem row, the sentence silently killed) must not
+	// reach this sentence. An interrupt that fires AFTER this drain is a real one
+	// for THIS sentence: its token stays for the chunk callback and its abort is
+	// wired below, which is why the entry drains exactly once.
+	select {
+	case <-rv.interruptCh:
+	default:
+	}
 	text := req.text
 	// HOP 1: the C25 channel gate. A hit is not an error - it is the channel
 	// working - so it is counted and reported by source, and NOTHING is
@@ -943,9 +954,20 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 	}
 	spoke := 0
 	chunks := 0
-	// TICKET 381 R26-1:播报中打断通道。每次播放一小段前检查 ev.interrupt，
+	// TICKET 381-r2: the abort hop. From here until the function returns, an
+	// interrupt from another goroutine - the Esc cancel key fires on the ball's
+	// UI thread - reaches the device through TriggerInterrupt -> Abort(): during
+	// playback the owner is parked inside Drain where no select runs, and the
+	// reset behind Abort is the only thing that stops audible audio. Cleared on
+	// the way out so a stale abort can never reach a later announcement's
+	// speaker.
+	rv.speakAbort.Store(func() { _ = speaker.Abort() })
+	defer rv.speakAbort.Store((func())(nil))
+	// TICKET 381 R26-1:播报中打断通道（合成半边）。每次播放一小段前检查 ev.interrupt，
 	// 如果收到 EvInterrupt 则立即返回中断错误，导致 speak() 提前退出并
-	// dispatch EvInterrupt (≤400ms)。非阻塞 select，不会卡住播放器线程。
+	// dispatch EvInterrupt。非阻塞 select，不会卡住播放器线程。381-r2 注：
+	// 这层 select 只在 chunk 边界跑（matcha 一句只发 1-2 个大 chunk），出声期
+	// 零次 - 出声期那一半由上面的 abort 接线（TriggerInterrupt -> Abort）承担。
 	speakErr := eng.Speak(text, func(samples []float32) error {
 		if len(samples) == 0 {
 			return nil
@@ -954,9 +976,10 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 		spoke += len(samples)
 		rv.ttsSamples.Add(uint64(len(samples)))
 
-		// Check interrupt before playing each chunk. ≤400ms target from hotkey/click/word
-		// to TTS pause: this select is in the innermost loop so the next iteration
-		// sees the interrupt immediately. Non-blocking default ensures we don't stall.
+		// Check interrupt before playing each chunk. During synthesis this is the
+		// stop: the token arrives, the callback refuses the chunk, no further
+		// chunk is fed. During playback (Drain parked below) this select never
+		// runs - see the abort hop above.
 		select {
 		case <-rv.interruptCh:
 			// Interrupt fired: return an error that will be treated as "interrupted" not "failed".
@@ -970,6 +993,21 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 	drainErr := speaker.Drain()
 	_ = speaker.Close()
 	rv.ttsChunks.Add(uint64(chunks))
+	// TICKET 381-r2: the abort path. An interrupt during playback ends here: the
+	// queue was dropped by waveOutReset, Drain answered errSpeakerAborted, and
+	// the walk is D43#27 - NOT #26, the sentence is never counted as spoken, and
+	// no problem is recorded (a user interrupt is intent, not a failure - the
+	// same ruling 381-r1 made for the synthesis half). This is the half that
+	// turns 381-v2's 6,653ms play-out into a real stop.
+	if errors.Is(drainErr, errSpeakerAborted) {
+		rv.ttsAborted.Add(1)
+		slog.Info("voice: announcement aborted mid-playback",
+			"chunks", chunks, "samples", spoke, "rate", eng.SampleRate())
+		if moved {
+			rv.dispatch(statemachine.EvInterrupt, nil, "播报出声期被打断：D43#27 回到 Listening（Abort 真停出声）")
+		}
+		return
+	}
 	if speakErr != nil {
 		// 381-r1: distinguish "interrupted" from "failed"。中断是用户意图（热键/单击/否决词），
 		// 失败是技术故障（引擎问题）。中断时只 dispatch EvInterrupt，不报 problem。

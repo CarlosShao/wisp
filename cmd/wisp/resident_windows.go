@@ -398,11 +398,9 @@ func runResident() {
 	// registers, so the frozen ten-step order closes the device - not a LIFO
 	// accident that would leave step 4 reporting a stop it did not perform.
 	raudio := startResidentAudio(rt, rb.setAudioLevel)
-	// 381-r1:播报中断通道。raudio.approval 用于 Esc→TTS interrupt，在 attachVoice 中
-	// 调用 rv.TriggerInterrupt（同文件 :520）。
-	raudio.approval = ra
-	// 381-r1:播报中断通道。raudio.approval 用于 Esc→TTS interrupt，在 attachVoice 中
-	// 调用 rv.TriggerInterrupt（同文件 :511）。
+	// 381-r1:播报中断通道。raudio.approval 用于 Esc→TTS interrupt，attachVoice
+	// 把 ra.approval.voiceInterrupt 接到 rv.TriggerInterrupt；381-r2 起
+	// TriggerInterrupt 同时中止在飞的 waveOut 出声（Abort 真停）。
 	raudio.approval = ra
 
 	// Ticket 290 AC#2 (form 甲-1, orchestrator ruling 2026-10-09 14:2x): the hop

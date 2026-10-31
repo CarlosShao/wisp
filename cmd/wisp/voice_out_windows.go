@@ -44,6 +44,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"unsafe"
 
@@ -102,7 +103,19 @@ const (
 	// duration) and never from "how long has it been" (D42#9); the grace is what
 	// covers the driver's own start-up, not a deadline anybody is racing.
 	voiceOutWaitGrace = 2000 // milliseconds
+	// voiceOutWaitSlice is the granularity the bounded wait is sliced to. An
+	// abort request is checked between slices, so a Drain parked on the owner
+	// goroutine answers the interrupt rows within one slice of the request
+	// (ticket 381-r2's ≤400ms stop) - a single wait the length of the whole
+	// chunk cannot, and that is exactly the 6,653ms shape 381-v2 measured.
+	voiceOutWaitSlice = 100 // milliseconds
 )
+
+// errSpeakerAborted is Drain's (and Play's slot wait's) answer when Abort was
+// called while the device still had audio queued: the queue was dropped, so the
+// caller's announcement ends through the interrupt rows (D43 #27 /
+// audio.release-output) and never through EvSpeakDone (ticket 381-r2).
+var errSpeakerAborted = errors.New("voice: the speaker was aborted mid-playback")
 
 // waveFormatEx is WAVEFORMATEX (mmreg.h). Size 18 on the wire; Go pads the
 // struct to 20 and only the first 18 bytes are read.
@@ -140,6 +153,14 @@ type waveOutSpeaker struct {
 	event  uintptr
 	rate   int
 	closed bool
+
+	// abortReq is the interrupt request (ticket 381-r2). It lives OUTSIDE the
+	// mutex on purpose: the mutex is held across the whole bounded wait below,
+	// so a caller that had to take the lock to raise the request could not
+	// deliver it until the current chunk finished - the exact latency the
+	// interrupt rows must not pay. The waiter checks the flag between wait
+	// slices; Abort() sets it before taking the lock for its own cleanup.
+	abortReq atomic.Bool
 
 	hdrs    []waveHdr
 	bufs    [][]int16
@@ -309,7 +330,11 @@ func (s *waveOutSpeaker) Play(samples []float32, engineRate int) error {
 
 // releaseLocked waits out one buffer and unprepares it. The wait is bounded by
 // the buffer's OWN duration on the audio clock plus one fixed grace: a device
-// that stops signalling is reported, never waited on forever.
+// that stops signalling is reported, never waited on forever. The wait runs in
+// voiceOutWaitSlice slices so an abort request is honored between slices - that
+// is what makes a parked Drain answer an interrupt within one slice instead of
+// after the whole chunk (ticket 381-r2). No wall clock is read: the bound and
+// its slices all come from the samples-to-duration arithmetic (D42#9).
 func (s *waveOutSpeaker) releaseLocked(i int) error {
 	if !s.pending[i] {
 		return nil
@@ -317,15 +342,39 @@ func (s *waveOutSpeaker) releaseLocked(i int) error {
 	hdr := &s.hdrs[i]
 	samples := len(s.bufs[i])
 	budget := samples*1000/s.rate + voiceOutWaitGrace // samples to milliseconds, audio clock
-	rc, _, _ := procWaitForSingle.Call(s.event, uintptr(budget))
-	switch uintptr(rc) {
-	case 0: // WAIT_OBJECT_0
-	case 0x102: // WAIT_TIMEOUT
-		return fmt.Errorf("waveOut did not finish chunk %d within its own %d ms of audio plus %d ms grace: the device stopped signalling",
-			i, samples*1000/s.rate, voiceOutWaitGrace)
-	default:
-		return fmt.Errorf("waiting for waveOut chunk %d returned %d", i, uintptr(rc))
+	for waited := 0; waited < budget; waited += voiceOutWaitSlice {
+		slice := voiceOutWaitSlice
+		if left := budget - waited; left < slice {
+			slice = left
+		}
+		rc, _, _ := procWaitForSingle.Call(s.event, uintptr(slice))
+		switch uintptr(rc) {
+		case 0: // WAIT_OBJECT_0
+		case 0x102: // WAIT_TIMEOUT
+		default:
+			return fmt.Errorf("waiting for waveOut chunk %d returned %d", i, uintptr(rc))
+		}
+		if s.abortReq.Load() {
+			// The abort owns the cleanup (Abort resets the device and drops every
+			// pending buffer under the same lock this waiter holds): leave the
+			// slot exactly as it stands and end the wait.
+			return errSpeakerAborted
+		}
+		// The driver sets WHDR_DONE before it signals the event, so the flag is
+		// the authoritative completion mark: a stale (WOM_OPEN) or coalesced
+		// signal must not unprepare a buffer that is still playing.
+		if hdr.Flags&whdrDone != 0 {
+			return s.unprepareLocked(i)
+		}
 	}
+	return fmt.Errorf("waveOut did not finish chunk %d within its own %d ms of audio plus %d ms grace: the device stopped signalling",
+		i, samples*1000/s.rate, voiceOutWaitGrace)
+}
+
+// unprepareLocked drops one finished buffer. It is the tail both the sliced
+// wait's completion and the natural end share.
+func (s *waveOutSpeaker) unprepareLocked(i int) error {
+	hdr := &s.hdrs[i]
 	if rc, _, _ := procWaveOutUnprep.Call(s.handle, uintptr(unsafe.Pointer(hdr)), unsafe.Sizeof(*hdr)); uintptr(rc) != mmSysErrNoErr && uintptr(rc) != 33 {
 		return fmt.Errorf("waveOutUnprepareHeader refused chunk %d: %s", i, waveOutError(uintptr(rc)))
 	}
@@ -336,7 +385,9 @@ func (s *waveOutSpeaker) releaseLocked(i int) error {
 }
 
 // Drain waits for every queued chunk. This is the "the sentence has been
-// spoken" signal the D43 walk hangs EvSpeakDone on.
+// spoken" signal the D43 walk hangs EvSpeakDone on. When an abort request
+// landed before or during the wait, Drain answers errSpeakerAborted instead:
+// the caller's sentence ends through the interrupt rows, not through #26.
 func (s *waveOutSpeaker) Drain() error {
 	if s == nil {
 		return nil
@@ -349,6 +400,9 @@ func (s *waveOutSpeaker) Drain() error {
 	if s.failed != nil {
 		return s.failed
 	}
+	if s.abortReq.Load() {
+		return errSpeakerAborted
+	}
 	for i := range s.hdrs {
 		if err := s.releaseLocked(i); err != nil {
 			s.failed = err
@@ -359,10 +413,15 @@ func (s *waveOutSpeaker) Drain() error {
 }
 
 // Abort drops what is queued (rows #27/#41: tts.stop / audio.release-output).
+// Since 381-r2 it is the interrupt rows' real stop, not a dead seam: the
+// request flag goes up BEFORE the lock, so a Drain parked on the owner
+// goroutine answers within one wait slice, and the waveOutReset here is what
+// makes the audible audio stop immediately.
 func (s *waveOutSpeaker) Abort() int {
 	if s == nil {
 		return 0
 	}
+	s.abortReq.Store(true)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.closed {
