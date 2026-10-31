@@ -29331,3 +29331,30 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 4**＝**写 3**（★`26p-r1` Path-C 集成面／`387-r1` tts 守卫／`386-r1` mockllm 帽）＋**裁 1**（★`12-v1`）—— 4 ≤7 ✅
 ★票池：done=**207**／open=**168**（**55.3%**，票池 375）；未推（本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
+
+## A1331（2026-10-31 21:2x +08，编排者，goal round 31 续）★★★收 `26p-r1`（`4c21ac42c` 11 枚 +2330/-10）：**Path-C 集成面——三个真数全 PASS**｜★**反向两发全复现**（摘门⇒自触发/摘 AEC3⇒逐字转写）｜★**两件设计输入钉死（28 全双工必读）**｜★派 `26p-v1` 终裁
+
+**① ★★★三个集成真数（staged 全链：真 waveOut＋真 matcha＋真 C8 帧＋真 AEC3＋真 389 组合门＋真 silero＋生产 TriggerInterrupt→Abort 停播链）**
+- ★★★**(a) 播报中发声 ⇒ barge-in 触发停播：五轮 99/56/67/65/40ms 全 ≤400ms**（VAD 起点算起；**D32:2315 形状「400ms 门禁由 VAD 而非 ASR 满足」**、episode 无 ASR 文本、Evaluate 仍是唯一阈值权威）；★onset→VAD-start＝MinSpeech 300ms 设计常数＋silero 时延、monitor 冷启动预热 ~0.6s 由说话者 +1.2s 注入避开
+- ★★**首格（389-v1 处置建议）**：★**Feed 在线 vs 窗级重放 6 窗零漂移**（回声-only 轮 6 窗全闭、lag=644/strength=0.89）
+- ★★★**(b) 产品麦面零转写＋零自触发**：★**播报自身回声整窗注入（S4 字面注入形状）⇒ episodes=1（残余 -42.88 被收紧档吃）、triggers=0、finals Δ=0、handed Δ=0、gate 2/2**
+- ★★★**(c) -30 裕量重测加严（两发在案）**：★**control-26 过链后 -29.42（margin +0.58）/-38.24（margin -8.24）**——★**AEC 自身双讲抑制损伤（0-8dB 随引擎状态摆）是主导项、offline 标定 3.3dB 裕量不保证过链＝28 全双工的设计输入**（rig 的 -26.70/-36.58 从未过引擎）；quiet-speech 被收紧档吃、**离线标称轴仍可达（裕量交换不是抑制开关、集成面复现）**；失配伪迹族 -36.38 距收紧档 6.38dB（比 rig 塌峰族 2.2-5.6 更宽）
+
+**② ★★反向两发＋还原核全复现**
+- ★**M1 摘组合门（dynamicOff＝回 loose -45 轴）⇒ 失配回声自触发复现**（残余 -36.74 过 -45、announcement aborted、无说话者）；还原＝dynamic ON 同材料 **triggers=0 held**
+- ★★**M2 摘 AEC3（aecBypass）⇒ episodes 打开＋同一材料过真 ASR 链逐字转写复现**「我已经完成明天下午三点的会议改到四点请准时参加谢谢」（**59-r1 的 5/5 形状在本面**）；还原＝AEC 回来 episodes=0/triggers=0 **成对闭合**
+
+**③ ★★接线（产品面形状）**
+★voiceBargeinMonitor：**far＝speak() chunk 回调进设备前**（D47「回声参考是我们自己渲染的 PCM」）；★采集＝arm 时 `HalfDuplexGate.SetConversation(true)`（D47 会话窗、internal/audio 新方法、**OFF 默认逐字节还原 26p 前形状、muted 仍最高优先**）；drain goroutine（C11 作用域、冻结临时名 tts-infer）为公告窗内 rv.frames 唯一读者；★AEC3 10ms 锁步＋在线对齐（**align.go＝rig 仪器产品形态、跨件对拍逐值同**）；过档触发 TriggerInterrupt（**Esc/球单击同通道**）
+
+**④ ★★两件集成面设计输入（读数钉住、28 全双工必读）**
+1. ★**健康匹配回声抵消下两路动态判据全读「可信」**（far-corr 0.78-0.9、ERLE ~23dB）、**残余地板 -42.11 骑上标称 -45 ⇒ 回声自触发** ⇒ ★**公告窗门以收紧档 -30 武装**（monitor 构造面选择、**389 门本体零改**）
+2. ★**AEC 残余连续性使 endpointer 首窗永不闭合 ⇒ 说话者 onset 永不产生 START** ⇒ ★**monitor 分段器加噪声门（2s 最小值地板×2＋512ms 保持、常数与发现引注进码）**、silero+Endpointer 门后照跑（D32 的 VAD+AEC 形状保住）
+
+**⑤ ★零回归**：★六族 staged 合跑 34 PASS/1 FAIL（★**真设备案全过：381r2 RealDevice 34.57s、390 CLICK-27 33.93s**）——唯一红 Test384 合跑时窗＝单跑 PASS 的 HEAD 既有形状；★**`262/640/902` 逐位同**；internal/audio 两形状全绿；gofumpt 0；vet；d22scan clean（分母 287/52/729/180）＋self-test 37/37
+
+**⑥ ★残余如实记账四条（不阻塞）**：①AEC 双讲损伤摆动（-29.4/-38.2）＝**28 集成的调参活** ②(a) 说话者电平 -20dBFS＝近麦正常、过链裕量 L1 如实报 ③monitor 跨公告保温＝28 的集成深度 ④**公告窗 -30 工作点＝monitor 构造面选择、反写进门常量属 389 面**
+
+**⑦ ★已派 `26p-v1`（终裁）**：三真数复刻＋反向复刻＋两设计输入核＋接线核＋可否收口＋残余四条定性
+★**写面互斥核**：26p-v1 只读／387-r1=internal/speech／386-r1=tools/mockllm——**零撞**；★**写 2 枚**（387-r1/386-r1）——★**具名：第三写腿＝28 全双工设计输入消费（等 26p-v1 判语后派）或票 36 TaskList（需预筛）** ⇒ 26p-v1 交件同轮补
+★票池：done=**205**／open=**169**；未推（网络断、本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
