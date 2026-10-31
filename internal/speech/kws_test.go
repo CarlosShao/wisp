@@ -481,7 +481,15 @@ func TestKwsEngineResetAfterHitLetsTheNextUtteranceHitAgain(t *testing.T) {
 // (score 3.0, threshold 0.1, c-api.h example), the spotter fires on the demo
 // fixtures. If the engine ever diverges from this, the diff is in kws.go, not
 // in sherpa.
+//
+// It skips by name when this host is on a shadowed onnxruntime (see
+// checkOnnxruntime): the probe calls the C API directly, below every Go guard,
+// so without the check it would crash the process instead of skipping. A skip
+// is not a pass: the staging recipe is what makes it run.
 func TestKwsProbeSherpaDebug(t *testing.T) {
+	if err := checkOnnxruntime(); err != nil {
+		t.Skipf("raw sherpa probe cannot create sessions on this host: %v", err)
+	}
 	cfg, err := DefaultKwsConfig()
 	if err != nil {
 		t.Fatalf("DefaultKwsConfig: %v", err)

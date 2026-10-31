@@ -127,6 +127,9 @@ var _ TtsEngine = (*MatchaTts)(nil)
 // contract depends on: that the engine can name its own sample rate. A model
 // that loads but reports 0 cannot be resampled for the render side, so it is
 // rejected here instead of at the first playback.
+//
+// It refuses, rather than crashes, when the process is running on an
+// onnxruntime older than the linked C API gives it: see checkOnnxruntime.
 func NewMatchaTts(cfg TtsConfig) (*MatchaTts, error) {
 	switch {
 	case cfg.AcousticModel == "":
@@ -135,6 +138,9 @@ func NewMatchaTts(cfg TtsConfig) (*MatchaTts, error) {
 		return nil, errors.New("speech: matcha tts needs a vocoder path")
 	case cfg.Lexicon == "" || cfg.Tokens == "":
 		return nil, errors.New("speech: matcha tts needs a lexicon and a token table")
+	}
+	if err := checkOnnxruntime(); err != nil {
+		return nil, err
 	}
 
 	model := sherpa.OfflineTtsModelConfig{
