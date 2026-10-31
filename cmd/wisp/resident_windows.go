@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -11,15 +12,24 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
+	"time"
 
 	"github.com/CarlosShao/wisp/internal/ball"
 	"github.com/CarlosShao/wisp/internal/buildinfo"
 	"github.com/CarlosShao/wisp/internal/config"
+	"github.com/CarlosShao/wisp/internal/memory"
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/proc"
 	"github.com/CarlosShao/wisp/internal/risk"
 )
+
+// lifecycleFastExit is the fast-shutdown flag the WM_QUERYENDSESSION door sets
+// and the deferred rt.Shutdown reads. It is declared here - before the defer
+// that consumes it - so the fast path is a property of the boot's own chain,
+// never of a callback that might race it.
+var lifecycleFastExit atomic.Bool
 
 // hotkeyReloadSource296 is ticket 258's hot-tier [hotkey] source - the reload
 // bridge's src, hoisted out of runResident so the ticket-296 case in
@@ -116,14 +126,79 @@ func runResident() {
 	} else {
 		defer sink.close()
 	}
+	// Ticket 43: the lifecycle facts that are decided at boot, in the order the
+	// boot produces them.
+	//
+	//   - the crash marker: from here until the deferred clear below, this
+	//     process believes itself alive; the NEXT boot that finds the file is
+	//     looking at an unclean death (kill -9 never runs the defer chain).
+	//   - the crashed-boot detection note: the marking itself runs where the
+	//     task store exists (assembleRuntime), so both the resident leg and the
+	//     CLI get the same sweep from one implementation.
+	//   - update-pending handoff: boot-time only, booked by name for ticket 56.
+	//   - autostart: [app].autostart is restart-tier (ticket 233), so the Run
+	//     key agrees with the config HERE, at the boot that owns the next
+	//     process start.
+	//   - the crashed-boot detection and ITS sweep, run here (not only where
+	//     the task pipeline assembles): a double-click boot has no console and
+	//     assembles no pipeline, and it is exactly the boot the owner sees
+	//     next. The sweep is idempotent, so the pipeline's own sweep later is
+	//     a no-op second look, and the CLI keeps its share through
+	//     assembleRuntime.
+	if hasRunMarker(rt.Layout.DataDir) {
+		if st, err := memory.Open(rt.Layout.DataDir); err == nil {
+			if n, serr := recoverCrashedTasks(context.Background(), st, rt.Layout.DataDir); serr != nil {
+				slog.Warn("crash-recovery: 崩溃恢复扫描失败", "err", serr.Error())
+			} else if n > 0 {
+				fmt.Printf("wisp: 上次进程异常退出：%d 个未收口任务已标记为中断（不会自动重跑）\n", n)
+			}
+			_ = st.Close()
+		} else {
+			slog.Warn("crash-recovery: 检测到启动标记但存储打不开，中断标记延后", "err", err.Error())
+		}
+	}
+	if err := writeRunMarker(rt.Layout.DataDir); err != nil {
+		slog.Warn("crash-recovery: 启动标记写入失败（本次异常退出将无法被下一次启动识别）", "err", err.Error())
+	}
 	defer func() {
-		records := rt.Shutdown(false)
+		if err := clearRunMarker(rt.Layout.DataDir); err != nil {
+			slog.Warn("crash-recovery: 退出时清除启动标记失败", "err", err.Error())
+		}
+	}()
+	markUpdatePendingHandoff(rt.Layout.DataDir)
+	// The receipt names what the Run key now agrees with; autostartSync reads
+	// the same config.toml every other boot leg reads and never stops the boot.
+	autostartReceipt := autostartSync(filepath.Join(rt.Layout.DataDir, configFileName), autostartRunValueName)
+	slog.Info("lifecycle: autostart 同步完成", "receipt", autostartReceipt)
+	fmt.Printf("wisp: 开机自启：%s\n", autostartReceipt)
+	defer func() {
+		records := rt.Shutdown(lifecycleFastExit.Load())
 		failed := 0
+		// The WHOLE trail lands on the sink, every step in order, success or
+		// not: RunShutdownSequence itself only logs the skipped and failed
+		// steps, so a successful step 4 (stop-audio) or 9 (close-job-object)
+		// would otherwise leave no on-disk trace at all - and the ticket's
+		// order audit ("steps 4/5/9 done, in order") is exactly a read of this
+		// trail.
 		for _, rec := range records {
+			state := "ok"
+			if rec.Skipped {
+				state = "skipped"
+			}
 			if rec.Err != nil {
 				failed++
+				state = "FAILED: " + rec.Err.Error()
 				fmt.Printf("wisp: shutdown step %d (%s) FAILED: %v\n", rec.Step, rec.Name, rec.Err)
 			}
+			slog.Info(fmt.Sprintf("wisp: D38(e) step %d (%s): %s elapsed=%s",
+				rec.Step, rec.Name, state, rec.Elapsed.Round(time.Microsecond)))
+		}
+		// The fast path receipt names WHY step 7 was skipped: D42#7's
+		// WM_QUERYENDSESSION shape, booked here so the audit trail says the
+		// sequence left through the fast door on purpose.
+		if lifecycleFastExit.Load() {
+			fmt.Printf("wisp: 快速关停（D42#7 会话结束）：第 7 步的非关键冲刷被跳过，第 4/5/9 步照走\n")
+			slog.Warn("lifecycle: 快速关停（D42#7 会话结束）：第 7 步的非关键冲刷被跳过，第 4/5/9 步照走")
 		}
 		fmt.Printf("wisp: exited through the D38(e) shutdown order (10 steps, %d failed)\n", failed)
 	}()
@@ -513,6 +588,14 @@ func runResident() {
 		rv.attachCaptureGate(raudio.gate)
 	}
 	raudio.attachVoice(rv)
+
+	// Ticket 43: the two OS doors and their sequences, wired here where every
+	// handle the sequences need (approvals, capture, voice residency) already
+	// exists. lifecycleFastExit is what the deferred rt.Shutdown above reads;
+	// a WM_QUERYENDSESSION flips it and requests the stop through the runtime's
+	// own bit, so the D38(e) chain still hangs off the boot's own defer.
+	life := startLifecycleEvents(rt, wireLifecycleSink(rt, ra, raudio, rv, &lifecycleFastExit), &lifecycleFastExit)
+	_ = life
 
 	// The boot report names the steps this process really owns, taken off the
 	// registration rather than off a comment (AC#4's "不许撒谎" half).

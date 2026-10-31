@@ -231,7 +231,7 @@ var hotRowClaims = map[string]string{
 	// chain is built at all, and [session] warm_timeout_sec (:1329) for the
 	// warm plan. The four hot KEYS below still read from nowhere, so the rows
 	// stay no-reader; only the reader-list half of their verdict text changes.
-	"app.theme":                  hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.App - manager.go's planApp compares and copies it, and no component re-skins from it",
+	"app.theme":                  hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.App.THEME - manager.go's planApp compares and copies it, and no component re-skins from it. The SECTION does have one production reader since 票 43: cmd/wisp/autostart_windows.go reads App.Autostart (the restart-tier key) once per boot to make the registry Run key agree with it - a reader of a different key, so this row stays no-reader",
 	"voice.tts.speed":            hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the TTS knobs are not threaded to the voice path yet",
 	"voice.punctuation":          hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the punctuation switch has no consumer yet",
 	"voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet",
@@ -266,7 +266,12 @@ var sectionReadSites = map[string][]string{
 	// importing internal/config or naming config.toml would be the dependency edge
 	// AC#4 forbids (TestTicket255HostStillDoesNotParseConfigItself checks both).
 	"Panel": {"cmd/wisp/panel_resident_windows.go"},
-	"App":   nil,
+	"App":   {"cmd/wisp/autostart_windows.go"},
+	// 票 43: the resident boot's autostart sync is [app]'s first production
+	// reader outside internal/config - it reads App.Autostart (restart tier,
+	// ticket 233) once per boot and makes HKCU's Run key agree with it. The
+	// restart tier is why the read is boot-time only: the key's own verdict
+	// (需要重启进程生效) is what makes this the honest consumer shape.
 	// 票 313 added two more [voice] readers to the scan's list: the settings leg
 	// cmd/wisp/panel_config_store.go reads the cloud chains and realtime keys off
 	// the LIVE Manager (ReadSettings), and internal/panel/config_handlers.go

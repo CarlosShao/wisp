@@ -36,6 +36,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -496,6 +497,17 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		return rt, 2
 	}
 	rt.store = mem
+
+	// Ticket 43: the one-shot crash sweep. The resident boot and the CLI both
+	// walk this line, so a boot that follows a kill -9 marks the dead process's
+	// unfinished tasks as interrupted exactly once, whether the next boot was
+	// the resident leg or a bare `wisp run`. The count (and the 不会自动重跑
+	// posture) is the diagnostics hint the ticket asks the listing to carry.
+	if n, cerr := recoverCrashedTasks(context.Background(), mem, s.dataDir); cerr != nil {
+		slog.Warn("wisp run: 崩溃恢复扫描失败", "err", cerr.Error())
+	} else if n > 0 {
+		fmt.Fprintf(s.stdout, "wisp run: 上次进程异常退出：%d 个未收口任务已标记为中断（不会自动重跑）\n", n)
+	}
 
 	// The host session identity (ticket 224, approval record A435).
 	//
