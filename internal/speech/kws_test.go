@@ -328,8 +328,13 @@ func TestKwsEngineRejectsIncompleteConfig(t *testing.T) {
 // all seven fixtures because nobody said those words -- the engine correctly
 // rejecting audio that does not contain them, which is its own control test
 // below. Every hit's Word must be one of the demo table's own display words,
-// and the per-file readings (Word, At) are logged for the verdict table.
+// and the per-file readings (Word, At) are logged for the verdict table. It
+// skips by name when this host's onnxruntime is shadowed (see
+// checkOnnxruntime): the staging recipe is what makes it run.
 func TestKwsEngineHitsTheFixtureWavs(t *testing.T) {
+	if err := checkOnnxruntime(); err != nil {
+		t.Skipf("KWS engine cannot create sessions on this host: %v", err)
+	}
 	fixtures := kwsFixtureDir(t)
 	demoTable := filepath.Join(fixtures, "test_keywords.txt")
 	words := kwsTableWords(t, demoTable)
@@ -394,8 +399,13 @@ func TestKwsEngineHitsTheFixtureWavs(t *testing.T) {
 // headline reading mean something: the production table's eight wake words
 // were never said in the demo recordings, so the engine over the production
 // table must score zero hits on all seven fixtures. This is the production
-// shape of "a hit requires the word in the audio".
+// shape of "a hit requires the word in the audio". It skips by name when this
+// host's onnxruntime is shadowed (see checkOnnxruntime): the staging recipe
+// is what makes it run.
 func TestKwsEngineProductionTableRejectsTheDemoWavs(t *testing.T) {
+	if err := checkOnnxruntime(); err != nil {
+		t.Skipf("KWS engine cannot create sessions on this host: %v", err)
+	}
 	k := newTestKws(t)
 	fixtures := kwsFixtureDir(t)
 	for n := 0; n <= 6; n++ {
@@ -411,8 +421,13 @@ func TestKwsEngineProductionTableRejectsTheDemoWavs(t *testing.T) {
 }
 
 // TestKwsEngineOnSilenceStaysSilent is the negative control, recognizer-level:
-// three seconds of digital silence must produce zero hits.
+// three seconds of digital silence must produce zero hits. It skips by name
+// when this host's onnxruntime is shadowed (see checkOnnxruntime): the
+// staging recipe is what makes it run.
 func TestKwsEngineOnSilenceStaysSilent(t *testing.T) {
+	if err := checkOnnxruntime(); err != nil {
+		t.Skipf("KWS engine cannot create sessions on this host: %v", err)
+	}
 	k := newTestKws(t)
 	samples := pcmToFloat(silence(msSamples(3000)))
 	hits, fed := feedKws(k, samples, nil)
@@ -425,8 +440,13 @@ func TestKwsEngineOnSilenceStaysSilent(t *testing.T) {
 
 // TestKwsEngineOnNonKeywordSpeechStaysSilent is the second negative control:
 // the package's synthetic speech surrogate -- real-speech-shaped, and
-// semantically far from every table word -- must produce zero hits.
+// semantically far from every table word -- must produce zero hits. It skips
+// by name when this host's onnxruntime is shadowed (see checkOnnxruntime):
+// the staging recipe is what makes it run.
 func TestKwsEngineOnNonKeywordSpeechStaysSilent(t *testing.T) {
+	if err := checkOnnxruntime(); err != nil {
+		t.Skipf("KWS engine cannot create sessions on this host: %v", err)
+	}
 	k := newTestKws(t)
 	samples := pcmToFloat(synthSpeech(msSamples(5000)))
 	hits, fed := feedKws(k, samples, nil)
@@ -444,8 +464,12 @@ func TestKwsEngineOnNonKeywordSpeechStaysSilent(t *testing.T) {
 // several keywords each, so a fresh spotter still has work to do after the
 // first hit). The reverse criterion for this test is the mutation that deletes
 // the Reset call in kws.go: the second pass then goes silent or wrong, and
-// this test goes red.
+// this test goes red. It skips by name when this host's onnxruntime is
+// shadowed (see checkOnnxruntime): the staging recipe is what makes it run.
 func TestKwsEngineResetAfterHitLetsTheNextUtteranceHitAgain(t *testing.T) {
+	if err := checkOnnxruntime(); err != nil {
+		t.Skipf("KWS engine cannot create sessions on this host: %v", err)
+	}
 	fixtures := kwsFixtureDir(t)
 	demoTable := filepath.Join(fixtures, "test_keywords.txt")
 	k := newTestKwsWithTable(t, demoTable)
@@ -537,8 +561,13 @@ func TestKwsProbeSherpaDebug(t *testing.T) {
 }
 
 // TestKwsEngineCloseIsIdempotent: C11 -- the second Close is a no-op, and an
-// Accept after Close degrades to silence instead of panicking.
+// Accept after Close degrades to silence instead of panicking. It skips by
+// name when this host's onnxruntime is shadowed (see checkOnnxruntime): the
+// staging recipe is what makes it run.
 func TestKwsEngineCloseIsIdempotent(t *testing.T) {
+	if err := checkOnnxruntime(); err != nil {
+		t.Skipf("KWS engine cannot create sessions on this host: %v", err)
+	}
 	k := newTestKws(t)
 	if err := k.Close(); err != nil {
 		t.Fatalf("Close: %v", err)
