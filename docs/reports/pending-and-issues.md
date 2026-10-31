@@ -29004,3 +29004,25 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ★**我现跑定案**：`.scratch/bullet-216-flip.txt`（mtime **2026-10-17**）／`.scratch/commit-msg-120r2.txt`（**10-15**）／`commit-msg-136s-ac2*.txt`（**10-14**）／`.scratch/ci-logs/*`（**10-04**）——★**全是早期会话（本编排线的前身会话）留下的草稿与日志**（工单 216/120/136 早已结案），**非在飞工作、非他人会话**
 - ⇒ ★**报备项销案**：机主 0 件；★**这些历史未跟踪残件按「临时件只建不删」原样保留**（⛔ 清理类动作仍押到全部票完成）
 - ★**摆机主清单更新**（A1307⑥ 7 件 → 6 件）：①347 追认 ②AEC3 fetch 批准 ③DEFERRED 登记批准 ④SPEC-10 CPU 回填批准 ⑤#32 nil facts 冻结面钩（可挂起）⑥Wails 裁定认可
+
+## A1310（2026-10-31 14:0x +08，编排者，goal round 31 续）★★★收 `43-r1`（`5056a365c` 11 枚）：**票 43 五格全落地**（真子进程 exit 90.8ms＝≤5s 红线余量 55 倍／kill -9 真强杀→中断零重跑／L2 voided 走表内 #24／autostart 真注册表往返）｜★**§16.11#10 悬案它给最终决定（契约面摆机主）**｜★派 `43-v1`＋`384-r1` ⇒ **写腿 3 满**
+
+**① ★★收 `43-r1`（11 枚：新 7＋改 3＋件；⛔ internal/{session,risk,speech,proc,memory,ball,audio,winsec} 零字节、D43 表一字未动）**
+- ★★★**五格读数**：①**suspend/resume＝替代形如实具名**（真睡眠不可自证＝无人值守无唤醒装置；**PowerRegisterSuspendResumeNotification 真注册＋WM_POWERBROADCAST 双门归一**；headless 真读数：**挂起前 EnginesHot=1→后 0、引擎 Close 恰 1、SCOPE-DISPOSED reason=suspend、采集 stops=1→resume starts=2、清场后冷装载成功**；VAD 微型检测器不属 SessionScope 保持驻留＝具名不虚报）②★★**WM_QUERYENDSESSION：真子进程定向 `SendMessageTimeoutW` 注入 → exit 90.8ms（≤5s 红线余量 55 倍、单调钟）exit 0**；★**盘上 trail：step1<4<5<9<10 顺序在**；★**HWND_BROADCAST 会打进宿主桌面全部应用（外向动作）⇒ 用定向注入、唯「消息从系统来」一跳是注入**（诚实）③**L2 voided＝D43 表 #24 表内合法行（⛔ 表一字未动）**：真 queue → **voided=2**、console 逐字「错过 2 个待确认操作…恢复后不会重放」、审计 SUSPEND-L2-VOIDED ④**kill -9：真 TerminateProcess 强杀 → marker 存活 → next boot「已标记为中断」、DB state=interrupted、ListTaskLogs 恰 1 行＝零重跑**；干净退出清 marker ⑤**autostart：真 HKCU 读写删往返**（值名参数化、**机主真键零触碰**）；**OFF default＝schema 零值断言＋fresh 目录 boot 无动作**
+- ★★**§16.11#10 悬案最终决定（腿内写明、契约面摆机主）**：★**挂起遇 AwaitingApproval ⇒ 一律作废＋按拒绝＋计数告知、恢复不重放**（★**这正是 SPEC-12 §4.2 挂账的"S7 切片卡定案"项之一**）⇒ ★**PLAN.md D43 note 文字改动待机主批（摆机主新增 1 件）**
+- ★★**反向判据 3 发**（全仓外 export-mut 树）：M1 摘 dispose→EnginesHot=1 want 0／M2 摘 Run key 写→红／M3 摘 L2 拒绝→voided=1 want 2；★还原核＝仓内 MUTANT 0（8 命中全是既有字样）、原样复跑 9/9
+- ★★**零回归**：★15e/26R3/41a2r1/381r2 四族 19 PASS/0 FAIL、**`262/640/902` 逐位同**；★session 27 全过（只调公开面）；★**255 名册枚红＝本腿新读点 → 按 233 §8 只加读者重裁后绿**（正确形状）
+- ★**坑备忘两条**（入册）：★**PowerRegisterSuspendResumeNotification 实在 powrprof.dll 非 winuser.h 宣称的 user32.dll**（猜错=boot 线程 panic、已修＋Find() 防呆）；★**窗口必须建在泵线程**（首版 boot 线程建窗→消息队列无人泵→SendMessage 全超时）
+- ★**具名残余**：托盘「开机自启」菜单项在 **internal/ball 冻结菜单表＝非本腿写面**（config 半边全通）；wall-derived schedules 无装置；update-pending 只登记事件（56 消费端未到）
+
+**② ★尺核**：★`5056a365c` 在／11 枚在／★我复跑 `Test43`（在册台型补 PATH）绿 ✅
+
+**③ ★已派 2 条**
+- ★**`43-v1`（裁）**：五格复核（替代形合法性／定向注入合法性／D43#24 表内核／§16.11#10 判语）＋mutation 复刻＋残余定性
+- ★★**`384-r1`（写、cmd/wisp 独占——43-r1 已让出）**：**watchdog 宿主接线**（真 TreeReader/StateFn/OnAlert→D43 #9#35 映射/四组件注册＋Start）；★**⚠OnAlert sink 依赖票 273——开工先核 273 状态、sink 缺 ⇒ 半边＋具名交回（⛔ 发明 sink）**
+★**写面互斥核**：384-r1=cmd/wisp／387-r1=internal/speech／386-r1=tools/mockllm／59-v1+43-v1 只读导出树——**零撞**；★**写 3 满** ✅
+
+**④ ★摆机主清单更新（A1309 的 6 件 → 7 件）**
+★**新增 ⑦：D43 note 文字**（§16.11#10 挂起遇 L2＝一律作废＋按拒绝＋计数、恢复不重放——**S7 切片卡定案项**）
+★**尺核教训入册**：★43-r1 复跑我在册台型补 PATH 一次过（**A1307补 的默认动作生效**）
+★票池：done=**202**／open=**170**；未推（本轮后现跑）；**摆机主 7 件**

@@ -1,0 +1,4 @@
+存档 2026-10-31 14:0x · 腿 384-r1（票 384 watchdog 宿主接线、写、cmd/wisp 独占——43-r1 已让出）
+来源＝票 42 终裁 42-v1 装配缺口：真 TreeReader／StateFn 接状态机／OnAlert 映射（AlertOverrun→EvWatchdogOverrun/#9、AlertFatal→EvWatchdogFatal/#35、Leak→日志/UI）／四组件注册＋Start。
+⚠OnAlert→D43 sink 依赖票 273 状态机 sink——开工先核 273 状态；sink 缺 ⇒ 可做半边＋具名交回（⛔ 发明 sink）。
+⛔ 改 internal/{watchdog,session,risk,speech} 语义；⛔ D43 表；⛔ thresholds。
