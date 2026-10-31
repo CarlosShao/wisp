@@ -52,3 +52,28 @@ module = "github.com/k2-fsa/sherpa-onnx-go"
 version = "v1.13.8"
 license = "Apache-2.0"
 note = "contains the prebuilt x86_64-pc-windows-gnu C API DLLs and c-api.h used at link time"
+
+# webrtc AEC3 (AudioProcessing module, M131 lineage) - fetched under the
+# owner-approved download lift for AEC3/webrtc-audio-processing (A1311), for
+# the Path C barge-in re-measurement (PRECHECK P15 flip material, leg
+# aec3-r1). Consumed via internal/audio/aec (cgo, -tags webrtcap); the
+# no-tag default build never links it.
+[webrtc-audio-processing]
+version = "2.1"
+license = "BSD-3-Clause"
+source = "https://freedesktop.org/software/pulseaudio/webrtc-audio-processing/webrtc-audio-processing-2.1.tar.xz"
+archive_type = "tar.xz"
+sha256 = "ae9302824b2038d394f10213cab05312c564a038434269f11dbf68f511f9f9fe"
+note = "PulseAudio packaging of the webrtc AudioProcessing module; MinGW fixes are in-tree; license files copied verbatim into docs/evidence/s1/"
+
+# Build-time abseil subproject, pinned by the release's own
+# subprojects/abseil-cpp.wrap (source_hash copied verbatim; onnxruntime
+# precedent: a pinned constituent of the primary dependency, recorded here
+# rather than downloaded unpinned).
+[webrtc-audio-processing.abseil]
+version = "20240722.0"
+license = "Apache-2.0"
+source = "https://github.com/abseil/abseil-cpp/releases/download/20240722.0/abseil-cpp-20240722.0.tar.gz"
+archive_type = "tar.gz"
+sha256 = "f50e5ac311a81382da7fa75b97310e4b9006474f9560ac46f54a9967f07d4ae3"
+note = "pinned by webrtc-audio-processing-2.1 subprojects/abseil-cpp.wrap; the wrap's wrapdb patch (patch_hash 12dd8df1488a314c53e3751abd2750cf233b830651d168b6a9f15e7d0cf71f7b) supplies only meson build files"
