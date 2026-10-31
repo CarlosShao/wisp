@@ -297,6 +297,10 @@ type voiceResidency struct {
 	kind  session.EngineKind
 	eng   *voiceEngineHandle
 
+	// settle is ticket 12 AC#9's fall-back trace (settle_trace_12r2.go): the
+	// scope's own settling announcement and dispose cascade stamp T1/T2 here.
+	settle *settleTrace
+
 	// Counters. The two that matter are LastAcquire (0 when the warm keeps the
 	// engine) and FamilyLoads/FamilyCloses (one of each per swap).
 	epochs       int
@@ -318,6 +322,11 @@ type voiceResidency struct {
 	// wiring under test here - the epoch, the slot, SetPunctuator, the final's text
 	// reach - is the production one either way).
 	asrLoader func() (speech.AsrEngine, error)
+	// ttsLoader mirrors asrLoader for the TTS family: nil means the production
+	// matcha factory, a non-nil means the case owns synthesis. The AC#9 timing
+	// harness uses it so the measured legs carry no synthesis cost of their own
+	// (the same shape the wire-r1 speaker stub is for the output device).
+	ttsLoader func() (speech.TtsEngine, error)
 	// loaderCalls counts how many times the factory above ran. It is the strong form
 	// of "the second turn loaded nothing": a timing can be fast by accident, a
 	// counter cannot.
@@ -334,7 +343,7 @@ type voiceResidency struct {
 }
 
 func newVoiceResidency(plan voicePlan, queue *voiceOwnerQueue, clock session.Clock) *voiceResidency {
-	r := &voiceResidency{plan: plan, queue: queue, clock: clock, slot: speech.NewSlot()}
+	r := &voiceResidency{plan: plan, queue: queue, clock: clock, slot: speech.NewSlot(), settle: &settleTrace{}}
 	if clock == nil {
 		clock = voiceOwnerClock{queue: queue}
 	}
@@ -402,6 +411,9 @@ func (r *voiceResidency) loader(kind session.EngineKind) (session.Engine, error)
 		}
 		files := r.plan.Tts
 		eng, err := r.slot.LoadTts(func() (speech.TtsEngine, error) {
+			if r.ttsLoader != nil {
+				return r.ttsLoader()
+			}
 			return speech.NewMatchaTts(speech.TtsConfig{
 				AcousticModel: files.Acoustic,
 				Vocoder:       files.Vocoder,
@@ -438,6 +450,12 @@ func (r *voiceResidency) loader(kind session.EngineKind) (session.Engine, error)
 func (r *voiceResidency) openScope(reason string) (*session.Scope, error) {
 	hooks := session.Hooks{
 		Logf: func(format string, args ...any) {
+			// 票 12 AC#9 的 T1：scope 自己宣布进 Settling（SCOPE-SETTLING 是它的
+			// 审计行首，D43#31 的 session 半边）的那一刻。锚在行首前缀上，行文
+			// 漂移只会让戳停掉、被回落测试当红抓住，不会给错数。
+			if strings.HasPrefix(format, "session: SCOPE-SETTLING") {
+				r.settle.markSettling()
+			}
 			slog.Info("voice[scope]: " + fmt.Sprintf(format, args...))
 		},
 		MicClose: func() {
@@ -457,7 +475,12 @@ func (r *voiceResidency) openScope(reason string) (*session.Scope, error) {
 				hook()
 			}
 		},
-		FreeOSMemory: func() { freeOSMemoryNow() },
+		FreeOSMemory: func() {
+			// 票 12 AC#9 的 T2：级联的第三步（C11 step 4）只从 dispose 级联跑，
+			// onSettleExpired 就是 D43#32 的触发器。戳在真释放发生的那一行。
+			r.settle.markFellBack()
+			freeOSMemoryNow()
+		},
 	}
 	return session.NewScope(session.ScopeOptions{
 		Loader: r.loader,

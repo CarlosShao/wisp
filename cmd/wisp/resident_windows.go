@@ -602,6 +602,14 @@ func runResident() {
 		}
 	}
 
+	// 票 12 AC#9（registry A25）的接缝挂接：execute() 的流式 sink 把「最后一个
+	// token」的 T0 戳记进常驻语音链的回落测量载体（settle_trace_12r2.go），
+	// session scope 的 Settling 宣布与 dispose 级联在那只载体上落 T1/T2。本段是
+	// 上面 30-w-r1 presenter 装配的兄弟段（43-r1/384-r1 同款），其挂接行零触碰。
+	if src != nil && src.run != nil && rv != nil && rv.residency != nil {
+		src.run.settle = rv.residency.settle
+	}
+
 	// Ticket 43: the two OS doors and their sequences, wired here where every
 	// handle the sequences need (approvals, capture, voice residency) already
 	// exists. lifecycleFastExit is what the deferred rt.Shutdown above reads;

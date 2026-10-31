@@ -385,6 +385,11 @@ type agentRuntime struct {
 	// stream is the results section's producer: the deltas this run streams,
 	// accumulated so a snapshot can carry them.
 	stream *panel.StreamLog
+	// settle is ticket 12 AC#9's last-token carrier (settle_trace_12r2.go): the
+	// sink stamps T0 here as each delta lands, and the resident voice leg reads
+	// the same trace at the settle walk. Nil on hosts that assembled no voice
+	// chain (the CLI) - the stamps then have no reader, which is the honest nil.
+	settle *settleTrace
 	// seenTasks are the task ids this process admitted - every root loop and
 	// every child loop, because agent.Options.AdmitTask is the one hook both of
 	// them pass through (internal/agent/loop.go:360, and task.spawn wraps the
@@ -1287,7 +1292,7 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	opts := agent.Options{
 		Provider: prov,
 		Tools:    rt.bridge,
-		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot, settle: rt.settle},
 		// The loop's own tool_call rows are deliberately NOT booked: the
 		// bridge already writes the authoritative one (assessed level, gate
 		// decision, outcome, correlation id). Two rows per call would make
@@ -1692,6 +1697,9 @@ type consoleSink struct {
 	// on a sink built without the pump (see assembleRuntime).
 	stream  *panel.StreamLog
 	publish func()
+	// settle is ticket 12 AC#9's T0 stamp target (settle_trace_12r2.go). Nil
+	// leaves Publish byte-identical to its pre-seam shape.
+	settle *settleTrace
 }
 
 func (c consoleSink) Publish(e agent.Event) {
@@ -1702,6 +1710,10 @@ func (c consoleSink) Publish(e agent.Event) {
 		if c.stream != nil {
 			c.stream.Append(e.TaskID, e.Text)
 		}
+		// T0 of the AC#9 measurement: the last delta of a reply is the moment
+		// the last token is delivered to the consumer surface. Every delta
+		// stamps, so the value a later settling reads is the last one.
+		c.settle.markLastToken()
 	case agent.EvReasoningDelta:
 		// Reasoning is shown as it is what the thinking probe measures; it is
 		// never mixed into the reply text. It is equally kept out of the
