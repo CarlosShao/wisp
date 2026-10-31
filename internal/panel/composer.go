@@ -98,6 +98,16 @@ type ResultChunk struct {
 	Done          bool   `json:"done"`
 }
 
+// workspaceRewrittenUnnarratedReason is the display boundary's fallback narration
+// for a workspace row whose ticket 102 account (Rewritten) says C26's expansion
+// step rewrote the path but that arrived without the producer's own sentence -
+// workspace.go mints one for every rewritten row it builds, so a row missing it is
+// exactly the "coordinate without its account" the account exists to prevent.
+// scrubComposerForDisplay washes this sentence like every other string that quotes
+// the C26 coordinate.
+const workspaceRewrittenUnnarratedReason = "工作区坐标被 C26 的展开步改写过（rewritten=true）：显示的坐标是改写后的树，" +
+	"不是使用者拼写的那一串"
+
 // NewSnapshot builds the one push from native state. The composer section is
 // MANDATORY (ticket 92 AC#4): the mode and the workspace a run is actually
 // using travel with every snapshot, so a panel that closes and reopens - or a
@@ -123,6 +133,17 @@ func NewSnapshot(pending []ApprovalCardView, results []ResultChunk,
 		// Same rule as the mode two lines up: a git dimension nobody read is
 		// stated as unread, never as an empty section that renders as "no repo".
 		composer.Git = GitViewNotProbed()
+	}
+	// Ticket 102's account is read here (the consumer the A380 static criterion
+	// named at composer.go:127): Rewritten=true is the producer's claim that C26's
+	// expansion step rewrote this path - proof that the dimension WAS read, and the
+	// notice that the coordinate on display is not the string the user spelled.
+	// The net answers the account first: a rewritten row that arrived without the
+	// producer's narration gets the account sentence instead of crossing as a bare
+	// coordinate, and "no reading" is never stamped onto a row whose account proves
+	// a reading happened (票 216 AC#4's pair must not collapse the other way).
+	if composer.Workspace.Rewritten && strings.TrimSpace(composer.Workspace.Reason) == "" {
+		composer.Workspace.Reason = workspaceRewrittenUnnarratedReason
 	}
 	if !composer.Workspace.Set && composer.Workspace.Canonical == "" &&
 		strings.TrimSpace(composer.Workspace.Reason) == "" {

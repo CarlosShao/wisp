@@ -35,6 +35,12 @@ package panel
 //	AttachmentRef.Name        picker-supplied; the ingress guard rejects only
 //	                          NUL/CR/LF/TAB, so ESC and the whole C1 range pass
 //	WorkspaceView.Canonical   C26's resolved tree, not the user's spelling
+//	WorkspaceView.Reason      producer text, but ONLY a rewritten row's narration
+//	                          quotes the C26 coordinate (and the spelling it moved
+//	                          away from); ticket 102's account (Rewritten=true) is
+//	                          what marks those rows, so the wash rides the account
+//	                          (102r2) - a narration that quotes the coordinate must
+//	                          cross the boundary as washed as the coordinate itself
 //
 // Plugin names, skill names and command descriptions are on AC#2's list in the
 // ticket but measure ZERO SOURCE / ZERO OUTBOUND at this anchor (tickets 213/215
@@ -215,6 +221,18 @@ func needsDisplayWash(s string) bool {
 // attachment in whatever still holds the original slice - including the message
 // the agent is about to receive (OutgoingMessage reads the same rows).
 func scrubComposerForDisplay(c ComposerState) ComposerState {
+	// Ticket 102's account is read here (the consumer the A380 static criterion
+	// named at :26/:37/:218): a rewritten row's narration is the one text that
+	// QUOTES the C26 coordinate on this roster, and the census ruled that the
+	// coordinate reaches a human washed because the user never typed it. Without
+	// the account read, the coordinate crosses raw through the narration side
+	// channel and defeats the boundary the canonical wash exists for. The account
+	// is what marks the rows whose Reason carries non-user-typed content; rows
+	// whose narration is the repository's own constant sentence stay on the
+	// identity fast path.
+	if c.Workspace.Rewritten {
+		c.Workspace.Reason = scrubForDisplay(c.Workspace.Reason)
+	}
 	c.Workspace.Canonical = scrubForDisplay(c.Workspace.Canonical)
 	if len(c.Attachments) == 0 {
 		return c
