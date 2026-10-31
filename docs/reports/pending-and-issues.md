@@ -29248,3 +29248,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 4**＝**写 3**（★`389-r1` 组合门／`387-r1` tts 守卫／`386-r1` mockllm 帽）＋**裁 1**（★`12-v1`）——4 ≤7 ✅
 ★票池：done=**205**／open=**168**；未推（本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
+
+## A1326 补（2026-10-31 18:4x +08，编排者）★`12-r2` 复跑两连败＝**我的尺架设失败**（非产品红）｜★独立复验由在飞 `12-v1` 承担
+
+- ★**我首跑**：裸 `go test -run Test12r2`（在册 PATH）⇒ **FAIL：`onnxruntime 1.17.1 is older than 1.28`**——★**第 15 处族**：go test 二进制在临时目录、旁边无 DLL ⇒ System32 1.17.1 遮蔽（★**正解＝DLL 贴测试二进制、PATH 注入无效——59-r1 已勘**）
+- ★**我二跑**：staged 二进制＋DLL 拷贝——**仍两红**：①VAD 仍没起来（★**onnxruntime.dll 不在 third_party/sherpa-onnx、我只拷了那个目录**）②**Test12r2SeamCallSites（AST 源码扫描案）0.00s 红＝cwd 不是包目录**（★384-r1 教训：binary 直跑 cwd 必须=包目录）
+- ⇒ ★**判：尺架设失败、非产品红**；★**腿的 staging（完整 381-v3 清单：DLL 全家＋manifest＋WISP_* 五 env＋cwd=包目录）才是对的尺**；★**独立复验由在飞 `12-v1` 承担**（派单已要求完整 staging 复跑）
+- ★**教训入册**：★**cmd/wisp 的定向复跑最小尺＝staged 二进制＋DLL 全家（含 onnxruntime.dll）＋WISP_* 五 env＋manifest 可达＋AST 案 cwd=包目录**——缺一即假红（**与 381-v3 清单合并为一张卡**）
