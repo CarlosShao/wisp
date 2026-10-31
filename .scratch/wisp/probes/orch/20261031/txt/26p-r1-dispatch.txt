@@ -1,0 +1,7 @@
+存档 2026-10-31 19:3x · 腿 26p-r1（Path-C 集成面腿、写、cmd/wisp 独占——390-r1 已让出）
+来源＝A1325（PRECHECK P15=PASS 无条件、26-PathC 重开）＋59-v3 判语：集成面出三个真数。
+①389 组合门（internal/audio/bargein.go＋标定集）接进 resident 语音路径（Feed 在线 vs 窗级重放等价首格核一枚——389-v1 处置建议）
+②三个集成真数：(a) 播报中发声 ⇒ barge-in 触发停播 ≤400ms（D47 §16.12 字面）；(b) 产品麦面零转写（回声不触发）；(c) -30 裕量重测加严读数
+③AEC3 引擎进真实采集路径的接线（aecsipke rig 形状产品化；若必须动 internal/speech 语义 ⇒ 具名交回）
+⛔ 改 internal/{risk,session,speech} 语义、⛔ D43 表、⛔ statemachine、⛔ thresholds；387-r1 在飞 internal/speech——其交件前你只能用已提交形状。
+staging 全套（A1326 卡：DLL 全家含 onnxruntime/五 env/manifest/cwd=包目录）；音频错峰。

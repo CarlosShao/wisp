@@ -29296,3 +29296,22 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **④ ★在飞 4**＝**写 3**（★`390-r1` 球单击／`387-r1` tts 守卫／`386-r1` mockllm 帽）＋**裁 1**（★`12-v1`）—— 4 ≤7 ✅
 ★票池：done=**206**／open=**169**（**55.1%**，票池 375——389/390 开后）；未推 **2**（网络抖、下轮先推）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
+
+## A1329（2026-10-31 19:3x +08，编排者，goal round 31 续）★★★收 `390-r1`（`e12200317` 3 枚 +438/-8＋`867606544` 证据）：**球单击打断真挂上**（≤400ms MET 33/39/22/31/39ms）｜★★**381-r1 的"需 ball API 扩展"申报被推翻**（OnClickBall 本就是既有面、冻结面零字节）｜★派 `390-v1`＋**`26p-r1`（Path-C 集成面）** ⇒ 写腿 3 满
+
+**① ★★收 `390-r1`（尺核：★两提交在／3 枚在）**
+- ★★★**关键定性：ball API 无需扩展**——★**`ball.Events.OnClickBall` 本就是既有单击事件面**（ball_windows.go:50 字段/:632 fire）⇒ **381-r1 的"需 internal/ball API 扩展"申报不成立、冻结面零字节**；★**不是停手交回情形、是"API 已够"情形**
+- ★**线程形状**：★单击回调与 Esc cancel key 同在 ball ui-sta 线程内联跑（Ball.fire 契约）⇒ **381-v2「abort 必须从触发方线程出手」同形满足**
+- ★★★**读数**：★**AC#2 端到端 ≤400ms MET：五轮 unstick/reset=33/39/22/31/39ms**（控制轮 parked_to_done=2.096s）；CLICK-27 aborted=1 spoken=0 next_spoken=1 probe2_aborts=0 gate 2/2；六轮后 gate 6/6
+- ★★**AC#3 反向**：★M1（仓外 mut＋-overlay、摘 clickInterruptGesture 的 trigger()）⇒ 主案红 rc=1（MUTANT 390r1-M1 具名句、spoken=1 aborted=0）；★**同突变二进制 Test381r2 两案＋Unattached 案 rc=0 全绿＝Esc 照常自证定向**；还原核绿
+- ★★**正控**：idle 球单击惰性（Sleeping 不动/timeline 空/计数 0）；**UNATTACHED 反形 spoken=1 aborted=0**（与主案唯一 delta=attach 行＝挂接敏感性测试内证明）
+- ★★**零回归**：★六族合跑×2＝42 RUN/41 PASS/1 FAIL（★唯一红 Test384 时窗归因三发：单跑×3 全绿＋**git archive HEAD 纯净对照树六族合跑也 2 FAIL** ⇒ **合跑负载时序红=HEAD 既有形状、红名集合零新增**）；★speech 67/67/0/0；d22scan clean＋正控两发可逆
+- ★**staging**：★A1326 清单全套（四 DLL 含 onnxruntime.dll＋WISP_* 五 env＋-timeout 30m＋-run 定向）✅
+- ★**残余**：①单击 summon 半仍无执行者（ballGestureWhy 已随真、归口在册）②384 合跑 3s 时窗＝HEAD 既有
+
+**② ★已派 2 条**
+- ★**`390-v1`（裁）**：五格复核＋**"ball API 无需扩展"推翻本身复核**（ball_windows.go:50/:632 现跑）＋可否收口
+- ★★★**`26p-r1`（写、cmd/wisp 独占）**：**Path-C 集成面**——389 组合门接进 resident 语音路径（**Feed 在线 vs 窗级重放等价首格核一枚**＝389-v1 处置建议）＋**三个集成真数**（(a) barge-in 停播 ≤400ms／(b) 产品麦面零转写／(c) -30 裕量重测）；★**AEC3 进真实采集路径接线**（若必须动 internal/speech 语义 ⇒ 具名交回）
+★**写面互斥核**：26p-r1=cmd/wisp／387-r1=internal/speech／386-r1=tools/mockllm／390-v1 只读——**零撞**；★**写 3 满** ✅
+
+**③ ★状态**：done=**206**／open=**170**（390 开后）；未推 **2**（网络抖）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
