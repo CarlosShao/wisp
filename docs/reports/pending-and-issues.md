@@ -28830,3 +28830,36 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ★在飞＝**写 2**（`381-r2` cmd/wisp／`59-r1` internal/audio AEC spike）＋裁 0（`30-v1`/`12-slo-v1`/`381-v2` 全交）⇒ **写腿 2＜3** ⇒ ★**具名：候选全撞 cmd/wisp（43/384/12-AC#9/219）或等 59 PRECHECK ⇒ 381-r2 或 59-r1 交件同轮即补满**
 ★票池：done=**200**／open=**170**（**54.2%**，票池 370）
 ★**摆机主 3 件**：①347 追认 ②216/120/136 外部会话 ③Wails 裁定
+
+## A1303b（2026-10-31 12:4x +08，编排者，goal round 31 续）★★★收 `381-r2`（`77c2cabfb` 5 文件 +756/−54）：**≤400ms 实测 MET**（★41/45/46/46/46ms×5 轮、对照 381-v2 的 6,653ms）｜★三发反向真跑全红｜★**veto 选删（100% 误伤支路具名删）**｜★R26-7 三件全补｜★**发现 panel 三处绕过 C26 rewrite account＝A380 根因 ⇒ 派 `102r2-r1` 修**｜★铺腿至 3 写＋1 裁
+
+**① ★★★收 `381-r2`（三件结构缺口全补、381-v2 裁决的"缺结构"已消）**
+1. ★★★**接 `speaker.Abort()`**：★TriggerInterrupt 之外经 `rv.speakAbort` 中止在飞 speaker（★**Esc 在 UI 线程、owner 停在 Drain ⇒ abort 必须从触发方线程出手**）；★winmm 侧 releaseLocked 改 **100ms 分片等待（音钟推导、零墙钟）**＋abortReq 锁外旗＋WHDR_DONE 旗核；Drain/Play 以 `errSpeakerAborted` 作答 ⇒ **speak() 走 D43#27（非 #26、不记 spoken、不记 problem、门照放）**
+2. ★★**speak 入口清一次 `interruptCh`**：★残留 token 无声杀下一句消
+3. ★★**veto 字符串支路选删**（★具名）：★文本路 veto **看不到 Speaking 态＋碰不到 interruptCh＋12/12 误伤＋D43 拒后吞句污染**；★final 一律照走 `finish()`；★**真 veto＝KWS 词级（#13/#22，未碰）＋Esc**
+- ★**≤400ms 实测（真设备＋真 matcha＋生产 TriggerInterrupt 通路）**：★**41/45/46/46/46ms**（前轮 42/45/55/49）——★**全部 ≤57ms、≤400ms MET**（对照 381-v2 的 **6,653ms 照播完**；control 照播完 parked_to_done=2.095s）；★**句子 chunks=4/≈6.4s 音频（比 381-v2 的 1-2 chunk 更不利形状 ⇒ abort 与 chunk 边界无关）**
+- ⇒ ★**R26-1「打断」半格具备收口读数（收口判定归编排者）** ⇒ ★**派 `381-v3` 验收**
+
+**② ★★三发反向判据（仓外 -overlay＋还原核；红句具名在测试件）**
+★M1 摘 Abort 接线 ⇒ **spoken=1 播完必红**／★M2 摘入口清 token ⇒ **spoken=0 杀句必红**／★M3 复插 veto 支路 ⇒ **良性句 finals=0 必红**；★还原核＝无 overlay 重编 4/4 PASS＋三变异件 SHA256 互异＋工作树零突变
+
+**③ ★★正控／零回归**
+★非播报期 Esc ⇒ **无事发生**（机器不动/timeline 空/problems 空）；★静音空文本 ⇒ 门针零触发；★**veto 语料误伤率 0/12**（381-r1 支路 12/12）
+★**零回归**：★`TestWireR1|Test15e|Test26R3|Test41a2r1|Test381r2` 合跑 **27 PASS/0 FAIL**；★**`262/640/902` 逐位同**；GATE/ECHO/REOPEN/SILENCE 全在；internal/speech 61/0/6 逐位同；session ok 2.804s；vet 0
+★**两尺**：★**`models.go` 确已不在假红名单**（381-r2 修后）、internal 4 行＝2 枚已知 CRLF＋2 枚 **aecspike 未跟踪在飞件**（★**59-r1 的、⛔ 归因**）
+★**d22scan**（导出树＋本腿 5 文件）rc 0 clean（分母 bans#1-5 274/45、ban#8 706/162）；正控两发可逆
+
+**④ ★★残余具名（不阻塞）**
+①Close/Abort 抢锁两形使 dropped 读数波动（0 或 n）、两形都落 waveOutReset **出声都停**——只记读数不作断言 ②出声期 KWS veto 结构性不可能在飞（owner 忙于 speak）、两通道射程不混 ③**球单击打断仍未装配**（381-r1 自认项）④★**speaker Drain 早回已实质收窄**（control 2.095s vs 旧 9.84s 信号/15.1s 真出声错位）——账仍归 26 侧核
+
+**⑤ ★★发现 panel 三处绕过 C26 rewrite account（42-r1 sweep 上报）＝票 102 洞重开 ＝ A380 存量红根因**
+★**`internal/panel` composer.go:127／display_scrub_216.go 三处读 `Result.Canonical` 不读 rewrite account** ⇒ ★**`TestC26RewriteAccountIsConsumedAtEverySecurityLeg`（A380 存量红）的根因**
+⇒ ★★★**派 `102r2-r1`（写、internal/panel 独占）**：★**三处改读 rewrite account ⇒ A380 红→绿**（★**这是把本会话一直背着的存量红清掉的一腿**）；★**同时收 42-r1 sweep 报的 panel↔frontend 契约漂移？⛔ 一腿一件事**、另记
+
+**⑥ ★已派 3 条（写 2＋裁 1）**
+- ★**`381-v3`（裁）**：验 381-r2（≤400ms 复跑＋mutation 三发＋R26-7 核）⇒ **六格判＋票 381 可否收口**
+- ★**`43-r1`（写、`cmd/wisp` 现空闲可占）**：票 43 power lifecycle 5 格全真机行为
+- ★★**`102r2-r1`（写、`internal/panel` 独占）**：**票 102 洞重开修复（A380 根因）**
+★**写面互斥核**：381-v3 只读导出树／43-r1=cmd/wisp／102r2-r1=internal/panel、59-r1=internal/audio —— **零撞**；总在飞 4（写 3＋裁 1）≤7 ✅
+
+**⑦ ★状态**：done=**200**／open=169（**54.2%**，票池 369）；未推（本轮后现跑）；**摆机主 3 件**

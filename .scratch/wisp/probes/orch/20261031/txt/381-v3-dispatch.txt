@@ -1,0 +1,2 @@
+存档 2026-10-31 12:4x · 腿 381-v3（票 381 验收腿、非实现者）——验 381-r2（77c2cabfb，dev 上）
+①≤400ms 实测复跑（真设备+真 matcha+生产 TriggerInterrupt；≥5 轮分布）②mutation 三发真跑（摘 Abort/摘入口清 token/复插 veto ⇒ 各红）③R26-7 三字段与 Abort 接线核④零回归 27/21⑤六格逐条判（AC#3/AC#4 是 381-v2 留下的两格）＋可否收口。⛔ 动工作树（59-r1 在飞 internal/audio）。

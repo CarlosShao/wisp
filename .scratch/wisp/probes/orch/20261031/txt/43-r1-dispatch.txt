@@ -1,0 +1,2 @@
+存档 2026-10-31 12:4x · 腿 43-r1（票 43 power lifecycle 落地腿、写；cmd/wisp 现空闲可占）
+5 格全真机行为：suspend/resume disposal／WM_QUERYENDSESSION exit ≤5s／L2 voided＋counted notice／kill -9 crash-recovery＝中断不重跑／autostart Run key OFF default。⛔ 改 internal/session 语义（28 收口，只用公开面）；⛔ D43 表；写面按票面定。
