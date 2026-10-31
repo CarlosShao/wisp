@@ -427,6 +427,14 @@ type residentVoice struct {
 	// leg that never registered one) means an interrupt while idle is inert.
 	speakAbort atomic.Value
 
+	// TICKET 26p (the Path-C integration surface): the barge-in monitor that
+	// owns one announcement window - the AEC'd capture judged by the 389
+	// combination gate, the announcement itself as the far reference, and a
+	// pass firing the interrupt channel above (D47 sec 16.12: 说话即插话).
+	// Nil-safe everywhere; inert without the AEC3 binding (-tags webrtcap),
+	// in which case the announcement window keeps today's exact D16 shape.
+	bargein *voiceBargeinMonitor
+
 	// Counters, all atomic: the asr-infer goroutine writes them, the boot report
 	// and the tray gesture read them.
 	drained     atomic.Uint64
@@ -518,7 +526,7 @@ func voiceRingAppend(ring, samples []float32) []float32 {
 // the process.
 func newResidentVoice(frames <-chan []byte, plan voicePlan, ball *residentBall, tasks voiceTranscriptSink) *residentVoice {
 	queue := newVoiceOwnerQueue()
-	return &residentVoice{
+	rv := &residentVoice{
 		frames:      frames,
 		plan:        plan,
 		ball:        ball,
@@ -530,6 +538,10 @@ func newResidentVoice(frames <-chan []byte, plan voicePlan, ball *residentBall, 
 		newSpeaker:  openWaveOutSpeaker,
 		interruptCh: make(chan struct{}, 1),
 	}
+	// TICKET 26p: the monitor rides the same seams the leg already holds; the
+	// scope joins it in start(), the conversation window in attachCaptureGate.
+	rv.bargein = newVoiceBargeinMonitor(frames, plan.VadModelPath, nil, rv.TriggerInterrupt)
+	return rv
 }
 
 // TICKET 381 R26-1: interrupt trigger API. Call this from any of the interrupt
@@ -610,6 +622,15 @@ func (rv *residentVoice) attachCaptureGate(gate interface {
 		return
 	}
 	rv.captureGate = gate
+	// TICKET 26p: the same object may carry the D47 conversation window
+	// (the production *audio.HalfDuplexGate does since this leg). Test
+	// recorders that do not implement it leave the monitor's seam nil and
+	// the monitor runs without the window (its readings say so).
+	if rv.bargein != nil {
+		if c, ok := gate.(voiceBargeinConvGate); ok {
+			rv.bargein.attachConvGate(c)
+		}
+	}
 	if gate != nil {
 		slog.Info("voice: capture gate wired to the announce path",
 			"seam", "audio.HalfDuplexGate.SetSpeaking", "path", string(audio.PathT))
@@ -651,6 +672,15 @@ func (rv *residentVoice) start(reg *observe.Registry) {
 	// inside run - cancel, then join, then release, which is the mandatory tail
 	// order.
 	rv.scope = plugin.NewDisposalScope("voice-15e", nil, opts...)
+	// TICKET 26p: the barge-in monitor's drain is booked under the same scope
+	// (the C11 join covers it), and the monitor's VAD rides the same model the
+	// chain resolved.
+	if rv.bargein != nil {
+		rv.bargein.scope = rv.scope
+		if rv.bargein.vadModel == "" {
+			rv.bargein.vadModel = rv.plan.VadModelPath
+		}
+	}
 	// The mic half of "Warm closes the microphone FIRST". What this chain can
 	// honestly close is the FEED, not the device: the C8 frames that carry the wake
 	// in are the capture leg's, and a chain that switched the device off in Warm
@@ -1774,6 +1804,9 @@ func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tas
 	}
 	rv.plan = plan
 	rv.frames = ra.frames
+	// TICKET 26p: the monitor rides the production frame channel; the scope
+	// joins it in start(), the conversation window in attachCaptureGate.
+	rv.bargein = newVoiceBargeinMonitor(rv.frames, plan.VadModelPath, nil, rv.TriggerInterrupt)
 	// The residency is built with the plan it will load from: the voicePlan the
 	// constructor got is the zero one on this path, and a residency holding no
 	// paths would answer "语音链：ASR 目录为空" for every turn.

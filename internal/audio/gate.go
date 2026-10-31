@@ -71,13 +71,14 @@ type HalfDuplexGate struct {
 	onEvent func(GateEvent)
 	meter   *meter
 
-	mu       sync.Mutex
-	ctx      context.Context
-	buf      chan<- []byte
-	running  bool
-	open     bool // capture currently handed to inner
-	muted    bool
-	speaking bool
+	mu           sync.Mutex
+	ctx          context.Context
+	buf          chan<- []byte
+	running      bool
+	open         bool // capture currently handed to inner
+	muted        bool
+	speaking     bool
+	conversation bool
 }
 
 // NewHalfDuplexGate wraps inner with the duplex policy of path.
@@ -162,6 +163,45 @@ func (g *HalfDuplexGate) SetSpeaking(speaking bool) {
 	}
 }
 
+// SetConversation is the D47 Path-C conversation window (ticket 26 integration
+// surface): while ON, a PathT gate does NOT close capture across
+// SetSpeaking(true) - the announcement window behaves like Path C, where
+// "echo cancellation is the AEC layer's job, not the gate's". While OFF (the
+// zero value and the production default) the gate is byte-identical to the
+// pre-26p shape: PathT speaking closes capture, D16 untouched. Muted still
+// outranks everything on both postures (user intent wins).
+//
+// The flip re-evaluates the open state in the same way SetSpeaking and
+// SetMuted do, so turning it on mid-speech reopens capture and turning it off
+// mid-speech closes it - each flip exactly one open/close hop.
+func (g *HalfDuplexGate) SetConversation(on bool) {
+	g.mu.Lock()
+	if g.conversation == on {
+		g.mu.Unlock()
+		return
+	}
+	g.conversation = on
+	shouldOpen := g.running && g.effectiveOpen()
+	var evs []GateEvent
+	if shouldOpen && !g.open {
+		g.open = g.openInnerLocked()
+		if g.open {
+			evs = append(evs, GateEvent{Kind: EventCaptureOpened, Reason: "conversation-window", At: observe.NowWallUTC()})
+		}
+	} else if !shouldOpen && g.open {
+		g.open = false
+		g.closeInnerLocked()
+		evs = append(evs, GateEvent{Kind: EventCaptureClosed, Reason: "conversation-window-off", At: observe.NowWallUTC()})
+	}
+	fn := g.onEvent
+	g.mu.Unlock()
+	for _, e := range evs {
+		if fn != nil {
+			fn(e)
+		}
+	}
+}
+
 // SetMuted is driven by the mute hotkey. Muted closes capture on both paths
 // (user intent outranks the duplex policy); the Muted/Unmuted events are the
 // hook into the Muted ball state (07).
@@ -230,12 +270,14 @@ func (g *HalfDuplexGate) Stats() Stats {
 
 // effectiveOpen reports whether the CURRENT state allows capture. Callers
 // hold mu. muted outranks everything (user intent); on Path T speaking
-// closes capture; on Path C (D47) speaking does not.
+// closes capture UNLESS the D47 conversation window is on (the announcement
+// window where the AEC layer owns the echo, tickets 26/59); on Path C
+// (D47) speaking does not.
 func (g *HalfDuplexGate) effectiveOpen() bool {
 	if g.muted {
 		return false
 	}
-	if g.speaking && g.path == PathT {
+	if g.speaking && g.path == PathT && !g.conversation {
 		return false
 	}
 	return true

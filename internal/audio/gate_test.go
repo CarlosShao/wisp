@@ -188,6 +188,48 @@ func TestGateStartMuted(t *testing.T) {
 	}
 }
 
+// TestGateConversationWindowOnPathT: the D47 Path-C window the ticket-26
+// integration surface hangs on the announcement - while ON, a PathT gate
+// keeps capture across SetSpeaking(true) (the AEC layer owns the echo);
+// muted still outranks it; OFF restores the D16 close byte-identically.
+func TestGateConversationWindowOnPathT(t *testing.T) {
+	inner := gateWav(t, 12)
+	gate := NewHalfDuplexGate(inner, PathT)
+	buf := make(chan []byte, 64)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	if err := gate.Start(ctx, buf); err != nil {
+		t.Fatal(err)
+	}
+	waitForFrame(t, buf)
+
+	// Window on: speaking does not close capture.
+	gate.SetConversation(true)
+	gate.SetSpeaking(true)
+	waitForFrame(t, buf)
+	waitForFrame(t, buf)
+
+	// Muted outranks the window (user intent wins on both postures).
+	gate.SetMuted(true)
+	assertNoFrames(t, buf)
+	gate.SetMuted(false)
+	waitForFrame(t, buf)
+
+	// Window off while still speaking: the D16 close comes back mid-speech.
+	gate.SetConversation(false)
+	assertNoFrames(t, buf)
+	gate.SetSpeaking(false)
+	waitForFrame(t, buf)
+
+	// And the default posture is unchanged: off-window speaking closes.
+	gate.SetSpeaking(true)
+	assertNoFrames(t, buf)
+	gate.SetSpeaking(false)
+	if err := gate.Stop(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 // TestGateStopIdempotent: Stop without Start, double Stop, Stop after ctx
 // cancel - all safe (D38e step 4 must never hang shutdown).
 func TestGateStopIdempotent(t *testing.T) {

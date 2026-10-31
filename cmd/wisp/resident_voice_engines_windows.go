@@ -942,6 +942,15 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 		}
 	}
 	defer gateRelease()
+	// TICKET 26p (the Path-C integration surface): the barge-in monitor arms
+	// for this announcement window BEFORE the close request. With the AEC3
+	// binding present it flips the D47 conversation window (capture stays
+	// open - the monitor's drain is the window's reader and its judge), and a
+	// judged episode fires the interrupt channel: 说话即插话. Without AEC3 the
+	// arm refuses and the window below keeps today's exact D16 shape - the
+	// half-duplex close is the only honest posture without the AEC layer.
+	rv.bargein.arm()
+	defer rv.bargein.release()
 	if rv.captureGate != nil {
 		rv.captureGate.SetSpeaking(true)
 		rv.speakGateOn.Add(1)
@@ -995,6 +1004,10 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 		if len(samples) == 0 {
 			return nil
 		}
+		// TICKET 26p: the far-reference tap. The announcement IS the echo
+		// source the monitor cancels against (D47: the render is our own PCM);
+		// the chunk is handed to the monitor before it reaches the device.
+		rv.bargein.speakFar(samples, eng.SampleRate())
 		chunks++
 		spoke += len(samples)
 		rv.ttsSamples.Add(uint64(len(samples)))
