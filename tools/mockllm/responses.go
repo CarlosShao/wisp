@@ -123,6 +123,21 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 			toolArgs = fmt.Sprintf(`{"text":%s}`, mustJSONString(argText))
 		}
 	}
+	// max_output_tokens truncation, the Responses twin of the chat dialect's
+	// max_tokens emulation (ticket 391): the field was parsed but never
+	// applied. Same ~4-bytes-per-token cap (intentional emulation - a real
+	// Responses provider that hits max_output_tokens stops mid-output) and
+	// same rune-boundary cut as chat; the termination is this protocol's own
+	// spelling: status "incomplete" with incomplete_details.reason
+	// "max_output_tokens" (this protocol has no finish_reason to spell
+	// "length" on).
+	truncated := false
+	if req.MaxTokens > 0 && toolName == "" {
+		if len(answer)/4 > req.MaxTokens {
+			answer = answer[:runeBoundaryWithin(req.MaxTokens*4, answer)]
+			truncated = true
+		}
+	}
 	if caps.fcBroken() && toolName != "" {
 		// No function-calling support: the forced tool_choice is silently
 		// ignored and the turn answers as an ordinary message item.
@@ -156,11 +171,16 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 				"content": []map[string]string{{"type": "output_text", "text": answer}},
 			})
 		}
-		writeJSON(w, map[string]any{
+		respBody := map[string]any{
 			"id": respID, "object": "response", "model": req.Model,
 			"status": "completed", "output": output,
 			"usage": map[string]any{"input_tokens": inTokens, "output_tokens": outTokens},
-		})
+		}
+		if truncated {
+			respBody["status"] = "incomplete"
+			respBody["incomplete_details"] = map[string]string{"reason": "max_output_tokens"}
+		}
+		writeJSON(w, respBody)
 		return
 	}
 
@@ -256,13 +276,19 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	status := "completed"
-	if !sse.event("response.completed", map[string]any{
-		"type": "response.completed",
-		"response": map[string]any{
-			"id": respID, "object": "response", "status": status,
-			"usage": map[string]any{"input_tokens": inTokens, "output_tokens": outTokens},
-		},
+	status, terminal := "completed", "response.completed"
+	respBody := map[string]any{
+		"id": respID, "object": "response",
+		"usage": map[string]any{"input_tokens": inTokens, "output_tokens": outTokens},
+	}
+	if truncated {
+		status, terminal = "incomplete", "response.incomplete"
+		respBody["incomplete_details"] = map[string]string{"reason": "max_output_tokens"}
+	}
+	respBody["status"] = status
+	if !sse.event(terminal, map[string]any{
+		"type":     terminal,
+		"response": respBody,
 	}) {
 		return
 	}

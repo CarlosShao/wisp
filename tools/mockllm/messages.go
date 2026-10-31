@@ -191,6 +191,20 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	p := planMessagesFrom(req.Messages, req.Tools, req.Choice)
+	// max_tokens truncation, the Messages twin of the chat dialect's
+	// emulation (ticket 391): the field was parsed but never applied. Same
+	// ~4-bytes-per-token cap (intentional emulation - a real Messages
+	// provider that hits max_tokens stops mid-output) and same rune-boundary
+	// cut as chat; the termination must be THIS protocol's stop_reason
+	// spelling ("max_tokens" - the chat word "length" is not in the
+	// Messages vocabulary and consumers reject unknown stop reasons).
+	truncated := false
+	if req.MaxTokens > 0 && p.toolName == "" {
+		if len(p.answer)/4 > req.MaxTokens {
+			p.answer = p.answer[:runeBoundaryWithin(req.MaxTokens*4, p.answer)]
+			truncated = true
+		}
+	}
 	// Capability emulation (ticket 11 AC#6), Messages dialect: the Anthropic
 	// shape of the same two honest failures a real provider produces. It runs
 	// AFTER the golden branch, so byte-pinned replay can never be disturbed.
@@ -229,6 +243,8 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 		stop := "end_turn"
 		if p.toolName != "" {
 			stop = "tool_use"
+		} else if truncated {
+			stop = "max_tokens"
 		}
 		writeJSON(w, map[string]any{
 			"id": msgID, "type": "message", "role": "assistant", "content": content,
@@ -278,9 +294,13 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 		idx++
 	}
 	stop := "end_turn"
+	if p.toolName != "" {
+		stop = "tool_use"
+	} else if truncated {
+		stop = "max_tokens"
+	}
 	switch {
 	case p.toolName != "":
-		stop = "tool_use"
 		if !raw("content_block_start", map[string]any{
 			"type":  "content_block_start",
 			"index": idx, "content_block": map[string]any{
