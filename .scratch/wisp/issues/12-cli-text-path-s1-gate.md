@@ -45,7 +45,8 @@ moment: type → reply → notification → memory returns to idle.
       —— 证据（编排者按代码对账时补，代理未写）：`cmd/wisp/run_test.go`
       `TestRunTextTaskTextPathEndToEnd` + `TestRunTextTaskFailNextIsClassified`，
       我亲自跑 `go test -run 'Providers|RunText|Host|Composed' ./cmd/wisp/` → **ok 13.794s**。
-- [ ] Idle SLO gate PASS recorded into docs/SLO.md appendix (numbers + machine + date), using
+- [x] Idle SLO gate PASS recorded into docs/SLO.md appendix (numbers + machine + date), using
+> 〔12-slo-v1 对抗验收 2026-10-31：SPEC-10 §8 七项全过；解除条件=票 66 done（7/7）成立；数字锚全核＋实弹复跑 rc=0（40/40 样本、CPU 门 0.026%、4.8MB、九门 7 门全过）；票 66「树外口径当门」四件齐照裁不重裁。凭据＝`docs/evidence/s1/12-slo-v1-verdict.md`〕
       tree-private metric; settle ≤10s verified with FreeOSMemory counter >0.
       —— 2026-09-20 桌面独占跑完，数字见 `docs/SLO.md` 附录 A；**本框不勾，因为 CPU 那一行是真 FAIL**。
       已 PASS（每个样本都列，没挑幸运值）：私有工作集中位 8.43/8.54/8.52/9.10/8.50MB ≤25MB ·
