@@ -1,6 +1,6 @@
 # 59 — P15 AEC spike: license, binding, echo quality, CPU, false-trigger thresholds
 
-**Status:** ready-for-agent
+**Status:** **DONE-带残余**（2026-10-31 编排者收口：59-v2 有条件 PASS、两条件读数＝重开首项；残余见末节）
 **Claimed by:** —
 **Last update:** 2026-09-19
 **Blocked by:** 13-audio-capture
