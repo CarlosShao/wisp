@@ -1,0 +1,3 @@
+存档 2026-10-31 15:3x · 腿 30-w-r1（票 30 残余③装配缝、写、cmd/wisp 独占——384-r1 已让出）
+来源＝票 30 收口残余③：present.New(present.Channels{...}) 一次装配——Speak→rt.voiceAnnounce 同款闭包（ChTTS 闸已在 announce 路径、⛔ 重复设闸）、Notify→rt.notify、Badge→ball.SetBadgeText、TaskList→面板任务表（nil=跳过）、Panel→C17 桥结果展示（桥一字未动）、Clipboard→真写适配器（⚠义务=先 risk.Provenance.CheckText(scope,ChClipboard,text)、已写进端口文档）、Artifacts→*memory.Store 原样即插。调用点=loop.Run 返回后对 completed 结果 Dispatch(ctx,Input{TaskID,Text})。
+⛔ 改 internal/present 语义、⛔ C17 桥、⛔ D43 表；⛔ 改 384-r1/43-r1 的挂接行。

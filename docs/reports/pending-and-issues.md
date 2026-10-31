@@ -29106,3 +29106,23 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ★**写面互斥核**：59-v2 只读导出树（在飞 384-r1/387-r1/386-r1 零撞）；★**在飞 6**（写 3＋裁 3）≤7 ✅
 
 **④ ★状态**：done=**203**／open=**170**（**54.8%**）；未推（本轮后现跑）；★**摆机主 2 件**（D43 note 文字／**abseil 组成件解读否决权**——默认成立）
+
+## A1316（2026-10-31 15:3x +08，编排者，goal round 31 续）★★★收 `384-r1`（`51899e7c0` 4 枚 681 行）：**watchdog 第一次有生产调用者**——42-v1 §7 四缝全接＋Start｜★**273 sink 缺口处置正确**（非 sink 半边全做＋映射交回、⛔ 未发明）｜★派 `384-v1`＋`30-w-r1` ⇒ 写腿 3 满
+
+**① ★★收 `384-r1`（`internal/watchdog` 从"库"变"活着"）**
+- ★★★**四缝全接**：①**真 TreeReader＝`proc.NewTreeSampler(rt.Job)`**（wisp slo 同一 C30 读数面）②**StateFn 接常驻 D43 机器**——Sleeping/Armed/Warm/Conversation 同名直映、**其余 16 态无 D32 采样行 ⇒ 零 SLOState fail-closed 跳 tick**（★**⛔ 不给会话活跃态套错行 cap＝D32③ 有害形状反面**）③**OnAlert 按表内现行行映射**（#9 留 Armed＋kws.keep-alive-alert／#35 落 WatchdogAlert＋one-click-restart／Leak 与非 Armed Overrun→日志/UI 不派发——**未列转移一律非法、零发明边**）④**panel-webview 真组件注册**（nil/无窗/在看三 skip 臂＋隐藏窗真 Destroy；**long-output-buffers/goja-vm/bm25-index-cache 无生产对象 ⇒ 不注册＝白名单查表天然跳过、具名申报不造假组件**）
+- ★★★**273 sink 申报（派单第一核的正确处置）**：★**273 未 -done、AC#2 三形未选形 ⇒ sink 缺**；★**处置＝做全部非 sink 半边＋映射具名交回**（生产机器 Sink=nil ⇒ Effect 落包内 no-op、**转移/留态真**；映射走 `rv.machine.Dispatch` 机器自有 Sink 字段 ⇒ **273 落真 Sink 时本缝零改动**）；★**⛔ 未发明 sink** ✅
+- ★★★**端到端真机读数**：★真 tick 行=3＋D38b CountByName(watchdog)=1；★**Sleeping 64MB sustain ⇒ 真 unload 趟=1 且 D43 事件零派发**；★**Armed 128MB ⇒ #9 effect=1、机器 STAY Armed**；★**3× settle 败 ⇒ #35 effect=1、机器落 WatchdogAlert**
+- ★★**反向判据两发**：★M1 摘 #9 Dispatch ⇒ 红（never observed kws.keep-alive-alert）／★M2 摘 #35 Dispatch ⇒ 红（**#35 effect=0、机器停 Armed、#9 effect=1 自证定向**）；还原核全过
+- ★★**零回归**：★Test384 3/3＋**Test43 9/9（43-r1 行零触碰）**＋15e 6/6＋**`262/640/902` 逐位同**＋41a2r1/381r2/26R3 全绿＋**watchdog/observe/session/config/statemachine 全 ok**＋d22scan clean＋正控 U+2264 咬红
+- ★**如实申报三件**：①ASR 冷装载案负载敏感红＝HEAD binary 同分布（**四红案单发 4/4 绿**）⇒ 环境抖动非本腿 ②**33r11 census 两枚红＝HEAD 既有**（voice_out releaseLocked/unprepareLocked 未入名册、**归 381 族债**）③**全包 go test 撞 33 族真窗口 0xC0000005**（winlive 未批固有形状、43-r1 同口径只跑定向＋族）
+- ★**staging 教训两条入册**：binary build 树必须=主仓（export 树 build 嵌错 runtime.Caller 路径）；binary 直跑 cwd 必须=包目录
+
+**② ★尺核**：★`51899e7c0` 在／4 枚在／★我复跑 `Test384`＋watchdog 包 ok ✅
+
+**③ ★已派 2 条**
+- ★**`384-v1`（裁）**：五格复核（四缝真伪／273 处置合规／端到端复刻／mutation 复刻）＋可否收口
+- ★★**`30-w-r1`（写、cmd/wisp 独占——384-r1 已让出）**：**票 30 残余③装配缝**（present.New 七通道＋Dispatch 调用点；★**Clipboard 义务=先 CheckText**、★**⛔ 重复设闸**）
+★**写面互斥核**：30-w-r1=cmd/wisp／387-r1=internal/speech／386-r1=tools/mockllm——**零撞**；★**写 3 满** ✅
+
+**④ ★状态**：done=**203**／open=**170**；未推（本轮后现跑）；★**摆机主 1 件**（D43 note）
