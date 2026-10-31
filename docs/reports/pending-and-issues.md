@@ -28789,3 +28789,24 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **⑤ ★在飞**＝**写 1**（`381-r2` cmd/wisp）＋**裁 1**（`42-v1` 已交）＋**`12-slo-v1`（裁）在飞**；**写腿 1 ＜3** ⇒ ★**具名：`43-r1` 必触 cmd/wisp＝排队 381-r2 后；`29-AC#2` golden（`29g-r1` 在飞）已补 1 枚** ⇒ **写腿实数＝`381-r2`＋`config-r1`＋`29g-r1` ＝ 3 枚** ✅（41a2-r1 已交出 cmd/wisp）
 ★票池：done=**199**／open=**169**（**54.5%**）；未推（本轮后现跑）；**摆机主 3 件**（347 追认／216-120-136 报备／Wails 裁定）
+
+## A1301（2026-10-31 13:5x +08，编排者，goal round 31 续）★★★收 `29g-r1`（`4dcfecd5a` 3 枚新件 +851、**我复跑 `TestTicket29_AC2` `ok 1.424s`**）：**票 29 `AC#2` 的验收靶立起来**（★**"没有钉死的靶，装配腿就会先写代码再看它产什么"**）｜★**它发现 `42-r1` 新件一枚 gofmt 假红待自查**（`config/manager_readfail_42r1_windows_test.go`）
+
+**① ★★收 `29g-r1`（`4dcfecd5a` 3 枚 +851：`golden_extract.go` 286／`golden_extract_test.go` 391／`internal/memory/testdata/golden_extract.json` 174）**
+- ★★★**10 段剧本 × 覆盖轴**：偏好／多轮末值生效／习惯多轮修正／**噪声零误报**／★**"别记了"撤销（L1、seed 后撤回 ⇒ `forgets=[pref.tone]`）**／中英混排／纯英文／敏感事实（L1）／★**批量三槽（batch-commit 靶）**
+- ★**值格式逐枚钉死**（zh/en、casual/concise、weekday HH:MM-HH:MM、vscode/goland、mother birthday MM-DD）；★**slot 限 `pref./habit./fact.` 命名空间（SPEC-02 §3）**；★**风险级用真 RiskL0/L1 常量校验**
+- ★★★**对照测试**：★**stub 只读剧本文本（⛔ 不认 case id）**→ 经**真 profile DAO** 落库 → `ListProfiles` 终态比对逐行 `source=extracted`；★**负控四变异（改值/缺槽/多槽/丢撤销）恒红且点名槽位**
+- ★★★**反向判据**：★case-02 期望值改一位 ⇒ **仅 case-02 红、逐字点名、红来自比较器**；★还原核 SHA256 前后一致
+- ★★★**"为何不是装饰"（件里必答、已答）**：★**"没有钉死的靶，装配腿就会先写代码再看它产什么"** —— 金集先钉规格；★**换装三步**：①C5 链实现 `Extractor`（SSE 字节入 `internal/llm/golden` 金流先例、Warm 窗口跑、整任务一个 outcome）②**`newGoldenExtractor()` 单点替换** ③`go test -run TestTicket29_AC2` 绿＝真链复现全部钉死值
+- ★**零回归**：★memory 全包 `rc=0`（37.3s）／session `rc=0`；**我复跑 `TestTicket29_AC2` `ok 1.424s`** ✅
+- ★**写面纪律**：★**仓根 `testdata/**` 零触碰**（金集放 `internal/memory/testdata/` 新目录）✅
+
+**② ★`AC#2` 缺口收窄（★本腿的定位）**
+★从「无金集、无链路」收窄为「**金集＋比较器＋契约已立**；残余＝**C5 LLM 链实现 `Extractor` 接缝（Warm 窗口小调用、整任务一个 outcome＝batch-commit）＋`WarmWindow` 主机装配**」＝ ★**归票 30/35 装配腿**
+
+**③ ★一处交 `config-r1` 自查**
+★`42-r1` 的新件 `internal/config/manager_readfail_42r1_windows_test.go` 进了 **gofmt 假红名单**（★**非 CRLF、是它的新件格式**）⇒ ★**`config-r1` 在飞、交件时自查**
+
+**④ ★写腿满额**：在飞写 ＝ ★**`41a2-r1`（cmd/wisp KWS）／`config-r1`（internal/config 收养修复）／`29g-r1` 已交** ⇒ **实数 2＋golden 已交** ＋ `381-r2` 在飞 ＝ ★**写 3 枚满**（41a2-r1／config-r1／381-r2；29g-r1 已交出）
+★在飞总＝写 3＋裁 1（`12-slo-v1`）＝4 ≤7 ✅
+★票池：done=**199**／open=**169**（**54.5%**）；未推（本轮后现跑）；**摆机主 3 件**
