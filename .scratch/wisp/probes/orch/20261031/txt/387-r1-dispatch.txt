@@ -1,0 +1,2 @@
+存档 2026-10-31 13:3x · 腿 387-r1（票 387 tts.go onnxruntime 守卫、写、internal/speech 独占）——59-r1 仪器发现①
+NewDetector/NewStreamingAsr 都有 checkOnnxruntime 守卫、独 NewMatchaTts 没有 ⇒ 裸跑 go test 崩 0xc0000005（System32 1.17.1 遮蔽）。补同族守卫＋具名 skip＋反向判据（仓外快照真改文件——A380 WalkDir 方法）＋staging 零回归。

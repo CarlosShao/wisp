@@ -28937,3 +28937,34 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **④ ★在飞**＝**写 2**（★`43-r1` cmd/wisp power lifecycle／`59-r1` internal/audio AEC spike）＋**裁 1**（★`41-v1` 票 41 终裁、刚派）——★**写腿 2＜3 的具名**：★**非 cmd/wisp 的可派写面已清**（29-golden／config-收养／102-洞／385-截断全交）、★**其余候选全撞 cmd/wisp（43-r1 占）或等机主（12-AC#8）或等契约批（225）** ⇒ ★**`43-r1` 交件同轮补满**
 ★票池：done=**201**／open=**170**（**54.4%**，票池 371）；未推（本轮后现跑）；**摆机主 3 件**
+
+## A1307（2026-10-31 13:4x +08，编排者，goal round 31 续）★★★收 `59-r1`（`22bfc0274` 12 文件 +2891）：**PRECHECK P15＝NO-GO（本机证据范围内、判语诚实）**——Path C 路线裁决材料齐（两枚翻转条件＋三形代价表）｜★**三枚仪器新发现**（①tts.go 缺守卫⇒开票 387＋派 387-r1 ②SyscallN XMM ③24H2 回环 denormal）｜★派 `59-v1`＋`386-r1` ⇒ 写腿 3 满
+
+**① ★★★收 `59-r1`（`internal/audio/aecspike/` 9 件＋license verdict＋evidence）**
+- ★★★**PRECHECK P15＝NO-GO（本机证据范围内）**——★**判语诚实三处**：①license 格"未完成＝按无 license 记 NO-GO"（★**凭记忆抄 license＝伪造、⛔**）②真跨端点漂移"本机测不了、owner 复跑命令在 evidence §5" ③AEC 引擎本体 CPU"本机测不到（引擎缺席）"
+- ★**三候选判**：★**乙＝webrtc AEC3（票面点名）本机零痕迹＋⛔ 下载边界**（⇒ license NO-GO 在腿射程内）；★**甲＝Windows 内置语音 AEC＝`CoCreateInstance(CLSID_CWMAudioAEC)=0x80040154` 类未注册实锤缺席**（★cgo smoke 真编译真链接真运行、钉定工具链核过）；★丙＝不上 AEC
+- ★★★**回环 rig 真读数**：★lag=493 样本(30.8ms)、**ERLE=16.8dB 单增益**、**ASR 对回声逐字转写「你好我是威斯普今天天气」且扣除后仍转写** ⇒ ★**无 AEC 的 Path C 必自触发、消参考不足够、必须真 AEC（≥30dB 级）**
+- ★★**误触发表 9 格**（silero 产品同源、合成 fixture 如实标注）：★**判别器建议＝barge-in 门＝VAD ∧ corr(far)<0.5**（**自回声 corr≈0.98 vs 外部 ≤0.014**）
+- ★★**CPU**：★消参考链≈0% 核；★**silero VAD 单遍≈26% 核（两遍 53%）⇒ 高于 SPEC-10 暂定 5% 行** ⇒ ★**SPEC-10 回填摆机主（⛔ 未动一字）**
+- ★★★**两枚翻转条件**：**(a) 批准 fetch AEC3 → 票 13 落 deps.toml+license → 重测；或 (b) 在 OS AEC 在场机器上实测 ERLE≥30dB**；★**三形代价表**（甲 OS 内置/乙 AEC3/丙 热键退化）
+
+**② ★★NO-GO 的路线处置（★票面格 7 预授权改道、但 DEFERRED 登记＝契约面 ⇒ 摆机主）**
+- ★**改道本身**：★**26 Path-C 部分／28 Path C／60 自动 defer**（票面格 7 逐字预授权）——★**台账先记改道意向、DEFERRED 五字段登记（SPEC-12 §5）摆机主批**（★**契约面**）
+- ★**摆机主新增 2 件**：①**批准 fetch AEC3（花钱/外部依赖）⇒ 票 13 落 deps.toml+license ⇒ 重测**；或 ②**OS AEC 在场机器实测 ERLE≥30dB**；③**DEFERRED 登记批准**（26-PathC/28-PathC/60）
+
+**③ ★★三枚仪器新发现（都已留 evidence、59-r1 未越界修）**
+1. ★★★**System32 onnxruntime 1.17.1 遮蔽 ⇒ `NewMatchaTts` 崩 0xc0000005——`speech/tts.go` 缺 `checkOnnxruntime` 守卫**（★**NewDetector/NewStreamingAsr 都有、独它没有**）⇒ ★**开票 387 ＋ 派 `387-r1`（写、internal/speech 独占）**
+2. ★★**Go `syscall.SyscallN` 传不了 XMM 寄存器** ⇒ 整型路径调 `ISimpleAudioVolume::SetMasterVolume` **把本进程会话音量写成垃圾≈0 且被 Windows 持久化**（回环"全零"根因）——rig 已用 cgo C 真浮点调用复位 1.0 ⇒ ★**记账：任何要做音量控制的腿 ⛔ syscall 整型路、必须 cgo 浮点**
+3. ★★**24H2+Realtek 回环 tap 把 int16 混音样本按位型塞进 float32**（值=样本×2^-149 全 denormal）——rig 检测后按 2^134 重标定 ⇒ ★**其它腿做音频回环必踩、处方在 evidence §10**
+
+**④ ★★运行期干扰警告**
+★**测量窗口中另有进程向默认端点播放 TTS**（ASR 听到「明天下午三点的会议改到四点」、疑 41a2-r1 测试音频）⇒ ★**并发跑音频类测试互污回环读数 ⇒ 音频类测试错峰**（记入派单模板）
+
+**⑤ ★已派 3 条（写 2＋裁 1）**
+- ★**`59-v1`（裁）**：七格复核（license 判语合法性／cgo smoke／rig 读数／判别器／CPU 登记／NO-GO 翻转条件）＋**关键裁点**：NO-GO 的 defer 是否按票面格 7 自动成立
+- ★★**`387-r1`（写、internal/speech 独占）**：**tts.go 守卫补齐**（同族 NewDetector/NewStreamingAsr 形）＋裸跑不崩＋反向判据（★**仓外快照真改文件——A380 WalkDir 方法**）
+- ★★**`386-r1`（写、tools/mockllm 独占）**：**同类帽逐帽判定**（reasoning 200 帽×3＋max_tokens 字节切——★**有意模拟 ⛔ 动、无意者修**）
+★**写面互斥核**：43-r1=cmd/wisp／59-v1 只读导出树／387-r1=internal/speech／386-r1=tools/mockllm —— **零撞**；★**写 3 满** ✅
+★**尺核**：★`22bfc0274` 在／12 文件在／**我复跑 `internal/audio` ok** ✅
+
+**⑥ ★状态**：done=**201**／open=**171**（387 开后）；未推（本轮后现跑）；**摆机主 6 件**（347 追认／216-120-136／Wails 裁定／**AEC3 fetch 批准**／**OS-AEC 机器实测**／**DEFERRED 登记批准**）
