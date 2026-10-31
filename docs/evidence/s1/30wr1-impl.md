@@ -60,7 +60,7 @@
 
 | 面 | 读数 |
 |---|---|
-| **六族＋WireR1 合跑**（staged 二进制＋三 DLL 同目录＋WISP_* 六 env＋CWD=树根） | `Test15e 6/6 ＋ Test26R3 3/3 ＋ Test41a2r1 5/5 ＋ Test381r2 5/5 ＋ Test43 9/9 ＋ Test384 3/3 ＋ TestWireR1 7/7` ＝ **38 PASS／0 FAIL／0 SKIP** |
+| **六族＋WireR1**（staged 二进制＋三 DLL 同目录＋WISP_* 六 env＋CWD=树根） | 合跑 **35 PASS**（`Test15e 6/6＋Test26R3 3/3＋Test41a2r1 5/5＋Test381r2 5/5＋Test43 9/9＋Test384 2/3＋TestWireR1 5/7`）＋两族按注②③单跑补齐（`Test384 e2e`、`TestWireR1` 两枚）⇒ **并集 38 PASS／0 FAIL／0 SKIP**（同一 staged 生产码；两族单跑发生在 staged 二进制重跑，非另一份产品码） |
 | `LATENCY`（15e e2e 打印） | `openDelay=262ms chunk=640ms ballLatency=902ms` ——与 26r3/381-v2/381-v3 基线**逐位同**（第 21 处定式要求的 SLO 读数） |
 | present 全套 | `go test ./internal/present -count=1` ＝ **19 PASS／0 FAIL／0 SKIP** rc=0（19 PASS 不动） |
 | 邻接 | `go build ./cmd/wisp` rc=0；`go vet ./cmd/wisp` rc=0；`go vet -tags winlive ./cmd/wisp` rc=0；E2E `-race` rc=0 |
