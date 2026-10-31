@@ -1,0 +1,3 @@
+存档 2026-10-31 19:0x · 腿 390-r1（票 390 球单击打断装配腿、写、cmd/wisp 独占——12-r2 已让出）
+球单击→rv.TriggerInterrupt() 挂接（Esc 通路已在、只缺球单击跳）；AC#1 真挂（ball API 扩展须具名交回=冻结面）／AC#2 端到端 ≤400ms（复用 381-r2 staged 测量形状）／AC#3 反向（摘挂接⇒红）／AC#4 零回归六族／AC#5 ⛔ internal/ball 扩展。
+staging 全套（381-v3 清单＋A1326 补卡：DLL 全家含 onnxruntime/五 env/manifest/cwd=包目录）。

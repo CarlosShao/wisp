@@ -29255,3 +29255,21 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ★**我二跑**：staged 二进制＋DLL 拷贝——**仍两红**：①VAD 仍没起来（★**onnxruntime.dll 不在 third_party/sherpa-onnx、我只拷了那个目录**）②**Test12r2SeamCallSites（AST 源码扫描案）0.00s 红＝cwd 不是包目录**（★384-r1 教训：binary 直跑 cwd 必须=包目录）
 - ⇒ ★**判：尺架设失败、非产品红**；★**腿的 staging（完整 381-v3 清单：DLL 全家＋manifest＋WISP_* 五 env＋cwd=包目录）才是对的尺**；★**独立复验由在飞 `12-v1` 承担**（派单已要求完整 staging 复跑）
 - ★**教训入册**：★**cmd/wisp 的定向复跑最小尺＝staged 二进制＋DLL 全家（含 onnxruntime.dll）＋WISP_* 五 env＋manifest 可达＋AST 案 cwd=包目录**——缺一即假红（**与 381-v3 清单合并为一张卡**）
+
+## A1327（2026-10-31 19:0x +08，编排者，goal round 31 续）★★★收 `389-r1`（`651067412` 4 枚 1743 行）：**动态门控把塌峰态拉平**——产品门两态 **0.00/0.00**（基线塌峰 11.5/10min）｜★开票 390（球单击打断）＋派 `389-v1`＋`390-r1` ⇒ 写腿 3 满
+
+**① ★★收 `389-r1`（尺核：★提交在／4 枚在／★我复跑 internal/audio——本轮在 A1327 bash）**
+- ★★★**AC#1 组合门产品形态**：★**`internal/audio/bargein.go`（纯 DSP、零 goroutine、零 internal/speech 依赖——BargeinEpisode 数据接缝把 VAD/ASR 留在调用方）**；★**静态三档（能量∧ASR 文本）＋三件套动态门控**；★**动态语义＝59-v3 两常量的产品化正解：标称 -45 宽松档＋判据在持窗收紧到 -30（"静态 -30 不是产品门"的产品化＝-30 从静态门变动态收紧档）**；★双接缝 Feed/ObserveWindow 同达 Evaluate 唯一决策路径；★**double-talk 不误伤（收紧是裕量交换不是抑制开关）**
+- ★★★**AC#2 两态读数**：★**离线复用 59-w 盘上工件**（零 rig 零实时采捕零 ASR 重跑——**判据在产品门内真实行使、无预 OR 短路**）；★**四格矩阵：-45 轴静态链 good 5.41/collapse 11.50 逐字复现 59-w 基线**；★★**产品门动态开两态 0.00/0.00（塌峰 11.5 拉到好峰水平或更低 ✓）**；★正控 control-26/-36 两轴读数（-36 从"被吃"变"可达"）
+- ★★★**AC#3 反向双闭环**：①产品开关关 ⇒ **塌峰回 11.50/10min 基线复现**；②**仓外 overlay 切断收紧接线 ⇒ 动态开读数与关逐格相同 ⇒ assertion 抓 no-op 红 rc=1**；③还原核 ⇒ 0/0 绿；★**断言全关系判据无 golden**
+- ★★**AC#4/5**：★四数 **94/83/0/11**（对 59-w 基线逐名作差：+11 全本腿、removed=0、FAIL=0）；gofumpt 空／vet 三形状／build 两形状；d22scan clean＋正控＋导出树分母（cmd +1 归在飞 12-r2、本腿零 cmd）
+- ★**照录**：★TestAC247 设备面偶发 1 红＝单跑/复跑 PASS（负载抖动形状、12-r2/384 先例同类）
+- ★**边界全守住**：⛔ cmd/wisp／⛔ internal/{risk,session,speech} 零 import／⛔ AEC3 源/deps.toml／59-w longrun 零改／AC#6 逐字遵守
+
+**② ★开票 390（球单击打断装配＝381 残余①）＋派 `390-r1`（写、cmd/wisp 独占——12-r2 已让出）**
+★**AC#1 真挂**（★**ball API 扩展须具名交回＝冻结面**）／AC#2 ≤400ms（复用 381-r2 staged 形状）／AC#3 反向／AC#4 零回归六族
+
+**③ ★已派 `389-v1`（终裁）**：五格复核（产品形态读码／两态读数复核＋离线复用合法性／反向双闭环复刻／94/83/0/11 作差）＋可否收口
+★**写面互斥核**：390-r1=cmd/wisp／387-r1=internal/speech／386-r1=tools/mockllm／389-v1+12-v1 只读——**零撞**；★**写 3 满** ✅
+
+**④ ★状态**：done=**205**／open=**169**（390 开后）；未推（网络断、本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
