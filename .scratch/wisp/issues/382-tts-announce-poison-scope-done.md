@@ -1,6 +1,6 @@
 # 382 — 票 26 的 `AC7` 播报闸在生产上"有牙无子弹"：`voice-announce` 生产零毒源（零 `Mark`）＋命中后无 L2 确认（R26-5）
 
-- **Status**：**待派**（编排者 2026-10-27 20:3x 立；来源＝票 26 终裁 `26-v1` ＋ `wire-r1` 残余①）
+- **Status**：**DONE-带残余**（2026-10-31 编排者收口：AC#1/3/4/5 翻；AC#2 半格留＝R382-1 cmd/wisp L2 接线、并入票 381 队列）（编排者 2026-10-27 20:3x 立；来源＝票 26 终裁 `26-v1` ＋ `wire-r1` 残余①）
 - **Blocks:** nothing · **Blocked by:** nothing
 - **写面**：`internal/risk/**`（★**闸的作用域寿命在 `risk.Scope.Close`**）＋ ★**`cmd/wisp/**`**（★**毒源接线**；★**与票 381 串行**）
 - **来源逐字**：★`26-v1` 判语「**`AC7` 不勾＝R26-5：调用点半边已收（`speak():864`＋wire-M1 牙）；但生产 `.Mark(` 全仓仍只 `panel_assets.go:245` 一处、`voice-announce` 的 Mark 唯一写者仍是测试；命中后只 `noteProblem` 无 L2 确认**」
