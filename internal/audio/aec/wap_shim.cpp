@@ -15,10 +15,14 @@
  */
 #include "wap_shim.h"
 
+#include <cmath>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "api/scoped_refptr.h"
+#include "api/audio/echo_canceller3_config.h"
+#include "modules/audio_processing/aec3/echo_canceller3.h"
 #include "modules/audio_processing/include/audio_processing.h"
 
 namespace {
@@ -33,6 +37,29 @@ struct WapSession {
 void note_error(WapSession* s, const char* what, int code) {
     s->last_error = std::string(what) + " code=" + std::to_string(code);
 }
+
+// The ticket-392 tuning factory: it hands APM an EchoCanceller3 built from
+// the caller's config - the same class the APM-internal default path would
+// construct, so a tuned session differs from a default one only in the
+// config fields the caller overrode. This is the binding layer's parameter
+// face; the webrtc tree itself is pinned and untouched.
+class TunedEchoControlFactory : public webrtc::EchoControlFactory {
+ public:
+  explicit TunedEchoControlFactory(webrtc::EchoCanceller3Config config)
+      : config_(config) {}
+
+  std::unique_ptr<webrtc::EchoControl> Create(int sample_rate_hz,
+                                              int num_render_channels,
+                                              int num_capture_channels) override {
+    return std::make_unique<webrtc::EchoCanceller3>(
+        config_, std::nullopt, sample_rate_hz,
+        static_cast<size_t>(num_render_channels),
+        static_cast<size_t>(num_capture_channels));
+  }
+
+ private:
+  webrtc::EchoCanceller3Config config_;
+};
 
 }  // namespace
 
@@ -58,6 +85,52 @@ extern "C" void* wap_new(int sample_rate_hz, int* out_err) {
     s->config = webrtc::StreamConfig(sample_rate_hz, 1);
     s->scratch.resize(s->config.num_frames());
     return s;
+}
+
+extern "C" void* wap_new_tuned(int sample_rate_hz, const wap_aec3_tuning* tuning,
+                               int* out_err) {
+    *out_err = 0;
+    if (tuning == nullptr) {
+        return wap_new(sample_rate_hz, out_err);
+    }
+    WapSession* s = nullptr;
+    try {
+        webrtc::EchoCanceller3Config cfg;
+        if (tuning->dominant_nearend_enr_threshold > 0) {
+            cfg.suppressor.dominant_nearend_detection.enr_threshold =
+                static_cast<float>(tuning->dominant_nearend_enr_threshold);
+        }
+        if (tuning->dominant_nearend_trigger_threshold > 0) {
+            cfg.suppressor.dominant_nearend_detection.trigger_threshold =
+                tuning->dominant_nearend_trigger_threshold;
+        }
+        if (tuning->nearend_max_dec_factor_lf > 0) {
+            cfg.suppressor.nearend_tuning.max_dec_factor_lf =
+                static_cast<float>(tuning->nearend_max_dec_factor_lf);
+        }
+        webrtc::EchoCanceller3Config::Validate(&cfg);
+        webrtc::AudioProcessing::Config config;
+        config.echo_canceller.enabled = true;
+        config.echo_canceller.mobile_mode = false;
+        auto apm = webrtc::AudioProcessingBuilder()
+                       .SetConfig(config)
+                       .SetEchoControlFactory(
+                           std::make_unique<TunedEchoControlFactory>(cfg))
+                       .Create();
+        if (!apm) {
+            *out_err = 1;
+            return nullptr;
+        }
+        s = new WapSession();
+        s->apm = apm;
+        s->config = webrtc::StreamConfig(sample_rate_hz, 1);
+        s->scratch.resize(s->config.num_frames());
+        return s;
+    } catch (...) {
+        delete s;
+        *out_err = 2;
+        return nullptr;
+    }
 }
 
 extern "C" void wap_free(void* session) { delete static_cast<WapSession*>(session); }

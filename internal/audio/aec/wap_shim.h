@@ -19,6 +19,18 @@ extern "C" {
  * 2 = allocation/exception). */
 void* wap_new(int sample_rate_hz, int* out_err);
 
+/* The ticket-392 tuning face: the double-talk suppressor overrides applied
+ * to an otherwise-default EchoCanceller3Config, injected through the public
+ * EchoControlFactory seam. Fields <= 0 keep the engine default. Passing a
+ * NULL tuning behaves exactly like wap_new. */
+typedef struct {
+  double dominant_nearend_enr_threshold;  /* default 0.25 */
+  int dominant_nearend_trigger_threshold; /* default 12 */
+  double nearend_max_dec_factor_lf;       /* default 0.25 */
+} wap_aec3_tuning;
+
+void* wap_new_tuned(int sample_rate_hz, const wap_aec3_tuning* tuning, int* out_err);
+
 /* Releases a session created by wap_new. NULL is allowed. */
 void wap_free(void* session);
 

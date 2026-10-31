@@ -66,6 +66,23 @@ package main
 // before the drain starts or after it joins, except the two atomics the
 // drain writes live.
 //
+// WHAT THE KEEPALIVE CHANGES (ticket 392, the 28-r1 warm shape on this
+// surface). The cross-stream resources - the silero session and the
+// streaming resampler - stay hot across announcement windows and retire with
+// the voice link (dispose runs on the C11 cascade's release step in stop()),
+// not with each window. Everything else measures or builds fresh per window,
+// and the readings carry why: the previous window's measured lag was tried
+// as a warm judge seed and measured non-transferable (the fresh verification
+// diverged from the seed while the seeded APM cancelled nothing - the
+// residual rode at the near level and the talker drowned in it), and the APM
+// is a per-stream resource (its echo-path state pairs render with capture
+// inside one stream; a window's end truncates that pairing). So every window
+// runs the pre-392 judge shape - measure, then arm, the ~0.6s blind head
+// 26p-r1's readings carried - on warm model engines. The window itself (the
+// conversation window + the drain) still opens and closes per announcement:
+// the single-reader discipline is the bracket, and between announcements the
+// capture frames belong to the transcript path again.
+//
 // The drain never waits on the far: when the ring does not yet cover the
 // next block the capture keeps draining into the pending buffer (bounded by
 // the announcement itself - the anchor opens with the first synthesis chunk
@@ -172,8 +189,14 @@ type voiceBargeinReadings struct {
 	AecAvailable  bool   // the AEC3 binding was really in the build
 	AecBypass     bool   // the M2 mutant ran the judge on raw capture
 	DynamicOff    bool   // the M1 mutant judged with the static loose chain
-	Lag           int    // measured render-to-capture lag (samples)
+	Keepalive     bool   // the engines were kept across windows (the 392 posture)
+	EngineBuilt   bool   // this window built the engines (a cold arm)
+	EngineWarm    bool   // this window reused the keepalive's hot engines
+	EnginesHot    bool   // engines are held right now (false after dispose)
+	AecTuned      bool   // the AC#2 parameter face was active in this window
+	Lag           int    // the lag the judge was built with (samples)
 	LagStrength   float64
+	ReadySamples  int // capture samples consumed when the judge armed
 	FarSamples    int // far ring size at release
 	FarCuts       int // far samples the ring cap dropped
 	Processed     int // capture samples pushed through the judge
@@ -204,6 +227,21 @@ type voiceBargeinMonitor struct {
 	aecBypass  bool
 	dynamicOff bool
 
+	// The ticket-392 keepalive (the 28-r1 warm-pool shape on this surface):
+	// the cross-stream resources - the silero session and the streaming
+	// resampler - would stay hot across announcement windows and retire with
+	// the voice link, not with each window. Production runs it OFF: the warm
+	// posture was tried and measured unsound here (the second warm window's
+	// echo cancellation failed even with a fresh APM and a fresh measurement
+	// - the 392 readings carry the finding), so the default is the exact
+	// pre-392 byte shape and the tests flip it on to read the warm posture
+	// beside the cold one.
+	keepalive bool
+	// aecTuning is the AC#2 parameter face the integration tests drive; it
+	// applies at the APM's per-window construction, so every window judges
+	// through exactly the parameters its readings name.
+	aecTuning aec.Tuning
+
 	// armed state (owner goroutine, before the drain starts)
 	cancel    context.CancelFunc
 	handle    *observe.Handle
@@ -225,8 +263,12 @@ type voiceBargeinMonitor struct {
 	reason       string
 	convWindow   bool
 	aecAvailable bool
+	engineBuilt  bool
+	engineWarm   bool
+	aecTuned     bool
 	lag          int
 	lagStrength  float64
+	readySamples int
 	episodes     []voiceBargeinEpisode
 	triggers     int
 	processed    int
@@ -245,10 +287,11 @@ type voiceBargeinMonitor struct {
 // scope or a trigger answers every arm with its reason instead of arming.
 func newVoiceBargeinMonitor(frames <-chan []byte, vadModel string, scope *plugin.DisposalScope, trigger func()) *voiceBargeinMonitor {
 	m := &voiceBargeinMonitor{
-		frames:   frames,
-		vadModel: vadModel,
-		scope:    scope,
-		trigger:  trigger,
+		frames:    frames,
+		vadModel:  vadModel,
+		scope:     scope,
+		trigger:   trigger,
+		keepalive: false, // the measured-good default: the exact pre-392 shape
 	}
 	return m
 }
@@ -260,6 +303,27 @@ func (m *voiceBargeinMonitor) setReverseCriteria(aecBypass, dynamicOff bool) {
 		return
 	}
 	m.aecBypass, m.dynamicOff = aecBypass, dynamicOff
+}
+
+// setKeepalive flips the cross-announcement engine keepalive. It must run
+// before arm; the tests use it to read the cold per-window posture (the
+// exact pre-392 shape) beside the warm one.
+func (m *voiceBargeinMonitor) setKeepalive(on bool) {
+	if m == nil {
+		return
+	}
+	m.keepalive = on
+}
+
+// setAECTuning installs the AC#2 parameter face. It applies at the next
+// engine construction; hot engines built under a different tuning are
+// rebuilt cold by the next arm, so a reading never describes stale
+// parameters (the one-parameter-one-firing rule).
+func (m *voiceBargeinMonitor) setAECTuning(t aec.Tuning) {
+	if m == nil {
+		return
+	}
+	m.aecTuning = t
 }
 
 // attachConvGate hands the monitor the capture gate's conversation window.
@@ -295,20 +359,35 @@ func (m *voiceBargeinMonitor) arm() bool {
 	if m.reason != "" {
 		return false
 	}
-	det, err := speech.NewDetector(speech.DetectorConfig{ModelPath: m.vadModel})
-	if err != nil {
-		m.reason = "VAD 没起来：" + err.Error()
-		return false
+	// The cold posture (the tests' switch) rebuilds every window - the
+	// pre-392 shape. The keepalive posture keeps the model engines (the
+	// silero session) and the resampler hot across windows; the APM is a
+	// per-stream resource and is rebuilt every window (see release).
+	if (m.apm != nil || m.det != nil) && !m.keepalive {
+		m.closeEngines()
 	}
-	var apm *aec.Apm
+	cold := m.det == nil
+	if cold {
+		det, err := speech.NewDetector(speech.DetectorConfig{ModelPath: m.vadModel})
+		if err != nil {
+			m.reason = "VAD 没起来：" + err.Error()
+			return false
+		}
+		m.det = det
+	}
+	// The APM: per-stream, every window, under the tuning face this window's
+	// readings will name.
 	if !m.aecBypass {
-		a, aerr := aec.NewApm(audio.TargetRate)
+		if m.apm != nil {
+			_ = m.apm.Close()
+			m.apm = nil
+		}
+		a, aerr := aec.NewApmTuned(audio.TargetRate, m.aecTuning)
 		if aerr != nil {
-			_ = det.Close()
 			m.reason = "AEC3 不可用（本构建没有 -tags webrtcap 的绑定）：" + aerr.Error()
 			return false
 		}
-		apm = a
+		m.apm = a
 	}
 	// The D47 conversation window: capture stays open across SetSpeaking(true)
 	// and the monitor owns the announcement window's frames. Muted still wins
@@ -320,15 +399,16 @@ func (m *voiceBargeinMonitor) arm() bool {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	m.cancel = cancel
-	m.det = det
-	m.apm = apm
 	m.armed = true
-	m.aecAvailable = apm != nil
+	m.aecAvailable = m.apm != nil
 	// Per-announcement reset: the monitor object is reused across the leg's
 	// announcements, and each window's readings must be its own.
 	m.mu.Lock()
 	m.reason = ""
+	m.engineBuilt, m.engineWarm = cold, !cold
+	m.aecTuned = m.aecTuning.Overrides()
 	m.lag, m.lagStrength = 0, 0
+	m.readySamples = 0
 	m.episodes = nil
 	m.triggers = 0
 	m.processed = 0
@@ -393,7 +473,8 @@ func (m *voiceBargeinMonitor) speakFar(samples []float32, engineRate int) {
 // release closes the announcement window: the conversation window goes first
 // (the D16 half-duplex close is back while SetSpeaking(true) still holds, so
 // the frames behind the close are pre-release ones), then the drain is told
-// the far is complete, cancelled, and joined, and the engines come down.
+// the far is complete, cancelled, and joined, and the engines either stay
+// hot (the keepalive posture) or come down (the cold one).
 // Runs on the owner goroutine; speak() declares its defer so this runs
 // BEFORE the capture gate's SetSpeaking(false).
 func (m *voiceBargeinMonitor) release() {
@@ -412,7 +493,25 @@ func (m *voiceBargeinMonitor) release() {
 	if m.handle != nil {
 		<-m.handle.Done()
 	}
-	m.closeEngines()
+	// The keepalive posture: the cross-stream resources - the silero session
+	// and the resampler - stay hot for the next announcement window (the
+	// 28-r1 warm shape). The APM does NOT ride the keepalive: its echo-path
+	// state pairs render with capture INSIDE one stream, and a window's end
+	// leaves that pairing truncated - measured on this surface, a warm APM
+	// carried across an interrupted window cancelled nothing (the residual
+	// rode at the near level and drowned the talker), so the APM is rebuilt
+	// by every arm and its cost is a constructor, not a model load. The cold
+	// posture (the tests' switch) closes everything right here - the exact
+	// pre-392 shape, rebuilt and re-measured by every window. Either way the
+	// dispose() tail below owns the final release.
+	if m.keepalive {
+		if m.apm != nil {
+			_ = m.apm.Close()
+			m.apm = nil
+		}
+	} else {
+		m.closeEngines()
+	}
 	m.armed = false
 	r := m.readings()
 	slog.Info("voice: barge-in monitor released",
@@ -423,7 +522,8 @@ func (m *voiceBargeinMonitor) release() {
 }
 
 // closeEngines releases the engines the arm built (C11: sessions are
-// released, never leaked). Runs after the drain joined.
+// released, never leaked). Runs after the drain joined (release's cold
+// branch) or after the voice link's scope joined everything (dispose).
 func (m *voiceBargeinMonitor) closeEngines() {
 	if m.apm != nil {
 		_ = m.apm.Close()
@@ -434,6 +534,18 @@ func (m *voiceBargeinMonitor) closeEngines() {
 		m.det = nil
 	}
 	m.resampler = nil
+}
+
+// dispose releases the engines the keepalive holds - the C11 cascade tail
+// the voice link's stop() runs after the scope joined every window
+// goroutine: cancel, then join, then release (the 28-r1 alignment - the
+// engines retire with the link, in the cascade's release step, never under
+// a live window). Idempotent.
+func (m *voiceBargeinMonitor) dispose() {
+	if m == nil {
+		return
+	}
+	m.closeEngines()
 }
 
 // readings snapshots the readings (copies; spans deep-copied).
@@ -450,8 +562,14 @@ func (m *voiceBargeinMonitor) readings() voiceBargeinReadings {
 		AecAvailable:  m.aecAvailable,
 		AecBypass:     m.aecBypass,
 		DynamicOff:    m.dynamicOff,
+		Keepalive:     m.keepalive,
+		EngineBuilt:   m.engineBuilt,
+		EngineWarm:    m.engineWarm,
+		EnginesHot:    m.apm != nil || m.det != nil,
+		AecTuned:      m.aecTuned,
 		Lag:           m.lag,
 		LagStrength:   m.lagStrength,
+		ReadySamples:  m.readySamples,
 		Triggers:      m.triggers,
 		Processed:     m.processed,
 		FramesDrained: int(m.framesDrained.Load()),
@@ -493,22 +611,24 @@ func (m *voiceBargeinMonitor) streams() (far, near, res []float32) {
 // bargeinDrain holds the drain goroutine's whole processing state. One
 // goroutine owns it from spawn to join - no locks on any of it.
 type bargeinDrain struct {
-	m           *voiceBargeinMonitor
-	anchor      int
-	anchorSet   bool
-	capCount    int
-	pending     []float32
-	procSamples int
-	lagDone     bool
-	lag         int
-	gate        *audio.BargeinGate
-	vadBuf      []float32
-	onsetRing   []float32
-	eps         []speech.Endpoint
-	triggered   bool
-	floorRing   []float64
-	floorN      int
-	gateHold    int
+	m            *voiceBargeinMonitor
+	anchor       int
+	anchorSet    bool
+	capCount     int
+	pending      []float32
+	procSamples  int
+	lag          int
+	lagStrength  float64
+	gateArmed    bool
+	readySamples int
+	gate         *audio.BargeinGate
+	vadBuf       []float32
+	onsetRing    []float32
+	eps          []speech.Endpoint
+	triggered    bool
+	floorRing    []float64
+	floorN       int
+	gateHold     int
 }
 
 // drain is the announcement window's frame reader and judge: the one reader
@@ -558,9 +678,10 @@ func (m *voiceBargeinMonitor) drain(ctx, scopeCtx context.Context) {
 					continue
 				}
 			}
-			d.pending = append(d.pending, voiceSamples(pcm)...)
-			if !d.lagDone {
-				if !d.measure() {
+			vs := voiceSamples(pcm)
+			d.pending = append(d.pending, vs...)
+			if !d.gateArmed {
+				if !d.armJudge() {
 					continue
 				}
 			}
@@ -569,9 +690,12 @@ func (m *voiceBargeinMonitor) drain(ctx, scopeCtx context.Context) {
 	}
 }
 
-// measure runs once per announcement: the render-to-capture lag online, then
-// the gate armed with it. It answers whether the judge is ready yet.
-func (d *bargeinDrain) measure() bool {
+// armJudge builds the window's judge: wait for the alignment spans, measure
+// the render-to-capture lag online, arm the gate at the measured lag - the
+// pre-392 shape every announcement runs (the warm seed that would have
+// skipped the wait was measured non-transferable on this surface; see the
+// monitor's keepalive comment). It answers whether the judge is ready yet.
+func (d *bargeinDrain) armJudge() bool {
 	m := d.m
 	m.farMu.Lock()
 	farLen := len(m.far)
@@ -585,9 +709,6 @@ func (d *bargeinDrain) measure() bool {
 		}
 		return false
 	}
-	if d.capCount-d.anchor < voiceBargeinAlignFar+voiceBargeinAlignMaxLag {
-		return false
-	}
 	m.farMu.Lock()
 	farHead := append([]float32(nil), m.far[:voiceBargeinAlignFar]...)
 	var farSum float64
@@ -596,13 +717,21 @@ func (d *bargeinDrain) measure() bool {
 	}
 	farRMS := math.Sqrt(farSum / float64(voiceBargeinAlignFar))
 	m.farMu.Unlock()
+
+	// The gate is nil until this returns true, so `pending` is still the
+	// whole unconsumed capture since the anchor here.
+	if len(d.pending) < voiceBargeinAlignFar+voiceBargeinAlignMaxLag {
+		return false
+	}
 	nearWin := append([]float32(nil), d.pending[:voiceBargeinAlignFar+voiceBargeinAlignMaxLag]...)
 	measured, strength := audio.AlignByEnvelopeCorrelation(farHead, nearWin, voiceBargeinAlignMaxLag)
 	if measured < 0 || strength < voiceBargeinAlignStrength {
 		measured = 0
 	}
 	d.lag = measured
-	d.lagDone = true
+	d.lagStrength = strength
+	d.gateArmed = true
+	d.readySamples = d.capCount - d.anchor
 	// The announcement window's operating point. The integration surface's
 	// own first staged run measured the shape that pins it: under HEALTHY
 	// matched-echo cancellation both dynamic channels read trusted (the
@@ -634,12 +763,14 @@ func (d *bargeinDrain) measure() bool {
 		})
 	}
 	m.mu.Lock()
-	m.lag, m.lagStrength = d.lag, strength
+	m.lag, m.lagStrength = d.lag, d.lagStrength
+	m.readySamples = d.readySamples
 	m.mu.Unlock()
-	slog.Info("voice: barge-in alignment measured",
+	slog.Info("voice: barge-in judge armed",
 		"lag_samples", d.lag, "lag_ms", d.lag*1000/audio.TargetRate,
-		"strength", math.Round(strength*1000)/1000,
-		"far_rms_dbfs", math.Round((20*math.Log10(farRMS))*100)/100)
+		"strength", math.Round(d.lagStrength*1000)/1000,
+		"far_rms_dbfs", math.Round((20*math.Log10(farRMS))*100)/100,
+		"ready_samples", d.readySamples, "dynamic_gating", !m.dynamicOff)
 	return true
 }
 

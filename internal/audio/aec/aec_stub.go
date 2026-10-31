@@ -11,6 +11,9 @@ package aec
 // NewApm always fails with ErrUnavailable in this build configuration.
 func NewApm(rate int) (*Apm, error) { return nil, ErrUnavailable }
 
+// NewApmTuned always fails with ErrUnavailable in this build configuration.
+func NewApmTuned(rate int, t Tuning) (*Apm, error) { return nil, ErrUnavailable }
+
 // ProcessRender always fails with ErrUnavailable in this build configuration.
 func (a *Apm) ProcessRender(far []float32) error { return ErrUnavailable }
 

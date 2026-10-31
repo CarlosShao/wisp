@@ -28,6 +28,46 @@ import (
 // tag, or the library is absent).
 var ErrUnavailable = errors.New("aec: webrtc-audio-processing binding not built (requires cgo + -tags webrtcap; see deps.toml [webrtc-audio-processing])")
 
+// Tuning is the AEC3 initialization-parameter face (ticket 392 AC#2): the
+// double-talk suppressor knobs the binding exposes at construction time.
+// Every field is an override - the zero value keeps the engine's own default
+// (the exact pre-392 posture), so a zero Tuning builds the identical engine
+// NewApm builds. The parameters ride the public EchoControlFactory seam
+// (AudioProcessingBuilder.SetEchoControlFactory) with an EchoCanceller3Config
+// - no webrtc source change, the C++ tree stays pinned and untouched.
+type Tuning struct {
+	// DominantNearendEnrThreshold overrides suppressor.
+	// dominant_nearend_detection.enr_threshold (engine default 0.25): the
+	// echo-to-nearend ratio under which the nearend-dominant state may
+	// engage. The nearend state is the transparent suppressor tuning - the
+	// state where the engine stops eating the near talker - so raising it is
+	// the double-talk damage lever: the state engages while the talker and
+	// the echo are still comparable instead of only when the talker
+	// dominates outright.
+	DominantNearendEnrThreshold float64
+	// DominantNearendTriggerThreshold overrides suppressor.
+	// dominant_nearend_detection.trigger_threshold (engine default 12, i.e.
+	// 12 consecutive 64-sample blocks ~= 48ms of evidence): how long the
+	// nearend evidence must hold before the state engages. Lower engages
+	// faster inside a barge-in.
+	DominantNearendTriggerThreshold int
+	// NearendMaxDecFactorLf overrides suppressor.nearend_tuning.
+	// max_dec_factor_lf (engine default 0.25): the per-frame drop floor of
+	// the low-band suppression gain while the nearend state holds. Higher
+	// makes the dive into deep suppression slower after strong nearend, so
+	// the talker's first syllables survive more of the engine's own
+	// suppression.
+	NearendMaxDecFactorLf float64
+}
+
+// Overrides reports whether any field carries a non-default instruction
+// (all three knobs are positive quantities, so zero means "unset").
+func (t Tuning) Overrides() bool {
+	return t.DominantNearendEnrThreshold > 0 ||
+		t.DominantNearendTriggerThreshold > 0 ||
+		t.NearendMaxDecFactorLf > 0
+}
+
 // Apm is one mono AEC3 pipeline at a fixed sample rate. A zero Apm is not
 // usable; obtain one from NewApm.
 type Apm struct {

@@ -737,6 +737,13 @@ func (rv *residentVoice) stop() {
 			slog.Warn("voice: disposal did not complete cleanly", "scope", res.Scope, "timed_out", res.TimedOut)
 		}
 	}
+	// TICKET 392: the barge-in monitor's keepalive engines (the AEC3 session
+	// with its learned echo path, the silero session) ride the same C11
+	// cascade's release step - the scope join above covered the drain, so
+	// the engines go down on a joined tree. Idempotent.
+	if rv.bargein != nil {
+		rv.bargein.dispose()
+	}
 	// The queue is closed AFTER the consumer is joined: a post that lands between
 	// the two is refused (counted) instead of growing work nobody will run.
 	if rv.queue != nil {

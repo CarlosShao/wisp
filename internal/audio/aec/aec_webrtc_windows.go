@@ -36,6 +36,30 @@ func NewApm(rate int) (*Apm, error) {
 	return &Apm{rate: rate, frame: rate / 100, sess: sess}, nil
 }
 
+// NewApmTuned is NewApm with the ticket-392 parameter face: the overrides
+// in t ride the public EchoControlFactory seam into an EchoCanceller3Config
+// at construction. A zero Tuning builds the byte-identical default engine
+// (it answers NewApm exactly); a tuned build is reported by the readings
+// that carry the tuning (392 AC#2's one-parameter-one-firing discipline).
+func NewApmTuned(rate int, t Tuning) (*Apm, error) {
+	if !t.Overrides() {
+		return NewApm(rate)
+	}
+	if rate <= 0 || rate%100 != 0 {
+		return nil, fmt.Errorf("aec: unsupported rate %d", rate)
+	}
+	var ct C.wap_aec3_tuning
+	ct.dominant_nearend_enr_threshold = C.double(t.DominantNearendEnrThreshold)
+	ct.dominant_nearend_trigger_threshold = C.int(t.DominantNearendTriggerThreshold)
+	ct.nearend_max_dec_factor_lf = C.double(t.NearendMaxDecFactorLf)
+	var cerr C.int
+	sess := C.wap_new_tuned(C.int(rate), &ct, &cerr)
+	if sess == nil {
+		return nil, fmt.Errorf("aec: wap_new_tuned failed (code=%d)", int(cerr))
+	}
+	return &Apm{rate: rate, frame: rate / 100, sess: sess}, nil
+}
+
 // ProcessRender feeds one 10ms far (render) frame. The echo canceller
 // buffers the reference internally; call it before the matching capture
 // frame of the same tick.
