@@ -1,0 +1,4 @@
+存档 2026-10-31 14:1x · 腿 contract-r1（契约文字执行腿、写）——★机主已批两项契约改动（A1311④⑤）
+①SPEC-10 §3.1 CPU 行：5% 暂定 → 实测（silero VAD 单遍≈26% 核/两遍 53%、消参考≈0%、AEC 引擎本体 TBD）——凭 59r1-aec-spike.md §CPU＋机主「批准 CPU 改真」。
+②SPEC-12 §5 DEFERRED 登记：26-PathC 部分／28-PathC／60 三条五字段齐全（内容/原因=PRECHECK NO-GO/重开条件=AEC3 重测 PASS 或 OS-AEC 机器 ERLE≥30dB/追踪=票 26/28/60+台账 A1307/A1311/影响），标注机主已批。
+⛔ 只动这两处文字、⛔ PLAN.md、⛔ 其它 spec 任何一行；编辑前后逐字引用。

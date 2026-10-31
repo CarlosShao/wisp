@@ -1,0 +1,4 @@
+存档 2026-10-31 14:1x · 腿 aec3-r1（AEC3 fetch+接入+重测腿、写）——★机主已批下载（A1311③，「批准下载 AEC3」）＝⛔下载边界对 AEC3/webrtc-audio-processing 解除（仅此）
+目标：把 webrtc AEC3（主流封装＝webrtc-audio-processing，PulseAudio 打包、BSD 类 license）接进回环 rig ⇒ 实测 ERLE（对照 59-r1 基线 16.8dB、判据 ≥30dB）⇒ PRECHECK P15 重裁材料。
+步骤：fetch（license 文件先入 evidence）→ deps.toml 登记（票 13 形状）→ Windows mingw-w64 钉定工具链构建（59-r1 已证 cgo 面可用）→ 接 rig 重测 → ERLE 读数＋PASS/NO-GO 材料。
+写面：internal/audio/**（新 aec 子包或 aecspike 扩展）＋deps.toml＋evidence。⛔ cmd/wisp、⛔ internal/speech 语义。59-r1 的 rig/三枚仪器发现（SyscallN XMM/24H2 denormal/PATH 遮蔽）直接用。音频测试错峰（41a2 干扰教训）。

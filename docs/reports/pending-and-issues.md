@@ -29026,3 +29026,23 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ★**新增 ⑦：D43 note 文字**（§16.11#10 挂起遇 L2＝一律作废＋按拒绝＋计数、恢复不重放——**S7 切片卡定案项**）
 ★**尺核教训入册**：★43-r1 复跑我在册台型补 PATH 一次过（**A1307补 的默认动作生效**）
 ★票池：done=**202**／open=**170**；未推（本轮后现跑）；**摆机主 7 件**
+
+## A1311（2026-10-31 14:1x +08，编排者，goal round 31 续）★★★**机主六件批复全清**（逐字：「347 认可、批准下载 AEC3、批准推迟、批准 CPU 改真、#32 挂起、Wails 认可」；**D43 note 未提＝仍挂**）｜★**执行：347 追认落账／两项契约改动派 `contract-r1`／AEC3 派 `aec3-r1`**
+
+**① ★★批复逐件执行**
+1. ★**347 认可** ⇒ ★**票 347 -done 已追机主追认行**（AC#0 自裁「一」闭环、无 revert）✅
+2. ★★★**批准下载 AEC3** ⇒ ★**⛔下载边界对 AEC3/webrtc-audio-processing 解除（仅此）** ⇒ ★**派 `aec3-r1`（写）**：fetch（license 先入 evidence）→ deps.toml 登记 → 钉定工具链构建 → 接 59-r1 rig 重测 ⇒ **ERLE 对照基线 16.8dB、判据 ≥30dB ⇒ PRECHECK P15 重裁材料**
+3. ★**批准推迟** ⇒ ★**DEFERRED 登记（SPEC-12 §5 五字段×3：26-PathC/28-PathC/60）派 `contract-r1` 执行**；★**重开条件写死**＝AEC3 重测 PASS 或 OS-AEC 机器 ERLE≥30dB（★**批了推迟≠放弃——闸门钥匙同时发**）
+4. ★**批准 CPU 改真** ⇒ ★**SPEC-10 §3.1 CPU 行 5%→实测**（派 `contract-r1` 执行、凭 59r1 evidence）
+5. ★**#32 挂起** ⇒ ★**记账挂起**（现行 #5 重武装自愈已 e2e 兜住；**冻结面钩永不自作**）
+6. ★**Wails 认可** ⇒ ★**A1295④ 裁定终局**（重开触发器仍记档：D10 多窗口/D41 更新链/WebView2 撞墙）
+
+**② ★未答项**
+★**D43 note 文字**（§16.11#10 挂起遇 L2＝一律作废）**仍挂**——★**43-r1 的实现走的是表内 #24 行（表未动）** ⇒ **行为已正确、只差 PLAN 文字**，不阻塞
+
+**③ ★已派 2 条**
+- ★★★**`aec3-r1`（写、internal/audio＋deps.toml）**：**Path C 闸门钥匙**——fetch（license 先入 evidence）→ deps.toml（票 13 形状）→ mingw-w64 构建 → 接 rig 重测 ERLE
+- ★**`contract-r1`（写、docs/specs 两处）**：**两项已批契约文字的精确执行**（★**编辑前后逐字引用、⛔ 别处一字不动**）
+★**写面互斥核**：384-r1=cmd/wisp／387-r1=internal/speech／386-r1=tools/mockllm／59-v1+43-v1 只读／aec3-r1=internal/audio＋deps.toml／contract-r1=docs/specs 两处——**零撞**；★**写 5 满**（超 ≥3 目标、机主"不要客气"指令持续有效）、总派发 6 ≤7 ✅
+
+**④ ★状态**：done=**202**／open=**170**；未推（本轮后现跑）；★**摆机主剩 1 件**（D43 note 文字——不阻塞）
