@@ -1,0 +1,4 @@
+存档 2026-10-31 17:5x · 腿 389-r1（票 389 Path-C barge-in 组合门+动态门控、写、internal/audio 独占——12-r2 在飞 cmd/wisp）
+来源＝59-v3 终判 PASS＋DEFERRED 重开条件满足（机主批推迟时预设）。设计输入两头钉死：59wr1-longrun-gates.md §5 三件套判据（CollapseDetector/采捕自相关/FractionalLag）＋59-v3-verdict.md §3 两常量（静态 -30 非产品门、必须配动态门控；-30/-36 裕量重测加严）。
+AC#1 组合门产品形态（VAD∧能量∧ASR 文本门+动态门控落 internal/audio）／AC#2 好峰塌峰两态误触发率（对照 59-w 5.4/11.5 基线）／AC#3 反向（摘动态门控⇒塌峰回升红）／AC#4 零回归 83/73/0/10 基线／AC#5 ⛔ cmd/wisp（12-r2 在飞）/internal/{risk,session,speech}／thresholds／AC#6 集成边界=400ms/产品麦面零转写/-30 裕量归票 26 集成面（⛔ rig 已饱和、⛔ 再开测量腿）。
+复用资产：D:\tmp\wisp\20261031\aec3r1\build\libwebrtc_audio_processing.a＋internal/audio/aec 绑定层＋59-w 的 rig 长窗/三件套。
