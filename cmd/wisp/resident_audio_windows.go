@@ -192,6 +192,15 @@ func (ra *residentAudio) toggleMute() (string, bool) {
 	// from claiming a device the user just closed, or denying one they opened.
 	// It crosses threads (this body is ui-sta, boot reads it), so it is a Store.
 	ra.started.Store(gate.Open())
+	// Ticket 41: the voice machine's half of the gesture. The gate flip is this
+	// leg's (ticket 290's ruling, unchanged); the D43 walk of the rows that EXIST
+	// (#8 from Armed, #10 from Muted, the KwsLoaded guard deciding) is posted to
+	// the voice owner from here. nil-safe: a boot whose voice leg does not exist
+	// yet, or whose machine is neither Armed nor Muted, walks nothing - the
+	// Sleeping posture stays dispatch-free exactly as 290 ruled. The line sits
+	// after the one real flip and before every return, so the machine cannot
+	// disagree with the gate about what the user just did.
+	ra.voice.onMuteGesture()
 
 	switch {
 	case gate.Muted():

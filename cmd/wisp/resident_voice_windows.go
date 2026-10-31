@@ -35,12 +35,13 @@ package main
 // Plus AC#1's last clause, which needs all three: the ball walks
 // Listening -> Thinking. That walk is the D43 table's rows #4 and #11, driven by
 // the endpoint events this file consumes - not by a state this file sets
-// directly. Row #4 is Sleeping + EvSummon -> Listening and it is the ONLY legal
-// way into Listening (row #7 needs a wake word, ticket 41, and the summon hot
-// key has no executor in this process), so "the user spoke while the microphone
-// was open" is dispatched as the summon. That is a wiring decision, not a table
-// change: when ticket 41 lands KWS this dispatch becomes EvWakeWord and the
-// table stays byte-identical.
+// directly. Row #4 is Sleeping + EvSummon -> Listening and, for a boot with no
+// wake-word engine, it is the ONLY legal way into Listening, so "the user spoke
+// while the microphone was open" is dispatched as the summon - a wiring
+// decision, not a table change. Ticket 41 landed KWS and the reserved sentence
+// came true: an ARMED boot wakes through row #7 instead (beginKwsWake dispatches
+// EvWakeWord, the table byte-identical), Sleeping keeps the summon for the
+// re-arm ordering, and the header comment 41-a1 read is now the shipped shape.
 //
 // WHY THE HAND-OFF IS GATED ON SPEECH AND NOT ON BOOT (the shape everything
 // else here follows). SPEC-04 sec 7.1 says a model is fetched on the FIRST USE
@@ -131,16 +132,32 @@ const (
 	voicePunctModelID = "punc-ct-transformer-zh-en-vocab272727"
 	voicePunctFile    = "model.int8.onnx"
 
-	// The matcha checkpoint's manifest id and the artifact names inside it. The
-	// vocoder is the manifest's second `files` entry (no archive), so it lands in
-	// the same directory. Status: blocked-p3 - this is a dev/measurement TTS, not
-	// the product's default (R5, ticket 61); nothing here selects an engine.
+	// voiceTtsModelID / voiceTtsAcoustic ... are the matcha checkpoint's manifest
+	// id and the artifact names inside it. The vocoder is the manifest's second
+	// `files` entry (no archive), so it lands in the same directory. Status:
+	// blocked-p3 - this is a dev/measurement TTS, not the product's default (R5,
+	// ticket 61); nothing here selects an engine.
 	voiceTtsModelID  = "tts-matcha-zh-baker"
 	voiceTtsAcoustic = "model-steps-3.onnx"
 	voiceTtsVocoder  = "vocos-22khz-univ.onnx"
 	voiceTtsLexicon  = "lexicon.txt"
 	voiceTtsTokens   = "tokens.txt"
 	voiceTtsDict     = "dict"
+
+	// Ticket 41's wake-word entry: the manifest id (purpose "kws", status ok,
+	// license Apache-2.0, quant int8) and the artifact names its archive pins.
+	// The store spelling is epoch-12-avg-2; the dev copies under third_party
+	// carry an epoch-99 spelling whose int8 triple hashes bit-identical to these
+	// (measured before this leg landed), so both spellings build the same engine
+	// the 41-a2 engine leg measured. The store paths are filled into
+	// speech.KwsConfig's five fields directly; the engine's own package constants
+	// are never consulted for the store layout.
+	voiceKwsModelID  = "kws-zipformer-wenetspeech-3.3M-2024-01-01"
+	voiceKwsEncoder  = "encoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx"
+	voiceKwsDecoder  = "decoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx"
+	voiceKwsJoiner   = "joiner-epoch-12-avg-2-chunk-16-left-64.int8.onnx"
+	voiceKwsTokens   = "tokens.txt"
+	voiceKwsKeywords = "keywords.txt"
 )
 
 // voiceTtsRuleFsts are the three text-normalisation graphs the checkpoint ships.
@@ -237,10 +254,51 @@ type voicePlan struct {
 	// process cannot speak: the announcement path says so and the D10 notification
 	// remains the delivery path.
 	Tts voiceTtsFiles
+	// Kws is the wake-word checkpoint's file set (ticket 41), resolved off the
+	// same store layout when [voice] wake_word.enabled asks for it. Incomplete
+	// means this process arms no wake-word engine and stays in Sleeping: the
+	// chain runs exactly as ticket 41 found it, and KwsNote says which of the
+	// two reasons (opt-in off, model missing) produced the empty set.
+	Kws     voiceKwsFiles
+	KwsNote string
 	// WarmTimeout is [session].warm_timeout_sec: how long the engines stay hot
 	// before the Settling window starts. 0 means the session package's own default
 	// (90 s), which is also the config default.
 	WarmTimeout time.Duration
+}
+
+// voiceKwsFiles is the KWS transducer triple plus its token and keyword tables,
+// spelled as the five paths speech.KwsConfig wants. The manifest pins each
+// file's sha256; this leg checks existence only, because the store's own
+// verification (hashes, signature) is models.go's - the same split the VAD, the
+// punctuation stage and the TTS checkpoint already follow.
+type voiceKwsFiles struct {
+	Encoder  string
+	Decoder  string
+	Joiner   string
+	Tokens   string
+	Keywords string
+}
+
+// complete reports whether every field KwsConfig requires is present. A partial
+// set is not a KWS this leg may load: NewKwsEngine refuses an empty path, and a
+// leg that tried anyway would spend an engine construction on a refusal.
+func (f voiceKwsFiles) complete() bool {
+	return f.Encoder != "" && f.Decoder != "" && f.Joiner != "" && f.Tokens != "" && f.Keywords != ""
+}
+
+// kwsConfig fills speech.KwsConfig's five fields directly off the resolved
+// paths. The threshold stays at the package constant (DefaultKwsThreshold
+// 0.1): the API defaults (1.0/0.25) score zero hits on the engine leg's own
+// fixtures, and 41-a2 measured 0.1/3.0 against the checkpoint's test_wavs.
+func (f voiceKwsFiles) kwsConfig() speech.KwsConfig {
+	return speech.KwsConfig{
+		EncoderPath:  f.Encoder,
+		DecoderPath:  f.Decoder,
+		JoinerPath:   f.Joiner,
+		TokensPath:   f.Tokens,
+		KeywordsPath: f.Keywords,
+	}
 }
 
 // voiceTransition is one D43 edge this leg actually walked. AtSample is the
@@ -325,11 +383,23 @@ type residentVoice struct {
 	speakGateOn  atomic.Uint64
 	speakGateOff atomic.Uint64
 
-	// warmFeed is D43 #26's mic.keep-off as this chain can honestly implement it:
-	// the frames keep draining (the detector still needs them to hear the summon)
-	// but nothing they produce reaches the text path until a wake resumes the
-	// session. Set by the session scope's MicClose hook, cleared on Resume.
+	// warmFeed is D43 #26's mic.keep-off, and since ticket 41 a REAL feed gate:
+	// the frames keep draining, but with a wake-word engine resident nothing they
+	// produce reaches the text path until a wake resumes the session - the KWS
+	// is the ears instead (R28-2's landing: Warm 期间 ASR 不再吃帧). Without a
+	// resident KWS the gate keeps the wire-r1 latch shape: the transcript path
+	// stays the only wake source and eats the frames exactly as it did before.
+	// Set by the session scope's MicClose hook, cleared on Resume.
 	warmFeed atomic.Bool
+
+	// kwsWake is ticket 41's wake-word engine, loaded once in start() when the
+	// opt-in asks for it and the model resolved (the same boot-thread precedent
+	// the VAD session follows: building it inside the consumer loop would drop
+	// the first frames of whatever the microphone was already saying). The
+	// consumer goroutine is its only Accept caller (D38b) and closes it on its
+	// way out; arming and pausing are the state machine's business, expressed
+	// here as the kwsFeed gate below - never as engine methods.
+	kwsWake speech.WakeWordEngine
 
 	announceMu      sync.Mutex
 	announcePending []voiceAnnounceRequest
@@ -383,6 +453,17 @@ type residentVoice struct {
 	// asrGone is set by the announce path when a family swap released the ASR the
 	// running transcriber still holds; the loop re-arms phase 1 on it.
 	asrGone atomic.Bool
+
+	// Ticket 41's feed counters. kwsFedSamples counts every sample handed to the
+	// wake-word engine, asrFedSamples every sample handed to the transcriber's
+	// Accept; the Warm reading is the PAIR of them (the KWS count advances while
+	// the ASR count stands still), which is what makes "the gate really gates" a
+	// reading instead of an inference. kwsHits/kwsVetos count the engine's two
+	// hit kinds separately, because they walk different D43 rows.
+	kwsFedSamples atomic.Int64
+	asrFedSamples atomic.Int64
+	kwsHits       atomic.Uint64
+	kwsVetos      atomic.Uint64
 
 	mu       sync.Mutex
 	timeline []voiceTransition
@@ -546,10 +627,31 @@ func (rv *residentVoice) start(reg *observe.Registry) {
 	// The mic half of "Warm closes the microphone FIRST". What this chain can
 	// honestly close is the FEED, not the device: the C8 frames that carry the wake
 	// in are the capture leg's, and a chain that switched the device off in Warm
-	// would never hear the next utterance (KWS, the other wake source, is ticket
-	// 41). So the hook closes what reaches the agent, and the evidence table names
-	// that shape instead of claiming a device close it did not do.
+	// would never hear the next utterance. Since ticket 41 the Warm ears are the
+	// wake-word engine (the frames keep feeding IT while the text path's feed
+	// stays closed), which is what makes the feed gate below a real gate instead
+	// of the latch wire-r1 could honestly build.
 	rv.residency.onMicClose = func() { rv.warmFeed.Store(true) }
+	// Ticket 41's arm: the opt-in asked for the wake word and the model resolved,
+	// so the engine is built HERE - on the boot thread, before the consumer is
+	// booked, for the same measured reason the VAD session is (a construction
+	// inside the loop would drop the first frames of whatever the microphone was
+	// already saying). A successful build walks D43#5: Sleeping + EvKwsEnabled ->
+	// Armed, with the engine as the kws.load side effect this wiring executes. A
+	// refusal is a boot sentence and a Sleeping process, never a half-armed one.
+	if rv.plan.Kws.complete() {
+		k, kerr := speech.NewKwsEngine(rv.plan.Kws.kwsConfig())
+		if kerr != nil {
+			rv.noteProblem("KWS 没装载（这一进程不进 Armed，唤醒源仍只有 summon 一条）：" + kerr.Error())
+		} else {
+			rv.kwsWake = k
+			rv.dispatch(statemachine.EvKwsEnabled, nil,
+				"唤醒词引擎已装载：D43#5 Sleeping 到 Armed（KWS 是这一进程的常驻唤醒源）")
+			slog.Info("voice: wake-word engine loaded and armed",
+				"model", voiceKwsModelID, "keywords", rv.plan.Kws.Keywords,
+				"goroutine", voiceGoroutineName, "threshold", speech.DefaultKwsThreshold)
+		}
+	}
 	rv.scope.Go(voiceGoroutineName, func(ctx context.Context) { rv.run(ctx, phase1) })
 	slog.Info("voice: consumer booked on the D38b roster",
 		"name", voiceGoroutineName, "category", "temporary (C11 scope)", "ring_seconds", voiceRingSeconds,
@@ -635,6 +737,14 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 			_ = asr.Close()
 		}
 	}()
+	// The wake-word engine is the consumer goroutine's too: it is the only Accept
+	// caller (D38b), so it is the one that releases it (C11).
+	defer func() {
+		if rv.kwsWake != nil {
+			_ = rv.kwsWake.Close()
+			rv.kwsWake = nil
+		}
+	}()
 
 	ring := make([]float32, 0, voiceRingSamples)
 	pausedClosed := false
@@ -658,6 +768,34 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 			}
 			slog.Info("voice: the announce swapped the engine family; phase 1 re-armed",
 				"reason", "tts-resident", "asr_released", true)
+		}
+		// The session's own cascade (90 s warm idle + 3 s settling) released the
+		// engines UNDER a chain this loop still holds: the transcriber's session
+		// is closed, and a live chain that keeps feeding it would silence the
+		// wake forever (a released session's Feed is the contract's no-op). The
+		// honest move is the announce branch's: drop the transcriber, forget the
+		// in-flight chain, re-arm phase 1 - the next wake starts a fresh chain
+		// and pays the load it really owes. The guard is the LIVE transcriber,
+		// nothing else: a chain still walking (tr == nil, the first epoch not
+		// open yet) must NOT fire this - stage() answers Disposed for a residency
+		// that never opened a scope, and resetting handOffStarted mid-walk is
+		// what turns one wake into four loads. A chainless boot self-heals
+		// instead: every wake path's acquireTurn opens a fresh epoch when the
+		// scope is gone. This runs on the owner goroutine between queue jobs, so
+		// it can never observe a half-finished family change (those complete
+		// inside one queued job).
+		if tr != nil && rv.residency != nil && rv.residency.stage() == session.StageDisposed {
+			tr, asr = nil, nil
+			rv.handOffStarted = false
+			rv.asrLoaded.Store(false)
+			if det, derr := speech.NewDetector(speech.DetectorConfig{ModelPath: rv.plan.VadModelPath}); derr != nil {
+				rv.noteProblem("会话级联释放后重建 VAD 失败：" + derr.Error())
+				return
+			} else {
+				phase1 = det
+			}
+			slog.Info("voice: the session cascade disposed the engines; phase 1 re-armed",
+				"reason", "settling-expiry", "asr_released", true)
 		}
 		if rv.paused.Load() {
 			if !pausedClosed {
@@ -719,6 +857,16 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 				if rv.handOffStarted {
 					continue
 				}
+				// Ticket 41's insertion point: the frame pipeline, after the ring.
+				// A hit inside kwsFeed dispatches its own D43 row (see onKwsHit);
+				// while the machine is Armed the wake-word engine is the ONLY
+				// legal ears - the phase-1 endpoint has no row out of Armed (row
+				// #4 needs a Sleeping machine), so the VAD is not fed here and a
+				// plain utterance without the wake word stays unheard. That is
+				// the privacy property Armed exists for, not a defect.
+				if rv.kwsFeed(samples) && rv.machine.State() == statemachine.StateArmed {
+					continue
+				}
 				eps = phase1.Accept(samples, eps[:0])
 				if len(eps) > 0 {
 					rv.beginHandOff(eps[0])
@@ -745,12 +893,26 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 			}
 			rv.drained.Add(1)
 			rv.fed.Add(int64(len(pcm)))
+			samples := voiceSamples(pcm)
 			// The ring is kept for the whole life of the chain since wire-r1, not
-			// only until the first speech: a Warm wake replays it the same way the
-			// first-use switchover does, so the utterance that woke the session is
-			// not clipped at the point the feed was opened.
-			ring = voiceRingAppend(ring, voiceSamples(pcm))
-			outs = tr.Accept(voiceSamples(pcm), outs[:0])
+			// only until the first speech. With the ticket-41 gate the Warm wake
+			// no longer replays it: the frames that closed the feed went to the
+			// wake-word engine, and the audio a KWS wake woke on is the WAKE WORD
+			// itself, which is not a command - replaying it would hand 「你好军哥」
+			// to the agent as a task. The ring stays the first-use switchover's
+			// replay history, and the wake-word-utterance handling is named in
+			// 41a2r1's evidence table rather than papered over.
+			ring = voiceRingAppend(ring, samples)
+			if rv.warmFeed.Load() && rv.kwsFeed(samples) {
+				// The feed gate, ticket 41 (R28-2's landing): Warm closed the
+				// text path and the wake-word engine ate the frame as the wake
+				// source. The transcriber sees nothing until a wake reopens the
+				// gate; without a resident KWS the gate keeps the wire-r1 latch
+				// shape and the transcript path stays the wake source.
+				continue
+			}
+			outs = tr.Accept(samples, outs[:0])
+			rv.asrFedSamples.Add(int64(len(samples)))
 			rv.consume(outs)
 		}
 	}
@@ -760,13 +922,25 @@ func (rv *residentVoice) run(ctx context.Context, phase1 *speech.Detector) {
 // AND the engine load on the roster's own model thread. It runs once per process,
 // on the asr-infer goroutine, and it deliberately does NOT wait - waiting is what
 // would drop the audio (see run).
+//
+// Since ticket 41 this is the VAD endpoint's entry only; the wake-word entry is
+// beginKwsWake below. Both share startChainLoad - the walk and the load are the
+// same machinery, only the D43 row that justifies them differs.
 func (rv *residentVoice) beginHandOff(start speech.Endpoint) {
 	rv.handOffStarted = true
 	rv.recordTurnOpen(start, rv.fed.Load())
 
 	rv.dispatch(statemachine.EvSummon, nil,
-		"麦克风开着时的第一次语音：D43#4（唤醒词是票 41、召唤热键在本进程没有执行器，所以语音就是 summon）")
+		"麦克风开着时的第一次语音：D43#4（本进程没武装唤醒词时语音就是 summon；KWS 武装后 Sleeping 只有重武装一条路，见 onKwsHit）")
 
+	rv.startChainLoad()
+}
+
+// startChainLoad is the walk-and-load half the two wake entries share: the model
+// hand-off and the ASR engine load run on the roster's model thread while the
+// consumer keeps draining into the ring, and the buffered channel is how the
+// ready engines (or the reason there are none) come back.
+func (rv *residentVoice) startChainLoad() {
 	rv.handOffs.Add(1)
 	rv.mu.Lock()
 	rv.askedFor = append(rv.askedFor, voiceAsrModelID)
@@ -807,6 +981,130 @@ func (rv *residentVoice) beginHandOff(start speech.Endpoint) {
 	})
 	slog.Info("voice: model hand-off and engine load started on the roster's model thread",
 		"goroutine", voiceHandOffGoroutine, "id", voiceAsrModelID, "dir", rv.plan.AsrDir)
+}
+
+// kwsFeed hands one frame's samples to the wake-word engine and answers whether
+// it ate them. It is the ARming gate: the engine runs when the machine is Armed
+// (D43#5 made it the resident wake source) or when the text feed is closed in the
+// Warm posture (ticket 41's ruling: the Warm gate stays open and the KWS is the
+// ears). Every other state is D43#7's kws.pause - Listening's floor belongs to
+// the ASR, Speaking's to the announcement, and a released engine answers
+// silence, so the gate degrades instead of panicking.
+//
+// It runs on the consumer goroutine only (the one Accept caller, D38b); the hit
+// handling happens inline because the D43 dispatches below are owner-goroutine
+// work.
+func (rv *residentVoice) kwsFeed(samples []float32) bool {
+	if rv == nil || rv.kwsWake == nil {
+		return false
+	}
+	if !rv.warmFeed.Load() && rv.machine.State() != statemachine.StateArmed {
+		return false
+	}
+	rv.kwsFedSamples.Add(int64(len(samples)))
+	var hits []speech.KeywordHit
+	hits = rv.kwsWake.Accept(samples, hits)
+	for _, h := range hits {
+		rv.onKwsHit(h)
+	}
+	return true
+}
+
+// onKwsHit routes one keyword detection through the rows the frozen table
+// already has. The veto half is the B1 voice-cancel channel: the interrupt
+// channel 381-r1 reserved for KWS veto words fires first (Speaking has no EvVeto
+// row - the announcement is stopped through the speak loop's interrupt check),
+// and the two states WITH a row walk it. The shipped keyword table carries no
+// veto word (kwsVetoWords is empty in internal/speech), so this branch is wired
+// but cannot fire from this tree's model - said here rather than left implied.
+//
+// The wake half branches on where the machine really is:
+//
+//	Armed       row #7, EvWakeWord -> Listening, plus the chain load the row's
+//	            speech.load-vad-asr side effect names (beginKwsWake).
+//	Sleeping    row #5 first: the machine's own timers (#12) can land it here
+//	            while the engine is still loaded, and #7 needs Armed - the
+//	            re-arm walk is the table's own answer, then #7.
+//	Warm/Settling with a live chain   the wire-r1 wake: open the feed, resume,
+//	            borrow (wakeFromWarm). #29/#33's row exists for EvSummon and the
+//	            warm wake dispatches it from inside.
+//	Warm/Settling with no chain       the post-announce shape (the announce's
+//	            family swap re-armed phase 1): beginKwsWake's Warm branch walks
+//	            #29/#33 and starts the chain load.
+//
+// A hit in any other state is counted and dropped: the table has no row, and a
+// leg that guesses an edge is worse than one that says so.
+func (rv *residentVoice) onKwsHit(hit speech.KeywordHit) {
+	if hit.Veto {
+		rv.kwsVetos.Add(1)
+		rv.TriggerInterrupt()
+		switch rv.machine.State() {
+		case statemachine.StateListening, statemachine.StateConfirming:
+			rv.dispatch(statemachine.EvVeto, nil,
+				"KWS veto 词命中：D43#13/#22（B1 语音取消通道，与唤醒词共用同一模型）")
+		}
+		return
+	}
+	rv.kwsHits.Add(1)
+	if rv.asrLoaded.Load() && !rv.asrGone.Load() {
+		// The chain is live (asrLoaded is reset by exactly the two branches that
+		// retire a chain - the announce swap and the settling dispose), so the
+		// wake is the wire-r1 one: open the feed, resume the session, take the
+		// borrow back. This runs before the in-flight guard below ON PURPOSE:
+		// handOffStarted stays true for the whole life of a live chain, and a
+		// Warm hit must not be swallowed by the wake that started it.
+		rv.wakeFromWarm("kws-wake")
+		return
+	}
+	if rv.handOffStarted {
+		// A chain load is already in flight for an earlier wake; a second hit
+		// must not start a second walk over it.
+		return
+	}
+	state := rv.machine.State()
+	if state == statemachine.StateSleeping {
+		rv.dispatch(statemachine.EvKwsEnabled, nil,
+			"KWS 已装载而机器停在 Sleeping：D43#5 重新武装（机器自己的 #12 定时器会落这里）")
+		state = rv.machine.State()
+	}
+	switch state {
+	case statemachine.StateArmed:
+		rv.beginKwsWake(hit, statemachine.EvWakeWord,
+			"唤醒词命中：D43#7 Armed 到 Listening（KWS 暂停、ASR 按行装载）")
+	case statemachine.StateWarm, statemachine.StateSettling:
+		_, _ = rv.residency.resume("kws-wake")
+		rv.beginKwsWake(hit, statemachine.EvSummon,
+			"Warm 里唤醒词命中：D43#29/#33（表无 Warm+EvWakeWord 行，走 summon 的零装载唤醒）")
+	default:
+		// The table has no row out of this state for a wake (the wire-r1 named
+		// Thinking-parking is the common one): the chain still restarts - the
+		// pipeline work a wake justifies - and the ball stays where the frozen
+		// table left it. Counted here, named in the evidence table.
+		slog.Info("voice: wake-word hit in a state with no wake row; the chain restarts, the ball stays",
+			"state", string(state), "word", hit.Word, "at_sample", hit.At)
+		rv.beginKwsWake(hit, "", "")
+	}
+}
+
+// beginKwsWake is the wake-word entry into the chain load: the turn opens at the
+// hit (on the seam clock, the same clock every other turn reading uses), the row
+// the caller chose is walked, and the walk-and-load machinery starts. An empty
+// ev means the machine had no row to walk (the default branch above): the load
+// starts anyway, and the ball stays where the frozen table put it.
+func (rv *residentVoice) beginKwsWake(hit speech.KeywordHit, ev statemachine.Event, say string) {
+	rv.handOffStarted = true
+	rv.mu.Lock()
+	rv.turns = append(rv.turns, voiceTurn{
+		OpenSample:  rv.fed.Load(),
+		StartSample: rv.fed.Load(),
+	})
+	rv.mu.Unlock()
+	if ev != "" {
+		rv.dispatch(ev, nil, say)
+	}
+	slog.Info("voice: wake-word hit opens the chain load",
+		"word", hit.Word, "engine_at_sample", hit.At, "event", string(ev))
+	rv.startChainLoad()
 }
 
 // abandonChain releases engines the model thread finished opening after the
@@ -903,7 +1201,7 @@ func (rv *residentVoice) consume(outs []speech.Transcript) {
 		// loading anything. Both kinds count, because a short utterance can reach
 		// its final without ever emitting a partial.
 		if rv.warmFeed.Load() && (t.Kind == speech.TranscriptPartial || t.Kind == speech.TranscriptFinal) {
-			rv.wakeFromWarm()
+			rv.wakeFromWarm("utterance-after-warm")
 		}
 		switch t.Kind {
 		case speech.TranscriptPartial:
@@ -932,12 +1230,15 @@ func (rv *residentVoice) consume(outs []speech.Transcript) {
 // wakeFromWarm is D43 #29 (Warm) / #33 (Settling) plus session Resume in one
 // place, and it is the reading ticket 28 AC1 keys on: the acquire it takes is
 // supposed to cost nothing, and the session's own LoadsAfterWarm counter refutes
-// that claim if the warm path lost an engine.
-func (rv *residentVoice) wakeFromWarm() {
+// that claim if the warm path lost an engine. Since ticket 41 it has two
+// callers: the transcript wake (a final after Warm - the shape that exists when
+// no wake-word engine is resident) and the KWS wake (a keyword hit while the
+// feed is closed); the reason names which.
+func (rv *residentVoice) wakeFromWarm(reason string) {
 	rv.warmFeed.Store(false)
 	rv.warmWake.Add(1)
 	resumed := false
-	if ok, err := rv.residency.resume("utterance-after-warm"); err == nil && ok {
+	if ok, err := rv.residency.resume(reason); err == nil && ok {
 		resumed = true
 	}
 	_ = resumed
@@ -1029,6 +1330,49 @@ func (rv *residentVoice) dispatch(ev statemachine.Event, facts *statemachine.Fac
 	rv.ball.setVoiceState(to)
 	slog.Info("voice: D43 walked", "from", string(from), "event", string(ev), "to", string(to), "why", say)
 	return true
+}
+
+// kwsLoaded is the truth source behind the Facts.KwsLoaded guard (rows #10 and
+// #32): an engine object is resident or it is not. Before ticket 41 the fact was
+// assigned nowhere in production; this is the one producer every dispatch that
+// walks a KwsLoaded-guarded row reads.
+func (rv *residentVoice) kwsLoaded() bool {
+	return rv != nil && rv.kwsWake != nil
+}
+
+// kwsFacts is the guard input for those dispatches. Built per call, like every
+// other Facts literal in this leg.
+func (rv *residentVoice) kwsFacts() *statemachine.Facts {
+	return &statemachine.Facts{KwsLoaded: rv.kwsLoaded()}
+}
+
+// onMuteGesture is the voice machine's half of the two mute gestures (the orb's
+// global hot key and the tray's item). The gate flip itself is the capture leg's
+// (ticket 290's ruling, unchanged); what ticket 41 adds is the D43 walk the
+// rows that EXIST make legal: from Armed, #8 (Armed -> Muted, kws.stop-inference
+// - the kwsFeed gate answers it, the engine object stays resident); from Muted,
+// #10 with the real KwsLoaded fact (Armed when the engine is resident, Sleeping
+// when it is not). The Sleeping posture stays dispatch-free exactly as 290
+// ruled: the table has no Sleeping -> Muted edge, and the resting state of a
+// boot without KWS is still Sleeping. The walk runs on the owner goroutine via
+// the queue - the gesture fires on the ui-sta thread, and the ball hop is owner
+// work (D38b).
+func (rv *residentVoice) onMuteGesture() {
+	if rv == nil || rv.machine == nil || rv.queue == nil {
+		return
+	}
+	from := rv.machine.State()
+	if from != statemachine.StateArmed && from != statemachine.StateMuted {
+		return
+	}
+	loaded := rv.kwsLoaded()
+	if !rv.queue.post(func() {
+		rv.dispatch(statemachine.EvMuteKey, rv.kwsFacts(),
+			"静音手势：D43#8/#10（guard=KwsLoaded，Muted 里 KWS 停推理留模型）")
+	}) {
+		slog.Warn("voice: mute gesture arrived after the owner queue closed; the D43 walk is dropped",
+			"from", string(from), "kws_loaded", loaded)
+	}
 }
 
 // drainWhilePaused drains one frame and drops it. It returns false when the
@@ -1230,12 +1574,31 @@ func (rv *residentVoice) posture() string {
 	return fmt.Sprintf("C8 帧通道已接上 1 个消费者（D38b 名册名 %s，C11 作用域 %q）；"+
 		"VAD=%s；ASR 模型 id=%s，字节只在第一次开句时由模型交还通过后从 %s 打开；"+
 		"目前排空 %d 帧／部分结果 %d 条／判停 %d 句／交给文本路 %d 句／模型交还 %d 次（exit=%d）；"+
-		"标点=%s（带标点的 final %d 条）；播报=%s；%s；配置来源 %s",
+		"标点=%s（带标点的 final %d 条）；唤醒词=%s；播报=%s；%s；配置来源 %s",
 		voiceGoroutineName, "voice-15e", rv.plan.VadModelPath, voiceAsrModelID, rv.plan.AsrDir,
 		rv.drained.Load(), rv.partials.Load(), rv.finals.Load(), rv.handed.Load(),
 		rv.handOffs.Load(), rv.handOffExit.Load(),
 		punctState(rv.plan.PunctModelPath, rv.punctAttached.Load()), rv.punctFinals.Load(),
+		rv.kwsReading(),
 		rv.announceReading(), rv.residency.reading(), rv.plan.Source)
+}
+
+// kwsReading is the wake-word half of the posture line, spelled so the three
+// "no KWS" shapes cannot be read as one: the opt-in never asked, the opt-in
+// asked and the model did not resolve, and the engine that was asked for and
+// refused to build (that one is in problems, where every other refusal is).
+func (rv *residentVoice) kwsReading() string {
+	if rv == nil {
+		return "未装配"
+	}
+	if rv.kwsLoaded() {
+		return fmt.Sprintf("已武装（Armed；命中 %d／veto %d／喂入 %d 样本；ASR 吃 %d 样本）",
+			rv.kwsHits.Load(), rv.kwsVetos.Load(), rv.kwsFedSamples.Load(), rv.asrFedSamples.Load())
+	}
+	if rv.plan.KwsNote != "" {
+		return "未武装（" + rv.plan.KwsNote + "）"
+	}
+	return "未武装"
 }
 
 // punctState spells the two "no punctuation" states apart, because they are
@@ -1288,12 +1651,13 @@ func (rv *residentVoice) stopLine() string {
 	if rv == nil || rv.scope == nil {
 		return "voice leg: not assembled in this process"
 	}
-	return fmt.Sprintf("voice leg stopped: frames_drained=%d paused_drops=%d partials=%d finals=%d discarded=%d handed=%d handoffs=%d handoff_exit=%d asr_loaded=%v punct_attached=%v punctuated_finals=%d announce_asked=%d spoken=%d gated=%d samples=%d warm_turn_end=%d warm_wake=%d gate_closed=%d gate_reopened=%d",
+	return fmt.Sprintf("voice leg stopped: frames_drained=%d paused_drops=%d partials=%d finals=%d discarded=%d handed=%d handoffs=%d handoff_exit=%d asr_loaded=%v punct_attached=%v punctuated_finals=%d announce_asked=%d spoken=%d gated=%d samples=%d warm_turn_end=%d warm_wake=%d gate_closed=%d gate_reopened=%d kws_fed=%d kws_hits=%d kws_vetos=%d asr_fed=%d",
 		rv.drained.Load(), rv.pausedDrops.Load(), rv.partials.Load(), rv.finals.Load(),
 		rv.discarded.Load(), rv.handed.Load(), rv.handOffs.Load(), rv.handOffExit.Load(),
 		rv.asrLoaded.Load(), rv.punctAttached.Load(), rv.punctFinals.Load(),
 		rv.announceAsked.Load(), rv.ttsSpoken.Load(), rv.ttsGated.Load(), rv.ttsSamples.Load(),
-		rv.warmTurnEnd.Load(), rv.warmWake.Load(), rv.speakGateOn.Load(), rv.speakGateOff.Load())
+		rv.warmTurnEnd.Load(), rv.warmWake.Load(), rv.speakGateOn.Load(), rv.speakGateOff.Load(),
+		rv.kwsFedSamples.Load(), rv.kwsHits.Load(), rv.kwsVetos.Load(), rv.asrFedSamples.Load())
 }
 
 // startResidentVoice is the assembly root's call: resolve the plan off this
@@ -1401,6 +1765,15 @@ func resolveVoicePlan(dataDir string, c *config.Config) (voicePlan, string) {
 				"wisp models ensure %s 是它的交还入口", vad, voiceVadModelID)
 		}
 	}
+	// Ticket 41's opt-in gate: the wake word is off by default and the empty set
+	// (with the reason spelled) is what the boot line reports. Only an explicit
+	// [voice] wake_word.enabled=true resolves the model set.
+	kws, kwsNote := voiceKwsFiles{}, ""
+	if !c.Voice.WakeWord.Enabled {
+		kwsNote = "[voice] wake_word.enabled=false（opt-in 没问，本进程停在 Sleeping）"
+	} else {
+		kws, kwsNote = voiceKwsFilesIn(store)
+	}
 	return voicePlan{
 		VadModelPath: vad,
 		AsrDir:       filepath.Join(store, voiceAsrModelID),
@@ -1412,7 +1785,64 @@ func resolveVoicePlan(dataDir string, c *config.Config) (voicePlan, string) {
 		// chain that refuses to start.
 		PunctModelPath: voicePunctModelPath(store),
 		Tts:            voiceTtsFilesIn(filepath.Join(store, voiceTtsModelID)),
+		// Ticket 41's wake-word set, resolved only when the opt-in asks for it:
+		// an unasked-for engine would move the machine into Armed without the
+		// user's consent, which is the exact posture the opt-in exists to gate.
+		Kws:     kws,
+		KwsNote: kwsNote,
 	}, ""
+}
+
+// voiceKwsFilesIn resolves the KWS checkpoint's five files, in the order the
+// other model families use: the store's own directory (the manifest's file
+// spelling) first, then the WISP_KWS_DIR escape hatch (the same convention
+// WISP_SILERO_MODEL / WISP_PUNC_MODEL / WISP_TTS_DIR follow for staging), then
+// the engine package's own resolution (WISP_SPIKE_MODELS or the walk-up, which
+// is what lets a plain `go test ./cmd/wisp` in a repository checkout find the
+// dev copies without any env var). Every step requires all five files; the first
+// complete set wins. The bytes are NOT re-verified here - the manifest's sha256
+// pins are models.go's business, the same split the VAD already follows.
+func voiceKwsFilesIn(store string) (voiceKwsFiles, string) {
+	dir := filepath.Join(store, voiceKwsModelID)
+	if f := voiceKwsFilesFrom(dir); f.complete() {
+		return f, ""
+	}
+	if env := os.Getenv("WISP_KWS_DIR"); env != "" {
+		if f := voiceKwsFilesFrom(env); f.complete() {
+			return f, ""
+		}
+	}
+	if cfg, err := speech.DefaultKwsConfig(); err == nil {
+		f := voiceKwsFiles{
+			Encoder:  cfg.EncoderPath,
+			Decoder:  cfg.DecoderPath,
+			Joiner:   cfg.JoinerPath,
+			Tokens:   cfg.TokensPath,
+			Keywords: cfg.KeywordsPath,
+		}
+		if f.complete() {
+			return f, ""
+		}
+	}
+	return voiceKwsFiles{}, fmt.Sprintf("KWS 模型五件不齐（%s 与 WISP_KWS_DIR 都不完整）", dir)
+}
+
+// voiceKwsFilesFrom fills the manifest spelling off one directory, checking each
+// of the five files the spotter cannot open without.
+func voiceKwsFilesFrom(dir string) voiceKwsFiles {
+	f := voiceKwsFiles{
+		Encoder:  filepath.Join(dir, voiceKwsEncoder),
+		Decoder:  filepath.Join(dir, voiceKwsDecoder),
+		Joiner:   filepath.Join(dir, voiceKwsJoiner),
+		Tokens:   filepath.Join(dir, voiceKwsTokens),
+		Keywords: filepath.Join(dir, voiceKwsKeywords),
+	}
+	for _, p := range []string{f.Encoder, f.Decoder, f.Joiner, f.Tokens, f.Keywords} {
+		if !voiceFileExists(p) {
+			return voiceKwsFiles{}
+		}
+	}
+	return f
 }
 
 // voicePunctModelPath resolves the CT-Transformer file (manifest purpose
