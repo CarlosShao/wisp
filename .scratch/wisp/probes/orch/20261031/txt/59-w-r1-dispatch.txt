@@ -1,0 +1,4 @@
+存档 2026-10-31 15:5x · 腿 59-w-r1（票 59 重开首项测量腿、写、internal/audio 独占——aec3-r1 已让出）
+来源＝59-v2 判语 PASS 条件两条：(a) 长窗稳态 ERLE（≥30s 连续采捕过引擎＝塌峰是否消失的唯一裁决读数——rig 现无长窗能力需扩展）；(b) 组合 barge-in 门产品级读数（VAD∧能量∧ASR 文本门在好峰/塌峰两态的误触发率——塌峰态 ASR 两音节已证单面不可靠）。
+附带：塌峰态表征（为何 2/4 发塌 22dB、收敛速度敏感度、在跑检测塌峰的可行判据）——重开首项的设计输入。
+⛔ 改 internal/speech 语义、⛔ cmd/wisp（30-w-r1 在飞）；AEC3 引擎/构建产物复用 aec3-r1 的（D:\tmp\wisp\20261031\aec3r1\build\libwebrtc_audio_processing.a）。
