@@ -28976,3 +28976,31 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ★**正确尺（在册台型）**：★**`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"` 复跑 ⇒ 两包 `ok`（internal/audio 16.4s／aecspike 0.136s）、53 PASS/0 FAIL/5 SKIP（live 硬件门）** ⇒ ★**`59-r1` 承重声称（0 FAIL）验证通过**
 - ★**计数差说明**：★我 `-v` 跨两包计数（53/5）vs 腿报 52 RUN（39/0/1）——★**SKIP 数随 live 硬件门机器态浮动＝在册读数非断言**；★**承重项＝0 FAIL、两包 ok＝一致**
 - ★**自踩计数**：★**第 15 处族我已自踩 3 次**（config-r1 首跑 cmd/wisp／385-r1 台面注记／本次）⇒ ★**收件复跑的默认动作升级：凡涉音频/sherpa 的包，复跑命令一律先补在册 PATH**（写进 checklist）
+
+## A1308（2026-10-31 13:5x +08，编排者，goal round 31 续）★★★收 `41-v1` ＋**结票 41（第 59 票）**——**六格各有缺角保持未勾＝15/28 先例、可带残余结案**｜★★★**R28-2 注销**（warmFeed 真门 e2e 验证）｜★Status 行 regex 两连败＝逐字替换补正（教训入册）
+
+**① ★★收 `41-v1`（件 72 行、`e926531d5`、必跑 7/7 全做全绿）**
+- ★**唤醒端到端复跑**：★三跳 `AtSample` 与实现件**逐位同**（#5 at_sample=0→#7 115200→#11 163840 语音 2816ms）；★0.wav 负控 0 hit
+- ★★**warmFeed 真门复刻**：★`kws_fed` 恰 +20480/`asr_fed`+0；再命中门重开、`loads_after_warm=0`
+- ★★**mutation 双发**红句逐字同实现案（M-a「Armed gate is closed」/M-b「kws_fed moved 0…KWS is not the Warm ears」）；还原核四件
+- ★★**零回归 26/26 rc=0**（★**含 381-r2 五案、RealDevice MET 真跑 35.52s 非 skip**）、`262/640/902` 逐位同、drained=181/181 零抖动；★**第 21 处归因**：★**59-r1 纯新增包零既有文件改动 ⇒ 读数仍有效、两腿无交叉红**
+- ★**复跑三红全 staging 缺口＝零代码红**（WISP_SPIKE_MODELS 未设×2／System32 1.17 遮蔽〔**正解＝DLL 贴测试二进制、PATH 注入无效**〕／VAD 缺失 plan 早退）
+
+**② ★★票 41 收口（第 59 票）——六格各有缺角保持未勾（★15〔收 3 格未勾〕/28〔带残余〕/42 先例）**
+- ★**六格缺角逐格**：AC1 缺 42 面 sampler＋≤300ms 实测／AC2 缺 **`keywords` 键 KWS 路径零消费＋thresholds/veto_words 255 审计零命中→config 票**／AC3 **`kwsVetoWords` 空表→B 腿改表即激活**／AC4 P14 报告未落／AC5 缺管线级「Muted 冻结」断言／AC6 缺设备句柄探针＋Sleeping 预算
+- ★**残余 7 条归口**：①sampler→42 ②词表热更→config 票+B 腿 ③veto e2e→B 腿+Confirming ④**唤醒句话轮过滤＝票面/D43 未定义、先定义再接 consume()（未自创＝正确形状）** ⑤**#32 nil facts→statemachine 冻结面钩＝须人工批准（摆机主）**、现行 #5 重武装自愈已 e2e 兜住 ⑥models ensure→models 票 ⑦Speaking 双门→26 家族观察
+- ★**41a2-r1 自评与复判逐格相符、无纸糊** ✅
+- ★**rename 双名闸 41 枚数 1** ✅；★**Status regex 两连败＝逐字替换补正**（**教训：个别票面 Status 行有隐形字符、regex 不可靠 ⇒ 逐字替换兜底**）
+
+**③ ★★★R28-2 注销（★票 28 的 -done 已追凭据行）**
+> ★**「mic 是闩不是门」正式注销**：★**票 41 落地 `warmFeed` 真喂食门并 e2e 验证**（Warm 静音帧 ⇒ KWS 吃帧/ASR 冻结；命中 ⇒ 门重开、零重装载）
+
+**④ ★在飞**＝**写 3**（★`43-r1` cmd/wisp／`387-r1` internal/speech tts 守卫／`386-r1` tools/mockllm 同类帽）＋**裁 1**（★`59-v1` 票 59 七格复核）＝ 4 ≤7 ✅、写 3 满 ✅
+★票池：done=**202**／open=**170**（**54.7%**，票池 372）；未推（本轮后现跑）；**摆机主 7 件**（347／216-120-136／Wails／AEC3 fetch／DEFERRED 登记／SPEC-10 CPU 回填／**#32 nil facts 冻结面钩**）
+
+## A1309（2026-10-31 13:5x +08，编排者）★★**机主澄清"没有别的会话"⇒ 216/120/136 外部会话疑云撤销**（A1295④②/A1307⑥ 的报备项销案）
+
+- ★**机主原话**：「现在我没迁移，没有别的会话了，只有现在的你一个会话」
+- ★**我现跑定案**：`.scratch/bullet-216-flip.txt`（mtime **2026-10-17**）／`.scratch/commit-msg-120r2.txt`（**10-15**）／`commit-msg-136s-ac2*.txt`（**10-14**）／`.scratch/ci-logs/*`（**10-04**）——★**全是早期会话（本编排线的前身会话）留下的草稿与日志**（工单 216/120/136 早已结案），**非在飞工作、非他人会话**
+- ⇒ ★**报备项销案**：机主 0 件；★**这些历史未跟踪残件按「临时件只建不删」原样保留**（⛔ 清理类动作仍押到全部票完成）
+- ★**摆机主清单更新**（A1307⑥ 7 件 → 6 件）：①347 追认 ②AEC3 fetch 批准 ③DEFERRED 登记批准 ④SPEC-10 CPU 回填批准 ⑤#32 nil facts 冻结面钩（可挂起）⑥Wails 裁定认可
