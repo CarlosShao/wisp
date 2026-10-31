@@ -28682,3 +28682,25 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **⑤ ★状态**：在飞 **3**（写 2：`41a2-r1`/`42-r1`；裁 1：`381-v2`）＋ 派单存档已提交（`4cd8cb4b1`）
 ★票池：done=**198**／open=**169**（**54.2%**）；未推（本轮后现跑）；**摆机主：347 追认＋216/120/136 报备**
 ★**HANDOVER §4 简条**：HEAD/腿/队列已同步（见本节）——§4 详细停车点以台账 A1296 为准
+
+## A1297（2026-10-31 10:5x +08，编排者，goal round 31 续）★收 `42-r1`（三把尺全过：提交 `9d99af5c4` 在／8 枚件在／复跑 watchdog `ok 0.359s`＋observe `ok 5.518s`）｜★★★铺满写腿 3 枚（`41a2-r1` 活着＋`30-r1`＋`226-r1` 新派）｜★派 `42-v1` 终裁
+
+**① ★★收 `42-r1`（`9d99af5c4` 8 枚 +1996 行）**
+- ★**尺核**：提交真在／件真在（`watchdog.go` 21,881 B／`caps.go` 2,264 B／件 14,324 B）／**我复跑 `watchdog ok 0.359s`＋`observe ok 5.518s`** ✅
+- ★**读数要点**：5 格全①可做；Sleeping 卸载趟（白名单∩注册表、Armed 态 **KWS retained**＝D43#9 留态）；3× settle 败 ⇒ **AlertFatal 恰 1 次**（D43#35 `Warm→WatchdogAlert`＋`ui.one-click-restart`）；泄漏告警**零卸载**；**shared test 双驱动与 05 contract DeepEqual 全同**；三发突变（摘 sustain 红 7／拆白名单外科红 3／摘 Fatal 红 1）＋还原核
+- ★**它开工三核的偏差声明（处理正确）**：开工时 HEAD 已 `07a010d59`（非派单写的 281862907）——**两格均为编排者记帐提交、未触其写面、分支非 detached** ⇒ 按三核意图通过 ✅
+- ★★★**`R-42r1-1`（新缺口、归 internal/config 所有者）**：★**`CheckAndReload` 失败路径一律收养 stat ⇒ 并发轮询实证一次瞬时 sharing violation 会把该次写永久隐藏**（修法：解析类收养/IO 类不收养；⛔ 本腿未碰）⇒ **归票 351 射程或新开 config 腿**
+- ★**全量 sweep 红处均 HEAD 既有**（panel↔frontend 契约漂移／risk C26 抓 panel 三处绕 rewrite account／winsec 342 racer）——已定性、⛔ 本腿
+- ★**具名交回**：真面板隐藏 cmd/wisp 半边＋Loop 生产装配（归宿主接线腿）；DEFERRED 摘标记归 225
+
+**② ★★★写腿补满（3 枚在飞）**
+- ★**`41a2-r1`**：★**活着**（重派腿）——`cmd/wisp` 脏 3 枚＝它的 KWS 接线（`resident_voice_windows.go` +487 行＋测试新件＋`wisp.test.exe` 今日 10:59 重build）✅
+- ★★**`30-r1`（新派、写）**：**result routing（D10）**——`Blocked by: 10,26` 两前置全 done；写面按票面定（预计 internal/agent）；**⛔ cmd/wisp（41a2-r1 独占，触它 ⇒ 库侧半边＋具名交回）**；开工三核＋筛票纪律全带
+- ★★**`226-r1`（新派、写）**：**"可撤销"真路径**（剩 1 格）；★**第一步＝读格正文判三分类**（第 18 处教训——判②③ ⇒ 零产码具名交回）；⛔ cmd/wisp／⛔ internal/{risk,speech,session,config,memory}
+- ★**`42-v1`（新派、裁）**：票 42 五格（mutation 复刻＋白名单审计自证＋D43#35/#9 核表＋shared test 复核＋**R-42r1-1 定性**）
+
+**③ ★43 排队（⛔ 现派）**
+★43 预筛：**5 格全要真机行为**（suspend/WM_QUERYENDSESSION/kill -9/Run key）⇒ **必触 cmd/wisp ＝ 41a2-r1 占面** ⇒ **排队：41a2-r1 交件同轮派 `43-r1`**
+
+**④ ★在飞**＝**写 3**（`41a2-r1`/`30-r1`/`226-r1`）＋**裁 2**（`42-v1`；`381-v2` 已交）＋`382-v1`/`381-v1` 已交 —— 总派发本波 4 ≤7 ✅
+★票池：done=198／open=169（**54.2%**）；未推（本轮后现跑）；**摆机主 2 件**（347 追认／216-120-136 报备）
