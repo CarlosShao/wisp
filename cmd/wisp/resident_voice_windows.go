@@ -1708,6 +1708,13 @@ func startResidentVoice(rt *proc.Runtime, ra *residentAudio, rb *residentBall, t
 		// the read half answers "no truth source" for a boot that built none.
 		rb.attachWakePause(rv.togglePause, rv.pausedForTray)
 		rb.mirrorTrayMute()
+		// Ticket 390: the ball click is the interrupt channel's second trigger
+		// source (after the Esc cancel key). The executor is this leg's own
+		// TriggerInterrupt, attached here because THIS leg owns the channel -
+		// the same ownership reason attachWakePause names. The click then stops
+		// an announcement in flight (the abort hop 381-r2 wired) and stays idle
+		// otherwise; 381-r2's interrupt body itself is untouched.
+		rb.attachVoiceInterrupt(rv.TriggerInterrupt)
 	}
 	return rv
 }

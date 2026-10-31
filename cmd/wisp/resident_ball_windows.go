@@ -247,6 +247,14 @@ type residentBall struct {
 	// invented as a false.
 	wakePauseToggle func() (outcome string, executed bool)
 	wakePauseRead   func() (paused, ownsListener bool)
+	// voiceInterrupt is ticket 390's executor for the ball click: the function
+	// that turns a single click on the orb into the voice leg's
+	// TriggerInterrupt - the second trigger source of the announcement-interrupt
+	// channel, after the Esc cancel key. It is attached late for the same reason
+	// muteGate is (the ball is built before the leg that owns the channel), under
+	// the same mutex, and nil is the pre-390 shape: the click then records itself
+	// as unhosted, exactly like before.
+	voiceInterrupt func()
 	// voiceStates is every D43 state the voice leg (resident_voice_windows.go)
 	// projected onto this ball, oldest first. It is a record, not a flag: the
 	// projection's claim is "the orb really walked these states, in this order",
@@ -394,7 +402,7 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 		Hotkeys:  cfg,
 		Registry: reg,
 		Events: ball.Events{
-			OnClickBall:     func() { recordBallGesture("click") },
+			OnClickBall:     func() { rb.clickInterruptGesture() },
 			OnSummonHotkey:  func() { recordBallGesture("summon-hotkey") },
 			OnMuteHotkey:    func() { rb.muteGesture("mute-hotkey") },
 			OnCancelHotkey:  func() { recordCancelHotkey(onCancelEsc) },
@@ -473,8 +481,9 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hotCfg fu
 		"gestures", "recorded only except the ones the assembly root hands an executor for: the cancel key (ticket 246), "+
 			"the panel gestures (ticket 33) and the tray's Exit item, whose request goes to the stop bit this boot "+
 			"built (ticket 228 AC#11); the two mute gestures turn this process's capture gate once that leg is "+
-			"assembled (ticket 290 - this line prints before the attach, because the ball is built first), and D43's four "+
-			"veto channels stay reduced here to the one the assembly root injected")
+			"assembled (ticket 290 - this line prints before the attach, because the ball is built first), the tray's "+
+			"pause-wake item and the ball click's interrupt follow the voice chain the same way (ticket 15e / 390), "+
+			"and D43's four veto channels stay reduced here to the one the assembly root injected")
 	return rb
 }
 
@@ -532,11 +541,14 @@ func (rb *residentBall) stop() {
 // has to be a reason that gesture still has.
 //
 // What the gestures this file still records as unhosted actually lack, named:
-//   - the ball click and the summon key: no executor is handed to THIS host for
-//     them. The leg does assemble a task pipeline
+//   - the summon key, and the ball click's summon half: no executor is handed to
+//     THIS host for them. The leg does assemble a task pipeline
 //     (cmd/wisp/resident_task_source_windows.go), but it reads the console, and
 //     nothing here turns a click on the orb into a task; that hop is not this
-//     ticket's to invent.
+//     ticket's to invent. (Ticket 390 gave the click its INTERRUPT executor -
+//     attachVoiceInterrupt, live when this process assembled a voice chain -
+//     which is not a summon: it dispatches no D43 event of its own and only
+//     stops an announcement in flight.)
 //   - the tray's pause-wake item: as of ticket 15e it HAS an executor when this
 //     process assembled a voice chain (residentVoice.togglePause), and the
 //     checkmark's second bit then follows that listener's own paused flag. Before
@@ -552,8 +564,8 @@ func (rb *residentBall) stop() {
 const ballGestureWhy = "no executor was handed to this ball host for this gesture; the gestures with one are the " +
 	"cancel key when the assembly root injected an approval gate (ticket 246), the panel gestures when it " +
 	"injected a panel host (ticket 33), the two mute gestures when this process assembled a capture leg " +
-	"(ticket 290) and the tray's pause-wake item when it assembled a voice chain (ticket 15e) - what is left " +
-	"is recorded by name, never invented"
+	"(ticket 290), the tray's pause-wake item when it assembled a voice chain (ticket 15e) and the ball " +
+	"click's interrupt under the same condition (ticket 390) - what is left is recorded by name, never invented"
 
 // attachMuteGate hands this host the executor that turns a mute gesture into a
 // flip of this process's capture gate (ticket 290 AC#2). The assembly root calls
@@ -618,6 +630,30 @@ func (rb *residentBall) currentWakePauseRead() func() (bool, bool) {
 	return rb.wakePauseRead
 }
 
+// attachVoiceInterrupt hands this host ticket 390's click-interrupt executor.
+// The voice leg calls it once, right after the interrupt channel exists (inside
+// startResidentVoice, next to attachWakePause - the same "the leg is told what
+// already exists" hop), and it is the only writer.
+func (rb *residentBall) attachVoiceInterrupt(fn func()) {
+	if rb == nil {
+		return
+	}
+	rb.muteMux.Lock()
+	defer rb.muteMux.Unlock()
+	rb.voiceInterrupt = fn
+}
+
+// currentVoiceInterrupt reads the attached executor back under the same lock,
+// so the ui-sta thread can never see a half-written handoff.
+func (rb *residentBall) currentVoiceInterrupt() func() {
+	if rb == nil {
+		return nil
+	}
+	rb.muteMux.Lock()
+	defer rb.muteMux.Unlock()
+	return rb.voiceInterrupt
+}
+
 // pauseWakeGesture is what the tray's pause-wake item runs (ticket 15e). With an
 // executor attached it flips the voice chain's paused bit, says the chain's own
 // sentence and re-projects the checkmark; without one it records the gesture as
@@ -638,6 +674,33 @@ func (rb *residentBall) pauseWakeGesture() {
 	slog.Info("ball: tray pause-wake", "executed", executed, "say", sentence)
 	fmt.Printf("wisp: %s\n", sentence)
 	rb.mirrorTrayMute()
+}
+
+// clickInterruptGesture is what a single click on the orb runs since ticket
+// 390: the second trigger source of the announcement-interrupt channel, after
+// the Esc cancel key. With an executor attached (this process assembled a voice
+// chain) it fires the voice leg's TriggerInterrupt - during playback that aborts
+// the speaker in flight within the 400ms budget and speak()'s walk lands on
+// D43#27 (381-r2's readings); while idle it is inert by construction (a buffered
+// token, no dispatch, no state change). Without one it records the gesture as
+// unhosted, the pre-390 shape.
+//
+// It is NOT the click's summon half: TriggerInterrupt dispatches no D43 event of
+// its own (the #27 walk belongs to speak()'s owner goroutine), so this gesture
+// still claims no listen path - the summon sentence in ballGestureWhy stays true.
+//
+// It runs ON the ui-sta thread (Ball.fire calls it inline), so it may only do
+// non-blocking work: TriggerInterrupt is one buffered send with a default arm
+// plus one func() call - no waiting, no Win32.
+func (rb *residentBall) clickInterruptGesture() {
+	trigger := rb.currentVoiceInterrupt()
+	if trigger == nil {
+		recordBallGesture("click")
+		return
+	}
+	trigger()
+	slog.Info("ball: click interrupt dispatched", "executed", true)
+	fmt.Printf("wisp: ball click: interrupt requested\n")
 }
 
 // setVoiceState is the voice leg's projection hop onto the orb (ticket 15e): it
