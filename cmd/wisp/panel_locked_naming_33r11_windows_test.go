@@ -72,11 +72,21 @@ const lockedSuffix33r11 = "Locked"
 //	m.mu", its body takes no lock, and its single call site runs inside Show's
 //	m.mu.Lock() / m.mu.Unlock() section.
 //
+//	waveOutSpeaker.releaseLocked: ticket 381-r2's sliced winmm wait. Both call sites
+//	(Play and Drain) run inside that caller's s.mu.Lock() / defer s.mu.Unlock()
+//	section, the body takes no lock itself (its abortReq is an atomic.Bool, not a
+//	mutex), and the one method it calls, unprepareLocked, is itself rostered below.
+//
+//	waveOutSpeaker.unprepareLocked: the tail releaseLocked and the natural end
+//	share; its only caller runs with s.mu held, and its body takes no lock.
+//
 // The two methods this leg renamed are deliberately ABSENT: they take m.mu inside
 // their own bodies, so they must not carry the Locked suffix and no roster entry
 // could make that honest.
 var lockedNamingRoster33r11 = map[string]string{
 	"PanelManager.setPriorFocusLocked": "requires the caller to hold m.mu; body takes no lock",
+	"waveOutSpeaker.releaseLocked":     "requires the caller to hold s.mu; body takes no lock",
+	"waveOutSpeaker.unprepareLocked":   "requires the caller to hold s.mu; body takes no lock",
 }
 
 // lockMethodNames33r11 are the mutex and rwmutex operations whose presence in a
