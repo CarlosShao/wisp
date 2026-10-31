@@ -96,10 +96,11 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 	// thinking=broken withholds the reasoning summary item and its delta,
 	// exactly as the chat and Messages dialects do above.
 	if thought && !s.capability().thinkingBroken() {
+		// No size clamp on the reasoning summary (ticket 386): the old
+		// 200-byte cap cut multi-byte text mid-UTF-8-sequence and simulates
+		// no real provider behavior - no API truncates reasoning summaries
+		// at 200 bytes. The request bounds the echo.
 		reason = "thinking about: " + text
-		if len(reason) > 200 {
-			reason = reason[:200]
-		}
 	}
 	toolName, toolArgs := "", ""
 	if len(req.Tools) > 0 {

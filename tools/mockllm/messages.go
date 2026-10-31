@@ -110,10 +110,11 @@ func planMessagesFrom(messages []msgMessage, tools []msgTool, choice json.RawMes
 	}
 	p.image = image
 	if strings.Contains(text, "[think]") {
+		// No size clamp on the thinking block (ticket 386): the old 200-byte
+		// cap cut multi-byte text mid-UTF-8-sequence and simulates no real
+		// provider behavior - no API truncates thinking at 200 bytes. The
+		// request bounds the echo (same ruling as 385's echo clamp).
 		p.reason = "thinking about: " + text
-		if len(p.reason) > 200 {
-			p.reason = p.reason[:200]
-		}
 	}
 
 	// Forced tool selection (tool_choice any | tool) with tools declared.

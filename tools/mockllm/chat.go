@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // POST /v1/chat/completions (OpenAI Chat Completions shape).
@@ -164,10 +165,12 @@ func planChat(req *chatRequest) (answer string, toolName string, toolArgs string
 		answer = "echo: " + lastUser.text
 	}
 	if lastUser.thought {
+		// No size clamp on the reasoning echo (ticket 386): the old 200-byte
+		// cap cut multi-byte text mid-UTF-8-sequence and simulates no real
+		// provider behavior - no API truncates reasoning at 200 bytes. The
+		// 8MB LimitReader already bounds the request, and length control
+		// belongs to request semantics (same ruling as 385's echo clamp).
 		reasoning = "thinking about: " + lastUser.text
-		if len(reasoning) > 200 {
-			reasoning = reasoning[:200]
-		}
 	}
 
 	// Tool call decision: forced tool / required / auto-with-[tool] marker.
@@ -201,10 +204,17 @@ func planChat(req *chatRequest) (answer string, toolName string, toolArgs string
 		toolArgs = fmt.Sprintf(`{"text":%s}`, mustJSONString(lastUser.text))
 	}
 
-	// max_tokens truncation: ~4 chars per token heuristic.
+	// max_tokens truncation: ~4 chars per token heuristic. The cap itself is
+	// deliberate emulation - a real chat API that hits max_tokens stops
+	// mid-output and reports finish_reason "length" - so the heuristic and
+	// the length semantics are kept (ticket 386). Only the cut point was
+	// unintentionally byte-exact: real providers truncate at token boundaries
+	// and never emit invalid UTF-8, while a byte cut split CJK text
+	// mid-UTF-8-sequence and the JSON encoder carried the broken tail as
+	// U+FFFD (the same defect class as 385's echo clamp).
 	if req.MaxTokens > 0 && toolName == "" {
 		if len(answer)/4 > req.MaxTokens {
-			answer = answer[:req.MaxTokens*4]
+			answer = answer[:runeBoundaryWithin(req.MaxTokens*4, answer)]
 			finish = "length"
 		}
 	}
@@ -349,6 +359,20 @@ func chatUsage(answer, toolArgs string, req *chatRequest) usageBlock {
 // keep their own 16-rune pacing: their /__control/truncate cases are pinned
 // to those event counts.
 const synthTextPieceRunes = 48
+
+// runeBoundaryWithin returns the largest i <= n that is a rune boundary in s
+// (s[:i] ends on a whole rune). For ASCII text this is exactly min(n, len(s));
+// for multi-byte text it never splits a UTF-8 sequence, matching real
+// providers that truncate at token boundaries (ticket 386).
+func runeBoundaryWithin(n int, s string) int {
+	if n >= len(s) {
+		return len(s)
+	}
+	for n > 0 && !utf8.RuneStart(s[n]) {
+		n--
+	}
+	return n
+}
 
 // splitChunks cuts s into rune-safe pieces of about n runes.
 func splitChunks(s string, n int) []string {
