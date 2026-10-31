@@ -28810,3 +28810,23 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **④ ★写腿满额**：在飞写 ＝ ★**`41a2-r1`（cmd/wisp KWS）／`config-r1`（internal/config 收养修复）／`29g-r1` 已交** ⇒ **实数 2＋golden 已交** ＋ `381-r2` 在飞 ＝ ★**写 3 枚满**（41a2-r1／config-r1／381-r2；29g-r1 已交出）
 ★在飞总＝写 3＋裁 1（`12-slo-v1`）＝4 ≤7 ✅
 ★票池：done=**199**／open=**169**（**54.5%**）；未推（本轮后现跑）；**摆机主 3 件**
+
+## A1303（2026-10-31 12:2x +08，编排者，goal round 31 续）★★★收 `30-v1`（九项全自跑）＋**结票 30（第 57 票）**｜★开票 385（mockllm 400 字节截断）｜★推重试仍断（未推 9、本地照常）
+
+**① ★★收 `30-v1`（件 71 行、`1f16b9a51`）——九项全自跑（仓外导出树 `git archive eaeba3a92`）**
+- ★**present 19/0/0＋`-race` 一发**；★★**三发 mutation 各 rc=1 红句正中判据**（M1 `tier = none, want structured` 四档全塌＋E2E 四子案红／M2 `badge updates = 0, want 1`＋E2E `badge=0 task=0`／M3 tier1 `want 0`、tier4 `2 calls`）；★还原核哈希与 30-r1 记录**逐字同值**
+- ★★★**AC2 绕行判合法（关键裁点）**：★`tools/mockllm/chat.go:159-162` **逐字核到 `len(answer) > 400` 字节截断**、402 汉字物理回不来；★`scriptedC5` 实现 `llm.LlmProvider`、经 `agent.Options.Provider` 注入＝**AGENTS 1.3 具名缝 C5**、四案同 `agent.New` 回路同 router、缝上计 `calls==1`；★**`internal/present` 零 provider 引用＝结构性无二次请求** ⇒ ★**不是假报完成、30-r1 §8③ 已具名自报**
+- ★**D10 两量词判成立**（★`PLAN.md:261` 原文「≥2 个链接／文件路径清单」＝最小复数同构读法；单路径散文留 tier-4 有测试钉死；链接先剥再数、href 不二次计）
+- ★**具名交回核过**：★`git grep present HEAD -- cmd/wisp` **0 命中**（装配缝真开着）；★ChTTS 闸不重复（端口文档逐字、对照 wire-r1 闸位）；★Clipboard 义务在端口文档（真实 API `provenance.go:826/:123`）
+- ★**d22scan 四分母 274/45/706/161 与 30-r1 逐字对上**（design/ 差异＝工作树未提交 design/**、不在四数内）；正控植真 U+2705 ⇒ rc=1 逐字红
+
+**② ★★结票 30（第 57 票）**：★**六格全翻**（格为无编号形、python 数出恰 6 枚才翻——**盲翻防护**）＋★**残余三条随结案登记**：①**mockllm 400 字节截断** ⇒ **开票 385** ②D10 量词解释三处留痕 ③**cmd/wisp 装配缝**归接线腿（41a2-r1/381-r2 之后波次）
+- ★**机械闸 30 枚数 1** ✅
+
+**③ ★开票 385（mockllm 400 字节截断、归 tools/mockllm 所有者）**
+★**判据**：AC#1 按 rune 截断或去截断（★原始意图对照具名）／AC#2 多字节回归（402 汉字不再拦腰切）／AC#3 反向（摘修复⇒红）／AC#4 零回归（票 12/30 的 E2E 全绿）／AC#5 ⛔ `cmd/wisp`／`internal/**`（★只 `tools/mockllm/**`）
+
+**④ ★网络仍断**：未推 **9**（本地照常、恢复后统一推——goal 规矩已写死）
+★在飞＝**写 2**（`381-r2` cmd/wisp／`59-r1` internal/audio AEC spike）＋裁 0（`30-v1`/`12-slo-v1`/`381-v2` 全交）⇒ **写腿 2＜3** ⇒ ★**具名：候选全撞 cmd/wisp（43/384/12-AC#9/219）或等 59 PRECHECK ⇒ 381-r2 或 59-r1 交件同轮即补满**
+★票池：done=**200**／open=**170**（**54.2%**，票池 370）
+★**摆机主 3 件**：①347 追认 ②216/120/136 外部会话 ③Wails 裁定
