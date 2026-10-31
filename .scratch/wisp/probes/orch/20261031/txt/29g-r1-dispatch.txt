@@ -1,0 +1,3 @@
+存档 2026-10-31 11:2x · 腿 29g-r1（票 29 golden 抽取集腿、写）——⚠ 编排者补记（本应先存档再派，此笔补齐、第 2 次同违规）
+AC#2 验收靶：10 段剧本对话→期望 profile slots/values；golden 契约件＋stub 对照测试（自洽）＋反向判据；"未来换真抽取器"说明。
+⛔ cmd/wisp（41a2-r1 独占）、⛔ internal/{agent,session,risk,speech} 语义、⛔ internal/memory 既有语义（undo.go 刚修）、⛔ 仓根 testdata/**、⛔ thresholds/golden。
