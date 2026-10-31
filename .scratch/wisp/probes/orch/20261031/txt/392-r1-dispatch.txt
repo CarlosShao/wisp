@@ -1,0 +1,4 @@
+存档 2026-10-31 22:0x · 腿 392-r1（票 392 28-PathC 会话集成、写、cmd/wisp＋internal/audio——26p-r1 已让出）
+重开条件已满足（59-v3 字面：26 门模块落地+首格验收过，均在盘）。消费 26p-r1 三件设计输入：①AEC 双讲损伤调参读数（⛔ AEC3 源改）②monitor 跨公告保温深度对齐（对照 28-r1 Scope 形状）③会话侧与 barge-in monitor 深度对齐。
+26p-r1 接线形状=对齐目标（SetConversation/drain goroutine/far=speak chunk 回调）。★⚠26p-v1 判语在飞——若判语与本腿前提冲突 ⇒ 停手重对齐。
+AC#4 零回归=六族+Path-C 三真数不退化。⛔ internal/{risk,session,speech} 语义（SetConversation 公开面可用）、D43 表、thresholds。
