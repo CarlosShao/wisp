@@ -28739,3 +28739,29 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 2. ★★**`internal/memory/undo.go` gofmt 真红**（★**29-r1 引入、非 CRLF**：blob CR=0、blob 拷出仍点名）—— ★**编排者跑尺已修**（gofumpt -w、memory 复跑 `ok 25.166s`、机械尺净）
 
 **⑧ ★写腿满额说明**：在飞写腿＝★**`41a2-r1`（cmd/wisp）＋ `config-r1`（internal/config 修 R-42r1-1 收养 bug）＋ `29g-r1`（golden 集）＝ 3 枚** ✅；★**`381-r2`（Abort 接线）排 41a2-r1 之后**（同面）
+
+## A1299（2026-10-31 11:2x +08，编排者，goal round 31 续）★收 `42-v1`（五格全翻、可带残余结案——**mutation A 复刻恰 7 红＋自加反例探针证"白名单∩注册表结构保证"有牙**）｜★**票 42 收口（第 56 票）＋开承接票 383/384**｜★派 `59-r1`（AEC spike＝Path C 闸门）＋`12-r1`（预筛读腿）｜**在飞 5（写 4＋读 1）**
+
+**① ★★收 `42-v1`（件 112 行、`934daf6e5`）——判语全部自跑**
+- ★**五格全翻**：★主面 `watchdog 12 PASS`＋`observe 82 PASS`；★★**mutation A 复刻（摘 sustain）恰 7 枚红、三枚红句与实现件逐字对上**；★★★**自加反例探针**（注册表只装非白名单 ⇒ 零 Unload 调用、趟照跑＝**结构保证成立**；换突变 B ⇒ 恰 4 红＝**探针有牙**）
+- ★**D43 核表**：★#9＝`table.go:69-72`（Armed 留态＋`kws.keep-alive-alert`、与"结构性不卸 KWS＋去重告警"一致）；★#35＝`table.go:256-257`（`WatchdogAlert`＋`ui.one-click-restart`、settle 真机 Dispatch 一致）
+- ★★★**`R-42r1-1` 定性**：★**真缺口成立**（`manager.go:160-168` 失败支无条件收养 stat）；★**修法"解析类收养/IO 类不收养"今天可行**（★**错误链已可分**：`loader.go:81` read 支 vs `:102` parse 支）；★**"该现在开新小票"**（226 已终裁射程不同、不宜并入）
+- ★**装配缺口**：★生产调用者 0 ⇒ **宿主接线腿**（真 TreeReader/StateFn/OnAlert→D43/四组件注册＋Start）；★**时机＝41a2-r1 落地后**、★**OnAlert 依赖票 273 状态机 sink ⇒ 与 273 同波或其后**
+
+**② ★★票 42 收口（第 56 票）**：★五格全翻（凭 42-v1）＋**残余具名**（宿主接线票／`R-42r1-1` 小票／225 摘标记／USER record-only 如实登记）；rename 双名闸=1 ✅
+
+**③ ★开两张承接票**
+- ★**票 383**（`CheckAndReload` IO 失败收养修复＝`R-42r1-1`）：**Status 实施中——`config-r1` 已在飞执行本票**；修法/判据全按 `42-v1` §6（★解析类收养保持/IO 类 ⛔ 收养⇒下 tick 重试）
+- ★**票 384**（watchdog 宿主接线）：**Status 待派**；★排 `41a2-r1` 交件后＋**OnAlert 依赖票 273 sink ⇒ 与 273 同波或其后**
+
+**④ ★派 `59-r1`（AEC spike、写）**
+- ★★★**票 59 ＝ Path C 全双工的闸门**：★票 26 的 `AC3`、票 28 的 `AC3`、票 60 **全等它**；★`Blocked by: 13` 已 DONE、7 格全空、`internal/audio` 零脏（空闲）
+- ★7 格：license 判定（**⛔ 无 license ⇒ NO-GO 候选**）／binding（mingw-w64＋cgo smoke）／**回环 rig**（WASAPI render＋capture）／跨端点漂移／误触发表／**CPU 数回填 SPEC-10（★契约面 ⇒ 数留 evidence、回填摆机主）**／★★★**PRECHECK P15 = PASS/NO-GO（★改道 26/28/60 的开关）**
+- ★**⛔ 下载/花钱 ⇒ 停手（铁律三类）**；写面 `internal/audio/**`＋evidence
+
+**⑤ ★派 `12-r1`（预筛读腿）**
+★票 12（`Status: review`、剩 3 格）**挡着票 16**：①Idle SLO 入 `docs/SLO.md` 附录（★staging 数——树在动⇒判"现在能测吗"）②**人工目验球状态＝D29 要人** ③A25 3s 回落实测 —— ★**裁每格"现在能做/要人/等稳定树"＋票 16 解锁条件**
+
+**⑥ ★在飞**＝**写 4**（`41a2-r1`/`config-r1`/`29g-r1`/`59-r1`）＋**读 1**（`12-r1`）＝ 总 5 ≤7 ✅、写 4 ≥3 ✅
+★票池：done=**199**／open=**168**（**54.5%**，383/384 开后 open=170）；未推（本轮后现跑）
+★**摆机主 3 件**：①347 追认 ②216/120/136 外部会话知情吗 ③Wails 裁定＝不迁移（可推翻）
