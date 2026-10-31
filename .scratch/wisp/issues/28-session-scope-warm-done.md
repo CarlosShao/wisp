@@ -86,3 +86,5 @@ registry (rows now, lifecycle at 49), and the settle/dispose cascade.
 
 ### ★★⑥ 零回归（`tri-v1` 复跑）
 ★**15e `6/6`**、★**`262/640/902` 逐位同值**、★**`drained=181/181`**（★另一发 `179/181` 当抖动）；★`session 42/0/0`；★**`d22scan` 导出树 `rc0 clean`**
+
+> ★**R28-2 注销（2026-10-31 记）**：★**票 41（41a2-r1/41-v1）落地 `warmFeed` 真喂食门并 e2e 验证**（Warm 态静音帧 ⇒ KWS 吃帧 `kws_fed`+20480／ASR `asr_fed` 冻结+0；命中 ⇒ 门重开、`loads_after_warm=0`）⇒ **「mic 是闩不是门」问题正式注销**。凭据＝`docs/evidence/s1/41-v1-verdict.md`。

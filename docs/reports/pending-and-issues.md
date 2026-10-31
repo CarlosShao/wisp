@@ -29153,3 +29153,21 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 4**＝**写 4**（★`59-w-r1` 长窗 rig／`30-w-r1` present 装配缝／`387-r1` tts 守卫／`386-r1` mockllm 帽）——4 ≤7 ✅、写 4 ≥3 ✅
 ★票池：done=**205**／open=**168**（**55.0%**，票池 373——**破 55%**）；未推（本轮后现跑）；★**摆机主 1 件**（D43 note 文字）
+
+## A1322（2026-10-31 16:5x +08，编排者，goal round 31 续）★★★收 `30-w-r1`（`c15888b28` 6 枚 1085+/20−＋`f8a951755` 口径精化）：**呈现路由从"库"接进生产**——七通道装配＋四档 E2E 全绿＋**剪贴板安全闸真咬**｜★派 `30-w-v1` 终裁
+
+**① ★★收 `30-w-r1`（尺核：★两提交在／6 枚在／★我复跑 present 全套 `ok 3.169s`；★定向 `-run` 模式没对上案名＝尺没打中、由腿 38 PASS staging 覆盖）**
+- ★★★**七通道装配（30-v1 §9.3 逐字落地）**：★Speak→`rt.voiceAnnounce` 同一函数值（**零新闸**）／Notify→`rt.notify`／Badge→`ball.SetBadgeText`（nil 守卫）／**TaskList＝具名 nil**（面板任务表快照派生无单条入口 API＝30-r1 预留跳过）／Panel→C17 桥结果展示（**桥一字未动**、工件裸名＋「全文已存」指针行）／★★**Clipboard→真写适配器（GMEM_FIXED+RtlMoveMemory+CF_UNICODETEXT）、写真写第一行即 `CheckText(presentClipboardScope, risk.ChClipboard, text)`**／Artifacts→`*memory.Store` 原样即插
+- ★★**具名决策（装配说明未覆盖处、腿自拍）**：★**presenter 宿主上旧 D10 通知＋wire-r1 播报行让位**（否则 completed 双 toast＋双播报、违背 D10 档表）；★**CLI（presenter=nil）字节同行为、有专测钉**
+- ★★**Clipboard scope＝进程级 `present-clipboard`**（voiceAnnounceScope 先例：任务 C25 scope 在 loop.Run 返回前被 revoke ⇒ 指给它会 fail-closed 错杀一切）；★**"任务污点跨 scope 关闭存活"＝382 形 B 设计行为非洞**（具名归 risk 生命周期）
+- ★★★**七通道 E2E 全绿**：★真装配根×真环路×四档（真 mockllm golden 选择器×3＋golden C5 缝×1）——tier-4 剪贴板恰 1 逐字/通知 0、tier-3 通知恰 1（**双发即红**）、tier-1/2 工件落盘＋面板指针行、**RouteCount 服务器侧每案==1**；★**回声解释**：prompt 恒带 scene 后缀 ⇒ 回声回的是后缀块 ⇒ golden 选择器＋自备 golden 目录（testdata 零写）
+- ★★★**反向判据两发**：★M1 摘 Dispatch ⇒ 四档呈现塌红／★★**M2 摘 CheckText ⇒ 污句直抵真写半边红**（`clipboard writes = [凭据是 SK-wisp-30wr1-tainted-secret], want 0`）；★还原核哈希同值
+- ★★**闸核**：★**负控污句 ⇒ 0 次真写＋具名拒绝＋日志 ok:false**／正控恰写 1 次／★**winlive 真写往返 PASS（剪贴板现读证实）**
+- ★★**零回归**：★staging 六族＋WireR1 **38 PASS/0 FAIL**（同一 staged 生产码）＋**`262/640/902` 逐位同**＋present 19/0/0＋**E2E `-race` 归零**（首跑 4 条 race 全在测试 launcher 自己＝轮询 bytes.Buffer、产品码零竞争）＋两尺空＋d22scan 全仓＋导出树 clean＋正控咬红
+- ★**环境账三条（入 staging 清单）**：★①`WISP_PUNC_MODEL` 要 **onnx 文件路径**非目录（首跑给目录 ⇒ WireR1 两枚红、改后 7/7）②System32 遮蔽（在册）③**Test384 e2e 3 秒树回落时窗须单跑读**（合跑被前序残留 goroutine 抬树）
+- ★**开工三核发现**：索引有一枚**他人 staged 的 28-*.md**（未触碰、pathspec 规避）——★**28 暂存件是我在票 28 追注 R28-2 时的 add 残留**、下轮收编
+
+**② ★已派 `30-w-v1`（终裁腿）**：七通道逐通道核／"让位"决策裁／Clipboard scope 合法性／E2E＋mutation 复刻／可否收口
+
+**③ ★在飞 4**＝**写 3**（★`59-w-r1` 长窗 rig／`387-r1` tts 守卫／`386-r1` mockllm 帽）＋**裁 1**（★`30-w-v1`）—— 4 ≤7 ✅、写 3 ✅
+★票池：done=**205**／open=**168**（**55.0%**）；未推（本轮后现跑）；★**摆机主 1 件**（D43 note）
