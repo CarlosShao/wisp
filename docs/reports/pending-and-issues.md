@@ -29191,3 +29191,22 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ★**写面互斥核**：59-v3 只读／12-r2=cmd/wisp／387-r1=internal/speech／386-r1=tools/mockllm——**零撞**；★**写 3 满** ✅
 
 **④ ★状态**：done=**204**／open=**169**；未推（本轮后现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字更新）
+
+## A1324（2026-10-31 17:2x +08，编排者，goal round 31 续）★★★收 `30-w-v1`（九项自跑）——**票 30 残余③销账资格具备**（-done 已追销账行）｜★**push 异常查明**（tracking ref 陈旧假象）｜★派 `59-v3`＋`12-r2`
+
+**① ★★收 `30-w-v1`（件 61 行、`13781ba52`、九项全自跑仓外导出树）**
+- ★★★**终判三条**：①**残余③落地＝成立**（装配七通道逐通道真——Speak=`resident_windows.go:580` 同一函数值、Clipboard 第一行业务调用即 CheckText 拒则永不达真写、TaskList 具名 nil 的"无单条入口 API"核为真、**`git diff -- internal/panel` 恰 0 行＝桥一字未动**）②**销账资格＝具备** ③**残余定性**：TaskList nil 合法（真入口归票 36）／**任务污点跨 scope＝382 形 B 设计行为非洞**（RecordTaintInheritance 记点拷贝＋继承链重推＝有意设计；★精化一处：形 B 恰不改 scope 寿命、缝注释措辞偏窄）／环境账三条全复现零产品判语
+- ★★★**"让位"判正确**：D10 档表现核（tier-1/2/4 均不发通知）⇒ 保留旧路必双 toast/双播报违档表；**CLI 字节同行为专测 PASS**
+- ★★**mutation 两发复刻**：M1 摘 Dispatch ⇒ 四档塌红且 **CLI 案独绿**（自证定向）；M2 摘 CheckText ⇒ 污句 `SK-wisp-30wr1-tainted-secret` 直抵真写红句逐字；还原核 blob 同值
+- ★**零回归**：六族并集 **38/0/0**（唯一红＝Test384 3 秒时窗＝环境形状③、单跑 1.28s PASS）＋`262/640/902` 逐位同＋present 19/0/0＋**E2E -race 0 DATA RACE**＋d22scan 分母 283/50/719/174（**cmd 差值恰＝本缝 3 新件自洽**）
+- ★**生产现状一笔**：★**TTSGate 继承机制零接线（announce 仍裸 CheckText）⇒ 与 announce 同担已登记残余 R26-5、非本缝新洞**
+
+**② ★★push 异常查明**
+★A1323 的 push 说 "Everything up-to-date" 但 `origin/dev..HEAD`=6 —— ★**根因＝A1322 那次 SSL 断发生在服务端已收包之后**（本地 tracking ref 未更新 ⇒ rev-list 用陈旧 ref 假报 6）⇒ **fetch 对齐后真值**（本轮现跑）
+
+**③ ★已派 2 条**
+- ★★★**`59-v3`（裁）**：**PRECHECK P15 终判**（59-w-r1 两层 (a) 读数＋(b) 阈值敏感性；**塌峰污染暴露＝测量环境属性的权重由它裁**）
+- ★**`12-r2`（写、cmd/wisp 独占）**：**票 12 AC#9**（A25 3s 回落）resident 侧接缝＋≥5 样本单调钟实测（**⛔ statemachine events 冻结面**）
+★**写面互斥核**：12-r2=cmd/wisp／387-r1=internal/speech／386-r1=tools/mockllm／59-v3 只读——**零撞**；★**写 3 满** ✅
+
+**④ ★状态**：done=**204**／open=**169**；未推（fetch 后真值现跑）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字更新）
