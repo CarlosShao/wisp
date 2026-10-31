@@ -70,6 +70,9 @@ agent 单方面改契约 = 跑歪模式 #1，对抗验收判失败。
 | DEFERRED | i18n/非中文 | D23（⚠ 语音链路是中文模型，非 locale 问题；非中文用户语音功能不可用只能走文字通道） | UI 全外置+英文 locale+英文 ASR/TTS/KWS 模型过基线 | S5+英文语音模型 | 界面中文；语音仅中文 |
 | DEFERRED | 无障碍 | 未讨论遗漏后补；自用期非阻塞 | 面板过 axe 检查；悬浮球状态有非视觉等价反馈；全流程纯键盘 | S5 | 屏幕阅读器不可用面板 |
 | ~~DEFERRED~~ 已采纳（Path C） | AEC/barge-in（陪聊路径） | **D47 部分推翻（2026-09-19）**：陪聊全双工是 owner 硬需求，降为 S4 必做；仍 DEFERRED 的只有干活路径全双工（设计非债务） | 播报中说话 ≤400ms 停播转听；播报音频注入麦克风回路无 ASR 转写 | P15 | 干活路径播报中仍不能语音打断（设计） |
+| DEFERRED | 票 26（TTS 播报）的 Path-C barge-in 部分——播报中说话停播转听 | **PRECHECK P15 NO-GO**（台账 A1307，回环 rig 实测无 AEC 必自触发；`docs/evidence/s1/59r1-aec-spike.md` §8）；**机主已批推迟（A1311③，2026-10-31：「批准推迟」）** | AEC3 重测 PASS 或 OS-AEC 在场机器 ERLE≥30dB（aec3-r1 在飞） | aec3-r1 重测（在飞） | 全双工暂缓、半双工不受影响 |
+| DEFERRED | 票 28（SessionScope C31）的 Path C 全双工 | **PRECHECK P15 NO-GO**（台账 A1307，回环 rig 实测无 AEC 必自触发；`docs/evidence/s1/59r1-aec-spike.md` §8）；**机主已批推迟（A1311③，2026-10-31：「批准推迟」）** | AEC3 重测 PASS 或 OS-AEC 在场机器 ERLE≥30dB（aec3-r1 在飞） | aec3-r1 重测（在飞） | 全双工暂缓、半双工不受影响 |
+| DEFERRED | C32 云端 realtime 引擎门（票 60，gated） | **PRECHECK P15 NO-GO**（台账 A1307，回环 rig 实测无 AEC 必自触发；`docs/evidence/s1/59r1-aec-spike.md` §8）；**机主已批推迟（A1311③，2026-10-31：「批准推迟」）** | AEC3 重测 PASS 或 OS-AEC 在场机器 ERLE≥30dB（aec3-r1 在飞） | aec3-r1 重测（在飞） | 全双工暂缓、半双工不受影响 |
 | DEFERRED | 快捷键路径语音否决（B1） | KWS 未加载+ASR 加载 1–3s > 2–3s 窗口，物理不可能 | 快捷键会话中说「取消」能否决 L1 | AEC | Confirming 明示「语音取消不可用」 |
 | DEFERRED | 剪贴板历史（D34） | 无差别记录隐私风险过高 | 敏感内容识别+自动跳过+逐条删 | 敏感识别器 | 只有当次读写 |
 | DEFERRED | `doc.read` xlsx/OCR（D34） | 工量大/额外模型冲击内存 | OCR 模型常驻 ≤80MB 不破 700MB；xlsx 读出表格结构 | S3 的 PDF/docx | 读不了 Excel 与图片文字 |
