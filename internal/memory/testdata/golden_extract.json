@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "set": "ticket 29 AC#2 golden extraction set: 10 scripted conversations -> expected profile slots/values",
+  "cases": [
+    {
+      "id": "case-01-pref-reply-language",
+      "title": "偏好到 slots：回复语言与语气一次给出",
+      "risk": "L0",
+      "covers": ["pref-slots"],
+      "turns": [
+        { "role": "user", "text": "以后都用中文回我，语气随意一点，别太正式。" },
+        { "role": "assistant", "text": "好的，之后都用中文，语气放松些。" }
+      ],
+      "expect": {
+        "upserts": [
+          { "slot": "pref.language", "content": "zh" },
+          { "slot": "pref.tone", "content": "casual" }
+        ],
+        "forgets": []
+      }
+    },
+    {
+      "id": "case-02-pref-tone-multi-turn",
+      "title": "多轮增量：同一偏好槽位在后轮被改写，末值生效",
+      "risk": "L0",
+      "covers": ["pref-slots", "multi-turn"],
+      "turns": [
+        { "role": "user", "text": "你回复别太正式了，随意点就行。" },
+        { "role": "assistant", "text": "好，那我随意些。" },
+        { "role": "user", "text": "嗯，另外回答再简短一些，说重点就行。" },
+        { "role": "assistant", "text": "明白，简短、说重点。" }
+      ],
+      "expect": {
+        "upserts": [
+          { "slot": "pref.tone", "content": "concise" }
+        ],
+        "forgets": []
+      }
+    },
+    {
+      "id": "case-03-habit-work-hours",
+      "title": "习惯到 slots：工作时段勿扰写成一条 habit",
+      "risk": "L0",
+      "covers": ["habit-slots"],
+      "turns": [
+        { "role": "user", "text": "工作日早上 9 点到晚上 6 点我都在上班，那段时间别给我安排打扰。" },
+        { "role": "assistant", "text": "记住了：工作日 9 点到 18 点不安排打扰。" }
+      ],
+      "expect": {
+        "upserts": [
+          { "slot": "habit.work_hours", "content": "weekday 09:00-18:00" }
+        ],
+        "forgets": []
+      }
+    },
+    {
+      "id": "case-04-habit-editor-correction",
+      "title": "习惯多轮修正：编辑器换新，末值覆盖旧值",
+      "risk": "L0",
+      "covers": ["habit-slots", "multi-turn"],
+      "turns": [
+        { "role": "user", "text": "我平时写代码都用 VS Code。" },
+        { "role": "assistant", "text": "记住了，代码问题按 VS Code 的习惯来。" },
+        { "role": "user", "text": "上礼拜我换 GoLand 了，以后按 GoLand 来。" },
+        { "role": "assistant", "text": "好，以后按 GoLand 来。" }
+      ],
+      "expect": {
+        "upserts": [
+          { "slot": "habit.editor", "content": "goland" }
+        ],
+        "forgets": []
+      }
+    },
+    {
+      "id": "case-05-noise-only",
+      "title": "纯噪声对话：零抽取，不许误报槽位",
+      "risk": "L0",
+      "covers": ["noise"],
+      "turns": [
+        { "role": "user", "text": "今天路上太堵了，迟到了二十分钟。" },
+        { "role": "assistant", "text": "路上辛苦了，需要我帮你做点什么吗？" },
+        { "role": "user", "text": "先不用，帮我看看下午有没有雨就行。" }
+      ],
+      "expect": {
+        "upserts": [],
+        "forgets": []
+      }
+    },
+    {
+      "id": "case-06-forget-intent",
+      "title": "撤销意图：之前存过的偏好，用户说别记了，落库后必须消失",
+      "risk": "L1",
+      "covers": ["forget-intent", "noise"],
+      "seed": { "slot": "pref.tone", "content": "casual" },
+      "turns": [
+        { "role": "user", "text": "对了，今天例会开了一个半小时，真是够长的。" },
+        { "role": "assistant", "text": "辛苦了。" },
+        { "role": "user", "text": "另外，我那个说话风格的偏好，别记了，删掉吧。" }
+      ],
+      "expect": {
+        "upserts": [],
+        "forgets": ["pref.tone"]
+      }
+    },
+    {
+      "id": "case-07-mixed-zh-en",
+      "title": "中英混排：输入混英文，回复语言锚定中文，另带语气",
+      "risk": "L0",
+      "covers": ["mixed-language", "pref-slots"],
+      "turns": [
+        { "role": "user", "text": "Daily standup 我都记在 notion 里，不过回复你都用中文，另外简短一点。" },
+        { "role": "assistant", "text": "好，都用中文、简短一点。" }
+      ],
+      "expect": {
+        "upserts": [
+          { "slot": "pref.language", "content": "zh" },
+          { "slot": "pref.tone", "content": "concise" }
+        ],
+        "forgets": []
+      }
+    },
+    {
+      "id": "case-08-english-pref",
+      "title": "纯英文偏好：回复语言锚定英文，枚举值为 en",
+      "risk": "L0",
+      "covers": ["english-pref"],
+      "turns": [
+        { "role": "user", "text": "Please always reply in English from now on." },
+        { "role": "assistant", "text": "Sure, I will reply in English." }
+      ],
+      "expect": {
+        "upserts": [
+          { "slot": "pref.language", "content": "en" }
+        ],
+        "forgets": []
+      }
+    },
+    {
+      "id": "case-09-family-fact",
+      "title": "家庭事实：生日日期落 fact.family，敏感级 L1",
+      "risk": "L1",
+      "covers": ["family-fact"],
+      "turns": [
+        { "role": "user", "text": "我妈 11 月 9 号过生日，到时候记得提醒我准备礼物。" },
+        { "role": "assistant", "text": "好，生日提醒我来安排。" }
+      ],
+      "expect": {
+        "upserts": [
+          { "slot": "fact.family", "content": "mother birthday 11-09" }
+        ],
+        "forgets": []
+      }
+    },
+    {
+      "id": "case-10-batch-three-slots",
+      "title": "批量抽取：一次任务对话出三个槽位，整批一次提交",
+      "risk": "L1",
+      "covers": ["batch-multi-slot", "pref-slots", "habit-slots", "family-fact"],
+      "turns": [
+        { "role": "user", "text": "以后都用中文回我。" },
+        { "role": "user", "text": "工作日早上 9 点到晚上 6 点别安排打扰。" },
+        { "role": "user", "text": "对了，我妈 11 月 9 号生日。" }
+      ],
+      "expect": {
+        "upserts": [
+          { "slot": "fact.family", "content": "mother birthday 11-09" },
+          { "slot": "habit.work_hours", "content": "weekday 09:00-18:00" },
+          { "slot": "pref.language", "content": "zh" }
+        ],
+        "forgets": []
+      }
+    }
+  ]
+}
