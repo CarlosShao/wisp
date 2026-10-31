@@ -28863,3 +28863,27 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ★**写面互斥核**：381-v3 只读导出树／43-r1=cmd/wisp／102r2-r1=internal/panel、59-r1=internal/audio —— **零撞**；总在飞 4（写 3＋裁 1）≤7 ✅
 
 **⑦ ★状态**：done=**200**／open=169（**54.2%**，票池 369）；未推（本轮后现跑）；**摆机主 3 件**
+
+## A1304（2026-10-31 12:5x +08，编排者，goal round 31 续）★★★收 `385-r1`（`fad2f5e4f` 5 枚 +262/−9：**mockllm 400 字节帽摘除、修法选②去截断**）｜★**尺核三把尺过（tools/mockllm 复跑绿）**｜★开票 386（同类帽登记不修三处）｜★在飞 4
+
+**① ★★收 `385-r1`（`fad2f5e4f`：chat.go/responses.go/messages.go/chat_echo_385_test.go/件）**
+- ★★★**修法选型＝②去截断**（★**⛔ ①rune 截断**）——★**四条具名理由**：⑴帽与真护栏重复（8MB LimitReader＋max_tokens 模拟才是按请求长度控制）⑵**零消费方测量该帽**（包内测试零断言、golden 整条绕过）⑶**AC#2"两路输出一致"只有摘帽能满足**（C5 缝回全文、rune 截 400 仍把 420-rune 样本截短）⑷**主流 harness 判断：test double 不设不模拟真实行为的暗上限**
+- ★**原始意图核**：★blame 逐行同源建仓提交、无注释无解释、但**三方言同型对称 400/200 帽＝刻意"防超长回声"惯例、意图可辨**（未触发停手①）
+- ★**协议形状零改动**（SSE/字段/finish/usage 未动）✅
+
+**② ★★读数**
+- ★★**AC#2 一发**：★票 30 tier-2 同一样本三子测试全 PASS——**与 C5 缝案口径一致＝剥「echo: 」签名后两路逐字节相同**
+- ★★★**AC#3 反向**：overlay 装回字节帽 ⇒ **rc=1、红句逐字** `assembled text = 402 bytes / 138 runes, want 1243 bytes / 419 runes (tail lost: 测…)` —— ★**尾部 U+FFFD 即拦腰切坏字节 JSON 化残迹**；★messages/responses 子测试保持绿（突变只落 chat.go）；★撤 overlay 复绿；★sha256 三产码前后逐一相同
+- ★★**AC#4 零回归**：★tools/mockllm 19/16/0/0；★internal/llm＋present（票 30 E2E 真子进程）7 包 ok；★cmd/wisp 定向消费方 46/36/0/0＋TestComposedGate 单发；★build/vet 全绿
+- ★**门禁**：★两尺对 tools\mockllm 双 0；★**d22scan 真仓 rc=0 clean**（★分母 bans#1-5 280/45、ban#6 frontend/116、ban#7 internal/tools/25、ban#8 design 39/frontend 116/internal 714/cmd 162）；★**正控＝d22scan 自检 rc=0**（★TestScanDetectsAllSeededViolations PASS）
+- ★★**射程如实报**：★**顶层 `tools/**` 不在 d22scan 八枚 ban 任何一枚射程内**（ban#7 是 internal/tools 另目录、ban#8 只扫 design/frontend/internal/cmd；源码注释＋实跑 scope 表双向一致）—— ⛔ 诚实、⛔ 假装覆盖
+
+**③ ★登记不修（残余）→ 开票 386**
+★**三处同类帽**：★reasoning/reason **200 字节帽三方言**（`chat.go:168-169`／`responses.go:100-101`／`messages.go:114-115`）＋★**max_tokens 字节切**（`chat.go:207`、**带 finish=length 模拟语义——可能有意**）＋★`cmd/wisp/subagent_carrier_197_test.go:605-608` 引用本帽的论证注释前提已失效（断言实测仍绿、归 cmd/wisp 所有者改注释——385-r1 ⛔ 越面没改）
+⇒ ★**开票 386**（★逐帽判"有意模拟 vs 无意缺陷"、有意模拟 ⛔ 动）
+
+**④ ★台面注记**
+★cmd/wisp 首发裸跑 `0xc0000135`＝在册 DLL 形状、按 `wisp-cli-tests.sh` 台型前置 sherpa 复跑全绿；★**本腿在飞期间共享 HEAD 被推进两笔、零 .go、读数不受影响**；★**编译含他人四枚 resident_voice_*.go WIP（41a2-r1 的）＝共享树读数、mockllm 独立模块经子进程构建**
+
+**⑤ ★状态**：在飞＝写 2（★`43-r1` cmd/wisp／`59-r1` AEC）＋**`381-v3`/`12-slo-v1`/`29g-r1`/`config-r1` 已交** ⇒ ★**本轮派 `386-r1`（写、tools/mockllm）补满写 3**
+★票池：done=**200**／open=**171**（385/386 开后）；未推（本轮后现跑）；**摆机主 3 件**
