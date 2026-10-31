@@ -54,6 +54,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/perm"
+	"github.com/CarlosShao/wisp/internal/present"
 	"github.com/CarlosShao/wisp/internal/projctx"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/secret"
@@ -322,6 +323,12 @@ type agentRuntime struct {
 	// every hop after that (risk.ChTTS gate, TTS engine, output device, the
 	// ball's Speaking) belongs to the leg, not to this runtime.
 	voiceAnnounce func(text string) bool
+	// presenter is 票 30 收口残余③'s D10 tier router (internal/present), wired
+	// once by the resident assembly root (assembleResidentPresenter). execute()
+	// hands every COMPLETED result to it after loop.Run returns; nil keeps the
+	// legacy notification + announce path below for every shape - which is the
+	// CLI's shape, since only the resident assembly wires one.
+	presenter *present.Dispatcher
 	// provs is the built provider chain, kept for the probe path.
 	provs    []llm.LlmProvider // built chain, kept for the probe path
 	names    []string
@@ -1481,27 +1488,46 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 		fmt.Fprintf(rt.stdout, "wisp run: 回复已完成\n")
 	}
 
-	// D10: the result arrives as a notification too, because the CLI has no
-	// ball to pop. A poster failure is reported and never swallowed.
-	if err := rt.notify("Wisp", notifyBody(res)); err != nil {
-		fmt.Fprintf(rt.stderr, "wisp run: 通知未能发出：%v\n", err)
-		if code == 0 {
-			code = 1
-		}
-	}
-	// Ticket wire-r1: ticket 26's announcement hop, and the ONE production trigger
-	// the TTS path has. This line hands over the SAME sentence D10 just notified
-	// with, so the notification and the spoken line cannot disagree about what the
-	// result was. nil means this boot assembled no voice chain (or a `wisp run` that
-	// never will), and then nothing is claimed.
+	// 票 30 收口残余③ (30-v1 verdict §9.3, the named handoff): a host that wired
+	// the D10 tier router hands every COMPLETED result to it here - the call
+	// point the handoff names, "after loop.Run returns". The router owns the
+	// tier table then: clipboard only on tier 4, notify + badge + task + panel
+	// on tier 3, artifact + panel + spoken summary on tiers 1-2, and every
+	// spoken line through the same announce seam wire-r1 mounted.
 	//
-	// The call does not block: the voice leg queues the sentence for its own owner
-	// goroutine (D38b), where the ChTTS gate, the single-family engine slot, the
-	// output device and the ball's Speaking all live. What it returns is "was the
-	// sentence taken", which is booked rather than swallowed.
-	if rt.voiceAnnounce != nil {
-		if taken := rt.voiceAnnounce(notifyBody(res)); !taken {
-			rt.auditf("wisp run: 播报没有受理（语音链未装配、TTS 模型缺失或队列已满），结果由上面的 D10 通知交付")
+	// What stays on the legacy path below, and why: every shape the router
+	// deliberately never sees (failures, control words, truncations - Input's
+	// own doc pins that) and every host that wired no presenter, which is the
+	// CLI's shape. Leaving a completed result on BOTH paths would double-fire
+	// the toast and the announcement on the resident and break D10's tier table
+	// (a long result would notify, a tier-4 result would announce twice), so
+	// the gate is the reconciliation, not a behaviour swap: the CLI run reads
+	// byte-identical behaviour from this block, because its presenter is nil.
+	if rt.presenter != nil && res.Status == agent.StatusCompleted {
+		rt.presenter.Dispatch(ctx, present.Input{TaskID: res.TaskID, Text: res.Text})
+	} else {
+		// D10: the result arrives as a notification too, because the CLI has no
+		// ball to pop. A poster failure is reported and never swallowed.
+		if err := rt.notify("Wisp", notifyBody(res)); err != nil {
+			fmt.Fprintf(rt.stderr, "wisp run: 通知未能发出：%v\n", err)
+			if code == 0 {
+				code = 1
+			}
+		}
+		// Ticket wire-r1: ticket 26's announcement hop, and the ONE production trigger
+		// the TTS path has. This line hands over the SAME sentence D10 just notified
+		// with, so the notification and the spoken line cannot disagree about what the
+		// result was. nil means this boot assembled no voice chain (or a `wisp run` that
+		// never will), and then nothing is claimed.
+		//
+		// The call does not block: the voice leg queues the sentence for its own owner
+		// goroutine (D38b), where the ChTTS gate, the single-family engine slot, the
+		// output device and the ball's Speaking all live. What it returns is "was the
+		// sentence taken", which is booked rather than swallowed.
+		if rt.voiceAnnounce != nil {
+			if taken := rt.voiceAnnounce(notifyBody(res)); !taken {
+				rt.auditf("wisp run: 播报没有受理（语音链未装配、TTS 模型缺失或队列已满），结果由上面的 D10 通知交付")
+			}
 		}
 	}
 	if code != 0 {

@@ -589,6 +589,19 @@ func runResident() {
 	}
 	raudio.attachVoice(rv)
 
+	// 票 30 收口残余③（30-v1 裁决 §9.3 的具名交回）：present.New(Channels{...}) 一次装配，
+	// 把票 30 落的 internal/present 库接进本进程。逐通道的形状、nil 的取舍与 Clipboard
+	// 适配器的 CheckText 义务都写在 assembleResidentPresenter 的头上（本包
+	// resident_present_windows.go）；调用点在 execute()（run.go）：loop.Run 返回后对
+	// completed 结果 Dispatch。TaskList 是具名 nil：面板任务表是快照派生的，没有单条入口。
+	// 本腿只加兄弟段：下面 43-r1 的 lifecycle 装配与 384-r1 的 watchdog 装配一行未动。
+	if src != nil && src.run != nil {
+		if dp, presentLine := assembleResidentPresenter(src, rb, rv, writeClipboardWindows); dp != nil {
+			src.run.presenter = dp
+			fmt.Printf("wisp: %s\n", presentLine)
+		}
+	}
+
 	// Ticket 43: the two OS doors and their sequences, wired here where every
 	// handle the sequences need (approvals, capture, voice residency) already
 	// exists. lifecycleFastExit is what the deferred rt.Shutdown above reads;
