@@ -1,0 +1,2 @@
+存档 2026-10-31 21:5x · 腿 33r11-r2（roster 债修复腿、写、cmd/wisp 独占）——384-v1 归因的 381 族债
+384-v1 坐实：33r11 census 两枚红＝voice_out_windows.go 的 releaseLocked/unprepareLocked 未入 D38b 名册（HEAD 既有 381 族债）。修＝按 233 §8 只加读者形状补名册登记（或按 census 判据该登记的形状）⇒ census 红→绿；⛔ 改 census 判据本身；⛔ 动 381-r2 本体。Test256 红属 375 族（b63d56413）⛔ 本腿碰。

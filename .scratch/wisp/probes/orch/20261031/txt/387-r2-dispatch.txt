@@ -1,0 +1,2 @@
+存档 2026-10-31 21:5x · 腿 387-r2（票 387 tts.go onnxruntime 守卫、写、internal/speech 独占——387-r1 静默死亡重派：8.5h 零痕迹判死）
+AC#1 NewMatchaTts 挂同族 checkOnnxruntime（NewDetector/NewStreamingAsr 同形）／AC#2 裸跑不崩=具名 skip／AC#3 反向（仓外快照真改文件——A380 WalkDir 方法）／AC#4 staging 零回归 61/0/6／AC#5 纪律。
