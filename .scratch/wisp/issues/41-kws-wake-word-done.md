@@ -1,6 +1,6 @@
 # 41 — KWS wake word: Armed state, keywords+veto words, mute, opt-in privacy
 
-**Status:** ready-for-agent
+**Status:** **DONE-带残余**（2026-10-31 编排者收口：六格各有缺角保持未勾＝15/28 先例；R28-2 注销；残余 7 条归口见末节）
 **Claimed by:** —
 **Last update:** 2026-09-19
 **Blocked by:** 15-speech-engines-cer-harness, 28-session-scope-warm
