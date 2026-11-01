@@ -1,0 +1,4 @@
+存档 2026-11-01 20:0x · 腿 400-r2（票 400 残余①执行腿、写、cmd/wisp panel_pump.go——397-r4 已让出）
+400-v1 残余①：wire 携 DroppedCount 需动 cmd/wisp/panel_pump.go:250（装配点现读坐实 state.DroppedStreamKeys=DroppedKeys()）。
+使命：panel_pump.go 的 wire 挂上 DroppedCount（对照 400-r1 的 Ring 64+DroppedCount() 面）；⛔ 动 panel 契约语义/C17 桥/Thresholds；读数＝wire 后 DroppedCount 真到面板侧读数＋反向（摘 wire⇒零读数红）＋零回归（panel 全套＋cmd/wisp 消费面 15/15＋六族抽案）。
+⚠ 397-r4 同文件包刚交付、开工三核照做。

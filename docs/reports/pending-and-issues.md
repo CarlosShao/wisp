@@ -29952,3 +29952,15 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 1**＝**写 1**（★`397-r4` -Inf 哨兵小腿、cmd/wisp 测试面）——**写 1＜3 具名**：★**第三写腿＝400 残余①（wire 携 DroppedCount 需 panel_pump.go:250）——⛔ 等队（cmd/wisp 每波一枚、397-r4 在飞）⇒ 397-r4 交件同轮派**；★CI 两 run 完成后 ⇒ **票 16 格④翻**
 ★票池：done=**216**／open=**168**（**56.2%**，票池 384）；未推（本轮后现跑）；★**摆机主 2 件**（**panel.ts 追认圈阅**／**R15 三参数挑值**）
+
+## A1371（2026-11-01 20:0x +08，编排者，goal round 39 续）★★★收 `397-r4`（`e7db006e6` 2 枚 +202/-1）：**-Inf 哨兵落地**（±Inf/NaN 钳成 -999 有限哨兵、反向摘哨兵⇒397-v2 撞面逐字复现、零回归 98/75/0/11 逐位）｜★**漏存档再现（第三例）**：397-r4-dispatch.txt 没写（腿按任务面全文执行、如实自报）｜★**CI 两 run FAILURE＝预期内**（frontend lint＋speech census＝ci-r1 上报不修两项；CER 具体读数下轮查）｜★派 `400-r2`（400 残余① wire 小腿）
+
+**① ★★收 `397-r4`（尺核：★提交在／2 枚在／★我复跑哨兵单元案 ok 0.084s）**
+- ★★★**哨兵拍板**：★**write392JSON 序列化前经 voice392JSONSafe（reflect 走查）**、±Inf/NaN 钳成 **voice392NoSignalDbfs=-999（dBFS）**、钳制打 JSON-SENTINEL 日志行（不进工件不加键）；★**选有限值不选 null 的理由＝null 须改整个工件 schema（float 字段改 any/指针）且破坏有限形逐位同；-Inf 本面语义＝无信号、-999 远低于真读数带（最低≈-59）且保 float 字段型、正常形 byte 逐位同（单元 byte-equality 断言钉住）**；★行为断言/WARM REVIVAL MOVED/rounds 语义零字节
+- ★★★**读数**：★单元驱动案 rc=0（finite 钳制计数=0 且 marshal 逐字节同；gate-clean (b) 形钳制恰 2→工件 `"rms": -999`、`"res_profile": [-999, -58.9]`）；★真 rig keepalive 复活案 rc=0（35.22s 断言全过、工件全新落盘；本跑 (b)=episodes=1 有限值形 ⇒ **哨兵静默＝正常形零干预活证**）；★正常形工件 130 键路径逐位同；★**反向摘哨兵⇒rc=1 `json: unsupported value: -Inf` 逐字复现（397-v2 撞面原样）**＋还原核
+- ★★**零回归**：392 三案＋26p keyed 4/4＋六族 34/1/0＋**四数 98/75/0/11 逐位同基线**；gofumpt/vet/d22scan 全绿
+- ★**如实记三笔（腿自报）**：①**397-r4-dispatch.txt 盘上不存在＝漏存档第三例**（腿按任务面全文执行）②四数首跑 70/57/0/1＝staging 缺口（aecspike 二进制旁无 DLL→0xc0000135）、按 397-v2 处方补跑归位 ③首版单行 sed 突变自抓编译红、整块摘除重做
+**② ★★漏存档第三例入册**：★**存档动作必须与派单同一 pwsh 调用**（已入册仍犯第三次——**规则升级：派单 pwsh 调用末尾必须 ls 该存档文件、缺失即当次派单作废重做**）
+**③ ★CI 两 run FAILURE＝预期内**：★frontend lint（SA9009 外部面）＋speech census（结构矛盾待机主裁）＝**ci-r1 上报不修两项**；★**CER 门具体读数下轮查**（gh log grep near_clean）
+**④ ★已派 `400-r2`（写、cmd/wisp panel_pump.go——397-r4 已让出）**：★400-v1 残余①执行＝**wire 挂上 DroppedCount**（对照 400-r1 的 Ring 64＋DroppedCount() 面）；读数＝wire 后 DroppedCount 真到面板侧＋反向摘 wire 红＋零回归（panel 全套＋消费面 15/15＋六族抽案）
+★票池：done=**216**／open=**168**；未推 **5**（网络断、本轮后现跑）；★**摆机主 2 件**（**panel.ts 追认圈阅**／**R15 三参数挑值**）
