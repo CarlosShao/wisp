@@ -248,6 +248,9 @@ func (rt *agentRuntime) taskRosterState() panel.TaskRosterState {
 	state.StreamTruncated = rt.stream.Truncated()
 	state.StreamElidedRunes = rt.stream.ElidedRunes()
 	state.DroppedStreamKeys = rt.stream.DroppedKeys()
+	// The total behind those names: the ledger holds only its most recent cap,
+	// so past it the page would otherwise read "some of them" as "all of them".
+	state.DroppedCount = rt.stream.DroppedCount()
 	return state
 }
 

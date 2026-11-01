@@ -94,6 +94,7 @@ type carrier197Wire struct {
 	StreamTruncated   bool            `json:"streamTruncated"`
 	StreamElidedRunes int             `json:"streamElidedRunes"`
 	DroppedStreamKeys []string        `json:"droppedStreamKeys"`
+	DroppedCount      int             `json:"droppedCount"`
 }
 
 // packetTasks197 reads the roster section back out of a run's own bytes. A missing
@@ -562,6 +563,10 @@ func TestRunPacketReportsTheStreamLogPastItsBound(t *testing.T) {
 		t.Errorf("packet names %v dropped, want the log's own %v", sect.DroppedStreamKeys,
 			driven.stream.DroppedKeys())
 	}
+	if sect.DroppedCount != driven.stream.DroppedCount() {
+		t.Errorf("packet counts %d dropped, want the log's own %d", sect.DroppedCount,
+			driven.stream.DroppedCount())
+	}
 
 	// Every child keeps its OWN row, under its own key, with nobody else's label in
 	// it - the carrier-side reading of the invariant 197-r2 made StreamLog keep.
@@ -593,6 +598,53 @@ func TestRunPacketReportsTheStreamLogPastItsBound(t *testing.T) {
 		sect.StreamElidedRunes, sect.DroppedStreamKeys)
 }
 
+// TestRunPacketCarriesTheStreamDroppedCountPastTheHardCeiling is the count half of
+// the drop accounting, read off a packet the real assembly published. The
+// bound-crossing case above stops at the soft bound, because the hard ceiling is
+// DefaultStreamKeys x 2 = 64 real child loops and 33 was already this suite's
+// slowest case. The flood here is therefore driven the only way left that keeps
+// the packet honest: Append on the run's OWN StreamLog - the same method the
+// loop's sink (run.go:1704) and the artifact surface use - so everything under
+// assertion is still real (real taskRosterState, real render, real publish), and
+// only the log's contents are synthetic. DroppedCount is the TOTAL, including the
+// names past the naming ledger's own cap; the named keys can never exceed it.
+func TestRunPacketCarriesTheStreamDroppedCountPastTheHardCeiling(t *testing.T) {
+	f := newRunFixture(t, "openai-chat")
+	var driven *agentRuntime
+	f.rtHook = func(rt *agentRuntime) { driven = rt }
+	if code := f.run("总结一下 这份笔记"); code != 0 {
+		t.Fatalf("exit %d\n%s\n%s", code, f.out.String(), f.err.String())
+	}
+	if driven == nil {
+		t.Fatal("the run never assembled a runtime")
+	}
+	for i := 0; i < panel.DefaultStreamKeys*panel.StreamKeyHardCeilingMultiple+8; i++ {
+		driven.stream.Append(fmt.Sprintf("flood-400r3-%03d", i), "flood")
+	}
+	driven.publishPanelSnapshot()
+	_, data, seen := driven.lastPanelSnapshot()
+	if !seen {
+		t.Fatal("no packet")
+	}
+	sect := packetTasks197(t, data)
+	live := driven.stream.DroppedCount()
+	if live == 0 {
+		t.Fatalf("the flood never crossed the hard ceiling (total dropped 0): the readings below would be vacuous")
+	}
+	if sect.DroppedCount != live {
+		t.Errorf("packet counts %d dropped, want the log's own %d: the reader has to be the log, and a count the ledger lost room for still has to ride along",
+			sect.DroppedCount, live)
+	}
+	if len(sect.DroppedStreamKeys) > sect.DroppedCount {
+		t.Errorf("packet names %d dropped keys but counts %d: the named half can never exceed the total",
+			len(sect.DroppedStreamKeys), sect.DroppedCount)
+	}
+	if len(sect.DroppedStreamKeys) == 0 {
+		t.Errorf("packet names no dropped keys at a live total of %d: the naming half went silent", live)
+	}
+	t.Logf("hard ceiling crossed: dropped total=%d named=%d", sect.DroppedCount, len(sect.DroppedStreamKeys))
+}
+
 // WHAT THIS FILE DID NOT MEASURE.
 //
 //  1. blockedOnApproval is never asserted on a production packet. The join has two
@@ -608,9 +660,12 @@ func TestRunPacketReportsTheStreamLogPastItsBound(t *testing.T) {
 //     bound-crossing case therefore reads truncated=true with elided=0, which is true
 //     and honest, and the per-row arithmetic lives in internal/panel's
 //     TestTruncationFactsRideThePacket instead (real StreamLog, real pump, real bytes).
-//  3. Dropped stream keys are never named on a production packet: the hard ceiling is
-//     DefaultStreamKeys x 2 = 64 keys, i.e. 64 real child loops. 33 was already the
-//     slowest case in this suite.
+//  3. A flood of REAL child loops is never run against the hard ceiling: it is
+//     DefaultStreamKeys x 2 = 64 keys, i.e. 64 real child loops, and 33 was already the
+//     slowest case in this suite. The COUNT half of the drop accounting is now read on
+//     the wire anyway (TestRunPacketCarriesTheStreamDroppedCountPastTheHardCeiling) by
+//     appending the flood to the run's own StreamLog - the packet, the render and the
+//     reader stay production; only the log's contents are synthetic there.
 //  4. The in-flight moment is not caught on the production path. A child's turn is
 //     ~2-4 SSE chunks and the root's is ~9, so which one is observable first is a race,
 //     and no instrument in this tree makes a child provably slower. Case 1 therefore

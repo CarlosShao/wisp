@@ -98,6 +98,11 @@ type TaskRosterState struct {
 	StreamTruncated   bool
 	StreamElidedRunes int
 	DroppedStreamKeys []string
+	// DroppedCount is the log's own total of evicted keys, the total the
+	// naming ledger can only ever hold the most recent cap of. It rides the
+	// same state so the page can show both halves of the bound: WHICH streams
+	// were dropped and HOW MANY ever were.
+	DroppedCount int
 }
 
 // TaskRowView is one roster row as the page reads it. Every field is a copy of
@@ -169,6 +174,13 @@ type TaskRosterSection struct {
 	// DroppedCount carries the total, so a flood cannot grow the naming memory.
 	// Empty array means none, never "unread".
 	DroppedStreamKeys []string `json:"droppedStreamKeys"`
+	// DroppedCount is every key the log stopped tracking at the hard ceiling,
+	// including the ones the naming ledger no longer holds room for - the total
+	// that the named keys above can only ever be the most recent cap of. Zero
+	// means nothing was dropped, never "unread"; the count rides the wire
+	// whenever the roster does, so a flood past the ledger's own cap stays a
+	// number on the page instead of silently becoming exactly the names shown.
+	DroppedCount int `json:"droppedCount"`
 }
 
 // TaskRosterSectionFrom renders the host's read as the packet's section, and it
@@ -215,6 +227,7 @@ func taskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView, l1
 		StreamTruncated:   state.StreamTruncated,
 		StreamElidedRunes: state.StreamElidedRunes,
 		DroppedStreamKeys: append([]string(nil), state.DroppedStreamKeys...),
+		DroppedCount:      state.DroppedCount,
 	}
 	if sect.DroppedStreamKeys == nil {
 		// An empty array, not null: "nothing was dropped" has to be readable
