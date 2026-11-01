@@ -10,3 +10,9 @@
 - [ ] **AC#3 反向判据**（★三读数＋还原核）
 - [ ] **AC#4 零回归**（★六族＋tools 消费方）
 - [ ] **AC#5 纪律格**：⛔ 翻框/改票面/台账/push；⛔ thresholds/golden
+## 选型单更新（2026-11-01 10:4x 编排者，凭 382-w-v2 主新发现——原两形不穷尽）
+
+- 生产带内容 mark 实测共 4 处跨 3 包：bridge.go:687／subagent_197.go:512（同任务作用域 mark——382-w-r2 的「唯一 mark 点」表述不周延）／panel_assets.go:245／projctx.go:349 ⇒ tools.Options.OnMark 只能盖 1 处
+- 第三形＝risk 层 mark 观察缝（ProvOptions 钩或 TTSGate 借引擎自注册）：覆盖全部 4 处、契约面只在 risk、并收回调用方根本无法履行的 normalizeTaint 归一化义务（risk 未导出函数——382wr2 测试被迫手选已归一化常量即此痛）；不动 Scope.Close 语义、非 tri-v1 否决的形 A
+- 代价如实：留存策略从显式 opt-in 变引擎侧姿势（建议只收任务作用域 mark）
+- ⇒ 选型单＝三形（①tools.Options.OnMark ②闸下沉 ③risk 层观察缝）——批仍归机主（契约面）；382-w-v2 建议：批前把第三形并入选型单（已并）
