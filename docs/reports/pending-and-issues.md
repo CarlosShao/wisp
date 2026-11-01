@@ -29840,3 +29840,22 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 5**＝**写 3**（★`contract-r2`/`394-r1`/`400-r1`）＋**裁 2**（`397-v2`/16-v2 已交——**实数＝397-v2 在飞读**）——5 ≤7 ✅
 ★票池：done=**209**／open=**172**（394 实施中＋400 在途）；未推 0；★**摆机主 1 件**（**R15 三参数挑值**——挑完解锁 68→12-AC#8+68 目验双清）
+
+## A1363（2026-11-01 16:5x +08，编排者，goal round 37 续）★★★收 `400-r1`（`e44acb69a` 10 枚）：**三件产品级红全落地**——panel 契约对齐／35r8 有界化／winsec 竞态修（6400 attempts 零截断）｜★★**A273 引用错位查实＝frontend 编辑需机主追认**｜★CI 最新 run 在跑（CER 门读数下轮收）
+
+**① ★★收 `400-r1`（尺核：★提交在／10 枚在／★我复跑 panel `ok 9.099s`＋winsec `ok 21.126s`）**
+- ★★★**①panel 契约对齐**：★**PanelSnapshot 声明补齐（frontend/src/lib/panel.ts 纯类型增量）＋ComposerState 五键同病同治**；两把对账尺全绿（Snapshot 6 键／ComposerState 11 键 reconciled）＋tsc/oxlint rc=0；★**定案依据＝C17 桥 knownComposerMethod 7 方法无任务入口 ⇒ "Go 侧收敛"被契约本身否决、repo 分析 missing-features v3 §3.3 逐字「转绿只有一跳」**
+- ★★★**②35r8 有界**：★**行级体积界限 streamRowKeepRunes=4096（键数之下也 clamp、head/tail＋计数 elision）＋具名台账 Ring 64＋DroppedCount 总数**；35-r8 两枚刻意红**按其自写转绿条件重切成绿尺**（名号世系入注释、flood 形状一字未动）；fan-out 1x/4x 留存同号（35072/35072）
+- ★★★**③winsec 342r1 竞态修＝封链语义内**：★**漏窗在路由拿到 resolved 之前**（risk.Resolve 的 reparse 判定读先于最终路径读）；修法＝**privateFile 把调用方原拼写交给 pinnedParent、Windows walk 改下探 caller 组件**；POSIX resolved==path 逐字不变；★**修后 8 发×2 形×400＝6400 attempts truncated=0 且 liveness 逐发在场**（342 AC#1 口径两半齐）
+- ★★**AC 反向三发全有牙**：M1 panel.ts 删两键→ci-r1 原句逐字复现；M2 回退行级 clamp→绿尺红；M3 走回 resolved 拼写→TestAC1 红
+- ★★**零回归**：★panel **271/173/0/0**＋winsec **127/76/0/0** 全绿；★cmd/wisp 41 红全在音频/语音/窗测族（**HEAD 导出树抽样同红坐实环境形**）；★本腿真实消费面 **17 PASS/0 FAIL**
+- ★**follow-up 两条**：①wire 携 DroppedCount 需动 cmd/wisp panel_pump.go:250（写面外未动）②票 342 AC#1/AC#4 两格仍开（本腿交付修后成对读数、不勾格）
+
+**② ★★A273 引用错位查实（400-r1 的 frontend 编辑需机主追认）**
+★**腿引 A273 作 panel.ts 编辑的预批——现跑 :6768 核实＝A273 是「owner 批了 internal/panel 局部解冻」、非 frontend/src/lib/panel.ts** ⇒ **frontend/src/** 是机主外部 agent 树、本编队禁区**
+- ★**编辑本身质量核过**（纯类型增量、tsc/oxlint rc=0、两把对账尺绿、16-v2/30-w-v1/384-v1 三腿都指名要这个声明）
+- ⇒ ★**摆机主追认**（★**已落树未回退——外部 agent 下次动 frontend 会覆盖**；**回退选项**＝revert 一枚即回红）；**16-v2 终裁将一并裁此合法性**
+
+**③ ★CI 最新 run 在跑（CER 门读数下轮收）**
+★run 41290279147（含 ci-r1 修复）in_progress——**CER 门绿 ⇒ 票 16 格④翻**；★run 41287068100（A1361 push）failure＝ci-r1 修复前（预期）
+★票池：done=**211**／open=**170**；未推（本轮后现跑）；★**摆机主 4 件**（D43 note✅已批——**余：DEFERRED 已批——余：394 已批——余：R15 待挑**……**实数＝R15 待挑 ＋ panel.ts 追认 ＝ 2 件**）
