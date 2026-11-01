@@ -29751,3 +29751,19 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **④ ★在飞 1**＝**写 1**（★`397-r2`）——**具名**：★**394 等机主批三形／12-AC#8 等 R15／16-格④ 等 push 后 CI 工件** ⇒ 397-r2 交件同轮评估
 ★票池：done=**209**／open=**170**（397 在途）；未推 **6**（网络断持续）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／票 394 三形选一）＋**R15 三项（半急）**
+
+## A1356（2026-11-01 14:0x +08，编排者，goal round 35 续）★★★收 `397-r2`（`4c8b8ea60` 3 枚 +345/-77）：**保温复活三处窗间清＋arm() 重建点消解全落地**——AC#2 权威读数第二暖窗 **episodes=1/triggers=1@talker**、392-r1 finding 形消除｜★派 `397-v1` 终裁
+
+**① ★★收 `397-r2`（尺核：★提交在／3 枚在）**
+- ★★★**AC#1 三处窗间清＋arm() 消解全落地**：★**release() keepalive 分支＝APM 持有＋Reset()（拒绝→Close+nil 冷重建兜底）＋resampler Flush()＋det Finalize(nil)＋1.2s 静音冷段（38 整窗、边界事件弃置）**；★**arm() :381-384 重建点消解＝apmTuning 记录持有引擎构造调参、同调参持有复用/异调参冷重建（one-parameter-one-firing 保持）**；★speakFar 持有 resampler 的 rate 守卫；★**judge 的 measure-then-arm＋~0.6s 盲头零动**；★**零新 API（三清全既有公开面）、internal/{audio,speech} 0 字节、keepalive=false 默认路径逐字节不动**
+- ★★★**FINDING MOVED 断言改钉＋工件壳修复**：★**WARM REVIVAL MOVED（episodes=1/triggers=1@talker）**＋**voice392RoundOut 全导出**（**392-r1 空壳实锤的缺陷闭环**——392-v3 §1 在案）；★申报为具名小扩展（断言区外 instrument 面、为「残余 cancelled 深度」提供盘上支撑）
+- ★★★**AC#2 权威读数（staged 全链、keepalive 显式开启）**：★**第二暖窗 episodes=1、triggers=1@talker、engine_warm=true/engine_built=false、ready=9728（判官全新实测）、rms=-24.13@-30**；warm 剖面 [-28.9,-22.6] 与冷 (a) 轮同带；(b) echo-only 残余 -41..-59 cancelled 深度；run1 rc=0＋全突变后还原核 rc=0；**392-r1 finding 形消除**
+- ★★★**AC#3 反向（仓外 overlay、SHA 互异）**：★**摘 Finalize＋冷段 ⇒ episodes=0/triggers=0 红（判死形定向复现）**；★**摘冷段留 Finalize ⇒ episodes=1/triggers=0 红（hangover 瞬态形定向复现）**；★**摘 Reset／摘 Flush ⇒ 本材料读健康（rc=0）**——★⚠**跨面差异具名：392-r2 复刻矩阵的 revival-no-reset 形未迁移到 staged 链**（每帧 delay hint 重锚＋窗间声学几何同一）；★**这是 APM 半在 staged 链的第一份全导出读数**（392-v3 §1 已实锤 392-r1 对 APM 半的 staged 原读数是空壳）；★**实现按 392-v3 采纳路径①保持 Reset 形**（统一器兼省构造、复刻矩阵 19.24dB 仍最敏感证据）；**更广材料的 Reset 承重读数归默认翻转腿全链复读**
+- ★★**AC#4 零回归**：★**26p 套件 (a)keyed/(b)/M2/等价 4/5 PASS＋(c) 三发 1 绿 2 红＝纯净 HEAD 对照树（git archive d8cc6f785）同枚同 M1 形红**（发动机摆动族、红名零新增、A1329 归因法）；★392 调参族首发深压红→复跑 rc=0 全绿＋HEAD 对照绿（归因闭合）；★六族 staged **34/1/0**、唯一红 Test384 合跑负载时窗单跑 rc=0；★**`262/640/902` 逐位同值**；★四数 **rc=0、RUN=98 PASS=75 FAIL=0 SKIP=11 顶层口径逐位同基线**、SKIP 集逐名同形（★**另 `./...` 全仓 9 红全在写面外——panel/observe/risk/agent/winsec，基线口径不跑 ./...、与改动文件零编译域交集**）；gofumpt 三树=0；vet 双形状＋GOOS=linux rc=0；d22scan clean＋selftest 35/0/0＋分母 287/52/731/183（731=392-r2 件、本腿零新文件）
+- ★**踩坑入账**：★**overlay JSON 键须正斜杠、反斜杠被静默忽略**（首建四枚 SHA 全同 pristine 当场抓住）
+- ★**越界核**：全部禁触面零触碰 ✅
+
+**② ★已派 `397-v1`（终裁）**：三处窗间清读码核／断言改钉复核／**AC#2 权威读数复跑**／反向三形复刻＋**跨面差异具名核**／零回归全项／可否收口＋残余定性
+
+**③ ★在飞 3**＝**裁 3**（★`397-v1`/`16-v2`? 已交——**实数＝397-v1 新派＋382-w-v1（24h+ 昨判死——晨检复核其产物仍零 ⇒ 死亡判定维持）**）——**写 0＝裁决瓶颈轮具名（同 A1348）**：★**第三写腿＝28-PathC 深度消费（等 26p-v2 判语、在飞 13h+——**晨检无产物 ⇒ **同法判死风险高、下轮定**）＋394 执行（等机主批）⇒ 判语交件同轮补
+★票池：done=**209**／open=**170**（397 在途）；未推（本轮后现跑——**网络恢复待验证**）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／票 394 三形选一）＋**R15 三项（半急）**
