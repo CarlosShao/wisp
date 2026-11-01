@@ -1,0 +1,6 @@
+存档 2026-11-01 17:0x · 腿 394-r1（票 394 第三形实施腿、写、internal/risk＋cmd/wisp 如需）
+机主批复（A1362 逐字）：「394 按第三形批」＝risk 层 mark 观察缝（ProvOptions 钩或 TTSGate 借引擎自注册）。
+使命：RecordTaintInheritance 的生产调用方落地——第三形覆盖全部 4 处 mark 点（bridge.go:687/subagent_197.go:512/panel_assets.go:245/projctx.go:349）、契约面只在 risk、收回 normalizeTaint 义务（382wr2 测试被迫手选常量即此痛）；不动 Scope.Close、非形 A。
+代价已批：留存策略从显式 opt-in 变引擎侧姿势（建议只收任务作用域 mark——382-w-v2 建议）。
+读数：382-w-r2 的机制读数转生产真挂（污句拒播经生产 mark 链）＋反向（摘缝⇒拒播失效红）＋零回归六族。
+⛔ 改 internal/{risk 既有语义,session,speech}（新缝=新增面）/⛔ tools 契约（第三形=不动 tools）/⛔ D43/thresholds。
