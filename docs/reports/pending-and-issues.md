@@ -30038,3 +30038,18 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 1**＝**裁 1**（★`401-v1`）——**写 0＝裁决瓶颈轮具名**：★**第三写腿＝./... 死形票（401-r1 建议开、panel/WebView2 域）＋394 残余票 ⇒ 401-v1 交件同轮开立**
 ★票池：done=**216**／open=**170**（401 实施中）；未推 **8**（网络断持续）；★**摆机主 3 件**（**panel.ts 追认**／**droppedCount TS 键预批**／**R15 三参数挑值**）
+
+## A1378（2026-11-01 22:4x +08，编排者，goal round 41 续）★★★**机主三连批复落账执行**（逐字「追认、TS 预批、R15 全按推荐」）——**TS droppedCount 键落地（窗口闭）＋结票 400（第 74 票）＋R15 答案落册解锁票 68**｜★派 `68-r1`（prototypeVisuals 翻转腿）
+
+**① ★★机主批复逐件执行**
+1. ★**panel.ts 追认**＝**票 400 收口条件满足**（400-v1 附条件①：外部 agent 知悉措辞在 400-v1 裁决表内、**机主转**——机主动作）
+2. ★**TS 预批**＝**droppedCount 键落地**（frontend/src/lib/panel.ts TaskRosterSection＋字段＋注释——**「Go 发 TS 未跟」窗口闭**；400-r3 §2 三行的执行）
+3. ★**R15 全按推荐**＝**Settling alpha 0.33 接受／停靠露出 82% 接受／命中半径 21px→26px 修正**——**票 68 解锁**（prototypeVisuals 翻转的 R15 材料齐）
+
+**② ★★结票 400（第 74 票）**：★**五格全过（400-v1 三方实测）＋残余①执行链闭环**（400-r2 停手具名→400-r3 Go 侧 23f69b8b9→**TS 键落地本笔**）；★**rename 双名闸 400 枚数 1** ✅；★残余＝票 342 两格归自己终裁线
+
+**③ ★68 面现读（本笔）**：★**翻转点＝`internal/ball/statevisual.go:76-84` 的 `var prototypeVisuals bool`（Go 侧、非 frontend）**——写面 internal/ball＋cmd/balldebug（**全空闲**）；票面 Status review（AC#1/AC#4 已交付勿重开）；★**R15 三答案入 68-r1 派单**（①0.33 接受②82% 接受③**命中半径 21px→26px 修正**——唯一参数改动）
+
+**④ ★已派 `68-r1`（写、internal/ball＋cmd/balldebug）**：**prototypeVisuals 默认翻 true＋命中半径 26px 修正＋7 态截图（AC#2/AC#3 真桌面）＝owner 签收材料**
+★**写 1**；★**具名**：★**第二写腿＝394 残余票（MaxAncestorDepth 演化）随下一波**；★**票 16/394/398/400 全收官后写面全开**
+★票池：done=**217**／open=**167**；未推（本轮后现跑）；★**摆机主 1 件**（**7 态截图签收**——68-r1 交件后）
