@@ -52,9 +52,36 @@ type leafPin struct {
 	dir  string
 }
 
-// pinnedParent walks the caller's resolved spelling from the root of its own volume, pinning every
-// component and re-verifying each one against the name it was reached through, and hands back the
-// pin for the directory carrying the leaf.
+// pinnedParent walks the caller's own spelling from the root of its volume,
+// pinning every component and re-verifying each one against the name it was
+// reached through, and hands back the pin for the directory carrying the leaf.
+//
+// ★Ticket 400 AC#3: the walk descends `caller` - the spelling the caller of
+// privateFile owns - and NOT the resolver's answer (`resolved`). The answer is a
+// spelling captured at another instant: on this platform the C26 pipeline reads
+// its reparse verdict per component and then reads the final path through an
+// open that follows links, so an ancestor renamed between those reads turned a
+// "clean" verdict into an answer naming the attacker's tree, and a walk over the
+// answer was then internally consistent all the way into somebody else's file
+// (TestAC1WindowsPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile-
+// 342r1: truncated=2/400, both forms, local machine and CI agreeing). Walking the
+// caller's components makes each component open the act-time answer for the one
+// string this route must answer for: a junction or absolute-target link refuses
+// inside the open itself (OBJ_DONT_REPARSE), an in-root relative link is caught
+// by the identity gate against the pinned parent, and the leaf open stays
+// relative to the verified handle. `resolved` keeps the two jobs it always had -
+// the traversal verdict taken before any act, and the spelling every refusal
+// text names - and it remains the volume root's source (pinVolumeRoot), because
+// the floor and C26 together guarantee the answer names the caller's tree on the
+// caller's volume; only the components are the caller's own.
+//
+// A caller spelling that is not absolute is refused before the walk: its
+// components would otherwise be walked from a volume root the caller never
+// named (a relative spelling names whatever the process is standing in - the
+// same reason RemoveUnlinked refuses one). Spellings that reach this walk have
+// already passed the floor and C26 with no expansion accounted, so on the
+// shipped wiring this refusal is a guard for future callers, not a behaviour
+// change for a live one.
 //
 // Order at each level is pin, then verify - never verify, then pin - which is the rule
 // pinPlacement states for POSIX and the reason that function exists (Lstat before the open is the
@@ -66,8 +93,11 @@ type leafPin struct {
 // The parent descriptor lives until the route releases it (see winsec.go's deferred close), because
 // the refusal-path unlink is relative to it. Closing it as soon as the leaf is open would leave
 // ticket 348's removal with nothing to be relative to - the coupling 342-v1's answer (v) named.
-func pinnedParent(resolved string) (leafPin, error) {
-	comps := pathComponents(resolved)
+func pinnedParent(caller, resolved string) (leafPin, error) {
+	if !filepath.IsAbs(caller) {
+		return leafPin{}, preOpenRefusal(resolved, "the caller's spelling is relative, so no tree names it and this route cannot walk the components the caller owned")
+	}
+	comps := pathComponents(caller)
 	leaf := "."
 	ancestors := comps
 	if n := len(comps); n > 0 {

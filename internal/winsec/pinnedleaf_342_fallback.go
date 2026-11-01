@@ -35,8 +35,10 @@ type leafPin struct{}
 // that does not compile today - not an exported API, and not reachable from any shipped binary.
 var errNoActTimePrimitive = errors.New("winsec: this platform has no openat/unlinkat, so a private write cannot be pinned to a parent handle")
 
-// pinnedParent refuses rather than pretending to pin.
-func pinnedParent(resolved string) (leafPin, error) {
+// pinnedParent refuses rather than pretending to pin. The caller spelling is
+// taken and ignored with the resolved one - this build set refuses before any
+// act, which is the established direction (never wider, never silently by name).
+func pinnedParent(caller, resolved string) (leafPin, error) {
 	return leafPin{}, wrapPath(resolved, errNoActTimePrimitive)
 }
 

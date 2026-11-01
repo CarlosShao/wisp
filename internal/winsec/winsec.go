@@ -176,7 +176,22 @@ func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
 	// every act after them used to re-resolve that spelling through the kernel, so
 	// whoever could rename an ancestor in the gap chose which object this open
 	// truncated and which object the refusal-path unlink removed.
-	parent, err := pinnedParent(resolved)
+	//
+	// Ticket 400 AC#3 is the window that remained, and it sits BEFORE the walk:
+	// the resolver's answer is itself a spelling captured at another instant. The
+	// C26 pipeline reads the reparse verdict (a per-component walk) and then reads
+	// the final path (an open that follows links), so an ancestor renamed between
+	// those two reads turned a "clean" verdict into an answer that names the
+	// attacker's tree - measured 2/400 through TestAC1WindowsPrivateFileThrough-
+	// ASwappedAncestorNeverTruncatesAForeignFile342r1 on this box, CI agreeing.
+	// Every gate downstream was then internally consistent, because it verified
+	// the answer's own tree. The chain therefore binds to the CALLER's spelling:
+	// the walk below descends path's components, so each component open answers
+	// "is this component a link" at act time on the string this route is
+	// responsible for, and a flip anywhere before it is seen by that open. The
+	// resolved answer keeps its two jobs - the traversal verdict and the text
+	// every refusal carries - and never becomes the act's target.
+	parent, err := pinnedParent(path, resolved)
 	if err != nil {
 		// Verbatim too, and NOT through sealError: this is the pin refusing, which is a
 		// placement answer about a spelling this route may not act on. pinPlacement carries

@@ -23,6 +23,18 @@
 //     dropped-key ledger pins one name per key the flood opened (both RED, and both
 //     are the honest reading: making them green needs a production decision, which
 //     this leg may not make).
+//
+// TICKET 400 AC#2 IS THAT PRODUCTION DECISION, and it is why the two red
+// deliverables below are now green rulers. The reds' names carried "IsNotBounded"
+// because that was the truth they measured; the closure re-cut them by name
+// (IsBounded) instead of deleting them, so the roster keeps the lineage: the
+// production changes they now hold are the per-row volume bound below the key
+// bound (pump.go streamRowKeepRunes) and the bounded dropped-name ledger
+// (pump.go streamDroppedNamesCap + DroppedCount). The rule the red leg wrote
+// still holds and is not relaxed anywhere below: no red is closed by shrinking
+// the flood until the assertion passes, every cap's terms come from production
+// bounds and none from the flood size, and the positive control at the bottom
+// still proves the predicate discriminates.
 package panel
 
 import (
@@ -37,15 +49,19 @@ import (
 
 // floodMeasurement35r8 is what one structure holds after a flood, in the units the
 // AC can be read in: the runes of display text it pins, how many rows that text is
-// spread over, the runes of KEY NAMES it pins for the keys it stopped tracking, and
-// the live heap the flood bought. Names are memory too - a structure that gets its
-// rows down by remembering every row it dropped is not bounded.
+// spread over, the runes of KEY NAMES it pins for the keys it stopped tracking, how
+// many such names it holds, and the live heap the flood bought. Names are memory
+// too - a structure that gets its rows down by remembering every row it dropped is
+// not bounded - and the dropped TOTAL is the honest remainder of a capped naming
+// ledger: the count of every key it stopped tracking, named or not (ticket 400
+// AC#2).
 type floodMeasurement35r8 struct {
-	textRunes int
-	rows      int
-	nameRunes int
-	names     int
-	heapDelta uint64
+	textRunes    int
+	rows         int
+	nameRunes    int
+	names        int
+	droppedTotal int
+	heapDelta    uint64
 }
 
 // floodTarget35r8 is the seam the flood is driven through. The production log and
@@ -53,7 +69,7 @@ type floodMeasurement35r8 struct {
 // judge both - which is the only reason the control below can say anything.
 type floodTarget35r8 interface {
 	Push(key, delta string)
-	Measure() (textRunes, rows, nameRunes, names int)
+	Measure() (textRunes, rows, nameRunes, names, droppedTotal int)
 	Snapshot() []ResultChunk
 }
 
@@ -62,7 +78,7 @@ type streamLogTarget35r8 struct{ log *StreamLog }
 
 func (s streamLogTarget35r8) Push(key, delta string) { s.log.Append(key, delta) }
 
-func (s streamLogTarget35r8) Measure() (int, int, int, int) {
+func (s streamLogTarget35r8) Measure() (int, int, int, int, int) {
 	text, rows, names := 0, 0, 0
 	for _, c := range s.log.Chunks() {
 		text += len([]rune(c.Text))
@@ -72,7 +88,7 @@ func (s streamLogTarget35r8) Measure() (int, int, int, int) {
 	for _, d := range dropped {
 		names += len([]rune(d))
 	}
-	return text, rows, names, len(dropped)
+	return text, rows, names, len(dropped), s.log.DroppedCount()
 }
 
 func (s streamLogTarget35r8) Snapshot() []ResultChunk { return s.log.Chunks() }
@@ -100,12 +116,12 @@ func (u *unboundedSink35r8) Push(key, delta string) {
 	u.texts[key] += delta
 }
 
-func (u *unboundedSink35r8) Measure() (int, int, int, int) {
+func (u *unboundedSink35r8) Measure() (int, int, int, int, int) {
 	text := 0
 	for _, k := range u.order {
 		text += len([]rune(u.texts[k]))
 	}
-	return text, len(u.order), 0, 0
+	return text, len(u.order), 0, 0, 0
 }
 
 func (u *unboundedSink35r8) Snapshot() []ResultChunk {
@@ -184,10 +200,11 @@ func flood35r8(t *testing.T, target floodTarget35r8, keys, perKey, deltaLen int)
 	default:
 	}
 
-	text, rows, nameRunes, names := target.Measure()
+	text, rows, nameRunes, names, droppedTotal := target.Measure()
 	return floodMeasurement35r8{
 		textRunes: text, rows: rows, nameRunes: nameRunes, names: names,
-		heapDelta: after - before,
+		droppedTotal: droppedTotal,
+		heapDelta:    after - before,
 	}
 }
 
@@ -254,9 +271,18 @@ func TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8(t *testing.T) {
 			m1.textRunes, m4.textRunes)
 	}
 
-	// The bound must be paid for with content it can name, not with silence.
+	// The bound must be paid for with content it can name, not with silence. The
+	// ledger is bounded (ticket 400 AC#2), so a 1600-key flood retains the cap's
+	// worth of names and counts the rest; the rows themselves stay at the
+	// ceiling and every one of them holds its own head and tail.
 	if m4.rows != cap.rows {
 		t.Errorf("rows = %d, want exactly the hard ceiling %d: fewer rows than the ceiling means the flood was dropped rather than bounded", m4.rows, cap.rows)
+	}
+	if got, want := len(four.DroppedKeys()), streamDroppedNamesCap; got != want {
+		t.Errorf("dropped naming = %d keys, want the ledger cap %d: the naming is bounded memory, and DroppedCount carries the remainder", got, want)
+	}
+	if got := four.DroppedCount(); got != 1600-cap.rows {
+		t.Errorf("dropped total = %d, want %d: every key the log stopped tracking must be counted even when the ledger no longer has room to name it", got, 1600-cap.rows)
 	}
 	for _, c := range four.Chunks() {
 		if len([]rune(c.Text)) < 2*streamTruncateKeepRunes {
@@ -269,28 +295,30 @@ func TestStreamLogFanOutFloodKeepsRetentionUnderCap35r8(t *testing.T) {
 	if !four.Truncated() || four.ElidedRunes() == 0 {
 		t.Errorf("counting exits silent under a 1600-stream flood: Truncated=%v ElidedRunes=%d", four.Truncated(), four.ElidedRunes())
 	}
-	if got := len(four.DroppedKeys()); got != 1600-cap.rows {
-		t.Errorf("dropped naming = %d keys, want %d: every key the log stopped tracking must be named", got, 1600-cap.rows)
-	}
-	if one.ElidedRunes() == 0 || len(one.DroppedKeys()) != 400-cap.rows {
-		t.Errorf("the 1x flood's counting exits disagree with its rows: ElidedRunes=%d dropped=%d", one.ElidedRunes(), len(one.DroppedKeys()))
+	if one.ElidedRunes() == 0 || one.DroppedCount() != 400-cap.rows {
+		t.Errorf("the 1x flood's counting exits disagree with its rows: ElidedRunes=%d droppedTotal=%d, want non-zero / %d",
+			one.ElidedRunes(), one.DroppedCount(), 400-cap.rows)
 	}
 	t.Logf("35r8 fan-out reading: 1x text=%d rows=%d names=%d heap+%dB | 4x text=%d rows=%d names=%d heap+%dB | cap text=%d rows=%d",
 		m1.textRunes, m1.rows, m1.names, m1.heapDelta, m4.textRunes, m4.rows, m4.names, m4.heapDelta, cap.textRunes, cap.rows)
 }
 
-// TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 is a RED deliverable on purpose,
-// and it is the reading the census pointed at without measuring. This package's
-// bound engages on KEY COUNT, not on VOLUME: pump.go's Append clamps a row only
-// while s.truncated is set, and s.truncated is set only by enforceBoundLocked once
-// the key count passes maxKeys. So a flood that never opens a 33rd stream - one
-// long answer, or a handful, the ordinary shape of a run - accumulates every rune it
-// is given while the page is not reading, and there is no heap cap to assert. The
-// numbers are printed in the failure. Closing this needs a production decision
-// (clamp per-row runes below the key bound too, with the elision counted, or refuse
-// at the exit); this leg may not make it, and the red must NEVER be "closed" by
-// shrinking the flood until the assertion passes.
-func TestStreamLogFloodBelowKeyBoundIsNotBounded35r8(t *testing.T) {
+// TestStreamLogFloodBelowKeyBoundIsBounded35r8 is the green ruler the red
+// deliverable TestStreamLogFloodBelowKeyBoundIsNotBounded35r8 became. The red
+// measured the shape the census pointed at without measuring: this package's
+// bound engaged on KEY COUNT, not on VOLUME, so a flood that never opens a 33rd
+// stream - one long answer, the ordinary shape of a run - accumulated every rune
+// it was given while the page was not reading (its own reading: 3 streams pinned
+// 1.2M and 4.8M runes through a 32-key log, retention scaling 4.0x for a 4x
+// flood). Ticket 400 AC#2 made the production decision the red asked for: a
+// per-row volume bound (pump.go streamRowKeepRunes) that engages below the key
+// bound, keeps each row's own head and tail and counts what it elided. This
+// ruler holds that decision to the same standard the red stated: retention
+// comes from the bound and not from the flood size (1x vs 4x read the same),
+// the loss is counted per row through TruncationFor, and the cap is the one
+// this file already states - rows from the key bound, runes from the retained
+// windows - never from the flood.
+func TestStreamLogFloodBelowKeyBoundIsBounded35r8(t *testing.T) {
 	cap := retentionCap35r8()
 
 	one := NewStreamLog(DefaultStreamKeys)
@@ -298,26 +326,63 @@ func TestStreamLogFloodBelowKeyBoundIsNotBounded35r8(t *testing.T) {
 	four := NewStreamLog(DefaultStreamKeys)
 	m4 := flood35r8(t, streamLogTarget35r8{four}, 3, 800, 2000)
 
-	if m1.textRunes != 3*200*2000 || m4.textRunes != 3*800*2000 {
-		t.Fatalf("measurement sanity: 1x pinned %d runes want %d, 4x pinned %d want %d - the harness stopped measuring the flood",
-			m1.textRunes, 3*200*2000, m4.textRunes, 3*800*2000)
+	// The harness must still be measuring a real retention: each of the three
+	// rows holds its own head and tail from the bound, so pinned text cannot
+	// collapse to zero without the bound having stopped clamping.
+	if min := 3 * 2 * streamRowKeepRunes; m1.textRunes < min || m4.textRunes < min {
+		t.Fatalf("measurement sanity: 1x pinned %d and 4x pinned %d runes over %d rows, want at least the retained windows (%d) - the harness stopped measuring the bound",
+			m1.textRunes, m4.textRunes, m1.rows, min)
 	}
-	bad := overCap35r8(m4, cap)
-	if bad == "" {
-		t.Fatal("3 streams under a 32-key bound are now capped: production grew a per-row volume bound and this red ruler should turn green")
+	if bad := overCap35r8(m4, cap); bad != "" {
+		t.Errorf("3 streams under a 32-key bound are over cap: %s (flooded %d runes in)", bad, 3*800*2000)
 	}
-	t.Errorf("flood under a blocked consumer with no fan-out (3 streams, so the key bound never engages): 1x pinned %d text runes over %d rows (live heap +%d bytes), 4x pinned %d runes over %d rows (live heap +%d bytes), against the cap this package can state (%d runes over %d rows). Retention grew %.1fx for a 4x flood and equals the flood exactly, so ticket 35 :49's \"no unbounded memory (heap cap asserted)\" has no counterpart in internal/panel below the key bound. %s",
-		m1.textRunes, m1.rows, m1.heapDelta, m4.textRunes, m4.rows, m4.heapDelta,
-		cap.textRunes, cap.rows, float64(m4.textRunes)/float64(m1.textRunes), bad)
+	if m4.textRunes > m1.textRunes*5/4+1000 {
+		t.Errorf("retention scaled with the flood: 1x pinned %d runes, 4x pinned %d - a cap that grows with the event count is not a cap",
+			m1.textRunes, m4.textRunes)
+	}
+
+	// The bound is paid for with counted loss, per row: each stream's own
+	// truncation answer names what its clamp elided, which is the difference
+	// between a bound and a silent drop. The per-row elided number is the
+	// stream's own flood minus the retained window, so it MUST differ between
+	// the 1x and the 4x log by the flood size - a clamp that lost nothing (or
+	// everything) would read the same at both sizes and prove nothing.
+	for _, tc := range []struct {
+		log    *StreamLog
+		perRow int
+	}{{one, 200 * 2000}, {four, 800 * 2000}} {
+		for i := 0; i < 3; i++ {
+			key := fmt.Sprintf("subagent:%d", i)
+			tr := tc.log.TruncationFor(key)
+			if !tr.Truncated {
+				t.Errorf("row %q reports no truncation although the log clamped it: the per-row bound went silent", key)
+				continue
+			}
+			if want := tc.perRow - 2*streamRowKeepRunes; tr.ElidedRunes != want {
+				t.Errorf("row %q elided %d runes, want exactly its own counted middle %d", key, tr.ElidedRunes, want)
+			}
+		}
+		if tc.log.ElidedRunes() != 3*(tc.perRow-2*streamRowKeepRunes) {
+			t.Errorf("log-level elision = %d, want the three rows' own %d - a loss the log cannot count is a loss it can lie about",
+				tc.log.ElidedRunes(), 3*(tc.perRow-2*streamRowKeepRunes))
+		}
+	}
+	t.Logf("35r8 below-bound reading: 1x text=%d rows=%d heap+%dB | 4x text=%d rows=%d heap+%dB | cap text=%d rows=%d (flood in: %d / %d runes)",
+		m1.textRunes, m1.rows, m1.heapDelta, m4.textRunes, m4.rows, m4.heapDelta, cap.textRunes, cap.rows, 3*200*2000, 3*800*2000)
 }
 
-// TestStreamLogDroppedNamingLedgerIsNotBounded35r8 is the second RED reading, on the
-// face the existing row-count rulers structurally cannot see: past the hard ceiling
-// the log keeps ONE NAME per key it stopped tracking, for as long as the process
-// lives, and DroppedKeys() hands the whole ledger out on every read. Rows stay at
-// the ceiling while the bytes scale with the flood, so "bounded" in the count sense
-// and "bounded" in the AC's sense are two different claims.
-func TestStreamLogDroppedNamingLedgerIsNotBounded35r8(t *testing.T) {
+// TestStreamLogDroppedNamingLedgerIsBounded35r8 is the green ruler the red
+// deliverable TestStreamLogDroppedNamingLedgerIsNotBounded35r8 became. The red
+// measured the face the row-count rulers structurally cannot see: past the hard
+// ceiling the log kept ONE NAME per key it stopped tracking, for as long as the
+// process lives, so rows stayed at the ceiling while the bytes scaled with the
+// flood - "bounded" in the count sense and "bounded" in the AC's sense were two
+// different claims (its own reading: 4000 streams pinned 3936 names, 16000 pinned
+// 15936). Ticket 400 AC#2 bounded the ledger itself (pump.go
+// streamDroppedNamesCap) and made the remainder a counted fact (DroppedCount):
+// the naming keeps the most recent drops, the total keeps every drop, and
+// neither grows with the event count.
+func TestStreamLogDroppedNamingLedgerIsBounded35r8(t *testing.T) {
 	cap := retentionCap35r8()
 
 	one := NewStreamLog(DefaultStreamKeys)
@@ -325,16 +390,25 @@ func TestStreamLogDroppedNamingLedgerIsNotBounded35r8(t *testing.T) {
 	four := NewStreamLog(DefaultStreamKeys)
 	m4 := flood35r8(t, streamLogTarget35r8{four}, 16000, 1, 1)
 
-	if m1.names != 4000-cap.rows || m4.names != 16000-cap.rows {
-		t.Fatalf("measurement sanity: 1x named %d keys want %d, 4x named %d want %d - the ledger being measured is not the one the log writes",
-			m1.names, 4000-cap.rows, m4.names, 16000-cap.rows)
+	// The ledger holds the cap's worth of names at BOTH flood sizes: its memory
+	// is a bound, not the event count.
+	if m1.names != streamDroppedNamesCap || m4.names != streamDroppedNamesCap {
+		t.Errorf("naming = %d / %d keys, want the ledger cap %d at both sizes - a ledger that keeps every name it ever wrote is memory that scales with the flood",
+			m1.names, m4.names, streamDroppedNamesCap)
 	}
-	bad := overCap35r8(m4, cap)
-	if bad == "" {
-		t.Fatal("the dropped-name ledger is capped now: production bounded what it names and this red ruler should turn green")
+	// And the count is the honest remainder: every key the log stopped tracking
+	// is accounted, named or not.
+	if m1.droppedTotal != 4000-cap.rows {
+		t.Errorf("1x dropped total = %d, want %d - the capped ledger must not lose the accounting", m1.droppedTotal, 4000-cap.rows)
 	}
-	t.Errorf("blocked consumer, fan-out past the ceiling: 1x opened 4000 streams and pins %d names (%d runes, live heap +%d bytes), 4x opened 16000 and pins %d names (%d runes, live heap +%d bytes) - rows stayed at the ceiling %d in both, so the memory the flood bought is the naming ledger itself. Its cap is the event count, not the bound. %s",
-		m1.names, m1.nameRunes, m1.heapDelta, m4.names, m4.nameRunes, m4.heapDelta, cap.rows, bad)
+	if m4.droppedTotal != 16000-cap.rows {
+		t.Errorf("4x dropped total = %d, want %d", m4.droppedTotal, 16000-cap.rows)
+	}
+	if bad := overCap35r8(m4, cap); bad != "" {
+		t.Errorf("blocked consumer, fan-out past the ceiling: %s (rows stayed at the ceiling %d in both runs)", bad, cap.rows)
+	}
+	t.Logf("35r8 ledger reading: 1x names=%d total=%d nameRunes=%d heap+%dB | 4x names=%d total=%d nameRunes=%d heap+%dB | cap text=%d rows=%d",
+		m1.names, m1.droppedTotal, m1.nameRunes, m1.heapDelta, m4.names, m4.droppedTotal, m4.nameRunes, m4.heapDelta, cap.textRunes, cap.rows)
 }
 
 // TestFloodRulerFiresOnAnUnboundedSink35r8 is the positive control the repo requires

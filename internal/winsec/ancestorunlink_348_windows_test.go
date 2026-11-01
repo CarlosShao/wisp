@@ -138,7 +138,7 @@ func TestAC2WindowsLeafIdentityReCheckRefusesAForeignNameAndNeverDeletesIt342r1(
 	if !reparseAt(linked) {
 		t.Fatalf("%s is not a reparse point, so this case measured nothing", filepath.Base(linked))
 	}
-	pin, err := pinnedParent(linked)
+	pin, err := pinnedParent(linked, linked)
 	if err != nil {
 		// A pin failure here would be the world, not the leg: the leaf form keeps `sub` real.
 		t.Fatalf("AC#2 RED instrument: pinning the parent of a real directory failed: %v", err)

@@ -116,6 +116,115 @@ export interface ComposerState {
   acceptedAttachmentMimes: string[];
   maxAttachmentBytes: number;
   attachmentError: string;
+  /** The read-only git dimension (ticket 181; internal/panel/git.go GitView).
+      Declared here by ticket 400 AC#1 - the Go side has carried it since 181
+      and the two-way reconciliation (internal/panel composer_test.go and
+      approval_test.go) went red over every key this file did not declare. */
+  git?: GitView;
+  /** The model id this boot resolved, and whether anybody read it at all
+      (internal/panel/composer.go ComposerState). "Nobody read it" is a
+      different fact from "no model", and modelKnown is that sentence. */
+  currentModel?: string;
+  modelKnown?: boolean;
+  /** The credential dimension (ticket 248; internal/panel/config_handlers.go):
+      a STATE and a count, never a value - there is no key material on this
+      wire, and credentialKnown distinguishes "nobody asked" from the states
+      below. */
+  credentialState?: CredentialState;
+  credentialKnown?: boolean;
+}
+
+/** One credential-dimension state (internal/panel/config_handlers.go). Never a
+    value: the panel can display recorded/not-recorded/unknown and nothing that
+    could leak by refreshing. */
+export type CredentialState =
+  | "unknown"
+  | "config_unreadable"
+  | "no_ref_declared"
+  | "all_recorded"
+  | "partly_missing";
+
+/** One worktree entry of the git dimension (internal/panel/git.go). */
+export interface GitWorktree {
+  path: string;
+  branch: string;
+  sha: string;
+  detached: boolean;
+  main: boolean;
+}
+
+/** The git section of the composer (internal/panel/git.go GitView). The two
+    list fields are always arrays on the wire; kind is one of "repo" |
+    "not_a_repo" | "permission_denied" | "unreadable", and reason is mandatory
+    and never empty - "nothing" is stated, never left blank. */
+export interface GitView {
+  kind: string;
+  reason: string;
+  branch: string;
+  detachedSha: string;
+  isDetached: boolean;
+  repoRoot: string;
+  currentWorktree: string;
+  worktrees: GitWorktree[];
+  branches: string[];
+  switchBlocked: string;
+}
+
+/** One loaded project-instruction file (internal/panel/instructions_200.go).
+    dropped=true means the context budget removed the whole file, so the panel
+    can say "this one did not take effect" instead of pretending it did. */
+export interface ProjectInstructionFile {
+  path: string;
+  tier: string;
+  depth: number;
+  bytes: number;
+  truncatedBytes?: number;
+  dropped?: boolean;
+  duplicateOf?: string;
+  source?: string;
+}
+
+/** The instructions section (internal/panel/instructions_200.go). Present on
+    the wire exactly when the pump has a reader; status is then one of "loaded"
+    | "none_found" | "off" | "refused" | "not_run", and files is always an
+    array - empty WITH a status, never a bare absence. */
+export interface InstructionsSection {
+  status: string;
+  reason?: string;
+  files: ProjectInstructionFile[];
+}
+
+/** One roster row as the page reads it (internal/panel/subagent_roster_197.go).
+    status is a D43 name and is empty exactly when statusKnown is false; the
+    stream triple describes this row's own work page - "少了多少" is a number,
+    never a shrug. */
+export interface TaskRowView {
+  taskId: string;
+  label: string;
+  kind: string;
+  parentTaskId: string;
+  status: string;
+  statusKnown: boolean;
+  statusReason?: string;
+  streamKey: string;
+  blockedOnApproval: boolean;
+  streamTruncated: boolean;
+  streamElidedRunes: number;
+  streamDropped: boolean;
+}
+
+/** The tasks section (internal/panel/subagent_roster_197.go TaskRosterSection).
+    Present on the wire exactly when the pump has a roster reader - including
+    when nothing has been spawned, which arrives as empty rows plus the pool
+    numbers, so "no subagents yet" and "this host cannot see subagents" stay
+    two different readings. droppedStreamKeys is always an array. */
+export interface TaskRosterSection {
+  rows: TaskRowView[];
+  inFlightSlots: number;
+  poolCap: number;
+  streamTruncated: boolean;
+  streamElidedRunes: number;
+  droppedStreamKeys: string[];
 }
 
 /** One streamed assistant/result chunk for the result region. */
@@ -134,6 +243,15 @@ export interface PanelSnapshot {
   /** ISO-8601 stamp of when Go built the snapshot; display only, never used
       to derive state - the panel keeps none. */
   generatedAt: string;
+  /** Which project instruction files this run followed, and - when it followed
+      none - which of the five states that is (ticket 200). Optional in the
+      Go struct's own sense: a pump assembled without a reader is the one case
+      in which the key is absent at all (internal/panel/composer.go). */
+  instructions?: InstructionsSection;
+  /** Which tasks this process is running, which are subagents and whose, and
+      how much of each work page the stream log dropped to keep its bound
+      (ticket 197). Same optionality rule as instructions. */
+  tasks?: TaskRosterSection;
 }
 
 /** Shape of the object WebView2 installs on the host page (C17). */

@@ -411,8 +411,9 @@ func (p *SnapshotPump) count() {
 // its own head and tail, and the elided middle is said out loud in that chunk's text.
 // The bound is still a bound: it moved from "how many rows exist" to "how many runes
 // each row holds", and past a hard ceiling whole keys stop being tracked and are
-// NAMED in DroppedKeys() - "nobody is showing this one" is a different sentence from
-// "somebody merged this one".
+// NAMED in DroppedKeys() up to the ledger's own cap, with DroppedCount() carrying
+// the total - "nobody is showing this one" is a different sentence from
+// "somebody merged this one", and neither may cost unbounded memory.
 //
 // What this file does NOT do is put either fact on the wire: ResultChunk keeps its
 // three JSON keys (composer.go:65-69, mirrored by frontend/src/lib/panel.ts's
@@ -428,6 +429,11 @@ type StreamLog struct {
 	truncated bool
 	elided    int
 	dropped   []string
+	// droppedTotal is every key the hard ceiling ever evicted, including the
+	// ones streamDroppedNamesCap no longer leaves room to name. The count is
+	// what keeps the capped ledger honest: a bound on the names without a
+	// count of the unnamed would turn "the oldest names fell off" into silence.
+	droppedTotal int
 }
 
 // streamKept is what one row retains of ITS OWN stream once the log is
@@ -438,10 +444,17 @@ type StreamLog struct {
 // marker inside the first. The text the panel sees is always this state rendered,
 // never a string edited in place, which is also why a stream's own text can
 // mention a marker without being parsed by anything.
+//
+// window is the retained half-width this row's state was built with, and it can
+// differ between rows: a row clamped below the key bound holds the wider
+// streamRowKeepRunes window, and the truncated-mode re-clamp shrinks it. The
+// window rides the state so absorb, render and the per-row truncation answer
+// all read the width that row is actually keeping.
 type streamKept struct {
-	head []rune
-	tail []rune
-	seen int
+	head   []rune
+	tail   []rune
+	seen   int
+	window int
 }
 
 // absorb feeds one delta into the retained tail window and reports how many runes
@@ -449,7 +462,7 @@ type streamKept struct {
 func (st *streamKept) absorb(delta []rune) int {
 	st.seen += len(delta)
 	st.tail = append(st.tail, delta...)
-	over := len(st.tail) - streamTruncateKeepRunes
+	over := len(st.tail) - st.window
 	if over <= 0 {
 		return 0
 	}
@@ -461,7 +474,7 @@ func (st *streamKept) absorb(delta []rune) int {
 // a marker that counts the middle this ONE stream lost. Nothing from another key
 // can appear here - the state is per key.
 func (st *streamKept) render() string {
-	elided := st.seen - 2*streamTruncateKeepRunes
+	elided := st.seen - 2*st.window
 	if elided <= 0 {
 		return string(append(append([]rune{}, st.head...), st.tail...))
 	}
@@ -484,6 +497,27 @@ const (
 	// log is in truncated mode. Runes, not bytes: a byte cut would split the
 	// Chinese this project streams and hand the panel mojibake.
 	streamTruncateKeepRunes = 256
+
+	// streamRowKeepRunes is the head AND the tail a row keeps once ITS OWN text
+	// grows past 2× this, and it is ticket 400 AC#2's per-row volume bound: the
+	// key-count bound above engages only when a flood opens stream after stream,
+	// so a flood that stays under it - one long answer, the ordinary shape of a
+	// run - used to pin every rune it was given while the page was not reading
+	// (35-r8's red deliverable measured 3 streams holding 1.2M and 4.8M runes
+	// through a 32-key log). The window engages below the key bound, keeps this
+	// row's own head and tail, and counts what it elided, exactly like the
+	// truncated-mode window one constant up; 4096 keeps a normal answer (under
+	// 8192 runes) rendering in full, so the bound is paid only by streams that
+	// outgrew the page they feed.
+	streamRowKeepRunes = 4096
+
+	// streamDroppedNamesCap is how many dropped-key names the ledger retains.
+	// Naming what the log stopped tracking is the honesty rule (never folded
+	// into a neighbour), and the ledger is memory like everything else: past
+	// this cap the oldest names make room for newer ones and DroppedCount
+	// carries the total, so "nobody is showing this one" stays sayable at any
+	// flood size for a bounded price (64 names of ordinary task ids ≈ 1.3 KiB).
+	streamDroppedNamesCap = DefaultStreamKeys * StreamKeyHardCeilingMultiple
 
 	// SubagentStreamKeyPrefix is the key shape ticket 197 §0 writes down: one
 	// subagent = one stream, "subagent:<taskID>", literal lowercase, the task id
@@ -521,6 +555,11 @@ func NewStreamLog(maxKeys int) *StreamLog {
 
 // Append adds one delta to its key's chunk. A key the log already tracks is
 // only ever appended to - never re-keyed, never folded into a neighbour.
+//
+// Every append is clamped, not just the ones past the key count bound: the
+// per-row volume bound (streamRowKeepRunes) is what keeps a flood that never
+// opens a 33rd stream - one long answer, the ordinary shape of a run - from
+// pinning every rune it is given while the page is not reading.
 func (s *StreamLog) Append(key, text string) {
 	if s == nil || text == "" {
 		return
@@ -531,14 +570,23 @@ func (s *StreamLog) Append(key, text string) {
 	if !ok {
 		s.chunks[key] = ResultChunk{CorrelationID: key, Text: text}
 		s.order = append(s.order, key)
+		s.clampLocked(key, s.rowWindowLocked())
 		s.enforceBoundLocked()
 		return
 	}
 	cur.Text += text
 	s.chunks[key] = cur
+	s.clampLocked(key, s.rowWindowLocked())
+}
+
+// rowWindowLocked is the retained half-width appends clamp to right now: the
+// wide per-row window below the key bound, the narrow truncated-mode one past
+// it. Truncation is one-way, so a row's window only ever shrinks.
+func (s *StreamLog) rowWindowLocked() int {
 	if s.truncated {
-		s.clampLocked(key)
+		return streamTruncateKeepRunes
 	}
+	return streamRowKeepRunes
 }
 
 // Close marks one key's chunk as the end of its stream. An unknown key still
@@ -586,7 +634,7 @@ func (s *StreamLog) enforceBoundLocked() {
 	}
 	s.truncated = true
 	for _, k := range s.order {
-		s.clampLocked(k)
+		s.clampLocked(k, streamTruncateKeepRunes)
 	}
 	ceiling := s.maxKeys * StreamKeyHardCeilingMultiple
 	for len(s.order) > ceiling {
@@ -594,7 +642,14 @@ func (s *StreamLog) enforceBoundLocked() {
 		s.order = s.order[1:]
 		delete(s.chunks, oldest)
 		delete(s.kept, oldest)
+		s.droppedTotal++
 		s.dropped = append(s.dropped, oldest)
+		if len(s.dropped) > streamDroppedNamesCap {
+			// The ledger is bounded memory like everything else: the oldest
+			// names give way and droppedTotal keeps counting them, so the
+			// naming never grows with the event count.
+			s.dropped = s.dropped[1:]
+		}
 	}
 }
 
@@ -603,38 +658,51 @@ func (s *StreamLog) enforceBoundLocked() {
 // It never runs over another key's text, and re-running it on a row already under
 // the fold changes nothing - which is the difference between "this stream lost its
 // middle" and the old fold's "these two streams became one row". Caller holds s.mu.
-func (s *StreamLog) clampLocked(key string) {
+//
+// keep is the retained half-width for this pass. A row already under the fold
+// with a WIDER window (clamped below the key bound, before the key count
+// crossed it) absorbs its pending delta first and is then shrunk, with the
+// shrink counted into the same elision ledger - the order matters, because the
+// delta is recovered by stripping the row's CURRENT rendering off its text.
+func (s *StreamLog) clampLocked(key string, keep int) {
 	c := s.chunks[key]
 	if st, ok := s.kept[key]; ok {
-		// The row is already under the fold: the only text that may have been added
-		// is the delta Append put on top of the rendered window, so re-render from
-		// state and drop the raw tail difference into the counted elision.
 		delta := []rune(strings.TrimPrefix(c.Text, st.render()))
 		if len(delta) > 0 {
 			s.elided += st.absorb(delta)
+		}
+		if st.window > keep {
+			cut := st.window - keep
+			st.head = st.head[:keep]
+			st.tail = st.tail[len(st.tail)-keep:]
+			st.window = keep
+			s.elided += 2 * cut
 		}
 		c.Text = st.render()
 		s.chunks[key] = c
 		return
 	}
 	r := []rune(c.Text)
-	if len(r) <= streamTruncateKeepRunes*2 {
+	if len(r) <= keep*2 {
 		return
 	}
 	st := &streamKept{
-		head: r[:streamTruncateKeepRunes],
-		tail: r[len(r)-streamTruncateKeepRunes:],
-		seen: len(r),
+		head:   r[:keep],
+		tail:   r[len(r)-keep:],
+		seen:   len(r),
+		window: keep,
 	}
 	s.kept[key] = st
-	s.elided += len(r) - 2*streamTruncateKeepRunes
+	s.elided += len(r) - 2*keep
 	c.Text = st.render()
 	s.chunks[key] = c
 }
 
 // Truncated reports the log went past its key bound, so at least one row is no
-// longer the full stream it started as. Full fidelity below the bound is the
-// promise; this is the accessors' way of saying when it stopped holding.
+// longer the full stream it started as. Below the key bound each row keeps its
+// own text in full up to the per-row volume bound (2× streamRowKeepRunes); a
+// row that outgrew THAT has its own inline marker and its own TruncationFor
+// answer, which is the per-row truth this log-level flag does not carry.
 func (s *StreamLog) Truncated() bool {
 	if s == nil {
 		return false
@@ -656,10 +724,13 @@ func (s *StreamLog) ElidedRunes() int {
 	return s.elided
 }
 
-// DroppedKeys names every key the log stopped tracking at the hard ceiling, oldest
-// first. It is the honest remainder of a bound: the panel shows no row for these,
-// and the host can say WHICH ones and say they were never merged into a row that is
-// still on screen.
+// DroppedKeys names the keys the log stopped tracking at the hard ceiling and
+// still has ledger room for, oldest retained first. It is the honest remainder
+// of a bound: the panel shows no row for these, and the host can say WHICH ones
+// and say they were never merged into a row that is still on screen. The ledger
+// holds at most streamDroppedNamesCap names - a flood past that evicts the
+// oldest - and DroppedCount carries the total, so a bound on the names is a
+// bound on the memory and never on the accounting.
 func (s *StreamLog) DroppedKeys() []string {
 	if s == nil {
 		return nil
@@ -669,6 +740,20 @@ func (s *StreamLog) DroppedKeys() []string {
 	out := make([]string, len(s.dropped))
 	copy(out, s.dropped)
 	return out
+}
+
+// DroppedCount is every key the log stopped tracking at the hard ceiling,
+// including the ones the naming ledger no longer holds room for. It exists
+// because the ledger's cap is a memory bound, not an accounting one: "named the
+// most recent N" plus this number is the same statement the uncapped ledger
+// made, at a price that does not grow with the flood.
+func (s *StreamLog) DroppedCount() int {
+	if s == nil {
+		return 0
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.droppedTotal
 }
 
 // StreamTruncation is what ONE key of the log cost the bound. It is the
@@ -710,7 +795,7 @@ func (s *StreamLog) TruncationFor(key string) StreamTruncation {
 	if !ok {
 		return StreamTruncation{}
 	}
-	elided := st.seen - 2*streamTruncateKeepRunes
+	elided := st.seen - 2*st.window
 	if elided <= 0 {
 		return StreamTruncation{}
 	}

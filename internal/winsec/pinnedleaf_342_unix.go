@@ -71,7 +71,17 @@ type leafPin struct {
 // making decisions, and this package already calls Dir in privateDirAll). The name handed to the
 // open and to the unlink is filepath.Base of the same spelling, so the two are one component by
 // construction - the same decomposition pinPlacement applies at its own leaf level.
-func pinnedParent(resolved string) (leafPin, error) {
+//
+// ★Ticket 400 AC#3 added the caller spelling to the route, and this platform takes it and
+// walks `resolved` exactly as before, said out loud rather than silently. The reason is the
+// same shape as ticket 353's ignored FileInfo below: on this platform the resolver never
+// rewrites an answer through a link (the floor's reparse walk refuses one outright, and
+// with the shipped wiring C26's reparse verdict precedes the answer), so for every
+// spelling that reaches this walk `resolved` IS the caller's own tree namer, and the
+// ancestor window the Windows leg measured through a follow-through-link answer does not
+// exist here. Pinning `resolved` keeps the POSIX landing's measured form byte-for-byte.
+func pinnedParent(caller, resolved string) (leafPin, error) {
+	_ = caller
 	dir := filepath.Dir(resolved)
 	pin, err := pinPlacement(dir)
 	if err != nil {

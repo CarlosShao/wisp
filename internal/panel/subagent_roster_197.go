@@ -161,9 +161,12 @@ type TaskRosterSection struct {
 	StreamTruncated bool `json:"streamTruncated"`
 	// StreamElidedRunes is the log's total, across every stream it had to fold.
 	StreamElidedRunes int `json:"streamElidedRunes"`
-	// DroppedStreamKeys names every stream the log stopped tracking at the hard
-	// ceiling. Naming them is the difference between "this page lost a section"
-	// and "somebody merged it into a row that is still here" (197-r2 §1 乙).
+	// DroppedStreamKeys names the streams the log stopped tracking at the hard
+	// ceiling and still has ledger room for. Naming them is the difference
+	// between "this page lost a section" and "somebody merged it into a row
+	// that is still here" (197-r2 §1 乙). The ledger itself is bounded (ticket
+	// 400 AC#2): past its cap the oldest names give way and the log's
+	// DroppedCount carries the total, so a flood cannot grow the naming memory.
 	// Empty array means none, never "unread".
 	DroppedStreamKeys []string `json:"droppedStreamKeys"`
 }
