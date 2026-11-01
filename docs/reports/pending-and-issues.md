@@ -29809,3 +29809,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ★**ci-r1 上报的三件产品级红**：①panel 契约对齐（Snapshot [instructions tasks] vs PanelSnapshot 未声明）②35r8 流日志有界（4x flood→4.0x 驻留）③winsec 342r1 竞态修（祖先换位窗 2/400＝真产品发现）；★各 AC 反向判据＋零回归；★**⛔ frontend/design（机主外部 agent）**
 ★**写面互斥核**：398-r1=internal/speech／400-r1=internal/panel＋winsec／397-v2 只读——**零撞**；★**写 2 枚**——★**具名：第三写腿＝394 执行（等机主批三形）／(a) 加稳产品形（等 28 集成）⇒ 裁决/批文交件同轮补**
 ★票池：done=**211**／open=**169**；未推 0；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／票 394 三形选一）＋**R15 三项（半急）**
+
+## A1361（2026-11-01 16:1x +08，编排者，goal round 37 续）★★★收 `398-r1`（`ced345c3c` 3 枚 +289）：**silero RNN hangover reset 面落地**——`Detector.Reset()` 只清状态、**两面正交**（开口话态清面仍是 Finalize）｜★**口径差如实记：reset 后 (0,1) 非 0/0——silence=0 才是主判据**｜★派 `398-v1` 终裁
+
+**① ★★收 `398-r1`（尺核：★提交在／3 枚在）**
+- ★★★**AC#1 reset 面落地**：★**`func (d *Detector) Reset() { d.rest = d.rest[:0]; d.vad.Reset() }`**——对照 Finalize 形状新增；只清状态（RNN 语境＋sherpa 段队列＋rest 半窗缓冲）；**Endpointer 一字未动（开口话态清面仍是 Finalize、两面正交组合＝owner 完整窗间清 Finalize(nil)+Reset() 免冷段）**；Finalize/classifier/threshold 零字节；★**状态位置具名：RNN 状态在 C 侧会话持有、Go 绑定 1.13.8 已暴露 vad.Reset()（sherpa_onnx.go:1787→C API c-api.h:2235）**——停手①未触发；★**如实记：C++ 源码级逐行核未做成（网络策略拦）**、以 C API 注释＋行为级三面读数为证
+- ★★★**AC#2 hangover 清除读数**：★**reset 前 (silence=1 talker=0)（392-r2 形状复现）⇒ reset 后 (silence=0 talker=1)**；★**口径差如实记：派单写 0/0、实测 (0,1)——silence=0 是主判据、talker=1 是判定通路活着的内建正控、字面 0/0 反触发停手③（detector 清死）、392-r2 探针自己的 Fatalf 就把 nSil+nTalk==0 定为 MECHANISM MOVED**；★**等价案 Test398ResetMatchesAFreshDetector：dirty→Finalize→Reset vs 全新 detector 三段计数两臂全等**
+- ★★★**AC#3 反向**：★**仓外 -overlay 摘 d.vad.Reset() ⇒ 主案红＋等价案红**；同突变二进制定向自证＝旁案全绿；还原核（同 sed 再生突变 diff 零差＋写面恰本腿两件＋正树探针复跑绿）
+- ★★**AC#4 零回归**：★**staged rc=0 RUN=69/PASS=63/0/6（基线 67 枚名册逐位同＋本腿两枚新增绿）**；★**裸跑 rc=0 25/0/44（387-r3 全绿未破、+2 SKIP＝本腿两枚具名 skip）**；★**cmd/wisp KWS 族 41a2r1 两案 staged 2/2**；★门禁 gofumpt/vet/d22scan clean（ban#8 internal=732）
+- ★**AC#5 ✓**：写面恰三枚／越界面零字节／显式 pathspec／临时件只建不删 ✅
+
+**② ★已派 `398-v1`（终裁）**：reset 面形状核／hangover 读数复跑＋**口径差裁定（0/0 vs (0,1)）**／等价案核／反向复刻／零回归／可否收口＋残余定性
+
+**③ ★在飞 3**＝**写 1**（★`400-r1` panel+winsec）＋**裁 2**（★`398-v1`/`397-v2`）——**写 1＜3 具名**：★**第三写腿＝394 执行（等机主批三形）／(a) 加稳产品形（等 28 集成）⇒ 裁决/批文交件同轮补**
+★票池：done=**211**／open=**170**；未推（本轮后现跑）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／票 394 三形选一）＋**R15 三项（半急）**
