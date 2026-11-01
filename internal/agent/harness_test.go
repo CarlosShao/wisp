@@ -65,11 +65,6 @@ func withJournal(j Journal) harnessOpt {
 	return func(_ *harness, o *Options) { o.Journal = j }
 }
 
-// withSummarizer attaches a history summarizer.
-func withSummarizer(s Summarizer) harnessOpt {
-	return func(_ *harness, o *Options) { o.Summarizer = s }
-}
-
 // withControl installs a control handler.
 func withControl(f ControlHandler) harnessOpt {
 	return func(_ *harness, o *Options) { o.Control = f }

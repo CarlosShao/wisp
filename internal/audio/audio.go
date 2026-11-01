@@ -159,6 +159,10 @@ func (m *meter) reopened() {
 	m.mu.Unlock()
 }
 
+// reopened's callers are the windows WASAPI hotplug path, which the linux
+// build cannot see; the counter is pinned here rather than deleted.
+var _ = (*meter).reopened
+
 // snapshot builds the Stats view.
 func (m *meter) snapshot() Stats {
 	m.mu.Lock()

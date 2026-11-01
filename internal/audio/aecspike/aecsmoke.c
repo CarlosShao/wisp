@@ -1,3 +1,5 @@
+//go:build windows && cgo
+
 /* aecsmoke.c - the ticket 59 AEC spike's Voice Capture DSP (CWMAudioAEC)
  * driver. Windows-only, compiled by the pinned mingw-w64 toolchain through
  * cgo. See aecsmoke.h for the contract.

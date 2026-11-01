@@ -451,7 +451,7 @@ func requireForeignKeysOff(tx txExec) error {
 		`abort on SQLite's "FOREIGN KEY constraint failed" and name neither a table nor a row. ` +
 		"SQLite's 12-step ALTER procedure disables enforcement for a rebuild (its step 1), and " +
 		"the migration connection is supposed to declare that itself (migrationDSN in open.go): " +
-		"something removed that declaration. Nothing was modified.")
+		"something removed that declaration. Nothing was modified")
 }
 
 // applyV4 rebuilds task_log with the state CHECK (ticket 196).

@@ -148,7 +148,7 @@ func TestPanicInWorkerSurvivesAndCancelsRoot(t *testing.T) {
 		t.Fatalf("panic error class = %q, want internal", got)
 	}
 	var oe *Error
-	if !errors.As(err, &oe) || !errors.As(err, &oe) {
+	if !errors.As(err, &oe) {
 		t.Fatalf("panic error not an observe *Error: %v", err)
 	}
 

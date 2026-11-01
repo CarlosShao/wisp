@@ -29,7 +29,6 @@ type cfg248Leg struct {
 	credCalls   int
 	lastWrite   SettingWrite
 	lastRawSeen string
-	lastReqSeen ComposerRequest
 
 	readView SettingsView
 	readErr  error

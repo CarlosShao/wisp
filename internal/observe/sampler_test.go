@@ -20,6 +20,13 @@ type fakeTree struct {
 	current func() TreeMetrics
 }
 
+// captureBufferLimitConversation is recorded in thresholds.go as a note (the
+// D32 Conversation capture-buffer bound, not measurable until the speech
+// pipeline of tickets 15/26 runs, so it is kept out of every pass/fail path).
+// Nothing reads it yet; this reference keeps the recorded number in the build
+// without touching that file.
+var _ = captureBufferLimitConversation
+
 // errFakeTreeNoScript answers a fakeTree that was handed no script at all.
 //
 // Ticket 136 AC#13 (R-136-9): this seam used to answer the exhausted-script

@@ -110,9 +110,6 @@ type runSpec struct {
 	dataDir string
 	// notify posts the result notification; nil = postSystemNotification.
 	notify notifyPoster
-	// probeSink, when non-nil, also receives the capability probe's verdicts.
-	// Production passes the provider_health DAO adapter.
-	probeSink llm.HealthSink
 	// now is the clock source for persisted records (never for deadlines).
 	now func() time.Time
 	// onRuntime hands the assembled stack to the caller before the task runs.
@@ -428,8 +425,6 @@ type agentRuntime struct {
 	notify     notifyPoster
 	stdout     io.Writer
 	stderr     io.Writer
-	// logf receives the bridge's audit lines.
-	logf func(string, ...any)
 }
 
 // assembleRuntime builds the whole stack from the data dir. A failure here is
@@ -562,9 +557,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// by the bridge and the fs tools, so the path the risk verdict judged is
 	// the path that opens.
 	allowed := make([]string, 0, len(cfg.FS.AllowedDirs))
-	for _, d := range cfg.FS.AllowedDirs {
-		allowed = append(allowed, d)
-	}
+	allowed = append(allowed, cfg.FS.AllowedDirs...)
 	rt.paths = tools.NewPathCanonicalizer(allowed, cfg.FS.ReparsePointExceptions)
 
 	reg := tools.NewRegistry()

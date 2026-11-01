@@ -176,7 +176,7 @@ func TestTaskState196RefusesRebuildWithForeignKeysOn(t *testing.T) {
 	for _, want := range []string{
 		"foreign_keys",
 		"tool_call.task_id REFERENCES task_log(id)",
-		"Nothing was modified.",
+		"Nothing was modified",
 	} {
 		if !strings.Contains(msg, want) {
 			t.Errorf("refusal does not mention %q; it is not the guard's message:\n%v", want, msg)

@@ -445,14 +445,6 @@ func d34ToolRowMentioningGit(plan string) string {
 	return ""
 }
 
-// composerMethodWhitelist is the whitelist as ONE list, so a fifth method cannot
-// slip in by being declared somewhere else in the package.
-func composerMethodWhitelist() []string {
-	return []string{
-		MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend,
-	}
-}
-
 // gitToolNamesUnder returns every `"git.*"` tool-name literal in a tree's
 // production Go files. Split out of the criterion above so that criterion can be
 // pointed at a knowingly wrong tree the way TestPlantedComposerModeWriteGoesRed

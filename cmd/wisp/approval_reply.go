@@ -83,15 +83,6 @@ const (
 	panelReplySource  = "cmd-wisp-console-panel-route"
 )
 
-// maxTrackedCards is the ledger's own ceiling, read off the seam that enforces
-// it (approval.MaxTrackedCards). The queue bounds pending items at its own
-// DefaultMaxPending and an L1 window leaves the ledger on its dismissal or
-// handoff event, so the ceiling exists only for the case where an event never
-// arrives (a UI that returned an error mid-flight). Eviction is the safe
-// direction: an evicted card has no grant held for it, so it can be refused but
-// never allowed by this surface.
-const maxTrackedCards = approval.MaxTrackedCards
-
 // liveCard is one confirmation this process displayed, as the answering side
 // needs it: where it is, what it is, and - native side only - the proof an allow
 // has to present. It is the seam's own card type (ticket 201 moved the ledger and

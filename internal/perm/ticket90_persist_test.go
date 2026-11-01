@@ -56,7 +56,7 @@ func openManager(t *testing.T, path string) *config.Manager {
 
 // t90tool is a declared-L1 tool: with no facts and no paths its verdict is
 // exactly L1, which is the level the modes disagree about.
-type t90tool struct{ mu sync.Mutex }
+type t90tool struct{}
 
 func (*t90tool) Name() string        { return "t90.l1" }
 func (*t90tool) Description() string { return "ticket 90 fixture" }

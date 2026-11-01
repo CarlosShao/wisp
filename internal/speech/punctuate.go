@@ -62,8 +62,11 @@ const PunctuationLatencyBudget = 300 * time.Millisecond
 // rather than a guess about it.
 //
 // A different model changes this constant, not the seam. The positive controls
-// use it to state precisely what "no invented punctuation" means.
+// restate the no-invention rule in their own words rather than reading this
+// constant, so the pin below is what keeps the label set itself in the build.
 const punctuationAlphabet = "_\uFF0C\u3002\uFF1F\u3001"
+
+var _ = punctuationAlphabet
 
 // Punctuator is the punctuation seam: unpunctuated transcript in, punctuated
 // transcript out.

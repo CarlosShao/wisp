@@ -90,10 +90,10 @@ func TestSubtractEchoLeavesIndependentSignal(t *testing.T) {
 }
 
 func TestPpmDriftDegradesCancellationMonotonically(t *testing.T) {
-	far, near := echoFixture(1600, 16000*3, 0.5, 0.001)
+	far, _ := echoFixture(1600, 16000*3, 0.5, 0.001)
 	// Rebuild near from the DRIFTED far so the echo really carries the drift.
 	drifted := ApplyPpmDrift(far, 200)
-	near = make([]float32, len(drifted))
+	near := make([]float32, len(drifted))
 	copy(near, drifted)
 	for i := range near { // undo the scale so subtraction has to work
 		near[i] *= 0.5

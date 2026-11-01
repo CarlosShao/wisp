@@ -195,9 +195,8 @@ func (l *BucketLimiter) Reconcile(delta int) {
 // gates NEW attempts. To keep that ordering simple it wraps the OUTERMOST
 // provider (see Resolver.BuildChain).
 type LimiterProvider struct {
-	inner    LlmProvider
-	limiter  *BucketLimiter
-	reserved int
+	inner   LlmProvider
+	limiter *BucketLimiter
 }
 
 // Limiter reports the pacing decorator in use (nil = unpaced).

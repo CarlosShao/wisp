@@ -40,7 +40,15 @@ const (
 	// point - Lstat fails with "syntax is incorrect", NOT "no such file".
 	noise334a  = "已允许\x1b\xe2\x80\xae"
 	hostile334 = "id_ed25519" + noise334a
+)
 
+// Every current reader of hostile334 (the 336 teeth and the 334 miss-reason
+// file) is windows-tagged, so the linux build reads the pair as dead; the
+// constant is pinned here rather than moved behind a tag, which is what the
+// sentence above promises.
+var _ = hostile334
+
+const (
 	// hostilePOSIX347 is the POSIX candidate name: an ordinary B-tier name
 	// (id_*), because on POSIX nothing about the NAME can be refused. The
 	// unproven-spelling half comes from the dangling symlink built around it.

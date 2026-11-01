@@ -101,7 +101,6 @@ type fakeUI struct {
 	mu       sync.Mutex
 	prompts  []approval.Prompt
 	events   []approval.Event
-	views    []approval.PanelItem
 	prompted chan approval.Prompt
 	err      error
 }
@@ -389,12 +388,6 @@ func (f *fakeTool) count() int {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	return f.calls
-}
-
-func (f *fakeTool) setSteps(s []string) {
-	f.mu.Lock()
-	f.steps = s
-	f.mu.Unlock()
 }
 
 // bridgeFor wires the gate under the real bridge, which is the only dispatch

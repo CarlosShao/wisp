@@ -131,6 +131,11 @@ func stagingAttributable(name string) bool {
 	return stagingAttribution(name) != ""
 }
 
+// Both helpers exist so the naming scheme has exactly ONE spelling and so tests
+// can name orphaned staging files; their current reader is the windows-tagged
+// staging test, which the linux build cannot see. This reference pins them.
+var _ = []any{stagingNameOf, stagingAttributable}
+
 // stagingAttribution parses a staging name and returns the creator's pid as a
 // string, or "" when the name is not attributable. Splitting is done on fixed
 // field counts rather than with a wildcard prefix match, because "starts with

@@ -42,6 +42,7 @@ import (
 // author recorded why the noise stays until an owner decides).
 var spawn229OffRosterKnown = map[string]string{
 	"panel-sta":               "cmd/wisp/panel_resident_windows.go:80-84 逐字写了：deliberately NOT one of observe.ResidentNames 的六枚常驻名（加名是 D38b 契约改）",
+	"lifecycle-sta":           "cmd/wisp/lifecycle_windows.go:187-190 逐字写了：deliberately outside the six-name frozen resident roster, the same shape panel-sta books（票 43；43-r1 落地时漏了本登记，ci-r1 按 229 自己的补救路径补上）",
 	"balldebug-hotkey-bridge": "cmd/balldebug/main.go:35-43 逐字写了：R16#5 禁止借名册名蒙过漏哨，噪声留着、归票 66",
 	"balldebug-level-feeder":  "同上（票 66）",
 	"mockllm-stdout-reader":   "internal/llm/adaptertest/mockllm.go:92；cmd/balldebug/main.go:42 登记为票 67 的 loose end",

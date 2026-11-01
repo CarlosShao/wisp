@@ -1,7 +1,6 @@
 package adaptertest
 
 import (
-	"encoding/json"
 	"net/http"
 	"reflect"
 	"testing"
@@ -216,12 +215,6 @@ func runBoth(t *testing.T, strict, loose llm.LlmProvider, sc ScenarioID) []strin
 		t.Fatalf("scenario %s: loose adapter emitted nothing", sc)
 	}
 	return kinds
-}
-
-// evSignature renders one event compactly and deterministically.
-func evSignature(ev llm.StreamEvent) string {
-	b, _ := json.Marshal(ev)
-	return string(b)
 }
 
 // TestFaultClassIsAdapterIndependent answers the "did every adapter classify

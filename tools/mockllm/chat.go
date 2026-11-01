@@ -228,8 +228,6 @@ func planChat(req *chatRequest) (answer string, toolName string, toolArgs string
 	return answer, toolName, toolArgs, reasoning, finish
 }
 
-func estimateTokens(b []byte) int { return len(b) / 4 }
-
 func (s *Server) synthChat(w http.ResponseWriter, req *chatRequest, lat int, trunc int) {
 	answer, toolName, toolArgs, reasoning, finish := planChat(req)
 	if s.capability().thinkingBroken() {

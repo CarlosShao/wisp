@@ -707,13 +707,6 @@ func (pkg *boundaryPackage) classifyDecodes() {
 	}
 }
 
-func quoteOrEmpty(s string) string {
-	if s == "" {
-		return "(unknown)"
-	}
-	return strconv.Quote(s)
-}
-
 // parseBoundaryPackage reads a directory's struct types, string constants and
 // inbound route guard.
 func parseBoundaryPackage(dir string) (boundaryPackage, error) {
@@ -1824,13 +1817,16 @@ func TestJSONKeyDerivationAgreesWithEncodingJSON(t *testing.T) {
 			}
 		}
 		// The reflection side must land on the same answers, or the two halves of
-		// this file are still two rules.
+		// this file are still two rules. The fifth field probes a named tag that
+		// also carries an option; the option spelling is a real one because
+		// staticcheck (SA5008) rejects a bogus one, and the key the probe asserts
+		// is unaffected either way.
 		type f5Probe struct {
 			Named     string `json:"named,omitempty"`
 			Nameless  string `json:",omitempty"`
 			Untagged  string
 			Skipped   string `json:"-"`
-			Recursive string `json:"rec,-"`
+			Recursive string `json:"rec,omitempty"`
 		}
 		want := map[string]bool{"named": true, "Nameless": true, "Untagged": true, "rec": true}
 		for _, k := range reflectionTopKeys(reflect.TypeOf(f5Probe{})) {

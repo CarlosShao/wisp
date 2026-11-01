@@ -28,10 +28,6 @@ func ExtractTarBz2(archivePath, destDir string) error {
 	tr := tar.NewReader(bz)
 
 	var topDirs []string
-	type entry struct {
-		header *tar.Header
-		body   []byte
-	}
 	// Two passes are avoided by buffering small headers first to detect the
 	// shared top dir; instead we extract into a temp subdir with structure,
 	// then flatten if exactly one top dir exists. Bounded by the staging dir

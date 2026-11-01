@@ -204,7 +204,7 @@ func (a *Adapter) consume(ctx context.Context, body io.Reader, emit func(llm.Str
 				eventName = ""
 				continue
 			}
-			stop, err := st.handle(ctx, eventName, data, emit)
+			_, err := st.handle(ctx, eventName, data, emit)
 			data = nil
 			eventName = ""
 			if err != nil {
@@ -212,9 +212,6 @@ func (a *Adapter) consume(ctx context.Context, body io.Reader, emit func(llm.Str
 					return a.cancelled(emit)
 				}
 				return a.fail(emit, err)
-			}
-			if stop {
-				// message_stop with no dispatch left: terminal handled below.
 			}
 		case strings.HasPrefix(line, ":"):
 			// SSE comment (keep-alive).

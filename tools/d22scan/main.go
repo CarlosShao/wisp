@@ -144,7 +144,6 @@ type scanner struct {
 	root             string
 	allow            map[string]map[string]bool // ban-id -> path prefix set
 	findings         []Finding
-	failAddOn        string          // unused placeholder guard
 	citationReported map[string]bool // ban #9: phantom tokens already reported in this scan
 	citationExists   map[string]bool // ban #9: token -> existence, judged once per scan
 	emojiSeen        map[string]int  // ban #8: scope label -> files actually line-scanned
@@ -162,7 +161,6 @@ type scanner struct {
 
 var (
 	secretNameWords  = map[string]bool{"key": true, "token": true, "secret": true, "password": true, "passwd": true, "credential": true, "passphrase": true}
-	secretNameRe     = regexp.MustCompile(`(?i)(?:^|[^a-z])(api[_-]?key|secret|passw(or)?d|credential|passphrase|access[_-]?token|refresh[_-]?token)(?:[^a-z]|$)`)
 	wallclockRe      = regexp.MustCompile(`\.Sub\(time\.Now\(\)\)`)
 	unixTimeRe       = regexp.MustCompile(`time\.Now\(\)\.(Unix|UnixNano|UnixMilli)\(`)
 	timeoutWordRe    = regexp.MustCompile(`(?i)timeout|deadline|expire|\bttl\b|budget|until`)

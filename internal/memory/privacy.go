@@ -256,14 +256,3 @@ func firstLine(s string) string {
 	}
 	return s
 }
-
-// purgeAllDomains is the "wipe everything the privacy page exposes" helper
-// (used by diagnostics and tests; the UI clears per domain).
-func (s *Store) purgeAllDomains(ctx context.Context) error {
-	for _, d := range PrivacyDomains() {
-		if _, err := s.PurgePrivacy(ctx, d); err != nil {
-			return err
-		}
-	}
-	return nil
-}

@@ -1106,15 +1106,11 @@ func TestC21TokenConsumerReport(t *testing.T) {
 	}
 
 	tokens := make([]string, 0, len(code)+len(c21MotionGolden)+49)
-	for _, n := range c21SortedNames(code) {
-		tokens = append(tokens, n)
-	}
+	tokens = append(tokens, c21SortedNames(code)...)
 	// Ticket 74: the constants the table names from hit.go and liquid.go are held
 	// to the same rule as tokens.go's - tabled means somebody reads it, or the
 	// table says why not.
-	for _, n := range c21SortedKeys(c21MotionGolden) {
-		tokens = append(tokens, n)
-	}
+	tokens = append(tokens, c21SortedKeys(c21MotionGolden)...)
 	for _, n := range c21ColourFieldNames(t, reflect.TypeOf(Palette{})) {
 		tokens = append(tokens, "Palette."+n)
 	}

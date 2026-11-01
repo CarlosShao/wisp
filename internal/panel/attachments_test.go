@@ -27,10 +27,9 @@ import (
 // exclusive create, and a counter for every guard that must fire BEFORE the
 // source is opened.
 type fakeArtifacts struct {
-	dir       string
-	puts      int
-	exists    map[string]bool
-	openCalls *int
+	dir    string
+	puts   int
+	exists map[string]bool
 }
 
 func newFakeArtifacts(t *testing.T) *fakeArtifacts {

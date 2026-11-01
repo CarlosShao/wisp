@@ -35,20 +35,6 @@ var goldenDir = func() string {
 	return filepath.Join(filepath.Dir(thisFile), "..", "testdata", "golden")
 }()
 
-// serveGolden loads a golden fixture and serves it sequentially.
-func serveGolden(t *testing.T, name string, pace bool) (*httptestServer, *golden.Replayer) {
-	t.Helper()
-	rs, err := golden.LoadFile(filepath.Join(goldenDir, name+".sse"))
-	if err != nil {
-		t.Fatalf("load golden %s: %v", name, err)
-	}
-	rep := golden.NewReplayer(rs)
-	rep.Pace = pace
-	srv := rep.Server()
-	t.Cleanup(srv.Close)
-	return &httptestServer{srv}, rep
-}
-
 // httptestServer wraps *httptest.Server so tests can pass a BaseURL.
 type httptestServer struct {
 	*wrapper

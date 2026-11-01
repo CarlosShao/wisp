@@ -9,8 +9,8 @@ package main
 // denominators were computed from the FILESYSTEM, so they counted whatever the
 // machine happened to hold - and `frontend/dist/` is build output, ignored by
 // `frontend/.gitignore:12` (`dist/*`) and `.gitignore:22` (`frontend/dist/*`),
-// with `dist/.gitkeep` re-included by a negation in both files because
-// go:embed needs the directory to exist in a clean checkout (ticket 77 AC#1).
+// with `dist/.gitkeep` re-included by a negation in both files - the go:embed
+// directive needs the directory to exist in a clean checkout (ticket 77 AC#1).
 // Measured at anchor 7771409 with one binary on one source tree:
 //
 //	real worktree (someone ran a build)      ban #6 / ban #8 frontend/ = 43

@@ -124,3 +124,14 @@ func (t *settleTrace) samplesSnapshot() []settleSample {
 	defer t.mu.Unlock()
 	return append([]settleSample(nil), t.samples...)
 }
+
+// The three stamps and their carrier fields have no live caller outside
+// windows-tagged files (resident_voice_engines_windows.go and the two windows
+// test files), so the linux build reads them as dead. This reference keeps the
+// 12-r2 carrier whole in every build; the three-stamp logic itself is frozen
+// and is not touched here.
+var _ = []any{
+	(*settleTrace).markSettling,
+	(*settleTrace).markFellBack,
+	(*settleTrace).samplesSnapshot,
+}

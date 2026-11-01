@@ -245,6 +245,11 @@ func registerLegNail131(leg string, test func(*testing.T), entry ...string) legN
 	return n
 }
 
+// registerLegNail131's callers are all in windows-tagged nail files, so the
+// linux build would otherwise read the registrar as dead; the gate's compile-
+// time claim shape is pinned by this reference instead of by deleting it.
+var _ = registerLegNail131
+
 // TestAC4EveryLegIsNailedOrRuled is the gate.
 func TestAC4EveryLegIsNailedOrRuled(t *testing.T) {
 	pkg, err := loadMainPackage131(".")

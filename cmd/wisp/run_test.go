@@ -75,9 +75,8 @@ type runFixture struct {
 	// strings.NewReader("") is the degenerate attached-but-silent console (EOF
 	// ends the listener, which is the honest shape when nobody types).
 	reply io.Reader
-	// calls records what the bridge booked, read back after the run.
-	mu    sync.Mutex
-	calls []string
+
+	mu sync.Mutex
 }
 
 // newRunFixture writes a config.toml into a fresh data dir (allowlisting that

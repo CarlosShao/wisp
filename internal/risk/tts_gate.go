@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"log"
 	"slices"
-	"strings"
 	"sync"
 
 	"github.com/CarlosShao/wisp/internal/observe"
@@ -306,20 +305,6 @@ func (s TaintSource) String() string {
 	return string(s)
 }
 
-// validateSourceFormat validates the format of a TaintSource.
-// Expected: "<tool> <origin>" where tool is a known sensitive source tool.
-func validateSourceSource(source string) bool {
-	// Split on first space
-	idx := strings.Index(source, " ")
-	if idx == -1 {
-		// Only tool name, no origin
-		return IsSensitiveSource(source)
-	}
-
-	tool := source[:idx]
-	return IsSensitiveSource(tool)
-}
-
 // TTSLimitControl controls the length limit for TTS announce text.
 // Long text (>120 runes) should be handled by D10 notification, not TTS.
 type TTSLimitControl struct {
@@ -345,35 +330,6 @@ func (c TTSLimitControl) CheckLength(text string) (ok bool, trimmedText string, 
 	trimmed := string(runes[:c.MaxRunes])
 	reason = fmt.Sprintf("播报文本超长 (%d 字符>上限%d)，已截断至前%d字符；完整内容请走 D10 通知", len(runes), c.MaxRunes, c.MaxRunes)
 	return false, trimmed, reason
-}
-
-// --- helper functions for form B implementation ---
-
-// buildNormalizedTaintString converts a taint string to normalized form for storage.
-// This is the same normalization used in Mark(): whitespace stripped, case-folded, full-hlf unified.
-func buildNormalizedTaintString(content string) string {
-	return normalizeTaint(content)
-}
-
-// fragmentMatch checks if two normalized strings share any >=n contiguous fragment.
-// Uses FNV-1a window hashing (same algorithm as taintmatch.go).
-func fragmentMatch(normA, normB string, n int) bool {
-	if len(normA) < n || len(normB) < n {
-		return false
-	}
-
-	// Build hash sets for both strings (window size n)
-	hashSetA := getWindowHashes([]rune(normA), n)
-	hashSetB := getWindowHashes([]rune(normB), n)
-
-	// Check intersection
-	for h := range hashSetA {
-		if _, ok := hashSetB[h]; ok {
-			return true
-		}
-	}
-
-	return false
 }
 
 // getWindowHashes computes FNV-1a hashes for all windows of size n in the rune slice.

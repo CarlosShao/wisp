@@ -113,10 +113,3 @@ func (b *Bridge) readBlacklist(raw []string) BlacklistNote {
 	}
 	return n
 }
-
-// blacklistedSensitive reports whether the note found anything worth putting on
-// a card: A-tier, B-tier, or an unresolved path on a call the judge already
-// flagged as sensitive.
-func (n BlacklistNote) blacklistedSensitive() bool {
-	return n.Class != risk.ClassNone
-}

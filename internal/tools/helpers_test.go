@@ -19,15 +19,7 @@ import (
 // real SQLite store for the rows. Nothing is stubbed except the gate, which is
 // ticket 21's to build.
 
-// fsBridge returns a bridge over the real fs pair rooted at allowed (canonical,
-// already inside the allowlist).
-func fsBridge(t *testing.T, allowed string) (*Bridge, *PathCanonicalizer) {
-	t.Helper()
-	b, _ := fsBridgeWith(t, nil, nil, allowed)
-	return b, b.Paths()
-}
-
-// fsBridgeWith is fsBridge with an optional journal and gate. The C25 engine is
+// fsBridgeWith is the shared bridge wiring, with an optional journal and gate. The C25 engine is
 // always wired, because "results are taint-marked" is a hard rule, not a flag.
 func fsBridgeWith(t *testing.T, j agent.Journal, g Gate, allowed ...string) (*Bridge, *risk.Provenance) {
 	t.Helper()

@@ -76,6 +76,11 @@ type Apm struct {
 	sess  unsafe.Pointer
 }
 
+// The fields are the binding's private state: every reader lives in the
+// windows && cgo && webrtcap binding (aec_webrtc_windows.go), which the linux
+// build cannot see. This reference keeps the seam struct whole per platform.
+var _ = [3]any{Apm{}.rate, Apm{}.frame, Apm{}.sess}
+
 // FrameSamples is the 10ms frame length at the given rate, the chunk size
 // ProcessRender and ProcessCapture accept.
 func FrameSamples(rate int) int { return rate / 100 }

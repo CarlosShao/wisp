@@ -60,9 +60,9 @@ func TestScrubForDisplayEscapesEveryUnseenCharAndTouchesNothingElse(t *testing.T
 		{"crlf", "a\r\nb", `a\r\nb`},
 		{"tab", "a\tb", `a\tb`},
 		{"del", "a\x7fb", `a\x7fb`},
-		{"c1 next line", "ab", `a\x85b`},
-		{"c1 device control", "ab", `a\x90b`},
-		{"c1 highest", "ab", `a\x9fb`},
+		{"c1 next line", "a\u0085b", `a\x85b`},
+		{"c1 device control", "a\u0090b", `a\x90b`},
+		{"c1 highest", "a\u009fb", `a\x9fb`},
 		{"invalid utf8 byte", "a\\xffb", `a\xffb`},
 		{"two escs keep both", "\x1b\x1b", `\x1b\x1b`},
 	}

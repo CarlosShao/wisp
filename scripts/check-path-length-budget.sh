@@ -380,6 +380,7 @@ BEGIN {
     R[".scratch/wisp/issues/192-the-browser-and-artifact-preview-stack-is-unclaimed-and-sits-on-the-undefined-web-search-ruling.md"] = "hist: ticket filed before README rule 9 (100-char hat, added 2026-10-04); still open, renaming it is outside this gate"
     R[".scratch/wisp/issues/142-the-two-git-spawns-are-not-atomic-so-a-tracked-directory-can-be-skipped-during-the-window-done.md"] = "hist: ticket filed before README rule 9 (100-char hat, added 2026-10-04); closed, name doubles as the -done anti-double-claim key"
     R[".scratch/wisp/issues/141-ban8-emoji-scan-range-is-narrower-than-plan-md-states-41-go-files-carry-u2190-u25ff-today-done.md"] = "hist: ticket filed before README rule 9 (100-char hat, added 2026-10-04); closed, name doubles as the -done anti-double-claim key"
+    R[".scratch/wisp/issues/233-d36-three-tier-enum-is-tagged-on-no-key-and-the-reload-tier-has-neither-producer-nor-consumer-done.md"] = "hist: ticket filed before README rule 9 (100-char hat, added 2026-10-04); closed 2026-10-27 (A1291 appended the -done anti-double-claim key); missed the original roster compile and was caught by the count guard (tree 62 vs roster 61, run 41274267651) - registered by leg ci-r1, no threshold moved"
 #ROSTER-AWK-END
 }
 {

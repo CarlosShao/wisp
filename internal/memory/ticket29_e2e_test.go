@@ -119,18 +119,6 @@ func TestTicket29_L1_Undo(t *testing.T) {
 	}
 }
 
-func equalIDs(a, b []int64) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
 // TestTicket29_L2_Scoping verifies basic memory operations (recall visibility across sessions).
 func TestTicket29_L2_Scoping(t *testing.T) {
 	s := openTestStore(t)

@@ -81,12 +81,6 @@ func newTestTranscriber(t *testing.T) (*Transcriber, *StreamingAsr) {
 	return NewTranscriber(det, asr), asr
 }
 
-// feedWindow pushes one seam window worth of pcm through the transcriber and
-// returns the transcripts it produced.
-func feedWindow(tr *Transcriber, pcm []int16) []Transcript {
-	return tr.Accept(pcmToFloat(pcm), nil)
-}
-
 // TestAsrRecognizerConfigPinsTheShape is the wiring receipt for the two
 // decisions that must not drift: one intra-op thread, and endpointing owned by
 // the Go state machine rather than by sherpa.

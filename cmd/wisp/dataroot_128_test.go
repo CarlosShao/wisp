@@ -56,9 +56,9 @@ import (
 	"github.com/CarlosShao/wisp/internal/proc"
 )
 
-// planted128Cause is the OS's own words on a Windows box with no APPDATA, spelled
+// errPlanted128Cause is the OS's own words on a Windows box with no APPDATA, spelled
 // the way syscall.Getenv spells it (AC#1 read it live off a real process).
-var planted128Cause = errors.New("%AppData% is not defined")
+var errPlanted128Cause = errors.New("%AppData% is not defined")
 
 // failConfigDir128 rebinds this package's single OS read of the config root for
 // one case and puts it back through Cleanup, so no case can leave the refusal
@@ -66,7 +66,7 @@ var planted128Cause = errors.New("%AppData% is not defined")
 func failConfigDir128(t *testing.T) {
 	t.Helper()
 	prev := userConfigDir
-	userConfigDir = func() (string, error) { return "", planted128Cause }
+	userConfigDir = func() (string, error) { return "", errPlanted128Cause }
 	t.Cleanup(func() { userConfigDir = prev })
 }
 
@@ -178,8 +178,8 @@ func TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128(t *testing.T) {
 			if !strings.Contains(err.Error(), want) {
 				t.Errorf("AC#2 RED: the refusal does not name the tree the data root belongs in (%s); it reads: %v", want, err)
 			}
-			if !strings.Contains(err.Error(), planted128Cause.Error()) {
-				t.Errorf("AC#2 RED: the refusal drops the OS's own reason (%s), which is the only part that says which variable is empty: %v", planted128Cause, err)
+			if !strings.Contains(err.Error(), errPlanted128Cause.Error()) {
+				t.Errorf("AC#2 RED: the refusal drops the OS's own reason (%s), which is the only part that says which variable is empty: %v", errPlanted128Cause, err)
 			}
 			assertDirEmpty128(t, cwd, "resolveDataDir("+env+")")
 		})
@@ -240,7 +240,7 @@ func TestAC2RefusalMarkersAreNotAShortenableList128(t *testing.T) {
 	}
 	sentence := err.Error()
 	clauses := []struct{ what, text string }{
-		{"which OS read failed, in the OS's own words", "数据根无法解析：用户配置目录不可得（OS 原话：" + planted128Cause.Error() + "）："},
+		{"which OS read failed, in the OS's own words", "数据根无法解析：用户配置目录不可得（OS 原话：" + errPlanted128Cause.Error() + "）："},
 		{"where the data root belongs, on the no-fallback statement it hangs off", "数据根本应是 " + filepath.Join("<用户配置目录>", "wisp-dev") + "，而 Wisp 拒绝把它回落到当前工作目录"},
 		{"what to set to get the data root back", "修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。"},
 	}
@@ -673,7 +673,7 @@ func TestAC5RefusalSentenceHasOneWordingPoint128(t *testing.T) {
 	if err == nil {
 		t.Fatalf("AC#5 RED: resolveDataDir(dev) answered %q with no error, so there is no sentence to compare", dir)
 	}
-	want := proc.UserConfigDirUnresolved(buildinfo.EnvDev, planted128Cause).Error()
+	want := proc.UserConfigDirUnresolved(buildinfo.EnvDev, errPlanted128Cause).Error()
 	if got := err.Error(); got != want {
 		t.Errorf("AC#5 RED: this package refuses with a sentence of its own rather than the one wording point.\ngot:  %s\nwant: %s", got, want)
 	}

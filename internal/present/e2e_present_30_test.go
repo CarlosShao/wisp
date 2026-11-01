@@ -205,9 +205,7 @@ func Test30FourResultsThroughTheRealPipeline(t *testing.T) {
 			loop := newLoop(t, s.prov, sink)
 
 			var calls int
-			if sc, ok := s.prov.(*scriptedC5); ok {
-				calls = sc.calls
-			} else {
+			if _, ok := s.prov.(*scriptedC5); !ok {
 				proc.Reset(t)
 			}
 			res := loop.Run(context.Background(), s.prompt)

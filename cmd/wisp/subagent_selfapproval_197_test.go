@@ -584,9 +584,7 @@ func Test197NoAllowDoorIsReachableFromASubagentsAssembly(t *testing.T) {
 		t.Fatalf("这架扫描器在种了一扇门的载体上只读出 %v：负向判据不能由一架照不见门的仪器来签发", planted)
 	}
 	var verbs []string
-	for _, p := range planted {
-		verbs = append(verbs, p)
-	}
+	verbs = append(verbs, planted...)
 	if !strings.Contains(strings.Join(verbs, "|"), "Allow") ||
 		!strings.Contains(strings.Join(verbs, "|"), "Native") {
 		t.Errorf("种下的两枚出口名字里读出了 %v，想要 Allow 与 Native 都在", verbs)
@@ -605,6 +603,11 @@ func Test197NoAllowDoorIsReachableFromASubagentsAssembly(t *testing.T) {
 type selfApprovalDoor197 struct{ holder carrierWithDoor197 }
 
 type carrierWithDoor197 struct{ Inner nativeDoor197 }
+
+// The walker reaches carrierWithDoor197 only by reflecting on
+// selfApprovalDoor197's field type, which no static reader of this package
+// sees; this reference keeps the planted shape itself alive in the build.
+var _ = selfApprovalDoor197{}.holder
 
 type nativeDoor197 struct{}
 

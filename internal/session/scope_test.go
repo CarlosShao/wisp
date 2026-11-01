@@ -178,12 +178,6 @@ func (s *engineStub) closesOf(kind EngineKind) int {
 	return s.closes[kind]
 }
 
-func (s *engineStub) loadsOf(kind EngineKind) int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.loads[kind]
-}
-
 func (s *engineStub) totalLoads() int {
 	s.mu.Lock()
 	defer s.mu.Unlock()

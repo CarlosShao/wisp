@@ -143,7 +143,6 @@ func logMsgs(entries []map[string]any, msg string) []map[string]any {
 // alert. Non-whitelisted registrations are never called (AC#4's structural
 // half is asserted here too).
 func TestSleepingOverCapDropsUnloadablesThenWithinCap(t *testing.T) {
-	const capB = int64(25 << 20)
 	tree := &fakeTree{}
 	tree.set(overCapTree(30 << 20)) // over the Sleeping cap
 

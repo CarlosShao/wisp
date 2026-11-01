@@ -52,16 +52,12 @@ var crossVetPackages = []string{"./internal/proc/", "./internal/ball/"}
 func TestCrossVetForLinux(t *testing.T) {
 	root := repoRootForTest(t)
 
-	goExe := "go"
-	if p, err := exec.LookPath("go"); err == nil {
-		goExe = p
-	} else {
-		rooted := filepath.Join(runtime.GOROOT(), "bin", "go.exe")
-		if st, err := os.Stat(rooted); err != nil || st.IsDir() {
-			t.Fatalf("cannot resolve the go tool: LookPath failed (%v) and %s is not a file - "+
-				"this check must fail loudly, never skip", err, rooted)
-		}
-		goExe = rooted
+	goExe, err := exec.LookPath("go")
+	if err != nil {
+		// runtime.GOROOT is the BUILD machine's root and deprecated as a go
+		// binary locator (Go 1.24, SA1019); PATH is the supported resolution,
+		// and this gate's contract is a loud failure, never a skip.
+		t.Fatalf("cannot resolve the go tool on PATH: %v - this check must fail loudly, never skip", err)
 	}
 
 	cmd := exec.Command(goExe, "vet")

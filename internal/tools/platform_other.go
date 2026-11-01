@@ -38,6 +38,10 @@ func volumeID(canonical string) string { return filepath.VolumeName(canonical) }
 // volumeRootOf is the mount root a per-volume query is answered against.
 func volumeRootOf(canonical string) string { return filepath.VolumeName(canonical) }
 
+// volumeRootOf's readers are the windows volume/recycle paths, which the linux
+// build cannot see; the seam helper is pinned here rather than deleted.
+var _ = volumeRootOf
+
 // sameVolume compares two volume identities. On a platform with one namespace,
 // absolute paths with no volume name compare as one volume, which is what
 // os.Rename's own atomicity guarantees are written against.

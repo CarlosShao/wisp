@@ -46,14 +46,12 @@ func startMockllm(t *testing.T) *mockllmProc {
 		t.Skip("integration test (mockllm subprocess) skipped under -short")
 	}
 
-	// 1. Build the tool module once. Locate the go toolchain: PATH first
-	// (works under `go test` since the env is inherited), GOROOT fallback.
+	// 1. Locate the go toolchain on PATH (the env a `go test` run inherits).
+	// runtime.GOROOT is the BUILD machine's root and deprecated as a go binary
+	// locator (Go 1.24, SA1019).
 	goBin, err := exec.LookPath("go")
 	if err != nil {
-		goBin = filepath.Join(runtime.GOROOT(), "bin", "go"+exeSuffix())
-		if _, statErr := os.Stat(goBin); statErr != nil {
-			t.Skipf("go toolchain not found (PATH nor GOROOT/bin): %v", statErr)
-		}
+		t.Skipf("go toolchain not found on PATH: %v (mockllm builds itself)", err)
 	}
 	_, thisFile, _, ok := runtime.Caller(0)
 	if !ok {

@@ -42,8 +42,25 @@ func autostartCleanup43(t *testing.T) {
 	t.Cleanup(func() { _ = applyAutostartValue(autostartTestValueName, false) })
 }
 
+// ensureRunKey43 open-or-creates the per-user Run key before the round trip
+// writes through it. A bare profile can lack CurrentVersion\Run entirely (the
+// hosted CI runner's does), and then applyAutostartValue's OpenKey fails with
+// ERROR_FILE_NOT_FOUND before the write under test could act. Creating the key
+// is seeding the precondition, not weakening an assertion: every receipt and
+// readback assertion below is unchanged, and on a normal profile CreateKey is
+// an open of the existing key.
+func ensureRunKey43(t *testing.T) {
+	t.Helper()
+	k, _, err := registry.CreateKey(registry.CURRENT_USER, autostartRunKeyPath, registry.QUERY_VALUE|registry.SET_VALUE)
+	if err != nil {
+		t.Fatalf("cannot open-or-create the Run key: %v", err)
+	}
+	k.Close()
+}
+
 func Test43AutostartRunKeyWriteRemoveRoundTrip(t *testing.T) {
 	autostartCleanup43(t)
+	ensureRunKey43(t)
 	if _, exists := autostartValue43(t); exists {
 		t.Fatal("a leftover test entry existed before the round trip started")
 	}

@@ -51,3 +51,5 @@ Focus-Assist-proof badge update.
 
 ★**六格全翻、可带残余结案**（★`30-v1` 九项全自跑：present 19/0/0＋`-race`；**三发 mutation 各 rc=1 红句正中判据**；**AC2 的 mockllm 400 字节截断绕行判合法**——`chat.go:159-162` 逐字核到截断、402 汉字物理回不来，`scriptedC5` 经 `agent.Options.Provider` 注入＝AGENTS 1.3 具名缝 C5、四案同回路同 router、`present` 零 provider 引用＝**结构性无二次请求**）。
 ★**残余三条（随结案登记）**：①**mockllm 回声 400 字节字节级截断**（`tools/mockllm/chat.go:160`、多字节拦腰切）⇒ **归 tools/mockllm 所有者立票**；②D10 两量词解释已三处留痕（30-r1 §8⑤/测试名/裁决表 §5）；③**`cmd/wisp` 装配缝**（`present.New(Channels{...})`＋`loop.Run` 后对 completed `Dispatch`；Speak→`rt.voiceAnnounce` 闭包不重复设闸；Clipboard 适配器先 `CheckText`）⇒ **归接线腿（41a2-r1/381-r2 之后波次）**。
+
+> ★**残余③（cmd/wisp 装配缝）销账（2026-10-31 17:2x 记）**：★**30-w-r1（`c15888b28`）落地＋30-w-v1（`13781ba52`）终裁「落地成立、销账资格具备」**——七通道逐通道真（Clipboard 写真写第一行即 CheckText、"让位"判正确、C17 桥零字节）；★**残余定性三条**：TaskList nil 合法（真入口归票 36）／任务污点跨 scope 关闭存活＝382 形 B 设计行为非洞（归 R26-5 同源）／环境账三条入册。凭据＝`docs/evidence/s1/30-w-v1-verdict.md`。

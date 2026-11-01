@@ -27,12 +27,6 @@ import (
 // bridge (ticket 20+) will produce, and exactly the shape that used to swallow
 // the structured TOOL_TIMEOUT (MAJOR-2).
 
-// sleepArgs is the argument shape the golden fixtures use for the sleep tool.
-type sleepArgs struct {
-	Text string `json:"text"`
-	MS   int    `json:"ms"`
-}
-
 // blockingProvider holds tool calls until released. Safe for concurrent use.
 type blockingProvider struct {
 	mu sync.Mutex
@@ -45,8 +39,6 @@ type blockingProvider struct {
 	obsMax     atomic.Int32
 	callCount  atomic.Int32
 	errOnAbort bool // return ctx.Err() (host failure) instead of a soft outcome
-
-	done []string // recorded "<name>:<abort>" lines, in completion order
 }
 
 // newBlockingProvider builds a provider whose calls block until release().

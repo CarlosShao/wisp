@@ -247,6 +247,27 @@ fi
 # 111 AC#1 was filed for). The scope entry and the pin line move in the SAME commit
 # because GUARD C compares them.
 #
+# ./internal/present/, ./internal/watchdog/ and ./internal/audio/aecspike/ JOINED
+# THE CORE LIST 2026-11-01 (leg ci-r1, the census's own remedy for GUARD D). All
+# three sat UNCLAIMED-HAS-TESTS on the windows census (run 41274267651: present
+# 4/0, watchdog 3/0, aecspike 7/0) after their test files landed without a claim.
+# Measured reasons, per the speech/cer bar above: present carries 4 test files and
+# watchdog 4, both with ZERO //go:build lines, ZERO t.Skip, ZERO os.Getenv and ZERO
+# exec.Command (grep-measured; both ran green on this windows host at the claim
+# commit). aecspike carries 3 test files that compile on linux (the other 5 are
+# //go:build windows rig/opt-in files gated by WISP_AEC_SPIKE / WISP_AEC392R2, so
+# no portable carrier can run them - their readings stay dev-box readings per
+# their own headers), and its non-test linux files import nothing that links
+# sherpa, so the ubuntu test binary loads (the windows-shaped local reading dies
+# at load on missing DLLs instead - 0xc0000135 - which is why its first ubuntu run
+# below is the reading this claim owes). The parent's audio glob was narrowed from
+# ./internal/audio/... to ./internal/audio/ + ./internal/audio/aecspike/ in the
+# SAME commit because internal/audio/aec compiles ZERO test files on linux (its
+# only test file is windows && cgo && webrtcap), so the glob would have pulled a
+# package GUARD A refuses to declare. The scope entry and the pin line move in the
+# SAME commit because GUARD C compares them. ./internal/speech/ stays unclaimed as
+# documented below; its census row is reported to the owner, not resolved here.
+#
 # ./internal/speech/ IS DELIBERATELY NOT CLAIMED, here or in any other tier, and that
 # is a reading rather than an omission: the parent package dies at LOAD time without
 # the three sherpa DLLs (`go test ./internal/speech` = `exit status 0xc0000135` before
@@ -272,6 +293,7 @@ github.com/CarlosShao/wisp/cmd/llmrecord
 github.com/CarlosShao/wisp/internal/agent
 github.com/CarlosShao/wisp/internal/agent/approval
 github.com/CarlosShao/wisp/internal/audio
+github.com/CarlosShao/wisp/internal/audio/aecspike
 github.com/CarlosShao/wisp/internal/ball
 github.com/CarlosShao/wisp/internal/buildinfo
 github.com/CarlosShao/wisp/internal/config
@@ -287,6 +309,7 @@ github.com/CarlosShao/wisp/internal/observe
 github.com/CarlosShao/wisp/internal/panel
 github.com/CarlosShao/wisp/internal/perm
 github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/present
 github.com/CarlosShao/wisp/internal/proc
 github.com/CarlosShao/wisp/internal/projctx
 github.com/CarlosShao/wisp/internal/risk
@@ -295,6 +318,7 @@ github.com/CarlosShao/wisp/internal/session
 github.com/CarlosShao/wisp/internal/speech/cer
 github.com/CarlosShao/wisp/internal/statemachine
 github.com/CarlosShao/wisp/internal/tools
+github.com/CarlosShao/wisp/internal/watchdog
 github.com/CarlosShao/wisp/internal/winsec
 '
 win_pin='
@@ -346,10 +370,12 @@ core)
         ./internal/memory/... ./internal/observe/... ./internal/secret/...
         ./internal/risk/... ./internal/statemachine/...
         ./internal/tools/... ./internal/models/...
-        ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
+        ./internal/buildinfo/... ./internal/audio/ ./internal/audio/aecspike/
+        ./internal/proc/...
         ./internal/panel/... ./internal/ball/ ./internal/perm/
         ./internal/plugin/ ./cmd/llmrecord/ "$winsec_scope"
-        ./internal/session/ ./internal/projctx/
+        ./internal/session/ ./internal/projctx/ ./internal/present/
+        ./internal/watchdog/
         ./internal/speech/cer/
     )
     pinned=$core_pin

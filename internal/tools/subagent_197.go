@@ -328,7 +328,7 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 	// thrown away and the page was two lifecycle lines).
 	opt.Sink = nil
 	if t.d.Stream != nil {
-		opt.Sink = subagentTextSink{d: t.d}
+		opt.Sink = subagentTextSink(t)
 	}
 	// The child is admitted through the PARENT's admission hook, i.e. the host's
 	// one approval queue - which is also the second publisher of its roster row

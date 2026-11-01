@@ -742,10 +742,6 @@ func inv76ReclaimKeys(artTree string, keys ...string) []string {
 	return out
 }
 
-func inv76Abs(root, rel string) string {
-	return filepath.Join(root, filepath.FromSlash(rel))
-}
-
 type inv76File struct {
 	name string
 	src  *ast.File

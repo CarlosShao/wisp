@@ -228,9 +228,7 @@ func repoMutatingHits186(t *testing.T, dir string, files []string) []string {
 	var hits []string
 	for _, name := range files {
 		p := filepath.Join(dir, name)
-		for _, hit := range reMatchesInFile(repoMutatingCallRe, p) {
-			hits = append(hits, hit)
-		}
+		hits = append(hits, reMatchesInFile(repoMutatingCallRe, p)...)
 	}
 	return hits
 }

@@ -65,6 +65,14 @@ type deviceStream interface {
 	Close() error
 }
 
+// Both interfaces are the capture seam the windows WASAPI implementation and
+// its hotplug tests drive; the linux build has no user for them, so the seam
+// types are pinned here instead of being deleted out from under that side.
+var (
+	_ = streamOpener(nil)
+	_ = deviceStream(nil)
+)
+
 // Windows HRESULTs the audio stack maps (D42#2/#12). Values from
 // audioclient.h / winerror.h.
 const (
@@ -119,14 +127,4 @@ func hresultString(hr uintptr) string {
 		hr >>= 4
 	}
 	return string(buf)
-}
-
-// isDeviceInvalidated reports whether err is an endpoint-invalidated error
-// (the stale-handle scenario of D42#2: the device died under us).
-func isDeviceInvalidated(err error) bool {
-	e, ok := err.(*observe.Error)
-	if !ok {
-		return false
-	}
-	return e.Class == observe.ClassAudioDevice && e.ProviderCode == hresultString(hrAUDCLNTDeviceInv)
 }

@@ -55,10 +55,10 @@ func StartMockllm(t *testing.T) *Mockllm {
 	}
 	goBin, err := exec.LookPath("go")
 	if err != nil {
-		goBin = filepath.Join(runtime.GOROOT(), "bin", "go"+exeSuffix())
-		if _, statErr := os.Stat(goBin); statErr != nil {
-			t.Skipf("go toolchain not found (PATH nor GOROOT/bin): %v", statErr)
-		}
+		// runtime.GOROOT is the BUILD machine's root and deprecated as a go
+		// binary locator (Go 1.24, SA1019); the supported shape is PATH, which
+		// is what every `go test` invocation inherits.
+		t.Skipf("go toolchain not found on PATH: %v (mockllm builds itself)", err)
 	}
 	root := RepoRoot()
 	exe := filepath.Join(t.TempDir(), "mockllm"+exeSuffix())
