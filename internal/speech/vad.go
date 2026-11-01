@@ -174,6 +174,19 @@ func (d *Detector) Finalize(out []Endpoint) []Endpoint {
 	return d.ep.Finalize(out)
 }
 
+// Reset drops the silero session state so the detector can process a new
+// stream: the RNN context (which carries across silent gaps - no input means
+// no decay, and the hangover can fire a start on post-speech silence, ticket
+// 398), sherpa's own segment queue, and any buffered partial window. The
+// endpointer is not touched: closing an open utterance stays Finalize's job,
+// and the two faces compose into the full inter-window clear. The classifier
+// is untouched - same model, same threshold, same window - so a reset detector
+// answers fresh input exactly like a just-constructed one.
+func (d *Detector) Reset() {
+	d.rest = d.rest[:0]
+	d.vad.Reset()
+}
+
 // Consume drains seam frames until the channel closes or ctx is cancelled,
 // decoding each to samples and feeding the detector. It runs in the caller's
 // goroutine by design: the voice chain starts no detached goroutines (D38b),
