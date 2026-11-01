@@ -581,3 +581,42 @@ tasklist | grep -iE "wisp|balldebug"
 - A.5 那句「CI 今天必红」在修复后应读作：缺陷①已修（无 keeper 可跑，C.1）、缺陷②改为树外口径（C.3）、
   而 A.5 当时**没预见**的第三起（聚合崩溃）由 C.4 修掉 ⇒ 今天 `smoke` 5/5 exit=0（C.4）。
 - A14/A15 在 `docs/reports/pending-and-issues.md` 移入「已解决」，关闭 commit 见那里的引用行。
+
+---
+
+# 附录 D — 票 16 S2 延迟段实测对照（2026-11-01，腿 16-r1）
+
+> **落点授权**：票 16 AC#2 逐字「Latency table filled with measured numbers vs budget,
+> committed to docs/SLO.md appendix」——本附录是该票明令的编辑位。**叠加不改写**：上文
+> 正文与附录 A/B/C 的每一行原样保留，本附录只加对照行，不动任何预算值。
+> **测量机**：DESKTOP-LVS7839（同 §A）；**数据源**＝12-v3/12-r2/15e/15c 已在案基线读数
+> ＋腿 16-r1 当日 demo 新读数（log `D:\tmp\wisp\20261101\16r1\logs\16r1-demo2.log`，
+> 证据表 `docs/evidence/s1/16r1-impl.md`）。预算行原文＝`docs/PLAN.md` D32 16.3.4
+> （`:2330-2346`，现核于 HEAD `19d715c5a`）。
+
+## D.1 预算行 vs 实测
+
+| 预算行（16.3.4 原文口径） | 实测 | 读数出处 | 判 |
+|---|---|---|---|
+| 唤醒词说完 → 球转「监听中」 ≤300ms | 唤醒命中 → D43#7 派发＝**0 样本差**（音钟同拍，`at_sample=115200` 两行同值；demo 语音链实测） | `16r1-demo2.log` DEMO16 D43 | 音钟口径 0 差；**声学端到端唤醒延迟归票 42 sampler**（41-v1 AC1 半格，样本钟原料已备） |
+| VAD 判停 → ASR 出全文 ≤800ms（流式） | **语音尾 → final 704ms**（基线 finalLatency 4.096s − speechMS 3.392s；demo 同构 3.52s − 2.816s ＝ 704ms，两形状同值） | 12-v3 §2／16r1 demo | **PASS**（流式） |
+| ASR 全文 → 标点恢复完成 ≤300ms | flush 腿 **0.53ms**（墙钟；标点非真——27 未接，按票 16 口径只量管道开销） | 15c／15-v1 §5 | **PASS**（开销口径；真标点归 27） |
+| 标点 → 上下文组装 ≤50ms | **未测**（无仪器读数；12 家族未单列） | — | 未测，如实记；归口后续票 |
+| 上下文组装 → LLM 首 token ≤1500ms | **未单测**（本腿 golden LLM 任务回合整体完成，无该段单列读数） | — | 未测，如实记 |
+| 首 token → TTS 首帧 ≤800ms（Warm 内已加载）／≤1600ms（需加载） | 真 matcha **冷装载 3.715s**（demo 实测 `acquire=3.7150564s`，槽位换族路径） | `16r1-demo2.log` | **≤1600ms「需加载」分支 FAIL**——方向与 §4 的 4.7s 串行 FAIL 同源（S0 已裁定降级策略）；「Warm 内已加载」形状待票 28 SessionScope，未测 |
+| 「说完话 → 听见第一个字」冷会话 P50 ≤4s · P95 ≤6s | 首用形状 `seamWaitToFirstText=5.51s`（含首装 3.38s＋引擎装载 ~2.2s，15-v1 R5 首用成本照录） | 15e／12-v3 §2 | 首用形状超 P50（含首装，非稳态）；稳态分布未成统计，P95 无读数 |
+| Warm 内 P50 ≤2.5s · P95 ≤4s | **未测**（Warm 会话多轮数据归票 28） | — | 票 16 自带 deferred 分支，照记 |
+| （相邻族）播报期打断停播 ≤400ms（D47 Path C） | **41–46ms**（381-r2 真机五轮）／**28–50ms**（390 两跑十轮） | `381r2-impl.md` §2／`390-v1-verdict.md` §2 | **PASS**（引用既有读数，本腿不重测） |
+| 回复后 3s 回落（D43#32 静置窗；票 12 AC#9 本体） | **3000–3001ms**（12-r2/12-v3 十样本）＋ **3039ms**（本腿 demo 语音链形状：真 TTS 播报后落 Warm → 静置 → dispose） | 12-v3 §2／16r1 demo | **PASS**（3s 静置窗真值；「进窗腿 ≤3000ms」判的是 staging 暖窗形状——12-v3 §3 裁定与 90s 默认的诚实边界照录） |
+| settle ≤10s 回落至 cap | **261–263ms** | 附录 A.3/C.5 | **PASS** |
+| Idle/Sleeping 采样复跑（语音栈在场后） | C.5 六态九门全过（**skeleton 口径**——非真引擎加载，边界照 C.5 原文）；本腿当日六族＋demo 无新增红 | 附录 C.5／16r1 | 记录（六态表达的「真加载」行仍挂票 28/33/36/15 常驻面） |
+
+## D.2 腿 16-r1 demo 的新读数（2026-11-01）
+
+staged 真硬件一轮完整语音 E2E（真 KWS 唤醒→真流式 ASR→真 agent 回合（golden SSE，
+一笔 `fs.read` L0 tool_call 落真库）→真 matcha 播报（真 waveOut 设备，`spoken=1
+samples=88856`）→SCOPE-WARM→SCOPE-SETTLING→SCOPE-DISPOSED）：球走位
+`Armed→Listening→Thinking→Speaking→Warm` 全部由产线派发；wake 路 utterance 形状
+`openDelay=6.95s chunk=640ms finalLatency=3.52s speechMS=2816`（唤醒后才开句的形状，
+与 15e 单句基线 262/640/902 不同口径——基线本身由六族 `Test15e` 同日复跑逐位同值钉住）。
+本腿未改任何阈值/预算行；`git diff -- docs/SLO.md` 仅此附录。
