@@ -29571,3 +29571,23 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 3**＝**写 2**（★`16-r1` S2 验收证据／`393-r2` flush-reset API）＋**裁 1**（★`382-w-v1` R382-1 接线终裁）——**写 2＜3 具名**：★**第三写腿＝(a) 加稳设计消费（归票 26/28 集成面、等 382-w-v1+26p-v1 裁决链）或 392 残余①毒源隔离票（待开）⇒ 裁决交件同轮补**
 ★票池：done=**210**／open=**169**（**55.6%**，票池 379）；未推（本轮后现跑）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／**票 394 契约批准**）
+
+## A1345（2026-11-01 09:5x +08，编排者，goal round 34 续）★★★收 `393-r2`（`35084d0b0` 6 枚 +718）：**半停手落地**——reset 半边有公开面（APM Initialize＝真 reset）按铁律落地、flush 半边无公开面具名未伪造｜★**主新发现：生产路径吃全带 vs tuned 吃分带**（ApplyConfig-after-Create 留 stale submodule_states_）｜★派 `393-v1` 终裁
+
+**① ★★收 `393-r2`（尺核：★提交在／6 枚在）**
+- ★★★**半停手裁定（本票最关键决策）**：★**钉定树逐面现核**——①`EchoControl` 接口无任何 reset/flush ②**APM 公开 `Initialize()`＝真 reset 面**（audio_processing.h:497 逐字「retaining all user settings…before beginning to process a new audio stream」）且 **InitializeLocked 经 echo_control_factory_ 重造 ⇒ tuned 会话重造同参数引擎（实测逐位证实）** ③**保滤波器只清延迟缓冲的 flush 无公开面**（kBufferFlush/delay_controller_->Reset 均非公开；kPlayoutVolumeChange 只置 gain_change 标志）＝**具名、未伪造 Flush API**；★**派单 stop①对 flush 半边成立、对 reset 半边不成立——reset 正是保温根因链「APM 跨窗携带失准」所需 ⇒ 按铁律落地 reset 半边而非全停**
+- ★★★**AC 一句话**：★**AC#1 落地 `wap_reset`（shim）＋`Reset()`（Go＋stub、对照 wap_new_tuned 形状、AEC3 源树零触碰）**；★**AC#2 状态清洁读数（K=4 合成、四臂、`WISP_AEC393R2=1` 门、两跑逐位复现）：reset==rebuild-control 逐位（4/4 发帧差 0）＝carry 状态被完全清除；reset 臂 echo_resid 全 ≤-39（比 -24 近端回声低 15dB＝「第二窗重新会判」形状成立）**
+- ★★★**AC#3 反向**：★**carry 臂（render 满窗/capture 2.0s 截断/同 Apm 下窗）退化 7.87dB（-39.73 vs -47.60）＝392 根因在绑定层隔离复现且 Reset 移除之**；还原核逐位 0；tuned 引擎过 Reset 逐位存活
+- ★★**AC#4 零回归**：★build/vet 两形状＋linux vet rc=0、gofumpt 空、四数 rc=0 FAIL=0 SKIP=11（★**口径差如实记**：-v 口径 RUN=98 与 392-r1 自记逐位同、顶层终态 86/75/11/0、派单基线 94/83/0/11 与两口径都对不齐——**判据落在 FAIL=0＋SKIP 集＋392 口径逐位上**）、d22scan clean＋selftest 35/0/0（★首跑 2 红＝证据件未落盘的 phantom-citation、aec3r1 同形状、落盘后转绿）
+- ★**AC#5 纪律格**：★cmd/wisp、389 门、392 调参面（aec.go/wap_new_tuned）、AEC3 源树、deps.toml、thresholds 全零触碰 ✅
+
+**② ★★主新发现（具名未改、需编排者裁量）**
+★**钉定树 `ApplyConfig`-after-`Create` 留 stale `submodule_states_`**——★**生产默认路径 `wap_new`（Create 后 ApplyConfig、对 echo_canceller.enabled 变化只局部重建、不跑 UpdateActiveSubmoduleStates）的引擎 `ProcessStream` 分带门不开＝AEC3 吃全带**；★**tuned 路径（factory 构造时预标）与任何走过全量 InitializeLocked 的会话（含本腿 Reset）＝吃分带**；两形帧差 0.0411、读数带差 ≤1.7dB（本合成刺激）；★**392 基线带（-41.28..-28.12）是全带形上测的——若未来把生产路径改到 factory/Initialize 形、392 K=4 读数会移位、先跑对照再动**；处置摆编排者/后续票
+
+**③ ★保温真解可行性读数（本票交付问题）**
+★**APM 半可原地清干净（reset==无历史逐位）⇒ 保温修复票收窄为 resampler/detector 半**（392-r1 §6.1 具名残余）；flush 若未来 webrtc 升级带来公开面、**照 wap_reset 形状加一方法即可**
+
+**④ ★已派 `393-v1`（终裁）**：半停手裁法核／AC#1-3 复刻／口径差核／**主新发现核与处置建议**
+
+**⑤ ★在飞 3**＝**写 1**（★`16-r1` S2 验收证据）＋**裁 2**（★`393-v1`/`382-w-v1`）——**写 1＜3 具名**：★**第三写腿＝票 394 执行（等机主批契约）或 28 调参方向消费（等 392-v2/26p-v1 判语链）⇒ 判语交件同轮补**
+★票池：done=**210**／open=**169**；未推 **5**（网络断）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／票 394 契约批准）
