@@ -1,0 +1,5 @@
+存档 2026-11-01 21:0x · 腿 398-v3（398 残余③ hangover 衰减扫参小腿、写、internal/speech——398-r1 已让出）
+398-v2 残余③：hangover 衰减扫参未关闭。使命＝silero RNN 语境跨空窗衰减行为量化（N 个空窗后 hangover 自然衰减？——reset 面落地后的行为图谱）。
+读数＝空窗序列扫参（1..16 空窗后 silence/talker 探针读数曲线——398-r1 探针形状复用）＋反向（reset 后全零衰减曲线对照）＋零回归（speech staged 63/0/6＋裸跑 25/0/44）。
+产出＝衰减曲线入证据件（喂 keepalive 默认翻转裁定——392-v3 采纳③、owner Finalize+Reset 免冷段决策的材料）。
+⛔ 动产品码（纯测量）／⛔ silero 语义。
