@@ -29539,3 +29539,22 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 4**＝**写 3**（★`16-r1` S2 验收证据／`387-r3` 已交／`391-r1` 已交……**实数＝16-r1 新派＋387-r3 已交——在飞写＝16-r1 ＋ 382-w-r2/393-r2（重派四腿中的两写）＝3** ✅）＋**裁 2**（392-v2/12-v3 已交）
 ★票池：done=**209**／open=**168**（**55.8%**，票池 377——12 收口、16 在途）；未推 **4**（网络断）；★**摆机主 2 件**（D43 note／DEFERRED 登记行文字）
+
+## A1343（2026-11-01 09:3x +08，编排者，goal round 34 续）★★★收 `382-w-r2`（`8189f4a9b` 4 枚 +340/-5）：**R382-1 机制面全接**（形 B 污句拒播读数绿＋反向双发红）｜★★**停手②具名触发：任务级积累钩生产挂点不存在**——**真解属新契约面 ⇒ 开票 394（待机主批）**｜★派 `382-w-v1` 终裁
+
+**① ★★收 `382-w-r2`（尺核：★提交在／4 枚在）**
+- ★★★**AC#1①② 落地（382-v1 修法逐字、26p-r1 后最新形状全对上）**：★`resident_voice_windows.go:361` `ttsGate *risk.TTSGate` 字段＋`:615` attachProvenance 初始化 `risk.NewTTSGate(p, risk.DefaultTTSGateConfig())`（**借 bridge mark 同一引擎、早退分支两者一齐 nil＝旧 prov==nil 同形**）；★`resident_voice_engines_windows.go:904` speak() HOP 1：**`prov.CheckText` 换 `ttsGate.CheckTextWithInheritance`、refused ⇒ ttsGated+1＋noteProblem（三态 source）＋return 绝不合成**
+- ★★★**AC#2 读数**：★**形 B 污句拒播 `INHERIT refused=1 spoken=0 slot_loads=0`＋问题行带 "from closed task scope"**＋干净句照播＋**直查仍拒 `DIRECT refused=1`**
+- ★★**AC#3 反向两发**：★M1 摘闸调用 ⇒ 污句照播红（announcement spoken 56482 样本）／★M2 摘初始化 ⇒ 闸对象消失（nil panic 形）＋直查污句照播红；pristine 复跑 3/3 绿逐位复现
+- ★★**AC#4 零回归**：★六族 staged 合跑 **34/1/0 逐位复现 392 基线**（唯一红 Test384 时窗＝A1329 既有）；★**`262/640/902` 逐位同**；★26p (b) PASS 基线逐字、(a) 单跑 **26/83/50/50/34ms 全≤400**；d22scan clean＋selftest 35/0/0＋分母 287/52/730/182（**cmd +1＝本腿测试件；internal 730＝HEAD 既有、派单 729 过期一枚**）
+- ★**共享树申明诚实**：★393-r2 并发未提交改动零触碰、两 staged 二进制＝两树合并态读数（**且仍逐位复现基线**）
+
+**② ★★★停手②证据链（摆编排者裁承接票）＝开票 394**
+★**证据链**：RecordTaintInheritance 契约逐字要求「调用方在 mark 时累积归一化内容」（tts_gate.go:245）；**生产唯一 mark 点＝internal/tools/bridge.go:687 MarkWithHostPath**（res.Text 不跨界）；**tools.Options 无任何 mark 观察钩**；**ScopeTaints 按安全设计只回元数据** ⇒ admitTask 收尾闭包只能发**空内容（假接线）**或 **Origin 冒充（改闸语义）**——两形 ⛔
+⇒ ★**真解两形**：①**internal/tools 加 mark 观察缝**（扩 tools 契约）②**闸/调用方下沉 internal/tools**（更深契约面）＝ ★**开票 394（Status 待机主批——契约面 SPEC-12 §4.1）**
+★**L2 弹卡 UI 仍归票 26 集成面残余**（本腿只接机制调用）
+
+**③ ★已派 `382-w-v1`（终裁）**：修法逐字核／三态读数复跑／mutation 复刻／**停手②证据链复核（归口成立性）**／可否收口
+
+**④ ★在飞 3**＝**写 2**（★`16-r1` S2 验收证据／`393-r2` flush-reset API）＋**裁 1**（★`382-w-v1`）——**写 2＜3 具名**：★**第三写腿＝票 394 执行（等机主批契约）或 28 调参方向消费（等 392-v2 判语）⇒ 两判语交件同轮补**
+★票池：done=**206**／open=**171**（394 开后）；未推（本轮后现跑）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／**票 394 契约批准**）
