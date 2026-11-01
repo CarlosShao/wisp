@@ -33,7 +33,7 @@ budget, and the S2 pre-mortem items executed for real.
 - [x] E2E voice demo recorded (log + state trace + tool rows), run on real hardware.
 - [x] Latency table filled with measured numbers vs budget, committed to docs/SLO.md appendix.
 - [x] All six pre-mortem scenarios executed with evidence and correct error classes.
-- [ ] CER gates from 15 green in CI artifacts (near_clean mandatory; noisy_far status recorded).
+- [x] CER gates from 15 green in CI artifacts (near_clean mandatory; noisy_far status recorded).
 - [x] Adversarial acceptance pass by a different agent (stub scan + contract conformance).
 
 ## Progress log (append-only, newest last)
@@ -43,3 +43,5 @@ budget, and the S2 pre-mortem items executed for real.
 - 格①②③ 翻（各带具名边界）；格④ 维持残余（真 CI 工件待编排者下一次 push 后留存——CER 本地 24/24 与 ci.yml:732 逐字同命令已钉）；格⑤ 本件即其本体（SPEC-10 §8 七项义务全落）。对照 15-done 先例＝第 48 票带 10 条具名残余收口。
 - 升级发现（16-v2）：D43#15 工具臂与 Acting 家族（#17-20）今日产码全仓零生产派发位（demo SSE 带 tool_calls 而产线 resident_voice_engines_windows.go:979-981 恒 HasToolCall:false 走 #15）＝产品级缺口（非 16-r1 伪造）、demo 走位仍每行合法；归口 26 集成面 ⇒ 开票 395。
 - 残余七枚：①Acting 球态载体→票 395 ②真 CI 工件待 push（格④）③TTS 首帧 3.715s→S0 降级方向/Warm 归 28 ④OS 级三触发不可达（admin）⑤磁盘满守卫→票 45 ⑥live smoke 声学相位两发红＝环境性不判回归 ⑦kws 导出树协议差（16-r1 照录维持）。
+
+> ★**格④ CI 工件落地（2026-11-01 21:2x 编排者跑尺、门禁格）**：★**CI run 41302852850（HEAD 789c6c6fb push）日志在案——near_clean CER=100.00%＋noisy_far CER=100.00% 双门过**（baseline_test.go:145/165、runtests.sh cer 同款命令）；★尺可复现＝`gh run view 41302852850 --repo CarlosShao/wisp --log | grep near_clean`；**run 整体 failure＝CER 无辜**（红在 ci-r1 上报不修的既有项族）。⇒ **票 16 五格全清、零残余收官**。
