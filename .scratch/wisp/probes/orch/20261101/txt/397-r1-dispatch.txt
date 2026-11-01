@@ -1,0 +1,3 @@
+存档 2026-11-01 13:0x · 腿 397-r1（票 397 monitor 复活三处窗间清一体落地、写、internal/audio 独占）
+AC#1 三处窗间清一体落地（APM Reset＋resampler Flush＋detector Finalize＋1.2s 冷段；⛔拆开——392-v3 矩阵证明联合承重；keepalive=false 默认 ⛔ 动、显式开启读数）／AC#2 保温复活读数（第二暖窗重新会判、对照 392-r2 revival-cool 形状）／AC#3 反向三发（摘任一件⇒对应失败形）／AC#4 零回归 94/83/0/11＋392/393 面不退化／AC#5 纪律。
+复用：393-r2 Reset/shim＋392-r2 矩阵测量形＋59-w rig。
