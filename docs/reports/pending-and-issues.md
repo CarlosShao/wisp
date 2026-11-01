@@ -29964,3 +29964,19 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **③ ★CI 两 run FAILURE＝预期内**：★frontend lint（SA9009 外部面）＋speech census（结构矛盾待机主裁）＝**ci-r1 上报不修两项**；★**CER 门具体读数下轮查**（gh log grep near_clean）
 **④ ★已派 `400-r2`（写、cmd/wisp panel_pump.go——397-r4 已让出）**：★400-v1 残余①执行＝**wire 挂上 DroppedCount**（对照 400-r1 的 Ring 64＋DroppedCount() 面）；读数＝wire 后 DroppedCount 真到面板侧＋反向摘 wire 红＋零回归（panel 全套＋消费面 15/15＋六族抽案）
 ★票池：done=**216**／open=**168**；未推 **5**（网络断、本轮后现跑）；★**摆机主 2 件**（**panel.ts 追认圈阅**／**R15 三参数挑值**）
+
+## A1372（2026-11-01 20:3x +08，编排者，goal round 39 续）★★★**400-r2 停手具名接收**（停条件②命中＝**wire 类型面没有 DroppedCount 的位置**——TaskRosterState/Section/render 三处＋TS 名册都没有）⇒ **400-v1 残余①措辞与现读错位实锤**｜★**重派 `400-r3`**（写面如实扩）｜★**TS 侧须您预批（与 panel.ts 追认捆绑）**
+
+**① ★★400-r2 停手具名（质量极高、零产码改动）**
+- ★**断点链路四处现读**：①StreamLog.DroppedCount() 在源头已就位（pump.go:750-757）②**panel.TaskRosterState 无 DroppedCount 字段**（panel_pump.go:250 只能赋 DroppedStreamKeys、**没有 state.DroppedCount 左值可赋——只动装配点连编译都过不了**）③**panel.TaskRosterSection wire json 6 键无 droppedCount**、render 无拷贝行可挂 ④**TS 名册 TaskRosterSection 同 6 键无 droppedCount**——**Go 侧加键必须 TS 跟（400-r1 刚治的同病；该树归机主外部 agent、400-v1 附条件③明令此类跳点先转界面支或先取预批）**
+- ★**根因**：★**400r1-impl.md:46 follow-up① 与 400-v1-verdict.md:52 残余①措辞与现读错位**——两份在案文书暗示 wire 类型已就位只差装配点；**实际 400-r1 只落了 StreamLog 侧 accessor、wire 类型面三处一个都没动**
+- ★**腿给的完整挂接清单（重派用）**：①internal/panel/subagent_roster_197.go 三处（TaskRosterState 加 DroppedCount int 字段／TaskRosterSection 加 droppedCount json 键／taskRosterSectionFrom 拷贝行）＋②cmd/wisp/panel_pump.go:250 后加一行＋③**frontend/src/lib/panel.ts TaskRosterSection 加 droppedCount: number（TS 枚须按 400-v1 附条件③走机主预批）**＋④cmd/wisp/subagent_carrier_197_test.go 同族断言（:561 现形状可照抄）
+- ★**编排者教训落册**：400-v1 判语说「装配点现读坐实」但只坐实了 accessor 侧、wire 类型面三处没核——**400-r2 用编译级现实抓出来了**（停手条款②的字面价值）
+
+**② ★裁定：重派 `400-r3`（写面如实扩）**
+- ★**写面＝`internal/panel/**`＋`cmd/wisp/**`**（①②④Go 侧全做）；★**TS 侧（③）＝**⛔ **等机主预批**（**与 panel.ts 追认捆绑一次问**——机主回「TS 预批」后由编排者转界面支或并入下一笔已授权编辑）→ **400-r3 只做 Go 侧并把 TS diff 三行写进证据件、⛔ 自作 TS**
+- ★**同病窗口如实具名**：Go 键先行＝窗口期「Go 发 TS 未跟」复现一小段（**400-r1 刚治的病、 knowingly 复发一小窗**——窗口＝机主回复前；**400-r3 件里具名**）
+- ★**读数**＝wire 后 DroppedCount 到 Go wire 面读数＋反向摘 wire 红＋零回归（panel 全套＋消费面＋六族抽案）
+
+**③ ★在飞**＝**写 1**（★`400-r3`）——**具名**：★**CI CER 读数下轮查（票 16 格④）／TS 侧等机主预批**
+★票池：done=**216**／open=**168**；未推 **5**（网络断）；★**摆机主 3 件**（**panel.ts 追认**／**droppedCount TS 键预批**（可与追认并回）／**R15 三参数挑值**）
