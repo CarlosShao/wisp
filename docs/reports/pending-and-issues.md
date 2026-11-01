@@ -29980,3 +29980,16 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞**＝**写 1**（★`400-r3`）——**具名**：★**CI CER 读数下轮查（票 16 格④）／TS 侧等机主预批**
 ★票池：done=**216**／open=**168**；未推 **5**（网络断）；★**摆机主 3 件**（**panel.ts 追认**／**droppedCount TS 键预批**（可与追认并回）／**R15 三参数挑值**）
+
+## A1373（2026-11-01 20:2x +08，编排者，goal round 39 续）★★★收 `400-r3`（`23f69b8b9` 4 枚）：**400 残余① Go 侧全落地**——wire 字节逐字 `"droppedCount":9` 与日志自身相等＋反向摘装配行双红句逐字＋零回归 panel 271/173/0/0 逐位｜★我复跑新案 FAIL＝**0xc0000135 尺架设**（第 15 处家族、非产品红）｜★CI run 41302852850 仍在跑
+
+**① ★★收 `400-r3`（尺核：★提交在／4 枚在／★panel 复跑 ok 7.120s／★我新案复跑 FAIL＝`exit status 0xc0000135`＝尺架设〔测试二进制旁无 DLL、进程起不来〕——腿 staged 读数成立）**
+- ★★★**Go 侧三处＋装配点＋断言全落地**（400-r2 停手件施工图逐字核对一致后施工）：★internal/panel/subagent_roster_197.go 三处（TaskRosterState＋DroppedCount int／TaskRosterSection＋droppedCount json 键／taskRosterSectionFrom 拷贝行）＋★panel_pump.go:250 装配行＋★carrier197Wire＋droppedCount 键＋33 流案同族断言＋新案 TestRunPacketCarriesTheStreamDroppedCountPastTheHardCeiling
+- ★★★**读数**：★wire 面 flood 非零——**`"droppedCount":9` 与 log 自身 DroppedCount() 逐字相等、dropped total=9 named=9**；★反向摘装配行（diff=3 删现核）⇒ **rc=1 双红句逐字**＋还原绿＋SHA 逐位同＝**红咬装配线非编译面**；★零回归 panel **271/173/0/0** 逐位＋消费面 **16/16**＋六族 **34/1/0**＋`262/640/902` 逐位；★两尺双空＋d22scan 实扫/导出树 clean＋正控 35/0/0＋vet/build
+- ★**knowingly 具名窗口（已入册）**：Go wire 恒发 droppedCount、TS 名册未跟（对账尺只对顶层键、窗口内不红）——**闭窗＝机主批证据件 §2 三行后界面支落地**
+- ★**环境注收档**：pwsh 直跑测试二进制 `-test.*` 旗标须 `=` 形（空格分参报 flag not defined）
+
+**② ★票 400 状态**：★**五格已过（400-v1）＋残余① Go 侧落地（本笔）**——**收口条件＝机主圈阅 panel.ts 追认段（挂机主）**；★**TS 三行 diff＝机主预批后界面支落地（同批闭窗）**
+
+**③ ★在飞 0**＝**裁决/收口/机主三重瓶颈轮具名**：★**在飞写 0 读 0**——**等**：①**CI run 41302852850 完成 ⇒ CER 门读数 ⇒ 票 16 格④翻**（门禁格编排者跑尺）②**机主三连回复 ⇒ TS 落地＋票 400 收口＋68 翻默认＋12-AC#8 链清** ③**394 残余票（MaxAncestorDepth 演化）按需开立**
+★票池：done=**216**／open=**168**；未推 **6**（网络断、本轮后现跑）；★**摆机主 3 件**（**panel.ts 追认**／**droppedCount TS 键预批**／**R15 三参数挑值**）
