@@ -29695,3 +29695,25 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **④ ★在飞 1**＝**写 1**（★`392-r2`）——**写 1＜3 具名**：★**第三写腿＝28-PathC 深度消费（392-r2 交件同轮）或 394 执行（等机主批）⇒ 本轮先 1 写＋载入裁决链**
 ★票池：done=**211**／open=**169**（396 开后）；未推 **12**（**网络断持续——最长断窗**、恢复即推）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／票 394 三形选一）＋**R15 三项（半急）**
+
+## A1353（2026-11-01 12:3x +08，编排者，goal round 35 续）★★★收 `392-r2`（`49ce619f1` 2 枚 +1173）：**保温根因链改判＋修复路径打通**——**毒源＝detector 半、resampler 洗清、复活纪律＝持有＋窗间清（W2/W3 全愈）**｜★派 `392-v3` 终裁
+
+**① ★★收 `392-r2`（尺核：★提交在／2 枚在）**
+- ★★★**AC#1 毒源半隔离 ✓（矩阵 8 臂×3 窗×两跑）**：★**毒源＝detector 半**——中断把 endpointer 的开口话态带进下一暖窗（话态开着 ⇒ 不可能再发 start ⇒ episodes=0）；★warm-392 W2＝**finding 精确复现**（残余 -62.11 与 cold 逐位同深）；★iso-res-fresh（仅 det 保温）同样死；★**iso-det-fresh（仅 resampler 保温）triggers=1 且残余 -62.11＝cold 全同 ⇒ resampler 半在链上洗清**；★**机制单元探针直接钉死**：开口话态跨 400ms 静音携带、吞掉第二话者的 start、**Finalize 直接摘除**
+- ★★★**根因链改判（要重写 392-r1 finding 一句话）**：★**finding 拆两半**——①「episodes=0 不判」＝**detector 开口话态**（candidate-3 形复现）；②「残余骑近端电平」＝**APM 跨窗携带形**（裸携带 APM 下一窗残余 -42.78≈近端 -38.17、只消 ~5dB＝candidate-2「彻底失准」在链上复现）；★**392-r1 该句残余读数在其工件里本是空壳**（round 字段未导出、JSON 全 {}、剖面从未落盘）——**本腿工件全导出（40KB 两跑全量）**
+- ★★★**AC#2 Reset 接入保温 ✓**：★**复活＝「持有＋窗间清」纪律**（393-v1 统一器从 APM 半推广到整池、全公开面、零生产路径改动）：**APM 保温＋窗间 Reset()（承重 19.24dB）＋resampler 保温＋窗间 Flush()＋detector 保温＋窗间 Finalize(nil) ＋1.2s 静音冷段**；★**复活读数：revival-cool W2/W3 全愈（episodes=1、triggers=1@12320＝talker 本体、残余 -62.02）**
+- ★★**新发现（具名）**：★**silero RNN 语境跨空窗携带**（无输入不衰减）、**hangover 能在 post-speech 静音上开火**（探针实测 silence=1 talker=0）——只 Finalize 不冷段 ⇒ episodes=1 但 triggers=0（**假 start 抢先吃 endpointer；该假 start 在 26p 回声电平下不过收紧档＝无假打断、但该窗 talker 打断会漏**）、**冷段吸收之**
+- ★★**AC#3 反向 ✓**：摘 Finalize ⇒ finding 复现；摘 Reset ⇒ 残余死 19.24dB；cold 三窗全判＝基准；★还原核＝**全矩阵＋全新冷窗复读开场 cold W1 逐位全同**
+- ★★**AC#4 零回归 ✓**：★-v 口径 **RUN=98 PASS=75 FAIL=0 SKIP=11 与 392-r1 自记逐位同**；★**keepalive=false 默认面 0 字节**（cmd/wisp 与 internal/audio/aec 双零 diff、393 Reset／392 Tuning 语义原样）；gofumpt／vet 三形状／d22scan clean（ban#8 internal=731）全 rc=0
+- ★**AC#5 ✓**：票面 Status 未动／台账未碰／push 未做 ✅
+
+**② ★采纳路径与残余（392-r2 §6、392-v3 终裁复核）**
+1. ★**monitor 复活＝release() keepalive 分支三处窗间清**（APM 持有＋Reset／resampler 持有＋Flush／detector 持有＋Finalize＋1.2s 冷段、边界事件弃置）；★**默认仍 keepalive=false、翻转属后续裁定（本腿读数＝裁定材料）**
+2. ★**RNN hangover＝detector 面具名缺口**（internal/speech 无 session reset 面；冷段是 owner 侧纪律）——**更硬的清面属 internal/speech 票**
+3. ★**跨进程材料微差如实记**（matcha 渲染跨进程 ~0.2-0.6dB；本仪器判据全是类别/相对判据）
+4. ★**复现处方在证据件**（DLL 三枚贴 exe＋WISP_AEC392R2 门＋test.exe 定向）
+
+**③ ★已派 `392-v3`（终裁）**：矩阵复核＋**根因链改判核**＋复活纪律复跑＋反向复刻＋零回归＋**采纳路径裁定**（monitor 复活三处窗间清/RNN hangover 归 internal/speech 票/默认翻转属后续裁定）
+
+**④ ★在飞 1**＝**裁 1**（★`392-v3`）——**写 0＝波间低谷具名**：★**写腿候选＝monitor 复活采纳（等 392-v3 裁定）／RNN hangover internal/speech 票（待开）／394 执行（等机主批）⇒ 392-v3 交件同轮补**
+★票池：done=**211**／open=**169**；未推（本轮后现跑）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／票 394 三形选一）＋**R15 三项（半急）**
