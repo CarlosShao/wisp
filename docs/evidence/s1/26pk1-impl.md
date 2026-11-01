@@ -20,12 +20,12 @@
 
 `cmd/wisp/resident_voice_bargein_26p_windows_test.go` 唯一写面。diff 两个区：
 文件头 (a) 从句（:6-8）与 `Test26PBargeinStopsWithin400ms` 全案（:293-490）。
-`Test26PFeedOnlineMatchesWindowReplay`（:496 起）与 (b)(c) 件（echo 测试文件）零触碰。
+`Test26PFeedOnlineMatchesWindowReplay`（:499 起）与 (b)(c) 件（echo 测试文件）零触碰。
 
 | 旧（静态，已退） | 新（keyed，26p-v2 §3） |
 |---|---|
-| 每轮 `Triggers != 1` 即红（「每轮必火」） | 火/不火都合法落窗：`fired = ttsAborted 移动`（:390，392 `voice392Capture` 同款 either-or 等待 :384） |
-| 每轮断 vadToStop ≤400ms | **凡火必 ≤400ms**（火窗逐窗断言 :429，原字面原样）；不火窗不断时延 |
+| 每轮 `Triggers != 1` 即红（「每轮必火」） | 火/不火都合法落窗：`fired = ttsAborted 移动`（:390，392 `voice392Capture` 同款 either-or 等待 :387） |
+| 每轮断 vadToStop ≤400ms | **凡火必 ≤400ms**（火窗逐窗断言 :432，原字面原样）；不火窗不断时延 |
 | 无档（只有 summary 行） | **每窗读数入档**：`26p-a-keyed.json`（:483）逐窗 fired/vad_ms/episode rms/阈值/tighten＋**不火窗逐 episode 深压读数**（rms/阈值/tighten/energy_pass/suppressed）＋每窗 HELD 行 t.Logf（:463）——FINDING MOVED 牙式「测试即档案」 |
 | —（隐含「全火」） | **K=5/N=1 地板**（:479）：`FINDING MOVED: 0/5 windows fired - the keyed floor (K=5/N=1) is red`——五窗全不火＝红（N 地板防空转死），消息里把「静态五轮全火断言已退役、不许回摆」钉死 |
 | `Triggers != 1` 打包两义 | **零自激字面独立保住**：`Triggers > 1` 即红（:400，S4「不自激」逐 episode 原样）；火窗 `Triggers==1`＋passing episode 必在（原两断言原样）；被打断播报不计 spoken（原字面，改相对形）；不火窗播报恰计 +1 |
