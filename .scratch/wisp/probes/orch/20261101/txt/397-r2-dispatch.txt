@@ -1,0 +1,4 @@
+存档 2026-11-01 13:1x · 腿 397-r2（票 397 monitor 复活三处窗间清一体落地、写、cmd/wisp＋internal/audio 如需——397-r1 停手具名后编排者重授 cmd/wisp）
+★编排者裁定随单：①断言翻动归属＝FINDING MOVED 断言（resident_voice_bargein_392_windows_test.go:271-322）翻动归本落地腿（改钉复活读数 episodes=1/triggers=1@talker；默认 :294 与最终 staged 全链复读归默认翻转腿）②arm() :381-384 每窗 APM 重建点消解＝本腿范围内（不消即死代码）③冷路径（closeEngines/:294/dispose）逐字节不动。
+397-r1 已核清事实（免重跑）：三清公开面全在（Reset aec_webrtc_windows.go:101／Flush resample.go:83／Finalize vad.go:167）；爆炸半径三处（keepalive 分支本体/arm() 重建点/392 finding 测试）；树相对 392-v3 复核点零漂移。
+⛔ keepalive=false 默认翻转（392-r1 裁定、默认 :294 与最终复读归翻转腿）；⛔ AEC3 源树/389 门本体/392 调参面语义；AC#2/AC#3 权威读数面=cmd/wisp staged 全链（392-v3 §6.3）；零回归=六族+Test43/384/41a2r1/381r2/390 全族+262/640/902+默认路径逐字节不动。
