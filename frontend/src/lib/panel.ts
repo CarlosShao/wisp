@@ -225,6 +225,8 @@ export interface TaskRosterSection {
   streamTruncated: boolean;
   streamElidedRunes: number;
   droppedStreamKeys: string[];
+  /** Dropped stream entry count total (Ring 64 overflow; internal/panel DroppedCount()). */
+  droppedCount: number;
 }
 
 /** One streamed assistant/result chunk for the result region. */
