@@ -1,6 +1,6 @@
 # 12 — S1 gate: `wisp run` text path end-to-end, notify/list_tools, settle, RSS gate
 
-**Status:** review
+**Status:** **DONE-带残余**（2026-11-01 编排者收口：AC#2/AC#9 翻（12-slo-v1/12-v3）、**AC#8＝机主目验等人残余**（R15→68→7 态签收链）——15-done 先例）
 **Claimed by:** agent-ticket12-assembly (165 次调用后撞 150 轮上限) + orchestrator（票面对账）
 **Last update:** 2026-09-20T13:40Z
 **Blocked by:** 04-sqlite-core, 06-secretstore-envs, 07-ball-state-machine-core,

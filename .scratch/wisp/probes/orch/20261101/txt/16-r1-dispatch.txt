@@ -1,0 +1,3 @@
+存档 2026-11-01 09:0x · 腿 16-r1（票 16 S2 验收门证据组装腿、写）——12 收口后解锁（12+15 全 done）
+5 格：①E2E voice demo 录制（log+state trace+tool rows、真硬件——本机即真硬件、RealDevice 测试已证可跑）②延迟表实测数 vs 预算进 docs/SLO.md 附录（★票面明令 SLO 附录=票授权编辑）③六场景 pre-mortem 执行＋证据＋正确错误类④CER 门绿于 CI 工件（★网络断⇒CI 跑不了：判"本地测试记录可否替代/须真 CI"——拿不准⇒停手具名）⑤对抗验收=另一 agent（16-v1，编排者派）。
+写面：docs/evidence/s1/16r1-*.md＋docs/SLO.md 附录（票授权）＋可能 cmd/wisp 测试取证（⛔ 改产品码语义）。①的 E2E demo＝staged 真硬件跑 15e 族形状。③六场景=SPEC-10 §7 失败预演（现读）。
