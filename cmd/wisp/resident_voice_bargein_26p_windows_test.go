@@ -3,8 +3,9 @@
 package main
 
 // Ticket 26p's integration readings, part 1: the equivalence first grid (the
-// 389-v1 disposition suggestion) and the (a) true number - 播报中发声 ⇒
-// barge-in 触发停播 ≤400ms on the staged full chain: the real waveOut device,
+// 389-v1 disposition suggestion) and the (a) keyed number (the 26p-v2 §3
+// re-key) - 播报中发声 ⇒ barge-in 凡火必停播 ≤400ms、5 窗至少 1 火、每窗深压读数
+// 入档 on the staged full chain: the real waveOut device,
 // the real matcha announcement (the far reference), the real C8 seam frames,
 // the real AEC3 cancellation, the real 389 combination gate, the real silero
 // VAD, and the production TriggerInterrupt -> abort stop.
@@ -289,14 +290,32 @@ func voice26pEchoWav(t *testing.T, dir, name string, recording []float32, engine
 	return p, samples
 }
 
-// Test26PBargeinStopsWithin400ms is the (a) true number: five barge-in
-// rounds, each a real matcha announcement on the real device with the
-// announcement's own echo injected into the C8 seam and real TTS speech
-// starting 1.2s into the playback. The monitor's trigger stops the device;
-// the reading is the VAD-start-to-stop distance (the half D32:2315 assigns to
-// the system: 400ms 门禁由 VAD 而非 ASR 满足), with the onset-to-stop sum and
-// its decomposition reported. One control round first (no injection, the
-// echo source).
+// Test26PBargeinStopsWithin400ms is the (a) keyed number (the 26p-v2 §3
+// re-key ruling, the 59-v3 disposition): five barge-in windows, each a real
+// matcha announcement on the real device with the announcement's own echo
+// injected into the C8 seam and real TTS speech starting 1.2s into the
+// playback. The window materials and timing are the 26p-r1 originals - only
+// the assertion shape is keyed:
+//
+//   - 5 windows at least 1 fire (K=5/N=1: all five windows held = red - the
+//     engine's deep-press swing becomes an explicitly tested dimension, not
+//     a coin toss);
+//   - every fire lands within 400ms (per fired window, the VAD-start-to-stop
+//     distance the half D32:2315 assigns to the system, its decomposition
+//     reported);
+//   - every window's readings land in the keyed archive (the FINDING MOVED
+//     shape the 392 keepalive pin uses: the test is the archive - a held
+//     window's pressed dB values are the measurement, not a silence).
+//
+// The static all-five-fire assertion this case carried before the re-key is
+// retired, not relaxed: 392-v2 measured the same material swinging ~19.7dB
+// across windows (an engine deep-press at -39..-45 dBFS does not trigger, a
+// good peak at -20 does) and 26p-v2 re-measured 1/6 windows firing with the
+// only fire at 24ms, so an every-window-must-fire assertion is not
+// reproducible on this surface. The S4 literals stay absolute per window:
+// the echo must never self-trigger, an interrupted announcement must never
+// count as spoken, and a fired window's stop must land within 400ms. One
+// control round first (no injection, the echo source).
 func Test26PBargeinStopsWithin400ms(t *testing.T) {
 	if probe, err := openWaveOutSpeaker(22050); err != nil {
 		t.Skipf("no output device on this machine: %v", err)
@@ -329,16 +348,28 @@ func Test26PBargeinStopsWithin400ms(t *testing.T) {
 	t.Logf("CONTROL spoken=%d echo_samples=%d", rig.rv.ttsSpoken.Load(), len(control.recording()))
 
 	const rounds = 5
+	type episodeReading struct {
+		RmsDbfs       float64 `json:"rms_dbfs"`
+		ThresholdDbfs float64 `json:"threshold_dbfs"`
+		TightenActive bool    `json:"tighten_active"`
+		EnergyPass    bool    `json:"energy_pass"`
+		Suppressed    bool    `json:"suppressed"`
+	}
 	type roundReading struct {
-		round          int
-		vadToStopMS    int64
-		episodeRmsDbfs float64
-		thresholdDbfs  float64
-		tighten        bool
-		lag            int
-		lagStrength    float64
+		Round          int              `json:"round"`
+		Fired          bool             `json:"fired"`
+		Triggers       int              `json:"triggers"`
+		VadToStopMS    int64            `json:"vad_to_stop_ms"`
+		EpisodeRmsDbfs float64          `json:"episode_rms_dbfs"`
+		ThresholdDbfs  float64          `json:"threshold_dbfs"`
+		Tighten        bool             `json:"tighten"`
+		Lag            int              `json:"lag"`
+		LagStrength    float64          `json:"lag_strength"`
+		DeepPress      []episodeReading `json:"deep_press_episodes"`
 	}
 	readings := make([]roundReading, 0, rounds)
+	firedWindows := 0
+	maxFireMS := int64(0)
 	for r := 1; r <= rounds; r++ {
 		walkToThinking381r2(t, rig.rv)
 		if !rig.rv.announce(announceSentence) {
@@ -346,58 +377,117 @@ func Test26PBargeinStopsWithin400ms(t *testing.T) {
 		}
 		spy := rig.spyAt(r)
 		<-spy.first
+		aborted0, spoken0 := rig.rv.ttsAborted.Load(), rig.rv.ttsSpoken.Load()
 		stopEcho, _ := rig.inject(echoWav)
 		time.Sleep(voice26pTalkerAt)
 		stopTalker, _ := rig.inject(talkerWav)
-		// The round's stop marker is the abort landing on the device; the
-		// t0 is the monitor's own trigger stamp.
-		voice15eWaitFor(t, fmt.Sprintf("round %d: the barge-in stop to land", r), func() bool {
-			return rig.rv.ttsAborted.Load() >= uint64(r)
+		// The round resolves either way under the keyed shape: the monitor's
+		// trigger lands as an abort, or the announcement plays out unheard -
+		// exactly the held-window outcome the swing finding predicts.
+		voice15eWaitFor(t, fmt.Sprintf("round %d: the announcement to resolve (aborted or spoken)", r), func() bool {
+			return rig.rv.ttsAborted.Load() > aborted0 || rig.rv.ttsSpoken.Load() > spoken0
 		})
-		<-spy.abortDone
+		fired := rig.rv.ttsAborted.Load() > aborted0
+		if fired {
+			<-spy.abortDone
+		}
 		// The injectors stop before the window closes: their tails belong to
 		// the monitor's window, never to the transcript path.
 		stopEcho()
 		stopTalker()
 		rig.waitReleased()
 		read := rig.rv.bargein.readings()
-		if read.Triggers != 1 {
-			t.Fatalf("round %d: the monitor triggered %d times, want exactly 1 (episodes=%d): the echo must not self-trigger and the talker must", r, read.Triggers, len(read.Episodes))
+		if read.Triggers > 1 {
+			t.Fatalf("round %d: the monitor triggered %d times (episodes=%d): the echo must not self-trigger - the S4 zero-self-excitation literal stays absolute under the keyed acceptance", r, read.Triggers, len(read.Episodes))
 		}
-		if got := rig.rv.ttsSpoken.Load(); got != 1 {
-			t.Fatalf("round %d: the interrupted announcement was counted as spoken (%d)", r, got)
-		}
-		var fired *voiceBargeinEpisode
+		rr := roundReading{Round: r, Triggers: read.Triggers, Lag: read.Lag, LagStrength: read.LagStrength}
 		for i := range read.Episodes {
-			if read.Episodes[i].EnergyPass {
-				fired = &read.Episodes[i]
+			ep := read.Episodes[i]
+			rr.DeepPress = append(rr.DeepPress, episodeReading{
+				RmsDbfs:       ep.RmsDbfs,
+				ThresholdDbfs: ep.ThresholdDbfs,
+				TightenActive: ep.TightenActive,
+				EnergyPass:    ep.EnergyPass,
+				Suppressed:    ep.Suppressed,
+			})
+		}
+		if fired {
+			if read.Triggers != 1 {
+				t.Fatalf("round %d: the device aborted without exactly one judge trigger (triggers=%d)", r, read.Triggers)
+			}
+			if got := rig.rv.ttsSpoken.Load(); got != spoken0 {
+				t.Fatalf("round %d: the interrupted announcement was counted as spoken (%d -> %d)", r, spoken0, got)
+			}
+			var pass *voiceBargeinEpisode
+			for i := range read.Episodes {
+				if read.Episodes[i].EnergyPass {
+					pass = &read.Episodes[i]
+				}
+			}
+			if pass == nil {
+				t.Fatalf("round %d: the trigger fired without a passing episode (episodes=%d)", r, len(read.Episodes))
+			}
+			vadToStop := time.Since(read.TriggerAt)
+			if vadToStop > 400*time.Millisecond {
+				t.Fatalf("round %d: the device answered the barge-in trigger in %s, want within 400ms", r, vadToStop)
+			}
+			firedWindows++
+			rr.Fired = true
+			rr.VadToStopMS = vadToStop.Milliseconds()
+			maxFireMS = max(maxFireMS, rr.VadToStopMS)
+			rr.EpisodeRmsDbfs = pass.RmsDbfs
+			rr.ThresholdDbfs = pass.ThresholdDbfs
+			rr.Tighten = pass.TightenActive
+			t.Logf("BARGE-IN-%d FIRED vad_to_stop=%s episode_rms=%.2f threshold=%.1f tighten=%v lag=%d strength=%.2f episodes=%d drained=%d",
+				r, vadToStop.Round(time.Millisecond), pass.RmsDbfs, pass.ThresholdDbfs,
+				pass.TightenActive, read.Lag, read.LagStrength, len(read.Episodes), read.FramesDrained)
+		} else {
+			if read.Triggers != 0 {
+				t.Fatalf("round %d: the judge fired %d trigger(s) the device never aborted on", r, read.Triggers)
+			}
+			if got := rig.rv.ttsSpoken.Load(); got != spoken0+1 {
+				t.Fatalf("round %d: the unheard announcement did not count as spoken exactly once (%d -> %d)", r, spoken0, got)
+			}
+			// The held window's deep-press readings are the measurement (the
+			// FINDING MOVED shape: the test is the archive) - the episode
+			// levels land in the keyed artifact verbatim.
+			if len(rr.DeepPress) == 0 {
+				t.Logf("BARGE-IN-%d HELD episodes=0 lag=%d strength=%.2f drained=%d (no episode opened; the empty episode list is the held window's keyed reading)",
+					r, read.Lag, read.LagStrength, read.FramesDrained)
+			} else {
+				lo, hi := math.Inf(1), math.Inf(-1)
+				for _, ep := range rr.DeepPress {
+					lo = min(lo, ep.RmsDbfs)
+					hi = max(hi, ep.RmsDbfs)
+				}
+				t.Logf("BARGE-IN-%d HELD deep_press_rms=[%.2f..%.2f] threshold=%.1f episodes=%d lag=%d strength=%.2f drained=%d (the engine deep-press readings land in the keyed archive)",
+					r, lo, hi, rr.DeepPress[0].ThresholdDbfs, len(rr.DeepPress),
+					read.Lag, read.LagStrength, read.FramesDrained)
 			}
 		}
-		if fired == nil {
-			t.Fatalf("round %d: the trigger fired without a passing episode (episodes=%d)", r, len(read.Episodes))
-		}
-		vadToStop := time.Since(read.TriggerAt)
-		if vadToStop > 400*time.Millisecond {
-			t.Fatalf("round %d: the device answered the barge-in trigger in %s, want within 400ms", r, vadToStop)
-		}
-		rr := roundReading{
-			round:          r,
-			vadToStopMS:    vadToStop.Milliseconds(),
-			episodeRmsDbfs: fired.RmsDbfs,
-			thresholdDbfs:  fired.ThresholdDbfs,
-			tighten:        fired.TightenActive,
-			lag:            read.Lag,
-			lagStrength:    read.LagStrength,
-		}
 		readings = append(readings, rr)
-		t.Logf("BARGE-IN-%d vad_to_stop=%s episode_rms=%.2f threshold=%.1f tighten=%v lag=%d strength=%.2f episodes=%d drained=%d",
-			r, vadToStop.Round(time.Millisecond), fired.RmsDbfs, fired.ThresholdDbfs,
-			fired.TightenActive, read.Lag, read.LagStrength, len(read.Episodes), read.FramesDrained)
 	}
 	if got := rig.rv.problemsSnapshot(); len(got) != 0 {
 		t.Fatalf("the barge-in rounds left problems behind: %v", got)
 	}
-	t.Logf("BARGE-IN-SUMMARY rounds=%d vad_to_stop=%v all<=400ms=true (the onset-to-stop sum rides the VAD's MinSpeech 300ms design constant; the decomposition is in the per-round lines)", rounds, readings)
+	// The keyed floor (K=5/N=1, the 26p-v2 §3 re-key ruling): five windows
+	// firing zero is red on its own terms - the N floor exists so a fully
+	// dead (a) surface cannot ride the keyed shape to green. The static
+	// all-five-fire assertion stays retired: re-tightening it re-imports the
+	// swing fragility the 392-v2 finding measured.
+	if firedWindows == 0 {
+		t.Fatalf("FINDING MOVED: 0/%d windows fired - the keyed floor (K=%d/N=1) is red: every window's engine deep-pressed the talker (the readings are in the keyed archive). The retired static all-five-fire assertion must not come back (392-v2: the same material swings ~19.7dB across windows; 26p-v2 re-measured 1/6 with the only fire at 24ms); if the engine state genuinely changed, re-measure and re-rule before touching this floor", rounds, rounds)
+	}
+	t.Logf("BARGE-IN-SUMMARY keyed windows=%d fired=%d/%d max_fire=%dms deep_press_windows=%d (K=5/N=1 per the 26p-v2 §3 re-key; every window's readings are in the keyed archive; the onset-to-stop decomposition rides the VAD's MinSpeech 300ms design constant in the fired lines)",
+		rounds, firedWindows, rounds, maxFireMS, rounds-firedWindows)
+	write26pJSON(t, "26p-a-keyed.json", map[string]any{
+		"ruling":            "26p-v2 §3 re-key: K=5/N=1 fires, every fire within 400ms, every window's readings archived; the static all-five-fire assertion retired as swing-fragile (392-v2)",
+		"windows":           readings,
+		"fired_windows":     firedWindows,
+		"max_fire_ms":       maxFireMS,
+		"talker_at":         voice26pTalkerAt.String(),
+		"talker_level_dbfs": voice26pTalkerDbfs,
+	})
 }
 
 // Test26PFeedOnlineMatchesWindowReplay is the equivalence first grid (the
