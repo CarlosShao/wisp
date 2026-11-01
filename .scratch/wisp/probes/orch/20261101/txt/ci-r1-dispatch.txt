@@ -1,0 +1,5 @@
+存档 2026-11-01 22:4x · 腿 ci-r1（CI 修复腿、写）——CI 三连红定位
+①lint＝staticcheck 未用码错误清单（cmd/wisp/settle_trace_12r2.go 全家 U1000×9／run.go probeSink/logf／approval_reply maxTrackedCards／dataroot_128 planted128Cause／leg_sink_gate_131 registerLegNail131／run_test calls／subagent_selfapproval_197 loop+holder+carrierWithDoo）＋d22scan self-test「type unparseable」
+②test-core＝proc TestLayoutForTestE 步骤 exit 1（CER 门 100% PASS 在案）
+③test-windows＝failure（详情待拉）
+修法按仓内惯例（U1000 的既有处置形状——先查仓内有没有 nolint/注册先例）；⛔ thresholds/golden/产品语义；gh run view 41274267651 --log-failed 全日志在案可查。

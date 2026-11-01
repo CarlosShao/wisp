@@ -29767,3 +29767,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 3**＝**裁 3**（★`397-v1`/`16-v2`? 已交——**实数＝397-v1 新派＋382-w-v1（24h+ 昨判死——晨检复核其产物仍零 ⇒ 死亡判定维持）**）——**写 0＝裁决瓶颈轮具名（同 A1348）**：★**第三写腿＝28-PathC 深度消费（等 26p-v2 判语、在飞 13h+——**晨检无产物 ⇒ **同法判死风险高、下轮定**）＋394 执行（等机主批）⇒ 判语交件同轮补
 ★票池：done=**209**／open=**170**（397 在途）；未推（本轮后现跑——**网络恢复待验证**）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／票 394 三形选一）＋**R15 三项（半急）**
+
+## A1357（2026-11-01 22:4x +08，编排者，goal round 36）★★★**CI 三连红定位＋开 CI 修复腿 `ci-r1`**（网络恢复、全部推平）
+
+**① ★CI 状态首查（gh 可用）**：最近三 run＝A1356 in_progress／A1355 FAILURE／A1354 FAILURE；**slo-full=success／slo-smoke=success／lint-frontend=success**（全 SLO 套件过！）；**lint=三连红／test-core=三连红／test-windows=两红**
+**② ★lint 失败＝staticcheck 未用码清单**（U1000 族）：settle_trace_12r2.go 全家 9 行（12-r2 的测量字段被 staticcheck 判未用）＋run.go probeSink/logf＋approval_reply maxTrackedCards＋dataroot_128/leg_sink_gate_131/run_test/subagent_selfapproval_197 遗留；**d22scan self-test「type unparseable」一处**
+**③ ★test-core 失败＝proc TestLayoutForTestE 步骤 exit 1**（**CER 门 100.00% PASS 在案**——CER 不是凶手）
+**④ ★处置＝派 `ci-r1`（CI 修复腿）**：修 lint（按仓内 U1000 惯例形状）＋诊断 test-core proc 步骤＋**gh run view 41274267651 --log-failed 全日志在案**
+★网络恢复：A1342 起的全部积压（9 笔）＋本轮已全部推平（未推 0）⇒ **票 16 格④的 CI 工件链已激活**（新 push 触发新 CI、ci-r1 修复后 CER 工件可留）
+★票池：done=209／open=168＋ci-r1 在途；摆机主 3 件（D43 note／DEFERRED 登记行文字／票 394 三形选一）＋R15 三项（半急）
