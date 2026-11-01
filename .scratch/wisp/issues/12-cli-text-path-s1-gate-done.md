@@ -147,7 +147,8 @@ moment: type → reply → notification → memory returns to idle.
   而不是"UI 文案全链路已被看管"。后半句"tokens doc updated"由票 69 的机器检查接管（表↔码双向已钉死），
   票 74 正在把它没看管的 29 条漂移收口。
 - [ ] Human visual acceptance of ball states (user signs off screenshots — D29 rule).
-- [ ] **（2026-09-20 编排者新加，registry A25）回复后 3s 回落有实测记录**：PLAN `:1424` 的 S1 第一判据原文是
+- [x] **（2026-09-20 编排者新加，registry A25）回复后 3s 回落有实测记录**：PLAN `:1424` 的 S1 第一判据原文是
+> 〔12-v3 终裁 2026-11-01：**3s 语义＝D43#32 静置窗**（PLAN:1430＋票 12 :26＋D43#32 三证；6/6 样本 3000-3001ms=冻结 SettleStaticDefault 真值）；**进窗腿 ≤3000ms 在暖窗 1.2s 下判 5/5 过**、生产默认 90s 暖窗按字面必超＝诚实边界照录不挡翻勾（90s 保热属票 28/D43#26/#31 设计、非 S1 语义）。凭据＝`docs/evidence/s1/12-v3-verdict.md`〕
       「打字→得回复→**3s 回落**」，逐项对账后确认这是**四项里唯一从未被量过的一条**
       （`wisp slo` 量空闲态、`balldebug -diff` 量逐态驻留，都不量"最后一个 token 之后多久进 `Settling`/`Sleeping`"）。
       完成判据：①从"最后一个 token 送达"起算到进入 `Settling` 的耗时 **≤3000ms**，
@@ -186,3 +187,10 @@ moment: type → reply → notification → memory returns to idle.
   **D4 新缺口**（新增 61 行无机器检查，`TestTokenGoldenValues` 只管 20 条配色）待单开小票；
   D5 是我的 `printf` 事故已修；D6 面板侧 80 条 token 按名声明域外。
   **AC#7 解除条件**：票 67 的 AC#3（扩覆盖面 + 三处字形）+ 票 68 的 AC#1（尺寸真值表）。**D4 另计。**
+
+## ★★★终裁落地（2026-11-01 08:5x 编排者，凭非实现者 `12-v3`，件 `docs/evidence/s1/12-v3-verdict.md` 125 行、`c791d8ea2`）
+
+★**AC#9 翻**（七项全过）＋**AC#2 已于 A1322 翻**（凭 12-slo-v1）⇒ ★**票 12 带具名残余收口**（★**AC#8＝机主目验、等人残余**——15-done 现核 3/6 未勾结案先例、28 收口句明引 15；★**AC#8 解锁链＝机主答 R15→票 68 翻默认→默认构建 7 态截图一次性签收（同清 68 目验面）**）。
+★**12-v3 七项**：①接缝最小侵入 PASS（★**计数照录：statemachine.New( 构造点 3 枚非实现件写的 2 枚、0 枚带 Sink＝273 实质成立**）②分布复跑 5/5＋还原独立 5/5（1219-1229/3000×5/4219-4235）③**3s 语义裁定＝D43#32 静置窗**（三证）④反向两发闭合（M1/M2 红句逐字＋**SCOPE-DISPOSED 仍在 log＝行为在记录无处落**＋AST 牙同变异 0 秒红）⑤零回归六族 **28/28 PASS**（**LATENCY 加三项 seamWaitToFirstText=5.51s/finalLatency=4.096s/speechMS=3392 逐位同**）⑥落点 evidence、SLO.md 未动 ⑦收口路径。
+★**残余照录**：文本路今天仍无回落走位（12-r1 发现维持、行为改动超接缝派单）；进窗腿默认 90s 形状未实测（推得 ≈90s+管道、缝可测）。
+★**票 16 解锁**（12 收口后唯一前置全清）。
