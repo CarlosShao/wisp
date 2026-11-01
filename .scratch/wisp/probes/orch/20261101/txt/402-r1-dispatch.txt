@@ -1,0 +1,5 @@
+存档 2026-11-01 23:5x · 腿 402-r1（票 402 panel/WebView2 死形修复腿、写、cmd/wisp＋internal/panel 如需——全空闲）
+两形（401-v1 双树归因闭合）：①工作库 go test ./cmd/wisp/ 全包跑死于 TestAC14GoSideEvalPushReachesThePage 中途（静默杀：无 panic/--- FAIL/exit status、panel 33r9-nail 窗创建域、HEAD 既有零翻转归属）②导出树 TestAC4FocusReturnToPriorWindowGap33r5 断言红（33r5 push 维度摆动族）。
+使命：AC#1 静默杀根因定位＋修（panel 33r9-nail 窗创建域）／AC#2 ./... 整包可跑完（顶层完成集全、无静默杀）／AC#3 33r5 摆动稳定化或显式归因／AC#4 零回归（六族＋panel＋262/640/902）／AC#5 纪律。
+参照：401-v1 双树归因（572=572、TestAC4FocusReturn pre-flip 红/flipped 绿方向利好）、401-r1 三发现。
+⚠ MSYS2 PATH 陷阱：PATH 注入必须 POSIX /d/ 形。
