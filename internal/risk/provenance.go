@@ -253,6 +253,11 @@ type Provenance struct {
 	maxMarks int
 	channel  map[string][]string
 	sync     *syncSet
+	// markObs is the ticket 394 mark-observation seam (markseam_394.go):
+	// observers of THIS engine's committed marks, registered only from inside
+	// the package (TTSGate self-registers in NewTTSGate). The unexported type
+	// keeps the seam's contract face inside risk.
+	markObs []taintMarkObserver
 }
 
 // scopeReg is ONE registration of one scope id: its taints and the single
@@ -638,6 +643,13 @@ func (p *Provenance) MarkWithHostPath(scopeID, tool, origin, content, hostPath s
 	if truncated {
 		logf("risk/C25: source %s origin=%q truncated to MaxSourceRunes=%d; fragments past the cap can be missed (documented residual)", tool, origin, p.maxSrc)
 	}
+	// Ticket 394 mark-observation seam (markseam_394.go): the mark is committed,
+	// so this engine's observers learn of it with the content exactly as it was
+	// indexed — normalized (the obligation RecordTaintInheritance documents and
+	// no caller outside risk can fulfill) and truncated. Marks that returned
+	// early above recorded nothing and notify nothing. The call runs OUTSIDE
+	// p.mu; rp is copied into a string so the observer holds immutable text.
+	p.notifyTaintMark(scopeID, tool, origin, string(rp))
 	return true
 }
 

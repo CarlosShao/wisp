@@ -82,15 +82,28 @@ type TTSGate struct {
 
 // NewTTSGate creates a new TTS gate wired to the provenance engine.
 // The gate does NOT own the provenance — it borrows it (same pattern as boundDetector).
+//
+// 票 394 第三形（机主 A1362 批）: with EnableTaintInheritance on, the gate also
+// registers itself on the borrowed engine as a mark observer (markseam_394.go),
+// so every mark that engine commits — all four production mark sites funnel
+// through MarkWithHostPath — lands in the inheritance chain with content the
+// mark path already normalized. This is the production caller side of
+// RecordTaintInheritance's accumulation contract; wiring it needs no change at
+// any mark site and none in the composition root. With inheritance disabled
+// the chain is never scanned, so nothing registers.
 func NewTTSGate(prov *Provenance, cfg TTSGateConfig) *TTSGate {
 	if prov == nil {
 		log.Printf("risk/C25: TTSGate created with nil provenance — all checks will return no-hit")
 		return &TTSGate{config: cfg}
 	}
-	return &TTSGate{
+	g := &TTSGate{
 		config: cfg,
 		prov:   prov,
 	}
+	if cfg.EnableTaintInheritance {
+		prov.addMarkObserver(g)
+	}
+	return g
 }
 
 // CheckTextWithInheritance is the main entry point for TTS announce gate.

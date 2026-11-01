@@ -113,9 +113,13 @@ func TestTTSGate_AncestorInheritance(t *testing.T) {
 	// This simulates what the caller (internal/agent) should do at task open time
 	gate.RecordTaintInheritance(taskID, taintContents, toolSources)
 
-	// Verify inheritance was recorded
-	if gate.CountInheritanceLinks() != 1 {
-		t.Errorf("expected 1 inheritance link, got %d", gate.CountInheritanceLinks())
+	// Verify inheritance was recorded. 票 394: the two prov.Mark calls above now
+	// also land in the chain through the mark-observation seam (one upserted
+	// link, engine-side retention posture — the owner-approved cost of the
+	// third form); the explicit record below appends the second link exactly as
+	// RecordTaintInheritance always did.
+	if gate.CountInheritanceLinks() != 2 {
+		t.Errorf("expected 2 inheritance links (1 seam + 1 explicit), got %d", gate.CountInheritanceLinks())
 	}
 
 	// Step 3: Close the task scope (this would normally delete the taints)
