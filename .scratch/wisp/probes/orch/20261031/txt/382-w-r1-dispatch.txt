@@ -1,0 +1,4 @@
+存档 2026-11-01 00:1x · 腿 382-w-r1（R382-1 L2 接线腿、写、cmd/wisp 独占——12-r2/390-r1/26p-r1/12-r2 全让出）
+来源＝382-v1/30-w-v1 具名交回＋A1295 排队：382 形 B 的 L2 接线——①speak() 的 CheckText 换 CheckTextWithInheritance（residentVoice 加 ttsGate 字段＋attachProvenance 初始化——382-v1 修法逐字）②任务级积累钩：任务完成时 RecordTaintInheritance（382 形 B 的调用方接线；★现零调用＝30-w-v1 实锤）。
+★L2 弹卡 UI 面（NativePanelBridge 交互）仍归票 26 集成面残余——本腿只接机制调用＋读数（污句拒播）。
+⛔ 改 internal/{risk,speech} 语义（CheckTextWithInheritance 公开面现成）、⛔ D43 表、⛔ thresholds；三读数＋还原核＋零回归六族。

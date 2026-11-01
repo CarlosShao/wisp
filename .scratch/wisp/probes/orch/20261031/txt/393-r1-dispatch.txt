@@ -1,0 +1,2 @@
+存档 2026-11-01 00:1x · 腿 393-r1（票 393 AEC3 flush/reset 绑定 API、写、internal/audio/aec 独占——392-r1 已让出）
+392 残余：保温真解前置。AC#1 shim＋Go 方法 flush/reset（对照 wap_new_tuned 形状）／AC#2 flush-reset 后状态清洁读数（对照 392 K=4 测量形）／AC#3 反向／AC#4 零回归（94/83/0/11＋392 调参面不退化）／AC#5 ⛔ AEC3 源树/cmd/wisp/thresholds。
