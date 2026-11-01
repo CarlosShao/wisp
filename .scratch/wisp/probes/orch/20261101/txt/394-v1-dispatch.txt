@@ -1,0 +1,4 @@
+存档 2026-11-01 17:4x · 腿 394-v1（票 394 终裁腿、非实现者）——394-r1 交件 27bda97e0（7 枚 +675/-4）
+裁五格：①第三形选型核（TTSGate 借引擎自注册 vs ProvOptions 钩——亚形 B 理由核：闸在 attachProvenance 才存在/ProvOptions 在 NewProvenance 定格；未导出面核）②4 处 mark 点覆盖核（bridge:687/subagent_197:512/projctx:349 共享引擎直喂✓；panel_assets:245=一次性 CLI 诊断私有引擎——**"不硬造消费方"裁**）③★留存姿势追认核（每作用域 upsert vs 逐 mark 追加——MaxAncestorDepth(16) 扫描窗论证核；RecordTaintInheritance 逐字节未动核；TestTTSGate_AncestorInheritance 1→2 已批姿势可见面核）④生产真挂读数复跑（SEAM-PRODUCTION refused=1、全角 mark vs 半角播报=normalizeTaint 双钉）⑤零回归（risk 全套＋六族 34/1/0＋262/640/902＋分母 288/52/734/184 逐枚归因）⑥可否收口＋残余定性（注册前 mark 不入链/缝日志 logf/MaxAncestorDepth 帽=382 既有）。
+编排者已追认：留存姿势＝每作用域 upsert（论证扎实）。
+⛔ 动工作树（397-v2/400-v1 只读同行）。

@@ -29871,3 +29871,19 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 3**＝**写 1**（★`394-r1` risk 观察缝）＋**裁 2**（★`397-v2` 保温复活终裁／`400-v1` 三件产品红终裁）——**写 1＜3 具名**：★**第三写腿＝28-PathC 深度消费（26p-v2 已交裁定、392-r2 保温落地后即可派）或 394 执行（等机主批——**已批！**394-r1 在飞**）⇒ **392-r2/394-r1 交件同轮补**
 ★票池：done=**211**／open=**170**；未推（本轮后现跑）；★**摆机主 2 件**（D43 note✅／DEFERRED✅／394✅ 已执行——**余：R15 三参数挑值 ＋ 392-v3 采纳路径③的 keepalive 默认翻转（后续裁定、前置=397-r2 落地验收）**）
+
+## A1365（2026-11-01 17:4x +08，编排者，goal round 37 续）★★★收 `394-r1`（`27bda97e0` 7 枚 +675/-4）：**第三形落地＝R26-5 安全残缺闭环**——**4 处 mark 点全经缝喂闸＋normalizeTaint 义务收回缝内**（生产真挂双钉）｜★**留存姿势编排者追认**（每作用域 upsert）｜★派 `394-v1` 终裁
+
+**① ★★收 `394-r1`（尺核：★提交在／7 枚在／★我复跑 risk 全套——本轮 bash）**
+- ★★★**AC#1 第三形落地（亚形 B＝TTSGate 借引擎自注册、弃 ProvOptions 钩）**：★**理由①生产闸在 attachProvenance 才存在、ProvOptions 在 NewProvenance 定格**／②**B 的 NewTTSGate(prov,cfg) 天然持引擎、382-w-r2 已落接线零改动生效**／③**B 全部新面可包内未导出＝「契约面只在 risk」逐字达成**；★新面 4 件（markseam_394.go 观察缝＋provenance.go markObs 字段＋MarkWithHostPath 落账后通知**已归一化**内容、**mark 语义零动**＋tts_gate.go 自注册＋两测试）；★**internal/tools 0 字节触碰＝第三形的全部意义达成**
+- ★★★**4 处 mark 点覆盖核**：★bridge.go:687／subagent_197.go:512／projctx.go:349 共享引擎直喂 ✅；★**panel_assets.go:245＝一次性 CLI 诊断私有引擎（进程内无闸无播报）——缝照常触发但不硬造消费方（382-w-r2 同款假接线拒绝）**、判非「够不着」
+- ★★★**AC#2 生产真挂读数**：★**SEAM-PRODUCTION refused=1 passed=0 spoken=0 links=1**（纯 prov.Mark 喂链、零手动 record、**全角原文 mark vs 半角文句播报——只有缝内归一化副本才可能匹配＝normalizeTaint 义务收回的双钉之二**）；382WR2 三案不退化
+- ★★★**AC#3 反向两发**：M1 摘汇流口通知／M2 摘自注册——risk 层 4 缝测试＋AncestorInheritance 红；staged 层喂数零链＋**污句照播 runes=27 samples=81534**；382WR2 三案保持绿（**缝与显式 record 互不依赖**）；还原核 pristine 5/5
+- ★★**AC#4 零回归**：★risk 全套 rc=0＋六族 staged **34/1/0** 逐位复现＋`262/640/902` 逐位同＋race rc=0＋gofumpt 六件 0＋vet/build＋d22scan clean＋正控 35/0/0＋分母 **288/52/734/184**（bans#1-5 internal +1＝本腿唯一新增生产件；ban#8 增量含两腿之间他人落库 3 件、**git ls-tree 逐点归因**）
+- ★**申报待追认（编排者已追认＝论证扎实）**：★**留存姿势＝每作用域一条 link 的 upsert、不逐 mark 追加**——既有 checkAncestorScopes 只扫前 MaxAncestorDepth(16) 条链、逐 mark 追加会让第 17 个 mark 起的生产毒永久落扫描窗外；382-w-v2「只收任务作用域」不按 id 前缀落（risk 无任务作用域判别器）；**RecordTaintInheritance 逐字节未动（append 语义测试钉住）**；唯一既有测试改动＝AncestorInheritance 链数 1→2（已批姿势变更的可见面）
+- ★**残余**：注册前 mark 不入链（无回退、与今日保护面同）／缝日志走 logf 宿主汇／链无淘汰触及既有 MaxAncestorDepth 帽（382 既有性质）
+
+**② ★编排者追认＋派 `394-v1`（终裁）**：★**留存姿势追认**（upsert 论证扎实——MaxAncestorDepth(16) 扫描窗外漏毒防住）＋**五格复核**（第三形选型／4 处覆盖／姿势追认核／生产真挂复跑／零回归）＋**可否收口＋残余定性**
+
+**③ ★在飞 3**＝**裁 3**（★`394-v1`/`397-v2`/`400-v1`）——**写 0＝裁决瓶颈轮具名（三判语回来解锁：394 收口→397 收口→400 收口→28 深度消费/394 残余票）**
+★票池：done=**211**／open=**170**（394 实施中）；未推（本轮后现跑）；★**摆机主 3 件**（D43 note✅／DEFERRED✅／394✅ 已执行——**余：R15 三参数挑值 ＋ 392-v3 采纳③ keepalive 翻转（后续裁定）**）
