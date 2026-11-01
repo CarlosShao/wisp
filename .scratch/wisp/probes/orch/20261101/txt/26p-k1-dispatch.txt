@@ -1,0 +1,4 @@
+存档 2026-11-01 11:2x · 腿 26p-k1（Path-C (a) 重 key 验收小腿、写、cmd/wisp 测试面——26p-r1 已让出）
+来源＝59-v3「(a) 验收语义按重 key 小写腿收口（FINDING MOVED 牙式钉改）」＋26p-v2 §4 裁定（重 key 胜出：5 窗至少 1 火＋凡火必 ≤400ms＋每窗深压读数入档、K=5/N=1 起步；加稳归 28-PathC/393 Reset 轨、放宽驳回）。
+对象＝cmd/wisp/resident_voice_bargein_26p_windows_test.go 的 (a) 案（Test26PBargeinStopsWithin400ms）：静态五轮断言改 episode keyed（FINDING MOVED 牙式钉改——392 keepalive 同款）。
+⛔ 改产品码/门本体（bargein.go 零字节）；⛔ 动 (b)(c) 案；反向判据（改回静态⇒摆动敏感复现）＋零回归（26p 套件其余＋六族抽 Path-C 案）。
