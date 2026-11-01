@@ -135,6 +135,15 @@ extern "C" void* wap_new_tuned(int sample_rate_hz, const wap_aec3_tuning* tuning
 
 extern "C" void wap_free(void* session) { delete static_cast<WapSession*>(session); }
 
+extern "C" int wap_reset(void* session) {
+    WapSession* s = static_cast<WapSession*>(session);
+    int rc = s->apm->Initialize();
+    if (rc != 0) {
+        note_error(s, "Initialize", rc);
+    }
+    return rc;
+}
+
 extern "C" int wap_process_reverse(void* session, const float* far_frame, int frames) {
     WapSession* s = static_cast<WapSession*>(session);
     const float* src[1] = {far_frame};

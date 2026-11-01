@@ -89,6 +89,22 @@ func (a *Apm) ProcessCapture(near []float32, delayMs int) ([]float32, error) {
 	return out, nil
 }
 
+// Reset restores the session to its just-created state. This is the
+// ticket-393 flush/reset face's reset half, ridden on AudioProcessing's
+// public Initialize() face: every internal buffer and the echo canceller
+// itself are rebuilt (through the injected EchoControlFactory, so a tuned
+// session re-creates the same tuned engine) while the user settings are
+// retained - the between-windows lever for the cross-window carry the 392
+// findings pinned. A keep-filter flush (drain the latency buffers, keep the
+// adapted filter) has no public face in the pinned webrtc tree; that half is
+// named absent in docs/evidence/s1/393r2-flush-reset.md.
+func (a *Apm) Reset() error {
+	if rc := C.wap_reset(a.sess); rc != 0 {
+		return fmt.Errorf("aec: Initialize rc=%d: %s", int(rc), a.errString())
+	}
+	return nil
+}
+
 // Close releases the native session. Idempotent; a used-after-Close Apm
 // reports an error instead of crashing.
 func (a *Apm) Close() error {

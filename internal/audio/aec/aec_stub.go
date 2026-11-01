@@ -22,5 +22,8 @@ func (a *Apm) ProcessCapture(near []float32, delayMs int) ([]float32, error) {
 	return nil, ErrUnavailable
 }
 
+// Reset always fails with ErrUnavailable in this build configuration.
+func (a *Apm) Reset() error { return ErrUnavailable }
+
 // Close always fails with ErrUnavailable in this build configuration.
 func (a *Apm) Close() error { return ErrUnavailable }

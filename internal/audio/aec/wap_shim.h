@@ -34,6 +34,15 @@ void* wap_new_tuned(int sample_rate_hz, const wap_aec3_tuning* tuning, int* out_
 /* Releases a session created by wap_new. NULL is allowed. */
 void wap_free(void* session);
 
+/* Restores the session to its just-created state: the APM rebuilds every
+ * internal buffer and the echo canceller itself (through the injected
+ * EchoControlFactory, so a tuned session re-creates the same tuned engine)
+ * while retaining the user settings. This is the public
+ * AudioProcessing::Initialize() face - the ticket-393 reset half; a
+ * keep-filter flush has no public face in the pinned tree. Returns 0 or an
+ * AudioProcessing error code. */
+int wap_reset(void* session);
+
 /* Feeds one ~10ms far (render) frame; the APM buffers the reference
  * internally. Returns 0 or an AudioProcessing error code. */
 int wap_process_reverse(void* session, const float* far_frame, int frames);
