@@ -67,21 +67,26 @@ package main
 // drain writes live.
 //
 // WHAT THE KEEPALIVE CHANGES (ticket 392, the 28-r1 warm shape on this
-// surface). The cross-stream resources - the silero session and the
-// streaming resampler - stay hot across announcement windows and retire with
-// the voice link (dispose runs on the C11 cascade's release step in stop()),
-// not with each window. Everything else measures or builds fresh per window,
-// and the readings carry why: the previous window's measured lag was tried
-// as a warm judge seed and measured non-transferable (the fresh verification
-// diverged from the seed while the seeded APM cancelled nothing - the
-// residual rode at the near level and the talker drowned in it), and the APM
-// is a per-stream resource (its echo-path state pairs render with capture
-// inside one stream; a window's end truncates that pairing). So every window
-// runs the pre-392 judge shape - measure, then arm, the ~0.6s blind head
-// 26p-r1's readings carried - on warm model engines. The window itself (the
-// conversation window + the drain) still opens and closes per announcement:
-// the single-reader discipline is the bracket, and between announcements the
-// capture frames belong to the transcript path again.
+// surface; the between-window clears are ticket 397's). The cross-stream
+// resources - the silero session, the streaming resampler and the APM - stay
+// hot across announcement windows and retire with the voice link (dispose
+// runs on the C11 cascade's release step in stop()), not with each window,
+// each walking its own public clear at release: APM Reset, resampler Flush,
+// detector Finalize plus a 1.2s fed-silence cool segment whose boundary
+// events are discarded (the 392-r2 matrix read the clears jointly
+// load-bearing - the bare warm posture judged dead, the cleared one revived).
+// Everything else measures or builds fresh per window, and the readings carry
+// why: the previous window's measured lag was tried as a warm judge seed and
+// measured non-transferable (the fresh verification diverged from the seed
+// while the seeded APM cancelled nothing - the residual rode at the near
+// level and the talker drowned in it). So every window runs the pre-392 judge
+// shape - measure, then arm, the ~0.6s blind head 26p-r1's readings carried -
+// on warm engines. The window itself (the conversation window + the drain)
+// still opens and closes per announcement: the single-reader discipline is
+// the bracket, and between announcements the capture frames belong to the
+// transcript path again. Production runs the posture OFF (the exact pre-392
+// byte shape); the default flip is a separate ruling that re-measures the
+// full staged chain.
 //
 // The drain never waits on the far: when the ring does not yet cover the
 // next block the capture keeps draining into the pending buffer (bounded by
@@ -165,6 +170,18 @@ const (
 	voiceBargeinFloorWindows = 64 // 2s of 32ms windows
 	voiceBargeinGateStep     = 2.0
 	voiceBargeinGateHold     = 16 // 512ms
+	// The keepalive posture's between-window cool segment (the 397 revival
+	// shape): 1.2s of digital silence fed to the held detector between
+	// windows. The silero RNN context does not decay without input - the
+	// 392-r2 probe read the hangover firing a false start ON post-speech
+	// silence - so only fed silence decays it, and 1.2s outlasts the
+	// endpointer's 700ms close: the boundary utterance the interruption left
+	// and the hangover's own false start both open and close inside the
+	// segment, and every event it produces is discarded (not a window
+	// reading). Whole windows, so the detector's partial-window buffer ends
+	// the segment empty.
+	voiceBargeinCoolSamples = 1200 * audio.TargetRate / 1000
+	voiceBargeinCoolWindows = (voiceBargeinCoolSamples + speech.WindowSamples - 1) / speech.WindowSamples
 )
 
 // voiceBargeinEpisode is one judged episode's reading. Span is the judged
@@ -228,12 +245,16 @@ type voiceBargeinMonitor struct {
 	dynamicOff bool
 
 	// The ticket-392 keepalive (the 28-r1 warm-pool shape on this surface):
-	// the cross-stream resources - the silero session and the streaming
-	// resampler - would stay hot across announcement windows and retire with
-	// the voice link, not with each window. Production runs it OFF: the warm
-	// posture was tried and measured unsound here (the second warm window's
-	// echo cancellation failed even with a fresh APM and a fresh measurement
-	// - the 392 readings carry the finding), so the default is the exact
+	// the cross-stream resources - the silero session, the streaming
+	// resampler and the APM - stay hot across announcement windows and retire
+	// with the voice link, not with each window, each walking its own public
+	// between-window clear at release (the 397 revival shape: APM Reset,
+	// resampler Flush, detector Finalize plus the 1.2s cool segment - the
+	// 392-r2 matrix read the three clears jointly load-bearing). Production
+	// runs it OFF: the bare warm posture was measured unsound here (the 392
+	// finding), the clears revive it (the 392-r2 revival-cool readings, the
+	// 397 staged readings), and the default flip is a separate ruling that
+	// re-measures the full staged chain - so the default stays the exact
 	// pre-392 byte shape and the tests flip it on to read the warm posture
 	// beside the cold one.
 	keepalive bool
@@ -247,6 +268,7 @@ type voiceBargeinMonitor struct {
 	handle    *observe.Handle
 	det       *speech.Detector
 	apm       *aec.Apm
+	apmTuning aec.Tuning // the tuning the held APM was built under (the arm-side rebuild guard)
 	resampler *audio.Resampler
 
 	// far ring (farMu guards it; the drain polls coverage, never waits)
@@ -360,9 +382,10 @@ func (m *voiceBargeinMonitor) arm() bool {
 		return false
 	}
 	// The cold posture (the tests' switch) rebuilds every window - the
-	// pre-392 shape. The keepalive posture keeps the model engines (the
-	// silero session) and the resampler hot across windows; the APM is a
-	// per-stream resource and is rebuilt every window (see release).
+	// pre-392 shape. The keepalive posture holds the model engines (the
+	// silero session), the resampler and the APM across windows; release's
+	// between-window clears put each held engine back to its just-created
+	// state, so the arms below only build what nothing holds.
 	if (m.apm != nil || m.det != nil) && !m.keepalive {
 		m.closeEngines()
 	}
@@ -375,19 +398,27 @@ func (m *voiceBargeinMonitor) arm() bool {
 		}
 		m.det = det
 	}
-	// The APM: per-stream, every window, under the tuning face this window's
-	// readings will name.
+	// The APM: per-stream state, under the tuning face this window's readings
+	// name. A held APM comes out of release Reset() - the 393 face's
+	// just-created state, which the 392-r2 matrix read bit-identical to a
+	// fresh construction - so the keepalive posture reuses it and only a
+	// tuning change rebuilds cold (the one-parameter-one-firing rule: a
+	// reading never describes stale parameters). The cold posture holds
+	// nothing and builds here every window.
 	if !m.aecBypass {
-		if m.apm != nil {
+		if m.apm != nil && m.apmTuning != m.aecTuning {
 			_ = m.apm.Close()
 			m.apm = nil
 		}
-		a, aerr := aec.NewApmTuned(audio.TargetRate, m.aecTuning)
-		if aerr != nil {
-			m.reason = "AEC3 不可用（本构建没有 -tags webrtcap 的绑定）：" + aerr.Error()
-			return false
+		if m.apm == nil {
+			a, aerr := aec.NewApmTuned(audio.TargetRate, m.aecTuning)
+			if aerr != nil {
+				m.reason = "AEC3 不可用（本构建没有 -tags webrtcap 的绑定）：" + aerr.Error()
+				return false
+			}
+			m.apm = a
+			m.apmTuning = m.aecTuning
 		}
-		m.apm = a
 	}
 	// The D47 conversation window: capture stays open across SetSpeaking(true)
 	// and the monitor owns the announcement window's frames. Muted still wins
@@ -442,6 +473,15 @@ func (m *voiceBargeinMonitor) speakFar(samples []float32, engineRate int) {
 	if m == nil || !m.armed || len(samples) == 0 {
 		return
 	}
+	// The keepalive posture holds the resampler across windows; an engine
+	// whose rate differs from the held one cannot reuse it (the from-rate is
+	// baked into the position accumulator), so the held one comes down here
+	// and a fresh one is built for this engine.
+	if m.resampler != nil {
+		if from, _ := m.resampler.Rates(); from != engineRate {
+			m.resampler = nil
+		}
+	}
 	if m.resampler == nil {
 		if engineRate <= 0 {
 			return
@@ -493,21 +533,43 @@ func (m *voiceBargeinMonitor) release() {
 	if m.handle != nil {
 		<-m.handle.Done()
 	}
-	// The keepalive posture: the cross-stream resources - the silero session
-	// and the resampler - stay hot for the next announcement window (the
-	// 28-r1 warm shape). The APM does NOT ride the keepalive: its echo-path
-	// state pairs render with capture INSIDE one stream, and a window's end
-	// leaves that pairing truncated - measured on this surface, a warm APM
-	// carried across an interrupted window cancelled nothing (the residual
-	// rode at the near level and drowned the talker), so the APM is rebuilt
-	// by every arm and its cost is a constructor, not a model load. The cold
-	// posture (the tests' switch) closes everything right here - the exact
-	// pre-392 shape, rebuilt and re-measured by every window. Either way the
-	// dispose() tail below owns the final release.
+	// The keepalive posture: every held engine walks its own public
+	// between-window clear and stays hot for the next announcement window
+	// (the 397 revival shape - the 392-r2 matrix read the three clears
+	// jointly load-bearing, and their union, revival-cool, healthy on this
+	// surface). The APM rides the keepalive now too, under its Reset(): the
+	// BARE carry was the measured unsoundness (a window's end truncates the
+	// render/capture pairing and the carried APM cancelled nothing - the
+	// residual rode at the near level), but a Reset session is the 393
+	// face's just-created state, read bit-identical to a fresh construction;
+	// a refused reset comes down for the next arm's cold rebuild. The
+	// resampler's absolute stream coordinates zero out. The detector closes
+	// the open utterance the interruption left (Finalize - its boundary
+	// event is discarded here) and then takes the cool segment: 1.2s of fed
+	// silence decays the silero RNN context (it does not decay without
+	// input) and outlasts the endpointer's 700ms close, so the hangover's
+	// false start happens ON the segment's silence and closes inside it -
+	// every event the segment produces is discarded, never a window reading.
+	// The cold posture (the tests' switch) closes everything right here - the
+	// exact pre-392 shape, rebuilt and re-measured by every window. Either
+	// way the dispose() tail below owns the final release.
 	if m.keepalive {
 		if m.apm != nil {
-			_ = m.apm.Close()
-			m.apm = nil
+			if rerr := m.apm.Reset(); rerr != nil {
+				slog.Warn("voice: barge-in APM reset refused; the engine comes down for a cold rebuild",
+					"err", rerr.Error())
+				_ = m.apm.Close()
+				m.apm = nil
+			}
+		}
+		if m.resampler != nil {
+			m.resampler.Flush()
+		}
+		if m.det != nil {
+			_ = m.det.Finalize(nil)
+			for i := 0; i < voiceBargeinCoolWindows; i++ {
+				_ = m.det.Accept(voiceBargeinSilence, nil)
+			}
 		}
 	} else {
 		m.closeEngines()

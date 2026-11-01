@@ -7,14 +7,18 @@ package main
 // tuning face, and their reverses - the surfaces the 26p-r1 design inputs
 // assigned to the 28 session-integration leg:
 //
-//	AC#1 保温：the warm posture was tried and measured UNSOUND on this
+//	AC#1 保温：the bare warm posture was tried and measured UNSOUND on this
 //	     surface - the second warm window's echo cancellation failed even
 //	     with a fresh APM and a fresh measurement (the readings carry the
 //	     profiles), so production runs the exact pre-392 byte shape
-//	     (keepalive off) and this test pins the finding: the cold
-//	     posture's multi-window (a)/(b) shapes hold, the warm posture's
-//	     second window does not judge, the posture retires with the voice
-//	     link either way.
+//	     (keepalive off). The 397 between-window clears revive it: each
+//	     held engine walks its public clear at release (APM Reset /
+//	     resampler Flush / detector Finalize plus the 1.2s cool segment,
+//	     boundary events discarded), and this test pins both halves - the
+//	     cold posture's multi-window (a)/(b) shapes hold, and the cleared
+//	     warm posture's second window judges again (episodes=1,
+//	     triggers=1@talker, the 392-r2 revival-cool readings). The posture
+//	     retires with the voice link either way.
 //	AC#2 调参：the double-talk damage swing the 26p-r1 L1 reading
 //	     carried (-29.4/-38.2 across two firings, 0-8dB with the engine
 //	     state) re-measured with K firings per setting: the engine
@@ -132,6 +136,45 @@ type voice392Round struct {
 	resProfile   []float64
 }
 
+// voice392RoundOut is the round reading's exported artifact shape - the keys
+// the evidence quotes. 392-r1's artifact serialized every round as an empty
+// object because the working struct's fields are unexported (392-v3 §1 named
+// the shell); every reading this test pins lands on disk through this shape.
+type voice392RoundOut struct {
+	Round        int       `json:"round"`
+	Rms          float64   `json:"rms"`
+	Threshold    float64   `json:"threshold"`
+	Episodes     int       `json:"episodes"`
+	Triggers     int       `json:"triggers"`
+	EngineBuilt  bool      `json:"engine_built"`
+	EngineWarm   bool      `json:"engine_warm"`
+	AecTuned     bool      `json:"aec_tuned"`
+	ReadySamples int       `json:"ready_samples"`
+	Lag          int       `json:"lag"`
+	NearProfile  []float64 `json:"near_profile"`
+	ResProfile   []float64 `json:"res_profile"`
+}
+
+// voice392RoundOutFrom copies one round reading into the artifact shape.
+func voice392RoundOutFrom(r voice392Round) voice392RoundOut {
+	return voice392RoundOut{
+		Round: r.round, Rms: r.rms, Threshold: r.threshold,
+		Episodes: r.episodes, Triggers: r.triggers,
+		EngineBuilt: r.engineBuilt, EngineWarm: r.engineWarm,
+		AecTuned: r.aecTuned, ReadySamples: r.readySamples, Lag: r.lag,
+		NearProfile: r.nearProfile, ResProfile: r.resProfile,
+	}
+}
+
+// voice392RoundsOut copies a round sequence into the artifact shape.
+func voice392RoundsOut(rs []voice392Round) []voice392RoundOut {
+	out := make([]voice392RoundOut, 0, len(rs))
+	for _, r := range rs {
+		out = append(out, voice392RoundOutFrom(r))
+	}
+	return out
+}
+
 // voice392Capture rounds one announcement (sentence + matched echo + an
 // optional talker at talkerAt; a zero talkerAt runs the (b) shape), waits
 // for the window to close, and reads the judge with the stream profiles.
@@ -191,11 +234,14 @@ func voice392Capture(t *testing.T, rig *voice26pRig, sentence, echoWav, talkerWa
 // (a)/(b) shapes healthy window after window with the engines rebuilt per
 // window. Part B (the warm posture, the tests' switch): the same sequence on
 // held engines - the first warm window judges, and the second one is the
-// measured finding: no episode, no trigger, the residual riding at the near
-// level (the profiles in the artifact) even though that window ran a fresh
-// APM and a fresh measurement. The restore core: the switch back off, the
-// (b) shape holds again. The default stays off; a future leg that fixes the
-// warm posture flips this assert together with the default.
+// 397 revival reading: the held engines walked their between-window clears
+// (APM Reset, resampler Flush, detector Finalize plus the 1.2s cool segment,
+// boundary events discarded), so the second window judges again - episodes=1,
+// triggers=1@talker, the residual at the cancelled depth (the 392-r2
+// revival-cool shape, first read in the aecspike replica and pinned here on
+// the staged chain). The restore core: the switch back off, the (b) shape
+// holds again. The default stays off - the clears revive the posture, the
+// default flip is a separate ruling that re-measures the full staged chain.
 func Test392KeepalivePostureFindingsAndColdDefault(t *testing.T) {
 	if probe, err := openWaveOutSpeaker(22050); err != nil {
 		t.Skipf("no output device on this machine: %v", err)
@@ -280,20 +326,24 @@ func Test392KeepalivePostureFindingsAndColdDefault(t *testing.T) {
 	}
 	t.Logf("WARM-POSTURE round=1 triggers=1 (the first warm window judges)")
 
-	// The finding: the SECOND warm window does not judge - no episode, no
-	// trigger on the same -20 talker, and the residual profile rides at the
-	// near level (the echo not cancelled) even though this window ran a
-	// fresh APM and a fresh measurement. Pinned as the measured unsoundness
-	// that keeps the posture off; the profiles land in the artifact.
+	// The revival (ticket 397): the second warm window judges again. The held
+	// engines walked their between-window clears at the last release - the
+	// APM's Reset, the resampler's Flush, the detector's Finalize plus the
+	// 1.2s cool segment whose boundary events are discarded - so the -20
+	// talker fires from the held pool exactly as the 392-r2 revival-cool
+	// readings pinned: episodes=1, triggers=1@talker, the residual at the
+	// cancelled depth (the profiles in the artifact). The clears are jointly
+	// load-bearing: removing any one regresses its own directed failure
+	// shape (the AC#3 overlay firings name them).
 	warm2 := voice392Capture(t, rig, voice26pAnnounceA, echoWav, talkerWav, voice392EarlyTalkerAt, 5)
 	if !warm2.engineWarm || warm2.engineBuilt {
 		t.Fatalf("the second warm window rebuilt the held engines: built=%v warm=%v", warm2.engineBuilt, warm2.engineWarm)
 	}
-	if warm2.triggers != 0 || warm2.episodes != 0 {
-		t.Fatalf("FINDING MOVED: the second warm window judged (episodes=%d triggers=%d) - the warm posture now behaves; flip this assert together with the keepalive default and re-measure",
+	if warm2.episodes != 1 || warm2.triggers != 1 {
+		t.Fatalf("WARM REVIVAL MOVED: the second warm window read (episodes=%d triggers=%d), want episodes=1 triggers=1@talker (the 392-r2 revival-cool readings) - the between-window clears did not revive the judge or moved past them",
 			warm2.episodes, warm2.triggers)
 	}
-	t.Logf("WARM-POSTURE round=2 triggers=0 episodes=0 (the measured finding: the second warm window does not judge; the profiles are in the artifact)")
+	t.Logf("WARM-POSTURE round=2 triggers=1 episodes=1 (the 397 revival: the held engines judge the second window again; the profiles are in the artifact)")
 
 	// The restore core: the switch back off, the (b) shape holds again.
 	rig.rv.bargein.setKeepalive(false)
@@ -312,14 +362,14 @@ func Test392KeepalivePostureFindingsAndColdDefault(t *testing.T) {
 	t.Logf("COLD-RESTORE triggers=0 episodes=%d all_below_cut=true (the pair closed)", bRestore.episodes)
 	write392JSON(t, "392-keepalive.json", map[string]any{
 		"cold_control": ctrl,
-		"cold_rounds":  partA,
-		"cold_echo":    bCold,
-		"warm_round1":  warm1,
-		"warm_round2":  warm2,
-		"cold_restore": bRestore,
+		"cold_rounds":  voice392RoundsOut(partA),
+		"cold_echo":    voice392RoundOutFrom(bCold),
+		"warm_round1":  voice392RoundOutFrom(warm1),
+		"warm_round2":  voice392RoundOutFrom(warm2),
+		"cold_restore": voice392RoundOutFrom(bRestore),
 		"talker_at":    voice392EarlyTalkerAt.String(),
 		"talker_level": voice26pTalkerDbfs,
-		"finding":      "the warm keepalive posture is unsound on this surface: the second warm window judges nothing (no episode, no trigger) with the residual riding at the near level - even with a fresh APM and a fresh measurement; the default stays the exact pre-392 byte shape",
+		"revival":      "the 397 between-window clears revived the warm posture on the staged chain: the second warm window judges again (episodes=1, triggers=1@talker, the residual at the cancelled depth) - the 392-r2 revival-cool shape; the clears are jointly load-bearing (the AC#3 overlay firings), and the production default stays keepalive=false pending the separate default-flip ruling",
 	})
 }
 
@@ -366,12 +416,12 @@ func Test392AecTuningDoubleTalkSwing(t *testing.T) {
 		{name: "nearend-max-dec-lf-0.5", tuning: aec.Tuning{NearendMaxDecFactorLf: 0.5}},
 	}
 	type settingReadings struct {
-		Name    string          `json:"name"`
-		Tuning  aec.Tuning      `json:"tuning"`
-		Rounds  []voice392Round `json:"rounds"`
-		MinRms  float64         `json:"min_rms"`
-		MaxRms  float64         `json:"max_rms"`
-		SwingDb float64         `json:"swing_db"`
+		Name    string             `json:"name"`
+		Tuning  aec.Tuning         `json:"tuning"`
+		Rounds  []voice392RoundOut `json:"rounds"`
+		MinRms  float64            `json:"min_rms"`
+		MaxRms  float64            `json:"max_rms"`
+		SwingDb float64            `json:"swing_db"`
 	}
 	out := make([]settingReadings, 0, len(settings)+1)
 	for _, s := range settings {
@@ -387,7 +437,7 @@ func Test392AecTuningDoubleTalkSwing(t *testing.T) {
 			t.Logf("TUNING-%s round=%d rms=%.2f threshold=%.1f episodes=%d triggers=%d tuned=%v ready=%d",
 				s.name, r, round.rms, round.threshold, round.episodes, round.triggers,
 				round.aecTuned, round.readySamples)
-			sr.Rounds = append(sr.Rounds, round)
+			sr.Rounds = append(sr.Rounds, voice392RoundOutFrom(round))
 			if first {
 				sr.MinRms, sr.MaxRms = round.rms, round.rms
 				first = false
@@ -416,7 +466,7 @@ func Test392AecTuningDoubleTalkSwing(t *testing.T) {
 		restore.rms, out[0].MinRms, out[0].MaxRms)
 	write392JSON(t, "392-aec-tuning.json", map[string]any{
 		"settings":  out,
-		"restore":   restore,
+		"restore":   voice392RoundOutFrom(restore),
 		"talker":    "control-26 (-26.70 dBFS)",
 		"echo":      "matched, coupling 0.2",
 		"talker_at": voice26pTalkerAt.String(),
