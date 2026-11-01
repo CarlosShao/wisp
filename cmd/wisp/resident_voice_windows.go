@@ -354,6 +354,11 @@ type residentVoice struct {
 	residency *voiceResidency
 	prov      *risk.Provenance
 	provScope string
+	// R382-1: the announce gate over the same engine prov holds. attachProvenance
+	// is the only writer of either field, so a leg that attached no provenance
+	// has neither, and speak() skips the check exactly as it did before this
+	// field existed.
+	ttsGate *risk.TTSGate
 	// newSpeaker is the render seam. Production is the waveOut device; the tests
 	// hand in a recorder so the samples an announcement produced can be read back
 	// without a sound card, and one live case uses the device itself.
@@ -602,6 +607,12 @@ func (rv *residentVoice) attachProvenance(p *risk.Provenance) {
 		return
 	}
 	rv.prov = p
+	// R382-1: the gate borrows the SAME engine the tool bridge marks task scopes
+	// into - a gate over a private copy would check against marks production
+	// never made, which is the "engine nobody marks" shape the hand-off above
+	// already refuses. DefaultTTSGateConfig is the ticket's posture: form B on,
+	// L2 confirmation on, nothing tuned here.
+	rv.ttsGate = risk.NewTTSGate(p, risk.DefaultTTSGateConfig())
 	slog.Info("voice: ChTTS gate wired", "scope", rv.provScope, "channel", string(risk.ChTTS))
 }
 

@@ -860,7 +860,7 @@ func (rv *residentVoice) speakQueued() {
 // speak is the announce path itself, and every hop the ticket asks for is a
 // separate line below so the evidence table can quote one of them:
 //
-//  1. risk.ChTTS gate    CheckText before anything is synthesised
+//  1. risk.ChTTS gate    CheckTextWithInheritance before anything is synthesised
 //  2. engine             the slot's TTS family (the ASR is released first)
 //     2b. capture gate      SetSpeaking(true) once the family swap has released
 //     the ASR, so the frames the gate closes behind are
@@ -893,12 +893,18 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 	text := req.text
 	// HOP 1: the C25 channel gate. A hit is not an error - it is the channel
 	// working - so it is counted and reported by source, and NOTHING is
-	// synthesised (ticket 26 AC7: "before playback").
-	if rv.prov != nil {
-		hit, refused := rv.prov.CheckText(req.scope, risk.ChTTS, text)
+	// synthesised (ticket 26 AC7: "before playback"). R382-1 (382-w-r2): the
+	// gate is the TTSGate, whose direct check keeps the old CheckText verdict
+	// and whose inheritance scan also refuses a sentence that quotes a CLOSED
+	// task scope's taint (form B); the refusal contract is unchanged - refused
+	// means this sentence never reaches synthesis. A leg that attached no
+	// provenance has neither engine nor gate, and skips the check exactly as it
+	// did before the gate existed.
+	if rv.ttsGate != nil {
+		_, refused, source := rv.ttsGate.CheckTextWithInheritance(req.scope, risk.ChTTS, text)
 		if refused {
 			rv.ttsGated.Add(1)
-			rv.noteProblem("播报被 ChTTS 闸拦下（" + string(risk.ChTTS) + "，来源 " + hit.Source() + "）：这一句不出声")
+			rv.noteProblem("播报被 ChTTS 闸拦下（" + string(risk.ChTTS) + "，来源 " + source + "）：这一句不出声")
 			return
 		}
 	}
