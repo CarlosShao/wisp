@@ -1,5 +1,7 @@
 package ball
 
+import "math"
+
 // Hit-testing / click-through (SPEC-08 §2: "透明像素区域 WS_EX_TRANSPARENT 或
 // hit-test 返回 HTTRANSPARENT；球体本体可点").
 //
@@ -17,8 +19,8 @@ const (
 )
 
 // RingMarginPx is the non-interactive rendering margin around the orb. It
-// sizes the window but NOT the clickable circle, which stays the orb body + a
-// small tolerance so the visible ring still counts as "the ball".
+// sizes the window but NOT the clickable circle, which is the orb body plus a
+// small tolerance, extended outward to the halo's visible edge (R15#5).
 //
 // The margin has to contain the widest thing a frame draws, which is the
 // Listening wave train at R+5px+16px of travel (+ a 2px badge beyond the rim):
@@ -29,18 +31,28 @@ const (
 const RingMarginPx = 22.0
 
 // ClickTolerancePx extends the clickable circle slightly beyond the orb so
-// the drawn ring belongs to the hit region (DPI-scaled at call sites).
+// the drawn ring belongs to the hit region (DPI-scaled at call sites). It is
+// the FLOOR of the clickable circle, not its whole story: since R15#5 (owner,
+// 2026-11-01) the circle never stops inside the visible outer edge either -
+// see HitTest.
 const ClickTolerancePx = 4.0
 
 // HitTest returns HTClient when (x, y) - window-client coordinates in
-// physical pixels - lies within the clickable circle (orb radius scaled to
-// the monitor DPI + tolerance), HTTRANSPARENT otherwise. sizePx is the
-// window edge in physical pixels, dpi the window's monitor DPI (per-monitor
-// V2) and orbPx the configured orb size at 96 DPI. All inputs are injected:
-// tests simulate any DPI/size without a window.
+// physical pixels - lies within the clickable circle, HTTRANSPARENT
+// otherwise. The circle is the larger of the orb body plus the click
+// tolerance and the halo's visible outer edge (1.5*R, the fill radius
+// haloExtents draws - unclipped at every supported size since RingMarginPx
+// went to 22): a pixel the user can see must be clickable (R15#5 "对齐可见
+// 外沿"), so the Sleeping rest body's 21px circle became the dispatched 26px.
+// sizePx is the window edge in physical pixels, dpi the window's monitor DPI
+// (per-monitor V2) and orbPx the configured orb size at 96 DPI. All inputs
+// are injected: tests simulate any DPI/size without a window.
 func HitTest(x, y int32, sizePx int32, orbPx int, dpi uint32) int {
 	scale := float64(dpi) / 96.0
 	r := float64(orbPx)*scale/2 + ClickTolerancePx*scale
+	if edge := math.Ceil(float64(orbPx) * scale * 0.75); edge > r {
+		r = edge
+	}
 	cx, cy := float64(sizePx)/2, float64(sizePx)/2
 	dx, dy := float64(x)-cx, float64(y)-cy
 	if dx*dx+dy*dy <= r*r {

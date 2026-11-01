@@ -138,25 +138,36 @@ func TestVisualForCoversAllTwentyStates(t *testing.T) {
 		}
 	}
 
-	// SPEC-08 §2.1 anchors. The Sleeping size/opacity, Armed, Muted and the
-	// Settling end-anchor below all read the mode the library DEFAULT is in
-	// today (prototypeVisuals off) - that is precisely what ticket 68 AC#2
-	// flips. AC#2 must migrate each of them to the new default's behaviour, or
-	// make them flag-explicit with EnablePrototypeVisuals(false) where their
-	// whole purpose is to pin the frozen table. Naming them is AC#1's job;
-	// moving them without the desktop re-measurement is not.
-	if v := VisualFor(p, 56, statemachine.StateSleeping, 0); v.SizePx != 12 || v.Opacity != 0.35 {
-		t.Errorf("Sleeping: want 12px @ 0.35, got %v px @ %v", v.SizePx, v.Opacity)
+	// The flip itself (ticket 68 AC#2, 2026-11-01): the library default is the
+	// look the owner signed, so every anchor below reads the DEFAULT mode and
+	// asserts the prototype reading. Under each anchor, what it asserted
+	// before the flip and where that number lives now:
+	//   - Sleeping 12px @ 0.35 -> the resting glass body 34.72px @ 1
+	//     (12px @ 0.35 is re-asserted verbatim in the frozen block below);
+	//   - "12px at any configured size" -> "grows with the configured size"
+	//     (SPEC-08 §2 INTERIM: 用户尺寸 × 0.62, floored - same re-homing);
+	//   - Armed 0.6 / Muted 0.4 -> the prototype ladder 0.92 / 0.85 (R15#1
+	//     Q-1: the glass material images exactly by being this opaque), with
+	//     the 0.6/0.4 numbers re-asserted under the frozen flag;
+	//   - Settling end 0.35 -> RestSettledOpacity 0.95 (R15#3 accepted the
+	//     composite ≈0.33 as implemented: 0.95 here times the ULW 0.35),
+	//     frozen 0.35 re-asserted below. Entry 1 held in both modes, kept.
+	if !PrototypeVisualsEnabled() {
+		t.Fatal("prototypeVisuals must default to ON after ticket 68 AC#2")
 	}
-	// Sleeping ignores the configured size (ball.html: 放大就失去意义).
-	if v := VisualFor(p, 72, statemachine.StateSleeping, 0); v.SizePx != 12 {
-		t.Errorf("Sleeping must stay 12px at any configured size, got %v", v.SizePx)
+	if v := VisualFor(p, 56, statemachine.StateSleeping, 0); abs32(v.SizePx-BallSizeDefaultPx*SleepRestRatio) > 1e-4 || v.Opacity != 1 || !v.Glass {
+		t.Errorf("Sleeping: want the %vpx resting glass body @ 1, got %vpx @ %v glass=%v",
+			BallSizeDefaultPx*SleepRestRatio, v.SizePx, v.Opacity, v.Glass)
 	}
-	if v := VisualFor(p, 56, statemachine.StateArmed, 0); v.Opacity != 0.6 {
-		t.Errorf("Armed opacity = %v, want 0.6", v.Opacity)
+	// The resting body rides the configured size (floored; see the truth table).
+	if v := VisualFor(p, 72, statemachine.StateSleeping, 0); v.SizePx <= BallSizeDefaultPx*SleepRestRatio {
+		t.Errorf("Sleeping must grow past its default rest size at 72px configured, got %v", v.SizePx)
 	}
-	if v := VisualFor(p, 56, statemachine.StateMuted, 0); v.Opacity != 0.4 || v.Icon != IconSlash {
-		t.Errorf("Muted: want 0.4 + slash, got %v / %d", v.Opacity, v.Icon)
+	if v := VisualFor(p, 56, statemachine.StateArmed, 0); v.Opacity != 0.92 || !v.Glass {
+		t.Errorf("Armed opacity = %v, want the prototype 0.92", v.Opacity)
+	}
+	if v := VisualFor(p, 56, statemachine.StateMuted, 0); v.Opacity != 0.85 || v.Icon != IconSlash {
+		t.Errorf("Muted: want 0.85 + slash, got %v / %d", v.Opacity, v.Icon)
 	}
 	// Conversation ring must not be weaker than Confirming's.
 	conv := VisualFor(p, 56, statemachine.StateConversation, 0)
@@ -164,12 +175,12 @@ func TestVisualForCoversAllTwentyStates(t *testing.T) {
 	if conv.RingWidth <= conf.RingWidth {
 		t.Errorf("Conversation ring (%v) must beat Confirming (%v)", conv.RingWidth, conf.RingWidth)
 	}
-	// Settling fade endpoints: 1 at entry, 0.35 fully faded (float32 eps).
+	// Settling fade endpoints: 1 at entry, RestSettledOpacity fully faded.
 	if v := VisualFor(p, 56, statemachine.StateSettling, 0); v.Opacity != 1 {
 		t.Errorf("Settling entry opacity = %v, want 1", v.Opacity)
 	}
-	if v := VisualFor(p, 56, statemachine.StateSettling, 1); abs32(v.Opacity-SleepOpacity) > 1e-6 {
-		t.Errorf("Settling end opacity = %v, want %v", v.Opacity, SleepOpacity)
+	if v := VisualFor(p, 56, statemachine.StateSettling, 1); abs32(v.Opacity-RestSettledOpacity) > 1e-6 {
+		t.Errorf("Settling end opacity = %v, want %v", v.Opacity, RestSettledOpacity)
 	}
 	// Size clamping to the token range.
 	if v := VisualFor(p, 999, statemachine.StateWarm, 0); v.SizePx != BallSizeMaxPx {
@@ -177,6 +188,30 @@ func TestVisualForCoversAllTwentyStates(t *testing.T) {
 	}
 	if v := VisualFor(p, 10, statemachine.StateWarm, 0); v.SizePx != BallSizeMinPx {
 		t.Errorf("size clamp low: %v", v.SizePx)
+	}
+
+	// The frozen §2.1 table is the escape hatch, and these are its pins: the
+	// same anchors as before the flip, re-homed here verbatim (ticket 68 AC#2:
+	// migrate every assertion, delete none, relax none - a test whose whole
+	// purpose is the frozen table stays, made flag-explicit).
+	restored := PrototypeVisualsEnabled()
+	t.Cleanup(func() { EnablePrototypeVisuals(restored) })
+	EnablePrototypeVisuals(false)
+	if v := VisualFor(p, 56, statemachine.StateSleeping, 0); v.SizePx != 12 || v.Opacity != 0.35 {
+		t.Errorf("frozen Sleeping: want 12px @ 0.35, got %v px @ %v", v.SizePx, v.Opacity)
+	}
+	// Sleeping ignores the configured size (ball.html: 放大就失去意义).
+	if v := VisualFor(p, 72, statemachine.StateSleeping, 0); v.SizePx != 12 {
+		t.Errorf("frozen Sleeping must stay 12px at any configured size, got %v", v.SizePx)
+	}
+	if v := VisualFor(p, 56, statemachine.StateArmed, 0); v.Opacity != 0.6 {
+		t.Errorf("frozen Armed opacity = %v, want 0.6", v.Opacity)
+	}
+	if v := VisualFor(p, 56, statemachine.StateMuted, 0); v.Opacity != 0.4 || v.Icon != IconSlash {
+		t.Errorf("frozen Muted: want 0.4 + slash, got %v / %d", v.Opacity, v.Icon)
+	}
+	if v := VisualFor(p, 56, statemachine.StateSettling, 1); abs32(v.Opacity-SleepOpacity) > 1e-6 {
+		t.Errorf("frozen Settling end opacity = %v, want %v", v.Opacity, SleepOpacity)
 	}
 }
 
@@ -370,6 +405,26 @@ func TestHitTestAndDPIInjection(t *testing.T) {
 		if got := HitTest(c, 1, edge, BallSizeDefaultPx, dpi); got != HTTransparent {
 			t.Errorf("dpi %d: top-edge hit = %d, want HTTransparent", dpi, got)
 		}
+	}
+
+	// R15#5 (owner 2026-11-01): the clickable circle reaches the visible outer
+	// edge. The Sleeping rest body draws 34.72px (halo to 26px) but was
+	// clickable only to body/2+4 = 21px; the WM_NCHITTEST call site hands
+	// HitTest the int-truncated 34, so the circle now lands on ceil(34*0.75)
+	// = 26 with the old body+tolerance circle as the floor.
+	edge96 := int32(WindowEdgePx(BallSizeDefaultPx, 96))
+	c96 := edge96 / 2
+	restBodyPx := float32(BallSizeDefaultPx) * SleepRestRatio // 34.72
+	restBody := int(restBodyPx)                               // 34, as the call site truncates it
+	restHit := int(math.Ceil(float64(restBody) * 0.75))       // 26
+	if got := HitTest(c96+int32(restHit)-1, c96, edge96, restBody, 96); got != HTClient {
+		t.Errorf("the visible fringe of the resting Sleeping body (r=%d) must be clickable, got %d", restHit-1, got)
+	}
+	if got := HitTest(c96+int32(restHit), c96, edge96, restBody, 96); got != HTClient {
+		t.Errorf("the visible edge itself (r=%d) counts as the ball, got %d", restHit, got)
+	}
+	if got := HitTest(c96+int32(restHit)+1, c96, edge96, restBody, 96); got != HTTransparent {
+		t.Errorf("outside the visible edge (r=%d) must stay click-through, got %d", restHit+1, got)
 	}
 
 	// Edges grow with DPI and with the orb size.

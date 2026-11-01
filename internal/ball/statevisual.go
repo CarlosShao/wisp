@@ -85,21 +85,15 @@ const (
 	EdgeBottom
 )
 
-// prototypeVisuals selects the ticket 62 liquid-glass rendering. It is still
-// OFF by default, but the reason is no longer "the owner has not signed the
-// new look": on 2026-09-20 the owner signed it PROVISIONALLY (SPEC-08 §2
-// INTERIM - "先勉强用吧"), and SPEC-08 §2's Sleeping row now describes THIS
-// mode. Flipping the default is ticket 68 AC#2, held back only because its
-// re-measurement needs a desktop that is not busy; EnablePrototypeVisuals(false)
-// and `balldebug -frozen` stay as the escape hatch back to the old frozen table.
-//
-// Two facts AC#1 established from code, both unresolved by this ticket:
-//   - the resting body is stateSize()'s 56*SleepRestRatio = 34.72px, which is
-//     NOT the "直径 44px" SPEC-08 §2 now claims (see TestSleepingSizeTruthTable
-//     for the derivation of the recorded diff boxes) - 不符, awaiting ruling;
-//   - cmd/balldebug is today the only caller that turns this on, so a library
-//     consumer (the panel, a future wisp GUI host) still gets the frozen look.
-var prototypeVisuals bool
+// prototypeVisuals selects the ticket 62 liquid-glass rendering. It is ON by
+// default since ticket 68 AC#2 (2026-11-01): the owner answered R15 in full
+// (registry A1378, "R15 全按推荐") - the Settling composite ≈0.33 and the
+// ≈82% dock reveal are accepted as implemented - so the default build now
+// draws exactly the look the owner signed, and SPEC-08 §2's Sleeping row
+// (rest body 34.72px, R15#1) describes the default configuration. The frozen
+// §2.1 table stays reachable as the escape hatch: EnablePrototypeVisuals(false)
+// and `balldebug -frozen` render the old 12px/0.35 Sleeping dot verbatim.
+var prototypeVisuals = true
 
 // EnablePrototypeVisuals turns on the ticket 62 liquid-glass mapping. The
 // caller must trigger a repaint (and a setAssets rebuild) afterwards.

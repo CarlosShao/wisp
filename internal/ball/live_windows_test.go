@@ -103,7 +103,19 @@ func TestBallLiveLifecycle(t *testing.T) {
 	} {
 		b.SetState(s)
 		time.Sleep(80 * time.Millisecond)
-		if want := Animated(s) && s != statemachine.StateActing || s == statemachine.StateWarm || s == statemachine.StateSettling; want != b.TimersAlive() {
+		if s == statemachine.StateActing {
+			// Prototype mode - the library default since ticket 68 AC#2 - arms
+			// ticket 62's bounded liquid burst on entry (transitionDriven holds
+			// Acting) and it retires by itself; the frozen default this test
+			// silently relied on never armed it. The discipline that survives
+			// the flip is "no PERSISTENT timer": the burst must retire, and
+			// AnimationPolicy still grants Acting no animation timer.
+			if !waitFor(2*time.Second, func() bool { return !b.TimersAlive() }) {
+				t.Errorf("%s: the liquid burst never retired (TimersAlive=true 2s after entry)", s)
+			}
+			continue
+		}
+		if want := Animated(s) || s == statemachine.StateWarm || s == statemachine.StateSettling; want != b.TimersAlive() {
 			t.Errorf("%s: TimersAlive=%v, want %v", s, b.TimersAlive(), want)
 		}
 	}
@@ -625,6 +637,12 @@ func TestBallLiveEdgeDockHover(t *testing.T) {
 func TestBallLiveAudioLiquidGate(t *testing.T) {
 	restored := PrototypeVisualsEnabled()
 	t.Cleanup(func() { EnablePrototypeVisuals(restored) })
+	// The first section tests the FROZEN mapping by name. Before ticket 68
+	// AC#2 that was also the library default, so this test relied on it
+	// silently - the ticket flagged exactly that. The default is now the
+	// prototype, so frozen is requested explicitly; the flip and this line
+	// land in the same commit.
+	EnablePrototypeVisuals(false)
 
 	b, err := New(Options{Initial: statemachine.StateSleeping, StartHidden: true})
 	if err != nil {
