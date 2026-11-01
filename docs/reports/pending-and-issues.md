@@ -30053,3 +30053,18 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **④ ★已派 `68-r1`（写、internal/ball＋cmd/balldebug）**：**prototypeVisuals 默认翻 true＋命中半径 26px 修正＋7 态截图（AC#2/AC#3 真桌面）＝owner 签收材料**
 ★**写 1**；★**具名**：★**第二写腿＝394 残余票（MaxAncestorDepth 演化）随下一波**；★**票 16/394/398/400 全收官后写面全开**
 ★票池：done=**217**／open=**167**；未推（本轮后现跑）；★**摆机主 1 件**（**7 态截图签收**——68-r1 交件后）
+
+## A1379（2026-11-01 23:0x +08，编排者，goal round 41 续）★★★收 `68-r1`（`4b9efc889` 12 枚 +250/-46）：**prototypeVisuals 默认翻转落地＋命中半径 26px＋7 态签收截图就绪**——**owner 目验签收面解锁**｜★HitTest 选型编排者追认｜★推平（未推 0）
+
+**① ★★收 `68-r1`（尺核：★提交在／:102 翻转现读＝EnablePrototypeVisuals seam 在／7 截图在盘／★我抽查 Sleeping.png＝玻璃球真实桌面帧目验过）**
+- ★★★**AC#2 翻转落地**：★**statevisual.go `var prototypeVisuals = true`**（注释按 A1378「R15 全按推荐」重写）——**默认构建从现在起画的就是 owner 签收的玻璃球**；`EnablePrototypeVisuals(false)`／`balldebug -frozen` 保留为**冻结规格逃生门**；①Settling 0.33②停靠 82% 按实现值零改
+- ★★★**命中半径 21→26px（R15#5）＝HitTest 选型编排者追认**：★**不按字面 ClickTolerancePx 4→9**（会打红 C21 门——c21-native-tokens.md:239 钉值且表在本腿写面外；单一容差不可能全态对齐可见外沿）；★**实现＝HitTest 可点圆＝max(本体半径＋容差， 可见外沿 1.5R)**——Sleeping 静息体精确落 **26px**（=ceil(34×0.75)、画沿 26.04px＝调用点 int 截断既有行为）、其余各态 32→42px 对齐各自可见外沿（Q-2 全态推广）、frozen 微点保持 10px；**ClickTolerancePx/RingMarginPx 数值未动、C21 表零改动仍逐值为真**——★**owner 批的推荐原文就是「对齐可见外沿（改 HitTest）」＝选型与批复逐字吻合、追认**
+- ★★★**测试联动账（票面要求逐条）**：①TestVisualForCoversAllTwentyStates 四锚点迁新默认读数＋**旧冻结数字原样挂显式 frozen 块（零删除零放宽）**＋翻转钉 ②票面点名地雷 TestBallLiveAudioLiquidGate 补 frozen ③winlive 环游 Acting 改等票 62 有界 burst 自退休（翻转联动同类）
+- ★★★**AC#3 桌面定量（真桌面 96 DPI、teardown clean）**：★** Sleeping px≥8=2106 ≥ 2098 门过、框 40×39、timers=no、cpu_all 0.000%**；冻结对照 px≥8=0/框 0×0（**逃生门健在**）；句柄门 379≤600；★**环境发现＝默认中屏被活窗口占满**（Task Manager＋QQ＋微信）、改静态浅色背景布点后可比性恢复（原始表留档）；Listening/Thinking/Speaking/Warm/Settling/Armed 全成像（框 68-85px＞旧 72 封顶＝RingMargin 22 后不再裁切）
+- ★★**7 态签收截图交付**：★**docs/evidence/s1/68r1-{Sleeping,Listening,Thinking,Speaking,Warm,Settling,Armed}.png 7 枚**（干净布点 alive 真桌面帧、逐枚目验）＋68r1-evidence.md 全账
+- ★**两件如实报**：①dock 行定量复测开放（右缘被占、82% 本身已按实现值接受）②**winlive 171/172 唯一红＝物理 Esc 注入**（活跃桌面归因、与本腿零机制关联、**建议安静窗口复跑一条**）
+
+**② ★摆机主签收**：★**7 态截图＋evidence 已 present 给机主**——**签收 ⇒ 票 68 目验面清＋票 12 AC#8 链清**（SPEC-08 §2.1 更新＝签收后另票）
+
+**③ ★在飞 0**＝**签收瓶颈（机主）＋winlive 安静复跑（编排者找安静窗）＋394 残余票/401-v1 判语**——**具名：下一写腿＝机主签收后 68 目验面收口；winlive 复跑找安静窗执行**
+★票池：done=**217**／open=**167**；未推 **0** ✅；★**摆机主 1 件**（**7 态签收**）
