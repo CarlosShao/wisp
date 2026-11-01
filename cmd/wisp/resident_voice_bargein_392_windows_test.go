@@ -40,6 +40,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 	"time"
 
@@ -68,12 +69,20 @@ const voice392Rounds = 4
 const voice392ColdReadyFloor = 9000
 
 // write392JSON drops one readings artifact (the evidence table quotes these).
+// Non-finite readings are clamped first: JSON has no Infinity, so one -Inf
+// anywhere in the artifact fails the whole marshal and the readings never
+// land (397-v2's residual 2 - a fully gate-clean (b) round red the run's
+// tail with every behavioral assertion passed).
 func write392JSON(t *testing.T, name string, v any) {
 	t.Helper()
 	if err := os.MkdirAll(voice392Out, 0o755); err != nil {
 		t.Fatalf("out dir: %v", err)
 	}
-	b, err := json.MarshalIndent(v, "", "  ")
+	safe, clamped := voice392JSONSafe(v)
+	if clamped > 0 {
+		t.Logf("JSON-SENTINEL %s: clamped %d non-finite reading(s) to %.0f dBFS (the gate-clean -Inf shape)", name, clamped, voice392NoSignalDbfs)
+	}
+	b, err := json.MarshalIndent(safe, "", "  ")
 	if err != nil {
 		t.Fatalf("marshal %s: %v", name, err)
 	}
@@ -82,6 +91,146 @@ func write392JSON(t *testing.T, name string, v any) {
 		t.Fatalf("write %s: %v", p, err)
 	}
 	t.Logf("WROTE %s", p)
+}
+
+// voice392NoSignalDbfs is the artifact value for a non-finite reading. -Inf
+// here means "no signal" - the no-episode round's rms sentinel and a
+// pure-silence profile bucket are digital silence, not measurements - and
+// -999 sits far below every real reading this suite produces (the quietest
+// band bottoms out near -59) while staying a number the evidence table can
+// quote. A finite clamp (not null) keeps the artifact schema untouched:
+// float fields stay floats, a finite artifact marshals bit-for-bit as
+// before, and the sentinel only fires where -Inf did. Both signs and NaN
+// take the same value - the artifact's job is to say "this reading does not
+// exist", not to guess a magnitude, and 0 would misread as full scale.
+const voice392NoSignalDbfs = -999.0
+
+// voice392JSONSafe returns v with every non-finite float clamped to
+// voice392NoSignalDbfs, and reports how many readings it clamped. The walk
+// covers maps, slices, pointers, interfaces, and exported struct fields -
+// both artifact shapes route through here, plus the raw control readings.
+// Containers are copied only when something inside them was clamped; a
+// value with nothing to clamp comes back as-is.
+func voice392JSONSafe(v any) (any, int) {
+	out, clamped := voice392JSONSafeWalk(reflect.ValueOf(v))
+	if clamped == 0 {
+		return v, 0
+	}
+	return out.Interface(), clamped
+}
+
+func voice392JSONSafeWalk(rv reflect.Value) (reflect.Value, int) {
+	switch rv.Kind() {
+	case reflect.Float32, reflect.Float64:
+		if f := rv.Float(); math.IsInf(f, 0) || math.IsNaN(f) {
+			return reflect.ValueOf(voice392NoSignalDbfs), 1
+		}
+	case reflect.Interface, reflect.Pointer:
+		if !rv.IsNil() {
+			return voice392JSONSafeWalk(rv.Elem())
+		}
+	case reflect.Map:
+		clamped := 0
+		out := reflect.MakeMapWithSize(rv.Type(), rv.Len())
+		iter := rv.MapRange()
+		for iter.Next() {
+			cv, n := voice392JSONSafeWalk(iter.Value())
+			clamped += n
+			out.SetMapIndex(iter.Key(), cv)
+		}
+		if clamped > 0 {
+			return out, clamped
+		}
+	case reflect.Slice:
+		clamped := 0
+		out := reflect.MakeSlice(rv.Type(), rv.Len(), rv.Len())
+		for i := 0; i < rv.Len(); i++ {
+			cv, n := voice392JSONSafeWalk(rv.Index(i))
+			clamped += n
+			out.Index(i).Set(cv)
+		}
+		if clamped > 0 {
+			return out, clamped
+		}
+	case reflect.Struct:
+		clamped := 0
+		out := reflect.New(rv.Type()).Elem()
+		for i := 0; i < rv.NumField(); i++ {
+			if !rv.Type().Field(i).IsExported() {
+				continue
+			}
+			cv, n := voice392JSONSafeWalk(rv.Field(i))
+			clamped += n
+			out.Field(i).Set(cv)
+		}
+		if clamped > 0 {
+			return out, clamped
+		}
+	}
+	return rv, 0
+}
+
+// Test392JSONSentinelClampsNonFiniteReadings pins the writer's JSON safety
+// sentinel at the exact face 397-v2's residual 2 measured: a fully gate-clean
+// (b) round (episodes=0) leaves the round reading's rms at the capture's -Inf
+// sentinel and a pure-silence profile bucket at -Inf, and one -Inf failed the
+// whole artifact marshal (the run red at the tail with every behavioral
+// assertion passed). The sentinel must also stay silent on finite readings -
+// a finite artifact marshals byte-for-byte as before.
+func Test392JSONSentinelClampsNonFiniteReadings(t *testing.T) {
+	finite := voice392RoundOutFrom(voice392Round{
+		round: 3, rms: -47.2, threshold: -30,
+		episodes: 1, triggers: 0, engineBuilt: true,
+		readySamples: voice392ColdReadyFloor, lag: 490,
+		nearProfile: []float64{-22.6, -24.3},
+		resProfile:  []float64{-47.2, -58.9},
+	})
+	safe, clamped := voice392JSONSafe(finite)
+	if clamped != 0 {
+		t.Fatalf("the finite reading was clamped %d time(s): the sentinel must stay silent on finite values", clamped)
+	}
+	before, err := json.Marshal(finite)
+	if err != nil {
+		t.Fatalf("marshal finite: %v", err)
+	}
+	after, err := json.Marshal(safe)
+	if err != nil {
+		t.Fatalf("marshal finite through the sentinel: %v", err)
+	}
+	if string(before) != string(after) {
+		t.Fatalf("the finite artifact changed through the sentinel:\nbefore:  %s\nafter:   %s", before, after)
+	}
+
+	// The (b) artifact face: no episode fired, so rms keeps the value
+	// voice392Capture leaves (its -Inf sentinel), and the residual's first
+	// second is digital silence (its profile bucket is -Inf the same way).
+	gateClean := voice392RoundOutFrom(voice392Round{
+		round: 3, rms: math.Inf(-1),
+		episodes: 0, triggers: 0, engineBuilt: true,
+		readySamples: voice392ColdReadyFloor, lag: 536,
+		nearProfile: []float64{-22.6, -24.3},
+		resProfile:  []float64{math.Inf(-1), -58.9},
+	})
+	safe, clamped = voice392JSONSafe(gateClean)
+	if clamped != 2 {
+		t.Fatalf("clamped=%d, want 2 (the no-episode rms plus the silent bucket)", clamped)
+	}
+	b, err := json.Marshal(safe)
+	if err != nil {
+		t.Fatalf("marshal gate-clean through the sentinel: %v", err)
+	}
+	var back map[string]any
+	if err := json.Unmarshal(b, &back); err != nil {
+		t.Fatalf("the clamped artifact is not valid JSON: %v", err)
+	}
+	if got := fmt.Sprintf("%v", back["rms"]); got != "-999" {
+		t.Fatalf("the gate-clean rms reads %s, want the no-signal sentinel -999", got)
+	}
+	profile, ok := back["res_profile"].([]any)
+	if !ok || len(profile) != 2 || fmt.Sprintf("%v", profile[0]) != "-999" {
+		t.Fatalf("the silent profile bucket reads %v, want the no-signal sentinel -999 in slot 0", back["res_profile"])
+	}
+	write392JSON(t, "392-json-sentinel.json", gateClean)
 }
 
 // voice392RmsProfile buckets one recorded stream's RMS per second - the
