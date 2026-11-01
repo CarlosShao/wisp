@@ -29608,3 +29608,23 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **③ ★在飞 2**＝**写 1**（★`16-r1` S2 验收证据组装）＋**裁 1**（★`382-w-v1` R382-1 接线终裁）——**写 1＜3 具名**：★**第三写腿＝票 394 执行（等机主批契约）或 28 调参方向消费（等裁决链）或 (a) 加稳票（392-v2 主发现承接、待开）⇒ 裁决交件同轮补**
 ★票池：done=**211**／open=**168**（**55.9%**，票池 379）；未推 **7**（网络断、恢复即推）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／票 394 契约批准）
+
+## A1347（2026-11-01 22:1x +08，编排者，goal round 34 续）★★★收 `16-r1`（`83c08b2f6` 3 枚：demo 测试 541 行＋证据 153 行＋**docs/SLO.md 附录 D 纯追加 39+/0-**）：**S2 验收证据组装完成**——格①-④取证齐、**格⑤自裁留给 16-v1（票面 mandate）**｜★派 `16-v1`（对抗验收＝票面法定「different agent」）
+
+**① ★★★格①E2E demo＝真硬件全链绿**：★`Test16r1VoiceDemo...RealHardware` PASS **28.37s**——真 KWS 唤醒（0.wav 负控 0→4.wav hits=1）→D43#5/#7/#11→**真流式 Paraformer 转写**→真 agent 回合（golden SSE 两轮：**tool_call 落真库＋task_log done＋D10 通知**）→产线 speak() 真 matcha 真 waveOut（spoken=1 samples=88856）→D43#15/#26→SETTLING（3s 实测 3039ms）→DISPOSED；★**球走位五行全产线派发、零手工桥**；TestLiveWasapiSmoke 真机两跑 PASS
+- ★**诚实边界三枚照录**：①Acting 无球态载体（announce 走 #15 纯文本臂、工具证据在 tool_call 行）⇒ 16-v1/编排者裁量 ②settle 8984ms 含真 TTS 装载（12-r2 桩形状不可比）③wake openDelay 6.95s 与 15e 262ms 不同口径（基线由六族钉住）
+
+**② ★★★格②延迟表＝docs/SLO.md 附录 D（票面明令位）**：★12 行预算 vs 实测——多行 PASS、**TTS 首帧 3.715s FAIL 照录**（Warm 形状归票 28）、冷首用 5.51s 超 P50 照录、打断 41-46ms 引、3s 回落 PASS；★正文与 A/B/C 零改写 ✅
+
+**③ ★★★格③六场景＝4 执行＋2 具名边界、全部真读数无静默跳过**：①麦克风占用＝**真 HRESULT AUDCLNT_E_DEVICE_INUSE 过真 open 路径** ②权限拒绝＝seam 真映射＋OS 级两杠杆真翻负照录（**真触发剩余路径＝设置页/admin、具名**）③热拔 mid-utterance＝seam 三连＋D43#14（OS 级需 admin、本机 admin=no 现核）④磁盘满＝audit 不静默＋WAL 防线＋**D42#5 预检归票 45 具名**（真满盘需 admin 未伪造）⑤模型损坏＝**真翻转 encoder 一字节→sha256 mismatch→生产拒交未验证字节→自愈重取 12.884s**（不可自愈分支 TestAC21 钉住）⑥**下载杀进程＝真镜像 237MB 中断态→partial 存活→二跑 9.11s→verify「与已验签清单一致」**（Range 续传服务端断言钉住、真镜像侧无法观测 Range 头＝分工照录）
+
+**④ ★格④CER＝CI 同款 runner 本地记录＋接线引用＋具名残余（不停手）**：★runtests.sh cer **24/0/0 rc=0（与 ci.yml:732 逐字同命令）**；★仓内存档 CI 日志全部早于 10-26 接线 ⇒ **真 CI 工件今日不存在**；★**残余「真 CI 工件待编排者下一次 push 后留存」具名**（near_clean mandatory 在案、noisy_far EXERCISED-not-MET 照录）
+
+**⑤ ★格⑤＝16-v1 待派**（★**票面 mandate「different agent」——本腿自裁未做＝正确**）
+
+**⑥ ★零回归**：★六族 rc=0 **28/28**＋**`262/640/902` 逐位同（连三项次级与 12-v3 逐字同）**＋d22scan clean＋正控可逆＋两尺空
+
+**⑦ ★已派 `16-v1`（格⑤对抗验收＝票面法定 different agent）**：stub scan＋contract conformance＋三枚诚实边界裁量＋格①-④复核＋**票 16 可否收口**
+
+**⑧ ★在飞 2**＝**裁 2**（★`16-v1`/`382-w-v1`）——**写 0＝波间低谷具名**：★**第三写腿＝票 394（等机主批）/(a) 加稳票（392-v2 主发现承接）/28 调参消费⇒ 裁决交件同轮补**
+★票池：done=**209**／open=**168**；未推（本轮后现跑）；★**摆机主 3 件**（D43 note／DEFERRED 登记行文字／票 394 契约批准）

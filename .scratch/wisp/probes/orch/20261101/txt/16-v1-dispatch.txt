@@ -1,0 +1,4 @@
+存档 2026-11-01 22:1x · 腿 16-v1（票 16 格⑤对抗验收腿、非实现者）——16-r1 交件 83c08b2f6（3 枚：demo 测试 541 行＋证据 153 行＋SLO 附录 D）
+格⑤=票面自己的 mandate：「Adversarial acceptance pass by a different agent (stub scan + contract conformance)」——**你就是那个 different agent**。
+裁：①stub scan（**全 S2 面搜 mock/stub 替真形**——C8/C5/C17 接缝白名单外零替真）②contract conformance（**D10/D32/D43/C 系对 S2 交付的符合性**）③16-r1 的三枚诚实边界裁量（Acting 无球态载体／settle 8984ms 含真 TTS／openDelay 6.95s 口径）④格①-④证据复核（demo 测试复跑＋SLO 附录 12 行 vs 预算＋六场景映射＋CER 本地记录的残余定性）⑤票 16 可否收口（格⑤过 ⇒ 全格翻）。
+⛔ 动工作树（16-r1 已交、无同行写腿）；涉 sherpa＝staged；音频错峰。
