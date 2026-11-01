@@ -1,0 +1,2 @@
+存档 2026-11-01 23:0x · 腿 398-r1（票 398 silero RNN hangover reset 面、写、internal/speech 独占——387-r3 已让出）
+392-v3 采纳路径②：RNN 无 reset 面（语境跨空窗携带、hangover 静音开火、冷段 interim）⇒ internal/speech 需 session reset 面（新 API、契约相邻）。AC#1 reset 面设计（对照 detector Finalize 形状、⛔ 动 silero 语义）／AC#2 hangover 清除读数／AC#3 反向／AC#4 零回归（61/0/6＋裸跑 25/0/42）／AC#5 纪律。

@@ -1,0 +1,2 @@
+存档 2026-11-01 23:0x · 腿 400-r1（票 400 产品级红三件、写、internal/panel＋internal/winsec——全空闲）
+①panel 契约对齐（Go Snapshot 发 [instructions tasks] 而 PanelSnapshot 未声明——C17 桥面契约不一致）②panel 35r8 流日志有界（4x flood→4.0x 驻留）③winsec 342r1 竞态修（TestAC1..342r1 祖先换位窗 2/400 命中＝真产品发现；封链语义内）。各 AC 反向判据＋零回归。⛔ frontend/design（机主外部 agent）。
