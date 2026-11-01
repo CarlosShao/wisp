@@ -29776,3 +29776,19 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **④ ★处置＝派 `ci-r1`（CI 修复腿）**：修 lint（按仓内 U1000 惯例形状）＋诊断 test-core proc 步骤＋**gh run view 41274267651 --log-failed 全日志在案**
 ★网络恢复：A1342 起的全部积压（9 笔）＋本轮已全部推平（未推 0）⇒ **票 16 格④的 CI 工件链已激活**（新 push 触发新 CI、ci-r1 修复后 CER 工件可留）
 ★票池：done=209／open=168＋ci-r1 在途；摆机主 3 件（D43 note／DEFERRED 登记行文字／票 394 三形选一）＋R15 三项（半急）
+
+## A1358（2026-11-01 15:4x +08，编排者，goal round 36 续）★★★收 `ci-r1`（`79041f071` 59 文件＋`2ac673005` 误吞更正）：**CI 修复落地**（lint 78→1 剩 frontend 外部面／test-core 真因修＝aecsmoke.c build 约束／census 4→1 剩 speech 结构矛盾待机主裁）｜★**产品级红三件开票 400**｜★**票 16 格④ CI 链激活**
+
+**① ★★收 `ci-r1`（尺核：★两提交在／59 文件＋误吞更正笔）——派单三处定位两处误判、腿诚实更正**
+- ★**真因更正**：①"d22scan self-test exit 1"＝**误报**（setup-go problem-matcher 把 self-test 输出内嵌文本注解成错误行、self-test 实际 40/40）②"TestLayoutForTestE"＝**误判**（该步骤 PASS=1；**test-core 真因＝aecspike 的 aecsmoke.c 拖死 portable go list**「C source files not allowed when not using cgo」——ubuntu cgo=1 才炸、本地 CGO=0 看不见）③test-windows＝**五步红非一条**
+- ★★**已修**：①**aecsmoke.c 顶部 `//go:build windows && cgo`** ⇒ **lint 的 go vet 与 test-core 的 go list 双双转绿（linux 容器权威验证 rc=0）** ②**staticcheck 2026.2.2 linux 78→剩 1**（真死码删 34 处／平台性未用 var _= 注册 9 组——**settle_trace 12-r2 三戳＝注册行、三戳逻辑零触碰**／风格缺陷 15 机械修）；★**唯一残留＝frontend/embed.go:4 SA9009**（**frontend/** 归外部 agent 本腿零写面 ⇒ staticcheck 步骤仍 exit 1——需外部 agent 或机主一次性授权**）③path-length 预算门 roster 补登 233 号（VERDICT GREEN 62=62）④census GUARD D **4→1**（present/watchdog/aecspike 认领、**ubuntu 首读全绿**；**剩 internal/speech＝结构矛盾**〔GUARD D exit 1 与脚本自带「speech 刻意不认领」互斥〕**需机主裁决**——census 步骤在 speech 上仍红）⑤既有红修复两笔（**autostart_43 hosted HKCU 缺 Run 键播种**／**229 名册补登 lifecycle-sta＝43-r1 昨日落地漏做**）
+- ★**误吞更正笔**：79041f071 pathspec 把票 30 面两行（残余③销账）误吞提交 ⇒ 2ac673005 退回原态、两行写回工作区（**未提交态恢复、原文在两笔 commit 信息里**）
+- ★**上报不修（CI 仍会相应红）**：winsec 342r1 竞态（真产品发现）／223 权限句／config ReadFailure 42r1（windows-2025 镜像差）／**panel 契约漂移＋35r8 无界＝真产品发现**／AC13 窗测 flake／AC247+PerCallBudget flake
+
+**② ★产品级红三件开票 400（panel 契约漂移／35r8 无界／winsec 342r1 竞态）**
+
+**③ ★票 16 格④ CI 链激活**
+★**网络恢复 ⇒ 本轮 push 触发新 CI ⇒ CER 门工件可留**（ci-r1 修后 CER runner 24/24 在案）——**CI 绿后格④可翻**（门禁格、编排者跑尺）
+
+**④ ★在飞 3**＝**写 2**（★`16-r1` 已交——**实数＝393-r2 已交、16-r1 已交、在飞＝392-v2/382-w-v1 疑死已重派链、397-v1 疑死、16-v2 已交、26p-v2 已交……在飞＝397-v1（疑死）＋392-v2/382-w-v1/16-v2 已交——**真在飞＝**392-v2（疑死）、382-w-v1（判死复核）**）……**简化：在飞＝397-v1（疑死）＋392-v2（疑死）＋382-w-v1（已判死）＋16-v2（已交）**——★**晨检循环继续**
+★票池：done=**211**／open=**171**（400 开后）；未推（本轮后现跑）；★**摆机主 4 件**（D43 note／DEFERRED 登记行文字／票 394 三形选一／**speech census 结构矛盾裁决**）＋**R15 三项（半急）**
