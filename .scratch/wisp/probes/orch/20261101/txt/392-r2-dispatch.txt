@@ -1,0 +1,3 @@
+存档 2026-11-01 11:3x · 腿 392-r2（票 396 保温修复腿、写、internal/audio 独占——26p-k1 已让出）
+AC#1 毒源半隔离（resampler/detector 逐件定位）／AC#2 393 Reset 接入保温路径（第二窗重新会判）／AC#3 反向／AC#4 零回归（94/83/0/11 基线＋keepalive=false 默认 ⛔ 动——修复经显式开启读数）／AC#5 纪律。
+复用：393-r2 的 Reset/shim＋392-r1 的 K=4 测量形＋59-w 长窗 rig。
