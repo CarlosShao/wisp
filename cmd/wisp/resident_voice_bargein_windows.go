@@ -84,9 +84,9 @@ package main
 // on warm engines. The window itself (the conversation window + the drain)
 // still opens and closes per announcement: the single-reader discipline is
 // the bracket, and between announcements the capture frames belong to the
-// transcript path again. Production runs the posture OFF (the exact pre-392
-// byte shape); the default flip is a separate ruling that re-measures the
-// full staged chain.
+// transcript path again. Production runs the posture ON since the 401 flip
+// (ticket 401, the ruling on the 392-v3 adoption path's step 3 - the staged
+// full-chain re-read re-measured the flip).
 //
 // The drain never waits on the far: when the ring does not yet cover the
 // next block the capture keeps draining into the pending buffer (bounded by
@@ -251,12 +251,12 @@ type voiceBargeinMonitor struct {
 	// between-window clear at release (the 397 revival shape: APM Reset,
 	// resampler Flush, detector Finalize plus the 1.2s cool segment - the
 	// 392-r2 matrix read the three clears jointly load-bearing). Production
-	// runs it OFF: the bare warm posture was measured unsound here (the 392
-	// finding), the clears revive it (the 392-r2 revival-cool readings, the
-	// 397 staged readings), and the default flip is a separate ruling that
-	// re-measures the full staged chain - so the default stays the exact
-	// pre-392 byte shape and the tests flip it on to read the warm posture
-	// beside the cold one.
+	// runs it ON since the 401 flip: the bare warm posture was measured
+	// unsound here (the 392 finding) and the clears revive it (the 392-r2
+	// revival-cool readings, the 397 staged readings) - the staged
+	// full-chain re-read re-measured the flip and made the revived posture
+	// the production default. The tests flip it off to read the cold
+	// pre-392 shape beside it.
 	keepalive bool
 	// aecTuning is the AC#2 parameter face the integration tests drive; it
 	// applies at the APM's per-window construction, so every window judges
@@ -313,7 +313,7 @@ func newVoiceBargeinMonitor(frames <-chan []byte, vadModel string, scope *plugin
 		vadModel:  vadModel,
 		scope:     scope,
 		trigger:   trigger,
-		keepalive: false, // the measured-good default: the exact pre-392 shape
+		keepalive: true, // the 401 flip: the cleared warm posture IS the default
 	}
 	return m
 }

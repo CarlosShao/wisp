@@ -10,14 +10,14 @@ package main
 //	AC#1 保温：the bare warm posture was tried and measured UNSOUND on this
 //	     surface - the second warm window's echo cancellation failed even
 //	     with a fresh APM and a fresh measurement (the readings carry the
-//	     profiles), so production runs the exact pre-392 byte shape
-//	     (keepalive off). The 397 between-window clears revive it: each
-//	     held engine walks its public clear at release (APM Reset /
-//	     resampler Flush / detector Finalize plus the 1.2s cool segment,
-//	     boundary events discarded), and this test pins both halves - the
-//	     cold posture's multi-window (a)/(b) shapes hold, and the cleared
-//	     warm posture's second window judges again (episodes=1,
-//	     triggers=1@talker, the 392-r2 revival-cool readings). The posture
+//	     profiles). The 397 between-window clears revive it: each held
+//	     engine walks its public clear at release (APM Reset / resampler
+//	     Flush / detector Finalize plus the 1.2s cool segment, boundary
+//	     events discarded), and the 401 flip made the CLEARED posture the
+//	     production default - this test pins the default path (the held
+//	     windows judge again window after window: episodes=1,
+//	     triggers=1@talker, the 392-r2 revival-cool readings) beside the
+//	     switch-off cold face (the exact pre-392 shapes). The posture
 //	     retires with the voice link either way.
 //	AC#2 调参：the double-talk damage swing the 26p-r1 L1 reading
 //	     carried (-29.4/-38.2 across two firings, 0-8dB with the engine
@@ -27,8 +27,8 @@ package main
 //	     pinned and untouched). Each setting's swing width is the
 //	     reading; if nothing flattens it, the widths say by how much -
 //	     the design input's refinement.
-//	AC#3 反向：the cold posture is the default (the pre-392 shape); the
-//	     tuning face off -> the default engine returns (AecTuned=false);
+//	AC#3 反向：the cold posture is the switch-off face (the pre-392 shape);
+//	     the tuning face off -> the default engine returns (AecTuned=false);
 //	     dispose -> the engines go down. Each with its restore core.
 //
 // Staging: part 1's header (the 26p rig's shape) - the same staged binary
@@ -378,19 +378,19 @@ func voice392Capture(t *testing.T, rig *voice26pRig, sentence, echoWav, talkerWa
 }
 
 // Test392KeepalivePostureFindingsAndColdDefault is the AC#1 reading. Part A
-// (the production default, the exact pre-392 byte shape): a multi-window
-// sequence - control, two talker rounds, an echo-only round - keeps the
-// (a)/(b) shapes healthy window after window with the engines rebuilt per
-// window. Part B (the warm posture, the tests' switch): the same sequence on
-// held engines - the first warm window judges, and the second one is the
-// 397 revival reading: the held engines walked their between-window clears
-// (APM Reset, resampler Flush, detector Finalize plus the 1.2s cool segment,
-// boundary events discarded), so the second window judges again - episodes=1,
-// triggers=1@talker, the residual at the cancelled depth (the 392-r2
-// revival-cool shape, first read in the aecspike replica and pinned here on
-// the staged chain). The restore core: the switch back off, the (b) shape
-// holds again. The default stays off - the clears revive the posture, the
-// default flip is a separate ruling that re-measures the full staged chain.
+// (the production default since the 401 flip): a multi-window sequence -
+// control, two talker rounds, an echo-only round - on the held engines: the
+// between-window clears (APM Reset, resampler Flush, detector Finalize plus
+// the 1.2s cool segment, boundary events discarded) put the engines back to
+// their just-created state at every release, so the talker windows judge
+// again window after window - episodes=1, triggers=1@talker, the residual at
+// the cancelled depth (the 392-r2 revival-cool shape, first read in the
+// aecspike replica, pinned here on the staged chain, now live under the
+// default with no switch) and the echo-only window holds (no false-start
+// leak - the 398-v3 decay curve's clearing). Part B (the switch-off face,
+// the exact pre-392 shape): the cold posture rebuilds per window and keeps
+// the (a)/(b) shapes. The restore core: the switch back on, the (b) shape
+// holds on the default's fresh build again.
 func Test392KeepalivePostureFindingsAndColdDefault(t *testing.T) {
 	if probe, err := openWaveOutSpeaker(22050); err != nil {
 		t.Skipf("no output device on this machine: %v", err)
@@ -402,14 +402,14 @@ func Test392KeepalivePostureFindingsAndColdDefault(t *testing.T) {
 
 	rig := newVoice26pRig(t, nil)
 	rig.requireAEC3()
-	if rig.rv.bargein.readings().Keepalive {
-		t.Fatalf("the monitor's production default is the warm posture - the measured finding keeps it off")
+	if ka := rig.rv.bargein.readings().Keepalive; !ka {
+		t.Fatalf("the monitor's default is not the warm posture - the 401 flip made the cleared posture the default, got keepalive=%v", ka)
 	}
 
 	// Part A, round 0: the echo-source control. No injection - the rig has
 	// no capture device, so the drain sees no frames and the judge never
-	// arms here; the window builds the engines (rebuilt at the next arm -
-	// the cold posture) and records the announcement.
+	// arms here; the window builds the engines (the default's first build)
+	// and records the announcement.
 	walkToThinking381r2(t, rig.rv)
 	if !rig.rv.announce(voice26pAnnounceA) {
 		t.Fatalf("the control refused the sentence; problems=%v", rig.rv.problemsSnapshot())
@@ -420,105 +420,116 @@ func Test392KeepalivePostureFindingsAndColdDefault(t *testing.T) {
 	})
 	rig.waitReleased()
 	ctrl := rig.rv.bargein.readings()
-	if ctrl.Keepalive || !ctrl.EngineBuilt || ctrl.EngineWarm {
-		t.Fatalf("the control is not the cold posture: keepalive=%v built=%v warm=%v",
+	if !ctrl.Keepalive || !ctrl.EngineBuilt || ctrl.EngineWarm {
+		t.Fatalf("the control is not the default warm posture's first build: keepalive=%v built=%v warm=%v",
 			ctrl.Keepalive, ctrl.EngineBuilt, ctrl.EngineWarm)
+	}
+	if hot := rig.rv.bargein.readings().EnginesHot; !hot {
+		t.Fatalf("the default posture did not hold the engines past the control window (EnginesHot=false)")
 	}
 	echoWav, _ := voice26pEchoWav(t, dir, "echo-392", control.recording(), 22050, voice26pEchoGain)
 
-	// Part A, rounds 1-2: the (a) shape on two consecutive windows - the -20
-	// talker judged through the fresh-measuring judge both times, engines
-	// rebuilt per window (the pre-392 shape holds multi-window).
-	var partA []voice392Round
+	// Part A, rounds 1-2: the (a) shape on the held engines - the between-
+	// window clears ran at the previous release, so the judge measures fresh
+	// and the -20 talker is judged window after window with nothing rebuilt:
+	// the revival is live under the DEFAULT (the WARM REVIVAL MOVED guard
+	// runs here without any switch - the 401 flip's pin).
+	var warmRounds []voice392Round
 	for r := 1; r <= 2; r++ {
 		rd := voice392Capture(t, rig, voice26pAnnounceA, echoWav, talkerWav, voice392EarlyTalkerAt, r)
-		if rd.triggers != 1 {
-			t.Fatalf("part A round %d triggered %d time(s) (episodes=%d): the -20 talker the (a) surface passes was not judged",
-				r, rd.triggers, rd.episodes)
+		if rd.episodes != 1 || rd.triggers != 1 {
+			t.Fatalf("WARM REVIVAL MOVED: the held window round %d read (episodes=%d triggers=%d), want episodes=1 triggers=1@talker (the 392-r2 revival-cool readings, live under the default) - the between-window clears did not revive the judge or moved past them",
+				r, rd.episodes, rd.triggers)
 		}
-		if !rd.engineBuilt || rd.engineWarm {
-			t.Fatalf("part A round %d did not rebuild per window: built=%v warm=%v", r, rd.engineBuilt, rd.engineWarm)
+		if rd.engineBuilt || !rd.engineWarm {
+			t.Fatalf("default posture round %d rebuilt instead of judging on the held engines: built=%v warm=%v", r, rd.engineBuilt, rd.engineWarm)
 		}
 		if rd.readySamples < voice392ColdReadyFloor {
-			t.Fatalf("part A round %d's judge did not measure fresh (ready=%d samples)", r, rd.readySamples)
+			t.Fatalf("default posture round %d's judge did not measure fresh (ready=%d samples)", r, rd.readySamples)
 		}
-		t.Logf("COLD-MULTIWINDOW round=%d triggers=1 ready_samples=%d lag=%d (the (a) shape holds window after window)",
+		t.Logf("WARM-DEFAULT round=%d triggers=1 episodes=1 ready_samples=%d lag=%d (the revival holds window after window on the held engines)",
 			r, rd.readySamples, rd.lag)
-		partA = append(partA, rd)
+		warmRounds = append(warmRounds, rd)
 	}
 
-	// Part A, round 3: the (b) shape on the same posture - the echo-only
-	// window holds the tightened cut.
-	bCold := voice392Capture(t, rig, voice26pAnnounceA, echoWav, "", 0, 3)
-	if bCold.triggers != 0 {
-		t.Fatalf("part A round 3's echo self-triggered (triggers=%d): the cold posture does not hold the (b) shape", bCold.triggers)
+	// Part A, round 3: the (b) shape on the held engines - the echo-only
+	// window holds the tightened cut, and no false start leaks through the
+	// clears (the 398-v3 decay curve: the Finalize closes the open utterance
+	// and the cool segment absorbs the hangover - the first fed silence eats
+	// any false start and the discarded events never reach a reading).
+	bWarm := voice392Capture(t, rig, voice26pAnnounceA, echoWav, "", 0, 3)
+	if bWarm.triggers != 0 {
+		t.Fatalf("the default posture's echo-only window self-triggered (triggers=%d): the clears did not hold the (b) shape on the held engines", bWarm.triggers)
+	}
+	if bWarm.engineBuilt || !bWarm.engineWarm {
+		t.Fatalf("the default posture's echo-only window rebuilt instead of judging on the held engines: built=%v warm=%v", bWarm.engineBuilt, bWarm.engineWarm)
 	}
 	for _, ep := range rig.rv.bargein.readings().Episodes {
 		if ep.EnergyPass {
-			t.Fatalf("part A round 3 let an echo episode through the tightened cut (%.2f dBFS)", ep.RmsDbfs)
+			t.Fatalf("the default posture's echo-only window let an echo episode through the tightened cut (%.2f dBFS)", ep.RmsDbfs)
 		}
 	}
-	t.Logf("COLD-MULTIWINDOW echo-only triggers=0 episodes=%d all_below_cut=true (the (b) shape holds)", bCold.episodes)
+	t.Logf("WARM-DEFAULT echo-only triggers=0 episodes=%d all_below_cut=true (the (b) shape holds on the held engines; no false-start leak)", bWarm.episodes)
 
-	// Part B: the warm posture on. The engines the last cold window released
-	// are rebuilt here and then HELD - the 28-r1 warm shape - and the first
-	// warm window judges fine.
-	rig.rv.bargein.setKeepalive(true)
-	warm1 := voice392Capture(t, rig, voice26pAnnounceA, echoWav, talkerWav, voice392EarlyTalkerAt, 4)
-	if warm1.triggers != 1 {
-		t.Fatalf("the first warm window triggered %d time(s) (episodes=%d): the -20 talker was not judged",
-			warm1.triggers, warm1.episodes)
-	}
-	if !warm1.engineBuilt || warm1.engineWarm {
-		t.Fatalf("the first warm window did not build fresh (the cold round closed the engines): built=%v warm=%v",
-			warm1.engineBuilt, warm1.engineWarm)
-	}
-	t.Logf("WARM-POSTURE round=1 triggers=1 (the first warm window judges)")
-
-	// The revival (ticket 397): the second warm window judges again. The held
-	// engines walked their between-window clears at the last release - the
-	// APM's Reset, the resampler's Flush, the detector's Finalize plus the
-	// 1.2s cool segment whose boundary events are discarded - so the -20
-	// talker fires from the held pool exactly as the 392-r2 revival-cool
-	// readings pinned: episodes=1, triggers=1@talker, the residual at the
-	// cancelled depth (the profiles in the artifact). The clears are jointly
-	// load-bearing: removing any one regresses its own directed failure
-	// shape (the AC#3 overlay firings name them).
-	warm2 := voice392Capture(t, rig, voice26pAnnounceA, echoWav, talkerWav, voice392EarlyTalkerAt, 5)
-	if !warm2.engineWarm || warm2.engineBuilt {
-		t.Fatalf("the second warm window rebuilt the held engines: built=%v warm=%v", warm2.engineBuilt, warm2.engineWarm)
-	}
-	if warm2.episodes != 1 || warm2.triggers != 1 {
-		t.Fatalf("WARM REVIVAL MOVED: the second warm window read (episodes=%d triggers=%d), want episodes=1 triggers=1@talker (the 392-r2 revival-cool readings) - the between-window clears did not revive the judge or moved past them",
-			warm2.episodes, warm2.triggers)
-	}
-	t.Logf("WARM-POSTURE round=2 triggers=1 episodes=1 (the 397 revival: the held engines judge the second window again; the profiles are in the artifact)")
-
-	// The restore core: the switch back off, the (b) shape holds again.
+	// Part B: the switch-off face - the exact pre-392 shape. The cold
+	// posture rebuilds per window and keeps the (a)/(b) shapes on the same
+	// material (the pre-392 default's own reading, still the reverse gear).
 	rig.rv.bargein.setKeepalive(false)
+	aCold := voice392Capture(t, rig, voice26pAnnounceA, echoWav, talkerWav, voice392EarlyTalkerAt, 4)
+	if aCold.triggers != 1 {
+		t.Fatalf("the cold face's talker round triggered %d time(s) (episodes=%d): the (a) shape does not hold on the rebuilt engines",
+			aCold.triggers, aCold.episodes)
+	}
+	if !aCold.engineBuilt || aCold.engineWarm {
+		t.Fatalf("the cold face did not rebuild per window: built=%v warm=%v", aCold.engineBuilt, aCold.engineWarm)
+	}
+	if aCold.readySamples < voice392ColdReadyFloor {
+		t.Fatalf("the cold face's judge did not measure fresh (ready=%d samples)", aCold.readySamples)
+	}
+	t.Logf("COLD-FACE round=4 triggers=1 ready_samples=%d lag=%d (the pre-392 shape holds on the switch-off face)",
+		aCold.readySamples, aCold.lag)
+	bCold := voice392Capture(t, rig, voice26pAnnounceA, echoWav, "", 0, 5)
+	if bCold.triggers != 0 {
+		t.Fatalf("the cold face's echo self-triggered (triggers=%d): the cold posture does not hold the (b) shape", bCold.triggers)
+	}
+	if !bCold.engineBuilt || bCold.engineWarm {
+		t.Fatalf("the cold face's echo-only window did not rebuild: built=%v warm=%v", bCold.engineBuilt, bCold.engineWarm)
+	}
+	for _, ep := range rig.rv.bargein.readings().Episodes {
+		if ep.EnergyPass {
+			t.Fatalf("the cold face's echo-only window let an echo episode through the tightened cut (%.2f dBFS)", ep.RmsDbfs)
+		}
+	}
+	t.Logf("COLD-FACE echo-only triggers=0 episodes=%d all_below_cut=true built=true (the (b) shape holds on the rebuilt engines)", bCold.episodes)
+
+	// The restore core: the switch back on - the default's first window
+	// after the cold rounds builds fresh (the cold face closed the engines)
+	// and the (b) shape holds again.
+	rig.rv.bargein.setKeepalive(true)
 	bRestore := voice392Capture(t, rig, voice26pAnnounceA, echoWav, "", 0, 6)
 	if bRestore.triggers != 0 {
 		t.Fatalf("the restore round's echo self-triggered (triggers=%d)", bRestore.triggers)
+	}
+	if !bRestore.engineBuilt || bRestore.engineWarm {
+		t.Fatalf("the restore round did not rebuild (the cold face closed the engines; the default's first window back builds fresh): built=%v warm=%v",
+			bRestore.engineBuilt, bRestore.engineWarm)
 	}
 	for _, ep := range rig.rv.bargein.readings().Episodes {
 		if ep.EnergyPass {
 			t.Fatalf("the restore round let an echo episode through the tightened cut (%.2f dBFS)", ep.RmsDbfs)
 		}
 	}
-	if !bRestore.engineBuilt {
-		t.Fatalf("the restore round did not rebuild (the cold posture is not back): built=%v", bRestore.engineBuilt)
-	}
-	t.Logf("COLD-RESTORE triggers=0 episodes=%d all_below_cut=true (the pair closed)", bRestore.episodes)
+	t.Logf("DEFAULT-RESTORE triggers=0 episodes=%d all_below_cut=true built=true (the default is back and the pair closed)", bRestore.episodes)
 	write392JSON(t, "392-keepalive.json", map[string]any{
-		"cold_control": ctrl,
-		"cold_rounds":  voice392RoundsOut(partA),
-		"cold_echo":    voice392RoundOutFrom(bCold),
-		"warm_round1":  voice392RoundOutFrom(warm1),
-		"warm_round2":  voice392RoundOutFrom(warm2),
-		"cold_restore": voice392RoundOutFrom(bRestore),
-		"talker_at":    voice392EarlyTalkerAt.String(),
-		"talker_level": voice26pTalkerDbfs,
-		"revival":      "the 397 between-window clears revived the warm posture on the staged chain: the second warm window judges again (episodes=1, triggers=1@talker, the residual at the cancelled depth) - the 392-r2 revival-cool shape; the clears are jointly load-bearing (the AC#3 overlay firings), and the production default stays keepalive=false pending the separate default-flip ruling",
+		"control_first_build": ctrl,
+		"warm_rounds":         voice392RoundsOut(warmRounds),
+		"warm_echo":           voice392RoundOutFrom(bWarm),
+		"cold_round":          voice392RoundOutFrom(aCold),
+		"cold_echo":           voice392RoundOutFrom(bCold),
+		"restore_echo":        voice392RoundOutFrom(bRestore),
+		"talker_at":           voice392EarlyTalkerAt.String(),
+		"talker_level":        voice26pTalkerDbfs,
+		"default":             "the 401 flip made the cleared warm posture the production default: the held engines judge again window after window under the between-window clears (the WARM REVIVAL MOVED guard is live on the default path, no switch), the echo-only window holds on held engines with no false-start leak (the 398-v3 decay curve), and the switch-off face still carries the exact pre-392 cold shapes with the restore core bringing the default back",
 	})
 }
 
