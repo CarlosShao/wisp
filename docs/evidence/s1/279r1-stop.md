@@ -124,7 +124,7 @@ git status --porcelain -- cmd/wisp  = (空)
 |------|------|------|
 | 停手证据 | `docs/evidence/s1/279r1-stop.md` | 本件 |
 | 临时件 | `D:\tmp\wisp\20261102\279r1\` | DLLs + logs (`roster-test-255.log`, `family-255.log`) |
-| Commit | pending (only evidence file pathspec) | ⛔ amend/reset/push |
+| Commit | `d27b3ff43`（显式 pathspec 逐枚点名＝`docs/evidence/s1/279r1-stop.md` 一枚） | ⛔ amend/reset/push；⛔ cmd/wisp 零字节 |
 
 ---
 
