@@ -30277,3 +30277,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **385 结案**：`385-v1` 五格全 PASS「是否同意结 385: 是」（`tools/mockllm` 三处 400-byte clamp 全摘、`runeBoundaryWithin` UTF-8 边界回退、streaming `[]rune` 分块；多字节回归 `Test385EchoDeliversLongMultibyteInFull` PASS=20 FAIL=0；反向判据摘修复⇒红＋还原；零回归）。落地件 `fad2f5e4f`（2026-10-31 原腿）。编排者翻框 5 枚、Status→done、`git mv`→`-done`、双名闸现跑。已推。
 **派**：`386-v1`（386 mockllm 帽登记，落地 `1773881db`，mockllm 包已空出）。
+
+## A1412（2026-11-02 16:5x +08，编排者）★402-v1 不同意结：AC#1/AC#2 FAIL（静默杀主形未修）；402 仍开
+
+**402-v1 判语**：五格 ① PASS／② **FAIL**／③ PASS／④ PASS／⑤ PASS；SPEC-10 七项全 PASS；但 **AC#1「修静默杀主形」与 AC#2「无静默杀」实质未满足**——本机实证 pkg-dir 形状 **2/2 复现 AV `0xC0000005`**，死点 `TestBookedSnapshotReachesHostBitForBit329`，完成集 196/441；a07f685eb 只修了 **AC14 push 维度**（6/6 绿、mutant 红句注册），**未触静默杀主体**。判语件 `docs/evidence/s1/402-v1-verdict.md`。⇒ **402 不结，归"需深修 cmd/wisp 崩溃（panel 窗创建域状态累积）"待 deep-dive**（cmd/wisp 单发、与真窗族谨慎区分）。
+**派**：`244-v1`（244 r1/r2 后新鲜构建坐实 GUI 子系统 `-H=windowsgui`＋P1 冒烟真闸，cmd/wisp 单发）。
