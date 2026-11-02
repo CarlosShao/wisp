@@ -30393,3 +30393,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **44-v1 裁决（件 `b951d94d0`）**：**PASS＝AC#1/#2/#4/#6**（数学/聚合/未知价降级/版本记录，证据硬、突变能红、还原干净；③ 阈值行为 PASS）。**不同意整票结，三处具名欠账**：① **AC#5 整格未交付**（per-model 日/月配额闸、`plan_credit_total_micro` plan-credit 分账、"remaining 0→跳过派发＋链推进"）；② **AC#3 只 3/4**（80% 预警今天**无事件出口**，成本路径仅发 100% 被拒 `EvError`）；③ **产品不咬**（`cmd/wisp/run.go` 不填 `Config.Price`／`[cost]`，`SetCostBudget`/`BudgetFrom` 非测试代码**零调用者**）。
 **派**：`44-r2` 补上述三处（写面 observe/memory/agent＋`cmd/wisp/run.go`，★本波唯一 cmd/wisp 腿）。**45-r1 继续押后**（r2 要写 observe）。
 **在飞**：22-v1（web 验收）／50-r1d（plugin AC2）／44-r2（成本收尾）。
+
+## A1432（2026-11-02 22:1x +08，编排者）★44-r2 崩溃（交 checkpoint1/3 后死）；50-r1d 交付 AC2；派 44-r3 缩小步
+
+**44-r2 崩溃**：`ok:false/null`，但**先 commit 了 checkpoint `19b48978b`（AC#5 observe 部分）后才死**，未全丢；未完＝AC#3 warn／`run.go` 咬合／AC#5 其余。
+**50-r1d 交付 AC2**：`0e8f2ccea`（C16 host_api caret 版本门 `^1.0` vs host 1.x/2.x）＋`ce198441b`（证据）。
+**派** `44-r3`：缩到**最小两件**——AC#3 80% warn 事件出口＋`cmd/wisp/run.go` 生产咬合（填 `Config.Price`／`[cost]`＋`SetCostBudget`/`BudgetFrom` 调用者）；**≤12 次工具调用、单一 checkpoint**；AC#5 其余留 `44-r4`。
+**★教训**：大跨面腿易崩（`50-r1b`／`44-r2` 均 `ok:false/null`）⇒ **改小步、早 checkpoint、单腿单面**。
+**在飞**：22-v1（web 验收）／50-r1d（收尾）／44-r3（成本最小两件）。
