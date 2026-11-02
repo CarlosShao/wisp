@@ -30319,3 +30319,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **45-r1 停手上报**：票 45（诊断守卫 bundle 本尊住 `internal/observe/diagnostics.go:62`）写面＝`internal/observe`，与在飞 `44-r1` **同包**——44 正在写 `internal/observe`（costmeter.go／pricing_44_test.go／costmeter_44_test.go 活件，取钟 19:18）；45 产码 0、未 commit（做对，按派单「同包即停」）。**处置**：45 排 `44-r1` 完成后**串行重派**（同包只一枚写腿）。
 **派**：`22-r1`（web 工具 D30：SSRF／重定向链／协议矩阵／首访提示；前置 19／20 已 done；独立包）补第 3 写腿。
 **在飞 3 写腿**：44-r1（internal/observe 成本计）／31-r1（提醒）／22-r1（web）。
+
+## A1420（2026-11-02 19:5x +08，编排者）★31-r1 停手（3 硬闸）＋45 停手：A 档清单虚高实证；派 50-r1 补位
+
+**31-r1 停手上报**：票 31（提醒）三处硬闸同时命中，今日射程内无可落地写面，零产码；顺带订正第20处两笔——① 票面局限句「进程未运行则不会触发」≠ PLAN.md:2612 逐字「进程没在跑就不会触发」（按 PLAN 权威）；② `AGENTS.md` D42 表记 `PLAN.md:3035` 已腐烂，**真＝3057**。**31＋45 处置**：均归"需重分诊/串行"，非今日可写腿（A 档清单含相当比例硬闸/已落地，逐票现读才能定）。
+**派**：`50-r1`（Tier1 manifest 插件：schema／安装／篡改；前置 20 已 done；预期独立包如 internal/plugin）补第 3 写腿，逐票自核同包。
+**在飞 3 写腿**：44-r1（internal/observe）／22-r1（web）／50-r1（plugin）。
+★**流程教训**：派腿回执我 slice 400 字丢细节；停手腿应落停手报告件（下次派单加要求）。
