@@ -1321,6 +1321,12 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	prov := rt.provs[0]
 	info := prov.Info()
 	ep := rt.endpoint
+	// Ticket 44 生产咬合: the C23 money path needs two things from this
+	// composition root and had neither — a price card (Config.Price below, the one
+	// field loop.go prices every turn with) and the [cost] caps handed to the
+	// meter after the loop exists. Read from the LIVE cfg, so the ticket 223
+	// reload tick reaches both on the next task.
+	card, budget := agent.CostWiring(cfg, ep.Provider, ep.Model)
 	opts := agent.Options{
 		Provider: prov,
 		Tools:    rt.bridge,
@@ -1346,6 +1352,9 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 			PerToolTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS) *
 				time.Millisecond,
 			SteeringEnabled: cfg.Agent.SteeringEnabled,
+			// The model price card, looked up (never guessed): zero = 价格未知,
+			// which the loop books as tokens-only with Priced=false (AC#4).
+			Price: card,
 		},
 	}
 	// ticket 197: task.spawn reads this snapshot to build its child loop, so a
@@ -1374,6 +1383,11 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 		fmt.Fprintf(rt.stderr, "wisp run: agent 环路装配失败：%v\n", err)
 		return 1
 	}
+	// and the [cost] caps: uncapped params (a zero BudgetParams) keep the meter
+	// judging against no budget, which is the honest reading of a config that
+	// set none — but they are now handed over on every task, so [cost] in
+	// config.toml actually bites instead of only existing in the schema.
+	loop.SetCostBudget(budget)
 	// ticket 200: read the project's own instruction files (AGENTS.md and its
 	// siblings) and attach them to the loop assembled just above, so what the
 	// repository says about itself reaches the request instead of living in a
@@ -1780,6 +1794,12 @@ func (c consoleSink) Publish(e agent.Event) {
 		if e.Err != nil {
 			fmt.Fprintf(c.out, "\n[错误 %s] %s\n", e.Err.Class, e.Err.Detail)
 		}
+		changed = true
+	case agent.EvWarn:
+		// The C23 80% line (ticket 44 AC#3): the task starts, so this is not an
+		// error, but it has to be visible on the console the way the panel
+		// renders it — otherwise the event has a producer and no reader here.
+		fmt.Fprintf(c.out, "\n[预警] %s\n", e.Text)
 		changed = true
 	case agent.EvDone:
 		// The reply is over; the packet the panel renders has to carry that, or

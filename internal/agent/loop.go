@@ -409,7 +409,7 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 	//     error_class=budget and the explicit notice as its message, so "which
 	//     three tasks did it refuse yesterday" has an answer in the product's
 	//     own record instead of only in a log file.
-	if v := l.preDispatchBudget(ctx); v != nil {
+	if v := l.preDispatchBudget(ctx, taskID); v != nil {
 		res.Message = v.Notice
 		res.Err = observe.New(observe.ClassBudget, "agent: 新任务被费用预算拒绝")
 		l.publish(Event{Kind: EvError, TaskID: taskID, Text: v.Notice})

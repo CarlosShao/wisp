@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/observe"
 )
 
@@ -129,7 +130,7 @@ func (l *Loop) CostBudget(ctx context.Context) (CostReport, error) {
 // product outage, and the outage is the more expensive of the two. It is loud
 // (Warn, with the error), not silent, so a budget that never actually gates is
 // still discoverable from the log.
-func (l *Loop) preDispatchBudget(ctx context.Context) *observe.BudgetVerdict {
+func (l *Loop) preDispatchBudget(ctx context.Context, taskID string) *observe.BudgetVerdict {
 	if l.costMeter == nil {
 		return nil
 	}
@@ -137,6 +138,13 @@ func (l *Loop) preDispatchBudget(ctx context.Context) *observe.BudgetVerdict {
 	if err != nil {
 		l.log().Warn("agent: cost budget unreadable, the new task starts anyway", "err", err)
 		return nil
+	}
+	// The 80% half of AC#3: a task that starts anyway still announces the
+	// budget line it crossed. Before this publish point the warn Notice was only
+	// ever returned (BudgetVerdict.Notice) and never produced onto the bus, so the
+	// ticket"s "80% warn event" had no event exit — 44-v1 §3.2 ②.
+	if rep.Metered && rep.Verdict.AllowNewTask && rep.Verdict.Level != observe.LevelOK {
+		l.publish(Event{Kind: EvWarn, TaskID: taskID, Text: rep.Verdict.Notice})
 	}
 	if !rep.Metered || rep.Verdict.AllowNewTask {
 		return nil
@@ -151,4 +159,31 @@ func (l *Loop) SetCostBudget(b observe.BudgetParams) {
 	if l.costMeter != nil {
 		l.costMeter.SetBudget(b)
 	}
+}
+
+// CostWiring adapts the host's two C23 knobs into the shapes the loop consumes
+// (ticket 44 生产咬合: until a host calls this the price card is a zero value, every
+// turn costs 0 micros, and the meter judges against no cap at all — the [cost] section
+// and llm.providers.<p>.models.<m>.price were loadable and dead). The price card is
+// looked up, never guessed: a model config.toml does not carry a card for returns the
+// zero Price, which is PriceKnown() == false and the 价格未知 reading (AC#4), not a
+// fabricated number. The caps go through observe.BudgetFrom so a bad [cost] leaf is
+// refused there and leaves the loop uncapped with the host naming the reason.
+func CostWiring(cfg *config.Config, provider, model string) (config.Price, observe.BudgetParams) {
+	var card config.Price
+	var budget observe.BudgetParams
+	if cfg == nil {
+		return card, budget
+	}
+	if p, ok := cfg.LLM.Providers[provider]; ok {
+		if m, ok := p.Models[model]; ok {
+			card = m.Price
+		}
+	}
+	b, err := observe.BudgetFrom(cfg.Cost.DailyBudget, cfg.Cost.MonthlyBudget,
+		cfg.Cost.AlertThreshold, cfg.Cost.OverBudget)
+	if err != nil {
+		return card, observe.BudgetParams{}
+	}
+	return card, b
 }

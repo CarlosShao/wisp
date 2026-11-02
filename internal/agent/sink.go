@@ -34,6 +34,13 @@ const (
 	// EvError announces a classified failure (SPEC-05 §3.4: failures are
 	// visible and distinguishable, never a silent downgrade).
 	EvError EventKind = "error"
+	// EvWarn announces a non-fatal warning the user has to see: today the C23 money
+	// budget crossing [cost] alert_threshold (ticket 44 AC#3, "80% warn event"), where
+	// the task does start and nothing else announces it. It is its own kind rather than
+	// a reused EvError because an error says a task failed and a warning says one went
+	// through against a budget the user should know is close (票 40 renders the two
+	// apart).
+	EvWarn EventKind = "warn"
 	// EvDone closes the task.
 	EvDone EventKind = "done"
 )
