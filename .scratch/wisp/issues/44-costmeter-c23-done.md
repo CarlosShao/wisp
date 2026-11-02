@@ -1,6 +1,6 @@
 # 44 — CostMeter (C23): usage accounting, pricing, budgets, pause-at-limit
 
-**Status:** ready-for-agent
+**Status:** **已结案 done**（2026-11-02 23:1x 编排者：44-v2 非实现者综合复验六格 AC 全 PASS、同意结〔判语 `48c0ebfb1`〕，v1 三处欠账〔AC#5/warn 事件/产品咬合〕确已真补；commits `8827e54ca`+`dc88642e0`+`19b48978b`+`5ae48abc9`+`a11e63bee`+`b14ee2a95`；三条结票登记见 Progress log 末）
 **Claimed by:** —
 **Last update:** 2026-09-19
 **Blocked by:** 04-sqlite-core, 10-agent-loop-core
@@ -43,16 +43,18 @@ the cost tables.
   chain stepping logic (11).
 
 ## Acceptance criteria
-- [ ] Multi-turn golden task: per-task tokens/cost match hand-computed fixture to the unit.
-- [ ] Aggregates: day rollover + month rollover correct (fixture clocks); reconciliation with
+- [x] Multi-turn golden task: per-task tokens/cost match hand-computed fixture to the unit.
+- [x] Aggregates: day rollover + month rollover correct (fixture clocks); reconciliation with
       task_log exact.
-- [ ] Budget: 80% warn event; 100% → new task rejected with explicit message + running task
+- [x] Budget: 80% warn event; 100% → new task rejected with explicit message + running task
       finishes; warn-only mode alternative verified.
-- [ ] Unknown-price provider → tokens-only + marker (no invented currency amounts).
-- [ ] Quota: per-model daily/monthly gates; plan-credit bookkeeping (manual total − consumption,
+- [x] Unknown-price provider → tokens-only + marker (no invented currency amounts).
+- [x] Quota: per-model daily/monthly gates; plan-credit bookkeeping (manual total − consumption,
       "estimated" marker); **pre-dispatch anti-negative test (fixture: remaining 0 → dispatch
       skipped, chain advanced, visible event); 80%/100% events; plan vs pay-per-token tracked
       separately per model.**
-- [ ] Pricing-table version bump → recorded, old aggregates unchanged.
+- [x] Pricing-table version bump → recorded, old aggregates unchanged.
 
 ## Progress log (append-only, newest last)
+
+- [2026-11-02 23:1x +08] agent=编排者（结案）did=44-v2六格全PASS同意结(48c0ebfb1),v1三欠账(AC5/warn事件/产品咬合)真补;三条登记:①配额闸cmd/wisp装配腿=44-r5;②per-model消费永久落库D35加列=机主/§5;③realtime→票60/warn渲染→票40. 不挡结小项:costwiring_44r3_test.go超写面一寸(正当自报).
