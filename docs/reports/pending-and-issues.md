@@ -30433,3 +30433,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **PDF 仍依赖阻断**（pdfcpu 待机主批 SPEC-01 白名单）。
 **派**：`24-v1` 验收 docx/search.content＋裁 PDF 处置（24 能否在 docx+search 下结、PDF 单列或待批）。
 **在飞**：44-r4（成本 AC#5）／24-v1（文档验收）。
+
+## A1438（2026-11-02 22:4x +08，编排者）★44-r4 交付 AC#5 整格；44 现 AC1–6 全覆盖，派 44-v2 综合复验
+
+**44-r4 交付**：`a11e63bee`（`internal/agent/quota_44r4.go` 237 行＋测试 256）＋`b14ee2a95`（证据）。`go test ./internal/agent -run AC5` **7/7 PASS**：remaining 0 跳过派发（`calls==0`→`ClassBudget`）＋链推进不崩链／plan-credit 余额 1000−900=100＋「估算」marker＋plan 与 pay-per-token 分账物理隔离／负数拒且余额不变／80% warn 有 `EvWarn` 且仍派发／exhausted 落 `provider_health`／空 config 零 invent。零回归 agent 全包 `ok 4.441s`、observe/memory 零改动、反向六条具名。
+**⇒ 44 现 AC1–6 全覆盖**（r1 成本核心＋r2 observe 配额计算＋r3 预警/咬合＋r4 agent 配额接线）。**派** `44-v2` 综合复验（三轮改动后重新逐格验 AC1–6＋回归＋比对 44-v1 三处欠账是否已补）。
+**在飞**：24-v1（文档验收）／44-v2（成本综合复验）。
