@@ -30195,3 +30195,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **★337 落地两段齐**：`337-r1`(66d528120 接线 gate.go New()) ＋ `337-r2`(7fd2f37b5 补注入式宿主 risk.Logf)；剩 337-v1 非实现者验收（复核 r1+r2）后可结。
 **★调度决定（具名为什么暂不派 cmd/wisp 腿）**：cmd/wisp 已让出，但 `344r1`(写 internal/ball)、`345r1`(写 internal/config) 仍在飞，而 `cmd/wisp`/`internal/panel`/`internal/tools` 都 import ball/config ⇒ 现派 cmd/wisp 腿会读到半成品编译面（第21处污染）。故 **244-r1（console_other.go 注改＋构建验）与 337-v1 重跑 均待 ball/config 收口即发**。
 **在飞 4 条**：345r1(config)/344r1(ball)/340r1(approval)/346-c1(winsec普查)；写腿 3 条满≥3。
+
+## A1398（2026-11-02 11:4x +08，编排者）★344r1 交件收件（通过）＋补 244-r2 写腿保 ≥3
+
+**344r1 收件三把尺**：提交 `ebf33fd77`（5 件：`docs/evidence/s1/c21-native-tokens.md` 真相源改指 v3、`344r1-impl.md`、`internal/ball/tokens.go` **删 `GlassRing/GlassHi/GlassHiSoft` 三枚死玻璃色码**、`tokens_table_test.go`/`tokens_test.go` 改钉字段缺席反向钉）；历史线性（`285fad18b` 是祖先✓）；未推 1 → 已推 origin/dev。**通过**。待 `344-v1` 非实现者验收。
+**调度（写腿低于 3 即补）**：344r1 落 ball 线收口；但 345r1(config) 仍在写、340r1(approval) 在飞 ⇒ 写腿仅 2。**补 `244-r2`（scripts/build.ps1:309-310 冒烟空转修复，镜像 slo-check 的 Invoke-ExternalProgram；用 GUI-stub 证 fix 机制、⛔构建 cmd/wisp 避污染）** ⇒ 写腿＝345r1+340r1+244-r2 三条满 ≥3。
+**在飞**：345r1(config)/340r1(approval)/244-r2(scripts)/346-c1(winsec 普查)。**球/config 一旦收口即发** cmd/wisp 线：`244-r1`(console_other.go 注改+构建验)、`337-v1`(复核 r1+r2)、`395-v1`/`402-v1`。
