@@ -1,6 +1,6 @@
 # 22 — Web & open tools: web.search/fetch/open, file.open, app.launch, D30 five layers
 
-**Status:** ready-for-agent
+**Status:** **已结案 done**（2026-11-02 22:2x 编排者：22-v1 非实现者验收六格 AC 全 PASS、无放水，判语件 `afc39c489`；commits `547d9da00` 等 24 files +5014：SSRF/协议矩阵/首访/`docker/mockweb` 注入夹具/launcher）
 **Claimed by:** —
 **Last update:** 2026-09-19
 **Blocked by:** 19-provenance-c25, 20-host-bridge-fs-tools
@@ -38,14 +38,16 @@ first-visit-new-domain prompt.
   pending user decision.
 
 ## Acceptance criteria
-- [ ] SSRF suite: every private range form (incl. decimal/octal/hex IP encodings, DNS-rebinding
+- [x] SSRF suite: every private range form (incl. decimal/octal/hex IP encodings, DNS-rebinding
       fixture via mock) → denied BEFORE connection (receiver asserts zero hits).
-- [ ] Redirect chain test: https→http and https→file/private → blocked; response→Markdown
+- [x] Redirect chain test: https→http and https→file/private → blocked; response→Markdown
       conversion verified; huge response → spill path.
-- [ ] Protocol matrix: web.open/file.open allow/deny table per 16.5.3 — exhaustive test.
-- [ ] app.launch launches (notepad fixture) under Job; AUMID + name + path paths work.
-- [ ] Taint-in-query → L2 (R4 integration); first-visit prompt appears once, remembered.
-- [ ] `web.search` OPEN decision: ticket updated with user's chosen path OR scrape-default
+- [x] Protocol matrix: web.open/file.open allow/deny table per 16.5.3 — exhaustive test.
+- [x] app.launch launches (notepad fixture) under Job; AUMID + name + path paths work.
+- [x] Taint-in-query → L2 (R4 integration); first-visit prompt appears once, remembered.
+- [x] `web.search` OPEN decision: ticket updated with user's chosen path OR scrape-default
       noted with TODO block for 25 review.
 
 ## Progress log (append-only, newest last)
+
+- [2026-11-02 22:2x +08] agent=编排者（结案）did=22-v1非实现者验收六格AC全PASS无放水(判语afc39c489);22-r1交付web D30(547d9da00,24files+5014);Test22 60/60+race;反向五发全咬还原净. 结案.
