@@ -30387,3 +30387,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **50-r1c 交付**：`internal/plugin`——`manifest.go`（C14 结构＋闭合字段表＋`ParseManifest`，`parameters` 不透明不下钻）·`validator.go`（逐字段规则＋`ValidationErrors` 一次报全）·`tamper.go`（`ManifestHash=sha256:<hex>`、`VerifyBytes`/`LoadInstalled` 先哈希后解析、`ErrTampered`/`Alerter`/`plugin_tamper` 事件）＋`manifest_test.go`/`tamper_test.go`。C14 契约已定义（PLAN.md:1370／SPEC-07 §4§6），未发明字段。**AC1／AC4 落地；AC2／AC3／AC6 待**。
 **派**：`50-r1d`（AC2 host_api 版本门：`^1.0` plugin 在 host 1.x loads、vs 2.x refuse；internal/plugin 继续）。
 **在飞**：44-v1（成本验收）／22-v1（web 验收）／50-r1d（plugin AC2 写）。
+
+## A1431（2026-11-02 22:0x +08，编排者）★44-v1 判：部分 PASS 不可整票结；派 44-r2 补缺口
+
+**44-v1 裁决（件 `b951d94d0`）**：**PASS＝AC#1/#2/#4/#6**（数学/聚合/未知价降级/版本记录，证据硬、突变能红、还原干净；③ 阈值行为 PASS）。**不同意整票结，三处具名欠账**：① **AC#5 整格未交付**（per-model 日/月配额闸、`plan_credit_total_micro` plan-credit 分账、"remaining 0→跳过派发＋链推进"）；② **AC#3 只 3/4**（80% 预警今天**无事件出口**，成本路径仅发 100% 被拒 `EvError`）；③ **产品不咬**（`cmd/wisp/run.go` 不填 `Config.Price`／`[cost]`，`SetCostBudget`/`BudgetFrom` 非测试代码**零调用者**）。
+**派**：`44-r2` 补上述三处（写面 observe/memory/agent＋`cmd/wisp/run.go`，★本波唯一 cmd/wisp 腿）。**45-r1 继续押后**（r2 要写 observe）。
+**在飞**：22-v1（web 验收）／50-r1d（plugin AC2）／44-r2（成本收尾）。
