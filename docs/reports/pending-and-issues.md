@@ -30150,3 +30150,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **④ ★实测（关键、如实）**：改后**当前运行的 DSH 未热加载**——「不加 override 的默认子代理」探针仍落 `model: auto/deepseek-v4.1-flash / reasoningEffort: high`（继承主会话），**非 qfmodel/max** ⇒ **需重启一次 DSH 让 agent-default-model 新配置加载**
 **⑤ ★重启前的临时保证**：`workflow` `agent({provider:"magpie", model:"auto/qfmodel"})` **显式 override 已验证可通**（A1389）⇒ 派单时带 override 即可让子代理跑 Qwen（档位取默认、钉不了 max）；**主会话全程 DeepSeek 不变**
 **⑥ ★待机主**：重启一次 DSH（让子代理默认＝Qwen+max 生效；重启后会话重开，可由 HANDOVER/台账无缝接回）；或在 GUI「子代理模型」设置卡直接选 qwen+max（等价）
+
+## A1391（2026-11-02 09:5x +08，编排者）★★**收 395-r1 交件＝在飞 0、树干净、机主现在可重启（零损失）**
+
+**① ★交件核（盘上三把尺）**：commit `2216f0d3d`（父 `c9f6e097f`）真在；6 件 +490/−8＝`cmd/wisp/resident_voice_engines_windows.go`(+70)、`resident_voice_windows.go`(+5)、`resident_windows.go`(+5)、`run.go`(+22)、新测试 `resident_voice_acting_395r1_windows_test.go`(250)＋证据 `395r1-impl.md`(146)；**工作树 tracked 脏=0** ⇒ 提交真在＋件真在成立；★**"自己复跑"待非实现者 `395-v1` 验收（D22 双角色）**
+**② ★实现**：`speak()` HOP5a 由硬编码 `HasToolCall:false` → 按**真 `res.ToolCalls`** 分支（>0 走 D43#15 工具臂 Thinking→Acting ＋ #18 Acting→Speaking；否则纯文本臂）；事实链 `run.go execute()`→`voiceTurnTools`→`rv.noteTurnToolCalls`→`announce.hasToolCall`→`speak()`，失败行转 0；**D43 表/statemachine 零改**
+**③ ★诚实边界**：Acting 是 announce 交接点按真 res.ToolCalls **回放冻结边、非实时绿球**（`agent.EvToolStart` 全仓零生产者、写面只 cmd/wisp）；16-r1 demo 件未改（留裁）；Path-C 需 `-tags webrtcap` 自跳
+**④ ★待裁 3 项**：①16-r1 demo 是否更新 ②是否做实时缝（超本票，须 cmd/wisp 外造 EvToolStart 生产者）③Path-C webrtcap 重建
+**⑤ ★在飞=0、树干净 ⇒ 机主现在可重启 DSH（零损失）**；重启后 `agent-default-model=qfmodel+max` 生效；重启后派 `395-v1` 验收＋`337-v1` 验证＋337 残余补丁

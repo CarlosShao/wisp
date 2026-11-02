@@ -4113,3 +4113,6 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 **模型分工（A1390）**：主会话固定 DeepSeek；子代理默认已在 profile `agent-default-model`＝`magpie / auto/qfmodel / reasoningEffort: max`（**重启后生效**）；重启前用 `workflow` 显式 override `{provider:"magpie", model:"auto/qfmodel"}` 保证子代理跑 Qwen。
 
 **下一步队列**：①337-v1 验证 ②337 残余（注入式宿主 `risk.Logf` 需 cmd/wisp 补丁腿）③402-v1 验证（cmd/wisp 让出后）④395 收尾。
+
+### §4.更新（2026-11-02 09:5x）— 395-r1 已交件、在飞 0、可重启
+**395-r1 已交件＋已推：commit `2216f0d3d`（6 件 +490/−8，D43 零改）；在工作树脏=0、在飞=0 ⇒ 现在重启 DSH 零损失。** 重启后 `agent-default-model`＝`magpie/auto/qfmodel/reasoningEffort:max` 生效。重启后队列：①`395-v1` 验收（非实现者，D22）②`337-v1` 验证 ③337 残余 cmd/wisp 补丁腿 ④402-v1 验证。
