@@ -1,6 +1,6 @@
 # 86 — `TestResolvePerCallBudget` 那条 1ms 墙钟预算：并跑必假失败，本轮连单跑也红
 
-**Status:** open（排队）
+**Status:** 已结案 done（2026-11-02 19:2x 编排者据非实现者 86-v1「同意结 86」四格全 PASS 结案；落地件＝commit 4d0e2577d（internal/risk 4 枚测试文件把 1ms 绝对墙钟改成进程 CPU 时间自校准 GetProcessTimes/getrusage；1ms 预算一字未动；反向判据：旧墙钟形并跑红复现＋自校准后三档 rc=0 零 SKIP；`go test -count=2 ./internal/risk` rc=0、vet 三平台 rc=0）；判语件 docs/evidence/s1/86-v1-verdict.md＝11f40ee5e）｜原: open（排队）
 **Type:** 测试质量（脆弱性），**不是**性能回归
 **Blocks:** nothing · **Blocked by:** nothing
 **Packages:** `internal/risk/`（那条用例所在的测试文件）。**禁改**：冻结面与 `docs/`。
@@ -23,12 +23,12 @@
 
 ## AC
 
-- [ ] **AC#1** 先量出这条用例的**真实分布**：`-count=10` 单跑 / 与 `internal/config` 并跑 / 与全仓并跑，
+- [x] **AC#1** 先量出这条用例的**真实分布**：`-count=10` 单跑 / 与 `internal/config` 并跑 / 与全仓并跑，
       三档各给 `ms/op` 的**全部样本**（不许只报平均、不许抹掉坏尾部），并给出机器核数。
-- [ ] **AC#2** 按上面的边界改成自校准或 `testing.Short()` 门控，**并保留一条能抓到真回归的断言**
+- [x] **AC#2** 按上面的边界改成自校准或 `testing.Short()` 门控，**并保留一条能抓到真回归的断言**
       （变异检验：人为把每次解析多塞一次真实工作 ⇒ 该用例必须红）。
-- [ ] **AC#3** 三档并重跑：单跑 rc=0、并跑 rc=0、且**没有任何新增 SKIP**（逐条点名 `--- SKIP`）。
-- [ ] **AC#4** 门禁：`gofmt -l` 空、`go vet ./internal/risk/` rc=0、`go test -count=2 ./internal/risk/` rc=0。
+- [x] **AC#3** 三档并重跑：单跑 rc=0、并跑 rc=0、且**没有任何新增 SKIP**（逐条点名 `--- SKIP`）。
+- [x] **AC#4** 门禁：`gofmt -l` 空、`go vet ./internal/risk/` rc=0、`go test -count=2 ./internal/risk/` rc=0。
 
 ## Rules（本仓固定）
 
@@ -51,3 +51,5 @@
   拿一次安静的单跑数字去勾框，等于把这条脆弱性重新藏起来。
 
 （空）
+
+- [2026-11-02 19:2x +08] agent=编排者（结案）did=据非实现者 86-v1 四格全 PASS「同意结86」翻框结案；落地件=commit 4d0e2577d(1ms绝对墙钟→进程CPU自校准,预算一字未动);判语=docs/evidence/s1/86-v1-verdict.md。
