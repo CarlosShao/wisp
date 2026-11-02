@@ -30303,3 +30303,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **86-r1 交付**：commit `4d0e2577d`「票 86 落地腿 86-r1：C26 每调用预算的仪器改自校准」——4 枚**全 `internal/risk` 测试文件**（`pathresolver_budget_norace_test.go` +311；`proccpu_windows_test.go`(GetProcessTimes)／`proccpu_unix_test.go`(getrusage)／`proccpu_unsupported_test.go`）；零产码、⛔ 碰 thresholds/golden。★**漏 `docs/evidence/s1/86r1-impl.md`（腿未产 impl 证据件）**——非致命，verdict 腿补全 AC 读数作凭据。
 **派**：`86-v1`（非实现者验收 internal/risk，跑 `TestResolvePerCallBudget` 三档，补 verdict）。
 **在飞**：402-c2／44-r1／86-v1。
+
+## A1417（2026-11-02 19:0x +08，编排者）★第 9 票结案：402 → done（402-c2 重评「同意结」；静默杀证为平台事实）
+
+**402 结案**：`402-c2`（非实现者裁决）重评五格：② 由 FAIL 改判 **PASS**——**正确 sherpa 三层 staging 现跑 E3/E4 整包 581/575 RUN 零 AV 完整跑完**，terminal anchor 对称、死点未漂；**402-v1 之 AV/196-441 系 staging 未摆对（缺 DLL）的假象＋cmd/wisp 真窗族平台特性，非 402 缺陷**；单发死点 `TestBookedSnapshotReachesHostBitForBit329` 6/6 PASS。AC#1/2/3/4/5 全 PASS。AC14 push 维度 `a07f685eb` 6/6 green＋mutant 红句注册有效。判语 `docs/evidence/s1/402-c2-verdict.md`＝44afb4d03。编排者翻框（AC#4 补勾）、Status→done、`git mv`→`-done`、双名闸现跑。已推。**登记待办**：真窗族"整包零 AV"需机主空闲安静窗口复跑（pending_read，归票 314 范围，不新开票）。
+**派（补写腿）**：`31-r1`（提醒 set/cancel/list/持久化/跳钟）＋`45-r1`（诊断守卫 bundle/磁盘满/WAL/LRU）。
