@@ -30370,3 +30370,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **296-r1 停手上报（零码，写 296r1-stop.md）**：票 296 已落地——热键重载源跳 `ApplyHotkeyDefaults` 已修（`cmd/wisp/resident_windows.go` `hotkeyReloadSource296` 两 `return` 皆过合并，blob `be971cf7` 不变）；AC#2 过头注释收敛（`296-r2` `1d6b0cf9`，非实现者 `296-v2` 裁 AC#2/AC#5 成立，10-20 编排者翻勾）；**票框 6/6 全勾**；今日活读数 `go test ./cmd/wisp -run 'Test296|Test258'` rc=0、13 PASS。**未 -done＝编排者明示预留：AC#3ⓒ 需机主在场安静窗口的真机读数**（同票 314 那类）。⇒ **296 归 C 档（需机主真机窗口），6 格虽勾但不可结**。
 **派**：`50-r1b`（Tier1 插件 manifest 核心真实现：AC1 C14 manifest schema 校验＋AC2 host_api 版本门＋AC4 tamper；internal/plugin 隔离；AC3/AC6 留后续腿）。
 **在飞**：22-r1（web）／44-v1（成本验收）／50-r1b（plugin core）。
+
+## A1428（2026-11-02 21:2x +08，编排者）★50-r1b 子代理异常失败（零痕迹）；收窄重派 50-r1c
+
+**50-r1b 失败**：返回 `ok:false/out:null`，盘上零痕迹（无 commit、`internal/plugin` 无改动、无证据件）＝**子代理异常（非停手）**。**重派** `50-r1c`：范围收窄到 **AC1（C14 manifest schema 校验，unknown key 拒绝）＋AC4（tamper bit-flip ⇒ load refused）**，去掉 AC2/AC3/AC6 降低崩溃面；C14 shape 未定义即停（⛔发明 schema）。
+**在飞**：22-r1（web）／44-v1（成本验收，正在反向突变 internal/observe/costbudget.go）／50-r1c（plugin manifest 校验）。
