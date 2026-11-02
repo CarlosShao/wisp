@@ -30413,3 +30413,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **派** `24-r1`（文档与检索工具：PDF/docx 读取＋`search.content`；前置 20 已 done；internal/tools 已由 22 交付后空出；本腿只碰文档类件、⛔碰 web*.go／internal/plugin／cmd/wisp=44-r3 在写）。
 **50 暂 park**：AC1（C14 校验）/AC2（host_api 门）/AC4（tamper）已交，AC3（install e2e＋UI）/AC6（bridge 工具可见性）待；因 50 腿连续崩（r1b/r1d 皆 `ok:false`），先不追，留多轮专门攻坚。
 **在飞**：44-r3（成本最小两件）／24-r1（文档检索）。
+
+## A1435（2026-11-02 22:3x +08，编排者）★24-r1 停手（依赖闸·正确）：PDF 需库；铁律处置——先零依赖，依赖白名单摆机主批
+
+**24-r1 停手**：PDF 文本抽取需 PDF 解析库，`go.mod` 无，`SPEC-01:96-101` 依赖白名单八件逐字"新增须人批准"，票 `:16-17` 自证；docx＋search 三件零新依赖可做，PDF 纯 stdlib＝自选库/发明 ⇒ 按未定义即停（写 24r1-stop.md，commit `4b354f135`）。
+**★铁律⓪处置（技术选型 agent 拍，只把契约文字摆机主）**：PDF 解析建议 **pdfcpu**（纯 Go、Apache-2.0、主流；unidoc 为 AGPL 不宜）**加进 SPEC-01 依赖白名单**——此为"改契约文字"属机主三类之一，**列入待批清单**。同时**不空等**：先派 `24-r2a` 落 docx＋`search.content` 零依赖部分，PDF 留 `TextExtractor` 接口＋stub（待依赖批准后接 pdfcpu）。
+**DEFERRED 标记字面**：仓内既有 `D28-1`/`D11-3` 形 ⇒ 本票用 `D34-1`（编排者定字，非契约改动）。
+**派**：`24-r2a`（docx 读取＋`search.content` 零依赖；PDF 留接口）。**在飞**：44-r3（成本）／24-r2a（文档零依赖）。
