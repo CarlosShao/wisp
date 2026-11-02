@@ -30259,3 +30259,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **337 结案**：非实现者 `337-v1` 六格全 PASS「同意结票 337」（判语件 `337-v1-verdict.md`=`15d108ef4`）＋`337-v1c` 补上 337-v1 留的 cmd/wisp 半格（真跑 `TestTicket337R2*` 两枚：`TestOnRuntimeAudit`/`TestWhenHostNeverArmed` 各 rc=0、审计句落 sink `:208`；三格全 PASS「337 可翻框」）。落地腿 `337-r1`=`66d528120`（gate.go New() 接 risk.Logf）＋`337-r2`=`7fd2f37b5`（run.go:758 注入式宿主 risk.Logf=rt.auditf）。编排者翻框 7 枚、Status→done、`git mv`→`-done`、双名闸现跑。已推。
 **派**：`402-v1`（402 打捞件 a07f685eb 待验，AC#4 零回归电池，cmd/wisp 单发）。
+
+## A1409（2026-11-02 15:2x +08，编排者）★分诊收件（165 未结票三档）＋派 385r1/86r1 非 cmd 写腿
+
+**分诊件**：`docs/evidence/s1/triage-20261102.md`（只读腿现跑 165 未结：**A 83（cmd/wisp 面 30 需分波）／B 55 归口／C 27（待人 23＋已撤 4）**）。
+**★已知陈旧点（⛔ 照抄分诊）**：①345 分诊记"待人"→ 实则已由 `345-r1`(2d3ad35e9) 交付、待 345-v1 验收；②244 分诊记 B"硬前置"→ 实则 r1/r2 已收口、只差新鲜构建坐实；③402 分诊记 B"待 395-r1 让出 cmd/wisp"→ 395-r1 已收、已排 `402-v1` 在跑。
+**派（非 cmd/wisp 写腿，与 402-v1 并行）**：`385r1`（tools/mockllm 400 字节腰斩多字节 UTF-8）＋`86r1`（ResolvePerCallBudget 墙钟脆弱→自校准，三档重跑取数）。
+**C 档待人 23 枚**（56/60/61/62/65/68/100/138/148/150/191/192/193/211/264/266/290/291/293/314/345/350/354）已集中入清单、摆机主一次。
