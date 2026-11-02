@@ -30287,3 +30287,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **386 结案**：`386-v1` 五格全 PASS「同意结 386」（四帽判定与盘上代码逐枚对上、有意半边有 ASCII 对照钉死；反向用 `1773881db^` 自建快照独立复现红→绿→装回复红同位→还原核；`tools/mockllm` FAIL=0、消费方 E2E 全绿；§7.2 过期注释尾归 cmd/wisp 所有者）。落地件 `1773881db`（票386落地腿386-r2）。判语件 `386-v1-verdict.md`＝200fb51b6。编排者翻框 5 枚、Status→done、`git mv`→`-done`、双名闸现跑。已推。
 **派**：`391-v1`（391 mockllm max_tokens 死字段两方言，落地 `6cf941b72`，mockllm 包空出）。
+
+## A1414（2026-11-02 17:4x +08，编排者）★第 7 票结案：244 → done（非实现者 244-v1 全 AC PASS）
+
+**244 结案**：`244-v1` 全 AC PASS「同意结 244」——新鲜构建 `build/wisp.exe` → `Subsystem 00000002 (Windows GUI)`（objdump）、P1 冒烟门对照（旧 `&` 读陈值 0 假绿 ⇄ 新 `Process.Start+WaitForExit` 真读退出码 7 真红）、真 `wisp doctor` 过、console 注释与现状一致。落地链 244-r1=`8edbed156`(注释改精准条件句)＋244-r2=`19fccc726`(build.ps1 冒烟 `Invoke-ExternalProgram`)＋`fafac05d6`(证据)；判语件 `244-v1-verdict.md`。编排者翻框 7 枚、Status→done、`git mv`→`-done`、双名闸现跑。已推。**残余登记**：build.ps1:246-248 注释「(redirected or parent console)」应「(redirected only)」——留后续小笔。
+**在飞**：391-v1（mockllm 验收）／86-r1（预算墙钟写）／402-c2（判静默杀属平台事实还是真缺陷，定 402 去向）。
