@@ -73,3 +73,10 @@
 ## 结论
 
 **同意结 340**：题面三格（AC#0/1/2）＋零回归＋纪律全部 PASS，反向判据由本腿以 overlay 独立复现两枚红句；340-r1 交付即票 328 必答①交回的那半格（叠改形真产用例从 0 → 1，且自带去牙成对）。翻框与结案由编排者按 AC#6 执行（本腿⛔ 翻框）。
+
+## 补记（同腿追加，12:5x+08）——测量树具名与并发时间线
+
+- **时间线现量**：起手三核跑于 `063dcd4d1`（≥`8edbed156` 真，当时 `internal/config` 8 枚脏＝345r1 在写、如实不碰）。`2d3ad35e9`（345-r1 config 收口）落盘 12:43:27、编排者收件 `ea41fcab7`（A1402）12:45:30——本腿**全部测量读数（go test 全量/窄面、M1/M2 overlay、d22scan、gofumpt）均取在 12:47 之后**，即跑在具名树 **`ea41fcab7`**（＝验收 HEAD ＋ 345-r1 config 件）上、工作树已净（tracked 零脏，复量＝`git status --porcelain` 无 ` M` 行）。
+- **对结论的零影响，逐尺坐实**：① approval 面 `412a58356..HEAD` 零提交（`git rev-list --count 412a58356..HEAD -- internal/agent/approval`＝0，本腿前后各量一次同数）⇒ 被验交付字节全程未动；② approval 生产＋测试文件对 `internal/config` 引用＝**0**（`git grep -l 'internal/config' HEAD -- internal/agent/approval` rc=1）；③ 传递面如实具名：`internal/agent/loop.go`/`cost.go` import config ⇒ 345-r1 的 config 字节经传递编译进入 approval 测试二进制，**而全量包 86 PASS/0 FAIL 与新用例 PASS 正是在"config 已收口"的树上取得**——若 345-r1 改动破坏 approval 回归，此读数会红而非绿，故零回归判定在该联合树上成立且更强（对 `063dcd4d1` 树而言 approval 面字节相同，结论不变）。
+- **git show／具名树诸尺**（AC#0 字面尺、numstat、name-only、ancestor 核）一律钉 `412a58356^`／`412a58356`／`HEAD-at-check`，不受并发影响。
+- 判语各格判定与"同意结 340"结论：**不变**。本补记只把测量树从含混的"HEAD"钉死为 `ea41fcab7`（12:47+ 读数）＋`063dcd4d1`（起手核），供收件时逐字复跑。
