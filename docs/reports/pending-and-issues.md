@@ -30237,3 +30237,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **344 结案**：`344-v1` 五查全 PASS「同意结 344」（判语件 `docs/evidence/s1/344-v1-verdict.md`＝`182499a34`）→ 编排者翻框 7 枚、Status→done、`git mv`→`-done`、追加结案 bullet、判语入史；**双名闸现跑 `grep -c issues/344-`＝1**，已推 HEAD `59ec80e9f`。落地腿 `344-r1`＝`ebf33fd77`（C21 真相源改指 v3 `tokens.generated.css`＋删 `GlassRing/GlassHi/GlassHiSoft` 三死码；反向判据：overlay 恢复字段⇒编译红）。**偏差登记**：344-r1 另动了 `internal/ball/tokens_test.go` 注释（引 retired GlassRing）——在 `internal/ball/**` 写面内、无害。
 **验收在飞**：337-v1 / 395-v1。下波：402-v1、244 构建验、346 归口。
+
+## A1405（2026-11-02 13:2x +08，编排者）★337-v1 收件：六格全 PASS「同意结票 337」，但 cmd/wisp 经验红那半格留边界→337 暂不翻框
+
+**337-v1 判语**：判语件 `docs/evidence/s1/337-v1-verdict.md`（commit `15d108ef4`，17KB）——起手三核/AC#0 消费者0＋正控/AC#1 两处接线(gate.go:180-182＋run.go:758)/AC#2 反向判据(overlay 同摘两处⇒rc=1)/AC#3 零回归(approval/risk/tools FAIL=0；panel 1 枚=TestC21DesignTokensFourWayAgree 归因到 344-r1 已处理)/AC#4 门禁四数 rc=0/AC#5 纪律——**全 PASS，「同意结票 337」**。
+**★边界（verdict 自具名）**：cmd/wisp 那两枚注入支用例的**经验红**本腿没跑（避与 395-v1 cmd/wisp 并发），交复跑。⇒ **337 暂不翻框**：待 395-v1 收后，编排者自跑 `go test ./cmd/wisp -run 'TestRiskSinkInjected337r2' -timeout 30m`（sherpa staging）坐实那半格，再据「同意结」翻框结 337。
+**已推**判语件（`15d108ef4`）。**验收在飞**：395-v1（唯一 cmd/wisp 腿）。下波：402-v1、244 构建验、346 归口。
