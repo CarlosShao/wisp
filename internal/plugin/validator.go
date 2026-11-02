@@ -69,13 +69,17 @@ func Validate(m *Manifest) ValidationErrors {
 		})
 	}
 
-	// Grammar check of the C16 range string is the host_api gate cell (ticket 50
-	// AC2), not this one: here the field only has to be present and clean.
+	// Presence/cleanliness is this cell (AC1); the range grammar is checked
+	// here too so an unreadable host_api never reaches the C16 gate, whose
+	// verdict (load vs refuse) is ticket 50 AC2 — hostapi.go.
 	switch {
 	case m.HostAPI == "":
 		errs = append(errs, ValidationError{Field: "host_api", Reason: "required (C16 range, e.g. \"^1.0\")"})
 	case hasControl(m.HostAPI):
 		errs = append(errs, ValidationError{Field: "host_api", Reason: "contains control characters"})
+	case func() bool { _, err := ParseCaretRange(m.HostAPI); return err != nil }():
+		_, err := ParseCaretRange(m.HostAPI)
+		errs = append(errs, ValidationError{Field: "host_api", Reason: fmt.Sprintf("invalid C16 range: %v", err)})
 	}
 
 	switch {
