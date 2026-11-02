@@ -30117,3 +30117,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **③ ★本轮派 2 写腿（写面互斥）**：`395-r1`（cmd/wisp resident_voice_engines 派发位）＋`337-r1`（internal/risk/agent/panel 读侧接线）——**缺第三写腿具名**：402 验证腿须跑 cmd/wisp 整包（与 395 撞车、排 395 交件后）／350 契约邻接需人工批准面／244 构建形态可下一波
 **④ ★goal resume 被策略拒（paused 只能机主本机恢复）**——**不阻塞：逐轮实活推进**
 ★票池：done=218／open=168
+
+## A1387（2026-11-02 09:3x +08，编排者）★**模型分工实测：override 机制通、但 Qwen3.8-Flash 在本会话路由组打不通**（goal rev26 已录机主令）
+
+**① ★机制已验证可用**：`workflow` 的 `agent(prompt,{provider,model})` **确实能覆盖模型**——★**`provider:"magpie", model:"auto/deepseek-v4.1-flash"` → 回复「收到」**（与主会话同模型、走 auto 组）；默认不覆盖也正常。⇒ **换模型派单＝可行，走 workflow**（subagent/spawn_teammate 无 model 参数）
+**② ★Qwen3.8-Flash 全部不通（6 探针 17 agent）**：注册表确有 `qwen3.8-flash`（providers：opencode-go/opencode/qwen-token-plan-cn/…，model id 亦有 `alibaba/qwen3.8-flash`、`qwen/qwen3.8-flash`）＋`Xhigh` 是 thinking level；但**试遍 `auto/`、`qwen/`、`opencode/`、`qwen3.8/`、`qwen-token-plan/`、`alibaba/` 六组 × magpie/直连 provider 全 `NULL(fail)`**
+**③ ★根因判读**：本会话 **routing group 只放通 deepseek（auto 组）**；Qwen 那几家 provider **未在本会话启用/未配凭据** ⇒ 非代码问题、是宿主路由/凭据面
+**④ ★待机主（1 件）**：★**在 GUI 模型选择器里看 Qwen3.8-Flash 的 routing group 名（斜杠前那段）告知我**，或★**在 GUI 里选一次 Qwen3.8-Flash 让宿主注册/授权**——通了我就把子代理切到 `magpie / <组>/qwen3.8-flash`（含 Xhigh 档验证该 API 是否吃档位参数）
+**⑤ ★当前不阻塞**：子代理仍走 subagent 继承主模型，编队照常推进
