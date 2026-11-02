@@ -791,10 +791,42 @@ func (r *voiceResidency) reading() string {
 // ---- the announce path ----------------------------------------------------
 
 // voiceAnnounceRequest is one sentence the process wants said out loud, plus the
-// C25 scope it came from.
+// C25 scope it came from and, since ticket 395, the shape of the turn that
+// produced it.
 type voiceAnnounceRequest struct {
 	text  string
 	scope string
+	// hasToolCall is ticket 395's D43#15 guard fact: the finished turn's first
+	// response carried a tool call. When true, speak() enters the ball through
+	// #15's TOOL arm (Thinking -> Acting) and leaves Acting through #18's
+	// has-announcement guard (Acting -> Speaking) before the sentence plays; when
+	// false it keeps the pre-395 pure-text arm (Thinking -> Speaking). Captured
+	// from the real res.ToolCalls at announce time.
+	hasToolCall bool
+}
+
+// noteTurnToolCalls records how many tool calls the turn being presented really
+// executed (ticket 395). The composition root calls it right before presenting
+// a completed result; the next announce consumes it and carries "the turn's
+// first response had a tool call" into speak()'s D43#15 dispatch. It is reset on
+// every turn, so a pure-text turn (0) can never inherit a previous turn's shape.
+func (rv *residentVoice) noteTurnToolCalls(n int) {
+	if rv == nil {
+		return
+	}
+	rv.announceMu.Lock()
+	rv.turnToolCalls = n
+	rv.announceMu.Unlock()
+}
+
+// takeTurnToolCalls consumes the pending turn-shape fact (ticket 395) exactly
+// once, so only the first announcement of a turn carries the tool-arm walk.
+func (rv *residentVoice) takeTurnToolCalls() int {
+	rv.announceMu.Lock()
+	defer rv.announceMu.Unlock()
+	n := rv.turnToolCalls
+	rv.turnToolCalls = 0
+	return n
 }
 
 // announce asks the voice chain to say one sentence. It is called from any
@@ -822,7 +854,12 @@ func (rv *residentVoice) announce(text string) bool {
 	if scope == "" {
 		scope = voiceAnnounceScope
 	}
-	req := voiceAnnounceRequest{text: text, scope: scope}
+	// Ticket 395: consume the pending turn-shape fact once, here, so exactly
+	// this sentence carries it into speak()'s D43#15 dispatch. noteTurnToolCalls
+	// reset it on every turn, so a pure-text turn (0) can never inherit a
+	// previous tool turn's shape.
+	hasToolCall := rv.takeTurnToolCalls() > 0
+	req := voiceAnnounceRequest{text: text, scope: scope, hasToolCall: hasToolCall}
 	rv.announceMu.Lock()
 	if len(rv.announcePending) >= voiceAnnounceQueue {
 		rv.announceMu.Unlock()
@@ -973,12 +1010,29 @@ func (rv *residentVoice) speak(req voiceAnnounceRequest) {
 
 	// HOP 5a: the ball walks into Speaking BEFORE the first sample, because the
 	// orb is the answer to "is it talking" and a hop dispatched after the audio
-	// would show it talking late. D43 #15 is the only legal way in from Thinking
-	// and its guard is "first token, no tool call" - a pure-text result is the
-	// definition of that.
-	moved := rv.dispatch(statemachine.EvFirstToken,
-		&statemachine.Facts{HasToolCall: false, HasAnnouncement: true},
-		"播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）")
+	// would show it talking late.
+	//
+	// Ticket 395: when the turn that produced this sentence really carried a tool
+	// call, D43#15's guard "first-token-has-tool-call" holds, so the legal entry
+	// from Thinking is the TOOL arm (Thinking -> Acting). The tools have then
+	// completed and this sentence IS the announcement, which is exactly D43#18's
+	// has-announcement guard (Acting -> Speaking). A pure-text turn keeps the old
+	// single hop: #15's pure-text arm (Thinking -> Speaking). Both walks are the
+	// frozen D43 rows - no new row, no table edit.
+	var moved bool
+	if req.hasToolCall {
+		if rv.dispatch(statemachine.EvFirstToken,
+			&statemachine.Facts{HasToolCall: true, HasAnnouncement: true},
+			"播报：D43#15 首个 token 带 tool call 让球走 Acting（Acting 家族可达）") {
+			moved = rv.dispatch(statemachine.EvToolsCompleted,
+				&statemachine.Facts{HasAnnouncement: true},
+				"工具完成：D43#18 Acting 到 Speaking（这一句就是播报）")
+		}
+	} else {
+		moved = rv.dispatch(statemachine.EvFirstToken,
+			&statemachine.Facts{HasToolCall: false, HasAnnouncement: true},
+			"播报：D43#15 首个纯文本 token 让球走 Speaking（TTS 说这一句）")
+	}
 
 	// HOP 3 and 4: synthesis and the device.
 	speaker, serr := rv.newSpeaker(eng.SampleRate())

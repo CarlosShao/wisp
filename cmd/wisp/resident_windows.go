@@ -578,6 +578,11 @@ func runResident() {
 		if src != nil && src.run != nil {
 			prov = src.run.c25
 			src.run.voiceAnnounce = rv.announce
+			// Ticket 395: the same boot line also hands the leg the turn's
+			// tool-call shape, so a voice turn whose first response carried a
+			// tool call walks D43#15's tool arm into Acting instead of the
+			// pure-text arm it always took.
+			src.run.voiceTurnTools = rv.noteTurnToolCalls
 		}
 		rv.attachProvenance(prov)
 		// Ticket 26's one needle (26r3): the announce path now drives the capture

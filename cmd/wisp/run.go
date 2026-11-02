@@ -320,6 +320,14 @@ type agentRuntime struct {
 	// every hop after that (risk.ChTTS gate, TTS engine, output device, the
 	// ball's Speaking) belongs to the leg, not to this runtime.
 	voiceAnnounce func(text string) bool
+	// voiceTurnTools is ticket 395's turn-shape seam. It carries the number of
+	// tool calls the finished turn REALLY executed into the voice leg just
+	// before the result is presented, so the announce path can take D43 #15's
+	// tool arm (Thinking -> Acting) when the turn's first response carried a
+	// tool call - instead of the pure-text arm every tool-carrying turn walked
+	// before this ticket. It is the real res.ToolCalls, not an inference; nil
+	// when this process assembled no voice chain (the CLI's shape).
+	voiceTurnTools func(toolCalls int)
 	// presenter is 票 30 收口残余③'s D10 tier router (internal/present), wired
 	// once by the resident assembly root (assembleResidentPresenter). execute()
 	// hands every COMPLETED result to it after loop.Run returns; nil keeps the
@@ -1501,6 +1509,20 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// (a long result would notify, a tier-4 result would announce twice), so
 	// the gate is the reconciliation, not a behaviour swap: the CLI run reads
 	// byte-identical behaviour from this block, because its presenter is nil.
+	// Ticket 395: hand the voice leg the turn's real tool-call shape BEFORE it
+	// presents, so a completed turn whose first SSE response carried a tool call
+	// walks D43#15's TOOL arm into Acting (then #18 out to Speaking for this
+	// announcement), not the pure-text arm. The count is the loop's own
+	// res.ToolCalls - a row that really landed, not an inference. Only a
+	// COMPLETED result has a spoken reply; a failure line keeps the legacy
+	// pure-text announce it always had, so nothing about failures changes.
+	if rt.voiceTurnTools != nil {
+		if res.Status == agent.StatusCompleted {
+			rt.voiceTurnTools(res.ToolCalls)
+		} else {
+			rt.voiceTurnTools(0)
+		}
+	}
 	if rt.presenter != nil && res.Status == agent.StatusCompleted {
 		rt.presenter.Dispatch(ctx, present.Input{TaskID: res.TaskID, Text: res.Text})
 	} else {

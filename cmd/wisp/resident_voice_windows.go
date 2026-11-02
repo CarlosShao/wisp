@@ -407,6 +407,11 @@ type residentVoice struct {
 
 	announceMu      sync.Mutex
 	announcePending []voiceAnnounceRequest
+	// turnToolCalls is ticket 395's pending turn-shape fact: how many tool calls
+	// the turn being presented really executed. Set from the composition root
+	// before it presents (noteTurnToolCalls) and consumed once by the next
+	// announce (takeTurnToolCalls). Guarded by announceMu.
+	turnToolCalls int
 
 	// handOffStarted and chainReady are the first-use trigger's own state, owned
 	// by the consumer goroutine: the walk AND the engine load run on the roster's
