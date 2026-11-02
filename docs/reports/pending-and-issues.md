@@ -30381,3 +30381,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **22-r1 交付**：web 工具 D30——`internal/tools`（web 守卫/SSRF/首访/协议矩阵 web*.go＋launcher）＋`docker/mockweb`（nginx.conf＋fixtures clean/injection）＋证据件；最后 commit `547d9da00`（多枚）。22-r1 报"红来自 50-r1c 在飞 internal/plugin 半成品"（跨包，非其缺陷；其提交树无 plugin 文件）。
 **派**：`22-v1`（非实现者验收 internal/tools web D30；⛔ 误把 50-r1c 的 plugin 红算它头上）。
 **在飞**：44-v1（成本验收）／50-r1c（plugin manifest）／22-v1（web 验收）。
+
+## A1430（2026-11-02 21:5x +08，编排者）★50-r1c 交付（AC1 C14 校验＋AC4 tamper）；派 50-r1d（AC2）
+
+**50-r1c 交付**：`internal/plugin`——`manifest.go`（C14 结构＋闭合字段表＋`ParseManifest`，`parameters` 不透明不下钻）·`validator.go`（逐字段规则＋`ValidationErrors` 一次报全）·`tamper.go`（`ManifestHash=sha256:<hex>`、`VerifyBytes`/`LoadInstalled` 先哈希后解析、`ErrTampered`/`Alerter`/`plugin_tamper` 事件）＋`manifest_test.go`/`tamper_test.go`。C14 契约已定义（PLAN.md:1370／SPEC-07 §4§6），未发明字段。**AC1／AC4 落地；AC2／AC3／AC6 待**。
+**派**：`50-r1d`（AC2 host_api 版本门：`^1.0` plugin 在 host 1.x loads、vs 2.x refuse；internal/plugin 继续）。
+**在飞**：44-v1（成本验收）／22-v1（web 验收）／50-r1d（plugin AC2 写）。
