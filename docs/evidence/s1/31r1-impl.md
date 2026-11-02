@@ -200,3 +200,26 @@ AGENTS.md ③「派单先存档再发」归编排者动作，本腿只登记、�
 - 临时件只建不删：`D:\tmp\wisp\20261102\31r1\`（本件未用中间产物，目录留空建档）。
 
 **五格终量**：`- [ ]` ×5 → 仍 ×5（本腿未翻任何框；翻框权归非实现者裁腿）。
+
+---
+
+## §8 追加更正（19:5x，交件后现读；⛔ amend，只追加）
+
+**更正①＝`internal/tools/webnet.go` 的归属由"不明他腿"改判为"已具名的在飞写腿 `22-r1`"**。
+尺＝`git log --oneline origin/dev..HEAD`＋`Select-String docs/reports/pending-and-issues.md -Pattern "^## A1419"` ⇒ 台账 **A1419（L30317，2026-11-02 19:2x）** 逐字：
+「**派**：`22-r1`（web 工具 D30：SSRF／重定向链／协议矩阵／首访提示；前置 19／20 已 done；独立包）补第 3 写腿」
+＋「**在飞 3 写腿**：44-r1（internal/observe 成本计）／31-r1（提醒）／22-r1（web）」。
+⇒ 该件＝22-r1 的 D30 射程正字（SSRF＝票面写明的 web 工具面），**不是野件、不是违令**；本腿 §2 那句"看着像一枚未收尾的在飞件"改判＝
+**一枚刚开始落第一笔的在飞腿**（她盘上先出 `webnet.go`（`!windows`），`webnet_windows.go` 尚未出＝正常工序，非缺陷）。
+本腿对"该件与票 31 零交集、且落在本腿唯一可用包内 ⇒ 停手"这一条判据**不变**（撞面与作者是谁无关）。
+
+**更正②＝先例补齐：同波已有一枚腿按同一理由停手，且编排者已裁"串行重派"**。
+A1419 同节逐字：「**45-r1 停手上报**：票 45…写面＝`internal/observe`，与在飞 `44-r1` **同包**…**45 产码 0、未 commit（做对，按派单「同包即停」）**。**处置**：45 排 `44-r1` 完成后**串行重派**（同包只一枚写腿）」。
+⇒ 本腿（31-r1）＝同波第二枚按同一判据停手的腿，**处置建议照 45-r1 同一形**：排面让出后串行重派，⛔ 与 44-r1／22-r1 并包同写。
+⇒ 本腿 §6 第 1 件"让面"因此**不必新造规矩**，只排队：memory 面按 44-r1 交件释放、tools 面按 22-r1 交件释放。
+
+**更正③＝本腿交件后的盘上状态尺**（自证⛔ 吞他人活）：
+`git show --name-only HEAD` ⇒ 本腿那笔只含两枚文档（`docs/evidence/s1/31r1-impl.md`＋`.scratch/wisp/probes/31/r1/logs/00-start-readings.txt`）＝**2 files changed, 335 insertions(+), 0 deletions**；
+`.scratch/wisp/issues/31-reminders.md` 在 `origin/dev..HEAD` 区间**零改动**（尺＝`git diff --name-only origin/dev..HEAD -- .scratch/wisp/issues/31-reminders.md` 空）⇒ 票面五框原样（现读 `- [ ]` ×5／`- [x]` ×0）＝**未翻任何框**；
+`git status --porcelain -- internal/` 复尺 ⇒ 14 枚他腿脏件**逐枚仍在盘上、状态未变**（本腿⛔ add 他件／⛔ checkout／⛔ clean／⛔ stash）。
+`git rev-list --left-right --count origin/dev...HEAD`＝`0	2`（本腿一笔＋编排者 A1419 一笔）⇒ **⛔ push，欠推 2 枚如实登记，推送归编排者。**
