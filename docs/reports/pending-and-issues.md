@@ -30336,3 +30336,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ＋ **未定义即停**：票面与 SPEC 均未定义 reminder 表形状（表名/列/状态值域）＝AGENTS §0，⛔ 发明 schema。
 ⇒ **31 归 C 档（契约面待人批／需 spec 决定）＋写面占，非今日写腿**；机器侧零实现（`reminder.(set|list|cancel)` 非测试 0 命中）。
 **顺带更正**：44-r1 写面实扩到 `internal/memory`（+`internal/agent`/`internal/observe`）；22-r1 落 `internal/tools/webnet.go`。派单存档 `31r1-dispatch.txt` 缺（编排者漏存、已知，登记）。
+
+## A1422（2026-11-02 20:1x +08，编排者）★50-r1 只普查未落地（大实现票，暂缓）；转"已落地票批量验收"
+
+**50-r1**：零产出零提交——仅普查报 `internal/plugin` 空骨架（仅 disposal.go／C11）、缺 manifest 解析器／C14 schema_validator／Tier-1 provider；AC5（net allowlist）已存在，AC1/2/3/4/6 待落地。⇒ **50 归"大实现票（Tier1 插件系统 multi-leg）"**，非单腿能尽，暂缓，先清已落地验收票。
