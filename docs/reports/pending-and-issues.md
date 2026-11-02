@@ -30180,3 +30180,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **345＝做（甲形：读纯读、迁移搬到显式写）** ｜ **344＝甲（C21真相源改指v3＋删三枚死玻璃色死码）** ｜ **340＝链（补 callCorr⇄Queue.push 真端到端用例）** ｜ **244＝切（先普查 AC#5ⓐ任务源＋AC#6下游退出码名册，再改构建链）**
 **★调度**：为避免污染在飞 337-v1 的编译面（panel/tools 确 import ball/config），已撤 337-v1（稍后干净树重跑）；本波发 4 腿：`345r1`(写 internal/config)、`344r1`(写 internal/ball+docs)、`340r1`(写 internal/agent/approval)、`244c1`(普查只读)。写腿＝337r2+345r1+344r1+340r1 共 4 条满足「铺满≥3」。
 **★写面互斥**：cmd/wisp(337r2)、internal/config(345r1)、internal/ball(344r1)、internal/agent/approval(340r1)、winsec只读(346c1)、scripts只读(244c1)——互不重叠；同名包仅 1 写腿。
+
+## A1396（2026-11-02 11:0x +08，编排者）★★244-c1 普查收件：**244「切GUI」其实已落地**（票面事实过期）＋新发现 P1 冒烟空转
+
+**收件**（三把尺过）：提交 `5adb2e3c2`、证据件 `docs/evidence/s1/244-c1-census.md`(96行)、自己复跑——票面 7 框 `unchecked=7/checked=0` 未碰、零动码/构建/go test、`M cmd/wisp/run.go`(337r2)原样未动。**通过**。
+**① 关键纠偏（票面事实过期＝第19/20处）**：派单预测「产物应=00000003 控制台」**与真读数相反**——`objdump -p build/wisp.exe`＝**00000002 (Windows GUI)**；且 `scripts/build.ps1:256` `$ldflags` **已含 `-H=windowsgui`**（七枚=6×-X＋-H）。⇒ **244 的"切"这件事在构建链与产物两半今天都已落地**；票面"没带 -H／产物 CUI"是旧时代读数（行号 `:103-110`/`:115` 也腐烂，现居 `:249-257`）。**故 244 剩余不再是"加 -H"**。
+**② 新发现 P1（真缺陷）**：`scripts/build.ps1:309-310` 冒烟 `& (build\wisp.exe) doctor` ＋ `if($LASTEXITCODE -ne 0)`——GUI 子系统下 `&` 不等待、`$LASTEXITCODE` 读到前一道 `& go build`(rc0) 的**陈值⇒doctor 真 FAIL 也不会红（结构性空转）**。票 263 只修了 `slo-check.ps1` 姊妹文件、漏扫本枚。⇒ 需一枚修复腿（新票或并入 244，归口我裁）。
+**③ 244 剩余实际项**：AC#3 改 `cmd/wisp/console_other.go:7` 那句"GUI-subsystem binary (ticket 07)"假出处（**cmd/wisp 面，待 337r2 让出**）＋ 新鲜构建一发验子系统读数 ＋ ②冒烟修复。
+**④ 在飞 5 条**：337r2(cmd/wisp)/346-c1(winsec普查)/345r1(config)/344r1(ball)/340r1(approval)。写腿 4 条满≥3。244 下一腿待 cmd/wisp 让出再发。
