@@ -30308,3 +30308,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **402 结案**：`402-c2`（非实现者裁决）重评五格：② 由 FAIL 改判 **PASS**——**正确 sherpa 三层 staging 现跑 E3/E4 整包 581/575 RUN 零 AV 完整跑完**，terminal anchor 对称、死点未漂；**402-v1 之 AV/196-441 系 staging 未摆对（缺 DLL）的假象＋cmd/wisp 真窗族平台特性，非 402 缺陷**；单发死点 `TestBookedSnapshotReachesHostBitForBit329` 6/6 PASS。AC#1/2/3/4/5 全 PASS。AC14 push 维度 `a07f685eb` 6/6 green＋mutant 红句注册有效。判语 `docs/evidence/s1/402-c2-verdict.md`＝44afb4d03。编排者翻框（AC#4 补勾）、Status→done、`git mv`→`-done`、双名闸现跑。已推。**登记待办**：真窗族"整包零 AV"需机主空闲安静窗口复跑（pending_read，归票 314 范围，不新开票）。
 **派（补写腿）**：`31-r1`（提醒 set/cancel/list/持久化/跳钟）＋`45-r1`（诊断守卫 bundle/磁盘满/WAL/LRU）。
+
+## A1418（2026-11-02 19:2x +08，编排者）★第 10 票结案：86 → done（非实现者 86-v1 四格全 PASS）
+
+**86 结案**：`86-v1` 四格全 PASS「同意结 86」——AC#1 旧仪器负载敏感复现（单跑 0.354ms↔并跑 2.044ms）；AC#2 自校准形状成立＋AC#2 牙独立复现（M-4x 红 1.826ms CPU）；AC#3 三档 rc=0、SKIP 0；AC#4 gofmt/gofumpt 空、vet 三平台 rc=0、`go test -count=2 ./internal/risk` rc=0。落地件 `4d0e2577d`（1ms 绝对墙钟→进程 CPU 自校准，1ms 预算一字未动）。判语 `86-v1-verdict.md`＝11f40ee5e。编排者翻框 4 枚、Status→done、`git mv`→`-done`、双名闸现跑。已推。
+**在飞**：44-r1（成本计，正在写 internal/agent/cost.go+loop.go）／31-r1（提醒）／45-r1（诊断守卫）。
