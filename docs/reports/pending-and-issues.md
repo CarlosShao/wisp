@@ -30227,3 +30227,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **★config 收口** ⇒ `cmd/wisp`/`panel`/`tools`/`ball`/`winsec` 依赖面全部解冻。
 **★转验收相（approved 写票全落地：337r2/345r1/344r1/340r1/244r2/244r1）**：派验收批 `337-v1`(internal 四包复核 r1+r2)/`344-v1`(ball 真相源+删死码反向判据)/`395-v1`(cmd/wisp 单发 D22 验收)＋`340-v1`(在跑)。写腿相结束、进入非实现者验收＋门禁相。
 **下波（cmd/wisp 串行）**：`402-v1`(panel验证)/`244 构建验一发`/`346 归口`。
+
+## A1403（2026-11-02 13:0x +08，编排者）★★本轮首票结案：340 → done（非实现者 340-v1 七格全 PASS）
+
+**340 结案**：非实现者 `340-v1` 判语「同意结 340」（七格 AC 全 PASS，判语件 `docs/evidence/s1/340-v1-verdict.md`＝`4135189c2`+`d7bde44cb`）。编排者据判语翻框：7 枚 `- [ ]`→`- [x]`、Status→已结案 done、`git mv`→`-done.md`、追加结案 bullet、判语件入史；**双名闸现跑 `git ls-tree HEAD | grep -c issues/340-`＝1**（旧名已删），已推 HEAD `dc0b254bf`。落地腿 `340-r1`＝`412a58356`（真端到端用例 `corr_clash_e2e_340_test.go` 556 行）。撤销口令「撤 340」。
+**验收在飞**：337-v1 / 344-v1 / 395-v1（三腿）。下波：402-v1、244 构建验、346 归口。
