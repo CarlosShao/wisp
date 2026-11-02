@@ -30446,3 +30446,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **PDF 处置**：维持既有裁定（依赖闸待机主批 pdfcpu，A1435）；`§5 DEFERRED(D34-1)` 五字段行＋新开「24b」续票＋标记两式统一（`D34-1` vs 具名）＝**契约文字，留 24 收官时编排者具名处置**（非本波）。
 **派**：`24-r3`（`search.files`＋`search.apps` 零依赖；★先核 `search.apps`/app.launch 是否已由 22-r1 `launcher_windows.go` 交付，是则 AC#4 免做只做 search.files）。
 **在飞**：44-v2（成本综合复验）／24-r3（search.files/apps）。
+
+## A1440（2026-11-02 23:1x +08，编排者）★第 13 票结案：44 → done（成本计 C23，44-v2 同意结六格全 PASS）
+
+**44 结案**：44-r1（`8827e54ca`+`dc88642e0` 成本核心）＋r2（`19b48978b` observe 配额计算）＋r3（`5ae48abc9` AC#3 EvWarn＋run.go 咬合）＋r4（`a11e63bee`+`b14ee2a95` agent 配额接线）。44-v2 复验**六格全 PASS、同意结**（判语 `48c0ebfb1`），v1 三处欠账**确已真补**（AC#5 整格/ warn 事件出口/ 产品咬合），反向四发自做全红、还原核字节对回。编排者翻 6 框、Status done、`git mv`→`-done`、双名闸现跑。
+**★三条结票登记（落编排者/机主）**：① **配额闸 cmd/wisp 装配腿**（组件层 `QuotaWiring`/`NewQuotaGate`/`GateProvider` 未装进宿主派发链）⇒ **派 44-r5 装配（本波）**；② **per-model 消费永久落库＝D35 冻结表加列**⇒ 机主批准面／或 `SPEC-12 §5` 五字段登记（二选一，**列入待批**）；③ **realtime 轮 gate＝票 60、warn/降级渲染＝票 40**（归属转登记，不记 44 完成）。不挡结小项：`costwiring_44r3_test.go` 超写面一寸（正当自报）。
+**在飞**：24-r3（search.files/apps）／44-r5（配额闸装配）。
