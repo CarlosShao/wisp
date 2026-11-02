@@ -30141,3 +30141,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **③ ★收 337-r1 交件**：commit `66d528120`（3 文件 +305：`internal/agent/approval/gate.go` `New()` 处 `risk.Logf=o.Logf`＋`ticket337_reason_reader_test.go`＋证据件 15067B）——三把尺已验：**提交真在＋件真在**；★**"自己复跑"待非实现者验证腿**（331 报零回归 approval86/85/0/1·risk172/171/0/1·tools253/253/0/0·panel173/173/0/0，均为腿自报、待复核）
 **④ ★337 具名残余**：①注入式宿主 `risk.Logf` 需 `cmd/wisp` 写腿补（现被 395-r1 占 cmd/wisp，排其后）②乙/丙形须先落 `A##` 才许动 ③六族/262-640-902 桌面族本腿无真桌面未跑 ④`./cmd/wisp` 整包本腿零改跳过
 **⑤ ★下一步**：395-r1 仍在飞；337 验证腿＋337 残余 cmd/wisp 补丁腿排在 395 交件后；新派写腿一律 workflow+auto/qfmodel
+
+## A1390（2026-11-02 09:4x +08，编排者）★★**模型分工找到正确独立旋钮：`agent-default-model.reasoningEffort`（不动主会话）——已改宿主配置，需重启生效**
+
+**① ★机主纠正（重要）**：机主明确**主会话必须保持 DeepSeek、不许为让子代理继承而切主会话**；我此前"在 GUI 会话侧设 max 让子代理继承"的说法是**错的**（那会让主会话跟着变）——更正
+**② ★正确机制（从 asar 源码 `AgentDefaultModelConfig` 抠出）**：子代理默认模型是**独立配置项** `agent-default-model`，其 `static Config = z.object({ provider: z.string().required(), model: z.string().required(), **reasoningEffort: z.string()** })` ⇒ **模型+档位都可独立于主会话设定**
+**③ ★已落改**：`C:\Users\swq\.dsh\profiles\desktop\cordis.patch.yml` 的 `- id: agent-default-model` 块补 `reasoningEffort: max`（现＝`provider: magpie / model: auto/qfmodel / reasoningEffort: max`）；★**备份**＝同目录 `cordis.patch.yml.bak-orch-<时间戳>`；★回滚＝把该 `reasoningEffort: max` 行删掉或恢复备份
+**④ ★实测（关键、如实）**：改后**当前运行的 DSH 未热加载**——「不加 override 的默认子代理」探针仍落 `model: auto/deepseek-v4.1-flash / reasoningEffort: high`（继承主会话），**非 qfmodel/max** ⇒ **需重启一次 DSH 让 agent-default-model 新配置加载**
+**⑤ ★重启前的临时保证**：`workflow` `agent({provider:"magpie", model:"auto/qfmodel"})` **显式 override 已验证可通**（A1389）⇒ 派单时带 override 即可让子代理跑 Qwen（档位取默认、钉不了 max）；**主会话全程 DeepSeek 不变**
+**⑥ ★待机主**：重启一次 DSH（让子代理默认＝Qwen+max 生效；重启后会话重开，可由 HANDOVER/台账无缝接回）；或在 GUI「子代理模型」设置卡直接选 qwen+max（等价）
