@@ -30220,3 +30220,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **244-r1 收件三把尺**：提交 `8edbed156`（`cmd/wisp/console_other.go`＋`console_windows.go` 注释改——精准条件句「今天 build.ps1:256 带 -H=windowsgui、故 attachParentConsole 早退仅在重定向stdout态触发；链若去旗则控制台态也早退」＋纠正出处 ticket 07→票 244 线；**仅注释、零产码**）；已推。**通过**。
 **★调度实况**：244-r1 落 cmd/wisp 注改线；现仅 `345r1`(config) 一写腿在跑。现跑查 import：`internal/ball`(hotkey_live_test)、`internal/winsec`(多枚 test＋winsec.go) **都 import internal/config（正被 345r1 改 flux）⇒ 不能安全加写腿**；**唯一不 import config 的面＝`internal/agent/approval`** ⇒ 派 `340-v1` 非实现者验收填空。
 **写腿暂 1 条具名原因**：config 是单条关键路径大改（345r1 临时件 12:26 仍活），cmd/wisp/panel/tools/ball/winsec 皆转依赖它；345 收口即铺 cmd/wisp 全线（337-v1/344-v1/395-v1/402-v1＋244 构建验证）。
+
+## A1402（2026-11-02 12:4x +08，编排者）★345r1 收件通过（我自跑 config 测试绿）＋ config 收口、cmd/wisp 线解锁、转验收相
+
+**345r1 收件三把尺**：提交 `2d3ad35e9`（9 件 +357/−92；核心＝`loader.go` 读路径 `applyMigrations(path,…)`(盘) ⇒ `migrateRaw(raw,…)`(内存)，迁移搬出读路径、只在显式写时落盘；测试改钉未删；证据件 107 行）；**我自己复跑 `go test ./internal/config -count=1` ＝ ok 1.644s**；已推。**通过**。
+**★config 收口** ⇒ `cmd/wisp`/`panel`/`tools`/`ball`/`winsec` 依赖面全部解冻。
+**★转验收相（approved 写票全落地：337r2/345r1/344r1/340r1/244r2/244r1）**：派验收批 `337-v1`(internal 四包复核 r1+r2)/`344-v1`(ball 真相源+删死码反向判据)/`395-v1`(cmd/wisp 单发 D22 验收)＋`340-v1`(在跑)。写腿相结束、进入非实现者验收＋门禁相。
+**下波（cmd/wisp 串行）**：`402-v1`(panel验证)/`244 构建验一发`/`346 归口`。

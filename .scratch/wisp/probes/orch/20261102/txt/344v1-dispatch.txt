@@ -1,0 +1,1 @@
+派单 12:4x 腿 344-v1: 复核 344-r1(ebf33fd77) 全AC——C21真相源改指v3(逐字对PLAN.md:3316/3612)+删三死玻璃色码; internal/ball go test FAIL=0; 反向判据: 恢复三字段引用=>编译红(证删净); 产 docs/evidence/s1/344-v1-verdict.md; 只读; ⛔frontend/design; ⛔push.

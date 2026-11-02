@@ -1,0 +1,1 @@
+派单 12:4x 腿 395-v1(非实现者验收): 验收 395-r1(2216f0d3d,6件+490/-8,D43#15工具臂Thinking->Acting+#18) 按D22七项+SPEC-10对抗验收; cmd/wisp 单发(本波唯一cmd/wisp腿); 产 docs/evidence/s1/395-v1-verdict.md 逐格PASS/FAIL; 只读不改; ⛔改票面/台账/push.

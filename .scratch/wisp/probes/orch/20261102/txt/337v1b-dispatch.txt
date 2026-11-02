@@ -1,0 +1,1 @@
+派单 12:4x 腿 337-v1(重跑,config已收口): 复核 337-r1(66d528120)+337-r2(7fd2f37b5) 全AC; internal/{approval,risk,tools,panel}四包 go test + d22scan/pathlen/vet/gofumpt; 反向判据 -overlay 摘 risk.Logf=>不落sink=>红; 产 docs/evidence/s1/337-v1-verdict.md 逐格PASS/FAIL+'同意结337吗'; 只读; ⛔cmd/wisp(单发留给395-v1); ⛔push.
