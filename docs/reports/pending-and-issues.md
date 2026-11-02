@@ -30272,3 +30272,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **385-r1 报**：票 385（mockllm 400 字节腰斩）**已于 2026-10-31 落地**（commit `fad2f5e4f`「票385落地腿385-r1」；`chat.go` 原 `len(answer)>400` 硬 clamp 已改为字符边界安全）⇒ 本次派单是陈旧重复件，腿零改动零提交（做对：第19处核对，⛔硬做）。已派 `385-v1` 验收结案。
 **★A 档扫描（非 cmd 票逐号 grep 落地提交）发现同族若干**：386（`1773881db` 票386落地腿386-r2）、391（`6cf941b72` 票391落地腿391-r1）、239（`83903d1e2` A1122 翻票239五格但未结）、339/330 等有裁决/落地痕迹。⇒ **A 档 83 枚里含相当比例"已落地未改名／半结"** ⇒ **策略修订：对已落地票优先派非实现者验收腿＋翻框结案（比派新写腿更快减开票数）**；同包（mockllm:385/386/391）串行验。
 **在飞**：385-v1（mockllm 验收）／402-v1（cmd/wisp 验收）／86-r1（预算墙钟写）。
+
+## A1411（2026-11-02 16:2x +08，编排者）★第 5 票结案：385 → done（非实现者 385-v1 五格全 PASS）
+
+**385 结案**：`385-v1` 五格全 PASS「是否同意结 385: 是」（`tools/mockllm` 三处 400-byte clamp 全摘、`runeBoundaryWithin` UTF-8 边界回退、streaming `[]rune` 分块；多字节回归 `Test385EchoDeliversLongMultibyteInFull` PASS=20 FAIL=0；反向判据摘修复⇒红＋还原；零回归）。落地件 `fad2f5e4f`（2026-10-31 原腿）。编排者翻框 5 枚、Status→done、`git mv`→`-done`、双名闸现跑。已推。
+**派**：`386-v1`（386 mockllm 帽登记，落地 `1773881db`，mockllm 包已空出）。
