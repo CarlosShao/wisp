@@ -30357,3 +30357,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **279 结案**：盘上真相——AC#1 早在 **2026-10-14** 由腿 `279-r1` 落地（P39 料文贴入 `run.go` 331-339＋`config_readers_255.go` 七处刷新＋`TestTicket255` rc=0，随行 `bfc74ae9`，**框未翻**）；其后 **114-r2（`80376d58f`，10-24）按生产事实重写同块注释**，票面 P39 料文前提已失效（**再贴＝回退别人产码事实**；2026-11-02 独立腿 `279-r1` 复核盘上 0 命中）。AC#2／AC#3 已勾。⇒ **三格满足、无待做，按已满足结案（⛔ 实现）**。编排者翻 AC#1、加 Status done、`git mv`→`-done`、双名闸现跑。已推。
 **注**：279 票面原无 Status 行，结案补一条。**在飞**：44-r1（cost）／22-r1（web）／296-r1（cmd/wisp 热键）。
+
+## A1426（2026-11-02 21:0x +08，编排者）★44-r1 交付（成本计 C23，15 文件跨 3 包）；派 44-v1 验收
+
+**44-r1 交付**：2 枚 commit（盘上，⛔push），15 文件、3 包：`internal/observe`（`pricing.go`/`pricing.json`/`costmeter.go`/`costbudget.go`+2 测试）· `internal/memory`（`costdao_44.go`+测试）· `internal/agent`（`costbook_44.go`/`costgate`+测试）。per-task 成本累加／日聚合／预算 80-100% 预警。
+**派**：`44-v1`（非实现者验收 observe/memory/agent 三包＋反向判据）。
+**★45-r1 暂缓**：internal/observe 现已空出，但 45（诊断守卫）写入 observe 会污染 44-v1 的只读验证 ⇒ **等 44-v1 验完再派 45-r1**。
+**在飞**：22-r1（web）／296-r1（热键）／44-v1（验收）。
