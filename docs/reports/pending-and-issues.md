@@ -30232,3 +30232,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **340 结案**：非实现者 `340-v1` 判语「同意结 340」（七格 AC 全 PASS，判语件 `docs/evidence/s1/340-v1-verdict.md`＝`4135189c2`+`d7bde44cb`）。编排者据判语翻框：7 枚 `- [ ]`→`- [x]`、Status→已结案 done、`git mv`→`-done.md`、追加结案 bullet、判语件入史；**双名闸现跑 `git ls-tree HEAD | grep -c issues/340-`＝1**（旧名已删），已推 HEAD `dc0b254bf`。落地腿 `340-r1`＝`412a58356`（真端到端用例 `corr_clash_e2e_340_test.go` 556 行）。撤销口令「撤 340」。
 **验收在飞**：337-v1 / 344-v1 / 395-v1（三腿）。下波：402-v1、244 构建验、346 归口。
+
+## A1404（2026-11-02 13:1x +08，编排者）★第 2 票结案：344 → done（非实现者 344-v1 五查全 PASS 同意结）
+
+**344 结案**：`344-v1` 五查全 PASS「同意结 344」（判语件 `docs/evidence/s1/344-v1-verdict.md`＝`182499a34`）→ 编排者翻框 7 枚、Status→done、`git mv`→`-done`、追加结案 bullet、判语入史；**双名闸现跑 `grep -c issues/344-`＝1**，已推 HEAD `59ec80e9f`。落地腿 `344-r1`＝`ebf33fd77`（C21 真相源改指 v3 `tokens.generated.css`＋删 `GlassRing/GlassHi/GlassHiSoft` 三死码；反向判据：overlay 恢复字段⇒编译红）。**偏差登记**：344-r1 另动了 `internal/ball/tokens_test.go` 注释（引 retired GlassRing）——在 `internal/ball/**` 写面内、无害。
+**验收在飞**：337-v1 / 395-v1。下波：402-v1、244 构建验、346 归口。
