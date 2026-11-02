@@ -30282,3 +30282,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **402-v1 判语**：五格 ① PASS／② **FAIL**／③ PASS／④ PASS／⑤ PASS；SPEC-10 七项全 PASS；但 **AC#1「修静默杀主形」与 AC#2「无静默杀」实质未满足**——本机实证 pkg-dir 形状 **2/2 复现 AV `0xC0000005`**，死点 `TestBookedSnapshotReachesHostBitForBit329`，完成集 196/441；a07f685eb 只修了 **AC14 push 维度**（6/6 绿、mutant 红句注册），**未触静默杀主体**。判语件 `docs/evidence/s1/402-v1-verdict.md`。⇒ **402 不结，归"需深修 cmd/wisp 崩溃（panel 窗创建域状态累积）"待 deep-dive**（cmd/wisp 单发、与真窗族谨慎区分）。
 **派**：`244-v1`（244 r1/r2 后新鲜构建坐实 GUI 子系统 `-H=windowsgui`＋P1 冒烟真闸，cmd/wisp 单发）。
+
+## A1413（2026-11-02 17:1x +08，编排者）★第 6 票结案：386 → done（非实现者 386-v1 五格全 PASS）
+
+**386 结案**：`386-v1` 五格全 PASS「同意结 386」（四帽判定与盘上代码逐枚对上、有意半边有 ASCII 对照钉死；反向用 `1773881db^` 自建快照独立复现红→绿→装回复红同位→还原核；`tools/mockllm` FAIL=0、消费方 E2E 全绿；§7.2 过期注释尾归 cmd/wisp 所有者）。落地件 `1773881db`（票386落地腿386-r2）。判语件 `386-v1-verdict.md`＝200fb51b6。编排者翻框 5 枚、Status→done、`git mv`→`-done`、双名闸现跑。已推。
+**派**：`391-v1`（391 mockllm max_tokens 死字段两方言，落地 `6cf941b72`，mockllm 包空出）。
