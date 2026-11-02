@@ -30158,3 +30158,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **③ ★诚实边界**：Acting 是 announce 交接点按真 res.ToolCalls **回放冻结边、非实时绿球**（`agent.EvToolStart` 全仓零生产者、写面只 cmd/wisp）；16-r1 demo 件未改（留裁）；Path-C 需 `-tags webrtcap` 自跳
 **④ ★待裁 3 项**：①16-r1 demo 是否更新 ②是否做实时缝（超本票，须 cmd/wisp 外造 EvToolStart 生产者）③Path-C webrtcap 重建
 **⑤ ★在飞=0、树干净 ⇒ 机主现在可重启 DSH（零损失）**；重启后 `agent-default-model=qfmodel+max` 生效；重启后派 `395-v1` 验收＋`337-v1` 验证＋337 残余补丁
+
+## A1393（2026-11-02 10:1x +08，编排者）★机主 resume 后第一批 3 腿开干（1 写＋1 验＋1 普查，跨包不撞 cmd/wisp）
+
+**机主令**：resume 后立刻铺写腿、不再做模型测试。**第一批（跨包、避 cmd/wisp 撞）**：
+- `337r2`（写腿 cmd/wisp）：补 337 残余＝注入式宿主 `risk.Logf=rt.auditf`；补完 337 可结
+- `337-v1`（非实现者验证腿，internal/{risk,agent,approval,tools,panel}）：复核 337-r1 读数
+- `346-c1`（普查腿 internal/winsec）：CI 竞态仪器归因（只读）
+**★为何只 1 条写腿**：`cmd/wisp` 每波只许 1 条写腿（337r2 占）；其余可写票 345/344/340/244 卡「须机主一句明示/契约邻接/人工批准门」硬门（属铁律「改契约/行为变更」类，⛔ agent 自拍）⇒ 已具名摆机主，等其一句话即可补满写腿。
+**在飞**：见 list/临时件 mtime——337r2/337v1/346c1 三腿

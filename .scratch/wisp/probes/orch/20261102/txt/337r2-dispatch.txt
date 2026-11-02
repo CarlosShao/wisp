@@ -1,0 +1,5 @@
+派单 2026-11-02 10:1x · 腿 337r2（票 337 残余·写腿 cmd/wisp）
+任务：补 337 唯一残余——注入式宿主装配点（run.go 中 s.gate!=nil / approval 构造路径）把 risk.Logf=rt.auditf 接上，使注入式宿主也落 fail-closed 审计；⛔ 改 337-r1 已落的 gate.go New() 逻辑（如确需改属 337-r1 面，停手上报）。
+AC：①接线（注入式宿主 Gate 的 rule= 落 rt.auditf sink）②反向判据（摘接线⇒不落 sink⇒红＋还原核）③零回归（approval/risk 包 + go build ./cmd/wisp）④纪律格。
+边界：写面 cmd/wisp/** + docs/evidence/s1/337r2-*.md；⛔ gate.go(337-r1面)/thresholds/golden/frontend/design/speech/audio/testdata；⛔ 改票面/台账/push。
+环境：staged(A1326)、MSYS2 PATH 必须 POSIX /d/ 形、gofumpt 绝对路径、cmd/wisp 整包 -timeout 30m；临时件 D:\tmp\wisp\20261102\337r2\。

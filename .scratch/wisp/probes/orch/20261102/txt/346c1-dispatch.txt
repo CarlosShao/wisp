@@ -1,0 +1,4 @@
+派单 2026-11-02 10:1x · 腿 346-c1（票 346 普查腿·只读）
+任务：票 346 第一趟只读普查——AC#0 现跑六行（两枚仪器 blob 同一性 + CI run 红名册作差）+ AC#1 三形代价表（甲台面侧/乙/丙）+ AC#3 归因工具；产 docs/evidence/s1/346-c1-census.md；⛔ 动码、⛔ 放宽/改断言。
+边界：只读 internal/winsec/** + .scratch/wisp/probes/**；⛔ 碰 winsec.go/winsec_other.go/winsec_windows.go 任何字节；⛔ frontend/design；⛔ 改票面/台账/push。
+环境：两平台成对尺（Linux 容器⇄本机 Windows 样本）；临时件 D:\tmp\wisp\20261102\346c1\。

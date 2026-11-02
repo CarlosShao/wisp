@@ -1,0 +1,4 @@
+派单 2026-11-02 10:1x · 腿 337-v1（非实现者验证腿·只读）
+任务：复核 337-r1(commit 66d528120) 全部读数——AC#0 Reason 消费者0 枚、接线 gate.go New() risk.Logf=o.Logf、反向判据、零回归 approval86/risk172/tools253/panel173(FAIL 全0)、门禁 d22scan/pathlen/vet/gofumpt；产 docs/evidence/s1/337-v1-verdict.md，逐格判 PASS/FAIL。
+边界：只读+证据件；⛔ 改任何代码；⛔ 碰 cmd/wisp（避与 337r2 撞，若需跑 cmd/wisp 具名跳过）；⛔ 改票面/台账/push。
+环境：staged、MSYS2 PATH POSIX 形、gofumpt 绝对路径；临时件 D:\tmp\wisp\20261102\337v1\。
