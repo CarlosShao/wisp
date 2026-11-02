@@ -30133,3 +30133,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **③ ★档位限制（如实）**：`agent()` **仅接受 `label/phase/schema/provider/model` 五选项、无 effort 参数**（实测 `reasoningEffort`/`thinkingLevel` 均报 "not recognized"）⇒ **Xhigh 无法按次下发**，子代理档位＝宿主/网关对该路由组默认；须强制 Xhigh 只能宿主侧设
 **④ ★定案**：**后续子代理派单一律 `workflow` + `provider:"magpie", model:"auto/qfmodel"`**；主会话保持 DeepSeek-V4.1-Flash；`subagent` 仅用于继承主模型的纯委派
 **⑤ ★证据**：7 轮探针（A1387+本笔）——显示名/registry 名 6+ 组全 NULL，最终 `auto/qfmodel` 命中
+
+## A1389（2026-11-02 09:5x +08，编排者）★★★**模型分工最终定案：Qwen3.8-Flash 派单测试通过** ＋ 收 337-r1 交件
+
+**① ★模型测试（机主令「只测，通了同步 goal」）**：`workflow` `agent("…只回复四个字：Qwen就绪",{provider:"magpie", model:"auto/qfmodel"})` → **回复「Qwen就绪」✅ 通**；机主 2026-11-02 已把 `auto/qfmodel` 配成 **low/high/max** 三档（profile 现证 `reasoningEfforts:{low,high,max}`）；★**定案＝后续子代理派单一律 `workflow` + `provider:"magpie", model:"auto/qfmodel"`**（goal rev28）
+**② ★档位限制（如实，未解）**：`agent()` 仅接受 `label/phase/schema/provider/model`、**无 effort 参数**；子会话 cache 只录 model/provider **未录 reasoningEffort** ⇒ **子代理实际档位取会话/网关默认、我无法按次钉 max**；要固定档位只能机主 GUI 会话侧设（子代理继承会话档）
+**③ ★收 337-r1 交件**：commit `66d528120`（3 文件 +305：`internal/agent/approval/gate.go` `New()` 处 `risk.Logf=o.Logf`＋`ticket337_reason_reader_test.go`＋证据件 15067B）——三把尺已验：**提交真在＋件真在**；★**"自己复跑"待非实现者验证腿**（331 报零回归 approval86/85/0/1·risk172/171/0/1·tools253/253/0/0·panel173/173/0/0，均为腿自报、待复核）
+**④ ★337 具名残余**：①注入式宿主 `risk.Logf` 需 `cmd/wisp` 写腿补（现被 395-r1 占 cmd/wisp，排其后）②乙/丙形须先落 `A##` 才许动 ③六族/262-640-902 桌面族本腿无真桌面未跑 ④`./cmd/wisp` 整包本腿零改跳过
+**⑤ ★下一步**：395-r1 仍在飞；337 验证腿＋337 残余 cmd/wisp 补丁腿排在 395 交件后；新派写腿一律 workflow+auto/qfmodel
