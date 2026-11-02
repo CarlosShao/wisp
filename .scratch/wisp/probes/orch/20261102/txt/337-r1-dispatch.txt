@@ -1,0 +1,6 @@
+存档 2026-11-02 09:3x · 腿 337-r1（票 337 fail-closed 实话 BlacklistNote.Reason 消费者 0 枚·接线、写、internal/risk+agent+panel）
+写面：internal/risk/**＋internal/agent/**＋internal/panel/** 的读侧接线（先只读普查再决定接哪层）。
+来源：非实现者终裁腿 334-v1 必答①。类型：接线（先普查后接线）。
+AC：①只读普查 Reason 消费者 0 枚（尺可重跑）②决定接哪一层并接线（最主流 harness：fail-closed 理由必须到人/模型可见面）③反向判据（摘接线 ⇒ 理由不可见 ⇒ 红）④零回归（六族＋262/640/902）⑤纪律格。
+⚠ 硬边界：⛔ thresholds/golden／⛔ frontend/design（机主外部 agent）／⛔ internal/speech(共享编译面，现无写腿)。
+⚠ 平台：staged(A1326)、MSYS2 PATH 必须 POSIX /d/ 形、gofumpt 绝对路径。

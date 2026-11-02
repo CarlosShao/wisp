@@ -30109,3 +30109,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **② ★A1384 预期清单更正**：★**证据件 `402r1-*.md` 从未写出**（腿死于额度耗尽前）——真交付只有两枚测试文件（AC14 push 维度修＋33r5 采样稳定化）；**内容底稿仍＝A1383 中程报**（静默杀归因停追 MARK299 ShowWindow 激活段／33r5 机制＝Weixin 前台锁）
 **③ ★票 402 面更新指引（下一会话）**：AC#1＝归因停追（复现条件待从 A1383 转写）／AC#2＝修已落（6/6 中程报读数、**缺门禁复跑**）／AC#3＝采样稳定化已落＋机制钉死／AC#4＝**电池未跑完、零回归读数缺**（下一会话补跑）／AC#5＝纪律过
 **④ ★停车状态**：goal **paused**；票池 done=**218**／open=**167**；HEAD＝origin/dev、未推 0
+
+## A1386（2026-11-02 09:3x +08，编排者，goal round 55 复启）★★★**机主令「继续完成goal」——恢复实活**（解释空转：goal paused 后自动续轮仍触发、我只回状态句＝看着像循环；现改为每轮干实活）｜★派 `395-r1`（cmd/wisp）＋`337-r1`（internal/risk/agent/panel）双写腿
+
+**① ★地面真相（现跑）**：HEAD=d6e0ee49f、未推 0、tracked 脏 0、done=218／open=168；票 402 待派、68 待机主签收
+**② ★筛票结论（逐格读脸）**：★**249＝WITHDRAWN 排除**／★**195＝blocked（排票 33 片 B）排除**／★可派＝**395**（D43#15 Acting 家族生产零派发·写 cmd/wisp）＋**337**（fail-closed Reason 消费者 0 枚·接线 internal/risk/agent/panel）
+**③ ★本轮派 2 写腿（写面互斥）**：`395-r1`（cmd/wisp resident_voice_engines 派发位）＋`337-r1`（internal/risk/agent/panel 读侧接线）——**缺第三写腿具名**：402 验证腿须跑 cmd/wisp 整包（与 395 撞车、排 395 交件后）／350 契约邻接需人工批准面／244 构建形态可下一波
+**④ ★goal resume 被策略拒（paused 只能机主本机恢复）**——**不阻塞：逐轮实活推进**
+★票池：done=218／open=168

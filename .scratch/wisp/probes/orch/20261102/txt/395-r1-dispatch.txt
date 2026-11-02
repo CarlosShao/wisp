@@ -1,0 +1,6 @@
+存档 2026-11-02 09:3x · 腿 395-r1（票 395 D43#15 工具臂与 Acting 家族零生产派发修复、写、cmd/wisp）
+写面：cmd/wisp/**（resident_voice_engines_windows.go 派发位）。
+机理（16-v2 实锤）：demo 回合 SSE 首响应带 tool_calls（tool_call 落真库），产线语音回合带 tool_calls 却恒走纯文本臂 ⇒ Acting 家族（#17-20）生产零派发。demo 每行合法、缺口非破坏。
+AC#1 HasToolCall:true ⇒ 派 #15 工具臂（Acting 可达）／AC#2 语音回合带 tool_calls ⇒ Acting 呈现读数（对照 16-r1 demo 形状）／AC#3 反向（摘派发 ⇒ 回纯文本臂 ⇒ 红；三读数＋还原核）／AC#4 零回归（六族＋Path-C＋262/640/902）／AC#5 纪律。
+⚠ 硬边界：⛔ D43 表／statemachine／internal/{risk,session,speech,audio}；⛔ frontend/design。
+⚠ 平台：staged(A1326)、MSYS2 PATH 必须 POSIX /d/ 形、gofumpt 绝对路径、cmd/wisp 整包只跑一个。
