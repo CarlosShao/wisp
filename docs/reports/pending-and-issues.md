@@ -30439,3 +30439,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **44-r4 交付**：`a11e63bee`（`internal/agent/quota_44r4.go` 237 行＋测试 256）＋`b14ee2a95`（证据）。`go test ./internal/agent -run AC5` **7/7 PASS**：remaining 0 跳过派发（`calls==0`→`ClassBudget`）＋链推进不崩链／plan-credit 余额 1000−900=100＋「估算」marker＋plan 与 pay-per-token 分账物理隔离／负数拒且余额不变／80% warn 有 `EvWarn` 且仍派发／exhausted 落 `provider_health`／空 config 零 invent。零回归 agent 全包 `ok 4.441s`、observe/memory 零改动、反向六条具名。
 **⇒ 44 现 AC1–6 全覆盖**（r1 成本核心＋r2 observe 配额计算＋r3 预警/咬合＋r4 agent 配额接线）。**派** `44-v2` 综合复验（三轮改动后重新逐格验 AC1–6＋回归＋比对 44-v1 三处欠账是否已补）。
 **在飞**：24-v1（文档验收）／44-v2（成本综合复验）。
+
+## A1439（2026-11-02 23:0x +08，编排者）★24-v1 判：docx+search.content 部分 PASS，整票不可结；派 24-r3（search.files/apps）
+
+**24-v1 裁决（件 `8f0d08622`）**：**docx＋search.content 部分全 PASS**（19/19 真跑 FAIL=0、还原核 `8523211a0` blob 全同、越界/坏档/泄露三反向有牙、零三方依赖、纪律 4 files+1681 插入 0 删、写面仅 internal/tools 文档新件）。**但整票 24 不得加 `-done`**：剩 **AC#1 PDF 两格**、**AC#3 `search.files`**、**AC#4 `search.apps`→app.launch** 未完。
+**PDF 处置**：维持既有裁定（依赖闸待机主批 pdfcpu，A1435）；`§5 DEFERRED(D34-1)` 五字段行＋新开「24b」续票＋标记两式统一（`D34-1` vs 具名）＝**契约文字，留 24 收官时编排者具名处置**（非本波）。
+**派**：`24-r3`（`search.files`＋`search.apps` 零依赖；★先核 `search.apps`/app.launch 是否已由 22-r1 `launcher_windows.go` 交付，是则 AC#4 免做只做 search.files）。
+**在飞**：44-v2（成本综合复验）／24-r3（search.files/apps）。
