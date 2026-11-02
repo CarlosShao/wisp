@@ -121,7 +121,7 @@
 
 | 尺 | 读数 |
 |---|---|
-| `gofumpt.exe -l`（绝对 `/d/work/base/gopath/bin/gofumpt.exe`）对 §5 的 13 枚 | 输出**空**＝干净（`logs/10-gofumpt.txt`）。全目录跑只剩他腿的 `internal/agent/approval/pending_read.go`、`internal/agent/tools.go` 两枚未格式化 ⇒ **不是本腿面** |
+| `gofumpt.exe -l`（绝对 `/d/work/base/gopath/bin/gofumpt.exe`）对 §5 的 13 枚 | 输出**空**＝干净（`logs/10-gofumpt.txt`）。全目录 `gofumpt -l internal/observe internal/memory internal/agent` 另点两枚＝`internal/agent/approval/pending_read.go`、`internal/agent/tools.go`：**本腿没写过这两枚，且它们在 git 里是"跟踪且未修改"态**（尺＝`git status --porcelain internal/agent/tools.go internal/agent/approval/pending_read.go` ⇒ 空），红因是**行尾形状而非代码**：`git ls-files --eol` 读 `i/lf w/crlf attr/text eol=lf`（工作树 CRLF 违 `.gitattributes:5 *.go text eol=lf`），gofumpt 按工具规范输出 LF 才整文件标差 ⇒ 既有债（与票 276 那族"对 17 枚他票台件退 1"同形），⛔ 本腿顺手修别人的面。本腿 15 枚 `git ls-files --eol` 全读 `i/lf w/lf`（pricing.json 读 `i/lf w/lf attr/text=auto`）＝合属性 |
 | `go vet ./...` | rc=0，无输出（`logs/11-vet.txt`）⇒ 含 `cmd/wisp` 测试面编译干净 |
 | `go build ./...` | rc=0 |
 | D22 门 `sh scripts/d22scan.sh` 的两步（正控测试另计）：`cd tools/d22scan; go run . -root <repo>` | `clean - no D22 ban violations`；`internal/=766 Go files`（含注释与 `_test.go` 的 ban#8 覆盖）`cmd/=186`；rc=0（`logs/12-d22scan.txt`） |
@@ -145,3 +145,11 @@
 6. 若机主要"逐日持久钉价格表版本"：与 AC#5 同一枚墙（要列）。
 
 **勾框未翻**：票面 6 枚 `- [ ]` 本腿一枚都没勾（只写实现与证据）；§2 的"判"列是给非实现者验收腿的落点，AC#5 的停手上报需要编排者／机主先裁 D35 那一寸。
+
+---
+
+## 8. 追加更正（44-r1 自纠，⛔ amend：只追加一枚新 commit）
+
+**枚 1（改 §6 那一格的归因）**：首枚 commit `8827e54ca` 的证据件把 `internal/agent/approval/pending_read.go`／`internal/agent/tools.go` 被 `gofumpt -l` 点名写成"**他腿的**未格式化"。现跑复核＝该归因**不实**：两枚都是**跟踪且未修改**（`git status --porcelain` 对这两枚返回空），红因是**工作树行尾 CRLF** 违 `.gitattributes` 的 `*.go text eol=lf`（`git ls-files --eol` 读 `i/lf w/crlf`）＝既有债，与"哪条腿在飞"无关。§6 那一格已按实测改写，并附本腿 15 枚的 EOL 读数（全 `i/lf w/lf`）。
+
+**其余各格复核（同一把尺重跑，无翻转）**：`go build ./... ` rc=0、`go vet ./...` rc=0、`go test -count=1` 三包 ok（`observe 4.327s / memory 22.903s / agent 5.660s`）、§2 的六格判语与 §3 的八发突变读数未变（红→绿还原痕在 `logs/mutation.txt`）。票面 6 枚勾框仍一枚未翻，`.scratch/wisp/issues/44-costmeter-c23.md` 在本腿两次 `git status` 里都是空输出＝零触碰。
