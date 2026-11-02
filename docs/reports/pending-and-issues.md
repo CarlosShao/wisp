@@ -30188,3 +30188,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **② 新发现 P1（真缺陷）**：`scripts/build.ps1:309-310` 冒烟 `& (build\wisp.exe) doctor` ＋ `if($LASTEXITCODE -ne 0)`——GUI 子系统下 `&` 不等待、`$LASTEXITCODE` 读到前一道 `& go build`(rc0) 的**陈值⇒doctor 真 FAIL 也不会红（结构性空转）**。票 263 只修了 `slo-check.ps1` 姊妹文件、漏扫本枚。⇒ 需一枚修复腿（新票或并入 244，归口我裁）。
 **③ 244 剩余实际项**：AC#3 改 `cmd/wisp/console_other.go:7` 那句"GUI-subsystem binary (ticket 07)"假出处（**cmd/wisp 面，待 337r2 让出**）＋ 新鲜构建一发验子系统读数 ＋ ②冒烟修复。
 **④ 在飞 5 条**：337r2(cmd/wisp)/346-c1(winsec普查)/345r1(config)/344r1(ball)/340r1(approval)。写腿 4 条满≥3。244 下一腿待 cmd/wisp 让出再发。
+
+## A1397（2026-11-02 11:2x +08，编排者）★337r2 交件收件（通过）＋ 337 落地两段齐（r1+r2），待 337-v1 验收
+
+**收件三把尺**：提交 `7fd2f37b5`（3 件 +391：`cmd/wisp/run.go`+31，其中真产码 1 行 `risk.Logf = rt.auditf` @注入式装配点；新测试 `risk_sink_injected_337r2_windows_test.go` 253 行；证据件 `337r2-failclosed-sink.md` 107 行）；新文件真在；产码行复认 ✓；`gate.go`/`thresholds` 一字未动。**通过**，已推 origin/dev。
+**★337 落地两段齐**：`337-r1`(66d528120 接线 gate.go New()) ＋ `337-r2`(7fd2f37b5 补注入式宿主 risk.Logf)；剩 337-v1 非实现者验收（复核 r1+r2）后可结。
+**★调度决定（具名为什么暂不派 cmd/wisp 腿）**：cmd/wisp 已让出，但 `344r1`(写 internal/ball)、`345r1`(写 internal/config) 仍在飞，而 `cmd/wisp`/`internal/panel`/`internal/tools` 都 import ball/config ⇒ 现派 cmd/wisp 腿会读到半成品编译面（第21处污染）。故 **244-r1（console_other.go 注改＋构建验）与 337-v1 重跑 均待 ball/config 收口即发**。
+**在飞 4 条**：345r1(config)/344r1(ball)/340r1(approval)/346-c1(winsec普查)；写腿 3 条满≥3。
