@@ -30207,3 +30207,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **340r1 收件三把尺**：提交 `412a58356`（新文件 `internal/agent/approval/corr_clash_e2e_340_test.go` 556 行；`gate.go` 零字节改——337-r1 的 `risk.Logf=o.Logf` 原样在）；已推 origin/dev。**通过**。待 `340-v1` 非实现者验收。
 **活跃度现跑**：345r1 临时件 12:20 仍在更新（loader.m1/m2 变体生成中，**config 行为变更活干着**）；244r2 12:17 在跑；**346-c1 临时件最后更新 11:35、已约 45 分钟无动静、累计跑约 2h——疑似卡在 gh/网络，待查/可能杀**。
 **调度**：approval 线收口；写腿仅 2（345r1 config ＋ 244r2 scripts）。config 仍活跃写 ⇒ cmd/wisp/panel 均 import config，仍堵。**补 `244-r1`（`cmd/wisp/console_other.go:7` 那句"GUI-subsystem binary (ticket 07)"假出处改真——纯注释改、本腿不 build cmd/wisp 以避免 config 半写污染，构建验证留到 config 收口）作第 3 写腿**。
+
+## A1400（2026-11-02 12:3x +08，编排者）★346-c1 收件通过 ＋ 244-r2 交件（diff 已审）＋ 346 前提再纠偏
+
+**① 346-c1 收件**：提交 `bba8b118b`，证据件 `docs/evidence/s1/346-c1-census.md` 34339 B（现读）；只读普查、0 动码、票面 7 框未碰。**通过**。
+**② ★346 前提纠偏（第 22 处式，⛔贸然派 346-r1）**：census 四组新读数——(i) 两枚仪器今天连 8 发全绿；(ii) **但 8 发锚全在 `winsec.go` 已变（30 笔）之后，⛔读成"本票已自愈"**；(iii) 票 369 已把该族"乙"落地过一次(`-done`)，判语给 POSIX/Windows 分野「票 346 射程只到 POSIX…」；(iv) `346-a1` 说的常驻件 `scripts/abstention-census.sh` 今天**不存在**。⇒ 346 三形裁形须据这四读重判，**下一步我读全文再派 346-r1**。
+**③ 244-r2 交件（diff 已审）**：提交 `19fccc726`（`scripts/build.ps1` 新增 `Invoke-ExternalProgram`＝Process.Start+WaitForExit+真 ExitCode，镜像 slo-check ticket 263；注释记 244-r2 GUI-stub 实测 `&` 21ms 读陈旧 0 ⇄ 真 7）＋`fafac05d6` 证据件；写面仅 `scripts/build.ps1`。**通过**（待 job 正式收尾报 staging）。
+**④ 已推 origin/dev**：346-c1 ＋ 244-r2 ＋ 本账。**在飞**：345r1(config 写)/244-r1(console 注改写)/244-r2(收尾)。
