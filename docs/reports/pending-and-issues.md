@@ -30401,3 +30401,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **派** `44-r3`：缩到**最小两件**——AC#3 80% warn 事件出口＋`cmd/wisp/run.go` 生产咬合（填 `Config.Price`／`[cost]`＋`SetCostBudget`/`BudgetFrom` 调用者）；**≤12 次工具调用、单一 checkpoint**；AC#5 其余留 `44-r4`。
 **★教训**：大跨面腿易崩（`50-r1b`／`44-r2` 均 `ok:false/null`）⇒ **改小步、早 checkpoint、单腿单面**。
 **在飞**：22-v1（web 验收）／50-r1d（收尾）／44-r3（成本最小两件）。
+
+## A1433（2026-11-02 22:2x +08，编排者）★第 12 票结案：22 → done（web D30，22-v1 同意结，六格全 PASS）
+
+**22 结案**：22-r1 交付 web 工具 D30（`547d9da00`，24 files +5014：SSRF 私网/回环/重定向链硬拒 `hits=0`＋rebinding per-hop；协议矩阵 17×2 门；首访七判；`docker/mockweb` 注入夹具；launcher）。22-v1 非实现者验收**六格 AC 全 PASS、无放水**（Test22 名册 60/60 零红零跳、`-race` ok、反向五发 `-overlay` 突变全咬、还原干净、`547d9da00..HEAD` 无夹带、thresholds/golden/cmd 两把尺 0 files），判语件 `afc39c489`。编排者翻 6 框、加 Status done、`git mv`→`-done`、双名闸现跑。已推（网恢复后）。
+**附**：50-r1d 子代理收尾崩但**崩前已交 AC2 代码＋证据**（`0e8f2ccea`＋`ce198441b`）⇒ 50 现 AC1/AC2/AC4 齐，AC3/AC6 待。
+**在飞**：44-r3（成本最小两件）。
