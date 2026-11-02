@@ -4096,3 +4096,20 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 **关键裁定存档**：keepalive 默认翻转（铁律④编排者拍、A1376）／panel.ts 追认三条件（400-v1）／R15 三答案（A1378）／MSYS2 PATH 绞碎陷阱（398-v3 遗产：PATH 注入必须 POSIX /d/ 形）
 
 **goal**：goal-4c8d8f64-3f2f-47fe-85f9-360b295697d4 已 **pause**（机主刹车令；恢复＝update_goal resume）
+
+## §4.重启前停车点（2026-11-02 09:5x +08，编排者）
+
+**HEAD＝`14cfd8730`；origin/dev＝同；未推 0；已推送安全。**
+**在飞：`395-r1`（subagent，写 cmd/wisp，票 395 Acting 家族派发修复）** —— 重启前工作树有 **4 个未提交修改**：
+- `cmd/wisp/resident_voice_engines_windows.go`
+- `cmd/wisp/resident_voice_windows.go`
+- `cmd/wisp/resident_windows.go`
+- `cmd/wisp/run.go`
+
+★**重启不丢盘上代码**：以上 4 个脏文件在重启后仍在工作树；新会话接手时先 `git diff` 这 4 枚判断完成度 → 接着收尾 → 提交（主题逐字 `票 395 落地腿 395-r1`）。丢的只是那条腿的对话记忆＋收尾报告，代码可从盘上续。
+
+**已交件待复核**：`337-r1`＝commit `66d528120`（已推 origin/dev）；待派 **`337-v1` 验证腿**（非实现者复核零回归）。
+
+**模型分工（A1390）**：主会话固定 DeepSeek；子代理默认已在 profile `agent-default-model`＝`magpie / auto/qfmodel / reasoningEffort: max`（**重启后生效**）；重启前用 `workflow` 显式 override `{provider:"magpie", model:"auto/qfmodel"}` 保证子代理跑 Qwen。
+
+**下一步队列**：①337-v1 验证 ②337 残余（注入式宿主 `risk.Logf` 需 cmd/wisp 补丁腿）③402-v1 验证（cmd/wisp 让出后）④395 收尾。
