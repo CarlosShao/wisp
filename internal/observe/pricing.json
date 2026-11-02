@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "updated": "2026-11-02",
+  "notes": "C23 起始价格表（票 44）。单位：微货币单位（1e-6）／每 100 万 token，整数，⛔ 浮点。这张表只收 provider 自己公开发布的价卡：没公布价格的模型读作 tokens-only ＋「价格未知」，绝不臆造金额（票面 44:19-20 逐字 never fabricate amounts）。日常改价请用 config 覆盖（llm.providers.<provider>.models.<model>.price.*，internal/config/settings.go 的 SetModelPriceIn/Out 就是那两枚叶子），⛔ 改这个文件；改了本文件必须把 version +1 —— AC#6 要的是「版本 bump 记录在案、旧聚合不重算」。key 拼写＝provider/model，与 [llm] text_chain 元素、config.checkChainElement 同形。",
+  "models": {}
+}

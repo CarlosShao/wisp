@@ -190,6 +190,9 @@ type Loop struct {
 	comp     *Compressor
 	reg      *observe.Registry
 	provider llm.LlmProvider
+	// costMeter books the finished task into cost_daily and answers the money
+	// budget (ticket 44). nil = the wired Journal has no cost surface.
+	costMeter *observe.CostMeter
 
 	mu      sync.Mutex
 	history []llm.Message
@@ -254,6 +257,7 @@ func New(opt Options) (*Loop, error) {
 			Budgets:          b,
 		},
 	}
+	l.costMeter = costMeterFor(opt.Journal, opt.Logger)
 	return l, nil
 }
 
@@ -390,6 +394,26 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 	l.append(userMessage(input))
 	if err := j.startTask(ctx, input); err != nil {
 		l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)
+	}
+
+	// C23 money budget (ticket 44 AC#3): a NEW task is refused here, after the
+	// row exists and before a single byte reaches the provider. Two properties
+	// this placement carries:
+	//
+	//   - running tasks are unaffected. Nothing below this line consults the
+	//     budget again, so a task that passed the gate finishes even if its own
+	//     spend crosses the line on the way (the in-flight brake is C22's
+	//     token/round ceiling in the loop above, a different layer with a
+	//     different number - 票 44:24).
+	//   - the refusal is auditable. The task_log row is closed by finish() with
+	//     error_class=budget and the explicit notice as its message, so "which
+	//     three tasks did it refuse yesterday" has an answer in the product's
+	//     own record instead of only in a log file.
+	if v := l.preDispatchBudget(ctx); v != nil {
+		res.Message = v.Notice
+		res.Err = observe.New(observe.ClassBudget, "agent: 新任务被费用预算拒绝")
+		l.publish(Event{Kind: EvError, TaskID: taskID, Text: v.Notice})
+		return l.finish(ctx, root, j, guard, cost, &res, StatusFailed, v.Notice)
 	}
 
 	for {
@@ -1015,6 +1039,12 @@ func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
 		int64(cost.Usage.InputTokens), int64(cost.Usage.OutputTokens),
 		cost.Micros, errClass); err != nil {
 		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+	} else {
+		// Ticket 44: the day aggregate is booked only when the task's own row
+		// actually closed. Booking after a failed close would put cost in the
+		// aggregate for a task_log row that never got its numbers, and the two
+		// surfaces would disagree from then on.
+		l.bookCostDay(wctx, cost, res.TaskID)
 	}
 	l.publish(Event{
 		Kind: EvDone, TaskID: res.TaskID, Text: summary,
