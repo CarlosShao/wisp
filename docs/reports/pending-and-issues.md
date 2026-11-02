@@ -30407,3 +30407,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **22 结案**：22-r1 交付 web 工具 D30（`547d9da00`，24 files +5014：SSRF 私网/回环/重定向链硬拒 `hits=0`＋rebinding per-hop；协议矩阵 17×2 门；首访七判；`docker/mockweb` 注入夹具；launcher）。22-v1 非实现者验收**六格 AC 全 PASS、无放水**（Test22 名册 60/60 零红零跳、`-race` ok、反向五发 `-overlay` 突变全咬、还原干净、`547d9da00..HEAD` 无夹带、thresholds/golden/cmd 两把尺 0 files），判语件 `afc39c489`。编排者翻 6 框、加 Status done、`git mv`→`-done`、双名闸现跑。已推（网恢复后）。
 **附**：50-r1d 子代理收尾崩但**崩前已交 AC2 代码＋证据**（`0e8f2ccea`＋`ce198441b`）⇒ 50 现 AC1/AC2/AC4 齐，AC3/AC6 待。
 **在飞**：44-r3（成本最小两件）。
+
+## A1434（2026-11-02 22:2x +08，编排者）派 24-r1（文档检索工具）；50 暂 park
+
+**派** `24-r1`（文档与检索工具：PDF/docx 读取＋`search.content`；前置 20 已 done；internal/tools 已由 22 交付后空出；本腿只碰文档类件、⛔碰 web*.go／internal/plugin／cmd/wisp=44-r3 在写）。
+**50 暂 park**：AC1（C14 校验）/AC2（host_api 门）/AC4（tamper）已交，AC3（install e2e＋UI）/AC6（bridge 工具可见性）待；因 50 腿连续崩（r1b/r1d 皆 `ok:false`），先不追，留多轮专门攻坚。
+**在飞**：44-r3（成本最小两件）／24-r1（文档检索）。
