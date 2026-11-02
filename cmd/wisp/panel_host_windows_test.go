@@ -841,6 +841,47 @@ func TestPanelHostRealWindowHopAndLifecycle(t *testing.T) {
 		head, baselineTree.TreeWebview, rightAfter.TreeWebview, baselineTree.MachineNamed, rightAfter.MachineNamed)
 }
 
+// foregroundSettleBudget bounds how long this ruler waits for a foreground
+// transition to finish before it samples one. SetForegroundWindow's call
+// returning is not the same event as the foreground having moved: on a busy
+// desktop the transition completes asynchronously, and a sample taken the
+// instant after the call reads the window the transition is LEAVING - the shape
+// of the registered ±1 flap in this ruler's family (docs/evidence/s1/
+// 303-ac3b-ac5-v2.md measured 13 shots on this box, 5 green / 8 red, same code;
+// the ledger entry at pending-and-issues.md:14768 names the family). The four
+// assertions below are byte-identical to 33-r4's and still demand the real
+// transition; the wait only stops them from reading it mid-flight. An
+// instrument bound on a monotonic clock, never a product threshold.
+const foregroundSettleBudget = 2 * time.Second
+
+// waitForegroundIs polls until the foreground window reads target (or the
+// budget ends) and returns the last reading. Monotonic deadline, never a
+// wall-clock difference (ban #4).
+func waitForegroundIs(target uintptr, budget time.Duration) uintptr {
+	deadline := time.Now().Add(budget)
+	for {
+		fg := uintptr(windows.GetForegroundWindow())
+		if fg == target || !time.Now().Before(deadline) {
+			return fg
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+// waitForegroundNot is waitForegroundIs's other half: poll until the foreground
+// window reads anything BUT target, for the samples that must not read the
+// window a Hide has just hidden while Windows is still moving focus off it.
+func waitForegroundNot(target uintptr, budget time.Duration) uintptr {
+	deadline := time.Now().Add(budget)
+	for {
+		fg := uintptr(windows.GetForegroundWindow())
+		if fg != target || !time.Now().Before(deadline) {
+			return fg
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
 // TestAC4FocusReturnToPriorWindowGap33r5 is ticket 33 AC#4's ruler ("editor ->
 // panel -> hide -> focus back in editor"), built by 33-r4. The name carries the leg
 // that owns the fix: 33-r5 landed it. (The code this ruler used to be named after,
@@ -896,6 +937,12 @@ func TestAC4FocusReturnToPriorWindowGap33r5(t *testing.T) {
 		pnlShowWindow.Call(uintptr(editor), pnlSwShow)
 		pnlUpdateWindow.Call(uintptr(editor))
 		pnlSetForeground.Call(uintptr(editor))
+		// The hop's first link is the editor genuinely holding the foreground when
+		// Show samples priorFocus: a process that owns the foreground may hand it
+		// to its own windows, so the whole dance below is same-process and
+		// deterministic only from here. If another window still holds it when the
+		// budget ends, Show proceeds and reads what the desktop actually gave it.
+		waitForegroundIs(uintptr(editor), foregroundSettleBudget)
 		return mgr.Show(ctx)
 	}); err != nil {
 		t.Fatalf("the product's first Show, the one a panel gesture drives and which creates the window, failed on the host thread: %v", err)
@@ -927,16 +974,16 @@ func TestAC4FocusReturnToPriorWindowGap33r5(t *testing.T) {
 	// Windows' threading rule as a product defect. The four assertions are
 	// unchanged either way.
 	hh.call(func() { mgr.Hide() })
-	prior := uintptr(windows.GetForegroundWindow())
+	prior := waitForegroundNot(panelHwnd, foregroundSettleBudget)
 	var showErr error
 	hh.call(func() { showErr = mgr.Show(ctx) })
 	if showErr != nil {
 		t.Fatalf("Show for the focus hop: %v", showErr)
 	}
-	afterShow := uintptr(windows.GetForegroundWindow())
+	afterShow := waitForegroundIs(panelHwnd, foregroundSettleBudget)
 	recorded := uintptr(mgr.prevFocus)
 	hh.call(func() { mgr.Hide() })
-	afterHide := uintptr(windows.GetForegroundWindow())
+	afterHide := waitForegroundNot(panelHwnd, foregroundSettleBudget)
 	head := gitHeadShortForTest(t)
 	mgr.mu.Lock()
 	restoreTo, restoreFG, restoreFocus := uintptr(mgr.lastRestoreTo), mgr.lastRestoreSetForeground, mgr.lastRestoreSetFocus

@@ -377,6 +377,56 @@ func awaitEntryReport(t *testing.T, rp *residentPanel, h *recordingModeHandler, 
 // forever.
 const probeAttemptSettle = 2 * time.Second
 
+// awaitSettledHandoverDocument re-asks the live document, bounded, until it reads
+// as the state coldStartPageHandover hands over LAST: the entry navigation when the
+// embed carries the bundle, the not-built notice otherwise. bringUp issues that
+// handover just before Show returns and the document it starts replaces the probe
+// page asynchronously - ~0.5s after Show returns on this box, the shape 299-r1
+// measured for AC#13's probe. The AC#14 push nail fires the moment showAndWait
+// unblocks, so its document.title write can land in the outgoing document while its
+// report envelope runs in the incoming one: the page then honestly reports a title
+// the push never got to keep (measured 2026-11-01 on the working tree, and the same
+// red on CI run 327 two weeks earlier). The settled reading is the page's own
+// fingerprint (href|readyState|title), read twice in a row identical, readyState
+// complete, and a document that is no longer the transient probe page - the probe
+// page is the one handover document that carries no title of its own. A push timed
+// after that measures the push, not the handover's transit.
+func awaitSettledHandoverDocument(t *testing.T, rp *residentPanel, h *recordingModeHandler) {
+	t.Helper()
+	fingerprintOf := func(seq int) string {
+		id := fmt.Sprintf("ac14-docprobe-%d", seq)
+		evalOnPanelThread(t, rp, "window.wispDispatch("+reportJSEnv(id,
+			"location.href + '|' + document.readyState + '|' + document.title")+");")
+		settle := time.Now().Add(probeAttemptSettle)
+		for time.Now().Before(settle) {
+			if got, ok := latestReport(h, id); ok {
+				return got
+			}
+			time.Sleep(10 * time.Millisecond)
+		}
+		return ""
+	}
+	settled := func(fp string) bool {
+		parts := strings.SplitN(fp, "|", 3)
+		return len(parts) == 3 && parts[1] == "complete" &&
+			(parts[0] == panelEntryURL || parts[2] != "")
+	}
+	prev := ""
+	deadline := time.Now().Add(panelThreadWait)
+	for seq := 1; ; seq++ {
+		if !time.Now().Before(deadline) {
+			t.Fatalf("the panel document never settled on the handover's end state within %v (last fingerprint %q) - a push timed now would measure the handover's transit and not the push, which is a failed measurement, not a pass", panelThreadWait, prev)
+		}
+		fp := fingerprintOf(seq)
+		if fp != "" && fp == prev && settled(fp) {
+			t.Logf("AC#14 push nail: the handover document settled on probe attempt %d: %q", seq, fp)
+			return
+		}
+		prev = fp
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
 // TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe is ticket 33 AC#13's ruler: after a
 // real cold start the document in the window must be the embedded page, not the
 // round-trip probe the host shows while it checks the message channel.
@@ -933,6 +983,12 @@ func TestAC14GoSideEvalPushReachesThePage(t *testing.T) {
 	rp, mgr := startPanelForTest(t)
 	showAndWait(t, rp)
 	h := mgr.disp.Mode.(*recordingModeHandler)
+
+	// The handover's last document must be live before anything is pushed into it:
+	// the push and its report envelope would otherwise straddle the asynchronous
+	// document replacement and measure the transit instead of the push (the helper
+	// names the measurement and the runs that showed it).
+	awaitSettledHandoverDocument(t, rp, h)
 
 	// A value the page can only know if Go's push landed. This nail never awaits a
 	// binding, so nothing here can be satisfied by the reply hop, and vice versa.
