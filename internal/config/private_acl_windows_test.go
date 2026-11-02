@@ -69,22 +69,33 @@ func TestAC2BaselineModeIsDecorative(t *testing.T) {
 	}
 }
 
-// TestAC2MigrationBackupLandsPrivate drives the real read-back path: LoadFile
-// on a v1 config, which is what the process does at every startup, so
-// applyMigrations writes config.toml.bak-1 and rewrites config.toml. Both must
-// come back private.
+// TestAC2MigrationBackupLandsPrivate drives the migration through production
+// entry points and checks the seal. Ticket 345 (2026-11-02, shape A) re-nailed
+// the TRIGGER half of this case: LoadFile on a v1 config is now a PURE read
+// (it asserts no backup and no rewrite appear at the read), and the explicit
+// write - SaveFile, which is where the migration lands now - must write
+// config.toml.bak-1 and replace config.toml, and both files must come back
+// private. The privacy claim AC#2 pinned is unchanged; only which production
+// call creates those files moved.
 func TestAC2MigrationBackupLandsPrivate(t *testing.T) {
 	dir := wideDir(t)
 	path := filepath.Join(dir, "config.toml")
 	if err := os.WriteFile(path, []byte(v1Fixture), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	if _, _, err := LoadFile(path, nil); err != nil {
+	c, _, err := LoadFile(path, nil)
+	if err != nil {
 		t.Fatalf("migrating load: %v", err)
 	}
 	backup := path + ".bak-1"
+	if _, err := os.Stat(backup); !os.IsNotExist(err) {
+		t.Fatalf("ticket 345: the read itself must not write a backup (stat err=%v)", err)
+	}
+	if err := SaveFile(path, c); err != nil {
+		t.Fatalf("SaveFile: %v", err)
+	}
 	if _, err := os.Stat(backup); err != nil {
-		t.Fatalf("migration wrote no backup, so the seal was never exercised: %v", err)
+		t.Fatalf("the explicit migration write made no backup, so the seal was never exercised: %v", err)
 	}
 	assertPrivate(t, backup)
 	assertPrivate(t, path)

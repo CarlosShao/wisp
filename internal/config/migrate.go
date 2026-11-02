@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	toml "github.com/pelletier/go-toml/v2"
@@ -10,11 +11,30 @@ import (
 	"github.com/CarlosShao/wisp/internal/winsec"
 )
 
-// Schema migration (SPEC-03 sec 4.4): a registry of per-version rewrites;
-// loading an older file auto-migrates it through the chain, keeping a
-// byte-identical backup first. Unmigratable files are left untouched with an
-// explicit error (the caller surfaces Unconfigured + guidance) - silently
-// resetting would wipe fs/net allowlists, which is a security bug.
+// Schema migration (SPEC-03 sec 4.4): a registry of per-version rewrites.
+//
+// Ticket 345 (2026-11-02, owner-approved shape A) split the pipeline in two:
+//
+//   - READ (migrateRaw): loading an older file migrates it through the chain
+//     IN MEMORY and hands the migrated bytes to the decoder. The read
+//     pipeline writes no bytes - the operator's file, its comments and its
+//     hand-chosen key order, stay on disk exactly as left.
+//   - WRITE (backupOldSchema, called by SaveFile): the migration lands on an
+//     explicit write, which was always going to replace the file anyway
+//     (D36 rule 3: SaveFile stamps the current version). Before it does, the
+//     pre-write bytes are kept verbatim as config.toml.bak-<ver>.
+//
+// Before this split, "read config.toml once" was itself a disk write whenever
+// the file was behind on schema_version (backup + canonical rewrite inside
+// readConfigFile) - ticket 345's named root of the lost-comments reports.
+//
+// Unmigratable files are left untouched with an explicit error (the caller
+// surfaces Unconfigured + guidance) - silently resetting would wipe fs/net
+// allowlists, which is a security bug. The error sentences below say "the
+// file was left untouched"; since ticket 345 the read path means it by
+// construction, and the write path refuses to run backupOldSchema over a
+// file whose migrated bytes would not load (SaveFile only ever writes an
+// already-validated in-memory config, and mergeWrite re-reads first).
 //
 // Safety invariant: the migrated bytes are decoded and validated BEFORE the
 // file is replaced, so a migration can never write a config that would not
@@ -36,11 +56,12 @@ var migrations = map[int]migrationStep{
 	1: {To: 2, Fn: migrateV1toV2},
 }
 
-// applyMigrations walks raw from ver up to SchemaVersionCurrent. ver 0 (file
-// without schema_version) is treated as v1, the last unversioned layout.
-// On success the original is backed up as config.toml.bak-<ver> and the
-// migrated file atomically replaces path.
-func applyMigrations(path string, raw []byte, ver int) ([]byte, error) {
+// migrateRaw walks raw from ver up to SchemaVersionCurrent and returns the
+// migrated bytes. ver 0 (file without schema_version) is treated as v1, the
+// last unversioned layout. It is PURE (ticket 345): nothing is read from or
+// written to the disk here - the backup and the rewrite that used to ride
+// along moved to backupOldSchema, which SaveFile runs on an explicit write.
+func migrateRaw(raw []byte, ver int) ([]byte, error) {
 	from := ver
 	if from == 0 {
 		from = 1
@@ -65,7 +86,8 @@ func applyMigrations(path string, raw []byte, ver int) ([]byte, error) {
 		cur = step.To
 		data = next
 	}
-	// Dry-check: never write a migrated file that would not load.
+	// Dry-check: a migrated config that would not load is refused here, on
+	// the read side, before any write could carry it anywhere.
 	check := NewDefaults()
 	if err := decodeStrict(data, check); err != nil {
 		return nil, observe.New(observe.ClassConfig, fmt.Sprintf(
@@ -79,24 +101,51 @@ func applyMigrations(path string, raw []byte, ver int) ([]byte, error) {
 			"config.toml: migration to schema version %d produced an invalid config (%v); the file was left untouched",
 			SchemaVersionCurrent, err))
 	}
-	backup := path + ".bak-" + strconv.Itoa(from)
-	// The backup is the pre-migration config *verbatim*, and on a machine that
-	// has not been through D33 yet that is the one file here that still carries
-	// plaintext api_key values (secret.MigratePlaintext exists precisely because
-	// config.toml may hold them). A mode argument does not land on Windows
-	// (ticket 89, A51①), so 0o600 here was decoration: the bytes landed with
-	// whatever the parent directory's DACL hands down, which is readable by
-	// other local accounts. winsec.PrivateFile seals the handle before the first
-	// content byte and refuses the write if the seal fails; because this call
-	// rewrites an existing backup rather than skipping it, PrivateFile is also
-	// the repair path for a wide backup left by an older build.
-	if err := winsec.PrivateFile(backup, raw, 0o600); err != nil {
-		return nil, observe.Wrap(observe.ClassConfig, err, "config.toml migration backup write")
-	}
-	if err := atomicWrite(path, data); err != nil {
-		return nil, observe.Wrap(observe.ClassConfig, err, "config.toml migration rewrite")
-	}
 	return data, nil
+}
+
+// backupOldSchema keeps the pre-write bytes of an older-schema config.toml
+// verbatim as <path>.bak-<ver>, immediately before SaveFile replaces them -
+// the write-side half of what applyMigrations used to run on every read
+// (ticket 345). Pure reads never reach it.
+//
+// Three cases deliberately back up nothing:
+//   - no file at path (first-run): there are no bytes to keep;
+//   - no version can be picked out of the bytes: the read pipeline owns that
+//     report (ticket 223 AC#4 routing), and writing a .bak-<ver> would invent
+//     a version number for a file that never declared one;
+//   - the file already declares the current or a newer version: no migration
+//     is being taken over by this write.
+//
+// The backup can still carry plaintext api_key values (secret.MigratePlaintext
+// exists precisely because config.toml may hold them). A mode argument does
+// not land on Windows (ticket 89, A51①), so 0o600 here was decoration: the
+// bytes landed with whatever the parent directory's DACL hands down, which is
+// readable by other local accounts. winsec.PrivateFile seals the handle before
+// the first content byte and refuses the write if the seal fails; because this
+// call rewrites an existing backup rather than skipping it, PrivateFile is
+// also the repair path for a wide backup left by an older build.
+func backupOldSchema(path string) error {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil // missing or unreadable: nothing verbatim to keep; the atomicWrite that follows answers for the path
+	}
+	ver, peekErr := peekSchemaVersion(raw)
+	if peekErr != nil {
+		return nil
+	}
+	from := ver
+	if from == 0 {
+		from = 1 // the last unversioned layout, the same reading migrateRaw uses
+	}
+	if from >= SchemaVersionCurrent {
+		return nil
+	}
+	backup := path + ".bak-" + strconv.Itoa(from)
+	if err := winsec.PrivateFile(backup, raw, 0o600); err != nil {
+		return observe.Wrap(observe.ClassConfig, err, "config.toml migration backup write")
+	}
+	return nil
 }
 
 // migrateV1toV2 maps the D36 draft model onto the catalog schema (SPEC-03

@@ -12,8 +12,11 @@ import (
 )
 
 // Load pipeline (SPEC-03 sec 4.1): read file -> schema_version check ->
-// (migrate with backup when older) -> strict decode onto struct-tag defaults
+// (migrate IN MEMORY when older; ticket 345 moved the backup and the rewrite
+// out of this pipeline onto the explicit-write side, SaveFile ->
+// backupOldSchema) -> strict decode onto struct-tag defaults
 // -> preset inheritance -> semantic validation -> api_key_ref resolution.
+// The READ pipeline writes no bytes.
 // Plaintext secrets never enter the Config struct; they live in Resolved.
 
 // SecretResolver resolves api_key_ref values to plaintext secrets (SPEC-03
@@ -110,7 +113,7 @@ func readConfigFile(path string) (*Config, error) {
 		// these bytes, the file's shape is unreadable and that is a SYNTAX
 		// failure - it must be named as one, not as a migration problem. It used
 		// to be unnameable, because this probe discarded its error: the version
-		// stayed 0, the pipeline fell into applyMigrations, and a broken line
+		// stayed 0, the pipeline fell into the migration path, and a broken line
 		// came back reported as "cannot migrate from schema version 1".
 		// Measured, not theorized - 票 223's own case planted
 		// "schema_version = 2\n\nthis is not toml [[[" and read that sentence;
@@ -118,7 +121,7 @@ func readConfigFile(path string) (*Config, error) {
 		//
 		// The ver != 0 half is deliberate and it is not a loosening: a file that
 		// declares a version OLDER than this build belongs to the migration
-		// pipeline, and TestMigrateCorruptFileUntouched (migrate_test.go:123)
+		// pipeline, and TestMigrateCorruptFileUntouched (migrate_test.go:166)
 		// requires that path's guidance ("the file was left untouched") for a
 		// declared-1 file with a broken table header. Which pipeline owns the
 		// error is decided by the version the file declares, not by which
@@ -147,7 +150,10 @@ func readConfigFile(path string) (*Config, error) {
 			ver, SchemaVersionCurrent))
 	}
 	if ver != SchemaVersionCurrent {
-		raw, err = applyMigrations(path, raw, ver)
+		// Ticket 345 AC#0/甲形：migration ran on disk whenever we called this;
+		// now it happens in-memory only. The backup-and-replace moved to SaveFile,
+		// which writes canonical form anyway (D36 rule 3).
+		raw, err = migrateRaw(raw, ver)
 		if err != nil {
 			return nil, err
 		}
@@ -182,7 +188,7 @@ func peekSchemaVersion(raw []byte) (int, error) {
 	// that distinction is what decides which pipeline owns the error: a file
 	// that says "schema_version = 1" and is broken further down belongs to the
 	// migration path, whose guidance names the version and promises the file was
-	// left untouched (migrate_test.go:123 pins that sentence for exactly that
+	// left untouched (migrate_test.go:166 pins that sentence for exactly that
 	// shape); a file from which no version can be picked at all has a syntax
 	// problem, and 票 223 AC#4 requires it to be called that.
 	//
@@ -273,6 +279,13 @@ func resolveRefs(c *Config, res SecretResolver) (*Resolved, error) {
 // SaveFile serializes c in canonical form and atomically replaces path. The
 // written file always carries the current schema version (D36 rule 3: the
 // struct is the truth; the file is its serialization).
+//
+// Ticket 345 (shape A): SaveFile is also where schema migration lands now.
+// If the bytes currently on path declare an older schema_version, they are
+// kept verbatim as config.toml.bak-<ver> before this replace (backupOldSchema
+// in migrate.go). The read pipeline never wrote anything; an older file stays
+// exactly as the operator left it - comments and key order included - until
+// an explicit write like this one takes the upgrade over.
 func SaveFile(path string, c *Config) error {
 	if c == nil {
 		return observe.New(observe.ClassConfig, "save: nil config")
@@ -281,6 +294,9 @@ func SaveFile(path string, c *Config) error {
 	cp.SchemaVersion = SchemaVersionCurrent
 	data, err := MarshalCanonical(cp)
 	if err != nil {
+		return err
+	}
+	if err := backupOldSchema(path); err != nil {
 		return err
 	}
 	return atomicWrite(path, data)

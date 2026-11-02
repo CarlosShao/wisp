@@ -45,6 +45,21 @@ base_url = "https://api.deepseek.com/v1"
 model = "deepseek-chat"
 `
 
+// TestMigrateV1Fixture is ticket 345's re-nail of this case (2026-11-02,
+// shape A, owner-approved). What the old case pinned, line by line, and what
+// the same name pins now - no assertion was deleted, the TRIGGER of the disk
+// half moved from read to write:
+//
+//   - OLD: LoadFile on a v1 file wrote the disk inside the read pipeline -
+//     config.toml.bak-1 appeared AND config.toml itself was re-laid with
+//     schema_version = 2 before LoadFile returned.
+//   - NEW: LoadFile only migrates IN MEMORY. The file on disk stays
+//     byte-identical and no backup exists after the read (these are asserted,
+//     not assumed). The first explicit write (SaveFile) lands the migration:
+//     it keeps the pre-write bytes verbatim as config.toml.bak-1 and replaces
+//     the file with the current-schema canonical form.
+//   - UNCHANGED here: the v1 -> v2 value mapping, the byte-identical backup,
+//     the current schema_version in the written file, the clean reload.
 func TestMigrateV1Fixture(t *testing.T) {
 	path := writeConfigFile(t, v1Fixture)
 	before, _ := os.ReadFile(path)
@@ -53,19 +68,16 @@ func TestMigrateV1Fixture(t *testing.T) {
 		t.Fatalf("migrating load: %v", err)
 	}
 
-	// Backup exists and carries the pre-migration original.
-	backup, err := os.ReadFile(path + ".bak-1")
+	// Ticket 345: the read wrote nothing. Same bytes, no backup.
+	afterRead, err := os.ReadFile(path)
 	if err != nil {
-		t.Fatalf("backup config.toml.bak-1 must exist: %v", err)
+		t.Fatal(err)
 	}
-	if string(backup) != string(before) {
-		t.Fatal("backup must be byte-identical to the pre-migration file")
+	if string(afterRead) != string(before) {
+		t.Fatal("a read must not rewrite config.toml - migration-on-read is gone (ticket 345)")
 	}
-
-	// The file itself was upgraded in place.
-	after, _ := os.ReadFile(path)
-	if !strings.Contains(string(after), "schema_version = 2") {
-		t.Fatalf("migrated file must carry schema_version = 2, got:\n%s", after)
+	if _, err := os.Stat(path + ".bak-1"); !os.IsNotExist(err) {
+		t.Fatalf("a read must not create a backup (stat err=%v)", err)
 	}
 
 	// v1 values mapped into the v2 model (nothing silently reset).
@@ -99,6 +111,26 @@ func TestMigrateV1Fixture(t *testing.T) {
 		t.Errorf("[risk] must pass through, got l1_window_sec=%d", c.Risk.L1WindowSec)
 	}
 
+	// The explicit write lands the migration: backup first, then the upgrade.
+	if err := SaveFile(path, c); err != nil {
+		t.Fatalf("explicit write: %v", err)
+	}
+
+	// Backup exists and carries the pre-migration original.
+	backup, err := os.ReadFile(path + ".bak-1")
+	if err != nil {
+		t.Fatalf("backup config.toml.bak-1 must exist after the write: %v", err)
+	}
+	if string(backup) != string(before) {
+		t.Fatal("backup must be byte-identical to the pre-migration file")
+	}
+
+	// The written file carries the current schema version.
+	after, _ := os.ReadFile(path)
+	if !strings.Contains(string(after), "schema_version = 2") {
+		t.Fatalf("written file must carry schema_version = 2, got:\n%s", after)
+	}
+
 	// A reload of the migrated file loads cleanly (idempotent).
 	m2, _, err := LoadFile(path, nil)
 	if err != nil {
@@ -109,14 +141,25 @@ func TestMigrateV1Fixture(t *testing.T) {
 	}
 }
 
+// TestMigrateNoVersionKeyAssumedV1 re-nailed by ticket 345 alongside
+// TestMigrateV1Fixture: the "assumed v1" reading itself is unchanged (a file
+// with no schema_version loads as v1 through the chain); what moves is the
+// backup - it appears on the explicit write, not on the read.
 func TestMigrateNoVersionKeyAssumedV1(t *testing.T) {
 	noVer := strings.Replace(v1Fixture, "schema_version = 1\n", "", 1)
 	path := writeConfigFile(t, noVer)
-	if _, _, err := LoadFile(path, nil); err != nil {
+	c, _, err := LoadFile(path, nil)
+	if err != nil {
 		t.Fatalf("file without schema_version is treated as v1: %v", err)
 	}
+	if _, err := os.Stat(path + ".bak-1"); !os.IsNotExist(err) {
+		t.Fatalf("a read must not create a backup (ticket 345; stat err=%v)", err)
+	}
+	if err := SaveFile(path, c); err != nil {
+		t.Fatalf("explicit write: %v", err)
+	}
 	if _, err := os.ReadFile(path + ".bak-1"); err != nil {
-		t.Fatalf("backup must exist: %v", err)
+		t.Fatalf("backup must exist after the write: %v", err)
 	}
 }
 
@@ -141,9 +184,10 @@ func TestMigrateCorruptFileUntouched(t *testing.T) {
 }
 
 func TestMigrateUnsupportedVersionUntouched(t *testing.T) {
-	path := writeConfigFile(t, "schema_version = 1\n[app]\ntheme = \"dark\"\n")
-	// Direct unit test of the chain: no step registered for 7.
-	_, err := applyMigrations(path, []byte("schema_version = 7\n"), 7)
+	// Direct unit test of the chain: no step registered for 7. migrateRaw is
+	// pure since ticket 345 - it takes no path and cannot touch any file, so
+	// "untouched" holds by construction here.
+	_, err := migrateRaw([]byte("schema_version = 7\n"), 7)
 	if err == nil {
 		t.Fatal("missing migration step must be an explicit error")
 	}

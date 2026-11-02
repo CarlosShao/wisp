@@ -105,10 +105,13 @@ block_private_ranges = true
 }
 
 // TestUnwiredGuardFiresBeforeAnyFileWrite pins AC#2's "no side effects" half.
-// Migration is the only load step that writes to disk (backup + atomic
-// rewrite), and it dry-checks the migrated bytes before touching the file. A
-// v1 config carrying a lying key must therefore leave the file byte-identical
-// and create no backup.
+// Since ticket 345 the load pipeline performs no disk write at all - the
+// migration (migrateRaw) is pure in-memory work, and the backup-and-rewrite
+// only runs inside SaveFile on an explicit write, which a rejected load never
+// reaches. A v1 config carrying a lying key must therefore leave the file
+// byte-identical, create no backup, and leave no temp file - the same reading
+// the old (pre-345) "dry-check before any write" design pinned, now true by
+// construction rather than by ordering.
 func TestUnwiredGuardFiresBeforeAnyFileWrite(t *testing.T) {
 	const v1WithLyingKey = `schema_version = 1
 

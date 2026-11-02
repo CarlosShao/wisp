@@ -49,7 +49,13 @@ package config
 // more (that is AC#1); formatting is. The other loss is narrower and deliberate:
 // because SaveFile always writes the current schema version, a file the loader
 // had to migrate is re-laid out at that version by this write - the same thing
-// the old path did, and the reason readConfigFile below runs migrations first.
+// the old path did, and the reason SaveFile now runs backupOldSchema first.
+//
+// Ticket 345 (2026-11-02, shape A) moved migration-on-disk off the read path.
+// The operator's file now stays exactly as left until SaveFile runs; its comments
+// survive until then (including the moment a migration would have rewritten it).
+// That is the cost surface that used to be invisible when every startup could
+// have replaced your config.toml with a fresh layout - it no longer does.
 
 import (
 	"fmt"
@@ -145,14 +151,21 @@ func (m *Manager) mergeWrite(ownedKey string, setOn func(base *Config)) error {
 	// (2) The keys this write would actually change in the file. Against the
 	// file's own content, never against memory - "what did I write" and "what do
 	// I hold" are two different questions and only the first one is this report.
+	// Ticket 345 (2026-11-02, shape A): the mergeWrite re-read used to call
+	// applyMigrations and re-lay the file in canonical form during the read
+	// itself; that disk write was the root of the "config.toml got reordered,
+	// comments lost" reports. Now the re-read migrates IN MEMORY ONLY; this
+	// branch's bytes-stayed-promise holds for every file, not just one whose
+	// schema_version was already current. The file's upgrade (and its backup)
+	// land when SaveFile actually replaces it.
 	written := []string{ownedKey}
 	if disk != nil {
 		written = diffKeyPaths(disk, base)
 		if len(written) == 0 {
 			slog.Info("config: config.toml already carries this key; this write added nothing (the "+
-				"file's bytes and mtime stayed put only because its schema_version was already current; "+
-				"a file behind on schema_version had already been re-laid in canonical form by the "+
-				"re-read, so comments and hand-chosen key order are not preserved)",
+				"file's bytes and mtime stayed put, and since ticket 345 they stay put whatever the "+
+				"file's schema_version is: the re-read migrates an older file in memory only, so its "+
+				"comments and hand-chosen key order survive until some write actually changes it)",
 				"key", ownedKey)
 			return nil
 		}

@@ -5,10 +5,12 @@ package config
 // says it" promise. Tests only; no behaviour changes (AC#4). 226 planted only a
 // changed VALUE ("size = 56" -> "size = 60") on a fixture whose schema_version was
 // current, so its AC#1/AC#2 held along that branch only: nothing here deletes a
-// line, and nothing there reached the migration inside readConfigFile. These cases
-// pin the delete shapes and that migration, permanently, red on regression.
+// line. Ticket 345 (2026-11-02) re-nailed ONE case of this file - the schema-
+// boundary case below - after migration left the read pipeline; the delete-shape
+// cases above are byte-for-byte the promises 227 pinned and stay green.
 
 import (
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -97,13 +99,23 @@ base_url = "https://api.deepseek.com/v1"
 	}
 }
 
-// AC#2's boundary: the nothing-written promise holds only when the file's
-// schema_version is already current. Strip it and the migration inside
-// readConfigFile re-lays the file DURING the re-read that ends in that log line:
-// bytes move, mtime moves, the comment is gone, while the program says it wrote
-// nothing. AC#4's written-key half needs no new case: writeguard_226_test.go:126-131
-// already pins wrote=[fs.allowed_dirs] and forbids wrote=[ball.size....
-func TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent(t *testing.T) {
+// AC#2's boundary, RE-NAILED by ticket 345 (2026-11-02, shape A, owner-approved;
+// this replaces TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent - no
+// assertion was deleted, the pinned TRUTH is the opposite half, named below):
+//
+//   - OLD promise: "this write added nothing" held ONLY for a current-schema
+//     file, because a behind-version file had already been re-laid in canonical
+//     form by the migration INSIDE the re-read - bytes moved, mtime moved, the
+//     operator's comment died, and the file said schema_version = 2, all while
+//     the program logged that it had added nothing.
+//   - NEW promise: the nothing-written branch writes NOTHING, whatever the
+//     file's schema_version declares. The re-read migrates in memory only
+//     (ticket 345), so the bytes stay put, the mtime stays put, the operator's
+//     comment survives, no config.toml.bak-1 appears (no SaveFile ran), and the
+//     file still declares no schema_version because nothing rewrote it.
+//   - AC#4's written-key half is untouched: writeguard_226_test.go:126-131
+//     still pins wrote=[fs.allowed_dirs] and forbids wrote=[ball.size....
+func TestNothingWrittenStaysUntouchedEvenWhenSchemaIsStale(t *testing.T) {
 	logs := captureSlog(t)
 	hand := strings.Replace(matrixBase,
 		"allowed_dirs = []", `allowed_dirs = ["D:\\data"]  # hand set`, 1)
@@ -116,6 +128,9 @@ func TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent(t *testing.T) {
 	mutate(noVersion)
 	before := readText(t, path)
 	mtimeBefore := statMod(t, path)
+	if !strings.Contains(before, "hand set") {
+		t.Fatal("setup: the stale fixture had no comment to keep")
+	}
 
 	if err := m.AddAllowedDir(testDir); err != nil {
 		t.Fatalf("AddAllowedDir: %v", err)
@@ -125,28 +140,33 @@ func TestNothingWrittenPromiseOnlyHoldsWhenSchemaIsCurrent(t *testing.T) {
 	if !strings.Contains(text, "already carries this key") {
 		t.Fatalf("expected the nothing-written branch to fire; log:\n%s", text)
 	}
-	if !strings.Contains(text, "only because its schema_version was already current") {
-		t.Errorf("the nothing-written sentence must state the schema-current condition; log:\n%s", text)
+	// The sentence may no longer state the schema-current condition: under
+	// ticket 345 the promise is unconditional.
+	if strings.Contains(text, "only because its schema_version was already current") {
+		t.Errorf("the nothing-written sentence still claims the old schema-current condition; log:\n%s", text)
 	}
-	if readText(t, path) == before {
-		t.Error("the schema-less file was NOT re-laid although the log said this write added nothing - " +
-			"either the migration stopped moving the file or this case stopped proving the boundary")
+	if got := readText(t, path); got != before {
+		t.Errorf("ticket 345: a nothing-written branch on a stale-schema file must leave the bytes alone; got:\n%s", got)
 	}
-	if statMod(t, path).Equal(mtimeBefore) {
-		t.Error("mtime did not move on a stale-schema file that logged 'added nothing' - the " +
-			"migration-on-read boundary is no longer being exercised")
+	if !statMod(t, path).Equal(mtimeBefore) {
+		t.Error("mtime moved although this branch writes nothing")
 	}
-	if !strings.Contains(readText(t, path), "schema_version = 2") {
-		t.Errorf("the migrated file does not declare the current schema:\n%s", readText(t, path))
+	if !strings.Contains(readText(t, path), "hand set") {
+		t.Error("the operator's comment did not survive the re-read - the whole point of ticket 345")
 	}
-	if strings.Contains(readText(t, path), "hand set") {
-		t.Error("the operator's comment survived the migration-on-read; the boundary must report it gone")
+	if strings.Contains(readText(t, path), "schema_version") {
+		t.Error("the stale file was re-laid after all - migration-on-read is back")
+	}
+	if _, err := os.Stat(path + ".bak-1"); !os.IsNotExist(err) {
+		t.Errorf("no backup may appear when no write ran (stat err=%v)", err)
 	}
 }
 
-// The paired control that keeps the case above from being red because its setup
-// always mutates the file: same shape, schema already current, promise is true -
-// byte-for-byte untouched, comment still there.
+// The paired control under the NEW promise: nothing-written leaves the file
+// untouched for a stale-schema file too - and for this current-schema control
+// it must stay untouched exactly as before, which keeps the case above from
+// proving a blanket "nothing is ever written" rather than the schema-
+// unconditional boundary of ticket 345.
 func TestNothingWrittenLeavesFileUntouchedWhenSchemaIsCurrent(t *testing.T) {
 	m, path, mutate := newTestManager(t, matrixBase)
 	hand := strings.Replace(matrixBase,

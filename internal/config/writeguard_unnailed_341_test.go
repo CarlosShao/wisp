@@ -191,9 +191,10 @@ func TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory(t *testing.T) {
 // They are two different paths through mergeWrite, and running both is what makes
 // "which branch did a schema-less file take" a reading instead of an assumption:
 // here the file still disagrees with memory on the owned key, so the write really
-// happens - and the migration inside the re-read has already rewritten the file
-// before that write (readConfigFile sees version 0, treats it as v1,
-// applyMigrations replaces the bytes and drops config.toml.bak-1).
+// happens - and since ticket 345 (shape A) the read path never wrote anything;
+// applyMigrations became migrateRaw, which only migrates IN MEMORY. The backup
+// moved to SaveFile; P5's migration-on-read behavior is now a non-starter on
+// reads and requires an explicit write to land any disk changes.
 //
 // What this case pins is what the file promises afterwards: the deleted version
 // line comes back FORCED to the current number, and the report must not say two
@@ -202,7 +203,7 @@ func TestHandDeletedWholeSectionComesBackFromDefaultsNotMemory(t *testing.T) {
 // (writeguard.go:225-229) precisely because SaveFile stamps it, so a claim naming
 // it would be a lie about a key nobody asked this write to touch.
 //
-// Guard pinned: SaveFile stamps the current schema version (loader.go:257). De-gum
+// Guard pinned: SaveFile stamps the current schema version (loader.go:287). De-gum
 // landing: that stamp moved to 1 - the version the operator deleted then comes
 // back WRONG and nothing in the report says so, which is the failure this nail
 // exists for.
@@ -230,16 +231,17 @@ func TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed(t *tes
 	if !strings.Contains(text, "schema_version = 2") {
 		t.Fatalf("the write branch did not re-stamp the deleted schema_version line at the current version:\n%s", text)
 	}
-	// (2) this is a write: bytes and mtime moved (the migration had already moved
-	// them once inside the re-read).
+	// (2) this is a write: bytes and mtime moved (since ticket 345 this is the
+	// ONLY way they move - the re-read leaves a behind-version file alone).
 	if text == before {
 		t.Error("a schema-less file was left byte-identical although this write owned a change")
 	}
 	if statMod(t, path).Equal(mtimeBefore) {
 		t.Error("mtime did not move on the write branch")
 	}
-	// (3) the operator's comment died in the canonical re-lay, and the migration
-	// kept the pre-migration bytes verbatim as the backup: that file is the one
+	// (3) the operator's comment died in the canonical re-lay, and the explicit
+	// write kept the pre-write bytes verbatim as the backup (ticket 345: the
+	// backup moved from the read onto SaveFile): that file is the one
 	// place the destroyed comment still exists, so it is pinned here too.
 	if strings.Contains(text, "hand note") {
 		t.Error("the operator's comment survived the migration-on-read plus write")
