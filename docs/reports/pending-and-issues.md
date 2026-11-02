@@ -30254,3 +30254,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **在飞**：`337-v1c`（补 337-v1 留的 cmd/wisp 半格：跑 `TestRiskSinkInjected337r2`，唯一 cmd/wisp 腿）＋派**票池分诊腿**（只读产工作队列）。
 **402**＝`Status 实施中·待验`（打捞件 a07f685eb 已落，AC#1/2/3/5 已勾、AC#4 零回归电池待跑）；写面 cmd/wisp＋internal/panel ⇒ **cmd/wisp 单发，排 337-v1c 之后**。
 **346**＝普查三形表已出（甲=改 `.github/workflows/ci.yml` 需人工批且顶 111/251/254 钉／乙=POSIX 确定性交错 0 产码、有票 369-r1 先例／丙=同屏打数归因）；★但两枚仪器 `//go:build !windows` ⇒ **本机 Windows 结构性跑不了**，乙只能 Linux CI 验证本机仅 `GOOS=linux` 编译核 ⇒ **346 暂缓派修，具名：其绿读数须 CI，本机不可闭环**。
+
+## A1408（2026-11-02 14:5x +08，编排者）★第 4 票结案：337 → done（337-v1 六格 PASS 同意结 ＋ 337-v1c 补 cmd/wisp 注入支半格绿）
+
+**337 结案**：非实现者 `337-v1` 六格全 PASS「同意结票 337」（判语件 `337-v1-verdict.md`=`15d108ef4`）＋`337-v1c` 补上 337-v1 留的 cmd/wisp 半格（真跑 `TestTicket337R2*` 两枚：`TestOnRuntimeAudit`/`TestWhenHostNeverArmed` 各 rc=0、审计句落 sink `:208`；三格全 PASS「337 可翻框」）。落地腿 `337-r1`=`66d528120`（gate.go New() 接 risk.Logf）＋`337-r2`=`7fd2f37b5`（run.go:758 注入式宿主 risk.Logf=rt.auditf）。编排者翻框 7 枚、Status→done、`git mv`→`-done`、双名闸现跑。已推。
+**派**：`402-v1`（402 打捞件 a07f685eb 待验，AC#4 零回归电池，cmd/wisp 单发）。
