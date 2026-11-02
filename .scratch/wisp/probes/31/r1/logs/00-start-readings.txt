@@ -1,0 +1,133 @@
+票 31 落地腿 31-r1 — 起手核与写面核对（原始读数，2026-11-02 19:0x–19:2x +08）
+本件＝逐字读数归档；判读在 docs/evidence/s1/31r1-impl.md。
+
+[R1] git log --oneline -5 / git rev-parse HEAD / git branch --show-current
+  HEAD=23e63fe0a797e95025ea74c145d1d92a9ca034b3  branch=dev
+  首行＝「编排者A1417：第9票结案402->done…；派31-r1+45-r1补写腿」＝本腿派单笔（现盘最新）
+
+[R2] git diff --cached --name-only
+  （空）⇒ 索引干净
+
+[R3] git rev-list --left-right --count origin/dev...HEAD
+  0	0  ⇒ HEAD==origin/dev、未推 0
+
+[R4] git status --porcelain（他腿在飞面，摘本票相关部分）
+   M internal/agent/cost.go
+   M internal/agent/loop.go
+  ?? internal/agent/costbook_44.go
+  ?? internal/memory/costdao_44.go
+  ?? internal/observe/costbudget.go
+  ?? internal/observe/costmeter.go
+  ?? internal/observe/pricing.go
+  ?? internal/observe/pricing.json
+
+[R5] 在飞文件 mtime（判"正在写"）
+  costdao_44.go     5674B  2026/11/2 18:46:46
+  costbudget.go     8149B  2026/11/2 18:55:42
+  cost.go           4100B  2026/11/2 19:04:08
+  costbook_44.go    5132B  2026/11/2 19:05:51
+  （本腿起手＝19:07:35 ⇒ 44-r1 起手前 2 分 44 秒仍在落笔）
+
+[R6] go build ./internal/...   ⇒ [exit code: 0]（他腿树当下可编译）
+
+[R7] 票面点名的件在不在（第19处）
+  .scratch/wisp/issues/31-reminders.md                        在（42 行，Status: ready-for-agent）
+  .scratch/wisp/issues/04-sqlite-core-done.md                 在 ⇒ 前置票 04 已 done
+  .scratch/wisp/issues/30-result-routing-d10-done.md          在 ⇒ 前置票 30 已 done
+  docs/specs/SPEC-07-tools-and-plugins.md:L68                 在，逐字：
+    | `reminder.set/list/cancel` | 一次性提醒（只发通知） | L1 / L0 / L1 | notify | **S4** | D12 窄例外：不做周期性/触发执行/跨重启补发/OS 级调度 |
+  docs/PLAN.md:L2568（D34 权威表行）                          在，逐字：
+    | **`reminder.set/list/cancel`** | 一次性提醒（**只发通知**） | L1 / L0 / L1 | `notify` | **S4** | ⭐ **对 D12 的部分推翻**，见 16.5.4 |
+  docs/PLAN.md:L2594（16.5.4 标题）                           在：### 16.5.4 对 D12 的部分推翻：提醒（reminder）
+  docs/PLAN.md:L2606（做＝进程内定时器+一条 SQLite 行）        在（逐字）
+  docs/PLAN.md:L2612（局限必须告知）                          在：进程没在跑就不会触发
+  docs/PLAN.md:L3057（D42 表第 9 行＝系统时钟跳变）            在：所有超时与保留期必须用单调时钟…只有落盘时间戳用 wall clock…禁用 wall clock 差值做超时判断
+  docs/PLAN.md:L2838-2846（D38（b）goroutine 名册）            在：常驻 6 个 + 按需 kws-infer + 每任务 3 个 + 临时 6 枚（无任一枚定时器名）
+
+[R8] 引文对不对（第20处）
+  票面 L16「set L1, list L0, cancel L1」⇄ PLAN.md:2568「L1 / L0 / L1」⇄ SPEC-07:68「L1 / L0 / L1」＝三处一致
+  票面 L21 的局限句「进程未运行则不会触发」⇄ PLAN.md:2612 逐字「进程没在跑就不会触发」＝**措辞不同**（PLAN 为权威，票面为转述）
+  AGENTS.md §5 D 表称「D42 出处＝PLAN.md:3035」＝**过期**：现读 L3035＝「A 被原生侧批准 → 按 correlationId 路由回 A…」，真表头＝L3045、真第 9 行＝L3057
+    （AGENTS.md 自己写明"这张表的行号会腐烂 ⇒ 引用前先现跑那把尺"；本腿照做，取到的是 L3057）
+
+[R9] 持久化只能走 internal/memory 的三条尺
+  git grep -l "CREATE TABLE" -- "*.go"（滤掉 _test）⇒ 全仓唯一命中＝internal/memory/schema.go
+  internal/memory/open.go:L100-101 ⇒ reader/writer 两枚 *sql.DB 全为小写字段（包外拿不到句柄）
+  internal/memory/schema.go ⇒ migrationChain(L225)/ddlV1..V4(L34,164,269,324)/applyV1..V4(L235,245,295,471)/schemaMetaVersionKey(L179) 全 package-private；
+    包内导出给外面的只有 Store 的各 DAO 方法（无 Exec/Raw/DB/AddMigration 形接口）
+
+[R10] schema 契约钉（落地时必须动的既有断言，非本腿擅自放宽）
+  internal/memory/schema.go:L159        const SchemaVersionTarget = 4
+  internal/memory/schema_test.go:L201-205  contractTableOrder = 恰好 11 枚表名（"Exactly the eleven tables exist (plus none other)"）
+  internal/memory/schema_test.go:L257    if v != "4"（schema_version 读数钉）
+  internal/memory/schema_test.go:L263-279  逐版语句数钉：v1=15 / v2=1 / v3=5 / v4=5
+  docs/specs/SPEC-02-data-storage.md §3 标题逐字：「Schema（契约级，不得自行增删字段；【SPEC 细化】给出类型）」——**表内无 reminder 表**
+
+[R11] 先例（同族落地腿怎么走的）
+  git log --oneline -6 -- internal/memory/schema_test.go
+    6e19f4a43 票 196 落地腿 196-r1：task_log.state 加 Go 侧唯一权威名册 ＋ schema v4 CHECK（〔乙〕）
+    427c62d0a 票 166-r1：Go 侧会话管理层…＋ schema v3（session/session_turn）
+  internal/memory/schema.go:L152-158 注释逐字承认：「⚠ D35 is a frozen contract…SPEC-02 §3 still lists nine tables;
+    this v3 roster extension carries a spec-note debt that ticket 166's progress note names for the owner」
+  台账现读：L22848「★摆机主 1 件（票 196 契约文字）」＝先例＝Go 侧先落、契约文字那一步摆机主
+
+[R12] 依赖方向铁律（决定包怎么切）
+  internal/tools/grant.go:L12-20 逐字：「the alternative - handing internal/tools a *memory.Store - would put a
+    database handle inside the enforcement layer, and internal/tools has never had one
+    (perm/approval/tools reference memory.Store zero times; the only reason this package imports
+    internal/memory at all is the tool_call row shape)」
+
+[R13] 组装根＝禁区
+  cmd/wisp/run.go:L571  reg := tools.NewRegistry()（生产装配点；本票射程 ⛔ cmd/wisp/**）
+  内部先例＝只交货不接线：internal/tools/plan_present.go:L138 BuiltinPlanEntries()、fs.go:L326、task.go:L601、subagent_197.go:L234
+
+[R14] 名册/分母钉（落地会牵动，非本腿能自行改）
+  internal/tools/tier_consistency_172_ruler_test.go:L34-44：
+    tier172TierEntries=41 / tier172DocNames=40 / tier172LandedNumb=9，注释逐字
+    「这几个数是分母（AC#3）：任何一处变了都是契约变更，钉住它们是为了不让分母悄悄缩水」
+  internal/tools/tier_consistency_172_machine_test.go:L15-27 tier172Bridge 只注册 FS/Task/Subagent 三族（不含 reminder）
+
+[R15] goroutine 名册（票面 L23-24 要求的"named, owned"无处可登记）
+  PLAN.md:L2838-2846 D38（b）名册＝常驻 6／按需 1／每任务 3／临时 6，**无定时器名**
+  internal/observe/goroutine.go:L43-60 四张名册逐字；L81 return CategoryUnknown（名册外＝泄漏症状）
+  先例＝票 197 生产面新起名：internal/tools/subagent_197.go observe.Default.Spawn("subagent-finish-"+bg.ID, "tools", watchRoot, …)
+    （该名同样不在 D38 名册内 ⇒ ClassifyGoroutine 答 Unknown）
+
+[R16] 派单存档
+  Get-ChildItem .scratch/wisp/probes/orch/20261102/txt/ ⇒ 14 枚他腿 *-dispatch.txt，**无 31r1-dispatch.txt**
+  （AGENTS.md ③「派单先存档再发」＝编排者侧动作；本腿只登记缺件，不代写、不据此改判据）
+
+[R17] 今日机器侧零实现（分母尺）
+  git grep -nE "reminder\.(set|list|cancel)" -- "*.go"  => 命中 1 行，且唯一命中在测试注释里：
+    internal/tools/tier_consistency_172_ruler_test.go:129  // cell ("reminder.set/list/cancel") is completed from the shared namespace, so the
+  滤掉 *_test.go 后 非测试命中 = 0  => 今天没有任何 Go 侧 reminder 工具注册（与 172 普查「未落地抽 3 枚…reminder.list」同向）
+
+[R18] 其余写面核对
+  git status --porcelain -- internal/tools  => （空）本腿工具面可用
+  git status --porcelain -- cmd/wisp internal/panel => （空）但 dispatch 明令 ⛔ cmd/wisp/**，不动
+
+[R19] ★复尺（19:4x，交件前）：本腿另一枚写面也被占了
+  起手那次尺（19:2x）＝`git status --porcelain -- internal/tools` 为空 ⇒ 当时判"工具面可用"；
+  19:38:51 现量＝该面多出一枚**他腿未跟踪件**，且非本票任何一格的作者：
+    ?? internal/tools/webnet.go   2696B  CreationTime=LastWriteTime=2026/11/2 19:38:51
+  该件首两行＝`//go:build !windows`／`+build !windows`，体内是 ssrfGuard（自定义 DNS resolver、私有段 pre-connect 阻断），
+  第 17 行注释逐字「See webnet_windows.go for platform-specific implementations」——**`webnet_windows.go` 盘上不存在**
+  （`Get-ChildItem internal/tools -Filter "webnet*" -Name` 只回 `webnet.go` 一枚）。
+  ⇒ 与本票零关系（票 31 不碰 net/ssrf），但它落在本腿**唯一还可用的那枚包**里 ⇒ 本腿对 `internal/tools` 也停手。
+
+[R20] internal/ 全量脏集（19:4x 复尺，逐枚归他腿）
+   M internal/agent/cost.go                     ← 44-r1
+   M internal/agent/loop.go                     ← 44-r1
+  ?? internal/agent/cost_44_test.go             ← 44-r1（起手后新增）
+  ?? internal/agent/costbook_44.go              ← 44-r1
+  ?? internal/agent/costbook_44_test.go         ← 44-r1（起手后新增）
+  ?? internal/memory/costdao_44.go              ← 44-r1  ★闸①
+  ?? internal/memory/costdao_44_test.go         ← 44-r1（起手后新增）
+  ?? internal/observe/costbudget.go             ← 44-r1
+  ?? internal/observe/costmeter.go              ← 44-r1
+  ?? internal/observe/costmeter_44_test.go      ← 44-r1（起手后新增）
+  ?? internal/observe/pricing.go                ← 44-r1
+  ?? internal/observe/pricing.json              ← 44-r1
+  ?? internal/observe/pricing_44_test.go        ← 44-r1（起手后新增）
+  ?? internal/tools/webnet.go                   ← 不明他腿  ★闸①扩面（见 [R19]）
+  git diff --cached --name-only ＝ 空 ⇒ 索引仍干净（本腿⛔ add 他件）
