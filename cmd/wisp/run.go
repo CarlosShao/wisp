@@ -725,6 +725,37 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		rt.gate = s.gate
 		rt.ui = nil // no console surface in a process whose cards go to another host
 		rt.liveCards = &nativeCards{h: s.cards}
+		// Ticket 337 residual, leg 337r2: arm the risk package's OWN security sink
+		// on the injected-host path too. risk.Gate is the sole producer of the honest
+		// fail-closed sentence (the aRuleReason text "... [fail-closed, NOT a match
+		// on this rule] ..." in internal/risk/blacklist.go), and it emits that
+		// sentence through the package-level risk.Logf as the `rule=` field of its
+		// "risk: A-list DENY path=... rule=..." lines (blacklist.go:83). Ticket 337-r1
+		// armed that sink inside approval.New (gate.go:180-182), which covers every
+		// assembly that BUILDS its gate through that constructor - including the
+		// console leg below. A host that INJECTS a gate never calls that constructor
+		// from this function, so this branch was the residual gate.go:175-179 names
+		// out loud: the fail-closed reason still landed on the floor there.
+		//
+		// The sink is rt.auditf - the family every other audit line in this file uses
+		// (:551, :767, :812, :837, :941): "[audit] ..." on stderr plus the "audit: "
+		// record on this run's own sink (agentRuntime.auditf, logsink.go). Assign, do
+		// not guard on nil: an injected host's gate may have armed risk.Logf with the
+		// host's own line (newResidentApprovalWithConfig passes ra.residentAuditf,
+		// resident_approval_windows.go:404), and this assembly cannot read that field
+		// back - approval.Gate keeps Options.Logf write-only (gate.go:180-182). The
+		// root that runs the pipeline owns the process's audit trail, so it is the
+		// root that arms the security sink, and it arms it with the SAME value the
+		// console leg hands through Options.Logf below. One sink family per process,
+		// whichever branch built the gate - that equality is the whole of this
+		// ticket's residual.
+		//
+		// WHAT THIS IS NOT: authority, a widening, or an outward face. It feeds the
+		// LOCAL audit log only - never the model text, never the panel bytes - and it
+		// cannot allow or deny anything. The folded (normPath) paths it carries are
+		// exactly what an auditor needs to attribute a deny, which is the surface a
+		// local audit line is for (337-r1's own note).
+		risk.Logf = rt.auditf
 	} else {
 		rt.liveCards = newNativeCards()
 		rt.ui = &consoleApprovalUI{out: s.stdout, run: rt, live: rt.liveCards}
