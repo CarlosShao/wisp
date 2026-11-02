@@ -30247,3 +30247,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1406（2026-11-02 14:0x +08，编排者）★第 3 票结案：395 → done（非实现者 395-v1 五格＋SPEC-10 七项全 PASS 同意结）
 
 **395 结案**：`395-v1` 五格（①D43表零改②派发逻辑逐行③新测试真跑④反向判据三红＋还原⑤纪律）＋SPEC-10 §8 七项全 PASS「同意结 395」（判语件 `docs/evidence/s1/395-v1-verdict.md`＝`059011810`；遗留两笔跨票边界留编排裁：题面 -run 名误写作测试名、§6.1/§6.2 两笔缝）。落地腿 `395-r1`＝`2216f0d3d`（D43#15 工具臂 Thinking→Acting＋#18 Acting→Speaking 真派发）。编排者翻框 5 枚、Status→done、`git mv`→`-done`、判语入史；双名闸现跑，已推。
+
+## A1407（2026-11-02 14:1x +08，编排者）★395 结案已推（网络恢复）；337-v1c 补验在飞；402 cmd/wisp 待验排后；346 暂缓（Linux-only）
+
+**推送**：网络一度断（github 443 超时），本地照常 commit，恢复后统一推成功（`749b54af9..7b05fa0da`，未推=0）⇒ 340/344/395 三票 done 均在远端。
+**在飞**：`337-v1c`（补 337-v1 留的 cmd/wisp 半格：跑 `TestRiskSinkInjected337r2`，唯一 cmd/wisp 腿）＋派**票池分诊腿**（只读产工作队列）。
+**402**＝`Status 实施中·待验`（打捞件 a07f685eb 已落，AC#1/2/3/5 已勾、AC#4 零回归电池待跑）；写面 cmd/wisp＋internal/panel ⇒ **cmd/wisp 单发，排 337-v1c 之后**。
+**346**＝普查三形表已出（甲=改 `.github/workflows/ci.yml` 需人工批且顶 111/251/254 钉／乙=POSIX 确定性交错 0 产码、有票 369-r1 先例／丙=同屏打数归因）；★但两枚仪器 `//go:build !windows` ⇒ **本机 Windows 结构性跑不了**，乙只能 Linux CI 验证本机仅 `GOOS=linux` 编译核 ⇒ **346 暂缓派修，具名：其绿读数须 CI，本机不可闭环**。
