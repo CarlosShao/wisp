@@ -1,0 +1,2 @@
+派单 2026-11-02 10:4x · 腿 244-c1（普查腿，只读；为'切GUI子系统'做前置）
+任务：AC#0现跑产物子系统(objdump -p build/wisp.exe|grep Subsystem 应=3控制台)+构建链读(scripts/build.ps1:103-110 ldflags)；AC#5ⓐ答'GUI进程任务源从哪来'(依244-a2普查件若在)；AC#6交'谁消费wisp.exe退出码'名册(&/Start-Process/重定向/CI步)。产docs/evidence/s1/244-c1-census.md。⛔动码/构建链(只读第一趟)。边界只读scripts/**+docs/**+console_other.go读；⛔frontend/design/⛔cmd/wisp写(337r2占)；⛔改票面/台账/push。临时件D:\tmp\wisp\20261102\244c1\。

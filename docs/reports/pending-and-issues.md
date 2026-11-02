@@ -30173,3 +30173,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **① 337-v1 首趟**：workflow job 报 completed，但**盘上零产物**——无 337-v1 提交、无 docs/evidence/s1/337-v1-verdict.md、工作树那 1 个 tracked 脏＝337r2 正在改的 cmd/wisp/run.go（非它）⇒ 按「收件只认盘上三把尺（提交真在/件真在/自己复跑）」**判交件失败、不计入**
 **② 重派**：337-v1 重派，硬性要求"每格立刻写进证据件＋commit 证据件"、⛔ 只在回复说结论
 **③ 在飞**：337r2（写 cmd/wisp，已实例在改 run.go）、346-c1（普查 winsec）、337-v1-retry 三腿
+
+## A1395（2026-11-02 10:4x +08，编排者）★★机主「都按推荐」＝对 345/344/340/244 的**机主明示**（满足票面人工批准/行为变更/契约门）
+
+**机主逐字：「都按推荐」**。据此四条一律按推荐执行：
+- **345＝做（甲形：读纯读、迁移搬到显式写）** ｜ **344＝甲（C21真相源改指v3＋删三枚死玻璃色死码）** ｜ **340＝链（补 callCorr⇄Queue.push 真端到端用例）** ｜ **244＝切（先普查 AC#5ⓐ任务源＋AC#6下游退出码名册，再改构建链）**
+**★调度**：为避免污染在飞 337-v1 的编译面（panel/tools 确 import ball/config），已撤 337-v1（稍后干净树重跑）；本波发 4 腿：`345r1`(写 internal/config)、`344r1`(写 internal/ball+docs)、`340r1`(写 internal/agent/approval)、`244c1`(普查只读)。写腿＝337r2+345r1+344r1+340r1 共 4 条满足「铺满≥3」。
+**★写面互斥**：cmd/wisp(337r2)、internal/config(345r1)、internal/ball(344r1)、internal/agent/approval(340r1)、winsec只读(346c1)、scripts只读(244c1)——互不重叠；同名包仅 1 写腿。

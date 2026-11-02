@@ -1,0 +1,2 @@
+派单 2026-11-02 10:4x · 腿 340-r1（写腿 internal/agent/approval，机主明示=链）
+任务：补真端到端用例把 callCorr 与 Queue.push 撞名改写链起来，证 <corr>#<seq> 生成正确(可加最小测试注入口)。AC#0起手现跑；AC#1补用例；AC#2⛔删/放宽既有守卫句；零回归approval包；纪律。⚠起手核 gate.go 已落 337-r1 逻辑勿覆盖。边界写面internal/agent/approval/**+测试；⛔thr/golden/frontend/design/c&#47;cmd/wisp；⛔改票面/台账/push。环境staged/MSYS2 POSIX/gofumpt绝对；临时件D:\tmp\wisp\20261102\340r1\。

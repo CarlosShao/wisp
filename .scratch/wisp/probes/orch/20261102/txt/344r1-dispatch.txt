@@ -1,0 +1,2 @@
+派单 2026-11-02 10:4x · 腿 344-r1（写腿 internal/ball+docs，机主明示=甲）
+任务：C21真相源改指v3(docs/evidence/c21-native-tokens.md 指向)+删三枚死玻璃色死码(internal/ball/tokens.go 废弃v2玻璃字段)；改 TestC21TabkeColour 指向新稿、⛔删断言换绿。零回归。边界写面internal/ball/**+docs/evidence/+必要tokens_table测试；⛔frontend/design/⛔cmd/wisp/⛔改票面/台账/push。环境staged/MSYS2 POSIX PATH/gofumpt绝对；临时件D:\tmp\wisp\20261102\344r1\。

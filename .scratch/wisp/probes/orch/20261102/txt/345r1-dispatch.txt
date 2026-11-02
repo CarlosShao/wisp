@@ -1,0 +1,2 @@
+派单 2026-11-02 10:4x · 腿 345-r1（写腿 internal/config，机主明示=做/甲形）
+任务：迁移-on-读挪出读路径（读=纯读不写盘；迁移只在显式写时发生）。落点 loader.go:126 applyMigrations(读管线)、migrate.go:93/96(写回)。AC#0起手现跑三落点+自加'读路径还有无别的写盘点'尺；AC#1先出三形代价表再动码(甲=迁移只在显式写)；AC#2⛔删用例换绿、改钉新语义具名；AC#3注释存续改前后真读字节各一发；零回归。边界写面internal/config/**+docs/evidence/s1/345r1-*.md；⛔cmd/wisp/thresholds/golden/frontend/design；⛔改票面/台账/push。环境staged/MSYS2 POSIX PATH/gofumpt绝对路径/-overlay仓外+还原核；临时件D:\tmp\wisp\20261102\345r1\。
