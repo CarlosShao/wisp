@@ -4071,3 +4071,28 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 ★**最新台账**＝`A1296`（本日）：结 382（55 票）、在飞 `381-v2`/`41a2-r1`/`42-r1`、写面互斥表在台账②节。
 ★**等机主**：①票 347「一」追认（不认可＝「347 回退」）②他人会话动票 216/120/136 知情吗 ③Wails 迁移裁定＝不迁移（A1295④、可推翻）。
 ★**细则**：全部在台账 A1283–A1296 ＋ `.scratch/wisp/probes/orch/20261022/txt/ruler-scope-checklist.md`（22 处尺坑）。
+
+## 4.★ 停车点（2026-11-02 08:5x +08 · 机主令「收尾刹车」· 编排者 goal-4c8d8f64 round 42）
+
+**HEAD=6c13df498＝origin/dev、未推 0 ✅（全部落库）**
+
+**刚收官（2026-11-01 下午～深夜）**：
+- 票 394（第 70 票 risk 层 mark 观察缝＝R26-5 安全闭环）/397（第 71 票 monitor 复活三处窗间清）/398（第 72 票 silero RNN Reset 面）/400（第 74 票 产品红三件）/401（第 75 票 **keepalive 默认暖姿势正式上线**）全收
+- **票 16 五格全清零残余收官**（格④＝CI run 41302852850 CER=100.00% 双门、编排者跑尺）
+- **机主三连批复全部执行**（panel.ts 追认／droppedCount TS 键已落 frontend/src/lib/panel.ts／R15 三答案＝0.33/82%/26px）
+- **keepalive 链全闭环**：392-r2 毒源隔离→393 Reset API→398 RNN reset 面→397-r2 monitor 复活→401 默认翻转（401-v1 连续 6 发全绿）
+
+**在飞**：无（**402-r1 判死**——临时目录 D:\tmp\wisp\20261101\402r1\** 有半成品脚本、无产物无提交；**票 402 保持待派**）
+
+**待机主 1 件**：★**7 态截图签收**（docs/evidence/s1/68r1-{Sleeping,Listening,Thinking,Speaking,Warm,Settling,Armed}.png＋68r1-evidence.md——回「签收」即清 68 目验面＋12-AC#8 双票）
+
+**下一会话接手清单（按优先序）**：
+1. 机主签收后 → 票 68 目验面收口＋票 12 AC#8 链清（SPEC-08 §2.1 更新＝签收后另票走契约）
+2. **票 402 重派**（panel/WebView2 死形修复＝CI 转绿最后拼图；**派单存档 402-r1-dispatch.txt 可复用**＋401-v1 双树归因为施工图）
+3. 394 残余票（MaxAncestorDepth(16) 演化、394-v2 判后按需）
+4. CI 既有项族：frontend lint SA9009（外部面、需机主授权）／speech census 结构矛盾（待机主裁 DLL-staging carrier 或票面覆盖声明）
+5. TS droppedCount 键已落——**外部 agent 知悉措辞在 docs/evidence/s1/400-v1-verdict.md（机主转）**
+
+**关键裁定存档**：keepalive 默认翻转（铁律④编排者拍、A1376）／panel.ts 追认三条件（400-v1）／R15 三答案（A1378）／MSYS2 PATH 绞碎陷阱（398-v3 遗产：PATH 注入必须 POSIX /d/ 形）
+
+**goal**：goal-4c8d8f64-3f2f-47fe-85f9-360b295697d4 已 **pause**（机主刹车令；恢复＝update_goal resume）
