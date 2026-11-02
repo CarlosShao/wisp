@@ -1,19 +1,24 @@
 # C21 原生侧 token 对照表（ticket 07）
 
-`s1/` 证据 · 生成：T07-impl · 2026-09-19 · 全表反向对账补录：票 12 AC#7 · 2026-09-20
+`s1/` 证据 · 生成：T07-impl · 2026-09-19 · 全表反向对账补录：票 12 AC#7 · 2026-09-20 · 真相源改指第四代＋玻璃三枚退役：票 344 甲 · 2026-11-02（台账 `A1395`）
 
-权威真相源：`design/assets/tokens.css`（C21 契约参考实现）。原生侧（`internal/ball/tokens.go`）
-逐值复制下表；`docs/evidence` 本表供人工核对。规则：球体绘制代码出现任何硬编码色值即违规
+权威真相源：`frontend/src/styles/tokens.generated.css`（第四代生成件，由 `frontend/scripts/gen-tokens.mjs`
+的 `TOKENS` 表逐值产出，`:root` = light、`[data-theme="dark"]` = dark；机主 2026-09-25 pivot，契约文字
+已由票 380 落为 `PLAN.md:3316` 与 `PLAN.md:3612`）。上面 78 行配色表是原生世代（`internal/ball/tokens.go`）
+按第一代参考实现 `design/assets/tokens.css`（原件已在 `72b65c614` 删除）逐值复制的书面记录；机器检查的
+CSS 腿钉在 c21-r1 提交入库的第一代留档副本（`internal/ball/testdata/tokens_c21.css`）上——逐值相等只对**同代同文件**断言：
+第四代腿由「生成器表 ↔ 生成件」守（`internal/panel`），原生世代腿由本表与 `TestC21TableColourRowsMatch*`
+守。`docs/evidence` 本表供人工核对。规则：球体绘制代码出现任何硬编码色值即违规
 （SPEC-08 §2）—— 该约束由 `TestNoHardcodedColorsInBallPackage` 机器执行（仅 `tokens.go` 允许
 出现 `rgba(` / 6 位 hex 字面量）。
 
-**⚠ 覆盖面限定（2026-09-20 编排者裁定，票 12 AC#7 复验挖出的争议 D3）**：上面那句"真相源是 `tokens.css`"
+**⚠ 覆盖面限定（2026-09-20 编排者裁定，票 12 AC#7 复验挖出的争议 D3）**：上面那句"按第一代留档副本逐值复制"
 **只适用于 CSS 有出处的行**。票 62 的液面/吸附配色里有 **36 个 look 色值在 `tokens.css` 里不存在**
 （表内已逐行标 `（无，原生自有）`）——它们是原生侧**首创**，不是复制。两类因此受**不同**的约束：
 
 | 类别 | 出处 | 一致性由谁保证 | 今天有无机器检查（2026-09-21 票 69/74 之后） |
 |---|---|---|---|
-| CSS 同源行（40 暗 + 38 亮 = 78 配色行） | `tokens.css` | 本表逐值对齐（2026-09-20 全表反向对账：**零漂移**） | **有，且已是三方**：`TestC21TableColourRowsMatchCode`（表↔`tokens.go`，78+36 行逐值）+ `TestC21TableColourRowsMatchTokensCSS`（票 74 AC#4：`tokens.css` = 表的 CSS 列 = `tokens.go`，78/78）+ 旧的 `TestTokenGoldenValues`（20 条 CSS 抽查）与 `TestNoHardcodedColorsInBallPackage` |
+| CSS 同源行（40 暗 + 38 亮 = 78 配色行） | 第一代 `tokens.css`（原件已删，CSS 腿钉在 c21-r1 留档副本） | 本表逐值对齐（2026-09-20 全表反向对账：**零漂移**；票 344 甲后 72 行照旧、3 枚玻璃名改钉「字段缺席」） | **有，且已是三方**：`TestC21TableColourRowsMatchCode`（表↔`tokens.go`，78+36 行逐值，玻璃 6 行按 `c21V2RetiredGlass` 反向钉缺席）+ `TestC21TableColourRowsMatchTokensCSS`（票 74 AC#4：留档副本 = 表的 CSS 列，78/78；对 `tokens.go` 75 行逐值 + 3 行钉缺席）+ 旧的 `TestTokenGoldenValues`（19 条 CSS 抽查，玻璃一枚随字段退役）与 `TestNoHardcodedColorsInBallPackage` |
 | 原生自有 look 色（36 行） | 仅 `tokens.go` | 本表 + `tokens.go` 即真相 | **有**：`TestC21TableColourRowsMatchCode` 逐行核这 36 个值并反向要求每个 look 字段都有行。**CSS 腿按定义覆盖不到它们**（`tokens.css` 里没有同名变量），所以"契约级事实"这条限制仍然成立——见下 |
 
 ⇒ 上面第二行的限制（A24-D4 的完成判据）：**"纳入某条机器断言"这半已在 2026-09-21 由票 69 落地**
@@ -28,8 +33,9 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 原生侧只复制其中的颜色分量（`--sheen` 属于上面「范围」列出的 80 条面板专用声明）——本表把 CSS 原文
 照抄，不再只记颜色那半，免得下一个读表的人以为 CSS 里只有一个颜色。
 
-范围（ticket 12 AC#7 对账时明确，2026-09-20；票 74 扩几何/动效一侧，2026-09-21）：本表覆盖**原生侧已
-复制的切片** —— 即 `internal/ball/tokens.go` 的 40 个 `Palette` 字段 + 全部导出的几何/动效常量。
+范围（ticket 12 AC#7 对账时明确，2026-09-20；票 74 扩几何/动效一侧，2026-09-21；票 344 甲核字段名册，2026-11-02）：本表覆盖**原生侧已
+复制的切片** —— 即 `internal/ball/tokens.go` 现役 37 个 `Palette` 字段（3 枚玻璃字段已按票 344 甲退役删除，
+行保留作第一代记录，见「亮色系」表下注记）+ 全部导出的几何/动效常量。
 **票 74 起几何/动效一侧不再停在 `tokens.go`**：凡是改像素的常量，无论声明在 `tokens.go`、`hit.go`
 还是 `liquid.go`，一律要么进本表、要么进 `internal/ball/tokens_table_test.go` 的 `c21OutTableExempt`
 显式豁免（写明一句理由）——机器检查 `TestC21CodeTokensAreTabledOrExempt` 与
@@ -133,6 +139,16 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 
 亮色块未重定义的变量（`--ball-halo`、`--on-solid`）沿用 `:root` 值 —— `LightPalette()` 以
 `DarkPalette()` 为基底覆写，与 CSS 级联语义一致。
+
+**★ 玻璃三枚已退役（票 344 甲，机主 2026-11-02 明示，台账 `A1395`）**：`--glass-ring` / `--glass-hi` /
+`--glass-hi-soft` 在上两表的 6 行**一行不删**——删行＝把债洗成不存在，票 344 AC#2 明令禁止——但
+`internal/ball/tokens.go` 的三个 `Palette` 字段已按裁定删除（删前读数：暗 `rgba(255,255,255,.14)` /
+`.18` / `.08`，亮 `.66` / `.90` / `.60`；非测试读者 `git grep` = **0**，全读数见
+`docs/evidence/s1/344r1-impl.md`）。第四代里没有玻璃这一族（`frontend/src/styles/theme.css` 与
+`tokens.generated.css` 逐枚 `grep -ci glass` = **0**）。机器判据随之**反向钉死**（`c21V2RetiredGlass`，
+`internal/ball/tokens_table_test.go`）：这 6 行必须仍与第一代留档副本逐字一致，**且** `Palette` 必须
+**不再持有**这三个字段——谁把死色码加回去，两处检查当场红。注意与活着的另一族区分：`LiquidLook.Glass`
+（bool）与 `GlassCaustic` / `GlassRimPx` / `GlassLipPx`（票 62 液面玻璃 look）不在本注记射程内，仍被绘制代码读取。
 
 ## 第四代槽位对照（第四代覆盖的 11 名 · 票 380 / `C″`）
 
@@ -255,7 +271,7 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
    目前只对调试器成立。登记为发现，非文档笔误。
 3. **票 62 的 36 个 look 色值没有 CSS 真相源**：`tokens.go` 的 `looks` 表（aurora / glacier /
    nebula / solar × 9 字段）是原生侧自有字面量，`tokens.css` 中无同名变量 —— `TestNoHardcodedColorsInBallPackage`
-   放过它（字面量确在 `tokens.go` 内），但表头「权威真相源 = tokens.css」这条契约对它不成立。
+   放过它（字面量确在 `tokens.go` 内），但表头「第一代留档副本逐值复制」那条记录对它不成立（它连第一代出处都没有）。
    下表按代码逐值补录，CSS 两列如实标 `无（原生自有）`。
 
 ## 票 62 液态玻璃 look 色板（`tokens.go` 的 `looks` 表；无 CSS 真相源）
@@ -316,9 +332,6 @@ CSS 侧消费者、接线的票），"暂未使用"不算。
 |---|---|
 | `Palette.FgPrimary` | CSS 侧 13 个 design 文件在引用（`base.css` + 12 张屏），球面文字只取 `Palette.OnSolid`（角标数字）与 `Palette.FgSecondary`，第三档没有像素路径 |
 | `Palette.FgTertiary` | `--fg-tertiary` 是面板三级文本（`base.css` 13 处 + 8 张屏），悬浮球内不存在第三级文字；面板原生切片（票 33+）才是它的消费方 |
-| `Palette.GlassRing` | 面板 `--shadow-pop`/`--shadow-card` 的 1px 棱边色；球体边缘由 `looks[*].Rim` + `GlassRimPx` 承担（票 62），不叠 CSS 的 shadow 语法 |
-| `Palette.GlassHi` | 面板 inset 高光（`--glass-hi` 只在 `tokens.css` 的 shadow 组合里被引用），球面高光是 `looks[*].Hi` + `OrbHi`，两者不同源 |
-| `Palette.GlassHiSoft` | `base.css`/`ball.html` 的 soft inset 线；原生球体没有独立 soft 层（三枚 brush 直接叠出），所以无消费者 |
 | `Palette.InfoLine` | 原生侧 info 只有队列点，取 `Palette.Info` 单色；`--info-line` 在 CSS 也只被 `base.css` 引用一次，是面板描边色 |
 | `Palette.OrbShadow` | 球的接地阴影由 `looks[*].Caustic × GlassCaustic` 画（`renderer_windows.go` 的 caustic brush），`--orb-shadow` 是 CSS 侧 approval/ball 两屏的投影色 |
 | `Palette.TintAccentHi` | v2 把球面渐变收敛成「核心色 + 高光色」，accent 态实际取 `Palette.Accent`（`statevisual.go`），`--tint-accent-hi` 在 `tokens.css` 之外零引用（死色镜像） |
@@ -359,6 +372,11 @@ CSS 侧消费者、接线的票），"暂未使用"不算。
   字面量与 `tokens.css` 声明逐条比对，`design/assets/tokens.css` 129 条声明中 80 条无原生对应
   （见「范围」）。核对结论：色值 78 行（明 40 + 亮 38）**与 CSS、`tokens.go` 三方逐字一致，零漂移**；
   几何/动效缺 25 个常量，票 12 已全部补录，票 74 再把 `hit.go`/`liquid.go` 的 11 枚提进来。
+- 票 344 甲后补（2026-11-02，台账 `A1395`）：上面"40 个 `Palette` 字段"是当时读数，现现役 37 枚——三枚玻璃
+  字段已删（删前非测试读者 = 0，读数存 `docs/evidence/s1/344r1-impl.md`）；**78 行一行未删**，其中玻璃 6 行
+  的机器判据从「三方逐值一致」改为「行 ↔ 第一代留档副本逐字一致 **且** 字段缺席」反向钉（`c21V2RetiredGlass`），
+  其余 72 行的三方零漂移结论不受影响。「未接线豁免」表里玻璃三行随字段删除（登记对象已不存在，双向机器检查
+  不容许多行）——那是**债的清偿**不是债的抹除：行、读数、裁定去向全部留在本表与 `344r1-impl.md`。
 - 票 64 的 hotkey 面**不产 token**（本票查过，免下一个代理重查）：`internal/ball/hotkey_windows.go`
   三处 `const` 块是 Win32 修饰键/虚拟键码（`modAlt=0x0001` … `vkEscape=0x1B`）与 `HotkeyStatus`
   枚举，既无尺寸也无颜色；`hkNames` 的用户可见文案零 emoji。票 64 进本表的只有边缘吸附三常量

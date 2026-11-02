@@ -68,16 +68,16 @@ func (c Color) Premultiplied() Color {
 }
 
 // Palette is the ball-relevant slice of C21, per theme. Field comments name
-// the CSS custom property; the values are the dark/light rows of
-// design/assets/tokens.css (checked against the CSS by the evidence table).
+// the CSS custom property; the values are the dark/light rows of the
+// first-generation reference (checked against its retained copy by the
+// evidence table). C21's live design authority moved with the owner's
+// 2026-09-25 pivot to the fourth-generation theme -- see
+// docs/evidence/s1/c21-native-tokens.md; nothing here re-pins a value.
 type Palette struct {
-	// Surfaces and glass edges.
-	BGInset     Color // --bg-inset     rgba(6,8,11,.38) | rgba(20,24,28,.06)
-	BGOverlay   Color // --bg-overlay   rgba(30,36,44,.50) | rgba(255,255,255,.72)
-	GlassRing   Color // --glass-ring   rgba(255,255,255,.14) | rgba(255,255,255,.66)
-	GlassHi     Color // --glass-hi     rgba(255,255,255,.18) | rgba(255,255,255,.90)
-	GlassHiSoft Color // --glass-hi-soft rgba(255,255,255,.08) | rgba(255,255,255,.60)
-	BorderSoft  Color // --border-soft  rgba(255,255,255,.10) | rgba(16,20,24,.12)
+	// Surfaces and the soft border.
+	BGInset    Color // --bg-inset     rgba(6,8,11,.38) | rgba(20,24,28,.06)
+	BGOverlay  Color // --bg-overlay   rgba(30,36,44,.50) | rgba(255,255,255,.72)
+	BorderSoft Color // --border-soft  rgba(255,255,255,.10) | rgba(16,20,24,.12)
 
 	// Text.
 	FgPrimary   Color // --fg-primary   #F2F3F5 | #17191C
@@ -124,15 +124,13 @@ type Palette struct {
 	OnSolid Color // --on-solid #FFFFFF (not redefined in light)
 }
 
-// DarkPalette returns the :root palette of tokens.css.
+// DarkPalette returns the :root palette of the first-generation reference
+// (its retained copy; :root was the dark block in that generation).
 func DarkPalette() Palette {
 	return Palette{
-		BGInset:     rgba(6, 8, 11, 0.38),
-		BGOverlay:   rgba(30, 36, 44, 0.50),
-		GlassRing:   rgba(255, 255, 255, 0.14),
-		GlassHi:     rgba(255, 255, 255, 0.18),
-		GlassHiSoft: rgba(255, 255, 255, 0.08),
-		BorderSoft:  rgba(255, 255, 255, 0.10),
+		BGInset:    rgba(6, 8, 11, 0.38),
+		BGOverlay:  rgba(30, 36, 44, 0.50),
+		BorderSoft: rgba(255, 255, 255, 0.10),
 
 		FgPrimary:   hex(0xF2F3F5, 1),
 		FgSecondary: hex(0xA6A9B0, 1),
@@ -175,14 +173,12 @@ func DarkPalette() Palette {
 	}
 }
 
-// LightPalette returns the [data-theme="light"] palette of tokens.css.
+// LightPalette returns the [data-theme="light"] palette of the
+// first-generation reference (its retained copy).
 func LightPalette() Palette {
 	p := DarkPalette() // values the light block does not redefine carry over
 	p.BGInset = rgba(20, 24, 28, 0.06)
 	p.BGOverlay = rgba(255, 255, 255, 0.72)
-	p.GlassRing = rgba(255, 255, 255, 0.66)
-	p.GlassHi = rgba(255, 255, 255, 0.90)
-	p.GlassHiSoft = rgba(255, 255, 255, 0.60)
 	p.BorderSoft = rgba(16, 20, 24, 0.12)
 
 	p.FgPrimary = hex(0x17191C, 1)

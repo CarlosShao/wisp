@@ -636,6 +636,24 @@ func c21ColourFieldNames(t *testing.T, typ reflect.Type) []string {
 	return out
 }
 
+// c21V2RetiredGlass names the first-generation frosted-glass edge colours the
+// owner retired on ticket 344, shape A (owner ruling 2026-11-02, ledger A1395):
+// the fourth-generation theme has no glass family at all (grep -ci glass = 0 in
+// both frontend/src/styles/theme.css and tokens.generated.css) and the three
+// Palette fields had zero readers outside tokens.go, so the fields are gone.
+//
+// The table KEEPS their rows - deleting a row would launder the record into
+// nonexistence (ticket 344 AC#2) - so checks 1 and 5 flip exactly these rows
+// from "the native copy must hold this value" to "the native copy must NOT hold
+// this field", while the first-generation cross-check (row text vs the retained
+// copy) still runs on them. Re-adding a retired colour is a visual decision
+// that belongs to the owner, so it fails here rather than passing silently.
+var c21V2RetiredGlass = map[string]string{
+	"GlassRing":   "ticket 344 shape A (ledger A1395): v2 glass family retired, zero readers before deletion",
+	"GlassHi":     "ticket 344 shape A (ledger A1395): v2 glass family retired, zero readers before deletion",
+	"GlassHiSoft": "ticket 344 shape A (ledger A1395): v2 glass family retired, zero readers before deletion",
+}
+
 // ----------------------------------------------------- check 1: colour rows
 
 // TestC21TableColourRowsMatchCode walks the C21 table's three colour sections and
@@ -643,7 +661,10 @@ func c21ColourFieldNames(t *testing.T, typ reflect.Type) []string {
 // table writes - then walks the other way and asserts that no Palette field or
 // look colour exists without a row. That covers all 114 colour rows (40 dark +
 // 38 light + 36 look), against the 20 TestTokenGoldenValues kept for the CSS
-// spot check.
+// spot check. The three rows named in c21V2RetiredGlass (ticket 344 shape A,
+// ledger A1395) assert the OPPOSITE - the field must be gone - but still count:
+// the row is checked, only the checked proposition flipped from equality to
+// absence.
 func TestC21TableColourRowsMatchCode(t *testing.T) {
 	root := c21RepoRoot(t)
 	colour, geom, _ := c21ParseTable(t, root)
@@ -683,6 +704,7 @@ func TestC21TableColourRowsMatchCode(t *testing.T) {
 	// (a) table -> code: same name, same value.
 	seen := make(map[string]c21ColourRow, len(colour))
 	verified := 0
+	retiredVerified := 0
 	for _, r := range colour {
 		key := r.section + "|" + r.goRef
 		if prev, dup := seen[key]; dup {
@@ -700,6 +722,14 @@ func TestC21TableColourRowsMatchCode(t *testing.T) {
 				continue
 			}
 			field := strings.TrimPrefix(r.goRef, "Palette.")
+			if _, retired := c21V2RetiredGlass[field]; retired {
+				if back, present := c21StructColour(c21PaletteOf(r.section), field); present {
+					t.Errorf("%s: Palette.%s was retired by owner ruling (ticket 344 shape A, ledger A1395) but tokens.go holds it again (%s): re-adding a retired colour is the owner's call, not a test edit",
+						r.where, field, c21ColourText(back))
+				}
+				retiredVerified++
+				continue
+			}
 			var ok bool
 			if got, ok = c21StructColour(c21PaletteOf(r.section), field); !ok {
 				t.Errorf("%s: the table declares Palette.%s, but internal/ball/tokens.go has no Color field of that name", r.where, field)
@@ -802,8 +832,8 @@ func TestC21TableColourRowsMatchCode(t *testing.T) {
 			lookChecked++
 		}
 	}
-	t.Logf("verified %d/%d colour rows against tokens.go (%d palette fields checked in code -> table, %d look colours, %d looks)",
-		verified, len(colour), paletteType.NumField(), lookChecked, len(looks))
+	t.Logf("verified %d/%d colour rows against tokens.go, plus %d retired-glass rows pinned ABSENT (ticket 344 shape A) (%d palette fields checked in code -> table, %d look colours, %d looks)",
+		verified, len(colour), retiredVerified, paletteType.NumField(), lookChecked, len(looks))
 }
 
 // c21EvalClaim evaluates the Go construction the table writes for a colour
@@ -1350,6 +1380,20 @@ func c21FileConsts(t *testing.T, path string) []c21ConstInfo {
 // Ticket 74 AC#4 closes it: for every colour row that cites a CSS variable, all
 // three must now agree, row by row, on the same run.
 //
+// Generation note (ticket 344 shape A, owner ruling 2026-11-02, ledger A1395;
+// contract wording PLAN.md:3316 / PLAN.md:3612, landed by ticket 380): C21's LIVE
+// design authority is the fourth-generation generated theme
+// (frontend/src/styles/tokens.generated.css, polarity :root = light /
+// [data-theme="dark"] = dark, machine-checked by internal/panel). This leg stays
+// a FIRST-generation check on purpose - it reads the retained copy of the old
+// reference committed by c21-r1 (c21TokensCSSPath), because value equality is
+// only assertable within one generation and the native values were never
+// re-pinned to the fourth generation (a value change is a visual decision the
+// owner has to sign). The three glass rows are the one documented exception:
+// their fields were retired WITH the v2 glass family, so leg 2 asserts their
+// ABSENCE (c21V2RetiredGlass) instead of equality - the watchdog still barks,
+// it now guards the deletion.
+//
 // What stays out of this on purpose (the table's own 范围 block):
 //   - the 36 原生自有 look colours, whose CSS column says （无，原生自有）. They have
 //     no tokens.css citation to check, and inventing one would fake the very
@@ -1456,15 +1500,17 @@ func c21NormCSS(v string) string {
 }
 
 // TestC21TableColourRowsMatchTokensCSS walks the dark and light colour rows and
-// pins the third edge: what the table says tokens.css declares must be what
-// tokens.css declares, and that must be the colour tokens.go holds.
+// pins the third edge: what the table says the first-generation reference
+// declares must be what that reference declares, and (for live fields) that must
+// be the colour tokens.go holds - for the three c21V2RetiredGlass rows, that the
+// field is gone instead.
 func TestC21TableColourRowsMatchTokensCSS(t *testing.T) {
 	root := c21RepoRoot(t)
 	colour, _, _ := c21ParseTable(t, root)
 	dark, light := c21ParseTokensCSS(t, root)
 	blocks := map[string]map[string]c21CSSValue{"dark": dark, "light": light}
 
-	cited, checked := 0, 0
+	cited, checked, retiredChecked := 0, 0, 0
 	for _, r := range colour {
 		name := c21TrimTicks(r.cssVar)
 		if !strings.HasPrefix(name, "--") {
@@ -1496,6 +1542,20 @@ func TestC21TableColourRowsMatchTokensCSS(t *testing.T) {
 			continue
 		}
 		field := strings.TrimPrefix(c21TrimTicks(r.goRef), "Palette.")
+		if _, retired := c21V2RetiredGlass[field]; retired {
+			// Ticket 344 shape A: the row must still cite the retired variable
+			// with its first-generation value (leg 1 ran above), and tokens.go
+			// must NOT hold the field any more. Both halves are assertions,
+			// neither is a skip.
+			if back, present := c21StructColour(c21PaletteOf(r.section), field); present {
+				t.Errorf("%s: Palette.%s was retired by owner ruling (ticket 344 shape A, ledger A1395) but tokens.go holds it again (%s): re-adding a retired colour is the owner's call, not a test edit",
+					r.where, field, c21ColourText(back))
+				continue
+			}
+			retiredChecked++
+			checked++
+			continue
+		}
 		fromGo, ok := c21StructColour(c21PaletteOf(r.section), field)
 		if !ok {
 			t.Errorf("%s: the table's Go column %q is not a Palette.<Field> reference", r.where, r.goRef)
@@ -1523,8 +1583,8 @@ func TestC21TableColourRowsMatchTokensCSS(t *testing.T) {
 	} else {
 		t.Errorf("%s declares no --font-sans in :root: FontFamily cites a variable that is not there", c21TokensCSSPath)
 	}
-	t.Logf("three-way colour check: %d/%d cited rows agree across %s, %s and internal/ball/tokens.go (:root=%d decls, light=%d)",
-		checked, cited, c21TablePath, c21TokensCSSPath, len(dark), len(light))
+	t.Logf("three-way colour check: %d/%d cited rows agree across %s, %s and internal/ball/tokens.go, of which %d retired-glass rows verified as row-cites-reference AND field-absent (ticket 344 shape A) (:root=%d decls, light=%d)",
+		checked, cited, c21TablePath, c21TokensCSSPath, retiredChecked, len(dark), len(light))
 }
 
 // c21EvalCSSColor reads a CSS colour literal (`rgba(r,g,b,a)` / `#RRGGBB`) with

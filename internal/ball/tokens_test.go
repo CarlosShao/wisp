@@ -42,7 +42,10 @@ func TestTokenGoldenValues(t *testing.T) {
 		{"light accent", light.Accent, hex(0x3E837A, 1)},
 		{"light danger", light.Danger, hex(0xBC544C, 1)},
 		{"light orb-rim", light.OrbRim, rgba(20, 24, 28, 0.16)},
-		{"light glass-ring", light.GlassRing, rgba(255, 255, 255, 0.66)},
+		// light.GlassRing went with the retired v2 glass family (ticket 344
+		// shape A, ledger A1395): no value is pinned here any more because the
+		// field no longer exists; its ABSENCE is pinned by c21V2RetiredGlass in
+		// tokens_table_test.go, which fails if anybody re-adds the field.
 		// Light does not redefine on-solid/ball-halo: cascade keeps :root.
 		{"light on-solid cascade", light.OnSolid, hex(0xFFFFFF, 1)},
 		{"light ball-halo cascade", light.BallHalo, rgba(255, 255, 255, 0.10)},
