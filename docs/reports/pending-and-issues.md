@@ -30420,3 +30420,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **★铁律⓪处置（技术选型 agent 拍，只把契约文字摆机主）**：PDF 解析建议 **pdfcpu**（纯 Go、Apache-2.0、主流；unidoc 为 AGPL 不宜）**加进 SPEC-01 依赖白名单**——此为"改契约文字"属机主三类之一，**列入待批清单**。同时**不空等**：先派 `24-r2a` 落 docx＋`search.content` 零依赖部分，PDF 留 `TextExtractor` 接口＋stub（待依赖批准后接 pdfcpu）。
 **DEFERRED 标记字面**：仓内既有 `D28-1`/`D11-3` 形 ⇒ 本票用 `D34-1`（编排者定字，非契约改动）。
 **派**：`24-r2a`（docx 读取＋`search.content` 零依赖；PDF 留接口）。**在飞**：44-r3（成本）／24-r2a（文档零依赖）。
+
+## A1436（2026-11-02 22:3x +08，编排者）★44-r3 交付（AC#3 预警事件＋run.go 生产咬合）；派 44-r4（AC#5 整格接线）
+
+**44-r3 交付**（`5ae48abc9`，7 files +424/−2）：`sink.go` 加 `EvWarn`（与 `EvError` 并列）；`costbook_44.go` `preDispatchBudget` 在 `AllowNewTask` return 前发预警（覆盖 80–99% 与 warn 越 100%，100%+pause 仍只 `EvError`）＋`CostWiring`（价卡查不猜＋`observe.BudgetFrom`）；`loop.go` 传 taskID；`cmd/wisp/run.go` `Config.Price=card`＋`SetCostBudget(budget)`＋`consoleSink` 补 `EvWarn`。**AC#3＋生产咬合 done**（腿超 12 调用至 19 次但范围未扩）。
+**44 剩余**：**AC#5 整格**（per-model 日/月配额闸在派发前 gate＋`plan_credit_total_micro` plan-credit 分账＋"remaining 0→跳过派发＋链推进"）——r2 只交 `internal/observe/quota_44.go`（337 行计算），**派 44-r4 接线到 agent 派发路径＋memory 分账**。
+**在飞**：24-r2a（文档零依赖）／44-r4（AC#5 接线）。
