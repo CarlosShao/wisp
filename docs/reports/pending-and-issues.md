@@ -30125,3 +30125,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **③ ★根因判读**：本会话 **routing group 只放通 deepseek（auto 组）**；Qwen 那几家 provider **未在本会话启用/未配凭据** ⇒ 非代码问题、是宿主路由/凭据面
 **④ ★待机主（1 件）**：★**在 GUI 模型选择器里看 Qwen3.8-Flash 的 routing group 名（斜杠前那段）告知我**，或★**在 GUI 里选一次 Qwen3.8-Flash 让宿主注册/授权**——通了我就把子代理切到 `magpie / <组>/qwen3.8-flash`（含 Xhigh 档验证该 API 是否吃档位参数）
 **⑤ ★当前不阻塞**：子代理仍走 subagent 继承主模型，编队照常推进
+
+## A1388（2026-11-02 09:4x +08，编排者）★★★**模型分工已彻底查清并实测通过**（A1387 更正补完）
+
+**① ★根因（我此前按显示名猜错）**：Qwen3.8-Flash 的 routing group `id` **不是** `qwen3.8-flash`，而是 **`auto/qfmodel`**（出处＝`C:\Users\swq\.dsh\profiles\desktop\cordis.patch.yml` 的 `magpie.models`，`id: auto/qfmodel`、`name: Qwen3.8-Flash · routing group`，`reasoningEfforts: {low,medium,xhigh}`）；provider 段 `magpie`（`apiKeyEnv: MAGPIE_GATEWAY_KEY`）
+**② ★实测通过**：`workflow` 的 `agent(prompt,{provider:"magpie", model:"auto/qfmodel"})` → **回复「收到」** ✅（同一 provider 下 `auto/deepseek-v4.1-flash` 亦通）
+**③ ★档位限制（如实）**：`agent()` **仅接受 `label/phase/schema/provider/model` 五选项、无 effort 参数**（实测 `reasoningEffort`/`thinkingLevel` 均报 "not recognized"）⇒ **Xhigh 无法按次下发**，子代理档位＝宿主/网关对该路由组默认；须强制 Xhigh 只能宿主侧设
+**④ ★定案**：**后续子代理派单一律 `workflow` + `provider:"magpie", model:"auto/qfmodel"`**；主会话保持 DeepSeek-V4.1-Flash；`subagent` 仅用于继承主模型的纯委派
+**⑤ ★证据**：7 轮探针（A1387+本笔）——显示名/registry 名 6+ 组全 NULL，最终 `auto/qfmodel` 命中
