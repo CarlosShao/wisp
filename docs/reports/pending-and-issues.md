@@ -30326,3 +30326,13 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **派**：`50-r1`（Tier1 manifest 插件：schema／安装／篡改；前置 20 已 done；预期独立包如 internal/plugin）补第 3 写腿，逐票自核同包。
 **在飞 3 写腿**：44-r1（internal/observe）／22-r1（web）／50-r1（plugin）。
 ★**流程教训**：派腿回执我 slice 400 字丢细节；停手腿应落停手报告件（下次派单加要求）。
+
+## A1421（2026-11-02 19:5x +08，编排者）★31 定性（读其停手件 d457fcbac/5c5bd0626）：非已落地，三重硬闸→C 档契约面
+
+**31 三闸具名（盘上读数全在 `.scratch/wisp/probes/31/r1/logs/00-start-readings.txt`）**：
+① **写面占**：`internal/memory`（44-r1 的 `costdao_44.go` 等）＋`internal/tools`（22-r1 落 `webnet.go`，2696B ssrfGuard）两枚包都被在飞腿占；
+② **存储契约面**：持久化唯一合规落点＝`internal/memory/schema.go`（全仓唯一 `CREATE TABLE`），须**同时移动 4 枚既有契约钉**（D35／SPEC-02 §3，reader/writer 皆小写、迁移链全 package-private）＝**改契约面**；
+③ **名册契约**：票面要 named/owned 定时器，D38(b) 名册（PLAN.md:2838-2846＋goroutine.go:43-60）＝须 1:1；
+＋ **未定义即停**：票面与 SPEC 均未定义 reminder 表形状（表名/列/状态值域）＝AGENTS §0，⛔ 发明 schema。
+⇒ **31 归 C 档（契约面待人批／需 spec 决定）＋写面占，非今日写腿**；机器侧零实现（`reminder.(set|list|cancel)` 非测试 0 命中）。
+**顺带更正**：44-r1 写面实扩到 `internal/memory`（+`internal/agent`/`internal/observe`）；22-r1 落 `internal/tools/webnet.go`。派单存档 `31r1-dispatch.txt` 缺（编排者漏存、已知，登记）。
