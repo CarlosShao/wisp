@@ -305,9 +305,66 @@ $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 Write-Host "build.ps1: wrote $sumsPath"
 
 # --- 6. smoke test ----------------------------------------------------------
+# build\wisp.exe links with -H=windowsgui (`:256`), so it is a GUI-subsystem
+# binary, and a bare '&' call is NOT waited for it: measured 2026-10-04 in
+# ticket 263 (console probe returned after 2049ms with rc=3; the GUI probe
+# fell through in 70ms), and re-measured 2026-11-02 by ticket 244-r2 with a
+# self-built GUI stub that sleeps 2000ms then os.Exit(7): '&' returned after
+# 21ms and $LASTEXITCODE read the stale 0 that '& $go build' (`:270`) had left
+# there (docs/evidence/s1/244r2-smoke-gate.md). That made this gate
+# structurally green no matter what doctor said - the exact defect the
+# 244-c1 census §4 row 1 names. The shape below mirrors
+# scripts/slo-check.ps1 Invoke-ExternalProgram (:143-200, ticket 263):
+# Process.Start + WaitForExit() + the real ExitCode. doctor FAIL => red here.
+function Invoke-ExternalProgram {
+    # Starts an external program, waits for it, and RETURNS its exit code.
+    # Returns [pscustomobject]@{ ok; code; why }; ok=$false means "there is
+    # no code to read" and the caller must FAIL, never treat it as a pass.
+    param(
+        [Parameter(Mandatory)][string]$FilePath,
+        [string[]]$ArgumentList = @()
+    )
+    if (-not (Test-Path -LiteralPath $FilePath)) {
+        return [pscustomobject]@{ ok = $false; code = $null; why = "program not found: $FilePath" }
+    }
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = $FilePath
+    # One command-line string, space/quote-bearing values wrapped the way the
+    # Windows command-line parser expects (this repo's own paths contain spaces).
+    $psi.Arguments = -join @(foreach ($v in $ArgumentList) {
+        $s = [string]$v
+        if ($s -match '[\s"]') { ' "' + ($s -replace '"', '\"') + '"' } else { " $s" }
+    })
+    # UseShellExecute=$false is the measured shape (ticket 263): the child's
+    # own lines still reach this caller's streams, so the CI log keeps the
+    # doctor output, and the exit code comes back the same.
+    $psi.UseShellExecute = $false
+    $proc = $null
+    try {
+        $proc = [System.Diagnostics.Process]::Start($psi)
+    } catch {
+        return [pscustomobject]@{ ok = $false; code = $null; why = ("cannot start '{0}': {1}" -f $FilePath, $_.Exception.Message) }
+    }
+    if ($null -eq $proc) {
+        return [pscustomobject]@{ ok = $false; code = $null; why = ("no process object returned for '{0}'" -f $FilePath) }
+    }
+    try {
+        # The wait is the point. No timeout is invented here: a hang is still
+        # caught by the CI step's own timeout (unchanged shape).
+        $proc.WaitForExit()
+        return [pscustomobject]@{ ok = $true; code = [int]$proc.ExitCode; why = '' }
+    } catch {
+        return [pscustomobject]@{ ok = $false; code = $null; why = ("'{0}' started but its exit code could not be read: {1}" -f $FilePath, $_.Exception.Message) }
+    } finally {
+        $proc.Dispose()
+    }
+}
+
 Write-Host 'build.ps1: smoke test - running wisp.exe doctor'
-& (Join-Path $outDir 'wisp.exe') doctor
-if ($LASTEXITCODE -ne 0) { Fail 'wisp doctor reported FAIL.' }
+$smokeExe = Join-Path $outDir 'wisp.exe'
+$smoke = Invoke-ExternalProgram -FilePath $smokeExe -ArgumentList @('doctor')
+if (-not $smoke.ok) { Fail "smoke test: 'wisp.exe doctor' could not be measured: $($smoke.why)" }
+if ($smoke.code -ne 0) { Fail "wisp doctor reported FAIL (exit code $($smoke.code))." }
 
 Write-Host 'build.ps1: done. Artifacts in build\: wisp.exe, onnxruntime.dll, sherpa-onnx-c-api.dll, sherpa-onnx-cxx-api.dll, SHA256SUMS'
 exit 0
