@@ -30201,3 +30201,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **344r1 收件三把尺**：提交 `ebf33fd77`（5 件：`docs/evidence/s1/c21-native-tokens.md` 真相源改指 v3、`344r1-impl.md`、`internal/ball/tokens.go` **删 `GlassRing/GlassHi/GlassHiSoft` 三枚死玻璃色码**、`tokens_table_test.go`/`tokens_test.go` 改钉字段缺席反向钉）；历史线性（`285fad18b` 是祖先✓）；未推 1 → 已推 origin/dev。**通过**。待 `344-v1` 非实现者验收。
 **调度（写腿低于 3 即补）**：344r1 落 ball 线收口；但 345r1(config) 仍在写、340r1(approval) 在飞 ⇒ 写腿仅 2。**补 `244-r2`（scripts/build.ps1:309-310 冒烟空转修复，镜像 slo-check 的 Invoke-ExternalProgram；用 GUI-stub 证 fix 机制、⛔构建 cmd/wisp 避污染）** ⇒ 写腿＝345r1+340r1+244-r2 三条满 ≥3。
 **在飞**：345r1(config)/340r1(approval)/244-r2(scripts)/346-c1(winsec 普查)。**球/config 一旦收口即发** cmd/wisp 线：`244-r1`(console_other.go 注改+构建验)、`337-v1`(复核 r1+r2)、`395-v1`/`402-v1`。
+
+## A1399（2026-11-02 12:2x +08，编排者）★340r1 收件通过＋调度（config 仍在写＝cmd/wisp 线堵）
+
+**340r1 收件三把尺**：提交 `412a58356`（新文件 `internal/agent/approval/corr_clash_e2e_340_test.go` 556 行；`gate.go` 零字节改——337-r1 的 `risk.Logf=o.Logf` 原样在）；已推 origin/dev。**通过**。待 `340-v1` 非实现者验收。
+**活跃度现跑**：345r1 临时件 12:20 仍在更新（loader.m1/m2 变体生成中，**config 行为变更活干着**）；244r2 12:17 在跑；**346-c1 临时件最后更新 11:35、已约 45 分钟无动静、累计跑约 2h——疑似卡在 gh/网络，待查/可能杀**。
+**调度**：approval 线收口；写腿仅 2（345r1 config ＋ 244r2 scripts）。config 仍活跃写 ⇒ cmd/wisp/panel 均 import config，仍堵。**补 `244-r1`（`cmd/wisp/console_other.go:7` 那句"GUI-subsystem binary (ticket 07)"假出处改真——纯注释改、本腿不 build cmd/wisp 以避免 config 半写污染，构建验证留到 config 收口）作第 3 写腿**。
