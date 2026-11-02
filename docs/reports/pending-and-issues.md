@@ -30426,3 +30426,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **44-r3 交付**（`5ae48abc9`，7 files +424/−2）：`sink.go` 加 `EvWarn`（与 `EvError` 并列）；`costbook_44.go` `preDispatchBudget` 在 `AllowNewTask` return 前发预警（覆盖 80–99% 与 warn 越 100%，100%+pause 仍只 `EvError`）＋`CostWiring`（价卡查不猜＋`observe.BudgetFrom`）；`loop.go` 传 taskID；`cmd/wisp/run.go` `Config.Price=card`＋`SetCostBudget(budget)`＋`consoleSink` 补 `EvWarn`。**AC#3＋生产咬合 done**（腿超 12 调用至 19 次但范围未扩）。
 **44 剩余**：**AC#5 整格**（per-model 日/月配额闸在派发前 gate＋`plan_credit_total_micro` plan-credit 分账＋"remaining 0→跳过派发＋链推进"）——r2 只交 `internal/observe/quota_44.go`（337 行计算），**派 44-r4 接线到 agent 派发路径＋memory 分账**。
 **在飞**：24-r2a（文档零依赖）／44-r4（AC#5 接线）。
+
+## A1437（2026-11-02 22:4x +08，编排者）★24-r2a 交付（docx＋search.content 零依赖）；派 24-v1
+
+**24-r2a 交付**（`8523211a0`，4 新件）：`document_text.go`（`TextExtractor`＋docx 零依赖 `archive/zip`+`encoding/xml` 读 `word/document.xml` 抽 `w:t`／`w:tab`／`w:br`／`</w:p>`＋**PDF stub `DEFERRED(D34-1)`**＋`doc.read` 工具）· `search_content.go`（`search.content`：C26 规范根越界即拒、A/B 清单打开前排除不打印名、三重预算、符号链接不跟随、NUL 二道闸、`Origin`=规范路径 C25 打标缝）· 19 枚定向测试 · 证据。**派单存档已存**（前次 24r1 漏存的毛病已纠）。
+**PDF 仍依赖阻断**（pdfcpu 待机主批 SPEC-01 白名单）。
+**派**：`24-v1` 验收 docx/search.content＋裁 PDF 处置（24 能否在 docx+search 下结、PDF 单列或待批）。
+**在飞**：44-r4（成本 AC#5）／24-v1（文档验收）。
