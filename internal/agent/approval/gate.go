@@ -149,6 +149,37 @@ func New(o Options) *Gate {
 	if logf == nil {
 		logf = func(string, ...any) {}
 	}
+	// Ticket 337 (form 甲, the local audit log): hand the host's audit sink to
+	// the risk package's OWN security sink. risk.Gate is the sole producer of
+	// the honest fail-closed sentence (the aRuleReason text "... [fail-closed,
+	// NOT a match on this rule] ..." in internal/risk/blacklist.go), and it
+	// emits that sentence through the package-level risk.Logf as the `rule=`
+	// field of its "risk: A-list DENY ..."/"risk: B-list ..." lines. Until this
+	// wiring risk.Logf was nil in every production assembly (only tests set it;
+	// census ruler in docs/evidence/s1/337r1-*.md), so those lines - the honest
+	// reason with them - were dropped on the floor: the "消费者 0 枚" this
+	// ticket names, and the reason the ticket-334 sentence reached no human and
+	// no log. This constructor is the in-surface host seam that already receives
+	// that audit sink (Options.Logf, wired to agentRuntime.auditf by cmd/wisp),
+	// so arming the risk sink here makes the fail-closed reason land in the same
+	// local audit trail MODE-READ and PATH-ACCOUNT already use.
+	//
+	// WHAT THIS IS NOT: authority, a widening, or an outward face. It feeds the
+	// LOCAL audit log only - never the model text and never the panel bytes -
+	// and it cannot allow or deny anything. It carries the folded (normPath)
+	// paths the reason already names, which is exactly what an auditor needs to
+	// attribute a deny; the ticket's 334-v1 verdict flagged that this reason
+	// carries real (folded) paths, and a local audit line is the surface where
+	// that is the point rather than a leak.
+	//
+	// RESIDUAL, stated not hidden: a host that injects its own gate (run.go's
+	// s.gate != nil branch) never calls this constructor, so risk.Logf stays
+	// unwired there; that host owns its own risk-security-sink wiring. The two
+	// product assemblies - the console `wisp run` gate and the resident gate -
+	// both build through here.
+	if o.Logf != nil {
+		risk.Logf = o.Logf
+	}
 	ui := o.UI
 	if ui == nil {
 		ui = UIFuncs{}
