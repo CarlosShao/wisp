@@ -3,7 +3,8 @@
 - **腿**: `244-r2`（派单存档 `.scratch/wisp/probes/orch/20261102/txt/244r2-dispatch.txt`，2026-11-02 11:4x）
 - **任务**: `scripts/build.ps1:309-310` 的冒烟从 `& (build\wisp.exe) doctor; if ($LASTEXITCODE -ne 0){Fail}` 改为**真正等到 GUI 进程退出 + 取真实 ExitCode** 的形态（镜像 `scripts/slo-check.ps1:143-200` 的 `Invoke-ExternalProgram`）。
 - **边界**: ⛔只改 `scripts/build.ps1`；⛔不碰 `cmd/wisp/**` / `slo-check.ps1`（263 已修）；stub 临时件放 `D:\tmp\wisp\20261102\244r2\`。
-- **收尾锚点**: HEAD=`c9ef940c853d417d528e0c47e1b0887fcac6cf14`；本文件是唯一交付物（commit message 行：`ticket 244-r2 smoke gate shape fix, scripts/build.ps1 only`，显式 pathspec `D:\work\workspace\projects plans\Wisp\scripts\build.ps1`, `D:\work\workspace\projects plans\Wisp\docs\evidence\s1\244r2-smoke-gate.md`）。
+- **起手三核**（11:4x 现跑）：HEAD=`5f06e48ad`（＝派单要求的号，相等）；暂存区干净；`scripts/build.ps1` 无他人脏（工作树唯一脏项族＝`M internal/config/*`，属 345r1 写腿，本腿一枚没碰）。
+- **交件提交**：`19fccc726`（显式 pathspec＝`scripts/build.ps1`＋本文件两枚，2 files changed；只 commit 未 push）。取数时刻 `2026-11-02 11:42–12:30 +0800`。
 
 ---
 
