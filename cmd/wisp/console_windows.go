@@ -23,7 +23,8 @@ const (
 )
 
 // attachParentConsole makes console output work when this binary is built with
-// the windowsgui subsystem (the final GUI build, ticket 07): such processes
+// the windowsgui subsystem (this attribute comes from scripts/build.ps1's
+// -H=windowsgui flag in the ticket 244 line, not ticket 07): such processes
 // start detached from any console, so `wisp run` / `wisp doctor` must attach to
 // the parent console and rebind the standard handles before printing
 // (SPEC-11 §2.2, SPEC-01 §3).
