@@ -30297,3 +30297,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **391 结案**：`391-v1` 五格全 PASS「同意结 391」（messages/responses 两方言补齐 max_tokens 应用、对照 chat 386-r2 rune 边界同形；两方言各一发汉字切案；`tools/mockllm` FAIL=0、消费方 E2E 全绿；起手三核遇 86-r1 在写 internal/risk 零碰零误判）。落地件 `6cf941b72`（票391落地腿391-r1）。判语件 `391-v1-verdict.md`＝dcb2a28a3。编排者翻框 5 枚、Status→done、`git mv`→`-done`、双名闸现跑。已推。
 **在飞**：86-r1（预算墙钟写）／402-c2（判静默杀去向）／44-r1（成本计 C23 写腿）。
+
+## A1416（2026-11-02 18:4x +08，编排者）★86-r1 交付收件（缺 impl 证据件，派 86-v1 补 verdict 作凭据）
+
+**86-r1 交付**：commit `4d0e2577d`「票 86 落地腿 86-r1：C26 每调用预算的仪器改自校准」——4 枚**全 `internal/risk` 测试文件**（`pathresolver_budget_norace_test.go` +311；`proccpu_windows_test.go`(GetProcessTimes)／`proccpu_unix_test.go`(getrusage)／`proccpu_unsupported_test.go`）；零产码、⛔ 碰 thresholds/golden。★**漏 `docs/evidence/s1/86r1-impl.md`（腿未产 impl 证据件）**——非致命，verdict 腿补全 AC 读数作凭据。
+**派**：`86-v1`（非实现者验收 internal/risk，跑 `TestResolvePerCallBudget` 三档，补 verdict）。
+**在飞**：402-c2／44-r1／86-v1。
