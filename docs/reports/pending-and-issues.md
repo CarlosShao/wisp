@@ -30243,3 +30243,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **337-v1 判语**：判语件 `docs/evidence/s1/337-v1-verdict.md`（commit `15d108ef4`，17KB）——起手三核/AC#0 消费者0＋正控/AC#1 两处接线(gate.go:180-182＋run.go:758)/AC#2 反向判据(overlay 同摘两处⇒rc=1)/AC#3 零回归(approval/risk/tools FAIL=0；panel 1 枚=TestC21DesignTokensFourWayAgree 归因到 344-r1 已处理)/AC#4 门禁四数 rc=0/AC#5 纪律——**全 PASS，「同意结票 337」**。
 **★边界（verdict 自具名）**：cmd/wisp 那两枚注入支用例的**经验红**本腿没跑（避与 395-v1 cmd/wisp 并发），交复跑。⇒ **337 暂不翻框**：待 395-v1 收后，编排者自跑 `go test ./cmd/wisp -run 'TestRiskSinkInjected337r2' -timeout 30m`（sherpa staging）坐实那半格，再据「同意结」翻框结 337。
 **已推**判语件（`15d108ef4`）。**验收在飞**：395-v1（唯一 cmd/wisp 腿）。下波：402-v1、244 构建验、346 归口。
+
+## A1406（2026-11-02 14:0x +08，编排者）★第 3 票结案：395 → done（非实现者 395-v1 五格＋SPEC-10 七项全 PASS 同意结）
+
+**395 结案**：`395-v1` 五格（①D43表零改②派发逻辑逐行③新测试真跑④反向判据三红＋还原⑤纪律）＋SPEC-10 §8 七项全 PASS「同意结 395」（判语件 `docs/evidence/s1/395-v1-verdict.md`＝`059011810`；遗留两笔跨票边界留编排裁：题面 -run 名误写作测试名、§6.1/§6.2 两笔缝）。落地腿 `395-r1`＝`2216f0d3d`（D43#15 工具臂 Thinking→Acting＋#18 Acting→Speaking 真派发）。编排者翻框 5 枚、Status→done、`git mv`→`-done`、判语入史；双名闸现跑，已推。
