@@ -30619,3 +30619,16 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
  d) 若 magpie 网关可调 idle-timeout/并发度则调（环境层，待查）。
 
 **本轮实果（均已推，未推=0，HEAD `4a6e70afe`）**：114(ci.yml AC#11 `34a630d72`)、276(证据+前提顶正 `6fa464a21`)、342(抢救 342r2 撞超时前落的 unix 测试：补成对读数归属支+纠正 old 侧零不可当已闭，`GOOS=linux go vet` rc=0，运行时待 linux CI `4a6e70afe`)。gov-summary 两腿均撞超时未落报告，改由我本轮直查完成根因（即本条）。
+
+## A1461（2026-11-03 23:1x +08，编排者）第76轮：370〔甲′〕落地+371按机主裁定改写落票面；378〔乙〕/309仪器腿在飞
+
+**机主 2026-11-03 就 +GOV 三票作决定**：①371「有价值就改写、不随便去除功能」；②370「按你的来」；③378「按你说的来」。
+
+**本轮实果（已推，未推以现跑为准）**：
+- **370〔甲′〕落地**（`74f430d86`，3 文件）：run.go 保留 chat `RoleSettings` 逐任务重解析→`agent.Config.MaxOutputTokens`→`Assembler.MaxOutputTokens`→请求 `max_tokens`；补 3 枚测试（`Test370RoleMaxOutputReachesTheAssemblerAndTheWire` 读**真实 socket JSON body**、反向"没设就不发"、per-loop）全绿；build rc=0／gofumpt 空／d22 clean。**机主批准〔甲′〕，已兑现 `max_output_tokens` 真流到请求。**
+- **371 按机主裁定改写落票面**（`c5c980220`，票 285 行）：前提「门判方向」已被票 372 撤销（HEAD store.go:268/281 均 RequiresCard(to)，direction.go:23 仅 auto_approve），失效段加注留痕**原句不删**；剩余价值 AC R1–R9 全保留（R2 门放行前要有"卡被答过"凭据、R4 验收靶从不可达 AE→AH 换到 AA；R9 M4 对所有变宽出卡须摆机主）。Status 保持 ready-for-agent（未 -done）。**★关键：372 只挪走门，未治『门只判 nil-ness 不判 answered』核心病 ⇒ 371 真价值仍在。**
+- **在飞**：378〔乙〕（`workflow-8b0074b485de4861`，cmd/wisp，子环路继承半实现 journal：新增行=子任务数、无工具调用行）+ 309b2（`workflow-cefa5f14ddc54933`，internal/tools 只补仪器测试）。写面互斥。
+
+**待机主（已一次摆，编号）**：301（AC#4 裁语"历史违规可追加闭抵消"）／256（Q-77：C18 写死300s vs [risk].confirm_timeout_sec 可配，谁优先）／273（选形，我推荐甲）／185（是否推翻 09-27 按域路径名册旧裁定）。这 4 张是当前 CODE 队列仅剩的 +GOV 卡点。
+
+**dud 实况**：今晚 flash 腿撞上游 300s idle+限流，返空率高（但"返空常有真产出"，本轮 370 即从空返回腿抢救出完整实现）；关键分析我不靠腿、自己读自己写兜底。
