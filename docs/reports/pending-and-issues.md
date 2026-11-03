@@ -30452,3 +30452,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **44 结案**：44-r1（`8827e54ca`+`dc88642e0` 成本核心）＋r2（`19b48978b` observe 配额计算）＋r3（`5ae48abc9` AC#3 EvWarn＋run.go 咬合）＋r4（`a11e63bee`+`b14ee2a95` agent 配额接线）。44-v2 复验**六格全 PASS、同意结**（判语 `48c0ebfb1`），v1 三处欠账**确已真补**（AC#5 整格/ warn 事件出口/ 产品咬合），反向四发自做全红、还原核字节对回。编排者翻 6 框、Status done、`git mv`→`-done`、双名闸现跑。
 **★三条结票登记（落编排者/机主）**：① **配额闸 cmd/wisp 装配腿**（组件层 `QuotaWiring`/`NewQuotaGate`/`GateProvider` 未装进宿主派发链）⇒ **派 44-r5 装配（本波）**；② **per-model 消费永久落库＝D35 冻结表加列**⇒ 机主批准面／或 `SPEC-12 §5` 五字段登记（二选一，**列入待批**）；③ **realtime 轮 gate＝票 60、warn/降级渲染＝票 40**（归属转登记，不记 44 完成）。不挡结小项：`costwiring_44r3_test.go` 超写面一寸（正当自报）。
 **在飞**：24-r3（search.files/apps）／44-r5（配额闸装配）。
+
+## A1441（2026-11-03 09:3x +08，编排者）★24-r3 交付（search.files＋search.apps 枚举半）；派 24-v2
+
+**24-r3 交付**：5 新件、零新依赖——`search_files.go`（`search.files`：复用 r2a `resolveSearch`、名片通配、三重预算、符号链接不跟、越界拒、取消⇒truncated）＋`search.apps` **枚举半**（复用 22-r1 `resolveApp`，不另起第二套；AC#4 启动半已由 22 交付）。腿**超工具预算**（≈34 次，自报因写坏一枚测试返工，非外部阻塞）但交付。
+**24 现状**：零依赖 AC 全覆（docx／search.content／search.files／search.apps），**仅 PDF 两格待依赖批**（pdfcpu，A1435 待机主）＋ `§5 DEFERRED(D34-1)` 登记（契约文字，待机主）。
+**派**：`24-v2` 验 search.files/apps＋裁 24 收官（PDF 仅剩 ⇒ 24 能否结或须待 PDF）。
+**在飞**：44-r5（配额闸装配）／24-v2（文档续验）。
