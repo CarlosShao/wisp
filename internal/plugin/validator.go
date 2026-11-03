@@ -2,8 +2,13 @@ package plugin
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
+
+// envNamePattern is the shape of an environment variable NAME (no '=',
+// no path, nothing a shell would interpret).
+var envNamePattern = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 
 // ValidationError is one C14 schema finding: a dotted field path plus the
 // human-readable reason. Reasons name the contract clause they come from so
@@ -99,6 +104,30 @@ func Validate(m *Manifest) ValidationErrors {
 	for i := range m.Tools {
 		errs = append(errs, validateTool(&m.Tools[i], i)...)
 	}
+	errs = append(errs, validateDuplicateToolNames(m.Tools)...)
+	return errs
+}
+
+// validateDuplicateToolNames enforces C1's uniqueness inside one manifest. Two
+// [[tools]] entries with the same name would silently collapse in the slot's
+// byName map, and the one that lost is the one nobody would notice missing.
+func validateDuplicateToolNames(tools []ToolDef) ValidationErrors {
+	var errs ValidationErrors
+	seen := make(map[string]int, len(tools))
+	for i := range tools {
+		name := tools[i].Name
+		if name == "" {
+			continue
+		}
+		if first, dup := seen[name]; dup {
+			errs = append(errs, ValidationError{
+				Field:  fmt.Sprintf("tools[%d].name", i),
+				Reason: fmt.Sprintf("duplicate tool name %q (already declared at tools[%d]; C1 requires global uniqueness)", name, first),
+			})
+			continue
+		}
+		seen[name] = i
+	}
 	return errs
 }
 
@@ -161,6 +190,159 @@ func validateTool(t *ToolDef, i int) ValidationErrors {
 				Reason: "must not be an empty string",
 			})
 		}
+	}
+
+	// kind selects which of the two shapes this entry is. An unrecognized
+	// spelling is refused: defaulting it to "declarative" would leave the D46
+	// fields of a mis-typed command tool unread, and defaulting it to
+	// "command" would demand an exe nobody wrote.
+	var command bool
+	switch t.Kind {
+	case "", ToolKindDeclarative:
+	case ToolKindCommand:
+		command = true
+	default:
+		errs = append(errs, ValidationError{
+			Field:  path + ".kind",
+			Reason: fmt.Sprintf("must be %q or %q (C14); got %q", ToolKindDeclarative, ToolKindCommand, t.Kind),
+		})
+	}
+
+	errs = append(errs, validateIrreversible(t, path)...)
+	if command {
+		errs = append(errs, validateCommand(t, path)...)
+	}
+	return errs
+}
+
+// validateCommand is the D46 half of C14 (§16.5.6): the fields that only a
+// kind = "command" tool carries, each checked against the constraint that
+// makes the execution channel safe rather than merely convenient.
+func validateCommand(t *ToolDef, path string) ValidationErrors {
+	var errs ValidationErrors
+	errs = append(errs, validateExe(t.Exe, path+".exe")...)
+	errs = append(errs, validateArgvTemplate(t.ArgvTemplate, path+".argv_template")...)
+	if _, perr := schemaProperties(t.Parameters); perr == nil {
+		errs = append(errs, validatePlaceholderSchemas(t, path)...)
+	}
+	errs = append(errs, validateExtract(t.Extract, path+".extract")...)
+
+	// timeout_ms: 0 means "use the D46 default (15000)". A negative value is
+	// nonsense, and an explicit value gets the same floor/ceiling the runtime
+	// applies, so a manifest cannot declare a budget the executor would then
+	// silently change.
+	switch {
+	case t.TimeoutMs == 0:
+	case t.TimeoutMs < MinCommandTimeoutMS:
+		errs = append(errs, ValidationError{
+			Field:  path + ".timeout_ms",
+			Reason: fmt.Sprintf("must be 0 (default %d) or at least %d ms; got %d", DefaultCommandTimeoutMS, MinCommandTimeoutMS, t.TimeoutMs),
+		})
+	case t.TimeoutMs > MaxCommandTimeoutMS:
+		errs = append(errs, ValidationError{
+			Field:  path + ".timeout_ms",
+			Reason: fmt.Sprintf("must be at most %d ms; got %d", MaxCommandTimeoutMS, t.TimeoutMs),
+		})
+	}
+
+	seen := make(map[string]bool, len(t.EnvAllowlist))
+	for j, name := range t.EnvAllowlist {
+		at := fmt.Sprintf("%s.env_allowlist[%d]", path, j)
+		switch {
+		case name == "":
+			errs = append(errs, ValidationError{Field: at, Reason: "must not be an empty string"})
+		case seen[name]:
+			errs = append(errs, ValidationError{Field: at, Reason: fmt.Sprintf("duplicate entry %q", name)})
+		case !envNamePattern.MatchString(name):
+			errs = append(errs, ValidationError{
+				Field:  at,
+				Reason: fmt.Sprintf("%q is not an environment variable name ([A-Za-z_][A-Za-z0-9_]*)", name),
+			})
+		}
+		seen[name] = true
+	}
+	return errs
+}
+
+func validateIrreversible(t *ToolDef, path string) ValidationErrors {
+	var errs ValidationErrors
+	seen := make(map[string]bool, len(t.Irreversible))
+	for j, class := range t.Irreversible {
+		at := fmt.Sprintf("%s.irreversible[%d]", path, j)
+		switch {
+		case class == "":
+			errs = append(errs, ValidationError{Field: at, Reason: "must not be an empty string"})
+		case seen[class]:
+			errs = append(errs, ValidationError{Field: at, Reason: fmt.Sprintf("duplicate class %q", class)})
+		case !containsString(IrreversibleClasses, class):
+			errs = append(errs, ValidationError{
+				Field:  at,
+				Reason: fmt.Sprintf("%q is not an R8 class (%s)", class, strings.Join(IrreversibleClasses, "|")),
+			})
+		}
+		seen[class] = true
+	}
+	return errs
+}
+
+func containsString(list []string, s string) bool {
+	for _, x := range list {
+		if x == s {
+			return true
+		}
+	}
+	return false
+}
+
+// validateExe is the C14 shape check on `exe`, the cheap half of D46's
+// "absolute + stable path" rule. The expensive half (C26 resolution, TEMP
+// detection, the executable-image check and the hash) runs at install time in
+// PinCommandExe, which refuses the same spellings; keeping the shape check here
+// too means a manifest with `%TEMP%\x.exe` is refused by the loader as well, so
+// the red-team case fails even for a leg that never reaches the pin.
+func validateExe(exe, path string) ValidationErrors {
+	switch {
+	case strings.TrimSpace(exe) == "":
+		return ValidationErrors{{Field: path, Reason: "required for a command tool (D46: the absolute path of the wrapped CLI)"}}
+	}
+	for _, marker := range unstableExeMarkers {
+		if strings.Contains(exe, marker) {
+			return ValidationErrors{{
+				Field:  path,
+				Reason: fmt.Sprintf("%q contains %q: D46 refuses a variable or home-relative exe because a movable executable cannot be hash-pinned (PLAN.md §16.5.6)", exe, marker),
+			}}
+		}
+	}
+	var errs ValidationErrors
+	if !isAbsSpelling(exe) {
+		errs = append(errs, ValidationError{
+			Field:  path,
+			Reason: fmt.Sprintf("%q is not absolute: a relative exe depends on the working directory, so its hash proves nothing about what runs", exe),
+		})
+	}
+	// The dangerous ABSOLUTE spelling is refused too, and the order is about a
+	// readable message rather than about severity: a path under
+	// `C:/.../Temp\cli.exe` is absolute, so a test asserting the TEMP marker
+	// would pass on the absoluteness refusal alone and never prove the
+	// stability rule. Being inside a TEMP root is the stronger statement, so it
+	// is named first.
+	if env, root, inTemp := underTempRoot(exe); inTemp {
+		errs = append(errs, ValidationError{
+			Field:  path,
+			Reason: fmt.Sprintf("%q is under %s (%q): a TEMP directory is recycled, so an executable there cannot be hash-pinned (PLAN.md §16.5.6 red-team case)", exe, env, root),
+		})
+	}
+	if strings.HasPrefix(exe, `\\`) || strings.HasPrefix(exe, "//") {
+		errs = append(errs, ValidationError{
+			Field:  path,
+			Reason: fmt.Sprintf("%q is a UNC share: a share name is not a local pin", exe),
+		})
+	}
+	if !CommandExeAllowed(exe) {
+		errs = append(errs, ValidationError{
+			Field:  path,
+			Reason: fmt.Sprintf("%q is not an executable image (%s): a script would need a shell, and D46 never uses one", exe, strings.Join(commandExeExts, "/")),
+		})
 	}
 	return errs
 }

@@ -29,16 +29,22 @@ import (
 //     uninstall teardown (DisposalScope of running instances, ask-about-data)
 //     lives in lifecycle.go — same package, same Authorizer contract.
 //   - The on-disk layout is exactly SPEC-07 §6: <root>\<id>\manifest.toml.
-//   - exe_hash stays empty here: it is the D46 command-plugin slot (ticket 52).
+//   - exe_hash is pinned for a manifest that wraps CLIs (D46, ticket 52):
+//     before anything lands, PinManifestExe resolves each `exe` through C26,
+//     refuses an unstable path, hashes the bytes and compares them with any
+//     exe_hash the manifest declared. The resulting pins go into plugin_state
+//     and into the live view, where every execution re-verifies them.
 
 // InstalledRecord is what the install leg pins in plugin_state: the §14.7
-// columns needed for the AC4 tamper gate (id/version/hash).
+// columns needed for the AC4 tamper gate (id/version/hash), plus the D46 pin.
 type InstalledRecord struct {
 	ID      string
 	Version string
 	Hash    string // "sha256:<hex>" over the exact manifest bytes
-	// ExeHash is the D46 command-plugin slot: always empty for Tier-1
-	// manifests, written by ticket 52 when command tools land.
+	// ExeHash is the D46 command-plugin slot (ticket 52): the pinned sha256 of
+	// every wrapped CLI, keyed by tool name. Empty for a manifest without
+	// command tools, and then nothing about the record changed (the value is
+	// the same shape ticket 50 reserved).
 	ExeHash string
 }
 
@@ -98,6 +104,9 @@ type InstallResult struct {
 	Manifest plugin.Manifest
 	Path     string // <PluginsRoot>\<id>\manifest.toml
 	Hash     string // the pinned plugin_state.hash value
+	// ExePins are the D46 pins by tool name (empty when the plugin wraps no
+	// CLI). They are what every call re-verifies.
+	ExePins map[string]plugin.ExePin
 }
 
 // Refusal sentinels for the install leg.
@@ -155,6 +164,16 @@ func (in Installer) Install(ctx context.Context, raw []byte, source string) (Ins
 		}
 	}
 
+	// D46: pin every wrapped executable BEFORE anything lands, so a command
+	// tool whose exe is movable, missing, not an image, or not the bytes the
+	// manifest named is refused with no file, no state and no registration
+	// (ticket 52, PLAN.md §16.5.6 red-team case 1).
+	exePins, err := plugin.PinManifestExe(m, nil)
+	if err != nil {
+		return InstallResult{}, fmt.Errorf("manifestslot: install refused by D46 pinning: %w", err)
+	}
+	exeHash := plugin.EncodeExePins(exePins)
+
 	if err := in.Authorizer.Authorize(ctx, reviewSheet(m, source)); err != nil {
 		return InstallResult{}, fmt.Errorf("%w: %v", ErrNotAuthorized, err)
 	}
@@ -175,7 +194,7 @@ func (in Installer) Install(ctx context.Context, raw []byte, source string) (Ins
 		in.rollback(ctx, dir, m.ID)
 		return InstallResult{}, fmt.Errorf("manifestslot: installed manifest does not match its pinned hash (refused before registration)")
 	}
-	if err := in.Store.SaveInstalled(ctx, InstalledRecord{ID: m.ID, Version: m.Version, Hash: hash}); err != nil {
+	if err := in.Store.SaveInstalled(ctx, InstalledRecord{ID: m.ID, Version: m.Version, Hash: hash, ExeHash: exeHash}); err != nil {
 		in.rollback(ctx, dir, m.ID)
 		return InstallResult{}, fmt.Errorf("manifestslot: record plugin_state for %s: %w", m.ID, err)
 	}
@@ -189,7 +208,7 @@ func (in Installer) Install(ctx context.Context, raw []byte, source string) (Ins
 		in.rollback(ctx, dir, m.ID)
 		return InstallResult{}, fmt.Errorf("manifestslot: register %s: %w", m.ID, err)
 	}
-	return InstallResult{Manifest: m, Path: path, Hash: hash}, nil
+	return InstallResult{Manifest: m, Path: path, Hash: hash, ExePins: exePins}, nil
 }
 
 // Uninstall is the state/file half of teardown: the record goes and the
