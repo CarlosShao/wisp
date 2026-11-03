@@ -66,6 +66,12 @@ var spawn229ReviewedSites = map[string]string{
 	// Option (a) extend D38b (改契约＝owner), option (b) leave as Unknown until owner decides.
 	// We take (b) now, with documented rationale at agent/reminder_timer.go line comment.
 	`internal/agent/reminder_timer.go|reminderTimerGoroutine`: "reminder-timer：category=unknown（非 roster），票 31-r1 登记为有意识债务。",
+	// ticket 52: c.spawner.Spawn is the OS CHILD-PROCESS spawner (SpawnSpec /
+	// OSCommandSpawner), not a goroutine scope. Its method name trips this
+	// census' Spawn heuristic; the child's lifetime is joined by proc.Wait and
+	// the scope.Go waiter above it, so it is a reviewed NON-goroutine site.
+	// First arg is the monotonic-budget childCtx.
+	`internal/plugin/manifestslot/command.go|childCtx`: "OS 子进程 spawner（SpawnSpec），非 goroutine 名册；首参 childCtx 是预算上下文，进程由 proc.Wait+scope.Go 管辖",
 }
 
 // expr229 renders one AST expression back to source text, whitespace-folded so
