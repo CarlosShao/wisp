@@ -30465,3 +30465,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **44-r5 交付**：`cmd/wisp/run.go` +150（`quotaLedger` 跨任务累积桶＋`quotaDispatchChain` 用 `agent.QuotaWiring`/`NewQuotaGate` 建阀、每链元素包 `gate.GateProvider`、`llm.ChainRunner` 派发链推进、`OnFailover` 发警告、`SetSignalWriter` 落 `provider_health.quota_state=exhausted`、`Book` 记账）＋`quota_44r5_test.go` 9 用例（over-cap skip＋chain advance＋warn／under-cap／no-card 不阻／**no-notify＝债务 shape 反向**／`Test44R5RunGoInstallsTheGate` static pin）。**⇒ 配额闸现真机派发链生效，44 登记①完成、44 全组装**。注：装配腿无独立非实现者复验（9 用例含反向＋static pin，留 QA 抽查）。
 **派**：`45-r1`（诊断守卫；前次因与 44-r1 同包 `internal/observe` 停手，现 44 已结、observe 空出可做）。
 **在飞**：24-v2（文档续验）／45-r1（诊断守卫写）。
+
+## A1443（2026-11-03 09:5x +08，编排者）★24-v2 判：零依赖 AC 全 PASS；24 归 C 档（待 owner 两纸）；派 50-r1e
+
+**24-v2 裁决**：零依赖格**全 PASS**——`search.files`＋`search.apps` 枚举半（复用 22-r1 `resolveApp` 未起二套；39+27 用例全绿、`SkipsSymlinks`/AUMID 形状门真跑非 Skip、反向有牙、还原核 blob 全同、go.mod 零改）。**四格中三枚整格闭合**（AC#2/3/4＋AC#1 docx 半）。**整票 −done 不同意**——卡点仅两张待批纸：① **pdfcpu 白名单**（机主）② **`SPEC-12 §5 DEFERRED(D34-1)` 五字段行**（契约文字，机主/编排者具名）。⇒ **24 归 C 档（owner-gated），零依赖部分已闭合**；落行后可开「24b：PDF 三支 AC」续票 + bridge 接线续票。
+**派**：`50-r1e`（AC6 plugin 工具桥：plugin tool 进 `list_tools`/discovery＋execution 记录 plugin id；internal/tools+plugin 已空）。
+**在飞**：45-r1（诊断守卫）／50-r1e（plugin AC6）。
