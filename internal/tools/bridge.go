@@ -409,6 +409,7 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 func (b *Bridge) checkCaps(req agent.ToolRequest, entry Entry) (Decision, string) {
 	dec := Decision{
 		Tool: req.Name, Provider: entry.Decl.Provider, Args: req.Args,
+		PluginID:     entry.Decl.PluginID,
 		Capabilities: dedupe(entry.Decl.Needs), CorrelationID: req.CorrelationID,
 		TaskID: req.TaskID, CallID: req.CallID,
 		Level:   entry.Decl.Declared,
@@ -538,6 +539,18 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 ) (agent.ToolOutcome, error) {
 	timeout := b.timeoutFor(entry)
 	dec.Timeout = timeout
+
+	// Ticket 50 AC6: a plugin-supplied tool executes behind the SAME gate as a
+	// builtin, but its execution record also names which plugin it came from.
+	// It is booked here, at the dispatch into entry.Tool.Execute, and not in
+	// the refusals above: a call that never ran must not leave an execution
+	// attribution behind. A builtin entry has no plugin id and prints nothing,
+	// so this line is the positive evidence that the call was plugin-sourced.
+	if entry.Decl.PluginID != "" {
+		b.log("tools: PLUGIN-SOURCE task=%s corr=%s tool=%s plugin_id=%s kind=%s",
+			req.TaskID, orDefault(req.CorrelationID, req.TaskID), req.Name,
+			entry.Decl.PluginID, entry.Decl.Provider)
+	}
 
 	// D38d ceiling. A cancelled task must not queue behind a full semaphore.
 	slot := &inFlightSlot{}

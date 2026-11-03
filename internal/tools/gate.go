@@ -13,8 +13,13 @@ import (
 // renders RulesHit and Reason VERBATIM (ticket 17's frozen-contract note), so
 // this struct, not a string, is the unit that leaves the bridge.
 type Decision struct {
-	Tool         string
-	Provider     Kind
+	Tool     string
+	Provider Kind
+	// PluginID is the installed plugin that owns a non-builtin entry (ticket 50
+	// AC6). It travels with the verdict for the same reason Mode does: the audit
+	// trail has to answer "which plugin ran this" from the record, and the tool
+	// name cannot answer it. Empty for builtin tools.
+	PluginID     string
 	Params       map[string]any
 	Args         json.RawMessage
 	Level        risk.Level

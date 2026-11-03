@@ -27,8 +27,8 @@ const (
 // to wire Tier-1/Tier-2/MCP discovers the gap at construction time instead of
 // shipping a provider that silently offers zero tools.
 var ErrSlotNotLanded = errors.New(
-	"tools: provider slot declared but not implemented (manifest=ticket 50, " +
-		"goja=ticket 51, mcp=REJECTED per D13/16.9#7)")
+	"tools: provider slot declared but not implemented (goja=ticket 51, " +
+		"mcp=REJECTED per D13/16.9#7)")
 
 // SlotErr records WHY a slot is still empty, so the reason travels with the
 // error rather than living only in a comment.
@@ -47,10 +47,11 @@ func (e SlotErr) Error() string {
 // Unwrap lets errors.Is(err, ErrSlotNotLanded) work through the wrap.
 func (e SlotErr) Unwrap() error { return ErrSlotNotLanded }
 
-// providerSlots is the declared C4 surface: every slot the spec names, whether
-// or not anything lives behind it.
+// providerSlots is the declared C4 surface that still has NO implementation.
+// The Manifest slot is not on it any more: ticket 50 (AC6) landed it, so a
+// plugin's declarative tools register through RegisterProvider like any other
+// slot instead of being answered with a placeholder error.
 var providerSlots = []SlotErr{
-	{Kind: KindManifest, Ticket: "ticket 50 lands Tier-1 manifests"},
 	{Kind: KindGoja, Ticket: "ticket 51 lands the Tier-2 goja runtime"},
 	{Kind: KindMCP, Ticket: "REJECTED: D13/16.9#7, interface slot only"},
 }
@@ -169,7 +170,9 @@ func (r *Registry) RegisterProvider(p Provider) error {
 			return s // SlotErr: the slot exists in the contract and nothing lands it yet
 		}
 	}
-	if p.Kind() != KindBuiltin {
+	switch p.Kind() {
+	case KindBuiltin, KindManifest:
+	default:
 		return fmt.Errorf("tools: register provider: unknown slot %q", p.Kind())
 	}
 	// Validate every entry first (Register would refuse a bad one, but it also
@@ -179,6 +182,13 @@ func (r *Registry) RegisterProvider(p Provider) error {
 		if err := r.validate(e); err != nil {
 			return err
 		}
+		// AC6 (ticket 50): a plugin-supplied tool must say WHICH plugin. A
+		// manifest slot that registers an entry without an identity would put
+		// the provenance gap back exactly where the audit trail needs it, so it
+		// is refused here rather than logged as empty later.
+		if p.Kind() == KindManifest && e.Decl.PluginID == "" {
+			return fmt.Errorf("tools: register provider %s: entry %q carries no plugin id (AC6)", p.Kind(), e.Tool.Name())
+		}
 		ok = append(ok, e)
 	}
 	r.mu.Lock()
@@ -187,7 +197,7 @@ func (r *Registry) RegisterProvider(p Provider) error {
 	for _, e := range ok {
 		if _, dup := r.byName[e.Tool.Name()]; !dup {
 			if e.Decl.Provider == "" {
-				e.Decl.Provider = KindBuiltin
+				e.Decl.Provider = p.Kind()
 			}
 			e.Decl.Capabilities = dedupe(e.Decl.Capabilities)
 			e.Decl.Needs = dedupe(e.Decl.Needs)

@@ -94,4 +94,12 @@ type Decl struct {
 	Resident bool
 	// Provider is which C4 slot supplied this entry.
 	Provider Kind
+	// PluginID names the installed plugin that owns this entry, for every slot
+	// but Builtin (ticket 50 AC6). The tool NAME is not an identity: the C1
+	// shape is 'namespace.action' and says nothing about which manifest it came
+	// from, so an execution record that only carries the name cannot answer
+	// "which plugin did this". The bridge books it at the execution dispatch.
+	// Empty for builtin entries - there is no plugin to name, and filling it
+	// with a placeholder would make the field unreadable as "plugin or not".
+	PluginID string
 }

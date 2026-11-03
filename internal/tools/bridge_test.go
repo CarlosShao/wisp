@@ -387,12 +387,14 @@ func TestUndeclaredCapabilityHardRejects(t *testing.T) {
 // C4: the ToolProvider registry and its unlanded slots
 // ---------------------------------------------------------------------------
 
-// TestC4SlotsWithoutAnImplementationAreNotSilent is the anti-fake guard: the
-// Manifest/Goja/MCP slots must answer with a checkable error, and no code in
-// this repository may pretend to serve them.
+// TestC4SlotsWithoutAnImplementationAreNotSilent is the anti-fake guard: a slot
+// with no implementation must answer with a checkable error, and no code in this
+// repository may pretend to serve it. The Manifest slot left this list when
+// ticket 50 landed Tier-1 plugin tools (AC6); its entries now register through
+// RegisterProvider like any other slot - see plugin_source_50r1e_test.go.
 func TestC4SlotsWithoutAnImplementationAreNotSilent(t *testing.T) {
 	reg := NewRegistry()
-	for _, kind := range []Kind{KindManifest, KindGoja, KindMCP} {
+	for _, kind := range []Kind{KindGoja, KindMCP} {
 		err := reg.RegisterProvider(&slotProvider{kind: kind})
 		if err == nil {
 			t.Fatalf("slot %s accepted registration: something landed there without a ticket", kind)
@@ -407,8 +409,8 @@ func TestC4SlotsWithoutAnImplementationAreNotSilent(t *testing.T) {
 	}
 	// The declared surface is enumerable, so `wisp doctor`-style checks can
 	// report the gap instead of shipping it quietly.
-	if got := len(UnlandedSlots()); got != 3 {
-		t.Fatalf("UnlandedSlots() = %d, want 3 (manifest/goja/mcp)", got)
+	if got := len(UnlandedSlots()); got != 2 {
+		t.Fatalf("UnlandedSlots() = %d, want 2 (goja/mcp)", got)
 	}
 	// Builtin is the one slot that does land, and its entries are the
 	// directory the bridge serves.
