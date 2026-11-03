@@ -30578,3 +30578,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ◑ AC4 round-trip：taint→R4 已测；真剪贴板 round-trip 属集成。
 
 **结论**：票 23 **不结案**（AC2/AC3 残余）。后端工具层（agent 可做部分）已完整落地并全绿；残余为 loop(C7)/前端(确认卡)/真机集成，与票 50 的授权 UI 残余同型。票池仍把它当 open。
+
+## A1458（2026-11-03 21:5x +08，编排者）第 74 轮：136 补钉落库、301 核清（代码完整仅 AC#4b 流程闸门）、262/301 空跑重派、182/262r2 在飞
+
+**triage 落地**（A1457 后）：全 150 未结 → A78/B21/C46/D5；5 枚 withdrawn（249/269/316/379/100）；报告 `probes/orch/20261103/txt/triage-20261103.md`。现跑 `ps` 无 go 进程、tmp 腿止于午间 ⇒ 报告的"4 条在飞腿(329/324/327/config-r1)"是过期 Claim。
+
+**逐格复核抓 triage 误判**：311 表面 6/6 勾但残余依赖票 295-v1、第三方言够不着 ⇒ 实不可派（印证"派单前必读正文"）。
+
+**本轮实果**：
+- **136**（internal/observe 零样本 fail-closed 折叠门钉）：腿空返回但留下 `sampler_zerosample_guard_136r2_test.go`(239 行)，我修 2 处 `foldStatePass(rep/zero)`→`.Verdicts` 编译错、gofumpt，`go test ./internal/observe` **全绿**（含 leg2 驱动真 SampleState 的正控），已 commit。⚠ 票 136 已有 6 枚 tracked 前置测试，本文件是第 7 枚补充 fold 门。
+- **301**（audio windows 测试/档）：`301r2` 详实取证**非空跑**——audio 代码早已交付（`portable-tests.sh:387` 含 `./internal/audio/`、win_pin 含、4 枚 tagged 测试、build/test/gofumpt/d22 全绿）；5 勾（AC#0-3,5）/ AC#4 编排者裁定**永久留空**/ **仅 AC#4b（前瞻式 pathspec 名册流程闸门）未落**。⇒ 301 待落 AC#4b 即可 -done（下轮我落）。
+- **262**（path-length gate）：首腿空跑零改动 ⇒ 已重派 `262r2`(在飞)。
+- **182**（只读普查）：在飞。
+
+**在飞**：262r2(write scripts/ci.yml) + 182(read)。写面互斥。未推=0。
