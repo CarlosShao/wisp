@@ -30506,3 +30506,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **44b 结案**（`3cc7b1d6c`）：44b-v1 非实现者验收 5 格全 PASS（memory 30.3s/observe 5.1s/agent 7.7s FAIL=0：迁移 4→5 幂等+旧数据 byte-identical／同批 upsert 两表／重启 SeedBaseline 重建基线一致／rollover model 维度／reconciliation）。15 文件、D35 `cost_daily_model` 分表（不回改主键）。翻 5 框、Status done、`git mv`→`-done`、双名核。
 **派**：24-v3（PDF 验收＋裁 24 能否 -done）。
 **池现空**（batch-459 收）：tools/memory/observe/agent/plugin 全空；下一波 51(plugin,需预置 goja)／23(tools)／31(tools+memory)。
+
+## A1449（2026-11-03 12:2x +08，编排者）★24-v3 挂起；编排者窄过滤自验发现 24r5 遗留 2 枚旧 stub 测试未更新；预置 goja 供票51
+
+**24-v3 停**：qwen 腿 35+min 无输出，疑卡在 `-run '…Search…'` 触发的走网络测试（本机 DNS 被劫 198.18/15 ⇒ hang）。`job_kill` 改**编排者窄过滤自验**（`go test ./internal/tools -run 'PDF|Pdf|Doc|Extract|Document'`，避开 Search/网络）。
+**自验**：24r5 新 PDF 测试全 PASS（ScanIsMarked/BrokenFailsClosed/DocReadEndToEndOnPDF），`DEFERRED(D34-1)`/stub 确删、`ledongthuc/pdf` 已引。但 **2 枚 24-r2a 旧测试 FAIL**：`Test24R2APDFStubIsErrUnsupportedAndCarriesTheMarker`、`Test24R2ADocReadPDFIsARefusalNotASuccess`——断言的是**旧 stub 拒绝语义**（PDF→ErrUnsupported/refusal），真抽取后前提失效 ⇒ **24r5 漏更新这两枚**，包级非全绿。⇒ 派 24-r6 修两枚旧测试＋窄过滤跑绿，再收 24。
+**预置 goja**（`github.com/dop251/goja`，SPEC-01 白名单已有、主流纯 Go 引擎）供票 51；派 24-r6(tools)＋51-r1(plugin goja VM 生命周期)。
