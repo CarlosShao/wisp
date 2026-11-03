@@ -30484,3 +30484,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **机主令**（原话：「你说的我的待批清单，我全批了，给你权限」「magpie已重启…恢复goal之后，你就继续干活儿就行」）：此前待批清单**全部批准**——① **24**：pdfcpu 进 `SPEC-01` 白名单 ＋ `SPEC-12 §5` `DEFERRED(D34-1)` 五字段登记；② **44**：D35 冻结表加列（per-model 消费永久落库）；③ **31／239／296** 及早先 **23 枚 C 档**。⇒ 上述「改契约文字」项**已获机主批准**（`SPEC-12 §4.1` 人工批准面已满足，可执行，⛔ 再当降级理由）。
 **magpie 已重启**（更新内容后）。**goal 已 resume**（rev32 pause→active）。
 **下一批**：45-v1（验收结 45）＋50-r1f（AC3 install e2e 后端）；随后 24-PDF／44-D35 加列／31·239·296。
+
+## A1446（2026-11-03 10:4x +08，编排者）★第14票结案45->done；50-r1f AC3后端落地；SPEC-01 白名单加 pdfcpu(批A1445)
+
+**45 结案**：45-v1 非实现者验收 5 格全 PASS（observe 两跑 5.15s/4.32s FAIL=0：AC1 预览=包内容/AC2 磁盘闸+日志上尾不丢/AC3 WAL 有界/AC4 Focus-Assist/AC5 artifacts LRU），commit 579b8ba26；实现 45-r1 `guards_45.go` 614 行（39cf67751）。翻 5 框、Status done、`git mv`→`-done`、双名核。
+**50-r1f**：AC3 后端 install e2e 落地（`internal/plugin/manifestslot/install.go`：ParseManifest→CompatibleWith→host-api gate→approval→写盘→RegisterProvider→UpsertPluginState→list_tools 可见；反向 C14/C16/重名），commit 626dcb71a。**50 仅剩 AC3 的授权 UI（frontend=机主外部 agent，⛔本编队写面）**，后端已全；50 不结。
+**契约(批A1445)**：`SPEC-01` 依赖白名单追加 `pdfcpu`（Apache-2.0 纯 Go），用于 `doc.read` PDF 文本层。
+**依赖预置**：编排者亲自 `go get github.com/pdfcpu/pdfcpu` 改 go.mod（独占共享编译面），再派 24-r4 只写代码。
+**下一步**：24-r4（PDF 文本层实现，替换 stub、去 DEFERRED(D34-1)）＋建 44b 票（D35 加列 per-model 落库）。
+**★派单说明**：本击只 1 腿（24-r4）独占 go.mod 变更至 commit，故暂不铺满≥3 写腿；go.mod 一锁即放其余腿。
