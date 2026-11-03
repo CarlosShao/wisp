@@ -1511,10 +1511,12 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 		// The loop's own tool_call rows are deliberately NOT booked: the
 		// bridge already writes the authoritative one (assessed level, gate
 		// decision, outcome, correlation id). Two rows per call would make
-		// tool_call a guess instead of a record. It is the ROOT loop below that
-		// gets the one journal half this file does hand over - the task row -
-		// and only for its StartTaskLog: see the taskLifecycleJournal
-		// assignment after rt.loopOpt.
+		// tool_call a guess instead of a record. Journal stays nil HERE (the
+		// base assembly, and so the copy this line publishes for task.spawn
+		// before the journal exists); the one journal half this file does hand
+		// over - the task row - is attached to loopOpts below and republished
+		// onto rt.loopOpt, for the root loop and its children alike. Ticket
+		// 378: see the assignment after rt.loopOpt.
 		Journal: nil,
 		// D47: only a task the TEXT loop registered may reach a gate, and the
 		// loop owns its task id, so registration travels through this hook.
@@ -1545,19 +1547,39 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// Ticket 373 件一 (parent before child): the parent task_log row must exist
 	// before the first tool_call row can name it. The only point in this tree
 	// that knows the loop-minted task id before a tool can run is the loop's own
-	// journal start (internal/agent/loop.go:391, after admission and before the
-	// first model call), so the ROOT loop is handed that one half of the
-	// interface. This is the same write order the journal has always used for
-	// any loop that had a store; what this file used to do instead - open the row
-	// after bg.Wait() - booked every child before its parent (census 373-a1
-	// section 3, E1/E2). rt.loopOpt above keeps Journal nil on purpose: the
-	// child loops task.spawn derives must keep exactly the write set they have
-	// today, and this ticket's sweep is the root task's row.
+	// journal start (internal/agent/loop.go:414, after admission and before the
+	// first model call), so every loop is handed that one half of the interface.
+	// This is the same write order the journal has always used for any loop that
+	// had a store; what this file used to do instead - open the row after
+	// bg.Wait() - booked every child before its parent (census 373-a1 section 3,
+	// E1/E2).
+	//
+	// Ticket 378〔乙〕: the CHILD loops task.spawn derives get the same journal,
+	// published on rt.loopOpt above and inherited by subagent_197.go's copy of
+	// the snapshot, because until then a child opened no task_log row at all and
+	// every tool_call row it wrote named a parent that never existed (census
+	// 378-a1: the second source of orphans 373 cannot reach - 373's acceptance
+	// is "delete the parent, fkc returns 0", which says nothing about a child
+	// whose parent was never written).
+	//
+	// What inheriting this payload buys, exactly, is ONE row per child task and
+	// nothing else: taskLifecycleJournal is the task-row half, so the child's
+	// StartTaskLog lands a row and its three tool_call methods stay inert
+	// (returning the interface's own "no row booked" zeros). The tool_call rows
+	// keep being the bridge's, one per call, exactly as before - the
+	// rows-per-call relationship does not move. Handing the child a
+	// *memory.Store instead would be the shape ticket 378's hard reminder #1
+	// forbids: a forensics row per call inside every subagent, which is the
+	// record page flooded.
 	loopOpts := opts
-	var rootRows *taskLifecycleJournal
 	if rt.store != nil {
-		rootRows = &taskLifecycleJournal{store: rt.store}
-		loopOpts.Journal = rootRows
+		rows := &taskLifecycleJournal{store: rt.store}
+		loopOpts.Journal = rows
+		// The snapshot task.spawn reads is the one that must carry it: the child
+		// is assembled from rt.loopOpt, not from loopOpts (subagent_197.go:320).
+		// rt.loopOpt was published above, before this branch existed, so it is
+		// republished here with the journal attached.
+		rt.loopOpt = loopOpts
 	}
 	loop, err := agent.New(loopOpts)
 	if err != nil {
@@ -1696,7 +1718,17 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 		// never) - writing the parent here, after the children, still heals it
 		// to foreign_key_check = 0 with foreign keys off, which is the same
 		// thing this file did for every task before this change.
-		opened := rootRows != nil && rootRows.opened()
+		// Ticket 378〔乙〕: the journal, not the local variable, is what says
+		// whether the row landed. The payload this root handed the loop is the
+		// same one a spawned child now inherits, so the row-opened flag it
+		// carries is read back through loopOpts rather than through a
+		// composition-root-only pointer.
+		opened := rt.store != nil && loopOpts.Journal != nil
+		if opened {
+			if rows, ok := loopOpts.Journal.(*taskLifecycleJournal); ok {
+				opened = rows.opened()
+			}
+		}
 		if !opened {
 			if err := rt.store.StartTaskLog(c, tl); err != nil {
 				rt.auditf("wisp run: task_log open failed: %v", err)
