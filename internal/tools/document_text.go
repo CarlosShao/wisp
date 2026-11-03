@@ -8,10 +8,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"sort"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/CarlosShao/wisp/internal/risk"
+	"github.com/ledongthuc/pdf"
 )
 
 // Ticket 24 (D34 `doc.read` row, SPEC-07 §3 "PDF/docx/pptx -> 文本", capability
@@ -23,19 +26,16 @@ import (
 // `encoding/xml` is enough to pull the text out (ticket:16-17 "docx XML text
 // extraction with pure-Go"). search.content lives in search_content.go.
 //
+// The PDF reader (24-r5) rides the whitelisted pure-Go parser
+// `github.com/ledongthuc/pdf` (BSD-3) rather than an invented one: ToUnicode
+// CMaps, embedded font encodings and the xref table are exactly what the ticket
+// forbids reimplementing here. Page text is walked per page and concatenated
+// under the caller's byte budget; the spill layer (D15(3)) owns anything above
+// the context budget, so this reader only ever reports Truncated.
+//
 // What is NOT here, and why (every one is a registered deferral, never a silent
 // success):
 //
-//	DEFERRED(D34-1)  PDF text extraction. Inflating content streams is not
-//	   extracting text: ToUnicode CMaps, embedded font encodings and the xref
-//	   cross table all have to be reimplemented to get readable output, which
-//	   is precisely the "invent your own parser path" the ticket forbids. The
-//	   pure-Go candidate (pdfcpu, Apache-2.0/MIT dual) is in neither go.mod nor
-//	   the SPEC-01 §96 dependency whitelist, and a whitelist change needs a
-//	   human approval - 24-r1 stopped on exactly this gate, A1435 queued the
-//	   proposal. pdfText below therefore holds the interface position and
-//	   answers ErrUnsupported so the limb that lands the dependency only has to
-//	   replace one method body.
 //	DEFERRED(xlsx, D34)  SPEC-12 §5 row "`doc.read` xlsx/OCR（D34）". No
 //	   extractor is registered for .xlsx, so doc.read refuses it rather than
 //	   returning a blob of shared-strings XML dressed up as a document.
@@ -319,23 +319,121 @@ func appendText(b *strings.Builder, s string, limit int64) bool {
 }
 
 // ---------------------------------------------------------------------------
-// The PDF position: interface in place, body deferred behind the dep gate.
+// PDF text extractor: ledongthuc/pdf (BSD-3 pure Go, whitelisted in SPEC-01 §96)
 // ---------------------------------------------------------------------------
 
-// pdfText is the DEFERRED(D34-1) stub named in the block above this file. It
-// implements TextExtractor so doc.read's dispatch, schema and Decl already have
-// their final shape and only one method body is owed.
+// pdfText extracts text from PDFs using the ledongthuc library. It handles
+// multi-page concatenation, scanned PDFs (no text layer), and truncation.
 type pdfText struct{}
 
 func (pdfText) Format() string { return "pdf" }
 
-// ExtractText implements TextExtractor. It deliberately touches no bytes: a
-// stub that half-reads a PDF and returns something as "text" would be the
-// silent success the ticket forbids.
-func (pdfText) ExtractText(_ context.Context, _ string, _ int64) (Extracted, error) {
-	return Extracted{}, fmt.Errorf(
-		"pdf: %w (DEFERRED(D34-1): PDF text extraction waits for the whitelisted "+
-			"parser approval, see docs/evidence/s1/24r2a-impl.md)", ErrUnsupported)
+// ExtractText implements TextExtractor. It walks pages, extracts plain text with
+// Unicode support, and reports scanned or broken PDFs as errors. Multi-page
+// extraction respects the caller's byte limit (C15 context budget spill layer).
+func (pdfText) ExtractText(ctx context.Context, canonicalPath string, limit int64) (Extracted, error) {
+	if limit <= 0 {
+		limit = defaultMaxTextBytes
+	}
+	// Fail closed: a bad PDF is an error, never a silent empty success.
+	f, err := os.Open(canonicalPath)
+	if err != nil {
+		return Extracted{}, fmt.Errorf("pdf: 无法打开文件：%w", err)
+	}
+	defer f.Close() //nolint:errcheck // read-only
+
+	fi, err := f.Stat()
+	if err != nil {
+		return Extracted{}, fmt.Errorf("pdf: 无法读取文件信息：%w", err)
+	}
+	size := fi.Size()
+
+	reader, err := pdf.NewReader(f, size)
+	if err != nil {
+		return Extracted{}, fmt.Errorf("pdf: 不是有效的 PDF（解析失败）：%w", err)
+	}
+
+	numPages := reader.NumPage()
+	if numPages == 0 {
+		return Extracted{}, fmt.Errorf("pdf: %s", scannedPDFReason)
+	}
+
+	var (
+		b         strings.Builder
+		runs      int
+		truncated bool
+		pageErr   error
+	)
+	for i := 1; i <= numPages; i++ {
+		if err := ctx.Err(); err != nil {
+			return Extracted{}, err
+		}
+		page := reader.Page(i)
+		if page.V.Kind() == pdf.Null {
+			// A missing page index is not an error; it is just no content here.
+			continue
+		}
+		// ledongthuc reports a page-level panic as an error here (its GetPlainText
+		// recovers internally). One bad content stream must not void a document
+		// whose other pages read fine - but it is remembered, so a document that
+		// yields nothing is never guessed at as a scan when it actually broke.
+		text, err := page.GetPlainText(nil)
+		if err != nil {
+			if pageErr == nil {
+				pageErr = err
+			}
+			continue
+		}
+		// Page text from ledongthuc carries layout newlines (one per BT block);
+		// the body is what matters here, so the shell is trimmed and pages are
+		// joined with a single newline.
+		body := strings.TrimSpace(text)
+		if body == "" {
+			continue
+		}
+		if b.Len() > 0 {
+			if !appendText(&b, "\n", limit) {
+				truncated = true
+				break
+			}
+		}
+		runs++
+		if !appendTextWithin(&b, body, limit) {
+			truncated = true
+			break
+		}
+	}
+	// Scanned PDF (or every page empty): zero text and no content-stream failure.
+	// This is the ticket's "no silent empty result" case, and the marker says what
+	// it observed instead of guessing at why (OCR is DEFERRED(OCR, D34)).
+	if runs == 0 {
+		if pageErr != nil {
+			return Extracted{}, fmt.Errorf("pdf: 内容流解析失败：%w", pageErr)
+		}
+		return Extracted{}, fmt.Errorf("pdf: %s（疑似扫描件，无文本层）", scannedPDFReason)
+	}
+	return Extracted{Text: b.String(), Truncated: truncated, Runs: runs}, nil
+}
+
+// appendTextWithin writes as much of s as the remaining budget holds and returns
+// false when s did not fit whole. Unlike appendText it never throws a run away:
+// a truncated read still owes the caller the head of the text, cut on a rune
+// boundary so the result stays valid UTF-8.
+func appendTextWithin(b *strings.Builder, s string, limit int64) bool {
+	room := limit - int64(b.Len())
+	if room <= 0 {
+		return false
+	}
+	if int64(len(s)) <= room {
+		b.WriteString(s)
+		return true
+	}
+	cut := s[:room]
+	for !utf8.ValidString(cut) && len(cut) > 0 {
+		cut = cut[:len(cut)-1]
+	}
+	b.WriteString(cut)
+	return false
 }
 
 // scannedPDFReason is what a PDF with no text layer owes its reader (ticket:
@@ -393,7 +491,8 @@ func (d DocDeps) classify(canonical string) risk.Class {
 }
 
 // DefaultExtractors is the D34 doc.read roster as far as it lands today: docx
-// real, PDF a deferred stub. xlsx is absent on purpose - DEFERRED(xlsx, D34).
+// and PDF both real (24-r5). xlsx is absent on purpose - DEFERRED(xlsx, D34),
+// as is OCR for scanned PDFs, which pdfText refuses with scannedPDFReason.
 func DefaultExtractors() []TextExtractor {
 	return []TextExtractor{docxText{}, pdfText{}}
 }
@@ -432,7 +531,7 @@ func (docRead) Name() string { return "doc.read" }
 // Description implements Tool. It names the deferred formats up front instead of
 // letting the model discover them by trial.
 func (docRead) Description() string {
-	return "提取文档正文文本（docx 已支持；PDF 待依赖批准；xlsx 与扫描件 OCR 推迟）"
+	return "提取文档正文文本（docx 与 PDF 已支持；PDF 无文本层（扫描件）与 xlsx 推迟，OCR 见 DEFERRED）"
 }
 
 func (docRead) Parameters() JSONSchema { return docReadSchema }

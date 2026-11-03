@@ -1,0 +1,1 @@
+Dispatch for ticket 24r5: implement ledongthuc/pdf extraction in document_text.go, delete DEFERRED(D34-1) stub, add tests for min/multi-page/scan/bad pdf, gofmt, produce evidence doc, commit with explicit pathspec.
