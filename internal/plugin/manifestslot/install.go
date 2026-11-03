@@ -24,10 +24,10 @@ import (
 // write, no state, no registration.
 //
 // Scope notes:
-//   - This is fresh-install only. Update/reinstall re-runs the authorization
-//     flow (PLAN.md §14.7) and is ticket 52's and later legs' business; here an
-//     existing plugins\<id>\ directory is refused so a rollback can never
-//     destroy a live install.
+//   - This file is the fresh-install half. The update flow re-runs this same
+//     authorization flow against a live install (SPEC-07 §6), and the full
+//     uninstall teardown (DisposalScope of running instances, ask-about-data)
+//     lives in lifecycle.go — same package, same Authorizer contract.
 //   - The on-disk layout is exactly SPEC-07 §6: <root>\<id>\manifest.toml.
 //   - exe_hash stays empty here: it is the D46 command-plugin slot (ticket 52).
 
@@ -37,6 +37,9 @@ type InstalledRecord struct {
 	ID      string
 	Version string
 	Hash    string // "sha256:<hex>" over the exact manifest bytes
+	// ExeHash is the D46 command-plugin slot: always empty for Tier-1
+	// manifests, written by ticket 52 when command tools land.
+	ExeHash string
 }
 
 // StateStore is the plugin_state seam the installer must record through.
@@ -46,6 +49,9 @@ type InstalledRecord struct {
 type StateStore interface {
 	SaveInstalled(ctx context.Context, rec InstalledRecord) error
 	DeleteInstalled(ctx context.Context, id string) error
+	// ListInstalled feeds Manager.LoadAll's restart path (SPEC-07 §6
+	// load-time verification runs over exactly this list).
+	ListInstalled(ctx context.Context) ([]InstalledRecord, error)
 }
 
 // InstallInfo is the full review sheet the Authorizer must see before
@@ -57,6 +63,10 @@ type InstallInfo struct {
 	Source       string // what the user is being asked to trust (path/URL)
 	Capabilities []string
 	Manifest     plugin.Manifest
+	// PreviousVersion is non-empty only on an update's sheet: "update =
+	// re-run install authorization" must tell the user what is being
+	// replaced (SPEC-07 §6).
+	PreviousVersion string
 }
 
 // Authorizer decides whether the install proceeds. Returning an error refuses
@@ -182,9 +192,10 @@ func (in Installer) Install(ctx context.Context, raw []byte, source string) (Ins
 	return InstallResult{Manifest: m, Path: path, Hash: hash}, nil
 }
 
-// Uninstall is the state/file half of teardown: the record goes, the installed
-// files go, and the registry slot is dropped by re-registration elsewhere
-// (DisposalScope teardown of running instances belongs to the lifecycle leg).
+// Uninstall is the state/file half of teardown: the record goes and the
+// installed files go. Callers who own live plugin instances must use
+// Manager.Uninstall (lifecycle.go), which additionally revokes calls and
+// disposes the plugin's C11 DisposalScope before reaching this.
 func (in Installer) Uninstall(ctx context.Context, id string) error {
 	if in.Store == nil || in.PluginsRoot == "" {
 		return errors.New("manifestslot: uninstaller: PluginsRoot and Store are required")

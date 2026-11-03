@@ -21,6 +21,14 @@ func okRun(context.Context, string, plugin.ToolDef, json.RawMessage) (tools.Resu
 type memStore struct{ saved []InstalledRecord }
 
 func (m *memStore) SaveInstalled(_ context.Context, r InstalledRecord) error {
+	// Upsert by id, mirroring memory.UpsertPluginState's ON CONFLICT so the
+	// update flow re-pins in place instead of stacking records.
+	for i, s := range m.saved {
+		if s.ID == r.ID {
+			m.saved[i] = r
+			return nil
+		}
+	}
 	m.saved = append(m.saved, r)
 	return nil
 }
@@ -33,6 +41,14 @@ func (m *memStore) DeleteInstalled(_ context.Context, id string) error {
 		}
 	}
 	return errors.New("not recorded: " + id)
+}
+
+func (m *memStore) ListInstalled(_ context.Context) ([]InstalledRecord, error) {
+	out := make([]InstalledRecord, 0, len(m.saved))
+	for _, r := range m.saved {
+		out = append(out, r)
+	}
+	return out, nil
 }
 
 type allowAuth struct{ saw []InstallInfo }
@@ -381,6 +397,18 @@ func (m memoryDAO) SaveInstalled(ctx context.Context, r InstalledRecord) error {
 
 func (m memoryDAO) DeleteInstalled(ctx context.Context, id string) error {
 	return m.store.DeletePluginState(ctx, id)
+}
+
+func (m memoryDAO) ListInstalled(ctx context.Context) ([]InstalledRecord, error) {
+	all, err := m.store.ListPluginStates(ctx)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]InstalledRecord, 0, len(all))
+	for _, p := range all {
+		out = append(out, InstalledRecord{ID: p.ID, Version: p.Version, Hash: p.Hash, ExeHash: p.ExeHash})
+	}
+	return out, nil
 }
 
 func toolNames(r *tools.Registry) []string {
