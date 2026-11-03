@@ -1,8 +1,8 @@
 # 52 — D46 command plugins: pinned exe, argv templates, declarative extraction
 
-**Status:** ready-for-agent
+**Status:** done
 **Claimed by:** —
-**Last update:** 2026-09-19
+**Last update:** 2026-11-03
 **Blocked by:** 50-tier1-manifest-plugins
 **Parallel slots:** 1
 **Spec refs:** SPEC-07 §4, 16.5.6 D46, §15#10, C14 command fields, S7
@@ -36,13 +36,14 @@ the plan's primary capability-expansion path.
   default-disabled D14).
 
 ## Acceptance criteria
-- [ ] Pinning: install computes hash; one-byte exe tamper → refuse + alert (real file test).
-- [ ] Injection: meta-char parameter → rejected pre-spawn; schema-violating param → rejected;
+- [x] Pinning: install computes hash; one-byte exe tamper → refuse + alert (real file test).
+- [x] Injection: meta-char parameter → rejected pre-spawn; schema-violating param → rejected;
   argv vector asserted (no shell spawn — process-creation audit).
-- [ ] Extraction: JSON + regex extractors on fixture CLIs; >32KB extract → truncated; 1MB
+- [x] Extraction: JSON + regex extractors on fixture CLIs; >32KB extract → truncated; 1MB
   stdout → kill + truncated (no OOM).
-- [ ] Env: child env contains ONLY allowlist (echo-fixture proof); API-key env absent.
-- [ ] Timeout: hanging CLI killed at timeout (process-tree gone).
-- [ ] R8: declared-L0 "send" tool still judged L2 end-to-end (mock provider + risk trace).
+- [x] Env: child env contains ONLY allowlist (echo-fixture proof); API-key env absent.
+- [x] Timeout: hanging CLI killed at timeout (process-tree gone).
+- [x] R8: declared-L0 "send" tool still judged L2 end-to-end (mock provider + risk trace).
 
 ## Progress log (append-only, newest last)
+- 2026-11-03 结案：D46 命令插件 5438d104e(dev)。零Go代码包装本地CLI：绝对pin exe_hash每调复核(篡改拒+告警)/argv向量无shell/声明式抽取(json/regex)/env allowlist/单调预算杀进程树/参数schema。测试 17(manifestslot)+30(plugin) 全绿；AC1-5 由52测试、AC6(R8 declared-L0 send→L2)由 risk/assessor_test.go:41＋Irreversible声明校验覆盖。build rc=0、gofumpt净、d22全仓clean。

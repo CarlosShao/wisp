@@ -30540,3 +30540,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **票50 Tier1 manifest 插件落地**：提交 `d99b1a970`（dev）：C14 schema + C16 host_api gate + install/update/uninstall lifecycle + tamper 检测 + net allowlist；plugin 窄测 rc=0、d22 全仓 clean。结案票面手续待补。
 **模型变化**：机主令子代理改用 ClinePass 套餐模型 `cline/cline-pass/deepseek-v4.1-flash-1017`（带 cline-pass＝套餐计费；少它＝API 余额烧钱）。实测该模型 agentic 产出质量差（多腿 null、重复冲突代码），已上呈机主定是否换模型。
 **在飞/搁置**：票52 D46 命令插件生产代码已写（build 绿、d22 clean）但自动测试约 8 条真-CLI 用例红（Truncated 未置位/fixture 异常），未提交；票23 internal/tools 未起。均待模型决策后续。
+
+## A1454（2026-11-03 21:0x +08，编排者）★第19票结案 52->done（D46 命令插件）
+
+**52 结案**：提交 `5438d104e`（dev，15 文件：manifest/validator 改 + command.go/command_argv.go/extract.go + manifestslot command.go/command_extract.go/command_job_{windows,other}.go/job_other.go/stopwatch.go + 两套 52 测试）。零 Go 代码包装本地 CLI：绝对 pin exe_hash 每调复核（一字节篡改=拒+告警）、argv 向量无 shell、声明式抽取（json-path/regex）、env allowlist（路径裁剪、key 不外泄）、单调预算超时杀进程树、参数 JSON Schema。
+**验证**：`go test ./internal/plugin/...` → internal/plugin ok 7.9s、manifestslot ok 8.5s（52 测试 17 在 manifestslot + 30 在 plugin，全 PASS）；build rc=0、gofumpt 净、`d22scan` 全仓 clean（0 违规）。AC1-6 覆盖：AC1-5 由 52 测试；AC6（声明 L0 的 send 类→L2）由 `internal/risk/assessor_test.go:41`（declared L0 + send → L2/[R8]）＋本票 Irreversible 声明校验（Test52CommandKindValidates）联合覆盖。票 52→-done，六框全翻。
+**过程**：52f 腿(ClinePass flash)产出生产代码但测试接线缺陷——7 处 CommandRunOptions 漏 EnvLookup（子进程拿不到 fixture 握手→跑成测试二进制打印 -test 用法）、fixture `block()` 裸收 channel 触发 Go deadlock 检测秒崩。编排者零子代理手工修 7 处 EnvLookup + 改 block() 为循环 sleep，全转绿后提交。
