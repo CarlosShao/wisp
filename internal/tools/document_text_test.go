@@ -14,11 +14,14 @@ import (
 )
 
 // Ticket 24 / limb 24-r2a: the zero-dependency half (docx via archive/zip +
-// encoding/xml, search.content) plus the TextExtractor seam with the PDF
-// position stubbed. Every reverse criterion the ticket names is pinned here: a
-// broken docx never reads as success, an out-of-allowlist root is refused, a
-// blacklisted file never appears even in a listing, and a cancelled scan comes
-// back marked truncated instead of clean.
+// encoding/xml, search.content) plus the TextExtractor seam. The PDF position
+// was a stub when this limb landed; since 24-r5 it is the real ledongthuc/pdf
+// reader, and 24-r6 replaced the two stub-era PDF assertions below with the
+// post-extraction criteria. Every reverse criterion the ticket names is pinned
+// here: a broken docx never reads as success, a broken or missing PDF fails
+// closed by name, an out-of-allowlist root is refused, a blacklisted file never
+// appears even in a listing, and a cancelled scan comes back marked truncated
+// instead of clean.
 
 // r2aDocxBody is a hand-written WordprocessingML body: three paragraphs, a
 // tab, a hard break, a preserved-space run and one property element that must
@@ -225,7 +228,8 @@ func Test24R2ADocxNoTextIsNotASilentSuccess(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
-// TextExtractor seam: format dispatch, the PDF position, the deferral markers
+// TextExtractor seam: format dispatch, the PDF branch (24-r5 real reader,
+// re-pinned by 24-r6; xlsx remains refused, DEFERRED(xlsx, D34))
 // ---------------------------------------------------------------------------
 
 func Test24R2AExtractorSetDispatch(t *testing.T) {
@@ -254,36 +258,89 @@ func Test24R2AExtractorSetDispatch(t *testing.T) {
 	}
 }
 
-func Test24R2APDFStubIsErrUnsupportedAndCarriesTheMarker(t *testing.T) {
-	got, err := pdfText{}.ExtractText(context.Background(), `C:\x\scan.pdf`, 0)
-	if !errors.Is(err, ErrUnsupported) {
-		t.Fatalf("the PDF position must answer ErrUnsupported, got %v", err)
+// Test24R6PDFBranchIsARealReaderNotAStub replaces the 24-r2a assertion that the
+// PDF position answered ErrUnsupported with a DEFERRED(D34-1) marker: 24-r5
+// landed the real ledongthuc/pdf reader, so the true shape at this seam is 有效
+// PDF 抽出正文、坏 PDF fail-closed 具名报错 — never ErrUnsupported, never the
+// retired marker.
+func Test24R6PDFBranchIsARealReaderNotAStub(t *testing.T) {
+	// 有效 PDF: the seam extracts the drawn body instead of refusing.
+	path := r5PDF(t, "ticket 24 pdf seam body")
+	got, err := pdfText{}.ExtractText(context.Background(), path, 0)
+	if err != nil {
+		t.Fatalf("a text-layer PDF must extract, got error: %v", err)
 	}
-	if !strings.Contains(err.Error(), "DEFERRED(D34-1)") {
-		t.Errorf("the deferral marker must travel with the error, got %v", err)
+	if !strings.Contains(got.Text, "ticket 24 pdf seam body") || got.Runs == 0 {
+		t.Errorf("extraction must carry the drawn body and non-zero runs, got %+v", got)
 	}
-	if got.Text != "" || got.Runs != 0 || got.Truncated {
-		t.Errorf("the stub must return an empty Extracted, got %+v", got)
+	if got.Truncated {
+		t.Error("a one-page fixture under the default budget must not be truncated")
+	}
+
+	// 坏 PDF（打不开）: a named fail-closed error, not the retired stub seam.
+	miss, err := pdfText{}.ExtractText(context.Background(), filepath.Join(t.TempDir(), "absent.pdf"), 0)
+	if err == nil {
+		t.Fatalf("a missing PDF must error, got %+v", miss)
+	}
+	if errors.Is(err, ErrUnsupported) {
+		t.Errorf("a broken file must not be laundered into ErrUnsupported: %v", err)
+	}
+	if !strings.Contains(err.Error(), "无法打开文件") {
+		t.Errorf("error = %v, want it to name the open failure", err)
+	}
+	if strings.Contains(err.Error(), "DEFERRED(D34-1)") {
+		t.Errorf("the retired deferral marker must be gone from the error path: %v", err)
+	}
+	if miss.Text != "" || miss.Runs != 0 {
+		t.Errorf("a failed extraction must carry no text, got %+v", miss)
 	}
 }
 
-func Test24R2ADocReadPDFIsARefusalNotASuccess(t *testing.T) {
-	dir := t.TempDir()
-	path := filepath.Join(dir, "report.pdf")
-	if err := os.WriteFile(path, []byte("%PDF-1.7 fake"), 0o600); err != nil {
-		t.Fatal(err)
-	}
-	p, canon := r2aCanon(t, []string{dir}, path)
-	res, err := docRead{d: DocDeps{Paths: p}}.Execute(context.Background(),
-		r2aParams(t, map[string]any{"path": canon}), nil)
+// Test24R6DocReadPDFSucceedsAndBrokenPDFFailsClosed replaces the 24-r2a refusal
+// assertion (deferred format ⇒ IsError carrying the DEFERRED(D34-1) marker).
+// Post-extraction the true criteria are: 有效 PDF 经 doc.read 端到端成功并带上
+// C25 打标 Origin; 坏 PDF ⇒ IsError 具名解析失败, which is neither a success
+// nor a "该格式暂未实现" deferral.
+func Test24R6DocReadPDFSucceedsAndBrokenPDFFailsClosed(t *testing.T) {
+	good := r5PDF(t, "doc.read end to end pdf body")
+	p1, canon1 := r2aCanon(t, []string{filepath.Dir(good)}, good)
+	res, err := docRead{d: DocDeps{Paths: p1}}.Execute(context.Background(),
+		r2aParams(t, map[string]any{"path": canon1}), nil)
 	if err != nil {
 		t.Fatalf("Execute: %v", err)
 	}
-	if !res.IsError {
-		t.Fatalf("a deferred format must not read as success: %+v", res)
+	if res.IsError {
+		t.Fatalf("a text-layer PDF must read as success, got %q", res.Text)
 	}
-	if !strings.Contains(res.Text, "DEFERRED(D34-1)") {
-		t.Errorf("the refusal must name the marker, got %q", res.Text)
+	if !strings.Contains(res.Text, "doc.read end to end pdf body") {
+		t.Errorf("body = %q, want the drawn text", res.Text)
+	}
+	if res.Origin != canon1 {
+		t.Errorf("Origin = %q, want the canonical path %q (the C25 taint seam)", res.Origin, canon1)
+	}
+
+	dir := t.TempDir()
+	bad := filepath.Join(dir, "report.pdf")
+	if err := os.WriteFile(bad, []byte("%PDF-1.7 fake"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	p2, canon2 := r2aCanon(t, []string{dir}, bad)
+	badRes, err := docRead{d: DocDeps{Paths: p2}}.Execute(context.Background(),
+		r2aParams(t, map[string]any{"path": canon2}), nil)
+	if err != nil {
+		t.Fatalf("Execute: %v", err)
+	}
+	if !badRes.IsError {
+		t.Fatalf("a broken PDF must never read as success: %+v", badRes)
+	}
+	if !strings.Contains(badRes.Text, "解析失败") || !strings.Contains(badRes.Text, "不是有效的 PDF") {
+		t.Errorf("the refusal must name the parse failure, got %q", badRes.Text)
+	}
+	if strings.Contains(badRes.Text, "DEFERRED(D34-1)") || strings.Contains(badRes.Text, "该格式暂未实现") {
+		t.Errorf("a broken file must not be reported as a deferral, got %q", badRes.Text)
+	}
+	if badRes.Origin != canon2 {
+		t.Errorf("Origin = %q, want the canonical path %q (the taint seam rides errors too)", badRes.Origin, canon2)
 	}
 }
 
