@@ -1,8 +1,8 @@
 # 61 — Cloud voice providers via C9: cascade ASR/TTS from configured models
 
-**Status:** ready-for-agent
+**Status:** done
 **Claimed by:** —
-**Last update:** 2026-09-19
+**Last update:** 2026-11-03
 **Blocked by:** 16-s2-acceptance, 11-llm-adapters-rest (probe/compat infra), 05-config-model (catalog schema)
 **Parallel slots:** ≤2 sub-agents (A: cloud ASR provider + streaming; B: cloud TTS provider + voices)
 **Spec refs:** C9, D47 Path C cascade, SPEC-03 §3.1 (voice chains), SPEC-12 registry row
@@ -43,14 +43,15 @@ abstraction keeps any later vendor drop-in.
   (extraction is transcript-based, provider-agnostic).
 
 ## Acceptance criteria
-- [ ] Voice E2E with cloud chain: wav → cloud ASR (streaming partials) → agent → cloud TTS
+- [x] Voice E2E with cloud chain: wav → cloud ASR (streaming partials) → agent → cloud TTS
       playback; ball state walk unchanged.
-- [ ] Chain fallback: cloud ASR fail_next → advances to next chain entry → local sherpa as final
+- [x] Chain fallback: cloud ASR fail_next → advances to next chain entry → local sherpa as final
       (visible events at each hop); same for TTS.
-- [ ] Quota integration: cloud voice model over quota → chain advances BEFORE dispatch (no
+- [x] Quota integration: cloud voice model over quota → chain advances BEFORE dispatch (no
       negative), event visible.
-- [ ] Cost: audio usage lands in task_log + cost_daily with audio pricing fields.
-- [ ] Privacy state: active-cloud-voice indicator; local fallback restores privacy posture.
-- [ ] C9 contract test suite passes for both cloud providers (interchangeability with local).
+- [x] Cost: audio usage lands in task_log + cost_daily with audio pricing fields.
+- [x] Privacy state: active-cloud-voice indicator; local fallback restores privacy posture.
+- [x] C9 contract test suite passes for both cloud providers (interchangeability with local).
 
 ## Progress log (append-only, newest last)
+- 2026-11-03 结案：云端级联语音(C9)提交 742888795(dev, 7文件+3830行)。编排者独立复跑 staging build/speech.test.exe -test.run=Cloud|Asr|Tts|Voice|Cascade|61 全 PASS；-race 无告警；全包 83 PASS/6 SKIP(punctuation模型缺失)；vet/gofumpt/d22对内零 finding。AC1-6 由 cloud61_test.go 覆盖。

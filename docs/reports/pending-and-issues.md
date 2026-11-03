@@ -30533,3 +30533,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **验证**：memory ok 30.35s；tools -skip Search ok 32.4s；agent ok 6.56s；go build ./cmd/wisp rc=0；AC1-5 测试全覆盖（tools 15 + agent 13 条 Test31*）。证据 docs/evidence/s1/{31r2,31}-impl.md。票 31-reminders.md→-done，五框全翻。
 **过程**：31-r2/31-r3(qwen) 均产出主体后卡死；编排者修 itoa 签名/补 Close/清 emoji 救活并门禁收口。
 **spec-note 债**：SPEC-02 §3 roster 扩 v6，待机主按 D35 增列（同 A1445）。
+
+## A1453（2026-11-03 20:5x +08，编排者）★第18票结案 61->done（云端级联语音 C9）；补记票50 Tier1 插件落地
+
+**61 结案**：提交 `742888795`（dev，7 文件 +3830 行：cloudasr/cloudtts/cloudchain/cloudendpoint/cloudcatalog/cloudprobe/cloud61_test）。编排者独立复跑 staging `build/speech.test.exe -test.run=Cloud|Asr|Tts|Voice|Cascade|61` 全 PASS（25+ 合同用例 + E2E + ASR/TTS 链回退 + 配额预检前步进 + 探针）；`-race` 无告警；全包 83 PASS/6 SKIP（punctuation 模型缺失）；vet/gofumpt/d22 对内零 finding。AC1-6 由 cloud61_test.go 覆盖（E2E／链回退可见事件／配额／C23 audio 计量／privacy posture 恢复／C9 合同套件）。票 61→-done，六框全翻。
+**票50 Tier1 manifest 插件落地**：提交 `d99b1a970`（dev）：C14 schema + C16 host_api gate + install/update/uninstall lifecycle + tamper 检测 + net allowlist；plugin 窄测 rc=0、d22 全仓 clean。结案票面手续待补。
+**模型变化**：机主令子代理改用 ClinePass 套餐模型 `cline/cline-pass/deepseek-v4.1-flash-1017`（带 cline-pass＝套餐计费；少它＝API 余额烧钱）。实测该模型 agentic 产出质量差（多腿 null、重复冲突代码），已上呈机主定是否换模型。
+**在飞/搁置**：票52 D46 命令插件生产代码已写（build 绿、d22 clean）但自动测试约 8 条真-CLI 用例红（Truncated 未置位/fixture 异常），未提交；票23 internal/tools 未起。均待模型决策后续。
