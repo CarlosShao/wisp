@@ -30493,3 +30493,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **依赖预置**：编排者亲自 `go get github.com/pdfcpu/pdfcpu` 改 go.mod（独占共享编译面），再派 24-r4 只写代码。
 **下一步**：24-r4（PDF 文本层实现，替换 stub、去 DEFERRED(D34-1)）＋建 44b 票（D35 加列 per-model 落库）。
 **★派单说明**：本击只 1 腿（24-r4）独占 go.mod 变更至 commit，故暂不铺满≥3 写腿；go.mod 一锁即放其余腿。
+
+## A1447（2026-11-03 11:2x +08，编排者）★24-r4 停手（pdfcpu 不能抽文本＋构建不通，换 ledongthuc/pdf）；44b-r1 交付
+
+**24-r4 停手（硬门，未写一行实现码）**：pdfcpu v0.16.4 **无文本抽取 API**——`api.ExtractContent`→`pdfcpu.ExtractPageContent`→`ctx.PageContent` 只回**解压后原始内容流字节**（PDF 算符/字形编码，非 Unicode）；全包 grep 无 Tj/TJ→Unicode 解码器（`ToUnicode` 只在 font/validate 写水印路径）；要真做得自写内容流分词+CMap 解析＝**禁止的自造解析器**。且 `go build pdfcpu/pkg/api` 因 6 个传递依赖（x/image/ccitt、webp、x/text 等）缺 go.sum 失败。⇒ **pdfcpu 选型错误**；按铁律换主流纯 Go 文本抽取库 **`ledongthuc/pdf`（BSD-3）**；编排者换依赖＋改 `SPEC-01` 白名单（pdfcpu→ledongthuc/pdf），再派 24-r5。
+**44b-r1 交付**（`3cc7b1d6c`，15 文件 +1280/−56）：memory 迁移 4→5 建 `cost_daily_model`（分表、不回改 `cost_daily` 主键，A1445 批注）；`costmodeldao_44b.go` 同批 DAO（单写事务 bump 两表）；observe `ModelReader/ModelLedger/PostModelTask/MonthFirst/QuotaLedger.SeedFrom`；旧 v1seed/366/196 版本钉对齐 v5。待 44b-v1 验收。
+**在飞**：无（batch-456b 收）；即派 24-r5＋44b-v1。

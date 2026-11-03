@@ -98,8 +98,9 @@ wisp/                                  # Go module: github.com/CarlosShao/wisp�
 **`webrtc-audio-processing`（AEC3，BSD-3，cgo —— 随 D47/P15 批准加入，2026-09-19：仅用于 Path C
 陪聊回声消除；许可证与绑定可用性由 P15 实测把关，不通过则本条回收、Path C barge-in 降级为
 按键/点击打断，不得复活 Path T 全双工）**。
-**`pdfcpu`（Apache-2.0，纯 Go —— 随票 24「`doc.read` PDF 文本层」批准加入，2026-11-03 机主批 `A1445`：
-仅用于 `doc.read` 的 PDF 文本抽取与多页 spill 到 C15 上下文预算；⛔ 引入 AGPL 的 `unidoc`）**。
+**`ledongthuc/pdf`（BSD-3，纯 Go —— 随票 24「`doc.read` PDF 文本层」批准加入，2026-11-03 机主批 `A1445`：
+仅用于 `doc.read` 的 PDF 文本抽取与多页 spill 到 C15 上下文预算。选它而非 pdfcpu：pdfcpu v0.16.4 无「内容流→Unicode」
+解码 API、其传递依赖缺 go.sum；本库是纯 Go 主流文本抽取方案。⛔ 引入 AGPL 的 `unidoc`）**。
 【SPEC】白名单类别内选型：SQLite 用 `modernc.org/sqlite`（纯 Go，不再叠加 cgo）、TOML 用
 `pelletier/go-toml/v2`、结构化日志用标准库 `log/slog`（零新依赖）。前端白名单见 SPEC-08 §5。
 明确排除：`wails`、`webview/webview_go`、任何 Node/Python/Deno **运行时**（构建期工具链除外）、
