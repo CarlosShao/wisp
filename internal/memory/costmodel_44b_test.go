@@ -34,8 +34,8 @@ func TestMigration44bAddsModelTableKeepsOldData(t *testing.T) {
 		t.Fatalf("seeded cost_daily rows = %d, want 2", len(before))
 	}
 
-	// Reopen: the migration recognizes v5 as current and is a no-op; the data
-	// must be untouched.
+	// Reopen: the migration recognizes the current target (v6 since ticket 31)
+	// and is a no-op; the data must be untouched.
 	if err := s.Close(); err != nil {
 		t.Fatal(err)
 	}
@@ -49,8 +49,8 @@ func TestMigration44bAddsModelTableKeepsOldData(t *testing.T) {
 		`SELECT value FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatal(err)
 	}
-	if v != "5" {
-		t.Errorf("schema_version = %q, want 5", v)
+	if v != "6" {
+		t.Errorf("schema_version = %q, want 6 (v5 plus the ticket-31 5->6 step)", v)
 	}
 	after, err := s2.CostDaysBetween(ctx, "2026-01-01", "2026-12-31")
 	if err != nil {

@@ -154,6 +154,11 @@ CREATE TABLE plugin_state (
 //	     cost_daily's PK shape is untouched (mainstream harness split-table
 //	     rule), and fresh and existing databases reach v5 through the same 4->5
 //	     step.
+//	v6 - reminders (ticket 31, leg 31-r2): the one-shot in-process reminder
+//	     row (schema_reminders_v6.go). Same rule as v3/v5: a NEW table in its
+//	     own step, no earlier ddl text touched, so fresh and upgraded databases
+//	     reach it through the identical 5->6 step; the step is IF NOT EXISTS
+//	     idempotent and never rewrites a row of any other table.
 //
 // ⚠ D35 is a frozen contract (AGENTS.md §1.1) and SPEC-02 §3 still lists nine
 // tables; this v3 roster extension carries a spec-note debt that
@@ -163,8 +168,10 @@ CREATE TABLE plugin_state (
 // touch D35 does not edit the spec text. Both are named in
 // docs/evidence/s1/196-r1-impl.md rather than fixed by an agent. The v5 table
 // is the third extension of the same kind; its approval is ledger A1445 (owner,
-// 2026-11-03, ticket 44b).
-const SchemaVersionTarget = 5
+// 2026-11-03, ticket 44b). The v6 table is the fourth; it carries the same
+// debt (named in docs/evidence/s1/31r2-impl.md) and waits for the owner's
+// D35 addition the way A1445 did.
+const SchemaVersionTarget = 6
 
 // ddlV2 appends the provider_health table (SPEC-02 §3 note, schema v2). The
 // DDL below mirrors the ```sql block in docs/specs/SPEC-02-data-storage.md
@@ -238,6 +245,8 @@ var migrationChain = []migrationStep{
 	// the one whose transaction has to be checked before it commits (ticket 366).
 	{from: 3, to: 4, apply: applyV4, auditForeignKeys: true},
 	{from: 4, to: 5, apply: applyV5},
+	// ticket 31 (leg 31-r2): one new table, no rebuild, no foreign keys.
+	{from: 5, to: 6, apply: applyV6},
 }
 
 // applyV1 creates the eight D35 tables + indexes and seeds schema_version=1.

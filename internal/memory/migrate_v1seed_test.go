@@ -65,8 +65,8 @@ func TestMigrateSeededV1DatabaseToV2(t *testing.T) {
 		`SELECT value FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatal(err)
 	}
-	if v != "5" {
-		t.Errorf("schema_version = %q, want 5", v)
+	if v != "6" {
+		t.Errorf("schema_version = %q, want 6", v)
 	}
 
 	// 3. provider_health now exists with the v2 shape and is usable.
@@ -111,11 +111,14 @@ func TestMigrateSeededV1DatabaseToV2(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(dir, "backup", "wisp.db.bak-4-5")); err != nil {
 		t.Errorf("pre-migration backup for the v5 step missing: %v", err)
 	}
+	if _, err := os.Stat(filepath.Join(dir, "backup", "wisp.db.bak-5-6")); err != nil {
+		t.Errorf("pre-migration backup for the v6 step missing: %v", err)
+	}
 	entries, err := os.ReadDir(filepath.Join(dir, "backup"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	wantBackups := []string{"wisp.db.bak-0-1", "wisp.db.bak-1-2", "wisp.db.bak-2-3", "wisp.db.bak-3-4", "wisp.db.bak-4-5"}
+	wantBackups := []string{"wisp.db.bak-0-1", "wisp.db.bak-1-2", "wisp.db.bak-2-3", "wisp.db.bak-3-4", "wisp.db.bak-4-5", "wisp.db.bak-5-6"}
 	if len(entries) != len(wantBackups) {
 		t.Errorf("backup dir = %v, want %v", namesOf(entries), wantBackups)
 	}

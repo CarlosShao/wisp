@@ -125,6 +125,32 @@ type PluginState struct {
 	ExeHash          string // D46 command plugin exe sha256; "" = NULL
 }
 
+// Reminder is one ticket-31 one-shot in-process reminder row (schema v6).
+// Fire-at is a WALL-CLOCK unix-seconds instant (a reminder is "at 3pm", a
+// wall-clock notion); the wait until it is computed on the MONOTONIC clock
+// (observe.NowMono), never by subtracting two wall-clock readings — AGENTS.md
+// 1.2 bans wall-clock deltas for timing.
+//
+// Status is one-way terminal from 'armed': armed -> fired | cancelled.
+// ⛔ the row is a task queue: a fired row is history, never a re-arming
+// handle, and nothing here stores recurrence/cron (ticket 31 rejects it).
+type Reminder struct {
+	ID        string // 'rem_' + crypto/rand hex (same mint shape as C31 session ids)
+	FireAt    int64  // fire_at_wallclock_utc: unix 秒
+	Note      string // 提醒正文（给用户的一句话，不是指令）
+	Status    string // 'armed' | 'fired' | 'cancelled'
+	CreatedAt int64  // created_utc: unix 秒
+	FiredAt   *int64 // NULL until fired
+}
+
+// Reminder status values (reminders.status, schema v6). The roster lives in
+// dao_reminders.go (reminderStatusRoster); the DDL CHECK is generated from it.
+const (
+	ReminderArmed     = "armed"
+	ReminderFired     = "fired"
+	ReminderCancelled = "cancelled"
+)
+
 // Risk levels (tool_call.risk_level).
 const (
 	RiskL0 = "L0"
