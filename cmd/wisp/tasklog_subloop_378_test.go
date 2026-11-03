@@ -237,7 +237,7 @@ func Test378ChildLoopWritesOneTaskRowAndNoToolCallRows(t *testing.T) {
 				names = append(names, r.Tool)
 			}
 			t.Errorf("[B] 子任务 %s 写了 %d 行 tool_call（%v），want 0："+
-				"继承的 journal 只该开任务行，⛔ 不该把子环路的每次工具调用都记成取证行",
+				"继承的 journal 只该开任务行，不该把子环路的每次工具调用都记成取证行",
 				k.TaskID, len(rows), names)
 		}
 	}
