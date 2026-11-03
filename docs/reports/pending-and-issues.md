@@ -30602,3 +30602,20 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 
 **262r2 腿**：又空返回，未造成改动（符合上述"无代码可写"——它照 301r2 若给取证报告更好，但本轮 262 我已自行核清）。
 **在飞**：182（只读普查）。**未推=2（TLS 断，本地累积，恢复统一推）**。
+
+## A1460（2026-11-03 22:5x +08，编排者）★根因诊断：子代理"返空"＝上游流 300s 空闲超时+限流，非模型能力；1017 模型强、5/5 探针全通
+
+**机主问：「1017 应该很强，查为什么返回空」。查清结论如下（盘上可核）**：
+
+1. **受控分级诊断探针 5/5 全通、零空**：同 provider/model（`magpie` / `cline/cline-pass/deepseek-v4.1-flash-1017`）跑 ①只回一行文本→"PONG1017" ②一条 bash→"D2OK" ③读 sampler.go 1-30 行总结→正确 ④统计 internal/tools 所有 .go 总行数→"38951" ⑤数文件个数→"135"。⇒ **模型各档（纯文本/工具/多文件聚合）都强，不是模型弱**。机主直觉对。
+2. **解压 DSH 本地会话转写**（`C:\Users\swq\.dsh\sessions\--D-work-workspace-projects~0020plans-Wisp--/session-77e8e22e-.../session.v4.jsonl.zstd`，用 `/e/work/base/msys64/mingw64/bin/zstd`）字面统计：**`"error":"pi-ai stream idle timeout after 300000ms"` 出现 172 次**；限流/429 相关 120 次；另见 `400:` 与 compaction `summary is not smaller than the shadowed content` 报错。
+3. ⇒ **返空＝上游流"卡住不吐字 300 秒即判超时"（172 次）+ 限流/5xx/EOF** 的**网关/网络层**故障，**不是模型层**。证据吻合现象：**重活腿**（screen-code 扫 78 票、342 跨平台成对读数、gov-summary 读 10 票）跑得久、最易半路撞 300s idle → child 最终 failed → 返 null，但盘上常留半成品（114 改 ci.yml、276 写证据、342 改 unix 测试、screen-code 写 41KB）；**轻活腿一跑完就正常返回**。git push 反复 TLS eof 是同一网络不稳旁证。
+4. **收回"换 pro"建议**——方向错了：这是网关/网络层，换模型不解决。
+
+**我定的修法（铁律：agent 自拍+理由，主判据＝最有价值）**：不换模型，提高腿"完成率"——
+ a) **重活拆小**：每腿只做一件能短时间出结论的小任务，复杂票拆成多腿接力，降低半路撞 300s idle；
+ b) **控并发**：429 说明超网关速率 ⇒ 每波放 2-3 枚而非 5+；
+ c) **返空即当可重试的瞬时失败**，对"返空但盘上有产出"的腿做抢救结账；
+ d) 若 magpie 网关可调 idle-timeout/并发度则调（环境层，待查）。
+
+**本轮实果（均已推，未推=0，HEAD `4a6e70afe`）**：114(ci.yml AC#11 `34a630d72`)、276(证据+前提顶正 `6fa464a21`)、342(抢救 342r2 撞超时前落的 unix 测试：补成对读数归属支+纠正 old 侧零不可当已闭，`GOOS=linux go vet` rc=0，运行时待 linux CI `4a6e70afe`)。gov-summary 两腿均撞超时未落报告，改由我本轮直查完成根因（即本条）。
