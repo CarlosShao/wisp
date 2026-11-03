@@ -30525,3 +30525,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **派 31-r1**（reminder.*：internal/tools + internal/memory v5→v6 迁移 + internal/agent timer + notify 接缝；机主 A1445 已批 31）。
 **待机主**：51 块B＝**冻结 C24 `GojaHostAPI` 初始集**（＝改契约文字，AGENTS §2「未定义即停」项）——已把拟议初始集（http/fs/clipboard/notify/sysinfo/state）摆机主，等「行／增删」。
 **D 盘**：完整报告子代理仍在深挖 `D:\work`(231G 是大头)；阶段结论（项目仅 2.7G）已给机主。
+
+## A1452（2026-11-03 16:2x +08，编排者）★第17票结案 31->done；reminder.* 三工具+单调计时器全落地，d22scan 绿
+
+**31 结案（第17票，reminder.*）**：内存层 `5ebdf6961`（schema v6 reminders 表 + dao_reminders + 迁移幂等 v5→v6）；tools+agent 层 `da9b5fb9c`（reminder.set L1 / list L0 / cancel L1 + 进程内 named+owned 单调时钟计时器：MonoNow/WallNow 算墙钟 delta、到点 Notifier.Notify + MarkReminderFired + `reminder.fire` tool_call 审计行；boot ReportMissed→CountMissedArmed 只报错过数、不补发）。硬排除 recurring/cron/action/OS/重启补发 均 REJECTED（注释+注册 note）。
+**门禁修复** `37c468f41`：31-r2/31-r3 引入 4 处 D22 违规（源码字符串 emoji、schema.go phantom 引用 31r2-impl.md）＋1 处旧债（install.go 注释 tools/registry.go→internal/tools/registry.go）；清后 `d22scan.sh` PASS=35 FAIL=0、真仓 clean（0 违规）。
+**验证**：memory ok 30.35s；tools -skip Search ok 32.4s；agent ok 6.56s；go build ./cmd/wisp rc=0；AC1-5 测试全覆盖（tools 15 + agent 13 条 Test31*）。证据 docs/evidence/s1/{31r2,31}-impl.md。票 31-reminders.md→-done，五框全翻。
+**过程**：31-r2/31-r3(qwen) 均产出主体后卡死；编排者修 itoa 签名/补 Close/清 emoji 救活并门禁收口。
+**spec-note 债**：SPEC-02 §3 roster 扩 v6，待机主按 D35 增列（同 A1445）。
