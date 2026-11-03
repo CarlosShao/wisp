@@ -624,6 +624,33 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		}
 	}
 
+	// The machine-control family (ticket 23: system.* / window.* / clipboard.* /
+	// media.control / screen.capture / input.type) is registered in the same
+	// loop shape as the fs and task blocks above, and it is the ONLY way those
+	// eleven D34 rows become reachable: internal/tools holds the tools and their
+	// declarations, and a tool nobody registers here is compiled, vetted and
+	// green while the model cannot knock on the door (the "written but never
+	// wired" family run.go's plan.present block names below).
+	//
+	// What the composition root owes and nothing else can supply: the host
+	// bridge. The zero value with a nil Backend is the REAL machine - Do falls
+	// back to platformSystemBackend() (system_ops_windows.go on Windows,
+	// ErrNoSystemBackend elsewhere) - so this line needs no platform switch and
+	// no test double. Everything the family must refuse (an elevated target's
+	// UIPI answer, a missing typed word for shutdown, an unimplemented volume
+	// level) is refused inside the tool or the bridge, never here.
+	//
+	// The risk half is not decided here either: these entries declare L0/L1/L2
+	// and their R8 facts, and the bridge assembled above runs C19 over them per
+	// call - clipboard.write's "send" class and window.manage.close's
+	// "close-window" class reach the existing C18 card, not a new channel.
+	for _, e := range tools.BuiltinSystemEntries(tools.SystemDeps{Bridge: &tools.SystemBridge{}}) {
+		if err := reg.Register(e); err != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
+			return rt, 2
+		}
+	}
+
 	// The approval layer (A13). Channels loaded here are the honest set for a
 	// console run: no floating ball, no global Esc hook, so an L1 window can
 	// only expire unvetoed and an L2 card can only time out into a reject.
