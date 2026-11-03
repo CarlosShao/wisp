@@ -30512,3 +30512,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **24-v3 停**：qwen 腿 35+min 无输出，疑卡在 `-run '…Search…'` 触发的走网络测试（本机 DNS 被劫 198.18/15 ⇒ hang）。`job_kill` 改**编排者窄过滤自验**（`go test ./internal/tools -run 'PDF|Pdf|Doc|Extract|Document'`，避开 Search/网络）。
 **自验**：24r5 新 PDF 测试全 PASS（ScanIsMarked/BrokenFailsClosed/DocReadEndToEndOnPDF），`DEFERRED(D34-1)`/stub 确删、`ledongthuc/pdf` 已引。但 **2 枚 24-r2a 旧测试 FAIL**：`Test24R2APDFStubIsErrUnsupportedAndCarriesTheMarker`、`Test24R2ADocReadPDFIsARefusalNotASuccess`——断言的是**旧 stub 拒绝语义**（PDF→ErrUnsupported/refusal），真抽取后前提失效 ⇒ **24r5 漏更新这两枚**，包级非全绿。⇒ 派 24-r6 修两枚旧测试＋窄过滤跑绿，再收 24。
 **预置 goja**（`github.com/dop251/goja`，SPEC-01 白名单已有、主流纯 Go 引擎）供票 51；派 24-r6(tools)＋51-r1(plugin goja VM 生命周期)。
+
+## A1450（2026-11-03 13:0x +08，编排者）★第16票结案 24->done；51-r1 goja VM 块A(8a2a40b0f)
+
+**24 结案**（第16票）：24-r6（`52ed59cff`/`f6fd8270a`）把 2 枚旧 stub 测试改为真抽取判据；编排者窄过滤复跑 `go test ./internal/tools -run 'PDF|Pdf|Doc|Extract|Document'` **rc=0 / 0.338s 全绿**；票面五格全 PASS（PDF/docx/扫描件现验；search.content/files/apps 前验；DEFERRED xlsx/OCR 与 SPEC-12 §5 对上）。裁决表 `docs/evidence/s1/24-v3-verdict.md`。**PDF 文本层从"推迟"→"已实现"**（A1445 批 ledongthuc/pdf）。
+**51-r1**（`8a2a40b0f`）：Tier2 goja 运行时**块 A**——per-call 隔离（每调 `goja.New`）、5s 墙钟中断（具名 watchdog + `vm.Interrupt`）、256KB 结果截断+flag、recover 边界；测试 5.00s 中断/隔离/截断/panic 全 PASS。票51 剩**块 B＝C24 host API**。
+**在飞**：batch-463 收。下一波：51-r2(host API,plugin)；23/31(tools/memory 现空)。
