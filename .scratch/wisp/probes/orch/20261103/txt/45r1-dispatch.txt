@@ -1,0 +1,8 @@
+票 45 落地腿 45-r1 ＝实现腿（写腿）。工作目录 D:\work\workspace\projects plans\Wisp。⛔push。**≤18 次工具调用、尽早 checkpoint commit**。派单存档 .scratch/wisp/probes/orch/20261103/txt/45r1-dispatch.txt（★务必先存）。
+先读票面 .scratch/wisp/issues/45-*.md（诊断守卫；前次 45-r1 因与 44-r1 **同包 internal/observe** 停手，现 44 成本计已结、observe 空出可做）。逐格做 AC。
+起手三核：HEAD 现盘最新；索引干净；票面点名的串/行/文件还在不在（第19处）；引文出处对不对（第20处）。**若票面所述已落地/已 -done ⇒ 停手上报**（写 45r1-stop.md 记盘上读数，⛔硬做）。
+写面：internal/observe/**。★**先跑 git status --porcelain -- internal/observe 核 observe 无他腿脏**（44 已结、24-v2 只读 internal/tools）。⛔cmd/wisp／⛔internal/agent·memory／⛔internal/tools／⛔internal/plugin／⛔thresholds/golden。
+做法：按票面落诊断守卫逻辑＋补定向测试；反向判据（摘守卫⇒点名用例红）＋还原核；gofumpt 绝对 /d/work/base/gopath/bin/gofumpt.exe。
+产 docs/evidence/s1/45r1-impl.md（逐格 AC＋尺＋读数）。只 commit（显式 pathspec 逐枚字面点名），⛔ add -A/amend/reset，⛔ push。
+环境：staged、MSYS2 PATH 必须 POSIX /d/ 形；临时件 D:\tmp\wisp\20261103\45r1\。
+未定义即停：票面所述不在／写面冲突／要动契约/thresholds＝停手上报（写 45r1-stop.md）。完成后报：改动文件、测试读数、commit hash。
