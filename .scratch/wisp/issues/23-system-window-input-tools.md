@@ -47,3 +47,5 @@ per-target-process session-binding groundwork.
 - [ ] system.power shutdown path requires typed confirmation word (unit test with fake executor).
 
 ## Progress log (append-only, newest last)
+
+- 2026-11-03 21:4x 编排者：后端+工具接线层落地（119c3fa91 后端6文件；a2f6f4a95 system.go BuiltinSystemEntries 11工具+run.go注册+system_23测试 1450行；df67e002e 修229普查登记52的OS进程spawn站点）。internal/tools 整包 ok、d22 clean。**已满足**: AC1 风险矩阵、AC5 关机确认词、AC4 taint→R4。**残余**: AC2 C7 ImagePart→LLM 接缝(需 internal/agent loop+llm.ImagePart 集成)+bytes_ref内存only/DRM黑帧；AC3 input.type 真fixture app+UIPI 真机+确认卡三选项UI(前端)；AC4 真剪贴板round-trip。**卡点**: AC3 确认卡UI=frontend(机主外部agent)+真机集成，非纯后端可闭合。票仍 open。

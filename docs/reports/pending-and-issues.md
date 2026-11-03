@@ -30559,3 +30559,22 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **编排者修复**：逐条修 12 编译错（LookupPrivilegeValueW→advapi proc；删 `LazyDLL.Find`；`Handle↔Token` 转换；`SubAuthorityCount` 单返回值；imeLayouts 改 uintptr；unused x/y；自建 `systemPowerStatus` struct + `GetSystemPowerStatus` proc；sendVolumeKey uint16）→ `go build ./internal/tools/` **0 error**；gofumpt 已格式化；`go vet` 仅 2 条 `unsafe.Pointer`（GlobalLock uintptr→ptr，WinAPI 固有用法的已知告警，不影响 go test）。
 **提交**：6 文件 WIP 检查点（system_bridge.go / system_backend_windows.go / system_ops_windows.go / system_readings_windows.go / system_dpi_windows.go / screen_capture_windows.go）。
 **待续（23 未完，票仍 open）**：工具接线层 `BuiltinSystemEntries`（Entry/Decl/risk/ImagePart）+ `cmd/wisp/run.go` 注册 + AC1-5 测试 + 非 Windows 后端 stub。
+
+## A1457（2026-11-03 21:4x +08，编排者）票23 后端+工具接线层落地（三提交），AC1/AC5/AC4-taint 达成，残余 AC2/AC3 明列
+
+**落地（三提交）**：
+- `119c3fa91` 底层后端 6 文件（SystemBridge.Do(Action) 设计 + backend_windows + screen_capture + readings + dpi + ops），修 12 winapi 签名错后编译通过。
+- `a2f6f4a95` 工具接线层：`internal/tools/system.go`（638 行，BuiltinSystemEntries 覆盖 11 个 D34 工具：system.get/set/power、window.list/focus/manage、clipboard.read/write、media.control、screen.capture、input.type；各带 Decl 风险等级 + R8 Facts）+ `cmd/wisp/run.go`(+27 注册循环) + `system_23_test.go`(725)/`system_23_windows_test.go`(60)。
+- `df67e002e` 修 229 普查：登记票52 `manifestslot/command.go|childCtx` 为 OS 子进程 spawner（SpawnSpec，非 goroutine 名册）——这是票 52 当时只跑 plugin 包漏跑 internal/tools 229 的跨包回归，现已恢复整包全绿。
+
+**门禁**：`go build ./internal/tools ./cmd/wisp` rc=0；`go test ./internal/tools -count=1` **ok**（含 14+ 条 Test23* 全 PASS）；gofumpt 净；d22scan 全仓 clean。
+
+**AC 判定**：
+- ✅ AC1 风险矩阵（Test23RosterDeclarationsMatchTheFrozenTable / WindowManageCloseIsL2ByFacts：get=L0、set=L1、power=L2、window.close=L2…）。
+- ✅ AC5 关机/重启确认词（Test23PowerShutdownRequiresTheTypedWord：缺 confirm_word 不调后端）。
+- ✅ AC4 taint→R4（Test23ClipboardWriteFactsFuseToL2：clipboard.write 的 send 类使调用判 L2）。
+- ⛔ **AC2 残余**：`screen.capture` 的 C7 ImagePart→LLM 接缝**未接**——`tools.Result` 无 image 字段，`llm.ImagePart` 仅存在于 internal/agent loop 侧；需新增 tool-Result→loop→llm.ImagePart 集成 + bytes_ref 内存-only/DRM 黑帧测试。属 Go（internal/agent 共享面）可做但独立一轮。
+- ⛔ **AC3 残余**：`input.type` 真 fixture app 300 字注入 + UIPI 真机行为 + **确认卡三选项 danger 样式 UI 渲染**——确认卡 UI＝frontend（机主外部 agent），真机注入＝集成/实机，非纯后端可闭合。
+- ◑ AC4 round-trip：taint→R4 已测；真剪贴板 round-trip 属集成。
+
+**结论**：票 23 **不结案**（AC2/AC3 残余）。后端工具层（agent 可做部分）已完整落地并全绿；残余为 loop(C7)/前端(确认卡)/真机集成，与票 50 的授权 UI 残余同型。票池仍把它当 open。
