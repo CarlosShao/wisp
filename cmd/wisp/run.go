@@ -338,9 +338,17 @@ type agentRuntime struct {
 	provs    []llm.LlmProvider // built chain, kept for the probe path
 	names    []string
 	endpoint llm.Endpoint
-	gate     *approval.Gate
-	ui       *consoleApprovalUI
-	bridge   *tools.Bridge
+	// quotaLedger is ticket 44-r5's session-scoped quota bucket holder: the one
+	// object the pre-dispatch gate judges against and the task-finish path
+	// books, so a [llm].models.*_quota_micro day/month cap keeps accumulating
+	// across every task THIS process runs instead of restarting at zero for
+	// each one (44-r2's ledger is session-scoped by design; the permanent disk
+	// signal is provider_health.quota_state, written by the gate itself).
+	// nil until the first execute() assembles the gate.
+	quotaLedger *observe.QuotaLedger
+	gate        *approval.Gate
+	ui          *consoleApprovalUI
+	bridge      *tools.Bridge
 	// liveCards is the native-side ledger of the cards this run displayed: the
 	// one place a displayed card's single-use grant is kept, and therefore the
 	// one thing that makes an allow possible at all (ticket 201). It is filled
@@ -1304,6 +1312,102 @@ func (j *taskLifecycleJournal) FinishToolCall(context.Context, int64, string, st
 // task's lifetime), a run assembled with runSpec.taskCtx gets that host's task
 // root, and a host that submits one task at a time passes a root derived from it
 // so a single task can be cancelled without touching the entry that produced it.
+// quotaDispatchChain is ticket 44-r5's assembly of the C23 pre-dispatch quota
+// gate onto the HOST dispatch chain (44-v2-verdict §4①(a) registration ①:
+// QuotaWiring/NewQuotaGate/GateProvider had zero callers in cmd/wisp, so the
+// gate was a component that nothing dispatched through).
+//
+// The reading discipline is 44-r4's, unchanged: the caps come from the LIVE
+// config through agent.QuotaWiring (no card = uncapped, never an invented
+// limit), the judgment is pre-dispatch, and an over-quota element is refused
+// BEFORE its Stream is called - zero bytes leave the machine for that model -
+// while stepping to the next entry is done by ticket 11's existing
+// llm.ChainRunner, whose own tests already prove a ClassBudget element advances
+// the chain instead of breaking it. No stepping code changes here and no loop
+// changes: this function only wraps elements and hands the loop one C5 provider.
+//
+// notify is mandatory, and that is the 不得静默 rule (票 44:35 visible fallback
+// event / SPEC-03 §3.1): a chain assembled with no event mouth returns the
+// ungated primary element, which is exactly the pre-44-r5 shape - the reverse
+// judge's 「未装就派进债务」 case, pinned by name in the cmd test rather than
+// papered over here.
+//
+// servedKey names the element that ACTUALLY served once the chain stepped, so
+// the task's real spend is booked into the bucket the gate will read next time
+// instead of always into the primary's.
+func quotaDispatchChain(cfg *config.Config, provs []llm.LlmProvider, keys []string,
+	ledger *observe.QuotaLedger, notify func(agent.Event),
+) (llm.LlmProvider, *agent.QuotaGate, *observe.QuotaLedger, func() string) {
+	servedKey := func() string { return "" }
+	if len(provs) == 0 {
+		return nil, nil, ledger, servedKey
+	}
+	if ledger == nil {
+		ledger = observe.NewQuotaLedger(nil)
+	}
+	key := ""
+	if len(keys) > 0 {
+		key = keys[0]
+	}
+	servedKey = func() string { return key }
+	if notify == nil {
+		// No event mouth: the gate is not installed, and the honest statement
+		// of that is the raw chain, not a silent gate.
+		return provs[0], nil, ledger, servedKey
+	}
+	cards, providers, params := agent.QuotaWiring(cfg)
+	gate := agent.NewQuotaGate(params, cards, providers, ledger, notify)
+	elements := make([]llm.LlmProvider, 0, len(provs))
+	for i, p := range provs {
+		k := ""
+		if i < len(keys) {
+			k = keys[i]
+		}
+		elements = append(elements, gate.GateProvider(p, k))
+	}
+	runner := &llm.ChainRunner{
+		Elements: elements,
+		Names:    keys,
+		OnFailover: func(ev llm.FailoverEvent) {
+			if ev.To != "" {
+				key = ev.To
+			}
+			class := ""
+			if ev.Cause != nil {
+				class = string(ev.Cause.Class)
+			}
+			if ev.To == "" {
+				notify(agent.Event{
+					Kind: agent.EvWarn,
+					Text: fmt.Sprintf("派发链已用尽（最后 %s，原因 %s）", ev.From, class),
+				})
+				return
+			}
+			notify(agent.Event{
+				Kind: agent.EvWarn,
+				Text: fmt.Sprintf("派发链推进：%s -> %s（原因 %s）", ev.From, ev.To, class),
+			})
+		},
+	}
+	return &gatedChainDispatch{runner: runner, info: provs[0].Info()}, gate, ledger, servedKey
+}
+
+// gatedChainDispatch is the C5 shape the loop dispatches through: ticket 11's
+// llm.ChainRunner (which carries Stream but no Info) plus the identity of the
+// chain's primary element, which is the model this run's config line names.
+type gatedChainDispatch struct {
+	runner *llm.ChainRunner
+	info   llm.ProviderInfo
+}
+
+// Info implements llm.LlmProvider.
+func (c *gatedChainDispatch) Info() llm.ProviderInfo { return c.info }
+
+// Stream implements llm.LlmProvider by walking the gated chain.
+func (c *gatedChainDispatch) Stream(ctx context.Context, req *llm.Request, emit func(llm.StreamEvent) error) error {
+	return c.runner.Stream(ctx, req, emit)
+}
+
 func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// The LIVE config, read per task: since ticket 223 a resident 1s tick hot-
 	// applies changed sections into the Manager, so reading the boot snapshot
@@ -1318,9 +1422,30 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	if rt.mgr != nil {
 		cfg = rt.mgr.Config()
 	}
-	prov := rt.provs[0]
-	info := prov.Info()
 	ep := rt.endpoint
+	// Ticket 44-r5 装配 (44-v2-verdict §4①(a) 登记①): the pre-dispatch quota
+	// gate goes ONTO the host dispatch chain here, not next to it. Every
+	// element of the built chain is wrapped with GateProvider under its own
+	// "provider/model" key (element 0 keyed by the resolved endpoint, the same
+	// pair CostWiring below reads its price card from, so a card and a gate
+	// decision can never name two different models), and the loop dispatches
+	// through ticket 11's ChainRunner: an over-quota model is SKIPPED before
+	// its Stream runs and the chain ADVANCES, with the skip and the step both
+	// announced on this run's own sink. The ledger lives on the runtime so the
+	// caps accumulate across this process's tasks.
+	sink := consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot, settle: rt.settle}
+	quotaKeys := append([]string{}, rt.names...)
+	if len(quotaKeys) > 0 {
+		quotaKeys[0] = ep.Provider + "/" + ep.Model
+	}
+	prov, quotaGate, ledger, servedKey := quotaDispatchChain(cfg, rt.provs, quotaKeys, rt.quotaLedger, sink.Publish)
+	rt.quotaLedger = ledger
+	if quotaGate != nil && rt.store != nil {
+		// The disk half of AC#5: quota_state='exhausted' through the existing
+		// provider_health DAO, never a new column.
+		quotaGate.SetSignalWriter(rt.store, rt.auditf)
+	}
+	info := prov.Info()
 	// Ticket 44 生产咬合: the C23 money path needs two things from this
 	// composition root and had neither — a price card (Config.Price below, the one
 	// field loop.go prices every turn with) and the [cost] caps handed to the
@@ -1330,7 +1455,7 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	opts := agent.Options{
 		Provider: prov,
 		Tools:    rt.bridge,
-		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot, settle: rt.settle},
+		Sink:     sink,
 		// The loop's own tool_call rows are deliberately NOT booked: the
 		// bridge already writes the authoritative one (assessed level, gate
 		// decision, outcome, correlation id). Two rows per call would make
@@ -1473,6 +1598,19 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)
 	if why != "" {
 		rt.auditf("wisp run: 后台任务的输出没有进名册：%s", why)
+	}
+
+	// Ticket 44-r5: the bookkeeping half of the assembly. The finished task's
+	// real spend goes back into the SAME session ledger the pre-dispatch gate
+	// judged from, keyed by the chain element that actually served (servedKey
+	// names the fallback once the chain stepped). Without this line the gate
+	// would judge against zero forever and the quota caps in config.toml would
+	// again be schema that never bites - 44-v1's 「机制在、产品不咬」 shape.
+	if quotaGate != nil && res.CostMicros != 0 {
+		served := servedKey()
+		if err := quotaGate.Book(served, res.CostMicros); err != nil {
+			rt.auditf("wisp run: 配额记账失败 model=%s err=%v", served, err)
+		}
 	}
 
 	class := ""
