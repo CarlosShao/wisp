@@ -30499,3 +30499,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **24-r4 停手（硬门，未写一行实现码）**：pdfcpu v0.16.4 **无文本抽取 API**——`api.ExtractContent`→`pdfcpu.ExtractPageContent`→`ctx.PageContent` 只回**解压后原始内容流字节**（PDF 算符/字形编码，非 Unicode）；全包 grep 无 Tj/TJ→Unicode 解码器（`ToUnicode` 只在 font/validate 写水印路径）；要真做得自写内容流分词+CMap 解析＝**禁止的自造解析器**。且 `go build pdfcpu/pkg/api` 因 6 个传递依赖（x/image/ccitt、webp、x/text 等）缺 go.sum 失败。⇒ **pdfcpu 选型错误**；按铁律换主流纯 Go 文本抽取库 **`ledongthuc/pdf`（BSD-3）**；编排者换依赖＋改 `SPEC-01` 白名单（pdfcpu→ledongthuc/pdf），再派 24-r5。
 **44b-r1 交付**（`3cc7b1d6c`，15 文件 +1280/−56）：memory 迁移 4→5 建 `cost_daily_model`（分表、不回改 `cost_daily` 主键，A1445 批注）；`costmodeldao_44b.go` 同批 DAO（单写事务 bump 两表）；observe `ModelReader/ModelLedger/PostModelTask/MonthFirst/QuotaLedger.SeedFrom`；旧 v1seed/366/196 版本钉对齐 v5。待 44b-v1 验收。
 **在飞**：无（batch-456b 收）；即派 24-r5＋44b-v1。
+
+## A1448（2026-11-03 11:5x +08，编排者）★第15票结案44b->done；24-r5 PDF 落地(0950ddd7c)；派24-v3收官24
+
+**24-r5**（`0950ddd7c`）：PDF 文本层用 **ledongthuc/pdf** 落地——逐页拼接 `Page(i).GetPlainText`、预算 spill 只报 Truncated、扫描件(runs==0)→「疑似扫描件，无文本层」marker 不猜、坏 PDF→fail-closed、**删 `DEFERRED(D34-1)` 与 stub**（保留 xlsx/OCR 的 `D34`）。库在 `page.go:250` 读 `/ToUnicode` CMap 真能解 Unicode。⇒ 24 的 PDF 格代码落地，待 24-v3 验收。
+**44b 结案**（`3cc7b1d6c`）：44b-v1 非实现者验收 5 格全 PASS（memory 30.3s/observe 5.1s/agent 7.7s FAIL=0：迁移 4→5 幂等+旧数据 byte-identical／同批 upsert 两表／重启 SeedBaseline 重建基线一致／rollover model 维度／reconciliation）。15 文件、D35 `cost_daily_model` 分表（不回改主键）。翻 5 框、Status done、`git mv`→`-done`、双名核。
+**派**：24-v3（PDF 验收＋裁 24 能否 -done）。
+**池现空**（batch-459 收）：tools/memory/observe/agent/plugin 全空；下一波 51(plugin,需预置 goja)／23(tools)／31(tools+memory)。
