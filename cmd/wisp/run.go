@@ -338,6 +338,11 @@ type agentRuntime struct {
 	provs    []llm.LlmProvider // built chain, kept for the probe path
 	names    []string
 	endpoint llm.Endpoint
+	// roleSettings is the chat role's call-time settings (llm.RoleSettings:
+	// Temperature / ThinkingIntensity / MaxOutputTokens) as resolved at boot.
+	// Ticket 370: this used to be discarded at the ResolveRole call, which is
+	// why [llm.roles.chat].max_output_tokens never reached a request.
+	roleSettings llm.RoleSettings
 	// quotaLedger is ticket 44-r5's session-scoped quota bucket holder: the one
 	// object the pre-dispatch gate judges against and the task-finish path
 	// books, so a [llm].models.*_quota_micro day/month cap keeps accumulating
@@ -500,12 +505,17 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// Role -> endpoint -> provider, with the key resolved through the DPAPI
 	// store by the resolver (A8's whole point).
 	res := llm.NewResolver(cfg, st)
-	ep, _, err := res.ResolveRole(llm.RoleChat)
+	// Ticket 370: the role's RoleSettings used to be discarded here (`ep, _, err`),
+	// so [llm.roles.chat].max_output_tokens stopped dead at the resolver and no
+	// request ever carried a max_tokens. It is kept on the runtime now and
+	// re-resolved per task in execute() from the LIVE config, exactly like rt.endpoint.
+	ep, roleSettings, err := res.ResolveRole(llm.RoleChat)
 	if err != nil {
 		fmt.Fprintf(s.stderr, "wisp run: 文本角色未配置（Unconfigured）：%v\n", err)
 		return rt, 2
 	}
 	rt.endpoint = ep
+	rt.roleSettings = roleSettings
 	prov, err := llm.BuildEndpointProvider(ep, chainOptions(cfg))
 	if err != nil {
 		fmt.Fprintf(s.stderr, "wisp run: 无法构造 provider：%v\n", err)
@@ -1450,6 +1460,21 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 		cfg = rt.mgr.Config()
 	}
 	ep := rt.endpoint
+	// Ticket 370: the chat role's call-time settings. ResolveRole's SECOND
+	// return value used to be discarded at the boot site, which is why
+	// [llm.roles.chat].max_output_tokens stopped at the resolver. The settings
+	// are per-role, so they are re-derived per task from the LIVE cfg exactly as
+	// the comment above describes for [agent]/[llm]: a keyless resolver is
+	// enough to READ them (RoleSettings is copied straight off Roles.Chat and
+	// touches no api_key_ref), and it is the only shape available here because
+	// this function holds no secret store of its own.
+	_, roleSettings, rerr := llm.NewResolver(cfg, nil).ResolveRole(llm.RoleChat)
+	if rerr != nil {
+		// A per-task read that fails is not fatal for THIS task: the boot copy
+		// (resolved at assembly through the real DPAPI store) still carries the
+		// role's settings, which is the same posture ep above takes.
+		roleSettings = rt.roleSettings
+	}
 	// Ticket 44-r5 装配 (44-v2-verdict §4①(a) 登记①): the pre-dispatch quota
 	// gate goes ONTO the host dispatch chain here, not next to it. Every
 	// element of the built chain is wrapped with GateProvider under its own
@@ -1500,7 +1525,11 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 		Config: agent.Config{
 			Model:         info.Model,
 			ContextWindow: ep.ContextWindow,
-			ArtifactsDir:  filepath.Join(rt.spec.dataDir, "artifacts"),
+			// Ticket 370: the chat role's ceiling reaches the loop here, and the
+			// loop puts it on the Assembler, which puts it on every request as
+			// max_tokens. 0 (the role set none) keeps the provider default.
+			MaxOutputTokens: roleSettings.MaxOutputTokens,
+			ArtifactsDir:    filepath.Join(rt.spec.dataDir, "artifacts"),
 			PerToolTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS) *
 				time.Millisecond,
 			SteeringEnabled: cfg.Agent.SteeringEnabled,

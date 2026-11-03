@@ -130,6 +130,17 @@ type Config struct {
 	// cannot verify.
 	PointerJudge PointerJudge
 
+	// MaxOutputTokens is the resolved chat role's own output ceiling
+	// ([llm.roles.chat].max_output_tokens, ticket 370). New copies it onto the
+	// Assembler, which puts it on every C5 request as max_tokens. 0 = the role
+	// set none, and the request then carries no ceiling at all (the provider
+	// default), which is exactly what every turn did before this field existed.
+	//
+	// It is per-role, so the composition root re-reads it per task with the
+	// rest of the live config: it belongs in the same place Temperature and
+	// ThinkingIntensity would live if this struct carried those today.
+	MaxOutputTokens int
+
 	// PassThroughUnclassifiedRisk routes calls whose provider reports no risk
 	// level as L0 pass-through. Ticket 21 replaces this with the C19 gate;
 	// with the flag off an unclassified call fails closed instead.
@@ -240,12 +251,20 @@ func New(opt Options) (*Loop, error) {
 	if model == "" {
 		model = info.Model
 	}
+	// Ticket 370: the chat role's output ceiling, which until this ticket
+	// stopped at llm.RoleSettings (run.go discarded it) and never reached the
+	// request. The assembler is reachable from the very first turn, so the
+	// value is set BEFORE the Loop exists: there is no later window that is
+	// any less racy. 0 passes straight through - the assembler then renders
+	// the request without a ceiling, the pre-370 behaviour.
+	asm := NewAssembler(model, b, info.Cache)
+	asm.MaxOutputTokens = opt.Config.MaxOutputTokens
 	l := &Loop{
 		opt:      opt,
 		b:        b,
 		reg:      opt.Registry,
 		provider: opt.Provider,
-		asm:      NewAssembler(model, b, info.Cache),
+		asm:      asm,
 		sp:       NewSpiller(opt.Config.ArtifactsDir, b).WithPointerJudge(opt.Config.PointerJudge),
 		comp:     NewCompressor(b, opt.Summarizer, WithLogger(opt.Logger)),
 		guard: GuardConfig{
