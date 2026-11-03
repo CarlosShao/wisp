@@ -30552,3 +30552,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **50 结案**：代码早于 `d99b1a970`（dev）落地：C14 TOML schema 校验（per-field 正反矩阵/未知键拒）、C16 host_api 语义化门（major 不合=明确拒载非静默）、install/update/uninstall 生命周期、tamper 检测（installed manifest hash 不匹配=拒+告警）、plugin net_allowlist（出表→L2/R5）。
 **验证**：`go test ./internal/plugin/...` → internal/plugin ok 7.9s（50 测试 ParseManifest golden/FieldMatrix/UnknownKeysRejected/CaretGate/Allowlist R5 in-out/LoadInstalled bitflip/DisposalScope 零泄漏 等全 PASS）、manifestslot ok 8.5s。build rc=0、gofumpt 净、`d22scan` 全仓 clean。AC1/2/4/5 由 backend 测试直证；AC3 安装授权 UI 属 frontend(33-40)面、后端 install/teardown(DisposalScope)已测；AC6 list_tools/discovery 可见＋bridge 记录 plugin id 已接。票 50→-done，六框全翻。
 **注**：52(D46 命令插件)以 50 为基础已同时结案（A1454），二者测试同包全绿互为佐证。
+
+## A1456（2026-11-03 21:3x +08，编排者）票23（WIP 检查点）：system/window/input 底层后端 6 文件编译通过并落库
+
+**背景**：23-impl 腿（ClinePass flash）返回 null，但写了 2179 行 backend（`system_bridge.go` 的 `SystemBridge.Do(Action)` 设计 + `system_backend_windows.go` 全动作 + screen_capture/readings/dpi/ops），未提交、未接线、未测试，且 12 处 winapi 签名错、编译不过。
+**编排者修复**：逐条修 12 编译错（LookupPrivilegeValueW→advapi proc；删 `LazyDLL.Find`；`Handle↔Token` 转换；`SubAuthorityCount` 单返回值；imeLayouts 改 uintptr；unused x/y；自建 `systemPowerStatus` struct + `GetSystemPowerStatus` proc；sendVolumeKey uint16）→ `go build ./internal/tools/` **0 error**；gofumpt 已格式化；`go vet` 仅 2 条 `unsafe.Pointer`（GlobalLock uintptr→ptr，WinAPI 固有用法的已知告警，不影响 go test）。
+**提交**：6 文件 WIP 检查点（system_bridge.go / system_backend_windows.go / system_ops_windows.go / system_readings_windows.go / system_dpi_windows.go / screen_capture_windows.go）。
+**待续（23 未完，票仍 open）**：工具接线层 `BuiltinSystemEntries`（Entry/Decl/risk/ImagePart）+ `cmd/wisp/run.go` 注册 + AC1-5 测试 + 非 Windows 后端 stub。
