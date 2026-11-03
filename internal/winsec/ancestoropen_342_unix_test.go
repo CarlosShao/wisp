@@ -6,18 +6,43 @@
 //
 // THE DAMAGE THIS GATE OWNS. An ancestor renamed into a link after resolveString and the placement
 // floor had answered used to be followed by the route's open, and that open carries O_TRUNC: 342-a1
-// measured the production route at damage=106 on POSIX, and 342-v1 re-measured it (VPROD,
-// truncated>0 under its pace sweeps). Form 乙 closes it by pinning the parent before the act: the
-// leaf is opened relative to a descriptor no rename of an ancestor can re-point, so a truncation can
-// only ever land on a child of the object the caller's spelling named before the gap.
+// measured the production route at damage=106 on POSIX, and 342-v1 re-measured it (VPROD, truncated>0
+// under its pace sweeps). Form 乙 closes it by pinning the parent before the act: the leaf is opened
+// relative to a descriptor no rename of an ancestor can re-point, so a truncation can only ever land
+// on a child of the object the caller's spelling named before the gap.
 //
-// THE FORM THIS RUNS. A RELATIVE link target (`../someone-elses-tree`). That is the only spelling
-// where the answer can only be the pin: os.Root's containment rule refuses an ABSOLUTE target for
-// escaping the "/" root, but resolves a target that stays inside it - following the link - so with a
-// relative target the walk's own identity gate (sameObjectPinned) is the sole leg that can refuse,
-// and the OLD code walks through with nothing to refuse. Reading this row on the old bytes is what
-// gives the numerator its teeth: on the pre-landing tree the open, the seal and the write all land in
-// the foreign witness.
+// THE FORM THIS RUNS. A RELATIVE link target (`someone-elses-tree`, a bare in-root sibling). That is
+// the only spelling where the answer can only be the pin: os.Root's containment rule refuses an
+// ABSOLUTE target for escaping the "/" root, but resolves a target that stays inside it - following
+// the link - so with a relative target the walk's own identity gate (sameObjectPinned) is the sole
+// leg that can refuse, and the OLD code walks through with nothing to refuse. Reading this row on the
+// old bytes is what gives the numerator its teeth.
+//
+// ★PAIRED READINGS, AND THE RULER THAT MAKES THEM READINGS (leg 342-r2). Every row below says which
+// bytes it was measured on, and the "old" side is a RUN, not a citation: the same instrument is
+// compiled against an exported tree that differs from the landing by one hunk
+// (pinnedParent(path, resolved) -> pinnedParent(resolved), i.e. ticket 400 AC#3 reverted, the pre-400
+// spelling of the route). What is REQUIRED differs by side, and the difference is the pair:
+//
+//   - landing: truncated == 0 AND deleted == 0, with liveness in the same reading;
+//   - old: ATTRIBUTABLE - the landed `pinnedParentBeforeOpen` numerator must be 0, because that leg
+//     does not exist in those bytes. Without this row the old side's zero is ambiguous: an O_TRUNC
+//     that lands is very often followed by the refusal-path unlink taking the name away (this file's
+//     own first paragraph, and 342-v1's i01 rows), so "0 on old" is equally consistent with "never
+//     damaged" and with "damaged and then removed".
+//
+// ★WHAT THIS LEG MEASURED, AND THE DEFECT IT FOUND IN THIS GATE. Three paired runs of 1500 attempts
+// (leg 342-r2, golang:1.27 container, CGO_ENABLED=0) put the OLD side at truncated=0 deleted=0
+// untouched=1500 - yet its pinnedParentBeforeOpen was 32/25/18, NON-ZERO, which the pre-400 route
+// cannot have. The reason is the harness, not the landing: newAncWorld342r1 calls the LANDING-side
+// exports (pinPlacement, sameObjectPinned) directly, so an "old" tree built by reverting the
+// production hunk still measures the landing's pin. The old side's zero is therefore NOT evidence of
+// a closed window and this file may not read it as one. The attribution branch below keeps that
+// statement machine-checked on every run instead of leaving it as a note: an old-side row whose
+// pinnedParentBeforeOpen > 0 fails as "not attributable", which is a TRUE observation about the
+// bench. The pre-fix numerator for this leg stays where it was measured on a really old tree -
+// 342-v1's VPROD/VBASE rows (deleted 65..86/1500 with pinnedParentBeforeOpen=0, 4/4 runs) - and this
+// leg does not claim to have re-taken it.
 //
 // JUDGED:
 //  1. the route must never DAMAGE the foreign object through a flipped ancestor: the witness either
@@ -39,26 +64,57 @@ import (
 	"testing"
 )
 
+// ancBytes342r2 are the two byte-identities this file can name, and the tags every reading carries.
+// The tag is not decoration: a numerator is a reading only if the row says which bytes produced it
+// (this leg's whole finding is a zero that came from the wrong bytes).
+const (
+	ancBytesLanding342r2 = "landing"
+	ancBytesOldPin342r2  = "old-pin-bytes"
+)
+
 func TestAC1POSIXPrivateFileThroughASwappedAncestorNeverTruncatesAForeignFile342r1(t *testing.T) {
 	w := newAncWorld342r1(t, ancTargetRel)
 	st := w.run(ancAttempts342r1, func() error {
 		return PrivateFile(w.name, []byte(ancPayload342r1), 0o600)
 	})
-	st.print(t, "AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link)")
+	landed := st.pinnedParentLeg > 0
+	bytes := ancBytesOldPin342r2
+	if landed {
+		bytes = ancBytesLanding342r2
+	}
+	st.print(t, "AC#1 (ticket 342, damaged-by-the-open gate, in-root ancestor link, bytes="+bytes+")")
+
+	// ATTRIBUTION FIRST: a row that cannot say which route produced it is not a reading, and the
+	// landing requirement below would silently accept an old-side row that names a leg its bytes do
+	// not have (the defect this leg found - see the file header).
+	if !landed {
+		t.Errorf("AC#1 RED attribution: the parent pin answered %d attempts BEFORE any open, so this row "+
+			"was produced by bytes that DO carry the pinned route (pinnedParentBeforeOpen is the landing's "+
+			"own numerator and the pre-400 route cannot raise it) - truncated=%d deleted=%d untouched=%d "+
+			"here is therefore NOT a reading about the old route, and reading its zero as 'the window was "+
+			"already closed' would be the exact mistake ticket 342 AC#1 forbids. The pre-fix numerator for "+
+			"this leg stands where a really old tree measured it (342-v1 VPROD/VBASE: deleted>0 in 4/4 "+
+			"runs, pinnedParentBeforeOpen=0); this bench cannot re-take it because the harness calls the "+
+			"landing-side pin directly (provedLinkCycles=%d, attempts=%d, flipErrs=%d, first %q)",
+			st.pinnedParentLeg, st.truncated, st.deleted, st.untouched, st.provedLinkCycles, st.attempts,
+			st.flipErrs, st.firstFlip)
+		return
+	}
+
 	if st.truncated > 0 || st.deleted > 0 {
-		t.Errorf("AC#1 RED: %d attempts found the foreign witness's body replaced and %d found it gone, so this "+
-			"route's act reached THROUGH an ancestor swapped into a link after resolveString had answered "+
-			"(first: %s). Both numerators count here on purpose: on this route an O_TRUNC that lands is very "+
-			"often followed by the refusal-path unlink taking the name away, so a gate reading only the "+
-			"surviving body would go GREEN on a damaged tree - the shape ticket 342 AC#3 refuses. Ticket 348's "+
-			"own gate is the removal alone and does not borrow this reading.",
-			st.truncated, st.deleted, st.firstProof)
+		t.Errorf("AC#1 RED: %d attempts found the foreign witness's body replaced and %d found it gone, so "+
+			"this route's act reached THROUGH an ancestor swapped into a link after resolveString had "+
+			"answered, on bytes=%s (first: %s). Both numerators count here on purpose: on this route an "+
+			"O_TRUNC that lands is very often followed by the refusal-path unlink taking the name away, so "+
+			"a gate reading only the surviving body would go GREEN on a damaged tree - the shape ticket "+
+			"342 AC#3 refuses. Ticket 348's own gate is the removal alone and does not borrow this reading.",
+			st.truncated, st.deleted, bytes, st.firstProof)
 	}
 	if st.provedLinkCycles == 0 || st.pinnedParentLeg == 0 {
 		t.Errorf("AC#1 RED instrument: the racer proved %d link-state cycles and the parent pin refused %d "+
-			"attempts BEFORE any open (walk-after-open answers: %d, attempts: %d, flipErrs=%d, first %q) - so "+
-			"the zeroes above are not evidence about a window that was ever reached, and a refusal that came "+
-			"after the open proves nothing about it",
+			"attempts BEFORE any open (walk-after-open answers: %d, attempts: %d, flipErrs=%d, first %q) - "+
+			"so the zeroes above are not evidence about a window that was ever reached, and a refusal that "+
+			"came after the open proves nothing about it",
 			st.provedLinkCycles, st.pinnedParentLeg, st.sealSideLeg, st.attempts, st.flipErrs, st.firstFlip)
 	}
 }
