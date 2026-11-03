@@ -30546,3 +30546,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **52 结案**：提交 `5438d104e`（dev，15 文件：manifest/validator 改 + command.go/command_argv.go/extract.go + manifestslot command.go/command_extract.go/command_job_{windows,other}.go/job_other.go/stopwatch.go + 两套 52 测试）。零 Go 代码包装本地 CLI：绝对 pin exe_hash 每调复核（一字节篡改=拒+告警）、argv 向量无 shell、声明式抽取（json-path/regex）、env allowlist（路径裁剪、key 不外泄）、单调预算超时杀进程树、参数 JSON Schema。
 **验证**：`go test ./internal/plugin/...` → internal/plugin ok 7.9s、manifestslot ok 8.5s（52 测试 17 在 manifestslot + 30 在 plugin，全 PASS）；build rc=0、gofumpt 净、`d22scan` 全仓 clean（0 违规）。AC1-6 覆盖：AC1-5 由 52 测试；AC6（声明 L0 的 send 类→L2）由 `internal/risk/assessor_test.go:41`（declared L0 + send → L2/[R8]）＋本票 Irreversible 声明校验（Test52CommandKindValidates）联合覆盖。票 52→-done，六框全翻。
 **过程**：52f 腿(ClinePass flash)产出生产代码但测试接线缺陷——7 处 CommandRunOptions 漏 EnvLookup（子进程拿不到 fixture 握手→跑成测试二进制打印 -test 用法）、fixture `block()` 裸收 channel 触发 Go deadlock 检测秒崩。编排者零子代理手工修 7 处 EnvLookup + 改 block() 为循环 sleep，全转绿后提交。
+
+## A1455（2026-11-03 21:1x +08，编排者）★第20票结案 50->done（Tier1 manifest 插件 C14/C16/lifecycle）
+
+**50 结案**：代码早于 `d99b1a970`（dev）落地：C14 TOML schema 校验（per-field 正反矩阵/未知键拒）、C16 host_api 语义化门（major 不合=明确拒载非静默）、install/update/uninstall 生命周期、tamper 检测（installed manifest hash 不匹配=拒+告警）、plugin net_allowlist（出表→L2/R5）。
+**验证**：`go test ./internal/plugin/...` → internal/plugin ok 7.9s（50 测试 ParseManifest golden/FieldMatrix/UnknownKeysRejected/CaretGate/Allowlist R5 in-out/LoadInstalled bitflip/DisposalScope 零泄漏 等全 PASS）、manifestslot ok 8.5s。build rc=0、gofumpt 净、`d22scan` 全仓 clean。AC1/2/4/5 由 backend 测试直证；AC3 安装授权 UI 属 frontend(33-40)面、后端 install/teardown(DisposalScope)已测；AC6 list_tools/discovery 可见＋bridge 记录 plugin id 已接。票 50→-done，六框全翻。
+**注**：52(D46 命令插件)以 50 为基础已同时结案（A1454），二者测试同包全绿互为佐证。
