@@ -80,8 +80,8 @@ func TestTaskState196LegacyV3WithToolCallRowsStillOpens(t *testing.T) {
 		`SELECT value FROM schema_meta WHERE key='schema_version'`).Scan(&ver); err != nil {
 		t.Fatal(err)
 	}
-	if ver != "4" {
-		t.Errorf("schema_version = %q, want 4: the 3->4 step did not land", ver)
+	if ver != "5" {
+		t.Errorf("schema_version = %q, want 5: the 3->4 step did not land (or a later step failed)", ver)
 	}
 
 	var rows, matched int

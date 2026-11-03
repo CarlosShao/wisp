@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/llm"
@@ -58,6 +59,11 @@ type QuotaGate struct {
 	signals QuotaSignalWriter
 	// logW receives signal failures; they never block a dispatch.
 	logW func(string, ...any)
+	// Per-model permanence mouths (ticket 44b; both may be nil = 44-r4
+	// session-only behaviour, set through SetModelStore).
+	modelLedger observe.ModelLedger
+	models      observe.ModelReader
+	clock       func() time.Time
 }
 
 // NewQuotaGate wires cards/providers from config-shape inputs plus the

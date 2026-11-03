@@ -148,6 +148,12 @@ CREATE TABLE plugin_state (
 //	     constrained shape through the 3->4 rebuild in ddlV4. The accepted
 //	     values come from taskStateRoster, so the SQL and the DAO cannot fork
 //	     either.
+//	v5 - cost_daily_model (ticket 44b): the per-model day aggregate that makes
+//	     C23's per-model consumption permanent across restarts (owner approved
+//	     the D35 addition, ledger A1445). A NEW table, not an edit of ddlV1:
+//	     cost_daily's PK shape is untouched (mainstream harness split-table
+//	     rule), and fresh and existing databases reach v5 through the same 4->5
+//	     step.
 //
 // ⚠ D35 is a frozen contract (AGENTS.md §1.1) and SPEC-02 §3 still lists nine
 // tables; this v3 roster extension carries a spec-note debt that
@@ -155,8 +161,10 @@ CREATE TABLE plugin_state (
 // 人工批准" and probes/166/a2 §H). v4 adds a second debt of the same kind:
 // SPEC-02 §3's task_log block carries no CHECK, and the owner's approval to
 // touch D35 does not edit the spec text. Both are named in
-// docs/evidence/s1/196-r1-impl.md rather than fixed by an agent.
-const SchemaVersionTarget = 4
+// docs/evidence/s1/196-r1-impl.md rather than fixed by an agent. The v5 table
+// is the third extension of the same kind; its approval is ledger A1445 (owner,
+// 2026-11-03, ticket 44b).
+const SchemaVersionTarget = 5
 
 // ddlV2 appends the provider_health table (SPEC-02 §3 note, schema v2). The
 // DDL below mirrors the ```sql block in docs/specs/SPEC-02-data-storage.md
@@ -229,6 +237,7 @@ var migrationChain = []migrationStep{
 	// auditForeignKeys: the 3->4 step is the one that rebuilds a table, so it is
 	// the one whose transaction has to be checked before it commits (ticket 366).
 	{from: 3, to: 4, apply: applyV4, auditForeignKeys: true},
+	{from: 4, to: 5, apply: applyV5},
 }
 
 // applyV1 creates the eight D35 tables + indexes and seeds schema_version=1.
@@ -294,6 +303,38 @@ CREATE INDEX idx_session_turn_session ON session_turn(session_id, seq);`
 // applyV3 creates the session tables (ticket 166).
 func applyV3(tx txExec) error {
 	for _, stmt := range splitSQLStatements(ddlV3) {
+		if _, err := tx.ExecContext(context.Background(), stmt); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ddlV5 adds cost_daily_model (ticket 44b, D35 addition approved as ledger
+// A1445): the per-model day aggregate that makes the C23 per-model consumption
+// permanent. Same rule as ddlV3: a NEW table in its own step, so ddlV1's text
+// (including cost_daily's primary key) is untouched, and a fresh database
+// reaches the table through the same 4->5 step an existing one does.
+//
+// Unknown price is the 44 reading kept on disk: a tokens-only row with
+// amount_micro 0. The marker is the reader's (observe.PriceUnknownMarker),
+// never a second number invented here.
+const ddlV5 = `-- per-model 日聚合（schema v5：票 44b，D35 加列，机主批台账 A1445）
+-- 分表不回改 cost_daily 主键（主流 harness 做法）；未知价 = tokens-only + amount_micro 0
+CREATE TABLE cost_daily_model (
+  day          TEXT NOT NULL,             -- 'YYYY-MM-DD'（与 cost_daily.day 同形，validDay 强制）
+  provider     TEXT NOT NULL,             -- 目录 provider 名
+  model        TEXT NOT NULL,             -- 目录 model id
+  tokens_in    INTEGER NOT NULL DEFAULT 0,
+  tokens_out   INTEGER NOT NULL DEFAULT 0,
+  amount_micro INTEGER NOT NULL DEFAULT 0, -- 1e-6 货币单位整数（与 cost_daily.cost_micros 同单位）
+  tasks        INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (day, provider, model)
+);`
+
+// applyV5 creates the cost_daily_model table (ticket 44b).
+func applyV5(tx txExec) error {
+	for _, stmt := range splitSQLStatements(ddlV5) {
 		if _, err := tx.ExecContext(context.Background(), stmt); err != nil {
 			return err
 		}

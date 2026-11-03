@@ -148,9 +148,14 @@ type CostMeter struct {
 	ledger DayLedger
 	writer DayWriter
 	tasks  TaskReader
-	loc    *time.Location
-	now    Clock
-	log    *slog.Logger
+	// modelLedger books cost_daily (+ cost_daily_model in one storage batch);
+	// models reads the per-day model rows (ticket 44b). Both are optional:
+	// a meter built without them keeps 44's global-only behaviour.
+	modelLedger ModelLedger
+	models      ModelReader
+	loc         *time.Location
+	now         Clock
+	log         *slog.Logger
 
 	mu     sync.RWMutex
 	budget BudgetParams

@@ -326,8 +326,8 @@ func TestMigration366AuditRecordsOrphansAndStillOpens(t *testing.T) {
 			if got := strings.Join(t366ChildTaskIDs(t, dbPath), ","); got != tc.childTaskID {
 				t.Errorf("tool_call.task_id = %q, want %q: the forensic rows must be untouched", got, tc.childTaskID)
 			}
-			if v := t366Scalar(t, dbPath, `SELECT value FROM schema_meta WHERE key='schema_version'`); v != 4 {
-				t.Errorf("schema_version = %d, want 4", v)
+			if v := t366Scalar(t, dbPath, `SELECT value FROM schema_meta WHERE key='schema_version'`); v != 5 {
+				t.Errorf("schema_version = %d, want 5 (3->4 rebuild then 4->5)", v)
 			}
 		})
 	}
@@ -374,8 +374,8 @@ func TestMigration366AuditNeverLocksTheDatabase(t *testing.T) {
 		t.Errorf("second Open audit = {version %d, orphans %d}, want {%d, 0}",
 			secondAudit.SchemaVersion, secondAudit.OrphanRows, SchemaVersionTarget)
 	}
-	if v := t366Scalar(t, dbPath, `SELECT value FROM schema_meta WHERE key='schema_version'`); v != 4 {
-		t.Errorf("schema_version = %d after two Opens, want 4", v)
+	if v := t366Scalar(t, dbPath, `SELECT value FROM schema_meta WHERE key='schema_version'`); v != 5 {
+		t.Errorf("schema_version = %d after two Opens, want 5", v)
 	}
 	if got := strings.Join(t366ChildTaskIDs(t, dbPath), ","); got != "task-A,task-A,task-B" {
 		t.Errorf("tool_call.task_id = %q after two Opens, want task-A,task-A,task-B: nothing may be deleted", got)
@@ -522,7 +522,7 @@ func TestMigration366AuditNeverTurnsABrokenRulerIntoALock(t *testing.T) {
 				audit.SchemaVersion, audit.OrphanRows, audit.ChildTables, SchemaVersionTarget)
 		}
 		logs := buf.String()
-		for _, want := range []string{"level=WARN", "could not be read", "opening anyway", "schema_version=4"} {
+		for _, want := range []string{"level=WARN", "could not be read", "opening anyway", "schema_version=5"} {
 			if !strings.Contains(logs, want) {
 				t.Errorf("the unreadable-ruler warning is missing %q:\n%s", want, logs)
 			}
@@ -559,8 +559,8 @@ func TestMigration366AuditNeverTurnsABrokenRulerIntoALock(t *testing.T) {
 		if got := t366Scalar(t, dbPath, `SELECT count(*) FROM tool_call`); got != 3 {
 			t.Errorf("tool_call = %d after the migration, want 3: forensic rows are never deleted", got)
 		}
-		if v := t366Scalar(t, dbPath, `SELECT value FROM schema_meta WHERE key='schema_version'`); v != 4 {
-			t.Errorf("schema_version = %d, want 4: the step committed even though the ruler was broken", v)
+		if v := t366Scalar(t, dbPath, `SELECT value FROM schema_meta WHERE key='schema_version'`); v != 5 {
+			t.Errorf("schema_version = %d, want 5: the step committed even though the ruler was broken", v)
 		}
 		logs := buf.String()
 		for _, want := range []string{"level=WARN", "could not be read", "opening anyway", "schema_version=4"} {
