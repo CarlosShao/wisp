@@ -30518,3 +30518,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **24 结案**（第16票）：24-r6（`52ed59cff`/`f6fd8270a`）把 2 枚旧 stub 测试改为真抽取判据；编排者窄过滤复跑 `go test ./internal/tools -run 'PDF|Pdf|Doc|Extract|Document'` **rc=0 / 0.338s 全绿**；票面五格全 PASS（PDF/docx/扫描件现验；search.content/files/apps 前验；DEFERRED xlsx/OCR 与 SPEC-12 §5 对上）。裁决表 `docs/evidence/s1/24-v3-verdict.md`。**PDF 文本层从"推迟"→"已实现"**（A1445 批 ledongthuc/pdf）。
 **51-r1**（`8a2a40b0f`）：Tier2 goja 运行时**块 A**——per-call 隔离（每调 `goja.New`）、5s 墙钟中断（具名 watchdog + `vm.Interrupt`）、256KB 结果截断+flag、recover 边界；测试 5.00s 中断/隔离/截断/panic 全 PASS。票51 剩**块 B＝C24 host API**。
 **在飞**：batch-463 收。下一波：51-r2(host API,plugin)；23/31(tools/memory 现空)。
+
+## A1451（2026-11-03 13:1x +08，编排者）51-r1 块A 编排者复跑全绿；派 31-r1；C24 初始集待机主批
+
+**51-r1 复跑**（`8a2a40b0f`）：`go test ./internal/plugin -run 'Goja|VM|Disposal|Interrupt|51'` **ok 5.042s rc=0** 全 PASS（per-call 隔离／panic boundary／result cap 256KB 截断／wall-clock 5.01s 中断／watchdog roster 具名／misconfig 拒）。
+**派 31-r1**（reminder.*：internal/tools + internal/memory v5→v6 迁移 + internal/agent timer + notify 接缝；机主 A1445 已批 31）。
+**待机主**：51 块B＝**冻结 C24 `GojaHostAPI` 初始集**（＝改契约文字，AGENTS §2「未定义即停」项）——已把拟议初始集（http/fs/clipboard/notify/sysinfo/state）摆机主，等「行／增删」。
+**D 盘**：完整报告子代理仍在深挖 `D:\work`(231G 是大头)；阶段结论（项目仅 2.7G）已给机主。
