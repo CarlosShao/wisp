@@ -125,7 +125,7 @@ func (in Installer) Install(ctx context.Context, raw []byte, source string) (Ins
 	}
 
 	// C1 global uniqueness, checked before anything lands. The Registry itself
-	// skips names it already has when a provider registers (tools/registry.go),
+	// skips names it already has when a provider registers (internal/tools/registry.go),
 	// so a plugin shadowing a builtin or another plugin's tool would half-
 	// install silently — the install leg refuses the whole manifest instead.
 	// This runs after the already-installed check so a reinstall of the same

@@ -25,7 +25,7 @@ import (
 // (internal/tools + internal/agent), so a system-clock adjustment never moves
 // a scheduled fire.
 //
-// ⛔ 这张表刻意表达不了的（票 31 拒绝清单；同样写进工具注册的 note）：
+// 禁止 这张表刻意表达不了的（票 31 拒绝清单；同样写进工具注册的 note）：
 //   - 无 recurrence/cron 列：不做循环提醒；
 //   - 无 action/payload 列：fire 只把 note 推给 Notifier 端口，绝不触发任何
 //     工具执行；
@@ -43,8 +43,8 @@ func buildDDLV6() string {
 		quoted[i] = "'" + st + "'"
 	}
 	return `-- 一次性进程内提醒（schema v6：票 31 / 31-r2；SPEC-02 §3 roster 的第四枚扩展，spec-note 债摆机主批）
--- ⛔ 无 recurrence/cron 列 · ⛔ 无 action/payload 列（fire 只推通知，绝不触发工具）
--- ⛔ 不是 OS 计划任务：进程退出即失效，重启只计数不补发
+-- 禁止 无 recurrence/cron 列 · 禁止 无 action/payload 列（fire 只推通知，绝不触发工具）
+-- 禁止 不是 OS 计划任务：进程退出即失效，重启只计数不补发
 CREATE TABLE IF NOT EXISTS reminders (
   id                    TEXT PRIMARY KEY,            -- 'rem_' + crypto/rand hex（C31 同形铸造）
   fire_at_wallclock_utc INTEGER NOT NULL,            -- unix 秒（墙钟目标时刻）

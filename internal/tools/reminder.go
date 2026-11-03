@@ -39,7 +39,7 @@ import (
 //     uninstall residue (PLAN.md:2611).
 //  4. ⛔ missed-reminder replay across restarts — boot reports a COUNT only
 //     ("你错过了 N 条提醒") and never re-delivers per item (PLAN.md:2610).
-//     ⚠ 这四条是 REJECTED，不是 DEFERRED：AGENTS.md §1.1 requires any
+//     注意 这四条是 REJECTED，不是 DEFERRED：AGENTS.md §1.1 requires any
 //     DEFERRED(D-xx) marker to match SPEC-12 §5 1:1, and none of them is registered there.
 //
 // What the timer layer (internal/agent) owes and this file does NOT do:
@@ -131,7 +131,7 @@ const reminderExclusions = "只做一次性提醒：不做周期/cron、不做�
 // its own constant because ticket 31's AC#5 asserts THIS string in the set
 // confirmation and nothing else: PLAN.md:2612-2613 is verbatim
 // 「**进程没在跑就不会触发**……必须在设置提醒时告知用户，不得静默失败」.
-// ⚠ 措辞以 PLAN.md 权威行为准：票 31 票面第 21 行是转述（「进程未运行则不会触发」），
+// 注意 措辞以 PLAN.md 权威行为准：票 31 票面第 21 行是转述（「进程未运行则不会触发」），
 // 台账 A1420 已就地订正为「按 PLAN 权威」，本腿不拿转述串当判据。
 const reminderCaveat = "进程没在跑就不会触发"
 
@@ -303,7 +303,7 @@ func (t reminderSet) Execute(ctx context.Context, params json.RawMessage, onUpda
 	text := fmt.Sprintf("已设一次性提醒 %s：到点只发一条通知，正文是「%s」。", id, note)
 	if !waited {
 		// The timer seam was never wired: say it, do not imply a fire.
-		text += "⚠ 计时器未接线，这条提醒只是写进了表，本进程内不会触发。"
+		text += "注意 计时器未接线，这条提醒只是写进了表，本进程内不会触发。"
 	}
 	// 16.5.4's honesty rule: the limit is spoken at set-time, every time, and
 	// AC#5 asserts this exact string is present in this output.
