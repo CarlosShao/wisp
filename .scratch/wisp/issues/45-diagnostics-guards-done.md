@@ -1,6 +1,6 @@
 # 45 — Diagnostics bundle + disk-full/WAL guard + Focus-Assist degradation conclusion
 
-**Status:** ready-for-agent
+**Status:** **已结案 done**（2026-11-03 10:4x 编排者：45-v1 非实现者验收 5 格全 PASS〔observe 两跑 5.15s/4.32s FAIL=0，commit 579b8ba26〕，45-r1 实现 guards_45.go 614 行〔39cf67751〕）
 **Claimed by:** —
 **Last update:** 2026-09-19
 **Blocked by:** 42-watchdog
@@ -32,12 +32,14 @@ conclusion.
 - Panel pages rendering these (40); watchdog unload actions (42).
 
 ## Acceptance criteria
-- [ ] Bundle contents exactly as previewed; seeded secrets/transcripts/audio absent by default;
+- [x] Bundle contents exactly as previewed; seeded secrets/transcripts/audio absent by default;
       opt-in transcript inclusion works with per-item preview.
-- [ ] Disk-full fixture (small virtual disk / quota): guard trips at threshold, L3+logs stop,
+- [x] Disk-full fixture (small virtual disk / quota): guard trips at threshold, L3+logs stop,
       live task completes normally; recovery when space freed.
-- [ ] WAL bounded under sustained write fixture (size cap observed); checkpoint on demand.
-- [ ] Focus-Assist: with toast suppression simulated, badge+task-list still updated (trace).
-- [ ] Artifacts LRU eviction under quota pressure; evicted files logged.
+- [x] WAL bounded under sustained write fixture (size cap observed); checkpoint on demand.
+- [x] Focus-Assist: with toast suppression simulated, badge+task-list still updated (trace).
+- [x] Artifacts LRU eviction under quota pressure; evicted files logged.
 
 ## Progress log (append-only, newest last)
+
+- [2026-11-03 10:4x +08] agent=编排者（结案）did=45-v1 5格全PASS(579b8ba26);45-r1 guards_45.go 614行(39cf67751).
