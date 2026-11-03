@@ -30632,3 +30632,19 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **待机主（已一次摆，编号）**：301（AC#4 裁语"历史违规可追加闭抵消"）／256（Q-77：C18 写死300s vs [risk].confirm_timeout_sec 可配，谁优先）／273（选形，我推荐甲）／185（是否推翻 09-27 按域路径名册旧裁定）。这 4 张是当前 CODE 队列仅剩的 +GOV 卡点。
 
 **dud 实况**：今晚 flash 腿撞上游 300s idle+限流，返空率高（但"返空常有真产出"，本轮 370 即从空返回腿抢救出完整实现）；关键分析我不靠腿、自己读自己写兜底。
+
+## A1462（2026-11-03 23:3x +08，编排者）第76轮续：4 票落地；273 判为多波集成；收票门禁电池待跑
+
+**本轮已落地并推（以现跑为准，HEAD 见 git log）**：
+- **370〔甲′〕**（`74f430d86`）：chat RoleSettings 逐任务重解析→agent.Config.MaxOutputTokens→Assembler→请求 max_tokens；3 测试（wire JSON body+反向+per-loop）全绿。
+- **371 改写**（`c5c980220`）：前提被 372 撤销、加注留痕原句不删、剩余价值 AC R1–R9 保留。
+- **378〔乙〕**（`e76712fb8`+`843a6d172`）：子环路继承 taskLifecycleJournal（仅任务行、无工具调用行）；真 SQLite 定向测试 PASS（staged 复跑）；d22 修 emoji 转绿。
+- **309 仪器**（`f0a19ced6`）：assessorFor 三处置 EXPECTED-GAP 测试，变异验证过。
+
+**273 结论（★重要，别再单腿硬塞）**：`Effect` 只带 `{D43 int; Name string}`＝一个副作用名；产码 4 处 `statemachine.New`（`cmd/balldebug/main.go:188`／`cmd/wisp/models.go:358`／`resident_voice_windows.go:544`/`:1794`）全不带 Sink。〔甲〕"真收件人"实质＝把 **50 个副作用名映射到真实 ball/panel 动作**（AC 明令 ⛔ 偷换成"加条日志"）。⇒ **多波集成，非单 flash 腿可完成**。下一步：先做名映射设计（读/拆波），再逐波写。
+
+**收票待办（把已落地 4 票翻 -done）**：370/371/378 需跑整包门禁电池（`GOFLAGS= go build ./...`／`go vet` 触包／`go test -count=1` 四数分开／`d22scan`／`check-path-length-budget`）后由编排者翻 AC#0/AC#3/AC#4；309 六格近全勾、差收尾。⚠ 整包 `go test ./cmd/wisp` 有既有真窗族+进程截断陷阱，只按名作差、抬 `-timeout 30m`；sherpa DLL 需 staging（二进制+3 DLL 同目录）才起得来。
+
+**待机主（4 条）**：256（300s vs 可配谁优先）／301（"可抵消"裁语）／185（是否推翻 09-27 旧裁定）／347（解析器"一"落点追认，或说"347 回退"）。
+
+**dud 实况**：288/309b2/370/378 均"空返回但有真产出"被抢救落地；273design/qaudit 空跑无件。读腿 dud 亦高，关键分析编排者自读。
