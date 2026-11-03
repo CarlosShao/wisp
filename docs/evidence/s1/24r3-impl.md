@@ -9,7 +9,7 @@
 
 | 尺 | 读数 |
 |---|---|
-| HEAD 起点 | 起手 HEAD＝`a11e63bee` 之后的最新（44-v2 在飞，见 `A1439`「在飞」行）；收尾 HEAD＝本腿两枚提交（代码件 `e1ee3b357`＋本件），父提交见 §7 的 `HEAD~2` 读数 ⇒ 他腿并行、写面不重叠 |
+| HEAD 起点 | 起手 HEAD＝`46dec5c61`（现跑 `git rev-parse --short HEAD~2` 收尾复核）；收尾＝本腿两枚提交 `e1ee3b357`（代码四枚）＋`d59093153`（本件）；24-v1 记录的 `a11e63bee` 已在其之下（44 系他腿在飞），写面不重叠 |
 | 写面无他脏（第 19 处） | `git status --porcelain -- internal/tools` 起手＝**空**；收尾（提交后）＝**空** |
 | 票面在场（第 20 处） | `.scratch/wisp/issues/24-doc-search-tools.md` **无 `-done`**、Status: ready-for-agent、AC 复选框未勾；前置 `20-host-bridge-fs-tools-done.md` 已 done ⇒ C26 形状可复用 |
 | SPEC-07 §3 | `docs/specs/SPEC-07-tools-and-plugins.md:49`（`search.files` L0／`fs.read`／白名单内）＋`:51`（`search.apps` L0／`sysinfo`／只检索不启动）＋`:48`（`app.launch` L1／shell）逐字在场 |
