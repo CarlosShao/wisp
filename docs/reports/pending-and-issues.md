@@ -30699,3 +30699,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **AC#6 还原自证**：突变一律 copy+`-overlay`（放 `build/`，仓外语义），未原地改共享树。
 - **剩余收口动作**：AC#2 三形(甲乙丙)代价表并入票面（材料在 `273-waves.md`+`273-a2` verdict）＋ 编排者作非实现者判语翻 AC#2-6 ＋ rename `-done`（rename 提交双路径 literal）。**仍未 `-done`。**
 - 地面：HEAD `650ae2cdd`，未推=0。**待机主仍 4 条**：256/301/185/347。
+
+## A1467（2026-11-04 11:32 +08，编排者）第90-97轮：A 档批量收口 11 票＋全池三档分类＋flash 腿失效确认
+
+- **本会话累计收口 14 票，全部 `-done`＋推 origin/dev**：273／175／128（早轮）＋ A 档 11 枚 **324 327 309 310 304 296 165 109 303 352 351**。每枚 rename 均 `git ls-tree -r HEAD` 双名核=1。
+- **全池三档（pool-triage 只读腿现跑）**：`.scratch/wisp/issues` 开放 136 枚（总 388／done 252）；A＝已落盘待翻 18、B＝真可写 65、C＝不派 61。件＝`.scratch/wisp/probes/orch/20261103/txt/pool-triage.md`。
+- **A 档实收后核出 5 处 triage 误列**（逐格读 verdict 后推翻，已记 triage 尾部修正）：`220`（AC#5 待机主窗口＋票328未落）／`262`（AC#5 需真 self-hosted CI，本地结构不可能）／`329`（其 verdict 自判 AC#0 交件三把尺**不成立**＋AC#7 不可判）／`23`（ImagePart 刻意不覆盖＋input.type 真窗）／`370·378`（需裁形＋真落地）。另 `239`／`311` 虽 0 未勾但票尾明写〔不结案〕（0.25px 真码／等 Q##）。⇒ 盲翻＝误关，全防住。
+- **flash 子代理失效确认（关键运行事实）**：本会话写腿 `356`/`239` 与读普查腿 `361` 均 **dud（NULL_REPORT，零盘上产出）**；唯"摘要既有文档"型读腿（`351-verdict` 裁语／`pool-triage` 分类）成功。⇒ 后续写任务须**逐字码派单**或**编排者自办**，纯指令型派单高概率空转。
+- **门禁读数**：352 AC#2 五包成对色由量色腿 `gw-1`（commit `8f86e9364`，`.scratch/wisp/probes/gw/1/02-five-packages.md`）证"落地⇄基线 逐名新增红=0／symdiff=0"；351 判据锚 `cmd/wisp/config_reload_223_test.go:574/602/619`（G1/G2/G3）我现核真在。
+- **待机主仍 4 条**：256／301／185／347。
