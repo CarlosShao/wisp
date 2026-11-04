@@ -30731,3 +30731,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ⇒ 编队要真正"全票完成"，卡点在 owner 决策＋大特性放行，而非我可再自办的存量。待机主按 7 条 + 是否放行 35/224。
 
 - **A1470 更正（同轮）**：上条两处被吞的字应为 approval_test.go:105 与 Q-51；其余读数不变。
+
+## A1471（2026-11-04 12:04 +08，编排者）108轮：29 假绿陷阱避开＋179/72 复核 gated（未虚翻任何格）
+
+- **29 假绿陷阱（重要，防未来误翻）**：golden_extract.go/test 存在、TestTicket29_AC2 十例全绿、fixture 10 会话，由腿 29g-r1（4dcfecd5a，10-31）交。**但票面 29-v1 裁决明文 ⛔翻 两格**：AC#1 待装配（Host Hooks{} 未赋 WarmWindow，resident_voice_engines_windows.go:439）；AC#2 缺口＝C5 golden SSE 注入链（10 剧本×slot 对值），且明写「impl 谈 batch-commit＝答非所问」。⇒ 29g-r1 的 rule-based STUB 正是 29-v1 判为「答非所问」者，**⛔ 把十例绿读成 AC#2 已做、⛔ 翻**。29 仍 gated，等 C5 管道装配（WarmWindow＋LLM 抽取）。
+- **179**：两未勾 AC#1/AC#8 均需**真机 CLI 端到端**（probes/176/r1 台件）＝gated。
+- **72**：AC#4/AC#6 需 **CI runner 两侧**（同命令双 exit code）＝gated。
+- **145**（上轮判）：gated 于票 35 面板出向跳＋Q-51。
+- ⇒ **再次确认：开放池自办可收已尽**；余票 gated 于四类：owner 拍板／票 35 大特性／真机真 CI／大特性多格（224/176）。**107-108 轮为负判与阻断确认，未虚翻任何格**（宁不翻，不把 stub 绿当完成）。
