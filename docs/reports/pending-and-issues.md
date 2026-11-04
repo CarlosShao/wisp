@@ -30770,3 +30770,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 边界：本文仅评估交付；C33 落地＝改契约文字需 owner 单独批准；票 95 在 AC#0 触发门前保持 blocked。
 - 教训（本轮又踩）：A1473 heredoc 反引号被命令替换注入垃圾，已 c92305201 修正推上；本 A1474 正文零反引号。
 - 本会话累计收口 18 票（…224 91）。
+
+## A1475（2026-11-04 12:36 +08，编排者）116轮：225 收口（第 19 枚，非实现者裁决另一张假硬票）
+
+- **225 → -done**（ade49c8e8，双名核=1）：只读审计票（不产码），前置腿 agent-ticket225-a1 已把双向对账产物入库（docs/evidence/s1/225-deferred-registry-audit.md 369 行，dd7c447fd 落盘 + 3397dbd00 §7 更正），但 AC#1-4 一直未勾。
+- 我（编排者＝非实现者）核 3 把尺：commit 真在（dd7c447fd/3397dbd00）／件真在（tracked、369 行、工作树净）／自复读结构 1:1 映 AC（§1 表一 22 标记逐条 AC#1＋§2 反向 12 DEFERRED+7 RESERVED AC#2＋§3 两失配 config/doc.go:14 与 watchdog/doc.go:18 结论 AC#3＋§4 仪器形状零实现 AC#4＋§6 诚实未证＋§7 时刻账）⇒ 四格满足，翻勾转 -done。
+- 边界：只读审计不产码；补 §5 行属改 docs/specs 需 owner 批；两枚源码注释摘标记须与票 223／票 42 落点核销；未动 docs/specs 一字节。
+- 本会话累计收口 19 票（…224 91 225）。
