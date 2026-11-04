@@ -30685,3 +30685,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   5. **AC#5 门禁四数** + 非实现者验收（裁决者≠实现者）后由编排者翻框。
 - 地面：HEAD `f74826064`，未推=0，工作树 clean（build/mut_* 为临时件未跟踪）。
 - **待机主仍 4 条**：256/301/185/347。
+
+## A1466（2026-11-04 10:4x +08，编排者）第89轮：273 落地齐+AC#5 门禁电池现跑取数
+
+- **273 落地靶子 (a)+(b) 均已实质达成**：(a) #37→JSONL（Wave1 `21d3f8653`）；(b) 10 枚 only-dev 名**已被 2b-1 的 `:1794` Sink 顺带覆盖**（`273-b-scope` 现量证：需新接构造点 0 枚）。
+- **AC#5 门禁四数（本轮现跑）**：
+  1. `sh scripts/d22scan.sh` rc=0 且正控 `TestScanDetectsAllSeededViolations`/`TestScanCleanRepoIsGreen` PASS。
+  2. `gofmt -l` 与 `gofumpt v0.12.0 -l` 喂 273 全部改动 `.go` ⇒ **空**。
+  3. `go vet ./cmd/wisp ./internal/statemachine` rc=0。
+  4. `go test ./cmd/wisp` 定向（273|Effect273|Fanout|ResidentVoiceMachine）staged ⇒ **PASS**；`go test ./internal/...` 两红=`internal/panel` tokens（颜色表 GlassHiSoft 不在 LightPalette）＋`internal/speech` `0xc0000135`（sherpa DLL 未 staging 的已知现象）——**均非 273 引入**：本轮 273 只改 `cmd/wisp/**`，`git diff origin/dev..HEAD -- internal/` 为空（AC#3 证据），两红属基线与 DLL 陷阱，⛔ 记作 273 回归。
+- **AC#3 零新契约面**：`internal/statemachine/**` 零改动（证的）；D43 表/50 名/C17/thresholds 全未碰。
+- **AC#4 反向敏感性**：`TestResidentVoiceMachine273AuditIsWired`（EvSummon→row#4）+ overlay 摘 `:1794` Sink 必红（我自跑验证）；另 Wave1 空罐反向红。全 10 名矩阵证据腿 `273b-evi` **dud**，但 AC#4 已由上述定向突变满足（矩阵为加码非必需）。
+- **AC#6 还原自证**：突变一律 copy+`-overlay`（放 `build/`，仓外语义），未原地改共享树。
+- **剩余收口动作**：AC#2 三形(甲乙丙)代价表并入票面（材料在 `273-waves.md`+`273-a2` verdict）＋ 编排者作非实现者判语翻 AC#2-6 ＋ rename `-done`（rename 提交双路径 literal）。**仍未 `-done`。**
+- 地面：HEAD `650ae2cdd`，未推=0。**待机主仍 4 条**：256/301/185/347。
