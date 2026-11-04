@@ -21,10 +21,13 @@ package perm
 // non-nil, it returns nil, and it never raises a card at all.
 //
 // EXPECTATION FRESHNESS, stated the way store_367_test.go states it: the A and B
-// readings are stable (R20/M4). The D and F readings pin a LIVE HOLE, so the day
-// ticket 371's AC#2' lands - "a card that was never answered must not apply" -
-// the D/F assertions below flip to applied=0 with a refusal naming the unasked
-// card. Flipping that assertion is part of that fix, not a regression here.
+// readings are stable (R20/M4). The D and F readings pinned a LIVE HOLE, and the
+// note they carried said what would happen when ticket 371's AC#2' landed - "a
+// card that was never answered must not apply" - so the D/F assertions below were
+// FLIPPED by leg 371-r1p to applied=0 / refused with the unanswered-card reason.
+// That flip is the fix landing, not a regression here; the readings themselves
+// (invoked=1 / asked=0 for the fake limb) are unchanged, because the limb-side
+// facts are what any fix has to keep true.
 //
 // On the 372 blob (before the gate moved back to the target) A read
 // refused-confirm instead of applied; on the 367 blob B read confirm_calls=0
@@ -32,6 +35,8 @@ package perm
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"sync"
 	"testing"
 
@@ -44,25 +49,31 @@ type a1pLimb struct {
 	invoked int
 	asked   int
 	answer  error
+	corr    string
 }
 
-// real is a limb that actually asks: it raises the card (asked++) and returns
-// nil only when that card came back allow - the production limb's contract.
-func (l *a1pLimb) real(context.Context, Switch) error {
+// real is a limb that actually asks: it raises the card (asked++) and returns an
+// answered-allow credential only when that card came back allow - the production
+// limb's contract (ticket 371: the credential, not the nil error, is what says so).
+func (l *a1pLimb) real(context.Context, Switch) (Card, error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.invoked++
 	l.asked++
-	return l.answer
+	if l.answer != nil {
+		return Card{}, l.answer
+	}
+	return AnsweredCard(l.corr), nil
 }
 
-// fake is NON-NIL and NEVER ASKS: it is entered, records that it was entered,
-// and returns nil without a card ever existing. AC#0'②'s new shape.
-func (l *a1pLimb) fake(context.Context, Switch) error {
+// fake is NON-NIL and NEVER ASKS: it is entered, records that it was entered, and
+// returns the ZERO credential without a card ever existing. AC#0'②'s new shape -
+// the one ticket 371's gate has to refuse.
+func (l *a1pLimb) fake(context.Context, Switch) (Card, error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.invoked++
-	return nil
+	return Card{}, nil
 }
 
 func (l *a1pLimb) counts() (invoked, asked int) {
@@ -143,14 +154,18 @@ func Test371A1PAC0PositiveControlOneCardOnAutoApprove(t *testing.T) {
 	}
 }
 
-// Test371A1PAC0PrimeFakeLimbIsSilentlyApplied is AC#0'② and ④: the LIVE HOLE.
-// auto_approve, a non-nil limb that never asks, and the gate cannot tell it
-// apart from the answering limb above - the switch applies with asked=0.
+// Test371A1PAC0PrimeFakeLimbIsRefusedNotSilentlyApplied is AC#0'② and ④. It was
+// written as Test371A1PAC0PrimeFakeLimbIsSilentlyApplied on the 786a13b22 blob,
+// where this reading WAS the hole: auto_approve, a non-nil limb that never asks,
+// and the gate could not tell it apart from the answering limb above - the switch
+// applied with asked=0.
 //
-// This is not ticket 375's hole and not 372's: those are the "cannot ask" side
-// (they fire on nil). This limb CAN ask; it simply is not made to, and nothing
-// in Set asks whether it did.
-func Test371A1PAC0PrimeFakeLimbIsSilentlyApplied(t *testing.T) {
+// Leg 371-r1p flipped it, which is the fix landing: the same fake limb is now
+// entered once, never asks, and the switch is REFUSED with a reason that names the
+// unanswered card. This is not ticket 375's hole and not 372's: those are the
+// "cannot ask" side (they fire on nil). This limb CAN ask; it simply is not made
+// to, and the gate no longer takes that for an answer.
+func Test371A1PAC0PrimeFakeLimbIsRefusedNotSilentlyApplied(t *testing.T) {
 	ctx := context.Background()
 	limb := &a1pLimb{}
 	s, mc, _ := newTestStore(t, risk.ModeAskEveryStep.String(), limb.fake)
@@ -170,26 +185,43 @@ func Test371A1PAC0PrimeFakeLimbIsSilentlyApplied(t *testing.T) {
 	if asked != 0 {
 		t.Fatalf("the fake limb reported %d asks; by construction it never asks", asked)
 	}
-	// Gate-side reading TODAY: entered, never asked, applied anyway.
-	if setErr != nil {
-		t.Fatalf("the fake limb was not silently accepted (%v); the hole AC#0'② records is gone - "+
-			"flip this case and the evidence's D row instead of deleting it", setErr)
+	// Gate-side reading SINCE 371: entered, never asked, refused - and the reason
+	// is its own, not the nil-channel one.
+	if setErr == nil {
+		t.Fatalf("the fake limb was silently accepted; ticket 371's gate is gone - "+
+			"the never-answering limb must be refused (%v)", setErr)
 	}
-	if !ok || last.Result != ResultApplied {
-		t.Errorf("audit result = %q, want %q (this is the hole: applied without an ask)", last.Result, ResultApplied)
+	if !errors.Is(setErr, ErrCardNotAnswered) {
+		t.Errorf("refusal = %v, want it to wrap ErrCardNotAnswered (a card was never answered, "+
+			"which is not the nil-channel refusal)", setErr)
 	}
-	if persisted != risk.ModeAutoApprove.String() || saves != 1 {
-		t.Errorf("persisted = %q / saves=%d, want %q / 1 (the loosest tier landed on disk)", persisted, saves, risk.ModeAutoApprove)
+	if !strings.Contains(setErr.Error(), "card was not answered") {
+		t.Errorf("refusal %q does not name the unanswered card", setErr.Error())
+	}
+	if last.Result != ResultCardNotAnswered {
+		t.Errorf("audit result = %q, want %q (not %q, which is the nil-channel verdict)",
+			last.Result, ResultCardNotAnswered, ResultRefused)
+	}
+	if last.Asked || last.Card != "" {
+		t.Errorf("audit asked=%v card=%q, want false/\"\": nothing was answered", last.Asked, last.Card)
+	}
+	if persisted != risk.ModeAskEveryStep.String() || saves != 0 {
+		t.Errorf("persisted = %q / saves=%d, want %q / 0 (the loosest tier must not land)",
+			persisted, saves, risk.ModeAskEveryStep)
 	}
 }
 
-// Test371A1PAC0PrimeTheAutoApproveGateHasTheSameHole is AC#0'④: the judgement,
-// not a second measurement. It runs the answering limb and the never-asking
-// limb against the same target and asserts that the gate's DECISION - the pair
-// (error is nil, result, persisted) - is identical while the ask counts differ.
-// That equality IS the hole: the gate's verdict is a function of non-nil-ness,
-// which both limbs satisfy, so "was answered" contributes nothing to it.
-func Test371A1PAC0PrimeTheAutoApproveGateHasTheSameHole(t *testing.T) {
+// Test371A1PAC0PrimeTheAutoApproveGateSplitsTheTwoLimbs is AC#0'④. It was written
+// as ...TheAutoApproveGateHasTheSameHole: it asserted that the gate's DECISION was
+// identical for the answering and the never-asking limb, and that equality WAS the
+// hole. Leg 371-r1p flipped the judgement - the gate must now split them, and the
+// only reading that may stay equal is the limb-side one.
+//
+// It runs both limbs against the same target and asserts (a) the asks differ (1
+// vs 0, unchanged), (b) the answered limb applies, and (c) the never-asking limb
+// is refused with the unanswered-card result. If a later change lets the fake
+// through again, (c) reddens with both outcomes printed.
+func Test371A1PAC0PrimeTheAutoApproveGateSplitsTheTwoLimbs(t *testing.T) {
 	ctx := context.Background()
 
 	type outcome struct {
@@ -225,12 +257,19 @@ func Test371A1PAC0PrimeTheAutoApproveGateHasTheSameHole(t *testing.T) {
 		t.Fatalf("the two limbs did not differ where they must: answered=%d never-asking=%d asks",
 			realOut.asked, fakeOut.asked)
 	}
-	if realOut.refused != fakeOut.refused || realOut.result != fakeOut.result ||
-		realOut.persisted != fakeOut.persisted || realOut.saves != fakeOut.saves {
-		t.Errorf("the gate split the two limbs: answered=%+v never-asking=%+v. If that is ticket "+
-			"371's fix landing, make this the positive judgement instead of deleting it", realOut, fakeOut)
-	}
 	if realOut.refused {
-		t.Errorf("the answered limb was refused; AA with an answering card must apply")
+		t.Errorf("the answered limb was refused; AA with an answering card must apply (got %+v)", realOut)
+	}
+	if realOut.result != ResultApplied {
+		t.Errorf("the answered limb's result = %q, want %q", realOut.result, ResultApplied)
+	}
+	if !fakeOut.refused || fakeOut.result != ResultCardNotAnswered {
+		t.Errorf("the NEVER-ANSWERING limb was not refused as unanswered: got %+v, want refused with %q. "+
+			"If the two limbs read the same verdict again, ticket 371's gate is gone", fakeOut,
+			ResultCardNotAnswered)
+	}
+	if realOut.persisted == fakeOut.persisted && realOut.saves == fakeOut.saves {
+		t.Errorf("both limbs left the same persisted state (%q/%d): the gate did not split them",
+			realOut.persisted, realOut.saves)
 	}
 }

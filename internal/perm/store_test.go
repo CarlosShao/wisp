@@ -83,11 +83,18 @@ type confirmSpy struct {
 	answer error
 }
 
-func (c *confirmSpy) Confirm(_ context.Context, sw Switch) error {
+// Confirm is the answered limb the fixtures have always stood for: a nil answer
+// means "the operator clicked allow", so it reports the credential (ticket 371).
+// The error case reports a zero Card - the store must refuse on the error, not on
+// the missing credential, and the two are asserted separately.
+func (c *confirmSpy) Confirm(_ context.Context, sw Switch) (Card, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.calls = append(c.calls, sw)
-	return c.answer
+	if c.answer != nil {
+		return Card{}, c.answer
+	}
+	return AnsweredCard("spy"), nil
 }
 
 func (c *confirmSpy) n() int {
@@ -224,8 +231,8 @@ func TestTicket90ConfirmRefusalLeavesModeAlone(t *testing.T) {
 func TestTicket90PersistFailureKeepsMemory(t *testing.T) {
 	mc := &memConfig{mode: risk.ModeAskEveryStepName, fail: errors.New("disk gone")}
 	rec := &recorder{}
-	s, err := New(Options{Manager: mc, Logf: rec.logf, Confirm: func(context.Context, Switch) error {
-		return nil
+	s, err := New(Options{Manager: mc, Logf: rec.logf, Confirm: func(context.Context, Switch) (Card, error) {
+		return AnsweredCard("persist"), nil
 	}})
 	if err != nil {
 		t.Fatalf("New: %v", err)

@@ -107,8 +107,10 @@ var errResidentNoBall = errors.New("常驻进程没有悬浮球窗口，卡片�
 // (startResidentTaskSource's early return), which is the shape the user actually
 // launches. This gate exists from boot in every shape, so the leg does too. The
 // adapter is the same panelModeConfirm the run seam uses, so the sentences cannot
-// drift.
-func (ra *residentApproval) confirmModeSwitch(ctx context.Context, sw perm.Switch) error {
+// drift. Since ticket 371 the credential that says "allow came back" is minted by
+// the same shared body, so the orb's card and the console card are judged by one
+// rule too.
+func (ra *residentApproval) confirmModeSwitch(ctx context.Context, sw perm.Switch) (perm.Card, error) {
 	return confirmModeSwitchVia(ra.gate, ctx, sw)
 }
 

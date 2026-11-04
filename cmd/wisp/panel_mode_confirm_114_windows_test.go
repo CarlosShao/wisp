@@ -65,11 +65,14 @@ type countingPermConfirm struct {
 }
 
 func (c *countingPermConfirm) fn() perm.ConfirmFunc {
-	return func(_ context.Context, sw perm.Switch) error {
+	return func(_ context.Context, sw perm.Switch) (perm.Card, error) {
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		c.to = append(c.to, sw.To)
-		return c.fail
+		if c.fail != nil {
+			return perm.Card{}, c.fail
+		}
+		return perm.AnsweredCard("t114r2"), nil
 	}
 }
 

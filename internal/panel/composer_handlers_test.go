@@ -53,13 +53,14 @@ func (f *fakeModeWriter) Set(_ context.Context, to risk.Mode, origin, actor stri
 }
 
 // countingConfirm is the attached leg. It counts, because the single-card rule
-// says the handler must never call it.
+// says the handler must never call it. Since ticket 371 it reports perm's answered
+// credential, i.e. the same answer type the store's own leg returns.
 type countingConfirm struct{ calls int }
 
 func (c *countingConfirm) fn() ModeConfirm {
-	return func(context.Context, risk.Mode, risk.Mode, string, string) error {
+	return func(context.Context, risk.Mode, risk.Mode, string, string) (perm.Card, error) {
 		c.calls++
-		return nil
+		return perm.AnsweredCard(""), nil
 	}
 }
 

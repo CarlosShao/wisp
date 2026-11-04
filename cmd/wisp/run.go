@@ -1095,8 +1095,28 @@ const modeSwitchToolName = "permission.mode"
 // gate refuses any request whose task was never admitted, so this registers its
 // own synthetic task id for the duration of the confirmation and revokes it on
 // the way out.
-func (rt *agentRuntime) confirmModeSwitch(ctx context.Context, sw perm.Switch) error {
+func (rt *agentRuntime) confirmModeSwitch(ctx context.Context, sw perm.Switch) (perm.Card, error) {
 	return confirmModeSwitchVia(rt.gate, ctx, sw)
+}
+
+// modeSwitchTaskID is the synthetic D47 task the host admits for the duration of
+// one mode-switch card, and the prefix of the card's correlation id.
+const modeSwitchTaskID = "host:mode-switch"
+
+// modeSwitchCardSeq numbers the L2 cards this process raises for mode switches.
+// Ticket 371-b needs the STORE's audit row to name the card that was answered, so
+// the id has to be chosen before the gate is called - PendingApproval does not
+// return it - and it has to be unique per card, or the queue's own clash branch
+// would append a suffix the credential could not know (approval/queue.go's push
+// keeps a non-empty Decision.CorrelationID while nothing else holds it). A
+// counter is the smallest thing unique for the life of the process; it also makes
+// the D31 bookkeeping key per-card instead of per-task, which the old constant
+// "host:mode-switch" was not.
+var modeSwitchCardSeq atomic.Uint64
+
+// modeSwitchCardCorr mints the correlation id of the next mode-switch card.
+func modeSwitchCardCorr() string {
+	return fmt.Sprintf("%s#%d", modeSwitchTaskID, modeSwitchCardSeq.Add(1))
 }
 
 // confirmModeSwitchVia is that body, with the gate as a parameter. It is factored
@@ -1107,17 +1127,29 @@ func (rt *agentRuntime) confirmModeSwitch(ctx context.Context, sw perm.Switch) e
 // reason panel_inbound.go shares one audit sink across both halves of its hop).
 // The argument is a value and may be nil; a nil gate keeps the refusal below
 // instead of panicking on it.
-func confirmModeSwitchVia(gate *approval.Gate, ctx context.Context, sw perm.Switch) error {
+//
+// TICKET 371: THE CREDENTIAL IS MINTED HERE, AND NOWHERE ELSE. This is the one
+// production function that sees approval.Gate's answer, so it is the one place
+// that may say "a card was shown and allow came back" (perm.AnsweredCard). A limb
+// that returned a nil error without ever reaching this line used to satisfy the
+// gate; since 371 it hands back a zero perm.Card and Set refuses it, naming the
+// card that was never answered.
+func confirmModeSwitchVia(gate *approval.Gate, ctx context.Context, sw perm.Switch) (perm.Card, error) {
 	if gate == nil {
-		return fmt.Errorf("审批 gate 未装配，无法为切到 %s 签发 L2 卡片", sw.To)
+		return perm.Card{}, fmt.Errorf("审批 gate 未装配，无法为切到 %s 签发 L2 卡片", sw.To)
 	}
-	const taskID = "host:mode-switch"
-	revoke := gate.AdmitTextTask(taskID)
+	revoke := gate.AdmitTextTask(modeSwitchTaskID)
 	defer revoke()
+	// The id the card is addressed by, chosen here so the credential can carry it.
+	// The queue prints its own ANSWER-ALLOW line with this same value, which is the
+	// join ticket 371-b asks for (MODE-SWITCH ... card=<id> <-> ANSWER-ALLOW
+	// corr=<id>).
+	corr := modeSwitchCardCorr()
 	ans, why := gate.PendingApproval(ctx, tools.Decision{
-		TaskID: taskID,
-		Tool:   modeSwitchToolName,
-		Level:  risk.L2,
+		TaskID:        modeSwitchTaskID,
+		CorrelationID: corr,
+		Tool:          modeSwitchToolName,
+		Level:         risk.L2,
 		Reason: fmt.Sprintf("切换到 %s 会移除本应询问的确认，需要一次 L2 强确认（R20/M4，当前档 %s）",
 			sw.To, sw.From),
 		Mode: sw.From,
@@ -1126,9 +1158,9 @@ func confirmModeSwitchVia(gate *approval.Gate, ctx context.Context, sw perm.Swit
 		if why == "" {
 			why = string(ans)
 		}
-		return fmt.Errorf("L2 强确认未通过（%s）：%s", ans, why)
+		return perm.Card{}, fmt.Errorf("L2 强确认未通过（%s）：%s", ans, why)
 	}
-	return nil
+	return perm.AnsweredCard(corr), nil
 }
 
 // panelModeConfirm is the ONE adapter from perm's ConfirmFunc to the panel
@@ -1136,15 +1168,20 @@ func confirmModeSwitchVia(gate *approval.Gate, ctx context.Context, sw perm.Swit
 // (rt.modeWrites) and the resident panel's chain build their leg through it, so
 // "the leg a panel request is judged by" has one translation, not two.
 //
-// nil in, nil out, on purpose: ModeWriteHandler reads only nil-ness, and perm's
-// Store reads its own nil-ness to refuse every widening, so an adapter that turned
-// nil into a always-refusing closure would silently open both gates (see
+// nil in, nil out, on purpose: ModeWriteHandler reads the presence of the leg and
+// perm's Store reads its own, so an adapter that turned nil into an
+// always-refusing closure would silently open both gates (see
 // storeConfirmFromPanel's note for the gate itself).
+//
+// From ticket 371 it also carries the ANSWER through: the credential perm's
+// ConfirmFunc returns is handed back unchanged, in the same type. An adapter that
+// flattened it to an error here would put the panel seam back on "no error means
+// allowed" while the run seam judged the credential - two gates, two rules.
 func panelModeConfirm(confirm perm.ConfirmFunc) panel.ModeConfirm {
 	if confirm == nil {
 		return nil
 	}
-	return func(ctx context.Context, from, to risk.Mode, origin, actor string) error {
+	return func(ctx context.Context, from, to risk.Mode, origin, actor string) (perm.Card, error) {
 		return confirm(ctx, perm.Switch{From: from, To: to, Origin: origin, Actor: actor})
 	}
 }

@@ -22,6 +22,48 @@ import "github.com/CarlosShao/wisp/internal/risk"
 // harmless (PermissionMode collapses to ask_every_step).
 func RequiresCard(to risk.Mode) bool { return to == risk.ModeAutoApprove }
 
+// CardGate is what one switch costs the layer judging it. It is the ONE gate
+// judgement both transition points apply, and it is a value rather than a pair of
+// booleans so "which of the three cases is this" is asked once (ticket 371).
+type CardGate uint8
+
+// The three cases JudgeCard can report.
+const (
+	// GateNoCard: the target is not the one档 R20/M4 cards. Proceed.
+	GateNoCard CardGate = iota
+	// GateNoChannel: the target costs a card and this layer holds no confirmation
+	// channel. Refuse HERE, before a write leg is reached - the refusal belongs to
+	// the layer that could not even try to ask.
+	GateNoChannel
+	// GateAsk: the target costs a card and a channel is attached. The asking layer
+	// (perm.Store.Set, the only one that raises the card) must obtain an ANSWERED
+	// allow before the switch proceeds; this layer itself may proceed to that
+	// layer.
+	GateAsk
+)
+
+// JudgeCard is the ONE predicate both transition points call:
+// perm.Store.Set (store.go) and panel.ModeWriteHandler (composer_handlers.go)
+// judge the same target with the same channel term by calling this function
+// instead of each spelling `RequiresCard(to) && confirm == nil`. Ticket 367
+// established that single-definition discipline for the direction rule; ticket
+// 372 kept it for the target rule; ticket 371 extends it to the pair
+// (target, channel) so a change to the RULE cannot land in one gate only.
+//
+// It does not judge the ANSWER. Whether an allow actually came back is a fact only
+// the layer that raises the card can observe - the panel deliberately raises no
+// second card (composer_handlers.go's header) - and it is judged there, against
+// the Card credential ConfirmFunc hands back (store.go's Set).
+func JudgeCard(to risk.Mode, channel bool) CardGate {
+	if !RequiresCard(to) {
+		return GateNoCard
+	}
+	if !channel {
+		return GateNoChannel
+	}
+	return GateAsk
+}
+
 // IsWidening reports whether the switch from -> to removes questions instead of
 // adding them: a raw `to > from` over risk.Mode's constants, which is only sound
 // because internal/risk/mode.go orders them strict -> loose and says "Do not

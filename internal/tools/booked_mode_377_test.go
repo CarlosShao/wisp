@@ -258,7 +258,12 @@ func Test377PanelInboundBookingNamesTheEffectiveMode(t *testing.T) {
 // `wisp run` seam the configured and effective faces are equal by construction
 // (confirm is never nil there), and the line must keep saying auto_approve.
 func Test377ConfiguredVersusEffectiveTwoShots(t *testing.T) {
-	leg := func(context.Context, perm.Switch) error { return nil }
+	// Ticket 371: a limb reports the answered allow as a perm.Card; this rig only
+	// needs the reporting to be possible, because no case here switches the档
+	// through the card (the store is only read).
+	leg := func(context.Context, perm.Switch) (perm.Card, error) {
+		return perm.AnsweredCard("t377"), nil
+	}
 	legs := []struct {
 		name        string
 		confirm     perm.ConfirmFunc

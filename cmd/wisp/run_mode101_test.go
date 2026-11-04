@@ -221,13 +221,15 @@ func TestTicket101ManualSwitchSurvivesRestart(t *testing.T) {
 	)
 	// The stub stands for "the native side clicked allow once" - a console run
 	// has no native channel, so the production adapter always refuses (pinned by
-	// TestTicket101ModeSwitchUsesTheRealL2Gate, not faked away here).
-	confirm := func(_ context.Context, sw perm.Switch) error {
+	// TestTicket101ModeSwitchUsesTheRealL2Gate, not faked away here). Ticket 371:
+	// clicking allow is reported as the credential, because a nil error alone no
+	// longer settles the card.
+	confirm := func(_ context.Context, sw perm.Switch) (perm.Card, error) {
 		mu.Lock()
 		defer mu.Unlock()
 		asked = append(asked, sw.To)
 		lastSwch = sw
-		return nil
+		return perm.AnsweredCard("t101"), nil
 	}
 	hook1 := func(rt *agentRuntime) {
 		if got := rt.modes.PermissionMode(); got != risk.ModeAskEveryStep {

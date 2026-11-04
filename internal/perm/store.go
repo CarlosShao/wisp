@@ -15,11 +15,15 @@
 //     auto_approve is refused outright when no confirmation channel was wired
 //     (fail-closed), and every other target - wider or narrower - passes
 //     (R20/M4, owner 2026-09-21: only the switch into全自动 costs a card).
-//     On top of that gate the auto_approve switch still costs one answered L2
-//     strong confirmation. Ticket 367 judged the DIRECTION instead; the survey
-//     at docs/evidence/s1/m4-survey.md:96 found no mainstream harness gating on
+//     On top of that gate the auto_approve switch still costs one ANSWERED L2
+//     strong confirmation: a channel that is merely attached is not enough, the
+//     limb has to come back with a Card (ticket 371 - "non-nil" was what let a
+//     never-asking leg through silently, docs/evidence/s1/371-a1p-impl.md §5).
+//     Ticket 367 judged the DIRECTION instead; the survey at
+//     docs/evidence/s1/m4-survey.md:96 found no mainstream harness gating on
 //     "wider", so ticket 372 reverted the judgement while keeping 367's
-//     single-definition discipline (RequiresCard, one definition and two calls).
+//     single-definition discipline (JudgeCard/RequiresCard: one definition, both
+//     transition points).
 //   - RECORD: every switch writes one audit line through the sink the project
 //     already uses for security decisions (the Logf family that cmd/wisp renders
 //     as "[audit] ..."), carrying from/to, time, origin and actor. No second
@@ -40,6 +44,7 @@ package perm
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -72,6 +77,14 @@ const (
 	ResultPersistError Result = "persist-failed"
 	ResultNoChange     Result = "no-change"
 	ResultBadMode      Result = "invalid-mode"
+	// ResultCardNotAnswered is ticket 371's own refusal (AC#2'): the switch
+	// needed an answered L2 card, a channel was attached, and the limb came back
+	// WITHOUT one - no card was shown, or the one that was shown never came back
+	// allow. It is its own value because "refused" alone cannot be told apart from
+	// ResultRefused's "this machine has no channel at all", and those are two
+	// different operator stories: one is a hole in the assembly, the other is a
+	// card nobody answered.
+	ResultCardNotAnswered Result = "card-not-answered"
 	// ResultDowngraded is the READ side of ticket 372-r2: the configured档 is
 	// looser than ask_every_step and this store has no confirmation channel, so
 	// PermissionMode answers ask_every_step while config.toml keeps what the
@@ -79,6 +92,13 @@ const (
 	// auto_approve but this process runs strict" must be greppable, not prose.
 	ResultDowngraded Result = "downgraded-no-channel"
 )
+
+// ErrCardNotAnswered is the error a carded switch earns when the confirmation
+// limb reported no answered allow. The wording is load-bearing: AC#2' requires
+// the refusal to NAME this, because "refused" is indistinguishable from the
+// no-channel branch and would hide the hole ticket 371 exists to close.
+var ErrCardNotAnswered = errors.New(
+	"perm: card was not answered (no L2 card was shown and answered allow)")
 
 // Switch is the audit record of one mode switch attempt.
 type Switch struct {
@@ -90,18 +110,69 @@ type Switch struct {
 	Result Result    // see Result
 	Detail string    // the human-readable why, verbatim in the audit line
 	Secs   int64     // seconds the confirmation took (0 when none was asked)
+	// Asked reports whether this switch's card was actually SHOWN and answered
+	// allow (ticket 371-b, the 〔丙-b〕 half of the ruling). Before it, the audit
+	// row could not answer "did this switch really put a card in front of
+	// somebody?" - the hole docs/evidence/s1/371-a1p-impl.md §5 measured was
+	// silent in the log as well as in the gate.
+	Asked bool
+	// Card is the correlation id of the card that was answered, empty when none
+	// was (or when the surface that answered had no id). The approval layer's own
+	// `ANSWER-ALLOW corr=<id>` line carries the same value, so the two records can
+	// be joined by it; that is what makes "asked, but which card?" answerable.
+	Card string
 }
 
-// ConfirmFunc asks the operator for one L2 strong confirmation and reports
-// whether it was granted. A nil return means "allowed"; any error means the
-// switch did not happen, including "could not ask" - which is a refusal, never
-// an assumed yes.
+// Card is the evidence that one L2 card was actually put in front of an operator
+// AND that operator answered ALLOW (ticket 371, AC#1'〔丙-a〕). It is what a
+// confirmation limb hands back to the layer that asked, and the only thing that
+// settles the one target R20/M4 cards.
+//
+// THE ZERO VALUE MEANS "NOT ANSWERED". That is the whole point of a return value
+// separate from the error: before this ticket the limb reported `err == nil`, and
+// that is also exactly what a limb that never raised a card reported, so the gate
+// could not tell "the operator answered allow" from "nothing happened" and a
+// non-nil but never-asking leg was applied silently (the D/F readings in
+// docs/evidence/s1/371-a1p-impl.md).
+//
+// THE LIMIT, stated where a reader can see it: a credential is minted inside this
+// process, so it defeats ACCIDENTAL fake limbs - the shape 371-a1p measured - and
+// not a caller that deliberately calls AnsweredCard without asking. That is the
+// same trust boundary Options.Confirm already had: perm cannot manufacture an
+// ask, it can only be handed one, and the production mint site is the one place
+// that has seen approval.Gate answer AnswerAllow (cmd/wisp/run.go's
+// confirmModeSwitchVia).
+type Card struct {
+	answered bool
+	corr     string
+}
+
+// AnsweredCard mints the credential for the card whose correlation id is corr -
+// the id the approval queue issued, i.e. the value its own ANSWER-ALLOW line
+// carries. The empty string is allowed for a surface that has no correlation id
+// (the audit row then prints card=""), and it still proves the answered allow.
+func AnsweredCard(corr string) Card { return Card{answered: true, corr: corr} }
+
+// Answered reports whether this credential proves an answered allow. Only this
+// bit settles a carded switch.
+func (c Card) Answered() bool { return c.answered }
+
+// Corr is the correlation id of the card that was answered ("" when none).
+func (c Card) Corr() string { return c.corr }
+
+// ConfirmFunc asks the operator for one L2 strong confirmation and reports the
+// credential: a non-zero Card means "one card was shown and this operator
+// answered ALLOW". A ZERO Card with a nil error means "the limb ran and no
+// answered allow came back" - Set refuses that with ResultCardNotAnswered
+// (ticket 371), because a nil error on its own must never buy the档 that removes
+// questions. Any error means the switch did not happen, including "could not
+// ask" - a refusal, never an assumed yes.
 //
 // The only production implementation allowed is the C18 approval route
 // (internal/agent/approval's L2 queue, native-click-only, 300s deadline that
 // resolves to reject). This package takes it as a function so the boundary is
 // visible: perm cannot manufacture a confirmation, it can only be handed one.
-type ConfirmFunc func(ctx context.Context, req Switch) error
+type ConfirmFunc func(ctx context.Context, req Switch) (Card, error)
 
 // Options configures a Store. Every zero value is safe: no confirmation source
 // means auto_approve can never be reached, no log sink means the record is
@@ -111,9 +182,11 @@ type Options struct {
 	// Manager is required; without a config to read there is no mode.
 	Manager ConfigManager
 	// Confirm is the L2 strong confirmation the store asks for the one target
-	// that costs it (RequiresCard). nil = auto_approve is unreachable (fail
-	// closed) AND the read side collapses to ask_every_step: a composition with
-	// no way to ask must not run a档 that removes questions (ticket 372-r2).
+	// that costs it (RequiresCard/JudgeCard). nil = auto_approve is unreachable
+	// (fail closed) AND the read side collapses to ask_every_step: a composition
+	// with no way to ask must not run a档 that removes questions (ticket 372-r2).
+	// A non-nil Confirm is not by itself permission either: Set applies the switch
+	// only when the limb hands back an answered-allow Card (ticket 371).
 	Confirm ConfirmFunc
 	// Logf is the audit sink (the project's existing "[audit]" family).
 	Logf func(format string, args ...any)
@@ -241,8 +314,14 @@ func (s *Store) configuredMode() risk.Mode {
 // (docs/evidence/s1/m4-survey.md:96). The missing-channel case is instead made
 // safe on the READ side: PermissionMode answers ask_every_step for the two looser
 // 档, so a host assembled without a leg asks about everything whatever config.toml
-// says. RequiresCard remains the ONE definition of the target rule, called by both
-// transition points (this function and panel.ModeWriteHandler).
+// says. JudgeCard remains the ONE definition of the (target, channel) rule, called
+// by both transition points (this function and panel.ModeWriteHandler).
+//
+// AND THE CARD MUST BE ANSWERED (ticket 371). A channel that is attached is only
+// the capability to ask; the switch is applied only when the limb hands back a
+// Card that says an allow came back. A limb that returns a nil error without ever
+// showing a card is refused with ResultCardNotAnswered, which is a different
+// story from ResultRefused and names itself in the audit row.
 func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) error {
 	if !to.Valid() {
 		s.audit(Switch{
@@ -265,28 +344,42 @@ func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) err
 	// / minimax / openchamber do (m4-survey.md:104-106); judging the direction
 	// (ticket 367) also refused ask_every_step -> ask_high_risk, which M4 says
 	// costs no card and which the read-side downgrade already makes harmless.
-	if RequiresCard(to) && s.confirm == nil {
+	// JudgeCard is the same function panel.ModeWriteHandler calls (ticket 371-b).
+	switch JudgeCard(to, s.confirm != nil) {
+	case GateNoChannel:
 		sw.Result = ResultRefused
 		sw.Detail = fmt.Sprintf(
 			"从 %s 切到 %s 需要一次 L2 强确认，但本机没有接入确认通道（fail-closed 未切）", from, to)
 		s.audit(sw)
 		return fmt.Errorf("perm: %s", sw.Detail)
-	}
-	// R20/M4's asymmetry stands on top of that gate: the auto_approve target
-	// costs one answered L2 card. There is no nil test here on purpose - the gate
-	// above refused every auto_approve switch whose s.confirm was nil, so this
-	// call cannot dereference a nil channel. That invariant is what the panic shot
-	// pins: change the gate to anything that lets auto_approve past a nil channel
-	// and this line panics instead of refusing.
-	if RequiresCard(to) {
+	case GateAsk:
+		// R20/M4's asymmetry stands on top of that gate: the auto_approve target
+		// costs one ANSWERED L2 card. There is no separate nil test here on
+		// purpose - JudgeCard refused every auto_approve switch whose channel was
+		// nil, so this call cannot dereference a nil channel. That invariant is
+		// what the panic shot pins: change the gate to anything that lets
+		// auto_approve past a nil channel and this line panics instead of
+		// refusing.
 		started := s.now()
-		if err := s.confirm(ctx, sw); err != nil {
-			sw.Result, sw.Detail = classifyConfirmFailure(err), "L2 强确认未通过："+err.Error()
-			sw.Secs = int64(s.now().Sub(started).Seconds())
+		card, err := s.confirm(ctx, sw)
+		sw.Secs = int64(s.now().Sub(started).Seconds())
+		if err != nil {
+			sw.Result, sw.Detail = RefusalResult(err), "L2 强确认未通过："+err.Error()
 			s.audit(sw)
 			return fmt.Errorf("perm: 切到 auto_approve 被拒绝: %w", err)
 		}
-		sw.Secs = int64(s.now().Sub(started).Seconds())
+		if !card.Answered() {
+			// Ticket 371's half of the gate: the channel was called and came back
+			// without an answered allow. Nothing was shown, or what was shown was
+			// never answered, and a nil error used to be enough. The refusal names
+			// that, so it cannot be confused with GateNoChannel's.
+			sw.Result = ResultCardNotAnswered
+			sw.Detail = "切到 auto_approve 需要一张被回答过的 L2 强确认卡，" +
+				"但确认通道没有交回任何“有人答过允许”的凭据（card was not answered）：未切"
+			s.audit(sw)
+			return fmt.Errorf("perm: 切到 auto_approve 被拒绝: %w", ErrCardNotAnswered)
+		}
+		sw.Asked, sw.Card = true, card.Corr()
 	}
 
 	if err := s.mgr.SetPermissionMode(to); err != nil {
@@ -299,15 +392,23 @@ func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) err
 	return nil
 }
 
-// classifyConfirmFailure separates "the operator answered no" from "we could not
-// ask". Both refuse the switch; only the second one is a fault worth its own
-// audit value, because it is the one that says the confirmation path is broken.
-func classifyConfirmFailure(err error) Result {
-	if err == nil {
+// RefusalResult maps one refusal to the audit's Result vocabulary. It is the ONE
+// classification the two transition points share (ticket 371-b): Set uses it for
+// the error a limb returned, and panel.ModeWriteHandler uses it to name the
+// refusal the write leg made on its behalf - so the same refusal cannot be booked
+// as two different things at the two gates.
+//
+// It separates "the operator answered no" from "we could not ask", and both from
+// ticket 371's "a card was asked for and never answered": all refuse the switch,
+// but only the last one says the confirmation path produced nothing, and only
+// ResultConfirmError says the path itself is broken.
+func RefusalResult(err error) Result {
+	switch {
+	case err == nil:
 		return ResultApplied
-	}
-	switch err {
-	case context.Canceled, context.DeadlineExceeded:
+	case errors.Is(err, ErrCardNotAnswered):
+		return ResultCardNotAnswered
+	case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 		return ResultConfirmError
 	}
 	return ResultRefused
@@ -358,16 +459,27 @@ func (s *Store) record(sw Switch) {
 func (s *Store) audit(sw Switch) { s.auditAs("MODE-SWITCH", sw) }
 
 // auditAs is audit with the kind as a parameter, so the read-side downgrade can
-// carry the same eight fields without calling itself a switch: config.toml did
-// not move, the effective read did.
+// carry the same fields without calling itself a switch: config.toml did not
+// move, the effective read did.
+//
+// asked / card are ticket 371-b's 〔丙-b〕 reading: every row says whether a card
+// was really answered on this attempt, and which one. On a MODE-SWITCH into
+// auto_approve, card is the same correlation id the approval layer printed on its
+// `ANSWER-ALLOW corr=<id>` line, so "the switch said applied" and "somebody
+// clicked allow" can be joined instead of assumed. A downgrade, a no-change and a
+// refusal that never asked print asked=0 card="".
 func (s *Store) auditAs(kind string, sw Switch) {
 	s.record(sw)
 	if s.logf == nil {
 		return
 	}
-	s.logf("perm: %s from=%s to=%s at=%s origin=%q actor=%q result=%s detail=%q",
+	asked := 0
+	if sw.Asked {
+		asked = 1
+	}
+	s.logf("perm: %s from=%s to=%s at=%s origin=%q actor=%q asked=%d card=%q result=%s detail=%q",
 		kind, sw.From, sw.To, sw.At.UTC().Format(time.RFC3339Nano), sw.Origin, sw.Actor,
-		sw.Result, sw.Detail)
+		asked, sw.Card, sw.Result, sw.Detail)
 }
 
 func (s *Store) stamp() time.Time {

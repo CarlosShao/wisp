@@ -105,10 +105,11 @@ func askOnce(t *testing.T, path string) (int, int) {
 	// read-side downgrade), so a looser key could never reach the chain. This test
 	// is about "the key changes what the chain asks" in a process ALLOWED to run
 	// the looser档 - i.e. one that can ask for the card. The downgrade itself is
-	// pinned in store_372_test.go.
+	// pinned in store_372_test.go. Ticket 371 adds the answered allow to the same
+	// fixture: a nil error alone no longer settles the carded target.
 	st, err := New(Options{
 		Manager: mgr,
-		Confirm: func(context.Context, Switch) error { return nil },
+		Confirm: func(context.Context, Switch) (Card, error) { return AnsweredCard("t90"), nil },
 	})
 	if err != nil {
 		t.Fatalf("perm.New: %v", err)
@@ -151,7 +152,10 @@ func TestTicket90ManualSwitchSurvivesRestart(t *testing.T) {
 	var confirmCalls int
 	st, err := New(Options{
 		Manager: mgr,
-		Confirm: func(context.Context, Switch) error { confirmCalls++; return nil },
+		Confirm: func(context.Context, Switch) (Card, error) {
+			confirmCalls++
+			return AnsweredCard("t90"), nil
+		},
 	})
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -354,7 +358,7 @@ func TestTicket90HandEditLooseningGoesThroughD36(t *testing.T) {
 	}
 	st, err := New(Options{
 		Manager: mgr,
-		Confirm: func(context.Context, Switch) error { return nil },
+		Confirm: func(context.Context, Switch) (Card, error) { return AnsweredCard("t90"), nil },
 	})
 	if err != nil {
 		t.Fatalf("New: %v", err)

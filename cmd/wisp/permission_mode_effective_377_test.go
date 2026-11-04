@@ -79,7 +79,11 @@ func Test377BookedModeReadsTheEffectivePermissionMode(t *testing.T) {
 // value and the read must stay auto_approve. A fix that simply hard-coded the
 // strictest档 would pass the case above and fail this one.
 func Test377BookedModeKeepsTheConfiguredModeWhenAChannelExists(t *testing.T) {
-	leg := func(context.Context, perm.Switch) error { return nil }
+	// Ticket 371: the leg reports perm's answered credential, which is the shape
+	// every production limb has now; this fixture only needs it to be non-nil.
+	leg := func(context.Context, perm.Switch) (perm.Card, error) {
+		return perm.AnsweredCard("t377"), nil
+	}
 	rt := t377ModeRuntime(t, leg)
 	if got := rt.permissionMode(); got != risk.ModeAutoApprove {
 		t.Errorf("with a confirmation leg attached the effective档 is config.toml's "+

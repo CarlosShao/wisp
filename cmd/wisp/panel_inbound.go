@@ -272,8 +272,11 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	store, err := perm.New(perm.Options{
 		Manager: mgr,
 		// The SAME leg the handler below gets, in perm's shape. nil stays nil:
-		// perm.Store.Set reads it to refuse every widening, so a closure that
-		// only refused when called would turn that gate off (store.go:209).
+		// perm.Store.Set reads it to refuse every auto_approve switch, so a
+		// closure that only refused when called would turn that gate off. From
+		// ticket 371 the conversion below also carries the ANSWERED credential
+		// through unchanged, so this seam cannot quietly fall back to "no error
+		// means allowed" while the run seam judges the credential.
 		Confirm: storeConfirmFromPanel(confirm),
 		Logf:    auditf,
 	})
@@ -282,9 +285,11 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	}
 	modeWrites := &panel.ModeWriteHandler{
 		Modes: store,
-		// The handler reads only this field's nil-ness to refuse a widening
-		// request; it never calls it. R20/M4's one card is raised by Set, i.e.
-		// by the Store's copy of the same leg.
+		// The handler judges the target and this field's presence with the same
+		// predicate the store calls (perm.JudgeCard); it never calls the leg.
+		// R20/M4's one card - and the answered-allow credential that now has to
+		// come back with it - is raised by Set, i.e. by the Store's copy of the
+		// same leg.
 		Confirm: confirm,
 		Audit:   auditf,
 		Actor:   actor,
@@ -338,16 +343,22 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 // perm.Switch record and is the only one that calls it.
 //
 // A nil panel leg stays a nil perm leg. That is not a convenience: perm.Store.Set's
-// gate is `RequiresCard(to) && s.confirm == nil` (store.go:268) and the read side
-// keys the same nil-ness (PermissionMode collapses to ask_every_step), so returning
-// a closure that merely refused when called would hand the Store a non-nil leg and
-// silently restore the looser档's silencing - the hole ticket 114 AC#2 keeps closed
-// on the handler side and ticket 372 closes on the read side.
+// gate is perm.JudgeCard(to, s.confirm != nil) and the read side keys the same
+// channel term (PermissionMode collapses to ask_every_step), so returning a
+// closure that merely refused when called would hand the Store a non-nil leg and
+// silently restore the looser档's silencing - the hole ticket 114 AC#2 keeps
+// closed on the handler side and ticket 372 closes on the read side.
+//
+// Ticket 371 makes it lossless in the other direction too: the credential the
+// panel leg reports (an ANSWERED allow, perm.Card) is returned unchanged, so a
+// limb that comes back without one is refused by the store at this seam exactly as
+// it is at the run seam. Flattening it to an error here would have restored the
+// old "nil error means allowed" rule on this one assembly.
 func storeConfirmFromPanel(confirm panel.ModeConfirm) perm.ConfirmFunc {
 	if confirm == nil {
 		return nil
 	}
-	return func(ctx context.Context, sw perm.Switch) error {
+	return func(ctx context.Context, sw perm.Switch) (perm.Card, error) {
 		return confirm(ctx, sw.From, sw.To, sw.Origin, sw.Actor)
 	}
 }

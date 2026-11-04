@@ -32,17 +32,31 @@ package panel
 // THE HANDLER NEVER CALLS Confirm. Asking belongs to the write leg: perm.Store.Set
 // raises the single C18 card for auto_approve (R20/M4), and an ask here on top
 // of it would be two cards for one click - two 300s windows, two timeouts, two
-// rejects. What Confirm's nil-ness buys is exactly that property, and nothing
+// rejects. What Confirm's PRESENCE buys is exactly that property, and nothing
 // else: an assembly that hands this handler no leg cannot reach auto_approve.
 // TestOnlyTheAutoApproveTargetIsRefusedWhenNoL2ConfirmLegIsAttached pins that Set
 // is not reached for that target; TestTheModeHandlerRaisesNoSecondCard pins that
 // Confirm is not called either.
 //
+// TICKET 371: THE SAME RULE, AND WHY THE ANSWER IS NOT JUDGED HERE. Since 371 the
+// card must come back with an ANSWERED allow (perm.Card), not merely a nil error.
+// This layer judges the half it can observe - the target and whether a channel is
+// attached - by calling the SAME predicate the store calls (perm.JudgeCard), so
+// the rule has one definition and two call sites. It cannot judge the answer
+// itself: it raises no card, so "was an allow answered" is a fact only the layer
+// that asked can see. What it owes the operator instead is that the store's
+// refusal is NAMED here with the same classification the store booked
+// (perm.RefusalResult) and recorded with this request's id, so the two records
+// cannot describe one refusal as two different things.
+//
 // AUDIT IS NOT THE GATE'S TRADE. Every refusal written here emits its own audit
 // line before returning, because the write leg never ran and would otherwise
 // have recorded nothing; every request that passes goes to Set, which records
-// all three档 (R20). No branch of this file is silent, and adding the gate
-// removes no line the wiring would have written.
+// all three档 (R20). A refusal the write leg made on this request's behalf is
+// recorded here too - it is the layer that knows the requestId, and one refusal
+// deserves one line at each layer that judged it, both carrying the same
+// perm.Result. No branch of this file is silent, and adding the gate removes no
+// line the wiring would have written.
 //
 // WHO CALLS THIS NOW: the earlier "nothing calls this handler yet" was true
 // while the inbound hop did not exist, and it is not true now. Both production
@@ -92,17 +106,23 @@ type ModeWriter interface {
 	Set(ctx context.Context, to risk.Mode, origin, actor string) error
 }
 
-// ModeConfirm is one L2 strong-confirmation leg (R20/M4). The handler reads its
-// nil-ness and never its body; the shape mirrors the confirmation the write leg
-// takes so an assembly can hand both the same thing.
-type ModeConfirm func(ctx context.Context, from, to risk.Mode, origin, actor string) error
+// ModeConfirm is one L2 strong-confirmation leg (R20/M4), in perm's own
+// credential contract (ticket 371): it reports the answered allow as a perm.Card,
+// the same value perm.ConfirmFunc returns and the same bit perm.Store.Set judges.
+// The handler reads its presence and never its body; the shape mirrors the
+// confirmation the write leg takes so an assembly can hand both the same thing,
+// and so the credential cannot be dropped between the two layers.
+type ModeConfirm func(ctx context.Context, from, to risk.Mode, origin, actor string) (perm.Card, error)
 
 // ModeWriteHandler is the native handler for one panel.mode.request.
 type ModeWriteHandler struct {
 	// Modes is the single write leg. nil = every request is refused.
 	Modes ModeWriter
-	// Confirm is the L2 leg whose absence closes the gate for widening
-	// requests. Never called here; see the header.
+	// Confirm is the L2 leg whose absence closes the gate for a request whose
+	// target costs a card (R20/M4: auto_approve, and only it). Never called here;
+	// see the header. Since ticket 371 it is the credential-returning shape, so a
+	// limb that reports "no answered allow" can reach the store's gate through the
+	// same contract instead of being flattened to an error on the way.
 	Confirm ModeConfirm
 	// Audit is the project's existing "[audit]" sink (workspace.go's AuditFunc).
 	// nil is tolerated the way perm tolerates it: the refusal still returns.
@@ -147,20 +167,26 @@ func (h *ModeWriteHandler) HandleModeRequest(ctx context.Context, req ComposerRe
 		return h.Modes.Set(ctx, to, PanelModeOrigin, h.actor())
 	}
 	// Ticket 372: the gate is the TARGET, and it is the same predicate
-	// perm.Store.Set applies. A request for auto_approve with no leg is refused
-	// here, before the write leg sees it, so the page gets a panel error code;
-	// every other target reaches Set, which judges the same target the same way.
-	if perm.RequiresCard(to) && h.Confirm == nil {
+	// perm.Store.Set applies. Ticket 371 folded the channel term into that
+	// predicate too (perm.JudgeCard), so "which targets cost a card, and does
+	// this layer hold a channel for them" is answered once, not spelled twice.
+	// A request for auto_approve with no leg is refused here, before the write
+	// leg sees it, so the page gets a panel error code; every other target
+	// reaches Set, which judges the same rule and the ANSWER as well.
+	if perm.JudgeCard(to, h.Confirm != nil) == perm.GateNoChannel {
 		refused := fmt.Errorf("%w: 请求 %q 要把档位从 %s 切到 %s（R20/M4：只有全自动要确认），而本机没有接入 L2 确认腿",
 			ErrNoL2Confirm, req.RequestID, from, to)
 		h.record(req, refused, from.String(), to.String())
 		return refused
 	}
 	// The leg is attached, so R20/M4's ask is the write leg's to make - exactly
-	// one card, raised by Set, for the one target that costs it. Set judges the
-	// same target with the same predicate and would refuse the same request on its
-	// own if nothing had; this layer exists so the refusal carries a panel error.
+	// one card, raised by Set, for the one target that costs it, and only an
+	// ANSWERED allow settles it (ticket 371). Set judges the same rule with the
+	// same predicate and refuses on its own; this layer exists so a refusal made
+	// before Set carries a panel error code, and so the refusal Set makes is
+	// booked here with this request's id and the same perm.Result.
 	if err := h.Modes.Set(ctx, to, PanelModeOrigin, h.actor()); err != nil {
+		h.recordStoreRefusal(req, err, from.String(), to.String())
 		return err
 	}
 	return nil
@@ -177,11 +203,31 @@ func (h *ModeWriteHandler) actor() string {
 // record writes the one audit line a refused request deserves. A nil sink is
 // tolerated (perm's Options.Logf is optional too) but never turns a refusal into
 // a silence at this level - the error still goes back to the caller.
+//
+// result= is perm.RefusalResult's classification, i.e. the SAME value perm.Store
+// booked on its own MODE-SWITCH row for the same refusal. That is what makes
+// "two gates, one rule" a reading instead of a claim: a card that was never
+// answered reads result=card-not-answered here and there, and a missing channel
+// reads result=refused-confirm at both.
 func (h *ModeWriteHandler) record(req ComposerRequest, err error, from, to string) {
+	h.recordAs(req, err, from, to, "档位未变化：写入腿没有被调用")
+}
+
+// recordStoreRefusal books the refusal the WRITE LEG made on this request's
+// behalf. The store wrote its own row (it always does); this one exists because
+// the store's row cannot name the panel's requestId, and because the panel is a
+// layer that judged the same rule and must not leave its half of the story
+// silent (ticket 371-b). It carries the same perm.Result the store booked.
+func (h *ModeWriteHandler) recordStoreRefusal(req ComposerRequest, err error, from, to string) {
+	h.recordAs(req, err, from, to, "档位未变化：写入腿按同一条规则拒绝了这一发")
+}
+
+// recordAs is the one emitter both refusal paths share, so the two lines cannot
+// drift into two vocabularies.
+func (h *ModeWriteHandler) recordAs(req ComposerRequest, err error, from, to, detail string) {
 	if h == nil || h.Audit == nil {
 		return
 	}
-	h.Audit("panel: MODE-REFUSED request=%q from=%q to=%q origin=%q actor=%q err=%v detail=%q",
-		req.RequestID, from, to, PanelModeOrigin, h.actor(), err,
-		"档位未变化：写入腿没有被调用")
+	h.Audit("panel: MODE-REFUSED request=%q from=%q to=%q origin=%q actor=%q result=%s err=%v detail=%q",
+		req.RequestID, from, to, PanelModeOrigin, h.actor(), perm.RefusalResult(err), err, detail)
 }
