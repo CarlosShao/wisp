@@ -280,6 +280,9 @@ type ComposerState struct {
 	// declaration that matches it on the page side is not this session's to
 	// write - see the note on Snapshot above and Q-51.
 	Git GitView `json:"git"`
+	// Files is ticket 190's top-level files key: the working-tree file list as the
+	// host read it. omitempty keeps a section with no reader off the wire entirely.
+	Files *TreeView `json:"files,omitempty"`
 	// CurrentModel is the model id this boot actually resolved for its text
 	// role, handed over at the pump's assembly root from the one endpoint the
 	// runtime built (llm.Endpoint.Model). It is NOT a selectable catalog and NOT

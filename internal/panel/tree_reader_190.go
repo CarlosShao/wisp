@@ -68,3 +68,6 @@ func readGitTree190(root string) TreeView {
 	reason := "total " + strconv.Itoa(total) + " files"
 	return TreeView{Kind: TreeKindCounted, Reason: reason, Entries: entries, FilesTotal: total, FilesTruncated: truncated}
 }
+
+// ReadFileTree190 returns the working-tree file list for root (ticket 190 host-side source).
+func ReadFileTree190(root string) TreeView { return readGitTree190(root) }

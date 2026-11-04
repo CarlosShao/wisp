@@ -150,6 +150,8 @@ type PumpSources struct {
 	// route this dimension takes: there is no git tool for the model to call, and
 	// no inbound method for a switch to arrive on.
 	Git func() GitView
+	// Files reads the working-tree file list for the same root (ticket 190).
+	Files func() TreeView
 	// Model reads the model id this boot resolved (llm.Endpoint.Model), ticket
 	// 145 AC#2b's "which model is answering". It is one live string read off the
 	// endpoint the runtime already built - not the selectable catalog and not
@@ -282,6 +284,10 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		// NewComposerState left this section saying "not probed"; a reader that
 		// exists overwrites it with what the files actually say.
 		composer.Git = p.src.Git()
+	}
+	if p.src.Files != nil {
+		v := p.src.Files()
+		composer.Files = &v
 	}
 	if p.src.Model != nil {
 		// Same shape one line up: NewComposerState built this section with no
