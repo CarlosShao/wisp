@@ -31051,3 +31051,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 假 done 核：`ls *-done.md`=267 ＝ ticket-lint done=267 ⇒ 无"Status done 缺 -done"票（189 唯一，已修）。
 - 抽样 gated：316 withdrawn(并272)／290 真机读数／293 机主肉眼／220 死区+票328／64 副屏硬件／138 Q-55 blocked／180 33/35／354 拍形／371 改写 ⇒ 全卡 owner/硬件/真机/死区/撤/等票。
 - ⇒ 无红门禁可修、无假 done 可收；剩余自推窗窄，下轮续抽 ready-right-now 未读票。
+
+## A1523（2026-11-04 20:5x，编排者）165轮：29 现核＝大型功能(非小修)；其余抽样仍 gated
+- **29 memory L1/L2**：Status ready-for-review，2 具名残余＝AC1(宿主 `Hooks{WarmWindow}` 未赋值：`cmd/wisp/resident_voice_engines_windows.go:451` hooks 装配＋`internal/session/scope.go:194/:477` 契约在)、AC2(golden 抽取链)。`internal/memory/golden_extract.go` 是**契约件**（已 embed `testdata/golden_extract.json` 钉 10 剧本 slot 目标＋`golden_extract_test.go`＋`newGoldenExtractor()` 规则 stub）。残的＝**实现真 C5 LLM 抽取链（每任务一次 LLM、Warm 窗内、非响应路径）＋录 golden SSE＋宿主装配**。⇒ 这是**多文件大型功能**，非单轮可安全落地；⛔ 不宜近枯上下文盲派 flash 腿（LLM 集成＋golden SSE＋cmd/wisp 死区，半破风险高）。
+- 其余抽样仍 gated：68(桌面复测)／70(blocked-on-owner＋Linux runner)／72(CI runner)／342(容器真机台件 liveness)／301/329/174 未细读但同类。
+- **结论**：唯一非 gated 实体工作是 29(大型)、370(medium cmd/wisp)。二选一需**专门多轮腿序列**；当前每轮近枯上下文无法安全承接。→ 等 owner 指方向(专注 29 或 370 的专项腿) 或 ①–④ 决策。
