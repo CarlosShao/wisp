@@ -16,9 +16,12 @@ package memory
 //	              prefix is identical for every slot a task yields, so a task
 //	              costs at most ONE prompt-cache invalidation. That is what
 //	              "batch-commit" means on the C5 side. (The AC#2 deliverable -
-//	              recorded golden SSE bytes per scripted conversation - is the
-//	              named residual of 29-v1 and is NOT claimed here: this file
-//	              cannot record what a real endpoint answers.)
+//	              one assistant-text golden-SSE recording per scripted
+//	              conversation - lives under internal/memory/testdata/golden_sse
+//	              and replays through this extractor. Those bytes are pinned to
+//	              the reviewed fixture, not captured from a live endpoint: a
+//	              live capture needs a real key and would pin whatever the model
+//	              happened to answer that day.)
 //	L1Pipeline    runs the extractor, then commits the WHOLE outcome through
 //	              ONE store transaction (Store.ApplyExtraction): upserts first,
 //	              forgets after, net per task. A failed extraction commits
@@ -28,12 +31,11 @@ package memory
 //	              assigned to session.WarmWindow, which hands the batch
 //	              to the "memory-extract" roster goroutine.
 //
-// It implements the Extractor interface golden_extract.go defines, so the AC#2
-// swap point (newGoldenExtractor) can return an *L1Extractor over a replayed C5
-// chain without touching the fixture, the comparator or the DAO assertions.
-// That swap is the AC#2 leg's to make; this leg deliberately did not make it,
-// because without recorded bytes the golden suite would assert whatever the
-// live endpoint happened to answer.
+// It implements the Extractor interface golden_extract.go defines, and the AC#2
+// swap point (newGoldenExtractor) returns an *L1Extractor over the replayed C5
+// chain without touching the fixture, the comparator or the DAO assertions. The
+// golden suite therefore asserts the reviewed contract, not a live endpoint's
+// mood.
 
 import (
 	"context"
@@ -139,7 +141,7 @@ func NewL1Extractor(provider llm.LlmProvider, model string, opts ...L1ExtractorO
 }
 
 // Extractor is the seam golden_extract.go defines; this line is the compile-time
-// proof that the real chain can take the stub's place at newGoldenExtractor().
+// proof that the real chain is what newGoldenExtractor() returns.
 var _ Extractor = (*L1Extractor)(nil)
 
 // Extract runs the one C5 call and parses its single JSON answer into the

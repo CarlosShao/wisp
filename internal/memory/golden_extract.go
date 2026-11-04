@@ -14,25 +14,27 @@ package memory
 // The wiring leg then gets a real target to shoot at instead of writing the
 // test to match its own output.
 //
-// How the future leg swaps the stub for the real extractor:
+// How the real chain got swapped in (landed with the AC#2 leg):
 //
-//  1. Implement Extractor where the C5 chain lives: one small LLM call per
-//     task over the conversation turns (via llm.LlmProvider, golden SSE bytes
-//     recorded under the C5 golden harness, cf. internal/llm/golden and the
-//     internal/agent/testdata/golden/*.sse precedent), run in the Warm window
-//     after the response, never on the response path (SPEC-05 section 6).
-//     The call returns the ExtractionOutcome for the WHOLE task in one go,
-//     which is what batch-commit means: one prompt-cache invalidation per
-//     task, not per fact.
-//  2. In golden_extract_test.go replace the single construction point
-//     newGoldenExtractor() (currently the rule-based stub) with the real
-//     chain. Nothing else changes: same fixture, same CompareExtraction,
-//     same assertions against the real profile table.
+//  1. The implementation lives in l1_extract.go: one small LLM call per task
+//     over the conversation turns (llm.LlmProvider), run in the Warm window
+//     after the response, never on the response path (SPEC-05 section 6). The
+//     call returns the ExtractionOutcome for the WHOLE task in one go, which
+//     is what batch-commit means: one prompt-cache invalidation per task, not
+//     per fact.
+//  2. newGoldenExtractor in golden_extract_test.go is the single construction
+//     point and builds that real chain over the pinned golden-SSE recordings in
+//     internal/memory/testdata/golden_sse: one assistant-text SSE per case,
+//     replayed over real HTTP through the real openai-chat adapter, so the test
+//     exercises the production seam instead of a double.
 //  3. Run: go test ./internal/memory -run 'TestTicket29_AC2' -count=1.
 //     Green = the real chain reproduces the pinned slots/values on all 10
-//     scripts; red = the chain disagrees with the pinned contract. If the
-//     CONTRACT itself is wrong, amend the golden JSON through a new ticket
-//     (it is a reviewed fixture, not a scratch file).
+//     scripts; red = the chain (or its recording) disagrees with the pinned
+//     contract. If the CONTRACT itself is wrong, amend the golden JSON through
+//     a new ticket (it is a reviewed fixture, not a scratch file). When the
+//     contract moves, the matching recording under
+//     internal/memory/testdata/golden_sse moves with it: fixture and recordings
+//     are two pinned artefacts that must agree.
 //
 // Value formats are part of the contract (the real chain must emit exactly
 // these normalized values):
@@ -145,11 +147,11 @@ const goldenSetCaseCount = 10
 // goldenSetVersion is the fixture schema version the loader accepts.
 const goldenSetVersion = 1
 
-// Extractor is the L1 profile extraction seam (ticket 29 AC#2). TODAY the
-// only implementation is the deterministic rule-based stub in
-// golden_extract_test.go, which exists to prove the golden set is
-// self-consistent. The REAL implementation is the C5 LLM chain (small call in
-// the Warm window, batch-commit, see the swap instructions above).
+// Extractor is the L1 profile extraction seam (ticket 29 AC#2). The real
+// implementation is *L1Extractor (l1_extract.go): the C5 LLM chain, one call
+// in the Warm window, batch-commit. The AC#2 golden test drives that chain over
+// the pinned golden-SSE recordings; the interface is the seam the Warm window's
+// pipeline consumes, not a hook for a test double.
 type Extractor interface {
 	Extract(ctx context.Context, conv GoldenConversation) (ExtractionOutcome, error)
 }

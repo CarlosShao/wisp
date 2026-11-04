@@ -1,0 +1,16 @@
+# wisp golden sse v1
+# @scenario ticket 29 AC#2 case-10-batch-three-slots: pinned assistant answer (normalized extraction JSON replayed through the real C5 chain)
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"{\"upserts\":[{\"slot\":\"fact.family\",\"content\":\"mother birthday "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"11-09\"},{\"slot\":\"habit.work_hours\",\"content\":\"weekday 09:00-1"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"8:00\"},{\"slot\":\"pref.language\",\"content\":\"zh\"}],\"forgets\":[]}"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":742,"completion_tokens":38,"total_tokens":780,"prompt_tokens_details":{"cached_tokens":704}}}
+
+data: [DONE]

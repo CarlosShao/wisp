@@ -1,0 +1,16 @@
+# wisp golden sse v1
+# @scenario ticket 29 AC#2 case-09-family-fact: pinned assistant answer (normalized extraction JSON replayed through the real C5 chain)
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"{\"upserts\":[{\"slot\":\"fact.f"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"amily\",\"content\":\"mother bi"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"rthday 11-09\"}],\"forgets\":[]}"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":742,"completion_tokens":38,"total_tokens":780,"prompt_tokens_details":{"cached_tokens":704}}}
+
+data: [DONE]
