@@ -211,7 +211,13 @@ func TestPanelGateAndStoreGateAgreeOnTheAnsweredCard371(t *testing.T) {
 						t.Errorf("%s -> %s / %s: writeCalls=%d limbEnters=%d, want 1/1 (the store asks once)",
 							from, to, kind, writer.calls, limb.asked())
 					}
-					if !strings.Contains(handlerErr.Error(), "card was not answered") {
+					// handlerErr may be nil on the should-refuse-but-did-not path;
+					// fail the assertion with a clear message instead of panicking
+					// while trying to read the missing error.
+					if handlerErr == nil {
+						t.Errorf("%s -> %s / %s: the store refused the unanswered card but the panel "+
+							"surfaced no error; the refusal never reached the page", from, to, kind)
+					} else if !strings.Contains(handlerErr.Error(), "card was not answered") {
 						t.Errorf("%s -> %s / %s: the surfaced refusal does not name the unanswered card: %v",
 							from, to, kind, handlerErr)
 					}

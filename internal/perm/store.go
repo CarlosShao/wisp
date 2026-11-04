@@ -354,14 +354,27 @@ func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) err
 		return fmt.Errorf("perm: %s", sw.Detail)
 	case GateAsk:
 		// R20/M4's asymmetry stands on top of that gate: the auto_approve target
-		// costs one ANSWERED L2 card. There is no separate nil test here on
-		// purpose - JudgeCard refused every auto_approve switch whose channel was
-		// nil, so this call cannot dereference a nil channel. That invariant is
-		// what the panic shot pins: change the gate to anything that lets
-		// auto_approve past a nil channel and this line panics instead of
-		// refusing.
+		// costs one ANSWERED L2 card. JudgeCard is supposed to have refused every
+		// auto_approve switch whose channel was nil, so this branch used to call
+		// the limb directly and PANIC if that invariant was ever broken - the
+		// panic shot in 372-r2's evidence pinned exactly that. Ticket 371's R6
+		// changes the failure mode to a refusal: a broken predicate (or a channel
+		// that disappears between the judgement and the ask) must not take the
+		// process down while the operator is changing a security posture. This is
+		// defense in depth, not a second gate: JudgeCard remains the one
+		// judgement, and the guard only refuses the state JudgeCard promised
+		// could never reach here. It captures the function it is about to call,
+		// so the value judged and the value invoked are the same one.
 		started := s.now()
-		card, err := s.confirm(ctx, sw)
+		confirm := s.confirm
+		if confirm == nil {
+			sw.Result = ResultRefused
+			sw.Detail = fmt.Sprintf(
+				"从 %s 切到 %s 需要一次 L2 强确认，但确认通道为 nil（内层 nil 兜底：门谓词被改坏时拒而不 panic，未切）", from, to)
+			s.audit(sw)
+			return fmt.Errorf("perm: %s", sw.Detail)
+		}
+		card, err := confirm(ctx, sw)
 		sw.Secs = int64(s.now().Sub(started).Seconds())
 		if err != nil {
 			sw.Result, sw.Detail = RefusalResult(err), "L2 强确认未通过："+err.Error()
