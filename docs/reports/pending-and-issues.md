@@ -30881,3 +30881,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 落点仅 cmd/wisp/run.go execute() :1666-1680。甲(终态≈6-8行,不红)/乙(运行态+终态≈18-24行,会红 subagent_carrier_197_test.go:317-327 的"根行状态必须空"钉,需具名改判)。C17 不加方法、不加顶层 key。
 - 铁律取乙（运行态+终态更有价值：任务监控须显示"进行中"）：需 A## 具名改判 197 的"根行状态必须空"钉为"根行可带状态 Thinking→终态"。188-r3 落 cmd/wisp（共享面）+改 197 测试，需精细手（flash 跨文件易错），下轮精细派/亲做。
 - 附带纠正：TestComposerContractTypesMatchFrontend 现红句＝"Go ComposerState emits [files]"(＝190 新键,页侧待 UI 腿)；tasks/instructions 页侧已声明。C21 现红因＝c21-native-tokens.md 表 3 字段在 ball/tokens.go 找不到（非 tokens.css 删）。
+
+## A1493（编排者）135轮：★★拦下 188 普查误判；188 排 145-r3 之后不可动；panel 簇多 gate on 145（未派）
+- 187-a1 普查（242 行件 docs/evidence/s1/187-a1-census.md，commit d564fd424，已推）：187 不需新读面（DiscoveredModels 已导出、catalog 已在 config.get payload；模型已能从面板改 via config.set+role_chat_model/role_chat_pair）；缺仅思考档字段＋Assembler.ThinkingIntensity 零赋值那 3 行；≈82-121 行生产＋140-200 判据，跨 loop.go/config/panel/run.go 大共享面。本波未做（体量+共享面+context）。
+- ★★188 拦截（筛票陷阱）：188-a1 census 建议「乙＝改判 subagent_carrier_197_test.go:317-327 根行状态钉」。查 188 票正文＋A394/A398＋run.go:1672 注释通读：根行状态空「带理由」是 A394 故意设计（196 已 DONE 修二词表）；且 A398 逐字「188-r3＝生产者那一跳，排 145-r3 交件之后」。⇒ 188-r3 归口/排在 145-r3 之后，census 的乙/改197钉会违反设计，⛔ 不采用。
+- 145 现量：Status ready-for-agent 未派，无 -done。⇒ 188（及 panel 簇快照载体扩张）多 gate on 145。188 现 checked=1/unchecked=5（余 AC#2 生产写入者→145-r3、AC#3 已 188-r2 落、AC#4 分账），不可收。
+- 判：panel 簇剩票多为 ①gate on 145（未派大票=根闸）②单票体量大（187 82-121 行跨多共享面）。145 是 panel 簇根闸：真跑完须先启动 145（大票，跨 pump/composer/run.go 载体扩张，多腿）。
