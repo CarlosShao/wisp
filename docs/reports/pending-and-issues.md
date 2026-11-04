@@ -31045,3 +31045,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   - **370**：agent/llm/cmd-wisp 接线，medium。
   - **371**：改写稿，前提部分被 372 失效，AC#1 裁形。
 - **结论：7 纯候选无一"小而自洽"可自推；全部 gated(33/35·C17·前端·owner拍形) 或 medium/cascade。** 自推自洽票已尽——需 owner ①–④ 或接受 medium 票的多年轮投入。
+
+## A1522（2026-11-04 20:4x，编排者）164轮：门禁全绿核查＋无假done＋抽样确认 gated
+- 门禁现跑（HEAD 起）：d22scan rc=0 clean；check-path-length-budget rc=0 GREEN(65/65)；attrib --self-test rc=0；ticket-lint rc=0（咨询非强制，R7 done=267 live=123 ready-right-now=54 但 Blocked-by 字段常空、该数不可全信）；slo-freshness rc=2＝无 GITHUB_REPOSITORY 按设计拒答（非红）。
+- 假 done 核：`ls *-done.md`=267 ＝ ticket-lint done=267 ⇒ 无"Status done 缺 -done"票（189 唯一，已修）。
+- 抽样 gated：316 withdrawn(并272)／290 真机读数／293 机主肉眼／220 死区+票328／64 副屏硬件／138 Q-55 blocked／180 33/35／354 拍形／371 改写 ⇒ 全卡 owner/硬件/真机/死区/撤/等票。
+- ⇒ 无红门禁可修、无假 done 可收；剩余自推窗窄，下轮续抽 ready-right-now 未读票。
