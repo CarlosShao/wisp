@@ -30893,3 +30893,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 145 现量 checked=4/unchecked=3（AC#2/AC#6 未翻）；自记"本票写腿排在票35现状对拉+票274 之后" ⇒ 145 gate on 35+274。
 - 188 gate on 145-r3 ⇒ 传递 gate on 35。187 亦在 35 之后才有显示价值（host 数据可先长）。
 - 判：panel 簇（145/187/188 及"画出来"）根阻断＝票 35（webview 出向跳+页面接收器，owner 前端域，放行35 未决）＋票274（构建带页面）。190 已把 host 侧 files 数据源落好（host 侧层面到顶）。⇒ 要真把 panel 簇跑完并"画出来"，须 owner 放行 35（合法 owner 升级：frontend 域＝放行类）。
+
+## A1495（编排者）138轮：票池样本证实系统性闸——剩余票多在 owner/CI/death-zone终态/跨票
+- 样本现读：179（ready-for-agent，AC#8 端到端卡 cmd-wisp 死区 0xc0000135＋L2 R4，未结案）；262（AC#5ⓑ 本机 self-hosted 结构不可满足）；226（终裁 4/6，AC#5 残余归 227/219/224，不 -done）；220（AC#1-4 勾、AC#5「整包终态」需本机活 Wisp 窗口＝仅本机可量，不 -done）。
+- 共性：多票 AC「整包终态 go test ./cmd/wisp ./internal/... 到终态」在本机＝死区（rc=1 ~40 环境 FAIL，规则自承认不可当判据）⇒ 这些 AC 结构上本机不可满足，票恒卡「1 未勾」。
+- 系统闸三类：①owner（放行35/A671·Q-76 C17白名单/8条待裁/347/256/301）②CI self-hosted runner③cmd-wisp 整包终态死区（需机主/CI 侧裁「本机死区如何收该 AC」）。⇒ 票池吞吐已 owner/CI 受限。
+- pool-scan 12 票分类腿 dud（读面大，已杀）；下轮小拆（每腿≤3票）重派。
