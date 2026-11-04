@@ -4144,3 +4144,14 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 - **脉象**：假硬票纯文档脉（91/225）已收尽；近完成/文档/acceptance 票尾（220 247 262 274 230 234 177 103 62 114 136 342 138 219 189 190 313 371 346 361）残余 AC 全落 owner／真机真窗／真 CI／前端 browser-context／改契约。
 - **220 AC#5** 已被前任（10-16）裁〔仅本机可量·待机主窗口 Q-85〕：需机主先退其 10-15 自起活实例 PID 21892 ＋ 可控前台，否则 cmd/wisp 整包在真窗用例处硬截断、未达终态；本段复核确认（./internal/... 可终态，cmd/wisp 不可）。
 - **台账**＝pending-and-issues.md A1472/A1473/A1474/A1475/A1476 详。**待机主 8 条**：256／301／185／347／230 AC#4／174 AC#4／226 ＋ **264 AC#0（甲降敏/乙只装仪器/不做）**。**放行大特性/前端**：35。
+
+### 4.0fw（2026-11-04 13:5x +08，编排者 goal round 119-124）★403 真缺陷收口（risk 测试 import cycle）＋ 234 十二格全读数收口｜本会话累计 21 票
+
+- **接手先跑地面**：open／done／HEAD／未推 每轮现跑（本件 ⛔ 记快照数，以盘为准）。
+- **本段新增收口 2 票**：
+  - **403**（internal/risk 测试包 import cycle＝[setup failed]，真回归）：现跑撞出（为 234 取 risk 门禁读数时）——provenance_test.go:12 import plugin，plugin/command.go:42 import risk ⇒ 环；根因 f576cf08（票160）引入、票160 以 broken 收口、无票覆盖。立票 403，派腿 risk-cycle-403（乙-scoped：唯一用 plugin 的 TestDisposalScopeClearsTaints 移 internal/plugin），非实现者三把尺核（risk/plugin go test ok、vet0、gofumpt空、cycle0）⇒ AC#1-4 翻勾，AC#5 回填 234 归 234。-done（带残余）。
+  - **234**（12 格只差一发读数）：编排者亲跑收尾（flash 腿 gate-rerun-2/3/m34 连三次达轮帽死）——AC#1 新基线（旧 baseline 因 risk 坏作废）；AC#2 五变异 M1/M2/M5(gate-rerun-2)＋M3(/tmp 快照 winsec-tests.sh)＋M4(Docker 11 POSIX red 两形)；AC#3 七门禁四数现取(approval/tools/risk/winsec/memory/secret rc=0；panel 1 既有红；容器 winsec/risk ok memory-linux 2 红产品范围外)；AC#4 基线=终态；AC#5 10 指向标记现盘核=10（gate-rerun-1 旧 HEAD 已落）；AC#6 void。汇表 gate-rerun-3/table.md。-done（零产码）。
+  - ⇒ 本会话累计收口 **21 票**（273 175 128 324 327 309 310 304 296 165 109 303 352 351 222 356 224 91 225 403 234），全 -done 已推。
+- **假硬票脉再核**：239/311 均全勾但**有据不结案**（239 残余 0.25px/C21名册/239-v1常驻＋cmd/wisp 复跑；311 残余 Q-311-r1-1＋票310盖章需验收腿）⇒ 不虚翻。近收口 u=1 九只（316/220/216/226/290/293/339/246/64）全门禁（owner/前端/真机/硬件/等347或228）。
+- **脉象**：两次真收口均属缺陷修复＋测量脉；余池近完成票尾残余仍全落 owner／真机真窗／真 CI／前端 browser-context／改契约。**无可由编排者直接收口的开放票**（唯余把 owner 项推进）。
+- **台账**＝pending-and-issues.md A1478-A1482 详。**待机主 8 条**：256／301／185／347／230 AC#4／174 AC#4／226／264 AC#0（甲降敏/乙只装仪器/不做）。**放行大特性/前端**：35。
