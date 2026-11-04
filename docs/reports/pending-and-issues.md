@@ -30999,3 +30999,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1513（编排者）156轮：更正 405 残余旧注释（3 处）与现码对齐
 - run.go:1289-1298 taskLifecycleJournal doc、run.go:1717-1721 root 关闭注释、tasklog_subloop_378_test.go:127-128：由「FinishTaskLog inert/单写手」改为「FinishTaskLog 写终态/tool_call 三法仍 inert/root 双写幂等」。
 - 仅注释；gofumpt 空/build rc0/vet rc0/e2e+378 回归 ok。405 收口残余清零。
+
+## A1514（编排者）157轮：票池三档分诊（纯 ready-for-agent 且非 owner/frontend/立而不派/blocked＝10 枚）
+- 候选：179 180 182 187 188 189 354 361 370 371。
+- 已逐读：145（卡 Q-51/owner＋涉 frontend）、167（等145/frontend）、169（frontend 结构性禁写）、170（立而不派/契约待 owner）、354（AC#0 需现跑 ancestorunlink/ancestorworld 两族读数＋正控，仪器活）、370（MaxOutputTokens 全仓无赋值，跨 agent/llm/cmd-wisp 接线）、371（internal/perm 门改写，前提被票372撤销，复杂）。均非小而自洽。
+- 待逐读：180/182/187/188/361（疑涉 panel/frontend 或 CI 环境）。189 疑与已收 189 重号，下轮核。
+- 结论：本编队可自推的「小而自洽票」已尽；余须 owner ①②⑤ 或 fresh 上下文深做。
