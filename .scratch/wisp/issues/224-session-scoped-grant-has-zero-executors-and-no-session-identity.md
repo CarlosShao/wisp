@@ -35,7 +35,7 @@
 - [x] **AC#1 身份有唯一的铸造点**：`grep` 点数：改前生产铸造者＝0，改后 ≥1，且具名写出"会话结束"是哪一行代码在做什么。
 - [x] **AC#2 三件套齐全**：**写**（答复"本会话内允许" ⇒ `approval_grant` 真有一行，带 session 身份＋工具＋模式＋创建时间）、**读**（下一次同类请求命中它 ⇒ **不再弹卡**）、**失效**（会话结束 ⇒ 同一身份查不到、行为回到"要问"）。三格各自有独立用例，⛔ **不许合并成一枚"持久化"用例**（`ticket90_persist_test.go` 文件头逐字"They are three test functions on purpose"）。
 - [ ] **AC#3 重启必失效**：进程重启 ⇒ 同类请求**重新弹卡**（这条是"永久免审通行证"的命）。
-- [ ] **AC#4 反控（正控！）**：种一条"派生式 session id 让授权跨会话仍生效"的假腿 ⇒ **AC#2／AC#3 至少一枚必须红**；如果三枚钉全绿而授权实际生效 ⇒ **本票判失败**，因为那正是 `store.go:19-27` 那段注释点名要挡的形状。
+- [x] **AC#4 反控（正控！）**：种一条"派生式 session id 让授权跨会话仍生效"的假腿 ⇒ **AC#2／AC#3 至少一枚必须红**；如果三枚钉全绿而授权实际生效 ⇒ **本票判失败**，因为那正是 `store.go:19-27` 那段注释点名要挡的形状。
 - [x] **AC#5 不许把"长期"混进这一票**："长期／永久允许"落 `[fs] allowed_dirs`，见票 219 与批准记录 `A424`，**不是这张票的射程**。
 
 ## 禁区
@@ -107,3 +107,13 @@
   3. **常驻钉**（现跑 go test ./internal/session -run Dialect|Wildcard|PatternWithoutStar|Malformed|PatternCovers ⇒ ok 0.900s）：TestTicket224DialectIsPathMatchNotRegex／TestTicket224PatternWithoutStarIsNeverReinterpreted／TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk／TestTicket224WildcardRowCoversAConcretePath／TestTicket224PatternCoversIsTheOnlyMatcher。
   - 射程具名＝N#7 那条：Windows 反斜杠通配授权暂不支持（写侧拒收），现实受害面今天＝零。
 - ⚠ 本翻后 224 余 **AC#3（真 OS 进程重启那发＝N#8③ 欠做）＋ AC#4（反控/正控）**。本票仍不加 -done。
+
+### 2026-11-04 12:12 +08 编排者增量 — AC#4 反控裁决翻勾（含变异自证）
+
+- **AC#4 成立 ⇒ 翻**。变异自证（编排者现跑）：把 internal/session/session.go 的 Mint 改成**派生式**（返回常量 id，跨 boot 相同＝模拟「派生式 session id 让授权跨会话仍生效」的假腿）⇒ build OK，3 枚测 RED：
+  - TestTicket224MintIsRandomAndValid：报「Mint produced ... twice in one process: that is a derived identity (A435 clause 1 forbids it), and a derived identity turns 「本会话内允许」 into a permanent pass because the next boot recomputes this boot s key」。
+  - TestTicket224CoveringDoesNotCrossToANewSession（＝AC#2 失效判据）红。
+  - TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk 红。
+  - 还原后 git diff 空、测 ok(1.667s)。
+- ⇒ 派生式假腿下 **AC#2 判据（CoveringDoesNotCrossToANewSession）与 mint 随机判据均红**；且 cmd/wisp TestTicket224ProductionSessionDoesNotSurviveRestart 的 id2!=id1 断言在常量 Mint 下亦必红（id2==id1）。⇒「三枚钉全绿而授权实际生效」的情形被排除＝判据有真牙。AC#4 满足。
+- ⚠ 本翻后 224 **仅余 AC#3**（进程重启⇒同类重新弹卡；其「真 OS 进程」那一半＝N#8③ 欠做）。本票仍不加 -done。
