@@ -30842,3 +30842,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 核核心特性票：47(TaskScheduler/PathLock)、48(ApprovalQueue)、49(Session grants) 功能码均已在位（scheduler/doc.go、approval/queue.go、tools/grant.go＋测试＋本会话已收的 224 引用），但均旧 roadmap v-slice 票且 49 Blocked by 48、48/47 未正式销：属"功能已在、票未销/依赖未清"考古族，非新丐建。
 - ⇒ 前沿定图（余 open 无 Go 侧 dispatchable clean 票）：①前端页(owner 外 agent)：313/145/216/329/114…；②owner 决策 8 条(256/301/185/347/230AC#4/174AC#4/226/264AC#0)；③真机/真 CI；④设计按住 284/316(撤)；⑤依赖 179→183/176、49→48；⑥旧 v-slice 考古 47/48/49。
 - 下一枚：优先攻 48(approval-queue-full)——queue.go 已在位，若达判据则收口并解阻 49；或 owner 解任一阻即派对应腿。
+
+## A1487（2026-11-04 15:01 +08，编排者）129轮：★★收 189 面板审查读面（真脉首枚）
+- 发现真脉：旧特性票(47/48/49)皆UI/依赖考古后，扫出面板补功能连号簇 167/180/182/187-194＝"宿主侧无源"(Go侧供数据、前端只渲染)，owner 09-28 放权缺就补。
+- 189 落地：r1 dud（634行执行器写好但类型未定义/build失败/无测试/未commit）→ r2 收尾腿补五类型+GitView 两嵌套子格(无顶层键,不触Q-51)+接线+六枚判据测试，提交 e1345b0a0（三件无夹带）。
+- 非实现者自证：①正控：clone --shared 父提交 66fdb2275 上 C21 测试同样 FAIL ⇒ 整包唯一红非本票引入 ②变异自证：把"没读"改报0 ⇒ 两枚第三态测试 RED（"0=干净/未读≠0"命门有真牙）。
+- 门禁：build rc=0／189 六枚全 PASS／整包 PASS=178 FAIL=1(已知)／gofumpt 空／d22scan clean／vet rc=0。翻 AC#2-6，AC#1 归 189-a1。件 docs/evidence/s1/189-ac-verdict.md。
+- 190-a1 普查腿同轮完成（250行件,三枚commit零产码）：落点 tree.go 300-360行+tree_test.go+composer/pump/scrub/cmdwisp 约600-760行；取数=问git两问(ls-files -z / -o -i --exclude-standard)+自加一枚.git排除;v1不做懒展开(懒展开触C17+人工批准=Q-76第二枚);顶层files键omitempty新增红0枚(普查证)。
+- 下一枚：190-r1 落地腿派单已存档待发（面板写面1腿/波，189已腾面→立即发）。
