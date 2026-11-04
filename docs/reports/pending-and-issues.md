@@ -30835,3 +30835,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 结论逐条：316 withdrawn；272/176 已 done。u=1 九只（220/216/226/290/293/339/246/64）全门禁（owner Q-85/前端 ChatInput/真机/真第二屏/等347/归228/owner#7）。近收口逐读：301(u=2) AC#4＝"历史违规永久留空"(301-v3 裁、⛔可翻)、AC#4b 前瞻闸门；179(u=2) AC#8 端到端解封 09-28 转票183(R4)＋依赖 176(open)；177 设计腿起手；72 真CI gated；145「为什么现在按住」＋panel 冻结面；余 panel/audio/CI/真机族。ready-for-agent 多为 frontend(owner 外 agent)/S-acceptance(阶段门控)/大特性(port/engine/i18n/plugin SDK)。
 - ⇒ **320 是本会话最后一张遗留可收票；余 open 无 dispatchable clean 票**。非怠工：flash 腿对 135/136 巨型仪器票高概率 dud（多次实证）、gated 票不可收。
 - 真解阻路径＝①owner 8 条(256/301/185/347/230AC#4/174AC#4/226/264AC#0) ②放行大特性/前端(35) ③票链(176/183→179)。下一枚：owner 解任一阻→即刻派对应腿；否则下轮起重型自办(逐字码，非纯指令派单)。
+
+## A1486（2026-11-04 14:13 +08，编排者）128轮：修正版假硬票重扫（容空格）＋前沿定图
+- 修正第124轮扫描缺陷（行首锚 ^-\[ \] 漏缩进勾框票如 320）：改用 ^\s*- \[ \] 重扫 ⇒ 全勾未收口仍只 239/311（皆有据残余：239 残余0.25px/C21名册/239-v1常驻/cmd-wisp复跑；311 Q-311-r1-1＋票310盖章需验收腿）。无新隐藏假硬票。
+- 逐读"看似小票"：284 按设计按住（AC#2 ⛔ 不许单独改 gate.go，须并入下一枚动 gate.go 的腿）；316 withdrawn；313 Go 侧已全验收（313-v1，AC#1/2/3 Go 半成立）但页面侧＝前端（owner 外 agent）＋真机端到端 ⇒ gated。
+- 核核心特性票：47(TaskScheduler/PathLock)、48(ApprovalQueue)、49(Session grants) 功能码均已在位（scheduler/doc.go、approval/queue.go、tools/grant.go＋测试＋本会话已收的 224 引用），但均旧 roadmap v-slice 票且 49 Blocked by 48、48/47 未正式销：属"功能已在、票未销/依赖未清"考古族，非新丐建。
+- ⇒ 前沿定图（余 open 无 Go 侧 dispatchable clean 票）：①前端页(owner 外 agent)：313/145/216/329/114…；②owner 决策 8 条(256/301/185/347/230AC#4/174AC#4/226/264AC#0)；③真机/真 CI；④设计按住 284/316(撤)；⑤依赖 179→183/176、49→48；⑥旧 v-slice 考古 47/48/49。
+- 下一枚：优先攻 48(approval-queue-full)——queue.go 已在位，若达判据则收口并解阻 49；或 owner 解任一阻即派对应腿。
