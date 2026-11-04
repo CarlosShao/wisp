@@ -42,3 +42,5 @@
   - **L2 刷屏机理（证据，不改判）**：范围外目录只会被判 L2（`rules_gateway.go:45-49`），而 L2 的唯一应答通道是原生卡（`bridge.go:457-458`），超时自动拒绝（`:464-465`）；面板侧永不是答案（仪器 ban #6 `main.go:23-29`＋`:271`、Go 边界尺 `internal/panel/l2_grant_boundary_test.go:4-8`、`:1533`；命名先例条文 `bridge.go:46-68` 逐字"a route that lets the page change configuration is not a route that lets the page *approve* anything"）。
 - **给编排者的判断（由你裁）**：**乙形便宜**；且只要"bounded depth ＋ 展开是纯前端状态"，**乙形不需要任何新面板方法名＝不触 C17＝不必走人工批准**（demo 的点击形状已证明可零宿主调用）。**只有**改做"点了才向宿主要下一层"的懒展开，才必须新增 `panel.*` 方法＝C17 变更＝人工批准。另：本程新撞出一枚**未定案 Q-56**（甲形专用腿才会碰），建议进台账由人拍。
 - **AC#6 那三把尺本程一律未跑**（`internal/panel` 测试／`d22scan` 基线 433／`gate-clauses` 名册）＝硬约束"零 go 命令"，⛔ 不许据此声称任何一条已核。另引用兄弟腿 `189-a1`（`ae9cd5fb`）的两把尺不重跑：它报"AC#6 那 2 枚已知红实为 4 枚"、"裸 `gate-clauses.sh` 实物在 `probes/154/`"、"09-28 同名件行号全漂"——**最后那一条对 09-28 的 `docs/evidence/s1/190-file-tree-design-a1.md` 同样是风险提示，本程未逐格复跑那份设计核的行号。**
+
+- [2026-11-04 15:40 +08] agent=编排者+微粒细胞：Go 核心落地（6 commit：types/reader/屯据/接线1/接线2），build 三包+vet 绿；panel 整包红2=C21(既有)+TestComposerContractTypesMatchFrontend(新,页侧待UI腿)。余 AC#4 三形+AC#2/#3 判据未做，未收。
