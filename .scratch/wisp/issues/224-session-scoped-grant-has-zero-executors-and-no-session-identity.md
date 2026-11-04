@@ -70,7 +70,7 @@
 - [x] **N#2 把 AC#3 缺的那枚真·跨进程用例写出来**（不是同进程两枚 `Mint()`），并**删掉/改正那三处指着一枚不存在的测试的注释**。⚠ 判定上限要具名写进用例注释：「run_mode101_test.go:145-147」逐字「a new process surface」的第二次装配**仍是同一测试进程** ⇒ **今天全仓没有仪器能区分"重启"的两种含义**，这条限制同时打在交件那枚旧钉与票面⑩ 的措辞上。
 - [x] **N#3 改写账户 `run_mode101_test.go:427-428` 的注释半**（绝对句⇒带条件的事实句），断言半不动。
 - [x] **N#4 「本次会话内」的时长定案**（编排者 09-30 已按现状裁＝**一次进程存活期，重启即失效**，与已落地实现一致；owner 若要"跨重启仍算同一会话"是**契约级改动**，撤销口令「224 会话时长改跨重启」）。
-- [ ] **N#5 glob 方言定案**：授权行里写的通配模式今天**没有仪器拦**（写了通配行＝等于没写）。完成判据＝定案一种方言（`path.Match`／自研／正则）并加一枚常驻钉，防止"看着有规则其实从不匹配"。
+- [x] **N#5 glob 方言定案**：授权行里写的通配模式今天**没有仪器拦**（写了通配行＝等于没写）。完成判据＝定案一种方言（`path.Match`／自研／正则）并加一枚常驻钉，防止"看着有规则其实从不匹配"。
 - [x] **N#6 反射钉的 setter 半射程**（今天只罚「Kind()==Func」，结构体字段那条路放过）——由 `224-r2` 判要不要在本票收，不收就具名归口票 90 那族。
 
 ## 2026-09-30 **14:00:13** 编排者增量 — 收「224-v2」（表「docs/evidence/s1/224-session-grant-v2.md」447 行／38,798 字节、真正占位符 0 枚〔文中两处「待填」都是引死腿那份文件〕）
@@ -98,3 +98,12 @@
 - **反向判据（变异自证，编排者现跑）**：短路 gate.go:764 的 g.grants.Record 调用 ⇒ build OK、3 枚 approval 测 RED（TestTicket224AllowSessionRecordsEveryPathTheAnsweredCardNamed／TestTicket224ForgedSessionAnswerRecordsNothing／TestTicket224RecordingFailureReleasesTheCallButClaimsNoRow，报「GRANT-RECORDED grant_id=-1」却无行＝被捉）；还原后 git diff 空、测 ok(0.037s)。⇒「答复⇒落行」这一跳今天有真仪器（补上 224-v1 判不成立的那一格）。
 - 读跳只读 seam 已接：internal/tools/bridge.go:102 Grants GrantSource ＋ internal/session/grants.go:177 实现（gate.go:64 注释指此）。
 - ⚠ **AC#3 仍不翻**：其「真 OS 进程重启」那一半＝N#8③ 欠做（现 cmd/wisp TestTicket224ProductionSessionDoesNotSurviveRestart 的 JUDGEMENT CEILING 自述只证「同测试进程内二次装配铸新 key、读 0 行」，不证「第二个 OS 进程」）。AC#4/N#5 亦待。本票仍不加 -done。
+
+### 2026-11-04 12:10 +08 编排者增量 — N#5 裁决翻勾（非实现者）
+
+- **N#5 成立 ⇒ 翻**。完成判据（定案方言＋常驻钉防"看着有规则其实从不匹配"）三项全满足：
+  1. **方言定案**＝internal/session/grants.go:296「THE DECISION: path.Match (the standard library s, not a regex, not a hand-rolled second dialect) - applied ONLY to patterns that carry *」。
+  2. **写侧拒收（Q-73 乙）**＝grants.go:280 storeablePattern(p)：含 * 且 path.Match 判 path.ErrBadPattern 者直接 fmt.Errorf「拒绝落盘一行永远不会命中的规则」，fail-closed；不含 * 的字面路径（如 note[s].txt）仍 storeable 且精确匹配。
+  3. **常驻钉**（现跑 go test ./internal/session -run Dialect|Wildcard|PatternWithoutStar|Malformed|PatternCovers ⇒ ok 0.900s）：TestTicket224DialectIsPathMatchNotRegex／TestTicket224PatternWithoutStarIsNeverReinterpreted／TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk／TestTicket224WildcardRowCoversAConcretePath／TestTicket224PatternCoversIsTheOnlyMatcher。
+  - 射程具名＝N#7 那条：Windows 反斜杠通配授权暂不支持（写侧拒收），现实受害面今天＝零。
+- ⚠ 本翻后 224 余 **AC#3（真 OS 进程重启那发＝N#8③ 欠做）＋ AC#4（反控/正控）**。本票仍不加 -done。
