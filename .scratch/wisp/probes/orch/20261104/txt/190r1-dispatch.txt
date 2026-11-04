@@ -1,0 +1,21 @@
+TASK 票 190 落地腿 190-r1（面板"工作区文件"文件树，宿主侧 Go 源，owner 09-28 放权缺就补）
+
+环境：cwd=D:\work\workspace\projects plans\Wisp；Go1.27 Windows；Git Bash=D:\work\soft\Git\bin\bash.exe；gofumpt 绝对路径=/d/work/base/gopath/bin/gofumpt.exe。cmd/wisp 整包死亡区勿整跑。
+
+【先读】.scratch/wisp/issues/190-*.md 全文；普查 docs/evidence/s1/190-a1-census.md（250 行，落点/雷区/C17判/成本实测全在此，按它做）；internal/panel/git_readonly_exec.go（189 执行器族，本票复用同一读面族/exec 纪律，⛔ 另起第二份）。⚠ 189-r1 那枚 exec 曾是半成品、已由 189-r2 收口；开工先 go build ./internal/panel 一次确认 189 已绿再动。
+
+【要建（照普查 §落点）】
+- 新增 internal/panel/tree.go（约300-360行）：三型＋四态枚举＋读取器＋git 两问＋三上限四元组。取数＝**直接问 git 两问**：`git ls-files -z`（tracked）＋`git ls-files -o -i --exclude-standard`（未跟踪且未忽略）；⛔ 抄 tools/d22scan/gitignore.go matcher；⛔ 抄 testdata/node_modules 语义；只自加**一枚** `.git` 名字级排除（实测 git ignored 集 `.git/` 0 条）。**必须缓存**（键取 `.git/index` mtime+size；成本实测两条 git≈0.4-0.6s/次）。
+- 新增 internal/panel/tree_test.go（约260-330）：合成真目录树／只读边界常驻钉／不跨 junction／截断四元组／问不到 git 就全扫自陈。
+- composer.go：顶层加 `files` 键（`*T`+omitempty，普查已证 omitempty 指针型顶层 key 不会让 pump_test 两条字节钉红＝新增红0枚）；⛔ 挂 composer.git.* 下（GitView 不在任何 pairs 名册＝没尺看着＝静默漂）。pump.go：`PumpSources.Files` reader。display_scrub_216.go：**文件名必须过 scrubForDisplay**（"A file name is somebody else's string"）。cmd/wisp/panel_pump.go：`fileTreeView()`；cmd/wisp/run.go 装配一行。
+- v1 **不做懒展开**（普查裁：本仓 depth2 只406节点一次推得起；懒展开进 panel.* 触 C17 三把尺+人工批准＝Q-76 第二枚，归机主另批）。
+- 越权三形分开（不是仓库/问不到/树太大）。树腿不接受面板传根。
+
+【C17】本形=快照内推、无新方法、⛔ 触 C17、⛔ 需人工批准（普查已证）。
+
+【禁区】⛔ 动 frontend/**·design/**；⛔ D34/PLAN/specs/thresholds/golden；⛔ 改 189 的 git.go 字段/⛔ 第二份 git 读面；⛔ 提交/推送/接受/回滚动作；⛔ 懒展开。
+
+【门禁】go build ./internal/panel ./internal/tools rc=0；go test -count=1 ./internal/panel（既有 4 枚已知红照实记不修，逐名见 docs/evidence/s1/197-subagent-carrier-r3.md:268-275）；gofumpt -l 你改的文件=空；sh scripts/d22scan.sh 纯净；gate-clauses 比名册（.scratch/wisp/probes/154/gate-clauses.sh，在册只 G6neg）。cmd/wisp 勿整跑。
+
+【纪律】只 commit 不 push；git add/commit 两处显式 pathspec（只点名你写的文件；⛔ -A/amend/reset/rebase/stash/checkout ./clean）；临时件 D:\tmp\wisp\20261104\190r1\ 只建不删。回报：逐枚改动＋门禁逐条读数＋已知红名册＋撞钉。
+模型：magpie / cline/cline-pass/deepseek-v4.1-flash-1017
