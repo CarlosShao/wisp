@@ -33,7 +33,7 @@
 ## 判据（草稿，逐格要 `file:line` 与正控）
 
 - [x] **AC#1 身份有唯一的铸造点**：`grep` 点数：改前生产铸造者＝0，改后 ≥1，且具名写出"会话结束"是哪一行代码在做什么。
-- [ ] **AC#2 三件套齐全**：**写**（答复"本会话内允许" ⇒ `approval_grant` 真有一行，带 session 身份＋工具＋模式＋创建时间）、**读**（下一次同类请求命中它 ⇒ **不再弹卡**）、**失效**（会话结束 ⇒ 同一身份查不到、行为回到"要问"）。三格各自有独立用例，⛔ **不许合并成一枚"持久化"用例**（`ticket90_persist_test.go` 文件头逐字"They are three test functions on purpose"）。
+- [x] **AC#2 三件套齐全**：**写**（答复"本会话内允许" ⇒ `approval_grant` 真有一行，带 session 身份＋工具＋模式＋创建时间）、**读**（下一次同类请求命中它 ⇒ **不再弹卡**）、**失效**（会话结束 ⇒ 同一身份查不到、行为回到"要问"）。三格各自有独立用例，⛔ **不许合并成一枚"持久化"用例**（`ticket90_persist_test.go` 文件头逐字"They are three test functions on purpose"）。
 - [ ] **AC#3 重启必失效**：进程重启 ⇒ 同类请求**重新弹卡**（这条是"永久免审通行证"的命）。
 - [ ] **AC#4 反控（正控！）**：种一条"派生式 session id 让授权跨会话仍生效"的假腿 ⇒ **AC#2／AC#3 至少一枚必须红**；如果三枚钉全绿而授权实际生效 ⇒ **本票判失败**，因为那正是 `store.go:19-27` 那段注释点名要挡的形状。
 - [x] **AC#5 不许把"长期"混进这一票**："长期／永久允许"落 `[fs] allowed_dirs`，见票 219 与批准记录 `A424`，**不是这张票的射程**。
@@ -88,3 +88,13 @@
 - 现跑傍证：go test ./internal/session -run TestTicket224 ⇒ ok(2.784s)；go vet ./cmd/wisp ⇒ 净。
 - ⚠ 本翻只动 AC#1；**AC#2/AC#3/AC#4 仍不翻**（核心执行链判据＋AC#3 真 OS 进程那发＝N#8③ 欠做；N#5 glob/N#7 写侧拒收/N#9 setter 待人），本票仍不加 -done。
 - **AC#1 证补正（同轮：上条 heredoc 未引号致三处反引号代码名被命令替换吞掉）**：正确应为——生产铸造调用＝cmd/wisp/run.go:561 的 sessID, err := session.Mint()；铸造函数＝internal/session/session.go:94 的 func Mint()；幻影用例＝cmd/wisp/ticket224_assembly_test.go:420 的 TestTicket224ProductionSessionDoesNotSurviveRestart。读数不变（session 测 ok 2.784s、vet 净、铸造点唯一）。
+
+### 2026-11-04 12:09 +08 编排者增量 — AC#2 裁决翻勾（非实现者；含变异自证）
+
+- **AC#2 成立 ⇒ 翻**。三件套各有独立用例（文件头 They are three test functions on purpose）：
+  - 写：内部 session TestTicket224RecordWritesOneRowPerAnswer ＋ 装配 cmd/wisp TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun。
+  - 读：TestTicket224CoveringMatchesItsOwnSession ＋ 装配 cmd/wisp TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking（live grant ⇒ bridge 不再问）。
+  - 失效：TestTicket224ExpiredOrRevokedRowIsNotLive ＋ TestTicket224CoveringDoesNotCrossToANewSession。
+- **反向判据（变异自证，编排者现跑）**：短路 gate.go:764 的 g.grants.Record 调用 ⇒ build OK、3 枚 approval 测 RED（TestTicket224AllowSessionRecordsEveryPathTheAnsweredCardNamed／TestTicket224ForgedSessionAnswerRecordsNothing／TestTicket224RecordingFailureReleasesTheCallButClaimsNoRow，报「GRANT-RECORDED grant_id=-1」却无行＝被捉）；还原后 git diff 空、测 ok(0.037s)。⇒「答复⇒落行」这一跳今天有真仪器（补上 224-v1 判不成立的那一格）。
+- 读跳只读 seam 已接：internal/tools/bridge.go:102 Grants GrantSource ＋ internal/session/grants.go:177 实现（gate.go:64 注释指此）。
+- ⚠ **AC#3 仍不翻**：其「真 OS 进程重启」那一半＝N#8③ 欠做（现 cmd/wisp TestTicket224ProductionSessionDoesNotSurviveRestart 的 JUDGEMENT CEILING 自述只证「同测试进程内二次装配铸新 key、读 0 行」，不证「第二个 OS 进程」）。AC#4/N#5 亦待。本票仍不加 -done。
