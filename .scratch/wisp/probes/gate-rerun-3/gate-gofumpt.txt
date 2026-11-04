@@ -1,0 +1,3 @@
+internal\agent\approval\pending_read.go
+internal\agent\tools.go
+gofumpt_rc=0 files=2

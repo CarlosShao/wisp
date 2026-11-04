@@ -1,0 +1,12 @@
+vet_rc[./internal/panel/]=0
+vet_rc[./internal/agent/approval/]=0
+vet_rc[./internal/winsec/]=0
+vet_rc[./internal/memory/]=0
+vet_rc[./internal/secret/]=0
+internal\tools\system_backend_windows.go:337:44: possible misuse of unsafe.Pointer
+internal\tools\system_backend_windows.go:355:32: possible misuse of unsafe.Pointer
+vet_rc[./internal/tools/]=1
+package github.com/CarlosShao/wisp/internal/risk
+	imports github.com/CarlosShao/wisp/internal/plugin from provenance_test.go
+	imports github.com/CarlosShao/wisp/internal/risk from command.go: import cycle not allowed in test
+vet_rc[./internal/risk/]=1

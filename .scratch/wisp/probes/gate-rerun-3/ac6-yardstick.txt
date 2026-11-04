@@ -1,0 +1,44 @@
+=== AC6 bad ruler, verbatim: grep -rn NewGate( --include=*.go internal cmd | grep -v _test
+hits_prod=0
+=== widened: whole repo incl tests
+0
+=== real thing: blacklist.go Gate definition
+77:func Gate(canonical string, bOverrides map[string]bool) PathDecision {
+func Classify(canonical string) Class {
+	c, _ := classifyWith(canonical)
+	return c
+}
+
+// Gate applies the blacklist policy to a canonical path. bOverrides maps the
+// normalized path of individually L2-confirmed B-tier files to true.
+func Gate(canonical string, bOverrides map[string]bool) PathDecision {
+	p := normPath(canonical)
+	cand := formsOf(canonical)
+	class, rule := classifyForms(cand)
+=== production call sites of risk.Gate(
+./internal/tools/mode.go:98:		d := risk.Gate(c, overrides)
+prod_callers=1
+=== test call sites of risk.Gate(
+./cmd/wisp/risk_sink_injected_337r2_windows_test.go
+./internal/agent/approval/ticket337_reason_reader_test.go
+test_files=2
+=== mode.go context
+	if b.paths == nil || len(raw) == 0 {
+		return n
+	}
+	overrides := b.confirmations()
+	for _, p := range raw {
+		c, err := b.paths.Canonicalize(p)
+		if err != nil {
+			n.Unresolved++
+			continue
+		}
+		d := risk.Gate(c, overrides)
+		switch d.Class {
+		case risk.ClassA:
+=== unwired.go line 81
+	{
+		path:    "risk.blacklist_overrides",
+		missing: "nothing populates the bOverrides map risk.Gate reads: ticket 90 gave Gate a production call site (internal/tools readBlacklist, which feeds the card and the security log), but the confirmations that would fill this map are minted only by an L2 answer, and that flow is ticket 21's approval queue",
+		lands:   "the contract defines a B-tier exemption as a runtime event - one L2 confirmation plus a log line (SPEC-06 sec 4.1), which lands with the approval queue, ticket 21; wiring a static pre-authorization instead would need D22 (ticket 80 AC#2), because a file on disk cannot have clicked anything",
+		fires:   func(c *Config) bool { return len(c.Risk.BlacklistOverrides) > 0 },

@@ -30800,3 +30800,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 234 是纯测量票(零产码、非假收口)。派 ClinePass 腿 gate-rerun-2 在当前 HEAD 3395dc217 重取 AC#1-6(前置 gate-rerun-1 已在旧 HEAD 015f6be1 全做过,读数是 5 周前的,须重取)。
 - 结果:部分完成——AC#1 基线名册(285 行)+ 变异 M1(票92)/M2a/b/c(票104)/M5a/b(票115) 的 red/restored 读数已落盘并 commit(.scratch/wisp/probes/gate-rerun-2/,含原始 -v 日志);未完成 M3(票110)/M4(票113 Docker)、AC#3 门禁 7 枚、AC#4 对比、AC#5 销账、AC#6(腿达轮帽死,final=null)。产码已还原(internal/ cmd/wisp 仅余一 .txt 临时件)。
 - 决策:不虚翻 234(6 格未勾、Status 未动)。产物保全入库;续跑待 gate-rerun-3 或编排者接续。
+
+## A1479（2026-11-04 13:09 +08，编排者）121轮：234 gate-rerun-3 部分完成(AC#3门禁+AC#6),保全
+- gate-rerun-3(ClinePass)续跑已落盘 AC#3 门禁读数 + AC#6 坏尺读数(gate-rerun-3/)。现 HEAD 门禁红三处口径:①gofmt/gofumpt 2 文件=CRLF/autocrlf 假红(gofmt-diff -/+ 同文,非真格式,第17处);②go vet ./internal/tools/ rc=1 system_backend_windows.go:337 unsafe.Pointer(真红/待核,非本票);③go vet ./internal/risk/ rc=1 provenance_test<->command.go import cycle(A1473 已见旧疾);④GOOS=linux undefined platformSystemBackend(跨平台缺口)。d22scan rc=0 clean,计数 internal/=348 cmd/=54(比旧 HEAD 增,不降)。
+- 未完成 AC#4/M3/M4/AC#5/table.md;腿达轮帽死(final=null)。产码还原。
+- 决定:不再派 flash 腿(连 gate-rerun-2/3 两腿均达轮帽死);改编排者自己接续收尾 234。不虚翻。

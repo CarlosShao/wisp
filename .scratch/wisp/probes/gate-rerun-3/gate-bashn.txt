@@ -1,0 +1,3 @@
+bashn_rc[scripts/winsec-tests.sh]=0
+bashn_rc[scripts/portable-tests.sh]=0
+bashn_rc[tools/d22scan/runtests.sh]=0

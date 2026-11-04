@@ -1,0 +1,16 @@
+# github.com/CarlosShao/wisp/internal/tools
+internal\tools\system_bridge.go:129:9: undefined: platformSystemBackend
+vetlinux_rc[./internal/panel/]=1
+# github.com/CarlosShao/wisp/internal/tools
+internal\tools\system_bridge.go:129:9: undefined: platformSystemBackend
+vetlinux_rc[./internal/agent/approval/]=1
+vetlinux_rc[./internal/winsec/]=0
+vetlinux_rc[./internal/memory/]=0
+vetlinux_rc[./internal/secret/]=0
+# github.com/CarlosShao/wisp/internal/tools [github.com/CarlosShao/wisp/internal/tools.test]
+internal\tools\system_bridge.go:129:9: undefined: platformSystemBackend
+vetlinux_rc[./internal/tools/]=1
+package github.com/CarlosShao/wisp/internal/risk
+	imports github.com/CarlosShao/wisp/internal/plugin from provenance_test.go
+	imports github.com/CarlosShao/wisp/internal/risk from command.go: import cycle not allowed in test
+vetlinux_rc[./internal/risk/]=1
