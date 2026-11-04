@@ -1,6 +1,6 @@
 # 29 — Memory system: L1 profile extraction, L2 explicit memory, feedback loop
 
-**Status:** **ready-for-review**（2026-10-28 编排者落 29-v1 裁决：LRU/Undo/排名/隐私四格翻；AC1 待装配、AC2 待 golden 链＝具名残余） ~~ready-for-agen~~
+**Status:** **done**（2026-11-04 编排者据 29-v1 非实现者裁 AC#1/AC#2 PASS 收口；A1526） ／ 历史：~~ready-for-review（2026-10-28 落 29-v1：AC1 待装配、AC2 待 golden 链＝具名残余）~~
 **Claimed by:** —
 **Last update:** 2026-09-19
 **Blocked by:** 04-sqlite-core, 10-agent-loop-core, 28-session-scope-warm
@@ -34,11 +34,11 @@ the data-ops APIs the privacy page (40) will render.
   grants (RESERVED).
 
 ## Acceptance criteria
-- [ ] Latency-isolation test: extraction runs post-response; first-token latency unchanged
-> 〔29-v1：⛔ 翻——主机端 `Hooks{}` 未赋 `WarmWindow`（resident_voice_engines_windows.go:439）＝待装配〕
+- [x] Latency-isolation test: extraction runs post-response; first-token latency unchanged
+> 〔2026-11-04 收口：`Hooks{WarmWindow}` 已装配（resident_voice_engines_windows.go:499），AC#1 落 f92e4b177、29-v1 非实现者 PASS〕
       (statistical assertion vs baseline).
-- [ ] Golden extraction set: 10 scripted conversations → expected profile slots/values;
-> 〔29-v1：⛔ 翻——缺口＝C5 golden SSE 注入链（10 剧本×slot 对值）；impl 谈 batch-commit＝答非所问〕
+- [x] Golden extraction set: 10 scripted conversations → expected profile slots/values;
+> 〔2026-11-04 收口：10 枚 golden SSE→真 C5 适配器→L1Extractor 真链，AC#2 落 bbe7e2bee、29-v1 PASS（反向牙 zh→zg 反转红）〕
       batch-commit produces one prompt-cache invalidation per task (not per fact).
 - [x] LRU: 21st fact evicts oldest + log line + flash reflects what was evicted... (flash on
       SAVE; eviction visible in log + panel later) — assert log.

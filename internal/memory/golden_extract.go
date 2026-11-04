@@ -5,14 +5,14 @@ package memory
 // CONTRACT; the fixture is testdata/golden_extract.json (embedded below); the
 // comparison test is golden_extract_test.go.
 //
-// Why this is not decoration: the L1 extraction pipeline is NOT wired yet
-// (29-v1: the host never assigns Hooks.WarmWindow, and no C5 LLM call feeds
-// profile upserts). Without a pinned target, the future wiring leg would pick
-// expected slots AFTER seeing what its code produces, which proves nothing.
-// The golden set pins the target first: for each of the 10 scripted
-// conversations, exactly which slots must land, with exactly which content.
-// The wiring leg then gets a real target to shoot at instead of writing the
-// test to match its own output.
+// Why this is not decoration: the L1 extraction pipeline is now wired (ticket
+// 29 AC#1/AC#2 landed: the host assigns the session WarmWindow hook and a real
+// one-call-per-task C5 LLM chain feeds profile upserts). The golden set was
+// pinned BEFORE wiring so the wiring leg had a fixed target instead of one
+// written to match its own output. For each of the 10 scripted conversations,
+// exactly which slots must land, with exactly which content, is pinned in the
+// fixture; newGoldenExtractor() now drives the REAL chain over replayed golden
+// SSE, and the comparison test still judges against this contract.
 //
 // How the real chain got swapped in (landed with the AC#2 leg):
 //
