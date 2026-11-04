@@ -593,6 +593,15 @@ func runResident() {
 			src.run.voiceTurnTools = rv.noteTurnToolCalls
 		}
 		rv.attachProvenance(prov)
+		// Ticket 29 AC#1: the L1 extraction pipeline. Without this line the
+		// session's WarmWindow hook has no body in the whole process -
+		// which is exactly the gap the ticket's 29-v1 ruling named ("主机端
+		// Hooks{} 未赋 WarmWindow"). It is assembled from the SAME store and
+		// the SAME C5 chain this boot built (src.run), and the runtime keeps the
+		// window so execute() can record each finished task's conversation.
+		if src != nil && src.run != nil {
+			rv.attachMemoryL1(src.run)
+		}
 		// Ticket 26's one needle (26r3): the announce path now drives the capture
 		// leg's half-duplex gate. The gate was mounted in assembleCapture (PathT,
 		// WithStartMuted(mic_muted_default)); before this line its SetSpeaking had

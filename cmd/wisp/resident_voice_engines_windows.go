@@ -58,6 +58,7 @@ import (
 	"time"
 
 	"github.com/CarlosShao/wisp/internal/audio"
+	"github.com/CarlosShao/wisp/internal/memory"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/session"
 	"github.com/CarlosShao/wisp/internal/speech"
@@ -340,6 +341,15 @@ type voiceResidency struct {
 	// the FEED - what reaches the agent - and the evidence table says exactly that
 	// (see the 采集门 row) instead of claiming a device close it did not do.
 	onMicClose func()
+
+	// l1Warm is ticket 29 AC#1's L1 extraction entry: the body assigned to
+	// session.WarmWindow. It is a plain function value because the work it
+	// starts is memory's (memory.L1WarmWindow.Fire: spawn the memory-extract
+	// goroutine, never block the hook); this leg only owns the WARM TRANSITION
+	// that fires it, which is why the seam is here and not in internal/memory.
+	// nil = this process has no extraction pipeline (a boot with no C5 chain or
+	// no store), and the hook then does nothing at all.
+	l1Warm func()
 }
 
 func newVoiceResidency(plan voicePlan, queue *voiceOwnerQueue, clock session.Clock) *voiceResidency {
@@ -481,6 +491,12 @@ func (r *voiceResidency) openScope(reason string) (*session.Scope, error) {
 			r.settle.markFellBack()
 			freeOSMemoryNow()
 		},
+		// Ticket 29 AC#1: the Warm window is where L1 profile extraction runs.
+		// The body is a method, not a closure over a memory object, so the
+		// assignment above reads as "this session's Warm window is this leg's
+		// warm entry" and a process that attached no pipeline stays nil here
+		// instead of carrying a no-op that looks wired.
+		WarmWindow: r.warmWindow,
 	}
 	return session.NewScope(session.ScopeOptions{
 		Loader: r.loader,
@@ -491,6 +507,88 @@ func (r *voiceResidency) openScope(reason string) (*session.Scope, error) {
 		// means its default (90 s).
 		WarmTimeout: r.plan.WarmTimeout,
 	})
+}
+
+// attachL1Warm installs ticket 29 AC#1's L1 extraction entry on this residency.
+// The value is the memory pipeline's own Fire: the scope's WarmWindow hook calls
+// it when the session lands in Warm, and Fire hands the batch to the
+// memory-extract roster goroutine without blocking the hook (the scope's own
+// contract: the scope never waits for the work).
+func (r *voiceResidency) attachL1Warm(fire func()) {
+	if r == nil || fire == nil {
+		return
+	}
+	r.mu.Lock()
+	r.l1Warm = fire
+	r.mu.Unlock()
+}
+
+// warmWindow is the session WarmWindow hook body: call whatever the assembly
+// root attached (ticket 29's L1 extraction today), or do nothing when this
+// process assembled no pipeline. It runs on the voice owner goroutine and must
+// return immediately; the pipeline owns its own goroutine.
+func (r *voiceResidency) warmWindow() {
+	if r == nil {
+		return
+	}
+	r.mu.Lock()
+	fire := r.l1Warm
+	r.mu.Unlock()
+	if fire == nil {
+		return
+	}
+	fire()
+}
+
+// attachMemoryL1 assembles ticket 29 AC#1's L1 extraction pipeline out of the
+// SAME objects this boot already built - the runtime's store (the one every DAO
+// call writes through) and the FIRST element of the runtime's C5 chain - and
+// hands its Fire to the residency's Warm hook above. No new global, no second
+// provider, no second store.
+//
+// Every refusal is a named problem, never a silent skip: a process that cannot
+// extract must say so, because "the profile never learns anything" and "the
+// profile is not wired" look identical from the user's side.
+func (rv *residentVoice) attachMemoryL1(run *agentRuntime) {
+	if rv == nil || rv.residency == nil || run == nil {
+		return
+	}
+	if run.store == nil {
+		rv.noteProblem("记忆抽取未装配：本进程没有存储，L1 抽取没有提交面")
+		return
+	}
+	prov, model := run.L1Provider()
+	if prov == nil {
+		rv.noteProblem("记忆抽取未装配：本进程没有 C5 链，L1 抽取没有模型面")
+		return
+	}
+	ex, err := memory.NewL1Extractor(prov, model, memory.WithL1Logf(func(format string, args ...any) {
+		slog.Debug("voice[memory]: " + fmt.Sprintf(format, args...))
+	}))
+	if err != nil {
+		rv.noteProblem("记忆抽取未装配：" + err.Error())
+		return
+	}
+	pipe, err := memory.NewL1Pipeline(run.store, ex, memory.WithL1PipelineLogf(func(format string, args ...any) {
+		slog.Debug("voice[memory]: " + fmt.Sprintf(format, args...))
+	}))
+	if err != nil {
+		rv.noteProblem("记忆抽取未装配：" + err.Error())
+		return
+	}
+	warm, err := memory.NewL1WarmWindow(pipe, memory.WithL1WarmLogger(slog.Default()))
+	if err != nil {
+		rv.noteProblem("记忆抽取未装配：" + err.Error())
+		return
+	}
+	// The runtime keeps the window so execute() can hand it the finished task's
+	// conversation (post-response), and the residency keeps only the hook body.
+	// Both halves are therefore the same object, which is what makes "recorded"
+	// and "extracted" one pipeline instead of two lookalikes.
+	run.memoryL1 = warm
+	rv.residency.attachL1Warm(warm.Fire)
+	slog.Info("voice: L1 记忆抽取已接到 Warm 窗口（票 29 AC#1）",
+		"model", model, "goroutine", "memory-extract", "store", "runtime")
 }
 
 // acquireTurn returns the engine for one turn, loading it only when the epoch is

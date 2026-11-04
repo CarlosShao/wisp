@@ -334,6 +334,19 @@ type agentRuntime struct {
 	// legacy notification + announce path below for every shape - which is the
 	// CLI's shape, since only the resident assembly wires one.
 	presenter *present.Dispatcher
+	// memoryL1 is ticket 29 AC#1's L1 profile extraction warm window. It is
+	// assembled by the RESIDENT assembly root (resident_voice_engines_windows.go's
+	// attachMemoryL1) out of the SAME store and the SAME C5 chain this runtime
+	// built, because the Warm window belongs to a live session and the CLI has
+	// none. nil on the CLI: then no conversation is recorded and nothing pretends
+	// an extraction pipeline exists.
+	//
+	// The two halves are deliberately on different goroutines: execute() only
+	// RECORDS the finished task's conversation here (post-response, no C5 call,
+	// no DB write), and the session Warm hook calls Fire() on the voice owner's
+	// goroutine, which spawns the "memory-extract" roster goroutine. That split
+	// is what the AC#1 latency test asserts.
+	memoryL1 *memory.L1WarmWindow
 	// provs is the built provider chain, kept for the probe path.
 	provs    []llm.LlmProvider // built chain, kept for the probe path
 	names    []string
@@ -1684,6 +1697,19 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	// for a root row and only subagent rows carry a D43 name.
 	rt.tasks.MarkRoot(bg.ID, task)
 	res := bg.Wait()
+
+	// Ticket 29 AC#1: hand the FINISHED task's conversation to the L1 extraction
+	// warm window. The placement is the requirement: it is after the task
+	// returned its answer and before anything is presented, and the call itself
+	// does no C5 call and no database write (memory.L1WarmWindow.Record copies
+	// the turns and returns), so it cannot delay a token of this response and it
+	// cannot be the extraction either. The extraction runs when the session lands
+	// in Warm - the voice leg's announce-end entry, after the result was spoken -
+	// where the hook calls Fire(). A process with no session (the CLI) has no
+	// warm window and records nothing.
+	if rt.memoryL1 != nil {
+		rt.memoryL1.Record(memoryConversationFromHistory(res.TaskID, loop.History()))
+	}
 	_, why := (tools.TaskBackfill{
 		Roster: rt.tasks,
 		Spills: agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets()),
@@ -1876,6 +1902,57 @@ func costLine(res agent.Result) string {
 	return fmt.Sprintf("%d micro-%s（in %d / out %d tokens）",
 		res.CostMicros, orDefaultS(res.Currency, "CNY"),
 		res.Usage.InputTokens, res.Usage.OutputTokens)
+}
+
+// L1Provider is the C5 seam ticket 29 AC#1's extraction call runs on: the FIRST
+// element of the chain this boot built (the same provider object every task
+// dispatches through, not a second one invented for extraction). The model id
+// comes from the resolved endpoint for the same reason - a chain element and a
+// model id that disagree would make the extraction bill against a model the
+// provider was not built for.
+//
+// A nil provider is the honest "this boot has no C5 chain" answer, and the
+// resident assembly refuses to wire extraction on it (attachMemoryL1) instead of
+// failing once per Warm window.
+func (rt *agentRuntime) L1Provider() (llm.LlmProvider, string) {
+	if rt == nil || len(rt.provs) == 0 {
+		return nil, ""
+	}
+	return rt.provs[0], rt.endpoint.Model
+}
+
+// l1ConversationTurns bounds how much of the finished task's history is carried
+// to the warm window. The extractor trims to its own window anyway; this bound
+// is about not holding a whole tool-heavy transcript in memory between the
+// response and the Warm entry.
+const l1ConversationTurns = 40
+
+// memoryConversationFromHistory maps the loop's finished conversation into the
+// extraction seam's transcript (memory.GoldenConversation - the same shape the
+// golden fixture is written in). Only user and assistant text is carried: tool
+// messages are not facts about the user, and image parts carry no text.
+func memoryConversationFromHistory(taskID string, hist []llm.Message) memory.GoldenConversation {
+	conv := memory.GoldenConversation{ID: taskID}
+	for _, m := range hist {
+		if m.Role != llm.RoleUser && m.Role != llm.RoleAssistant {
+			continue
+		}
+		var b strings.Builder
+		for _, p := range m.Content {
+			if tp, ok := p.(llm.TextPart); ok {
+				b.WriteString(tp.Text)
+			}
+		}
+		text := strings.TrimSpace(b.String())
+		if text == "" {
+			continue
+		}
+		conv.Turns = append(conv.Turns, memory.GoldenTurn{Role: string(m.Role), Text: text})
+	}
+	if len(conv.Turns) > l1ConversationTurns {
+		conv.Turns = conv.Turns[len(conv.Turns)-l1ConversationTurns:]
+	}
+	return conv
 }
 
 // printCompressionTrace writes the compression line to w and reports whether it
