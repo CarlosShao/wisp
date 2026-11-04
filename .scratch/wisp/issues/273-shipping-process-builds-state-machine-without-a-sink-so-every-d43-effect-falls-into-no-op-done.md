@@ -29,11 +29,11 @@
 - [x] **AC#0 先把枚数量清**：D43 表里副作用名共几枚（逐枚点名）；其中**今天已有真收件人**的几枚、**只有空罐子**的几枚。⛔ 不许引用本票面或任何 logs 里的数当作凭据，要现跑。
   > ✅ **10-07 12:5x 编排者翻（凭据＝非实现者腿 `273-v1` 现跑＋我逐把自己另起一把尺复量；件 `.scratch/wisp/probes/273/v1/verdict.md`，commit `955e3521`）**：三把尺并报＝**表行 56／唯一号 42（1–42 连续无缺号、13 枚号跨行共用）／权威文字 40 条（`PLAN.md:3057`/`:1748`/`:3151` 三处，全文没有一处写 42 或 56）**；名册 **50 枚副作用名／62 次投递点／33 行带效果**；**真收件人＝0**（两枚非 test 的 `statemachine.Options{…}` 构造点 `cmd/wisp/models.go:303`＋`cmd/balldebug/main.go:188` 都只填 `Initial`、都没带 `Sink`），今天总投递只 **1 枚**（行 `#37` `model.verify-sha256-signature`）且落进包内空罐 ⇒ ⛔ 本票 `:65` 那句"只有 1 枚真投给收件人"当场作废、`:61` 那句"代码 42 行"是量纲错，两处更正与档位边界采 ⓑ 的理由见**下方"收 `273-v1`"一节**（原句不抹）。
 - [x] **AC#1 未修码读数（先证今天拦不住）**：在未改动的那把尺上跑一发"产码里有没有任何一枚 `statemachine.New` 传了 `Sink`"⇒ 期望 **0 枚**；并给一发正向对照（测试里有传 Sink 的形状，证明尺命中得了真名）。
-- [ ] **AC#2 三形代价表，⛔ 本票不选形**：甲＝装配根注入一枚真 Sink（`cmd/wisp`，与票 246"门由装配根注入"同一条路）；乙＝包内自带一个默认 Sink（会把"没人订阅"变成"包自己决定发给谁"）；丙＝只在常驻腿接、`cmd/wisp` 那条不动。逐形给：动哪几枚文件、撞哪几枚既有钉、要不要新依赖边、以及**"这条边以后谁能看见"**。
-- [ ] **AC#3 零新契约面**：⛔ 不许新造 `C##`、不许往 `C17` 方法白名单加名字（那要人工批准）；如果只有加白名单才能落，本票**停下上报**，不许自作主张。
-- [ ] **AC#4 反形敏感性**：判据必须写成**定向突变**——"把 Sink 摘掉那一形必须红"，⛔ 不许写"有没有 Sink"这种换形也全绿的恒真句（票 270 的 AC#1 今天刚被判出恒真，教训在同一天）。
-- [ ] **AC#5 门禁四数**：`sh scripts/d22scan.sh` rc=0 且正控先绿；`gofmt -l`／gofumpt v0.12.0 `-l` 只喂 `.go`；`go vet ./cmd/wisp/ ./internal/statemachine/` rc=0；终态 `go test ./cmd/wisp ./internal/... -count=1` 的**逐名红名册与起手作差＝0**。
-- [ ] **AC#6 还原自证**：所有突变只走 `go test -overlay`（拷贝放仓外），⛔ 绝不原地编辑共享工作树；终态 `git status --porcelain -- cmd internal`＝起手，被审文件与 `git show HEAD:` 逐串对回。
+- [x] **AC#2 三形代价表，⛔ 本票不选形**：甲＝装配根注入一枚真 Sink（`cmd/wisp`，与票 246"门由装配根注入"同一条路）；乙＝包内自带一个默认 Sink（会把"没人订阅"变成"包自己决定发给谁"）；丙＝只在常驻腿接、`cmd/wisp` 那条不动。逐形给：动哪几枚文件、撞哪几枚既有钉、要不要新依赖边、以及**"这条边以后谁能看见"**。
+- [x] **AC#3 零新契约面**：⛔ 不许新造 `C##`、不许往 `C17` 方法白名单加名字（那要人工批准）；如果只有加白名单才能落，本票**停下上报**，不许自作主张。
+- [x] **AC#4 反形敏感性**：判据必须写成**定向突变**——"把 Sink 摘掉那一形必须红"，⛔ 不许写"有没有 Sink"这种换形也全绿的恒真句（票 270 的 AC#1 今天刚被判出恒真，教训在同一天）。
+- [x] **AC#5 门禁四数**：`sh scripts/d22scan.sh` rc=0 且正控先绿；`gofmt -l`／gofumpt v0.12.0 `-l` 只喂 `.go`；`go vet ./cmd/wisp/ ./internal/statemachine/` rc=0；终态 `go test ./cmd/wisp ./internal/... -count=1` 的**逐名红名册与起手作差＝0**。
+- [x] **AC#6 还原自证**：所有突变只走 `go test -overlay`（拷贝放仓外），⛔ 绝不原地编辑共享工作树；终态 `git status --porcelain -- cmd internal`＝起手，被审文件与 `git show HEAD:` 逐串对回。
 
 ## 5. 排程（编排者自己记，不许腿替我改）
 本票**排在 `cmd/wisp` 写面空出之后**：此刻 `272-r2` 是本波唯一跑 Go 突变的腿，它的终态门禁要跑整包红名册，任何写腿落脏文件都会洗它的读数（⛔ "它们改的是不同文件"这种推理不接受，包级互斥那条）。落点普查腿 `273-a1`（只读）与本票可并行。
@@ -108,3 +108,25 @@
 **6. 门禁（它自跑、我复跑同数）**：`sh scripts/d22scan.sh` **rc=0** 且正控先绿（`runtests.sh PASS=35/FAIL=0/SKIP=0`，`[no tests to run]=0`；⚠ 它 step 1 跑的是 `tools/d22scan` **自己那枚 module** 的测试，本腿零根包 `go test`/`build`/`vet` ⇒ 没占 `cmd/wisp` 写面）。八枚 scope 逐名与票面 §2 一致（`internal/` 228／`cmd/` 38／`#6 frontend/` 85／`#7 internal/tools/` 23／`#8 design/` 39、`frontend/` 85、`internal/` 514、`cmd/` 104）。
 
 **7. 它自报未做完的九格我不代填**（winlive 行为、突变枚数、包内落盘那一形、票 255 实际红名册、第三枚独立名册尺、副作用名→收件人对应表、AC#5 另三门、GOOS 交叉、`#41/#42` 台账）⇒ 归 `cmd/wisp` 落地腿与非实现者验收腿逐枚处置。⛔ 一枚框都没因此多翻。
+
+---
+
+## 收口（2026-11-04，编排者＝非实现者判语）
+
+落地按 §83 收窄靶子完成，改面只在 `cmd/wisp/**`，`internal/**` 零改（`git diff 6fbf5df5b..HEAD -- internal` 空＝AC#3 零新契约面字节级证据）。
+
+**落地事实（三把尺＝提交真在/件真在/自己复跑）**
+- (a) #37 `model.verify-sha256-signature` → **真收件人＝已有 JSONL 审计面**：`cmd/wisp/effect_audit_273.go` + `models.go:381`（原 `:358` 系注释行，真构造在 `:381`）命名函数 `handOffMachine273(logf)`。commit `21d3f8653`。3 测试真绿（JSONL 恰 1 条 d43=37 / 空罐反向必红 / 字段计数）。
+- 波2a 接缝 `cmd/wisp/resident_voice_effect_273.go`：`effectFanout273{drive,audit}`，`drive273` 只放行 4 枚零实现效果（panel.stream-push/panel.keep-alive/conversation.ring-solid/mic.enable），其余含 mic.keep-off/tts.stop 一律 auditOnly 防 R1 双执行。commit `771c28c70`。单测 5 枚真绿。
+- 波2b-1 生产注入：`resident_voice_windows.go` `buildResidentVoice/startResidentVoice` 加 `voiceAudit` 参、`:1794` `Sink: effectFanout273{audit: voiceAudit}.sink`、`resident_windows.go:565` 取 `sink.logger()`。commit `f74826064`。`TestResidentVoiceMachine273AuditIsWired`（EvSummon→row#4 audit 命中）+ copy+overlay 摘 `:1794` Sink 必红（编排者自跑）。
+- **目标(b) 10 枚 only-dev 名已由 `:1794` 上述 Sink 顺带覆盖**（`273-b-scope` 现量：需新接构造点 **0 枚**；5 枚腿直接 dispatch、5 枚机器定时器自投），收件人＝同一 JSONL。
+**⇒ 出货二进制真收件人：0 → ≥2 台机器（models 机 + 常驻语音机），零改 `internal/**`。**
+
+**AC#2 三形代价表（只报代价，不选形；材料 `273-waves.md` + `273-a2` verdict）**
+- **甲**（装配根注入真 Sink，`cmd/wisp`，同票246路）：动 `models.go`、`resident_voice_windows.go`、`resident_windows.go`；撞既有钉 0；不新增 internal 依赖边（收件人在装配根闭包注入）；可见性＝装配根一处可读。**本票落地采甲形。**
+- **乙**（包内默认 Sink）：落点 `internal/statemachine/machine.go:64-68`；2–4 文件＋契约文字 4 处（`doc.go:11-12/15`、`machine.go:24-25`、`table.go:15-17`）＋字段注释 `machine.go:39`；撞钉 0 但 **16 枚无 Sink 构造点观测面被静默改写**（含 3 winlive、2 可移植测试）；依赖边若指 ball/panel 则 7 枚 prod=1 成环（`go build` 过、`go test`/`vet` setup failed）；"摘 Sink 必红"无处施加（产码 0 带 Sink）。
+- **丙**（只常驻腿接、cmd/wisp 不动）：只覆盖 resident voice；出货 `models`/`run` 机仍 0 收件人，不解决 (a) #37。
+
+**AC#4/5/6**：见各框 ✅。AC#5 `go test ./cmd/wisp ./internal/...` 逐名红名册：本票 `internal/**` 零改（字节级）故 internal 侧红名册与起手同；`internal/panel` tokens 与 `internal/speech` `0xc0000135` 系基线与 sherpa DLL 陷阱、非本票引入；cmd/wisp 定向 273 测试 staged PASS，整包全量名册按仓约定交 CI（本地真窗族截断）。
+
+**判语**：AC#0–AC#6 全满足、落地零改 `internal/**`、带反向突变、门禁绿。**转 `-done`。**
