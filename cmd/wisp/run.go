@@ -906,6 +906,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Mode:      rt.modes.PermissionMode,
 		Workspace: rt.workspaceView,
 		Git:       rt.gitView,
+		Files:     rt.fileTreeView,
 		Model:     rt.currentModel,
 		// Ticket 248 AC#2's reader: it asks the settings leg, which asks the store
 		// whether a reference has a blob behind it. What comes back on the wire is a

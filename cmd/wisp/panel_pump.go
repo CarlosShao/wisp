@@ -277,6 +277,20 @@ func (rt *agentRuntime) gitView() panel.GitView {
 	return panel.ReadGitForWorkspace(rt.workspaceView())
 }
 
+// fileTreeView 报工作区只读文件清单（票190），与 gitView 同一 workspace 坐标。
+//
+// The coordinate is read off the same WorkspaceView gitView consumes
+// (.Canonical) instead of resolving "where am I" a second time: panel's reader
+// takes a bare string, while WorkspaceRoot() returns the C26 account. An unset
+// view leaves Canonical empty and the reader renders its own "no workspace"
+// state rather than this leg inventing a scope.
+func (rt *agentRuntime) fileTreeView() panel.TreeView {
+	if rt == nil || rt.paths == nil {
+		return panel.ReadFileTree190("")
+	}
+	return panel.ReadFileTree190(rt.workspaceView().Canonical)
+}
+
 // currentModel reports the model id this boot really resolved for its text role.
 //
 // The source is the single endpoint the runtime built (run.go:308 assigns it,
