@@ -31010,3 +31010,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 189 功能已收（impl e1345b0a0／verdict 189-ac-verdict.md／AC#2-6 勾／A1487），但树里票仍原名 ⇒ 被下轮扫描误当 open 候选（重派风险）。
 - 修：git mv 189→-done；Status ready-for-agent→done（原句留痕）；双名核=1。AC#1 只读设计核归 189-a1 件不代勾（照 v1 原判）。
 - 教训：收口 commit 必须同时 git mv ＋ 旧新名两字面 pathspec ＋ 落账后现跑双名核。
+
+## A1516（编排者）159轮：361 现量更新＋AC#1 裁形=乙
+- attrib.sh --tracked-only 现仅 2 枚脏（pending_read.go/tools.go）；经 blob vs worktree gofumpt 比：blob 干净/worktree 脏/core.autocrlf=true ⇒ 纯 CRLF 假红，现 0 枚真脏（票面 20 枚真脏已随 HEAD 修掉）。
+- AC#1 裁形=乙（attrib.sh 本机按入库 blob 读，同格式门禁口径）；AC#2 实现下次，须保 --self-test 正控＋真脏 blob 点名。

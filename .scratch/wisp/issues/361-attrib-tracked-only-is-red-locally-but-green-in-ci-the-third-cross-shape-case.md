@@ -77,3 +77,8 @@
 ## Progress log
 
 - [2026-10-22 16:3x +08] agent=`编排者` did=立案（来路＝`227-v1` 第 6 项；★票面写明"本机尺与 CI 尺不同形第 3 例"、并列前两例）next=派 `361-a1` 只读腿。
+
+## 159轮现量更新（编排者，HEAD 12d3ae7f2）——票面前提再次收窄
+- 现跑 `.scratch/wisp/probes/161/r5/attrib.sh --tracked-only` rc=1，仅 **2 枚**脏：internal/agent/approval/pending_read.go、internal/agent/tools.go（票面旧 35/20/15 已随 HEAD 演进）。
+- 判真脏 vs 假红：两文件对 **HEAD blob 的 gofumpt -l=0（干净）、对 worktree=1（脏）**，core.autocrlf=true ⇒ **纯 CRLF 假红**（worktree 被 autocrlf 转 CRLF，gofumpt 读 worktree 误判；CI 读 LF blob 故绿）。⇒ 当前 **0 枚真脏**（票面「20 枚真脏」那一半在现 HEAD 已不成立/随历史修掉）。
+- AC#1 裁形（编排者拍，按铁律最有价值/主流）＝**〔乙〕**：让 attrib.sh ruler_a 本机也按**入库 blob** 读（与格式门禁裁定同口径），⛔ 不选只写「不可判」的〔甲〕。AC#2 实现下次（须保 --self-test 正控仍红、真脏 blob 仍被点名）。AC#0 ③正控/④archive 对照待实现同程补。
