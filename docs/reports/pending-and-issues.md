@@ -30875,3 +30875,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 判：AC#1-6 成立。独立只读核验腿 190-verify-min 现跑 build panel+tools+cmd-wisp rc=0／Tree190 6/6 PASS／vet rc=0；d22scan clean。panel 整包红=2 照实记：C21（既有，父提交正控证非本票）＋TestComposerContractTypesMatchFrontend（Go 出 files 键、frontend/src/lib/panel.ts 未声明＝181/197/248 先例的契约移动正常刻度，页侧归 owner UI 腿）。件 docs/evidence/s1/190-ac-verdict.md。
 - 遗留（诚实）：①文件名 scrub＝census 硬化项、AC 未点名、本波未接（登记硬-化遗留）②页侧 frontend/src/lib/panel.ts ComposerState 需声明 files 键（owner 外部 UI agent）。
 - 方法论：微粒细胞法破 flash 大活 dud——单件/单一文件/内联规格的小腿稳定成（190 全程 8 commit 多由小腿落地，编排者亲补关键 AC#4 判据）。
+
+## A1492（编排者）134轮：188 普查＝归口197/已实现，仅缺 AC#2-e 根行状态生产者
+- 188-a1 普查（226 行件 docs/evidence/s1/188-a1-census.md，commit 3ab2e9d4a）：子代理/后台任务两堆共用 panel.TaskRosterState（197 subagent_roster_197.go:94 ← cmd/wisp/panel_pump.go:191 taskRosterState ← rt.tasks），rows 按 kind 分 subagent/root；状态词/池数/流截断/streamKey 全在，不需新读面。AC#1-3 已覆盖/归口197；唯一缺 AC#2-e 生产者：MarkRoot 不写状态(task.go:349-357)、TaskBackfill 没带 State(run.go:1674-1677) ⇒ 根行恒 statusKnown=false。
+- 落点仅 cmd/wisp/run.go execute() :1666-1680。甲(终态≈6-8行,不红)/乙(运行态+终态≈18-24行,会红 subagent_carrier_197_test.go:317-327 的"根行状态必须空"钉,需具名改判)。C17 不加方法、不加顶层 key。
+- 铁律取乙（运行态+终态更有价值：任务监控须显示"进行中"）：需 A## 具名改判 197 的"根行状态必须空"钉为"根行可带状态 Thinking→终态"。188-r3 落 cmd/wisp（共享面）+改 197 测试，需精细手（flash 跨文件易错），下轮精细派/亲做。
+- 附带纠正：TestComposerContractTypesMatchFrontend 现红句＝"Go ComposerState emits [files]"(＝190 新键,页侧待 UI 腿)；tasks/instructions 页侧已声明。C21 现红因＝c21-native-tokens.md 表 3 字段在 ball/tokens.go 找不到（非 tokens.css 删）。
