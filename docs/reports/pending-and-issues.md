@@ -30925,3 +30925,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 五动作 list/search/rename/archive/unarchive 落地 cmd/wisp/sessions.go(+r1a/r1b/r1c)；sessions_test.go 320 行两用例绿，编排者亲跑 `go test ./cmd/wisp -run TestSessions`=ok rc=0；反向三读数(注case→仅对应用例红/还原双绿/基线绿)。commit 1b4b607aa/f98cbce41/fb27a8843/ae2ab606d。裁决件 docs/evidence/s1/364-ac-verdict.md。AC#0-4 全翻。
 - ★关键发现：`go test ./cmd/wisp -run <Test>` **不死区**（-run 只跑匹配用例避开窗口族，有完整判决）；整包仍死区。
 - ★系统性问题（Q 提机主）：path-budget 因「长票名+`-done`后缀+165 路径预算(self-hosted runner)」三方撞而红——273/403 的 -done.md 超预算、roster 漂 62vs64(128/175 落榜)。选①维护 roster(补 273/403 剔 128/175) 还是②长名票收口改短别名(改约定)？⛔ 我擅改 gate 数据。
+
+## A1501（编排者）146轮：378 定位为下一净设计核件；AC#0①③静态已取，②④fkc 待实跑
+- 378（子环路不写 task_log⇒task.spawn 子任务 tool_call 无父；孤儿第二类源；票373 管第一类）：与 364 同构(AC#0只读→AC#1裁形→AC#2写腿+牙+fkc=0+反向)；纯 internal(run.go/subagent_197/agent/loop/memory)，无 Blocked-by ⇒ 净件。
+- 本轮：378-a1 普查腿 dud(flash 对含运行测量 fkc 的普查不稳, 返 null 零落盘)。编排者亲取静态 AC#0①③：子环路 Journal=nil 根在 run.go:1521(base opts Journal:nil)→rt.loopOpt(:1547)，root 走 :1578 loopOpts.Journal=rows，子代理复制 rt.loopOpt=Journal nil。代价面 dao_tasklog.go:95/privacy.go:170/retention.go。落部分件 docs/evidence/s1/378-a0.md。
+- 待：新鲜上下文补 ②④ fkc 实跑(发 task.spawn 量 PRAGMA foreign_key_check) → 裁 AC#1 → 378-r1 写腿。
+- 候选扫描本轮结论：138 blocked(Q-55)、167 排145后、361 牵连 path-budget 系统红+20枚blob脏另立票、135 死区AC#6+Blocked-by-130、182 只读普查喂 gated145 ⇒ 均非净件；378 是唯一净件。
