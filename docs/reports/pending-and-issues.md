@@ -30985,3 +30985,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 机制勘查：loop→journal.go:137-145 finishTask→taskLifecycleJournal.FinishTaskLog(inert run.go:1324-1328)；root 由 run.go:1742 闭、child 无闭点⇒恒 running。
 - 裁 Option A（最有价值/主流：环路拥有自己 task 行 lifecycle）：FinishTaskLog 写终态+rowFinished；run.go:1742 加 guard 防 root 双写。
 - 未实现（上下文近枯，勿半成品动 run.go）。378 已收口(27张)；本轮纯勘查推进 405。
+
+## A1511（编排者）155轮：405 实现 Option A（FinishTaskLog 写终态）＋真牙，待 v1 裁
+- run.go taskLifecycleJournal.FinishTaskLog inert→store.FinishTaskLog 写终态；tasklog_fkcheck_378_test.go [B] 段升级为断言子行 state==done。
+- 修后 e2e ok 0.285s/Test233 ok 2.600s/build rc0/gofumpt 空；反向（改 inert）⇒ e2e 红 state=running want done。
+- 待 405-v1 非实现者裁定收口。

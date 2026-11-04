@@ -33,3 +33,8 @@
 
 ## Progress log（续）
 - [2026-11-04] agent=编排者 did=AC#1 裁形=Option A + 勘查 loop/journal/run.go 关闭三处机制。
+
+## 实现（编排者 2026-11-04，待 v1 非实现者裁）
+- AC#1 已落 Option A：run.go taskLifecycleJournal.FinishTaskLog 由 inert 改为调 store.FinishTaskLog 写终态（5s bound，同 StartTaskLog 风格）。root 双写值等价幂等（loop finishTask 与 run.go:1742 同源 cost）。
+- AC#2 牙：把 cmd/wisp/tasklog_fkcheck_378_test.go 的 [B] 段由「只记录不断言 state」升级为断言 childRow.State==done。修后 e2e ok 0.285s、Test233 ok 2.600s、build rc0、gofumpt 空。反向：把 store 写回改 inert ⇒ e2e 红 [405] 子任务 state=running want done；还原 build rc0。
+- Status 待 v1 裁定后置 done。

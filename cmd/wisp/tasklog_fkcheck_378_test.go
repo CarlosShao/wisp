@@ -477,13 +477,18 @@ func Test378SpawnedChildToolCallsHaveAParentRow(t *testing.T) {
 	if err != nil {
 		t.Errorf("[B] 子任务 %s 在 task_log 里没有行（%v）：那样上面那句 fkc=0 只是「没有子调用」的 0", childID, err)
 	} else {
-		// The child's row is NOT closed by anything today (the terminal state of a
-		// child task has no writer: finishTask is inert in taskLifecycleJournal and
-		// the CLI only closes the ROOT), so no state word is asserted here - the
-		// leg report names that residual rather than pinning it as correct.
-		t.Logf("[378] 子任务行：id=%s state=%s query=%q", childRow.ID, childRow.State, childRow.QueryText)
+		// Ticket 405: the child's row MUST reach a terminal state. It used to stay
+		// "running" forever (finishTask was inert in taskLifecycleJournal and the
+		// CLI only closed the ROOT), which crash_recovery later mislabelled
+		// "interrupted" even on success. Now the loop's own finishTask closes each
+		// loop's row, so a completed child is "done".
+		t.Logf("[378/405] 子任务行：id=%s state=%s query=%q", childRow.ID, childRow.State, childRow.QueryText)
 		if childRow.QueryText == "" {
 			t.Errorf("[B] 子任务 %s 的 task_log 行没有 query_text：这行不是「子任务自己的任务书」", childID)
+		}
+		if childRow.State != string(memory.TaskStateDone) {
+			t.Errorf("[405] 子任务 %s 的 task_log 行 state=%q，want %q：子任务行必须被关成终态（否则恒 running、crash_recovery 会把成功的子任务误标 interrupted）",
+				childID, childRow.State, string(memory.TaskStateDone))
 		}
 	}
 	// Exactly one row for that id: task_log's id is its primary key, so a second

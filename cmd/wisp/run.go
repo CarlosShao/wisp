@@ -1321,10 +1321,19 @@ func (j *taskLifecycleJournal) StartTaskLog(ctx context.Context, tl memory.TaskL
 	return err
 }
 
-// FinishTaskLog is inert on purpose: see the type comment. Returning nil keeps
-// the loop's "task_log finish failed" warning out of a close this file owns.
-func (j *taskLifecycleJournal) FinishTaskLog(context.Context, string, string, string, int64, int64, int64, string) error {
-	return nil
+// FinishTaskLog writes the terminal state of the row this journal opened.
+// Ticket 405: it used to be inert (the composition root closed the ROOT row
+// separately at run.go, but a child loop had no such file-side close, so its row
+// stayed "running" forever and crash_recovery later mislabelled a completed
+// child "interrupted"). The loop calls this exactly once at task end
+// (internal/agent/loop.go:1057) with the same state/summary/tokens/cost it
+// reports as the result, so writing here closes each loop's own row - root and
+// child alike. For the root the composition root's own close still runs with the
+// identical numbers; the UPDATE is idempotent.
+func (j *taskLifecycleJournal) FinishTaskLog(ctx context.Context, id, state, summary string, tokensIn, tokensOut, costMicro int64, errorClass string) error {
+	c, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+	defer cancel()
+	return j.store.FinishTaskLog(c, id, state, summary, tokensIn, tokensOut, costMicro, errorClass)
 }
 
 // InsertToolCall / DecideToolCall / FinishToolCall are the bridge's job: a
