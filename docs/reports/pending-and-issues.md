@@ -30920,3 +30920,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1499（编排者）144轮：364-r1 五动作全落地（r1b f98cbce41 / r1c fb27a8843）
 - r1b: wisp sessions search（sessions.go +74/-13，抽 sessionsPrint 防漂移）；r1c: rename/archive/unarchive（+131/-14，共享 sessionsMutate，真机全链路往返6例：改名带空格/归档即隐藏/取消归档 updated_at 不变/参数错 rc=2/坏 id rc=1）。均 build rc=0、gofumpt 空、vet 0，编排者自复跑过。
 - 五动作 list/search/rename/archive/unarchive 齐。364 余：AC#2 端到端用例+反向判据（摘跳必红）、AC#3 门禁、AC#4 纪律。AC#0/AC#1 已翻。
+
+## A1500（编排者）144轮：364 收口（第25张）—票166四出口接CLI+牙
+- 五动作 list/search/rename/archive/unarchive 落地 cmd/wisp/sessions.go(+r1a/r1b/r1c)；sessions_test.go 320 行两用例绿，编排者亲跑 `go test ./cmd/wisp -run TestSessions`=ok rc=0；反向三读数(注case→仅对应用例红/还原双绿/基线绿)。commit 1b4b607aa/f98cbce41/fb27a8843/ae2ab606d。裁决件 docs/evidence/s1/364-ac-verdict.md。AC#0-4 全翻。
+- ★关键发现：`go test ./cmd/wisp -run <Test>` **不死区**（-run 只跑匹配用例避开窗口族，有完整判决）；整包仍死区。
+- ★系统性问题（Q 提机主）：path-budget 因「长票名+`-done`后缀+165 路径预算(self-hosted runner)」三方撞而红——273/403 的 -done.md 超预算、roster 漂 62vs64(128/175 落榜)。选①维护 roster(补 273/403 剔 128/175) 还是②长名票收口改短别名(改约定)？⛔ 我擅改 gate 数据。

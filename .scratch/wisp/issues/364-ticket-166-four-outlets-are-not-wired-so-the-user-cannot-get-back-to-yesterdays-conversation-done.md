@@ -38,12 +38,12 @@
 - [x] **AC#1 裁形（编排者拍）**：三形各写代价＝〔甲〕**只在 CLI 加出口**（`wisp sessions` 一类子命令，写面 `cmd/wisp`）；
       〔乙〕**只在面板加**（`internal/panel` 侧，走 `C17` 契约 ⇒ **可能触契约变更**）；〔丙〕**两者都做**。★**未裁形任何实现都⛔ 开工**。
       ★**⚠ 〔乙〕若必须动 `C17 PanelBridge` 的方法白名单 ⇒ 那是"改契约文字"、须机主批准**（★摆机主、⛔ agent 自决）。
-- [ ] **AC#2 落地＋牙（写腿）**：按裁定那一形做；★**每处改动配一枚用例**，且★**必须有一枚"端到端：用户真的能列出/搜到/改名/归档撤销"的读数**（⛔ 只测 Manager 就算）。
+- [x] **AC#2 落地＋牙（写腿）**：按裁定那一形做；★**每处改动配一枚用例**，且★**必须有一枚"端到端：用户真的能列出/搜到/改名/归档撤销"的读数**（⛔ 只测 Manager 就算）。
       ★**反向判据**＝把新加的那一跳摘掉 ⇒ 用例必须**转红并逐名报红行**；三读数（变异红／还原绿／原样绿）逐字贴 ＋ **还原核**。
-- [ ] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet` 动过的包／`go test -count=1`（**四数分开报、⛔ 相减**）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
+- [x] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet` 动过的包／`go test -count=1`（**四数分开报、⛔ 相减**）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh` 各 rc。
       ★**格式门禁甲乙两尺都报**（甲＝入库 blob、**判据**；乙＝工作树、**只作诊断**）。
       ★★**`cmd/wisp` 整包四数 ⛔ 当判据**（未判决恒 1、红名册逐发漂移、截断点后整族 `RUN=0`）⇒ 只按名作差＋逐发登记死点。
-- [ ] **AC#4 纪律格**：⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 166 任何原句（含它票尾那节「★产品面残余」）。
+- [x] **AC#4 纪律格**：⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 166 任何原句（含它票尾那节「★产品面残余」）。
 
 ## ★硬提醒（⛔ 踩）
 
@@ -60,3 +60,5 @@
 - [2026-10-22 23:4x +08] agent=`编排者` did=立案（来路＝`166-v1` 第八项 ＋ 硬条件；★票面写清"全仓 6／3 命中全在定义侧、`panel`＋`cmd` 确为 0"——这是我自己差点用错尺的那处）next=派 `364-a1` 只读腿。
 
 - [2026-11-04 17:01 +08] agent=编排者：AC#0 现读＋归因完成（5 尺全 0＋正控 memory.=21 命中、session 包已导入 cmd/wisp；用户看会话路径=无）；AC#1 裁形=【甲】CLI 出口（未受阻、主流 harness 标配；乙/丙 经 C17 契约变更＋gate 35 列 follow-on）。件 docs/evidence/s1/364-a0.md。下一步 364-r1 写腿（cmd/wisp 每波一枚）。
+
+- [2026-11-04 17:32 +08] agent=编排者：AC#2/3/4 翻勾，落 -done。AC#2 端到端用例绿（编排者亲跑 TestSessions ok）+反向三读数；AC#3 代码门绿(vet/d22scan/touched-build/TestSessions/gofumpt)，两红非364(build/残留 untracked；path-budget 273/403 -done 长名+roster 漂移)；AC#4 纪律合规。裁决件 docs/evidence/s1/364-ac-verdict.md。path-budget 系统性问题列 A1500/Q。
