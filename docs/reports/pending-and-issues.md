@@ -31056,3 +31056,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **29 memory L1/L2**：Status ready-for-review，2 具名残余＝AC1(宿主 `Hooks{WarmWindow}` 未赋值：`cmd/wisp/resident_voice_engines_windows.go:451` hooks 装配＋`internal/session/scope.go:194/:477` 契约在)、AC2(golden 抽取链)。`internal/memory/golden_extract.go` 是**契约件**（已 embed `testdata/golden_extract.json` 钉 10 剧本 slot 目标＋`golden_extract_test.go`＋`newGoldenExtractor()` 规则 stub）。残的＝**实现真 C5 LLM 抽取链（每任务一次 LLM、Warm 窗内、非响应路径）＋录 golden SSE＋宿主装配**。⇒ 这是**多文件大型功能**，非单轮可安全落地；⛔ 不宜近枯上下文盲派 flash 腿（LLM 集成＋golden SSE＋cmd/wisp 死区，半破风险高）。
 - 其余抽样仍 gated：68(桌面复测)／70(blocked-on-owner＋Linux runner)／72(CI runner)／342(容器真机台件 liveness)／301/329/174 未细读但同类。
 - **结论**：唯一非 gated 实体工作是 29(大型)、370(medium cmd/wisp)。二选一需**专门多轮腿序列**；当前每轮近枯上下文无法安全承接。→ 等 owner 指方向(专注 29 或 370 的专项腿) 或 ①–④ 决策。
+
+## A1524（2026-11-04 20:5x，编排者）166轮：29 专项腿1 落地 AC#1（L1 抽取真链＋宿主 WarmWindow 装配）经我自验
+- 腿 commit f92e4b177（7 文件 +1654）：internal/memory/l1_extract.go（真 Extractor，一任务一次 llm.LlmProvider.Stream，坏回复整批拒）＋l1_warm.go（L1WarmWindow Record/Fire，Fire 赋 session.WarmWindow→spawn memory-extract，钩子不等待）＋2 测试；cmd/wisp resident_voice_engines_windows.go／resident_windows.go／run.go 装配（Hooks{WarmWindow:r.warmWindow} 闭合 29-v1 缺口，Record 在 bg.Wait() 之后＝post-response）。
+- 我自验三把尺：commit 真在/件真在/自己复跑——build ./internal/memory ./internal/session ./cmd/wisp rc=0；go test ./internal/memory -run TestTicket29 ok 2.865s、全包 ok 28.6s；./internal/session TestTicket28WarmWindow|TestTicket29 ok 0.189s、全包 ok 4.3s；gofumpt -l 7 文件空；d22scan rc=0 clean；树净、无禁改面。
+- 29 未结：AC#2（C5 golden SSE 录制链，newGoldenExtractor 仍规则 stub）＝残余；AC#1 待非实现者 v1 裁后翻。
