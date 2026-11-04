@@ -30969,3 +30969,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 源起 378-v1 R4。修 internal/tools/system.go:470 补逗号；加 internal/tools/screencapture_schema_404_test.go 的 Test404ScreenCaptureSchemaIsValidJSON 回归。
 - 牙（机械可验）：修前 Test233HotTierAgentReachesTheNextTask FAIL（invalid character after object key:value pair）／修后 ok 2.375s；Test404 ok 0.045s。门禁 build ./internal/tools rc0／test404 ok／test233 ok／gofumpt 空／d22scan clean 全绿。
 - 意义：R4 解除 ⇒ 票 378 的 AC#2 真 task.spawn＋摘 run.go:1583 即红 验收测试变可行；378 下一步＝写该真牙用例＋补 AC#1 R3 子任务终态。
+
+## A1508（编排者）153轮：378 AC#2 真 e2e 测试成立（R4 修后）；R3 另立票 405
+- 关键：先前 e2e 测试 tasklog_fkcheck_378_test.go 的 golden requests 恒空，根因是 R4（screenCaptureSchema 坏 JSON 使真 run 序列化即炸）。R4 修后该测试连绿 3 次（真 task.spawn、PRAGMA foreign_key_check=0、子任务恰 1 行）。
+- 反向牙：摘 run.go:1583 rt.loopOpt=loopOpts ⇒ 测试真红逐名报（foreign_key_check=1 行 want 0、子任务 task_log 行数=0 want 1、tool_call 无父任务行）；还原 diff=0。⇒ AC#2 的 R1/R2 补齐。
+- R3（FinishTaskLog 惰性⇒子行恒 running、crash_recovery 误标 interrupted）独立于 fkc 核心 ⇒ 另立票 405（open）。tasklog_fkcheck_378_test.go 取回入仓（gofumpt 净）；待 378-v1 复审收口。
