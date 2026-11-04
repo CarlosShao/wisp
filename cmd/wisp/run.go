@@ -1291,11 +1291,15 @@ func (rt *agentRuntime) noteTask(taskID string) {
 // calls StartTaskLog from the task's own goroutine at its start
 // (internal/agent/loop.go:391), after AdmitTask and before the first model call,
 // so the parent row exists before any tool_call row that names it can be
-// written. Every other method is deliberately inert: tool_call rows stay the
-// bridge's (Options.Journal's comment above execute), and the task row is closed
-// there, once, after Wait() on a detached context with the numbers the CLI
-// presents - not by forwarding the loop's own finish, which would write the same
-// row twice with two different summary truncations.
+// written. The three tool_call methods stay deliberately inert: tool_call rows
+// stay the bridge's (Options.Journal's comment above execute). FinishTaskLog
+// writes the terminal state of the row this journal opened (ticket 405): the
+// loop calls it once at task end (internal/agent/loop.go:1057) with the same
+// numbers it reports as the result, so each loop - root and spawned child alike
+// - closes its own row. For the root the composition root also closes it after
+// Wait() with the identical numbers (the UPDATE is idempotent); without this the
+// child's row would stay "running" forever and crash_recovery would mislabel a
+// completed child "interrupted".
 type taskLifecycleJournal struct {
 	store     *memory.Store
 	rowOpened atomic.Bool
@@ -1714,10 +1718,11 @@ func (rt *agentRuntime) execute(parent context.Context, task string) int {
 			CostTokensIn: int64(res.Usage.InputTokens), CostTokensOut: int64(res.Usage.OutputTokens),
 			CostAmountMicro: res.CostMicros, Currency: res.Currency, ErrorClass: class,
 		}
-		// Ticket 373: when the loop's journal opened the row at the task's own
-		// start (the usual path), this site only CLOSES it - the numbers and the
-		// terminal state are still this composition root's, written once, on a
-		// context that survives the task's own cancellation.
+		// Ticket 373/405: when the loop's journal opened the row at the task's own
+		// start (the usual path), the loop's own FinishTaskLog already closed it
+		// at task end; this site closes it once more with the same numbers and
+		// terminal state, which is the authoritative final value (the UPDATE is
+		// idempotent). The context survives the task's own cancellation.
 		//
 		// The fallback below covers the shapes that never reached that start:
 		// a control word returns before the loop opens a row

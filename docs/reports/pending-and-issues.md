@@ -30995,3 +30995,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 405 实现 Option A：FinishTaskLog inert→store.FinishTaskLog 写终态；e2e [B] 断言子行 state==done。v1 四数 build/vet rc0、e2e ok0.398s（子 state=done/fkc=0/task_log 2行 root1 child1/root task.spawn 正控/子 fs.read success）、Test233 ok4.455s、gofumpt 空、d22scan PASS=35。反向：仅 state 断言红（fkc 仍0/root 仍在/其余不红）⇒ 牙净。AC#1 幂等独立核：dao_tasklog.go:49-76 按 id 单条 UPDATE、root 双写同源、run.go 后写为最终值。
 - 378 家族 6 用例回归全 PASS。票 405→-done，双名核=1，收口提交 b341f6519。
 - 残余（⛔挡收口，owner cmd/wisp）：3 处注释仍写 405 前单写手理由（run.go:1290-1298/1717-1721、tasklog_subloop_378_test.go:127-128），随后续 cmd/wisp 小笔更正。既有红 Test370TheInterruptedRowNeedsTheCeiling 本环境红（mockllm captured no request），用 405 前形状复跑同样红 ⇒ 与本票无关。
+
+## A1513（编排者）156轮：更正 405 残余旧注释（3 处）与现码对齐
+- run.go:1289-1298 taskLifecycleJournal doc、run.go:1717-1721 root 关闭注释、tasklog_subloop_378_test.go:127-128：由「FinishTaskLog inert/单写手」改为「FinishTaskLog 写终态/tool_call 三法仍 inert/root 双写幂等」。
+- 仅注释；gofumpt 空/build rc0/vet rc0/e2e+378 回归 ok。405 收口残余清零。

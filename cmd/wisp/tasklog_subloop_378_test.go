@@ -125,7 +125,8 @@ func Test378ChildLoopWritesOneTaskRowAndNoToolCallRows(t *testing.T) {
 	roster.MarkRoot(sub378RootID, "根任务")
 
 	// The one journal payload this composition root hands over (run.go's
-	// taskLifecycleJournal): StartTaskLog writes, everything else is inert.
+	// taskLifecycleJournal): StartTaskLog writes and FinishTaskLog closes the row
+	// (ticket 405); the three tool_call methods are inert.
 	// task.spawn's child copies the snapshot verbatim (subagent_197.go:320,
 	// `opt := base`), which is the wiring under test.
 	// One provider per child loop. A single shared counter would make the two
