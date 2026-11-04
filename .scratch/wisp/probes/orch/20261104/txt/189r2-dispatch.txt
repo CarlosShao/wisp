@@ -1,0 +1,16 @@
+TASK 票 189 收尾腿 189-r2（承接 189-r1 在树上的未提交半成品，把它做完并提交）
+
+背景：189-r1 在工作树留下未提交两件——M internal/panel/git.go（仅注释块加了 Ticket189 段）＋ ?? internal/panel/git_readonly_exec.go（634 行，硬解析逻辑已写好：runGitReadOnly/readGitWorkingState/parseGitStatusZ/parseGitNumstatZ/gitDiffUnavailable/diffSentence/gitRecoverCommand… 全在）。但它没定义所需类型、没接 GitView 字段、没写测试、build 失败。你的任务＝把它做完。
+
+环境：cwd=D:\work\workspace\projects plans\Wisp；Go1.27 Windows；Git Bash=D:\work\soft\Git\bin\bash.exe；gofumpt 绝对路径=/d/work/base/gopath/bin/gofumpt.exe。cmd/wisp 整包死亡区勿整跑。
+
+【必做】
+1. 读 internal/panel/git_readonly_exec.go 全文，据其实际使用反推并定义 4 类型（放到该文件顶部）：GitChangedFile、GitUncommittedCounts、GitUncommittedView、GitDiffView。当前 build 报这些 undefined：git_readonly_exec.go:228 GitUncommittedView/GitDiffView；:259 GitChangedFile/GitUncommittedCounts/GitUncommittedView；:278/:284/:300 同。
+2. type GitView struct（internal/panel/git.go:135）加两【子字段】：Uncommitted GitUncommittedView `json:"uncommitted"` ＋ Diff GitDiffView `json:"diff"`（⛔ 顶层 key，嵌在 composer.git 下）。
+3. 接线：ReadGit（git.go:191）与/或 newGitView（git.go:173）在解析出 working tree 后调用 readGitWorkingState(currentWorktree) 填两子格；NotProbed/Unreadable 路径用 gitUncommittedUnavailable/gitDiffUnavailable 给第三枚举值，绝不报 0。
+4. 新建 2 枚判据测试件 internal/panel/git_189_test.go：①合成临时 git 仓（git init→改几文件：暂存1/未暂存1/新文件1→断言 uncommitted 各档计数与 diff 文件名集合来自真仓）；②只读边界钉（.git/index md5 跑前后不变仅作"这次没写"，+ diff/uncommitted 路径无写落点）。
+5. 门禁：go build ./internal/panel ./internal/tools rc=0；go test -count=1 ./internal/panel -run 'Git|189|Uncommitted|Diff' 全绿（面板既有 4 枚已知红照实记不修，非你引入，逐名见 docs/evidence/s1/197-subagent-carrier-r3.md:268-275）；gofumpt -l 你改的文件=空；sh scripts/d22scan.sh 纯净。MUST 编译过再 commit。
+6. commit 显式 pathspec：internal/panel/git.go internal/panel/git_readonly_exec.go internal/panel/git_189_test.go。⛔ push。
+
+【禁区】⛔ 动 frontend/**·design/**；⛔ D34/PLAN/specs/thresholds/golden；⛔ C17；⛔ 提交/推送/接受/回滚动作；⛔ 删改 189-r1 已有解析逻辑除非必要。回报：build rc＋test 读数＋已知红名册＋逐枚改动。
+模型：magpie / cline/cline-pass/deepseek-v4.1-flash-1017
