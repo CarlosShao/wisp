@@ -30805,3 +30805,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - gate-rerun-3(ClinePass)续跑已落盘 AC#3 门禁读数 + AC#6 坏尺读数(gate-rerun-3/)。现 HEAD 门禁红三处口径:①gofmt/gofumpt 2 文件=CRLF/autocrlf 假红(gofmt-diff -/+ 同文,非真格式,第17处);②go vet ./internal/tools/ rc=1 system_backend_windows.go:337 unsafe.Pointer(真红/待核,非本票);③go vet ./internal/risk/ rc=1 provenance_test<->command.go import cycle(A1473 已见旧疾);④GOOS=linux undefined platformSystemBackend(跨平台缺口)。d22scan rc=0 clean,计数 internal/=348 cmd/=54(比旧 HEAD 增,不降)。
 - 未完成 AC#4/M3/M4/AC#5/table.md;腿达轮帽死(final=null)。产码还原。
 - 决定:不再派 flash 腿(连 gate-rerun-2/3 两腿均达轮帽死);改编排者自己接续收尾 234。不虚翻。
+
+## A1480（2026-11-04 13:11 +08，编排者）121轮：立票 403（internal/risk 测试 import cycle 真缺陷）
+- 为取 234 的 risk 门禁读数时现跑撞上：go test ./internal/risk/ = FAIL [setup failed]，import cycle（provenance_test.go:12 imports plugin；plugin/command.go:42 imports risk）。根因 f576cf08（票160）给 provenance_test 加 plugin import（票52 起 plugin 就 import risk）⇒ 票 160 以 broken 收口=回归；无任何开放票覆盖（179/350 不涉）。
+- 立票 403（.scratch/wisp/issues/403-...md）：待派产码/测试重构断环（甲乙丙丁戊五选一先裁）；阻塞 234 AC#3（G-3/G-6）/AC#4 的 risk 分母。
+- 234 现状：AC#1 基线（285 名）＋M1/M2/M5 变异（gate-rerun-2）＋AC#3 门禁/AC#6（gate-rerun-3）已落盘并 commit；AC#4/M3/M4/AC#5 未做，且 AC#4 依赖 risk 可编译 ⇒ 受本 403 阻。故 234 暂不虚翻。
