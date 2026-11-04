@@ -30814,3 +30814,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1481（2026-11-04 13:21 +08，编排者）122轮：403 收口（第20枚，非实现者裁决真缺陷修复）
 - 腿 risk-cycle-403 修好 internal/risk 测试 import cycle（318f0edd0，2 文件，乙-scoped：TestDisposalScopeClearsTaints 移 internal/plugin）。非实现者 3 把尺复跑：risk=ok 12.5s rc=0(无 setup failed)、plugin=ok 7.9s、vet0、gofumpt空、cycle0。AC#1-4 翻勾。AC#5 回填 234 已证 risk 分母可读（AC#4 roster rc=0 PASS=455 FAIL=0 SKIP=2 含 risk），残余归 234。403→-done(带残余)。
 - 教训/发现：票160(f576cf08)给 risk/provenance_test.go 加 plugin import 致 risk 测试包整包不可编译(回归,之前无人跑 go test ./internal/risk/ 故未察)。
+
+## A1482（2026-11-04 13:44 +08，编排者）123轮：234 收口（第21枚）——12 格全读数
+- 编排者亲跑补齐 234：AC#1 新基线(457 名 rc=0 PASS=455 FAIL=0 SKIP=2，旧 baseline 因 risk 坏作废)；AC#2 M3(winsec-tests.sh 快照 rc=1 dllfail0 ≥10red)+M4(Docker golang1.27 11 POSIX red 两形 restore identical)，M1/M2/M5 用 gate-rerun-2；AC#3 七门禁四数现取(approval/tools/risk/winsec/memory/secret rc=0；panel 1 既有红；容器 winsec/risk ok、memory-linux 2 红产品范围外)；AC#4 基线=终态；AC#5 10 指向标记现盘核=10；AC#6 void。汇表 gate-rerun-3/table.md。
+- 234→-done。零产码。403(第20枚)修 risk import cycle 解锁本票 risk 分母。flash 腿 gate-rerun-2/3+m34 均达轮帽死，故编排者亲跑收尾。

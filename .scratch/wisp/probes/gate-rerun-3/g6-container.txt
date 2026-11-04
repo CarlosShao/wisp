@@ -1,0 +1,14 @@
+g6_rc=1
+RUN=986 PASS=588 FAIL=4 SKIP=4
+--- SKIP names ---
+TestAppendSessionTurnCrashChild
+TestSubprocessCrashWriter
+--- FAIL names ---
+TestDsn196r3BusinessPoolsKeepTheirOwnForeignKeys
+TestMigration31V5ToV6KeepsOldData
+--- package lines ---
+ok  	github.com/CarlosShao/wisp/internal/winsec	10.042s
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/memory	42.171s
+ok  	github.com/CarlosShao/wisp/internal/risk	27.823s
+FAIL

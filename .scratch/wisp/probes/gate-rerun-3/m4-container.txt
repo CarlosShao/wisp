@@ -1,0 +1,47 @@
+=== false-green guard ===
+go_mod_present=yes
+go_files_internal=848
+posix_winsec_other=1
+go version go1.27.1 linux/amd64
+=== pristine positive control: go test ./internal/winsec/ -count=1 ===
+go: downloading golang.org/x/sys v0.49.0
+ok  	github.com/CarlosShao/wisp/internal/winsec	3.219s
+pristine_tail_done
+=== M4a: turn the new leg off (ancestorIsLink pass-through) ===
+419:		if ancestorIsLink(prefix) {
+landing_m4a=1
+build_m4a_rc=0
+m4a_test_rc=1
+m4a_fail_top=11
+TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed
+TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed
+TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing
+TestAC1POSIXSealDirThroughASymlinkRefuses
+TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth
+TestAC1POSIXSealFileThroughABackslashNamedLink
+TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone
+TestAC1POSIXUnresolvedSymlinkedRootStillRefused119
+TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125
+TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119
+=== restore after M4a ===
+restored_m4a_identical=yes
+=== M4b: half-fix, consult only first prefix ===
+landing_m4b=1
+build_m4b_rc=0
+m4b_test_rc=1
+m4b_fail_top=11
+TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed
+TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed
+TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing
+TestAC1POSIXSealDirThroughASymlinkRefuses
+TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth
+TestAC1POSIXSealFileThroughABackslashNamedLink
+TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone
+TestAC1POSIXUnresolvedSymlinkedRootStillRefused119
+TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125
+TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119
+=== restore after M4b ===
+restored_m4b_identical=yes
+DONE_M4

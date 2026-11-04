@@ -1,0 +1,7 @@
+M3 (票110:39) — 现跑读数 @HEAD caea1b5df，2026-11-04 13:30 +08（编排者亲跑；/tmp 快照 /tmp/gr3snap；Git Bash；PATH staging）
+- 快照：git archive HEAD | tar -x -C /tmp/gr3snap（仓外，⛔ 不碰 worktree）
+- [正控] bash scripts/winsec-tests.sh -> rc=0；ok internal/winsec 19.973s；四数(portable-tests 口径, -v)：RUN=127 PASS=76 FAIL=0 SKIP=0
+- [变异A 票面自家例：私有集按名字比] internal/winsec/winsec_windows.go:174 `set[ace.trustee]` -> `set[ace.text]`；landing orig=0 repl=2；go build ./internal/winsec/ rc=0（非编译失败）；bash scripts/winsec-tests.sh -> rc=1；0xc0000135 命中=0（真执行二进制）；具名顶层 red ≥10 枚（含 TestAC118KindFieldSaysBothWhenTheObjectCarriedItsOwnGrantToo、TestAC118KindFieldSaysExplicit…、TestAC118KindFieldSaysInherited…、TestAC118NamesEveryoneIsJudgedBySIDNotByTwoBytes、TestAC1BaselineProductionPaths、TestAC1DefaultLogSaysInherited、TestAC1RefusedInstallLeavesTheSealWorking、TestAC1SealFileReportsTheInheritedGrantItCleared、TestAC1SealLandsInAForeignTree…、TestAC1SeamCannotBeFreed… 等）
+- [变异B 非空仪器证明] bash scripts/winsec-tests.sh ./internal/config/ -> rc=2；GUARD 1 显式失败句："the package list for this step does not name ./internal/winsec/; it is [./internal/config/]."
+- [边界] 变异仅在 /tmp 快照内；仓库 worktree git status --porcelain -- internal/ cmd/wisp 只余一枚 .txt 临时件（零产码改动）。
+- 注：本文件是把编排者实际跑的读数转录落盘（日志重定向因 W 变量内含空格误置），四数与 red 名单来自同一发真实运行。
