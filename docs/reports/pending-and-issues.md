@@ -31005,3 +31005,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 已逐读：145（卡 Q-51/owner＋涉 frontend）、167（等145/frontend）、169（frontend 结构性禁写）、170（立而不派/契约待 owner）、354（AC#0 需现跑 ancestorunlink/ancestorworld 两族读数＋正控，仪器活）、370（MaxOutputTokens 全仓无赋值，跨 agent/llm/cmd-wisp 接线）、371（internal/perm 门改写，前提被票372撤销，复杂）。均非小而自洽。
 - 待逐读：180/182/187/188/361（疑涉 panel/frontend 或 CI 环境）。189 疑与已收 189 重号，下轮核。
 - 结论：本编队可自推的「小而自洽票」已尽；余须 owner ①②⑤ 或 fresh 上下文深做。
+
+## A1515（编排者）158轮：修 189 收口双名缺陷——A1487 已记收但票无 -done（rename 遗漏）
+- 189 功能已收（impl e1345b0a0／verdict 189-ac-verdict.md／AC#2-6 勾／A1487），但树里票仍原名 ⇒ 被下轮扫描误当 open 候选（重派风险）。
+- 修：git mv 189→-done；Status ready-for-agent→done（原句留痕）；双名核=1。AC#1 只读设计核归 189-a1 件不代勾（照 v1 原判）。
+- 教训：收口 commit 必须同时 git mv ＋ 旧新名两字面 pathspec ＋ 落账后现跑双名核。
