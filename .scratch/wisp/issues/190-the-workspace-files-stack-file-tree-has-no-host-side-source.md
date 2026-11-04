@@ -44,3 +44,5 @@
 - **AC#6 那三把尺本程一律未跑**（`internal/panel` 测试／`d22scan` 基线 433／`gate-clauses` 名册）＝硬约束"零 go 命令"，⛔ 不许据此声称任何一条已核。另引用兄弟腿 `189-a1`（`ae9cd5fb`）的两把尺不重跑：它报"AC#6 那 2 枚已知红实为 4 枚"、"裸 `gate-clauses.sh` 实物在 `probes/154/`"、"09-28 同名件行号全漂"——**最后那一条对 09-28 的 `docs/evidence/s1/190-file-tree-design-a1.md` 同样是风险提示，本程未逐格复跑那份设计核的行号。**
 
 - [2026-11-04 15:40 +08] agent=编排者+微粒细胞：Go 核心落地（6 commit：types/reader/屯据/接线1/接线2），build 三包+vet 绿；panel 整包红2=C21(既有)+TestComposerContractTypesMatchFrontend(新,页侧待UI腿)。余 AC#4 三形+AC#2/#3 判据未做，未收。
+
+- [2026-11-04 16:00 +08] agent=编排者：补 AC#4 三形+AC#3 只读+AC#2 not_chosen 判据（commit 5229a5e41），Tree190 6/6 绿，d22scan clean。host 侧功能完；余：文件名 scrub（硬化项）、契约 files 键页侧待 UI 腿、正式非实现者判语（核验腿 dud 下轮重派）。未 -done。

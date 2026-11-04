@@ -30863,3 +30863,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 门禁：build ./internal/panel ./internal/tools ./cmd/wisp rc=0；vet rc=0；panel 整包红=2：TestC21DesignTokensFourWayAgree（既有 tokens 域）＋TestComposerContractTypesMatchFrontend（新增：Go ComposerState 出 files 键但 frontend/src/lib/panel.ts 未声明——按 181/197/248 先例＝Go 先出键、页面声明归 owner UI 腿）。
 - 余（未收）：AC#4 越权三形（不可读/权限拒绝/symlink-junction 跨界各现量+文案）未做；AC#2 根选取判据、AC#3 只读判据 未加测试；文件名 scrub 未接。190 未 -done。
 - 页侧待 owner 外部 agent：frontend/src/lib/panel.ts ComposerState 加 files 键（本队 ⛔ 零写面 frontend）。
+
+## A1490（129 轮编排者）132轮：190 宿主侧文件树补完 AC#2/3/4 判据，d22scan clean
+- 亲补 reader AC#4 三形（os.Lstat/symlink/dir/open → unreadable/permission_denied/link_outside）＋改 "listing failed" 为 unreadable；AC#2 not_chosen（空根不落整盘）；AC#3 只读判据（扫源码无 os.Remove/WriteFile 等写动作）。新屯据 internal/panel/tree_190_ac234_test.go。commit 5229a5e41。
+- 门禁：build panel+tools+cmd/wisp rc=0；Tree190 判据 6/6 绿（含 symlink→LinkOutside 真跑）；整包 panel 红=2（C21 既有 + TestComposerContractTypesMatchFrontend 契约页侧）；d22scan clean(rc=0)；gate-clauses 聚合退码=10（既有名册，190 未动）；vet rc=0。
+- 190 余：①文件名 scrub（census 硬化项，AC 未点名）②TestComposerContractTypesMatchFrontend 页侧待 owner UI 腿声明 files 键 ③正式非实现者 AC 判语（只读核验腿 dud，下轮小拆件重派）。
+- 190 host 侧功能已完，未 -done（待契约页侧＋正式判语裁定是否按 181/197/248 先例收）。
