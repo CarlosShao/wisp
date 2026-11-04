@@ -30899,3 +30899,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 共性：多票 AC「整包终态 go test ./cmd/wisp ./internal/... 到终态」在本机＝死区（rc=1 ~40 环境 FAIL，规则自承认不可当判据）⇒ 这些 AC 结构上本机不可满足，票恒卡「1 未勾」。
 - 系统闸三类：①owner（放行35/A671·Q-76 C17白名单/8条待裁/347/256/301）②CI self-hosted runner③cmd-wisp 整包终态死区（需机主/CI 侧裁「本机死区如何收该 AC」）。⇒ 票池吞吐已 owner/CI 受限。
 - pool-scan 12 票分类腿 dud（读面大，已杀）；下轮小拆（每腿≤3票）重派。
+
+## A1496（编排者）140轮：抽样 ~16 票皆 gated，编队到 owner/CI 平台期；276 已裁不做、136 余格 CI-yaml
+- 276（gofumpt 普查清账）：票面自裁「今天状态＝不做〔已裁非结案〕」，重排唯一触发＝机主愿意推并要求绿 ⇒ GATED(owner)，⛔ 不派。
+- 136（fail-closed 值守缺钉）：AC#1/2/3/4/8/9/11/12/13/14/15 已勾；余 AC#5(P1 尺不查 paths/paths-ignore 触发过滤)、AC#6(slo-fresh.yml schedule 到点没响)、AC#7(门禁)、AC#10 ⇒ 均 CI-yaml/触发/门禁域 ⇒ GATED(CI)。
+- 至今抽样（135-140 轮）：145/187/188(=197/145/35) 179 262 226 220 291 230 274 114 177 247 342 329 276 136 —— **全部 gated**（owner决策/CI self-hosted/本机活窗口/frontend/跨票残余/已裁不做）。⇒ 编队已达 owner/CI 平台期，无净可派 Go 落地件。
+- 真正解闸＝机主：①放行35(+C17白名单 A671/Q-76)②「cmd-wisp 整包终态」口径(本机死区不可判据,给豁免还是押CI)③前端 panel.ts 声明 files 键④8条待裁(256/301/185/347/230AC#4/174AC#4/226/264AC#0)。
+- 交班要点：24 票已收(273…190)；190 host 侧 files 数据源到顶；panel 簇"画出来"待 35。剩余 ~86 未读票，若继续应由机主放行/CI 侧推进或明确授权逐票慢扫。
