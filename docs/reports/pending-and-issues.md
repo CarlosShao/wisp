@@ -30916,3 +30916,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - cmd/wisp/sessions.go(164 新)＋main.go(+10 分派)＋dataroot_128_test.go(+9 拒答腿,AST 双向所需)：`wisp sessions list` 接 session.Manager.List，打印 id/updated_at/title 前20，空库提示、无子命令 usage rc=2。
 - 门禁：编排者自复跑 go build ./cmd/wisp rc=0；gofumpt -l 三件空；腿自报 test-compile rc=0＋真机冒烟(空库/2行降序)。⛔ cmd/wisp 整包测试未跑(死区)。
 - 364 余：search/rename/archive/unarchive 四动作(364-r1b..)＋端到端读数＋反向判据(AC#2)；AC#3 门禁；AC#4 纪律。AC#0/AC#1 已翻。
+
+## A1499（编排者）144轮：364-r1 五动作全落地（r1b f98cbce41 / r1c fb27a8843）
+- r1b: wisp sessions search（sessions.go +74/-13，抽 sessionsPrint 防漂移）；r1c: rename/archive/unarchive（+131/-14，共享 sessionsMutate，真机全链路往返6例：改名带空格/归档即隐藏/取消归档 updated_at 不变/参数错 rc=2/坏 id rc=1）。均 build rc=0、gofumpt 空、vet 0，编排者自复跑过。
+- 五动作 list/search/rename/archive/unarchive 齐。364 余：AC#2 端到端用例+反向判据（摘跳必红）、AC#3 门禁、AC#4 纪律。AC#0/AC#1 已翻。
