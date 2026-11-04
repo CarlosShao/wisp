@@ -30906,3 +30906,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 至今抽样（135-140 轮）：145/187/188(=197/145/35) 179 262 226 220 291 230 274 114 177 247 342 329 276 136 —— **全部 gated**（owner决策/CI self-hosted/本机活窗口/frontend/跨票残余/已裁不做）。⇒ 编队已达 owner/CI 平台期，无净可派 Go 落地件。
 - 真正解闸＝机主：①放行35(+C17白名单 A671/Q-76)②「cmd-wisp 整包终态」口径(本机死区不可判据,给豁免还是押CI)③前端 panel.ts 声明 files 键④8条待裁(256/301/185/347/230AC#4/174AC#4/226/264AC#0)。
 - 交班要点：24 票已收(273…190)；190 host 侧 files 数据源到顶；panel 簇"画出来"待 35。剩余 ~86 未读票，若继续应由机主放行/CI 侧推进或明确授权逐票慢扫。
+
+## A1497（编排者）143轮：364 AC#0 亲跑＋AC#1 裁形=甲(CLI 出口)
+- 364（票166 四出口未接线，用户回不到昨天对话）：五尺复跑 cmd+internal/panel 非测试全 0（session.NewManager/ListSessions/SessionByID/memory.Session/CLI token）；正控成立（同尺 memory. 于 cmd/wisp 非测试=21 命中、session 包确被 cmd/wisp 导入 4 文件）；用户看会话路径=无（sessions/history 命中全在 C11 语音注释）。件 docs/evidence/s1/364-a0.md。
+- AC#1 裁形=【甲】只在 cmd/wisp 加 wisp sessions list|search|rename|archive|unarchive（接 session.Manager 现成方法）；不触 C17、不 gate 35。乙(panel,经C17 契约变更须机主批)/丙 列为 35 解封+C17 批后 follow-on。甲非降级＝今日唯一未受阻且价值充分、CLI 会话历史乃主流 harness 标配。
+- 下一步 364-r1 写腿（cmd/wisp 每波一枚＋每处用例＋端到端读数＋反向判据）。
