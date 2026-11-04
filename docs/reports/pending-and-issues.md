@@ -30786,3 +30786,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   - 103＝Status rejected-needs-fix（需真修删守卫/junction 平台用例）；62＝液态玻璃球视觉原型需真桌面差分截屏；114 AC#6 真机差分截屏/AC#11 CI npm；136 AC#5-7,10 CI/slo-schedule/gofmt；342 AC#1 容器真机 liveness；138 Status blocked 等 Q-55；219/189/190/313/371/346/361 皆功能/CI/前端（census a1 仅首切片产物）。
 - ★**上浮一条 owner 决策（新增第 8 条）**：**票 264 AC#0** 要求机主一句话定「**甲**＝fs.* 失败句把绝对路径脱敏后再发云端／**乙**＝保持现状、只装能力尺仪器／**不做**」；票面硬约束「取回机主一句话前 ⛔ 不派写腿、⛔ 动产业代码」。属"发给云端服务商的内容/隐私姿态"＝产品决策，摆机主。
 - 结论：可自办脉（含假硬票纯文档、近完成票尾）本轮**确已枯竭**；余下批量需 owner 决策（现 8 条）或前端/CI/真机腿到位方能解锁。
+
+## A1477（2026-11-04 12:45 +08，编排者）118轮：整包终态跑存证＋220 Q-85 修正
+
+- **跑法**：PATH="$PWD/build:$PWD/third_party/sherpa-onnx:$PATH"＋WISP_ENV=dev，go test ./cmd/wisp ./internal/... -count=1 -timeout 30m，落 /d/tmp/wisp/118/fullgate.log。
+- **结果**：达终态 EXIT=1；cmd/wisp 275.7s FAIL（~40 红）＋./internal/... 诸包（llm 86.7s／memory 70.9s／tools 44.2s／winsec 48.7s 等全 ok）。
+- **./internal 两枚红归因**：① internal/panel TestC21DesignTokensFourWayAgree＝**已知既有红**（114-v2-verdict 明列"live 5 红既有集"，frontend 四向耦合，非新红、非本会话引入）；② internal/agent Test31DisarmStopsTheWait（0.05s）＝**未在任何账册/票面出现**，疑计时敏感/待核，⛔ 未证为回归。
+- **cmd/wisp ~40 红**：逐名看全落真窗/真桌面/frontend 环境（TestPanelHost*／TestAC4FocusReturn／TestRunBooks＊／TestSnapshot＊／TestThePumpIsDriven＊等），＝**无可控交互前台**下方显红的窗族，⛔ 真缺陷集。
+- **★Q-85 修正一条**：前任(10-16)记"cmd/wisp 整包永不达终态(3 发断在 TestAC13/14)"；本发**已达终态(275s)**⇒ 堵塞点从"进程截断"变为"红名不可归因（无交互桌面/无台面）"。220 AC#5 仍需机主**可控交互前台＋无活实例**之台面方能落 Attributable 名册，本 headless 后台进程给不了 ⇒ **220 保持未勾**。
+- 本段无新收口（184之前 19 票照旧）。
