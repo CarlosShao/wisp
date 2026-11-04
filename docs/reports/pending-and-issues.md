@@ -30887,3 +30887,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ★★188 拦截（筛票陷阱）：188-a1 census 建议「乙＝改判 subagent_carrier_197_test.go:317-327 根行状态钉」。查 188 票正文＋A394/A398＋run.go:1672 注释通读：根行状态空「带理由」是 A394 故意设计（196 已 DONE 修二词表）；且 A398 逐字「188-r3＝生产者那一跳，排 145-r3 交件之后」。⇒ 188-r3 归口/排在 145-r3 之后，census 的乙/改197钉会违反设计，⛔ 不采用。
 - 145 现量：Status ready-for-agent 未派，无 -done。⇒ 188（及 panel 簇快照载体扩张）多 gate on 145。188 现 checked=1/unchecked=5（余 AC#2 生产写入者→145-r3、AC#3 已 188-r2 落、AC#4 分账），不可收。
 - 判：panel 簇剩票多为 ①gate on 145（未派大票=根闸）②单票体量大（187 82-121 行跨多共享面）。145 是 panel 簇根闸：真跑完须先启动 145（大票，跨 pump/composer/run.go 载体扩张，多腿）。
+
+## A1494（编排者）136轮：★★panel 簇根阻断＝票35（Go→页出向跳+页面接收器都不存在）；非仅145；需放行35
+- 核 145 进度（末 A 段 10-13 编排者自记）：panel"画不出真数据"第一阻断不在字段层，而在"有没有耳朵/有没有推送"——PostWebMessage/EvaluateScript 全仓 Go 侧 0 命中（正控 1 枚 scratch）、page 侧 addEventListener/postMessage 于 frontend/src 0 命中（正控 8 文件）。⇒ 出向跳(Go→页)+页面接收器两枚都不存在，归票 35。
+- 145 现量 checked=4/unchecked=3（AC#2/AC#6 未翻）；自记"本票写腿排在票35现状对拉+票274 之后" ⇒ 145 gate on 35+274。
+- 188 gate on 145-r3 ⇒ 传递 gate on 35。187 亦在 35 之后才有显示价值（host 数据可先长）。
+- 判：panel 簇（145/187/188 及"画出来"）根阻断＝票 35（webview 出向跳+页面接收器，owner 前端域，放行35 未决）＋票274（构建带页面）。190 已把 host 侧 files 数据源落好（host 侧层面到顶）。⇒ 要真把 panel 簇跑完并"画出来"，须 owner 放行 35（合法 owner 升级：frontend 域＝放行类）。
