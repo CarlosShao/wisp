@@ -3,12 +3,20 @@ package panel
 // The git dimension of the snapshot (ticket 181: the read-only half).
 //
 // WHAT THIS FILE IS. A host-side read surface that answers three questions by
-// reading files and nothing else: is this workspace a git tree, which branch (or
-// which bare commit) is checked out in it, and which worktrees does it have. The
-// answers ride the snapshot push that already exists (internal/panel/pump.go ->
+// reading files: is this workspace a git tree, which branch (or which bare commit)
+// is checked out in it, and which worktrees does it have. The answers ride the
+// snapshot push that already exists (internal/panel/pump.go ->
 // cmd/wisp/panel_pump.go), which is the outbound half ticket 181's census
 // (docs/evidence/s1/181-186-git-detection-census-c1.md §⑤) measured as really
 // running today.
+//
+// Ticket 189 added the two dimensions a review pane reads underneath the same
+// section: composer.git.uncommitted (how many changes are not committed yet, split
+// into staged and unstaged, with the untracked half counted separately) and
+// composer.git.diff (the per-file diff, inside a byte budget, with the command that
+// recovers the whole of it). They are part of this family - same package, same view
+// kind, same pump hook, no second implementation - but they live in the sibling
+// file git_readonly_exec.go, for the reason the paragraph after next states.
 //
 // WHAT THIS FILE IS NOT. It is not a tool. D34's built-in tool table
 // (docs/PLAN.md §D34) carries no git row, and giving the model a `git.*` tool
@@ -21,11 +29,20 @@ package panel
 // about the PROCESS that produced the packet, not a computed verdict about the
 // product.
 //
-// NO EXTERNAL PROCESS. Everything is os.Stat / os.ReadFile / os.ReadDir. The
-// census §② took this repository's own three shapes as live data and concluded
-// that recognising a repo, the current branch and detached HEAD needs no `git`
-// binary; spawning one would additionally drag in D38's goroutine-owner rules and
-// d22scan ban #1 for no gain.
+// NO EXTERNAL PROCESS IN THIS FILE. Everything here is os.Stat / os.ReadFile /
+// os.ReadDir. The census §② took this repository's own three shapes as live data
+// and concluded that recognising a repo, the current branch and detached HEAD
+// needs no `git` binary; spawning one for those three answers would additionally
+// drag in D38's goroutine-owner rules and d22scan ban #1 for no gain.
+//
+// Ticket 189's two dimensions are a different kind of question, and the census
+// said so: the staged column is "index versus HEAD", and HEAD is a tree object
+// inside a packfile; the untracked column needs gitignore(5); the diff is a
+// content comparison against HEAD. Those three rent their correctness from git
+// in the sibling file git_readonly_exec.go, which is the ONE file in this
+// package allowed to start a process - this file still starts none, and
+// TestTheWorkspaceSwitchLegCannotMutateARepo pins that by name. A machine with
+// no git binary gets the third read state (GitReadNoGit), never a zero.
 //
 // THE THREE SHAPES THIS HAS TO EAT (census §②, all measured on real data):
 //
@@ -153,6 +170,15 @@ type GitView struct {
 	// "switchable by the process that produced this packet", and that is false
 	// for every producer in this tree, so it carries the reason.
 	SwitchBlocked string `json:"switchBlocked"`
+	// Uncommitted is ticket 189's count dimension: staged, unstaged and
+	// untracked, from one `git status`. It is a NESTED sub-section on purpose -
+	// composer.git is already a declared key on the composer section, so the two
+	// new dimensions ride it instead of adding top-level keys the frontend
+	// contract has never declared (Q-51).
+	Uncommitted GitUncommittedView `json:"uncommitted"`
+	// Diff is ticket 189's per-file diff, budgeted and truncation-aware, with
+	// the command that recovers the whole of each file.
+	Diff GitDiffView `json:"diff"`
 }
 
 // GitViewNotProbed is what the pump sends when the assembly attached no reader
@@ -162,6 +188,12 @@ func GitViewNotProbed() GitView {
 	return newGitView(GitKindUnreadable, gitNoWorkspaceReason)
 }
 
+// newGitView is the base for every git section. Ticket 189's two sub-sections
+// start in the third state - unread, with a reason - and are overwritten only by
+// a reader that actually read them. That default is load-bearing: a GitView
+// built for a non-repo, a refused path or a machine without git must not carry
+// an empty count object, because an empty count renders as "0 uncommitted" and
+// 0 is the sentence "this tree is clean".
 func newGitView(kind, reason string) GitView {
 	return GitView{
 		Kind:          kind,
@@ -169,6 +201,8 @@ func newGitView(kind, reason string) GitView {
 		Worktrees:     []GitWorktree{},
 		Branches:      []string{},
 		SwitchBlocked: GitSwitchBlockedReason,
+		Uncommitted:   gitUncommittedUnavailable(kind, reason),
+		Diff:          gitDiffUnavailable(kind, reason),
 	}
 }
 
@@ -191,8 +225,21 @@ func ReadGit(workspaceRoot string) GitView {
 	if kind != GitKindRepo {
 		view.Kind = kind
 		view.Reason = reason
+		// Ticket 189's two dimensions are unread for the same reason the branch
+		// is unknown; they say so instead of reporting zero.
+		view.Uncommitted = gitUncommittedUnavailable(kind, reason)
+		view.Diff = gitDiffUnavailable(kind, reason)
 		return view
 	}
+
+	// Ticket 189: the working tree is known, so the two review dimensions are
+	// read against it in one pass. The coordinate is CurrentWorktree - the
+	// directory this run is scoped to, which is also what `git -C` needs: in a
+	// linked worktree the work files live there, not under RepoRoot (the main
+	// tree). readGitWorkingState resolves it through C26 once more before any
+	// process starts, and returns the third state on every path that did not
+	// read.
+	view.Uncommitted, view.Diff = readGitWorkingState(view.CurrentWorktree)
 
 	branch, sha, detached, headKind, headReason := readHead(loc.worktreeGitDir)
 	view.RepoRoot = loc.repoRoot
