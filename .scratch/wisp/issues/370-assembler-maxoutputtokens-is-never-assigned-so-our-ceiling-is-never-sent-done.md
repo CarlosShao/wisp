@@ -4,7 +4,7 @@
 > 原题写「**永远到不了**」、**比我量到的强**。证到的是「**没有**我们设的**天花板**」（`Assembler.MaxOutputTokens` 全仓无赋值 ⇒ `max_tokens` 被 `omitempty` 省略）；
 > ★**供应商仍可按**自身模型上限**返回 `length`**（`loop.go:490` `if turn.Stop == llm.StopMaxTokens`）。
 
-- Status: **ready-for-agent**
+- Status: **done**（2026-11-04 编排者据 370-v1 非实现者 AC#0-4 全 PASS 收口；A1527；实现 74f430d86＋mockllm 修 ddbec5ee6；已知假红 build/mut_rvw.go 非 HEAD）
 - 立案：2026-10-23 18:0x +08 编排者立
 - ★**来路（实现者签名、只报不修）**：`365-r1` §9-2（件 `docs/evidence/s1/365-r1-impl.md` **150 行**、`6b9a83c04`）
 - 关联：票 **365**（`taskLogState` 统一）· `internal/agent/prompt.go:132` · `internal/llm/resolver.go:205` · `cmd/wisp/**`
@@ -35,29 +35,29 @@
 
 ## 结案判据
 
-- [ ] **AC#0 现读＋归因（只读，⛔ 动任何产码字节）**：
+- [x] **AC#0 现读＋归因（只读，⛔ 动任何产码字节）**：
       ①★**现跑** `git grep 'MaxOutputTokens'` ⇒ ★**逐处列出**（★`prompt.go:132` 的字段、★`Request` 的字段、★**有没有任何赋值**）。
       ②★**现跑** `resolver.go:205` ⇒ ★**配置值确实进了 `llm.Endpoint` 吗**（★给逐字）。
       ③★**量出整条链**：★`config → llm.Endpoint → ?(断点) → agent.Config → Assembler → Request` ⇒ ★**给一张"哪个环节断了"的表**。
       ④**正控**：★**造一发"手工把 `Request.MaxOutputTokens` 设成 `1`"** ⇒ ★**必须能撞出 `StatusTruncated`**（★**证明"到不了"是配置没传、⛔ 状态机缺**）。
       ⑤★★**量出"供应商自己的上限"这条**：★**把 `max_tokens` 完全省略** ⇒ ★**供应商是否仍可能返回 `length`**（★`loop.go:490` `StopMaxTokens`）⇒ ★**给读数**（★**这条决定"到不了"的射程**）。
-- [ ] **AC#1 裁形（编排者拍）**：三形各写代价＝
+- [x] **AC#1 裁形（编排者拍）**：三形各写代价＝
       〔甲〕**把 `MaxOutputTokens` 一路传到 `Request`**（★**最小、但要看 `agent.Config` 加字段会不会撞契约**）；
       〔乙〕**在 `Assembler` 里从 `llm.Endpoint` 读**（★**可能造 `agent`→`llm` 的新依赖**）；
       〔丙〕**删掉 `StatusTruncated` 及其映射**（★**承认这个状态不存在** ⇒ ★**但那会抹掉一个真实的上限语义** ⇒ ★**⛔ 推荐**）。
       ★**未裁形任何实现都⛔ 开工**。
       ★★**注意**：★**`cmd/wisp` 每波只许一枚写腿**；★**若必须动 `cmd/wisp` 组装 ⇒ 与别的 `cmd/wisp` 腿**串行**。
-- [ ] **AC#2 落地＋牙（写腿）**：按裁定那一形做；★**每处改动配一枚今天响、不修不响的用例**；
+- [x] **AC#2 落地＋牙（写腿）**：按裁定那一形做；★**每处改动配一枚今天响、不修不响的用例**；
       ★**反向判据**＝把新加的那一跳摘掉 ⇒ 用例必须**转红并逐名报红行**；三读数 ＋ **还原核**（★**时机必须在最后一发变异之后**）。
       ★★**验收判据两条都要**：★①**造一发「输出撞我们设的天花板」** ⇒ ★**库里的 `task_log.state` 必须是 `interrupted`**（★**⛔ 只测「字段有值」**）；
       ★②★**同一发的**屏幕**说的是哪个词**（★**今天会是 `truncated`、库是 `interrupted`**）⇒ ★**把这两个词**逐字记下来**、★**并判「要不要一致」**
       （★**若判要一致 ⇒ 那是改屏幕文案、属另一件事**；★**本票只负责把这件事**记下来、**并可测**）。
       ★★**配方可借 `365-r1` 那条**：★**用**配置**造真状态、⛔ 构造 `Result` 冒充**。
-- [ ] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet` 动过的包／`go test -count=1`（**四数分开、⛔ 相减**）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`。
+- [x] **AC#3 门禁**：`GOFLAGS= go build ./...`／`go vet` 动过的包／`go test -count=1`（**四数分开、⛔ 相减**）／`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`。
       ★**格式门禁甲乙两尺都报**（甲＝入库 blob、**判据**；乙＝工作树、**只作诊断**）。
       ★★**`cmd/wisp` 的测试必须带 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`** —— **不加就 `0xc0000135` ＝ 假失败**；
       ★★**但整包 `cmd/wisp` 会在 `MARK299 before CreateWindowExW` / `before Embed` 被硬终止** ⇒ **整包四数 ⛔ 当判据**、只跑定向 `-run`。
-- [ ] **AC#4 纪律格**：⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 365 任何原句。
+- [x] **AC#4 纪律格**：⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 365 任何原句。
 
 ## ★硬提醒（⛔ 踩）
 
