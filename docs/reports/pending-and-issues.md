@@ -31014,3 +31014,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1516（编排者）159轮：361 现量更新＋AC#1 裁形=乙
 - attrib.sh --tracked-only 现仅 2 枚脏（pending_read.go/tools.go）；经 blob vs worktree gofumpt 比：blob 干净/worktree 脏/core.autocrlf=true ⇒ 纯 CRLF 假红，现 0 枚真脏（票面 20 枚真脏已随 HEAD 修掉）。
 - AC#1 裁形=乙（attrib.sh 本机按入库 blob 读，同格式门禁口径）；AC#2 实现下次，须保 --self-test 正控＋真脏 blob 点名。
+
+## A1517（编排者）160轮：361 AC#2 实现规格＋基线落档（未实现，交 fresh/腿）
+- 基线：--self-test rc=0(10例0失败)；--tracked-only rc=1(2脏)。改点 ruler_a:585 读 worktree→blob(法A git archive 导出 LF 树)；必保 self-test rosterctl/parse-error/A_FILES 三边。
+- 未实现：改 gate 脚本耦合 self-test 正控，近枯上下文硬改风险＞收益；spec+基线已备。

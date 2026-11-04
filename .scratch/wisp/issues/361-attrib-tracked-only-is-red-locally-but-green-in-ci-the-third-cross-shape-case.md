@@ -82,3 +82,12 @@
 - 现跑 `.scratch/wisp/probes/161/r5/attrib.sh --tracked-only` rc=1，仅 **2 枚**脏：internal/agent/approval/pending_read.go、internal/agent/tools.go（票面旧 35/20/15 已随 HEAD 演进）。
 - 判真脏 vs 假红：两文件对 **HEAD blob 的 gofumpt -l=0（干净）、对 worktree=1（脏）**，core.autocrlf=true ⇒ **纯 CRLF 假红**（worktree 被 autocrlf 转 CRLF，gofumpt 读 worktree 误判；CI 读 LF blob 故绿）。⇒ 当前 **0 枚真脏**（票面「20 枚真脏」那一半在现 HEAD 已不成立/随历史修掉）。
 - AC#1 裁形（编排者拍，按铁律最有价值/主流）＝**〔乙〕**：让 attrib.sh ruler_a 本机也按**入库 blob** 读（与格式门禁裁定同口径），⛔ 不选只写「不可判」的〔甲〕。AC#2 实现下次（须保 --self-test 正控仍红、真脏 blob 仍被点名）。AC#0 ③正控/④archive 对照待实现同程补。
+
+## AC#2 实现规格＋基线（编排者 160轮；实现腿/fresh 照此一次做完）
+- 改点：ruler_a `:585` 的 `A_OUT=$(git ls-files -z "*.go" "$A_N_EXCLUDE" | xargs -0 "$GOFUMPT" -l 2>&1)` 现读 **worktree(CRLF)** ⇒ 改读**入库 blob(LF)**。
+- 法A（推荐）：`git archive HEAD` 导出到 tmp（.gitattributes `*.go text eol=lf` ⇒ 导出树 LF），tmp 内剔 `.scratch/**`，`cd tmp && "$GOFUMPT" -l <五生产目录或 .>`，输出即 repo-relative；A_OUT 语义不变、下游循环不改。
+- 法B：逐文件 `git cat-file blob HEAD:$f` 到 tmp（1089 子进程，慢）。
+- 必保 3 边：①`--self-test` rosterctl 正控（:568、`/tmp/wisp-275-r2-rosterctl.*`，要 gofumpt rc=2＋A-ROSTER 点名）不受影响；②parse-error rc>=2 分支（:586-609）语义不变；③A_FILES 的 `:N:N:` 剥离（:623）不变。
+- 基线（160轮现跑）：`--self-test` rc=0（cases=10 failures=0 GREEN）；`--tracked-only` rc=1 tracked-dirty=2。目标：改后 `--tracked-only` rc=0（blob 干净）、`--self-test` 仍 rc=0、真脏 blob 仍被点名红。
+- 牙：造一枚真脏 blob（`git hash-object -w` 脏内容＋临时 index 替换该路径）⇒ 改后 attrib 仍红点名；摘掉 blob 读取跳 ⇒ 回 CRLF 假红。
+- ⚠ 本轮未实现（编排者上下文近枯＋改坏 gate 脚本风险高于收益）；spec＋基线已备，fresh/腿 一次做完再非实现者裁。
