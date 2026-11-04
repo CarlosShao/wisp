@@ -30941,3 +30941,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ★**关键**：cmd/wisp/run.go 早已含 378 接线——:1558「Ticket 378〔乙〕: CHILD loops task.spawn derives get the same journal」/:1562「378-a1: second source of orphans」/:1722「Ticket 378〔乙〕」。⇒ **378 的修复极可能已由先前 378-a1 腿实现（选〔乙〕：子环路继承同一 journal）**，故 fkc 已=0、测试通过。
 - ⇒ **A1502 裁形=甲 与既有代码〔乙〕冲突**：应先核 run.go 378 段完整实现＋fkc 是否真=0，若已修则 378 只需补牙/门禁后收口（裁形改〔乙〕已就），而非重写。**待新鲜上下文对账**，⛔ 本波未动 378 生产码。
 - 地面：HEAD fe7573aaf，未推=0，system.go 已回退(build rc=0)，378 测试件 untracked 留存待评。
+
+## A1504（编排者）148轮：378 修复确在库(run.go:1573-1585 乙)，但腿遗留测试不可靠⇒378 未收口
+- ★确认 run.go:1573-1585 已实现 378〔乙〕：子环路经 rt.loopOpt 继承 taskLifecycleJournal(task行半)⇒每子任务落 1 枚 task_log 行，tool_call 仍 bridge 每调一行(不变)⇒子任务 tool_call 有父、fkc=0。我 A1502 裁「甲」与代码「乙」**同义**(均为每子任务 1 行、不量级爆)，非冲突。
+- ⚠ 腿遗留测试 cmd/wisp/tasklog_fkcheck_378_test.go **不可靠**：首跑 ok0.305s，其后 3 次一致 FAIL(原因 `golden requests=[]`/脚本化模型未触达 rc=1，**非 fkc 断言**)。⇒ **我先前"反向判据成立"作废**——那次红=此环境失稳，非变异行为。
+- ⇒ 378 **未收口**：修复码在库，但缺一条**可靠** AC#2 测试(能稳定绿＋真反向红)。该 flaky 测试已移出仓到 /d/tmp/wisp/20261104/378r1/。run.go diff=0、cmd/wisp 干净(除既有 zz)。
+- 下步(fresh context)：为 378 写/修一条稳定端到端 task.spawn fkc 测试(参考 r1-tests 的 WISP_ENV=test+真 store 而不依赖脆弱 SSE 脚本服务器)＋真反向(摘 rt.loopOpt 重发布⇒红)＋AC#3 门禁⇒收口为第26张。
