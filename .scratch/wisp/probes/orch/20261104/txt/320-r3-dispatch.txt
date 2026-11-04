@@ -1,0 +1,26 @@
+320-r3 派单 — 票 320 AC#4 残余仪器收口（非实现者 320-v1 具名三缺口 + 编排者已裁第④口径）
+
+仓：D:\work\workspace\projects plans\Wisp   HEAD 0ac5c0a47   Git Bash: D:\work\soft\Git\bin\bash.exe
+（你的账号/模型由 workflow 覆盖为 magpie/cline-pass/deepseek-v4.1-flash-1017，你不需处理）
+
+目标：只做票 320 的 AC#4 残余。AC#1/2/3/5/6/7 已 [x]，⛔ 勿动。AC#4 = 拉取模型列表端口的行为要有"有牙仪器"证明四条：超时／错误分类／不回显密钥／不落盘明文 ＋ 返回 id。产码行为已在 cmd/wisp/panel_models_320.go，本腿补两点：①第④口径的代码修正 ②四条各有"今天红、修后绿"的测试。
+
+★编排者已裁（A1483，第④口径）：页面可见回执句**不得含上游返回 body/first-line**；只给 D37 分类 + 本机自带摘要句。现 cmd/wisp/panel_models_320.go:111 用 boundedFirstLine320(err.Error(),200) 会把上游首行带进页面句，与该文件头注释(:19-22 自述 "does not relay the upstream error body verbatim … built from the classified error") 不符 ⇒ 改成**不含 err.Error() 上游正文**的本机句（含 provider + "拉取失败" 字样即可；⛔ 不含上游 body）。若 boundedFirstLine320／modelsListErrorCap320 因此无引用，删除之避免死码。
+
+写面（仅这三枚，git commit 显式 pathspec）：
+- cmd/wisp/panel_models_320.go
+- cmd/wisp/panel_models_320_test.go
+- docs/evidence/s1/320-r3-instrument.md（新）
+⛔ 冻结点零改：internal/panel/l2_grant_boundary_test.go、248/313 两表、git_test.go、thresholds/golden/allowlist、frontend/**、design/**、PLAN/specs。
+
+四条测试（每条必须：先造对应变异/夹具 ⇒ 新测试红、红名逐字在案；还原 ⇒ 绿。用 -overlay 仓外 mutant，⛔ 不改工作树产码做变异）：
+1) 不落盘明文（a4m5）：成功拉取一次 + 失败一次后，遍历临时配置目录与 CWD，断言没有任何文件内容包含解析后的密钥字节；且回执不含密钥。要能逮住"处理腿把密钥写文件"这一形。
+2) 超时（a4m3）：加慢响应夹具（httptest sleep 超预算）。为可测，把 modelsFetchBudget320 由 const 改 var（加注释说明为可测），测试内临时改小（如 120ms，defer 复原），断言超时被分类且不挂死。
+3) 错误分类（非 200）：httptest 返 500，断言回执句体现分类/失败，且⛔ 不含上游 body 标记串。
+4) 不回显上游原文/密钥：500 body 埋标记串 UPSTREAM_LEAK_320XYZ，断言页面可见回执不含该串；成功夹具 body 含 id 列表，回执含 id 且零密钥。
+
+门禁（全跑，四数从 -v 量）：go build ./cmd/wisp ./internal/panel；go vet 同两包；/d/work/base/gopath/bin/gofumpt.exe -l 两 .go 文件空；sh scripts/d22scan.sh rc=0 clean；go test -count=2 -v ./cmd/wisp -run Test320 四数全 PASS。cmd/wisp 是窗族死区，⛔ 跑整包（只 -run Test320）。
+
+纪律：只 commit 不 push；git add/commit 显式 pathspec 那三枚；⛔ add -A/amend/reset/stash；做完 git diff 工作树为空；往票 320 append 一条 Progress log（⛔ 不翻 AC 框、不改 Status/票名——非实现者判语由编排者出）。evidence 件写红名逐字+四数+变异自证。
+
+回报：四数、每条测试红/绿名逐字、改了哪些行、git diff --stat。

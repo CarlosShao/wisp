@@ -30818,3 +30818,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1482（2026-11-04 13:44 +08，编排者）123轮：234 收口（第21枚）——12 格全读数
 - 编排者亲跑补齐 234：AC#1 新基线(457 名 rc=0 PASS=455 FAIL=0 SKIP=2，旧 baseline 因 risk 坏作废)；AC#2 M3(winsec-tests.sh 快照 rc=1 dllfail0 ≥10red)+M4(Docker golang1.27 11 POSIX red 两形 restore identical)，M1/M2/M5 用 gate-rerun-2；AC#3 七门禁四数现取(approval/tools/risk/winsec/memory/secret rc=0；panel 1 既有红；容器 winsec/risk ok、memory-linux 2 红产品范围外)；AC#4 基线=终态；AC#5 10 指向标记现盘核=10；AC#6 void。汇表 gate-rerun-3/table.md。
 - 234→-done。零产码。403(第20枚)修 risk import cycle 解锁本票 risk 分母。flash 腿 gate-rerun-2/3+m34 均达轮帽死，故编排者亲跑收尾。
+
+## A1483（2026-11-04 13:52 +08，编排者）125轮：320 AC#4 第④口径裁决 + 派 320-r3
+- 复扫票池确认：316 withdrawn（与272重复）、272 已done；239/311 全勾但有据不结案（残余）；近收口9只全门禁。快清面已尽。
+- **320 是最接近真收口票**：AC#1/2/3/5/6/7 已[x]，仅 AC#4 未勾；非实现者 320-v1 具名三仪器缺口（①不落盘明文判据层不成立 a4m5 ②超时缺世界 a4m3 ③错误分类缺世界）＋一枚待人裁（上游原文回显口径）。
+- **编排者裁定第④口径（技术选择，agent 拍）**：页面可见回执句不得含上游 body/first-line，只给 D37 分类＋本机摘要句——主流 harness 安全做法，且与 cmd/wisp/panel_models_320.go:19-22 文件头自述一致（现 :111 boundedFirstLine320(err.Error()) 与自述矛盾，属实现未跟上声明）。
+- **派腿 320-r3**（workflow 覆盖 magpie/cline-pass/deepseek-v4.1-flash-1017）：收 AC#4 残余（代码修正 + 四条有牙测试 + 门禁），派单存档 .scratch/wisp/probes/orch/20261104/txt/320-r3-dispatch.txt。只 commit 不 push；非实现者判语由编排者下轮出。
