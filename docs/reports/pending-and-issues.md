@@ -31034,3 +31034,14 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 选型（铁律 agent 拍）：★保留描述性长名 + 补/改 roster（roster 正是 ticket 262 为此设的豁免数据机制），⛔ 不选"短别名丢信息"。非 owner 待办的"二选一"，按最有价值自决。
 - 改动：scripts/check-path-length-budget.sh R[...] 块——128/175 两条改名 `-done`＋新增 273/364/403 三条。预算常量一字未动。
 - 现验：scan rc=0 over-budget=65 covered=65 not-in-roster=0 GREEN；--with-self-test rc=0（3/3 正控 PASSED）。⇒ owner ⑤ 关闭。
+
+## A1521（2026-11-04 20:3x，编排者）163轮：纯候选合并 triage——无可自推"小而自洽"票
+- 现 HEAD e3c29f948（ground：未推0/净/pathlen GREEN）。逐票读正文结论：
+  - **180**：AC#1 已判"规格要求生效"，但本树无面板窗口(票33/35)⇒AC#2 无对象＝**blocked-by 33/35**（已记入票面）。
+  - **179**：部分完成(AC#2-7/9/10 勾)，AC#1/AC#8 未闭，AC#8 归票 183(等 cmd/wisp 空档)。
+  - **182**：普查已交(180-182-panel-fields-census §4-8)，AC#1 勾；AC#2-7 可据普查翻，但 AC#3 会为"7 处未归属堆"点名立新票（cascade 扩池）⇒ 近枯上下文不宜开。
+  - **187/188**：功能票，需面板宿主/桥(33/35)＋前端，owner-gated。
+  - **354**：AC#1 拍形须先过编排者＋机主，⛔ 未拍形不开工。
+  - **370**：agent/llm/cmd-wisp 接线，medium。
+  - **371**：改写稿，前提部分被 372 失效，AC#1 裁形。
+- **结论：7 纯候选无一"小而自洽"可自推；全部 gated(33/35·C17·前端·owner拍形) 或 medium/cascade。** 自推自洽票已尽——需 owner ①–④ 或接受 medium 票的多年轮投入。
