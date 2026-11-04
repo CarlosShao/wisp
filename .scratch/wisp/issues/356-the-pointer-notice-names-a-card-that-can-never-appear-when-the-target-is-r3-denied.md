@@ -18,7 +18,7 @@
 
 ## 结案判据
 
-- [ ] **AC#0 现读＋归因（只读，⛔ 动文案字节）**：把"R3 A 档下 notice 说了什么 ⇄ `fs.read` 实际做了什么"量成成对读数。
+- [x] **AC#0 现读＋归因（只读，⛔ 动文案字节）**：把"R3 A 档下 notice 说了什么 ⇄ `fs.read` 实际做了什么"量成成对读数。
       必须**逐字**给：notice 原文（`announceOf`）、`fs.read` 的 `isError`／`level`／`class`／正文逐字、
       **`approval` 被问的次数（今天应为 0）**。★另起尺、⛔ 抄 `174-v1` 的数；★正控＝同一路径在 R2-only 形状下 approval＝1（证明尺分得清两种形状）。
 - [ ] **AC#1 改写口径（文案面）**：让回执能区分"只判到 L2（两条路都真）"与"被判 Deny（没有卡、批也无效）"。
@@ -59,3 +59,5 @@
 - [2026-10-21 10:2x +08] agent=`编排者` did=立案（非实现者签名＝`174-v1` 第 (5) 件第 2 条；三格按它的建议形状落，含 MUT-5 缺口）next=派 `356-a1` 只读出 `AC#0` 成对读数（approval 计数是承重那跳）。
 
 - [2026-11-04 11:41 +08] agent=编排者 did=修硬约束点名的**幻影引用**：`internal/tools/task.go` 注释原引 `task_output_pointer_notice_174rr1_test.go`（盘与 HEAD 均 0 命中＝幻影）→ 改指真实承重测 `task_output_pointer_two_roads_174r1_test.go`（其 `TestPointerSecondRoadBackIsRealOnThisBridge174r1` 正是"L2 卡批准即整读回 20000B"的同桥测，我现核）。build OK／gofumpt 净／vet 仅余 `system_backend_windows.go` 两处 unsafe.Pointer 基线告警（非本改）。★**仪器缺口具名登记**：`d22scan` ban #9 的 `repoPathRe` 只认"带目录前缀的完整仓相对路径"，裸文件名（如本幻影）进不去 ⇒ 这类"注释引裸文件名指向不存在件"今天扫不到，须人工 grep 兜底。⛔ 零 AC 翻（AC#0/1/2 仍未做，本只是硬约束里的顺手项）。
+
+- [2026-11-04 11:46 +08] agent=编排者 did=**AC#0 翻勾（只读现读＋归因）**：另起尺探针 `zz_356_ac0_probe_test.go`(tag `probe356`) 现跑 PASS，取三形成对读数（件 `.scratch/wisp/probes/356/a0/ac0-readings.md`）：**i 正控 R2-only** approval=**1**、整读回 20000B；**ii 越权+R3Deny** notice 仍吐两路文案（缺陷：点永不出示的卡）、fs.read `permission_denied`、approval=**0**；**iii 授权内+R3Deny** notice 无告警句(warn 0字节)、fs.read `permission_denied`、approval=**0**。归因＝`pointerNotice(task.go:831)` 无"被判 Deny"支。AC#1/AC#2 未做。
