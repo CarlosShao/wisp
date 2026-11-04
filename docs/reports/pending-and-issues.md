@@ -30850,3 +30850,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 门禁：build rc=0／189 六枚全 PASS／整包 PASS=178 FAIL=1(已知)／gofumpt 空／d22scan clean／vet rc=0。翻 AC#2-6，AC#1 归 189-a1。件 docs/evidence/s1/189-ac-verdict.md。
 - 190-a1 普查腿同轮完成（250行件,三枚commit零产码）：落点 tree.go 300-360行+tree_test.go+composer/pump/scrub/cmdwisp 约600-760行；取数=问git两问(ls-files -z / -o -i --exclude-standard)+自加一枚.git排除;v1不做懒展开(懒展开触C17+人工批准=Q-76第二枚);顶层files键omitempty新增红0枚(普查证)。
 - 下一枚：190-r1 落地腿派单已存档待发（面板写面1腿/波，189已腾面→立即发）。
+
+## A1488（2026-11-04 15:21 +08，编排者）130轮：flash 子代理对大段 Go 不稳 + 180 gated on 255 + 190 拆微策略
+- **发现（重要，运营）**：本会话子代理模型 magpie/cline-pass/deepseek-v4.1-flash-1017 对**大段 Go 代码生成不稳**——190-r1 连派 4 次（全量/重派/短派/单文件 tree.go-only）**全 dud 零产出**（report=null，盘上无文件）；但极小探针（读文件首行）与 250 行 md 普查（190-a1）**正常**；189 早前能写 634 行执行器。⇒ **非网关死（探针通），是大段代码生成的间歇失败**。按铁律⑤如实上报、⛔ 静默降级。
+- **对策**：190 改**超细粒度单件腿**（types/enum→reader→tests→wiring 各一腿，每腿小到 flash 能成），下轮起逐步推进；或换更强模型（需 owner 定，属"花钱/选型"边界外的运营项——本会话主会话模型不变，子代理受令必用 flash）。
+- **180 复扫**：逐格读毕——AC#2/AC#3 已归口票 255（ 收口记：宽度接线那一跳今天不差，差的是"重新生效"跳、归 255 AC#4）；AC#4（同族哑键名册）待 255 先例再裁；AC#5/AC#6 归落地腿。⇒ **180 gated on 255**，非独立可收。
+- 190/188 普查：190-a1 已成功出件（真脉可用）；188-a1 dud（无件），需重派。
+- 地面：HEAD 28d7f75a8、未推=0、panel 净、无残留 in-flight。189 为本会话第23枚（上一步已收）。
