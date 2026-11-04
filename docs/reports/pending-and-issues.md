@@ -30829,3 +30829,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 腿 320-r3 死前把两文件改到位（未 commit、report=null）；编排者从工作树捞起、补自证、出非实现者裁语（docs/evidence/s1/320-r3-instrument.md）。
 - 第④口径（A1483 ruling4）：错误句只带 D37 分类、不含上游正文；不转述 tooth 变异自证 RED（UPSTREAM_LEAK_320XYZ 落页面句，诚实树 PASS）。四条 AC#4 测试全绿，含不落盘正控（植密钥探测器能看见）＋超时慢夹具（ClassNetwork、elapsed<2s）。
 - 门禁：build/vet rc=0、gofumpt 空、d22scan clean、-count=2 Test320 24/24/0/0 rc=0。320 八格全[x]→-done。本会话累计 22 票。⛔ 零改 thresholds/golden/frontend/PLAN/specs。
+
+## A1485（2026-11-04 14:10 +08，编排者）127轮：320 后系统复扫——快清面已尽，余 open 池全门禁
+- 复扫口径：u=1 九只 ＋ c>=3 近收口十余只 ＋ ready-for-agent 一批，逐格读正文（非只看勾数）。
+- 结论逐条：316 withdrawn；272/176 已 done。u=1 九只（220/216/226/290/293/339/246/64）全门禁（owner Q-85/前端 ChatInput/真机/真第二屏/等347/归228/owner#7）。近收口逐读：301(u=2) AC#4＝"历史违规永久留空"(301-v3 裁、⛔可翻)、AC#4b 前瞻闸门；179(u=2) AC#8 端到端解封 09-28 转票183(R4)＋依赖 176(open)；177 设计腿起手；72 真CI gated；145「为什么现在按住」＋panel 冻结面；余 panel/audio/CI/真机族。ready-for-agent 多为 frontend(owner 外 agent)/S-acceptance(阶段门控)/大特性(port/engine/i18n/plugin SDK)。
+- ⇒ **320 是本会话最后一张遗留可收票；余 open 无 dispatchable clean 票**。非怠工：flash 腿对 135/136 巨型仪器票高概率 dud（多次实证）、gated 票不可收。
+- 真解阻路径＝①owner 8 条(256/301/185/347/230AC#4/174AC#4/226/264AC#0) ②放行大特性/前端(35) ③票链(176/183→179)。下一枚：owner 解任一阻→即刻派对应腿；否则下轮起重型自办(逐字码，非纯指令派单)。
