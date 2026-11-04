@@ -30739,3 +30739,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **72**：AC#4/AC#6 需 **CI runner 两侧**（同命令双 exit code）＝gated。
 - **145**（上轮判）：gated 于票 35 面板出向跳＋Q-51。
 - ⇒ **再次确认：开放池自办可收已尽**；余票 gated 于四类：owner 拍板／票 35 大特性／真机真 CI／大特性多格（224/176）。**107-108 轮为负判与阻断确认，未虚翻任何格**（宁不翻，不把 stub 绿当完成）。
+
+## A1472（2026-11-04 12:18 +08，编排者）109-113轮：224 会话授 executor 收口（第 17 枚）
+
+- **224 → -done**（72decb0a3，双名核=1）：十一格全勾，本会话五轮推进——AC#1 铸告点唯一（run.go:561 session.Mint + session.go:19 会话结束具名）／AC#2 答复⇒落行（三件套独立用例 + 短路 gate.go:764 Record 变异 3 红自证）／N#5 glob 方言（path.Match 定案 grants.go:296 + 写侧拒收 storeablePattern:280）／AC#4 反控（派生式常量 Mint 变异 → MintIsRandomAndValid+CoveringDoesNotCrossToANewSession 红）／AC#3 真 OS 进程（新测 ticket224_ac3_realprocess_windows_test.go：buildWispForTest + 双 exec，boot1 id 落 grant、boot2 id 读 0，补 JUDGEMENT CEILING 缺的真进程半）。
+- 门禁：d22scan clean、vet cmd/wisp 净（基线 unsafe 除外）、gofumpt 净、go test -c ./cmd/wisp 编译 OK、真进程测 PASS(8.00s)。
+- 本会话累计收口 17 票（273 175 128 324 327 309 310 304 296 165 109 303 352 351 222 356 224）。
+- 下轮候选：票 35 面板 Go→页出向跳（Go 半可做，页面接收器归 owner 前端）/ 票 176 起跑口（触 Loop 形状禁区）。
+- 待机主 7 条不变：256/301/185/347/230AC#4/174AC#4/226。
