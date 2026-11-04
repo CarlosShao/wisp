@@ -1,0 +1,7 @@
+TASK 票 188（面板"任务监控"栏：子代理状态＋后台任务状态，宿主侧 Go 无源）——只读设计核腿 188-a1（⛔ 零产码写）
+
+环境：cwd=D:\work\workspace\projects plans\Wisp；Go1.27 Windows；Git Bash=D:\work\soft\Git\bin\bash.exe。
+【读】.scratch/wisp/issues/188-*.md 全文（glob）；相关 internal/panel/（快照/ pump / composer）、internal/agent 子代理/任务状态现有载体；census docs/evidence/s1/180-182-panel-fields-census-c1.md 若在。
+【只读产出（⛔ 零写产码，仅 write 一份 evidence md）】docs/evidence/s1/188-a1-census.md，答：①子代理状态与后台任务状态各自从哪个现有数据结构取（复用现有还是新读面？⛔ 重造）；②落点＝哪些文件/约几行/是否触 C17 新方法/是否加顶层 key（撞 TestComposerContractTypesMatchFrontend）；③雷区与已知红（internal/panel 唯一已知红 TestC21DesignTokensFourWayAgree 属 tokens 域非本波）；④与票 190(文件树)/182/167 边界；⑤取数成本与缓存。
+【纪律】只 commit 你这份 evidence md（显式 pathspec，⛔ -A/amend/reset/stash/checkout）；⛔ push；临时件 D:\tmp\wisp\20261104\188a1\ 只建不删。回报：落点/行数/C17判/雷区。
+模型：magpie / cline/cline-pass/deepseek-v4.1-flash-1017
