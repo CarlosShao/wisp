@@ -31022,3 +31022,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1518（编排者）161轮：361 AC#2〔乙〕实现落地（attrib.sh ruler_a 读 index 取代 worktree）
 - 改=attrib.sh ruler_a：checkout-index(autocrlf=false)写 LF 树→gofumpt -l，含防 0 空绿守卫；self-test 抛树(index无commit)不变。
 - 四读：self-test 10/0绿；新版 tracked-only 0脏绿；真脏stage红点名；原版(worktree)红2枚。待 v1 裁收口。
+
+## A1519（2026-11-04 20:1x，编排者）161轮：★收 361（第 29 枚）——attrib 本机读 index 破 CRLF 假红
+- AC#2〔乙〕实现：attrib.sh ruler_a 由读 worktree(CRLF) 改为 `git -c core.autocrlf=false checkout-index -a` 写 LF 树→gofumpt -l；含防 0 空绿守卫。self-test 抛树(index 无 commit) 不变。
+- v1 非实现者独立复跑四读 PASS＋checkout-index/archive 双源互证（1089/0 脏）。实现 commit f2ce92a6e，verdict 7f079d122。
+- AC#3：d22scan 绿、attrib self-test 绿；path-length-budget 红＝5 枚 -done 长名超 165（128/175/273/364/403）＝owner ⑤ roster 漂移实例，与本票无关（另需处理）。
+- 收 361 后现跑 path-length 门禁＝红（见上）⇒ 下一动作：处置 ⑤（补 roster 或短别名），否则 CI 红。

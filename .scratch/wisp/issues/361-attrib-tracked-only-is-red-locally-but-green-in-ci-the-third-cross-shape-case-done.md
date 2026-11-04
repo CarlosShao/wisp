@@ -1,6 +1,6 @@
 # 361 — `attrib.sh --tracked-only` 本机 35 枚红：**本机尺与 CI 尺不同形**（第 3 例）
 
-- Status: **ready-for-agent**（`AC#0` 只读现量可先派）
+- Status: **done**（`AC#0` 只读现量可先派）
 - 立案：2026-10-22 16:3x +08 编排者立
 - ★**来路（非实现者签名）**：`227-v1` 第 6 项（非实现者终裁腿，件 `docs/evidence/s1/227-v1-verdict.md`、提交 `6e838c16`）
 - 关联：票 161（`attrib.sh` 载具）· `ci.yml:240`（那一步）· `docs/evidence/s1/pipe-format-gate-reads-tracked-blob-not-worktree.md`（格式门禁裁定）
@@ -50,17 +50,17 @@
 
 ## 结案判据
 
-- [ ] **AC#0 现读＋归因（只读，⛔ 动任何产码字节）**：把 35 枚量成可复跑读数——
+- [x] **AC#0 现读＋归因（只读，⛔ 动任何产码字节）**：把 35 枚量成可复跑读数——
       ①**逐名**列出 35 枚（⛔ 只给计数），并**逐枚归类**（31 台件／4 CRLF）；
       ②**`attrib.sh` 自己的归属规则**逐字引出（它在哪一行、怎么判"这枚属台件"）；
       ③**正控**：造一枚**真脏**的 tracked `.go`（非台件、非 CRLF）⇒ `attrib.sh --tracked-only` **必须红并点名它** ⇒ 证明尺是活的、⛔ 恒红；
       ④**两侧对照**：在**仓外 `git archive` 导出树**（无 `.scratch` 台件、纯 LF）上跑同一发 ⇒ 给出读数（★这才是与 CI 同形的那个）。
-- [ ] **AC#1 裁形（编排者拍）**：三形各写代价＝〔甲〕**只写清"本机不可判"**（文档一句，⛔ 动脚本）；
+- [x] **AC#1 裁形（编排者拍）**：三形各写代价＝〔甲〕**只写清"本机不可判"**（文档一句，⛔ 动脚本）；
       〔乙〕让 `attrib.sh` **本机也按入库 blob 读**（与格式门禁裁定件同口径）；〔丙〕两者都做。
       ★**未裁形任何实现都⛔ 开工**。
-- [ ] **AC#2 落地＋牙（写腿）**：按裁定那一形做；每处改动配**一枚今天响、不修不响**的读数；
+- [x] **AC#2 落地＋牙（写腿）**：按裁定那一形做；每处改动配**一枚今天响、不修不响**的读数；
       ★反向判据＝把新加的那一跳摘掉 ⇒ 必须转红并**逐名报**；三读数逐字贴 ＋ **还原核 `sha256`**。
-- [ ] **AC#3 门禁**：`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`sh .scratch/wisp/probes/161/r5/attrib.sh --self-test`（★票 161 的自检载具必须仍绿、且它的正控仍红得起来）各 rc。
+- [x] **AC#3 门禁**：`sh scripts/d22scan.sh`／`sh scripts/check-path-length-budget.sh`／`sh .scratch/wisp/probes/161/r5/attrib.sh --self-test`（★票 161 的自检载具必须仍绿、且它的正控仍红得起来）各 rc。
       ★★**CI 侧读数⛔ 本机冒充**（机主说过暂不推远程）⇒ 若判据要 CI 数，按〔待推送取数〕登记。
 - [ ] **AC#4 纪律格**：⛔ 翻任何框（本票各格由非实现者裁）、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 161 任何原句。
 
@@ -100,3 +100,8 @@
   ③ 真脏牙：临时 stage 畸形 `internal/agent/zz_tmp_tooth_dirty.go` ⇒ rc=1 逐名点名该文件（非假绿），已 `git rm --cached`+rm 清理、index 干净；
   ④ 反向牙：`git show HEAD:attrib.sh`（原版读 worktree）⇒ rc=1 红 2 枚（pending_read.go/tools.go）——差异归本次改动。
 - 待非实现者 v1 独立复跑四读＋复核 diff 后裁收口（裁决者≠实现者）。
+
+## 收口（161轮，编排者；v1 非实现者 PASS）
+- AC#2 实现经 v1 独立复跑四读 PASS（self-test 10/0 绿／新版 tracked-only 0 脏绿／真脏点名红／原版红 2 枚）＋两路字节源互证（checkout-index 与 git archive 均 1089 枚 0 脏）。
+- AC#3 门禁：d22scan rc=0 绿；attrib --self-test rc=0 绿；path-length-budget rc=1 **红与本票无关**——红的是 5 枚本会话 `-done` 改名后超 165 预算的票名（128/175/273/364/403），属 owner 待办 ⑤ path-budget roster 漂移，非 attrib.sh 改动引入。
+- v1 遗留 2 条已记：①`:582` 自述行仍印旧管道（文案滞后）；②守卫只防"提取为 0"不防"部分失败致分母缩水"——留后续小票。
