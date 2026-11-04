@@ -87,3 +87,4 @@
 - **AC#1 成立 ⇒ 翻**。三把尺现跑：①生产铸造点**唯一**＝cmd/wisp/run.go:561 （改前生产铸造者＝0 见 224-c1 普查，改后＝1）；铸造函数＝internal/session/session.go:94 （idPrefix=sess_ + 16B hex，Valid() 结构校检）。②会话结束**具名**＝internal/session/session.go:16-20（逐字「不许派生…；结束点今天＝进程退出，the identity this process minted dies with it, and the next process mints a different one」）。③原 224-v1 判「成立附条件」的唯一条件＝§6-a **幻影用例**，已由 224-r2 补真：cmd/wisp/ticket224_assembly_test.go:420  现真在（非注释）。
 - 现跑傍证：go test ./internal/session -run TestTicket224 ⇒ ok(2.784s)；go vet ./cmd/wisp ⇒ 净。
 - ⚠ 本翻只动 AC#1；**AC#2/AC#3/AC#4 仍不翻**（核心执行链判据＋AC#3 真 OS 进程那发＝N#8③ 欠做；N#5 glob/N#7 写侧拒收/N#9 setter 待人），本票仍不加 -done。
+- **AC#1 证补正（同轮：上条 heredoc 未引号致三处反引号代码名被命令替换吞掉）**：正确应为——生产铸造调用＝cmd/wisp/run.go:561 的 sessID, err := session.Mint()；铸造函数＝internal/session/session.go:94 的 func Mint()；幻影用例＝cmd/wisp/ticket224_assembly_test.go:420 的 TestTicket224ProductionSessionDoesNotSurviveRestart。读数不变（session 测 ok 2.784s、vet 净、铸造点唯一）。
