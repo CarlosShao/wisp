@@ -128,6 +128,15 @@ func refusalLegs128() []refusalLeg128 {
 			rc := cmdProviders([]string{"list"}, providersIO{stdout: io.Discard, stderr: &out})
 			return rc, out.String()
 		}},
+		{entry: "cmdSessions", drive: func(t *testing.T) (int, string) {
+			// Ticket 364-r1a: the sessions leg resolves the data root the same
+			// way `wisp run` and `wisp models` do, so it owes the same refusal
+			// row. Without this row the call-graph equality above names it as a
+			// consumer nobody drives.
+			var out bytes.Buffer
+			rc := cmdSessions([]string{"list"}, sessionsIO{stdout: io.Discard, stderr: &out})
+			return rc, out.String()
+		}},
 		{entry: "cmdDoctor", drive: func(t *testing.T) (int, string) {
 			var ok bool
 			text := captureStdout128(t, func() { ok = cmdDoctor() })

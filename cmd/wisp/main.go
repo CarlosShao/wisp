@@ -32,6 +32,10 @@ Usage:
   wisp run "task"  run one task end to end through the agent loop (ticket 12:
                    the S1 text path - streamed reply + notification + exit code
                    that reflects the error class)
+  wisp sessions    cross-restart conversation list (ticket 166 outlet #1,
+                   wired by 364-r1a): sessions list prints the newest sessions
+                   through the existing session.Manager.List - id, updated_at,
+                   title
   wisp providers   provider catalog path (ticket 12, ruling A11): discover
                    <provider> lists /v1/models; probe <provider>/<model> runs
                    the capability probe suite into provider_health
@@ -89,6 +93,12 @@ func main() {
 	case "run":
 		attachParentConsole()
 		os.Exit(cmdRun(args[1:]))
+	case "sessions":
+		// Ticket 364-r1a: the first production caller of session.Manager.List.
+		// Attach the parent console like the other operator-driven legs so the
+		// rows and the refusal line are readable from an Explorer start too.
+		attachParentConsole()
+		os.Exit(cmdSessions(args[1:], sessionsIO{stdout: os.Stdout, stderr: os.Stderr}))
 	case "providers":
 		attachParentConsole()
 		os.Exit(cmdProviders(args[1:], providersIO{}))
