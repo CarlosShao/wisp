@@ -30935,3 +30935,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1502（编排者）147轮：378 AC#1 裁形=甲（子任务获独立 task_log 行=一等子任务任务）
 - 依据机制(378-a0 ①③)：子环路 Journal=nil(run.go:1521→rt.loopOpt)，root 走 :1578 loopOps.Journal=rows，子代理复制 rt.loopOpt=nil。裁甲：每个 task.spawn 子任务写 1 枚 task_log 行（task 行半，复用 taskLifecycleJournal），其 tool_call 挂它 ⇒ fkc=0；⛔ 对每发工具调用写(量级爆)。理由：主流 harness 子代理=一等任务有独立日志、task_log 现子任务正确、retention 老化正确；⛔ 因隐私页/retention 代价降级乙/丙=退其次。
 - 落地待 378-r1 写腿(data-model 改 cmd/wisp 共享面，需新鲜上下文细做)＋fkc=0 测试＋反向判据。②④fkc 基线读数并入 r1 测试。
+
+## A1503（编排者）147轮：378-r1 腿失败(误跑整包死区600s/越界改system.go/无真修复)＋★发现 run.go 早已有 378〔乙〕接线
+- 378-r1 腿失：空转35分(误跑 cmd/wisp 整包 600s 死区)、越界改 internal/tools/system.go schema(已 git checkout 回退)、留 572 行测试 tasklog_fkcheck_378_test.go（untracked，`-run` 通过 ok0.305s、断言 fkc=0），但**无任何 378 生产改动**。
+- ★**关键**：cmd/wisp/run.go 早已含 378 接线——:1558「Ticket 378〔乙〕: CHILD loops task.spawn derives get the same journal」/:1562「378-a1: second source of orphans」/:1722「Ticket 378〔乙〕」。⇒ **378 的修复极可能已由先前 378-a1 腿实现（选〔乙〕：子环路继承同一 journal）**，故 fkc 已=0、测试通过。
+- ⇒ **A1502 裁形=甲 与既有代码〔乙〕冲突**：应先核 run.go 378 段完整实现＋fkc 是否真=0，若已修则 378 只需补牙/门禁后收口（裁形改〔乙〕已就），而非重写。**待新鲜上下文对账**，⛔ 本波未动 378 生产码。
+- 地面：HEAD fe7573aaf，未推=0，system.go 已回退(build rc=0)，378 测试件 untracked 留存待评。
