@@ -34,7 +34,7 @@
 
 - [x] **AC#1 身份有唯一的铸造点**：`grep` 点数：改前生产铸造者＝0，改后 ≥1，且具名写出"会话结束"是哪一行代码在做什么。
 - [x] **AC#2 三件套齐全**：**写**（答复"本会话内允许" ⇒ `approval_grant` 真有一行，带 session 身份＋工具＋模式＋创建时间）、**读**（下一次同类请求命中它 ⇒ **不再弹卡**）、**失效**（会话结束 ⇒ 同一身份查不到、行为回到"要问"）。三格各自有独立用例，⛔ **不许合并成一枚"持久化"用例**（`ticket90_persist_test.go` 文件头逐字"They are three test functions on purpose"）。
-- [ ] **AC#3 重启必失效**：进程重启 ⇒ 同类请求**重新弹卡**（这条是"永久免审通行证"的命）。
+- [x] **AC#3 重启必失效**：进程重启 ⇒ 同类请求**重新弹卡**（这条是"永久免审通行证"的命）。
 - [x] **AC#4 反控（正控！）**：种一条"派生式 session id 让授权跨会话仍生效"的假腿 ⇒ **AC#2／AC#3 至少一枚必须红**；如果三枚钉全绿而授权实际生效 ⇒ **本票判失败**，因为那正是 `store.go:19-27` 那段注释点名要挡的形状。
 - [x] **AC#5 不许把"长期"混进这一票**："长期／永久允许"落 `[fs] allowed_dirs`，见票 219 与批准记录 `A424`，**不是这张票的射程**。
 
@@ -117,3 +117,9 @@
   - 还原后 git diff 空、测 ok(1.667s)。
 - ⇒ 派生式假腿下 **AC#2 判据（CoveringDoesNotCrossToANewSession）与 mint 随机判据均红**；且 cmd/wisp TestTicket224ProductionSessionDoesNotSurviveRestart 的 id2!=id1 断言在常量 Mint 下亦必红（id2==id1）。⇒「三枚钉全绿而授权实际生效」的情形被排除＝判据有真牙。AC#4 满足。
 - ⚠ 本翻后 224 **仅余 AC#3**（进程重启⇒同类重新弹卡；其「真 OS 进程」那一半＝N#8③ 欠做）。本票仍不加 -done。
+
+### 2026-11-04 12:17 +08 编排者增量 — AC#3 裁决翻勾（非实现者；真 OS 进程实测）
+
+- **AC#3 成立 ⇒ 翻**。新测 cmd/wisp/ticket224_ac3_realprocess_windows_test.go（TestTicket224ProductionSessionChangesAcrossRealOSProcesses）用 buildWispForTest 建真二进制、两次 exec 真子进程 wisp run（同 WISP_TEST_DATA_DIR 共享 h.dir），现跑读数：boot1 minted sess_4382e9d5ef3c2cb414f0a1d5167b2daa（holds 1 grant）／boot2 minted sess_d406923ba76cf494c50e016f4f6f47ef（sees 0）。两真 OS 进程铸**不同合法**身份，且真进程1 落的 grant 行对真进程2 身份**不可见**（ListGrantsBySession(id2)=0）⇒ 同类请求在 boot2 无覆盖行 ⇒ 重新弹卡。**补上旧用例 JUDGEMENT CEILING 自述缺的「第二 OS 进程」那一半**（旧用例只证同进程二次装配）。DB 隔离半由 TestTicket224CoveringDoesNotCrossToANewSession 已在盘。
+- 现跑傍证：go test -c ./cmd/wisp 编译 OK；该测 PASS(8.00s)；gofumpt -l 空。
+- ⇒ 224 十一格全勾，转 -done。
