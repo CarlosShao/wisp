@@ -8,7 +8,7 @@
 
 `cmd/wisp/run.go:1324-1328` 的 `taskLifecycleJournal.FinishTaskLog` 是**有意惰性**（`return nil`）。子环路用的是同一个 journal ⇒ 子任务 `StartTaskLog` 落一行 `running`、但 `FinishTaskLog` 不写 ⇒ **子任务行永远停在 `running`**。
 
-全仓只有 `run.go` 在 `execute()` 收尾为 **root** 任务关闭行（`res.TaskID`）；**子任务没有任何关闭点**。而 `internal/memory/crash_recovery.go:150-159` 会把仍是 `running` 的行改判 `interrupted` ⇒ **成功完成的子任务被误标"中断"**。
+全仓只有 `run.go` 在 `execute()` 收尾为 **root** 任务关闭行（`res.TaskID`）；**子任务没有任何关闭点**。而 `cmd/wisp/crash_recovery.go:145-165` 会把仍是 `running` 的行改判 `interrupted` ⇒ **成功完成的子任务被误标"中断"**。
 
 ## 影响
 

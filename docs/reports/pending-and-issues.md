@@ -30974,3 +30974,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 关键：先前 e2e 测试 tasklog_fkcheck_378_test.go 的 golden requests 恒空，根因是 R4（screenCaptureSchema 坏 JSON 使真 run 序列化即炸）。R4 修后该测试连绿 3 次（真 task.spawn、PRAGMA foreign_key_check=0、子任务恰 1 行）。
 - 反向牙：摘 run.go:1583 rt.loopOpt=loopOpts ⇒ 测试真红逐名报（foreign_key_check=1 行 want 0、子任务 task_log 行数=0 want 1、tool_call 无父任务行）；还原 diff=0。⇒ AC#2 的 R1/R2 补齐。
 - R3（FinishTaskLog 惰性⇒子行恒 running、crash_recovery 误标 interrupted）独立于 fkc 核心 ⇒ 另立票 405（open）。tasklog_fkcheck_378_test.go 取回入仓（gofumpt 净）；待 378-v1 复审收口。
+
+## A1509（编排者）153轮：收口票 378（第 27 张）——378-v1 复审通过
+- AC#2 真 e2e：cmd/wisp/tasklog_fkcheck_378_test.go（真 task.spawn、PRAGMA foreign_key_check=0、子任务恰 1 行、tool_call fs.read/success 证非空 0、journal 未双写、root 正控）。反向：摘 run.go:1583 ⇒ 真红逐名报（fkc=1 want0／子行 0 want1）。四数 build/vet rc0、test ok 0.396s、gofumpt 空；Test233 ok、d22scan clean。
+- R3 归口票 405（open；路径已更正 cmd/wisp/crash_recovery.go:145-165）。票 378 → -done，双名核=1。
+- 两提交 10f8ef8be（收口）＋57eed2e9a（裁决读数校正）。
+- 注：go build ./... red 仅来自 untracked build/mut_rvw.go；长度门 pre-existing 5 offenders（128/175/273/364/403），本票零新增。
