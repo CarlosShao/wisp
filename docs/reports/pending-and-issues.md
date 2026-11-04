@@ -30671,3 +30671,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
   - 验证：headless 走 `buildResidentVoice(dir,nil,nil,nil,capFn)` 后驱动机器发 #26 效果→capture 收到 d43/name；突变（不传 voiceAudit/删 Sink）→ 记录消失必红。⛔ 面板/环视觉仍"仅本机可量未批"。
 - 地面：HEAD `771c28c70`，未推=0，工作树 clean。坏探针 `cmd/wisp/zz_probe_temp_test.go.txt` 已中和（未跟踪）。
 - **待机主仍 4 条**：256/301/185/347。
+
+## A1465（2026-11-04 10:3x +08，编排者）第86-87轮：273 落地靶子(a)达成；记剩余(b)+AC2-6
+
+- **273 票面重读裁定（第87轮现读）**：AC#0[x]/AC#1[x]；AC#2＝**"甲乙丙三形代价表、本票不选形"**（非"implement 甲"）；§83 把落地靶子收窄为 **(a)给已有那 1 枚(#37 model.verify-sha256-signature)接真收件人 ＋ (b)让 10 枚 only-dev(cmd/balldebug)可达的那族在出货包里也可达**；载体句＝"出货二进制里今天只有 1 枚 Effect 真投给收件人"。
+- **目标(a)已达成**：Wave1（`21d3f8653`）把 models 机（handOff #37）接 `effectAuditSink273`→**已有 JSONL 审计面**（真字节、测试读回、非"假日志"）。3 测试真绿。
+- **额外真实收益（超收窄靶子，非 AC 必需）**：2a `771c28c70` fan-out sink 接缝；2b-1 `f74826064` 生产语音机 `voiceAudit`→JSONL（我自跑正控+**overlay 突变摘 Sink 必红**验证）。⇒ 出货二进制真收件人从 0→≥2 台机器。
+- **273 仍未 `-done`，剩余（不假关）**：
+  1. **(b) 10 枚 only-dev 可达→出货包可达**：须先具名哪 10 枚、出货机里对应哪台机器/哪条构造点（读 `.scratch/wisp/probes/273/a2/machines.md` §B 档清单）。这是票面收窄靶子的第二半。
+  2. **AC#2 三形代价表**：把 273-waves.md/甲形实现代价写成票内表（动哪些文件/撞哪些钉/依赖边/可见性），⛔ 不在票里"选形"。
+  3. **AC#3 零新契约面**：本轮落地零改 `internal/statemachine/**`（可作证据）。
+  4. **AC#4/AC#6**：定向突变（已有）+ 一律 overlay（本轮 2b-1 突变已走 copy+overlay，未原地改共享树，符合）。
+  5. **AC#5 门禁四数** + 非实现者验收（裁决者≠实现者）后由编排者翻框。
+- 地面：HEAD `f74826064`，未推=0，工作树 clean（build/mut_* 为临时件未跟踪）。
+- **待机主仍 4 条**：256/301/185/347。
