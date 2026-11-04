@@ -31082,3 +31082,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 370-v1（c1d6ee7e0 非实现者）：AC#0-4 全 PASS；断言完整性 YES（ddbec5ee6 只碰 mockllm 2 文件，test blob 逐字相同）；overlay 反向：摘 loop.go:261 转红 task370_ac2_test.go:116/:183；复跑 cmd/wisp Test370 ok/agent 370 ok/mockllm ok/d22 clean/gofumpt 空。
 - 收口 49d89c9fc：翻 AC#0-4 五框、Status→done、改名+双名核=1。
 - 已知假红（非本票）：go build ./... rc=1 仅 build/mut_rvw.go（未跟踪/被 ignore，非 HEAD），同 364/378 记录。AC#2② 二词（屏幕 truncated／库 interrupted）已记、未统一（属另事）。
+
+## A1528（2026-11-04 23:1x，编排者）169轮：371 大改造两端验绿（未收口，R6/R7/R9 待）
+- 裁 AC#1prime=[bing-a]＋[bing-b]（a1p 证 ConfirmFunc 非 C 级契约、可自决）。
+- 371-a1p（8f03abd8b 只读）：AA＋非nil从不问假腿⇒applied=1 活洞现形；6 处门全判 nil-ness；ConfirmFunc 非 PLAN/specs 命中。
+- 371-r1p（8e0702fdb 17.go）：perm.Card 答过凭据；Set 仅 card.Answered() 才 applied，否则 ResultCardNotAnswered（逐字 card was not answered）；panel 同谓词 JudgeCard；MODE-SWITCH 带 asked=card corr。我自验 build/perm全包/panel gate子集/cmd-wisp定向371-367-101 134s/gofumpt/d22/pathlen 全绿；M4 断言逐字未动。
+- 371-v1p（e6838bd27 非实现者）：AC#2prime PASS／AC#2prime-b PASS／M4 byte-identical YES／三反向牙还原核；★整票⛔否：R6（内层 nil 兜底未实现 store.go:355-362）＋R9（扩 M4=摆机主）未了；小瑕 composer_gate_agreement_371_test.go:214 空指针。
+- ⇒ 371 未 -done。下轮 371-r2prime 补 R6（nil兜底＋谓词改坏⇒拒不 panic 用例）＋R7（边界 doc）；R9 摆机主。
