@@ -348,6 +348,42 @@ func modelsEnsure(io_ modelsIO, argv []string) int {
 	return store.handOffModel(io_, id, logf)
 }
 
+// handOffMachine273 is THE construction of the D43 machine this command walks,
+// and it is a named function for one reason that was measured rather than
+// argued (ticket 273, R1): the construction used to be an anonymous literal
+// here (`statemachine.New(statemachine.Options{Initial: ...})`), so a case that
+// wanted to drive the walk had no production grip to hold and would have had to
+// build its own machine - which is the tautology the ticket's AC#4 forbids in
+// words ("would only be testing the machine the test just made"). Production
+// and cmd/wisp/models_effect_273_test.go now both come through here, so
+// deleting the Sink field below changes THE machine `wisp models ensure` and
+// `residentVoiceHandOff` run, not a test's copy of it.
+//
+// The Sink is ticket 273 wave 1's only new wiring: the D43 table has carried
+// SideEffects since it was frozen, and before this line not one
+// statemachine.Options in the non-test tree had a Sink in it, so every effect
+// the table named was a hook nobody collected. Row #37 success
+// (`model.verify-sha256-signature`) is the one this machine fires in
+// production, and it is booked through the leg's persistent JSONL listener -
+// see effect_audit_273.go for what the record is and is not allowed to claim.
+//
+// WHAT IS FROZEN HERE: Initial stays StateFirstRun and the timeout table stays
+// nil (= DefaultTimeouts()), i.e. collapsing the literal into this function
+// changed no behaviour. The row #37 FAILED branch still has no SideEffects in
+// the table (table.go:267), and nothing here invents one for it (ticket 273 R3):
+// a failed hand-off fires no effect, so this sink books nothing for it, and the
+// failure verdict remains the stderr sentence in handOffModel below.
+//
+// logf is the writer modelsEnsure installed (models.go:344-346); it is nil on
+// the degraded branch where installLogSink refused, and effectAuditSink273
+// counts without recording there rather than inventing a second channel.
+func handOffMachine273(logf func(string, ...any)) *statemachine.Machine {
+	return statemachine.New(statemachine.Options{
+		Initial: statemachine.StateFirstRun,
+		Sink:    effectAuditSink273(logf),
+	})
+}
+
 // handOffModel runs one Downloading walk (D43 row #2 in, row #37 out) for id.
 //
 // This function is the grep target of ticket 121 AC#2: it is the non-test
@@ -355,7 +391,7 @@ func modelsEnsure(io_ modelsIO, argv []string) int {
 // whose body holds the only non-test call of Manager.VerifyInstalled
 // (internal/models/bridge.go:58). logf receives progress ticks and may be nil.
 func (ms *modelStore) handOffModel(io_ modelsIO, id string, logf func(string, ...any)) int {
-	machine := statemachine.New(statemachine.Options{Initial: statemachine.StateFirstRun})
+	machine := handOffMachine273(logf)
 	defer machine.Close()
 	bridge := models.WireDownloading(ms.mgr, machine)
 
