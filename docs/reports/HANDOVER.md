@@ -4132,3 +4132,15 @@ A41（"配置差异"与"自有脚本取消"两种解释**都已否证**）· A42
 - **356**（真实现，非虚翻）：`pointerNotice` 两腿(task.go/spill.go)加 A 档 Deny 支（`PathCanonicalizer.DenyA`＝`risk.Classify==ClassA`，只读分类已在 `refusal_20r2` 守卫测名册登记；`PointerJudge` 接口+2 fake 补 DenyA），deny 句两腿逐字同形 len=184；AC#2 第二路整句 pin＋变异删之→RED 自证。门禁：build/vet cmd-wisp 绿、gofumpt 净、d22scan rc=0、tools+agent 全测 ok。
 - **余池（开放 134）**：逐核每枚含 owner／真机真窗／真CI／cmd-wisp 死亡区／改契约 门。**下一枚候选**：`145`(panel 快照字段，触 internal/panel 共享面)/`224`(会话授 executor，6 格)/`176`(起跑口，触 Loop 形状禁区)。
 - **台账**＝`pending-and-issues.md A1468/A1469` 详。**待机主 7 条**：256／301／185／347 ＋ 230 AC#4／174 AC#4／226。
+
+### 4.0fv（2026-11-04 12:44 +08，编排者 goal round 107-118）★224 收口（真 OS 进程测）＋ 91/225 两张假硬票｜本会话累计 19 票
+
+- **接手先跑地面**：open／done／HEAD／未推 每轮现跑（本件 ⛔ 记快照数，以盘为准）。
+- **本段新增收口 3 票**：
+  - **224**（会话授权 executor）：五轮把 11 格收齐——AC#1 铸造点唯一／AC#2 答复⇒落行（短路 gate.go:764 Record 变异 3 红自证）／N#5 path.Match glob 方言＋写侧拒收／AC#4 反控（派生式常量 Mint 变异⇒判据红）／AC#3 真 OS 进程（新测 cmd/wisp/ticket224_ac3_realprocess_windows_test.go：buildWispForTest＋双 exec，boot1 id 落 grant、boot2 id 读 0，补 JUDGEMENT CEILING 缺的真进程半）。转 -done。
+  - **91**（OS 隔离只读选型评估，假硬票）：前置腿 agent-ticket91b 已产出 docs/evidence/s1/91-isolation-options.md＋91-os-isolation-memo.md，我作非实现者 3 把尺核 AC#1-4 满足，翻勾转 -done。
+  - **225**（DEFERRED↔SPEC-12 §5 双向对账只读审计，假硬票）：前置腿 225-a1 产出 225-deferred-registry-audit.md 369 行，非实现者 3 把尺核 AC#1-4 满足，翻勾转 -done。
+  - ⇒ 本会话累计收口 **19 票**（273 175 128 324 327 309 310 304 296 165 109 303 352 351 222 356 224 91 225），全 -done 已推。
+- **脉象**：假硬票纯文档脉（91/225）已收尽；近完成/文档/acceptance 票尾（220 247 262 274 230 234 177 103 62 114 136 342 138 219 189 190 313 371 346 361）残余 AC 全落 owner／真机真窗／真 CI／前端 browser-context／改契约。
+- **220 AC#5** 已被前任（10-16）裁〔仅本机可量·待机主窗口 Q-85〕：需机主先退其 10-15 自起活实例 PID 21892 ＋ 可控前台，否则 cmd/wisp 整包在真窗用例处硬截断、未达终态；本段复核确认（./internal/... 可终态，cmd/wisp 不可）。
+- **台账**＝pending-and-issues.md A1472/A1473/A1474/A1475/A1476 详。**待机主 8 条**：256／301／185／347／230 AC#4／174 AC#4／226 ＋ **264 AC#0（甲降敏/乙只装仪器/不做）**。**放行大特性/前端**：35。
