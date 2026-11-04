@@ -31028,3 +31028,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - v1 非实现者独立复跑四读 PASS＋checkout-index/archive 双源互证（1089/0 脏）。实现 commit f2ce92a6e，verdict 7f079d122。
 - AC#3：d22scan 绿、attrib self-test 绿；path-length-budget 红＝5 枚 -done 长名超 165（128/175/273/364/403）＝owner ⑤ roster 漂移实例，与本票无关（另需处理）。
 - 收 361 后现跑 path-length 门禁＝红（见上）⇒ 下一动作：处置 ⑤（补 roster 或短别名），否则 CI 红。
+
+## A1520（2026-11-04 20:2x，编排者）162轮：★处置 owner ⑤ path-budget roster 漂移（门禁转绿）
+- 现状：check-path-length-budget.sh 红——A:5 枚 `-done` 未入册(128/175/273/364/403)；B:2 枚 roster 旧名漂移(128/175 无 -done)；C:62≠65。成因＝本会话多枚票收口追加 `-done` 使长名超 165 预算。
+- 选型（铁律 agent 拍）：★保留描述性长名 + 补/改 roster（roster 正是 ticket 262 为此设的豁免数据机制），⛔ 不选"短别名丢信息"。非 owner 待办的"二选一"，按最有价值自决。
+- 改动：scripts/check-path-length-budget.sh R[...] 块——128/175 两条改名 `-done`＋新增 273/364/403 三条。预算常量一字未动。
+- 现验：scan rc=0 over-budget=65 covered=65 not-in-roster=0 GREEN；--with-self-test rc=0（3/3 正控 PASSED）。⇒ owner ⑤ 关闭。
