@@ -23,3 +23,13 @@
 ## Progress log
 
 - [2026-11-04] agent=`编排者` did=立案（票378-v1 R3 具名上报：FinishTaskLog 惰性⇒子行恒 running、crash_recovery 误标 interrupted；独立于 378 的"无父"核心，故另立本票）。
+
+## AC#1 裁形（编排者 2026-11-04）：Option A — journal 自写终态（主流：环路拥有自己 task 行的 lifecycle）
+- 机制：loop 经 internal/agent/journal.go:137-145 taskJournal.finishTask 调 j.FinishTaskLog(state,summary,tokensIn,tokensOut,costMicro,errorClass)，落到 taskLifecycleJournal.FinishTaskLog（现 inert，run.go:1324-1328）。root 另由 run.go:1742 关闭；child 无闭点 ⇒ 恒 running。
+- 定形：①taskLifecycleJournal.FinishTaskLog 由 inert 改为调 j.store.FinishTaskLog 写终态，加 rowFinished atomic.Bool 置位；②run.go:1742 的 root 关闭加 guard：若 journal 已 rowFinished 则跳过（防双写），否则照旧（fallback：journal 未开行时）；③loop 传的 state/summary/tokens/cost 来自 loop 自己的 finishTask，与 res 应一致（以测试核）。
+- 牙：child task.spawn 成功后子行 state=done；反向：摘 FinishTaskLog 写 ⇒ 子行 running、crash_recovery 语境红。
+- 风险：动 root 关闭路径，须回归现有 root 收口用例；cmd/wisp 共享面单腿。
+- 状态：本轮仅裁形+勘查落档；实现留 fresh/后续（编排者上下文近枯，⛔ 半成品动 run.go）。
+
+## Progress log（续）
+- [2026-11-04] agent=编排者 did=AC#1 裁形=Option A + 勘查 loop/journal/run.go 关闭三处机制。

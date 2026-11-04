@@ -30980,3 +30980,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - R3 归口票 405（open；路径已更正 cmd/wisp/crash_recovery.go:145-165）。票 378 → -done，双名核=1。
 - 两提交 10f8ef8be（收口）＋57eed2e9a（裁决读数校正）。
 - 注：go build ./... red 仅来自 untracked build/mut_rvw.go；长度门 pre-existing 5 offenders（128/175/273/364/403），本票零新增。
+
+## A1510（编排者）154轮：405 AC#1 裁形=Option A（journal 自写终态+rowFinished 防双写）+勘查；实现留 fresh
+- 机制勘查：loop→journal.go:137-145 finishTask→taskLifecycleJournal.FinishTaskLog(inert run.go:1324-1328)；root 由 run.go:1742 闭、child 无闭点⇒恒 running。
+- 裁 Option A（最有价值/主流：环路拥有自己 task 行 lifecycle）：FinishTaskLog 写终态+rowFinished；run.go:1742 加 guard 防 root 双写。
+- 未实现（上下文近枯，勿半成品动 run.go）。378 已收口(27张)；本轮纯勘查推进 405。
