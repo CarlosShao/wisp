@@ -8,23 +8,23 @@ const (
 )
 
 type TreeEntry struct {
-	Path  string
-	IsDir bool
-	Size  int64
+	Path  string `json:"path"`
+	IsDir bool   `json:"isDir"`
+	Size  int64  `json:"size"`
 }
 
 type TreeView struct {
-	Kind           string
-	Reason         string
-	Entries        []TreeEntry
-	FilesTotal     int
-	FilesTruncated bool
-	BytesTotal     int64
-	RecoverPointer string
+	Kind           string      `json:"kind"`
+	Reason         string      `json:"reason"`
+	Entries        []TreeEntry `json:"entries"`
+	FilesTotal     int         `json:"filesTotal"`
+	FilesTruncated bool        `json:"filesTruncated"`
+	BytesTotal     int64       `json:"bytesTotal"`
+	RecoverPointer string      `json:"recoverPointer"`
 }
 
 type TreeLimits struct {
-	MaxEntries int
-	MaxBytes   int64
-	MaxDepth   int
+	MaxEntries int   `json:"maxEntries"`
+	MaxBytes   int64 `json:"maxBytes"`
+	MaxDepth   int   `json:"maxDepth"`
 }

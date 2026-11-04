@@ -48,7 +48,7 @@ func readGitTree190(root string) TreeView {
 	if err != nil {
 		return TreeView{Kind: TreeKindTooLarge, Reason: "listing files failed", Entries: []TreeEntry{}}
 	}
-	more, _ := gitTreeRun190(ctx, root, "ls-files", "-o", "-i", "--exclude-standard", "-z")
+	more, _ := gitTreeRun190(ctx, root, "ls-files", "-o", "--exclude-standard", "-z")
 	paths := append(splitNUL190(files), splitNUL190(more)...)
 	const cap190 = 2000
 	truncated := false
