@@ -21,7 +21,7 @@
 - [x] **AC#0 现读＋归因（只读，⛔ 动文案字节）**：把"R3 A 档下 notice 说了什么 ⇄ `fs.read` 实际做了什么"量成成对读数。
       必须**逐字**给：notice 原文（`announceOf`）、`fs.read` 的 `isError`／`level`／`class`／正文逐字、
       **`approval` 被问的次数（今天应为 0）**。★另起尺、⛔ 抄 `174-v1` 的数；★正控＝同一路径在 R2-only 形状下 approval＝1（证明尺分得清两种形状）。
-- [ ] **AC#1 改写口径（文案面）**：让回执能区分"只判到 L2（两条路都真）"与"被判 Deny（没有卡、批也无效）"。
+- [x] **AC#1 改写口径（文案面）**：让回执能区分"只判到 L2（两条路都真）"与"被判 Deny（没有卡、批也无效）"。
       ★**范围扩充（机主 2026-10-21 14:2x 拍「扩」）＝必须同时覆盖第三种形状：目标在 allowlist 内、但被判 Deny**
       （`普查腿 356-a1` 现量——把 home 树整棵加进 `allowed_dirs` 后，`fs.read` 仍 `Deny [R3]`、
       `approval` 被问 **0 次**，而 `task.output` **完全沉默、notice 0 字节**）。我复核过 `pointerNotice` 的分支结构：
@@ -33,7 +33,7 @@
       落点＝`internal/tools/task.go` 的 `pointerNotice`（或它的同级读取）；★改后必须使**两条腿仍逐字节同形**
       （`internal/agent/spill.go` 的同族回执），判据＝两腿 notice 区逐字节 `cmp` 相同（`174-r1` 量到 246=246，本票要保住这个性质）。
       ⛔ 只在**文案与判据**面动；⛔ 动 R3/R2 判级语义、⛔ 改 `PLAN.md`／`docs/specs/**`、⛔ 新增授权能力。
-- [ ] **AC#2 牙（补 `174` 第 1 枚判据的 MUT-5 缺口）**：加一枚**只属第二路**的标记——
+- [x] **AC#2 牙（补 `174` 第 1 枚判据的 MUT-5 缺口）**：加一枚**只属第二路**的标记——
       现判据的标记集是 `{不在你被授权的目录范围内, [fs] allowed_dirs, L2 卡}`，
       `174-v1` 的 MUT-5 证明**把"要么批下那一张卡"整句删掉，四枚判据仍全绿**（我另尺复现同结论）。
       ⇒ 新判据必须让"删掉第二路整句"**转红并逐名报红行**；变形先证落地（`grep -n` ＋ `go build` rc=0）再读数，读完单独还原并核 blob 回 HEAD。
@@ -61,3 +61,5 @@
 - [2026-11-04 11:41 +08] agent=编排者 did=修硬约束点名的**幻影引用**：`internal/tools/task.go` 注释原引 `task_output_pointer_notice_174rr1_test.go`（盘与 HEAD 均 0 命中＝幻影）→ 改指真实承重测 `task_output_pointer_two_roads_174r1_test.go`（其 `TestPointerSecondRoadBackIsRealOnThisBridge174r1` 正是"L2 卡批准即整读回 20000B"的同桥测，我现核）。build OK／gofumpt 净／vet 仅余 `system_backend_windows.go` 两处 unsafe.Pointer 基线告警（非本改）。★**仪器缺口具名登记**：`d22scan` ban #9 的 `repoPathRe` 只认"带目录前缀的完整仓相对路径"，裸文件名（如本幻影）进不去 ⇒ 这类"注释引裸文件名指向不存在件"今天扫不到，须人工 grep 兜底。⛔ 零 AC 翻（AC#0/1/2 仍未做，本只是硬约束里的顺手项）。
 
 - [2026-11-04 11:46 +08] agent=编排者 did=**AC#0 翻勾（只读现读＋归因）**：另起尺探针 `zz_356_ac0_probe_test.go`(tag `probe356`) 现跑 PASS，取三形成对读数（件 `.scratch/wisp/probes/356/a0/ac0-readings.md`）：**i 正控 R2-only** approval=**1**、整读回 20000B；**ii 越权+R3Deny** notice 仍吐两路文案（缺陷：点永不出示的卡）、fs.read `permission_denied`、approval=**0**；**iii 授权内+R3Deny** notice 无告警句(warn 0字节)、fs.read `permission_denied`、approval=**0**。归因＝`pointerNotice(task.go:831)` 无"被判 Deny"支。AC#1/AC#2 未做。
+
+- [2026-11-04 11:56 +08] agent=编排者 did=**AC#1+AC#2 翻勾**（件 `.scratch/wisp/probes/356/a0/ac1-ac2.md`）：AC#1＝`pointerNotice` 两腿(task.go/spill.go)加 A 档 Deny 支（`PathCanonicalizer.DenyA`=risk.Classify==ClassA，只读分类已在 refusal_20r2 名册登记；PointerJudge 接口+2fake 补 DenyA），deny 句两腿逐字同形(len184)；探针证 ii/iii 形改吐「绝对禁止…无卡…批卡无效」、i 形两路不动。AC#2＝新 pin 测断言第二路整句『要么批下那一张卡』；变异删之→RED、还原→diff 空(count 回1)自证。门禁：build/vet cmd-wisp 绿、gofumpt 净、d22scan rc=0、tools+agent 全测 ok。⚠ vet tools 仅余 system_backend_windows.go 两处 unsafe 基线。⇒ 356 六格全勾，转 -done。

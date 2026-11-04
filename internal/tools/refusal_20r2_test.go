@@ -342,11 +342,14 @@ func Test20r2NoSecondAuthorizationPath(t *testing.T) {
 	// 1. The exported method set is EXACTLY the read/judge surface plus the
 	//    workspace NARROWING. A widening method (AddRoot/SetRoots/Reload...)
 	//    fails this roster; a new read must extend it in the same commit.
+	// DenyA is a READ/classify (A-list == absolute Deny, ticket 356): it never
+	// widens what InAllowlist authorizes, so it belongs on the read/judge
+	// surface, not with the widening methods this roster forbids.
 	want := map[string]bool{
 		"Canonicalize": true, "InAllowlist": true, "Roots": true,
 		"UnusableRoots": true, "RewrittenRoots": true,
 		"WorkspaceRoot": true, "ResolveWorkspace": true,
-		"SetWorkspaceRoot": true, "ClearWorkspace": true,
+		"SetWorkspaceRoot": true, "ClearWorkspace": true, "DenyA": true,
 	}
 	typ := reflect.TypeOf((*PathCanonicalizer)(nil))
 	got := map[string]bool{}
