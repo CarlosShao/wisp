@@ -91,3 +91,12 @@
 - 基线（160轮现跑）：`--self-test` rc=0（cases=10 failures=0 GREEN）；`--tracked-only` rc=1 tracked-dirty=2。目标：改后 `--tracked-only` rc=0（blob 干净）、`--self-test` 仍 rc=0、真脏 blob 仍被点名红。
 - 牙：造一枚真脏 blob（`git hash-object -w` 脏内容＋临时 index 替换该路径）⇒ 改后 attrib 仍红点名；摘掉 blob 读取跳 ⇒ 回 CRLF 假红。
 - ⚠ 本轮未实现（编排者上下文近枯＋改坏 gate 脚本风险高于收益）；spec＋基线已备，fresh/腿 一次做完再非实现者裁。
+
+## AC#2 实现（编排者 161轮，〔乙〕已落：ruler_a 读 index(LF) 取代 worktree(CRLF)）
+- 改动＝`attrib.sh` ruler_a A_OUT 源：`git -c core.autocrlf=false checkout-index -a --prefix=<tmp>` 写 LF 树（index 字节＝CI 同形）→ 剔 `.scratch` → gofumpt -l；含**防空 0 假绿**守卫（临时树 0 枚 .go 则回退 worktree 读，绝不报空绿）。self-test 抛树用 index(git add 无 commit)，走此路径不变。
+- 四读（现跑，全在 HEAD 工作树）：
+  ① `--self-test` rc=0 cases=10 failures=0 GREEN（证 index 读仍抓 parse-error CTL_BROKEN 与脏 CTL_UNFORMATTED 并点名）；
+  ② 新版 `--tracked-only` rc=0 GREEN 0 脏（CRLF 假红消失，1089 枚）；
+  ③ 真脏牙：临时 stage 畸形 `internal/agent/zz_tmp_tooth_dirty.go` ⇒ rc=1 逐名点名该文件（非假绿），已 `git rm --cached`+rm 清理、index 干净；
+  ④ 反向牙：`git show HEAD:attrib.sh`（原版读 worktree）⇒ rc=1 红 2 枚（pending_read.go/tools.go）——差异归本次改动。
+- 待非实现者 v1 独立复跑四读＋复核 diff 后裁收口（裁决者≠实现者）。

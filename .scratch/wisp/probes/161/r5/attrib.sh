@@ -582,7 +582,34 @@ ruler_a() {
     [ "$QUIET" = 1 ] || echo "== (A) tracked tree: git ls-files -z '*.go' '$A_N_EXCLUDE' | xargs -0 $GOFUMPT -l"
     [ "$QUIET" = 1 ] || echo "   (A) denominator: handed to gofumpt = $TRACKED_GO; total tracked .go = $TRACKED_GO_ALL; subtracted by the one named exclusion $A_N_EXCLUDE = $((TRACKED_GO_ALL - TRACKED_GO))"
     A_RC=0
-    A_OUT=$(git ls-files -z '*.go' "$A_N_EXCLUDE" | xargs -0 "$GOFUMPT" -l 2>&1) || A_RC=$?
+    # Ticket 361 (shape 乙): read the tracked set's INDEX bytes (LF), not the
+    # worktree files. The worktree is whatever checkout the developer happens to
+    # have; under core.autocrlf=true its .go files carry CRLF, and gofumpt -l flags
+    # every one of them as "needs formatting" even though the tracked bytes are
+    # clean - exactly the "local ruler != CI ruler" split this ticket is about. The
+    # index stores the normalised (LF) bytes, which is what a CI checkout formats,
+    # so reading it makes the local reading the same shape as CI's. checkout-index
+    # writes the whole index to a throwaway prefix in one git call with autocrlf
+    # off (so no conversion sneaks back in); .scratch is dropped there to keep the
+    # one named exclusion; the throwaway is removed right after. The uncommitted
+    # throwaway tree --self-test builds puts its samples in the INDEX (git add, no
+    # commit), so it flows through here unchanged. If the extraction yields zero
+    # .go files we do NOT report the vacuous "empty" - we fall back to the worktree
+    # read, so a broken extraction can never read as a clean tree.
+    A_TMP=$(mktemp -d 2>/dev/null) || A_TMP=""
+    A_TMP_N=0
+    if [ -n "$A_TMP" ]; then
+        git -c core.autocrlf=false checkout-index -a --prefix="$A_TMP/" >/dev/null 2>&1 || true
+        rm -rf "$A_TMP/.scratch"
+        A_TMP_N=$(find "$A_TMP" -type f -name '*.go' -print 2>/dev/null | grep -c . || true)
+    fi
+    if [ -n "$A_TMP" ] && [ "$A_TMP_N" -gt 0 ]; then
+        A_OUT=$( cd "$A_TMP" && find . -type f -name '*.go' -print | sed -e 's|^\./||' | xargs "$GOFUMPT" -l 2>&1 ) || A_RC=$?
+        rm -rf "$A_TMP"
+    else
+        [ -n "$A_TMP" ] && rm -rf "$A_TMP"
+        A_OUT=$(git ls-files -z '*.go' "$A_N_EXCLUDE" | xargs -0 "$GOFUMPT" -l 2>&1) || A_RC=$?
+    fi
     if [ "$A_RC" -gt 1 ]; then
         echo "attrib.sh: (A) gofumpt exited $A_RC on the tracked set (>=2 means a file would not parse) - the tracked tree is not readable by this ruler" >&2
         # 275-r1 / A663 (shape 丁): print the per-file roster gofumpt DID emit (A_OUT)

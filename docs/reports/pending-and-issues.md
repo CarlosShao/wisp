@@ -31018,3 +31018,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1517（编排者）160轮：361 AC#2 实现规格＋基线落档（未实现，交 fresh/腿）
 - 基线：--self-test rc=0(10例0失败)；--tracked-only rc=1(2脏)。改点 ruler_a:585 读 worktree→blob(法A git archive 导出 LF 树)；必保 self-test rosterctl/parse-error/A_FILES 三边。
 - 未实现：改 gate 脚本耦合 self-test 正控，近枯上下文硬改风险＞收益；spec+基线已备。
+
+## A1518（编排者）161轮：361 AC#2〔乙〕实现落地（attrib.sh ruler_a 读 index 取代 worktree）
+- 改=attrib.sh ruler_a：checkout-index(autocrlf=false)写 LF 树→gofumpt -l，含防 0 空绿守卫；self-test 抛树(index无commit)不变。
+- 四读：self-test 10/0绿；新版 tracked-only 0脏绿；真脏stage红点名；原版(worktree)红2枚。待 v1 裁收口。
