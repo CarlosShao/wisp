@@ -31067,3 +31067,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 我自验：build ./internal/memory ./cmd/wisp rc=0；go test ./internal/memory -run TestTicket29 ok 4.3s、全包 ok 30.8s；gofumpt -l 4 go 文件空；d22scan rc=0 clean；树净；无禁改面；golden_extract.json 未动。
 - 腿报反向牙：改 case-01 casual→formal ⇒ AC#2 红（pref.tone want casual），还原 sha256 同。
 - 29 距结仅差非实现者 v1 裁 AC#1+AC#2 → 翻两格+改名 -done。
+
+## A1526（2026-11-04 21:1x，编排者）167轮：29 收口＝本会话第 30 枚
+- 实现：f92e4b177（AC#1 真 L1 抽取链+WarmWindow 装配）、bbe7e2bee（AC#2 newGoldenExtractor→真链+10 金标 SSE）。
+- v1 非实现者裁 90ede65da：AC#1 PASS／AC#2 PASS；反向牙 zh→zg ⇒ AC#2 红；golden_extract.json 未动；树净。
+- 收口 3349709f0：翻 AC#1/AC#2 两格、Status→done、改名 -done、修 golden_extract.go 陈旧注释（NOT wired→已 wired）；双名核=1。
+- 三把尺自验：build rc0／TestTicket29 ok 4.3s／全包 memory ok 30.8s／gofumpt 空／d22 clean。
+- 残余（非阻）：golden SSE 为 pinned 非 live capture（harness 本义）；抽取未过 44-r5 配额门（后续决定）；面板/球「记住了：X」闪光+undo 属 37/40 面。
