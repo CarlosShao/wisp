@@ -1,15 +1,12 @@
 package risk
 
 import (
-	"context"
 	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
-
-	"github.com/CarlosShao/wisp/internal/plugin"
 )
 
 // const marker is the planted sensitive fragment used across the suite.
@@ -291,7 +288,14 @@ func TestDetectorUnknownToolScansEverything(t *testing.T) {
 	}
 }
 
-// --- scope lifetime / DisposalScope (AC #5) ----------------------------------
+// --- scope lifetime (AC #5) --------------------------------------------------
+//
+// Ticket 403: TestDisposalScopeClearsTaints moved to internal/plugin. Importing
+// internal/plugin from this package's tests closed the test-only cycle
+// risk(test) -> plugin -> risk (plugin/command.go and netallow.go import risk),
+// which stopped the whole risk test binary from building. The C11 disposal x
+// C25 taint integration assertion lives on the plugin side now; no coverage was
+// dropped. Everything below exercises the scope lifetime through risk alone.
 
 func TestScopesNeverInherit(t *testing.T) {
 	p := testProv(t, baseOptions(t))
@@ -299,39 +303,6 @@ func TestScopesNeverInherit(t *testing.T) {
 	p.Mark("task-1", SrcWebFetch, "https://a", marker)
 	if _, ok := p.Inspect("task-2", "web.search", map[string]any{"query": marker}); ok {
 		t.Fatal("a second concurrent scope must never see task-1's taint")
-	}
-}
-
-func TestDisposalScopeClearsTaints(t *testing.T) {
-	// C11/DisposalScope binding: closing the scope (session end) must drop
-	// every taint; the new session's scope starts clean (AC #5).
-	scope := plugin.NewDisposalScope("session-1", context.Background())
-	p := NewProvenance(baseOptions(t))
-	handle := p.OpenScope("session-1") // ticket 160: the handle is what closes it
-	scope.Defer(func() {
-		// Stricter than the old p.CloseScope("session-1") line, which could not
-		// fail: a Defer-ed closer that cannot close its own scope is the bug.
-		if err := handle.Close(); err != nil {
-			t.Errorf("DisposalScope must be able to close the scope it was handed: %v", err)
-		}
-	})
-
-	p.Mark("session-1", SrcFSRead, "/legacy/secret", marker)
-	if _, ok := p.Inspect("session-1", "notify", map[string]any{"text": marker}); !ok {
-		t.Fatal("taint live within the session")
-	}
-	if res := scope.Dispose(); res.Incomplete {
-		t.Fatalf("dispose incomplete: %+v", res)
-	}
-	if _, ok := p.Inspect("session-1", "notify", map[string]any{"text": marker}); ok {
-		t.Fatal("disposed session must not retain taint")
-	}
-	p.OpenScope("session-2")
-	if _, ok := p.Inspect("session-2", "notify", map[string]any{"text": marker}); ok {
-		t.Fatal("new session does not inherit old taints")
-	}
-	if len(p.ScopeTaints("session-2")) != 0 {
-		t.Fatal("new session store must start empty")
 	}
 }
 
