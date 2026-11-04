@@ -68,6 +68,10 @@ func NewSpiller(dir string, b Budgets) *Spiller { return &Spiller{dir: dir, b: b
 type PointerJudge interface {
 	Canonicalize(raw string) (string, error)
 	InAllowlist(canonical string) bool
+	// DenyA reports an A-list (absolute Deny, R3 tier A) target. It is what
+	// tells the notice apart from a plain out-of-allowlist target, so the stub
+	// never names a card an absolute Deny will never produce (ticket 356).
+	DenyA(canonical string) bool
 }
 
 // WithPointerJudge wires the C26 judge and returns the receiver, so a
@@ -227,6 +231,9 @@ func (s *Spiller) pointerNotice(path string) string {
 	canon, err := s.judge.Canonicalize(path)
 	if err != nil {
 		return "；注意：这条路径现在读不到，C26 连规范化都没通过"
+	}
+	if s.judge.DenyA(canon) {
+		return "；注意：这条路径现在绝对读不到——它命中了 A 档敏感路径（绝对禁止、任何授权都不可豁免，不会有卡，加 [fs] allowed_dirs 或批卡都无效）"
 	}
 	if !s.judge.InAllowlist(canon) {
 		return "；注意：这条路径现在读不到，它不在你被授权的目录范围内：" +

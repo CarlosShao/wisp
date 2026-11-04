@@ -57,6 +57,10 @@ func (j *argAware174r4Judge) InAllowlist(canonical string) bool {
 	return j.inFor[canonical]
 }
 
+// DenyA is a no-op for this judge: it models only the allowlist/verdict-ok
+// shapes ticket 174 r4 exercised, never an A-list absolute Deny (ticket 356).
+func (j *argAware174r4Judge) DenyA(string) bool { return false }
+
 // stubOf174r4 cuts the bracketed stub out of a spilled reply so a reading that
 // gets quoted into an evidence file names the sentence under test instead of
 // 68 KB of payload around it. The pointer parse of ticket 174 keeps working on

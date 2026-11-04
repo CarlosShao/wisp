@@ -844,6 +844,8 @@ func (d TaskDeps) pointerNotice(raw string) string {
 		// sentence below is the one internal/agent/spill.go already speaks for
 		// this same failure, so both legs now say the same thing.
 		notes = append(notes, "注意：这条路径现在读不到，C26 连规范化都没通过")
+	case d.Paths.DenyA(canon):
+		notes = append(notes, "注意：这条路径现在绝对读不到——它命中了 A 档敏感路径（绝对禁止、任何授权都不可豁免，不会有卡，加 [fs] allowed_dirs 或批卡都无效）")
 	case !d.Paths.InAllowlist(canon):
 		// Both roads back are named, because both exist. [fs] allowed_dirs is a
 		// risk-TIER input, not an execution wall: FSDeps.open canonicalizes and

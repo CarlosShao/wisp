@@ -81,6 +81,10 @@ func (f *fake174Judge) InAllowlist(canonical string) bool {
 	return f.inRoot
 }
 
+// DenyA is a no-op for this judge: ticket 174's honesty cases model readable /
+// out-of-root / unwired shapes, never an A-list absolute Deny (ticket 356).
+func (f *fake174Judge) DenyA(string) bool { return false }
+
 // spill174OverThreshold spills one payload with an optionally wired judge and
 // returns the stub plus the pieces the caller needs to check numbers from the
 // outside.

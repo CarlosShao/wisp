@@ -195,6 +195,16 @@ func sameFormOfUnresolved(canonical string) string {
 	return rf
 }
 
+// DenyA reports whether the already-canonical path hits an A-list (absolute,
+// non-overridable) sensitive rule -- i.e. the verdict is Deny (R3 tier A), not
+// merely out-of-allowlist. Ticket 356: the two refusal kinds (redteam-denied vs
+// out-of-allowlist) must be told apart by classification, never by the
+// RiskLevel string (bridge.go's levelString folds risk.Deny into "L2", so it
+// cannot distinguish them). Uses the same frozen blacklist the assessor uses.
+func (p *PathCanonicalizer) DenyA(canonical string) bool {
+	return risk.Classify(canonical) == risk.ClassA
+}
+
 // InAllowlist implements risk.PathCanonicalizer against already-canonical
 // input, component-boundary and case-folded (Windows is the only shipping
 // platform, and SPEC-06 §4 treats canonical paths as case-insensitive).
