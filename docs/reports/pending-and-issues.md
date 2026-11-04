@@ -30911,3 +30911,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 364（票166 四出口未接线，用户回不到昨天对话）：五尺复跑 cmd+internal/panel 非测试全 0（session.NewManager/ListSessions/SessionByID/memory.Session/CLI token）；正控成立（同尺 memory. 于 cmd/wisp 非测试=21 命中、session 包确被 cmd/wisp 导入 4 文件）；用户看会话路径=无（sessions/history 命中全在 C11 语音注释）。件 docs/evidence/s1/364-a0.md。
 - AC#1 裁形=【甲】只在 cmd/wisp 加 wisp sessions list|search|rename|archive|unarchive（接 session.Manager 现成方法）；不触 C17、不 gate 35。乙(panel,经C17 契约变更须机主批)/丙 列为 35 解封+C17 批后 follow-on。甲非降级＝今日唯一未受阻且价值充分、CLI 会话历史乃主流 harness 标配。
 - 下一步 364-r1 写腿（cmd/wisp 每波一枚＋每处用例＋端到端读数＋反向判据）。
+
+## A1498（编排者）143轮：364-r1a 落地 wisp sessions list（commit 1b4b607aa）
+- cmd/wisp/sessions.go(164 新)＋main.go(+10 分派)＋dataroot_128_test.go(+9 拒答腿,AST 双向所需)：`wisp sessions list` 接 session.Manager.List，打印 id/updated_at/title 前20，空库提示、无子命令 usage rc=2。
+- 门禁：编排者自复跑 go build ./cmd/wisp rc=0；gofumpt -l 三件空；腿自报 test-compile rc=0＋真机冒烟(空库/2行降序)。⛔ cmd/wisp 整包测试未跑(死区)。
+- 364 余：search/rename/archive/unarchive 四动作(364-r1b..)＋端到端读数＋反向判据(AC#2)；AC#3 门禁；AC#4 纪律。AC#0/AC#1 已翻。
