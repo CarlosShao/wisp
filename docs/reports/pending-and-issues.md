@@ -31061,3 +31061,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 腿 commit f92e4b177（7 文件 +1654）：internal/memory/l1_extract.go（真 Extractor，一任务一次 llm.LlmProvider.Stream，坏回复整批拒）＋l1_warm.go（L1WarmWindow Record/Fire，Fire 赋 session.WarmWindow→spawn memory-extract，钩子不等待）＋2 测试；cmd/wisp resident_voice_engines_windows.go／resident_windows.go／run.go 装配（Hooks{WarmWindow:r.warmWindow} 闭合 29-v1 缺口，Record 在 bg.Wait() 之后＝post-response）。
 - 我自验三把尺：commit 真在/件真在/自己复跑——build ./internal/memory ./internal/session ./cmd/wisp rc=0；go test ./internal/memory -run TestTicket29 ok 2.865s、全包 ok 28.6s；./internal/session TestTicket28WarmWindow|TestTicket29 ok 0.189s、全包 ok 4.3s；gofumpt -l 7 文件空；d22scan rc=0 clean；树净、无禁改面。
 - 29 未结：AC#2（C5 golden SSE 录制链，newGoldenExtractor 仍规则 stub）＝残余；AC#1 待非实现者 v1 裁后翻。
+
+## A1525（2026-11-04 21:0x，编排者）167轮：29 专项腿2 落地 AC#2（golden 抽取链 swap 真链）经我自验
+- 腿2 commit bbe7e2bee（14 文件：4 go＋10 枚 internal/memory/testdata/golden_sse/*.sse）：golden_extract_test.go newGoldenExtractor() 改返回真链（规则 stub ~190 行删除）；golden_sse_replay_test.go 新（真 openaichat→httptest 回放 pinned SSE，拒漂移/二次调用）；10 剧本 SSE（# wisp golden sse v1）。testdata/golden_extract.json 未动。
+- 我自验：build ./internal/memory ./cmd/wisp rc=0；go test ./internal/memory -run TestTicket29 ok 4.3s、全包 ok 30.8s；gofumpt -l 4 go 文件空；d22scan rc=0 clean；树净；无禁改面；golden_extract.json 未动。
+- 腿报反向牙：改 case-01 casual→formal ⇒ AC#2 红（pref.tone want casual），还原 sha256 同。
+- 29 距结仅差非实现者 v1 裁 AC#1+AC#2 → 翻两格+改名 -done。
