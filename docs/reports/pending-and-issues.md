@@ -30810,3 +30810,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 为取 234 的 risk 门禁读数时现跑撞上：go test ./internal/risk/ = FAIL [setup failed]，import cycle（provenance_test.go:12 imports plugin；plugin/command.go:42 imports risk）。根因 f576cf08（票160）给 provenance_test 加 plugin import（票52 起 plugin 就 import risk）⇒ 票 160 以 broken 收口=回归；无任何开放票覆盖（179/350 不涉）。
 - 立票 403（.scratch/wisp/issues/403-...md）：待派产码/测试重构断环（甲乙丙丁戊五选一先裁）；阻塞 234 AC#3（G-3/G-6）/AC#4 的 risk 分母。
 - 234 现状：AC#1 基线（285 名）＋M1/M2/M5 变异（gate-rerun-2）＋AC#3 门禁/AC#6（gate-rerun-3）已落盘并 commit；AC#4/M3/M4/AC#5 未做，且 AC#4 依赖 risk 可编译 ⇒ 受本 403 阻。故 234 暂不虚翻。
+
+## A1481（2026-11-04 13:21 +08，编排者）122轮：403 收口（第20枚，非实现者裁决真缺陷修复）
+- 腿 risk-cycle-403 修好 internal/risk 测试 import cycle（318f0edd0，2 文件，乙-scoped：TestDisposalScopeClearsTaints 移 internal/plugin）。非实现者 3 把尺复跑：risk=ok 12.5s rc=0(无 setup failed)、plugin=ok 7.9s、vet0、gofumpt空、cycle0。AC#1-4 翻勾。AC#5 回填 234 已证 risk 分母可读（AC#4 roster rc=0 PASS=455 FAIL=0 SKIP=2 含 risk），残余归 234。403→-done(带残余)。
+- 教训/发现：票160(f576cf08)给 risk/provenance_test.go 加 plugin import 致 risk 测试包整包不可编译(回归,之前无人跑 go test ./internal/risk/ 故未察)。
