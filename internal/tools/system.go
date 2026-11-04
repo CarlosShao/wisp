@@ -467,7 +467,7 @@ var (
 		`},"required":["action"],"additionalProperties":false}`)
 
 	screenCaptureSchema = JSONSchema(`{"type":"object","properties":{` +
-		`"target":{"type":"string","enum":["full","window","region"],"description":"截什么：full 全屏 / window 某个窗口 / region 一块区域"}` +
+		`"target":{"type":"string","enum":["full","window","region"],"description":"截什么：full 全屏 / window 某个窗口 / region 一块区域"},` +
 		windowTargetProperties + `,` +
 		`"x":{"type":"integer","description":"target=region 时区域的左上角 x"},` +
 		`"y":{"type":"integer","description":"target=region 时区域的左上角 y"},` +

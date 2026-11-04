@@ -30964,3 +30964,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 我本会话亲写 cmd/wisp/child_task_log_378_test.go（P1/P2，commit 6e61456e1）＝taskLifecycleJournal→Store 组件测，绿但**无反向牙（看不见 run.go:1583）**⇒ 被 v1 正确退回。诚实认账。
 - 378 收尾需三步（fresh/后续）：(a) 先治 **R4**——给 screenCaptureSchema 补逗号（单开票或并入），解锁 run 级测试；(b) 写「真 task.spawn＋摘 run.go:1583 即红」的验收用例（AC#2 真牙）；(c) AC#1 补裁 **R3 子任务终态**：加终态写手(推荐,主流 harness 子任务应有终态) or 按 §5 登记推迟——产品决定由 agent 拍但需落地。
 - R4 是**前置真 bug**（非 378 造），会影响一切 run 级测试，宜优先单开票。
+
+## A1507（编排者）152轮：收口票 404（screenCaptureSchema 坏 JSON＝378-R4 前置真 bug）——第 26 张
+- 源起 378-v1 R4。修 internal/tools/system.go:470 补逗号；加 internal/tools/screencapture_schema_404_test.go 的 Test404ScreenCaptureSchemaIsValidJSON 回归。
+- 牙（机械可验）：修前 Test233HotTierAgentReachesTheNextTask FAIL（invalid character after object key:value pair）／修后 ok 2.375s；Test404 ok 0.045s。门禁 build ./internal/tools rc0／test404 ok／test233 ok／gofumpt 空／d22scan clean 全绿。
+- 意义：R4 解除 ⇒ 票 378 的 AC#2 真 task.spawn＋摘 run.go:1583 即红 验收测试变可行；378 下一步＝写该真牙用例＋补 AC#1 R3 子任务终态。
