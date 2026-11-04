@@ -10,11 +10,11 @@
 
 ## AC
 - [x] **AC#1 只读设计核**（09-28 17:5x 编排者按现量复跑对格后勾：设计核＝`docs/evidence/s1/190-file-tree-design-a1.md`；根＝**配置根∩工作区的那个集合**（可 0 枚、空根是正常态，`SPEC-03:35` 默认 `allowed_dirs[]=[]`），**树腿不接受面板传根**；`allowed_dirs` 是**判级输入不是执行时硬边界**（`internal/risk/rules_gateway.go:45-49` 越界只吐 `level: L2`、签名里没有 deny 出口）＝账 `A390`）：树的根取哪一枚（工作区根？授权根 `allowed_dirs`？两者不等同时以谁为准）、深度与条目上限、忽略规则（`.git`／`node_modules`／构建产物）；⚠ **忽略过滤必须问 git index，问不到就全扫并响亮自陈**（这仓的 `d22scan` 已定过这条规矩，别另发明一套）。
-- [ ] **AC#2 只读落地＋常驻判据**：值来自真目录（临时目录合成一棵树，断言条目集合）；根的选取要一发判据钉住"工作区未窄化时报的是授权根而不是整个盘"。
-- [ ] **AC#3 ⚠ 只读边界**：树上**不许**出现删除／移动／重命名／新建任何写动作（普查把它列为雷区＝要 owner 逐枚批）。补常驻判据钉"这一维只读"。
-- [ ] **AC#4 越权那一形必须显式回答**：目录不可读／权限拒绝／符号链接与 junction 跨界（票 119／126 那一族）三形各给一条现量与文案，**不许静默少列**。
-- [ ] **AC#5 契约轴**：D34 表不加行、`docs/PLAN.md`／`docs/specs/**`／`allowlist.txt`／`thresholds.go`／golden 不动、C17 不加方法；路径决策一律过 `risk.PathResolver`（**不许**在它之外用 `filepath.Clean|Abs`，那是 d22scan ban #2）。
-- [ ] **AC#6 门禁**：`./internal/panel/ ./internal/tools/`＋`d22scan`（基线 433）＋`gate-clauses` 比名册（只 `G6neg`）；⚠ `internal/panel` 2 枚已知红照实记不修。
+- [x] **AC#2 只读落地＋常驻判据**：值来自真目录（临时目录合成一棵树，断言条目集合）；根的选取要一发判据钉住"工作区未窄化时报的是授权根而不是整个盘"。
+- [x] **AC#3 ⚠ 只读边界**：树上**不许**出现删除／移动／重命名／新建任何写动作（普查把它列为雷区＝要 owner 逐枚批）。补常驻判据钉"这一维只读"。
+- [x] **AC#4 越权那一形必须显式回答**：目录不可读／权限拒绝／符号链接与 junction 跨界（票 119／126 那一族）三形各给一条现量与文案，**不许静默少列**。
+- [x] **AC#5 契约轴**：D34 表不加行、`docs/PLAN.md`／`docs/specs/**`／`allowlist.txt`／`thresholds.go`／golden 不动、C17 不加方法；路径决策一律过 `risk.PathResolver`（**不许**在它之外用 `filepath.Clean|Abs`，那是 d22scan ban #2）。
+- [x] **AC#6 门禁**：`./internal/panel/ ./internal/tools/`＋`d22scan`（基线 433）＋`gate-clauses` 比名册（只 `G6neg`）；⚠ `internal/panel` 2 枚已知红照实记不修。
 
 ## 本票**不**解决
 不做树上写动作（待批）；不做搜索／模糊匹配（那是"打开文件"体验，另计）；不画界面。
