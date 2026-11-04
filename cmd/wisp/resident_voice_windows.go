@@ -1749,11 +1749,11 @@ func (rv *residentVoice) stopLine() string {
 // It never stops the boot. Every branch that cannot build a voice chain returns a
 // handle with its verdict already written, and the boot report prints that
 // verdict - the same posture startResidentAudio takes for the microphone.
-func startResidentVoice(rt *proc.Runtime, ra *residentAudio, rb *residentBall, tasks voiceTranscriptSink) *residentVoice {
+func startResidentVoice(rt *proc.Runtime, ra *residentAudio, rb *residentBall, tasks voiceTranscriptSink, voiceAudit func(statemachine.Effect)) *residentVoice {
 	if rt == nil {
 		return nil
 	}
-	rv := buildResidentVoice(rt.Layout.DataDir, ra, rb, tasks)
+	rv := buildResidentVoice(rt.Layout.DataDir, ra, rb, tasks, voiceAudit)
 	rv.start(rt.Registry)
 	if rb != nil {
 		// Both ends of the tray's pause-wake hop, attached here because this leg
@@ -1786,12 +1786,12 @@ func startResidentVoice(rt *proc.Runtime, ra *residentAudio, rb *residentBall, t
 // green while the production shape was dead. The queue is built here, for
 // every branch including the early returns, so a degraded boot still has the
 // honest refused-post shape instead of a nil dereference.
-func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tasks voiceTranscriptSink) *residentVoice {
+func buildResidentVoice(dataDir string, ra *residentAudio, rb *residentBall, tasks voiceTranscriptSink, voiceAudit func(statemachine.Effect)) *residentVoice {
 	rv := &residentVoice{
 		ball:        rb,
 		tasks:       tasks,
 		queue:       newVoiceOwnerQueue(),
-		machine:     statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping}),
+		machine:     statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping, Sink: effectFanout273{audit: voiceAudit}.sink}),
 		provScope:   voiceAnnounceScope,
 		newSpeaker:  openWaveOutSpeaker,
 		interruptCh: make(chan struct{}, 1),

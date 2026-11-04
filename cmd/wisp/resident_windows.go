@@ -23,6 +23,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/proc"
 	"github.com/CarlosShao/wisp/internal/risk"
+	"github.com/CarlosShao/wisp/internal/statemachine"
 )
 
 // lifecycleFastExit is the fast-shutdown flag the WM_QUERYENDSESSION door sets
@@ -562,7 +563,14 @@ func runResident() {
 	if src != nil && src.run != nil {
 		voiceTasks = src
 	}
-	rv := startResidentVoice(rt, raudio, rb, voiceTasks)
+	var voiceAudit273 func(statemachine.Effect)
+	if sink != nil {
+		vlg := sink.logger()
+		voiceAudit273 = func(e statemachine.Effect) {
+			vlg.Info(fmt.Sprintf("resident: effect d43=%d name=%s", e.D43, e.Name))
+		}
+	}
+	rv := startResidentVoice(rt, raudio, rb, voiceTasks, voiceAudit273)
 	// Ticket wire-r1: the announce path's PRODUCTION TRIGGER. The D10 result
 	// presenter in run.go's execute() is the one place in this process that holds
 	// the agent's answer text, so it is the only place a sentence can be handed to

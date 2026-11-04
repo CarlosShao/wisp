@@ -528,7 +528,7 @@ func Test41a2r1OptInGateResolvesTheManifestSpelling(t *testing.T) {
 
 	// Off: the opt-in never asked. Empty set, reason spelled, nothing resolved.
 	voice15eWriteConfig(t, dataDir, nil) // shipped defaults: wake_word.enabled=false
-	rv := buildResidentVoice(dataDir, ra, nil, nil)
+	rv := buildResidentVoice(dataDir, ra, nil, nil, nil)
 	if rv.plan.Kws.complete() {
 		t.Fatalf("the opt-in-off plan resolved a KWS set: %+v", rv.plan.Kws)
 	}
@@ -542,7 +542,7 @@ func Test41a2r1OptInGateResolvesTheManifestSpelling(t *testing.T) {
 	voice15eWriteConfig(t, dataDir, func(c *config.Config) {
 		c.Voice.WakeWord.Enabled = true
 	})
-	rv = buildResidentVoice(dataDir, ra, nil, nil)
+	rv = buildResidentVoice(dataDir, ra, nil, nil, nil)
 	if !rv.plan.Kws.complete() {
 		t.Fatalf("the opt-in-on plan did not resolve the KWS set (note=%q)", rv.plan.KwsNote)
 	}
