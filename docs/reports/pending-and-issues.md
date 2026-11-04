@@ -30857,3 +30857,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **180 复扫**：逐格读毕——AC#2/AC#3 已归口票 255（ 收口记：宽度接线那一跳今天不差，差的是"重新生效"跳、归 255 AC#4）；AC#4（同族哑键名册）待 255 先例再裁；AC#5/AC#6 归落地腿。⇒ **180 gated on 255**，非独立可收。
 - 190/188 普查：190-a1 已成功出件（真脉可用）；188-a1 dud（无件），需重派。
 - 地面：HEAD 28d7f75a8、未推=0、panel 净、无残留 in-flight。189 为本会话第23枚（上一步已收）。
+
+## A1489（TS，编排者）131轮：190 宿主侧文件树 Go 核心落地（6 commit），余 AC#4 三形+契约页侧
+- 190 从零到可编译接线（微粒细胞法，flash 单件小任务稳定成功）：0d5aa9b4c types／53b0d592d reader／025cf41f9 修 json tag 与 -i＋屯据绿（ReadGitTree190 三绿）／4d3daacea 接线1（composer 顶层 files *TreeView omitempty＋pump reader/装配＋ReadFileTree190 导出）／2ed557db1 接线2（cmd/wisp fileTreeView 用 workspaceView().Canonical 同坐标＋run 装配）。
+- 门禁：build ./internal/panel ./internal/tools ./cmd/wisp rc=0；vet rc=0；panel 整包红=2：TestC21DesignTokensFourWayAgree（既有 tokens 域）＋TestComposerContractTypesMatchFrontend（新增：Go ComposerState 出 files 键但 frontend/src/lib/panel.ts 未声明——按 181/197/248 先例＝Go 先出键、页面声明归 owner UI 腿）。
+- 余（未收）：AC#4 越权三形（不可读/权限拒绝/symlink-junction 跨界各现量+文案）未做；AC#2 根选取判据、AC#3 只读判据 未加测试；文件名 scrub 未接。190 未 -done。
+- 页侧待 owner 外部 agent：frontend/src/lib/panel.ts ComposerState 加 files 键（本队 ⛔ 零写面 frontend）。
