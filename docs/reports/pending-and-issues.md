@@ -30952,3 +30952,15 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 拷回干净环境(无僵留进程/端口)跑 2 次仍 FAIL(golden requests=[])⇒ 非我变异运行的端口争用，测试本身对脚本化 SSE 环境脆弱。已再次移出仓到 /d/tmp/wisp/20261104/378r1/。cmd/wisp 干净(run.go diff=0)。
 - ⇒ 378 收尾固定动作(fresh context)：写一条**机制级可靠测试**——WISP_ENV=test 真 memory.Store + 直构 taskLifecycleJournal 调 StartTaskLog 断言落 1 枚 task_log 行、随后挂 tool_call 断言 PRAGMA foreign_key_check=0；反向=不接 journal⇒fkc>0 红。避开脆弱 SSE 服务器。＋AC#3 门禁=第26张。
 - 本会话末段(146-149)在 378 上连番受挫(flash 对 cmd/wisp 数据模型/脚本测试不稳、编排者上下文近枯)。建议 fresh 会话精写测试收口 378，勿再重派大腿。
+
+## R383（退回票 378；由 378-v1 非实现者判，verdict=docs/evidence/s1/378-ac-verdict.md 775cdf517）
+- **R1 决定性**：树内两枚 378 用例都看不见 run.go:1583 `rt.loopOpt = loopOpts` 那一跳（`child_task_log_378_test.go:44` 自造 journal；`tasklog_subloop_378_test.go:138` 手工塞 Journal）。摘掉 :1583（回 Journal==nil）两枚照绿 ⇒ AC#2「不修不响＋摘掉新加那跳必转红逐名报行」**不成立**。
+- **R2 决定性**：验收数（task.spawn 后 fkc=0）树内无可复现用例：P1 手工造父行·无 spawn；唯一真跑 task.spawn 的 bridge 不带 journal ⇒ 子 tool_call 行按构为 0、fkc 空洞。量过「spawn+fkc」的 572 行测试已移出仓、其读数只在 untracked `378-r1-impl.md`。
+- **R3**：〔乙〕形（＝我 A1502 甲的实质）子任务行以 running 开、`FinishTaskLog` 惰性(run.go:1326)、全仓只 run.go:1742 关 root ⇒ **子任务恒显示 running**，且 `crash_recovery.go:150-159` 会把仍 running 的行改 `interrupted`（成功完成也被报中断）。AC#1 未裁终态写手、未按 SPEC-12 §5 登记推迟。
+- **R4**：`internal/tools/system.go:469-471` `screenCaptureSchema` **缺逗号＝坏 JSON**（现跑 `Test233HotTierAgentReachesTheNextTask` → MarshalJSON invalid char）⇒ 今天任何「真 wisp run 跑一发」的用例**不可能绿**。★这解释为何本会话末段腿返回该文件、我误当越界回退——它确是**前置真 bug**。v1 独立核：修复本身成立（BaseOptions 读时取值/subagent opt:=base/先父后子/生产 bridge run.go:955-960 Journal:mem）。
+- 门禁四数全绿（build/vet/test -run TestTicket378 ok0.336s/gofumpt 空）；双名核=1（票未改名，仍 ready-for-agent）。**不翻框**。
+
+## A1506（编排者）151轮：378 未收口（v1 退回 R383，判得对）；我组件测不足＋R3/R4 真发现
+- 我本会话亲写 cmd/wisp/child_task_log_378_test.go（P1/P2，commit 6e61456e1）＝taskLifecycleJournal→Store 组件测，绿但**无反向牙（看不见 run.go:1583）**⇒ 被 v1 正确退回。诚实认账。
+- 378 收尾需三步（fresh/后续）：(a) 先治 **R4**——给 screenCaptureSchema 补逗号（单开票或并入），解锁 run 级测试；(b) 写「真 task.spawn＋摘 run.go:1583 即红」的验收用例（AC#2 真牙）；(c) AC#1 补裁 **R3 子任务终态**：加终态写手(推荐,主流 harness 子任务应有终态) or 按 §5 登记推迟——产品决定由 agent 拍但需落地。
+- R4 是**前置真 bug**（非 378 造），会影响一切 run 级测试，宜优先单开票。
