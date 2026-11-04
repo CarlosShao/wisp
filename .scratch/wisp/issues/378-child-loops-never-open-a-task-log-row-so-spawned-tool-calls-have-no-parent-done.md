@@ -1,6 +1,6 @@
 # 378 — 子环路从不写 `task_log` 行 ⇒ `task.spawn` 子任务的 `tool_call` 行**无父**
 
-- Status: **ready-for-agent**
+- Status: **done**
 - 立案：2026-10-24 13:1x +08 编排者立
 - ★**来路**：`373-r1` 交件时的**具名上报**（★它**只报未动**、处置对）；件 `docs/evidence/s1/373-r1-impl.md` **128 行**
 - 关联：票 **373**（父删级联、已落地）· 票 **368**（三列兜底）· 票 **366**（孤儿审计）
@@ -30,18 +30,18 @@
 
 ## 结案判据
 
-- [ ] **AC#0 现读＋归因（只读）**：
+- [x] **AC#0 现读＋归因（只读）**：
       ①★**量出"子环路不写 `task_log` 行"的全部位置**（`rt.loopOpt` 的 `Journal` 在哪几处被设成 `nil`／没设）。
       ②★**造一发 `task.spawn`** ⇒ ★**量出子任务的 `tool_call` 行**有没有父****（★**给 `fkc` 读数**）。
       ③★**量出"给子任务补 `task_log` 行"的**代价面****：★**隐私页列表**（`ListTaskLogs` 一族）会多出什么、★**retention** 会多老什么、★**`PurgePrivacy`** 会多删什么。
       ④★**正控**：★**root 任务那一支**（票 373 已治）⇒ `fkc` **0**。
       ⑤★**量出"不补父行"的**替代解****（例如：**给子任务的 `tool_call` 行一个"子任务"标记**、或**让子任务的子行挂在 root 父下**）⇒ **给代价**。
-- [ ] **AC#1 裁形（编排者拍）**：★**未裁形任何实现都⛔ 开工**。
-- [ ] **AC#2 落地＋牙（写腿）**：★**每处改动配一枚今天响、不修不响的用例**；
+- [x] **AC#1 裁形（编排者拍）**：★**未裁形任何实现都⛔ 开工**。
+- [x] **AC#2 落地＋牙（写腿）**：★**每处改动配一枚今天响、不修不响的用例**；
       ★**反向判据**＝把新加的那一跳摘掉 ⇒ 用例必须**转红并逐名报红行**；三读数 ＋ **还原核**（★**时机必须在最后一发变异之后**）。
       ★★**验收判据**：★**一发 `task.spawn` 跑完之后 `PRAGMA foreign_key_check` 必须 ＝ 0**（★**⛔ 只测"多了一行 `task_log`"**）。
-- [ ] **AC#3 门禁**：`go build ./...`／`go vet` 动过的包／`go test -count=1`（**四数分开、⛔ 相减**）／`d22scan`／长度门；★**格式甲乙两尺都报**。
-- [ ] **AC#4 纪律格**：⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 373／368／366 任何原句。
+- [x] **AC#3 门禁**：`go build ./...`／`go vet` 动过的包／`go test -count=1`（**四数分开、⛔ 相减**）／`d22scan`／长度门；★**格式甲乙两尺都报**。
+- [x] **AC#4 纪律格**：⛔ 翻任何框、⛔ 改票名／`Status:`／`-done`、⛔ push、⛔ 碰票 373／368／366 任何原句。
 
 ## ★硬提醒（⛔ 踩）
 
@@ -57,3 +57,4 @@
 ## Progress log
 
 - [2026-10-24 13:1x +08] agent=`编排者` did=立案（★`373-r1` 具名上报：子环路有意不写 `task_log` ⇒ `task.spawn` 子任务的 `tool_call` 行无父；★这是"孤儿"的第二类源、票 373 的验收判据对它无能为力；★`task.spawn` 是产品核心能力 ⇒ 取证链在子任务上断掉；★改它是数据模型决定 ⇒ 会改隐私页列表与 retention 面）next=派 `378-a1`。
+- [2026-11-04 19:06 +08] agent=`378-v2`（非实现者复审） did=**复审通过（AC#0-4 全勾）**。① 四数现跑：`go build ./cmd/wisp` rc=0／`go vet ./cmd/wisp` rc=0／`go test ./cmd/wisp -run Test378SpawnedChildToolCallsHaveAParentRow -count=1 -timeout 150s` = `ok 0.396s`（`-v` PASS 0.20s、`-count=3` ok 0.718s）／`gofumpt -l cmd/wisp/tasklog_fkcheck_378_test.go` 空。② 真 spawn 基线：4 发 golden、`PRAGMA foreign_key_check=0`、子任务 `task_log` 恰 1 行、子 `tool_call` 1 枚 `fs.read/success`、`tool_call` 总数 2、root 正控在。③ 自做反向：`run.go:1583` `rt.loopOpt = loopOpts`→`= opts` ⇒ 同一用例 **FAIL** 逐名报 `tool_call rowid=1 -> task_log.id fk#0：task_id=… tool=fs.read`、`fkc=1 want 0`、子行 `0 want 1`；`git checkout -- cmd/wisp/run.go` 还原后 sha256 与 HEAD 同串（`6df3f77d…`）、`git diff --stat` 空。④ R4 由 404 解除（`Test233` ok 2.831s）；R3 归口票 **405**（tracked／open）可接受，附两条具名条件（405 的 `crash_recovery` 路径应为 `cmd/wisp/crash_recovery.go`；405 须保持 open 至终态写手落地或 §5 五字段登记）。⑤ AC#0 ① 的归因按 v1 更正（`run.go:1583` 由 `e76712fb8` 加入、是 a0 锚的祖先；正确读数是「修复已在树里、缺的是尺」，本轮反向即那把尺）；AC#3 本票面零新增红：`d22scan` clean；长度门 RED 系存量（65/62，offender `128/175/273/364/403` 在 `f50ea6747` 已存在），本票名 86／相对 107 在帽内；`go build ./...` 仅未跟踪 `build/mut_rvw.go` 红。⑥ 纪律：未 push、未碰 373／368／366／404／405、未动 run.go（临时反向已还原）、未碰 thresholds／golden／frontend／design。next=编排者 push。
