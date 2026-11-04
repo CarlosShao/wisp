@@ -31074,3 +31074,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 收口 3349709f0：翻 AC#1/AC#2 两格、Status→done、改名 -done、修 golden_extract.go 陈旧注释（NOT wired→已 wired）；双名核=1。
 - 三把尺自验：build rc0／TestTicket29 ok 4.3s／全包 memory ok 30.8s／gofumpt 空／d22 clean。
 - 残余（非阻）：golden SSE 为 pinned 非 live capture（harness 本义）；抽取未过 44-r5 配额门（后续决定）；面板/球「记住了：X」闪光+undo 属 37/40 面。
+
+## A1527（2026-11-04 21:4x，编排者）168轮：370 收口＝本会话第 31 枚（"能力造好没人用"那一族，实为 done-not-closed）
+- 现读判：370 前提在 HEAD 过期——修法 74f430d86（甲′：agent.Config.MaxOutputTokens→Assembler→Request max_tokens，3 wire 测试）是 HEAD 祖先；owner 批准在案（A1461/:30628）。票从未关。
+- 370-a1（e8cd575ec 只读）：AC#0 五读数＋正控 request=1→truncated→task_log.state=interrupted＋供应商自身上限射程；证 agent.Config 非 C 级契约；荐甲′。
+- 370-fx（ddbec5ee6）：根因＝tools/mockllm/chat.go handleChat 是唯一不调 recordRequest 的 handler ⇒ LastRequest("chat") 恒空（真·mock 缺陷）；补成 read→record→fault（与 messages/responses 同序）⇒ cmd/wisp Test370 本机转绿，断言一字未改。
+- 370-v1（c1d6ee7e0 非实现者）：AC#0-4 全 PASS；断言完整性 YES（ddbec5ee6 只碰 mockllm 2 文件，test blob 逐字相同）；overlay 反向：摘 loop.go:261 转红 task370_ac2_test.go:116/:183；复跑 cmd/wisp Test370 ok/agent 370 ok/mockllm ok/d22 clean/gofumpt 空。
+- 收口 49d89c9fc：翻 AC#0-4 五框、Status→done、改名+双名核=1。
+- 已知假红（非本票）：go build ./... rc=1 仅 build/mut_rvw.go（未跟踪/被 ignore，非 HEAD），同 364/378 记录。AC#2② 二词（屏幕 truncated／库 interrupted）已记、未统一（属另事）。
