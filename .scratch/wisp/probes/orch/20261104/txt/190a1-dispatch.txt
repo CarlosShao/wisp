@@ -1,0 +1,7 @@
+TASK 票 190（面板"工作区文件"文件树，宿主侧 Go 无源）——只读设计核腿 190-a1（⛔ 零产码写）
+
+身份/环境：cwd=D:\work\workspace\projects plans\Wisp；Go1.27 Windows；Git Bash=D:\work\soft\Git\bin\bash.exe。
+【读】.scratch/wisp/issues/190-*.md 全文；相关 internal/panel/git.go（票181读面族，569行）、票 181 done 件；census docs/evidence/s1/180-182-panel-fields-census-c1.md 若在。
+【只读产出（⛔ 零写 internal/panel/cmd/产码，仅 write 一份 evidence md）】docs/evidence/s1/190-a1-census.md，答：①文件树数据从哪取——复用票181/189同一 internal/panel/git.go 读面族还是另起（⛔ 重造第二份）；②落点＝哪些文件/约几行/是否触 C17 新方法/是否加顶层 key（撞 TestComposerContractTypesMatchFrontend）；③雷区与已知红（internal/panel 现4枚已知红，见 197-subagent-carrier-r3.md:268-275）；④与票 181/189/167 边界。
+【纪律】只 commit 你这份 evidence md（显式 pathspec，⛔ -A/amend/reset/stash）；⛔ push；临时件 D:\tmp\wisp\20261104\190a1\ 只建不删。回报：落点/行数/C17判/雷区。
+模型：magpie / cline/cline-pass/deepseek-v4.1-flash-1017

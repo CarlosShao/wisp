@@ -1,0 +1,25 @@
+TASK 票 189（面板"审查"读面：未提交改动枚数＋逐文件 diff，宿主侧 Go 源）——写腿 189-r1
+
+身份/环境：cwd = D:\work\workspace\projects plans\Wisp；Go 1.27 Windows。Git Bash = D:\work\soft\Git\bin\bash.exe。gofumpt 绝对路径 = /d/work/base/gopath/bin/gofumpt.exe（裸名 rc=127）。cmd/wisp 整包是死亡区勿整跑。
+
+【先读（必做，起手三核：核票面点名的串/行还在不在、引文出处对不对、红绿是否别人在飞件造成）】
+1. .scratch/wisp/issues/189-the-review-stack-needs-uncommitted-count-and-per-file-diff-but-go-side-has-zero-source.md 全文
+2. docs/evidence/s1/189-uncommitted-count-design-a1.md（设计核，含精确落点）
+3. .scratch/wisp/probes/189/a1/100-findings.md（10-08 普查：最少落点 3~4 文件/355~475 行、雷区现量=0、已知红实为 4 枚见 docs/evidence/s1/197-subagent-carrier-r3.md:268-275、行号已漂清单一览）
+票 181 已 done（.scratch/wisp/issues/181-...-done.md），其读面 = internal/panel/git.go（569 行）。本票复用同一读面族，⛔ 另起第二份实现。
+
+【要建（照普查结论）】
+- internal/panel/git.go：在既有 GitView 下加两个【子格】（⛔ 加顶层 key——会撞 TestComposerContractTypesMatchFrontend / Q-51）：
+  · uncommitted：未提交改动枚数，分"已暂存/未暂存"两档计数但都算"未提交"；未跟踪那一半若问不到 git→第三个枚举值，绝不报 0（高估 188 倍的教训）。
+  · diff：逐文件差异，走 `git --no-optional-locks diff`（实测定 267ms/1.5MB）；必带字节上限＋截断语义＋"怎么找回全量"的指针（D15 教训）。
+  · 并改掉 git.go:5-8 那句 "NO EXTERNAL PROCESS" 自陈使其诚实（普查明列此点）。
+- 新增同族 git_readonly_exec.go：未跟踪半的唯一准路（只读；带 owner/recover；⛔ 裸 go func；超时不用墙钟；路径决策过 C26；问不到=第三值）。
+- 两枚判据测试文件：①合成临时 git 仓（git init→改几个文件→断言枚数与文件名集合正确，值来自真仓）；②只读边界常驻钉（类型面无写落点／入向 hop 不存在／.git/index 跑前后 md5 不变——只作"这次没写"不作通则）。
+
+【禁区】⛔ 动 frontend/**·design/**；⛔ 改 D34/PLAN.md/docs/specs/**/allowlist.txt/thresholds.go/golden 一字节；⛔ C17 新方法；⛔ 做"提交/推送/接受/回滚"动作腿（雷区，待 owner 逐枚批）；⛔ 另起第二份 git 读面。
+
+【门禁】go build ./internal/panel ./internal/tools rc=0；go test -count=1 ./internal/panel ./internal/tools（internal/panel 现 4 枚已知红照实记不修，逐名见 197-subagent-carrier-r3.md:268-275）；gofumpt -l 你改的文件=空；sh scripts/d22scan.sh 纯净；gate-clauses 比名册（.scratch/wisp/probes/154/gate-clauses.sh，在册只 G6neg）。cmd/wisp 勿整跑。
+
+【纪律】子代理只 commit 不 push；git add/commit 两处显式 pathspec（只点名你写的文件；⛔ -A/amend/reset/rebase/stash/checkout ./clean）；临时件落 D:\tmp\wisp\20261104\189r1\（只建不删）。完成回报：逐枚改了哪些文件＋门禁逐条读数＋已知红名册＋任何撞钉。若普查前提过期按盘上现量开刀，⛔ 按票面原句。
+
+模型：magpie / cline/cline-pass/deepseek-v4.1-flash-1017（ClinePass 套餐）
