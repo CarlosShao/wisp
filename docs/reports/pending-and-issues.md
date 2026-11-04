@@ -30824,3 +30824,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **320 是最接近真收口票**：AC#1/2/3/5/6/7 已[x]，仅 AC#4 未勾；非实现者 320-v1 具名三仪器缺口（①不落盘明文判据层不成立 a4m5 ②超时缺世界 a4m3 ③错误分类缺世界）＋一枚待人裁（上游原文回显口径）。
 - **编排者裁定第④口径（技术选择，agent 拍）**：页面可见回执句不得含上游 body/first-line，只给 D37 分类＋本机摘要句——主流 harness 安全做法，且与 cmd/wisp/panel_models_320.go:19-22 文件头自述一致（现 :111 boundedFirstLine320(err.Error()) 与自述矛盾，属实现未跟上声明）。
 - **派腿 320-r3**（workflow 覆盖 magpie/cline-pass/deepseek-v4.1-flash-1017）：收 AC#4 残余（代码修正 + 四条有牙测试 + 门禁），派单存档 .scratch/wisp/probes/orch/20261104/txt/320-r3-dispatch.txt。只 commit 不 push；非实现者判语由编排者下轮出。
+
+## A1484（2026-11-04 14:07 +08，编排者）126轮：320 收口（第22枚）——AC#4 仪器收口
+- 腿 320-r3 死前把两文件改到位（未 commit、report=null）；编排者从工作树捞起、补自证、出非实现者裁语（docs/evidence/s1/320-r3-instrument.md）。
+- 第④口径（A1483 ruling4）：错误句只带 D37 分类、不含上游正文；不转述 tooth 变异自证 RED（UPSTREAM_LEAK_320XYZ 落页面句，诚实树 PASS）。四条 AC#4 测试全绿，含不落盘正控（植密钥探测器能看见）＋超时慢夹具（ClassNetwork、elapsed<2s）。
+- 门禁：build/vet rc=0、gofumpt 空、d22scan clean、-count=2 Test320 24/24/0/0 rc=0。320 八格全[x]→-done。本会话累计 22 票。⛔ 零改 thresholds/golden/frontend/PLAN/specs。

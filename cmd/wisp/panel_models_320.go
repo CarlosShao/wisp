@@ -19,7 +19,8 @@ package main
 // and it does not relay the upstream error body verbatim - the sentence the page
 // shows is this file's own, built from the classified error, because the reply is
 // page-visible and an upstream body is not this host's to quote (ticket 320
-// ruling 4, ledger A972).
+// ruling 4, ledger A972; sharpened to "class + this host's sentence only" by
+// ruling 4 of A1483, leg 320-r3).
 
 import (
 	"context"
@@ -30,6 +31,7 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/llm"
+	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/secret"
 )
@@ -39,13 +41,13 @@ import (
 // window; eight seconds is short enough that a stuck provider costs the operator
 // a visible pause rather than a hung page, and the page shows a loading state for
 // the duration.
-const modelsFetchBudget320 = 8 * time.Second
-
-// modelsListErrorCap320 is how much of a classified error sentence this hop
-// relays. The errors internal/llm returns are already classified (D37), but their
-// text can carry the first line of an upstream body; capping keeps that to one
-// bounded line and the page-visible reply stays this host's sentence.
-const modelsListErrorCap320 = 200
+//
+// It is a VAR and not a const so the slow-provider case is testable at all: a
+// budget that can only be reached by waiting eight real seconds is a budget
+// nobody will ever watch, and ticket 320 AC#4's timeout tooth (leg 320-r3) is
+// exactly that watch. Production never assigns it - the only writer is
+// panel_models_320_test.go, which shrinks it for one run and restores it.
+var modelsFetchBudget320 = 8 * time.Second
 
 // modelsListHandler320 implements panel.ModelsListRequestHandler against the same
 // pair the settings legs use: the live config manager for base_url/api_key_ref
@@ -108,7 +110,15 @@ func (h *modelsListHandler320) HandleModelsListRequest(ctx context.Context, req 
 		HTTPClient: llm.NewDefaultHTTPClient(cfg.Net.Proxy.Mode, cfg.Net.Proxy.URL),
 	})
 	if err != nil {
-		return "", fmt.Errorf("拉取失败（%s）：%s", provider, boundedFirstLine320(err.Error(), modelsListErrorCap320))
+		// Ruling 4 of ledger A1483 (leg 320-r3): the sentence the page shows is
+		// this host's own and NOTHING from the provider's answer rides in it.
+		// err.Error() is deliberately not relayed: for a non-200 the llm seam
+		// puts the upstream body's first line (and the provider's own code
+		// string) into it, and quoting either on a page-visible surface is what
+		// this ruling forbids. The D37 class is the one piece of the error that
+		// is this host's vocabulary, so it is what the sentence carries.
+		return "", fmt.Errorf("拉取失败（供应商 %s；D37 分类 %s）：没能取到它的模型列表，检查基址与密钥后再试",
+			provider, observe.ClassOfOrInternal(err))
 	}
 
 	payload := modelsListPayload320{Provider: provider, Models: make([]modelsListEntry320, 0, len(found))}
@@ -121,17 +131,4 @@ func (h *modelsListHandler320) HandleModelsListRequest(ctx context.Context, req 
 	}
 	return fmt.Sprintf("已从 %s 拉到 %d 个模型；勾选后逐枚「添加」即可（保存后重启生效）。\n%s%s",
 		provider, len(found), panel.ModelsListPayloadMarker, line), nil
-}
-
-// boundedFirstLine320 keeps one line and caps it, so an upstream body cannot ride
-// into a page-visible sentence in full.
-func boundedFirstLine320(s string, cap int) string {
-	if i := strings.IndexAny(s, "\r\n"); i >= 0 {
-		s = s[:i]
-	}
-	s = strings.TrimSpace(s)
-	if len(s) > cap {
-		s = s[:cap] + "…"
-	}
-	return s
 }
