@@ -57,3 +57,5 @@
 （追加式；每条 `- [日期 时刻 +08] agent=… did=… next=…`，钟点由 `date` 插值，不手打。）
 
 - [2026-10-21 10:2x +08] agent=`编排者` did=立案（非实现者签名＝`174-v1` 第 (5) 件第 2 条；三格按它的建议形状落，含 MUT-5 缺口）next=派 `356-a1` 只读出 `AC#0` 成对读数（approval 计数是承重那跳）。
+
+- [2026-11-04 11:41 +08] agent=编排者 did=修硬约束点名的**幻影引用**：`internal/tools/task.go` 注释原引 `task_output_pointer_notice_174rr1_test.go`（盘与 HEAD 均 0 命中＝幻影）→ 改指真实承重测 `task_output_pointer_two_roads_174r1_test.go`（其 `TestPointerSecondRoadBackIsRealOnThisBridge174r1` 正是"L2 卡批准即整读回 20000B"的同桥测，我现核）。build OK／gofumpt 净／vet 仅余 `system_backend_windows.go` 两处 unsafe.Pointer 基线告警（非本改）。★**仪器缺口具名登记**：`d22scan` ban #9 的 `repoPathRe` 只认"带目录前缀的完整仓相对路径"，裸文件名（如本幻影）进不去 ⇒ 这类"注释引裸文件名指向不存在件"今天扫不到，须人工 grep 兜底。⛔ 零 AC 翻（AC#0/1/2 仍未做，本只是硬约束里的顺手项）。

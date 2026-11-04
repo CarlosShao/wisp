@@ -849,7 +849,7 @@ func (d TaskDeps) pointerNotice(raw string) string {
 		// risk-TIER input, not an execution wall: FSDeps.open canonicalizes and
 		// never re-checks the allowlist, so one L2 card answered yes really does
 		// fetch these bytes (the criterion in
-		// task_output_pointer_notice_174rr1_test.go measures that on the same
+		// task_output_pointer_two_roads_174r1_test.go measures that on the same
 		// bridge). The previous sentence said flatly "fs.read 会被拒 ... 才读得
 		// 回来", which is true only of the nobody-approves case and made this leg
 		// contradict internal/agent/spill.go, which has told the model both roads
