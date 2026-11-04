@@ -3,6 +3,7 @@ package panel
 import (
 	"context"
 	"errors"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -29,7 +30,31 @@ func gitTreeRun190(ctx context.Context, root string, args ...string) ([]byte, er
 // readGitTree190 returns the file tree under root using git, or a third state.
 func readGitTree190(root string) TreeView {
 	if strings.TrimSpace(root) == "" {
-		return TreeView{Kind: TreeKindNotRepo, Reason: "no workspace to read", Entries: []TreeEntry{}}
+		return TreeView{Kind: TreeKindNotChosen, Reason: "no workspace was narrowed; the whole disk is not a fallback", Entries: []TreeEntry{}}
+	}
+	info, statErr := os.Lstat(root)
+	if statErr != nil {
+		if os.IsNotExist(statErr) {
+			return TreeView{Kind: TreeKindUnreadable, Reason: "the root does not exist", Entries: []TreeEntry{}}
+		}
+		if os.IsPermission(statErr) {
+			return TreeView{Kind: TreeKindPermissionDenied, Reason: "the filesystem refused this process", Entries: []TreeEntry{}}
+		}
+		return TreeView{Kind: TreeKindUnreadable, Reason: "the root could not be examined", Entries: []TreeEntry{}}
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return TreeView{Kind: TreeKindLinkOutside, Reason: "the root is a link; C26 default-deny refuses to follow it", Entries: []TreeEntry{}}
+	}
+	if !info.IsDir() {
+		return TreeView{Kind: TreeKindUnreadable, Reason: "the root is not a directory", Entries: []TreeEntry{}}
+	}
+	if d, openErr := os.Open(root); openErr != nil {
+		if os.IsPermission(openErr) {
+			return TreeView{Kind: TreeKindPermissionDenied, Reason: "the filesystem refused this process", Entries: []TreeEntry{}}
+		}
+		return TreeView{Kind: TreeKindUnreadable, Reason: "the root could not be opened", Entries: []TreeEntry{}}
+	} else {
+		_ = d.Close()
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), treeGitTimeout190)
 	defer cancel()
@@ -46,7 +71,7 @@ func readGitTree190(root string) TreeView {
 	}
 	files, err := gitTreeRun190(ctx, root, "ls-files", "-z")
 	if err != nil {
-		return TreeView{Kind: TreeKindTooLarge, Reason: "listing files failed", Entries: []TreeEntry{}}
+		return TreeView{Kind: TreeKindUnreadable, Reason: "listing files failed", Entries: []TreeEntry{}}
 	}
 	more, _ := gitTreeRun190(ctx, root, "ls-files", "-o", "--exclude-standard", "-z")
 	paths := append(splitNUL190(files), splitNUL190(more)...)

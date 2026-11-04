@@ -26,8 +26,8 @@ func TestReadGitTree190NotARepo(t *testing.T) {
 
 func TestReadGitTree190EmptyRoot(t *testing.T) {
 	v := readGitTree190("")
-	if v.Kind != TreeKindNotRepo {
-		t.Fatalf("empty root kind=%q want not_repo", v.Kind)
+	if v.Kind != TreeKindNotChosen {
+		t.Fatalf("empty root kind=%q want not_chosen (the whole disk is not a fallback)", v.Kind)
 	}
 }
 
