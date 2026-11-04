@@ -20,7 +20,7 @@ v1 退回的两条决定性理由——「尺看不见 `run.go:1583` 那一跳�
 附加现跑（不入四数，只作归因材料）：
 
 - `go test ./cmd/wisp -run Test233HotTierAgentReachesTheNextTask -count=1` ⇒ **`ok 2.831s`**：R4（试 404 修 `screenCaptureSchema`）独立复核转绿，跑级通道确实解锁。
-- `go test ./cmd/wisp -run '378' -count=1` ⇒ **`ok 0.787s`**：三枚 378 用例同包同跑不互扰。
+- `go test ./cmd/wisp -run '378' -count=1` ⇒ **`ok 0.787s`**：4 枚 378 用例（3 个测试文件）同包同跑不互扰。
 - `sh scripts/d22scan.sh` ⇒ **clean，rc=0**（`examined 406 production Go files`；`ban #8 internal/=855`／`cmd/=200`）。
 - `go build ./...` ⇒ **rc=1**，但红的全部是**未跟踪**的 `build/mut_rvw.go`（`undefined: voiceTtsFiles` 等 10 行；`git ls-files build/mut_rvw.go` = **0**）；`go build ./cmd/... ./internal/...` ⇒ **rc=0**。⇒ 这是本机 staging 件的存量假红，不属本票，也与 CI 干净检出无关。
 - `sh scripts/check-path-length-budget.sh --with-self-test` ⇒ **VERDICT RED**，**但存量、非本票**：树 65 枚 over-budget／roster 62 枚；5 枚未 roster 的 `-done` 名（`128`/`175`/`273`/`364`/`403`）＋2 条旧名 stale 键（`128`/`175`）**在 `f50ea6747` 的树里已存在**（现跑 `git ls-tree -r --name-only f50ea6747 | grep -c` = 5）。本票文件名 `378-child-…-parent-done.md` = **86 字符／相对 107**，≤ 100／121 帽，**零新增违规**、不入 offender 集。该树级红具名交编排者（本腿⛔碰 roster／threshold）。
@@ -78,10 +78,10 @@ git show HEAD:cmd/wisp/run.go | sha256sum -> 同一串
 **405 的承载是实的（本腿现读）**：
 
 - 票 tracked（`git ls-tree -r HEAD --name-only | grep -c 'issues/405-'` = **1**）、`Status: open`，不是口头约定。
-- 机制描述对：`taskLifecycleJournal.FinishTaskLog` 故意惰性（`run.go:1324-1328`，现读 `return nil`）；全仓只有 root 收尾关行；子任务无关闭点 ⇒ 子行 `running`（本腿基线的 `state=running` 正是它）；`crash_recovery` 把仍 `running` 的行改成 `interrupted`（本腿现读 `cmd/wisp/crash_recovery.go:145-165` 的 `TaskStateRunning -> TaskStateInterrupted` 循环）。
+- 机制描述对：`taskLifecycleJournal.FinishTaskLog` 故意惰性（`run.go:1326-1328`，现读 `return nil`）；全仓只有 root 收尾关行（`run.go:1742`）；子任务无关闭点 ⇒ 子行 `running`（本腿基线的 `state=running` 正是它）；`crash_recovery` 把仍 `running` 的行改成 `interrupted`（本腿现读 `cmd/wisp/crash_recovery.go:145-165` 的 `TaskStateRunning -> TaskStateInterrupted` 循环）。
 - 影响与 AC#1 候选（①`FinishTaskLog` 对子任务写终态／②`run.go` 侧收尾关行／③按 `SPEC-12 §5` 五字段登记推迟）都写在票面，**没有被静默吞掉**。
 - 它**现在不是 DEFERRED 标记**，是一张要做的活票 ⇒ 不触发 `SPEC-12 §5` 五字段；**若 405 的 AC#1 最终选 ③**，那时才必须补五字段并让 `DEFERRED(D-xx)` 与 §5 1:1。
-- 378 的验收用例**只记录不判定**子行 `state`（`tasklog_fkcheck_378_test.go:480-487` 明写「没有终态写手，故不断言 state」）⇒ 它没有把 `running` 冒充成「完成」。
+- 378 的验收用例**只记录不判定**子行 `state`（`tasklog_fkcheck_378_test.go:480-483` 明写「没有终态写手，故不断言 state」）⇒ 它没有把 `running` 冒充成「完成」。
 
 **两条具名条件（不阻塞收口，但要落到 405）**：
 
