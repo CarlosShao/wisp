@@ -30931,3 +30931,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 本轮：378-a1 普查腿 dud(flash 对含运行测量 fkc 的普查不稳, 返 null 零落盘)。编排者亲取静态 AC#0①③：子环路 Journal=nil 根在 run.go:1521(base opts Journal:nil)→rt.loopOpt(:1547)，root 走 :1578 loopOpts.Journal=rows，子代理复制 rt.loopOpt=Journal nil。代价面 dao_tasklog.go:95/privacy.go:170/retention.go。落部分件 docs/evidence/s1/378-a0.md。
 - 待：新鲜上下文补 ②④ fkc 实跑(发 task.spawn 量 PRAGMA foreign_key_check) → 裁 AC#1 → 378-r1 写腿。
 - 候选扫描本轮结论：138 blocked(Q-55)、167 排145后、361 牵连 path-budget 系统红+20枚blob脏另立票、135 死区AC#6+Blocked-by-130、182 只读普查喂 gated145 ⇒ 均非净件；378 是唯一净件。
+
+## A1502（编排者）147轮：378 AC#1 裁形=甲（子任务获独立 task_log 行=一等子任务任务）
+- 依据机制(378-a0 ①③)：子环路 Journal=nil(run.go:1521→rt.loopOpt)，root 走 :1578 loopOps.Journal=rows，子代理复制 rt.loopOpt=nil。裁甲：每个 task.spawn 子任务写 1 枚 task_log 行（task 行半，复用 taskLifecycleJournal），其 tool_call 挂它 ⇒ fkc=0；⛔ 对每发工具调用写(量级爆)。理由：主流 harness 子代理=一等任务有独立日志、task_log 现子任务正确、retention 老化正确；⛔ 因隐私页/retention 代价降级乙/丙=退其次。
+- 落地待 378-r1 写腿(data-model 改 cmd/wisp 共享面，需新鲜上下文细做)＋fkc=0 测试＋反向判据。②④fkc 基线读数并入 r1 测试。
