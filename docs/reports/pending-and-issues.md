@@ -30648,3 +30648,12 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 **待机主（4 条）**：256（300s vs 可配谁优先）／301（"可抵消"裁语）／185（是否推翻 09-27 旧裁定）／347（解析器"一"落点追认，或说"347 回退"）。
 
 **dud 实况**：288/309b2/370/378 均"空返回但有真产出"被抢救落地；273design/qaudit 空跑无件。读腿 dud 亦高，关键分析编排者自读。
+
+## A1463（2026-11-04 09:2x +08，编排者）第79轮：370 AC#2 端到端测试落地（本机 probe365 罐漂移，待 CI）；网络恢复推送清零
+
+- **370 AC#2 ①② 测试已产出**：`cmd/wisp/task370_ac2_test.go`（194 行，package main）。正控 `Test370TruncatedRunRowsAnInterruptedTask`：`newProbe365` + `[llm.roles.chat]max_output_tokens=1` 造"撞上限"→ 断言 `task_log.state=="interrupted"`、屏幕词逐字记录（今天 truncated vs 库 interrupted）、exit=3；反向 `Test370TheInterruptedRowNeedsTheCeiling` 两向（无上限上 wire→row=done；上限撞不到但请求体确带 max_tokens→row=done），证明 interrupted 行由该跳造成。用 `p.surfaces()` 直接取（屏幕词, 库 state）。
+- **★本机无法本地复验（如实）**：staged 跑（二进制进 `build/`+DLL 同目录）该测试**失败**，所有 run `failed/error/exit1`。但**既有** `Test365RunRowsAStuckTaskAsStuck` 在本机**同样** `failed/error/exit1` ⇒ **probe365/mockllm 罐在本机整体不工作（环境限制，非新测试缺陷）**。故该测试 **CI 验证**（同 342 "运行时待 linux CI"）。⚠ 勿因本机红判 370 缺陷。
+- **370 不标 -done**：核心"值到 wire"已 3 测试绿+门禁全绿；AC#2①行为端到端待 CI。
+- **网络恢复**：TLS 断数小时后恢复，积压本地提交（A1461/A1462 等）已推，未推清零（现跑为准）。
+- 坏探针 `cmd/wisp/zz_probe_temp_test.go`（引用未定义 `probeRealSchemas` 砸编译）已按 309-r2 先例改名 `.go.txt` 中和（不删内容）。
+- **待机主仍 4 条**：256/301/185/347。
