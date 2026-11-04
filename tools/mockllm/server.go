@@ -33,8 +33,10 @@ type Server struct {
 	caps capabilityMode
 
 	// lastRequest keeps the most recent body per route (ticket 11: cache
-	// breakpoint / probe assertions read it back). Only routes that call
-	// recordRequest contribute; the chat route is untouched.
+	// breakpoint / probe assertions read it back). Every dialect handler calls
+	// recordRequest before its first response byte; chat used not to, which
+	// made /__control/last_request?route=chat answer present:false even though
+	// its control API documented the route (fixed for ticket 370).
 	lastRequest map[string]recordedRequest
 }
 

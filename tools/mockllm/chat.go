@@ -14,14 +14,20 @@ import (
 
 // POST /v1/chat/completions (OpenAI Chat Completions shape).
 func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
-	if f, ok := s.takeFault(); ok {
-		serveFault(w, f, "chat")
-		return
-	}
-
 	body, err := io.ReadAll(io.LimitReader(r.Body, 8<<20))
+	// Read + record before any response byte (ticket 11; see handleMessages).
+	// The chat dialect was the one route that did not record, so
+	// /__control/last_request?route=chat - a route its own control API
+	// advertises - always answered present:false and a chat-wire assertion
+	// could not read back the body the openai-chat adapter actually sent
+	// (ticket 370 AC#2's max_tokens hop is measured that way).
+	s.recordRequest("chat", body, r.Header)
 	if err != nil {
 		writeJSONError(w, http.StatusBadRequest, "read body: "+err.Error())
+		return
+	}
+	if f, ok := s.takeFault(); ok {
+		serveFault(w, f, "chat")
 		return
 	}
 	var req chatRequest
