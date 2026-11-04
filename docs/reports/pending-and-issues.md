@@ -30657,3 +30657,17 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **网络恢复**：TLS 断数小时后恢复，积压本地提交（A1461/A1462 等）已推，未推清零（现跑为准）。
 - 坏探针 `cmd/wisp/zz_probe_temp_test.go`（引用未定义 `probeRealSchemas` 砸编译）已按 309-r2 先例改名 `.go.txt` 中和（不删内容）。
 - **待机主仍 4 条**：256/301/185/347。
+
+## A1464（2026-11-04 10:1x +08，编排者）第84-85轮：273〔甲〕波1+2a 落地；波2b 连续2 dud，记精确接缝
+
+- **273 波1 已落地+推送**：`handOffMachine273(logf)` 命名构造 + `effectAuditSink273(logf)`→已有 JSONL 审计面，仅 #37 `model.verify-sha256-signature`。3 测试本机真绿（JSONL 恰 1 条 d43=37 / 空罐反向红 / 字段计数）。commit `21d3f8653`。
+- **273 波2a 已落地+推送**：`cmd/wisp/resident_voice_effect_273.go` `effectFanout273{drive,audit}.sink`（audit 先跑；仅 `drive273` 4 名 [panel.stream-push/panel.keep-alive/conversation.ring-solid/mic.enable] 才 drive，其余含 mic.keep-off/tts.stop **只审计防 R1 双执行**）+ 单测（我自跑 8 测试全 PASS）。commit `771c28c70`。
+- **273 波2b（生产机接线）连续 2 dud（273w2b、273w2b1 均零产出）**：对 flash 一次吃不下多文件穿参。**已定位精确接缝（下轮逐字执行/给腿精确代码）**：
+  1. `buildResidentVoice`（`resident_voice_windows.go:1789`）加末参 `voiceAudit func(statemachine.Effect)`；
+  2. `:1794` `statemachine.Options{Initial: statemachine.StateSleeping}` → 加 `Sink: effectFanout273{audit: voiceAudit}.sink`（drive 缺省 nil）；
+  3. `startResidentVoice`（:1752）加末参 `voiceAudit func(statemachine.Effect)`，`:1756` 透传给 buildResidentVoice；
+  4. 调用点 `resident_windows.go:565`（在 `runResident()` 内，`:120` 的 `sink` 在作用域）：`if sink!=nil { vlg:=sink.logger(); voiceAudit273=func(e statemachine.Effect){ vlg.Info(fmt.Sprintf("resident: effect d43=%d name=%s", e.D43, e.Name)) } }`，传入 `startResidentVoice(..., voiceAudit273)`（需确认 resident_windows.go 已 import statemachine/fmt）；
+  5. 测试调用点 `resident_voice_41a2r1_windows_test.go:531/:545` `buildResidentVoice(dataDir, ra, nil, nil)` → 末尾补 `, nil`。
+  - 验证：headless 走 `buildResidentVoice(dir,nil,nil,nil,capFn)` 后驱动机器发 #26 效果→capture 收到 d43/name；突变（不传 voiceAudit/删 Sink）→ 记录消失必红。⛔ 面板/环视觉仍"仅本机可量未批"。
+- 地面：HEAD `771c28c70`，未推=0，工作树 clean。坏探针 `cmd/wisp/zz_probe_temp_test.go.txt` 已中和（未跟踪）。
+- **待机主仍 4 条**：256/301/185/347。
