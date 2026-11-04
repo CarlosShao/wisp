@@ -30716,3 +30716,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **余池筛查（98-100 轮逐枚读）**：`216`(待派真未做，跨213/214/215字符串且反面教材在前端＝机主外部)／`68`(AC#2/3 blocked-on-owner桌面复测)／`145`(未派·真未做，扩展Snapshot字段)／`230`(AC#4 blacklist_overrides改契约=机主点＋AC#5死亡区整包)／`174`(AC#4改PLAN.md文字须owner批)／`180`(补实现，本树今天无面板窗口，接线目标不清)／`342`(需真机liveness读数)／`226`(AC#5半交付,与219同源)。⇒ **每枚都至少含一格 owner/真机/真CI/死亡区/改契约门**，无自由可整票收口者。
 - **新增待机主项（除既有 256/301/185/347 外）**：`230 AC#4`＝`risk.blacklist_overrides` 要"运行前放行"＝改契约须机主点；`174 AC#4`＝`PLAN.md` task.output"按需再读"文字要不要改须批原文落台账；`226`＝答复语法触发那半（与票219同源，是否补真写腿须裁）。
 - 地面：HEAD `9ebee3305`，未推=0。
+
+## A1469（2026-11-04 11:57 +08，编排者）第102-105轮：356 指针回执 R3-Deny 收口（第2个"假硬票"→真中量实现）
+
+- **356 → `-done`**（`593cec781`，双名核=1）：`pointerNotice` 两腿(task.go/spill.go)加 A 档 Deny 支（`PathCanonicalizer.DenyA`＝`risk.Classify==ClassA`，只读分类，已在 refusal_20r2 守卫测名册登记；`PointerJudge` 接口+2fake 补 DenyA），deny 句两腿逐字同形 len=184。探针(tag probe356)证 ii/iii 形改吐「绝对禁止/无卡/批卡无效」、i 形(R2)两路不动；AC#2 新 pin 断言第二路整句『要么批下那一张卡』，变异删之→RED、还原→diff 空自证。门禁全绿。耗时＝多轮深办，非派 dud 腿。
+- 本会话累计收口 16 票：273 175 128 324 327 309 310 304 296 165 109 303 352 351 222 356。
+- 剩余池每枚逐核仍含 owner/真机/真CI/死亡区/改契约门；下轮挑下一枚隔离包可整票自办者（internal/audio·internal/memory 等，避开 golden/thresholds/panel/frontend/winsec）。
