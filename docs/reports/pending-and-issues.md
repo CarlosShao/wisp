@@ -30947,3 +30947,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ⚠ 腿遗留测试 cmd/wisp/tasklog_fkcheck_378_test.go **不可靠**：首跑 ok0.305s，其后 3 次一致 FAIL(原因 `golden requests=[]`/脚本化模型未触达 rc=1，**非 fkc 断言**)。⇒ **我先前"反向判据成立"作废**——那次红=此环境失稳，非变异行为。
 - ⇒ 378 **未收口**：修复码在库，但缺一条**可靠** AC#2 测试(能稳定绿＋真反向红)。该 flaky 测试已移出仓到 /d/tmp/wisp/20261104/378r1/。run.go diff=0、cmd/wisp 干净(除既有 zz)。
 - 下步(fresh context)：为 378 写/修一条稳定端到端 task.spawn fkc 测试(参考 r1-tests 的 WISP_ENV=test+真 store 而不依赖脆弱 SSE 脚本服务器)＋真反向(摘 rt.loopOpt 重发布⇒红)＋AC#3 门禁⇒收口为第26张。
+
+## A1505（编排者）149轮：378 腿测试干净态复核仍坏（确认非端口争用），378 待 fresh 写可靠测试
+- 拷回干净环境(无僵留进程/端口)跑 2 次仍 FAIL(golden requests=[])⇒ 非我变异运行的端口争用，测试本身对脚本化 SSE 环境脆弱。已再次移出仓到 /d/tmp/wisp/20261104/378r1/。cmd/wisp 干净(run.go diff=0)。
+- ⇒ 378 收尾固定动作(fresh context)：写一条**机制级可靠测试**——WISP_ENV=test 真 memory.Store + 直构 taskLifecycleJournal 调 StartTaskLog 断言落 1 枚 task_log 行、随后挂 tool_call 断言 PRAGMA foreign_key_check=0；反向=不接 journal⇒fkc>0 红。避开脆弱 SSE 服务器。＋AC#3 门禁=第26张。
+- 本会话末段(146-149)在 378 上连番受挫(flash 对 cmd/wisp 数据模型/脚本测试不稳、编排者上下文近枯)。建议 fresh 会话精写测试收口 378，勿再重派大腿。
