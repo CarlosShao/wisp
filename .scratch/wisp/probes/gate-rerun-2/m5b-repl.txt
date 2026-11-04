@@ -1,0 +1,2 @@
+_ = resolved
+	return strings.EqualFold(n.Path, spelling)

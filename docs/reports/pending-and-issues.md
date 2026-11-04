@@ -30795,3 +30795,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **cmd/wisp ~40 红**：逐名看全落真窗/真桌面/frontend 环境（TestPanelHost*／TestAC4FocusReturn／TestRunBooks＊／TestSnapshot＊／TestThePumpIsDriven＊等），＝**无可控交互前台**下方显红的窗族，⛔ 真缺陷集。
 - **★Q-85 修正一条**：前任(10-16)记"cmd/wisp 整包永不达终态(3 发断在 TestAC13/14)"；本发**已达终态(275s)**⇒ 堵塞点从"进程截断"变为"红名不可归因（无交互桌面/无台面）"。220 AC#5 仍需机主**可控交互前台＋无活实例**之台面方能落 Attributable 名册，本 headless 后台进程给不了 ⇒ **220 保持未勾**。
 - 本段无新收口（184之前 19 票照旧）。
+
+## A1478（2026-11-04 13:01 +08，编排者）120轮：234 派腿 gate-rerun-2 部分完成(达轮帽死),保全产物
+- 234 是纯测量票(零产码、非假收口)。派 ClinePass 腿 gate-rerun-2 在当前 HEAD 3395dc217 重取 AC#1-6(前置 gate-rerun-1 已在旧 HEAD 015f6be1 全做过,读数是 5 周前的,须重取)。
+- 结果:部分完成——AC#1 基线名册(285 行)+ 变异 M1(票92)/M2a/b/c(票104)/M5a/b(票115) 的 red/restored 读数已落盘并 commit(.scratch/wisp/probes/gate-rerun-2/,含原始 -v 日志);未完成 M3(票110)/M4(票113 Docker)、AC#3 门禁 7 枚、AC#4 对比、AC#5 销账、AC#6(腿达轮帽死,final=null)。产码已还原(internal/ cmd/wisp 仅余一 .txt 临时件)。
+- 决策:不虚翻 234(6 格未勾、Status 未动)。产物保全入库;续跑待 gate-rerun-3 或编排者接续。
