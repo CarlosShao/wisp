@@ -74,7 +74,6 @@ import (
 	"github.com/CarlosShao/wisp/internal/agent"
 	"github.com/CarlosShao/wisp/internal/llm/golden"
 	"github.com/CarlosShao/wisp/internal/memory"
-	"github.com/CarlosShao/wisp/internal/secret"
 	"github.com/CarlosShao/wisp/internal/tools"
 )
 
@@ -219,7 +218,7 @@ backoff_ms = 1
 [llm.providers.acme]
 protocol = "openai-chat"
 base_url = %q
-api_key_ref = "dpapi:acme"
+api_key_ref = %q
 
 [llm.providers.acme.models.m1]
 enabled = true
@@ -233,15 +232,8 @@ per_tool_timeout_ms = 60000
 
 [risk]
 confirm_timeout_sec = 31
-`, baseURL+"/v1", filepath.ToSlash(dir))
+`, baseURL+"/v1", fixtureKeyRef180(t, dir, "acme", fakeStoreKey), filepath.ToSlash(dir))
 	if err := os.WriteFile(filepath.Join(dir, configFileName), []byte(body), 0o600); err != nil {
-		t.Fatal(err)
-	}
-	st, err := secret.NewStore(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := st.Store("dpapi:acme", fakeStoreKey); err != nil {
 		t.Fatal(err)
 	}
 }

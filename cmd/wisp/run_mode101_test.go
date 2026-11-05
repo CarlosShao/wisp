@@ -78,6 +78,10 @@ type t101host struct {
 	t    *testing.T
 	dir  string
 	base string
+	// keyRef is the api_key_ref this host's config.toml carries. The constructors
+	// fill it through the portable seam (secret_fixture_180_test.go, 票 98 C1) so
+	// no case depends on a DPAPI blob existing on a non-Windows leg.
+	keyRef string
 }
 
 // t101boot writes a config whose [risk] block carries the given mode ("" = the
@@ -87,14 +91,8 @@ func t101boot(t *testing.T, mode string) *t101host {
 	t.Helper()
 	srv := adaptertest.StartMockllm(t)
 	h := &t101host{t: t, dir: t.TempDir(), base: srv.Base}
+	h.keyRef = fixtureKeyRef180(t, h.dir, "acme", t101Key)
 	h.writeConfig(t, mode)
-	st, err := secret.NewStore(h.dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := st.Store("dpapi:acme", t101Key); err != nil {
-		t.Fatal(err)
-	}
 	return h
 }
 
@@ -123,7 +121,7 @@ backoff_ms = 1
 [llm.providers.acme]
 protocol = "openai-chat"
 base_url = %q
-api_key_ref = "dpapi:acme"
+api_key_ref = %q
 
 [llm.providers.acme.models.m1]
 # 261-r2: explicit enabled, same reason as run_test.go's fixture comment.
@@ -133,7 +131,7 @@ context_window = 128000
 [fs]
 allowed_dirs = [%q]
 
-%s`, h.base+"/v1", filepath.ToSlash(h.dir), riskLines)
+%s`, h.base+"/v1", h.keyRef, filepath.ToSlash(h.dir), riskLines)
 	if err := os.WriteFile(h.configPath(), []byte(body), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -647,6 +645,7 @@ func TestTicket101UnreadableModeFailsLoudlyAndStrict(t *testing.T) {
 			// auto_approve LOOSE on disk first, then the store breaks underneath
 			// it: the assertion is about what the failed read answers with.
 			h := &t101host{t: t, dir: t.TempDir()}
+			h.keyRef = fixtureKeyRef180(t, h.dir, "acme", t101Key)
 			h.writeConfig(t, risk.ModeAutoApproveName)
 			if _, err := secret.NewStore(h.dir); err != nil {
 				t.Fatal(err)

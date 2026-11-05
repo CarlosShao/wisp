@@ -791,12 +791,18 @@ func TestTicket255ReceiptOmitsASectionWithNoReaderAnywhere(t *testing.T) {
 // the boot snapshot still holds the old one. That is what makes the claim "有人按新
 // 值做事" instead of "内存换了".
 func TestTicket255ReceiptStillNamesTheLiveReadSection(t *testing.T) {
-	const oldRef = `api_key_ref = "dpapi:acme"`
-	const newRef = `api_key_ref = "dpapi:acme-255r2"`
 	r := newReloadRun223(t, 40*time.Second)
+	// 票 98 C1 / 180 leg: the fixture's ref is chosen per platform by
+	// newReplyHost's portable seam (secret_fixture_180_test.go), so this case
+	// derives both literals from the ref that host really booted with instead of
+	// pinning the Windows one. The assertions are unchanged: the plant rewrites
+	// exactly this ref, the live settings leg must answer with the planted one,
+	// and the boot snapshot must not have moved.
+	oldRef := "api_key_ref = " + strconv.Quote(r.h.keyRef)
+	newRef := "api_key_ref = " + strconv.Quote(r.h.keyRef+"-255r2")
 	r.live(t, func() {
 		r.awaitAudit(t, "config: HOT-RELOAD state=armed")
-		if got := r.rt.cfg.LLM.Providers["acme"].APIKeyRef; got != "dpapi:acme" {
+		if got := r.rt.cfg.LLM.Providers["acme"].APIKeyRef; got != r.h.keyRef {
 			t.Fatalf("this case's premise moved: the boot snapshot carries ref %q", got)
 		}
 		r.plant(t, oldRef, newRef)
@@ -827,11 +833,11 @@ func TestTicket255ReceiptStillNamesTheLiveReadSection(t *testing.T) {
 		if len(view.Providers) != 1 {
 			t.Fatalf("settings view carries %d providers, want the one this run configured", len(view.Providers))
 		}
-		if view.Providers[0].APIKeyRef != "dpapi:acme-255r2" {
+		if view.Providers[0].APIKeyRef != r.h.keyRef+"-255r2" {
 			t.Errorf("the live settings read still answers ref %q, want the planted %q - if this fails, [llm] has no live reader and the receipt must not claim it",
-				view.Providers[0].APIKeyRef, "dpapi:acme-255r2")
+				view.Providers[0].APIKeyRef, r.h.keyRef+"-255r2")
 		}
-		if got := r.rt.cfg.LLM.Providers["acme"].APIKeyRef; got == "dpapi:acme-255r2" {
+		if got := r.rt.cfg.LLM.Providers["acme"].APIKeyRef; got == r.h.keyRef+"-255r2" {
 			t.Errorf("the boot snapshot moved too, so nothing here separates a live reader from a memory write: %q", got)
 		}
 		ledger := r.awaitAuditLine(t, "config: HOT-RELOAD-READER section=llm")

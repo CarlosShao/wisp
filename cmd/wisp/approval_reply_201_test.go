@@ -55,7 +55,6 @@ import (
 	"github.com/CarlosShao/wisp/internal/agent/approval"
 	"github.com/CarlosShao/wisp/internal/llm/adaptertest"
 	"github.com/CarlosShao/wisp/internal/memory"
-	"github.com/CarlosShao/wisp/internal/secret"
 )
 
 // syncWriter serialises one run's console writes. The reply listener prints from
@@ -98,6 +97,11 @@ type replyHost struct {
 	l2Wait    time.Duration
 	rtHook    func(*agentRuntime)
 	cleaner   []func()
+	// keyRef is the api_key_ref this host booted with: the seam's own answer
+	// (secret_fixture_180_test.go, 票 98 C1). A case that reads the live
+	// Manager's ref must not have to guess whether this platform's fixture used
+	// a DPAPI blob or an env var.
+	keyRef string
 }
 
 func newReplyHost(t *testing.T, l2Wait time.Duration) *replyHost {
@@ -115,6 +119,11 @@ func newReplyHost(t *testing.T, l2Wait time.Duration) *replyHost {
 	}
 	h.dir = t.TempDir()
 	h.outside = t.TempDir()
+	// 票 98 C1: the fixture key is seeded by the portable seam
+	// (secret_fixture_180_test.go); the ref it returns is what this host's
+	// config.toml names.
+	keyRef := fixtureKeyRef180(t, h.dir, "acme", fakeStoreKey)
+	h.keyRef = keyRef
 	cfgPath := filepath.Join(h.dir, configFileName)
 	body := fmt.Sprintf(`schema_version = 2
 
@@ -128,7 +137,7 @@ backoff_ms = 1
 [llm.providers.acme]
 protocol = "openai-chat"
 base_url = %q
-api_key_ref = "dpapi:acme"
+api_key_ref = %q
 
 [llm.providers.acme.models.m1]
 # 261-r2: without an enabled key this entry decodes to enabled=false and the
@@ -143,21 +152,11 @@ allowed_dirs = [%q]
 
 [risk]
 confirm_timeout_sec = %d
-`, h.srv.Base+"/v1", filepath.ToSlash(h.dir),
+`, h.srv.Base+"/v1", keyRef, filepath.ToSlash(h.dir),
 		int(h.l2Wait.Seconds()))
 	if err := os.WriteFile(cfgPath, []byte(body), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	st, err := secret.NewStore(h.dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := st.Store("dpapi:acme", "wire-fake-key-0123456789abcdef"); err != nil {
-		t.Fatal(err)
-	}
-	// secret.Store holds no handle to release (its reads and writes open the blob
-	// per call), so the store below needs no close - unlike memory.Store, which
-	// owns the SQLite file and does.
 	t.Cleanup(func() {
 		for _, fn := range h.cleaner {
 			fn()
