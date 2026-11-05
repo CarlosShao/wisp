@@ -151,23 +151,37 @@ func (r *GojaRuntime) MaxResultBytes() int { return r.maxResultBytes }
 // values converted by the VM into JS values. Scope is optional: pass the
 // caller's tool/task DisposalScope to have the watchdog joined by that scope,
 // otherwise Execute owns a per-call scope and disposes it.
+//
+// Surface is block B's C24 binding for this call (c24.go). nil means a pure
+// computation VM: no host object is installed at all, which is the honest state
+// for a plugin tool that declares no host capability. A non-nil Surface is
+// installed into this call's VM only, and its granted entries are the only host
+// entries the JS can reach - the per-call VM is what keeps a plugin from
+// carrying a patched `wisp` into its next call.
 type GojaCall struct {
 	PluginID string
 	Source   string
 	Function string
 	Args     []any
 	Scope    *DisposalScope
+	Surface  *C24Surface
 }
 
 // GojaResult is the capped, rendered outcome of one call. FullBytes is the
 // size before the cap, ReturnedBytes after it, so a truncated result is
 // measurable rather than silently shorter.
+//
+// ContractViolations carries the static scan's findings (one C24Violation line
+// each): the call still runs - a reference to an entry that does not exist is
+// simply undefined in the VM - but the violation is never silent, and it is
+// logged through the surface's audit sink as it is found.
 type GojaResult struct {
-	Value         string `json:"value"`
-	Truncated     bool   `json:"truncated"`
-	FullBytes     int    `json:"full_bytes"`
-	ReturnedBytes int    `json:"returned_bytes"`
-	Interrupted   bool   `json:"interrupted"`
+	Value              string   `json:"value"`
+	Truncated          bool     `json:"truncated"`
+	FullBytes          int      `json:"full_bytes"`
+	ReturnedBytes      int      `json:"returned_bytes"`
+	Interrupted        bool     `json:"interrupted"`
+	ContractViolations []string `json:"contract_violations,omitempty"`
 }
 
 // GojaWatchdogName is the D38 roster name the per-call watchdog is spawned
@@ -219,13 +233,20 @@ func (r *GojaRuntime) Execute(ctx context.Context, call GojaCall) (out GojaResul
 			"plugin %q: tier2 call was cancelled by the host before it started", call.PluginID))
 	}
 
+	// C24 static double check (block B), before any VM exists: the scan is pure
+	// text, so it cannot fail the call, and its findings belong to the result
+	// even on the paths that fail later. A reference to an entry outside the
+	// frozen table or outside this tool's declaration is a contract violation -
+	// prohibited by C24, reported here, and left undefined in the VM below.
+	violations := scanC24Call(call)
+
 	// Last-resort recover boundary, ON THE CALLING GOROUTINE: a panic that
 	// escapes the guarded block (including one from the disposal tail) becomes
 	// a tool-class error instead of taking the process down. Registered first
 	// so it runs last, after the teardown defers below.
 	defer func() {
 		if p := recover(); p != nil {
-			out = GojaResult{}
+			out = GojaResult{ContractViolations: violations}
 			err = r.panicError(call.PluginID, p)
 		}
 	}()
@@ -250,6 +271,12 @@ func (r *GojaRuntime) Execute(ctx context.Context, call GojaCall) (out GojaResul
 	defer stop()
 
 	rendered, gerr := r.guardedCall(call.PluginID, func() (string, error) {
+		// The C24 surface is installed into THIS VM, after the watchdog is
+		// armed and before the plugin's own code compiles/runs, so a host entry
+		// call is bounded by the same budget as everything else.
+		if err := installC24Surface(ctx, vm, call.Surface); err != nil {
+			return "", err
+		}
 		v, e := r.runProgram(vm, call)
 		if e != nil {
 			return "", e
@@ -257,10 +284,13 @@ func (r *GojaRuntime) Execute(ctx context.Context, call GojaCall) (out GojaResul
 		return renderGojaValue(vm, v)
 	})
 	if gerr != nil {
-		return r.classify(call.PluginID, gerr)
+		res, cerr := r.classify(call.PluginID, gerr)
+		res.ContractViolations = violations
+		return res, cerr
 	}
 
 	out.FullBytes = len(rendered)
+	out.ContractViolations = violations
 	if len(rendered) > r.maxResultBytes {
 		// Truncate on a rune boundary so the model never receives a broken
 		// UTF-8 sequence, and say so - in the result and in the log.
