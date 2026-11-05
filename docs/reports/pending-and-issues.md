@@ -31299,3 +31299,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1564（2026-11-05 22:xx，编排者）⚠子代理路由故障：magpie/cline-pass 连续 8 次 null
 - wave26(3腿)+wave27(3腿) 全 null、零产出零脏；诊断探针：同 prompt 默认模型返 PONG2 正常、provider=magpie model=cline/cline-pass/deepseek-v4.1-flash-1017 返 null（各 1 发）。⇒ 套餐路由挂了（非任务/非派单问题）。
 - 按机主 2026-11-03 令必须走 cline-pass 套餐、⛔ 静默降级到默认（默认走 API 余额＝烧钱，明令禁止）。已摆机主：①查 ClinePass 套餐余额/网关是否到期/限流、恢复后继续；②或明确授权临时改用默认模型派子代理。恢复前⛔ 派腿、只记账。
+
+## A1565（2026-11-05 22:xx，编排者）路由仍挂第2证 + 全勾未done扫描=0真可结
+- probe2（magpie/cline-pass）仍 null（第 2 goal 轮）。停派维持。
+- 扫 112 张 open 票「框全勾未 -done」仅 2 枚：311（票自陈六格齐但仍⛔ -done、3 笔残余）、239（票自陈不结案、残余 2 枚＋实现者=编排者须他腿裁）——均自 declared 陷阱，不碰。
+- 结论：无子代理时无安全可自结票；等机主 ClinePass 余额/网关 or 授权默认模型。
