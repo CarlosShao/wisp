@@ -1,0 +1,7 @@
+票 339 落地腿 339-r2（第二笔）：收尾尺——从已提交树 dfd6f624b 重打两平台名册
+
+git archive dfd6f624b 重建两平台台件、同一 -run 'TestAnchorMiss|TestAnchorFallbackTeeth'：
+- Linux 容器 24/5/0/0 rc=0
+- Windows 原生 22/3/0/0 rc=0
+⇒ 上面那笔的读数属于提交字节，不是工作树里的未入库形状。证据件补一行、台件 scripts/08 + 两枚日志。
+零 .go 字节；⛔ 翻框；⛔ push。

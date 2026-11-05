@@ -73,6 +73,7 @@ anchor_miss_reason_334_test.go:151: an A deny from the fail-closed clause was un
 
 - Linux 那 +5 = 2 枚顶层 + 3 枚子用例（`absent-aws-leaf-accuses-aws-and-says-so`／`installing-aws-moves-the-named-anchor-to-kube`／`proven-match-keeps-the-bare-literal`）＝`339-r1` 甲形在 Linux 上让出的那 5 枚名字，现在回来了。
 - 日志：`logs/linux-base-miss-suite.log`／`logs/linux-green-miss-suite.log`／`logs/win-base-miss-suite.log`／`logs/win-green-miss-suite.log`（逐枚非 0 字节）。
+- **收尾尺（从已提交树重打，不是工作树）**：`git archive dfd6f624b` 重建两平台台件 => Linux `24/5/0/0 rc=0`、Windows `22/3/0/0 rc=0`（`logs/linux-final-miss-suite.log`／`logs/win-final-miss-suite.log`）＝读数属于提交字节。
 - POSIX 侧红句真长得出来（不是空跑）：`logs/linux-green-miss-suite.log` 里 `anchor_miss_reason_334_test.go:97: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "/tmp/gt/.../profile/work/id_ed25519" is not proven handle-expanded (its own walk stopped at "/tmp/gt/.../profile/work") and the anchor ".../.aws/credentials" is not installed here (its expansion stopped at "/tmp/gt/.../profile") ...`
 
 ### 整包 `./internal/risk/`（同锚、同台面，`-v -count=1`）
