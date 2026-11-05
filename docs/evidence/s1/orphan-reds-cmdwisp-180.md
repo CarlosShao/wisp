@@ -1,7 +1,10 @@
 # 180 — cmd/wisp 孤儿红修复（98 归因 C1：DPAPI 桩夹具 → 平台无关的夹具缝）
 
 **Status**：交付件（写腿自证）。**写面**：`cmd/wisp/**`（改 4 枚、新增 1 枚）＋ 本文件；**未 push**。
-**锚定树**：`3ff1b1395`（工作树；本腿的改动尚未提交时取的全部读数，见 §6 与 §8）。
+**锚定树**：`3ff1b1395`（派单给的 HEAD）。读数期间 HEAD 前进过两枚**别人的**提交——
+`471365f92`（只动 `internal/{agent,proc}` 两枚生产文件＋两枚新测试）与 `9cd528199`（只动一份证据件）。
+可核尺：`git diff --stat 3ff1b1395 9cd528199 -- cmd/wisp` = **0 行** ⇒ 本件引的 `cmd/wisp` 读数对两枚提交都成立。
+**本腿提交**：`ae8136261`（工作树带本腿改动时取的全部读数；见 §6 与 §8）。
 **仪器**：Windows 侧 `go1.27.1 windows/amd64`（`PATH` 前置 `build;third_party/sherpa-onnx`）；
 POSIX 侧 `docker.io/library/golang:1.27-bookworm`（容器内 `linux/amd64`、`CGO_ENABLED=1`），
 快照一律 `git archive`（不建 worktree、不 checkout）。
@@ -228,3 +231,8 @@ sh scripts/d22scan.sh
   后面还会不会红本件量不到——与 98 §0 的边界①同一条，本件只是把**本腿负责的 22 枚**推到了真绿。
 - **`internal/secret` 的两个形状没有改**：`protect_other.go` 的 fail-closed 桩、`refs.go` 的两种 ref
   都是冻结契约（C28 / C27），本件只消费它们。
+- **`HEAD` 在读数期间动过两枚**（`471365f92` internal-only、`9cd528199` docs-only）：修前整包那一发
+  （13:31 起）与修后整包那一发（13:41 起）都在 `9cd528199` 上，**同树对照**；
+  修前"点名集"那一发（13:10）在 `3ff1b1395` 上。`cmd/wisp` 在这三枚提交之间逐字节相同（上面那把尺），
+  所以两张读数可以并排引。同轮还有一条 internal 腿（`471365f92`，证据
+  `docs/evidence/s1/orphan-reds-internal-180.md`）；两条腿的写面不重叠。
