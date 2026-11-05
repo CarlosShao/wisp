@@ -25,6 +25,17 @@ package config
 // before/after anchor hit counts, the verbatim red lines and the restore hashes
 // are in .scratch/wisp/probes/341/r1/logs/05-mu-p2.txt, 05-mu-p3.txt,
 // 05-mu-p5.txt and 05-mu-p6.txt.
+//
+// Ticket 186 cut (2026-11-05, orphan red - ticket 341 was already -done): the P5
+// case below used to close its "a real write happened" claim with an
+// mtime-progression assertion. On POSIX that is a coin flip, not a test: this
+// container quantizes file mtime to 4.00047 ms while the two writes of that case
+// land 2-4 ms apart, so 5 of 10 runs went red on that one line while every other
+// assertion in the case passed (docs/evidence/s1/config-handed-red-186.md).
+// The clock line is gone; the same fact was already carried by the byte
+// comparison and by the content assertions around it, and no other assertion in
+// this file changed by one byte. Before/after readings:
+// docs/evidence/s1/config-240-fix.md.
 
 import (
 	"bytes"
@@ -217,7 +228,6 @@ func TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed(t *tes
 	}
 	mutate(noVersion)
 	before := readText(t, path)
-	mtimeBefore := statMod(t, path)
 	if strings.Contains(before, "schema_version") {
 		t.Fatal("setup: the file on disk still declares a version")
 	}
@@ -231,13 +241,24 @@ func TestHandDeletedSchemaVersionOnTheWriteBranchIsForcedBackAndUnclaimed(t *tes
 	if !strings.Contains(text, "schema_version = 2") {
 		t.Fatalf("the write branch did not re-stamp the deleted schema_version line at the current version:\n%s", text)
 	}
-	// (2) this is a write: bytes and mtime moved (since ticket 345 this is the
-	// ONLY way they move - the re-read leaves a behind-version file alone).
+	// (2) this is a write, and the proof is the BYTES: the file no longer holds
+	// what the operator left (since ticket 345 the re-read writes nothing, so a
+	// byte-level change here can only come from SaveFile's atomic replace).
+	//
+	// Why this is a byte check and not the mtime check it used to be (ticket 186,
+	// orphan red): this container's file mtime only moves in 4.00047 ms steps
+	// while the two writes of this case - mutate's os.WriteFile, then SaveFile's
+	// temp-file+rename - land 2-4 ms apart, so "mtime advanced" was a coin flip
+	// (measured 68 FAIL / 32 PASS over 100 runs, every red on this one line; see
+	// docs/evidence/s1/config-handed-red-186.md section 3 and the re-read in
+	// docs/evidence/s1/config-240-fix.md). A clock coarser than the event it is
+	// asked to evidence cannot be that evidence; the content can, and it does
+	// not soften anything. The dropped line was the same fact read through a
+	// broken ruler, so no claim lost coverage: the forced version line, the dead
+	// comment, the verbatim backup and the four log sentences are asserted below
+	// as before.
 	if text == before {
 		t.Error("a schema-less file was left byte-identical although this write owned a change")
-	}
-	if statMod(t, path).Equal(mtimeBefore) {
-		t.Error("mtime did not move on the write branch")
 	}
 	// (3) the operator's comment died in the canonical re-lay, and the explicit
 	// write kept the pre-write bytes verbatim as the backup (ticket 345: the
