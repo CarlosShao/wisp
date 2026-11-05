@@ -139,4 +139,5 @@ func (rt *agentRuntime) fileTreeView() panel.TreeView {
 **`A380` 那四行红的被告（`cmd/wisp/panel_pump.go:283/:291`、`internal/panel/git_readonly_exec.go:409/:412`）已从「读 `Result.Canonical` 不读账」改成「账随 view 走／账走 `Result.Actable()`」，判据件零改、断言零松；RED 四行逐字在案，GREEN＝判据用例 PASS＋`internal/risk` 整包 `281/171/0/1 rc=0`，`internal/panel` 整包只剩两枚与本腿无关的在册红（新增红 0 枚）。**
 
 撤销口令（一句话复原本腿全部字节）：
-`git revert <本腿 commit> --no-edit`（仅本腿五枚 `.go`＋本件；`internal/risk` 不在内，故回退后那四行红会逐字重现，属预期）。
+`git revert b058171e7 --no-edit`（仅本腿五枚 `.go`＋本件；`internal/risk` 不在内，故回退后那四行红会逐字重现，属预期）。
+★本件 sha 的追加说明：`b058171e7`＝产码那一笔（五枚 `.go`＋本件）。上面这行把占位符换成真 sha 的是**只改这一行的第二笔**（同一条显式 pathspec、零代码字节），回退口令仍指 `b058171e7`。
