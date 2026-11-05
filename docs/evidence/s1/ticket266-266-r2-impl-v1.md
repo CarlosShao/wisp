@@ -6,6 +6,9 @@
 - 写面（派单）＝`scripts/**` ＋ 本件。改动两枚：新件 `scripts/slo-nail-census.sh`（569 行）＋ 本件。
   **零 Go、零前端** ⇒ 派单的 STOP 条件未触发。
 - 环境：`export PATH="$PWD/build:$PWD/third_party/sherpa-onnx:$PATH"`；`unset GOTMPDIR TMPDIR TEMP TMP`；⛔ 全程未用 `CGO_ENABLED=0`。
+- **窗口内 HEAD 漂移（共享工作树，具名）**：`b5ac0a181`（收 wave16）与 `6a46140ea`（230-ac4 part1）在本腿交件前后落地；
+  两笔 `git show --name-only` 与本腿写面零相交（config/tools 侧）。`scripts/slo-check.ps1` 自 `cb8dceccc`（263-r1）以来**一字节未动**
+  （`git log --oneline -1 -- scripts/slo-check.ps1` 与 `grep -n` 行号在 18:35 现读仍为 `:214/:233/:291/:292`）⇒ 本件引用的行号在交件时仍准。
 - **结论先行**：AC#1/AC#2/AC#3/AC#4 已交（读数见下）；**形 ①-A 的另一半（CI 步）未交**，因为 `.github/**` 不在本腿写面
   ⇒ 逐字补丁在 §6。⚠ **所以今天这枚外牙还没有任何 CI 调用点**：它是"能手跑、且可直接接进 lint 作业的一枚牙"，
   ⛔ 不是"已上牙"。这一句请编排者具名收件，别当已闭合。
@@ -74,7 +77,7 @@ slo-nail-census: FAIL 2 declaration violation(s) - the D32 gate is not the shape
 - 声明计数**单独**改成 3 → `declaration-drift` 红；
 - 两枚调用**挪到首枚采样之后** → `ordering` 红（逐字 `not before the first sampling call`）。
 
-**还原证（AC#2 后半）**：`git status --porcelain -- scripts tools .github` **空**（18:30:02 现跑一次，commit 后交件前再跑一次，见 §5）。
+**还原证（AC#2 后半）**：`git status --porcelain -- scripts tools .github` **空**（18:30:02 一次；两笔交件 commit 后的 **18:35:28** 再跑一次仍空，见 §5）。
 真件 `scripts/slo-check.ps1` 在 `fae8ba704..6589a0625` 区间**一字节未动**（`git diff --stat` 空）。
 
 ## §3 AC#3 —— 四条偷懒形状逐条点名（**我没做哪一种**）
@@ -136,7 +139,7 @@ ban #9（票 212 幻引）在同一次 scan 内判、0 命中（`clean - no D22 
 | Go 构建 | `go build ./cmd/... ./internal/... ./tools/...` | **0** | 18:25:15→18:25:26，空输出 |
 | D22 扫描 | `sh scripts/d22scan.sh`（×2） | **0 / 0** | 见 §4A |
 | 路径长度门 | `sh scripts/check-path-length-budget.sh --with-self-test`（×2） | **1 / 1** | 见 §4B（既有红，非本腿） |
-| 写面干净 | `git status --porcelain -- scripts tools .github` | 空 | 18:30:02；commit `6589a0625` 后 |
+| 写面干净 | `git status --porcelain -- scripts tools .github` | 空 | 18:30:02（commit `6589a0625` 后）＋ **18:35:28（两笔交件 commit 后，交件时刻）** |
 
 ## §6 形 ①-A 的另一半：CI 步（⛔ 写面外，逐字补丁交编排者）
 
