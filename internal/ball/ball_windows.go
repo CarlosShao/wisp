@@ -123,6 +123,7 @@ type Ball struct {
 	hotkeyReport      HotkeyReport // outcome of the last registration pass (ticket 64 A1b)
 	boundCfg          HotkeyConfig // the set the last pass was given (rebind updates it)
 	escTakenOver      bool
+	escBorrowRefused  bool   // a borrow was attempted and Win32 refused it (ticket 245 AC#7)
 	cancelBinding     string // configured cancel binding, for B1 release
 
 	trayMuted     bool
@@ -820,6 +821,9 @@ func (b *Ball) RebindHotkeys(cfg HotkeyConfig) HotkeyReport {
 		b.registeredHotkeys = rep.Live()
 		b.cancelBinding = cfg.Cancel
 		b.escTakenOver = false
+		// The fresh pass starts from the idle set, so neither the lent borrow nor
+		// the refused one (ticket 245 AC#7) outlives it.
+		b.escBorrowRefused = false
 	})
 	return rep
 }
@@ -892,11 +896,20 @@ func (b *Ball) TakeEscForCancel() {
 		if err := takeEscBorrow(b.hwnd, borrow); err != nil {
 			// The borrow was refused: say it on the report (Problems() names it)
 			// rather than leaving a card with no cancel key and no explanation.
+			//
+			// Ticket 245 AC#7: the refusal is a fact about THIS session, not a
+			// property of the process. escBorrowRefused is what tells
+			// ReleaseEscAfterSession that there is a line to put back even though
+			// escTakenOver is (rightly) false; without it the receipt stayed on the
+			// report for the life of the process, claiming a registration that
+			// never happened while the desktop held nothing at all.
+			b.escBorrowRefused = true
 			b.hotkeyReport = b.hotkeyReport.withCancel(cancelFailedLineFor(borrow, err))
 			b.registeredHotkeys = b.hotkeyReport.Live()
 			return
 		}
 		b.escTakenOver = true
+		b.escBorrowRefused = false
 		b.hotkeyReport = b.hotkeyReport.withCancel(cancelBorrowedLineFor(borrow))
 		b.registeredHotkeys = b.hotkeyReport.Live()
 	})
@@ -908,13 +921,23 @@ func (b *Ball) TakeEscForCancel() {
 // (ticket 245's defect) or any key the user moved it to (ticket 260 made the
 // borrow follow the config; the return still drops exactly what was borrowed).
 // Idempotent.
+//
+// Ticket 245 AC#7: a session can end without the borrow ever having been lent -
+// Win32 refused it. There is no key to drop in that case, but the report still
+// carries the refusal line, and leaving it there describes a registration that
+// never happened: AllLive() stayed false and Problems() kept saying the key "was
+// not registered" for the life of the process. escBorrowRefused is how the
+// refused branch gets the same confirmation step as the lent one.
 func (b *Ball) ReleaseEscAfterSession() {
 	b.uiRun(func() {
-		if !b.escTakenOver {
+		if !b.escTakenOver && !b.escBorrowRefused {
 			return
 		}
-		releaseEsc(b.hwnd)
+		if b.escTakenOver {
+			releaseEsc(b.hwnd)
+		}
 		b.escTakenOver = false
+		b.escBorrowRefused = false
 		// Back to the idle line for whatever the user configured (standby /
 		// disabled / unparsable), so the report describes the set Win32 holds.
 		b.hotkeyReport = b.hotkeyReport.withCancel(cancelIdleLine(b.cancelBinding))
