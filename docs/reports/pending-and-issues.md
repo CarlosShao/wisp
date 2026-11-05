@@ -31224,3 +31224,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 重普查 retriage-186（未跟踪，待提交）：开放池 116、A=31（在飞5 + 284差翻框 + 176/180 前提倒 + 干净可派23）、B14/C22/D15/E8/F22/W4。top5＝245(cmd/wisp热键+ball)/98(scripts)/103(winsec+memory)/266(scripts slo)/276(scripts)。改判：269→W、176→作废、180→前提倒、284→差翻框。
 - secret protector 缝代提：protect.go 新接口，Windows=dpapiProtector 纯委托（DPAPI flags/缓冲/报错逐字未变）、store.go protect/unprotect 改走 s.protector；非 Windows=本地密钥（D7 Linux 不进支持矩阵、仅测试面）；+3 测试。build all rc0/test ok/gofumpt 空/d22 clean。go.mod tidy(goja/pdf 直接)。⇒ 待下一波 cmd/wisp 复验解锁 10 枚 C1 红(63×8/248×2)。
 - 我自验：build ./cmd/... ./internal/... ./tools/... rc0、internal/secret ok、gofumpt 空、d22 clean。
+
+## A1549（2026-11-05 17:4x，编排者）机主第3条裁定＝走 B：开放 B 级用户自定义放行口（230 AC#4）
+- 机主原话："走 B 比较好，完全不给放行太严格，应让用户自定义最好…开放口子给用户，否则一旦定死完全没入口可改，不友好"。编排者更正先前"维持不做"的推荐并遵办（诚实：B 级本就"一次 L2 确认+日志"可放行，不是锁死；现在按机主要求再加配置持久化入口）。
+- 设计：`risk.blacklist_overrides` 从 unwired 响亮失败 → 真生效；用户可持久化 B 级豁免；A 级核心（SSH/.git-credentials/.aws/浏览器密码库/密钥环）绝对禁、永不覆盖；每次豁免用记安全日志。符合主流 harness（用户可配置 trusted paths，配核心硬禁）。
+- 契约行为变化：blacklist_overrides（unwired→生效）。撤销口令：`git revert <接线提交>` 即恢复响亮失败。
+- 动作：派 230-AC4 腿（internal/config 面；Gate 接线需 internal/risk/cmd-wisp 则报 seam 续体）。
