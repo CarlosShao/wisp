@@ -246,3 +246,23 @@
   ⚠ 票 123 那批（`run_mode101_test.go` 三枚 `TestTicket101*`＋`run_test.go` 的 `TestComposedGateBlocksAWriteForTwoSeconds`，逐名现核在案）：**本腿一字未碰、未放宽**（本腿五枚 commit 只带三件 Go：`dataroot_128_test.go`／`leg_sink_gate_131_test.go`／`internal/proc/envfork_test.go`）。
   存证 `.scratch/wisp/probes/135/06-gate.txt`。next=**剩 AC#6 的整包 cmd/wisp 四数**（需一次完整 `-count=2 -v` 跑到终点锚；本轮被 deadline-pause 停）、**以及非实现者的终裁**（本腿七格自评不翻框）；
   `did=deadline-pause`：⛔ 未翻 AC 框／未动 `Status:`／票名／台账／HANDOVER／`frontend/**`／`design/**`；只 commit 不 push。
+
+- [2026-11-05 20:4x +08] agent=135-r2 did=**读票后先量盘（不接别人的自述）**：AC#1–AC#5／AC#7 七格**早已落地**
+  （`b46a867b1`／`b53b79bda`／`144b038f5`／`bf25809a3`／`2781ec380`，逐枚 `grep -n` 现读命中于 `cmd/wisp/dataroot_128_test.go`、`cmd/wisp/leg_sink_gate_131_test.go`、`internal/proc/envfork_test.go`），
+  起手七枚全绿（`ok cmd/wisp 1.253s`）⇒ 本程**零改生产码、零改测试码**（`git diff --name-only` 起手与末了各 0 行）。
+  **三件实事**：
+  ① **五发真变异重证"牙"**（逐发 `grep` 证落地＋`go build` rc=0 再读红名，逐发还原、sha256 逐枚对回）：
+     **M-C**（把 `assertDirEmpty128` 那一句弄哑）⇒ 7 用例里 2 红＝AC#1＋AC#2A（6 子腿全红）；同变异下**摘掉 AC#1 那枚**仍红（AC#1 自己的结案判据当场成立，`0.605s`）。
+     ⚠ **M-A2 照存证 `02-ac3-doctor-tooth.txt` 那一形今天已是死码**：`resolveDataDir` 在票 128 之后一律拒绝，`doctor.go:107` 的 `else if probeWritable(...)` **走不到** ⇒ 照抄它读到的 7/7 全绿；
+     **M-A2b**（拒绝句一字不动＋另起一段 `probeWritable(".")`）⇒ **唯一红＝AC#3**（`the probe deletes its own file`）⇒ 牙活着，但**那一发变异的复算口径要改成 M-A2b**，不许再照抄 M-A2 的读数。
+     **M-E**（六枚 marker 全在、成句与句末标点全没）⇒ `cmd/wisp` **唯一红＝AC#4 那枚**（三条成句＋`然后重试。`）、`internal/proc` **红＝AC#5 那枚**（`envfork_test.go:407/416`）；
+     六枚子串的合取检查在 M-E 上**仍全过** ⇒ 新牙与旧清单相互独立（`R-128-2` 要的那一层）。
+  ② **AC#6 门禁现跑**（本机 45371ca0b、cpu 37%、无别的 go 进程）：build 三组 **rc=0**；本票切片 `-count=2 -v` **RUN=56/PASS=20/FAIL=0/SKIP=0 rc=0（13.110s）**；
+     `internal/proc` 整包 `-count=2 -v` **106/88/0/2 rc=0**（两枚 SKIP＝`TestHelperProcess`）；`cmd/wisp` 整包 `-count=1 -v` **640/439/44/2 rc=1（662.377s）**
+     ——44 红逐名归族**全在语音/模型、窗口焦点、常驻汇三族，零枚落在本票面**（与 `9b0f7d555` 那笔同形）⇒ **不作分母**；
+     `gofumpt -l cmd/wisp internal/proc` **零输出 rc=0**（宿主现成 v0.12.0，未装新东西）；`go vet` `./cmd/wisp/`、`./internal/proc/`、`GOOS=linux ./internal/proc/` **三条 rc=0**
+     （`GOOS=linux ./cmd/wisp/` rc=1，唯一链在 `sherpa-onnx-go-linux` 第三方、`R-131r3-5` 同形）；
+     `sh scripts/d22scan.sh` **rc=0 clean**（正控 `PASS=35 FAIL=0 SKIP=0`、`=== RUN=77`；scope 今量 363/58/116/48/39/116/905/211，因本程零改 Go 件、逐 scope 与 HEAD 同值）。
+  ③ 存证落 **`docs/evidence/s1/135-ac1-ac6-impl.md`**（本票在 `docs/evidence/s1/` 的**第一枚实现侧件**；此前七格的读数只在 `.scratch/wisp/probes/135/*.txt` 与 commit message 里）。
+  ⚠ **本程没做、已具名留在件 §7**：AC#7 的 (a)/(b) 两拍未重跑；整包 `-count=2` 四数未取（一发 662s×2 且红名册是同一批台面族）。
+  next=**非实现者终裁**（七格仍 `[ ]`，本程一格不翻）；`did=verify+evidence`：⛔ 未动 `Status:`／票名／台账／HANDOVER／`frontend/**`／`design/**`；只 commit 不 push。
