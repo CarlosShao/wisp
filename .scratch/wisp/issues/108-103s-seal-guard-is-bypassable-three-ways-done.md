@@ -1,6 +1,6 @@
 # 108 — 票 103 的守卫被验收代理**三枚探针当场绕过**：先 `nil` 解除再装伪造解析器（外来 `S-1-1-0` 被静默剥掉）、全 `/` 或混合分隔符让祖先检查**一个都不查**、`platformVerifyPlacement` 同错法还在（退回单）
 
-**Status:** **rejected-needs-fix**（2026-09-21 20:3x 编排者标注，依据=`acceptor-ticket108` 的
+**Status:** **done**（A1537，2026-11-05 编排者据最终复判收口：AC#1-4 全通过、内部 winsec 两平台全绿〔Win 254/254、POSIX 152/152〕；AC#5 门禁字面 rc=1 但三条红归他票〔TestC26=A380/189+190；TestDsn196r3→票196r3；TestMigration31→票31r2〕。原 rejected-needs-fix（2026-09-21 20:3x 编排者标注，依据=`acceptor-ticket108` 的
 `docs/evidence/s1/108-adversarial-acceptance.md`：**总判 FAIL**（不是"通过附条件"），
 因为验收在 **POSIX 上把 P3 的结局真造出来了**：`winsec_other.go:64` 的 `platformVerifyPlacement` 就是 `return path, nil`、
 底线没有链接腿 ⇒ 容器里 `SealFile` 穿过 symlink 返回 nil、外来文件 mode 从 `0666` 变 `0600`。
@@ -34,17 +34,17 @@
 
 ## AC（1:1，裁决表 `docs/evidence/s1/108-*.md` 由验收方出）
 
-- [ ] **AC#1** 缝**不可解除**：`SetPathResolver(nil)` 要么**拒绝**、要么"只能把真解析器装上"这种**单向语义**（幂等/一次性都要在类型或守卫上说得出口）；
+- [x] **AC#1** 缝**不可解除**：`SetPathResolver(nil)` 要么**拒绝**、要么"只能把真解析器装上"这种**单向语义**（幂等/一次性都要在类型或守卫上说得出口）；
       并给出探针 P1b 的**正向钉子**：先解除再装"恒改写"伪造 ⇒ **必须拒**，且判据要**证明外来 DACL 没被动过**（`icacls` SID 级前后读数，"什么都没发生"不算绿）。
-- [ ] **AC#2** 祖先链检查**对所有分隔符形状都生效**：全 `/`、混合、尾部带分隔符、`\\?\` 前缀等**逐形状**给结论；
+- [x] **AC#2** 祖先链检查**对所有分隔符形状都生效**：全 `/`、混合、尾部带分隔符、`\\?\` 前缀等**逐形状**给结论；
       ⚠ **修法必须平台正确**：Windows 上把 `/` 也当分隔符是合法的；
       **在 POSIX 上把 `\` 折成分隔符是错的**（反斜杠是合法文件名字符 ⇒ 会把两个不同名字折成同一个串，那是**跨目录放行**，A74③ 抓过）。
       判据里要有一条**反向用例**钉住"POSIX 上不折 `\`"。
-- [ ] **AC#3** `platformVerifyPlacement` 走**同一套**底线复判 + 树归属检查（不许留第二条"消费解析器答案但不查"的路）。
+- [x] **AC#3** `platformVerifyPlacement` 走**同一套**底线复判 + 树归属检查（不许留第二条"消费解析器答案但不查"的路）。
       若它落在票 106 的文件分界里 ⇒ **停手登记交回**，不要抢。
-- [ ] **AC#4** **树归属**这一刀真正落地：调用方点名的树 vs 解析器答的树不一致时 ⇒ **拒 + 记账 + 响亮**，
+- [x] **AC#4** **树归属**这一刀真正落地：调用方点名的树 vs 解析器答的树不一致时 ⇒ **拒 + 记账 + 响亮**，
       并把票 102 已有的 `Rewritten`/`Actable()` 接进来（**复用，不新造第二本账**）。
-- [ ] **AC#5** 变异三向（每向点名红在哪）+ 门禁：`go test -count=2 -v ./internal/winsec/ ./internal/memory/ ./internal/risk/`
+- [x] **AC#5** 变异三向（每向点名红在哪）+ 门禁：`go test -count=2 -v ./internal/winsec/ ./internal/memory/ ./internal/risk/`
       四数逐包（`=== RUN`/PASS/FAIL/SKIP，报 SKIP 要说是不是 `-v`）、`gofmt`/`gofumpt` 空、按包 `go vet` 原生+linux rc=0、
       `sh scripts/d22scan.sh` 纯净快照 rc=0 且台账各 scope 不降。
       ⚠ **本轮新增的硬要求（台账 A79①）**：这台机器**能真跑 Linux 测试**（Docker 或 WSL2 + `GOOS=linux go test -c` 交叉编译后执行，

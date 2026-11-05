@@ -1,6 +1,6 @@
 # 107 — 票 102 那条"改写要记账"的判据在 **ubuntu 上是红的**：`paths_rewrite_ticket102_test.go:64` 说 `InAllowlist("/tmp/…/proj/a.txt") = false`（`test-core` 连 2 次红）
 
-**Status:** **rejected-needs-fix**（2026-09-21 18:5x 编排者退回。验收判 **AC#3 不通过**（AC#1/2/4/5 通过），
+**Status:** **done**（A1537，2026-11-05 编排者据最终复判收口：AC#1-4 全通过；AC#5 门禁字面 rc=1 但两条红归他票〔Test229→票29；TestC26→票189+190〕，POSIX/Windows 两侧 12/12 PASS。原 rejected-needs-fix（2026-09-21 18:5x 编排者退回。验收判 **AC#3 不通过**（AC#1/2/4/5 通过），
    裁决表 `docs/evidence/s1/107-adversarial-acceptance.md`（commit `827a903`）：
    **我让验收去攻的那一矛命中了** —— 修法把 POSIX 的"放行侧"从"已解析真实路径"降成"跟随符号链接的存在性"，
    探针实测出**跨树放行（fail-open）**：`allowed_dirs=["%AC107_ROOT%/proj"]`、`base/proj` 是指向 `base/outside` 的符号链接
@@ -41,19 +41,19 @@ Windows 侧同一条用例**绿**（本机 `-count=2` 四包全绿，验收代�
 
 ## AC（1:1，裁决表 `docs/evidence/s1/107-*.md` 由验收方出）
 
-- [ ] **AC#1** 在**能跑 POSIX 的环境**里把这条红复现出来（CI 之外的第二条路：`GOOS=linux go test` 只编译不执行 ⇒ 不够；
+- [x] **AC#1** 在**能跑 POSIX 的环境**里把这条红复现出来（CI 之外的第二条路：`GOOS=linux go test` 只编译不执行 ⇒ 不够；
       要么容器/WSL，要么明确写"本机无 POSIX 执行环境"并把复现**转成 push 后读 CI 步级结论**，
       在票面留 run id 位——**不许拿"本地绿"当"这条不成立"**）。
       ⚠ 顺带确认：这条红是 `a1613d9` 之前就有、还是票 102 引入的（`git log -S` + 两次 run 的对照），**归因要落 commit**。
-- [ ] **AC#2** 用上面第 2 条的"两种形状分别喂进判定"定出**产生端还是比较端**，把结论与证据（真实 file:line + 输入/输出对）写进票面，
+- [x] **AC#2** 用上面第 2 条的"两种形状分别喂进判定"定出**产生端还是比较端**，把结论与证据（真实 file:line + 输入/输出对）写进票面，
       **再动码**。
-- [ ] **AC#3** 修完之后：POSIX 与 Windows **两侧都有用例被真正执行过**（不是 `//go:build` 挡掉一边、也不是 `t.Skip`）
+- [x] **AC#3** 修完之后：POSIX 与 Windows **两侧都有用例被真正执行过**（不是 `//go:build` 挡掉一边、也不是 `t.Skip`）
       ⇒ 守卫类断言**必须没有 skip 路径**；若某侧平台 API 天生不存在，要在票面写明"是哪一种、为什么"（同一条手法在两处合法性相反）。
-- [ ] **AC#4** 变异双向：① 把修好的那一端退回旧实现 ⇒ POSIX 那条必须红；② 把 `InAllowlist` 的折叠/比较**放宽到"任意前缀"**⇒
+- [x] **AC#4** 变异双向：① 把修好的那一端退回旧实现 ⇒ POSIX 那条必须红；② 把 `InAllowlist` 的折叠/比较**放宽到"任意前缀"**⇒
       必须有一条用例红（证明"放行侧只认唯一已解析形式"这条**真的有牙**，对应上面那条同形排查）。
       锚点=承载行为那一行，同链 `grep -n` 证落地，`go build` rc=0 先过（**编译失败不算变异**），
       只在 `/tmp` 的 `git archive` 快照做（带会话后缀），还原证 `git diff --quiet`。
-- [ ] **AC#5** 门禁：`gofmt -l`/`gofumpt -l` 空；`go vet` 与 `GOOS=linux go vet` **按包** rc=0
+- [x] **AC#5** 门禁：`gofmt -l`/`gofumpt -l` 空；`go vet` 与 `GOOS=linux go vet` **按包** rc=0
       （⚠ 本机整仓 `GOOS=linux go vet ./...` 永远 rc=1，是既有坑，不要拿它当回归）；
       `go test -count=2 -v ./internal/tools/ ./internal/risk/` rc=0 且逐条点名 SKIP/FAIL（`=== RUN` == 不同名 ×2，报 SKIP 要说是不是 `-v`）；
       收尾必跑 `sh scripts/d22scan.sh`（纯净快照 rc=0，台账各 scope 不降）。

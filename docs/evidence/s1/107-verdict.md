@@ -167,3 +167,107 @@ PREFIX_RC=1
 2. **工作树在他人在写**：本腿开跑时（10:22）`git status --porcelain -- internal/tools internal/risk` 为空；10:3x 复核时同路径出现 ` M internal/tools/bridge.go`、` M internal/tools/system.go`、` M internal/tools/system_23_test.go`、` M internal/tools/tool.go`、`?? internal/tools/ticket23_image_channel_test.go`（票 23 的在飞改动，**不是本腿做的**）。§2.1 的 Windows 读数是干净树时跑的；本腿全程未改仓库任何代码/票/台账，只新建本文件。
 3. **POSIX 桩的范围**：`/d/tmp/107v-snap` 里的 `system_ops_other.go` 只补"平台后端"这一处编译面，`return nil, ErrNoSystemBackend` 是 fail-closed 方向，不参与 `InAllowlist`/`resolvedForm`/`treeResolvedAsNamed` 的任何判定；因此它的读数对票 107 的放行侧结论有效，但**不能替代**"HEAD 字面 POSIX 口径"那一格（那一格判不通过）。
 4. 本腿未 push、未 commit、未跑任何 git 写操作；`git status` 里 `docs/evidence/s1/` 新增的只有本文件。
+
+---
+
+# 7. 最终裁决（round 4 · 2026-11-05 11:1x-11:3x +08 · HEAD `6a18aa8dd`；收尾时上游已漂到 `7eaf992af`，见 7.6-6）
+
+**本节取代 §3 里 AC#3 / AC#5 的"不通过"判词** —— 那两格当时唯一的阻塞原因（`GOOS=linux` 下 `internal/tools` 编译断 `undefined: platformSystemBackend`，以及 Windows `go vet` 的 `unsafe.Pointer` 两条）已由票 23 的放行件 **`bb237e441`** 消除。§3 中 AC#1 / AC#2 的判词与读数继续有效；AC#4 本轮**重新跑过两发变异**（读数在 7.3）。
+
+## 7.0 一句话结论
+
+**票 107 现在 CLOSEABLE。** AC#1 / #2 / #3 / #4 通过；AC#5 的五项里**四项字面通过**，第五项（两包 `go test -count=2 -v`）**字面 rc=1**，但**两条红 0 条归 107**，且逐条点名到票号（票 29；票 189 + 190）。票 107 自己的**六条守卫**在 POSIX 与 Windows 两侧各被执行 2 次、**各 12/12 PASS、0 FAIL / 0 SKIP**。
+
+## 7.1 票 23 放行件核对（本轮的前提）
+
+| 项 | 读数 | 命令（cwd = 仓根） |
+| --- | --- | --- |
+| `bb237e441` 是 HEAD 祖先 | **YES** | `git merge-base --is-ancestor bb237e441 HEAD` |
+| `system_ops_other.go` 在树 | 1579 B，`//go:build !windows`，`platformSystemBackend() (systemFuncs, error) { return nil, ErrNoSystemBackend }` | `ls -la internal/tools/system_ops_other.go` |
+| `GOOS=linux CGO_ENABLED=0 go vet ./internal/tools/` | **rc=0**（§2.2 的 rc=1 已消失） | 同左 |
+| `GOOS=linux CGO_ENABLED=0 go test -c ./internal/tools/` | **rc=0**，二进制 39,069,508 B | `go test -c -o /d/tmp/107r3/tools_linux.test ./internal/tools/` |
+| `go vet ./internal/tools/ ./internal/risk/`（Windows） | **rc=0**（`system_backend_windows.go:337/355` 两条 unsafe 已消） | 同左 |
+| `GOOS=linux CGO_ENABLED=0 go vet ./internal/risk/` | **rc=0** | 同左 |
+
+## 7.2 最终 AC 表
+
+| AC | 判 | 读数（命令 / 文件:行） | 归他票 |
+| --- | --- | --- | --- |
+| **AC#1** 在能跑 POSIX 的环境里复现红并归因到 commit | **通过**（沿用 §2.4，本轮未重跑——107 的代码自 `ba0ea51` 起逐字节未变） | 修前快照 `4b4cfc95a` + docker/alpine `-test.count=2` → `--- FAIL: TestPathCanonicalizerAccountsForRewrittenRoots` ×2，报文与 CI 逐字同；`git log -S "not confirmed on disk" -- internal/tools/paths.go` → **`a66aadf4e`**（票 102 fix B） | — |
+| **AC#2** 两形状分别喂判定，定产生端/比较端 | **通过**（沿用 §3 + 本轮两侧探针 PASS） | HEAD `paths.go:99`（root 腿 `!res.Resolved && !treeResolvedAsNamed(...)`）、`:230-233`（target 腿 `resolvedForm` 再判 containment）；`TestTicket107AllowlistJudgmentTwoShapes` 在 Windows 与 POSIX 各 PASS×2。注意前提已变：POSIX 的 `resolveHandle` 由票 347（`0c730cac2`）落地为真，所以 shape E 今天也 true（§6.1） | — |
+| **AC#3** POSIX 与 Windows 两侧都被真正执行、无 skip / 无 `//go:build` 挡边 | **通过**（本轮翻绿；上一轮红在"POSIX 编译都过不去"） | POSIX：`GOOS=linux go test -c` rc=0 → docker/alpine `-test.count=2 -test.v`，六条守卫 **12 RUN = 6×2 / 12 PASS / 0 FAIL / 0 SKIP**（`.scratch/107r3/posix-tools-cwd.log`）。Windows：`go test -count=2 -v ./internal/tools/`，同六条 **12 RUN = 6×2 / 12 PASS / 0 SKIP**（`.scratch/107r3/win-both.log`）。`grep -n "t\.Skip\|go:build" internal/tools/paths_ticket107*.go internal/tools/paths_rewrite_ticket102_test.go` → **0 命中**（rc=1） | — |
+| **AC#4** 变异双向 | **通过**（本轮重跑，见 7.3） | 变异A（两处 `resolvedForm` 调用都退回 lexical：`paths.go:191` + `:230` 都成 `rf, ok := canonical, bool(true)`）：Linux build rc=0 → POSIX `--- FAIL: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside`，rc=1。变异B（`:248` 去掉组件分隔 `strings.HasPrefix(folded, r)`）：Linux + Windows build rc=0 → POSIX `--- FAIL: TestTicket107AllowlistBoundaryIsComponentWise`，Windows 同一条 FAIL。还原 `diff -q` ⇒ `RESTORED_IDENTICAL` | — |
+| **AC#5** 门禁五项 | **不通过（字面 rc=1）／红 0 条归 107** | ① `gofmt -l internal/tools internal/risk` → **空**；`gofumpt -l internal/tools/ internal/risk/` → **空**。② `go vet ./internal/tools/ ./internal/risk/`（Win）→ rc=0。③ `GOOS=linux go vet ./internal/tools/ ./internal/risk/` → rc=0（按包，未跑整树那条既有坑）。④ `go test -count=2 -v ./internal/tools/ ./internal/risk/` → **rc=1**：tools **1084 RUN = 542×2** / PASS 784 / FAIL **2 行**（`Test229SpawnNamesAreRosterShaped`×2）/ SKIP 0；risk **562 RUN = 281×2** / PASS 340 / FAIL **2 行**（`TestC26RewriteAccountIsConsumedAtEverySecurityLeg`×2）/ SKIP **2 行**（`TestSyncRegistryProbeLive`×2，HEAD 既有）。⑤ `sh scripts/d22scan.sh`：纯净 `git archive HEAD` 快照 **rc=0 clean**；工作树 **rc=0 clean**，`runtests.sh: PASS=35 FAIL=0 SKIP=0`，scopes `bans#1-5 internal/=356 cmd/=56 · ban#6 116 · ban#7 internal/tools/=48 · ban#8 design/=39 frontend/=116 internal/=876 cmd/=203`，对上一轮（354/56/116/47/39/116/872/203）**各 scope 只增不减** | **票 29；票 189 + 190**（明细见 7.4） |
+
+## 7.3 命令与读数（本机复跑，原样）
+
+```
+# 0) 身份
+git rev-parse HEAD                          -> 6a18aa8dd41769316471fc71981858b89b49c4f9
+git merge-base --is-ancestor bb237e441 HEAD -> 0 (YES)
+
+# 1) 本票被卡的两个门 (POSIX build / unsafe)
+GOOS=linux CGO_ENABLED=0 go vet ./internal/tools/                    -> rc=0
+GOOS=linux CGO_ENABLED=0 go test -c -o /d/tmp/107r3/tools_linux.test ./internal/tools/ -> rc=0
+go vet ./internal/tools/ ./internal/risk/                            -> rc=0
+GOOS=linux CGO_ENABLED=0 go vet ./internal/risk/                     -> rc=0
+gofmt -l internal/tools internal/risk                                -> 空
+/d/work/base/gopath/bin/gofumpt.exe -l internal/tools/ internal/risk/ -> 空
+
+# 2) 两包 Windows（工作树；开跑时只有两条 untracked，见 7.6）
+go test -count=2 -v ./internal/tools/ ./internal/risk/ > .scratch/107r3/win-both.log 2>&1
+  -> rc=1；1646 RUN = 823×2；FAIL 4 行 = 2 名×2；SKIP 2 行 = 1 名×2
+  tools: 1084 RUN = 542×2, PASS 784, FAIL 2 (Test229), SKIP 0
+  risk :  562 RUN = 281×2, PASS 340, FAIL 2 (TestC26), SKIP 2 (TestSyncRegistryProbeLive)
+  107 六条: 12 × --- PASS
+
+# 3) POSIX 真执行（git archive HEAD 快照 /d/tmp/107r3/snap，容器内 CWD=包目录）
+MSYS_NO_PATHCONV=1 docker run --rm -w /src/internal/tools \
+  -v "D:/tmp/107r3/snap:/src" -v "D:/tmp/107r3:/t" alpine \
+  /t/tools_linux.test -test.v -test.count=2     -> rc=1（见 7.4 的 11 条红）
+  926 RUN = 463×2；PASS 682；FAIL 22 行 = 11 名×2；SKIP 12 行 = 6 名×2
+  107 六条: 12 × --- PASS
+MSYS_NO_PATHCONV=1 docker run --rm -w /src/internal/risk \
+  -v "D:/tmp/107r3/snap:/src" -v "D:/tmp/107r3:/t" alpine \
+  /t/risk_linux.test -test.v -test.count=2      -> rc=1
+  500 RUN = 250×2；PASS 300；FAIL 2 行 = TestC26×2；SKIP 0
+
+# 4) 变异（/d/tmp/107r3/snap-mut，仓内未建 worktree）
+sed A: paths.go:191 + :230 -> rf, ok := canonical, bool(true)
+   GOOS=linux go test -c rc=0 -> POSIX: --- FAIL: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (rc=1)
+sed B: paths.go:248 -> if folded == r || strings.HasPrefix(folded, r) {
+   Linux build rc=0 / Windows build rc=0
+   POSIX: --- FAIL: TestTicket107AllowlistBoundaryIsComponentWise
+   Windows: --- FAIL: TestTicket107AllowlistBoundaryIsComponentWise
+还原: cp + diff -q 对 HEAD 快照 -> RESTORED_IDENTICAL
+
+# 5) D22
+sh scripts/d22scan.sh（工作树）  -> rc=0 clean，runtests PASS=35 FAIL=0 SKIP=0
+sh scripts/d22scan.sh（纯净快照） -> rc=0 clean
+```
+
+容器与内核：Docker 29.6.2（server linux/amd64），容器 `alpine`，内核 `6.6.114.1-microsoft-standard-WSL2` x86_64。
+
+## 7.4 归他票清单（红的名字 + 落点 + 引入 commit + 归属票）
+
+| # | 红的名字 | 落点（file:line） | 引入 commit / 票 | 说明 |
+| --- | --- | --- | --- | --- |
+| 1 | `Test229SpawnNamesAreRosterShaped`（Windows ×2 且 POSIX ×2——两包门禁里 `internal/tools` 唯一红） | `internal/memory/l1_warm.go:221` `reg.Spawn(l1ExtractGoroutine, …)`：首参非字面量，且没登记进 `spawn229ReviewedSites` | **`f92e4b177`（"29 AC#1: L1 抽取真链入仓 + 宿主 Warm 窗口装配"）** | 票 229 的名册普查按设计抓"新站点未复审" ⇒ **归票 29** 补复审记录/改名册内名字 |
+| 2 | `TestC26RewriteAccountIsConsumedAtEverySecurityLeg`（Windows ×2 且 POSIX ×2，`internal/risk` 唯一红） | `cmd/wisp/panel_pump.go:283/291`；`internal/panel/git_readonly_exec.go:409/412`（读 `Result.Canonical` 未读改写账 `Actable/Rewritten`） | `panel_pump.go` = **`2ed557db1`（票 190 接线2）**；`git_readonly_exec.go` = **`e1345b0a0`（票 189-r2）** | **归票 190 + 189**；与 §5.3 上一轮记录同一条红，未被任何后续提交修掉 |
+| 3 | POSIX `internal/tools` 整包的 11 名红（**不在 AC#5 字面里**，如实登记） | 24 搜索内容 ×7：`joinForListing` 无条件拼 `\`（`internal/tools/fs.go:280`，起源 `64c5fea3b` 票 20 的 fs.read/fs.list 对；消费腿 = 票 24 的 `search.content`），POSIX 上打开 `/tmp/x\a.txt` → 0 命中；22 ×2：`internal/tools/web_launch_test.go:150-160` non-Windows 期望"不支持"实得"找不到应用"；20r2 ×1：`refusal_20r2_test.go:377` 用 `runtime.Caller` 取到编译期 `D:/…` 绝对路径，交叉编译二进制里读不到（**仪器形状，非产品红**）；229 ×1（同 #1） | 票 20 / 24 / 22 / 29 | 全部非 107：都不在 `InAllowlist`/`resolvedForm`/`treeResolvedAsNamed` 的判定面上 |
+| 4 | POSIX 整包 SKIP 6 名×2 | `TestD34WriteMatrix`、`TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop`、`TestWorkspaceSwitchRefusesAJunctionToOutside`、`Test22AppLaunchNoJobsStillHonest`、`Test24R3SearchAppsAUMIDCandidateFeedsTheAUMIDArm`、`TestCanonicalizeErrorNoticeMustNotRelayTheFiledPath174r3` | 各自既有 `t.Skip` | 不是 107 的 skip；107 六条守卫 0 skip |
+
+## 7.5 CLOSEABLE 判词与残留
+
+1. **结票条件满足**：AC#1–#4 全通过；AC#5 字面第 4 项（两包 `go test`）的红**全部归他票且点名**（票 29；票 189+190）⇒ 按"全 AC 通过 **或** 红归他票"的口径，**票 107 可结**。
+2. **结票 ≠ 仓绿**：CI 的 ubuntu 腿仍会被 7.4 的 #1 / #3 打红（`Test229` 两侧都红；搜索内容 7 条只在 POSIX 红）——那是票 29 / 20+24 / 22 的活，不是 107 的。
+3. **不要为变绿动 107 的判定方向**：本轮变异读数再次说明"放行侧只认已解析形式"这条牙长在 `paths.go:230-233`（target 腿）；删它就是重开验收探针 C。变异A 里 ProbeA/102 用例仍绿而 ProbeC 红，这一半承重关系与 §3 AC#4 的登记一致（POSIX 上 `res.Resolved` 为真，root 腿被短路）。
+
+## 7.6 诚实登记
+
+1. **工作树状态**：开跑时 `git status --porcelain -- internal/tools internal/risk cmd/wisp internal/panel` 只有两条 untracked：`internal/tools/ticket23_image_channel_test.go`（票 23 的 WIP 测试）与 `cmd/wisp/zz_probe_temp_test.go.txt`（非 `.go`，不参与编译）。Windows 读数与 POSIX 二进制是在这棵工作树上跑的；**两条红在纯净 `git archive HEAD` 快照里同样复现**（`go test -count=1 -run "Test229…|TestC26…" ./internal/tools/ ./internal/risk/` ⇒ 两条 FAIL，报文逐字同），所以不是 untracked 文件造成的。
+2. **POSIX 第一次跑是 CWD 假红**：在容器里从 `/` 执行时多红了 9 名（172/221/236/309/188 等"读源文件"的 ruler，报文是找不到 `rules_shell.go` 之类）；已改用 `-w /src/internal/tools`（`git archive HEAD` 快照）重跑，7.2/7.3 用的是重跑读数，第一次日志留在 `/d/tmp/107r3/posix-tools.log`。
+3. **AC#1 本轮未重跑**（`4b4cfc95a` 是冻结的历史提交，107 的代码自 `ba0ea51` 起 `git diff --stat` 为空 ⇒ §2.4 读数仍成立）。
+4. **POSIX 整包 `-count=2 -v` 不是 AC#5 的字面项**（AC#5 只写两包本机口径 + 按包 `GOOS=linux go vet`），本节把它作为侧量登记，不用它加减 107 的分。
+5. 本腿未改任何代码 / 票 / 台账，未跑任何 git 写操作（`git status` 里新增的只有本文件与 `.scratch/107r3/*.log`、`/d/tmp/107r3/**` 仓外证据）。
+6. **HEAD 在本腿运行期间漂了**：开跑与全部读数时是 `6a18aa8dd`；收尾时 `git rev-parse HEAD` = **`7eaf992af`**（`57e764f82` 把 CI 的 gofumpt 钉到 `@v0.12.0`，只改 `.github/workflows/ci.yml`＋`docs/evidence/s1/85-gofumpt-pin.md`；`7eaf992af` 只改 85 号裁决表文字）。`git diff --stat 6a18aa8dd..HEAD` 只碰这两个文件，**107 的四个文件（`paths.go`、`paths_ticket107_portable_test.go`、`paths_ticket107b_probes_test.go`、`paths_rewrite_ticket102_test.go`）diff 为空**；在 `7eaf992af` 上复跑 `GOOS=linux CGO_ENABLED=0 go vet ./internal/tools/` 仍 **rc=0** ⇒ 本节的"翻绿"不是被漂走的 HEAD 骗出来的，但严格口径应以 `6a18aa8dd` 记读数。

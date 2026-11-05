@@ -31136,3 +31136,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 51-ac5（eafb13d5f）：AC#5 Tier2 启用门（internal/plugin/tier2_gate.go 272 行+448 行 5 测试，默认关=无对象、开须 L2 裁决、逐插件关、D37 拒绝；五发变异全红）。★51 AC#3 C24 GojaHostAPI 初始集=需 owner 批（改契约文字，A1451 已摆机主）。
 - 182 普查（docs/evidence/s1/182-census.md 31KB）：task-monitor 10 堆三档归口；关键新读数：K5 插件"库里有读面无生产装配无规格"＝无票认领（须立票或摆 owner）；AC#5 雷区 6→4 枚现存写形状；行号漂移十四行表现 PLAN.md:3499-3512。
 - 我逐包自验：build ./internal/tools ./internal/config ./internal/plugin ./cmd/wisp rc=0；三组测试 ok；gofumpt 空；d22scan clean（internal/tools=48）。
+
+## A1537（2026-11-05 11:4x，编排者）178轮：107＋108 双收口（本会话第 36、37 枚），85/213 落切片，21 腿死
+- 107 收口（第36）：AC#1-4 全通过；AC#5 门禁字面 rc=1、两红归他票（Test229→票29 l1_warm.go:221 f92e4b177；TestC26→票189+190）；POSIX/Windows 各 12/12 PASS 0 SKIP。裁决 107-verdict.md §7。翻5格+Status→done+改名+双名核=1。
+- 108 收口（第37）：AC#1-4 全通过、内部 winsec 两平台全绿（Win 254/254、POSIX 152/152）；AC#5 三条红归他票（TestC26=A380/189+190；TestDsn196r3→196r3；TestMigration31→31r2）。裁决 108-verdict.md。翻5格+done+改名+双名核=1。
+- 85 PASS 部（57e764f82 件 + 7eaf992af 校正）：.github/workflows/ci.yml 把 go install gofumpt@latest 钉到 @v0.12.0；★findings 清算（全仓多包）＋真 CI run 色 STOP-note 未做（另属多包写面/CI）。
+- 213 PASS（84e4cc78d+c497ee63e）：internal/command 命令名册第一格（可枚举/命令行执行），四发变异逐发红；★Production() 生产调用者=0（AC#4 终态残）。
+- 21 腿死（res=null，无脏、无提交）。
+- 我自验：build ./internal/command rc0、test ok、gofumpt 空、ci.yml 第293行已 @v0.12.0。
