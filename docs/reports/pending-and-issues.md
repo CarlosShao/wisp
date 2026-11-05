@@ -31285,3 +31285,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 246 STOP：AC#8 归票 228（用例名 TestAC228…，落点 cmd/wisp 常驻启动）＋撞票 314 整包死亡区(A957 9趟2死1超时)⇒干净 -count=10 今天测不出；台账 :21123 明令非写腿。246 留 8/9、AC#8 等 228。
 - 135（7eb64d5ce，零产码）：AC#1 已落(b46a867b1 等)，r2 复证 5 变异 M-C/M-A2/M-A2b/M-E 全红、M-A2 现死码(M-A2b 牙活)、门禁切片 -count=2 RUN56/PASS20/FAIL0、cmd/wisp 整包 44 红全语音/焦点族非本票。票面 7 格仍空、待非实现者裁决。
 - 51 裁决(51-verdict)：AC#1-5 全 PASS、AC#4 实落(宿主panic隔离+归因+恰一条C24-HOSTPANIC+Calls记账+不转JS)、AC#6 实质 PASS(4 行字面自指·无产码) ⇒ 可结。
+
+## A1561（2026-11-05 21:3x，编排者）收 wave24：135 裁决7/7 PASS(可结)、266 裁决 CLOSE(可结)、177 AC#0普查交件
+- 135-verdict（e0fa59a40）：7/7 AC PASS（M-C 两守卫、M-A2 死码/M-A2b 牙活、M-E 新牙独立、linux 容器分母咬、门禁切片 38/38/0/0）。AC#6 留一格整包 -count=2 四数未取（44 既有红非本票）不翻判。⇒ 可结。
+- 266-verdict：CLOSE（AC#0-4 全 PASS、ci.yml 13/13 字节对齐、删钉变异响、正控32/32、restore 绿）。两 residual：①删文件+CI步=静默(P3 按天钝)；②原地缩声明(3行→1)仍 rc=0、删匹配调用仍 rc=0——证据§1「体积最小」句需更正。⇒ 可结。
+- 177（aee58549c/5bc65085f，零产码）：AC#0 只读普查交「丙形价目表」（L2 四形/每次必批结构因/R4、选丙则 164 AC#3 两判据必改形须 owner）。依赖 owner 选不选丙 ⇒ 不结、作价目表留档。
