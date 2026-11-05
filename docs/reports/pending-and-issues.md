@@ -31265,3 +31265,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ci266（6e5957756）：ci.yml +14 行 SLO nail census 步（YAML 6 jobs、lint 14→15 step、无 continue-on-error、LF）；正控32发0败。
 - ★边界（需机主/契约）：现「配了豁免」只让 gate 判定 Allow+落安全行，真实工具调用**仍问一次**（R3 把 B 档升 L2 与 override 无关）。要「配了免问」须解耦 R3 与 override（internal/risk rules_gateway + internal/tools 路由）=改契约、新票+机主批。
 - rename 坑：284 收尾 rename 首拆两提交（新名6b230772a+旧名删c6d1d187e），双名核终=1。
+
+## A1556（2026-11-05 19:2x，编排者）收 wave20：103 复核(AC#1/2 建议过)、276 判 moot、216 判 gated
+- 103（86d2af61e evidence）：AC#1/AC#2 生产实现已在历史（0717bf296，退回三形由 108/113 闭合）；HEAD 7 条 AC 用例 -count=2 双样本全 PASS、变异 MUT-1 4FAIL 在守卫、d22 clean、build rc0 ⇒ 建议 AC#1/AC#2 过；R-103-5/6/7 登记不压结案。零产码（重写即退化）。
+- 276 判 moot：门今天 green（362 在 attrib.sh:577 加 exclude .scratch/**、P3 已收）；276 AC#1 要求 .scratch 脏件也红＝与 362 P3 相反裁定；A669/A1496 已两度裁「不做」；production 面 gofumpt=0（29 枚脏全在 .scratch probe）。⇒ 编排者裁：按 362 收口、维持 exclude、276 不做。
+- 216 判 gated：AC#5 归 S6 DEFERRED（SPEC-12:80），A1273 已裁⛔做；写面在 cmd/wisp/tools 不在本票。留 1 格挂起、不结案。附新读数：词形活口 cmd/wisp/resident_voice_engines_windows.go:1208 Contains(\"interrupted\")（票381-r2 引入，非216）登记。
