@@ -2,6 +2,7 @@
 
 - 腿：`51-ac4`＝票 51 的第 4 条 AC（`Panic isolation: JS triggering goja panic -> recovered, other plugin unaffected, host alive`）
 - 时刻：2026-11-05 20:0x +08
+- **交付提交：`a7093e473`**（4 文件 / +674 −9）
 - 进场 HEAD：`b88f3ef94`（派单写「HEAD ae62f761a」，现跑 `git log --oneline -1`＝`b88f3ef94`；现量 `git diff --stat ae62f761a b88f3ef94` 只动 `docs/evidence/s1/retriage-189.md` 与 `docs/reports/pending-and-issues.md` 两件，`-- internal/plugin` 的输出 **0 行**）
 - 写面（**只有这四件**）：
   - `internal/plugin/c24.go`（改，产码：`C24HostPanic` 归因值 + `callHost` 的崩溃 recover + `C24-HOSTPANIC` 审计行 + 崩溃现场栈）
@@ -135,6 +136,7 @@ ok  github.com/CarlosShao/wisp/internal/plugin  0.139s
 | gofumpt | `/d/work/base/gopath/bin/gofumpt.exe -l internal/plugin/ internal/plugin/manifestslot/` | **空**（0 行） |
 | D22 扫描 | `sh scripts/d22scan.sh`（共享树） | **rc=0**，`d22scan: clean`；分母 `bans#1-5 internal/=363 cmd/=58`、`ban#6 frontend/=116`、`ban#7 internal/tools/=48`、`ban#8 design/=39 frontend/=116 internal/=905 cmd/=211` |
 | 运行环境 | `go version` / PATH | `go1.27.1 windows/amd64`；`PATH="$PWD/build:$PWD/third_party/sherpa-onnx:$PATH"`、`unset GOTMPDIR TMPDIR TEMP TMP`、**未** `CGO_ENABLED=0` |
+| **提交后复跑**（`a7093e473` 之后的树） | `go build …` / 本腿四尺 / `gofumpt -l internal/plugin/ docs/` / `sh scripts/d22scan.sh` | build **rc=0**；四尺 **ok 0.110s**；gofumpt **空**；d22 **rc=0 `clean`**，分母与提交前逐字相同（363/58/116/48/39/116/905/211）⇒ 提交本身不带任何 D22 违规 |
 
 ## 7. `AC#6 措辞审计` 读数（本腿只量，⛔ 判勾）
 
