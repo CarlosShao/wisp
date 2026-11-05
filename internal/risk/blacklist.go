@@ -11,8 +11,11 @@ import (
 //
 //   - A tier: absolutely forbidden, non-overridable. Read AND write denied.
 //     No grant, session grant or config relaxation can unlock it.
-//   - B tier: default deny; a single-file override grants only after one L2
-//     strong confirm plus a log entry (emitted here via Logf).
+//   - B tier: default deny; a single-file override grants only through one of
+//     two distinguishable sources - one L2 strong confirm given in this
+//     process, or a standing exemption the operator wrote into config.toml's
+//     risk.blacklist_overrides - and either one emits exactly one log entry
+//     naming the path, the rule and the source (emitted here via Logf).
 //
 // Classification always operates on the C26-resolved canonical path
 // (SPEC-06 §4: whitelist AND blacklist membership both go through the same
@@ -23,7 +26,7 @@ type Class int
 
 const (
 	ClassNone Class = iota
-	ClassB          // default deny + single-file override (one L2 confirm + log)
+	ClassB          // default deny + single-file override (one L2 confirm, or one persisted config exemption; both logged)
 	ClassA          // absolute deny, non-overridable
 )
 
@@ -74,7 +77,32 @@ func Classify(canonical string) Class {
 
 // Gate applies the blacklist policy to a canonical path. bOverrides maps the
 // normalized path of individually L2-confirmed B-tier files to true.
+//
+// It is GateStanding with no persisted-exemption source, so every caller that
+// predates that seam keeps exactly the behavior it had.
 func Gate(canonical string, bOverrides map[string]bool) PathDecision {
+	return GateStanding(canonical, bOverrides, nil)
+}
+
+// GateStanding applies the blacklist policy to a canonical path with BOTH
+// B-tier override sources kept apart, because they are different claims about
+// the same file and only one of them involves a human clicking anything.
+//
+//   - l2 holds the B-tier single-file overrides a human confirmed at run time
+//     (one strong L2 confirm per file - the source SPEC-06 §4.1 describes).
+//   - persisted holds the standing exemptions the operator wrote into
+//     config.toml's risk.blacklist_overrides. Nothing was clicked for those, so
+//     the allow line below and the returned Reason must not claim an L2
+//     confirm: ticket 334's precedent is that an untrue reason is a defect.
+//
+// The keys of both maps are OverrideKey output (normPath's fold) - a caller
+// that keys them with any other spelling unlocks nothing, which is
+// overrideApplies' long-standing asymmetry, deliberately unchanged.
+//
+// The tier check runs FIRST and unchanged: an A-tier path returns before
+// either map is read, so no persisted entry can unlock A, and an A path placed
+// in both maps still answers ClassA with no Allow and no NeedL2.
+func GateStanding(canonical string, l2, persisted map[string]bool) PathDecision {
 	p := normPath(canonical)
 	cand := formsOf(canonical)
 	class, rule := classifyForms(cand)
@@ -83,9 +111,15 @@ func Gate(canonical string, bOverrides map[string]bool) PathDecision {
 		logf("risk: A-list DENY path=%s rule=%s (non-overridable)", p, rule)
 		return PathDecision{Class: ClassA, Reason: "A-list sensitive path (non-overridable): " + rule}
 	case ClassB:
-		if overrideApplies(cand, bOverrides) {
-			logf("risk: B-list OVERRIDE (single-file, L2 confirmed) path=%s rule=%s", p, rule)
+		// l2 is asked first: when both sources cover this file, the one a human
+		// answered is the true story, and exactly one line leaves this function.
+		if overrideApplies(cand, l2) {
+			logf("risk: B-list OVERRIDE (single-file, source=l2-confirm) path=%s rule=%s", p, rule)
 			return PathDecision{Class: ClassB, Allow: true, Reason: "B-list single-file override (one L2 confirm + logged): " + rule}
+		}
+		if overrideApplies(cand, persisted) {
+			logf("risk: B-list OVERRIDE (single-file, source=config:risk.blacklist_overrides) path=%s rule=%s", p, rule)
+			return PathDecision{Class: ClassB, Allow: true, Reason: "B-list single-file override (standing exemption from config risk.blacklist_overrides; no L2 confirm was given for this use): " + rule}
 		}
 		logf("risk: B-list default DENY -> L2 path=%s rule=%s", p, rule)
 		return PathDecision{Class: ClassB, NeedL2: true, Reason: "B-list sensitive path; single-file override requires one L2 confirm: " + rule}
@@ -140,6 +174,17 @@ func normPath(p string) string {
 	}
 	return u
 }
+
+// OverrideKey folds a C26-canonical spelling into the key space the B-tier
+// override maps are compared in: the very fold GateStanding applies to its
+// argument through overrideApplies. A composition root that feeds a persisted
+// exemption set keys it with this, so the key is produced by one
+// implementation of the security comparison and not by a second copy elsewhere.
+//
+// The result is a COMPARISON key (lowercased, separators unified, trailing
+// separator trimmed). It is never a path: do not hand it to the OS and do not
+// print it as one (normPath's own comment is the rule).
+func OverrideKey(canonical string) string { return normPath(canonical) }
 
 // normDir normalizes an anchor directory for prefix matching.
 func normDir(p string) string {

@@ -59,19 +59,26 @@ func (b *Bridge) permissionMode() (m risk.Mode) {
 // witness: the A/B evidence reaches the card and the audit line on its own.
 //
 // It is NOT an authority. Reading this note grants nothing: an
-// AlreadyUnlocked entry requires a confirmation record that only the approval
-// queue (ticket 21) can produce, and until something populates
-// Options.Confirmations that map stays empty, so Gate answers every B-tier path
-// with "ask first" - the fail-closed side of the pair.
+// AlreadyUnlocked entry requires an override on record, and there are exactly
+// two sources of those, neither of them writable from here - a runtime L2
+// confirmation (the approval queue, ticket 21) and the operator's standing
+// list in config.toml's risk.blacklist_overrides (Options.PersistedExemptions,
+// ticket 230 AC#4). With neither armed, Gate answers every B-tier path with
+// "ask first" - the fail-closed side of the pair.
 type BlacklistNote struct {
 	// Class is the strictest tier seen across the call's paths.
 	Class risk.Class
 	// Absolute names the A-tier paths: non-overridable, no mode, no grant.
 	Absolute []string
-	// Unlockable names the B-tier paths that ONE L2 confirmation can unlock.
+	// Unlockable names the B-tier paths that ONE L2 confirmation can unlock
+	// (or that a persisted config exemption would unlock, if one were armed).
 	Unlockable []string
-	// AlreadyUnlocked names the B-tier paths whose single-file confirmation is
-	// already on record.
+	// AlreadyUnlocked names the B-tier paths whose single-file override is
+	// already on record: a runtime L2 confirmation, or a persisted config
+	// exemption. This note deliberately does not say which one, because the
+	// verdict it mirrors (risk.GateStanding) already writes that source into
+	// its own security log line at the moment of the allow, and a second copy
+	// here would be a second place to keep honest.
 	AlreadyUnlocked []string
 	// Reason is the rule text Gate produced for the strictest finding.
 	Reason string
@@ -89,13 +96,14 @@ func (b *Bridge) readBlacklist(raw []string) BlacklistNote {
 		return n
 	}
 	overrides := b.confirmations()
+	exemptions := b.persistedExemptions()
 	for _, p := range raw {
 		c, err := b.paths.Canonicalize(p)
 		if err != nil {
 			n.Unresolved++
 			continue
 		}
-		d := risk.Gate(c, overrides)
+		d := risk.GateStanding(c, overrides, exemptions)
 		switch d.Class {
 		case risk.ClassA:
 			n.Absolute = append(n.Absolute, c)

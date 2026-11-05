@@ -106,6 +106,20 @@ type Options struct {
 	// "ask first". Populating it is ticket 21's confirmation flow; nothing in
 	// this package can add to it.
 	Confirmations func() map[string]bool
+	// PersistedExemptions returns the STANDING B-tier exemptions the operator
+	// wrote into config.toml's risk.blacklist_overrides, keyed with
+	// risk.OverrideKey (the same comparison fold risk.GateStanding applies).
+	// nil or empty means "no path was ever exempted by config", so every
+	// B-tier path still answers "ask first".
+	//
+	// Deliberately a SECOND source beside Confirmations, never a union with it:
+	// those two say different things about the same file ("a human clicked
+	// this" versus "the config file names it"), and risk.GateStanding logs
+	// which one allowed a use. Merging them here would destroy that tag before
+	// the log line could name it. Like Confirmations it is read-only and
+	// re-read per call, so a reload that re-arms the list takes effect without
+	// a restart; nothing in this package can add to it.
+	PersistedExemptions func() map[string]bool
 }
 
 // Bridge is the host bridge: the single choke point every capability flows
@@ -144,8 +158,14 @@ type Bridge struct {
 	// modes and confirmations are ticket 90's two read-only injections: the
 	// permission mode source, and the B-tier override set risk.Gate reads. Both
 	// are read per call, and neither has a setter on the bridge.
-	modes         ModeSource
-	confirmations func() map[string]bool
+	//
+	// persistedExemptions is the second B-tier source (ticket 230 AC#4): the
+	// standing config list, kept beside confirmations rather than folded into
+	// it so risk.GateStanding can still tell the two apart in its log line.
+	// Same rules: read per call, no setter, nil means "nothing was exempted".
+	modes               ModeSource
+	confirmations       func() map[string]bool
+	persistedExemptions func() map[string]bool
 	// grants is ticket 224's third read-only injection, same shape and the same
 	// rule: read per call, no setter, and nil means no session has ever
 	// answered anything.
@@ -197,6 +217,12 @@ func New(o Options) *Bridge {
 				return nil // no file was ever confirmed: B tier stays "ask first"
 			}
 			return o.Confirmations()
+		},
+		persistedExemptions: func() map[string]bool {
+			if o.PersistedExemptions == nil {
+				return nil // no config exemption was ever armed: B tier stays "ask first"
+			}
+			return o.PersistedExemptions()
 		},
 		classifier: NewSensitiveClassifier(),
 		seqs:       map[string]int64{},
