@@ -116,7 +116,12 @@ func distinctnessReds133(legs []*leg133) []string {
 		if leg.installs {
 			installs++
 		}
-		if strings.HasPrefix(leg.covered, "test ") {
+		// The denominator is coveredBy, not the row text: a SOURCE-ONLY row starts
+		// with "test " too, and it is deliberately NOT a name the run-roster check can
+		// reconcile on this leg. Counting it here would let a census whose every claim
+		// stopped at the platform gate pass with an empty roster denominator - the Y3
+		// shape this reading exists to refuse.
+		if len(leg.coveredBy) > 0 {
 			driven++
 		}
 	}
@@ -274,6 +279,76 @@ type logSink struct{ root string }
 func runResident() {}
 `
 
+// fixtureSplitMain133 is the platform-gate fixture: one leg (`eps`) whose only
+// source-side witness lives in a file the OTHER CLI leg's build takes (see
+// fixtureSplitCase133), which is exactly the shape docs/evidence/s1/98-attribution.md
+// §2 C3 measured on the ubuntu leg for ticket 133's real `slo` leg.
+const fixtureSplitMain133 = `package main
+
+import "os"
+
+const usage = "wisp - split fixture\n\nUsage:\n  wisp             the no-args branch\n  wisp eps    the leg whose only witness is the other leg's case\n"
+
+func main() {
+	args := os.Args[1:]
+	if len(args) == 0 {
+		runResident()
+		return
+	}
+	switch args[0] {
+	case "eps":
+		os.Exit(cmdEps(args[1:]))
+	default:
+		os.Exit(cmdUnknown())
+	}
+}
+
+func cmdEps(args []string) int { return len(args) }
+
+func cmdUnknown() int { return 2 }
+
+func installLogSink(root string) (*logSink, error) { return &logSink{root: root}, nil }
+
+type logSink struct{ root string }
+
+func runResident() {}
+`
+
+const fixtureSplitCase133 = `package main
+
+import "testing"
+
+func TestFixtureEpsDrivesTheLeg(t *testing.T) {
+	cmdEps(nil)
+}
+`
+
+// fixtureDeadCase133 is the boundary the disclosure must NOT swallow: a case
+// declared in a file no CLI leg's build takes (`//go:build ignore` is false
+// everywhere), so nobody runs it anywhere and the roster red below has to stay.
+const fixtureDeadCase133 = `//go:build ignore
+
+package main
+
+import "testing"
+
+func TestFixtureEpsDeadLeg133(t *testing.T) {
+	cmdEps(nil)
+}
+`
+
+// otherCLILeg133 names the CLI leg that is NOT the one running this binary, so a
+// fixture can put a case in a file only that leg compiles. The self-proof leg runs on
+// whichever leg it is invoked from (scripts/wisp-cli-tests.sh on windows, the ubuntu
+// leg on linux); picking the other one is what makes the same fixture exercise the
+// disclosure on both.
+func otherCLILeg133() string {
+	if goos133() == "linux" {
+		return "windows"
+	}
+	return "linux"
+}
+
 // TestAC3SelfProof133TheDispatchReadersCanAnswerNo is the self-proof leg: every
 // assertion below is a reader being handed a bad input and being required to
 // report it. Degrade any of the readers it feeds and this case fails.
@@ -367,6 +442,88 @@ func TestAC3SelfProof133TheDispatchReadersCanAnswerNo(t *testing.T) {
 	got := strings.Join(distinctnessReds133(twinLegs), "\n")
 	if !strings.Contains(got, `"twin1"`) || !strings.Contains(got, `"twin2"`) {
 		t.Errorf("the distinctness predicate did not name the planted twin rows (two legs dispatching the same entry, nothing else to tell them apart); it said:\n%s", got)
+	}
+}
+
+// TestAC3SelfProof133ThePlatformGateDisclosesByNameInsteadOfReddening is the
+// self-proof of the one branch that stops short of a red: a `covered=test` claim whose
+// case only the OTHER CLI leg's build compiles. docs/evidence/s1/98-attribution.md §2 C3
+// measured that branch reddening ticket 133's real `slo` leg on the ubuntu leg over
+// Test384ResidentWatchdogEndToEnd (resident_watchdog_windows_test.go); ticket 131's
+// shape says name it, do not judge it red. Three readings, and the third is the
+// boundary that keeps ticket 133's R-133-9 (M-G) nail:
+//
+//	(a) the row says SOURCE-ONLY and names the case and the file,
+//	(b) the roster check and the disclosure line name the same leg/case/file and do not
+//	    red the claim (the roster of THIS leg cannot start that case),
+//	(c) a case no CLI leg's build takes (`//go:build ignore`) is NOT disclosed and stays
+//	    red - the disclosure may only explain an absence the platform explains.
+func TestAC3SelfProof133ThePlatformGateDisclosesByNameInsteadOfReddening(t *testing.T) {
+	other := otherCLILeg133()
+	caseFile := "eps_" + other + "_test.go"
+
+	splitDir := writeFixture133(t, map[string]string{
+		"main.go": fixtureSplitMain133,
+		caseFile:  fixtureSplitCase133,
+	})
+	splitPkg, err := loadPackage133(splitDir)
+	if err != nil {
+		t.Fatalf("the platform-gate fixture did not parse: %v", err)
+	}
+	splitLegs, splitEnum := splitPkg.enumerateLegs133()
+	if len(splitEnum) != 0 {
+		t.Errorf("the platform-gate fixture's dispatch is readable by construction; it reported: %v", splitEnum)
+	}
+	// (a) the row, read from the same predicate the gate prints.
+	coverReds := strings.Join(splitPkg.coverageReds133(splitLegs), "\n")
+	if strings.Contains(coverReds, `leg "eps"`) {
+		t.Errorf("the coverage reader reddened a leg whose only witness is the other CLI leg's case (%s). That is docs/evidence/s1/98-attribution.md §2 C3: the row has to disclose the platform split by name and stop there; it reported:\n%s", caseFile, coverReds)
+	}
+	var row *leg133
+	for _, leg := range splitLegs {
+		if leg.key == "eps" {
+			row = leg
+		}
+	}
+	if row == nil {
+		t.Fatalf("the fixture's eps leg left the census: %v", legKeys133(splitLegs))
+	}
+	if !strings.Contains(row.covered, "SOURCE-ONLY on GOOS="+goos133()) || !strings.Contains(row.covered, caseFile) {
+		t.Errorf("a platform-split claim has to say SOURCE-ONLY and name the file this leg's build does not take (looked for %q and %q); the row says: %q",
+			"SOURCE-ONLY on GOOS="+goos133(), caseFile, row.covered)
+	}
+	if len(row.coveredBy) != 0 {
+		t.Errorf("a platform-split claim must not travel in coveredBy: that bucket is the `=== RUN`-able set this leg can start, and the whole point is that this leg cannot start it (coveredBy=%v)", row.coveredBy)
+	}
+	// (b) the roster and the disclosure, on a roster that is honestly missing the case.
+	self := t.Name()
+	thisLegRoster := map[string]bool{self: true}
+	if got := splitPkg.runRosterReds135(splitLegs, self, thisLegRoster, len(thisLegRoster), nil); len(got) != 0 {
+		t.Errorf("the run-roster check judged a platform-split claim red, which is the C3 shape this branch exists to stop reddening; it said:\n%s", strings.Join(got, "\n"))
+	}
+	disc := splitPkg.runRosterDisclosure135(splitLegs, thisLegRoster, len(thisLegRoster), nil)
+	for _, want := range []string{`leg "eps"`, "TestFixtureEpsDrivesTheLeg", caseFile, "taken on GOOS=" + other} {
+		if !strings.Contains(disc, want) {
+			t.Errorf("the disclosure line has to name the split by leg, case, file and the leg that compiles it (looked for %q); it says:\n%s", want, disc)
+		}
+	}
+	// (c) the boundary: a case nobody's build takes stays red.
+	deadDir := writeFixture133(t, map[string]string{
+		"main.go":            fixtureSplitMain133,
+		"eps_ignore_test.go": fixtureDeadCase133,
+	})
+	deadPkg, err := loadPackage133(deadDir)
+	if err != nil {
+		t.Fatalf("the dead-case fixture did not parse: %v", err)
+	}
+	deadLegs, deadEnum := deadPkg.enumerateLegs133()
+	if len(deadEnum) != 0 {
+		t.Errorf("the dead-case fixture's dispatch is readable by construction; it reported: %v", deadEnum)
+	}
+	deadPkg.coverageReds133(deadLegs) // fills coveredBy, the row runRosterReds135 reads
+	deadReds := strings.Join(deadPkg.runRosterReds135(deadLegs, self, thisLegRoster, len(thisLegRoster), nil), "\n")
+	if !strings.Contains(deadReds, "has no such case") || !strings.Contains(deadReds, "TestFixtureEpsDeadLeg133") {
+		t.Errorf("a case declared in a file NO CLI leg's build takes (//go:build ignore) has to stay red - a disclosure that swallowed it would be saying \"the platform explains this\" about a case that runs on no platform; the reader said:\n%s", deadReds)
 	}
 }
 

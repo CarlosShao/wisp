@@ -35,7 +35,11 @@ package main
 //	    roster check below is the one reading here that does not come from
 //	    go/parser: it asks the running binary which cases it can start. It is NOT
 //	    folded back into the parser, because the point of a second instrument is a
-//	    second, independent source of truth.
+//	    second, independent source of truth. An absence this reading finds is
+//	    judged red UNLESS the platform explains it: every declaring file of the
+//	    case is outside this leg's build and inside the other CLI leg's (see
+//	    platformSplit133). That branch names leg, case and file in the row and in
+//	    the disclosure line and does not redden; every other absence stays red.
 //
 // WHAT EACH OF THE FIVE SHOTS IN AC#1 HITS, stated before the fact and measured
 // afterwards (readings in docs/evidence/s1/133-ac1-ac2-instrument.md):
@@ -96,8 +100,21 @@ package main
 //     they are not, and that is disclosed in the same line rather than reddened,
 //     because a red there would be this instrument claiming a coverage debt on a
 //     platform whose cmd/wisp denominator is the other leg's business (ticket 133
-//     R-133-2's measured "装不下"). The `covered=test` bucket - the one shot M-G was
-//     filed for - has no such exemption.
+//     R-133-2's measured "装不下").
+//   - a `covered=test` claim whose case only the OTHER CLI leg's build compiles. This
+//     is the same platform rule, extended to the bucket shot M-G was filed for, and the
+//     extension is deliberate: the census in docs/evidence/s1/98-attribution.md §2 C3
+//     measured that on GOOS=linux this gate reddened the `slo` leg over
+//     Test384ResidentWatchdogEndToEnd, a case declared in resident_watchdog_windows_test.go
+//     that runs on the windows leg - a red on a package that is green on the leg which
+//     compiles the case. Ticket 131's shape is the precedent: name it, do not judge it
+//     red. The boundary that keeps M-G's nail is in platformSplit133: the disclosure
+//     has to be bought with BOTH readings (the running binary's roster does not list the
+//     case, AND every declaration of it sits in a file this leg's build does not take
+//     while the other CLI leg's build does). A name whose declaring file this build
+//     takes, a name declared nowhere, and a name no leg's build takes (a `//go:build
+//     ignore` plant) all stay red; the self-proof leg plants the last two and asserts
+//     the red, and the row plus the disclosure line always name leg, case and file.
 //
 // COST: one go/parser pass over this directory's ~30 files per run, plus ONE child
 // process: the test binary re-lists its own cases with `-test.list '.*'` (measured
@@ -110,6 +127,7 @@ import (
 	"context"
 	"fmt"
 	"go/ast"
+	"go/build"
 	"go/parser"
 	"go/printer"
 	"go/token"
@@ -311,6 +329,15 @@ type leg133 struct {
 	// roster, so that the reconciliation reads the same claim the row prints rather
 	// than re-deriving it from the parser.
 	coveredBy []string
+	// sourceOnly holds the claims that stopped at the platform gate: a leg whose only
+	// witness is a case declared in a file THIS leg's build does not take but the
+	// other leg's does (slo's Test384ResidentWatchdogEndToEnd, declared in
+	// resident_watchdog_windows_test.go, read on the linux leg). The entry is
+	// "case (file, taken on GOOS=...)" and the row's covered column says
+	// SOURCE-ONLY; runRosterDisclosure135 names it and runRosterReds135 does not
+	// judge it red, which is ticket 131's shape applied to this bucket
+	// (docs/evidence/s1/98-attribution.md §2 C3).
+	sourceOnly []string
 }
 
 // pkg133 is the parsed directory. Build tags are ignored and same-named
@@ -322,6 +349,11 @@ type leg133 struct {
 // coverage.
 type pkg133 struct {
 	fset *token.FileSet
+	// dir is the directory loadPackage133 read. It is kept because the one platform
+	// test this gate asks ("does this leg's build take the file this case is declared
+	// in?") is put to the toolchain's own build context, which needs the directory the
+	// file name is relative to.
+	dir string
 
 	decls   map[string][]*decl133 // production decls by bare name
 	methods map[string][]*decl133 // production methods by bare name
@@ -389,6 +421,7 @@ func loadPackage133(dir string) (*pkg133, error) {
 		return nil, fmt.Errorf("read %s: %w", dir, err)
 	}
 	p := newPkg133()
+	p.dir = dir
 	for _, e := range entries {
 		name := e.Name()
 		if e.IsDir() || !strings.HasSuffix(name, ".go") {
@@ -1422,7 +1455,7 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 			if ds := p.helpers[c.test]; len(ds) > 0 {
 				what = fmt.Sprintf("declares %s, which this file sorts with %s: a helper or a method, not a case Go's testing package runs", ds[0].site, "isRunnableCase133")
 			}
-			reds = append(reds, fmt.Sprintf("this gate claims leg %q is nailed by %q, which is not a test function in this directory's sources: %s. A nail has to name a top-level func TestXxx(t *testing.T); the gate's registry is a list of cases, and the ledger row it produces is a coverage claim. A renamed or deleted case is red here, where the registry is compared with the sources. A case that is in the sources but is not in this round's binary is red one check down for the `covered=test` bucket (runRosterReds135) and disclosed, not reddened, for a registry nail - see this file's header, third limit, and the disclosure line this run prints.", c.leg, c.test, what))
+			reds = append(reds, fmt.Sprintf("this gate claims leg %q is nailed by %q, which is not a test function in this directory's sources: %s. A nail has to name a top-level func TestXxx(t *testing.T); the gate's registry is a list of cases, and the ledger row it produces is a coverage claim. A renamed or deleted case is red here, where the registry is compared with the sources. A case that is in the sources but is not in this round's binary is red one check down for the `covered=test` bucket (runRosterReds135) - unless the case is declared only in a file the other CLI leg's build takes, which is the one named disclosure in that bucket (platformSplit133) - and it is disclosed, not reddened, for a registry nail: see this file's header, third limit, and the disclosure line this run prints.", c.leg, c.test, what))
 			continue
 		}
 		claimedBy[c.leg] = append(claimedBy[c.leg], c)
@@ -1448,8 +1481,29 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 		// orphan-ruling red at the bottom) keep seeing a marker in any file.
 		adjacent := p.rulingAdjacentTo133(leg)
 		driver, driverProof := "", ""
+		// splitName is the first candidate that stopped at the platform gate: a case
+		// that exists in this directory's sources, is this leg's only source-side
+		// witness, and is declared in a file only the OTHER CLI leg's build takes. It
+		// is remembered so the row can say so by name, and the walk continues so a
+		// driver this leg's build really has is preferred over the disclosure.
+		splitName, splitProof, splitFile, splitGOOS := "", "", "", ""
 		if len(nails) == 0 {
-			driver, driverProof = p.drivenBy133(leg, shared)
+			skip := map[string]bool{}
+			for {
+				name, proof := p.drivenBy133(leg, shared, skip)
+				if name == "" {
+					break
+				}
+				if file, goos, ok := p.platformSplit133(name); ok {
+					if splitName == "" {
+						splitName, splitProof, splitFile, splitGOOS = name, proof, file, goos
+					}
+					skip[name] = true
+					continue
+				}
+				driver, driverProof = name, proof
+				break
+			}
 		}
 		switch {
 		case len(nails) > 0:
@@ -1487,6 +1541,17 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 			// The bare name travels with the row so the run-roster check below
 			// reconciles the same claim the ledger prints, in the same words.
 			leg.coveredBy = []string{driver}
+		case splitName != "":
+			// The named disclosure ticket 131's shape asks for: the leg is not claimed
+			// as covered on THIS leg (no `=== RUN` for the case here), and the claim is
+			// not red either, because the case does run on the leg whose build takes
+			// the file - and this row, the disclosure line and the evidence all say
+			// which leg, which case and which file. docs/evidence/s1/98-attribution.md
+			// §2 C3 is the measurement that filed this branch: on GOOS=linux the gate
+			// reddened the `slo` leg for a case that runs on the windows leg.
+			leg.covered = fmt.Sprintf("test %s - SOURCE-ONLY on GOOS=%s: %s is not in this leg's build; disclosed, not red (the case runs on GOOS=%s)",
+				splitProof, goos133(), splitFile, splitGOOS)
+			leg.sourceOnly = []string{fmt.Sprintf("%s (%s, taken on GOOS=%s)", splitName, splitFile, splitGOOS)}
 		case adjacent != "":
 			leg.covered = "ruling " + adjacent
 		default:
@@ -1517,11 +1582,14 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 // a method name would be resolved here without receiver types and a coincidental
 // `.stop()` in somebody else's case is not a claim about this leg. Test names are
 // walked in sorted order so the row a reading quotes is the same row the next run
-// quotes.
-func (p *pkg133) drivenBy133(leg *leg133, shared map[string]int) (string, string) {
+// quotes. skip names a case the caller has already accounted for - a claim that stopped
+// at the platform gate (platformSplit133) - so a leg whose first driver is the other
+// leg's case still gets its in-build driver read, instead of the disclosure standing in
+// for coverage this leg really has.
+func (p *pkg133) drivenBy133(leg *leg133, shared map[string]int, skip map[string]bool) (string, string) {
 	var names []string
 	for name := range p.tests {
-		if strings.HasPrefix(name, "Test") {
+		if strings.HasPrefix(name, "Test") && !skip[name] {
 			names = append(names, name)
 		}
 	}
@@ -1649,6 +1717,91 @@ func headRunes135(s string, n int) string {
 	return s
 }
 
+// ---------------------------------------------------------------------------
+// the platform split: an absence the toolchain's own build context explains
+// ---------------------------------------------------------------------------
+//
+// WHY THIS EXISTS (docs/evidence/s1/98-attribution.md §2 C3, measured 2026-11-05).
+// The roster check above finds a `covered=test` claim whose case this round's binary
+// cannot start and reds it - that is the M-G nail, and it stays. But one of the rows
+// it reds is not a coverage debt at all: on the linux leg the `slo` leg is booked
+// driver=Test384ResidentWatchdogEndToEnd, declared in resident_watchdog_windows_test.go,
+// so the ubuntu leg's 226-case roster has no such case and the gate went red on a
+// package that is green on the leg which compiles the case. The census that measured
+// it files the row as "the gate reads 'present in sources, not compiled here' as
+// 'absent'" and points at ticket 131's shape: name it, do not judge it red.
+//
+// THE BOUNDARY THIS KEEPS. A disclosure may only explain an absence the PLATFORM
+// explains. Two independent readings have to agree before a claim is disclosed:
+//
+//	(i) the running binary's own roster does not list the case (already read above),
+//	(ii) every declaration of that name sits in a file THIS leg's build does not take,
+//	     and at least one of those files IS taken by the other CLI leg's build
+//	     (windows: scripts/wisp-cli-tests.sh / the CI test-windows step; linux: the
+//	     ubuntu leg, CGO_ENABLED=1). A case nobody's build takes - a `//go:build
+//	     ignore` line, a stale name - is taken by neither and still reddens, because
+//	     on no leg does it run.
+//
+// The platform answer in (ii) comes from go/build's own constraint matcher, the
+// object the toolchain itself uses, NOT from a tag evaluator written here: ticket 133
+// AC#8 refused teaching THIS reader to imitate the build, and flipping GOOS across the
+// two legs is what keeps a build-tag or GOFLAGS artefact from being mistaken for a
+// platform fact (a tag that excludes a file excludes it on BOTH legs, so it never
+// becomes a disclosure). The matcher is only ever allowed to downgrade a red the
+// roster already produced into a NAMED disclosure; it can never turn an absent case
+// into coverage.
+
+// cliLegs133 are the two platforms this repository runs cmd/wisp under. The ubuntu
+// leg (CGO_ENABLED=1, scripts/wisp-cli-tests.sh's counterpart) and this host's
+// windows leg are the denominators ticket 98's census compared; a case that runs on
+// neither is nobody's witness.
+var cliLegs133 = []string{"windows", "linux"}
+
+// buildTakes133 asks the toolchain's build context whether file is part of this
+// package's build for goos. The current platform is asked exactly as this build is;
+// the other leg is probed with cgo on, because both CLI legs build with it.
+func (p *pkg133) buildTakes133(file, goos string) bool {
+	c := build.Default
+	c.GOOS = goos
+	c.GOARCH = runtime.GOARCH
+	if goos != goos133() {
+		c.CgoEnabled = true
+	}
+	ok, err := c.MatchFile(p.dir, file)
+	return err == nil && ok
+}
+
+// platformSplit133 answers, for one case name this round's roster does not list,
+// whether the platform explains the absence, and names the declaration that proves
+// it: (file, the GOOS that does compile it, true). "" / false when the absence is
+// not explained - including the shape where the name is declared in a file this
+// build takes (then the absence is an instrument inconsistency, not a platform
+// fact) and the shape where no CLI leg's build takes any declaring file.
+func (p *pkg133) platformSplit133(name string) (string, string, bool) {
+	ds := p.tests[name]
+	if len(ds) == 0 {
+		return "", "", false
+	}
+	var excluded []string
+	for _, d := range ds {
+		if p.buildTakes133(d.file, goos133()) {
+			return "", "", false
+		}
+		excluded = append(excluded, d.file)
+	}
+	for _, goos := range cliLegs133 {
+		if goos == goos133() {
+			continue
+		}
+		for _, f := range excluded {
+			if p.buildTakes133(f, goos) {
+				return f, goos, true
+			}
+		}
+	}
+	return "", "", false
+}
+
 // flagValue135 returns the value a flag was given in this process's own command line, in
 // either the -flag=value or the -flag value form, or "" when the flag is absent. The
 // testing package's own flags are visible here, which is how this gate can say out loud
@@ -1685,12 +1838,23 @@ func (p *pkg133) runRosterReds135(legs []*leg133, self string, roster map[string
 			if roster[name] {
 				continue
 			}
+			// The platform branch: when the ONLY declarations of this name sit in a
+			// file this leg's build does not take and the other CLI leg's build does,
+			// the absence is the platform's, not the leg's. The row already says
+			// SOURCE-ONLY by name (coverageReds133), and runRosterDisclosure135 names
+			// it again with leg, case and file; this check must not judge it red, which
+			// is ticket 131's shape and the fix docs/evidence/s1/98-attribution.md §2 C3
+			// asks for. A name whose declaring file this build takes - or that no leg's
+			// build takes - does not reach this branch and stays red below.
+			if _, _, ok := p.platformSplit133(name); ok {
+				continue
+			}
 			where := "declared nowhere in this directory's test sources"
 			if ds := p.tests[name]; len(ds) > 0 {
 				where = fmt.Sprintf("declared at %s", ds[0].site)
 			}
 			reds = append(reds, fmt.Sprintf("leg %q (%s) is booked in the ledger below as covered by the case %q, and this round's test binary has no such case: the roster read from the running binary lists %d startable cases and %q is not one of them, so no \"=== RUN   %s\" line exists in this run or can exist in it. The name is %s, which is the point - the declaration is in the sources and the sources are not the build.\n"+
-				"That is ticket 133's R-133-9, family shot M-G: a func TestXxx(t *testing.T) this platform does not compile cannot run, so it reads no disk, books no record and holds no behaviour, and a row crediting it is a coverage claim with no witness. This is also the reading this file cannot get from its own parser, because the parser is what the plant satisfies. Fix: put the case in a file this build takes (the usual shapes are a `_linux_test.go`/`_windows_test.go` suffix and a //go:build line this platform fails), or take the claim out and let the leg be ruled out in words next to the code that owns it.",
+				"That is ticket 133's R-133-9, family shot M-G: a func TestXxx(t *testing.T) this platform does not compile cannot run, so it reads no disk, books no record and holds no behaviour, and a row crediting it is a coverage claim with no witness. This is also the reading this file cannot get from its own parser, because the parser is what the plant satisfies. Fix: put the case in a file this build takes (the usual shapes are a `_linux_test.go`/`_windows_test.go` suffix and a //go:build line this platform fails), or take the claim out and let the leg be ruled out in words next to the code that owns it. A case that only the OTHER CLI leg's build takes is the one shape this check discloses instead of reddening (see platformSplit133); it has to be declared in such a file, not merely missing from this binary.",
 				leg.key, leg.site, name, n, name, name, where))
 		}
 	}
@@ -1726,8 +1890,20 @@ func (p *pkg133) runRosterDisclosure135(legs []*leg133, roster map[string]bool, 
 		}
 	}
 	sort.Strings(nailsOut)
-	out := fmt.Sprintf("run-roster disclosure: GOOS=%s, %d startable cases read from this binary itself (`-test.list '.*'`); case names this round's ledger credited through `covered=test`: %d distinct, %d of them startable (one outside the roster is red above); this gate's registry: %d claims, %d of them outside this round's roster",
-		goos133(), n, len(driven), len(driven)-len(missing), len(legCovers133), len(nailsOut))
+	var sourceOnly []string
+	for _, leg := range legs {
+		for _, s := range leg.sourceOnly {
+			sourceOnly = append(sourceOnly, fmt.Sprintf("leg %q %s -> %s", leg.key, leg.site, s))
+		}
+	}
+	sort.Strings(sourceOnly)
+	out := fmt.Sprintf("run-roster disclosure: GOOS=%s, %d startable cases read from this binary itself (`-test.list '.*'`); case names this round's ledger credited through `covered=test`: %d distinct, %d of them startable, %d red above; %d claim(s) stopped at the platform gate (named below, not reddened); this gate's registry: %d claims, %d of them outside this round's roster",
+		goos133(), n, len(driven), len(driven)-len(missing), len(missing), len(sourceOnly), len(legCovers133), len(nailsOut))
+	if len(sourceOnly) > 0 {
+		out += fmt.Sprintf(" - %s. These cases are declared in a file THIS leg's build does not take and the other CLI leg's build does (go/build's own matcher says so on both legs), so the absence is the platform's, not a coverage debt: the row says SOURCE-ONLY by name, the case runs on the leg that compiles it, and docs/evidence/s1/98-attribution.md §2 C3 is the census that filed this shape. Ticket 133's R-133-9 (M-G) is unaffected: a name whose declaring file this build DOES take, or that no leg's build takes, is red above.", strings.Join(sourceOnly, "; "))
+	} else {
+		out += " - no coverage claim in this round's ledger stopped at the platform gate."
+	}
 	if len(nailsOut) > 0 {
 		out += fmt.Sprintf(" - %s. A registry nail the build does not take is disclosed here and not reddened, because the leg it nails is installed and driven on the leg that does compile it: scripts/wisp-cli-tests.sh is the windows leg where these run (this file's header, third limit).", strings.Join(nailsOut, ", "))
 	} else {
