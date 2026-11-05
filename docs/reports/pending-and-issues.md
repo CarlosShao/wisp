@@ -31115,3 +31115,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 383（config-r1 a1fc94b3b）：already-landed；我复核 ancestor rc0／manager.go diff 0 行／config 测试绿；反向控 overlay IO 发红 @:119（解析发 PASS）已复现还原。翻 AC#1-6、Status→done、裁决件 docs/evidence/s1/383-verdict.md、改名＋双名核=1。
 - 71（08c4c51e2 写腿 PASS）：cmd/balldebug -diff 阈值门（px_delta/缺行/零定时器）8 测试 red→green；我复验 build/test/gofumpt/d22 绿。★未闭：AC#4 ban#6／AC#5 CI 真红(需 push)／AC#6 注册表(写面外)／AC#7 对抗验收(非实现者)——留后续 wave。
 - 194：三档普查误分为 internal/tools；真写面＝internal/panel（bridge.go 常量＋guard＋router＋inbound_roster_253 同批），且前提过期（248/320 已使 spec∩answered=2 非 0）。改派需 internal/panel 面、与 panel 写腿串行。
+
+## A1534（2026-11-05 10:2x，编排者）175轮：收一浪三腿（245/346/23）落 fleet-切片，我自验三把尺全绿
+- 245 AC#7（internal/ball）：借被拒的归还把 cancel 槽写回 idle（非 registration failed）；red 逐字（before=registration failed/want not bound while idle）、green 三 PASS；M1/M2 overlay 突变真咬、正控保票260收据。commit 02799be92+ce6f556d9。★未闭：AC#4 阻塞228／AC#6①② 出写面／AC#8/9 真机。
+- 346 AC#3（probes/346/a1，13 件）：ci-red-attribution.sh 空名册 exit5 拒答＋正控先于归因＋离线缝；selftest 34/34；真两发 CI log top FAIL=16、unique red=14。commit 1f298db54。★未闭：AC#1 选形（须非实现者；甲支须 CI 人工批准）／AC#2/4 须已选形+CI/Linux／342 未 done。
+- 23 AC#2 loop+llm 半边（6 源+4 测）：mem: 句柄图像仓库、三适配器按协议送图（openaichat tool文本+user图像轮／anthropic tool_result／native openairesponses input_image）。commit a67e1d335。★AC#2 tools 半边出写面（tool.go Result 图像通道／bridge.go Images／system.go 假话注释 3 处）→ 下波 23-tools 补；AC#3 需真机+前端。
+- 我自验：go build rc0；go test ball(245)／agent+openaichat/anthropic/openairesponses(23) 全 ok；gofumpt 空；d22scan clean；346 bash -n ok。Test31DisarmStopsTheWait 为计时敏感既有红（与本浪无关，单跑曾 3红2绿）。
