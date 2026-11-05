@@ -31144,3 +31144,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 213 PASS（84e4cc78d+c497ee63e）：internal/command 命令名册第一格（可枚举/命令行执行），四发变异逐发红；★Production() 生产调用者=0（AC#4 终态残）。
 - 21 腿死（res=null，无脏、无提交）。
 - 我自验：build ./internal/command rc0、test ok、gofumpt 空、ci.yml 第293行已 @v0.12.0。
+
+## A1538（2026-11-05 12:3x，编排者）179轮：收 wave5 全 PASS；★Test229 仓库级红清掉；98 普查撞出 C2 真 bug
+- 29-r2（8a75004ce）：清仓库级红 Test229SpawnNamesAreRosterShaped——spawn229ReviewedSites 增登 internal/memory/l1_warm.go:221 的 l1ExtractGoroutine（本就在 D38b TemporaryNames）；生产 l1_warm.go 净 0 字节改动，断言零放宽。★我自验：go test -run Test229SpawnNamesAreRosterShaped → **ok**（原红、惠及每包 go test）。
+- 21-r1（a980734f0）：派单两项前提均**不成立**——"拆 loop 预闸"=STALE（loop.go:919-924 已有 AdmitTask 白名单、生产 run.go:1589 已接、拆了会撤 loop_approval_test 失败安全网）；"装 Gate"=DONE。改做 AC#1 倒计时数据面（EventWarning Remaining 按 clock 算，不再写死 g.window）。★21 段 2（卡片渲染/球视觉/状态机驱动）全在写面外＝owner。
+- 213-ac4（e198c3fd2）：Production() 调用者 0→1（console `wisp commands`），AC#4 名册可见+命令行执行落；页面半（snapshot key/C17 closed set）仍需 A##。
+- 98 普查（98-attribution.md 27KB）：ubuntu 81 红（非 19）、80 可归因；★**C2＝config_readers_255.go 名册漂移**（干净快照 Windows 逐字同红）⇒ CI test-windows 步不可能绿，是真 bug；建议 255/133/119 各开腿；76 枚 C1（DPAPI stub）需政策="decision 加 //go:build windows（移出 ubuntu 分母）vs 换 env: ref（留分母但动别票夹具）"＝owner。
+- 我自验：Test229 PASS、build ./internal/agent/... ./internal/command ./cmd/wisp ./internal/tools rc=0、agent/command tests ok、gofumpt 空、d22 clean。
