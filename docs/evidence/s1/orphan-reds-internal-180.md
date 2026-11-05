@@ -2,7 +2,7 @@
 
 **票/轮**：ORPHAN-RED REPAIR · 180 轮（派单只给「internal/**，⛔ cmd/wisp 及其测试」）。
 **锚定树**：`3ff1b1395`（HEAD）。**时间**：2026-11-05 13:00–13:2x +08。
-**Status**：证据件（非实现者裁决另派）。本件记录的改动只有三处：
+**Status**：证据件（非实现者裁决另派）。本件记录的改动只有四处 ＋ 本文件：
 `internal/proc/treemetrics_windows.go`、`internal/agent/reminder_timer.go` 两处生产代码，
 `internal/proc/snapshot_growth_180_test.go`、`internal/agent/reminder_disarm_race_180_test.go` 两枚新测试，
 以及本文件。**未碰** `cmd/wisp/**`、`internal/risk/**`（冻结）、`internal/panel/**`、`frontend/**`、`design/**`。
@@ -19,7 +19,7 @@
      修的是 `NtQuerySystemInformation` 的**重试规则**（照抄 required ⇒ 系统在长就永远差一步）。
    - `internal/agent` `Test31DisarmStopsTheWait` —— 账册 A1477 逐字写「**未在任何账册/票面出现**，疑计时敏感/待核」；
      实测**不是计时敏感，是 select 在 `stop`＋`ready` 同时就绪时随机取**（`-count=4` 得 3 红 1 绿）。
-4. 门禁（§5）：`go build ./internal/...` rc=0、两包 `go test -count=1` ok、`gofumpt -l` 空、`sh scripts/d22scan.sh` rc=0。
+4. 门禁（§5）：`go build ./internal/...` rc=0、两包 `go test -count=1` ok、`gofumpt -l`（四个改动文件）空、`sh scripts/d22scan.sh` rc=0。
 
 ## 1. 前提核对：98 归因的 81 枚红，住在哪？
 
@@ -54,7 +54,7 @@ sed -n '113,193p' docs/evidence/s1/98-attribution.md | awk -F'|' '{print $4}' | 
 | # | 红 | 包 | 第一条红（逐字） | 根因 | 归谁 | 本腿 |
 |---|---|---|---|---|---|---|
 | 1 | `Test31DisarmStopsTheWait` | `internal/agent` | `reminder_timer_test.go:370: 取消后仍发了 1 条通知` | `run()` 的 `select`：Disarm 关掉 `stop` 之后、协程仍未进 select 时 Advance 又放了 `ready` ⇒ 两个 case 同时就绪，Go 随机取 ⇒ 一半的跑法照样 `fire`，而假行还是 armed ⇒ 通知发出 | 票 31 **已 done**；账册 A1477 逐字：「**未在任何账册/票面出现**，疑计时敏感/待核，⛔ 未证为回归」⇒ **孤儿** | **修**（§3.2） |
-| 2 | `TestExternalSamplerTracksSubjectGrowth` | `internal/proc` | `externalsampler_windows_test.go:86: first ReadTree: resource: proc: external system process snapshot: NtQuerySystemInformation: buffer never sufficient (last 1143584 bytes)` | 重试规则照抄 `RequiredLength`；系统进程/线程数在两发之间还在长 ⇒ 每一发都比自己要的尺寸晚一步 ⇒ 8 发（旧 6 发）全 mismatch | 票 66 **已 done**，票面残口①逐字：「`NtQuerySystemInformation: buffer never sufficient`（200 次读 1 次）**未修**，归票 71 之后的仪器批次」——那批从没来 ⇒ **孤儿** | **修**（§3.1） |
+| 2 | `TestExternalSamplerTracksSubjectGrowth` | `internal/proc` | `externalsampler_windows_test.go:86: first ReadTree: resource: proc: external system process snapshot: NtQuerySystemInformation: buffer never sufficient (last 1143584 bytes)` | 重试规则照抄 `RequiredLength`；系统进程/线程数在两发之间还在长 ⇒ 每一发都比自己要的尺寸晚一步 ⇒ 旧规则 6 发**全** mismatch | 票 66 **已 done**，票面残口①逐字：「`NtQuerySystemInformation: buffer never sufficient`（200 次读 1 次）**未修**，归票 71 之后的仪器批次」——那批从没来 ⇒ **孤儿** | **修**（§3.1） |
 | 3 | `TestComposerContractTypesMatchFrontend` | `internal/panel` | `composer_test.go:78: Go ComposerState emits [files] that interface ComposerState does not declare` | Go 侧发 `files`，`frontend/**` 的 `interface ComposerState` 没声明 | 前端（114-v2 已列「live 5 红既有集」） | **STOP**：要改 `frontend/**` |
 | 4 | `TestC21DesignTokensFourWayAgree` | `internal/panel` | `tokens_fourway_test.go:726: docs/evidence/s1/c21-native-tokens.md:58: the table names Palette.GlassRing, but internal/ball/tokens.go holds no such colour literal in DarkPalette()` | 四向对账：证据表 78 色行 vs `internal/ball/tokens.go` 37/35 vs `frontend/scripts/gen-tokens.mjs` 43 | 设计/前端（D29 视觉面）＋证据表 | **STOP**：测试的四条腿有两条读 `frontend/**`，缺的两枚色值属设计面 |
 | 5 | `TestC26RewriteAccountIsConsumedAtEverySecurityLeg` | `internal/risk` | `pathresolver_rewrite_account_test.go:200: ..\..\cmd\wisp\panel_pump.go:283 reads Result.Canonical without reading the rewrite account (Actable/Rewritten)` | 新消费者读 `Canonical` 不看 rewrite account（票 102 的洞） | A380／票 189+190 | **STOP**：测试住在**冻结**的 `internal/risk`，且四个违规站点里两个在 `cmd/wisp/panel_pump.go`（本腿禁写） |
