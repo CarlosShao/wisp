@@ -16,6 +16,7 @@
 | R9 的登记处 | `371-iswidening-...-done.md:242`：`R9`（待人拍板，⛔ 本票自决）＝〔甲〕扩 M4 让所有变宽出卡 ⇒ 须摆机主；另见 `:7` Status 行「★R9 扩 M4＝待机主、已列入摆机主清单」 |
 | 机主授权 | 台账 `A1541`（`docs/reports/pending-and-issues.md:31174`）逐字「按推荐 → **R9 全弹卡（所有变松动作都出确认卡）批准**」 |
 | 派单 | 台账 `A1542`（`:31187`）「机主上轮已批 51-AC#3/347/R9 ⇒ 本波起派 51-B/339/R9」 |
+| wave9 派单原文 | `.scratch/wisp/probes/orch/20261105/txt/wave9-182-dispatch.txt:4` 逐字「R9 (自定面)：机主批"所有变松动作都出确认卡"，Go 侧把 loosening 都引到卡/审批队列；**STOP 若需 frontend/risk冻结/cmd-wisp**」；`:5`「本波不分配 cmd/wisp 写腿（**若面落 cmd/wisp ⇒ STOP**）」 |
 | 371 票状态 | `Status: done`（2026-11-05，A1529：R1–R8 DONE、**R9 surfaced**）。按「withdrawn/done ⇒ STOP」的字面本可整腿停工；因 R9 已被机主批、本波点名派出，本腿按「371 之外的独立工作项」处理，**停因不是 done，是写面越界（见 §2）**。 |
 
 ## 1 三条核（THREE-CORE）
@@ -140,6 +141,9 @@ func JudgeCard(from, to risk.Mode, channel bool) CardGate { /* 同三态，判�
 
 - `docs/evidence/s1/R9-stop-cmdwisp-face.md`（本文件）。零产码、零 `_test.go`、零 `cmd/wisp`、零 `internal/command`。
 - 未翻任何票面 `[ ]`／`Status:`／`-done`；未改 `M4` 任何断言；未 push。
+- 共享工作树的并行读数（**非本腿**）：本腿运行期间（14:51 前后）同浪 `339-r2` 腿在改
+  `internal/risk/anchor_miss_reason_334_test.go`、`internal/risk/anchor_miss_reason_339_other_test.go`（去掉 windows build tag／加 339 格）；
+  我的提交用了显式 pathspec，只含本文件。
 
 ## 7 给编排者的一句话
 
