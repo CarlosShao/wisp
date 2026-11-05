@@ -31192,3 +31192,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 51-B 腿死（res=null，无脏无提交）。
 - 我自验：build ./cmd/... ./internal/... ./tools/... rc=0；internal/risk -run 339 定向 ok；gofumpt 空；d22 clean；internal/risk 整包红＝C26 既有（panel_pump/git_readonly_exec，非339）。
 - 动作：下波给 R9 一条 cmd/wisp 写腿（唯一，照 §4，含 internal/command）。
+
+## A1544（2026-11-05 15:5x，编排者）机主第9条裁定＝③（406 结案）；第3条问"黑名单"来历已查证待讲
+- 票406 C6 POSIX 哨兵：机主裁定 **③＝维持各认各的并登记、不改代码**。功能安全（POSIX 拒绝确实发生），只是测试期望的错误代号写错（断言 winsec.ErrUnresolvedPath、实际 risk.ErrReparseDenied）。⇒ 406 Status=done、POSIX 保留 1 枚 known-red 登记、不再重派。撤销口令：机主改口「406 走②」可重开改 cmd/wisp 测试断言。文件 git mv 至 -done，双名核=1。
+- 第3条（黑名单）：机主问"主流都是白名单命令，何时搞出黑名单？" 编排者查证：Wisp 白名单(ShellAllowlist 命令/目录白名单/域名白名单)与主流一致；"黑名单"＝**敏感路径黑名单**（internal/risk/blacklist.go：A 级绝对禁不可覆盖、B 级默认禁一次 L2+日志才放行，如 ~/.ssh/.git-credentials/.aws/浏览器密码库），是白名单**之下**的安全地板，PLAN D30(1064/1094) 立、并引 Codex read_only_subpaths 佐证。`risk.blacklist_overrides`＝B 级豁免清单；AC#4＝是否让配置一写就静态放行（绕过运行时点卡）⇒ 推荐维持不做。待机主一句确认。
