@@ -61,6 +61,13 @@ type EventKind string
 
 // The events.
 const (
+	// EventTick is the per-frame countdown update. It has NO producer in this
+	// tree and this ticket does not add one: every Update is printed verbatim by
+	// the console surface (cmd/wisp's consoleApprovalUI.Update), so a frame-rate
+	// tick would write a line per frame into the operator's log. The live
+	// countdown value a strip needs is carried by the EventWarning this route
+	// already emits (Remaining, honest since ticket 21's countdown reading); a
+	// host that wants a smooth ring owns the cadence on its own side.
 	EventTick      EventKind = "tick"      // L1 countdown still running
 	EventWarning   EventKind = "warning"   // C18 last-30s prominent warning
 	EventDismissed EventKind = "dismissed" // prompt gone (answered/expired)
@@ -68,6 +75,12 @@ const (
 )
 
 // Event is one transient update about a live prompt.
+//
+// Remaining is the live time left in whatever the event is about - the rest of
+// the L1 block, or the rest of the C18 deadline - read from the same Clock the
+// deadline itself was armed with (gate.go's remainingIn). It is NEVER the
+// configured length: a strip that draws a countdown from this field must see it
+// shrink. Zero means "not a countdown" (dismissed / started), not "time is up".
 type Event struct {
 	Kind          EventKind
 	CorrelationID string

@@ -117,6 +117,12 @@ type window struct {
 	ctx  context.Context
 	corr string
 	tool string
+	// start is when this block began counting, stamped from the layer's Clock.
+	// The deadline channel armed beside it stays the ONE authority over when the
+	// window ends; start exists only so the strip/card can be told how much of
+	// the block is left right now (remainingIn) instead of being handed the
+	// configured length again. Read-only after construction, so no lock.
+	start time.Time
 	// taskID is the task the call belongs to, filed alongside the correlation and
 	// not derived from it (the two differ as soon as a host supplies its own
 	// correlation id). It exists for one thing only: the read-only enumeration in
@@ -354,7 +360,11 @@ func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answe
 	}
 
 	corr := orDefaultText(d.CorrelationID, d.TaskID)
-	w := &window{ctx: ctx, corr: corr, tool: d.Tool, taskID: d.TaskID, vetoes: make(chan Veto, len(allChannels)+1)}
+	w := &window{
+		ctx: ctx, corr: corr, tool: d.Tool, taskID: d.TaskID,
+		vetoes: make(chan Veto, len(allChannels)+1),
+		start:  g.clock.Now(),
+	}
 	if !g.openWindow(w) {
 		return tools.AnswerReject, "同一 correlation_id 已有确认窗口在跑，无法重复登记，已 fail-closed 拒绝"
 	}
@@ -362,7 +372,10 @@ func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answe
 
 	// Armed BEFORE the prompt is delivered: the countdown belongs to the
 	// window, not to the UI's repaint, and arming after Prompt() would make
-	// "the strip took 4s to draw" silently extend a 3s block.
+	// "the strip took 4s to draw" silently extend a 3s block. w.start was
+	// stamped immediately before openWindow, from the same Clock, so the two
+	// agree on when the block began; the channel below remains the only thing
+	// that can END it.
 	deadline := g.clock.After(g.window)
 
 	p := g.promptFor(d, corr, g.window, 0, bv, "")
@@ -380,7 +393,7 @@ func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answe
 			if err := g.channels.check(v.Channel); err != nil {
 				g.logf("approval: veto on unloaded channel corr=%s: %v", corr, err)
 				_ = g.ui.Update(ctx, Event{
-					Kind: EventWarning, CorrelationID: corr, Remaining: g.window,
+					Kind: EventWarning, CorrelationID: corr, Remaining: g.remainingIn(w),
 					Text: err.(*ChannelError).Msg,
 				})
 				continue
@@ -443,6 +456,34 @@ func (g *Gate) closeWindow(corr string) {
 	g.mu.Lock()
 	delete(g.windows, corr)
 	g.mu.Unlock()
+}
+
+// remainingIn reports how much of w's block is left at the instant of the call,
+// from the layer's ONE Clock (D42#9). It exists because Event.Remaining is what
+// a strip/card draws its countdown from, and until ticket 21's countdown reading
+// the only number this route handed out was the CONFIGURED length: a warning
+// raised 2.5s into a 3s block said "3s left" - a ring driven by that value sits
+// at full and then jumps to zero, which is exactly the kind of instrument that
+// looks fine and reports nothing.
+//
+// This is a REPORT, not an authority: the deadline channel armed beside w.start
+// is still the only thing that ends the window, and nothing here can shorten,
+// extend or answer it. Overshoot clamps to zero so a read a moment after the
+// deadline cannot report negative time, and the value never exceeds the block
+// length (a clock read before the deadline channel fires may differ by the few
+// instructions between the two calls).
+func (g *Gate) remainingIn(w *window) time.Duration {
+	if w == nil {
+		return 0
+	}
+	left := g.window - g.clock.Now().Sub(w.start)
+	if left < 0 {
+		return 0
+	}
+	if left > g.window {
+		return g.window
+	}
+	return left
 }
 
 // markStarted moves a correlation from "asking" to "running" for D31 tracking.
@@ -514,7 +555,7 @@ func (g *Gate) Veto(v Veto) error {
 			ce := &ChannelError{}
 			if errors.As(err, &ce) {
 				_ = g.ui.Update(w.ctx, Event{
-					Kind: EventWarning, CorrelationID: w.corr, Remaining: g.window,
+					Kind: EventWarning, CorrelationID: w.corr, Remaining: g.remainingIn(w),
 					Text: ce.Msg,
 				})
 			}
