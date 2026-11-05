@@ -171,6 +171,7 @@ TEST_RC=1
 | 回归（任务指定的两包） | `go test ./internal/winsec ./internal/memory -count=2 -timeout 420s` | `TEST_RC=0`；`ok winsec 72.518s` / `ok memory 84.235s`；`--- FAIL` **0** |
 | 格式 | `/d/work/base/gopath/bin/gofumpt.exe -l internal/winsec/ internal/memory/` | **空**（`GOFUMPT_RC=0`，`GOFUMPT_EMPTY`） |
 | D22 | `sh scripts/d22scan.sh` | `D22_RC=0`，`clean - no D22 ban violations`；scope 计数与复核腿一致（bans #1-5 internal/=363、cmd/=58，ban #6 frontend/=116，ban #7 internal/tools/=48，ban #8 design/=39、frontend/=116、internal/=904、cmd/=211，不降） |
+| 逐条点名（补充） | `go test ./internal/winsec ./internal/memory -count=1 -timeout 420s -v` | `RUN=320 / PASS=179 / FAIL=0 / SKIP=2`，`ok winsec 41.360s` / `ok memory 50.589s`；SKIP 点名 `TestSubprocessCrashWriter`、`TestAppendSessionTurnCrashChild`（均为既有环境条件用例，与 `103-head-reappraisal.md` §7 的 2 条一致；`=== RUN` 计数含子用例） |
 
 门禁跑完复查：`git status --porcelain internal/memory internal/winsec` 仍空 ⇒ 本腿没有在生产写面留下任何改动。
 
