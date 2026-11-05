@@ -472,7 +472,13 @@ type RiskSection struct {
 	AllowShellString bool `toml:"allow_shell_string" default:"false"`
 	// ShellAllowlist is the command allowlist for shell tools.
 	ShellAllowlist []string `toml:"shell_allowlist"`
-	// BlacklistOverrides are B-tier blacklist exemptions (per entry).
+	// BlacklistOverrides are the persisted B-tier exemptions (per entry, one
+	// file each). Ticket 230 AC#4 (owner ruling 2026-11-05, ledger A1549) made
+	// this a real setting: validateBlacklistOverrides canonicalizes every entry
+	// through the C26 resolver and refuses entries that name an A-tier path
+	// (absolutely denied, never overridable) or that match no B-tier rule (an
+	// exemption that could never fire). The gate's own rule is unchanged: an
+	// exemption is a default-deny exception for one file, never a blanket allow.
 	BlacklistOverrides []string `toml:"blacklist_overrides"`
 	// PermissionMode is the user-facing permission mode (ticket 90, R20/M1):
 	// "ask_every_step" (default, strictest) | "ask_high_risk" | "auto_approve".

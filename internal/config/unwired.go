@@ -76,12 +76,11 @@ var unwiredKeys = []unwiredKey{
 		lands:   "it lands with the shell.exec tool (SPEC-06 sec 10)",
 		fires:   func(c *Config) bool { return len(c.Risk.ShellAllowlist) > 0 },
 	},
-	{
-		path:    "risk.blacklist_overrides",
-		missing: "nothing populates the bOverrides map risk.Gate reads: ticket 90 gave Gate a production call site (internal/tools readBlacklist, which feeds the card and the security log), but the confirmations that would fill this map are minted only by an L2 answer, and that flow is ticket 21's approval queue",
-		lands:   "the contract defines a B-tier exemption as a runtime event - one L2 confirmation plus a log line (SPEC-06 sec 4.1), which lands with the approval queue, ticket 21; wiring a static pre-authorization instead would need D22 (ticket 80 AC#2), because a file on disk cannot have clicked anything",
-		fires:   func(c *Config) bool { return len(c.Risk.BlacklistOverrides) > 0 },
-	},
+	// risk.blacklist_overrides used to sit here. Ticket 230 AC#4 (owner ruling
+	// 2026-11-05, ledger A1549) opened the B-tier exemption as a user-persisted
+	// path instead: the key is now validated and canonicalized at load
+	// (overrides.go), A-tier entries are refused, and the row is gone - a
+	// load-time error must not outlive the capability that justified it.
 	{
 		path:    "net.allowlist",
 		missing: "risk.NetTarget.Allowlist has no production writer, and no web/open tool exists to build one, so R5's domain gate never runs",
@@ -123,7 +122,7 @@ var lockedKeyDisposition = map[string]string{
 	"risk.shell_enabled":       "unwired:risk.shell_enabled",
 	"risk.allow_shell_string":  "unwired:risk.allow_shell_string",
 	"risk.shell_allowlist":     "unwired:risk.shell_allowlist",
-	"risk.blacklist_overrides": "unwired:risk.blacklist_overrides",
+	"risk.blacklist_overrides": "consumed: validated and canonicalized at load (overrides.go, ticket 230 AC#4: B tier only, A tier refused); the list is the persisted exemption set tools.Options.Confirmations will key for risk.Gate's bOverrides map - that arming is the remaining wiring leg, named in docs/evidence/s1/230-ac4-config-half.md",
 	"risk.permission_mode":     "consumed: Config.PermissionMode is read per tool call by the bridge (internal/tools), persisted by Manager.SetPermissionMode; ticket 90",
 	// [fs]
 	"fs.allowed_dirs":             "consumed: cmd/wisp/run.go feeds the C26 canonicalizer",

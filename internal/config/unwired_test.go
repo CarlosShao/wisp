@@ -22,7 +22,6 @@ var unwiredCases = []struct {
 	{"risk.shell_enabled", "[risk]\nshell_enabled = true\n", "shell.exec"},
 	{"risk.allow_shell_string", "[risk]\nallow_shell_string = true\n", "shell.exec"},
 	{"risk.shell_allowlist", "[risk]\nshell_allowlist = [\"git\"]\n", "shell.exec"},
-	{"risk.blacklist_overrides", "[risk]\nblacklist_overrides = [\"D:\\\\secret\"]\n", "ticket 21"},
 	{"net.allowlist", "[net]\nallowlist = [\"api.example.com\"]\n", "ticket 22"},
 	{"net.block_private_ranges", "[net]\nblock_private_ranges = false\n", "D22"},
 }
@@ -244,7 +243,7 @@ net_allowlist = ["a.example"]
 host_api = ["fs"]
 `)
 	if _, _, err := LoadFile(path, nil); err != nil {
-		t.Fatalf("only the six named keys are guarded, this config must load: %v", err)
+		t.Fatalf("only the five named keys are guarded, this config must load: %v", err)
 	}
 
 	// A key that is genuinely unknown is still the decoder's job, and its
@@ -267,13 +266,21 @@ host_api = ["fs"]
 // marshal/decode symmetry still has to hold, because the day ticket 21/22 lands
 // the consumer the row disappears and the GUI double-source guard (D36 rule 4)
 // must already cover them. validate() is deliberately bypassed here.
+//
+// risk.blacklist_overrides is no longer one of the guarded keys (ticket 230
+// AC#4 made it a real setting), but it stays in this fixture: its byte-level
+// symmetry is still a schema property, and since the ticket it ALSO has to
+// survive the load validator, which canonicalizes it. The fixture entry is
+// therefore a B-tier shape (a ".env" leaf under a temp root) rather than the
+// old placeholder, which validateBlacklistOverrides would now refuse.
 func TestUnwiredKeysStillRoundTripAtTheByteLevel(t *testing.T) {
+	override := filepath.Join(sealableTempDir124(t), ".env")
 	c := NewDefaults()
 	c.SchemaVersion = SchemaVersionCurrent
 	c.Risk.ShellEnabled = true
 	c.Risk.AllowShellString = true
 	c.Risk.ShellAllowlist = []string{"git", "go"}
-	c.Risk.BlacklistOverrides = []string{"B-1"}
+	c.Risk.BlacklistOverrides = []string{override}
 	c.Net.Allowlist = []string{"api.example.com"}
 	c.Net.BlockPrivateRanges = false
 
@@ -299,7 +306,7 @@ func TestUnwiredKeysStillRoundTripAtTheByteLevel(t *testing.T) {
 	}
 	if !back.Risk.ShellEnabled || !back.Risk.AllowShellString ||
 		!equalStrings(back.Risk.ShellAllowlist, []string{"git", "go"}) ||
-		!equalStrings(back.Risk.BlacklistOverrides, []string{"B-1"}) ||
+		!equalStrings(back.Risk.BlacklistOverrides, c.Risk.BlacklistOverrides) ||
 		!equalStrings(back.Net.Allowlist, []string{"api.example.com"}) ||
 		back.Net.BlockPrivateRanges != false {
 		t.Fatalf("guarded keys lost their values in the round trip: %+v %+v", back.Risk, back.Net)

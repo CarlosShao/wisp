@@ -29,6 +29,7 @@ func validate(c *Config) error {
 		validatePrivacy(c),
 		validateModels(c),
 		validateRisk(c),
+		validateBlacklistOverrides(c),
 		validateUnwired(c),
 		validateCost(c),
 		validateObserve(c),
