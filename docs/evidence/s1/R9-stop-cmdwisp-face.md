@@ -35,7 +35,7 @@
 | 位置 | 现读 |
 |---|---|
 | `internal/perm/direction.go:23` | `func RequiresCard(to risk.Mode) bool { return to == risk.ModeAutoApprove }` |
-| `internal/perm/direction.go:57-65` | `JudgeCard(to, channel bool)`：`GateNoCard / GateNoChannel / GateAsk`（唯一判决，两处调用） |
+| `internal/perm/direction.go:57-65` | `JudgeCard(to, channel bool)`：`GateNoCard / GateNoChannel / GateAsk`（唯一判决；生产调用点实为三处：`perm`／`panel`／`roster`） |
 | `internal/perm/store.go:348` | `switch JudgeCard(to, s.confirm != nil)`；`GateAsk` 分支要「**被回答过的** `Card`」（371）＋ R6 内层 nil 兜底（`:370-376`） |
 | `internal/panel/composer_handlers.go:176` | `if perm.JudgeCard(to, h.Confirm != nil) == perm.GateNoChannel`（面板半） |
 | `internal/command/roster.go:287` | `switch perm.JudgeCard(to, env.CardChannel)`（**第三处**生产调用点，回答「这条命令要不要卡」） |
