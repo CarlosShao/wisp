@@ -31129,3 +31129,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 107 复判（107-verdict.md）：AC#3/AC#5 **被票 23 挡**——HEAD 上 GOOS=linux go test -c ./internal/tools rc=1（system_ops_other.go 缺 platformSystemBackend）＋ system_backend_windows.go:337/355 unsafe.Pointer vet 红，均属票 23 WIP。⛔ 当前 HEAD 挂 done；待 23 补 system_ops_other.go+修 unsafe 后同批复跑。
 - 108 复判（108-verdict.md）：AC#1-4 全通过（AC#3 POSIX 链接腿由票 113 3c5d1c3 落地、R-108-1 关闭）；AC#5 门禁红全归因他票（TestC26RewriteAccount=A380；memory 两枚跨平台用例）。108 自身无需改码——待裁是否按"AC#1-4过+AC#5红归他票"结案。
 - 我逐包自验 build rc0 已入；无禁改面。
+
+## A1536（2026-11-05 11:2x，编排者）177轮：收 wave3 全 PASS（23-posix/323-ac5/51-ac5/182 普查），我自验绿
+- 23-posix（bb237e441）：新增 internal/tools/system_ops_other.go（!windows，platformSystemBackend→nil,ErrNoSystemBackend，不接 xdotool/AppleScript shim）；system_backend_windows.go:337/355 改 GlobalSize+RtlMoveMemory 双拷贝（去 unsafe 伪造指针）。★我自验：go vet ./internal/tools rc=0（原 rc1）、GOOS=linux CGO_ENABLED=0 go build ./internal/tools rc=0（原 rc1）、容器 POSIX 真跑 28/28 PASS。**⇒ 解 107/108 POSIX AC#3/#5 的"被票 23 挡"依赖**。
+- 323-ac5（d1b1a2d22）：AC#5 protocol 分层断言（settings_320_test.go +25/-11，m5 isProtocol→true 转红、拒因不含 refusalInvalid，照 527d483f）。go test ./internal/config ok。
+- 51-ac5（eafb13d5f）：AC#5 Tier2 启用门（internal/plugin/tier2_gate.go 272 行+448 行 5 测试，默认关=无对象、开须 L2 裁决、逐插件关、D37 拒绝；五发变异全红）。★51 AC#3 C24 GojaHostAPI 初始集=需 owner 批（改契约文字，A1451 已摆机主）。
+- 182 普查（docs/evidence/s1/182-census.md 31KB）：task-monitor 10 堆三档归口；关键新读数：K5 插件"库里有读面无生产装配无规格"＝无票认领（须立票或摆 owner）；AC#5 雷区 6→4 枚现存写形状；行号漂移十四行表现 PLAN.md:3499-3512。
+- 我逐包自验：build ./internal/tools ./internal/config ./internal/plugin ./cmd/wisp rc=0；三组测试 ok；gofumpt 空；d22scan clean（internal/tools=48）。
