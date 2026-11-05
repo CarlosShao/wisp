@@ -1,0 +1,2 @@
+test-core	Portable package tests	2026-10-18T20:00:00.0000000Z --- PASS: TestFixtureGreen (0.01s)
+test-core	Portable package tests	2026-10-18T20:00:00.5000000Z --- SKIP: TestFixtureSkipped (0.00s)

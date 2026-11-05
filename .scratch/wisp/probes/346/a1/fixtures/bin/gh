@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Fixture gh used only by selftest.sh check 6: any run id fails to fetch.
+echo "gh: fixture failure" >&2
+exit 7

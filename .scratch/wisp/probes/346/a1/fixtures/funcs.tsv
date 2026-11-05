@@ -1,0 +1,2 @@
+TestFixtureKnownByFile	internal/winsec/fixture_owner_test.go
+TestFixtureKnownByLedger	internal/winsec/ledger_owner_test.go

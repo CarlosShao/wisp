@@ -1,0 +1,4 @@
+# Ticket 346 AC#3 bench. The fixture log/tsv files are read with exact
+# anchors (awk ^---) and fixtures/bin/gh is a shebang script, so CRLF breaks
+# both on a Windows checkout (core.autocrlf=true). Pin this subtree to LF.
+* text eol=lf
