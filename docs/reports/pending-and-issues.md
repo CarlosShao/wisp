@@ -31095,3 +31095,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 371-v2p（22a414e52+12290c139 非实现者终裁）：R6 PASS／R7 PASS／M4 byte-identical／R1-R8 DONE、仅 R9 余；建议 closeable with R9 surfaced。
 - 收口 55e62d4a0：翻 primed AC#0/1/2/2b/5、Status→done、并入 r1p 证据、改名＋双名核=1。（原文 AC#0-4 按改写约定保留不翻。）
 - ★R9（扩 M4 让所有变松档都出卡）＝机主 2026-09-21 定案、须摆机主：问题＝把档位从「每步都问」放松到「仅高风险问」是否也应出卡？→ 并入摆机主清单。
+
+## A1530（2026-11-05 09:1x，编排者）171轮：114 收口＝本会话第 33 枚（done-but-not-closed；AC#6残余/AC#11作废）
+- 114-a1p（b698bd99e 只读核）：可收口 YES；371 改 composer_handlers.go 未 weaken 114 六枚断言（仅夹具 error→Card、行号+1）；AC#2 门在 composer_handlers.go:176 perm.JudgeCard；未勾恰 {AC#6,AC#11}；仅 1 预存红 TestComposerContractTypesMatchFrontend（前端 ComposerState.files＝owner③）。
+- 收口：Status→done（纠正 in-progress 与 9 个 [x] 矛盾）、AC#6 保持未勾＝残余（真机截屏/GUI-CI）、AC#11 保持未勾＝作废（frontend）、改名＋双名核=1。
+- 残余登记：AC#6 真机 WebView2 差分截屏（需 GUI 会话/CI；本机 cmd/wisp MARK299 死）。

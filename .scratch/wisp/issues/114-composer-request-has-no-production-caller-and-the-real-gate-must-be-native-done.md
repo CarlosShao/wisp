@@ -6,10 +6,11 @@
 > 领这票的代理**只做非前端腿**，AC#6 那格**保持未勾**并在 Progress log 写 `skipped=frontend(owner-delegated)`，
 > **不许替它勾、也不许"只改一角"继续写**。判据：**先把要写的文件列出来，有一枚在 `frontend/` 下就整段停手上报**。
 
-**Status:** in-progress（2026-09-23 10:4x `agent-ticket114-ac2` 交 AC#2 原生侧门 + AC#1 现状表入库；
-              **AC#3/#4/#5/#7/#8/#9/#10/#11 未做**，AC#6 按票头 09-23 横幅**保持未勾**（`skipped=frontend(owner-delegated)`）；
-              2026-09-21 20:2x 编排者建；来源=`acceptor-ticket92` 的 `docs/evidence/s1/92-adversarial-acceptance.md`
-              总判一节的两条记账：`R-92-1`（文本门只覆盖三种扩展名的字面量）、`R-92-2`（真边界在原生侧））
+**Status:** done（2026-11-05 编排者据 114-a1p 只读核收口；A1530）。
+              AC#1-5/7/8/9/10 全 [x]（114-v1 `387e2d2b`、114-v2 `3efb53526` 判语在案；371 改 composer_handlers.go 未 weaken 其 6 枚"ModeWriter 未被调用"断言——仅夹具形 error→Card、行号+1）。
+              AC#6 保持未勾＝**残余**（真机 WebView2 差分截屏，需 GUI/CI 会话；本机 `cmd/wisp` MARK299 死）。
+              AC#11 保持未勾＝**作废**（frontend `npm run render:composer` CI 步，`frontend/**` 结构上不归本编队）。
+              （原 in-progress：2026-09-23 `agent-ticket114-ac2` 交 AC#2 原生侧门+AC#1 现状表；来源=`acceptor-ticket92` R-92-1/R-92-2。）
 **Type:** 能力已实现但没接线（memory 第 8 条那个形状的**第五次**）+ **一条前置条件**（接线方式决定门是否成立）
 **Blocks:** owner 要的"在主面板输入框里看到并请求档位"（R20 的最后一段路）· **Blocked by:** 票 92 结案（同一批文件）
 **Packages:** `internal/panel/`（请求解析的原生侧落点）、`cmd/wisp/`（装配根：把 composer 请求接到 `perm.Store`/审批链）、
