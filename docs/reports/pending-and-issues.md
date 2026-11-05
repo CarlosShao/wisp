@@ -31110,3 +31110,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - T1（22）：21 23 51 71 85 98 107 108 163 182 194 195 211 213 230 239 245 323 339 346 354 383。
 - 摆机主/外部归类见 SUMMARY（frontend/真机/CI/契约/纯owner/R9/114AC#6）。
 - 下波派写腿 194(internal/tools)·71(cmd/balldebug)·383(internal/config) 写面互斥。
+
+## A1533（2026-11-05 09:4x，编排者）173轮：383 收口＝本会话第 35 枚（done-but-not-closed；config reload IO 失败收养）；71 落地待 v1；194 误分档
+- 383（config-r1 a1fc94b3b）：already-landed；我复核 ancestor rc0／manager.go diff 0 行／config 测试绿；反向控 overlay IO 发红 @:119（解析发 PASS）已复现还原。翻 AC#1-6、Status→done、裁决件 docs/evidence/s1/383-verdict.md、改名＋双名核=1。
+- 71（08c4c51e2 写腿 PASS）：cmd/balldebug -diff 阈值门（px_delta/缺行/零定时器）8 测试 red→green；我复验 build/test/gofumpt/d22 绿。★未闭：AC#4 ban#6／AC#5 CI 真红(需 push)／AC#6 注册表(写面外)／AC#7 对抗验收(非实现者)——留后续 wave。
+- 194：三档普查误分为 internal/tools；真写面＝internal/panel（bridge.go 常量＋guard＋router＋inbound_roster_253 同批），且前提过期（248/320 已使 spec∩answered=2 非 0）。改派需 internal/panel 面、与 panel 写腿串行。
