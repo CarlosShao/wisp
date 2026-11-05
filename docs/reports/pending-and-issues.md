@@ -31280,3 +31280,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 185（7f6d7a26a/567c7875a/f606fe4be，纯测试）：缺陷本体已由 ee1e2118c(r1,owner批 A381) 落主线；r2 补 AC#1 红前(risk 4红22绿 / tools 6红)、AC#7 牙(basename 级变异=1红独有，旧 M1 假牙更正)。未做：AC#6 真机/代价尺/别人表。零产码。仪器账：A363/A364 冻结文字按行号窗口取、行号漂移(+5/+9)致假红，内容锚点同 hash ⇒ 建议台账改内容锚。
 - 51 AC#4（a7093e473/e43c097fd）：宿主 Go panic 穿 goja 无归因(goja vm.go:6002/901、runtime.go:1512 锁定)；加 C24HostPanic+callHost recover(先记账/先审计 C24-HOSTPANIC/先 slog 栈/再重抛不转JS异常)+classify 认归因；4 e2e。变异 M1/M2/M5/M4 红、M3 0红(归因第二载体，登记)。既有红 Test52SchemaViolations/Test52CommandKind 非本腿(票52)。⇒ AC#4 落地、待非实现者裁勾。
 - 238 STOP（owner-vetoed）：票面 A476/Q-72 owner 当场否决「锁个屁」＝本条不做；且 132-r1(b22225513) 已 PrivateDirAll 创建即封，票面 logging.go:72 旧行已不存在；写面还需 cmd/wisp。retriage-189 把 238 误列 A④(漏 A476)——就地更正，238 标 owner-vetoed。
+
+## A1560（2026-11-05 20:4x，编排者）收 wave23：246 AC#8 gated、135 读数PASS、51 裁决可结
+- 246 STOP：AC#8 归票 228（用例名 TestAC228…，落点 cmd/wisp 常驻启动）＋撞票 314 整包死亡区(A957 9趟2死1超时)⇒干净 -count=10 今天测不出；台账 :21123 明令非写腿。246 留 8/9、AC#8 等 228。
+- 135（7eb64d5ce，零产码）：AC#1 已落(b46a867b1 等)，r2 复证 5 变异 M-C/M-A2/M-A2b/M-E 全红、M-A2 现死码(M-A2b 牙活)、门禁切片 -count=2 RUN56/PASS20/FAIL0、cmd/wisp 整包 44 红全语音/焦点族非本票。票面 7 格仍空、待非实现者裁决。
+- 51 裁决(51-verdict)：AC#1-5 全 PASS、AC#4 实落(宿主panic隔离+归因+恰一条C24-HOSTPANIC+Calls记账+不转JS)、AC#6 实质 PASS(4 行字面自指·无产码) ⇒ 可结。
