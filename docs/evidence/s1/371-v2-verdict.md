@@ -48,7 +48,7 @@ A  internal/perm/store_371_r6_test.go                      (+93)
 | 3 | `go test ./internal/perm -run 'Test371R6' -count=1 -v -timeout 200s` | **0** | `--- PASS: Test371R6TheGateAskPathRefusesANilChannelInsteadOfPanicking (0.00s)`；`ok … 0.040s` |
 | 4 | `go test ./internal/panel -run '371\|Gate\|Agreement' -count=1 -timeout 200s` | **0** | `ok … 0.045s`；`-v` **6 PASS**（逐名见 ②.1） |
 | 5 | `export PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"; go test ./cmd/wisp -run 'Test371' -count=1 -timeout 220s` | **0** | `ok  github.com/CarlosShao/wisp/cmd/wisp  0.263s`；**3 PASS**（逐名见 ②.2） |
-| 6 | `sh scripts/d22scan.sh`（**首跑**） | **1** | ⚠ **环境事故、非判据**：`TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_…` 被 `*** Test killed: ran too long (11m0s)` 杀掉，整包墙钟 **33550.847s**（＝本机会话被挂起跨夜，与 08:4x 恢复之间**9h21m** 的空档吻合）。**未出现任何 ban violation**。 |
+| 6 | `sh scripts/d22scan.sh`（**首跑**） | **1** | ⚠ **环境事故、非判据**：`TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_…` 被 `*** Test killed: ran too long (11m0s)` 杀掉，整包墙钟 **33550.847s**（＝本机会话被挂起跨夜，与 08:4x 恢复之间**9h21m** 的空档吻合）。**唯一那条 `1 finding(s)` 出自自测夹具**（`seeded_violation` 临时目录里的 `internal/bad/leak.go`，是**用例故意种的红**），⛔ 是本仓的 ban violation。 |
 | 6b | `sh scripts/d22scan.sh`（**复跑**） | **0** | `d22scan: clean - no D22 ban violations; … ban #8 internal/=865 … cmd/=201`（全绿） |
 | 7 | `sh scripts/check-path-length-budget.sh` | **0** | `VERDICT GREEN - every over-budget tracked path is rostered by name with a reason, and the roster equals the tree`（over=65／roster=65／wall interval=0，字节与字符两尺同选 65 条） |
 | 8 | `gofumpt -l` **甲＝`HEAD` blob**（3 枚抽到 `.scratch` 后跑） | **0** | **输出空** |
@@ -201,7 +201,7 @@ run_mode101_test.go                work=81053c1d…  HEAD=81053c1d…  SAME
 ### ④.2 "三条判据不可互替"成立（文档 §2 的推理，本腿验过判据面）
 
 - 372 读的是**腿存不存在**（`s.confirm == nil`），**不触发**非 `nil` 假腿（文档 §2 第 2 行）；
-- 375 读的是**此刻有没有人能答**（`Gate.answer()`），**不碰 L2**（`gate.go` 的 L2 路径未动，本腿 §② 复跑 375 相关包外的 `gate` 测试未涉及）；
+- 375 读的是**此刻有没有人能答**（`Gate.answer()`），**不碰 L2**：本腿只做了**读码复核**（`gate.go:346-350` 的 `L1-UNANSWERABLE` 在 L1 分支里；`internal/agent/approval` **不在本提交写面**，§① 已证），**未复跑** 375 自己的测试包 —— 这一条是**读**的结论、⛔ 跑出来的；
 - 371 读的是**这张卡有没有被答过允许**（`card.Answered()`）。
 ⇒ 三者值不同、落点不同（读侧／动作侧／档位切换），**没有一个能推出另一个**；文档"本票没有把 372／375／377 的收益算成自己的"这句**与代码一致**。
 
