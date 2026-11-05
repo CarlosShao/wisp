@@ -31178,3 +31178,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 8「按推荐」→ 76 枚 C1 DPAPI 桩：编排者**更正推荐为 B（换 env: ref、保留 ubuntu 分母；原推荐 A 加 build tag 是次优）**，腿已在 continue-C1 执行。
 9「第九个完全看不懂」→ 待讲解后判（票406 C6 POSIX 哨兵名字不一致）。
 ⇒ 授权落地：51-AC#3／347／R9 已获机主批 ⇒ 下波派 51-B／339（依赖347）／R9。K5→407。108 已闭。item8 走 continue-C1。item3/9 待机主再看一次再判。
+
+## A1542（2026-11-05 15:3x，编排者）182轮：收 wave8；342/continue-C1 PASS、195 死腿遗产代提
+- 342（b93467e43）：祖先换链两平台成对读数（POSIX 修前 deleted 83/100、HEAD 3/3 PASS；Windows 修前 junction/symlink truncated 有、HEAD 3/3 PASS）；internal/winsec 生产零字节（仅证据件 342-r3-impl.md）。3 具名缺陷（归属判据头注反、winsec.go:139-161 自陈与父钉路由相反、长度门漂移）。AC#1 待非实现者裁。
+- continue-C1（331a4b1cd+30fa87fb3）：37 枚 C1 孤儿红 → 27 转绿（POSIX 40→13、PASS 188→215），10 STOP＝63×8＋248×2（红在 secret.Store fail-closed 桩、非夹具，需 internal/secret C28 契约缝，派单禁 build tag）。0 断言改/0 build tag/0 skip；Windows gate 123s 绿。
+- 195 死腿遗产代提：sectionwrite.go(17KB)+sectionwrite_195_test.go(15KB)+manager.go/settings.go（writeOneKey 改 WriteSection 适配、Manager 加 LoosenQueue/Audit；SourcePanel 标注使未来 locked 段拒放行）。build rc0/test ok/gofumpt 空/d22 clean。AC「分节写入地基」切片；panel config.set 不在本票。
+- 我自验：build ./cmd/... ./internal/... ./tools/... rc0；config/winsec tests ok；gofumpt 空；d22 clean。
+- 机主上轮已批 51-AC#3/347/R9 ⇒ 本波起派 51-B/339/R9。10 枚 C1-STOP 建议开 2 票交 internal/secret 契约主人（06/08）。
