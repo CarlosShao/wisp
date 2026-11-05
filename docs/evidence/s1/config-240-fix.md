@@ -1,6 +1,6 @@
 # internal/config 去红 — `writeguard_unnailed_341_test.go:240` 的 mtime 断言改切（票 341 已 `-done` ⇒ 孤儿红）
 
-- 起手锚：派单写 `9b475a369`（现跑 `git merge-base --is-ancestor 9b475a369 HEAD` = YES）；开工时 `HEAD=5dc22f882`，收工时 `HEAD=fae8ba704`（本腿期间别腿推进两笔，本腿只提交自己的两条路径）。
+- 起手锚：派单写 `9b475a369`（现跑 `git merge-base --is-ancestor 9b475a369 HEAD` = YES）；开工时 `HEAD=5dc22f882`，改切前 `HEAD=fae8ba704`（本腿期间别腿推进两笔），本笔提交 `a047fec21`（只含本腿两条路径）。
 - 判据件：`internal/config/writeguard_unnailed_341_test.go`。改前 blob = `fb305668674cdba9082b4ec3f519b6176c19320b`（与 `docs/evidence/s1/config-handed-red-186.md` 抬头记的同一个 blob ⇒ 186 之后无人动过此件）；改后 blob = `5bcd923f67ee9e13c8b9b3804f1c7c77d1f1e47c`。
 - 背景件（只读引用，本腿一字未改）：`docs/evidence/s1/config-handed-red-186.md`（186 腿判它 FLAKY、按派单停手交件，并在 §9.1 登记"把 `:240` 从钟改成钟之外的事实"留给下一位）。
 - 票 341 状态：`.scratch/wisp/issues/341-…-done.md`＝**已结案**（`4f8d52268` 收 `341-v1`、七格全勾）。⇒ 这枚红**没有活票持有**，按派单口径当**孤儿红**处理：本腿不改票、不翻框、不动 `.scratch/**`。
@@ -8,7 +8,7 @@
 
 ## 0. 结论先行（四行）
 
-1. **改切＝删一条断言、删一个变量、加注释；别的一条没动。** `:239-241` 的 `statMod(t, path).Equal(mtimeBefore)` 三段连同 `:220` 的 `mtimeBefore := statMod(t, path)` 一并删除；`git diff --stat`＝`1 file changed, 27 insertions(+), 6 deletions(-)`，其中 26 行是注释、1 行是 `if text == before {` 保持原样。
+1. **改切＝删一条断言、删一个变量、加注释；别的一条没动。** `:239-241` 的 `statMod(t, path).Equal(mtimeBefore)` 三段连同 `:220` 的 `mtimeBefore := statMod(t, path)` 一并删除；`git diff --stat`＝`1 file changed, 27 insertions(+), 6 deletions(-)`，**27 行新增全部是注释**，6 行删除＝4 行代码（mtime 变量 1 ＋ 断言 3）＋2 行旧注释。**零行新增代码。**
 2. **"真写发生了"的证据改成纯内容**：`:241-243` 的 `strings.Contains(text, "schema_version = 2")`（删前的 `before` 逐字无 version 行，`:230-233` 已硬断）＋ `:260` 的 `if text == before` ＋ `:267-269` 注释死掉 ＋ `:270-276` 备份逐字 ＋ `:280-292` 四句日志。票 345 之后读路径**不写盘**，所以盘上字节变化只可能来自 `SaveFile` 的原子替换——这一条在注释里写明了。
 3. **写作上刻意删而不是换个钟**：186 §9.1 建议的"mtime 不早于 `mtimeBefore`"本腿**没取**（仍依赖钟，NTP 回拨会造新 flake）；派单给的另一条支路"断言内容/diff 或删掉冗余行"取了后者。
 4. **重跑读数：容器 10 发 5 PASS/5 FAIL（全红 `:240`）⇒ 改后 10/10 PASS、30/30 PASS；宿主整包 rc=0。**
@@ -90,7 +90,7 @@ docker run --rm -v "D:\work\workspace\projects plans\Wisp:/src" \
 ## 5. 未动 / 边界
 
 - **未动**：`writeguard.go`／`loader.go`／`migrate.go`／`parse.go` 任何字节；`internal/config` 里任何别条断言；`t.Skip`（本件 0）；票面／台账／`.scratch/**`／`frontend/**`／`design/**`／`thresholds.go`／golden／SLO／`go.mod`／`go.sum`。
-- **未做**：`git add -A`／amend／reset／rebase／stash／push。提交两条路径**逐枚字面 pathspec**（本件＋本件）。
+- **未做**：`git add -A`／amend／reset／rebase／stash／push。`add` 与 `commit` 两处都写**逐枚字面 pathspec**（`internal/config/writeguard_unnailed_341_test.go` ＋ `docs/evidence/s1/config-240-fix.md`），`index.lock` 有重试环。
 - 容器内写的只有 `/tmp`（overlay），宿主树只读挂载；仓内零临时件。
 
 ## 6. 给下一位的两条登记（本腿**未取**）
