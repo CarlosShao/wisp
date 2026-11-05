@@ -31158,3 +31158,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 119 STOP：票 119 已 accepted-done；98 普查 C6=TestAC3POSIXSecretRoute...119b（cmd/wisp/secret_dataroot_119b_test.go:241，POSIX 哨兵 ErrReparseDenied vs winsec.ErrUnresolvedPath 不一致）**孤儿无票主**。三候选写面（internal/risk 冻结／winsec 票94 已done／cmd/wisp 测整包禁）全顶 ⇒ 建议甲：另开新票（下文立）。
 - 我自验：build ./cmd/... ./internal/... ./tools/... rc=0、cmd/wisp -run TestTicket255|DispatchGate|133 ok、gofumpt 空。
 - ★纪律教训：wave6 两腿（255 config_readers_255.go、133 leg_dispatch_gate_133_test.go）**均落 cmd/wisp**，违反"cmd/wisp 每波仅一枚写腿"，二者已各自绿但应避免；后续 cmd/wisp 每波只发一枚。
+
+## A1540（2026-11-05 13:5x，编排者）181轮：收 wave7；triage 全池分档＋孤儿红大修（cmd/wisp POSIX 79→40、internal 2 真bug）
+- triage-180.md（38KB）：现读开放池 114 枚（117 非done − 3 withdrawn/void）。分档 A 可做-Go 56 / B 前端 12 / C owner 17 / D 真机 21 / E 需CI 8。A 类 11 枚零前置可起手；81 枚孤儿红全落 cmd/wisp、52 归已 done 票。
+- orphan-cmdwisp（ae8136261 + 2916bad1c）：C1 DPAPI 夹具三缝修（newReplyHost/t101boot/zz315WriteConfig + 新缝 secret_fixture_180_test.go：Windows 逐字节同形、非Windows 走 env:，未加 build tag/未删用例/SKIP）；POSIX 快照 PASS149/FAIL79 → PASS188/FAIL40（39 转绿）；Windows gate ok 220.9s。★建议 gate -timeout 240→420s（余量仅 19s）。
+- orphan-internal（471365f92 + 9cd528199）：internal 5 红→修 2 真 bug（internal/proc TestExternalSamplerTracksSubjectGrowth 缓冲"至少翻倍"规则、internal/agent Test31DisarmStopsTheWait run() 复查 stop——非计时敏感、select 随机）、3 STOP（2 panel＝前端 agent；TestC26＝risk 冻结+cmd/wisp 禁写，建议另开票）。
+- 我自验：build ./cmd/... ./internal/... ./tools/... rc=0；proc/agent 修复定向复跑 ok；cmd/wisp 快核 ok；d22 clean；gofumpt 仅 internal/agent/approval/pending_read.go（会话前既有 CRLF，腿已具名披露，非本腿改）。
+- 立票 406（C6 POSIX 哨兵孤儿，待 owner 三选一）随本轮提交。
