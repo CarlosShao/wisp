@@ -57,6 +57,17 @@ type Manager struct {
 	// values stay active until process restart; the app surfaces
 	// "restart required" with these section names.
 	OnRestartPending func(sections []string)
+	// LoosenQueue is the C18 hand-off for a PROGRAMMATIC loosening of a locked
+	// section (ticket 195; see sectionwrite.go). nil = refuse the loosening
+	// (fail-closed), the same rule ConfirmLocked carries for the reload path.
+	//
+	// It is called OUTSIDE mu and must return as soon as the request is
+	// queued - it must not wait for a card, because C18 allows 300s and that
+	// deadline has no business inside a config write.
+	LoosenQueue LoosenQueue
+	// Audit receives the attribution line for an adjudicated section write.
+	// nil = the process log.
+	Audit AuditFunc
 
 	mu        sync.Mutex
 	reloadMu  sync.Mutex

@@ -242,71 +242,58 @@ func requireChatProvider(base *Config, model string) error {
 			refusalRowMissing+"："+guidanceRolePair)
 }
 
-// writeOneKey is the shared body: pre-read the file (that snapshot is both the
-// validation base and the report's baseline), apply, validate the base the write
-// would actually produce, only then hand the change to the guarded merge writer,
-// and finally report the key paths the FILE changed by.
+// writeOneKey is the settings page's adapter over WriteSection
+// (sectionwrite.go): pre-read the file (that snapshot is both the validation base and
+// the report's baseline), apply, validate the base the write would actually
+// produce, take the D36 direction verdict, only then hand the change to the
+// guarded merge writer, and finally report the key paths the FILE changed by.
 //
 // The three shapes mergeWrite refuses to be silent about are unchanged and this
-// body adds no fourth: an unreadable file is still a refused write, a file that
+// path adds no fourth: an unreadable file is still a refused write, a file that
 // already carries the value is still not rewritten, and a write that preserved
 // foreign hand edits is still not claimed as this process's own.
 //
 // apply reports false when the target key turned out not to exist on the base it
 // was given (the file changed underneath between the pre-read and mergeWrite's own
-// re-read). That is not an error and it is not a success to pretend about: nothing
-// changes, the diff comes back empty, and the receipt says so.
+// re-read). That is not an error and it is not a success to pretend about: the
+// adapter turns it into the same refusal sentence it always returned, and the
+// file stays untouched.
+//
+// WHY SourcePanel: the only production caller of these six setters is the
+// panel's settings route (cmd/wisp/panel_config_store.go). Labelling it here is
+// what makes a FUTURE locked-section field refuse a loosening instead of writing
+// one - a settings page is exactly where a loosening would look most harmless.
+// Every key this page owns today sits in [llm], so the verdict is neutral for
+// all of them and none of the six setters changes behaviour (ticket 195: the
+// verdict is the foundation, the panel's config.set stays out of this ticket).
 func (m *Manager) writeOneKey(ownedKey string, apply func(base *Config) bool,
 	check func(base *Config) error,
 ) ([]string, error) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	pre, preExists, err := m.readCurrentFile()
+	res, err := m.WriteSection(SectionWrite{
+		Section: sectionOfKey(ownedKey),
+		Key:     ownedKey,
+		Source:  SourcePanel,
+		Origin:  "panel.settings",
+		Check:   check,
+		Apply: func(base *Config) error {
+			if !apply(base) {
+				return observe.New(observe.ClassConfig,
+					"config: "+ownedKey+" does not exist in the file this write is based on; nothing was written")
+			}
+			return nil
+		},
+	})
 	if err != nil {
-		// The file is here and this process cannot read it. Overwriting it is the
-		// exact destruction ticket 226 was filed for, so the settings page gets the
-		// refusal, not a write.
 		return nil, err
 	}
-	candidate := deepCopyConfig(pre)
-	if !preExists {
-		candidate = deepCopyConfig(m.cur)
-		if candidate == nil {
-			candidate = NewDefaults()
-		}
-	}
-	if check != nil {
-		if err := check(candidate); err != nil {
-			return nil, err
-		}
-	}
-	if !apply(candidate) {
+	if res.PendingID != "" {
+		// A queued loosening must never be reported as a saved field: "saved"
+		// is the lie ticket 257 exists to prevent, and this page has no way to
+		// show a pending card.
 		return nil, observe.New(observe.ClassConfig,
-			"config: "+ownedKey+" does not exist in the file this write is based on; nothing was written")
+			"config: "+ownedKey+" was queued for approval ("+res.PendingID+"), not written")
 	}
-	// AC#7's gate: the SAME validate() the start-up path runs, over the base the
-	// write would produce, before a single byte is written.
-	if err := validate(candidate); err != nil {
-		return nil, observe.Wrap(observe.ClassConfig, err,
-			"config: refused to write "+ownedKey+"; the value would not survive validation, so config.toml is unchanged。"+
-				refusalInvalid+"：值本身过不了这份 schema 的校验，这一行要改的是值；文件一个字节都没动。")
-	}
-
-	// Memory first, then the file, then memory back if the file refused - the same
-	// order and rollback the three older setters use.
-	memOld := deepCopyConfig(m.cur)
-	if memOld == nil {
-		return nil, observe.New(observe.ClassConfig, "config: no loaded config in this Manager, refusing to write one")
-	}
-	apply(m.cur)
-	if err := m.mergeWrite(ownedKey, func(base *Config) { apply(base) }); err != nil {
-		m.cur = memOld
-		return nil, observe.Wrap(observe.ClassConfig, err,
-			"config: settings write for "+ownedKey+" failed; the values in memory are the ones this process started with")
-	}
-
-	return m.writtenKeyPaths(pre, preExists, ownedKey), nil
+	return res.Keys, nil
 }
 
 // writtenKeyPaths is the receipt's factual half: what the file actually changed by.
