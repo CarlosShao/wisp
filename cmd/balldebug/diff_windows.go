@@ -55,6 +55,8 @@ type diffOpts struct {
 	level     float64       // synthetic envelope handed to the child (-level)
 	dock      string        // also shoot each state docked here (-diff-dock)
 	killGrace time.Duration // wait for graceful exit before Kill
+	gate      bool          // judge the table this run wrote (ticket 71 AC#1)
+	gateMin   int           // px_delta_ge8 floor (0 = diffGateFloorPx8)
 }
 
 // stateVariant is one differential row: a state, optionally docked to an edge.
@@ -373,6 +375,19 @@ func runDiff(o diffOpts) error {
 		return err
 	}
 	fmt.Printf("diff: table -> %s\n", filepath.Join(o.dir, "diff-table.txt"))
+	// Ticket 71 AC#1: printing the numbers was never a verdict. Once asked for
+	// (-diff-gate), the run judges its own table - every requested row present,
+	// every row imaged, every zero-timer state holding timers=no - and exits
+	// non-zero through runDiff's error path when the evidence does not hold.
+	if o.gate {
+		spec := diffGateSpec{minPx8: o.gateMin}
+		for _, v := range o.variants() {
+			spec.want = append(spec.want, v.label)
+		}
+		if err := gateDiffRows(os.Stdout, rows, spec); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

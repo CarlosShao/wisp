@@ -108,6 +108,12 @@ func main() {
 	dock := flag.String("dock", "", "dock the ball to this edge the way a drag ending there would: "+
 		"left|right|top|bottom (no timer: the dock is carried by mouse messages)")
 	diffDock := flag.String("diff-dock", "", "with -diff: also shoot every state docked to this edge, as an extra row")
+	diffGate := flag.Bool("diff-gate", false, "with -diff: judge the table the run just wrote (px_delta_ge8 floor, "+
+		"every requested row present, zero-timer states holding timers=no) and exit non-zero on any violation")
+	diffGateTable := flag.String("diff-gate-table", "", "judge an existing diff-table.txt with the same gate and exit "+
+		"non-zero on any violation (shoots nothing, so it needs no desktop)")
+	diffGateMin := flag.Int("diff-gate-min-px8", 0, "with a gate: minimum px_delta_ge8 per row (0 = the documented "+
+		"floor "+fmt.Sprint(diffGateFloorPx8)+"; it may only be raised, never lowered to make a run green)")
 	tour := flag.Bool("tour", false, "guided walk for owner sign-off, in one run: liquid flow -> voice-driven "+
 		"rotation -> idle border -> static Sleeping -> docked on all four edges -> popped back -> yours to play with")
 	tourDwell := flag.Duration("tour-dwell", 5*time.Second, "with -tour: how long each numbered step holds")
@@ -146,6 +152,21 @@ func main() {
 		}
 	}
 
+	// The gate floor is resolved before any run so an attempt to lower it fails
+	// loudly instead of being clamped or ignored (ticket 71 AC#1).
+	gateMin, gateErr := resolveGateMinPx8(*diffGateMin)
+	if gateErr != nil {
+		fmt.Fprintf(os.Stderr, "balldebug: %v\n", gateErr)
+		os.Exit(2)
+	}
+	if *diffGateTable != "" {
+		if err := gateDiffTable(os.Stdout, *diffGateTable, diffGateSpec{minPx8: gateMin}); err != nil {
+			fmt.Fprintf(os.Stderr, "balldebug: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	// -diff is the parent role: it spawns one child balldebug per state, shoots
 	// the same region alive and dead, and measures. No ball lives here.
 	if *diffDir != "" {
@@ -163,6 +184,8 @@ func main() {
 			frozen:  *frozen,
 			level:   *diffLevel,
 			dock:    *diffDock,
+			gate:    *diffGate,
+			gateMin: gateMin,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "balldebug: %v\n", err)
