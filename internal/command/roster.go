@@ -47,13 +47,18 @@
 //
 // AC#4, STATED SO NOBODY INFERS OTHERWISE. Before the roster reaches the page,
 // ticket 213's terminal state is "名册可见（可枚举）＋命令行可执行，界面点不了".
-// This package is that enumerable roster, and today the two doors are reachable
-// from the command line (`wisp panel-inbound` carries a panel.mode.request
-// envelope; `wisp run` carries a control word), while the page has no commands
-// key to read. Production() therefore has no production caller yet, by design,
-// and this comment is the place that says so: the day a snapshot key or a C17
-// method delivers this list to the page, that leg owns the key and the two rulers
-// it moves (ticket 213's "交付 3"), not this one.
+// The enumerable half is this package; the executable half is the two doors'
+// command-line spellings (`wisp run` carries a control word, `wisp panel-inbound`
+// carries a panel.mode.request envelope); and the visible half is now a production
+// caller - cmd/wisp's `wisp commands` leg prints this roster, so Production() is
+// reached from a binary rather than from this package's tests (roster_test.go
+// measures that off the disk, because "a test calls it" and "the product calls it"
+// are different facts). What still does not exist is the PAGE's own path: no
+// snapshot key, no C17 method, no row in ComposerState, so the menu's members are
+// readable on the command line and unreadable in the chat box. Whoever adds that
+// key owns it and the two rulers it moves (ticket 213's "交付 3"), and updates this
+// paragraph and cmd/wisp/commands.go's footer, which says the same thing to the
+// operator.
 package command
 
 import (
@@ -92,6 +97,19 @@ const (
 	// in Judge rather than pretending one boolean describes every target.
 	ApprovalPerRequest
 )
+
+// String renders the approval the way a menu row or a console line shows it. An
+// unknown value says so instead of borrowing the nearest sentence: a row that
+// cannot classify its own approval is the "clicked and nothing happened" family.
+func (a Approval) String() string {
+	switch a {
+	case ApprovalNever:
+		return "不需要"
+	case ApprovalPerRequest:
+		return "看参数（要不要卡由门自己的闸答）"
+	}
+	return fmt.Sprintf("未知(%d)", uint8(a))
+}
 
 // Verdict is what the roster says about one concrete request under one档.
 type Verdict uint8
@@ -133,6 +151,20 @@ type Command struct {
 	Utterance string
 	// Method is C17's method constant (ChannelPanelMode only).
 	Method string
+}
+
+// Door renders the door this row points at in this package's own words: the frozen
+// contract, and the identifier that door parses. Nothing here is a synonym - the
+// control word is the utterance agent.MatchControl takes, and the method is C17's
+// own constant - so a printed row and an executed request name the same thing.
+func (c Command) Door() string {
+	switch c.Channel {
+	case ChannelControlWord:
+		return fmt.Sprintf("D11(1) 控制词「%s」（agent.MatchControl 解析、(*Loop).runControl 执行）", c.Utterance)
+	case ChannelPanelMode:
+		return fmt.Sprintf("C17 %s（panel.ModeWriteHandler -> perm.Store.Set）", c.Method)
+	}
+	return fmt.Sprintf("未知通道 %q（fail-closed：这条门没有执行者）", c.Channel)
 }
 
 // Env is the host's condition for one judgement: the permission档 in force (the
@@ -267,8 +299,10 @@ func judgeMode(env Env, e Command, req Request) Availability {
 }
 
 // Production is the assembled roster: the commands this machine can actually
-// execute today. It has no production caller yet - see the package comment's
-// AC#4 paragraph for why that is the delivery's terminal state, not an oversight.
+// execute today. Its production caller is cmd/wisp's `wisp commands` leg, which
+// prints these rows and nothing else; a caller that kept its own copy of the table
+// would make this function decorative, so roster_test.go re-reads the disk for the
+// import and the call rather than trusting the sentence.
 func Production() (*Roster, error) { return New(productionEntries()...) }
 
 // productionEntries is the only table. Each row is proved executable by New (the

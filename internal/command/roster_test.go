@@ -21,9 +21,12 @@ package command
 //   - AC#5: every one of those rows must also leave an audit line in every档 (the
 //     "三档都写审计" half), and this package is scanned to prove it holds no
 //     execution of its own (there is no second path to audit).
-//   - AC#4 is NOT asserted green here: the roster is enumerable and the doors are
-//     command-line executable, but the page has no commands key, so the ticket's
-//     own cell stays for the orchestrator/verifier.
+//   - AC#4's roster half is read off the DISK: a non-test file outside this package
+//     has to import it and call Production() (before the AC#4 leg the answer was
+//     zero callers, which was the cell leg r1 left red on purpose). The page's half
+//     of that cell - a snapshot key or a C17 method that delivers the list to the
+//     chat box - still does not exist, so the ticket's own cell stays for the
+//     orchestrator/verifier.
 
 import (
 	"context"
@@ -31,10 +34,13 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -485,6 +491,114 @@ func waitClosed213(t *testing.T, ch <-chan struct{}, d time.Duration) bool {
 	case <-timer.C:
 		return false
 	}
+}
+
+// ---------------------------------------------------------------------- AC#4
+
+// TestTheProductionRosterHasAProductionCaller213 is AC#4's reading, and it is the
+// cell leg 213-r1 left red on purpose: the roster was enumerable from THIS package's
+// tests and reachable from no production path at all (r1's own ruler - non-test
+// files outside internal/command importing it - answered 0).
+//
+// WHY A DISK READING. "The roster is visible" is a claim about the binary, and a
+// binary's callers are its sources: a case that calls Production() proves the
+// function runs, never that the product reaches it. That is exactly the reading
+// TestEveryRosterDoorHasAProductionDoor213 already makes for the two doors, one
+// level up. So this case re-reads the two production package roots and reports every
+// non-test file that imports this package AND calls Production() - by name, so a
+// reader can look at the line instead of trusting the sentence.
+func TestTheProductionRosterHasAProductionCaller213(t *testing.T) {
+	const importPath = "github.com/CarlosShao/wisp/internal/command"
+	root := repoRoot213(t)
+	self := packageDir213(t)
+
+	var callers []string
+	for _, top := range []string{"cmd", "internal"} {
+		err := filepath.WalkDir(filepath.Join(root, top), func(path string, d fs.DirEntry, walkErr error) error {
+			if walkErr != nil {
+				return walkErr
+			}
+			if d.IsDir() {
+				switch {
+				case path == self, d.Name() == "testdata", d.Name() == "vendor":
+					// This package's own sources are the subject, not a caller; the
+					// other two never hold a production caller of anything.
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+				return nil
+			}
+			local, calls, parseErr := productionCall213(path, importPath, "Production")
+			if parseErr != nil {
+				t.Fatalf("parse %s: %v", path, parseErr)
+			}
+			if local == "" || calls == 0 {
+				return nil
+			}
+			rel, relErr := filepath.Rel(root, path)
+			if relErr != nil {
+				rel = path
+			}
+			callers = append(callers, fmt.Sprintf("%s (%d call site(s))", filepath.ToSlash(rel), calls))
+			return nil
+		})
+		if err != nil {
+			t.Fatalf("walk %s: %v", filepath.Join(root, top), err)
+		}
+	}
+	sort.Strings(callers)
+	if len(callers) == 0 {
+		t.Errorf("AC#4 RED: no non-test file under cmd/ or internal/ imports %q and calls command.Production().\n"+
+			"The roster is therefore enumerable from this package's tests only: the commands exist as rows and reach no binary, so AC#4's terminal state (\"名册可见 + 命令行可执行\") is half met - the doors are on the command line, the list is nowhere.\n"+
+			"Fix: give it a production caller and keep that caller's rows EQUAL to the roster rather than a copy of it (the console leg `wisp commands` is the smallest one); a caller that prints its own private table would satisfy this case and lie to the user.",
+			importPath)
+		return
+	}
+	t.Logf("AC#4: production callers of command.Production(): %s", strings.Join(callers, "; "))
+}
+
+// productionCall213 reports the local name one file gives the package ("" when it
+// does not import it) and how many times that name calls the given selector. It
+// parses ASTs rather than grepping: this package's own refusal sentences spell the
+// names of things it does not call, and a text match would read prose as a call.
+func productionCall213(path, importPath, selector string) (string, int, error) {
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, path, nil, parser.SkipObjectResolution)
+	if err != nil {
+		return "", 0, err
+	}
+	local := ""
+	for _, im := range file.Imports {
+		p, unquoteErr := strconv.Unquote(im.Path.Value)
+		if unquoteErr != nil || p != importPath {
+			continue
+		}
+		local = "command"
+		if im.Name != nil {
+			local = im.Name.Name
+		}
+	}
+	if local == "" {
+		return "", 0, nil
+	}
+	calls := 0
+	ast.Inspect(file, func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		sel, ok := call.Fun.(*ast.SelectorExpr)
+		if !ok || sel.Sel.Name != selector {
+			return true
+		}
+		if id, ok := sel.X.(*ast.Ident); ok && id.Name == local {
+			calls++
+		}
+		return true
+	})
+	return local, calls, nil
 }
 
 // ---------------------------------------------------------------------- AC#5

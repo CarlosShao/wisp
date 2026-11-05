@@ -36,6 +36,12 @@ Usage:
                    wired by 364-r1a): sessions list prints the newest sessions
                    through the existing session.Manager.List - id, updated_at,
                    title
+  wisp commands    the command roster (ticket 213 AC#4): prints every command
+                   this machine can really execute, one row each - the name, what
+                   it does, its argument shape, whether a human approval is
+                   involved, and which existing door runs it. The rows come from
+                   internal/command's production roster, so a capability with no
+                   door cannot appear here
   wisp providers   provider catalog path (ticket 12, ruling A11): discover
                    <provider> lists /v1/models; probe <provider>/<model> runs
                    the capability probe suite into provider_health
@@ -99,6 +105,13 @@ func main() {
 		// rows and the refusal line are readable from an Explorer start too.
 		attachParentConsole()
 		os.Exit(cmdSessions(args[1:], sessionsIO{stdout: os.Stdout, stderr: os.Stderr}))
+	case "commands":
+		// Ticket 213 AC#4: the command roster's first production caller. A console
+		// leg that prints internal/command's production table and nothing else - it
+		// opens no store, resolves no data root and calls no door, so
+		// attachParentConsole is all it needs from this file.
+		attachParentConsole()
+		os.Exit(cmdCommands(args[1:], commandsIO{stdout: os.Stdout, stderr: os.Stderr}))
 	case "providers":
 		attachParentConsole()
 		os.Exit(cmdProviders(args[1:], providersIO{}))
