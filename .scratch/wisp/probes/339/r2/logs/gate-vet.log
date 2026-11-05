@@ -1,0 +1,1 @@
+RC=0 (go vet printed nothing; rc recorded in gate-summary.log)

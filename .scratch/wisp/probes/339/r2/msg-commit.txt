@@ -1,0 +1,33 @@
+票 339 落地腿 339-r2：票334那枚仪器的"世界"补到POSIX（甲形拆分收拢为乙形），AC#2去牙反控两平台成对可达
+
+阻塞链清账：票 347 已 -done（机主 2026-10-31 追认 A1311①、2026-11-05 15:0x 按推荐 A1541 第2条），
+pathresolver_other.go 的 resolveHandle 现为 EvalSymlinks（不再是恒 ("",false) 桩）⇒ formsOf 能填 root
+⇒ uncertainAnchorMiss 在 POSIX 可触发 ⇒ 票 339 唯一未勾的那格（AC#2"修好后的仪器必须在两平台都点名红"）可达。
+
+落码（只动测试面，零产码字节）：
+- anchor_miss_reason_334_test.go：摘掉 //go:build windows；三枚用例与 class 用例改走 partialCandidate334；
+  三句承重断言（want A / class=A needL2=false allow=false / override 键不解锁）逐字未动。
+- anchor_miss_reason_334_windows_test.go（新增，唯一带档件，38 行）：Windows 半=hostile334 + 前提断言
+  "必须是 OS 拒绝解析，不是普通缺位"（errors.Is(err, os.ErrNotExist) 即 fatal，否则 partial 静默变 false）。
+- anchor_miss_reason_339_other_test.go（+11 行，纯追加）：POSIX 半委派 347 落地的 posixPartialCandidate347
+  （悬空符号链接），不重造世界；假主目录世界仍只走 anchor_world_334_test.go 的共享 builder。
+
+读数（仓外导出树，同一 -run 'TestAnchorMiss|TestAnchorFallbackTeeth'，四数逐枚）：
+- Linux 19/3/0/0 rc=0 ⇒ 24/5/0/0 rc=0（+5=2 顶层+3 子用例，就是 339-r1 甲形在 Linux 上让出的那 5 枚名字）
+- Windows 22/3/0/0 rc=0 逐数一字不变
+- 整包 ./internal/risk/：Linux 250/150/1/0 ⇒ 255/152/1/0；Windows 导出树 281/166/5/1 改前⇄改后 diff IDENTICAL
+  （C26 存量 + 4 枚 116 台面红，两发同数；共享树权威色只有 C26）
+RED-before（只摘 tag 不补世界）：Linux :81/:106/:143/:147/:151 五句 class=B … id_*。
+AC#2 去牙反控（aRelates 尾行回落支整支摘掉，锚命中 1，仓外树、逐发还原 restored=44f6eb9b match=YES）：
+Linux 改前树 19/0/3 rc=1（334 仪器两枚不在名册=摘牙零变化）⇄ Linux 改后树 24/0/5 rc=1（+两枚 334 名字）
+⇄ Windows 改后树 22/0/3 rc=1 ⇒ 同一枚仪器两平台点名红。
+零放宽：diff 的 - 行里 want A|ClassA|t.Skip 0 命中；新增 t.Skip/Short 0；Windows 名册枚数 22 不变。
+
+门禁（共享工作树，跑前 unset GOTMPDIR TMPDIR TEMP TMP）：build rc=0；go test ./internal/risk/ rc=1（存量
+TestC26RewriteAccount，HEAD 导出树复跑同红并点名 cmd/wisp/panel_pump.go:283/:291 与
+internal/panel/git_readonly_exec.go:409/:412）；gofumpt 写面三件 0 行 rc=0；d22scan rc=0 clean；
+长度门 rc=1=既有 roster 漂移（HEAD 的 :328 指 179-…-sentence.md，被跟踪件已 …-sentence-done.md）；
+go vet ./internal/risk/ rc=0。
+
+未做：⛔ 动产码；⛔ 翻任何框（未勾 1／已勾 6）；⛔ 改票名/Status:/-done；⛔ 动票 334 一字；⛔ ./cmd/wisp 整包与
+go test ./...；⛔ push。证据件 docs/evidence/s1/339-r2-impl.md。

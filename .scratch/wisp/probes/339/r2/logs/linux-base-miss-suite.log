@@ -1,0 +1,52 @@
+GO_TEST_RC=0
+time=2026-11-05T06:47:08.899Z level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1
+=== RUN   TestAnchorFallbackTeethPerAnchor336
+=== RUN   TestAnchorFallbackTeethPerAnchor336/git-credentials
+    anchor_fallback_teeth_336_roster_test.go:137: TEETH336 operand=git-credentials class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-under
+    anchor_fallback_teeth_336_roster_test.go:137: TEETH336 operand=wisp-config-under class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-eq
+    anchor_fallback_teeth_336_roster_test.go:137: TEETH336 operand=wisp-config-eq class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/ssh
+    anchor_fallback_teeth_336_roster_test.go:137: TEETH336 operand=ssh class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/ssh/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/aws
+    anchor_fallback_teeth_336_roster_test.go:137: TEETH336 operand=aws class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/aws/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/kube
+    anchor_fallback_teeth_336_roster_test.go:137: TEETH336 operand=kube class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/kube/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/dpapi-protect
+    anchor_fallback_teeth_336_roster_test.go:137: TEETH336 operand=dpapi-protect class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain
+=== RUN   TestAnchorFallbackTeethPerAnchor336/local-credentials
+    anchor_fallback_teeth_336_roster_test.go:137: TEETH336 operand=local-credentials class=A matched=false clause=true
+=== RUN   TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain
+--- PASS: TestAnchorFallbackTeethPerAnchor336 (0.36s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/git-credentials/offchain (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-under (0.03s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-under/offchain (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq (0.03s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/wisp-config-eq/offchain (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/ssh/offchain (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/aws/offchain (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/kube (0.03s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/kube/offchain (0.03s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect (0.03s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/dpapi-protect/offchain (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials (0.02s)
+    --- PASS: TestAnchorFallbackTeethPerAnchor336/local-credentials/offchain (0.01s)
+=== RUN   TestAnchorMissReasonNamesCandidateAndMissingAnchorPosix339
+    anchor_miss_reason_339_other_test.go:119: honest reject: A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate "/tmp/gt/testanchormissreasonnamescandidateandmissinganchorposix339418656572/001/profile/work/id_ed25519" is not proven handle-expanded (its own walk stopped at "/tmp/gt/testanchormissreasonnamescandidateandmissinganchorposix339418656572/001/profile/work") and the anchor "/tmp/gt/TestAnchorMissReasonNamesCandidateAndMissingAnchorPosix339418656572/001/profile/.aws/credentials" is not installed here (its expansion stopped at "/tmp/gt/testanchormissreasonnamescandidateandmissinganchorposix339418656572/001/profile"), so R17 protects the ancestry chain the two share instead of proving a miss
+--- PASS: TestAnchorMissReasonNamesCandidateAndMissingAnchorPosix339 (0.01s)
+=== RUN   TestAnchorMissKeepsNonOverridableClassPosix339
+    anchor_miss_reason_339_other_test.go:149: ANCHORMISS339-OTHER-347 cand=class=A allow=false needL2=false reason="A-list sensitive path (non-overridable): ~/.aws/credentials [fail-closed, NOT a match on this rule]: the candidate \"/tmp/gt/testanchormisskeepsnonoverridableclassposix339971945819/001/profile/work/id_ed25519\" is not proven handle-expanded (its own walk stopped at \"/tmp/gt/testanchormisskeepsnonoverridableclassposix339971945819/001/profile/work\") and the anchor \"/tmp/gt/TestAnchorMissKeepsNonOverridableClassPosix339971945819/001/profile/.aws/credentials\" is not installed here (its expansion stopped at \"/tmp/gt/testanchormisskeepsnonoverridableclassposix339971945819/001/profile\"), so R17 protects the ancestry chain the two share instead of proving a miss" class=A clause=true offchain=B
+--- PASS: TestAnchorMissKeepsNonOverridableClassPosix339 (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.436s

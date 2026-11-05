@@ -1,5 +1,3 @@
-//go:build windows
-
 package risk
 
 import (
@@ -10,23 +8,30 @@ import (
 	"testing"
 )
 
-// Ticket 339 shape A: this instrument is windows-tagged because its world was
-// un-buildable on POSIX for a reason in the resolver, not in the environment.
-// formsOf (pathresolver.go) can only fill pathForms.root through resolveHandle,
-// and on the other platform that USED to be the documented stub
-// pathresolver_other.go returning ("", false) for every spelling - measured
-// (readings named PROBE339, .scratch/wisp/probes/339/r1/logs/probe339-posix-root
-// .log): walking a real existing directory through formsOf on linux gives
-// root == "". uncertainAnchorMiss (blacklist.go:359) needs a NON-EMPTY root on
-// both sides, so R17's fail-closed clause cannot fire there and the
-// non-overridable A that AC#1/AC#2 pin has no world on that platform. Un-tagged,
-// the two fail-closed cases are permanently red (ticket 334's Linux CI leg going
-// red = the ticket 339 report). The environment is NOT the cause: this file's
-// world builder sets HOME as well as USERPROFILE, os.UserHomeDir reads HOME on
-// POSIX, and the ticket's original "USERPROFILE is Windows-only, so the fake
-// home is never read" diagnosis was re-measured false (AC#0). The named POSIX
-// half (the mechanism + a tripwire that goes red the moment a POSIX resolver
-// lands) is anchor_miss_reason_339_other_test.go.
+// Ticket 339 shape B, completed by ticket 347: this instrument is NOT
+// windows-tagged. It was, for one shape (339-r1: //go:build windows plus a
+// POSIX tripwire), because its world could not be built here - and the
+// condition was in the resolver, not in the environment. formsOf
+// (pathresolver.go) fills pathForms.root only through resolveHandle, and
+// pathresolver_other.go used to return ("", false) for every spelling, so
+// uncertainAnchorMiss (blacklist.go) could not fire on POSIX at all (it needs a
+// non-empty root on both sides) and the non-overridable A these cases pin had
+// no world on that platform. Ticket 347 landed realpath + lstat there, the
+// tripwire went red exactly as designed, and the ticket-339 split collapses
+// here: the same three cases below now run on every platform. The environment
+// was never the cause - the world builder sets HOME as well as USERPROFILE, and
+// os.UserHomeDir reads HOME on POSIX (re-measured for the ticket's AC#0).
+//
+// What still differs per platform is HOW a spelling becomes unproven
+// (pathForms.partial), because the OS decides that: a Windows name carrying
+// U+001B / U+202E cannot be parsed at all, while both bytes are ordinary
+// filename bytes on POSIX, so there the same "present but unprovable" pair is a
+// dangling symlink. That single step is partialCandidate334, supplied per
+// platform (anchor_miss_reason_334_windows_test.go, and the POSIX half
+// delegating to the maker ticket 347 landed, anchor_miss_reason_339_other_test.go).
+// Everything else - the profile world and its installed/absent leaf lists -
+// comes from the shared builder in anchor_world_334_test.go, so the two
+// platforms cannot drift into two copies of one expectation.
 //
 // Ticket 334. Two things multiply into one dishonest rejection:
 //
@@ -45,10 +50,7 @@ import (
 //
 // The worlds below are built, not inherited from the host: every A-anchor leaf
 // is either installed by name or deliberately absent, so both the over-strict
-// shape and the honest-match shape are decidable on every WINDOWS machine. The
-// builder and its constants moved to anchor_world_334_test.go in ticket 347, so
-// the POSIX teeth read the same world instead of a copy of it; the Windows-only
-// half left here is the partial maker, hostile334 (see that file's header).
+// shape and the honest-match shape are decidable on every machine.
 
 // quotedFold334 puts a path into the shape aRuleReason prints it in: %q quoting
 // (backslashes doubled, control characters escaped) and lowercased, because
@@ -73,11 +75,7 @@ func TestAnchorMissReasonNamesCandidateAndMissingAnchor(t *testing.T) {
 		// honestly and the first fail-closed hit is the ~/.aws one - the exact
 		// reason string ticket 334 was written about.
 		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
-		cand := filepath.Join(w.work, hostile334)
-		_, err := os.Lstat(cand)
-		if err == nil {
-			t.Fatalf("setup: the hostile candidate must not exist, got a stat for %q", cand)
-		}
+		cand := partialCandidate334(t, w.work)
 		d := Gate(cand, nil)
 		if d.Class != ClassA {
 			t.Fatalf("fixture guard: the fail-closed shape must still be A here, got %s", gateShape216(d))
@@ -102,7 +100,7 @@ func TestAnchorMissReasonNamesCandidateAndMissingAnchor(t *testing.T) {
 		// Ticket 334 现量 row 3, built instead of inherited: the reason follows
 		// WHICH anchor is missing, never the candidate's identity.
 		w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", ".aws/not_credentials", wispCfgLeaf334)
-		cand := filepath.Join(w.work, hostile334)
+		cand := partialCandidate334(t, w.work)
 		d := Gate(cand, nil)
 		if d.Class != ClassA {
 			t.Fatalf("fixture guard: want A from the fail-closed clause, got %s", gateShape216(d))
@@ -140,7 +138,7 @@ func TestAnchorMissReasonNamesCandidateAndMissingAnchor(t *testing.T) {
 // red the moment anyone downgrades it, even by one tier.
 func TestAnchorMissKeepsNonOverridableClassAndNeedL2(t *testing.T) {
 	w := newWorld334(t, true, ".git-credentials", ".ssh/id_installed", wispCfgLeaf334)
-	cand := filepath.Join(w.work, hostile334)
+	cand := partialCandidate334(t, w.work)
 	if got := Classify(cand); got != ClassA {
 		t.Errorf("class: got %s, want A (the fail-closed tier is unchanged by AC#1)", got)
 	}
@@ -156,6 +154,6 @@ func TestAnchorMissKeepsNonOverridableClassAndNeedL2(t *testing.T) {
 	// assertion: the same input beside the profile is a plain B deny. The
 	// over-strictness inside the profile chain is real, it is today's behavior,
 	// and its denominator is still unmeasured (the ticket's 未定案那一支).
-	off := Gate(filepath.Join(newWorld334(t, false).work, hostile334), nil)
+	off := Gate(partialCandidate334(t, newWorld334(t, false).work), nil)
 	t.Logf("SHAPE-READING334 inside-profile=%s || off-profile=%s", gateShape216(d), gateShape216(off))
 }

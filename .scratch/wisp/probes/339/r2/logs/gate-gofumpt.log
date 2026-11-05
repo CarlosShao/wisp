@@ -1,0 +1,1 @@
+RC=0 (gofumpt -l printed nothing = all three written files are formatted; rc recorded in gate-summary.log)

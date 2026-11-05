@@ -1,0 +1,13 @@
+check-path-length-budget.sh: repo=D:/work/workspace/projects plans/Wisp
+check-path-length-budget.sh: unit=characters (probe: length of the 5-byte sample "a U+25FF b" = 3; LANG=en_US.UTF-8 LC_ALL=unset)
+check-path-length-budget.sh: hat: rule 9 name cap=100 + issues dir prefix=21 -> relative hat=121 ; worst checkout prefix=44 -> full-path budget=165
+check-path-length-budget.sh: check: relative_length + 44 > 165, or a last name component > 100
+check-path-length-budget.sh: denominator read: 18704 tracked paths
+check-path-length-budget.sh: denominator: tracked paths=18704  over-budget=65  covered by roster=64  not in roster=1
+check-path-length-budget.sh: longest=185 chars relative (.scratch/wisp/issues/252-the-two-spellings-of-one-path-split-inside-the-allowlist-check-short-name-stays-short-long-name-folds-long-so-in-root-writes-read-as-out-of-bounds-r2-l2-done.md)
+check-path-length-budget.sh: worst full path on the self-hosted runner=229 chars (hat budget 165, wall open interval (206,217])
+check-path-length-budget.sh: bands: over the hat=65  of which in the 122..180 middle=61  past the old debt line(180)=4  in the wall interval=0  roster entries=65
+check-path-length-budget.sh: RED - over budget and NOT in the roster: .scratch/wisp/issues/179-loop-deciderisk-treats-a-declared-l0-as-unclassified-so-every-readonly-builtin-is-refused-on-the-real-cli-and-no-criterion-holds-that-sentence-done.md  (relative 175 chars, name 154 chars, full path on the self-hosted runner 219 chars, budget 165)
+check-path-length-budget.sh: RED - roster entry that is not an over-budget tracked path any more (the roster has drifted away from the tree): .scratch/wisp/issues/179-loop-deciderisk-treats-a-declared-l0-as-unclassified-so-every-readonly-builtin-is-refused-on-the-real-cli-and-no-criterion-holds-that-sentence.md
+check-path-length-budget.sh: VERDICT RED
+check-path-length-budget.sh: unit cross-check: the byte view and the character view select the SAME 65 paths on this tree, recomputed just now in both units

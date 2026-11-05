@@ -57,6 +57,17 @@ func posixPartialCandidate347(t *testing.T, dir, name string) string {
 	return cand
 }
 
+// partialCandidate334 is the POSIX half of ticket 334's world, and it delegates
+// instead of rebuilding: ticket 347 landed posixPartialCandidate347 above and
+// the ticket-339 rule "do not build the same world twice" still holds. This is
+// the step that lets the ticket 334 instrument itself (three cases, untagged
+// since this ticket) run here instead of only its premise twin below - the
+// ticket 339 report was that the instrument had a world on one platform only.
+func partialCandidate334(t *testing.T, dir string) string {
+	t.Helper()
+	return posixPartialCandidate347(t, dir, hostilePOSIX347)
+}
+
 // TestAnchorMissReasonNamesCandidateAndMissingAnchorPosix339 is ticket 334 AC#1
 // on the platform ticket 347 opened: the fail-closed rejection has to say which
 // candidate was rejected and which anchor was not installed, instead of

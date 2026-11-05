@@ -1,0 +1,8 @@
+339-r2 gate summary (shared worktree, HEAD=5fd76dc7f)
+unset GOTMPDIR TMPDIR TEMP TMP before the runs (ticket 311 shape B GUARD)
+BUILD go build ./cmd/... ./internal/... ./tools/... RC=0
+TEST  go test ./internal/risk/ -count=1 -timeout 240s RC=1 (stock red: TestC26RewriteAccountIsConsumedAtEverySecurityLeg, same at HEAD export tree)
+GOFUMPT /d/work/base/gopath/bin/gofumpt.exe -l <the 3 written files> RC=0 LINES=0
+D22SCAN sh scripts/d22scan.sh RC=0 (clean; ban#8 internal 885 files, cmd 207 files)
+PATHLEN sh scripts/check-path-length-budget.sh RC=1 (pre-existing roster drift, NOT this leg: HEAD script:328 names 179-...-sentence.md while the tracked file is 179-...-sentence-done.md)
+VET go vet ./internal/risk/ RC=0
