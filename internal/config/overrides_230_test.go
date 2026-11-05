@@ -58,7 +58,12 @@ func TestBlacklistOverridesParseAsAnExemptionList(t *testing.T) {
 	pinOverrideAnchors230(t, root)
 
 	// A real B-tier file (".env" is the canonical example of the tier) plus a
-	// home-relative spelling that only exists after expansion.
+	// second B-tier file spelled with a redundant "." segment: the load must
+	// publish the C26-canonical spelling, not the operator's raw string. The
+	// spelling deliberately avoids env/home expansion - since ticket 102's
+	// rewrite account is consumed by this leg, an entry C26 has to substitute
+	// into is refused at load, not canonicalized (see
+	// overrides_c26_rewrite_test.go).
 	project := filepath.Join(root, "project")
 	if err := os.MkdirAll(project, 0o755); err != nil {
 		t.Fatal(err)
@@ -67,9 +72,17 @@ func TestBlacklistOverridesParseAsAnExemptionList(t *testing.T) {
 	if err := os.WriteFile(envFile, []byte("TOKEN=fixture\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	homeRelative := filepath.Join(root, "later", ".env")
+	later := filepath.Join(root, "later")
+	if err := os.MkdirAll(later, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(later, ".env"), []byte("TOKEN=fixture\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	sep := string(filepath.Separator)
+	unclean := later + sep + "." + sep + ".env"
 
-	path := writeConfigFile(t, overrideConfig230(envFile, "~/later/.env"))
+	path := writeConfigFile(t, overrideConfig230(envFile, unclean))
 	c, _, err := LoadFile(path, nil)
 	if err != nil {
 		t.Fatalf("a valid B-tier exemption must load: %v", err)
@@ -82,7 +95,7 @@ func TestBlacklistOverridesParseAsAnExemptionList(t *testing.T) {
 	// pipeline uses, so the assertion is "the value is C26-canonical", not
 	// "the value is whatever this test happens to think a path looks like".
 	want := make([]string, 0, 2)
-	for _, spelling := range []string{envFile, homeRelative} {
+	for _, spelling := range []string{envFile, unclean} {
 		res, err := risk.Resolve(spelling, nil)
 		if err != nil {
 			t.Fatalf("Resolve(%q): %v", spelling, err)

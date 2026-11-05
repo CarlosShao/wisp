@@ -14,33 +14,47 @@ package config
 // unlock it" (internal/risk/blacklist.go's own header).
 //
 // So the key is now a real setting, and this file is what the config layer owes
-// it at load. Three duties, all fail-loud, because the failure mode this repo
+// it at load. Four duties, all fail-loud, because the failure mode this repo
 // keeps paying for is a line that reads as a policy change and is not one:
 //
-//  1. CANONICALIZE. Each entry goes through the C26 pipeline (risk.Resolve) and
-//     the Config carries the resulting canonical spelling. This is not
-//     cosmetic: the gate compares override keys against the handle-resolved
-//     comparison form of the path it is asked about, so an entry that keeps the
-//     operator's raw spelling is an exemption that may silently never fire
-//     (8.3 short names, junction targets, mixed separators).
-//  2. REFUSE A TIER. An entry whose canonical spelling classifies ClassA is a
+//  1. CONSUME THE C26 REWRITE ACCOUNT. This leg does not merely classify the
+//     resolver's answer - it PUBLISHES that answer as the key the gate will
+//     match - so it has to ask what the pipeline substituted to get there
+//     (Result.Actable, ticket 102). An entry whose %VAR%/$VAR/leading-~ was
+//     expanded is a load error: keying the gate on the expanded tree would
+//     exempt a file this line never named, while the line still reads as the
+//     spelling the operator typed. Expansion stays in the pipeline on purpose
+//     (SPEC-06 4 step 1); what is refused is letting its answer travel into the
+//     exemption set unaccounted for.
+//  2. CANONICALIZE. Each accepted entry goes through the same C26 pipeline
+//     (risk.Resolve) and the Config carries the resulting canonical spelling.
+//     This is not cosmetic: the gate compares override keys against the
+//     handle-resolved comparison form of the path it is asked about, so an
+//     entry that keeps the operator's raw spelling is an exemption that may
+//     silently never fire (8.3 short names, junction targets, mixed
+//     separators). Those are handle-resolution steps, not rewrites, so they do
+//     not trip (1).
+//  3. REFUSE A TIER. An entry whose expanded spelling classifies ClassA is a
 //     load error. Accepting it would recreate, one layer down, exactly the
 //     lying option unwired.go existed to prevent: the file would carry a
 //     standing "exemption" for a file no exemption can ever unlock.
-//  3. REFUSE AN ENTRY THAT CANNOT FIRE. B membership is decided by the file
+//  4. REFUSE AN ENTRY THAT CANNOT FIRE. B membership is decided by the file
 //     name (internal/risk's B rules), so an entry matching no B rule can never
 //     become true later. A typo must not sit in config.toml reading as a
 //     standing exemption.
 //
-// The expansion-before-classification order in (1)/(2) is load-bearing: without
-// it "~/.ssh/id_rsa" would be classified on the literal string, match the
-// B-tier "id_*" name rule, and be accepted - the exact fail-open the tier check
-// exists to stop.
+// The tier check still runs on the EXPANDED form, on purpose: "~/.ssh/id_rsa"
+// must reach ClassA instead of matching the literal B-tier "id_*" name rule.
+// The rewrite account binds where the answer becomes an exemption key, i.e. the
+// B tier; an A-tier refusal keeps its tier reason and additionally reports the
+// expansion (see the ClassA branch below).
 //
-// STILL UNDONE (reported as the seam, not hand-waved here): nothing consumes
-// the list yet. tools.Options.Confirmations is the documented seam for Gate's
-// bOverrides map, and keying it needs risk's comparison fold, which is
-// unexported in a frozen package. See docs/evidence/s1/230-ac4-config-half.md.
+// THE REMAINING WIRING LEG (reported as the seam, not hand-waved here): no
+// committed code in cmd/wisp arms the list yet. The consumers exist -
+// tools.Options.PersistedExemptions is the provider risk.GateStanding takes as
+// its third argument (the second is the runtime L2 confirmations) - so arming
+// it is a pure fold with risk.OverrideKey, not a new seam. See
+// docs/evidence/s1/230-ac4-config-rewrite-account.md.
 
 import (
 	"fmt"
@@ -75,28 +89,51 @@ func validateBlacklistOverrides(c *Config) error {
 				"config.toml: %s %q cannot be canonicalized: %v. An exemption must be the real "+
 					"path of the file it exempts (SPEC-06 4.1: the blacklist takes the C26 resolver's answer)", key, entry, err))
 		}
-		path := res.Canonical
-		switch class := risk.Classify(path); class {
+		// The tier is decided on the expanded form on purpose (SPEC-06 4:
+		// expand, then classify): that is what makes "~/.ssh/id_rsa" reach
+		// ClassA instead of matching the literal B-tier "id_*" name rule.
+		switch class := risk.Classify(res.Canonical); class {
 		case risk.ClassA:
-			return observe.New(observe.ClassConfig, fmt.Sprintf(
+			reason := fmt.Sprintf(
 				"config.toml: %s %q resolves to %q, which is an A-tier sensitive path: the A tier is "+
 					"absolutely denied and is never overridable (SPEC-06 4.1), so no exemption - standing, "+
-					"per-session or in this file - can unlock it. Remove this entry", key, entry, path))
+					"per-session or in this file - can unlock it. Remove this entry", key, entry, res.Canonical)
+			if res.Rewritten {
+				reason += fmt.Sprintf(" (C26 also expanded this spelling: %s; the refusal stands on the "+
+					"expanded form, so neither form may be exempted)", strings.Join(res.Rewrites, "+"))
+			}
+			return observe.New(observe.ClassConfig, reason)
 		case risk.ClassB:
-			// The only tier an exemption can honour.
+			// The only tier an exemption can honour - and the only branch whose
+			// answer becomes a published key, so this is where the rewrite
+			// account binds (ticket 102). An expanded spelling is not the file
+			// the operator named, so it never reaches c.Risk.BlacklistOverrides.
+			path, err := res.Actable()
+			if err != nil {
+				return observe.New(observe.ClassConfig, fmt.Sprintf(
+					"config.toml: %s %q cannot be a standing exemption: %v. "+
+						"A spelling C26 has to substitute into does not name the file it ends up at; "+
+						"publishing the substituted tree as the exemption key would exempt a path this "+
+						"entry never spelled. Write the entry as the literal path, or remove it", key, entry, err))
+			}
+			// Two spellings of one file are one exemption; keeping both would only
+			// make the gate's set do the same work twice.
+			if seen[path] {
+				continue
+			}
+			seen[path] = true
+			canonical = append(canonical, path)
 		default:
-			return observe.New(observe.ClassConfig, fmt.Sprintf(
+			reason := fmt.Sprintf(
 				"config.toml: %s %q resolves to %q, which matches no B-tier rule: the tier is decided by "+
 					"the file name (internal/risk's B rules), so this exemption could never fire. "+
-					"Check the spelling or remove the entry", key, entry, path))
+					"Check the spelling or remove the entry", key, entry, res.Canonical)
+			if res.Rewritten {
+				reason += fmt.Sprintf(" (C26 also expanded this spelling: %s; an expanded spelling is not "+
+					"the path this entry names)", strings.Join(res.Rewrites, "+"))
+			}
+			return observe.New(observe.ClassConfig, reason)
 		}
-		// Two spellings of one file are one exemption; keeping both would only
-		// make the gate's set do the same work twice.
-		if seen[path] {
-			continue
-		}
-		seen[path] = true
-		canonical = append(canonical, path)
 	}
 	c.Risk.BlacklistOverrides = canonical
 	return nil
