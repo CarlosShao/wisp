@@ -54,7 +54,7 @@
 
 ```
 $ CGO_ENABLED=1 go test -count=1 -v -timeout 30m -run 'TestAC1AC2DispatchHopGate133|TestAC3SelfProof133...|TestAC4Distinctness133...' ./cmd/wisp/
---- RUN   TestAC1AC2DispatchHopGate133
+=== RUN   TestAC1AC2DispatchHopGate133
     leg_dispatch_gate_133_test.go:251: AC#1/#2 RED: leg "slo" (main.go:133) is booked in the ledger below as covered by the case "Test384ResidentWatchdogEndToEnd", and this round's test binary has no such case: the roster read from the running binary lists 226 startable cases and "Test384ResidentWatchdogEndToEnd" is not one of them, so no "=== RUN   Test384ResidentWatchdogEndToEnd" line exists in this run or can exist in it. The name is declared at resident_watchdog_windows_test.go:184, which is the point - the declaration is in the sources and the sources are not the build.
 --- FAIL: TestAC1AC2DispatchHopGate133 (0.22s)
 FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.494s
@@ -90,6 +90,11 @@ windows 腿（改后）：`go test -count=1 -timeout 200s -run 'TestAC1AC2Dispat
 ⇒ 4 枚全 `--- PASS`，`ok … 0.698s`；账本与改前逐字相同（`slo` 在 windows roster 里，正常记 `covered=test`），
 披露行 `… 5 distinct, 5 of them startable, 0 red above; 0 claim(s) stopped at the platform gate …`。
 
+**树前进（据实记）**：本腿开工锚点 `05e02c4df`，linux 快照与那一发都钉在它上。提交前兄弟代理落了
+`50b540fad`（票 255 C2 名册重判，动 `cmd/wisp/config_readers_255.go` 与其用例）⇒ 本腿提交的父就是
+`50b540fad`。改后 4 枚 133 用例在 `50b540fad` 那棵树上**再跑一遍仍全 PASS**（`ok 0.609s`，§5 表内），
+`go build ./cmd/... ./internal/...` 也仍 rc=0。
+
 ## 4. 边界：四种形状，谁披露谁红（自证腿逐条钉）
 
 | 形状 | 本腿 build 收？ | 另一条腿 build 收？ | 结果 |
@@ -110,7 +115,7 @@ windows 腿（改后）：`go test -count=1 -timeout 200s -run 'TestAC1AC2Dispat
 |---|---|---|
 | 构建 | `go build ./cmd/... ./internal/...` | **rc=0** |
 | 构建（全仓） | `go build ./...` | 被**未跟踪**的本地目录 `build/`（`build/mut_rvw.go`，`git ls-files build` = 0）挡住：`undefined: voiceBargeinMonitor` 等；**与本次改动无关**，不是本腿造的 |
-| 定向测试 | `go test -count=1 -timeout 200s -run '<4 枚 133 用例>' ./cmd/wisp/` | **ok 0.698s**（windows）；linux 容器同一 `-timeout` 口径 **ok 0.837s** |
+| 定向测试 | `go test -count=1 -timeout 200s -run '<4 枚 133 用例>' ./cmd/wisp/` | **ok 0.698s / 0.609s**（windows，两次；第二次在兄弟代理 `50b540fad` 落地后）；linux 容器同一选择、`-timeout 30m` 上限下 **ok 0.837s / 1.115s** |
 | 整包测试（派单口径） | `go test -count=1 -timeout 200s ./cmd/wisp/` | **超时**（`panic: test timed out after 200s`）：本机这棵树的整包要 **580s**（下面一条）；这是机器/套件规模，不是本腿 |
 | 整包测试（放宽到 900s，只取名册） | `go test -count=1 -timeout 900s ./cmd/wisp/` | `FAIL … 580.339s`，27 枚红**全是语音/实时硬件类**；抽一枚的原因为 `speech: onnxruntime 1.17.1 is older than the 1.28 the linked sherpa-onnx C API requires; a second onnxruntime.dll is shadowing the one on PATH (on Windows the loader searches System32 before PATH)` ⇒ **本机 DLL 遮蔽**，非本腿 |
 | 格式 | `gofumpt -l cmd/` | **空**（本腿两枚文件干净；HEAD blob 抽出来跑 `gofumpt -l cmd internal` 也是空） |
