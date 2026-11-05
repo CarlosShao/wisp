@@ -122,7 +122,7 @@ var lockedKeyDisposition = map[string]string{
 	"risk.shell_enabled":       "unwired:risk.shell_enabled",
 	"risk.allow_shell_string":  "unwired:risk.allow_shell_string",
 	"risk.shell_allowlist":     "unwired:risk.shell_allowlist",
-	"risk.blacklist_overrides": "consumed: validated and canonicalized at load (overrides.go, ticket 230 AC#4: B tier only, A tier refused, a spelling C26 has to expand is refused); the list is the persisted exemption set tools.Options.PersistedExemptions returns to risk.GateStanding as its third argument (the second is the runtime L2 confirmations) - arming that closure in cmd/wisp is the remaining wiring leg, named in docs/evidence/s1/230-ac4-config-half.md",
+	"risk.blacklist_overrides": "consumed: validated and canonicalized at load (overrides.go, ticket 230 AC#4: B tier only, A tier refused, a spelling C26 has to expand is refused); the list is the persisted exemption set tools.Options.PersistedExemptions returns to risk.GateStanding as its third argument (the second is the runtime L2 confirmations), armed by cmd/wisp (armPersistedExemptions, keyed with risk.OverrideKey) and re-armed after every reload",
 	"risk.permission_mode":     "consumed: Config.PermissionMode is read per tool call by the bridge (internal/tools), persisted by Manager.SetPermissionMode; ticket 90",
 	// [fs]
 	"fs.allowed_dirs":             "consumed: cmd/wisp/run.go feeds the C26 canonicalizer",

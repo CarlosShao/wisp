@@ -49,11 +49,12 @@ package config
 // B tier; an A-tier refusal keeps its tier reason and additionally reports the
 // expansion (see the ClassA branch below).
 //
-// THE REMAINING WIRING LEG (reported as the seam, not hand-waved here): no
-// committed code in cmd/wisp arms the list yet. The consumers exist -
-// tools.Options.PersistedExemptions is the provider risk.GateStanding takes as
-// its third argument (the second is the runtime L2 confirmations) - so arming
-// it is a pure fold with risk.OverrideKey, not a new seam. See
+// WIRING (landed while this leg ran, by the composition-root leg):
+// cmd/wisp/run.go assembles tools.Options.PersistedExemptions from this list,
+// cmd/wisp/blacklist_overrides_230.go's armPersistedExemptions folds each entry
+// with risk.OverrideKey, and risk.GateStanding reads the result as its third
+// argument (the second is the runtime L2 confirmations).
+// cmd/wisp/config_reload.go re-arms the snapshot after every reload. See
 // docs/evidence/s1/230-ac4-config-rewrite-account.md.
 
 import (
