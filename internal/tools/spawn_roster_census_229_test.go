@@ -72,6 +72,11 @@ var spawn229ReviewedSites = map[string]string{
 	// the scope.Go waiter above it, so it is a reviewed NON-goroutine site.
 	// First arg is the monotonic-budget childCtx.
 	`internal/plugin/manifestslot/command.go|childCtx`: "OS 子进程 spawner（SpawnSpec），非 goroutine 名册；首参 childCtx 是预算上下文，进程由 proc.Wait+scope.Go 管辖",
+	// ticket 29 AC#1: Fire() hands the batch to the L1 extraction goroutine
+	// through a package const (l1ExtractGoroutine = "memory-extract"), so the
+	// census cannot see a literal here. The runtime name IS the frozen D38b
+	// temporary-roster name (observe.TemporaryNames), not an invented one.
+	`internal/memory/l1_warm.go|l1ExtractGoroutine`: "memory-extract：temporary（D38b 冻结临时族；L1 抽取只在 Warm 窗口内跑，永不上响应路径）",
 }
 
 // expr229 renders one AST expression back to source text, whitespace-folded so
