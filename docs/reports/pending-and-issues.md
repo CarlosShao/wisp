@@ -31235,3 +31235,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 230-AC4 config 半场（eacf043d0 + 9b475a369）：validateBlacklistOverrides（每条过 C26 落 canonical；ClassA 条目＝加载错误绝对禁；inert 条目拒；空拒、重复去重）；删 unwired.go:79 响亮失败守卫→consumed 实话；进 validate 链；schema 注释改实话；overrides_230_test 4 枚含 9 个 A 级例子逐枚拒 + A 塞进 override 集合 Gate 仍 ClassA/不 Allow/不 NeedL2+出 A 级日志。config 整包 rc0；POSIX 唯一红＝既有 :240 flaky（未改树同红，非本腿）。internal/risk/cmd/wisp 字节 0。
 - 全接线 seam（下一波，需 internal/risk 冻结包专波；且须等 wave14 的 cmd/wisp 腿落账＝共享编译面）：①internal/risk 导出 OverrideKey＋GateStanding（保 overrideApplies 钉）②internal/tools 加 PersistedExemptions 第二来源 ③cmd/wisp 从 cfg 建 map+reload。
 - 机主第3条已按走B落（A1549）。config :240 flaky 建议重写断言⇒本波派 config-240-fix。
+
+## A1551（2026-11-05 18:1x，编排者）收 wave14：245 PASS、98 AC#3 PASS、103 腿死
+- 245（9e84ae42e）：AC#6② 稳态热键钉改判「裸键」（MOD_NOREPEAT 不算修饰）+四处改判；AC#6① wisp -h 文案改事实句；AC#4 新增真 config→球 HotkeyConfig 钉（含只删行回默认正控）。cmd/wisp 新增红 0（overlay 45/45 名同）。★未闭：AC#6② 行为半边与票260「稳态永不绑cancel」冲突⇒编排者裁＝不动260、只留判据精度（配置组合键常绑列未来项）；AC#8/9 真机。
+- 98 AC#3（4a682f698）：scripts/wisp-cli-tests.sh 加 PATH 可达性守卫（按 deps.toml 每枚钉名遍历 PATH、不可达点名 exit1）+ 加载失败兜底；改前误诊"does not build"无点名→改后点名 sherpa 2 DLL。AC#1(iii)/AC#4 STOP（真机CI/台账面）。
+- 103 腿死（无脏无提交）。
+- 我自验：build rc0、internal/ball ok、cmd/wisp 新增红0、gofumpt 空、d22 clean。
+- 动作：cmd/wisp 空出⇒下一波派 230-AC4 全接线（risk冻结+tools 半场先，再 cmd/wisp）。
