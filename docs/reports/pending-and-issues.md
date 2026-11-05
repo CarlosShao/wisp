@@ -31290,3 +31290,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 135-verdict（e0fa59a40）：7/7 AC PASS（M-C 两守卫、M-A2 死码/M-A2b 牙活、M-E 新牙独立、linux 容器分母咬、门禁切片 38/38/0/0）。AC#6 留一格整包 -count=2 四数未取（44 既有红非本票）不翻判。⇒ 可结。
 - 266-verdict：CLOSE（AC#0-4 全 PASS、ci.yml 13/13 字节对齐、删钉变异响、正控32/32、restore 绿）。两 residual：①删文件+CI步=静默(P3 按天钝)；②原地缩声明(3行→1)仍 rc=0、删匹配调用仍 rc=0——证据§1「体积最小」句需更正。⇒ 可结。
 - 177（aee58549c/5bc65085f，零产码）：AC#0 只读普查交「丙形价目表」（L2 四形/每次必批结构因/R4、选丙则 164 AC#3 两判据必改形须 owner）。依赖 owner 选不选丙 ⇒ 不结、作价目表留档。
+
+## A1563（2026-11-05 21:5x，编排者）收 wave25：182-r2 交出(10堆归口返图)、346 STOP gated、323 阵亡
+- 182-r2（0a45bd90b＋补正）：任务监控栏 10 堆源/载体/归属返图（145/188/192 持有、K5→407、K7→163/191、K2 独立时间线=改PLAN须批）。补正=行号刷新 7 处（leg 死前未提交，编排者补提交）。它是 145/187/188/192/195 gated 簇的归口图。
+- 346 STOP：b 门槛全锁——AC#1 选形须非实现者(未出)、AC#5 禁动 .github/ci.yml(人工批准)、写面只有 probes/346，甲/丙形都要动 CI 或 internal/winsec test(出票面写面)、且票 342 未 done、两仪器 //go:build !windows 在 Windows 结构性 0 编译须 Linux CI。⇒ 暂缓。
+- 323 阵亡：wave25 该腿 null 无产出；323 已有前批提交(d1b1a2d22 等)、仍开、待重派剩余格。
