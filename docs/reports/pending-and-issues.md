@@ -31121,3 +31121,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 346 AC#3（probes/346/a1，13 件）：ci-red-attribution.sh 空名册 exit5 拒答＋正控先于归因＋离线缝；selftest 34/34；真两发 CI log top FAIL=16、unique red=14。commit 1f298db54。★未闭：AC#1 选形（须非实现者；甲支须 CI 人工批准）／AC#2/4 须已选形+CI/Linux／342 未 done。
 - 23 AC#2 loop+llm 半边（6 源+4 测）：mem: 句柄图像仓库、三适配器按协议送图（openaichat tool文本+user图像轮／anthropic tool_result／native openairesponses input_image）。commit a67e1d335。★AC#2 tools 半边出写面（tool.go Result 图像通道／bridge.go Images／system.go 假话注释 3 处）→ 下波 23-tools 补；AC#3 需真机+前端。
 - 我自验：go build rc0；go test ball(245)／agent+openaichat/anthropic/openairesponses(23) 全 ok；gofumpt 空；d22scan clean；346 bash -n ok。Test31DisarmStopsTheWait 为计时敏感既有红（与本浪无关，单跑曾 3红2绿）。
+
+## A1535（2026-11-05 11:0x，编排者）176轮：收 wave2（323/230 PASS，107/108 复判），23-tools 死腿遗产代提
+- 323 PASS：AC#0 六条残余现量（4闭/2开：超时无人盯 m3 rc0、protocol 预检 m5 rc0）＋AC#1/2/3 落地（cmd/wisp/panel_models_320_test.go＋证据 323-a0-ac1-ac2.md），Test320 PASS=13 FAIL=0；commit eda34703f+6c38e70cd。★未闭：AC#5 须改 internal/config/settings_320.go（出写面）／AC#6 真机 WebView2。
+- 230 PASS：AC#3 处置＝乙（作废票 80，两格接收在 230 AC#3 名下；80:61 原句具名作废），commit a3a4feefd（130+/0-，零 .go）。★未闭：AC#4 owner/改契约、AC#5 cmd/wisp 死区。
+- 23-tools 死腿遗产代提：wave2 23-tools 腿（res=null，疑似轮帽/超时）留下完整未提交改动——bridgeImages 定义在 bridge.go:678、Image 类型（无 Path/Ref）、tool.go Result.Images 通道、system.capture 注释改写。我自验：build ./internal/tools ./cmd/wisp ./internal/llm ./internal/config rc=0、go test -run 23 ok、gofumpt 空；整包唯一红 Test229SpawnNamesAreRosterShaped 归因 internal/memory/l1_warm.go:221（票 29 落地、不属本改动集）＝既有红。⇒ 显式 pathspec 代提。至此 23 AC#2 两半（loop+llm a67e1d335 ＋ tools 本次）齐全；AC#3 需真机+前端。
+- 107 复判（107-verdict.md）：AC#3/AC#5 **被票 23 挡**——HEAD 上 GOOS=linux go test -c ./internal/tools rc=1（system_ops_other.go 缺 platformSystemBackend）＋ system_backend_windows.go:337/355 unsafe.Pointer vet 红，均属票 23 WIP。⛔ 当前 HEAD 挂 done；待 23 补 system_ops_other.go+修 unsafe 后同批复跑。
+- 108 复判（108-verdict.md）：AC#1-4 全通过（AC#3 POSIX 链接腿由票 113 3c5d1c3 落地、R-108-1 关闭）；AC#5 门禁红全归因他票（TestC26RewriteAccount=A380；memory 两枚跨平台用例）。108 自身无需改码——待裁是否按"AC#1-4过+AC#5红归他票"结案。
+- 我逐包自验 build rc0 已入；无禁改面。
