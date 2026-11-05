@@ -442,9 +442,9 @@ func Test23PowerShutdownRequiresTheTypedWord(t *testing.T) {
 
 // Test23ExecuteRendersDetailReportAndBytes is the Result shape per verb kind:
 // a write verb's Detail becomes Text verbatim; a read verb's Report becomes
-// compact JSON; and screen.capture's BYTES never appear - the model gets
-// {mime, bytes_len, drm} and the text says the image is not visible to it,
-// which is the honest state of C7 (AC2's seam does not exist yet).
+// compact JSON; and screen.capture's BYTES never appear in the TEXT - the model
+// gets {mime, bytes_len, drm} as prose plus the pixels on the image channel
+// (C7 ImagePart), which is what ticket 23 AC#2 asks for.
 func Test23ExecuteRendersDetailReportAndBytes(t *testing.T) {
 	f := &fake23Backend{reply: func(a Action, _ map[string]any) (ActionResult, error) {
 		switch a {
@@ -487,8 +487,16 @@ func Test23ExecuteRendersDetailReportAndBytes(t *testing.T) {
 			t.Errorf("screen.capture 把像素写进了 Text（%q）：截图只存内存", leak)
 		}
 	}
-	if !strings.Contains(cap.Text, "C7") {
-		t.Errorf("screen.capture 的文本没说 C7 ImagePart 接缝不存在（模型会以为自己看到了画面）：%q", cap.Text)
+	// The text must now tell the truth in the OTHER direction: the pixels did go
+	// to the model. The pre-23 wording ("接缝不存在，模型看不到画面") is the lie
+	// this leg removes, so it is asserted absent on purpose.
+	for _, stale := range []string{"接缝", "看不到画面"} {
+		if strings.Contains(cap.Text, stale) {
+			t.Errorf("screen.capture 的文本还在说 %q（图像通道已接通，这是对模型说假话）：%q", stale, cap.Text)
+		}
+	}
+	if !strings.Contains(cap.Text, "送入模型") {
+		t.Errorf("screen.capture 的文本没说像素已作为图像送入模型：%q", cap.Text)
 	}
 }
 

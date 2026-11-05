@@ -47,6 +47,15 @@ type Result struct {
 	IsError bool
 	// Truncated is set by a tool that shortened its own output.
 	Truncated bool
+	// Images are the pictures this result carries to the model (C7 ImagePart).
+	// screen.capture is the D34 row that fills it today; a tool with nothing to
+	// show leaves it nil, and the bridge must not invent one (an empty image
+	// makes a model describe pixels it never received).
+	//
+	// This is the PAYLOAD channel, so pixels must never ALSO be rendered into
+	// Text (ticket 23 AC#2, D34's screen.capture note: bytes_ref lives in memory
+	// only - not on disk, not in the DB, not in a log).
+	Images []Image
 	// Origin names where the result came from for C25 provenance marking
 	// (the canonical path / URL / window title). Empty falls back to the
 	// bridge's own view of the call's path parameter.
@@ -57,6 +66,28 @@ type Result struct {
 	// (fs.read/fs.list have no side effects); the fs.write/trash/move family
 	// (ticket 20 segment 2) is the first consumer.
 	AppliedSteps []string
+}
+
+// Image is one picture a tool produced, on its way to a C7 ImagePart
+// (SPEC-05 §3.3). Three fields, and the absence of a fourth is the design:
+// there is no Path and no Ref here, because a screenshot may reach the model and
+// nothing else. The loop turns Bytes into a `mem:<n>` handle of its own
+// memory-only store (agent/images.go), so nothing this package returns can put a
+// file on the wire even by accident (ticket 23 AC#2).
+type Image struct {
+	// Bytes are the encoded image (PNG for screen.capture). The tool hands
+	// ownership over: the slice is read once, copied into the loop's session
+	// store, and this package never writes it to a file, a row or a log line.
+	Bytes []byte
+	// Mime is the media type of Bytes. Empty falls back to
+	// application/octet-stream - the same fallback the metadata text prints.
+	// This layer does not guess that arbitrary bytes are an image the model
+	// can decode.
+	Mime string
+	// Alt is the sentence shown when an image is rendered as text (provider
+	// fallbacks, accessibility) and what the loop quotes when the image does
+	// not fit its store: "屏幕截图（记事本）", not a nameless attachment.
+	Alt string
 }
 
 // Decl is the host-side declaration for one Tool: the metadata the bridge

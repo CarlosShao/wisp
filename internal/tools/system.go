@@ -47,15 +47,19 @@ package tools
 //	AC5 power word       covered here: restart/shutdown with a missing or
 //	                     different confirm_word never reaches the backend.
 //
-//	AC2 C7 ImagePart     NOT COVERED, and deliberately not faked. C7 has no
-//	                     image part in this tree's llm.Content, and Result has no
-//	                     field that carries bytes, so screen.capture renders
-//	                     {mime, bytes_len, drm} as TEXT and the PNG never leaves
-//	                     process memory. The model therefore cannot SEE the
-//	                     screenshot until the C7 ImagePart -> LLM seam exists
-//	                     (owner-approved contract work, PLAN.md:2962). Until it
-//	                     does, screen.capture is a tool that reports what it
-//	                     captured, not one that shows it.
+//	AC2 C7 ImagePart     covered on this side by Result.Images (bytes + mime +
+//	                     alt, filled by renderSystemResult for screen.capture)
+//	                     and by the bridge forwarding them into
+//	                     agent.ToolOutcome.Images. The loop+llm half landed
+//	                     first (a67e1d335): the loop turns Bytes into a memory-
+//	                     only mem:<n> handle and each adapter emits its native
+//	                     image shape. So a screenshot now REACHES the model as a
+//	                     C7 ImagePart; the pixels still never touch a file, a
+//	                     row, a log or a diagnostics bundle. DRM black frames
+//	                     are produced and flagged by the platform backend
+//	                     (screen_capture_windows.go) and named in the alt text
+//	                     here, so the model is told the black rectangle is the
+//	                     real picture.
 //	AC3 confirm-card UI  NOT COVERED here: the three D45 options for input.type
 //	                     (仅本次 / 本会话内允许向此应用 / 所有应用 with the
 //	                     danger styling) are rendered by the native card, not by
@@ -233,22 +237,27 @@ func isSystemRefusal(err error) bool {
 		errors.Is(err, ErrElevatedTarget)
 }
 
-// renderSystemResult turns an ActionResult into the text the model reads. Three
-// shapes, one per kind of verb:
+// renderSystemResult turns an ActionResult into the text the model reads, and -
+// for the one verb that produces pixels - into the image the model SEES. Three
+// text shapes, one per kind of verb:
 //
 //   - Detail: the write verbs' one-liner ("音量已设为 40%").
 //   - Report: the read verbs' structured payload, as compact JSON so a test
 //     asserts keys rather than prose.
-//   - Bytes: screen.capture. There is NO image channel in Result and none in
-//     C7 in this tree, so what goes back is the metadata ({mime, bytes_len,
-//     drm}) and not one byte of the PNG. The wording says so out loud: a text
-//     render that stayed silent would let the model claim it "saw" the screen.
+//   - Bytes: screen.capture. The pixels go out on Result.Images (C7 ImagePart)
+//     and the TEXT carries only the metadata ({mime, bytes_len, drm}), never
+//     base64. Both halves are needed: the image is what the model can look at,
+//     the metadata is what the transcript and a text-only provider can still
+//     report. The wording says the pixels were handed over, because a text
+//     render that stayed silent would let the model deny seeing a screen it
+//     actually received.
 func renderSystemResult(name string, res ActionResult) Result {
 	out := Result{Origin: res.Target}
 	switch {
 	case len(res.Bytes) > 0:
+		mime := orDefaultString(res.Mime, "application/octet-stream")
 		rep := map[string]any{
-			"mime":      orDefaultString(res.Mime, "application/octet-stream"),
+			"mime":      mime,
 			"bytes_len": len(res.Bytes),
 			"drm":       res.DRM,
 		}
@@ -258,9 +267,22 @@ func renderSystemResult(name string, res ActionResult) Result {
 		if res.Detail != "" {
 			rep["detail"] = res.Detail
 		}
+		// The C7 image channel (ticket 23 AC#2). The bytes are handed over as
+		// they are: the loop copies them into its memory-only store and only a
+		// mem:<n> handle ever reaches the history, the DB or a log.
+		out.Images = []Image{{
+			Bytes: res.Bytes,
+			Mime:  mime,
+			Alt:   systemCaptureAlt(res),
+		}}
 		out.Text = renderSystemReport(rep) + "\n" +
-			"（截图像素只在内存里，没有落盘；C7 ImagePart 到 LLM 的接缝本仓当前不存在，" +
-			"所以模型看不到画面，只能拿到上面这份元数据）"
+			"（截图像素随本次结果交给宿主，作为图像送入模型（C7 ImagePart）；" +
+			"像素只在内存里，不落盘、不进日志、不进 DB，除非用户明确要求保存。" +
+			"若宿主因自身内存上限没能挂上，模型会另收到一句「未送入」说明）"
+		if res.DRM {
+			out.Text += "\n（drm=true：受 DRM 保护的内容被系统截成黑帧，黑帧就是这次真实画面，" +
+				"不要把纯黑当成桌面颜色）"
+		}
 		return out
 	case len(res.Report) > 0:
 		out.Text = renderSystemReport(res.Report)
@@ -294,6 +316,23 @@ func orDefaultString(s, def string) string {
 		return def
 	}
 	return s
+}
+
+// systemCaptureAlt is the C7 `alt` for a screenshot: the one sentence a
+// provider shows when it renders the image as text, and the sentence the loop
+// quotes if the image does not fit its store. It names WHAT was captured
+// (Target is "screen" / a window title / "region") and, for a protected
+// surface, that the black frame IS the picture - otherwise a model reads pure
+// black as "the user's desktop is black" and says so out loud.
+func systemCaptureAlt(res ActionResult) string {
+	alt := "屏幕截图"
+	if t := strings.TrimSpace(res.Target); t != "" {
+		alt += "（" + t + "）"
+	}
+	if res.DRM {
+		alt += "；受 DRM 保护的内容被系统截成黑帧"
+	}
+	return alt
 }
 
 // ---------------------------------------------------------------------------
@@ -488,9 +527,9 @@ var (
 
 // Each Description states what the tool does AND what it cannot or will not do,
 // because that second half is what stops the model from promising the user
-// something the row refuses: the backend is not wired on every platform, screens
-// cannot be seen yet, and an elevated window is a hard Windows limit rather than
-// a permission Wisp can ask for.
+// something the row refuses: the backend is not wired on every platform, a DRM
+// window yields a black frame, and an elevated window is a hard Windows limit
+// rather than a permission Wisp can ask for.
 func (t systemTool) Description() string {
 	switch t.name {
 	case "system.get":
@@ -512,7 +551,7 @@ func (t systemTool) Description() string {
 	case "media.control":
 		return "控制正在播放的媒体：播放/暂停、下一首、上一首、停止（发媒体键，可逆）"
 	case "screen.capture":
-		return "截屏（全屏/窗口/区域）。当前只能回报 {mime, bytes_len, drm} 元数据，像素留在内存里、模型看不到画面"
+		return "截屏（全屏/窗口/区域）。像素作为图像随结果送入模型（C7 ImagePart；只在内存里，不落盘不进日志/DB），同时回报 {mime, bytes_len, drm} 元数据"
 	case "input.type":
 		return "向目标窗口注入文本或键序列（L2；目标程序以管理员身份运行时为 Windows UIPI 硬限制，会明确拒绝且不提权绕过）"
 	}

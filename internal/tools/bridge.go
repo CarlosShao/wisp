@@ -632,6 +632,7 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 		IsError:      res.IsError,
 		RiskLevel:    dec.LevelString(),
 		Truncated:    res.Truncated,
+		Images:       bridgeImages(res.Images),
 		AppliedSteps: append([]string(nil), res.AppliedSteps...),
 	}
 	kind := OutcomeKindSuccess
@@ -660,6 +661,31 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 		b.mark(dec, res, hostPaths.get())
 	}
 	return b.close(ctx, req, dec, grantID, out, kind)
+}
+
+// bridgeImages maps the C1 Result's image channel onto the loop's attachments
+// (ticket 23 AC#2, the second hole a67e1d335's evidence note names). Without
+// this line a tool can produce pixels and the bridge drops them one frame later,
+// which looks identical to a tool that produced none.
+//
+// No filtering and no size re-check happen here: the loop's store owns the
+// 4 MiB per-image / 32 MiB per-session bounds AND owns the sentence the model
+// reads when an image does not fit (agent/images.go). Deciding again in the
+// bridge would create a second, silently different limit. Images travel even
+// when the result is an error, because C7 puts content and is_error side by
+// side; what must never happen is a SILENT drop, and the loop is the only place
+// that can explain a drop to the model.
+func bridgeImages(in []Image) []agent.ImageAttachment {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]agent.ImageAttachment, 0, len(in))
+	for _, img := range in {
+		out = append(out, agent.ImageAttachment{
+			MimeType: img.Mime, Data: img.Bytes, Alt: img.Alt,
+		})
+	}
+	return out
 }
 
 // execContext puts the C22 per-tool deadline on the caller's ctx. The budget
