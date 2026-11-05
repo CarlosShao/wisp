@@ -4,7 +4,11 @@
 **派单钉的 HEAD**：`0fa1527f9`；**本腿实际开工 HEAD**：`0af3b17aa`（＝钉的下一笔，编排者的收件 commit
 "收wave17:230-AC4 seam1 6a46140ea+266 PASS;登记overrides.go:78 C26红;A1553"，只动 `docs/reports/pending-and-issues.md` 6 行）
 ⇒ **漂移 +1 笔**，本腿在 `0af3b17aa` 上做，未 reset / 未 rebase。
-**交件 commit**：`6e5957756`（ci.yml，14 行纯插入）＋ 本文件所在 commit（docs/evidence）。
+**交件 commit**：`6e5957756`（ci.yml，14 行纯插入，父 `c6d1d187e`）＋ `23cfd5725`（本文件）＋ 本条补正（sha 由
+`git log --oneline -- docs/evidence/s1/ticket266-266-ci-step-v1.md` 现取；本文件不写自己未知的 sha）。
+**窗口内 HEAD 漂移（现读，非推断）**：`0af3b17aa` → **`c6d1d187e`**（兄弟腿 "284 rename 收尾:删旧名"，`2026-11-05 18:45:44`）
+→ `6e5957756`（本腿 ci.yml，`18:48:15`）。`0af3b17aa` 与 `6e5957756^` 的 `.github/workflows/ci.yml` **blob 逐字节相同**（`git rev-parse` 两枚 sha 相等），
+且 `git log --oneline 0af3b17aa..HEAD -- .github/workflows/ci.yml` **只有本腿一笔** ⇒ 漂移没夹带别人对 ci.yml 的改动，本腿的 14 行仍是唯一增量。
 **来源**：`docs/evidence/s1/ticket266-266-r2-impl-v1.md` §6（逐字补丁）——本腿是"无脑照抄"，**未增删一字**（§2 有逐行字节比对读数）。
 
 ---
