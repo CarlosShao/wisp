@@ -1,10 +1,10 @@
 # C26 rewrite account x `risk.blacklist_overrides` — internal/config de-red (2026-11-05)
 
-- Leg: `internal/config` de-red + wording cleanup. Start anchor `0fa1527f9` (branch `dev`), owner dispatch: ticket 230 AC#4 (`A1549`) meets the ticket 102 AC#5 static criterion.
+- Leg: `internal/config` de-red + wording cleanup. Dispatch anchor `0fa1527f9`; the worktree HEAD when this leg started was `0af3b17aa`, and other legs landed `23cfd5725`/`ad4aa9b90` while this one ran, so the two commits below sit on `ad4aa9b90` (`git show --stat 3c3c516ce f9d80bf38` lists only this leg's files). Branch `dev`. Owner dispatch: ticket 230 AC#4 (`A1549`) meets the ticket 102 AC#5 static criterion.
 - Write face actually touched: `internal/config/overrides.go`, `internal/config/overrides_230_test.go`, `internal/config/overrides_c26_rewrite_test.go` (new), `internal/config/unwired.go`, this file.
 - Not touched: `internal/risk/**` (frozen), `internal/tools/**`, `cmd/wisp/**`, `docs/reports/**`, the ticket pool.
 
-## 1. RED before (this leg's own run, HEAD `0fa1527f9`)
+## 1. RED before (this leg's own run, worktree HEAD `0af3b17aa`, dispatch anchor `0fa1527f9`)
 
 ```
 go test ./internal/risk -run TestC26RewriteAccountIsConsumedAtEverySecurityLeg -count=1
