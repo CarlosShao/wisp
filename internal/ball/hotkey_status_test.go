@@ -102,15 +102,21 @@ func fullConfig() HotkeyConfig {
 //
 // Ticket 245 rewrote the expected set from four to three, and that edit is a
 // TIGHTENING in two directions at once, so both halves are asserted here:
-//   - an idle ball may hold EXACTLY summon / mute / panel - one more, or one
-//     less, is red (the old "exactly four" would have called the pre-245 bug
-//     green, which is why it is not enough any more);
+//   - an idle ball may hold EXACTLY summon / mute / panel - one less is red
+//     (the old "exactly four" would have called the pre-245 bug green, which is
+//     why it is not enough any more);
 //   - and the thing it may never hold while idle is the cancel slot, which the
 //     production default spells as a bare Esc. That is asserted as an
 //     accelerator, not as a slot name: bindsEsc() must be false on the idle
 //     pass, and true the moment the borrow runs (the positive control below,
 //     in the same fake registry - a ruler that only ever sees "no Esc" because
 //     nothing registers ever would be a blind ruler).
+//
+// Ticket 245 AC#6② re-anchored the SET half from a count to the bare key (see
+// idleRosterReds245): "exactly three entries" cannot see a bare key bound in a
+// slot it never looked at, and it would red on a user-configured modifier
+// combination that steals nothing. The three named slots are still required
+// individually, and the cancel slot's standby reading is still asserted below.
 func TestRegisterAllLiveSet(t *testing.T) {
 	reg := &fakeRegistry{}
 	rep := registerAllWith(0, fullConfig(), reg.register)
@@ -126,8 +132,8 @@ func TestRegisterAllLiveSet(t *testing.T) {
 		}
 	}
 	live := rep.Live()
-	if len(live) != 3 {
-		t.Fatalf("live set = %d entries %v, want exactly 3 (summon/mute/panel)", len(live), live)
+	if reds := idleRosterReds245(rep); len(reds) != 0 {
+		t.Fatalf("the idle roster is not the standby one: %v\n%+v", reds, rep.Bindings())
 	}
 	for _, id := range want {
 		if !rep.IsLive(id) {
@@ -178,8 +184,8 @@ func TestDefaultHotkeysIdlePassHoldsNoEsc(t *testing.T) {
 	if reg.bindsEsc() {
 		t.Fatalf("the production defaults bound a bare Esc globally: %v", reg.attemptedAcc)
 	}
-	if len(rep.Live()) != 3 {
-		t.Fatalf("idle live set with the production defaults = %d, want 3: %+v", len(rep.Live()), rep.Bindings())
+	if reds := idleRosterReds245(rep); len(reds) != 0 {
+		t.Fatalf("idle roster with the production defaults is not the standby one: %v\n%+v", reds, rep.Bindings())
 	}
 	if rep.IsLive(hkCancel) {
 		t.Fatalf("cancel live with the production defaults: %+v", rep.Bindings())

@@ -65,15 +65,18 @@ func TestBallLiveLifecycle(t *testing.T) {
 	if !windowAlive(hwnd) {
 		t.Fatalf("ball window %v is not a window after New", hwnd)
 	}
-	// Ticket 245 tightened this nail from "exactly four" to "exactly the three
-	// an idle ball may hold, and NOT the cancel slot". The tightening is
-	// two-directional on purpose: one extra entry (a ball that binds cancel, or
-	// binds the bare Esc) is red, and one missing entry (a hotkey that failed to
-	// register) is red too. See requireIdleRoster for the second half - the
-	// desktop probe that shows the bare Esc is really free while we are idle.
-	if got := b.HotkeyReport(); !got.AllLive() || len(got.Live()) != 3 {
-		t.Fatalf("the live ball did not register its three idle hotkeys (summon/mute/panel, cancel is "+
-			"borrowed only during Confirming): %+v", got.Bindings())
+	// Ticket 245 tightened this nail from "exactly four" to "the three slots an
+	// idle ball may hold, and NOT a bare key". Ticket 245 AC#6② then moved the
+	// anchor from the entry COUNT to the bare key: a count reads green while a
+	// bare key sits in one of the three slots it never looked at, and it would
+	// red on a user-configured modifier combination that steals nothing. See
+	// idleRosterReds245 for the judgment and requireIdleRoster for the second
+	// half - the desktop probe that shows the bare Esc is really free while we
+	// are idle.
+	idle := b.HotkeyReport()
+	if reds := idleRosterReds245(idle); !idle.AllLive() || len(reds) != 0 {
+		t.Fatalf("the live ball did not register its idle hotkey roster (summon/mute/panel, no bare key, "+
+			"cancel is borrowed only during Confirming): %v\n%+v", reds, idle.Bindings())
 	}
 	requireIdleRoster(t, b)
 	afterNew := handlesOfProcess()

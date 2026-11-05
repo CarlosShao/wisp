@@ -22,13 +22,17 @@ const usage = `wisp - personal voice agent for Windows
 
 Usage:
   wisp             GUI resident process: boots the runtime skeleton, hosts the
-                   floating ball window, its tray icon and its four global hot
-                   keys in this same process, shows confirmation cards on that
-                   ball, and takes tasks from the operator's console when this
-                   process really owns one (ticket 246 AC#7: no interactive
-                   console means the task entry says so out loud and the ball
-                   keeps running; Ctrl+C stops the process, and the tray's Exit
-                   item still has no stop path attached to it)
+                   floating ball window, its tray icon and its three always-on
+                   global hot keys in this same process (summon, mute, panel;
+                   the cancel slot is the fourth key, bound only while a
+                   confirmation card is waiting and handed back when it leaves,
+                   so an idle wisp holds no bare key against the rest of the
+                   desktop), shows confirmation cards on that ball, and takes
+                   tasks from the operator's console when this process really
+                   owns one (ticket 246 AC#7: no interactive console means the
+                   task entry says so out loud and the ball keeps running;
+                   Ctrl+C stops the process, and the tray's Exit item still has
+                   no stop path attached to it)
   wisp run "task"  run one task end to end through the agent loop (ticket 12:
                    the S1 text path - streamed reply + notification + exit code
                    that reflects the error class)

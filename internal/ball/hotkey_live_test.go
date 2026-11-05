@@ -483,27 +483,26 @@ func TestLiveSleepingZeroTimerHandles(t *testing.T) {
 	}
 }
 
-// requireIdleRoster is AC#1 on a real window: the idle registration set is
-// EXACTLY summon / mute / panel, the cancel slot is not in it, and - because a
-// count alone could be three by accident - the bare Esc must be free on the
+// requireIdleRoster is AC#1 on a real window, read through AC#6②'s criterion:
+// the idle registration set is summon / mute / panel and holds NO bare key, and
+// - the half a registration set cannot answer - the bare Esc must be free on the
 // desktop at that moment. The two halves are the same ruler run twice: the
 // pre-245 ball read 4 live with Esc bound, and a ball that simply failed to
 // register anything would read 0 or 1.
+//
+// The entry COUNT is deliberately not the anchor (ticket 245 AC#6②): a bare key
+// bound in one of the other three slots is the same defect under a different
+// name and a count reads it green, while a user-configured modifier combination
+// held while idle is not a defect at all (it takes nothing from another
+// application). "The cancel slot is not attempted while idle" is still pinned -
+// deterministically, by the idle-pass attempt counting in hotkey_status_test.go
+// and by ticket 260's TestConfiguredCancelStillNeverBoundWhileIdle260 - so the
+// ruling moved the judgment shape, not the behaviour.
 func requireIdleRoster(t *testing.T, b *Ball) {
 	t.Helper()
 	rep := b.HotkeyReport()
-	if _, held := rep.Live()[hkCancel]; held {
-		t.Fatalf("ticket 245 RED: the idle ball holds the cancel hot key: %+v", rep.Bindings())
-	}
-	if len(rep.Live()) != 3 {
-		t.Fatalf("idle live set = %d entries, want exactly 3 (summon/mute/panel): %+v",
-			len(rep.Live()), rep.Bindings())
-	}
-	if !rep.IsLive(hkSummon) || !rep.IsLive(hkMute) || !rep.IsLive(hkPanel) {
-		t.Fatalf("idle live set is not summon/mute/panel: %+v", rep.Bindings())
-	}
-	if c, _ := rep.Binding(hkCancel); c.Status != HotkeyStandby {
-		t.Errorf("idle cancel line = %+v, want standby", c)
+	if reds := idleRosterReds245(rep); len(reds) != 0 {
+		t.Fatalf("the live ball's idle roster is not the standby one: %v\n%+v", reds, rep.Bindings())
 	}
 	free, err := escBorrowProbe(t, b)
 	if err != nil {
