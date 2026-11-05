@@ -31151,3 +31151,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 213-ac4（e198c3fd2）：Production() 调用者 0→1（console `wisp commands`），AC#4 名册可见+命令行执行落；页面半（snapshot key/C17 closed set）仍需 A##。
 - 98 普查（98-attribution.md 27KB）：ubuntu 81 红（非 19）、80 可归因；★**C2＝config_readers_255.go 名册漂移**（干净快照 Windows 逐字同红）⇒ CI test-windows 步不可能绿，是真 bug；建议 255/133/119 各开腿；76 枚 C1（DPAPI stub）需政策="decision 加 //go:build windows（移出 ubuntu 分母）vs 换 env: ref（留分母但动别票夹具）"＝owner。
 - 我自验：Test229 PASS、build ./internal/agent/... ./internal/command ./cmd/wisp ./internal/tools rc=0、agent/command tests ok、gofumpt 空、d22 clean。
+
+## A1539（2026-11-05 13:0x，编排者）180轮：收 wave6；255 C2 修绿、133 披露化、119 撞 C6 孤儿；记 cmd/wisp 双写教训
+- 255 C2（50b540fad）：名册重判——cmd/wisp/config_readers_255.go 三 section（cost/llm/voice）match=false→true；[cost] 判语升 consumed（44 CostWiring 每任务热读），llm 补登 44×2+61、voice 补 cloudcatalog；TestTicket255 14/14 ok。★255 票已 -done：本腿按 98 C2 定义做"结后漂移修复"，非新票；撤销 git revert 50b540fad。
+- 133（bf1e8d8ce+92ccd00a6）：covered=test 桶平台分裂改成"具名披露不判红"（照票131 先例）；证据件订正 RUN 原文/linux 超时口径。
+- 119 STOP：票 119 已 accepted-done；98 普查 C6=TestAC3POSIXSecretRoute...119b（cmd/wisp/secret_dataroot_119b_test.go:241，POSIX 哨兵 ErrReparseDenied vs winsec.ErrUnresolvedPath 不一致）**孤儿无票主**。三候选写面（internal/risk 冻结／winsec 票94 已done／cmd/wisp 测整包禁）全顶 ⇒ 建议甲：另开新票（下文立）。
+- 我自验：build ./cmd/... ./internal/... ./tools/... rc=0、cmd/wisp -run TestTicket255|DispatchGate|133 ok、gofumpt 空。
+- ★纪律教训：wave6 两腿（255 config_readers_255.go、133 leg_dispatch_gate_133_test.go）**均落 cmd/wisp**，违反"cmd/wisp 每波仅一枚写腿"，二者已各自绿但应避免；后续 cmd/wisp 每波只发一枚。
