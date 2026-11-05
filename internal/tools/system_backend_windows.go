@@ -66,6 +66,8 @@ var (
 	procGlobalFree   = kernel32.NewProc("GlobalFree")
 	procGlobalLock   = kernel32.NewProc("GlobalLock")
 	procGlobalUnlock = kernel32.NewProc("GlobalUnlock")
+	procGlobalSize   = kernel32.NewProc("GlobalSize")
+	procRtlMoveMem   = kernel32.NewProc("RtlMoveMemory")
 
 	procGetDpiForWindow = user32.NewProc("GetDpiForWindow")
 
@@ -251,6 +253,32 @@ func callUintptr(proc *windows.LazyProc, args ...uintptr) uintptr {
 	return r
 }
 
+// moveMemory copies n bytes with the OS memmove. It exists because the two
+// clipboard legs own a piece of memory the GC does not: GlobalLock returns an
+// ADDRESS (a uintptr from a syscall), and turning such an address into a Go
+// pointer is exactly the conversion go vet refuses ("possible misuse of
+// unsafe.Pointer") - correctly, since nothing proves it points at live memory
+// the collector knows about.
+//
+// The fix is not a pragma, it is to not build a Go pointer at all: the OS-owned
+// side stays a uintptr for the whole call, and the Go side is handed over as
+// uintptr(unsafe.Pointer(...)) for the duration of the call - the shape the
+// unsafe rules bless for syscall arguments and the one syscall.Syscall itself
+// uses. The copy also keeps the bytes alive after GlobalUnlock, which the old
+// slice-over-OS-memory shape did not.
+//
+// A missing entry point is an error, never a silent no-op: a clipboard read that
+// copied nothing would answer "empty", which is a lie the caller cannot see.
+func moveMemory(dst, src, n uintptr) error {
+	if procRtlMoveMem.Find() != nil {
+		return fmt.Errorf("RtlMoveMemory 不可用")
+	}
+	if n != 0 {
+		callUintptr(procRtlMoveMem, dst, src, n)
+	}
+	return nil
+}
+
 func realEnumWindows(cb func(hwnd uintptr) bool) error {
 	if procEnumWindows.Find() != nil {
 		return fmt.Errorf("EnumWindows 不可用")
@@ -334,7 +362,22 @@ func realClipboardRead() (string, error) {
 		return "", fmt.Errorf("锁定剪贴板句柄失败")
 	}
 	defer callUintptr(procGlobalUnlock, h)
-	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(p))), nil
+	// The locked address stays a uintptr: GlobalSize is asked for the block's
+	// length and the OS copies the bytes into a Go slice (see moveMemory). No
+	// Go pointer is ever forged out of an address the collector cannot track,
+	// and the string outlives the unlock below because it is a copy.
+	if procGlobalSize.Find() != nil {
+		return "", fmt.Errorf("GlobalSize 不可用")
+	}
+	size := int(callUintptr(procGlobalSize, h))
+	if size < 2 {
+		return "", nil // a handle with no character in it: honest empty string
+	}
+	buf := make([]uint16, size/2)
+	if err := moveMemory(uintptr(unsafe.Pointer(&buf[0])), p, uintptr(size)); err != nil {
+		return "", fmt.Errorf("读取剪贴板内容失败：%w", err)
+	}
+	return windows.UTF16ToString(buf), nil
 }
 
 func realClipboardWrite(text string) error {
@@ -352,8 +395,13 @@ func realClipboardWrite(text string) error {
 		procGlobalFree.Call(h)
 		return fmt.Errorf("GlobalLock 失败")
 	}
-	dst := unsafe.Slice((*uint16)(unsafe.Pointer(p)), len(utf16))
-	copy(dst, utf16)
+	// Same rule as the read path, in the other direction: the Go string is handed
+	// to the OS as uintptr(unsafe.Pointer(...)) for the length of the call, and
+	// the locked address is never turned into a Go slice.
+	if err := moveMemory(p, uintptr(unsafe.Pointer(&utf16[0])), size); err != nil {
+		procGlobalFree.Call(h)
+		return fmt.Errorf("写入剪贴板内存失败：%w", err)
+	}
 	procGlobalUnlock.Call(h)
 
 	if !callBool(procOpenClipboard, 0) {

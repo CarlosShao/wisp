@@ -34,7 +34,7 @@ import (
 //
 // The production implementation is split by platform: system_backend_windows.go
 // speaks to the OS (with a per-surface fake in this file selected by
-// system_ops_windows.go only when told to), and system_backend_other.go answers
+// system_ops_windows.go only when told to), and system_ops_other.go answers
 // every action with ErrNoSystemBackend. A build for another platform therefore
 // REFUSES (fail-closed, IsError text the model can act on) instead of pretending
 // the machine was touched.
