@@ -98,7 +98,7 @@ jobs:
     # BOUND - 0 of 40 runs reached this job's end, because `staticcheck` died
     # at import time (that is the pin fixed below), so the cost of the steps
     # after it was never paid. 20 carries two cold `go install` builds plus the
-    # 37-package three-module scan (`go install mvdan.cc/gofumpt@latest` and
+    # 37-package three-module scan (`go install mvdan.cc/gofumpt@v0.12.0` and
     # `go install .../staticcheck` are both compiled from source in this job).
     timeout-minutes: 20
     steps:
@@ -270,9 +270,27 @@ jobs:
       # other. That divergence is a finding, not a rounding difference: when it
       # happens the census step names the file and this step does not.
       - name: gofmt (gofumpt)
+        # TICKET 85 AC#1 (2026-11-05, leg 85-pin): VERSION PINNED. Until this
+        # leg the line below carried no `@version` at all - it asked the module
+        # proxy for "latest", so every run formatted the tree with whatever
+        # upstream had published that morning. That is the defect ticket 85 was
+        # filed for on the other tool: a gate whose verdict depends on the
+        # calendar instead of on our bytes, so a run that goes red because
+        # gofumpt changed its mind gets read as "somebody broke the code".
+        #
+        # WHY v0.12.0 AND NOT SOMETHING ELSE: it is this repo's bench binary
+        # (`gofumpt --version` = `v0.12.0 (go1.27.1)`, the same Go line as
+        # go.mod's `toolchain go1.27.1`), and the unpinned specifier already
+        # resolved to it on that toolchain - so this pin changes ZERO verdicts
+        # today and only removes tomorrow's randomness. The pinned string was
+        # installed once into a throwaway GOBIN by the same leg to prove it
+        # still resolves and builds (rc=0, `v0.12.0 (go1.27.1)`), and the bench
+        # tree still formats clean under that binary. Bumping this pin is now a
+        # code change with a reading attached, not an upstream event; an
+        # unversioned install specifier here is ticket 85's forbidden shape.
         if: ${{ !cancelled() }}
         run: |
-          go install mvdan.cc/gofumpt@latest
+          go install mvdan.cc/gofumpt@v0.12.0
           OUT="$(gofumpt -l internal cmd tools scripts frontend)"
           if [ -n "$OUT" ]; then
             echo "gofumpt would reformat:"
