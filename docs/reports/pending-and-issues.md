@@ -31100,3 +31100,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 114-a1p（b698bd99e 只读核）：可收口 YES；371 改 composer_handlers.go 未 weaken 114 六枚断言（仅夹具 error→Card、行号+1）；AC#2 门在 composer_handlers.go:176 perm.JudgeCard；未勾恰 {AC#6,AC#11}；仅 1 预存红 TestComposerContractTypesMatchFrontend（前端 ComposerState.files＝owner③）。
 - 收口：Status→done（纠正 in-progress 与 9 个 [x] 矛盾）、AC#6 保持未勾＝残余（真机截屏/GUI-CI）、AC#11 保持未勾＝作废（frontend）、改名＋双名核=1。
 - 残余登记：AC#6 真机 WebView2 差分截屏（需 GUI 会话/CI；本机 cmd/wisp MARK299 死）。
+
+## A1531（2026-11-05 09:1x，编排者）172轮：179 收口＝本会话第 34 枚（done-but-not-closed；声明 L0 被自门拒）
+- 179-a1p（ff69d8d4e 只读核）：修在 loop.go:900 case RiskL0；build rc0；go test ./internal/agent -run 179/Declared 全 PASS；gofumpt 空；d22 rc0(ban#8=865,PASS=35 FAIL=0)。AC#1 现树 overlay-red 复现（摘 loop.go:900-903 ⇒ declared_l0_risk_179_test.go:101/104/107/110/252 红、逐字 风险未分级…已拒绝执行）；旧 cf527f32 读数 7 仅佐证。183=done：端到端首读 kind=success risk=L0 decision=allow rules_hit=[] 读回 20000B，残余第二次受限续读归 185(open)。未勾恰 {AC#1,AC#8}。
+- 收口：翻 AC#1(现树红前读数)＋AC#8(由 183 done 落地端到端)，Status→done，改名＋双名核=1。顺带校正票 183 陈旧 Status 行（误留 ready-for-agent、实已 done）。
