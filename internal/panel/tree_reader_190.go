@@ -96,3 +96,47 @@ func readGitTree190(root string) TreeView {
 
 // ReadFileTree190 returns the working-tree file list for root (ticket 190 host-side source).
 func ReadFileTree190(root string) TreeView { return readGitTree190(root) }
+
+// ReadFileTreeForWorkspace190 is the account-aware entry to ticket 190's file
+// list: the same shape the git dimension got in ReadGitForWorkspace (git.go:298),
+// for the same rule (ticket 102, ledger A380).
+//
+// WHY THIS EXISTS AT ALL. A file list is read off a coordinate, and a coordinate
+// is only "the folder the user named" if C26's account says so. ReadFileTree190
+// takes a bare string and cannot know whether expansion moved that string onto a
+// different tree, so a leg that reaches past the account for the path renders a
+// listing of a tree nobody named as if it were the operator's own folder - the
+// exact shape the account exists to prevent. Taking the whole WorkspaceView is
+// what makes the account readable at this leg instead of a field the caller
+// silently skips.
+//
+// THE DISPOSITION IS THE GIT DIMENSION'S, deliberately. GitViewRewritten
+// (git.go:335) reports candidate ① of ticket 181 AC#6 as ruled by the
+// orchestrator: state the expanded truth AND say out loud that the coordinate
+// was rewritten. The tree rides the same ruling so one packet cannot narrate the
+// same workspace two different ways - git's section saying "rewritten" while the
+// files section quietly says "your folder". Refusing the whole dimension
+// (candidate ②) is not implemented here either, for the same reason it is not
+// implemented there: that ruling is the orchestrator's, and this leg does not
+// take it by itself.
+//
+// A view that was never rewritten is the ordinary road and behaves exactly as
+// before, byte for byte - the same contract ReadGitForWorkspace carries.
+func ReadFileTreeForWorkspace190(ws WorkspaceView) TreeView {
+	if ws.Rewritten {
+		return fileTreeRewritten190(ws)
+	}
+	return ReadFileTree190(ws.Canonical)
+}
+
+// fileTreeRewritten190 is ticket 190's file list for a coordinate C26's expansion
+// step moved onto another tree. It reads the expanded tree (the account-bearing
+// reading) and puts the account into the sentence the page renders, in the same
+// words the git section uses: both the spelling the user gave and the tree it
+// moved to, plus the literal `rewritten=true` a reader can grep for.
+func fileTreeRewritten190(ws WorkspaceView) TreeView {
+	view := ReadFileTree190(ws.Canonical)
+	view.Reason = "注意：这条工作区路径被 C26 的展开步改写过（账户 rewritten=true），" +
+		"下面这份文件清单来自改写后的树 " + ws.Canonical + "，不是原拼法 " + ws.Spelling + "。" + view.Reason
+	return view
+}

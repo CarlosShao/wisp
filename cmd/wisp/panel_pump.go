@@ -279,16 +279,21 @@ func (rt *agentRuntime) gitView() panel.GitView {
 
 // fileTreeView 报工作区只读文件清单（票190），与 gitView 同一 workspace 坐标。
 //
-// The coordinate is read off the same WorkspaceView gitView consumes
-// (.Canonical) instead of resolving "where am I" a second time: panel's reader
-// takes a bare string, while WorkspaceRoot() returns the C26 account. An unset
-// view leaves Canonical empty and the reader renders its own "no workspace"
-// state rather than this leg inventing a scope.
+// The coordinate is handed over as the whole view, not as a path string - the
+// same shape gitView gives panel.ReadGitForWorkspace, and for the same reason
+// (ticket 102's rule, ledger A380). The view carries C26's rewrite account on its
+// own fields, and panel.ReadFileTreeForWorkspace190 reads that account before it
+// reads anything off disk; taking the coordinate alone would let this leg publish
+// a listing of a tree the operator never named while the packet presented it as
+// "your folder". ReadFileTree190 by itself takes a bare string and cannot know
+// that, which is why the account-aware entry is the one wired here. An unset view
+// leaves the account and the coordinate empty and the reader renders its own "no
+// workspace" state rather than this leg inventing a scope.
 func (rt *agentRuntime) fileTreeView() panel.TreeView {
 	if rt == nil || rt.paths == nil {
 		return panel.ReadFileTree190("")
 	}
-	return panel.ReadFileTree190(rt.workspaceView().Canonical)
+	return panel.ReadFileTreeForWorkspace190(rt.workspaceView())
 }
 
 // currentModel reports the model id this boot really resolved for its text role.

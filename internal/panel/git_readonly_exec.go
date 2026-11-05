@@ -390,13 +390,22 @@ func runGitReadOnly(tree string, keep int64, args ...string) gitAnswer {
 	}
 }
 
-// resolveGitTree is C26's vote, taken once per read. The canonical answer is what
-// `-C` receives; a refusal (ErrReparseDenied, or an empty answer) is reported as an
-// unreadable dimension, never as a tree the reader picked for itself.
+// resolveGitTree is C26's vote, taken once per read. The tree `-C` receives is the
+// one C26's own account says a caller may ACT on; a refusal (ErrReparseDenied,
+// ErrRewrittenPath, or an empty answer) is reported as an unreadable dimension,
+// never as a tree the reader picked for itself.
 //
-// The rewrite account is deliberately NOT re-judged here: GitViewRewritten already
-// reports the expansion (candidate 1 of ticket 181 AC#6, ruled by the orchestrator),
-// and ReadGit has already read that account before it hands the tree over.
+// THE REWRITE ACCOUNT IS READ HERE, through Result.Actable() and nothing else
+// (ticket 102's rule, A380). This leg hands its answer to a process, so it is an
+// "act" leg no matter how read-only the subcommand is, and the account is what
+// separates "the tree the operator named" from "the tree expansion moved the
+// spelling onto". The disposition of a rewritten workspace is still not judged
+// here: ReadGitForWorkspace/GitViewRewritten (candidate 1 of ticket 181 AC#6,
+// ruled by the orchestrator) narrates the expansion and hands over the EXPANDED
+// tree as a plain string, which resolves with Rewritten=false and therefore
+// passes this door unchanged, byte for byte. What this door refuses is the other
+// shape: a root still carrying an expansion construct arriving from a caller that
+// never read the account at all.
 func resolveGitTree(root string) (string, string, string) {
 	if strings.TrimSpace(root) == "" {
 		return "", GitKindUnreadable, gitNoWorkspaceReason
@@ -406,10 +415,17 @@ func resolveGitTree(root string) (string, string, string) {
 		return "", GitKindUnreadable,
 			"C26 拒绝这条工作区路径，git 这一维不越过它去取数：" + err.Error()
 	}
-	if strings.TrimSpace(res.Canonical) == "" {
+	// Ticket 102's door: the account is read, so an expansion that moved the
+	// spelling onto another tree becomes a refusal instead of a `-C` argument.
+	tree, err := res.Actable()
+	if err != nil {
+		return "", GitKindUnreadable,
+			"C26 的展开步把这条工作区路径改写到了另一棵树（rewritten=true），git 这一维不在原拼法上取数：" + err.Error()
+	}
+	if strings.TrimSpace(tree) == "" {
 		return "", GitKindUnreadable, "C26 没有给出可用的树，git 这一维没有可探测的目录：" + root
 	}
-	return res.Canonical, "", ""
+	return tree, "", ""
 }
 
 // readGitWorkingState answers both ticket-189 dimensions for one tree, in the order
