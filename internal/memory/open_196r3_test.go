@@ -22,9 +22,45 @@ import (
 	"database/sql"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
+
+// fixturePathEnv196r3 names the variable the POSIX half of the shape fixture
+// publishes its path under. One fixed name, the shape ticket 180's
+// secret_fixture_180_test.go gives its ref: the case below runs on its own, and
+// t.Setenv restores whatever the host had before.
+const fixturePathEnv196r3 = "WISP_TEST_FIXTURE_DB_PATH"
+
+// dsnFixturePath196r3 returns the path the shape assertion pins and the exact
+// "file:" head that path must render to.
+//
+// dsn() renders a path through filepath.ToSlash, so the Windows drive spelling
+// is the half that measures a conversion: C:\Users\x\wisp\wisp.db must come out
+// with forward slashes. That literal is not a fixture a POSIX host can answer
+// for - filepath.ToSlash replaces os.PathSeparator and nothing else, so off
+// Windows the path keeps its backslashes byte for byte and the expected head is
+// unreachable. Feeding the Windows spelling to every host was the only reason
+// this boundary case was red on the POSIX leg (together with ticket 31-r2's
+// dbPath in reminders_test.go, the memory package's two deterministic POSIX
+// reds).
+//
+// Windows keeps today's bytes exactly - same literal, same expected head, same
+// assertions. Everywhere else the fixture is a POSIX path published to the
+// environment and read back, so the case is fed the host's fixture instead of a
+// second hard-coded copy of it; the expected head is still written out here
+// independently, never derived from the path, so the assertion keeps an
+// authority of its own to compare against.
+func dsnFixturePath196r3(t *testing.T) (path, dsnHead string) {
+	t.Helper()
+	if runtime.GOOS == "windows" {
+		return `C:\Users\x\wisp\wisp.db`, "file:C:/Users/x/wisp/wisp.db"
+	}
+	const posixPath = "/home/x/wisp/wisp.db"
+	t.Setenv(fixturePathEnv196r3, posixPath)
+	return os.Getenv(fixturePathEnv196r3), "file:/home/x/wisp/wisp.db"
+}
 
 // TestDsn196r3BusinessPoolsKeepTheirOwnForeignKeys is hard boundary 1, made
 // executable: the migration fix must not be a global switch.
@@ -34,9 +70,9 @@ import (
 // claim. The second half is the actual boundary: a caller who turns enforcement
 // on gets it, on a connection this package built.
 func TestDsn196r3BusinessPoolsKeepTheirOwnForeignKeys(t *testing.T) {
-	const p = `C:\Users\x\wisp\wisp.db`
+	p, dsnHead := dsnFixturePath196r3(t)
 	for _, forWriter := range []bool{false, true} {
-		want := "file:C:/Users/x/wisp/wisp.db?_pragma=busy_timeout(3000)" +
+		want := dsnHead + "?_pragma=busy_timeout(3000)" +
 			"&_pragma=journal_mode(WAL)&_pragma=synchronous(NORMAL)" +
 			"&_pragma=wal_autocheckpoint(1000)"
 		if forWriter {

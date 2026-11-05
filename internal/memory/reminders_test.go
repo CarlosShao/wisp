@@ -3,6 +3,7 @@ package memory
 import (
 	"context"
 	"database/sql"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -61,10 +62,12 @@ func scalarAt(t *testing.T, path, q string, args ...any) int {
 // reminders table exists, and the v5-era rows are byte-identical.
 func TestMigration31V5ToV6KeepsOldData(t *testing.T) {
 	dir := seedV5Database(t)
-	dbPath := dir + "\\" + dbFileName
-	if strings.ContainsRune(dbFileName, '/') {
-		dbPath = dir + "/" + dbFileName
-	}
+	// The fixture is the file the production Open just wrote, named the way this
+	// platform names it (filepath.Join yields dir\wisp.db on Windows, byte for
+	// byte the spelling this line used to build by hand, and dir/wisp.db
+	// everywhere else - where the hand-built "dir\\wisp.db" opened a second,
+	// empty database and read 0 reminders).
+	dbPath := filepath.Join(dir, dbFileName)
 
 	s, err := Open(dir)
 	if err != nil {
