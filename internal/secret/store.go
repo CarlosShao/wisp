@@ -18,11 +18,19 @@ var ErrPortableDecrypt = errors.New(
 	"secret: portable mode: DPAPI blob cannot be decrypted (created by another user or on another machine); " +
 		"store this key as an env: reference instead (P13: there is no plaintext fallback)")
 
-// Store is the DPAPI-backed secret store (C28): one blob file per ref under
+// Store is the C28 secret store: one blob file per ref under
 // <dataDir>\secrets\ (SPEC-02 §6 layout). Create with NewStore.
+//
+// The crypto mechanism behind the blobs is the platform protector (protect.go):
+// DPAPI in CurrentUser scope on Windows, unchanged; on other platforms see
+// protect_other.go. Store owns ref parsing, the file-per-ref layout, the
+// no-plaintext rule, the portable-mode error (P13) and the platform-neutral
+// half of every error message, so both mechanisms are exercised by the same
+// code.
 type Store struct {
-	dir      string
-	portable bool
+	dir       string
+	portable  bool
+	protector protector
 }
 
 // Option adjusts a Store.
@@ -40,6 +48,7 @@ func WithPortable(p bool) Option {
 // env-fork policy).
 func NewStore(dataDir string, opts ...Option) (*Store, error) {
 	s := &Store{dir: filepath.Join(dataDir, "secrets")}
+	s.protector = platformProtector(s.dir)
 	for _, o := range opts {
 		o(s)
 	}
@@ -56,11 +65,12 @@ func NewStore(dataDir string, opts ...Option) (*Store, error) {
 // material; diagnostics may print them.
 func (s *Store) Dir() string { return s.dir }
 
-// Store encrypts secret with DPAPI (CurrentUser scope) and writes it as the
-// blob file for ref ("dpapi:<blob-id>"), creating or overwriting it. env:
-// refs are rejected: their values live in the process environment, there is
-// nothing to persist. On Windows the DPAPI user scope is the access control;
-// the 0600 mode is best-effort semantics for non-Windows tooling.
+// Store seals secret with the platform protector (protect.go: DPAPI in
+// CurrentUser scope on Windows) and writes it as the blob file for ref
+// ("dpapi:<blob-id>"), creating or overwriting it. env: refs are rejected:
+// their values live in the process environment, there is nothing to persist.
+// On Windows the DPAPI user scope is the access control; the 0600 mode is
+// best-effort semantics for non-Windows tooling.
 func (s *Store) Store(ref, secret string) error {
 	kind, id, err := ParseRef(ref)
 	if err != nil {
@@ -72,7 +82,7 @@ func (s *Store) Store(ref, secret string) error {
 	if secret == "" {
 		return errors.New("secret: store: refusing to store an empty secret")
 	}
-	blob, err := protect([]byte(secret))
+	blob, err := s.protector.protect([]byte(secret))
 	if err != nil {
 		return err
 	}
@@ -109,7 +119,7 @@ func (s *Store) Resolve(ref string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("secret: resolve %q: read blob: %w", ref, err)
 		}
-		plain, err := unprotect(blob)
+		plain, err := s.protector.unprotect(blob)
 		if err != nil {
 			if s.portable {
 				return "", fmt.Errorf("secret: resolve %q: %w", ref, ErrPortableDecrypt)

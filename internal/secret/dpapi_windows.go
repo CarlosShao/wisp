@@ -42,6 +42,23 @@ func unprotect(blob []byte) ([]byte, error) {
 	return takeBlob(&out)
 }
 
+// dpapiProtector is C28's Windows mechanism behind the protector seam
+// (protect.go). It is a pure delegation to the two functions above: the DPAPI
+// calls, their flags, their buffer handling and their error strings are the
+// ones that were here before the seam, so the bytes on disk and the messages
+// callers see are unchanged. The seam adds a call, not a mechanism.
+type dpapiProtector struct{}
+
+func (dpapiProtector) protect(plaintext []byte) ([]byte, error) { return protect(plaintext) }
+
+func (dpapiProtector) unprotect(blob []byte) ([]byte, error) { return unprotect(blob) }
+
+// platformProtector is the Windows half of protect.go's seam. DPAPI's scope is
+// the Windows user (CurrentUser), not the directory, so dir is deliberately
+// unused: two stores under the same user still share one crypto scope, exactly
+// as they did before this seam existed.
+func platformProtector(string) protector { return dpapiProtector{} }
+
 // takeBlob copies the DPAPI output buffer into Go-owned memory and frees the
 // LocalAlloc'd original (the caller owns it per the DPAPI contract).
 func takeBlob(out *windows.DataBlob) ([]byte, error) {
