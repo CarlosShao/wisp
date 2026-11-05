@@ -136,6 +136,8 @@ $ go test ./internal/tools/ -run 'TestPointer185' -count=1 -v
 
 （PATH 前缀按在册形：`export PATH="$PWD/build:$PWD/third_party/sherpa-onnx:$PATH"`；`GOTMPDIR/TMPDIR/TEMP/TMP` 已 unset。）
 
+**补记（本腿末枚 commit `567c7875a` 上再取一遍，防"读数早于最后一枚 commit"）**：`build rc=0`；`./internal/risk/` `ok 14.689s`；`./internal/tools/` `ok 29.361s`；`gofumpt -l` 空；`sh scripts/d22scan.sh` `rc=0`、`clean - no D22 ban violations`、`examined 421 production Go files`。⚠ 计时三次在 14.689–17.254s／29.361–31.272s 之间跳（同一套判据、同一 PASS/FAIL 计数）＝主机噪声，**颜色与计数三次相同**。
+
 ## ⑥ 契约轴（票 185 AC#6）：**冻结文字内容未变，但"按行号取 md5"那两把尺在本锚点已过期**
 
 `185-r1` 记的基线用**行号窗口**取；本锚点行号已被别家写腿顶移，逐字复跑**对不上**：
