@@ -148,7 +148,7 @@ $ /tmp/85-gofumpt-bin/gofumpt -l internal cmd tools scripts frontend
 | `go test -count=1 -timeout 200s ./internal/... ./tools/...` | **rc=1** —— **29 包 `ok` / 3 包 `FAIL` / 4 条用例红**：`internal/tools::Test229SpawnNamesAreRosterShaped`、`internal/panel::TestComposerContractTypesMatchFrontend` ＋ `TestC21DesignTokensFourWayAgree`、`internal/risk::TestC26RewriteAccountIsConsumedAtEverySecurityLeg`。四条**都在 `git archive HEAD` 纯净快照上逐条复现**（见脚注②） | 见脚注② |
 | `gofumpt -l internal cmd tools scripts frontend`（**纯净快照**，1112 枚跟踪 `.go`） | **空**，rc=0 | **PASS** |
 | 同上（**共享工作树**） | 1 行：`internal/agent/approval/pending_read.go` —— 该文件工作树是 **CRLF**（`file` 逐字 `with CRLF line terminators`）、`git status` **0 行**、`git show HEAD:` 的同一文件喂 gofumpt **干净**（rc=0）⇒ **换行符工作树假阳性，不是格式问题** | 见脚注③ |
-| `sh scripts/d22scan.sh` | **rc=0**，`clean - no D22 ban violations`；runtests `PASS=35 FAIL=0 SKIP=0`，`=== RUN=77`；八格 scope 分母 `356/56/116/48/39/116/876/203` | **PASS** |
+| `sh scripts/d22scan.sh` | **rc=0**，`clean - no D22 ban violations`；runtests `PASS=35 FAIL=0 SKIP=0`，`=== RUN=77`；八格 scope 分母 **落刀前 `356/56/116/48/39/116/876/203`、提交后复跑 `357/56/116/48/39/116/878/203`**（⚠ 分母是**工作树**读数，随别腿新增未跟踪件漂；两次判定都 `clean`） | **PASS** |
 | `go vet ./...` | **未跑**（会撞脚注①同一枚未跟踪文件）；本腿零 `.go` 改动，无被改包可点名 | 未跑·如实记 |
 
 **脚注①（`go build ./...`）**：红点是 `build/mut_rvw.go`，91,003 B、mtime `11-04 10:26`、**未跟踪**（`git ls-files build` = 0）。
