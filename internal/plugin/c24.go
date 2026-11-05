@@ -34,6 +34,18 @@ package plugin
 //     the R1 floor, and the host judges the concrete target (paths, allowlist,
 //     taint) before acting. A declaration is input only; C19 may raise it.
 //
+// A host implementation can also CRASH (a nil map write, a broken assumption).
+// goja does not turn such a panic into a JS exception - exceptionFromValue
+// answers nil for a non-Exception value and handleThrow re-panics it - so the
+// value travels out of RunProgram as a raw Go panic. bind() recovers it at the
+// exact seam, attributes it (C24HostPanic: entry, capability, risk floor, tool,
+// plugin, crash-site stack), records the attempt on Calls() and logs one
+// C24-HOSTPANIC line, then re-panics so GojaRuntime.Execute's calling-goroutine
+// boundary owns the recovery. It is deliberately NOT converted into a JS
+// exception: a plugin that could catch a host crash could keep hammering a host
+// whose state is unknown. Ticket 51 AC#4; the e2e ruler is
+// panic_isolation_51_test.go.
+//
 // Isolation: the surface is built per call and installed into the per-call VM
 // (goja_runtime.go), so state written by one call - including a plugin that
 // monkey-patches wisp.fs.read - dies with that VM.
@@ -51,9 +63,11 @@ package plugin
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"regexp"
+	"runtime/debug"
 	"sort"
 	"strings"
 	"sync"
@@ -286,6 +300,57 @@ type C24Reply struct {
 // verdict, the taint mark and the tool_call row all sit on this one seam.
 type C24Host interface {
 	CallC24(ctx context.Context, req C24Request) (C24Reply, error)
+}
+
+// C24HostPanic is a host implementation that CRASHED while serving one entry.
+//
+// It exists because "something panicked" is not an actionable failure: the value
+// carries the entry, its frozen capability and risk floor, the tool and plugin
+// that asked, and the stack of the crash SITE (not the unwinding envelope), so
+// the log line an operator greps and the error the model reads both say which
+// host entry is broken. Recovery itself is not done here - this value is
+// re-panicked on purpose and caught by GojaRuntime.Execute on the calling
+// goroutine (ticket 51 AC#4).
+type C24HostPanic struct {
+	PluginID   string
+	Tool       string
+	Entry      string
+	Capability string
+	Level      risk.Level
+	// Recovered is the value the host panicked with (a string, an error, a
+	// runtime.Error - whatever the host implementation sent).
+	Recovered any
+	// Stack is the stack at the crash site, captured before unwinding.
+	Stack string
+}
+
+// Error renders the attribution as one line. Plugin and tool are named because
+// the same entry can be granted to several tools of the same plugin.
+func (p *C24HostPanic) Error() string {
+	if p == nil {
+		return "host entry panicked"
+	}
+	return fmt.Sprintf("host entry %s (capability %s, risk floor %s) of plugin %q tool %q panicked inside its host implementation: %v",
+		p.Entry, capabilityOrNone(p.Capability), p.Level, p.PluginID, p.Tool, p.Recovered)
+}
+
+// asC24HostPanic digs the attribution out of a recovered panic value. It is a
+// typed assertion first (goja re-panics the exact value) with an errors.As
+// fallback for a host that wrapped one.
+func asC24HostPanic(v any) *C24HostPanic {
+	if v == nil {
+		return nil
+	}
+	if hp, ok := v.(*C24HostPanic); ok {
+		return hp
+	}
+	if err, ok := v.(error); ok {
+		var hp *C24HostPanic
+		if errors.As(err, &hp) {
+			return hp
+		}
+	}
+	return nil
 }
 
 // C24Option configures a surface.
@@ -578,6 +643,50 @@ func c24Stringifier(vm *goja.Runtime) (goja.Callable, error) {
 	return fn, nil
 }
 
+// callHost is the single seam between one JS entry and the host implementation.
+// Beyond the call it owns one thing: a host CRASH is recorded and attributed
+// before the panic leaves this frame. Recording first matters - the call that
+// takes the host down is exactly the call an operator needs on file - and so
+// does attributing first: the goja frames that unwind the VM do not promise to
+// keep a panic value intact, and a bare "tier 2 panicked" line would leave
+// nobody able to name the broken entry.
+//
+// The panic is re-raised as *C24HostPanic, never converted into a JS exception:
+// see the file header. Recovery belongs to GojaRuntime.Execute, on the calling
+// goroutine, once.
+func (s *C24Surface) callHost(ctx context.Context, e C24Entry, args any) (reply C24Reply, err error) {
+	defer func() {
+		if p := recover(); p != nil {
+			hp := &C24HostPanic{
+				PluginID:   s.pluginID,
+				Tool:       s.tool,
+				Entry:      e.Path,
+				Capability: e.Capability,
+				Level:      e.Level,
+				Recovered:  p,
+				Stack:      string(debug.Stack()),
+			}
+			s.record(e.Path)
+			s.logf("tier2: C24-HOSTPANIC plugin=%s tool=%s entry=%s capability=%s level=%s panic=%v",
+				s.pluginID, s.tool, e.Path, capabilityOrNone(e.Capability), e.Level, p)
+			slog.Error("tier2 C24 host implementation panicked",
+				"plugin", s.pluginID, "tool", s.tool, "entry", e.Path,
+				"capability", capabilityOrNone(e.Capability), "panic", fmt.Sprint(p), "stack", hp.Stack)
+			panic(hp)
+		}
+	}()
+	reply, err = s.host.CallC24(ctx, C24Request{
+		PluginID:   s.pluginID,
+		Tool:       s.tool,
+		Entry:      e.Path,
+		Capability: e.Capability,
+		Level:      e.Level,
+		Args:       args,
+	})
+	s.record(e.Path)
+	return reply, err
+}
+
 // bind wraps one frozen entry as the JS function the plugin calls. Everything
 // the page can observe - the argument decode, the host call, the refusal, the
 // audit line - happens here, on the calling goroutine, inside the VM.
@@ -587,15 +696,7 @@ func (s *C24Surface) bind(ctx context.Context, vm *goja.Runtime, stringify goja.
 		if err != nil {
 			panic(vm.NewTypeError("%s", err.Error()))
 		}
-		reply, herr := s.host.CallC24(ctx, C24Request{
-			PluginID:   s.pluginID,
-			Tool:       s.tool,
-			Entry:      e.Path,
-			Capability: e.Capability,
-			Level:      e.Level,
-			Args:       args,
-		})
-		s.record(e.Path)
+		reply, herr := s.callHost(ctx, e, args)
 		if herr != nil {
 			s.logf("tier2: C24-HOSTERR plugin=%s tool=%s entry=%s err=%v",
 				s.pluginID, s.tool, e.Path, herr)

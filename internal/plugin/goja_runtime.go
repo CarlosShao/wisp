@@ -350,6 +350,12 @@ func (r *GojaRuntime) armWatchdog(scope *DisposalScope, vm *goja.Runtime, plugin
 // program here, on the caller's goroutine, is what keeps the boundary
 // meaningful: a panic that crossed a spawned goroutine would land on the
 // registry boundary instead (class internal), not on this tool result.
+//
+// The most likely panic in practice is not goja's own: it is a C24 host entry
+// whose Go implementation crashed. goja re-raises those unchanged (see c24.go),
+// so they arrive here too - and asC24HostPanic recovers the attribution the
+// surface attached, which is what turns "something panicked" into "wisp.fs.read
+// of tool js.read panicked" (ticket 51 AC#4).
 func (r *GojaRuntime) guardedCall(pluginID string, fn func() (string, error)) (out string, err error) {
 	defer func() {
 		if p := recover(); p != nil {
@@ -459,6 +465,20 @@ func (r *GojaRuntime) classify(pluginID string, cause error) (GojaResult, error)
 	}
 	var gp *gojaPanic
 	if errors.As(cause, &gp) {
+		// A host entry that crashed is attributed before the generic sentence:
+		// the model and the operator need the entry name, not "tier 2 panicked".
+		// C24Surface.callHost recorded the attempt and the C24-HOSTPANIC audit
+		// line already; the classification is still tool-class, because the
+		// model decides whether to retry a plugin whose host call is broken.
+		if hp := asC24HostPanic(gp.recovered); hp != nil {
+			slog.Error("tier2 C24 host crash recovered at the calling-goroutine boundary",
+				"plugin", hp.PluginID, "tool", hp.Tool, "entry", hp.Entry,
+				"capability", capabilityOrNone(hp.Capability), "panic", fmt.Sprint(hp.Recovered))
+			return GojaResult{}, observe.New(observe.ClassTool, fmt.Sprintf(
+				"plugin %q tool %q: %s; recovered at the calling-goroutine boundary - "+
+					"the plugin's own JS cannot catch it, and other plugins and the host keep running",
+				hp.PluginID, hp.Tool, hp.Error()))
+		}
 		slog.Error("tier2 goja panic recovered at the calling-goroutine boundary",
 			"plugin", gp.pluginID, "recovered", fmt.Sprint(gp.recovered), "stack", gp.stack)
 		return GojaResult{}, observe.New(observe.ClassTool, fmt.Sprintf(
