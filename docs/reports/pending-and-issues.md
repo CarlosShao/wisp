@@ -31165,3 +31165,16 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - orphan-internal（471365f92 + 9cd528199）：internal 5 红→修 2 真 bug（internal/proc TestExternalSamplerTracksSubjectGrowth 缓冲"至少翻倍"规则、internal/agent Test31DisarmStopsTheWait run() 复查 stop——非计时敏感、select 随机）、3 STOP（2 panel＝前端 agent；TestC26＝risk 冻结+cmd/wisp 禁写，建议另开票）。
 - 我自验：build ./cmd/... ./internal/... ./tools/... rc=0；proc/agent 修复定向复跑 ok；cmd/wisp 快核 ok；d22 clean；gofumpt 仅 internal/agent/approval/pending_read.go（会话前既有 CRLF，腿已具名披露，非本腿改）。
 - 立票 406（C6 POSIX 哨兵孤儿，待 owner 三选一）随本轮提交。
+
+## A1541（2026-11-05 15:0x，编排者）机主对 9 条清单逐条回复（Q 级决定）
+机主原话逐条：
+1「按推荐」→ 票51 AC#3（C24 GojaHostAPI 六组白名单）**批准**。
+2「按推荐」→ 票347 解析器「一」**追认**。
+3「黑名单这个我不是很懂，哪块功能的，有什么用？」→ 待编排者讲解后再判（本票 AC#4＝静态放行开关，见下条动作）。
+4「按推荐」→ R9 全弹卡（所有变松动作都出确认卡）**批准**。
+5「可以真机看一眼」→ 意愿收到；但票114 已于 A1530 收口，此条**作废**；等真有需真机的票再具体喊机主按键。
+6「立新票」→ K5 插件面板 → 已立新票 **407**。
+7「可结案」→ 票108 已于 A1537 结案，**无动作**。
+8「按推荐」→ 76 枚 C1 DPAPI 桩：编排者**更正推荐为 B（换 env: ref、保留 ubuntu 分母；原推荐 A 加 build tag 是次优）**，腿已在 continue-C1 执行。
+9「第九个完全看不懂」→ 待讲解后判（票406 C6 POSIX 哨兵名字不一致）。
+⇒ 授权落地：51-AC#3／347／R9 已获机主批 ⇒ 下波派 51-B／339（依赖347）／R9。K5→407。108 已闭。item8 走 continue-C1。item3/9 待机主再看一次再判。
