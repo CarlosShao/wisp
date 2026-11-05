@@ -31253,3 +31253,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - ★红登记：TestC26RewriteAccount… 红在 internal/config/overrides.go:78「reads Result.Canonical without reading rewrite account（Actable/Rewritten）」——config 半场引入的 C26 同形消费者，读 risk.Resolve 后直接拿 res.Canonical 当豁免键未看改写账。已在 origin（config 半场早推）⇒ 需 config 面修（Actable() 闸 fail-closed）risk 整包才绿。下一波派 cfg-c26。
 - 欠账：internal/config/unwired.go:125 措辞仍指旧符号 Confirmations→应改 PersistedExemptions+GateStanding，随 cfg-c26 一起改。
 - 266（6589a0625/78e77888f/38d05fcf4/0fa1527f9）：scripts/slo-nail-census.sh 569行（AC#1 声明/AC#2 台件删调用 rc1 点名正控32发0败/AC#3 偷懒四形逐条未做/AC#4 d22 clean）；①-A 另一半 ci.yml lint 步需 .github 写面⇒下一波派 ci266。路径门既有红（179改名 roster 漂移）报我裁、不动。
+
+## A1554（2026-11-05 18:4x，编排者）结票 284（AC#1/AC#3 实质达标；AC#2 单腿落地＝纪律偏差不勾）
+- 裁决者（非实现者）284-verdict.md：AC#1 PASS（gate.go:872-884 三要素齐、无行号、具名符号）；AC#3 PASS（go vet ./internal/agent/approval rc0、d22 clean×2 独立复跑）；AC#2 FAIL（专为票 284 单开腿 556f0483c、无随批掩护）＝明写过程偏差。
+- 收官：AC#1/AC#3 翻框勾、AC#2 留不勾+注偏差；git mv -done；双名核 issues/284-=1。⛔ 不对外称三 AC 全绿。
+- 附带更正：实现者证据§2「块内无数字」不实（现跑 4 个数字＝契约号 L2/C18×2/D47）⇒ 口径改「无计数式数字、只有契约号」；交付件 284-gate-replay-zero-caller-comment.md 此前从未提交，本次补提交。
