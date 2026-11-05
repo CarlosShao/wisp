@@ -31258,3 +31258,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 裁决者（非实现者）284-verdict.md：AC#1 PASS（gate.go:872-884 三要素齐、无行号、具名符号）；AC#3 PASS（go vet ./internal/agent/approval rc0、d22 clean×2 独立复跑）；AC#2 FAIL（专为票 284 单开腿 556f0483c、无随批掩护）＝明写过程偏差。
 - 收官：AC#1/AC#3 翻框勾、AC#2 留不勾+注偏差；git mv -done；双名核 issues/284-=1。⛔ 不对外称三 AC 全绿。
 - 附带更正：实现者证据§2「块内无数字」不实（现跑 4 个数字＝契约号 L2/C18×2/D47）⇒ 口径改「无计数式数字、只有契约号」；交付件 284-gate-replay-zero-caller-comment.md 此前从未提交，本次补提交。
+
+## A1555（2026-11-05 19:0x，编排者）收 wave19：黑名单口子全线接通（config C26修复+cmd/wisp接线+CI步）
+- cfgc26（3c3c516ce/f9d80bf38/3a20e3b26/0d809934e）：overrides.go:112 改读 res.Actable()、被 C26 展开改写的 B 条目 load 期 fail-closed 拒并报改写；unwired.go:125 措辞改真实符号 PersistedExemptions+GateStanding。go test ./internal/risk -count=1 rc0(288P/1SKIP 环境)、config rc0、gofumpt 空、d22 clean。
+- cmdwisp2（2addacf7d）：cmd/wisp/blacklist_overrides_230.go(+98) exemptionKeySet+armPersistedExemptions(atomic.Pointer 快照)+persistedExemptions；run.go 装 PersistedExemptions；config_reload.go reload 重臂；+290 测试。Test230AC4AConfiguredExemptionReachesTheGate/AnATierEntryCannotBeArmedFromConfig PASS；变异3发全红。⇒ 配置 B 级豁免→GateStanding 判 Allow+安全行点名 source=config、A 级载入拒。
+- ci266（6e5957756）：ci.yml +14 行 SLO nail census 步（YAML 6 jobs、lint 14→15 step、无 continue-on-error、LF）；正控32发0败。
+- ★边界（需机主/契约）：现「配了豁免」只让 gate 判定 Allow+落安全行，真实工具调用**仍问一次**（R3 把 B 档升 L2 与 override 无关）。要「配了免问」须解耦 R3 与 override（internal/risk rules_gateway + internal/tools 路由）=改契约、新票+机主批。
+- rename 坑：284 收尾 rename 首拆两提交（新名6b230772a+旧名删c6d1d187e），双名核终=1。
