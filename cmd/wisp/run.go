@@ -388,6 +388,16 @@ type agentRuntime struct {
 	// no context.
 	reloadRoot   *observe.Root
 	reloadHandle *observe.Handle
+	// exemptions is ticket 230 AC#4's ARMED form of cfg.Risk.BlacklistOverrides:
+	// the standing B-tier exemption set the bridge answers with, keyed by
+	// risk.OverrideKey (see cmd/wisp/blacklist_overrides_230.go). It is a
+	// snapshot rather than a live read because config.Manager.Config hands out a
+	// deep copy of the WHOLE config, and nobody wants that per tool call; it is
+	// atomic because the reload tick rebuilds it (config_reload.go's reloadOnce)
+	// while the bridge reads it from whichever goroutine is calling a tool. A
+	// nil snapshot means "no path was ever exempted by config", which is the
+	// fail-closed default every pre-ticket assembly had.
+	exemptions atomic.Pointer[map[string]bool]
 	// modes is the assembled owner of the permission mode (ticket 90's storage,
 	// ticket 101's wire): the read the bridge consults once per call, and the
 	// only object in this process that may change the档.
@@ -965,6 +975,13 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// taint index the R4 checks read.
 	c25 := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
 	rt.c25 = c25
+	// Ticket 230 AC#4: arm the standing B-tier exemption set BEFORE the bridge
+	// exists. The closure below reads the snapshot per call, so a tool call in
+	// the window between these two lines would answer "no exemption" and put a
+	// configured exemption back to "ask first" - fail-closed, but a silent lie
+	// about the operator's own config file. Arming here also keeps the fold off
+	// the call path (blacklist_overrides_230.go says why it is a snapshot).
+	rt.armPersistedExemptions()
 	rt.bridge = tools.New(tools.Options{
 		Registry: reg,
 		Paths:    rt.paths,
@@ -988,6 +1005,15 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// could not mint a session, which is the state every pre-224 assembly was
 		// in and which leaves every question asked.
 		Grants: grantRead,
+		// Ticket 230 AC#4's anchor line: the operator's STANDING B-tier
+		// exemptions (config.toml's risk.blacklist_overrides) enter the gate
+		// here and nowhere else, and deliberately NOT by unioning them into
+		// Confirmations - this assembly leaves that map nil by design ("a human
+		// clicked this" is a different claim), and risk.GateStanding's security
+		// line names which of the two sources allowed a use. Reading a snapshot
+		// keeps the policy read off the per-call path; config_reload.go re-arms
+		// it after every reload, so an edit takes effect without a restart.
+		PersistedExemptions: rt.persistedExemptions,
 		// R4 stays dormant: probing every result for sensitive sources needs
 		// the C25 detector's own wiring (ticket 25), and a dormant R4 is the
 		// honest state, not a weakened one.

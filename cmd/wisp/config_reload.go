@@ -181,6 +181,15 @@ func (rt *agentRuntime) reloadOnce() {
 	if rep == nil {
 		return
 	}
+	// Ticket 230 AC#4: after the reload COMMITTED (the D36 verdict for a locked
+	// loosening has already been asked and honoured or refused inside
+	// CheckAndReload), re-fold the standing B-tier exemption set from the config
+	// this reload left in force. An added entry that was approved shows up here;
+	// a removed entry stops being an exemption here; a refused loosening never
+	// reached the Manager's cur, so the old set is rebuilt unchanged - the same
+	// values, not a stale copy of them. This is the only rebuild point, because
+	// it is the only path that mutates that list at run time.
+	rt.armPersistedExemptions()
 	rt.reportReload(rep)
 }
 
