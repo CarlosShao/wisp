@@ -85,7 +85,9 @@ func Test320SetProviderBillingWritesTheEnumLeafAndRefusesOthers(t *testing.T) {
 // AC#2: the non-preset row. One guarded write lands the section with the protocol
 // and base_url it was given plus the optional first model; five refusals - the
 // four the design named and the empty name - each say why and leave the file
-// byte-identical. The preset-name refusal names the step that DOES own preset
+// byte-identical. The out-of-enum protocol additionally pins WHICH layer refuses
+// (its own field pre-check, not the whole-file gate), the same layering 527d483f
+// pinned for billing. The preset-name refusal names the step that DOES own preset
 // rows, so the page is sent to the right field instead of to the file.
 func Test320CreateCustomProviderRowLandsAndRefusesByName(t *testing.T) {
 	m, path, _ := newTestManager(t, settingsBase)
@@ -137,19 +139,23 @@ func Test320CreateCustomProviderRowLandsAndRefusesByName(t *testing.T) {
 	// The refusals, each naming its reason, each leaving the file byte-identical.
 	before := readSettingsFile(t, path)
 	cases := []struct {
-		name     string
-		provider string
-		protocol string
-		baseURL  string
-		mustSay  string
+		name       string
+		provider   string
+		protocol   string
+		baseURL    string
+		mustSay    string
+		mustNotSay string
 	}{
-		{"a preset name belongs to provider_row_create", "stepfun", ProtocolOpenAIChat, "https://api.stepfun.com/v1", "provider_row_create"},
-		{"an empty base_url", "local-gw-two", ProtocolOpenAIChat, "   ", "base_url"},
-		{"a protocol outside the enum", "local-gw-three", "grpc", "http://127.0.0.1:1", "protocol"},
+		{"a preset name belongs to provider_row_create", "stepfun", ProtocolOpenAIChat, "https://api.stepfun.com/v1", "provider_row_create", ""},
+		{"an empty base_url", "local-gw-two", ProtocolOpenAIChat, "   ", "base_url", ""},
+		// The out-of-enum protocol is the one refusal with a layer to pin: it
+		// must come from isProtocol's own pre-check, never from the whole-file
+		// gate underneath it (mustNotSay, asserted below).
+		{"a protocol outside the enum", "local-gw-three", "grpc", "http://127.0.0.1:1", "protocol", refusalInvalid},
 		// The row this test created above: a non-preset name that already exists,
 		// so this is refusal 4 and not the preset-name refusal one row up.
-		{"a row the config already declares", "local-gw", ProtocolOpenAIChat, "http://127.0.0.1:8080/v1", "already exists"},
-		{"no name at all", "   ", ProtocolOpenAIChat, "http://127.0.0.1:1", "行不存在"},
+		{"a row the config already declares", "local-gw", ProtocolOpenAIChat, "http://127.0.0.1:8080/v1", "already exists", ""},
+		{"no name at all", "   ", ProtocolOpenAIChat, "http://127.0.0.1:1", "行不存在", ""},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -162,6 +168,14 @@ func Test320CreateCustomProviderRowLandsAndRefusesByName(t *testing.T) {
 			}
 			if !strings.Contains(err.Error(), tc.mustSay) {
 				t.Errorf("the refusal does not say why (%q missing): %v", tc.mustSay, err)
+			}
+			// And the layer that refuses is the field's own pre-check, not the
+			// whole-file gate: both leave the file alone, but only one of them
+			// names the field this step is about, and that naming is why the
+			// pre-check exists at all (the same layering 527d483f pinned for
+			// billing, applied here to protocol).
+			if tc.mustNotSay != "" && strings.Contains(err.Error(), tc.mustNotSay) {
+				t.Errorf("the refusal came from the whole-file gate instead of the field's own pre-check: %v", err)
 			}
 			if after := readSettingsFile(t, path); after != before {
 				t.Errorf("config.toml changed under a refused create:\n%s", after)
