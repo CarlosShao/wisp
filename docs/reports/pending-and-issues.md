@@ -31104,3 +31104,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 ## A1531（2026-11-05 09:1x，编排者）172轮：179 收口＝本会话第 34 枚（done-but-not-closed；声明 L0 被自门拒）
 - 179-a1p（ff69d8d4e 只读核）：修在 loop.go:900 case RiskL0；build rc0；go test ./internal/agent -run 179/Declared 全 PASS；gofumpt 空；d22 rc0(ban#8=865,PASS=35 FAIL=0)。AC#1 现树 overlay-red 复现（摘 loop.go:900-903 ⇒ declared_l0_risk_179_test.go:101/104/107/110/252 红、逐字 风险未分级…已拒绝执行）；旧 cf527f32 读数 7 仅佐证。183=done：端到端首读 kind=success risk=L0 decision=allow rules_hit=[] 读回 20000B，残余第二次受限续读归 185(open)。未勾恰 {AC#1,AC#8}。
 - 收口：翻 AC#1(现树红前读数)＋AC#8(由 183 done 落地端到端)，Status→done，改名＋双名核=1。顺带校正票 183 陈旧 Status 行（误留 ready-for-agent、实已 done）。
+
+## A1532（2026-11-05 09:2x，编排者）173轮：全开放票池三档普查（120票）＝T1 22/T2 ~30/T3 ~68；铺下波写腿
+- workflow 6 段并行只读普查，落 docs/reports/triage-20261105/batch-1..6.md ＋ SUMMARY.md。
+- T1（22）：21 23 51 71 85 98 107 108 163 182 194 195 211 213 230 239 245 323 339 346 354 383。
+- 摆机主/外部归类见 SUMMARY（frontend/真机/CI/契约/纯owner/R9/114AC#6）。
+- 下波派写腿 194(internal/tools)·71(cmd/balldebug)·383(internal/config) 写面互斥。
