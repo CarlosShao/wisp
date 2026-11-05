@@ -2,7 +2,7 @@
 
 - 腿身份＝**实现者**。⛔ 未翻 AC 框、⛔ 未动票面 `Status:`/票名/票尾 bullet（票面不在本腿写面）。
 - 锚：起手现读 HEAD＝`fae8ba704`（派单写 `9e84ae42e`；现读多一枚 `fae8ba704`＝wave14 收件腿，`--name-only` 与本腿写面零相交）；
-  交件 commit＝`6589a0625`（`git show --name-only` ＝ **仅** `scripts/slo-nail-census.sh` 一枚）；读数窗口 **2026-11-05 18:17–18:32 +08**。
+  交件 commit＝`6589a0625`（`git show --name-only` ＝ **仅** `scripts/slo-nail-census.sh` 一枚）；读数窗口 **2026-11-05 18:17–18:36 +08**。
 - 写面（派单）＝`scripts/**` ＋ 本件。改动两枚：新件 `scripts/slo-nail-census.sh`（569 行）＋ 本件。
   **零 Go、零前端** ⇒ 派单的 STOP 条件未触发。
 - 环境：`export PATH="$PWD/build:$PWD/third_party/sherpa-onnx:$PATH"`；`unset GOTMPDIR TMPDIR TEMP TMP`；⛔ 全程未用 `CGO_ENABLED=0`。
@@ -39,7 +39,7 @@
    且它的自动入口 `slo-fresh.yml:46-52` 只有 `schedule`+`workflow_dispatch`，cron 只在默认分支评估（dev 上 inert）。
    ⇒ 本件是**对一行编辑的牙**，不是关上的门。
 3. **静态尺的固有盲区**：把两枚调用**移进一个没人调用的函数**里，本尺看不见（它钉"调用点在主流程里、位置对"，不证可达）。
-   "真跑"（那两行 ok 句真被打出来）只能由形 ② 给；本尺反过来说明了这一点，且 PASS 行每晚都带一行 NOTE 复述，不藏。
+   "真跑"（那两行 ok 句真被打出来）只能由形 ② 给；本尺反过来说明了这一点，且每次 PASS 都带一行 NOTE 复述，不藏。
 
 **另一条诚实的边界**：本尺只读文本。目标里今天**没有** here-string（现跑 `grep -nE "@.( |)$" scripts/slo-check.ps1` ＝ **10 命中**，逐条都是 `@{`／`@(` 造型；here-string 收尾形 `grep -nE "^[[:space:]]*['\"]@" scripts/slo-check.ps1` ＝ **0 命中**），
 但 reader 仍为 here-string 与块注释各留了一枚状态位；运行时拼出来的调用（`Get-Variable` 那族）照旧抓不到（票 263 已具名）。
