@@ -111,7 +111,19 @@ var hotRowClaims = map[string]string{
 	// (cmd/wisp/run.go:438 [res := llm.NewResolver(cfg, st)]), so "已立即生效"
 	// here means "the live reader answers differently", not "the in-flight
 	// model swapped".
-	"llm": hotClaimConsumed + "cmd/wisp/panel_config_store.go:98 [ChatModel:      cfg.LLM.Roles.Chat.Model] - configStore.ReadSettings calls s.mgr.Config() per call",
+	//
+	// 2026-11-05 re-adjudication (ticket 98's C2): the reader scan also names
+	// three files that take a *config.Config and reach into this section, and
+	// they are pinned in sectionReadSites below rather than cited here because
+	// each one's verdict depends on WHO hands it the config - 票 44's
+	// internal/agent/costbook_44.go + internal/agent/quota_44r4.go (price
+	// cards, provider cards and quota params; execute() hands them the LIVE
+	// per-task cfg) and 票 61's internal/speech/cloudcatalog.go (cloud chain
+	// elements, resolved from a snapshot the caller supplies; its
+	// ResolveCloudChain still has zero non-test callers). None of the three
+	// changes this row's verdict: the claim still rests on the settings leg's
+	// per-call re-read that this cite names.
+	"llm": hotClaimConsumed + "cmd/wisp/panel_config_store.go:98 [ChatModel:      cfg.LLM.Roles.Chat.Model] - configStore.ReadSettings calls s.mgr.Config() per call; the scan also names internal/agent/costbook_44.go, internal/agent/quota_44r4.go and internal/speech/cloudcatalog.go, which read the section off a config they are handed (pinned in sectionReadSites)",
 
 	// Since ticket 233 this is a live reader, and the row moved to "consumed":
 	// execute() (cmd/wisp/run.go:1252 [cfg := rt.mgr.Config()]) now reads the
@@ -178,7 +190,19 @@ var hotRowClaims = map[string]string{
 	"audio":   hotClaimOtherProcess + "cmd/wisp/resident_audio_windows.go:256 [ra.mutedAtBoot = c.Audio.MicMutedDefault] - the resident capture leg is [audio]'s first production reader and it reads the file once at boot, so a hot reload of this section waits for a restart instead of acting in this run",
 	"privacy": hotClaimNoReader + "internal/observe/logging.go:51 [RedactPaths bool] - the mirror field exists and is filled by callers, never from cfg.Privacy",
 	"memory":  hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Memory - the L1/L3 knobs have no consumer",
-	"cost":    hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.Cost - the C23 budget knobs (ticket 44) are not landed",
+	// Ticket 44 (C23 money path) landed its composition-root wiring after this
+	// row was written, so the 2026-11-05 re-adjudication moved [cost] out of the
+	// reader-less class: execute() reads the LIVE Manager at the top of every
+	// task (cmd/wisp/run.go:1524 [cfg = rt.mgr.Config()]) and hands that same
+	// cfg to agent.CostWiring (run.go:1570) and, through quotaDispatchChain, to
+	// agent.QuotaWiring - and both read the four [cost] leaves below. So a
+	// hot-applied [cost] edit reaches the NEXT task's meter and quota gate with
+	// no restart, the same per-task shape [agent] carries (and the same caveat:
+	// the task in flight keeps the caps it started with). The old verdict
+	// ("扫描零命中 ... the C23 budget knobs (ticket 44) are not landed") became
+	// false the day 44-r3/44-r5 landed, which is exactly the drift ticket 98's
+	// census caught in this roster.
+	"cost":    hotClaimConsumed + "internal/agent/costbook_44.go:183 [b, err := observe.BudgetFrom(cfg.Cost.DailyBudget, cfg.Cost.MonthlyBudget,] - execute() hands the live per-task cfg to agent.CostWiring (cmd/wisp/run.go:1570), whose budget half is built from these four [cost] leaves; agent.QuotaWiring (internal/agent/quota_44r4.go:135) reads the same caps, and both run once per task",
 	"observe": hotClaimNoReader + "cmd/wisp/logsink.go:149 [Level: logSinkLevel] - the log sinks choose their level themselves, never from cfg.Observe",
 
 	// [panel]: the section 票 255 was 立 for, and AC#4 landed while this file was
@@ -231,11 +255,20 @@ var hotRowClaims = map[string]string{
 	// chain is built at all, and [session] warm_timeout_sec (:1329) for the
 	// warm plan. The four hot KEYS below still read from nowhere, so the rows
 	// stay no-reader; only the reader-list half of their verdict text changes.
-	"app.theme":                  hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.App.THEME - manager.go's planApp compares and copies it, and no component re-skins from it. The SECTION does have one production reader since 票 43: cmd/wisp/autostart_windows.go reads App.Autostart (the restart-tier key) once per boot to make the registry Run key agree with it - a reader of a different key, so this row stays no-reader",
-	"voice.tts.speed":            hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the TTS knobs are not threaded to the voice path yet",
-	"voice.punctuation":          hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the punctuation switch has no consumer yet",
-	"voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet",
-	"voice.wake_word.veto_words": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the four files sectionReadSites pins) - the veto list is not consumed by the KWS path yet",
+	"app.theme": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads cfg.App.THEME - manager.go's planApp compares and copies it, and no component re-skins from it. The SECTION does have one production reader since 票 43: cmd/wisp/autostart_windows.go reads App.Autostart (the restart-tier key) once per boot to make the registry Run key agree with it - a reader of a different key, so this row stays no-reader",
+	// 2026-11-05 re-adjudication (ticket 98's C2): ticket 61's cloud catalog
+	// added a production READ SITE for voice.tts.speed, so the old 扫描零命中
+	// wording is no longer literally true - but it did not add a reader that
+	// anything reaches: internal/speech/cloudcatalog.go copies the knob onto a
+	// CloudEndpoint inside ResolveCloudChain, and that function still has zero
+	// non-test callers in the repository. The row stays no-reader (nothing that
+	// RUNS acts on the value) and now names the dead read site instead of
+	// denying it exists; the other three hot [voice] keys have no read site at
+	// all.
+	"voice.tts.speed":            hotClaimNoReader + "没有一条运行路径按这个值做事：唯一的生产读点是 internal/speech/cloudcatalog.go:119 [ep.Speed = cfg.Voice.TTS.Speed]，而它住在票 61 的 ResolveCloudChain 里——那枚函数全仓非测试调用者 0 枚（cmd/internal 里只有定义与注释）⇒ 读点存在、没人调用，TTS 的 speed 仍未接进运行的语音链 (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins)",
+	"voice.punctuation":          hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the punctuation switch has no consumer yet",
+	"voice.wake_word.thresholds": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the wake-word tunables are not consumed by the KWS path yet",
+	"voice.wake_word.veto_words": hotClaimNoReader + "扫描零命中：nothing outside internal/config reads this [voice] key (the section's production readers answer other keys: cmd/wisp/resident_audio_windows.go:257 [ra.voiceEnabled = c.Voice.Enabled] decides at boot whether the capture leg is built at all, ticket wire-r1's cmd/wisp/resident_voice_windows.go:1315 [c.Voice.Enabled] makes the same boot decision for the voice leg, and since 票 313 the settings leg cmd/wisp/panel_config_store.go and the panel view internal/panel/config_handlers.go read the cloud-chain/realtime keys off the live Manager - the files sectionReadSites pins) - the veto list is not consumed by the KWS path yet",
 }
 
 // sectionReadSites pins, per Config field, which production files the reader scan
@@ -258,7 +291,14 @@ var sectionReadSites = map[string][]string{
 	"Audio":   {"cmd/wisp/resident_audio_windows.go"},
 	"Privacy": nil,
 	"Memory":  nil,
-	"Cost":    nil,
+	// 2026-11-05 re-adjudication (ticket 98's C2): ticket 44 landed the C23
+	// money path, and both of its adapters read the four [cost] leaves off a
+	// *config.Config they are handed - agent.CostWiring (costbook_44.go, called
+	// from execute() with the LIVE Manager config, cmd/wisp/run.go:1570) and
+	// agent.QuotaWiring (quota_44r4.go, reached through quotaDispatchChain).
+	// The same two files also read [llm] provider cards, which is why they
+	// appear in both lists.
+	"Cost":    {"internal/agent/costbook_44.go", "internal/agent/quota_44r4.go"},
 	"Observe": nil,
 	// Read by the resident panel host's assembly root, per window creation, since
 	// 票 255 AC#4. The host file itself is NOT in this list and must stay out of
@@ -281,7 +321,13 @@ var sectionReadSites = map[string][]string{
 	// and [session] warm_timeout_sec at its boot LoadFile (see the per-key rows
 	// above). The per-key rows stay "no-reader" because no file reads THOSE keys -
 	// a verdict about the keys, not about these files.
-	"Voice":  {"cmd/wisp/panel_config_store.go", "cmd/wisp/resident_audio_windows.go", "cmd/wisp/resident_voice_windows.go", "internal/panel/config_handlers.go"},
+	// 2026-11-05 re-adjudication (ticket 98's C2): 票 61's cloud catalog is the
+	// fifth file the scan names - ResolveCloudChain reads voice.cloud_*_chain
+	// plus tts.voice / tts.speed off its snapshot argument. It is a READ SITE
+	// whose function still has zero non-test callers, which is exactly why
+	// voice.tts.speed's row was re-worded (the read exists, the caller does
+	// not) rather than promoted to consumed.
+	"Voice":  {"cmd/wisp/panel_config_store.go", "cmd/wisp/resident_audio_windows.go", "cmd/wisp/resident_voice_windows.go", "internal/panel/config_handlers.go", "internal/speech/cloudcatalog.go"},
 	"Agent":  {"cmd/wisp/run.go"},
 	"Models": {"cmd/wisp/models.go"},
 	// 票 320's fetch port added a fifth live reader of [llm], and 票 324 AC#2 books it
@@ -294,7 +340,15 @@ var sectionReadSites = map[string][]string{
 	// (a hand-edited provider row changes what the NEXT models.list hop asks for, with
 	// no restart). Its caveat is the row's existing caveat, unchanged - the boot
 	// snapshot still drives the in-flight chain.
-	"LLM": {"cmd/wisp/panel_config_store.go", "cmd/wisp/panel_models_320.go", "cmd/wisp/providers.go", "cmd/wisp/run.go", "internal/llm/resolver.go"},
+	// 2026-11-05 re-adjudication (ticket 98's C2): three more files read this
+	// section off a config value they are handed, and are pinned here rather
+	// than cited in the row: 票 44's internal/agent/costbook_44.go (price card
+	// for one provider/model) and internal/agent/quota_44r4.go (provider cards,
+	// model quota cards, quota params) - both fed the LIVE per-task cfg by
+	// execute() - and 票 61's internal/speech/cloudcatalog.go (the provider
+	// entry a cloud chain element names). The verdict does not move: the claim
+	// still rests on the live re-readers already cited.
+	"LLM": {"cmd/wisp/panel_config_store.go", "cmd/wisp/panel_models_320.go", "cmd/wisp/providers.go", "cmd/wisp/run.go", "internal/agent/costbook_44.go", "internal/agent/quota_44r4.go", "internal/llm/resolver.go", "internal/speech/cloudcatalog.go"},
 	// Ticket 258 moved the shipped reader into the resident leg: the
 	// construction chain lives in resident_windows.go (it maps [hotkey] into
 	// ball.HotkeyConfig), while resident_ball_windows.go only receives the

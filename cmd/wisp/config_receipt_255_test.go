@@ -89,23 +89,28 @@ func TestTicket255SplitOnlyClaimsSectionsWithALiveReader(t *testing.T) {
 	// Manager per task (cmd/wisp/run.go:1263 [cfg = rt.mgr.Config()]), so the
 	// claimable set is [llm agent] - llm via the settings leg, agent via the
 	// composition root's own per-task read. Slice order fixes the join.
-	if strings.Join(split.claimable, " ") != "llm agent" {
-		t.Errorf("claimable = %v, want exactly [llm agent]: llm is read live per call by the settings leg (cmd/wisp/panel_config_store.go:92), agent by execute() per task since ticket 233 (cmd/wisp/run.go:1263). A section with no live reader must never be in this list.", split.claimable)
+	// 2026-11-05: [cost] joined them (ticket 98's C2 re-adjudication) - ticket
+	// 44's per-task CostWiring/QuotaWiring read the LIVE cfg that execute()
+	// re-reads, so a hot-applied [cost] edit reaches the next task's meter and
+	// quota gate. Slice order is the caller's hot list, so cost comes last.
+	if strings.Join(split.claimable, " ") != "llm agent cost" {
+		t.Errorf("claimable = %v, want exactly [llm agent cost]: llm is read live per call by the settings leg (cmd/wisp/panel_config_store.go:92), agent by execute() per task since ticket 233 (cmd/wisp/run.go:1263), and cost by the per-task CostWiring/QuotaWiring ticket 44 landed (cmd/wisp/run.go:1570). A section with no live reader must never be in this list.", split.claimable)
 	}
 	quiet := map[string]bool{}
 	for _, name := range split.quiet {
 		quiet[name] = true
 	}
+	claimed := map[string]bool{"llm": true, "agent": true, "cost": true}
 	for _, name := range hot {
-		if name == "llm" || name == "agent" {
+		if claimed[name] {
 			continue
 		}
 		if !quiet[name] {
 			t.Errorf("%q is hot-applied but appears in neither bucket - it would vanish from the receipt (摘尺当修尺, forbidden by AC#1); got claimable=%v quiet=%v", name, split.claimable, split.quiet)
 		}
 	}
-	if len(quiet) != len(hot)-2 {
-		t.Errorf("quiet = %v, want the %d non-llm/agent hot names", split.quiet, len(hot)-2)
+	if len(quiet) != len(hot)-len(claimed) {
+		t.Errorf("quiet = %v, want the %d non-llm/agent/cost hot names", split.quiet, len(hot)-len(claimed))
 	}
 
 	// A name plan() booked that the registry cannot explain is neither claimed nor
@@ -239,9 +244,10 @@ func TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim(t *testing.T) {
 			citesChecked++
 		}
 	}
-	// Today the roster carries cites on 13 of the 17 rows (the three marker-only
-	// rows [session]/[memory]/[cost] and [app.theme] carry none; [panel] carries
-	// two and the four [voice] key rows share the section reader's cite). The
+	// Today the roster carries checked cites on 12 of the 17 rows ([llm], [agent],
+	// [models], [hotkey], [ball], [session], [audio], [privacy], [cost], [observe]
+	// and [voice.tts.speed] carry one each, [panel] carries two) - the marker-only
+	// rows are [memory], [app.theme] and the three other [voice] key rows. The
 	// floor keeps a refactor from quietly turning all the cites into markers.
 	const citedRowsFloor = 8
 	if citesChecked < citedRowsFloor {
@@ -310,6 +316,55 @@ func TestTicket255RosterStillMatchesTheActualReadSites(t *testing.T) {
 		if !found {
 			t.Errorf("sectionReadSites names field %q which the roster no longer adjudicates (a hot row left hotRowClaims but its site list stayed)", field)
 		}
+	}
+}
+
+// TestTicket255RosterReJudgedAfterTickets44And61 pins the 2026-11-05
+// re-adjudication that ticket 98's census (C2) forced. The scan ruler above is
+// what reddened on BOTH the ubuntu and the windows legs: 票 44 had added real
+// readers of [cost] and [llm] (internal/agent/costbook_44.go +
+// internal/agent/quota_44r4.go), 票 61 had added one of [llm] and [voice]
+// (internal/speech/cloudcatalog.go), and this roster still said [cost] had no
+// reader at all and [llm]/[voice] only their old ones. The scan now measures
+// the three sections against the re-judged file lists; this case fixes the two
+// JUDGEMENTS behind those lists so a later edit cannot slide them back:
+//
+//   - [cost] is no longer reader-less. execute() reads the live Manager per
+//     task and hands it to agent.CostWiring / agent.QuotaWiring (ticket 44), so
+//     the row must be "consumed", cite the [cost] leaves, and splitHotTier must
+//     claim it - a [cost] edit that the tick hot-applies reaches the NEXT task
+//     with no restart, which is 票 255 AC#1's definition of 已立即生效.
+//   - [voice.tts.speed] must STAY "no-reader" even though 票 61 gave it a read
+//     site: the site lives in ResolveCloudChain, which still has zero non-test
+//     callers, so nothing that runs acts on the value. Promoting it would be
+//     the same lie in the other direction; the row names the dead site instead
+//     of denying it (the 扫描零命中 wording it used to carry is no longer true).
+func TestTicket255RosterReJudgedAfterTickets44And61(t *testing.T) {
+	cost := hotRowClaims["cost"]
+	if !strings.HasPrefix(cost, hotClaimConsumed) {
+		t.Errorf("[cost] = %q, want a %q verdict: ticket 44's per-task CostWiring/QuotaWiring read the LIVE Manager cfg (cmd/wisp/run.go:1570), so the section has a live reader in this host", cost, hotClaimConsumed)
+	}
+	if !strings.Contains(cost, "internal/agent/costbook_44.go") || !strings.Contains(cost, "cfg.Cost.DailyBudget") {
+		t.Errorf("[cost] must cite the [cost] leaves' read site (internal/agent/costbook_44.go, cfg.Cost.DailyBudget): %q", cost)
+	}
+	if got := splitHotTier([]string{"cost"}).claimable; len(got) != 1 || got[0] != "cost" {
+		t.Errorf("splitHotTier([cost]) claimable = %v, want [cost]: the receipt may say 已立即生效 about [cost] only because that per-task reader exists", got)
+	}
+	if want := []string{"internal/agent/costbook_44.go", "internal/agent/quota_44r4.go"}; !slicesEqualSorted(sectionReadSites["Cost"], want) {
+		t.Errorf("sectionReadSites[Cost] = %v, want %v: both ticket 44 adapters read the four caps off the config they are handed", sectionReadSites["Cost"], want)
+	}
+	// The dead-read-site row: the token is re-checked by
+	// TestTicket255RosterEvidenceLinesStillSayWhatTheyClaim; what this case adds
+	// is the VERDICT - a read site with no caller is still no-reader.
+	speed := hotRowClaims["voice.tts.speed"]
+	if !strings.HasPrefix(speed, hotClaimNoReader) {
+		t.Errorf("[voice.tts.speed] = %q, want it to stay %q: internal/speech/cloudcatalog.go reads it inside ResolveCloudChain, a function with zero non-test callers, so no running path acts on the value", speed, hotClaimNoReader)
+	}
+	if !strings.Contains(speed, "internal/speech/cloudcatalog.go") {
+		t.Errorf("[voice.tts.speed] must name its one production read site (internal/speech/cloudcatalog.go) instead of still claiming 扫描零命中: %q", speed)
+	}
+	if got := splitHotTier([]string{"voice"}).claimable; len(got) != 0 {
+		t.Errorf("splitHotTier([voice]) claimable = %v, want none: none of the four hot [voice] keys has a reader that runs", got)
 	}
 }
 
@@ -814,7 +869,9 @@ func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
 		}
 		// Ticket 233: [agent] joined the claimable set (execute() reads the live
 		// Manager per task), so the immediate sentence carries it next to [llm].
-		if !strings.Contains(immediate, "[llm]") || !strings.Contains(immediate, "[agent]") {
+		// 2026-11-05: [cost] joined too (ticket 98's C2 re-adjudication) - the
+		// per-task CostWiring/QuotaWiring ticket 44 landed read the same live cfg.
+		if !strings.Contains(immediate, "[llm]") || !strings.Contains(immediate, "[agent]") || !strings.Contains(immediate, "[cost]") {
 			t.Errorf("the live-read sections are not claimed: %q", immediate)
 		}
 		for _, forbidden := range []string{"[panel]", "[ball]", "[app]", "[voice]", "[models]", "[hotkey]"} {
@@ -828,7 +885,7 @@ func TestTicket255ReceiptSentenceAssemblyIsFiltered(t *testing.T) {
 				t.Errorf("the honest sentence omits %s, so the edit vanished from the receipt: %q", want, honest)
 			}
 		}
-		if strings.Contains(honest, "[llm]") || strings.Contains(honest, "[agent]") {
+		if strings.Contains(honest, "[llm]") || strings.Contains(honest, "[agent]") || strings.Contains(honest, "[cost]") {
 			t.Errorf("a claimed section is in both buckets: %q", honest)
 		}
 		// Logged for the evidence file (run with -v) so both sentences are quoted
