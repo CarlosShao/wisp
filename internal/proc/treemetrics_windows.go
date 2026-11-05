@@ -202,33 +202,99 @@ type SysProcSample struct {
 	ThreadCount       uint32
 }
 
+const (
+	// sysProcInitialSize is the first buffer size. 1 MiB holds a full desktop
+	// snapshot with room to spare (~112 bytes per process plus its threads), so
+	// the common case succeeds in ONE call and pays nothing for the retry path.
+	sysProcInitialSize uint32 = 1 << 20
+
+	// sysProcMaxSize caps the scan buffer. A snapshot that needs more than this
+	// is not a measurement any D32 gate can act on, and an unbounded retry loop
+	// would turn a wedged machine into an OOM (fail closed, never grow forever).
+	sysProcMaxSize uint32 = 64 << 20
+
+	// sysProcAttempts bounds the retry loop. At least doubling per attempt
+	// reaches sysProcMaxSize from sysProcInitialSize in seven tries; the cap,
+	// not the attempt count, is the real refusal (ticket 66 residual ①).
+	sysProcAttempts = 8
+)
+
+// sysProcQuery is one NtQuerySystemInformation(SystemProcessInformation) call:
+// it fills buf and answers the NTSTATUS plus the byte count the kernel reported
+// as required. Split out from the syscall so the retry policy can be driven by
+// a model of a GROWING system instead of by a busy machine - the pre-fix rule
+// could not be reproduced deterministically any other way (ticket 180 repair).
+type sysProcQuery func(buf []byte) (status uint32, required uint32)
+
+// sysProcNextSize is the growth policy after one STATUS_INFO_LENGTH_MISMATCH.
+//
+// `required` is the byte count that was needed AT ONE INSTANT: the process and
+// thread population keeps moving between two calls, so taking it verbatim (the
+// pre-fix rule) is one step behind forever on a system that is still growing -
+// six attempts, six misses, "buffer never sufficient". Mainstream readers of
+// this class (psutil's NtQuerySystemInformation loop) double the buffer instead
+// of trusting the returned length; we do both: at least double, and keep 1/8
+// headroom over a reported need that is already ahead of the doubling, so the
+// next call lands inside the buffer instead of exactly on its edge.
+//
+// ok=false means the next size would not grow (the cap is reached); the caller
+// must then fail closed rather than spin.
+func sysProcNextSize(size, required uint32) (uint32, bool) {
+	if size >= sysProcMaxSize {
+		return size, false
+	}
+	next := size * 2
+	if required > next {
+		if required >= sysProcMaxSize {
+			return sysProcMaxSize, true
+		}
+		next = required + required/8
+	}
+	if next > sysProcMaxSize {
+		next = sysProcMaxSize
+	}
+	if next <= size {
+		return size, false
+	}
+	return next, true
+}
+
 // SystemProcessSnapshot reads SystemProcessInformation once and extracts
 // the fields the D42#10 metric set needs per pid. The scan buffer is a Go
 // slice: for the out-of-tree readers that is free (the scratch belongs to
 // the measuring process, never the subject); the in-tree reader's own
 // footprint is dominated by the image map, not this scratch.
 func SystemProcessSnapshot() (map[uint32]SysProcSample, error) {
-	size := uint32(1 << 20)
-	for attempt := 0; attempt < 6; attempt++ {
-		buf := make([]byte, size)
+	return systemProcessSnapshot(func(buf []byte) (uint32, uint32) {
 		retLen := uint32(0)
 		status, _, _ := procNtQuerySystemInformation.Call(
 			uintptr(systemProcessInformation),
 			uintptr(unsafe.Pointer(&buf[0])),
-			uintptr(size),
+			uintptr(len(buf)),
 			uintptr(unsafe.Pointer(&retLen)),
 		)
+		return uint32(status), retLen
+	})
+}
+
+// systemProcessSnapshot is SystemProcessSnapshot's retry loop with the kernel
+// call injected, so the growth policy is testable without a busy machine.
+func systemProcessSnapshot(query sysProcQuery) (map[uint32]SysProcSample, error) {
+	size := sysProcInitialSize
+	for attempt := 0; attempt < sysProcAttempts; attempt++ {
+		buf := make([]byte, size)
+		status, required := query(buf)
 		if status == 0 {
 			return parseSystemProcesses(buf)
 		}
-		if status != uintptr(statusInfoLengthMismatch) {
-			return nil, fmt.Errorf("NtQuerySystemInformation: NTSTATUS 0x%08x", uint32(status))
+		if status != statusInfoLengthMismatch {
+			return nil, fmt.Errorf("NtQuerySystemInformation: NTSTATUS 0x%08x", status)
 		}
-		if retLen > size {
-			size = retLen
-		} else {
-			size *= 2
+		next, ok := sysProcNextSize(size, required)
+		if !ok {
+			return nil, fmt.Errorf("NtQuerySystemInformation: buffer never sufficient (last %d bytes, required %d)", size, required)
 		}
+		size = next
 	}
 	return nil, fmt.Errorf("NtQuerySystemInformation: buffer never sufficient (last %d bytes)", size)
 }

@@ -47,7 +47,10 @@ import (
 //  1. MarkReminderFired — the one-way armed→fired stamp, whose applied=false
 //     answer IS the delivery gate: a timer that lost the race with a cancel
 //     delivers nothing (the DAO's late-timer guard at dao_reminders.go:36-39,
-//     first production reader of it).
+//     first production reader of it). A cancel that landed before the wait was
+//     released never reaches this stamp at all: run() re-checks the stop
+//     channel after the release (ticket 180). The stamp covers the opposite
+//     order - a cancel that arrives while fire is already in flight.
 //  2. Notify — the ONLY thing a fire can do. 票 31's second hard exclusion says
 //     a fire never executes a tool and never calls an LLM, so there is no
 //     dispatch path in this file at all: just the C3 `notify` port.
@@ -318,9 +321,20 @@ func (t *ReminderTimers) run(ctx context.Context, w *reminderWait, ready <-chan 
 		t.emit("agent: REMINDER-DISARMED id=%s - 没有送达任何东西", w.id)
 		return
 	case <-ready:
-		// A halt that raced this release is settled by the fired-stamp guard in
-		// fire (applied=false => deliver nothing), so there is no second check
-		// here on purpose: one authority, not two that can disagree.
+		// A cancel that landed BEFORE this release was observable still wins.
+		// Once stop is closed and ready has a value, Go's select picks
+		// uniformly among the ready cases, so without the re-check below the
+		// same user cancel sometimes delivered a toast (measured red: 3 of 4
+		// package runs, ticket 180 orphan-red repair). The stop channel is this
+		// wait's authority; the fired-stamp guard in fire stays the second belt
+		// for the order this check cannot see - a cancel that arrives after
+		// fire has already claimed the row.
+		select {
+		case <-w.stop:
+			t.emit("agent: REMINDER-DISARMED id=%s - 没有送达任何东西", w.id)
+			return
+		default:
+		}
 	}
 
 	// Monotonic lateness, for the resume case: a wait released long after its
