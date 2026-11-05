@@ -145,4 +145,4 @@ ok  	github.com/CarlosShao/wisp/internal/command
 | `internal/command/roster.go` | 名册本体：`Command`／`Roster`／`New`（AC#2 闸）／`Judge`（AC#3，借 `perm.JudgeCard`）／`Production()`＋生产表 3 行 | 新建 |
 | `internal/command/roster_test.go` | 8 枚用例（§④ 逐条对应）＋两枚生产锚扫描＋AST"本包不执行"扫描 | 新建 |
 | `docs/evidence/s1/213-command-roster-r1.md` | 本文件 | 新建 |
-| `.scratch/wisp/probes/213/r1/**` | 台件：`readings.txt`／`readings2.txt`／`gate-tests.txt`／`gate-d22.txt`／`m1..m4.txt`／`sha-before.txt`（**不入库**） | 6 枚日志＋2 枚 sha |
+| `.scratch/wisp/probes/213/r1/**` | 台件：`readings.txt`／`readings2.txt`／`gate-tests.txt`／`gate-d22.txt`／`m1..m4.txt`／`commit-msg.txt`＋两枚源码备份＋`sha-before.txt`（**不入库**，`ls -1` 现读 **12** 枚） | 9 枚日志＋2 枚备份＋1 枚 sha |
