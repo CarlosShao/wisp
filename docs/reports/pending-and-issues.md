@@ -31247,3 +31247,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - config-240（a047fec21 + 9a4a7168a）：删掉 writeguard_unnailed_341_test.go:240 的 mtime 前进断言（钟太粗：POSIX 4ms 量化），判据改由 :236 内容相等取证（其余断言一条未动，diff 4 行全删仅 mtime 那枚）。容器 -count=10：改前 5/10 红→改后 10/10 绿（-count=30=30/30）；宿主整包 ok。⇒ 既有 config POSIX flaky 红清除。
 - 登记（未取）：writeguard_226/227 同族"没写⇒mtime 不动"方向相反（更易假绿、今天不红），manager.go:168 同形假设未复核 ⇒ 另票。
 - 我自验：go test ./internal/config rc0。
+
+## A1553（2026-11-05 18:4x，编排者）收 wave17：230-AC4 安全门 part1 PASS（6a46140ea）+ 266 scripts PASS；暴露 overrides.go:78 C26 红待修
+- 230-AC4 seam1（6a46140ea）：internal/risk 导出 OverrideKey=normPath + GateStanding(c,l2,persisted map)（Gate 委托、persisted nil 逐字节同判）；放行日志点名 source=l2-confirm|config:risk.blacklist_overrides、config 源不冒充 L2；A 档在两 map 前返回；overrideApplies 一字未动（216 两钉绿）。internal/tools 加 Options.PersistedExemptions（不并 Confirmations），readBlacklist 调 GateStanding。6 枚新测四条覆盖+变异 M1/M2/M3 全红、还原 sha 一致。build rc0、tools ok(394 pass)、gofumpt 空、d22 clean(903)。★签名口径：persisted 用 map[string]bool（非 bool）——为让 Gate 委托、nil 等价；代码签名非契约文字，编排者拍。
+- ★红登记：TestC26RewriteAccount… 红在 internal/config/overrides.go:78「reads Result.Canonical without reading rewrite account（Actable/Rewritten）」——config 半场引入的 C26 同形消费者，读 risk.Resolve 后直接拿 res.Canonical 当豁免键未看改写账。已在 origin（config 半场早推）⇒ 需 config 面修（Actable() 闸 fail-closed）risk 整包才绿。下一波派 cfg-c26。
+- 欠账：internal/config/unwired.go:125 措辞仍指旧符号 Confirmations→应改 PersistedExemptions+GateStanding，随 cfg-c26 一起改。
+- 266（6589a0625/78e77888f/38d05fcf4/0fa1527f9）：scripts/slo-nail-census.sh 569行（AC#1 声明/AC#2 台件删调用 rc1 点名正控32发0败/AC#3 偷懒四形逐条未做/AC#4 d22 clean）；①-A 另一半 ci.yml lint 步需 .github 写面⇒下一波派 ci266。路径门既有红（179改名 roster 漂移）报我裁、不动。
