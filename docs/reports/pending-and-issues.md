@@ -31089,3 +31089,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 371-r1p（8e0702fdb 17.go）：perm.Card 答过凭据；Set 仅 card.Answered() 才 applied，否则 ResultCardNotAnswered（逐字 card was not answered）；panel 同谓词 JudgeCard；MODE-SWITCH 带 asked=card corr。我自验 build/perm全包/panel gate子集/cmd-wisp定向371-367-101 134s/gofumpt/d22/pathlen 全绿；M4 断言逐字未动。
 - 371-v1p（e6838bd27 非实现者）：AC#2prime PASS／AC#2prime-b PASS／M4 byte-identical YES／三反向牙还原核；★整票⛔否：R6（内层 nil 兜底未实现 store.go:355-362）＋R9（扩 M4=摆机主）未了；小瑕 composer_gate_agreement_371_test.go:214 空指针。
 - ⇒ 371 未 -done。下轮 371-r2prime 补 R6（nil兜底＋谓词改坏⇒拒不 panic 用例）＋R7（边界 doc）；R9 摆机主。
+
+## A1529（2026-11-05 09:1x，编排者）170轮：371 收口＝本会话第 32 枚（门判「问过」而非「通道在」）
+- 371-r2p（be74e2e7b）：R6 内层 nil 兜底（GateAsk 前判 s.confirm nil ⇒ 拒而不 panic；红牙 overlay 前 panic store.go:364／后 refuse-confirm）＋R7 边界 doc（372/375/377/371 谁做啥＋R9）＋panel test 空指针修。我自验 build/perm全包/R6/panel gate/cmd-wisp Test371/gofumpt/d22/pathlen 全绿、树净、M4 未动。
+- 371-v2p（22a414e52+12290c139 非实现者终裁）：R6 PASS／R7 PASS／M4 byte-identical／R1-R8 DONE、仅 R9 余；建议 closeable with R9 surfaced。
+- 收口 55e62d4a0：翻 primed AC#0/1/2/2b/5、Status→done、并入 r1p 证据、改名＋双名核=1。（原文 AC#0-4 按改写约定保留不翻。）
+- ★R9（扩 M4 让所有变松档都出卡）＝机主 2026-09-21 定案、须摆机主：问题＝把档位从「每步都问」放松到「仅高风险问」是否也应出卡？→ 并入摆机主清单。
