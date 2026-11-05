@@ -11,19 +11,23 @@
 //     confirmation channel, a configured auto_approve / ask_high_risk reads as
 //     ask_every_step (ticket 372-r2). The configured value is never rewritten.
 //   - WRITE (Set): the only function in the system that changes the mode at
-//     runtime. Its gate is the TARGET, not the direction: a switch INTO
-//     auto_approve is refused outright when no confirmation channel was wired
-//     (fail-closed), and every other target - wider or narrower - passes
-//     (R20/M4, owner 2026-09-21: only the switch into全自动 costs a card).
-//     On top of that gate the auto_approve switch still costs one ANSWERED L2
-//     strong confirmation: a channel that is merely attached is not enough, the
-//     limb has to come back with a Card (ticket 371 - "non-nil" was what let a
-//     never-asking leg through silently, docs/evidence/s1/371-a1p-impl.md §5).
-//     Ticket 367 judged the DIRECTION instead; the survey at
-//     docs/evidence/s1/m4-survey.md:96 found no mainstream harness gating on
-//     "wider", so ticket 372 reverted the judgement while keeping 367's
-//     single-definition discipline (JudgeCard/RequiresCard: one definition, both
-//     transition points).
+//     runtime. Its gate is the DIRECTION: every loosening (a switch that removes
+//     questions) is refused outright when no confirmation channel was wired
+//     (fail-closed), and a tightening is never guarded (PLAN.md:132). That is R9
+//     (owner 2026-11-05, ledger A1541 item 4: "every loosening shows a
+//     confirmation card"), and it is the same rule the config-file channel has
+//     applied since D36, so the two doors no longer read one request differently.
+//     A loosening with a channel attached costs one ANSWERED L2 strong
+//     confirmation: a channel that is merely attached is not enough, the limb has
+//     to come back with a Card (ticket 371 - "non-nil" was what let a never-asking
+//     leg through silently, docs/evidence/s1/371-a1p-impl.md §5).
+//     The history matters when reading this: ticket 367 gated the direction,
+//     ticket 372 reverted it to the target after the survey at
+//     docs/evidence/s1/m4-survey.md:96 found no mainstream harness REFUSING a
+//     switch for being wider, and R9 landed the owner's differing product
+//     decision on COST (a card, not a refusal) while keeping 367's
+//     single-definition discipline (JudgeCard/RequiresCard: one definition, every
+//     transition point).
 //   - RECORD: every switch writes one audit line through the sink the project
 //     already uses for security decisions (the Logf family that cmd/wisp renders
 //     as "[audit] ..."), carrying from/to, time, origin and actor. No second
@@ -181,12 +185,13 @@ type ConfirmFunc func(ctx context.Context, req Switch) (Card, error)
 type Options struct {
 	// Manager is required; without a config to read there is no mode.
 	Manager ConfigManager
-	// Confirm is the L2 strong confirmation the store asks for the one target
-	// that costs it (RequiresCard/JudgeCard). nil = auto_approve is unreachable
-	// (fail closed) AND the read side collapses to ask_every_step: a composition
-	// with no way to ask must not run a档 that removes questions (ticket 372-r2).
-	// A non-nil Confirm is not by itself permission either: Set applies the switch
-	// only when the limb hands back an answered-allow Card (ticket 371).
+	// Confirm is the L2 strong confirmation a loosening costs (RequiresCard/
+	// JudgeCard). nil = no loosening is reachable (fail closed) AND the read side
+	// collapses to ask_every_step: a composition with no way to ask must not run a
+	// looser档 than the operator wrote (ticket 372-r2). A tightening still lands
+	// with no channel at all - it is never guarded.
+	// A non-nil Confirm is not by itself permission either: Set applies a carded
+	// switch only when the limb hands back an answered-allow Card (ticket 371).
 	Confirm ConfirmFunc
 	// Logf is the audit sink (the project's existing "[audit]" family).
 	Logf func(format string, args ...any)
@@ -253,8 +258,8 @@ func New(o Options) (*Store, error) {
 // mode THIS PROCESS enforces, which is config.toml's档 except when this store was
 // handed no confirmation channel (ticket 372-r2).
 //
-// WHY THE READ SIDE. A store with Confirm == nil cannot ask for the one card
-// R20/M4 requires, and the two looser档 are exactly the ones that remove a
+// WHY THE READ SIDE. A store with Confirm == nil cannot ask for the card a
+// loosening costs (R9), and the two looser档 are exactly the ones that remove a
 // question: auto_approve silences every non-red-line call and ask_high_risk
 // silences every L1 call (risk.Mode.Screen). An assembly with no way to ask must
 // therefore run neither of them, so the effective read collapses to
@@ -276,6 +281,20 @@ func (s *Store) PermissionMode() risk.Mode {
 	}
 	return configured
 }
+
+// ConfiguredMode is config.toml's own value, WITHOUT the read-side downgrade
+// PermissionMode applies: the档 the next process would start on if the file still
+// says so.
+//
+// It exists for a layer that PRE-JUDGES a switch on the same baseline the write
+// leg will judge. Set compares the PERSISTED pair, because ticket 372's accounting
+// tooth (TestSetAccountsOnTheConfiguredValueNotTheDowngradedRead) needs it to; a
+// panel gate that compared the EFFECTIVE pair instead would read a legless host's
+// configured auto_approve -> requested ask_high_risk as a loosening (effective
+// ask_every_step -> ask_high_risk) and refuse a change that only makes the FILE
+// stricter. Refusing that would block the one direction PLAN.md:132 says is never
+// blocked, so R9 has the panel gate ask this question rather than PermissionMode's.
+func (s *Store) ConfiguredMode() risk.Mode { return s.configuredMode() }
 
 // configuredMode is config.toml's own value, WITHOUT the read-side downgrade.
 //
@@ -299,23 +318,29 @@ func (s *Store) configuredMode() risk.Mode {
 // Set switches to the档 and persists it (R20/M3: the choice survives a new
 // session and a restart; nothing else does).
 //
-// The confirmation rule is R20/M4 and it is asymmetric on purpose: only the
-// switch INTO auto_approve costs an answered L2 strong confirmation, because
-// that is the only档 that can remove a question about a call the operator would
-// otherwise have been asked about. The audit log, by contrast, records ALL THREE
-// 档 switches - a security posture change you cannot reconstruct from the log is
-// not an audited one.
+// The confirmation rule is R9 (owner 2026-11-05, ledger A1541 item 4: "every
+// loosening shows a confirmation card"), which extends R20/M4's asymmetry rather
+// than keeping it: EVERY switch that removes questions costs one answered L2
+// strong confirmation - the middle tier included - because ask_every_step ->
+// ask_high_risk silences every L1 window just as surely as auto_approve silences
+// more. A tightening costs nothing: getting stricter is never guarded
+// (PLAN.md:132). The audit log records ALL THREE 档 switches - a security posture
+// change you cannot reconstruct from the log is not an audited one.
 //
-// The GATE in front of it is the TARGET (ticket 372 reverted 367's direction
-// rule): with no confirmation channel wired, a switch INTO auto_approve is
-// refused and nothing else is. Ticket 367 refused every widening, which made
-// ask_every_step -> ask_high_risk unreachable on a host with no card surface - a
-// switch R20/M4 does not card, and no surveyed mainstream harness gates on "wider"
-// (docs/evidence/s1/m4-survey.md:96). The missing-channel case is instead made
-// safe on the READ side: PermissionMode answers ask_every_step for the two looser
-// 档, so a host assembled without a leg asks about everything whatever config.toml
-// says. JudgeCard remains the ONE definition of the (target, channel) rule, called
-// by both transition points (this function and panel.ModeWriteHandler).
+// The GATE in front of it judges the DIRECTION through JudgeCard: with no
+// confirmation channel wired, every loosening is refused (fail-closed) and no
+// tightening is. The missing-channel case is ALSO made safe on the READ side:
+// PermissionMode answers ask_every_step for the two looser 档, so a host assembled
+// without a leg asks about everything whatever config.toml says. JudgeCard remains
+// the ONE definition of the (direction, channel) rule, called by every transition
+// point (this function, panel.ModeWriteHandler and command.Roster).
+//
+// WHY THE DIRECTION AND NOT THE TARGET, since ticket 372 chose the target and this
+// reverses it knowingly: the survey at docs/evidence/s1/m4-survey.md:96 refuted
+// REFUSING a switch for being wider, and R9 does not refuse one for that reason -
+// it asks for the card every loosening has cost at the config-file door since
+// D36. The two doors now say the same thing about the same request, which is the
+// inconsistency R9 exists to remove (docs/evidence/s1/R9-impl.md §1).
 //
 // AND THE CARD MUST BE ANSWERED (ticket 371). A channel that is attached is only
 // the capability to ask; the switch is applied only when the limb hands back a
@@ -338,33 +363,33 @@ func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) err
 		return nil
 	}
 
-	// The gate is the TARGET, not the direction (ticket 372; R20/M4). A store
-	// with no confirmation channel cannot reach the one档 that removes the most
-	// questions. Judging the target is the owner's 2026-09-21 ruling and what dsh
-	// / minimax / openchamber do (m4-survey.md:104-106); judging the direction
-	// (ticket 367) also refused ask_every_step -> ask_high_risk, which M4 says
-	// costs no card and which the read-side downgrade already makes harmless.
-	// JudgeCard is the same function panel.ModeWriteHandler calls (ticket 371-b).
-	switch JudgeCard(to, s.confirm != nil) {
+	// The gate is the DIRECTION (R9; ticket 367's judgement, whose COST ticket 372
+	// had reduced to the auto_approve target). A store with no confirmation channel
+	// cannot loosen at all: every switch that removes questions is refused here,
+	// while a tightening is passed. That is what makes the runtime channel agree
+	// with the config-file channel (internal/config/manager.go cards every
+	// loosening too) and with D4 ("调松需显式勾选风险告知", PLAN.md:132).
+	// JudgeCard is the same function panel.ModeWriteHandler and command.Roster call.
+	switch JudgeCard(from, to, s.confirm != nil) {
 	case GateNoChannel:
 		sw.Result = ResultRefused
 		sw.Detail = fmt.Sprintf(
-			"从 %s 切到 %s 需要一次 L2 强确认，但本机没有接入确认通道（fail-closed 未切）", from, to)
+			"从 %s 切到 %s 是调松，需要一次 L2 强确认，但本机没有接入确认通道（fail-closed 未切）", from, to)
 		s.audit(sw)
 		return fmt.Errorf("perm: %s", sw.Detail)
 	case GateAsk:
-		// R20/M4's asymmetry stands on top of that gate: the auto_approve target
-		// costs one ANSWERED L2 card. JudgeCard is supposed to have refused every
-		// auto_approve switch whose channel was nil, so this branch used to call
-		// the limb directly and PANIC if that invariant was ever broken - the
-		// panic shot in 372-r2's evidence pinned exactly that. Ticket 371's R6
-		// changes the failure mode to a refusal: a broken predicate (or a channel
-		// that disappears between the judgement and the ask) must not take the
-		// process down while the operator is changing a security posture. This is
-		// defense in depth, not a second gate: JudgeCard remains the one
-		// judgement, and the guard only refuses the state JudgeCard promised
-		// could never reach here. It captures the function it is about to call,
-		// so the value judged and the value invoked are the same one.
+		// R9's cost stands on top of that gate: every loosening costs one ANSWERED
+		// L2 card. JudgeCard is supposed to have refused every loosening whose
+		// channel was nil, so this branch used to call the limb directly and PANIC
+		// if that invariant was ever broken - the panic shot in 372-r2's evidence
+		// pinned exactly that. Ticket 371's R6 changed the failure mode to a
+		// refusal: a broken predicate (or a channel that disappears between the
+		// judgement and the ask) must not take the process down while the operator
+		// is changing a security posture. This is defense in depth, not a second
+		// gate: JudgeCard remains the one judgement, and the guard only refuses the
+		// state JudgeCard promised could never reach here. It captures the function
+		// it is about to call, so the value judged and the value invoked are the
+		// same one.
 		started := s.now()
 		confirm := s.confirm
 		if confirm == nil {
@@ -379,7 +404,7 @@ func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) err
 		if err != nil {
 			sw.Result, sw.Detail = RefusalResult(err), "L2 强确认未通过："+err.Error()
 			s.audit(sw)
-			return fmt.Errorf("perm: 切到 auto_approve 被拒绝: %w", err)
+			return fmt.Errorf("perm: 从 %s 切到 %s 被拒绝: %w", from, to, err)
 		}
 		if !card.Answered() {
 			// Ticket 371's half of the gate: the channel was called and came back
@@ -387,10 +412,10 @@ func (s *Store) Set(ctx context.Context, to risk.Mode, origin, actor string) err
 			// never answered, and a nil error used to be enough. The refusal names
 			// that, so it cannot be confused with GateNoChannel's.
 			sw.Result = ResultCardNotAnswered
-			sw.Detail = "切到 auto_approve 需要一张被回答过的 L2 强确认卡，" +
-				"但确认通道没有交回任何“有人答过允许”的凭据（card was not answered）：未切"
+			sw.Detail = fmt.Sprintf("从 %s 切到 %s 需要一张被回答过的 L2 强确认卡，"+
+				"但确认通道没有交回任何“有人答过允许”的凭据（card was not answered）：未切", from, to)
 			s.audit(sw)
-			return fmt.Errorf("perm: 切到 auto_approve 被拒绝: %w", ErrCardNotAnswered)
+			return fmt.Errorf("perm: 从 %s 切到 %s 被拒绝: %w", from, to, ErrCardNotAnswered)
 		}
 		sw.Asked, sw.Card = true, card.Corr()
 	}
@@ -476,11 +501,11 @@ func (s *Store) audit(sw Switch) { s.auditAs("MODE-SWITCH", sw) }
 // move, the effective read did.
 //
 // asked / card are ticket 371-b's 〔丙-b〕 reading: every row says whether a card
-// was really answered on this attempt, and which one. On a MODE-SWITCH into
-// auto_approve, card is the same correlation id the approval layer printed on its
-// `ANSWER-ALLOW corr=<id>` line, so "the switch said applied" and "somebody
-// clicked allow" can be joined instead of assumed. A downgrade, a no-change and a
-// refusal that never asked print asked=0 card="".
+// was really answered on this attempt, and which one. On a MODE-SWITCH that cost a
+// card (since R9: every loosening), card is the same correlation id the approval
+// layer printed on its `ANSWER-ALLOW corr=<id>` line, so "the switch said applied"
+// and "somebody clicked allow" can be joined instead of assumed. A downgrade, a
+// no-change and a refusal that never asked print asked=0 card="".
 func (s *Store) auditAs(kind string, sw Switch) {
 	s.record(sw)
 	if s.logf == nil {

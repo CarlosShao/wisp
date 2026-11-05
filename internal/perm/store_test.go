@@ -132,35 +132,43 @@ func TestTicket90ThreeModesAndNoFourth(t *testing.T) {
 	}
 }
 
-// TestTicket90OnlyAutoCostsAConfirmAndAllThreeAreAudited is R20/M4, both halves:
-// the confirmation is asymmetric (only the switch INTO auto_approve), the audit
-// line is not (every档 change writes one, naming from/to/time/origin/actor).
-func TestTicket90OnlyAutoCostsAConfirmAndAllThreeAreAudited(t *testing.T) {
+// TestTicket90EveryLooseningCostsAConfirmAndAllThreeAreAudited is R20/M4's
+// confirmation as R9 amended it (owner 2026-11-05, ledger A1541 item 4): every
+// switch that loosens costs one answered L2 confirmation - the middle tier
+// included - and no tightening does. The audit line is not asymmetric at all:
+// every档 change writes one, naming from/to/time/origin/actor.
+func TestTicket90EveryLooseningCostsAConfirmAndAllThreeAreAudited(t *testing.T) {
 	spy := &confirmSpy{}
 	s, mc, rec := newTestStore(t, risk.ModeAskEveryStepName, spy.Confirm)
 	ctx := context.Background()
 
+	// ask_every_step -> ask_high_risk is a loosening: it silences every L1 window,
+	// so R9 makes it cost a card instead of riding free.
 	if err := s.Set(ctx, risk.ModeAskHighRisk, "panel", "owner"); err != nil {
 		t.Fatalf("Set(ask_high_risk): %v", err)
 	}
-	if spy.n() != 0 {
-		t.Errorf("switching to ask_high_risk cost %d confirmations, want 0 (R20/M4)", spy.n())
+	if spy.n() != 1 {
+		t.Errorf("switching to ask_high_risk cost %d confirmations, want 1 (R9: every loosening)", spy.n())
 	}
 	if err := s.Set(ctx, risk.ModeAutoApprove, "panel", "owner"); err != nil {
 		t.Fatalf("Set(auto_approve): %v", err)
 	}
-	if spy.n() != 1 {
-		t.Errorf("switching to auto_approve cost %d confirmations, want 1", spy.n())
+	if spy.n() != 2 {
+		t.Errorf("the two loosenings cost %d confirmations in total, want 2 (one each)", spy.n())
 	}
-	if spy.calls[0].To != risk.ModeAutoApprove || spy.calls[0].From != risk.ModeAskHighRisk {
-		t.Errorf("the confirmation was asked about %v->%v, want ask_high_risk->auto_approve",
+	if spy.calls[0].To != risk.ModeAskHighRisk || spy.calls[0].From != risk.ModeAskEveryStep {
+		t.Errorf("the first confirmation was asked about %v->%v, want ask_every_step->ask_high_risk",
 			spy.calls[0].From, spy.calls[0].To)
+	}
+	if spy.calls[1].To != risk.ModeAutoApprove || spy.calls[1].From != risk.ModeAskHighRisk {
+		t.Errorf("the second confirmation was asked about %v->%v, want ask_high_risk->auto_approve",
+			spy.calls[1].From, spy.calls[1].To)
 	}
 	if err := s.Set(ctx, risk.ModeAskEveryStep, "ball", "owner"); err != nil {
 		t.Fatalf("Set(ask_every_step): %v", err)
 	}
-	if spy.n() != 1 {
-		t.Errorf("tightening back cost an extra confirmation (%d), want the same 1", spy.n())
+	if spy.n() != 2 {
+		t.Errorf("tightening back cost an extra confirmation (%d), want the same 2", spy.n())
 	}
 
 	if mode, saves := mc.saved(); mode != risk.ModeAskEveryStepName || saves != 3 {
@@ -223,11 +231,11 @@ func TestTicket90ConfirmRefusalLeavesModeAlone(t *testing.T) {
 // the write to config.toml fails, the runtime must not run a档 the next start
 // will not read back.
 //
-// The confirmation channel is part of the fixture as of ticket 367: Set refuses
-// EVERY widening when no channel is wired (ask_every_step -> ask_high_risk is
-// one), so without it the switch would be refused before it ever reached the
-// write this test is about. What this asserts is unchanged - a failed persist
-// must not be mistaken for an applied switch.
+// The confirmation channel is part of the fixture, and R9 is why: every loosening
+// costs a card, so ask_every_step -> ask_high_risk is refused outright when no
+// channel is wired and the switch would never reach the write this test is about.
+// What this asserts is unchanged - a failed persist must not be mistaken for an
+// applied switch.
 func TestTicket90PersistFailureKeepsMemory(t *testing.T) {
 	mc := &memConfig{mode: risk.ModeAskEveryStepName, fail: errors.New("disk gone")}
 	rec := &recorder{}

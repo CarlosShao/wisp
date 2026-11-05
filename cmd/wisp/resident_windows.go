@@ -291,13 +291,15 @@ func runResident() {
 	//
 	// Ticket 114 AC#3 (R-92-2's other half): the panel's mode chain is handed the
 	// L2 leg HERE, and the leg is this process's own approval gate. Until this line
-	// the chain assembled its own handler with Confirm nil, so a widening request
-	// from the page was refused before Store.Set - the gate held, but R20/M4's card
-	// had no way to be raised from the panel at all. The gate above (ra) is built
-	// unconditionally at boot, so the leg exists in the no-console launch shape too;
-	// rt.modeWrites is assembled later, by the task source, and not at all without a
-	// console. panelModeConfirm is the same adapter run.go uses, and both close over
-	// confirmModeSwitchVia, so there is one card body and one sentence.
+	// the chain assembled its own handler with Confirm nil, so a loosening request
+	// from the page was refused before Store.Set - the gate held, but the card a
+	// loosening costs had no way to be raised from the panel at all (since R9 that
+	// card covers every loosening, not only the auto_approve tier). The gate above
+	// (ra) is built unconditionally at boot, so the leg exists in the no-console
+	// launch shape too; rt.modeWrites is assembled later, by the task source, and
+	// not at all without a console. panelModeConfirm is the same adapter run.go
+	// uses, and both close over confirmModeSwitchVia, so there is one card body and
+	// one sentence.
 	rp, panelScope, rpErr := newResidentPanelManager(rt.Layout.DataDir, panelModeConfirm(ra.confirmModeSwitch))
 	// Ticket 319 AC#1: the assembly root's handle on the panel thread is a HOLDER
 	// now, not the thread itself. The one thing that changes in a visible way:

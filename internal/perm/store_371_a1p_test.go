@@ -29,9 +29,10 @@ package perm
 // (invoked=1 / asked=0 for the fake limb) are unchanged, because the limb-side
 // facts are what any fix has to keep true.
 //
-// On the 372 blob (before the gate moved back to the target) A read
-// refused-confirm instead of applied; on the 367 blob B read confirm_calls=0
-// because the direction rule let the middle tier past without a card.
+// On the 372 blob A read refused-confirm instead of applied (367's direction rule
+// was refusing the middle tier); on the 367 blob B read confirm_calls=0 because
+// the middle tier was free; since R9 both middle-tier rows read one card, because
+// every loosening costs one.
 
 import (
 	"context"
@@ -95,8 +96,11 @@ func a1pReading(t *testing.T, tag string, from, to risk.Mode, invoked, asked int
 }
 
 // Test371A1PAC0RealLimbOnTheMiddleTier measures AC#0②: ask_every_step ->
-// ask_high_risk with a REAL, asking limb attached. R20/M4 says this target
-// costs no card, so the reading must be invoked=0 / asked=0 / applied.
+// ask_high_risk with a REAL, asking limb attached. On 786a13b22 this reading was
+// invoked=0 / asked=0 because R20/M4 carded only the auto_approve target. R9
+// (owner 2026-11-05, ledger A1541 item 4) cards EVERY loosening, so the same row
+// now reads invoked=1 / asked=1 and still applies - the middle tier moved from
+// "no card" to "one card", not to "refused".
 func Test371A1PAC0RealLimbOnTheMiddleTier(t *testing.T) {
 	ctx := context.Background()
 	limb := &a1pLimb{}
@@ -110,10 +114,11 @@ func Test371A1PAC0RealLimbOnTheMiddleTier(t *testing.T) {
 		invoked, asked, setErr, last, ok, persisted, saves)
 
 	if setErr != nil {
-		t.Fatalf("ask_every_step -> ask_high_risk was refused (%v); R20/M4 cards only auto_approve", setErr)
+		t.Fatalf("ask_every_step -> ask_high_risk was refused with an answering limb attached: %v", setErr)
 	}
-	if invoked != 0 || asked != 0 {
-		t.Errorf("the middle tier cost %d invocations / %d asks, want 0/0 (R20/M4)", invoked, asked)
+	if invoked != 1 || asked != 1 {
+		t.Errorf("the middle tier cost %d invocations / %d asks, want 1/1 (R9: every loosening shows one card)",
+			invoked, asked)
 	}
 	if !ok || last.Result != ResultApplied {
 		t.Errorf("audit result = %q, want %q - the switch applied", last.Result, ResultApplied)

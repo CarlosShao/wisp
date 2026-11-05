@@ -174,8 +174,9 @@ func TestTicket90ManualSwitchSurvivesRestart(t *testing.T) {
 			t.Errorf("after restart mode = %v, want the manually chosen %v", got, want)
 		}
 	}
-	if confirmCalls != 1 {
-		t.Errorf("confirmations asked = %d, want 1 (only the auto_approve switch)", confirmCalls)
+	if confirmCalls != 2 {
+		t.Errorf("confirmations asked = %d, want 2: one per loosening (R9), "+
+			"ask_every_step -> ask_high_risk and ask_high_risk -> auto_approve", confirmCalls)
 	}
 	// The persisted form is the config key, and it is a real string in the
 	// file - not a runtime-only value that a restart could not see.

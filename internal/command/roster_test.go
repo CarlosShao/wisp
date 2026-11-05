@@ -308,10 +308,12 @@ func TestAvailabilityAgreesWithTheProductionModeDoor213(t *testing.T) {
 					Actor:   "roster-213",
 				}
 
-				// The ENV carries the EFFECTIVE档, which is what the handler's own
-				// gate reads (a legless store answers the strictest档 even when the
-				// file says otherwise: ticket 372-r2).
-				env := Env{Mode: store.PermissionMode(), CardChannel: card}
+				// The ENV carries the PERSISTED baseline - the pair the handler's own
+				// gate and perm.Store.Set both measure (R9): a legless store's
+				// EFFECTIVE档 collapses to ask_every_step (372-r2), and judging the
+				// direction on that baseline would disagree with the door about a
+				// change that only tightens the file.
+				env := Env{Mode: store.ConfiguredMode(), CardChannel: card}
 				av := r.Judge(env, Request{Name: "mode", Target: target.String()})
 				verdicts[av.Verdict]++
 

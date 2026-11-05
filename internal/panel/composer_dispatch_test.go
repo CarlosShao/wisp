@@ -66,6 +66,10 @@ func (w *hop33ModeWriter) PermissionMode() risk.Mode {
 	return w.current
 }
 
+// ConfiguredMode is the baseline R9's gate reads; this fake has no read-side
+// downgrade to model, so it answers the same on-ladder value.
+func (w *hop33ModeWriter) ConfiguredMode() risk.Mode { return w.PermissionMode() }
+
 func (w *hop33ModeWriter) Set(_ context.Context, to risk.Mode, origin, actor string) error {
 	w.setCalls++
 	w.lastTo = to

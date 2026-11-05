@@ -247,12 +247,12 @@ func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc, confirm
 // widening request is refused before Store.Set is ever reached" - true of this
 // file, false of this PROCESS: the assembly root builds the orb's approval gate
 // (resident_approval_windows.go) before this function is called, and a card on the
-// orb is exactly the native surface R20/M4 asks for. So the leg arrives as a
+// orb is exactly the native surface the mode gate asks for. So the leg arrives as a
 // parameter now, and the root hands it panelModeConfirm(ra.confirmModeSwitch):
 // the same adapter and the same card body the run seam uses (run.go's
-// rt.modeWrites), over the one gate this process has. What did NOT change is
-// M4's reach - only the switch INTO auto_approve raises a card, and this file
-// neither widens nor narrows that.
+// rt.modeWrites), over the one gate this process has. What did NOT change is the
+// card rule itself - since R9 every loosening raises exactly one card and a
+// tightening raises none, and this file neither widens nor narrows that.
 //
 // The actor is named for what actually drives it, so the audit line cannot be read
 // as the CLI seam's.

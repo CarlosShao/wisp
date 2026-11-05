@@ -117,12 +117,12 @@ type runSpec struct {
 	// host-side tool call through the same bridge the loop uses, instead of
 	// rebuilding the wiring and proving nothing.
 	onRuntime func(*agentRuntime)
-	// modeConfirm is the L2 strong confirmation a switch INTO auto_approve
-	// costs (R20/M4). Production leaves it nil, which means confirmModeSwitch:
-	// one card through the same C18 gate a tool call goes through, answerable
-	// only from the native side. The end-to-end tests fill it to stand for "the
-	// operator clicked allow", because a console run has no native channel and
-	// its L2 card therefore always resolves to a reject.
+	// modeConfirm is the L2 strong confirmation a loosening switch costs (R9;
+	// before it, R20/M4's "only the switch INTO auto_approve"). Production leaves it
+	// nil, which means confirmModeSwitch: one card through the same C18 gate a tool
+	// call goes through, answerable only from the native side. The end-to-end tests
+	// fill it to stand for "the operator clicked allow", because a console run has no
+	// native channel and its L2 card therefore always resolves to a reject.
 	modeConfirm perm.ConfirmFunc
 	// sink is the persistent log pipeline this run installed. Every caller
 	// leaves it nil: runTextTask fills it in after installing the sink, and
@@ -1081,9 +1081,10 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 // audit line name what is being confirmed.
 const modeSwitchToolName = "permission.mode"
 
-// confirmModeSwitch is the production R20/M4 confirmation: exactly ONE L2 card,
-// raised through the same C18 approval gate a tool call goes through, and it can
-// only be answered from the native side (SPEC-06:1588, machine-gated by ban #6).
+// confirmModeSwitch is the production confirmation a loosening costs (R9; R20/M4
+// before it): exactly ONE L2 card, raised through the same C18 approval gate a tool
+// call goes through, and it can only be answered from the native side
+// (SPEC-06:1588, machine-gated by ban #6).
 //
 // A console run has no native channel, so this refuses - the card times out into
 // a reject, or the caller's context ends first and the gate abandons it. That is
@@ -1150,7 +1151,7 @@ func confirmModeSwitchVia(gate *approval.Gate, ctx context.Context, sw perm.Swit
 		CorrelationID: corr,
 		Tool:          modeSwitchToolName,
 		Level:         risk.L2,
-		Reason: fmt.Sprintf("切换到 %s 会移除本应询问的确认，需要一次 L2 强确认（R20/M4，当前档 %s）",
+		Reason: fmt.Sprintf("切换到 %s 会移除本应询问的确认（调松），需要一次 L2 强确认（R9；当前档 %s）",
 			sw.To, sw.From),
 		Mode: sw.From,
 	})

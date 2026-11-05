@@ -1,0 +1,41 @@
+package main
+
+// TEMPORARY diagnostic probe (untracked, never committed).
+
+import (
+	"encoding/json"
+	"fmt"
+	"testing"
+)
+
+func TestZZProbeTempError(t *testing.T) {
+	p := newProbe365(t, 128000)
+	code := p.run("总结一下 这份笔记")
+	fmt.Printf("PROBE code=%d\nPROBE stdout:\n%s\n", code, p.out.String())
+}
+
+func TestZZProbeTempSchemas(t *testing.T) {
+	// Which tool schema fails to round-trip through json.RawMessage?
+	bad := 0
+	for _, raw := range probeSchemaSamples() {
+		var v any
+		if err := json.Unmarshal([]byte(raw), &v); err != nil {
+			fmt.Printf("PROBE BAD raw=%q err=%v\n", raw, err)
+			bad++
+			continue
+		}
+		re, err := json.Marshal(json.RawMessage(raw))
+		if err != nil {
+			fmt.Printf("PROBE REMARSHAL-ERR raw=%q err=%v\n", raw, err)
+			bad++
+			continue
+		}
+		fmt.Printf("PROBE OK rawlen=%d remarshal=%s\n", len(raw), re)
+	}
+	fmt.Printf("PROBE bad=%d\n", bad)
+}
+
+// probeSchemaSamples returns the real tool schemas the composition root registers.
+func probeSchemaSamples() []string {
+	return probeRealSchemas(t)
+}

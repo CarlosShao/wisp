@@ -88,18 +88,18 @@ const residentCardTool = "resident.confirmation"
 // every confirmation instead of asking a question nobody can see.
 var errResidentNoBall = errors.New("常驻进程没有悬浮球窗口，卡片无处呈现")
 
-// confirmModeSwitch is this process's R20/M4 L2 leg for the PANEL's mode chain
-// (ticket 114 AC#3, R-92-2's other half). It is not a second card body: it is the
-// same confirmModeSwitchVia the run seam uses (cmd/wisp/run.go), handed THIS
-// process's gate - the one built above with ballCardUI, which is what makes the
-// card appear on the orb and, for an L1 window, borrow the cancel key.
+// confirmModeSwitch is this process's L2 leg for the PANEL's mode chain (ticket
+// 114 AC#3, R-92-2's other half). It is not a second card body: it is the same
+// confirmModeSwitchVia the run seam uses (cmd/wisp/run.go), handed THIS process's
+// gate - the one built above with ballCardUI, which is what makes the card appear
+// on the orb and, for an L1 window, borrow the cancel key.
 //
 // WHY THE PANEL CHAIN NEEDS IT AT ALL. Without a leg, ModeWriteHandler refuses
-// every widening request before Store.Set is reached (composer_handlers.go:131),
-// so the page could never ask for a looser档 even with a human sitting in front of
-// the orb. With it, the handler steps aside and R20/M4 decides: only the switch
-// INTO auto_approve raises a card, exactly one, through this gate. Nothing here
-// widens M4's reach.
+// every loosening request before Store.Set is reached, so the page could never ask
+// for a looser档 even with a human sitting in front of the orb. With it, the
+// handler steps aside and the card rule decides: since R9 every loosening raises
+// exactly one card through this gate, and a tightening raises none. Nothing here
+// reaches past that rule.
 //
 // WHY IT IS THE RESIDENT GATE AND NOT run.go's rt.modeWrites: the panel host is
 // built at boot (resident_windows.go:214), and the task pipeline that owns

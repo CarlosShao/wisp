@@ -7,16 +7,19 @@ package panel
 // perm.IsWidening) while perm.Store judged the TARGET ("is it auto_approve?").
 // A panel request that widened to ask_high_risk was refused here and would have
 // been applied unchanged by Set had anything else called it. Ticket 367 made both
-// layers judge the direction; ticket 372 found that judgement refuted by the
+// layers judge the direction; ticket 372 found the REFUSAL refuted by the
 // mainstream survey (docs/evidence/s1/m4-survey.md:96: no surveyed harness gates
-// on "wider"), reverted it to the target and kept ONE definition of the target
-// rule (perm.RequiresCard), called here and in Set.
+// on "wider"), reverted it to the target and kept ONE definition of the rule
+// (perm.RequiresCard); R9 (owner 2026-11-05, ledger A1541 item 4) landed the
+// owner's product decision that a widening COSTS A CARD - not that it is refused
+// for being wider - so the direction is the judgement again and a legless host
+// refuses every loosening.
 //
 // The rows below are the invariant, not either implementation: for every ordered
 // pair of the three modes, with no confirmation channel wired anywhere, the two
-// layers must refuse the same switches. Since 372 the refused set is exactly "the
-// target is auto_approve" - the one档 R20/M4 cards - so the auto_approve rows are
-// the teeth, and ask_every_step -> ask_high_risk is the row the revert buys.
+// layers must refuse the same switches. Since R9 the refused set is "the switch
+// loosens", so the three widening rows are the teeth and the three narrowing rows
+// keep a gate that refuses everything from passing.
 
 import (
 	"context"
@@ -58,7 +61,7 @@ func TestPanelGateAndStoreGateAgreeOnEveryPair367(t *testing.T) {
 				continue
 			}
 			pairs++
-			wantRefused := perm.RequiresCard(to)
+			wantRefused := perm.RequiresCard(from, to)
 			if wantRefused {
 				refused++
 			}
@@ -83,12 +86,12 @@ func TestPanelGateAndStoreGateAgreeOnEveryPair367(t *testing.T) {
 			handlerErr := h.HandleModeRequest(ctx, modeReq(names[toIdx], id))
 
 			if (storeErr != nil) != wantRefused {
-				t.Errorf("%s -> %s: perm.Store refused=%v (%v), want refused=%v (target is auto_approve: %v)",
-					from, to, storeErr != nil, storeErr, wantRefused, perm.RequiresCard(to))
+				t.Errorf("%s -> %s: perm.Store refused=%v (%v), want refused=%v (this switch loosens: %v)",
+					from, to, storeErr != nil, storeErr, wantRefused, perm.RequiresCard(from, to))
 			}
 			if (handlerErr != nil) != wantRefused {
-				t.Errorf("%s -> %s: panel handler refused=%v (%v), want refused=%v (target is auto_approve: %v)",
-					from, to, handlerErr != nil, handlerErr, wantRefused, perm.RequiresCard(to))
+				t.Errorf("%s -> %s: panel handler refused=%v (%v), want refused=%v (this switch loosens: %v)",
+					from, to, handlerErr != nil, handlerErr, wantRefused, perm.RequiresCard(from, to))
 			}
 			if (storeErr == nil) != (handlerErr == nil) {
 				t.Errorf("%s -> %s: the two gates disagree - perm.Store refused=%v (%v), panel handler refused=%v (%v)",
@@ -115,8 +118,8 @@ func TestPanelGateAndStoreGateAgreeOnEveryPair367(t *testing.T) {
 				}
 				continue
 			}
-			// A target M4 does not card passes BOTH layers: nothing here is a
-			// widening rule in disguise, and the middle档 is reachable.
+			// A tightening passes BOTH layers: nothing here is a "refuse every
+			// change" rule in disguise.
 			if mgr.mode != to {
 				t.Errorf("%s -> %s: the allowed switch did not persist the target (file says %s)", from, to, mgr.mode)
 			}
@@ -126,10 +129,10 @@ func TestPanelGateAndStoreGateAgreeOnEveryPair367(t *testing.T) {
 			}
 		}
 	}
-	if pairs != 6 || refused != 2 {
-		t.Fatalf("matrix covered %d pairs with %d refused, want 6 pairs and 2 refused (auto_approve from the two stricter档)", pairs, refused)
+	if pairs != 6 || refused != 3 {
+		t.Fatalf("matrix covered %d pairs with %d refused, want 6 pairs and 3 refused (every loosening, no tightening)", pairs, refused)
 	}
 	if !sawMiddleWidening {
-		t.Fatal("the ask_every_step -> ask_high_risk row is missing: the revert's own case went untested")
+		t.Fatal("the ask_every_step -> ask_high_risk row is missing: R9's own middle-tier case went untested")
 	}
 }

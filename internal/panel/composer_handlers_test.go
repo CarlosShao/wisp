@@ -46,6 +46,17 @@ func (f *fakeModeWriter) PermissionMode() risk.Mode {
 	return f.current
 }
 
+// ConfiguredMode is the baseline the R9 gate judges against (the persisted value,
+// which this fake equates with the effective one: it has no read-side downgrade to
+// model here).
+func (f *fakeModeWriter) ConfiguredMode() risk.Mode {
+	f.readCalls++
+	if !f.currentOK {
+		return risk.Mode(97)
+	}
+	return f.current
+}
+
 func (f *fakeModeWriter) Set(_ context.Context, to risk.Mode, origin, actor string) error {
 	f.setCalls++
 	f.setMode, f.setOrigin, f.setActor = to, origin, actor
@@ -85,15 +96,12 @@ func modeLadder(t *testing.T) []risk.Mode {
 }
 
 // TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree nails the vocabulary
-// these cases iterate, plus the ladder order the audit words "widened"/"narrowed"
-// still read. Since ticket 372 the GATE is perm.RequiresCard(target), not the
-// direction, so this test is no longer the gate's premise: it is the list's own
-// pin (exact equality, length floor, strict-prefix negative arm) with the order
-// witness perm.IsWidening still names. The vocabulary is nailed three ways: exact
-// equality (a rename or a reorder goes red), a length floor and a strict-prefix
-// negative assertion (a SHRUNKEN list goes red on its own line, not only inside
-// the equality - A109(2) measured that a 6-to-5 trim leaves per-entry assertions
-// green).
+// these cases iterate, plus the ladder order R9's gate reads (every loosening
+// costs a card, so "which pairs loosen" is the rule). The vocabulary is nailed
+// three ways: exact equality (a rename or a reorder goes red), a length floor and
+// a strict-prefix negative assertion (a SHRUNKEN list goes red on its own line,
+// not only inside the equality - A109(2) measured that a 6-to-5 trim leaves
+// per-entry assertions green).
 func TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree(t *testing.T) {
 	names := risk.ModeNames()
 	want := []string{risk.ModeAskEveryStepName, risk.ModeAskHighRiskName, risk.ModeAutoApproveName}
@@ -123,15 +131,12 @@ func TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree(t *testing.T) {
 	}
 }
 
-// TestOnlyTheAutoApproveTargetIsRefusedWhenNoL2ConfirmLegIsAttached is AC#2 as
-// ticket 372 re-scoped it (its 114 name was the widening one): with no leg
-// attached, requests whose TARGET is auto_approve are refused - that is the one
-// target R20/M4 cards - and every other target reaches the write leg. Refusing
-// ask_high_risk here was ticket 367's direction rule; it is exactly the request
-// M4 says costs no card, and the read-side downgrade (perm.Store.PermissionMode
-// answers ask_every_step without a leg) is what keeps a legless host safe after
-// it lands.
-func TestOnlyTheAutoApproveTargetIsRefusedWhenNoL2ConfirmLegIsAttached(t *testing.T) {
+// TestEveryLooseningIsRefusedWhenNoL2ConfirmLegIsAttached is AC#2 as R9 scoped it
+// (its 114 name was the widening one, its 372 name the auto_approve one): with no
+// leg attached, every request that LOOSENS the档 is refused, and every tightening
+// reaches the write leg. The refused set is the same one perm.Store refuses, and
+// the tightening rows are what keep "no leg" from becoming "no change at all".
+func TestEveryLooseningIsRefusedWhenNoL2ConfirmLegIsAttached(t *testing.T) {
 	ladder := modeLadder(t)
 	names := risk.ModeNames()
 	cases, refused, unchanged, passed := 0, 0, 0, 0
@@ -155,9 +160,9 @@ func TestOnlyTheAutoApproveTargetIsRefusedWhenNoL2ConfirmLegIsAttached(t *testin
 					t.Fatalf("%s unchanged: ModeWriter called %d time(s) with %s, want one call with %s",
 						names[fromIdx], w.setCalls, w.setMode, names[toIdx])
 				}
-			case perm.RequiresCard(to):
+			case perm.RequiresCard(from, to):
 				if err == nil {
-					t.Fatalf("%s -> %s targets auto_approve with no confirm leg: got nil error, the档 would have been written",
+					t.Fatalf("%s -> %s loosens the档 with no confirm leg: got nil error, the file would have been written",
 						names[fromIdx], names[toIdx])
 				}
 				if !errors.Is(err, ErrNoL2Confirm) {
@@ -178,8 +183,8 @@ func TestOnlyTheAutoApproveTargetIsRefusedWhenNoL2ConfirmLegIsAttached(t *testin
 				refused++
 			default:
 				if err != nil {
-					t.Fatalf("%s -> %s targets %s, which R20/M4 does not card, but the handler refused it: %v",
-						names[fromIdx], names[toIdx], names[toIdx], err)
+					t.Fatalf("%s -> %s tightens the档, which is never guarded, but the handler refused it: %v",
+						names[fromIdx], names[toIdx], err)
 				}
 				if w.setCalls != 1 || w.setMode != to {
 					t.Fatalf("%s -> %s: the write leg was called %d time(s) with %s, want exactly one call with %s",
@@ -197,16 +202,16 @@ func TestOnlyTheAutoApproveTargetIsRefusedWhenNoL2ConfirmLegIsAttached(t *testin
 		t.Fatalf("the switch matrix covered %d pairs of %d modes (%d): the enumeration was shortened",
 			cases, len(ladder), len(ladder)*len(ladder))
 	}
-	// One refusal per starting档 except auto_approve itself: the target that costs
-	// a card is refused whenever it would be a change.
-	if want := len(ladder) - 1; refused != want {
-		t.Fatalf("%d auto_approve changes refused, want %d", refused, want)
+	// The three loosening pairs (strict -> looser, in both tiers): R9 cards every
+	// one of them, so without a leg every one is refused.
+	if want := len(ladder) * (len(ladder) - 1) / 2; refused != want {
+		t.Fatalf("%d loosening changes refused, want %d", refused, want)
 	}
 	if want := len(ladder); unchanged != want {
 		t.Fatalf("%d no-change rows reached the write leg, want %d (R20 audits all three档)", unchanged, want)
 	}
-	if want := len(ladder)*(len(ladder)-1) - (len(ladder) - 1); passed != want {
-		t.Fatalf("%d non-card changes reached the write leg, want %d: a direction rule crept back in", passed, want)
+	if want := len(ladder) * (len(ladder) - 1) / 2; passed != want {
+		t.Fatalf("%d tightening changes reached the write leg, want %d: a gate that refuses every change crept in", passed, want)
 	}
 }
 

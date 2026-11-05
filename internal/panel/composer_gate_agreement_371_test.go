@@ -20,7 +20,8 @@ package panel
 //	never-asking   -> the panel passes, the STORE refuses, BOTH layers book
 //	                  result=card-not-answered, and nothing lands
 //	answered allow -> the switch applies, one card, no panel line
-//	target M4 does not card -> the switch applies, the limb is never entered
+//	loosening?     -> since R9 the row set is "the switch loosens"; a tightening
+//	                  applies in EVERY assembly and the limb is never entered
 //
 // Each row runs a REAL perm.Store behind the handler (no fake verdict), and the
 // store's verdict is read from its own audit row rather than from the error the
@@ -90,6 +91,10 @@ type t371Writer struct {
 
 func (w *t371Writer) PermissionMode() risk.Mode { return w.store.PermissionMode() }
 
+// ConfiguredMode is the baseline the gate judges against (R9): the persisted
+// value, which is what Set will measure the switch from.
+func (w *t371Writer) ConfiguredMode() risk.Mode { return w.store.ConfiguredMode() }
+
 func (w *t371Writer) Set(ctx context.Context, to risk.Mode, origin, actor string) error {
 	w.calls++
 	return w.store.Set(ctx, to, origin, actor)
@@ -152,7 +157,7 @@ func TestPanelGateAndStoreGateAgreeOnTheAnsweredCard371(t *testing.T) {
 				id := fmt.Sprintf("t371-%s-%s-%s", names[fromIdx], names[toIdx], strings.ReplaceAll(kind, " ", "-"))
 				handlerErr := h.HandleModeRequest(ctx, modeReq(names[toIdx], id))
 
-				carded := perm.RequiresCard(to)
+				carded := perm.RequiresCard(from, to)
 				wantRefused := carded && kind != "answered allow"
 
 				// (1) The handler's own verdict, before either record is read.
@@ -255,14 +260,15 @@ func TestPanelGateAndStoreGateAgreeOnTheAnsweredCard371(t *testing.T) {
 							from, to, kind, row)
 					}
 				default:
-					// !carded: M4 says this target costs no card in ANY assembly.
+					// !carded: a tightening costs no card in ANY assembly (R9), and
+					// the limb must never be entered for it.
 					applied++
 					if writer.calls != 1 {
 						t.Errorf("%s -> %s / %s: writeCalls=%d, want 1", from, to, kind, writer.calls)
 					}
 					if limb.asked() != 0 {
-						t.Errorf("%s -> %s / %s: R20/M4 was widened - the limb was entered for a target "+
-							"that costs no card", from, to, kind)
+						t.Errorf("%s -> %s / %s: R9 was widened over a tightening - the limb was entered for "+
+							"a switch that removes no questions", from, to, kind)
 					}
 					if len(panelLog) != 0 {
 						t.Errorf("%s -> %s / %s: a passing request added a panel verdict: %q",
@@ -279,9 +285,9 @@ func TestPanelGateAndStoreGateAgreeOnTheAnsweredCard371(t *testing.T) {
 	}
 	// Two auto_approve pairs are refused by the panel (no channel) and two by the
 	// store (never-asking); the rest apply.
-	if refusedByPanel != 2 || refusedByStore != 2 {
-		t.Errorf("refused by panel=%d by store=%d, want 2/2 (auto_approve from the two stricter档)",
-			refusedByPanel, refusedByStore)
+	if refusedByPanel != 3 || refusedByStore != 3 {
+		t.Errorf("refused by panel=%d by store=%d, want 3/3 (every loosening, under each of the two "+
+			"refusing limb shapes: R9)", refusedByPanel, refusedByStore)
 	}
 	if want := kinds - refusedByPanel - refusedByStore; applied != want {
 		t.Errorf("%d rows applied, want %d", applied, want)
@@ -351,18 +357,28 @@ func Test371R1PThePanelGateCallsTheSameCardPredicate(t *testing.T) {
 			path, len(calls))
 	}
 	call := calls[0]
-	if len(call.Args) != 2 {
-		t.Fatalf("perm.JudgeCard takes (target, channel); the gate passes %d argument(s)", len(call.Args))
+	if len(call.Args) != 3 {
+		t.Fatalf("perm.JudgeCard takes (from, to, channel) since R9; the gate passes %d argument(s)",
+			len(call.Args))
 	}
-	channel := exprText371(call.Args[1])
+	channel := exprText371(call.Args[2])
 	if channel != "h.Confirm != nil" {
 		t.Errorf("the panel's channel term is %q, want \"h.Confirm != nil\": that is the term "+
 			"perm.Store.Set passes its own channel as", channel)
 	}
-	// The old spelling must be gone, not merely shadowed by the new call.
+	// The from/to pair is judged as ONE switch: a gate that passed a constant, or
+	// the same value twice, would satisfy the arity check and none of R9.
+	if got := exprText371(call.Args[0]); got != "from" {
+		t.Errorf("the panel's `from` term is %q, want \"from\" (the persisted baseline Set will use)", got)
+	}
+	if got := exprText371(call.Args[1]); got != "to" {
+		t.Errorf("the panel's `to` term is %q, want \"to\"", got)
+	}
+	// The old spells must be gone, not merely shadowed by the new call.
 	for i, line := range strings.Split(string(src), "\n") {
-		if strings.Contains(line, "perm.RequiresCard(to) &&") {
-			t.Errorf("%s:%d still spells the (target, channel) rule by hand: %q", path, i+1, strings.TrimSpace(line))
+		if strings.Contains(line, "perm.RequiresCard(to) &&") ||
+			strings.Contains(line, "perm.JudgeCard(to,") {
+			t.Errorf("%s:%d still spells the card rule by hand: %q", path, i+1, strings.TrimSpace(line))
 		}
 	}
 	// The panel's refusal line carries perm's classification, which is the other

@@ -227,24 +227,43 @@ func Test371R1PAnOperatorsNoIsStillARefusalNotAnUnansweredCard(t *testing.T) {
 	}
 }
 
-// Test371R1PTheMiddleTargetIsStillFreeOfCards is R20/M4's asymmetry, unmoved by
-// this ticket: ask_every_step -> ask_high_risk costs no card at all, so the new
-// answered rule cannot have leaked onto it.
-func Test371R1PTheMiddleTargetIsStillFreeOfCards(t *testing.T) {
+// Test371R1PTheMiddleTargetCostsOneCardSinceR9 is the asymmetry this file used to
+// pin ("the middle target is still free of cards"), flipped by R9: every loosening
+// costs one card, so the middle tier enters the limb exactly once and lands. The
+// second half is the control R9 must not break - a tightening still costs nothing.
+func Test371R1PTheMiddleTargetCostsOneCardSinceR9(t *testing.T) {
 	limb := &leg371{}
-	s, mc, rec := newTestStore(t, risk.ModeAskEveryStepName, neverAsks371(limb))
+	s, mc, rec := newTestStore(t, risk.ModeAskEveryStepName, answers371(limb, "r9/middle"))
 	if err := s.Set(context.Background(), risk.ModeAskHighRisk, "panel", "owner"); err != nil {
-		t.Fatalf("the middle target was refused: %v", err)
+		t.Fatalf("the middle target was refused although a limb answers allow: %v", err)
 	}
-	if limb.invoked != 0 {
-		t.Errorf("ask_high_risk entered the confirmation limb %d time(s); R20/M4 cards only auto_approve", limb.invoked)
+	if limb.invoked != 1 {
+		t.Errorf("ask_high_risk entered the confirmation limb %d time(s); R9 cards every loosening, want 1",
+			limb.invoked)
 	}
 	if mode, saves := mc.saved(); mode != risk.ModeAskHighRiskName || saves != 1 {
 		t.Errorf("persisted mode=%q saves=%d, want ask_high_risk/1", mode, saves)
 	}
 	line := cardLine371(t, rec, risk.ModeAskHighRiskName)
+	if !strings.Contains(line, "asked=1") {
+		t.Errorf("a loosening that cost a card claims nobody was asked: %s", line)
+	}
+
+	// The control: a tightening never reaches the limb.
+	tight := &leg371{}
+	s2, mc2, rec2 := newTestStore(t, risk.ModeAskHighRiskName, neverAsks371(tight))
+	if err := s2.Set(context.Background(), risk.ModeAskEveryStep, "panel", "owner"); err != nil {
+		t.Fatalf("the tightening was refused: %v", err)
+	}
+	if tight.invoked != 0 {
+		t.Errorf("the tightening entered the limb %d time(s), want 0", tight.invoked)
+	}
+	if mode, saves := mc2.saved(); mode != risk.ModeAskEveryStepName || saves != 1 {
+		t.Errorf("persisted mode=%q saves=%d, want ask_every_step/1", mode, saves)
+	}
+	line = cardLine371(t, rec2, risk.ModeAskEveryStepName)
 	if !strings.Contains(line, "asked=0") {
-		t.Errorf("a target that costs no card claims somebody was asked: %s", line)
+		t.Errorf("a tightening claims somebody was asked: %s", line)
 	}
 }
 

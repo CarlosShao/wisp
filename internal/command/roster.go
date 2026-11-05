@@ -31,10 +31,13 @@
 //
 // WHY THE VERDICT DELEGATES (AC#3). "Does this request need a card" is permission
 // policy, and this repository keeps exactly one definition of it:
-// perm.JudgeCard/perm.RequiresCard, called by both transition points (perm.Store
-// and panel.ModeWriteHandler). The roster calls the same function; it never
-// re-spells `target == auto_approve`. A refusal here therefore always carries the
-// sentence the door would give, and the roster cannot drift into a second policy.
+// perm.JudgeCard/perm.RequiresCard, called by every transition point (perm.Store,
+// panel.ModeWriteHandler and this roster). The roster calls the same function; it
+// never re-spells `to == auto_approve` or `to > from`. A refusal here therefore
+// always carries the sentence the door would give, and the roster cannot drift
+// into a second policy. Since R9 the term that decides is the DIRECTION (every
+// loosening costs a card, every tightening is free), so the verdict this function
+// returns changed for the middle tier without a second rule appearing here.
 //
 // WHY THE ROSTER LIVES OUTSIDE internal/panel. The frozen grant-boundary
 // instrument (internal/panel/l2_grant_boundary_test.go's poolJudgedByRealGuard)
@@ -93,8 +96,9 @@ const (
 	ApprovalNever Approval = iota
 	// ApprovalPerRequest: whether this particular request asks depends on its
 	// argument, and the answer comes from the door's own gate (for the mode
-	// command: perm.JudgeCard on the target档). The roster answers it per request
-	// in Judge rather than pretending one boolean describes every target.
+	// command: perm.JudgeCard on the from -> to direction). The roster answers it
+	// per request in Judge rather than pretending one boolean describes every
+	// target.
 	ApprovalPerRequest
 )
 
@@ -167,10 +171,19 @@ func (c Command) Door() string {
 	return fmt.Sprintf("未知通道 %q（fail-closed：这条门没有执行者）", c.Channel)
 }
 
-// Env is the host's condition for one judgement: the permission档 in force (the
-// EFFECTIVE档, i.e. what perm.PermissionMode answers - a store with no
-// confirmation channel answers the strictest档 even when the file says
-// otherwise, ticket 372-r2) and whether an L2 confirmation leg is attached.
+// Env is the host's condition for one judgement: the permission档 the door will
+// measure the switch FROM, and whether an L2 confirmation leg is attached.
+//
+// WHICH档, EXACTLY. Since R9 the mode verdict is a judgement about a DIRECTION, so
+// the baseline has to be the one the write leg uses - perm.Store.ConfiguredMode,
+// the persisted value - because perm.Store.Set compares the persisted pair and the
+// panel gate compares the same pair. The EFFECTIVE档 (perm.PermissionMode, what the
+// page displays) is NOT the right baseline for that arithmetic: on a legless host
+// it collapses to ask_every_step (ticket 372-r2), which would make a configured
+// auto_approve -> ask_high_risk request look like a loosening and the roster would
+// refuse a change that only tightens the file. A caller that has only the effective
+// value should pass that; the verdict then answers for that baseline, which is what
+// a caller with no write leg to inspect actually knows.
 type Env struct {
 	Mode        risk.Mode
 	CardChannel bool
@@ -268,7 +281,10 @@ func (r *Roster) Judge(env Env, req Request) Availability {
 
 // judgeMode judges one panel.mode.request against the same predicate the two
 // production gate layers call (perm.JudgeCard), so the roster cannot disagree with
-// the door about who needs a card.
+// the door about which switch needs a card. The `from` it passes is Env.Mode, the
+// EFFECTIVE档, because that is the档 the panel handler judges against; a legless
+// store answers the strictest档 there even when the file says otherwise (ticket
+// 372-r2), and R9's direction rule must be read on the same pair the door reads.
 func judgeMode(env Env, e Command, req Request) Availability {
 	target := strings.TrimSpace(req.Target)
 	if target == "" {
@@ -284,18 +300,19 @@ func judgeMode(env Env, e Command, req Request) Availability {
 		return Availability{Verdict: Allowed, Reason: fmt.Sprintf(
 			"目标就是当前档 %q：没有变化，不花一张卡（perm.Store.Set 的 no-change 分支）", to)}
 	}
-	switch perm.JudgeCard(to, env.CardChannel) {
+	switch perm.JudgeCard(env.Mode, to, env.CardChannel) {
 	case perm.GateNoCard:
 		return Availability{Verdict: Allowed, Reason: fmt.Sprintf(
-			"R20/M4 只有切进全自动要确认；perm.JudgeCard(%q, card=%v) 报 GateNoCard，写腿直接落盘并写审计", to, env.CardChannel)}
+			"从 %q 切到 %q 是调严，不出卡（R9：只有调松要确认）；perm.JudgeCard(%q, %q, card=%v) 报 GateNoCard，写腿直接落盘并写审计",
+			env.Mode, to, env.Mode, to, env.CardChannel)}
 	case perm.GateNoChannel:
 		return Availability{Verdict: Refused, Reason: fmt.Sprintf(
-			"请求把档位切到 %q，而本机没有接 L2 确认腿：perm.JudgeCard 报 GateNoChannel，面板腿在写之前就拒（panel.ErrNoL2Confirm），perm.Store.Set 也拒（失败闭合）", to)}
+			"从 %q 切到 %q 是调松，而本机没有接 L2 确认腿：perm.JudgeCard 报 GateNoChannel，面板腿在写之前就拒（panel.ErrNoL2Confirm），perm.Store.Set 也拒（失败闭合）", env.Mode, to)}
 	case perm.GateAsk:
 		return Availability{Verdict: NeedsApproval, Reason: fmt.Sprintf(
-			"请求把档位切到 %q：perm.JudgeCard 报 GateAsk，perm.Store.Set 要一张已应答的 L2 强确认卡；只连了腿不算，卡没被答就是拒（perm.ResultCardNotAnswered）", to)}
+			"从 %q 切到 %q 是调松：perm.JudgeCard 报 GateAsk，perm.Store.Set 要一张已应答的 L2 强确认卡；只连了腿不算，卡没被答就是拒（perm.ResultCardNotAnswered）", env.Mode, to)}
 	}
-	return Availability{Verdict: Refused, Reason: fmt.Sprintf("perm.JudgeCard 对 %q 给出未知判决，按 fail-closed 拒绝", to)}
+	return Availability{Verdict: Refused, Reason: fmt.Sprintf("perm.JudgeCard 对 %q -> %q 给出未知判决，按 fail-closed 拒绝", env.Mode, to)}
 }
 
 // Production is the assembled roster: the commands this machine can actually

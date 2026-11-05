@@ -235,7 +235,8 @@ func TestTicket101ManualSwitchSurvivesRestart(t *testing.T) {
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		// R20/M4 is asymmetric: only the switch INTO auto_approve costs a card.
+		// R9 (owner 2026-11-05, ledger A1541 item 4): every loosening costs one
+		// card, so both of these switches ask; a tightening would ask none.
 		if err := rt.modes.Set(ctx, risk.ModeAskHighRisk, "cli", "t101"); err != nil {
 			t.Errorf("Set(ask_high_risk): %v", err)
 		}
@@ -253,8 +254,10 @@ func TestTicket101ManualSwitchSurvivesRestart(t *testing.T) {
 	mu.Lock()
 	gotAsked := append([]risk.Mode(nil), asked...)
 	mu.Unlock()
-	if len(gotAsked) != 1 || gotAsked[0] != risk.ModeAutoApprove {
-		t.Errorf("L2 confirmations asked = %v, want exactly [auto_approve] (R20/M4)", gotAsked)
+	wantAsked := []risk.Mode{risk.ModeAskHighRisk, risk.ModeAutoApprove}
+	if len(gotAsked) != len(wantAsked) || gotAsked[0] != wantAsked[0] || gotAsked[1] != wantAsked[1] {
+		t.Errorf("L2 confirmations asked = %v, want exactly %v (R9: one card per loosening, "+
+			"and these two switches both loosen)", gotAsked, wantAsked)
 	}
 	if lastSwch.Origin != "cli" || lastSwch.Actor != "t101" {
 		t.Errorf("the switch record has origin=%q actor=%q; a mode change must be attributable",

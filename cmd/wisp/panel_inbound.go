@@ -240,16 +240,17 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 // newPanelInboundDispatch, with the audit actor as a parameter. The actor is not
 // decoration: the MODE-SWITCH audit line names whoever asked, so a chain built for
 // the resident panel must not sign itself as the CLI seam (ticket 33's resident
-// wiring passes "resident-panel"). What keeps a widening request from reaching
+// wiring passes "resident-panel"). What keeps a loosening request from reaching
 // Store.Set is no longer a constant of this function: it is `confirm`, and both
-// layers that can judge a widening are handed the same value (ticket 114 AC#3).
+// layers that can judge a loosening are handed the same value (ticket 114 AC#3;
+// since R9 the set refused without one is every loosening, not only auto_approve).
 //
 // WHICH IS WHY THE LEG IS A PARAMETER AND NOT A FIELD TO FILL LATER. perm.New
 // copies Confirm into the Store at construction and ModeWriteHandler reads its own
 // copy's nil-ness per request, so a leg attached after this function returns
 // cannot reach either: a holder would have to be non-nil (which switches the
 // handler's gate off forever) or would arrive too late to matter (the Store keeps
-// the nil it was born with and refuses every widening). A caller that has a card
+// the nil it was born with and refuses every loosening). A caller that has a card
 // surface therefore passes it HERE, at assembly time; one that does not passes nil
 // and keeps the refusal.
 //
@@ -272,11 +273,11 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	store, err := perm.New(perm.Options{
 		Manager: mgr,
 		// The SAME leg the handler below gets, in perm's shape. nil stays nil:
-		// perm.Store.Set reads it to refuse every auto_approve switch, so a
-		// closure that only refused when called would turn that gate off. From
-		// ticket 371 the conversion below also carries the ANSWERED credential
-		// through unchanged, so this seam cannot quietly fall back to "no error
-		// means allowed" while the run seam judges the credential.
+		// perm.Store.Set reads it to refuse every loosening (R9), so a closure
+		// that only refused when called would turn that gate off. From ticket 371
+		// the conversion below also carries the ANSWERED credential through
+		// unchanged, so this seam cannot quietly fall back to "no error means
+		// allowed" while the run seam judges the credential.
 		Confirm: storeConfirmFromPanel(confirm),
 		Logf:    auditf,
 	})
@@ -285,11 +286,11 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 	}
 	modeWrites := &panel.ModeWriteHandler{
 		Modes: store,
-		// The handler judges the target and this field's presence with the same
+		// The handler judges the direction and this field's presence with the same
 		// predicate the store calls (perm.JudgeCard); it never calls the leg.
-		// R20/M4's one card - and the answered-allow credential that now has to
-		// come back with it - is raised by Set, i.e. by the Store's copy of the
-		// same leg.
+		// The one card a loosening costs (R9) - and the answered-allow credential
+		// that now has to come back with it - is raised by Set, i.e. by the
+		// Store's copy of the same leg.
 		Confirm: confirm,
 		Audit:   auditf,
 		Actor:   actor,
@@ -343,11 +344,13 @@ func newComposerDispatchChain(dir string, auditf panel.AuditFunc, actor string, 
 // perm.Switch record and is the only one that calls it.
 //
 // A nil panel leg stays a nil perm leg. That is not a convenience: perm.Store.Set's
-// gate is perm.JudgeCard(to, s.confirm != nil) and the read side keys the same
+// gate is perm.JudgeCard(from, to, s.confirm != nil) and the read side keys the same
 // channel term (PermissionMode collapses to ask_every_step), so returning a
 // closure that merely refused when called would hand the Store a non-nil leg and
 // silently restore the looser档's silencing - the hole ticket 114 AC#2 keeps
-// closed on the handler side and ticket 372 closes on the read side.
+// closed on the handler side and ticket 372 closes on the read side. Since R9 the
+// same nilness also means this pipe cannot loosen at all (every loosening is
+// GateNoChannel); that is the ruling's accepted cost, not an oversight.
 //
 // Ticket 371 makes it lossless in the other direction too: the credential the
 // panel leg reports (an ANSWERED allow, perm.Card) is returned unchanged, so a

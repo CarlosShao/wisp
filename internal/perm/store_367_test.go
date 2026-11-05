@@ -1,19 +1,27 @@
 package perm
 
-// Tickets 367 / 372: what Set's gate judges, and what stayed from 367.
+// Tickets 367 / 372 / R9: what Set's gate judges.
 //
-// 367's rule - every widening refused without a confirmation channel - is no
-// longer this package's rule. Ticket 372 reverted the gate to the TARGET because
-// the mainstream survey found no harness that gates on "wider"
-// (docs/evidence/s1/m4-survey.md:96) and because R20/M4 cards only the switch INTO
-// auto_approve. What the revert KEPT from 367 is the discipline: one predicate
-// (perm.RequiresCard, direction.go) called by both transition points, instead of
-// the two private judges 367-a1 measured.
+// THREE RULINGS IN A ROW, and this file is the seam between them:
 //
-// The expectations below are the post-372 ones, which is what makes them teeth:
-// on the 367 blob the first table's ask_every_step -> ask_high_risk row reads
-// refused-confirm and fails; on the pre-367 blob both auto_approve rows read
-// applied and fail there.
+//   - ticket 367 made the DIRECTION the gate (every widening refused without a
+//     confirmation channel), which also made ask_every_step -> ask_high_risk
+//     unreachable on a legless host;
+//   - ticket 372 reverted the judgement to the TARGET ("only auto_approve"),
+//     because the mainstream survey found no harness that REFUSES a switch for
+//     being wider (docs/evidence/s1/m4-survey.md:96), and kept 367's discipline:
+//     one predicate (perm.RequiresCard, direction.go) called by every transition
+//     point;
+//   - R9 (owner 2026-11-05, ledger A1541 item 4: "every loosening shows a
+//     confirmation card") put the DIRECTION back as the COST rule. It does not
+//     contradict the survey: the survey refuted refusing a widening, and R9 makes
+//     a widening ask for the card the config-file channel has asked for since D36.
+//     A host with no card surface therefore cannot loosen at all, which is the
+//     ruling's accepted cost (docs/evidence/s1/R9-impl.md).
+//
+// The expectations below are R9's. On the 367 blob they differ in the middle-tier
+// row only for the widening arm (367 refused it, R9 asks a card for it); on the
+// 372 blob the same row applies with zero cards and fails here.
 
 import (
 	"context"
@@ -50,17 +58,17 @@ func sixPairs() []struct {
 	return out
 }
 
-// TestSetGatesOnlyTheAutoApproveTargetAndEveryNarrowingApplies is ticket 372's
-// acceptance reading as a table: with NO confirmation channel wired, exactly the
-// two switches whose TARGET is auto_approve are refused, and the other four -
-// the middle-tier widening included - apply.
+// TestSetGatesEveryLooseningAndLetsEveryNarrowingApply is R9's acceptance reading
+// as a table: with NO confirmation channel wired, exactly the three switches that
+// REMOVE questions are refused, and the three that add them apply.
 //
 // The direction columns are not decoration. The table asserts 3 widening / 3
-// narrowing, so a predicate that went back to "refuse every widening" would still
-// refuse 2 of the 3 widenings and the count alone would not catch it; the
-// ask_every_step -> ask_high_risk row is the line that does, and the three
-// narrowing rows keep a gate that refuses everything from hiding behind it.
-func TestSetGatesOnlyTheAutoApproveTargetAndEveryNarrowingApplies(t *testing.T) {
+// narrowing, so a predicate that refused everything (or nothing) cannot pass on a
+// count alone, and the three narrowing rows keep the gate from turning "no
+// confirmation channel" into "no mode change ever". The middle widening - the row
+// tickets 367 and 372 disagreed about - is the one R9 decides: it costs a card, so
+// without a channel it is refused.
+func TestSetGatesEveryLooseningAndLetsEveryNarrowingApply(t *testing.T) {
 	ctx := context.Background()
 	pairs := sixPairs()
 	if len(pairs) != 6 {
@@ -70,7 +78,7 @@ func TestSetGatesOnlyTheAutoApproveTargetAndEveryNarrowingApplies(t *testing.T) 
 	for _, p := range pairs {
 		s, mc, rec := newTestStore(t, p.from.String(), nil)
 		before, _ := mc.saved()
-		err := s.Set(ctx, p.to, "t372", "owner")
+		err := s.Set(ctx, p.to, "r9", "owner")
 		last, ok := s.Last()
 		if !ok {
 			t.Fatalf("%s -> %s: the switch left no audit record at all", p.from, p.to)
@@ -83,11 +91,11 @@ func TestSetGatesOnlyTheAutoApproveTargetAndEveryNarrowingApplies(t *testing.T) 
 
 		// Spelled literally on purpose: a test that asked RequiresCard would agree
 		// with a broken predicate instead of judging it.
-		if p.to == risk.ModeAutoApprove {
+		if p.widens {
 			refused++
 			if err == nil {
-				t.Errorf("%s -> %s was APPLIED with no confirmation channel; the auto_approve target must be refused (R20/M4)",
-					p.from, p.to)
+				t.Errorf("%s -> %s was APPLIED with no confirmation channel; every loosening must be "+
+					"refused without one (R9)", p.from, p.to)
 			}
 			if last.Result != ResultRefused {
 				t.Errorf("%s -> %s audit result = %q, want %q", p.from, p.to, last.Result, ResultRefused)
@@ -109,7 +117,8 @@ func TestSetGatesOnlyTheAutoApproveTargetAndEveryNarrowingApplies(t *testing.T) 
 		} else {
 			applied++
 			if err != nil {
-				t.Errorf("%s -> %s was REFUSED (%v); R20/M4 cards only the auto_approve target", p.from, p.to, err)
+				t.Errorf("%s -> %s was REFUSED (%v); getting stricter is never guarded (PLAN.md:132)",
+					p.from, p.to, err)
 			}
 			if last.Result != ResultApplied {
 				t.Errorf("%s -> %s audit result = %q, want %q", p.from, p.to, last.Result, ResultApplied)
@@ -119,7 +128,7 @@ func TestSetGatesOnlyTheAutoApproveTargetAndEveryNarrowingApplies(t *testing.T) 
 					p.from, p.to, mode, saves, p.to)
 			}
 			if rec.count(string(ResultRefused)) != 0 {
-				t.Errorf("%s -> %s wrote a refusal line for a target M4 does not card: %v", p.from, p.to, rec.all())
+				t.Errorf("%s -> %s wrote a refusal line for a tightening: %v", p.from, p.to, rec.all())
 			}
 		}
 		// Both halves read the same effective档: with no channel the read side is
@@ -131,61 +140,77 @@ func TestSetGatesOnlyTheAutoApproveTargetAndEveryNarrowingApplies(t *testing.T) 
 	if widening != 3 || narrowing != 3 {
 		t.Fatalf("table classified %d widening / %d narrowing, want 3/3", widening, narrowing)
 	}
-	if refused != 2 || applied != 4 {
-		t.Fatalf("table produced %d refused / %d applied, want 2/4 (only the two auto_approve targets are gated)", refused, applied)
+	if refused != 3 || applied != 3 {
+		t.Fatalf("table produced %d refused / %d applied, want 3/3 (every loosening gated, every tightening free)",
+			refused, applied)
 	}
 }
 
-// TestSetPassesTheMiddleTargetAndCardsOnlyTheAutoTarget is the other half of the
-// rule: a channel is what makes the auto_approve target reachable, and the
-// non-auto step costs no ask at all (R20/M4). The first switch would also pass
-// without a channel since 372 - it is here to keep the asymmetry reading: zero
-// cards for ask_high_risk, exactly one for auto_approve.
-func TestSetPassesTheMiddleTargetAndCardsOnlyTheAutoTarget(t *testing.T) {
+// TestSetCardsTheMiddleLooseningAndNeverACardForATightening is the other half of
+// the rule: a channel is what makes a loosening reachable, and it costs exactly
+// one card each time - including the middle tier, which is the cell R9 moved. The
+// tightening at the end is the control: it must cost none.
+func TestSetCardsTheMiddleLooseningAndNeverACardForATightening(t *testing.T) {
 	ctx := context.Background()
 	spy := &confirmSpy{}
 	s, mc, rec := newTestStore(t, risk.ModeAskEveryStepName, spy.Confirm)
-	if err := s.Set(ctx, risk.ModeAskHighRisk, "t372", "owner"); err != nil {
+	if err := s.Set(ctx, risk.ModeAskHighRisk, "r9", "owner"); err != nil {
 		t.Fatalf("ask_every_step -> ask_high_risk refused although a confirmation channel is attached: %v", err)
 	}
 	if got := s.PermissionMode(); got != risk.ModeAskHighRisk {
-		t.Errorf("mode = %s after an allowed widening, want ask_high_risk", got)
+		t.Errorf("mode = %s after the allowed loosening, want ask_high_risk", got)
 	}
 	if mode, saves := mc.saved(); mode != risk.ModeAskHighRiskName || saves != 1 {
 		t.Errorf("persisted mode=%q saves=%d, want ask_high_risk/1", mode, saves)
 	}
-	if spy.n() != 0 {
-		t.Errorf("the non-auto widening cost %d confirmations; R20/M4 says only auto_approve does", spy.n())
+	if spy.n() != 1 {
+		t.Errorf("the middle-tier loosening cost %d confirmations; R9 cards every loosening, want 1", spy.n())
+	}
+	if len(spy.calls) == 1 && (spy.calls[0].From != risk.ModeAskEveryStep || spy.calls[0].To != risk.ModeAskHighRisk) {
+		t.Errorf("the card was raised about %s -> %s, want ask_every_step -> ask_high_risk",
+			spy.calls[0].From, spy.calls[0].To)
 	}
 	if rec.count(string(ResultApplied)) != 1 {
-		t.Errorf("the allowed widening is not in the audit as applied: %v", rec.all())
+		t.Errorf("the allowed loosening is not in the audit as applied: %v", rec.all())
 	}
 
-	// And the own-target case still costs exactly one answered card, which is
-	// what "the gate did not replace R20/M4" means.
-	if err := s.Set(ctx, risk.ModeAutoApprove, "t372", "owner"); err != nil {
+	// The next loosening costs exactly one more card, and it is the auto_approve
+	// one - "one card per loosening", not "one card per process".
+	if err := s.Set(ctx, risk.ModeAutoApprove, "r9", "owner"); err != nil {
 		t.Fatalf("ask_high_risk -> auto_approve refused with a channel attached: %v", err)
 	}
-	if spy.n() != 1 {
-		t.Errorf("auto_approve cost %d confirmations, want exactly 1 (R20/M4)", spy.n())
+	if spy.n() != 2 {
+		t.Errorf("two loosenings cost %d confirmations in total, want exactly 2", spy.n())
 	}
-	if len(spy.calls) == 1 && (spy.calls[0].From != risk.ModeAskHighRisk || spy.calls[0].To != risk.ModeAutoApprove) {
-		t.Errorf("the card was raised about %s -> %s, want ask_high_risk -> auto_approve",
-			spy.calls[0].From, spy.calls[0].To)
+	if len(spy.calls) == 2 && (spy.calls[1].From != risk.ModeAskHighRisk || spy.calls[1].To != risk.ModeAutoApprove) {
+		t.Errorf("the second card was raised about %s -> %s, want ask_high_risk -> auto_approve",
+			spy.calls[1].From, spy.calls[1].To)
+	}
+
+	// The control: a tightening is not a request for a card.
+	if err := s.Set(ctx, risk.ModeAskHighRisk, "r9", "owner"); err != nil {
+		t.Fatalf("auto_approve -> ask_high_risk (a tightening) was refused: %v", err)
+	}
+	if spy.n() != 2 {
+		t.Errorf("the tightening cost a confirmation (%d total); getting stricter must cost none", spy.n())
+	}
+	if mode, saves := mc.saved(); mode != risk.ModeAskHighRiskName || saves != 3 {
+		t.Errorf("persisted mode=%q saves=%d, want ask_high_risk/3", mode, saves)
 	}
 }
 
 // TestSetRefusesAutoApproveOnAnUnreadableStoredMode pins the invariant the gate
 // leans on: PermissionMode() fail-closes to ask_every_step, so an unreadable
-// config is still a *different* mode from auto_approve and the target gate refuses
-// the switch. Without the gate's nil check this path would dereference a nil
-// channel instead of refusing (the panic shot in 372-r2's evidence).
+// config is still a *different* mode from auto_approve and the direction gate
+// refuses the switch (ask_every_step -> auto_approve is a loosening). Without the
+// gate's nil check this path would dereference a nil channel instead of refusing
+// (the panic shot in 372-r2's evidence).
 func TestSetRefusesAutoApproveOnAnUnreadableStoredMode(t *testing.T) {
 	s, mc, _ := newTestStore(t, "not_a_mode", nil)
 	if got := s.PermissionMode(); got != risk.ModeAskEveryStep {
 		t.Fatalf("an unreadable stored mode reads as %s, want the strict default ask_every_step", got)
 	}
-	err := s.Set(context.Background(), risk.ModeAutoApprove, "t372", "owner")
+	err := s.Set(context.Background(), risk.ModeAutoApprove, "r9", "owner")
 	if err == nil {
 		t.Fatal("auto_approve was reached from an unreadable stored mode with no channel")
 	}
@@ -195,10 +220,10 @@ func TestSetRefusesAutoApproveOnAnUnreadableStoredMode(t *testing.T) {
 }
 
 // TestIsWideningOnTheDocumentedLadder keeps the ladder-order witness alive: since
-// ticket 372 this function is NOT a gate, but the order it reads is still the
-// vocabulary the audit words "widened"/"narrowed" rest on. internal/panel drives
-// the SAME function over the SAME names, so a reorder breaks both ends rather
-// than silently flipping one.
+// R9 this function IS the gate's first term (RequiresCard), and it is also the
+// vocabulary the audit words "widened"/"narrowed" rest on. internal/panel and
+// internal/command drive the SAME order over the SAME names, so a reorder breaks
+// all three ends rather than silently flipping one.
 func TestIsWideningOnTheDocumentedLadder(t *testing.T) {
 	ladder := []risk.Mode{risk.ModeAskEveryStep, risk.ModeAskHighRisk, risk.ModeAutoApprove}
 	names := risk.ModeNames()
@@ -223,11 +248,11 @@ func TestIsWideningOnTheDocumentedLadder(t *testing.T) {
 // TestSetConfirmRefusalOnTheAutoTargetIsClassifiedAsRefused keeps the two failure
 // modes distinguishable in the audit: "the operator said no" is not "there was no
 // way to ask". The nil-channel case above is ResultRefused at the gate; this is
-// the answered-no case on the one target that asks.
+// the answered-no case on a loosening that asks.
 func TestSetConfirmRefusalOnTheAutoTargetIsClassifiedAsRefused(t *testing.T) {
 	spy := &confirmSpy{answer: errors.New("用户拒绝")}
 	s, mc, rec := newTestStore(t, risk.ModeAskEveryStepName, spy.Confirm)
-	err := s.Set(context.Background(), risk.ModeAutoApprove, "t372", "owner")
+	err := s.Set(context.Background(), risk.ModeAutoApprove, "r9", "owner")
 	if err == nil {
 		t.Fatal("Set succeeded although the confirmation was refused")
 	}
