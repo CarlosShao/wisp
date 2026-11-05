@@ -31218,3 +31218,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - pending_read CRLF（869278313）：CRLF 幻影族（blob 本 LF、工作树 CR131 致 gofumpt 列它）；清 CR 后全仓 gofumpt 残渣归零（生产面 w/crlf=0）；.go 对象未变（git add no-op，CI 侧本就 LF 不红）。
 - 我自验：build rc0、C26 PASS、memory ok、全仓 gofumpt 空、d22 clean。
 - 影响：342 AC#4 剩 internal/config flaky TestHandDeletedSchemaVersion + cmd/wisp 整包 host limit。
+
+## A1548（2026-11-05 17:3x，编排者）187轮：收 wave13；config=FLAKY判、重普查成、secret 缝代提
+- config de-red（357431336）：TestHandDeletedSchemaVersion 判 **FLAKY 非真红**——POSIX 容器 100 发 68 红/32 绿，全红在单行 :240；机理＝本机 mtime 仅 4.00047ms 量化，两次写差 2~4ms 落在边界，strace 一包即 8/8 绿。属该重写断言（:236 已证真写、:240 mtime 进展冗余）＝另票，非夹具可救。零改码。
+- 重普查 retriage-186（未跟踪，待提交）：开放池 116、A=31（在飞5 + 284差翻框 + 176/180 前提倒 + 干净可派23）、B14/C22/D15/E8/F22/W4。top5＝245(cmd/wisp热键+ball)/98(scripts)/103(winsec+memory)/266(scripts slo)/276(scripts)。改判：269→W、176→作废、180→前提倒、284→差翻框。
+- secret protector 缝代提：protect.go 新接口，Windows=dpapiProtector 纯委托（DPAPI flags/缓冲/报错逐字未变）、store.go protect/unprotect 改走 s.protector；非 Windows=本地密钥（D7 Linux 不进支持矩阵、仅测试面）；+3 测试。build all rc0/test ok/gofumpt 空/d22 clean。go.mod tidy(goja/pdf 直接)。⇒ 待下一波 cmd/wisp 复验解锁 10 枚 C1 红(63×8/248×2)。
+- 我自验：build ./cmd/... ./internal/... ./tools/... rc0、internal/secret ok、gofumpt 空、d22 clean。
