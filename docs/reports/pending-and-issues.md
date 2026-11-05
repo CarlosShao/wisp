@@ -31275,3 +31275,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 103-ac3（a418c158d/ae62f761a）：AC#3③ tripwire 改下降变异→责任用例红在下降路径（artifacts_junction_tripwire:68 removeStray(junklink) 点名）、还原 119 文件 sha 逐同、四门全绿 ⇒ 103 全 AC 达标、本波可结。
 - 102 STOP：102 盘上已 accepted-done（-done 单件、AC#1-5 全[x]）、invariant 今绿 ⇒ 无活 AC、不再派 102。过期指针：103:11/62/64 仍写「入口展开归票102」，103 收口时改引。
 - retriage-189（303 行）：开放 115（A25/B14/C22/D16/E8/F25/W4/M1）；A 干净可派 20。改判10处（284闭/276→M/216→F/180→F/220→D/145 188→F/230→C/51 C→A④ 机主批C24）。top5=103/185/51/238/182(读)；第6=246。
+
+## A1558（2026-11-05 20:1x，编排者）收 wave22：185 读数PASS、51 AC#4 PASS、238 owner-vetoed STOP
+- 185（7f6d7a26a/567c7875a/f606fe4be，纯测试）：缺陷本体已由 ee1e2118c(r1,owner批 A381) 落主线；r2 补 AC#1 红前(risk 4红22绿 / tools 6红)、AC#7 牙(basename 级变异=1红独有，旧 M1 假牙更正)。未做：AC#6 真机/代价尺/别人表。零产码。仪器账：A363/A364 冻结文字按行号窗口取、行号漂移(+5/+9)致假红，内容锚点同 hash ⇒ 建议台账改内容锚。
+- 51 AC#4（a7093e473/e43c097fd）：宿主 Go panic 穿 goja 无归因(goja vm.go:6002/901、runtime.go:1512 锁定)；加 C24HostPanic+callHost recover(先记账/先审计 C24-HOSTPANIC/先 slog 栈/再重抛不转JS异常)+classify 认归因；4 e2e。变异 M1/M2/M5/M4 红、M3 0红(归因第二载体，登记)。既有红 Test52SchemaViolations/Test52CommandKind 非本腿(票52)。⇒ AC#4 落地、待非实现者裁勾。
+- 238 STOP（owner-vetoed）：票面 A476/Q-72 owner 当场否决「锁个屁」＝本条不做；且 132-r1(b22225513) 已 PrivateDirAll 创建即封，票面 logging.go:72 旧行已不存在；写面还需 cmd/wisp。retriage-189 把 238 误列 A④(漏 A476)——就地更正，238 标 owner-vetoed。
