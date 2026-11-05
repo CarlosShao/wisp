@@ -3,6 +3,7 @@
 - 腿：`51-B`（重试；上一发 `51-B` 死于无输出、零脏零提交，见台账 `A1543` 末行）
 - 时刻：2026-11-05 15:3x +08
 - 进场 HEAD：`a2b3b80c9`
+- 交付提交：`9d27a8a7f`（本件是它的证据；§7 的"提交后 HEAD 的树"一行是提交后复跑追加的订正笔）
 - 写面（**只有这 7 件 + 本件**）：
   - `internal/plugin/c24.go`（新，产码：冻结表＋静态扫描＋运行时表面）
   - `internal/plugin/tier2_loader.go`（新，产码：loader 这一跳）
@@ -137,6 +138,7 @@ $ go test ./internal/plugin/manifestslot -run 'Tier2Run' -count=1 -timeout 300s 
 | test（邻包，防连带） | `go test ./internal/memory ./internal/config -count=1 -timeout 420s` | `ok internal/memory 39.482s` ＋ `ok internal/config 3.035s` |
 | gofumpt | `gofumpt -l internal/plugin/ internal/plugin/manifestslot/`（`/d/work/base/gopath/bin/gofumpt.exe`） | **空**（0 行） |
 | D22 扫描（**本腿的树**） | 仓外导出树 `D:/tmp/wisp51b-clean-20261105`＝`git archive HEAD` ＋ 本腿 7 件 → `sh scripts/d22scan.sh` | **rc=0**；`d22scan: clean`；分母 `bans#1-5 internal/=361 cmd/=57`、`ban#6 frontend/=116`、`ban#7 internal/tools/=48`、`ban#8 design/=14 frontend/=116 internal/=890 cmd/=207` |
+| D22 扫描（**提交后 HEAD 的树**） | 提交 `9d27a8a7f` 之后：`git archive HEAD` → 仓外 `D:/tmp/wisp51b-post-20261105` → `sh scripts/d22scan.sh` | **rc=0**；`d22scan: clean`；分母与上一行**逐字相同**（361/57/116/48/14/116/890/207）⇒ 本腿的提交本身不带任何 D22 违规 |
 | D22 扫描（**共享树**） | `sh scripts/d22scan.sh`（仓内，含别人在飞的脏件） | **rc=1**，2 枚 FAIL，**唯一违规行**＝`internal/panel/composer_handlers.go:33 [phantom-citation] 引 "docs/evidence/s1/R9-impl.md" 盘上没有` ⇒ 归 **R9-full 腿**（该文件不在 HEAD 的干净内容里、其证据件尚未落地；`git show HEAD:…` 第 33 行是无此引用的旧注释、`git cat-file -e HEAD:docs/evidence/s1/R9-impl.md`＝rc=128）。⛔ 本腿未动 `internal/panel/**` 一个字节。 |
 
 ## 8. `AC#6 措辞审计` 读数（本腿只量，⛔ 判勾）
