@@ -206,6 +206,20 @@ jobs:
         if: ${{ !cancelled() }}
         run: sh scripts/check-path-length-budget.sh --with-self-test
 
+      - name: "SLO nail census (ticket 266 - the outer tooth over slo-check.ps1's nails)"
+        # ADDED STEP ONLY. This is a text reader with no toolchain: it declares in
+        # scripts/slo-nail-census.sh that the D32 gate carries exactly two
+        # self-locking nails, and it goes red when one of those call lines is
+        # deleted or commented out (ticket 263 mutant delete-nails measured an
+        # all-green screen with both calls removed; ticket 266 is that hole).
+        # It refuses to print a verdict at all - exit 2 - when the target is
+        # missing/empty or its sampling anchor is gone, so "did not look" cannot
+        # read as green. Runs its own 32-shot positive control first and refuses
+        # to print a reading if the control cannot be made red. No threshold, no
+        # golden, no allowlist entry, and no existing step touched.
+        if: ${{ !cancelled() }}
+        run: sh scripts/slo-nail-census.sh --with-self-test
+
       # CALL SURFACE CHANGED (ticket 362, AC#1 form (A'), owner-approved edit of
       # .github/**; the approval is docs/reports/pending-and-issues.md A1161 (1),
       # and the dispatch that carries it is commit 76ae3bbb). Four claims:
