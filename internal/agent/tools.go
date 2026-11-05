@@ -71,12 +71,29 @@ type ToolOutcome struct {
 	RiskLevel  string
 	ErrorClass string
 	Truncated  bool
+	// Images are the tool's image attachments (C7 ImagePart; screen.capture is
+	// the D34 source). Data is raw bytes the tool still owns; the loop moves
+	// them into its memory-only session store and only the resulting mem:
+	// handle joins the history - so a tool cannot put a path into a request
+	// even if it tried. A tool whose image does not fit the store's bounds
+	// leaves it out; the loop then tells the model, in words, that it received
+	// no pixels (see images.go).
+	Images []ImageAttachment
 	// AppliedSteps is the D31 ledger the tool reported for itself (see
 	// tools.Result.AppliedSteps): what already landed when the call stopped
 	// early. It is DATA, not a second report type - the report wording stays
 	// approval.CancellationReport's - because a host that shows the strip, the
 	// panel or the transcript needs the list, not a re-parse of Text.
 	AppliedSteps []string
+}
+
+// ImageAttachment is one image a tool produced, on its way to a C7 ImagePart.
+// There is no Ref field and no path: an image reaches the model as bytes, or
+// not at all (SPEC-05 sec 3.3 privacy rule; ticket 23 AC#2).
+type ImageAttachment struct {
+	MimeType string
+	Data     []byte
+	Alt      string
 }
 
 // ToolProvider is the loop's view of the tool host (C4).

@@ -201,6 +201,10 @@ type Loop struct {
 	comp     *Compressor
 	reg      *observe.Registry
 	provider llm.LlmProvider
+	// images is the session's memory-only image store (ticket 23 AC#2). The
+	// history's ImagePart handles resolve against it; it is cleared exactly
+	// when the history is (Reset), never at task end.
+	images *imageStore
 	// costMeter books the finished task into cost_daily and answers the money
 	// budget (ticket 44). nil = the wired Journal has no cost surface.
 	costMeter *observe.CostMeter
@@ -267,6 +271,7 @@ func New(opt Options) (*Loop, error) {
 		asm:      asm,
 		sp:       NewSpiller(opt.Config.ArtifactsDir, b).WithPointerJudge(opt.Config.PointerJudge),
 		comp:     NewCompressor(b, opt.Summarizer, WithLogger(opt.Logger)),
+		images:   newImageStore(imageSessionBudget),
 		guard: GuardConfig{
 			RepeatThresholds: opt.Config.RepeatThresholds,
 			MaxRounds:        opt.Config.MaxRounds,
@@ -298,6 +303,12 @@ func (l *Loop) Reset() {
 	defer l.mu.Unlock()
 	l.history = nil
 	l.steer = nil
+	// The images are only reachable through the history that just went away;
+	// dropping them together is what keeps "live handle" and "live message"
+	// from ever disagreeing (ticket 23 AC#2).
+	if l.images != nil {
+		l.images.clear()
+	}
 }
 
 // Steer inserts a runtime instruction into the inner queue (Pi's two-layer
@@ -650,7 +661,16 @@ func (l *Loop) buildRequest(ctx context.Context) (*llm.Request, error) {
 		Scene:     l.opt.Config.SceneFunc(),
 		Injection: inj,
 	}
-	return l.asm.Build(in, l.History()), nil
+	req := l.asm.Build(in, l.History())
+	// C7 resolution point (SPEC-05 sec 3.3): adapters decode ImagePart.BytesRef
+	// into wire bytes and nothing else. Wiring it here - the one place every
+	// turn is assembled - means a request that carries no image is unaffected
+	// (the hook is inert until an adapter asks for a ref) and a request that
+	// does carry one cannot forget it.
+	if req != nil && l.images != nil {
+		req.ResolveBytes = l.images.resolve
+	}
+	return req, nil
 }
 
 // toolPlan is one call's pre-flight decisions (row, gate outcome, skip).
@@ -777,6 +797,9 @@ func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJour
 	for i, c := range turn.ToolCalls {
 		p := plans[i]
 		log := ToolResultLog{CallID: c.ID, Name: c.Name, Rejected: p.rejected}
+		// attached holds this call's images until the history message is built
+		// below; the bytes never enter the row, the log or the event.
+		var attached []ImageAttachment
 		switch {
 		case p.skip:
 			log.Outcome, log.ErrorClass, log.Text = p.outcome, p.class, p.reason
@@ -792,6 +815,7 @@ func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJour
 			log.Text = execErr[i].Error()
 		default:
 			out := results[i]
+			attached = out.Images
 			log.Text = out.Text
 			log.Truncated = out.Truncated
 			if out.IsError {
@@ -816,7 +840,8 @@ func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJour
 		j.finish(wctx, c.ID, p.rowID, log.Outcome, log.ErrorClass)
 		res.ToolLog = append(res.ToolLog, log)
 		res.ToolCalls++
-		l.append(toolResultMessage(c.ID, log.Text, log.Outcome != OutcomeSuccess))
+		l.append(toolResultMessageParts(c.ID, toolResultParts(l, log.Text, attached),
+			log.Outcome != OutcomeSuccess))
 		l.publish(Event{
 			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
 			ToolName: c.Name, Outcome: log.Outcome, Text: log.Text,
@@ -1207,9 +1232,40 @@ func assistantTurnMessage(turn llm.TurnResult) llm.Message {
 // toolResultMessage builds the one-ToolResultPart message the C5 seam requires
 // per call id (openai-chat: a tool message carries exactly one result).
 func toolResultMessage(id, text string, isErr bool) llm.Message {
+	return toolResultMessageParts(id, []llm.Content{llm.TextPart{Text: text}}, isErr)
+}
+
+// toolResultMessageParts is toolResultMessage over arbitrary C7 result parts
+// (ticket 23 AC#2: text plus, when the tool produced pixels, the ImageParts).
+func toolResultMessageParts(id string, parts []llm.Content, isErr bool) llm.Message {
 	return llm.Message{Role: llm.RoleTool, Content: []llm.Content{llm.ToolResultPart{
-		ID: id, Content: []llm.Content{llm.TextPart{Text: text}}, IsError: isErr,
+		ID: id, Content: parts, IsError: isErr,
 	}}}
+}
+
+// toolResultParts builds one tool answer's C7 content: its text first, then an
+// ImagePart per image the session store accepted. An image the store refuses is
+// replaced by a sentence, never by silence: a model that believes it saw a
+// screen it never received will describe pixels out of thin air, and a
+// screenshot's alt text is exactly the kind of claim a user reads back.
+func toolResultParts(l *Loop, text string, images []ImageAttachment) []llm.Content {
+	parts := make([]llm.Content, 0, 1+len(images))
+	parts = append(parts, llm.TextPart{Text: text})
+	for _, img := range images {
+		if l.images == nil {
+			parts = append(parts, llm.TextPart{Text: imageDropNotice(img.Alt, errImageStoreMissing)})
+			continue
+		}
+		ref, err := l.images.put(img.MimeType, img.Data, img.Alt)
+		if err != nil {
+			parts = append(parts, llm.TextPart{Text: imageDropNotice(img.Alt, err)})
+			continue
+		}
+		parts = append(parts, llm.ImagePart{
+			MimeType: img.MimeType, BytesRef: ref, Alt: img.Alt,
+		})
+	}
+	return parts
 }
 
 func reminderMessage(text string) llm.Message {

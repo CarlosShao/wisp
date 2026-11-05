@@ -279,7 +279,7 @@ func (a *Adapter) encodeMessage(req *llm.Request, m llm.Message, mark bool) (wir
 	case llm.RoleAssistant:
 		return a.encodeAssistant(m, mark)
 	case llm.RoleTool:
-		return a.encodeToolResult(m, mark)
+		return a.encodeToolResult(req, m, mark)
 	case llm.RoleSystem:
 		return wireMessageIn{}, observe.New(observe.ClassInternal,
 			"anthropic: a mid-conversation system message has no wire form (put it in Request.System)")
@@ -369,7 +369,12 @@ func (a *Adapter) encodeAssistant(m llm.Message, mark bool) (wireMessageIn, erro
 
 // encodeToolResult flattens a ToolResultPart into the user-message block
 // Anthropic expects.
-func (a *Adapter) encodeToolResult(m llm.Message, mark bool) (wireMessageIn, error) {
+//
+// This protocol is the one where the image belongs exactly where C7 puts it:
+// a tool_result block's content is an array of blocks and `image` is one of
+// them, so the pixels stay attached to the call that produced them (see
+// tool_result_image_23_test.go). No synthetic turn is needed here.
+func (a *Adapter) encodeToolResult(req *llm.Request, m llm.Message, mark bool) (wireMessageIn, error) {
 	if len(m.Content) != 1 {
 		return wireMessageIn{}, observe.New(observe.ClassInternal,
 			"anthropic: a tool message must carry exactly one ToolResultPart")
@@ -381,16 +386,23 @@ func (a *Adapter) encodeToolResult(m llm.Message, mark bool) (wireMessageIn, err
 	}
 	inner := make([]json.RawMessage, 0, len(res.Content))
 	for i, p := range res.Content {
-		t, ok := p.(llm.TextPart)
-		if !ok {
+		switch c := p.(type) {
+		case llm.TextPart:
+			b, err := json.Marshal(wireTextBlock{Type: "text", Text: c.Text})
+			if err != nil {
+				return wireMessageIn{}, err
+			}
+			inner = append(inner, b)
+		case llm.ImagePart:
+			b, err := a.encodeImage(req, c)
+			if err != nil {
+				return wireMessageIn{}, err
+			}
+			inner = append(inner, b)
+		default:
 			return wireMessageIn{}, observe.New(observe.ClassInternal,
-				fmt.Sprintf("anthropic: tool result part %d is %T (only TextPart)", i, p))
+				fmt.Sprintf("anthropic: tool result part %d is %T (want TextPart or ImagePart)", i, p))
 		}
-		b, err := json.Marshal(wireTextBlock{Type: "text", Text: t.Text})
-		if err != nil {
-			return wireMessageIn{}, err
-		}
-		inner = append(inner, b)
 	}
 	if len(inner) == 0 {
 		inner = append(inner, mustJSON(wireTextBlock{Type: "text", Text: " "}))

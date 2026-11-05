@@ -99,11 +99,11 @@ func (a *Adapter) buildWire(req *llm.Request) ([]byte, error) {
 	}
 
 	for _, m := range req.Messages {
-		wm, err := a.encodeMessage(req, m)
+		wms, err := a.encodeMessage(req, m)
 		if err != nil {
 			return nil, err
 		}
-		w.Messages = append(w.Messages, wm)
+		w.Messages = append(w.Messages, wms...)
 	}
 
 	for _, t := range req.Tools {
@@ -146,34 +146,35 @@ func (a *Adapter) buildWire(req *llm.Request) ([]byte, error) {
 	return b, nil
 }
 
-// encodeMessage maps one normalized message.
-func (a *Adapter) encodeMessage(req *llm.Request, m llm.Message) (wireMessage, error) {
+// encodeMessage maps one normalized message. A message maps to ONE wire message
+// except a tool result that carries images: chat completions has no image part
+// in a role:"tool" message, so that case emits the text answer plus a follow-up
+// user turn (see encodeToolResult).
+func (a *Adapter) encodeMessage(req *llm.Request, m llm.Message) ([]wireMessage, error) {
 	switch m.Role {
 	case llm.RoleUser:
 		return a.encodeUser(req, m)
 	case llm.RoleAssistant:
 		return a.encodeAssistant(m)
 	case llm.RoleTool:
-		return a.encodeToolResult(m)
+		return a.encodeToolResult(req, m)
 	default:
-		return wireMessage{}, observe.New(observe.ClassInternal,
+		return nil, observe.New(observe.ClassInternal,
 			fmt.Sprintf("openai-chat: unsupported message role %q", m.Role))
 	}
 }
 
 // encodeUser emits plain-string content for pure text turns and the parts
 // array when images are present.
-func (a *Adapter) encodeUser(req *llm.Request, m llm.Message) (wireMessage, error) {
-	texts := 0
+func (a *Adapter) encodeUser(req *llm.Request, m llm.Message) ([]wireMessage, error) {
 	images := 0
 	for _, p := range m.Content {
 		switch p.(type) {
 		case llm.TextPart:
-			texts++
 		case llm.ImagePart:
 			images++
 		default:
-			return wireMessage{}, observe.New(observe.ClassInternal,
+			return nil, observe.New(observe.ClassInternal,
 				fmt.Sprintf("openai-chat: user message cannot carry %T", p))
 		}
 	}
@@ -185,7 +186,7 @@ func (a *Adapter) encodeUser(req *llm.Request, m llm.Message) (wireMessage, erro
 			}
 			sb.WriteString(p.(llm.TextPart).Text)
 		}
-		return wireMessage{Role: "user", Content: jsonString(sb.String())}, nil
+		return []wireMessage{{Role: "user", Content: jsonString(sb.String())}}, nil
 	}
 
 	parts := make([]json.RawMessage, 0, len(m.Content))
@@ -197,7 +198,7 @@ func (a *Adapter) encodeUser(req *llm.Request, m llm.Message) (wireMessage, erro
 		case llm.ImagePart:
 			dataURL, err := a.imageDataURL(req, c)
 			if err != nil {
-				return wireMessage{}, err
+				return nil, err
 			}
 			b, _ := json.Marshal(map[string]any{
 				"type":      "image_url",
@@ -208,9 +209,9 @@ func (a *Adapter) encodeUser(req *llm.Request, m llm.Message) (wireMessage, erro
 	}
 	arr, err := json.Marshal(parts)
 	if err != nil {
-		return wireMessage{}, observe.Wrap(observe.ClassInternal, err, "openai-chat: encode user parts")
+		return nil, observe.Wrap(observe.ClassInternal, err, "openai-chat: encode user parts")
 	}
-	return wireMessage{Role: "user", Content: arr}, nil
+	return []wireMessage{{Role: "user", Content: arr}}, nil
 }
 
 // imageDataURL resolves the ImagePart.BytesRef into a data: URL. Resolution
@@ -237,7 +238,7 @@ func (a *Adapter) imageDataURL(req *llm.Request, img llm.ImagePart) (string, err
 
 // encodeAssistant emits text and/or tool_use parts (OpenAI merges them into
 // one assistant message: tool_calls beside content).
-func (a *Adapter) encodeAssistant(m llm.Message) (wireMessage, error) {
+func (a *Adapter) encodeAssistant(m llm.Message) ([]wireMessage, error) {
 	wm := wireMessage{Role: "assistant"}
 	var texts []string
 	for _, p := range m.Content {
@@ -256,7 +257,7 @@ func (a *Adapter) encodeAssistant(m llm.Message) (wireMessage, error) {
 			wt.Function.Arguments = args
 			wm.ToolCalls = append(wm.ToolCalls, wt)
 		default:
-			return wireMessage{}, observe.New(observe.ClassInternal,
+			return nil, observe.New(observe.ClassInternal,
 				fmt.Sprintf("openai-chat: assistant message cannot carry %T", p))
 		}
 	}
@@ -267,39 +268,79 @@ func (a *Adapter) encodeAssistant(m llm.Message) (wireMessage, error) {
 	} else {
 		wm.Content = json.RawMessage(`""`)
 	}
-	return wm, nil
+	return []wireMessage{wm}, nil
 }
 
 // encodeToolResult flattens ToolResultPart content into the role:"tool"
 // message OpenAI expects (one message per tool call id).
-func (a *Adapter) encodeToolResult(m llm.Message) (wireMessage, error) {
+//
+// Image parts cannot ride that message: chat completions takes text only in a
+// tool turn, and every provider in this tree rejects an image part there (the
+// pre-23 adapter did too, by failing the whole request). The mainstream mapping
+// - what the OpenAI cookbook does for a tool that returns a picture - is to
+// keep the text answer in role:"tool" and attach the pixels to the next user
+// turn, labelled with the call they answer. The C7 history keeps the image
+// INSIDE the tool result (protocol-neutral); only this wire dialect has to
+// split it.
+func (a *Adapter) encodeToolResult(req *llm.Request, m llm.Message) ([]wireMessage, error) {
 	if len(m.Content) != 1 {
-		return wireMessage{}, observe.New(observe.ClassInternal,
+		return nil, observe.New(observe.ClassInternal,
 			"openai-chat: a tool message must carry exactly one ToolResultPart")
 	}
 	res, ok := m.Content[0].(llm.ToolResultPart)
 	if !ok {
-		return wireMessage{}, observe.New(observe.ClassInternal,
+		return nil, observe.New(observe.ClassInternal,
 			fmt.Sprintf("openai-chat: tool message carries %T, want ToolResultPart", m.Content[0]))
 	}
 	var sb strings.Builder
+	var images []llm.ImagePart
 	for i, p := range res.Content {
-		t, ok := p.(llm.TextPart)
-		if !ok {
-			return wireMessage{}, observe.New(observe.ClassInternal,
-				fmt.Sprintf("openai-chat: tool result part %d is %T (only TextPart)", i, p))
+		switch c := p.(type) {
+		case llm.TextPart:
+			if i > 0 && sb.Len() > 0 {
+				sb.WriteString("\n")
+			}
+			sb.WriteString(c.Text)
+		case llm.ImagePart:
+			images = append(images, c)
+		default:
+			return nil, observe.New(observe.ClassInternal,
+				fmt.Sprintf("openai-chat: tool result part %d is %T (want TextPart or ImagePart)", i, p))
 		}
-		if i > 0 {
-			sb.WriteString("\n")
-		}
-		sb.WriteString(t.Text)
 	}
+	out := sb.String()
 	if res.IsError {
 		// Keep the error visible to the model without a second vocabulary.
-		out := "tool error: " + sb.String()
-		return wireMessage{Role: "tool", ToolCallID: res.ID, Content: jsonString(out)}, nil
+		out = "tool error: " + out
 	}
-	return wireMessage{Role: "tool", ToolCallID: res.ID, Content: jsonString(sb.String())}, nil
+	msgs := []wireMessage{{Role: "tool", ToolCallID: res.ID, Content: jsonString(out)}}
+	if len(images) == 0 {
+		return msgs, nil
+	}
+
+	parts := make([]json.RawMessage, 0, len(images)+1)
+	label := map[string]string{
+		"type": "text",
+		"text": "（工具调用 " + res.ID + " 返回的图像）",
+	}
+	lb, _ := json.Marshal(label)
+	parts = append(parts, lb)
+	for _, img := range images {
+		dataURL, err := a.imageDataURL(req, img)
+		if err != nil {
+			return nil, err
+		}
+		b, _ := json.Marshal(map[string]any{
+			"type":      "image_url",
+			"image_url": map[string]string{"url": dataURL},
+		})
+		parts = append(parts, b)
+	}
+	arr, err := json.Marshal(parts)
+	if err != nil {
+		return nil, observe.Wrap(observe.ClassInternal, err, "openai-chat: encode tool result images")
+	}
+	return append(msgs, wireMessage{Role: "user", Content: arr}), nil
 }
 
 // jsonString marshals a Go string as a JSON string value.

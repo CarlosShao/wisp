@@ -226,24 +226,40 @@ func (a *Adapter) encodeMessage(req *llm.Request, m llm.Message) ([]wireInputIte
 				fmt.Sprintf("openai-responses: tool message carries %T, want ToolResultPart", m.Content[0]))
 		}
 		var sb strings.Builder
+		var images []llm.ImagePart
 		for i, p := range res.Content {
-			t, ok := p.(llm.TextPart)
-			if !ok {
+			switch c := p.(type) {
+			case llm.TextPart:
+				if i > 0 && sb.Len() > 0 {
+					sb.WriteString("\n")
+				}
+				sb.WriteString(c.Text)
+			case llm.ImagePart:
+				images = append(images, c)
+			default:
 				return nil, observe.New(observe.ClassInternal,
-					fmt.Sprintf("openai-responses: tool result part %d is %T (only TextPart)", i, p))
+					fmt.Sprintf("openai-responses: tool result part %d is %T (want TextPart or ImagePart)", i, p))
 			}
-			if i > 0 {
-				sb.WriteString("\n")
-			}
-			sb.WriteString(t.Text)
 		}
 		out := sb.String()
 		if res.IsError {
 			out = "tool error: " + out
 		}
+		// function_call_output takes an ARRAY of input items, so the pixels can
+		// stay attached to the call that produced them (ticket 23 AC#2). This
+		// is the protocol-native shape; only openai-chat has to split them out.
+		parts := make([]wireContentPart, 0, len(images)+1)
+		parts = append(parts, wireContentPart{Type: "input_text", Text: out})
+		for _, img := range images {
+			url, err := a.imageDataURL(req, img)
+			if err != nil {
+				return nil, err
+			}
+			parts = append(parts, wireContentPart{Type: "input_image", ImageURL: url})
+		}
 		return []wireInputItem{{
 			Type: "function_call_output", CallID: res.ID,
-			Output: mustJSON([]wireContentPart{{Type: "input_text", Text: out}}),
+			Output: mustJSON(parts),
 		}}, nil
 
 	case llm.RoleSystem:
