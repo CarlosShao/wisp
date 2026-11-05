@@ -317,11 +317,30 @@ func TestPointer185OneRuneDifferentPathStillHits(t *testing.T) {
 }
 
 // TestPointer185SameBasenameOtherDirectoryStillHits is ticket 185 AC#7's new
-// permanent leg. 185-c1 measured (§ its table, orchestrator re-run) that the
-// suite in the tree before this file — internal/risk/pointer_183_test.go (8) plus
-// shape_a_exemption_test.go (8), 16 legs — does NOT go red when the comparison is
-// relaxed to basename level: this shape had zero teeth. It is therefore written
-// here, on the rostered mark, and its tooth is table §8's M1.
+// permanent leg. 185-c1 measured that the suite in the tree before this file —
+// internal/risk/pointer_183_test.go (8) plus shape_a_exemption_test.go (8), 16
+// legs — does NOT go red when the comparison is relaxed to basename level: this
+// shape had zero teeth. It is therefore written here, on the rostered mark.
+//
+// Its tooth, measured on the fix-present anchor through an -overlay mutant (never
+// a tracked file) that widens the value rule to basename level inside
+// (f *fragmentIndex) contains (ruler:
+//
+//	grep -n "func (f \*fragmentIndex) contains" internal/risk/taintmatch.go
+//
+// — when the CANDIDATE's own basename occurs inside this mark's declared path,
+// the whole candidate stops being evidence): exactly this leg goes red and the
+// other 25 legs of pointer_183 (8) / pointer_185 (10) / shape_a (8) stay green.
+// That is the reading ticket 185 AC#7 demands ("its tooth must be measured").
+//
+// What is NOT this leg's tooth, stated because the r1 table claimed the opposite:
+// its roster mutant M1 (hostMintedPathFor comparing the last 24 runes instead of
+// the whole normalized path) turns ZERO legs red in this package - relaxing the
+// roster key does not touch the candidate this leg inspects. And this leg is also
+// GREEN on the unfixed anchor (roster consult removed), which is exactly what
+// AC#7 says it is: a "must not break" guard, never the ticket's new tooth.
+//
+// Reading: docs/evidence/s1/185-r2-ac1-ac7-readings.md §4.
 func TestPointer185SameBasenameOtherDirectoryStillHits(t *testing.T) {
 	nb, np := normalizeTaint(ptr185SameBasename), normalizeTaint(ptr185Path)
 	if strings.Contains(nb, np) || strings.Contains(np, nb) {
