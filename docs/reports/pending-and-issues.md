@@ -31242,3 +31242,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 103 腿死（无脏无提交）。
 - 我自验：build rc0、internal/ball ok、cmd/wisp 新增红0、gofumpt 空、d22 clean。
 - 动作：cmd/wisp 空出⇒下一波派 230-AC4 全接线（risk冻结+tools 半场先，再 cmd/wisp）。
+
+## A1552（2026-11-05 18:3x，编排者）收 wave16：config :240 flaky 修
+- config-240（a047fec21 + 9a4a7168a）：删掉 writeguard_unnailed_341_test.go:240 的 mtime 前进断言（钟太粗：POSIX 4ms 量化），判据改由 :236 内容相等取证（其余断言一条未动，diff 4 行全删仅 mtime 那枚）。容器 -count=10：改前 5/10 红→改后 10/10 绿（-count=30=30/30）；宿主整包 ok。⇒ 既有 config POSIX flaky 红清除。
+- 登记（未取）：writeguard_226/227 同族"没写⇒mtime 不动"方向相反（更易假绿、今天不红），manager.go:168 同形假设未复核 ⇒ 另票。
+- 我自验：go test ./internal/config rc0。
