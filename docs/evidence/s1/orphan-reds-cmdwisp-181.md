@@ -2,7 +2,8 @@
 
 **Status**：交付件（写腿自证）。**写面**：`cmd/wisp/**`（改 4 枚、新增 1 枚）＋ 本文件；**未 push**。
 **锚定树**：`7eb0e3f4b`（派单给的 HEAD，= 180 件 `ae8136261` 并进去之后的那一枚）。
-**本腿提交**：见 §6 末尾（工作树带本腿改动时取的全部读数）。
+**本腿提交**：`331a4b1cd`（工作树带本腿改动时取的全部读数；读数期间 HEAD 前进过一枚**docs-only** 提交，
+见 §9）。
 **仪器**：Windows 侧 `go1.27.1 windows/amd64`（`PATH` 前置 `build;third_party/sherpa-onnx`）；
 POSIX 侧 `docker.io/library/golang:1.27-bookworm`（容器内 `linux/amd64`、`CGO_ENABLED=1`），
 快照一律 `git archive 7eb0e3f4b` + overlay（不建 worktree、不 checkout）。
@@ -270,3 +271,20 @@ sh scripts/d22scan.sh
 - **C4 / 票 131 的故意红、C5 的假红（无 `.git`）** 仍在这 13 里，理由与 180 §5 逐字相同，本腿不重复论证。
 - **`internal/secret` 的两个形状没有改**：`protect_other.go` 的 fail-closed 桩、`refs.go` 的两种 ref
   都是冻结契约（C28 / C27），本件只消费它们。
+
+## 9. 读数期间 HEAD 动过一枚（docs-only，两树 `cmd/wisp` 逐字节相同）
+
+派单锚定 `7eb0e3f4b`；**修前**整包那一发（13:5x 起）的 `git archive` 取的就是它。
+**修后**整包那一发（14:1x 起）取快照时，别腿的 `b93467e43`（14:12:49，`342-r3` 证据件）已经落地，
+所以那一发取到的是 `b93467e43`。两棵树对 `cmd/wisp` 的差：
+
+```
+$ git diff --stat 7eb0e3f4b b93467e43 -- cmd/wisp
+（无输出，0 行）
+$ git diff --name-only 7eb0e3f4b b93467e43
+docs/evidence/s1/342-r3-impl.md
+```
+
+⇒ 两张整包读数可以并排引：被检对象（`cmd/wisp`）在两枚提交之间逐字节相同，变的只有别人的一份证据件。
+本腿的 Windows gate 跑在**工作树**上（= `7eb0e3f4b` 的 `cmd/wisp` + 本腿 5 枚文件），与上面两棵树都不冲突。
+
