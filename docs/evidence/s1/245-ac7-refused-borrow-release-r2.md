@@ -123,6 +123,12 @@ ok  	github.com/CarlosShao/wisp/internal/ball	0.050s
 | vet | `go vet ./internal/ball`；`go vet -tags winlive ./internal/ball`；`go vet -tags winlive ./cmd/wisp` | 三发 rc=0 |
 | D22 闸 | `sh scripts/d22scan.sh` | `rc=0`；`PASS=35 FAIL=0 SKIP=0`；`d22scan: clean - no D22 ban violations`（`internal/` 353 生产件＋869 Go 件含注释/测试） |
 
+> ⚠ **复跑注记（同一会话稍后，提交之后）**：上表的 `go build ./internal/ball ./cmd/wisp` 是**测时读数**。
+> 稍后复跑时 `./cmd/wisp` 编译红，但**不是本提交**：另一条腿在飞未提交的 `internal/llm/openaichat/request.go`
+> （`git status` 为 `M`，票 23 的 `tool_result_image_23` 台件那一族）在 `:160`／`:260`／`:271` 处 `wireMessage` 形状对不上。
+> 本腿随即单跑：`go build ./internal/ball` **rc=0**、`go test ./internal/ball -count=1` **ok**、`go vet ./internal/ball` **rc=0**、
+> 三发 `-run 245` 全 PASS。⇒ 那枚红归那条腿，本提交的包仍然是绿的。
+
 ## 7. 残余与归口（具名，不藏）
 
 1. **本腿只解"会话结束后归位"，不解"借被拒那张卡本身没有 Esc"**：卡片挂着时它仍是一条 `HotkeyError`＋一句"was not registered"，这是票 260 AC#2 要的收据，**不是**本票残留。真要让用户有一条能用的否决键（换键名／第二条通道）仍是票 245 文末五字段残余登记里的那笔账。
