@@ -44,7 +44,6 @@ import (
 	"github.com/CarlosShao/wisp/internal/agent"
 	"github.com/CarlosShao/wisp/internal/llm/adaptertest"
 	"github.com/CarlosShao/wisp/internal/memory"
-	"github.com/CarlosShao/wisp/internal/secret"
 )
 
 // fakeStoreKey is the fixed fake constant this suite puts into the store. It is
@@ -66,6 +65,11 @@ type runFixture struct {
 	notices []string
 	// rtHook receives the assembled stack while it is still open.
 	rtHook func(*agentRuntime)
+	// keyRef is the api_key_ref this fixture actually planted (ticket 98 C1,
+	// leg 181). It is "dpapi:<id>" on Windows and "env:<name>" elsewhere, so a
+	// case that has to retire the key asks this field instead of spelling a
+	// platform.
+	keyRef string
 	// reply is the answer stream this run is given (ticket 375). It stays nil -
 	// "nobody can answer" - unless a case is about a route that needs an answer
 	// source to exist at all: from 375 on, a run with no reply surface refuses the
@@ -80,13 +84,15 @@ type runFixture struct {
 }
 
 // newRunFixture writes a config.toml into a fresh data dir (allowlisting that
-// dir as the only fs root), stores the fake key under dpapi:acme, and starts
-// mockllm.
+// dir as the only fs root), plants the fake key behind the fixture's ref, and
+// starts mockllm.
 func newRunFixture(t *testing.T, protocol string) *runFixture {
 	t.Helper()
 	f := &runFixture{t: t, srv: adaptertest.StartMockllm(t), out: &bytes.Buffer{}, err: &bytes.Buffer{}}
 	f.dir = t.TempDir()
 	cfgPath := filepath.Join(f.dir, configFileName)
+	keyRef := fixtureKeyRef181(t, f.dir, "dpapi:acme", fakeStoreKey)
+	f.keyRef = keyRef
 	body := fmt.Sprintf(`schema_version = 2
 
 [llm]
@@ -99,7 +105,7 @@ backoff_ms = 1
 [llm.providers.acme]
 protocol = %q
 base_url = %q
-api_key_ref = "dpapi:acme"
+api_key_ref = %q
 
 [llm.providers.acme.models.m1]
 # 261-r2: an enabled key omitted decodes to false (defaults never enter maps)
@@ -110,15 +116,8 @@ context_window = 128000
 
 [fs]
 allowed_dirs = [%q]
-`, protocol, f.srv.Base+"/v1", filepath.ToSlash(f.dir))
+`, protocol, f.srv.Base+"/v1", keyRef, filepath.ToSlash(f.dir))
 	if err := os.WriteFile(cfgPath, []byte(body), 0o600); err != nil {
-		t.Fatal(err)
-	}
-	st, err := secret.NewStore(f.dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := st.Store("dpapi:acme", fakeStoreKey); err != nil {
 		t.Fatal(err)
 	}
 	return f
@@ -464,13 +463,7 @@ func TestRunTextTaskKeyResolvesInTheStore(t *testing.T) {
 // carrying no (or a fallback) credential, so the request count is asserted too.
 func TestMissingBlobFailsUnconfiguredNeverSilently(t *testing.T) {
 	f := newRunFixture(t, "openai-responses")
-	st, err := secret.NewStore(f.dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := st.Delete("dpapi:acme"); err != nil {
-		t.Fatal(err)
-	}
+	fixtureKeyDrop181(t, f.dir, f.keyRef)
 	f.srv.Reset(t)
 	code := f.run("总结一下 这份笔记")
 	if code == 0 {

@@ -33,7 +33,6 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/agent"
 	"github.com/CarlosShao/wisp/internal/llm/adaptertest"
-	"github.com/CarlosShao/wisp/internal/secret"
 	"github.com/CarlosShao/wisp/internal/tools"
 )
 
@@ -45,6 +44,8 @@ func new174r8EmptyRootsFixture(t *testing.T) *runFixture {
 	f := &runFixture{t: t, srv: adaptertest.StartMockllm(t), out: &bytes.Buffer{}, err: &bytes.Buffer{}}
 	f.dir = t.TempDir()
 	cfgPath := filepath.Join(f.dir, configFileName)
+	keyRef := fixtureKeyRef181(t, f.dir, "dpapi:acme", fakeStoreKey)
+	f.keyRef = keyRef
 	body := fmt.Sprintf(`schema_version = 2
 
 [llm]
@@ -57,7 +58,7 @@ backoff_ms = 1
 [llm.providers.acme]
 protocol = "openai-chat"
 base_url = %q
-api_key_ref = "dpapi:acme"
+api_key_ref = %q
 
 [llm.providers.acme.models.m1]
 enabled = true
@@ -65,15 +66,8 @@ context_window = 128000
 
 [fs]
 allowed_dirs = []
-`, f.srv.Base+"/v1")
+`, f.srv.Base+"/v1", keyRef)
 	if err := os.WriteFile(cfgPath, []byte(body), 0o600); err != nil {
-		t.Fatal(err)
-	}
-	st, err := secret.NewStore(f.dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := st.Store("dpapi:acme", fakeStoreKey); err != nil {
 		t.Fatal(err)
 	}
 	return f

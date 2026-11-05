@@ -33,7 +33,6 @@ import (
 	"github.com/CarlosShao/wisp/internal/agent"
 	"github.com/CarlosShao/wisp/internal/llm/adaptertest"
 	"github.com/CarlosShao/wisp/internal/memory"
-	"github.com/CarlosShao/wisp/internal/secret"
 )
 
 // closingLineRe finds the CLI's own closing line, and statusWordRe pulls the
@@ -97,6 +96,7 @@ func newProbe365(t *testing.T, contextWindow int) *probe365 {
 	t.Helper()
 	p := &probe365{t: t, srv: adaptertest.StartMockllm(t), out: &bytes.Buffer{}, errb: &bytes.Buffer{}}
 	p.dir = t.TempDir()
+	keyRef := fixtureKeyRef181(t, p.dir, "dpapi:acme", fakeStoreKey)
 	body := fmt.Sprintf(`schema_version = 2
 
 [llm]
@@ -109,7 +109,7 @@ backoff_ms = 1
 [llm.providers.acme]
 protocol = "openai-chat"
 base_url = %q
-api_key_ref = "dpapi:acme"
+api_key_ref = %q
 
 [llm.providers.acme.models.m1]
 enabled = true
@@ -117,15 +117,8 @@ context_window = %d
 
 [fs]
 allowed_dirs = [%q]
-`, p.srv.Base+"/v1", contextWindow, filepath.ToSlash(p.dir))
+`, p.srv.Base+"/v1", keyRef, contextWindow, filepath.ToSlash(p.dir))
 	if err := os.WriteFile(filepath.Join(p.dir, configFileName), []byte(body), 0o600); err != nil {
-		t.Fatal(err)
-	}
-	store, err := secret.NewStore(p.dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := store.Store("dpapi:acme", fakeStoreKey); err != nil {
 		t.Fatal(err)
 	}
 	return p
