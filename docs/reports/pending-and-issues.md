@@ -31295,3 +31295,7 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 182-r2（0a45bd90b＋补正）：任务监控栏 10 堆源/载体/归属返图（145/188/192 持有、K5→407、K7→163/191、K2 独立时间线=改PLAN须批）。补正=行号刷新 7 处（leg 死前未提交，编排者补提交）。它是 145/187/188/192/195 gated 簇的归口图。
 - 346 STOP：b 门槛全锁——AC#1 选形须非实现者(未出)、AC#5 禁动 .github/ci.yml(人工批准)、写面只有 probes/346，甲/丙形都要动 CI 或 internal/winsec test(出票面写面)、且票 342 未 done、两仪器 //go:build !windows 在 Windows 结构性 0 编译须 Linux CI。⇒ 暂缓。
 - 323 阵亡：wave25 该腿 null 无产出；323 已有前批提交(d1b1a2d22 等)、仍开、待重派剩余格。
+
+## A1564（2026-11-05 22:xx，编排者）⚠子代理路由故障：magpie/cline-pass 连续 8 次 null
+- wave26(3腿)+wave27(3腿) 全 null、零产出零脏；诊断探针：同 prompt 默认模型返 PONG2 正常、provider=magpie model=cline/cline-pass/deepseek-v4.1-flash-1017 返 null（各 1 发）。⇒ 套餐路由挂了（非任务/非派单问题）。
+- 按机主 2026-11-03 令必须走 cline-pass 套餐、⛔ 静默降级到默认（默认走 API 余额＝烧钱，明令禁止）。已摆机主：①查 ClinePass 套餐余额/网关是否到期/限流、恢复后继续；②或明确授权临时改用默认模型派子代理。恢复前⛔ 派腿、只记账。
