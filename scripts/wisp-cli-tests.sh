@@ -219,6 +219,98 @@ fi
 # the plain value is the correct one, and `pwd -W` is a trap here.
 export PATH="$dll_dir:$PATH"
 
+# ---- TICKET 98 AC#3: the missing-DLL failure must be a LOUD, NAMED red owned by
+# this step, not an rc=1 load crash that the next reader files under "environment,
+# do not chase". AC#3's own criterion is the one implemented here: take AC#2's
+# injection away and the guard has to go red AND say which DLL.
+#
+# WHY A PATH SCAN AND NOT `where`, AND WHY A LOAD PROBE WAS NOT ENOUGH.
+#   (a) `where sherpa-onnx-c-api.dll` is NOT this check: measured on the dev host,
+#       it answered `D:\work\...\Wisp\sherpa-onnx-c-api.dll` with the pinned
+#       directory ABSENT from PATH, because `where` also searches the CURRENT
+#       DIRECTORY. There is in fact a stray copy of that DLL in the repo root on
+#       this host (untracked; `git ls-files` does not know it), and a direct start
+#       of a `go test -c` binary from the repo root loads because of it.
+#   (b) That copy saves nobody: `go test` runs the test binary from a TEMP
+#       directory with the PACKAGE directory as cwd, so the only route left for
+#       the loader is PATH. Measured two ways at this HEAD: the same binary started
+#       from a temp cwd reads
+#       `error while loading shared libraries: sherpa-onnx-c-api.dll: cannot open
+#       shared object file` (rc=127), and `go test ./cmd/wisp/` on the ambient PATH
+#       reads `exit status 0xc0000135` with rc=1 and ZERO `--- FAIL` / `=== RUN`
+#       lines - not one test ran.
+#   (c) A `-test.list` probe is not this guard either: it costs a full test-binary
+#       build first, and its verdict FLIPS WITH THE CWD - measured at this HEAD, the
+#       same binary answered rc=0 and 482 case names when started from the repo root
+#       (the stray copy) and died at load (rc=127) from a temp cwd. A check whose
+#       colour depends on where you stand is the shape this ticket exists to kill.
+# So the guard asks what the loader asks - "is a file of this name on
+# PATH?" - for EVERY name pinned in deps.toml, and refuses BEFORE any test process
+# exists. It reads PATH itself (backslashes normalised), never the cwd, and it has
+# no escape hatch: no `|| true`, no env switch, no skip.
+dll_on_path() {
+    dll_want=$1
+    dll_saved_ifs=$IFS
+    IFS=:
+    dll_rc=1
+    for dll_entry in $PATH; do
+        [ -n "$dll_entry" ] || continue
+        dll_entry=${dll_entry//\\//}
+        if [ -f "$dll_entry/$dll_want" ]; then
+            dll_rc=0
+            break
+        fi
+    done
+    IFS=$dll_saved_ifs
+    return "$dll_rc"
+}
+
+dll_unreachable=""
+for dll in $need; do
+    if ! dll_on_path "$dll"; then
+        dll_unreachable="$dll_unreachable $dll"
+    fi
+done
+if [ -n "$dll_unreachable" ]; then
+    echo "wisp-cli-tests.sh: GUARD (ticket 98 AC#3) - cmd/wisp was NOT tested on this host: the loader" \
+        "cannot reach pinned DLL(s) on PATH:$dll_unreachable" >&2
+    echo "wisp-cli-tests.sh: the test binary is started from a TEMP directory, so a copy of these files in" \
+        "the current directory does not help: measured on this host, a stray copy in the repo root loads" \
+        "for a direct start of the same binary while go test still dies at load." >&2
+    echo "wisp-cli-tests.sh: without them the process dies at LOAD time (0xc0000135) before the first test" \
+        "runs: rc=1 with zero '--- FAIL' lines, which reads exactly like a broken package and is why ticket" \
+        "98's hole was carried around as an 'environment fact' for six briefings." >&2
+    echo "wisp-cli-tests.sh: fix the staging step (deps.toml -> scripts/fetch-deps.ps1 -> $dll_dir) or point" \
+        "PATH at wherever the pinned files really are, then run this step again. Do NOT relax a test, an" \
+        "assertion, a threshold or a golden to get past this line, and do NOT move the tests out of" \
+        "./cmd/wisp/ - that is the shape ticket 98 AC#2 forbids." >&2
+    exit 1
+fi
+
 echo "wisp-cli-tests.sh: scope=./cmd/wisp/ dll_dir=$dll_dir (pinned: $(printf '%s\n' $need | tr '\n' ' '))"
 echo "wisp-cli-tests.sh: handing the verdict to portable-tests.sh --scope=cli"
-bash "$portable" --scope=cli
+
+# ---- TICKET 98 AC#3, SECOND HALF: a load failure that gets past the scan above
+# (wrong architecture, a missing transitive DLL, a loader that answers
+# 0xc0000135 for some other reason) must still not reach the log as an opaque
+# exit code. The delegated run keeps its verdict and its exit code; the only thing
+# added is a named finding when the log shows the load-failure signature AND no
+# test ever ran - no PASS, no FAIL, no SKIP, no `=== RUN`. That conjunction is the
+# discriminator: a real red always carries `--- FAIL` and `=== RUN` lines, and a
+# log with the signature but no test lines is the ticket-98 shape (A594 section 4,
+# and the 176-r1 / 260-v1 notes that had to say "not measured" because of it).
+cli_log="${GOTMPDIR:-${TMPDIR:-/tmp}}/wisp-cli-tests-$(date +%Y%m%d-%H%M%S)-$$.log"
+cli_rc=0
+bash "$portable" --scope=cli 2>&1 | tee "$cli_log" || cli_rc=$?
+if [ "$cli_rc" -ne 0 ] \
+    && grep -Eq '0xc0000135|STATUS_DLL_NOT_FOUND|cannot open shared object file' "$cli_log" \
+    && ! grep -Eq '^(--- (PASS|FAIL|SKIP)|=== RUN|ok[[:space:]])' "$cli_log"; then
+    echo "wisp-cli-tests.sh: GUARD (ticket 98 AC#3) - the run returned rc=$cli_rc, the log carries a" \
+        "load-failure signature, and it contains NO test result line at all: cmd/wisp was not tested." >&2
+    echo "wisp-cli-tests.sh: pinned DLLs from deps.toml:$need (staged under $dll_dir; PATH scan above" \
+        "passed, so the file this platform could not load is one of them or a dependency of one)." >&2
+    echo "wisp-cli-tests.sh: this is a SETUP failure of the step, not a verdict on ./cmd/wisp/. The log is" \
+        "$cli_log - attach it to the ticket; do not report this run as red tests or as a green gate." >&2
+    exit "$cli_rc"
+fi
+exit "$cli_rc"
