@@ -31185,3 +31185,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 195 死腿遗产代提：sectionwrite.go(17KB)+sectionwrite_195_test.go(15KB)+manager.go/settings.go（writeOneKey 改 WriteSection 适配、Manager 加 LoosenQueue/Audit；SourcePanel 标注使未来 locked 段拒放行）。build rc0/test ok/gofumpt 空/d22 clean。AC「分节写入地基」切片；panel config.set 不在本票。
 - 我自验：build ./cmd/... ./internal/... ./tools/... rc0；config/winsec tests ok；gofumpt 空；d22 clean。
 - 机主上轮已批 51-AC#3/347/R9 ⇒ 本波起派 51-B/339/R9。10 枚 C1-STOP 建议开 2 票交 internal/secret 契约主人（06/08）。
+
+## A1543（2026-11-05 15:4x，编排者）183轮：收 wave9；339 PASS、R9 STOP（需 cmd/wisp 预算）、51-B 腿死
+- 339-r2（dfd6f624b/2897aae93/f35ecc94b）：AC#2 仪器补 POSIX "世界"——摘 //go:build windows、新增 hostile334（windows-only）、posix 半委派 347 的 posixPartialCandidate347；Linux 19/3/0/0→24/5/0/0、Windows 22/3/0/0 逐数不变、零放宽（t.Skip 0）。AC#2 待非实现者裁（本腿一格没翻）。写面 internal/risk/*_test.go 测试面。
+- R9 STOP（aa5db141b/68cd7dff8/5fd76dc7f）：R9 真实写面＝cmd/wisp 7 格断言 + internal/command/roster.go:287（JudgeCard 第四调用点）；本波零 cmd/wisp 预算 ⇒ 只落 R9-stop-cmdwisp-face.md（含 §4 可照做落地草案：RequiresCard(from,to)=IsWidening、三处同判、要翻格清单）。⇒ 需单独一盏 cmd/wisp 写腿（唯一）。
+- 51-B 腿死（res=null，无脏无提交）。
+- 我自验：build ./cmd/... ./internal/... ./tools/... rc=0；internal/risk -run 339 定向 ok；gofumpt 空；d22 clean；internal/risk 整包红＝C26 既有（panel_pump/git_readonly_exec，非339）。
+- 动作：下波给 R9 一条 cmd/wisp 写腿（唯一，照 §4，含 internal/command）。
