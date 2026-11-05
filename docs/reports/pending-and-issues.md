@@ -31230,3 +31230,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 设计：`risk.blacklist_overrides` 从 unwired 响亮失败 → 真生效；用户可持久化 B 级豁免；A 级核心（SSH/.git-credentials/.aws/浏览器密码库/密钥环）绝对禁、永不覆盖；每次豁免用记安全日志。符合主流 harness（用户可配置 trusted paths，配核心硬禁）。
 - 契约行为变化：blacklist_overrides（unwired→生效）。撤销口令：`git revert <接线提交>` 即恢复响亮失败。
 - 动作：派 230-AC4 腿（internal/config 面；Gate 接线需 internal/risk/cmd-wisp 则报 seam 续体）。
+
+## A1550（2026-11-05 18:0x，编排者）收 wave15：230-AC4 config 半场 PASS；全接线 seam 待专波
+- 230-AC4 config 半场（eacf043d0 + 9b475a369）：validateBlacklistOverrides（每条过 C26 落 canonical；ClassA 条目＝加载错误绝对禁；inert 条目拒；空拒、重复去重）；删 unwired.go:79 响亮失败守卫→consumed 实话；进 validate 链；schema 注释改实话；overrides_230_test 4 枚含 9 个 A 级例子逐枚拒 + A 塞进 override 集合 Gate 仍 ClassA/不 Allow/不 NeedL2+出 A 级日志。config 整包 rc0；POSIX 唯一红＝既有 :240 flaky（未改树同红，非本腿）。internal/risk/cmd/wisp 字节 0。
+- 全接线 seam（下一波，需 internal/risk 冻结包专波；且须等 wave14 的 cmd/wisp 腿落账＝共享编译面）：①internal/risk 导出 OverrideKey＋GateStanding（保 overrideApplies 钉）②internal/tools 加 PersistedExemptions 第二来源 ③cmd/wisp 从 cfg 建 map+reload。
+- 机主第3条已按走B落（A1549）。config :240 flaky 建议重写断言⇒本波派 config-240-fix。
