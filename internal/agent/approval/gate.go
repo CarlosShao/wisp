@@ -873,6 +873,15 @@ func (g *Gate) DecideFromPanel(ctx context.Context, r Request) error {
 // correlation id (C18 一键重放). It requires the task to be admitted again
 // (D47 still applies to a replay), and it is NOT an answer: the new item must
 // still be approved with a newly minted grant.
+//
+// Today it has no production caller, and that is a state to record, not a
+// defect to tidy away: do not delete it as dead code. It is the queue half of
+// C18's 一键重放, already implemented here - Queue.replay mints the fresh
+// correlation id and links the new item back through replayOf. The missing half
+// is the answer-side verb, and neither NativeAPI nor PanelAPI declares one, so
+// no card, no panel and no console line can reach this method yet. Adding that
+// half is a wiring decision with an owner, which is why the caller side reads
+// the way it does rather than because somebody forgot to call it.
 func (g *Gate) Replay(ctx context.Context, corr, taskID string) (tools.Decision, string, error) {
 	if err := g.admitCheck(taskID); err != nil {
 		return tools.Decision{}, "", err
