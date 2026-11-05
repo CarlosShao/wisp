@@ -31211,3 +31211,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 284 死腿注释代提（gate.go +9 注释）：AC#1 三要素齐（零产码调用者/非死代码勿删/缺 answer-side verb）；★纪律偏差＝AC#2 明令"勿为这一行单开腿"，我误作独立腿（登记，下次随批）；vet/d22 绿。284 仍开待非实现者终裁(不翻框)。
 - 我自验：vet ./internal/agent/approval rc0、build rc0、d22 clean。
 - 转向：A 池变薄（196/31 已done、220真机、342被既有红卡）⇒ 下一步攻既有根红（C26/A380、memory196r3/31r2 POSIX、config schema POSIX、pending_read CRLF）以解锁 108/342 等。
+
+## A1547（2026-11-05 17:0x，编排者）186轮：收 wave12；C26 源扫红修复、memory POSIX 绿、gofumpt 残渣归零
+- C26 源扫红修复（b058171e7 + 65865271e）：TestC26RewriteAccountIsConsumedAtEverySecurityLeg PASS；internal/risk 整包 rc=0（281/171/0/1）；internal/panel 新增红 0（只剩两枚 frontend/design 在册红）。修法＝把改写账真读进来（git_readonly_exec.go 用 res.Actable()、tree_reader_190 新增 ReadFileTreeForWorkspace190、panel_pump 传整 view 写 rewritten=true+理由），非加注释骗尺；两枚行为钉+去牙证明有牙。⇒ C26/A380 根红销账，342 AC#4 既有红少一味。
+- memory 196r3/31r2（874da82fa + 4f5d5b0a2 + 09efdea24）：内存层两枚 POSIX 确定红改平台中立夹具，internal/memory 全绿 32.8s。
+- pending_read CRLF（869278313）：CRLF 幻影族（blob 本 LF、工作树 CR131 致 gofumpt 列它）；清 CR 后全仓 gofumpt 残渣归零（生产面 w/crlf=0）；.go 对象未变（git add no-op，CI 侧本就 LF 不红）。
+- 我自验：build rc0、C26 PASS、memory ok、全仓 gofumpt 空、d22 clean。
+- 影响：342 AC#4 剩 internal/config flaky TestHandDeletedSchemaVersion + cmd/wisp 整包 host limit。
