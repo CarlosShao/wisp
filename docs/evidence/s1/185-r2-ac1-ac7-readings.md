@@ -129,8 +129,8 @@ $ go test ./internal/tools/ -run 'TestPointer185' -count=1 -v
 | 门 | 命令 | 读数 |
 |---|---|---|
 | build | `go build ./cmd/... ./internal/... ./tools/...` | `rc=0` |
-| risk 全包 | `go test ./internal/risk/ -count=1 -timeout 420s` | `ok … 14.700s`（rc=0） |
-| tools 全包 | `go test ./internal/tools/ -count=1 -timeout 420s` | `ok … 29.638s`（rc=0） |
+| risk 全包 | `go test ./internal/risk/ -count=1 -timeout 420s` | `ok … 17.254s`（rc=0；末 commit 前同一套判据另一次 `ok 14.700s`） |
+| tools 全包 | `go test ./internal/tools/ -count=1 -timeout 420s` | `ok … 31.272s`（rc=0；末 commit 前另一次 `ok 29.638s`） |
 | gofumpt | `/d/work/base/gopath/bin/gofumpt.exe -l internal/risk/ internal/tools/` | **空**（rc=0） |
 | d22scan | `sh scripts/d22scan.sh` | `d22rc=0`：`clean - no D22 ban violations`；`examined 421 production Go files`；`ban #8 internal/ 905`／`cmd/ 211`／`frontend/ 116`／`design/ 39` |
 
