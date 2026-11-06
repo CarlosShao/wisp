@@ -31310,3 +31310,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 185（b7157ac19）PASS：**先测更正**——"缺陷在主线上"在 HEAD 为假；修法本体在、生产路径零 commit 变化；用 -overlay 摘名册跳取 HEAD-first red（risk4红+tools6红，与185-r2同名单），HEAD 全绿。落 internal/tools/pointer_185_reread_chain_test.go（续读链判据：12+1发全L0、逐字节、mark14分毫）+ 185-r3-head-criterion.md。AC#2 裁定 C25 声明"两边都不给"、只归 task.output（fs.read 由 risk hostMintedPathFor 派生）。⇒ 待非实现者 verdict 翻 AC#1/#7。
 - 136（001b516ce）PASS：AC#5 取"明写不查"路（slo-freshness.sh 注释+票面>块；d22scan 补 ban 未做=另派须解冻）；AC#6 票面前提被现量推翻——142枚 schedule run、45/45天每日≥2⇒"每日≥1"零改动已满足。⇒ 待非实现者 verdict 翻 AC#5/#6。
 - 140（edab04ab6）PASS(measure)+STOP：AC#1两形真跑读数（四包 env归因换色=0；cmd/wisp 489枚 44/45红全机器形状非WISP_ENV）；裁形主支(b)保env用例自钉+(c)三笔具名登记+补dev断言step（属ci.yml改动须先登记）。⇒ 未结，待登记决策。
+
+## A1567（2026-11-06 12:xx，编排者）收 wave30＋sweeper：136/182/271 三腿 PASS；185/123 两腿阵亡(123遗留已swept)
+- V136（b12bd2070 136-verdict）PASS：AC#5/AC#6 均 PASS 无附条件（schedule 现量 142 枚、44/44 天每日≥2、active/dev；交件写45/45 差1已更正）。closeable=yes，两格可翻。残留：d22scan 补 ban 需解冻、"4格cron全缺"新格。注意票136共15 AC，AC#7/AC#10 仍开 ⇒ 未全结。
+- W182（9652a020d 182-census-r3）PASS：AC#2 十堆三档定性全复现 r2、AC#3 14张 owning 票框态现读、0 级联立票（越人工批准线）；订正票92框态实5/1。待翻 AC#2/#3。
+- W271（dcd5bc825）PASS 选形=甲（哨兵保留+说明书+resident正控，三枚 resident 件全绿）；需台账 A648 追加甲形落地登记（撤销=回退三文件回 ac2c1d903）。
+- V185 null 阵亡（无产出，wave31 重派）；W123 null 阵亡，但死前遗留 113 行票123测试改动（程序化应答腿/8.3短路径/sync-root不skip）→ 编排者 go build+go vet 均 rc0、gofumpt 空后 swept 提交 abf2a35a6，待绿验（W123g 在跑）。
+- 网络：推送 12 次全 TLS 失败，未推=4 全在本地安全，恢复后统一推。
