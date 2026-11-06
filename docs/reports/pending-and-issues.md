@@ -31459,3 +31459,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **T163 AC#1b**（`95cab0c6f`/`31aa60ad5` 已 cherry-pick 主树 `ac7d14c7f`）：在册 `shell.exec`(PLAN:2574)+`shell.session`(:2575) 两枚，**生产注册表 0/2**（真 Registry 21 枚 Lookup 两枚全 false，对照组 task.output true），代码命中全非实现，DEFERRED 0 行 ⇒ 40 天仍是"在册＋零实现"。AC#1b 可闭格（留名不摘、照 164 先例留硬账）；AC#2/#3/#4 可同腿派（缝全现成）；AC#5 一句摆机主（`internal/config/unwired.go:63` 文案会撒谎、需批"只改文案不删守卫"）。
 - **前置核查（现跑）**：47 的前置 10/21 **均 done ⇒ 47 真解锁**；23 前置 20 done ⇒ 解锁；33 前置 07/12 done ⇒ 解锁。35/37/47/48 自身仍开（35 卡着 36/38/39/40 一批 UI 票）。
 - 派 **wave45**：W47（task scheduler pathlock，写腿）＋ W23（system window input tools，写腿）＋ W33（panel host C27，写腿）。
+
+## A1589（2026-11-06 22:xx，编排者）收 wave45：47/23/33 三腿皆 PASS
+- **W47 PASS**（`1cc67664b`，19 文件 +2805/−77）：**六条 AC 全落地**（FIFO 并发零泄漏／PathLock 排队＋逐字原因＋释放重发／死锁夹具超时 ErrDeadlock 零新 timer／批准独立不阻塞／中飞取消 applied-steps／task.list 按 A434 同规解冻往返）。五枚既有尺同批翻转（无一放宽）：236r3 名集钉、221 枚数哨兵 2→3、221 标记尺、271 B-3 正控 3→4、175r2 分类表＋172 分母 9→10。门禁全绿。**cmd/wisp 未动**（装配缝已留，下一装配写腿）。
+- **W23 PASS**（`e3abe0ebb`，主树与克隆 SHA-1 **完全相同**）：AC#2 闭（孤儿 5 腿代提：像素→Result.Images→桥 ToolOutcome.Images→mock LLM 可见、tool_call 行+审计四编码零泄漏、负控、DRM 黑帧）；AC#4 闭到可复跑（真剪贴板往返 `WISP_T23_LIVE_CLIPBOARD=1` 门闩＋SrcClipboardRead→R4 外泄判定）；AC#3 部分（UIPI 拒绝序＋真谓词＋D45 绑定键），残余＝写面外（真 fixture app/真提权窗口/确认卡 UI 归前端+需开窗）。`go test ./internal/tools` ok 54.153s。
+- **W33 PASS**（`721b4b00f`，cmd/wisp）：AC#6 严格 CSP 响应头逐字落地（200/404 都带、单一构造点 `panelResponseHeaders`）；AC#8ⓐ 钳制支装牙（`tryBookPanelSnapshot` TryLock）；`Hide()` 补关窗读数。7 新尺 14/14 PASS＋变异三发各红后还原。**剩余具名**：AC#7（生产走 Publish 非 Marshal，补假调用＝F-PUMP-4 之罪 ⇒ 要 owner 定"哪两个瞬间须一致"）、AC#8ⓑ（EvToolStart 零发射者，删/造假都被 F-PUMP-6 拒）、AC#1–5/9–14 归旧腿与 33-v2 终裁。
+- 派 **wave46**：verdict47（六 AC 复跑＋突变 M=摘 BuiltinTaskEntries 的 task.list 行）＋ verdict23＋verdict33。
+- 待拍板累积（机主）：65 玻璃签收／170 CLI veto 通道／163 unwired 文案／148 ⒶⒷ／264 甲乙不做／33 AC#7 两个瞬间。
