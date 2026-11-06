@@ -31452,3 +31452,10 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **W65-jarvis 空手**：返回空字符串、盘上零文件（`internal/ball/jarvis*` 不存在、无 `65-jarvis-impl.md`、无克隆树）⇒ 记作**未验证/未交付**，重派 **W65jarvis2**（更窄、明确只写一个文件＋一个测试文件、给足量化参数、⛔ 不许跑 GUI）。
 - 65 仍欠：**机主真桌面 6 步**（build → `-diff -diff-gate` 看 timers=no/cpu/px≥2120 → `-style jarvis` 对拍 → 三张截图 → **`-tour -style glass` 眼睛判「这次对了」** → 编排者摘 SPEC-08 INTERIM 标注结票）。
 - 派 **wave44**：W65jarvis2（写腿，internal/ball）＋ T170a1（AC#1 复算普查那五个 0，只读分析）＋ T163a1b（AC#1b 现量归口，只读分析）。
+
+## A1588（2026-11-06 20:xx，编排者）收 wave44：Jarvis 二次空手；170/163 清数有料；前置核查解锁 47/23/33
+- **W65-jarvis 二次空手**（零文件、零提交）⇒ 判定该模型对该任务（纯 D2D 粒子渲染器）**能力不足**，改**拆步**：先 token+测试、再渲染器，且每次只写一个文件、必须提交。玻璃渲染器结构已摸清（`wensity_windows.go` 124 行，`setWensity`/`drawWensityBand`/`drawWensityEdges` 三函数）。
+- **T170 AC#1**（`51ef6a872`）：票面五枚 0 **今天复算不出**——Native 0→1、Panel 0→2、Veto 0→1直+2上游、DecideFrom* 0→4、**Replay 仍 0（故意，注释明写别当死码删）**；1166 枚 .go 解析失败 0、台件 POS 7/7 NEG 全零、wisp.exe 现编 rc=0 六符号在二进制里。⇒ 170 主体**已被后续票大半解决**；剩一问摆机主：**给 CLI 键入 `veto` 一枚 SPEC-06 §2 通道名，批/不批**。
+- **T163 AC#1b**（`95cab0c6f`/`31aa60ad5` 已 cherry-pick 主树 `ac7d14c7f`）：在册 `shell.exec`(PLAN:2574)+`shell.session`(:2575) 两枚，**生产注册表 0/2**（真 Registry 21 枚 Lookup 两枚全 false，对照组 task.output true），代码命中全非实现，DEFERRED 0 行 ⇒ 40 天仍是"在册＋零实现"。AC#1b 可闭格（留名不摘、照 164 先例留硬账）；AC#2/#3/#4 可同腿派（缝全现成）；AC#5 一句摆机主（`internal/config/unwired.go:63` 文案会撒谎、需批"只改文案不删守卫"）。
+- **前置核查（现跑）**：47 的前置 10/21 **均 done ⇒ 47 真解锁**；23 前置 20 done ⇒ 解锁；33 前置 07/12 done ⇒ 解锁。35/37/47/48 自身仍开（35 卡着 36/38/39/40 一批 UI 票）。
+- 派 **wave45**：W47（task scheduler pathlock，写腿）＋ W23（system window input tools，写腿）＋ W33（panel host C27，写腿）。
