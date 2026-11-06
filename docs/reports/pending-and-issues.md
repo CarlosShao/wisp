@@ -31335,3 +31335,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - 未推=15（网络间歇断，本地全安全），恢复统一推。
 - 授权登记：140 之 ci.yml「dev-branch doctor 断言 step」——编排者按先例规矩允许登记立此条；本次只出 diff 提案落证据＋做两处纯测试码修复（ticket224 WISP_ENV pin、R-140-1 恒真），ci.yml 本体待定是否摘。
 - 待办：剩余未结多为 C(owner 22)/D(真机 16)/E(CI 8)/F(gated 27)/B(前端 14)；干净可写 A 近见底（98/123 卡 CI 尾、177 AC#0 待 owner 选丙）⇒ 派 fresh census 找残余可写并出 owner 清单。
+
+## A1570（2026-11-06 16:xx，编排者）收 wave33＋派 wave34：140 修复落地；census-199 重普查 A=27（推翻"近见底"）
+- I140b（`1afa3c280`＋`6ae44b1fb` 140-ac2-fixes）：ticket224 WISP_ENV「先栽后钉」＋文件系统牙、R-140-1 恒真改码；变异三发各红；门禁全绿；**ci.yml 一字未动**（提案 diff 落证据 §5，待摘）。收讫。
+- CENSUS199（`b471d4b27` census-199.md）：107 未结重分桶 **A27/B31/C23/D11/E9/F3/W2/M1**；A 桶 27 张逐枚写面+why-now；owner 清单 23 项＋Q 汇总（Q-55 压 3 票、Q-59–Q-63 压 2 票）。**A=27 ⇒ 上一轮"干净可写近见底"判断被普查推翻**，可写货仍多。
+- 授权登记：85 之 ci.yml「lint 两把尺」变更——编排者按先例规矩登记允许 W85 腿改 ci.yml＋lint config；staticcheck pin 选型＝agent 自拍（铁律②）。
+- 派 wave34（4 写腿，face 各异，腿内自检在飞）：W21（审批门 seg2，internal/agent/approval＋cmd/wisp 唯一槽）/ W85（lint 尺，ci.yml）/ W200（AI 说明书，docs）/ W226（最后一格销账）。
+- 全池 done=286；网络已恢复，wave33 三提交已推（未推清零）；wave34 起本地继续。
+- owner 清单（23 项）已成形待机主过目，见 census-199.md §4。
