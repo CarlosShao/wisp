@@ -924,12 +924,31 @@ func (u *ballCardUI) Prompt(_ context.Context, p approval.Prompt) error {
 		b.TakeEscForCancel()
 	}
 	b.SetState(stateForCardLevel(p.Level))
+	// SPEC-06 §7's 「队头单显 + 深度角标（悬浮球必显，不能只藏面板）」, wired.
+	// The orb's state alone says somebody is being waited on; the badge says
+	// how many cards are in line behind the one on screen. It is posted AFTER
+	// SetState because applyStateLocked zeroes the badge on every state entry,
+	// and the STA queue runs posted tasks in order - so on a state change the
+	// zero lands first and the depth lands second, and on a same-state card
+	// (a second L2 while one is pending) the depth just updates in place.
+	if n := approvalDepthBadge(p); n > 0 {
+		b.SetBadge(n)
+	}
 	slog.Info("approval: 常驻进程显示一张确认卡片",
 		"corr", p.CorrelationID, "level", p.Level, "tool", p.Tool,
 		"orb_state", string(stateForCardLevel(p.Level)),
 		"esc_borrowed", p.Level == "L1",
+		"badge_depth", approvalDepthBadge(p),
 		"channels", channelRosterText(p.Channels))
 	fmt.Printf("wisp: 卡片挂起：%s %s（编号 %s）\n", p.Level, p.Tool, p.CorrelationID)
+	// The full native card - rules, task, depth, batch view, FULL params,
+	// paths, channels, window - through the one renderer the console surface
+	// also uses (ticket 21 segment 2). The orb cannot draw text; this process
+	// has a console, and SPEC-06 §7 owes the card content to whichever native
+	// face the human is reading.
+	for _, line := range approval.RenderCard(p) {
+		fmt.Println(line)
+	}
 
 	// A card whose borrow Win32 refused is a card the user cannot cancel. The
 	// report is the authority on that (internal/ball books the refusal there),
@@ -978,6 +997,11 @@ func (u *ballCardUI) Update(_ context.Context, e approval.Event) error {
 	case approval.EventDismissed, approval.EventStarted:
 		u.ra.cards.Forget(e.CorrelationID)
 		u.settleOrb()
+		// settleOrb returns the orb to Sleeping (which zeroes the badge) only
+		// when NO card is still awaiting. When one settles and another is
+		// behind it the state stays AwaitingApproval, and without this line the
+		// corner mark would keep advertising the older, deeper queue.
+		u.syncBadge()
 	case approval.EventWarning:
 		slog.Warn("approval: 常驻进程卡片进入醒目提示", "corr", e.CorrelationID, "text", e.Text)
 	}
@@ -1001,6 +1025,42 @@ func (u *ballCardUI) settleOrb() {
 	}
 	b.ReleaseEscAfterSession()
 	b.SetState(statemachine.StateSleeping)
+}
+
+// approvalDepthBadge is the orb's AwaitingApproval corner mark (SPEC-06 §7:
+// 「队头单显 + 深度角标（悬浮球必显，不能只藏面板）」). The shape is a pure
+// function so the law has an executable ruler without a Win32 window: only an
+// L2 queue card has a queue depth to show, an L1 window is not a queue item,
+// and a depth that somehow arrived at zero or below prints no mark rather
+// than a "0" a reader could take for an off-by-one claim about the queue.
+//
+// The value comes from Prompt.Depth, which the gate stamps from its own queue
+// at display time (approval/gate.go PendingApproval) - never from a re-read of
+// ball state, and never from the panel. This is the corner mark's only
+// producer; before ticket 21 segment 2 ball.SetBadge had no call site outside
+// cmd/balldebug.
+func approvalDepthBadge(p approval.Prompt) int {
+	if p.Level != "L2" || p.Depth <= 0 {
+		return 0
+	}
+	return p.Depth
+}
+
+// syncBadge refreshes the corner mark after one card left the queue while
+// others stayed: the orb's state was never re-entered (settleOrb early-returns
+// when a card is still awaiting, so applyStateLocked did not run), which means
+// the badge still carries the count from before the answer. With nobody
+// awaiting it does nothing - settleOrb already returned the orb to Sleeping,
+// and applyStateLocked zeroed the badge on that edge.
+func (u *ballCardUI) syncBadge() {
+	if _, awaiting := u.ra.cards.AwaitingHuman(); !awaiting {
+		return
+	}
+	b := u.currentBall()
+	if b == nil {
+		return
+	}
+	b.SetBadge(u.ra.gate.Queue().Depth())
 }
 
 // stateForCardLevel is the D43 name for "a human is being waited on at this

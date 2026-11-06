@@ -2258,21 +2258,18 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 			u.run.bookWaitingState("ui-prompt")
 		}
 	}
-	fmt.Fprintf(u.out, "\n[确认 %s %s] %s\n", p.Level, p.Tool, p.Reason)
-	for _, r := range p.RulesHit {
-		fmt.Fprintf(u.out, "  规则 %s\n", r)
+	// The card's content is rendered by approval.RenderCard - the same function
+	// the resident orb's card uses, so the two native surfaces cannot grow
+	// different disclosures of the same security card (ticket 21 segment 2).
+	// This loop owns only the host's print shape: the leading blank line and
+	// the per-line newline the console's cross-surface parsers expect.
+	for i, line := range approval.RenderCard(p) {
+		if i == 0 {
+			fmt.Fprintf(u.out, "\n%s\n", line)
+			continue
+		}
+		fmt.Fprintln(u.out, line)
 	}
-	for _, c := range p.Channels {
-		fmt.Fprintf(u.out, "  取消方式：%s（%s）\n", c.Text, channelState(c))
-	}
-	if len(p.Paths) > 0 {
-		fmt.Fprintf(u.out, "  影响路径：%s\n", strings.Join(p.Paths, ", "))
-	}
-	shownWindow := p.Window
-	if p.Level == "L2" { // an L2 card's Window is 0 by construction; its wait is Deadline
-		shownWindow = p.Deadline
-	}
-	fmt.Fprintf(u.out, "  窗口 %.1fs\n", shownWindow.Seconds())
 	// The address the operator answers against. Without it C18's 「回复按
 	// correlationId 路由」 is a rule a terminal user cannot obey, and a reply
 	// that names nothing is a reply the gate has to refuse as an unknown
@@ -2318,11 +2315,4 @@ func (u *consoleApprovalUI) Update(_ context.Context, e approval.Event) error {
 		}
 	}
 	return nil
-}
-
-func channelState(c approval.ChannelStatus) string {
-	if c.Loaded {
-		return "已加载"
-	}
-	return "未加载"
 }

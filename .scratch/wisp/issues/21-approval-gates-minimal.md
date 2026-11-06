@@ -96,3 +96,49 @@ block window (2–3s countdown strip) with its four veto channels, L2 native con
   41 flips ChannelRegistry.SetLoaded(ChannelKWS,true) once the model is
   resident; ticket 37 gets Queue.Panel() and nothing more. State machine D43
   #17,21-24 AC untouched here.
+
+- 2026-11-06 (segment 2, agent=C, wave 34, clone --shared tree 21s2): did=the
+  card-side of segment 2, narrowed by re-audit to what was ACTUALLY still open
+  (most of the old "next=" list landed via tickets 12/20/201/246 in between):
+  ① internal/agent/approval/cardrender.go - approval.RenderCard, the ONE
+  native card renderer both surfaces print through: header (unchanged
+  「[确认 level tool] reason」 shape the cross-surface tests parse), rules_hit
+  verbatim in order, owning task, L2 queue depth (SPEC-06 §7 深度角标 text
+  face), D45-1 batch view (total + affected dirs + first-5 + expandable
+  remainder, nil view prints nothing), FULL params (Args verbatim via
+  json.Indent, Params fallback via MarshalIndent, explicit gap sentence when
+  neither arrived, unparseable Args printed raw - never a summary), paths,
+  four channel lines with honest availability (「语音取消不可用」 travels in
+  the registry's Text), and the route's own window (Deadline on L2, Window on
+  L1 - ticket 376's polarity kept). ② cmd/wisp/run.go consoleApprovalUI.Prompt
+  now prints RenderCard's lines (was: rules/channels/paths/window only, full
+  params + batch never shown); dead channelState helper removed. ③
+  cmd/wisp/resident_approval_windows.go ballCardUI: Prompt posts
+  ball.SetBadge(p.Depth) AFTER SetState (STA queue order matters -
+  applyStateLocked zeroes the badge on state entry; on same-state cards the
+  depth updates in place), prints the full RenderCard lines on the console,
+  Update re-syncs the badge via Queue().Depth() when one card settles with
+  another still pending; helper approvalDepthBadge (L2+positive only).
+  ball.SetBadge had ZERO production callers before this leg (census: only
+  cmd/balldebug). ④ doc.go "Still owed" rewritten to the two true residuals
+  (decideRisk dead branch = cleanup; panel card half = ticket 37).
+  Tests: cardrender_test.go (10 cases, external pkg, incl. batch shape +
+  params-per-value + B1 channel wording), approval_card_render_21s2_test.go
+  (real gate -> console card -> native allow round trip; D45 batch card),
+  approval_badge_21s2_windows_test.go (pure mapping + AST census with
+  MUTATION-PROVEN tooth: removing the SetBadge post turns
+  TestTicket21S2BadgeWiringCensus and BadgePosts red, restored green).
+  Gates (clone tree D:\tmp\wisp\20261106\21s2\tree, CGO default=1, temp vars
+  unset per dispatch): go build ./cmd/... ./internal/... ./tools/... rc=0;
+  go test ./internal/agent/... -count=1 ok; go test ./cmd/wisp -run
+  <approval/card/badge-relevant set> -count=1 ok; full ./cmd/wisp suite
+  (result recorded in evidence file); gofumpt -l = 0 on all touched files;
+  sh scripts/d22scan.sh rc=0 clean (positive control PASS=35 FAIL=0, scan
+  examined 422 production files). NOT done, named: decideRisk dead-branch
+  deletion (internal/agent is ticket 12/162's surface, outside this leg's
+  write face); winlive visual verification of the badge on a real orb window
+  (260-r3 precedent: real-window rig belongs to the owner-present pass; the
+  census + mapping rulers are the headless half); AC boxes stay unticked
+  pending the non-implementer adversarial pass (rule 6).
+  next=non-implementer verdict + AC adjudication; ticket 41 KWS flip; ticket
+  37 panel card half.
