@@ -31392,3 +31392,8 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **W150**（`2ea6aa0fc` 已 fetch cherry-pick 回主树）：SPEC-12 §5 补 4 枚 DEFERRED 登记行（D28-1×3、D11-3×1），两向 diff 空；待非实现者裁＋AC#3(CI 仪器)缺口具名。
 - 机器卫生项（可选）：System32 旧 `onnxruntime.dll` 1.17.1 遮蔽致本机语音测试红，清则本地绿、不影响 CI。
 - 派 **wave38**：verdict350＋verdict150（非实现者裁，落 docs/evidence，不碰产码/票面）。
+
+## A1578（2026-11-06 18:xx，编排者）verdict21 首跑未收尾 ⇒ 重派窄口径
+- verdict21 腿（`6d36d06045a246da`）把 build/test 丢后台即结束、**未出裁决表＝未验证**；仅静态链核对（statemachine ok 2.4s；L2 混合→不聚合分支在 `internal/agent/approval/batch.go:36`；decideRisk 死分支仍在 `internal/agent/loop.go:919-924`＝residual#1）。
+- 重派 **verdict21-narrow**：只跑 build(cmd/wisp+approval)、`go test ./internal/agent` 审批族、隔离树 cmd/wisp 卡面貌族（实现者曾 41s 跑完）；单命令 >6 分钟即 kill 报 partial；**裁决必须写在腿最终返回**、⛔ 挂后台即散；门禁/全量 build/vet/d22scan 采信 W21 已记读数。
+- 在飞：wave36(68)、wave37(65 设计)、wave38(350/150 验收)、verdict21-narrow。
