@@ -4,7 +4,7 @@ package main
 //
 // WHAT ALREADY EXISTED BEFORE THIS FILE. The pump builds the packet and books it:
 // publishPanelSnapshot calls pump.Publish, Publish marshals the snapshot and hands
-// the bytes to src.Out, and out.bookPanelSnapshot retains them on the runtime
+// the bytes to src.Out, and out.bookPanelSnapshotBlocking retains them on the runtime
 // (cmd/wisp/panel_pump.go:360). What did NOT exist was any production reader of
 // that retention: lastPanelSnapshot had zero non-test callers, so the bytes stopped
 // at the ledger summary and never reached a page. That gap is ticket 329's subject,

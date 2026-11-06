@@ -955,7 +955,11 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// L1 confirmation windows this run's gate is holding open right now, read
 		// off the gate itself - see panel_pump.go's liveL1WindowWaits.
 		L1Windows: rt.liveL1WindowWaits,
-		Out:       rt.bookPanelSnapshot,
+		// Ticket 33 AC#8's naming split (33-r14): Publish keeps the blocking
+		// ledger entry by that name, and the AC#8 clamp-branch ruler drives the
+		// packet through tryBookPanelSnapshot when it needs a pass that cannot
+		// queue behind a publish already in flight.
+		Out: rt.bookPanelSnapshotBlocking,
 	})
 	// The console surface publishes a packet when the approval state moves. A
 	// host whose cards go somewhere else (ticket 246 AC#7's injected gate) has no

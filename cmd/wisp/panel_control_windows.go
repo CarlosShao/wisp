@@ -91,6 +91,21 @@ const (
 	panelEntryURL           = panelOrigin + "/" + panel.EntryFile
 )
 
+// panelCSPHeaderValue is the policy every document this filter serves carries
+// (ticket 33 AC#6): the strict CSP of SPEC-06 sec 9
+// (docs/specs/SPEC-06-security-gatekeeping.md:126) verbatim, whose own line
+// names connect-src 'none' as the exfiltration cut. It travels as a response
+// HEADER on the one serving surface this tree has - the
+// AddWebResourceRequestedFilter arm below - not as an injected <meta>, so a
+// page cannot strip it by rewriting its own document.
+const panelCSPHeaderValue = "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'"
+
+// panelCSPHeader is the header LINE handed to CreateWebResourceResponse. It is
+// on every response the filter answers - 200 and 404 alike - so the policy
+// reaches the entry document, every hashed asset and the not-found body, and
+// no served document exists without it.
+const panelCSPHeader = "Content-Security-Policy: " + panelCSPHeaderValue
+
 // entry points this file needs. Reused from panel_host_windows.go (same
 // package): pnlShowWindow, pnlUpdateWindow, pnlSetFocus, pnlGetAncestor,
 // pnlTranslateMsg, pnlDispatchMsgW.
@@ -474,12 +489,9 @@ func (c *panelControl) respondWithEmbeddedAsset(assets *panel.Assets, request *e
 		log.Printf("panel host: %s: no WebView2 environment to build a response", uri)
 		return
 	}
-	headers := ""
-	if status == 200 {
-		// The content type comes from Assets.Resolve's own second return value
-		// (assets.go:75); nothing here invents one.
-		headers = "Content-Type: " + contentType
-	}
+	// Ticket 33 AC#6: the CSP header is on EVERY response this filter answers,
+	// success or miss, so no document reaches the window without the policy.
+	headers := panelResponseHeaders(status, contentType)
 	response, err := panelBuildResponse(env, data, status, reason, headers)
 	if err != nil {
 		log.Printf("panel host: %s: CreateWebResourceResponse (status %d, %d byte(s), %q): %v",
@@ -489,6 +501,20 @@ func (c *panelControl) respondWithEmbeddedAsset(assets *panel.Assets, request *e
 	if err := args.PutResponse(response); err != nil {
 		log.Printf("panel host: %s: PutResponse: %v", uri, err)
 	}
+}
+
+// panelResponseHeaders builds the header string one filtered response carries.
+// It is a named function so the AC#6 ruler (panel_csp_33r14_windows_test.go)
+// asks the filter's own construction for the policy instead of re-spelling the
+// constant - the single build site stays here. The CSP line is on the miss
+// (empty) response too, so the not-found body is served under the same policy
+// as the documents around it. Content-Type is Assets.Resolve's own second
+// return value (assets.go:75); nothing here invents one.
+func panelResponseHeaders(status int, contentType string) string {
+	if status == 200 {
+		return "Content-Type: " + contentType + "\r\n" + panelCSPHeader
+	}
+	return panelCSPHeader
 }
 
 // panelBuildResponse creates one web-resource response, with a bounded retry of

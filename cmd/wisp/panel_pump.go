@@ -354,8 +354,9 @@ func stringList(v any) ([]string, bool) {
 	return out, true
 }
 
-// bookPanelSnapshot is the exit's far end, and it is where this repository's
-// missing transport becomes a measured fact rather than an assumption.
+// bookPanelSnapshotBlocking is the exit's far end, and it is where this
+// repository's missing transport becomes a measured fact rather than an
+// assumption.
 //
 // WHAT IT CAN AND CANNOT CARRY. The one durable, machine-readable destination a
 // `wisp run` has is its own ledger (cmd/wisp/logsink.go), and every string that
@@ -384,12 +385,33 @@ func stringList(v any) ([]string, bool) {
 // packet below, and a mismatch is visible instead of silent. The full bytes stay
 // with the process - and from ticket 329 they also go to the run's panel host,
 // verbatim, whenever this process owns one (panel_snapshot_deliver_329.go).
-func (rt *agentRuntime) bookPanelSnapshot(snap panel.Snapshot, data []byte) error {
+// Ticket 33 AC#8 (a) named the summary-clamp branch with no test reaching it;
+// the counter below is the test's only way in: the old name kept the branch a
+// single hop from Publish, so any synchronous test drive could take the slow
+// path too, and the empty ledger the miss produced was indistinguishable from
+// a run that never published at all. The new entry is 33-r14's.
+func (rt *agentRuntime) bookPanelSnapshotBlocking(snap panel.Snapshot, data []byte) error {
 	rt.snapMu.Lock()
 	rt.lastSnap, rt.lastSnapBytes, rt.snapSeen = snap, data, true
 	rt.snapMu.Unlock()
 	rt.spec.sink.logger().Info(panelSnapshotSummary(snap, data))
 	return nil
+}
+
+// tryBookPanelSnapshot is the non-blocking shape of the ledger entry above: the
+// packet is retained and the summary line logged ONLY when no other publish
+// currently holds the booking lock. A caller that loses the race leaves both the
+// ledger and the booking untouched and reports it, instead of parking behind the
+// holder (the blocking shape above is the one that waits - ticket 33 AC#8's
+// naming split, landed by 33-r14).
+func (rt *agentRuntime) tryBookPanelSnapshot(snap panel.Snapshot, data []byte) (bool, error) {
+	if !rt.snapMu.TryLock() {
+		return false, nil
+	}
+	rt.lastSnap, rt.lastSnapBytes, rt.snapSeen = snap, data, true
+	rt.snapMu.Unlock()
+	rt.spec.sink.logger().Info(panelSnapshotSummary(snap, data))
+	return true, nil
 }
 
 // panelSnapshotSummary renders the bounded ledger record. It clamps its own

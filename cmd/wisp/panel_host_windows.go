@@ -792,7 +792,13 @@ func (m *PanelManager) Hide() {
 	}
 	pnlShowWindow.Call(uintptr(hwnd), pnlSwHide)
 	pnlUpdateWindow.Call(uintptr(hwnd))
+	// The close reading (orchestrator's ticket 33 note, 2026-10-10 09:0x): a
+	// cold start logs "panel window is up" (panel_resident_windows.go:446) but
+	// the hide side logged nothing, so a toggle that closed the window left no
+	// trace at all. One line, same stdout surface, and the focus hand-back is
+	// named when there is one to hand back to.
 	if prev == 0 {
+		fmt.Printf("wisp: panel window hidden (no prior window to return focus to)\n")
 		return
 	}
 	rf, _, _ := pnlSetForeground.Call(uintptr(prev))
@@ -802,6 +808,7 @@ func (m *PanelManager) Hide() {
 	m.lastRestoreSetForeground = rf
 	m.lastRestoreSetFocus = rc
 	m.mu.Unlock()
+	fmt.Printf("wisp: panel window hidden (focus returned to hwnd 0x%x)\n", prev)
 }
 
 // terminateOnThisThread asks the window's message loop to end. It must be called
