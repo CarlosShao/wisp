@@ -31363,3 +31363,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **68 都按推荐**：R15#3→Settling 合成 0.95、#4→贴边露出修 ~50%、#5/Q-2→点击半径对齐可见外沿、R15#10 Q 列表按推荐。据此解锁 68 AC#2/AC#3：翻转 `prototypeVisuals` 默认=true＋按推荐值改 settling/dock/hit＋迁移断言。派 **W68**（internal/ball，腿内先判桌面；无桌面则只交码+非 winlive 门禁、AC#3 桌面复测留真机）。
 - **65**：机主自知参考图难找 ⇒ 改令编排者用搜索做**广度调研**语音球/助手球视觉方案（不限玻璃、含海外），给来源供机主挑选；选定后再返工质感。
 - **技术判断（铁律②）**：本球是 **44px 悬浮球、睡眠零定时器、CPU≤0.5%/私有 WS≤25MB（D32）** ⇒ 花哨 WebGL 常驻渲染会爆预算；落地取"活跃态音频驱动渲染＋睡眠态静态帧缓存"主流形，WebGL/着色器方案（liquid-glass/Codrops 3D visualizer）只作活跃态观感目标。
+
+## A1574（2026-11-06 18:xx，编排者）收 wave34＋收口 200＋W21 落回主树
+- **W200**（`a6861da41` 200-verdict）：8 格 AC 全绿 ⇒ 编排者翻框＋git mv 成 -done（files=1/done=1/open=0）。**全池 done 286→287。**
+- **W21**（隔离树 `026feeee2`/`21174d9bf`）：segment-2 切片完整落地（cardrender.RenderCard 唯一卡渲染器 FULL 参数/D45-1 批量/球深度角标 SetBadge+syncBadge；10 新测试+变异自证）；已 cherry-pick 主树（`fb10eae49`/`9468fccad`），`go build ./cmd/wisp ./internal/agent/approval` rc=0。**closeable=否**：待非实现者裁决＋两具名残余（decideRisk 死分支清理在 internal/agent/loop.go；角标真窗 winlive 签收）。
+- **W85**（`23b8fa25d`）：ci.yml lint 落刀（step 更名、run 行零变动）；gofumpt@v0.12.0 已钉、staticcheck 已能跑（37 finding/0 crash）；closeable=否（AC#1/#4 需推送后 CI 跑色；AC#2/#3 归票 122/85b）。
+- **W226**（`92d5a33d1`）：AC#5 归口②＝票 219 答复语法面，零产码停；closeable=否，等 219。
+- 新基线漂移登记（非本批责任）：256 花名册应 7 字段（归 375 尾）、247 prototypeVisuals 断言（W68 处理中）、`internal/risk` 涨 5 条（归 334/394→票 122）。
+- 待办：21 待非实现者裁决；219/224 解锁 226 撤销动词；下一波派 219、verdict21、及 A 桶余票（57/163/176/192/264/148/170/168/70/58/60 等）。
