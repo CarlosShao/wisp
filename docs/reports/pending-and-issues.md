@@ -31317,3 +31317,11 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - W271（dcd5bc825）PASS 选形=甲（哨兵保留+说明书+resident正控，三枚 resident 件全绿）；需台账 A648 追加甲形落地登记（撤销=回退三文件回 ac2c1d903）。
 - V185 null 阵亡（无产出，wave31 重派）；W123 null 阵亡，但死前遗留 113 行票123测试改动（程序化应答腿/8.3短路径/sync-root不skip）→ 编排者 go build+go vet 均 rc0、gofumpt 空后 swept 提交 abf2a35a6，待绿验（W123g 在跑）。
 - 网络：推送 12 次全 TLS 失败，未推=4 全在本地安全，恢复后统一推。
+
+## A1568（2026-11-06 13:xx，编排者）收 wave31：185/123/98/177 四腿全 PASS；⚠swept abf2a35a6 不完整已补修
+- V185（296117f0d 185-verdict）：AC#1/2/3/5/6/7 六格 PASS 无附条件可翻、AC#4 PARTIAL（3/10尺修复后树未复量，带注翻）。closeable=YES。撤销沿 A381「撤分页」。
+- W123g（f79d27b08 123-verdict）：AC#1/2/3/5/6 PASS（应答腿 2.24s vs 40s 超时、SyncRedTeam SKIP=0），AC#4 E尾(CI run)未取 ⇒ closeable=no。**关键发现**：swept abf2a35a6 引用 t123script 等 helper 只定义在未跟踪件 ⇒ 纯检出编不出 cmd/wisp 测试。
+- W98（55f3d4dea+e5c83bb83 98-*.md）：AC#1(i)(ii)(iii)读数+AC#4收敛草稿+AC#5门禁交齐；AC#3已4a682f698；AC#1(iii) E尾(gh run)、AC#4台账收敛归编排者 ⇒ 未全结。
+- W177（5e344d27c 177-design-core-and-accounting-r2）：AC#5分账/AC#6时序/AC#0普查凭据齐；本腿零改票面。⇒ AC#5/#6 可翻；AC#0 仍待 owner 选丙（保守不结）。
+- **修**：abf2a35a6 编译缺口 → 补交 cmd/wisp/ticket123_replyleg_{test,windows_test,other_test}.go（446831ea9）；**纯 HEAD 导出树 `go vet ./cmd/wisp` rc=0** 已核；已推（未推=0）。
+- 待办：185 可结（收口腿在跑）；271 需非实现者裁形后结；136 AC#7/#10、182 AC#4-7、98 AC#1iii/AC#4 仍开。
