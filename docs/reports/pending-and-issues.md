@@ -31446,3 +31446,9 @@ R7 STAT done=189 live=175 void=1 blocked-on-owner=1 blocked=4 ready-right-now=78
 - **T264 AC#0**（`77d114b00`）：现量 **①103/112 处 err.Error() 可进模型可见正文（39 枚带绝对路径）②既有脱敏点 0 枚**；建议咽喉一处（`loop.go:1251 toolResultParts`）掩发送副本、须绕开 174-r8 的 task.output 指针钉。**待机主一句话**：甲（脱敏）/乙（只装仪器）/不做。
 - **T274 AC#0**（`014ae20a1`）：现量 (a) CI lint-frontend 产 3 枚落 dist 即弃、无通道进 exe；(b) build.ps1 `panel-assets built=true` 内嵌 4 枚、本机复现 exe 内嵌 sha256 与 dist 逐枚相等 ⇒ **既非"只改注释"、也不再是开着的接线缺口**；唯一文字欠账＝`SPEC-11 §2.2` 与实现反向矛盾（改 spec＝人工批准，另案）。**AC#0 可翻。**
 - 派 **wave43**：W65-jarvis（`jarvis_windows.go` 粒子球：粒子10–15%、2–3椭圆轨道、态差结构差 thinking0.67R/alert0.39R、palette 色相 cyan187°/violet#9F63FF、D32 静帧）＋ verdict65（非实现者复核玻璃码＋非桌面门禁）。
+
+## A1587（2026-11-06 20:xx，编排者）收 wave43：65 裁决 4/6 PASS；**W65-jarvis 空手返回 ⇒ 重派**
+- **verdict65**（`1a1f6b344`）：九道门全绿新鲜复跑；量化规格逐枚核实在码里（0.13R/0.39R/0.33R/六stop序/顶弧0.95R·0.04R·57°/右下唇0.97R/42%dock/0.95settling/0.15R形变/伪谱400·40ms）；D32 双钉 PASS。AC 判：**#1 PASS**（上位替代件＝65-style-direction.md；票面写的 `65-glass-reference-analysis.md` 不存在＝编排者簿记项）、**#2 PASS**、**#3/#5 未做＝真桌面件**、**#4 PASS**、**#6＝人判不可代行** ⇒ 65 保持 open。
+- **W65-jarvis 空手**：返回空字符串、盘上零文件（`internal/ball/jarvis*` 不存在、无 `65-jarvis-impl.md`、无克隆树）⇒ 记作**未验证/未交付**，重派 **W65jarvis2**（更窄、明确只写一个文件＋一个测试文件、给足量化参数、⛔ 不许跑 GUI）。
+- 65 仍欠：**机主真桌面 6 步**（build → `-diff -diff-gate` 看 timers=no/cpu/px≥2120 → `-style jarvis` 对拍 → 三张截图 → **`-tour -style glass` 眼睛判「这次对了」** → 编排者摘 SPEC-08 INTERIM 标注结票）。
+- 派 **wave44**：W65jarvis2（写腿，internal/ball）＋ T170a1（AC#1 复算普查那五个 0，只读分析）＋ T163a1b（AC#1b 现量归口，只读分析）。
